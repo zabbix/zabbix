@@ -153,6 +153,14 @@
 
 		activateSortable();
 		rewriteNameLinks();
+
+		// refresh form if Y axis was ITEM without any item
+		if (list.values.length > 0) {
+			if ((jQuery('#ymin_type').val() == '<?php echo GRAPH_YAXIS_TYPE_ITEM_VALUE; ?>' && jQuery('#ymin_name').length == 0)
+					|| (jQuery('#ymax_type').val() == '<?php echo GRAPH_YAXIS_TYPE_ITEM_VALUE; ?>' && jQuery('#ymax_name').length == 0)) {
+				jQuery('form[name="graphForm"]').submit();
+			}
+		}
 	}
 
 	function getOnlyHostParam() {
@@ -189,6 +197,14 @@
 
 		recalculateSortOrder();
 		activateSortable();
+
+		// refresh form if Y axis was ITEM without any item
+		if (jQuery('#itemsTable tr.sortable').length == 0) {
+			if ((jQuery('#ymin_type').val() == '<?php echo GRAPH_YAXIS_TYPE_ITEM_VALUE; ?>' && jQuery('#ymin_name').length > 0)
+					|| (jQuery('#ymax_type').val() == '<?php echo GRAPH_YAXIS_TYPE_ITEM_VALUE; ?>' && jQuery('#ymax_name').length > 0)) {
+				jQuery('form[name="graphForm"]').submit();
+			}
+		}
 	}
 
 	function recalculateSortOrder() {
