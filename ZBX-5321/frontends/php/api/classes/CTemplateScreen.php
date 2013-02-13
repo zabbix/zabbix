@@ -52,7 +52,7 @@ class CTemplateScreen extends CScreen {
 		$subselectsAllowedOutputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND);
 
 		$sqlParts = array(
-			'select'	=> array('screens' => 's.screenid, s.templateid'),
+			'select'	=> array('screens' => 's.screenid,s.templateid'),
 			'from'		=> array('screens' => 'screens s'),
 			'where'		=> array('template' => 's.templateid IS NOT NULL'),
 			'order'		=> array(),
@@ -276,9 +276,9 @@ class CTemplateScreen extends CScreen {
 		}
 		$sqlLimit = $sqlParts['limit'];
 
-		$sql = 'SELECT '.zbx_db_distinct($sqlParts).' '.$sqlSelect.'
-					FROM '.$sqlFrom.'
-					WHERE '.DBin_node('s.screenid', $nodeids).
+		$sql = 'SELECT '.zbx_db_distinct($sqlParts).' '.$sqlSelect.
+					'FROM '.$sqlFrom.
+					'WHERE '.DBin_node('s.screenid', $nodeids).
 					$sqlWhere.
 					$sqlGroup.
 					$sqlOrder;

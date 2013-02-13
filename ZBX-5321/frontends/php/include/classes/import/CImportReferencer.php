@@ -600,7 +600,7 @@ class CImportReferencer {
 			}
 
 			if ($sqlWhere) {
-				$dbApplications = DBselect('SELECT applicationid, hostid, name FROM applications WHERE '.implode(' OR ', $sqlWhere));
+				$dbApplications = DBselect('SELECT applicationid,hostid,name FROM applications WHERE '.implode(' OR ', $sqlWhere));
 				while ($dbApplication = DBfetch($dbApplications)) {
 					$this->applicationsRefs[$dbApplication['hostid']][$dbApplication['name']] = $dbApplication['applicationid'];
 				}
@@ -670,9 +670,9 @@ class CImportReferencer {
 			$this->triggersRefs = array();
 
 			$triggerIds = array();
-			$sql = 'SELECT t.triggerid,t.expression,t.description
-				FROM triggers t
-				WHERE '.dbConditionString('t.description', array_keys($this->triggers));
+			$sql = 'SELECT t.triggerid,t.expression,t.description'.
+				' FROM triggers t'.
+				'WHERE '.dbConditionString('t.description', array_keys($this->triggers));
 			$dbTriggers = DBselect($sql);
 			while ($dbTrigger = DBfetch($dbTriggers)) {
 				$dbExpr = explode_exp($dbTrigger['expression']);
