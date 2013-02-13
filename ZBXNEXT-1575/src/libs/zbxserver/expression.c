@@ -334,11 +334,12 @@ int	evaluate(double *value, char *exp, char *error, int maxerrlen)
  *           Use zbx_free_numbers to free allocated memory                    *
  *                                                                            *
  ******************************************************************************/
-static char 	**extract_numbers(char *str, int *count)
+static char 	**extract_numbers(const char *str, int *count)
 {
-	char	*s, *e, **result = NULL;
-	int	dot_found;
-	size_t	len;
+	char		**result = NULL;
+	const char	*s, *e;
+	int		dot_found;
+	size_t		len;
 
 	assert(count);
 
@@ -412,38 +413,23 @@ static void	zbx_free_numbers(char ***numbers, int count)
  *                                                                            *
  * Parameters: data - trigger description                                     *
  *                                                                            *
- * Return value:                                                              *
- *                                                                            *
- * Author: Eugene Grigorjev                                                   *
- *                                                                            *
- * Comments: !!! Don't forget to sync the code with PHP !!!                   *
- *           replace ONLY $1-9 macros NOT {HOSTNAME}                          *
- *                                                                            *
  ******************************************************************************/
-static void	expand_trigger_description_constants(char **data, zbx_uint64_t triggerid)
+static void	expand_trigger_description_constants(char **data, const char *expression)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
-	char		**numbers = NULL, *new_str = NULL, replace[3] = "$0";
-	int		numbers_cnt = 0, i = 0;
+	char	**numbers = NULL, *new_str = NULL, replace[3] = "$0";
+	int	numbers_cnt = 0, i = 0;
 
-	result = DBselect("select expression from triggers where triggerid=" ZBX_FS_UI64, triggerid);
+	numbers = extract_numbers(expression, &numbers_cnt);
 
-	if (NULL != (row = DBfetch(result)))
+	for (i = 0; i < 9; i++)
 	{
-		numbers = extract_numbers(row[0], &numbers_cnt);
-
-		for (i = 0; i < 9; i++)
-		{
-			replace[1] = '0' + i + 1;
-			new_str = string_replace(*data, replace, i < numbers_cnt ?  numbers[i] : "");
-			zbx_free(*data);
-			*data = new_str;
-		}
-
-		zbx_free_numbers(&numbers, numbers_cnt);
+		replace[1] = '0' + i + 1;
+		new_str = string_replace(*data, replace, i < numbers_cnt ?  numbers[i] : "");
+		zbx_free(*data);
+		*data = new_str;
 	}
-	DBfree_result(result);
+
+	zbx_free_numbers(&numbers, numbers_cnt);
 }
 
 static void	DCexpand_trigger_expression(char **expression)
@@ -1736,6 +1722,7 @@ static int	get_autoreg_value_by_event(DB_EVENT *event, char **replace_to, const 
 #define MVAR_TRIGGER_SEVERITY		"{TRIGGER.SEVERITY}"
 #define MVAR_TRIGGER_NSEVERITY		"{TRIGGER.NSEVERITY}"
 #define MVAR_TRIGGER_STATUS		"{TRIGGER.STATUS}"
+#define MVAR_TRIGGER_STATE		"{TRIGGER.STATE}"
 #define MVAR_STATUS			"{STATUS}"			/* deprecated */
 #define MVAR_TRIGGER_VALUE		"{TRIGGER.VALUE}"
 #define MVAR_TRIGGER_URL		"{TRIGGER.URL}"
@@ -2157,7 +2144,7 @@ int	substitute_simple_macros(DB_EVENT *event, zbx_uint64_t *hostid, DC_HOST *dc_
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() data:'%s'", __function_name, *data);
 
 	if (macro_type & MACRO_TYPE_TRIGGER_DESCRIPTION)
-		expand_trigger_description_constants(data, event->objectid);
+		expand_trigger_description_constants(data, event->trigger.expression);
 
 	p = *data;
 	if (NULL == (m = bl = strchr(p, '{')))
@@ -2195,7 +2182,7 @@ int	substitute_simple_macros(DB_EVENT *event, zbx_uint64_t *hostid, DC_HOST *dc_
 
 		if (macro_type & MACRO_TYPE_MESSAGE)
 		{
-			if (EVENT_SOURCE_TRIGGERS == event->source)
+			if (EVENT_OBJECT_TRIGGER == event->object)
 			{
 				if (0 == strcmp(m, MVAR_TRIGGER_NAME))
 				{
@@ -2288,11 +2275,16 @@ int	substitute_simple_macros(DB_EVENT *event, zbx_uint64_t *hostid, DC_HOST *dc_
 					replace_to = zbx_strdup(replace_to, zbx_date2str(time(NULL)));
 				else if (0 == strcmp(m, MVAR_TIME))
 					replace_to = zbx_strdup(replace_to, zbx_time2str(time(NULL)));
-				else if (0 == strcmp(m, MVAR_TRIGGER_STATUS) || 0 == strcmp(m, MVAR_STATUS))
+				else if (EVENT_SOURCE_TRIGGERS == event->source &&
+						(0 == strcmp(m, MVAR_TRIGGER_STATUS) || 0 == strcmp(m, MVAR_STATUS)))
+				{
 					replace_to = zbx_strdup(replace_to, event->value == TRIGGER_VALUE_PROBLEM ? "PROBLEM" : "OK");
+				}
+				else if (EVENT_SOURCE_INTERNAL == event->source && 0 == strcmp(m, MVAR_TRIGGER_STATE))
+					replace_to = zbx_strdup(replace_to, zbx_trigger_state_string(event->value));
 				else if (0 == strcmp(m, MVAR_TRIGGER_ID))
 					replace_to = zbx_dsprintf(replace_to, ZBX_FS_UI64, event->objectid);
-				else if (0 == strcmp(m, MVAR_TRIGGER_VALUE))
+				else if (EVENT_SOURCE_TRIGGERS == event->source && 0 == strcmp(m, MVAR_TRIGGER_VALUE))
 					replace_to = zbx_dsprintf(replace_to, "%d", event->value);
 				else if (0 == strcmp(m, MVAR_TRIGGER_URL))
 				{
@@ -2300,14 +2292,26 @@ int	substitute_simple_macros(DB_EVENT *event, zbx_uint64_t *hostid, DC_HOST *dc_
 					substitute_simple_macros(event, hostid, dc_host, dc_item, escalation,
 							&replace_to, MACRO_TYPE_TRIGGER_URL, error, maxerrlen);
 				}
-				else if (0 == strcmp(m, MVAR_TRIGGER_EVENTS_ACK))
+				else if (EVENT_SOURCE_TRIGGERS == event->source &&
+						0 == strcmp(m, MVAR_TRIGGER_EVENTS_ACK))
+				{
 					ret = DBget_trigger_event_count(event->objectid, &replace_to, 0, 1);
-				else if (0 == strcmp(m, MVAR_TRIGGER_EVENTS_UNACK))
+				}
+				else if (EVENT_SOURCE_TRIGGERS == event->source &&
+						0 == strcmp(m, MVAR_TRIGGER_EVENTS_UNACK))
+				{
 					ret = DBget_trigger_event_count(event->objectid, &replace_to, 0, 0);
-				else if (0 == strcmp(m, MVAR_TRIGGER_EVENTS_PROBLEM_ACK))
+				}
+				else if (EVENT_SOURCE_TRIGGERS == event->source &&
+						0 == strcmp(m, MVAR_TRIGGER_EVENTS_PROBLEM_ACK))
+				{
 					ret = DBget_trigger_event_count(event->objectid, &replace_to, 1, 1);
-				else if (0 == strcmp(m, MVAR_TRIGGER_EVENTS_PROBLEM_UNACK))
+				}
+				else if (EVENT_SOURCE_TRIGGERS == event->source &&
+						0 == strcmp(m, MVAR_TRIGGER_EVENTS_PROBLEM_UNACK))
+				{
 					ret = DBget_trigger_event_count(event->objectid, &replace_to, 1, 0);
+				}
 				else if (0 == strcmp(m, MVAR_EVENT_ID))
 					replace_to = zbx_dsprintf(replace_to, ZBX_FS_UI64, event->eventid);
 				else if (0 == strcmp(m, MVAR_EVENT_DATE))
@@ -2316,10 +2320,16 @@ int	substitute_simple_macros(DB_EVENT *event, zbx_uint64_t *hostid, DC_HOST *dc_
 					replace_to = zbx_strdup(replace_to, zbx_time2str(event->clock));
 				else if (0 == strcmp(m, MVAR_EVENT_AGE))
 					replace_to = zbx_strdup(replace_to, zbx_age2str(time(NULL) - event->clock));
-				else if (0 == strcmp(m, MVAR_EVENT_ACK_STATUS))
+				else if (EVENT_SOURCE_TRIGGERS == event->source &&
+						0 == strcmp(m, MVAR_EVENT_ACK_STATUS))
+				{
 					replace_to = zbx_strdup(replace_to, event->acknowledged ? "Yes" : "No");
-				else if (0 == strcmp(m, MVAR_EVENT_ACK_HISTORY))
+				}
+				else if (EVENT_SOURCE_TRIGGERS == event->source &&
+						0 == strcmp(m, MVAR_EVENT_ACK_HISTORY))
+				{
 					ret = get_event_ack_history(event, &replace_to);
+				}
 				else if (0 == strcmp(m, MVAR_ESC_HISTORY))
 					ret = get_escalation_history(event, escalation, &replace_to);
 				else if (0 == strcmp(m, MVAR_TRIGGER_SEVERITY))
@@ -2341,7 +2351,7 @@ int	substitute_simple_macros(DB_EVENT *event, zbx_uint64_t *hostid, DC_HOST *dc_
 					*br = '\0';
 				}
 			}
-			else if (EVENT_SOURCE_DISCOVERY == event->source)
+			else if (EVENT_OBJECT_DHOST == event->object || EVENT_OBJECT_DSERVICE == event->object)
 			{
 				if (0 == strcmp(m, MVAR_DATE))
 					replace_to = zbx_strdup(replace_to, zbx_date2str(time(NULL)));
@@ -2414,7 +2424,7 @@ int	substitute_simple_macros(DB_EVENT *event, zbx_uint64_t *hostid, DC_HOST *dc_
 					}
 				}
 			}
-			else if (EVENT_SOURCE_AUTO_REGISTRATION == event->source)
+			else if (EVENT_OBJECT_ZABBIX_ACTIVE == event->object)
 			{
 				if (0 == strcmp(m, MVAR_DATE))
 					replace_to = zbx_strdup(replace_to, zbx_date2str(time(NULL)));
@@ -2456,7 +2466,7 @@ int	substitute_simple_macros(DB_EVENT *event, zbx_uint64_t *hostid, DC_HOST *dc_
 		}
 		else if (macro_type & (MACRO_TYPE_TRIGGER_DESCRIPTION | MACRO_TYPE_TRIGGER_COMMENTS))
 		{
-			if (EVENT_SOURCE_TRIGGERS == event->source)
+			if (EVENT_OBJECT_TRIGGER == event->object)
 			{
 				if (0 == strcmp(m, MVAR_HOST_HOST) || 0 == strcmp(m, MVAR_HOSTNAME))
 				{
@@ -2500,7 +2510,7 @@ int	substitute_simple_macros(DB_EVENT *event, zbx_uint64_t *hostid, DC_HOST *dc_
 		}
 		else if (macro_type & MACRO_TYPE_TRIGGER_EXPRESSION)
 		{
-			if (EVENT_SOURCE_TRIGGERS == event->source)
+			if (EVENT_OBJECT_TRIGGER == event->object)
 			{
 				if (0 == strcmp(m, MVAR_TRIGGER_VALUE))
 					replace_to = zbx_dsprintf(replace_to, "%d", event->value);
@@ -2514,7 +2524,7 @@ int	substitute_simple_macros(DB_EVENT *event, zbx_uint64_t *hostid, DC_HOST *dc_
 		}
 		else if (macro_type & MACRO_TYPE_TRIGGER_URL)
 		{
-			if (EVENT_SOURCE_TRIGGERS == event->source)
+			if (EVENT_OBJECT_TRIGGER == event->object)
 			{
 				if (0 == strcmp(m, MVAR_TRIGGER_ID))
 					replace_to = zbx_dsprintf(replace_to, ZBX_FS_UI64, event->objectid);

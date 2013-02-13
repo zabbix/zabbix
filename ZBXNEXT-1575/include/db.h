@@ -367,21 +367,11 @@ DB_ACTION;
 
 typedef struct
 {
-	zbx_uint64_t	operationid;
-	zbx_uint64_t	actionid;
-	int		operationtype;
-	int		esc_period;
-	unsigned char	evaltype;
-}
-DB_OPERATION;
-
-typedef struct
-{
 	zbx_uint64_t	conditionid;
 	zbx_uint64_t	actionid;
-	zbx_condition_type_t	conditiontype;
-	zbx_condition_op_t	operator;
 	char		*value;
+	unsigned char	conditiontype;
+	unsigned char	operator;
 }
 DB_CONDITION;
 

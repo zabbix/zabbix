@@ -2686,6 +2686,19 @@ const char	*zbx_escalation_status_string(unsigned char status)
 	}
 }
 
+const char	*zbx_trigger_state_string(unsigned char state)
+{
+	switch (state)
+	{
+		case TRIGGER_STATE_NORMAL:
+			return "Normal";
+		case TRIGGER_STATE_UNKNOWN:
+			return "Unknown";
+		default:
+			return "unknown";
+	}
+}
+
 #ifdef _WINDOWS
 static int	get_codepage(const char *encoding, unsigned int *codepage)
 {
