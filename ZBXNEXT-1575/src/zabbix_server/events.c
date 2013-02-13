@@ -126,19 +126,6 @@ static void	save_events()
 
 /******************************************************************************
  *                                                                            *
- * Function: process_event                                                    *
- *                                                                            *
- * Purpose: process new event                                                 *
- *                                                                            *
- * Parameters: event - event data                                             *
- *                                                                            *
- ******************************************************************************/
-static void	process_event(DB_EVENT *event)
-{
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: clean_events                                                     *
  *                                                                            *
  * Purpose: cleans all array entries and resets events_num                    *
