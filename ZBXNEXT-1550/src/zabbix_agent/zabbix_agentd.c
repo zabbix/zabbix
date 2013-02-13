@@ -538,7 +538,7 @@ int	MAIN_ZABBIX_ENTRY()
 	init_perf_collector(1);
 	load_perf_counters(CONFIG_PERF_COUNTERS);
 #endif
-	if (FAIL == load_modules(CONFIG_LOAD_MODULE_PATH, CONFIG_LOAD_MODULE))
+	if (FAIL == load_modules(CONFIG_LOAD_MODULE_PATH, CONFIG_LOAD_MODULE, CONFIG_TIMEOUT))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "loading modules failed, exiting...");
 		exit(FAIL);
@@ -735,7 +735,7 @@ int	main(int argc, char **argv)
 			init_perf_collector(0);
 			load_perf_counters(CONFIG_PERF_COUNTERS);
 #endif
-			if (FAIL == load_modules(CONFIG_LOAD_MODULE_PATH, CONFIG_LOAD_MODULE))
+			if (FAIL == load_modules(CONFIG_LOAD_MODULE_PATH, CONFIG_LOAD_MODULE, CONFIG_TIMEOUT))
 			{
 				zabbix_log(LOG_LEVEL_CRIT, "loading modules failed, exiting...");
 				exit(FAIL);

@@ -51,6 +51,7 @@ void	add_metric(ZBX_METRIC *new)
 	if (NULL == new->key)
 		return;
 
+/* TODO we should verify that key does not exists */
 	while (NULL != commands[i].key)
 		i++;
 
@@ -85,6 +86,7 @@ int	add_user_parameter(const char *key, char *command)
 		flag |= CF_USEUPARAM;
 	}
 
+/* TODO It should use add_metric */
 	for (i = 0;; i++)
 	{
 		/* add new parameters */
@@ -106,54 +108,6 @@ int	add_user_parameter(const char *key, char *command)
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "failed to add UserParameter \"%s\": duplicate key", key);
 			exit(FAIL);
-		}
-	}
-
-	return SUCCEED;
-}
-
-int	add_user_module(const char *key, int (*function)())
-{
-	int		i;
-	char		usr_cmd[MAX_STRING_LEN], usr_param[MAX_STRING_LEN];
-	unsigned	flag = CF_MODFUNCTION;
-
-	if (ZBX_COMMAND_ERROR == (i = parse_command(key, usr_cmd, sizeof(usr_cmd), usr_param, sizeof(usr_param))))
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "failed to add module function \"%s\": parsing error", key);
-		return FAIL;
-	}
-	else if (ZBX_COMMAND_WITH_PARAMS == i)
-	{
-		if (0 != strcmp(usr_param, "*"))	/* must be '*' parameters */
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "failed to add module function \"%s\": invalid key", key);
-			return FAIL;
-		}
-		flag |= CF_USEUPARAM;
-	}
-
-	for (i = 0;; i++)
-	{
-		/* add new parameters */
-		if (NULL == commands[i].key)
-		{
-			commands[i].key = zbx_strdup(NULL, usr_cmd);
-			commands[i].flags = flag;
-			commands[i].function = function;
-			commands[i].main_param = 0;
-			commands[i].test_param = 0;
-
-			commands = zbx_realloc(commands, (i + 2) * sizeof(ZBX_METRIC));
-			commands[i + 1].key = NULL;
-			break;
-		}
-
-		/* treat duplicate UserParameters as error */
-		if (0 == strcmp(commands[i].key, usr_cmd))
-		{
-			zabbix_log(LOG_LEVEL_CRIT, "failed to add module function \"%s\": duplicate key", key);
-			return FAIL;
 		}
 	}
 
@@ -241,7 +195,6 @@ void	init_request(AGENT_REQUEST *request)
 	request->key = NULL;
 
 	request->nparam = 0;
-	request->timeout = 0;
 	request->params = NULL;
 }
 
@@ -281,18 +234,16 @@ void	free_request(AGENT_REQUEST *request)
  * Return value: request - structure filled with data from item key           *
  *                                                                            *
  * Comment: this function should be rewritten to get rid of key,buf,get_param *
+ *          nparam must be 0 (not 1!) if no parameters given                  *
  *                                                                            *
  ******************************************************************************/
 int	parse_item_key(char *cmd, char *key, AGENT_REQUEST *request)
 {
 	int i;
-/* TODO Rewrite without use of buf, key and get_param */
 	char		buf[MAX_STRING_LEN];
 
 	request->nparam = num_param(cmd);
 	request->key = zbx_strdup(NULL, key);
-
-/* TODO Perhaps params[0] should return key? It will simplify agents */
 
 	request->params = zbx_malloc(request->params, request->nparam * sizeof(char *));
 
@@ -553,8 +504,6 @@ int	process(const char *in_command, unsigned flags, AGENT_RESULT *result)
 				free_request(&request);
 				goto notsupported;
 			}
-/* TODO Not sure if it is the best place to set timeout */
-			request.timeout = CONFIG_TIMEOUT;
 			if (ZBX_MODULE_OK != command->function(&request, result))
 			{
 				free_request(&request);
