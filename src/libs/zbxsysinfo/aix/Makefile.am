@@ -15,4 +15,4 @@ libspecsysinfo_a_SOURCES = \
 	swap.c \
 	uptime.c \
 	vmstats.c
-	
+
