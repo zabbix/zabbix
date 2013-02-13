@@ -144,6 +144,7 @@ const char	*zbx_result_string(int result);
 #define MAX_STRING_LEN		2048
 #define MAX_BUFFER_LEN		65536
 #define MAX_ZBX_HOSTNAME_LEN	64
+#define MAX_EXECUTE_OUTPUT_LEN	(512 * ZBX_KIBIBYTE)
 
 #define ZBX_MAX_UINT64_LEN	21
 #define ZBX_DM_DELIMITER	'\255'
@@ -650,10 +651,8 @@ typedef enum
 typedef enum
 {
 	PERM_DENY = 0,
-	PERM_READ_LIST,
-	PERM_READ_ONLY,
-	PERM_READ_WRITE,
-	PERM_MAX = 3
+	PERM_READ = 2,
+	PERM_READ_WRITE
 } zbx_user_permission_t;
 
 const char	*zbx_permission_string(int perm);
@@ -979,6 +978,7 @@ void	uint64_array_remove_both(zbx_uint64_t *values, int *num, zbx_uint64_t *rm_v
 
 #ifdef _WINDOWS
 LPTSTR	zbx_acp_to_unicode(LPCSTR acp_string);
+LPTSTR	zbx_oemcp_to_unicode(LPCSTR oemcp_string);
 int	zbx_acp_to_unicode_static(LPCSTR acp_string, LPTSTR wide_string, int wide_size);
 LPTSTR	zbx_utf8_to_unicode(LPCSTR utf8_string);
 LPSTR	zbx_unicode_to_utf8(LPCTSTR wide_string);

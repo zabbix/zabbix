@@ -250,7 +250,7 @@ class ZBase {
 			}
 
 			// don't show the call to this handler function
-			error($errstr.' ['.CProfiler::getInstance()->formatCallStack(1).']');
+			error($errstr.' ['.CProfiler::getInstance()->formatCallStack().']');
 		}
 
 		set_error_handler('zbx_err_handler');

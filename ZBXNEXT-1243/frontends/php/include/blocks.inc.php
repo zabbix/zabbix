@@ -266,14 +266,7 @@ function make_system_status($filter) {
 			'limit' => 1
 		);
 		$events = API::Event()->get($options);
-		if (empty($events)) {
-			$trigger['event'] = array(
-				'value' => $trigger['value'],
-				'acknowledged' => true,
-				'clock' => $trigger['lastchange']
-			);
-		}
-		else {
+		if ($events) {
 			$trigger['event'] = reset($events);
 		}
 
@@ -287,7 +280,7 @@ function make_system_status($filter) {
 			}
 
 			if (in_array($filter['extAck'], array(EXTACK_OPTION_UNACK, EXTACK_OPTION_BOTH))
-					&& !$trigger['event']['acknowledged']) {
+					&& isset($trigger['event']) && !$trigger['event']['acknowledged']) {
 				$groups[$group['groupid']]['tab_priority'][$trigger['priority']]['count_unack']++;
 
 				if ($groups[$group['groupid']]['tab_priority'][$trigger['priority']]['count_unack'] < 30) {
@@ -965,6 +958,15 @@ function make_latest_issues(array $filter = array()) {
 	return $widgetDiv;
 }
 
+/**
+ * Create and return a DIV with web monitoring overview.
+ *
+ * @param array $filter
+ * @param array $filter['groupids']
+ * @param bool  $filter['maintenance']
+ *
+ * @return CDiv
+ */
 function make_webmon_overview($filter) {
 	$groups = API::HostGroup()->get(array(
 		'groupids' => $filter['groupids'],
@@ -974,20 +976,20 @@ function make_webmon_overview($filter) {
 		'preservekeys' => true
 	));
 
-	foreach($groups as &$group) {
+	foreach ($groups as &$group) {
 		$group['nodename'] = get_node_name_by_elid($group['groupid']);
 	}
 	unset($group);
 
-	// we need natural sort
-	$sortFields = array(
+	CArrayHelper::sort($groups, array(
 		array('field' => 'nodename', 'order' => ZBX_SORT_UP),
 		array('field' => 'name', 'order' => ZBX_SORT_UP)
-	);
-	CArrayHelper::sort($groups, $sortFields);
+	));
+
+	$groupIds = array_keys($groups);
 
 	$availableHosts = API::Host()->get(array(
-		'groupids' => array_keys($groups),
+		'groupids' => $groupIds,
 		'monitored_hosts' => true,
 		'filter' => array('maintenance_status' => $filter['maintenance']),
 		'output' => array('hostid'),
@@ -995,7 +997,7 @@ function make_webmon_overview($filter) {
 	));
 	$availableHostIds = array_keys($availableHosts);
 
-	$table  = new CTableInfo();
+	$table = new CTableInfo();
 	$table->setHeader(array(
 		is_show_all_nodes() ? _('Node') : null,
 		_('Host group'),
@@ -1004,46 +1006,42 @@ function make_webmon_overview($filter) {
 		_('Unknown')
 	));
 
+	$data = array();
+
+	$result = DBselect(
+		'SELECT DISTINCT ht.httptestid,i.lastclock,i.lastvalue,hg.groupid'.
+		' FROM items i,httptestitem hti,httptest ht,hosts_groups hg'.
+		' WHERE i.itemid=hti.itemid'.
+			' AND hti.httptestid=ht.httptestid'.
+			' AND hti.type='.HTTPSTEP_ITEM_TYPE_LASTSTEP.
+			' AND ht.status='.HTTPTEST_STATUS_ACTIVE.
+			' AND ht.hostid=hg.hostid'.
+			' AND '.dbConditionInt('hg.hostid', $availableHostIds).
+			' AND '.dbConditionInt('hg.groupid', $groupIds)
+	);
+	while ($row = DBfetch($result)) {
+		if (!$row['lastclock']) {
+			$data[$row['groupid']]['unknown'] = empty($data[$row['groupid']]['unknown']) ? 1 : ++$data[$row['groupid']]['unknown'];
+		}
+		elseif ($row['lastvalue'] != 0) {
+			$data[$row['groupid']]['failed'] = empty($data[$row['groupid']]['failed']) ? 1 : ++$data[$row['groupid']]['failed'];
+		}
+		else {
+			$data[$row['groupid']]['ok'] = empty($data[$row['groupid']]['ok']) ? 1 : ++$data[$row['groupid']]['ok'];
+		}
+	}
 
 	foreach ($groups as $group) {
-		$showGroup = false;
-		$okCount = 0;
-		$failedCount = 0;
-		$unknownCount = 0;
-
-		$result = DBselect(
-			'SELECT DISTINCT ht.httptestid,i.lastclock,i.lastvalue'.
-			' FROM items i,httptestitem hti,httptest ht,applications a,hosts_groups hg'.
-			' WHERE i.itemid=hti.itemid'.
-				' AND hti.httptestid=ht.httptestid'.
-				' AND ht.applicationid=a.applicationid'.
-				' AND a.hostid=hg.hostid'.
-				' AND hti.type='.HTTPSTEP_ITEM_TYPE_LASTSTEP.
-				' AND ht.status='.HTTPTEST_STATUS_ACTIVE.
-				' AND '.dbConditionInt('hg.hostid', $availableHostIds).
-				' AND hg.groupid='.$group['groupid']
-		);
-		while ($row = DBfetch($result)) {
-			$showGroup = true;
-
-			if (!$row['lastclock']) {
-				$unknownCount++;
-			}
-			elseif ($row['lastvalue'] != 0) {
-				$failedCount++;
-			}
-			else {
-				$okCount++;
-			}
-		}
-
-		if ($showGroup) {
+		if (!empty($data[$group['groupid']])) {
 			$table->addRow(array(
 				is_show_all_nodes() ? $group['nodename'] : null,
 				$group['name'],
-				new CSpan($okCount, 'off'),
-				new CSpan($failedCount, $failedCount ? 'on' : 'off'),
-				new CSpan($unknownCount, 'unknown')
+				new CSpan(empty($data[$group['groupid']]['ok']) ? 0 : $data[$group['groupid']]['ok'], 'off'),
+				new CSpan(
+					empty($data[$group['groupid']]['failed']) ? 0 : $data[$group['groupid']]['failed'],
+					empty($data[$group['groupid']]['failed']) ? 'off' : 'on'
+				),
+				new CSpan(empty($data[$group['groupid']]['unknown']) ? 0 : $data[$group['groupid']]['unknown'], 'unknown')
 			));
 		}
 	}
@@ -1397,20 +1395,19 @@ function makeTriggersPopup(array $triggers, array $ackParams) {
 		_('Actions')
 	));
 
-	foreach ($triggers as $tnum => $trigger) {
-		$triggers[$tnum]['clock'] = $trigger['event']['clock'];
-	}
-	CArrayHelper::sort($triggers, array(array('field' => 'clock', 'order' => ZBX_SORT_DOWN)));
+	CArrayHelper::sort($triggers, array(array('field' => 'lastchange', 'order' => ZBX_SORT_DOWN)));
 
 	foreach ($triggers as $trigger) {
-		$event = $trigger['event'];
-		$ack = getEventAckState($event, true, true, $ackParams);
-
-		if (isset($event['eventid'])) {
+		// an event exists
+		if (isset($trigger['event'])) {
+			$event = $trigger['event'];
+			$ack = getEventAckState($event, true, true, $ackParams);
 			$actions = get_event_actions_status($event['eventid']);
 		}
+		// no events exist
 		else {
-			$actions = _('no data');
+			$ack = _('No events');
+			$actions = _('No data');
 		}
 
 		// unknown triggers
@@ -1425,7 +1422,7 @@ function makeTriggersPopup(array $triggers, array $ackParams) {
 			get_node_name_by_elid($trigger['triggerid']),
 			$trigger['hostname'],
 			getSeverityCell($trigger['priority'], $trigger['description']),
-			zbx_date2age($trigger['clock']),
+			zbx_date2age($trigger['lastchange']),
 			$unknown,
 			$config['event_ack_enable'] ? $ack : null,
 			$actions
