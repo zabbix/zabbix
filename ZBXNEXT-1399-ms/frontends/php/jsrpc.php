@@ -247,7 +247,7 @@ switch ($data['method']) {
 			foreach ($hostGroups as $hostGroup) {
 				$result[] = array(
 					'id' => $hostGroup['groupid'],
-					'prefix' => $hostGroup['nodename'],
+					'prefix' => (string) $hostGroup['nodename'],
 					'name' => $hostGroup['name']
 				);
 			}
