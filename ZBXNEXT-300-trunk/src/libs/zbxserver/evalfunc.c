@@ -1835,6 +1835,75 @@ clean:
 
 /******************************************************************************
  *                                                                            *
+ * Function: evaluate_AND                                                     *
+ *                                                                            *
+ * Purpose: evaluate logical bitwise function 'and' for the item              *
+ *                                                                            *
+ * Parameters: value - buffer of size MAX_BUFFER_LEN                          *
+ *             item - item (performance metric)                               *
+ *             parameters - up to 3 comma-separated fields:                   *
+ *                            (1) mask to bitwise AND with                    *
+ *                            (2) Nth last value                              *
+ *                            (3) time shift (optional)                       *
+ *                                                                            *
+ * Return value: SUCCEED - evaluated successfully, result is stored in 'value'*
+ *               FAIL - failed to evaluate function                           *
+ *                                                                            *
+ ******************************************************************************/
+static int	evaluate_AND(char *value, DB_ITEM *item, const char *function, const char *parameters, time_t now)
+{
+	const char	*__function_name = "evaluate_AND";
+	char		*last_parameters = NULL;
+	int		mask, mask_flag, nth_val, nth_val_flag, time_shift, time_shift_flag, nparams, res = FAIL;
+	zbx_uint64_t	last_uint64;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	if (ITEM_VALUE_TYPE_UINT64 != item->value_type)
+		goto clean;
+
+	if (3 < (nparams = num_param(parameters)))
+		goto clean;
+
+	if (FAIL == get_function_parameter_uint(item->hostid, parameters, 1, &mask, &mask_flag) ||
+				ZBX_FLAG_SEC != mask_flag)
+		{
+			goto clean;
+		}
+
+	if (1 < nparams && FAIL == get_function_parameter_uint(item->hostid, parameters, 2, &nth_val, &nth_val_flag))
+		goto clean;
+
+	if (2 < nparams)
+	{
+		if (FAIL == get_function_parameter_uint(item->hostid, parameters, 3, &time_shift, &time_shift_flag) ||
+				ZBX_FLAG_SEC != time_shift_flag)
+		{
+			goto clean;
+		}
+
+		now -= time_shift;
+	}
+
+	last_parameters = zbx_strdup(NULL, parameters);
+	remove_param(last_parameters, 1);
+
+	if (SUCCEED == evaluate_LAST(value, item, "last", last_parameters, now))
+	{
+		ZBX_STR2UINT64(last_uint64, value);
+		zbx_snprintf(value, MAX_BUFFER_LEN, ZBX_FS_UI64, last_uint64 & (zbx_uint64_t)mask);
+		res = SUCCEED;
+	}
+
+	zbx_free(last_parameters);
+clean:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(res));
+
+	return res;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: evaluate_function                                                *
  *                                                                            *
  * Purpose: evaluate function                                                 *
@@ -1957,6 +2026,10 @@ int	evaluate_function(char *value, DB_ITEM *item, const char *function, const ch
 	else if (0 == strcmp(function, "logsource"))
 	{
 		ret = evaluate_LOGSOURCE(value, item, function, parameter, now);
+	}
+	else if (0 == strcmp(function, "and"))
+	{
+		ret = evaluate_AND(value, item, function, parameter, now);
 	}
 	else
 	{
