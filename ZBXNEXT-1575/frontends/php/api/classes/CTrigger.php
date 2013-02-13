@@ -1379,12 +1379,6 @@ class CTrigger extends CTriggerGeneral {
 							_s('Cannot implode expression "%s".', $expressionFull).' '.$e->getMessage());
 				}
 
-				if (isset($trigger['status']) && ($trigger['status'] != TRIGGER_STATUS_ENABLED)) {
-					if ($trigger['state'] == TRIGGER_STATE_NORMAL) {
-						$trigger['state'] = TRIGGER_STATE_UNKNOWN;
-					}
-				}
-
 				// if the expression has changed, we must revalidate the existing dependencies
 				if (!isset($trigger['dependencies'])) {
 					$trigger['dependencies'] = zbx_objectValues($dbTrigger['dependencies'], 'triggerid');
