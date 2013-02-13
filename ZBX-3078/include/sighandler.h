@@ -18,5 +18,4 @@
 **/
 
 void	zbx_set_common_signal_handlers();
-void	zbx_set_daemon_signal_handlers();
 void	zbx_set_child_signal_handler();
