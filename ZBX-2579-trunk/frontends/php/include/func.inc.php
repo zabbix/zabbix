@@ -671,7 +671,7 @@ function convertBase10ToBase8 ($value ,$step  = false) {
 		$valData['value'] = bcmul($valData['value'], 1024);
 	}
 
-	$valData['value'] = round($valData['value'], ZBX_UNITS_ROUNDOFF_UPPER_LIMIT);
+	$valData['value'] = sprintf('%.0f', round($valData['value'], ZBX_UNITS_ROUNDOFF_UPPER_LIMIT));
 	return $valData;
 }
 

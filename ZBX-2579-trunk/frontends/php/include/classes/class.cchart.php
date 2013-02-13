@@ -820,10 +820,10 @@ class CChart extends CGraphDraw {
 		$sideMaxData = convertBase10ToBase8($this->m_maxY[$side]);
 		$otherSideMaxData = convertBase10ToBase8($this->m_maxY[$other_side]);
 		if ($intervalData['pow'] != $sideMaxData['pow']) {
-			$interval = round(bcmul($interval, 1.024), ZBX_UNITS_ROUNDOFF_UPPER_LIMIT);
+			$interval = sprintf('%.0f', round(bcmul(bcdiv($interval, 1000), 1024), ZBX_UNITS_ROUNDOFF_UPPER_LIMIT));
 		}
 		if ($intervalOtherSideData['pow'] != $otherSideMaxData['pow']) {
-			$interval_other_side = round(bcmul($interval_other_side, 1.024), ZBX_UNITS_ROUNDOFF_UPPER_LIMIT);
+			$interval_other_side = sprintf('%.0f', round(bcmul(bcdiv($interval_other_side, 1000), 1024), ZBX_UNITS_ROUNDOFF_UPPER_LIMIT));
 		}
 
 		// correcting MIN & MAX
