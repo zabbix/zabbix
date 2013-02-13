@@ -890,6 +890,23 @@ static int	DBpatch_02010043()
 
 	return FAIL;
 }
+
+static int	DBpatch_02010044()
+{
+	const ZBX_FIELD	field = {"itemid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBadd_field("escalations", &field);
+}
+
+static int	DBpatch_02010045()
+{
+	return DBdrop_index("escalations", "escalations_1");
+}
+
+static int	DBpatch_02010046()
+{
+	return DBcreate_index("escalations", "escalations_1", "actionid,triggerid,itemid,escalationid", 1);
+}
 #endif	/* not HAVE_SQLITE3 */
 
 static void	DBget_version(int *mandatory, int *optional)
@@ -971,11 +988,14 @@ int	DBcheck_version()
 		{DBpatch_02010041, 2010041, 0, 1},
 		{DBpatch_02010042, 2010042, 0, 1},
 		{DBpatch_02010043, 2010043, 0, 1},
+		{DBpatch_02010044, 2010044, 0, 1},
+		{DBpatch_02010045, 2010045, 0, 0},
+		{DBpatch_02010046, 2010046, 0, 0},
 		/* IMPORTANT! When adding a new mandatory DBPatch don't forget to update it for SQLite, too. */
 		{NULL}
 	};
 #else
-	required = 2010043;	/* <---- Update mandatory DBpatch for SQLite here. */
+	required = 2010044;	/* <---- Update mandatory DBpatch for SQLite here. */
 #endif
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
