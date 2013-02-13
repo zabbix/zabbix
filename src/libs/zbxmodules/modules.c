@@ -74,22 +74,23 @@ static void	register_module(void *module)
  *                                                                            *
  * Parameters: path - directory where modules are located                     *
  *             modules - list of module names                                 *
+ *             timeout - timeout in seconds for processing of items by module *
  *                                                                            *
  * Return value: 0 - success                                                  *
  *               -1 - loading of modules failed                               *
  *                                                                            *
  ******************************************************************************/
-int	load_modules(const char *path, char **modules)
+int	load_modules(const char *path, char **modules, int timeout)
 {
 	const char	*__function_name = "load_modules";
 	char	**module;
-	char	**key, **keys;
+	ZBX_METRIC	*metrics, *metric;
 	void	*lib;
 	char	filename[MAX_STRING_LEN];
-	int	(*func_init)();
-	int	(*func_process)();
-	char	**(*func_list)();
-	int	ret = 0;
+	int	(*func_init)(), (*func_version)();
+	ZBX_METRIC	*(*func_list)();
+	char	**(*func_timeout)();
+	int	i, ret = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -97,13 +98,32 @@ int	load_modules(const char *path, char **modules)
 	{
 		zbx_snprintf(filename, sizeof(filename), "%s/%s", path, *module);
 
-		zabbix_log(LOG_LEVEL_WARNING, "Loading module \"%s\"", filename);
+		zabbix_log(LOG_LEVEL_DEBUG, "Loading module \"%s\"", filename);
 
 		lib = dlopen(filename, RTLD_NOW);
 
 		if (NULL == lib)
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "Loading module failed: %s", dlerror());
+			ret = FAIL;
+			goto ret;
+		}
+
+		*(void **)(&func_version) = dlsym(lib, ZBX_MODULE_FUNC_VERSION);
+		if (NULL == func_version)
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "Module \"%s\". Cannot find version function: %s",
+				filename, dlerror());
+			dlclose(lib);
+			ret = FAIL;
+			goto ret;
+		}
+
+		if (ZBX_MODULE_VERSION_ONE != func_version())
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "Module \"%s\". Unsupported module version.",
+				filename);
+			dlclose(lib);
 			ret = FAIL;
 			goto ret;
 		}
@@ -127,17 +147,20 @@ int	load_modules(const char *path, char **modules)
 			goto ret;
 		}
 
-		*(void **)(&func_process) = dlsym(lib, ZBX_MODULE_FUNC_ITEM_PROCESS);
-		if(NULL == func_process)
+		/* the function is optional, zabbix will load the module ieven if it is missing */
+		*(void **)(&func_timeout) = dlsym(lib, ZBX_MODULE_FUNC_ITEM_TIMEOUT);
+		if (NULL != func_timeout)
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "Module \"%s\". Cannot find item process function: %s",
+			func_timeout(timeout);
+		}
+		else
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "Module \"%s\". Cannot find item timeout function: %s",
 				filename, dlerror());
-			dlclose(lib);
-			continue;
 		}
 
 		*(void **)(&func_list) = dlsym(lib, ZBX_MODULE_FUNC_ITEM_LIST);
-		if(NULL == func_list)
+		if (NULL == func_list)
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "Module \"%s\". Finding item list function \"%s\" failed: %s",
 				filename, ZBX_MODULE_FUNC_ITEM_LIST, dlerror());
@@ -145,10 +168,11 @@ int	load_modules(const char *path, char **modules)
 			continue;
 		}
 
-		keys = func_list();
-		for (key = keys; NULL != *key; key++)
+		metrics = func_list();
+		for (i = 0; NULL != metrics[i].key; i++)
 		{
-			add_user_module(*key, func_process);
+			metrics[i].flags |= CF_MODFUNCTION;
+			add_metric(&metrics[i]);
 		}
 
 		register_module(lib);
@@ -197,7 +221,7 @@ void	unload_modules()
 			continue;
 		}
 
-		if(ZBX_MODULE_OK != func_uninit())
+		if (ZBX_MODULE_OK != func_uninit())
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "Uninitialization failed.");
 			dlclose(*module);

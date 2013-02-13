@@ -20,6 +20,22 @@
 #include "sysinfo.h"
 #include "module.h"
 
+/* the variable keeps timeout setting for item processing */
+static int item_timeout = 0;
+
+int zbx_module_dummy_echo(AGENT_REQUEST *request, AGENT_RESULT *result);
+int zbx_module_dummy_ping(AGENT_REQUEST *request, AGENT_RESULT *result);
+int zbx_module_dummy_random(AGENT_REQUEST *request, AGENT_RESULT *result);
+
+static ZBX_METRIC keys[] =
+/*      KEY                     FLAG		FUNCTION        	ADD_PARAM       TEST_PARAM */
+{
+	{"dummy.ping",		0,		zbx_module_dummy_ping,	0,		0},
+	{"dummy.echo",		CF_USEUPARAM,	zbx_module_dummy_echo, 	0,		"a message"},
+	{"dummy.random",	CF_USEUPARAM,	zbx_module_dummy_random,0,		"1,1000"},
+	{0}
+};
+
 /******************************************************************************
  *                                                                            *
  * Function: zbx_module_version                                               *
@@ -28,12 +44,29 @@
  *                                                                            *
  * Parameters:                                                                *
  *                                                                            *
- * Return value: 1 - current version supported by the agent                   *
+ * Return value: ZBX_MODULE_VERSION_ONE - the only version supported by the   *
+ *               agent                                                        *
  *                                                                            *
  ******************************************************************************/
 int zbx_module_version()
 {
-	return 1;
+	return ZBX_MODULE_VERSION_ONE;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_module_item_timeout                                          *
+ *                                                                            *
+ * Purpose: set timeout value for processing of items                         *
+ *                                                                            *
+ * Parameters: timeout - timeout in seconds, 0 - no timeout set               *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ ******************************************************************************/
+void zbx_module_item_timeout(int timeout)
+{
+	item_timeout = timeout;
 }
 
 /******************************************************************************
@@ -49,23 +82,19 @@ int zbx_module_version()
  * Comment: item keys that accept optional parameters must have [*] included  *
  *                                                                            *
  ******************************************************************************/
-char **zbx_module_item_list()
+ZBX_METRIC *zbx_module_item_list()
 {
-	/* keys having [*] accept optional parameters */
-	/* key, func, useparam, testparam */
-	static char *keys[]={"dummy.ping", "dummy.echo[*]", "dummy.random[*]"};
-
 	return keys;
 }
 
-static int dummy_ping(AGENT_REQUEST *request, AGENT_RESULT *result)
+int zbx_module_dummy_ping(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	SET_UI64_RESULT(result, 1);
 
 	return	ZBX_MODULE_OK;
 }
 
-static int dummy_echo(AGENT_REQUEST *request, AGENT_RESULT *result)
+int zbx_module_dummy_echo(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 /* TODO nparam return 1 event in case if there are no parameters, it should be fixed */
 	if (request->nparam != 1)
@@ -80,7 +109,31 @@ static int dummy_echo(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return	ZBX_MODULE_OK;
 }
 
-static int dummy_random(AGENT_REQUEST *request, AGENT_RESULT *result)
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_module_dummy_random                                          *
+ *                                                                            *
+ * Purpose: a main entry point for processing of an item                      *
+ *                                                                            *
+ * Parameters: request - structure that contains item key and parameters      *
+ *              request->key - item key without parameters                    *
+ *              request->nparam - number of parameters                        *
+ *              request->timeout - processing should not take longer than     *
+ *                                 this number of seconds                     *
+ *              request->params[N-1] - pointers to item key parameters        *
+ *                                                                            *
+ *             result - structure that will contain result                    *
+ *                                                                            *
+ * Return value: ZBX_MODULE_FAIL - function failed, item will be marked       *
+ *                                 as not supported by zabbix                 *
+ *               ZBX_MODULE_OK - success                                      *
+ *                                                                            *
+ * Comment: get_param(request, N-1) can be used to get a pointer to the Nth   *
+ *          parameter starting from 0 (first parameter). Make sure it exists  *
+ *          by checking value of request->nparam.                             *
+ *                                                                            *
+ ******************************************************************************/
+int zbx_module_dummy_random(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	int	from, to;
 
@@ -104,54 +157,6 @@ static int dummy_random(AGENT_REQUEST *request, AGENT_RESULT *result)
 	SET_UI64_RESULT(result, from + rand() % (to - from+1));
 
 	return	ZBX_MODULE_OK;
-}
-
-
-/******************************************************************************
- *                                                                            *
- * Function: zbx_module_item_process                                          *
- *                                                                            *
- * Purpose: a main entry point for processing of items                        *
- *                                                                            *
- * Parameters: request - structure that contains item key and parameters      *
- *              request->key - item key without parameters                    *
- *              request->nparam - number of parameters                        *
- *              request->timeout - processing should not take longer than     *
- *                                 this number of seconds                     *
- *              request->params[N-1] - pointers to item key parameters        *
- *                                                                            *
- *             result - structure that will contain result                    *
- *                                                                            *
- * Return value: SYSINFO_RET_FAIL - function failed, item will be marked      *
- *                                  as not supported by zabbix                *
- *               SYSINFO_RET_OK - success                                     *
- *                                                                            *
- * Comment: get_param(request, N-1) can be used to get a pointer to the Nth   *
- *          parameter starting from 0 (first parameter). Make sure it exists  *
- *          by checking value of request->nparam.                             *
- *                                                                            *
- ******************************************************************************/
-int	zbx_module_item_process(AGENT_REQUEST *request, AGENT_RESULT *result)
-{
-	int ret = ZBX_MODULE_FAIL;
-
-	/* it always returns 1 */
-	if (0 == strcmp(request->key, "dummy.ping"))
-	{
-		ret = dummy_ping(request, result);
-	}
-	/* dummy.echo[param1] accepts one parameter and returns it as a result. For example: dummy.echo[abc] -> abc */
-	else if (0 == strcmp(request->key, "dummy.echo"))
-	{
-		ret = dummy_echo(request, result);
-	}
-	/* dummy.random[from,to] returns integer random number between 'from' and 'to' */
-	else if (0 == strcmp(request->key, "dummy.random"))
-	{
-		ret = dummy_random(request, result);
-	}
-
-	return ZBX_MODULE_OK;
 }
 
 /******************************************************************************

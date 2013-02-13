@@ -23,6 +23,8 @@
 #define ZBX_MODULE_OK	0
 #define ZBX_MODULE_FAIL	-1
 
+#define ZBX_MODULE_VERSION_ONE	1
+
 #define get_rparam(request,num) ((request->nparam > num) ? request->params[num] : NULL)
 
 /* agent request structure */
@@ -30,7 +32,6 @@ typedef struct
 {
 	char	*key;
 	int	nparam;
-	int	timeout;
 	char	**params;
 }
 AGENT_REQUEST;
