@@ -889,34 +889,24 @@ int	DBget_proxy_lastaccess(const char *hostname, int *lastaccess, char **error)
 
 void	DBstart_escalation(zbx_uint64_t actionid, zbx_uint64_t triggerid, zbx_uint64_t eventid)
 {
-	const char	*__function_name = "DBstart_escalation";
 	zbx_uint64_t	escalationid;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	escalationid = DBget_maxid("escalations");
 
 	DBexecute("insert into escalations (escalationid,actionid,triggerid,eventid,status)"
 			" values (" ZBX_FS_UI64 "," ZBX_FS_UI64 ",%s," ZBX_FS_UI64 ",%d)",
 			escalationid, actionid, DBsql_id_ins(triggerid), eventid, ESCALATION_STATUS_ACTIVE);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 void	DBstop_escalation(zbx_uint64_t actionid, zbx_uint64_t triggerid, zbx_uint64_t eventid)
 {
-	const char	*__function_name = "DBstop_escalation";
 	zbx_uint64_t	escalationid;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	escalationid = DBget_maxid("escalations");
 
 	DBexecute("insert into escalations (escalationid,actionid,triggerid,r_eventid,status)"
 			" values (" ZBX_FS_UI64 "," ZBX_FS_UI64 ",%s," ZBX_FS_UI64 ",%d)",
 			escalationid, actionid, DBsql_id_ins(triggerid), eventid, ESCALATION_STATUS_ACTIVE);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 /******************************************************************************
