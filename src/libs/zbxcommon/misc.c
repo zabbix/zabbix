@@ -1291,7 +1291,7 @@ int	is_uint_prefix(const char *c)
 
 	while (c[i]==' ') /* trim left spaces */
 		i++;
-	
+
 	if (!isdigit(c[i]))
 		return FAIL;
 	else
@@ -1352,12 +1352,12 @@ int	is_uint(const char *c)
 
 #if defined(_WINDOWS)
 int	_wis_uint(const wchar_t *wide_string)
-{	
+{
 	const wchar_t	*wide_char = wide_string;
-	
+
 	if (L'\0' == *wide_char)
 		return FAIL;
-		
+
 	while (L'\0' != *wide_char)
 	{
 		if (0 != iswdigit(*wide_char))
@@ -1367,7 +1367,7 @@ int	_wis_uint(const wchar_t *wide_string)
 		}
 		return FAIL;
 	}
-	
+
 	return SUCCEED;
 }
 #endif
@@ -1395,7 +1395,7 @@ int	is_int_prefix(const char *c)
 
 	if (c[i]=='-' || c[i]=='+')
 		i++;
-	
+
 	if (!isdigit(c[i]))
 		return FAIL;
 
@@ -2058,9 +2058,9 @@ int	is_function_char(char c)
 void	make_hostname(char *host)
 {
 	char	*c;
-	
+
 	assert(host);
-	
+
 	for (c = host; '\0' != *c; ++c)
 	{
 		if (FAIL == is_hostname_char(*c))

@@ -55,7 +55,7 @@ static int	get_if_stats(const char *if_name, MIB_IFROW *pIfRow)
 	/* Allocate memory for our pointers. */
 	dwSize = sizeof(MIB_IFTABLE);
 	pIfTable = (MIB_IFTABLE *)zbx_malloc(pIfTable, dwSize);
-	
+
 	/* Before calling GetIfEntry, we call GetIfTable to make
 	   sure there are entries to get and retrieve the interface index.
 	   Make an initial call to GetIfTable to get the necessary size into dwSize */
@@ -105,7 +105,7 @@ static int	get_if_stats(const char *if_name, MIB_IFROW *pIfRow)
 				}
 			}
 		}
-		
+
 		if (SUCCEED == ret)
 			break;
 	}
@@ -352,7 +352,7 @@ int	NET_IF_LIST(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 	/* Allocate memory for our pointers. */
 	dwSize = sizeof(MIB_IFTABLE);
 	pIfTable = (MIB_IFTABLE *)zbx_malloc(pIfTable, dwSize);
-	
+
 	/* Before calling GetIfEntry, we call GetIfTable to make
 	   sure there are entries to get and retrieve the interface index.
 	   Make an initial call to GetIfTable to get the necessary size into dwSize */

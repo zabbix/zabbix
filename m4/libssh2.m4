@@ -38,12 +38,12 @@ AC_DEFUN([LIBSSH2_ACCEPT_VERSION],
 [
 	# Zabbix minimal major supported version of libssh2:
 	minimal_libssh2_major_version=1
-	
+
 	# get the major version
 	found_ssh2_version_major=`cat $1 | $EGREP \#define.*LIBSSH2_VERSION_MAJOR | $AWK '{print @S|@3;}'`
-	
+
 	accept_ssh2_version="no"
-	
+
 	if test $found_ssh2_version_major -ge $minimal_libssh2_major_version; then
 		accept_ssh2_version="yes"
 	fi;

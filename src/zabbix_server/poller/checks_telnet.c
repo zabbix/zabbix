@@ -256,7 +256,7 @@ static void	convert_telnet_to_unix_eol(char *buf, size_t *offset)
 static void	convert_unix_to_telnet_eol(const char *buf, size_t offset, char *out_buf, size_t *out_offset)
 {
 	size_t	i;
-	
+
 	*out_offset = 0;
 
 	for (i = 0; i < offset; i++)

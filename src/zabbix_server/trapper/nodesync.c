@@ -431,7 +431,7 @@ static void	process_checksum(int nodeid, char *data, int sender_nodetype)
 			while (NULL != r)
 			{
 				len = zbx_get_next_field((const char **)&r, &buf, &buf_alloc, ZBX_DM_DELIMITER);
-	
+
 				zbx_snprintf_alloc(&fld, &fld_alloc, &fld_offset, len + 2, "%s,", buf);
 
 				zbx_get_next_field((const char **)&r, &buf, &buf_alloc, ZBX_DM_DELIMITER);	/* value type */

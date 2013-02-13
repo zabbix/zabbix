@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# 
+#
 # ZABBIX
 # Copyright (C) 2000-2005 SIA Zabbix
 #
@@ -72,7 +72,7 @@ local $output;
 	"t_cksum_text"	=>	"ZBX_TYPE_TEXT"
 );
 
-$c{"before"}="/* 
+$c{"before"}="/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **

@@ -315,7 +315,7 @@ void	zbx_hashset_iter_remove(zbx_hashset_iter_t *iter)
 		while (prev_entry->next != iter->entry)
 			prev_entry = prev_entry->next;
 
-		prev_entry->next = iter->entry->next;		
+		prev_entry->next = iter->entry->next;
 		__hashset_free_entry(iter->hashset, iter->entry);
 		iter->hashset->num_data--;
 
