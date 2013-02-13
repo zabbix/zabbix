@@ -340,6 +340,7 @@
 		$filter_history				= $_REQUEST['filter_history'];
 		$filter_trends				= $_REQUEST['filter_trends'];
 		$filter_status				= $_REQUEST['filter_status'];
+		$filter_state				= $_REQUEST['filter_state'];
 		$filter_templated_items		= $_REQUEST['filter_templated_items'];
 		$filter_with_triggers		= $_REQUEST['filter_with_triggers'];
 		$subfilter_hosts			= $_REQUEST['subfilter_hosts'];
@@ -347,6 +348,7 @@
 		$subfilter_types			= $_REQUEST['subfilter_types'];
 		$subfilter_value_types		= $_REQUEST['subfilter_value_types'];
 		$subfilter_status			= $_REQUEST['subfilter_status'];
+		$subfilter_state			= $_REQUEST['subfilter_state'];
 		$subfilter_templated_items	= $_REQUEST['subfilter_templated_items'];
 		$subfilter_with_triggers	= $_REQUEST['subfilter_with_triggers'];
 		$subfilter_history			= $_REQUEST['subfilter_history'];
@@ -362,6 +364,7 @@
 		$form->addVar('subfilter_types', $subfilter_types);
 		$form->addVar('subfilter_value_types', $subfilter_value_types);
 		$form->addVar('subfilter_status', $subfilter_status);
+		$form->addVar('subfilter_state', $subfilter_state);
 		$form->addVar('subfilter_templated_items', $subfilter_templated_items);
 		$form->addVar('subfilter_with_triggers', $subfilter_with_triggers);
 		$form->addVar('subfilter_history', $subfilter_history);
@@ -433,6 +436,13 @@
 		$cmbStatus->addItem(-1, _('all'));
 		foreach (array(ITEM_STATUS_ACTIVE, ITEM_STATUS_DISABLED) as $status) {
 			$cmbStatus->addItem($status, item_status2str($status));
+		}
+
+		// state select
+		$cmbState = new CComboBox('filter_state', $filter_state);
+		$cmbState->addItem(-1, _('all'));
+		foreach (array(ITEM_STATE_NORMAL, ITEM_STATE_NOTSUPPORTED) as $state) {
+			$cmbState->addItem($state, itemState($state));
 		}
 
 		// update interval
@@ -517,12 +527,8 @@
 			new CCol($updateIntervalInput),
 			new CCol($dataTypeLabel, 'label'),
 			new CCol($dataTypeInput),
-			new CCol(bold(_('Triggers').': '), 'label'),
-			new CCol(new CComboBox('filter_with_triggers', $filter_with_triggers, null, array(
-				-1 => _('all'),
-				1 => _('With triggers'),
-				0 => _('Without triggers')
-			))),
+			new CCol(bold(_('State').': '), 'label'),
+			new CCol($cmbState, 'col4'),
 		));
 		// row 3
 		$table->addRow(array(
@@ -541,11 +547,11 @@
 			new CCol(array($snmpCommunityField, $snmpSecurityField)),
 			new CCol(array(bold(_('Keep history')), SPACE._('(in days)').': '), 'label'),
 			new CCol(new CNumericBox('filter_history', $filter_history, 8, null, true)),
-			new CCol(bold(_('Template').': '), 'label'),
-			new CCol(new CComboBox('filter_templated_items', $filter_templated_items, null, array(
+			new CCol(bold(_('Triggers').': '), 'label'),
+			new CCol(new CComboBox('filter_with_triggers', $filter_with_triggers, null, array(
 				-1 => _('all'),
-				1 => _('Templated items'),
-				0 => _('Not Templated items'),
+				1 => _('With triggers'),
+				0 => _('Without triggers')
 			))),
 		));
 		// row 4
@@ -556,8 +562,12 @@
 			new CCol($snmpOidField),
 			new CCol(array(bold(_('Keep trends')), SPACE._('(in days)').': '), 'label'),
 			new CCol(new CNumericBox('filter_trends', $filter_trends, 8, null, true)),
-			new CCol(null, 'label'),
-			new CCol(),
+			new CCol(bold(_('Template').': '), 'label'),
+			new CCol(new CComboBox('filter_templated_items', $filter_templated_items, null, array(
+				-1 => _('all'),
+				1 => _('Templated items'),
+				0 => _('Not Templated items'),
+			))),
 		));
 		// row 5
 		$table->addRow(array(
@@ -595,6 +605,7 @@
 			'types' => array(),
 			'value_types' => array(),
 			'status' => array(),
+			'state' => array(),
 			'templated_items' => array(),
 			'with_triggers' => array(),
 			'history' => array(),
@@ -710,6 +721,26 @@
 				}
 				if ($show_item) {
 					$item_params['status'][$item['status']]['count']++;
+				}
+			}
+
+			// state
+			if ($filter_state == -1) {
+				if (!isset($item_params['state'][$item['state']])) {
+					$item_params['state'][$item['state']] = array(
+						'name' => itemState($item['state']),
+						'count' => 0
+					);
+				}
+				$show_item = true;
+				foreach ($item['subfilters'] as $name => $value) {
+					if ($name == 'subfilter_state') {
+						continue;
+					}
+					$show_item &= $value;
+				}
+				if ($show_item) {
+					$item_params['state'][$item['state']]['count']++;
 				}
 			}
 
@@ -839,6 +870,11 @@
 		if ($filter_status == -1 && count($item_params['status']) > 1) {
 			$status_output = prepare_subfilter_output($item_params['status'], $subfilter_status, 'subfilter_status');
 			$table_subfilter->addRow(array(_('Status'), $status_output));
+		}
+
+		if ($filter_state == -1 && count($item_params['state']) > 1) {
+			$state_output = prepare_subfilter_output($item_params['state'], $subfilter_state, 'subfilter_state');
+			$table_subfilter->addRow(array(_('State'), $state_output));
 		}
 
 		if ($filter_templated_items == -1 && count($item_params['templated_items']) > 1) {

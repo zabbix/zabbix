@@ -180,7 +180,8 @@ $fields = array(
 	'filter_delay' => array(T_ZBX_INT, O_OPT, P_UNSET_EMPTY, BETWEEN(0, SEC_PER_DAY), null, _('Update interval')),
 	'filter_history' => array(T_ZBX_INT, O_OPT, P_UNSET_EMPTY, BETWEEN(0, 65535), null, _('Keep history (in days)')),
 	'filter_trends' => array(T_ZBX_INT, O_OPT, P_UNSET_EMPTY, BETWEEN(0, 65535), null, _('Keep trends (in days)')),
-	'filter_status' =>			array(T_ZBX_INT, O_OPT, null,	IN('-1,0,1,3'), null),
+	'filter_status' =>			array(T_ZBX_INT, O_OPT, null,	IN(array(-1, ITEM_STATUS_ACTIVE, ITEM_STATUS_DISABLED)), null),
+	'filter_state' =>			array(T_ZBX_INT, O_OPT, null,	IN(array(-1, ITEM_STATE_NORMAL, ITEM_STATE_NOTSUPPORTED)), null),
 	'filter_templated_items' => array(T_ZBX_INT, O_OPT, null,	IN('-1,0,1'), null),
 	'filter_with_triggers' =>	array(T_ZBX_INT, O_OPT, null,	IN('-1,0,1'), null),
 	'filter_ipmi_sensor' =>		array(T_ZBX_STR, O_OPT, null,	null,		null),
@@ -189,6 +190,7 @@ $fields = array(
 	'subfilter_types' =>		array(T_ZBX_INT, O_OPT, null,	null,		null),
 	'subfilter_value_types' =>	array(T_ZBX_INT, O_OPT, null,	null,		null),
 	'subfilter_status' =>		array(T_ZBX_INT, O_OPT, null,	null,		null),
+	'subfilter_state' =>		array(T_ZBX_INT, O_OPT, null,	null,		null),
 	'subfilter_templated_items' => array(T_ZBX_INT, O_OPT, null, null,		null),
 	'subfilter_with_triggers' => array(T_ZBX_INT, O_OPT, null,	null,		null),
 	'subfilter_hosts' =>		array(T_ZBX_INT, O_OPT, null,	null,		null),
@@ -267,6 +269,7 @@ if (isset($_REQUEST['filter_set'])) {
 	$_REQUEST['filter_history'] = get_request('filter_history');
 	$_REQUEST['filter_trends'] = get_request('filter_trends');
 	$_REQUEST['filter_status'] = get_request('filter_status', -1);
+	$_REQUEST['filter_state'] = get_request('filter_state', -1);
 	$_REQUEST['filter_templated_items'] = get_request('filter_templated_items', -1);
 	$_REQUEST['filter_with_triggers'] = get_request('filter_with_triggers', -1);
 	$_REQUEST['filter_ipmi_sensor'] = get_request('filter_ipmi_sensor');
@@ -287,6 +290,7 @@ if (isset($_REQUEST['filter_set'])) {
 	CProfile::update('web.items.filter_history', $_REQUEST['filter_history'], PROFILE_TYPE_STR);
 	CProfile::update('web.items.filter_trends', $_REQUEST['filter_trends'], PROFILE_TYPE_STR);
 	CProfile::update('web.items.filter_status', $_REQUEST['filter_status'], PROFILE_TYPE_INT);
+	CProfile::update('web.items.filter_state', $_REQUEST['filter_state'], PROFILE_TYPE_INT);
 	CProfile::update('web.items.filter_templated_items', $_REQUEST['filter_templated_items'], PROFILE_TYPE_INT);
 	CProfile::update('web.items.filter_with_triggers', $_REQUEST['filter_with_triggers'], PROFILE_TYPE_INT);
 	CProfile::update('web.items.filter_ipmi_sensor', $_REQUEST['filter_ipmi_sensor'], PROFILE_TYPE_STR);
@@ -308,6 +312,7 @@ else {
 	$_REQUEST['filter_history'] = CProfile::get('web.items.filter_history');
 	$_REQUEST['filter_trends'] = CProfile::get('web.items.filter_trends');
 	$_REQUEST['filter_status'] = CProfile::get('web.items.filter_status');
+	$_REQUEST['filter_state'] = CProfile::get('web.items.filter_state');
 	$_REQUEST['filter_templated_items'] = CProfile::get('web.items.filter_templated_items', -1);
 	$_REQUEST['filter_with_triggers'] = CProfile::get('web.items.filter_with_triggers', -1);
 	$_REQUEST['filter_ipmi_sensor'] = CProfile::get('web.items.filter_ipmi_sensor');
@@ -328,8 +333,9 @@ if (isset($_REQUEST['filter_hostname']) && !zbx_empty($_REQUEST['filter_hostname
 }
 
 // subfilters
-foreach (array('subfilter_apps', 'subfilter_types', 'subfilter_value_types', 'subfilter_status', 'subfilter_templated_items',
-	'subfilter_with_triggers', 'subfilter_hosts', 'subfilter_interval', 'subfilter_history', 'subfilter_trends') as $name) {
+foreach (array('subfilter_apps', 'subfilter_types', 'subfilter_value_types', 'subfilter_status', 'subfilter_state',
+			'subfilter_templated_items', 'subfilter_with_triggers', 'subfilter_hosts', 'subfilter_interval',
+			'subfilter_history', 'subfilter_trends') as $name) {
 	$_REQUEST[$name] = isset($_REQUEST['filter_set']) ? array() : get_request($name, array());
 }
 
@@ -903,6 +909,9 @@ else {
 	if (isset($_REQUEST['filter_status']) && !zbx_empty($_REQUEST['filter_status']) && $_REQUEST['filter_status'] != -1) {
 		$options['filter']['status'] = $_REQUEST['filter_status'];
 	}
+	if (isset($_REQUEST['filter_state']) && !zbx_empty($_REQUEST['filter_state']) && $_REQUEST['filter_state'] != -1) {
+		$options['filter']['state'] = $_REQUEST['filter_state'];
+	}
 	if (isset($_REQUEST['filter_templated_items']) && !zbx_empty($_REQUEST['filter_templated_items'])
 			&& $_REQUEST['filter_templated_items'] != -1) {
 		$options['inherited'] = $_REQUEST['filter_templated_items'];
@@ -958,6 +967,8 @@ else {
 					|| uint_in_array($item['value_type'], $_REQUEST['subfilter_value_types']),
 				'subfilter_status' => empty($_REQUEST['subfilter_status'])
 					|| uint_in_array($item['status'], $_REQUEST['subfilter_status']),
+				'subfilter_state' => empty($_REQUEST['subfilter_state'])
+					|| uint_in_array($item['state'], $_REQUEST['subfilter_state']),
 				'subfilter_templated_items' => empty($_REQUEST['subfilter_templated_items'])
 					|| ($item['templateid'] == 0 && uint_in_array(0, $_REQUEST['subfilter_templated_items'])
 					|| ($item['templateid'] > 0 && uint_in_array(1, $_REQUEST['subfilter_templated_items']))),

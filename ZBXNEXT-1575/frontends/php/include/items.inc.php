@@ -161,6 +161,33 @@ function item_status2str($type = null) {
 }
 
 /**
+ * Returns the names of supported item states.
+ *
+ * If the $state parameter is passed, returns the name of the specific state, otherwise - returns an array of all
+ * supported states.
+ *
+ * @param string $state
+ *
+ * @return array|string
+ */
+function itemState($state = null) {
+	$states = array(
+		ITEM_STATE_NORMAL => _('Normal'),
+		ITEM_STATE_NOTSUPPORTED => _('Not supported')
+	);
+
+	if ($state === null) {
+		return $states;
+	}
+	elseif (isset($states[$state])) {
+		return $states[$state];
+	}
+	else {
+		return _('Unknown');
+	}
+}
+
+/**
  * Returns the text indicating the items status and state. If the $state parameter is not given, only the status of
  * the item will be taken into account.
  *
