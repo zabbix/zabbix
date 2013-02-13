@@ -67,7 +67,7 @@ void	add_event(zbx_uint64_t eventid, unsigned char source, unsigned char object,
 	events[events_num].value = value;
 	events[events_num].acknowledged = EVENT_NOT_ACKNOWLEDGED;
 
-	if (EVENT_OBJECT_TRIGGER == events[events_num].object)
+	if (EVENT_SOURCE_TRIGGERS == source)
 	{
 		events[events_num].trigger.triggerid = objectid;
 		events[events_num].trigger.description = zbx_strdup(NULL, trigger_description);
@@ -157,7 +157,7 @@ static void	clean_events()
 
 	for (i = 0; i < events_num; i++)
 	{
-		if (EVENT_OBJECT_TRIGGER != events[i].object)
+		if (EVENT_SOURCE_TRIGGERS != events[i].source)
 			continue;
 
 		zbx_free(events[i].trigger.description);
