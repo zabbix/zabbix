@@ -1,6 +1,7 @@
 Changes for 2.1.0
 
 New features:
+...G...... [ZBXNEXT-1243] added support for agent system.swap.size key on AIX (wiper)
 A.F.I...S. [ZBXNEXT-1574] removed unknown event support (Pavel, Sasha)
 A...I..... [ZBXNEXT-1574] dropped the event value_changed property (Pavel, Sasha)
 A.F....... [ZBX-6126] changed the proxy.delete, user.delete and host.delete methods to accept both objects and IDs (Pavels)
