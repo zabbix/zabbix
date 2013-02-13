@@ -261,8 +261,8 @@ elseif (isset($_REQUEST['save'])) {
 		}
 
 		if ($_REQUEST['authentication'] != HTTPTEST_AUTH_NONE) {
-			$httpTest['http_user'] = htmlspecialchars($_REQUEST['http_user']);
-			$httpTest['http_password'] = htmlspecialchars($_REQUEST['http_password']);
+			$httpTest['http_user'] = $_REQUEST['http_user'];
+			$httpTest['http_password'] = $_REQUEST['http_password'];
 		}
 		else {
 			$httpTest['http_user'] = '';
