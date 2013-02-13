@@ -501,7 +501,7 @@ function convertUnitsS($value) {
 	return rtrim($value);
 }
 
-function convert_units($value, $units, $convert = ITEM_CONVERT_WITH_UNITS) {
+function convert_units($value, $units, $convert = ITEM_CONVERT_WITH_UNITS, $byteStep = false, $pow = false) {
 	// special processing for unix timestamps
 	if ($units == 'unixtime') {
 		return zbx_date2str(_('Y.m.d H:i:s'), $value);
@@ -550,6 +550,11 @@ function convert_units($value, $units, $convert = ITEM_CONVERT_WITH_UNITS) {
 			$step = 1000;
 	}
 
+	// if one or more items is B or Bps, then Y-scale use base 8 and calculate in bytes
+	if ($byteStep) {
+		$step = 1024;
+	}
+
 	// init intervals
 	static $digitUnits;
 	if (is_null($digitUnits)) {
@@ -585,15 +590,26 @@ function convert_units($value, $units, $convert = ITEM_CONVERT_WITH_UNITS) {
 	}
 
 	$valUnit = array('pow' => 0, 'short' => '', 'long' => '', 'value' => $value);
-	if ($abs > 999 || $abs < 0.001) {
-		foreach ($digitUnits[$step] as $dnum => $data) {
-			if (bccomp($abs, $data['value']) > -1) {
-				$valUnit = $data;
-			}
-			else {
-				break;
+	if ($byteStep || $abs > 999 || $abs < 0.001) {
+		if (!$pow || $value == 0) {
+			foreach ($digitUnits[$step] as $dnum => $data) {
+				if (bccomp($abs, $data['value']) > -1) {
+					$valUnit = $data;
+				}
+				else {
+					break;
+				}
 			}
 		}
+		else {
+			foreach ($digitUnits[$step] as $data) {
+				if ($pow == $data['pow']) {
+					$valUnit = $data;
+					break;
+				}
+			}
+		}
+
 		if (round($valUnit['value'], 6) > 0) {
 			$valUnit['value'] = bcdiv(sprintf('%.6f',$value), sprintf('%.6f', $valUnit['value']), 6);
 		}
@@ -612,6 +628,51 @@ function convert_units($value, $units, $convert = ITEM_CONVERT_WITH_UNITS) {
 	$value = rtrim($value, '.');
 
 	return rtrim(sprintf('%s %s%s', $value, $desc, $units));
+}
+
+function convertBase10ToBase8 ($value ,$step  = false) {
+	if (empty($step)) {
+		$step = 1000;
+	}
+
+	$steps = array(
+		array('pow' => 0),
+		array('pow' => 1),
+		array('pow' => 2),
+		array('pow' => 3),
+		array('pow' => 4),
+		array('pow' => 5),
+		array('pow' => 6),
+		array('pow' => 7),
+		array('pow' => 8)
+	);
+
+	foreach ($steps as $dunit => $data) {
+		$steps[$dunit]['value'] = bcpow($step, $data['pow']);
+	}
+
+	$valData = array('pow' => 0, 'value' => $value);
+	foreach ($steps as $dnum => $data) {
+		if (bccomp($value, $data['value']) > -1) {
+			$valData = $data;
+		}
+		else {
+			break;
+		}
+	}
+	if (round($valData['value'], 6) > 0) {
+		$valData['value'] = bcdiv(sprintf('%.6f',$value), sprintf('%.6f', $valData['value']), 6);
+	}
+	else {
+		$valData['value'] = 0;
+	}
+
+	for ($i = 0; $i < $valData['pow']; $i++) {
+		$valData['value'] = bcmul($valData['value'], 1024);
+	}
+
+	$valData['value'] = round($valData['value'], ZBX_UNITS_ROUNDOFF_UPPER_LIMIT);
+	return $valData;
 }
 
 /**
@@ -644,7 +705,7 @@ function convertFunctionValue($value) {
 				$value = bcmul($value, '604800');
 				break;
 			case 'K':
-				$value = bcmul($value, '1000');
+				$value = bcmul($value, '1024');
 				break;
 			case 'M':
 				$value = bcmul($value, '1048576');

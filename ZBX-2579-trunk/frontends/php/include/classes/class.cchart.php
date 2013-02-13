@@ -709,6 +709,18 @@ class CChart extends CGraphDraw {
 			}
 		}
 
+		// check if items use B or Bps units
+		for ($item = 0; $item < $this->num; $item++) {
+			if (($this->items[$item]['units'] == 'B' || $this->items[$item]['units'] == 'Bps')
+					&& $this->items[$item]['axisside'] == GRAPH_YAXIS_SIDE_LEFT) {
+				$leftBase8 = true;
+			}
+			if (($this->items[$item]['units'] == 'B' || $this->items[$item]['units'] == 'Bps')
+					&& $this->items[$item]['axisside'] == GRAPH_YAXIS_SIDE_RIGHT) {
+				$rightBase8 = true;
+			}
+		}
+
 		foreach (array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18) as $num) {
 			$dec = bcpow(10, $num);
 			foreach (array(1, 2, 5) as $int) {
@@ -776,6 +788,10 @@ class CChart extends CGraphDraw {
 				$interval = $int;
 			}
 		}
+		if ($leftBase8) {
+			$intervalData = convertBase10ToBase8($interval);
+			$interval = $intervalData['value'];
+		}
 
 		$columnInterval = bcdiv(bcmul($this->gridPixelsVert, bcsub($this->m_maxY[$other_side], $this->m_minY[$other_side])), $this->sizeY);
 
@@ -795,6 +811,19 @@ class CChart extends CGraphDraw {
 				$dist = $t;
 				$interval_other_side = $int;
 			}
+		}
+		if ($rightBase8) {
+			$intervalOtherSideData = convertBase10ToBase8($interval_other_side);
+			$interval_other_side = $intervalOtherSideData['value'];
+		}
+
+		$sideMaxData = convertBase10ToBase8($this->m_maxY[$side]);
+		$otherSideMaxData = convertBase10ToBase8($this->m_maxY[$other_side]);
+		if ($intervalData['pow'] != $sideMaxData['pow']) {
+			$interval = round(bcmul($interval, 1.024), ZBX_UNITS_ROUNDOFF_UPPER_LIMIT);
+		}
+		if ($intervalOtherSideData['pow'] != $otherSideMaxData['pow']) {
+			$interval_other_side = round(bcmul($interval_other_side, 1.024), ZBX_UNITS_ROUNDOFF_UPPER_LIMIT);
 		}
 
 		// correcting MIN & MAX
@@ -1326,13 +1355,18 @@ class CChart extends CGraphDraw {
 
 		$units = null;
 		$unitsLong = null;
+		$byteStep = false;
 		for ($item = 0; $item < $this->num; $item++) {
 			if ($this->items[$item]['axisside'] == GRAPH_YAXIS_SIDE_LEFT) {
+				// check if items use B or Bps units
+				if ($this->items[$item]['units'] == 'B' || $this->items[$item]['units'] == 'Bps') {
+					$byteStep = true;
+				}
 				if (is_null($units)) {
 					$units = $this->items[$item]['units'];
 				}
 				elseif ($this->items[$item]['units'] != $units) {
-					$units = false;
+					$units = '';
 				}
 			}
 		}
@@ -1371,6 +1405,7 @@ class CChart extends CGraphDraw {
 		$step = $this->gridStep[GRAPH_YAXIS_SIDE_LEFT];
 		$hstr_count = $this->gridLinesCount[GRAPH_YAXIS_SIDE_LEFT];
 
+		$maxYPow = convertBase10ToBase8($maxY, 1024);
 		for ($i = 0; $i <= $hstr_count; $i++) {
 			// division by zero
 			$hstr_count = ($hstr_count == 0) ? 1 : $hstr_count;
@@ -1381,7 +1416,8 @@ class CChart extends CGraphDraw {
 			if (bccomp(bcadd($val, bcdiv($step,2)), $maxY) == 1) {
 				continue;
 			}
-			$str = convert_units($val, $units, ITEM_CONVERT_NO_UNITS);
+
+			$str = convert_units($val, $units, ITEM_CONVERT_NO_UNITS, $byteStep, $maxYPow['pow']);
 
 			$dims = imageTextSize(8, 0, $str);
 
@@ -1402,7 +1438,8 @@ class CChart extends CGraphDraw {
 			}
 		}
 
-		$str = convert_units($maxY, $units, ITEM_CONVERT_NO_UNITS);
+		$str = convert_units($maxY, $units, ITEM_CONVERT_NO_UNITS, $byteStep);
+
 		$dims = imageTextSize(8, 0, $str);
 		imageText(
 			$this->im,
@@ -1436,13 +1473,17 @@ class CChart extends CGraphDraw {
 
 		$units = null;
 		$unitsLong = null;
+		$byteStep = false;
 		for ($item = 0; $item < $this->num; $item++) {
 			if ($this->items[$item]['axisside'] == GRAPH_YAXIS_SIDE_RIGHT) {
+				if ($this->items[$item]['units'] == 'B' || $this->items[$item]['units'] == 'Bps') {
+					$byteStep = true;
+				}
 				if (is_null($units)) {
 					$units = $this->items[$item]['units'];
 				}
 				elseif ($this->items[$item]['units'] != $units) {
-					$units = false;
+					$units = '';
 				}
 			}
 		}
@@ -1492,7 +1533,7 @@ class CChart extends CGraphDraw {
 				continue;
 			}
 
-			$str = convert_units($val, $units, ITEM_CONVERT_NO_UNITS);
+			$str = convert_units($val, $units, ITEM_CONVERT_NO_UNITS, $byteStep);
 
 			// marker Y coordinate
 			$dims = imageTextSize(8, 0, $str);
@@ -1512,7 +1553,7 @@ class CChart extends CGraphDraw {
 			}
 		}
 
-		$str = convert_units($maxY, $units, ITEM_CONVERT_NO_UNITS);
+		$str = convert_units($maxY, $units, ITEM_CONVERT_NO_UNITS, $byteStep);
 		imageText(
 			$this->im,
 			8,
