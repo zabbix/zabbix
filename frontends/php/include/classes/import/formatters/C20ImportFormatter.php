@@ -166,6 +166,11 @@ class C20ImportFormatter extends CImportFormatter {
 			foreach ($this->data['hosts'] as $host) {
 				if (!empty($host['discovery_rules'])) {
 					foreach ($host['discovery_rules'] as $item) {
+						// if a discovery rule has the "Not supported" status, convert it to "Active"
+						if ($item['status'] == 3) {
+							$item['status'] = ITEM_STATUS_ACTIVE;
+						}
+
 						$item = $this->formatDiscoveryRule($item);
 
 						$discoveryRulesData[$host['host']][$item['key_']] = $item;
