@@ -522,10 +522,10 @@ notsupported:
 
 		int	n1, n2 = 0;
 
-		n1 = printf("%s", in_command);
+		n1 = printf("%s", usr_cmd);
 
-		if (0 < n1 && '\0' != *param)
-			n2 = printf("[%s]", param);
+		if (0 < n1 && '\0' != *usr_param)
+			n2 = printf("[%s]", usr_param);
 
 		if (0 < n1 && 0 <= n2 && COL_WIDTH > n1 + n2)
 			printf("%-*s", COL_WIDTH - n1 - n2, " ");
