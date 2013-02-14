@@ -8,7 +8,7 @@ DB2_LENGTH_LIMIT=32000
 # Converts hexadecimal string to DB2 BLOB format.
 #
 # This function splits the string into 32000 byte chunks because
-# of DB2 limitation "For a hexadecimal constant (X, GX, or UX), 
+# of DB2 limitation "For a hexadecimal constant (X, GX, or UX),
 # the number of hexadecimal digits must not exceed 32704"
 # Though it still did not work with 32704 length limit, so it was
 # lowered to 32000.
