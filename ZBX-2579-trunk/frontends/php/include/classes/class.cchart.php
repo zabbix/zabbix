@@ -791,6 +791,17 @@ class CChart extends CGraphDraw {
 		if ($leftBase8) {
 			$intervalData = convertBase10ToBase8($interval);
 			$interval = $intervalData['value'];
+			$sideMaxData = convertBase10ToBase8($this->m_maxY[$side]);
+			$sideMinData = convertBase10ToBase8($this->m_minY[$side]);
+			if ($sideMaxData['pow'] > $sideMinData['pow']) {
+				$sideMax = $sideMaxData['pow'];
+			}
+			else {
+				$sideMax = $sideMinData['pow'];
+			}
+			if ($intervalData['pow'] != $sideMax) {
+				$interval = sprintf('%.0f', round(bcmul(bcdiv($interval, 1000), 1024), ZBX_UNITS_ROUNDOFF_UPPER_LIMIT));
+			}
 		}
 
 		$columnInterval = bcdiv(bcmul($this->gridPixelsVert, bcsub($this->m_maxY[$other_side], $this->m_minY[$other_side])), $this->sizeY);
@@ -815,30 +826,17 @@ class CChart extends CGraphDraw {
 		if ($rightBase8) {
 			$intervalOtherSideData = convertBase10ToBase8($interval_other_side);
 			$interval_other_side = $intervalOtherSideData['value'];
-		}
-
-		$sideMaxData = convertBase10ToBase8($this->m_maxY[$side]);
-		$sideMinData = convertBase10ToBase8($this->m_minY[$side]);
-		if ($sideMaxData['pow'] > $sideMinData['pow']) {
-			$sideMax = $sideMaxData['pow'];
-		}
-		else {
-			$sideMax = $sideMinData['pow'];
-		}
-
-		$otherSideMaxData = convertBase10ToBase8($this->m_maxY[$other_side]);
-		$otherSideMinData = convertBase10ToBase8($this->m_minY[$other_side]);
-		if ($otherSideMaxData['pow'] > $otherSideMinData['pow']) {
-			$otherSideMax = $otherSideMaxData['pow'];
-		}
-		else {
-			$otherSideMax = $otherSideMinData['pow'];
-		}
-		if ($intervalData['pow'] != $sideMax) {
-			$interval = sprintf('%.0f', round(bcmul(bcdiv($interval, 1000), 1024), ZBX_UNITS_ROUNDOFF_UPPER_LIMIT));
-		}
-		if ($intervalOtherSideData['pow'] != $otherSideMax) {
-			$interval_other_side = sprintf('%.0f', round(bcmul(bcdiv($interval_other_side, 1000), 1024), ZBX_UNITS_ROUNDOFF_UPPER_LIMIT));
+			$otherSideMaxData = convertBase10ToBase8($this->m_maxY[$other_side]);
+			$otherSideMinData = convertBase10ToBase8($this->m_minY[$other_side]);
+			if ($otherSideMaxData['pow'] > $otherSideMinData['pow']) {
+				$otherSideMax = $otherSideMaxData['pow'];
+			}
+			else {
+				$otherSideMax = $otherSideMinData['pow'];
+			}
+			if ($intervalOtherSideData['pow'] != $otherSideMax) {
+				$interval_other_side = sprintf('%.0f', round(bcmul(bcdiv($interval_other_side, 1000), 1024), ZBX_UNITS_ROUNDOFF_UPPER_LIMIT));
+			}
 		}
 
 		// correcting MIN & MAX
@@ -1420,15 +1418,18 @@ class CChart extends CGraphDraw {
 		$step = $this->gridStep[GRAPH_YAXIS_SIDE_LEFT];
 		$hstr_count = $this->gridLinesCount[GRAPH_YAXIS_SIDE_LEFT];
 
-		$maxYPow = convertBase10ToBase8($maxY, 1024);
-		$minYPow = convertBase10ToBase8($minY, 1024);
-		if ($maxYPow['pow'] > $minYPow['pow']) {
-			$newPow = $maxYPow['pow'];
+		if ($byteStep) {
+			$maxYPow = convertBase10ToBase8($maxY, 1024);
+			$minYPow = convertBase10ToBase8($minY, 1024);
+			if ($maxYPow['pow'] > $minYPow['pow']) {
+				$newPow = $maxYPow['pow'];
+			}
+			else {
+				$newPow = $minYPow['pow'];
+			}
+		} else {
+			$newPow = false;
 		}
-		else {
-			$newPow = $minYPow['pow'];
-		}
-
 		for ($i = 0; $i <= $hstr_count; $i++) {
 			// division by zero
 			$hstr_count = ($hstr_count == 0) ? 1 : $hstr_count;
