@@ -31,15 +31,15 @@ static int	get_cpu_num()
 	return (int)sysInfo.dwNumberOfProcessors;
 }
 
-int	SYSTEM_CPU_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+int	SYSTEM_CPU_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	char	tmp[16];
+	char	*tmp;
 
-	if (1 < num_param(param))
+	if (1 < request->nparam)
 		return SYSINFO_RET_FAIL;
 
 	/* only "online" (default) for parameter "type" is supported */
-	if (0 == get_param(param, 1, tmp, sizeof(tmp)) && '\0' != *tmp && 0 != strcmp(tmp, "online"))
+	if (NULL != tmp && '\0' != *tmp && 0 != strcmp(tmp, "online"))
 		return SYSINFO_RET_FAIL;
 
 	SET_UI64_RESULT(result, get_cpu_num());

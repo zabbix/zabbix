@@ -78,7 +78,7 @@ static int	VM_MEMORY_PAVAILABLE(AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
-int     VM_MEMORY_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+int     VM_MEMORY_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	const MODE_FUNCTION	fl[] =
 	{
@@ -91,14 +91,18 @@ int     VM_MEMORY_SIZE(const char *cmd, const char *param, unsigned flags, AGENT
 		{NULL,		0}
 	};
 
-	char	mode[MAX_STRING_LEN];
+	char	*mode_str, mode[MAX_STRING_LEN];
 	int	i;
 
-	if (1 < num_param(param))
+	if (1 < request->nparam)
 		return SYSINFO_RET_FAIL;
 
-	if (0 != get_param(param, 1, mode, sizeof(mode)) || '\0' == *mode)
+	mode_str = get+rparam(request, 0);
+
+	if (NULL == mode_str || '\0' == *mode_str)
 		strscpy(mode, "total");
+	else
+		strscpy(mode, mode_str);
 
 	for (i = 0; NULL != fl[i].mode; i++)
 		if (0 == strcmp(mode, fl[i].mode))

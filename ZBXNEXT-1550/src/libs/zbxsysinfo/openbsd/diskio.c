@@ -129,7 +129,7 @@ static int	VFS_DEV_WRITE_OPERATIONS(const char *devname, AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
-int	VFS_DEV_WRITE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+int	VFS_DEV_WRITE(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	const MODE_FUNCTION	fl[] =
 	{
@@ -138,26 +138,25 @@ int	VFS_DEV_WRITE(const char *cmd, const char *param, unsigned flags, AGENT_RESU
 		{NULL,		0}
 	};
 
-	char	devname[MAX_STRING_LEN];
-	char	mode[MAX_STRING_LEN];
+	char	*devname_str, devname[MAX_STRING_LEN];
+	char	*mode_str, mode[MAX_STRING_LEN];
 	int	i;
 
-	if (num_param(param) > 3)
+	if (2 < request->nparam)
 		return SYSINFO_RET_FAIL;
 
-	if (0 != get_param(param, 1, devname, sizeof(devname)))
-		*devname = '\0';
+	devname_str = get_param(request, 0);
+	mode_str = get_param(request, 1);
 
-	/* default parameter */
-	if (*devname == '\0')
-		zbx_snprintf(devname, sizeof(devname), "all");
+	if (NULL == devname_str || '\0' == *devname_str)
+		strscpy(devname, "all");
+	else
+		strscpy(devname, devname_str);
 
-	if (0 != get_param(param, 2, mode, sizeof(mode)))
-		*mode = '\0';
-
-	/* default parameter */
-	if (*mode == '\0')
-		zbx_snprintf(mode, sizeof(mode), "operations");
+	if (NULL == mode_str || '\0' == *mode_str)
+		strscpy(mode, "operations");
+	else
+		strscpy(mode, mode_str);
 
 	for (i = 0; fl[i].mode != 0; i++)
 		if (0 == strncmp(mode, fl[i].mode, MAX_STRING_LEN))
@@ -166,7 +165,7 @@ int	VFS_DEV_WRITE(const char *cmd, const char *param, unsigned flags, AGENT_RESU
 	return SYSINFO_RET_FAIL;
 }
 
-int	VFS_DEV_READ(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+int	VFS_DEV_READ(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	const MODE_FUNCTION	fl[] =
 	{
@@ -175,26 +174,25 @@ int	VFS_DEV_READ(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 		{NULL,		0}
 	};
 
-	char	devname[MAX_STRING_LEN];
-	char	mode[MAX_STRING_LEN];
+	char	*devname_str, devname[MAX_STRING_LEN];
+	char	*mode_str, mode[MAX_STRING_LEN];
 	int	i;
 
-	if (num_param(param) > 3)
+	if (2 < request->nparam)
 		return SYSINFO_RET_FAIL;
 
-	if (0 != get_param(param, 1, devname, sizeof(devname)))
-		*devname = '\0';
+	devname_str = get_param(request, 0);
+	mode_str = get_param(request, 1);
 
-	/* default parameter */
-	if (*devname == '\0')
-		zbx_snprintf(devname, sizeof(devname), "all");
+	if (NULL == devname_str || '\0' == *devname_str)
+		strscpy(devname, "all");
+	else
+		strscpy(devname, devname_str);
 
-	if (0 != get_param(param, 2, mode, sizeof(mode)))
-		*mode = '\0';
-
-	/* default parameter */
-	if (*mode == '\0')
-		zbx_snprintf(mode, sizeof(mode), "operations");
+	if (NULL == mode_str || '\0' == *mode_str)
+		strscpy(mode, "operations");
+	else
+		strscpy(mode, mode_str);
 
 	for (i = 0; fl[i].mode != 0; i++)
 		if (0 == strncmp(mode, fl[i].mode, MAX_STRING_LEN))

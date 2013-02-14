@@ -93,18 +93,20 @@ int	get_diskstat(const char *devname, zbx_uint64_t *dstat)
 	return ret;
 }
 
-static int	vfs_dev_rw(const char *param, AGENT_RESULT *result, int rw)
+static int	vfs_dev_rw(AGENT_REQUEST *request, AGENT_RESULT *result, int rw)
 {
 	ZBX_SINGLE_DISKDEVICE_DATA *device;
-	char		devname[32], tmp[16];
-	int		type, mode, nparam;
+	char		*devname, *tmp;
+	int		type, mode;
 	zbx_uint64_t	dstats[ZBX_DSTAT_MAX];
 	char		*pd;			/* pointer to device name without '/dev/' prefix, e.g. 'da0' */
 
-	if (3 < (nparam = num_param(param)))	/* too many parameters? */
+	if (3 < request->nparam)
 		return SYSINFO_RET_FAIL;
 
-	if (0 != get_param(param, 1, devname, sizeof(devname)))
+	devname = get_rparam(request, 0);
+
+	if (NULL == devname)
 		return SYSINFO_RET_FAIL;
 
 	pd = devname;
@@ -121,10 +123,9 @@ static int	vfs_dev_rw(const char *param, AGENT_RESULT *result, int rw)
 		}
 	}
 
-	if (0 != get_param(param, 2, tmp, sizeof(tmp)))
-		*tmp = '\0';
+	tmp = get_rparam(request, 1);
 
-	if ('\0' == *tmp || 0 == strcmp(tmp, "bps"))	/* default parameter */
+	if (NULL == tmp || '\0' == *tmp || 0 == strcmp(tmp, "bps"))	/* default parameter */
 		type = ZBX_DSTAT_TYPE_BPS;
 	else if (0 == strcmp(tmp, "ops"))
 		type = ZBX_DSTAT_TYPE_OPS;
@@ -137,7 +138,7 @@ static int	vfs_dev_rw(const char *param, AGENT_RESULT *result, int rw)
 
 	if (type == ZBX_DSTAT_TYPE_BYTE || type == ZBX_DSTAT_TYPE_OPER)
 	{
-		if (nparam > 2)
+		if (request->nparam > 2)
 			return SYSINFO_RET_FAIL;
 
 		if (FAIL == get_diskstat(pd, dstats))
@@ -151,10 +152,9 @@ static int	vfs_dev_rw(const char *param, AGENT_RESULT *result, int rw)
 		return SYSINFO_RET_OK;
 	}
 
-	if (0 != get_param(param, 3, tmp, sizeof(tmp)))
-		*tmp = '\0';
+	tmp = get_rparam(request, 2);
 
-	if ('\0' == *tmp || 0 == strcmp(tmp, "avg1"))	/* default parameter */
+	if (NULL == tmp || '\0' == *tmp || 0 == strcmp(tmp, "avg1"))	/* default parameter */
 		mode = ZBX_AVG1;
 	else if (0 == strcmp(tmp, "avg5"))
 		mode = ZBX_AVG5;
@@ -191,12 +191,12 @@ static int	vfs_dev_rw(const char *param, AGENT_RESULT *result, int rw)
 	return SYSINFO_RET_OK;
 }
 
-int	VFS_DEV_READ(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+int	VFS_DEV_READ(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	return vfs_dev_rw(param, result, ZBX_DEV_READ);
+	return vfs_dev_rw(request, result, ZBX_DEV_READ);
 }
 
-int	VFS_DEV_WRITE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+int	VFS_DEV_WRITE(AGENT_REQUEST *request, unsigned flags, AGENT_RESULT *result)
 {
-	return vfs_dev_rw(param, result, ZBX_DEV_WRITE);
+	return vfs_dev_rw(request, result, ZBX_DEV_WRITE);
 }

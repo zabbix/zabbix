@@ -495,7 +495,7 @@ int	process(const char *in_command, unsigned flags, AGENT_RESULT *result)
 		else
 			strscpy(param, usr_param);
 
-		/* The coomand is found in one of agent loadable modules */
+		/* The command is found in one of agent loadable modules */
 		if (0 != (command->flags & CF_MODFUNCTION))
 		{
 			init_request(&request);
@@ -515,12 +515,24 @@ int	process(const char *in_command, unsigned flags, AGENT_RESULT *result)
 		}
 		else
 		{
-			if (SYSINFO_RET_OK != command->function(usr_command, param, flags, result))
+/*			if (SYSINFO_RET_OK != command->function(usr_command, param, flags, result))
 			{
+				goto notsupported;
+			}*/
+			init_request(&request);
+			if (0 != parse_item_key(param, usr_cmd, &request))
+			{
+				free_request(&request);
+				goto notsupported;
+			}
+			if (SYSINFO_RET_OK != command->function(&request, result))
+			{
+				free_request(&request);
 				/* "return NOTSUPPORTED;" would be more appropriate here for preserving original error */
 				/* message in "result" but would break things relying on ZBX_NOTSUPPORTED message. */
 				goto notsupported;
 			}
+			free_request(&request);
 		}
 	}
 	else

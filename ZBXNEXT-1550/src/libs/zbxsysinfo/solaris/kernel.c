@@ -20,7 +20,7 @@
 #include "common.h"
 #include "sysinfo.h"
 
-int	KERNEL_MAXPROC(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+int	KERNEL_MAXPROC(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	int		ret = SYSINFO_RET_FAIL;
 	kstat_ctl_t	*kc;

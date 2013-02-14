@@ -27,9 +27,9 @@
 #	pragma comment(lib, "user32.lib")
 #endif
 
-int	SYSTEM_LOCALTIME(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+int	SYSTEM_LOCALTIME(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	char		type[16], buf[32];
+	char		*type, buf[32];
 	struct tm	*tm;
 	size_t		offset;
 	int		gmtoff, ms;
@@ -41,10 +41,12 @@ int	SYSTEM_LOCALTIME(const char *cmd, const char *param, unsigned flags, AGENT_R
 	struct timezone	tz;
 #endif
 
-	if (3 < num_param(param))
+	if (1 < request->nparam)
 		return SYSINFO_RET_FAIL;
 
-	if (0 != get_param(param, 1, type, sizeof(type)))
+	type = get_rparam(request, 0);
+
+	if (NULL == type)
 		return SYSINFO_RET_FAIL;
 
 	if ('\0' == *type || 0 == strcmp(type, "utc"))
@@ -94,7 +96,7 @@ int	SYSTEM_LOCALTIME(const char *cmd, const char *param, unsigned flags, AGENT_R
 	return SYSINFO_RET_OK;
 }
 
-int	SYSTEM_USERS_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+int	SYSTEM_USERS_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 #ifdef _WINDOWS
 	char	counter_path[64];
@@ -103,7 +105,7 @@ int	SYSTEM_USERS_NUM(const char *cmd, const char *param, unsigned flags, AGENT_R
 
 	return PERF_COUNTER(cmd, counter_path, flags, result);
 #else
-	return EXECUTE_INT(cmd, "who | wc -l", flags, result);
+	return EXECUTE_INT("who | wc -l", result);
 #endif
 }
 
@@ -289,7 +291,7 @@ static void	get_cpu_type(char **os, size_t *os_alloc, size_t *os_offset, SYSTEM_
 }
 #endif
 
-int	SYSTEM_UNAME(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+int	SYSTEM_UNAME(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 #ifdef _WINDOWS
 	typedef void (WINAPI *PGNSI)(LPSYSTEM_INFO);
@@ -371,28 +373,27 @@ int	SYSTEM_UNAME(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 
 	return SYSINFO_RET_OK;
 #else
-	return EXECUTE_STR(cmd, "uname -a", flags, result);
+	return EXECUTE_STR("uname -a", result);
 #endif
 }
 
-int	SYSTEM_HOSTNAME(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+int	SYSTEM_HOSTNAME(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 #ifdef _WINDOWS
 	DWORD	dwSize = 256;
 	TCHAR	computerName[256];
-	char	buffer[256];
+	char	*type, buffer[256];
 	int	netbios, ret;
 	WSADATA sockInfo;
 
-	if (1 < num_param(param))
+	if (1 < request->nparam)
 		return SYSINFO_RET_FAIL;
 
-	if (0 != get_param(param, 1, buffer, sizeof(buffer)))
-		*buffer = '\0';
+	type = get_rparam(request, 0);
 
-	if ('\0' == *buffer || 0 == strcmp(buffer, "netbios"))
+	if (NULL == type || '\0' == *type || 0 == strcmp(type, "netbios"))
 		netbios = 1;
-	else if (0 == strcmp(buffer, "host"))
+	else if (0 == strcmp(type, "host"))
 		netbios = 0;
 	else
 		return SYSINFO_RET_FAIL;
@@ -422,6 +423,6 @@ int	SYSTEM_HOSTNAME(const char *cmd, const char *param, unsigned flags, AGENT_RE
 	else
 		return SYSINFO_RET_FAIL;
 #else
-	return EXECUTE_STR(cmd, "hostname", flags, result);
+	return EXECUTE_STR("hostname", result);
 #endif
 }

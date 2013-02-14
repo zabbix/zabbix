@@ -23,10 +23,10 @@
 
 #define ZBX_MAX_WAIT_VMSTAT	2	/* maximum seconds to wait for vmstat data on the first call */
 
-int	SYSTEM_STAT(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+int	SYSTEM_STAT(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	char	section[16], type[8];
-	int	nparams, wait = ZBX_MAX_WAIT_VMSTAT;
+	char	*section, *type;
+	int	wait = ZBX_MAX_WAIT_VMSTAT;
 
 	if (!VMSTAT_COLLECTOR_STARTED(collector))
 	{
@@ -50,18 +50,19 @@ int	SYSTEM_STAT(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 			return SYSINFO_RET_FAIL;
 	}
 
-	nparams = num_param(param);
-
-	if (nparams > 2)
+	if (2 < request->nparam)
 		return SYSINFO_RET_FAIL;
 
-	if (0 != get_param(param, 1, section, sizeof(section)))
+	section = get_rparam(request, 0);
+	type = get_rparam(request, 1);
+
+	if (NULL == section)
 		return SYSINFO_RET_FAIL;
 
 	if (0 != get_param(param, 2, type, sizeof(type)))
 		*type = '\0';
 
-	if (0 == strcmp(section, "kthr"))
+	if (0 == strcmp(section, "kthr") && NULL != type)
 	{
 		if (0 == strcmp(type, "r"))
 			SET_DBL_RESULT(result, collector->vmstat.kthr_r);
@@ -70,7 +71,7 @@ int	SYSTEM_STAT(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 		else
 			return SYSINFO_RET_FAIL;
 	}
-	else if (0 == strcmp(section, "page"))
+	else if (0 == strcmp(section, "page") && NULL != type)
 	{
 		if (0 == strcmp(type, "fi"))
 			SET_DBL_RESULT(result, collector->vmstat.fi);
@@ -87,7 +88,7 @@ int	SYSTEM_STAT(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 		else
 			return SYSINFO_RET_FAIL;
 	}
-	else if (0 == strcmp(section, "faults"))
+	else if (0 == strcmp(section, "faults") && NULL != type)
 	{
 		if (0 == strcmp(type, "in"))
 			SET_DBL_RESULT(result, collector->vmstat.in);
@@ -98,7 +99,7 @@ int	SYSTEM_STAT(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 		else
 			return SYSINFO_RET_FAIL;
 	}
-	else if (0 == strcmp(section, "cpu"))
+	else if (0 == strcmp(section, "cpu") && NULL != type)
 	{
 		if (0 == strcmp(type, "us"))
 			SET_DBL_RESULT(result, collector->vmstat.cpu_us);
@@ -119,7 +120,7 @@ int	SYSTEM_STAT(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 		else
 			return SYSINFO_RET_FAIL;
 	}
-	else if (0 == strcmp(section, "disk"))
+	else if (0 == strcmp(section, "disk") && NULL != type)
 	{
 		if (0 == strcmp(type, "bps"))
 			SET_UI64_RESULT(result, collector->vmstat.disk_bps);
@@ -128,9 +129,9 @@ int	SYSTEM_STAT(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 		else
 			return SYSINFO_RET_FAIL;
 	}
-	else if (0 == strcmp(section, "ent") && nparams == 1 && collector->vmstat.shared_enabled)
+	else if (0 == strcmp(section, "ent") && 1 == request->nparam && collector->vmstat.shared_enabled)
 		SET_DBL_RESULT(result, collector->vmstat.ent);
-	else if (0 == strcmp(section, "memory"))
+	else if (0 == strcmp(section, "memory") && NULL != type)
 	{
 		if (0 == strcmp(type, "avm") && collector->vmstat.aix52stats)
 			SET_UI64_RESULT(result, collector->vmstat.mem_avm);

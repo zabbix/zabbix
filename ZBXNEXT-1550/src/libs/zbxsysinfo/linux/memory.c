@@ -180,7 +180,7 @@ static int	VM_MEMORY_SHARED(AGENT_RESULT *result)
 #endif
 }
 
-int	VM_MEMORY_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+int	VM_MEMORY_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	const MODE_FUNCTION	fl[] =
 	{
@@ -196,13 +196,15 @@ int	VM_MEMORY_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_RES
 		{NULL,		0}
 	};
 
-	char	mode[MAX_STRING_LEN];
+	char	*mode;
 	int	i;
 
-	if (1 < num_param(param))
+	if (1 < request -> nparam)
 		return SYSINFO_RET_FAIL;
 
-	if (0 != get_param(param, 1, mode, sizeof(mode)) || '\0' == *mode)
+	mode = get_rparam(request, 0);
+
+	if (NULL == mode || '\0' == *mode)
 		strscpy(mode, "total");
 
 	for (i = 0; NULL != fl[i].mode; i++)

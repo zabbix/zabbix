@@ -39,7 +39,7 @@
 extern int	CONFIG_TIMEOUT;
 
 static int	ONLY_ACTIVE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
-static int	SYSTEM_RUN(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
+static int	SYSTEM_RUN(AGENT_REQUEST *request, AGENT_RESULT *result);
 
 ZBX_METRIC	parameters_common[] =
 /*      KEY                     FLAG		FUNCTION        ADD_PARAM       TEST_PARAM */
@@ -89,7 +89,7 @@ int	EXECUTE_USER_PARAMETER(const char *cmd, const char *param, unsigned flags, A
 {
 	int	ret;
 
-	ret = EXECUTE_STR(cmd, param, flags, result);
+	ret = EXECUTE_STR(param, result);
 
 	if (SYSINFO_RET_FAIL == ret && 0 == result->type)
 	{
@@ -102,7 +102,7 @@ int	EXECUTE_USER_PARAMETER(const char *cmd, const char *param, unsigned flags, A
 	return ret;
 }
 
-int	EXECUTE_STR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+int	EXECUTE_STR(const char *command, AGENT_RESULT *result)
 {
 	int	ret = SYSINFO_RET_FAIL;
 	char	*cmd_result = NULL, error[MAX_STRING_LEN];
@@ -111,7 +111,7 @@ int	EXECUTE_STR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 
 	init_result(result);
 
-	if (SUCCEED != zbx_execute(param, &cmd_result, error, sizeof(error), CONFIG_TIMEOUT))
+	if (SUCCEED != zbx_execute(command, &cmd_result, error, sizeof(error), CONFIG_TIMEOUT))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, error));
 		goto lbl_exit;
@@ -120,7 +120,7 @@ int	EXECUTE_STR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 	zbx_rtrim(cmd_result, ZBX_WHITESPACE);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "Run remote command [%s] Result [%d] [%.20s]...",
-			param, strlen(cmd_result), cmd_result);
+			command, strlen(cmd_result), cmd_result);
 
 	if ('\0' == *cmd_result)	/* we got whitespace only */
 		goto lbl_exit;
@@ -134,14 +134,14 @@ lbl_exit:
 	return ret;
 }
 
-int	EXECUTE_DBL(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+int	EXECUTE_DBL(const char *command, AGENT_RESULT *result)
 {
-	if (SYSINFO_RET_OK != EXECUTE_STR(cmd, param, flags, result))
+	if (SYSINFO_RET_OK != EXECUTE_STR(command, result))
 		return SYSINFO_RET_FAIL;
 
 	if (NULL == GET_DBL_RESULT(result))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "Remote command [%s] result is not double", param);
+		zabbix_log(LOG_LEVEL_WARNING, "Remote command [%s] result is not double", command);
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -150,14 +150,14 @@ int	EXECUTE_DBL(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 	return SYSINFO_RET_OK;
 }
 
-int	EXECUTE_INT(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+int	EXECUTE_INT(const char *command, AGENT_RESULT *result)
 {
-	if (SYSINFO_RET_OK != EXECUTE_STR(cmd, param, flags, result))
+	if (SYSINFO_RET_OK != EXECUTE_STR(command, result))
 		return SYSINFO_RET_FAIL;
 
 	if (NULL == GET_UI64_RESULT(result))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "Remote command [%s] result is not unsigned integer", param);
+		zabbix_log(LOG_LEVEL_WARNING, "Remote command [%s] result is not unsigned integer", command);
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -166,20 +166,22 @@ int	EXECUTE_INT(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 	return SYSINFO_RET_OK;
 }
 
-static int	SYSTEM_RUN(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+static int	SYSTEM_RUN(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	char	command[MAX_STRING_LEN], flag[9];
+	char	*command, *flag;
 
+/* TODO
 	if (1 != CONFIG_ENABLE_REMOTE_COMMANDS && 0 == (flags & PROCESS_LOCAL_COMMAND))
 		return SYSINFO_RET_FAIL;
+*/
 
-	if (2 < num_param(param))
+	if (2 < request->nparam)
 		return SYSINFO_RET_FAIL;
 
-	if (0 != get_param(param, 1, command, sizeof(command)))
-		return SYSINFO_RET_FAIL;
+	command = get_rparam(request, 0);
+	flag = get_rparam(request, 1);
 
-	if ('\0' == *command)
+	if (NULL == command || '\0' == *command)
 		return SYSINFO_RET_FAIL;
 
 	if (1 == CONFIG_LOG_REMOTE_COMMANDS)
@@ -187,11 +189,8 @@ static int	SYSTEM_RUN(const char *cmd, const char *param, unsigned flags, AGENT_
 	else
 		zabbix_log(LOG_LEVEL_DEBUG, "Executing command '%s'", command);
 
-	if (0 != get_param(param, 2, flag, sizeof(flag)))
-		*flag = '\0';
-
-	if ('\0' == *flag || 0 == strcmp(flag, "wait"))	/* default parameter */
-		return EXECUTE_STR(cmd, command, flags, result);
+	if (NULL == flag || '\0' == *flag || 0 == strcmp(flag, "wait"))	/* default parameter */
+		return EXECUTE_STR(command, result);
 	else if (0 != strcmp(flag, "nowait") || SUCCEED != zbx_execute_nowait(command))
 		return SYSINFO_RET_FAIL;
 
