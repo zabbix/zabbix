@@ -69,9 +69,9 @@ foreach ($data['discoveries'] as $discovery) {
 	$description[] = new CLink($discovery['name_expanded'], '?form=update&itemid='.$discovery['itemid']);
 
 	$status = new CLink(
-		itemIndicator($discovery['status']),
+		itemIndicator($discovery['status'], $discovery['state']),
 		'?hostid='.$_REQUEST['hostid'].'&g_hostdruleid='.$discovery['itemid'].'&go='.($discovery['status'] ? 'activate':'disable'),
-		itemIndicatorStyle($discovery['status'])
+		itemIndicatorStyle($discovery['status'], $discovery['state'])
 	);
 
 	$error = '';
