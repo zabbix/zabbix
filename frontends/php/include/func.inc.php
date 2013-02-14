@@ -537,22 +537,23 @@ function convert_units($value, $units, $convert = ITEM_CONVERT_WITH_UNITS, $byte
 		}
 	}
 
-	switch ($units) {
-		case 'Bps':
-		case 'B':
-			$step = 1024;
-			$convert = $convert ? $convert : ITEM_CONVERT_NO_UNITS;
-			break;
-		case 'b':
-		case 'bps':
-			$convert = $convert ? $convert : ITEM_CONVERT_NO_UNITS;
-		default:
-			$step = 1000;
-	}
-
-	// if one or more items is B or Bps, then Y-scale use base 8 and calculate in bytes
+	// if one or more items is B or Bps, then Y-scale use base 8 and calculated in bytes
 	if ($byteStep) {
 		$step = 1024;
+	}
+	else {
+		switch ($units) {
+			case 'Bps':
+			case 'B':
+				$step = 1024;
+				$convert = $convert ? $convert : ITEM_CONVERT_NO_UNITS;
+				break;
+			case 'b':
+			case 'bps':
+				$convert = $convert ? $convert : ITEM_CONVERT_NO_UNITS;
+			default:
+				$step = 1000;
+		}
 	}
 
 	// init intervals
@@ -630,7 +631,7 @@ function convert_units($value, $units, $convert = ITEM_CONVERT_WITH_UNITS, $byte
 	return rtrim(sprintf('%s %s%s', $value, $desc, $units));
 }
 
-function convertBase10ToBase8 ($value ,$step  = false) {
+function convertBase10ToBase8 ($value ,$step = false) {
 	if (empty($step)) {
 		$step = 1000;
 	}
