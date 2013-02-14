@@ -97,7 +97,7 @@ int     VM_MEMORY_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if (1 < request->nparam)
 		return SYSINFO_RET_FAIL;
 
-	mode_str = get+rparam(request, 0);
+	mode_str = get_rparam(request, 0);
 
 	if (NULL == mode_str || '\0' == *mode_str)
 		strscpy(mode, "total");

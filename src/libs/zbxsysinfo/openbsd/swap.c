@@ -117,7 +117,7 @@ int	SYSTEM_SWAP_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 	char	*swapdev, *mode;
 	int	ret = SYSINFO_RET_FAIL;
 
-	if (2 < request-nparam)
+	if (2 < request->nparam)
 		return SYSINFO_RET_FAIL;
 
 	swapdev = get_rparam(request, 0);

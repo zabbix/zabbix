@@ -109,18 +109,18 @@ static int	SYSTEM_SWAP_PFREE(AGENT_REQUEST *request, AGENT_RESULT *result)
 
         init_result(&result_tmp);
 
-	if(SYSTEM_SWAP_TOTAL(cmd, param, flags, &result_tmp) != SYSINFO_RET_OK || !(result_tmp.type & AR_UINT64))
+	if (SYSINFO_RET_OK != SYSTEM_SWAP_TOTAL(request, &result_tmp) || !(result_tmp.type & AR_UINT64))
 		return SYSINFO_RET_FAIL;
 	tot_val = result_tmp.ui64;
 
 	/* Check for division by zero */
-	if(tot_val == 0)
+	if (0 == tot_val)
 	{
 		free_result(&result_tmp);
 		return SYSINFO_RET_FAIL;
 	}
 
-	if(SYSTEM_SWAP_FREE(cmd, param, flags, &result_tmp) != SYSINFO_RET_OK || !(result_tmp.type & AR_UINT64))
+	if (SYSINFO_RET_OK != SYSTEM_SWAP_FREE(request, &result_tmp) || !(result_tmp.type & AR_UINT64))
 		return SYSINFO_RET_FAIL;
 	free_val = result_tmp.ui64;
 
@@ -139,18 +139,18 @@ static int	SYSTEM_SWAP_PUSED(AGENT_REQUEST *request, AGENT_RESULT *result)
 
         init_result(&result_tmp);
 
-	if(SYSTEM_SWAP_TOTAL(cmd, param, flags, &result_tmp) != SYSINFO_RET_OK || !(result_tmp.type & AR_UINT64))
+	if (SYSINFO_RET_OK != SYSTEM_SWAP_TOTAL(request, &result_tmp) || !(result_tmp.type & AR_UINT64))
 		return SYSINFO_RET_FAIL;
 	tot_val = result_tmp.ui64;
 
 	/* Check for division by zero */
-	if(tot_val == 0)
+	if(0 == tot_val)
 	{
 		free_result(&result_tmp);
 		return SYSINFO_RET_FAIL;
 	}
 
-	if(SYSTEM_SWAP_FREE(cmd, param, flags, &result_tmp) != SYSINFO_RET_OK || !(result_tmp.type & AR_UINT64))
+	if (SYSINFO_RET_OK != SYSTEM_SWAP_FREE(request, &result_tmp) || !(result_tmp.type & AR_UINT64))
 		return SYSINFO_RET_FAIL;
 	free_val = result_tmp.ui64;
 
