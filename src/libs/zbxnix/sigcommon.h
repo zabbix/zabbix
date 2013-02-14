@@ -27,11 +27,10 @@ extern int	sig_exiting;
 #define SIG_CHECKED_FIELD_TYPE(siginfo, field, type)	(NULL == siginfo ? (type)-1 : siginfo->field)
 #define SIG_PARENT_PROCESS				(sig_parent_pid == (int)getpid())
 
-#define SIG_CHECK_PARAMS(sig, siginfo, context) \
-		if (NULL == siginfo) \
-			zabbix_log(LOG_LEVEL_DEBUG, "received [signal:%d(%s)] with NULL siginfo", sig, get_signal_name(sig)); \
-		if (NULL == context) \
-			zabbix_log(LOG_LEVEL_DEBUG, "received [signal:%d(%s)] with NULL context", sig, get_signal_name(sig));
+#define SIG_CHECK_PARAMS(sig, siginfo, context)											\
+		if (NULL == siginfo)												\
+			zabbix_log(LOG_LEVEL_DEBUG, "received [signal:%d(%s)] with NULL siginfo", sig, get_signal_name(sig));	\
+		if (NULL == context)												\
+			zabbix_log(LOG_LEVEL_DEBUG, "received [signal:%d(%s)] with NULL context", sig, get_signal_name(sig))
 
-
-#endif /* SIGCOMMON_H_ */
+#endif	/* SIGCOMMON_H_ */
