@@ -126,7 +126,7 @@ static int	VFS_FS_PFREE(const char *fs, AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
-int	VFS_FS_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+int	VFS_FS_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	const MODE_FUNCTION	fl[] =
 	{
@@ -138,17 +138,22 @@ int	VFS_FS_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 		{NULL,		0}
 	};
 
-	char	fsname[MAX_STRING_LEN], mode[8];
+	char	*fsname, *mode_str, mode[8];
 	int	i;
 
-	if (2 < num_param(param))
+	if (2 < request->nparam)
 		return SYSINFO_RET_FAIL;
 
-	if (0 != get_param(param, 1, fsname, sizeof(fsname)))
+	fsname = get_rparam(request, 0);
+	mode_str = get_rparam(request, 1);
+
+	if (NULL == fsname)
 		return SYSINFO_RET_FAIL;
 
-	if (0 != get_param(param, 2, mode, sizeof(mode)) || '\0' == *mode)
+	if (NULL == mode_str || '\0' == *mode_str)
 		strscpy(mode, "total");
+	else
+		strscpy(mode, mode_str);
 
 	for (i = 0; NULL != fl[i].mode; i++)
 		if (0 == strcmp(mode, fl[i].mode))
@@ -157,7 +162,7 @@ int	VFS_FS_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 	return SYSINFO_RET_FAIL;
 }
 
-int	VFS_FS_DISCOVERY(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+int	VFS_FS_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	int		i, rc, ret = SYSINFO_RET_FAIL;
 	struct statfs	*mntbuf;

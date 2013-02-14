@@ -176,11 +176,12 @@ clean:
 	return ret;
 }
 
-int	NET_IF_IN(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+int	NET_IF_IN(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char		if_name[MAX_STRING_LEN], mode[16];
 	zbx_uint64_t	ibytes, ipackets, ierrors, idropped;
 
+/* TODO finish ... */
 	if (num_param(param) > 2)
 		return SYSINFO_RET_FAIL;
 

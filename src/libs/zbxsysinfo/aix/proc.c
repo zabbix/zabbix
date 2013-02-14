@@ -195,7 +195,7 @@ int	PROC_MEM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *r
 
 			zbx_snprintf(tmp, sizeof(tmp), "ps -p %i -oargs=", procsinfo.pi_pid);
 
-			if (SYSINFO_RET_OK != EXECUTE_STR(cmd, tmp, flags, &proc_args))
+			if (SYSINFO_RET_OK != EXECUTE_STR(tmp, &proc_args))
 			{
 				free_result(&proc_args);
 				continue;
@@ -355,7 +355,7 @@ int	PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *r
 
 			zbx_snprintf(tmp, sizeof(tmp), "ps -p %i -oargs=", procsinfo.pi_pid);
 
-			if (SYSINFO_RET_OK != EXECUTE_STR(cmd, tmp, flags, &proc_args))
+			if (SYSINFO_RET_OK != EXECUTE_STR(tmp, &proc_args))
 			{
 				free_result(&proc_args);
 				continue;

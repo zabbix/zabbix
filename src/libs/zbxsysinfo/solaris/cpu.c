@@ -21,16 +21,18 @@
 #include "sysinfo.h"
 #include "stats.h"
 
-int	SYSTEM_CPU_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+int	SYSTEM_CPU_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	char	tmp[16];
+	char	*tmp;
 	int	name;
 	long	ncpu;
 
-	if (1 < num_param(param))
+	if (1 < request->nparam)
 		return SYSINFO_RET_FAIL;
 
-	if (0 != get_param(param, 1, tmp, sizeof(tmp)) || '\0' == *tmp || 0 == strcmp(tmp, "online"))
+	tmp = get_rparam(request, 0);
+
+	if (NULL == tmp || '\0' == *tmp || 0 == strcmp(tmp, "online"))
 		name = _SC_NPROCESSORS_ONLN;
 	else if (0 == strcmp(tmp, "max"))
 		name = _SC_NPROCESSORS_CONF;
@@ -45,20 +47,24 @@ int	SYSTEM_CPU_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RES
 	return SYSINFO_RET_OK;
 }
 
-int	SYSTEM_CPU_UTIL(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+int	SYSTEM_CPU_UTIL(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	char	tmp[16];
+	char	*tmp;
 	int	cpu_num, state, mode;
 
-	if (3 < num_param(param))
+	if (3 < request->nparam)
 		return SYSINFO_RET_FAIL;
 
-	if (0 != get_param(param, 1, tmp, sizeof(tmp)) || '\0' == *tmp || 0 == strcmp(tmp, "all"))
+	tmp = get_rparam(request, 0);
+
+	if (NULL == tmp || '\0' == *tmp || 0 == strcmp(tmp, "all"))
 		cpu_num = 0;
 	else if (SUCCEED != is_uint(tmp) || 1 > (cpu_num = atoi(tmp) + 1))
 		return SYSINFO_RET_FAIL;
 
-	if (0 != get_param(param, 2, tmp, sizeof(tmp)) || '\0' == *tmp || 0 == strcmp(tmp, "user"))
+	tmp = get_rparam(request, 1);
+
+	if (NULL == tmp || '\0' == *tmp || 0 == strcmp(tmp, "user"))
 		state = ZBX_CPU_STATE_USER;
 	else if (0 == strcmp(tmp, "iowait"))
 		state = ZBX_CPU_STATE_IOWAIT;
@@ -69,7 +75,9 @@ int	SYSTEM_CPU_UTIL(const char *cmd, const char *param, unsigned flags, AGENT_RE
 	else
 		return SYSINFO_RET_FAIL;
 
-	if (0 != get_param(param, 3, tmp, sizeof(tmp)) || '\0' == *tmp || 0 == strcmp(tmp, "avg1"))
+	tmp = get_rparam(request, 2);
+
+	if (NULL == tmp || '\0' == *tmp || 0 == strcmp(tmp, "avg1"))
 		mode = ZBX_AVG1;
 	else if (0 == strcmp(tmp, "avg5"))
 		mode = ZBX_AVG5;
@@ -111,9 +119,9 @@ close:
 }
 #endif
 
-int	SYSTEM_CPU_LOAD(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+int	SYSTEM_CPU_LOAD(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	char	tmp[16];
+	char	*tmp;
 	double	value;
 	int	per_cpu = 1, cpu_num;
 #if defined(HAVE_GETLOADAVG)
@@ -124,16 +132,20 @@ int	SYSTEM_CPU_LOAD(const char *cmd, const char *param, unsigned flags, AGENT_RE
 	int	load;
 #endif
 
-	if (2 < num_param(param))
+	if (2 < request->nparam)
 		return SYSINFO_RET_FAIL;
 
-	if (0 != get_param(param, 1, tmp, sizeof(tmp)) || '\0' == *tmp || 0 == strcmp(tmp, "all"))
+	tmp = get_rparam(request, 0);
+
+	if (NULL == tmp || '\0' == *tmp || 0 == strcmp(tmp, "all"))
 		per_cpu = 0;
 	else if (0 != strcmp(tmp, "percpu"))
 		return SYSINFO_RET_FAIL;
 
 #if defined(HAVE_GETLOADAVG)
-	if (0 != get_param(param, 2, tmp, sizeof(tmp)) || '\0' == *tmp || 0 == strcmp(tmp, "avg1"))
+	tmp = get_rparam(request, 1);
+
+	if (NULL == tmp || '\0' == *tmp || 0 == strcmp(tmp, "avg1"))
 		mode = ZBX_AVG1;
 	else if (0 == strcmp(tmp, "avg5"))
 		mode = ZBX_AVG5;
@@ -147,7 +159,9 @@ int	SYSTEM_CPU_LOAD(const char *cmd, const char *param, unsigned flags, AGENT_RE
 
 	value = load[mode];
 #elif defined(HAVE_KSTAT_H)
-	if (0 != get_param(param, 2, tmp, sizeof(tmp)) || '\0' == *tmp || 0 == strcmp(tmp, "avg1"))
+	tmp = get_rparam(request, 1);
+
+	if (NULL == tmp || '\0' == *tmp || 0 == strcmp(tmp, "avg1"))
 		key = "avenrun_1min";
 	else if (0 == strcmp(tmp, "avg5"))
 		key = "avenrun_5min";
@@ -175,7 +189,7 @@ int	SYSTEM_CPU_LOAD(const char *cmd, const char *param, unsigned flags, AGENT_RE
 	return SYSINFO_RET_OK;
 }
 
-int	SYSTEM_CPU_SWITCHES(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+int	SYSTEM_CPU_SWITCHES(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	kstat_ctl_t	*kc;
 	kstat_t		*k;
@@ -210,7 +224,7 @@ int	SYSTEM_CPU_SWITCHES(const char *cmd, const char *param, unsigned flags, AGEN
 	return SYSINFO_RET_OK;
 }
 
-int	SYSTEM_CPU_INTR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+int	SYSTEM_CPU_INTR(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	kstat_ctl_t	*kc;
 	kstat_t		*k;

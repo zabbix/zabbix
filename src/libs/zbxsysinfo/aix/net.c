@@ -64,15 +64,16 @@ static int	get_net_stat(const char *if_name, net_stat_t *ns)
 #endif
 }
 
-int	NET_IF_IN(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+int	NET_IF_IN(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char		if_name[MAX_STRING_LEN], mode[MAX_STRING_LEN];
 	net_stat_t	ns;
 	int		ret = SYSINFO_RET_OK;
 
-	if (num_param(param) > 2)
+	if (2 < request->nparam)
 		return SYSINFO_RET_FAIL;
 
+/* TODO finish ... */
 	if (0 != get_param(param, 1, if_name, sizeof(if_name)) || *if_name == '\0')
 		return SYSINFO_RET_FAIL;
 

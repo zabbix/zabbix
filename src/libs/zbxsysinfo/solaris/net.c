@@ -181,15 +181,17 @@ static int	NET_IF_TOTAL_ERRORS(const char *if_name, AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
-int	NET_IF_COLLISIONS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+int	NET_IF_COLLISIONS(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	kstat_named_t	kn;
-	char		if_name[MAX_STRING_LEN];
+	char		*if_name;
 
-	if (1 < num_param(param))
+	if (1 < request->nparam)
 		return SYSINFO_RET_FAIL;
 
-	if (0 != get_param(param, 1, if_name, sizeof(if_name)))
+	if_name = get_rparam(request, 0);
+
+	if (NULL == if_name)
 		return SYSINFO_RET_FAIL;
 
 	if (SUCCEED == get_kstat_named_field(if_name, "collisions", &kn))
@@ -200,16 +202,18 @@ int	NET_IF_COLLISIONS(const char *cmd, const char *param, unsigned flags, AGENT_
 	return SYSINFO_RET_OK;
 }
 
-int	NET_TCP_LISTEN(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+int	NET_TCP_LISTEN(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	char		tmp[8], command[64];
+	char		*tmp, command[64];
 	unsigned short	port;
 	int		res;
 
-	if (1 < num_param(param))
+	if (1 < request->nparam)
 		return SYSINFO_RET_FAIL;
 
-	if (0 != get_param(param, 1, tmp, sizeof(tmp)))
+	tmp = get_rparam(request, 0);
+
+	if (NULL == tmp)
 		return SYSINFO_RET_FAIL;
 
 	if (FAIL == is_ushort(tmp, &port))
@@ -217,7 +221,7 @@ int	NET_TCP_LISTEN(const char *cmd, const char *param, unsigned flags, AGENT_RES
 
 	zbx_snprintf(command, sizeof(command), "netstat -an -P tcp | grep '\\.%hu[^.].*LISTEN' | wc -l", port);
 
-	if (SYSINFO_RET_FAIL == (res = EXECUTE_INT(NULL, command, flags, result)))
+	if (SYSINFO_RET_FAIL == (res = EXECUTE_INT(command, result)))
 		return res;
 
 	if (1 < result->ui64)
@@ -226,16 +230,18 @@ int	NET_TCP_LISTEN(const char *cmd, const char *param, unsigned flags, AGENT_RES
 	return res;
 }
 
-int	NET_UDP_LISTEN(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+int	NET_UDP_LISTEN(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	char		tmp[8], command[64];
+	char		*tmp, command[64];
 	unsigned short	port;
 	int		res;
 
-	if (1 < num_param(param))
+	if (1 < request->nparam)
 		return SYSINFO_RET_FAIL;
 
-	if (0 != get_param(param, 1, tmp, sizeof(tmp)))
+	tmp = get_rparam(request, 0);
+
+	if (NULL == tmp)
 		return SYSINFO_RET_FAIL;
 
 	if (FAIL == is_ushort(tmp, &port))
@@ -243,7 +249,7 @@ int	NET_UDP_LISTEN(const char *cmd, const char *param, unsigned flags, AGENT_RES
 
 	zbx_snprintf(command, sizeof(command), "netstat -an -P udp | grep '\\.%hu[^.].*Idle' | wc -l", port);
 
-	if (SYSINFO_RET_FAIL == (res = EXECUTE_INT(NULL, command, flags, result)))
+	if (SYSINFO_RET_FAIL == (res = EXECUTE_INT(command, result)))
 		return res;
 
 	if (1 < result->ui64)
@@ -252,7 +258,7 @@ int	NET_UDP_LISTEN(const char *cmd, const char *param, unsigned flags, AGENT_RES
 	return res;
 }
 
-int	NET_IF_IN(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+int	NET_IF_IN(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	const MODE_FUNCTION	fl[] =
 	{
@@ -262,17 +268,22 @@ int	NET_IF_IN(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *
 		{NULL,	    0}
 	};
 
-	char	if_name[MAX_STRING_LEN], mode[16];
+	char	*if_name, *mode_str, mode[16];
 	int	i;
 
-	if (2 < num_param(param))
+	if (2 < request->nparam)
 		return SYSINFO_RET_FAIL;
 
-	if (0 != get_param(param, 1, if_name, sizeof(if_name)))
+	if_name = get_rparam(request, 0);
+	mode_str = get_rparam(request, 1);
+
+	if (NULL == if_name)
 		return SYSINFO_RET_FAIL;
 
-	if (0 != get_param(param, 2, mode, sizeof(mode)) || '\0' == *mode)
+	if (NULL == mode_str || '\0' == *mode_str)
 		strscpy(mode, "bytes");
+	else
+		strscpy(mode, mode_str);
 
 	for (i = 0; NULL != fl[i].mode; i++)
 		if (0 == strcmp(mode, fl[i].mode))
@@ -281,7 +292,7 @@ int	NET_IF_IN(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *
 	return SYSINFO_RET_FAIL;
 }
 
-int	NET_IF_OUT(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+int	NET_IF_OUT(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	const MODE_FUNCTION	fl[] =
 	{
@@ -291,17 +302,22 @@ int	NET_IF_OUT(const char *cmd, const char *param, unsigned flags, AGENT_RESULT 
 		{NULL,	    0}
 	};
 
-	char	if_name[MAX_STRING_LEN], mode[16];
+	char	*if_name, *mode_str, mode[16];
 	int	i;
 
-	if (2 < num_param(param))
+	if (2 < request->nparam)
 		return SYSINFO_RET_FAIL;
 
-	if (0 != get_param(param, 1, if_name, sizeof(if_name)))
+	if_name = get_rparam(request, 0);
+	mode_str = get_rparam(request, 1);
+
+	if (NULL == if_name)
 		return SYSINFO_RET_FAIL;
 
-	if (0 != get_param(param, 2, mode, sizeof(mode)) || '\0' == *mode)
+	if (NULL == mode_str || '\0' == *mode_str)
 		strscpy(mode, "bytes");
+	else
+		strscpy(mode, mode_str);
 
 	for (i = 0; NULL != fl[i].mode; i++)
 		if (0 == strcmp(mode, fl[i].mode))
@@ -310,7 +326,7 @@ int	NET_IF_OUT(const char *cmd, const char *param, unsigned flags, AGENT_RESULT 
 	return SYSINFO_RET_FAIL;
 }
 
-int	NET_IF_TOTAL(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+int	NET_IF_TOTAL(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	const MODE_FUNCTION	fl[] =
 	{
@@ -320,17 +336,22 @@ int	NET_IF_TOTAL(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 		{NULL,	    0}
 	};
 
-	char	if_name[MAX_STRING_LEN], mode[16];
+	char	*if_name, *mode_str, mode[16];
 	int	i;
 
-	if (2 < num_param(param))
+	if (2 < request->nparam)
 		return SYSINFO_RET_FAIL;
 
-	if (0 != get_param(param, 1, if_name, sizeof(if_name)))
+	if_name = get_rparam(request, 0);
+	mode_str = get_rparam(request, 1);
+
+	if (NULL == if_name)
 		return SYSINFO_RET_FAIL;
 
-	if (0 != get_param(param, 2, mode, sizeof(mode)) || '\0' == *mode)
+	if (NULL == mode_str || '\0' == *mode_str)
 		strscpy(mode, "bytes");
+	else
+		strscpy(mode, mode_str);
 
 	for (i = 0; NULL != fl[i].mode; i++)
 		if (0 == strcmp(mode, fl[i].mode))
@@ -339,7 +360,7 @@ int	NET_IF_TOTAL(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 	return SYSINFO_RET_FAIL;
 }
 
-int	NET_IF_DISCOVERY(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+int	NET_IF_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	struct if_nameindex	*ni;
 	struct zbx_json		j;

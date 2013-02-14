@@ -21,20 +21,26 @@
 #include "sysinfo.h"
 #include "zbxjson.h"
 
-int	VFS_FS_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+int	VFS_FS_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	char		path[MAX_PATH], mode[20];
+	char		*path, *mode_str, mode[20];
 	LPTSTR		wpath;
 	ULARGE_INTEGER	freeBytes, totalBytes;
 
-	if (num_param(param) > 2)
+	if (2 < request->nparam)
 		return SYSINFO_RET_FAIL;
 
-	if (0 != get_param(param, 1, path, MAX_PATH))
+	path = get_nparam(request, 0);
+	mode_str = get_nparam(request, 1);
+
+	if (NULL = path)
 		return SYSINFO_RET_FAIL;
 
-	if (0 != get_param(param, 2, mode, sizeof(mode)))
-		*mode = '\0';
+	if (NULL == mode_str || '\0' == *mode_str)
+		strscpy(mode, "total");
+	else
+		strscpy(mode, mode_str);
+
 
 	wpath = zbx_utf8_to_unicode(path);
 	if (0 == GetDiskFreeSpaceEx(wpath, &freeBytes, &totalBytes, NULL))
@@ -44,7 +50,7 @@ int	VFS_FS_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 	}
 	zbx_free(wpath);
 
-	if ('\0' == *mode || 0 == strcmp(mode, "total"))	/* default parameter */
+	if (0 == strcmp(mode, "total"))
 		SET_UI64_RESULT(result, totalBytes.QuadPart);
 	else if (0 == strcmp(mode, "free"))
 		SET_UI64_RESULT(result, freeBytes.QuadPart);
@@ -61,7 +67,7 @@ int	VFS_FS_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 	return SYSINFO_RET_OK;
 }
 
-int	VFS_FS_DISCOVERY(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+int	VFS_FS_DISCOVERY(AGENT_REQUEST request, AGENT_RESULT *result)
 {
 	TCHAR		fsName[MAX_PATH + 1];
 	LPTSTR		buffer = NULL, p;

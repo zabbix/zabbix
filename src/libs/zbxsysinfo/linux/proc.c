@@ -96,7 +96,7 @@ static int	check_procname(FILE *f_cmd, FILE *f_stat, const char *procname)
 	size_t	l;
 	int	ret = SUCCEED;
 
-	if ('\0' == *procname)
+	if (NULL == procname || '\0' == *procname)
 		return SUCCEED;
 
 	/* process name in /proc/[pid]/status contains limited number of characters */
@@ -157,7 +157,7 @@ static int	check_proccomm(FILE *f_cmd, const char *proccomm)
 	size_t	i, l;
 	int	ret = SUCCEED;
 
-	if ('\0' == *proccomm)
+	if (NULL == proccomm || '\0' == *proccomm)
 		return SUCCEED;
 
 	if (SUCCEED == get_cmdline(f_cmd, &tmp, &l))
@@ -209,11 +209,9 @@ static int	check_procstate(FILE *f_stat, int zbx_proc_stat)
 	return FAIL;
 }
 
-int	PROC_MEM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	char		tmp[MAX_STRING_LEN], *p, *p1,
-			procname[MAX_STRING_LEN],
-			proccomm[MAX_STRING_LEN];
+	char		tmp[MAX_STRING_LEN], *p, *p1, *procname, *username, *procfunc, *proccomm;
 	DIR		*dir;
 	struct dirent	*entries;
 	struct passwd	*usrinfo;
@@ -222,28 +220,24 @@ int	PROC_MEM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *r
 	int		do_task, proccount = 0;
 	double		memsize = 0;
 
-	if (4 < num_param(param))
+	if (4 < request->nparam)
 		return SYSINFO_RET_FAIL;
 
-	if (0 != get_param(param, 1, procname, sizeof(procname)))
-		*procname = '\0';
+	procname = get_rparam(request, 0);
+	username = get_rparam(request, 1);
+	procfunc = get_rparam(request, 2);
+	proccomm = get_rparam(request, 3);
 
-	if (0 != get_param(param, 2, tmp, sizeof(tmp)))
-		*tmp = '\0';
-
-	if ('\0' != *tmp)
+	if (NULL != username && '\0' != *username)
 	{
-		usrinfo = getpwnam(tmp);
+		usrinfo = getpwnam(username);
 		if (NULL == usrinfo)	/* incorrect user name */
 			return SYSINFO_RET_FAIL;
 	}
 	else
 		usrinfo = NULL;
 
-	if (0 != get_param(param, 3, tmp, sizeof(tmp)))
-		*tmp = '\0';
-
-	if ('\0' != *tmp)
+	if (NULL != procfunc && '\0' != *tmp)
 	{
 		if (0 == strcmp(tmp, "avg"))
 			do_task = DO_AVG;
@@ -258,9 +252,6 @@ int	PROC_MEM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *r
 	}
 	else
 		do_task = DO_SUM;
-
-	if (0 != get_param(param, 4, proccomm, sizeof(proccomm)))
-		*proccomm = '\0';
 
 	if (NULL == (dir = opendir("/proc")))
 		return SYSINFO_RET_FAIL;
@@ -349,11 +340,9 @@ int	PROC_MEM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *r
 	return SYSINFO_RET_OK;
 }
 
-int	PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	char		tmp[MAX_STRING_LEN],
-			procname[MAX_STRING_LEN],
-			proccomm[MAX_STRING_LEN];
+	char		tmp[MAX_STRING_LEN], *procname, *username, *procfunc, *proccomm;
 	DIR		*dir;
 	struct dirent	*entries;
 	struct passwd	*usrinfo;
@@ -361,45 +350,37 @@ int	PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *r
 	int		zbx_proc_stat;
 	zbx_uint64_t	proccount = 0;
 
-	if (num_param(param) > 4)
+	if (request->nparam > 4)
 		return SYSINFO_RET_FAIL;
 
-	if (0 != get_param(param, 1, procname, sizeof(procname)))
-		*procname = '\0';
+	procname = get_rparam(request, 0);
+	username = get_rparam(request, 1);
+	procfunc = get_rparam(request, 2);
+	proccomm = get_rparam(request, 3);
 
-	if (0 != get_param(param, 2, tmp, sizeof(tmp)))
-		*tmp = '\0';
-
-	if (*tmp != '\0')
+	if (NULL != username && *username != '\0')
 	{
-		usrinfo = getpwnam(tmp);
-		if (usrinfo == NULL)	/* incorrect user name */
+		if (NULL == (usrinfo = getpwnam(username)))	/* incorrect user name */
 			return SYSINFO_RET_FAIL;
 	}
 	else
 		usrinfo = NULL;
 
-	if (0 != get_param(param, 3, tmp, sizeof(tmp)))
-		*tmp = '\0';
-
-	if (*tmp != '\0')
+	if (NULL != procfunc && *procfunc != '\0')
 	{
-		if (0 == strcmp(tmp, "run"))
+		if (0 == strcmp(procfunc, "run"))
 			zbx_proc_stat = ZBX_PROC_STAT_RUN;
-		else if (0 == strcmp(tmp, "sleep"))
+		else if (0 == strcmp(procfunc, "sleep"))
 			zbx_proc_stat = ZBX_PROC_STAT_SLEEP;
-		else if (0 == strcmp(tmp, "zomb"))
+		else if (0 == strcmp(procfunc, "zomb"))
 			zbx_proc_stat = ZBX_PROC_STAT_ZOMB;
-		else if (0 == strcmp(tmp, "all"))
+		else if (0 == strcmp(procfunc, "all"))
 			zbx_proc_stat = ZBX_PROC_STAT_ALL;
 		else
 			return SYSINFO_RET_FAIL;
 	}
 	else
 		zbx_proc_stat = ZBX_PROC_STAT_ALL;
-
-	if (0 != get_param(param, 4, proccomm, sizeof(proccomm)))
-		*proccomm = '\0';
 
 	if (NULL == (dir = opendir("/proc")))
 		return SYSINFO_RET_FAIL;

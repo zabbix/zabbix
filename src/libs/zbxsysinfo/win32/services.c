@@ -21,23 +21,22 @@
 #include "sysinfo.h"
 #include "log.h"
 
-int	SERVICE_STATE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+int	SERVICE_STATE(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	SC_HANDLE	mgr, service;
-	char		name[MAX_STRING_LEN];
+	char		*name;
 	LPTSTR		wname;
 	TCHAR		service_name[MAX_STRING_LEN];
 	DWORD		max_len_name = MAX_STRING_LEN;
 	int		i, ret = SYSINFO_RET_FAIL;
 	SERVICE_STATUS	status;
 
-	if (num_param(param) > 1)
+	if (1 < request->nparam)
 		return SYSINFO_RET_FAIL;
 
-	if (get_param(param, 1, name, sizeof(name)) != 0)
-		return SYSINFO_RET_FAIL;
+	name = get_rparam(request, 0);
 
-	if ('\0' == *name)
+	if (NULL == name || '\0' == *name)
 		return SYSINFO_RET_FAIL;
 
 	if (NULL == (mgr = OpenSCManager(NULL,NULL,GENERIC_READ)) )

@@ -20,7 +20,7 @@
 #include "common.h"
 #include "sysinfo.h"
 
-int	SYSTEM_SWAP_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+int	SYSTEM_SWAP_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 /*
  *  FreeBSD 7.0 i386
@@ -36,14 +36,14 @@ int	SYSTEM_SWAP_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_R
 
         init_result(result);
 
-	if (num_param(param) > 2)
+	if (2 < request->nparam)
 		return SYSINFO_RET_FAIL;
 
-	if (0 != get_param(param, 1, swapdev, sizeof(swapdev)))
-		return SYSINFO_RET_FAIL;
+	swapdev = get_rparam(request, 0);
+	mode = get_rparam(request, 1);
 
-	if (0 != get_param(param, 2, mode, sizeof(mode)))
-		*mode = '\0';
+	if (NULL == swapdev)
+		return SYSINFO_RET_FAIL;
 
 	sz = sizeof(mib) / sizeof(mib[0]);
 	if (-1 == sysctlnametomib("vm.swap_info", mib, &sz))
@@ -66,7 +66,7 @@ int	SYSTEM_SWAP_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_R
 		(*mib_dev)++;
 	}
 
-	if ('\0' == *mode || 0 == strcmp(mode, "free"))	/* default parameter */
+	if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "free"))	/* default parameter */
 		SET_UI64_RESULT(result, (total - used) * getpagesize());
 	else if (0 == strcmp(mode, "total"))
 		SET_UI64_RESULT(result, total * getpagesize());
