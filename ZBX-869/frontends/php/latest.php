@@ -212,8 +212,7 @@ $sql = 'SELECT DISTINCT h.name as hostname,h.hostid, a.* '.
 		' FROM applications a, hosts h '.$sql_from.
 		' WHERE a.hostid=h.hostid'.
 			$sql_where.
-			' AND '.dbConditionInt('h.hostid', $available_hosts).
-		order_by('h.name,h.hostid','a.name,a.applicationid');
+			' AND '.dbConditionInt('h.hostid', $available_hosts);
 
 $db_app_res = DBselect($sql);
 while($db_app = DBfetch($db_app_res)){
@@ -222,6 +221,20 @@ while($db_app = DBfetch($db_app_res)){
 	$db_apps[$db_app['applicationid']] = $db_app;
 	$db_appids[$db_app['applicationid']] = $db_app['applicationid'];
 }
+
+$sortField = get_request('sort', CProfile::get('web.'.$page['file'].'.sort', null));
+$sortOrder = get_request('sortorder', CProfile::get('web.'.$page['file'].'.sortorder', ZBX_SORT_UP));
+
+// if sortfield is host name
+if ($sortField == 'h.name') {
+	$sortFields = array(array('field' => 'hostname', 'order' => $sortOrder));
+}
+else {
+	$sortFields = array();
+}
+// by default order by application name and application id
+array_push($sortFields, 'name', 'applicationid');
+CArrayHelper::sort($db_apps, $sortFields);
 
 $tab_rows = array();
 
@@ -232,11 +245,25 @@ $sql = 'SELECT DISTINCT i.*, ia.applicationid '.
 			' AND i.itemid=ia.itemid'.
 			($_REQUEST['show_without_data'] ? '' : ' AND i.lastvalue IS NOT NULL').
 			' AND (i.status='.ITEM_STATUS_ACTIVE.' OR i.status='.ITEM_STATUS_NOTSUPPORTED.')'.
-			' AND '.dbConditionInt('i.flags', array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)).
-		order_by('i.name,i.itemid,i.lastclock');
+			' AND '.dbConditionInt('i.flags', array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED));
 
-$db_items = DBselect($sql);
-while($db_item = DBfetch($db_items)){
+$dbItems = DBfetchArray(DBselect($sql));
+
+// if sortfield is item name
+if ($sortField == 'i.name') {
+	$sortFields = array(array('field' => 'name', 'order' => $sortOrder));
+}
+// if sortfield is item lastclock
+elseif ($sortField == 'i.lastclock') {
+	$sortFields = array(array('field' => 'lastclock', 'order' => $sortOrder), 'name');
+}
+// by default
+else {
+	$sortFields = array('name');
+}
+CArrayHelper::sort($dbItems, $sortFields);
+
+foreach ($dbItems as $db_item){
 	$description = itemName($db_item);
 
 	if(!empty($_REQUEST['select']) && !zbx_stristr($description, $_REQUEST['select']) ) continue;
@@ -366,15 +393,23 @@ $sql = 'SELECT DISTINCT h.name,h.hostid '.
 			$sql_where.
 			' AND h.hostid=i.hostid '.
 			' AND '.dbConditionInt('i.flags', array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)).
-			' AND '.dbConditionInt('h.hostid', $available_hosts).
-		' ORDER BY h.name';
+			' AND '.dbConditionInt('h.hostid', $available_hosts);
 
-$db_host_res = DBselect($sql);
-while($db_host = DBfetch($db_host_res)) {
-	$db_host['item_cnt'] = 0;
+$dbHostRes = DBfetchArray(DBselect($sql));
 
-	$db_hosts[$db_host['hostid']] = $db_host;
-	$db_hostids[$db_host['hostid']] = $db_host['hostid'];
+// if sortfield is host name
+if ($sortField == 'h.name') {
+	$sortFields = array(array('field' => 'name', 'order' => $sortOrder));
+}
+else {
+	$sortFields = array('name');
+}
+CArrayHelper::sort($dbHostRes, $sortFields);
+
+foreach ($dbHostRes as $dbHost) {
+	$dbHost['item_cnt'] = 0;
+	$db_hosts[$dbHost['hostid']] = $dbHost;
+	$db_hostids[$dbHost['hostid']] = $dbHost['hostid'];
 }
 
 $tab_rows = array();
@@ -389,10 +424,28 @@ $sql = 'SELECT DISTINCT h.host as hostname,h.hostid,i.* '.
 			($_REQUEST['show_without_data'] ? '' : ' AND i.lastvalue IS NOT NULL').
 			' AND (i.status='.ITEM_STATUS_ACTIVE.' OR i.status='.ITEM_STATUS_NOTSUPPORTED.')'.
 			' AND '.dbConditionInt('i.flags', array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)).
-			' AND '.dbConditionInt('h.hostid', $db_hostids).
-		' ORDER BY i.name,i.itemid';
-$db_items = DBselect($sql);
-while ($db_item = DBfetch($db_items)) {
+			' AND '.dbConditionInt('h.hostid', $db_hostids);
+
+$dbItems = DBfetchArray(DBselect($sql));
+
+// if sortfield is item name
+if ($sortField == 'i.name') {
+	$sortFields = array(array('field' => 'name', 'order' => $sortOrder));
+}
+// if sortfield is item lastclock
+elseif ($sortField == 'i.lastclock') {
+	$sortFields = array(
+		array('field' => 'lastclock', 'order' => $sortOrder),
+		'name'
+	);
+}
+// by default
+else {
+	$sortFields = array('name');
+}
+CArrayHelper::sort($dbItems, $sortFields);
+
+foreach ($dbItems as $db_item){
 	$description = itemName($db_item);
 
 	if (!empty($_REQUEST['select']) && !zbx_stristr($description, $_REQUEST['select'])) continue;
