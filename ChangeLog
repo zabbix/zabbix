@@ -21,7 +21,7 @@ A.F....... [ZBX-1357] updated American English, Brazilian Portuguese, Dutch, Fin
 .......PS. [ZBX-5920] added prefetching of 2 MB of data for Oracle SQL selects (dimir)
 
 Bug fixes:
-..F....... [ZBX-6217] fixed not possible to use html special characters in web scenario password (Toms)
+..F....... [ZBX-6217] fixed inability to use HTML special characters in web scenario password (Toms)
 ...G...... [ZBX-5358] fixed encoding of network interface names with non ASCII characters on Vista/Server 2008 + (wiper)
 ...G...... [ZBX-6216] fixed crash when zabbix_sender was used in realtime mode on windows (wiper)
 A......... [ZBX-6124] fixed hostgroup.massupdate validation on removing group from host with only one group (Eduard)
@@ -1256,7 +1256,7 @@ New features:
 Changes for 1.8.17rc1
 
 ..F....... [ZBX-6258] updated Japanese translation; thanks to Kodai Terashima (Richlv)
-..F....... [ZBX-6217] fixed not possible to use html special characters in web scenario password (Toms)
+..F....... [ZBX-6217] fixed inability to use HTML special characters in web scenario password (Toms)
 ...G...... [ZBX-6057] fixed using of ServerActive option by zabbix_sender (Sasha)
 .......PS. [ZBX-5973] faster build up of SNMP dynamic index items cache in poller processes (Andris)
 
