@@ -30,6 +30,8 @@
 #include "stats.h"
 #ifdef _WINDOWS
 #	include "perfstat.h"
+#else
+#	include "sighandler.h"
 #endif
 #include "active.h"
 #include "listener.h"
@@ -736,6 +738,8 @@ int	main(int argc, char **argv)
 #ifdef _WINDOWS
 			init_perf_collector(0);
 			load_perf_counters(CONFIG_PERF_COUNTERS);
+#else
+			zbx_set_common_signal_handlers();
 #endif
 			load_user_parameters(CONFIG_USER_PARAMETERS);
 			load_aliases(CONFIG_ALIASES);
