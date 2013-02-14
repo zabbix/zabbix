@@ -57,16 +57,21 @@ $fields=array(
 	'filter_set'=>			array(T_ZBX_STR, O_OPT,	P_SYS,	null,		NULL),
 //ajax
 	'favobj'=>				array(T_ZBX_STR, O_OPT, P_ACT,	NULL,		NULL),
-	'favref'=>				array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,	'isset({favobj})'),
-	'favstate'=>			array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,	'isset({favobj})'),
+	'favref'=>				array(T_ZBX_STR, O_OPT, P_ACT,  NULL,		NULL),
+	'favstate'=>			array(T_ZBX_INT, O_OPT, P_ACT,  NULL,		NULL),
+	'toggle_id'=>			array(T_ZBX_STR, O_OPT, P_ACT,  NULL,		NULL),
+	'toggle_open_state'=>	array(T_ZBX_INT, O_OPT, P_ACT,  NULL,		NULL)
 );
 
 check_fields($fields);
 
 /* AJAX */
 if(isset($_REQUEST['favobj'])){
-	if('filter' == $_REQUEST['favobj']){
+	if($_REQUEST['favobj'] == 'filter'){
 		CProfile::update('web.latest.filter.state',$_REQUEST['favstate'], PROFILE_TYPE_INT);
+	}
+	elseif ($_REQUEST['favobj'] == 'toggle') {
+		CProfile::update('web.latest.toggle.'.$_REQUEST['toggle_id'], $_REQUEST['toggle_open_state'], PROFILE_TYPE_INT);
 	}
 }
 
@@ -96,7 +101,7 @@ else {
 }
 // --------------
 
-$latest_wdgt = new CWidget();
+$latest_wdgt = new CWidget(null, 'latest-mon');
 
 // Header
 $fs_icon = get_icon('fullscreen', array('fullscreen' => $_REQUEST['fullscreen']));
@@ -146,43 +151,11 @@ $latest_wdgt->addFlicker($filterForm, CProfile::get('web.latest.filter.state', 1
 
 validate_sort_and_sortorder('i.name',ZBX_SORT_UP);
 
-$_REQUEST['apps'] = get_request('apps', array());
-$apps = zbx_toHash($_REQUEST['apps']);
-
-if(isset($_REQUEST['open'])){
-	$showAll = 1;
-	if(isset($_REQUEST['applicationid']))
-		$apps[$_REQUEST['applicationid']] = $_REQUEST['applicationid'];
-}
-else{
-	$hideAll = 1;
-	if(isset($_REQUEST['applicationid']))
-		$apps[$_REQUEST['applicationid']] = $_REQUEST['applicationid'];
-}
-
-if(count($apps) > 35){
-	$apps = array_slice($apps, -35);
-}
-
 // js templates
 require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php';
+require_once dirname(__FILE__).'/include/views/js/monitoring.latest.js.php';
 
-if(isset($showAll)){
-	$url = '?close=1'.
-		url_param('groupid').
-		url_param('hostid').
-		url_param('select');
-	$link = new CLink(new CImg('images/general/minus.png'),$url);
-//		$link = new CLink(new CImg('images/general/minus.png'),$url,null,"javascript: return updater.onetime_update('".ZBX_PAGE_MAIN_HAT."','".$url."');");
-}
-else{
-	$url = '?open=1'.
-		url_param('groupid').
-		url_param('hostid').
-		url_param('select');
-	$link = new CLink(new CImg('images/general/plus.png'),$url);
-//		$link = new CLink(new CImg('images/general/plus.png'),$url,null,"javascript: return updater.onetime_update('".ZBX_PAGE_MAIN_HAT."','".$url."');");
-}
+$link = new CCol(new CDiv(null, 'app-list-toggle-all icon-plus-9x9'));
 
 $table = new CTableInfo(_('No values found.'));
 $table->setHeader(array(
@@ -195,8 +168,6 @@ $table->setHeader(array(
 	_x('Change', 'noun in latest data'),
 	_('History')
 ));
-
-//	$table->ShowStart();
 
 /**
  * Display APPLICATION ITEMS
@@ -282,9 +253,6 @@ while($db_item = DBfetch($db_items)){
 
 	$db_app['item_cnt']++;
 
-	if(isset($showAll) && !empty($apps) && !isset($apps[$db_app['applicationid']])) continue;
-	else if(isset($hideAll) && (empty($apps) || isset($apps[$db_app['applicationid']]))) continue;
-
 	if (isset($db_item['lastclock'])) {
 		$lastclock = zbx_date2str(_('d M Y H:i:s'), $db_item['lastclock']);
 	}
@@ -339,48 +307,26 @@ while($db_item = DBfetch($db_items)){
 unset($app_rows);
 unset($db_app);
 
-foreach ($db_apps as $appid => $db_app) {
-	$host = $hosts[$db_app['hostid']];
-	$group = reset($host['groups']);
+foreach ($db_apps as $appid => $dbApp) {
+	$host = $hosts[$dbApp['hostid']];
 
 	if(!isset($tab_rows[$appid])) continue;
 
-	$app_rows = $tab_rows[$appid];
+	$appRows = $tab_rows[$appid];
 
-	$tmp_apps = $apps;
-	if(isset($apps[$db_app['applicationid']])){
-		unset($tmp_apps[$db_app['applicationid']]);
-		$tmp_apps = array_values($tmp_apps);
+	$openState = CProfile::get('web.latest.toggle.'.$dbApp['applicationid']);
+
+	$toggle = new CDiv(SPACE, 'app-list-toggle icon-plus-9x9');
+	if ($openState) {
+		$toggle->addClass('icon-minus-9x9');
 	}
+	$toggle->setAttribute('data-app_id', $dbApp['applicationid']);
+	$toggle->setAttribute('data-open_state', $openState);
 
-	if(isset($showAll)){
-		if(!empty($apps) && !isset($apps[$db_app['applicationid']])) $img = new CImg('images/general/plus.png');
-		else $img = new CImg('images/general/minus.png');
-	}
-	else{
-		if(!empty($apps) && !isset($apps[$db_app['applicationid']])) $img = new CImg('images/general/minus.png');
-		else $img = new CImg('images/general/plus.png');
-	}
-
-	if(isset($showAll) && (!empty($tmp_apps) || empty($apps))){
-		if(empty($apps)) $url = '?close=1&applicationid='.$db_app['applicationid'];
-		else if(isset($apps[$db_app['applicationid']])) $url = '?open=1'.url_param($tmp_apps, false, 'apps');
-		else $url = '?open=1&applicationid='.$db_app['applicationid'].url_param($tmp_apps, false, 'apps');
-	}
-	else{
-		if(empty($apps)) $url = '?open=1&applicationid='.$db_app['applicationid'];
-		else if(isset($apps[$db_app['applicationid']])) $url = '?close=1'.url_param($tmp_apps, false, 'apps');
-		else $url = '?close=1&applicationid='.$db_app['applicationid'].url_param($tmp_apps, false, 'apps');
-	}
-
-	$url.= url_param('groupid').url_param('hostid').url_param('fullscreen').url_param('select');
-	$link = new CLink($img,$url);
-
-	$col = new CCol(array(bold($db_app['name']),SPACE.'('._n('%1$s Item', '%1$s Items', $db_app['item_cnt']).')'));
-
+	$col = new CCol(array(bold($dbApp['name']),SPACE.'('._n('%1$s Item', '%1$s Items', $dbApp['item_cnt']).')'));
 	$col->setColSpan(5);
-	// host JS menu link
 
+	// host JS menu link
 	$hostSpan = null;
 	if ($_REQUEST['hostid'] == 0) {
 		$hostSpan = new CSpan($host['name'], 'link_menu menu-host');
@@ -388,15 +334,22 @@ foreach ($db_apps as $appid => $db_app) {
 		$hostSpan->setAttribute('data-menu', hostMenuData($host, $scripts));
 	}
 
+	// add toggle row
 	$table->addRow(array(
-		$link,
-		get_node_name_by_elid($db_app['applicationid']),
+		$toggle,
+		get_node_name_by_elid($dbApp['applicationid']),
 		$hostSpan,
 		$col
 	));
 
-	foreach($app_rows as $row)
+	// add toggle sub rows
+	foreach ($appRows as $row) {
+		$row->setAttribute('parent_app_id', $dbApp['applicationid']);
+		if (!$openState) {
+			$row->addClass('hidden');
+		}
 		$table->addRow($row);
+	}
 }
 
 /**
@@ -456,9 +409,6 @@ while ($db_item = DBfetch($db_items)) {
 
 	$db_host['item_cnt']++;
 
-	if (isset($showAll) && !empty($apps) && !isset($apps[0])) continue;
-	else if (isset($hideAll) && (empty($apps) || isset($apps[0]))) continue;
-
 	// column "lastclock"
 	if (isset($db_item['lastclock'])) {
 		$lastclock = zbx_date2str(_('d M Y H:i:s'), $db_item['lastclock']);
@@ -516,44 +466,24 @@ while ($db_item = DBfetch($db_items)) {
 unset($app_rows);
 unset($db_host);
 
-foreach ($db_hosts as $hostid => $db_host) {
-	$host = $hosts[$db_host['hostid']];
-	$group = reset($host['groups']);
+foreach ($db_hosts as $hostId => $dbHost) {
+	$host = $hosts[$dbHost['hostid']];
 
-	if(!isset($tab_rows[$hostid])) continue;
-	$app_rows = $tab_rows[$hostid];
-
-	$tmp_apps = $apps;
-	if(isset($apps[0])){
-		unset($tmp_apps[0]);
-		$tmp_apps = array_values($tmp_apps);
+	if(!isset($tab_rows[$hostId])) {
+		continue;
 	}
+	$appRows = $tab_rows[$hostId];
 
-	if(isset($showAll)){
-		if(!empty($apps) && !isset($apps[0])) $img = new CImg('images/general/plus.png');
-		else $img = new CImg('images/general/minus.png');
+	$openState = CProfile::get('web.latest.toggle.0_'.$host['hostid']);
+
+	$toggle = new CDiv(SPACE, 'app-list-toggle icon-plus-9x9');
+	if ($openState) {
+		$toggle->addClass('icon-minus-9x9');
 	}
-	else{
-		if(!empty($apps) && !isset($apps[0])) $img = new CImg('images/general/minus.png');
-		else $img = new CImg('images/general/plus.png');
-	}
+	$toggle->setAttribute('data-app_id', '0_'.$host['hostid']);
+	$toggle->setAttribute('data-open_state', $openState);
 
-	if(isset($showAll) && (!empty($tmp_apps) || empty($apps))){
-		if(empty($apps)) $url = '?close=1&applicationid=0';
-		else if(isset($apps[0])) $url = '?open=1'.url_param($tmp_apps, false, 'apps');
-		else $url = '?open=1&applicationid=0'.url_param($tmp_apps, false, 'apps');
-	}
-	else{
-		if(empty($apps)) $url = '?open=1&applicationid=0';
-		else if(isset($apps[0])) $url = '?close=1'.url_param($tmp_apps, false, 'apps');
-		else $url = '?close=1&applicationid=0'.url_param($tmp_apps, false, 'apps');
-	}
-
-	$url.= url_param('groupid').url_param('hostid').url_param('fullscreen').url_param('select');
-	$link = new CLink($img,$url);
-
-
-	$col = new CCol(array(bold('- '.('other').' -'), SPACE.'('._n('%1$s Item', '%1$s Items', $db_host['item_cnt']).')'));
+	$col = new CCol(array(bold('- '.('other').' -'), SPACE.'('._n('%1$s Item', '%1$s Items', $dbHost['item_cnt']).')'));
 	$col->setColSpan(5);
 
 	// host JS menu link
@@ -564,15 +494,22 @@ foreach ($db_hosts as $hostid => $db_host) {
 		$hostSpan->setAttribute('data-menu', hostMenuData($host, $scripts));
 	}
 
+	// add toggle row
 	$table->addRow(array(
-		$link,
-		get_node_name_by_elid($db_host['hostid']),
+		$toggle,
+		get_node_name_by_elid($dbHost['hostid']),
 		$hostSpan,
 		$col
 	));
 
-	foreach($app_rows as $row)
+	// add toggle sub rows
+	foreach($appRows as $row) {
+		$row->setAttribute('parent_app_id', '0_'.$host['hostid']);
+		if (!$openState) {
+			$row->addClass('hidden');
+		}
 		$table->addRow($row);
+	}
 }
 
 $latest_wdgt->addItem($table);

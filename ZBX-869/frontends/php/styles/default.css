@@ -483,6 +483,9 @@ table.tableinfo caption {
 	line-height: 22px;
 }
 
+.latest-mon .tableinfo { table-layout: fixed; }
+.latest-mon .tableinfo tr > td:first-child { width:9px; }
+
 /* regexp test result table, based on .tableinfo */
 #testResultTable tr td:first-child {
 	width: auto;
