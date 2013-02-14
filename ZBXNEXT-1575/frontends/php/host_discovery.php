@@ -50,7 +50,7 @@ $fields = array(
 	'add_delay_flex' =>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'new_delay_flex' => array(T_ZBX_STR, O_OPT, null, NOT_EMPTY, 'isset({add_delay_flex})&&(isset({type})&&({type}!=2))',
 		_('New flexible interval')),
-	'status' =>				array(T_ZBX_INT, O_OPT, null,	BETWEEN(0, 65535), 'isset({save})'),
+	'status' =>					array(T_ZBX_INT, O_OPT, null,	IN(ITEM_STATUS_ACTIVE), null),
 	'type' =>				array(T_ZBX_INT, O_OPT, null,	IN(array(-1, ITEM_TYPE_ZABBIX, ITEM_TYPE_SNMPV1, ITEM_TYPE_TRAPPER,
 		ITEM_TYPE_SIMPLE, ITEM_TYPE_SNMPV2C, ITEM_TYPE_INTERNAL, ITEM_TYPE_SNMPV3, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_AGGREGATE,
 		ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_JMX,
@@ -116,6 +116,7 @@ validate_sort_and_sortorder('name', ZBX_SORT_UP);
 $_REQUEST['go'] = get_request('go', 'none');
 $_REQUEST['params'] = get_request($paramsFieldName, '');
 unset($_REQUEST[$paramsFieldName]);
+$_REQUEST['status'] = isset($_REQUEST['status']) ? ITEM_STATUS_ACTIVE : ITEM_STATUS_DISABLED;
 
 /*
  * Permissions
