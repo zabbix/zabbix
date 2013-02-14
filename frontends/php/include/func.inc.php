@@ -651,9 +651,16 @@ function convertBase10ToBase8 ($value ,$step  = false) {
 		$steps[$dunit]['value'] = bcpow($step, $data['pow']);
 	}
 
+	if ($value < 0) {
+		$abs = bcmul($value, '-1');
+	}
+	else {
+		$abs = $value;
+	}
+
 	$valData = array('pow' => 0, 'value' => $value);
 	foreach ($steps as $dnum => $data) {
-		if (bccomp($value, $data['value']) > -1) {
+		if (bccomp($abs, $data['value']) > -1) {
 			$valData = $data;
 		}
 		else {
