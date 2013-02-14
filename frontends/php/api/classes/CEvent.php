@@ -352,12 +352,6 @@ class CEvent extends CZBXAPI {
 			$sqlParts['limit'] = $options['limit'];
 		}
 
-		// selectHosts, selectTriggers, selectItems
-		if ($options['output'] != API_OUTPUT_EXTEND && (!is_null($options['selectHosts']) || !is_null($options['selectTriggers']) || !is_null($options['selectItems']))) {
-			$sqlParts = $this->addQuerySelect($this->fieldId('object'), $sqlParts);
-			$sqlParts = $this->addQuerySelect($this->fieldId('objectid'), $sqlParts);
-		}
-
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQueryNodeOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
@@ -461,7 +455,11 @@ class CEvent extends CZBXAPI {
 		$sqlParts = parent::applyQueryOutputOptions($tableName, $tableAlias, $options, $sqlParts);
 
 		if ($options['countOutput'] === null) {
-			if ($options['selectTriggers'] !== null) {
+			if ($options['selectTriggers'] !== null
+				|| $options['selectRelatedObject'] !== null
+				|| $options['selectItems'] !== null
+				|| $options['selectHosts'] !== null) {
+
 				$sqlParts = $this->addQuerySelect('e.object', $sqlParts);
 				$sqlParts = $this->addQuerySelect('e.objectid', $sqlParts);
 			}
