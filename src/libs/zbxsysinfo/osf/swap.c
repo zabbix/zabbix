@@ -86,7 +86,7 @@ point them all to the same buffer */
 #endif
 #endif
 
-static int	SYSTEM_SWAP_FREE(AGENT_REQUEST *request, AGENT_RESULT *result)
+static int	SYSTEM_SWAP_FREE(AGENT_RESULT *result)
 {
 #ifdef HAVE_SYSINFO_FREESWAP
 	struct sysinfo info;
@@ -117,7 +117,7 @@ static int	SYSTEM_SWAP_FREE(AGENT_REQUEST *request, AGENT_RESULT *result)
 #endif
 }
 
-static int	SYSTEM_SWAP_TOTAL(AGENT_REQUEST *request, AGENT_RESULT *result)
+static int	SYSTEM_SWAP_TOTAL(AGENT_RESULT *result)
 {
 #ifdef HAVE_SYSINFO_TOTALSWAP
 	struct sysinfo info;
@@ -148,7 +148,7 @@ static int	SYSTEM_SWAP_TOTAL(AGENT_REQUEST *request, AGENT_RESULT *result)
 #endif
 }
 
-static int	SYSTEM_SWAP_PFREE(AGENT_REQUEST *request, AGENT_RESULT *result)
+static int	SYSTEM_SWAP_PFREE(AGENT_RESULT *result)
 {
 	AGENT_RESULT	result_tmp;
 	zbx_uint64_t	tot_val = 0;
@@ -178,7 +178,7 @@ static int	SYSTEM_SWAP_PFREE(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
-static int	SYSTEM_SWAP_PUSED(AGENT_REQUEST *request, AGENT_RESULT *result)
+static int	SYSTEM_SWAP_PUSED(AGENT_RESULT *result)
 {
 	AGENT_RESULT	result_tmp;
 	zbx_uint64_t	tot_val = 0;
@@ -208,7 +208,7 @@ static int	SYSTEM_SWAP_PUSED(AGENT_REQUEST *request, AGENT_RESULT *result)
         return SYSINFO_RET_OK;
 }
 
-int	SYSTEM_SWAP_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+int	SYSTEM_SWAP_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	const MODE_FUNCTION	fl[] =
 	{
@@ -219,45 +219,43 @@ int	SYSTEM_SWAP_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_R
 		{NULL,		0}
 	};
 
-	char swapdev[MAX_STRING_LEN];
-	char mode[MAX_STRING_LEN];
-	int i;
+	char *swapdev, *mode;
+	int ret = SYSINFO_RET_FAIL;
 
-        if(num_param(param) > 2)
-        {
-                return SYSINFO_RET_FAIL;
-        }
-
-        if(get_param(param, 1, swapdev, sizeof(swapdev)) != 0)
-        {
-                return SYSINFO_RET_FAIL;
-        }
-
-        if(swapdev[0] == '\0')
+	if (2 < request->nparam)
 	{
-		/* default parameter */
-		zbx_snprintf(swapdev, sizeof(swapdev), "all");
+		return ret;
 	}
 
-	if(strncmp(swapdev, "all", sizeof(swapdev)) != 0)
+	swapdev = get_rparam(request, 0);
+	mode = get_rparam(request, 1);
+
+	if (NULL != swapdev && '\0' != *swapdev && 0 != strncmp(swapdev, "all", sizeof(swapdev)))
 	{
-		return SYSINFO_RET_FAIL;
+		return ret;
 	}
 
-	if(get_param(param, 2, mode, sizeof(mode)) != 0)
-        {
-                mode[0] = '\0';
-        }
-
-        if(mode[0] == '\0')
+	if (NULL == mode || '\0' == *mode || 0 == strcmp (mode, "free"))
 	{
-		/* default parameter */
-		zbx_snprintf(mode, sizeof(mode), "free");
+		ret = SYSTEM_SWAP_FREE(result);
+	}
+	else if (0 == strcmp (mode, "total"))
+	{
+		ret = SYSTEM_SWAP_TOTAL(result);
+	}
+	else if (0 == strcmp (mode, "pfree"))
+	{
+		ret = SYSTEM_SWAP_PFREE(result);
+	}
+	else if (0 == strcmp (mode, "pused"))
+	{
+		ret = SYSTEM_SWAP_PUSED(result);
+	}
+	else
+	{
+		ret = SYSINFO_RET_FAIL;
 	}
 
-	for(i=0; fl[i].mode!=0; i++)
-		if(strncmp(mode, fl[i].mode, MAX_STRING_LEN)==0)
-			return (fl[i].function)(cmd, param, flags, result);
 
-	return SYSINFO_RET_FAIL;
+	return ret;
 }

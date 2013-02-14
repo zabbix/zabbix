@@ -217,7 +217,7 @@ int     VM_MEMORY_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if (NULL == mode_str || '\0' == *mode_str)
 		strscpy(mode, "total");
 	else
-		strscpy(mode, Mode_str);
+		strscpy(mode, mode_str);
 
 	for (i = 0; NULL != fl[i].mode; i++)
 		if (0 == strcmp(mode, fl[i].mode))

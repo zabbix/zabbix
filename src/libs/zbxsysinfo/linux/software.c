@@ -121,16 +121,27 @@ int     SYSTEM_SW_PACKAGES(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	size_t			offset = 0;
 	int			ret = SYSINFO_RET_FAIL, show_pm, i, j;
-	char			buffer[MAX_BUFFER_LEN], *regex, *manager, *mode,
-				tmp[MAX_STRING_LEN], *buf = NULL, *package;
+	char			buffer[MAX_BUFFER_LEN], manager[MAX_BUFFER_LEN], *regex_str, *manager_str, *mode,
+				regex[MAX_BUFFER_LEN], tmp[MAX_STRING_LEN], *buf = NULL, *package;
 	zbx_vector_str_t	packages;
 	ZBX_PACKAGE_MANAGER	*mng;
 
 	if (3 < request->nparam)
 		return ret;
 
-	regex = get_rparam(request, 0);
-	manager = get_rparam(request, 1);
+	regex_str = get_rparam(request, 0);
+	if (NULL == regex_str || '\0' == *regex_str || 0 == strcmp(regex_str, "all"))
+		*regex = '\0';
+	else
+		strscpy(regex, regex_str);
+
+	manager_str = get_rparam(request, 1);
+
+	if (NULL == manager_str || '\0' == *manager_str || 0 == strcmp(manager_str, "all"))
+		*manager = '\0';
+	else
+		strscpy(manager, manager_str);
+
 	mode = get_rparam(request, 2);
 
 	if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "full"))
@@ -147,9 +158,7 @@ int     SYSTEM_SW_PACKAGES(AGENT_REQUEST *request, AGENT_RESULT *result)
 	{
 		mng = &package_managers[i];
 
-		if (NULL != manager && '\0' != *manager &&
-			(0 != strcmp(manager, mng->name) || 0 != strcmp(manager, "all"))
-		)
+		if ('\0' != *manager && 0 != strcmp(manager, mng->name))
 			continue;
 
 		if (SUCCEED == zbx_execute(mng->test_cmd, &buf, tmp, sizeof(tmp), CONFIG_TIMEOUT) &&
@@ -172,7 +181,7 @@ int     SYSTEM_SW_PACKAGES(AGENT_REQUEST *request, AGENT_RESULT *result)
 						goto next;
 				}
 
-				if (NULL == regex || '\0' == *regex || NULL == zbx_regexp_match(package, regex, NULL))
+				if (NULL != regex && '\0' != *regex && NULL == zbx_regexp_match(package, regex, NULL))
 					goto next;
 
 				zbx_vector_str_append(&packages, zbx_strdup(NULL, package));

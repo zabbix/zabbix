@@ -38,7 +38,7 @@
 
 extern int	CONFIG_TIMEOUT;
 
-static int	ONLY_ACTIVE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
+static int	ONLY_ACTIVE(AGENT_REQUEST *request, AGENT_RESULT *result);
 static int	SYSTEM_RUN(AGENT_REQUEST *request, AGENT_RESULT *result);
 
 ZBX_METRIC	parameters_common[] =
@@ -78,18 +78,24 @@ ZBX_METRIC	parameters_common[] =
 	{0}
 };
 
-static int	ONLY_ACTIVE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+static int	ONLY_ACTIVE(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	SET_MSG_RESULT(result, zbx_strdup(NULL, "Accessible only as active check!"));
 
 	return SYSINFO_RET_FAIL;
 }
 
-int	EXECUTE_USER_PARAMETER(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+int	EXECUTE_USER_PARAMETER(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	int	ret;
+	char	*command;
 
-	ret = EXECUTE_STR(param, result);
+	if (1 != request->nparam)
+		return SYSINFO_RET_FAIL;
+
+	command = get_rparam(request, 0);
+
+	ret = EXECUTE_STR(command, result);
 
 	if (SYSINFO_RET_FAIL == ret && 0 == result->type)
 	{

@@ -245,12 +245,6 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 		return SYSINFO_RET_FAIL;
 
 	procname = get_rparam(request, 0);
-
-/* TODO why the code was here and under PROC_MEM?
-	else if (strlen(procname) > ZBX_COMMLEN)
-		procname[ZBX_COMMLEN] = '\0';
-*/
-
 	buffer = get_rparam(request, 1);
 
 	if (NULL != buffer && *buffer != '\0')

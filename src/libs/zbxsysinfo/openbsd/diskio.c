@@ -145,8 +145,8 @@ int	VFS_DEV_WRITE(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if (2 < request->nparam)
 		return SYSINFO_RET_FAIL;
 
-	devname_str = get_param(request, 0);
-	mode_str = get_param(request, 1);
+	devname_str = get_rparam(request, 0);
+	mode_str = get_rparam(request, 1);
 
 	if (NULL == devname_str || '\0' == *devname_str)
 		strscpy(devname, "all");
@@ -181,8 +181,8 @@ int	VFS_DEV_READ(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if (2 < request->nparam)
 		return SYSINFO_RET_FAIL;
 
-	devname_str = get_param(request, 0);
-	mode_str = get_param(request, 1);
+	devname_str = get_rparam(request, 0);
+	mode_str = get_rparam(request, 1);
 
 	if (NULL == devname_str || '\0' == *devname_str)
 		strscpy(devname, "all");

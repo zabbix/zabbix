@@ -37,7 +37,7 @@ int	VFS_FILE_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	filename = get_rparam(request, 0);
 
-	if(NULL == filename || '\0' == *filename || 0 != zbx_stat(filename, &buf))
+	if (NULL == filename || '\0' == *filename || 0 != zbx_stat(filename, &buf))
 		goto err;
 
 	SET_UI64_RESULT(result, buf.st_size);

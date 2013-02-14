@@ -72,7 +72,7 @@ int	VFS_FS_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 		return SYSINFO_RET_FAIL;
 
 	fsname = get_rparam(request, 0);
-	fsname = get_rparam(request, 1);
+	mode = get_rparam(request, 1);
 
 	if (SYSINFO_RET_OK != get_fs_size_stat(fsname, &total, &free, &used, &pfree, &pused))
 		return SYSINFO_RET_FAIL;

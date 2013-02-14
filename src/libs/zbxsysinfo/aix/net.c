@@ -66,27 +66,22 @@ static int	get_net_stat(const char *if_name, net_stat_t *ns)
 
 int	NET_IF_IN(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	char		if_name[MAX_STRING_LEN], mode[MAX_STRING_LEN];
+	char		*if_name, *mode;
 	net_stat_t	ns;
 	int		ret = SYSINFO_RET_OK;
 
 	if (2 < request->nparam)
 		return SYSINFO_RET_FAIL;
 
-/* TODO finish ... */
-	if (0 != get_param(param, 1, if_name, sizeof(if_name)) || *if_name == '\0')
+	if_name = get_rparam(request, 0);
+	mode = get_rparam(request, 1);
+
+	if (NULL == if_name || '\0' == *if_name)
 		return SYSINFO_RET_FAIL;
-
-	if (0 != get_param(param, 2, mode, sizeof(mode)))
-		*mode = '\0';
-
-	/* default parameter */
-	if ('\0' == *mode)
-		zbx_snprintf(mode, sizeof(mode), "bytes");
 
 	if (SYSINFO_RET_OK == get_net_stat(if_name, &ns))
 	{
-		if (0 == strcmp(mode, "bytes"))
+		if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "bytes"))
 		{
 			SET_UI64_RESULT(result, ns.ibytes);
 		}
@@ -107,28 +102,24 @@ int	NET_IF_IN(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return ret;
 }
 
-int	NET_IF_OUT(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+int	NET_IF_OUT(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	char		if_name[MAX_STRING_LEN], mode[MAX_STRING_LEN];
+	char		*if_name, *mode;
 	net_stat_t	ns;
 	int		ret = SYSINFO_RET_OK;
 
-	if (num_param(param) > 2)
+	if (2 < request->nparam)
 		return SYSINFO_RET_FAIL;
 
-	if (0 != get_param(param, 1, if_name, sizeof(if_name)) || *if_name == '\0')
+	if_name = get_rparam(request, 0);
+	mode = get_rparam(request, 1);
+
+	if (NULL == if_name || '\0' == *if_name)
 		return SYSINFO_RET_FAIL;
-
-	if (0 != get_param(param, 2, mode, sizeof(mode)))
-		*mode = '\0';
-
-	/* default parameter */
-	if ('\0' == *mode)
-		zbx_snprintf(mode, sizeof(mode), "bytes");
 
 	if (SYSINFO_RET_OK == get_net_stat(if_name, &ns))
 	{
-		if (0 == strcmp(mode, "bytes"))
+		if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "bytes"))
 		{
 			SET_UI64_RESULT(result, ns.obytes);
 		}
@@ -149,28 +140,24 @@ int	NET_IF_OUT(const char *cmd, const char *param, unsigned flags, AGENT_RESULT 
 	return ret;
 }
 
-int	NET_IF_TOTAL(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+int	NET_IF_TOTAL(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	char		if_name[MAX_STRING_LEN], mode[MAX_STRING_LEN];
+	char		*if_name, *mode;
 	net_stat_t	ns;
 	int		ret = SYSINFO_RET_OK;
 
-	if (num_param(param) > 2)
+	if (2 < request->nparam)
 		return SYSINFO_RET_FAIL;
 
-	if (0 != get_param(param, 1, if_name, sizeof(if_name)) || *if_name == '\0')
+	if_name = get_rparam(request, 0);
+	mode = get_rparam(request, 1);
+
+	if (NULL == if_name || '\0' == *if_name)
 		return SYSINFO_RET_FAIL;
-
-	if (0 != get_param(param, 2, mode, sizeof(mode)))
-		*mode = '\0';
-
-	/* default parameter */
-	if ('\0' == *mode)
-		zbx_snprintf(mode, sizeof(mode), "bytes");
 
 	if (SYSINFO_RET_OK == get_net_stat(if_name, &ns))
 	{
-		if (0 == strcmp(mode, "bytes"))
+		if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "bytes"))
 		{
 			SET_UI64_RESULT(result, ns.ibytes + ns.obytes);
 		}
@@ -191,16 +178,18 @@ int	NET_IF_TOTAL(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 	return ret;
 }
 
-int	NET_IF_COLLISIONS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+int	NET_IF_COLLISIONS(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	char		if_name[MAX_STRING_LEN];
+	char		*if_name;
 	net_stat_t	ns;
 	int		ret = SYSINFO_RET_OK;
 
-	if (num_param(param) > 1)
+	if (1 < request->nparam)
 		return SYSINFO_RET_FAIL;
 
-	if (0 != get_param(param, 1, if_name, sizeof(if_name)))
+	if_name = get_rparam(request, 0);
+
+	if (NULL == if_name || '\0' == *ifname)
 		return SYSINFO_RET_FAIL;
 
 	if (SYSINFO_RET_OK == get_net_stat(if_name, &ns))
@@ -213,7 +202,7 @@ int	NET_IF_COLLISIONS(const char *cmd, const char *param, unsigned flags, AGENT_
 	return ret;
 }
 
-int	NET_IF_DISCOVERY(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+int	NET_IF_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 #if defined(HAVE_LIBPERFSTAT)
 	int			rc, i, ret = SYSINFO_RET_FAIL;
