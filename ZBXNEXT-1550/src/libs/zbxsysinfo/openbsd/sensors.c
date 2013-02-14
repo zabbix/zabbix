@@ -139,8 +139,8 @@ int	GET_SENSOR(AGENT_REQUEST *request, AGENT_RESULT *result)
 		return SYSINFO_RET_FAIL;
 
 	device = get_rparam(request, 0);
-	name = get_rparam(name, 1);
-	function = get_rparam(function, 2);
+	name = get_rparam(request, 1);
+	function = get_rparam(request, 2);
 
 	if(NULL == device || NULL == name)
 		return SYSINFO_RET_FAIL;

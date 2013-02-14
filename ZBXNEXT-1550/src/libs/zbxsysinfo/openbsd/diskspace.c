@@ -143,10 +143,10 @@ int	VFS_FS_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if (2 < request->nparam)
 		return SYSINFO_RET_FAIL;
 
-	fsname = get_nparam(request, 0);
-	mode_str = get_nparam(request, 1);
+	fsname = get_rparam(request, 0);
+	mode_str = get_rparam(request, 1);
 
-	if (NULL = fsname)
+	if (NULL == fsname)
 		return SYSINFO_RET_FAIL;
 
 	if (NULL == mode_str || '\0' == *mode_str)

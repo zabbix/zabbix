@@ -26,7 +26,7 @@ int	SYSTEM_SWAP_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
  *  FreeBSD 7.0 i386
  */
 #ifdef XSWDEV_VERSION	/* defined in <vm/vm_param.h> */
-	char		swapdev[64], mode[64];
+	char		*swapdev, *mode;
 	int		mib[16], *mib_dev;
 	size_t		sz, mib_sz;
 	struct xswdev	xsw;

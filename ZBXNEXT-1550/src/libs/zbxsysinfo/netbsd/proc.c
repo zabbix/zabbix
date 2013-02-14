@@ -73,7 +73,7 @@ static char	*proc_argv(pid_t pid)
 int     PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char	*procname,
-		buffer[MAX_STRING_LEN],
+		*buffer,
 		*proccomm,
 		*args;
 	int	do_task, pagesize, count, i,

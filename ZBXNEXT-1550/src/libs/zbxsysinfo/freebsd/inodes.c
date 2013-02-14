@@ -36,8 +36,8 @@ int	VFS_FS_INODE(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if (2 < request->nparam)
 		return SYSINFO_RET_FAIL;
 
-	fsname = get_nparam(request, 0);
-	mode = get_nparam(request, 1);
+	fsname = get_rparam(request, 0);
+	mode = get_rparam(request, 1);
 
 	if (NULL == fsname)
 		return SYSINFO_RET_FAIL;
