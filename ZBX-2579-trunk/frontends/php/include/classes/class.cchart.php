@@ -800,7 +800,8 @@ class CChart extends CGraphDraw {
 				$sideMax = $sideMinData['pow'];
 			}
 			if ($intervalData['pow'] != $sideMax) {
-				$interval = sprintf('%.0f', round(bcmul(bcdiv($interval, 1000), 1024), ZBX_UNITS_ROUNDOFF_UPPER_LIMIT));
+				// interval correction, if Max Y have other unit, then interval unit = Max Y unit
+				$interval = sprintf('%.0f', round(bcmul($interval, 1.024), ZBX_UNITS_ROUNDOFF_UPPER_LIMIT));
 			}
 		}
 
@@ -835,7 +836,9 @@ class CChart extends CGraphDraw {
 				$otherSideMax = $otherSideMinData['pow'];
 			}
 			if ($intervalOtherSideData['pow'] != $otherSideMax) {
-				$interval_other_side = sprintf('%.0f', round(bcmul(bcdiv($interval_other_side, 1000), 1024), ZBX_UNITS_ROUNDOFF_UPPER_LIMIT));
+				// interval correction, if Max Y have other unit, then interval unit = Max Y unit
+				$interval_other_side = sprintf('%.0f', round(bcmul($interval_other_side, 1.024),
+					ZBX_UNITS_ROUNDOFF_UPPER_LIMIT));
 			}
 		}
 
@@ -1545,6 +1548,19 @@ class CChart extends CGraphDraw {
 
 		$step = $this->gridStep[GRAPH_YAXIS_SIDE_RIGHT];
 		$hstr_count = $this->gridLinesCount[GRAPH_YAXIS_SIDE_RIGHT];
+
+		if ($byteStep) {
+			$maxYPow = convertBase10ToBase8($maxY, 1024);
+			$minYPow = convertBase10ToBase8($minY, 1024);
+			if ($maxYPow['pow'] > $minYPow['pow']) {
+				$newPow = $maxYPow['pow'];
+			}
+			else {
+				$newPow = $minYPow['pow'];
+			}
+		} else {
+			$newPow = false;
+		}
 		for ($i = 0; $i <= $hstr_count; $i++) {
 			if ($hstr_count == 0) {
 				continue;
@@ -1557,7 +1573,7 @@ class CChart extends CGraphDraw {
 				continue;
 			}
 
-			$str = convert_units($val, $units, ITEM_CONVERT_NO_UNITS, $byteStep);
+			$str = convert_units($val, $units, ITEM_CONVERT_NO_UNITS, $byteStep, $newPow);
 
 			// marker Y coordinate
 			$dims = imageTextSize(8, 0, $str);
@@ -1577,7 +1593,7 @@ class CChart extends CGraphDraw {
 			}
 		}
 
-		$str = convert_units($maxY, $units, ITEM_CONVERT_NO_UNITS, $byteStep);
+		$str = convert_units($maxY, $units, ITEM_CONVERT_NO_UNITS, $byteStep, $newPow);
 		imageText(
 			$this->im,
 			8,
