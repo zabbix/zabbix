@@ -59,9 +59,6 @@ int	SYSTEM_STAT(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if (NULL == section)
 		return SYSINFO_RET_FAIL;
 
-	if (0 != get_param(param, 2, type, sizeof(type)))
-		*type = '\0';
-
 	if (0 == strcmp(section, "kthr") && NULL != type)
 	{
 		if (0 == strcmp(type, "r"))

@@ -464,7 +464,6 @@ int	process(const char *in_command, unsigned flags, AGENT_RESULT *result)
 
 	if (NULL != command->key)
 	{
-
 		if (0 != (command->flags & CF_USEUPARAM))
 		{
 			if (0 != (flags & PROCESS_USE_TEST_PARAM) && NULL != command->test_param)
@@ -495,45 +494,20 @@ int	process(const char *in_command, unsigned flags, AGENT_RESULT *result)
 		else
 			strscpy(param, usr_param);
 
-		/* The command is found in one of agent loadable modules */
-		if (0 != (command->flags & CF_MODFUNCTION))
+		init_request(&request);
+		if (0 != parse_item_key(param, usr_cmd, &request))
 		{
-			init_request(&request);
-			if (0 != parse_item_key(param, usr_cmd, &request))
-			{
-				free_request(&request);
-				goto notsupported;
-			}
-			if (ZBX_MODULE_OK != command->function(&request, result))
-			{
-				free_request(&request);
-				/* "return NOTSUPPORTED;" would be more appropriate here for preserving original error */
-				/* message in "result" but would break things relying on ZBX_NOTSUPPORTED message. */
-				goto notsupported;
-			}
 			free_request(&request);
+			goto notsupported;
 		}
-		else
+		if (SYSINFO_RET_OK != command->function(&request, result))
 		{
-/*			if (SYSINFO_RET_OK != command->function(usr_command, param, flags, result))
-			{
-				goto notsupported;
-			}*/
-			init_request(&request);
-			if (0 != parse_item_key(param, usr_cmd, &request))
-			{
-				free_request(&request);
-				goto notsupported;
-			}
-			if (SYSINFO_RET_OK != command->function(&request, result))
-			{
-				free_request(&request);
-				/* "return NOTSUPPORTED;" would be more appropriate here for preserving original error */
-				/* message in "result" but would break things relying on ZBX_NOTSUPPORTED message. */
-				goto notsupported;
-			}
 			free_request(&request);
+			/* "return NOTSUPPORTED;" would be more appropriate here for preserving original error */
+			/* message in "result" but would break things relying on ZBX_NOTSUPPORTED message. */
+			goto notsupported;
 		}
+		free_request(&request);
 	}
 	else
 		goto notsupported;

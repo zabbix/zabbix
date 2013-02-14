@@ -67,11 +67,9 @@ static int	check_procstate(struct procsinfo *procsinfo, int zbx_proc_stat)
 }
 #endif /* HAVE_SYS_PROCFS_H */
 
-int	PROC_MEM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	char			tmp[MAX_STRING_LEN],
-				procname[MAX_STRING_LEN],
-				proccomm[MAX_STRING_LEN];
+	char			*tmp, *procname, *proccomm;
 #ifdef HAVE_SYS_PROCFS_H
 	DIR			*dir;
 	struct dirent		*entries;
@@ -89,16 +87,14 @@ int	PROC_MEM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *r
 	double			memsize = 0;
 	zbx_uint64_t		proccount = 0;
 
-	if (num_param(param) > 4)
+	if (4 < request->nparam)
 		return SYSINFO_RET_FAIL;
 
-	if (0 != get_param(param, 1, procname, sizeof(procname)))
-		*procname = '\0';
+	procname = get_rparam(request, 0);
 
-	if (0 != get_param(param, 2, tmp, sizeof(tmp)))
-		*tmp = '\0';
+	tmp = get_rparam(request, 1);
 
-	if (*tmp != '\0')
+	if (NULL != tmp && '\0' != *tmp)
 	{
 		usrinfo = getpwnam(tmp);
 		if (usrinfo == NULL)	/* incorrect user name */
@@ -107,10 +103,9 @@ int	PROC_MEM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *r
 	else
 		usrinfo = NULL;
 
-	if (0 != get_param(param, 3, tmp, sizeof(tmp)))
-		*tmp = '\0';
+	tmp = get_rparam(request, 2);
 
-	if (*tmp != '\0')
+	if (NULL != tmp && '\0' != *tmp)
 	{
 		if (0 == strcmp(tmp, "avg"))
 			do_task = DO_AVG;
@@ -126,8 +121,7 @@ int	PROC_MEM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *r
 	else
 		do_task = DO_SUM;
 
-	if (0 != get_param(param, 4, proccomm, sizeof(proccomm)))
-		*proccomm = '\0';
+	proccomm = get_rparam(request, 3);
 
 #ifdef HAVE_SYS_PROCFS_H /* AIX 5.x */
 	if (NULL == (dir = opendir("/proc")))
@@ -152,13 +146,13 @@ int	PROC_MEM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *r
 		if (-1 == read(fd, &psinfo, sizeof(psinfo)))
 			continue;
 
-		if ('\0' != *procname && 0 != strcmp(procname, psinfo.pr_fname))
+		if (NULL != procname && '\0' != *procname && 0 != strcmp(procname, psinfo.pr_fname))
 			continue;
 
 		if (NULL != usrinfo && usrinfo->pw_uid != psinfo.pr_uid)
 			continue;
 
-		if ('\0' != *proccomm && NULL == zbx_regexp_match(psinfo.pr_psargs, proccomm, NULL))
+		if (NULL != proccomm && '\0' != *proccomm && NULL == zbx_regexp_match(psinfo.pr_psargs, proccomm, NULL))
 			continue;
 
 		value = psinfo.pr_size;
@@ -183,13 +177,13 @@ int	PROC_MEM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *r
 #else
 	while (0 < getprocs(&procsinfo, (int)sizeof(struct procsinfo), NULL, 0, &pid, 1))
 	{
-		if ('\0' != *procname && 0 != strcmp(procname, procsinfo.pi_comm))
+		if (NULL != procname && '\0' != *procname && 0 != strcmp(procname, procsinfo.pi_comm))
 			continue;
 
 		if (NULL != usrinfo && usrinfo->pw_uid != procsinfo.pi_uid)
 			continue;
 
-		if ('\0' != *proccomm)
+		if (NULL != procname && '\0' != *proccomm)
 		{
 			init_result(&proc_args);
 
@@ -236,11 +230,9 @@ int	PROC_MEM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *r
 	return SYSINFO_RET_OK;
 }
 
-int	PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	char			tmp[MAX_STRING_LEN],
-				procname[MAX_STRING_LEN],
-				proccomm[MAX_STRING_LEN];
+	char			*tmp, *procname, *proccomm;
 #ifdef HAVE_SYS_PROCFS_H
 	DIR			*dir;
 	struct dirent		*entries;
@@ -256,16 +248,14 @@ int	PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *r
 	int			zbx_proc_stat;
 	zbx_uint64_t		proccount = 0;
 
-	if (num_param(param) > 4)
+	if (4 < request->nparam)
 		return SYSINFO_RET_FAIL;
 
-	if (0 != get_param(param, 1, procname, sizeof(procname)))
-		*procname = '\0';
+	procname = get_rparam(request, 0);
 
-	if (0 != get_param(param, 2, tmp, sizeof(tmp)))
-		*tmp = '\0';
+	tmp = get_rparam(request, 1);
 
-	if (*tmp != '\0')
+	if (NULL != tmp && '\0' != *tmp)
 	{
 		usrinfo = getpwnam(tmp);
 		if (usrinfo == NULL)	/* incorrect user name */
@@ -274,10 +264,9 @@ int	PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *r
 	else
 		usrinfo = NULL;
 
-	if (0 != get_param(param, 3, tmp, sizeof(tmp)))
-		*tmp = '\0';
+	tmp = get_rparam(request, 2);
 
-	if (*tmp != '\0')
+	if (NULL != tmp && '\0' != *tmp)
 	{
 		if (0 == strcmp(tmp, "run"))
 			zbx_proc_stat = ZBX_PROC_STAT_RUN;
@@ -293,8 +282,7 @@ int	PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *r
 	else
 		zbx_proc_stat = ZBX_PROC_STAT_ALL;
 
-	if (0 != get_param(param, 4, proccomm, sizeof(proccomm)))
-		*proccomm = '\0';
+	proccomm = get_rparam(request, 3);
 
 #ifdef HAVE_SYS_PROCFS_H /* AIX 5.x */
 	if (NULL == (dir = opendir("/proc")))
@@ -319,7 +307,7 @@ int	PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *r
 		if (-1 == read(fd, &psinfo, sizeof(psinfo)))
 			continue;
 
-		if ('\0' != *procname && 0 != strcmp(procname, psinfo.pr_fname))
+		if (NULL != procname && '\0' != *procname && 0 != strcmp(procname, psinfo.pr_fname))
 			continue;
 
 		if (NULL != usrinfo && usrinfo->pw_uid != psinfo.pr_uid)
@@ -328,7 +316,7 @@ int	PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *r
 		if (FAIL == check_procstate(&psinfo, zbx_proc_stat))
 			continue;
 
-		if ('\0' != *proccomm && NULL == zbx_regexp_match(psinfo.pr_psargs, proccomm, NULL))
+		if (NULL != proccomm && '\0' != *proccomm && NULL == zbx_regexp_match(psinfo.pr_psargs, proccomm, NULL))
 			continue;
 
 		proccount++;
@@ -340,7 +328,7 @@ int	PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *r
 #else
 	while (0 < getprocs(&procsinfo, (int)sizeof(struct procsinfo), NULL, 0, &pid, 1))
 	{
-		if ('\0' != *procname && 0 != strcmp(procname, procsinfo.pi_comm))
+		if (NULL != procname && '\0' != *procname && 0 != strcmp(procname, procsinfo.pi_comm))
 			continue;
 
 		if (NULL != usrinfo && usrinfo->pw_uid != procsinfo.pi_uid)
@@ -349,7 +337,7 @@ int	PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *r
 		if (FAIL == check_procstate(&procsinfo, zbx_proc_stat))
 			continue;
 
-		if ('\0' != *proccomm)
+		if (NULL != proccomm && '\0' != *proccomm)
 		{
 			init_result(&proc_args);
 

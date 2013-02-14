@@ -91,7 +91,7 @@ int zbx_module_dummy_ping(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	SET_UI64_RESULT(result, 1);
 
-	return	ZBX_MODULE_OK;
+	return	SYSINFO_RET_OK;
 }
 
 int zbx_module_dummy_echo(AGENT_REQUEST *request, AGENT_RESULT *result)
@@ -101,12 +101,12 @@ int zbx_module_dummy_echo(AGENT_REQUEST *request, AGENT_RESULT *result)
 	{
 		/* set optional error message */
 		SET_MSG_RESULT(result, strdup("Incorrect number of parameters, expected one parameter."));
-		return ZBX_MODULE_FAIL;
+		return SYSINFO_RET_FAIL;
 	}
 
 	SET_STR_RESULT(result, strdup(get_rparam(request,0)));
 
-	return	ZBX_MODULE_OK;
+	return	SYSINFO_RET_OK;
 }
 
 /******************************************************************************
@@ -124,9 +124,9 @@ int zbx_module_dummy_echo(AGENT_REQUEST *request, AGENT_RESULT *result)
  *                                                                            *
  *             result - structure that will contain result                    *
  *                                                                            *
- * Return value: ZBX_MODULE_FAIL - function failed, item will be marked       *
+ * Return value: SYSINFO_RET_FAIL - function failed, item will be marked      *
  *                                 as not supported by zabbix                 *
- *               ZBX_MODULE_OK - success                                      *
+ *               SYSINFO_RET_OK - success                                     *
  *                                                                            *
  * Comment: get_param(request, N-1) can be used to get a pointer to the Nth   *
  *          parameter starting from 0 (first parameter). Make sure it exists  *
@@ -141,7 +141,7 @@ int zbx_module_dummy_random(AGENT_REQUEST *request, AGENT_RESULT *result)
 	{
 		/* set optional error message */
 		SET_MSG_RESULT(result, strdup("Incorrect number of parameters, expected two parameters."));
-		return ZBX_MODULE_FAIL;
+		return SYSINFO_RET_FAIL;
 	}
 
 	/* there is no strict validation of parameters for simplicity sake */
@@ -151,12 +151,12 @@ int zbx_module_dummy_random(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if (from > to)
 	{
 		SET_MSG_RESULT(result, strdup("Incorrect range given."));
-		return ZBX_MODULE_FAIL;
+		return SYSINFO_RET_FAIL;
 	}
 
 	SET_UI64_RESULT(result, from + rand() % (to - from+1));
 
-	return	ZBX_MODULE_OK;
+	return	SYSINFO_RET_OK;
 }
 
 /******************************************************************************
