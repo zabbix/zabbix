@@ -218,10 +218,10 @@ function itemIndicator($status, $state = null) {
  */
 function itemIndicatorStyle($status, $state = null) {
 	if ($status == ITEM_STATUS_ACTIVE) {
-		return ($state == ITEM_STATE_NOTSUPPORTED) ? 'unknown' : 'off';
+		return ($state == ITEM_STATE_NOTSUPPORTED) ? 'unknown' : 'enabled';
 	}
 	elseif ($status == ITEM_STATUS_DISABLED) {
-		return 'on';
+		return 'disabled';
 	}
 
 	return 'unknown';

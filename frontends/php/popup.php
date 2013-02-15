@@ -983,7 +983,7 @@ elseif ($srctbl == 'triggers') {
 	$options = array(
 		'nodeids' => $nodeid,
 		'hostids' => $hostid,
-		'output' => array('triggerid', 'description', 'expression', 'priority', 'status'),
+		'output' => array('triggerid', 'description', 'expression', 'priority', 'status', 'state'),
 		'selectHosts' => array('hostid', 'name'),
 		'selectDependencies' => API_OUTPUT_EXTEND,
 		'expandDescription' => true
@@ -1039,19 +1039,14 @@ elseif ($srctbl == 'triggers') {
 			}
 		}
 
-		switch ($trigger['status']) {
-			case TRIGGER_STATUS_DISABLED:
-				$status = new CSpan(_('Disabled'), 'disabled');
-				break;
-			case TRIGGER_STATUS_ENABLED:
-				$status = new CSpan(_('Enabled'), 'enabled');
-				break;
-		}
 		$table->addRow(array(
 			$multiselect ? new CCheckBox('triggers['.zbx_jsValue($trigger[$srcfld1]).']', null, null, $trigger['triggerid']) : null,
 			$description,
 			getSeverityCell($trigger['priority']),
-			$status
+			new CSpan(
+				triggerIndicator($trigger['status'], $trigger['state']),
+				triggerIndicatorStyle($trigger['status'], $trigger['state'])
+			)
 		));
 
 		// made to save memmory usage
