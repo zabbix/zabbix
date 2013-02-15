@@ -415,21 +415,23 @@ class CEvent extends CZBXAPI {
 		$this->checkSourceObject($options);
 	}
 
-	public function acknowledge($data) {
-		$eventids = isset($data['eventids']) ? zbx_toArray($data['eventids']) : array();
-		$eventids = zbx_toHash($eventids);
+	/**
+	 * Acknowledges the given events.
+	 *
+	 * Supported parameters:
+	 * - eventids   - an event ID or an array of event IDs to acknowledge
+	 * - message    - acknowledgment message
+	 *
+	 * @param array $data
+	 *
+	 * @return array
+	 */
+	public function acknowledge(array $data) {
+		$data['eventids'] = zbx_toArray($data['eventids']);
 
-		$allowedEvents = $this->get(array(
-			'eventids' => $eventids,
-			'output' => API_OUTPUT_REFER,
-			'preservekeys' => true
-		));
-		foreach ($eventids as $eventid) {
-			if (!isset($allowedEvents[$eventid])) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
-			}
-		}
+		$this->validateAcknowledge($data);
 
+		$eventids = zbx_toHash($data['eventids']);
 		$sql = 'UPDATE events SET acknowledged=1 WHERE '.dbConditionInt('eventid', $eventids);
 		if (!DBexecute($sql)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
@@ -449,6 +451,19 @@ class CEvent extends CZBXAPI {
 		DB::insert('acknowledges', $dataInsert);
 
 		return array('eventids' => array_values($eventids));
+	}
+
+	/**
+	 * Validates the input parameters for the acknowledge() method.
+	 *
+	 * @throws APIException     if the input is invalid
+	 *
+	 * @param array     $data
+	 *
+	 * @return void
+	 */
+	protected function validateAcknowledge(array $data) {
+		$this->checkCanBeAcknowledged($data['eventids']);
 	}
 
 	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
@@ -733,6 +748,54 @@ class CEvent extends CZBXAPI {
 					rtrim($supportedObjects, ', ')
 				)
 			);
+		}
+	}
+
+	/**
+	 * Checks if the given events exist, are accessible and can be acknowledged.
+	 *
+	 * @throws APIException     if an event does not exist, is not accessible or is not a trigger event
+	 *
+	 * @param array $eventIds
+	 *
+	 * @return void
+	 */
+	protected function checkCanBeAcknowledged(array $eventIds) {
+		$allowedEvents = $this->get(array(
+			'eventids' => $eventIds,
+			'output' => API_OUTPUT_REFER,
+			'preservekeys' => true
+		));
+		foreach ($eventIds as $eventId) {
+			if (!isset($allowedEvents[$eventId])) {
+				// check if an event actually exists but maybe belongs to a different source or object
+				$event = API::getApi()->select($this->tableName(), array(
+					'output' => array('eventid', 'source', 'object'),
+					'eventids' => $eventId,
+					'limit' => 1
+				));
+				$event = reset($event);
+
+				// if the event exists, check if we have permissions to access it
+				if ($event) {
+					$event = $this->get(array(
+						'output' => array('eventid'),
+						'eventids' => $event['eventid'],
+						'source' => $event['source'],
+						'object' => $event['object'],
+						'limit' => 1
+					));
+				}
+
+				// the event exists, is accessible but belongs to a different object or source
+				if ($event) {
+					self::exception(ZBX_API_ERROR_PERMISSIONS, _('Only trigger events can be acknowledged.'));
+				}
+				// the event either doesn't exist or is not accessible
+				else {
+					self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+				}
+			}
 		}
 	}
 }
