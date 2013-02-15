@@ -733,9 +733,7 @@ class CTrigger extends CTriggerGeneral {
 			$triggerDbFields = array(
 				'description' => null,
 				'expression' => null,
-				'error' => 'Trigger just added. No status update so far.',
-				'value' => TRIGGER_VALUE_FALSE,
-				'state' => TRIGGER_STATE_UNKNOWN
+				'value' => TRIGGER_VALUE_FALSE
 			);
 		}
 
@@ -1245,32 +1243,10 @@ class CTrigger extends CTriggerGeneral {
 		foreach ($triggers as $tnum => $trigger) {
 			$triggerId = $triggers[$tnum]['triggerid'] = $triggerIds[$tnum];
 
-			$statusHost = true;
-			foreach ($triggersAndHosts[$triggerId] as $host) {
-				if (!in_array($host, $allowedHosts)) {
-					$statusHost = false;
-					break;
-				}
-			}
-
-			// host trigger
-			if ($statusHost) {
-				DB::update('triggers', array(
-					'values' => array(
-						'expression' => $triggerExpression[$triggerId],
-						'error' => 'Trigger just added. No status update so far.',
-						'state' => TRIGGER_STATE_UNKNOWN
-					),
-					'where' => array('triggerid' => $triggerId)
-				));
-			}
-			// template trigger
-			else {
-				DB::update('triggers', array(
-					'values' => array('expression' => $triggerExpression[$triggerId]),
-					'where' => array('triggerid' => $triggerId)
-				));
-			}
+			DB::update('triggers', array(
+				'values' => array('expression' => $triggerExpression[$triggerId]),
+				'where' => array('triggerid' => $triggerId)
+			));
 
 			info(_s('Created: Trigger "%1$s" on "%2$s".', $trigger['description'], implode(', ', $triggersAndHosts[$triggerId])));
 			add_audit_ext(AUDIT_ACTION_ADD, AUDIT_RESOURCE_TRIGGER, $triggerId,
