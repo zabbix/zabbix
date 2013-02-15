@@ -271,21 +271,16 @@ int	node_process_command(zbx_sock_t *sock, const char *data, struct zbx_json_par
 				CONFIG_NODEID, nodeid, next_nodeid);
 
 		if (SUCCEED == (ret = send_script(next_nodeid, data, &result)))
-		{
 			send = result;
-		}
 	}
 	else
-	{
-		result = zbx_dsprintf(result, "NODE %d: Unknown Node ID [%d]",
-				CONFIG_NODEID, nodeid);
-	}
-
+		result = zbx_dsprintf(result, "NODE %d: Unknown Node ID [%d]", CONFIG_NODEID, nodeid);
 finish:
 	if (FAIL == ret)
 	{
 		zbx_json_addstring(&j, ZBX_PROTO_TAG_RESPONSE, ZBX_PROTO_VALUE_FAILED, ZBX_JSON_TYPE_STRING);
-		zbx_json_addstring(&j, ZBX_PROTO_TAG_VALUE, result ? result : "Unknown error", ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(&j, ZBX_PROTO_TAG_VALUE, (NULL != result) ? result : "Unknown error",
+				ZBX_JSON_TYPE_STRING);
 		send = j.buffer;
 	}
 
