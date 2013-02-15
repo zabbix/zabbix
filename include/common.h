@@ -468,6 +468,7 @@ const char	*zbx_alert_type_string(unsigned char type);
 /* item states */
 #define ITEM_STATE_NORMAL		0
 #define ITEM_STATE_NOTSUPPORTED		1
+const char	*zbx_item_state_string(unsigned char state);
 
 /* group statuses */
 typedef enum
@@ -572,15 +573,12 @@ const char	*zbx_trigger_state_string(unsigned char state);
 #define TRIGGER_SEVERITY_DISASTER	5
 #define TRIGGER_SEVERITY_COUNT		6	/* number of trigger severities */
 
-typedef enum
-{
-	ITEM_LOGTYPE_INFORMATION = 1,
-	ITEM_LOGTYPE_WARNING,
-	ITEM_LOGTYPE_ERROR = 4,
-	ITEM_LOGTYPE_FAILURE_AUDIT = 7,
-	ITEM_LOGTYPE_SUCCESS_AUDIT
-} zbx_item_logtype_t;
-const char	*zbx_item_logtype_string(zbx_item_logtype_t logtype);
+#define ITEM_LOGTYPE_INFORMATION	1
+#define ITEM_LOGTYPE_WARNING		2
+#define ITEM_LOGTYPE_ERROR		4
+#define ITEM_LOGTYPE_FAILURE_AUDIT	7
+#define ITEM_LOGTYPE_SUCCESS_AUDIT	8
+const char	*zbx_item_logtype_string(unsigned char logtype);
 
 /* media statuses */
 #define MEDIA_STATUS_ACTIVE	0
