@@ -2576,7 +2576,7 @@ const char	*zbx_result_string(int result)
 	}
 }
 
-const char	*zbx_item_logtype_string(zbx_item_logtype_t logtype)
+const char	*zbx_item_logtype_string(unsigned char logtype)
 {
 	switch (logtype)
 	{
@@ -2694,6 +2694,19 @@ const char	*zbx_trigger_state_string(unsigned char state)
 			return "Normal";
 		case TRIGGER_STATE_UNKNOWN:
 			return "Unknown";
+		default:
+			return "unknown";
+	}
+}
+
+const char	*zbx_item_state_string(unsigned char state)
+{
+	switch (state)
+	{
+		case TRIGGER_STATE_NORMAL:
+			return "Normal";
+		case TRIGGER_STATE_UNKNOWN:
+			return "Not supported";
 		default:
 			return "unknown";
 	}
