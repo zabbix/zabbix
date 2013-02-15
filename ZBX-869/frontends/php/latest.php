@@ -59,19 +59,26 @@ $fields=array(
 	'favobj'=>				array(T_ZBX_STR, O_OPT, P_ACT,	NULL,		NULL),
 	'favref'=>				array(T_ZBX_STR, O_OPT, P_ACT,  NULL,		NULL),
 	'favstate'=>			array(T_ZBX_INT, O_OPT, P_ACT,  NULL,		NULL),
-	'toggle_id'=>			array(T_ZBX_STR, O_OPT, P_ACT,  NULL,		NULL),
+	'toggle_ids'=>			array(T_ZBX_STR, O_OPT, P_ACT,  NULL,		NULL),
 	'toggle_open_state'=>	array(T_ZBX_INT, O_OPT, P_ACT,  NULL,		NULL)
 );
 
 check_fields($fields);
 
 /* AJAX */
-if(isset($_REQUEST['favobj'])){
-	if($_REQUEST['favobj'] == 'filter'){
+if (isset($_REQUEST['favobj'])) {
+	if ($_REQUEST['favobj'] == 'filter') {
 		CProfile::update('web.latest.filter.state',$_REQUEST['favstate'], PROFILE_TYPE_INT);
 	}
 	elseif ($_REQUEST['favobj'] == 'toggle') {
-		CProfile::update('web.latest.toggle.'.$_REQUEST['toggle_id'], $_REQUEST['toggle_open_state'], PROFILE_TYPE_INT);
+		if (!is_array($_REQUEST['toggle_ids'])) {
+			CProfile::update('web.latest.toggle.'.$_REQUEST['toggle_ids'], $_REQUEST['toggle_open_state'], PROFILE_TYPE_INT);
+		}
+		else {
+			foreach ($_REQUEST['toggle_ids'] as $toggleId) {
+				CProfile::update('web.latest.toggle.'.$toggleId, $_REQUEST['toggle_open_state'], PROFILE_TYPE_INT);
+			}
+		}
 	}
 }
 
