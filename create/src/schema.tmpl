@@ -247,7 +247,7 @@ FIELD		|inventory_link	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|lifetime	|t_varchar(64)	|'30'	|NOT NULL	|ZBX_SYNC
 FIELD		|snmpv3_authprotocol|t_integer	|'0'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|snmpv3_privprotocol|t_integer	|'0'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
-FIELD		|state		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|state		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC,ZBX_NODATA
 UNIQUE		|1		|hostid,key_
 INDEX		|3		|status
 INDEX		|4		|templateid
