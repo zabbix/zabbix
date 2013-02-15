@@ -39,7 +39,6 @@ A.F.I...S. [ZBXNEXT-1186] increased length to 2048 characters of expression fiel
 ..F....... [ZBX-5127] regular expressions form redesign (Vedmak)
 
 Bug fixes:
-........S. [ZBX-6262] fixed regression when function is_uint_suffix() did not treat '0' as a valid unsigned integer (dimir)
 ...G...PS. [ZBX-3078] added signal handling to agent also when it's not ran as daemon (wiper)
 .....J.... [ZBX-6229] removed pretty formatting from java gateway JSON responses (wiper)
 ..F....PS. [ZBX-5549] removed unused PERM_READ_LIST and PERM_MAX constants (wiper, Oleg)
