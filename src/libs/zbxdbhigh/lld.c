@@ -718,7 +718,7 @@ static void	DBlld_save_triggers(zbx_vector_ptr_t *triggers, unsigned char status
 	zbx_lld_trigger_t	*trigger;
 	zbx_lld_function_t	*function;
 	zbx_uint64_t		triggerid = 0, triggerdiscoveryid = 0, functionid = 0;
-	char			*sql1 = NULL, *sql2 = NULL, *sql3 = NULL, *sql4 = NULL, *error_esc = NULL;
+	char			*sql1 = NULL, *sql2 = NULL, *sql3 = NULL, *sql4 = NULL;
 	size_t			sql1_alloc = 8 * ZBX_KIBIBYTE, sql1_offset = 0,
 				sql2_alloc = 2 * ZBX_KIBIBYTE, sql2_offset = 0,
 				sql3_alloc = 2 * ZBX_KIBIBYTE, sql3_offset = 0,
@@ -726,7 +726,7 @@ static void	DBlld_save_triggers(zbx_vector_ptr_t *triggers, unsigned char status
 	const char		*ins_triggers_sql =
 				"insert into triggers"
 				" (triggerid,description,expression,priority,status,"
-					"comments,url,type,value,state,flags,error)"
+					"comments,url,type,value,state,flags)"
 				" values ";
 	const char		*ins_trigger_discovery_sql =
 				"insert into trigger_discovery"
@@ -761,7 +761,6 @@ static void	DBlld_save_triggers(zbx_vector_ptr_t *triggers, unsigned char status
 		zbx_strcpy_alloc(&sql1, &sql1_alloc, &sql1_offset, ins_triggers_sql);
 		zbx_strcpy_alloc(&sql2, &sql2_alloc, &sql2_offset, ins_trigger_discovery_sql);
 #endif
-		error_esc = DBdyn_escape_string_len("Trigger just added. No status update so far.", TRIGGER_ERROR_LEN);
 	}
 
 	if (0 != new_functions)
@@ -834,10 +833,10 @@ static void	DBlld_save_triggers(zbx_vector_ptr_t *triggers, unsigned char status
 #endif
 			expression_esc = DBdyn_escape_string_len(trigger->expression, TRIGGER_EXPRESSION_LEN);
 			zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset,
-					"(" ZBX_FS_UI64 ",'%s','%s',%d,%d,'%s','%s',%d,%d,%d,%d,'%s')" ZBX_ROW_DL,
+					"(" ZBX_FS_UI64 ",'%s','%s',%d,%d,'%s','%s',%d,%d,%d,%d)" ZBX_ROW_DL,
 					trigger->triggerid, description_esc, expression_esc, (int)priority, (int)status,
-					comments_esc, url_esc, (int)type, TRIGGER_VALUE_OK, TRIGGER_STATE_UNKNOWN,
-					ZBX_FLAG_DISCOVERY_CREATED, error_esc);
+					comments_esc, url_esc, (int)type, TRIGGER_VALUE_OK, TRIGGER_STATE_NORMAL,
+					ZBX_FLAG_DISCOVERY_CREATED);
 			zbx_free(expression_esc);
 
 #ifndef HAVE_MULTIROW_INSERT
@@ -906,7 +905,6 @@ static void	DBlld_save_triggers(zbx_vector_ptr_t *triggers, unsigned char status
 		DBexecute("%s", sql2);
 		zbx_free(sql1);
 		zbx_free(sql2);
-		zbx_free(error_esc);
 	}
 
 	if (new_triggers < triggers->values_num)
