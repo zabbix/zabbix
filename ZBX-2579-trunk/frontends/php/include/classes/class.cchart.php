@@ -789,6 +789,9 @@ class CChart extends CGraphDraw {
 			}
 		}
 		if ($leftBase8) {
+			if ($this->m_minY[$side] < 0 && bcmul($this->m_minY[$side], '-1') > $this->m_maxY[$side]) {
+				$this->m_minY[$side] -= $interval;
+			}
 			$intervalData = convertBase10ToBase8($interval);
 			$interval = $intervalData['value'];
 			$sideMaxData = convertBase10ToBase8($this->m_maxY[$side]);
@@ -825,6 +828,10 @@ class CChart extends CGraphDraw {
 			}
 		}
 		if ($rightBase8) {
+			if ($this->m_minY[$other_side] < 0
+					&& bcmul($this->m_minY[$other_side], '-1') > $this->m_maxY[$other_side]) {
+				$this->m_minY[$other_side] -= $interval;
+			}
 			$intervalOtherSideData = convertBase10ToBase8($interval_other_side);
 			$interval_other_side = $intervalOtherSideData['value'];
 			$otherSideMaxData = convertBase10ToBase8($this->m_maxY[$other_side]);
@@ -848,6 +855,7 @@ class CChart extends CGraphDraw {
 		$this->m_minY[$other_side] = bcmul(bcfloor(bcdiv($this->m_minY[$other_side], $interval_other_side)), $interval_other_side);
 		$this->m_maxY[$other_side] = bcmul(bcceil(bcdiv($this->m_maxY[$other_side], $interval_other_side)), $interval_other_side);
 
+		// calculate interval count for main side
 		$this->gridLinesCount[$side] = bcceil(bcdiv(bcsub($this->m_maxY[$side], $this->m_minY[$side]), $interval));
 
 		// we add 1 interval so max Y wouldn't be at the top
@@ -1503,6 +1511,7 @@ class CChart extends CGraphDraw {
 		$byteStep = false;
 		for ($item = 0; $item < $this->num; $item++) {
 			if ($this->items[$item]['axisside'] == GRAPH_YAXIS_SIDE_RIGHT) {
+				// check if items use B or Bps units
 				if ($this->items[$item]['units'] == 'B' || $this->items[$item]['units'] == 'Bps') {
 					$byteStep = true;
 				}
