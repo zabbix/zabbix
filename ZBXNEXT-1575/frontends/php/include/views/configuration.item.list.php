@@ -145,13 +145,6 @@ foreach ($this->data['items'] as $item) {
 			$trigger['error'] = '';
 		}
 
-		if ($trigger['status'] == TRIGGER_STATUS_DISABLED) {
-			$triggerStatus = new CSpan(_('Disabled'), 'disabled');
-		}
-		elseif ($trigger['status'] == TRIGGER_STATUS_ENABLED){
-			$triggerStatus = new CSpan(_('Enabled'), 'enabled');
-		}
-
 		$trigger['items'] = zbx_toHash($trigger['items'], 'itemid');
 		$trigger['functions'] = zbx_toHash($trigger['functions'], 'functionid');
 
@@ -159,7 +152,10 @@ foreach ($this->data['items'] as $item) {
 			getSeverityCell($trigger['priority']),
 			$triggerDescription,
 			triggerExpression($trigger, true),
-			$triggerStatus,
+			new CSpan(
+				triggerIndicator($trigger['status'], $trigger['state']),
+				triggerIndicatorStyle($trigger['status'], $trigger['state'])
+			),
 		));
 
 		$item['triggers'][$num] = $trigger;

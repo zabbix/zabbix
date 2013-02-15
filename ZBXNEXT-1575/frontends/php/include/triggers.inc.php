@@ -2374,3 +2374,43 @@ function quoteFunctionParam($param)
 
 	return '"'.str_replace('"', '\\"', $param).'"';
 }
+
+/**
+ * Returns the text indicating the triggers status and state. If the $state parameter is not given, only the status of
+ * the trigger will be taken into account.
+ *
+ * @param int $status
+ * @param int $state
+ *
+ * @return string
+ */
+function triggerIndicator($status, $state = null) {
+	if ($status == TRIGGER_STATUS_ENABLED) {
+		return ($state == TRIGGER_STATE_UNKNOWN) ? _('Unknown') : _('Enabled');
+	}
+	elseif ($status == TRIGGER_STATUS_DISABLED) {
+		return _('Disabled');
+	}
+
+	return _('Unknown');
+}
+
+/**
+ * Returns the CSS class for the triggers status and state indicator. If the $state parameter is not given, only the
+ * status of the trigger will be taken into account.
+ *
+ * @param int $status
+ * @param int $state
+ *
+ * @return string
+ */
+function triggerIndicatorStyle($status, $state = null) {
+	if ($status == TRIGGER_STATUS_ENABLED) {
+		return ($state == TRIGGER_STATE_UNKNOWN) ? 'unknown' : 'enabled';
+	}
+	elseif ($status == TRIGGER_STATUS_DISABLED) {
+		return 'disabled';
+	}
+
+	return 'unknown';
+}
