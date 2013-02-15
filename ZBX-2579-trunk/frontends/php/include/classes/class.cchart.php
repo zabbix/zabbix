@@ -858,8 +858,8 @@ class CChart extends CGraphDraw {
 		// calculate interval count for main side
 		$this->gridLinesCount[$side] = bcceil(bcdiv(bcsub($this->m_maxY[$side], $this->m_minY[$side]), $interval));
 
-		// we add 1 interval so max Y wouldn't be at the top
-		if (bccomp($this->m_maxY[$side], $tmp_maxY[$side], 2) == 0) {
+		// we add 1 interval so max Y wouldn't be at the top, if max value is positive
+		if ($this->m_maxY[$side] > 0 && bccomp($this->m_maxY[$side], $tmp_maxY[$side], 2) == 0) {
 			$this->gridLinesCount[$side]++;
 		}
 
