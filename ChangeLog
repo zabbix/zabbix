@@ -39,6 +39,7 @@ A.F.I...S. [ZBXNEXT-1186] increased length to 2048 characters of expression fiel
 ..F....... [ZBX-5127] regular expressions form redesign (Vedmak)
 
 Bug fixes:
+....I..... [ZBX-5668] added upgrade patch for change "server_check_interval" field value to 10 (Sasha)
 ...G...PS. [ZBX-3078] added signal handling to agent also when it's not ran as daemon (wiper)
 .....J.... [ZBX-6229] removed pretty formatting from java gateway JSON responses (wiper)
 ..F....PS. [ZBX-5549] removed unused PERM_READ_LIST and PERM_MAX constants (wiper, Oleg)
