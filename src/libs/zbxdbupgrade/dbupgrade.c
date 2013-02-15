@@ -837,29 +837,37 @@ static int	DBpatch_02010036()
 
 static int	DBpatch_02010037()
 {
+	if (ZBX_DB_OK <= DBexecute("update config set server_check_interval=10"))
+		return SUCCEED;
+
+	return FAIL;
+}
+
+static int	DBpatch_02010038()
+{
 	const ZBX_FIELD	field = {"state", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBrename_field("triggers", "value_flags", &field);
 }
 
-static int	DBpatch_02010038()
+static int	DBpatch_02010039()
 {
 	return DBdrop_index("events", "events_1");
 }
 
-static int	DBpatch_02010039()
+static int	DBpatch_02010040()
 {
 	return DBcreate_index("events", "events_1", "source,object,objectid,eventid", 1);
 }
 
-static int	DBpatch_02010040()
+static int	DBpatch_02010041()
 {
 	const ZBX_FIELD field = {"state", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("items", &field);
 }
 
-static int	DBpatch_02010041()
+static int	DBpatch_02010042()
 {
 	if (ZBX_DB_OK <= DBexecute(
 			"update items"
@@ -872,14 +880,14 @@ static int	DBpatch_02010041()
 	return FAIL;
 }
 
-static int	DBpatch_02010042()
+static int	DBpatch_02010043()
 {
 	const ZBX_FIELD	field = {"state", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBrename_field("proxy_history", "status", &field);
 }
 
-static int	DBpatch_02010043()
+static int	DBpatch_02010044()
 {
 	if (ZBX_DB_OK <= DBexecute(
 			"update proxy_history"
@@ -891,19 +899,19 @@ static int	DBpatch_02010043()
 	return FAIL;
 }
 
-static int	DBpatch_02010044()
+static int	DBpatch_02010045()
 {
 	const ZBX_FIELD	field = {"itemid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
 
 	return DBadd_field("escalations", &field);
 }
 
-static int	DBpatch_02010045()
+static int	DBpatch_02010046()
 {
 	return DBdrop_index("escalations", "escalations_1");
 }
 
-static int	DBpatch_02010046()
+static int	DBpatch_02010047()
 {
 	return DBcreate_index("escalations", "escalations_1", "actionid,triggerid,itemid,escalationid", 1);
 }
@@ -981,21 +989,22 @@ int	DBcheck_version()
 		{DBpatch_02010034, 2010034, 0, 1},
 		{DBpatch_02010035, 2010035, 0, 0},
 		{DBpatch_02010036, 2010036, 0, 0},
-		{DBpatch_02010037, 2010037, 0, 1},
-		{DBpatch_02010038, 2010038, 0, 0},
+		{DBpatch_02010037, 2010037, 0, 0},
+		{DBpatch_02010038, 2010038, 0, 1},
 		{DBpatch_02010039, 2010039, 0, 0},
-		{DBpatch_02010040, 2010040, 0, 1},
+		{DBpatch_02010040, 2010040, 0, 0},
 		{DBpatch_02010041, 2010041, 0, 1},
 		{DBpatch_02010042, 2010042, 0, 1},
 		{DBpatch_02010043, 2010043, 0, 1},
 		{DBpatch_02010044, 2010044, 0, 1},
-		{DBpatch_02010045, 2010045, 0, 0},
+		{DBpatch_02010045, 2010045, 0, 1},
 		{DBpatch_02010046, 2010046, 0, 0},
+		{DBpatch_02010047, 2010047, 0, 0},
 		/* IMPORTANT! When adding a new mandatory DBPatch don't forget to update it for SQLite, too. */
 		{NULL}
 	};
 #else
-	required = 2010044;	/* <---- Update mandatory DBpatch for SQLite here. */
+	required = 2010045;	/* <---- Update mandatory DBpatch for SQLite here. */
 #endif
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
