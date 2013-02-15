@@ -1,6 +1,7 @@
 Changes for 2.1.0
 
 New features:
+...G...... [ZBXNEXT-1243] added support for agent system.swap.size key on AIX (wiper)
 A.F.I...S. [ZBXNEXT-1574] removed unknown event support (Pavel, Sasha)
 A...I..... [ZBXNEXT-1574] dropped the event value_changed property (Pavel, Sasha)
 A.F....... [ZBX-6126] changed the proxy.delete, user.delete and host.delete methods to accept both objects and IDs (Pavels)
@@ -38,6 +39,11 @@ A.F.I...S. [ZBXNEXT-1186] increased length to 2048 characters of expression fiel
 ..F....... [ZBX-5127] regular expressions form redesign (Vedmak)
 
 Bug fixes:
+...G...PS. [ZBX-3078] added signal handling to agent also when it's not ran as daemon (wiper)
+.....J.... [ZBX-6229] removed pretty formatting from java gateway JSON responses (wiper)
+..F....PS. [ZBX-5549] removed unused PERM_READ_LIST and PERM_MAX constants (wiper, Oleg)
+...G...... [ZBX-3646] improved agent termination and resource cleanup on windows (wiper)
+.......P.. [ZBX-6219] fixed proxy sending host availability data for templates (wiper)
 ..F....... [ZBX-6196] added missing HTTPS and TELNET options to Service type condition in Action configuration (Toms)
 ..F....... [ZBXNEXT-1574] changed the text in the "ack" column for triggers with no events in the trigger pop up of the "System status" widget to "No events" (Pavels)
 ..F....... [ZBX-6006] fixed URLs not displayed in map configuration (Toms)
@@ -108,6 +114,18 @@ A......... [ZBX-5498] applications API refactoring (Vedmak)
 ..F....... [ZBX-1845] added tabs to host massupdate form (Vedmak)
 
 --------------------------------------------------------------------------------
+Changes for 2.0.6rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 2.0.5
+
+2.0.5rc1 was released as 2.0.5 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 2.0.5rc1
 
 New features:
@@ -119,7 +137,9 @@ A.F....... [ZBX-1357] updated American English, Brazilian Portuguese, Dutch, Fin
 .......PS. [ZBX-5920] added prefetching of 2 MB of data for Oracle SQL selects (dimir)
 
 Bug fixes:
-..F....... [ZBX-6217] fixed not possible to use html special characters in web scenario password (Toms)
+..F....... [ZBX-6217] fixed inability to use HTML special characters in web scenario password (Toms)
+...G...... [ZBX-5358] fixed encoding of network interface names with non ASCII characters on Vista/Server 2008 + (wiper)
+...G...... [ZBX-6216] fixed crash when zabbix_sender was used in realtime mode on windows (wiper)
 A......... [ZBX-6124] fixed hostgroup.massupdate validation on removing group from host with only one group (Eduard)
 ....I..... [ZBX-6197] updated DB2 image importer script to work with larger (>16KB) images (wiper)
 ..F....... [ZBX-6211] fixed errors in Monitoring->Discovery and added check for Discovery existing (Oleg)
@@ -1351,6 +1371,8 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.17rc1
 
+..F....... [ZBX-6258] updated Japanese translation; thanks to Kodai Terashima (Richlv)
+..F....... [ZBX-6217] fixed inability to use HTML special characters in web scenario password (Toms)
 ...G...... [ZBX-6057] fixed using of ServerActive option by zabbix_sender (Sasha)
 .......PS. [ZBX-5973] faster build up of SNMP dynamic index items cache in poller processes (Andris)
 
