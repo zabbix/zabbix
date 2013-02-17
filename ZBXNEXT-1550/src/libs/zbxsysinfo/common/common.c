@@ -66,10 +66,10 @@ ZBX_METRIC	parameters_common[] =
 	{"net.tcp.dns.query",	CF_USEUPARAM,	NET_DNS_RECORD,		0,	",zabbix.com"}, /* deprecated */
 	{"net.tcp.port",	CF_USEUPARAM,	NET_TCP_PORT,		0,	",80"},
 
-	{"system.hostname",	CF_USEUPARAM,	SYSTEM_HOSTNAME,	0,	0},
-	{"system.uname",	0,		SYSTEM_UNAME,		0,	0},
+	{"system.hostname",	CF_USEUPARAM,	SYSTEM_HOSTNAME,	0,	NULL},
+	{"system.uname",	0,		SYSTEM_UNAME,		0,	NULL},
 
-	{"system.users.num",	0,		SYSTEM_USERS_NUM,	0,	0},
+	{"system.users.num",	0,		SYSTEM_USERS_NUM,	0,	NULL},
 
 	{"log",			CF_USEUPARAM,	ONLY_ACTIVE, 		0,	"logfile"},
 	{"logrt",		CF_USEUPARAM,	ONLY_ACTIVE,		0,	"logfile"},

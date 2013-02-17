@@ -186,42 +186,46 @@ static int	VM_MEMORY_SHARED(AGENT_RESULT *result)
 
 int     VM_MEMORY_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	const MODE_FUNCTION	fl[] =
-	{
-		{"total",	VM_MEMORY_TOTAL},
-		{"active",	VM_MEMORY_ACTIVE},
-		{"inactive",	VM_MEMORY_INACTIVE},
-		{"wired",	VM_MEMORY_WIRED},
-		{"anon",	VM_MEMORY_ANON},
-		{"exec",	VM_MEMORY_EXEC},
-		{"file",	VM_MEMORY_FILE},
-		{"free",	VM_MEMORY_FREE},
-		{"used",	VM_MEMORY_USED},
-		{"pused",	VM_MEMORY_PUSED},
-		{"available",	VM_MEMORY_AVAILABLE},
-		{"pavailable",	VM_MEMORY_PAVAILABLE},
-		{"buffers",	VM_MEMORY_BUFFERS},
-		{"cached",	VM_MEMORY_CACHED},
-		{"shared",	VM_MEMORY_SHARED},
-		{NULL,		0}
-	};
-
-	char	*mode_str, mode[MAX_STRING_LEN];
-	int	i;
+	char	*mode;
+	int	ret = SYSINFO_RET_FAIL;
 
 	if (1 < request->nparam)
 		return SYSINFO_RET_FAIL;
 
-	mode_str = get_rparam(request, 0);
+	mode = get_rparam(request, 0);
 
-	if (NULL == mode_str || '\0' == *mode_str)
-		strscpy(mode, "total");
+	if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "total"))
+		ret = VM_MEMORY_TOTAL(result);
+	if (0 == strcmp(mode, "active"))
+		ret = VM_MEMORY_ACTIVE(result);
+	if (0 == strcmp(mode, "inactive"))
+		ret = VM_MEMORY_INACTIVE(result);
+	if (0 == strcmp(mode, "wired"))
+		ret = VM_MEMORY_WIRED(result);
+	if (0 == strcmp(mode, "anon"))
+		ret = VM_MEMORY_ANON(result);
+	if (0 == strcmp(mode, "exec"))
+		ret = VM_MEMORY_EXEC(result);
+	if (0 == strcmp(mode, "file"))
+		ret = VM_MEMORY_FILE(result);
+	if (0 == strcmp(mode, "free"))
+		ret = VM_MEMORY_FREE(result);
+	if (0 == strcmp(mode, "used"))
+		ret = VM_MEMORY_USED(result);
+	if (0 == strcmp(mode, "pused"))
+		ret = VM_MEMORY_PUSED(result);
+	if (0 == strcmp(mode, "available"))
+		ret = VM_MEMORY_AVAILABLE(result);
+	if (0 == strcmp(mode, "pavailable"))
+		ret = VM_MEMORY_PAVAILABLE(result);
+	if (0 == strcmp(mode, "buffers"))
+		ret = VM_MEMORY_BUFFERS(result);
+	if (0 == strcmp(mode, "cached"))
+		ret = VM_MEMORY_CACHED(result);
+	if (0 == strcmp(mode, "shared"))
+		ret = VM_MEMORY_SHARED(result);
 	else
-		strscpy(mode, mode_str);
+		ret = SYSINFO_RET_FAIL;
 
-	for (i = 0; NULL != fl[i].mode; i++)
-		if (0 == strcmp(mode, fl[i].mode))
-			return (fl[i].function)(result);
-
-	return SYSINFO_RET_FAIL;
+	return ret;
 }

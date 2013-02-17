@@ -311,10 +311,12 @@ int	PROC_INFO(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if (3 < request->nparam)
 		return SYSINFO_RET_FAIL;
 
-	if (NULL == (proc_name = get_rparam(request, 0)))
-		return SYSINFO_RET_FAIL;
+	proc_name = get_rparam(request, 0);
 	attr = get_rparam(request, 1);
 	type = get_rparam(request, 2);
+
+	if (NULL == proc_name || '\0' == *proc_name)
+		return SYSINFO_RET_FAIL;
 
 	/* Get attribute code from string */
 	if (NULL == attr || '\0' == *attr)

@@ -382,7 +382,7 @@ int	SYSTEM_HW_DEVICES(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	type = get_rparam(request, 0);
 
-	if (NULL ==type || '\0' == *type || 0 == strcmp(type, "pci"))
+	if (NULL == type || '\0' == *type || 0 == strcmp(type, "pci"))
 		return EXECUTE_STR("lspci", result);	/* list PCI devices by default */
 	else if (0 == strcmp(type, "usb"))
 		return EXECUTE_STR("lsusb", result);
@@ -429,7 +429,7 @@ int     SYSTEM_HW_MACADDR(AGENT_REQUEST *request, AGENT_RESULT *result)
 	/* go through the list */
 	for (i = ifc.ifc_len / sizeof(struct ifreq); 0 < i--; ifr++)
 	{
-		if (NULL == regex || '\0' != *regex && NULL == zbx_regexp_match(ifr->ifr_name, regex, NULL))
+		if (NULL != regex && '\0' != *regex && NULL == zbx_regexp_match(ifr->ifr_name, regex, NULL))
 			continue;
 
 		if (-1 != ioctl(s, SIOCGIFFLAGS, ifr) &&		/* get the interface */

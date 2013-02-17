@@ -96,7 +96,7 @@ static int	get_ifdata(const char *if_name, zbx_uint64_t *ibytes, zbx_uint64_t *i
 					if (kvm_read(kp, (u_long)ifp, &v, len) < len)
 						break;
 
-					if (NULL == if_name || '\0' == *if_name || 0 == strcmp(if_name, v.if_xname))
+					if (0 == strcmp(if_name, v.if_xname))
 					{
 						if (ibytes)
 							*ibytes += v.if_ibytes;
@@ -134,9 +134,6 @@ static int	get_ifdata(const char *if_name, zbx_uint64_t *ibytes, zbx_uint64_t *i
 		int		if_s;
 		struct ifreq	ifr;
 		struct if_data	v;
-
-		if (NULL == if_name || '\0' == *if_name)
-			goto clean;
 
 		if ((if_s = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
 			goto clean;
@@ -190,6 +187,9 @@ int	NET_IF_IN(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if_name = get_rparam(request, 0);
 	mode = get_rparam(request, 1);
 
+	if (NULL == if_name || '\0' == *if_name)
+		return SYSINFO_RET_FAIL;
+
 	if (SYSINFO_RET_OK != get_ifdata(if_name, &ibytes, &ipackets, &ierrors, &idropped, NULL, NULL, NULL, NULL, NULL, NULL, NULL))
 		return SYSINFO_RET_FAIL;
 
@@ -218,6 +218,9 @@ int	NET_IF_OUT(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if_name = get_rparam(request, 0);
 	mode = get_rparam(request, 1);
 
+	if (NULL == if_name || '\0' == *if_name)
+		return SYSINFO_RET_FAIL;
+
 	if (SYSINFO_RET_OK != get_ifdata(if_name, NULL, NULL, NULL, NULL, &obytes, &opackets, &oerrors, NULL, NULL, NULL, NULL))
 		return SYSINFO_RET_FAIL;
 
@@ -244,6 +247,9 @@ int	NET_IF_TOTAL(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if_name = get_rparam(request, 0);
 	mode = get_rparam(request, 1);
 
+	if (NULL == if_name || '\0' == *if_name)
+		return SYSINFO_RET_FAIL;
+
 	if (SYSINFO_RET_OK != get_ifdata(if_name, NULL, NULL, NULL, NULL, NULL, NULL, NULL, &tbytes, &tpackets, &terrors, NULL))
 		return SYSINFO_RET_FAIL;
 
@@ -268,6 +274,9 @@ int	NET_IF_COLLISIONS(AGENT_REQUEST *request, AGENT_RESULT *result)
 		return SYSINFO_RET_FAIL;
 
 	if_name = get_rparam(request, 0);
+
+	if (NULL == if_name || '\0' == *if_name)
+		return SYSINFO_RET_FAIL;
 
 	if (SYSINFO_RET_OK != get_ifdata(if_name, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, &icollisions))
 		return SYSINFO_RET_FAIL;

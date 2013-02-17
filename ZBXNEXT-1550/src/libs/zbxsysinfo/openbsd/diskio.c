@@ -61,7 +61,8 @@ static int	get_disk_stats(const char *devname, zbx_uint64_t *rbytes, zbx_uint64_
 	{
 		for (i = 0; i < drive_count; i++)
 		{
-			if (0 == strcmp(devname, "all") || 0 == strcmp(devname, stats[i].ds_name))
+			if (NULL == devname || '\0' == *devname || 0 == strcmp(devname, "all") ||
+				0 == strcmp(devname, stats[i].ds_name))
 			{
 				if (rbytes)
 					*rbytes += stats[i].ds_rbytes;
@@ -131,72 +132,52 @@ static int	VFS_DEV_WRITE_OPERATIONS(const char *devname, AGENT_RESULT *result)
 
 int	VFS_DEV_WRITE(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	const MODE_FUNCTION	fl[] =
-	{
-		{"bytes",	VFS_DEV_WRITE_BYTES},
-		{"operations",	VFS_DEV_WRITE_OPERATIONS},
-		{NULL,		0}
-	};
-
-	char	*devname_str, devname[MAX_STRING_LEN];
-	char	*mode_str, mode[MAX_STRING_LEN];
-	int	i;
+	char	*devname, *mode;
+	int	ret = SYSINFO_RET_FAIL;
 
 	if (2 < request->nparam)
 		return SYSINFO_RET_FAIL;
 
 	devname_str = get_rparam(request, 0);
-	mode_str = get_rparam(request, 1);
+	mode = get_rparam(request, 1);
 
 	if (NULL == devname_str || '\0' == *devname_str)
 		strscpy(devname, "all");
 	else
 		strscpy(devname, devname_str);
 
-	if (NULL == mode_str || '\0' == *mode_str)
-		strscpy(mode, "operations");
+	if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "operations"))
+		ret = VFS_DEV_WRITE_OPERATIONS(devname, result);
+	else if (0 == strcmp(mode, "bytes"))
+		ret = VFS_DEV_WRITE_BYTES(devname, result);
 	else
-		strscpy(mode, mode_str);
+		ret = SYSINFO_RET_FAIL;
 
-	for (i = 0; fl[i].mode != 0; i++)
-		if (0 == strncmp(mode, fl[i].mode, MAX_STRING_LEN))
-			return (fl[i].function)(devname, result);
-
-	return SYSINFO_RET_FAIL;
+	return ret;
 }
 
 int	VFS_DEV_READ(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	const MODE_FUNCTION	fl[] =
-	{
-		{"bytes",	VFS_DEV_READ_BYTES},
-		{"operations",	VFS_DEV_READ_OPERATIONS},
-		{NULL,		0}
-	};
-
-	char	*devname_str, devname[MAX_STRING_LEN];
-	char	*mode_str, mode[MAX_STRING_LEN];
-	int	i;
+	char	*devname, *mode;
+	int	ret = SYSINFO_RET_FAIL;
 
 	if (2 < request->nparam)
 		return SYSINFO_RET_FAIL;
 
 	devname_str = get_rparam(request, 0);
-	mode_str = get_rparam(request, 1);
+	mode = get_rparam(request, 1);
 
 	if (NULL == devname_str || '\0' == *devname_str)
 		strscpy(devname, "all");
 	else
 		strscpy(devname, devname_str);
 
-	if (NULL == mode_str || '\0' == *mode_str)
-		strscpy(mode, "operations");
+	if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "operations"))
+		ret = VFS_DEV_READ_OPERATIONS(devname, result);
+	else if (0 == strcmp(mode, "bytes"))
+		ret = VFS_DEV_READ_BYTES(devname, result);
 	else
-		strscpy(mode, mode_str);
+		ret = SYSINFO_RET_FAIL;
 
-	for (i = 0; fl[i].mode != 0; i++)
-		if (0 == strncmp(mode, fl[i].mode, MAX_STRING_LEN))
-			return (fl[i].function)(devname, result);
-
-	return SYSINFO_RET_FAIL;
+	return ret;
 }

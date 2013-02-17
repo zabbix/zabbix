@@ -119,7 +119,7 @@ int	WEB_PAGE_PERF(AGENT_REQUEST *request, AGENT_RESULT *result)
 	path_str = get_rparam(request, 1);
 	port_str = get_rparam(request, 2);
 
-	if (NULL == hostname)
+	if (NULL == hostname || '\0' == *hostname)
                 return SYSINFO_RET_FAIL;
 
 	if (NULL == path_str || '\0' == *path_str)
@@ -164,7 +164,7 @@ int	WEB_PAGE_REGEXP(AGENT_REQUEST *request, AGENT_RESULT *result)
 	regexp = get_rparam(request, 3);
 	length_str = get_rparam(request, 4);
 
-	if (NULL == hostname)
+	if (NULL == hostname || '\0' == *hostname)
                 return SYSINFO_RET_FAIL;
 
 	if (NULL == path_str || '\0' == *path_str)

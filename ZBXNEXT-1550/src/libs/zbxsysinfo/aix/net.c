@@ -82,17 +82,11 @@ int	NET_IF_IN(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if (SYSINFO_RET_OK == get_net_stat(if_name, &ns))
 	{
 		if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "bytes"))
-		{
 			SET_UI64_RESULT(result, ns.ibytes);
-		}
 		else if (0 == strcmp(mode, "packets"))
-		{
 			SET_UI64_RESULT(result, ns.ipackets);
-		}
 		else if (0 == strcmp(mode, "errors"))
-		{
 			SET_UI64_RESULT(result, ns.ierr);
-		}
 		else
 			ret = SYSINFO_RET_FAIL;
 	}
@@ -120,17 +114,11 @@ int	NET_IF_OUT(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if (SYSINFO_RET_OK == get_net_stat(if_name, &ns))
 	{
 		if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "bytes"))
-		{
 			SET_UI64_RESULT(result, ns.obytes);
-		}
 		else if (0 == strcmp(mode, "packets"))
-		{
 			SET_UI64_RESULT(result, ns.opackets);
-		}
 		else if (0 == strcmp(mode, "errors"))
-		{
 			SET_UI64_RESULT(result, ns.oerr);
-		}
 		else
 			ret = SYSINFO_RET_FAIL;
 	}
@@ -158,17 +146,11 @@ int	NET_IF_TOTAL(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if (SYSINFO_RET_OK == get_net_stat(if_name, &ns))
 	{
 		if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "bytes"))
-		{
 			SET_UI64_RESULT(result, ns.ibytes + ns.obytes);
-		}
 		else if (0 == strcmp(mode, "packets"))
-		{
 			SET_UI64_RESULT(result, ns.ipackets + ns.opackets);
-		}
 		else if (0 == strcmp(mode, "errors"))
-		{
 			SET_UI64_RESULT(result, ns.ierr + ns.oerr);
-		}
 		else
 			ret = SYSINFO_RET_FAIL;
 	}
@@ -182,7 +164,6 @@ int	NET_IF_COLLISIONS(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char		*if_name;
 	net_stat_t	ns;
-	int		ret = SYSINFO_RET_OK;
 
 	if (1 < request->nparam)
 		return SYSINFO_RET_FAIL;
@@ -195,11 +176,10 @@ int	NET_IF_COLLISIONS(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if (SYSINFO_RET_OK == get_net_stat(if_name, &ns))
 	{
 		SET_UI64_RESULT(result, ns.colls);
+		return SYSINFO_RET_OK;
 	}
-	else
-		ret = SYSINFO_RET_FAIL;
 
-	return ret;
+	return SYSINFO_RET_FAIL;
 }
 
 int	NET_IF_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)

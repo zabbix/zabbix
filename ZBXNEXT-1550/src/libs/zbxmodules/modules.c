@@ -41,7 +41,7 @@ static void **modules = NULL;
 static void	register_module(void *module)
 {
 	const char	*__function_name = "register_module";
-	int	i = 0;
+	int		i = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -83,14 +83,14 @@ static void	register_module(void *module)
 int	load_modules(const char *path, char **modules, int timeout)
 {
 	const char	*__function_name = "load_modules";
-	char	**module;
+	char		**module;
 	ZBX_METRIC	*metrics, *metric;
-	void	*lib;
-	char	filename[MAX_STRING_LEN];
-	int	(*func_init)(), (*func_version)();
+	void		*lib;
+	char		filename[MAX_STRING_LEN];
+	int		(*func_init)(), (*func_version)();
 	ZBX_METRIC	*(*func_list)();
-	char	**(*func_timeout)();
-	int	i, ret = 0;
+	char		**(*func_timeout)();
+	int		i, ret = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -199,8 +199,8 @@ ret:
 void	unload_modules()
 {
 	const char	*__function_name = "unload_modules";
-	int	(*func_uninit)();
-	void	**module;
+	int		(*func_uninit)();
+	void		**module;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 

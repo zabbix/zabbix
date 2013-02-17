@@ -163,54 +163,31 @@ static int	SYSTEM_SWAP_PUSED(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 int	SYSTEM_SWAP_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	const MODE_FUNCTION	fl[] =
-	{
-		{"total",	SYSTEM_SWAP_TOTAL},
-		{"free",	SYSTEM_SWAP_FREE},
-		{"pfree",       SYSTEM_SWAP_PFREE},
-		{"pused",       SYSTEM_SWAP_PUSED},
-		{NULL,		0}
-	};
-
-	char *swapdev_str, swapdev[MAX_STRING_LEN];
-	char *mode_str, mode[MAX_STRING_LEN];
-	int i;
+	char *swapdev, *mode;
+	int ret = SYSINFO_RET_FAIL;
 
 	if (2 < request->nparam)
-	{
 		return SYSINFO_RET_FAIL;
-	}
 
-	swapdev_str = get_rparam(request, 0);
+	swapdev = get_rparam(request, 0);
 
-	if (NULL == swapdev_str)
-	{
+	if (NULL != swapdev && '\0' != *swapdev && 0 != strcmp(swapdev, "all"))
 		return SYSINFO_RET_FAIL;
-	}
 
-	if ('\0' == *swapdev_str)
-		strscpy(swapdev, "all");
+	mode = get_rparam(request, 1);
+
+	if (NULL == mode || '\0' == *mode || 0 ==strcmp(mode, "free"))
+		ret = SYSTEM_SWAP_FREE(request, result);
+	else if (0 ==strcmp(mode, "total"))
+		ret = SYSTEM_SWAP_TOTAL(request, result);
+	else if (0 ==strcmp(mode, "pfree"))
+		ret = SYSTEM_SWAP_PFREE(request, result);
+	else if (0 ==strcmp(mode, "pused"))
+		ret = SYSTEM_SWAP_PUSED(request, result);
 	else
-		strscpy(swapdev, swapdev_str);
+		ret = SYSINFO_RET_FAIL;
 
-/* TODO strange code */
-	if (strncmp(swapdev, "all", sizeof(swapdev)))
-	{
-		return SYSINFO_RET_FAIL;
-	}
-
-	mode_str = get_rparam(request, 1);
-
-	if (NULL == mode_str || '\0' == *mode_str)
-		strscpy(mode, "free");
-	else
-		strscpy(mode, mode_str);
-
-	for (i = 0; fl[i].mode != 0; i++)
-		if (0 == strncmp(mode, fl[i].mode, MAX_STRING_LEN))
-			return (fl[i].function)(request, result);
-
-	return SYSINFO_RET_FAIL;
+	return ret;
 }
 
 #define	DO_SWP_IN	1
@@ -275,52 +252,24 @@ static int	get_swap_io(double *swapin, double *pgswapin, double *swapout, double
 int	SYSTEM_SWAP_IN(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	int	ret = SYSINFO_RET_FAIL;
-	char	*swapdev_str, swapdev[MAX_STRING_LEN];
-	char	*mode_str, mode[MAX_STRING_LEN];
+	char	*swapdev, *mode;
 	double	value = 0;
 
 	if (2 < request->nparam)
-	{
 		return SYSINFO_RET_FAIL;
-	}
 
-	swapdev_str = get_rparam(request, 0);
+	swapdev = get_rparam(request, 0);
+	mode = get_rparam(request, 1);
 
-	if (NULL == swapdev_str)
-	{
+	if (NULL != swapdev && '\0' != *swapdev && 0 != strcmp(swapdev, "all"))
 		return SYSINFO_RET_FAIL;
-	}
 
-	if ('\0' == *swapdev_str)
-		strscpy(swapdev, "all");
-	else
-		strscpy(swapdev, swapdev_str);
-
-/* TODO strange code here */
-	if (strncmp(swapdev, "all", sizeof(swapdev)))
-	{
-		return SYSINFO_RET_FAIL;
-	}
-
-	mode_str = get_rparam(request, 1);
-
-	if (NULL == mode_str || '\0' == *mode_str)
-		strscpy(mode, "count");
-	else
-		strscpy(mode, mode_str);
-
-	if (0 == strcmp(mode,"count"))
-	{
+	if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "count"))
 		ret = get_swap_io(&value, NULL, NULL, NULL);
-	}
 	else if (0 == strcmp(mode,"pages"))
-	{
 		ret = get_swap_io(NULL, &value, NULL, NULL);
-	}
 	else
-	{
-		return SYSINFO_RET_FAIL;
-	}
+		ret =  SYSINFO_RET_FAIL;
 
 	if (ret != SYSINFO_RET_OK)
 		return ret;
@@ -332,52 +281,24 @@ int	SYSTEM_SWAP_IN(AGENT_REQUEST *request, AGENT_RESULT *result)
 int	SYSTEM_SWAP_OUT(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	int	ret = SYSINFO_RET_FAIL;
-	char	*swapdev_str, swapdev[MAX_STRING_LEN];
-	char	*mode_str, mode[MAX_STRING_LEN];
+	char	*swapdev, *mode;
 	double	value = 0;
 
 	if (2 < request->nparam)
-	{
 		return SYSINFO_RET_FAIL;
-	}
 
-	swapdev_str = get_rparam(request, 0);
+	swapdev = get_rparam(request, 0);
+	mode = get_rparam(request, 1);
 
-	if (NULL == swapdev_str)
-	{
+	if (NULL != swapdev && '\0' != *swapdev && 0 != strcmp(swapdev, "all"))
 		return SYSINFO_RET_FAIL;
-	}
 
-	if ('\0' == *swapdev_str)
-		strscpy(swapdev, "all");
-	else
-		strscpy(swapdev, swapdev_str);
-
-/* TDOD strange code */
-	if(strncmp(swapdev, "all", sizeof(swapdev)))
-	{
-		return SYSINFO_RET_FAIL;
-	}
-
-	mode_str = get_rparam(request, 1);
-
-	if (NULL == mode_str || '\0' == *mode_str)
-		strscpy(mode, "count");
-	else
-		strscpy(mode, mode_str);
-
-	if (0 == strcmp(mode,"count"))
-	{
+	if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "count"))
 		ret = get_swap_io(NULL, NULL, &value, NULL);
-	}
 	else if (0 == strcmp(mode,"pages"))
-	{
 		ret = get_swap_io(NULL, NULL, NULL, &value);
-	}
 	else
-	{
-		return SYSINFO_RET_FAIL;
-	}
+		ret = SYSINFO_RET_FAIL;
 
 	if (ret != SYSINFO_RET_OK)
 		return ret;

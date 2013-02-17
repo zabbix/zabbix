@@ -175,7 +175,7 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 
 	size_t		offset = 0;
 	int		res, type, retrans, retry, i, ret = SYSINFO_RET_FAIL;
-	char		*ip, zone[MAX_STRING_LEN], tmp[MAX_STRING_LEN], buffer[MAX_STRING_LEN];
+	char		*ip, zone[MAX_STRING_LEN], buffer[MAX_STRING_LEN];
 	char		*zone_str, *tmp_str;
 	struct in_addr	inaddr;
 

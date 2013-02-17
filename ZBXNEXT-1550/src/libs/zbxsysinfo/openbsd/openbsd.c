@@ -23,12 +23,12 @@
 ZBX_METRIC	parameters_specific[] =
 /* 	KEY			FLAG		FUNCTION 	ADD_PARAM	TEST_PARAM */
 {
-	{"kernel.maxfiles",	0,		KERNEL_MAXFILES,	0,	0},
-	{"kernel.maxproc",	0,		KERNEL_MAXPROC, 	0,	0},
+	{"kernel.maxfiles",	0,		KERNEL_MAXFILES,	0,	NULL},
+	{"kernel.maxproc",	0,		KERNEL_MAXPROC, 	0,	NULL},
 
 	{"vfs.fs.size",		CF_USEUPARAM,	VFS_FS_SIZE, 		0,	"/"},
 	{"vfs.fs.inode",	CF_USEUPARAM,	VFS_FS_INODE,		0,	"/,free"},
-	{"vfs.fs.discovery",	0,		VFS_FS_DISCOVERY,	0,	0},
+	{"vfs.fs.discovery",	0,		VFS_FS_DISCOVERY,	0,	NULL},
 
 	{"vfs.dev.read",	CF_USEUPARAM,	VFS_DEV_READ,		NULL,	"sd0,operations"},
 	{"vfs.dev.write",	CF_USEUPARAM,	VFS_DEV_WRITE,		NULL,	"sd0,operations"},
@@ -43,8 +43,8 @@ ZBX_METRIC	parameters_specific[] =
 	{"proc.num",		CF_USEUPARAM,	PROC_NUM,		0,	"inetd,,"},
 	{"proc.mem",		CF_USEUPARAM,	PROC_MEM,		0,	"inetd,,"},
 
-	{"system.cpu.switches", 0,              SYSTEM_CPU_SWITCHES,    0,      0},
-	{"system.cpu.intr",     0,              SYSTEM_CPU_INTR,        0,      0},
+	{"system.cpu.switches", 0,              SYSTEM_CPU_SWITCHES,    0,      NULL},
+	{"system.cpu.intr",     0,              SYSTEM_CPU_INTR,        0,      NULL},
 	{"system.cpu.util",	CF_USEUPARAM,	SYSTEM_CPU_UTIL,	0,	"all,idle"},
 	{"system.cpu.load",	CF_USEUPARAM,	SYSTEM_CPU_LOAD,	0,	"all,avg1"},
 	{"system.cpu.num",	CF_USEUPARAM,	SYSTEM_CPU_NUM,		0,	"online"},
@@ -53,8 +53,8 @@ ZBX_METRIC	parameters_specific[] =
 	{"system.swap.in",      CF_USEUPARAM,   SYSTEM_SWAP_IN,         0,      "all,pages"},
 	{"system.swap.out",     CF_USEUPARAM,   SYSTEM_SWAP_OUT,        0,      "all,count"},
 
-	{"system.uptime",	0,		SYSTEM_UPTIME,		0,	0},
-	{"system.boottime",     0,      	SYSTEM_BOOTTIME,        0,      0},
+	{"system.uptime",	0,		SYSTEM_UPTIME,		0,	NULL},
+	{"system.boottime",     0,      	SYSTEM_BOOTTIME,        0,      NULL},
 
 	{"sensor",		CF_USEUPARAM,	GET_SENSOR,		0,	"cpu0,temp0"},
 

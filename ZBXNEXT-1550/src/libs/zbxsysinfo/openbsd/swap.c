@@ -125,7 +125,7 @@ int	SYSTEM_SWAP_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	/* default parameter */
 	if (NULL != swapdev && '\0' != *swapdev && 0 != strcmp(swapdev, "all"))
-		return ret;
+		return SYSINFO_RET_FAIL;
 
 	/* default parameter */
 	if (NULL == mode || *mode == '\0' || 0 == strcmp(mode, "free"))

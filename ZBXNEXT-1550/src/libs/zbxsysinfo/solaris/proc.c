@@ -74,21 +74,16 @@ int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	tmp = get_rparam(request, 2);
 
-	if (NULL != tmp && *tmp != '\0')
-	{
-		if (0 == strcmp(tmp, "avg"))
-			do_task = DO_AVG;
-		else if (0 == strcmp(tmp, "max"))
-			do_task = DO_MAX;
-		else if (0 == strcmp(tmp, "min"))
-			do_task = DO_MIN;
-		else if (0 == strcmp(tmp, "sum"))
-			do_task = DO_SUM;
-		else
-			return SYSINFO_RET_FAIL;
-	}
-	else
+	if (NULL == tmp || *tmp == '\0' || 0 == strcmp(tmp, "sum"))
 		do_task = DO_SUM;
+	else if (0 == strcmp(tmp, "avg"))
+		do_task = DO_AVG;
+	else if (0 == strcmp(tmp, "max"))
+		do_task = DO_MAX;
+	else if (0 == strcmp(tmp, "min"))
+		do_task = DO_MIN;
+	else
+		return SYSINFO_RET_FAIL;
 
 	proccomm = get_rparam(request, 3);
 
@@ -184,21 +179,16 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	tmp = get_rparam(request, 2);
 
-	if (NULL != tmp && *tmp != '\0')
-	{
-		if (0 == strcmp(tmp, "run"))
-			zbx_proc_stat = ZBX_PROC_STAT_RUN;
-		else if (0 == strcmp(tmp, "sleep"))
-			zbx_proc_stat = ZBX_PROC_STAT_SLEEP;
-		else if (0 == strcmp(tmp, "zomb"))
-			zbx_proc_stat = ZBX_PROC_STAT_ZOMB;
-		else if (0 == strcmp(tmp, "all"))
-			zbx_proc_stat = ZBX_PROC_STAT_ALL;
-		else
-			return SYSINFO_RET_FAIL;
-	}
-	else
+	if (NULL == tmp || *tmp == '\0' || 0 == strcmp(tmp, "all"))
 		zbx_proc_stat = ZBX_PROC_STAT_ALL;
+	else if (0 == strcmp(tmp, "run"))
+		zbx_proc_stat = ZBX_PROC_STAT_RUN;
+	else if (0 == strcmp(tmp, "sleep"))
+		zbx_proc_stat = ZBX_PROC_STAT_SLEEP;
+	else if (0 == strcmp(tmp, "zomb"))
+		zbx_proc_stat = ZBX_PROC_STAT_ZOMB;
+	else
+		return SYSINFO_RET_FAIL;
 
 	proccomm = get_rparam(request, 3);
 
@@ -233,7 +223,7 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 		if (FAIL == check_procstate(&psinfo, zbx_proc_stat))
 			continue;
 
-		if (NULL != proccomm || '\0' != *proccomm && NULL == zbx_regexp_match(psinfo.pr_psargs, proccomm, NULL))
+		if (NULL != proccomm && '\0' != *proccomm && NULL == zbx_regexp_match(psinfo.pr_psargs, proccomm, NULL))
 			continue;
 
 		proccount++;

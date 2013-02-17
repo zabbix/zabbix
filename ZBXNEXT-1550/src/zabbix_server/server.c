@@ -184,6 +184,9 @@ int	CONFIG_PROXYPOLLER_FORKS	= 1;	/* parameters for passive proxies */
 int	CONFIG_PROXYCONFIG_FREQUENCY	= 3600;	/* 1h */
 int	CONFIG_PROXYDATA_FREQUENCY	= 1;	/* 1s */
 
+char	*CONFIG_LOAD_MODULE_PATH	= NULL;
+char	**CONFIG_LOAD_MODULE		= NULL;
+
 /* mutex for node syncs */
 ZBX_MUTEX	node_sync_access;
 
@@ -390,6 +393,10 @@ static void	zbx_load_config()
 			PARM_OPT,	1,			SEC_PER_HOUR},
 		{"AllowRoot",			&CONFIG_ALLOW_ROOT,			TYPE_INT,
 			PARM_OPT,	0,			1},
+		{"LoadModule",			&CONFIG_LOAD_MODULE,			TYPE_MULTISTRING,
+			PARM_OPT,	0,			0},
+		{"LoadModulePath",		&CONFIG_LOAD_MODULE_PATH,		TYPE_STRING,
+			PARM_OPT,	0,			0},
 		{NULL}
 	};
 
@@ -478,6 +485,12 @@ int	main(int argc, char **argv)
 	init_metrics();
 
 	zbx_load_config();
+
+	if (FAIL == load_modules(CONFIG_LOAD_MODULE_PATH, CONFIG_LOAD_MODULE, CONFIG_TIMEOUT))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "loading modules failed, exiting...");
+		exit(FAIL);
+	}
 
 	if (ZBX_TASK_CONFIG_CACHE_RELOAD == task)
 		exit(SUCCEED == zbx_sigusr_send(ZBX_TASK_CONFIG_CACHE_RELOAD) ? EXIT_SUCCESS : EXIT_FAILURE);
@@ -808,6 +821,8 @@ void	zbx_on_exit()
 	}
 
 	free_metrics();
+
+	unload_modules();
 
 	zbx_sleep(2);	/* wait for all child processes to exit */
 
