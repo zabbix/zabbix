@@ -42,9 +42,6 @@ int	SYSTEM_SWAP_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 	swapdev = get_rparam(request, 0);
 	mode = get_rparam(request, 1);
 
-	if (NULL == swapdev)
-		return SYSINFO_RET_FAIL;
-
 	sz = sizeof(mib) / sizeof(mib[0]);
 	if (-1 == sysctlnametomib("vm.swap_info", mib, &sz))
 		return FAIL;
@@ -57,7 +54,7 @@ int	SYSTEM_SWAP_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	while (-1 != sysctl(mib, mib_sz, &xsw, &sz, NULL, 0))
 	{
-		if ('\0' == *swapdev || 0 == strcmp(swapdev, "all")	/* default parameter */
+		if (NULL == swapdev || '\0' == *swapdev || 0 == strcmp(swapdev, "all")	/* default parameter */
 				|| 0 == strcmp(swapdev, devname(xsw.xsw_dev, S_IFCHR)))
 		{
 			total += (zbx_uint64_t)xsw.xsw_nblks;

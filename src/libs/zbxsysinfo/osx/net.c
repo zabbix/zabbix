@@ -71,7 +71,7 @@ int	NET_IF_IN(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if_name = get_rparam(request, 0);
 	mode = get_rparam(request, 1);
 
-	if (NULL == if_name)
+	if (NULL == if_name || '\0' == *if_name)
 		return SYSINFO_RET_FAIL;
 
 	if (FAIL == get_ifmib_general(if_name))
@@ -101,7 +101,7 @@ int	NET_IF_OUT(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if_name = get_rparam(request, 0);
 	mode = get_rparam(request, 1);
 
-	if (NULL == if_name)
+	if (NULL == if_name || '\0' == *if_name)
 		return SYSINFO_RET_FAIL;
 
 	if (FAIL == get_ifmib_general(if_name))
@@ -129,7 +129,7 @@ int	NET_IF_TOTAL(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if_name = get_rparam(request, 0);
 	mode = get_rparam(request, 1);
 
-	if (NULL == if_name)
+	if (NULL == if_name || '\0' == *if_name)
 		return SYSINFO_RET_FAIL;
 
 	if (FAIL == get_ifmib_general(if_name))
@@ -158,7 +158,7 @@ int     NET_TCP_LISTEN(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	tmp = get_rparam(request, 0);
 
-	if (NULL == tmp)
+	if (NULL == tmp || '0' == *tmp)
 		return SYSINFO_RET_FAIL;
 
 	if (FAIL == is_ushort(tmp, &port))
@@ -186,7 +186,7 @@ int     NET_UDP_LISTEN(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	tmp = get_rparam(request, 0);
 
-	if (NULL == tmp)
+	if (NULL == tmp || '0' == *tmp)
 		return SYSINFO_RET_FAIL;
 
 	if (FAIL == is_ushort(tmp, &port))
@@ -212,7 +212,7 @@ int     NET_IF_COLLISIONS(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if_name = get_rparam(request, 0);
 
-	if (NULL == ifname)
+	if (NULL == ifname || '\0'== *ifname)
 		return SYSINFO_RET_FAIL;
 
 	if (FAIL == get_ifmib_general(if_name))

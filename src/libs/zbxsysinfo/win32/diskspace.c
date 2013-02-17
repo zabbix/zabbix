@@ -23,7 +23,7 @@
 
 int	VFS_FS_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	char		*path, *mode_str, mode[20];
+	char		*path, *mode;
 	LPTSTR		wpath;
 	ULARGE_INTEGER	freeBytes, totalBytes;
 
@@ -31,16 +31,10 @@ int	VFS_FS_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 		return SYSINFO_RET_FAIL;
 
 	path = get_nparam(request, 0);
-	mode_str = get_nparam(request, 1);
+	mode = get_nparam(request, 1);
 
-	if (NULL = path)
+	if (NULL = path && '\0' == *path)
 		return SYSINFO_RET_FAIL;
-
-	if (NULL == mode_str || '\0' == *mode_str)
-		strscpy(mode, "total");
-	else
-		strscpy(mode, mode_str);
-
 
 	wpath = zbx_utf8_to_unicode(path);
 	if (0 == GetDiskFreeSpaceEx(wpath, &freeBytes, &totalBytes, NULL))
@@ -50,7 +44,7 @@ int	VFS_FS_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 	}
 	zbx_free(wpath);
 
-	if (0 == strcmp(mode, "total"))
+	if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "total"))
 		SET_UI64_RESULT(result, totalBytes.QuadPart);
 	else if (0 == strcmp(mode, "free"))
 		SET_UI64_RESULT(result, freeBytes.QuadPart);

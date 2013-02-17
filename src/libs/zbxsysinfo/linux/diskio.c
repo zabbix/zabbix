@@ -175,7 +175,7 @@ static int	vfs_dev_rw(AGENT_REQUEST *request, AGENT_RESULT *result, int rw)
 {
 	ZBX_SINGLE_DISKDEVICE_DATA	*device;
 	char				*devname, *tmp, kernel_devname[MAX_STRING_LEN];
-	int				type, mode, nparam;
+	int				type, mode;
 	zbx_uint64_t			dstats[ZBX_DSTAT_MAX];
 
 	if (3 < request->nparam)	/* too many parameters? */
@@ -183,10 +183,7 @@ static int	vfs_dev_rw(AGENT_REQUEST *request, AGENT_RESULT *result, int rw)
 
 	devname = get_rparam(request, 0);
 
-	if (NULL == devname)
-		return SYSINFO_RET_FAIL;
-
-	if (0 == strcmp(devname, "all"))
+	if (NULL == devname || '\0' == *devname || 0 == strcmp(devname, "all"))
 		*devname = '\0';
 
 	tmp = get_rparam(request, 1);
@@ -204,7 +201,7 @@ static int	vfs_dev_rw(AGENT_REQUEST *request, AGENT_RESULT *result, int rw)
 
 	if (type == ZBX_DSTAT_TYPE_SECT || type == ZBX_DSTAT_TYPE_OPER)
 	{
-		if (nparam > 2)
+		if (request->nparam > 2)
 			return SYSINFO_RET_FAIL;
 
 		if (SUCCEED != get_diskstat(devname, dstats))

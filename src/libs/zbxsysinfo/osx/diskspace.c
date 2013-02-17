@@ -128,38 +128,32 @@ static int	VFS_FS_PFREE(const char *fs, AGENT_RESULT *result)
 
 int	VFS_FS_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	const MODE_FUNCTION	fl[] =
-	{
-		{"total",	VFS_FS_TOTAL},
-		{"used",	VFS_FS_USED},
-		{"pused",	VFS_FS_PUSED},
-		{"free",	VFS_FS_FREE},
-		{"pfree",	VFS_FS_PFREE},
-		{NULL,		0}
-	};
-
-	char	*fsname, *mode_str, mode[8];
-	int	i;
+	char	*fsname, *mode;
+	int	ret = SYSINFO_RET_FAIL;
 
 	if (2 < request->nparam)
 		return SYSINFO_RET_FAIL;
 
 	fsname = get_rparam(request, 0);
-	mode_str = get_rparam(request, 1);
+	mode = get_rparam(request, 1);
 
-	if (NULL == fsname)
+	if (NULL == fsname || '\0' == *fsname)
 		return SYSINFO_RET_FAIL;
 
-	if (NULL == mode_str || '\0' == *mode_str)
-		strscpy(mode, "total");
+	if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "total"))
+		ret = VFS_FS_TOTAL(fsname, result);
+	else if (0 == strcmp(mode, "used"))
+		ret = VFS_FS_USED(fsname, result);
+	else if (0 == strcmp(mode, "pused"))
+		ret = VFS_FS_PUSED(fsname, result);
+	else if (0 == strcmp(mode, "free"))
+		ret = VFS_FS_FREE(fsname, result);
+	else if (0 == strcmp(mode, "pfree"))
+		ret = VFS_FS_PFREE(fsname, result);
 	else
-		strscpy(mode, mode_str);
+		ret = SYSINFO_RET_FAIL;
 
-	for (i = 0; NULL != fl[i].mode; i++)
-		if (0 == strcmp(mode, fl[i].mode))
-			return (fl[i].function)(fsname, result);
-
-	return SYSINFO_RET_FAIL;
+	return ret;
 }
 
 int	VFS_FS_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)

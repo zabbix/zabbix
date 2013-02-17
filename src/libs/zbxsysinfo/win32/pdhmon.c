@@ -38,6 +38,9 @@ int	USER_PERF_COUNTER(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	counter = get_rparam(request, 0);
 
+	if (NULL == counter || '\0' == *counter)
+		return SYSINFO_RET_FAIL;
+
 	if (SUCCEED != perf_collector_started())
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "Collector is not started!");

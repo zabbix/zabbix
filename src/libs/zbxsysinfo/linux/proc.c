@@ -237,21 +237,16 @@ int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 	else
 		usrinfo = NULL;
 
-	if (NULL != procfunc && '\0' != *tmp)
-	{
-		if (0 == strcmp(tmp, "avg"))
-			do_task = DO_AVG;
-		else if (0 == strcmp(tmp, "max"))
-			do_task = DO_MAX;
-		else if (0 == strcmp(tmp, "min"))
-			do_task = DO_MIN;
-		else if (0 == strcmp(tmp, "sum"))
-			do_task = DO_SUM;
-		else
-			return SYSINFO_RET_FAIL;
-	}
-	else
+	if (NULL == procfunc || '\0' != *procfunc || 0 == strcmp(procfunc, "sum"))
 		do_task = DO_SUM;
+	else if (0 == strcmp(procfunc, "avg"))
+		do_task = DO_AVG;
+	else if (0 == strcmp(procfunc, "max"))
+		do_task = DO_MAX;
+	else if (0 == strcmp(procfunc, "min"))
+		do_task = DO_MIN;
+	else
+		return SYSINFO_RET_FAIL;
 
 	if (NULL == (dir = opendir("/proc")))
 		return SYSINFO_RET_FAIL;
@@ -366,21 +361,16 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 	else
 		usrinfo = NULL;
 
-	if (NULL != procfunc && *procfunc != '\0')
-	{
-		if (0 == strcmp(procfunc, "run"))
-			zbx_proc_stat = ZBX_PROC_STAT_RUN;
-		else if (0 == strcmp(procfunc, "sleep"))
-			zbx_proc_stat = ZBX_PROC_STAT_SLEEP;
-		else if (0 == strcmp(procfunc, "zomb"))
-			zbx_proc_stat = ZBX_PROC_STAT_ZOMB;
-		else if (0 == strcmp(procfunc, "all"))
-			zbx_proc_stat = ZBX_PROC_STAT_ALL;
-		else
-			return SYSINFO_RET_FAIL;
-	}
-	else
+	if (NULL == procfunc || *procfunc == '\0' || 0 == strcmp(procfunc, "all"))
 		zbx_proc_stat = ZBX_PROC_STAT_ALL;
+	else if (0 == strcmp(procfunc, "run"))
+		zbx_proc_stat = ZBX_PROC_STAT_RUN;
+	else if (0 == strcmp(procfunc, "sleep"))
+		zbx_proc_stat = ZBX_PROC_STAT_SLEEP;
+	else if (0 == strcmp(procfunc, "zomb"))
+		zbx_proc_stat = ZBX_PROC_STAT_ZOMB;
+	else
+		return SYSINFO_RET_FAIL;
 
 	if (NULL == (dir = opendir("/proc")))
 		return SYSINFO_RET_FAIL;

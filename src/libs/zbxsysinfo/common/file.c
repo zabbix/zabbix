@@ -124,7 +124,7 @@ int	VFS_FILE_CONTENTS(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if (NULL == tmp)
 		*encoding = '\0';
 	else
-		zbx_strlcpy(encoding, tmp ,sizeof(encoding));
+		strscpy(encoding, tmp);
 
 	if (NULL == filename || '\0' == *filename || 0 != zbx_stat(filename, &stat_buf))
 		goto err;
@@ -205,7 +205,7 @@ int	VFS_FILE_REGEXP(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if (NULL == tmp)
 		*encoding = '\0';
 	else
-		zbx_strlcpy(encoding, tmp ,sizeof(encoding));
+		strscpy(encoding, tmp);
 
 	if (-1 == (f = zbx_open(filename, O_RDONLY)))
 		goto err;
@@ -267,7 +267,7 @@ int	VFS_FILE_REGMATCH(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if (NULL == tmp)
 		*encoding = '\0';
 	else
-		zbx_strlcpy(encoding, tmp ,sizeof(encoding));
+		strscpy(encoding, tmp);
 
 	if (-1 == (f = zbx_open(filename, O_RDONLY)))
 		goto err;

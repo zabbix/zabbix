@@ -228,7 +228,7 @@ int	check_service(AGENT_REQUEST *request, const char *default_addr, AGENT_RESULT
 	if (NULL == ip_str || '\0' == *ip_str)
 		strscpy(ip, default_addr);
 	else
-		zbx_strlcpy(ip, ip_str, sizeof(ip));
+		strscpy(ip, ip_str);
 
 	if (NULL != port_str && '\0' != *port_str && FAIL == is_ushort(port_str, &port))
 	{

@@ -46,10 +46,7 @@ int	SYSTEM_LOCALTIME(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	type = get_rparam(request, 0);
 
-	if (NULL == type)
-		return SYSINFO_RET_FAIL;
-
-	if ('\0' == *type || 0 == strcmp(type, "utc"))
+	if (NULL == type || '\0' == *type || 0 == strcmp(type, "utc"))
 	{
 		SET_UI64_RESULT(result, time(NULL));
 	}

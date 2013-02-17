@@ -36,7 +36,7 @@ int	VFS_FS_INODE(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if (2 < request->nparam)
 		return SYSINFO_RET_FAIL;
 
-	if (NULL == fsname)
+	if (NULL == fsname || '\0' == *fsname)
 		return SYSINFO_RET_FAIL;
 
 	if (0 != ZBX_STATFS(fsname, &s))

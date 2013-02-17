@@ -223,39 +223,24 @@ int	SYSTEM_SWAP_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 	int ret = SYSINFO_RET_FAIL;
 
 	if (2 < request->nparam)
-	{
-		return ret;
-	}
+		return SYSINFO_RET_FAIL;
 
 	swapdev = get_rparam(request, 0);
 	mode = get_rparam(request, 1);
 
 	if (NULL != swapdev && '\0' != *swapdev && 0 != strncmp(swapdev, "all", sizeof(swapdev)))
-	{
-		return ret;
-	}
+		return SYSINFO_RET_FAIL;
 
 	if (NULL == mode || '\0' == *mode || 0 == strcmp (mode, "free"))
-	{
 		ret = SYSTEM_SWAP_FREE(result);
-	}
 	else if (0 == strcmp (mode, "total"))
-	{
 		ret = SYSTEM_SWAP_TOTAL(result);
-	}
 	else if (0 == strcmp (mode, "pfree"))
-	{
 		ret = SYSTEM_SWAP_PFREE(result);
-	}
 	else if (0 == strcmp (mode, "pused"))
-	{
 		ret = SYSTEM_SWAP_PUSED(result);
-	}
 	else
-	{
 		ret = SYSINFO_RET_FAIL;
-	}
-
 
 	return ret;
 }

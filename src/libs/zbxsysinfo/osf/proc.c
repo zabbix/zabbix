@@ -210,7 +210,7 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 		}
 	}
 
-	if (NULL == procstat || '\0' == *procstat || 0 == strcmp(procstat,"all"))
+	if (NULL != procstat && '\0' == *procstat && 0 == strcmp(procstat,"all"))
 	{
 		procstat[0] = '\0';
 	}
@@ -229,12 +229,8 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 		procstat[0] = PR_SZOMB;
 		procstat[1] = '\0';
 	}
-	else
-	{
-		return SYSINFO_RET_FAIL;
-	}
 
-	dir=opendir("/proc");
+	dir = opendir("/proc");
 	if (NULL == dir)
 	{
 	    return SYSINFO_RET_FAIL;

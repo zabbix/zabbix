@@ -51,7 +51,7 @@ void	add_metric(ZBX_METRIC *new)
 	if (NULL == new->key)
 		return;
 
-/* TODO we should verify that key does not exists */
+/* TODO load order: metrics, module, user parameters. next overwrites previous one. */
 	while (NULL != commands[i].key)
 		i++;
 
@@ -229,7 +229,6 @@ void	free_request(AGENT_REQUEST *request)
  * Purpose: parse item command (key) and fill AGET_REQUEST structure          *
  *                                                                            *
  * Parameters: cmd - complete item key                                        *
- *             key - item key without parameters                              *
  *                                                                            *
  * Return value: request - structure filled with data from item key           *
  *                                                                            *
@@ -237,13 +236,15 @@ void	free_request(AGENT_REQUEST *request)
  *          nparam must be 0 (not 1!) if no parameters given                  *
  *                                                                            *
  ******************************************************************************/
-int	parse_item_key(char *cmd, char *key, AGENT_REQUEST *request)
+int	parse_item_key(char *cmd, AGENT_REQUEST *request)
 {
 	int i;
 	char		buf[MAX_STRING_LEN];
 
 	request->nparam = num_param(cmd);
-	request->key = zbx_strdup(NULL, key);
+
+	get_param(cmd, 0, buf, sizeof(buf));
+	request->key = zbx_strdup(NULL, buf);
 
 	request->params = zbx_malloc(request->params, request->nparam * sizeof(char *));
 
@@ -495,7 +496,7 @@ int	process(const char *in_command, unsigned flags, AGENT_RESULT *result)
 			strscpy(param, usr_param);
 
 		init_request(&request);
-		if (0 != parse_item_key(param, usr_cmd, &request))
+		if (0 != parse_item_key(param, &request))
 		{
 			free_request(&request);
 			goto notsupported;

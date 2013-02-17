@@ -36,24 +36,21 @@ int	VFS_FS_INODE(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if (2 < request->nparam)
 		return SYSINFO_RET_FAIL;
 
-	if (NU:: == fsname)
+	fsname = get_rparam(request, 0);
+	mode = get_rparam(request, 1);
+
+	if (NULL == fsname || '\0' == *fsname)
 		return SYSINFO_RET_FAIL;
 
 	if (0 != ZBX_STATFS(fsname, &s))
 		return SYSINFO_RET_FAIL;
 
 	if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "total"))	/* default parameter */
-	{
 		SET_UI64_RESULT(result, s.f_files);
-	}
 	else if (0 == strcmp(mode, "free"))
-	{
 		SET_UI64_RESULT(result, s.ZBX_FFREE);
-	}
 	else if (0 == strcmp(mode, "used"))
-	{
 		SET_UI64_RESULT(result, s.f_files - s.f_ffree);
-	}
 	else if (0 == strcmp(mode, "pfree"))
 	{
 		total = s.f_files;

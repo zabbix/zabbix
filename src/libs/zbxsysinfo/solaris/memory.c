@@ -91,22 +91,28 @@ int     VM_MEMORY_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 		{NULL,		0}
 	};
 
-	char	*mode_str, mode[MAX_STRING_LEN];
-	int	i;
+	char	*mode;
+	int	ret = SYSINFO_RET_FAIL;
 
 	if (1 < request->nparam)
 		return SYSINFO_RET_FAIL;
 
-	mode_str = get_rparam(request, 0);
+	mode = get_rparam(request, 0);
 
-	if (NULL == mode_str || '\0' == *mode_str)
-		strscpy(mode, "total");
+	if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "total"))
+		ret = VM_MEMORY_TOTAL(result);
+	else if (0 == strcmp(mode, "free"))
+		ret = VM_MEMORY_FREE(result);
+	else if (0 == strcmp(mode, "used"))
+		ret = VM_MEMORY_USED(result);
+	else if (0 == strcmp(mode, "pused"))
+		ret = VM_MEMORY_PUSED(result);
+	else if (0 == strcmp(mode, "available"))
+		ret = VM_MEMORY_AVAILABLE(result);
+	else if (0 == strcmp(mode, "pavailable"))
+		ret = VM_MEMORY_PAVAILABLE(result);
 	else
-		strscpy(mode, mode_str);
+		ret = SYSINFO_RET_FAIL;
 
-	for (i = 0; NULL != fl[i].mode; i++)
-		if (0 == strcmp(mode, fl[i].mode))
-			return (fl[i].function)(result);
-
-	return SYSINFO_RET_FAIL;
+	return ret;
 }

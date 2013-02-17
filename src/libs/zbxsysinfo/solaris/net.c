@@ -260,104 +260,80 @@ int	NET_UDP_LISTEN(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 int	NET_IF_IN(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	const MODE_FUNCTION	fl[] =
-	{
-		{"bytes",   NET_IF_IN_BYTES},
-		{"packets", NET_IF_IN_PACKETS},
-		{"errors",  NET_IF_IN_ERRORS},
-		{NULL,	    0}
-	};
-
-	char	*if_name, *mode_str, mode[16];
-	int	i;
+	char	*if_name, *mode;
+	int	ret = SYSINFO_RET_FAIL;
 
 	if (2 < request->nparam)
 		return SYSINFO_RET_FAIL;
 
 	if_name = get_rparam(request, 0);
-	mode_str = get_rparam(request, 1);
+	mode = get_rparam(request, 1);
 
-	if (NULL == if_name)
+	if (NULL == if_name || '\0' == *if_name)
 		return SYSINFO_RET_FAIL;
 
-	if (NULL == mode_str || '\0' == *mode_str)
-		strscpy(mode, "bytes");
+	if (NULL == mode || '\0' == *mode || 0 ==strcmp(mode, "bytes"))
+		ret = NET_IF_IN_BYTES(if_name, result);
+	else if (0 ==strcmp(mode, "packets"))
+		ret = NET_IF_IN_PACKETS(if_name, result);
+	else if (0 ==strcmp(mode, "errors"))
+		ret = NET_IF_IN_ERRORS(if_name, result);
 	else
-		strscpy(mode, mode_str);
+		ret = SYSINFO_RET_FAIL;
 
-	for (i = 0; NULL != fl[i].mode; i++)
-		if (0 == strcmp(mode, fl[i].mode))
-			return (fl[i].function)(if_name, result);
-
-	return SYSINFO_RET_FAIL;
+	return ret;
 }
 
 int	NET_IF_OUT(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	const MODE_FUNCTION	fl[] =
-	{
-		{"bytes",   NET_IF_OUT_BYTES},
-		{"packets", NET_IF_OUT_PACKETS},
-		{"errors",  NET_IF_OUT_ERRORS},
-		{NULL,	    0}
-	};
-
-	char	*if_name, *mode_str, mode[16];
-	int	i;
+	char	*if_name, *mode;
+	int	ret = SYSINFO_RET_FAIL;
 
 	if (2 < request->nparam)
 		return SYSINFO_RET_FAIL;
 
 	if_name = get_rparam(request, 0);
-	mode_str = get_rparam(request, 1);
+	mode = get_rparam(request, 1);
 
-	if (NULL == if_name)
+	if (NULL == if_name || '\0' == *if_name)
 		return SYSINFO_RET_FAIL;
 
-	if (NULL == mode_str || '\0' == *mode_str)
-		strscpy(mode, "bytes");
+	if (NULL == mode || '\0' == *mode || 0 ==strcmp(mode, "bytes"))
+		ret = NET_IF_OUT_BYTES(if_name, result);
+	else if (0 ==strcmp(mode, "packets"))
+		ret = NET_IF_OUT_PACKETS(if_name, result);
+	else if (0 ==strcmp(mode, "errors"))
+		ret = NET_IF_OUT_ERRORS(if_name, result);
 	else
-		strscpy(mode, mode_str);
+		ret = SYSINFO_RET_FAIL;
 
-	for (i = 0; NULL != fl[i].mode; i++)
-		if (0 == strcmp(mode, fl[i].mode))
-			return (fl[i].function)(if_name, result);
-
-	return SYSINFO_RET_FAIL;
+	return ret;
 }
 
 int	NET_IF_TOTAL(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	const MODE_FUNCTION	fl[] =
-	{
-		{"bytes",   NET_IF_TOTAL_BYTES},
-		{"packets", NET_IF_TOTAL_PACKETS},
-		{"errors",  NET_IF_TOTAL_ERRORS},
-		{NULL,	    0}
-	};
-
-	char	*if_name, *mode_str, mode[16];
-	int	i;
+	char	*if_name, *mode;
+	int	ret = SYSINFO_RET_FAIL;
 
 	if (2 < request->nparam)
 		return SYSINFO_RET_FAIL;
 
 	if_name = get_rparam(request, 0);
-	mode_str = get_rparam(request, 1);
+	mode = get_rparam(request, 1);
 
-	if (NULL == if_name)
+	if (NULL == if_name || '\0' == *if_name)
 		return SYSINFO_RET_FAIL;
 
-	if (NULL == mode_str || '\0' == *mode_str)
-		strscpy(mode, "bytes");
+	if (NULL == mode || '\0' == *mode || 0 ==strcmp(mode, "bytes"))
+		ret = NET_IF_TOTAL_BYTES(if_name, result);
+	else if (0 ==strcmp(mode, "packets"))
+		ret = NET_IF_TOTAL_PACKETS(if_name, result);
+	else if (0 ==strcmp(mode, "errors"))
+		ret = NET_IF_TOTAL_ERRORS(if_name, result);
 	else
-		strscpy(mode, mode_str);
+		ret = SYSINFO_RET_FAIL;
 
-	for (i = 0; NULL != fl[i].mode; i++)
-		if (0 == strcmp(mode, fl[i].mode))
-			return (fl[i].function)(if_name, result);
-
-	return SYSINFO_RET_FAIL;
+	return ret;
 }
 
 int	NET_IF_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
