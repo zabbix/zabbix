@@ -24,6 +24,7 @@
 #include "sysinfo.h"
 #include "zbxconf.h"
 #include "zbxgetopt.h"
+#include "zbxmodules.h"
 #include "alias.h"
 
 const char	*progname = NULL;

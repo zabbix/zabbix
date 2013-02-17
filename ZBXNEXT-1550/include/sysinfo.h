@@ -173,6 +173,7 @@ int	get_diskstat(const char *devname, zbx_uint64_t *dstat);
 #define PROCESS_LOCAL_COMMAND	4
 
 void	init_metrics();
+void    add_metric(ZBX_METRIC *new);
 void	free_metrics();
 
 int	process(const char *in_command, unsigned flags, AGENT_RESULT *result);
@@ -184,6 +185,11 @@ void	test_parameter(const char *key, unsigned flags);
 
 void	init_result(AGENT_RESULT *result);
 void	free_result(AGENT_RESULT *result);
+
+void	init_request(AGENT_REQUEST *request);
+void	free_request(AGENT_REQUEST *request);
+
+int	parse_item_key(char *cmd, AGENT_REQUEST *request);
 
 int	set_result_type(AGENT_RESULT *result, int value_type, int data_type, char *c);
 

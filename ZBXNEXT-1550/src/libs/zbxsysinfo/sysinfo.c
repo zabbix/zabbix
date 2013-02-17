@@ -232,7 +232,7 @@ void	free_request(AGENT_REQUEST *request)
  *                                                                            *
  * Return value: request - structure filled with data from item key           *
  *                                                                            *
- * Comment: this function should be rewritten to get rid of key,buf,get_param *
+ * Comment: this function should be rewritten to get rid of buf and get_param *
  *          nparam must be 0 (not 1!) if no parameters given                  *
  *                                                                            *
  ******************************************************************************/
