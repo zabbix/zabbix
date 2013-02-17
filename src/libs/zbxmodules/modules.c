@@ -84,7 +84,7 @@ int	load_modules(const char *path, char **modules, int timeout)
 {
 	const char	*__function_name = "load_modules";
 	char		**module;
-	ZBX_METRIC	*metrics, *metric;
+	ZBX_METRIC	*metrics;
 	void		*lib;
 	char		filename[MAX_STRING_LEN];
 	int		(*func_init)(), (*func_version)();

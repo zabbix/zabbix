@@ -29,6 +29,7 @@
 #include "mutexs.h"
 
 #include "sysinfo.h"
+#include "zbxmodules.h"
 #include "zbxserver.h"
 
 #include "daemon.h"
