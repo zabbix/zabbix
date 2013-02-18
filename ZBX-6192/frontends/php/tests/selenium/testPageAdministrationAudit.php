@@ -1019,7 +1019,7 @@ class testPageAdministrationAudit extends CWebTest {
 		$alias = $auditlog['alias'];
 		$time = $auditlog['clock'];
 		//$details = $auditlog['details'];
-		$details = '.'.$auditlog['field_name'].': '.$auditlog['oldvalue'].' => '.$auditlog['newvalue'];
+		$details = '.'.$auditlog['field_name'].NAME_DELIMITER.$auditlog['oldvalue'].' => '.$auditlog['newvalue'];
 		$today = date("d M Y H:i:s", $time);
 
 		//$this->ok(array("$today", 'Admin', "$ip", 'Trigger', 'Updated', $auditlog['resourceid'], $auditlog['resourcename']));

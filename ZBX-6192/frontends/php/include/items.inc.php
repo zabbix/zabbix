@@ -230,7 +230,7 @@ function update_item_status($itemids, $status) {
 			if ($result) {
 				$host = get_host_by_hostid($item['hostid']);
 				$item_new = get_item_by_itemid($item['itemid']);
-				add_audit_ext(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ITEM, $item['itemid'], $host['host'].':'.$item['name'], 'items', $item, $item_new);
+				add_audit_ext(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ITEM, $item['itemid'], $host['host'].NAME_DELIMITER.$item['name'], 'items', $item, $item_new);
 			}
 		}
 	}
@@ -712,7 +712,7 @@ function get_items_data_overview($hostids, $application, $view_style) {
 	$items = array();
 	while ($row = DBfetch($db_items)) {
 		$descr = itemName($row);
-		$row['hostname'] = get_node_name_by_elid($row['hostid'], null, ': ').$row['hostname'];
+		$row['hostname'] = get_node_name_by_elid($row['hostid'], null, NAME_DELIMITER).$row['hostname'];
 		$hostnames[$row['hostid']] = $row['hostname'];
 
 		// a little tricky check for attempt to overwrite active trigger (value=1) with

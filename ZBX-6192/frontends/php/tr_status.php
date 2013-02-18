@@ -490,7 +490,7 @@ foreach ($triggers as $trigger) {
 
 		// if we have items from different hosts, we must prefix a host name
 		if ($usedHostCount > 1) {
-			$itemName = $usedHosts[$item['hostid']].': '.$itemName;
+			$itemName = $usedHosts[$item['hostid']].NAME_DELIMITER.$itemName;
 		}
 
 		$items[$inum]['itemid'] = $item['itemid'];
@@ -533,7 +533,7 @@ foreach ($triggers as $trigger) {
 	if (!empty($trigger['dependencies'])) {
 		$dependenciesTable = new CTableInfo();
 		$dependenciesTable->setAttribute('style', 'width: 200px;');
-		$dependenciesTable->addRow(bold(_('Depends on').':'));
+		$dependenciesTable->addRow(bold(_('Depends on').NAME_DELIMITER));
 
 		foreach ($trigger['dependencies'] as $dependency) {
 			$dependenciesTable->addRow(' - '.CMacrosResolverHelper::resolveTriggerNameById($dependency['triggerid']));
@@ -549,7 +549,7 @@ foreach ($triggers as $trigger) {
 	$dependency = false;
 	$dependenciesTable = new CTableInfo();
 	$dependenciesTable->setAttribute('style', 'width: 200px;');
-	$dependenciesTable->addRow(bold(_('Dependent').':'));
+	$dependenciesTable->addRow(bold(_('Dependent').NAME_DELIMITER));
 	if (!empty($triggerIdsDown[$trigger['triggerid']])) {
 		$depTriggers = CMacrosResolverHelper::resolveTriggerNameByIds($triggerIdsDown[$trigger['triggerid']]);
 
