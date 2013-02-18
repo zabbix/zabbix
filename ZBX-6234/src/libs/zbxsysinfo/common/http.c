@@ -67,10 +67,11 @@ static int	get_http_page(const char *host, const char *path, unsigned short port
 
 int	WEB_PAGE_GET(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	char	hostname[MAX_STRING_LEN];
-	char	path[MAX_STRING_LEN];
-	char	port_str[8];
-	char	buffer[MAX_BUFFER_LEN];
+	char		hostname[MAX_STRING_LEN];
+	char		path[MAX_STRING_LEN];
+	char		port_str[8];
+	char		buffer[MAX_BUFFER_LEN];
+	unsigned short	port_number;
 
         if (num_param(param) > 3)
                 return SYSINFO_RET_FAIL;
@@ -82,11 +83,11 @@ int	WEB_PAGE_GET(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 		*path = '\0';
 
 	if (0 != get_param(param, 3, port_str, sizeof(port_str)) || '\0' == *port_str)
-		zbx_snprintf(port_str, sizeof(port_str), "%d", ZBX_DEFAULT_HTTP_PORT);
-	else if (FAIL == is_uint(port_str))
+		port_number = ZBX_DEFAULT_HTTP_PORT;
+	else if (FAIL == is_ushort(port_str, &port_number))
 		return SYSINFO_RET_FAIL;
 
-	if (SYSINFO_RET_OK == get_http_page(hostname, path, (unsigned short)atoi(port_str), buffer, sizeof(buffer)))
+	if (SYSINFO_RET_OK == get_http_page(hostname, path, port_number, buffer, sizeof(buffer)))
 	{
 		zbx_rtrim(buffer, "\r\n");
 		SET_TEXT_RESULT(result, strdup(buffer));
@@ -99,10 +100,11 @@ int	WEB_PAGE_GET(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 
 int	WEB_PAGE_PERF(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	char	hostname[MAX_STRING_LEN];
-	char	path[MAX_STRING_LEN];
-	char	port_str[8];
-	double	start_time;
+	char		hostname[MAX_STRING_LEN];
+	char		path[MAX_STRING_LEN];
+	char		port_str[8];
+	double		start_time;
+	unsigned short	port_number;
 
         if (num_param(param) > 3)
                 return SYSINFO_RET_FAIL;
@@ -114,13 +116,13 @@ int	WEB_PAGE_PERF(const char *cmd, const char *param, unsigned flags, AGENT_RESU
 		*path = '\0';
 
 	if (0 != get_param(param, 3, port_str, sizeof(port_str)) || '\0' == *port_str)
-		zbx_snprintf(port_str, sizeof(port_str), "%d", ZBX_DEFAULT_HTTP_PORT);
-	else if (FAIL == is_uint(port_str))
+		port_number = ZBX_DEFAULT_HTTP_PORT;
+	else if (FAIL == is_ushort(port_str, &port_number))
 		return SYSINFO_RET_FAIL;
 
 	start_time = zbx_time();
 
-	if (SYSINFO_RET_OK == get_http_page(hostname, path, (unsigned short)atoi(port_str), NULL, 0))
+	if (SYSINFO_RET_OK == get_http_page(hostname, path, port_number, NULL, 0))
 	{
 		SET_DBL_RESULT(result, zbx_time() - start_time);
 	}
@@ -132,14 +134,16 @@ int	WEB_PAGE_PERF(const char *cmd, const char *param, unsigned flags, AGENT_RESU
 
 int	WEB_PAGE_REGEXP(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	char	hostname[MAX_STRING_LEN];
-	char	path[MAX_STRING_LEN];
-	char	port_str[8];
-	char	regexp[MAX_STRING_LEN];
-	char	len_str[16];
-	char	back[MAX_BUFFER_LEN];
-	char	*buffer = NULL, *found;
-	int	len, found_len;
+	char		hostname[MAX_STRING_LEN];
+	char		path[MAX_STRING_LEN];
+	char		port_str[8];
+	char		regexp[MAX_STRING_LEN];
+	char		len_str[16];
+	char		back[MAX_BUFFER_LEN];
+	char		*buffer = NULL, *found;
+	int		len, found_len;
+	unsigned short	port_number;
+
 
         if (num_param(param) > 5)
                 return SYSINFO_RET_FAIL;
@@ -151,8 +155,8 @@ int	WEB_PAGE_REGEXP(const char *cmd, const char *param, unsigned flags, AGENT_RE
 		*path = '\0';
 
 	if (0 != get_param(param, 3, port_str, sizeof(port_str)) || '\0' == *port_str)
-		zbx_snprintf(port_str, sizeof(port_str), "%d", ZBX_DEFAULT_HTTP_PORT);
-	else if (FAIL == is_uint(port_str))
+		port_number = ZBX_DEFAULT_HTTP_PORT;
+	else if (FAIL == is_ushort(port_str, &port_number))
 		return SYSINFO_RET_FAIL;
 
 	if (0 != get_param(param, 4, regexp, sizeof(regexp)))
@@ -160,12 +164,12 @@ int	WEB_PAGE_REGEXP(const char *cmd, const char *param, unsigned flags, AGENT_RE
 
 	if (0 != get_param(param, 5, len_str, sizeof(len_str)) || '\0' == *len_str)
 		zbx_snprintf(len_str, sizeof(len_str), "%d", MAX_BUFFER_LEN - 1);
-	else if (FAIL == is_uint(len_str))
+	else if (FAIL == is_uint32(len_str, NULL))
 		return SYSINFO_RET_FAIL;
 
 	buffer = zbx_malloc(buffer, ZBX_MAX_WEBPAGE_SIZE);
 
-	if (SYSINFO_RET_OK == get_http_page(hostname, path, (unsigned short)atoi(port_str), buffer, ZBX_MAX_WEBPAGE_SIZE))
+	if (SYSINFO_RET_OK == get_http_page(hostname, path, port_number, buffer, ZBX_MAX_WEBPAGE_SIZE))
 	{
 		if (NULL != (found = zbx_regexp_match(buffer, regexp, &found_len)))
 		{
