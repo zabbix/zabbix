@@ -60,7 +60,6 @@ static void	update_triggers_status_to_unknown(zbx_uint64_t hostid, zbx_item_type
 	DB_ROW		row;
 	char		*sql = NULL, failed_type_buf[8];
 	size_t		sql_alloc = 16 * ZBX_KIBIBYTE, sql_offset = 0;
-	unsigned char	new_event, event_source, event_value;
 	zbx_uint64_t	triggerid;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() hostid:" ZBX_FS_UI64, __function_name, hostid);

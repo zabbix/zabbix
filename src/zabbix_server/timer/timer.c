@@ -53,7 +53,6 @@ static void	process_time_functions()
 	int			i;
 	DC_TRIGGER		*trigger_info = NULL, *trigger;
 	zbx_vector_ptr_t	trigger_order;
-	unsigned char		new_event, event_source, event_value;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
