@@ -190,7 +190,7 @@ $newgroupTB = new CTextBox('newgroup', $newgroup, ZBX_TEXTBOX_SMALL_SIZE);
 $newgroupTB->setAttribute('maxlength', 64);
 $tmp_label = _('New host group');
 if ($USER_DETAILS['type'] != USER_TYPE_SUPER_ADMIN) {
-	$tmp_label .= SPACE._('(Only superadmins can create group)');
+	$tmp_label .= SPACE._('(Only superadmins can create groups)');
 	$newgroupTB->setReadonly(true);
 }
 $hostList->addRow(array(new CLabel($tmp_label, 'newgroup'), BR(), $newgroupTB), null, null, null, 'new');
