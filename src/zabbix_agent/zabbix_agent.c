@@ -25,6 +25,8 @@
 #include "zbxconf.h"
 #include "zbxgetopt.h"
 #include "alias.h"
+#include "sighandler.h"
+#include "threads.h"
 
 const char	*progname = NULL;
 const char	title_message[] = "Zabbix agent";
@@ -49,14 +51,6 @@ static struct zbx_option	longopts[] =
 	{"test",	1,	NULL,	't'},
 	{NULL}
 };
-
-void	child_signal_handler(int sig)
-{
-	if (SIGALRM == sig)
-		signal(SIGALRM, child_signal_handler);
-
-	exit(FAIL);
-}
 
 static char	DEFAULT_CONFIG_FILE[] = SYSCONFDIR "/zabbix_agent.conf";
 
@@ -185,6 +179,8 @@ int	main(int argc, char **argv)
 	else
 		zbx_load_config(ZBX_CFG_FILE_REQUIRED);
 
+	zbx_set_common_signal_handlers();
+
 	/* metrics should be initialized before loading user parameters */
 	init_metrics();
 
@@ -207,20 +203,12 @@ int	main(int argc, char **argv)
 				test_parameter(TEST_METRIC, PROCESS_TEST);
 			else
 				test_parameters();
-			zabbix_close_log();
-			free_metrics();
-			alias_list_free();
-			exit(SUCCEED);
+			zbx_on_exit();
 			break;
 		default:
 			/* do nothing */
 			break;
 	}
-
-	signal(SIGINT,  child_signal_handler);
-	signal(SIGTERM, child_signal_handler);
-	signal(SIGQUIT, child_signal_handler);
-	signal(SIGALRM, child_signal_handler);
 
 	alarm(CONFIG_TIMEOUT);
 
@@ -260,10 +248,17 @@ int	main(int argc, char **argv)
 
 	alarm(0);
 
+	zbx_on_exit();
+
+	return SUCCEED;
+}
+
+void	zbx_on_exit()
+{
 	zabbix_close_log();
 
 	free_metrics();
 	alias_list_free();
 
-	return SUCCEED;
+	exit(SUCCEED);
 }
