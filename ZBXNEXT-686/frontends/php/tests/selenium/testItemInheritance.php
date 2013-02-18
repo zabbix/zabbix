@@ -26,12 +26,12 @@ define('ITEM_BAD', 1);
 /**
  * Test the creation of inheritance of new objects on a previously linked template.
  */
-class testTemplateInheritance extends CWebTest {
+class testItemInheritance extends CWebTest {
 
 	/**
 	 * Backup the tables that will be modified during the tests.
 	 */
-	public function testTemplateInheritance_setup() {
+	public function testItemInheritance_setup() {
 		DBsave_tables('hosts');
 	}
 
@@ -82,7 +82,7 @@ class testTemplateInheritance extends CWebTest {
 	/**
 	 * @dataProvider simple
 	 */
-	public function testTemplateInheritance_simpleCreate($data) {
+	public function testItemInheritance_simpleCreate($data) {
 		$this->login('templates.php');
 
 		$template = 'Inheritance test template';
@@ -196,7 +196,7 @@ class testTemplateInheritance extends CWebTest {
 	/**
 	 * Restore the original tables.
 	 */
-	public function testTemplateInheritance_teardown() {
+	public function testItemInheritance_teardown() {
 		DBrestore_tables('hosts');
 	}
 }
