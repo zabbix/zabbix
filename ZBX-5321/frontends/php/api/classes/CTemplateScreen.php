@@ -278,7 +278,7 @@ class CTemplateScreen extends CScreen {
 
 		$sql = 'SELECT '.zbx_db_distinct($sqlParts).' '.$sqlSelect.
 					'FROM '.$sqlFrom.
-					'WHERE '.DBin_node('s.screenid', $nodeids).
+					' WHERE '.DBin_node('s.screenid', $nodeids).
 					$sqlWhere.
 					$sqlGroup.
 					$sqlOrder;

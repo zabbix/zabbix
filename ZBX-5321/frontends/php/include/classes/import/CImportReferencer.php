@@ -672,7 +672,7 @@ class CImportReferencer {
 			$triggerIds = array();
 			$sql = 'SELECT t.triggerid,t.expression,t.description'.
 				' FROM triggers t'.
-				'WHERE '.dbConditionString('t.description', array_keys($this->triggers));
+				' WHERE '.dbConditionString('t.description', array_keys($this->triggers));
 			$dbTriggers = DBselect($sql);
 			while ($dbTrigger = DBfetch($dbTriggers)) {
 				$dbExpr = explode_exp($dbTrigger['expression']);

@@ -176,7 +176,7 @@ class CProxy extends CZBXAPI {
 
 		$sql = 'SELECT '.zbx_db_distinct($sqlParts).' '.$sqlSelect.
 				'FROM '.$sqlFrom.
-				'WHERE '.DBin_node('h.hostid', $nodeids).
+				' WHERE '.DBin_node('h.hostid', $nodeids).
 					$sqlWhere.
 					$sqlOrder;
 		$res = DBselect($sql, $sqlLimit);

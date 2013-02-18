@@ -207,8 +207,8 @@ class CUserGroup extends CZBXAPI {
 		$sqlLimit = $sqlParts['limit'];
 
 		$sql = 'SELECT '.zbx_db_distinct($sqlParts).' '.$sqlSelect.
-				'FROM '.$sqlFrom.
-				'WHERE '.DBin_node('g.usrgrpid', $nodeids).
+				' FROM '.$sqlFrom.
+				' WHERE '.DBin_node('g.usrgrpid', $nodeids).
 			$sqlWhere.
 			$sqlOrder;
 		$res = DBselect($sql, $sqlLimit);
