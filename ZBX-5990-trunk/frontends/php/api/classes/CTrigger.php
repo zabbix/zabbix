@@ -130,7 +130,7 @@ class CTrigger extends CTriggerGeneral {
 					' LEFT JOIN rights r'.
 						' ON r.id=hgg.groupid'.
 							' AND '.dbConditionInt('r.groupid', $userGroups).
-				' WHERE f.triggerid = t.triggerid '.
+				' WHERE t.triggerid=f.triggerid '.
 					' AND f.itemid=i.itemid'.
 					' AND i.hostid=hgg.hostid'.
 				' GROUP BY i.hostid'.
