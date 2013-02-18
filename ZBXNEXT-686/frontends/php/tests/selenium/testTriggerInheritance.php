@@ -134,17 +134,29 @@ class testTriggerInheritance extends CWebTest {
 		}
 
 		if (isset($data['dbCheck'])) {
-			$result = DBselect("SELECT description FROM triggers where description = '".$description."' limit 1");
+			// template
+			$result = DBselect("SELECT description, triggerid FROM triggers where description = '".$description."' limit 1");
+			while ($row = DBfetch($result)) {
+				$this->assertEquals($row['description'], $description);
+				$templateid = $row['triggerid'];
+			}
+			// host
+			$result = DBselect("SELECT description FROM triggers where description = '".$description."'  AND templateid = ".$templateid."");
 			while ($row = DBfetch($result)) {
 				$this->assertEquals($row['description'], $description);
 			}
 		}
 
 		if (isset($data['hostRemove'])) {
-			$result = DBselect("SELECT triggerid FROM triggers where description = '".$description."' limit 1");
+			$result = DBselect("SELECT description, triggerid FROM triggers where description = '".$description."' limit 1");
 			while ($row = DBfetch($result)) {
-				$triggerId = $row['triggerid'] + 1;
+				$templateid = $row['triggerid'];
 			}
+			$result = DBselect("SELECT triggerid FROM triggers where description = '".$description."'  AND templateid = ".$templateid."");
+			while ($row = DBfetch($result)) {
+				$triggerId = $row['triggerid'];
+			}
+
 			$this->open('hosts.php');
 			$this->wait();
 			$this->button_click("link=$host");

@@ -139,8 +139,15 @@ class testItemInheritance extends CWebTest {
 		}
 
 		if (isset($data['dbCheck'])) {
-			$hostid =30000;
-			$result = DBselect("SELECT name, key_, itemid FROM items where name = '".$itemName."' AND hostid = ".$hostid."");
+			// template
+			$result = DBselect("SELECT name, key_, hostid FROM items where name = '".$itemName."' limit 1");
+			while ($row = DBfetch($result)) {
+				$this->assertEquals($row['name'], $itemName);
+				$this->assertEquals($row['key_'], $keyName);
+				$hostid = $row['hostid'] + 1;
+			}
+			// host
+			$result = DBselect("SELECT name, key_ FROM items where name = '".$itemName."'  AND hostid = ".$hostid."");
 			while ($row = DBfetch($result)) {
 				$this->assertEquals($row['name'], $itemName);
 				$this->assertEquals($row['key_'], $keyName);
@@ -148,11 +155,15 @@ class testItemInheritance extends CWebTest {
 		}
 
 		if (isset($data['hostRemove'])) {
-			$hostid = 30001;
-			$result = DBselect("SELECT itemid FROM items where name = '".$itemName."' AND hostid = ".$hostid."");
+			$result = DBselect("SELECT hostid FROM items where name = '".$itemName."' limit 1");
+			while ($row = DBfetch($result)) {
+				$hostid = $row['hostid'] + 1;
+			}
+			$result = DBselect("SELECT name, key_, itemid FROM items where name = '".$itemName."'  AND hostid = ".$hostid."");
 			while ($row = DBfetch($result)) {
 				$itemId = $row['itemid'];
 			}
+
 			$this->open('hosts.php');
 			$this->wait();
 			$this->button_click("link=$host");
@@ -170,11 +181,11 @@ class testItemInheritance extends CWebTest {
 		}
 
 		if (isset($data['remove'])) {
-			$hostid = 30000;
-			$result = DBselect("SELECT itemid FROM items where name = '".$itemName."' AND hostid = ".$hostid."");
+			$result = DBselect("SELECT itemid FROM items where name = '".$itemName."' limit 1");
 			while ($row = DBfetch($result)) {
 				$itemId = $row['itemid'];
 			}
+
 			$this->open('templates.php');
 			$this->wait();
 			$this->button_click("link=$template");
