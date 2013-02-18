@@ -589,6 +589,8 @@ int	MAIN_ZABBIX_ENTRY()
 	init_configuration_cache();
 	init_selfmon_collector();
 
+	zbx_create_services_lock();
+
 	DCload_config();
 
 	DBclose();
@@ -814,6 +816,9 @@ void	zbx_on_exit()
 	DBconnect(ZBX_DB_CONNECT_EXIT);
 	free_database_cache();
 	free_configuration_cache();
+
+	zbx_destroy_services_lock();
+
 	DBclose();
 
 	zbx_mutex_destroy(&node_sync_access);

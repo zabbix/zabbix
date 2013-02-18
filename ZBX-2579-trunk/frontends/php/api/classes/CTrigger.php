@@ -1569,7 +1569,7 @@ class CTrigger extends CTriggerGeneral {
 					}
 				}
 
-				// if found trigger id in dependant triggerids, then there is dependency loop
+				// if found trigger id is in dependent triggerids, there is a dependency loop
 				$downTriggerIds = array();
 				foreach ($upTriggersIds as $id) {
 					if (bccomp($id, $trigger['triggerid']) == 0) {
@@ -1634,7 +1634,7 @@ class CTrigger extends CTriggerGeneral {
 	 * Check that none of the triggers have dependencies on their children. Checks only one level of inheritance, but
 	 * since is is called on each inheritance step, also works for multiple inheritance levels.
 	 *
-	 * @throws APIException     if at least one trigger is dependant on it's child
+	 * @throws APIException     if at least one trigger is dependent on its child
 	 *
 	 * @param array $triggers
 	 */
@@ -1661,7 +1661,7 @@ class CTrigger extends CTriggerGeneral {
 							&& $parentDepTriggers[$depTriggerId]['templateid'] == $trigger['triggerid']) {
 
 						self::exception(ZBX_API_ERROR_PARAMETERS,
-							_s('Trigger cannot be dependant on a trigger, that is inherited from it.')
+							_s('Trigger cannot be dependent on a trigger that is inherited from it.')
 						);
 					}
 				}
