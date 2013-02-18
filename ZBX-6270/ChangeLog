@@ -3,6 +3,10 @@ Changes for 2.0.6rc1
 New features:
 
 Bug fixes:
+....I..... [ZBX-5635] changed value types to float for qps items in "Template App MySQL" (Sasha)
+....I..... [ZBX-5622] fixed grammatical error of snmptrap.fallback in help_items; thanks to Kodai Terashima (Sasha)
+....I..... [ZBX-6191] fixed state of unsupported items in data.sql (Sasha)
+........S. [ZBX-6262] fixed regression when function is_uint_suffix() did not treat '0' as a valid unsigned integer (dimir)
 
 --------------------------------------------------------------------------------
 Changes for 2.0.5
