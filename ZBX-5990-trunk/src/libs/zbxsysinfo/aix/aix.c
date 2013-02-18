@@ -48,5 +48,7 @@ ZBX_METRIC	parameters_specific[] =
 
 	{"system.stat",		CF_USEUPARAM,	SYSTEM_STAT,		NULL,	"page,fi"},
 
+	{"system.swap.size",	CF_USEUPARAM,	SYSTEM_SWAP_SIZE,	NULL,	"all,free"},
+
 	{0}
 };

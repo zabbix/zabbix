@@ -207,10 +207,8 @@ $db_appids = array();
 $options = array(
 	'output' => array('name', 'hostid'),
 	'hostids' => $available_hosts,
-	'selectAppllications' => API_OUTPUT_EXTEND,
 	'selectScreens' => API_OUTPUT_COUNT,
 	'selectInventory' => array('hostid'),
-	'selectGroups' => API_OUTPUT_REFER,
 	'preservekeys' => true
 );
 
@@ -341,7 +339,6 @@ unset($db_app);
 
 foreach ($db_apps as $appid => $db_app) {
 	$host = $hosts[$db_app['hostid']];
-	$group = reset($host['groups']);
 
 	if(!isset($tab_rows[$appid])) continue;
 
@@ -518,7 +515,6 @@ unset($db_host);
 
 foreach ($db_hosts as $hostid => $db_host) {
 	$host = $hosts[$db_host['hostid']];
-	$group = reset($host['groups']);
 
 	if(!isset($tab_rows[$hostid])) continue;
 	$app_rows = $tab_rows[$hostid];

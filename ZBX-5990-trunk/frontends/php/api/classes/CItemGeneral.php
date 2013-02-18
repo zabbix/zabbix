@@ -330,18 +330,18 @@ abstract class CItemGeneral extends CZBXAPI {
 			if (isset($fullItem['snmpv3_securitylevel']) && $fullItem['snmpv3_securitylevel'] != ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV) {
 				// snmpv3 authprotocol
 				if (str_in_array($fullItem['snmpv3_securitylevel'], array(ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV, ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV))) {
-					if (zbx_empty($fullItem['snmpv3_authprotocol'])
-							|| (isset($fullItem['snmpv3_authprotocol'])
-									&& !str_in_array($fullItem['snmpv3_authprotocol'], array(ITEM_AUTHPROTOCOL_MD5, ITEM_AUTHPROTOCOL_SHA)))) {
+					if (isset($fullItem['snmpv3_authprotocol']) && (zbx_empty($fullItem['snmpv3_authprotocol'])
+							|| !str_in_array($fullItem['snmpv3_authprotocol'],
+								array(ITEM_AUTHPROTOCOL_MD5, ITEM_AUTHPROTOCOL_SHA)))) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect authentication protocol for item "%1$s".', $fullItem['name']));
 					}
 				}
 
 				// snmpv3 privprotocol
 				if ($fullItem['snmpv3_securitylevel'] == ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV) {
-					if (zbx_empty($fullItem['snmpv3_privprotocol'])
-							|| (isset($fullItem['snmpv3_privprotocol'])
-									&& !str_in_array($fullItem['snmpv3_privprotocol'], array(ITEM_PRIVPROTOCOL_DES, ITEM_PRIVPROTOCOL_AES)))) {
+					if (isset($fullItem['snmpv3_privprotocol']) && (zbx_empty($fullItem['snmpv3_privprotocol'])
+							|| !str_in_array($fullItem['snmpv3_privprotocol'],
+								array(ITEM_PRIVPROTOCOL_DES, ITEM_PRIVPROTOCOL_AES)))) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect privacy protocol for item "%1$s".', $fullItem['name']));
 					}
 				}
