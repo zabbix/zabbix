@@ -2701,9 +2701,9 @@ const char	*zbx_item_state_string(unsigned char state)
 {
 	switch (state)
 	{
-		case TRIGGER_STATE_NORMAL:
+		case ITEM_STATE_NORMAL:
 			return "Normal";
-		case TRIGGER_STATE_UNKNOWN:
+		case ITEM_STATE_NOTSUPPORTED:
 			return "Not supported";
 		default:
 			return "unknown";
