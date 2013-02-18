@@ -140,7 +140,7 @@ $newgroupTB = new CTextBox('newgroup', $newgroup);
 $newgroupTB->setAttribute('maxlength', 64);
 $tmp_label = _('New group');
 if ($USER_DETAILS['type'] != USER_TYPE_SUPER_ADMIN) {
-	$tmp_label .= SPACE._('(Only superadmins can create groups)');
+	$tmp_label .= SPACE._('(Only super admins can create groups)');
 	$newgroupTB->setReadonly(true);
 }
 $templateList->addRow(array(

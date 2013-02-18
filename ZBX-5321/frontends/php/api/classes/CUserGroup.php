@@ -369,7 +369,7 @@ class CUserGroup extends CZBXAPI {
 
 	/**
 	 * Update UserGroups.
-	 * Checks permissions - only superadmins can update usergroups.
+	 * Checks permissions - only super admins can update usergroups.
 	 * Formats data to be used in massUpdate() method.
 	 *
 	 * @param array $usrgrps
