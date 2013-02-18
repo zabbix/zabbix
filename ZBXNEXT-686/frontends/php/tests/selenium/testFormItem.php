@@ -33,49 +33,25 @@ class testFormItem extends CWebTest {
 				array('type' => 'Zabbix agent')
 			),
 			array(
-				array(
-					'type' => 'Zabbix agent',
-					'value_type' => 'Numeric (unsigned)',
-					'data_type' => 'Boolean'
-				)
+				array('type' => 'Zabbix agent', 'value_type' => 'Numeric (unsigned)', 'data_type' => 'Boolean')
 			),
 			array(
-				array(
-					'type' => 'Zabbix agent',
-					'value_type' => 'Numeric (unsigned)',
-					'data_type' => 'Hexadecimal'
-				)
+				array('type' => 'Zabbix agent', 'value_type' => 'Numeric (unsigned)', 'data_type' => 'Hexadecimal')
 			),
 			array(
-				array(
-					'type' => 'Zabbix agent',
-					'value_type' => 'Numeric (unsigned)',
-					'data_type' => 'Octal'
-				)
+				array('type' => 'Zabbix agent', 'value_type' => 'Numeric (unsigned)', 'data_type' => 'Octal')
 			),
 			array(
-				array(
-					'type' => 'Zabbix agent',
-					'value_type' => 'Numeric (float)'
-				)
+				array('type' => 'Zabbix agent', 'value_type' => 'Numeric (float)')
 			),
 			array(
-				array(
-					'type' => 'Zabbix agent',
-					'value_type' => 'Character'
-				)
+				array('type' => 'Zabbix agent', 'value_type' => 'Character')
 			),
 			array(
-				array(
-					'type' => 'Zabbix agent',
-					'value_type' => 'Log'
-				)
+				array('type' => 'Zabbix agent', 'value_type' => 'Log')
 			),
 			array(
-				array(
-					'type' => 'Zabbix agent',
-					'value_type' => 'Text'
-				)
+				array('type' => 'Zabbix agent', 'value_type' => 'Text')
 			),
 			array(
 				array('type' => 'Zabbix agent (active)'),
@@ -165,11 +141,7 @@ class testFormItem extends CWebTest {
 				array('type' => 'Zabbix internal')
 			),
 			array(
-				array(
-					'type' => 'Zabbix internal',
-					'value_type' => 'Numeric (unsigned)',
-					'data_type' => 'Boolean'
-				)
+				array('type' => 'Zabbix internal', 'value_type' => 'Numeric (unsigned)', 'data_type' => 'Boolean')
 			),
 			array(
 				array('type' => 'Zabbix trapper')
@@ -196,18 +168,10 @@ class testFormItem extends CWebTest {
 				array('type' => 'SSH agent', 'authtype' => 'Password')
 			),
 			array(
-				array(
-					'type' => 'SSH agent',
-					'value_type' => 'Numeric (unsigned)',
-					'data_type' => 'Boolean'
-				)
+				array('type' => 'SSH agent', 'value_type' => 'Numeric (unsigned)', 'data_type' => 'Boolean')
 			),
 			array(
-				array(
-					'type' => 'SSH agent',
-					'authtype' => 'Password',
-					'value_type' => 'Character'
-				)
+				array('type' => 'SSH agent', 'authtype' => 'Password', 'value_type' => 'Character')
 			),
 			array(
 				array('type' => 'TELNET agent')
@@ -232,7 +196,6 @@ class testFormItem extends CWebTest {
 	 * @dataProvider itemTypes
 	 */
 	public function testFormItem_CheckLayout($data) {
-
 		$this->login('items.php');
 		$this->checkTitle('Configuration of items');
 		$this->ok('CONFIGURATION OF ITEMS');
@@ -240,19 +203,21 @@ class testFormItem extends CWebTest {
 		$this->button_click('form');
 		$this->wait();
 		$this->checkTitle('Configuration of items');
+		$this->ok('CONFIGURATION OF ITEMS');
+		$this->ok('Item');
 
 		$this->ok('Host');
 		$this->assertVisible('hostname');
 		$this->assertAttribute("//*[@id='hostname']/@readonly", 'readonly');
-		$this->assertAttribute("//input[@id='hostname']/@maxlength", '255');
-		$this->assertAttribute("//input[@id='hostname']/@size", '50');
+		$this->assertAttribute("//input[@id='hostname']/@maxlength", 255);
+		$this->assertAttribute("//input[@id='hostname']/@size", 50);
 		$this->assertVisible('btn_host');
 		$hostid = $this->getValue('hostid');
 
 		$this->ok('Name');
 		$this->assertVisible('name');
-		$this->assertAttribute("//input[@id='name']/@maxlength", '255');
-		$this->assertAttribute("//input[@id='name']/@size", '50');
+		$this->assertAttribute("//input[@id='name']/@maxlength", 255);
+		$this->assertAttribute("//input[@id='name']/@size", 50);
 		$this->assertAttribute("//input[@id='name']/@autofocus", 'autofocus');
 
 		$this->ok('Type');
@@ -277,19 +242,17 @@ class testFormItem extends CWebTest {
 			'Calculated'
 		));
 		$this->dropdown_select('type', $data['type']);
-		$type = $this->getSelectedLabel('type');
 
 		$this->ok('Key');
 		$this->assertVisible('key');
-		$this->assertAttribute("//input[@id='key']/@maxlength", '255');
-		$this->assertAttribute("//input[@id='key']/@size", '50');
+		$this->assertAttribute("//input[@id='key']/@maxlength", 255);
+		$this->assertAttribute("//input[@id='key']/@size", 50);
 		$this->assertElementPresent('keyButton');
 
-		if (isset($data['snmpv3_securitylevel'])) {
-			$this->dropdown_select('snmpv3_securitylevel', $data['snmpv3_securitylevel']);
-		}
-
-		if ($type == 'SNMPv3 agent') {
+		if ($data['type'] == 'SNMPv3 agent') {
+			if (isset($data['snmpv3_securitylevel'])) {
+				$this->dropdown_select('snmpv3_securitylevel', $data['snmpv3_securitylevel']);
+			}
 			$snmpv3_securitylevel = $this->getSelectedLabel('snmpv3_securitylevel');
 		}
 
@@ -298,52 +261,44 @@ class testFormItem extends CWebTest {
 		}
 		$value_type = $this->getSelectedLabel('value_type');
 
-		if (isset($data['data_type'])) {
-			$this->dropdown_select('data_type', $data['data_type']);
-		}
-
 		if ($value_type == 'Numeric (unsigned)') {
+			if (isset($data['data_type'])) {
+				$this->dropdown_select('data_type', $data['data_type']);
+			}
 			$data_type = $this->getSelectedLabel('data_type');
 		}
-		else {
-			$data_type = null;
-		}
 
-		if (isset($data['authtype'])) {
-			$this->dropdown_select('authtype', $data['authtype']);
-		}
-
-		if ($type == 'SSH agent') {
+		if ($data['type'] == 'SSH agent') {
+			if (isset($data['authtype'])) {
+				$this->dropdown_select('authtype', $data['authtype']);
+			}
 			$authtype = $this->getSelectedLabel('authtype');
 		}
-		else {
-			$authtype = null;
-		}
 
-		if ($type == 'Database monitor') {
+		if ($data['type'] == 'Database monitor') {
 			$this->ok('Additional parameters');
 			$this->assertVisible('params_ap');
-			$this->assertAttribute("//textarea[@id='params_ap']/@rows", '7');
+			$this->assertAttribute("//textarea[@id='params_ap']/@rows", 7);
 		}
 		else {
 			$this->nok('Additional parameters');
 			$this->assertNotVisible('params_ap');
 		}
 
-		if ($type == 'SSH agent' || $type == 'TELNET agent' ) {
+		if ($data['type'] == 'SSH agent' || $data['type'] == 'TELNET agent' ) {
 			$this->ok('Executed script');
 			$this->assertVisible('params_es');
-			$this->assertAttribute("//textarea[@id='params_es']/@rows", '7');
+			$this->assertAttribute("//textarea[@id='params_es']/@rows", 7);
 		}
 		else {
 			$this->nok('Executed script');
 			$this->assertNotVisible('params_es');
 		}
 
-		if ($type == 'Calculated') {
+		if ($data['type'] == 'Calculated') {
 			$this->ok('Formula');
 			$this->assertVisible('params_f');
-			$this->assertAttribute("//textarea[@id='params_f']/@rows", '7');
+			$this->assertAttribute("//textarea[@id='params_f']/@rows", 7);
 		}
 		else {
 			$this->nok('Formula');
@@ -351,94 +306,90 @@ class testFormItem extends CWebTest {
 		}
 
 		$interfaceType = itemTypeInterface($this->getValue('type'));
-			switch ($interfaceType) {
-				case INTERFACE_TYPE_SNMP :
-				case INTERFACE_TYPE_IPMI :
-				case INTERFACE_TYPE_AGENT :
-				case INTERFACE_TYPE_ANY :
-				case INTERFACE_TYPE_JMX :
-					$this->ok('Host interface');
-					$dbInterfaces = DBdata(
-						'SELECT type,ip,port'.
-						' FROM interface'.
-						' WHERE hostid='.$hostid.
-							($interfaceType == INTERFACE_TYPE_ANY ? '' : ' AND type='.$interfaceType)
-					);
-					$dbInterfaces = reset($dbInterfaces);
-					if ($dbInterfaces != null) {
-						foreach ($dbInterfaces as $host_interface) {
-							$this->assertElementPresent('//select[@id="interfaceid"]/optgroup/option[text()="'.
-							$host_interface['ip'].' : '.
-							$host_interface['port'].'"]');
-						}
+		switch ($interfaceType) {
+			case INTERFACE_TYPE_SNMP :
+			case INTERFACE_TYPE_IPMI :
+			case INTERFACE_TYPE_AGENT :
+			case INTERFACE_TYPE_ANY :
+			case INTERFACE_TYPE_JMX :
+				$this->ok('Host interface');
+				$dbInterfaces = DBdata(
+					'SELECT type,ip,port'.
+					' FROM interface'.
+					' WHERE hostid='.$hostid.
+						($interfaceType == INTERFACE_TYPE_ANY ? '' : ' AND type='.$interfaceType)
+				);
+				$dbInterfaces = reset($dbInterfaces);
+				if ($dbInterfaces != null) {
+					foreach ($dbInterfaces as $host_interface) {
+						$this->assertElementPresent('//select[@id="interfaceid"]/optgroup/option[text()="'.
+						$host_interface['ip'].' : '.$host_interface['port'].'"]');
 					}
-					else {
-						$this->ok('No interface found');
-						$this->assertNotVisible('interfaceid');
-					}
-					break;
-				default:
-					$this->nok(array('Host interface', 'No interface found'));
+				}
+				else {
+					$this->ok('No interface found');
 					$this->assertNotVisible('interfaceid');
-					break;
+				}
+				break;
+			default:
+				$this->nok(array('Host interface', 'No interface found'));
+				$this->assertNotVisible('interfaceid');
+				break;
 		}
 
-		if ($type == 'IPMI agent') {
+		if ($data['type'] == 'IPMI agent') {
 			$this->ok('IPMI sensor');
 			$this->assertVisible('ipmi_sensor');
-			$this->assertAttribute("//input[@id='ipmi_sensor']/@maxlength", '128');
-			$this->assertAttribute("//input[@id='ipmi_sensor']/@size", '50');
+			$this->assertAttribute("//input[@id='ipmi_sensor']/@maxlength", 128);
+			$this->assertAttribute("//input[@id='ipmi_sensor']/@size", 50);
 		}
 		else {
 			$this->nok('IPMI sensor');
 			$this->assertNotVisible('ipmi_sensor');
 		}
 
-		if ($type == 'SSH agent') {
+		if ($data['type'] == 'SSH agent') {
 			$this->ok('Authentication method');
 			$this->assertVisible('authtype');
-			$this->assertElementPresent("//select[@id='authtype']/option[text()='Password']");
-			$this->assertElementPresent("//select[@id='authtype']/option[text()='Public key']");
+			$this->zbxDropdownHasOptions('authtype', array('Password', 'Public key'));
 		}
 		else {
 			$this->nok('Authentication method');
 			$this->assertNotVisible('authtype');
 		}
 
-		if ($type == 'SSH agent' || $type == 'TELNET agent' || $type == 'JMX agent') {
+		if ($data['type'] == 'SSH agent' || $data['type'] == 'TELNET agent' || $data['type'] == 'JMX agent') {
 			$this->ok('User name');
 			$this->assertVisible('username');
-			$this->assertAttribute("//input[@id='username']/@maxlength", '64');
-			$this->assertAttribute("//input[@id='username']/@size", '25');
+			$this->assertAttribute("//input[@id='username']/@maxlength", 64);
+			$this->assertAttribute("//input[@id='username']/@size", 25);
 
-			if ($authtype == 'Public key') {
+			if (isset($authtype) && $authtype == 'Public key') {
 				$this->ok('Key passphrase');
 			}
 			else {
 				$this->ok('Password');
 			}
 			$this->assertVisible('password');
-			$this->assertAttribute("//input[@id='password']/@maxlength", '64');
-			$this->assertAttribute("//input[@id='password']/@size", '25');
+			$this->assertAttribute("//input[@id='password']/@maxlength", 64);
+			$this->assertAttribute("//input[@id='password']/@size", 25);
 		}
 		else {
-			$this->nok('User name');
+			$this->nok(array('User name', 'Password', 'Key passphrase'));
 			$this->assertNotVisible('username');
-
-			$this->nok('Password');
 			$this->assertNotVisible('password');
 		}
 
-		if	($authtype == 'Public key') {
+		if	(isset($authtype) && $authtype == 'Public key') {
 			$this->ok('Public key file');
 			$this->assertVisible('publickey');
-			$this->assertAttribute("//input[@id='publickey']/@maxlength", '64');
-			$this->assertAttribute("//input[@id='publickey']/@size", '25');
+			$this->assertAttribute("//input[@id='publickey']/@maxlength", 64);
+			$this->assertAttribute("//input[@id='publickey']/@size", 25);
 
 			$this->ok('Private key file');
 			$this->assertVisible('privatekey');
-			$this->assertAttribute("//input[@id='privatekey']/@maxlength", '64');
-			$this->assertAttribute("//input[@id='privatekey']/@size", '25');
+			$this->assertAttribute("//input[@id='privatekey']/@maxlength", 64);
+			$this->assertAttribute("//input[@id='privatekey']/@size", 25);
 		}
 		else {
 			$this->nok('Public key file');
@@ -448,52 +399,45 @@ class testFormItem extends CWebTest {
 			$this->assertNotVisible('publickey');
 		}
 
-		if	($type == 'SNMPv1 agent' || $type == 'SNMPv2 agent' || $type == 'SNMPv3 agent') {
+		if	($data['type'] == 'SNMPv1 agent' || $data['type'] == 'SNMPv2 agent' || $data['type'] == 'SNMPv3 agent') {
 			$this->ok('SNMP OID');
 			$this->assertVisible('snmp_oid');
-			$this->assertAttribute("//input[@id='snmp_oid']/@maxlength", '255');
-			$this->assertAttribute("//input[@id='snmp_oid']/@size", '50');
+			$this->assertAttribute("//input[@id='snmp_oid']/@maxlength", 255);
+			$this->assertAttribute("//input[@id='snmp_oid']/@size", 50);
+
+			$this->ok('Port');
+			$this->assertVisible('port');
+			$this->assertAttribute("//input[@id='port']/@maxlength", 64);
+			$this->assertAttribute("//input[@id='port']/@size", 25);
 		}
 		else {
 			$this->nok('SNMP OID');
 			$this->assertNotVisible('snmp_oid');
+
+			$this->nok('Port');
+			$this->assertNotVisible('port');
 		}
 
-		if	($type == 'SNMPv1 agent' || $type == 'SNMPv2 agent') {
+		if	($data['type'] == 'SNMPv1 agent' || $data['type'] == 'SNMPv2 agent') {
 			$this->ok('SNMP community');
 			$this->assertVisible('snmp_community');
-			$this->assertAttribute("//input[@id='snmp_community']/@maxlength", '64');
-			$this->assertAttribute("//input[@id='snmp_community']/@size", '50');
+			$this->assertAttribute("//input[@id='snmp_community']/@maxlength", 64);
+			$this->assertAttribute("//input[@id='snmp_community']/@size", 50);
 		}
 		else {
 			$this->nok('SNMP community');
 			$this->assertNotVisible('snmp_community');
 		}
 
-		if	($type == 'SNMPv1 agent' || $type == 'SNMPv2 agent' || $type == 'SNMPv3 agent') {
-			$this->ok('Port');
-			$this->assertVisible('port');
-			$this->assertAttribute("//input[@id='port']/@maxlength", '64');
-			$this->assertAttribute("//input[@id='port']/@size", '25');
-		}
-		else {
-			$this->nok('Port');
-			$this->assertNotVisible('port');
-		}
-
-		if	($type == 'SNMPv3 agent') {
+		if	($data['type'] == 'SNMPv3 agent') {
 			$this->ok('Security name');
 			$this->assertVisible('snmpv3_securityname');
-			$this->assertAttribute("//input[@id='snmpv3_securityname']/@maxlength", '64');
-			$this->assertAttribute("//input[@id='snmpv3_securityname']/@size", '50');
+			$this->assertAttribute("//input[@id='snmpv3_securityname']/@maxlength", 64);
+			$this->assertAttribute("//input[@id='snmpv3_securityname']/@size", 50);
 
 			$this->ok('Security level');
 			$this->assertVisible('snmpv3_securitylevel');
-			$this->zbxDropdownHasOptions('snmpv3_securitylevel', array(
-				'noAuthNoPriv',
-				'authNoPriv',
-				'authPriv'
-			));
+			$this->zbxDropdownHasOptions('snmpv3_securitylevel', array('noAuthNoPriv', 'authNoPriv', 'authPriv'));
 		}
 		else {
 			$this->nok('Security name');
@@ -503,7 +447,7 @@ class testFormItem extends CWebTest {
 			$this->assertNotVisible('snmpv3_securitylevel');
 		}
 
-		if ($type == 'SNMPv3 agent' && $snmpv3_securitylevel != 'noAuthNoPriv') {
+		if (isset($snmpv3_securitylevel) && $snmpv3_securitylevel != 'noAuthNoPriv') {
 			$this->ok('Authentication protocol');
 			$this->assertVisible('row_snmpv3_authprotocol');
 			$this->assertVisible("//span[text()='MD5']");
@@ -511,8 +455,8 @@ class testFormItem extends CWebTest {
 
 			$this->ok('Authentication passphrase');
 			$this->assertVisible('snmpv3_authpassphrase');
-			$this->assertAttribute("//input[@id='snmpv3_authpassphrase']/@maxlength", '64');
-			$this->assertAttribute("//input[@id='snmpv3_authpassphrase']/@size", '50');
+			$this->assertAttribute("//input[@id='snmpv3_authpassphrase']/@maxlength", 64);
+			$this->assertAttribute("//input[@id='snmpv3_authpassphrase']/@size", 50);
 		}
 		else {
 			$this->nok('Authentication protocol');
@@ -524,7 +468,7 @@ class testFormItem extends CWebTest {
 			$this->assertNotVisible('snmpv3_authpassphrase');
 		}
 
-		if ($type == 'SNMPv3 agent' && $snmpv3_securitylevel == 'authPriv') {
+		if (isset($snmpv3_securitylevel) && $snmpv3_securitylevel == 'authPriv') {
 			$this->ok('Privacy protocol');
 			$this->assertVisible('row_snmpv3_privprotocol');
 			$this->assertVisible("//span[text()='DES']");
@@ -532,8 +476,8 @@ class testFormItem extends CWebTest {
 
 			$this->ok('Privacy passphrase');
 			$this->assertVisible('snmpv3_privpassphrase');
-			$this->assertAttribute("//input[@id='snmpv3_privpassphrase']/@maxlength", '64');
-			$this->assertAttribute("//input[@id='snmpv3_privpassphrase']/@size", '50');
+			$this->assertAttribute("//input[@id='snmpv3_privpassphrase']/@maxlength", 64);
+			$this->assertAttribute("//input[@id='snmpv3_privpassphrase']/@size", 50);
 		}
 		else {
 			$this->nok('Privacy protocol');
@@ -545,7 +489,7 @@ class testFormItem extends CWebTest {
 			$this->assertNotVisible('snmpv3_privpassphrase');
 		}
 
-		switch ($type) {
+		switch ($data['type']) {
 			case 'Zabbix agent':
 			case 'Zabbix agent (active)':
 			case 'Simple check':
@@ -563,9 +507,9 @@ class testFormItem extends CWebTest {
 			case 'Calculated':
 				$this->ok('Update interval (in sec)');
 				$this->assertVisible('delay');
-				$this->assertAttribute("//input[@id='delay']/@maxlength", '5');
-				$this->assertAttribute("//input[@id='delay']/@size", '5');
-				$this->assertAttribute("//input[@id='delay']/@value", '30');
+				$this->assertAttribute("//input[@id='delay']/@maxlength", 5);
+				$this->assertAttribute("//input[@id='delay']/@size", 5);
+				$this->assertAttribute("//input[@id='delay']/@value", 30);
 				break;
 			default:
 				$this->nok('Update interval (in sec)');
@@ -582,17 +526,37 @@ class testFormItem extends CWebTest {
 			'Text'
 		));
 		$this->assertAttribute("//*[@id='value_type']/option[text()='Numeric (unsigned)']/@selected", 'selected');
+		$this->isEditable("//*[@id='value_type']/option[text()='Numeric (unsigned)']");
+		$this->isEditable("//*[@id='value_type']/option[text()='Numeric (float)']");
+
+		if ($data['type'] == 'Zabbix aggregate' || $data['type'] == 'Calculated') {
+			$this->assertAttribute("//*[@id='value_type']/option[text()='Character']/@disabled", 'disabled');
+			$this->assertAttribute("//*[@id='value_type']/option[text()='Log']/@disabled", 'disabled');
+			$this->assertAttribute("//*[@id='value_type']/option[text()='Text']/@disabled", 'disabled');
+		}
+		else {
+			$this->isEditable("//*[@id='value_type']/option[text()='Character']");
+			$this->isEditable("//*[@id='value_type']/option[text()='Log']");
+			$this->isEditable("//*[@id='value_type']/option[text()='Text']");
+		}
 
 		if ($value_type == 'Numeric (unsigned)') {
 			$this->ok('Data type');
 			$this->assertVisible('data_type');
-			$this->zbxDropdownHasOptions('data_type', array(
-				'Boolean',
-				'Octal',
-				'Decimal',
-				'Hexadecimal'
-			));
+			$this->zbxDropdownHasOptions('data_type', array('Boolean', 'Octal', 'Decimal', 'Hexadecimal'));
 			$this->assertAttribute("//*[@id='data_type']/option[text()='Decimal']/@selected", 'selected');
+			$this->isEditable("//*[@id='data_type']/option[text()='Decimal']");
+
+			if ($data['type'] == 'Zabbix aggregate' || $data['type'] == 'Calculated') {
+				$this->assertAttribute("//*[@id='data_type']/option[text()='Boolean']/@disabled", 'disabled');
+				$this->assertAttribute("//*[@id='data_type']/option[text()='Octal']/@disabled", 'disabled');
+				$this->assertAttribute("//*[@id='data_type']/option[text()='Hexadecimal']/@disabled", 'disabled');
+			}
+			else {
+				$this->isEditable("//*[@id='data_type']/option[text()='Boolean']");
+				$this->isEditable("//*[@id='data_type']/option[text()='Octal']");
+				$this->isEditable("//*[@id='data_type']/option[text()='Hexadecimal']");
+			}
 		}
 		else {
 			$this->nok('Data type');
@@ -602,31 +566,29 @@ class testFormItem extends CWebTest {
 		if ($value_type == 'Numeric (float)' || ($value_type == 'Numeric (unsigned)' && $data_type != 'Boolean')) {
 			$this->ok('Units');
 			$this->assertVisible('units');
-			$this->assertAttribute("//input[@id='units']/@maxlength", '255');
-			$this->assertAttribute("//input[@id='units']/@size", '50');
-		}
-		else {
-			$this->nok('Units');
-			$this->assertNotVisible('units');
-		}
+			$this->assertAttribute("//input[@id='units']/@maxlength", 255);
+			$this->assertAttribute("//input[@id='units']/@size", 50);
 
-		if ($value_type == 'Numeric (float)' || ($value_type == 'Numeric (unsigned)' && $data_type != 'Boolean')) {
 			$this->ok('Use custom multiplier');
 			$this->assertVisible('multiplier');
 			$this->assertAttribute("//input[@id='multiplier']/@type", 'checkbox');
 
 			$this->assertVisible('formula');
-			$this->assertAttribute("//input[@id='formula']/@maxlength", '255');
-			$this->assertAttribute("//input[@id='formula']/@size", '25');
-			$this->assertAttribute("//input[@id='formula']/@value", '1');
+			$this->assertAttribute("//input[@id='formula']/@maxlength", 255);
+			$this->assertAttribute("//input[@id='formula']/@size", 25);
+			$this->assertAttribute("//input[@id='formula']/@value", 1);
+			$this->assertAttribute("//input[@id='formula']/@disabled", '');
 		}
 		else {
+			$this->nok('Units');
+			$this->assertNotVisible('units');
+
 			$this->nok('Use custom multiplier');
 			$this->assertNotVisible('multiplier');
 			$this->assertNotVisible('formula');
 		}
 
-		switch ($type) {
+		switch ($data['type']) {
 			case 'Zabbix agent':
 			case 'Simple check':
 			case 'SNMPv1 agent':
@@ -646,13 +608,13 @@ class testFormItem extends CWebTest {
 
 				$this->ok('New flexible interval', 'Interval (in sec)', 'Period');
 				$this->assertVisible('new_delay_flex_delay');
-				$this->assertAttribute("//input[@id='new_delay_flex_delay']/@maxlength", '5');
-				$this->assertAttribute("//input[@id='new_delay_flex_delay']/@size", '5');
-				$this->assertAttribute("//input[@id='new_delay_flex_delay']/@value", '50');
+				$this->assertAttribute("//input[@id='new_delay_flex_delay']/@maxlength", 5);
+				$this->assertAttribute("//input[@id='new_delay_flex_delay']/@size", 5);
+				$this->assertAttribute("//input[@id='new_delay_flex_delay']/@value", 50);
 
 				$this->assertVisible('new_delay_flex_period');
-				$this->assertAttribute("//input[@id='new_delay_flex_period']/@maxlength", '255');
-				$this->assertAttribute("//input[@id='new_delay_flex_period']/@size", '20');
+				$this->assertAttribute("//input[@id='new_delay_flex_period']/@maxlength", 255);
+				$this->assertAttribute("//input[@id='new_delay_flex_period']/@size", 20);
 				$this->assertAttribute("//input[@id='new_delay_flex_period']/@value", '1-7,00:00-24:00');
 				$this->assertVisible('add_delay_flex');
 				break;
@@ -668,16 +630,16 @@ class testFormItem extends CWebTest {
 
 		$this->ok('Keep history (in days)');
 		$this->assertVisible('history');
-		$this->assertAttribute("//input[@id='history']/@maxlength", '8');
-		$this->assertAttribute("//input[@id='history']/@value", '90');
-		$this->assertAttribute("//input[@id='history']/@size", '8');
+		$this->assertAttribute("//input[@id='history']/@maxlength", 8);
+		$this->assertAttribute("//input[@id='history']/@value", 90);
+		$this->assertAttribute("//input[@id='history']/@size", 8);
 
 		if ($value_type == 'Numeric (unsigned)' || $value_type == 'Numeric (float)') {
 			$this->ok('Keep trends (in days)');
 			$this->assertVisible('trends');
-			$this->assertAttribute("//input[@id='trends']/@maxlength", '8');
-			$this->assertAttribute("//input[@id='trends']/@value", '365');
-			$this->assertAttribute("//input[@id='trends']/@size", '8');
+			$this->assertAttribute("//input[@id='trends']/@maxlength", 8);
+			$this->assertAttribute("//input[@id='trends']/@value", 365);
+			$this->assertAttribute("//input[@id='trends']/@size", 8);
 		}
 		else {
 			$this->nok('Keep trends (in days)');
@@ -687,11 +649,7 @@ class testFormItem extends CWebTest {
 		if ($value_type == 'Numeric (float)' || ($value_type == 'Numeric (unsigned)' && $data_type != 'Boolean')) {
 			$this->ok('Store value');
 			$this->assertVisible('delta');
-			$this->zbxDropdownHasOptions('delta', array(
-				'As is',
-				'Delta (speed per second)',
-				'Delta (simple change)'
-			));
+			$this->zbxDropdownHasOptions('delta', array('As is', 'Delta (speed per second)', 'Delta (simple change)'));
 			$this->assertAttribute("//*[@id='delta']/option[text()='As is']/@selected", 'selected');
 		}
 		else {
@@ -699,26 +657,28 @@ class testFormItem extends CWebTest {
 			$this->assertNotVisible('delta');
 		}
 
-		if ($value_type != 'Log' && $value_type != 'Text') {
+		if ($value_type == 'Numeric (float)' || $value_type == 'Numeric (unsigned)' || $value_type == 'Character') {
 			$this->ok(array('Show value', 'show value mappings'));
 			$this->assertVisible('valuemapid');
-			$this->assertElementPresent("//select[@id='valuemapid']/option[text()='As is']");
+			$this->assertAttribute("//*[@id='valuemapid']/option[text()='As is']/@selected", 'selected');
+
+			$options = array('As is');
 			$result = DBselect('SELECT name FROM valuemaps');
 			while ($row = DBfetch($result)) {
-				$this->assertElementPresent("//select[@id='valuemapid']/option[text()='".$row['name']."']");
+				$options[] = $row['name'];
 			}
-			$this->assertAttribute("//*[@id='valuemapid']/option[text()='As is']/@selected", 'selected');
+			$this->zbxDropdownHasOptions('valuemapid', $options);
 		}
 		else {
 			$this->nok(array('Show value', 'show value mappings'));
 			$this->assertNotVisible('valuemapid');
 		}
 
-		if ($type == 'Zabbix trapper') {
+		if ($data['type'] == 'Zabbix trapper') {
 			$this->ok('Allowed hosts');
 			$this->assertVisible('trapper_hosts');
-			$this->assertAttribute("//input[@id='trapper_hosts']/@maxlength", '255');
-			$this->assertAttribute("//input[@id='trapper_hosts']/@size", '50');
+			$this->assertAttribute("//input[@id='trapper_hosts']/@maxlength", 255);
+			$this->assertAttribute("//input[@id='trapper_hosts']/@size", 50);
 		}
 		else {
 			$this->nok('Allowed hosts');
@@ -728,8 +688,8 @@ class testFormItem extends CWebTest {
 		if ($value_type == 'Log') {
 			$this->ok('Log time format');
 			$this->assertVisible('logtimefmt');
-			$this->assertAttribute("//input[@id='logtimefmt']/@maxlength", '64');
-			$this->assertAttribute("//input[@id='logtimefmt']/@size", '25');
+			$this->assertAttribute("//input[@id='logtimefmt']/@maxlength", 64);
+			$this->assertAttribute("//input[@id='logtimefmt']/@size", 25);
 		}
 		else {
 			$this->nok('Log time format');
@@ -738,17 +698,19 @@ class testFormItem extends CWebTest {
 
 		$this->ok('New application');
 		$this->assertVisible('new_application');
-		$this->assertAttribute("//input[@id='new_application']/@maxlength", '255');
-		$this->assertAttribute("//input[@id='new_application']/@size", '50');
+		$this->assertAttribute("//input[@id='new_application']/@maxlength", 255);
+		$this->assertAttribute("//input[@id='new_application']/@size", 50);
 
 		$this->ok('Applications');
 		$this->assertVisible('applications_');
-		$this->assertElementPresent("//select[@id='applications_']/option[text()='-None-']");
-		$result = DBselect("SELECT name FROM applications WHERE hostid='.$hostid.'");
-		while ($row = DBfetch($result)) {
-			$this->assertElementPresent("//select[@id='applications_']/option[text()='".$row['name']."']");
-		}
 		$this->assertAttribute("//*[@id='applications_']/option[text()='-None-']/@selected", 'selected');
+
+		$options = array('-None-');
+		$result = DBselect('SELECT name FROM applications WHERE hostid='.$hostid);
+		while ($row = DBfetch($result)) {
+			$options[] = $row['name'];
+		}
+		$this->zbxDropdownHasOptions('applications_', $options);
 
 		if ($value_type != 'Log') {
 			$this->ok('Populates host inventory field');
@@ -831,15 +793,11 @@ class testFormItem extends CWebTest {
 
 		$this->ok('Description');
 		$this->assertVisible('description');
-		$this->assertAttribute("//textarea[@id='description']/@rows", '7');
+		$this->assertAttribute("//textarea[@id='description']/@rows", 7);
 
 		$this->ok('Status');
 		$this->assertVisible('status');
-		$this->zbxDropdownHasOptions('status', array(
-			'Enabled',
-			'Disabled',
-			'Not supported'
-		));
+		$this->zbxDropdownHasOptions('status', array('Enabled', 'Disabled', 'Not supported'));
 		$this->assertAttribute("//*[@id='status']/option[text()='Enabled']/@selected", 'selected');
 	}
 
@@ -1526,15 +1484,15 @@ class testFormItem extends CWebTest {
 		$this->login('hosts.php');
 		$this->checkTitle('Configuration of hosts');
 		$this->ok('CONFIGURATION OF HOSTS');
+
 		$this->dropdown_select_wait('groupid', 'all');
 		$this->checkTitle('Configuration of hosts');
 		$this->ok('CONFIGURATION OF HOSTS');
 
-		$host=$data['host'];
-		$row = DBfetch(DBselect("select hostid from hosts where name='$host'"));
+		$row = DBfetch(DBselect('select hostid from hosts where name='.zbx_dbstr($data['host'])));
 		$hostid = $row['hostid'];
 
-		$this->href_click("items.php?filter_set=1&hostid=$hostid&sid=");
+		$this->href_click('items.php?filter_set=1&hostid='.$hostid.'&sid=');
 		$this->wait();
 
 		$this->checkTitle('Configuration of items');
@@ -1543,6 +1501,7 @@ class testFormItem extends CWebTest {
 		$this->button_click('form');
 		$this->wait();
 		$this->checkTitle('Configuration of items');
+		$this->ok('CONFIGURATION OF ITEMS');
 
 		if (isset($data['name'])) {
 			$this->input_type('name', $data['name']);
@@ -1586,6 +1545,7 @@ class testFormItem extends CWebTest {
 				}
 			}
 		}
+
 		if (isset($data['history'])) {
 			$this->input_type('history', $data['history']);
 		}
@@ -1605,21 +1565,19 @@ class testFormItem extends CWebTest {
 			$expected = $data['expected'];
 			switch ($expected) {
 				case ITEM_GOOD:
-			$this->ok('Item added');
-			$this->checkTitle('Configuration of items');
-			$this->ok('CONFIGURATION OF ITEMS');
-			break;
+					$this->ok('Item added');
+					$this->checkTitle('Configuration of items');
+					$this->ok('CONFIGURATION OF ITEMS');
+					break;
 
 				case ITEM_BAD:
-			$this->checkTitle('Configuration of items');
-			$this->ok('CONFIGURATION OF ITEMS');
-			foreach ($data['errors'] as $msg) {
-				$this->ok($msg);
-			}
-			$this->ok('Host');
-			$this->ok('Name');
-			$this->ok('Key');
-			break;
+					$this->checkTitle('Configuration of items');
+					$this->ok('CONFIGURATION OF ITEMS');
+					foreach ($data['errors'] as $msg) {
+						$this->ok($msg);
+					}
+					$this->ok(array('Host', 'Name', 'Key'));
+					break;
 			}
 
 		if (isset($data['dbCheck'])) {
