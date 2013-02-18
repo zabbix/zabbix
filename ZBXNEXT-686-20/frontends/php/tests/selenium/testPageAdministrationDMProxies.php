@@ -30,18 +30,18 @@ class testPageAdministrationDMProxies extends CWebTest {
 	* @dataProvider allProxies
 	*/
 	public function testPageAdministrationDMProxies_CheckLayout($proxy) {
-		$this->login('proxies.php');
+		$this->zbxTestLogin('proxies.php');
 		$this->checkTitle('Configuration of proxies');
-		$this->ok('CONFIGURATION OF PROXIES');
-		$this->ok('Displaying');
-		$this->nok('Displaying 0');
-		// Header
-		$this->ok(array('Name', 'Mode', 'Last seen (age)', 'Host count', 'Item count', 'Required performance (vps)', 'Hosts'));
-		// Data
-		$this->ok(array($proxy['host']));
-		$this->dropdown_select('go', 'Enable selected');
-		$this->dropdown_select('go', 'Disable selected');
-		$this->dropdown_select('go', 'Delete selected');
+		$this->zbxTestTextPresent('CONFIGURATION OF PROXIES');
+		$this->zbxTestTextPresent('Displaying');
+		$this->zbxTestTextNotPresent('Displaying 0');
+
+		// header
+		$this->zbxTestTextPresent(array('Name', 'Mode', 'Last seen (age)', 'Host count', 'Item count', 'Required performance (vps)', 'Hosts'));
+
+		// data
+		$this->zbxTestTextPresent(array($proxy['host']));
+		$this->zbxTestDropdownHasOptions('go', array('Enable selected', 'Disable selected', 'Delete selected'));
 	}
 
 	/**
@@ -56,16 +56,15 @@ class testPageAdministrationDMProxies extends CWebTest {
 		$sqlHosts="select proxy_hostid from hosts order by hostid";
 		$oldHashHosts=DBhash($sqlHosts);
 
-		$this->login('proxies.php');
+		$this->zbxTestLogin('proxies.php');
 		$this->checkTitle('Configuration of proxies');
 		$this->click("link=$name");
 		$this->wait();
-		$this->button_click('save');
-		$this->wait();
+		$this->zbxTestClickWait('save');
 		$this->checkTitle('Configuration of proxies');
-		$this->ok('Proxy updated');
-		$this->ok("$name");
-		$this->ok('CONFIGURATION OF PROXIES');
+		$this->zbxTestTextPresent('Proxy updated');
+		$this->zbxTestTextPresent("$name");
+		$this->zbxTestTextPresent('CONFIGURATION OF PROXIES');
 
 		$this->assertEquals($oldHashProxy, DBhash($sqlProxy), "Chuck Norris: no-change proxy update should not update data in table 'hosts'");
 		$this->assertEquals($oldHashHosts, DBhash($sqlHosts), "Chuck Norris: no-change proxy update should not update 'hosts.proxy_hostid'");

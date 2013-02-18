@@ -23,44 +23,44 @@ require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 class testPageEvents extends CWebTest {
 
 	public function testPageEvents_Triggers_CheckLayout() {
-		$this->login('events.php');
+		$this->zbxTestLogin('events.php');
 
-		$this->dropdown_select_wait('source', 'Trigger');
-		$this->dropdown_select_wait('groupid', 'all');
-		$this->dropdown_select_wait('hostid', 'all');
+		$this->zbxTestDropdownSelectWait('source', 'Trigger');
+		$this->zbxTestDropdownSelectWait('groupid', 'all');
+		$this->zbxTestDropdownSelectWait('hostid', 'all');
 
 		$this->checkTitle('Latest events');
-		$this->ok('HISTORY OF EVENTS');
-		$this->ok('Group');
-		$this->ok('Host');
-		$this->ok('Source');
-		$this->ok('Filter');
-		$this->ok('Displaying');
+		$this->zbxTestTextPresent('HISTORY OF EVENTS');
+		$this->zbxTestTextPresent('Group');
+		$this->zbxTestTextPresent('Host');
+		$this->zbxTestTextPresent('Source');
+		$this->zbxTestTextPresent('Filter');
+		$this->zbxTestTextPresent('Displaying');
 		// table header
 		if (0 == DBcount('select * from events where value_changed=1 and source='.EVENT_SOURCE_TRIGGERS)) {
-			$this->ok('No events defined.');
+			$this->zbxTestTextPresent('No events defined.');
 		}
 		else {
-			$this->ok(array('Time', 'Description', 'Status', 'Severity', 'Duration', 'Ack', 'Actions'));
+			$this->zbxTestTextPresent(array('Time', 'Description', 'Status', 'Severity', 'Duration', 'Ack', 'Actions'));
 		}
 	}
 
 	public function testPageEvents_Discovery_CheckLayout() {
-		$this->login('events.php');
+		$this->zbxTestLogin('events.php');
 
-		$this->dropdown_select_wait('source', 'Discovery');
+		$this->zbxTestDropdownSelectWait('source', 'Discovery');
 
 		$this->checkTitle('Latest events');
-		$this->ok('HISTORY OF EVENTS');
-		$this->ok('Source');
-		$this->ok('Filter');
-		$this->ok('Displaying');
+		$this->zbxTestTextPresent('HISTORY OF EVENTS');
+		$this->zbxTestTextPresent('Source');
+		$this->zbxTestTextPresent('Filter');
+		$this->zbxTestTextPresent('Displaying');
 		// table header
 		if (0 == DBcount('select * from events where source='.EVENT_SOURCE_DISCOVERY)) {
-			$this->ok('No events defined.');
+			$this->zbxTestTextPresent('No events defined.');
 		}
 		else {
-			$this->ok(array('Time','IP','DNS','Description','Status'));
+			$this->zbxTestTextPresent(array('Time', 'IP', 'DNS', 'Description', 'Status'));
 		}
 	}
 
@@ -71,8 +71,8 @@ class testPageEvents extends CWebTest {
 
 // Check that no real host or template names displayed
 	public function testPageEvents_Triggers_NoHostNames() {
-		$this->login('events.php');
-		$this->dropdown_select_wait('source', 'Trigger');
+		$this->zbxTestLogin('events.php');
+		$this->zbxTestDropdownSelectWait('source', 'Trigger');
 		$this->checkTitle('Latest events');
 
 		$this->checkNoRealHostnames();
@@ -80,8 +80,8 @@ class testPageEvents extends CWebTest {
 
 // Check that no real host or template names displayed
 	public function testPageEvents_Discovery_NoHostNames() {
-		$this->login('events.php');
-		$this->dropdown_select_wait('source', 'Discovery');
+		$this->zbxTestLogin('events.php');
+		$this->zbxTestDropdownSelectWait('source', 'Discovery');
 		$this->checkTitle('Latest events');
 
 		$this->checkNoRealHostnames();

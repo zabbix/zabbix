@@ -25,63 +25,57 @@ class testFormTemplate extends CWebTest {
 	public $template_tmp = "Test template 2";
 
 	public function testFormTemplate_Create() {
-		$this->login('templates.php');
-		$this->dropdown_select_wait('groupid', 'Templates');
-		$this->button_click('form');
-		$this->wait();
+		$this->zbxTestLogin('templates.php');
+		$this->zbxTestDropdownSelectWait('groupid', 'Templates');
+		$this->zbxTestClickWait('form');
 		$this->input_type('template_name', $this->template);
-		$this->button_click('save');
-		$this->wait();
+		$this->zbxTestClickWait('save');
 		$this->checkTitle('Configuration of templates');
-		$this->ok('Template added');
-		$this->ok($this->template);
+		$this->zbxTestTextPresent('Template added');
+		$this->zbxTestTextPresent($this->template);
 	}
 
 	public function testFormTemplate_CreateLongTemplateName() {
 // 64 character long template name
 		$template="000000000011111111112222222222333333333344444444445555555555666";
-		$this->login('templates.php');
-		$this->dropdown_select_wait('groupid', 'Templates');
-		$this->button_click('form');
-		$this->wait();
+		$this->zbxTestLogin('templates.php');
+		$this->zbxTestDropdownSelectWait('groupid', 'Templates');
+		$this->zbxTestClickWait('form');
 		$this->input_type('template_name', $template);
-		$this->button_click('save');
-		$this->wait();
+		$this->zbxTestClickWait('save');
 		$this->checkTitle('Configuration of templates');
-		$this->ok('Template added');
-		$this->ok($template);
+		$this->zbxTestTextPresent('Template added');
+		$this->zbxTestTextPresent($template);
 	}
 
 	public function testFormTemplate_SimpleUpdate() {
-		$this->login('templates.php');
-		$this->dropdown_select_wait('groupid', 'Templates');
+		$this->zbxTestLogin('templates.php');
+		$this->zbxTestDropdownSelectWait('groupid', 'Templates');
 		$this->click('link=Template OS Linux');
 		$this->wait();
-		$this->button_click('save');
-		$this->wait();
+		$this->zbxTestClickWait('save');
 		$this->checkTitle('Configuration of templates');
-		$this->ok('Template updated');
-		$this->ok($this->template);
+		$this->zbxTestTextPresent('Template updated');
+		$this->zbxTestTextPresent($this->template);
 	}
 
 	public function testFormTemplate_UpdateTemplateName() {
 		// Update template
-		$this->login('templates.php');
-		$this->dropdown_select_wait('groupid', 'all');
+		$this->zbxTestLogin('templates.php');
+		$this->zbxTestDropdownSelectWait('groupid', 'all');
 		$this->click('link='.$this->template);
 		$this->wait();
 		$this->input_type('template_name', $this->template_tmp);
-		$this->button_click('save');
-		$this->wait();
+		$this->zbxTestClickWait('save');
 		$this->checkTitle('Configuration of templates');
-		$this->ok('Template updated');
+		$this->zbxTestTextPresent('Template updated');
 	}
 
 	/**
 	 * Adds two macros to an existing host.
 	 */
 	public function testFormTemplate_AddMacros() {
-		$this->login('templates.php');
+		$this->zbxTestLogin('templates.php');
 		$this->click("link=".$this->template_tmp);
 		$this->waitForPageToLoad("30000");
 		$this->tab_switch('Macros');
@@ -93,21 +87,19 @@ class testFormTemplate extends CWebTest {
 		$this->type("name=macros[1][value]", "2");
 		$this->click("id=save");
 		$this->waitForPageToLoad("30000");
-		$this->ok("Template updated");
+		$this->zbxTestTextPresent("Template updated");
 	}
 
 	public function testFormTemplate_CreateExistingTemplateNoGroups() {
 		// Attempt to create a template with a name that already exists and not add it to any groups
 		// In future should also check these conditions individually
-		$this->login('templates.php');
-		$this->dropdown_select_wait('groupid', 'all');
-		$this->button_click('form');
-		$this->wait();
+		$this->zbxTestLogin('templates.php');
+		$this->zbxTestDropdownSelectWait('groupid', 'all');
+		$this->zbxTestClickWait('form');
 		$this->input_type('template_name', 'Template OS Linux');
-		$this->button_click('save');
-		$this->wait();
+		$this->zbxTestClickWait('save');
 		$this->checkTitle('Configuration of templates');
-		$this->ok('No groups for template');
+		$this->zbxTestTextPresent('No groups for template');
 		$this->assertEquals(1, DBcount("select * from hosts where host='Template OS Linux'"));
 	}
 
@@ -118,15 +110,15 @@ class testFormTemplate extends CWebTest {
 
 		$this->chooseOkOnNextConfirmation();
 		// Delete template
-		$this->login('templates.php');
-		$this->dropdown_select_wait('groupid', 'all');
+		$this->zbxTestLogin('templates.php');
+		$this->zbxTestDropdownSelectWait('groupid', 'all');
 		$this->click('link='.$this->template_tmp);
 		$this->wait();
-		$this->button_click('delete');
+		$this->zbxTestClick('delete');
 		$this->waitForConfirmation();
 		$this->wait();
 		$this->checkTitle('Configuration of templates');
-		$this->ok('Template deleted');
+		$this->zbxTestTextPresent('Template deleted');
 
 		// check if the macros have been deleted
 		$macrosCount = DBcount("select * from hostmacro where hostid=".$template['hostid']);
@@ -135,61 +127,55 @@ class testFormTemplate extends CWebTest {
 
 	public function testFormTemplate_CloneTemplate() {
 		// Clone template
-		$this->login('templates.php');
-		$this->dropdown_select_wait('groupid', 'all');
+		$this->zbxTestLogin('templates.php');
+		$this->zbxTestDropdownSelectWait('groupid', 'all');
 		$this->click('link=Template OS Linux');
 		$this->wait();
-		$this->button_click('clone');
-		$this->wait();
+		$this->zbxTestClickWait('clone');
 		$this->input_type('template_name', $this->template_tmp);
-		$this->button_click('save');
-		$this->wait();
+		$this->zbxTestClickWait('save');
 		$this->checkTitle('Configuration of templates');
-		$this->ok('Template added');
+		$this->zbxTestTextPresent('Template added');
 	}
 
 	public function testFormTemplate_DeleteClonedTemplate() {
 		$this->chooseOkOnNextConfirmation();
 
 		// Delete template
-		$this->login('templates.php');
-		$this->dropdown_select_wait('groupid', 'all');
+		$this->zbxTestLogin('templates.php');
+		$this->zbxTestDropdownSelectWait('groupid', 'all');
 		$this->click('link='.$this->template_tmp);
 		$this->wait();
-		$this->button_click('delete');
-		$this->wait();
+		$this->zbxTestClickWait('delete');
 		$this->getConfirmation();
 		$this->checkTitle('Configuration of templates');
-		$this->ok('Template deleted');
+		$this->zbxTestTextPresent('Template deleted');
 	}
 
 	public function testFormTemplate_FullCloneTemplate() {
 		// Full clone template
-		$this->login('templates.php');
-		$this->dropdown_select_wait('groupid', 'all');
+		$this->zbxTestLogin('templates.php');
+		$this->zbxTestDropdownSelectWait('groupid', 'all');
 		$this->click('link=Template OS Linux');
 		$this->wait();
-		$this->button_click('full_clone');
-		$this->wait();
+		$this->zbxTestClickWait('full_clone');
 		$this->input_type('template_name', $this->template.'_fullclone');
-		$this->button_click('save');
-		$this->wait();
+		$this->zbxTestClickWait('save');
 		$this->checkTitle('Configuration of templates');
-		$this->ok('Template added');
+		$this->zbxTestTextPresent('Template added');
 	}
 
 	public function testFormTemplate_DeleteFullClonedTemplate() {
 		$this->chooseOkOnNextConfirmation();
 
 		// Delete full cloned template
-		$this->login('templates.php');
-		$this->dropdown_select_wait('groupid', 'all');
+		$this->zbxTestLogin('templates.php');
+		$this->zbxTestDropdownSelectWait('groupid', 'all');
 		$this->click('link='.$this->template.'_fullclone');
 		$this->wait();
-		$this->button_click('delete');
-		$this->wait();
+		$this->zbxTestClickWait('delete');
 		$this->getConfirmation();
 		$this->checkTitle('Configuration of templates');
-		$this->ok('Template deleted');
+		$this->zbxTestTextPresent('Template deleted');
 	}
 }

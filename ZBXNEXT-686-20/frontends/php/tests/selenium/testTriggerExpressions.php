@@ -26,15 +26,15 @@ class testTriggerExpression extends CWebTest {
 	* @dataProvider testTriggerExpression_SimpleTestProvider
 	*/
 	public function testTriggerExpression_SimpleTest($where, $what, $expected) {
-		$this->login('index.php');
-		$this->open("tr_testexpr.php?expression={Zabbix%20server%3Avm.memory.size[total].last%280%29}%3C".$where);
+		$this->zbxTestLogin('index.php');
+		$this->zbxTestOpen("tr_testexpr.php?expression={Zabbix%20server%3Avm.memory.size[total].last%280%29}%3C".$where);
 		$this->checkTitle('Test');
 		$this->input_type("//input[@type='text']", $what);
 
-		$this->button_click("//input[@value='Test']");
-		$this->button_click("//input[@id='test_expression']");
-		$this->button_click("//input[@name='test_expression']");
-		$this->ok($expected);
+		$this->zbxTestClick("//input[@value='Test']");
+		$this->zbxTestClick("//input[@id='test_expression']");
+		$this->zbxTestClick("//input[@name='test_expression']");
+		$this->zbxTestTextPresent($expected);
 	}
 
 	public function testTriggerExpression_SimpleTestProvider() {

@@ -47,7 +47,7 @@ class testFormSysmap extends CWebTest {
 
 
 	public function testFormSysmapOpen() {
-		$this->login('sysmaps.php');
+		$this->zbxTestLogin('sysmaps.php');
 		$this->checkTitle('Network maps');
 	}
 
@@ -60,20 +60,18 @@ class testFormSysmap extends CWebTest {
 
 		DBsave_tables('sysmaps');
 
-		$this->login('sysmaps.php');
-		$this->button_click('form');
-		$this->wait();
+		$this->zbxTestLogin('sysmaps.php');
+		$this->zbxTestClickWait('form');
 		$this->input_type('name', $mapName);
-		$this->button_click('save');
-		$this->wait();
+		$this->zbxTestClickWait('save');
 		$this->checkTitle('Network maps');
 		if ($successExpected) {
-			$this->ok('Network map added');
-			$this->ok($mapName);
+			$this->zbxTestTextPresent('Network map added');
+			$this->zbxTestTextPresent($mapName);
 
 		}
 		else {
-			$this->ok('ERROR');
+			$this->zbxTestTextPresent('ERROR');
 		}
 
 		DBrestore_tables('sysmaps');
@@ -81,14 +79,13 @@ class testFormSysmap extends CWebTest {
 
 
 	public function testFormSysmapSimpleUpdate() {
-		$this->login('sysmaps.php');
+		$this->zbxTestLogin('sysmaps.php');
 		$this->click('//a[text()="'.$this->mapName.'"]/../../td/a[text()="Edit"]');
 		$this->wait();
-		$this->button_click('save');
-		$this->wait();
+		$this->zbxTestClickWait('save');
 		$this->checkTitle('Network maps');
-		$this->ok('Network map updated');
-		$this->ok($this->mapName);
+		$this->zbxTestTextPresent('Network map updated');
+		$this->zbxTestTextPresent($this->mapName);
 	}
 
 
@@ -100,21 +97,20 @@ class testFormSysmap extends CWebTest {
 		// Update Map
 		DBsave_tables('sysmaps');
 
-		$this->login('sysmaps.php');
+		$this->zbxTestLogin('sysmaps.php');
 		$this->click('//a[text()="'.$this->mapName.'"]/../../td/a[text()="Edit"]');
 		$this->wait();
 
 		$this->input_type('name', $mapName);
-		$this->button_click('save');
-		$this->wait();
+		$this->zbxTestClickWait('save');
 		$this->checkTitle('Network maps');
 
 		if ($successExpected) {
-			$this->ok('Network map updated');
-			$this->ok($mapName);
+			$this->zbxTestTextPresent('Network map updated');
+			$this->zbxTestTextPresent($mapName);
 		}
 		else {
-			$this->ok('ERROR');
+			$this->zbxTestTextPresent('ERROR');
 		}
 
 		DBrestore_tables('sysmaps');
@@ -127,14 +123,14 @@ class testFormSysmap extends CWebTest {
 
 		$this->chooseOkOnNextConfirmation();
 		// Delete Map
-		$this->login('sysmaps.php');
+		$this->zbxTestLogin('sysmaps.php');
 		$this->click('//a[text()="'.$this->mapName.'"]/../../td/a[text()="Edit"]');
 		$this->wait();
-		$this->button_click('delete');
+		$this->zbxTestClick('delete');
 		$this->waitForConfirmation();
 		$this->wait();
 		$this->checkTitle('Network maps');
-		$this->ok('Network map deleted');
+		$this->zbxTestTextPresent('Network map deleted');
 
 		DBrestore_tables('sysmaps');
 	}
@@ -144,16 +140,15 @@ class testFormSysmap extends CWebTest {
 
 		$mapName = 'Cloned map';
 
-		$this->login('sysmaps.php');
+		$this->zbxTestLogin('sysmaps.php');
 		$this->click('//a[text()="'.$this->mapName.'"]/../../td/a[text()="Edit"]');
 		$this->wait();
-		$this->button_click('clone');
+		$this->zbxTestClick('clone');
 		$this->input_type('name', $mapName);
-		$this->button_click('save');
-		$this->wait();
+		$this->zbxTestClickWait('save');
 		$this->checkTitle('Network maps');
-		$this->ok('Network map added');
-		$this->ok($mapName);
+		$this->zbxTestTextPresent('Network map added');
+		$this->zbxTestTextPresent($mapName);
 		return $mapName;
 
 	}
@@ -164,16 +159,15 @@ class testFormSysmap extends CWebTest {
 	 */
 	public function testFormSysmapDeleteClonedMap($mapName = 'Cloned map') {
 		// Delete Map if it was created
-		$this->open('sysmaps.php');
+		$this->zbxTestOpen('sysmaps.php');
 		$this->chooseOkOnNextConfirmation();
-		$this->login('sysmaps.php');
+		$this->zbxTestLogin('sysmaps.php');
 		$this->click('//a[text()="'.$mapName.'"]/../../td/a[text()="Edit"]');
 		$this->wait();
-		$this->button_click('delete');
-		$this->wait();
+		$this->zbxTestClickWait('delete');
 		$this->getConfirmation();
 		$this->checkTitle('Network maps');
-		$this->ok('Network map deleted');
+		$this->zbxTestTextPresent('Network map deleted');
 	}
 
 }

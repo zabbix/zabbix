@@ -28,13 +28,12 @@ class testFormHostGroup extends CWebTest {
 
 
 	public function testFormHostGroup_CheckLayout() {
-		$this->login('hostgroups.php');
-		$this->button_click('form');
-		$this->wait();
+		$this->zbxTestLogin('hostgroups.php');
+		$this->zbxTestClickWait('form');
 
-		$this->ok('CONFIGURATION OF HOST GROUPS');
-		$this->ok('Host group');
-		$this->ok(array('Group name', 'Hosts', 'Hosts in', 'Other hosts | Group'));
+		$this->zbxTestTextPresent('CONFIGURATION OF HOST GROUPS');
+		$this->zbxTestTextPresent('Host group');
+		$this->zbxTestTextPresent(array('Group name', 'Hosts', 'Hosts in', 'Other hosts | Group'));
 
 		$this->assertElementPresent('name');
 		$this->assertElementPresent('twb_groupid');
@@ -52,49 +51,42 @@ class testFormHostGroup extends CWebTest {
 	}
 
 	public function testFormHostGroup_CreateEmpty() {
-		$this->login('hostgroups.php');
-		$this->button_click('form');
-		$this->wait();
+		$this->zbxTestLogin('hostgroups.php');
+		$this->zbxTestClickWait('form');
 
-		$this->button_click('save');
-		$this->wait();
-		$this->ok('ERROR: Page received incorrect data');
-		$this->ok('Warning. Incorrect value for field "name": cannot be empty.');
+		$this->zbxTestClickWait('save');
+		$this->zbxTestTextPresent('ERROR: Page received incorrect data');
+		$this->zbxTestTextPresent('Warning. Incorrect value for field "name": cannot be empty.');
 	}
 
 	public function testFormHostGroup_Create() {
-		$this->login('hostgroups.php');
-		$this->button_click('form');
-		$this->wait();
+		$this->zbxTestLogin('hostgroups.php');
+		$this->zbxTestClickWait('form');
 
 		$this->input_type('name', $this->hostGroup);
-		$this->button_click('save');
-		$this->wait();
-		$this->ok('Group added');
+		$this->zbxTestClickWait('save');
+		$this->zbxTestTextPresent('Group added');
 	}
 
 	public function testFormHostGroup_CreateDuplicate() {
-		$this->login('hostgroups.php');
-		$this->button_click('form');
-		$this->wait();
+		$this->zbxTestLogin('hostgroups.php');
+		$this->zbxTestClickWait('form');
 
 		$this->input_type('name', $this->hostGroup);
-		$this->button_click('save');
-		$this->wait();
-		$this->ok('ERROR: Cannot add group');
-		$this->ok('Host group "'.$this->hostGroup.'" already exists.');
+		$this->zbxTestClickWait('save');
+		$this->zbxTestTextPresent('ERROR: Cannot add group');
+		$this->zbxTestTextPresent('Host group "'.$this->hostGroup.'" already exists.');
 	}
 
 	public function testFormHostGroup_UpdateEmpty() {
-		$this->login('hostgroups.php');
+		$this->zbxTestLogin('hostgroups.php');
 		$this->click('link='.$this->hostGroup);
 		$this->wait();
 
 		$this->input_type('name', '');
-		$this->button_click('save');
-		$this->wait();
-		$this->ok('ERROR: Page received incorrect data');
-		$this->ok('Warning. Incorrect value for field "name": cannot be empty.');
+		$this->zbxTestClickWait('save');
+		$this->zbxTestTextPresent('ERROR: Page received incorrect data');
+		$this->zbxTestTextPresent('Warning. Incorrect value for field "name": cannot be empty.');
 	}
 
 	public function testFormHostGroup_UpdateDuplicate() {
@@ -103,30 +95,28 @@ class testFormHostGroup extends CWebTest {
 			' WHERE name<>'.zbx_dbstr($this->hostGroup), 1
 		));
 
-		$this->login('hostgroups.php');
+		$this->zbxTestLogin('hostgroups.php');
 		$this->click('link='.$this->hostGroup);
 		$this->wait();
 
 		$this->input_type('name', $hostGroup['name']);
-		$this->button_click('save');
-		$this->wait();
-		$this->ok('ERROR: Cannot update group');
-		$this->ok('Host group "'.$hostGroup['name'].'" already exists.');
+		$this->zbxTestClickWait('save');
+		$this->zbxTestTextPresent('ERROR: Cannot update group');
+		$this->zbxTestTextPresent('Host group "'.$hostGroup['name'].'" already exists.');
 	}
 
 	public function testFormHostGroup_Update() {
-		$this->login('hostgroups.php');
+		$this->zbxTestLogin('hostgroups.php');
 		$this->click('link='.$this->hostGroup);
 		$this->wait();
 
 		$this->input_type('name', $this->hostGroup.' 2');
-		$this->button_click('save');
-		$this->wait();
-		$this->ok('Group updated');
+		$this->zbxTestClickWait('save');
+		$this->zbxTestTextPresent('Group updated');
 	}
 
 	public function testFormHostGroup_Delete() {
-		$this->login('hostgroups.php');
+		$this->zbxTestLogin('hostgroups.php');
 		$this->click('link='.$this->hostGroup.' 2');
 		$this->wait();
 
@@ -134,6 +124,6 @@ class testFormHostGroup extends CWebTest {
 		$this->click('delete');
 		$this->waitForConfirmation();
 		$this->wait();
-		$this->ok('Group deleted');
+		$this->zbxTestTextPresent('Group deleted');
 	}
 }

@@ -111,18 +111,18 @@ class testClicks extends CWebTest {
 	* @dataProvider provider
 	*/
 	public function testClick($url, $clicks, $title, $expected) {
-		$this->login();
-		$this->open($url);
+		$this->zbxTestLogin();
+		$this->zbxTestOpen($url);
 		foreach ($clicks as $click) {
 			$this->click($click);
 			$this->waitForPageToLoad();
 		}
 
 		foreach ($this->failIfNotExists as $str) {
-			$this->ok($str);
+			$this->zbxTestTextPresent($str);
 		}
 		$this->checkTitle($title);
-		$this->ok($expected);
-		$this->logout();
+		$this->zbxTestTextPresent($expected);
+		$this->zbxTestLogout();
 	}
 }

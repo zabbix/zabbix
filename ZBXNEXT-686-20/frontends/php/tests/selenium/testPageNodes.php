@@ -30,12 +30,12 @@ class testPageNodes extends CWebTest {
 
 	public function testPageNodes_StandaloneSetup() {
 
-		$this->login('nodes.php');
+		$this->zbxTestLogin('nodes.php');
 		$this->checkTitle('Configuration of nodes');
-		$this->ok('DM');
-		$this->ok('CONFIGURATION OF NODES');
+		$this->zbxTestTextPresent('DM');
+		$this->zbxTestTextPresent('CONFIGURATION OF NODES');
 		if (0 == DBcount("select * from nodes order by nodeid")) {
-			$this->ok('Your setup is not configured for distributed monitoring');
+			$this->zbxTestTextPresent('Your setup is not configured for distributed monitoring');
 		}
 	}
 
@@ -44,12 +44,12 @@ class testPageNodes extends CWebTest {
 	*/
 	public function testPageNodes_CheckLayout($node) {
 
-		$this->login('nodes.php');
+		$this->zbxTestLogin('nodes.php');
 		$this->checkTitle('Configuration of nodes');
-		$this->ok(array('CONFIGURATION OF NODES', 'NODES', 'ID', 'Name', 'IP:Port'));
+		$this->zbxTestTextPresent(array('CONFIGURATION OF NODES', 'NODES', 'ID', 'Name', 'IP:Port'));
 		$this->assertElementPresent('config');
 		$this->assertElementPresent('form');
-		$this->ok(array($node['name']));
+		$this->zbxTestTextPresent(array($node['name']));
 
 	}
 
@@ -58,16 +58,15 @@ class testPageNodes extends CWebTest {
 	*/
 	public function testPageNodes_SimpleUpdate($node) {
 
-		$this->login('nodes.php');
+		$this->zbxTestLogin('nodes.php');
 
 		$sqlNodes = 'SELECT * FROM nodes ORDER BY nodeid';
 		$oldHashNodes=DBhash($sqlNodes);
 
 		$this->click('link='.$node['name']);
 		$this->wait();
-		$this->button_click('save');
-		$this->wait();
-		$this->ok('Node updated');
+		$this->zbxTestClickWait('save');
+		$this->zbxTestTextPresent('Node updated');
 
 		$newHashNodes = DBhash($sqlNodes);
 		$this->assertEquals($oldHashNodes, $newHashNodes, "Chuck Norris: no-change node update should not update data in table 'nodes'");

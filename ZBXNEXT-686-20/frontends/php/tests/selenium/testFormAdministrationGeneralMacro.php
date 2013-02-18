@@ -43,15 +43,15 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 	private $oldHashGlobalMacros = '';
 
 	private function openGlobalMacros() {
-		$this->login('adm.gui.php');
+		$this->zbxTestLogin('adm.gui.php');
 		$this->assertElementPresent('configDropDown');
-		$this->dropdown_select_wait('configDropDown', 'Macros');
+		$this->zbxTestDropdownSelectWait('configDropDown', 'Macros');
 		$this->assertElementPresent('configDropDown');
 
 		$this->checkTitle('Configuration of macros');
-		$this->ok('CONFIGURATION OF MACROS');
-		$this->ok('Macros');
-		$this->ok(array('Macro', 'Value'));
+		$this->zbxTestTextPresent('CONFIGURATION OF MACROS');
+		$this->zbxTestTextPresent('Macros');
+		$this->zbxTestTextPresent(array('Macro', 'Value'));
 	}
 
 	private function checkGlobalMacrosOrder($skip_index = -1) {
@@ -81,16 +81,16 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 	}
 
 	private function saveGlobalMacros($confirmation = false, $wait = true) {
-		$this->button_click('save');
+		$this->zbxTestClick('save');
 		if ($confirmation) {
 			$this->waitForConfirmation();
 		}
 		if ($wait) {
 			$this->wait();
 
-			$this->ok('CONFIGURATION OF MACROS');
-			$this->ok('Macros');
-			$this->ok(array('Macro', 'Value'));
+			$this->zbxTestTextPresent('CONFIGURATION OF MACROS');
+			$this->zbxTestTextPresent('Macros');
+			$this->zbxTestTextPresent(array('Macro', 'Value'));
 		}
 	}
 
@@ -176,7 +176,7 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 		$this->openGlobalMacros();
 
 		$this->saveGlobalMacros();
-		$this->ok('Macros updated');
+		$this->zbxTestTextPresent('Macros updated');
 
 		$this->checkGlobalMacrosOrder();
 
@@ -194,7 +194,7 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 		$this->waitForVisible('macros['.$countGlobalMacros.'][macro]');
 
 		$this->saveGlobalMacros();
-		$this->ok('Macros updated');
+		$this->zbxTestTextPresent('Macros updated');
 
 		$this->checkGlobalMacrosOrder();
 
@@ -222,9 +222,9 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 		$this->input_type('macros['.$countGlobalMacros.'][value]', $this->newValue);
 
 		$this->saveGlobalMacros();
-		$this->ok('ERROR: Cannot update macros');
-		$this->ok('Wrong macro "'.$macro.'".');
-		$this->ok('Cannot add macro.');
+		$this->zbxTestTextPresent('ERROR: Cannot update macros');
+		$this->zbxTestTextPresent('Wrong macro "'.$macro.'".');
+		$this->zbxTestTextPresent('Cannot add macro.');
 
 		$this->assertEquals($this->getValue('macros['.$countGlobalMacros.'][macro]'), $macro);
 		$this->assertEquals($this->getValue('macros['.$countGlobalMacros.'][value]'), $this->newValue);
@@ -248,9 +248,9 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 		$this->input_type('macros['.$countGlobalMacros.'][value]', $this->newValue);
 
 		$this->saveGlobalMacros();
-		$this->ok('ERROR: Cannot update macros');
-		$this->ok('Empty macro.');
-		$this->ok('Cannot add macro.');
+		$this->zbxTestTextPresent('ERROR: Cannot update macros');
+		$this->zbxTestTextPresent('Empty macro.');
+		$this->zbxTestTextPresent('Cannot add macro.');
 
 		$this->assertEquals($this->getValue('macros['.$countGlobalMacros.'][macro]'), '');
 		$this->assertEquals($this->getValue('macros['.$countGlobalMacros.'][value]'), $this->newValue);
@@ -276,7 +276,7 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 		$this->input_type('macros['.$countGlobalMacros.'][value]', $this->newValue);
 
 		$this->saveGlobalMacros();
-		$this->ok('Macros updated');
+		$this->zbxTestTextPresent('Macros updated');
 
 		$this->checkGlobalMacrosOrder();
 
@@ -306,7 +306,7 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 		$this->input_type('macros['.$countGlobalMacros.'][value]', '');
 
 		$this->saveGlobalMacros();
-		$this->ok('Macros updated');
+		$this->zbxTestTextPresent('Macros updated');
 
 		$this->checkGlobalMacrosOrder();
 
@@ -334,9 +334,9 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 		$this->input_type('macros['.$countGlobalMacros.'][value]', $this->newValue);
 
 		$this->saveGlobalMacros();
-		$this->ok('ERROR: Cannot update macros');
-		$this->ok('Macro "'.$this->newMacro.'" already exists.');
-		$this->ok('Cannot add macro.');
+		$this->zbxTestTextPresent('ERROR: Cannot update macros');
+		$this->zbxTestTextPresent('Macro "'.$this->newMacro.'" already exists.');
+		$this->zbxTestTextPresent('Cannot add macro.');
 
 		$this->assertEquals($this->getValue('macros['.$countGlobalMacros.'][macro]'), $this->newMacro);
 		$this->assertEquals($this->getValue('macros['.$countGlobalMacros.'][value]'), $this->newValue);
@@ -358,9 +358,9 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 		$this->input_type('macros[0][value]', $this->updValue);
 
 		$this->saveGlobalMacros();
-		$this->ok('ERROR: Cannot update macros');
-		$this->ok('Wrong macro "'.$macro.'".');
-		$this->ok('Cannot update macro.');
+		$this->zbxTestTextPresent('ERROR: Cannot update macros');
+		$this->zbxTestTextPresent('Wrong macro "'.$macro.'".');
+		$this->zbxTestTextPresent('Cannot update macro.');
 
 		$this->assertEquals($this->getValue('macros[0][macro]'), $macro);
 		$this->assertEquals($this->getValue('macros[0][value]'), $this->updValue);
@@ -379,9 +379,9 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 		$this->input_type('macros[0][value]', $this->updValue);
 
 		$this->saveGlobalMacros();
-		$this->ok('ERROR: Cannot update macros');
-		$this->ok('Empty macro.');
-		$this->ok('Cannot update macro.');
+		$this->zbxTestTextPresent('ERROR: Cannot update macros');
+		$this->zbxTestTextPresent('Empty macro.');
+		$this->zbxTestTextPresent('Cannot update macro.');
 
 		$this->assertEquals($this->getValue('macros[0][macro]'), '');
 		$this->assertEquals($this->getValue('macros[0][value]'), $this->updValue);
@@ -400,9 +400,9 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 		$this->input_type('macros[0][value]', '');
 
 		$this->saveGlobalMacros();
-		$this->ok('ERROR: Cannot update macros');
-		$this->ok('Empty macro.');
-		$this->ok('Cannot update macro.');
+		$this->zbxTestTextPresent('ERROR: Cannot update macros');
+		$this->zbxTestTextPresent('Empty macro.');
+		$this->zbxTestTextPresent('Cannot update macro.');
 
 		$this->assertEquals($this->getValue('macros[0][macro]'), '');
 		$this->assertEquals($this->getValue('macros[0][value]'), '');
@@ -430,7 +430,7 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 		$this->input_type('macros['.$i.'][value]', $this->updValue);
 
 		$this->saveGlobalMacros();
-		$this->ok('Macros updated');
+		$this->zbxTestTextPresent('Macros updated');
 
 		$this->checkGlobalMacrosOrder($i);
 
@@ -465,7 +465,7 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 		$this->input_type('macros['.$i.'][value]', '');
 
 		$this->saveGlobalMacros();
-		$this->ok('Macros updated');
+		$this->zbxTestTextPresent('Macros updated');
 
 		$this->checkGlobalMacrosOrder($i);
 
@@ -500,9 +500,9 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 		$this->input_type('macros['.$i.'][value]', $this->newValue);
 
 		$this->saveGlobalMacros();
-		$this->ok('ERROR: Cannot update macros');
-		$this->ok('Macro "'.$this->newMacro.'" already exists.');
-		$this->ok('Cannot update macro.');
+		$this->zbxTestTextPresent('ERROR: Cannot update macros');
+		$this->zbxTestTextPresent('Macro "'.$this->newMacro.'" already exists.');
+		$this->zbxTestTextPresent('Cannot update macro.');
 
 		$this->assertEquals($this->getValue('macros['.$i.'][macro]'), $this->newMacro);
 		$this->assertEquals($this->getValue('macros['.$i.'][value]'), $this->newValue);
@@ -558,7 +558,7 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 		$this->click('id=macros_'.$i.'_remove');
 
 		$this->saveGlobalMacros(true);
-		$this->ok('Macros updated');
+		$this->zbxTestTextPresent('Macros updated');
 
 		$this->checkGlobalMacrosOrder();
 
@@ -579,7 +579,7 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 		$this->click('id=macros_'.$countGlobalMacros.'_remove');
 
 		$this->saveGlobalMacros();
-		$this->ok('Macros updated');
+		$this->zbxTestTextPresent('Macros updated');
 
 		$this->checkGlobalMacrosOrder();
 

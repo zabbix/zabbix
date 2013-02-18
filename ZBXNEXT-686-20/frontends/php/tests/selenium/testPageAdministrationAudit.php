@@ -32,13 +32,13 @@ class testPageAdministrationAudit extends CWebTest {
 
 	public function testPageAdministrationAudit_CheckLayout() {
 
-		$this->login('auditlogs.php?stime=1328684400&period=63072000');
+		$this->zbxTestLogin('auditlogs.php?stime=1328684400&period=63072000');
 		$this->checkTitle('Audit');
 		$this->assertElementPresent('config');
 
-		$this->ok('AUDIT LOGS');
-		$this->ok('LOGS');
-		$this->ok(array('Time', 'User', 'IP', 'Resource', '	Action', 'ID', 'Description', 'Details'));
+		$this->zbxTestTextPresent('AUDIT LOGS');
+		$this->zbxTestTextPresent('LOGS');
+		$this->zbxTestTextPresent(array('Time', 'User', 'IP', 'Resource', '	Action', 'ID', 'Description', 'Details'));
 
 		// input field "User"
 		$this->assertElementPresent('alias');
@@ -99,15 +99,15 @@ class testPageAdministrationAudit extends CWebTest {
 	*/
 	public function testPageAdministrationAudit_LoginUser($auditlog) {
 
-		$this->login('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
+		$this->zbxTestLogin('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
 		$this->checkTitle('Audit');
 		$this->assertElementPresent('config');
 
 		$this->click('flicker_icon_l');
 
 		$this->input_type('alias', '');
-		$this->dropdown_select('action', 'Login');
-		$this->dropdown_select('resourcetype', 'User');
+		$this->zbxTestDropdownSelect('action', 'Login');
+		$this->zbxTestDropdownSelect('resourcetype', 'User');
 
 		$this->click("id=filter");
 		$this->wait();
@@ -117,7 +117,7 @@ class testPageAdministrationAudit extends CWebTest {
 		$ip = $auditlog['ip'];
 		$user = $auditlog['alias'];
 
-		$this->ok(array($today, $user, $ip, 'User', 'Login', $auditlog['userid']));
+		$this->zbxTestTextPresent(array($today, $user, $ip, 'User', 'Login', $auditlog['userid']));
 
 	}
 
@@ -130,19 +130,19 @@ class testPageAdministrationAudit extends CWebTest {
 	*/
 	public function testPageAdministrationAudit_LogoutUser($auditlog) {
 
-		$this->login('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
+		$this->zbxTestLogin('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
 		$this->checkTitle('Audit');
 		$this->assertElementPresent('config');
 
-		$this->ok('AUDIT LOGS');
-		$this->ok('LOGS');
-		$this->ok(array('Time', 'User', 'IP', 'Resource', '	Action', 'ID', 'Description', 'Details'));
+		$this->zbxTestTextPresent('AUDIT LOGS');
+		$this->zbxTestTextPresent('LOGS');
+		$this->zbxTestTextPresent(array('Time', 'User', 'IP', 'Resource', '	Action', 'ID', 'Description', 'Details'));
 
 		$this->click('flicker_icon_l');
 
 		$this->input_type('alias', 'Admin');
-		$this->dropdown_select('action', 'Logout');
-		$this->dropdown_select('resourcetype', 'User');
+		$this->zbxTestDropdownSelect('action', 'Logout');
+		$this->zbxTestDropdownSelect('resourcetype', 'User');
 
 		$this->click("id=filter");
 		$this->wait();
@@ -152,7 +152,7 @@ class testPageAdministrationAudit extends CWebTest {
 		$time = $auditlog['clock'];
 
 		$today = date("d M Y H:i:s", $time);
-		$this->ok(array("$today", 'Admin', "$ip", 'User', 'Logout'));
+		$this->zbxTestTextPresent(array("$today", 'Admin', "$ip", 'User', 'Logout'));
 
 	}
 
@@ -165,18 +165,18 @@ class testPageAdministrationAudit extends CWebTest {
 	*/
 	public function testPageAdministrationAudit_AddUser($auditlog) {
 
-		$this->login('auditlogs.php?stime=20130207090000&period=63072000');
+		$this->zbxTestLogin('auditlogs.php?stime=20130207090000&period=63072000');
 		$this->checkTitle('Audit');
 		$this->assertElementPresent('config');
 
-		$this->ok('AUDIT LOGS');
-		$this->ok('LOGS');
+		$this->zbxTestTextPresent('AUDIT LOGS');
+		$this->zbxTestTextPresent('LOGS');
 
 		$this->click('flicker_icon_l');
 		$user = 'Admin';
 		$this->input_type('alias', $user);
-		$this->dropdown_select('action', 'Add');
-		$this->dropdown_select('resourcetype', 'User');
+		$this->zbxTestDropdownSelect('action', 'Add');
+		$this->zbxTestDropdownSelect('resourcetype', 'User');
 
 		$this->click("id=filter");
 		$this->wait();
@@ -188,7 +188,7 @@ class testPageAdministrationAudit extends CWebTest {
 		$time = $auditlog['clock'];
 		$today = date("d M Y H:i:s", $time);
 		// User alias [Admin2] name [Admin2] surname [Admin2]
-		$this->ok(array($today, $user, $ip, 'User', 'Added', '0', "$details"));
+		$this->zbxTestTextPresent(array($today, $user, $ip, 'User', 'Added', '0', "$details"));
 
 	}
 
@@ -201,19 +201,19 @@ class testPageAdministrationAudit extends CWebTest {
 	*/
 	public function testPageAdministrationAudit_UpdateUser($auditlog) {
 
-		$this->login('auditlogs.php?stime=20130207090000&period=63072000');
+		$this->zbxTestLogin('auditlogs.php?stime=20130207090000&period=63072000');
 		$this->checkTitle('Audit');
 		$this->assertElementPresent('config');
 
-		$this->ok('AUDIT LOGS');
-		$this->ok('LOGS');
-		$this->ok(array('Time', 'User', 'IP', 'Resource', '	Action', 'ID', 'Description', 'Details'));
+		$this->zbxTestTextPresent('AUDIT LOGS');
+		$this->zbxTestTextPresent('LOGS');
+		$this->zbxTestTextPresent(array('Time', 'User', 'IP', 'Resource', '	Action', 'ID', 'Description', 'Details'));
 
 		$this->click('flicker_icon_l');
 
 		$this->input_type('alias', 'Admin');
-		$this->dropdown_select('action', 'Update');
-		$this->dropdown_select('resourcetype', 'User');
+		$this->zbxTestDropdownSelect('action', 'Update');
+		$this->zbxTestDropdownSelect('resourcetype', 'User');
 
 		$this->click("id=filter");
 		$this->wait();
@@ -224,7 +224,7 @@ class testPageAdministrationAudit extends CWebTest {
 		$time = $auditlog['clock'];
 		$today = date("d M Y H:i:s", $time);
 
-		$this->ok(array($today, 'Admin', $ip, 'User', 'Updated', $details));
+		$this->zbxTestTextPresent(array($today, 'Admin', $ip, 'User', 'Updated', $details));
 
 	}
 
@@ -237,19 +237,19 @@ class testPageAdministrationAudit extends CWebTest {
 	*/
 	public function testPageAdministrationAudit_DeleteUser($auditlog) {
 
-		$this->login('auditlogs.php?stime=20130207090000&period=63072000');
+		$this->zbxTestLogin('auditlogs.php?stime=20130207090000&period=63072000');
 		$this->checkTitle('Audit');
 		$this->assertElementPresent('config');
 
-		$this->ok('AUDIT LOGS');
-		$this->ok('LOGS');
-		$this->ok(array('Time', 'User', 'IP', 'Resource', 'Action', 'ID', 'Description', 'Details'));
+		$this->zbxTestTextPresent('AUDIT LOGS');
+		$this->zbxTestTextPresent('LOGS');
+		$this->zbxTestTextPresent(array('Time', 'User', 'IP', 'Resource', 'Action', 'ID', 'Description', 'Details'));
 
 		$this->click('flicker_icon_l');
 
 		$this->input_type('alias', 'Admin');
-		$this->dropdown_select('action', 'Delete');
-		$this->dropdown_select('resourcetype', 'User');
+		$this->zbxTestDropdownSelect('action', 'Delete');
+		$this->zbxTestDropdownSelect('resourcetype', 'User');
 
 		$this->click("id=filter");
 		$this->wait();
@@ -260,7 +260,7 @@ class testPageAdministrationAudit extends CWebTest {
 		$time = $auditlog['clock'];
 		$today = date("d M Y H:i:s", $time);
 
-		$this->ok(array($today, 'Admin', $ip, 'User', 'Deleted', $details));
+		$this->zbxTestTextPresent(array($today, 'Admin', $ip, 'User', 'Deleted', $details));
 
 	}
 
@@ -273,12 +273,12 @@ class testPageAdministrationAudit extends CWebTest {
 	*/
 	public function testPageAdministrationAudit_AddHost($auditlog) {
 
-		$this->login('auditlogs.php?stime=20130207090000&period=63072000');
+		$this->zbxTestLogin('auditlogs.php?stime=20130207090000&period=63072000');
 		$this->checkTitle('Audit');
 		$this->assertElementPresent('config');
 
-		$this->ok('AUDIT LOGS');
-		$this->ok('LOGS');
+		$this->zbxTestTextPresent('AUDIT LOGS');
+		$this->zbxTestTextPresent('LOGS');
 
 		$this->click('flicker_icon_l');
 
@@ -286,8 +286,8 @@ class testPageAdministrationAudit extends CWebTest {
 		$this->assertElementPresent('btn1');
 
 		$this->input_type('alias', 'Admin');
-		$this->dropdown_select('action', 'Add');
-		$this->dropdown_select('resourcetype', 'Host');
+		$this->zbxTestDropdownSelect('action', 'Add');
+		$this->zbxTestDropdownSelect('resourcetype', 'Host');
 
 		$this->click("id=filter");
 		$this->wait();
@@ -298,8 +298,8 @@ class testPageAdministrationAudit extends CWebTest {
 		$details = $auditlog['resourcename'];
 		$today = date("d M Y H:i:s", $time);
 
-		//$this->ok($today);
-		$this->ok(array($today, 'Admin', $ip, 'Host', 'Added', $details));
+		//$this->zbxTestTextPresent($today);
+		$this->zbxTestTextPresent(array($today, 'Admin', $ip, 'Host', 'Added', $details));
 
 	}
 
@@ -313,13 +313,13 @@ class testPageAdministrationAudit extends CWebTest {
 	*/
 	public function testPageAdministrationAudit_UpdateHost($auditlog) {
 
-		$this->login('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
+		$this->zbxTestLogin('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
 		$this->checkTitle('Audit');
 		$this->assertElementPresent('config');
 
-		$this->ok('AUDIT LOGS');
-		$this->ok('LOGS');
-		$this->ok(array('Time', 'User', 'IP', 'Resource', '	Action', 'ID', 'Description', 'Details'));
+		$this->zbxTestTextPresent('AUDIT LOGS');
+		$this->zbxTestTextPresent('LOGS');
+		$this->zbxTestTextPresent(array('Time', 'User', 'IP', 'Resource', '	Action', 'ID', 'Description', 'Details'));
 
 		$this->click('flicker_icon_l');
 
@@ -327,8 +327,8 @@ class testPageAdministrationAudit extends CWebTest {
 		$this->assertElementPresent('btn1');
 
 		$this->input_type('alias', 'Admin');
-		$this->dropdown_select('action', 'Update');
-		$this->dropdown_select('resourcetype', 'Host');
+		$this->zbxTestDropdownSelect('action', 'Update');
+		$this->zbxTestDropdownSelect('resourcetype', 'Host');
 
 		$this->click("id=filter");
 		$this->wait();
@@ -341,7 +341,7 @@ class testPageAdministrationAudit extends CWebTest {
 		$descr = $auditlog['resourcename'];
 
 		// TODO: can check also for the host status change in the "Details" column, i.e. "hosts.status: 0 => 1"
-		$this->ok(array($today, 'Admin', $ip, 'Host', 'Updated', $id, $descr, 'hosts.status:'));
+		$this->zbxTestTextPresent(array($today, 'Admin', $ip, 'Host', 'Updated', $id, $descr, 'hosts.status:'));
 
 	}
 
@@ -354,13 +354,13 @@ class testPageAdministrationAudit extends CWebTest {
 	*/
 	public function testPageAdministrationAudit_DeleteHost($auditlog) {
 
-		$this->login('auditlogs.php?stime=20130207090000&period=63072000');
+		$this->zbxTestLogin('auditlogs.php?stime=20130207090000&period=63072000');
 		$this->checkTitle('Audit');
 		$this->assertElementPresent('config');
 
-		$this->ok('AUDIT LOGS');
-		$this->ok('LOGS');
-		$this->ok(array('Time', 'User', 'IP', 'Resource', '	Action', 'ID', 'Description', 'Details'));
+		$this->zbxTestTextPresent('AUDIT LOGS');
+		$this->zbxTestTextPresent('LOGS');
+		$this->zbxTestTextPresent(array('Time', 'User', 'IP', 'Resource', '	Action', 'ID', 'Description', 'Details'));
 
 		$this->click('flicker_icon_l');
 
@@ -368,8 +368,8 @@ class testPageAdministrationAudit extends CWebTest {
 		$this->assertElementPresent('btn1');
 
 		$this->input_type('alias', 'Admin');
-		$this->dropdown_select('action', 'Delete');
-		$this->dropdown_select('resourcetype', 'Host');
+		$this->zbxTestDropdownSelect('action', 'Delete');
+		$this->zbxTestDropdownSelect('resourcetype', 'Host');
 
 		$this->click("id=filter");
 		$this->wait();
@@ -382,7 +382,7 @@ class testPageAdministrationAudit extends CWebTest {
 		$id = $auditlog['resourceid'];
 		$descr = $auditlog['resourcename'];
 
-		$this->ok(array($today, 'Admin', $ip, 'Host', 'Deleted', $id, $descr));
+		$this->zbxTestTextPresent(array($today, 'Admin', $ip, 'Host', 'Deleted', $id, $descr));
 
 	}
 
@@ -397,14 +397,14 @@ class testPageAdministrationAudit extends CWebTest {
 	*/
 	public function testPageAdministrationAudit_AddHG($auditlog) {
 
-		//$this->login('auditlogs.php?stime=20130207090000&period=63072000');
-		$this->login('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
+		//$this->zbxTestLogin('auditlogs.php?stime=20130207090000&period=63072000');
+		$this->zbxTestLogin('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
 		$this->checkTitle('Audit');
 		$this->assertElementPresent('config');
 
-		$this->ok('AUDIT LOGS');
-		$this->ok('LOGS');
-		$this->ok(array('Time', 'User', 'IP', 'Resource', '	Action', 'ID', 'Description', 'Details'));
+		$this->zbxTestTextPresent('AUDIT LOGS');
+		$this->zbxTestTextPresent('LOGS');
+		$this->zbxTestTextPresent(array('Time', 'User', 'IP', 'Resource', '	Action', 'ID', 'Description', 'Details'));
 
 		$this->click('flicker_icon_l');
 
@@ -412,8 +412,8 @@ class testPageAdministrationAudit extends CWebTest {
 		$this->assertElementPresent('btn1');
 
 		$this->input_type('alias', 'Admin');
-		$this->dropdown_select('action', 'Add');
-		$this->dropdown_select('resourcetype', 'Host group');
+		$this->zbxTestDropdownSelect('action', 'Add');
+		$this->zbxTestDropdownSelect('resourcetype', 'Host group');
 
 		$this->click("id=filter");
 		$this->wait();
@@ -424,8 +424,8 @@ class testPageAdministrationAudit extends CWebTest {
 		$details = $auditlog['resourcename'];
 		$today = date("d M Y H:i:s", $time);
 
-		// $this->ok(array("$today", 'Admin', "$ip", 'Host group', 'Added', '$details'));
-		$this->ok(array("$today", 'Admin', "$ip", 'Host group', 'Added', $auditlog['resourceid'], $auditlog['resourcename']));
+		// $this->zbxTestTextPresent(array("$today", 'Admin', "$ip", 'Host group', 'Added', '$details'));
+		$this->zbxTestTextPresent(array("$today", 'Admin', "$ip", 'Host group', 'Added', $auditlog['resourceid'], $auditlog['resourcename']));
 
 	}
 
@@ -438,14 +438,14 @@ class testPageAdministrationAudit extends CWebTest {
 	*/
 	public function testPageAdministrationAudit_UpdateHG($auditlog) {
 
-		//$this->login('auditlogs.php?stime=20130207090000&period=63072000');
-		$this->login('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
+		//$this->zbxTestLogin('auditlogs.php?stime=20130207090000&period=63072000');
+		$this->zbxTestLogin('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
 		$this->checkTitle('Audit');
 		$this->assertElementPresent('config');
 
-		$this->ok('AUDIT LOGS');
-		$this->ok('LOGS');
-		$this->ok(array('Time', 'User', 'IP', 'Resource', '	Action', 'ID', 'Description', 'Details'));
+		$this->zbxTestTextPresent('AUDIT LOGS');
+		$this->zbxTestTextPresent('LOGS');
+		$this->zbxTestTextPresent(array('Time', 'User', 'IP', 'Resource', '	Action', 'ID', 'Description', 'Details'));
 
 		$this->click('flicker_icon_l');
 
@@ -453,8 +453,8 @@ class testPageAdministrationAudit extends CWebTest {
 		$this->assertElementPresent('btn1');
 
 		$this->input_type('alias', 'Admin');
-		$this->dropdown_select('action', 'Update');
-		$this->dropdown_select('resourcetype', 'Host group');
+		$this->zbxTestDropdownSelect('action', 'Update');
+		$this->zbxTestDropdownSelect('resourcetype', 'Host group');
 
 		$this->click("id=filter");
 		$this->wait();
@@ -466,8 +466,8 @@ class testPageAdministrationAudit extends CWebTest {
 		$today = date("d M Y H:i:s", $time);
 		//$oldvalue = $auditlog_details['oldvalue'];
 
-		$this->ok(array("$today", 'Admin', "$ip", 'Host group', 'Updated', $auditlog['resourceid'], $auditlog['resourcename'], 'groups.name:', $details));
-		//$this->ok(array("$today", 'Admin', "$ip", 'Host group', 'Added', $auditlog['resourceid'], $auditlog['resourcename'], 'groups.name: '.$oldvalue.'=>'.$details));
+		$this->zbxTestTextPresent(array("$today", 'Admin', "$ip", 'Host group', 'Updated', $auditlog['resourceid'], $auditlog['resourcename'], 'groups.name:', $details));
+		//$this->zbxTestTextPresent(array("$today", 'Admin', "$ip", 'Host group', 'Added', $auditlog['resourceid'], $auditlog['resourcename'], 'groups.name: '.$oldvalue.'=>'.$details));
 
 	}
 
@@ -480,14 +480,14 @@ class testPageAdministrationAudit extends CWebTest {
 	*/
 	public function testPageAdministrationAudit_DeleteHG($auditlog) {
 
-		//$this->login('auditlogs.php?stime=20130207090000&period=63072000');
-		$this->login('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
+		//$this->zbxTestLogin('auditlogs.php?stime=20130207090000&period=63072000');
+		$this->zbxTestLogin('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
 		$this->checkTitle('Audit');
 		$this->assertElementPresent('config');
 
-		$this->ok('AUDIT LOGS');
-		$this->ok('LOGS');
-		$this->ok(array('Time', 'User', 'IP', 'Resource', 'Action', 'ID', 'Description', 'Details'));
+		$this->zbxTestTextPresent('AUDIT LOGS');
+		$this->zbxTestTextPresent('LOGS');
+		$this->zbxTestTextPresent(array('Time', 'User', 'IP', 'Resource', 'Action', 'ID', 'Description', 'Details'));
 
 		$this->click('flicker_icon_l');
 
@@ -495,8 +495,8 @@ class testPageAdministrationAudit extends CWebTest {
 		$this->assertElementPresent('btn1');
 
 		$this->input_type('alias', 'Admin');
-		$this->dropdown_select('action', 'Delete');
-		$this->dropdown_select('resourcetype', 'Host group');
+		$this->zbxTestDropdownSelect('action', 'Delete');
+		$this->zbxTestDropdownSelect('resourcetype', 'Host group');
 
 		$this->click("id=filter");
 		$this->wait();
@@ -508,7 +508,7 @@ class testPageAdministrationAudit extends CWebTest {
 		$today = date("d M Y H:i:s", $time);
 		//$oldvalue = $auditlog_details['oldvalue'];
 
-		$this->ok(array("$today", 'Admin', "$ip", 'Host group', 'Deleted', $auditlog['resourceid'], $auditlog['resourcename']));
+		$this->zbxTestTextPresent(array("$today", 'Admin', "$ip", 'Host group', 'Deleted', $auditlog['resourceid'], $auditlog['resourcename']));
 
 	}
 
@@ -521,14 +521,14 @@ class testPageAdministrationAudit extends CWebTest {
 	*/
 	public function testPageAdministrationAudit_AddService($auditlog) {
 
-		//$this->login('auditlogs.php?stime=20130207090000&period=63072000');
-		$this->login('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
+		//$this->zbxTestLogin('auditlogs.php?stime=20130207090000&period=63072000');
+		$this->zbxTestLogin('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
 		$this->checkTitle('Audit');
 		$this->assertElementPresent('config');
 
-		$this->ok('AUDIT LOGS');
-		$this->ok('LOGS');
-		$this->ok(array('Time', 'User', 'IP', 'Resource', '	Action', 'ID', 'Description', 'Details'));
+		$this->zbxTestTextPresent('AUDIT LOGS');
+		$this->zbxTestTextPresent('LOGS');
+		$this->zbxTestTextPresent(array('Time', 'User', 'IP', 'Resource', '	Action', 'ID', 'Description', 'Details'));
 
 		$this->click('flicker_icon_l');
 
@@ -536,8 +536,8 @@ class testPageAdministrationAudit extends CWebTest {
 		$this->assertElementPresent('btn1');
 
 		$this->input_type('alias', 'Admin');
-		$this->dropdown_select('action', 'Add');
-		$this->dropdown_select('resourcetype', 'IT service');
+		$this->zbxTestDropdownSelect('action', 'Add');
+		$this->zbxTestDropdownSelect('resourcetype', 'IT service');
 
 		$this->click("id=filter");
 		$this->wait();
@@ -548,7 +548,7 @@ class testPageAdministrationAudit extends CWebTest {
 		$details = $auditlog['details'];
 		$today = date("d M Y H:i:s", $time);
 
-		$this->ok(array("$today", 'Admin', "$ip", 'IT service', 'Added', $auditlog['resourceid'], $details));
+		$this->zbxTestTextPresent(array("$today", 'Admin', "$ip", 'IT service', 'Added', $auditlog['resourceid'], $details));
 
 	}
 
@@ -561,14 +561,14 @@ class testPageAdministrationAudit extends CWebTest {
 	*/
 	public function testPageAdministrationAudit_UpdateService($auditlog) {
 
-		//$this->login('auditlogs.php?stime=20130207090000&period=63072000');
-		$this->login('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
+		//$this->zbxTestLogin('auditlogs.php?stime=20130207090000&period=63072000');
+		$this->zbxTestLogin('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
 		$this->checkTitle('Audit');
 		$this->assertElementPresent('config');
 
-		$this->ok('AUDIT LOGS');
-		$this->ok('LOGS');
-		$this->ok(array('Time', 'User', 'IP', 'Resource', '	Action', 'ID', 'Description', 'Details'));
+		$this->zbxTestTextPresent('AUDIT LOGS');
+		$this->zbxTestTextPresent('LOGS');
+		$this->zbxTestTextPresent(array('Time', 'User', 'IP', 'Resource', '	Action', 'ID', 'Description', 'Details'));
 
 		$this->click('flicker_icon_l');
 
@@ -576,8 +576,8 @@ class testPageAdministrationAudit extends CWebTest {
 		$this->assertElementPresent('btn1');
 
 		$this->input_type('alias', 'Admin');
-		$this->dropdown_select('action', 'Update');
-		$this->dropdown_select('resourcetype', 'IT service');
+		$this->zbxTestDropdownSelect('action', 'Update');
+		$this->zbxTestDropdownSelect('resourcetype', 'IT service');
 
 		$this->click("id=filter");
 		$this->wait();
@@ -588,7 +588,7 @@ class testPageAdministrationAudit extends CWebTest {
 		$details = $auditlog['details'];
 		$today = date("d M Y H:i:s", $time);
 
-		$this->ok(array("$today", 'Admin', "$ip", 'IT service', 'Updated', $auditlog['resourceid'], $details));
+		$this->zbxTestTextPresent(array("$today", 'Admin', "$ip", 'IT service', 'Updated', $auditlog['resourceid'], $details));
 
 	}
 
@@ -601,14 +601,14 @@ class testPageAdministrationAudit extends CWebTest {
 	*/
 	public function testPageAdministrationAudit_DeleteService($auditlog) {
 
-		//$this->login('auditlogs.php?stime=20130207090000&period=63072000');
-		$this->login('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
+		//$this->zbxTestLogin('auditlogs.php?stime=20130207090000&period=63072000');
+		$this->zbxTestLogin('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
 		$this->checkTitle('Audit');
 		$this->assertElementPresent('config');
 
-		$this->ok('AUDIT LOGS');
-		$this->ok('LOGS');
-		$this->ok(array('Time', 'User', 'IP', 'Resource', '	Action', 'ID', 'Description', 'Details'));
+		$this->zbxTestTextPresent('AUDIT LOGS');
+		$this->zbxTestTextPresent('LOGS');
+		$this->zbxTestTextPresent(array('Time', 'User', 'IP', 'Resource', '	Action', 'ID', 'Description', 'Details'));
 
 		$this->click('flicker_icon_l');
 
@@ -616,8 +616,8 @@ class testPageAdministrationAudit extends CWebTest {
 		$this->assertElementPresent('btn1');
 
 		$this->input_type('alias', 'Admin');
-		$this->dropdown_select('action', 'Delete');
-		$this->dropdown_select('resourcetype', 'IT service');
+		$this->zbxTestDropdownSelect('action', 'Delete');
+		$this->zbxTestDropdownSelect('resourcetype', 'IT service');
 
 		$this->click("id=filter");
 		$this->wait();
@@ -628,7 +628,7 @@ class testPageAdministrationAudit extends CWebTest {
 		$details = $auditlog['details'];
 		$today = date("d M Y H:i:s", $time);
 
-		$this->ok(array("$today", 'Admin', "$ip", 'IT service', 'Deleted', $auditlog['resourceid'], $details));
+		$this->zbxTestTextPresent(array("$today", 'Admin', "$ip", 'IT service', 'Deleted', $auditlog['resourceid'], $details));
 
 	}
 
@@ -641,14 +641,14 @@ class testPageAdministrationAudit extends CWebTest {
 	*/
 	public function testPageAdministrationAudit_AddImage($auditlog) {
 
-		//$this->login('auditlogs.php?stime=20130207090000&period=63072000');
-		$this->login('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
+		//$this->zbxTestLogin('auditlogs.php?stime=20130207090000&period=63072000');
+		$this->zbxTestLogin('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
 		$this->checkTitle('Audit');
 		$this->assertElementPresent('config');
 
-		$this->ok('AUDIT LOGS');
-		$this->ok('LOGS');
-		$this->ok(array('Time', 'User', 'IP', 'Resource', '	Action', 'ID', 'Description', 'Details'));
+		$this->zbxTestTextPresent('AUDIT LOGS');
+		$this->zbxTestTextPresent('LOGS');
+		$this->zbxTestTextPresent(array('Time', 'User', 'IP', 'Resource', '	Action', 'ID', 'Description', 'Details'));
 
 		$this->click('flicker_icon_l');
 
@@ -656,8 +656,8 @@ class testPageAdministrationAudit extends CWebTest {
 		$this->assertElementPresent('btn1');
 
 		$this->input_type('alias', 'Admin');
-		$this->dropdown_select('action', 'Add');
-		$this->dropdown_select('resourcetype', 'Image');
+		$this->zbxTestDropdownSelect('action', 'Add');
+		$this->zbxTestDropdownSelect('resourcetype', 'Image');
 
 		$this->click("id=filter");
 		$this->wait();
@@ -668,7 +668,7 @@ class testPageAdministrationAudit extends CWebTest {
 		$details = $auditlog['details'];
 		$today = date("d M Y H:i:s", $time);
 
-		$this->ok(array("$today", 'Admin', "$ip", 'Image', 'Added', $auditlog['resourceid'], $details));
+		$this->zbxTestTextPresent(array("$today", 'Admin', "$ip", 'Image', 'Added', $auditlog['resourceid'], $details));
 
 	}
 
@@ -681,13 +681,13 @@ class testPageAdministrationAudit extends CWebTest {
 	*/
 	public function testPageAdministrationAudit_UpdateImage($auditlog) {
 
-		$this->login('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
+		$this->zbxTestLogin('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
 		$this->checkTitle('Audit');
 		$this->assertElementPresent('config');
 
-		$this->ok('AUDIT LOGS');
-		$this->ok('LOGS');
-		$this->ok(array('Time', 'User', 'IP', 'Resource', '	Action', 'ID', 'Description', 'Details'));
+		$this->zbxTestTextPresent('AUDIT LOGS');
+		$this->zbxTestTextPresent('LOGS');
+		$this->zbxTestTextPresent(array('Time', 'User', 'IP', 'Resource', '	Action', 'ID', 'Description', 'Details'));
 
 		$this->click('flicker_icon_l');
 
@@ -695,8 +695,8 @@ class testPageAdministrationAudit extends CWebTest {
 		$this->assertElementPresent('btn1');
 
 		$this->input_type('alias', 'Admin');
-		$this->dropdown_select('action', 'Update');
-		$this->dropdown_select('resourcetype', 'Image');
+		$this->zbxTestDropdownSelect('action', 'Update');
+		$this->zbxTestDropdownSelect('resourcetype', 'Image');
 
 		$this->click("id=filter");
 		$this->wait();
@@ -707,7 +707,7 @@ class testPageAdministrationAudit extends CWebTest {
 		$details = $auditlog['details'];
 		$today = date("d M Y H:i:s", $time);
 
-		$this->ok(array("$today", 'Admin', "$ip", 'Image', 'Updated', $auditlog['resourceid'], $details));
+		$this->zbxTestTextPresent(array("$today", 'Admin', "$ip", 'Image', 'Updated', $auditlog['resourceid'], $details));
 
 	}
 
@@ -720,14 +720,14 @@ class testPageAdministrationAudit extends CWebTest {
 	*/
 	public function testPageAdministrationAudit_DeleteImage($auditlog) {
 
-		//$this->login('auditlogs.php?stime=20130207090000&period=63072000');
-		$this->login('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
+		//$this->zbxTestLogin('auditlogs.php?stime=20130207090000&period=63072000');
+		$this->zbxTestLogin('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
 		$this->checkTitle('Audit');
 		$this->assertElementPresent('config');
 
-		$this->ok('AUDIT LOGS');
-		$this->ok('LOGS');
-		$this->ok(array('Time', 'User', 'IP', 'Resource', '	Action', 'ID', 'Description', 'Details'));
+		$this->zbxTestTextPresent('AUDIT LOGS');
+		$this->zbxTestTextPresent('LOGS');
+		$this->zbxTestTextPresent(array('Time', 'User', 'IP', 'Resource', '	Action', 'ID', 'Description', 'Details'));
 
 		$this->click('flicker_icon_l');
 
@@ -735,8 +735,8 @@ class testPageAdministrationAudit extends CWebTest {
 		$this->assertElementPresent('btn1');
 
 		$this->input_type('alias', 'Admin');
-		$this->dropdown_select('action', 'Delete');
-		$this->dropdown_select('resourcetype', 'Image');
+		$this->zbxTestDropdownSelect('action', 'Delete');
+		$this->zbxTestDropdownSelect('resourcetype', 'Image');
 
 		$this->click("id=filter");
 		$this->wait();
@@ -747,7 +747,7 @@ class testPageAdministrationAudit extends CWebTest {
 		$details = $auditlog['details'];
 		$today = date("d M Y H:i:s", $time);
 
-		$this->ok(array("$today", 'Admin', "$ip", 'Image', 'Deleted', $auditlog['resourceid'], $details));
+		$this->zbxTestTextPresent(array("$today", 'Admin', "$ip", 'Image', 'Deleted', $auditlog['resourceid'], $details));
 
 	}
 
@@ -760,13 +760,13 @@ class testPageAdministrationAudit extends CWebTest {
 	*/
 	public function testPageAdministrationAudit_AddItem($auditlog) {
 
-		$this->login('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
+		$this->zbxTestLogin('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
 		$this->checkTitle('Audit');
 		$this->assertElementPresent('config');
 
-		$this->ok('AUDIT LOGS');
-		$this->ok('LOGS');
-		$this->ok(array('Time', 'User', 'IP', 'Resource', '	Action', 'ID', 'Description', 'Details'));
+		$this->zbxTestTextPresent('AUDIT LOGS');
+		$this->zbxTestTextPresent('LOGS');
+		$this->zbxTestTextPresent(array('Time', 'User', 'IP', 'Resource', '	Action', 'ID', 'Description', 'Details'));
 
 		$this->click('flicker_icon_l');
 
@@ -774,8 +774,8 @@ class testPageAdministrationAudit extends CWebTest {
 		$this->assertElementPresent('btn1');
 
 		$this->input_type('alias', 'Admin');
-		$this->dropdown_select('action', 'Add');
-		$this->dropdown_select('resourcetype', 'Item');
+		$this->zbxTestDropdownSelect('action', 'Add');
+		$this->zbxTestDropdownSelect('resourcetype', 'Item');
 
 		$this->click("id=filter");
 		$this->wait();
@@ -786,7 +786,7 @@ class testPageAdministrationAudit extends CWebTest {
 		$details = $auditlog['details'];
 		$today = date("d M Y H:i:s", $time);
 
-		$this->ok(array("$today", 'Admin', "$ip", 'Item', 'Added', $auditlog['resourceid'], 'Item added'));
+		$this->zbxTestTextPresent(array("$today", 'Admin', "$ip", 'Item', 'Added', $auditlog['resourceid'], 'Item added'));
 
 	}
 
@@ -799,13 +799,13 @@ class testPageAdministrationAudit extends CWebTest {
 	*/
 	public function testPageAdministrationAudit_UpdateItem($auditlog) {
 
-		$this->login('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
+		$this->zbxTestLogin('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
 		$this->checkTitle('Audit');
 		$this->assertElementPresent('config');
 
-		$this->ok('AUDIT LOGS');
-		$this->ok('LOGS');
-		$this->ok(array('Time', 'User', 'IP', 'Resource', '	Action', 'ID', 'Description', 'Details'));
+		$this->zbxTestTextPresent('AUDIT LOGS');
+		$this->zbxTestTextPresent('LOGS');
+		$this->zbxTestTextPresent(array('Time', 'User', 'IP', 'Resource', '	Action', 'ID', 'Description', 'Details'));
 
 		$this->click('flicker_icon_l');
 
@@ -813,8 +813,8 @@ class testPageAdministrationAudit extends CWebTest {
 		$this->assertElementPresent('btn1');
 
 		$this->input_type('alias', 'Admin');
-		$this->dropdown_select('action', 'Update');
-		$this->dropdown_select('resourcetype', 'Item');
+		$this->zbxTestDropdownSelect('action', 'Update');
+		$this->zbxTestDropdownSelect('resourcetype', 'Item');
 
 		$this->click("id=filter");
 		$this->wait();
@@ -825,7 +825,7 @@ class testPageAdministrationAudit extends CWebTest {
 		$details = $auditlog['details'];
 		$today = date("d M Y H:i:s", $time);
 
-		$this->ok(array("$today", 'Admin', "$ip", 'Item', 'Updated', $auditlog['resourceid'], 'Item updated'));
+		$this->zbxTestTextPresent(array("$today", 'Admin', "$ip", 'Item', 'Updated', $auditlog['resourceid'], 'Item updated'));
 
 	}
 
@@ -838,13 +838,13 @@ class testPageAdministrationAudit extends CWebTest {
 	*/
 	public function testPageAdministrationAudit_DeleteItem($auditlog) {
 
-		$this->login('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
+		$this->zbxTestLogin('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
 		$this->checkTitle('Audit');
 		$this->assertElementPresent('config');
 
-		$this->ok('AUDIT LOGS');
-		$this->ok('LOGS');
-		$this->ok(array('Time', 'User', 'IP', 'Resource', '	Action', 'ID', 'Description', 'Details'));
+		$this->zbxTestTextPresent('AUDIT LOGS');
+		$this->zbxTestTextPresent('LOGS');
+		$this->zbxTestTextPresent(array('Time', 'User', 'IP', 'Resource', '	Action', 'ID', 'Description', 'Details'));
 
 		$this->click('flicker_icon_l');
 
@@ -852,8 +852,8 @@ class testPageAdministrationAudit extends CWebTest {
 		$this->assertElementPresent('btn1');
 
 		$this->input_type('alias', 'Admin');
-		$this->dropdown_select('action', 'Delete');
-		$this->dropdown_select('resourcetype', 'Item');
+		$this->zbxTestDropdownSelect('action', 'Delete');
+		$this->zbxTestDropdownSelect('resourcetype', 'Item');
 
 		$this->click("id=filter");
 		$this->wait();
@@ -863,7 +863,7 @@ class testPageAdministrationAudit extends CWebTest {
 		$time = $auditlog['clock'];
 		$details = $auditlog['details'];
 		$today = date("d M Y H:i:s", $time);
-		$this->ok(array("$today", 'Admin', "$ip", 'Item', 'Deleted', $auditlog['resourceid'], 'Item deleted', $details));
+		$this->zbxTestTextPresent(array("$today", 'Admin', "$ip", 'Item', 'Deleted', $auditlog['resourceid'], 'Item deleted', $details));
 
 	}
 
@@ -876,13 +876,13 @@ class testPageAdministrationAudit extends CWebTest {
 	*/
 	public function testPageAdministrationAudit_DisableItem($auditlog) {
 
-		$this->login('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
+		$this->zbxTestLogin('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
 		$this->checkTitle('Audit');
 		$this->assertElementPresent('config');
 
-		$this->ok('AUDIT LOGS');
-		$this->ok('LOGS');
-		$this->ok(array('Time', 'User', 'IP', 'Resource', '	Action', 'ID', 'Description', 'Details'));
+		$this->zbxTestTextPresent('AUDIT LOGS');
+		$this->zbxTestTextPresent('LOGS');
+		$this->zbxTestTextPresent(array('Time', 'User', 'IP', 'Resource', '	Action', 'ID', 'Description', 'Details'));
 
 		$this->click('flicker_icon_l');
 
@@ -891,8 +891,8 @@ class testPageAdministrationAudit extends CWebTest {
 
 		$this->input_type('alias', 'Admin');
 		// at this moment there is not implemented "Enable/Disable" action, it is recorded as "Update" action
-		$this->dropdown_select('action', 'Update');
-		$this->dropdown_select('resourcetype', 'Item');
+		$this->zbxTestDropdownSelect('action', 'Update');
+		$this->zbxTestDropdownSelect('resourcetype', 'Item');
 
 		$this->click("id=filter");
 		$this->wait();
@@ -902,7 +902,7 @@ class testPageAdministrationAudit extends CWebTest {
 		$time = $auditlog['clock'];
 		$details = $auditlog['details'];
 		$today = date("d M Y H:i:s", $time);
-		$this->ok(array("$today", 'Admin', "$ip", 'Item', 'Updated', $auditlog['resourceid'], $auditlog['resourcename'], 'items.status: 0 => 1'));
+		$this->zbxTestTextPresent(array("$today", 'Admin', "$ip", 'Item', 'Updated', $auditlog['resourceid'], $auditlog['resourcename'], 'items.status: 0 => 1'));
 
 	}
 
@@ -915,13 +915,13 @@ class testPageAdministrationAudit extends CWebTest {
 	*/
 	public function testPageAdministrationAudit_EnableItem($auditlog) {
 
-		$this->login('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
+		$this->zbxTestLogin('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
 		$this->checkTitle('Audit');
 		$this->assertElementPresent('config');
 
-		$this->ok('AUDIT LOGS');
-		$this->ok('LOGS');
-		$this->ok(array('Time', 'User', 'IP', 'Resource', '	Action', 'ID', 'Description', 'Details'));
+		$this->zbxTestTextPresent('AUDIT LOGS');
+		$this->zbxTestTextPresent('LOGS');
+		$this->zbxTestTextPresent(array('Time', 'User', 'IP', 'Resource', '	Action', 'ID', 'Description', 'Details'));
 
 		$this->click('flicker_icon_l');
 
@@ -930,8 +930,8 @@ class testPageAdministrationAudit extends CWebTest {
 
 		$this->input_type('alias', 'Admin');
 		// at this moment there is not implemented "Enable/Disable" action, it is recorded as "Update" action
-		$this->dropdown_select('action', 'Update');
-		$this->dropdown_select('resourcetype', 'Item');
+		$this->zbxTestDropdownSelect('action', 'Update');
+		$this->zbxTestDropdownSelect('resourcetype', 'Item');
 
 		$this->click("id=filter");
 		$this->wait();
@@ -941,7 +941,7 @@ class testPageAdministrationAudit extends CWebTest {
 		$time = $auditlog['clock'];
 		$details = $auditlog['details'];
 		$today = date("d M Y H:i:s", $time);
-		$this->ok(array("$today", 'Admin', "$ip", 'Item', 'Updated', $auditlog['resourceid'], $auditlog['resourcename'], 'items.status: 1 => 0'));
+		$this->zbxTestTextPresent(array("$today", 'Admin', "$ip", 'Item', 'Updated', $auditlog['resourceid'], $auditlog['resourcename'], 'items.status: 1 => 0'));
 
 	}
 
@@ -954,13 +954,13 @@ class testPageAdministrationAudit extends CWebTest {
 	*/
 	public function testPageAdministrationAudit_AddTrigger($auditlog) {
 
-		$this->login('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
+		$this->zbxTestLogin('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
 		$this->checkTitle('Audit');
 		$this->assertElementPresent('config');
 
-		$this->ok('AUDIT LOGS');
-		$this->ok('LOGS');
-		$this->ok(array('Time', 'User', 'IP', 'Resource', '	Action', 'ID', 'Description', 'Details'));
+		$this->zbxTestTextPresent('AUDIT LOGS');
+		$this->zbxTestTextPresent('LOGS');
+		$this->zbxTestTextPresent(array('Time', 'User', 'IP', 'Resource', '	Action', 'ID', 'Description', 'Details'));
 
 		$this->click('flicker_icon_l');
 
@@ -968,8 +968,8 @@ class testPageAdministrationAudit extends CWebTest {
 		$this->assertElementPresent('btn1');
 
 		$this->input_type('alias', 'Admin');
-		$this->dropdown_select('action', 'Add');
-		$this->dropdown_select('resourcetype', 'Trigger');
+		$this->zbxTestDropdownSelect('action', 'Add');
+		$this->zbxTestDropdownSelect('resourcetype', 'Trigger');
 
 		$this->click("id=filter");
 		$this->wait();
@@ -980,7 +980,7 @@ class testPageAdministrationAudit extends CWebTest {
 		$details = $auditlog['details'];
 		$today = date("d M Y H:i:s", $time);
 
-		$this->ok(array("$today", 'Admin', "$ip", 'Trigger', 'Added', $auditlog['resourceid'], $auditlog['resourcename'], ''));
+		$this->zbxTestTextPresent(array("$today", 'Admin', "$ip", 'Trigger', 'Added', $auditlog['resourceid'], $auditlog['resourcename'], ''));
 
 	}
 
@@ -995,13 +995,13 @@ class testPageAdministrationAudit extends CWebTest {
 	*/
 	public function testPageAdministrationAudit_UpdateTrigger($auditlog) {
 
-		$this->login('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
+		$this->zbxTestLogin('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
 		$this->checkTitle('Audit');
 		$this->assertElementPresent('config');
 
-		$this->ok('AUDIT LOGS');
-		$this->ok('LOGS');
-		$this->ok(array('Time', 'User', 'IP', 'Resource', '	Action', 'ID', 'Description', 'Details'));
+		$this->zbxTestTextPresent('AUDIT LOGS');
+		$this->zbxTestTextPresent('LOGS');
+		$this->zbxTestTextPresent(array('Time', 'User', 'IP', 'Resource', '	Action', 'ID', 'Description', 'Details'));
 
 		$this->click('flicker_icon_l');
 
@@ -1009,8 +1009,8 @@ class testPageAdministrationAudit extends CWebTest {
 		$this->assertElementPresent('btn1');
 
 		$this->input_type('alias', 'Admin');
-		$this->dropdown_select('action', 'Update');
-		$this->dropdown_select('resourcetype', 'Trigger');
+		$this->zbxTestDropdownSelect('action', 'Update');
+		$this->zbxTestDropdownSelect('resourcetype', 'Trigger');
 
 		$this->click("id=filter");
 		$this->wait();
@@ -1022,8 +1022,8 @@ class testPageAdministrationAudit extends CWebTest {
 		$details = '.'.$auditlog['field_name'].': '.$auditlog['oldvalue'].' => '.$auditlog['newvalue'];
 		$today = date("d M Y H:i:s", $time);
 
-		//$this->ok(array("$today", 'Admin', "$ip", 'Trigger', 'Updated', $auditlog['resourceid'], $auditlog['resourcename']));
-		$this->ok(array("$today", 'Admin', "$ip", 'Trigger', 'Updated', $auditlog['resourceid'], "$details"));
+		//$this->zbxTestTextPresent(array("$today", 'Admin', "$ip", 'Trigger', 'Updated', $auditlog['resourceid'], $auditlog['resourcename']));
+		$this->zbxTestTextPresent(array("$today", 'Admin', "$ip", 'Trigger', 'Updated', $auditlog['resourceid'], "$details"));
 
 	}
 
@@ -1036,13 +1036,13 @@ class testPageAdministrationAudit extends CWebTest {
 	*/
 	public function testPageAdministrationAudit_DeleteTrigger($auditlog) {
 
-		$this->login('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
+		$this->zbxTestLogin('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
 		$this->checkTitle('Audit');
 		$this->assertElementPresent('config');
 
-		$this->ok('AUDIT LOGS');
-		$this->ok('LOGS');
-		$this->ok(array('Time', 'User', 'IP', 'Resource', '	Action', 'ID', 'Description', 'Details'));
+		$this->zbxTestTextPresent('AUDIT LOGS');
+		$this->zbxTestTextPresent('LOGS');
+		$this->zbxTestTextPresent(array('Time', 'User', 'IP', 'Resource', '	Action', 'ID', 'Description', 'Details'));
 
 		$this->click('flicker_icon_l');
 
@@ -1050,8 +1050,8 @@ class testPageAdministrationAudit extends CWebTest {
 		$this->assertElementPresent('btn1');
 
 		$this->input_type('alias', 'Admin');
-		$this->dropdown_select('action', 'Delete');
-		$this->dropdown_select('resourcetype', 'Trigger');
+		$this->zbxTestDropdownSelect('action', 'Delete');
+		$this->zbxTestDropdownSelect('resourcetype', 'Trigger');
 
 		$this->click("id=filter");
 		$this->wait();
@@ -1061,7 +1061,7 @@ class testPageAdministrationAudit extends CWebTest {
 		$time = $auditlog['clock'];
 		$details = $auditlog['details'];
 		$today = date("d M Y H:i:s", $time);
-		$this->ok(array("$today", 'Admin', "$ip", 'Trigger', 'Deleted', $auditlog['resourceid'], 'updated'));
+		$this->zbxTestTextPresent(array("$today", 'Admin', "$ip", 'Trigger', 'Deleted', $auditlog['resourceid'], 'updated'));
 
 	}
 
@@ -1074,13 +1074,13 @@ class testPageAdministrationAudit extends CWebTest {
 	*/
 	public function testPageAdministrationAudit_DisableTrigger($auditlog) {
 
-		$this->login('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
+		$this->zbxTestLogin('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
 		$this->checkTitle('Audit');
 		$this->assertElementPresent('config');
 
-		$this->ok('AUDIT LOGS');
-		$this->ok('LOGS');
-		$this->ok(array('Time', 'User', 'IP', 'Resource', '	Action', 'ID', 'Description', 'Details'));
+		$this->zbxTestTextPresent('AUDIT LOGS');
+		$this->zbxTestTextPresent('LOGS');
+		$this->zbxTestTextPresent(array('Time', 'User', 'IP', 'Resource', '	Action', 'ID', 'Description', 'Details'));
 
 		$this->click('flicker_icon_l');
 
@@ -1089,8 +1089,8 @@ class testPageAdministrationAudit extends CWebTest {
 
 		$this->input_type('alias', 'Admin');
 		// at this moment there is not implemented "Enable/Disable" action, it is recorded as "Update" action
-		$this->dropdown_select('action', 'Update');
-		$this->dropdown_select('resourcetype', 'Trigger');
+		$this->zbxTestDropdownSelect('action', 'Update');
+		$this->zbxTestDropdownSelect('resourcetype', 'Trigger');
 
 		$this->click("id=filter");
 		$this->wait();
@@ -1100,7 +1100,7 @@ class testPageAdministrationAudit extends CWebTest {
 		$time = $auditlog['clock'];
 		$details = $auditlog['details'];
 		$today = date("d M Y H:i:s", $time);
-		$this->ok(array("$today", 'Admin', "$ip", 'Trigger', 'Updated', $auditlog['resourceid'], $auditlog['resourcename'], 'triggers.status: 0 => 1'));
+		$this->zbxTestTextPresent(array("$today", 'Admin', "$ip", 'Trigger', 'Updated', $auditlog['resourceid'], $auditlog['resourcename'], 'triggers.status: 0 => 1'));
 
 	}
 
@@ -1113,13 +1113,13 @@ class testPageAdministrationAudit extends CWebTest {
 	*/
 	public function testPageAdministrationAudit_EnableTrigger($auditlog) {
 
-		$this->login('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
+		$this->zbxTestLogin('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
 		$this->checkTitle('Audit');
 		$this->assertElementPresent('config');
 
-		$this->ok('AUDIT LOGS');
-		$this->ok('LOGS');
-		$this->ok(array('Time', 'User', 'IP', 'Resource', '	Action', 'ID', 'Description', 'Details'));
+		$this->zbxTestTextPresent('AUDIT LOGS');
+		$this->zbxTestTextPresent('LOGS');
+		$this->zbxTestTextPresent(array('Time', 'User', 'IP', 'Resource', '	Action', 'ID', 'Description', 'Details'));
 
 		$this->click('flicker_icon_l');
 
@@ -1128,8 +1128,8 @@ class testPageAdministrationAudit extends CWebTest {
 
 		$this->input_type('alias', 'Admin');
 		// at this moment there is not implemented "Enable/Disable" action, it is recorded as "Update" action
-		$this->dropdown_select('action', 'Update');
-		$this->dropdown_select('resourcetype', 'Trigger');
+		$this->zbxTestDropdownSelect('action', 'Update');
+		$this->zbxTestDropdownSelect('resourcetype', 'Trigger');
 
 		$this->click("id=filter");
 		$this->wait();
@@ -1139,7 +1139,7 @@ class testPageAdministrationAudit extends CWebTest {
 		$time = $auditlog['clock'];
 		$details = $auditlog['details'];
 		$today = date("d M Y H:i:s", $time);
-		$this->ok(array("$today", 'Admin', "$ip", 'Trigger', 'Updated', $auditlog['resourceid'], $auditlog['resourcename'], 'triggers.status: 1 => 0'));
+		$this->zbxTestTextPresent(array("$today", 'Admin', "$ip", 'Trigger', 'Updated', $auditlog['resourceid'], $auditlog['resourcename'], 'triggers.status: 1 => 0'));
 
 	}
 
@@ -1152,13 +1152,13 @@ class testPageAdministrationAudit extends CWebTest {
 	*/
 	public function testPageAdministrationAudit_AddGraph($auditlog) {
 
-		$this->login('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
+		$this->zbxTestLogin('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
 		$this->checkTitle('Audit');
 		$this->assertElementPresent('config');
 
-		$this->ok('AUDIT LOGS');
-		$this->ok('LOGS');
-		$this->ok(array('Time', 'User', 'IP', 'Resource', '	Action', 'ID', 'Description', 'Details'));
+		$this->zbxTestTextPresent('AUDIT LOGS');
+		$this->zbxTestTextPresent('LOGS');
+		$this->zbxTestTextPresent(array('Time', 'User', 'IP', 'Resource', '	Action', 'ID', 'Description', 'Details'));
 
 		$this->click('flicker_icon_l');
 
@@ -1166,8 +1166,8 @@ class testPageAdministrationAudit extends CWebTest {
 		$this->assertElementPresent('btn1');
 
 		$this->input_type('alias', 'Admin');
-		$this->dropdown_select('action', 'Add');
-		$this->dropdown_select('resourcetype', 'Graph');
+		$this->zbxTestDropdownSelect('action', 'Add');
+		$this->zbxTestDropdownSelect('resourcetype', 'Graph');
 
 		$this->click("id=filter");
 		$this->wait();
@@ -1178,7 +1178,7 @@ class testPageAdministrationAudit extends CWebTest {
 		$details = $auditlog['details'];
 		$today = date("d M Y H:i:s", $time);
 
-		$this->ok(array("$today", 'Admin', "$ip", 'Graph', 'Added', $auditlog['resourceid'], '', $auditlog['details']));
+		$this->zbxTestTextPresent(array("$today", 'Admin', "$ip", 'Graph', 'Added', $auditlog['resourceid'], '', $auditlog['details']));
 
 	}
 
@@ -1191,13 +1191,13 @@ class testPageAdministrationAudit extends CWebTest {
 	*/
 	public function testPageAdministrationAudit_UpdateGraph($auditlog) {
 
-		$this->login('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
+		$this->zbxTestLogin('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
 		$this->checkTitle('Audit');
 		$this->assertElementPresent('config');
 
-		$this->ok('AUDIT LOGS');
-		$this->ok('LOGS');
-		$this->ok(array('Time', 'User', 'IP', 'Resource', '	Action', 'ID', 'Description', 'Details'));
+		$this->zbxTestTextPresent('AUDIT LOGS');
+		$this->zbxTestTextPresent('LOGS');
+		$this->zbxTestTextPresent(array('Time', 'User', 'IP', 'Resource', '	Action', 'ID', 'Description', 'Details'));
 
 		$this->click('flicker_icon_l');
 
@@ -1205,8 +1205,8 @@ class testPageAdministrationAudit extends CWebTest {
 		$this->assertElementPresent('btn1');
 
 		$this->input_type('alias', 'Admin');
-		$this->dropdown_select('action', 'Update');
-		$this->dropdown_select('resourcetype', 'Graph');
+		$this->zbxTestDropdownSelect('action', 'Update');
+		$this->zbxTestDropdownSelect('resourcetype', 'Graph');
 
 		$this->click("id=filter");
 		$this->wait();
@@ -1217,7 +1217,7 @@ class testPageAdministrationAudit extends CWebTest {
 		$details = $auditlog['details'];
 		$today = date("d M Y H:i:s", $time);
 
-		$this->ok(array("$today", 'Admin', "$ip", 'Graph', 'Updated', $auditlog['resourceid'], $auditlog['details']));
+		$this->zbxTestTextPresent(array("$today", 'Admin', "$ip", 'Graph', 'Updated', $auditlog['resourceid'], $auditlog['details']));
 
 	}
 
@@ -1230,13 +1230,13 @@ class testPageAdministrationAudit extends CWebTest {
 	*/
 	public function testPageAdministrationAudit_DeleteGraph($auditlog) {
 
-		$this->login('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
+		$this->zbxTestLogin('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
 		$this->checkTitle('Audit');
 		$this->assertElementPresent('config');
 
-		$this->ok('AUDIT LOGS');
-		$this->ok('LOGS');
-		$this->ok(array('Time', 'User', 'IP', 'Resource', '	Action', 'ID', 'Description', 'Details'));
+		$this->zbxTestTextPresent('AUDIT LOGS');
+		$this->zbxTestTextPresent('LOGS');
+		$this->zbxTestTextPresent(array('Time', 'User', 'IP', 'Resource', '	Action', 'ID', 'Description', 'Details'));
 
 		$this->click('flicker_icon_l');
 
@@ -1244,8 +1244,8 @@ class testPageAdministrationAudit extends CWebTest {
 		$this->assertElementPresent('btn1');
 
 		$this->input_type('alias', 'Admin');
-		$this->dropdown_select('action', 'Delete');
-		$this->dropdown_select('resourcetype', 'Graph');
+		$this->zbxTestDropdownSelect('action', 'Delete');
+		$this->zbxTestDropdownSelect('resourcetype', 'Graph');
 
 		$this->click("id=filter");
 		$this->wait();
@@ -1255,7 +1255,7 @@ class testPageAdministrationAudit extends CWebTest {
 		$time = $auditlog['clock'];
 		$details = $auditlog['details'];
 		$today = date("d M Y H:i:s", $time);
-		$this->ok(array("$today", 'Admin', "$ip", 'Graph', 'Deleted', $auditlog['resourceid'], $auditlog['resourceid'], $auditlog['details']));
+		$this->zbxTestTextPresent(array("$today", 'Admin', "$ip", 'Graph', 'Deleted', $auditlog['resourceid'], $auditlog['resourceid'], $auditlog['details']));
 
 	}
 
@@ -1268,13 +1268,13 @@ class testPageAdministrationAudit extends CWebTest {
 	*/
 	public function testPageAdministrationAudit_AddAction($auditlog) {
 
-		$this->login('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
+		$this->zbxTestLogin('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
 		$this->checkTitle('Audit');
 		$this->assertElementPresent('config');
 
-		$this->ok('AUDIT LOGS');
-		$this->ok('LOGS');
-		$this->ok(array('Time', 'User', 'IP', 'Resource', '	Action', 'ID', 'Description', 'Details'));
+		$this->zbxTestTextPresent('AUDIT LOGS');
+		$this->zbxTestTextPresent('LOGS');
+		$this->zbxTestTextPresent(array('Time', 'User', 'IP', 'Resource', '	Action', 'ID', 'Description', 'Details'));
 
 		$this->click('flicker_icon_l');
 
@@ -1282,8 +1282,8 @@ class testPageAdministrationAudit extends CWebTest {
 		$this->assertElementPresent('btn1');
 
 		$this->input_type('alias', 'Admin');
-		$this->dropdown_select('action', 'Add');
-		$this->dropdown_select('resourcetype', 'Action');
+		$this->zbxTestDropdownSelect('action', 'Add');
+		$this->zbxTestDropdownSelect('resourcetype', 'Action');
 
 		$this->click("id=filter");
 		$this->wait();
@@ -1294,7 +1294,7 @@ class testPageAdministrationAudit extends CWebTest {
 		$details = $auditlog['details'];
 		$today = date("d M Y H:i:s", $time);
 
-		$this->ok(array("$today", 'Admin', "$ip", 'Action', 'Added', $auditlog['resourceid'], '', $auditlog['details']));
+		$this->zbxTestTextPresent(array("$today", 'Admin', "$ip", 'Action', 'Added', $auditlog['resourceid'], '', $auditlog['details']));
 
 	}
 
@@ -1307,13 +1307,13 @@ class testPageAdministrationAudit extends CWebTest {
 	*/
 	public function testPageAdministrationAudit_UpdateAction($auditlog) {
 
-		$this->login('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
+		$this->zbxTestLogin('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
 		$this->checkTitle('Audit');
 		$this->assertElementPresent('config');
 
-		$this->ok('AUDIT LOGS');
-		$this->ok('LOGS');
-		$this->ok(array('Time', 'User', 'IP', 'Resource', 'Action', 'ID', 'Description', 'Details'));
+		$this->zbxTestTextPresent('AUDIT LOGS');
+		$this->zbxTestTextPresent('LOGS');
+		$this->zbxTestTextPresent(array('Time', 'User', 'IP', 'Resource', 'Action', 'ID', 'Description', 'Details'));
 
 		$this->click('flicker_icon_l');
 
@@ -1321,8 +1321,8 @@ class testPageAdministrationAudit extends CWebTest {
 		$this->assertElementPresent('btn1');
 
 		$this->input_type('alias', 'Admin');
-		$this->dropdown_select('action', 'Update');
-		$this->dropdown_select('resourcetype', 'Action');
+		$this->zbxTestDropdownSelect('action', 'Update');
+		$this->zbxTestDropdownSelect('resourcetype', 'Action');
 
 		$this->click("id=filter");
 		$this->wait();
@@ -1333,7 +1333,7 @@ class testPageAdministrationAudit extends CWebTest {
 		$details = $auditlog['details'];
 		$today = date("d M Y H:i:s", $time);
 
-		$this->ok(array("$today", 'Admin', "$ip", 'Action', 'Updated', $auditlog['resourceid'], $auditlog['details']));
+		$this->zbxTestTextPresent(array("$today", 'Admin', "$ip", 'Action', 'Updated', $auditlog['resourceid'], $auditlog['details']));
 
 	}
 
@@ -1346,13 +1346,13 @@ class testPageAdministrationAudit extends CWebTest {
 	*/
 	public function testPageAdministrationAudit_DeleteAction($auditlog) {
 
-		$this->login('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
+		$this->zbxTestLogin('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
 		$this->checkTitle('Audit');
 		$this->assertElementPresent('config');
 
-		$this->ok('AUDIT LOGS');
-		$this->ok('LOGS');
-		$this->ok(array('Time', 'User', 'IP', 'Resource', '	Action', 'ID', 'Description', 'Details'));
+		$this->zbxTestTextPresent('AUDIT LOGS');
+		$this->zbxTestTextPresent('LOGS');
+		$this->zbxTestTextPresent(array('Time', 'User', 'IP', 'Resource', '	Action', 'ID', 'Description', 'Details'));
 
 		$this->click('flicker_icon_l');
 
@@ -1360,8 +1360,8 @@ class testPageAdministrationAudit extends CWebTest {
 		$this->assertElementPresent('btn1');
 
 		$this->input_type('alias', 'Admin');
-		$this->dropdown_select('action', 'Delete');
-		$this->dropdown_select('resourcetype', 'Action');
+		$this->zbxTestDropdownSelect('action', 'Delete');
+		$this->zbxTestDropdownSelect('resourcetype', 'Action');
 
 		$this->click("id=filter");
 		$this->wait();
@@ -1371,7 +1371,7 @@ class testPageAdministrationAudit extends CWebTest {
 		$time = $auditlog['clock'];
 		$details = $auditlog['details'];
 		$today = date("d M Y H:i:s", $time);
-		$this->ok(array("$today", 'Admin', "$ip", 'Action', 'Deleted', $auditlog['resourceid'], 'Action deleted', $auditlog['details']));
+		$this->zbxTestTextPresent(array("$today", 'Admin', "$ip", 'Action', 'Deleted', $auditlog['resourceid'], 'Action deleted', $auditlog['details']));
 
 	}
 
@@ -1384,13 +1384,13 @@ class testPageAdministrationAudit extends CWebTest {
 	*/
 	public function testPageAdministrationAudit_DisableAction($auditlog) {
 
-		$this->login('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
+		$this->zbxTestLogin('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
 		$this->checkTitle('Audit');
 		$this->assertElementPresent('config');
 
-		$this->ok('AUDIT LOGS');
-		$this->ok('LOGS');
-		$this->ok(array('Time', 'User', 'IP', 'Resource', '	Action', 'ID', 'Description', 'Details'));
+		$this->zbxTestTextPresent('AUDIT LOGS');
+		$this->zbxTestTextPresent('LOGS');
+		$this->zbxTestTextPresent(array('Time', 'User', 'IP', 'Resource', '	Action', 'ID', 'Description', 'Details'));
 
 		$this->click('flicker_icon_l');
 
@@ -1399,8 +1399,8 @@ class testPageAdministrationAudit extends CWebTest {
 
 		$this->input_type('alias', 'Admin');
 		// at this moment there is not implemented "Enable/Disable" action, it is recorded as "Update" action
-		$this->dropdown_select('action', 'Update');
-		$this->dropdown_select('resourcetype', 'Action');
+		$this->zbxTestDropdownSelect('action', 'Update');
+		$this->zbxTestDropdownSelect('resourcetype', 'Action');
 
 		$this->click("id=filter");
 		$this->wait();
@@ -1410,7 +1410,7 @@ class testPageAdministrationAudit extends CWebTest {
 		$time = $auditlog['clock'];
 		$details = $auditlog['details'];
 		$today = date("d M Y H:i:s", $time);
-		$this->ok(array("$today", 'Admin', "$ip", 'Action', 'Updated', $auditlog['resourceid'], '', "$details"));
+		$this->zbxTestTextPresent(array("$today", 'Admin', "$ip", 'Action', 'Updated', $auditlog['resourceid'], '', "$details"));
 
 	}
 
@@ -1423,13 +1423,13 @@ class testPageAdministrationAudit extends CWebTest {
 	*/
 	public function testPageAdministrationAudit_EnableAction($auditlog) {
 
-		$this->login('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
+		$this->zbxTestLogin('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
 		$this->checkTitle('Audit');
 		$this->assertElementPresent('config');
 
-		$this->ok('AUDIT LOGS');
-		$this->ok('LOGS');
-		$this->ok(array('Time', 'User', 'IP', 'Resource', '	Action', 'ID', 'Description', 'Details'));
+		$this->zbxTestTextPresent('AUDIT LOGS');
+		$this->zbxTestTextPresent('LOGS');
+		$this->zbxTestTextPresent(array('Time', 'User', 'IP', 'Resource', '	Action', 'ID', 'Description', 'Details'));
 
 		$this->click('flicker_icon_l');
 
@@ -1438,8 +1438,8 @@ class testPageAdministrationAudit extends CWebTest {
 
 		$this->input_type('alias', 'Admin');
 		// at this moment there is not implemented "Enable/Disable" action, it is recorded as "Update" action
-		$this->dropdown_select('action', 'Update');
-		$this->dropdown_select('resourcetype', 'Action');
+		$this->zbxTestDropdownSelect('action', 'Update');
+		$this->zbxTestDropdownSelect('resourcetype', 'Action');
 
 		$this->click("id=filter");
 		$this->wait();
@@ -1449,7 +1449,7 @@ class testPageAdministrationAudit extends CWebTest {
 		$time = $auditlog['clock'];
 		$details = $auditlog['details'];
 		$today = date("d M Y H:i:s", $time);
-		$this->ok(array("$today", 'Admin', "$ip", 'Action', 'Updated', $auditlog['resourceid'], '', "$details"));
+		$this->zbxTestTextPresent(array("$today", 'Admin', "$ip", 'Action', 'Updated', $auditlog['resourceid'], '', "$details"));
 
 	}
 
@@ -1462,13 +1462,13 @@ class testPageAdministrationAudit extends CWebTest {
 	*/
 	public function testPageAdministrationAudit_AddApplication($auditlog) {
 
-		$this->login('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
+		$this->zbxTestLogin('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
 		$this->checkTitle('Audit');
 		$this->assertElementPresent('config');
 
-		$this->ok('AUDIT LOGS');
-		$this->ok('LOGS');
-		$this->ok(array('Time', 'User', 'IP', 'Resource', '	Action', 'ID', 'Description', 'Details'));
+		$this->zbxTestTextPresent('AUDIT LOGS');
+		$this->zbxTestTextPresent('LOGS');
+		$this->zbxTestTextPresent(array('Time', 'User', 'IP', 'Resource', '	Action', 'ID', 'Description', 'Details'));
 
 		$this->click('flicker_icon_l');
 
@@ -1476,8 +1476,8 @@ class testPageAdministrationAudit extends CWebTest {
 		$this->assertElementPresent('btn1');
 
 		$this->input_type('alias', 'Admin');
-		$this->dropdown_select('action', 'Add');
-		$this->dropdown_select('resourcetype', 'Application');
+		$this->zbxTestDropdownSelect('action', 'Add');
+		$this->zbxTestDropdownSelect('resourcetype', 'Application');
 
 		$this->click("id=filter");
 		$this->wait();
@@ -1487,7 +1487,7 @@ class testPageAdministrationAudit extends CWebTest {
 		$time = $auditlog['clock'];
 		$today = date("d M Y H:i:s", $time);
 
-		$this->ok(array("$today", 'Admin', "$ip", 'Application', 'Added', $auditlog['resourceid'], '', $auditlog['details']));
+		$this->zbxTestTextPresent(array("$today", 'Admin', "$ip", 'Application', 'Added', $auditlog['resourceid'], '', $auditlog['details']));
 
 	}
 
@@ -1500,13 +1500,13 @@ class testPageAdministrationAudit extends CWebTest {
 	*/
 	public function testPageAdministrationAudit_UpdateApplication($auditlog) {
 
-		$this->login('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
+		$this->zbxTestLogin('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
 		$this->checkTitle('Audit');
 		$this->assertElementPresent('config');
 
-		$this->ok('AUDIT LOGS');
-		$this->ok('LOGS');
-		$this->ok(array('Time', 'User', 'IP', 'Resource', 'Action', 'ID', 'Description', 'Details'));
+		$this->zbxTestTextPresent('AUDIT LOGS');
+		$this->zbxTestTextPresent('LOGS');
+		$this->zbxTestTextPresent(array('Time', 'User', 'IP', 'Resource', 'Action', 'ID', 'Description', 'Details'));
 
 		$this->click('flicker_icon_l');
 
@@ -1514,8 +1514,8 @@ class testPageAdministrationAudit extends CWebTest {
 		$this->assertElementPresent('btn1');
 
 		$this->input_type('alias', 'Admin');
-		$this->dropdown_select('action', 'Update');
-		$this->dropdown_select('resourcetype', 'Application');
+		$this->zbxTestDropdownSelect('action', 'Update');
+		$this->zbxTestDropdownSelect('resourcetype', 'Application');
 
 		$this->click("id=filter");
 		$this->wait();
@@ -1525,7 +1525,7 @@ class testPageAdministrationAudit extends CWebTest {
 		$time = $auditlog['clock'];
 		$today = date("d M Y H:i:s", $time);
 
-		$this->ok(array("$today", 'Admin', "$ip", 'Application', 'Updated', $auditlog['resourceid'], '', $auditlog['details']));
+		$this->zbxTestTextPresent(array("$today", 'Admin', "$ip", 'Application', 'Updated', $auditlog['resourceid'], '', $auditlog['details']));
 
 	}
 
@@ -1538,13 +1538,13 @@ class testPageAdministrationAudit extends CWebTest {
 	*/
 	public function testPageAdministrationAudit_DeleteApplication($auditlog) {
 
-		$this->login('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
+		$this->zbxTestLogin('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
 		$this->checkTitle('Audit');
 		$this->assertElementPresent('config');
 
-		$this->ok('AUDIT LOGS');
-		$this->ok('LOGS');
-		$this->ok(array('Time', 'User', 'IP', 'Resource', '	Action', 'ID', 'Description', 'Details'));
+		$this->zbxTestTextPresent('AUDIT LOGS');
+		$this->zbxTestTextPresent('LOGS');
+		$this->zbxTestTextPresent(array('Time', 'User', 'IP', 'Resource', '	Action', 'ID', 'Description', 'Details'));
 
 		$this->click('flicker_icon_l');
 
@@ -1552,8 +1552,8 @@ class testPageAdministrationAudit extends CWebTest {
 		$this->assertElementPresent('btn1');
 
 		$this->input_type('alias', 'Admin');
-		$this->dropdown_select('action', 'Delete');
-		$this->dropdown_select('resourcetype', 'Application');
+		$this->zbxTestDropdownSelect('action', 'Delete');
+		$this->zbxTestDropdownSelect('resourcetype', 'Application');
 
 		$this->click("id=filter");
 		$this->wait();
@@ -1562,7 +1562,7 @@ class testPageAdministrationAudit extends CWebTest {
 		$alias = $auditlog['alias'];
 		$time = $auditlog['clock'];
 		$today = date("d M Y H:i:s", $time);
-		$this->ok(array("$today", 'Admin', "$ip", 'Application', 'Deleted', $auditlog['resourceid'], '', $auditlog['details']));
+		$this->zbxTestTextPresent(array("$today", 'Admin', "$ip", 'Application', 'Deleted', $auditlog['resourceid'], '', $auditlog['details']));
 
 	}
 
@@ -1575,13 +1575,13 @@ class testPageAdministrationAudit extends CWebTest {
 	*/
 	public function testPageAdministrationAudit_AddDRule ($auditlog) {
 
-		$this->login('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
+		$this->zbxTestLogin('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
 		$this->checkTitle('Audit');
 		$this->assertElementPresent('config');
 
-		$this->ok('AUDIT LOGS');
-		$this->ok('LOGS');
-		$this->ok(array('Time', 'User', 'IP', 'Resource', '	Action', 'ID', 'Description', 'Details'));
+		$this->zbxTestTextPresent('AUDIT LOGS');
+		$this->zbxTestTextPresent('LOGS');
+		$this->zbxTestTextPresent(array('Time', 'User', 'IP', 'Resource', '	Action', 'ID', 'Description', 'Details'));
 
 		$this->click('flicker_icon_l');
 
@@ -1589,8 +1589,8 @@ class testPageAdministrationAudit extends CWebTest {
 		$this->assertElementPresent('btn1');
 
 		$this->input_type('alias', 'Admin');
-		$this->dropdown_select('action', 'Add');
-		$this->dropdown_select('resourcetype', 'Discovery rule');
+		$this->zbxTestDropdownSelect('action', 'Add');
+		$this->zbxTestDropdownSelect('resourcetype', 'Discovery rule');
 
 		$this->click("id=filter");
 		$this->wait();
@@ -1600,7 +1600,7 @@ class testPageAdministrationAudit extends CWebTest {
 		$time = $auditlog['clock'];
 		$today = date("d M Y H:i:s", $time);
 
-		$this->ok(array("$today", 'Admin', "$ip", 'Discovery rule', 'Added', $auditlog['resourceid'], '', $auditlog['details']));
+		$this->zbxTestTextPresent(array("$today", 'Admin', "$ip", 'Discovery rule', 'Added', $auditlog['resourceid'], '', $auditlog['details']));
 
 	}
 
@@ -1613,13 +1613,13 @@ class testPageAdministrationAudit extends CWebTest {
 	*/
 	public function testPageAdministrationAudit_UpdateDRule($auditlog) {
 
-		$this->login('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
+		$this->zbxTestLogin('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
 		$this->checkTitle('Audit');
 		$this->assertElementPresent('config');
 
-		$this->ok('AUDIT LOGS');
-		$this->ok('LOGS');
-		$this->ok(array('Time', 'User', 'IP', 'Resource', 'Action', 'ID', 'Description', 'Details'));
+		$this->zbxTestTextPresent('AUDIT LOGS');
+		$this->zbxTestTextPresent('LOGS');
+		$this->zbxTestTextPresent(array('Time', 'User', 'IP', 'Resource', 'Action', 'ID', 'Description', 'Details'));
 
 		$this->click('flicker_icon_l');
 
@@ -1627,8 +1627,8 @@ class testPageAdministrationAudit extends CWebTest {
 		$this->assertElementPresent('btn1');
 
 		$this->input_type('alias', 'Admin');
-		$this->dropdown_select('action', 'Update');
-		$this->dropdown_select('resourcetype', 'Discovery rule');
+		$this->zbxTestDropdownSelect('action', 'Update');
+		$this->zbxTestDropdownSelect('resourcetype', 'Discovery rule');
 
 		$this->click("id=filter");
 		$this->wait();
@@ -1638,7 +1638,7 @@ class testPageAdministrationAudit extends CWebTest {
 		$time = $auditlog['clock'];
 		$today = date("d M Y H:i:s", $time);
 
-		$this->ok(array("$today", 'Admin', "$ip", 'Discovery rule', 'Updated', $auditlog['resourceid'], '', $auditlog['details']));
+		$this->zbxTestTextPresent(array("$today", 'Admin', "$ip", 'Discovery rule', 'Updated', $auditlog['resourceid'], '', $auditlog['details']));
 
 	}
 
@@ -1651,13 +1651,13 @@ class testPageAdministrationAudit extends CWebTest {
 	*/
 	public function testPageAdministrationAudit_DeleteDRule($auditlog) {
 
-		$this->login('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
+		$this->zbxTestLogin('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
 		$this->checkTitle('Audit');
 		$this->assertElementPresent('config');
 
-		$this->ok('AUDIT LOGS');
-		$this->ok('LOGS');
-		$this->ok(array('Time', 'User', 'IP', 'Resource', '	Action', 'ID', 'Description', 'Details'));
+		$this->zbxTestTextPresent('AUDIT LOGS');
+		$this->zbxTestTextPresent('LOGS');
+		$this->zbxTestTextPresent(array('Time', 'User', 'IP', 'Resource', '	Action', 'ID', 'Description', 'Details'));
 
 		$this->click('flicker_icon_l');
 
@@ -1665,8 +1665,8 @@ class testPageAdministrationAudit extends CWebTest {
 		$this->assertElementPresent('btn1');
 
 		$this->input_type('alias', 'Admin');
-		$this->dropdown_select('action', 'Delete');
-		$this->dropdown_select('resourcetype', 'Discovery rule');
+		$this->zbxTestDropdownSelect('action', 'Delete');
+		$this->zbxTestDropdownSelect('resourcetype', 'Discovery rule');
 
 		$this->click("id=filter");
 		$this->wait();
@@ -1675,7 +1675,7 @@ class testPageAdministrationAudit extends CWebTest {
 		$alias = $auditlog['alias'];
 		$time = $auditlog['clock'];
 		$today = date("d M Y H:i:s", $time);
-		$this->ok(array("$today", 'Admin', "$ip", 'Discovery rule', 'Deleted', $auditlog['resourceid'], '', $auditlog['details']));
+		$this->zbxTestTextPresent(array("$today", 'Admin', "$ip", 'Discovery rule', 'Deleted', $auditlog['resourceid'], '', $auditlog['details']));
 
 	}
 
@@ -1688,13 +1688,13 @@ class testPageAdministrationAudit extends CWebTest {
 	*/
 	public function testPageAdministrationAudit_DisableDRule($auditlog) {
 
-		$this->login('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
+		$this->zbxTestLogin('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
 		$this->checkTitle('Audit');
 		$this->assertElementPresent('config');
 
-		$this->ok('AUDIT LOGS');
-		$this->ok('LOGS');
-		$this->ok(array('Time', 'User', 'IP', 'Resource', '	Action', 'ID', 'Description', 'Details'));
+		$this->zbxTestTextPresent('AUDIT LOGS');
+		$this->zbxTestTextPresent('LOGS');
+		$this->zbxTestTextPresent(array('Time', 'User', 'IP', 'Resource', '	Action', 'ID', 'Description', 'Details'));
 
 		$this->click('flicker_icon_l');
 
@@ -1703,8 +1703,8 @@ class testPageAdministrationAudit extends CWebTest {
 
 		$this->input_type('alias', 'Admin');
 		// at this moment there is not implemented "Enable/Disable" action, it is recorded as "Update" action
-		$this->dropdown_select('action', 'Update');
-		$this->dropdown_select('resourcetype', 'Discovery rule');
+		$this->zbxTestDropdownSelect('action', 'Update');
+		$this->zbxTestDropdownSelect('resourcetype', 'Discovery rule');
 
 		$this->click("id=filter");
 		$this->wait();
@@ -1714,7 +1714,7 @@ class testPageAdministrationAudit extends CWebTest {
 		$time = $auditlog['clock'];
 		$details = $auditlog['details'];
 		$today = date("d M Y H:i:s", $time);
-		$this->ok(array("$today", 'Admin', "$ip", 'Discovery rule', 'Updated', $auditlog['resourceid'], '', "$details"));
+		$this->zbxTestTextPresent(array("$today", 'Admin', "$ip", 'Discovery rule', 'Updated', $auditlog['resourceid'], '', "$details"));
 
 	}
 
@@ -1727,13 +1727,13 @@ class testPageAdministrationAudit extends CWebTest {
 	*/
 	public function testPageAdministrationAudit_EnableDRule($auditlog) {
 
-		$this->login('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
+		$this->zbxTestLogin('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
 		$this->checkTitle('Audit');
 		$this->assertElementPresent('config');
 
-		$this->ok('AUDIT LOGS');
-		$this->ok('LOGS');
-		$this->ok(array('Time', 'User', 'IP', 'Resource', '	Action', 'ID', 'Description', 'Details'));
+		$this->zbxTestTextPresent('AUDIT LOGS');
+		$this->zbxTestTextPresent('LOGS');
+		$this->zbxTestTextPresent(array('Time', 'User', 'IP', 'Resource', '	Action', 'ID', 'Description', 'Details'));
 
 		$this->click('flicker_icon_l');
 
@@ -1742,8 +1742,8 @@ class testPageAdministrationAudit extends CWebTest {
 
 		$this->input_type('alias', 'Admin');
 		// at this moment there is not implemented "Enable/Disable" action, it is recorded as "Update" action
-		$this->dropdown_select('action', 'Update');
-		$this->dropdown_select('resourcetype', 'Discovery rule');
+		$this->zbxTestDropdownSelect('action', 'Update');
+		$this->zbxTestDropdownSelect('resourcetype', 'Discovery rule');
 
 		$this->click("id=filter");
 		$this->wait();
@@ -1753,7 +1753,7 @@ class testPageAdministrationAudit extends CWebTest {
 		$time = $auditlog['clock'];
 		$details = $auditlog['details'];
 		$today = date("d M Y H:i:s", $time);
-		$this->ok(array("$today", 'Admin', "$ip", 'Discovery rule', 'Updated', $auditlog['resourceid'], '', "$details"));
+		$this->zbxTestTextPresent(array("$today", 'Admin', "$ip", 'Discovery rule', 'Updated', $auditlog['resourceid'], '', "$details"));
 
 	}
 
@@ -1766,13 +1766,13 @@ class testPageAdministrationAudit extends CWebTest {
 	*/
 	public function testPageAdministrationAudit_AddMacro ($auditlog) {
 
-		$this->login('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
+		$this->zbxTestLogin('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
 		$this->checkTitle('Audit');
 		$this->assertElementPresent('config');
 
-		$this->ok('AUDIT LOGS');
-		$this->ok('LOGS');
-		$this->ok(array('Time', 'User', 'IP', 'Resource', 'Action', 'ID', 'Description', 'Details'));
+		$this->zbxTestTextPresent('AUDIT LOGS');
+		$this->zbxTestTextPresent('LOGS');
+		$this->zbxTestTextPresent(array('Time', 'User', 'IP', 'Resource', 'Action', 'ID', 'Description', 'Details'));
 
 		$this->click('flicker_icon_l');
 
@@ -1780,8 +1780,8 @@ class testPageAdministrationAudit extends CWebTest {
 		$this->assertElementPresent('btn1');
 
 		$this->input_type('alias', 'Admin');
-		$this->dropdown_select('action', 'Add');
-		$this->dropdown_select('resourcetype', 'Macro');
+		$this->zbxTestDropdownSelect('action', 'Add');
+		$this->zbxTestDropdownSelect('resourcetype', 'Macro');
 
 		$this->click("id=filter");
 		$this->wait();
@@ -1791,7 +1791,7 @@ class testPageAdministrationAudit extends CWebTest {
 		$time = $auditlog['clock'];
 		$today = date("d M Y H:i:s", $time);
 
-		$this->ok(array("$today", 'Admin', "$ip", 'Macro', 'Added', $auditlog['resourceid'], '{$B} ? abcd', ''));
+		$this->zbxTestTextPresent(array("$today", 'Admin', "$ip", 'Macro', 'Added', $auditlog['resourceid'], '{$B} ? abcd', ''));
 
 	}
 
@@ -1804,13 +1804,13 @@ class testPageAdministrationAudit extends CWebTest {
 	*/
 	public function testPageAdministrationAudit_UpdateMacro($auditlog) {
 
-		$this->login('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
+		$this->zbxTestLogin('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
 		$this->checkTitle('Audit');
 		$this->assertElementPresent('config');
 
-		$this->ok('AUDIT LOGS');
-		$this->ok('LOGS');
-		$this->ok(array('Time', 'User', 'IP', 'Resource', 'Action', 'ID', 'Description', 'Details'));
+		$this->zbxTestTextPresent('AUDIT LOGS');
+		$this->zbxTestTextPresent('LOGS');
+		$this->zbxTestTextPresent(array('Time', 'User', 'IP', 'Resource', 'Action', 'ID', 'Description', 'Details'));
 
 		$this->click('flicker_icon_l');
 
@@ -1818,8 +1818,8 @@ class testPageAdministrationAudit extends CWebTest {
 		$this->assertElementPresent('btn1');
 
 		$this->input_type('alias', 'Admin');
-		$this->dropdown_select('action', 'Update');
-		$this->dropdown_select('resourcetype', 'Macro');
+		$this->zbxTestDropdownSelect('action', 'Update');
+		$this->zbxTestDropdownSelect('resourcetype', 'Macro');
 
 		$this->click("id=filter");
 		$this->wait();
@@ -1829,7 +1829,7 @@ class testPageAdministrationAudit extends CWebTest {
 		$time = $auditlog['clock'];
 		$today = date("d M Y H:i:s", $time);
 
-		$this->ok(array("$today", 'Admin', "$ip", 'Macro', 'Updated', $auditlog['resourceid'], '{$B} ? xyz', ''));
+		$this->zbxTestTextPresent(array("$today", 'Admin', "$ip", 'Macro', 'Updated', $auditlog['resourceid'], '{$B} ? xyz', ''));
 
 	}
 
@@ -1842,13 +1842,13 @@ class testPageAdministrationAudit extends CWebTest {
 	*/
 	public function testPageAdministrationAudit_DeleteMacro($auditlog) {
 
-		$this->login('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
+		$this->zbxTestLogin('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
 		$this->checkTitle('Audit');
 		$this->assertElementPresent('config');
 
-		$this->ok('AUDIT LOGS');
-		$this->ok('LOGS');
-		$this->ok(array('Time', 'User', 'IP', 'Resource', '	Action', 'ID', 'Description', 'Details'));
+		$this->zbxTestTextPresent('AUDIT LOGS');
+		$this->zbxTestTextPresent('LOGS');
+		$this->zbxTestTextPresent(array('Time', 'User', 'IP', 'Resource', '	Action', 'ID', 'Description', 'Details'));
 
 		$this->click('flicker_icon_l');
 
@@ -1856,8 +1856,8 @@ class testPageAdministrationAudit extends CWebTest {
 		$this->assertElementPresent('btn1');
 
 		$this->input_type('alias', 'Admin');
-		$this->dropdown_select('action', 'Delete');
-		$this->dropdown_select('resourcetype', 'Macro');
+		$this->zbxTestDropdownSelect('action', 'Delete');
+		$this->zbxTestDropdownSelect('resourcetype', 'Macro');
 
 		$this->click("id=filter");
 		$this->wait();
@@ -1866,7 +1866,7 @@ class testPageAdministrationAudit extends CWebTest {
 		$alias = $auditlog['alias'];
 		$time = $auditlog['clock'];
 		$today = date("d M Y H:i:s", $time);
-		$this->ok(array("$today", 'Admin', "$ip", 'Macro', 'Deleted', $auditlog['resourceid'], 'Array ? xyz', ''));
+		$this->zbxTestTextPresent(array("$today", 'Admin', "$ip", 'Macro', 'Deleted', $auditlog['resourceid'], 'Array ? xyz', ''));
 
 	}
 
@@ -1879,13 +1879,13 @@ class testPageAdministrationAudit extends CWebTest {
 	*/
 	public function testPageAdministrationAudit_AddMaintenance ($auditlog) {
 
-		$this->login('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
+		$this->zbxTestLogin('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
 		$this->checkTitle('Audit');
 		$this->assertElementPresent('config');
 
-		$this->ok('AUDIT LOGS');
-		$this->ok('LOGS');
-		$this->ok(array('Time', 'User', 'IP', 'Resource', 'Action', 'ID', 'Description', 'Details'));
+		$this->zbxTestTextPresent('AUDIT LOGS');
+		$this->zbxTestTextPresent('LOGS');
+		$this->zbxTestTextPresent(array('Time', 'User', 'IP', 'Resource', 'Action', 'ID', 'Description', 'Details'));
 
 		$this->click('flicker_icon_l');
 
@@ -1893,8 +1893,8 @@ class testPageAdministrationAudit extends CWebTest {
 		$this->assertElementPresent('btn1');
 
 		$this->input_type('alias', 'Admin');
-		$this->dropdown_select('action', 'Add');
-		$this->dropdown_select('resourcetype', 'Maintenance');
+		$this->zbxTestDropdownSelect('action', 'Add');
+		$this->zbxTestDropdownSelect('resourcetype', 'Maintenance');
 
 		$this->click("id=filter");
 		$this->wait();
@@ -1904,7 +1904,7 @@ class testPageAdministrationAudit extends CWebTest {
 		$time = $auditlog['clock'];
 		$today = date("d M Y H:i:s", $time);
 
-		$this->ok(array("$today", 'Admin', "$ip", 'Maintenance', 'Added', $auditlog['resourceid'], '', $auditlog['details']));
+		$this->zbxTestTextPresent(array("$today", 'Admin', "$ip", 'Maintenance', 'Added', $auditlog['resourceid'], '', $auditlog['details']));
 
 	}
 
@@ -1917,13 +1917,13 @@ class testPageAdministrationAudit extends CWebTest {
 	*/
 	public function testPageAdministrationAudit_UpdateMaintenance($auditlog) {
 
-		$this->login('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
+		$this->zbxTestLogin('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
 		$this->checkTitle('Audit');
 		$this->assertElementPresent('config');
 
-		$this->ok('AUDIT LOGS');
-		$this->ok('LOGS');
-		$this->ok(array('Time', 'User', 'IP', 'Resource', 'Action', 'ID', 'Description', 'Details'));
+		$this->zbxTestTextPresent('AUDIT LOGS');
+		$this->zbxTestTextPresent('LOGS');
+		$this->zbxTestTextPresent(array('Time', 'User', 'IP', 'Resource', 'Action', 'ID', 'Description', 'Details'));
 
 		$this->click('flicker_icon_l');
 
@@ -1931,8 +1931,8 @@ class testPageAdministrationAudit extends CWebTest {
 		$this->assertElementPresent('btn1');
 
 		$this->input_type('alias', 'Admin');
-		$this->dropdown_select('action', 'Update');
-		$this->dropdown_select('resourcetype', 'Maintenance');
+		$this->zbxTestDropdownSelect('action', 'Update');
+		$this->zbxTestDropdownSelect('resourcetype', 'Maintenance');
 
 		$this->click("id=filter");
 		$this->wait();
@@ -1942,7 +1942,7 @@ class testPageAdministrationAudit extends CWebTest {
 		$time = $auditlog['clock'];
 		$today = date("d M Y H:i:s", $time);
 
-		$this->ok(array("$today", 'Admin', "$ip", 'Maintenance', 'Updated', $auditlog['resourceid'], '', $auditlog['details']));
+		$this->zbxTestTextPresent(array("$today", 'Admin', "$ip", 'Maintenance', 'Updated', $auditlog['resourceid'], '', $auditlog['details']));
 
 	}
 
@@ -1955,13 +1955,13 @@ class testPageAdministrationAudit extends CWebTest {
 	*/
 	public function testPageAdministrationAudit_DeleteMaintenance($auditlog) {
 
-		$this->login('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
+		$this->zbxTestLogin('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
 		$this->checkTitle('Audit');
 		$this->assertElementPresent('config');
 
-		$this->ok('AUDIT LOGS');
-		$this->ok('LOGS');
-		$this->ok(array('Time', 'User', 'IP', 'Resource', '	Action', 'ID', 'Description', 'Details'));
+		$this->zbxTestTextPresent('AUDIT LOGS');
+		$this->zbxTestTextPresent('LOGS');
+		$this->zbxTestTextPresent(array('Time', 'User', 'IP', 'Resource', '	Action', 'ID', 'Description', 'Details'));
 
 		$this->click('flicker_icon_l');
 
@@ -1969,8 +1969,8 @@ class testPageAdministrationAudit extends CWebTest {
 		$this->assertElementPresent('btn1');
 
 		$this->input_type('alias', 'Admin');
-		$this->dropdown_select('action', 'Delete');
-		$this->dropdown_select('resourcetype', 'Maintenance');
+		$this->zbxTestDropdownSelect('action', 'Delete');
+		$this->zbxTestDropdownSelect('resourcetype', 'Maintenance');
 
 		$this->click("id=filter");
 		$this->wait();
@@ -1979,7 +1979,7 @@ class testPageAdministrationAudit extends CWebTest {
 		$alias = $auditlog['alias'];
 		$time = $auditlog['clock'];
 		$today = date("d M Y H:i:s", $time);
-		$this->ok(array("$today", 'Admin', "$ip", 'Maintenance', 'Deleted', $auditlog['resourceid'], '',$auditlog['details']));
+		$this->zbxTestTextPresent(array("$today", 'Admin', "$ip", 'Maintenance', 'Deleted', $auditlog['resourceid'], '',$auditlog['details']));
 
 	}
 
@@ -1992,13 +1992,13 @@ class testPageAdministrationAudit extends CWebTest {
 	*/
 	public function testPageAdministrationAudit_AddMap ($auditlog) {
 
-		$this->login('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
+		$this->zbxTestLogin('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
 		$this->checkTitle('Audit');
 		$this->assertElementPresent('config');
 
-		$this->ok('AUDIT LOGS');
-		$this->ok('LOGS');
-		$this->ok(array('Time', 'User', 'IP', 'Resource', 'Action', 'ID', 'Description', 'Details'));
+		$this->zbxTestTextPresent('AUDIT LOGS');
+		$this->zbxTestTextPresent('LOGS');
+		$this->zbxTestTextPresent(array('Time', 'User', 'IP', 'Resource', 'Action', 'ID', 'Description', 'Details'));
 
 		$this->click('flicker_icon_l');
 
@@ -2006,8 +2006,8 @@ class testPageAdministrationAudit extends CWebTest {
 		$this->assertElementPresent('btn1');
 
 		$this->input_type('alias', 'Admin');
-		$this->dropdown_select('action', 'Add');
-		$this->dropdown_select('resourcetype', 'Map');
+		$this->zbxTestDropdownSelect('action', 'Add');
+		$this->zbxTestDropdownSelect('resourcetype', 'Map');
 
 		$this->click("id=filter");
 		$this->wait();
@@ -2017,7 +2017,7 @@ class testPageAdministrationAudit extends CWebTest {
 		$time = $auditlog['clock'];
 		$today = date("d M Y H:i:s", $time);
 
-		$this->ok(array("$today", 'Admin', "$ip", 'Map', 'Added', $auditlog['resourceid'], '', $auditlog['details']));
+		$this->zbxTestTextPresent(array("$today", 'Admin', "$ip", 'Map', 'Added', $auditlog['resourceid'], '', $auditlog['details']));
 
 	}
 
@@ -2030,13 +2030,13 @@ class testPageAdministrationAudit extends CWebTest {
 	*/
 	public function testPageAdministrationAudit_UpdateMap($auditlog) {
 
-		$this->login('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
+		$this->zbxTestLogin('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
 		$this->checkTitle('Audit');
 		$this->assertElementPresent('config');
 
-		$this->ok('AUDIT LOGS');
-		$this->ok('LOGS');
-		$this->ok(array('Time', 'User', 'IP', 'Resource', 'Action', 'ID', 'Description', 'Details'));
+		$this->zbxTestTextPresent('AUDIT LOGS');
+		$this->zbxTestTextPresent('LOGS');
+		$this->zbxTestTextPresent(array('Time', 'User', 'IP', 'Resource', 'Action', 'ID', 'Description', 'Details'));
 
 		$this->click('flicker_icon_l');
 
@@ -2044,8 +2044,8 @@ class testPageAdministrationAudit extends CWebTest {
 		$this->assertElementPresent('btn1');
 
 		$this->input_type('alias', 'Admin');
-		$this->dropdown_select('action', 'Update');
-		$this->dropdown_select('resourcetype', 'Map');
+		$this->zbxTestDropdownSelect('action', 'Update');
+		$this->zbxTestDropdownSelect('resourcetype', 'Map');
 
 		$this->click("id=filter");
 		$this->wait();
@@ -2055,7 +2055,7 @@ class testPageAdministrationAudit extends CWebTest {
 		$time = $auditlog['clock'];
 		$today = date("d M Y H:i:s", $time);
 
-		$this->ok(array("$today", 'Admin', "$ip", 'Map', 'Updated', $auditlog['resourceid'], '', $auditlog['details']));
+		$this->zbxTestTextPresent(array("$today", 'Admin', "$ip", 'Map', 'Updated', $auditlog['resourceid'], '', $auditlog['details']));
 
 	}
 
@@ -2068,13 +2068,13 @@ class testPageAdministrationAudit extends CWebTest {
 	*/
 	public function testPageAdministrationAudit_DeleteMap($auditlog) {
 
-		$this->login('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
+		$this->zbxTestLogin('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
 		$this->checkTitle('Audit');
 		$this->assertElementPresent('config');
 
-		$this->ok('AUDIT LOGS');
-		$this->ok('LOGS');
-		$this->ok(array('Time', 'User', 'IP', 'Resource', '	Action', 'ID', 'Description', 'Details'));
+		$this->zbxTestTextPresent('AUDIT LOGS');
+		$this->zbxTestTextPresent('LOGS');
+		$this->zbxTestTextPresent(array('Time', 'User', 'IP', 'Resource', '	Action', 'ID', 'Description', 'Details'));
 
 		$this->click('flicker_icon_l');
 
@@ -2082,8 +2082,8 @@ class testPageAdministrationAudit extends CWebTest {
 		$this->assertElementPresent('btn1');
 
 		$this->input_type('alias', 'Admin');
-		$this->dropdown_select('action', 'Delete');
-		$this->dropdown_select('resourcetype', 'Map');
+		$this->zbxTestDropdownSelect('action', 'Delete');
+		$this->zbxTestDropdownSelect('resourcetype', 'Map');
 
 		$this->click("id=filter");
 		$this->wait();
@@ -2092,7 +2092,7 @@ class testPageAdministrationAudit extends CWebTest {
 		$alias = $auditlog['alias'];
 		$time = $auditlog['clock'];
 		$today = date("d M Y H:i:s", $time);
-		$this->ok(array("$today", 'Admin', "$ip", 'Map', 'Deleted', $auditlog['resourceid'], '',$auditlog['details']));
+		$this->zbxTestTextPresent(array("$today", 'Admin', "$ip", 'Map', 'Deleted', $auditlog['resourceid'], '',$auditlog['details']));
 
 	}
 
@@ -2105,13 +2105,13 @@ class testPageAdministrationAudit extends CWebTest {
 	*/
 	public function testPageAdministrationAudit_AddMediaType ($auditlog) {
 
-		$this->login('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
+		$this->zbxTestLogin('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
 		$this->checkTitle('Audit');
 		$this->assertElementPresent('config');
 
-		$this->ok('AUDIT LOGS');
-		$this->ok('LOGS');
-		$this->ok(array('Time', 'User', 'IP', 'Resource', 'Action', 'ID', 'Description', 'Details'));
+		$this->zbxTestTextPresent('AUDIT LOGS');
+		$this->zbxTestTextPresent('LOGS');
+		$this->zbxTestTextPresent(array('Time', 'User', 'IP', 'Resource', 'Action', 'ID', 'Description', 'Details'));
 
 		$this->click('flicker_icon_l');
 
@@ -2119,8 +2119,8 @@ class testPageAdministrationAudit extends CWebTest {
 		$this->assertElementPresent('btn1');
 
 		$this->input_type('alias', 'Admin');
-		$this->dropdown_select('action', 'Add');
-		$this->dropdown_select('resourcetype', 'Media type');
+		$this->zbxTestDropdownSelect('action', 'Add');
+		$this->zbxTestDropdownSelect('resourcetype', 'Media type');
 
 		$this->click("id=filter");
 		$this->wait();
@@ -2130,7 +2130,7 @@ class testPageAdministrationAudit extends CWebTest {
 		$time = $auditlog['clock'];
 		$today = date("d M Y H:i:s", $time);
 
-		$this->ok(array("$today", 'Admin', "$ip", 'Media type', 'Added', $auditlog['resourceid'], '', $auditlog['details']));
+		$this->zbxTestTextPresent(array("$today", 'Admin', "$ip", 'Media type', 'Added', $auditlog['resourceid'], '', $auditlog['details']));
 
 	}
 
@@ -2143,13 +2143,13 @@ class testPageAdministrationAudit extends CWebTest {
 	*/
 	public function testPageAdministrationAudit_UpdateMediaType($auditlog) {
 
-		$this->login('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
+		$this->zbxTestLogin('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
 		$this->checkTitle('Audit');
 		$this->assertElementPresent('config');
 
-		$this->ok('AUDIT LOGS');
-		$this->ok('LOGS');
-		$this->ok(array('Time', 'User', 'IP', 'Resource', 'Action', 'ID', 'Description', 'Details'));
+		$this->zbxTestTextPresent('AUDIT LOGS');
+		$this->zbxTestTextPresent('LOGS');
+		$this->zbxTestTextPresent(array('Time', 'User', 'IP', 'Resource', 'Action', 'ID', 'Description', 'Details'));
 
 		$this->click('flicker_icon_l');
 
@@ -2157,8 +2157,8 @@ class testPageAdministrationAudit extends CWebTest {
 		$this->assertElementPresent('btn1');
 
 		$this->input_type('alias', 'Admin');
-		$this->dropdown_select('action', 'Update');
-		$this->dropdown_select('resourcetype', 'Media type');
+		$this->zbxTestDropdownSelect('action', 'Update');
+		$this->zbxTestDropdownSelect('resourcetype', 'Media type');
 
 		$this->click("id=filter");
 		$this->wait();
@@ -2168,7 +2168,7 @@ class testPageAdministrationAudit extends CWebTest {
 		$time = $auditlog['clock'];
 		$today = date("d M Y H:i:s", $time);
 
-		$this->ok(array("$today", 'Admin', "$ip", 'Media type', 'Updated', $auditlog['resourceid'], '', $auditlog['details']));
+		$this->zbxTestTextPresent(array("$today", 'Admin', "$ip", 'Media type', 'Updated', $auditlog['resourceid'], '', $auditlog['details']));
 
 	}
 
@@ -2181,13 +2181,13 @@ class testPageAdministrationAudit extends CWebTest {
 	*/
 	public function testPageAdministrationAudit_DisableMediaType($auditlog) {
 
-		$this->login('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
+		$this->zbxTestLogin('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
 		$this->checkTitle('Audit');
 		$this->assertElementPresent('config');
 
-		$this->ok('AUDIT LOGS');
-		$this->ok('LOGS');
-		$this->ok(array('Time', 'User', 'IP', 'Resource', 'Action', 'ID', 'Description', 'Details'));
+		$this->zbxTestTextPresent('AUDIT LOGS');
+		$this->zbxTestTextPresent('LOGS');
+		$this->zbxTestTextPresent(array('Time', 'User', 'IP', 'Resource', 'Action', 'ID', 'Description', 'Details'));
 
 		$this->click('flicker_icon_l');
 
@@ -2195,8 +2195,8 @@ class testPageAdministrationAudit extends CWebTest {
 		$this->assertElementPresent('btn1');
 
 		$this->input_type('alias', 'Admin');
-		$this->dropdown_select('action', 'Update');
-		$this->dropdown_select('resourcetype', 'Media type');
+		$this->zbxTestDropdownSelect('action', 'Update');
+		$this->zbxTestDropdownSelect('resourcetype', 'Media type');
 
 		$this->click("id=filter");
 		$this->wait();
@@ -2206,7 +2206,7 @@ class testPageAdministrationAudit extends CWebTest {
 		$time = $auditlog['clock'];
 		$today = date("d M Y H:i:s", $time);
 
-		$this->ok(array("$today", 'Admin', "$ip", 'Media type', 'Updated', $auditlog['resourceid'], '', $auditlog['details']));
+		$this->zbxTestTextPresent(array("$today", 'Admin', "$ip", 'Media type', 'Updated', $auditlog['resourceid'], '', $auditlog['details']));
 
 	}
 
@@ -2219,13 +2219,13 @@ class testPageAdministrationAudit extends CWebTest {
 	*/
 	public function testPageAdministrationAudit_EnableMediaType($auditlog) {
 
-		$this->login('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
+		$this->zbxTestLogin('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
 		$this->checkTitle('Audit');
 		$this->assertElementPresent('config');
 
-		$this->ok('AUDIT LOGS');
-		$this->ok('LOGS');
-		$this->ok(array('Time', 'User', 'IP', 'Resource', 'Action', 'ID', 'Description', 'Details'));
+		$this->zbxTestTextPresent('AUDIT LOGS');
+		$this->zbxTestTextPresent('LOGS');
+		$this->zbxTestTextPresent(array('Time', 'User', 'IP', 'Resource', 'Action', 'ID', 'Description', 'Details'));
 
 		$this->click('flicker_icon_l');
 
@@ -2233,8 +2233,8 @@ class testPageAdministrationAudit extends CWebTest {
 		$this->assertElementPresent('btn1');
 
 		$this->input_type('alias', 'Admin');
-		$this->dropdown_select('action', 'Update');
-		$this->dropdown_select('resourcetype', 'Media type');
+		$this->zbxTestDropdownSelect('action', 'Update');
+		$this->zbxTestDropdownSelect('resourcetype', 'Media type');
 
 		$this->click("id=filter");
 		$this->wait();
@@ -2244,7 +2244,7 @@ class testPageAdministrationAudit extends CWebTest {
 		$time = $auditlog['clock'];
 		$today = date("d M Y H:i:s", $time);
 
-		$this->ok(array("$today", 'Admin', "$ip", 'Media type', 'Updated', $auditlog['resourceid'], '', $auditlog['details']));
+		$this->zbxTestTextPresent(array("$today", 'Admin', "$ip", 'Media type', 'Updated', $auditlog['resourceid'], '', $auditlog['details']));
 
 	}
 
@@ -2257,13 +2257,13 @@ class testPageAdministrationAudit extends CWebTest {
 	*/
 	public function testPageAdministrationAudit_DeleteMediaType($auditlog) {
 
-		$this->login('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
+		$this->zbxTestLogin('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
 		$this->checkTitle('Audit');
 		$this->assertElementPresent('config');
 
-		$this->ok('AUDIT LOGS');
-		$this->ok('LOGS');
-		$this->ok(array('Time', 'User', 'IP', 'Resource', '	Action', 'ID', 'Description', 'Details'));
+		$this->zbxTestTextPresent('AUDIT LOGS');
+		$this->zbxTestTextPresent('LOGS');
+		$this->zbxTestTextPresent(array('Time', 'User', 'IP', 'Resource', '	Action', 'ID', 'Description', 'Details'));
 
 		$this->click('flicker_icon_l');
 
@@ -2271,8 +2271,8 @@ class testPageAdministrationAudit extends CWebTest {
 		$this->assertElementPresent('btn1');
 
 		$this->input_type('alias', 'Admin');
-		$this->dropdown_select('action', 'Delete');
-		$this->dropdown_select('resourcetype', 'Media type');
+		$this->zbxTestDropdownSelect('action', 'Delete');
+		$this->zbxTestDropdownSelect('resourcetype', 'Media type');
 
 		$this->click("id=filter");
 		$this->wait();
@@ -2281,7 +2281,7 @@ class testPageAdministrationAudit extends CWebTest {
 		$alias = $auditlog['alias'];
 		$time = $auditlog['clock'];
 		$today = date("d M Y H:i:s", $time);
-		$this->ok(array("$today", 'Admin', "$ip", 'Media type', 'Deleted', $auditlog['resourceid'], '',$auditlog['details']));
+		$this->zbxTestTextPresent(array("$today", 'Admin', "$ip", 'Media type', 'Deleted', $auditlog['resourceid'], '',$auditlog['details']));
 
 	}
 
@@ -2294,13 +2294,13 @@ class testPageAdministrationAudit extends CWebTest {
 	*/
 	public function testPageAdministrationAudit_AddRegexp ($auditlog) {
 
-		$this->login('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
+		$this->zbxTestLogin('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
 		$this->checkTitle('Audit');
 		$this->assertElementPresent('config');
 
-		$this->ok('AUDIT LOGS');
-		$this->ok('LOGS');
-		$this->ok(array('Time', 'User', 'IP', 'Resource', 'Action', 'ID', 'Description', 'Details'));
+		$this->zbxTestTextPresent('AUDIT LOGS');
+		$this->zbxTestTextPresent('LOGS');
+		$this->zbxTestTextPresent(array('Time', 'User', 'IP', 'Resource', 'Action', 'ID', 'Description', 'Details'));
 
 		$this->click('flicker_icon_l');
 
@@ -2308,8 +2308,8 @@ class testPageAdministrationAudit extends CWebTest {
 		$this->assertElementPresent('btn1');
 
 		$this->input_type('alias', 'Admin');
-		$this->dropdown_select('action', 'Add');
-		$this->dropdown_select('resourcetype', 'Regular expression');
+		$this->zbxTestDropdownSelect('action', 'Add');
+		$this->zbxTestDropdownSelect('resourcetype', 'Regular expression');
 
 		$this->click("id=filter");
 		$this->wait();
@@ -2319,7 +2319,7 @@ class testPageAdministrationAudit extends CWebTest {
 		$time = $auditlog['clock'];
 		$today = date("d M Y H:i:s", $time);
 
-		$this->ok(array("$today", 'Admin', "$ip", 'Regular expression', 'Added', $auditlog['resourceid'], '', $auditlog['details']));
+		$this->zbxTestTextPresent(array("$today", 'Admin', "$ip", 'Regular expression', 'Added', $auditlog['resourceid'], '', $auditlog['details']));
 
 	}
 
@@ -2332,13 +2332,13 @@ class testPageAdministrationAudit extends CWebTest {
 	*/
 	public function testPageAdministrationAudit_UpdateRegexp($auditlog) {
 
-		$this->login('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
+		$this->zbxTestLogin('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
 		$this->checkTitle('Audit');
 		$this->assertElementPresent('config');
 
-		$this->ok('AUDIT LOGS');
-		$this->ok('LOGS');
-		$this->ok(array('Time', 'User', 'IP', 'Resource', 'Action', 'ID', 'Description', 'Details'));
+		$this->zbxTestTextPresent('AUDIT LOGS');
+		$this->zbxTestTextPresent('LOGS');
+		$this->zbxTestTextPresent(array('Time', 'User', 'IP', 'Resource', 'Action', 'ID', 'Description', 'Details'));
 
 		$this->click('flicker_icon_l');
 
@@ -2346,8 +2346,8 @@ class testPageAdministrationAudit extends CWebTest {
 		$this->assertElementPresent('btn1');
 
 		$this->input_type('alias', 'Admin');
-		$this->dropdown_select('action', 'Update');
-		$this->dropdown_select('resourcetype', 'Regular expression');
+		$this->zbxTestDropdownSelect('action', 'Update');
+		$this->zbxTestDropdownSelect('resourcetype', 'Regular expression');
 
 		$this->click("id=filter");
 		$this->wait();
@@ -2357,7 +2357,7 @@ class testPageAdministrationAudit extends CWebTest {
 		$time = $auditlog['clock'];
 		$today = date("d M Y H:i:s", $time);
 
-		$this->ok(array("$today", 'Admin', "$ip", 'Regular expression', 'Updated', $auditlog['resourceid'], '', $auditlog['details']));
+		$this->zbxTestTextPresent(array("$today", 'Admin', "$ip", 'Regular expression', 'Updated', $auditlog['resourceid'], '', $auditlog['details']));
 
 	}
 
@@ -2370,13 +2370,13 @@ class testPageAdministrationAudit extends CWebTest {
 	*/
 	public function testPageAdministrationAudit_DeleteRegexp($auditlog) {
 
-		$this->login('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
+		$this->zbxTestLogin('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
 		$this->checkTitle('Audit');
 		$this->assertElementPresent('config');
 
-		$this->ok('AUDIT LOGS');
-		$this->ok('LOGS');
-		$this->ok(array('Time', 'User', 'IP', 'Resource', '	Action', 'ID', 'Description', 'Details'));
+		$this->zbxTestTextPresent('AUDIT LOGS');
+		$this->zbxTestTextPresent('LOGS');
+		$this->zbxTestTextPresent(array('Time', 'User', 'IP', 'Resource', '	Action', 'ID', 'Description', 'Details'));
 
 		$this->click('flicker_icon_l');
 
@@ -2384,8 +2384,8 @@ class testPageAdministrationAudit extends CWebTest {
 		$this->assertElementPresent('btn1');
 
 		$this->input_type('alias', 'Admin');
-		$this->dropdown_select('action', 'Delete');
-		$this->dropdown_select('resourcetype', 'Regular expression');
+		$this->zbxTestDropdownSelect('action', 'Delete');
+		$this->zbxTestDropdownSelect('resourcetype', 'Regular expression');
 
 		$this->click("id=filter");
 		$this->wait();
@@ -2394,7 +2394,7 @@ class testPageAdministrationAudit extends CWebTest {
 		$alias = $auditlog['alias'];
 		$time = $auditlog['clock'];
 		$today = date("d M Y H:i:s", $time);
-		$this->ok(array("$today", 'Admin', "$ip", 'Regular expression', 'Deleted', $auditlog['resourceid'], '', $auditlog['details']));
+		$this->zbxTestTextPresent(array("$today", 'Admin', "$ip", 'Regular expression', 'Deleted', $auditlog['resourceid'], '', $auditlog['details']));
 
 	}
 
@@ -2407,13 +2407,13 @@ class testPageAdministrationAudit extends CWebTest {
 	*/
 	public function testPageAdministrationAudit_AddScenario ($auditlog) {
 
-		$this->login('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
+		$this->zbxTestLogin('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
 		$this->checkTitle('Audit');
 		$this->assertElementPresent('config');
 
-		$this->ok('AUDIT LOGS');
-		$this->ok('LOGS');
-		$this->ok(array('Time', 'User', 'IP', 'Resource', 'Action', 'ID', 'Description', 'Details'));
+		$this->zbxTestTextPresent('AUDIT LOGS');
+		$this->zbxTestTextPresent('LOGS');
+		$this->zbxTestTextPresent(array('Time', 'User', 'IP', 'Resource', 'Action', 'ID', 'Description', 'Details'));
 
 		$this->click('flicker_icon_l');
 
@@ -2421,8 +2421,8 @@ class testPageAdministrationAudit extends CWebTest {
 		$this->assertElementPresent('btn1');
 
 		$this->input_type('alias', 'Admin');
-		$this->dropdown_select('action', 'Add');
-		$this->dropdown_select('resourcetype', 'Scenario');
+		$this->zbxTestDropdownSelect('action', 'Add');
+		$this->zbxTestDropdownSelect('resourcetype', 'Scenario');
 
 		$this->click("id=filter");
 		$this->wait();
@@ -2432,7 +2432,7 @@ class testPageAdministrationAudit extends CWebTest {
 		$time = $auditlog['clock'];
 		$today = date("d M Y H:i:s", $time);
 
-		$this->ok(array("$today", 'Admin', "$ip", 'Scenario', 'Added', $auditlog['resourceid'], '', $auditlog['details']));
+		$this->zbxTestTextPresent(array("$today", 'Admin', "$ip", 'Scenario', 'Added', $auditlog['resourceid'], '', $auditlog['details']));
 
 	}
 
@@ -2445,13 +2445,13 @@ class testPageAdministrationAudit extends CWebTest {
 	*/
 	public function testPageAdministrationAudit_UpdateScenario($auditlog) {
 
-		$this->login('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
+		$this->zbxTestLogin('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
 		$this->checkTitle('Audit');
 		$this->assertElementPresent('config');
 
-		$this->ok('AUDIT LOGS');
-		$this->ok('LOGS');
-		$this->ok(array('Time', 'User', 'IP', 'Resource', 'Action', 'ID', 'Description', 'Details'));
+		$this->zbxTestTextPresent('AUDIT LOGS');
+		$this->zbxTestTextPresent('LOGS');
+		$this->zbxTestTextPresent(array('Time', 'User', 'IP', 'Resource', 'Action', 'ID', 'Description', 'Details'));
 
 		$this->click('flicker_icon_l');
 
@@ -2459,8 +2459,8 @@ class testPageAdministrationAudit extends CWebTest {
 		$this->assertElementPresent('btn1');
 
 		$this->input_type('alias', 'Admin');
-		$this->dropdown_select('action', 'Update');
-		$this->dropdown_select('resourcetype', 'Scenario');
+		$this->zbxTestDropdownSeleczbxTestDropdownSelect('action', 'Update');
+		$this->zbxTestDropdownSelect('resourcetype', 'Scenario');
 
 		$this->click("id=filter");
 		$this->wait();
@@ -2470,7 +2470,7 @@ class testPageAdministrationAudit extends CWebTest {
 		$time = $auditlog['clock'];
 		$today = date("d M Y H:i:s", $time);
 
-		$this->ok(array("$today", 'Admin', "$ip", 'Scenario', 'Updated', $auditlog['resourceid'], '', $auditlog['details']));
+		$this->zbxTestTextPresent(array("$today", 'Admin', "$ip", 'Scenario', 'Updated', $auditlog['resourceid'], '', $auditlog['details']));
 
 	}
 
@@ -2483,13 +2483,13 @@ class testPageAdministrationAudit extends CWebTest {
 	*/
 	public function testPageAdministrationAudit_DisableScenario($auditlog) {
 
-		$this->login('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
+		$this->zbxTestLogin('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
 		$this->checkTitle('Audit');
 		$this->assertElementPresent('config');
 
-		$this->ok('AUDIT LOGS');
-		$this->ok('LOGS');
-		$this->ok(array('Time', 'User', 'IP', 'Resource', '	Action', 'ID', 'Description', 'Details'));
+		$this->zbxTestTextPresent('AUDIT LOGS');
+		$this->zbxTestTextPresent('LOGS');
+		$this->zbxTestTextPresent(array('Time', 'User', 'IP', 'Resource', '	Action', 'ID', 'Description', 'Details'));
 
 		$this->click('flicker_icon_l');
 
@@ -2498,8 +2498,8 @@ class testPageAdministrationAudit extends CWebTest {
 
 		$this->input_type('alias', 'Admin');
 		// at this moment there is not implemented "Enable/Disable" action, it is recorded as "Update" action
-		$this->dropdown_select('action', 'Update');
-		$this->dropdown_select('resourcetype', 'Scenario');
+		$this->zbxTestDropdownSelect('action', 'Update');
+		$this->zbxTestDropdownSelect('resourcetype', 'Scenario');
 
 		$this->click("id=filter");
 		$this->wait();
@@ -2509,8 +2509,8 @@ class testPageAdministrationAudit extends CWebTest {
 		$time = $auditlog['clock'];
 		$details = $auditlog['details'];
 		$today = date("d M Y H:i:s", $time);
-		$this->ok(array("$today", 'Admin', "$ip", 'Scenario', 'Updated', $auditlog['resourceid'], '', $auditlog['details']));
-		$this->ok(array("$today", 'Admin', "$ip", 'Scenario', 'Updated', $auditlog['resourceid'], '', 'Scenario disabled'));
+		$this->zbxTestTextPresent(array("$today", 'Admin', "$ip", 'Scenario', 'Updated', $auditlog['resourceid'], '', $auditlog['details']));
+		$this->zbxTestTextPresent(array("$today", 'Admin', "$ip", 'Scenario', 'Updated', $auditlog['resourceid'], '', 'Scenario disabled'));
 
 	}
 
@@ -2523,13 +2523,13 @@ class testPageAdministrationAudit extends CWebTest {
 	*/
 	public function testPageAdministrationAudit_EnableScenario($auditlog) {
 
-		$this->login('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
+		$this->zbxTestLogin('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
 		$this->checkTitle('Audit');
 		$this->assertElementPresent('config');
 
-		$this->ok('AUDIT LOGS');
-		$this->ok('LOGS');
-		$this->ok(array('Time', 'User', 'IP', 'Resource', '	Action', 'ID', 'Description', 'Details'));
+		$this->zbxTestTextPresent('AUDIT LOGS');
+		$this->zbxTestTextPresent('LOGS');
+		$this->zbxTestTextPresent(array('Time', 'User', 'IP', 'Resource', '	Action', 'ID', 'Description', 'Details'));
 
 		$this->click('flicker_icon_l');
 
@@ -2538,8 +2538,8 @@ class testPageAdministrationAudit extends CWebTest {
 
 		$this->input_type('alias', 'Admin');
 		// at this moment there is not implemented "Enable/Disable" action, it is recorded as "Update" action
-		$this->dropdown_select('action', 'Update');
-		$this->dropdown_select('resourcetype', 'Scenario');
+		$this->zbxTestDropdownSelect('action', 'Update');
+		$this->zbxTestDropdownSelect('resourcetype', 'Scenario');
 
 		$this->click("id=filter");
 		$this->wait();
@@ -2549,8 +2549,8 @@ class testPageAdministrationAudit extends CWebTest {
 		$time = $auditlog['clock'];
 		$details = $auditlog['details'];
 		$today = date("d M Y H:i:s", $time);
-		$this->ok(array("$today", 'Admin', "$ip", 'Scenario', 'Updated', $auditlog['resourceid'], '', "$details"));
-		$this->ok(array("$today", 'Admin', "$ip", 'Scenario', 'Updated', $auditlog['resourceid'], '', 'Scenario activated'));
+		$this->zbxTestTextPresent(array("$today", 'Admin', "$ip", 'Scenario', 'Updated', $auditlog['resourceid'], '', "$details"));
+		$this->zbxTestTextPresent(array("$today", 'Admin', "$ip", 'Scenario', 'Updated', $auditlog['resourceid'], '', 'Scenario activated'));
 
 	}
 
@@ -2563,13 +2563,13 @@ class testPageAdministrationAudit extends CWebTest {
 	*/
 	public function testPageAdministrationAudit_DeleteScenario($auditlog) {
 
-		$this->login('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
+		$this->zbxTestLogin('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
 		$this->checkTitle('Audit');
 		$this->assertElementPresent('config');
 
-		$this->ok('AUDIT LOGS');
-		$this->ok('LOGS');
-		$this->ok(array('Time', 'User', 'IP', 'Resource', '	Action', 'ID', 'Description', 'Details'));
+		$this->zbxTestTextPresent('AUDIT LOGS');
+		$this->zbxTestTextPresent('LOGS');
+		$this->zbxTestTextPresent(array('Time', 'User', 'IP', 'Resource', '	Action', 'ID', 'Description', 'Details'));
 
 		$this->click('flicker_icon_l');
 
@@ -2577,8 +2577,8 @@ class testPageAdministrationAudit extends CWebTest {
 		$this->assertElementPresent('btn1');
 
 		$this->input_type('alias', 'Admin');
-		$this->dropdown_select('action', 'Delete');
-		$this->dropdown_select('resourcetype', 'Scenario');
+		$this->zbxTestDropdownSelect('action', 'Delete');
+		$this->zbxTestDropdownSelect('resourcetype', 'Scenario');
 
 		$this->click("id=filter");
 		$this->wait();
@@ -2587,7 +2587,7 @@ class testPageAdministrationAudit extends CWebTest {
 		$alias = $auditlog['alias'];
 		$time = $auditlog['clock'];
 		$today = date("d M Y H:i:s", $time);
-		$this->ok(array("$today", 'Admin', "$ip", 'Scenario', 'Deleted', $auditlog['resourceid'], '', $auditlog['details']));
+		$this->zbxTestTextPresent(array("$today", 'Admin', "$ip", 'Scenario', 'Deleted', $auditlog['resourceid'], '', $auditlog['details']));
 
 	}
 
@@ -2600,13 +2600,13 @@ class testPageAdministrationAudit extends CWebTest {
 	*/
 	public function testPageAdministrationAudit_AddScreen($auditlog) {
 
-		$this->login('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
+		$this->zbxTestLogin('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
 		$this->checkTitle('Audit');
 		$this->assertElementPresent('config');
 
-		$this->ok('AUDIT LOGS');
-		$this->ok('LOGS');
-		$this->ok(array('Time', 'User', 'IP', 'Resource', 'Action', 'ID', 'Description', 'Details'));
+		$this->zbxTestTextPresent('AUDIT LOGS');
+		$this->zbxTestTextPresent('LOGS');
+		$this->zbxTestTextPresent(array('Time', 'User', 'IP', 'Resource', 'Action', 'ID', 'Description', 'Details'));
 
 		$this->click('flicker_icon_l');
 
@@ -2614,8 +2614,8 @@ class testPageAdministrationAudit extends CWebTest {
 		$this->assertElementPresent('btn1');
 
 		$this->input_type('alias', 'Admin');
-		$this->dropdown_select('action', 'Add');
-		$this->dropdown_select('resourcetype', 'Screen');
+		$this->zbxTestDropdownSelect('action', 'Add');
+		$this->zbxTestDropdownSelect('resourcetype', 'Screen');
 
 		$this->click("id=filter");
 		$this->wait();
@@ -2625,7 +2625,7 @@ class testPageAdministrationAudit extends CWebTest {
 		$time = $auditlog['clock'];
 		$today = date("d M Y H:i:s", $time);
 
-		$this->ok(array("$today", 'Admin', "$ip", 'Screen', 'Added', $auditlog['resourceid'], '', $auditlog['details']));
+		$this->zbxTestTextPresent(array("$today", 'Admin', "$ip", 'Screen', 'Added', $auditlog['resourceid'], '', $auditlog['details']));
 
 	}
 
@@ -2638,13 +2638,13 @@ class testPageAdministrationAudit extends CWebTest {
 	*/
 	public function testPageAdministrationAudit_UpdateScreen($auditlog) {
 
-		$this->login('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
+		$this->zbxTestLogin('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
 		$this->checkTitle('Audit');
 		$this->assertElementPresent('config');
 
-		$this->ok('AUDIT LOGS');
-		$this->ok('LOGS');
-		$this->ok(array('Time', 'User', 'IP', 'Resource', 'Action', 'ID', 'Description', 'Details'));
+		$this->zbxTestTextPresent('AUDIT LOGS');
+		$this->zbxTestTextPresent('LOGS');
+		$this->zbxTestTextPresent(array('Time', 'User', 'IP', 'Resource', 'Action', 'ID', 'Description', 'Details'));
 
 		$this->click('flicker_icon_l');
 
@@ -2652,8 +2652,8 @@ class testPageAdministrationAudit extends CWebTest {
 		$this->assertElementPresent('btn1');
 
 		$this->input_type('alias', 'Admin');
-		$this->dropdown_select('action', 'Update');
-		$this->dropdown_select('resourcetype', 'Screen');
+		$this->zbxTestDropdownSelect('action', 'Update');
+		$this->zbxTestDropdownSelect('resourcetype', 'Screen');
 
 		$this->click("id=filter");
 		$this->wait();
@@ -2663,7 +2663,7 @@ class testPageAdministrationAudit extends CWebTest {
 		$time = $auditlog['clock'];
 		$today = date("d M Y H:i:s", $time);
 
-		$this->ok(array("$today", 'Admin', "$ip", 'Screen', 'Updated', $auditlog['resourceid'], '', $auditlog['details']));
+		$this->zbxTestTextPresent(array("$today", 'Admin', "$ip", 'Screen', 'Updated', $auditlog['resourceid'], '', $auditlog['details']));
 
 	}
 
@@ -2676,13 +2676,13 @@ class testPageAdministrationAudit extends CWebTest {
 	*/
 	public function testPageAdministrationAudit_DeleteScreen($auditlog) {
 
-		$this->login('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
+		$this->zbxTestLogin('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
 		$this->checkTitle('Audit');
 		$this->assertElementPresent('config');
 
-		$this->ok('AUDIT LOGS');
-		$this->ok('LOGS');
-		$this->ok(array('Time', 'User', 'IP', 'Resource', '	Action', 'ID', 'Description', 'Details'));
+		$this->zbxTestTextPresent('AUDIT LOGS');
+		$this->zbxTestTextPresent('LOGS');
+		$this->zbxTestTextPresent(array('Time', 'User', 'IP', 'Resource', '	Action', 'ID', 'Description', 'Details'));
 
 		$this->click('flicker_icon_l');
 
@@ -2690,8 +2690,8 @@ class testPageAdministrationAudit extends CWebTest {
 		$this->assertElementPresent('btn1');
 
 		$this->input_type('alias', 'Admin');
-		$this->dropdown_select('action', 'Delete');
-		$this->dropdown_select('resourcetype', 'Screen');
+		$this->zbxTestDropdownSelect('action', 'Delete');
+		$this->zbxTestDropdownSelect('resourcetype', 'Screen');
 
 		$this->click("id=filter");
 		$this->wait();
@@ -2700,7 +2700,7 @@ class testPageAdministrationAudit extends CWebTest {
 		$alias = $auditlog['alias'];
 		$time = $auditlog['clock'];
 		$today = date("d M Y H:i:s", $time);
-		$this->ok(array("$today", 'Admin', "$ip", 'Screen', 'Deleted', $auditlog['resourceid'], $auditlog['resourcename'], ''));
+		$this->zbxTestTextPresent(array("$today", 'Admin', "$ip", 'Screen', 'Deleted', $auditlog['resourceid'], $auditlog['resourcename'], ''));
 
 	}
 
@@ -2713,13 +2713,13 @@ class testPageAdministrationAudit extends CWebTest {
 	*/
 	public function testPageAdministrationAudit_AddScript ($auditlog) {
 
-		$this->login('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
+		$this->zbxTestLogin('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
 		$this->checkTitle('Audit');
 		$this->assertElementPresent('config');
 
-		$this->ok('AUDIT LOGS');
-		$this->ok('LOGS');
-		$this->ok(array('Time', 'User', 'IP', 'Resource', 'Action', 'ID', 'Description', 'Details'));
+		$this->zbxTestTextPresent('AUDIT LOGS');
+		$this->zbxTestTextPresent('LOGS');
+		$this->zbxTestTextPresent(array('Time', 'User', 'IP', 'Resource', 'Action', 'ID', 'Description', 'Details'));
 
 		$this->click('flicker_icon_l');
 
@@ -2727,8 +2727,8 @@ class testPageAdministrationAudit extends CWebTest {
 		$this->assertElementPresent('btn1');
 
 		$this->input_type('alias', 'Admin');
-		$this->dropdown_select('action', 'Add');
-		$this->dropdown_select('resourcetype', 'Script');
+		$this->zbxTestDropdownSelect('action', 'Add');
+		$this->zbxTestDropdownSelect('resourcetype', 'Script');
 
 		$this->click("id=filter");
 		$this->wait();
@@ -2738,7 +2738,7 @@ class testPageAdministrationAudit extends CWebTest {
 		$time = $auditlog['clock'];
 		$today = date("d M Y H:i:s", $time);
 
-		$this->ok(array("$today", 'Admin', "$ip", 'Script', 'Added', $auditlog['resourceid'], '', $auditlog['details']));
+		$this->zbxTestTextPresent(array("$today", 'Admin', "$ip", 'Script', 'Added', $auditlog['resourceid'], '', $auditlog['details']));
 
 	}
 
@@ -2751,13 +2751,13 @@ class testPageAdministrationAudit extends CWebTest {
 	*/
 	public function testPageAdministrationAudit_UpdateScript($auditlog) {
 
-		$this->login('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
+		$this->zbxTestLogin('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
 		$this->checkTitle('Audit');
 		$this->assertElementPresent('config');
 
-		$this->ok('AUDIT LOGS');
-		$this->ok('LOGS');
-		$this->ok(array('Time', 'User', 'IP', 'Resource', 'Action', 'ID', 'Description', 'Details'));
+		$this->zbxTestTextPresent('AUDIT LOGS');
+		$this->zbxTestTextPresent('LOGS');
+		$this->zbxTestTextPresent(array('Time', 'User', 'IP', 'Resource', 'Action', 'ID', 'Description', 'Details'));
 
 		$this->click('flicker_icon_l');
 
@@ -2765,8 +2765,8 @@ class testPageAdministrationAudit extends CWebTest {
 		$this->assertElementPresent('btn1');
 
 		$this->input_type('alias', 'Admin');
-		$this->dropdown_select('action', 'Update');
-		$this->dropdown_select('resourcetype', 'Script');
+		$this->zbxTestDropdownSelect('action', 'Update');
+		$this->zbxTestDropdownSelect('resourcetype', 'Script');
 
 		$this->click("id=filter");
 		$this->wait();
@@ -2776,7 +2776,7 @@ class testPageAdministrationAudit extends CWebTest {
 		$time = $auditlog['clock'];
 		$today = date("d M Y H:i:s", $time);
 
-		$this->ok(array("$today", 'Admin', "$ip", 'Script', 'Updated', $auditlog['resourceid'], '', $auditlog['details']));
+		$this->zbxTestTextPresent(array("$today", 'Admin', "$ip", 'Script', 'Updated', $auditlog['resourceid'], '', $auditlog['details']));
 
 	}
 
@@ -2789,13 +2789,13 @@ class testPageAdministrationAudit extends CWebTest {
 	*/
 	public function testPageAdministrationAudit_DeleteScript($auditlog) {
 
-		$this->login('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
+		$this->zbxTestLogin('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
 		$this->checkTitle('Audit');
 		$this->assertElementPresent('config');
 
-		$this->ok('AUDIT LOGS');
-		$this->ok('LOGS');
-		$this->ok(array('Time', 'User', 'IP', 'Resource', '	Action', 'ID', 'Description', 'Details'));
+		$this->zbxTestTextPresent('AUDIT LOGS');
+		$this->zbxTestTextPresent('LOGS');
+		$this->zbxTestTextPresent(array('Time', 'User', 'IP', 'Resource', '	Action', 'ID', 'Description', 'Details'));
 
 		$this->click('flicker_icon_l');
 
@@ -2803,8 +2803,8 @@ class testPageAdministrationAudit extends CWebTest {
 		$this->assertElementPresent('btn1');
 
 		$this->input_type('alias', 'Admin');
-		$this->dropdown_select('action', 'Delete');
-		$this->dropdown_select('resourcetype', 'Script');
+		$this->zbxTestDropdownSelect('action', 'Delete');
+		$this->zbxTestDropdownSelect('resourcetype', 'Script');
 
 		$this->click("id=filter");
 		$this->wait();
@@ -2813,7 +2813,7 @@ class testPageAdministrationAudit extends CWebTest {
 		$alias = $auditlog['alias'];
 		$time = $auditlog['clock'];
 		$today = date("d M Y H:i:s", $time);
-		$this->ok(array("$today", 'Admin', "$ip", 'Script', 'Deleted', $auditlog['resourceid'], '', $auditlog['details']));
+		$this->zbxTestTextPresent(array("$today", 'Admin', "$ip", 'Script', 'Deleted', $auditlog['resourceid'], '', $auditlog['details']));
 
 	}
 
@@ -2826,13 +2826,13 @@ class testPageAdministrationAudit extends CWebTest {
 	*/
 	public function testPageAdministrationAudit_AddSlideshow ($auditlog) {
 
-		$this->login('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
+		$this->zbxTestLogin('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
 		$this->checkTitle('Audit');
 		$this->assertElementPresent('config');
 
-		$this->ok('AUDIT LOGS');
-		$this->ok('LOGS');
-		$this->ok(array('Time', 'User', 'IP', 'Resource', 'Action', 'ID', 'Description', 'Details'));
+		$this->zbxTestTextPresent('AUDIT LOGS');
+		$this->zbxTestTextPresent('LOGS');
+		$this->zbxTestTextPresent(array('Time', 'User', 'IP', 'Resource', 'Action', 'ID', 'Description', 'Details'));
 
 		$this->click('flicker_icon_l');
 
@@ -2840,8 +2840,8 @@ class testPageAdministrationAudit extends CWebTest {
 		$this->assertElementPresent('btn1');
 
 		$this->input_type('alias', 'Admin');
-		$this->dropdown_select('action', 'Add');
-		$this->dropdown_select('resourcetype', 'Slide show');
+		$this->zbxTestDropdownSelect('action', 'Add');
+		$this->zbxTestDropdownSelect('resourcetype', 'Slide show');
 
 		$this->click("id=filter");
 		$this->wait();
@@ -2851,7 +2851,7 @@ class testPageAdministrationAudit extends CWebTest {
 		$time = $auditlog['clock'];
 		$today = date("d M Y H:i:s", $time);
 
-		$this->ok(array("$today", 'Admin', "$ip", 'Slide show', 'Added', $auditlog['resourceid'], '', $auditlog['details']));
+		$this->zbxTestTextPresent(array("$today", 'Admin', "$ip", 'Slide show', 'Added', $auditlog['resourceid'], '', $auditlog['details']));
 
 	}
 
@@ -2864,13 +2864,13 @@ class testPageAdministrationAudit extends CWebTest {
 	*/
 	public function testPageAdministrationAudit_UpdateSlideshow($auditlog) {
 
-		$this->login('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
+		$this->zbxTestLogin('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
 		$this->checkTitle('Audit');
 		$this->assertElementPresent('config');
 
-		$this->ok('AUDIT LOGS');
-		$this->ok('LOGS');
-		$this->ok(array('Time', 'User', 'IP', 'Resource', 'Action', 'ID', 'Description', 'Details'));
+		$this->zbxTestTextPresent('AUDIT LOGS');
+		$this->zbxTestTextPresent('LOGS');
+		$this->zbxTestTextPresent(array('Time', 'User', 'IP', 'Resource', 'Action', 'ID', 'Description', 'Details'));
 
 		$this->click('flicker_icon_l');
 
@@ -2878,8 +2878,8 @@ class testPageAdministrationAudit extends CWebTest {
 		$this->assertElementPresent('btn1');
 
 		$this->input_type('alias', 'Admin');
-		$this->dropdown_select('action', 'Update');
-		$this->dropdown_select('resourcetype', 'Slide show');
+		$this->zbxTestDropdownSelect('action', 'Update');
+		$this->zbxTestDropdownSelect('resourcetype', 'Slide show');
 
 		$this->click("id=filter");
 		$this->wait();
@@ -2889,7 +2889,7 @@ class testPageAdministrationAudit extends CWebTest {
 		$time = $auditlog['clock'];
 		$today = date("d M Y H:i:s", $time);
 
-		$this->ok(array("$today", 'Admin', "$ip", 'Slide show', 'Updated', $auditlog['resourceid'], '', $auditlog['details']));
+		$this->zbxTestTextPresent(array("$today", 'Admin', "$ip", 'Slide show', 'Updated', $auditlog['resourceid'], '', $auditlog['details']));
 
 	}
 
@@ -2902,13 +2902,13 @@ class testPageAdministrationAudit extends CWebTest {
 	*/
 	public function testPageAdministrationAudit_DeleteSlideshow($auditlog) {
 
-		$this->login('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
+		$this->zbxTestLogin('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
 		$this->checkTitle('Audit');
 		$this->assertElementPresent('config');
 
-		$this->ok('AUDIT LOGS');
-		$this->ok('LOGS');
-		$this->ok(array('Time', 'User', 'IP', 'Resource', '	Action', 'ID', 'Description', 'Details'));
+		$this->zbxTestTextPresent('AUDIT LOGS');
+		$this->zbxTestTextPresent('LOGS');
+		$this->zbxTestTextPresent(array('Time', 'User', 'IP', 'Resource', '	Action', 'ID', 'Description', 'Details'));
 
 		$this->click('flicker_icon_l');
 
@@ -2916,8 +2916,8 @@ class testPageAdministrationAudit extends CWebTest {
 		$this->assertElementPresent('btn1');
 
 		$this->input_type('alias', 'Admin');
-		$this->dropdown_select('action', 'Delete');
-		$this->dropdown_select('resourcetype', 'Slide show');
+		$this->zbxTestDropdownSelect('action', 'Delete');
+		$this->zbxTestDropdownSelect('resourcetype', 'Slide show');
 
 		$this->click("id=filter");
 		$this->wait();
@@ -2926,7 +2926,7 @@ class testPageAdministrationAudit extends CWebTest {
 		$alias = $auditlog['alias'];
 		$time = $auditlog['clock'];
 		$today = date("d M Y H:i:s", $time);
-		$this->ok(array("$today", 'Admin', "$ip", 'Slide show', 'Deleted', $auditlog['resourceid'], '', $auditlog['details']));
+		$this->zbxTestTextPresent(array("$today", 'Admin', "$ip", 'Slide show', 'Deleted', $auditlog['resourceid'], '', $auditlog['details']));
 
 	}
 
@@ -2939,13 +2939,13 @@ class testPageAdministrationAudit extends CWebTest {
 	*/
 	public function testPageAdministrationAudit_AddValuemap ($auditlog) {
 
-		$this->login('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
+		$this->zbxTestLogin('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
 		$this->checkTitle('Audit');
 		$this->assertElementPresent('config');
 
-		$this->ok('AUDIT LOGS');
-		$this->ok('LOGS');
-		$this->ok(array('Time', 'User', 'IP', 'Resource', 'Action', 'ID', 'Description', 'Details'));
+		$this->zbxTestTextPresent('AUDIT LOGS');
+		$this->zbxTestTextPresent('LOGS');
+		$this->zbxTestTextPresent(array('Time', 'User', 'IP', 'Resource', 'Action', 'ID', 'Description', 'Details'));
 
 		$this->click('flicker_icon_l');
 
@@ -2953,8 +2953,8 @@ class testPageAdministrationAudit extends CWebTest {
 		$this->assertElementPresent('btn1');
 
 		$this->input_type('alias', 'Admin');
-		$this->dropdown_select('action', 'Add');
-		$this->dropdown_select('resourcetype', 'Value map');
+		$this->zbxTestDropdownSelect('action', 'Add');
+		$this->zbxTestDropdownSelect('resourcetype', 'Value map');
 
 		$this->click("id=filter");
 		$this->wait();
@@ -2964,7 +2964,7 @@ class testPageAdministrationAudit extends CWebTest {
 		$time = $auditlog['clock'];
 		$today = date("d M Y H:i:s", $time);
 
-		$this->ok(array("$today", 'Admin', "$ip", 'Value map', 'Added', $auditlog['resourceid'], '', $auditlog['details']));
+		$this->zbxTestTextPresent(array("$today", 'Admin', "$ip", 'Value map', 'Added', $auditlog['resourceid'], '', $auditlog['details']));
 
 	}
 
@@ -2977,13 +2977,13 @@ class testPageAdministrationAudit extends CWebTest {
 	*/
 	public function testPageAdministrationAudit_UpdateValuemap($auditlog) {
 
-		$this->login('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
+		$this->zbxTestLogin('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
 		$this->checkTitle('Audit');
 		$this->assertElementPresent('config');
 
-		$this->ok('AUDIT LOGS');
-		$this->ok('LOGS');
-		$this->ok(array('Time', 'User', 'IP', 'Resource', 'Action', 'ID', 'Description', 'Details'));
+		$this->zbxTestTextPresent('AUDIT LOGS');
+		$this->zbxTestTextPresent('LOGS');
+		$this->zbxTestTextPresent(array('Time', 'User', 'IP', 'Resource', 'Action', 'ID', 'Description', 'Details'));
 
 		$this->click('flicker_icon_l');
 
@@ -2991,8 +2991,8 @@ class testPageAdministrationAudit extends CWebTest {
 		$this->assertElementPresent('btn1');
 
 		$this->input_type('alias', 'Admin');
-		$this->dropdown_select('action', 'Update');
-		$this->dropdown_select('resourcetype', 'Value map');
+		$this->zbxTestDropdownSelect('action', 'Update');
+		$this->zbxTestDropdownSelect('resourcetype', 'Value map');
 
 		$this->click("id=filter");
 		$this->wait();
@@ -3002,7 +3002,7 @@ class testPageAdministrationAudit extends CWebTest {
 		$time = $auditlog['clock'];
 		$today = date("d M Y H:i:s", $time);
 
-		$this->ok(array("$today", 'Admin', "$ip", 'Value map', 'Updated', $auditlog['resourceid'], '', ''));
+		$this->zbxTestTextPresent(array("$today", 'Admin', "$ip", 'Value map', 'Updated', $auditlog['resourceid'], '', ''));
 
 	}
 
@@ -3015,13 +3015,13 @@ class testPageAdministrationAudit extends CWebTest {
 	*/
 	public function testPageAdministrationAudit_DeleteValuemap($auditlog) {
 
-		$this->login('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
+		$this->zbxTestLogin('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
 		$this->checkTitle('Audit');
 		$this->assertElementPresent('config');
 
-		$this->ok('AUDIT LOGS');
-		$this->ok('LOGS');
-		$this->ok(array('Time', 'User', 'IP', 'Resource', '	Action', 'ID', 'Description', 'Details'));
+		$this->zbxTestTextPresent('AUDIT LOGS');
+		$this->zbxTestTextPresent('LOGS');
+		$this->zbxTestTextPresent(array('Time', 'User', 'IP', 'Resource', '	Action', 'ID', 'Description', 'Details'));
 
 		$this->click('flicker_icon_l');
 
@@ -3029,8 +3029,8 @@ class testPageAdministrationAudit extends CWebTest {
 		$this->assertElementPresent('btn1');
 
 		$this->input_type('alias', 'Admin');
-		$this->dropdown_select('action', 'Delete');
-		$this->dropdown_select('resourcetype', 'Value map');
+		$this->zbxTestDropdownSelect('action', 'Delete');
+		$this->zbxTestDropdownSelect('resourcetype', 'Value map');
 
 		$this->click("id=filter");
 		$this->wait();
@@ -3039,7 +3039,7 @@ class testPageAdministrationAudit extends CWebTest {
 		$alias = $auditlog['alias'];
 		$time = $auditlog['clock'];
 		$today = date("d M Y H:i:s", $time);
-		$this->ok(array("$today", 'Admin', "$ip", 'Value map', 'Deleted', $auditlog['resourceid'], '', ''));
+		$this->zbxTestTextPresent(array("$today", 'Admin', "$ip", 'Value map', 'Deleted', $auditlog['resourceid'], '', ''));
 
 	}
 
@@ -3052,13 +3052,13 @@ class testPageAdministrationAudit extends CWebTest {
 	*/
 	public function testPageAdministrationAudit_UpdateConfig($auditlog) {
 
-		$this->login('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
+		$this->zbxTestLogin('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
 		$this->checkTitle('Audit');
 		$this->assertElementPresent('config');
 
-		$this->ok('AUDIT LOGS');
-		$this->ok('LOGS');
-		$this->ok(array('Time', 'User', 'IP', 'Resource', '	Action', 'ID', 'Description', 'Details'));
+		$this->zbxTestTextPresent('AUDIT LOGS');
+		$this->zbxTestTextPresent('LOGS');
+		$this->zbxTestTextPresent(array('Time', 'User', 'IP', 'Resource', '	Action', 'ID', 'Description', 'Details'));
 
 		$this->click('flicker_icon_l');
 
@@ -3066,8 +3066,8 @@ class testPageAdministrationAudit extends CWebTest {
 		$this->assertElementPresent('btn1');
 
 		$this->input_type('alias', 'Admin');
-		$this->dropdown_select('action', 'Update');
-		$this->dropdown_select('resourcetype', 'Configuration of Zabbix');
+		$this->zbxTestDropdownSelect('action', 'Update');
+		$this->zbxTestDropdownSelect('resourcetype', 'Configuration of Zabbix');
 
 		$this->click("id=filter");
 		$this->wait();
@@ -3076,7 +3076,7 @@ class testPageAdministrationAudit extends CWebTest {
 		$alias = $auditlog['alias'];
 		$time = $auditlog['clock'];
 		$today = date("d M Y H:i:s", $time);
-		$this->ok(array("$today", 'Admin', "$ip", 'Configuration of Zabbix', 'Updated', $auditlog['resourceid'], $auditlog['details']));
+		$this->zbxTestTextPresent(array("$today", 'Admin', "$ip", 'Configuration of Zabbix', 'Updated', $auditlog['resourceid'], $auditlog['details']));
 
 	}
 

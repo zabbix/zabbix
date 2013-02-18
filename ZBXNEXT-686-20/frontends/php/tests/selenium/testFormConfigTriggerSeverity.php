@@ -109,15 +109,15 @@ class testFormConfigTriggerSeverity extends CWebTest {
 
 
 	public function testFormTriggerSeverity_Layout() {
-		$this->login('adm.triggerseverities.php');
+		$this->zbxTestLogin('adm.triggerseverities.php');
 		$this->checkTitle('Configuration of trigger severities');
 
-		$this->dropdown_select_wait('configDropDown', 'Trigger severities');
+		$this->zbxTestDropdownSelectWait('configDropDown', 'Trigger severities');
 
-		$this->ok('Trigger severities');
-		$this->ok('CONFIGURATION OF TRIGGER SEVERITIES');
+		$this->zbxTestTextPresent('Trigger severities');
+		$this->zbxTestTextPresent('CONFIGURATION OF TRIGGER SEVERITIES');
 
-		$this->ok(array('Not classified', 'Information', 'Warning', 'Average', 'High', 'Disaster'));
+		$this->zbxTestTextPresent(array('Not classified', 'Information', 'Warning', 'Average', 'High', 'Disaster'));
 		$this->assertElementPresent('severity_name_0');
 		$this->assertElementPresent('severity_color_0');
 		$this->assertElementPresent('lbl_severity_color_0');
@@ -150,7 +150,7 @@ class testFormConfigTriggerSeverity extends CWebTest {
 	public function testFormTriggerSeverity_Update($data, $resultSave, $DBvalues) {
 		DBsave_tables('config');
 
-		$this->login('adm.triggerseverities.php');
+		$this->zbxTestLogin('adm.triggerseverities.php');
 
 		foreach ($data as $field => $value) {
 			$this->input_type($field, $value);
@@ -165,7 +165,7 @@ class testFormConfigTriggerSeverity extends CWebTest {
 		$this->wait();
 
 		if ($resultSave) {
-			$this->ok('Configuration updated');
+			$this->zbxTestTextPresent('Configuration updated');
 
 			$dbres = DBfetch(DBselect($sql));
 			foreach ($dbres as $field => $value) {
@@ -173,7 +173,7 @@ class testFormConfigTriggerSeverity extends CWebTest {
 			}
 		}
 		else {
-			$this->ok('ERROR:');
+			$this->zbxTestTextPresent('ERROR:');
 			$this->assertEquals($DBhash, DBhash($sql), "DB fields changed after unsuccessful save.");
 		}
 

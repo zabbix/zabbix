@@ -23,67 +23,67 @@ require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 class testPageAdministrationScripts extends CWebTest {
 	// Returns all scripts
 	public static function allScripts() {
-		return DBdata('SELECT * FROM scripts');
+		return DBdata('SELECT scriptid,name,command FROM scripts');
 	}
 
 	/**
 	* @dataProvider allScripts
 	*/
 	public function testPageAdministrationScripts_CheckLayout($script) {
-		$this->login('scripts.php');
+		$this->zbxTestLogin('scripts.php');
 		$this->checkTitle('Configuration of scripts');
+		$this->zbxTestTextPresent('CONFIGURATION OF SCRIPTS');
+		$this->zbxTestTextPresent('Scripts');
+		$this->zbxTestTextPresent('Displaying');
 
-		$this->ok('Scripts');
-		$this->ok('CONFIGURATION OF SCRIPTS');
-		$this->ok('Displaying');
-		// Header
-		$this->ok(array('Name', 'Command', 'User group', 'Host group', 'Host access'));
-		// Data
-		$this->ok(array($script['name'], $script['command'], 'Read'));
-		$this->dropdown_select('go', 'Delete selected');
+		// header
+		$this->zbxTestTextPresent(
+				array('Name', 'Type', 'Execute on', 'Commands', 'User group', 'Host group', 'Host access')
+		);
+
+		// data
+		$this->zbxTestTextPresent(array($script['name'], $script['command']));
+		$this->zbxTestDropdownSelect('go', 'Delete selected');
 	}
 
 	/**
 	* @dataProvider allScripts
 	*/
 	public function testPageAdministrationScripts_SimpleUpdate($script) {
-		$name = $script['name'];
-
-		$sql = 'SELECT * FROM scripts WHERE name = '.zbx_dbstr($name).' ORDER BY scriptid';
+		$sql = 'SELECT * FROM scripts WHERE name='.zbx_dbstr($script['name']).' ORDER BY scriptid';
 		$oldHash = DBhash($sql);
 
-		$this->login('scripts.php');
-		$this->checkTitle('Configuration of scripts');
-		$this->click("link=$name");
-		$this->wait();
-		$this->button_click('save');
-		$this->wait();
-		$this->checkTitle('Configuration of scripts');
-		$this->ok('Script updated');
-		$this->ok($name);
-		$this->ok('CONFIGURATION OF SCRIPTS');
+		$this->zbxTestLogin('scripts.php');
 
-		$this->assertEquals($oldHash, DBhash($sql), 'Chuck Norris: Non-change update should not change contents of the "scripts" table');
+		$this->click('link='.$script['name']);
+		$this->wait();
+		$this->zbxTestClickWait('save');
+		$this->checkTitle('Configuration of scripts');
+		$this->zbxTestTextPresent('Script updated');
+		$this->zbxTestTextPresent('CONFIGURATION OF SCRIPTS');
+
+		$this->assertEquals($oldHash, DBhash($sql),
+				'Chuck Norris: Non-change update should not change contents of the "scripts" table');
 	}
 
 	public function testPageAdministrationScripts_MassDeleteAll() {
-
 		DBsave_tables('scripts');
+
 		$this->chooseOkOnNextConfirmation();
 
-		$this->login('scripts.php');
-		$this->checkTitle('Configuration of scripts');
-		$this->checkbox_select("all_scripts");
-		$this->dropdown_select('go', 'Delete selected');
-		$this->button_click('goButton');
-		$this->wait();
+		$this->zbxTestLogin('scripts.php');
+
+		$this->checkbox_select('all_scripts');
+		$this->zbxTestDropdownSelect('go', 'Delete selected');
+		$this->zbxTestClickWait('goButton');
 
 		$this->getConfirmation();
 		$this->checkTitle('Configuration of scripts');
-		$this->ok('Script deleted');
+		$this->zbxTestTextPresent('Script deleted');
 
 		$sql = 'SELECT * FROM scripts';
-		$this->assertEquals(0, DBcount($sql), 'Chuck Norris: Not all scripts have been deleted from the "scripts" table');
+		$this->assertEquals(0, DBcount($sql),
+				'Chuck Norris: Not all scripts have been deleted from the "scripts" table');
 
 		DBrestore_tables('scripts');
 	}
@@ -92,23 +92,21 @@ class testPageAdministrationScripts extends CWebTest {
 	* @dataProvider allScripts
 	*/
 	public function testPageAdministrationScripts_MassDelete($script) {
-		$scriptid = $script['scriptid'];
-
 		DBsave_tables('scripts');
+
 		$this->chooseOkOnNextConfirmation();
 
-		$this->login('scripts.php');
-		$this->checkTitle('Configuration of scripts');
-		$this->checkbox_select("scripts[$scriptid]");
-		$this->dropdown_select('go', 'Delete selected');
-		$this->button_click('goButton');
-		$this->wait();
+		$this->zbxTestLogin('scripts.php');
+
+		$this->checkbox_select('scripts['.$script['scriptid'].']');
+		$this->zbxTestDropdownSelect('go', 'Delete selected');
+		$this->zbxTestClickWait('goButton');
 
 		$this->getConfirmation();
 		$this->checkTitle('Configuration of scripts');
-		$this->ok('Script deleted');
+		$this->zbxTestTextPresent('Script deleted');
 
-		$sql = 'SELECT * FROM scripts WHERE scriptid='.zbx_dbstr($scriptid).'';
+		$sql = 'SELECT * FROM scripts WHERE scriptid='.zbx_dbstr($script['scriptid']);
 		$this->assertEquals(0, DBcount($sql));
 
 		DBrestore_tables('scripts');

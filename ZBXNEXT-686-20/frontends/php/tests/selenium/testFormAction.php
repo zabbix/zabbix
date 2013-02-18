@@ -64,7 +64,7 @@ class testFormAction extends CWebTest {
 	public function testActionCreateSimple($action) {
 		DBsave_tables('actions');
 
-		$this->login('actionconf.php?form=1&eventsource=0');
+		$this->zbxTestLogin('actionconf.php?form=1&eventsource=0');
 		$this->checkTitle('Configuration of actions');
 
 		$this->type('name', $action['name']);
@@ -75,25 +75,25 @@ class testFormAction extends CWebTest {
 		$this->click("link=Conditions");
 		foreach ($action['conditions'] as $condition) {
 
-			$this->dropdown_select_wait("new_condition_conditiontype", $condition['type']);
+			$this->zbxTestDropdownSelectWait("new_condition_conditiontype", $condition['type']);
 			switch ($condition['type']) {
 				case 'Trigger name':
 					$this->type("new_condition_value", $condition['value']);
 					$this->click('add_condition');
 					$this->wait();
-					$this->ok('Trigger name like "'.$condition['value'].'"');
+					$this->zbxTestTextPresent('Trigger name like "'.$condition['value'].'"');
 					break;
 				case 'Trigger severity':
-					$this->dropdown_select('new_condition_value', $condition['value']);
+					$this->zbxTestDropdownSelect('new_condition_value', $condition['value']);
 					$this->click('add_condition');
 					$this->wait();
-					$this->ok('Trigger severity = "'.$condition['value'].'"');
+					$this->zbxTestTextPresent('Trigger severity = "'.$condition['value'].'"');
 					break;
 				case 'Application':
 					$this->type("new_condition_value", $condition['value']);
 					$this->click('add_condition');
 					$this->wait();
-					$this->ok('Application = "'.$condition['value'].'"');
+					$this->zbxTestTextPresent('Application = "'.$condition['value'].'"');
 					break;
 			}
 		}
@@ -103,7 +103,7 @@ class testFormAction extends CWebTest {
 		foreach ($action['operations'] as $operation) {
 			$this->click('new_operation');
 			$this->wait();
-			$this->dropdown_select_wait('new_operation_operationtype', $operation['type']);
+			$this->zbxTestDropdownSelectWait('new_operation_operationtype', $operation['type']);
 
 			switch ($operation['type']) {
 				case 'Send message':
@@ -139,7 +139,7 @@ class testFormAction extends CWebTest {
 		$this->click('save');
 
 		$this->wait();
-		$this->ok('Action added');
+		$this->zbxTestTextPresent('Action added');
 
 		DBrestore_tables('actions');
 	}
@@ -147,7 +147,7 @@ class testFormAction extends CWebTest {
 	public function testActionCreate() {
 		DBsave_tables('actions');
 
-		$this->login('actionconf.php?form=1&eventsource=0');
+		$this->zbxTestLogin('actionconf.php?form=1&eventsource=0');
 		$this->checkTitle('Configuration of actions');
 
 		$this->type("name", "action test");
@@ -160,21 +160,21 @@ class testFormAction extends CWebTest {
 		$this->type("new_condition_value", "trigger");
 		$this->click("add_condition");
 		$this->wait();
-		$this->ok("Trigger name like \"trigger\"");
+		$this->zbxTestTextPresent("Trigger name like \"trigger\"");
 
 		$this->select("new_condition_conditiontype", "label=Trigger severity");
 		$this->wait();
 		$this->select("new_condition_value", "label=Average");
 		$this->click("add_condition");
 		$this->wait();
-		$this->ok("Trigger severity = \"Average\"");
+		$this->zbxTestTextPresent("Trigger severity = \"Average\"");
 
 		$this->select("new_condition_conditiontype", "label=Application");
 		$this->wait();
 		$this->type("new_condition_value", "app");
 		$this->click("add_condition");
 		$this->wait();
-		$this->ok("Application = \"app\"");
+		$this->zbxTestTextPresent("Application = \"app\"");
 
 // adding operations
 		$this->click("link=Operations");
@@ -198,8 +198,8 @@ class testFormAction extends CWebTest {
 		$this->select("new_operation_opmessage_mediatypeid", "label=Jabber");
 		$this->click("add_operation");
 		$this->wait();
-		$this->ok("Send message to users: Admin");
-		$this->ok("Send message to user groups: Enabled debug mode, Zabbix administrators");
+		$this->zbxTestTextPresent("Send message to users: Admin");
+		$this->zbxTestTextPresent("Send message to user groups: Enabled debug mode, Zabbix administrators");
 		$this->click("new_operation");
 		$this->wait();
 		$this->select("new_operation_operationtype", "label=Remote command");
@@ -214,7 +214,7 @@ class testFormAction extends CWebTest {
 		$this->click("select");
 		$this->waitForPopUp("zbx_popup", "30000");
 		$this->selectWindow("name=zbx_popup");
-		$this->dropdown_select_wait('groupid', 'Zabbix servers');
+		$this->zbxTestDropdownSelectWait('groupid', 'Zabbix servers');
 		$this->click("spanid10053");
 		$this->selectWindow("null");
 		$this->click("//input[@name='save']");
@@ -236,9 +236,9 @@ class testFormAction extends CWebTest {
 		$this->type("new_operation_opcommand_command", "command");
 		$this->click("add_operation");
 		$this->wait();
-		$this->ok("Run remote commands on current host");
-		// $this->ok("Run remote commands on hosts: ЗАББИКС Сервер");
-		$this->ok("Run remote commands on host groups: Zabbix servers");
+		$this->zbxTestTextPresent("Run remote commands on current host");
+		// $this->zbxTestTextPresent("Run remote commands on hosts: ЗАББИКС Сервер");
+		$this->zbxTestTextPresent("Run remote commands on host groups: Zabbix servers");
 		$this->click("new_operation");
 		$this->wait();
 		$this->type("new_operation_esc_step_to", "2");
@@ -253,10 +253,10 @@ class testFormAction extends CWebTest {
 		$this->type("new_operation_opcommand_command", "command ssh");
 		$this->click("add_operation");
 		$this->wait();
-		$this->ok("Run remote commands on current host");
+		$this->zbxTestTextPresent("Run remote commands on current host");
 		$this->click("save");
 		$this->wait();
-		$this->ok("Action added");
+		$this->zbxTestTextPresent("Action added");
 
 		DBrestore_tables('actions');
 	}

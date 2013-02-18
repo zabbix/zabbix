@@ -59,53 +59,52 @@ class testFormItem extends CWebTest {
 	 */
 	public function testFormItem_CheckLayout($itemTypeID, $itemType ) {
 
-		$this->login('items.php');
+		$this->zbxTestLogin('items.php');
 		$this->checkTitle('Configuration of items');
-		$this->ok('CONFIGURATION OF ITEMS');
+		$this->zbxTestTextPresent('CONFIGURATION OF ITEMS');
 
-		$this->button_click('form');
-		$this->wait();
+		$this->zbxTestClickWait('form');
 		$this->checkTitle('Configuration of items');
 
-		$this->ok('Host interface');
-		$this->ok('Type of information');
-		$this->ok('Data type');
-		$this->ok('Units');
-		$this->ok('Use custom multiplier');
-		$this->ok('Update interval (in sec)');
-		$this->ok('Flexible intervals');
-		$this->ok('Interval');
-		$this->ok('Period');
-		$this->ok('Action');
-		$this->ok('No flexible intervals defined.');
-		// $this->ok('New flexible interval');
-		$this->ok('Update interval (in sec)');
-		$this->ok('Period');
-		$this->ok('Keep history (in days)');
-		$this->ok('Keep trends (in days)');
-		$this->ok('Store value');
-		$this->ok('Show value');
-		$this->ok('show value mappings');
-		$this->ok('New application');
-		$this->ok('Applications');
-		$this->ok('Populates host inventory field');
-		$this->ok('Description');
-		$this->ok('Status');
+		$this->zbxTestTextPresent('Host interface');
+		$this->zbxTestTextPresent('Type of information');
+		$this->zbxTestTextPresent('Data type');
+		$this->zbxTestTextPresent('Units');
+		$this->zbxTestTextPresent('Use custom multiplier');
+		$this->zbxTestTextPresent('Update interval (in sec)');
+		$this->zbxTestTextPresent('Flexible intervals');
+		$this->zbxTestTextPresent('Interval');
+		$this->zbxTestTextPresent('Period');
+		$this->zbxTestTextPresent('Action');
+		$this->zbxTestTextPresent('No flexible intervals defined.');
+		// $this->zbxTestTextPresent('New flexible interval');
+		$this->zbxTestTextPresent('Update interval (in sec)');
+		$this->zbxTestTextPresent('Period');
+		$this->zbxTestTextPresent('Keep history (in days)');
+		$this->zbxTestTextPresent('Keep trends (in days)');
+		$this->zbxTestTextPresent('Store value');
+		$this->zbxTestTextPresent('Show value');
+		$this->zbxTestTextPresent('show value mappings');
+		$this->zbxTestTextPresent('New application');
+		$this->zbxTestTextPresent('Applications');
+		$this->zbxTestTextPresent('Populates host inventory field');
+		$this->zbxTestTextPresent('Description');
+		$this->zbxTestTextPresent('Status');
 
-		$this->ok('Host');
+		$this->zbxTestTextPresent('Host');
 		$this->assertElementPresent('hostname');
 		// this check will fail in case of incorrect maxlength value for this "host" element!!!
 ////TODO	$this->assertAttribute("//input[@id='hostname']/@maxlength", '64');
 
 		$this->assertElementPresent('btn_host');
 
-		$this->dropdown_select('type', $itemType);
+		$this->zbxTestDropdownSelect('type', $itemType);
 
-		$this->ok('Name');
+		$this->zbxTestTextPresent('Name');
 		$this->assertElementPresent('name');
 		$this->assertAttribute("//input[@id='name']/@maxlength", '255');
 
-		$this->ok('Key');
+		$this->zbxTestTextPresent('Key');
 		$this->assertElementPresent('key');
 		$this->assertAttribute("//input[@id='key']/@maxlength", '255');
 
@@ -797,12 +796,12 @@ class testFormItem extends CWebTest {
 	 */
 	public function testFormItem_Create($expected, $visibleHostname, $type, $name, $key, $formula, $delay,
 				$flexPeriod, $flexDelay, $history, $trends, $errorMsgs) {
-		$this->login('hosts.php');
+		$this->zbxTestLogin('hosts.php');
 		$this->checkTitle('Configuration of hosts');
-		$this->ok('CONFIGURATION OF HOSTS');
-		$this->dropdown_select_wait('groupid', 'all');
+		$this->zbxTestTextPresent('CONFIGURATION OF HOSTS');
+		$this->zbxTestDropdownSelectWait('groupid', 'all');
 		$this->checkTitle('Configuration of hosts');
-		$this->ok('CONFIGURATION OF HOSTS');
+		$this->zbxTestTextPresent('CONFIGURATION OF HOSTS');
 
 
 		$row = DBfetch(DBselect("select hostid from hosts where name='$visibleHostname'"));
@@ -812,10 +811,9 @@ class testFormItem extends CWebTest {
 		$this->wait();
 
 		$this->checkTitle('Configuration of items');
-		$this->ok('CONFIGURATION OF ITEMS');
+		$this->zbxTestTextPresent('CONFIGURATION OF ITEMS');
 
-		$this->button_click('form');
-		$this->wait();
+		$this->zbxTestClickWait('form');
 		$this->checkTitle('Configuration of items');
 
 		$this->input_type('name', $name);
@@ -837,12 +835,11 @@ class testFormItem extends CWebTest {
 				if ($flexDelay!=null) {
 					$this->input_type('new_delay_flex_delay', $flexDelay);
 				}
-				$this->button_click('add_delay_flex');
-				$this->wait();
+				$this->zbxTestClickWait('add_delay_flex');
 			}
 			if ($flexDelay==null) {
 					foreach ($errorMsgs as $msg) {
-					$this->ok($msg);
+					$this->zbxTestTextPresent($msg);
 				}
 			}
 		}
@@ -856,24 +853,23 @@ class testFormItem extends CWebTest {
 		}
 
 		if (($flexPeriod==null) || ($flexDelay!=null)) {
-			$this->button_click('save');
-			$this->wait();
+			$this->zbxTestClickWait('save');
 			switch ($expected) {
 				case ITEM_GOOD:
-					$this->ok('Item added');
+					$this->zbxTestTextPresent('Item added');
 					$this->checkTitle('Configuration of items');
-					$this->ok('CONFIGURATION OF ITEMS');
+					$this->zbxTestTextPresent('CONFIGURATION OF ITEMS');
 					break;
 
 				case ITEM_BAD:
 					$this->checkTitle('Configuration of items');
-					$this->ok('CONFIGURATION OF ITEMS');
+					$this->zbxTestTextPresent('CONFIGURATION OF ITEMS');
 					foreach ($errorMsgs as $msg) {
-						$this->ok($msg);
+						$this->zbxTestTextPresent($msg);
 					}
-					$this->ok('Host');
-					$this->ok('Name');
-					$this->ok('Key');
+					$this->zbxTestTextPresent('Host');
+					$this->zbxTestTextPresent('Name');
+					$this->zbxTestTextPresent('Key');
 					break;
 			}
 		}
