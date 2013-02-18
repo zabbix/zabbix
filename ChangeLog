@@ -39,6 +39,7 @@ A.F.I...S. [ZBXNEXT-1186] increased length to 2048 characters of expression fiel
 ..F....... [ZBX-5127] regular expressions form redesign (Vedmak)
 
 Bug fixes:
+........S. [ZBX-6123] ensured sequential IT services updates by database syncers (dimir)
 ....I..... [ZBX-5668] added upgrade patch for change "server_check_interval" field value to 10 (Sasha)
 ...G...PS. [ZBX-3078] added signal handling to agent also when it's not ran as daemon (wiper)
 .....J.... [ZBX-6229] removed pretty formatting from java gateway JSON responses (wiper)
@@ -120,6 +121,7 @@ Changes for 2.0.6rc1
 New features:
 
 Bug fixes:
+........S. [ZBX-6123] ensured sequential IT services updates by database syncers (dimir)
 ....I..... [ZBX-5635] changed value types to float for qps items in "Template App MySQL" (Sasha)
 ....I..... [ZBX-5622] fixed grammatical error of snmptrap.fallback in help_items; thanks to Kodai Terashima (Sasha)
 ....I..... [ZBX-6191] fixed state of unsupported items in data.sql (Sasha)
