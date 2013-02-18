@@ -49,9 +49,9 @@ int	SYSTEM_CPU_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RES
 
 int	SYSTEM_CPU_UTIL(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	char	tmp[16];
-	int	cpu_num;
-	double	value;
+	char		tmp[16];
+	uint32_t	cpu_num;
+	double		value;
 
 	if (!CPU_COLLECTOR_STARTED(collector))
 	{
@@ -64,7 +64,7 @@ int	SYSTEM_CPU_UTIL(const char *cmd, const char *param, unsigned flags, AGENT_RE
 
 	if (0 != get_param(param, 1, tmp, sizeof(tmp)) || '\0' == *tmp || 0 == strcmp(tmp, "all"))
 		cpu_num = 0;
-	else if (SUCCEED != is_uint(tmp) || 1 > (cpu_num = atoi(tmp) + 1) || cpu_num > collector->cpus.count)
+	else if (SUCCEED != is_uint32(tmp, &cpu_num) || ++cpu_num > collector->cpus.count)
 		return SYSINFO_RET_FAIL;
 
 	/* only "system" (default) for parameter "type" is supported */

@@ -1433,48 +1433,6 @@ int	is_uint_suffix(const char *str, unsigned int *value)
 	return SUCCEED;
 }
 
-/******************************************************************************
- *                                                                            *
- * Function: is_uint                                                          *
- *                                                                            *
- * Purpose: check if the string is unsigned integer                           *
- *                                                                            *
- * Parameters: str - string to check                                          *
- *                                                                            *
- * Return value:  SUCCEED - the string is unsigned integer                    *
- *                FAIL - otherwise                                            *
- *                                                                            *
- * Author: Alexei Vladishev                                                   *
- *                                                                            *
- ******************************************************************************/
-int	is_uint(const char *str)
-{
-	size_t	i, len;
-
-	for (i = 0; ' ' == str[i] && '\0' != str[i]; i++)	/* trim left spaces */
-		;
-
-	for (len = 0; '\0' != str[i]; i++, len++)
-	{
-		if (0 != isdigit(str[i]))
-			continue;
-
-		if (' ' == str[i])	/* check right spaces */
-		{
-			for (; ' ' == str[i] && '\0' != str[i]; i++)	/* trim right spaces */
-				;
-
-			if ('\0' == str[i])	/* SUCCEED */
-				break;
-		}
-		return FAIL;
-	}
-
-	if (0 == len)
-		return FAIL;
-
-	return SUCCEED;
-}
 
 #if defined(_WINDOWS)
 int	_wis_uint(const wchar_t *wide_string)
@@ -1569,6 +1527,49 @@ int	is_uint64_n(const char *str, size_t n, zbx_uint64_t *value)
 
 	if (NULL != value)
 		*value = value_uint64;
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: is_uint32_n                                                      *
+ *                                                                            *
+ * Purpose: check if the string is 32bit unsigned integer                     *
+ *                                                                            *
+ * Parameters: str   - [IN] string to check                                   *
+ *             n     - [IN] string length or ZBX_MAX_UINT32_LEN               *
+ *             value - [OUT] a pointer to converted value (optional)          *
+ *                                                                            *
+ * Return value:  SUCCEED - the string is unsigned integer                    *
+ *                FAIL - the string is not a number or overflow               *
+ *                                                                            *
+ ******************************************************************************/
+int	is_uint32_n(const char *str, size_t n, uint32_t *value)
+{
+	const uint32_t	max_uint32 = ~(uint32_t)0L;
+	uint32_t	value_uint32 = 0, c;
+
+	if ('\0' == *str || 0 == n)
+		return FAIL;
+
+	while ('\0' != *str && 0 < n--)
+	{
+		if (0 == isdigit(*str))
+			return FAIL;	/* not a digit */
+
+		c = (uint32_t)(unsigned char)(*str - '0');
+
+		if ((max_uint32 - c) / 10 < value_uint32)
+			return FAIL;	/* overflow */
+
+		value_uint32 = value_uint32 * 10 + c;
+
+		str++;
+	}
+
+	if (NULL != value)
+		*value = value_uint32;
 
 	return SUCCEED;
 }
