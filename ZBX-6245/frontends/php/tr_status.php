@@ -117,8 +117,10 @@ else {
 
 // show events
 if (isset($_REQUEST['show_events'])) {
-	if ($config['event_ack_enable'] == EVENT_ACK_DISABLED && $_REQUEST['show_events'] == EVENTS_OPTION_ALL) {
-		$_REQUEST['show_events'] = EVENTS_OPTION_NOEVENT;
+	if ($config['event_ack_enable'] == EVENT_ACK_DISABLED) {
+		if (!str_in_array($_REQUEST['show_events'], array(EVENTS_OPTION_NOEVENT, EVENTS_OPTION_ALL))) {
+			$_REQUEST['show_events'] = EVENTS_OPTION_NOEVENT;
+		}
 	}
 
 	CProfile::update('web.tr_status.filter.show_events', $_REQUEST['show_events'], PROFILE_TYPE_INT);
@@ -132,7 +134,13 @@ if (isset($_REQUEST['show_details'])) {
 	CProfile::update('web.tr_status.filter.show_details', $_REQUEST['show_details'], PROFILE_TYPE_INT);
 }
 else {
-	$_REQUEST['show_details'] = CProfile::get('web.tr_status.filter.show_details', 0);
+	if (isset($_REQUEST['filter_set'])) {
+		CProfile::update('web.tr_status.filter.show_details', 0, PROFILE_TYPE_INT);
+		$_REQUEST['show_details'] = 0;
+	}
+	else {
+		$_REQUEST['show_details'] = CProfile::get('web.tr_status.filter.show_details', 0);
+	}
 }
 
 // show maintenance
@@ -162,7 +170,13 @@ if (isset($_REQUEST['status_change'])) {
 	CProfile::update('web.tr_status.filter.status_change', $_REQUEST['status_change'], PROFILE_TYPE_INT);
 }
 else {
-	$_REQUEST['status_change'] = CProfile::get('web.tr_status.filter.status_change', 0);
+	if (isset($_REQUEST['filter_set'])) {
+		CProfile::update('web.tr_status.filter.status_change', 0, PROFILE_TYPE_INT);
+		$_REQUEST['status_change'] = 0;
+	}
+	else {
+		$_REQUEST['status_change'] = CProfile::get('web.tr_status.filter.status_change', 0);
+	}
 }
 
 // status change days
@@ -175,10 +189,16 @@ else {
 
 // ack status
 if (isset($_REQUEST['ack_status'])) {
+	if ($config['event_ack_enable'] == EVENT_ACK_DISABLED) {
+		$_REQUEST['ack_status'] = ZBX_ACK_STS_ANY;
+	}
+
 	CProfile::update('web.tr_status.filter.ack_status', $_REQUEST['ack_status'], PROFILE_TYPE_INT);
 }
 else {
-	$_REQUEST['ack_status'] = CProfile::get('web.tr_status.filter.ack_status', ZBX_ACK_STS_ANY);
+	$_REQUEST['ack_status'] = ($config['event_ack_enable'] == EVENT_ACK_DISABLED)
+		? ZBX_ACK_STS_ANY
+		: CProfile::get('web.tr_status.filter.ack_status', ZBX_ACK_STS_ANY);
 }
 
 // txt select
@@ -287,7 +307,7 @@ $statusChangeCheckBox->addStyle('vertical-align: middle;');
 
 $daysSpan = new CSpan(_('days'));
 $daysSpan->addStyle('vertical-align: middle;');
-$filterForm->addRow(_('Age less than'), array($statusChangeCheckBox, $statusChangeDays, $daysSpan,));
+$filterForm->addRow(_('Age less than'), array($statusChangeCheckBox, $statusChangeDays, SPACE, $daysSpan));
 $filterForm->addRow(_('Show details'), new CCheckBox('show_details', $_REQUEST['show_details'], null, 1));
 $filterForm->addRow(_('Filter by name'), new CTextBox('txt_select', $_REQUEST['txt_select'], 40));
 $filterForm->addRow(_('Show hosts in maintenance'), new CCheckBox('show_maintenance', $_REQUEST['show_maintenance'], null, 1));
