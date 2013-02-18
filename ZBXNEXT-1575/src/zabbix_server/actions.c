@@ -964,7 +964,6 @@ static int	check_internal_condition(DB_EVENT *event, DB_CONDITION *condition)
 	zbx_uint64_t	value_uint64;
 	int		nodeid;
 	char		sql[256];
-	char		*tmp_str = NULL;
 	int		ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);

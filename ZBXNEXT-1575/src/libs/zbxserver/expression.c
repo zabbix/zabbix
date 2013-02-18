@@ -1627,8 +1627,6 @@ static int	DBget_node_value(zbx_uint64_t objectid, char **replace_to, int reques
  ******************************************************************************/
 static int	get_node_value_by_trigger(DB_TRIGGER *trigger, char **replace_to, int N_functionid, int request)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
 	zbx_uint64_t	functionid;
 
 	if (FAIL == trigger_get_N_functionid(trigger->expression, N_functionid, &functionid))

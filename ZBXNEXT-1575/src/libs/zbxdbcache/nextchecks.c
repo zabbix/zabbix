@@ -143,7 +143,6 @@ void	DCflush_nextchecks()
 		char		*sql = NULL;
 		size_t		sql_alloc = 4 * ZBX_KIBIBYTE, sql_offset = 0;
 		DC_TRIGGER	*trigger;
-		unsigned char	new_event, event_source, event_value;
 
 		sql = zbx_malloc(sql, sql_alloc);
 
