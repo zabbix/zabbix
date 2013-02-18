@@ -788,14 +788,23 @@ class CChart extends CGraphDraw {
 				$interval = $int;
 			}
 		}
+
+		// add 1 interval so max Y wouldn't be at the top
+		if ($this->m_maxY[$side] > 0 && bcmul($this->m_minY[$side], '-1') < $this->m_maxY[$side]) {
+			$this->m_maxY[$side] += $interval;
+		}
+
+		// add 1 interval so min Y wouldn't be at the top
+		if ($this->m_minY[$side] < 0 && bcmul($this->m_minY[$side], '-1') > $this->m_maxY[$side]) {
+			$this->m_minY[$side] -= $interval;
+		}
+
+		// calculate interval, if left side use B or Bps
 		if ($leftBase8) {
-			if ($this->m_minY[$side] < 0 && bcmul($this->m_minY[$side], '-1') > $this->m_maxY[$side]) {
-				$this->m_minY[$side] -= $interval;
-			}
-			$intervalData = convertBase10ToBase8($interval);
+			$intervalData = convertBase8Values($interval);
 			$interval = $intervalData['value'];
-			$sideMaxData = convertBase10ToBase8($this->m_maxY[$side]);
-			$sideMinData = convertBase10ToBase8($this->m_minY[$side]);
+			$sideMaxData = convertBase8Values($this->m_maxY[$side]);
+			$sideMinData = convertBase8Values($this->m_minY[$side]);
 			if ($sideMaxData['pow'] > $sideMinData['pow']) {
 				$sideMax = $sideMaxData['pow'];
 			}
@@ -827,15 +836,23 @@ class CChart extends CGraphDraw {
 				$interval_other_side = $int;
 			}
 		}
+
+		// add 1 interval so max Y wouldn't be at the top
+		if ($this->m_maxY[$other_side] > 0 && bcmul($this->m_minY[$other_side], '-1') < $this->m_maxY[$other_side]) {
+			$this->m_maxY[$other_side] += $interval_other_side;
+		}
+
+		// add 1 interval so min Y wouldn't be at the top
+		if ($this->m_minY[$other_side] < 0 && bcmul($this->m_minY[$other_side], '-1') > $this->m_maxY[$other_side]) {
+			$this->m_minY[$other_side] -= $interval_other_side;
+		}
+
+		// calculate interval, if right side use B or Bps
 		if ($rightBase8) {
-			if ($this->m_minY[$other_side] < 0
-					&& bcmul($this->m_minY[$other_side], '-1') > $this->m_maxY[$other_side]) {
-				$this->m_minY[$other_side] -= $interval;
-			}
-			$intervalOtherSideData = convertBase10ToBase8($interval_other_side);
+			$intervalOtherSideData = convertBase8Values($interval_other_side);
 			$interval_other_side = $intervalOtherSideData['value'];
-			$otherSideMaxData = convertBase10ToBase8($this->m_maxY[$other_side]);
-			$otherSideMinData = convertBase10ToBase8($this->m_minY[$other_side]);
+			$otherSideMaxData = convertBase8Values($this->m_maxY[$other_side]);
+			$otherSideMinData = convertBase8Values($this->m_minY[$other_side]);
 			if ($otherSideMaxData['pow'] > $otherSideMinData['pow']) {
 				$otherSideMax = $otherSideMaxData['pow'];
 			}
@@ -857,11 +874,6 @@ class CChart extends CGraphDraw {
 
 		// calculate interval count for main side
 		$this->gridLinesCount[$side] = bcceil(bcdiv(bcsub($this->m_maxY[$side], $this->m_minY[$side]), $interval));
-
-		// we add 1 interval so max Y wouldn't be at the top, if max value is positive
-		if ($this->m_maxY[$side] > 0 && bccomp($this->m_maxY[$side], $tmp_maxY[$side], 2) == 0) {
-			$this->gridLinesCount[$side]++;
-		}
 
 		$this->m_maxY[$side] = bcadd($this->m_minY[$side], bcmul($interval, $this->gridLinesCount[$side]));
 		$this->gridStep[$side] = $interval;
@@ -1430,8 +1442,8 @@ class CChart extends CGraphDraw {
 		$hstr_count = $this->gridLinesCount[GRAPH_YAXIS_SIDE_LEFT];
 
 		if ($byteStep) {
-			$maxYPow = convertBase10ToBase8($maxY, 1024);
-			$minYPow = convertBase10ToBase8($minY, 1024);
+			$maxYPow = convertBase8Values($maxY, 1024);
+			$minYPow = convertBase8Values($minY, 1024);
 			if ($maxYPow['pow'] > $minYPow['pow']) {
 				$newPow = $maxYPow['pow'];
 			}
@@ -1559,8 +1571,8 @@ class CChart extends CGraphDraw {
 		$hstr_count = $this->gridLinesCount[GRAPH_YAXIS_SIDE_RIGHT];
 
 		if ($byteStep) {
-			$maxYPow = convertBase10ToBase8($maxY, 1024);
-			$minYPow = convertBase10ToBase8($minY, 1024);
+			$maxYPow = convertBase8Values($maxY, 1024);
+			$minYPow = convertBase8Values($minY, 1024);
 			if ($maxYPow['pow'] > $minYPow['pow']) {
 				$newPow = $maxYPow['pow'];
 			}

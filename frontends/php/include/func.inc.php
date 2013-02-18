@@ -501,6 +501,19 @@ function convertUnitsS($value) {
 	return rtrim($value);
 }
 
+/**
+ * Converts value to actual value.
+ * Example:
+ * 	6442450944 B convert to 6 GB
+ *
+ * @param string $value
+ * @param string $units
+ * @param string $convert
+ * @param string $byteStep
+ * @param string $pow
+ *
+ * @return string
+ */
 function convert_units($value, $units, $convert = ITEM_CONVERT_WITH_UNITS, $byteStep = false, $pow = false) {
 	// special processing for unix timestamps
 	if ($units == 'unixtime') {
@@ -631,7 +644,17 @@ function convert_units($value, $units, $convert = ITEM_CONVERT_WITH_UNITS, $byte
 	return rtrim(sprintf('%s %s%s', $value, $desc, $units));
 }
 
-function convertBase10ToBase8 ($value ,$step = false) {
+/**
+ * Converts Base10 values to Base8 and calc pow
+ * Example:
+ * 	200 KBytes convert to 0.2MB (204.8 KBytes)
+ *
+ * @param string $value
+ * @param string $step
+ *
+ * @return array
+ */
+function convertBase8Values ($value ,$step = false) {
 	if (empty($step)) {
 		$step = 1000;
 	}
