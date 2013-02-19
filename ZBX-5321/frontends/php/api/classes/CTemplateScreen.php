@@ -277,11 +277,11 @@ class CTemplateScreen extends CScreen {
 		$sqlLimit = $sqlParts['limit'];
 
 		$sql = 'SELECT '.zbx_db_distinct($sqlParts).' '.$sqlSelect.
-					'FROM '.$sqlFrom.
-					' WHERE '.DBin_node('s.screenid', $nodeids).
-					$sqlWhere.
-					$sqlGroup.
-					$sqlOrder;
+				' FROM '.$sqlFrom.
+				' WHERE '.DBin_node('s.screenid', $nodeids).
+				$sqlWhere.
+				$sqlGroup.
+				$sqlOrder;
 
 		$res = DBselect($sql, $sqlLimit);
 		while ($screen = DBfetch($res)) {
