@@ -374,11 +374,12 @@ foreach ($db_apps as $appid => $dbApp) {
 		get_node_name_by_elid($dbApp['applicationid']),
 		$hostSpan,
 		$col
-	));
+	), 'odd_row');
 
 	// add toggle sub rows
 	foreach ($appRows as $row) {
 		$row->setAttribute('parent_app_id', $dbApp['applicationid']);
+		$row->addClass('odd_row');
 		if (!$openState) {
 			$row->addClass('hidden');
 		}
@@ -560,11 +561,12 @@ foreach ($db_hosts as $hostId => $dbHost) {
 		get_node_name_by_elid($dbHost['hostid']),
 		$hostSpan,
 		$col
-	));
+	), 'odd_row');
 
 	// add toggle sub rows
 	foreach($appRows as $row) {
 		$row->setAttribute('parent_app_id', '0_'.$host['hostid']);
+		$row->addClass('odd_row');
 		if (!$openState) {
 			$row->addClass('hidden');
 		}
