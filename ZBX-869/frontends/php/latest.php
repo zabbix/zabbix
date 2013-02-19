@@ -294,7 +294,7 @@ foreach ($dbItems as $db_item){
 		$lastclock = ' - ';
 	}
 
-	$lastvalue = formatItemValue($db_item);
+	$lastvalue = formatItemValue($db_item, '-', false);
 
 	$digits = ($db_item['value_type'] == ITEM_VALUE_TYPE_FLOAT) ? 2 : 0;
 	if (isset($db_item['lastvalue']) && isset($db_item['prevvalue'])
@@ -553,6 +553,7 @@ foreach ($db_hosts as $hostId => $dbHost) {
 		$hostSpan = new CSpan($host['name'], 'link_menu menu-host');
 		$scripts = $hostScripts[$host['hostid']];
 		$hostSpan->setAttribute('data-menu', hostMenuData($host, $scripts));
+		$hostSpan = new CDiv($hostSpan);
 	}
 
 	// add toggle row
