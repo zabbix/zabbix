@@ -28,15 +28,13 @@ class testFormLogin extends CWebTest {
 	public function testFormLogin_LoginOK() {
 		$this->zbxTestLogin('dashboard.php');
 		$this->checkTitle('Dashboard');
-		$this->click('link=Logout');
-		$this->wait();
+		$this->zbxTestClickWait('link=Logout');
 		$this->zbxTestTextPresent('Username');
 		$this->zbxTestTextPresent('Password');
 
 		$this->input_type('name', 'Admin');
 		$this->input_type('password', 'zabbix');
-		$this->click('enter');
-		$this->wait();
+		$this->zbxTestClickWait('enter');
 
 		$this->zbxTestTextNotPresent('Password');
 		$this->zbxTestTextNotPresent('Username');
@@ -47,15 +45,13 @@ class testFormLogin extends CWebTest {
 
 		$this->zbxTestLogin('dashboard.php');
 		$this->checkTitle('Dashboard');
-		$this->click('link=Logout');
-		$this->wait();
+		$this->zbxTestClickWait('link=Logout');
 		$this->zbxTestTextPresent('Username');
 		$this->zbxTestTextPresent('Password');
 
 		$this->input_type('name', 'Admin');
 		$this->input_type('password', '!@$#%$&^*(\"\'\\*;:');
-		$this->click('enter');
-		$this->wait();
+		$this->zbxTestClickWait('enter');
 		$this->zbxTestTextPresent(array('Login name or password is incorrect', 'Username', 'Password'));
 
 		$sql = 'SELECT * FROM users WHERE attempt_failed>0 AND alias='.zbx_dbstr('Admin');
@@ -73,16 +69,14 @@ class testFormLogin extends CWebTest {
 
 		$this->zbxTestLogin('dashboard.php');
 		$this->checkTitle('Dashboard');
-		$this->click('link=Logout');
-		$this->wait();
+		$this->zbxTestClickWait('link=Logout');
 		$this->zbxTestTextPresent('Username');
 		$this->zbxTestTextPresent('Password');
 
 		for ($i = 1; $i <= 5; $i++) {
 			$this->input_type('name', 'Admin');
 			$this->input_type('password', '!@$#%$&^*(\"\'\\*;:');
-			$this->click('enter');
-			$this->wait();
+			$this->zbxTestClickWait('enter');
 			$this->zbxTestTextPresent(array('Login name or password is incorrect', 'Username', 'Password'));
 
 			$sql = 'SELECT * FROM users WHERE alias=\'Admin\' AND attempt_failed='.$i.'';
@@ -95,8 +89,7 @@ class testFormLogin extends CWebTest {
 
 		$this->input_type('name', 'Admin');
 		$this->input_type('password', '!@$#%$&^*(\"\'\\*;:');
-		$this->click('enter');
-		$this->wait();
+		$this->zbxTestClickWait('enter');
 		$this->zbxTestTextPresent(array('Account is blocked for', 'seconds', 'Username', 'Password'));
 
 		DBrestore_tables('users');
@@ -107,16 +100,14 @@ class testFormLogin extends CWebTest {
 
 		$this->zbxTestLogin('dashboard.php');
 		$this->checkTitle('Dashboard');
-		$this->click('link=Logout');
-		$this->wait();
+		$this->zbxTestClickWait('link=Logout');
 		$this->zbxTestTextPresent('Username');
 		$this->zbxTestTextPresent('Password');
 
 		for ($i = 1; $i <= 5; $i++) {
 			$this->input_type('name', 'Admin');
 			$this->input_type('password', '!@$#%$&^*(\"\'\\*;:');
-			$this->click('enter');
-			$this->wait();
+			$this->zbxTestClickWait('enter');
 			$this->zbxTestTextPresent('Login name or password is incorrect');
 			$this->zbxTestTextPresent('Username');
 			$this->zbxTestTextPresent('Password');
@@ -131,8 +122,7 @@ class testFormLogin extends CWebTest {
 
 		$this->input_type('name', 'Admin');
 		$this->input_type('password', '!@$#%$&^*(\"\'\\*;:');
-		$this->click('enter');
-		$this->wait();
+		$this->zbxTestClickWait('enter');
 		$this->zbxTestTextPresent(array('Account is blocked for', 'seconds', 'Username', 'Password'));
 
 		// account is blocked, waiting 35 sec and trying to login
@@ -140,14 +130,12 @@ class testFormLogin extends CWebTest {
 
 		$this->zbxTestLogin('dashboard.php');
 		$this->checkTitle('Dashboard');
-		$this->click('link=Logout');
-		$this->wait();
+		$this->zbxTestClickWait('link=Logout');
 		$this->zbxTestTextPresent(array('Username', 'Password'));
 
 		$this->input_type('name', 'Admin');
 		$this->input_type('password', 'zabbix');
-		$this->click('enter');
-		$this->wait();
+		$this->zbxTestClickWait('enter');
 
 		$this->zbxTestTextNotPresent('Password');
 		$this->zbxTestTextNotPresent('Username');

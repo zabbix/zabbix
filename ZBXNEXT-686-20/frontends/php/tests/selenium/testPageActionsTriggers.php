@@ -168,8 +168,7 @@ class testPageActionsTriggers extends CWebTest {
 
 		$this->zbxTestLogin('actionconf.php?eventsource='.EVENT_SOURCE_TRIGGERS);
 		$this->checkTitle('Configuration of actions');
-		$this->click('link='.$action['name']);
-		$this->wait();
+		$this->zbxTestClickWait('link='.$action['name']);
 		$this->zbxTestClickWait('save');
 		$this->checkTitle('Configuration of actions');
 		$this->zbxTestTextPresent('Action updated');

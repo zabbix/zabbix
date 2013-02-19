@@ -32,7 +32,6 @@ class testPageTemplates extends CWebTest {
 	public function testPageTemplates_CheckLayout($template) {
 		$this->zbxTestLogin('templates.php');
 		$this->zbxTestDropdownSelectWait('groupid', 'Templates');
-//		$this->wait();
 		$this->checkTitle('Configuration of templates');
 		$this->zbxTestTextPresent('TEMPLATES');
 		$this->zbxTestTextPresent('Displaying');
@@ -68,8 +67,7 @@ class testPageTemplates extends CWebTest {
 		$this->checkTitle('Configuration of templates');
 
 		$this->zbxTestTextPresent($name); // link is present on the screen?
-		$this->click("link=$name");
-		$this->wait();
+		$this->zbxTestClickWait('link='.$name);
 		$this->zbxTestClickWait('save');
 		$this->checkTitle('Configuration of templates');
 		$this->zbxTestTextPresent('Template updated');

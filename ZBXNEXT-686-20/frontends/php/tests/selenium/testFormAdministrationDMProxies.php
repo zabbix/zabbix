@@ -228,7 +228,7 @@ class testFormAdministrationDMProxies extends CWebTest {
 		// adding host that will be monitored by this proxy
 		foreach ($hosts as $host) {
 			$this->zbxTestDropdownSelect('hosts_right', $host);
-			$this->click('add');
+			$this->zbxTestClick('add');
 		}
 		$this->zbxTestClickWait('save');
 		switch ($expected) {
@@ -296,8 +296,7 @@ class testFormAdministrationDMProxies extends CWebTest {
 		$this->checkTitle('Configuration of proxies');
 		$this->zbxTestTextPresent('CONFIGURATION OF PROXIES');
 		$this->zbxTestTextPresent('PROXIES');
-		$this->click('link='.$name);
-		$this->wait();
+		$this->zbxTestClickWait('link='.$name);
 
 		// check presence of buttons
 		$this->assertElementPresent('save');
@@ -344,8 +343,7 @@ class testFormAdministrationDMProxies extends CWebTest {
 		$this->checkTitle('Configuration of proxies');
 		$this->zbxTestTextPresent('CONFIGURATION OF PROXIES');
 		$this->zbxTestTextPresent('PROXIES');
-		$this->click('link='.$name);
-		$this->wait();
+		$this->zbxTestClickWait('link='.$name);
 
 		// check presence of buttons
 		$this->assertElementPresent('save');
@@ -391,8 +389,7 @@ class testFormAdministrationDMProxies extends CWebTest {
 		$this->zbxTestTextPresent('CONFIGURATION OF PROXIES');
 		$this->zbxTestTextPresent('PROXIES');
 
-		$this->click('link='.$name);
-		$this->wait();
+		$this->zbxTestClickWait('link='.$name);
 
 		$this->assertElementPresent('save');
 		$this->assertElementPresent('clone');

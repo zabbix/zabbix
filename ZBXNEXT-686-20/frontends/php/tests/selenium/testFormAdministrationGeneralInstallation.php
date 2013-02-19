@@ -88,8 +88,7 @@ class testFormAdministrationGeneralInstallation extends CWebTest {
 		$this->assertElementPresent('cancel');
 		$this->assertElementPresent('next_0');
 
-		$this->click('next_0');
-		$this->wait();
+		$this->zbxTestClickWait('next_0');
 
 		// Setup Check of pre-requisites page
 		$this->checkTitle($this->pageName);
@@ -110,8 +109,7 @@ class testFormAdministrationGeneralInstallation extends CWebTest {
 		$this->assertElementPresent('back_1');
 		$this->assertElementPresent('next_1');
 
-		$this->click('next_1');
-		$this->wait();
+		$this->zbxTestClickWait('next_1');
 
 		// Setup Configure DB connection page
 		$this->checkTitle($this->pageName);
@@ -154,7 +152,6 @@ class testFormAdministrationGeneralInstallation extends CWebTest {
 		$this->assertAttribute("//input[@id='password']/@maxlength", 255);
 		$this->assertAttribute("//input[@id='password']/@size", 50);
 
-		$this->click('cancel');
-
+		$this->zbxTestClickWait('cancel');
 	}
 }

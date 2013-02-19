@@ -53,8 +53,7 @@ class testPageScreens extends CWebTest {
 
 		$this->zbxTestLogin('screenconf.php');
 		$this->checkTitle('Configuration of screens');
-		$this->click("link=$name");
-		$this->wait();
+		$this->zbxTestClickWait('link='.$name);
 		$this->checkTitle('Configuration of screens');
 		$this->zbxTestTextPresent("$name");
 		$this->zbxTestTextPresent('Change');

@@ -80,8 +80,7 @@ class testFormSysmap extends CWebTest {
 
 	public function testFormSysmapSimpleUpdate() {
 		$this->zbxTestLogin('sysmaps.php');
-		$this->click('//a[text()="'.$this->mapName.'"]/../../td/a[text()="Edit"]');
-		$this->wait();
+		$this->zbxTestClickWait('//a[text()="'.$this->mapName.'"]/../../td/a[text()="Edit"]');
 		$this->zbxTestClickWait('save');
 		$this->checkTitle('Network maps');
 		$this->zbxTestTextPresent('Network map updated');
@@ -98,8 +97,7 @@ class testFormSysmap extends CWebTest {
 		DBsave_tables('sysmaps');
 
 		$this->zbxTestLogin('sysmaps.php');
-		$this->click('//a[text()="'.$this->mapName.'"]/../../td/a[text()="Edit"]');
-		$this->wait();
+		$this->zbxTestClickWait('//a[text()="'.$this->mapName.'"]/../../td/a[text()="Edit"]');
 
 		$this->input_type('name', $mapName);
 		$this->zbxTestClickWait('save');
@@ -124,8 +122,7 @@ class testFormSysmap extends CWebTest {
 		$this->chooseOkOnNextConfirmation();
 		// Delete Map
 		$this->zbxTestLogin('sysmaps.php');
-		$this->click('//a[text()="'.$this->mapName.'"]/../../td/a[text()="Edit"]');
-		$this->wait();
+		$this->zbxTestClickWait('//a[text()="'.$this->mapName.'"]/../../td/a[text()="Edit"]');
 		$this->zbxTestClick('delete');
 		$this->waitForConfirmation();
 		$this->wait();
@@ -141,8 +138,7 @@ class testFormSysmap extends CWebTest {
 		$mapName = 'Cloned map';
 
 		$this->zbxTestLogin('sysmaps.php');
-		$this->click('//a[text()="'.$this->mapName.'"]/../../td/a[text()="Edit"]');
-		$this->wait();
+		$this->zbxTestClickWait('//a[text()="'.$this->mapName.'"]/../../td/a[text()="Edit"]');
 		$this->zbxTestClick('clone');
 		$this->input_type('name', $mapName);
 		$this->zbxTestClickWait('save');
@@ -162,8 +158,7 @@ class testFormSysmap extends CWebTest {
 		$this->zbxTestOpen('sysmaps.php');
 		$this->chooseOkOnNextConfirmation();
 		$this->zbxTestLogin('sysmaps.php');
-		$this->click('//a[text()="'.$mapName.'"]/../../td/a[text()="Edit"]');
-		$this->wait();
+		$this->zbxTestClickWait('//a[text()="'.$mapName.'"]/../../td/a[text()="Edit"]');
 		$this->zbxTestClickWait('delete');
 		$this->getConfirmation();
 		$this->checkTitle('Network maps');

@@ -58,8 +58,7 @@ class testFormAdministrationGeneralImages extends CWebTest {
 		$this->input_type('name', $this->icon_image_name);
 		$this->zbxTestDropdownSelectWait('imagetype', 'Icon');
 		$this->type('image', '/home/hudson/public_html/trunk-FRONTEND-MYSQL/frontends/php/images/sysmaps/UPS.png');
-		$this->click('save');
-		$this->wait();
+		$this->zbxTestClickWait('save');
 		$this->checkTitle('Configuration of images');
 		$this->zbxTestTextPresent(array('CONFIGURATION OF IMAGES', 'Images', 'Type', 'Image added'));
 
@@ -75,11 +74,10 @@ class testFormAdministrationGeneralImages extends CWebTest {
 		$oldHashIcons=DBhash($sqlIcons);
 
 		$this->zbxTestLogin('adm.images.php');
-		$this->click('link='.$this->icon_image_name);
-		$this->wait();
+		$this->zbxTestClickWait('link='.$this->icon_image_name);
 		$this->input_type('name', $this->icon_image_name2);
 		$this->type('image', '/home/hudson/public_html/trunk-FRONTEND-MYSQL/frontends/php/images/sysmaps/Workstation.png');
-		$this->zbxTestClick("cancel");
+		$this->zbxTestClick('cancel');
 
 		// checking that image has not been changed after clicking on the "Cancel" button in the confirm dialog box
 		$this->assertEquals($oldHashIcons, DBhash($sqlIcons), 'Chuck Norris: No-change images update should not update data in table "images"');
@@ -89,12 +87,10 @@ class testFormAdministrationGeneralImages extends CWebTest {
 	public function testFormAdministrationGeneralImages_UpdateImage() {
 
 		$this->zbxTestLogin('adm.images.php');
-		$this->click('link='.$this->icon_image_name);
-		$this->wait();
+		$this->zbxTestClickWait('link='.$this->icon_image_name);
 		$this->input_type('name', $this->icon_image_name2);
 		$this->type('image', '/home/hudson/public_html/trunk-FRONTEND-MYSQL/frontends/php/images/sysmaps/Notebook.png');
-		$this->click('save');
-		$this->wait();
+		$this->zbxTestClickWait('save');
 		$this->checkTitle('Configuration of images');
 		$this->zbxTestTextPresent(array('CONFIGURATION OF IMAGES', 'Images', 'Image updated'));
 
@@ -107,8 +103,7 @@ class testFormAdministrationGeneralImages extends CWebTest {
 
 		$this->zbxTestLogin('adm.images.php');
 		$this->chooseOkOnNextConfirmation();
-		$this->click('link='.$this->icon_image_name2);
-		$this->wait();
+		$this->zbxTestClickWait('link='.$this->icon_image_name2);
 		$this->zbxTestClick('delete');
 		$this->waitForConfirmation();
 		$this->wait();
@@ -126,8 +121,7 @@ class testFormAdministrationGeneralImages extends CWebTest {
 		$this->input_type('name', $this->bg_image_name);
 		$this->zbxTestDropdownSelect('imagetype', 'Background');
 		$this->type('image', '/home/hudson/public_html/trunk-FRONTEND-MYSQL/frontends/php/images/sysmaps/Printer.png');
-		$this->click('save');
-		$this->wait();
+		$this->zbxTestClickWait('save');
 		$this->checkTitle('Configuration of images');
 		$this->zbxTestTextPresent(array('CONFIGURATION OF IMAGES', 'Images', 'Type', 'Image added'));
 
@@ -141,12 +135,10 @@ class testFormAdministrationGeneralImages extends CWebTest {
 		$this->zbxTestLogin('adm.images.php');
 		$this->zbxTestDropdownSelectWait('imagetype', 'Background');
 		$this->zbxTestTextPresent('Type');
-		$this->click("//form[@name='imageForm']//table//a[text()='".$this->bg_image_name."']");
-		$this->wait();
+		$this->zbxTestClickWait("//form[@name='imageForm']//table//a[text()='".$this->bg_image_name."']");
 		$this->input_type('name', $this->bg_image_name2);
 		$this->type('image', '/home/hudson/igor/trunk/frontends/php/images/sysmaps/Satellite.png');
-		$this->click('save');
-		$this->wait();
+		$this->zbxTestClickWait('save');
 		$this->checkTitle('Configuration of images');
 		$this->zbxTestTextPresent(array('CONFIGURATION OF IMAGES', 'Images', 'Image updated'));
 
@@ -159,8 +151,7 @@ class testFormAdministrationGeneralImages extends CWebTest {
 		$this->zbxTestLogin('adm.images.php');
 		$this->zbxTestDropdownSelectWait('imagetype', 'Background');
 		$this->chooseOkOnNextConfirmation();
-		$this->click("//form[@name='imageForm']//table//a[text()='".$this->bg_image_name2."']");
-		$this->wait();
+		$this->zbxTestClickWait("//form[@name='imageForm']//table//a[text()='".$this->bg_image_name2."']");
 		$this->zbxTestClick('delete');
 		$this->waitForConfirmation();
 		$this->wait();

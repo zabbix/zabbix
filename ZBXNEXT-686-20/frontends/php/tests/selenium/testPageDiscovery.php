@@ -56,8 +56,7 @@ class testPageDiscovery extends CWebTest {
 
 		$this->zbxTestLogin('discoveryconf.php');
 		$this->checkTitle('Configuration of discovery');
-		$this->click("link=$name");
-		$this->wait();
+		$this->zbxTestClickWait('link='.$name);
 		$this->zbxTestClickWait('save');
 		$this->checkTitle('Configuration of discovery');
 		$this->zbxTestTextPresent('Discovery rule updated');

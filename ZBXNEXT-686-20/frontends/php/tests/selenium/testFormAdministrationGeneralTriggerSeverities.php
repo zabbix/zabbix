@@ -103,23 +103,23 @@ class testFormAdministrationGeneralTriggerSeverities extends CWebTest {
 		$this->input_type('severity_name_4', 'High2');
 		$this->input_type('severity_name_5', 'Disaster2');
 
-		$this->click('lbl_severity_color_5');
-		$this->click("//div[@id='' and @onclick='set_color(\"880000\");']");
+		$this->zbxTestClick('lbl_severity_color_5');
+		$this->zbxTestClick("//div[@id='' and @onclick='set_color(\"880000\");']");
 
-		$this->click('lbl_severity_color_4');
-		$this->click("//div[@id='' and @onclick='set_color(\"FF3333\");']");
+		$this->zbxTestClick('lbl_severity_color_4');
+		$this->zbxTestClick("//div[@id='' and @onclick='set_color(\"FF3333\");']");
 
-		$this->click('lbl_severity_color_3');
-		$this->click("//div[@id='' and @onclick='set_color(\"FF6666\");']");
+		$this->zbxTestClick('lbl_severity_color_3');
+		$this->zbxTestClick("//div[@id='' and @onclick='set_color(\"FF6666\");']");
 
-		$this->click('lbl_severity_color_2');
-		$this->click("//div[@id='' and @onclick='set_color(\"DDDD00\");']");
+		$this->zbxTestClick('lbl_severity_color_2');
+		$this->zbxTestClick("//div[@id='' and @onclick='set_color(\"DDDD00\");']");
 
-		$this->click('lbl_severity_color_1');
-		$this->click("//div[@id='' and @onclick='set_color(\"00CCCC\");']");
+		$this->zbxTestClick('lbl_severity_color_1');
+		$this->zbxTestClick("//div[@id='' and @onclick='set_color(\"00CCCC\");']");
 
-		$this->click('lbl_severity_color_0');
-		$this->click("//div[@id='' and @onclick='set_color(\"999999\");']");
+		$this->zbxTestClick('lbl_severity_color_0');
+		$this->zbxTestClick("//div[@id='' and @onclick='set_color(\"999999\");']");
 
 		$this->zbxTestClickWait('save');
 		$this->zbxTestTextPresent('Configuration updated');
@@ -178,9 +178,8 @@ class testFormAdministrationGeneralTriggerSeverities extends CWebTest {
 			)
 		);
 		$this->zbxTestClick('resetDefaults');
-		$this->click("//button[@type='button']");
-		$this->click('save');
-		$this->wait();
+		$this->zbxTestClick("//button[@type='button']");
+		$this->zbxTestClickWait('save');
 		$this->zbxTestTextPresent('Configuration updated');
 		$this->zbxTestTextPresent('CONFIGURATION OF ZABBIX');
 		$this->zbxTestTextPresent('Trigger severities');

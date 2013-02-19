@@ -151,9 +151,7 @@ class testFormAdministrationScripts extends CWebTest {
 			$DBhash = DBhash($sql);
 		}
 
-		$this->click('save');
-		$this->wait();
-
+		$this->zbxTestClickWait('save');
 
 		if ($resultSave) {
 			$this->zbxTestTextPresent('Script added');

@@ -51,8 +51,7 @@ class testFormTemplate extends CWebTest {
 	public function testFormTemplate_SimpleUpdate() {
 		$this->zbxTestLogin('templates.php');
 		$this->zbxTestDropdownSelectWait('groupid', 'Templates');
-		$this->click('link=Template OS Linux');
-		$this->wait();
+		$this->zbxTestClickWait('link=Template OS Linux');
 		$this->zbxTestClickWait('save');
 		$this->checkTitle('Configuration of templates');
 		$this->zbxTestTextPresent('Template updated');
@@ -63,8 +62,7 @@ class testFormTemplate extends CWebTest {
 		// Update template
 		$this->zbxTestLogin('templates.php');
 		$this->zbxTestDropdownSelectWait('groupid', 'all');
-		$this->click('link='.$this->template);
-		$this->wait();
+		$this->zbxTestClickWait('link='.$this->template);
 		$this->input_type('template_name', $this->template_tmp);
 		$this->zbxTestClickWait('save');
 		$this->checkTitle('Configuration of templates');
@@ -76,16 +74,16 @@ class testFormTemplate extends CWebTest {
 	 */
 	public function testFormTemplate_AddMacros() {
 		$this->zbxTestLogin('templates.php');
-		$this->click("link=".$this->template_tmp);
+		$this->zbxTestClick('link='.$this->template_tmp);
 		$this->waitForPageToLoad("30000");
 		$this->tab_switch('Macros');
 		$this->type("name=macros[0][macro]", '{$TEST_MACRO}');
 		$this->type("name=macros[0][value]", "1");
-		$this->click("//table[@id='tbl_macros']//input[@id='macro_add']");
+		$this->zbxTestClick("//table[@id='tbl_macros']//input[@id='macro_add']");
 		$this->verifyElementPresent("name=macros[1][macro]");
 		$this->type("name=macros[1][macro]", '{$TEST_MACRO2}');
 		$this->type("name=macros[1][value]", "2");
-		$this->click("id=save");
+		$this->zbxTestClick('save');
 		$this->waitForPageToLoad("30000");
 		$this->zbxTestTextPresent("Template updated");
 	}
@@ -112,8 +110,7 @@ class testFormTemplate extends CWebTest {
 		// Delete template
 		$this->zbxTestLogin('templates.php');
 		$this->zbxTestDropdownSelectWait('groupid', 'all');
-		$this->click('link='.$this->template_tmp);
-		$this->wait();
+		$this->zbxTestClickWait('link='.$this->template_tmp);
 		$this->zbxTestClick('delete');
 		$this->waitForConfirmation();
 		$this->wait();
@@ -129,8 +126,7 @@ class testFormTemplate extends CWebTest {
 		// Clone template
 		$this->zbxTestLogin('templates.php');
 		$this->zbxTestDropdownSelectWait('groupid', 'all');
-		$this->click('link=Template OS Linux');
-		$this->wait();
+		$this->zbxTestClickWait('link=Template OS Linux');
 		$this->zbxTestClickWait('clone');
 		$this->input_type('template_name', $this->template_tmp);
 		$this->zbxTestClickWait('save');
@@ -144,8 +140,7 @@ class testFormTemplate extends CWebTest {
 		// Delete template
 		$this->zbxTestLogin('templates.php');
 		$this->zbxTestDropdownSelectWait('groupid', 'all');
-		$this->click('link='.$this->template_tmp);
-		$this->wait();
+		$this->zbxTestClickWait('link='.$this->template_tmp);
 		$this->zbxTestClickWait('delete');
 		$this->getConfirmation();
 		$this->checkTitle('Configuration of templates');
@@ -156,8 +151,7 @@ class testFormTemplate extends CWebTest {
 		// Full clone template
 		$this->zbxTestLogin('templates.php');
 		$this->zbxTestDropdownSelectWait('groupid', 'all');
-		$this->click('link=Template OS Linux');
-		$this->wait();
+		$this->zbxTestClickWait('link=Template OS Linux');
 		$this->zbxTestClickWait('full_clone');
 		$this->input_type('template_name', $this->template.'_fullclone');
 		$this->zbxTestClickWait('save');
@@ -171,8 +165,7 @@ class testFormTemplate extends CWebTest {
 		// Delete full cloned template
 		$this->zbxTestLogin('templates.php');
 		$this->zbxTestDropdownSelectWait('groupid', 'all');
-		$this->click('link='.$this->template.'_fullclone');
-		$this->wait();
+		$this->zbxTestClickWait('link='.$this->template.'_fullclone');
 		$this->zbxTestClickWait('delete');
 		$this->getConfirmation();
 		$this->checkTitle('Configuration of templates');
