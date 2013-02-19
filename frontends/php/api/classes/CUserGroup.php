@@ -91,10 +91,10 @@ class CUserGroup extends CZBXAPI {
 		}
 		elseif (is_null($options['editable']) && (self::$userData['type'] == USER_TYPE_ZABBIX_ADMIN)) {
 			$sqlParts['where'][] = 'g.usrgrpid IN ('.
-				' SELECT uug.usrgrpid'.
+				'SELECT uug.usrgrpid'.
 				' FROM users_groups uug'.
 				' WHERE uug.userid='.self::$userData['userid'].
-				' )';
+				')';
 		}
 		elseif (!is_null($options['editable']) && (self::$userData['type'] != USER_TYPE_SUPER_ADMIN)) {
 			return array();
@@ -203,7 +203,7 @@ class CUserGroup extends CZBXAPI {
 		}
 
 		if (!empty($usrgrpids)) {
-			$result = $this->get(array('usrgrpids'=>$usrgrpids, 'output' => API_OUTPUT_EXTEND));
+			$result = $this->get(array('usrgrpids' => $usrgrpids, 'output' => API_OUTPUT_EXTEND));
 		}
 
 		return $result;
@@ -278,7 +278,7 @@ class CUserGroup extends CZBXAPI {
 
 	/**
 	 * Update UserGroups.
-	 * Checks permissions - only superadmins can update usergroups.
+	 * Checks permissions - only super admins can update usergroups.
 	 * Formats data to be used in massUpdate() method.
 	 *
 	 * @param array $usrgrps
@@ -361,7 +361,7 @@ class CUserGroup extends CZBXAPI {
 
 		if (!is_null($rights)) {
 			$linkedRights = array();
-			$sql = 'SELECT groupid, id'.
+			$sql = 'SELECT groupid,id'.
 				' FROM rights'.
 				' WHERE '.dbConditionInt('groupid', $usrgrpids);
 			' AND '.dbConditionInt('id', zbx_objectValues($rights, 'id'));
@@ -473,7 +473,7 @@ class CUserGroup extends CZBXAPI {
 
 			// get already linked users
 			$linkedUsers = array();
-			$sql = 'SELECT usrgrpid, userid'.
+			$sql = 'SELECT usrgrpid,userid'.
 				' FROM users_groups'.
 				' WHERE '.dbConditionInt('usrgrpid', $usrgrpids);
 			$linkedUsersDb = DBselect($sql);
@@ -525,7 +525,7 @@ class CUserGroup extends CZBXAPI {
 
 			// get already linked rights
 			$linkedRights = array();
-			$sql = 'SELECT groupid, permission, id'.
+			$sql = 'SELECT groupid,permission,id'.
 				' FROM rights'.
 				' WHERE '.dbConditionInt('groupid', $usrgrpids);
 			$linkedRightsDb = DBselect($sql);
@@ -636,8 +636,8 @@ class CUserGroup extends CZBXAPI {
 
 		// delete action operation msg
 		$operationids = array();
-		$sql = 'SELECT DISTINCT om.operationid '.
-			' FROM opmessage_grp om '.
+		$sql = 'SELECT DISTINCT om.operationid'.
+			' FROM opmessage_grp om'.
 			' WHERE '.dbConditionInt('om.usrgrpid', $usrgrpids);
 		$dbOperations = DBselect($sql);
 		while ($dbOperation = DBfetch($dbOperations))
@@ -647,8 +647,8 @@ class CUserGroup extends CZBXAPI {
 
 		// delete empty operations
 		$delOperationids = array();
-		$sql = 'SELECT DISTINCT o.operationid '.
-			' FROM operations o '.
+		$sql = 'SELECT DISTINCT o.operationid'.
+			' FROM operations o'.
 			' WHERE '.dbConditionInt('o.operationid', $operationids).
 			' AND NOT EXISTS(SELECT om.opmessage_grpid FROM opmessage_grp om WHERE om.operationid=o.operationid)';
 		$dbOperations = DBselect($sql);
