@@ -1775,7 +1775,7 @@ class testPageAdministrationAudit extends CWebTest {
 		$time = $auditlog['clock'];
 		$today = date('d M Y H:i:s', $time);
 
-		$this->zbxTestTextPresent(array("$today", 'Admin', "$ip", 'Macro', 'Added', $auditlog['resourceid'], '{$B} ? abcd', ''));
+		$this->zbxTestTextPresent(array("$today", 'Admin', "$ip", 'Macro', 'Added', $auditlog['resourceid'], '{$B} ⇒ abcd', ''));
 
 	}
 
@@ -1812,7 +1812,7 @@ class testPageAdministrationAudit extends CWebTest {
 		$time = $auditlog['clock'];
 		$today = date('d M Y H:i:s', $time);
 
-		$this->zbxTestTextPresent(array("$today", 'Admin', "$ip", 'Macro', 'Updated', $auditlog['resourceid'], '{$B} ? xyz', ''));
+		$this->zbxTestTextPresent(array("$today", 'Admin', "$ip", 'Macro', 'Updated', $auditlog['resourceid'], '{$B} ⇒ xyz', ''));
 
 	}
 
@@ -1848,7 +1848,7 @@ class testPageAdministrationAudit extends CWebTest {
 		$alias = $auditlog['alias'];
 		$time = $auditlog['clock'];
 		$today = date('d M Y H:i:s', $time);
-		$this->zbxTestTextPresent(array("$today", 'Admin', "$ip", 'Macro', 'Deleted', $auditlog['resourceid'], 'Array ? xyz', ''));
+		$this->zbxTestTextPresent(array("$today", 'Admin', "$ip", 'Macro', 'Deleted', $auditlog['resourceid'], 'Array ⇒ xyz', ''));
 
 	}
 
@@ -2426,7 +2426,7 @@ class testPageAdministrationAudit extends CWebTest {
 		$this->assertElementPresent('btn1');
 
 		$this->input_type('alias', 'Admin');
-		$this->zbxTestDropdownSeleczbxTestDropdownSelect('action', 'Update');
+		$this->zbxTestDropdownSelect('action', 'Update');
 		$this->zbxTestDropdownSelect('resourcetype', 'Scenario');
 
 		$this->zbxTestClickWait('filter');
