@@ -103,6 +103,14 @@ class CProfile {
 		}
 	}
 
+	/**
+	 * Update favorite values in DB profiles table.
+	 *
+	 * @param string	$idx		max length is 96
+	 * @param mixed		$value		max length 255 for string
+	 * @param int		$type
+	 * @param int		$idx2
+	 */
 	public static function update($idx, $value, $type, $idx2 = 0) {
 		if (is_null(self::$profiles)) {
 			self::init();
