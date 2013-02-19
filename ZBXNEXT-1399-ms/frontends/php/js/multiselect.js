@@ -44,7 +44,7 @@ jQuery(function($) {
 			disabled: false,
 			labels: {
 				emptyResult: 'No matches found',
-				moreMatchesFound: 'More matches found..'
+				moreMatchesFound: 'More matches found...'
 			}
 		};
 		options = $.extend({}, defaults, options);
@@ -70,6 +70,7 @@ jQuery(function($) {
 					isWaiting: false,
 					isAjaxLoaded: true,
 					isMoreMatchesFound: false,
+					isAvailableOpenned: false,
 					selected: {},
 					available: {}
 				};
@@ -244,8 +245,10 @@ jQuery(function($) {
 					$('.selected ul', obj).addClass('active');
 				})
 				.focusout(function() {
-					$('.selected ul', obj).removeClass('active');
-					cleanSearchInput(obj);
+					if (!values.isAvailableOpenned) {
+						$('.selected ul', obj).removeClass('active');
+						cleanSearchInput(obj);
+					}
 				});
 				obj.append($('<div>', {style: 'position: relative;'}).append(input));
 			}
@@ -266,15 +269,18 @@ jQuery(function($) {
 					}
 				})
 				.append($('<ul>'))
-				.focusout(function() {
-					hideAvailable(obj);
+				.mouseenter(function() {
+					values.isAvailableOpenned = true;
+				})
+				.mouseleave(function() {
+					values.isAvailableOpenned = false;
 				});
 
 				// multi select
 				obj.append($('<div>', {style: 'position: relative;'}).append(available))
 				.focusout(function() {
 					setTimeout(function() {
-						if ($('.available', obj).is(':visible')) {
+						if (!values.isAvailableOpenned && $('.available', obj).is(':visible')) {
 							hideAvailable(obj);
 						}
 					}, 200);
@@ -304,18 +310,28 @@ jQuery(function($) {
 
 			// write empty result label
 			if (objectLength(values.available) == 0) {
-				$('.available', obj).append($('<div>', {
+				var div = $('<div>', {
 					'class': 'label-empty-result',
 					text: options.labels.emptyResult
-				}));
+				})
+				.click(function() {
+					$('input[type="text"]', obj).focus();
+				});
+
+				$('.available', obj).append(div);
 			}
 
 			// write more matches found label
 			if (values.isMoreMatchesFound) {
-				$('.available', obj).prepend($('<div>', {
+				var div = $('<div>', {
 					'class': 'label-more-matches-found',
 					text: options.labels.moreMatchesFound
-				}));
+				})
+				.click(function() {
+					$('input[type="text"]', obj).focus();
+				});
+
+				$('.available', obj).prepend(div);
 			}
 
 			showAvailable(obj, values);

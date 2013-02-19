@@ -56,7 +56,7 @@ class CMultiSelect extends CTag {
 			limit: '.(isset($options['limit']) ? $options['limit'] : '20').',
 			labels: {
 				emptyResult: "'._('No matches found').'",
-				moreMatchesFound: "'._('More matches found..').'"
+				moreMatchesFound: "'._('More matches found...').'"
 			},
 			disabled: '.($options['disabled'] ? 'true' : 'false').'
 		});');
