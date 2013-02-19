@@ -28,10 +28,10 @@
 #include "simple.h"
 
 ZBX_METRIC	parameters_simple[] =
-	/* KEY                   FLAG            FUNCTION             ADD_PARAM  TEST_PARAM      */
+	/* KEY			FLAG		FUNCTION		TEST PARAMETERS      */
 	{
-	{"net.tcp.service",	CF_USEUPARAM,	CHECK_SERVICE, 		0,	"ssh,127.0.0.1,22"},
-	{"net.tcp.service.perf",CF_USEUPARAM,	CHECK_SERVICE_PERF, 	0,	"ssh,127.0.0.1,22"},
+	{"net.tcp.service",	CF_HAVEPARAMS,	CHECK_SERVICE, 		"ssh,127.0.0.1,22"},
+	{"net.tcp.service.perf",CF_HAVEPARAMS,	CHECK_SERVICE_PERF, 	"ssh,127.0.0.1,22"},
 	{0}
 	};
 

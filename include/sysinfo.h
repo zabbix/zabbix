@@ -119,8 +119,7 @@ typedef struct
 	char		*key;
 	unsigned	flags;
 	int		(*function)();
-	char		*main_param;
-	char		*test_param;
+	char		*test_param; /* item test parameters; user parameter items keep command here */
 }
 ZBX_METRIC;
 
@@ -164,8 +163,9 @@ ZBX_METRIC;
 int	get_diskstat(const char *devname, zbx_uint64_t *dstat);
 
 /* flags for command */
-#define CF_USEUPARAM	1	/* use user param */
-#define CF_MODFUNCTION	2	/* function called from external module */
+#define CF_HAVEPARAMS		1	/* item accepts either optional or mandatory parameters */
+#define CF_MODULE		2	/* item is defined in a loadable module */
+#define CF_USERPARAMETER	4	/* item is defined as user parameter */
 
 /* flags for process */
 #define PROCESS_TEST		1
