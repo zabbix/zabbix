@@ -194,8 +194,8 @@ class CArrayHelper {
 		$diff = array();
 
 		foreach ($a as $key => $value) {
-			if (!is_array($value) && (isset($b[$key]) || is_null($b[$key]))) {
-				if ($value != $b[$key]
+			if (isset($b[$key]) || is_null($b[$key])) {
+				if ($value != $b[$key] || is_array($value)
 						|| is_null($value) && !is_null($b[$key]) || !is_null($value) && is_null($b[$key])
 						|| $value === 0 && $b[$key] === '' || $value === '' && $b[$key] === 0) {
 					$diff[$key] = $value;

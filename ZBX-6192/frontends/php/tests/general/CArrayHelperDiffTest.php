@@ -70,6 +70,10 @@ class CArrayHelperDiffTest extends CZabbixTest {
 			array(
 				array(array('a' => 0), array('a' => "")),
 				array('a' => 0)
+			),
+			array(
+				array(array('a' => array(1, 2, 3)), array('a' => '123')),
+				array('a' => array(1, 2, 3))
 			)
 		);
 	}
