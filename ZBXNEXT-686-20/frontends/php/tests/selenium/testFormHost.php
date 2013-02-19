@@ -32,7 +32,7 @@ class testFormHost extends CWebTest {
 	public function testFormHost_Layout() {
 		$this->zbxTestLogin('hosts.php?form=1');
 
-		$this->click('link=Host inventory');
+		$this->zbxTestClick('link=Host inventory');
 
 		$inventoryFields = getHostInventories();
 		$inventoryFields = zbx_toHash($inventoryFields, 'db_field');
@@ -69,8 +69,7 @@ class testFormHost extends CWebTest {
 	public function testFormHost_SimpleUpdate() {
 		$this->zbxTestLogin('hosts.php');
 		$this->zbxTestDropdownSelectWait('groupid', 'Zabbix servers');
-		$this->click('link='.$this->host);
-		$this->wait();
+		$this->zbxTestClickWait('link='.$this->host);
 		$this->zbxTestClickWait('save');
 		$this->checkTitle('Configuration of hosts');
 		$this->zbxTestTextPresent('Host updated');
@@ -82,19 +81,16 @@ class testFormHost extends CWebTest {
 	 */
 	public function testFormHost_AddMacros() {
 		$this->zbxTestLogin('hosts.php');
-		$this->click("link=".$this->host);
-		$this->waitForPageToLoad("30000");
+		$this->zbxTestClickWait('link='.$this->host);
 		$this->tab_switch('Macros');
 		$this->type("name=macros[0][macro]", '{$TEST_MACRO}');
 		$this->type("name=macros[0][value]", "1");
-		$this->click("//table[@id='tbl_macros']//input[@id='macro_add']");
+		$this->zbxTestClick("//table[@id='tbl_macros']//input[@id='macro_add']");
 		$this->verifyElementPresent("name=macros[1][macro]");
 		$this->type("name=macros[1][macro]", '{$TEST_MACRO2}');
 		$this->type("name=macros[1][value]", "2");
-		$this->click("id=save");
-		$this->waitForPageToLoad("30000");
+		$this->zbxTestClickWait('save');
 		$this->zbxTestTextPresent("Host updated");
-
 	}
 
 	public function testFormHost_CreateHostNoGroups() {
@@ -160,8 +156,7 @@ class testFormHost extends CWebTest {
 		// Clone Host
 		$this->zbxTestLogin('hosts.php');
 		$this->zbxTestDropdownSelectWait('groupid', 'all');
-		$this->click('link='.$this->host);
-		$this->wait();
+		$this->zbxTestClickWait('link='.$this->host);
 		$this->zbxTestClickWait('clone');
 		$this->input_type('host', $this->host_cloned);
 		$this->input_type('visiblename', $this->host_cloned_visible);
@@ -176,8 +171,7 @@ class testFormHost extends CWebTest {
 		// Delete Host
 		$this->zbxTestLogin('hosts.php');
 		$this->zbxTestDropdownSelectWait('groupid', 'all');
-		$this->click('link='.$this->host_cloned_visible);
-		$this->wait();
+		$this->zbxTestClickWait('link='.$this->host_cloned_visible);
 		$this->zbxTestClickWait('delete');
 		$this->getConfirmation();
 		$this->checkTitle('Configuration of hosts');
@@ -188,8 +182,7 @@ class testFormHost extends CWebTest {
 		// Full clone Host
 		$this->zbxTestLogin('hosts.php');
 		$this->zbxTestDropdownSelectWait('groupid', 'all');
-		$this->click('link='.$this->host);
-		$this->wait();
+		$this->zbxTestClickWait('link='.$this->host);
 		$this->zbxTestClickWait('full_clone');
 		$this->input_type('host', $this->host_fullcloned);
 		$this->input_type('visiblename', $this->host_fullcloned_visible);
@@ -204,8 +197,7 @@ class testFormHost extends CWebTest {
 		// Delete Host
 		$this->zbxTestLogin('hosts.php');
 		$this->zbxTestDropdownSelectWait('groupid', 'all');
-		$this->click('link='.$this->host_fullcloned_visible);
-		$this->wait();
+		$this->zbxTestClickWait('link='.$this->host_fullcloned_visible);
 		$this->zbxTestClickWait('delete');
 		$this->getConfirmation();
 		$this->checkTitle('Configuration of hosts');
@@ -216,8 +208,7 @@ class testFormHost extends CWebTest {
 		// Update Host
 		$this->zbxTestLogin('hosts.php');
 		$this->zbxTestDropdownSelectWait('groupid', 'all');
-		$this->click('link='.$this->host);
-		$this->wait();
+		$this->zbxTestClickWait('link='.$this->host);
 		$this->input_type('host', $this->host_tmp);
 		$this->zbxTestClickWait('save');
 		$this->checkTitle('Configuration of hosts');
@@ -234,8 +225,7 @@ class testFormHost extends CWebTest {
 		// Delete Host
 		$this->zbxTestLogin('hosts.php');
 		$this->zbxTestDropdownSelectWait('groupid', 'all');
-		$this->click('link='.$this->host_tmp);
-		$this->wait();
+		$this->zbxTestClickWait('link='.$this->host_tmp);
 		$this->zbxTestClick('delete');
 		$this->waitForConfirmation();
 		$this->wait();
@@ -268,14 +258,12 @@ class testFormHost extends CWebTest {
 
 		$this->zbxTestLogin('hosts.php');
 		$this->zbxTestDropdownSelectWait('groupid', 'all');
-		$this->click('link='.$name);
-		$this->wait();
+		$this->zbxTestClickWait('link='.$name);
 		$this->tab_switch('Templates');
 		$this->zbxTestTextPresent($template);
 		// clicks button named "Unlink" next to a template by name
-		$this->click("xpath=//div[text()='$template']/../div[@class='dd']/input[@value='Unlink']");
+		$this->zbxTestClickWait("xpath=//div[text()='$template']/../div[@class='dd']/input[@value='Unlink']");
 
-		$this->wait();
 		$this->zbxTestTextNotPresent($template);
 		$this->zbxTestClickWait('save');
 		$this->checkTitle('Configuration of hosts');
@@ -310,15 +298,13 @@ class testFormHost extends CWebTest {
 
 		$this->zbxTestLogin('hosts.php');
 		$this->zbxTestDropdownSelectWait('groupid', 'all');
-		$this->click('link='.$name);
-		$this->wait();
+		$this->zbxTestClickWait('link='.$name);
 		$this->tab_switch('Templates');
 		$this->zbxTestTextPresent($template);
 
 		// clicks button named "Unlink and clear" next to template named $template
-		$this->click("xpath=//div[text()='$template']/../div[@class='dd']/input[@value='Unlink']/../input[@value='Unlink and clear']");
+		$this->zbxTestClickWait("xpath=//div[text()='$template']/../div[@class='dd']/input[@value='Unlink']/../input[@value='Unlink and clear']");
 
-		$this->wait();
 		$this->zbxTestTextNotPresent($template);
 		$this->zbxTestClickWait('save');
 		$this->checkTitle('Configuration of hosts');

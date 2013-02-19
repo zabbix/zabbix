@@ -104,8 +104,7 @@ class testPageHosts extends CWebTest {
 			)
 		);
 
-		$this->click("link=$name");
-		$this->wait();
+		$this->zbxTestClickWait('link='.$name);
 		$this->zbxTestClickWait('save');
 		$this->checkTitle('Configuration of hosts');
 		$this->zbxTestTextPresent('Host updated');
@@ -126,12 +125,11 @@ class testPageHosts extends CWebTest {
 	*/
 	public function testPageHosts_FilterHost($host) {
 		$this->zbxTestLogin('hosts.php');
-		$this->click('flicker_icon_l');
+		$this->zbxTestClick('flicker_icon_l');
 		$this->input_type('filter_host', $host['name']);
 		$this->input_type('filter_ip', '');
 		$this->input_type('filter_port', '');
-		$this->click('filter');
-		$this->wait();
+		$this->zbxTestClickWait('filter');
 		$this->zbxTestTextPresent($host['name']);
 	}
 
@@ -140,11 +138,10 @@ class testPageHosts extends CWebTest {
 		$this->zbxTestLogin('hosts.php');
 
 		// Reset filter
-		$this->click('reset');
+		$this->zbxTestClick('reset');
 
 		$this->input_type('filter_host', '1928379128ksdhksdjfh');
-		$this->click('filter');
-		$this->wait();
+		$this->zbxTestClickWait('filter');
 		$this->zbxTestTextPresent('Displaying 0 of 0 found');
 	}
 
@@ -152,11 +149,10 @@ class testPageHosts extends CWebTest {
 		$this->zbxTestLogin('hosts.php');
 
 		// Reset filter
-		$this->click('reset');
+		$this->zbxTestClick('reset');
 
 		$this->input_type('filter_host', '_');
-		$this->click('filter');
-		$this->wait();
+		$this->zbxTestClickWait('filter');
 		$this->zbxTestTextPresent('Displaying 0 of 0 found');
 	}
 
@@ -164,11 +160,10 @@ class testPageHosts extends CWebTest {
 		$this->zbxTestLogin('hosts.php');
 
 		// Reset filter
-		$this->click('reset');
+		$this->zbxTestClick('reset');
 
 		$this->input_type('filter_host', '%');
-		$this->click('filter');
-		$this->wait();
+		$this->zbxTestClickWait('filter');
 		$this->zbxTestTextPresent('Displaying 0 of 0 found');
 	}
 
@@ -179,9 +174,8 @@ class testPageHosts extends CWebTest {
 	*/
 	public function testPageHosts_FilterReset($host) {
 		$this->zbxTestLogin('hosts.php');
-		$this->click('reset');
-		$this->click('filter');
-		$this->wait();
+		$this->zbxTestClick('reset');
+		$this->zbxTestClickWait('filter');
 		$this->zbxTestTextPresent($host['name']);
 	}
 

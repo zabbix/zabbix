@@ -70,8 +70,7 @@ class testFormMap extends CWebTest {
 		$this->assertTrue(isset($db_map['sysmapid']), 'Chuck Norris: Could not fetch map with name "'.$map_name.'" from DB. Here is what I got: '.print_r($db_map, true));
 
 		$this->zbxTestLogin('sysmaps.php');
-		$this->click('link='.$map_name);
-		$this->wait();
+		$this->zbxTestClickWait('link='.$map_name);
 
 		// checking if appropriate value for grid size is selected
 		$this->assertTrue(
@@ -101,10 +100,10 @@ class testFormMap extends CWebTest {
 
 		// changing other two options if they are not already set as needed
 		if (($db_map['grid_show'] == SYSMAP_GRID_SHOW_ON && $showGrid == 0) || ($db_map['grid_show'] == SYSMAP_GRID_SHOW_OFF && $showGrid == 1)) {
-			$this->click("gridshow");
+			$this->zbxTestClick('gridshow');
 		}
 		if (($db_map['grid_align'] == SYSMAP_GRID_ALIGN_ON && $autoAlign == 0) || ($db_map['grid_align'] == SYSMAP_GRID_ALIGN_OFF && $autoAlign == 1)) {
-			$this->click("gridautoalign");
+			$this->zbxTestClick('gridautoalign');
 		}
 
 		// clicking "Save"
@@ -124,10 +123,8 @@ class testFormMap extends CWebTest {
 			'Chuck Norris: Database was not updated as expected. Here is what I got: '.print_r($db_map, true).'. Now compare it with data set provided.'
 		);
 
-
 		// returning to the map
-		$this->click('link='.$map_name);
-		$this->wait();
+		$this->zbxTestClickWait('link='.$map_name);
 
 		// checking if all options remain as they were set
 		$this->assertTrue(

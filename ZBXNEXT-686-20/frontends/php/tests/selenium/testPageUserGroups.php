@@ -56,8 +56,7 @@ class testPageUserGroups extends CWebTest {
 
 		$this->zbxTestLogin('usergrps.php');
 		$this->checkTitle('Configuration of user groups');
-		$this->click("link=$name");
-		$this->wait();
+		$this->zbxTestClickWait('link='.$name);
 		$this->zbxTestClickWait('save');
 		$this->checkTitle('Configuration of user groups');
 		$this->zbxTestTextPresent('Group updated');

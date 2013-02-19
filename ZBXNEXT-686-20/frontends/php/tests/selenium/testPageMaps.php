@@ -63,8 +63,7 @@ class testPageMaps extends CWebTest {
 
 		$this->zbxTestLogin('sysmaps.php');
 		$this->checkTitle('Configuration of network maps');
-		$this->click("link=$name");
-		$this->wait();
+		$this->zbxTestClickWait('link='.$name);
 
 //		$this->waitForCondition("selenium.browserbot.getUserWindow().jQuery('img[name=sysmap]').attr('src') != 'images/general/tree/zero.gif'", 5000);
 
@@ -74,7 +73,6 @@ class testPageMaps extends CWebTest {
 
 		$txt = $this->getConfirmation();
 
-//		$this->wait();
 		$this->checkTitle('Configuration of network maps');
 		$this->zbxTestTextPresent("$name");
 		$this->zbxTestTextPresent('Configuration of network maps');

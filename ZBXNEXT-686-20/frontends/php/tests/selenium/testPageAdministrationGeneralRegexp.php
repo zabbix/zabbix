@@ -93,7 +93,7 @@ class testPageAdministrationGeneralRegexp extends CWebTest {
 		$this->openRegularExpressions();
 
 		$this->zbxTestDropdownSelect('go', 'Delete selected');
-		$this->click('goButton');
+		$this->zbxTestClick('goButton');
 		$this->waitForAlertPresent();
 		$this->assertAlert('No elements selected!');
 

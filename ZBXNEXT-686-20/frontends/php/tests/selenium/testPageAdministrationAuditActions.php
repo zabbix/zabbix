@@ -30,7 +30,7 @@ class testPageAdministrationAuditActions extends CWebTest {
 		$this->zbxTestTextPresent('AUDIT ACTIONS');
 		$this->zbxTestTextPresent('ACTIONS');
 
-		$this->click('flicker_icon_l');
+		$this->zbxTestClick('flicker_icon_l');
 
 		$this->zbxTestTextPresent('Recipient');
 		$this->assertElementPresent('alias');
@@ -58,7 +58,7 @@ class testPageAdministrationAuditActions extends CWebTest {
 		$this->zbxTestTextPresent('AUDIT ACTIONS');
 		$this->zbxTestTextPresent('ACTIONS');
 
-		$this->click('flicker_icon_l');
+		$this->zbxTestClick('flicker_icon_l');
 		$time = $auditactions['clock'];
 		$today = date("d M Y H:i:s", $time);
 
@@ -92,15 +92,12 @@ class testPageAdministrationAuditActions extends CWebTest {
 		$this->zbxTestTextPresent(array($today, $type['description'], $status, $retries, $auditactions['sendto'], $auditactions['subject'], $auditactions['message'], $auditactions['error']));
 
 		// checking that there are no records in the report for 'guest' user
-		$this->click('flicker_icon_l');
+		$this->zbxTestClick('flicker_icon_l');
 		$this->input_type('alias', 'guest');
-		$this->click("id=filter");
-		$this->wait();
+		$this->zbxTestClickWait('filter');
 		$this->zbxTestTextPresent('No actions defined.');
 
-		$this->click('flicker_icon_l');
-		$this->click('filter_rst');
-		$this->wait();
-
+		$this->zbxTestClick('flicker_icon_l');
+		$this->zbxTestClickWait('filter_rst');
 	}
 }

@@ -156,9 +156,8 @@ class testFormAdministrationGeneralTrigDisplOptions extends CWebTest {
 		$oldHash = DBhash($sqlHash);
 
 		$this->zbxTestClick('resetDefaults');
-		$this->click("//button[@type='button']");
-		$this->click("save");
-		$this->wait();
+		$this->zbxTestClick("//button[@type='button']");
+		$this->zbxTestClickWait('save');
 		$this->zbxTestTextPresent(array('Configuration updated', 'CONFIGURATION OF ZABBIX', 'Trigger displaying options'));
 
 		$sql = 'SELECT problem_unack_color FROM config WHERE problem_unack_color='.zbx_dbstr('DC0000').'';

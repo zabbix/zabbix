@@ -113,8 +113,7 @@ class CWebTest extends PHPUnit_Extensions_SeleniumTestCase {
 		if ($this->isElementPresent('id=password')) {
 			$this->input_type('name', PHPUNIT_LOGIN_NAME);
 			$this->input_type('password', PHPUNIT_LOGIN_PWD);
-			$this->click('enter');
-			$this->wait();
+			$this->zbxTestClickWait('enter');
 		}
 		if (isset($url)) {
 			$this->zbxTestOpenWait($url);
@@ -166,7 +165,7 @@ class CWebTest extends PHPUnit_Extensions_SeleniumTestCase {
 	}
 
 	public function zbxTestClickWait($id) {
-		$this->click($id);
+		$this->zbxTestClick($id);
 		$this->wait();
 	}
 
@@ -296,8 +295,7 @@ class CWebTest extends PHPUnit_Extensions_SeleniumTestCase {
 		// Link a template to a host from host properties page
 		$this->zbxTestLogin('hosts.php');
 		$this->zbxTestDropdownSelectWait('groupid', 'all');
-		$this->click("link=$host");
-		$this->wait();
+		$this->zbxTestClickWait('link='.$host);
 		$this->tab_switch("Templates");
 		$this->zbxTestTextNotPresent($template);
 

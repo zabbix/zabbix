@@ -63,8 +63,7 @@ class testPageActionsAutoregistration extends CWebTest {
 
 		$this->zbxTestLogin('actionconf.php?eventsource='.EVENT_SOURCE_AUTO_REGISTRATION);
 		$this->checkTitle('Configuration of actions');
-		$this->click("link=$name");
-		$this->wait();
+		$this->zbxTestClickWait('link='.$name);
 		$this->zbxTestClickWait('save');
 		$this->checkTitle('Configuration of actions');
 		$this->zbxTestTextPresent('Action updated');

@@ -63,8 +63,7 @@ class testPageNodes extends CWebTest {
 		$sqlNodes = 'SELECT * FROM nodes ORDER BY nodeid';
 		$oldHashNodes=DBhash($sqlNodes);
 
-		$this->click('link='.$node['name']);
-		$this->wait();
+		$this->zbxTestClickWait('link='.$node['name']);
 		$this->zbxTestClickWait('save');
 		$this->zbxTestTextPresent('Node updated');
 

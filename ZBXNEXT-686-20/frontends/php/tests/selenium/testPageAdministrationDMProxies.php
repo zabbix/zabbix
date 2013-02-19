@@ -58,8 +58,7 @@ class testPageAdministrationDMProxies extends CWebTest {
 
 		$this->zbxTestLogin('proxies.php');
 		$this->checkTitle('Configuration of proxies');
-		$this->click("link=$name");
-		$this->wait();
+		$this->zbxTestClickWait('link='.$name);
 		$this->zbxTestClickWait('save');
 		$this->checkTitle('Configuration of proxies');
 		$this->zbxTestTextPresent('Proxy updated');

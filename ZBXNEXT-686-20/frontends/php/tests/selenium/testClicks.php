@@ -114,7 +114,7 @@ class testClicks extends CWebTest {
 		$this->zbxTestLogin();
 		$this->zbxTestOpen($url);
 		foreach ($clicks as $click) {
-			$this->click($click);
+			$this->zbxTestClick($click);
 			$this->waitForPageToLoad();
 		}
 

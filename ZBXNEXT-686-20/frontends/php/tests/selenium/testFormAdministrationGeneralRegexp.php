@@ -165,8 +165,7 @@ class testFormAdministrationGeneralRegexp extends CWebTest {
 
 		// Testing regexp using Test button in the regexp properties form
 		$this->zbxTestLogin('adm.regexps.php');
-		$this->click('link='.$this->regexp);
-		$this->wait();
+		$this->zbxTestClickWait('link='.$this->regexp);
 
 		// Test #1 for the result=True
 		$this->zbxTestClickWait('test');
@@ -178,8 +177,7 @@ class testFormAdministrationGeneralRegexp extends CWebTest {
 
 		$this->zbxTestLogin('adm.regexps.php');
 		// test #2 for the result=False
-		$this->click('link='.$this->regexp);
-		$this->wait();
+		$this->zbxTestClickWait('link='.$this->regexp);
 		$this->input_type('test_string', 'abcdef');
 		$this->zbxTestClickWait('test');
 
@@ -192,8 +190,7 @@ class testFormAdministrationGeneralRegexp extends CWebTest {
 
 		// cloning regexp
 		$this->zbxTestLogin('adm.regexps.php');
-		$this->click('link='.$this->regexp);
-		$this->wait();
+		$this->zbxTestClickWait('link='.$this->regexp);
 		$this->zbxTestClickWait('clone');
 		$this->input_type('rename', $this->regexp.'_clone');
 		$this->zbxTestClickWait('save');
@@ -207,8 +204,7 @@ class testFormAdministrationGeneralRegexp extends CWebTest {
 
 		// Updating regexp
 		$this->zbxTestLogin('adm.regexps.php');
-		$this->click('link='.$this->regexp);
-		$this->wait();
+		$this->zbxTestClickWait('link='.$this->regexp);
 		$this->input_type('rename', $this->regexp.'2');
 		$this->zbxTestClickWait('save');
 		$this->zbxTestTextPresent('Regular expression updated');
@@ -234,8 +230,7 @@ class testFormAdministrationGeneralRegexp extends CWebTest {
 		// deleting regexp using "Delete" button in the regexp properties form
 		$this->zbxTestLogin('adm.regexps.php');
 		$this->chooseOkOnNextConfirmation();
-		$this->click('link='.$this->regexp2);
-		$this->wait();
+		$this->zbxTestClickWait('link='.$this->regexp2);
 		$this->zbxTestClick('delete');
 		$this->waitForConfirmation();
 		$this->wait();
@@ -259,7 +254,7 @@ class testFormAdministrationGeneralRegexp extends CWebTest {
 		$this->zbxTestCheckboxSelect('all_regexps');
 		$this->zbxTestDropdownSelect('go', 'Delete selected');
 		$this->chooseOkOnNextConfirmation();
-		$this->click('goButton');
+		$this->zbxTestClick('goButton');
 		$this->waitForConfirmation();
 		$this->wait();
 		$this->zbxTestTextPresent('Regular expressions deleted');

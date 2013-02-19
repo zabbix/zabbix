@@ -80,8 +80,7 @@ class testFormHostGroup extends CWebTest {
 
 	public function testFormHostGroup_UpdateEmpty() {
 		$this->zbxTestLogin('hostgroups.php');
-		$this->click('link='.$this->hostGroup);
-		$this->wait();
+		$this->zbxTestClickWait('link='.$this->hostGroup);
 
 		$this->input_type('name', '');
 		$this->zbxTestClickWait('save');
@@ -96,8 +95,7 @@ class testFormHostGroup extends CWebTest {
 		));
 
 		$this->zbxTestLogin('hostgroups.php');
-		$this->click('link='.$this->hostGroup);
-		$this->wait();
+		$this->zbxTestClickWait('link='.$this->hostGroup);
 
 		$this->input_type('name', $hostGroup['name']);
 		$this->zbxTestClickWait('save');
@@ -107,8 +105,7 @@ class testFormHostGroup extends CWebTest {
 
 	public function testFormHostGroup_Update() {
 		$this->zbxTestLogin('hostgroups.php');
-		$this->click('link='.$this->hostGroup);
-		$this->wait();
+		$this->zbxTestClickWait('link='.$this->hostGroup);
 
 		$this->input_type('name', $this->hostGroup.' 2');
 		$this->zbxTestClickWait('save');
@@ -117,11 +114,10 @@ class testFormHostGroup extends CWebTest {
 
 	public function testFormHostGroup_Delete() {
 		$this->zbxTestLogin('hostgroups.php');
-		$this->click('link='.$this->hostGroup.' 2');
-		$this->wait();
+		$this->zbxTestClickWait('link='.$this->hostGroup.' 2');
 
 		$this->chooseOkOnNextConfirmation();
-		$this->click('delete');
+		$this->zbxTestClick('delete');
 		$this->waitForConfirmation();
 		$this->wait();
 		$this->zbxTestTextPresent('Group deleted');

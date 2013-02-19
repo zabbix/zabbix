@@ -144,7 +144,7 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 		$this->assertElementPresent('macro_add');
 		$this->assertElementPresent('save');
 
-		$this->click('id=macro_add');
+		$this->zbxTestClick('macro_add');
 		$this->waitForVisible('macros['.$countGlobalMacros.'][macro]');
 
 		for ($i = 0; $i <= $countGlobalMacros; $i++) {
@@ -190,7 +190,7 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 
 		$this->openGlobalMacros();
 
-		$this->click('id=macro_add');
+		$this->zbxTestClick('macro_add');
 		$this->waitForVisible('macros['.$countGlobalMacros.'][macro]');
 
 		$this->saveGlobalMacros();
@@ -215,7 +215,7 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 
 		$this->openGlobalMacros();
 
-		$this->click('id=macro_add');
+		$this->zbxTestClick('macro_add');
 		$this->waitForVisible('macros['.$countGlobalMacros.'][macro]');
 
 		$this->input_type('macros['.$countGlobalMacros.'][macro]', $macro);
@@ -241,7 +241,7 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 
 		$this->openGlobalMacros();
 
-		$this->click('id=macro_add');
+		$this->zbxTestClick('macro_add');
 		$this->waitForVisible('macros['.$countGlobalMacros.'][macro]');
 
 		$this->input_type('macros['.$countGlobalMacros.'][macro]', '');
@@ -269,7 +269,7 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 
 		$this->openGlobalMacros();
 
-		$this->click('id=macro_add');
+		$this->zbxTestClick('macro_add');
 		$this->waitForVisible('macros['.$countGlobalMacros.'][macro]');
 
 		$this->input_type('macros['.$countGlobalMacros.'][macro]', $this->newMacro);
@@ -299,7 +299,7 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 
 		$this->openGlobalMacros();
 
-		$this->click('id=macro_add');
+		$this->zbxTestClick('macro_add');
 		$this->waitForVisible('macros['.$countGlobalMacros.'][macro]');
 
 		$this->input_type('macros['.$countGlobalMacros.'][macro]', $this->newEmptyMacro);
@@ -327,7 +327,7 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 
 		$this->openGlobalMacros();
 
-		$this->click('id=macro_add');
+		$this->zbxTestClick('macro_add');
 		$this->waitForVisible('macros['.$countGlobalMacros.'][macro]');
 
 		$this->input_type('macros['.$countGlobalMacros.'][macro]', $this->newMacro);
@@ -526,7 +526,7 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 		}
 		$this->assertNotEquals($i, $countGlobalMacros);
 
-		$this->click('id=macros_'.$i.'_remove');
+		$this->zbxTestClick('macros_'.$i.'_remove');
 
 		$this->saveGlobalMacros(true, false);
 
@@ -555,7 +555,7 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 		}
 		$this->assertNotEquals($i, $countGlobalMacros);
 
-		$this->click('id=macros_'.$i.'_remove');
+		$this->zbxTestClick('macros_'.$i.'_remove');
 
 		$this->saveGlobalMacros(true);
 		$this->zbxTestTextPresent('Macros updated');
@@ -573,10 +573,10 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 
 		$this->openGlobalMacros();
 
-		$this->click('id=macro_add');
+		$this->zbxTestClick('macro_add');
 		$this->waitForVisible('macros['.$countGlobalMacros.'][macro]');
 
-		$this->click('id=macros_'.$countGlobalMacros.'_remove');
+		$this->zbxTestClick('macros_'.$countGlobalMacros.'_remove');
 
 		$this->saveGlobalMacros();
 		$this->zbxTestTextPresent('Macros updated');

@@ -80,8 +80,7 @@ class testPageAdministrationGeneralImages extends CWebTest {
 		$this->zbxTestLogin('adm.images.php');
 		$this->assertElementPresent('form');
 		$this->zbxTestDropdownSelectWait('imagetype', 'Icon');
-		$this->click('link='.$icon_name['name']);
-		$this->wait();
+		$this->zbxTestClickWait('link='.$icon_name['name']);
 		$this->zbxTestTextPresent(array('Name', 'Type', 'Upload', 'Image'));
 		$this->assertElementPresent('save');
 		$this->assertElementPresent('delete');
@@ -104,8 +103,7 @@ class testPageAdministrationGeneralImages extends CWebTest {
 		$this->zbxTestLogin('adm.images.php');
 		$this->assertElementPresent('form');
 		$this->zbxTestDropdownSelectWait('imagetype', 'Background');
-		$this->click('link='.$bgimage_name['name']);
-		$this->wait();
+		$this->zbxTestClickWait('link='.$bgimage_name['name']);
 		$this->zbxTestTextPresent(array('Name', 'Type', 'Upload', 'Image'));
 		$this->assertElementPresent('save');
 		$this->assertElementPresent('delete');

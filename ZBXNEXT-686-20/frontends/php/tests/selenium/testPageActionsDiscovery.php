@@ -64,8 +64,7 @@ class testPageActionsDiscovery extends CWebTest {
 
 		$this->zbxTestLogin('actionconf.php?eventsource='.EVENT_SOURCE_DISCOVERY);
 		$this->checkTitle('Configuration of actions');
-		$this->click("link=$name");
-		$this->wait();
+		$this->zbxTestClickWait('link='.$name);
 		$this->zbxTestClickWait('save');
 		$this->checkTitle('Configuration of actions');
 		$this->zbxTestTextPresent('Action updated');

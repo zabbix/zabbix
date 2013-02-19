@@ -70,8 +70,7 @@ class testPageUsers extends CWebTest {
 		$this->checkTitle('Configuration of users');
 		$this->zbxTestDropdownSelectWait('filter_usrgrpid', 'All');
 
-		$this->click('link='.$alias);
-		$this->wait();
+		$this->zbxTestClickWait('link='.$alias);
 		$this->zbxTestClickWait('save');
 		$this->checkTitle('Configuration of users');
 		$this->zbxTestTextPresent('User updated');

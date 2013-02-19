@@ -87,8 +87,7 @@ class testFormAdministrationGeneralValuemap extends CWebTest {
 		$this->input_type('mappings[0][value]', $value);
 		$this->input_type('mappings[0][newvalue]', $newvalue);
 
-		$this->click("id=save");
-		$this->wait();
+		$this->zbxTestClickWait('save');
 		$this->zbxTestTextPresent('Value map added');
 		$this->zbxTestTextPresent('CONFIGURATION OF VALUE MAPPING');
 		$this->zbxTestTextPresent('Value mapping');
@@ -126,16 +125,15 @@ class testFormAdministrationGeneralValuemap extends CWebTest {
 		$this->input_type('mapname', $this->valuemapWithMultipleMappings);
 		$this->input_type('mappings[0][value]', $value1);
 		$this->input_type('mappings[0][newvalue]', $newvalue1);
-		$this->click("id=addMapping");
+		$this->zbxTestClick('addMapping');
 		$this->input_type('mappings[1][value]', $value2);
 		$this->input_type('mappings[1][newvalue]', $newvalue2);
-		$this->click("id=addMapping");
+		$this->zbxTestClick('addMapping');
 
 		$this->input_type('mappings[2][value]', $value3);
 		$this->input_type('mappings[2][newvalue]', $newvalue3);
 
-		$this->click("id=save");
-		$this->wait();
+		$this->zbxTestClickWait('save');
 		$this->zbxTestTextPresent('Value map added');
 		$this->zbxTestTextPresent('CONFIGURATION OF VALUE MAPPING');
 		$this->zbxTestTextPresent('Value mapping');
@@ -149,11 +147,9 @@ class testFormAdministrationGeneralValuemap extends CWebTest {
 	public function testFormAdministrationGeneralValuemap_UpdateValueMap($oldVmName, $newVmName) {
 
 		$this->zbxTestLogin('adm.valuemapping.php');
-		$this->click('link='.$oldVmName);
-		$this->wait();
+		$this->zbxTestClickWait('link='.$oldVmName);
 		$this->input_type("mapname", $newVmName);
-		$this->click("save");
-		$this->wait();
+		$this->zbxTestClickWait('save');
 
 		$sql = 'SELECT * FROM valuemaps WHERE name=\''.$newVmName.'\'';
 		$this->assertEquals(1, DBcount($sql), 'Chuck Norris: Value map name has not been updated in the DB');
@@ -168,12 +164,11 @@ class testFormAdministrationGeneralValuemap extends CWebTest {
 		$this->input_type('mapname', 'incorrect_valuemap');
 		// trying to create already existing valuemap
 		$this->input_type('mapname', $this->valuemapWithMultipleMappings);
-		$this->click("id=addMapping");
+		$this->zbxTestClick('addMapping');
 		$this->input_type('mappings[0][value]', 6);
 		$this->input_type('mappings[0][newvalue]', 'six');
-		$this->click("id=addMapping");
-		$this->click("save");
-		$this->wait();
+		$this->zbxTestClick('addMapping');
+		$this->zbxTestClickWait('save');
 		$this->zbxTestTextPresent(array('ERROR: Cannot add value map', 'Value map', 'already exists.'));
 	}
 
@@ -183,10 +178,9 @@ class testFormAdministrationGeneralValuemap extends CWebTest {
 	public function testFormAdministrationGeneralValuemap_DeleteValueMap($oldVmName, $newVmName) {
 
 		$this->zbxTestLogin('adm.valuemapping.php');
-		$this->click('link='.$newVmName);
-		$this->wait();
+		$this->zbxTestClickWait('link='.$newVmName);
 		$this->chooseOkOnNextConfirmation();
-		$this->click("delete");
+		$this->zbxTestClick('delete');
 		$this->waitForConfirmation();
 		$this->wait();
 		$this->zbxTestTextPresent('Value map deleted');
@@ -199,8 +193,7 @@ class testFormAdministrationGeneralValuemap extends CWebTest {
 	public function testFormAdministrationGeneralValuemap_CancelDeleteValueMap() {
 
 		$this->zbxTestLogin('adm.valuemapping.php');
-		$this->click('link='.$this->valuemapWithMultipleMappings);
-		$this->wait();
+		$this->zbxTestClickWait('link='.$this->valuemapWithMultipleMappings);
 		$this->zbxTestClick('cancel');
 
 		// checking that valuemap was not deleted after clicking on the "Cancel" button in the confirm dialog box
@@ -212,10 +205,9 @@ class testFormAdministrationGeneralValuemap extends CWebTest {
 
 		// finally deleting remaining value maps
 		$this->zbxTestLogin('adm.valuemapping.php');
-		$this->click('link='.$this->valuemapWithMultipleMappings);
-		$this->wait();
+		$this->zbxTestClickWait('link='.$this->valuemapWithMultipleMappings);
 		$this->chooseOkOnNextConfirmation();
-		$this->click("delete");
+		$this->zbxTestClick('delete');
 		$this->waitForConfirmation();
 		$this->wait();
 		$this->zbxTestTextPresent('Value map deleted');
