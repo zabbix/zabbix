@@ -1603,7 +1603,7 @@ static void	get_escalation_sql(char **sql, size_t *sql_alloc, size_t *sql_offset
  *                                                                            *
  * Function: process_actions                                                  *
  *                                                                            *
- * Purpose: process all actions that match single event                       *
+ * Purpose: process all actions of each event in a list                       *
  *                                                                            *
  * Parameters: events     - [IN] events to apply actions for                  *
  *             events_num - [IN] number of events                             *
@@ -1661,6 +1661,7 @@ void	process_actions(DB_EVENT *events, size_t events_num)
 #endif
 		DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 		DBexecute("%s", sql);
+		zbx_free(sql);
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
