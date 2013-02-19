@@ -354,8 +354,8 @@ foreach ($db_apps as $appid => $dbApp) {
 	if ($openState) {
 		$toggle->addClass('icon-minus-9x9');
 	}
-	$toggle->setAttribute('data-app_id', $dbApp['applicationid']);
-	$toggle->setAttribute('data-open_state', $openState);
+	$toggle->setAttribute('data-app-id', $dbApp['applicationid']);
+	$toggle->setAttribute('data-open-state', $openState);
 
 	$col = new CCol(array(bold($dbApp['name']),SPACE.'('._n('%1$s Item', '%1$s Items', $dbApp['item_cnt']).')'));
 	$col->setColSpan(5);
@@ -541,8 +541,8 @@ foreach ($db_hosts as $hostId => $dbHost) {
 	if ($openState) {
 		$toggle->addClass('icon-minus-9x9');
 	}
-	$toggle->setAttribute('data-app_id', '0_'.$host['hostid']);
-	$toggle->setAttribute('data-open_state', $openState);
+	$toggle->setAttribute('data-app-id', '0_'.$host['hostid']);
+	$toggle->setAttribute('data-open-state', $openState);
 
 	$col = new CCol(array(bold('- '.('other').' -'), SPACE.'('._n('%1$s Item', '%1$s Items', $dbHost['item_cnt']).')'));
 	$col->setColSpan(5);

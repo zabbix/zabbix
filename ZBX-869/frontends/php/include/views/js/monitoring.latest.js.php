@@ -20,7 +20,7 @@
 		var initialize = function() {
 			// if at least one toggle group is opened
 			if ($('.app-list-toggle.icon-minus-9x9').length) {
-				$('.app-list-toggle-all').addClass('icon-minus-9x9').data('open_state', 1);
+				$('.app-list-toggle-all').addClass('icon-minus-9x9').data('openState', 1);
 			}
 
 			rebuildRowColoring();
@@ -30,7 +30,7 @@
 
 		// click event for main toggle (+-) button
 		$('.app-list-toggle-all').click(function(){
-			var openState = $(this).data('open_state'),
+			var openState = $(this).data('openState'),
 				appIdList = [];
 
 			// switch between + and - icon
@@ -38,14 +38,14 @@
 
 			if (openState) {
 				$('.app-list-toggle.icon-minus-9x9').each(function(){
-					appIdList.push($(this).data('app_id'));
+					appIdList.push($(this).data('appId'));
 					// click on all opened toggle buttons
 					$(this).trigger('click', true);
 				});
 			}
 			else {
 				$('.app-list-toggle').not('.icon-minus-9x9').each(function(){
-					appIdList.push($(this).data('app_id'));
+					appIdList.push($(this).data('appId'));
 					// click on all closed toggle buttons
 					$(this).trigger('click', true);
 				});
@@ -53,7 +53,7 @@
 
 			// change and store new state
 			openState = openState ? 0 : 1;
-			$(this).data('open_state', openState);
+			$(this).data('openState', openState);
 
 			rebuildRowColoring();
 
@@ -65,8 +65,8 @@
 
 		// click event for every toggle (+-) button
 		$('.app-list-toggle').click(function(e, fromTrigger){
-			var appId = $(this).data('app_id'),
-				openState = $(this).data('open_state');
+			var appId = $(this).data('appId'),
+				openState = $(this).data('openState');
 
 			// hide/show all corresponding toggle sub rows
 			$('tr[parent_app_id=' + appId + ']').toggle();
@@ -75,17 +75,17 @@
 
 			// change and store new state
 			openState = openState ? 0 : 1;
-			$(this).data('open_state', openState);
+			$(this).data('openState', openState);
 
 			// only if clicked directly
 			if (typeof fromTrigger === 'undefined') {
 				// if at least one toggle is opened, make main toggle as -
 				if (openState) {
-					$('.app-list-toggle-all').addClass('icon-minus-9x9').data('open_state', 1);
+					$('.app-list-toggle-all').addClass('icon-minus-9x9').data('openState', 1);
 				}
 				// if all toggles are closed, make main toggle as +
 				else if (!$('.app-list-toggle.icon-minus-9x9').length) {
-					$('.app-list-toggle-all').removeClass('icon-minus-9x9').data('open_state', 0);
+					$('.app-list-toggle-all').removeClass('icon-minus-9x9').data('openState', 0);
 				}
 
 				rebuildRowColoring();
