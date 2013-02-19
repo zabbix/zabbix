@@ -42,38 +42,38 @@ static int	ONLY_ACTIVE(AGENT_REQUEST *request, AGENT_RESULT *result);
 static int	SYSTEM_RUN(AGENT_REQUEST *request, AGENT_RESULT *result);
 
 ZBX_METRIC	parameters_common[] =
-/*      KEY                     FLAG		FUNCTION        ADD_PARAM       TEST_PARAM */
+/*      KEY                     FLAG		FUNCTION        	TEST PARAMETERS */
 {
-	{"system.localtime",	CF_USEUPARAM,	SYSTEM_LOCALTIME,	0,	"utc"},
-	{"system.run",		CF_USEUPARAM,	SYSTEM_RUN,	 	0,	"echo test"},
+	{"system.localtime",	CF_HAVEPARAMS,	SYSTEM_LOCALTIME,	"utc"},
+	{"system.run",		CF_HAVEPARAMS,	SYSTEM_RUN,	 	"echo test"},
 
-	{"web.page.get",	CF_USEUPARAM,	WEB_PAGE_GET,	 	0,	"localhost,,80"},
-	{"web.page.perf",	CF_USEUPARAM,	WEB_PAGE_PERF,	 	0,	"localhost,,80"},
-	{"web.page.regexp",	CF_USEUPARAM,	WEB_PAGE_REGEXP,	0,	"localhost,,80,OK"},
+	{"web.page.get",	CF_HAVEPARAMS,	WEB_PAGE_GET,	 	"localhost,,80"},
+	{"web.page.perf",	CF_HAVEPARAMS,	WEB_PAGE_PERF,	 	"localhost,,80"},
+	{"web.page.regexp",	CF_HAVEPARAMS,	WEB_PAGE_REGEXP,	"localhost,,80,OK"},
 
-	{"vfs.file.size",	CF_USEUPARAM,	VFS_FILE_SIZE, 		0,	VFS_TEST_FILE},
-	{"vfs.file.time",	CF_USEUPARAM,	VFS_FILE_TIME,		0,	VFS_TEST_FILE ",modify"},
-	{"vfs.file.exists",	CF_USEUPARAM,	VFS_FILE_EXISTS,	0,	VFS_TEST_FILE},
-	{"vfs.file.contents",	CF_USEUPARAM,	VFS_FILE_CONTENTS,	0,	VFS_TEST_FILE},
-	{"vfs.file.regexp",	CF_USEUPARAM,	VFS_FILE_REGEXP,	0,	VFS_TEST_FILE "," VFS_TEST_REGEXP},
-	{"vfs.file.regmatch",	CF_USEUPARAM,	VFS_FILE_REGMATCH, 	0,	VFS_TEST_FILE "," VFS_TEST_REGEXP},
-	{"vfs.file.md5sum",	CF_USEUPARAM,	VFS_FILE_MD5SUM,	0,	VFS_TEST_FILE},
-	{"vfs.file.cksum",	CF_USEUPARAM,	VFS_FILE_CKSUM,		0,	VFS_TEST_FILE},
+	{"vfs.file.size",	CF_HAVEPARAMS,	VFS_FILE_SIZE, 		VFS_TEST_FILE},
+	{"vfs.file.time",	CF_HAVEPARAMS,	VFS_FILE_TIME,		VFS_TEST_FILE ",modify"},
+	{"vfs.file.exists",	CF_HAVEPARAMS,	VFS_FILE_EXISTS,	VFS_TEST_FILE},
+	{"vfs.file.contents",	CF_HAVEPARAMS,	VFS_FILE_CONTENTS,	VFS_TEST_FILE},
+	{"vfs.file.regexp",	CF_HAVEPARAMS,	VFS_FILE_REGEXP,	VFS_TEST_FILE "," VFS_TEST_REGEXP},
+	{"vfs.file.regmatch",	CF_HAVEPARAMS,	VFS_FILE_REGMATCH, 	VFS_TEST_FILE "," VFS_TEST_REGEXP},
+	{"vfs.file.md5sum",	CF_HAVEPARAMS,	VFS_FILE_MD5SUM,	VFS_TEST_FILE},
+	{"vfs.file.cksum",	CF_HAVEPARAMS,	VFS_FILE_CKSUM,		VFS_TEST_FILE},
 
-	{"net.dns",		CF_USEUPARAM,	NET_DNS,		0,	",zabbix.com"},
-	{"net.dns.record",	CF_USEUPARAM,	NET_DNS_RECORD,		0,	",zabbix.com"},
-	{"net.tcp.dns",		CF_USEUPARAM,	NET_DNS,		0,	",zabbix.com"}, /* deprecated */
-	{"net.tcp.dns.query",	CF_USEUPARAM,	NET_DNS_RECORD,		0,	",zabbix.com"}, /* deprecated */
-	{"net.tcp.port",	CF_USEUPARAM,	NET_TCP_PORT,		0,	",80"},
+	{"net.dns",		CF_HAVEPARAMS,	NET_DNS,		",zabbix.com"},
+	{"net.dns.record",	CF_HAVEPARAMS,	NET_DNS_RECORD,		",zabbix.com"},
+	{"net.tcp.dns",		CF_HAVEPARAMS,	NET_DNS,		",zabbix.com"}, /* deprecated */
+	{"net.tcp.dns.query",	CF_HAVEPARAMS,	NET_DNS_RECORD,		",zabbix.com"}, /* deprecated */
+	{"net.tcp.port",	CF_HAVEPARAMS,	NET_TCP_PORT,		",80"},
 
-	{"system.hostname",	CF_USEUPARAM,	SYSTEM_HOSTNAME,	0,	NULL},
-	{"system.uname",	0,		SYSTEM_UNAME,		0,	NULL},
+	{"system.hostname",	CF_HAVEPARAMS,	SYSTEM_HOSTNAME,	NULL},
+	{"system.uname",	0,		SYSTEM_UNAME,		NULL},
 
-	{"system.users.num",	0,		SYSTEM_USERS_NUM,	0,	NULL},
+	{"system.users.num",	0,		SYSTEM_USERS_NUM,	NULL},
 
-	{"log",			CF_USEUPARAM,	ONLY_ACTIVE, 		0,	"logfile"},
-	{"logrt",		CF_USEUPARAM,	ONLY_ACTIVE,		0,	"logfile"},
-	{"eventlog",		CF_USEUPARAM,	ONLY_ACTIVE, 		0,	"system"},
+	{"log",			CF_HAVEPARAMS,	ONLY_ACTIVE, 		"logfile"},
+	{"logrt",		CF_HAVEPARAMS,	ONLY_ACTIVE,		"logfile"},
+	{"eventlog",		CF_HAVEPARAMS,	ONLY_ACTIVE, 		"system"},
 
 	{0}
 };

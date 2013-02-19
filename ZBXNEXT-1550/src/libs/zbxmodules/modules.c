@@ -171,7 +171,10 @@ int	load_modules(const char *path, char **modules, int timeout)
 		metrics = func_list();
 		for (i = 0; NULL != metrics[i].key; i++)
 		{
-			metrics[i].flags |= CF_MODFUNCTION;
+			/* Accept only CF_HAVEPARAMS flag from module items */
+			metrics[i].flags &= CF_HAVEPARAMS;
+			/* The flag means that the items comes from a loadable module */
+			metrics[i].flags |= CF_MODULE;
 			add_metric(&metrics[i]);
 		}
 

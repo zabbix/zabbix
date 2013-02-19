@@ -28,11 +28,11 @@ int zbx_module_dummy_ping(AGENT_REQUEST *request, AGENT_RESULT *result);
 int zbx_module_dummy_random(AGENT_REQUEST *request, AGENT_RESULT *result);
 
 static ZBX_METRIC keys[] =
-/*      KEY                     FLAG		FUNCTION        	ADD_PARAM       TEST_PARAM */
+/*      KEY                     FLAG		FUNCTION        	TEST PARAMETERS */
 {
-	{"dummy.ping",		0,		zbx_module_dummy_ping,	0,		0},
-	{"dummy.echo",		CF_USEUPARAM,	zbx_module_dummy_echo, 	0,		"a message"},
-	{"dummy.random",	CF_USEUPARAM,	zbx_module_dummy_random,0,		"1,1000"},
+	{"dummy.ping",		0,		zbx_module_dummy_ping,	0},
+	{"dummy.echo",		CF_HAVEPARAMS,	zbx_module_dummy_echo, 	"a message"},
+	{"dummy.random",	CF_HAVEPARAMS,	zbx_module_dummy_random,"1,1000"},
 	{0}
 };
 
@@ -96,7 +96,7 @@ int zbx_module_dummy_ping(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 int zbx_module_dummy_echo(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-/* TODO nparam return 1 event in case if there are no parameters, it should be fixed */
+/* TODO nparam return 1 even in case if there are no parameters, it should be fixed */
 	if (request->nparam != 1)
 	{
 		/* set optional error message */

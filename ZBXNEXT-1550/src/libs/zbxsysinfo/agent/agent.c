@@ -27,11 +27,11 @@ static int	AGENT_PING(AGENT_REQUEST *request, AGENT_RESULT *result);
 static int	AGENT_VERSION(AGENT_REQUEST *request, AGENT_RESULT *result);
 
 ZBX_METRIC	parameters_agent[] =
-/*	KEY			FLAG		FUNCTION	ADD_PARAM	TEST_PARAM */
+/*	KEY			FLAG		FUNCTION	TEST PARAMETERS */
 {
-	{"agent.hostname",	0,		AGENT_HOSTNAME,		0,	NULL},
-	{"agent.ping",		0,		AGENT_PING, 		0,	NULL},
-	{"agent.version",	0,		AGENT_VERSION,		0,	NULL},
+	{"agent.hostname",	0,		AGENT_HOSTNAME,	NULL},
+	{"agent.ping",		0,		AGENT_PING, 	NULL},
+	{"agent.version",	0,		AGENT_VERSION,	NULL},
 	{NULL}
 };
 

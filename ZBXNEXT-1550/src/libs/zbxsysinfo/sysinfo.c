@@ -42,74 +42,65 @@
 
 static ZBX_METRIC	*commands = NULL;
 
-void	add_metric(ZBX_METRIC *new)
+void	add_metric(ZBX_METRIC *metric)
 {
 	int	i = 0;
 
-	assert(new);
+	assert(metric);
 
-	if (NULL == new->key)
+	if (NULL == metric->key)
 		return;
 
-/* TODO load order: metrics, module, user parameters. next overwrites previous one. */
 	while (NULL != commands[i].key)
+	{
+		if (0 == strcmp(commands[i].key, metric->key))
+		{
+			zabbix_log(LOG_LEVEL_CRIT, "failed to add new metric \"%s\": duplicate key", metric->key);
+			exit(FAIL);
+		}
 		i++;
+	}
 
-	commands[i].key = zbx_strdup(NULL, new->key);
-	commands[i].flags = new->flags;
-	commands[i].function = new->function;
-	commands[i].main_param = (NULL == new->main_param ? NULL : zbx_strdup(NULL, new->main_param));
-	commands[i].test_param = (NULL == new->test_param ? NULL : zbx_strdup(NULL, new->test_param));
+	commands[i].key = zbx_strdup(NULL, metric->key);
+	commands[i].flags = metric->flags;
+	commands[i].function = metric->function;
+	commands[i].test_param = (NULL == metric->test_param ? NULL : zbx_strdup(NULL, metric->test_param));
 
 	commands = zbx_realloc(commands, (i + 2) * sizeof(ZBX_METRIC));
 	memset(&commands[i + 1], 0, sizeof(ZBX_METRIC));
 }
 
-int	add_user_parameter(const char *key, char *command)
+int	add_user_parameter(const char *itemkey, char *command)
 {
 	int		i;
-	char		usr_cmd[MAX_STRING_LEN], usr_param[MAX_STRING_LEN];
-	unsigned	flag = 0;
+	char		key[MAX_STRING_LEN], parameters[MAX_STRING_LEN];
+	unsigned	flag = CF_USERPARAMETER;
+	ZBX_METRIC	metric;
 
-	if (ZBX_COMMAND_ERROR == (i = parse_command(key, usr_cmd, sizeof(usr_cmd), usr_param, sizeof(usr_param))))
+	if (ZBX_COMMAND_ERROR == (i = parse_command(itemkey, key, sizeof(key), parameters, sizeof(parameters))))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "failed to add UserParameter \"%s\": parsing error", key);
+		zabbix_log(LOG_LEVEL_WARNING, "failed to add UserParameter \"%s\": parsing error", itemkey);
 		return FAIL;
 	}
 	else if (ZBX_COMMAND_WITH_PARAMS == i)
 	{
-		if (0 != strcmp(usr_param, "*"))	/* must be '*' parameters */
+		if (0 != strcmp(parameters, "*"))	/* must be '*' parameters */
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "failed to add UserParameter \"%s\": invalid key", key);
+			zabbix_log(LOG_LEVEL_WARNING, "failed to add UserParameter \"%s\": invalid key", itemkey);
 			return FAIL;
 		}
-		flag |= CF_USEUPARAM;
+		flag |= CF_HAVEPARAMS;
 	}
 
-/* TODO It should use add_metric */
-	for (i = 0;; i++)
-	{
-		/* add new parameters */
-		if (NULL == commands[i].key)
-		{
-			commands[i].key = zbx_strdup(NULL, usr_cmd);
-			commands[i].flags = flag;
-			commands[i].function = &EXECUTE_USER_PARAMETER;
-			commands[i].main_param = zbx_strdup(NULL, command);
-			commands[i].test_param = 0;
+	metric.key = zbx_strdup(NULL, key);
+	metric.flags = flag;
+	metric.function = &EXECUTE_USER_PARAMETER;
+	metric.test_param = zbx_strdup(NULL, command);
 
-			commands = zbx_realloc(commands, (i + 2) * sizeof(ZBX_METRIC));
-			commands[i + 1].key = NULL;
-			break;
-		}
+	add_metric(&metric);
 
-		/* treat duplicate UserParameters as error */
-		if (0 == strcmp(commands[i].key, usr_cmd))
-		{
-			zabbix_log(LOG_LEVEL_CRIT, "failed to add UserParameter \"%s\": duplicate key", key);
-			exit(FAIL);
-		}
-	}
+	zbx_free(metric.key);
+	zbx_free(metric.test_param);
 
 	return SUCCEED;
 }
@@ -151,7 +142,6 @@ void	free_metrics()
 		for (i = 0; NULL != commands[i].key; i++)
 		{
 			zbx_free(commands[i].key);
-			zbx_free(commands[i].main_param);
 			zbx_free(commands[i].test_param);
 		}
 
@@ -228,7 +218,7 @@ void	free_request(AGENT_REQUEST *request)
  *                                                                            *
  * Purpose: parse item command (key) and fill AGET_REQUEST structure          *
  *                                                                            *
- * Parameters: cmd - complete item key                                        *
+ * Parameters: itemkey - complete item key                                    *
  *                                                                            *
  * Return value: request - structure filled with data from item key           *
  *                                                                            *
@@ -236,28 +226,28 @@ void	free_request(AGENT_REQUEST *request)
  *          nparam must be 0 (not 1!) if no parameters given                  *
  *                                                                            *
  ******************************************************************************/
-int	parse_item_key(char *cmd, AGENT_REQUEST *request)
+int	parse_item_key(char *itemkey, AGENT_REQUEST *request)
 {
 	int i;
 	char		buf[MAX_STRING_LEN];
+	char		key[MAX_STRING_LEN];
+	char		params[MAX_STRING_LEN];
 
-	request->nparam = num_param(cmd);
+	if (ZBX_COMMAND_ERROR == (i = parse_command(itemkey, key, sizeof(key), params, sizeof(params))))
+		return -1;
 
-	get_param(cmd, 0, buf, sizeof(buf));
-	request->key = zbx_strdup(NULL, buf);
+	request->nparam = num_param(params);
+
+	request->key = zbx_strdup(NULL, key);
 
 	request->params = zbx_malloc(request->params, request->nparam * sizeof(char *));
 
 	for (i = 0; i < request->nparam; i++)
 	{
-		if(0 == get_param(cmd, i+1, buf, sizeof(buf)))
-		{
+		if(0 == get_param(params, i+1, buf, sizeof(buf)))
 			request->params[i] = zbx_strdup(NULL, buf);
-		}
 		else
-		{
 			request->params[i] = zbx_strdup(NULL, '\0');
-		}
 	}
 	return 0;
 }
@@ -441,81 +431,92 @@ static int	replace_param(const char *cmd, const char *param, char *out, int outl
 int	process(const char *in_command, unsigned flags, AGENT_RESULT *result)
 {
 	int		rc, ret = NOTSUPPORTED;
-	char		usr_cmd[MAX_STRING_LEN];
-	char		usr_param[MAX_STRING_LEN];
-	char		usr_command[MAX_STRING_LEN];
-	char		param[MAX_STRING_LEN], error[MAX_STRING_LEN];
+	char		key[MAX_STRING_LEN];
+	char		parameters[MAX_STRING_LEN];
+	char		tmp[MAX_STRING_LEN];
+	char		newparameters[MAX_STRING_LEN], error[MAX_STRING_LEN];
 
 	ZBX_METRIC	*command = NULL;
 	AGENT_REQUEST	request;
 
 	assert(result);
 	init_result(result);
+	init_request(&request);
 
-	alias_expand(in_command, usr_command, sizeof(usr_command));
+	alias_expand(in_command, tmp, sizeof(tmp));
 
-	if (ZBX_COMMAND_ERROR == (rc = parse_command(usr_command, usr_cmd, sizeof(usr_cmd), usr_param, sizeof(usr_param))))
+	if (ZBX_COMMAND_ERROR == (rc = parse_command(tmp, key, sizeof(key), parameters, sizeof(parameters))))
 		goto notsupported;
 
+	/* TODO implement quick search */
 	for (command = commands; NULL != command->key; command++)
 	{
-		if (0 == strcmp(command->key, usr_cmd))
+		if (0 == strcmp(command->key, key))
 			break;
 	}
 
-	if (NULL != command->key)
+	if (NULL == command->key)
+		goto notsupported;
+
+	/* Command does not accept parameters but was called with parameters */
+	if (0 == (command->flags & CF_HAVEPARAMS) && ZBX_COMMAND_WITH_PARAMS == rc)
+		goto notsupported;
+
+	/* In test mode replace actual item key parameters with test ones */
+	if (0 != (flags & PROCESS_USE_TEST_PARAM))
 	{
-		if (0 != (command->flags & CF_USEUPARAM))
-		{
-			if (0 != (flags & PROCESS_USE_TEST_PARAM) && NULL != command->test_param)
-				strscpy(usr_param, command->test_param);
-		}
-		/* Command does not accept parameters but was called with parameters */
-		else if (ZBX_COMMAND_WITH_PARAMS == rc)
-			goto notsupported;
+		if (0 != (command->flags & CF_USERPARAMETER) || NULL == command->test_param)
+			strscpy(parameters, "");
+		else if(NULL != command->test_param)
+			strscpy(parameters, command->test_param);
+	}
 
-		*param = '\0';
-		*error = '\0';
+	*newparameters = '\0';
+	*error = '\0';
 
-		if (NULL != command->main_param)
+	if (0 != (command->flags & CF_USERPARAMETER))
+	{
+		if (0 != (command->flags & CF_HAVEPARAMS))
 		{
-			if (0 != (command->flags & CF_USEUPARAM))
+			if (FAIL == replace_param(command->test_param, parameters,
+					newparameters, sizeof(newparameters), error, sizeof(error)))
 			{
-				if (FAIL == replace_param(command->main_param, usr_param,
-						param, sizeof(param), error, sizeof(error)))
-				{
-					if ('\0' != *error)
-						zabbix_log(LOG_LEVEL_WARNING, "item [%s] error: %s", in_command, error);
-					goto notsupported;
-				}
+				if ('\0' != *error)
+					zabbix_log(LOG_LEVEL_WARNING, "item [%s] error: %s", in_command, error);
+				goto notsupported;
 			}
-			else
-				strscpy(param, command->main_param);
 		}
 		else
-			strscpy(param, usr_param);
+			strscpy(newparameters, command->test_param);
 
-		init_request(&request);
-		if (0 != parse_item_key(param, &request))
-		{
-			free_request(&request);
-			goto notsupported;
-		}
-		if (SYSINFO_RET_OK != command->function(&request, result))
-		{
-			free_request(&request);
-			/* "return NOTSUPPORTED;" would be more appropriate here for preserving original error */
-			/* message in "result" but would break things relying on ZBX_NOTSUPPORTED message. */
-			goto notsupported;
-		}
-		free_request(&request);
+		request.key = zbx_strdup(NULL, key);
+		request.nparam = 1;
+		request.params = zbx_malloc(request.params, request.nparam * sizeof(char *));
+		request.params[0] = zbx_strdup(NULL, newparameters);
 	}
 	else
+	{
+		strscpy(newparameters, parameters);
+		if (0 != (command->flags & CF_HAVEPARAMS))
+			zbx_snprintf(tmp, sizeof(tmp), "%s[%s]", key, newparameters);
+		else
+			zbx_snprintf(tmp, sizeof(tmp), "%s", key);
+
+		if (0 != parse_item_key(tmp, &request))
+			goto notsupported;
+	}
+
+	if (SYSINFO_RET_OK != command->function(&request, result))
+	{
+		/* "return NOTSUPPORTED;" would be more appropriate here for preserving original error */
+		/* message in "result" but would break things relying on ZBX_NOTSUPPORTED message. */
 		goto notsupported;
+	}
 
 	ret = SUCCEED;
 
 notsupported:
+	free_request(&request);
 
 	if (0 != (flags & PROCESS_TEST))
 	{
@@ -523,10 +524,10 @@ notsupported:
 
 		int	n1, n2 = 0;
 
-		n1 = printf("%s", usr_cmd);
+		n1 = printf("%s", key);
 
-		if (0 < n1 && '\0' != *usr_param)
-			n2 = printf("[%s]", usr_param);
+		if (0 < n1 && '\0' != *parameters)
+			n2 = printf("[%s]", parameters);
 
 		if (0 < n1 && 0 <= n2 && COL_WIDTH > n1 + n2)
 			printf("%-*s", COL_WIDTH - n1 - n2, " ");
