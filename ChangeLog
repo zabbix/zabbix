@@ -3,6 +3,7 @@ Changes for 2.0.6rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-5982] fixed read only items are listed in popup for trigger expression (Toms)
 ........S. [ZBX-6123] ensured sequential IT services updates by database syncers (dimir)
 ....I..... [ZBX-5635] changed value types to float for qps items in "Template App MySQL" (Sasha)
 ....I..... [ZBX-5622] fixed grammatical error of snmptrap.fallback in help_items; thanks to Kodai Terashima (Sasha)
