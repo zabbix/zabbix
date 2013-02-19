@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2012 Zabbix SIA
+** Copyright (C) 2000-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -156,7 +156,7 @@ elseif (isset($_REQUEST['save'])) {
 		$oldTrigger = reset($oldTrigger);
 		$oldTrigger['dependencies'] = zbx_toHash(zbx_objectValues($oldTrigger['dependencies'], 'triggerid'));
 
-		$triggerToUpdate = array_diff($trigger, $oldTrigger);
+		$triggerToUpdate = CArrayHelper::diff($trigger, $oldTrigger);
 		$triggerToUpdate['triggerid'] = $_REQUEST['triggerid'];
 
 		// dependencies
