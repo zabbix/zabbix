@@ -87,7 +87,7 @@ class testPageAdministrationMediaTypes extends CWebTest {
 		$this->zbxTestLogin('media_types.php');
 		$this->checkTitle('Configuration of media types');
 
-		$this->checkbox_select('mediatypeids_'.$mediatype['mediatypeid']);
+		$this->zbxTestCheckboxSelect('mediatypeids_'.$mediatype['mediatypeid']);
 		$this->zbxTestDropdownSelect('go', 'Disable selected');
 		$this->chooseOkOnNextConfirmation();
 		$this->zbxTestClick('goButton');
@@ -107,7 +107,7 @@ class testPageAdministrationMediaTypes extends CWebTest {
 		$this->zbxTestLogin('media_types.php');
 		$this->checkTitle('Configuration of media types');
 
-		$this->checkbox_select('mediatypeids_'.$mediatype['mediatypeid']);
+		$this->zbxTestCheckboxSelect('mediatypeids_'.$mediatype['mediatypeid']);
 		$this->zbxTestDropdownSelect('go', 'Enable selected');
 		$this->chooseOkOnNextConfirmation();
 		$this->zbxTestClick('goButton');
@@ -136,7 +136,7 @@ class testPageAdministrationMediaTypes extends CWebTest {
 		$this->zbxTestLogin('media_types.php');
 		$this->checkTitle('Configuration of media types');
 
-		$this->checkbox_select('mediatypeids_'.$mediatype['mediatypeid']);
+		$this->zbxTestCheckboxSelect('mediatypeids_'.$mediatype['mediatypeid']);
 		$this->zbxTestDropdownSelect('go', 'Delete selected');
 		$this->chooseOkOnNextConfirmation();
 		$this->zbxTestClick('goButton');
@@ -168,7 +168,7 @@ class testPageAdministrationMediaTypes extends CWebTest {
 		$row = DBfetch(DBselect('SELECT count(*) AS cnt FROM opmessage WHERE mediatypeid = '.$mediatypeid.''));
 		$used_in_operations = ($row['cnt'] > 0);
 
-		$this->checkbox_select("all_media_types");
+		$this->zbxTestCheckboxSelect('all_media_types');
 		$this->zbxTestDropdownSelect('go', 'Delete selected');
 		$this->chooseOkOnNextConfirmation();
 		$this->click('goButton');

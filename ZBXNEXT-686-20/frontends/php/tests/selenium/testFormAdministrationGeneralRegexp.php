@@ -97,7 +97,7 @@ class testFormAdministrationGeneralRegexp extends CWebTest {
 
 		// $this->zbxTestDropdownSelectWait('new_expression[expression_type]', 'Character string included');
 		$this->zbxTestDropdownSelectWait('new_expression_expression_type', $expression_type);
-		$this->checkbox_select('new_expression_case_sensitive');
+		$this->zbxTestCheckboxSelect('new_expression_case_sensitive');
 		$this->zbxTestClickWait('add_expression');
 		$this->zbxTestClickWait('save');
 		$this->zbxTestTextPresent('Regular expression added');
@@ -131,7 +131,7 @@ class testFormAdministrationGeneralRegexp extends CWebTest {
 
 		// clicking button "add_expression"
 		$this->input_type('new_expression[expression]', 'first test string');
-		$this->checkbox_select('new_expression[case_sensitive]');
+		$this->zbxTestCheckboxSelect('new_expression[case_sensitive]');
 		$this->zbxTestClickWait('add_expression');
 		$this->zbxTestClickWait('save');
 		$this->zbxTestTextPresent(array('ERROR: Cannot add regular expression', 'Regular expression', 'already exists.'));
@@ -256,7 +256,7 @@ class testFormAdministrationGeneralRegexp extends CWebTest {
 	public function testFormAdministrationGeneralRegexp_DeleteAll() {
 
 		$this->zbxTestLogin('adm.regexps.php');
-		$this->checkbox_select('all_regexps');
+		$this->zbxTestCheckboxSelect('all_regexps');
 		$this->zbxTestDropdownSelect('go', 'Delete selected');
 		$this->chooseOkOnNextConfirmation();
 		$this->click('goButton');

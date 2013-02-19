@@ -250,7 +250,7 @@ class testPageHosts extends CWebTest {
 		$this->checkTitle('Configuration of hosts');
 		$this->zbxTestDropdownSelectWait('groupid', 'all');
 
-		$this->checkbox_select("all_hosts");
+		$this->zbxTestCheckboxSelect('all_hosts');
 		$this->zbxTestDropdownSelect('go', 'Enable selected');
 		$this->zbxTestClickWait('goButton');
 
@@ -276,7 +276,7 @@ class testPageHosts extends CWebTest {
 		$this->checkTitle('Configuration of hosts');
 		$this->zbxTestDropdownSelectWait('groupid', 'all');
 
-		$this->checkbox_select("hosts_$hostid");
+		$this->zbxTestCheckboxSelect('hosts_'.$hostid);
 		$this->zbxTestDropdownSelect('go', 'Enable selected');
 		$this->zbxTestClickWait('goButton');
 
@@ -297,7 +297,7 @@ class testPageHosts extends CWebTest {
 		$this->checkTitle('Configuration of hosts');
 		$this->zbxTestDropdownSelectWait('groupid', 'all');
 
-		$this->checkbox_select("all_hosts");
+		$this->zbxTestCheckboxSelect('all_hosts');
 		$this->zbxTestDropdownSelect('go', 'Disable selected');
 		$this->zbxTestClickWait('goButton');
 
@@ -323,7 +323,7 @@ class testPageHosts extends CWebTest {
 		$this->checkTitle('Configuration of hosts');
 		$this->zbxTestDropdownSelectWait('groupid', 'all');
 
-		$this->checkbox_select("hosts_$hostid");
+		$this->zbxTestCheckboxSelect('hosts_'.$hostid);
 		$this->zbxTestDropdownSelect('go', 'Disable selected');
 		$this->zbxTestClickWait('goButton');
 

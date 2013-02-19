@@ -59,8 +59,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 		$this->zbxTestLogin('media_types.php');
 		$this->checkTitle('Configuration of media types');
 
-		$this->click('form');
-		$this->wait();
+		$this->zbxTestClickWait('form');
 
 		$this->zbxTestTextPresent('Media types');
 		$this->zbxTestTextPresent('CONFIGURATION OF MEDIA TYPES');
@@ -102,8 +101,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 			$this->assertElementPresent("//input[@id='status' and (@checked)]");
 		}
 
-		$this->click('cancel');
-		$this->wait();
+		$this->zbxTestClickWait('cancel');
 
 		$this->checkTitle('Configuration of media types');
 	}
@@ -167,8 +165,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 
 		$this->zbxTestLogin('media_types.php');
 		$this->checkTitle('Configuration of media types');
-		$this->click('link='.$name);
-		$this->wait();
+		$this->zbxTestClickWait('link='.$name);
 		$this->zbxTestClickWait('cancel');
 		$this->checkTitle('Configuration of media types');
 		$this->zbxTestTextPresent("$name");
@@ -189,8 +186,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 		$this->zbxTestLogin('media_types.php');
 		$this->checkTitle('Configuration of media types');
 		$this->zbxTestTextPresent('CONFIGURATION OF MEDIA TYPES');
-		$this->click('link='.$name);
-		$this->wait();
+		$this->zbxTestClickWait('link='.$name);
 		$this->zbxTestClickWait('save');
 		$this->zbxTestTextPresent('Media type updated');
 
@@ -214,7 +210,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 
 		$this->zbxTestLogin('media_types.php');
 		$this->checkTitle('Configuration of media types');
-		$this->click('link='.$name);
+		$this->zbxTestClick('link='.$name);
 		$this->chooseOkOnNextConfirmation();
 		$this->wait();
 

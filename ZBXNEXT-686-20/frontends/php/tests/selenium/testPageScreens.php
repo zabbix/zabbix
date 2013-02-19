@@ -151,7 +151,7 @@ class testPageScreens extends CWebTest {
 
 		$this->zbxTestLogin('screenconf.php');
 		$this->checkTitle('Configuration of screens');
-		$this->checkbox_select("screens[$screenid]");
+		$this->zbxTestCheckboxSelect('screens['.$screenid.']');
 		$this->zbxTestDropdownSelect('go', 'Delete selected');
 		$this->zbxTestClickWait('goButton');
 

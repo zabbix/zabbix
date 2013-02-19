@@ -111,7 +111,7 @@ class testFormAdministrationGeneralOtherParams extends CWebTest {
 		$this->input_type('refresh_unsupported', '700');
 		$this->zbxTestDropdownSelect('discovery_groupid', 'Linux servers');
 		$this->zbxTestDropdownSelect('alert_usrgrpid', 'Zabbix administrators');
-		$this->checkbox_select('snmptrap_logging');  // 1 - yes, 0 - no
+		$this->zbxTestCheckboxSelect('snmptrap_logging');  // 1 - yes, 0 - no
 		$this->zbxTestClickWait('save');
 		$this->zbxTestTextPresent('Configuration updated');
 
@@ -129,7 +129,7 @@ class testFormAdministrationGeneralOtherParams extends CWebTest {
 		$this->input_type('refresh_unsupported', '65535');
 		$this->zbxTestDropdownSelect('discovery_groupid', 'Linux servers');
 		$this->zbxTestDropdownSelect('alert_usrgrpid', 'Enabled debug mode');
-		$this->checkbox_unselect('snmptrap_logging');
+		$this->zbxTestCheckboxUnselect('snmptrap_logging');
 		$this->zbxTestClickWait('save');
 		$this->zbxTestTextPresent('Configuration updated');
 

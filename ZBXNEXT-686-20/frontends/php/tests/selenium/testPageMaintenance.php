@@ -99,7 +99,7 @@ class testPageMaintenance extends CWebTest {
 		$this->zbxTestLogin('maintenance.php');
 		$this->zbxTestDropdownSelectWait('groupid', 'all');
 		$this->checkTitle('Configuration of maintenance');
-		$this->checkbox_select("maintenanceids[$maintenanceid]");
+		$this->zbxTestCheckboxSelect('maintenanceids['.$maintenanceid.']');
 		$this->zbxTestDropdownSelect('go', 'Delete selected');
 		$this->zbxTestClickWait('goButton');
 

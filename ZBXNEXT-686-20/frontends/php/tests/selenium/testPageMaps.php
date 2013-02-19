@@ -131,7 +131,7 @@ class testPageMaps extends CWebTest {
 
 		$this->zbxTestLogin('sysmaps.php');
 		$this->checkTitle('Configuration of network maps');
-		$this->checkbox_select("maps[$sysmapid]");
+		$this->zbxTestCheckboxSelect('maps['.$sysmapid.']');
 		$this->zbxTestDropdownSelect('go', 'Delete selected');
 		$this->zbxTestClickWait('goButton');
 

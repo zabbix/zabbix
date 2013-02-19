@@ -43,7 +43,7 @@ class testPageDiscoveryRules extends CWebTest {
 
 		$this->zbxTestLogin('host_discovery.php?&hostid='.$rule['hostid']);
 		$this->checkTitle('Configuration of discovery');
-		$this->checkbox_select("group_itemid[$itemid]");
+		$this->zbxTestCheckboxSelect('group_itemid['.$itemid.']');
 		$this->zbxTestDropdownSelect('go', 'Delete selected');
 		$this->zbxTestClickWait('goButton');
 

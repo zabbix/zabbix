@@ -73,7 +73,7 @@ class testPageAdministrationScripts extends CWebTest {
 
 		$this->zbxTestLogin('scripts.php');
 
-		$this->checkbox_select('all_scripts');
+		$this->zbxTestCheckboxSelect('all_scripts');
 		$this->zbxTestDropdownSelect('go', 'Delete selected');
 		$this->zbxTestClickWait('goButton');
 
@@ -98,7 +98,7 @@ class testPageAdministrationScripts extends CWebTest {
 
 		$this->zbxTestLogin('scripts.php');
 
-		$this->checkbox_select('scripts['.$script['scriptid'].']');
+		$this->zbxTestCheckboxSelect('scripts['.$script['scriptid'].']');
 		$this->zbxTestDropdownSelect('go', 'Delete selected');
 		$this->zbxTestClickWait('goButton');
 

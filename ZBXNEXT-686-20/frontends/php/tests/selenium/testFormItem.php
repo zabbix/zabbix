@@ -820,7 +820,7 @@ class testFormItem extends CWebTest {
 		$this->input_type('key', $key);
 
 		if ($formula!=null)	{
-			$this->checkbox_select('multiplier');
+			$this->zbxTestCheckboxSelect('multiplier');
 			$this->input_type('formula', $formula);
 		}
 

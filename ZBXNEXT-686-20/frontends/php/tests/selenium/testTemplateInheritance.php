@@ -59,7 +59,7 @@ class testTemplateInheritance extends CWebTest {
 
 		$this->waitForPopUp("zbx_popup", "30000");
 		$this->selectWindow("name=zbx_popup");
-		$this->checkbox_select('//*[@value="Template App Zabbix Agent"]');
+		$this->zbxTestCheckboxSelect('//*[@value="Template App Zabbix Agent"]');
 		$this->zbxTestClick('select');
 
 		$this->selectWindow(null);
@@ -120,7 +120,7 @@ class testTemplateInheritance extends CWebTest {
 		$this->zbxTestDropdownSelect('value_type', 'Numeric (unsigned)');
 		$this->zbxTestDropdownSelect('data_type', 'Octal');
 		$this->input_type('units', 'units');
-		$this->checkbox_select('multiplier');
+		$this->zbxTestCheckboxSelect('multiplier');
 		$this->input_type('formula', 3);
 		$this->input_type('delay', '33');
 		$this->input_type('history', '54');
@@ -202,11 +202,11 @@ class testTemplateInheritance extends CWebTest {
 
 		$this->input_type('description', 'Test LLD trigger1');
 		$this->input_type('expression', '{Inheritance test template:test-general-item.last(0)}=0');
-		$this->checkbox_select('type');
+		$this->zbxTestCheckboxSelect('type');
 		$this->input_type('comments', 'comments');
 		$this->input_type('url', 'url');
 		$this->zbxTestClick('severity_label_2');
-		$this->checkbox_unselect('status');
+		$this->zbxTestCheckboxUnselect('status');
 
 		$this->zbxTestClickWait('save');
 
@@ -244,13 +244,13 @@ class testTemplateInheritance extends CWebTest {
 		$this->input_type('width', '950');
 		$this->input_type('height', '250');
 		$this->zbxTestDropdownSelect('graphtype', 'Normal');
-		$this->checkbox_unselect('legend');
-		$this->checkbox_unselect('showworkperiod');
-		$this->checkbox_unselect('showtriggers');
-		$this->checkbox_select('visible_percent_left');
+		$this->zbxTestCheckboxUnselect('legend');
+		$this->zbxTestCheckboxUnselect('showworkperiod');
+		$this->zbxTestCheckboxUnselect('showtriggers');
+		$this->zbxTestCheckboxSelect('visible_percent_left');
 		$this->input_type('percent_left', '4');
 		$this->input_type('percent_right', '5');
-		$this->checkbox_select('visible_percent_right');
+		$this->zbxTestCheckboxSelect('visible_percent_right');
 		$this->zbxTestDropdownSelect('ymin_type', 'Calculated');
 		$this->zbxTestDropdownSelect('ymax_type', 'Calculated');
 		$this->zbxTestClick('add_item');
@@ -353,14 +353,14 @@ class testTemplateInheritance extends CWebTest {
 		$this->zbxTestDropdownSelect('value_type', 'Numeric (unsigned)');
 		$this->zbxTestDropdownSelect('data_type', 'Octal');
 		$this->input_type('units', 'units');
-		$this->checkbox_select('multiplier');
+		$this->zbxTestCheckboxSelect('multiplier');
 		$this->input_type('formula', 3);
 		$this->input_type('delay', '33');
 		$this->input_type('history', '54');
 		$this->input_type('trends', '55');
 		$this->input_type('description', 'description');
 		$this->zbxTestDropdownSelect('delta', 'Delta (simple change)');
-		$this->checkbox_unselect('status');
+		$this->zbxTestCheckboxUnselect('status');
 
 		$this->zbxTestClickWait('save');
 
@@ -404,11 +404,11 @@ class testTemplateInheritance extends CWebTest {
 
 		$this->input_type('description', 'Test LLD trigger');
 		$this->input_type('expression', '{Inheritance test template:test-lld-item.last(0)}=0');
-		$this->checkbox_select('type');
+		$this->zbxTestCheckboxSelect('type');
 		$this->input_type('comments', 'comments');
 		$this->input_type('url', 'url');
 		$this->zbxTestClick('severity_label_2');
-		$this->checkbox_unselect('status');
+		$this->zbxTestCheckboxUnselect('status');
 
 		$this->zbxTestClickWait('save');
 
@@ -448,13 +448,13 @@ class testTemplateInheritance extends CWebTest {
 		$this->input_type('width', '950');
 		$this->input_type('height', '250');
 		$this->zbxTestDropdownSelect('graphtype', 'Normal');
-		$this->checkbox_unselect('legend');
-		$this->checkbox_unselect('showworkperiod');
-		$this->checkbox_unselect('showtriggers');
-		$this->checkbox_select('visible_percent_left');
+		$this->zbxTestCheckboxUnselect('legend');
+		$this->zbxTestCheckboxUnselect('showworkperiod');
+		$this->zbxTestCheckboxUnselect('showtriggers');
+		$this->zbxTestCheckboxSelect('visible_percent_left');
 		$this->input_type('percent_left', '4');
 		$this->input_type('percent_right', '5');
-		$this->checkbox_select('visible_percent_right');
+		$this->zbxTestCheckboxSelect('visible_percent_right');
 		$this->zbxTestDropdownSelect('ymin_type', 'Calculated');
 		$this->zbxTestDropdownSelect('ymax_type', 'Calculated');
 

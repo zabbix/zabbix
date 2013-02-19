@@ -103,7 +103,7 @@ class testPageSlideShows extends CWebTest {
 
 		$this->zbxTestLogin('slideconf.php');
 		$this->checkTitle('Configuration of slide shows');
-		$this->checkbox_select("shows[$slideshowid]");
+		$this->zbxTestCheckboxSelect('shows['.$slideshowid.']');
 		$this->zbxTestDropdownSelect('go', 'Delete selected');
 		$this->zbxTestClickWait('goButton');
 

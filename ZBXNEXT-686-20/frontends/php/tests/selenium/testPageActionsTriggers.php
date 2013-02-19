@@ -230,7 +230,7 @@ class testPageActionsTriggers extends CWebTest {
 
 		$this->zbxTestLogin('actionconf.php?eventsource='.EVENT_SOURCE_TRIGGERS);
 		$this->checkTitle('Configuration of actions');
-		$this->checkbox_select("g_actionid[$actionid]");
+		$this->zbxTestCheckboxSelect('g_actionid['.$actionid.']');
 		$this->zbxTestDropdownSelect('go', 'Disable selected');
 		$this->zbxTestClickWait('goButton');
 
@@ -259,7 +259,7 @@ class testPageActionsTriggers extends CWebTest {
 
 		$this->zbxTestLogin('actionconf.php?eventsource='.EVENT_SOURCE_TRIGGERS);
 		$this->checkTitle('Configuration of actions');
-		$this->checkbox_select("g_actionid[$actionid]");
+		$this->zbxTestCheckboxSelect('g_actionid['.$actionid.']');
 		$this->zbxTestDropdownSelect('go', 'Enable selected');
 		$this->zbxTestClickWait('goButton');
 
@@ -290,7 +290,7 @@ class testPageActionsTriggers extends CWebTest {
 
 		$this->zbxTestLogin('actionconf.php?eventsource='.EVENT_SOURCE_TRIGGERS);
 		$this->checkTitle('Configuration of actions');
-		$this->checkbox_select("g_actionid[$actionid]");
+		$this->zbxTestCheckboxSelect('g_actionid['.$actionid.']');
 		$this->zbxTestDropdownSelect('go', 'Delete selected');
 		$this->zbxTestClickWait('goButton');
 

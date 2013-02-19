@@ -102,7 +102,7 @@ class testPageUsers extends CWebTest {
 			$this->checkTitle('Configuration of users');
 			$this->zbxTestDropdownSelectWait('filter_usrgrpid', 'All');
 
-			$this->checkbox_select("group_userid[$id]");
+			$this->zbxTestCheckboxSelect('group_userid['.$id.']');
 			$this->zbxTestDropdownSelect('go', 'Delete selected');
 			$this->zbxTestClickWait('goButton');
 
@@ -135,7 +135,7 @@ class testPageUsers extends CWebTest {
 			$this->checkTitle('Configuration of users');
 			$this->zbxTestDropdownSelectWait('filter_usrgrpid', 'All');
 
-			$this->checkbox_select("group_userid[$id]");
+			$this->zbxTestCheckboxSelect('group_userid['.$id.']');
 			$this->zbxTestDropdownSelect('go', 'Delete selected');
 			$this->zbxTestClickWait('goButton');
 

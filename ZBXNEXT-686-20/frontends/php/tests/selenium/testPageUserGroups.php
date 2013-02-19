@@ -86,7 +86,7 @@ class testPageUserGroups extends CWebTest {
 		$this->zbxTestLogin('usergrps.php');
 		$this->checkTitle('Configuration of user groups');
 
-		$this->checkbox_select("group_groupid[$usrgrpid]");
+		$this->zbxTestCheckboxSelect('group_groupid['.$usrgrpid.']');
 		$this->zbxTestDropdownSelect('go', 'Enable selected');
 		$this->zbxTestClick('goButton');
 
@@ -121,7 +121,7 @@ class testPageUserGroups extends CWebTest {
 		$this->zbxTestLogin('usergrps.php');
 		$this->checkTitle('Configuration of user groups');
 
-		$this->checkbox_select("group_groupid[$usrgrpid]");
+		$this->zbxTestCheckboxSelect('group_groupid['.$usrgrpid.']');
 		$this->zbxTestDropdownSelect('go', 'Disable selected');
 		$this->zbxTestClick('goButton');
 
@@ -164,7 +164,7 @@ class testPageUserGroups extends CWebTest {
 		$this->zbxTestLogin('usergrps.php');
 		$this->checkTitle('Configuration of user groups');
 
-		$this->checkbox_select("group_groupid[$usrgrpid]");
+		$this->zbxTestCheckboxSelect('group_groupid['.$usrgrpid.']');
 		$this->zbxTestDropdownSelect('go', 'Enable DEBUG');
 		$this->zbxTestClick('goButton');
 
@@ -197,7 +197,7 @@ class testPageUserGroups extends CWebTest {
 		$this->zbxTestLogin('usergrps.php');
 		$this->checkTitle('Configuration of user groups');
 
-		$this->checkbox_select("group_groupid[$usrgrpid]");
+		$this->zbxTestCheckboxSelect('group_groupid['.$usrgrpid.']');
 		$this->zbxTestDropdownSelect('go', 'Disable DEBUG');
 		$this->zbxTestClick('goButton');
 
