@@ -587,4 +587,7 @@ void	DBfree_history(char **value);
 int	DBtxn_status();
 int	DBtxn_ongoing();
 
+void	zbx_create_services_lock();
+void	zbx_destroy_services_lock();
+
 #endif

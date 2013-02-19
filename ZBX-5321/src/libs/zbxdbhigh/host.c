@@ -23,6 +23,12 @@
 #include "log.h"
 #include "dbcache.h"
 #include "zbxserver.h"
+#include "mutexs.h"
+
+#define LOCK_SERVICES	zbx_mutex_lock(&services_lock)
+#define UNLOCK_SERVICES	zbx_mutex_unlock(&services_lock)
+
+static ZBX_MUTEX	services_lock;
 
 /******************************************************************************
  *                                                                            *
@@ -976,6 +982,8 @@ void	DBupdate_services(zbx_uint64_t triggerid, int status, int clock)
 
 	result = DBselect("select serviceid from services where triggerid=" ZBX_FS_UI64, triggerid);
 
+	LOCK_SERVICES;
+
 	while (NULL != (row = DBfetch(result)))
 	{
 		ZBX_STR2UINT64(serviceid, row[0]);
@@ -985,6 +993,8 @@ void	DBupdate_services(zbx_uint64_t triggerid, int status, int clock)
 		DBadd_service_alarm(serviceid, status, clock);
 		DBupdate_services_rec(serviceid, clock);
 	}
+
+	UNLOCK_SERVICES;
 
 	DBfree_result(result);
 }
@@ -3699,4 +3709,18 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():" ZBX_FS_UI64, __function_name, interfaceid);
 
 	return interfaceid;
+}
+
+void	zbx_create_services_lock()
+{
+	if (ZBX_MUTEX_ERROR == zbx_mutex_create_force(&services_lock, ZBX_MUTEX_SERVICES))
+	{
+		zbx_error("cannot create mutex for IT services");
+		exit(FAIL);
+	}
+}
+
+void	zbx_destroy_services_lock()
+{
+	zbx_mutex_destroy(&services_lock);
 }
