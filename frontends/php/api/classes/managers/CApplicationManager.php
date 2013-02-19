@@ -199,6 +199,15 @@ class CApplicationManager {
 				// update by templateid
 				if (isset($hostApp['byTemplateId'][$appId])) {
 					$exApplication = $hostApp['byTemplateId'][$appId];
+
+					// check if there's an application on the target host with the same name but from a different template
+					// or no template
+					if (isset($hostApp['byName'][$application['name']])
+							&& $hostApp['byName'][$application['name']]['templateid'] != $appId) {
+
+						$host = DBfetch(DBselect('SELECT h.name FROM hosts h WHERE h.hostid='.zbx_dbstr($hostId)));
+						throw new Exception(_s('Application "%1$s" already exists for host "%2$s".', $application['name'], $host['name']));
+					}
 				}
 
 				// update by name
