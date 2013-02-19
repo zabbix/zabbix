@@ -173,42 +173,36 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 	elseif ($this->data['ymin_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE) {
 		$graphForm->addVar('yaxismin', $this->data['yaxismin']);
 
-		if (!empty($this->data['items'])) {
-			$ymin_name = '';
-			if (!empty($this->data['ymin_itemid'])) {
-				$min_host = get_host_by_itemid($this->data['ymin_itemid']);
-				$min_item = get_item_by_itemid($this->data['ymin_itemid']);
-				$ymin_name = $min_host['name'].': '.itemName($min_item);
-			}
+		$ymin_name = '';
+		if (!empty($this->data['ymin_itemid'])) {
+			$min_host = get_host_by_itemid($this->data['ymin_itemid']);
+			$min_item = get_item_by_itemid($this->data['ymin_itemid']);
+			$ymin_name = $min_host['name'].': '.itemName($min_item);
+		}
 
-			$yaxisMinData[] = new CTextBox('ymin_name', $ymin_name, 36, 'yes');
-			$yaxisMinData[] = new CButton('yaxis_min', _('Select'), 'javascript: '.
+		$yaxisMinData[] = new CTextBox('ymin_name', $ymin_name, 36, 'yes');
+		$yaxisMinData[] = new CButton('yaxis_min', _('Select'), 'javascript: '.
+			'return PopUp("popup.php?dstfrm='.$graphForm->getName().
+				'&dstfld1=ymin_itemid'.
+				'&dstfld2=ymin_name'.
+				'&srctbl=items'.
+				'&srcfld1=itemid'.
+				'&srcfld2=name" + getOnlyHostParam(), 0, 0, "zbx_popup_item");',
+			'formlist'
+		);
+
+		// select prototype button
+		if (!empty($this->data['parent_discoveryid'])) {
+			$yaxisMinData[] = new CButton('yaxis_min', _('Select prototype'), 'javascript: '.
 				'return PopUp("popup.php?dstfrm='.$graphForm->getName().
+					'&parent_discoveryid='.$this->data['parent_discoveryid'].
 					'&dstfld1=ymin_itemid'.
 					'&dstfld2=ymin_name'.
-					'&srctbl=items'.
+					'&srctbl=prototypes'.
 					'&srcfld1=itemid'.
-					'&srcfld2=name" + getOnlyHostParam(), 0, 0, "zbx_popup_item");',
+					'&srcfld2=name", 0, 0, "zbx_popup_item");',
 				'formlist'
 			);
-
-			// select prototype button
-			if (!empty($this->data['parent_discoveryid'])) {
-				$yaxisMinData[] = new CButton('yaxis_min', _('Select prototype'), 'javascript: '.
-					'return PopUp("popup.php?dstfrm='.$graphForm->getName().
-						'&parent_discoveryid='.$this->data['parent_discoveryid'].
-						'&dstfld1=ymin_itemid'.
-						'&dstfld2=ymin_name'.
-						'&srctbl=prototypes'.
-						'&srcfld1=itemid'.
-						'&srcfld2=name", 0, 0, "zbx_popup_item");',
-					'formlist'
-				);
-			}
-		}
-		else {
-			$yaxisMinData[] = SPACE;
-			$yaxisMinData[] = new CSpan(_('Add graph items first'), 'red');
 		}
 	}
 	else {
@@ -238,35 +232,29 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 			$ymax_name = $max_host['name'].': '.itemName($max_item);
 		}
 
-		if (!empty($this->data['items'])) {
-			$yaxisMaxData[] = new CTextBox('ymax_name', $ymax_name, 36, 'yes');
-			$yaxisMaxData[] = new CButton('yaxis_max', _('Select'), 'javascript: '.
+		$yaxisMaxData[] = new CTextBox('ymax_name', $ymax_name, 36, 'yes');
+		$yaxisMaxData[] = new CButton('yaxis_max', _('Select'), 'javascript: '.
+			'return PopUp("popup.php?dstfrm='.$graphForm->getName().
+				'&dstfld1=ymax_itemid'.
+				'&dstfld2=ymax_name'.
+				'&srctbl=items'.
+				'&srcfld1=itemid'.
+				'&srcfld2=name" + getOnlyHostParam(), 0, 0, "zbx_popup_item");',
+			'formlist'
+		);
+
+		// select prototype button
+		if (!empty($this->data['parent_discoveryid'])) {
+			$yaxisMaxData[] = new CButton('yaxis_min', _('Select prototype'), 'javascript: '.
 				'return PopUp("popup.php?dstfrm='.$graphForm->getName().
+					'&parent_discoveryid='.$this->data['parent_discoveryid'].
 					'&dstfld1=ymax_itemid'.
 					'&dstfld2=ymax_name'.
-					'&srctbl=items'.
+					'&srctbl=prototypes'.
 					'&srcfld1=itemid'.
-					'&srcfld2=name" + getOnlyHostParam(), 0, 0, "zbx_popup_item");',
+					'&srcfld2=name", 0, 0, "zbx_popup_item");',
 				'formlist'
 			);
-
-			// select prototype button
-			if (!empty($this->data['parent_discoveryid'])) {
-				$yaxisMaxData[] = new CButton('yaxis_min', _('Select prototype'), 'javascript: '.
-					'return PopUp("popup.php?dstfrm='.$graphForm->getName().
-						'&parent_discoveryid='.$this->data['parent_discoveryid'].
-						'&dstfld1=ymax_itemid'.
-						'&dstfld2=ymax_name'.
-						'&srctbl=prototypes'.
-						'&srcfld1=itemid'.
-						'&srcfld2=name", 0, 0, "zbx_popup_item");',
-					'formlist'
-				);
-			}
-		}
-		else {
-			$yaxisMaxData[] = SPACE;
-			$yaxisMaxData[] = new CSpan(_('Add graph items first'), 'red');
 		}
 	}
 	else {

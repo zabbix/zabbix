@@ -39,6 +39,7 @@ A.F.I...S. [ZBXNEXT-1186] increased length to 2048 characters of expression fiel
 ..F....... [ZBX-5127] regular expressions form redesign (Vedmak)
 
 Bug fixes:
+..F....... [ZBX-6237] fixed Y axis item adding field, now it is available also if item list is empty (Eduard)
 ........S. [ZBX-6123] ensured sequential IT services updates by database syncers (dimir)
 ....I..... [ZBX-5668] added upgrade patch for change "server_check_interval" field value to 10 (Sasha)
 ...G...PS. [ZBX-3078] added signal handling to agent also when it's not ran as daemon (wiper)
@@ -71,7 +72,7 @@ A......... [ZBX-6126] implemented empty parameter validation in user.delete (Pav
 ..F....... [ZBX-6102] fixed type of web.httpconf.showdisabled profile record (Sasha)
 A.F....... [ZBX-6099] fixed event.get select_acknowledges count returning incorrect results if no acknowledgements exist (Pavels)
 ........S. [ZBX-6065] removed useless deletes when housekeeper deletes old history (Sasha)
-A......... [ZBX-6078] fixed graph item creating (Eduards)
+A......... [ZBX-6078] fixed graph item creating (Eduard)
 A......... [ZBX-6050] fixed duplicate step name validation in httptest.create and httptest.update (Pavels)
 A......... [ZBX-5846] removed the graphitem.getobjects method (Pavels)
 A......... [ZBX-5706] fixed trigger.adddependencies returning an object instead of an array of trigger IDs (Pavels)
