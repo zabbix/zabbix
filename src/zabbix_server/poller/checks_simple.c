@@ -49,6 +49,12 @@ int	get_value_simple(DC_ITEM *item, AGENT_RESULT *result)
 		if (SYSINFO_RET_OK == check_service(&request, item->interface.addr, result, 1))
 			ret = SUCCEED;
 	}
+	else
+	{
+		/* it will execute item from a loadable module if any */
+		if (SUCCEED == process(item->key, PROCESS_MODULE_COMMAND, result))
+			ret = SUCCEED;
+	}
 
 	if (NOTSUPPORTED == ret && !ISSET_MSG(result))
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Simple check is not supported"));

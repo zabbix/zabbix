@@ -236,7 +236,10 @@ int	parse_item_key(char *itemkey, AGENT_REQUEST *request)
 	if (ZBX_COMMAND_ERROR == (i = parse_command(itemkey, key, sizeof(key), params, sizeof(params))))
 		return -1;
 
-	request->nparam = num_param(params);
+	if (NULL != strchr(itemkey, '['))
+		request->nparam = num_param(params);
+	else
+		request->nparam = 0;
 
 	request->key = zbx_strdup(NULL, key);
 
@@ -448,14 +451,23 @@ int	process(const char *in_command, unsigned flags, AGENT_RESULT *result)
 	if (ZBX_COMMAND_ERROR == (rc = parse_command(tmp, key, sizeof(key), parameters, sizeof(parameters))))
 		goto notsupported;
 
-	/* TODO implement quick search */
+	/* system.run is not allowed by default except for getting hostname for daemons */
+	if ( 0 == strcmp(key, "system.run") && 1 != CONFIG_ENABLE_REMOTE_COMMANDS
+		&& 0 == (flags & PROCESS_LOCAL_COMMAND))
+		goto notsupported;
+
 	for (command = commands; NULL != command->key; command++)
 	{
 		if (0 == strcmp(command->key, key))
 			break;
 	}
 
+	/* item key not found */
 	if (NULL == command->key)
+		goto notsupported;
+
+	/* expected item from a module */
+	if (0 != (flags & PROCESS_MODULE_COMMAND) && 0 == (command->flags & CF_MODULE))
 		goto notsupported;
 
 	/* Command does not accept parameters but was called with parameters */

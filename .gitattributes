@@ -539,6 +539,9 @@ src/libs/zbxmodules/modules.c -text
 src/modules/agent/dummy/Makefile -text
 src/modules/agent/dummy/README -text
 src/modules/agent/dummy/dummy.c -text
+src/modules/dummy/Makefile -text
+src/modules/dummy/README -text
+src/modules/dummy/dummy.c -text
 src/zabbix_java/lib/logback-classic-0.9.27.jar -text
 src/zabbix_java/lib/logback-core-0.9.27.jar -text
 src/zabbix_java/lib/org-json-2010-12-28.jar -text

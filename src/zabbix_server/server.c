@@ -401,6 +401,9 @@ static void	zbx_load_config()
 		{NULL}
 	};
 
+	/* initialize multistrings */
+	zbx_strarr_init(&CONFIG_LOAD_MODULE);
+
 	parse_cfg_file(CONFIG_FILE, cfg, ZBX_CFG_FILE_REQUIRED, ZBX_CFG_STRICT);
 
 	zbx_set_defaults();

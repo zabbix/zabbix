@@ -176,11 +176,6 @@ static int	SYSTEM_RUN(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char	*command, *flag;
 
-/* TODO
-	if (1 != CONFIG_ENABLE_REMOTE_COMMANDS && 0 == (flags & PROCESS_LOCAL_COMMAND))
-		return SYSINFO_RET_FAIL;
-*/
-
 	if (2 < request->nparam)
 		return SYSINFO_RET_FAIL;
 
