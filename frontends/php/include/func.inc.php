@@ -604,7 +604,8 @@ function convert_units($value, $units, $convert = ITEM_CONVERT_WITH_UNITS, $byte
 	}
 
 	$valUnit = array('pow' => 0, 'short' => '', 'long' => '', 'value' => $value);
-	if (!$pow || $value == 0) {
+
+	if ($pow === false || $value == 0) {
 		foreach ($digitUnits[$step] as $dnum => $data) {
 			if (bccomp($abs, $data['value']) > -1) {
 				$valUnit = $data;
@@ -713,7 +714,7 @@ function convertBase8Values ($value ,$step = false) {
 			for ($i = 0; $i > $valData['pow']; $i--) {
 				$valData['value'] = bcdiv(bcmul($valData['value'], 1000, 10), 1.024, 10);
 			}
-			$valData['value'] = sprintf('%.6f', $valData['value']);
+			$valData['value'] = sprintf('%.10f', $valData['value']);
 		}
 	}
 	else {
