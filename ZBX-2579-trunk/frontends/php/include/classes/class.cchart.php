@@ -1449,18 +1449,24 @@ class CChart extends CGraphDraw {
 		$step = $this->gridStep[GRAPH_YAXIS_SIDE_LEFT];
 		$hstr_count = $this->gridLinesCount[GRAPH_YAXIS_SIDE_LEFT];
 
+		$newPow = false;
 		if ($byteStep) {
 			$maxYPow = convertBase8Values($maxY, 1024);
 			$minYPow = convertBase8Values($minY, 1024);
-			if ($maxYPow['pow'] > $minYPow['pow']) {
-				$newPow = $maxYPow['pow'];
-			}
-			else {
-				$newPow = $minYPow['pow'];
-			}
 		} else {
-			$newPow = false;
+			$maxYPow = convertBase8Values($maxY);
+			$minYPow = convertBase8Values($minY);
 		}
+		if (abs($maxYPow['pow']) > abs($minYPow['pow']) && $maxYPow['value'] != 0) {
+			$newPow = $maxYPow['pow'];
+		}
+		if (abs($maxYPow['pow'])< abs($minYPow['pow']) && $minYPow['value'] != 0) {
+			$newPow = $minYPow['pow'];
+		}
+		if ($maxYPow['pow'] == $minYPow['pow']) {
+			$newPow = $maxYPow['pow'];
+		}
+
 		for ($i = 0; $i <= $hstr_count; $i++) {
 			// division by zero
 			$hstr_count = ($hstr_count == 0) ? 1 : $hstr_count;
@@ -1578,18 +1584,24 @@ class CChart extends CGraphDraw {
 		$step = $this->gridStep[GRAPH_YAXIS_SIDE_RIGHT];
 		$hstr_count = $this->gridLinesCount[GRAPH_YAXIS_SIDE_RIGHT];
 
+		$newPow = false;
 		if ($byteStep) {
 			$maxYPow = convertBase8Values($maxY, 1024);
 			$minYPow = convertBase8Values($minY, 1024);
-			if ($maxYPow['pow'] > $minYPow['pow']) {
-				$newPow = $maxYPow['pow'];
-			}
-			else {
-				$newPow = $minYPow['pow'];
-			}
 		} else {
-			$newPow = false;
+			$maxYPow = convertBase8Values($maxY);
+			$minYPow = convertBase8Values($minY);
 		}
+		if (abs($maxYPow['pow']) > abs($minYPow['pow']) && $maxYPow['value'] != 0) {
+			$newPow = $maxYPow['pow'];
+		}
+		if (abs($maxYPow['pow'])< abs($minYPow['pow']) && $minYPow['value'] != 0) {
+			$newPow = $minYPow['pow'];
+		}
+		if ($maxYPow['pow'] == $minYPow['pow']) {
+			$newPow = $maxYPow['pow'];
+		}
+
 		for ($i = 0; $i <= $hstr_count; $i++) {
 			if ($hstr_count == 0) {
 				continue;
