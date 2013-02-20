@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-02-20 19:29+0200\n"
+"POT-Creation-Date: 2013-02-20 19:46+0200\n"
 "PO-Revision-Date: 2012-11-14 06:55+0200\n"
 "Last-Translator: wen <51netpro@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -7089,6 +7089,10 @@ msgstr "所选组件的链接"
 #: include/classes/class.clist.php:33
 msgid "List is empty"
 msgstr "清单是空的"
+
+#: include/locales.inc.php:61
+msgid "Lithuanian (lt_LT)"
+msgstr ""
 
 #: dashboard.php:294 dashboard.php:302 dashboard.php:309 dashboard.php:316
 #: dashboard.php:323 dashboard.php:333 include/views/monitoring.slides.php:108

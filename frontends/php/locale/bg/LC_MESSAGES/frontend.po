@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-02-20 19:29+0200\n"
+"POT-Creation-Date: 2013-02-20 19:46+0200\n"
 "PO-Revision-Date: 2013-01-12 23:52+0200\n"
 "Last-Translator: Fahri <fahri_hasan@hotmail.com>\n"
 "Language-Team: \n"
@@ -7114,6 +7114,10 @@ msgstr "Връзки за избрания елемент"
 #: include/classes/class.clist.php:33
 msgid "List is empty"
 msgstr "Списъкът е празен"
+
+#: include/locales.inc.php:61
+msgid "Lithuanian (lt_LT)"
+msgstr ""
 
 #: dashboard.php:294 dashboard.php:302 dashboard.php:309 dashboard.php:316
 #: dashboard.php:323 dashboard.php:333 include/views/monitoring.slides.php:108
