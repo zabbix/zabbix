@@ -170,15 +170,11 @@ class CArrayHelper {
 	}
 
 	/**
-	 * Get arrays difference based on first array.
+	 * Get arrays key-value difference based on first array.
 	 * Comparison rules:
 	 *	null is not ""
 	 *	null is not 0
 	 *	0 is not ""
-	 *
-	 * Standard array_diff() cannot be used because it incorrent compare values based on '0' and '1'.
-	 * For example this code return array() but must return array('type' => 1)
-	 *	print_r(array_diff(array('type' => 1), array('type' => 0, 'temp' => '1')));
 	 *
 	 * @param array $a
 	 * @param array $b
