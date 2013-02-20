@@ -109,7 +109,7 @@ int	load_modules(const char *path, char **modules, int timeout)
 			goto ret;
 		}
 
-		*(void **)(&func_version) = dlsym(lib, ZBX_MODULE_FUNC_VERSION);
+		*(void **)(&func_version) = dlsym(lib, ZBX_MODULE_FUNC_API_VERSION);
 		if (NULL == func_version)
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "Module \"%s\". Cannot find version function: %s",
@@ -119,7 +119,7 @@ int	load_modules(const char *path, char **modules, int timeout)
 			goto ret;
 		}
 
-		if (ZBX_MODULE_VERSION_ONE != func_version())
+		if (ZBX_MODULE_API_VERSION_ONE != func_version())
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "Module \"%s\". Unsupported module version.",
 				filename);

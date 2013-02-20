@@ -38,19 +38,19 @@ static ZBX_METRIC keys[] =
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_module_version                                               *
+ * Function: zbx_api_module_version                                           *
  *                                                                            *
- * Purpose: returns version number of the module                              *
+ * Purpose: returns version number of the module interface                    *
  *                                                                            *
  * Parameters:                                                                *
  *                                                                            *
- * Return value: ZBX_MODULE_VERSION_ONE - the only version supported by the   *
- *               agent                                                        *
+ * Return value: ZBX_MODULE_API_VERSION_ONE - the only version supported by   *
+ *               Zabbix currently                                             *
  *                                                                            *
  ******************************************************************************/
-int zbx_module_version()
+int zbx_module_api_version()
 {
-	return ZBX_MODULE_VERSION_ONE;
+	return ZBX_MODULE_API_VERSION_ONE;
 }
 
 /******************************************************************************

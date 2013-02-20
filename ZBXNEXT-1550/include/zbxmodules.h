@@ -21,7 +21,7 @@
 #define ZABBIX_ZBXMODULES_H
 
 #define ZBX_MODULE_FUNC_INIT		"zbx_module_init"
-#define ZBX_MODULE_FUNC_VERSION		"zbx_module_version"
+#define ZBX_MODULE_FUNC_API_VERSION	"zbx_module_api_version"
 #define ZBX_MODULE_FUNC_ITEM_LIST	"zbx_module_item_list"
 #define ZBX_MODULE_FUNC_ITEM_PROCESS	"zbx_module_item_process"
 #define ZBX_MODULE_FUNC_ITEM_TIMEOUT	"zbx_module_item_timeout"
