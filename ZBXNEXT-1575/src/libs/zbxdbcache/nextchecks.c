@@ -109,6 +109,7 @@ void	DCflush_nextchecks()
 	char			**errors = NULL;
 	zbx_hashset_t		trigger_info;
 	zbx_vector_ptr_t	trigger_order;
+	DC_TRIGGER		*trigger;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() nextcheck_num:%d", __function_name, nextcheck_num);
 
@@ -138,42 +139,15 @@ void	DCflush_nextchecks()
 	zbx_free(timespecs);
 	zbx_free(itemids);
 
-	if (0 != trigger_order.values_num)
+	for (i = 0; i < trigger_order.values_num; i++)
 	{
-		char		*sql = NULL;
-		size_t		sql_alloc = 4 * ZBX_KIBIBYTE, sql_offset = 0;
-		DC_TRIGGER	*trigger;
-
-		sql = zbx_malloc(sql, sql_alloc);
-
-		DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-		for (i = 0; i < trigger_order.values_num; i++)
-		{
-			trigger = (DC_TRIGGER *)trigger_order.values[i];
-
-			if (SUCCEED == DBget_trigger_update_sql(&sql, &sql_alloc, &sql_offset, trigger->triggerid,
-					trigger->description, trigger->expression_orig, trigger->priority,
-					trigger->type, trigger->value, trigger->state, trigger->error,
-					trigger->lastchange, TRIGGER_VALUE_UNKNOWN, trigger->new_error,
-					&trigger->timespec))
-			{
-				zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
-				DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
-			}
-
-			zbx_free(trigger->new_error);
-		}
-
-		DCfree_triggers(&trigger_order);
-
-		DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-		if (sql_offset > 16)	/* In ORACLE always present begin..end; */
-			DBexecute("%s", sql);
-
-		zbx_free(sql);
+		trigger = (DC_TRIGGER *)trigger_order.values[i];
+		trigger->new_value = TRIGGER_VALUE_UNKNOWN;
 	}
+
+	process_triggers(&trigger_order);
+
+	DCfree_triggers(&trigger_order);
 
 	zbx_hashset_destroy(&trigger_info);
 	zbx_vector_ptr_destroy(&trigger_order);
