@@ -156,7 +156,7 @@ int	VFS_FS_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return ret;;
 }
 
-int	VFS_FS_DISCOVERY(AGENT_REUQEST *request, AGENT_RESULT *result)
+int	VFS_FS_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	int		i, rc, ret = SYSINFO_RET_FAIL;
 	struct statfs	*mntbuf;

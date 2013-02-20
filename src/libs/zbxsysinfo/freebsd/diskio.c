@@ -196,7 +196,7 @@ int	VFS_DEV_READ(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return vfs_dev_rw(request, result, ZBX_DEV_READ);
 }
 
-int	VFS_DEV_WRITE(AGENT_REQUEST *request, unsigned flags, AGENT_RESULT *result)
+int	VFS_DEV_WRITE(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	return vfs_dev_rw(request, result, ZBX_DEV_WRITE);
 }
