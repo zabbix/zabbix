@@ -805,23 +805,15 @@ class CChart extends CGraphDraw {
 			$interval = $intervalData['value'];
 			$sideMaxData = convertBase8Values($this->m_maxY[$side]);
 			$sideMinData = convertBase8Values($this->m_minY[$side]);
-			if ($sideMaxData['pow'] > $sideMinData['pow'] && $sideMaxData['value'] != 0) {
-				$sideMax = $sideMaxData['pow'];
-			}
-			if ($sideMaxData['pow'] < $sideMinData['pow'] && $sideMinData['value'] != 0) {
-				$sideMax = $sideMinData['pow'];
-			}
-			if (!isset($sideMax)) {
-				// correcting MIN & MAX
-				$this->m_minY[$side] = bcmul(bcfloor(bcdiv($this->m_minY[$side], $interval)), $interval);
-				$this->m_maxY[$side] = bcmul(bcceil(bcdiv($this->m_maxY[$side], $interval)), $interval);
-				$gridLinesCount = bcceil(bcdiv(bcsub($this->m_maxY[$side], $this->m_minY[$side]), $interval));
-				$maxIntervalValue = convertBase8Values(bcmul($interval, $gridLinesCount));
-				$sideMax = $maxIntervalValue['pow'];
-			}
-			if ($intervalData['pow'] != $sideMax) {
+			if (($this->m_maxY[$side] != 0 && $sideMaxData['pow'] != $intervalData['pow']) ||
+					($this->m_minY[$side] != 0 && $sideMinData['pow'] != $intervalData['pow'])) {
 				// interval correction, if Max Y have other unit, then interval unit = Max Y unit
-				$interval = sprintf('%.6f', round(bcmul($interval, 1.024), ZBX_UNITS_ROUNDOFF_UPPER_LIMIT));
+				if ($intervalData['pow'] < 0) {
+					$interval = sprintf('%.10f', bcmul($interval, 1.024, 10));
+				}
+				else {
+					$interval = sprintf('%.6f', round(bcmul($interval, 1.024), ZBX_UNITS_ROUNDOFF_UPPER_LIMIT));
+				}
 			}
 		}
 
@@ -861,16 +853,15 @@ class CChart extends CGraphDraw {
 			$interval_other_side = $intervalOtherSideData['value'];
 			$otherSideMaxData = convertBase8Values($this->m_maxY[$other_side]);
 			$otherSideMinData = convertBase8Values($this->m_minY[$other_side]);
-			if ($otherSideMaxData['pow'] > $otherSideMinData['pow']) {
-				$otherSideMax = $otherSideMaxData['pow'];
-			}
-			else {
-				$otherSideMax = $otherSideMinData['pow'];
-			}
-			if ($intervalOtherSideData['pow'] != $otherSideMax) {
+			if (($this->m_maxY[$other_side] != 0 && $otherSideMaxData['pow'] != $intervalOtherSideData['pow']) ||
+					($this->m_minY[$other_side] != 0 && $otherSideMinData['pow'] != $intervalOtherSideData['pow'])) {
 				// interval correction, if Max Y have other unit, then interval unit = Max Y unit
-				$interval_other_side = sprintf('%.0f', round(bcmul($interval_other_side, 1.024),
-					ZBX_UNITS_ROUNDOFF_UPPER_LIMIT));
+				if ($intervalOtherSideData['pow'] < 0) {
+					$interval_other_side = sprintf('%.10f', bcmul($interval_other_side, 1.024, 10));
+				}
+				else {
+					$interval_other_side = sprintf('%.6f', round(bcmul($interval_other_side, 1.024), ZBX_UNITS_ROUNDOFF_UPPER_LIMIT));
+				}
 			}
 		}
 
