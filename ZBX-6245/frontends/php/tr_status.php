@@ -126,7 +126,9 @@ if (isset($_REQUEST['show_events'])) {
 	CProfile::update('web.tr_status.filter.show_events', $_REQUEST['show_events'], PROFILE_TYPE_INT);
 }
 else {
-	$_REQUEST['show_events'] = CProfile::get('web.tr_status.filter.show_events', EVENTS_OPTION_NOEVENT);
+	$_REQUEST['show_events'] = ($config['event_ack_enable'] == EVENT_ACK_DISABLED)
+		? EVENTS_OPTION_NOEVENT
+		: CProfile::get('web.tr_status.filter.show_events', EVENTS_OPTION_NOEVENT);
 }
 
 // show details
