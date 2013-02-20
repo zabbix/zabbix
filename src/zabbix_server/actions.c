@@ -1616,7 +1616,7 @@ void	process_actions(DB_EVENT *events, size_t events_num)
 	DB_RESULT	result;
 	DB_ROW		row;
 	zbx_uint64_t	actionid;
-	unsigned char	evaltype, recovery_msg;
+	unsigned char	evaltype;
 	char		*sql = NULL;
 	size_t		sql_alloc = ZBX_KIBIBYTE, sql_offset = 0, i;
 
@@ -1624,7 +1624,7 @@ void	process_actions(DB_EVENT *events, size_t events_num)
 
 	for (i = 0; i < events_num; i++)
 	{
-		result = DBselect("select actionid,evaltype,recovery_msg"
+		result = DBselect("select actionid,evaltype"
 				" from actions"
 				" where status=%d"
 					" and eventsource=%d"
@@ -1635,7 +1635,6 @@ void	process_actions(DB_EVENT *events, size_t events_num)
 		{
 			ZBX_STR2UINT64(actionid, row[0]);
 			evaltype = (unsigned char)atoi(row[1]);
-			recovery_msg = (unsigned char)atoi(row[2]);
 
 			if (SUCCEED == check_action_conditions(&events[i], actionid, evaltype))
 			{
