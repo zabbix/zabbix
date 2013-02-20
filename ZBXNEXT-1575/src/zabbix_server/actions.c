@@ -1647,7 +1647,7 @@ void	process_actions(DB_EVENT *events, size_t events_num)
 					execute_operations(&events[i], actionid);
 				}
 			}
-			else if (1 == recovery_msg)
+			else if (EVENT_SOURCE_TRIGGERS == events[i].source || EVENT_SOURCE_INTERNAL == events[i].source)
 				get_escalation_sql(&sql, &sql_alloc, &sql_offset, actionid, &events[i], 1);
 		}
 		DBfree_result(result);
