@@ -800,20 +800,28 @@ class CChart extends CGraphDraw {
 		}
 
 		// calculate interval, if left side use B or Bps
-		if ($leftBase8) {
+		if (isset($leftBase8)) {
 			$intervalData = convertBase8Values($interval);
 			$interval = $intervalData['value'];
 			$sideMaxData = convertBase8Values($this->m_maxY[$side]);
 			$sideMinData = convertBase8Values($this->m_minY[$side]);
-			if ($sideMaxData['pow'] > $sideMinData['pow']) {
+			if ($sideMaxData['pow'] > $sideMinData['pow'] && $sideMaxData['value'] != 0) {
 				$sideMax = $sideMaxData['pow'];
 			}
-			else {
+			if ($sideMaxData['pow'] < $sideMinData['pow'] && $sideMinData['value'] != 0) {
 				$sideMax = $sideMinData['pow'];
+			}
+			if (!isset($sideMax)) {
+				// correcting MIN & MAX
+				$this->m_minY[$side] = bcmul(bcfloor(bcdiv($this->m_minY[$side], $interval)), $interval);
+				$this->m_maxY[$side] = bcmul(bcceil(bcdiv($this->m_maxY[$side], $interval)), $interval);
+				$gridLinesCount = bcceil(bcdiv(bcsub($this->m_maxY[$side], $this->m_minY[$side]), $interval));
+				$maxIntervalValue = convertBase8Values(bcmul($interval, $gridLinesCount));
+				$sideMax = $maxIntervalValue['pow'];
 			}
 			if ($intervalData['pow'] != $sideMax) {
 				// interval correction, if Max Y have other unit, then interval unit = Max Y unit
-				$interval = sprintf('%.0f', round(bcmul($interval, 1.024), ZBX_UNITS_ROUNDOFF_UPPER_LIMIT));
+				$interval = sprintf('%.6f', round(bcmul($interval, 1.024), ZBX_UNITS_ROUNDOFF_UPPER_LIMIT));
 			}
 		}
 
@@ -848,7 +856,7 @@ class CChart extends CGraphDraw {
 		}
 
 		// calculate interval, if right side use B or Bps
-		if ($rightBase8) {
+		if (isset($rightBase8)) {
 			$intervalOtherSideData = convertBase8Values($interval_other_side);
 			$interval_other_side = $intervalOtherSideData['value'];
 			$otherSideMaxData = convertBase8Values($this->m_maxY[$other_side]);
@@ -2327,14 +2335,19 @@ class CChart extends CGraphDraw {
 		}
 
 		// If max Y-scale bigger min Y-scale only for 10% or less, then we don't allow Y-scale duplicate
-		if ((($this->m_maxY[GRAPH_YAXIS_SIDE_LEFT] - $this->m_minY[GRAPH_YAXIS_SIDE_LEFT]) / $this->m_maxY[GRAPH_YAXIS_SIDE_LEFT]) <= 0.1) {
-			$this->m_minY[GRAPH_YAXIS_SIDE_LEFT] = bcmul($this->m_minY[GRAPH_YAXIS_SIDE_LEFT],0.95);
-			$this->m_maxY[GRAPH_YAXIS_SIDE_LEFT] = bcmul($this->m_maxY[GRAPH_YAXIS_SIDE_LEFT],1.05);
+		if ($this->m_maxY[GRAPH_YAXIS_SIDE_LEFT] != 0) {
+			if (bcdiv(($this->m_maxY[GRAPH_YAXIS_SIDE_LEFT] - $this->m_minY[GRAPH_YAXIS_SIDE_LEFT]),
+				$this->m_maxY[GRAPH_YAXIS_SIDE_LEFT]) <= 0.1) {
+				$this->m_minY[GRAPH_YAXIS_SIDE_LEFT] = bcmul($this->m_minY[GRAPH_YAXIS_SIDE_LEFT],0.95);
+				$this->m_maxY[GRAPH_YAXIS_SIDE_LEFT] = bcmul($this->m_maxY[GRAPH_YAXIS_SIDE_LEFT],1.05);
+			}
 		}
-
-		if ((($this->m_maxY[GRAPH_YAXIS_SIDE_RIGHT] - $this->m_minY[GRAPH_YAXIS_SIDE_RIGHT]) / $this->m_maxY[GRAPH_YAXIS_SIDE_RIGHT]) <= 0.1) {
-			$this->m_minY[GRAPH_YAXIS_SIDE_RIGHT] = bcmul($this->m_minY[GRAPH_YAXIS_SIDE_RIGHT],0.95);
-			$this->m_maxY[GRAPH_YAXIS_SIDE_RIGHT] = bcmul($this->m_maxY[GRAPH_YAXIS_SIDE_RIGHT],1.05);
+		if ($this->m_maxY[GRAPH_YAXIS_SIDE_LEFT] != 0) {
+			if (bcdiv(($this->m_maxY[GRAPH_YAXIS_SIDE_RIGHT] - $this->m_minY[GRAPH_YAXIS_SIDE_RIGHT]),
+				$this->m_maxY[GRAPH_YAXIS_SIDE_RIGHT]) <= 0.1) {
+				$this->m_minY[GRAPH_YAXIS_SIDE_RIGHT] = bcmul($this->m_minY[GRAPH_YAXIS_SIDE_RIGHT],0.95);
+				$this->m_maxY[GRAPH_YAXIS_SIDE_RIGHT] = bcmul($this->m_maxY[GRAPH_YAXIS_SIDE_RIGHT],1.05);
+			}
 		}
 
 		$this->calcMinMaxInterval();
