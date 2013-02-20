@@ -146,6 +146,31 @@ class CArrayHelper {
 	}
 
 	/**
+	 * Unset values that are contained in $a2 from $a1. Skip arrays and keys given in $skipKeys.
+	 *
+	 * @param array $a1         array to modify
+	 * @param array $a2         array to compare with
+	 * @param array $skipKeys   fields to ignore
+	 *
+	 * @return array
+	 */
+	public static function unsetEqualValues(array $a1, array $a2, array $skipKeys = array()) {
+		// ignore given fields
+		foreach ($skipKeys as $key) {
+			unset($a2[$key]);
+		}
+
+		foreach ($a1 as $key => $value) {
+			// check if the values under $key are equal, skip arrays
+			if (isset($a2[$key]) && !is_array($value) && $a2[$key] == $a1[$key]) {
+				unset($a1[$key]);
+			}
+		}
+
+		return $a1;
+	}
+
+	/**
 	 * Checks if array $arrays contains arrays with duplicate values under the $uniqueField key. If a duplicate exists,
 	 * returns the first duplicate, otherwise returns null.
 	 *
@@ -167,38 +192,5 @@ class CArrayHelper {
 				$uniqueValues[$value] = $value;
 			}
 		}
-	}
-
-	/**
-	 * Get arrays key-value difference based on first array.
-	 * Comparison rules:
-	 *	null is not ""
-	 *	null is not 0
-	 *	0 is not ""
-	 *
-	 * @param array $a
-	 * @param array $b
-	 * @param array $skipKeys
-	 *
-	 * @return array
-	 */
-	public static function diff(array $a, array $b, array $skipKeys = array()) {
-		foreach ($skipKeys as $key) {
-			unset($b[$key]);
-		}
-
-		$diff = array();
-
-		foreach ($a as $key => $value) {
-			if (isset($b[$key]) || is_null($b[$key])) {
-				if ($value != $b[$key] || is_array($value)
-						|| is_null($value) && !is_null($b[$key]) || !is_null($value) && is_null($b[$key])
-						|| $value === 0 && $b[$key] === '' || $value === '' && $b[$key] === 0) {
-					$diff[$key] = $value;
-				}
-			}
-		}
-
-		return $diff;
 	}
 }

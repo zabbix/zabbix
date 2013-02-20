@@ -156,7 +156,7 @@ elseif (isset($_REQUEST['save'])) {
 		$oldTrigger = reset($oldTrigger);
 		$oldTrigger['dependencies'] = zbx_toHash(zbx_objectValues($oldTrigger['dependencies'], 'triggerid'));
 
-		$triggerToUpdate = CArrayHelper::diff($trigger, $oldTrigger);
+		$triggerToUpdate = array_diff_assoc($trigger, $oldTrigger);
 		$triggerToUpdate['triggerid'] = $_REQUEST['triggerid'];
 
 		// dependencies
