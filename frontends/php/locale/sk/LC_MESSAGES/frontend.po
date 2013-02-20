@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2013-02-20 19:29+0200\n"
-"PO-Revision-Date: 2013-02-05 09:49+0200\n"
+"PO-Revision-Date: 2013-02-08 14:55+0200\n"
 "Last-Translator: marki555 <marki@marki-online.net>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: sk\n"
@@ -23,27 +23,27 @@ msgstr "\"%s\" musí byť v intervale od 1970.01.01 do 2038.01.18."
 
 #: include/profiles.inc.php:286
 msgid "\"Display OK triggers\" needs to be \"0\" or a positive integer."
-msgstr "\"Ukáž OK spúšťače\" musí byť nastavené na \"0\", alebo akékoľvek iné pozitívne celé číslo."
+msgstr "\"Ukáž OK spúšťače\" musí byť nastavené na \"0\" alebo akékoľvek iné kladné celé číslo."
 
 #: include/profiles.inc.php:291
 msgid "\"Triggers blink on status change\" needs to be \"0\" or a positive integer."
-msgstr "\"Blikanie spúšťača pri zmene stavu\" musí byť \"0\", alebo pozitívne celé číslo."
+msgstr "\"Blikanie spúšťača pri zmene stavu\" musí byť \"0\" alebo kladné celé číslo."
 
 #: include/func.inc.php:433
 #, php-format
 msgid "%1$d day, "
 msgid_plural "%1$d days, "
-msgstr[0] "%1$d dní, "
-msgstr[1] "%1$d deň, "
+msgstr[0] "%1$d deň, "
+msgstr[1] "%1$d dni, "
 msgstr[2] "%1$d dní, "
 
 #: httpmon.php:295 include/views/configuration.httpconf.list.php:116
 #, php-format
 msgid "%1$d scenario"
 msgid_plural "%1$d scenarios"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%1$d scenár"
+msgstr[1] "%1$d scenáre"
+msgstr[2] "%1$d scenárov"
 
 #: chart4.php:90 chart5.php:83
 #, php-format
@@ -54,17 +54,17 @@ msgstr "%1$s (rok %2$s)"
 #, php-format
 msgid "%1$s Item"
 msgid_plural "%1$s Items"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%1$s položka"
+msgstr[1] "%1$s položky"
+msgstr[2] "%1$s položiek"
 
 #: include/page_header.php:480
 #, php-format
 msgid "%1$s failed login attempt logged. Last failed attempt was from %2$s on %3$s at %4$s."
 msgid_plural "%1$s failed login attempts logged. Last failed attempt was from %2$s on %3$s at %4$s."
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Bol detekovaný %1$s neúspešný pokus o prihlásenie. Posledný pokus bol z %2$s dňa %3$s o %4$s."
+msgstr[1] "Boli detekované %1$s neúspešné pokusy o prihlásenie. Posledný pokus bol z %2$s dňa %3$s o %4$s."
+msgstr[2] "Bolo detekovaných %1$s neúspešných pokusov o prihlásenie. Posledný pokus bol z %2$s dňa %3$s o %4$s."
 
 #: include/blocks.inc.php:960
 #, php-format
@@ -78,8 +78,8 @@ msgstr[2] "ukazujem %2$d z %1$d"
 #, php-format
 msgid "%d device"
 msgid_plural "%d devices"
-msgstr[0] "%d zariadení"
-msgstr[1] "%d zariadenie"
+msgstr[0] "%d zariadenie"
+msgstr[1] "%d zariadenia"
 msgstr[2] "%d zariadení"
 
 #: include/views/configuration.action.edit.php:424
@@ -94,11 +94,11 @@ msgstr ""
 
 #: include/forms.inc.php:539 include/forms.inc.php:554
 msgid "(in days)"
-msgstr ""
+msgstr "(v dňoch)"
 
 #: include/forms.inc.php:436
 msgid "(in sec)"
-msgstr ""
+msgstr "(v sek)"
 
 #: include/views/configuration.action.edit.php:434
 msgid "(minimum 60 seconds, 0 - use action default)"
@@ -155,9 +155,8 @@ msgid "500 latest values"
 msgstr "500 posledných hodnôt"
 
 #: include/views/configuration.sysmap.edit.php:67
-#, fuzzy
 msgid "<manual>"
-msgstr "<manual>"
+msgstr "<manuálne>"
 
 #: acknow.php:146
 msgid "ALARM ACKNOWLEDGES"
@@ -176,13 +175,12 @@ msgid "AND / OR"
 msgstr "A / ALEBO"
 
 #: include/views/administration.auditacts.list.php:31
-#, fuzzy
 msgid "AUDIT ACTIONS"
-msgstr "AUDIT AKCIÍ"
+msgstr "AKCIE AUDITU"
 
 #: include/views/administration.auditlogs.list.php:31
 msgid "AUDIT LOGS"
-msgstr "AUDITNÉ LOGY"
+msgstr "ZÁZNAMY AUDITU"
 
 #: report2.php:137
 msgid "AVAILABILITY REPORT"
@@ -190,23 +188,23 @@ msgstr "REPORT DOSTUPNOSTI"
 
 #: popup_trexpr.php:122
 msgid "Absolute difference between last and previous value is < N"
-msgstr ""
+msgstr "Absolútny rozdiel medzi poslednou a predchádzajúcou hodnotou je < N"
 
 #: popup_trexpr.php:130
 msgid "Absolute difference between last and previous value is = N"
-msgstr ""
+msgstr " Absolútny rozdiel medzi poslednou a predchádzajúcou hodnotou je = N"
 
 #: popup_trexpr.php:126
 msgid "Absolute difference between last and previous value is > N"
-msgstr ""
+msgstr "Absolútny rozdiel medzi poslednou a predchádzajúcou hodnotou je > N"
 
 #: popup_trexpr.php:134
 msgid "Absolute difference between last and previous value is NOT N"
-msgstr ""
+msgstr "Absolútny rozdiel medzi poslednou a predchádzajúcou hodnotou NIE JE N"
 
 #: report3.php:85 srv_status.php:160
 msgid "Acceptable SLA"
-msgstr ""
+msgstr "Akceptovateľná SLA"
 
 #: sysmap.php:75
 msgid "Access denied!"
@@ -255,7 +253,7 @@ msgstr "Potvrdene OK udalosti"
 
 #: include/views/administration.general.triggerDisplayOptions.edit.php:49
 msgid "Acknowledged PROBLEM events"
-msgstr "Potvrdene PROBLÉMové udalosti"
+msgstr "Potvrdené PROBLÉMové udalosti"
 
 #: acknow.php:27 tr_events.php:123
 msgid "Acknowledges"
@@ -294,7 +292,7 @@ msgstr "Akcia"
 #: api/classes/CAction.php:774 api/classes/CAction.php:871
 #, php-format
 msgid "Action \"%1$s\" has incorrect value for \"esc_period\" (minimum %2$s seconds)."
-msgstr ""
+msgstr "Akcia \"%1$s\" má nesprávnu hodnotu pre \"esc_period\" (minimum %2$s sekúnd)."
 
 #: api/classes/CAction.php:777 api/classes/CAction.php:791
 #: api/classes/CAction.php:880 api/classes/CAction.php:899
@@ -316,7 +314,6 @@ msgid "Action deleted"
 msgstr "Akcia bola vymazaná"
 
 #: include/views/configuration.action.edit.php:399
-#, fuzzy
 msgid "Action operations"
 msgstr "Operácie akcie"
 
@@ -575,19 +572,19 @@ msgid "Application"
 msgstr "Aplikácia"
 
 #: api/classes/CApplication.php:799
-#, fuzzy, php-format
+#, php-format
 msgid "Application \"%1$s\" already exists for host \"%2$s\"."
-msgstr "Aplikacia \"%1$s\" uz existuje pre hosta \"%2$s\"."
+msgstr "Aplikácia \"%1$s\" už pre host \"%2$s\" existuje."
 
 #: api/classes/CApplication.php:489
-#, fuzzy, php-format
+#, php-format
 msgid "Application \"%1$s\" already exists."
-msgstr "Aplikacia \"%1$s\" uz existuje."
+msgstr "Aplikácia \"%1$s\" už existuje."
 
 #: api/classes/CApplication.php:633
-#, fuzzy, php-format
+#, php-format
 msgid "Application \"%1$s\" used by scenario \"%2$s\" and can't be deleted."
-msgstr "Aplikacie \"%1$s\" ja pouzita v scenari \"%2$s\" a nemoze byt vymazana."
+msgstr "Aplikácia \"%1$s\" je použitá v scenári \"%2$s\" a nemôže byť vymazaná."
 
 #: applications.php:128
 msgid "Application added"
@@ -606,9 +603,9 @@ msgid "Application updated"
 msgstr "Aplikácia bola aktualizovaná"
 
 #: api/classes/CItemGeneral.php:333
-#, fuzzy, php-format
+#, php-format
 msgid "Application with ID \"%1$s\" is not available on \"%2$s\"."
-msgstr "Aplikacia s ID \"%1$s\" nie je na \"%2$s\" dostupna."
+msgstr "Aplikácia s ID \"%1$s\" nie je na \"%2$s\" dostupná."
 
 #: hosts.php:683 hosts.php:759 include/forms.inc.php:823
 #: include/html.inc.php:397 include/html.inc.php:401
@@ -650,7 +647,7 @@ msgstr "Ste si istý, že chcete spustiť túto akciu?"
 
 #: include/views/js/common.macros.js.php:53
 msgid "Are you sure you want to delete"
-msgstr "Ste si istý týmto vymazaním?"
+msgstr "Naozaj chcete zmazať"
 
 #: include/views/js/configuration.sysmaps.js.php:48
 msgid "Area size"
@@ -681,22 +678,20 @@ msgid "At"
 msgstr "O"
 
 #: include/forms.inc.php:1682
-#, fuzzy
 msgid "At (hour:minute)"
 msgstr "O (hodina:minuta)"
 
 #: api/classes/CMaintenance.php:403 api/classes/CMaintenance.php:595
 msgid "At least one host or group should be selected."
-msgstr "Minimalne jeden host, alebo skupina, musia byt oznacene."
+msgstr "Minimálne jeden host alebo skupina musia byť označené."
 
 #: api/classes/CMaintenance.php:473 api/classes/CMaintenance.php:586
 msgid "At least one maintenance period must be created."
-msgstr "Minimalne jedna planovana odstavka musi byt vytvorena."
+msgstr "Minimálne jedna plánovaná odstávka musí byť vytvorená."
 
 #: include/classes/class.frontendsetup.php:292
-#, fuzzy
 msgid "At least one of MySQL, PostgreSQL, Oracle, SQLite3 or IBM DB2 should be supported"
-msgstr "Minimalne jedna z MySQL, PostgreSQL, Oracle, SQLite3 alebo IBM DB2 musi byt podporovana."
+msgstr "Minimálne jedna z MySQL, PostgreSQL, Oracle, SQLite3 alebo IBM DB2 musí byť podporovaná"
 
 #: include/menu.inc.php:266
 msgid "Audit"
@@ -734,9 +729,8 @@ msgid "Authentication method"
 msgstr "Metódy prihlasovania"
 
 #: authentication.php:158 authentication.php:159
-#, fuzzy
 msgid "Authentication method changed to HTTP"
-msgstr "Metoda prihlasovania zmenena na HTTP"
+msgstr "Metóda prihlasovania bola zmenená na HTTP"
 
 #: authentication.php:121 authentication.php:122
 msgid "Authentication method changed to LDAP"
@@ -748,7 +742,7 @@ msgstr "Metóda prihlasovania bola zmenená na Zabbix internal"
 
 #: include/views/configuration.action.list.php:35
 msgid "Auto registration"
-msgstr "Automaticka registrácia"
+msgstr "Automatická registrácia"
 
 #: include/views/administration.users.edit.php:119
 msgid "Auto-login"
@@ -790,25 +784,24 @@ msgid "Average"
 msgstr "Priemer"
 
 #: include/reports.inc.php:677
-#, fuzzy
 msgid "Average by"
-msgstr "Priemer podľa"
+msgstr "Priemer za"
 
 #: popup_trexpr.php:138
 msgid "Average value of a period T is < N"
-msgstr ""
+msgstr "Priemerná hodnota za čas T je < N"
 
 #: popup_trexpr.php:148
 msgid "Average value of a period T is = N"
-msgstr ""
+msgstr "Priemerná hodnota za čas T je = N"
 
 #: popup_trexpr.php:143
 msgid "Average value of a period T is > N"
-msgstr ""
+msgstr "Priemerná hodnota za čas T je > N"
 
 #: popup_trexpr.php:153
 msgid "Average value of a period T is NOT N"
-msgstr ""
+msgstr "Priemerná hodnota za čas T NIE JE N"
 
 #: popup_bitem.php:140
 msgid "Axis side"
@@ -821,7 +814,7 @@ msgstr "B"
 
 #: include/page_header.php:224
 msgid "BACK"
-msgstr "SPäŤ"
+msgstr "SPÄŤ"
 
 #: include/views/administration.general.image.edit.php:29
 #: include/views/administration.general.image.list.php:25
@@ -874,7 +867,7 @@ msgstr "Hrubá čiara"
 
 #: include/items.inc.php:131
 msgid "Boolean"
-msgstr "Logicka hodnota"
+msgstr "Logická hodnota"
 
 #: include/views/configuration.screen.constructor.edit.php:602
 #: include/views/configuration.sysmap.edit.php:132
@@ -890,7 +883,7 @@ msgstr "Zosvetliť"
 
 #: include/locales.inc.php:46
 msgid "Bulgarian (bg_BG)"
-msgstr ""
+msgstr "Bulharsky (bg_BG)"
 
 #: tr_status.php:780
 msgid "Bulk acknowledge"
@@ -907,7 +900,7 @@ msgstr "Podľa šablóny spúšťača"
 #: include/views/configuration.action.edit.php:25
 #: include/views/configuration.action.list.php:29
 msgid "CONFIGURATION OF ACTIONS"
-msgstr "KONFIGURACIA AKCII"
+msgstr "KONFIGURÁCIA AKCIÍ"
 
 #: include/views/configuration.application.edit.php:23
 #: include/views/configuration.application.list.php:33
@@ -916,7 +909,7 @@ msgstr "KONFIGURÁCIA APLIKÁCIÍ"
 
 #: include/views/administration.authentication.edit.php:23
 msgid "CONFIGURATION OF AUTHENTICATION"
-msgstr "KONFIGURACIA PRIHLASOVANIA"
+msgstr "KONFIGURÁCIA PRIHLASOVANIA"
 
 #: include/views/configuration.discovery.edit.php:25
 #: include/views/configuration.discovery.list.php:28
@@ -941,7 +934,7 @@ msgstr "NASTAVENIA GRAFOV"
 
 #: adm.gui.php:107
 msgid "CONFIGURATION OF GUI"
-msgstr "KONFIGURACIA GUI"
+msgstr "KONFIGURÁCIA GUI"
 
 #: include/views/configuration.hostgroups.edit.php:23
 #: include/views/configuration.hostgroups.list.php:36
@@ -950,24 +943,24 @@ msgstr "NASTAVENIA SKUPÍN HOSTOV"
 
 #: hosts.php:570 hosts.php:619 hosts.php:639
 msgid "CONFIGURATION OF HOSTS"
-msgstr "KONFIGURACIA HOSTOV"
+msgstr "KONFIGURÁCIA HOSTOV"
 
 #: adm.housekeeper.php:86
 msgid "CONFIGURATION OF HOUSEKEEPER"
-msgstr ""
+msgstr "NASTAVENIA HOUSEKEEPERA (ÚDRŽBY)"
 
 #: adm.iconmapping.php:127
 msgid "CONFIGURATION OF ICON MAPPING"
-msgstr ""
+msgstr "NASTAVENIA MAPOVANIA IKON"
 
 #: adm.images.php:149
 msgid "CONFIGURATION OF IMAGES"
-msgstr "KONFIGURACIA OBRAZKOV"
+msgstr "KONFIGURÁCIA OBRÁZKOV"
 
 #: include/views/configuration.services.edit.php:28
 #: include/views/configuration.services.list.php:25
 msgid "CONFIGURATION OF IT SERVICES"
-msgstr ""
+msgstr "NASTAVENIE IT SLUŽIEB"
 
 #: disc_prototypes.php:313
 #: include/views/configuration.item.prototype.list.php:29
@@ -996,7 +989,7 @@ msgstr "NASTAVENIA TYPOV MÉDIÍ"
 
 #: sysmap.php:121 sysmaps.php:215
 msgid "CONFIGURATION OF NETWORK MAPS"
-msgstr "NASTAVENIA MÁP"
+msgstr "NASTAVENIA MÁP SIETE"
 
 #: include/views/administration.node.edit.php:25
 #: include/views/administration.node.list.php:60
@@ -1006,11 +999,11 @@ msgstr "NASTAVENIA UZLOV"
 #: include/views/administration.proxy.edit.php:23
 #: include/views/administration.proxy.list.php:33
 msgid "CONFIGURATION OF PROXIES"
-msgstr "NASTAVENIA PROXY SERVEROV"
+msgstr "NASTAVENIA PROXY"
 
 #: adm.regexps.php:226
 msgid "CONFIGURATION OF REGULAR EXPRESSIONS"
-msgstr "NASTAVENIE REGEXPov"
+msgstr "NASTAVENIA REGULÁRNYCH VÝRAZOV"
 
 #: include/views/configuration.screen.constructor.list.php:25
 msgid "CONFIGURATION OF SCREEN"
@@ -1033,57 +1026,57 @@ msgstr "CONFIGURATION OF SLIDE SHOWS"
 
 #: templates.php:422 templates.php:442
 msgid "CONFIGURATION OF TEMPLATES"
-msgstr "NASTAVENIE SABLON"
+msgstr "NASTAVENIA ŠABLÓN"
 
 #: include/views/configuration.triggers.edit.php:37
 #: include/views/configuration.triggers.list.php:41
 #: include/views/configuration.triggers.massupdate.php:37
 msgid "CONFIGURATION OF TRIGGER PROTOTYPES"
-msgstr ""
+msgstr "NASTAVENIA PROTOTYPOV SPÚŠŤAČOV"
 
 #: adm.triggerseverities.php:94
 msgid "CONFIGURATION OF TRIGGER SEVERITIES"
-msgstr ""
+msgstr "NASTAVENIA PRIORÍT SPÚŠŤAČOV"
 
 #: include/views/configuration.triggers.edit.php:40
 #: include/views/configuration.triggers.list.php:45
 #: include/views/configuration.triggers.massupdate.php:40 triggers.php:376
 msgid "CONFIGURATION OF TRIGGERS"
-msgstr "NASTAVENIE SPÚŠŤAČOV"
+msgstr "NASTAVENIA SPÚŠŤAČOV"
 
 #: include/views/administration.users.edit.php:30
 msgid "CONFIGURATION OF USER"
-msgstr ""
+msgstr "NASTAVENIA UŽÍVATEĽOV"
 
 #: include/views/administration.usergroups.edit.php:23
 msgid "CONFIGURATION OF USER GROUP"
-msgstr ""
+msgstr "NASTAVENIA UŽÍVATEĽSKÝCH SKUPÍN"
 
 #: include/views/administration.usergroups.list.php:31
 #: include/views/administration.users.list.php:31
 msgid "CONFIGURATION OF USERS AND USER GROUPS"
-msgstr "CONFIGURATION OF USERS AND USER GROUPS"
+msgstr "NASTAVENIA UŽÍVATEĽOV A UŽÍVATEĽSKÝCH SKUPÍN"
 
 #: adm.valuemapping.php:143
 msgid "CONFIGURATION OF VALUE MAPPING"
-msgstr ""
+msgstr "NASTAVENIA MAPOVANIA HODNÔT"
 
 #: include/views/configuration.httpconf.edit.php:25
 #: include/views/configuration.httpconf.list.php:37
 msgid "CONFIGURATION OF WEB MONITORING"
-msgstr "KONFIGURÁCIA WEB MONITORINGU"
+msgstr "NASTAVENIA MONITORINGU WEBU"
 
 #: adm.workingtime.php:76
 msgid "CONFIGURATION OF WORKING TIME"
-msgstr ""
+msgstr "NASTAVENIA PRACOVNEJ DOBY"
 
 #: adm.triggerdisplayoptions.php:89
 msgid "CONFIGURATION OF ZABBIX"
-msgstr "CONFIGURATION OF ZABBIX"
+msgstr "NASTAVENIA ZABBIXU"
 
 #: include/views/configuration.services.edit.php:62 services.php:45
 msgid "Calculate SLA, acceptable SLA (in %)"
-msgstr ""
+msgstr "Výpočet SLA, akceptovateľná SLA (v %)"
 
 #: include/items.inc.php:92 include/views/configuration.graph.edit.php:162
 #: include/views/configuration.graph.edit.php:220
@@ -1092,9 +1085,10 @@ msgstr "Vypočítané"
 
 #: include/views/administration.usergroups.edit.php:114
 msgid "Calculated permissions"
-msgstr ""
+msgstr "Vypočítané práva"
 
 #: include/hosts.inc.php:66
+#, fuzzy
 msgid "Callback"
 msgstr "Callback"
 
@@ -1112,7 +1106,7 @@ msgstr "Nebolo možné odstrániť skupinu"
 
 #: api/classes/CTemplate.php:1457 api/classes/CTemplate.php:1475
 msgid "Can't unlink template"
-msgstr ""
+msgstr "Nebolo možné zrušiť prepojenie so šablónou"
 
 #: include/views/administration.mediatypes.edit.php:88
 msgid "Canada (136 characters)"
@@ -1143,16 +1137,16 @@ msgstr "Nebolo možné pridať akciu"
 
 #: applications.php:129
 msgid "Cannot add application"
-msgstr "Cannot add application"
+msgstr "Nie je možné pridať aplikáciu"
 
 #: api/classes/CTrigger.php:1800
 msgid "Cannot add dependency from a host to a template."
-msgstr ""
+msgstr "Šablóna nemôže závisieť na hostovi."
 
 #: include/triggers.inc.php:501
 #, php-format
 msgid "Cannot add dependency from trigger \"%1$s:%2$s\" to non existing trigger \"%3$s:%4$s\"."
-msgstr ""
+msgstr "Nie je možné pridať závislosť zo spúšťača \"%1$s:%2$s\" pre neexistujúci spúšťač \"%3$s:%4$s\"."
 
 #: host_discovery.php:233
 msgid "Cannot add discovery rule"
@@ -1160,68 +1154,68 @@ msgstr "Nie je možné pridať pravidlo pre pátrača"
 
 #: graphs.php:225
 msgid "Cannot add graph"
-msgstr "Cannot add graph"
+msgstr "Nie je možné pridať graf"
 
 #: hostgroups.php:145 usergrps.php:173
 msgid "Cannot add group"
-msgstr "Cannot add group"
+msgstr "Nie je možné pridať skupinu"
 
 #: hosts.php:327
 msgid "Cannot add host"
-msgstr "Cannot add host"
+msgstr "Nie je možné pridať host"
 
 #: adm.images.php:62
 msgid "Cannot add image"
-msgstr "Cannot add image"
+msgstr "Nie je možné pridať obrázok"
 
 #: include/classes/import/CXmlImport18.php:632
 msgid "Cannot add image."
-msgstr ""
+msgstr "Nie je možné pridať obrázok."
 
 #: disc_prototypes.php:277 items.php:450 screenedit.php:180
 msgid "Cannot add item"
-msgstr "Cannot add item"
+msgstr "Nie je možné pridať položku"
 
 #: adm.macros.php:120
 msgid "Cannot add macro."
-msgstr ""
+msgstr "Nie je možné pridať makro."
 
 #: maintenance.php:137
 msgid "Cannot add maintenance"
-msgstr "Nie je mozne pridat planovanu odstavku"
+msgstr "Nie je možné pridať plánovanú odstávku"
 
 #: media_types.php:118
 msgid "Cannot add media type"
-msgstr "Nebolo mozne pridat tento typ media"
+msgstr "Nie je možné pridať tento typ média"
 
 #: api/classes/CGraphGeneral.php:84
 #, php-format
 msgid "Cannot add more than one item with type \"Graph sum\" on graph \"%1$s\"."
-msgstr ""
+msgstr "Nie je možné pridať viac než jednu položku typu \"Súhrn grafu\" pre graf \"%1$s\"."
 
 #: sysmaps.php:170
 msgid "Cannot add network map"
-msgstr "Nebolo možné pridať mapu"
+msgstr "Nie je možné pridať mapu siete"
 
 #: httpconf.php:256
 msgid "Cannot add new application."
-msgstr ""
+msgstr "Nie je možné pridať novú aplikáciu."
 
 #: nodes.php:77
 msgid "Cannot add node"
-msgstr "Nebolo mozne pridat uzol"
+msgstr "Nie je možné pridať uzol"
 
 #: proxies.php:111
 msgid "Cannot add proxy"
-msgstr "Nebolo mozne pridat proxy"
+msgstr "Nie je možné pridať proxy"
 
 #: adm.regexps.php:105
 msgid "Cannot add regular expression"
-msgstr "Cannot add regular expression"
+msgstr "Nie je možné pridať regulárny výraz"
 
 #: httpconf.php:210
 msgid "Cannot add scenario"
-msgstr "Nebolo možné pridať scenár"
+msgstr "Nie je možné pridať scenár"
 
 #: screenconf.php:178
 msgid "Cannot add screen"
@@ -1229,24 +1223,24 @@ msgstr "Nie je možné pridať pohľad"
 
 #: scripts.php:87 scripts.php:91 scripts.php:117
 msgid "Cannot add script"
-msgstr "Nebolo mozne pridat skript"
+msgstr "Nie je možné pridať skript"
 
 #: services.php:163
 msgid "Cannot add service"
-msgstr "Nebolo mozne pridat sluzbu"
+msgstr "Nie je možné pridať službu"
 
 #: slideconf.php:105
 msgid "Cannot add slide show"
-msgstr ""
+msgstr "Nie je možné pridať slide-show"
 
 #: templates.php:183
 msgid "Cannot add template"
-msgstr "Nebolo možné pridať šablónu"
+msgstr "Nie je možné pridať šablónu"
 
 #: trigger_prototypes.php:168 triggers.php:156 triggers.php:344
 #: tr_logform.php:147
 msgid "Cannot add trigger"
-msgstr "Nebolo mozne pridat spustac"
+msgstr "Nie je možné pridať spúšťač"
 
 #: users.php:196
 msgid "Cannot add user"
@@ -1254,72 +1248,72 @@ msgstr "Nie je možné pridať užívateľa"
 
 #: users.php:150
 msgid "Cannot add user. Both passwords must be equal."
-msgstr "Cannot add user. Both passwords must be equal."
+msgstr "Nie je možné pridať užívateľa. Obe heslá musia byť rovnaké."
 
 #: api/classes/CUserGroup.php:363
 msgid "Cannot add users."
-msgstr ""
+msgstr "Nie je možné pridávať užívateľov."
 
 #: adm.valuemapping.php:72
 msgid "Cannot add value map"
-msgstr "Cannot add value map"
+msgstr "Nie je možné pridať mapu hodnôt"
 
 #: authentication.php:163
 msgid "Cannot change authentication method to HTTP"
-msgstr ""
+msgstr "Nie je možné zmeniť metódu prihlasovania na HTTP"
 
 #: authentication.php:126
 msgid "Cannot change authentication method to LDAP"
-msgstr ""
+msgstr "Nie je možné zmeniť metódu prihlasovania na LDAP"
 
 #: authentication.php:88
 msgid "Cannot change authentication method to Zabbix internal"
-msgstr ""
+msgstr "Nie je možné zmeniť metódu prihlasovania na Zabbix-internal"
 
 #: items.php:472
 msgid "Cannot clear history"
-msgstr "Cannot clear history"
+msgstr "Nie je možné zmazať históriu"
 
 #: api/classes/CDiscoveryRule.php:1163
 msgid "Cannot clone graph prototypes."
-msgstr ""
+msgstr "Nie je možné klonovať prototypy grafov."
 
 #: api/classes/CDiscoveryRule.php:1048
 msgid "Cannot clone item prototypes."
-msgstr ""
+msgstr "Nie je možné klonovať prototypy položiek."
 
 #: api/classes/CDiscoveryRule.php:805
 msgid "Cannot clone trigger prototypes."
-msgstr ""
+msgstr "Nie je možné klonovať prototypy spúšťačov."
 
 #: scripts_exec.php:64
 msgid "Cannot connect to the trapper port of zabbix server daemon, but it should be available to run the script."
-msgstr ""
+msgstr "Pripojenie na Trapper port Zabbix servera zlyhalo, ale je potrebné pre spustenie skriptu."
 
 #: graphs.php:289
 msgid "Cannot copy graphs"
-msgstr "Cannot copy graphs"
+msgstr "Nie je možné kopírovať grafy"
 
 #: items.php:605
 msgid "Cannot copy items"
-msgstr "Mie je možné skopírovať položky"
+msgstr "Nie je možné skopírovať položky"
 
 #: include/triggers.inc.php:408
 #, php-format
 msgid "Cannot copy trigger \"%1$s:%2$s\", because it has multiple hosts in the expression."
-msgstr ""
+msgstr "Nie je možné skopírovať spúšťač \"%1$s:%2$s\", pretože jeho definícia obsahuje viac hostov."
 
 #: include/db.inc.php:54
 msgid "Cannot create another database connection."
-msgstr ""
+msgstr "Nie je možné otvoriť ďalšie pripojenie k databáze."
 
 #: api/classes/CTrigger.php:1834
 msgid "Cannot create circular dependencies."
-msgstr ""
+msgstr "Nie je možné vytvoriť zacyklené závislosti."
 
 #: api/classes/CTrigger.php:1806
 msgid "Cannot create dependency on trigger itself."
-msgstr ""
+msgstr "Nie je možné vytvoriť závislosť spúšťača na sebe samom."
 
 #: discoveryconf.php:151
 msgid "Cannot create discovery rule"
@@ -1327,50 +1321,50 @@ msgstr ""
 
 #: api/classes/CHostGroup.php:647
 msgid "Cannot create group without name."
-msgstr ""
+msgstr "Nie je možné vytvoriť skupinu bez mena."
 
 #: api/classes/CHost.php:1775
 msgid "Cannot create host group."
-msgstr ""
+msgstr "Nie je možné vytvoriť skupinu hostov."
 
 #: adm.iconmapping.php:82
 msgid "Cannot create icon map"
-msgstr ""
+msgstr "Nie je možné vytvoriť mapu ikon"
 
 #: api/classes/CIconMap.php:259 api/classes/CIconMap.php:319
 #, php-format
 msgid "Cannot create icon maps with identical name \"%s\"."
-msgstr ""
+msgstr "Nie je možné vytvoriť mapu ikon s rovnakým menom \"%s\"."
 
 #: include/classes/import/CXmlImport18.php:816
 #, php-format
 msgid "Cannot create map \"%s\"."
-msgstr ""
+msgstr "Nie je možné vytvoriť mapu \"%s\"."
 
 #: include/js.inc.php:265
 msgid "Cannot create new element"
-msgstr ""
+msgstr "Nie je možné vytvoriť nový prvok"
 
 #: include/classes/import/CXmlImport18.php:1709
 msgid "Cannot create screen."
-msgstr ""
+msgstr "Nie možné vytvoriť Obrazovku"
 
 #: api/classes/CUser.php:370
 #, php-format
 msgid "Cannot delete Zabbix internal user \"%1$s\", try disabling that user."
-msgstr ""
+msgstr "Nie je možné vymazať interného Zabbix užívateľa \"%1$s\", skúste ho disablovať."
 
 #: actionconf.php:170
 msgid "Cannot delete action"
-msgstr "Cannot delete action"
+msgstr "Nie je možné zmazať akciu"
 
 #: applications.php:155 applications.php:186
 msgid "Cannot delete application"
-msgstr "Cannot delete application"
+msgstr "Nie je možné zmazať aplikáciu"
 
 #: api/classes/CTrigger.php:1528
 msgid "Cannot delete dependency"
-msgstr ""
+msgstr "Nie je možné zmazať závislosť"
 
 #: api/classes/CDiscoveryRule.php:628 discoveryconf.php:164
 #: host_discovery.php:166
@@ -1383,19 +1377,19 @@ msgstr ""
 
 #: graphs.php:236
 msgid "Cannot delete graph"
-msgstr "Cannot delete graph"
+msgstr "Nie je možné zmazať graf"
 
 #: api/classes/CItemPrototype.php:768
 msgid "Cannot delete graph prototype"
-msgstr ""
+msgstr "Nie je možné zmazať prototyp grafu"
 
 #: api/classes/CItem.php:981
 msgid "Cannot delete graph."
-msgstr ""
+msgstr "Nie je možné zmazať graf."
 
 #: graphs.php:243
 msgid "Cannot delete graphs"
-msgstr "Cannot delete graphs"
+msgstr "Nie je možné zmazať grafy"
 
 #: api/classes/CGraphPrototype.php:785
 msgid "Cannot delete graphs created by low level discovery."
@@ -1403,35 +1397,35 @@ msgstr ""
 
 #: hostgroups.php:155 hostgroups.php:166 usergrps.php:191 usergrps.php:219
 msgid "Cannot delete group"
-msgstr "Cannot delete group"
+msgstr "Nie je možné zmazať skupinu"
 
 #: hosts.php:508 hosts.php:532
 msgid "Cannot delete host"
-msgstr "Nebolo možné zmazať hosta"
+msgstr "Nie je možné zmazať hosta"
 
 #: api/classes/CHost.php:1786
 msgid "Cannot delete host group."
-msgstr ""
+msgstr "Nie je možné zmazať skupinu hostov."
 
 #: adm.iconmapping.php:95
 msgid "Cannot delete icon map"
-msgstr ""
+msgstr "Nie je možné zmazať mapu ikon"
 
 #: adm.images.php:116
 msgid "Cannot delete image"
-msgstr "Cannot delete image"
+msgstr "Nie je možné zmazať obrázok"
 
 #: api/classes/CHost.php:1879
 msgid "Cannot delete inventory."
-msgstr ""
+msgstr "Nie je možné zmazať inventár."
 
 #: disc_prototypes.php:188 items.php:348 screenedit.php:199
 msgid "Cannot delete item"
-msgstr "Cannot delete item"
+msgstr "Nie je možné zmazať položku"
 
 #: disc_prototypes.php:299 items.php:651
 msgid "Cannot delete items"
-msgstr "Cannot delete items"
+msgstr "Nie je možné zmazať položky"
 
 #: api/classes/CItemPrototype.php:785
 msgid "Cannot delete items created by low level discovery."
@@ -1439,73 +1433,72 @@ msgstr ""
 
 #: maintenance.php:237
 msgid "Cannot delete maintenance"
-msgstr "Cannot delete maintenance"
+msgstr "Nie je možné zmazať plánovanú odstávku"
 
 #: media_types.php:131 media_types.php:170
 msgid "Cannot delete media type"
-msgstr ""
+msgstr "Nie je možné zmazať typ média"
 
 #: sysmaps.php:191
 msgid "Cannot delete network map"
-msgstr "Nebolo možné vymazať mapu"
+msgstr "Nie je možné zmazať mapu siete"
 
 #: nodes.php:93
 msgid "Cannot delete node"
-msgstr "Nebolo možné vymazať nód"
+msgstr "Nie je možné zmazať uzol"
 
 #: proxies.php:129 proxies.php:175
 msgid "Cannot delete proxy"
-msgstr "Cannot delete proxy"
+msgstr "Nie je možné zmazať proxy"
 
 #: adm.regexps.php:139
-#, fuzzy
 msgid "Cannot delete regular expression"
 msgid_plural "Cannot delete regular expressions"
-msgstr[0] "Cannot delete regular expression"
-msgstr[1] "Cannot delete regular expression"
-msgstr[2] "Cannot delete regular expression"
+msgstr[0] "Nie je možné zmazať regulárny výraz"
+msgstr[1] "Nie je možné zmazať regulárne výrazy"
+msgstr[2] "Nie je možné zmazať regulárne výrazy"
 
 #: httpconf.php:185
 msgid "Cannot delete scenario"
-msgstr "Nebolo možné vymazať scenár"
+msgstr "Nie je možné zmazať scenár"
 
 #: screenconf.php:226
 msgid "Cannot delete screen"
-msgstr ""
+msgstr "Nie je možné zmazať Obrazovku"
 
 #: scripts.php:139 scripts.php:155
 msgid "Cannot delete script"
-msgstr "Cannot delete script"
+msgstr "Nie je možné zmazať skript"
 
 #: api/classes/CScript.php:413
 msgid "Cannot delete scripts. Empty input parameter \"scriptids\"."
-msgstr ""
+msgstr "Nie je možné zmazať skripty. Parameter \"scriptids\" je prázdny."
 
 #: api/classes/CScript.php:437
 #, php-format
 msgid "Cannot delete scripts. Script \"%1$s\" is used in action operation \"%2$s\"."
-msgstr ""
+msgstr "Nie je možné zmazať skripty. Skript \"%1$s\" sa používa v operácii akcie \"%2$s\"."
 
 #: api/classes/CScript.php:426
 #, php-format
 msgid "Cannot delete scripts. Script with scriptid \"%s\" does not exist."
-msgstr ""
+msgstr "Nie je možné zmazať skripty. Skript so scriptid \"%s\" neexistuje."
 
 #: actionconf.php:308
 msgid "Cannot delete selected actions"
-msgstr ""
+msgstr "Nie je možné zmazať označené akcie"
 
 #: services.php:116
 msgid "Cannot delete service"
-msgstr "Cannot delete service"
+msgstr "Nie je možné zmazať službu"
 
 #: slideconf.php:118 slideconf.php:139
 msgid "Cannot delete slide show"
-msgstr ""
+msgstr "Nie je možné zmazať slide-show"
 
 #: templates.php:353 templates.php:371 templates.php:396
 msgid "Cannot delete template"
-msgstr "Nebolo možné vymazať šablónu"
+msgstr "Nie je možné zmazať šablónu"
 
 #: api/classes/CGraph.php:713 api/classes/CGraphPrototype.php:761
 msgid "Cannot delete templated graphs."
@@ -1534,15 +1527,15 @@ msgstr "Cannot delete trigger"
 
 #: api/classes/CItemPrototype.php:800
 msgid "Cannot delete trigger prototype"
-msgstr ""
+msgstr "Nie je možné zmazať prototyp spúšťača"
 
 #: api/classes/CItem.php:997
 msgid "Cannot delete trigger."
-msgstr ""
+msgstr "Nie je možné zmazať spúšťač."
 
 #: trigger_prototypes.php:287 triggers.php:353
 msgid "Cannot delete triggers"
-msgstr "Cannot delete triggers"
+msgstr "Nie je možné zmazať spúšťače"
 
 #: api/classes/CTriggerPrototype.php:963
 msgid "Cannot delete triggers created by low level discovery."
@@ -1550,60 +1543,60 @@ msgstr ""
 
 #: users.php:232 users.php:318
 msgid "Cannot delete user"
-msgstr "Nie je možné vymazať užívateľa"
+msgstr "Nie je možné zmazať užívateľa"
 
 #: api/classes/CUser.php:786
 msgid "Cannot delete user media."
-msgstr ""
+msgstr "Nie je možné zmazať médium užívateľa."
 
 #: adm.valuemapping.php:88
 msgid "Cannot delete value map"
-msgstr "Cannot delete value map"
+msgstr "Nie je možné zmazať mapu hodnôt"
 
 #: media_types.php:163
 msgid "Cannot disable media type"
-msgstr ""
+msgstr "Nie je možné zakázať typ média"
 
 #: media_types.php:147
 msgid "Cannot enable media type"
-msgstr ""
+msgstr "Nie je možné povoliť typ média"
 
 #: include/classes/import/CXmlImport18.php:676
 #: include/classes/import/importers/CMapImporter.php:188
 #, php-format
 msgid "Cannot find background image \"%1$s\" used in map \"%2$s\"."
-msgstr ""
+msgstr "Obrázok pozadia \"%1$s\" použitý v mape \"%2$s\" nebol nájdený."
 
 #: include/classes/import/CXmlImport18.php:506
 #: include/classes/import/CXmlImport18.php:1666
 #: include/classes/import/importers/CAbstractScreenImporter.php:69
 #, php-format
 msgid "Cannot find graph \"%1$s\" used in screen \"%2$s\"."
-msgstr ""
+msgstr "Graf \"%1$s\" použitý v Obrazovke \"%2$s\" nebol nájdený."
 
 #: include/classes/import/CXmlImport18.php:723
 #: include/classes/import/importers/CMapImporter.php:210
 #, php-format
 msgid "Cannot find group \"%1$s\" used in map \"%2$s\"."
-msgstr ""
+msgstr "Skupina \"%1$s\" použitá v mape \"%2$s\" nebola nájdená."
 
 #: include/classes/import/CXmlImport18.php:483
 #: include/classes/import/importers/CAbstractScreenImporter.php:53
 #, php-format
 msgid "Cannot find group \"%1$s\" used in screen \"%2$s\"."
-msgstr ""
+msgstr "Skupina \"%1$s\" použitá v Obrazovke \"%2$s\" nebola nájdená."
 
 #: include/classes/import/CXmlImport18.php:734
 #: include/classes/import/importers/CMapImporter.php:218
 #, php-format
 msgid "Cannot find host \"%1$s\" used in map \"%2$s\"."
-msgstr ""
+msgstr "Host \"%1$s\" použitý v mape \"%2$s\" nebol nájdený."
 
 #: include/classes/import/CXmlImport18.php:495
 #: include/classes/import/importers/CAbstractScreenImporter.php:61
 #, php-format
 msgid "Cannot find host \"%1$s\" used in screen \"%2$s\"."
-msgstr ""
+msgstr "Host \"%1$s\" použitý v Obrazovke \"%2$s\" nebol nájdený."
 
 #: api/classes/CDiscoveryRule.php:964 api/classes/CDiscoveryRule.php:1036
 #: api/classes/CItemGeneral.php:584 include/items.inc.php:288
@@ -1616,45 +1609,45 @@ msgstr ""
 #: include/classes/import/importers/CMapImporter.php:247
 #, php-format
 msgid "Cannot find icon \"%1$s\" used in map \"%2$s\"."
-msgstr ""
+msgstr "Ikona \"%1$s\" použitá v mape \"%2$s\" nebola nájdená."
 
 #: include/classes/import/importers/CMapImporter.php:180
 #, php-format
 msgid "Cannot find icon map \"%1$s\" used in map \"%2$s\"."
-msgstr ""
+msgstr "Mapa ikon \"%1$s\" použitá v mape \"%2$s\" nebola nájdená."
 
 #: include/classes/import/CXmlImport18.php:519
 #: include/classes/import/CXmlImport18.php:1679
 #: include/classes/import/importers/CAbstractScreenImporter.php:82
 #, php-format
 msgid "Cannot find item \"%1$s\" used in screen \"%2$s\"."
-msgstr ""
+msgstr "Položka \"%1$s\" použitá v Obrazovke \"%2$s\" nebola nájdená."
 
 #: include/classes/import/CXmlImport18.php:712
 #, php-format
 msgid "Cannot find map \"%1$s\" used in exported map \"%2$s\"."
-msgstr ""
+msgstr "Položka \"%1$s\" použitá v exportovanej mape \"%2$s\" nebola nájdená."
 
 #: include/classes/import/importers/CMapImporter.php:202
 #, php-format
 msgid "Cannot find map \"%1$s\" used in map \"%2$s\"."
-msgstr ""
+msgstr "Mapa \"%1$s\" použitá v mape \"%2$s\" nebola nájdená."
 
 #: include/classes/import/CXmlImport18.php:530
 #: include/classes/import/importers/CAbstractScreenImporter.php:90
 #, php-format
 msgid "Cannot find map \"%1$s\" used in screen \"%2$s\"."
-msgstr ""
+msgstr "Mapa \"%1$s\" použitá v Obrazovke \"%2$s\" nebola nájdená."
 
 #: include/js.inc.php:248
 msgid "Cannot find objects with name"
-msgstr ""
+msgstr "Nemôžem nájsť objekt s menom"
 
 #: include/classes/import/CXmlImport18.php:541
 #: include/classes/import/importers/CAbstractScreenImporter.php:98
 #, php-format
 msgid "Cannot find screen \"%1$s\" used in screen \"%2$s\"."
-msgstr ""
+msgstr "Obrazovka \"%1$s\" použitá v Obrazovke \"%2$s\" nebola nájdená."
 
 #: include/classes/import/CXmlImport18.php:745
 #: include/classes/import/CXmlImport18.php:788
@@ -1662,7 +1655,7 @@ msgstr ""
 #: include/classes/import/importers/CMapImporter.php:268
 #, php-format
 msgid "Cannot find trigger \"%1$s\" used in map \"%2$s\"."
-msgstr ""
+msgstr "Spúšťač \"%1$s\" použitý v mape \"%2$s\" nebol nájdený."
 
 #: srv_status.php:186
 msgid "Cannot format Tree. Check logic structure in service links."
@@ -1674,30 +1667,30 @@ msgstr ""
 
 #: api/classes/CTemplate.php:1380
 msgid "Cannot have empty visible template name"
-msgstr ""
+msgstr "Viditeľné meno šablóny nemôže byť prázdne"
 
 #: api/classes/CTrigger.php:1559 api/classes/CTrigger.php:1634
 #: api/classes/CTriggerPrototype.php:1006
 #: api/classes/CTriggerPrototype.php:1064
 #, php-format
 msgid "Cannot implode expression \"%s\"."
-msgstr ""
+msgstr "Nie je možné spracovať výraz \"%s\"."
 
 #: include/classes/import/importers/CScreenImporter.php:78
 #, php-format
 msgid "Cannot import screen \"%2$s\": subscreen \"%3$s\" does not exist."
 msgid_plural "Cannot import screen \"%2$s\": subscreens \"%3$s\" do not exist."
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Nie je možné importovať Obrazovku \"%2$s\": sub-Obrazovka \"%3$s\" neexistuje."
+msgstr[1] "Nie je možné importovať Obrazovku \"%2$s\": sub-Obrazovky \"%3$s\" neexistujú."
+msgstr[2] "Nie je možné importovať Obrazovku \"%2$s\": sub-Obrazovky \"%3$s\" neexistujú."
 
 #: include/classes/import/importers/CTemplateImporter.php:114
 #, php-format
 msgid "Cannot import template \"%2$s\", linked template \"%3$s\" does not exist."
 msgid_plural "Cannot import template \"%2$s\", linked templates \"%3$s\" does not exist."
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Nie je možné importovať šablónu \"%2$s\", pripojená šablóna \"%3$s\" neexistuje."
+msgstr[1] "Nie je možné importovať šablónu \"%2$s\", pripojené šablóny \"%3$s\" neexistujú."
+msgstr[2] "Nie je možné importovať šablónu \"%2$s\", pripojené šablóny \"%3$s\" neexistujú."
 
 #: include/classes/class.cview.php:113
 #, php-format
@@ -1710,11 +1703,11 @@ msgstr ""
 
 #: api/classes/CHost.php:1858
 msgid "Cannot link template"
-msgstr "Cannot link template"
+msgstr "Nie je možné nalinkovať šablónu"
 
 #: api/classes/CUser.php:880
 msgid "Cannot logout."
-msgstr ""
+msgstr "Odhlásenie nie je možné."
 
 #: api/classes/CHost.php:1682
 msgid "Cannot mass update host name."
@@ -1754,11 +1747,11 @@ msgstr ""
 
 #: adm.macros.php:104
 msgid "Cannot remove macro."
-msgstr ""
+msgstr "Nie je možné odstrániť makro."
 
 #: api/classes/CUser.php:380
 msgid "Cannot rename guest user."
-msgstr ""
+msgstr "Nie je možné premenovať užívateľa \"guest\"."
 
 #: api/classes/CDRule.php:445
 msgid "Cannot save discovery rule without checks."
@@ -2849,7 +2842,7 @@ msgstr "Custom slides"
 
 #: include/locales.inc.php:49
 msgid "Czech (cs_CZ)"
-msgstr "Czech (cs_CZ)"
+msgstr "Čeština (cs_CZ)"
 
 #: include/classes/class.cchart.php:1227
 msgid "D"
@@ -3151,7 +3144,7 @@ msgstr "Vymazať a vyčistiť"
 
 #: templates.php:617
 msgid "Delete and clear selected templates? (Warning: all linked hosts will be cleared!)"
-msgstr "Warning: this will delete selected templates and clear all linked hosts"
+msgstr "Zmazať a vyčistiť zvolené šablóny? (Pozor: všetky prepojené hosty budú tiež vyčistené!)"
 
 #: include/views/configuration.template.edit.php:438
 msgid "Delete and clear template? (Warning: all linked hosts will be cleared!)"
@@ -13146,7 +13139,7 @@ msgstr ""
 #: include/classes/import/CXmlImport18.php:406
 #: include/classes/import/CXmlImport18.php:409
 msgid "XML file contains errors"
-msgstr "XML súbor obsahuje chyby!"
+msgstr "XML súbor obsahuje chyby"
 
 #: include/classes/import/readers/CXmlImportReader.php:51
 #, php-format
@@ -13826,7 +13819,7 @@ msgstr "iné"
 
 #: include/page_header.php:129
 msgid "refreshed every"
-msgstr "Obnoviť každých"
+msgstr "obnovené každých"
 
 #: include/views/administration.general.gui.edit.php:35
 msgid "remember selected"
@@ -13921,7 +13914,7 @@ msgstr ""
 #: include/func.inc.php:456 jsLoader.php:92
 msgctxt "year short"
 msgid "y"
-msgstr ""
+msgstr "r"
 
 #: include/classes/class.frontendsetup.php:317
 #: include/classes/class.frontendsetup.php:336
@@ -13943,9 +13936,9 @@ msgstr "áno"
 #: include/views/configuration.services.edit.php:206
 #: include/views/configuration.services.edit.php:247
 msgid "yyyy"
-msgstr ""
+msgstr "rrrr"
 
 #: include/func.inc.php:561
 msgctxt "Micro short"
 msgid "µ"
-msgstr ""
+msgstr "µ"
