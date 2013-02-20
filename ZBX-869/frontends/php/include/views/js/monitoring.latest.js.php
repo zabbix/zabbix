@@ -30,6 +30,9 @@
 
 		// click event for main toggle (+-) button
 		$('.app-list-toggle-all').click(function(){
+			// this is for Opera browser with large tables, which renders table layout while showing/hidding rows
+			$('.tableinfo').fadeTo(0, 0);
+
 			var openState = $(this).data('openState'),
 				appIdList = [];
 
@@ -38,16 +41,16 @@
 
 			if (openState) {
 				$('.app-list-toggle.icon-minus-9x9').each(function(){
+					$(this).toggleClass('icon-minus-9x9');
+					$('tr[parent_app_id=' + $(this).data('appId') + ']').hide();
 					appIdList.push($(this).data('appId'));
-					// click on all opened toggle buttons
-					$(this).trigger('click', true);
 				});
 			}
 			else {
 				$('.app-list-toggle').not('.icon-minus-9x9').each(function(){
+					$(this).toggleClass('icon-minus-9x9');
+					$('tr[parent_app_id=' + $(this).data('appId') + ']').show();
 					appIdList.push($(this).data('appId'));
-					// click on all closed toggle buttons
-					$(this).trigger('click', true);
 				});
 			}
 
@@ -57,6 +60,9 @@
 
 			rebuildRowColoring();
 
+			// this is for Opera browser with large tables, which renders table layout while showing/hidding rows
+			$('.tableinfo').fadeTo(0, 1);
+
 			// store toggle state in DB
 			var url = new Curl('latest.php?output=ajax');
 			url.addSID();
@@ -64,12 +70,14 @@
 		});
 
 		// click event for every toggle (+-) button
-		$('.app-list-toggle').click(function(e, fromTrigger){
+		$('.app-list-toggle').click(function(){
 			var appId = $(this).data('appId'),
 				openState = $(this).data('openState');
 
 			// hide/show all corresponding toggle sub rows
-			$('tr[parent_app_id=' + appId + ']').toggle();
+			var hidden = $(this).parent().parent().next().css('display') == 'none'
+			$('tr[parent_app_id=' + appId + ']')[(hidden ? 'show' : 'hide')]();
+
 			// switch between + and - icon
 			$(this).toggleClass('icon-minus-9x9');
 
@@ -77,24 +85,22 @@
 			openState = openState ? 0 : 1;
 			$(this).data('openState', openState);
 
-			// only if clicked directly
-			if (typeof fromTrigger === 'undefined') {
-				// if at least one toggle is opened, make main toggle as -
-				if (openState) {
-					$('.app-list-toggle-all').addClass('icon-minus-9x9').data('openState', 1);
-				}
-				// if all toggles are closed, make main toggle as +
-				else if (!$('.app-list-toggle.icon-minus-9x9').length) {
-					$('.app-list-toggle-all').removeClass('icon-minus-9x9').data('openState', 0);
-				}
-
-				rebuildRowColoring();
-
-				// store toggle state in DB
-				var url = new Curl('latest.php?output=ajax');
-				url.addSID();
-				$.post(url.getUrl(), { favobj: 'toggle', toggle_ids: appId, toggle_open_state: openState });
+			// if at least one toggle is opened, make main toggle as -
+			if (openState) {
+				$('.app-list-toggle-all').addClass('icon-minus-9x9').data('openState', 1);
 			}
+			// if all toggles are closed, make main toggle as +
+			else if (!$('.app-list-toggle.icon-minus-9x9').length) {
+				$('.app-list-toggle-all').removeClass('icon-minus-9x9').data('openState', 0);
+			}
+
+			rebuildRowColoring();
+
+			// store toggle state in DB
+			var url = new Curl('latest.php?output=ajax');
+			url.addSID();
+			$.post(url.getUrl(), { favobj: 'toggle', toggle_ids: appId, toggle_open_state: openState });
+
 		});
 	});
 </script>
