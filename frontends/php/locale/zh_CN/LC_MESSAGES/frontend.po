@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-02-05 11:42+0200\n"
+"POT-Creation-Date: 2013-02-20 19:29+0200\n"
 "PO-Revision-Date: 2012-11-14 06:55+0200\n"
 "Last-Translator: wen <51netpro@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -49,7 +49,7 @@ msgstr[0] "%1$d 方案"
 msgid "%1$s (year %2$s)"
 msgstr "%1$s ( %2$s 年)"
 
-#: latest.php:379 latest.php:556
+#: latest.php:376 latest.php:552
 #, php-format
 msgid "%1$s Item"
 msgid_plural "%1$s Items"
@@ -77,14 +77,11 @@ msgstr[0] "%d个设备"
 msgid "(0 - infinitely)"
 msgstr "(0 -无限地)"
 
-#: include/views/configuration.hostgroups.list.php:31
-msgid "(Only Super Admins can create group)"
-msgstr "(仅超级管理员可以创建组)"
-
 #: include/views/configuration.host.edit.php:193
+#: include/views/configuration.hostgroups.list.php:31
 #: include/views/configuration.template.edit.php:143
-msgid "(Only superadmins can create group)"
-msgstr "(仅超级管理员可以创建组)"
+msgid "(Only super admins can create groups)"
+msgstr ""
 
 #: include/forms.inc.php:539 include/forms.inc.php:554
 msgid "(in days)"
@@ -1142,7 +1139,7 @@ msgstr "无法自触发器\"%1$s:%2$s\" 添加相依关系到不存在的触发�
 msgid "Cannot add discovery rule"
 msgstr "无法添加自动发现的规则"
 
-#: graphs.php:226
+#: graphs.php:225
 msgid "Cannot add graph"
 msgstr "无法添加图表"
 
@@ -1280,7 +1277,7 @@ msgstr "无法克隆触发器原型"
 msgid "Cannot connect to the trapper port of zabbix server daemon, but it should be available to run the script."
 msgstr "无法连接到系统主机主控程序的捉捕器的端口, 但是它应该可用的..."
 
-#: graphs.php:290
+#: graphs.php:289
 msgid "Cannot copy graphs"
 msgstr "无法复制图形"
 
@@ -1365,7 +1362,7 @@ msgstr "无法删除发现规则"
 msgid "Cannot delete discovery rules"
 msgstr "无法删除发现规则"
 
-#: graphs.php:237
+#: graphs.php:236
 msgid "Cannot delete graph"
 msgstr "无法删除图形"
 
@@ -1377,7 +1374,7 @@ msgstr "无法删除图原型"
 msgid "Cannot delete graph."
 msgstr "无法删除图形."
 
-#: graphs.php:244
+#: graphs.php:243
 msgid "Cannot delete graphs"
 msgstr "无法删除图形"
 
@@ -1876,7 +1873,7 @@ msgstr "无法更新发现规则"
 msgid "Cannot update frontend access"
 msgstr "无法更新前端访问"
 
-#: graphs.php:223
+#: graphs.php:222
 msgid "Cannot update graph"
 msgstr "无法更新图形"
 
@@ -2309,7 +2306,7 @@ msgstr "发现的配置"
 msgid "Configuration of discovery rules"
 msgstr "发现规则的配置"
 
-#: graphs.php:27
+#: graphs.php:26
 msgid "Configuration of graphs"
 msgstr "图形的配置"
 
@@ -4727,7 +4724,7 @@ msgstr "渐层线"
 #: include/audit.inc.php:29 include/blocks.inc.php:1120
 #: include/screens.inc.php:30 include/views/configuration.graph.edit.php:287
 #: include/views/monitoring.charts.php:27
-#: include/views/monitoring.history.php:60 latest.php:320 latest.php:498
+#: include/views/monitoring.history.php:60 latest.php:318 latest.php:495
 #: report2.php:240
 msgid "Graph"
 msgstr "图形"
@@ -4779,11 +4776,11 @@ msgstr "略过图形\"%1$s\"-用户规则."
 msgid "Graph \"%1$s\" with templated items cannot contain items from other hosts."
 msgstr "含模板项目的图形\"%1$s\"不能包含其它主机的项目."
 
-#: graphs.php:226
+#: graphs.php:225
 msgid "Graph added"
 msgstr "图形已添加"
 
-#: graphs.php:237
+#: graphs.php:236
 msgid "Graph deleted"
 msgstr "图形已删除"
 
@@ -4834,7 +4831,7 @@ msgstr "图形总合"
 msgid "Graph type"
 msgstr "图形类别"
 
-#: graphs.php:223
+#: graphs.php:222
 msgid "Graph updated"
 msgstr "图形已更新"
 
@@ -4861,11 +4858,11 @@ msgstr "同名但不同类型的图形已存在."
 msgid "Graphs"
 msgstr "图形"
 
-#: graphs.php:290
+#: graphs.php:289
 msgid "Graphs copied"
 msgstr "图形已复制"
 
-#: graphs.php:244
+#: graphs.php:243
 msgid "Graphs deleted"
 msgstr "图形已删除"
 
@@ -5026,7 +5023,7 @@ msgstr "硬件环境"
 msgid "Hardware (Full details)"
 msgstr "硬件(全细节)"
 
-#: graphs.php:44 include/views/configuration.graph.edit.php:55
+#: graphs.php:43 include/views/configuration.graph.edit.php:55
 #: include/views/configuration.graph.list.php:79
 #: include/views/configuration.screen.constructor.edit.php:574
 #: include/views/configuration.sysmap.edit.php:47
@@ -5077,7 +5074,7 @@ msgstr "严重"
 #: history.php:27 include/forms.inc.php:853 include/page_header.php:455
 #: include/views/configuration.item.list.php:59
 #: include/views/configuration.item.prototype.list.php:54 jsLoader.php:108
-#: latest.php:196 latest.php:323 latest.php:501
+#: latest.php:196 latest.php:321 latest.php:498
 msgid "History"
 msgstr "历史记录"
 
@@ -7841,7 +7838,7 @@ msgid "NTLM authentication"
 msgstr "NTLM认证"
 
 #: actionconf.php:34 actionconf.php:157 adm.regexps.php:36 adm.regexps.php:112
-#: adm.regexps.php:143 disc_prototypes.php:43 graphs.php:42
+#: adm.regexps.php:143 disc_prototypes.php:43 graphs.php:41
 #: host_discovery.php:41 hostinventories.php:159 hosts.php:651 hosts.php:682
 #: httpconf.php:43 httpmon.php:142 include/forms.inc.php:550
 #: include/forms.inc.php:1770 include/hosts.inc.php:114
@@ -8365,10 +8362,6 @@ msgstr "没有已定义的操作."
 
 #: include/classes/import/CConfigurationImport.php:820
 #: include/classes/import/CConfigurationImport.php:897
-#, php-format
-msgid "No permission for Graph \"%1$s\"."
-msgstr "无图形\"%s\"的许可权"
-
 #: include/classes/import/CXmlImport18.php:1552
 #, php-format
 msgid "No permission for graph \"%1$s\"."
@@ -8534,7 +8527,7 @@ msgstr "没有已定义的步骤."
 msgid "No target selected"
 msgstr "没有选择目标"
 
-#: graphs.php:294 items.php:609
+#: graphs.php:293 items.php:609
 msgid "No target selected."
 msgstr "没有已选的目标"
 
@@ -9420,19 +9413,11 @@ msgstr "密码不能为空"
 msgid "Peak memory usage: %s"
 msgstr "高峰记忆体用量: %s"
 
-#: graphs.php:54
-msgid "Percentile line (Left)"
-msgstr "百分比线(左)"
-
-#: graphs.php:55
-msgid "Percentile line (Right)"
-msgstr "百分比线(右)"
-
-#: include/views/configuration.graph.edit.php:144
+#: graphs.php:53 include/views/configuration.graph.edit.php:144
 msgid "Percentile line (left)"
 msgstr "百分比线(左)"
 
-#: include/views/configuration.graph.edit.php:156
+#: graphs.php:54 include/views/configuration.graph.edit.php:156
 msgid "Percentile line (right)"
 msgstr "百分比线(右)"
 
@@ -12240,8 +12225,8 @@ msgid "Unable to select configuration."
 msgstr "不能选择配置."
 
 #: include/classes/helpers/CUploadFile.php:57
-msgid "Unable to uploade file because \"file_uploads\" is disabled."
-msgstr "不能上传文件, 因为 \"file_uploads\"是停用的."
+msgid "Unable to upload file because \"file_uploads\" is disabled."
+msgstr ""
 
 #: include/maps.inc.php:695 include/maps.inc.php:785 include/maps.inc.php:883
 msgid "Unacknowledged"
@@ -12958,7 +12943,7 @@ msgstr "每周"
 msgid "When active"
 msgstr "当活动时"
 
-#: graphs.php:43 include/views/configuration.graph.edit.php:54
+#: graphs.php:42 include/views/configuration.graph.edit.php:54
 #: include/views/configuration.graph.list.php:78
 #: include/views/configuration.screen.constructor.edit.php:573
 #: include/views/configuration.sysmap.edit.php:46
@@ -13251,8 +13236,8 @@ msgstr "您没有指定目标为动作操作的全局脚本\"%s\"."
 #: api/classes/CGraph.php:709 api/classes/CGraphPrototype.php:758
 #: api/classes/CHostGroup.php:684 api/classes/CHostGroup.php:742
 #: api/classes/CHostGroup.php:894 api/classes/CHostGroup.php:949
-#: api/classes/CHostGroup.php:994 api/classes/CHostGroup.php:1006
-#: api/classes/CHostGroup.php:1021 api/classes/CHost.php:1604
+#: api/classes/CHostGroup.php:994 api/classes/CHostGroup.php:1007
+#: api/classes/CHostGroup.php:1023 api/classes/CHost.php:1604
 #: api/classes/CHost.php:1658 api/classes/CHost.php:1972
 #: api/classes/CMaintenance.php:608 api/classes/CMaintenance.php:715
 #: api/classes/CMaintenance.php:727 api/classes/CScript.php:300
@@ -13520,7 +13505,7 @@ msgstr "d M Y H:i"
 #: include/translateDefines.inc.php:46
 #: include/views/administration.auditacts.list.php:113
 #: include/views/administration.auditlogs.list.php:106 jsrpc.php:137
-#: latest.php:289 latest.php:464 tr_status.php:177 tr_status.php:658
+#: latest.php:287 latest.php:461 tr_status.php:177 tr_status.php:658
 #: tr_status.php:748
 msgid "d M Y H:i:s"
 msgstr "d M H:i:s"
