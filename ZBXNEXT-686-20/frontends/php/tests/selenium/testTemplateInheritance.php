@@ -183,7 +183,7 @@ class testTemplateInheritance extends CWebTest {
 		$this->zbxTestClick('tab_templateTab');
 		sleep(1);
 		$this->zbxTestClickWait('unlink_and_clear_10050');
-		$this->bzbxTestClickWait('save');
+		$this->zbxTestClickWait('save');
 
 		$this->zbxTestTextPresent('Host updated');
 	}
