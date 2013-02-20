@@ -279,6 +279,7 @@ class testFormItem extends CWebTest {
 			$this->ok('Additional parameters');
 			$this->assertVisible('params_ap');
 			$this->assertAttribute("//textarea[@id='params_ap']/@rows", 7);
+			$this->assertAttribute("//*[@id='params_ap']/text()", 'DSN=<database source name> user=<user name> password=<password> sql=<query>');
 		}
 		else {
 			$this->nok('Additional parameters');
@@ -404,6 +405,8 @@ class testFormItem extends CWebTest {
 			$this->assertVisible('snmp_oid');
 			$this->assertAttribute("//input[@id='snmp_oid']/@maxlength", 255);
 			$this->assertAttribute("//input[@id='snmp_oid']/@size", 50);
+			$this->assertAttribute("//input[@id='snmp_oid']/@value", 'interfaces.ifTable.ifEntry.ifInOctets.1');
+
 
 			$this->ok('Port');
 			$this->assertVisible('port');
@@ -423,6 +426,7 @@ class testFormItem extends CWebTest {
 			$this->assertVisible('snmp_community');
 			$this->assertAttribute("//input[@id='snmp_community']/@maxlength", 64);
 			$this->assertAttribute("//input[@id='snmp_community']/@size", 50);
+			$this->assertAttribute("//input[@id='snmp_community']/@value", 'public');
 		}
 		else {
 			$this->nok('SNMP community');
@@ -577,7 +581,7 @@ class testFormItem extends CWebTest {
 			$this->assertAttribute("//input[@id='formula']/@maxlength", 255);
 			$this->assertAttribute("//input[@id='formula']/@size", 25);
 			$this->assertAttribute("//input[@id='formula']/@value", 1);
-			$this->assertAttribute("//input[@id='formula']/@disabled", '');
+			$this->assertElementPresent("//input[@id='formula']/@disabled");
 		}
 		else {
 			$this->nok('Units');

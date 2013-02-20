@@ -84,7 +84,8 @@ if (isset($_REQUEST['sysmapid'])) {
 	$maps = API::Map()->get(array(
 		'sysmapids' => $_REQUEST['sysmapid'],
 		'editable' => true,
-		'output' => API_OUTPUT_EXTEND
+		'output' => API_OUTPUT_EXTEND,
+		'selectUrls' => API_OUTPUT_EXTEND
 	));
 
 	if (empty($maps)) {

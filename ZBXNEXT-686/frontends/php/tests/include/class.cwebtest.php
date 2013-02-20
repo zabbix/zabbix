@@ -72,7 +72,7 @@ class CWebTest extends PHPUnit_Extensions_SeleniumTestCase {
 		global $DB;
 
 		$this->setHost(PHPUNIT_FRONTEND_HOST);
-		$this->setBrowser('*firefox');
+		$this->setBrowser('*custom /usr/lib/firefox/firefox');
 		if (strstr(PHPUNIT_URL, 'http://')) {
 			$this->setBrowserUrl(PHPUNIT_URL);
 		}
@@ -216,10 +216,18 @@ class CWebTest extends PHPUnit_Extensions_SeleniumTestCase {
 	public function zbxLaunchPopup($buttonId, $windowId = 'zbx_popup') {
 		// $this->button_click('add');
 		// the above does not seem to work, thus this ugly method has to be used - at least until buttons get unique names...
+/*
 		$this->click("//input[@id='$buttonId' and contains(@onclick, 'return PopUp')]");
-		$this->waitForPopUp($windowId, 6000);
-		$this->selectWindow($windowId);
+		$this->waitForPopUp($windowId, 30000);
+		$this->selectWindow('name='.$windowId);
 		$this->checkFatalErrors();
+*/
+		$this->button_click($buttonId);
+		sleep(1);
+		$this->waitForPopUp($windowId, 30000);
+		$this->selectWindow('name='.$windowId);
+		$this->checkFatalErrors();
+
 	}
 
 	public function zbxGetDropDownElements($dropdownId) {

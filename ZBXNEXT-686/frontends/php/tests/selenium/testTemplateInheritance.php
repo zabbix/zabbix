@@ -20,8 +20,8 @@
 
 require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
-define('ITEM_GOOD', 0);
-define('ITEM_BAD', 1);
+define('TEST_GOOD', 0);
+define('TEST_BAD', 1);
 
 /**
  * Test the creation of inheritance of new objects on a previously linked template.
@@ -47,10 +47,236 @@ class testTemplateInheritance extends CWebTest {
 	 * Backup the tables that will be modified during the tests.
 	 */
 	public function testTemplateInheritance_setup() {
-		DBsave_tables('items');
+		DBsave_tables('hosts');
 	}
 
-	public function testFormItem_linkHost(){
+
+	// returns data for simple template checks
+	public static function simple() {
+		return array(
+			array(
+				array('expected' => TEST_GOOD,
+					'template' => 'Inheritance test template',
+					'host'=> 'Template inheritance test host',
+					'hostId' => 30000,
+					'itemAdd' => 'itemSimple',
+					'itemKey' => 'key-template-simple',
+					'triggerAdd' => 'triggerSimple',
+					'graphAdd' => 'graphSimple',
+					'unlinkCheck' => 'Template App Zabbix Agent',
+					'unlinkHostId' => 10050,
+					'hostCheck' => true,
+					'dbCheck' => true)
+			),
+			array(
+				array('expected' => TEST_GOOD,
+					'template' => 'Inheritance test template',
+					'host'=> 'Template inheritance test host',
+					'hostId' => 30000,
+					'itemAdd' => 'itemName',
+					'itemKey' => 'key-template-item',
+					'graphAdd' => 'graphName',
+					'hostCheck' => true)
+			),
+			array(
+				array('expected' => TEST_GOOD,
+					'template' => 'Inheritance test template',
+					'host'=> 'Template inheritance test host',
+					'hostId' => 30000,
+					'itemAdd' => 'itemTrigger',
+					'itemKey' => 'key-template-trigger',
+					'triggerAdd' => 'triggerName',
+					'hostCheck' => true,
+					'dbCheck' => true)
+			)
+		);
+	}
+
+	/**
+	 * @dataProvider simple
+	 */
+	public function testTemplateInheritance_simpleCreate($data) {
+		$this->login('templates.php');
+
+		$template = $data['template'];
+		$host = $data['host'];
+		$hostId = $data['hostId'];
+
+		// check template is linked to host TODO ask if needs to be checked
+		$this->open('hosts.php');
+		$this->wait();
+		$this->button_click("link=$host");
+		$this->wait();
+		$this->button_click('tab_templateTab');
+		sleep(1);
+		$this->ok('Inheritance test template');
+		$this->assertElementPresent("unlink_and_clear_$hostId");
+
+		if (isset($data['itemAdd'])) {
+			$itemName = $data['itemAdd'];
+			$keyName = $data['itemKey'];
+
+			$this->open('templates.php');
+			$this->button_click("link=$template");
+			$this->wait();
+			$this->button_click('link=Items');
+			$this->wait();
+			$this->button_click('form');
+			$this->wait();
+
+			$this->input_type('name', $itemName);
+			$this->input_type('key', $data['itemKey']);
+			$this->button_click('save');
+			$this->wait();
+
+// TODO if item good-check its added/bad-check errors
+
+			if (isset($data['hostCheck'])) {
+				$this->open('hosts.php');
+				$this->wait();
+				$this->button_click("link=$host");
+				$this->wait();
+				$this->button_click('link=Items');
+				$this->wait();
+
+				$this->ok("$template: $itemName");
+				$this->button_click("link=$itemName");
+				$this->wait();
+				$this->assertElementValue('name', $itemName);
+				$this->assertElementValue('key', $keyName);
+			}
+
+			if (isset($data['dbCheck'])) {
+				$result = DBselect("SELECT name, key_, value_type, data_type FROM items where key_ = '".$keyName."'");
+				while ($row = DBfetch($result)) {
+					$this->assertEquals($row['name'], $itemName);
+					$this->assertEquals($row['key_'], $keyName);
+				}
+			}
+		}
+
+		if (isset($data['triggerAdd'])) {
+			$this->open('templates.php');
+			$this->button_click("link=$template");
+			$this->wait();
+			$this->button_click("//div[@class='w']//a[text()='Triggers']");
+			$this->wait();
+			$this->button_click('form');
+			$this->wait();
+
+			$description = $data['triggerAdd'];
+			$expression = '{'.$template.':'.$keyName.'.last(0)}=0';
+			$this->input_type('description', $description);
+			$this->input_type('expression', $expression);
+			$this->button_click('save');
+			$this->wait();
+
+// TODO if trigger good-check its added/bad-check errors
+
+			if (isset($data['hostCheck'])) {
+				$this->open('hosts.php');
+				$this->wait();
+				$this->button_click("link=$host");
+				$this->wait();
+				$this->button_click("//div[@class='w']//a[text()='Triggers']");
+				$this->wait();
+
+				$this->ok("$template: $description");
+				$this->button_click("link=$description");
+				$this->wait();
+
+				$expressionHost = '{'.$host.':'.$keyName.'.last(0)}=0';
+				$this->assertElementValue('description', $description);
+				$this->assertElementValue('expression', $expressionHost);
+			}
+
+			if (isset($data['dbCheck'])) {
+				$result = DBselect("SELECT description FROM triggers where description = '".$description."'");
+				while ($row = DBfetch($result)) {
+					$this->assertEquals($row['description'], $description);
+				}
+			}
+		}
+
+		if (isset($data['graphAdd'])) {
+			$this->open('templates.php');
+			$this->button_click("link=$template");
+			$this->wait();
+			$this->button_click("//div[@class='w']//a[text()='Graphs']");
+			$this->wait();
+			$this->button_click('form');
+			$this->wait();
+
+			$graphName = $data['graphAdd'];
+			$this->input_type('name', $graphName);
+			$this->zbxLaunchPopup('add_item');
+			$this->button_click("link=$itemName");
+			$this->selectWindow(null);
+			sleep(1);
+
+			$this->button_click('save');
+			$this->wait();
+
+// TODO if graph good-check its added/bad-check errors
+
+			if (isset($data['hostCheck'])) {
+				$this->open('hosts.php');
+				$this->wait();
+				$this->button_click("link=$host");
+				$this->wait();
+				$this->button_click("//div[@class='w']//a[text()='Graphs']");
+				$this->wait();
+
+				$this->ok("$template: $graphName");
+				$this->button_click("link=$graphName");
+				$this->wait();
+
+				$this->assertElementValue('name', $graphName);
+				$this->assertElementPresent("//span[text()='$host: $itemName']");
+			}
+
+			if (isset($data['dbCheck'])) {
+			}
+		}
+
+		if (isset($data['unlinkCheck'])) {
+			$hostUnlink = $data['unlinkCheck'];
+			$unlinkHostId =$data['unlinkHostId'];
+
+			// link host
+			$this->button_click("//div[@id='sub_config']//a[text()='Hosts']");
+			$this->wait();
+			$this->button_click("link=$host");
+			$this->wait();
+
+			$this->button_click('tab_templateTab');
+
+			$this->zbxLaunchPopup('//*[@id="add"][@value="Add"]');
+			$this->checkbox_select("//*[@value='".$hostUnlink."']");
+			$this->button_click('select');
+			$this->selectWindow(null);
+
+			$this->wait();
+			$this->button_click('save');
+
+			$this->wait();
+			$this->ok('Host updated');
+
+			// unlink host
+			$this->button_click("link=$host");
+			$this->wait();
+
+			$this->button_click('tab_templateTab');
+			sleep(1);
+			$this->button_click("unlink_and_clear_$unlinkHostId");
+			$this->wait();
+			$this->button_click('save');
+
+			$this->wait();
+			$this->ok('Host updated');
+		}
+	}
+/*	public function testFormItem_linkHost(){
 		$this->login('hosts.php');
 		$this->button_click('link='.$this->hostName);
 		$this->wait();
@@ -104,11 +330,11 @@ class testTemplateInheritance extends CWebTest {
 				)
 			);
 	}
-
+*/
 	/**
 	 * @dataProvider dataCreate
 	 */
-	public function testFormItem_Create($result, $template, $itemName, $keyName, $errorMsgs) {
+/*	public function testFormItem_Create($result, $template, $itemName, $keyName, $errorMsgs) {
 		$this->login('templates.php');
 
 		// create an item
@@ -199,13 +425,13 @@ class testTemplateInheritance extends CWebTest {
 
 		$this->wait();
 		$this->ok('Host updated');
-	}
+	}*/
 	/**
 	 * Creates a new trigger on the template and checks that the inherited trigger matches the original.
 	 *
 	 * @todo
 	 */
-	public function testTemplateInheritance_CreateTrigger() {
+/*	public function testTemplateInheritance_CreateTrigger() {
 		$this->login('templates.php');
 
 		// create a trigger
@@ -247,13 +473,13 @@ class testTemplateInheritance extends CWebTest {
 		$this->assertTrue($this->isChecked('severity_2'));
 		$this->assertFalse($this->isChecked('status'));
 	}
-
+*/
 	/**
 	 * Creates a new graph on the template and checks that the inherited graph matches the original.
 	 *
 	 * @todo
 	 */
-	public function testTemplateInheritance_CreateGraph() {
+/*	public function testTemplateInheritance_CreateGraph() {
 		$this->login('templates.php');
 
 		// create a graph
@@ -312,7 +538,7 @@ class testTemplateInheritance extends CWebTest {
 		$this->assertAttribute('//*[@id="ymax_type"]/option[1]/@selected', 'selected');
 		$this->ok('Template inheritance test host: Test LLD item1');
 	}
-
+*/
 	/**
 	 * Creates a new LLD rule on the template and checks that the inherited LLD rule matches the original.
 	 *
@@ -364,7 +590,7 @@ class testTemplateInheritance extends CWebTest {
 		$this->assertElementText('description', 'description');
 		$this->assertDrowpdownValueText('status', 'Disabled');
 	}
-
+*/
 	/**
 	 * Creates a new trigger prototype on the template and checks that the inherited item prototype matches
 	 * the original.
@@ -373,7 +599,7 @@ class testTemplateInheritance extends CWebTest {
 	 * @todo match flexible intervals
 	 * @todo match value mappings
 	 */
-	public function testTemplateInheritance_CreateItemPrototype() {
+/*	public function testTemplateInheritance_CreateItemPrototype() {
 		$this->login('templates.php');
 
 		// create an item prototype
@@ -434,13 +660,13 @@ class testTemplateInheritance extends CWebTest {
 		$this->assertElementText('description', 'description');
 		$this->assertElementValue('delta_name', 'Delta (simple change)');
 	}
-
+*/
 	/**
 	 * Creates a new trigger prototype on the template and checks that the inherited trigger prototype matches
 	 * the original.
 	 *
 	 */
-	public function testTemplateInheritance_CreateTriggerPrototype() {
+/*	public function testTemplateInheritance_CreateTriggerPrototype() {
 		$this->login('templates.php');
 
 		// create a trigger prototype
@@ -489,12 +715,12 @@ class testTemplateInheritance extends CWebTest {
 		$this->assertTrue($this->isChecked('severity_2'));
 		$this->assertFalse($this->isChecked('status'));
 	}
-
+*/
 	/**
 	 * Creates a new graph prototype on the template and checks that the inherited graph prototype matches the original.
 	 *
 	 */
-	public function testTemplateInheritance_CreateGraphPrototype() {
+/*	public function testTemplateInheritance_CreateGraphPrototype() {
 		$this->login('templates.php');
 
 		// create a graph
@@ -571,11 +797,11 @@ class testTemplateInheritance extends CWebTest {
 		$this->ok('Template inheritance test host: Test LLD item');
 		$this->ok('Template inheritance test host: Test LLD item1');
 	}
-
+*/
 	/**
 	 * Restore the original tables.
 	 */
 	public function testTemplateInheritance_teardown() {
-		DBrestore_tables('items');
+		DBrestore_tables('hosts');
 	}
 }

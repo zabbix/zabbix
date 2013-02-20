@@ -384,7 +384,7 @@ int	main(int argc, char **argv)
 			if (1 == REAL_TIME)
 			{
 				/* set line buffering on stdin */
-				setvbuf(stdin, (char *)NULL, _IOLBF, 0);
+				setvbuf(stdin, (char *)NULL, _IOLBF, 1024);
 			}
 		}
 		else if (NULL == (in = fopen(INPUT_FILE, "r")) )
