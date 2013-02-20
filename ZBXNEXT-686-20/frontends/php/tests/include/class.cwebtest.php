@@ -222,7 +222,7 @@ class CWebTest extends PHPUnit_Extensions_SeleniumTestCase {
 	}
 
 	// zbx_popup is the default opened window id if none is passed
-	public function zbxLaunchPopup($buttonId, $windowId = 'zbx_popup') {
+	public function zbxTestLaunchPopup($buttonId, $windowId = 'zbx_popup') {
 		// the above does not seem to work, thus this ugly method has to be used - at least until buttons get unique names...
 		$this->click("//input[@id='$buttonId' and contains(@onclick, 'return PopUp')]");
 		$this->waitForPopUp($windowId, 6000);
@@ -301,10 +301,10 @@ class CWebTest extends PHPUnit_Extensions_SeleniumTestCase {
 
 		// adds template $template to the list of linked templates
 		// for now, ignores the fact that template might be already linked
-		$this->zbxLaunchPopup('add');
+		$this->zbxTestLaunchPopup('add');
 		$this->zbxTestDropdownSelectWait('groupid', 'Templates');
 		$this->check("//input[@value='$template' and @type='checkbox']");
-		$this->zbxTestClick('selet');
+		$this->zbxTestClick('select');
 		$this->selectWindow();
 		$this->wait();
 		$this->zbxTestClickWait('save');
