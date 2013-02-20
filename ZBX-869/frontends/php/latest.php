@@ -331,10 +331,10 @@ foreach ($dbItems as $db_item){
 		SPACE,
 		is_show_all_nodes()?SPACE:null,
 		($_REQUEST['hostid']>0)?NULL:SPACE,
-		new CCol(SPACE.SPACE.$description, $item_status),
-		new CCol($lastclock, $item_status),
-		new CCol($lastvalue, $item_status),
-		new CCol($change, $item_status),
+		new CCol(new CDiv(SPACE.SPACE.$description, $item_status)),
+		new CCol(new CDiv($lastclock, $item_status)),
+		new CCol(new CDiv($lastvalue, $item_status)),
+		new CCol(new CDiv($change, $item_status)),
 		$actions
 	)));
 }
@@ -366,6 +366,7 @@ foreach ($db_apps as $appid => $dbApp) {
 		$hostSpan = new CSpan($host['name'], 'link_menu menu-host');
 		$scripts = $hostScripts[$host['hostid']];
 		$hostSpan->setAttribute('data-menu', hostMenuData($host, $scripts));
+		$hostSpan = new CDiv($hostSpan);
 	}
 
 	// add toggle row
@@ -517,11 +518,11 @@ foreach ($dbItems as $db_item){
 		SPACE,
 		is_show_all_nodes() ? ($db_host['item_cnt'] ? SPACE : get_node_name_by_elid($db_item['itemid'])) : null,
 		$_REQUEST['hostid'] ? null : SPACE,
-		new CCol(SPACE.SPACE.$description, $item_status),
-		new CCol($lastclock, $item_status),
-		new CCol($lastvalue, $item_status),
-		new CCol($change, $item_status),
-		new CCol($actions, $item_status)
+		new CCol(new CDiv(SPACE.SPACE.$description, $item_status)),
+		new CCol(new CDiv($lastclock, $item_status)),
+		new CCol(new CDiv($lastvalue, $item_status)),
+		new CCol(new CDiv($change, $item_status)),
+		new CCol(new CDiv($actions, $item_status))
 	)));
 }
 unset($app_rows);
