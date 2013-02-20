@@ -487,26 +487,28 @@ DB_RESULT	DBselectN(const char *query, int n)
  * Comments: do not update value if there are dependencies with value PROBLEM *
  *                                                                            *
  ******************************************************************************/
-int	DBget_trigger_update_sql(char **sql, size_t *sql_alloc, size_t *sql_offset, zbx_uint64_t triggerid,
-		const char *description, const char *expression, unsigned char priority, unsigned char type, int value,
-		int state, const char *error, int lastchange, int new_value, const char *new_error,
-		zbx_timespec_t *new_lastchange)
+static int	DBget_trigger_update_sql(char **sql, size_t *sql_alloc, size_t *sql_offset, const DC_TRIGGER *trigger)
 {
 	const char	*__function_name = "DBget_trigger_update_sql";
+
 	const char	*new_error_local;
 	char		*new_error_esc;
-	int		new_state, value_changed, state_changed, multiple_problem, error_changed, ret = FAIL;
+	int		new_state, new_value, new_lastchange, value_changed, state_changed, multiple_problem,
+			error_changed, ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() triggerid:" ZBX_FS_UI64 " value:%d(%d) new_value:%d",
-			__function_name, triggerid, value, state, new_value);
+			__function_name, trigger->triggerid, trigger->value, trigger->state, trigger->new_value);
 
-	if (TRIGGER_VALUE_UNKNOWN == new_value)
+	if (TRIGGER_VALUE_UNKNOWN == trigger->new_value)
 	{
 		new_state = TRIGGER_STATE_UNKNOWN;
-		new_value = value;
+		new_value = trigger->value;
 	}
 	else
+	{
 		new_state = TRIGGER_STATE_NORMAL;
+		new_value = trigger->new_value;
+	}
 
 	/**************************************************************************************************/
 	/*                                                                                                */
@@ -540,17 +542,19 @@ int	DBget_trigger_update_sql(char **sql, size_t *sql_alloc, size_t *sql_offset, 
 	/*                                                                                                */
 	/**************************************************************************************************/
 
-	new_error_local = (NULL == new_error ? "" : new_error);
+	new_error_local = (NULL == trigger->new_error ? "" : trigger->new_error);
+	new_lastchange = trigger->timespec.sec;
 
-	value_changed = (value != new_value || (0 == lastchange && TRIGGER_STATE_UNKNOWN != new_state));
-	state_changed = (state != new_state);
-	multiple_problem = (TRIGGER_TYPE_MULTIPLE_TRUE == type && TRIGGER_VALUE_PROBLEM == new_value &&
+	value_changed = (trigger->value != new_value ||
+			(0 == trigger->lastchange && TRIGGER_STATE_UNKNOWN != new_state));
+	state_changed = (trigger->state != new_state);
+	multiple_problem = (TRIGGER_TYPE_MULTIPLE_TRUE == trigger->type && TRIGGER_VALUE_PROBLEM == new_value &&
 			TRIGGER_STATE_NORMAL == new_state);
-	error_changed = (0 != strcmp(error, new_error_local));
+	error_changed = (0 != strcmp(trigger->error, new_error_local));
 
 	if (0 != value_changed || 0 != state_changed || 0 != multiple_problem || 0 != error_changed)
 	{
-		if (SUCCEED == DCconfig_check_trigger_dependencies(triggerid))
+		if (SUCCEED == DCconfig_check_trigger_dependencies(trigger->triggerid))
 		{
 			if (NULL == *sql)
 			{
@@ -562,17 +566,18 @@ int	DBget_trigger_update_sql(char **sql, size_t *sql_alloc, size_t *sql_offset, 
 
 			if (0 != value_changed || 0 != multiple_problem)
 			{
-				DCconfig_set_trigger_value(triggerid, new_value, new_state, new_error_local,
-						&new_lastchange->sec);
+				DCconfig_set_trigger_value(trigger->triggerid, new_value, new_state, new_error_local,
+						&new_lastchange);
 
-				add_event(0, EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, triggerid, new_lastchange,
-						new_value, description, expression, priority, type);
+				add_event(0, EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, trigger->triggerid,
+						&trigger->timespec, new_value, trigger->description,
+						trigger->expression_orig, trigger->priority, trigger->type);
 
-				zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "lastchange=%d,", new_lastchange->sec);
+				zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "lastchange=%d,", new_lastchange);
 			}
 			else
 			{
-				DCconfig_set_trigger_value(triggerid, new_value, new_state, new_error_local,
+				DCconfig_set_trigger_value(trigger->triggerid, new_value, new_state, new_error_local,
 						NULL);
 			}
 
@@ -581,8 +586,9 @@ int	DBget_trigger_update_sql(char **sql, size_t *sql_alloc, size_t *sql_offset, 
 
 			if (0 != state_changed)
 			{
-				add_event(0, EVENT_SOURCE_INTERNAL, EVENT_OBJECT_TRIGGER, triggerid, new_lastchange,
-						new_state, description, expression, priority, type);
+				add_event(0, EVENT_SOURCE_INTERNAL, EVENT_OBJECT_TRIGGER, trigger->triggerid,
+						&trigger->timespec, new_state, trigger->description,
+						trigger->expression_orig, trigger->priority, trigger->type);
 
 				zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "state=%d,", new_state);
 			}
@@ -596,7 +602,8 @@ int	DBget_trigger_update_sql(char **sql, size_t *sql_alloc, size_t *sql_offset, 
 
 			(*sql_offset)--;
 
-			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, " where triggerid=" ZBX_FS_UI64, triggerid);
+			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, " where triggerid=" ZBX_FS_UI64,
+					trigger->triggerid);
 
 			ret = SUCCEED;
 		}
@@ -605,6 +612,45 @@ int	DBget_trigger_update_sql(char **sql, size_t *sql_alloc, size_t *sql_offset, 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
+}
+
+void	process_triggers(zbx_vector_ptr_t *triggers)
+{
+	const char		*__function_name = "process_triggers";
+
+	char			*sql = NULL;
+	size_t			sql_alloc = 16 * ZBX_KIBIBYTE, sql_offset = 0;
+	int			i;
+	DC_TRIGGER		*trigger;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() values_num:%d", __function_name, triggers->values_num);
+
+	if (0 == triggers->values_num)
+		goto out;
+
+	sql = zbx_malloc(sql, sql_alloc);
+
+	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	for (i = 0; i < triggers->values_num; i++)
+	{
+		trigger = (DC_TRIGGER *)triggers->values[i];
+
+		if (SUCCEED == DBget_trigger_update_sql(&sql, &sql_alloc, &sql_offset, trigger))
+		{
+			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
+			DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+		}
+	}
+
+	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	if (sql_offset > 16)	/* in ORACLE always present begin..end; */
+		DBexecute("%s", sql);
+
+	zbx_free(sql);
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 void	DBadd_trend(zbx_uint64_t itemid, double value, int clock)

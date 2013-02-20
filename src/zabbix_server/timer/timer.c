@@ -48,10 +48,7 @@ extern int		process_num;
 static void	process_time_functions()
 {
 	const char		*__function_name = "process_time_functions";
-	char			*sql = NULL;
-	size_t			sql_alloc = 16 * ZBX_KIBIBYTE, sql_offset = 0;
-	int			i;
-	DC_TRIGGER		*trigger_info = NULL, *trigger;
+	DC_TRIGGER		*trigger_info = NULL;
 	zbx_vector_ptr_t	trigger_order;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
@@ -67,36 +64,11 @@ static void	process_time_functions()
 
 	DBbegin();
 
-	sql = zbx_malloc(sql, sql_alloc);
-
-	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-	for (i = 0; i < trigger_order.values_num; i++)
-	{
-		trigger = (DC_TRIGGER *)trigger_order.values[i];
-
-		if (SUCCEED == DBget_trigger_update_sql(&sql, &sql_alloc, &sql_offset, trigger->triggerid,
-				trigger->description, trigger->expression_orig, trigger->priority, trigger->type,
-				trigger->value, trigger->state, trigger->error, trigger->lastchange, trigger->new_value,
-				trigger->new_error, &trigger->timespec))
-		{
-			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
-			DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
-		}
-
-		zbx_free(trigger->new_error);
-	}
+	process_triggers(&trigger_order);
 
 	DCfree_triggers(&trigger_order);
 
-	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-	if (sql_offset > 16)	/* In ORACLE always present begin..end; */
-		DBexecute("%s", sql);
-
 	process_events();
-
-	zbx_free(sql);
 
 	DBcommit();
 clean:

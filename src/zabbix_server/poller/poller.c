@@ -55,18 +55,18 @@ static int	is_bunch_poller(int poller_type)
 
 static void	update_triggers_status_to_unknown(zbx_uint64_t hostid, zbx_item_type_t type, zbx_timespec_t *ts, char *reason)
 {
-	const char	*__function_name = "update_triggers_status_to_unknown";
-	DB_RESULT	result;
-	DB_ROW		row;
-	char		*sql = NULL, failed_type_buf[8];
-	size_t		sql_alloc = 16 * ZBX_KIBIBYTE, sql_offset = 0;
-	zbx_uint64_t	triggerid;
+	const char		*__function_name = "update_triggers_status_to_unknown";
+	DB_RESULT		result;
+	DB_ROW			row;
+	char			failed_type_buf[8];
+	zbx_uint64_t		triggerid;
+	zbx_vector_ptr_t	triggers;
+	DC_TRIGGER		*trigger;
+	int			i;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() hostid:" ZBX_FS_UI64, __function_name, hostid);
 
-	sql = zbx_malloc(sql, sql_alloc);
-
-	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_vector_ptr_create(&triggers);
 
 	/* determine failed item type */
 	switch (type)
@@ -164,26 +164,33 @@ static void	update_triggers_status_to_unknown(zbx_uint64_t hostid, zbx_item_type
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		ZBX_STR2UINT64(triggerid, row[0]);
+		trigger = zbx_malloc(NULL, sizeof(trigger));
+		ZBX_STR2UINT64(trigger->triggerid, row[0]);
+		trigger->description = row[1];
+		trigger->expression_orig = row[2];
+		trigger->priority = (unsigned char)atoi(row[3]);
+		trigger->type = (unsigned char)atoi(row[4]);
+		trigger->value = atoi(row[5]);
+		trigger->state = atoi(row[6]);
+		trigger->error = row[7];
+		trigger->lastchange = atoi(row[8]);
+		trigger->new_value = TRIGGER_VALUE_UNKNOWN;
+		trigger->new_error = reason;
+		trigger->timespec = *ts;
 
-		if (SUCCEED == DBget_trigger_update_sql(&sql, &sql_alloc, &sql_offset, triggerid, row[1], row[2],
-				(unsigned char)atoi(row[3]), (unsigned char)atoi(row[4]), atoi(row[5]), atoi(row[6]),
-				row[7], atoi(row[8]), TRIGGER_VALUE_UNKNOWN, reason, ts))
-		{
-			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
-			DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
-		}
+		zbx_vector_ptr_append(&triggers, trigger);
 	}
 	DBfree_result(result);
 
-	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_vector_ptr_sort(&triggers, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 
-	if (sql_offset > 16)	/* begin..end; is a must in case of ORACLE */
-		DBexecute("%s", sql);
+	process_triggers(&triggers);
 
 	process_events();
 
-	zbx_free(sql);
+	for (i = 0; i < triggers.values_num; i++)
+		zbx_free(triggers.values[i]);
+	zbx_vector_ptr_destroy(&triggers);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }

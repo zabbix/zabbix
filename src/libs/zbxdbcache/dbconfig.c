@@ -3306,6 +3306,7 @@ static void	DCget_trigger(DC_TRIGGER *dst_trigger, const ZBX_DC_TRIGGER *src_tri
 
 static void	DCclean_trigger(DC_TRIGGER *trigger)
 {
+	zbx_free(trigger->new_error);
 	zbx_free(trigger->error);
 	zbx_free(trigger->expression_orig);
 	zbx_free(trigger->description);

@@ -776,13 +776,11 @@ static void	DCsync_trends()
 static void	DCmass_update_triggers(ZBX_DC_HISTORY *history, int history_num)
 {
 	const char		*__function_name = "DCmass_update_triggers";
-	size_t			sql_offset = 0;
 	int			i, item_num = 0;
 	zbx_uint64_t		*itemids = NULL;
 	zbx_timespec_t		*timespecs = NULL;
 	zbx_hashset_t		trigger_info;
 	zbx_vector_ptr_t	trigger_order;
-	DC_TRIGGER		*trigger;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -815,30 +813,9 @@ static void	DCmass_update_triggers(ZBX_DC_HISTORY *history, int history_num)
 
 	evaluate_expressions(&trigger_order);
 
-	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-	for (i = 0; i < trigger_order.values_num; i++)
-	{
-		trigger = (DC_TRIGGER *)trigger_order.values[i];
-
-		if (SUCCEED == DBget_trigger_update_sql(&sql, &sql_alloc, &sql_offset, trigger->triggerid,
-				trigger->description, trigger->expression_orig, trigger->priority, trigger->type,
-				trigger->value, trigger->state, trigger->error, trigger->lastchange, trigger->new_value,
-				trigger->new_error, &trigger->timespec))
-		{
-			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
-			DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
-		}
-
-		zbx_free(trigger->new_error);
-	}
+	process_triggers(&trigger_order);
 
 	DCfree_triggers(&trigger_order);
-
-	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-	if (sql_offset > 16)	/* In ORACLE always present begin..end; */
-		DBexecute("%s", sql);
 clean_triggers:
 	zbx_hashset_destroy(&trigger_info);
 	zbx_vector_ptr_destroy(&trigger_order);
