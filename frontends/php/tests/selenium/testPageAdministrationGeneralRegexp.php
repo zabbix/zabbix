@@ -30,15 +30,15 @@ class testPageAdministrationGeneralRegexp extends CWebTest {
 	private $oldRegexpId = 20;
 
 	private function openRegularExpressions() {
-		$this->login('adm.gui.php');
+		$this->zbxTestLogin('adm.gui.php');
 		$this->assertElementPresent('configDropDown');
-		$this->dropdown_select_wait('configDropDown', 'Regular expressions');
+		$this->zbxTestDropdownSelectWait('configDropDown', 'Regular expressions');
 		$this->assertElementPresent('configDropDown');
 
 		$this->checkTitle('Configuration of regular expressions');
-		$this->ok('CONFIGURATION OF REGULAR EXPRESSIONS');
-		$this->ok('Regular expressions');
-		$this->ok(array('Name', 'Expressions'));
+		$this->zbxTestTextPresent('CONFIGURATION OF REGULAR EXPRESSIONS');
+		$this->zbxTestTextPresent('Regular expressions');
+		$this->zbxTestTextPresent(array('Name', 'Expressions'));
 	}
 
 	private function calculateHash($conditions = null) {
@@ -76,7 +76,7 @@ class testPageAdministrationGeneralRegexp extends CWebTest {
 		$result = DBselect('select regexpid,name from regexps');
 		while ($row = DBfetch($result)) {
 			$this->assertElementPresent('regexpids['.$row['regexpid'].']');
-			$this->ok($row['name']);
+			$this->zbxTestTextPresent($row['name']);
 		}
 
 		$this->assertElementPresent('go');
@@ -92,8 +92,8 @@ class testPageAdministrationGeneralRegexp extends CWebTest {
 
 		$this->openRegularExpressions();
 
-		$this->dropdown_select('go', 'Delete selected');
-		$this->click('goButton');
+		$this->zbxTestDropdownSelect('go', 'Delete selected');
+		$this->zbxTestClick('goButton');
 		$this->waitForAlertPresent();
 		$this->assertAlert('No elements selected!');
 
@@ -107,9 +107,9 @@ class testPageAdministrationGeneralRegexp extends CWebTest {
 
 		$this->openRegularExpressions();
 
-		$this->checkbox_select('all_regexps');
-		$this->dropdown_select('go', 'Delete selected');
-		$this->button_click('goButton');
+		$this->zbxTestCheckboxSelect('all_regexps');
+		$this->zbxTestDropdownSelect('go', 'Delete selected');
+		$this->zbxTestClick('goButton');
 		$this->waitForConfirmation();
 
 		$this->verifyHash();
@@ -122,12 +122,12 @@ class testPageAdministrationGeneralRegexp extends CWebTest {
 
 		$this->openRegularExpressions();
 
-		$this->checkbox_select('regexpids['.$this->oldRegexpId.']');
-		$this->dropdown_select('go', 'Delete selected');
-		$this->button_click('goButton');
+		$this->zbxTestCheckboxSelect('regexpids['.$this->oldRegexpId.']');
+		$this->zbxTestDropdownSelect('go', 'Delete selected');
+		$this->zbxTestClick('goButton');
 		$this->waitForConfirmation();
 		$this->wait();
-		$this->ok('Regular expression deleted');
+		$this->zbxTestTextPresent('Regular expression deleted');
 
 		$count = DBcount('SELECT regexpid FROM regexps WHERE regexpid='.$this->oldRegexpId);
 		$this->assertEquals(0, $count, 'Chuck Norris: Record(s) has not been deleted from the DB.');
@@ -143,12 +143,12 @@ class testPageAdministrationGeneralRegexp extends CWebTest {
 
 		$this->openRegularExpressions();
 
-		$this->checkbox_select('all_regexps');
-		$this->dropdown_select('go', 'Delete selected');
-		$this->button_click('goButton');
+		$this->zbxTestCheckboxSelect('all_regexps');
+		$this->zbxTestDropdownSelect('go', 'Delete selected');
+		$this->zbxTestClick('goButton');
 		$this->waitForConfirmation();
 		$this->wait();
-		$this->ok('Regular expressions deleted');
+		$this->zbxTestTextPresent('Regular expressions deleted');
 
 		$count = DBcount('SELECT regexpid FROM regexps');
 		$this->assertEquals(0, $count, 'Chuck Norris: Record(s) has not been deleted from the DB');
