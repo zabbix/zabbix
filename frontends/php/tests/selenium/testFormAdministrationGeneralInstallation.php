@@ -72,59 +72,57 @@ class testFormAdministrationGeneralInstallation extends CWebTest {
 
 	public function testInstallPage() {
 
-		$this->login();
+		$this->zbxTestLogin();
 		// Setup Welcome page
-		$this->open($this->pageLink);
+		$this->zbxTestOpen($this->pageLink);
 		$this->checkTitle($this->pageName);
 
 		foreach ($this->failIfExists as $str) {
-			$this->nok($str, 'assertTextNotPresent('.$this->pageLink.','.$str.')');
+			$this->zbxTestTextNotPresent($str, 'assertTextNotPresent('.$this->pageLink.','.$str.')');
 		}
 
 		foreach ($this->failIfNotExistsInstall as $str) {
-			$this->ok($str, 'assertTextPresent('.$this->pageLink.','.$str.')');
+			$this->zbxTestTextPresent($str, 'assertTextPresent('.$this->pageLink.','.$str.')');
 		}
 
 		$this->assertElementPresent('cancel');
 		$this->assertElementPresent('next_0');
 
-		$this->click('next_0');
-		$this->wait();
+		$this->zbxTestClickWait('next_0');
 
 		// Setup Check of pre-requisites page
 		$this->checkTitle($this->pageName);
 
 		foreach ($this->failIfExists as $str) {
-			$this->nok($str, 'assertTextNotPresent('.$this->pageLink.','.$str.')');
+			$this->zbxTestTextNotPresent($str, 'assertTextNotPresent('.$this->pageLink.','.$str.')');
 		}
 
 		foreach ($this->failIfNotExistsInstall as $str) {
-			$this->ok($str, 'assertTextPresent('.$this->pageLink.','.$str.')');
+			$this->zbxTestTextPresent($str, 'assertTextPresent('.$this->pageLink.','.$str.')');
 		}
 
 		foreach ($this->failIfNotExistsPrereq as $str) {
-			$this->ok($str, 'assertTextPresent('.$this->pageLink.','.$str.')');
+			$this->zbxTestTextPresent($str, 'assertTextPresent('.$this->pageLink.','.$str.')');
 		}
 
 		$this->assertElementPresent('cancel');
 		$this->assertElementPresent('back_1');
 		$this->assertElementPresent('next_1');
 
-		$this->click('next_1');
-		$this->wait();
+		$this->zbxTestClickWait('next_1');
 
 		// Setup Configure DB connection page
 		$this->checkTitle($this->pageName);
 		foreach ($this->failIfExists as $str) {
-			$this->nok($str, 'assertTextNotPresent('.$this->pageLink.','.$str.')');
+			$this->zbxTestTextNotPresent($str, 'assertTextNotPresent('.$this->pageLink.','.$str.')');
 		}
 
 		foreach ($this->failIfNotExistsInstall as $str) {
-			$this->ok($str, 'assertTextPresent('.$this->pageLink.','.$str.')');
+			$this->zbxTestTextPresent($str, 'assertTextPresent('.$this->pageLink.','.$str.')');
 		}
 
 		foreach ($this->failIfNotExistsDBConf as $str) {
-			$this->ok($str, 'assertTextPresent('.$this->pageLink.','.$str.')');
+			$this->zbxTestTextPresent($str, 'assertTextPresent('.$this->pageLink.','.$str.')');
 		}
 
 		// Asserting Form buttons
@@ -154,7 +152,6 @@ class testFormAdministrationGeneralInstallation extends CWebTest {
 		$this->assertAttribute("//input[@id='password']/@maxlength", 255);
 		$this->assertAttribute("//input[@id='password']/@size", 50);
 
-		$this->click('cancel');
-
+		$this->zbxTestClickWait('cancel');
 	}
 }
