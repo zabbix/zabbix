@@ -45,7 +45,7 @@ class testGeneric extends CWebTest {
 
 			array('charts.php',		'Custom graphs \[refreshed every 30 sec\]'),
 			array('screens.php',	'Custom screens \[refreshed every 30 sec\]'),
-			array('slides.php',		'Custom slides \[refreshed every 30 sec\]'),
+			array('slides.php',		'Custom slides'),
 			array('maps.php',		'Network maps \[refreshed every 30 sec\]'),
 			array('srv_status.php',	'IT services \[refreshed every 30 sec\]'),
 
