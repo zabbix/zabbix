@@ -104,21 +104,17 @@ class testFormAction extends CWebTest {
 				case 'Send message':
 					sleep(1);
 
-					$this->zbxTestClick('addusrgrpbtn');
-					$this->waitForPopUp("zbx_popup", "30000");
-					$this->selectWindow("name=zbx_popup");
+					$this->zbxTestLaunchPopup('addusrgrpbtn');
 					$this->zbxTestClick('all_usrgrps');
 					$this->zbxTestClick('select');
-					$this->selectWindow("null");
+					$this->selectWindow('null');
 
 					sleep(1);
 
-					$this->zbxTestClick('adduserbtn');
-					$this->waitForPopUp("zbx_popup", "30000");
-					$this->selectWindow("name=zbx_popup");
+					$this->zbxTestLaunchPopup('adduserbtn');
 					$this->zbxTestClick('all_users');
 					$this->zbxTestClick('select');
-					$this->selectWindow("null");
+					$this->selectWindow('null');
 
 					$this->select('new_operation_opmessage_mediatypeid', $operation['media']);
 					break;
@@ -174,21 +170,17 @@ class testFormAction extends CWebTest {
 // adding operations
 		$this->zbxTestClick('link=Operations');
 		$this->zbxTestClickWait('new_operation');
-		$this->zbxTestClick('addusrgrpbtn');
 		sleep(1);
-		$this->waitForPopUp("zbx_popup", "30000");
-		$this->selectWindow("name=zbx_popup");
+		$this->zbxTestLaunchPopup('addusrgrpbtn');
 		$this->zbxTestClick('usrgrps_7');
 		$this->zbxTestClick('usrgrps_11');
 		$this->zbxTestClick('select');
-		$this->selectWindow("null");
+		$this->selectWindow('null');
 		sleep(1);
-		$this->zbxTestClick('adduserbtn');
-		$this->waitForPopUp("zbx_popup", "30000");
-		$this->selectWindow("name=zbx_popup");
+		$this->zbxTestLaunchPopup('adduserbtn');
 		$this->zbxTestClick("users_'1'");
 		$this->zbxTestClick('select');
-		$this->selectWindow("null");
+		$this->selectWindow('null');
 		$this->select("new_operation_opmessage_mediatypeid", "label=Jabber");
 		$this->zbxTestClickWait('add_operation');
 		$this->zbxTestTextPresent("Send message to users: Admin");
@@ -208,7 +200,7 @@ class testFormAction extends CWebTest {
 		$this->selectWindow("name=zbx_popup");
 		$this->zbxTestDropdownSelectWait('groupid', 'Zabbix servers');
 		$this->zbxTestClick('spanid10053');
-		$this->selectWindow("null");
+		$this->selectWindow('null');
 		$this->zbxTestClick("//input[@name='save']");
 
 		sleep(1);
@@ -220,7 +212,7 @@ class testFormAction extends CWebTest {
 		$this->waitForPopUp("zbx_popup", "30000");
 		$this->selectWindow("name=zbx_popup");
 		$this->zbxTestClick('spanid4');
-		$this->selectWindow("null");
+		$this->selectWindow('null');
 
 		sleep(1);
 
