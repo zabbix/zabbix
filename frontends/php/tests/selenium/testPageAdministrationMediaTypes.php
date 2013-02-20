@@ -30,30 +30,30 @@ class testPageAdministrationMediaTypes extends CWebTest {
 	 * @dataProvider allMediaTypes
 	 */
 	public function testPageAdministrationMediaTypes_CheckLayout($mediatype) {
-		$this->login('media_types.php');
+		$this->zbxTestLogin('media_types.php');
 		$this->checkTitle('Configuration of media types');
 
-		$this->ok(array('Media types', 'CONFIGURATION OF MEDIA TYPES', 'Displaying'));
-		$this->ok(array('Description', 'Type', 'Status', 'Used in actions', 'Details'));
-		$this->ok($mediatype['description']);
+		$this->zbxTestTextPresent(array('Media types', 'CONFIGURATION OF MEDIA TYPES', 'Displaying'));
+		$this->zbxTestTextPresent(array('Description', 'Type', 'Status', 'Used in actions', 'Details'));
+		$this->zbxTestTextPresent($mediatype['description']);
 		switch ($mediatype['type']) {
 			case MEDIA_TYPE_EMAIL:
-				$this->ok('Email');
+				$this->zbxTestTextPresent('Email');
 				break;
 			case MEDIA_TYPE_EXEC:
-				$this->ok('Script');
+				$this->zbxTestTextPresent('Script');
 				break;
 			case MEDIA_TYPE_SMS:
-				$this->ok('SMS');
+				$this->zbxTestTextPresent('SMS');
 				break;
 			case MEDIA_TYPE_JABBER:
-				$this->ok('Jabber');
+				$this->zbxTestTextPresent('Jabber');
 				break;
 			case MEDIA_TYPE_EZ_TEXTING:
-				$this->ok('Ez Texting');
+				$this->zbxTestTextPresent('Ez Texting');
 				break;
 		}
-		$this->zbxDropdownHasOptions('go', array('Enable selected', 'Disable selected', 'Delete selected'));
+		$this->zbxTestDropdownHasOptions('go', array('Enable selected', 'Disable selected', 'Delete selected'));
 	}
 
 	/**
@@ -68,14 +68,12 @@ class testPageAdministrationMediaTypes extends CWebTest {
 		$sql2 = 'SELECT * FROM media_type WHERE description <> '.zbx_dbstr($name).' ORDER BY mediatypeid';
 		$oldHashMediaTypes2 = DBhash($sql2);
 
-		$this->login('media_types.php');
+		$this->zbxTestLogin('media_types.php');
 		$this->checkTitle('Configuration of media types');
-		$this->click("link=$name");
-		$this->wait();
-		$this->button_click('save');
-		$this->wait();
+		$this->zbxTestClickWait('link='.$name);
+		$this->zbxTestClickWait('save');
 		$this->checkTitle('Configuration of media types');
-		$this->ok(array('Media type updated', "$name", 'CONFIGURATION OF MEDIA TYPES'));
+		$this->zbxTestTextPresent(array('Media type updated', "$name", 'CONFIGURATION OF MEDIA TYPES'));
 
 		$this->assertEquals($oldHashMediaTypes, DBhash($sql));
 		$this->assertEquals($oldHashMediaTypes2, DBhash($sql2), 'Chuck Norris: Values for other Media types in the DB should not be changed');
@@ -85,16 +83,16 @@ class testPageAdministrationMediaTypes extends CWebTest {
 	 * @dataProvider allMediaTypes
 	 */
 	public function testPageAdministrationMediaTypes_Disable($mediatype) {
-		$this->login('media_types.php');
+		$this->zbxTestLogin('media_types.php');
 		$this->checkTitle('Configuration of media types');
 
-		$this->checkbox_select('mediatypeids_'.$mediatype['mediatypeid']);
-		$this->dropdown_select('go', 'Disable selected');
+		$this->zbxTestCheckboxSelect('mediatypeids_'.$mediatype['mediatypeid']);
+		$this->zbxTestDropdownSelect('go', 'Disable selected');
 		$this->chooseOkOnNextConfirmation();
-		$this->button_click('goButton');
+		$this->zbxTestClick('goButton');
 		$this->waitForConfirmation();
 		$this->wait();
-		$this->ok('Media type disabled');
+		$this->zbxTestTextPresent('Media type disabled');
 
 		// checking that media type is disabled in the DB
 		$sql = 'SELECT NULL FROM media_type WHERE status='.MEDIA_TYPE_STATUS_DISABLED.' AND mediatypeid='.$mediatype['mediatypeid'];
@@ -105,16 +103,16 @@ class testPageAdministrationMediaTypes extends CWebTest {
 	 * @dataProvider allMediaTypes
 	 */
 	public function testPageAdministrationMediaTypes_Enable($mediatype) {
-		$this->login('media_types.php');
+		$this->zbxTestLogin('media_types.php');
 		$this->checkTitle('Configuration of media types');
 
-		$this->checkbox_select('mediatypeids_'.$mediatype['mediatypeid']);
-		$this->dropdown_select('go', 'Enable selected');
+		$this->zbxTestCheckboxSelect('mediatypeids_'.$mediatype['mediatypeid']);
+		$this->zbxTestDropdownSelect('go', 'Enable selected');
 		$this->chooseOkOnNextConfirmation();
-		$this->button_click('goButton');
+		$this->zbxTestClick('goButton');
 		$this->waitForConfirmation();
 		$this->wait();
-		$this->ok('Media type enabled');
+		$this->zbxTestTextPresent('Media type enabled');
 
 		// checking that media type is enabled in the DB
 		$sql = 'SELECT * FROM media_type WHERE status='.MEDIA_TYPE_STATUS_ACTIVE.' AND mediatypeid = '.$mediatype['mediatypeid'];
@@ -134,25 +132,25 @@ class testPageAdministrationMediaTypes extends CWebTest {
 		));
 		$used_in_operations = ($row['count'] > 0);
 
-		$this->login('media_types.php');
+		$this->zbxTestLogin('media_types.php');
 		$this->checkTitle('Configuration of media types');
 
-		$this->checkbox_select('mediatypeids_'.$mediatype['mediatypeid']);
-		$this->dropdown_select('go', 'Delete selected');
+		$this->zbxTestCheckboxSelect('mediatypeids_'.$mediatype['mediatypeid']);
+		$this->zbxTestDropdownSelect('go', 'Delete selected');
 		$this->chooseOkOnNextConfirmation();
-		$this->button_click('goButton');
+		$this->zbxTestClick('goButton');
 		$this->waitForConfirmation();
 		$this->wait();
 
 		$sql = 'SELECT NULL FROM media_type WHERE mediatypeid='.$mediatype['mediatypeid'];
 
 		if ($used_in_operations) {
-				$this->nok('Media type deleted');
-				$this->ok(array('ERROR: Cannot delete media type', 'Media types used by action'));
+				$this->zbxTestTextNotPresent('Media type deleted');
+				$this->zbxTestTextPresent(array('ERROR: Cannot delete media type', 'Media types used by action'));
 				$this->assertEquals(1, DBcount($sql));
 		}
 		else {
-				$this->ok('Media type deleted');
+				$this->zbxTestTextPresent('Media type deleted');
 				$this->assertEquals(0, DBcount($sql));
 		}
 
@@ -163,26 +161,26 @@ class testPageAdministrationMediaTypes extends CWebTest {
 		$this->markTestIncomplete();
 /*		DBsave_tables('media_type');
 
-		$this->login('media_types.php');
+		$this->zbxTestLogin('media_types.php');
 		$this->checkTitle('Configuration of media types');
 
 		$row = DBfetch(DBselect('SELECT count(*) AS cnt FROM opmessage WHERE mediatypeid = '.$mediatypeid.''));
 		$used_in_operations = ($row['cnt'] > 0);
 
-		$this->checkbox_select("all_media_types");
-		$this->dropdown_select('go', 'Delete selected');
+		$this->zbxTestCheckboxSelect('all_media_types');
+		$this->zbxTestDropdownSelect('go', 'Delete selected');
 		$this->chooseOkOnNextConfirmation();
 		$this->click('goButton');
 		$this->wait();
 		$this->getConfirmation();
 
 		if ($used_in_operations) {
-				$this->nok('Media type deleted');
-				$this->ok('Cannot delete media type');
-				$this->ok('Media types used by action');
+				$this->zbxTestTextNotPresent('Media type deleted');
+				$this->zbxTestTextPresent('Cannot delete media type');
+				$this->zbxTestTextPresent('Media types used by action');
 		}
 		else {
-				$this->ok('Media type deleted');
+				$this->zbxTestTextPresent('Media type deleted');
 				$sql = 'SELECT * FROM media_type WHERE mediatypeid = '.zbx_dbstr($mediatypeid);
 				$this->assertEquals(0, DBcount($sql), 'Chuck Norris: Media type has not been deleted from the DB');
 		}

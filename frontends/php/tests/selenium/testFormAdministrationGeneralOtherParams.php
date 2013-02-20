@@ -42,10 +42,10 @@ class testFormAdministrationGeneralOtherParams extends CWebTest {
 	*/
 	public function testFormAdministrationGeneralOtherParams_CheckLayout($allValues) {
 
-		$this->login('adm.other.php');
-		$this->dropdown_select_wait('configDropDown', 'Other');
+		$this->zbxTestLogin('adm.other.php');
+		$this->zbxTestDropdownSelectWait('configDropDown', 'Other');
 		$this->checkTitle('Other configuration parameters');
-		$this->ok(array('OTHER CONFIGURATION PARAMETERS', 'Other parameters'));
+		$this->zbxTestTextPresent(array('OTHER CONFIGURATION PARAMETERS', 'Other parameters'));
 		$this->assertAttribute("//input[@id='refresh_unsupported']/@value", $allValues['refresh_unsupported']);
 
 		// checkbox "snmptrap_logging"
@@ -67,10 +67,10 @@ class testFormAdministrationGeneralOtherParams extends CWebTest {
 	// checking possible values in the drop-down "Group for discovered hosts"
 	public function testFormAdministrationGeneralOtherParams_CheckHostGroupsLayout() {
 
-		$this->login('adm.other.php');
-		$this->dropdown_select_wait('configDropDown', 'Other');
+		$this->zbxTestLogin('adm.other.php');
+		$this->zbxTestDropdownSelectWait('configDropDown', 'Other');
 		$this->checkTitle('Other configuration parameters');
-		$this->ok(array('OTHER CONFIGURATION PARAMETERS', 'Other parameters'));
+		$this->zbxTestTextPresent(array('OTHER CONFIGURATION PARAMETERS', 'Other parameters'));
 
 		$sql = 'SELECT groupid FROM groups';
 		$hgroups = DBfetchArray(DBselect($sql));
@@ -82,10 +82,10 @@ class testFormAdministrationGeneralOtherParams extends CWebTest {
 	// checking possible values in the drop-down "User group for database down message"
 	public function testFormAdministrationGeneralOtherParams_CheckUserGroupLayout() {
 
-		$this->login('adm.other.php');
-		$this->dropdown_select_wait('configDropDown', 'Other');
+		$this->zbxTestLogin('adm.other.php');
+		$this->zbxTestDropdownSelectWait('configDropDown', 'Other');
 		$this->checkTitle('Other configuration parameters');
-		$this->ok(array('OTHER CONFIGURATION PARAMETERS', 'Other parameters'));
+		$this->zbxTestTextPresent(array('OTHER CONFIGURATION PARAMETERS', 'Other parameters'));
 
 		$sql = 'SELECT usrgrpid FROM usrgrp';
 		$usrgrp = DBfetchArray(DBselect($sql));
@@ -102,38 +102,36 @@ class testFormAdministrationGeneralOtherParams extends CWebTest {
 	*/
 	public function testFormAdministrationGeneralOtherParams_OtherParams() {
 
-		$this->login('adm.other.php');
-		$this->dropdown_select_wait('configDropDown', 'Other');
+		$this->zbxTestLogin('adm.other.php');
+		$this->zbxTestDropdownSelectWait('configDropDown', 'Other');
 		$this->checkTitle('Other configuration parameters');
-		$this->ok('OTHER CONFIGURATION PARAMETERS');
-		$this->ok('Other parameters');
+		$this->zbxTestTextPresent('OTHER CONFIGURATION PARAMETERS');
+		$this->zbxTestTextPresent('Other parameters');
 
 		$this->input_type('refresh_unsupported', '700');
-		$this->dropdown_select('discovery_groupid', 'Linux servers');
-		$this->dropdown_select('alert_usrgrpid', 'Zabbix administrators');
-		$this->checkbox_select('snmptrap_logging');  // 1 - yes, 0 - no
-		$this->button_click('save');
-		$this->wait();
-		$this->ok('Configuration updated');
+		$this->zbxTestDropdownSelect('discovery_groupid', 'Linux servers');
+		$this->zbxTestDropdownSelect('alert_usrgrpid', 'Zabbix administrators');
+		$this->zbxTestCheckboxSelect('snmptrap_logging');  // 1 - yes, 0 - no
+		$this->zbxTestClickWait('save');
+		$this->zbxTestTextPresent('Configuration updated');
 
 		$sql = 'SELECT refresh_unsupported FROM config WHERE refresh_unsupported=700';
 		$this->assertEquals(1, DBcount($sql), 'Chuck Norris: Incorrect value in the DB field "refresh_unsupported"');
 		$sql = 'SELECT snmptrap_logging FROM config WHERE snmptrap_logging=1';
 		$this->assertEquals(1, DBcount($sql), 'Chuck Norris: Incorrect value in the DB field "snmptrap_logging"');
 
-		$this->dropdown_select_wait('configDropDown', 'Other');
+		$this->zbxTestDropdownSelectWait('configDropDown', 'Other');
 		$this->checkTitle('Other configuration parameters');
-		$this->ok('OTHER CONFIGURATION PARAMETERS');
-		$this->ok('Other parameters');
+		$this->zbxTestTextPresent('OTHER CONFIGURATION PARAMETERS');
+		$this->zbxTestTextPresent('Other parameters');
 
 		// trying to enter max possible value
 		$this->input_type('refresh_unsupported', '65535');
-		$this->dropdown_select('discovery_groupid', 'Linux servers');
-		$this->dropdown_select('alert_usrgrpid', 'Enabled debug mode');
-		$this->checkbox_unselect('snmptrap_logging');
-		$this->button_click('save');
-		$this->wait();
-		$this->ok('Configuration updated');
+		$this->zbxTestDropdownSelect('discovery_groupid', 'Linux servers');
+		$this->zbxTestDropdownSelect('alert_usrgrpid', 'Enabled debug mode');
+		$this->zbxTestCheckboxUnselect('snmptrap_logging');
+		$this->zbxTestClickWait('save');
+		$this->zbxTestTextPresent('Configuration updated');
 
 		$sql = 'SELECT refresh_unsupported FROM config WHERE refresh_unsupported=65535';
 		$this->assertEquals(1, DBcount($sql), 'Chuck Norris: Incorrect value in the DB field "refresh_unsupported"');
@@ -142,13 +140,12 @@ class testFormAdministrationGeneralOtherParams extends CWebTest {
 
 		// trying to enter value > max_value
 		$this->checkTitle('Other configuration parameters');
-		$this->ok('OTHER CONFIGURATION PARAMETERS');
-		$this->ok('Other parameters');
+		$this->zbxTestTextPresent('OTHER CONFIGURATION PARAMETERS');
+		$this->zbxTestTextPresent('Other parameters');
 		$this->input_type('refresh_unsupported', '65536');
-		$this->button_click('save');
-		$this->wait();
-		$this->ok(array('ERROR: Page received incorrect data', 'Warning. Incorrect value for field "Refresh unsupported items (in sec)": must be between 0 and 65535.'));
-		// $this->ok('Warning. Incorrect value for field "Refresh unsupported items (in sec)": must be between 0 and 65535.');
+		$this->zbxTestClickWait('save');
+		$this->zbxTestTextPresent(array('ERROR: Page received incorrect data', 'Warning. Incorrect value for field "Refresh unsupported items (in sec)": must be between 0 and 65535.'));
+		// $this->zbxTestTextPresent('Warning. Incorrect value for field "Refresh unsupported items (in sec)": must be between 0 and 65535.');
 	}
 
 }
