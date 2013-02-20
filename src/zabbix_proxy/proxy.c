@@ -30,6 +30,7 @@
 #include "proxy.h"
 
 #include "sysinfo.h"
+#include "zbxmodules.h"
 #include "zbxserver.h"
 
 #include "daemon.h"
@@ -184,6 +185,9 @@ int	CONFIG_LOG_SLOW_QUERIES		= 0;	/* ms; 0 - disable */
 /* zabbix server startup time */
 int	CONFIG_SERVER_STARTUP_TIME	= 0;
 
+char	*CONFIG_LOAD_MODULE_PATH	= NULL;
+char	**CONFIG_LOAD_MODULE		= NULL;
+
 /* mutex for node syncs; not used in proxy */
 ZBX_MUTEX	node_sync_access;
 
@@ -253,6 +257,9 @@ static void	zbx_set_defaults()
 
 	if (NULL == CONFIG_EXTERNALSCRIPTS)
 		CONFIG_EXTERNALSCRIPTS = zbx_strdup(CONFIG_EXTERNALSCRIPTS, DATADIR "/zabbix/externalscripts");
+
+	if (NULL == CONFIG_LOAD_MODULE_PATH)
+		CONFIG_LOAD_MODULE_PATH = zbx_strdup(CONFIG_LOAD_MODULE_PATH, LIBDIR "/modules");
 
 	if (ZBX_PROXYMODE_ACTIVE != CONFIG_PROXYMODE || 0 == CONFIG_HEARTBEAT_FREQUENCY)
 		CONFIG_HEARTBEAT_FORKS = 0;
@@ -425,8 +432,15 @@ static void	zbx_load_config()
 			PARM_OPT,	0,			3600000},
 		{"AllowRoot",			&CONFIG_ALLOW_ROOT,			TYPE_INT,
 			PARM_OPT,	0,			1},
+		{"LoadModule",			&CONFIG_LOAD_MODULE,			TYPE_MULTISTRING,
+			PARM_OPT,	0,			0},
+		{"LoadModulePath",		&CONFIG_LOAD_MODULE_PATH,		TYPE_STRING,
+			PARM_OPT,	0,			0},
 		{NULL}
 	};
+
+	/* initialize multistrings */
+	zbx_strarr_init(&CONFIG_LOAD_MODULE);
 
 	parse_cfg_file(CONFIG_FILE, cfg, ZBX_CFG_FILE_REQUIRED, ZBX_CFG_STRICT);
 
@@ -508,6 +522,12 @@ int	main(int argc, char **argv)
 	init_metrics();
 
 	zbx_load_config();
+
+	if (FAIL == load_modules(CONFIG_LOAD_MODULE_PATH, CONFIG_LOAD_MODULE, CONFIG_TIMEOUT))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "loading modules failed, exiting...");
+		exit(FAIL);
+	}
 
 	if (ZBX_TASK_CONFIG_CACHE_RELOAD == task)
 		exit(SUCCEED == zbx_sigusr_send(ZBX_TASK_CONFIG_CACHE_RELOAD) ? EXIT_SUCCESS : EXIT_FAILURE);
