@@ -147,7 +147,6 @@ const char	*zbx_result_string(int result);
 #define MAX_EXECUTE_OUTPUT_LEN	(512 * ZBX_KIBIBYTE)
 
 #define ZBX_MAX_UINT64_LEN	21
-#define ZBX_MAX_UINT32_LEN	11
 #define ZBX_DM_DELIMITER	'\255'
 
 typedef struct
@@ -793,11 +792,14 @@ int	is_double_suffix(const char *str);
 int	is_double(const char *c);
 int	is_uint_suffix(const char *c, unsigned int *value);
 int	is_int_prefix(const char *c);
-#define is_uint32(str, value)	is_uint32_n(str, ZBX_MAX_UINT32_LEN, value)
-int	is_uint32_n(const char *str, size_t n, uint32_t *value);
-#define is_uint64(src, value)	is_uint64_n(src, ZBX_MAX_UINT64_LEN, value)
-int	is_uint64_n(const char *str, size_t n, zbx_uint64_t *value);
-int	is_ushort(const char *str, unsigned short *value);
+int	is_uint_n_bits(const char *str, size_t n, int bits, void *value, size_t size);
+
+#define is_ushort(str, value)		is_uint_n_bits(str, ZBX_MAX_UINT64_LEN, 16, value, 2)
+#define is_uint31(str, value)		is_uint_n_bits(str, ZBX_MAX_UINT64_LEN, 31, value, 4)
+#define is_uint32(str, value)		is_uint_n_bits(str, ZBX_MAX_UINT64_LEN, 32, value, 4)
+#define is_uint64(str, value)		is_uint_n_bits(str, ZBX_MAX_UINT64_LEN, 64, value, 8)
+#define is_uint64_n(str, n, value)	is_uint_n_bits(str, n, 64, value, 8)
+
 int	is_boolean(const char *str, zbx_uint64_t *value);
 int	is_uoct(const char *str);
 int	is_uhex(const char *str);
