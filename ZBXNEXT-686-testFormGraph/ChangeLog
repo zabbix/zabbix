@@ -39,6 +39,8 @@ A.F.I...S. [ZBXNEXT-1186] increased length to 2048 characters of expression fiel
 ..F....... [ZBX-5127] regular expressions form redesign (Vedmak)
 
 Bug fixes:
+..F....... [ZBX-6276] fixed function to get URL parameter error message (Eduard)
+..F....... [ZBX-6245] fixed monitoring trigger filter criteria saving (Eduard)
 ..F....... [ZBX-6237] fixed Y axis item adding field, now it is available also if item list is empty (Eduard)
 ........S. [ZBX-6123] ensured sequential IT services updates by database syncers (dimir)
 ....I..... [ZBX-5668] added upgrade patch for change "server_check_interval" field value to 10 (Sasha)
@@ -120,10 +122,13 @@ A......... [ZBX-5498] applications API refactoring (Vedmak)
 Changes for 2.0.6rc1
 
 New features:
+A.F....... [ZBX-1357] added Lithuanian translation; thanks to Zabbix translators (Richlv)
+A.F....... [ZBX-1357] updated Brazilian Portuguese, German, Latvian, Slovak, Russian and Ukrainian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+..F....... [ZBX-6290] fixed icon mapping selection (Eduard)
 A.F....... [ZBX-5321] unified translation strings, fixed typo and SQL query formatting (Pavels, Richlv)
-..F....... [ZBX-5982] fixed read only items are listed in popup for trigger expression (Toms)
+..F....... [ZBX-5982] fixed read only items being listed in popup for trigger expression (Toms)
 ........S. [ZBX-6123] ensured sequential IT services updates by database syncers (dimir)
 ....I..... [ZBX-5635] changed value types to float for qps items in "Template App MySQL" (Sasha)
 ....I..... [ZBX-5622] fixed grammatical error of snmptrap.fallback in help_items; thanks to Kodai Terashima (Sasha)
