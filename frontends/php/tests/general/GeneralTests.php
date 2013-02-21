@@ -39,6 +39,7 @@ require_once dirname(__FILE__).'/zbx_limitTest.php';
 require_once dirname(__FILE__).'/zbx_dbcast_2bigintTest.php';
 require_once dirname(__FILE__).'/dbConditionIntTest.php';
 require_once dirname(__FILE__).'/dbConditionStringTest.php';
+require_once dirname(__FILE__).'/urlParamTest.php';
 
 class GeneralTests {
 
@@ -66,6 +67,7 @@ class GeneralTests {
 		$suite->addTestSuite('zbx_dbcast_2bigintTest');
 		$suite->addTestSuite('dbConditionIntTest');
 		$suite->addTestSuite('dbConditionStringTest');
+		$suite->addTestSuite('urlParamTest');
 
 		return $suite;
 	}
