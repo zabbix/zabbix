@@ -59,7 +59,6 @@ static void	update_triggers_status_to_unknown(zbx_uint64_t hostid, zbx_item_type
 	DB_RESULT		result;
 	DB_ROW			row;
 	char			failed_type_buf[8];
-	zbx_uint64_t		triggerid;
 	zbx_vector_ptr_t	triggers;
 	DC_TRIGGER		*trigger;
 	int			i;
