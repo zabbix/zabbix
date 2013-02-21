@@ -26,12 +26,10 @@ class testFormScreen extends CWebTest {
 	public function testFormScreen_Create() {
 		$this->chooseOkOnNextConfirmation();
 
-		$this->login('screenconf.php');
-		$this->button_click('form');
-		$this->wait();
+		$this->zbxTestLogin('screenconf.php');
+		$this->zbxTestClickWait('form');
 		$this->input_type('name', $this->testscreen);
-		$this->button_click('save');
-		$this->wait();
-		$this->ok('Screen added');
+		$this->zbxTestClickWait('save');
+		$this->zbxTestTextPresent('Screen added');
 	}
 }

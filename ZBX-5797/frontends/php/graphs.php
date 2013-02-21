@@ -18,7 +18,6 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-
 require_once dirname(__FILE__).'/include/config.inc.php';
 require_once dirname(__FILE__).'/include/hosts.inc.php';
 require_once dirname(__FILE__).'/include/graphs.inc.php';
@@ -51,8 +50,8 @@ $fields = array(
 	'legend' =>				array(T_ZBX_INT, O_OPT, P_NZERO,	IN('0,1'),		null),
 	'ymin_itemid' =>		array(T_ZBX_INT, O_OPT, null,		DB_ID,			'isset({save})&&isset({ymin_type})&&({ymin_type}==3)'),
 	'ymax_itemid' =>		array(T_ZBX_INT, O_OPT, null,		DB_ID,			'isset({save})&&isset({ymax_type})&&({ymax_type}==3)'),
-	'percent_left' =>		array(T_ZBX_DBL, O_OPT, null,		BETWEEN(0, 100), null, _('Percentile line (Left)')),
-	'percent_right' =>		array(T_ZBX_DBL, O_OPT, null,		BETWEEN(0, 100), null, _('Percentile line (Right)')),
+	'percent_left' =>		array(T_ZBX_DBL, O_OPT, null,		BETWEEN(0, 100), null, _('Percentile line (left)')),
+	'percent_right' =>		array(T_ZBX_DBL, O_OPT, null,		BETWEEN(0, 100), null, _('Percentile line (right)')),
 	'visible' =>			array(T_ZBX_INT, O_OPT, null,		BETWEEN(0, 1),	null),
 	'items' =>				array(T_ZBX_STR, O_OPT, null,		null,			null),
 	'showworkperiod' =>		array(T_ZBX_INT, O_OPT, null,		IN('1'),		null),

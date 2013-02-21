@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-02-05 11:42+0200\n"
+"POT-Creation-Date: 2013-02-20 19:46+0200\n"
 "PO-Revision-Date: 2013-01-27 08:54+0200\n"
 "Last-Translator: Niklas <niklas@gyori.se>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -48,7 +48,7 @@ msgstr[1] ""
 msgid "%1$s (year %2$s)"
 msgstr ""
 
-#: latest.php:379 latest.php:556
+#: latest.php:376 latest.php:552
 #, php-format
 msgid "%1$s Item"
 msgid_plural "%1$s Items"
@@ -80,13 +80,10 @@ msgstr[1] ""
 msgid "(0 - infinitely)"
 msgstr ""
 
-#: include/views/configuration.hostgroups.list.php:31
-msgid "(Only Super Admins can create group)"
-msgstr ""
-
 #: include/views/configuration.host.edit.php:193
+#: include/views/configuration.hostgroups.list.php:31
 #: include/views/configuration.template.edit.php:143
-msgid "(Only superadmins can create group)"
+msgid "(Only super admins can create groups)"
 msgstr ""
 
 #: include/forms.inc.php:539 include/forms.inc.php:554
@@ -1145,7 +1142,7 @@ msgstr ""
 msgid "Cannot add discovery rule"
 msgstr ""
 
-#: graphs.php:226
+#: graphs.php:225
 msgid "Cannot add graph"
 msgstr "Kan inte lägga till diagram"
 
@@ -1283,7 +1280,7 @@ msgstr ""
 msgid "Cannot connect to the trapper port of zabbix server daemon, but it should be available to run the script."
 msgstr ""
 
-#: graphs.php:290
+#: graphs.php:289
 msgid "Cannot copy graphs"
 msgstr ""
 
@@ -1368,7 +1365,7 @@ msgstr ""
 msgid "Cannot delete discovery rules"
 msgstr ""
 
-#: graphs.php:237
+#: graphs.php:236
 msgid "Cannot delete graph"
 msgstr "Kan inte ta bort diagram"
 
@@ -1380,7 +1377,7 @@ msgstr ""
 msgid "Cannot delete graph."
 msgstr ""
 
-#: graphs.php:244
+#: graphs.php:243
 msgid "Cannot delete graphs"
 msgstr ""
 
@@ -1882,7 +1879,7 @@ msgstr ""
 msgid "Cannot update frontend access"
 msgstr ""
 
-#: graphs.php:223
+#: graphs.php:222
 msgid "Cannot update graph"
 msgstr "Kan inte uppdatera diagram"
 
@@ -2315,7 +2312,7 @@ msgstr ""
 msgid "Configuration of discovery rules"
 msgstr ""
 
-#: graphs.php:27
+#: graphs.php:26
 msgid "Configuration of graphs"
 msgstr "Konfiguration av diagram"
 
@@ -4723,7 +4720,7 @@ msgstr ""
 #: include/audit.inc.php:29 include/blocks.inc.php:1120
 #: include/screens.inc.php:30 include/views/configuration.graph.edit.php:287
 #: include/views/monitoring.charts.php:27
-#: include/views/monitoring.history.php:60 latest.php:320 latest.php:498
+#: include/views/monitoring.history.php:60 latest.php:318 latest.php:495
 #: report2.php:240
 msgid "Graph"
 msgstr "Diagram"
@@ -4775,11 +4772,11 @@ msgstr ""
 msgid "Graph \"%1$s\" with templated items cannot contain items from other hosts."
 msgstr ""
 
-#: graphs.php:226
+#: graphs.php:225
 msgid "Graph added"
 msgstr "Diagram lades till"
 
-#: graphs.php:237
+#: graphs.php:236
 msgid "Graph deleted"
 msgstr "Diagram togs bort"
 
@@ -4830,7 +4827,7 @@ msgstr ""
 msgid "Graph type"
 msgstr ""
 
-#: graphs.php:223
+#: graphs.php:222
 msgid "Graph updated"
 msgstr "Diagram uppdaterades"
 
@@ -4857,11 +4854,11 @@ msgstr ""
 msgid "Graphs"
 msgstr "Diagram"
 
-#: graphs.php:290
+#: graphs.php:289
 msgid "Graphs copied"
 msgstr ""
 
-#: graphs.php:244
+#: graphs.php:243
 msgid "Graphs deleted"
 msgstr ""
 
@@ -5022,7 +5019,7 @@ msgstr "Hårdvara"
 msgid "Hardware (Full details)"
 msgstr ""
 
-#: graphs.php:44 include/views/configuration.graph.edit.php:55
+#: graphs.php:43 include/views/configuration.graph.edit.php:55
 #: include/views/configuration.graph.list.php:79
 #: include/views/configuration.screen.constructor.edit.php:574
 #: include/views/configuration.sysmap.edit.php:47
@@ -5073,7 +5070,7 @@ msgstr "Hög"
 #: history.php:27 include/forms.inc.php:853 include/page_header.php:455
 #: include/views/configuration.item.list.php:59
 #: include/views/configuration.item.prototype.list.php:54 jsLoader.php:108
-#: latest.php:196 latest.php:323 latest.php:501
+#: latest.php:196 latest.php:321 latest.php:498
 msgid "History"
 msgstr "Historik"
 
@@ -7090,6 +7087,10 @@ msgstr ""
 msgid "List is empty"
 msgstr ""
 
+#: include/locales.inc.php:61
+msgid "Lithuanian (lt_LT)"
+msgstr ""
+
 #: dashboard.php:294 dashboard.php:302 dashboard.php:309 dashboard.php:316
 #: dashboard.php:323 dashboard.php:333 include/views/monitoring.slides.php:108
 msgid "Loading..."
@@ -7841,7 +7842,7 @@ msgid "NTLM authentication"
 msgstr ""
 
 #: actionconf.php:34 actionconf.php:157 adm.regexps.php:36 adm.regexps.php:112
-#: adm.regexps.php:143 disc_prototypes.php:43 graphs.php:42
+#: adm.regexps.php:143 disc_prototypes.php:43 graphs.php:41
 #: host_discovery.php:41 hostinventories.php:159 hosts.php:651 hosts.php:682
 #: httpconf.php:43 httpmon.php:142 include/forms.inc.php:550
 #: include/forms.inc.php:1770 include/hosts.inc.php:114
@@ -8365,10 +8366,6 @@ msgstr ""
 
 #: include/classes/import/CConfigurationImport.php:820
 #: include/classes/import/CConfigurationImport.php:897
-#, php-format
-msgid "No permission for Graph \"%1$s\"."
-msgstr ""
-
 #: include/classes/import/CXmlImport18.php:1552
 #, php-format
 msgid "No permission for graph \"%1$s\"."
@@ -8534,7 +8531,7 @@ msgstr ""
 msgid "No target selected"
 msgstr ""
 
-#: graphs.php:294 items.php:609
+#: graphs.php:293 items.php:609
 msgid "No target selected."
 msgstr ""
 
@@ -9420,19 +9417,11 @@ msgstr ""
 msgid "Peak memory usage: %s"
 msgstr ""
 
-#: graphs.php:54
-msgid "Percentile line (Left)"
-msgstr ""
-
-#: graphs.php:55
-msgid "Percentile line (Right)"
-msgstr ""
-
-#: include/views/configuration.graph.edit.php:144
+#: graphs.php:53 include/views/configuration.graph.edit.php:144
 msgid "Percentile line (left)"
 msgstr ""
 
-#: include/views/configuration.graph.edit.php:156
+#: graphs.php:54 include/views/configuration.graph.edit.php:156
 msgid "Percentile line (right)"
 msgstr ""
 
@@ -12244,7 +12233,7 @@ msgid "Unable to select configuration."
 msgstr ""
 
 #: include/classes/helpers/CUploadFile.php:57
-msgid "Unable to uploade file because \"file_uploads\" is disabled."
+msgid "Unable to upload file because \"file_uploads\" is disabled."
 msgstr ""
 
 #: include/maps.inc.php:695 include/maps.inc.php:785 include/maps.inc.php:883
@@ -12964,7 +12953,7 @@ msgstr "Veckovis"
 msgid "When active"
 msgstr "När aktiv"
 
-#: graphs.php:43 include/views/configuration.graph.edit.php:54
+#: graphs.php:42 include/views/configuration.graph.edit.php:54
 #: include/views/configuration.graph.list.php:78
 #: include/views/configuration.screen.constructor.edit.php:573
 #: include/views/configuration.sysmap.edit.php:46
@@ -13257,8 +13246,8 @@ msgstr ""
 #: api/classes/CGraph.php:709 api/classes/CGraphPrototype.php:758
 #: api/classes/CHostGroup.php:684 api/classes/CHostGroup.php:742
 #: api/classes/CHostGroup.php:894 api/classes/CHostGroup.php:949
-#: api/classes/CHostGroup.php:994 api/classes/CHostGroup.php:1006
-#: api/classes/CHostGroup.php:1021 api/classes/CHost.php:1604
+#: api/classes/CHostGroup.php:994 api/classes/CHostGroup.php:1007
+#: api/classes/CHostGroup.php:1023 api/classes/CHost.php:1604
 #: api/classes/CHost.php:1658 api/classes/CHost.php:1972
 #: api/classes/CMaintenance.php:608 api/classes/CMaintenance.php:715
 #: api/classes/CMaintenance.php:727 api/classes/CScript.php:300
@@ -13523,7 +13512,7 @@ msgstr ""
 #: include/translateDefines.inc.php:46
 #: include/views/administration.auditacts.list.php:113
 #: include/views/administration.auditlogs.list.php:106 jsrpc.php:137
-#: latest.php:289 latest.php:464 tr_status.php:177 tr_status.php:658
+#: latest.php:287 latest.php:461 tr_status.php:177 tr_status.php:658
 #: tr_status.php:748
 msgid "d M Y H:i:s"
 msgstr "d M H:i:s"

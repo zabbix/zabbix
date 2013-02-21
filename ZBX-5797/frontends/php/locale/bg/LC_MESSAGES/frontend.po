@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-02-05 11:42+0200\n"
+"POT-Creation-Date: 2013-02-20 19:46+0200\n"
 "PO-Revision-Date: 2013-01-12 23:52+0200\n"
 "Last-Translator: Fahri <fahri_hasan@hotmail.com>\n"
 "Language-Team: \n"
@@ -48,7 +48,7 @@ msgstr[1] "%1$d сценарий"
 msgid "%1$s (year %2$s)"
 msgstr "%1$s (година %2$s)"
 
-#: latest.php:379 latest.php:556
+#: latest.php:376 latest.php:552
 #, php-format
 msgid "%1$s Item"
 msgid_plural "%1$s Items"
@@ -80,14 +80,11 @@ msgstr[1] "%d устройства"
 msgid "(0 - infinitely)"
 msgstr "(0 - безкрайно)"
 
-#: include/views/configuration.hostgroups.list.php:31
-msgid "(Only Super Admins can create group)"
-msgstr "(Само Супер-Администраторите може да създадат група)"
-
 #: include/views/configuration.host.edit.php:193
+#: include/views/configuration.hostgroups.list.php:31
 #: include/views/configuration.template.edit.php:143
-msgid "(Only superadmins can create group)"
-msgstr "(Само Супер-Администраторите може да създадат група)"
+msgid "(Only super admins can create groups)"
+msgstr ""
 
 #: include/forms.inc.php:539 include/forms.inc.php:554
 msgid "(in days)"
@@ -1147,7 +1144,7 @@ msgstr "Не може да се добави зависимост от триг�
 msgid "Cannot add discovery rule"
 msgstr "Не може да се добави правило за откриване"
 
-#: graphs.php:226
+#: graphs.php:225
 msgid "Cannot add graph"
 msgstr "Не може да се добави графика"
 
@@ -1285,7 +1282,7 @@ msgstr "Не може да се клонират тригер прототипи
 msgid "Cannot connect to the trapper port of zabbix server daemon, but it should be available to run the script."
 msgstr "Не може да се свърже към трапер порта на Zabbix сървър демона, но той трябва да бъде наличен за да тръгне скрипта."
 
-#: graphs.php:290
+#: graphs.php:289
 msgid "Cannot copy graphs"
 msgstr "Не може да се копират графиките"
 
@@ -1371,7 +1368,7 @@ msgstr "Не може да се изтрие правило за открива�
 msgid "Cannot delete discovery rules"
 msgstr "Не може да се изтрият правилата за откриване"
 
-#: graphs.php:237
+#: graphs.php:236
 msgid "Cannot delete graph"
 msgstr "Не може да се изтрие графиката"
 
@@ -1383,7 +1380,7 @@ msgstr "Не може да се изтрие графичния прототип
 msgid "Cannot delete graph."
 msgstr "Не може да се изтрие графиката."
 
-#: graphs.php:244
+#: graphs.php:243
 msgid "Cannot delete graphs"
 msgstr "Не може да се изтрият графиките"
 
@@ -1886,7 +1883,7 @@ msgstr "Не може да се актуализират правилата за
 msgid "Cannot update frontend access"
 msgstr "Не може да се актуализира достъпа до уеб интерфейс"
 
-#: graphs.php:223
+#: graphs.php:222
 msgid "Cannot update graph"
 msgstr "Не може да се актуализира графиката"
 
@@ -2322,7 +2319,7 @@ msgstr "Конфигурация на откриване"
 msgid "Configuration of discovery rules"
 msgstr "Конфигурация на правилата за откриване"
 
-#: graphs.php:27
+#: graphs.php:26
 msgid "Configuration of graphs"
 msgstr "Конфигурация на графики"
 
@@ -4744,7 +4741,7 @@ msgstr "Градиентна линия"
 #: include/audit.inc.php:29 include/blocks.inc.php:1120
 #: include/screens.inc.php:30 include/views/configuration.graph.edit.php:287
 #: include/views/monitoring.charts.php:27
-#: include/views/monitoring.history.php:60 latest.php:320 latest.php:498
+#: include/views/monitoring.history.php:60 latest.php:318 latest.php:495
 #: report2.php:240
 msgid "Graph"
 msgstr "Графика"
@@ -4796,11 +4793,11 @@ msgstr "Графика \"%1$s\" пропуснато - потребителск�
 msgid "Graph \"%1$s\" with templated items cannot contain items from other hosts."
 msgstr "Графика \"%1$s\" с шаблонни елементи на данните не може да съдържа елементи на данните от други хостове."
 
-#: graphs.php:226
+#: graphs.php:225
 msgid "Graph added"
 msgstr "Графика добавена"
 
-#: graphs.php:237
+#: graphs.php:236
 msgid "Graph deleted"
 msgstr "Графика изтрита"
 
@@ -4851,7 +4848,7 @@ msgstr "Обща графика"
 msgid "Graph type"
 msgstr "Тип графика"
 
-#: graphs.php:223
+#: graphs.php:222
 msgid "Graph updated"
 msgstr "Графика актуализирана"
 
@@ -4878,11 +4875,11 @@ msgstr "Графика със същото име, но различен тип 
 msgid "Graphs"
 msgstr "Графики"
 
-#: graphs.php:290
+#: graphs.php:289
 msgid "Graphs copied"
 msgstr "Графики копирани"
 
-#: graphs.php:244
+#: graphs.php:243
 msgid "Graphs deleted"
 msgstr "Графики изтрити"
 
@@ -5043,7 +5040,7 @@ msgstr "Хардуер"
 msgid "Hardware (Full details)"
 msgstr "Хардуер (Пълни подробности)"
 
-#: graphs.php:44 include/views/configuration.graph.edit.php:55
+#: graphs.php:43 include/views/configuration.graph.edit.php:55
 #: include/views/configuration.graph.list.php:79
 #: include/views/configuration.screen.constructor.edit.php:574
 #: include/views/configuration.sysmap.edit.php:47
@@ -5094,7 +5091,7 @@ msgstr "Висок"
 #: history.php:27 include/forms.inc.php:853 include/page_header.php:455
 #: include/views/configuration.item.list.php:59
 #: include/views/configuration.item.prototype.list.php:54 jsLoader.php:108
-#: latest.php:196 latest.php:323 latest.php:501
+#: latest.php:196 latest.php:321 latest.php:498
 msgid "History"
 msgstr "История"
 
@@ -7118,6 +7115,10 @@ msgstr "Връзки за избрания елемент"
 msgid "List is empty"
 msgstr "Списъкът е празен"
 
+#: include/locales.inc.php:61
+msgid "Lithuanian (lt_LT)"
+msgstr ""
+
 #: dashboard.php:294 dashboard.php:302 dashboard.php:309 dashboard.php:316
 #: dashboard.php:323 dashboard.php:333 include/views/monitoring.slides.php:108
 msgid "Loading..."
@@ -7871,7 +7872,7 @@ msgid "NTLM authentication"
 msgstr "NTLM автентификация"
 
 #: actionconf.php:34 actionconf.php:157 adm.regexps.php:36 adm.regexps.php:112
-#: adm.regexps.php:143 disc_prototypes.php:43 graphs.php:42
+#: adm.regexps.php:143 disc_prototypes.php:43 graphs.php:41
 #: host_discovery.php:41 hostinventories.php:159 hosts.php:651 hosts.php:682
 #: httpconf.php:43 httpmon.php:142 include/forms.inc.php:550
 #: include/forms.inc.php:1770 include/hosts.inc.php:114
@@ -8396,10 +8397,6 @@ msgstr "Не са дефинирани операции."
 
 #: include/classes/import/CConfigurationImport.php:820
 #: include/classes/import/CConfigurationImport.php:897
-#, php-format
-msgid "No permission for Graph \"%1$s\"."
-msgstr "Нямате право на достъп до графика \"%1$s\"."
-
 #: include/classes/import/CXmlImport18.php:1552
 #, php-format
 msgid "No permission for graph \"%1$s\"."
@@ -8565,7 +8562,7 @@ msgstr "Не са дефинирани стъпки."
 msgid "No target selected"
 msgstr "Не е избрана цел"
 
-#: graphs.php:294 items.php:609
+#: graphs.php:293 items.php:609
 msgid "No target selected."
 msgstr "Не е избрана цел."
 
@@ -9453,19 +9450,11 @@ msgstr "Паролата не трябва да е празена"
 msgid "Peak memory usage: %s"
 msgstr "Пик на използваната памет: %s"
 
-#: graphs.php:54
-msgid "Percentile line (Left)"
-msgstr "Процентна линия (вляво)"
-
-#: graphs.php:55
-msgid "Percentile line (Right)"
-msgstr "Процентна линия (вдясно)"
-
-#: include/views/configuration.graph.edit.php:144
+#: graphs.php:53 include/views/configuration.graph.edit.php:144
 msgid "Percentile line (left)"
 msgstr "Процентна линия (вляво)"
 
-#: include/views/configuration.graph.edit.php:156
+#: graphs.php:54 include/views/configuration.graph.edit.php:156
 msgid "Percentile line (right)"
 msgstr "Процентна линия (вдясно)"
 
@@ -12280,8 +12269,8 @@ msgid "Unable to select configuration."
 msgstr "Не може да изберете конфигурация."
 
 #: include/classes/helpers/CUploadFile.php:57
-msgid "Unable to uploade file because \"file_uploads\" is disabled."
-msgstr "Не може да качите файла, защото \"file_uploads\" е изключен."
+msgid "Unable to upload file because \"file_uploads\" is disabled."
+msgstr ""
 
 #: include/maps.inc.php:695 include/maps.inc.php:785 include/maps.inc.php:883
 msgid "Unacknowledged"
@@ -13001,7 +12990,7 @@ msgstr "Ежеседмично"
 msgid "When active"
 msgstr "Когато е активен"
 
-#: graphs.php:43 include/views/configuration.graph.edit.php:54
+#: graphs.php:42 include/views/configuration.graph.edit.php:54
 #: include/views/configuration.graph.list.php:78
 #: include/views/configuration.screen.constructor.edit.php:573
 #: include/views/configuration.sysmap.edit.php:46
@@ -13295,8 +13284,8 @@ msgstr "Вие не сте уточнили цели за глобален ск�
 #: api/classes/CGraph.php:709 api/classes/CGraphPrototype.php:758
 #: api/classes/CHostGroup.php:684 api/classes/CHostGroup.php:742
 #: api/classes/CHostGroup.php:894 api/classes/CHostGroup.php:949
-#: api/classes/CHostGroup.php:994 api/classes/CHostGroup.php:1006
-#: api/classes/CHostGroup.php:1021 api/classes/CHost.php:1604
+#: api/classes/CHostGroup.php:994 api/classes/CHostGroup.php:1007
+#: api/classes/CHostGroup.php:1023 api/classes/CHost.php:1604
 #: api/classes/CHost.php:1658 api/classes/CHost.php:1972
 #: api/classes/CMaintenance.php:608 api/classes/CMaintenance.php:715
 #: api/classes/CMaintenance.php:727 api/classes/CScript.php:300
@@ -13564,7 +13553,7 @@ msgstr "d M Y H:i"
 #: include/translateDefines.inc.php:46
 #: include/views/administration.auditacts.list.php:113
 #: include/views/administration.auditlogs.list.php:106 jsrpc.php:137
-#: latest.php:289 latest.php:464 tr_status.php:177 tr_status.php:658
+#: latest.php:287 latest.php:461 tr_status.php:177 tr_status.php:658
 #: tr_status.php:748
 msgid "d M Y H:i:s"
 msgstr "d M Y H:i:s"

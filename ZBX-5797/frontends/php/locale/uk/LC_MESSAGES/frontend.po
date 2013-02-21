@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-02-05 11:42+0200\n"
-"PO-Revision-Date: 2013-01-16 22:42+0200\n"
+"POT-Creation-Date: 2013-02-20 19:46+0200\n"
+"PO-Revision-Date: 2013-02-20 20:27+0200\n"
 "Last-Translator: Oleksiy <zalex_ua@i.ua>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: uk\n"
@@ -50,7 +50,7 @@ msgstr[2] "%1$d сценаріїв"
 msgid "%1$s (year %2$s)"
 msgstr "%1$s (рік %2$s)"
 
-#: latest.php:379 latest.php:556
+#: latest.php:376 latest.php:552
 #, php-format
 msgid "%1$s Item"
 msgid_plural "%1$s Items"
@@ -86,14 +86,11 @@ msgstr[2] "%d пристроїв"
 msgid "(0 - infinitely)"
 msgstr "(0 - нескінченно)"
 
-#: include/views/configuration.hostgroups.list.php:31
-msgid "(Only Super Admins can create group)"
-msgstr "(Тільки Супер-Адміністратори можуть створювати групу)"
-
 #: include/views/configuration.host.edit.php:193
+#: include/views/configuration.hostgroups.list.php:31
 #: include/views/configuration.template.edit.php:143
-msgid "(Only superadmins can create group)"
-msgstr "(Тільки Супер-Адміністратори можуть створювати групу)"
+msgid "(Only super admins can create groups)"
+msgstr "(Тільки супер адміністратори можуть створювати групи)"
 
 #: include/forms.inc.php:539 include/forms.inc.php:554
 msgid "(in days)"
@@ -1151,7 +1148,7 @@ msgstr "Не вдалось додати залежність від триге�
 msgid "Cannot add discovery rule"
 msgstr "Не вдалося додати правило виявлення"
 
-#: graphs.php:226
+#: graphs.php:225
 msgid "Cannot add graph"
 msgstr "Не вдалося додати графік"
 
@@ -1289,7 +1286,7 @@ msgstr "Не вдалося клонувати прототипи тригері
 msgid "Cannot connect to the trapper port of zabbix server daemon, but it should be available to run the script."
 msgstr "Не вдалося під'єднатись до порту трапера демона zabbix сервера, але він повинен бути доступний для запуску скрипта."
 
-#: graphs.php:290
+#: graphs.php:289
 msgid "Cannot copy graphs"
 msgstr "Не вдалось скопіювати графіки"
 
@@ -1374,7 +1371,7 @@ msgstr "Не вдалося видалити правило виявлення"
 msgid "Cannot delete discovery rules"
 msgstr "Не вдалося видалити плавила виявлення"
 
-#: graphs.php:237
+#: graphs.php:236
 msgid "Cannot delete graph"
 msgstr "Не вдалося видалити графік"
 
@@ -1386,7 +1383,7 @@ msgstr "Не вдалося видалити прототип графіка"
 msgid "Cannot delete graph."
 msgstr "Не вдалося видалити графік."
 
-#: graphs.php:244
+#: graphs.php:243
 msgid "Cannot delete graphs"
 msgstr "Не вдалося видалити графіки"
 
@@ -1891,7 +1888,7 @@ msgstr "Не вдалося оновити правило виявлення"
 msgid "Cannot update frontend access"
 msgstr "Не вдалося оновити доступ до веб-інтерфейсу"
 
-#: graphs.php:223
+#: graphs.php:222
 msgid "Cannot update graph"
 msgstr "Не вдалося оновити графік"
 
@@ -2324,7 +2321,7 @@ msgstr "Налаштування виявлення"
 msgid "Configuration of discovery rules"
 msgstr "Налаштування правил виявлення"
 
-#: graphs.php:27
+#: graphs.php:26
 msgid "Configuration of graphs"
 msgstr "Налаштування графіків"
 
@@ -4744,7 +4741,7 @@ msgstr "Градієнтна лінія"
 #: include/audit.inc.php:29 include/blocks.inc.php:1120
 #: include/screens.inc.php:30 include/views/configuration.graph.edit.php:287
 #: include/views/monitoring.charts.php:27
-#: include/views/monitoring.history.php:60 latest.php:320 latest.php:498
+#: include/views/monitoring.history.php:60 latest.php:318 latest.php:495
 #: report2.php:240
 msgid "Graph"
 msgstr "Графік"
@@ -4796,11 +4793,11 @@ msgstr "Графік \"%1$s\" пропущено - правило користу
 msgid "Graph \"%1$s\" with templated items cannot contain items from other hosts."
 msgstr "Графік \"%1$s\" з елементами даних із шаблону не може містити елементи даних з інших вузлів мережі."
 
-#: graphs.php:226
+#: graphs.php:225
 msgid "Graph added"
 msgstr "Графік додано"
 
-#: graphs.php:237
+#: graphs.php:236
 msgid "Graph deleted"
 msgstr "Графік видалено"
 
@@ -4851,7 +4848,7 @@ msgstr "Сума графіку"
 msgid "Graph type"
 msgstr "Тип графіка"
 
-#: graphs.php:223
+#: graphs.php:222
 msgid "Graph updated"
 msgstr "Графік оновлено"
 
@@ -4878,11 +4875,11 @@ msgstr "Графік з таким же іменем, але іншого тип
 msgid "Graphs"
 msgstr "Графіки"
 
-#: graphs.php:290
+#: graphs.php:289
 msgid "Graphs copied"
 msgstr "Графіки скопійовано"
 
-#: graphs.php:244
+#: graphs.php:243
 msgid "Graphs deleted"
 msgstr "Графіки видалено"
 
@@ -5043,7 +5040,7 @@ msgstr "Апаратна конфігурація"
 msgid "Hardware (Full details)"
 msgstr "Апаратна частина (повні деталі)"
 
-#: graphs.php:44 include/views/configuration.graph.edit.php:55
+#: graphs.php:43 include/views/configuration.graph.edit.php:55
 #: include/views/configuration.graph.list.php:79
 #: include/views/configuration.screen.constructor.edit.php:574
 #: include/views/configuration.sysmap.edit.php:47
@@ -5094,7 +5091,7 @@ msgstr "Висока"
 #: history.php:27 include/forms.inc.php:853 include/page_header.php:455
 #: include/views/configuration.item.list.php:59
 #: include/views/configuration.item.prototype.list.php:54 jsLoader.php:108
-#: latest.php:196 latest.php:323 latest.php:501
+#: latest.php:196 latest.php:321 latest.php:498
 msgid "History"
 msgstr "Історія"
 
@@ -7112,6 +7109,10 @@ msgstr "Лінки для вибраного елемента"
 msgid "List is empty"
 msgstr "Список пустий"
 
+#: include/locales.inc.php:61
+msgid "Lithuanian (lt_LT)"
+msgstr "Литовський (lt_LT)"
+
 #: dashboard.php:294 dashboard.php:302 dashboard.php:309 dashboard.php:316
 #: dashboard.php:323 dashboard.php:333 include/views/monitoring.slides.php:108
 msgid "Loading..."
@@ -7866,7 +7867,7 @@ msgid "NTLM authentication"
 msgstr "NTLM аутентифікація"
 
 #: actionconf.php:34 actionconf.php:157 adm.regexps.php:36 adm.regexps.php:112
-#: adm.regexps.php:143 disc_prototypes.php:43 graphs.php:42
+#: adm.regexps.php:143 disc_prototypes.php:43 graphs.php:41
 #: host_discovery.php:41 hostinventories.php:159 hosts.php:651 hosts.php:682
 #: httpconf.php:43 httpmon.php:142 include/forms.inc.php:550
 #: include/forms.inc.php:1770 include/hosts.inc.php:114
@@ -8390,10 +8391,6 @@ msgstr "Операцій не визначено."
 
 #: include/classes/import/CConfigurationImport.php:820
 #: include/classes/import/CConfigurationImport.php:897
-#, php-format
-msgid "No permission for Graph \"%1$s\"."
-msgstr "Немає прав доступу до графіка \"%1$s\"."
-
 #: include/classes/import/CXmlImport18.php:1552
 #, php-format
 msgid "No permission for graph \"%1$s\"."
@@ -8559,7 +8556,7 @@ msgstr "Кроків не визначено."
 msgid "No target selected"
 msgstr "Ціль не обрано"
 
-#: graphs.php:294 items.php:609
+#: graphs.php:293 items.php:609
 msgid "No target selected."
 msgstr "Ціль не обрано."
 
@@ -9445,19 +9442,11 @@ msgstr "Пароль не може бути пустим"
 msgid "Peak memory usage: %s"
 msgstr "Пік використання пам'яті: %s"
 
-#: graphs.php:54
-msgid "Percentile line (Left)"
-msgstr "Процентна лінія (зліва)"
-
-#: graphs.php:55
-msgid "Percentile line (Right)"
-msgstr "Процентна лінія (справа)"
-
-#: include/views/configuration.graph.edit.php:144
+#: graphs.php:53 include/views/configuration.graph.edit.php:144
 msgid "Percentile line (left)"
 msgstr "Процентна лінія (зліва)"
 
-#: include/views/configuration.graph.edit.php:156
+#: graphs.php:54 include/views/configuration.graph.edit.php:156
 msgid "Percentile line (right)"
 msgstr "Процентна лінія (справа)"
 
@@ -12273,8 +12262,8 @@ msgid "Unable to select configuration."
 msgstr "Неможливо вибрати конфігурацію."
 
 #: include/classes/helpers/CUploadFile.php:57
-msgid "Unable to uploade file because \"file_uploads\" is disabled."
-msgstr "Неможливо завантажити файл, тому що \"file_uploads\" відключено."
+msgid "Unable to upload file because \"file_uploads\" is disabled."
+msgstr "Неможливо завантажити файл, так як \"file_uploads\" відімкнено."
 
 #: include/maps.inc.php:695 include/maps.inc.php:785 include/maps.inc.php:883
 msgid "Unacknowledged"
@@ -12995,7 +12984,7 @@ msgstr "Щотижня"
 msgid "When active"
 msgstr "Коли активно"
 
-#: graphs.php:43 include/views/configuration.graph.edit.php:54
+#: graphs.php:42 include/views/configuration.graph.edit.php:54
 #: include/views/configuration.graph.list.php:78
 #: include/views/configuration.screen.constructor.edit.php:573
 #: include/views/configuration.sysmap.edit.php:46
@@ -13288,8 +13277,8 @@ msgstr "Ви не вказали цілі глобального скрипта 
 #: api/classes/CGraph.php:709 api/classes/CGraphPrototype.php:758
 #: api/classes/CHostGroup.php:684 api/classes/CHostGroup.php:742
 #: api/classes/CHostGroup.php:894 api/classes/CHostGroup.php:949
-#: api/classes/CHostGroup.php:994 api/classes/CHostGroup.php:1006
-#: api/classes/CHostGroup.php:1021 api/classes/CHost.php:1604
+#: api/classes/CHostGroup.php:994 api/classes/CHostGroup.php:1007
+#: api/classes/CHostGroup.php:1023 api/classes/CHost.php:1604
 #: api/classes/CHost.php:1658 api/classes/CHost.php:1972
 #: api/classes/CMaintenance.php:608 api/classes/CMaintenance.php:715
 #: api/classes/CMaintenance.php:727 api/classes/CScript.php:300
@@ -13557,7 +13546,7 @@ msgstr "d.m.Y H:i"
 #: include/translateDefines.inc.php:46
 #: include/views/administration.auditacts.list.php:113
 #: include/views/administration.auditlogs.list.php:106 jsrpc.php:137
-#: latest.php:289 latest.php:464 tr_status.php:177 tr_status.php:658
+#: latest.php:287 latest.php:461 tr_status.php:177 tr_status.php:658
 #: tr_status.php:748
 msgid "d M Y H:i:s"
 msgstr "d.m.Y H:i:s"

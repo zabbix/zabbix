@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-02-05 11:42+0200\n"
+"POT-Creation-Date: 2013-02-20 19:46+0200\n"
 "PO-Revision-Date: 2012-12-25 07:09+0200\n"
 "Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
@@ -46,7 +46,7 @@ msgstr[0] "%1$dシナリオ"
 msgid "%1$s (year %2$s)"
 msgstr "%1$s (%2$s年)"
 
-#: latest.php:379 latest.php:556
+#: latest.php:376 latest.php:552
 #, php-format
 msgid "%1$s Item"
 msgid_plural "%1$s Items"
@@ -74,14 +74,11 @@ msgstr[0] "%dデバイス"
 msgid "(0 - infinitely)"
 msgstr "(0 - 無限)"
 
-#: include/views/configuration.hostgroups.list.php:31
-msgid "(Only Super Admins can create group)"
-msgstr "(Zabbix特権管理者のみがグループを作成できます)"
-
 #: include/views/configuration.host.edit.php:193
+#: include/views/configuration.hostgroups.list.php:31
 #: include/views/configuration.template.edit.php:143
-msgid "(Only superadmins can create group)"
-msgstr "(Zabbix特権管理者のみがグループを作成できます)"
+msgid "(Only super admins can create groups)"
+msgstr ""
 
 #: include/forms.inc.php:539 include/forms.inc.php:554
 msgid "(in days)"
@@ -1139,7 +1136,7 @@ msgstr "トリガー\"%1$s:%2$s\"から存在しないトリガー\"%3$s:%4$s\"�
 msgid "Cannot add discovery rule"
 msgstr "ディスカバリのルールを追加できません"
 
-#: graphs.php:226
+#: graphs.php:225
 msgid "Cannot add graph"
 msgstr "グラフを追加できません"
 
@@ -1277,7 +1274,7 @@ msgstr "トリガーのプロトタイプを複製できません"
 msgid "Cannot connect to the trapper port of zabbix server daemon, but it should be available to run the script."
 msgstr "ZabbixサーバーデーモンのTrapperポートに接続できません。スクリプトを実行するためには適切に設定を行ってください。"
 
-#: graphs.php:290
+#: graphs.php:289
 msgid "Cannot copy graphs"
 msgstr "グラフをコピーできません"
 
@@ -1362,7 +1359,7 @@ msgstr "ディスカバリのルールを削除できません"
 msgid "Cannot delete discovery rules"
 msgstr "ディスカバリルールを削除できません"
 
-#: graphs.php:237
+#: graphs.php:236
 msgid "Cannot delete graph"
 msgstr "グラフを削除できません"
 
@@ -1374,7 +1371,7 @@ msgstr "グラフのプロトタイプを削除できません"
 msgid "Cannot delete graph."
 msgstr "グラフを削除できません"
 
-#: graphs.php:244
+#: graphs.php:243
 msgid "Cannot delete graphs"
 msgstr "グラフを削除できません"
 
@@ -1873,7 +1870,7 @@ msgstr "ディスカバリのルールを更新できません"
 msgid "Cannot update frontend access"
 msgstr "フロントエンドのアクセスを更新できません"
 
-#: graphs.php:223
+#: graphs.php:222
 msgid "Cannot update graph"
 msgstr "グラフを更新できません"
 
@@ -2306,7 +2303,7 @@ msgstr "ディスカバリの設定"
 msgid "Configuration of discovery rules"
 msgstr "ディスカバリルールの設定"
 
-#: graphs.php:27
+#: graphs.php:26
 msgid "Configuration of graphs"
 msgstr "グラフの設定"
 
@@ -4724,7 +4721,7 @@ msgstr "グラデーションライン"
 #: include/audit.inc.php:29 include/blocks.inc.php:1120
 #: include/screens.inc.php:30 include/views/configuration.graph.edit.php:287
 #: include/views/monitoring.charts.php:27
-#: include/views/monitoring.history.php:60 latest.php:320 latest.php:498
+#: include/views/monitoring.history.php:60 latest.php:318 latest.php:495
 #: report2.php:240
 msgid "Graph"
 msgstr "グラフ"
@@ -4776,11 +4773,11 @@ msgstr "グラフ\"%1$s\"はスキップされました - ユーザの指定。"
 msgid "Graph \"%1$s\" with templated items cannot contain items from other hosts."
 msgstr "テンプレートのアイテムを含むグラフ\"%1$s\"には他のホストのアイテムを設定できません。"
 
-#: graphs.php:226
+#: graphs.php:225
 msgid "Graph added"
 msgstr "グラフを追加しました"
 
-#: graphs.php:237
+#: graphs.php:236
 msgid "Graph deleted"
 msgstr "グラフを削除しました"
 
@@ -4831,7 +4828,7 @@ msgstr "グラフの合計値"
 msgid "Graph type"
 msgstr "グラフのタイプ"
 
-#: graphs.php:223
+#: graphs.php:222
 msgid "Graph updated"
 msgstr "グラフを更新しました"
 
@@ -4858,11 +4855,11 @@ msgstr "同じ名前で異なるタイプのグラフが存在します。"
 msgid "Graphs"
 msgstr "グラフ"
 
-#: graphs.php:290
+#: graphs.php:289
 msgid "Graphs copied"
 msgstr "グラフをコピーしました"
 
-#: graphs.php:244
+#: graphs.php:243
 msgid "Graphs deleted"
 msgstr "グラフを削除しました"
 
@@ -5023,7 +5020,7 @@ msgstr "ハードウェア"
 msgid "Hardware (Full details)"
 msgstr "ハードウェア (詳細)"
 
-#: graphs.php:44 include/views/configuration.graph.edit.php:55
+#: graphs.php:43 include/views/configuration.graph.edit.php:55
 #: include/views/configuration.graph.list.php:79
 #: include/views/configuration.screen.constructor.edit.php:574
 #: include/views/configuration.sysmap.edit.php:47
@@ -5074,7 +5071,7 @@ msgstr "重度の障害"
 #: history.php:27 include/forms.inc.php:853 include/page_header.php:455
 #: include/views/configuration.item.list.php:59
 #: include/views/configuration.item.prototype.list.php:54 jsLoader.php:108
-#: latest.php:196 latest.php:323 latest.php:501
+#: latest.php:196 latest.php:321 latest.php:498
 msgid "History"
 msgstr "ヒストリ"
 
@@ -7090,6 +7087,10 @@ msgstr "選択された要素のリンク"
 msgid "List is empty"
 msgstr "リストがありません"
 
+#: include/locales.inc.php:61
+msgid "Lithuanian (lt_LT)"
+msgstr ""
+
 #: dashboard.php:294 dashboard.php:302 dashboard.php:309 dashboard.php:316
 #: dashboard.php:323 dashboard.php:333 include/views/monitoring.slides.php:108
 msgid "Loading..."
@@ -7838,7 +7839,7 @@ msgid "NTLM authentication"
 msgstr "NTLM認証"
 
 #: actionconf.php:34 actionconf.php:157 adm.regexps.php:36 adm.regexps.php:112
-#: adm.regexps.php:143 disc_prototypes.php:43 graphs.php:42
+#: adm.regexps.php:143 disc_prototypes.php:43 graphs.php:41
 #: host_discovery.php:41 hostinventories.php:159 hosts.php:651 hosts.php:682
 #: httpconf.php:43 httpmon.php:142 include/forms.inc.php:550
 #: include/forms.inc.php:1770 include/hosts.inc.php:114
@@ -8362,10 +8363,6 @@ msgstr "実行するアクションが設定されていません。"
 
 #: include/classes/import/CConfigurationImport.php:820
 #: include/classes/import/CConfigurationImport.php:897
-#, php-format
-msgid "No permission for Graph \"%1$s\"."
-msgstr "グラフ\"%1$s\"への権限がありません。"
-
 #: include/classes/import/CXmlImport18.php:1552
 #, php-format
 msgid "No permission for graph \"%1$s\"."
@@ -8531,7 +8528,7 @@ msgstr "ステップが設定されていません。"
 msgid "No target selected"
 msgstr "何も選択されていません"
 
-#: graphs.php:294 items.php:609
+#: graphs.php:293 items.php:609
 msgid "No target selected."
 msgstr "何も選択されていません。"
 
@@ -9417,19 +9414,11 @@ msgstr "パスワードを設定してください"
 msgid "Peak memory usage: %s"
 msgstr "ピークのメモリ使用量: %s"
 
-#: graphs.php:54
-msgid "Percentile line (Left)"
-msgstr "パーセンタイルライン (左)"
-
-#: graphs.php:55
-msgid "Percentile line (Right)"
-msgstr "パーセンタイルライン (右)"
-
-#: include/views/configuration.graph.edit.php:144
+#: graphs.php:53 include/views/configuration.graph.edit.php:144
 msgid "Percentile line (left)"
 msgstr "パーセンタイルライン (左)"
 
-#: include/views/configuration.graph.edit.php:156
+#: graphs.php:54 include/views/configuration.graph.edit.php:156
 msgid "Percentile line (right)"
 msgstr "パーセンタイルライン (右)"
 
@@ -12237,8 +12226,8 @@ msgid "Unable to select configuration."
 msgstr "選択した設定は行えません"
 
 #: include/classes/helpers/CUploadFile.php:57
-msgid "Unable to uploade file because \"file_uploads\" is disabled."
-msgstr "file_uploads\"が無効のためファイルをアップロードできません。"
+msgid "Unable to upload file because \"file_uploads\" is disabled."
+msgstr ""
 
 #: include/maps.inc.php:695 include/maps.inc.php:785 include/maps.inc.php:883
 msgid "Unacknowledged"
@@ -12955,7 +12944,7 @@ msgstr "毎週"
 msgid "When active"
 msgstr "有効な時間帯"
 
-#: graphs.php:43 include/views/configuration.graph.edit.php:54
+#: graphs.php:42 include/views/configuration.graph.edit.php:54
 #: include/views/configuration.graph.list.php:78
 #: include/views/configuration.screen.constructor.edit.php:573
 #: include/views/configuration.sysmap.edit.php:46
@@ -13248,8 +13237,8 @@ msgstr "アクションのグローバルスクリプト\"%s\"のターゲット
 #: api/classes/CGraph.php:709 api/classes/CGraphPrototype.php:758
 #: api/classes/CHostGroup.php:684 api/classes/CHostGroup.php:742
 #: api/classes/CHostGroup.php:894 api/classes/CHostGroup.php:949
-#: api/classes/CHostGroup.php:994 api/classes/CHostGroup.php:1006
-#: api/classes/CHostGroup.php:1021 api/classes/CHost.php:1604
+#: api/classes/CHostGroup.php:994 api/classes/CHostGroup.php:1007
+#: api/classes/CHostGroup.php:1023 api/classes/CHost.php:1604
 #: api/classes/CHost.php:1658 api/classes/CHost.php:1972
 #: api/classes/CMaintenance.php:608 api/classes/CMaintenance.php:715
 #: api/classes/CMaintenance.php:727 api/classes/CScript.php:300
@@ -13517,7 +13506,7 @@ msgstr "Y/m/d H:i"
 #: include/translateDefines.inc.php:46
 #: include/views/administration.auditacts.list.php:113
 #: include/views/administration.auditlogs.list.php:106 jsrpc.php:137
-#: latest.php:289 latest.php:464 tr_status.php:177 tr_status.php:658
+#: latest.php:287 latest.php:461 tr_status.php:177 tr_status.php:658
 #: tr_status.php:748
 msgid "d M Y H:i:s"
 msgstr "Y/m/d H:i:s"

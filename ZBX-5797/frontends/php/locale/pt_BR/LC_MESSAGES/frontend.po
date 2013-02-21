@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-02-05 11:42+0200\n"
-"PO-Revision-Date: 2013-01-23 18:49+0200\n"
+"POT-Creation-Date: 2013-02-20 19:46+0200\n"
+"PO-Revision-Date: 2013-02-21 00:37+0200\n"
 "Last-Translator: Adail <the.spaww@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pt_BR\n"
@@ -48,7 +48,7 @@ msgstr[1] "%1$d cenários"
 msgid "%1$s (year %2$s)"
 msgstr "%1$s (ano %2$s)"
 
-#: latest.php:379 latest.php:556
+#: latest.php:376 latest.php:552
 #, php-format
 msgid "%1$s Item"
 msgid_plural "%1$s Items"
@@ -80,14 +80,11 @@ msgstr[1] "%d dispositivos"
 msgid "(0 - infinitely)"
 msgstr "(0 - indefinidamente)"
 
-#: include/views/configuration.hostgroups.list.php:31
-msgid "(Only Super Admins can create group)"
-msgstr "(Somente Super Admins podem criar grupos)"
-
 #: include/views/configuration.host.edit.php:193
+#: include/views/configuration.hostgroups.list.php:31
 #: include/views/configuration.template.edit.php:143
-msgid "(Only superadmins can create group)"
-msgstr "(Somente superadmins podem criar grupos)"
+msgid "(Only super admins can create groups)"
+msgstr "(Apenas super administradores podem criar grupos)"
 
 #: include/forms.inc.php:539 include/forms.inc.php:554
 msgid "(in days)"
@@ -679,7 +676,7 @@ msgstr "Em"
 
 #: include/forms.inc.php:1682
 msgid "At (hour:minute)"
-msgstr "às (horas:minutos)"
+msgstr "Às (horas:minutos)"
 
 #: api/classes/CMaintenance.php:403 api/classes/CMaintenance.php:595
 msgid "At least one host or group should be selected."
@@ -944,11 +941,11 @@ msgstr "CONFIGURAÇÃO DE HOSTS"
 
 #: adm.housekeeper.php:86
 msgid "CONFIGURATION OF HOUSEKEEPER"
-msgstr "CONFIGURAÇÃO DO HOUSEKEEPER"
+msgstr "CONFIGURAÇÃO DE LIMPEZA DE DADOS"
 
 #: adm.iconmapping.php:127
 msgid "CONFIGURATION OF ICON MAPPING"
-msgstr "CONFIGURAÇÃO DO ÍCONE DE MAPA"
+msgstr "CONFIGURAÇÃO DO MAPEAMENTO DE ÍCONES"
 
 #: adm.images.php:149
 msgid "CONFIGURATION OF IMAGES"
@@ -1148,7 +1145,7 @@ msgstr "Não é possível adicionar dependência na trigger \"%1$s:%2$s\" para u
 msgid "Cannot add discovery rule"
 msgstr "Regra de autobusca não pode ser adicionada"
 
-#: graphs.php:226
+#: graphs.php:225
 msgid "Cannot add graph"
 msgstr "Gráfico não foi adicionado"
 
@@ -1286,7 +1283,7 @@ msgstr "Não foi possível clonar protótipos da trigger."
 msgid "Cannot connect to the trapper port of zabbix server daemon, but it should be available to run the script."
 msgstr "Não foi possível conectar na porta de trapper do daemon do servidor zabbix, mas ele deve estar disponível para executar o script."
 
-#: graphs.php:290
+#: graphs.php:289
 msgid "Cannot copy graphs"
 msgstr "Não foi possível copiar gráficos"
 
@@ -1371,7 +1368,7 @@ msgstr "Regra de autobusca não pode ser removida"
 msgid "Cannot delete discovery rules"
 msgstr "Não foi possível apagar a regra de descoberta."
 
-#: graphs.php:237
+#: graphs.php:236
 msgid "Cannot delete graph"
 msgstr "Gráfico não foi removido"
 
@@ -1383,7 +1380,7 @@ msgstr "Não foi possível excluir o protótipo de gráfico."
 msgid "Cannot delete graph."
 msgstr "Gráfico não foi removido."
 
-#: graphs.php:244
+#: graphs.php:243
 msgid "Cannot delete graphs"
 msgstr "Não foi possível remover gráficos"
 
@@ -1744,7 +1741,7 @@ msgstr "Não foi possível remover a macro."
 
 #: api/classes/CUser.php:380
 msgid "Cannot rename guest user."
-msgstr "Não é possível renomear o usuário \"guest\"."
+msgstr "Não é possível renomear o usuário \"guest\" (convidado)."
 
 #: api/classes/CDRule.php:445
 msgid "Cannot save discovery rule without checks."
@@ -1753,7 +1750,7 @@ msgstr "Não foi possível salvar as regras de descoberta sem checar."
 #: api/classes/CApplication.php:459
 #, php-format
 msgid "Cannot set \"templateid\" for application \"%1$s\"."
-msgstr "Não foi possível definir o ID de template para a aplicação \"%1$s\"."
+msgstr "Não foi possível definir o \"ID de template\" para a aplicação \"%1$s\"."
 
 #: api/classes/CGraphGeneral.php:62
 #, php-format
@@ -1885,7 +1882,7 @@ msgstr "Regra de autobusca não foi atualizada"
 msgid "Cannot update frontend access"
 msgstr "Não é possível atualizar o acesso ao frontend"
 
-#: graphs.php:223
+#: graphs.php:222
 msgid "Cannot update graph"
 msgstr "Gráfico não foi atualizado"
 
@@ -2077,7 +2074,7 @@ msgstr "Verificação já existe."
 #: include/classes/parsers/CTriggerExpression.php:248
 #, php-format
 msgid "Check expression part starting from \"%1$s\"."
-msgstr "Confira parte da expressão iniciando com  \"%1$s\"."
+msgstr "Confira parte da expressão iniciando com \"%1$s\"."
 
 #: api/classes/CItemGeneral.php:262
 msgid "Check the key, please. Default example was passed."
@@ -2213,7 +2210,7 @@ msgstr "Sobrepor coluna"
 #: api/classes/CScreenItem.php:613
 #, php-format
 msgid "Column span of screen element located at X - %1$s and Y - %2$s is too big."
-msgstr "A extensão da coluna do elemento de tela localizado entre  X - %1$s e Y - %2$s é muito grande."
+msgstr "A extensão da coluna do elemento de tela localizado entre X - %1$s e Y - %2$s é muito grande."
 
 #: include/views/configuration.screen.edit.php:40 screenconf.php:51
 msgid "Columns"
@@ -2318,7 +2315,7 @@ msgstr "Configuração da autobusca"
 msgid "Configuration of discovery rules"
 msgstr "Configuração de regras de descoberta"
 
-#: graphs.php:27
+#: graphs.php:26
 msgid "Configuration of graphs"
 msgstr "Configuração de gráficos"
 
@@ -2588,7 +2585,7 @@ msgstr "Criar mapa de ícone"
 
 #: adm.images.php:145
 msgid "Create image"
-msgstr "Create image"
+msgstr "Criar imagem"
 
 #: include/views/configuration.item.list.php:30 items.php:662
 msgid "Create item"
@@ -4215,7 +4212,7 @@ msgstr "Descrição do erro: Não foi possível enviar o comando, verifique as c
 
 #: api/classes/CScript.php:509
 msgid "Error description: defined in \"include/defines.inc.php\" constant ZBX_SCRIPT_BYTES_LIMIT read bytes limit is reached. You can try to increase this value."
-msgstr "Descrição do erro: O limite definido para a constante ZBX_SCRIPT_BYTES_LIMIT no arquivo  \"include/defines.inc.php\" foi alcançado. Você pode tentar aumentar este valor."
+msgstr "Descrição do erro: O limite definido para a constante ZBX_SCRIPT_BYTES_LIMIT no arquivo \"include/defines.inc.php\" foi alcançado. Você pode tentar aumentar este valor."
 
 #: api/classes/CScript.php:505
 msgid "Error description: defined in \"include/defines.inc.php\" constant ZBX_SCRIPT_TIMEOUT timeout is reached. You can try to increase this value."
@@ -4742,7 +4739,7 @@ msgstr "Área gradiente"
 #: include/audit.inc.php:29 include/blocks.inc.php:1120
 #: include/screens.inc.php:30 include/views/configuration.graph.edit.php:287
 #: include/views/monitoring.charts.php:27
-#: include/views/monitoring.history.php:60 latest.php:320 latest.php:498
+#: include/views/monitoring.history.php:60 latest.php:318 latest.php:495
 #: report2.php:240
 msgid "Graph"
 msgstr "Gráfico"
@@ -4792,13 +4789,13 @@ msgstr "Gráfico \"%1$s\" ignorado - regra de usuário."
 #: api/classes/CGraph.php:38
 #, php-format
 msgid "Graph \"%1$s\" with templated items cannot contain items from other hosts."
-msgstr "O gráfico \"%1$s\" possui itens de template. Nesta situação não é possível adicionar itens de outros hosts."
+msgstr "O gráfico \"%1$s\" possui itens de template, nesta situação não é possível adicionar itens de outros hosts."
 
-#: graphs.php:226
+#: graphs.php:225
 msgid "Graph added"
 msgstr "Gráfico incluído"
 
-#: graphs.php:237
+#: graphs.php:236
 msgid "Graph deleted"
 msgstr "Gráfico removido"
 
@@ -4817,7 +4814,7 @@ msgstr "Nome do gráfico"
 #: api/classes/CGraphPrototype.php:34
 #, php-format
 msgid "Graph prototype \"%1$s\" with templated items cannot contain items from other hosts."
-msgstr "O protótipo de gráfico \"%1$s\" possui itens de template. Nesta situação não é possível adicionar itens de outros hosts."
+msgstr "O protótipo de gráfico \"%1$s\" possui itens de template, esta situação não é possível adicionar itens de outros hosts."
 
 #: api/classes/CGraphPrototype.php:792
 #, php-format
@@ -4849,7 +4846,7 @@ msgstr "Somatória do gráfico"
 msgid "Graph type"
 msgstr "Tipo do gráfico"
 
-#: graphs.php:223
+#: graphs.php:222
 msgid "Graph updated"
 msgstr "Gráfico atualizado"
 
@@ -4876,11 +4873,11 @@ msgstr "Já existe um gráfico com o mesmo nome, mas com outro tipo."
 msgid "Graphs"
 msgstr "Gráficos"
 
-#: graphs.php:290
+#: graphs.php:289
 msgid "Graphs copied"
 msgstr "Gráficos copiados"
 
-#: graphs.php:244
+#: graphs.php:243
 msgid "Graphs deleted"
 msgstr "Gráficos removidos"
 
@@ -5041,7 +5038,7 @@ msgstr "Hardware"
 msgid "Hardware (Full details)"
 msgstr "Hardware (Mais detalhes)"
 
-#: graphs.php:44 include/views/configuration.graph.edit.php:55
+#: graphs.php:43 include/views/configuration.graph.edit.php:55
 #: include/views/configuration.graph.list.php:79
 #: include/views/configuration.screen.constructor.edit.php:574
 #: include/views/configuration.sysmap.edit.php:47
@@ -5092,7 +5089,7 @@ msgstr "Alta"
 #: history.php:27 include/forms.inc.php:853 include/page_header.php:455
 #: include/views/configuration.item.list.php:59
 #: include/views/configuration.item.prototype.list.php:54 jsLoader.php:108
-#: latest.php:196 latest.php:323 latest.php:501
+#: latest.php:196 latest.php:321 latest.php:498
 msgid "History"
 msgstr "Histórico"
 
@@ -5595,7 +5592,7 @@ msgstr "O mapeamento de ícone \"%s\" já existe."
 #: api/classes/CIconMap.php:538
 #, php-format
 msgid "Icon map \"%s\" cannot have mapping with empty expression."
-msgstr "O mapeamento de ícone \"%s\" não pode ter  expressão de mapeamento vazia."
+msgstr "O mapeamento de ícone \"%s\" não pode ter expressão de mapeamento vazia."
 
 #: api/classes/CIconMap.php:542
 #, php-format
@@ -5645,7 +5642,7 @@ msgstr "Mapeamento de ícone"
 #: api/classes/CIconMap.php:552
 #, php-format
 msgid "Icon mapping entry \"%1$s\" against \"%2$s\" already exists."
-msgstr "Já existe entrada no mapeamento de ícone de  \"%1$s\"  contra  \"%2$s\"."
+msgstr "Já existe entrada no mapeamento de ícone de \"%1$s\" contra \"%2$s\"."
 
 #: jsLoader.php:158
 msgid "Iconmap is not enabled"
@@ -5684,7 +5681,7 @@ msgstr "Tipo do rótulo de imagem"
 #: api/classes/CImage.php:343
 #, php-format
 msgid "Image load error [%1$s] in [%2$s]."
-msgstr "Erro carregando imagem  [%1$s] em [%2$s]."
+msgstr "Erro carregando imagem [%1$s] em [%2$s]."
 
 #: api/classes/CImage.php:588 include/classes/helpers/CUploadFile.php:129
 msgid "Image size must be less than 1MB."
@@ -6068,7 +6065,7 @@ msgstr "Item inválido para o eixo."
 #: api/classes/CTrigger.php:1206 include/triggers.inc.php:917
 #, php-format
 msgid "Incorrect item key \"%1$s\" provided for trigger expression on \"%2$s\"."
-msgstr "Chave de item inválida (\"%1$s\") é utilizada na expressão de trigger em \"%2$s\"."
+msgstr "Chave de item inválida \"%1$s\" é utilizada na expressão de trigger em \"%2$s\"."
 
 #: include/classes/validators/CTriggerFunctionValidator.php:64
 #, php-format
@@ -6254,12 +6251,12 @@ msgstr "Sintaxe incorreta próxima a \"%1$s\"."
 #: include/classes/validators/CTimePeriodValidator.php:92
 #, php-format
 msgid "Incorrect time period \"%1$s\" start day must be less or equal to end day."
-msgstr "A data de início informada (\"%1$s\") é inválida, ela deve ser igual ou superior ao dia final."
+msgstr "A data de início informada \"%1$s\" é inválida, ela deve ser igual ou superior ao dia final."
 
 #: include/classes/validators/CTimePeriodValidator.php:98
 #, php-format
 msgid "Incorrect time period \"%1$s\" start time must be less than end time."
-msgstr "O horário de início informado (\"%1$s\") é inválido, ele deve ser igual ou superior ao horário final."
+msgstr "O horário de início informado \"%1$s\" é inválido, ele deve ser igual ou superior ao horário final."
 
 #: include/classes/validators/CTimePeriodValidator.php:82
 #: include/classes/validators/CTimePeriodValidator.php:87
@@ -6289,7 +6286,7 @@ msgstr "Trigger com expressão inválida. O Host \"%1$s\" não existe ou você n
 #: api/classes/CTrigger.php:1186
 #, php-format
 msgid "Incorrect trigger expression. Host \"%s\" does not exist or you have no access to this host."
-msgstr "Trigger com expressão inválida.O host \"%s\" não existe ou você não possui acesso à este host."
+msgstr "Trigger com expressão inválida. O host \"%s\" não existe ou você não possui acesso à este host."
 
 #: api/classes/CTrigger.php:1192
 msgid "Incorrect trigger expression. Trigger expression elements should not belong to a template and a host simultaneously."
@@ -6304,7 +6301,7 @@ msgstr "Trigger com expressão inválida. Os elementos da expressão não podem 
 #: include/classes/validators/CTriggerFunctionValidator.php:112
 #, php-format
 msgid "Incorrect trigger function \"%1$s\" provided in expression."
-msgstr "A expressão da trigger possui uma função inválida (\"%1$s\")."
+msgstr "A expressão da trigger possui uma função inválida \"%1$s\"."
 
 #: include/func.inc.php:1058
 msgid "Incorrect type of asort_by_key."
@@ -7064,12 +7061,12 @@ msgstr "O nome do link deve ser único para o mapa \"%s\"."
 #: api/classes/CMap.php:642
 #, php-format
 msgid "Link selementid1 field is pointing to a nonexistent map selement ID \"%1$s\" for map \"%2$s\"."
-msgstr "O campo selementid1 possui vínculo apontando para um selement ID (\"%1$s\") inexistente para o mapa \"%2$s\"."
+msgstr "O campo \"selementid1\" possui vínculo apontando para um \"selementID\" \"%1$s\" inexistente para o mapa \"%2$s\"."
 
 #: api/classes/CMap.php:645
 #, php-format
 msgid "Link selementid2 field is pointing to a nonexistent map selement ID \"%1$s\" for map \"%2$s\"."
-msgstr "O campo selementid2 possui vínculo apontando para um selement ID (\"%1$s\") inexistente para o mapa \"%2$s\"."
+msgstr "O campo selementid2 possui vínculo apontando para um selement ID \"%1$s\" inexistente para o mapa \"%2$s\"."
 
 #: api/classes/CMap.php:628
 #, php-format
@@ -7111,6 +7108,10 @@ msgstr "Vínculos para o elemento selecionado"
 #: include/classes/class.clist.php:33
 msgid "List is empty"
 msgstr "A lista está vazia"
+
+#: include/locales.inc.php:61
+msgid "Lithuanian (lt_LT)"
+msgstr "Lituano (lt_LT)"
 
 #: dashboard.php:294 dashboard.php:302 dashboard.php:309 dashboard.php:316
 #: dashboard.php:323 dashboard.php:333 include/views/monitoring.slides.php:108
@@ -7863,7 +7864,7 @@ msgid "NTLM authentication"
 msgstr "Autenticação NTLM"
 
 #: actionconf.php:34 actionconf.php:157 adm.regexps.php:36 adm.regexps.php:112
-#: adm.regexps.php:143 disc_prototypes.php:43 graphs.php:42
+#: adm.regexps.php:143 disc_prototypes.php:43 graphs.php:41
 #: host_discovery.php:41 hostinventories.php:159 hosts.php:651 hosts.php:682
 #: httpconf.php:43 httpmon.php:142 include/forms.inc.php:550
 #: include/forms.inc.php:1770 include/hosts.inc.php:114
@@ -8387,10 +8388,6 @@ msgstr "Não foram definidas operações."
 
 #: include/classes/import/CConfigurationImport.php:820
 #: include/classes/import/CConfigurationImport.php:897
-#, php-format
-msgid "No permission for Graph \"%1$s\"."
-msgstr "Sem permissão para o gráfico \"%1$s\"."
-
 #: include/classes/import/CXmlImport18.php:1552
 #, php-format
 msgid "No permission for graph \"%1$s\"."
@@ -8556,7 +8553,7 @@ msgstr "Não foram definidos os passos."
 msgid "No target selected"
 msgstr "Nenhum alvo selecionado"
 
-#: graphs.php:294 items.php:609
+#: graphs.php:293 items.php:609
 msgid "No target selected."
 msgstr "Não foi selecionado o destinatário."
 
@@ -9190,7 +9187,7 @@ msgstr "PHP ctype"
 
 #: include/classes/class.frontendsetup.php:551
 msgid "PHP ctype extension missing (PHP configuration parameter --enable-ctype)"
-msgstr "A extensão PHP ctype está faltando  (Parâmetro de configuração do PHP --enable-ctype)"
+msgstr "A extensão PHP ctype está faltando (Parâmetro de configuração do PHP --enable-ctype)"
 
 #: include/classes/class.frontendsetup.php:288
 msgid "PHP databases support"
@@ -9366,7 +9363,7 @@ msgstr "Parâmetro do tipo string ou macro de usuário esperada, mas foi forneci
 #: include/classes/validators/CTriggerFunctionValidator.php:106
 #, php-format
 msgid "Parameter sec or #num or user macro expected, \"%1$s\" given."
-msgstr "Parâmetro sec ou #num ou  macro de usuário esperada, mas foi fornecido \"%1$s\"."
+msgstr "Parâmetro sec ou #num ou macro de usuário esperada, mas foi fornecido \"%1$s\"."
 
 #: include/classes/validators/CTriggerFunctionValidator.php:99
 #, php-format
@@ -9442,19 +9439,11 @@ msgstr "Senha não pode ser vazia"
 msgid "Peak memory usage: %s"
 msgstr "Pico de utilização de memória: %s"
 
-#: graphs.php:54
-msgid "Percentile line (Left)"
-msgstr "Linha percentual (Esquerda)"
-
-#: graphs.php:55
-msgid "Percentile line (Right)"
-msgstr "Linha percentual (Direita)"
-
-#: include/views/configuration.graph.edit.php:144
+#: graphs.php:53 include/views/configuration.graph.edit.php:144
 msgid "Percentile line (left)"
 msgstr "Linha percentual (esquerda)"
 
-#: include/views/configuration.graph.edit.php:156
+#: graphs.php:54 include/views/configuration.graph.edit.php:156
 msgid "Percentile line (right)"
 msgstr "Linha percentual (direita)"
 
@@ -12127,7 +12116,7 @@ msgstr "Dois elementos devem estar selecionados"
 #: api/classes/CItem.php:1273
 #, php-format
 msgid "Two items (\"%1$s\" and \"%2$s\") cannot populate one host inventory field \"%3$s\", this would lead to a conflict."
-msgstr "Dois itens (\"%1$s\" e \"%2$s\") não podem popular o mesmo campo no inventário (\"%3$s\"), isso levaria a um conflito."
+msgstr "Dois itens (\"%1$s\" e \"%2$s\") não podem popular o mesmo campo no inventário \"%3$s\", isso levaria a um conflito."
 
 #: hostinventories.php:160 include/actions.inc.php:731
 #: include/classes/screens/CScreenActions.php:48
@@ -12221,7 +12210,7 @@ msgstr "URL"
 
 #: include/views/administration.users.edit.php:123
 msgid "URL (after login)"
-msgstr "URL (ao sair)"
+msgstr "URL (ao se autenticar)"
 
 #: include/hosts.inc.php:274
 msgid "URL A"
@@ -12266,8 +12255,8 @@ msgid "Unable to select configuration."
 msgstr "Não foi possível selecionar a configuração."
 
 #: include/classes/helpers/CUploadFile.php:57
-msgid "Unable to uploade file because \"file_uploads\" is disabled."
-msgstr "Não foi possível enviar o arquivo pois a diretiva \"file_uploads\" está desabilitada."
+msgid "Unable to upload file because \"file_uploads\" is disabled."
+msgstr "Não foi possível enviar o arquivo pois o upload de arquivos esta desabilitado."
 
 #: include/maps.inc.php:695 include/maps.inc.php:785 include/maps.inc.php:883
 msgid "Unacknowledged"
@@ -12606,7 +12595,7 @@ msgstr "Grupo de usuários"
 #: api/classes/CUserGroup.php:718
 #, php-format
 msgid "User group \"%1$s\" is used in script \"%2$s\"."
-msgstr "O grupo de usuários \"%s$s\" é utililizado no script \"%2$s\"."
+msgstr "O grupo de usuários \"%1$s\" é utililizado no script \"%2$s\"."
 
 #: api/classes/CUserGroup.php:528
 #, php-format
@@ -12986,7 +12975,7 @@ msgstr "Semanal"
 msgid "When active"
 msgstr "Quando ativo"
 
-#: graphs.php:43 include/views/configuration.graph.edit.php:54
+#: graphs.php:42 include/views/configuration.graph.edit.php:54
 #: include/views/configuration.graph.list.php:78
 #: include/views/configuration.screen.constructor.edit.php:573
 #: include/views/configuration.sysmap.edit.php:46
@@ -13279,8 +13268,8 @@ msgstr "Não foi especificado nenhum destino para a operação de script para a 
 #: api/classes/CGraph.php:709 api/classes/CGraphPrototype.php:758
 #: api/classes/CHostGroup.php:684 api/classes/CHostGroup.php:742
 #: api/classes/CHostGroup.php:894 api/classes/CHostGroup.php:949
-#: api/classes/CHostGroup.php:994 api/classes/CHostGroup.php:1006
-#: api/classes/CHostGroup.php:1021 api/classes/CHost.php:1604
+#: api/classes/CHostGroup.php:994 api/classes/CHostGroup.php:1007
+#: api/classes/CHostGroup.php:1023 api/classes/CHost.php:1604
 #: api/classes/CHost.php:1658 api/classes/CHost.php:1972
 #: api/classes/CMaintenance.php:608 api/classes/CMaintenance.php:715
 #: api/classes/CMaintenance.php:727 api/classes/CScript.php:300
@@ -13549,7 +13538,7 @@ msgstr "d M Y H:i"
 #: include/translateDefines.inc.php:46
 #: include/views/administration.auditacts.list.php:113
 #: include/views/administration.auditlogs.list.php:106 jsrpc.php:137
-#: latest.php:289 latest.php:464 tr_status.php:177 tr_status.php:658
+#: latest.php:287 latest.php:461 tr_status.php:177 tr_status.php:658
 #: tr_status.php:748
 msgid "d M Y H:i:s"
 msgstr "d M Y H:i:s"
