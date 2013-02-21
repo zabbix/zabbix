@@ -71,10 +71,9 @@ int	PERF_COUNTER(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 {
 	const char		*__function_name = "PERF_COUNTER";
 	char			counterpath[PDH_MAX_COUNTER_PATH], tmp[MAX_STRING_LEN];
-	int			ret = SYSINFO_RET_FAIL;
+	int			interval, ret = SYSINFO_RET_FAIL;
 	double			value;
 	PERF_COUNTER_DATA	*perfs = NULL;
-	uint32_t		interval;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -86,7 +85,7 @@ int	PERF_COUNTER(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 
 	if (0 != get_param(param, 2, tmp, sizeof(tmp)) || '\0' == *tmp)
 		interval = 1;
-	else if (FAIL == is_uint32(tmp, &interval))
+	else if (FAIL == is_uint31(tmp, &interval))
 		goto clean;
 
 	if (FAIL == check_counter_path(counterpath))

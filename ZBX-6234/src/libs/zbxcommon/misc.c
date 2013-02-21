@@ -1488,26 +1488,35 @@ int	is_int_prefix(const char *str)
 
 /******************************************************************************
  *                                                                            *
- * Function: is_uint64_n                                                      *
+ * Function: is_uint_n_bits                                                   *
  *                                                                            *
- * Purpose: check if the string is 64bit unsigned integer                     *
+ * Purpose: check if the string is unsigned integer and optionally store      *
+ *          it into value parameter                                           *
  *                                                                            *
  * Parameters: str   - [IN] string to check                                   *
  *             n     - [IN] string length or ZBX_MAX_UINT64_LEN               *
+ *             bits  - [IN] the maximum number of bits in resulting value     *
  *             value - [OUT] a pointer to converted value (optional)          *
+ *             size  - [IN] size of the output buffer (optional)              *
  *                                                                            *
  * Return value:  SUCCEED - the string is unsigned integer                    *
- *                FAIL - the string is not a number or overflow               *
+ *                FAIL - the string is not a number or its value exceeds the  *
+ *                       specified number of bits or output buffer is too     *
+ *                       small                                                *
  *                                                                            *
- * Author: Alexander Vladishev                                                *
+ * Note that the output value is not zeroed. So if its size is larger than    *
+ * necessary to store the requested number of bits, it should be zeroed by    *
+ * caller.                                                                    *
+ *                                                                            *
+ * Author: Alexander Vladishev, Andris Zeila                                  *
  *                                                                            *
  ******************************************************************************/
-int	is_uint64_n(const char *str, size_t n, zbx_uint64_t *value)
+int	is_uint_n_bits(const char *str, size_t n, int bits, void *value, size_t size)
 {
-	const zbx_uint64_t	max_uint64 = ~(zbx_uint64_t)__UINT64_C(0);
+	const zbx_uint64_t	max_uint64 = ~(zbx_uint64_t)(0LL) >> (64 - bits);
 	zbx_uint64_t		value_uint64 = 0, c;
 
-	if ('\0' == *str || 0 == n)
+	if ('\0' == *str || 0 == n || 0 == bits)
 		return FAIL;
 
 	while ('\0' != *str && 0 < n--)
@@ -1526,94 +1535,19 @@ int	is_uint64_n(const char *str, size_t n, zbx_uint64_t *value)
 	}
 
 	if (NULL != value)
-		*value = value_uint64;
-
-	return SUCCEED;
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: is_uint32_n                                                      *
- *                                                                            *
- * Purpose: check if the string is 32bit unsigned integer                     *
- *                                                                            *
- * Parameters: str   - [IN] string to check                                   *
- *             n     - [IN] string length or ZBX_MAX_UINT32_LEN               *
- *             value - [OUT] a pointer to converted value (optional)          *
- *                                                                            *
- * Return value:  SUCCEED - the string is unsigned integer                    *
- *                FAIL - the string is not a number or overflow               *
- *                                                                            *
- ******************************************************************************/
-int	is_uint32_n(const char *str, size_t n, uint32_t *value)
-{
-	const uint32_t	max_uint32 = ~(uint32_t)0L;
-	uint32_t	value_uint32 = 0, c;
-
-	if ('\0' == *str || 0 == n)
-		return FAIL;
-
-	while ('\0' != *str && 0 < n--)
 	{
-		if (0 == isdigit(*str))
-			return FAIL;	/* not a digit */
+		/* On little endian architecture the output value will be stored into first value_bytes */
+		/* while on big endian architecture it will be stored into the last value_bytes. We     */
+		/* handle it by storing the offset in the most significant byte of short value and then */
+		/* use the first byte as source offset.                                                 */
+		int value_bytes = ((bits - 1) >> 3) + 1;
+		unsigned short value_offset = (sizeof(zbx_uint64_t) - value_bytes) << 8;
 
-		c = (uint32_t)(unsigned char)(*str - '0');
+		if (value_bytes > size)
+			return FAIL;
 
-		if ((max_uint32 - c) / 10 < value_uint32)
-			return FAIL;	/* overflow */
-
-		value_uint32 = value_uint32 * 10 + c;
-
-		str++;
+		memcpy(value, (char*)&value_uint64 + *((unsigned char*)&value_offset) , value_bytes);
 	}
-
-	if (NULL != value)
-		*value = value_uint32;
-
-	return SUCCEED;
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: is_ushort                                                        *
- *                                                                            *
- * Purpose: check if the string is 16bit unsigned integer                     *
- *                                                                            *
- * Parameters: str   - string to check                                        *
- *             value - a pointer to converted value (optional)                *
- *                                                                            *
- * Return value:  SUCCEED - the string is unsigned integer                    *
- *                FAIL - the string is not number or overflow                 *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
- ******************************************************************************/
-int	is_ushort(const char *str, unsigned short *value)
-{
-	const unsigned short	max_ushort = 0xffff;
-	unsigned short		value_ushort = 0, c;
-
-	if ('\0' == *str)
-		return FAIL;
-
-	while ('\0' != *str)
-	{
-		if (0 == isdigit(*str))
-			return FAIL;	/* not a digit */
-
-		c = (unsigned short)(unsigned char)(*str - '0');
-
-		if ((max_ushort - c) / 10 < value_ushort)
-			return FAIL;	/* overflow */
-
-		value_ushort = value_ushort * 10 + c;
-
-		str++;
-	}
-
-	if (NULL != value)
-		*value = value_ushort;
 
 	return SUCCEED;
 }

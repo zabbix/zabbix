@@ -64,7 +64,7 @@ int	SYSTEM_CPU_UTIL(const char *cmd, const char *param, unsigned flags, AGENT_RE
 
 	if (0 != get_param(param, 1, tmp, sizeof(tmp)) || '\0' == *tmp || 0 == strcmp(tmp, "all"))
 		cpu_num = 0;
-	else if (SUCCEED != is_uint32(tmp, &cpu_num) || ++cpu_num > collector->cpus.count)
+	else if (SUCCEED != is_uint31(tmp, &cpu_num) || ++cpu_num > collector->cpus.count)
 		return SYSINFO_RET_FAIL;
 
 	/* only "system" (default) for parameter "type" is supported */

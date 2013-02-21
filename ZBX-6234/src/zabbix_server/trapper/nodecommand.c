@@ -236,7 +236,7 @@ int	node_process_command(zbx_sock_t *sock, const char *data, struct zbx_json_par
 	zbx_json_init(&j, 256);
 
 	if (SUCCEED != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_NODEID, tmp, sizeof(tmp)) ||
-			FAIL == is_uint32(tmp, &nodeid))
+			FAIL == is_uint31(tmp, &nodeid))
 	{
 		result = zbx_dsprintf(result, "Failed to parse command request tag: %s", ZBX_PROTO_TAG_NODEID);
 		goto finish;
