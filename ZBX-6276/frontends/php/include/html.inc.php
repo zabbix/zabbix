@@ -101,33 +101,29 @@ function prepareUrlParam($value, $name = null) {
  * @return string
  */
 function url_param($param, $getFromRequest = true, $name = null) {
-	if (is_null($name)) {
-		if (is_array($param)) {
-			fatal_error(_('Url param name is empty.'));
+	if (is_array($param)) {
+		if ($getFromRequest) {
+			fatal_error(_('URL parameter cannot be array.'));
 		}
-		else {
+	}
+	else {
+		if (is_null($name)) {
+			if (!$getFromRequest) {
+				fatal_error(_('URL parameter name is empty.'));
+			}
+
 			$name = $param;
 		}
 	}
 
 	if ($getFromRequest) {
-		$name = $param;
-		$value = isset($_REQUEST[$name]) ? $_REQUEST[$name] : '';
+		$value =& $_REQUEST[$param];
 	}
 	else {
-		if (is_array($param)) {
-			if (!isset($param[$name])) {
-				fatal_error(_('Url param name not found in param array.'));
-			}
-
-			$value = $param[$name];
-		}
-		else {
-			$value = $param;
-		}
+		$value =& $param;
 	}
 
-	return $value ? prepareUrlParam($value, $name) : '';
+	return isset($value) ? prepareUrlParam($value, $name) : '';
 }
 
 function url_params(array $params) {

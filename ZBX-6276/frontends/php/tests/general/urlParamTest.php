@@ -28,16 +28,8 @@ class urlParamTest extends CZabbixTest {
 	public static function providerNotRequest() {
 		return array(
 			array(
-				array('abc', false, 'name'),
-				'&name=abc'
-			),
-			array(
 				array('abc', true, 'name'),
 				''
-			),
-			array(
-				array('abc', false),
-				'&abc=abc'
 			),
 			array(
 				array('abc', true),
@@ -48,8 +40,20 @@ class urlParamTest extends CZabbixTest {
 				''
 			),
 			array(
+				array(array('a' => 1, 'b' => 2, 'c' => 3), true),
+				''
+			),
+			array(
+				array('abc', false, 'name'),
+				'&name=abc'
+			),
+			array(
 				array(array('a' => 1, 'b' => 2, 'c' => 3), false, 'a'),
-				'&a=1'
+				'&a[a]=1&a[b]=2&a[c]=3'
+			),
+			array(
+				array(array('a' => 1, 'b' => 2, 'c' => 3), false, 'abc'),
+				'&abc[a]=1&abc[b]=2&abc[c]=3'
 			)
 		);
 	}
@@ -61,13 +65,29 @@ class urlParamTest extends CZabbixTest {
 				'&a=1'
 			),
 			array(
-				array('a', true, 'a'),
-				'&a=1'
+				array('a', true, 'b'),
+				'&b=1'
 			),
 			array(
-				array('a', true, 'b'),
-				'&a=1'
-			)
+				array('b', true, 'b'),
+				'&b=2'
+			),
+			array(
+				array('abc', true),
+				''
+			),
+			array(
+				array('abc', true, 'abc'),
+				''
+			),
+			array(
+				array('d', true, 'aaa'),
+				'&aaa[0]=d0&aaa[1]=d1&aaa[2]=d2'
+			),
+			array(
+				array('d', true, 'b'),
+				'&b[0]=d0&b[1]=d1&b[2]=d2'
+			),
 		);
 	}
 
@@ -77,7 +97,7 @@ class urlParamTest extends CZabbixTest {
 	public function test($params, $expectedResult) {
 		$result = call_user_func_array('url_param', $params);
 
-		$this->assertSame($expectedResult, $result);
+		$this->assertSame($result, $expectedResult);
 	}
 
 	/**
@@ -87,9 +107,12 @@ class urlParamTest extends CZabbixTest {
 		$_REQUEST['a'] = 1;
 		$_REQUEST['b'] = 2;
 		$_REQUEST['c'] = 3;
+		$_REQUEST['d'][0] = 'd0';
+		$_REQUEST['d'][1] = 'd1';
+		$_REQUEST['d'][2] = 'd2';
 
 		$result = call_user_func_array('url_param', $params);
 
-		$this->assertSame($expectedResult, $result);
+		$this->assertSame($result, $expectedResult);
 	}
 }
