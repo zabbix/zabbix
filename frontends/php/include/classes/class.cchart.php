@@ -803,10 +803,13 @@ class CChart extends CGraphDraw {
 		if (isset($leftBase8)) {
 			$intervalData = convertBase8Values($interval);
 			$interval = $intervalData['value'];
-			$sideMaxData = convertBase8Values($this->m_maxY[$side]);
-			$sideMinData = convertBase8Values($this->m_minY[$side]);
-			if (($this->m_maxY[$side] != 0 && $sideMaxData['pow'] != $intervalData['pow']) ||
-					($this->m_minY[$side] != 0 && $sideMinData['pow'] != $intervalData['pow'])) {
+			if (abs($this->m_maxY[$side]) > abs($this->m_minY[$side])) {
+				$sideMaxData = convertBase8Values($this->m_maxY[$side]);
+			}
+			else {
+				$sideMaxData = convertBase8Values($this->m_minY[$side]);
+			}
+			if ($sideMaxData['pow'] != $intervalData['pow']) {
 				// interval correction, if Max Y have other unit, then interval unit = Max Y unit
 				if ($intervalData['pow'] < 0) {
 					$interval = sprintf('%.10f', bcmul($interval, 1.024, 10));
@@ -851,10 +854,13 @@ class CChart extends CGraphDraw {
 		if (isset($rightBase8)) {
 			$intervalOtherSideData = convertBase8Values($interval_other_side);
 			$interval_other_side = $intervalOtherSideData['value'];
-			$otherSideMaxData = convertBase8Values($this->m_maxY[$other_side]);
-			$otherSideMinData = convertBase8Values($this->m_minY[$other_side]);
-			if (($this->m_maxY[$other_side] != 0 && $otherSideMaxData['pow'] != $intervalOtherSideData['pow']) ||
-					($this->m_minY[$other_side] != 0 && $otherSideMinData['pow'] != $intervalOtherSideData['pow'])) {
+			if (abs($this->m_maxY[$other_side]) > abs($this->m_minY[$other_side])) {
+				$sideMaxData = convertBase8Values($this->m_maxY[$other_side]);
+			}
+			else {
+				$sideMaxData = convertBase8Values($this->m_minY[$other_side]);
+			}
+			if ($sideMaxData['pow'] != $interval_other_side['pow']) {
 				// interval correction, if Max Y have other unit, then interval unit = Max Y unit
 				if ($intervalOtherSideData['pow'] < 0) {
 					$interval_other_side = sprintf('%.10f', bcmul($interval_other_side, 1.024, 10));
@@ -1451,7 +1457,7 @@ class CChart extends CGraphDraw {
 		if (abs($maxYPow['pow']) > abs($minYPow['pow']) && $maxYPow['value'] != 0) {
 			$newPow = $maxYPow['pow'];
 		}
-		if (abs($maxYPow['pow'])< abs($minYPow['pow']) && $minYPow['value'] != 0) {
+		if (abs($maxYPow['pow']) < abs($minYPow['pow']) && $minYPow['value'] != 0) {
 			$newPow = $minYPow['pow'];
 		}
 		if ($maxYPow['pow'] == $minYPow['pow']) {
@@ -1586,7 +1592,7 @@ class CChart extends CGraphDraw {
 		if (abs($maxYPow['pow']) > abs($minYPow['pow']) && $maxYPow['value'] != 0) {
 			$newPow = $maxYPow['pow'];
 		}
-		if (abs($maxYPow['pow'])< abs($minYPow['pow']) && $minYPow['value'] != 0) {
+		if (abs($maxYPow['pow']) < abs($minYPow['pow']) && $minYPow['value'] != 0) {
 			$newPow = $minYPow['pow'];
 		}
 		if ($maxYPow['pow'] == $minYPow['pow']) {
