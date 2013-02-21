@@ -39,6 +39,7 @@ A.F.I...S. [ZBXNEXT-1186] increased length to 2048 characters of expression fiel
 ..F....... [ZBX-5127] regular expressions form redesign (Vedmak)
 
 Bug fixes:
+..F....... [ZBX-6245] fixed monitoring trigger filter criteria saving (Eduard)
 ..F....... [ZBX-6237] fixed Y axis item adding field, now it is available also if item list is empty (Eduard)
 ........S. [ZBX-6123] ensured sequential IT services updates by database syncers (dimir)
 ....I..... [ZBX-5668] added upgrade patch for change "server_check_interval" field value to 10 (Sasha)
