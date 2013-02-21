@@ -39,6 +39,7 @@ A.F.I...S. [ZBXNEXT-1186] increased length to 2048 characters of expression fiel
 ..F....... [ZBX-5127] regular expressions form redesign (Vedmak)
 
 Bug fixes:
+..F....... [ZBX-6290] fixed icon mapping selection (Eduard)
 ..F....... [ZBX-6276] fixed function to get URL parameter error message (Eduard)
 ..F....... [ZBX-6245] fixed monitoring trigger filter criteria saving (Eduard)
 ..F....... [ZBX-6237] fixed Y axis item adding field, now it is available also if item list is empty (Eduard)
