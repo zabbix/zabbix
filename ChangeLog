@@ -6,7 +6,7 @@ A.F....... [ZBX-1357] updated Brazilian Portuguese, German, Latvian, Slovak, Rus
 
 Bug fixes:
 A.F....... [ZBX-5321] unified translation strings, fixed typo and SQL query formatting (Pavels, Richlv)
-..F....... [ZBX-5982] fixed read only items are listed in popup for trigger expression (Toms)
+..F....... [ZBX-5982] fixed read only items being listed in popup for trigger expression (Toms)
 ........S. [ZBX-6123] ensured sequential IT services updates by database syncers (dimir)
 ....I..... [ZBX-5635] changed value types to float for qps items in "Template App MySQL" (Sasha)
 ....I..... [ZBX-5622] fixed grammatical error of snmptrap.fallback in help_items; thanks to Kodai Terashima (Sasha)
