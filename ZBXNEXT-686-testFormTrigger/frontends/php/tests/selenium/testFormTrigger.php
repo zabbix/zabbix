@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2000-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -73,37 +73,36 @@ class testFormTrigger extends CWebTest {
 	 */
 	public function testFormTrigger_CheckLayout($data) {
 
-		$this->login('triggers.php');
+		$this->zbxTestLogin('triggers.php');
 		$this->checkTitle('Configuration of triggers');
-		$this->ok('CONFIGURATION OF TRIGGERS');
+		$this->zbxTestTextPresent('CONFIGURATION OF TRIGGERS');
 
-		$this->button_click('form');
-		$this->wait();
+		$this->zbxTestClickWait('form');
 		$this->checkTitle('Configuration of triggers');
 
 		if (isset($data['constructor'])) {
 			switch ($data['constructor']) {
 				case 'open':
-					$this->button_click("//span[text()='Expression constructor']");
+					$this->zbxTestClick("//span[text()='Expression constructor']");
 					sleep(1);
 					break;
 				case 'open_close':
-					$this->button_click("//span[text()='Expression constructor']");
+					$this->zbxTestClick("//span[text()='Expression constructor']");
 					sleep(1);
-					$this->button_click("//span[text()='Close expression constructor']");
+					$this->zbxTestClick("//span[text()='Close expression constructor']");
 					sleep(1);
 					break;
 			}
 		}
 
-		$this->ok('Trigger');
-		$this->ok('Name');
+		$this->zbxTestTextPresent('Trigger');
+		$this->zbxTestTextPresent('Name');
 		$this->assertVisible('description');
 		$this->assertAttribute("//input[@id='description']/@maxlength", '255');
 		$this->assertAttribute("//input[@id='description']/@size", '50');
 
 		if (!(isset($data['constructor'])) || $data['constructor'] == 'open_close') {
-			$this->ok(array('Expression', 'Expression constructor'));
+			$this->zbxTestTextPresent(array('Expression', 'Expression constructor'));
 			$this->assertVisible('expression');
 			$this->assertAttribute("//textarea[@id='expression']/@rows", '7');
 			$this->assertVisible('insert');
@@ -113,11 +112,11 @@ class testFormTrigger extends CWebTest {
 			$this->assertElementNotPresent('insert_macro');
 			$this->assertElementNotPresent('exp_list');
 		} else {
-			$this->ok('Expression');
+			$this->zbxTestTextPresent('Expression');
 			$this->assertVisible('expr_temp');
 			$this->assertAttribute("//textarea[@id='expr_temp']/@rows", '7');
 			$this->assertAttribute("//textarea[@id='expr_temp']/@readonly", 'readonly');
-			$this->nok('Expression constructor');
+			$this->zbxTestTextNotPresent('Expression constructor');
 			$this->assertNotVisible('expression');
 
 			$this->assertVisible('add_expression');
@@ -129,20 +128,20 @@ class testFormTrigger extends CWebTest {
 			$this->assertVisible('insert_macro');
 			$this->assertAttribute("//input[@id='insert_macro']/@value", 'Insert macro');
 
-			$this->ok(array('Target', 'Expression', 'Error', 'Action', 'Close expression constructor'));
+			$this->zbxTestTextPresent(array('Target', 'Expression', 'Error', 'Action', 'Close expression constructor'));
 			$this->assertVisible('exp_list');
-			$this->ok('Close expression constructor');
+			$this->zbxTestTextPresent('Close expression constructor');
 		}
 
-		$this->ok('Multiple PROBLEM events generation');
+		$this->zbxTestTextPresent('Multiple PROBLEM events generation');
 		$this->assertVisible('type');
 		$this->assertAttribute("//input[@id='type']/@type", 'checkbox');
 
-		$this->ok('Description');
+		$this->zbxTestTextPresent('Description');
 		$this->assertVisible('comments');
 		$this->assertAttribute("//textarea[@id='comments']/@rows", '7');
 
-		$this->ok('URL');
+		$this->zbxTestTextPresent('URL');
 		$this->assertVisible('url');
 		$this->assertAttribute("//input[@id='url']/@maxlength", '255');
 		$this->assertAttribute("//input[@id='url']/@size", '50');
@@ -164,29 +163,29 @@ class testFormTrigger extends CWebTest {
 		if (isset($data['severity'])) {
 			switch ($data['severity']) {
 				case 'Not classified':
-					$this->button_click('severity_0');
+					$this->zbxTestClick('severity_0');
 					break;
 				case 'Information':
-					$this->button_click('severity_1');
+					$this->zbxTestClick('severity_1');
 					break;
 				case 'Warning':
-					$this->button_click('severity_2');
+					$this->zbxTestClick('severity_2');
 					break;
 				case 'Average':
-					$this->button_click('severity_3');
+					$this->zbxTestClick('severity_3');
 					break;
 				case 'High':
-					$this->button_click('severity_4');
+					$this->zbxTestClick('severity_4');
 					break;
 				case 'Disaster':
-					$this->button_click('severity_5');
+					$this->zbxTestClick('severity_5');
 					break;
 				default:
 					break;
 			}
 		}
 
-		$this->ok('Enabled');
+		$this->zbxTestTextPresent('Enabled');
 		$this->assertVisible('status');
 		$this->assertAttribute("//input[@id='status']/@type", 'checkbox');
 
@@ -196,8 +195,8 @@ class testFormTrigger extends CWebTest {
 		$this->assertVisible('cancel');
 		$this->assertAttribute("//input[@id='cancel']/@value", 'Cancel');
 
-		$this->button_click('link=Dependencies');
-		$this->ok(array('Dependencies', 'Name', 'Action', 'No dependencies defined'));
+		$this->zbxTestClick('link=Dependencies');
+		$this->zbxTestTextPresent(array('Dependencies', 'Name', 'Action', 'No dependencies defined'));
 		$this->assertElementPresent('bnt1');
 		$this->assertAttribute("//input[@id='bnt1']/@value", 'Add');
 	}
@@ -504,15 +503,14 @@ class testFormTrigger extends CWebTest {
 	 */
 	public function testFormTrigger_Create($data) {
 
-		$this->login('triggers.php');
+		$this->zbxTestLogin('triggers.php');
 		$this->checkTitle('Configuration of triggers');
-		$this->ok('CONFIGURATION OF TRIGGERS');
-		$this->dropdown_select_wait('groupid', 'all');
+		$this->zbxTestTextPresent('CONFIGURATION OF TRIGGERS');
+		$this->zbxTestDropdownSelectWait('groupid', 'all');
 
-		$this->button_click('form');
-		$this->wait();
+		$this->zbxTestClickWait('form');
 		$this->checkTitle('Configuration of triggers');
-		$this->ok('CONFIGURATION OF TRIGGERS');
+		$this->zbxTestTextPresent('CONFIGURATION OF TRIGGERS');
 
 
 		if (isset($data['description'])) {
@@ -526,7 +524,7 @@ class testFormTrigger extends CWebTest {
 		}
 
 		if (isset($data['type'])) {
-			$this->checkbox_select('type');
+			$this->zbxTestCheckboxSelect('type');
 		}
 
 		if (isset($data['comments'])) {
@@ -540,38 +538,38 @@ class testFormTrigger extends CWebTest {
 		if (isset($data['severity'])) {
 			switch ($data['severity']) {
 				case 'Not classified':
-					$this->button_click('severity_0');
+					$this->zbxTestClick('severity_0');
 					break;
 				case 'Information':
-					$this->button_click('severity_1');
+					$this->zbxTestClick('severity_1');
 					break;
 				case 'Warning':
-					$this->button_click('severity_2');
+					$this->zbxTestClick('severity_2');
 					break;
 				case 'Average':
-					$this->button_click('severity_3');
+					$this->zbxTestClick('severity_3');
 					break;
 				case 'High':
-					$this->button_click('severity_4');
+					$this->zbxTestClick('severity_4');
 					break;
 				case 'Disaster':
-					$this->button_click('severity_5');
+					$this->zbxTestClick('severity_5');
 					break;
 			}
 		}
 
 		if (isset($data['status'])) {
-			$this->checkbox_unselect('status');
+			$this->zbxTestCheckboxUnselect('status');
 		}
 
 		if (isset($data['constructor'])) {
-			$this->button_click("//span[text()='Expression constructor']");
+			$this->zbxTestClick("//span[text()='Expression constructor']");
 			sleep(1);
 
 			foreach($data['constructor'] as $constructor) {
 				if (isset($constructor['errors'])) {
 					foreach($constructor['errors'] as $err) {
-						$this->ok($err);
+						$this->zbxTestTextPresent($err);
 					}
 				}
 				else {
@@ -585,7 +583,7 @@ class testFormTrigger extends CWebTest {
 					$this->assertElementPresent('replace_expression');
 					if (isset($constructor['text'])) {
 						foreach($constructor['text'] as $txt) {
-							$this->ok($txt);
+							$this->zbxTestTextPresent($txt);
 						}
 					}
 					if (isset($constructor['elements'])) {
@@ -604,29 +602,27 @@ class testFormTrigger extends CWebTest {
 		}
 
 		if (!isset($data['constructor'])) {
-			$this->button_click('save');
-			$this->wait();
+			$this->zbxTestClickWait('save');
 			switch ($data['expected']) {
 				case TRIGGER_GOOD:
-				$this->ok('Trigger added');
+				$this->zbxTestTextPresent('Trigger added');
 				$this->checkTitle('Configuration of triggers');
-				$this->ok('CONFIGURATION OF TRIGGERS');
+				$this->zbxTestTextPresent('CONFIGURATION OF TRIGGERS');
 				break;
 				case TRIGGER_BAD:
 				$this->checkTitle('Configuration of triggers');
-				$this->ok('CONFIGURATION OF TRIGGERS');
+				$this->zbxTestTextPresent('CONFIGURATION OF TRIGGERS');
 				foreach ($data['errors'] as $msg) {
-					$this->ok($msg);
+					$this->zbxTestTextPresent($msg);
 				}
-				$this->ok('Name');
-				$this->ok('Expression');
-				$this->ok('Description');
+				$this->zbxTestTextPresent('Name');
+				$this->zbxTestTextPresent('Expression');
+				$this->zbxTestTextPresent('Description');
 				break;
 			}
 
 			if (isset($data['formCheck'])) {
-				$this->button_click("link=$description");
-				$this->wait();
+				$this->zbxTestClickWait("link=$description");
 				$this->assertAttribute("//input[@id='description']/@value", 'exact:'.$description);
 				$this->assertTrue(true, "//text()='$expression'");
 			}
