@@ -83,7 +83,6 @@ require_once dirname(__FILE__).'/testFormSysmap.php';
 require_once dirname(__FILE__).'/testFormTemplate.php';
 require_once dirname(__FILE__).'/testPageApplications.php';
 require_once dirname(__FILE__).'/testPageBrowserWarning.php';
-require_once dirname(__FILE__).'/testTemplateInheritance.php';
 
 class SeleniumTests {
 	public static function suite() {
@@ -153,7 +152,6 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormTemplate');
 		$suite->addTestSuite('testPageApplications');
 		$suite->addTestSuite('testPageBrowserWarning');
-		$suite->addTestSuite('testTemplateInheritance');
 
 		return $suite;
 	}
