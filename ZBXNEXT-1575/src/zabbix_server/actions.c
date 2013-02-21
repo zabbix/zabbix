@@ -962,9 +962,8 @@ static int	check_internal_condition(DB_EVENT *event, DB_CONDITION *condition)
 	DB_RESULT	result;
 	DB_ROW		row;
 	zbx_uint64_t	value_uint64;
-	int		nodeid;
+	int		nodeid, ret = FAIL;
 	char		sql[256];
-	int		ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -1308,7 +1307,7 @@ out:
 int	check_action_condition(DB_EVENT *event, DB_CONDITION *condition)
 {
 	const char	*__function_name = "check_action_condition";
-	int		ret;
+	int		ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() actionid:" ZBX_FS_UI64 " conditionid:" ZBX_FS_UI64 " cond.value:'%s'",
 			__function_name, condition->actionid, condition->conditionid, condition->value);
@@ -1330,7 +1329,6 @@ int	check_action_condition(DB_EVENT *event, DB_CONDITION *condition)
 		default:
 			zabbix_log(LOG_LEVEL_ERR, "unsupported event source [%d] for condition id [" ZBX_FS_UI64 "]",
 					event->source, condition->conditionid);
-			ret = FAIL;
 			break;
 	}
 
@@ -1361,9 +1359,7 @@ static int	check_action_conditions(DB_EVENT *event, zbx_uint64_t actionid, unsig
 	DB_RESULT	result;
 	DB_ROW		row;
 	DB_CONDITION	condition;
-
-	int		ret = SUCCEED;	/* SUCCEED required for ACTION_EVAL_TYPE_AND_OR */
-	int		cond, exit = 0;
+	int		cond, exit = 0, ret = SUCCEED;	/* SUCCEED required for ACTION_EVAL_TYPE_AND_OR */
 	unsigned char	old_type = 0xff;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() actionid:" ZBX_FS_UI64, __function_name, actionid);

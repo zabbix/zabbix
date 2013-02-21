@@ -477,19 +477,21 @@ DB_RESULT	DBselectN(const char *query, int n)
 
 /******************************************************************************
  *                                                                            *
- * Function: DBget_trigger_update_sql                                         *
+ * Function: DBprocess_changed_trigger                                        *
  *                                                                            *
- * Purpose: generates sql statement for updating trigger value                *
+ * Purpose: 1) generate sql statement for updating trigger                    *
+ *          2) add events                                                     *
+ *          3) update cached trigger                                          *
  *                                                                            *
- * Return value: SUCCEED - sql statement generated successfully               *
- *               FAIL    - trigger update isn't required                      *
+ * Return value: SUCCEED - trigger processed successfully                     *
+ *               FAIL    - no changes                                         *
  *                                                                            *
- * Comments: do not update value if there are dependencies with value PROBLEM *
+ * Comments: do not process if there are dependencies with value PROBLEM      *
  *                                                                            *
  ******************************************************************************/
-static int	DBget_trigger_update_sql(char **sql, size_t *sql_alloc, size_t *sql_offset, const DC_TRIGGER *trigger)
+static int	DBprocess_changed_trigger(char **sql, size_t *sql_alloc, size_t *sql_offset, const DC_TRIGGER *trigger)
 {
-	const char	*__function_name = "DBget_trigger_update_sql";
+	const char	*__function_name = "DBprocess_changed_trigger";
 
 	const char	*new_error_local;
 	char		*new_error_esc;
@@ -616,12 +618,12 @@ static int	DBget_trigger_update_sql(char **sql, size_t *sql_alloc, size_t *sql_o
 
 void	process_triggers(zbx_vector_ptr_t *triggers)
 {
-	const char		*__function_name = "process_triggers";
+	const char	*__function_name = "process_triggers";
 
-	char			*sql = NULL;
-	size_t			sql_alloc = 16 * ZBX_KIBIBYTE, sql_offset = 0;
-	int			i;
-	DC_TRIGGER		*trigger;
+	char		*sql = NULL;
+	size_t		sql_alloc = 16 * ZBX_KIBIBYTE, sql_offset = 0;
+	int		i;
+	DC_TRIGGER	*trigger;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() values_num:%d", __function_name, triggers->values_num);
 
@@ -636,7 +638,7 @@ void	process_triggers(zbx_vector_ptr_t *triggers)
 	{
 		trigger = (DC_TRIGGER *)triggers->values[i];
 
-		if (SUCCEED == DBget_trigger_update_sql(&sql, &sql_alloc, &sql_offset, trigger))
+		if (SUCCEED == DBprocess_changed_trigger(&sql, &sql_alloc, &sql_offset, trigger))
 		{
 			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
 			DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
