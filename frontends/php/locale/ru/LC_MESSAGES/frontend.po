@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2013-02-20 19:46+0200\n"
-"PO-Revision-Date: 2013-01-09 19:38+0200\n"
+"PO-Revision-Date: 2013-02-20 19:49+0200\n"
 "Last-Translator: dotneft <dotneft@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: ru\n"
@@ -90,7 +90,7 @@ msgstr "(0 - бесконечно)"
 #: include/views/configuration.hostgroups.list.php:31
 #: include/views/configuration.template.edit.php:143
 msgid "(Only super admins can create groups)"
-msgstr ""
+msgstr "(Только Супер-Администраторы могут создавать группы)"
 
 #: include/forms.inc.php:539 include/forms.inc.php:554
 msgid "(in days)"
@@ -7112,7 +7112,7 @@ msgstr "Список пустой"
 
 #: include/locales.inc.php:61
 msgid "Lithuanian (lt_LT)"
-msgstr ""
+msgstr "Литовский (lt_LT)"
 
 #: dashboard.php:294 dashboard.php:302 dashboard.php:309 dashboard.php:316
 #: dashboard.php:323 dashboard.php:333 include/views/monitoring.slides.php:108
@@ -12265,7 +12265,7 @@ msgstr "Невозможно выбрать конфигурацию."
 
 #: include/classes/helpers/CUploadFile.php:57
 msgid "Unable to upload file because \"file_uploads\" is disabled."
-msgstr ""
+msgstr "Не удалось загрузить файл, т.к. \"file_uploads\" отключено."
 
 #: include/maps.inc.php:695 include/maps.inc.php:785 include/maps.inc.php:883
 msgid "Unacknowledged"
