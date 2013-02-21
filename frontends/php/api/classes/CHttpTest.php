@@ -455,7 +455,7 @@ class CHttpTest extends CZBXAPI {
 		$this->checkNames($httpTests);
 
 		foreach ($httpTests as $httpTest) {
-			$missingKeys = checkRequiredKeys($httpTest, array('name', 'hostid', 'status', 'steps'));
+			$missingKeys = checkRequiredKeys($httpTest, array('name', 'hostid', 'steps'));
 			if (!empty($missingKeys)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Web scenario missing parameters: %1$s', implode(', ', $missingKeys)));
 			}
