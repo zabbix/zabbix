@@ -714,6 +714,7 @@ function convertBase8Values ($value ,$step = false) {
 			for ($i = 0; $i > $valData['pow']; $i--) {
 				$valData['value'] = bcdiv(bcmul($valData['value'], 1000, 10), 1.024, 10);
 			}
+
 			$valData['value'] = sprintf('%.10f', $valData['value']);
 		}
 	}

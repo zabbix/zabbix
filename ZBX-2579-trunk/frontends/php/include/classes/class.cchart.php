@@ -1470,7 +1470,11 @@ class CChart extends CGraphDraw {
 
 			// using bc library, incase of large numbers
 			$val = bcadd(bcmul($i, $step), $minY);
-			$val = bcsub($val, $this->getYStepMarkerValueOffset(GRAPH_YAXIS_SIDE_LEFT, $i));
+
+			if (bccomp($minY, -1) == 1 && bccomp($minY, 0) == -1) {
+				$val = bcsub($val, $this->getYStepMarkerValueOffset(GRAPH_YAXIS_SIDE_LEFT, $i));
+			}
+
 			if (bccomp(bcadd($val, bcdiv($step,2)), $maxY) == 1) {
 				continue;
 			}
@@ -1606,7 +1610,11 @@ class CChart extends CGraphDraw {
 
 			// using bc module in case of large numbers
 			$val = bcadd(bcmul($i, $step), $minY);
-			$val = bcsub($val, $this->getYStepMarkerValueOffset(GRAPH_YAXIS_SIDE_RIGHT, $i));
+
+			if (bccomp($minY, -1) == 1 && bccomp($minY, 0) == -1) {
+				$val = bcsub($val, $this->getYStepMarkerValueOffset(GRAPH_YAXIS_SIDE_RIGHT, $i));
+			}
+
 			if (bccomp(bcadd($val, bcdiv($step, 2)), $maxY) == 1) {
 				continue;
 			}
