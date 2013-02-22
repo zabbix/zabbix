@@ -40,7 +40,8 @@ static int	get_net_stat(const char *if_name, net_stat_t *ns)
 	perfstat_netinterface_t	ps_netif;
 #endif
 
-	assert(ns);
+	if (NULL == if_name || '\0' == *if_name)
+		return SYSINFO_RET_FAIL;
 
 #if defined(HAVE_LIBPERFSTAT)
 	strscpy(ps_id.name, if_name);
@@ -76,9 +77,6 @@ int	NET_IF_IN(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if_name = get_rparam(request, 0);
 	mode = get_rparam(request, 1);
 
-	if (NULL == if_name || '\0' == *if_name)
-		return SYSINFO_RET_FAIL;
-
 	if (SYSINFO_RET_OK == get_net_stat(if_name, &ns))
 	{
 		if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "bytes"))
@@ -107,9 +105,6 @@ int	NET_IF_OUT(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if_name = get_rparam(request, 0);
 	mode = get_rparam(request, 1);
-
-	if (NULL == if_name || '\0' == *if_name)
-		return SYSINFO_RET_FAIL;
 
 	if (SYSINFO_RET_OK == get_net_stat(if_name, &ns))
 	{
@@ -140,9 +135,6 @@ int	NET_IF_TOTAL(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if_name = get_rparam(request, 0);
 	mode = get_rparam(request, 1);
 
-	if (NULL == if_name || '\0' == *if_name)
-		return SYSINFO_RET_FAIL;
-
 	if (SYSINFO_RET_OK == get_net_stat(if_name, &ns))
 	{
 		if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "bytes"))
@@ -169,9 +161,6 @@ int	NET_IF_COLLISIONS(AGENT_REQUEST *request, AGENT_RESULT *result)
 		return SYSINFO_RET_FAIL;
 
 	if_name = get_rparam(request, 0);
-
-	if (NULL == if_name || '\0' == *ifname)
-		return SYSINFO_RET_FAIL;
 
 	if (SYSINFO_RET_OK == get_net_stat(if_name, &ns))
 	{

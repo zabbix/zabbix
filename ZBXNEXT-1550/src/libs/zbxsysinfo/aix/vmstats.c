@@ -59,7 +59,17 @@ int	SYSTEM_STAT(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if (NULL == section)
 		return SYSINFO_RET_FAIL;
 
-	if (0 == strcmp(section, "kthr") && NULL != type)
+	if (0 == strcmp(section, "ent"))
+	{
+		if (1 == request->nparam && collector->vmstat.shared_enabled)
+			SET_DBL_RESULT(result, collector->vmstat.ent);
+		else
+			return SYSINFO_RET_FAIL;
+	}
+	else if (NULL == type)
+		return SYSINFO_RET_FAIL;
+
+	if (0 == strcmp(section, "kthr"))
 	{
 		if (0 == strcmp(type, "r"))
 			SET_DBL_RESULT(result, collector->vmstat.kthr_r);
@@ -68,7 +78,7 @@ int	SYSTEM_STAT(AGENT_REQUEST *request, AGENT_RESULT *result)
 		else
 			return SYSINFO_RET_FAIL;
 	}
-	else if (0 == strcmp(section, "page") && NULL != type)
+	else if (0 == strcmp(section, "page"))
 	{
 		if (0 == strcmp(type, "fi"))
 			SET_DBL_RESULT(result, collector->vmstat.fi);
@@ -85,7 +95,7 @@ int	SYSTEM_STAT(AGENT_REQUEST *request, AGENT_RESULT *result)
 		else
 			return SYSINFO_RET_FAIL;
 	}
-	else if (0 == strcmp(section, "faults") && NULL != type)
+	else if (0 == strcmp(section, "faults"))
 	{
 		if (0 == strcmp(type, "in"))
 			SET_DBL_RESULT(result, collector->vmstat.in);
@@ -96,7 +106,7 @@ int	SYSTEM_STAT(AGENT_REQUEST *request, AGENT_RESULT *result)
 		else
 			return SYSINFO_RET_FAIL;
 	}
-	else if (0 == strcmp(section, "cpu") && NULL != type)
+	else if (0 == strcmp(section, "cpu"))
 	{
 		if (0 == strcmp(type, "us"))
 			SET_DBL_RESULT(result, collector->vmstat.cpu_us);
@@ -117,7 +127,7 @@ int	SYSTEM_STAT(AGENT_REQUEST *request, AGENT_RESULT *result)
 		else
 			return SYSINFO_RET_FAIL;
 	}
-	else if (0 == strcmp(section, "disk") && NULL != type)
+	else if (0 == strcmp(section, "disk"))
 	{
 		if (0 == strcmp(type, "bps"))
 			SET_UI64_RESULT(result, collector->vmstat.disk_bps);
@@ -126,9 +136,7 @@ int	SYSTEM_STAT(AGENT_REQUEST *request, AGENT_RESULT *result)
 		else
 			return SYSINFO_RET_FAIL;
 	}
-	else if (0 == strcmp(section, "ent") && 1 == request->nparam && collector->vmstat.shared_enabled)
-		SET_DBL_RESULT(result, collector->vmstat.ent);
-	else if (0 == strcmp(section, "memory") && NULL != type)
+	else if (0 == strcmp(section, "memory"))
 	{
 		if (0 == strcmp(type, "avm") && collector->vmstat.aix52stats)
 			SET_UI64_RESULT(result, collector->vmstat.mem_avm);
