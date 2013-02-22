@@ -62,6 +62,7 @@ FIELD		|jmx_available	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC,ZBX_NODATA
 FIELD		|jmx_errors_from|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
 FIELD		|jmx_error	|t_varchar(128)	|''	|NOT NULL	|ZBX_SYNC,ZBX_NODATA
 FIELD		|name		|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
+FIELD		|flags		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 INDEX		|1		|host
 INDEX		|2		|status
 INDEX		|3		|proxy_hostid
@@ -1211,4 +1212,4 @@ UNIQUE		|1		|userid
 TABLE|dbversion||
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|2010034	|2010038
+ROW		|2010039	|2010039
