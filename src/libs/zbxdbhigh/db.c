@@ -477,7 +477,7 @@ DB_RESULT	DBselectN(const char *query, int n)
 
 /******************************************************************************
  *                                                                            *
- * Function: DBprocess_changed_trigger                                        *
+ * Function: process_trigger                                                  *
  *                                                                            *
  * Purpose: 1) generate sql statement for updating trigger                    *
  *          2) add events                                                     *
@@ -489,9 +489,9 @@ DB_RESULT	DBselectN(const char *query, int n)
  * Comments: do not process if there are dependencies with value PROBLEM      *
  *                                                                            *
  ******************************************************************************/
-static int	DBprocess_changed_trigger(char **sql, size_t *sql_alloc, size_t *sql_offset, const DC_TRIGGER *trigger)
+static int	process_trigger(char **sql, size_t *sql_alloc, size_t *sql_offset, const DC_TRIGGER *trigger)
 {
-	const char	*__function_name = "DBprocess_changed_trigger";
+	const char	*__function_name = "process_trigger";
 
 	const char	*new_error_local;
 	char		*new_error_esc;
@@ -638,7 +638,7 @@ void	process_triggers(zbx_vector_ptr_t *triggers)
 	{
 		trigger = (DC_TRIGGER *)triggers->values[i];
 
-		if (SUCCEED == DBprocess_changed_trigger(&sql, &sql_alloc, &sql_offset, trigger))
+		if (SUCCEED == process_trigger(&sql, &sql_alloc, &sql_offset, trigger))
 		{
 			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
 			DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
