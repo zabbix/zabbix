@@ -25,7 +25,7 @@
 
 #define ZBX_MODULE_API_VERSION_ONE	1
 
-#define get_rparam(request,num) ((request->nparam > num) ? request->params[num] : NULL)
+#define get_rparam(request, num)	(request->nparam > num ? request->params[num] : NULL)
 
 /* agent request structure */
 typedef struct

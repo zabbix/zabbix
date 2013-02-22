@@ -41,7 +41,8 @@ static int	get_net_stat(const char *if_name, net_stat_t *result)
 	char	line[MAX_STRING_LEN], name[MAX_STRING_LEN], *p;
 	FILE	*f;
 
-	assert(result);
+	if (NULL == if_name || '\0' == *if_name)
+		return SYSINFO_RET_FAIL;
 
 	if (NULL != (f = fopen("/proc/net/dev", "r")))
 	{
@@ -95,9 +96,6 @@ int	NET_IF_IN(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if_name = get_rparam(request, 0);
 	mode = get_rparam(request, 1);
 
-	if (NULL == if_name || '\0' == *if_name)
-		return SYSINFO_RET_FAIL;
-
 	if (SYSINFO_RET_OK != get_net_stat(if_name, &ns))
 		return SYSINFO_RET_FAIL;
 
@@ -125,9 +123,6 @@ int	NET_IF_OUT(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if_name = get_rparam(request, 0);
 	mode = get_rparam(request, 1);
-
-	if (NULL == if_name || '\0' == *if_name)
-		return SYSINFO_RET_FAIL;
 
 	if (SYSINFO_RET_OK != get_net_stat(if_name, &ns))
 		return SYSINFO_RET_FAIL;
@@ -157,9 +152,6 @@ int	NET_IF_TOTAL(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if_name = get_rparam(request, 0);
 	mode = get_rparam(request, 1);
 
-	if (NULL == if_name || '\0' == *if_name)
-		return SYSINFO_RET_FAIL;
-
 	if (SYSINFO_RET_OK != get_net_stat(if_name, &ns))
 		return SYSINFO_RET_FAIL;
 
@@ -186,9 +178,6 @@ int	NET_IF_COLLISIONS(AGENT_REQUEST *request, AGENT_RESULT *result)
 		return SYSINFO_RET_FAIL;
 
 	if_name = get_rparam(request, 0);
-
-	if (NULL == if_name || '\0' == *if_name)
-		return SYSINFO_RET_FAIL;
 
 	if (SYSINFO_RET_OK != get_net_stat(if_name, &ns))
 		return SYSINFO_RET_FAIL;
@@ -304,7 +293,7 @@ int	NET_UDP_LISTEN(AGENT_REQUEST *request, AGENT_RESULT *result)
 	zbx_uint64_t	listen = 0;
 	int		ret = SYSINFO_RET_FAIL;
 
-	if (1 < request->nparam);
+	if (1 < request->nparam)
 		return ret;
 
 	port_str = get_rparam(request, 0);

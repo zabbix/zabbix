@@ -183,7 +183,6 @@ void	free_result(AGENT_RESULT *result)
 void	init_request(AGENT_REQUEST *request)
 {
 	request->key = NULL;
-
 	request->nparam = 0;
 	request->params = NULL;
 }
@@ -201,14 +200,14 @@ void	init_request(AGENT_REQUEST *request)
  ******************************************************************************/
 void	free_request(AGENT_REQUEST *request)
 {
-	int i;
+	int	i;
 
 	zbx_free(request->key);
+
 	for (i = 0; i < request->nparam; i++)
-	{
 		zbx_free(request->params[i]);
-	}
 	zbx_free(request->params);
+
 	request->nparam = 0;
 }
 
@@ -228,31 +227,25 @@ void	free_request(AGENT_REQUEST *request)
  ******************************************************************************/
 int	parse_item_key(char *itemkey, AGENT_REQUEST *request)
 {
-	int i;
-	char		buf[MAX_STRING_LEN];
-	char		key[MAX_STRING_LEN];
-	char		params[MAX_STRING_LEN];
+	int	i;
+	char	key[MAX_STRING_LEN], params[MAX_STRING_LEN];
 
-	if (ZBX_COMMAND_ERROR == (i = parse_command(itemkey, key, sizeof(key), params, sizeof(params))))
-		return -1;
-
-	if (NULL != strchr(itemkey, '['))
-		request->nparam = num_param(params);
-	else
-		request->nparam = 0;
+	switch (parse_command(itemkey, key, sizeof(key), params, sizeof(params)))
+	{
+		case ZBX_COMMAND_WITH_PARAMS:
+			if (0 == (request->nparam = num_param(params)))
+				return FAIL;
+			request->params = zbx_malloc(request->params, request->nparam * sizeof(char *));
+			for (i = 0; i < request->nparam; i++)
+				request->params[i] = get_param_dyn(params, i + 1);
+			break;
+		case ZBX_COMMAND_ERROR:
+			return FAIL;
+	}
 
 	request->key = zbx_strdup(NULL, key);
 
-	request->params = zbx_malloc(request->params, request->nparam * sizeof(char *));
-
-	for (i = 0; i < request->nparam; i++)
-	{
-		if(0 == get_param(params, i+1, buf, sizeof(buf)))
-			request->params[i] = zbx_strdup(NULL, buf);
-		else
-			request->params[i] = zbx_strdup(NULL, '\0');
-	}
-	return 0;
+	return SUCCEED;
 }
 
 /******************************************************************************
@@ -514,7 +507,7 @@ int	process(const char *in_command, unsigned flags, AGENT_RESULT *result)
 		else
 			zbx_snprintf(tmp, sizeof(tmp), "%s", key);
 
-		if (0 != parse_item_key(tmp, &request))
+		if (SUCCEED != parse_item_key(tmp, &request))
 			goto notsupported;
 	}
 
