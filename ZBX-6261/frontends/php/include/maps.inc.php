@@ -1019,14 +1019,14 @@ function getSelementsInfo($sysmap) {
 		}
 	}
 
-	// get hosts data
+	// get host inventories
 	if ($sysmap['iconmapid']) {
 		$hostInventories = API::Host()->get(array(
 			'hostids' => $hostsToGetInventories,
 			'output' => API_OUTPUT_SHORTEN,
 			'nopermissions' => true,
 			'preservekeys' => true,
-			'selectInventory' => array('hostid')
+			'selectInventory' => API_OUTPUT_EXTEND
 		));
 	}
 
