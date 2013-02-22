@@ -80,7 +80,6 @@ static int	check_trigger_condition(DB_EVENT *event, DB_CONDITION *condition)
 				break;
 			default:
 				ret = NOTSUPPORTED;
-				break;
 		}
 		DBfree_result(result);
 	}
@@ -145,7 +144,6 @@ static int	check_trigger_condition(DB_EVENT *event, DB_CONDITION *condition)
 				break;
 			default:
 				ret = NOTSUPPORTED;
-				break;
 		}
 	}
 	else if (CONDITION_TYPE_HOST == condition->conditiontype)
@@ -175,7 +173,6 @@ static int	check_trigger_condition(DB_EVENT *event, DB_CONDITION *condition)
 				break;
 			default:
 				ret = NOTSUPPORTED;
-				break;
 		}
 	}
 	else if (CONDITION_TYPE_TRIGGER == condition->conditiontype)
@@ -221,7 +218,6 @@ static int	check_trigger_condition(DB_EVENT *event, DB_CONDITION *condition)
 				break;
 			default:
 				ret = NOTSUPPORTED;
-				break;
 		}
 	}
 	else if (CONDITION_TYPE_TRIGGER_NAME == condition->conditiontype)
@@ -243,7 +239,6 @@ static int	check_trigger_condition(DB_EVENT *event, DB_CONDITION *condition)
 				break;
 			default:
 				ret = NOTSUPPORTED;
-				break;
 		}
 		zbx_free(tmp_str);
 	}
@@ -271,7 +266,6 @@ static int	check_trigger_condition(DB_EVENT *event, DB_CONDITION *condition)
 				break;
 			default:
 				ret = NOTSUPPORTED;
-				break;
 		}
 	}
 	else if (CONDITION_TYPE_TRIGGER_VALUE == condition->conditiontype)
@@ -286,7 +280,6 @@ static int	check_trigger_condition(DB_EVENT *event, DB_CONDITION *condition)
 				break;
 			default:
 				ret = NOTSUPPORTED;
-				break;
 		}
 	}
 	else if (CONDITION_TYPE_TIME_PERIOD == condition->conditiontype)
@@ -303,7 +296,6 @@ static int	check_trigger_condition(DB_EVENT *event, DB_CONDITION *condition)
 				break;
 			default:
 				ret = NOTSUPPORTED;
-				break;
 		}
 	}
 	else if (CONDITION_TYPE_MAINTENANCE == condition->conditiontype)
@@ -344,7 +336,6 @@ static int	check_trigger_condition(DB_EVENT *event, DB_CONDITION *condition)
 				break;
 			default:
 				ret = NOTSUPPORTED;
-				break;
 		}
 	}
 	else if (CONDITION_TYPE_NODE == condition->conditiontype)
@@ -364,7 +355,6 @@ static int	check_trigger_condition(DB_EVENT *event, DB_CONDITION *condition)
 				break;
 			default:
 				ret = NOTSUPPORTED;
-				break;
 		}
 	}
 	else if (CONDITION_TYPE_EVENT_ACKNOWLEDGED == condition->conditiontype)
@@ -385,7 +375,6 @@ static int	check_trigger_condition(DB_EVENT *event, DB_CONDITION *condition)
 				break;
 			default:
 				ret = NOTSUPPORTED;
-				break;
 		}
 		DBfree_result(result);
 	}
@@ -435,7 +424,6 @@ static int	check_trigger_condition(DB_EVENT *event, DB_CONDITION *condition)
 				break;
 			default:
 				ret = NOTSUPPORTED;
-				break;
 		}
 		DBfree_result(result);
 	}
@@ -521,7 +509,6 @@ static int	check_discovery_condition(DB_EVENT *event, DB_CONDITION *condition)
 				break;
 			default:
 				ret = NOTSUPPORTED;
-				break;
 		}
 		DBfree_result(result);
 	}
@@ -551,7 +538,6 @@ static int	check_discovery_condition(DB_EVENT *event, DB_CONDITION *condition)
 					break;
 				default:
 					ret = NOTSUPPORTED;
-					break;
 			}
 			DBfree_result(result);
 		}
@@ -568,7 +554,6 @@ static int	check_discovery_condition(DB_EVENT *event, DB_CONDITION *condition)
 				break;
 			default:
 				ret = NOTSUPPORTED;
-				break;
 		}
 	}
 	else if (CONDITION_TYPE_PROXY == condition->conditiontype)
@@ -611,7 +596,6 @@ static int	check_discovery_condition(DB_EVENT *event, DB_CONDITION *condition)
 				break;
 			default:
 				ret = NOTSUPPORTED;
-				break;
 		}
 		DBfree_result(result);
 	}
@@ -655,7 +639,6 @@ static int	check_discovery_condition(DB_EVENT *event, DB_CONDITION *condition)
 						break;
 					default:
 						ret = NOTSUPPORTED;
-						break;
 				}
 			}
 			DBfree_result(result);
@@ -694,7 +677,6 @@ static int	check_discovery_condition(DB_EVENT *event, DB_CONDITION *condition)
 					break;
 				default:
 					ret = NOTSUPPORTED;
-					break;
 			}
 		}
 		DBfree_result(result);
@@ -727,7 +709,6 @@ static int	check_discovery_condition(DB_EVENT *event, DB_CONDITION *condition)
 						break;
 					default:
 						ret = NOTSUPPORTED;
-						break;
 				}
 			}
 			DBfree_result(result);
@@ -749,7 +730,6 @@ static int	check_discovery_condition(DB_EVENT *event, DB_CONDITION *condition)
 				break;
 			default:
 				ret = NOTSUPPORTED;
-				break;
 		}
 	}
 	else if (CONDITION_TYPE_DUPTIME == condition->conditiontype)
@@ -790,7 +770,6 @@ static int	check_discovery_condition(DB_EVENT *event, DB_CONDITION *condition)
 					break;
 				default:
 					ret = NOTSUPPORTED;
-					break;
 			}
 		}
 		DBfree_result(result);
@@ -819,7 +798,6 @@ static int	check_discovery_condition(DB_EVENT *event, DB_CONDITION *condition)
 						break;
 					default:
 						ret = NOTSUPPORTED;
-						break;
 				}
 			}
 			DBfree_result(result);
@@ -890,7 +868,6 @@ static int	check_auto_registration_condition(DB_EVENT *event, DB_CONDITION *cond
 					break;
 				default:
 					ret = NOTSUPPORTED;
-					break;
 			}
 		}
 		DBfree_result(result);
@@ -921,7 +898,6 @@ static int	check_auto_registration_condition(DB_EVENT *event, DB_CONDITION *cond
 					break;
 				default:
 					ret = NOTSUPPORTED;
-					break;
 			}
 		}
 		DBfree_result(result);
@@ -1036,7 +1012,6 @@ static int	check_internal_condition(DB_EVENT *event, DB_CONDITION *condition)
 							" and i.itemid=" ZBX_FS_UI64
 							" and hg.groupid=" ZBX_FS_UI64,
 						event->objectid, condition_value);
-				break;
 		}
 
 		result = DBselectN(sql, 1);
@@ -1053,7 +1028,6 @@ static int	check_internal_condition(DB_EVENT *event, DB_CONDITION *condition)
 				break;
 			default:
 				ret = NOTSUPPORTED;
-				break;
 		}
 		DBfree_result(result);
 	}
@@ -1143,7 +1117,6 @@ static int	check_internal_condition(DB_EVENT *event, DB_CONDITION *condition)
 				break;
 			default:
 				ret = NOTSUPPORTED;
-				break;
 		}
 	}
 	else if (CONDITION_TYPE_HOST == condition->conditiontype)
@@ -1185,7 +1158,6 @@ static int	check_internal_condition(DB_EVENT *event, DB_CONDITION *condition)
 				break;
 			default:
 				ret = NOTSUPPORTED;
-				break;
 		}
 		DBfree_result(result);
 	}
@@ -1206,7 +1178,6 @@ static int	check_internal_condition(DB_EVENT *event, DB_CONDITION *condition)
 				break;
 			default:
 				ret = NOTSUPPORTED;
-				break;
 		}
 	}
 	else if (CONDITION_TYPE_APPLICATION == condition->conditiontype)
@@ -1230,7 +1201,6 @@ static int	check_internal_condition(DB_EVENT *event, DB_CONDITION *condition)
 						" where a.applicationid=i.applicationid"
 							" and i.itemid=" ZBX_FS_UI64,
 						event->objectid);
-				break;
 		}
 
 		switch (condition->operator)
@@ -1268,7 +1238,6 @@ static int	check_internal_condition(DB_EVENT *event, DB_CONDITION *condition)
 				break;
 			default:
 				ret = NOTSUPPORTED;
-				break;
 		}
 		DBfree_result(result);
 	}
@@ -1329,7 +1298,6 @@ int	check_action_condition(DB_EVENT *event, DB_CONDITION *condition)
 		default:
 			zabbix_log(LOG_LEVEL_ERR, "unsupported event source [%d] for condition id [" ZBX_FS_UI64 "]",
 					event->source, condition->conditionid);
-			break;
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
@@ -1425,7 +1393,6 @@ static int	check_action_conditions(DB_EVENT *event, zbx_uint64_t actionid, unsig
 			default:
 				ret = FAIL;
 				exit = 1;
-				break;
 		}
 	}
 	DBfree_result(result);
