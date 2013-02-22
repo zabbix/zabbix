@@ -65,8 +65,7 @@ void	send_proxyconfig(zbx_sock_t *sock, struct zbx_json_parse *jp)
 
 	zabbix_log(LOG_LEVEL_WARNING, "Sending configuration data to proxy '%s'. Datalen " ZBX_FS_SIZE_T,
 			host, (zbx_fs_size_t)j.buffer_size);
-	zabbix_log(LOG_LEVEL_DEBUG, "%s",
-			j.buffer);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s", j.buffer);
 
 	alarm(CONFIG_TIMEOUT);
 
