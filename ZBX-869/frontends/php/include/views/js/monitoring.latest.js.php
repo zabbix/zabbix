@@ -75,8 +75,7 @@
 				openState = $(this).data('openState');
 
 			// hide/show all corresponding toggle sub rows
-			var hidden = $(this).parent().parent().next().css('display') == 'none'
-			$('tr[parent_app_id=' + appId + ']')[(hidden ? 'show' : 'hide')]();
+			$('tr[parent_app_id=' + appId + ']')[(openState ? 'hide' : 'show')]();
 
 			// switch between + and - icon
 			$(this).toggleClass('icon-minus-9x9');

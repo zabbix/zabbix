@@ -104,6 +104,28 @@ class CProfile {
 	}
 
 	/**
+	 * Removes profile values from DB and profiles cache
+	 *
+	 * @param string $idx	first identifier
+	 * @param mixed  $idx2	second identifier, which can be list of identifiers as well
+	 */
+	public static function delete($idx, $idx2) {
+		if (!is_array($idx2)) {
+			$idx2 = array($idx2);
+		}
+
+		// remove from DB
+		DBexecute('DELETE FROM profiles WHERE idx="'.$idx.'" AND '.dbConditionString('idx2', $idx2));
+
+		// remove from cache
+		if (!is_null(self::$profiles)) {
+			foreach ($idx2 as $v) {
+				unset(self::$profiles[$idx][$v]);
+			}
+		}
+	}
+
+	/**
 	 * Update favorite values in DB profiles table.
 	 *
 	 * @param string	$idx		max length is 96

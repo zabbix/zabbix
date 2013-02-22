@@ -484,7 +484,7 @@ table.tableinfo caption {
 }
 
 .latest-mon .tableinfo { table-layout: fixed; }
-.latest-mon .tableinfo tr > td:nth-child(1) { width: 9px; }
+.latest-mon .tableinfo tr > td:first-child { width: 9px; }
 .latest-mon .tableinfo tr > td:nth-child(2) { width: 20%; }
 .latest-mon .tableinfo tr > td:nth-child(3) { width: 25%; }
 .latest-mon .tableinfo tr > td:nth-child(7) { width: 120px; }

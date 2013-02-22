@@ -71,12 +71,28 @@ if (isset($_REQUEST['favobj'])) {
 		CProfile::update('web.latest.filter.state',$_REQUEST['favstate'], PROFILE_TYPE_INT);
 	}
 	elseif ($_REQUEST['favobj'] == 'toggle') {
+		// $_REQUEST['toggle_ids'] can be single id or list of ids,
+		// where id xxxx is application id and id 0_xxxx is 0_ + host id
 		if (!is_array($_REQUEST['toggle_ids'])) {
-			CProfile::update('web.latest.toggle.'.$_REQUEST['toggle_ids'], $_REQUEST['toggle_open_state'], PROFILE_TYPE_INT);
+			if ($_REQUEST['toggle_ids'][1] == '_') {
+				$hostId = substr($_REQUEST['toggle_ids'], 2);
+				CProfile::update('web.latest.toggle_other', $_REQUEST['toggle_open_state'], PROFILE_TYPE_INT, $hostId);
+			}
+			else {
+				$applicationId = $_REQUEST['toggle_ids'];
+				CProfile::update('web.latest.toggle', $_REQUEST['toggle_open_state'], PROFILE_TYPE_INT, $applicationId);
+			}
 		}
 		else {
 			foreach ($_REQUEST['toggle_ids'] as $toggleId) {
-				CProfile::update('web.latest.toggle.'.$toggleId, $_REQUEST['toggle_open_state'], PROFILE_TYPE_INT);
+				if ($toggleId[1] == '_') {
+					$hostId = substr($toggleId, 2);
+					CProfile::update('web.latest.toggle_other', $_REQUEST['toggle_open_state'], PROFILE_TYPE_INT, $hostId);
+				}
+				else {
+					$applicationId = $toggleId;
+					CProfile::update('web.latest.toggle', $_REQUEST['toggle_open_state'], PROFILE_TYPE_INT, $applicationId);
+				}
 			}
 		}
 	}
@@ -348,7 +364,7 @@ foreach ($db_apps as $appid => $dbApp) {
 
 	$appRows = $tab_rows[$appid];
 
-	$openState = CProfile::get('web.latest.toggle.'.$dbApp['applicationid']);
+	$openState = CProfile::get('web.latest.toggle', null, $dbApp['applicationid']);
 
 	$toggle = new CDiv(SPACE, 'app-list-toggle icon-plus-9x9');
 	if ($openState) {
@@ -536,7 +552,7 @@ foreach ($db_hosts as $hostId => $dbHost) {
 	}
 	$appRows = $tab_rows[$hostId];
 
-	$openState = CProfile::get('web.latest.toggle.0_'.$host['hostid']);
+	$openState = CProfile::get('web.latest.toggle_other', null, $host['hostid']);
 
 	$toggle = new CDiv(SPACE, 'app-list-toggle icon-plus-9x9');
 	if ($openState) {
