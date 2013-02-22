@@ -37,6 +37,10 @@ require_once dirname(__FILE__).'/include/page_header.php';
 $fields = array(
 	'parent_hostid' =>		array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
 	'parent_discoveryid' =>	array(T_ZBX_INT, O_MAND, P_SYS,	DB_ID, null),
+	'host' =>		        array(T_ZBX_STR, O_OPT, null,		NOT_EMPTY,	'isset({save})', _('Host name')),
+	'name' =>	    array(T_ZBX_STR, O_OPT, null,		null,		'isset({save})'),
+	'status' =>		        array(T_ZBX_INT, O_OPT, null,		        IN(HOST_STATUS_NOT_MONITORED, HOST_STATUS_MONITORED), 'isset({save})'),
+	'templates' =>		    array(T_ZBX_STR, O_OPT, null, NOT_EMPTY,	null),
 	'go' =>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'save' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'clone' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
@@ -98,12 +102,12 @@ elseif (isset($_REQUEST['save'])) {
 
 		$item['itemid'] = $_REQUEST['itemid'];
 
-		$result = API::Itemprototype()->update($item);
+//		$result = API::Itemprototype()->update($item);
 
 		show_messages($result, _('Item updated'), _('Cannot update item'));
 	}
 	else {
-		$result = API::Itemprototype()->create($item);
+//		$result = API::Itemprototype()->create($item);
 		show_messages($result, _('Item added'), _('Cannot add item'));
 	}
 
@@ -116,14 +120,14 @@ elseif (($_REQUEST['go'] == 'activate' || $_REQUEST['go'] == 'disable') && isset
 	$group_itemid = $_REQUEST['group_itemid'];
 
 	DBstart();
-	$go_result = ($_REQUEST['go'] == 'activate') ? activate_item($group_itemid) : disable_item($group_itemid);
+//	$go_result = ($_REQUEST['go'] == 'activate') ? activate_item($group_itemid) : disable_item($group_itemid);
 	$go_result = DBend($go_result);
 	show_messages($go_result, ($_REQUEST['go'] == 'activate') ? _('Items activated') : _('Items disabled'), null);
 }
 elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['group_itemid'])) {
 	$group_itemid = $_REQUEST['group_itemid'];
 	DBstart();
-	$go_result = API::Itemprototype()->delete($group_itemid);
+//	$go_result = API::Itemprototype()->delete($group_itemid);
 	$go_result = DBend($go_result);
 	show_messages($go_result, _('Items deleted'), _('Cannot delete items'));
 }
@@ -142,11 +146,11 @@ if (isset($_REQUEST['form'])) {
 		'parent_hostid' => get_request('parent_hostid', null),
 		'discovery_rule' => $discoveryRule,
 		'host_prototype' => array(
-			'hostid' => null,
-			'host' => '',
-			'name' => '',
-			'status' => HOST_STATUS_MONITORED,
-			'templates' => array()
+			'hostid' => get_request('hostid'),
+			'host' => get_request('host'),
+			'name' => get_request('name'),
+			'status' => get_request('status', HOST_STATUS_MONITORED),
+			'templates' => get_request('templates', array())
 		)
 	);
 
