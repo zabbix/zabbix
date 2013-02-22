@@ -25,94 +25,151 @@ require_once dirname(__FILE__).'/../../include/html.inc.php';
 
 class urlParamTest extends CZabbixTest {
 
-	public static function providerNotRequest() {
+	public static function provider() {
 		return array(
+			/*
+			 * Request is empty
+			 */
 			array(
-				array('abc', true, 'name'),
-				''
+				'inputData' => array('abc'),
+				'expectedResult' => '',
+				'expectError' => false,
+				'requestData' => array()
 			),
 			array(
-				array('abc', true),
-				''
+				'inputData' => array('abc', true),
+				'expectedResult' => '',
+				'expectError' => false,
+				'requestData' => array()
 			),
 			array(
-				array('abc'),
-				''
+				'inputData' => array('abc', true, 'name'),
+				'expectedResult' => '',
+				'expectError' => false,
+				'requestData' => array()
 			),
 			array(
-				array(array('a' => 1, 'b' => 2, 'c' => 3), true),
-				''
+				'inputData' => array(array('a' => 1, 'b' => 2, 'c' => 3)),
+				'expectedResult' => '',
+				'expectError' => true,
+				'requestData' => array()
 			),
 			array(
-				array('abc', false, 'name'),
-				'&name=abc'
+				'inputData' => array(array('a' => 1, 'b' => 2, 'c' => 3), true),
+				'expectedResult' => '',
+				'expectError' => true,
+				'requestData' => array()
 			),
 			array(
-				array(array('a' => 1, 'b' => 2, 'c' => 3), false, 'a'),
-				'&a[a]=1&a[b]=2&a[c]=3'
+				'inputData' => array('abc', false, 'name'),
+				'expectedResult' => '&name=abc',
+				'expectError' => false,
+				'requestData' => array()
 			),
 			array(
-				array(array('a' => 1, 'b' => 2, 'c' => 3), false, 'abc'),
-				'&abc[a]=1&abc[b]=2&abc[c]=3'
+				'inputData' => array(array('a' => 1, 'b' => 2, 'c' => 3), false, 'abc'),
+				'expectedResult' => '&abc[a]=1&abc[b]=2&abc[c]=3',
+				'expectError' => false,
+				'requestData' => array()
+			),
+			/*
+			 * Request exist
+			 */
+			array(
+				'inputData' => array('a'),
+				'expectedResult' => '&a=1',
+				'expectError' => false,
+				'requestData' => array('a' => 1, 'b' => 2, 'c' => 3, 'd' => array('d0', 'd1', 'd2'))
+			),
+			array(
+				'inputData' => array('a', true),
+				'expectedResult' => '&a=1',
+				'expectError' => false,
+				'requestData' => array('a' => 1, 'b' => 2, 'c' => 3, 'd' => array('d0', 'd1', 'd2'))
+			),
+			array(
+				'inputData' => array('a', true, 'b'),
+				'expectedResult' => '&b=1',
+				'expectError' => false,
+				'requestData' => array('a' => 1, 'b' => 2, 'c' => 3, 'd' => array('d0', 'd1', 'd2'))
+			),
+			array(
+				'inputData' => array('b', true, 'b'),
+				'expectedResult' => '&b=2',
+				'expectError' => false,
+				'requestData' => array('a' => 1, 'b' => 2, 'c' => 3, 'd' => array('d0', 'd1', 'd2'))
+			),
+			array(
+				'inputData' => array('abc', true),
+				'expectedResult' => '',
+				'expectError' => false,
+				'requestData' => array('a' => 1, 'b' => 2, 'c' => 3, 'd' => array('d0', 'd1', 'd2'))
+			),
+			array(
+				'inputData' => array('abc', true, 'abc'),
+				'expectedResult' => '',
+				'expectError' => false,
+				'requestData' => array('a' => 1, 'b' => 2, 'c' => 3, 'd' => array('d0', 'd1', 'd2'))
+			),
+			array(
+				'inputData' => array('d', true, 'aaa'),
+				'expectedResult' => '&aaa[0]=d0&aaa[1]=d1&aaa[2]=d2',
+				'expectError' => false,
+				'requestData' => array('a' => 1, 'b' => 2, 'c' => 3, 'd' => array('d0', 'd1', 'd2'))
+			),
+			array(
+				'inputData' => array('d', true, 'b'),
+				'expectedResult' => '&b[0]=d0&b[1]=d1&b[2]=d2',
+				'expectError' => false,
+				'requestData' => array('a' => 1, 'b' => 2, 'c' => 3, 'd' => array('d0', 'd1', 'd2'))
+			),
+			array(
+				'inputData' => array('abc', false, 'name'),
+				'expectedResult' => '&name=abc',
+				'expectError' => false,
+				'requestData' => array('a' => 1, 'b' => 2, 'c' => 3, 'd' => array('d0', 'd1', 'd2'))
+			),
+			array(
+				'inputData' => array(array('a' => 1, 'b' => 2, 'c' => 3), false, 'abc'),
+				'expectedResult' => '&abc[a]=1&abc[b]=2&abc[c]=3',
+				'expectError' => false,
+				'requestData' => array('a' => 1, 'b' => 2, 'c' => 3, 'd' => array('d0', 'd1', 'd2'))
 			)
 		);
 	}
 
-	public static function providerRequest() {
-		return array(
-			array(
-				array('a'),
-				'&a=1'
-			),
-			array(
-				array('a', true, 'b'),
-				'&b=1'
-			),
-			array(
-				array('b', true, 'b'),
-				'&b=2'
-			),
-			array(
-				array('abc', true),
-				''
-			),
-			array(
-				array('abc', true, 'abc'),
-				''
-			),
-			array(
-				array('d', true, 'aaa'),
-				'&aaa[0]=d0&aaa[1]=d1&aaa[2]=d2'
-			),
-			array(
-				array('d', true, 'b'),
-				'&b[0]=d0&b[1]=d1&b[2]=d2'
-			),
-		);
-	}
-
 	/**
-	 * @dataProvider providerNotRequest
+	 * @dataProvider provider
 	 */
-	public function test($params, $expectedResult) {
-		$result = call_user_func_array('url_param', $params);
+	public function test($inputData, $expectedResult, $expectError, $requestData) {
+		$_REQUEST = $requestData;
 
-		$this->assertSame($result, $expectedResult);
-	}
+		if ($expectError) {
+			try {
+				$result = null;
 
-	/**
-	 * @dataProvider providerRequest
-	 */
-	public function test2($params, $expectedResult) {
-		$_REQUEST['a'] = 1;
-		$_REQUEST['b'] = 2;
-		$_REQUEST['c'] = 3;
-		$_REQUEST['d'][0] = 'd0';
-		$_REQUEST['d'][1] = 'd1';
-		$_REQUEST['d'][2] = 'd2';
+				if (isset($inputData[2])) {
+					$result = call_user_func_array('url_param', array($inputData[0], $inputData[1], $inputData[2]));
+				}
+				elseif (isset($inputData[1])) {
+					$result = call_user_func_array('url_param', array($inputData[0], $inputData[1]));
+				}
+				elseif (isset($inputData[0])) {
+					$result = call_user_func_array('url_param', $inputData[0]);
+				}
+			}
+			catch (Exception $e) {
+				if (!isset($result)) {
+					$this->assertTrue(true);
+				}
+			}
 
-		$result = call_user_func_array('url_param', $params);
-
-		$this->assertSame($result, $expectedResult);
+			if (isset($result)) {
+				$this->assertSame($expectedResult, $result);
+			}
+		}
+		else {
+			$this->assertSame($expectedResult, call_user_func_array('url_param', $inputData));
+		}
 	}
 }
