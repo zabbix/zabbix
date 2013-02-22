@@ -77,6 +77,7 @@ class CDiscoveryRule extends CItemGeneral {
 			'selectItems'				=> null,
 			'selectTriggers'			=> null,
 			'selectGraphs'				=> null,
+			'selectHostPrototypes'		=> null,
 			'countOutput'				=> null,
 			'groupCount'				=> null,
 			'preservekeys'				=> null,
@@ -1044,6 +1045,21 @@ class CDiscoveryRule extends CItemGeneral {
 				$graphs = zbx_toHash($graphs, 'parent_itemid');
 				foreach ($result as $itemid => $item) {
 					$result[$itemid]['graphs'] = isset($graphs[$itemid]) ? $graphs[$itemid]['rowscount'] : 0;
+				}
+			}
+		}
+
+		// adding hosts
+		if ($options['selectHostPrototypes'] !== null) {
+			if ($options['selectHostPrototypes'] != API_OUTPUT_COUNT) {
+				$relationMap = new CRelationMap();
+				$hostPrototypes = array();
+				$result = $relationMap->mapMany($result, $hostPrototypes, 'hosts', $options['limitSelects']);
+			}
+			else {
+				$hostPrototypes = array();
+				foreach ($result as $itemid => $item) {
+					$result[$itemid]['hostPrototypes'] = isset($hostPrototypes[$itemid]) ? $hostPrototypes[$itemid]['rowscount'] : 0;
 				}
 			}
 		}

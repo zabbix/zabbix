@@ -297,6 +297,7 @@ else {
 		'selectItems' => API_OUTPUT_COUNT,
 		'selectGraphs' => API_OUTPUT_COUNT,
 		'selectTriggers' => API_OUTPUT_COUNT,
+		'selectHostPrototypes' => API_OUTPUT_COUNT,
 		'sortfield' => $sortfield,
 		'limit' => $config['search_limit'] + 1
 	));
