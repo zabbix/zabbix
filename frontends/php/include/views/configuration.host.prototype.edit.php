@@ -57,7 +57,7 @@ $hostTB->setAttribute('maxlength', 64);
 $hostTB->setAttribute('autofocus', 'autofocus');
 $hostList->addRow(_('Host name'), $hostTB);
 
-$visiblenameTB = new CTextBox('visiblename', $hostPrototype['name'], ZBX_TEXTBOX_STANDARD_SIZE);
+$visiblenameTB = new CTextBox('name', $hostPrototype['name'], ZBX_TEXTBOX_STANDARD_SIZE);
 $visiblenameTB->setAttribute('maxlength', 64);
 $hostList->addRow(_('Visible name'), $visiblenameTB);
 
