@@ -961,7 +961,7 @@ static int	check_internal_condition(DB_EVENT *event, DB_CONDITION *condition)
 	const char	*__function_name = "check_internal_condition";
 	DB_RESULT	result;
 	DB_ROW		row;
-	zbx_uint64_t	value_uint64;
+	zbx_uint64_t	condition_value;
 	int		nodeid, ret = FAIL;
 	char		sql[256];
 
@@ -977,9 +977,9 @@ static int	check_internal_condition(DB_EVENT *event, DB_CONDITION *condition)
 
 	if (CONDITION_TYPE_EVENT_TYPE == condition->conditiontype)
 	{
-		value_uint64 = atoi(condition->value);
+		condition_value = atoi(condition->value);
 
-		switch (value_uint64)
+		switch (condition_value)
 		{
 			case EVENT_TYPE_ITEM_NORMAL:
 				if (EVENT_OBJECT_ITEM == event->object && ITEM_STATE_NORMAL == event->value)
@@ -1011,7 +1011,7 @@ static int	check_internal_condition(DB_EVENT *event, DB_CONDITION *condition)
 	}
 	else if (CONDITION_TYPE_HOST_GROUP == condition->conditiontype)
 	{
-		ZBX_STR2UINT64(value_uint64, condition->value);
+		ZBX_STR2UINT64(condition_value, condition->value);
 
 		switch (event->object)
 		{
@@ -1025,7 +1025,7 @@ static int	check_internal_condition(DB_EVENT *event, DB_CONDITION *condition)
 							" and f.triggerid=t.triggerid"
 							" and t.triggerid=" ZBX_FS_UI64
 							" and hg.groupid=" ZBX_FS_UI64,
-						event->objectid, value_uint64);
+						event->objectid, condition_value);
 				break;
 			default:
 				zbx_snprintf(sql, sizeof(sql),
@@ -1035,7 +1035,7 @@ static int	check_internal_condition(DB_EVENT *event, DB_CONDITION *condition)
 							" and h.hostid=i.hostid"
 							" and i.itemid=" ZBX_FS_UI64
 							" and hg.groupid=" ZBX_FS_UI64,
-						event->objectid, value_uint64);
+						event->objectid, condition_value);
 				break;
 		}
 
@@ -1061,7 +1061,7 @@ static int	check_internal_condition(DB_EVENT *event, DB_CONDITION *condition)
 	{
 		zbx_uint64_t	hostid, objectid;
 
-		ZBX_STR2UINT64(value_uint64, condition->value);
+		ZBX_STR2UINT64(condition_value, condition->value);
 
 		switch (condition->operator)
 		{
@@ -1128,7 +1128,7 @@ static int	check_internal_condition(DB_EVENT *event, DB_CONDITION *condition)
 						ZBX_STR2UINT64(hostid, row[0]);
 						ZBX_STR2UINT64(objectid, row[1]);
 
-						if (hostid == value_uint64)
+						if (hostid == condition_value)
 						{
 							ret = SUCCEED;
 							break;
@@ -1148,7 +1148,7 @@ static int	check_internal_condition(DB_EVENT *event, DB_CONDITION *condition)
 	}
 	else if (CONDITION_TYPE_HOST == condition->conditiontype)
 	{
-		ZBX_STR2UINT64(value_uint64, condition->value);
+		ZBX_STR2UINT64(condition_value, condition->value);
 
 		switch (event->object)
 		{
@@ -1160,7 +1160,7 @@ static int	check_internal_condition(DB_EVENT *event, DB_CONDITION *condition)
 							" and f.triggerid=t.triggerid"
 							" and t.triggerid=" ZBX_FS_UI64
 							" and i.hostid=" ZBX_FS_UI64,
-						event->objectid, value_uint64);
+						event->objectid, condition_value);
 				break;
 			default:
 				zbx_snprintf(sql, sizeof(sql),
@@ -1168,7 +1168,7 @@ static int	check_internal_condition(DB_EVENT *event, DB_CONDITION *condition)
 						" from items"
 						" where itemid=" ZBX_FS_UI64
 							" and hostid=" ZBX_FS_UI64,
-						event->objectid, value_uint64);
+						event->objectid, condition_value);
 		}
 
 		result = DBselectN(sql, 1);
@@ -1192,16 +1192,16 @@ static int	check_internal_condition(DB_EVENT *event, DB_CONDITION *condition)
 	else if (CONDITION_TYPE_NODE == condition->conditiontype)
 	{
 		nodeid = get_nodeid_by_id(event->objectid);
-		value_uint64 = atoi(condition->value);
+		condition_value = atoi(condition->value);
 
 		switch (condition->operator)
 		{
 			case CONDITION_OPERATOR_EQUAL:
-				if (nodeid == value_uint64)
+				if (nodeid == condition_value)
 					ret = SUCCEED;
 				break;
 			case CONDITION_OPERATOR_NOT_EQUAL:
-				if (nodeid != value_uint64)
+				if (nodeid != condition_value)
 					ret = SUCCEED;
 				break;
 			default:
