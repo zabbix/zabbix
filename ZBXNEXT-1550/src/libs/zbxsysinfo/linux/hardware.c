@@ -278,33 +278,32 @@ int     SYSTEM_HW_CPU(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	int		ret = SYSINFO_RET_FAIL, filter, cpu, cur_cpu = -1, offset = 0;
 	zbx_uint64_t	maxfreq = FAIL, curfreq = FAIL;
-	char		line[MAX_STRING_LEN], name[MAX_STRING_LEN], tmp[MAX_STRING_LEN], buffer[MAX_BUFFER_LEN],
-			*param1, *param2;
+	char		line[MAX_STRING_LEN], name[MAX_STRING_LEN], tmp[MAX_STRING_LEN], buffer[MAX_BUFFER_LEN], *param;
 	FILE		*f;
 
 	if (2 < request->nparam)
 		return ret;
 
-	param1 = get_rparam(request, 0);
+	param = get_rparam(request, 0);
 
-	if (NULL == param1 || '\0' == *param1 || 0 == strcmp(param1, "all"))
+	if (NULL == param || '\0' == *param || 0 == strcmp(param, "all"))
 		cpu = HW_CPU_ALL_CPUS;	/* show all CPUs by default */
-	else if (FAIL == is_uint(param1))
+	else if (FAIL == is_uint(param))
 		return ret;
 	else
-		cpu = atoi(param1);
+		cpu = atoi(param);
 
-	param2 = get_rparam(request, 1);
+	param = get_rparam(request, 1);
 
-	if (NULL == param2 || '\0' == *param2 || 0 == strcmp(param2, "full"))
+	if (NULL == param || '\0' == *param || 0 == strcmp(param, "full"))
 		filter = HW_CPU_SHOW_ALL;	/* show full info by default */
-	else if (0 == strcmp(param2, "maxfreq"))
+	else if (0 == strcmp(param, "maxfreq"))
 		filter = HW_CPU_SHOW_MAXFREQ;
-	else if (0 == strcmp(param2, "vendor"))
+	else if (0 == strcmp(param, "vendor"))
 		filter = HW_CPU_SHOW_VENDOR;
-	else if (0 == strcmp(param2, "model"))
+	else if (0 == strcmp(param, "model"))
 		filter = HW_CPU_SHOW_MODEL;
-	else if (0 == strcmp(param2, "curfreq"))
+	else if (0 == strcmp(param, "curfreq"))
 		filter = HW_CPU_SHOW_CURFREQ;
 	else
 		return ret;
@@ -407,7 +406,7 @@ int     SYSTEM_HW_MACADDR(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (NULL == format || '\0' == *format || 0 == strcmp(format, "full"))
 		show_names = 1;	/* show interface names */
-	else if (0 == strcmp(buffer, "short"))
+	else if (0 == strcmp(format, "short"))
 		show_names = 0;
 	else
 		return ret;

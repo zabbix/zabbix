@@ -230,8 +230,7 @@ int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (NULL != username && '\0' != *username)
 	{
-		usrinfo = getpwnam(username);
-		if (NULL == usrinfo)	/* incorrect user name */
+		if (NULL == (usrinfo = getpwnam(username)))	/* incorrect user name */
 			return SYSINFO_RET_FAIL;
 	}
 	else
