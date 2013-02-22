@@ -200,7 +200,7 @@ static void	recv_proxy_heartbeat(zbx_sock_t *sock, struct zbx_json_parse *jp)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
-static int	process_trap(zbx_sock_t	*sock, char *s, int max_len)
+static int	process_trap(zbx_sock_t	*sock, char *s)
 {
 	char	*pl, *pr, *data, value_dec[MAX_BUFFER_LEN];
 	char	lastlogsize[ZBX_MAX_UINT64_LEN], timestamp[11], source[HISTORY_LOG_SOURCE_LEN_MAX], severity[11];
@@ -405,7 +405,7 @@ static void	process_trapper_child(zbx_sock_t *sock)
 	if (SUCCEED != zbx_tcp_recv_to(sock, &data, CONFIG_TRAPPER_TIMEOUT))
 		return;
 
-	process_trap(sock, data, sizeof(data));
+	process_trap(sock, data);
 }
 
 void	main_trapper_loop(zbx_sock_t *s)
