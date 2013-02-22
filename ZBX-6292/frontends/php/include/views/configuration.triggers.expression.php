@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2000-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -10,15 +10,15 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
+
 require_once dirname(__FILE__).'/js/configuration.triggers.expression.js.php';
 
 $expressionWidget = new CWidget();
@@ -106,7 +106,7 @@ if (isset($this->data['functions'][$this->data['function'].'['.$this->data['oper
 					&& substr($this->data['expr_type'], 0, 7) != 'iregexp') {
 				$paramTypeElement = SPACE._('Seconds');
 			}
-			$expressionFormList->addRow($pf['C'].' ', array(new CNumericBox('param['.$pid.']', $paramValue, 10, $paramIsReadonly), $paramTypeElement));
+			$expressionFormList->addRow($pf['C'].' ', array(new CTextBox('param['.$pid.']', $paramValue, 10, $paramIsReadonly), $paramTypeElement));
 		}
 		else {
 			$expressionFormList->addRow($pf['C'], new CTextBox('param['.$pid.']', $paramValue, 30));
@@ -130,4 +130,3 @@ $expressionForm->addItem(makeFormFooter(array(new CSubmit('insert', _('Insert'))
 
 $expressionWidget->addItem($expressionForm);
 return $expressionWidget;
-?>
