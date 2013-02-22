@@ -48,5 +48,5 @@ ZBX_METRIC	parameters_specific[] =
 
 	{"system.stat",		CF_HAVEPARAMS,	SYSTEM_STAT,		"page,fi"},
 
-	{0}
+	{NULL}
 };
