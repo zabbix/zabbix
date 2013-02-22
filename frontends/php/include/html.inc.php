@@ -305,17 +305,26 @@ function get_icon($name, $params = array()) {
  * @return object
  */
 function get_header_host_table($currentElement, $hostid, $discoveryid = null) {
-	$elements = array(
-		'items' => 'items',
-		'triggers' => 'triggers',
-		'graphs' => 'graphs',
-		'applications' => 'applications',
-		'screens' => 'screens',
-		'discoveries' => 'discoveries',
-		'web' => 'web'
-	);
-	if (!empty($discoveryid)) {
-		unset($elements['applications'], $elements['screens'], $elements['discoveries'], $elements['web']);
+	// LLD rule header
+	if ($discoveryid) {
+		$elements = array(
+			'items' => 'items',
+			'triggers' => 'triggers',
+			'graphs' => 'graphs',
+			'hosts' => 'hosts'
+		);
+	}
+	// host header
+	else {
+		$elements = array(
+			'items' => 'items',
+			'triggers' => 'triggers',
+			'graphs' => 'graphs',
+			'applications' => 'applications',
+			'screens' => 'screens',
+			'discoveries' => 'discoveries',
+			'web' => 'web'
+		);
 	}
 
 	$options = array(
@@ -340,6 +349,9 @@ function get_header_host_table($currentElement, $hostid, $discoveryid = null) {
 	}
 	if (isset($elements['web'])) {
 		$options['selectHttpTests'] = API_OUTPUT_COUNT;
+	}
+	if (isset($elements['hosts'])) {
+		$options['selectHostPrototypes'] = API_OUTPUT_COUNT;
 	}
 
 	// get hosts
@@ -501,6 +513,18 @@ function get_header_host_table($currentElement, $hostid, $discoveryid = null) {
 					' ('.$dbHost['graphs'].')'
 				));
 			}
+		}
+	}
+
+	if (isset($elements['hosts'])) {
+		if ($currentElement == 'hosts') {
+			$list->addItem(_('Host prototypes').' ('.$dbDiscovery['hostPrototypes'].')');
+		}
+		else {
+			$list->addItem(array(
+				new CLink(_('Host prototypes'), 'host_prototypes.php?parent_hostid='.$dbHost['hostid'].'&parent_discoveryid='.$dbDiscovery['itemid']),
+				' ('.$dbDiscovery['hostPrototypes'].')'
+			));
 		}
 	}
 
