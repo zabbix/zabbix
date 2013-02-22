@@ -144,7 +144,7 @@ static int	SYSTEM_SWAP_PUSED(AGENT_REQUEST *request, AGENT_RESULT *result)
 	tot_val = result_tmp.ui64;
 
 	/* Check for division by zero */
-	if(0 == tot_val)
+	if (0 == tot_val)
 	{
 		free_result(&result_tmp);
 		return SYSINFO_RET_FAIL;
@@ -163,26 +163,26 @@ static int	SYSTEM_SWAP_PUSED(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 int	SYSTEM_SWAP_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	char *swapdev, *mode;
-	int ret = SYSINFO_RET_FAIL;
+	char	*tmp;
+	int	ret = SYSINFO_RET_FAIL;
 
 	if (2 < request->nparam)
 		return SYSINFO_RET_FAIL;
 
-	swapdev = get_rparam(request, 0);
+	tmp = get_rparam(request, 0);
 
-	if (NULL != swapdev && '\0' != *swapdev && 0 != strcmp(swapdev, "all"))
+	if (NULL != tmp && '\0' != *tmp && 0 != strcmp(tmp, "all"))
 		return SYSINFO_RET_FAIL;
 
-	mode = get_rparam(request, 1);
+	tmp = get_rparam(request, 1);
 
-	if (NULL == mode || '\0' == *mode || 0 ==strcmp(mode, "free"))
+	if (NULL == tmp || '\0' == *tmp || 0 == strcmp(tmp, "free"))
 		ret = SYSTEM_SWAP_FREE(request, result);
-	else if (0 ==strcmp(mode, "total"))
+	else if (0 ==strcmp(tmp, "total"))
 		ret = SYSTEM_SWAP_TOTAL(request, result);
-	else if (0 ==strcmp(mode, "pfree"))
+	else if (0 ==strcmp(tmp, "pfree"))
 		ret = SYSTEM_SWAP_PFREE(request, result);
-	else if (0 ==strcmp(mode, "pused"))
+	else if (0 ==strcmp(tmp, "pused"))
 		ret = SYSTEM_SWAP_PUSED(request, result);
 	else
 		ret = SYSINFO_RET_FAIL;
@@ -252,21 +252,22 @@ static int	get_swap_io(double *swapin, double *pgswapin, double *swapout, double
 int	SYSTEM_SWAP_IN(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	int	ret = SYSINFO_RET_FAIL;
-	char	*swapdev, *mode;
+	char	*tmp;
 	double	value = 0;
 
 	if (2 < request->nparam)
 		return SYSINFO_RET_FAIL;
 
-	swapdev = get_rparam(request, 0);
-	mode = get_rparam(request, 1);
+	tmp = get_rparam(request, 0);
 
-	if (NULL != swapdev && '\0' != *swapdev && 0 != strcmp(swapdev, "all"))
+	if (NULL != tmp && '\0' != *tmp && 0 != strcmp(tmp, "all"))
 		return SYSINFO_RET_FAIL;
 
-	if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "count"))
+	tmp = get_rparam(request, 1);
+
+	if (NULL == tmp || '\0' == *tmp || 0 == strcmp(tmp, "count"))
 		ret = get_swap_io(&value, NULL, NULL, NULL);
-	else if (0 == strcmp(mode,"pages"))
+	else if (0 == strcmp(tmp,"pages"))
 		ret = get_swap_io(NULL, &value, NULL, NULL);
 	else
 		ret =  SYSINFO_RET_FAIL;
@@ -281,21 +282,22 @@ int	SYSTEM_SWAP_IN(AGENT_REQUEST *request, AGENT_RESULT *result)
 int	SYSTEM_SWAP_OUT(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	int	ret = SYSINFO_RET_FAIL;
-	char	*swapdev, *mode;
+	char	*tmp;
 	double	value = 0;
 
 	if (2 < request->nparam)
 		return SYSINFO_RET_FAIL;
 
-	swapdev = get_rparam(request, 0);
-	mode = get_rparam(request, 1);
+	tmp = get_rparam(request, 0);
 
-	if (NULL != swapdev && '\0' != *swapdev && 0 != strcmp(swapdev, "all"))
+	if (NULL != tmp && '\0' != *tmp && 0 != strcmp(tmp, "all"))
 		return SYSINFO_RET_FAIL;
 
-	if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "count"))
+	tmp = get_rparam(request, 1);
+
+	if (NULL == tmp || '\0' == *tmp || 0 == strcmp(tmp, "count"))
 		ret = get_swap_io(NULL, NULL, &value, NULL);
-	else if (0 == strcmp(mode,"pages"))
+	else if (0 == strcmp(tmp,"pages"))
 		ret = get_swap_io(NULL, NULL, NULL, &value);
 	else
 		ret = SYSINFO_RET_FAIL;
