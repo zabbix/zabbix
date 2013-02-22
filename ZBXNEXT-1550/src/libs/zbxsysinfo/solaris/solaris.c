@@ -59,5 +59,5 @@ ZBX_METRIC	parameters_specific[] =
 	{"system.uptime",	0,		SYSTEM_UPTIME,		NULL},
 	{"system.boottime",	0,		SYSTEM_BOOTTIME,	NULL},
 
-	{0}
+	{NULL}
 };

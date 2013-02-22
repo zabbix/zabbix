@@ -191,7 +191,7 @@ int	NET_IF_COLLISIONS(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if_name = get_rparam(request, 0);
 
-	if (NULL == if_name)
+	if (NULL == if_name || '\0' == *if_name)
 		return SYSINFO_RET_FAIL;
 
 	if (SUCCEED == get_kstat_named_field(if_name, "collisions", &kn))
@@ -213,10 +213,7 @@ int	NET_TCP_LISTEN(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	tmp = get_rparam(request, 0);
 
-	if (NULL == tmp)
-		return SYSINFO_RET_FAIL;
-
-	if (FAIL == is_ushort(tmp, &port))
+	if (NULL == tmp || FAIL == is_ushort(tmp, &port))
 		return SYSINFO_RET_FAIL;
 
 	zbx_snprintf(command, sizeof(command), "netstat -an -P tcp | grep '\\.%hu[^.].*LISTEN' | wc -l", port);
@@ -241,10 +238,7 @@ int	NET_UDP_LISTEN(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	tmp = get_rparam(request, 0);
 
-	if (NULL == tmp)
-		return SYSINFO_RET_FAIL;
-
-	if (FAIL == is_ushort(tmp, &port))
+	if (NULL == tmp || FAIL == is_ushort(tmp, &port))
 		return SYSINFO_RET_FAIL;
 
 	zbx_snprintf(command, sizeof(command), "netstat -an -P udp | grep '\\.%hu[^.].*Idle' | wc -l", port);
@@ -272,7 +266,7 @@ int	NET_IF_IN(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if (NULL == if_name || '\0' == *if_name)
 		return SYSINFO_RET_FAIL;
 
-	if (NULL == mode || '\0' == *mode || 0 ==strcmp(mode, "bytes"))
+	if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "bytes"))
 		ret = NET_IF_IN_BYTES(if_name, result);
 	else if (0 ==strcmp(mode, "packets"))
 		ret = NET_IF_IN_PACKETS(if_name, result);

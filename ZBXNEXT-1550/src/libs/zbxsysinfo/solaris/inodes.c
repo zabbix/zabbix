@@ -36,10 +36,10 @@ int	VFS_FS_INODE(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if (2 < request->nparam)
 		return SYSINFO_RET_FAIL;
 
-	if (NULL == fsname || '\0' == *fsname)
-		return SYSINFO_RET_FAIL;
+	fsname = get_rparam(request, 0);
+	mode = get_rparam(request, 1);
 
-	if (0 != ZBX_STATFS(fsname, &s))
+	if (NULL == fsname || '\0' == *fsname || 0 != ZBX_STATFS(fsname, &s))
 		return SYSINFO_RET_FAIL;
 
 	if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "total"))	/* default parameter */

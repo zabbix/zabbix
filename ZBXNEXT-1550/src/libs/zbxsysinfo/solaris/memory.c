@@ -80,17 +80,6 @@ static int	VM_MEMORY_PAVAILABLE(AGENT_RESULT *result)
 
 int     VM_MEMORY_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	const MODE_FUNCTION	fl[] =
-	{
-		{"total",	VM_MEMORY_TOTAL},
-		{"free",	VM_MEMORY_FREE},
-		{"used",	VM_MEMORY_USED},
-		{"pused",	VM_MEMORY_PUSED},
-		{"available",	VM_MEMORY_AVAILABLE},
-		{"pavailable",	VM_MEMORY_PAVAILABLE},
-		{NULL,		0}
-	};
-
 	char	*mode;
 	int	ret = SYSINFO_RET_FAIL;
 
