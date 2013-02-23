@@ -28,6 +28,9 @@ static int	get_ifmib_general(const char *if_name)
 	int	mib[6], ifcount;
 	size_t	len;
 
+	if (NULL == if_name || '\0' == *if_name)
+		return FAIL;
+
 	mib[0] = CTL_NET;
 	mib[1] = PF_LINK;
 	mib[2] = NETLINK_GENERIC;
@@ -71,9 +74,6 @@ int	NET_IF_IN(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if_name = get_rparam(request, 0);
 	mode = get_rparam(request, 1);
 
-	if (NULL == if_name || '\0' == *if_name)
-		return SYSINFO_RET_FAIL;
-
 	if (FAIL == get_ifmib_general(if_name))
 		return SYSINFO_RET_FAIL;
 
@@ -101,9 +101,6 @@ int	NET_IF_OUT(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if_name = get_rparam(request, 0);
 	mode = get_rparam(request, 1);
 
-	if (NULL == if_name || '\0' == *if_name)
-		return SYSINFO_RET_FAIL;
-
 	if (FAIL == get_ifmib_general(if_name))
 		return SYSINFO_RET_FAIL;
 
@@ -128,9 +125,6 @@ int	NET_IF_TOTAL(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if_name = get_rparam(request, 0);
 	mode = get_rparam(request, 1);
-
-	if (NULL == if_name || '\0' == *if_name)
-		return SYSINFO_RET_FAIL;
 
 	if (FAIL == get_ifmib_general(if_name))
 		return SYSINFO_RET_FAIL;
@@ -158,10 +152,7 @@ int     NET_TCP_LISTEN(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	tmp = get_rparam(request, 0);
 
-	if (NULL == tmp || '\0' == *tmp)
-		return SYSINFO_RET_FAIL;
-
-	if (FAIL == is_ushort(tmp, &port))
+	if (NULL == tmp || '\0' == *tmp || FAIL == is_ushort(tmp, &port))
 		return SYSINFO_RET_FAIL;
 
 	zbx_snprintf(command, sizeof(command), "netstat -an | grep '^tcp.*\\.%hu[^.].*LISTEN' | wc -l", port);
@@ -186,10 +177,7 @@ int     NET_UDP_LISTEN(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	tmp = get_rparam(request, 0);
 
-	if (NULL == tmp || '\0' == *tmp)
-		return SYSINFO_RET_FAIL;
-
-	if (FAIL == is_ushort(tmp, &port))
+	if (NULL == tmp || '\0' == *tmp || FAIL == is_ushort(tmp, &port))
 		return SYSINFO_RET_FAIL;
 
 	zbx_snprintf(command, sizeof(command), "netstat -an | grep '^udp.*\\.%hu[^.].*\\*\\.\\*' | wc -l", port);
@@ -211,9 +199,6 @@ int     NET_IF_COLLISIONS(AGENT_REQUEST *request, AGENT_RESULT *result)
 		return SYSINFO_RET_FAIL;
 
 	if_name = get_rparam(request, 0);
-
-	if (NULL == if_name || '\0' == *if_name)
-		return SYSINFO_RET_FAIL;
 
 	if (FAIL == get_ifmib_general(if_name))
 		return SYSINFO_RET_FAIL;

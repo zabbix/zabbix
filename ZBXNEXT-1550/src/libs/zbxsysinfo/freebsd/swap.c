@@ -32,10 +32,6 @@ int	SYSTEM_SWAP_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 	struct xswdev	xsw;
 	zbx_uint64_t	total = 0, used = 0;
 
-        assert(result);
-
-        init_result(result);
-
 	if (2 < request->nparam)
 		return SYSINFO_RET_FAIL;
 

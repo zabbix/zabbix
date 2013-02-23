@@ -96,7 +96,7 @@ int	get_diskstat(const char *devname, zbx_uint64_t *dstat)
 static int	vfs_dev_rw(AGENT_REQUEST *request, AGENT_RESULT *result, int rw)
 {
 	ZBX_SINGLE_DISKDEVICE_DATA *device;
-	char		*devname, *tmp;
+	char		devname[32], *tmp;
 	int		type, mode;
 	zbx_uint64_t	dstats[ZBX_DSTAT_MAX];
 	char		*pd;			/* pointer to device name without '/dev/' prefix, e.g. 'da0' */
@@ -104,23 +104,20 @@ static int	vfs_dev_rw(AGENT_REQUEST *request, AGENT_RESULT *result, int rw)
 	if (3 < request->nparam)
 		return SYSINFO_RET_FAIL;
 
-	devname = get_rparam(request, 0);
+	tmp = get_rparam(request, 0);
 
-	if (NULL == devname)
-		return SYSINFO_RET_FAIL;
+	if (NULL == tmp || 0 == strcmp(tmp, "all"))
+		*devname = '\0';
+	else
+		strscpy(devname, tmp);
 
 	pd = devname;
 
 	if ('\0' != *pd)
 	{
-		if (0 == strcmp(pd, "all"))
-			*pd = '\0';
-		else
-		{
-			/* skip prefix ZBX_DEV_PFX, if present */
-			if (0 == strncmp(pd, ZBX_DEV_PFX, sizeof(ZBX_DEV_PFX) - 1))
-				pd += sizeof(ZBX_DEV_PFX) - 1;
-		}
+		/* skip prefix ZBX_DEV_PFX, if present */
+		if (0 == strncmp(pd, ZBX_DEV_PFX, sizeof(ZBX_DEV_PFX) - 1))
+			pd += sizeof(ZBX_DEV_PFX) - 1;
 	}
 
 	tmp = get_rparam(request, 1);

@@ -174,13 +174,13 @@ int     PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 	{
 		proc_ok = 0;
 		comm_ok = 0;
-		if (NULL == procname || *procname == '\0' || 0 == strcmp(procname, proc[i].ZBX_PROC_COMM))
+		if (NULL == procname || '\0' == *procname || 0 == strcmp(procname, proc[i].ZBX_PROC_COMM))
 			proc_ok = 1;
 
-		if (NULL != proccomm && *proccomm != '\0')
+		if (NULL != proccomm && '\0' != *proccomm)
 		{
 			if (NULL != (args = get_commandline(&proc[i])))
-				if (zbx_regexp_match(args, proccomm, NULL) != NULL)
+				if (NULL != zbx_regexp_match(args, proccomm, NULL))
 					comm_ok = 1;
 		}
 		else
@@ -262,7 +262,7 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 	else
 		return SYSINFO_RET_FAIL;
 
-	proccomm = get_rparam(request, 4);
+	proccomm = get_rparam(request, 3);
 
 	mib[0] = CTL_KERN;
 	mib[1] = KERN_PROC;
@@ -302,7 +302,7 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 		stat_ok = 0;
 		comm_ok = 0;
 
-		if (NULL == procname || *procname == '\0' || 0 == strcmp(procname, proc[i].ZBX_PROC_COMM))
+		if (NULL == procname || '\0' == *procname || 0 == strcmp(procname, proc[i].ZBX_PROC_COMM))
 			proc_ok = 1;
 
 		if (zbx_proc_stat != ZBX_PROC_STAT_ALL)
@@ -325,10 +325,10 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 		else
 			stat_ok = 1;
 
-		if (NULL != proccomm && *proccomm != '\0')
+		if (NULL != proccomm && '\0' != *proccomm)
 		{
 			if (NULL != (args = get_commandline(&proc[i])))
-				if (zbx_regexp_match(args, proccomm, NULL) != NULL)
+				if (NULL != zbx_regexp_match(args, proccomm, NULL))
 					comm_ok = 1;
 		}
 		else
