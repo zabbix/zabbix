@@ -77,12 +77,10 @@ int	get_diskstat(const char *devname, zbx_uint64_t *dstat)
 	struct stat 	dev_st;
 	int		found = 0;
 
-	assert(devname);
-
 	for (i = 0; i < ZBX_DSTAT_MAX; i++)
 		dstat[i] = (zbx_uint64_t)__UINT64_C(0);
 
-	if ('\0' != *devname)
+	if (NULL != devname && '\0' != *devname && 0 != strcmp(devname, "all"))
 	{
 		*dev_path = '\0';
 		if (0 != strncmp(devname, ZBX_DEV_PFX, sizeof(ZBX_DEV_PFX) - 1))
@@ -99,7 +97,7 @@ int	get_diskstat(const char *devname, zbx_uint64_t *dstat)
 	while (NULL != fgets(tmp, sizeof(tmp), f))
 	{
 		PARSE(tmp);
-		if ('\0' != *devname)
+		if (NULL != devname && '\0' != *devname && 0 != strcmp(devname, "all"))
 		{
 			if (0 != strcmp(name, devname))
 			{
@@ -143,8 +141,6 @@ static int	get_kernel_devname(const char *devname, char *kernel_devname, size_t 
 	zbx_uint64_t	ds[ZBX_DSTAT_MAX], rdev_major, rdev_minor;
 	struct stat	dev_st;
 
-	assert(devname);
-
 	if ('\0' == *devname)
 		return ret;
 
@@ -182,10 +178,6 @@ static int	vfs_dev_rw(AGENT_REQUEST *request, AGENT_RESULT *result, int rw)
 		return SYSINFO_RET_FAIL;
 
 	devname = get_rparam(request, 0);
-
-	if (NULL == devname || '\0' == *devname || 0 == strcmp(devname, "all"))
-		*devname = '\0';
-
 	tmp = get_rparam(request, 1);
 
 	if (NULL == tmp || '\0' == *tmp || 0 == strcmp(tmp, "sps"))	/* default parameter */
@@ -237,7 +229,7 @@ static int	vfs_dev_rw(AGENT_REQUEST *request, AGENT_RESULT *result, int rw)
 		return SYSINFO_RET_FAIL;
 	}
 
-	if ('\0' == *devname)
+	if (NULL == devname || '\0' == *devname || 0 == strcmp(devname, "all"))
 		*kernel_devname = '\0';
 	else if (SUCCEED != get_kernel_devname(devname, kernel_devname, sizeof(kernel_devname)))
 		return SYSINFO_RET_FAIL;
