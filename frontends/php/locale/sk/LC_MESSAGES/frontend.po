@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2013-02-20 19:46+0200\n"
-"PO-Revision-Date: 2013-02-08 14:55+0200\n"
+"PO-Revision-Date: 2013-02-21 08:55+0200\n"
 "Last-Translator: marki555 <marki@marki-online.net>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: sk\n"
@@ -90,7 +90,7 @@ msgstr "(0 - donekonečna)"
 #: include/views/configuration.hostgroups.list.php:31
 #: include/views/configuration.template.edit.php:143
 msgid "(Only super admins can create groups)"
-msgstr ""
+msgstr "(Skupiny môžu vytvárať iba SuperAdmini)"
 
 #: include/forms.inc.php:539 include/forms.inc.php:554
 msgid "(in days)"
