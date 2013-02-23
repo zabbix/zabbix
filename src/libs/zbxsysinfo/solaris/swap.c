@@ -197,56 +197,53 @@ int	SYSTEM_SWAP_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 static int	get_swap_io(double *swapin, double *pgswapin, double *swapout, double *pgswapout)
 {
-    kstat_ctl_t	    *kc;
-    kstat_t	    *k;
-    cpu_stat_t	    *cpu;
+	kstat_ctl_t	*kc;
+	kstat_t		*k;
+	cpu_stat_t	*cpu;
+	int		cpu_count = 0;
 
-    int	    cpu_count = 0;
-
-    kc = kstat_open();
-
-    if(kc != NULL)
-    {
-	k = kc->kc_chain;
-  	while (k != NULL)
+	if (NULL != (kc = kstat_open()))
 	{
-	    if( (strncmp(k->ks_name, "cpu_stat", 8) == 0) &&
-		(kstat_read(kc, k, NULL) != -1) )
-	    {
-		cpu = (cpu_stat_t*) k->ks_data;
-		if(swapin)
+		while (NULL != (k = kc->kc_chain))
 		{
-		   /* uint_t   swapin;	    	*/ /* swapins */
-		   (*swapin) += (double) cpu->cpu_vminfo.swapin;
-		}
-		if(pgswapin)
-		{
-		   /* uint_t   pgswapin;	*/ /* pages swapped in */
-		  (*pgswapin) += (double) cpu->cpu_vminfo.pgswapin;
-		}
-		if(swapout)
-		{
-		   /* uint_t   swapout;	    	*/ /* swapout */
-		   (*swapout) += (double) cpu->cpu_vminfo.swapout;
-		}
-		if(pgswapout)
-		{
-		   /* uint_t   pgswapout;	*/ /* pages swapped out */
-		  (*pgswapout) += (double) cpu->cpu_vminfo.pgswapout;
-		}
-		cpu_count += 1;
-  	    }
-	    k = k->ks_next;
-        }
-	kstat_close(kc);
-    }
+			if (0 == strncmp(k->ks_name, "cpu_stat", 8) && -1 != kstat_read(kc, k, NULL))
+			{
+				cpu = (cpu_stat_t*)k->ks_data;
 
-    if(cpu_count == 0)
-    {
-	return SYSINFO_RET_FAIL;
-    }
+				if (NULL != swapin)
+				{
+					/* uint_t   swapin;	*/ /* swapins */
+					(*swapin) += (double)cpu->cpu_vminfo.swapin;
+				}
 
-    return SYSINFO_RET_OK;
+				if (NULL != pgswapin)
+				{
+					/* uint_t   pgswapin;	*/ /* pages swapped in */
+					(*pgswapin) += (double)cpu->cpu_vminfo.pgswapin;
+				}
+
+				if (NULL != swapout)
+				{
+					/* uint_t   swapout;	*/ /* swapout */
+					(*swapout) += (double)cpu->cpu_vminfo.swapout;
+				}
+
+				if (NULL != pgswapout)
+				{
+					/* uint_t   pgswapout;	*/ /* pages swapped out */
+					(*pgswapout) += (double)cpu->cpu_vminfo.pgswapout;
+				}
+				cpu_count += 1;
+			}
+			k = k->ks_next;
+		}
+		kstat_close(kc);
+	}
+
+	if (0 == cpu_count)
+		return SYSINFO_RET_FAIL;
+
+	return SYSINFO_RET_OK;
 }
 
 int	SYSTEM_SWAP_IN(AGENT_REQUEST *request, AGENT_RESULT *result)

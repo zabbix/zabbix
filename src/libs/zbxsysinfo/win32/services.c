@@ -49,7 +49,7 @@ int	SERVICE_STATE(AGENT_REQUEST *request, AGENT_RESULT *result)
 		service = OpenService(mgr, service_name, SERVICE_QUERY_STATUS);
 	zbx_free(wname);
 
-	if(NULL == service)
+	if (NULL == service)
 	{
 		SET_UI64_RESULT(result, 255);
 	}

@@ -32,13 +32,13 @@ int	SYSTEM_CPU_UTIL(AGENT_REQUEST *request, AGENT_RESULT *result)
 	tmp = get_rparam(request, 0);
 
 	/* only "all" (default) for parameter "cpu" is supported */
-	if (NULL == tmp && '\0' != *tmp && 0 != strcmp(tmp, "all"))
+	if (NULL != tmp && '\0' != *tmp && 0 != strcmp(tmp, "all"))
 		return SYSINFO_RET_FAIL;
 
 	tmp = get_rparam(request, 2);
 
 	/* only "avg1" (default) for parameter "mode" is supported */
-	if (NULL == tmp && '\0' != *tmp && 0 != strcmp(tmp, "avg1"))
+	if (NULL != tmp && '\0' != *tmp && 0 != strcmp(tmp, "avg1"))
 		return SYSINFO_RET_FAIL;
 
 	tmp = get_rparam(request, 1);
@@ -68,7 +68,7 @@ int	SYSTEM_CPU_LOAD(AGENT_REQUEST *request, AGENT_RESULT *result)
 	tmp = get_rparam(request, 0);
 
 	/* only "all" (default) for parameter "cpu" is supported */
-	if (NULL == tmp && '\0' != *tmp && 0 != strcmp(tmp, "all"))
+	if (NULL != tmp && '\0' != *tmp && 0 != strcmp(tmp, "all"))
 		return SYSINFO_RET_FAIL;
 
 	tmp = get_rparam(request, 1);

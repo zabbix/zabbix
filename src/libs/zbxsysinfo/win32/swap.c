@@ -38,7 +38,7 @@ int	SYSTEM_SWAP_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if (NULL == swapdev || '\0' == *swapdev || 0 != strcmp(swapdev, "all"))
 		return SYSINFO_RET_FAIL;
 
-	if(NULL != zbx_GlobalMemoryStatusEx)
+	if (NULL != zbx_GlobalMemoryStatusEx)
 	{
 		ms_ex.dwLength = sizeof(MEMORYSTATUSEX);
 

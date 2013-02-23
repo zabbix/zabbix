@@ -130,13 +130,13 @@ int	SYSTEM_SWAP_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 	/* default parameter */
 	if (NULL == mode || *mode == '\0' || 0 == strcmp(mode, "free"))
 		ret = SYSTEM_SWAP_FREE(result);
-	else if(0 == strcmp(mode, "used"))
+	else if (0 == strcmp(mode, "used"))
 		ret = SYSTEM_SWAP_USED(result);
-	else if(0 == strcmp(mode, "total"))
+	else if (0 == strcmp(mode, "total"))
 		ret = SYSTEM_SWAP_TOTAL(result);
-	else if(0 == strcmp(mode, "pfree"))
+	else if (0 == strcmp(mode, "pfree"))
 		ret = SYSTEM_SWAP_PFREE(result);
-	else if(0 == strcmp(mode, "pused"))
+	else if (0 == strcmp(mode, "pused"))
 		ret = SYSTEM_SWAP_PUSED(result);
 	else
 		ret = SYSINFO_RET_FAIL;

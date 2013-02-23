@@ -72,10 +72,7 @@ static char	*proc_argv(pid_t pid)
 
 int     PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	char	*procname,
-		*buffer,
-		*proccomm,
-		*args;
+	char	*procname, *proccomm, *param, *args;
 	int	do_task, pagesize, count, i,
 		proc_ok, comm_ok,
 		op, arg;
@@ -93,26 +90,25 @@ int     PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 		return SYSINFO_RET_FAIL;
 
 	procname = get_rparam(request, 0);
-	buffer = get_rparam(request, 1);
+	param = get_rparam(request, 1);
 
-	if (NULL != buffer || *buffer != '\0')
+	if (NULL != param || '\0' != *param)
 	{
-		usrinfo = getpwnam(buffer);
-		if (usrinfo == NULL)	/* incorrect user name */
+		if (NULL == (usrinfo = getpwnam(param)))	/* incorrect user name */
 			return SYSINFO_RET_FAIL;
 	}
 	else
 		usrinfo = NULL;
 
-	buffer = get_rparam(request, 2);
+	param = get_rparam(request, 2);
 
-	if (NULL == buffer || *buffer == '\0' || 0 == strcmp(buffer, "sum"))
+	if (NULL == param || '\0' == *param || 0 == strcmp(param, "sum"))
 		do_task = DO_SUM;
-	else if (0 == strcmp(buffer, "avg"))
+	else if (0 == strcmp(param, "avg"))
 		do_task = DO_AVG;
-	else if (0 == strcmp(buffer, "max"))
+	else if (0 == strcmp(param, "max"))
 		do_task = DO_MAX;
-	else if (0 == strcmp(buffer, "min"))
+	else if (0 == strcmp(param, "min"))
 		do_task = DO_MIN;
 	else
 		return SYSINFO_RET_FAIL;
@@ -188,10 +184,7 @@ int     PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	char	*procname,
-		*buffer,
-		*proccomm,
-		*args;
+	char	*procname, *proccomm, *param, *args;
 	int	zbx_proc_stat, count, i,
 		proc_ok, stat_ok, comm_ok,
 		op, arg;
@@ -207,27 +200,25 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 		return SYSINFO_RET_FAIL;
 
 	procname = get_rparam(request, 0);
+	param = get_rparam(request, 1);
 
-	buffer = get_rparam(request, 1);
-
-	if (NULL != buffer && *buffer != '\0')
+	if (NULL != param && '\0' != *param)
 	{
-		usrinfo = getpwnam(buffer);
-		if (usrinfo == NULL)	/* incorrect user name */
+		if (NULL == (usrinfo = getpwnam(param)))	/* incorrect user name */
 			return SYSINFO_RET_FAIL;
 	}
 	else
 		usrinfo = NULL;
 
-	buffer = get_rparam(request, 2);
+	param = get_rparam(request, 2);
 
-	if (NULL == buffer || *buffer == '\0' || 0 == strcmp(buffer, "all"))
+	if (NULL == param || '\0' == *param || 0 == strcmp(param, "all"))
 		zbx_proc_stat = ZBX_PROC_STAT_ALL;
-	else if (0 == strcmp(buffer, "run"))
+	else if (0 == strcmp(param, "run"))
 		zbx_proc_stat = ZBX_PROC_STAT_RUN;
-	else if (0 == strcmp(buffer, "sleep"))
+	else if (0 == strcmp(param, "sleep"))
 		zbx_proc_stat = ZBX_PROC_STAT_SLEEP;
-	else if (0 == strcmp(buffer, "zomb"))
+	else if (0 == strcmp(param, "zomb"))
 		zbx_proc_stat = ZBX_PROC_STAT_ZOMB;
 	else
 		return SYSINFO_RET_FAIL;
