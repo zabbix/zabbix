@@ -81,7 +81,7 @@ int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 	pid_t			pid = 0;
 	AGENT_RESULT		proc_args;
 #endif /* HAVE_SYS_PROCFS_H */
-	struct passwd		*usrinfo = NULL;
+	struct passwd		*usrinfo;
 	zbx_uint64_t		value = 0;
 	int			do_task;
 	double			memsize = 0;
@@ -91,7 +91,6 @@ int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 		return SYSINFO_RET_FAIL;
 
 	procname = get_rparam(request, 0);
-
 	param = get_rparam(request, 1);
 
 	if (NULL != param && '\0' != *param)
@@ -204,9 +203,9 @@ int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 			memsize = value;
 		else
 		{
-			if(do_task == DO_MAX)
+			if (DO_MAX == do_task)
 				memsize = MAX(memsize, value);
-			else if(do_task == DO_MIN)
+			else if (DO_MIN == do_task)
 				memsize = MIN(memsize, value);
 			else
 				memsize += value;
@@ -238,7 +237,7 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 	pid_t			pid = 0;
 	AGENT_RESULT		proc_args;
 #endif /* HAVE_SYS_PROCFS_H */
-	struct passwd		*usrinfo = NULL;
+	struct passwd		*usrinfo;
 	int			zbx_proc_stat;
 	zbx_uint64_t		proccount = 0;
 
@@ -246,7 +245,6 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 		return SYSINFO_RET_FAIL;
 
 	procname = get_rparam(request, 0);
-
 	param = get_rparam(request, 1);
 
 	if (NULL != param && '\0' != *param)

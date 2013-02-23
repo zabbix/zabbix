@@ -90,7 +90,7 @@ int	NET_TCP_PORT(AGENT_REQUEST *request, AGENT_RESULT *result)
 	ip_str = get_rparam(request, 0);
 	port_str = get_rparam(request, 1);
 
-	if(NULL == ip_str || '\0' == *ip_str)
+	if (NULL == ip_str || '\0' == *ip_str)
 		strscpy(ip, "127.0.0.1");
 	else
 		strscpy(ip, ip_str);

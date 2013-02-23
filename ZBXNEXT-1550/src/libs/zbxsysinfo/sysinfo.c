@@ -472,7 +472,7 @@ int	process(const char *in_command, unsigned flags, AGENT_RESULT *result)
 	{
 		if (0 != (command->flags & CF_USERPARAMETER) || NULL == command->test_param)
 			strscpy(parameters, "");
-		else if(NULL != command->test_param)
+		else if (NULL != command->test_param)
 			strscpy(parameters, command->test_param);
 	}
 
