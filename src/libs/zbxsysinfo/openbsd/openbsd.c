@@ -58,5 +58,5 @@ ZBX_METRIC	parameters_specific[] =
 
 	{"sensor",		CF_HAVEPARAMS,	GET_SENSOR,		"cpu0,temp0"},
 
-	{0}
+	{NULL}
 };
