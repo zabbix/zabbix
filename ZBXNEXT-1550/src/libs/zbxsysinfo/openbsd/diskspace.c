@@ -33,8 +33,6 @@ static int	get_fs_size_stat(const char *fs, zbx_uint64_t *total, zbx_uint64_t *f
 #endif
 	struct ZBX_STATFS	s;
 
-	assert(fs);
-
 	if (0 != ZBX_STATFS(fs, &s))
 		return SYSINFO_RET_FAIL;
 

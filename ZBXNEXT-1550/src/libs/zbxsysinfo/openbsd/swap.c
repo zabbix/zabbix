@@ -187,7 +187,7 @@ int	SYSTEM_SWAP_IN(AGENT_REQUEST *request, AGENT_RESULT *result)
 	mode = get_rparam(request, 1);
 
 	/* the only supported parameter */
-	if (NULL != swapdev || '\0' != *swapdev || 0 != strcmp(swapdev, "all"))
+	if (NULL != swapdev && '\0' != *swapdev && 0 != strcmp(swapdev, "all"))
 		return SYSINFO_RET_FAIL;
 
 	/* default parameter */
@@ -221,7 +221,7 @@ int	SYSTEM_SWAP_OUT(AGENT_REQUEST *request, AGENT_RESULT *result)
 	mode = get_rparam(request, 1);
 
 	/* the only supported parameter */
-	if (NULL != swapdev || '\0' != *swapdev || 0 != strcmp(swapdev, "all"))
+	if (NULL != swapdev && '\0' != *swapdev && 0 != strcmp(swapdev, "all"))
 		return SYSINFO_RET_FAIL;
 
 	/* default parameter */
