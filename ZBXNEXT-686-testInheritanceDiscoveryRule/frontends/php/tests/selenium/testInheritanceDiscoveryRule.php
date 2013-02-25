@@ -30,7 +30,7 @@ class testInheritanceDiscovery extends CWebTest {
 
 
 	// returns all possible item types
-/*	public static function itemTypes() {
+	public static function itemTypes() {
 		return array(
 			array(
 				array('type' => 'Zabbix agent')
@@ -108,7 +108,7 @@ class testInheritanceDiscovery extends CWebTest {
 				array('type' => 'Calculated')
 			)
 		);
-	}*/
+	}
 
 	/**
 	 * Backup the tables that will be modified during the tests.
@@ -120,7 +120,7 @@ class testInheritanceDiscovery extends CWebTest {
 	/**
 	 * @dataProvider itemTypes
 	 */
-/*	public function testInheritanceDiscoveryRule_CheckLayout($data) {
+	public function testInheritanceDiscoveryRule_CheckLayout($data) {
 		$this->zbxTestLogin('templates.php');
 
 		$template = 'Inheritance test template';
@@ -486,7 +486,7 @@ class testInheritanceDiscovery extends CWebTest {
 		$this->assertAttribute("//*[@id='status']/option[text()='Enabled']/@selected", 'selected');
 	}
 
-*/	// returns data for discovery rule create
+	// returns data for discovery rule create
 	public static function discoveryRule() {
 		return array(
 			array(
