@@ -1116,7 +1116,7 @@ function get_triggers_overview($hostids, $application, $view_style = null, $scre
 	foreach ($dbTriggers as $trigger) {
 		$trigger['host'] = $trigger['hosts'][0]['name'];
 		$trigger['hostid'] = $trigger['hosts'][0]['hostid'];
-		$trigger['host'] = get_node_name_by_elid($trigger['hostid'], null, ': ').$trigger['host'];
+		$trigger['host'] = get_node_name_by_elid($trigger['hostid'], null, NAME_DELIMITER).$trigger['host'];
 		$trigger['description'] = CMacrosResolverHelper::resolveTriggerReference($trigger['expression'], $trigger['description']);
 
 		$hostNames[$trigger['hostid']] = $trigger['host'];
@@ -1319,7 +1319,7 @@ function get_trigger_overview_cells($triggerHosts, $hostName, $screenId = null) 
 
 		$dep_table = new CTableInfo();
 		$dep_table->setAttribute('style', 'width: 200px;');
-		$dep_table->addRow(bold(_('Depends on').':'));
+		$dep_table->addRow(bold(_('Depends on').NAME_DELIMITER));
 
 		$dependency = false;
 		$dep_res = DBselect('SELECT td.* FROM trigger_depends td WHERE td.triggerid_down='.$triggerid);
@@ -1339,7 +1339,7 @@ function get_trigger_overview_cells($triggerHosts, $hostName, $screenId = null) 
 		// triggers that depend on this
 		$dep_table = new CTableInfo();
 		$dep_table->setAttribute('style', 'width: 200px;');
-		$dep_table->addRow(bold(_('Dependent').':'));
+		$dep_table->addRow(bold(_('Dependent').NAME_DELIMITER));
 
 		$dependency = false;
 		$dep_res = DBselect('SELECT td.* FROM trigger_depends td WHERE td.triggerid_up='.$triggerid);

@@ -706,6 +706,8 @@ class CTrigger extends CTriggerGeneral {
 	}
 
 	/**
+	 * Check input.
+	 *
 	 * @param $triggers
 	 * @param $method
 	 */
@@ -717,6 +719,7 @@ class CTrigger extends CTriggerGeneral {
 		// permissions
 		if ($update || $delete) {
 			$triggerDbFields = array('triggerid' => null);
+
 			$dbTriggers = $this->get(array(
 				'triggerids' => zbx_objectValues($triggers, 'triggerid'),
 				'output' => API_OUTPUT_EXTEND,
@@ -735,7 +738,7 @@ class CTrigger extends CTriggerGeneral {
 			);
 		}
 
-		if ($update){
+		if ($update) {
 			$triggers = $this->extendObjects($this->tableName(), $triggers, array('description'));
 		}
 
@@ -761,21 +764,11 @@ class CTrigger extends CTriggerGeneral {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect fields for trigger.'));
 			}
 
+			$expressionChanged = true;
+
 			if ($update) {
 				$dbTrigger = $dbTriggers[$trigger['triggerid']];
-			}
-			elseif ($delete) {
-				if ($dbTriggers[$trigger['triggerid']]['templateid'] != 0) {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Cannot delete templated trigger "%1$s:%2$s".', $dbTriggers[$trigger['triggerid']]['description'],
-							explode_exp($dbTriggers[$trigger['triggerid']]['expression']))
-					);
-				}
-				continue;
-			}
 
-			$expressionChanged = true;
-			if ($update) {
 				if (isset($trigger['expression'])) {
 					$expressionFull = explode_exp($dbTrigger['expression']);
 					if (strcmp($trigger['expression'], $expressionFull) == 0) {
@@ -785,27 +778,15 @@ class CTrigger extends CTriggerGeneral {
 				if (isset($trigger['description']) && strcmp($trigger['description'], $dbTrigger['description']) == 0) {
 					unset($trigger['description']);
 				}
-				if (isset($trigger['priority']) && $trigger['priority'] == $dbTrigger['priority']) {
-					unset($trigger['priority']);
+			}
+			elseif ($delete) {
+				if ($dbTriggers[$trigger['triggerid']]['templateid'] != 0) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Cannot delete templated trigger "%1$s:%2$s".', $dbTriggers[$trigger['triggerid']]['description'],
+							explode_exp($dbTriggers[$trigger['triggerid']]['expression']))
+					);
 				}
-				if (isset($trigger['type']) && $trigger['type'] == $dbTrigger['type']) {
-					unset($trigger['type']);
-				}
-				if (isset($trigger['comments']) && strcmp($trigger['comments'], $dbTrigger['comments']) == 0) {
-					unset($trigger['comments']);
-				}
-				if (isset($trigger['url']) && strcmp($trigger['url'], $dbTrigger['url']) == 0) {
-					unset($trigger['url']);
-				}
-				if (isset($trigger['status']) && $trigger['status'] == $dbTrigger['status']) {
-					unset($trigger['status']);
-				}
-				if (isset($trigger['dependencies'])) {
-					$dbTrigger['dependencies'] = zbx_objectValues($dbTrigger['dependencies'], 'triggerid');
-					if (array_equal($dbTrigger['dependencies'], $trigger['dependencies'])) {
-						unset($trigger['dependencies']);
-					}
-				}
+				continue;
 			}
 
 			// if some of the properties are unchanged, no need to update them in DB
@@ -1001,9 +982,7 @@ class CTrigger extends CTriggerGeneral {
 		return array('triggerids' => $delTriggerIds);
 	}
 
-
 	protected function deleteByPks(array $pks) {
-
 		// others idx should be deleted as well if they arise at some point
 		DB::delete('profiles', array(
 			'idx' => 'web.events.filter.triggerid',
@@ -1184,6 +1163,7 @@ class CTrigger extends CTriggerGeneral {
 		catch (APIException $e) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete dependency'));
 		}
+
 		return array('triggerids' => $triggerids);
 	}
 

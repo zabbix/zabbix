@@ -100,10 +100,10 @@ foreach ($this->data['alerts'] as $alert) {
 	}
 
 	if ($alert['alerttype'] == ALERT_TYPE_MESSAGE) {
-		$message = array(bold(_('Subject').': '), br(), $alert['subject'], br(), br(), bold(_('Message').': '), br(), zbx_nl2br($alert['message']));
+		$message = array(bold(_('Subject').NAME_DELIMITER), br(), $alert['subject'], br(), br(), bold(_('Message').NAME_DELIMITER), br(), zbx_nl2br($alert['message']));
 	}
 	else {
-		$message = array(bold(_('Command').': '), br(), zbx_nl2br($alert['message']));
+		$message = array(bold(_('Command').NAME_DELIMITER), br(), zbx_nl2br($alert['message']));
 	}
 
 	$error = empty($alert['error']) ? new CSpan(SPACE, 'off') : new CSpan($alert['error'], 'on');

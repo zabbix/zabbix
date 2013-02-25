@@ -116,7 +116,7 @@ $types = DBselect(
 while ($type = DBfetch($types)) {
 	$cmbType->addItem(
 		$type['mediatypeid'],
-		get_node_name_by_elid($type['mediatypeid'], null, ': ').$type['description']
+		get_node_name_by_elid($type['mediatypeid'], null, NAME_DELIMITER).$type['description']
 	);
 }
 $frmMedia->addRow(_('Type'), $cmbType);

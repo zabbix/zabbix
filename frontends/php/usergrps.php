@@ -352,7 +352,7 @@ if (isset($_REQUEST['form'])) {
 		$db_rights = DBselect($sql);
 		while ($db_right = DBfetch($db_rights)) {
 			if (!empty($db_right['node_name'])) {
-				$db_right['name'] = $db_right['node_name'].':'.$db_right['name'];
+				$db_right['name'] = $db_right['node_name'].NAME_DELIMITER.$db_right['name'];
 			}
 			$data['group_rights'][$db_right['id']] = array(
 				'permission' => $db_right['permission'],

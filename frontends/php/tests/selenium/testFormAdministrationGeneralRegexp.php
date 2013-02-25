@@ -27,24 +27,22 @@ class testFormAdministrationGeneralRegexp extends CWebTest {
 	private $cloned_regexp = 'test_regexp1_clone';
 
 	public function testFormAdministrationGeneralRegexp_Layout() {
-		$this->login('adm.gui.php');
-		$this->dropdown_select_wait('configDropDown', 'Regular expressions');
+		$this->zbxTestLogin('adm.gui.php');
+		$this->zbxTestDropdownSelectWait('configDropDown', 'Regular expressions');
 		$this->checkTitle('Configuration of regular expressions');
-		$this->ok('CONFIGURATION OF REGULAR EXPRESSIONS');
-		$this->ok(array('Regular expressions', 'Name', 'Expressions'));
+		$this->zbxTestTextPresent('CONFIGURATION OF REGULAR EXPRESSIONS');
+		$this->zbxTestTextPresent(array('Regular expressions', 'Name', 'Expressions'));
 
 		// clicking "New regular expression" button
-		$this->button_click('form');
-		$this->wait();
+		$this->zbxTestClickWait('form');
 
 		$this->checkTitle('Configuration of regular expressions');
-		$this->ok('CONFIGURATION OF REGULAR EXPRESSIONS');
-		$this->ok('Name');
-		$this->ok('Expressions');
+		$this->zbxTestTextPresent('CONFIGURATION OF REGULAR EXPRESSIONS');
+		$this->zbxTestTextPresent('Name');
+		$this->zbxTestTextPresent('Expressions');
 		$this->assertElementPresent('name');
-		$this->assertAttribute("//input[@id='name']/@maxlength", '128');
-		$this->assertAttribute("//input[@id='name']/@size", '50');
-
+		$this->assertAttribute("//input[@id='name']/@maxlength", 128);
+		$this->assertAttribute("//input[@id='name']/@size", 50);
 
 		$this->assertAttribute("//input[@id='expressionNew']/@maxlength", '255');
 		$this->assertAttribute("//input[@id='expressionNew']/@size", '50');
@@ -79,26 +77,24 @@ class testFormAdministrationGeneralRegexp extends CWebTest {
 	 * @dataProvider dataCreate
 	 */
 	public function testFormAdministrationGeneralRegexp_Create($result, $name, $test_string, $expression, $expression_type, $exp_delimiter, $case_sensitive) {
-		$this->login('adm.regexps.php');
+		$this->zbxTestLogin('adm.regexps.php');
 		// clicking "New regular expression" button
-		$this->button_click('form');
-		$this->wait();
+		$this->zbxTestClickWait('form');
 
 		// adding regexp
 		$this->input_type('name', $name);
 		$this->input_type('test_string', $test_string);
-		$this->button_click('add');
+		$this->zbxTestClick('add');
 
 		// clicking button "add_expression"
 		$this->input_type('expressionNew', $expression);
 
-		// $this->dropdown_select_wait('new_expression[expression_type]', 'Character string included');
-		$this->dropdown_select('typeNew', $expression_type);
-		$this->checkbox_select('case_sensitiveNew');
-		$this->button_click('saveExpression');
-		$this->button_click('save');
-		$this->wait();
-		$this->ok('Regular expression added');
+		// $this->zbxTestDropdownSelectWait('new_expression[expression_type]', 'Character string included');
+		$this->zbxTestDropdownSelect('typeNew', $expression_type);
+		$this->zbxTestCheckboxSelect('case_sensitiveNew');
+		$this->zbxTestClick('saveExpression');
+		$this->zbxTestClickWait('save');
+		$this->zbxTestTextPresent('Regular expression added');
 
 		// select * from regexps r, expressions e where r.name='...' and r.regexpid=e.regexpid
 		$sql = 'SELECT * FROM regexps r,expressions e WHERE r.name='.zbx_dbstr($name).' AND r.regexpid=e.regexpid';
@@ -116,76 +112,68 @@ class testFormAdministrationGeneralRegexp extends CWebTest {
 	 * @dataProvider dataUpdate
 	 */
 	public function testFormAdministrationGeneralRegexp_AddExisting($name) {
-		$this->login('adm.regexps.php');
+		$this->zbxTestLogin('adm.regexps.php');
 
 		// clicking "New regular expression" button
-		$this->button_click('form');
-		$this->wait();
+		$this->zbxTestClickWait('form');
 
 		// adding regexp
 		$this->input_type('name', $name);
 		$this->input_type('test_string', 'first test string');
-		$this->button_click('add');
+		$this->zbxTestClick('add');
 
 		// clicking button "add_expression"
 		$this->input_type('expressionNew', 'first test string');
-		$this->checkbox_select('case_sensitiveNew');
-		$this->button_click('saveExpression');
-		$this->button_click('save');
-		$this->wait();
-		$this->ok(array('ERROR: Cannot add regular expression', 'Regular expression', 'already exists.'));
+		$this->zbxTestCheckboxSelect('case_sensitiveNew');
+		$this->zbxTestClick('saveExpression');
+		$this->zbxTestClickWait('save');
+		$this->zbxTestTextPresent(array('ERROR: Cannot add regular expression', 'Regular expression', 'already exists.'));
 	}
 
 	public function testFormAdministrationGeneralRegexp_AddIncorrect() {
 		// creating regexp without expression
-		$this->login('adm.regexps.php');
+		$this->zbxTestLogin('adm.regexps.php');
 
 		// clicking "New regular expression" button
-		$this->button_click('form');
-		$this->wait();
+		$this->zbxTestClickWait('form');
 
 		$this->input_type('name', '1_regexp3');
-		$this->button_click('save');
-		$this->wait();
-		$this->ok(array('ERROR: Page received incorrect data', 'Warning. Field "expressions" is mandatory.'));
+		$this->zbxTestClickWait('save');
+		$this->zbxTestTextPresent(array('ERROR: Page received incorrect data', 'Warning. Field "expressions" is mandatory.'));
 	}
 
 	public function testFormAdministrationGeneralRegexp_Test() {
 		// Testing regexp using Test button in the regexp properties form
-		$this->login('adm.regexps.php');
-		$this->click('link='.$this->regexp);
-		$this->wait();
+		$this->zbxTestLogin('adm.regexps.php');
+		$this->zbxTestClickWait('link='.$this->regexp);
 
 		$this->click('link=Test');
 		// Test #1 for the result=True
 		$this->waitForCondition("selenium.browserbot.getCurrentWindow().jQuery.active == 0", 3000);
-		$this->ok('TRUE');
+		$this->zbxTestTextPresent('TRUE');
 	}
 
 	public function testFormAdministrationGeneralRegexp_Test2() {
-		$this->login('adm.regexps.php');
+		$this->zbxTestLogin('adm.regexps.php');
 		// test #2 for the result=False
-		$this->click('link='.$this->regexp);
-		$this->wait();
+		$this->zbxTestClickWait('link='.$this->regexp);
 		$this->click('link=Test');
 
 		$this->input_type('test_string', 'abcdef');
-		$this->button_click('testExpression');
+		$this->zbxTestClick('testExpression');
 		$this->waitForCondition("selenium.browserbot.getCurrentWindow().jQuery.active == 0", 3000);
 
-		$this->ok('FALSE');
+		$this->zbxTestTextPresent('FALSE');
 	}
 
 	public function testFormAdministrationGeneralRegexp_Clone() {
 		// cloning regexp
-		$this->login('adm.regexps.php');
-		$this->click('link='.$this->regexp);
-		$this->wait();
-		$this->button_click('clone');
+		$this->zbxTestLogin('adm.regexps.php');
+		$this->zbxTestClickWait('link='.$this->regexp);
+		$this->zbxTestClick('clone');
 		$this->input_type('name', $this->regexp.'_clone');
-		$this->button_click('save');
-		$this->wait();
-		$this->ok('Regular expression added');
+		$this->zbxTestClickWait('save');
+		$this->zbxTestTextPresent('Regular expression added');
 
 		$sql = 'SELECT * FROM regexps r,expressions e WHERE r.name='.zbx_dbstr($this->cloned_regexp).' AND r.regexpid=e.regexpid';
 		$this->assertEquals(1, DBcount($sql), 'Chuck Norris: Cloned regular expression does not exist in the DB');
@@ -193,13 +181,11 @@ class testFormAdministrationGeneralRegexp extends CWebTest {
 
 	public function testFormAdministrationGeneralRegexp_Update() {
 		// Updating regexp
-		$this->login('adm.regexps.php');
-		$this->click('link='.$this->regexp);
-		$this->wait();
+		$this->zbxTestLogin('adm.regexps.php');
+		$this->zbxTestClickWait('link='.$this->regexp);
 		$this->input_type('name', $this->regexp.'2');
-		$this->button_click('save');
-		$this->wait();
-		$this->ok('Regular expression updated');
+		$this->zbxTestClickWait('save');
+		$this->zbxTestTextPresent('Regular expression updated');
 
 		//$sql = 'SELECT * FROM regexps r,expressions e WHERE r.name=\''.$this->regexp.'2\' AND r.regexpid=e.regexpid';
 		$sql = 'SELECT * FROM regexps r,expressions e WHERE r.name='.zbx_dbstr($this->regexp.'2').' AND r.regexpid=e.regexpid';
@@ -219,16 +205,15 @@ class testFormAdministrationGeneralRegexp extends CWebTest {
 		DBsave_tables('regexps');
 
 		// deleting regexp using "Delete" button in the regexp properties form
-		$this->login('adm.regexps.php');
+		$this->zbxTestLogin('adm.regexps.php');
 
-		$this->click('link='.$this->regexp2);
-		$this->wait();
+		$this->zbxTestClickWait('link='.$this->regexp2);
 
 		$this->chooseOkOnNextConfirmation();
-		$this->button_click('delete');
+		$this->zbxTestClick('delete');
 		$this->getConfirmation();
 		$this->wait();
-		$this->ok(array('Regular expression deleted', 'CONFIGURATION OF REGULAR EXPRESSIONS', 'Regular expressions', 'Name', 'Expressions'));
+		$this->zbxTestTextPresent(array('Regular expression deleted', 'CONFIGURATION OF REGULAR EXPRESSIONS', 'Regular expressions', 'Name', 'Expressions'));
 
 		// checking that regexp "test_regexp2" has been deleted from the DB
 		$sql = 'SELECT * FROM regexps r WHERE r.name='.zbx_dbstr($name);
@@ -243,15 +228,15 @@ class testFormAdministrationGeneralRegexp extends CWebTest {
 	}
 
 	public function testFormAdministrationGeneralRegexp_DeleteAll() {
-		$this->login('adm.regexps.php');
-		$this->checkbox_select('all_regexps');
-		$this->dropdown_select('go', 'Delete selected');
+		$this->zbxTestLogin('adm.regexps.php');
+		$this->zbxTestCheckboxSelect('all_regexps');
+		$this->zbxTestDropdownSelect('go', 'Delete selected');
 
 		$this->chooseOkOnNextConfirmation();
-		$this->click('goButton');
+		$this->zbxTestClick('goButton');
 		$this->getConfirmation();
 		$this->wait();
-		$this->ok('Regular expressions deleted');
+		$this->zbxTestTextPresent('Regular expressions deleted');
 
 		$sql = 'SELECT * FROM regexps';
 		$this->assertEquals(0, DBcount($sql), 'Chuck Norris: Regexp has not been deleted from the DB');
