@@ -769,6 +769,9 @@ class CChart extends CGraphDraw {
 		if (!isset($this->axis_valuetype[GRAPH_YAXIS_SIDE_LEFT])) {
 			$side = GRAPH_YAXIS_SIDE_RIGHT;
 			$other_side = GRAPH_YAXIS_SIDE_LEFT;
+			$tempBase = $leftBase8;
+			$leftBase8 = $rightBase8;
+			$rightBase8 = $tempBase;
 		}
 
 		$tmp_minY = array();
@@ -911,19 +914,21 @@ class CChart extends CGraphDraw {
 		$this->m_minY[$other_side] = bcmul(bcfloor(bcdiv($this->m_minY[$other_side], $interval_other_side)), $interval_other_side);
 		$this->m_maxY[$other_side] = bcmul(bcceil(bcdiv($this->m_maxY[$other_side], $interval_other_side)), $interval_other_side);
 
-		// calculate interval count for main side
+		// calculate interval count for main and other side
 		$this->gridLinesCount[$side] = bcceil(bcdiv(bcsub($this->m_maxY[$side], $this->m_minY[$side]), $interval));
+		$this->gridLinesCount[$other_side] = bcceil(bcdiv(bcsub($this->m_maxY[$other_side], $this->m_minY[$other_side]), $interval_other_side));
 
 		$this->m_maxY[$side] = bcadd($this->m_minY[$side], bcmul($interval, $this->gridLinesCount[$side]));
 		$this->gridStep[$side] = $interval;
 
 		if (isset($this->axis_valuetype[$other_side])) {
+			// other side correction
 			$dist = bcsub($this->m_maxY[$other_side], $this->m_minY[$other_side]);
 			$interval = 1;
 
 			foreach ($intervals as $int) {
-				if (bccomp($dist, bcmul($this->gridLinesCount[$side], $int)) == -1) {
-					$interval = $int;
+			if (bccomp($dist, bcmul($this->gridLinesCount[$side], $int)) == -1) {
+				$interval = $int;
 					break;
 				}
 			}
@@ -943,6 +948,42 @@ class CChart extends CGraphDraw {
 					}
 				}
 
+				// recorrecting MIN & MAX
+				$this->m_minY[$other_side] = bcmul(bcfloor(bcdiv($this->m_minY[$other_side], $interval)), $interval);
+				$this->m_maxY[$other_side] = bcmul(bcceil(bcdiv($this->m_maxY[$other_side], $interval)), $interval);
+			}
+
+			// calculate interval, if right side use B or Bps
+			if (isset($rightBase8)) {
+				$intervalData = convertBase8Values($interval);
+				$interval = $intervalData['value'];
+				if ($this->m_maxY[$other_side] > 0) {
+					$absMaxY = $this->m_maxY[$other_side];
+				}
+				else {
+					$absMaxY = bcmul($this->m_maxY[$other_side], '-1');
+				}
+				if ($this->m_minY[$other_side] > 0) {
+					$absMinY = $this->m_minY[$other_side];
+				}
+				else {
+					$absMinY = bcmul($this->m_minY[$other_side], '-1');
+				}
+				if ($absMaxY > $absMinY) {
+					$sideMaxData = convertBase8Values($this->m_maxY[$other_side]);
+				}
+				else {
+					$sideMaxData = convertBase8Values($this->m_minY[$other_side]);
+				}
+				if ($sideMaxData['pow'] != $intervalData['pow']) {
+					// interval correction, if Max Y have other unit, then interval unit = Max Y unit
+					if ($intervalData['pow'] < 0) {
+						$interval = sprintf('%.10f', bcmul($interval, 1.024, 10));
+					}
+					else {
+						$interval = sprintf('%.6f', round(bcmul($interval, 1.024), ZBX_UNITS_ROUNDOFF_UPPER_LIMIT));
+					}
+				}
 				// recorrecting MIN & MAX
 				$this->m_minY[$other_side] = bcmul(bcfloor(bcdiv($this->m_minY[$other_side], $interval)), $interval);
 				$this->m_maxY[$other_side] = bcmul(bcceil(bcdiv($this->m_maxY[$other_side], $interval)), $interval);
