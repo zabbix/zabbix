@@ -281,9 +281,6 @@ static void	activate_host(DC_ITEM *item, zbx_timespec_t *ts)
 	if (0 == *errors_from && HOST_AVAILABLE_TRUE == *available)
 		return;
 
-	if (SUCCEED != DCconfig_activate_host(item))
-		return;
-
 	offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, "update hosts set ");
 
 	if (HOST_AVAILABLE_TRUE == *available)
@@ -309,9 +306,14 @@ static void	activate_host(DC_ITEM *item, zbx_timespec_t *ts)
 	offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, "%s=%d,%s=%d,%s='' where hostid=" ZBX_FS_UI64,
 			fld_errors_from, *errors_from, fld_disable_until, *disable_until, fld_error, item->host.hostid);
 
-	DBbegin();
-	DBexecute("%s", sql);
-	DBcommit();
+	if (SUCCEED == DCconfig_update_host_availability(item->host.hostid, item->type,	*available, *errors_from,
+			*disable_until))
+	{
+
+		DBbegin();
+		DBexecute("%s", sql);
+		DBcommit();
+	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
@@ -376,13 +378,6 @@ static void	deactivate_host(DC_ITEM *item, zbx_timespec_t *ts, const char *error
 			return;
 	}
 
-	if (SUCCEED != DCconfig_deactivate_host(item, ts->sec))
-		return;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() errors_from:%d available:%d", __function_name, *errors_from, *available);
-
-	DBbegin();
-
 	*error_msg = '\0';
 
 	offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, "update hosts set ");
@@ -435,8 +430,15 @@ static void	deactivate_host(DC_ITEM *item, zbx_timespec_t *ts, const char *error
 	offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, "%s=%d where hostid=" ZBX_FS_UI64,
 			fld_disable_until, *disable_until, item->host.hostid);
 
-	DBexecute("%s", sql);
-	DBcommit();
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() errors_from:%d available:%d", __function_name, *errors_from, *available);
+
+	if (SUCCEED == DCconfig_update_host_availability(item->host.hostid, item->type, *available, *errors_from,
+			*disable_until))
+	{
+		DBbegin();
+		DBexecute("%s", sql);
+		DBcommit();
+	}
 
 	if ('\0' != *error_msg)
 		zabbix_log(LOG_LEVEL_WARNING, "%s", error_msg);

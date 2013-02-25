@@ -4065,137 +4065,47 @@ void	DCrequeue_items(zbx_uint64_t *itemids, unsigned char *statuses, int *lastcl
 	UNLOCK_CACHE;
 }
 
-int	DCconfig_activate_host(DC_ITEM *item)
+int DCconfig_update_host_availability(zbx_uint64_t hostid, unsigned char item_type, unsigned char available,
+		int errors_from, int disable_until)
 {
 	int		res = FAIL;
 	ZBX_DC_HOST	*dc_host;
 
 	LOCK_CACHE;
 
-	if (NULL == (dc_host = zbx_hashset_search(&config->hosts, &item->host.hostid)))
+	if (NULL == (dc_host = zbx_hashset_search(&config->hosts, &hostid)))
 		goto unlock;
 
-	switch (item->type)
+	switch (item_type)
 	{
 		case ITEM_TYPE_ZABBIX:
-			item->host.errors_from = dc_host->errors_from;
-			item->host.available = dc_host->available;
-			item->host.disable_until = dc_host->disable_until;
-			dc_host->errors_from = 0;
-			dc_host->available = HOST_AVAILABLE_TRUE;
-			dc_host->disable_until = 0;
+			dc_host->errors_from = errors_from;
+			dc_host->available = available;
+			dc_host->disable_until = disable_until;
 			break;
 		case ITEM_TYPE_SNMPv1:
 		case ITEM_TYPE_SNMPv2c:
 		case ITEM_TYPE_SNMPv3:
-			item->host.snmp_errors_from = dc_host->snmp_errors_from;
-			item->host.snmp_available = dc_host->snmp_available;
-			item->host.snmp_disable_until = dc_host->snmp_disable_until;
-			dc_host->snmp_errors_from = 0;
-			dc_host->snmp_available = HOST_AVAILABLE_TRUE;
-			dc_host->snmp_disable_until = 0;
+			dc_host->snmp_errors_from = errors_from;
+			dc_host->snmp_available = available;
+			dc_host->snmp_disable_until = disable_until;
 			break;
 		case ITEM_TYPE_IPMI:
-			item->host.ipmi_errors_from = dc_host->ipmi_errors_from;
-			item->host.ipmi_available = dc_host->ipmi_available;
-			item->host.ipmi_disable_until = dc_host->ipmi_disable_until;
-			dc_host->ipmi_errors_from = 0;
-			dc_host->ipmi_available = HOST_AVAILABLE_TRUE;
-			dc_host->ipmi_disable_until = 0;
+			dc_host->ipmi_errors_from = errors_from;
+			dc_host->ipmi_available = available;
+			dc_host->ipmi_disable_until = available;
 			break;
 		case ITEM_TYPE_JMX:
-			item->host.jmx_errors_from = dc_host->jmx_errors_from;
-			item->host.jmx_available = dc_host->jmx_available;
-			item->host.jmx_disable_until = dc_host->jmx_disable_until;
-			dc_host->jmx_errors_from = 0;
-			dc_host->jmx_available = HOST_AVAILABLE_TRUE;
-			dc_host->jmx_disable_until = 0;
+			dc_host->jmx_errors_from = errors_from;
+			dc_host->jmx_available = available;
+			dc_host->jmx_disable_until = disable_until;
 			break;
 		default:
 			goto unlock;
 	}
 
 	res = SUCCEED;
-unlock:
-	UNLOCK_CACHE;
 
-	return res;
-}
-
-int	DCconfig_deactivate_host(DC_ITEM *item, int now)
-{
-	int		res = FAIL;
-	ZBX_DC_HOST	*dc_host;
-	int		*errors_from;
-	int		*disable_until;
-	unsigned char	*available;
-
-	LOCK_CACHE;
-
-	if (NULL == (dc_host = zbx_hashset_search(&config->hosts, &item->host.hostid)))
-		goto unlock;
-
-	switch (item->type)
-	{
-		case ITEM_TYPE_ZABBIX:
-			item->host.errors_from = dc_host->errors_from;
-			item->host.available = dc_host->available;
-			item->host.disable_until = dc_host->disable_until;
-			errors_from = &dc_host->errors_from;
-			available = &dc_host->available;
-			disable_until = &dc_host->disable_until;
-			break;
-		case ITEM_TYPE_SNMPv1:
-		case ITEM_TYPE_SNMPv2c:
-		case ITEM_TYPE_SNMPv3:
-			item->host.snmp_errors_from = dc_host->snmp_errors_from;
-			item->host.snmp_available = dc_host->snmp_available;
-			item->host.snmp_disable_until = dc_host->snmp_disable_until;
-			errors_from = &dc_host->snmp_errors_from;
-			available = &dc_host->snmp_available;
-			disable_until = &dc_host->snmp_disable_until;
-			break;
-		case ITEM_TYPE_IPMI:
-			item->host.ipmi_errors_from = dc_host->ipmi_errors_from;
-			item->host.ipmi_available = dc_host->ipmi_available;
-			item->host.ipmi_disable_until = dc_host->ipmi_disable_until;
-			errors_from = &dc_host->ipmi_errors_from;
-			available = &dc_host->ipmi_available;
-			disable_until = &dc_host->ipmi_disable_until;
-			break;
-		case ITEM_TYPE_JMX:
-			item->host.jmx_errors_from = dc_host->jmx_errors_from;
-			item->host.jmx_available = dc_host->jmx_available;
-			item->host.jmx_disable_until = dc_host->jmx_disable_until;
-			errors_from = &dc_host->jmx_errors_from;
-			available = &dc_host->jmx_available;
-			disable_until = &dc_host->jmx_disable_until;
-			break;
-		default:
-			goto unlock;
-	}
-
-	/* first error */
-	if (0 == *errors_from)
-	{
-		*errors_from = now;
-		*disable_until = now + CONFIG_UNREACHABLE_DELAY;
-	}
-	else
-	{
-		if (CONFIG_UNREACHABLE_PERIOD >= now - *errors_from)
-		{
-			/* still unavailable, but won't change status to UNAVAILABLE yet */
-			*disable_until = now + CONFIG_UNREACHABLE_DELAY;
-		}
-		else
-		{
-			*disable_until = now + CONFIG_UNAVAILABLE_DELAY;
-			*available = HOST_AVAILABLE_FALSE;
-		}
-	}
-
-	res = SUCCEED;
 unlock:
 	UNLOCK_CACHE;
 
