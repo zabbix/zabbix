@@ -23,5 +23,5 @@
 ZBX_METRIC	parameters_specific[] =
 /* 	KEY			FLAG		FUNCTION 	TEST PARAMETERS */
 {
-	{0}
+	{NULL}
 };
