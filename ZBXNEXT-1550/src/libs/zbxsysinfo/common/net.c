@@ -95,7 +95,7 @@ int	NET_TCP_PORT(AGENT_REQUEST *request, AGENT_RESULT *result)
 	else
 		strscpy(ip, ip_str);
 
-	if (NULL == port_str || '\0' == *port_str || SUCCEED != is_ushort(port_str, &port))
+	if (NULL == port_str || SUCCEED != is_ushort(port_str, &port))
 		return SYSINFO_RET_FAIL;
 
 	if (SYSINFO_RET_OK == (ret = tcp_expect(ip, port, CONFIG_TIMEOUT, NULL, NULL, NULL, &value_int)))

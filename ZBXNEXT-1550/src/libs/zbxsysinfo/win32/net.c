@@ -410,7 +410,7 @@ int	NET_TCP_LISTEN(AGENT_REQUEST *request, AGENT_RESULT *result)
 	DWORD		dwSize, dwRetVal;
 	int		i, ret = SYSINFO_RET_FAIL;
 	unsigned short	port;
-	char		*tmp;
+	char		*port_str;
 
 	assert(result);
 
@@ -419,9 +419,9 @@ int	NET_TCP_LISTEN(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if (1 <= request->rparam)
 		return SYSINFO_RET_FAIL;
 
-	tmp = get_rparam(request, 0);
+	port_str = get_rparam(request, 0);
 
-	if (NULL == tmp || '\0' == *tmp || SUCCEED != is_ushort(tmp, &port))
+	if (NULL == port_str || SUCCEED != is_ushort(port_str, &port))
 		return SYSINFO_RET_FAIL;
 
 	dwSize = sizeof(MIB_TCPTABLE);

@@ -30,10 +30,10 @@ int zbx_module_dummy_random(AGENT_REQUEST *request, AGENT_RESULT *result);
 static ZBX_METRIC keys[] =
 /*      KEY                     FLAG		FUNCTION        	TEST PARAMETERS */
 {
-	{"dummy.ping",		0,		zbx_module_dummy_ping,	0},
+	{"dummy.ping",		0,		zbx_module_dummy_ping,	NULL},
 	{"dummy.echo",		CF_HAVEPARAMS,	zbx_module_dummy_echo, 	"a message"},
 	{"dummy.random",	CF_HAVEPARAMS,	zbx_module_dummy_random,"1,1000"},
-	{0}
+	{NULL}
 };
 
 /******************************************************************************

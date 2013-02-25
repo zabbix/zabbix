@@ -204,16 +204,16 @@ int	NET_IF_COLLISIONS(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 int	NET_TCP_LISTEN(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	char		*tmp, command[64];
+	char		*port_str, command[64];
 	unsigned short	port;
 	int		res;
 
 	if (1 < request->nparam)
 		return SYSINFO_RET_FAIL;
 
-	tmp = get_rparam(request, 0);
+	port_str = get_rparam(request, 0);
 
-	if (NULL == tmp || FAIL == is_ushort(tmp, &port))
+	if (NULL == port_str || SUCCEED != is_ushort(port_str, &port))
 		return SYSINFO_RET_FAIL;
 
 	zbx_snprintf(command, sizeof(command), "netstat -an -P tcp | grep '\\.%hu[^.].*LISTEN' | wc -l", port);
@@ -229,16 +229,16 @@ int	NET_TCP_LISTEN(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 int	NET_UDP_LISTEN(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	char		*tmp, command[64];
+	char		*port_str, command[64];
 	unsigned short	port;
 	int		res;
 
 	if (1 < request->nparam)
 		return SYSINFO_RET_FAIL;
 
-	tmp = get_rparam(request, 0);
+	port_str = get_rparam(request, 0);
 
-	if (NULL == tmp || FAIL == is_ushort(tmp, &port))
+	if (NULL == port_str || SUCCEED != is_ushort(port_str, &port))
 		return SYSINFO_RET_FAIL;
 
 	zbx_snprintf(command, sizeof(command), "netstat -an -P udp | grep '\\.%hu[^.].*Idle' | wc -l", port);

@@ -75,7 +75,7 @@ ZBX_METRIC	parameters_common[] =
 	{"logrt",		CF_HAVEPARAMS,	ONLY_ACTIVE,		"logfile"},
 	{"eventlog",		CF_HAVEPARAMS,	ONLY_ACTIVE, 		"system"},
 
-	{0}
+	{NULL}
 };
 
 static int	ONLY_ACTIVE(AGENT_REQUEST *request, AGENT_RESULT *result)

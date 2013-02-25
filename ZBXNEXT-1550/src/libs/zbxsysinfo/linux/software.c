@@ -134,7 +134,7 @@ int     SYSTEM_SW_PACKAGES(AGENT_REQUEST *request, AGENT_RESULT *result)
 	mode = get_rparam(request, 2);
 
 	check_regex = (NULL != regex && '\0' != *regex && 0 != strcmp(regex, "all"));
-	check_manager =  (NULL != manager && '\0' != *manager && 0 != strcmp(manager, "all"));
+	check_manager = (NULL != manager && '\0' != *manager && 0 != strcmp(manager, "all"));
 
 	if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "full"))
 		show_pm = 1;	/* show package managers' names */

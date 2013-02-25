@@ -55,5 +55,5 @@ ZBX_METRIC	parameters_specific[] =
 
 	{"__UserPerfCounter",	CF_HAVEPARAMS,	USER_PERF_COUNTER,	""},
 
-	{0}
+	{NULL}
 };

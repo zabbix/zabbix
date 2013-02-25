@@ -28,12 +28,12 @@
 #include "simple.h"
 
 ZBX_METRIC	parameters_simple[] =
-	/* KEY			FLAG		FUNCTION		TEST PARAMETERS      */
-	{
+/*      KEY                     FLAG		FUNCTION        	TEST PARAMETERS */
+{
 	{"net.tcp.service",	CF_HAVEPARAMS,	CHECK_SERVICE, 		"ssh,127.0.0.1,22"},
 	{"net.tcp.service.perf",CF_HAVEPARAMS,	CHECK_SERVICE_PERF, 	"ssh,127.0.0.1,22"},
-	{0}
-	};
+	{NULL}
+};
 
 #ifdef HAVE_LDAP
 static int    check_ldap(const char *host, unsigned short port, int timeout, int *value_int)
@@ -230,7 +230,7 @@ int	check_service(AGENT_REQUEST *request, const char *default_addr, AGENT_RESULT
 	else
 		strscpy(ip, ip_str);
 
-	if (NULL != port_str && '\0' != *port_str && FAIL == is_ushort(port_str, &port))
+	if (NULL != port_str && SUCCEED != is_ushort(port_str, &port))
 	{
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Invalid \"port\" parameter"));
 		return ret;
