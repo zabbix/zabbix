@@ -92,7 +92,7 @@ int     PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 	procname = get_rparam(request, 0);
 	param = get_rparam(request, 1);
 
-	if (NULL != param || '\0' != *param)
+	if (NULL != param && '\0' != *param)
 	{
 		if (NULL == (usrinfo = getpwnam(param)))	/* incorrect user name */
 			return SYSINFO_RET_FAIL;
@@ -139,10 +139,10 @@ int     PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 		proc_ok = 0;
 		comm_ok = 0;
 
-		if (NULL == procname || *procname == '\0' || 0 == strcmp(procname, pproc->p_comm))
+		if (NULL == procname || '\0' == *procname || 0 == strcmp(procname, pproc->p_comm))
 			proc_ok = 1;
 
-		if (NULL != proccomm && *proccomm != '\0')
+		if (NULL != proccomm && '\0' != *proccomm)
 		{
 			if (NULL != (args = proc_argv(pproc->p_pid)))
 			{
@@ -248,7 +248,7 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 		stat_ok = 0;
 		comm_ok = 0;
 
-		if (NULL == procname || *procname == '\0' || 0 == strcmp(procname, pproc->p_comm))
+		if (NULL == procname || '\0' == *procname || 0 == strcmp(procname, pproc->p_comm))
 			proc_ok = 1;
 
 		if (zbx_proc_stat != ZBX_PROC_STAT_ALL)
@@ -271,11 +271,11 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 		else
 			stat_ok = 1;
 
-		if (NULL != proccomm && *proccomm != '\0')
+		if (NULL != proccomm && '\0' != *proccomm)
 		{
 			if (NULL != (args = proc_argv(pproc->p_pid)))
 			{
-				if (zbx_regexp_match(args, proccomm, NULL) != NULL)
+				if (NULL != zbx_regexp_match(args, proccomm, NULL))
 					comm_ok = 1;
 			}
 		}

@@ -33,8 +33,6 @@ static int	get_fs_size_stat(const char *fs, zbx_uint64_t *total, zbx_uint64_t *f
 #endif
 	struct ZBX_STATFS	s;
 
-	assert(fs);
-
 	if (0 != ZBX_STATFS(fs, &s))
 		return SYSINFO_RET_FAIL;
 
@@ -141,13 +139,13 @@ int	VFS_FS_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "total"))
 		ret = VFS_FS_TOTAL(fsname, result);
-	if (0 == strcmp(mode, "free"))
+	else if (0 == strcmp(mode, "free"))
 		ret = VFS_FS_FREE(fsname, result);
-	if (0 == strcmp(mode, "used"))
+	else if (0 == strcmp(mode, "used"))
 		ret = VFS_FS_USED(fsname, result);
-	if (0 == strcmp(mode, "pfree"))
+	else if (0 == strcmp(mode, "pfree"))
 		ret = VFS_FS_PFREE(fsname, result);
-	if (0 == strcmp(mode, "pused"))
+	else if (0 == strcmp(mode, "pused"))
 		ret = VFS_FS_PUSED(fsname, result);
 	else
 		ret = SYSINFO_RET_FAIL;

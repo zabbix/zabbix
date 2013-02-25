@@ -196,33 +196,33 @@ int     VM_MEMORY_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "total"))
 		ret = VM_MEMORY_TOTAL(result);
-	if (0 == strcmp(mode, "active"))
+	else if (0 == strcmp(mode, "active"))
 		ret = VM_MEMORY_ACTIVE(result);
-	if (0 == strcmp(mode, "inactive"))
+	else if (0 == strcmp(mode, "inactive"))
 		ret = VM_MEMORY_INACTIVE(result);
-	if (0 == strcmp(mode, "wired"))
+	else if (0 == strcmp(mode, "wired"))
 		ret = VM_MEMORY_WIRED(result);
-	if (0 == strcmp(mode, "anon"))
+	else if (0 == strcmp(mode, "anon"))
 		ret = VM_MEMORY_ANON(result);
-	if (0 == strcmp(mode, "exec"))
+	else if (0 == strcmp(mode, "exec"))
 		ret = VM_MEMORY_EXEC(result);
-	if (0 == strcmp(mode, "file"))
+	else if (0 == strcmp(mode, "file"))
 		ret = VM_MEMORY_FILE(result);
-	if (0 == strcmp(mode, "free"))
+	else if (0 == strcmp(mode, "free"))
 		ret = VM_MEMORY_FREE(result);
-	if (0 == strcmp(mode, "used"))
+	else if (0 == strcmp(mode, "used"))
 		ret = VM_MEMORY_USED(result);
-	if (0 == strcmp(mode, "pused"))
+	else if (0 == strcmp(mode, "pused"))
 		ret = VM_MEMORY_PUSED(result);
-	if (0 == strcmp(mode, "available"))
+	else if (0 == strcmp(mode, "available"))
 		ret = VM_MEMORY_AVAILABLE(result);
-	if (0 == strcmp(mode, "pavailable"))
+	else if (0 == strcmp(mode, "pavailable"))
 		ret = VM_MEMORY_PAVAILABLE(result);
-	if (0 == strcmp(mode, "buffers"))
+	else if (0 == strcmp(mode, "buffers"))
 		ret = VM_MEMORY_BUFFERS(result);
-	if (0 == strcmp(mode, "cached"))
+	else if (0 == strcmp(mode, "cached"))
 		ret = VM_MEMORY_CACHED(result);
-	if (0 == strcmp(mode, "shared"))
+	else if (0 == strcmp(mode, "shared"))
 		ret = VM_MEMORY_SHARED(result);
 	else
 		ret = SYSINFO_RET_FAIL;
