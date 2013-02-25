@@ -122,6 +122,8 @@ static int	check_trigger_condition(DB_EVENT *event, DB_CONDITION *condition)
 								" and t.triggerid=" ZBX_FS_UI64,
 							triggerid);
 
+					triggerid = 0;
+
 					if (NULL != (row = DBfetch(result)))
 					{
 						ZBX_STR2UINT64(hostid, row[0]);
@@ -133,8 +135,6 @@ static int	check_trigger_condition(DB_EVENT *event, DB_CONDITION *condition)
 							break;
 						}
 					}
-					else
-						triggerid = 0;
 					DBfree_result(result);
 				}
 				while (SUCCEED != ret && 0 != triggerid);
