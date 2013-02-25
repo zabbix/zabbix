@@ -42,22 +42,19 @@ class testPageHistory extends CWebTest {
 		// should switch to graph for numeric items, should check filter for history & text items
 		// also different header for log items (different for eventlog items ?)
 		$itemid = $item['itemid'];
-		$this->login("history.php?action=showvalues&itemid=$itemid");
+		$this->zbxTestLogin("history.php?action=showvalues&itemid=$itemid");
 		$this->checkTitle('History');
 		// Header
-		$this->ok(array('Timestamp', 'Value'));
-		$this->dropdown_select_wait('action', '500 latest values');
+		$this->zbxTestTextPresent(array('Timestamp', 'Value'));
+		$this->zbxTestDropdownSelectWait('action', '500 latest values');
 		$this->checkTitle('History');
-		$this->button_click('plaintext');
-		$this->wait();
+		$this->zbxTestClickWait('plaintext');
 
 		// there surely is a better way to get out of the plaintext page than just clicking 'back'...
 		$this->goBack();
 		$this->wait();
-		$this->dropdown_select_wait('action', 'Values');
+		$this->zbxTestDropdownSelectWait('action', 'Values');
 		$this->checkTitle('History');
-		$this->button_click('plaintext');
-		$this->wait();
-
+		$this->zbxTestClickWait('plaintext');
 	}
 }

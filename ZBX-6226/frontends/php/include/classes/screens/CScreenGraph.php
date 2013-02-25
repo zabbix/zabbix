@@ -112,7 +112,7 @@ class CScreenGraph extends CScreenBase {
 				}
 			}
 
-			$this->screenitem['url']->setArgument('name', $host['name'].': '.$graph['name']);
+			$this->screenitem['url']->setArgument('name', $host['name'].NAME_DELIMITER.$graph['name']);
 			$this->screenitem['url'] = $this->screenitem['url']->getUrl();
 		}
 
