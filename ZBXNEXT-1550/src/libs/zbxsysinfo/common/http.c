@@ -67,8 +67,7 @@ static int	get_http_page(const char *host, const char *path, unsigned short port
 
 int	WEB_PAGE_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	char	*hostname, *path_str, *port_str;
-	char	buffer[MAX_BUFFER_LEN], path[MAX_STRING_LEN];
+	char		*hostname, *path_str, *port_str, buffer[MAX_BUFFER_LEN], path[MAX_STRING_LEN];
 	unsigned short	port;
 
 	if (3 < request->nparam)
@@ -88,9 +87,7 @@ int	WEB_PAGE_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (NULL == port_str || '\0' == *port_str)
 		port = ZBX_DEFAULT_HTTP_PORT;
-	else if (FAIL != is_uint(port_str))
-		port = (unsigned int)atoi(port_str);
-	else
+	else if (SUCCEED != is_ushort(port_str, &port))
 		return SYSINFO_RET_FAIL;
 
 	if (SYSINFO_RET_OK == get_http_page(hostname, path, port, buffer, sizeof(buffer)))
@@ -106,11 +103,9 @@ int	WEB_PAGE_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 int	WEB_PAGE_PERF(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	char	*hostname;
-	char	path[MAX_STRING_LEN];
-	char	*port_str, *path_str;
-	double	start_time;
-	unsigned int	port;
+	char		*hostname, path[MAX_STRING_LEN], *port_str, *path_str;
+	double		start_time;
+	unsigned short	port;
 
 	if (3 < request->nparam)
 		return SYSINFO_RET_FAIL;
@@ -129,17 +124,13 @@ int	WEB_PAGE_PERF(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (NULL == port_str || '\0' == *port_str)
 		port = ZBX_DEFAULT_HTTP_PORT;
-	else if (FAIL != is_uint(port_str))
-		port = (unsigned int)atoi(port_str);
-	else
+	else if (SUCCEED != is_ushort(port_str, &port))
 		return SYSINFO_RET_FAIL;
 
 	start_time = zbx_time();
 
 	if (SYSINFO_RET_OK == get_http_page(hostname, path, port, NULL, 0))
-	{
 		SET_DBL_RESULT(result, zbx_time() - start_time);
-	}
 	else
 		SET_DBL_RESULT(result, 0.0);
 
@@ -148,12 +139,10 @@ int	WEB_PAGE_PERF(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 int	WEB_PAGE_REGEXP(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	char	*hostname, *path_str, *port_str, *regexp, *length_str;
-	char	path[MAX_STRING_LEN];
-	char	back[MAX_BUFFER_LEN];
-	char	*buffer = NULL, *found;
-	int	length, len, found_len;
-	unsigned int	port;
+	char		*hostname, *path_str, *port_str, *regexp, *length_str, path[MAX_STRING_LEN],
+			back[MAX_BUFFER_LEN], *buffer = NULL, *found;
+	int		length, len, found_len;
+	unsigned short	port;
 
 	if (5 < request->nparam)
 		return SYSINFO_RET_FAIL;
@@ -174,9 +163,7 @@ int	WEB_PAGE_REGEXP(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (NULL == port_str || '\0' == *port_str)
 		port = ZBX_DEFAULT_HTTP_PORT;
-	else if (FAIL != is_uint(port_str))
-		port = (unsigned int)atoi(port_str);
-	else
+	else if (SUCCEED != is_ushort(port_str, &port))
 		return SYSINFO_RET_FAIL;
 
 	if (NULL == regexp)
