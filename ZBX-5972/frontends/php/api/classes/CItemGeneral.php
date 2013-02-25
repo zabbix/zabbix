@@ -649,38 +649,32 @@ abstract class CItemGeneral extends CZBXAPI {
 			foreach ($parentItems as $parentItem) {
 				$exItem = null;
 
-				// update by templateid
-				if (isset($exItemsTpl[$parentItem['itemid']])) {
-					$exItem = $exItemsTpl[$parentItem['itemid']];
-
-					if (isset($exItemsKeys[$parentItem['key_']])
-							&& !idcmp($exItemsKeys[$parentItem['key_']]['templateid'], $parentItem['itemid'])) {
-
-						$exItem = $exItemsKeys[$parentItem['key_']];
-						if ($exItem['flags'] != $parentItem['flags']) {
-							$this->errorInheritFlags($exItem['flags'], $exItem['key_'], $host['host']);
-						}
-						else {
-							self::exception(
-								ZBX_API_ERROR_PARAMETERS,
-								_s($this->getErrorMsg(self::ERROR_EXISTS), $parentItem['key_'], $host['host'])
-							);
-						}
-					}
-				}
-
-				// update by key
+				// check if an item of a different type with the same key exists
 				if (isset($exItemsKeys[$parentItem['key_']])) {
 					$exItem = $exItemsKeys[$parentItem['key_']];
 					if ($exItem['flags'] != $parentItem['flags']) {
 						$this->errorInheritFlags($exItem['flags'], $exItem['key_'], $host['host']);
 					}
-					elseif ($exItem['templateid'] > 0 && !idcmp($exItem['templateid'], $parentItem['itemid'])) {
-						self::exception(
-							ZBX_API_ERROR_PARAMETERS,
-							_s($this->getErrorMsg(self::ERROR_EXISTS_TEMPLATE), $parentItem['key_'], $host['host'])
-						);
-					}
+				}
+
+				// update by templateid
+				if (isset($exItemsTpl[$parentItem['itemid']]) && isset($exItemsKeys[$parentItem['key_']])
+						&& !idcmp($exItemsKeys[$parentItem['key_']]['templateid'], $parentItem['itemid'])) {
+
+					self::exception(
+						ZBX_API_ERROR_PARAMETERS,
+						_s($this->getErrorMsg(self::ERROR_EXISTS), $parentItem['key_'], $host['host'])
+					);
+				}
+
+				// update by key
+				if (isset($exItemsKeys[$parentItem['key_']]) && $exItemsKeys[$parentItem['key_']]['templateid'] > 0
+						&& !idcmp($exItemsKeys[$parentItem['key_']]['templateid'], $parentItem['itemid'])) {
+
+					self::exception(
+						ZBX_API_ERROR_PARAMETERS,
+						_s($this->getErrorMsg(self::ERROR_EXISTS_TEMPLATE), $parentItem['key_'], $host['host'])
+					);
 				}
 
 				if ($host['status'] == HOST_STATUS_TEMPLATE || !isset($parentItem['type'])) {
