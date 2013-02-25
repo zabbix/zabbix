@@ -219,10 +219,10 @@ int     PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 		proc_ok = 0;
 		comm_ok = 0;
 
-		if (NULL == procname || *procname == '\0' || 0 == strcmp(procname, proc[i].ZBX_P_COMM))
+		if (NULL == procname || '\0' == *procname || 0 == strcmp(procname, proc[i].ZBX_P_COMM))
 			proc_ok = 1;
 
-		if (NULL != proccomm && *proccomm != '\0')
+		if (NULL != proccomm && '\0' != *proccomm)
 		{
 			if (SUCCEED == proc_argv(proc[i].ZBX_P_PID, &argv, &argv_alloc, &argc))
 			{
@@ -372,7 +372,7 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 		stat_ok = 0;
 		comm_ok = 0;
 
-		if (NULL == procname || *procname == '\0' || 0 == strcmp(procname, proc[i].ZBX_P_COMM))
+		if (NULL == procname || '\0' == *procname || 0 == strcmp(procname, proc[i].ZBX_P_COMM))
 			proc_ok = 1;
 
 		stat_ok = (zbx_proc_stat == ZBX_PROC_STAT_ALL ||
@@ -380,12 +380,12 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 				(zbx_proc_stat == ZBX_PROC_STAT_SLEEP && proc[i].ZBX_P_STAT == SSLEEP) ||
 				(zbx_proc_stat == ZBX_PROC_STAT_ZOMB && (proc[i].ZBX_P_STAT == SZOMB || proc[i].ZBX_P_STAT == SDEAD)));
 
-		if (NULL != proccomm && *proccomm != '\0')
+		if (NULL != proccomm && '\0' != *proccomm)
 		{
 			if (SUCCEED == proc_argv(proc[i].ZBX_P_PID, &argv, &argv_alloc, &argc))
 			{
 				collect_args(argv, argc, &args, &args_alloc);
-				if (zbx_regexp_match(args, proccomm, NULL) != NULL)
+				if (NULL != zbx_regexp_match(args, proccomm, NULL))
 					comm_ok = 1;
 			}
 		}
