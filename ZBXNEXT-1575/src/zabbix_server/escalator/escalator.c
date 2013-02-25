@@ -1010,7 +1010,7 @@ static int	get_event_info(zbx_uint64_t eventid, DB_EVENT *event)
 
 	if (SUCCEED == res && EVENT_OBJECT_TRIGGER == event->object)
 	{
-		result = DBselect("select description,expression,priority,comments,url,state"
+		result = DBselect("select description,expression,priority,comments,url"
 				" from triggers"
 				" where triggerid=" ZBX_FS_UI64,
 				event->objectid);
