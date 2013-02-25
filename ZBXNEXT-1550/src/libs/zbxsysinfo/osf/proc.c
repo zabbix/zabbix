@@ -62,11 +62,11 @@ int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (NULL == param || '\0' == *param || 0 == strcmp(param, "sum"))	/* default parameter */
 		do_task = DO_SUM;
-	if (0 == strcmp(param,"avg"))
+	else if (0 == strcmp(param, "avg"))
 		do_task = DO_AVG;
-	else if (0 == strcmp(param,"max"))
+	else if (0 == strcmp(param, "max"))
 		do_task = DO_MAX;
-	else if (0 == strcmp(param,"min"))
+	else if (0 == strcmp(param, "min"))
 		do_task = DO_MIN;
 	else
 		return SYSINFO_RET_FAIL;
@@ -87,14 +87,14 @@ int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 			if (-1 == proc)
 				goto lbl_skip_procces;
 
-			if (-1 == ioctl(proc,PIOCPSINFO,&psinfo))
+			if (-1 == ioctl(proc, PIOCPSINFO, &psinfo))
 				goto lbl_skip_procces;
 
 			/* Self process information. It leads to incorrect results for proc_cnt[zabbix_agentd] */
 			if (psinfo.pr_pid == curr_pid)
 				goto lbl_skip_procces;
 
-			if (NULL == procname || '\0' == *procname)
+			if (NULL != procname && '\0' != *procname)
 				if (0 == strcmp(procname, psinfo.pr_fname))
 					goto lbl_skip_procces;
 
@@ -103,7 +103,7 @@ int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 					goto lbl_skip_procces;
 
 			if (NULL != proccomm && '\0' != *proccomm)
-				if (NULL == zbx_regexp_match(psinfo.pr_psargs,proccomm,NULL))
+				if (NULL == zbx_regexp_match(psinfo.pr_psargs, proccomm, NULL))
 					goto lbl_skip_procces;
 
 			proccount++;
@@ -115,17 +115,11 @@ int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 			else
 			{
 				if (DO_MAX == do_task)
-				{
 					memsize = MAX(memsize, (double) (psinfo.pr_rssize * pgsize));
-				}
 				else if (DO_MIN == do_task)
-				{
 					memsize = MIN(memsize, (double) (psinfo.pr_rssize * pgsize));
-				}
 				else	/* SUM */
-				{
 					memsize +=  (double) (psinfo.pr_rssize * pgsize);
-				}
 			}
 lbl_skip_procces:
 			if (proc)
@@ -184,15 +178,15 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 	else
 		usrinfo = NULL;
 
-	procstat = get_rparam(request, 2);
+	param = get_rparam(request, 2);
 
-	if (NULL == procstat || '\0' == *procstat || 0 == strcmp(procstat, "all"))
+	if (NULL == param || '\0' == *param || 0 == strcmp(param, "all"))
 		zbx_proc_stat = -1;
-	else if (0 == strcmp(procstat,"run"))
+	else if (0 == strcmp(param, "run"))
 		zbx_proc_stat = PR_SRUN;
-	else if (0 == strcmp(procstat,"sleep"))
+	else if (0 == strcmp(param, "sleep"))
 		zbx_proc_stat = PR_SSLEEP;
-	else if (0 == strcmp(procstat,"zomb"))
+	else if (0 == strcmp(param, "zomb"))
 		zbx_proc_stat = PR_SZOMB;
 
 	proccomm = get_rparam(request, 3);
@@ -219,7 +213,7 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 				goto lbl_skip_procces;
 
 			if (NULL != procname && '\0' != *procname)
-				if (0 != strcmp(procname,psinfo.pr_fname))
+				if (0 != strcmp(procname, psinfo.pr_fname))
 					goto lbl_skip_procces;
 
 			if (NULL != usrinfo)
@@ -231,7 +225,7 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 					goto lbl_skip_procces;
 
 			if (NULL != proccomm && '\0' != *proccomm)
-				if (NULL == zbx_regexp_match(psinfo.pr_psargs,proccomm))
+				if (NULL == zbx_regexp_match(psinfo.pr_psargs, proccomm, NULL))
 					goto lbl_skip_procces;
 
 			proccount++;
