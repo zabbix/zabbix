@@ -1,6 +1,7 @@
 Changes for 2.1.0
 
 New features:
+........S. [ZBX-6226] added command request (global script) result logging (wiper)
 ...G...... [ZBXNEXT-1243] added support for agent system.swap.size key on AIX (wiper)
 A.F.I...S. [ZBXNEXT-1574] removed unknown event support (Pavel, Sasha)
 A...I..... [ZBXNEXT-1574] dropped the event value_changed property (Pavel, Sasha)
