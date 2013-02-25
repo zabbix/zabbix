@@ -583,7 +583,7 @@ function add_elementNames(&$selements) {
 				break;
 			case SYSMAP_ELEMENT_TYPE_TRIGGER:
 				$hostname = reset($triggers[$selement['elementid']]['hosts']);
-				$selements[$snum]['elementName'] = $hostname['name'].':'.
+				$selements[$snum]['elementName'] = $hostname['name'].NAME_DELIMITER.
 					CMacrosResolverHelper::resolveTriggerName($triggers[$selement['elementid']]);
 				break;
 			case SYSMAP_ELEMENT_TYPE_HOST_GROUP:

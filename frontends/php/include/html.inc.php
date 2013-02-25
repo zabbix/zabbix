@@ -381,12 +381,12 @@ function get_header_host_table($currentElement, $hostid, $discoveryid = null) {
 	$description = '';
 	if ($dbHost['proxy_hostid']) {
 		$proxy = get_host_by_hostid($dbHost['proxy_hostid']);
-		$description .= $proxy['host'].': ';
+		$description .= $proxy['host'].NAME_DELIMITER;
 	}
 	$description .= $dbHost['name'];
 
 	if ($dbHost['status'] == HOST_STATUS_TEMPLATE) {
-		$list->addItem(array(bold(_('Template').': '), new CLink($description, 'templates.php?form=update&templateid='.$dbHost['hostid'])));
+		$list->addItem(array(bold(_('Template').NAME_DELIMITER), new CLink($description, 'templates.php?form=update&templateid='.$dbHost['hostid'])));
 	}
 	else {
 		switch ($dbHost['status']) {
@@ -401,7 +401,7 @@ function get_header_host_table($currentElement, $hostid, $discoveryid = null) {
 				break;
 		}
 
-		$list->addItem(array(bold(_('Host').': '), new CLink($description, 'hosts.php?form=update&hostid='.$dbHost['hostid'])));
+		$list->addItem(array(bold(_('Host').NAME_DELIMITER), new CLink($description, 'hosts.php?form=update&hostid='.$dbHost['hostid'])));
 		$list->addItem($status);
 		$list->addItem(getAvailabilityTable($dbHost));
 	}
@@ -409,7 +409,7 @@ function get_header_host_table($currentElement, $hostid, $discoveryid = null) {
 	if (!empty($dbDiscovery)) {
 		$list->addItem(array('&laquo; ', new CLink(_('Discovery list'), 'host_discovery.php?hostid='.$dbHost['hostid'].url_param('groupid'))));
 		$list->addItem(array(
-			bold(_('Discovery').': '),
+			bold(_('Discovery').NAME_DELIMITER),
 			new CLink($dbDiscovery['name'], 'host_discovery.php?form=update&itemid='.$dbDiscovery['itemid'])
 		));
 	}
