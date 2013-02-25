@@ -71,7 +71,7 @@ if (zbx_empty($search)) {
 }
 $searchWidget->setClass('header');
 $searchWidget->addHeader(array(
-	_('SEARCH').': ',
+	_('SEARCH').NAME_DELIMITER,
 	bold($search)
 ), SPACE);
 
