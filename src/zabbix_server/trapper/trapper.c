@@ -248,7 +248,7 @@ static int	process_trap(zbx_sock_t	*sock, char *s, int max_len)
 				res = calculate_checksums(nodeid, NULL, 0);
 				if (SUCCEED == res && NULL != (data = DMget_config_data(nodeid, ZBX_NODE_SLAVE)))
 				{
-					zabbix_log( LOG_LEVEL_WARNING, "NODE %d: Sending configuration changes"
+					zabbix_log(LOG_LEVEL_WARNING, "NODE %d: sending configuration changes"
 							" to slave node %d for node %d datalen " ZBX_FS_SIZE_T,
 							CONFIG_NODEID,
 							sender_nodeid,
@@ -277,7 +277,7 @@ static int	process_trap(zbx_sock_t	*sock, char *s, int max_len)
 
 			alarm(CONFIG_TIMEOUT);
 			if (SUCCEED != zbx_tcp_send_raw(sock, reply))
-				zabbix_log(LOG_LEVEL_WARNING, "Error sending %s to node", reply);
+				zabbix_log(LOG_LEVEL_WARNING, "cannot send %s to node", reply);
 			alarm(0);
 
 			return ret;
