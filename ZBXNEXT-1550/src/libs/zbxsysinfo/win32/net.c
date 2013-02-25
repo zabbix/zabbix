@@ -117,7 +117,7 @@ clean:
 	return ret;
 }
 
-int	NET_IF_IN(AGENT_REQUEST, AGENT_RESULT *result)
+int	NET_IF_IN(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char		*if_name, *mode;
 	MIB_IFROW	pIfRow;
@@ -179,7 +179,7 @@ int	NET_IF_OUT(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
-int	NET_IF_TOTAL(AGENT_REQUEST *request,, AGENT_RESULT *result)
+int	NET_IF_TOTAL(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char		*if_name, *mode;
 	MIB_IFROW	pIfRow;
@@ -412,7 +412,7 @@ int	NET_TCP_LISTEN(AGENT_REQUEST *request, AGENT_RESULT *result)
 	unsigned short	port;
 	char		*port_str;
 
-	if (1 <= request->rparam)
+	if (1 <= request->nparam)
 		return SYSINFO_RET_FAIL;
 
 	port_str = get_rparam(request, 0);
