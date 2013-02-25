@@ -30,7 +30,7 @@ class testInheritanceDiscovery extends CWebTest {
 
 
 	// returns all possible item types
-	public static function itemTypes() {
+/*	public static function itemTypes() {
 		return array(
 			array(
 				array('type' => 'Zabbix agent')
@@ -108,19 +108,19 @@ class testInheritanceDiscovery extends CWebTest {
 				array('type' => 'Calculated')
 			)
 		);
-	}
+	}*/
 
 	/**
 	 * Backup the tables that will be modified during the tests.
 	 */
 	public function testInheritanceDiscoveryRule_setup() {
-		DBsave_tables('hosts');
+		DBsave_tables('items');
 	}
 
 	/**
 	 * @dataProvider itemTypes
 	 */
-	public function testInheritanceDiscoveryRule_CheckLayout($data) {
+/*	public function testInheritanceDiscoveryRule_CheckLayout($data) {
 		$this->zbxTestLogin('templates.php');
 
 		$template = 'Inheritance test template';
@@ -486,10 +486,225 @@ class testInheritanceDiscovery extends CWebTest {
 		$this->assertAttribute("//*[@id='status']/option[text()='Enabled']/@selected", 'selected');
 	}
 
+*/	// returns data for discovery rule create
+	public static function discoveryRule() {
+		return array(
+			array(
+				array(
+					'expected' => DISCOVERY_BAD,
+					'errors' => array(
+							'ERROR: Page received incorrect data',
+							'Warning. Incorrect value for field "Name": cannot be empty.',
+							'Warning. Incorrect value for field "key": cannot be empty.'
+					)
+				)
+			),
+			array(
+				array(
+					'expected' => DISCOVERY_BAD,
+					'name' => 'discoveryRuleError',
+					'errors' => array(
+							'ERROR: Page received incorrect data',
+							'Warning. Incorrect value for field "key": cannot be empty.'
+					)
+				)
+			),
+			array(
+				array(
+					'expected' => DISCOVERY_BAD,
+					'key' => 'discovery-rule-error',
+					'errors' => array(
+							'ERROR: Page received incorrect data',
+							'Warning. Incorrect value for field "Name": cannot be empty.'
+					)
+				)
+			),
+			array(
+				array(
+					'expected' => DISCOVERY_GOOD,
+					'name' => 'discoveryRuleNo1',
+					'key' => 'discovery-key-no1',
+					'templateCheck' => true,
+					'hostCheck' =>true,
+					'dbCheck' => true
+				)
+			),
+			array(
+				array(
+					'expected' => DISCOVERY_GOOD,
+					'name' => 'discoveryRuleNo2',
+					'key' => 'discovery-key-no2',
+					'templateCheck' => true,
+					'hostCheck' =>true,
+					'dbCheck' => true,
+					'hostRemove' => true,
+					'remove' => true
+				)
+			),
+			array(
+				array('expected' => DISCOVERY_BAD,
+					'name' => 'discoveryRuleNo1',
+					'key' => 'discovery-key-no1',
+					'errors' => array(
+						'ERROR: Cannot add discovery rule',
+						'Item with key "discovery-key-no1" already exists on "Inheritance test template".')
+				)
+			),
+			array(
+				array('expected' => DISCOVERY_BAD,
+					'name' => 'discoveryRuleError',
+					'key' => 'discovery-key-no1',
+					'errors' => array(
+						'ERROR: Cannot add discovery rule',
+						'Item with key "discovery-key-no1" already exists on "Inheritance test template".')
+				)
+			)
+		);
+	}
+
+	/**
+	 * @dataProvider discoveryRule
+	 */
+	public function testInheritanceDiscoveryRule_CreateDiscovery($data) {
+		$this->zbxTestLogin('templates.php');
+
+		$template = 'Inheritance test template';
+		$host = 'Template inheritance test host';
+
+		$this->checkTitle('Configuration of templates');
+		$this->zbxTestTextPresent('CONFIGURATION OF TEMPLATES');
+
+		// create a discovery rule on template
+		$this->zbxTestClickWait("link=$template");
+		$this->zbxTestClickWait('link=Discovery rules');
+		$this->zbxTestClickWait('form');
+
+		$this->checkTitle('Configuration of discovery rules');
+		$this->zbxTestTextPresent('CONFIGURATION OF DISCOVERY RULES');
+		$this->zbxTestTextPresent('Discovery rule');
+
+		if (isset($data['name'])) {
+			$this->input_type('name', $data['name']);
+		}
+		$name = $this->getValue('name');
+
+		if (isset($data['key'])) {
+			$this->input_type('key', $data['key']);
+		}
+		$key = $this->getValue('key');
+
+		$this->zbxTestClickWait('save');
+		$expected = $data['expected'];
+		switch ($expected) {
+			case DISCOVERY_GOOD:
+				$this->zbxTestTextPresent('Discovery rule created');
+				$this->checkTitle('Configuration of discovery rules');
+				$this->zbxTestTextPresent('CONFIGURATION OF DISCOVERY RULES');
+				$this->zbxTestTextPresent(array('Item prototypes',  'Trigger prototypes', 'Graph prototypes'));
+				break;
+
+			case DISCOVERY_BAD:
+				$this->checkTitle('Configuration of discovery rules');
+				$this->zbxTestTextPresent(array('CONFIGURATION OF DISCOVERY RULES','Discovery rule'));
+				foreach ($data['errors'] as $msg) {
+					$this->zbxTestTextPresent($msg);
+				}
+				$this->zbxTestTextPresent(array('Name', 'Type', 'Key'));
+				break;
+		}
+
+		if (isset($data['templateCheck'])) {
+			$this->zbxTestOpenWait('templates.php');
+			$this->zbxTestClickWait("link=$template");
+			$this->zbxTestClickWait('link=Discovery rules');
+
+			$this->zbxTestTextPresent("$name");
+			$this->zbxTestTextNotPresent("$template: $name");
+			$this->zbxTestClickWait("link=$name");
+
+			$this->assertElementValue('name', $name);
+			$this->assertElementValue('key', $key);
+		}
+
+		if (isset($data['hostCheck'])) {
+			$this->zbxTestOpenWait('hosts.php');
+			$this->zbxTestClickWait("link=$host");
+			$this->zbxTestClickWait('link=Discovery rules');
+
+			$this->zbxTestTextPresent("$template: $name");
+			$this->zbxTestClickWait("link=$name");
+
+			$this->assertElementValue('name', $name);
+			$this->assertAttribute("//*[@id='name']/@readonly", 'readonly');
+			$this->assertElementValue('key', $key);
+			$this->assertAttribute("//*[@id='key']/@readonly", 'readonly');
+		}
+
+		if (isset($data['dbCheck'])) {
+			// template
+			$result = DBselect("SELECT name, key_, hostid FROM items where name = '".$name."' AND value_type = 4 limit 1");
+			while ($row = DBfetch($result)) {
+				$this->assertEquals($row['name'], $name);
+				$this->assertEquals($row['key_'], $key);
+				$hostid = $row['hostid'] + 1;
+			}
+			// host
+			$result = DBselect("SELECT name, key_ FROM items where name = '".$name."'  AND value_type = 4 AND hostid = ".$hostid."");
+			while ($row = DBfetch($result)) {
+				$this->assertEquals($row['name'], $name);
+				$this->assertEquals($row['key_'], $key);
+			}
+		}
+
+		if (isset($data['hostRemove'])) {
+			$result = DBselect("SELECT hostid FROM items where name = '".$name."' AND value_type = 4 limit 1");
+			while ($row = DBfetch($result)) {
+				$hostid = $row['hostid'] + 1;
+			}
+			$result = DBselect("SELECT name, key_, itemid FROM items where name = '".$name."' AND value_type = 4 AND hostid = ".$hostid."");
+			while ($row = DBfetch($result)) {
+				$itemId = $row['itemid'];
+			}
+
+			$this->zbxTestOpenWait('hosts.php');
+			$this->zbxTestClickWait("link=$host");
+			$this->zbxTestClickWait('link=Discovery rules');
+
+			$this->zbxTestTextPresent("$template: $name");
+			$this->zbxTestCheckboxSelect("g_hostdruleid_$itemId");
+			$this->zbxTestDropdownSelect('go', 'Delete selected');
+			$this->zbxTestClick('goButton');
+
+			$this->getConfirmation();
+			$this->wait();
+			$this->zbxTestTextPresent(array('ERROR: Cannot delete discovery rules', 'Cannot delete templated items.'));
+		}
+
+		if (isset($data['remove'])) {
+			$result = DBselect("SELECT itemid FROM items where name = '".$name."' AND value_type = 4 limit 1");
+			while ($row = DBfetch($result)) {
+				$itemId = $row['itemid'];
+			}
+
+			$this->zbxTestOpenWait('templates.php');
+			$this->zbxTestClickWait("link=$template");
+			$this->zbxTestClickWait('link=Discovery rules');
+
+			$this->zbxTestCheckboxSelect("g_hostdruleid_$itemId");
+			$this->zbxTestDropdownSelect('go', 'Delete selected');
+			$this->zbxTestClick('goButton');
+
+			$this->getConfirmation();
+			$this->wait();
+			$this->zbxTestTextPresent('Discovery rules deleted');
+			$this->zbxTestTextNotPresent("$template: $name");
+		}
+	}
+
 	/**
 	 * Restore the original tables.
 	 */
 	public function testInheritanceDiscoveryRule_teardown() {
-		DBrestore_tables('hosts');
+		DBrestore_tables('items');
 	}
 }
