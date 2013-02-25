@@ -54,7 +54,7 @@ class CUploadFile {
 	 */
 	public function __construct($file) {
 		if (!ini_get('file_uploads')) {
-			throw new Exception(_('Unable to uploade file because "file_uploads" is disabled.'));
+			throw new Exception(_('Unable to upload file because "file_uploads" is disabled.'));
 		}
 
 		$this->name = $file['name'];

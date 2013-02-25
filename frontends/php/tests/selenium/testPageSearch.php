@@ -22,50 +22,50 @@ require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
 class testPageSearch extends CWebTest {
 	public function testPageHosts_FindZabbixServer() {
-		$this->login('dashboard.php');
+		$this->zbxTestLogin('dashboard.php');
 		$this->input_type('search', "ЗАББИКС Сервер");
 		$this->keyPress('search', "\\13");
 		$this->wait();
 		$this->checkTitle('Search');
-		$this->ok('Hosts');
-		$this->ok('Displaying 1 of 1 found');
-		$this->ok('Displaying 0 of 0 found');
-		$this->ok('Host groups');
-		$this->ok('Templates');
-		$this->ok('ЗАББИКС Сервер');
-		$this->nok('Test server');
-		$this->ok('127.0.0.1');
-		$this->ok('Latest data');
-		$this->ok('Triggers');
-		$this->ok('Applications');
-		$this->ok('Items');
-		$this->ok('Triggers');
-		$this->ok('Graphs');
-		$this->ok('Events');
+		$this->zbxTestTextPresent('Hosts');
+		$this->zbxTestTextPresent('Displaying 1 of 1 found');
+		$this->zbxTestTextPresent('Displaying 0 of 0 found');
+		$this->zbxTestTextPresent('Host groups');
+		$this->zbxTestTextPresent('Templates');
+		$this->zbxTestTextPresent('ЗАББИКС Сервер');
+		$this->zbxTestTextNotPresent('Test server');
+		$this->zbxTestTextPresent('127.0.0.1');
+		$this->zbxTestTextPresent('Latest data');
+		$this->zbxTestTextPresent('Triggers');
+		$this->zbxTestTextPresent('Applications');
+		$this->zbxTestTextPresent('Items');
+		$this->zbxTestTextPresent('Triggers');
+		$this->zbxTestTextPresent('Graphs');
+		$this->zbxTestTextPresent('Events');
 	}
 
 	public function testPageHosts_FindNone() {
-		$this->login('dashboard.php');
+		$this->zbxTestLogin('dashboard.php');
 		$this->input_type('search', "_");
 		$this->keyPress('search', "\\13");
 		$this->wait();
 		$this->checkTitle('Search');
-		$this->nok('Displaying 1 of 1 found');
-		$this->nok('ЗАББИКС Сервер');
-		$this->ok('Displaying 0 of 0 found');
-		$this->ok('...');
+		$this->zbxTestTextNotPresent('Displaying 1 of 1 found');
+		$this->zbxTestTextNotPresent('ЗАББИКС Сервер');
+		$this->zbxTestTextPresent('Displaying 0 of 0 found');
+		$this->zbxTestTextPresent('...');
 	}
 
 	public function testPageHosts_FindNone2() {
-		$this->login('dashboard.php');
+		$this->zbxTestLogin('dashboard.php');
 		$this->input_type('search', "%");
 		$this->keyPress('search', "\\13");
 		$this->wait();
 		$this->checkTitle('Search');
-		$this->nok('Displaying 1 of 1 found');
-		$this->nok('ЗАББИКС Сервер');
-		$this->ok('Displaying 0 of 0 found');
-		$this->ok('...');
+		$this->zbxTestTextNotPresent('Displaying 1 of 1 found');
+		$this->zbxTestTextNotPresent('ЗАББИКС Сервер');
+		$this->zbxTestTextPresent('Displaying 0 of 0 found');
+		$this->zbxTestTextPresent('...');
 	}
 
 	public function testPageHosts_Sorting() {
