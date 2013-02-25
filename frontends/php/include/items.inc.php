@@ -926,12 +926,13 @@ function delete_trends_by_itemid($itemIds) {
  * First format the value according to the configuration of the item. Then apply the value mapping to the formatted (!)
  * value.
  *
- * @param array $item
- * @param string $unknownString the text to be used if the item has no data
+ * @param array		$item
+ * @param string	$unknownString	the text to be used if the item has no data
+ * @param bool		$ellipsis		text will be cutted and ellipsis "..." added if set to true
  *
  * @return string
  */
-function formatItemValue(array $item, $unknownString = '-') {
+function formatItemValue(array $item, $unknownString = '-', $ellipsis = true) {
 	if (!isset($item['lastvalue']) || $item['lastclock'] == 0) {
 		return $unknownString;
 	}
@@ -944,7 +945,7 @@ function formatItemValue(array $item, $unknownString = '-') {
 
 		$mapping = getMappedValue($value, $item['valuemapid']);
 
-		if (zbx_strlen($value) > 20) {
+		if ($ellipsis && zbx_strlen($value) > 20) {
 			$value = zbx_substr($value, 0, 20).'...';
 		}
 		$value = nbsp(htmlspecialchars($value));
