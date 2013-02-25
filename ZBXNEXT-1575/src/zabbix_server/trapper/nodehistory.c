@@ -160,6 +160,7 @@ fail:
  ******************************************************************************/
 static int	process_record_event(int sender_nodeid, int nodeid, const ZBX_TABLE *table, const char *record)
 {
+	const char	*__function_name = "process_record_event";
 	const char	*r;
 	int		f, source = 0, object = 0, value = 0;
 	zbx_uint64_t	eventid = 0, objectid = 0;
@@ -168,7 +169,7 @@ static int	process_record_event(int sender_nodeid, int nodeid, const ZBX_TABLE *
 	DB_ROW		row;
 	int		ret = SUCCEED;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In process_record_event()");
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	ts.sec = 0;
 	ts.ns = 0;
@@ -177,7 +178,12 @@ static int	process_record_event(int sender_nodeid, int nodeid, const ZBX_TABLE *
 	for (f = 0; NULL != table->fields[f].name; f++)
 	{
 		if (NULL == r)
-			goto error;
+		{
+			zabbix_log(LOG_LEVEL_ERR, "NODE %d: received invalid record from node %d for node %d [%s]",
+					CONFIG_NODEID, sender_nodeid, nodeid, record);
+			ret = FAIL;
+			goto out;
+		}
 
 		zbx_get_next_field(&r, &buffer, &buffer_alloc, ZBX_DM_DELIMITER);
 
@@ -217,12 +223,9 @@ static int	process_record_event(int sender_nodeid, int nodeid, const ZBX_TABLE *
 	else
 		add_event(eventid, source, object, objectid, &ts, value, NULL, NULL, 0, 0);
 
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+out:
 	return ret;
-error:
-	zabbix_log(LOG_LEVEL_ERR, "NODE %d: received invalid record from node %d for node %d [%s]",
-			CONFIG_NODEID, sender_nodeid, nodeid, record);
-
-	return FAIL;
 }
 
 static void	begin_history_sql(char **sql, size_t *sql_alloc, size_t *sql_offset, const ZBX_TABLE *table)
@@ -619,7 +622,7 @@ int	node_history(char *data, size_t datalen)
 		}
 		else if (NULL != table)
 		{
-			if (events)
+			if (0 != events)
 			{
 				res = process_record_event(sender_nodeid, nodeid, table, r);
 			}
