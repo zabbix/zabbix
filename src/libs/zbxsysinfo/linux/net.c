@@ -239,12 +239,12 @@ int	NET_TCP_LISTEN(AGENT_REQUEST *request, AGENT_RESULT *result)
 	int		ret = SYSINFO_RET_FAIL;
 
 	if (1 < request->nparam)
-		return ret;
+		return SYSINFO_RET_FAIL;
 
 	port_str = get_rparam(request, 0);
 
-	if (NULL == port_str || '\0' == *port_str || SUCCEED != is_ushort(port_str, &port))
-		return ret;
+	if (NULL == port_str || SUCCEED != is_ushort(port_str, &port))
+		return SYSINFO_RET_FAIL;
 
 	if (NULL != (f = fopen("/proc/net/tcp", "r")))
 	{
@@ -294,12 +294,12 @@ int	NET_UDP_LISTEN(AGENT_REQUEST *request, AGENT_RESULT *result)
 	int		ret = SYSINFO_RET_FAIL;
 
 	if (1 < request->nparam)
-		return ret;
+		return SYSINFO_RET_FAIL;
 
 	port_str = get_rparam(request, 0);
 
-	if (NULL == port_str || '\0' == *port_str || SUCCEED != is_ushort(port_str, &port))
-		return ret;
+	if (NULL == port_str || SUCCEED != is_ushort(port_str, &port))
+		return SYSINFO_RET_FAIL;
 
 	if (NULL != (f = fopen("/proc/net/udp", "r")))
 	{
