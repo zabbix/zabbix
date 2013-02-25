@@ -956,7 +956,8 @@ static void	process_recovery_msg(DB_ESCALATION *escalation, DB_EVENT *r_event, D
 		DBfree_result(result);
 	}
 	else
-		zabbix_log(LOG_LEVEL_DEBUG, "Escalation stopped: recovery message not defined", escalation->actionid);
+		zabbix_log(LOG_LEVEL_DEBUG, "escalation stopped: recovery message not defined (actionid:" ZBX_FS_UI64
+				")", escalation->actionid);
 
 	escalation->status = ESCALATION_STATUS_COMPLETED;
 
