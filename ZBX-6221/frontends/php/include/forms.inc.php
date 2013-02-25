@@ -219,7 +219,7 @@
 				default:
 					$list_name = 'deny';
 			}
-			$lists['group'][$list_name]->addItem($group['groupid'], (empty($group['node_name']) ? '' : $group['node_name'].':' ).$group['name']);
+			$lists['group'][$list_name]->addItem($group['groupid'], (empty($group['node_name']) ? '' : $group['node_name'].NAME_DELIMITER).$group['name']);
 		}
 		unset($groups);
 
@@ -249,7 +249,7 @@
 			if (HOST_STATUS_PROXY_ACTIVE == $host['status'] || HOST_STATUS_PROXY_PASSIVE == $host['status']) {
 				$host['host_name'] = $host['host'];
 			}
-			$lists['host'][$list_name]->addItem($host['hostid'], (empty($host['node_name']) ? '' : $host['node_name'].':' ).$host['host_name']);
+			$lists['host'][$list_name]->addItem($host['hostid'], (empty($host['node_name']) ? '' : $host['node_name'].NAME_DELIMITER).$host['host_name']);
 		}
 		unset($hosts);
 
@@ -436,14 +436,14 @@
 		}
 
 		// update interval
-		$updateIntervalLabel = new CSpan(array(bold(_('Update interval')), SPACE._('(in sec)').': '));
+		$updateIntervalLabel = new CSpan(array(bold(_('Update interval')), SPACE._('(in sec)').NAME_DELIMITER));
 		$updateIntervalLabel->setAttribute('id', 'filter_delay_label');
 
 		$updateIntervalInput = new CNumericBox('filter_delay', $filter_delay, 5, null, true);
 		$updateIntervalInput->setEnabled('no');
 
 		// data type
-		$dataTypeLabel = new CSpan(bold(_('Data type').': '));
+		$dataTypeLabel = new CSpan(bold(_('Data type').NAME_DELIMITER));
 		$dataTypeLabel->setAttribute('id', 'filter_data_type_label');
 
 		$dataTypeInput = new CComboBox('filter_data_type', $filter_data_type);;
@@ -457,28 +457,28 @@
 		$table->setCellSpacing(0);
 
 		// SNMP community
-		$snmpCommunityLabel = new CSpan(array(bold(_('SNMP community')), SPACE._('like').': '));
+		$snmpCommunityLabel = new CSpan(array(bold(_('SNMP community')), SPACE._('like').NAME_DELIMITER));
 		$snmpCommunityLabel->setAttribute('id', 'filter_snmp_community_label');
 
 		$snmpCommunityField = new CTextBox('filter_snmp_community', $filter_snmp_community, ZBX_TEXTBOX_FILTER_SIZE);
 		$snmpCommunityField->setEnabled('no');
 
 		// SNMPv3 security name
-		$snmpSecurityLabel = new CSpan(array(bold(_('Security name')), SPACE._('like').': '));
+		$snmpSecurityLabel = new CSpan(array(bold(_('Security name')), SPACE._('like').NAME_DELIMITER));
 		$snmpSecurityLabel->setAttribute('id', 'filter_snmpv3_securityname_label');
 
 		$snmpSecurityField = new CTextBox('filter_snmpv3_securityname', $filter_snmpv3_securityname, ZBX_TEXTBOX_FILTER_SIZE);
 		$snmpSecurityField->setEnabled('no');
 
 		// SNMP OID
-		$snmpOidLabel = new CSpan(array(bold(_('SNMP OID')), SPACE._('like').': '));
+		$snmpOidLabel = new CSpan(array(bold(_('SNMP OID')), SPACE._('like').NAME_DELIMITER));
 		$snmpOidLabel->setAttribute('id', 'filter_snmp_oid_label');
 
 		$snmpOidField = new CTextBox('filter_snmp_oid', $filter_snmp_oid, ZBX_TEXTBOX_FILTER_SIZE);
 		$snmpOidField->setEnabled('no');
 
 		// port
-		$portLabel = new CSpan(array(bold(_('Port')), SPACE._('like').': '));
+		$portLabel = new CSpan(array(bold(_('Port')), SPACE._('like').NAME_DELIMITER));
 		$portLabel->setAttribute('id', 'filter_port_label');
 
 		$portField = new CNumericBox('filter_port', $filter_port, 5, null, true);
@@ -486,7 +486,7 @@
 
 		// row 1
 		$table->addRow(array(
-			new CCol(bold(_('Host group').': '), 'label col1'),
+			new CCol(bold(_('Host group').NAME_DELIMITER), 'label col1'),
 			new CCol(array(
 				new CTextBox('filter_group', $filter_group, ZBX_TEXTBOX_FILTER_SIZE),
 				new CButton('btn_group', _('Select'),
@@ -495,16 +495,16 @@
 					'G'
 				)
 			), 'col1'),
-			new CCol(bold(_('Type').': '), 'label col2'),
+			new CCol(bold(_('Type').NAME_DELIMITER), 'label col2'),
 			new CCol($cmbType, 'col2'),
-			new CCol(bold(_('Type of information').': '), 'label col3'),
+			new CCol(bold(_('Type of information').NAME_DELIMITER), 'label col3'),
 			new CCol($cmbValType, 'col3'),
-			new CCol(bold(_('Status').': '), 'label col4'),
+			new CCol(bold(_('Status').NAME_DELIMITER), 'label col4'),
 			new CCol($cmbStatus, 'col4'),
 		));
 		// row 2
 		$table->addRow(array(
-			new CCol(bold(_('Host').': '), 'label'),
+			new CCol(bold(_('Host').NAME_DELIMITER), 'label'),
 			new CCol(array(
 				new CTextBox('filter_hostname', $filter_hostname, ZBX_TEXTBOX_FILTER_SIZE),
 				new CButton('btn_host', _('Select'),
@@ -517,7 +517,7 @@
 			new CCol($updateIntervalInput),
 			new CCol($dataTypeLabel, 'label'),
 			new CCol($dataTypeInput),
-			new CCol(bold(_('Triggers').': '), 'label'),
+			new CCol(bold(_('Triggers').NAME_DELIMITER), 'label'),
 			new CCol(new CComboBox('filter_with_triggers', $filter_with_triggers, null, array(
 				-1 => _('all'),
 				1 => _('With triggers'),
@@ -526,7 +526,7 @@
 		));
 		// row 3
 		$table->addRow(array(
-			new CCol(bold(_('Application').': '), 'label'),
+			new CCol(bold(_('Application').NAME_DELIMITER), 'label'),
 			new CCol(array(
 				new CTextBox('filter_application', $filter_application, ZBX_TEXTBOX_FILTER_SIZE),
 				new CButton('btn_app', _('Select'),
@@ -539,9 +539,9 @@
 			)),
 			new CCol(array($snmpCommunityLabel, $snmpSecurityLabel), 'label'),
 			new CCol(array($snmpCommunityField, $snmpSecurityField)),
-			new CCol(array(bold(_('Keep history')), SPACE._('(in days)').': '), 'label'),
+			new CCol(array(bold(_('Keep history')), SPACE._('(in days)').NAME_DELIMITER), 'label'),
 			new CCol(new CNumericBox('filter_history', $filter_history, 8, null, true)),
-			new CCol(bold(_('Template').': '), 'label'),
+			new CCol(bold(_('Template').NAME_DELIMITER), 'label'),
 			new CCol(new CComboBox('filter_templated_items', $filter_templated_items, null, array(
 				-1 => _('all'),
 				1 => _('Templated items'),
@@ -550,18 +550,18 @@
 		));
 		// row 4
 		$table->addRow(array(
-			new CCol(array(bold(_('Name')), SPACE._('like').': '), 'label'),
+			new CCol(array(bold(_('Name')), SPACE._('like').NAME_DELIMITER), 'label'),
 			new CCol(new CTextBox('filter_name', $filter_name, ZBX_TEXTBOX_FILTER_SIZE)),
 			new CCol($snmpOidLabel, 'label'),
 			new CCol($snmpOidField),
-			new CCol(array(bold(_('Keep trends')), SPACE._('(in days)').': '), 'label'),
+			new CCol(array(bold(_('Keep trends')), SPACE._('(in days)').NAME_DELIMITER), 'label'),
 			new CCol(new CNumericBox('filter_trends', $filter_trends, 8, null, true)),
 			new CCol(null, 'label'),
 			new CCol(),
 		));
 		// row 5
 		$table->addRow(array(
-			new CCol(array(bold(_('Key')), SPACE._('like').': '), 'label'),
+			new CCol(array(bold(_('Key')), SPACE._('like').NAME_DELIMITER), 'label'),
 			new CCol(new CTextBox('filter_key', $filter_key, ZBX_TEXTBOX_FILTER_SIZE)),
 			new CCol($portLabel, 'label'),
 			new CCol($portField),
