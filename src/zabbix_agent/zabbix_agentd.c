@@ -246,8 +246,10 @@ static void	set_defaults()
 	else if (NULL != CONFIG_HOSTNAME_ITEM)
 		zabbix_log(LOG_LEVEL_WARNING, "both Hostname and HostnameItem defined, using [%s]", CONFIG_HOSTNAME);
 
+#ifndef _WINDOWS
 	if (NULL == CONFIG_LOAD_MODULE_PATH)
 		CONFIG_LOAD_MODULE_PATH = zbx_strdup(CONFIG_LOAD_MODULE_PATH, LIBDIR "/modules");
+#endif
 
 #ifdef USE_PID_FILE
 	if (NULL == CONFIG_PID_FILE)
@@ -421,10 +423,12 @@ static void	zbx_load_config(int requirement)
 			PARM_OPT,	0,			0},
 		{"UserParameter",		&CONFIG_USER_PARAMETERS,		TYPE_MULTISTRING,
 			PARM_OPT,	0,			0},
+#ifndef _WINDOWS
 		{"LoadModule",			&CONFIG_LOAD_MODULE,			TYPE_MULTISTRING,
 			PARM_OPT,	0,			0},
 		{"LoadModulePath",		&CONFIG_LOAD_MODULE_PATH,		TYPE_STRING,
 			PARM_OPT,	0,			0},
+#endif
 #ifdef _WINDOWS
 		{"PerfCounter",			&CONFIG_PERF_COUNTERS,			TYPE_MULTISTRING,
 			PARM_OPT,	0,			0},
@@ -434,8 +438,10 @@ static void	zbx_load_config(int requirement)
 
 	/* initialize multistrings */
 	zbx_strarr_init(&CONFIG_ALIASES);
-	zbx_strarr_init(&CONFIG_LOAD_MODULE);
 	zbx_strarr_init(&CONFIG_USER_PARAMETERS);
+#ifndef _WINDOWS
+	zbx_strarr_init(&CONFIG_LOAD_MODULE);
+#endif
 #ifdef _WINDOWS
 	zbx_strarr_init(&CONFIG_PERF_COUNTERS);
 #endif
@@ -474,8 +480,10 @@ static void	zbx_load_config(int requirement)
 static void	zbx_free_config()
 {
 	zbx_strarr_free(CONFIG_ALIASES);
-	zbx_strarr_free(CONFIG_LOAD_MODULE);
 	zbx_strarr_free(CONFIG_USER_PARAMETERS);
+#ifndef _WINDOWS
+	zbx_strarr_free(CONFIG_LOAD_MODULE);
+#endif
 #ifdef _WINDOWS
 	zbx_strarr_free(CONFIG_PERF_COUNTERS);
 #endif
@@ -541,11 +549,13 @@ int	MAIN_ZABBIX_ENTRY()
 	init_perf_collector(1);
 	load_perf_counters(CONFIG_PERF_COUNTERS);
 #endif
+#ifndef _WINDOWS
 	if (FAIL == load_modules(CONFIG_LOAD_MODULE_PATH, CONFIG_LOAD_MODULE, CONFIG_TIMEOUT))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "loading modules failed, exiting...");
 		exit(FAIL);
 	}
+#endif
 	load_user_parameters(CONFIG_USER_PARAMETERS);
 	load_aliases(CONFIG_ALIASES);
 
@@ -661,7 +671,9 @@ void	zbx_on_exit()
 
 	zabbix_close_log();
 
+#ifndef _WINDOWS
 	unload_modules();
+#endif
 	free_metrics();
 	alias_list_free();
 	free_collector_data();
@@ -738,11 +750,13 @@ int	main(int argc, char **argv)
 			init_perf_collector(0);
 			load_perf_counters(CONFIG_PERF_COUNTERS);
 #endif
+#ifndef _WINDOWS
 			if (FAIL == load_modules(CONFIG_LOAD_MODULE_PATH, CONFIG_LOAD_MODULE, CONFIG_TIMEOUT))
 			{
 				zabbix_log(LOG_LEVEL_CRIT, "loading modules failed, exiting...");
 				exit(FAIL);
 			}
+#endif
 			load_user_parameters(CONFIG_USER_PARAMETERS);
 			load_aliases(CONFIG_ALIASES);
 			zbx_free_config();
@@ -753,7 +767,9 @@ int	main(int argc, char **argv)
 #ifdef _WINDOWS
 			free_perf_collector();	/* cpu_collector must be freed before perf_collector is freed */
 #endif
+#ifndef _WINDOWS
 			unload_modules();
+#endif
 			free_metrics();
 			alias_list_free();
 			exit(SUCCEED);

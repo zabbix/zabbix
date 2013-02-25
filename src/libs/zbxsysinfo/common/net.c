@@ -175,8 +175,7 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 
 	size_t		offset = 0;
 	int		res, type, retrans, retry, i, ret = SYSINFO_RET_FAIL;
-	char		*ip, zone[MAX_STRING_LEN], buffer[MAX_STRING_LEN];
-	char		*zone_str, *tmp_str;
+	char		*ip, zone[MAX_STRING_LEN], buffer[MAX_STRING_LEN], *zone_str, *param;
 	struct in_addr	inaddr;
 
 	typedef struct
@@ -214,7 +213,7 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 #ifdef _WINDOWS
 	PDNS_RECORD	pQueryResults, pDnsRecord;
 	LPTSTR		wzone;
-	char		tmp2[MAX_STRING_LEN];
+	char		tmp2[MAX_STRING_LEN], tmp[MAX_STRING_LEN];
 #else
 	char		*name;
 	unsigned char	*msg_end, *msg_ptr, *p;
@@ -257,19 +256,15 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 	else
 		strscpy(zone, zone_str);
 
-	tmp_str = get_rparam(request, 2);
+	param = get_rparam(request, 2);
 
-	if (NULL == tmp_str || '\0' == *tmp_str)
+	if (NULL == param || '\0' == *param)
 		type = T_SOA;
 	else
 	{
 		for (i = 0; NULL != qt[i].name; i++)
 		{
-#ifdef _WINDOWS
-			if (0 == lstrcmpiA(qt[i].name, tmp_str))
-#else
-			if (0 == strcasecmp(qt[i].name, tmp_str))
-#endif
+			if (0 == strcasecmp(qt[i].name, param))
 			{
 				type = qt[i].type;
 				break;
@@ -280,19 +275,19 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 			return SYSINFO_RET_FAIL;
 	}
 
-	tmp_str = get_rparam(request, 3);
+	param = get_rparam(request, 3);
 
-	if (NULL == tmp_str || '\0' == *tmp_str)
+	if (NULL == param || '\0' == *param)
 		retrans = 1;
 	else
-		retrans = atoi(tmp_str);
+		retrans = atoi(param);
 
-	tmp_str = get_rparam(request, 4);
+	param = get_rparam(request, 4);
 
-	if (NULL == tmp_str || '\0' == *tmp_str)
+	if (NULL == param || '\0' == *param)
 		retry = 2;
 	else
-		retry = atoi(tmp_str);
+		retry = atoi(param);
 
 #ifdef _WINDOWS
 	wzone = zbx_utf8_to_unicode(zone);

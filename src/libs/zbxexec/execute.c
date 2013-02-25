@@ -267,7 +267,6 @@ int	zbx_execute(const char *command, char **buffer, char *error, size_t max_erro
 	STARTUPINFO				si;
 	PROCESS_INFORMATION			pi;
 	SECURITY_ATTRIBUTES			sa;
-	JOBOBJECT_EXTENDED_LIMIT_INFORMATION	limits;
 	HANDLE					job = NULL, hWrite = NULL, hRead = NULL;
 	char					*cmd = NULL;
 	LPTSTR					wcmd = NULL;

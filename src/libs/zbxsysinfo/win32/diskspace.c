@@ -30,10 +30,10 @@ int	VFS_FS_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if (2 < request->nparam)
 		return SYSINFO_RET_FAIL;
 
-	path = get_nparam(request, 0);
-	mode = get_nparam(request, 1);
+	path = get_rparam(request, 0);
+	mode = get_rparam(request, 1);
 
-	if (NULL = path && '\0' == *path)
+	if (NULL == path || '\0' == *path)
 		return SYSINFO_RET_FAIL;
 
 	wpath = zbx_utf8_to_unicode(path);
@@ -61,7 +61,7 @@ int	VFS_FS_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
-int	VFS_FS_DISCOVERY(AGENT_REQUEST request, AGENT_RESULT *result)
+int	VFS_FS_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	TCHAR		fsName[MAX_PATH + 1];
 	LPTSTR		buffer = NULL, p;
