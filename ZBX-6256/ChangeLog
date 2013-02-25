@@ -39,6 +39,7 @@ A.F.I...S. [ZBXNEXT-1186] increased length to 2048 characters of expression fiel
 ..F....... [ZBX-5127] regular expressions form redesign (Vedmak)
 
 Bug fixes:
+A......... [ZBX-6255] removed unnecessary dcheck.isreadable and dcheck.iswritable methods (Pavels)
 ..F....... [ZBX-6276] fixed function to get URL parameter error message (Eduard)
 ..F....... [ZBX-6245] fixed monitoring trigger filter criteria saving (Eduard)
 ..F....... [ZBX-6237] fixed Y axis item adding field, now it is available also if item list is empty (Eduard)
@@ -123,9 +124,11 @@ Changes for 2.0.6rc1
 
 New features:
 A.F....... [ZBX-1357] added Lithuanian translation; thanks to Zabbix translators (Richlv)
-A.F....... [ZBX-1357] updated Brazilian Portuguese, German, Latvian, Slovak, Russian and Ukrainian translations; thanks to Zabbix translators (Richlv)
+A.F....... [ZBX-1357] updated Brazilian Portuguese, German, Latvian, Slovak, Russian, Turkish and Ukrainian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+A......... [ZBX-6261] fixed service.getsla not working with Oracle database (Pavels)
+........S. [ZBX-5797] fixed server SNMP interfaces ignoring IP/DNS toggle (wiper)
 ..F....... [ZBX-6290] fixed icon mapping selection (Eduard)
 A.F....... [ZBX-5321] unified translation strings, fixed typo and SQL query formatting (Pavels, Richlv)
 ..F....... [ZBX-5982] fixed read only items being listed in popup for trigger expression (Toms)
