@@ -654,7 +654,7 @@ abstract class CItemGeneral extends CZBXAPI {
 					$exItem = $exItemsTpl[$parentItem['itemid']];
 
 					if (isset($exItemsKeys[$parentItem['key_']])
-							&& $exItemsKeys[$parentItem['key_']]['templateid'] != $parentItem['itemid']) {
+							&& !idcmp($exItemsKeys[$parentItem['key_']]['templateid'], $parentItem['itemid'])) {
 
 						$exItem = $exItemsKeys[$parentItem['key_']];
 						if ($exItem['flags'] != $parentItem['flags']) {
@@ -675,7 +675,7 @@ abstract class CItemGeneral extends CZBXAPI {
 					if ($exItem['flags'] != $parentItem['flags']) {
 						$this->errorInheritFlags($exItem['flags'], $exItem['key_'], $host['host']);
 					}
-					elseif ($exItem['templateid'] > 0 && bccomp($exItem['templateid'], $parentItem['itemid']) != 0) {
+					elseif ($exItem['templateid'] > 0 && !idcmp($exItem['templateid'], $parentItem['itemid'])) {
 						self::exception(
 							ZBX_API_ERROR_PARAMETERS,
 							_s($this->getErrorMsg(self::ERROR_EXISTS_TEMPLATE), $parentItem['key_'], $host['host'])
