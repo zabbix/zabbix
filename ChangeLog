@@ -39,6 +39,7 @@ A.F.I...S. [ZBXNEXT-1186] increased length to 2048 characters of expression fiel
 ..F....... [ZBX-5127] regular expressions form redesign (Vedmak)
 
 Bug fixes:
+A.F....... [ZBX-6192] improved trigger update, must update only changed fields (Eduard)
 A......... [ZBX-6256] fixed "limitSelect" in drule.get sorting dchecks and dhosts results by name instead of IDs (Pavels)
 A......... [ZBX-6256] fixed drule.exists "druleids" parameter not working (Pavels)
 A......... [ZBX-6255] removed unnecessary dcheck.isreadable and dcheck.iswritable methods (Pavels)
