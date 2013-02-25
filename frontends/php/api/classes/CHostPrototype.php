@@ -93,13 +93,44 @@ class CHostPrototype extends CZBXAPI {
 	 * @return void
 	 */
 	protected function validateCreate(array $hostPrototypes) {
-		foreach ($hostPrototypes as $hostPrototype) {
+		$parameters = array(
+			'host' => null,
+			'name' => null,
+			'ruleid' => null,
+			'status' => HOST_STATUS_MONITORED
+		);
 
-			$error = _s('Wrong fields for host prototype "%1$s".', $hostPrototype['name']);
-			$this->checkUnsupportedFields($this->tableName(), $hostPrototype, $error, array(
-				'ruleid', 'templateids'
-			));
+		foreach ($hostPrototypes as $hostPrototype) {
+			if (!check_db_fields($parameters, $hostPrototype)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Wrong fields for host prototype "%1$s".', $hostPrototype['host']));
+			}
+
+			$this->checkUnsupportedFields($this->tableName(), $hostPrototype,
+				_s('Wrong fields for host prototype "%1$s".', $hostPrototype['host']),
+				array('ruleid', 'templates')
+			);
+
+			$this->checkHost($hostPrototype);
+			$this->checkName($hostPrototype);
+			$this->checkStatus($hostPrototype);
+			$this->checkId($hostPrototype['ruleid'],
+				_s('Incorrect discovery rule ID for host prototype "%1$s".', $hostPrototype['host'])
+			);
 		}
+
+		$this->checkDiscoveryRulePermissions(zbx_objectValues($hostPrototypes, 'ruleid'));
+
+		// template permissions
+		$templates = array();
+		foreach ($hostPrototypes as $hostPrototype) {
+			if (isset($hostPrototype['templates'])) {
+				$templates = array_merge($templates, $hostPrototype['templates']);
+			}
+		}
+		$this->checkTemplatePermissions(zbx_objectValues($templates, 'templateid'));
+
+		$this->checkDuplicates($hostPrototypes, 'host', _('Host prototype "%1$s" already exists.'));
+		$this->checkHostPrototypesExist($hostPrototypes);
 	}
 
 	/**
@@ -111,6 +142,12 @@ class CHostPrototype extends CZBXAPI {
 	 */
 	public function create(array $hostPrototypes) {
 		$hostPrototypes = zbx_toArray($hostPrototypes);
+
+		foreach ($hostPrototypes as $hostPrototype) {
+			if (isset($hostPrototype['templates'])) {
+				$hostPrototype['templates'] = zbx_toArray($hostPrototype['templates']);
+			}
+		}
 
 		$this->validateCreate($hostPrototypes);
 
@@ -129,25 +166,55 @@ class CHostPrototype extends CZBXAPI {
 	 *
 	 * @throws APIException if the input is invalid
 	 *
-	 * @param array $hosts
+	 * @param array $hostPrototypes
 	 *
 	 * @return void
 	 */
-	public function validateUpdate(array $hosts) {
-		foreach ($hosts as $host) {
+	public function validateUpdate(array $hostPrototypes) {
+		foreach ($hostPrototypes as $host) {
 			if (empty($host['hostid'])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Invalid method parameters.'));
 			}
 		}
 
-		$hosts = $this->extendObjects($this->tableName(), $hosts, array('host'));
-		foreach ($hosts as $host) {
+		$hostPrototypes = $this->extendObjects($this->tableName(), $hostPrototypes, array('host'));
 
-			$error = _s('Wrong fields for host prototype "%1$s".', $host['host']);
-			$this->checkUnsupportedFields($this->tableName(), $host, $error, array(
-				'ruleid', 'templates'
-			));
+		foreach ($hostPrototypes as $hostPrototype) {
+			$this->checkUnsupportedFields($this->tableName(), $hostPrototype,
+				_s('Wrong fields for host prototype "%1$s".', $hostPrototype['host']),
+				array('ruleid', 'templates')
+			);
+
+			if (isset($hostPrototype['host'])) {
+				$this->checkHost($hostPrototype);
+			}
+			if (isset($hostPrototype['name'])) {
+				$this->checkName($hostPrototype);
+			}
+			if (isset($hostPrototype['status'])) {
+				$this->checkStatus($hostPrototype);
+			}
+			if (isset($hostPrototype['ruleid'])) {
+				$this->checkId($hostPrototype['ruleid'],
+					_s('Incorrect discovery rule ID for host prototype "%1$s".', $hostPrototype['host'])
+				);
+			}
 		}
+
+		$this->checkHostPrototypePermissions(zbx_objectValues($hostPrototypes, 'hostid'));
+		$this->checkDiscoveryRulePermissions(zbx_objectValues($hostPrototypes, 'ruleid'));
+
+		// template permissions
+		$templates = array();
+		foreach ($hostPrototypes as $hostPrototype) {
+			if (isset($hostPrototype['templates'])) {
+				$templates = array_merge($templates, $hostPrototype['templates']);
+			}
+		}
+		$this->checkTemplatePermissions(zbx_objectValues($templates, 'templateid'));
+
+		$this->checkDuplicates($hostPrototypes, 'host', _('Host prototype "%1$s" already exists.'));
+		$this->checkHostPrototypesExist($hostPrototypes);
 	}
 
 	/**
@@ -159,6 +226,13 @@ class CHostPrototype extends CZBXAPI {
 	 */
 	public function update(array $hostPrototypes) {
 		$hostPrototypes = zbx_toArray($hostPrototypes);
+
+		foreach ($hostPrototypes as $hostPrototype) {
+			if (isset($hostPrototype['templates'])) {
+				$hostPrototype['templates'] = zbx_toArray($hostPrototype['templates']);
+			}
+		}
+
 		$this->validateUpdate($hostPrototypes);
 
 		// save the host prototypes
@@ -182,6 +256,8 @@ class CHostPrototype extends CZBXAPI {
 		if (!$hostPrototypeIds) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 		}
+
+		$this->checkHostPrototypePermissions($hostPrototypeIds);
 	}
 
 	/**
@@ -229,5 +305,123 @@ class CHostPrototype extends CZBXAPI {
 	 */
 	public function isWritable(array $ids) {
 		return $this->isReadable($ids);
+	}
+
+	/**
+	 * Validates the "host" field.
+	 *
+	 * @throws APIException if the name is missing
+	 *
+	 * @param array $host
+	 *
+	 * @return void
+	 */
+	protected function checkHost(array $host) {
+		if (zbx_empty($host['host'])) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty host.'));
+		}
+
+		// Check if host name isn't longer than 64 chars
+		if (zbx_strlen($host['host']) > 64) {
+			self::exception(
+				ZBX_API_ERROR_PARAMETERS,
+				_n(
+					'Maximum host name length is %2$d characters, "%3$s" is %1$d character.',
+					'Maximum host name length is %2$d characters, "%3$s" is %1$d characters.',
+					zbx_strlen($host['host']),
+					64,
+					$host['host']
+				)
+			);
+		}
+
+		if (!preg_match('/^'.ZBX_PREG_HOST_FORMAT.'$/', $host['host'])) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect characters used for host "%s".', $host['host']));
+		}
+	}
+
+	/**
+	 * Validates the "name" field. Assumes the "host" field is valid.
+	 *
+	 * @throws APIException if the name is missing
+	 *
+	 * @param array $host
+	 *
+	 * @return void
+	 */
+	protected function checkName(array $host) {
+		if (zbx_empty($host['name'])) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Empty name for host prototype "%1$s".', $host['host']));
+		}
+	}
+
+	/**
+	 * Validates the "host" field. Assumes the "host" field is valid.
+	 *
+	 * @throws APIException if the status is incorrect
+	 *
+	 * @param array $host
+	 *
+	 * @return void
+	 */
+	protected function checkStatus(array $host) {
+		$statuses = array(
+			HOST_STATUS_MONITORED => true,
+			HOST_STATUS_NOT_MONITORED => true
+		);
+
+		if (!isset($statuses[$host['status']])) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect status for host prototype "%1$s".', $host['host']));
+		}
+	}
+
+	/**
+	 * Checks if the current user has access to the given LLD rules.
+	 *
+	 * @throws APIException if the user doesn't have write permissions for the given LLD rules
+	 *
+	 * @param array $discoveryRuleIds
+	 */
+	protected function checkDiscoveryRulePermissions(array $discoveryRuleIds) {
+		if (!API::DiscoveryRule()->isWritable($discoveryRuleIds)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+		}
+	}
+
+	/**
+	 * Checks if the current user has access to the given templates.
+	 *
+	 * @throws APIException if the user doesn't have write permissions for the given templates.
+	 *
+	 * @param array $templateIds
+	 */
+	protected function checkTemplatePermissions(array $templateIds) {
+		if (!API::Template()->isWritable($templateIds)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+		}
+	}
+
+	/**
+	 * Checks if the current user has access to the given host prototypes.
+	 *
+	 * @throws APIException if the user doesn't have write permissions for the host prototypes.
+	 *
+	 * @param array $hostPrototypeIds
+	 */
+	protected function checkHostPrototypePermissions(array $hostPrototypeIds) {
+		if (!$this->isWritable($hostPrototypeIds)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+		}
+	}
+
+	/**
+	 * Checks if any of the given prototypes already exist.
+	 *
+	 * @throws APIException if at least on prototype with the same host name already exists on the LLD rule
+	 *
+	 * @param array $hostPrototypes
+	 */
+	protected function checkHostPrototypesExist(array $hostPrototypes) {
+		// TODO: implement this check
 	}
 }

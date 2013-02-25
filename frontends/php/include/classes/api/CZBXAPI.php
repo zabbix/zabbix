@@ -744,6 +744,43 @@ class CZBXAPI {
 	}
 
 	/**
+	 * Checks if the ID is valid.
+	 *
+	 * Required error messages:
+	 * - empty      - if the ID is empty
+	 * - invalid    - if the ID is not numeric
+	 *
+	 * @param string    $id
+	 * @param string    $error
+	 *
+	 * @throws APIException
+	 *
+	 * @return void
+	 */
+	protected function checkId($id, $error) {
+		if (zbx_empty($id) || !is_numeric($id)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
+	}
+
+	/**
+	 * Checks if the array contains objects with duplicate values under the $uniqueField field.
+	 *
+	 * @param array    $objects
+	 * @param string   $uniqueField
+	 * @param string   $error
+	 *
+	 * @throws APIException
+	 *
+	 * @return void
+	 */
+	protected function checkDuplicates(array $objects, $uniqueField, $error) {
+		if ($duplicate = CArrayHelper::findDuplicate($objects, $uniqueField)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s($error, $duplicate[$uniqueField]));
+		}
+	}
+
+	/**
 	 * Throws an API exception.
 	 *
 	 * @static
