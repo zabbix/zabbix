@@ -24,7 +24,9 @@
 #include "log.h"
 #include "zbxconf.h"
 #include "zbxgetopt.h"
-#include "zbxmodules.h"
+#ifndef _WINDOWS
+#	include "zbxmodules.h"
+#endif
 #include "comms.h"
 #include "alias.h"
 
@@ -424,9 +426,9 @@ static void	zbx_load_config(int requirement)
 		{"UserParameter",		&CONFIG_USER_PARAMETERS,		TYPE_MULTISTRING,
 			PARM_OPT,	0,			0},
 #ifndef _WINDOWS
-		{"LoadModule",			&CONFIG_LOAD_MODULE,			TYPE_MULTISTRING,
-			PARM_OPT,	0,			0},
 		{"LoadModulePath",		&CONFIG_LOAD_MODULE_PATH,		TYPE_STRING,
+			PARM_OPT,	0,			0},
+		{"LoadModule",			&CONFIG_LOAD_MODULE,			TYPE_MULTISTRING,
 			PARM_OPT,	0,			0},
 #endif
 #ifdef _WINDOWS
@@ -553,7 +555,7 @@ int	MAIN_ZABBIX_ENTRY()
 	if (FAIL == load_modules(CONFIG_LOAD_MODULE_PATH, CONFIG_LOAD_MODULE, CONFIG_TIMEOUT))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "loading modules failed, exiting...");
-		exit(FAIL);
+		exit(EXIT_FAILURE);
 	}
 #endif
 	load_user_parameters(CONFIG_USER_PARAMETERS);
@@ -669,11 +671,11 @@ void	zbx_on_exit()
 	zabbix_log(LOG_LEVEL_INFORMATION, "Zabbix Agent stopped. Zabbix %s (revision %s).",
 			ZABBIX_VERSION, ZABBIX_REVISION);
 
-	zabbix_close_log();
-
 #ifndef _WINDOWS
 	unload_modules();
 #endif
+	zabbix_close_log();
+
 	free_metrics();
 	alias_list_free();
 	free_collector_data();

@@ -24,7 +24,14 @@
 #include "log.h"
 #include "sysinfo.h"
 
-static void **modules = NULL;
+#define ZBX_MODULE_FUNC_INIT		"zbx_module_init"
+#define ZBX_MODULE_FUNC_API_VERSION	"zbx_module_api_version"
+#define ZBX_MODULE_FUNC_ITEM_LIST	"zbx_module_item_list"
+#define ZBX_MODULE_FUNC_ITEM_PROCESS	"zbx_module_item_process"
+#define ZBX_MODULE_FUNC_ITEM_TIMEOUT	"zbx_module_item_timeout"
+#define ZBX_MODULE_FUNC_UNINIT		"zbx_module_uninit"
+
+static void	**modules = NULL;
 
 /******************************************************************************
  *                                                                            *
@@ -202,6 +209,7 @@ ret:
 void	unload_modules()
 {
 	const char	*__function_name = "unload_modules";
+
 	int		(*func_uninit)();
 	void		**module;
 
@@ -209,9 +217,7 @@ void	unload_modules()
 
 	/* there is no registered modules */
 	if (NULL == modules)
-	{
 		return;
-	}
 
 	for (module = modules; NULL != *module; module++)
 	{

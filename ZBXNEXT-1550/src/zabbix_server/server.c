@@ -397,9 +397,9 @@ static void	zbx_load_config()
 			PARM_OPT,	1,			SEC_PER_HOUR},
 		{"AllowRoot",			&CONFIG_ALLOW_ROOT,			TYPE_INT,
 			PARM_OPT,	0,			1},
-		{"LoadModule",			&CONFIG_LOAD_MODULE,			TYPE_MULTISTRING,
-			PARM_OPT,	0,			0},
 		{"LoadModulePath",		&CONFIG_LOAD_MODULE_PATH,		TYPE_STRING,
+			PARM_OPT,	0,			0},
+		{"LoadModule",			&CONFIG_LOAD_MODULE,			TYPE_MULTISTRING,
 			PARM_OPT,	0,			0},
 		{NULL}
 	};
@@ -431,6 +431,18 @@ void	zbx_sigusr_handler(zbx_task_t task)
 	}
 }
 #endif
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_free_config                                                  *
+ *                                                                            *
+ * Purpose: free configuration memory                                         *
+ *                                                                            *
+ ******************************************************************************/
+static void	zbx_free_config()
+{
+	zbx_strarr_free(CONFIG_LOAD_MODULE);
+}
 
 /******************************************************************************
  *                                                                            *
@@ -496,8 +508,10 @@ int	main(int argc, char **argv)
 	if (FAIL == load_modules(CONFIG_LOAD_MODULE_PATH, CONFIG_LOAD_MODULE, CONFIG_TIMEOUT))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "loading modules failed, exiting...");
-		exit(FAIL);
+		exit(EXIT_FAILURE);
 	}
+
+	zbx_free_config();
 
 	if (ZBX_TASK_CONFIG_CACHE_RELOAD == task)
 		exit(SUCCEED == zbx_sigusr_send(ZBX_TASK_CONFIG_CACHE_RELOAD) ? EXIT_SUCCESS : EXIT_FAILURE);
@@ -829,8 +843,6 @@ void	zbx_on_exit()
 
 	free_metrics();
 
-	unload_modules();
-
 	zbx_sleep(2);	/* wait for all child processes to exit */
 
 	DBconnect(ZBX_DB_CONNECT_EXIT);
@@ -849,6 +861,8 @@ void	zbx_on_exit()
 #endif
 
 	free_selfmon_collector();
+
+	unload_modules();
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "Zabbix Server stopped. Zabbix %s (revision %s).",
 			ZABBIX_VERSION, ZABBIX_REVISION);
