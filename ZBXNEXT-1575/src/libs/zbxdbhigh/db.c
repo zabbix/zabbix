@@ -1685,7 +1685,7 @@ const char	*zbx_user_string(zbx_uint64_t userid)
 	return buf_string;
 }
 
-double	DBmultiply_value_float(DB_ITEM *item, double value)
+double	multiply_item_value_float(DB_ITEM *item, double value)
 {
 	double	value_double;
 
@@ -1694,13 +1694,13 @@ double	DBmultiply_value_float(DB_ITEM *item, double value)
 
 	value_double = value * atof(item->formula);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "DBmultiply_value_float() " ZBX_FS_DBL ",%s " ZBX_FS_DBL,
+	zabbix_log(LOG_LEVEL_DEBUG, "multiply_item_value_float() " ZBX_FS_DBL ",%s " ZBX_FS_DBL,
 			value, item->formula, value_double);
 
 	return value_double;
 }
 
-zbx_uint64_t	DBmultiply_value_uint64(DB_ITEM *item, zbx_uint64_t value)
+zbx_uint64_t	multiply_item_value_uint64(DB_ITEM *item, zbx_uint64_t value)
 {
 	zbx_uint64_t	formula_uint64, value_uint64;
 
@@ -1712,7 +1712,7 @@ zbx_uint64_t	DBmultiply_value_uint64(DB_ITEM *item, zbx_uint64_t value)
 	else
 		value_uint64 = (zbx_uint64_t)((double)value * atof(item->formula));
 
-	zabbix_log(LOG_LEVEL_DEBUG, "DBmultiply_value_uint64() " ZBX_FS_UI64 ",%s " ZBX_FS_UI64,
+	zabbix_log(LOG_LEVEL_DEBUG, "multiply_item_value_uint64() " ZBX_FS_UI64 ",%s " ZBX_FS_UI64,
 			value, item->formula, value_uint64);
 
 	return value_uint64;
