@@ -177,6 +177,8 @@ class CHostPrototype extends CZBXAPI {
 		// link host prototypes to discovery rules
 		DB::insert('host_discovery', $hostPrototypeDiscoveryRules);
 
+		// TODO: inheritance
+
 		return array('hostids' => $hostPrototypeIds);
 	}
 
@@ -195,6 +197,8 @@ class CHostPrototype extends CZBXAPI {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Invalid method parameters.'));
 			}
 		}
+
+		$this->checkHostPrototypePermissions(zbx_objectValues($hostPrototypes, 'hostid'));
 
 		$hostPrototypes = $this->extendObjects($this->tableName(), $hostPrototypes, array('host'));
 
@@ -220,7 +224,6 @@ class CHostPrototype extends CZBXAPI {
 			}
 		}
 
-		$this->checkHostPrototypePermissions(zbx_objectValues($hostPrototypes, 'hostid'));
 		$this->checkDiscoveryRulePermissions(zbx_objectValues($hostPrototypes, 'ruleid'));
 
 		// template permissions
@@ -258,6 +261,8 @@ class CHostPrototype extends CZBXAPI {
 		foreach ($hostPrototypes as $hostPrototype) {
 			DB::updateByPk($this->tableName(), $hostPrototype['hostid'], $hostPrototype);
 		}
+
+		// TODO: inheritance
 
 		return array('hostids' => zbx_objectValues($hostPrototypes, 'hostid'));
 	}
