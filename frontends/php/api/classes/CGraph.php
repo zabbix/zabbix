@@ -589,13 +589,30 @@ class CGraph extends CGraphGeneral {
 				'itemids' => $itemids,
 				'webitems' => true,
 				'editable' => true,
-				'output' => API_OUTPUT_EXTEND,
+				'output' => array('itemid'),
 				'preservekeys' => true
 			));
 
+			$notAllowedItems = array();
 			foreach ($itemids as $itemid) {
 				if (!isset($allowedItems[$itemid])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
+					$notAllowedItems[$itemid] = $itemid;
+				}
+			}
+			if (!empty($notAllowedItems)) {
+				$allowedPrototypes = API::ItemPrototype()->get(array(
+					'nodeids' => get_current_nodeid(true),
+					'itemids' => $notAllowedItems,
+					'webitems' => true,
+					'editable' => true,
+					'output' => array('itemid'),
+					'preservekeys' => true
+				));
+
+				foreach ($notAllowedItems as $itemid) {
+					if (!isset($allowedPrototypes[$itemid])) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
+					}
 				}
 			}
 		}
