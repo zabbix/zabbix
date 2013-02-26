@@ -35,12 +35,14 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = array(
+	'hostid' =>				array(T_ZBX_INT, O_NO,	P_SYS,	DB_ID,		'(isset({form})&&({form}=="update"))'),
 	'parent_hostid' =>		array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
 	'parent_discoveryid' =>	array(T_ZBX_INT, O_MAND, P_SYS,	DB_ID, null),
 	'host' =>		        array(T_ZBX_STR, O_OPT, null,		NOT_EMPTY,	'isset({save})', _('Host name')),
-	'name' =>	    array(T_ZBX_STR, O_OPT, null,		null,		'isset({save})'),
-	'status' =>		        array(T_ZBX_INT, O_OPT, null,		        IN(HOST_STATUS_NOT_MONITORED, HOST_STATUS_MONITORED), 'isset({save})'),
+	'name' =>	            array(T_ZBX_STR, O_OPT, null,		null,		'isset({save})'),
+	'status' =>		        array(T_ZBX_INT, O_OPT, null,		        IN(array(HOST_STATUS_NOT_MONITORED, HOST_STATUS_MONITORED)), 'isset({save})'),
 	'templates' =>		    array(T_ZBX_STR, O_OPT, null, NOT_EMPTY,	null),
+	'group_hostid' =>		array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
 	'go' =>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'save' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'clone' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
@@ -56,7 +58,7 @@ validate_sort_and_sortorder('name', ZBX_SORT_UP);
 $_REQUEST['go'] = get_request('go', 'none');
 
 // permissions
-if (get_request('parent_discoveryid', false)) {
+if (get_request('parent_discoveryid')) {
 	$discoveryRule = API::DiscoveryRule()->get(array(
 		'itemids' => $_REQUEST['parent_discoveryid'],
 		'output' => API_OUTPUT_EXTEND,
@@ -66,19 +68,16 @@ if (get_request('parent_discoveryid', false)) {
 	if (!$discoveryRule) {
 		access_deny();
 	}
-//	$_REQUEST['hostid'] = $discovery_rule['hostid'];
 
-//	if (isset($_REQUEST['itemid'])) {
-//		$itemPrototype = API::ItemPrototype()->get(array(
-//			'itemids' => $_REQUEST['itemid'],
-//			'output' => array('itemid'),
-//			'editable' => true,
-//			'preservekeys' => true
-//		));
-//		if (empty($itemPrototype)) {
-//			access_deny();
-//		}
-//	}
+	$hostPrototype = API::HostPrototype()->get(array(
+		'hostids' => get_request('hostid'),
+		'output' => API_OUTPUT_EXTEND,
+		'editable' => true
+	));
+	$hostPrototype = reset($hostPrototype);
+	if (!$hostPrototype) {
+		access_deny();
+	}
 }
 else {
 	access_deny();
@@ -87,28 +86,39 @@ else {
 /*
  * Actions
  */
-if (isset($_REQUEST['delete']) && isset($_REQUEST['itemid'])) {
+if (isset($_REQUEST['delete']) && isset($_REQUEST['hostid'])) {
 
+	$result = API::HostPrototype()->delete(get_request('hostid'));
 
-	unset($_REQUEST['itemid'], $_REQUEST['form']);
+	show_messages($result, _('Host prototype deleted'), _('Cannot delete host prototypes'));
+
+	unset($_REQUEST['hostid'], $_REQUEST['form']);
 }
 elseif (isset($_REQUEST['clone']) && isset($_REQUEST['itemid'])) {
 	unset($_REQUEST['itemid']);
 	$_REQUEST['form'] = 'clone';
 }
 elseif (isset($_REQUEST['save'])) {
+	$newHostPrototype = array(
+		'host' => get_request('host'),
+		'name' => get_request('name'),
+		'status' => get_request('status'),
+		'templates' => get_request('templates'),
+		'status' => get_request('status')
+	);
 
-	if (isset($_REQUEST['hostid'])) {
+	if (get_request('hostid')) {
+		$newHostPrototype['hostid'] = get_request('hostid');
+		$newHostPrototype = CArrayHelper::unsetEqualValues($newHostPrototype, $hostPrototype, array('hostid'));
+		$result = API::HostPrototype()->update($newHostPrototype);
 
-		$item['itemid'] = $_REQUEST['itemid'];
-
-//		$result = API::Itemprototype()->update($item);
-
-		show_messages($result, _('Item updated'), _('Cannot update item'));
+		show_messages($result, _('Host prototype updated'), _('Cannot update host prototype'));
 	}
 	else {
-//		$result = API::Itemprototype()->create($item);
-		show_messages($result, _('Item added'), _('Cannot add item'));
+		$newHostPrototype['ruleid'] = get_request('parent_discoveryid');
+		$result = API::HostPrototype()->create($newHostPrototype);
+
+		show_messages($result, _('Host prototype added'), _('Cannot add host prototype'));
 	}
 
 	if ($result) {
@@ -116,20 +126,22 @@ elseif (isset($_REQUEST['save'])) {
 	}
 }
 // GO
-elseif (($_REQUEST['go'] == 'activate' || $_REQUEST['go'] == 'disable') && isset($_REQUEST['group_itemid'])) {
-	$group_itemid = $_REQUEST['group_itemid'];
+elseif (($_REQUEST['go'] == 'activate' || $_REQUEST['go'] == 'disable') && isset($_REQUEST['group_hostid'])) {
+	$update = array();
+	foreach ((array) get_request('group_hostid') as $hostPrototypeId) {
+		$update[] = array(
+			'hostid' => $hostPrototypeId,
+			'status' => (get_request('go') == 'activate') ? HOST_STATUS_MONITORED : HOST_STATUS_NOT_MONITORED
+		);
+	}
 
-	DBstart();
-//	$go_result = ($_REQUEST['go'] == 'activate') ? activate_item($group_itemid) : disable_item($group_itemid);
-	$go_result = DBend($go_result);
-	show_messages($go_result, ($_REQUEST['go'] == 'activate') ? _('Items activated') : _('Items disabled'), null);
+	$go_result = API::HostPrototype()->update($update);
+
+	show_messages($go_result, ($_REQUEST['go'] == 'activate') ? _('Host prototypes activated') : _('Host prototypes disabled'), null);
 }
-elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['group_itemid'])) {
-	$group_itemid = $_REQUEST['group_itemid'];
-	DBstart();
-//	$go_result = API::Itemprototype()->delete($group_itemid);
-	$go_result = DBend($go_result);
-	show_messages($go_result, _('Items deleted'), _('Cannot delete items'));
+elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['group_hostid'])) {
+	$go_result = API::HostPrototype()->delete($_REQUEST['group_hostid']);
+	show_messages($go_result, _('Host prototypes deleted'), _('Cannot delete host prototypes'));
 }
 
 if ($_REQUEST['go'] != 'none' && isset($go_result) && $go_result) {
@@ -154,6 +166,10 @@ if (isset($_REQUEST['form'])) {
 		)
 	);
 
+	if (get_request('hostid')) {
+		$data['host_prototype'] = array_merge($data['host_prototype'], $hostPrototype);
+	}
+
 	// render view
 	$itemView = new CView('configuration.host.prototype.edit', $data);
 	$itemView->render();
@@ -168,21 +184,19 @@ else {
 	);
 
 	// get items
-	$data['items'] = array();
-//	$sortfield = getPageSortField('name');
-//	$data['items'] = API::ItemPrototype()->get(array(
-//		'discoveryids' => $data['parent_discoveryid'],
-//		'output' => API_OUTPUT_EXTEND,
-//		'editable' => true,
-//		'selectApplications' => API_OUTPUT_EXTEND,
-//		'sortfield' => $sortfield,
-//		'limit' => $config['search_limit'] + 1
-//	));
-//
-//	if (!empty($data['items'])) {
-//		order_result($data['items'], $sortfield, getPageSortOrder());
-//	}
-	$data['paging'] = getPagingLine($data['items']);
+	$sortfield = getPageSortField('name');
+	$data['hostPrototypes'] = API::HostPrototype()->get(array(
+		'discoveryids' => $data['parent_discoveryid'],
+		'output' => API_OUTPUT_EXTEND,
+		'editable' => true,
+		'sortfield' => $sortfield,
+		'limit' => $config['search_limit'] + 1
+	));
+
+	if ($data['hostPrototypes']) {
+		order_result($data['hostPrototypes'], $sortfield, getPageSortOrder());
+	}
+	$data['paging'] = getPagingLine($data['hostPrototypes']);
 
 	// render view
 	$itemView = new CView('configuration.host.prototype.list', $data);

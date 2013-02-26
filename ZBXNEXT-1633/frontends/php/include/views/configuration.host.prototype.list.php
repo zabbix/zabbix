@@ -21,6 +21,8 @@
 <?php
 $itemsWidget = new CWidget();
 
+$discoverRule = $this->data['discovery_rule'];
+
 // create new item button
 $createForm = new CForm('get');
 $createForm->cleanItems();
@@ -38,6 +40,7 @@ $itemsWidget->addItem(get_header_host_table('hosts', $this->data['parent_hostid'
 $itemForm = new CForm('get');
 $itemForm->setName('hosts');
 $itemForm->addVar('parent_hostid', $this->data['parent_hostid']);
+$itemForm->addVar('parent_discoveryid', $this->data['parent_discoveryid']);
 
 // create table
 $hostTable = new CTableInfo(_('No host prototypes defined.'));
@@ -47,49 +50,23 @@ $sortLink->setArgument('parent_discoveryid', $this->data['parent_discoveryid']);
 $sortLink = $sortLink->getUrl();
 
 $hostTable->setHeader(array(
-	new CCheckBox('all_hosts', null, "checkAll('".$itemForm->getName()."', 'all_hosts', 'group_host');"),
+	new CCheckBox('all_hosts', null, "checkAll('".$itemForm->getName()."', 'all_hosts', 'group_hostid');"),
 	make_sorting_header(_('Name'),'name', $sortLink),
-	_('Templates')
+	_('Templates'),
+	make_sorting_header(_('Status'),'status', $sortLink)
 ));
 
-foreach ($this->data['items'] as $item) {
-	$description = array();
-	if (!empty($item['templateid'])) {
-		$template_host = get_realhost_by_itemid($item['templateid']);
-		$templateDiscoveryRuleId = get_realrule_by_itemid_and_hostid($this->data['parent_discoveryid'], $template_host['hostid']);
-
-		$description[] = new CLink($template_host['name'], '?parent_discoveryid='.$templateDiscoveryRuleId, 'unknown');
-		$description[] = ': ';
-	}
-	$description[] = new CLink(itemName($item), '?form=update&itemid='.$item['itemid'].'&parent_discoveryid='.$this->data['parent_discoveryid']);
-
-	$status = new CLink(item_status2str($item['status']), '?group_itemid='.$item['itemid'].'&parent_discoveryid='.$this->data['parent_discoveryid'].
-		'&go='.($item['status'] ? 'activate' : 'disable'), item_status2style($item['status'])
+foreach ($this->data['hostPrototypes'] as $host) {
+	$status = new CLink(item_status2str($host['status']),
+		'?group_hostid='.$host['hostid'].'&parent_discoveryid='.$discoverRule['itemid'].'&parent_hostid='.$this->data['parent_hostid'].
+		'&go='.($host['status'] ? 'activate' : 'disable'), item_status2style($host['status'])
 	);
 
-	if (!empty($item['applications'])) {
-		order_result($item['applications'], 'name');
-
-		$applications = zbx_objectValues($item['applications'], 'name');
-		$applications = implode(', ', $applications);
-		if (empty($applications)) {
-			$applications = '-';
-		}
-	}
-	else {
-		$applications = '-';
-	}
-
 	$hostTable->addRow(array(
-		new CCheckBox('group_itemid['.$item['itemid'].']', null, null, $item['itemid']),
-		$description,
-		$item['key_'],
-		$item['delay'],
-		$item['history'],
-		in_array($item['value_type'], array(ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT)) ? '' : $item['trends'],
-		item_type2str($item['type']),
-		$status,
-		new CCol($applications, 'wraptext'),
+		new CCheckBox('group_hostid['.$host['hostid'].']', null, null, $host['hostid']),
+		new CLink($host['name'], '?form=update&parent_discoveryid='.$discoverRule['itemid'].'&parent_hostid='.$this->data['parent_hostid'].'&hostid='.$host['hostid']),
+		'',
+		$status
 	));
 }
 
