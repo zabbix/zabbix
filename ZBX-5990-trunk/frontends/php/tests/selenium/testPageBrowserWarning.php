@@ -24,10 +24,10 @@ require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 class testPageBrowserWarning extends CWebTest {
 
 	public function testPageBrowserWarning_CheckLayout() {
-		$this->open('browserwarning.php');
+		$this->zbxTestOpen('browserwarning.php');
 		$this->assertTitle('WARNING! You are using an outdated browser.');
-		$this->ok('WARNING! You are using an outdated browser.');
-		$this->ok(array(
+		$this->zbxTestTextPresent('WARNING! You are using an outdated browser.');
+		$this->zbxTestTextPresent(array(
 			'Google Chrome',
 			'Mozilla Firefox',
 			'Internet Explorer',

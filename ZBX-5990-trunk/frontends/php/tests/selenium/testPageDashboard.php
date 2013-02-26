@@ -22,23 +22,23 @@ require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
 class testPageDashboard extends CWebTest {
 	public function testPageDashboard_CheckLayout() {
-		$this->login('dashboard.php');
+		$this->zbxTestLogin('dashboard.php');
 		$this->checkTitle('Dashboard');
-		$this->ok('PERSONAL DASHBOARD');
-		$this->ok('Favourite graphs');
-		$this->ok('Favourite screens');
-		$this->ok('Favourite maps');
-		$this->ok('Status of Zabbix');
-		$this->ok('System status');
-		$this->ok('Host status');
-		$this->ok('Last 20 issues');
-		$this->ok('Web monitoring');
-		$this->ok('Updated:');
+		$this->zbxTestTextPresent('PERSONAL DASHBOARD');
+		$this->zbxTestTextPresent('Favourite graphs');
+		$this->zbxTestTextPresent('Favourite screens');
+		$this->zbxTestTextPresent('Favourite maps');
+		$this->zbxTestTextPresent('Status of Zabbix');
+		$this->zbxTestTextPresent('System status');
+		$this->zbxTestTextPresent('Host status');
+		$this->zbxTestTextPresent('Last 20 issues');
+		$this->zbxTestTextPresent('Web monitoring');
+		$this->zbxTestTextPresent('Updated:');
 	}
 
 // Check that no real host or template names displayed
 	public function testPageDashboard_NoHostNames() {
-		$this->login('dashboard.php');
+		$this->zbxTestLogin('dashboard.php');
 		$this->checkTitle('Dashboard');
 		$this->checkNoRealHostnames();
 	}

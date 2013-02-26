@@ -76,47 +76,63 @@ function nbsp($str) {
 	return str_replace(' ', SPACE, $str);
 }
 
-function prepare_url(&$var, $varname = null) {
-	$result = '';
-	if (is_array($var)) {
-		foreach ($var as $id => $par)
-					$result .= prepare_url($par, isset($varname) ? $varname.'['.$id.']' : $id);
-				}
-	else {
-		$result = '&'.$varname.'='.urlencode($var);
+function prepareUrlParam($value, $name = null) {
+	if (is_array($value)) {
+		$result = '';
+
+		foreach ($value as $key => $param) {
+			$result .= prepareUrlParam($param, isset($name) ? $name.'['.$key.']' : $key);
+		}
 	}
+	else {
+		$result = '&'.$name.'='.urlencode($value);
+	}
+
 	return $result;
 }
 
-function url_param($param, $isRequest = true, $name = null) {
-	$result = '';
-	if (!is_array($param)) {
+/**
+ * Get ready for url params.
+ *
+ * @param mixed  $param				param name or array with data depend from $getFromRequest
+ * @param bool   $getFromRequest	detect data source - input array or $_REQUEST variable
+ * @param string $name				if $_REQUEST variable is used this variable not used
+ *
+ * @return string
+ */
+function url_param($param, $getFromRequest = true, $name = null) {
+	if (is_array($param)) {
+		if ($getFromRequest) {
+			fatal_error(_('URL parameter cannot be array.'));
+		}
+	}
+	else {
 		if (is_null($name)) {
-			if (!$isRequest) {
-				fatal_error(_('Not request variable require.'));
+			if (!$getFromRequest) {
+				fatal_error(_('URL parameter name is empty.'));
 			}
+
 			$name = $param;
 		}
 	}
 
-	if ($isRequest) {
-		$var =& $_REQUEST[$param];
+	if ($getFromRequest) {
+		$value =& $_REQUEST[$param];
 	}
 	else {
-		$var =& $param;
+		$value =& $param;
 	}
 
-	if (isset($var)) {
-		$result = prepare_url($var, $name);
-	}
-	return $result;
+	return isset($value) ? prepareUrlParam($value, $name) : '';
 }
 
-function url_params($params) {
+function url_params(array $params) {
 	$result = '';
+
 	foreach ($params as $param) {
 		$result .= url_param($param);
 	}
+
 	return $result;
 }
 
@@ -365,12 +381,12 @@ function get_header_host_table($currentElement, $hostid, $discoveryid = null) {
 	$description = '';
 	if ($dbHost['proxy_hostid']) {
 		$proxy = get_host_by_hostid($dbHost['proxy_hostid']);
-		$description .= $proxy['host'].': ';
+		$description .= $proxy['host'].NAME_DELIMITER;
 	}
 	$description .= $dbHost['name'];
 
 	if ($dbHost['status'] == HOST_STATUS_TEMPLATE) {
-		$list->addItem(array(bold(_('Template').': '), new CLink($description, 'templates.php?form=update&templateid='.$dbHost['hostid'])));
+		$list->addItem(array(bold(_('Template').NAME_DELIMITER), new CLink($description, 'templates.php?form=update&templateid='.$dbHost['hostid'])));
 	}
 	else {
 		switch ($dbHost['status']) {
@@ -385,7 +401,7 @@ function get_header_host_table($currentElement, $hostid, $discoveryid = null) {
 				break;
 		}
 
-		$list->addItem(array(bold(_('Host').': '), new CLink($description, 'hosts.php?form=update&hostid='.$dbHost['hostid'])));
+		$list->addItem(array(bold(_('Host').NAME_DELIMITER), new CLink($description, 'hosts.php?form=update&hostid='.$dbHost['hostid'])));
 		$list->addItem($status);
 		$list->addItem(getAvailabilityTable($dbHost));
 	}
@@ -393,7 +409,7 @@ function get_header_host_table($currentElement, $hostid, $discoveryid = null) {
 	if (!empty($dbDiscovery)) {
 		$list->addItem(array('&laquo; ', new CLink(_('Discovery list'), 'host_discovery.php?hostid='.$dbHost['hostid'].url_param('groupid'))));
 		$list->addItem(array(
-			bold(_('Discovery').': '),
+			bold(_('Discovery').NAME_DELIMITER),
 			new CLink($dbDiscovery['name'], 'host_discovery.php?form=update&itemid='.$dbDiscovery['itemid'])
 		));
 	}

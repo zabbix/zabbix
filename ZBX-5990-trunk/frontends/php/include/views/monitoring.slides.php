@@ -64,7 +64,7 @@ else {
 
 	$elementsComboBox = new CComboBox('elementid', $this->data['elementid'], 'submit()');
 	foreach ($this->data['slideshows'] as $slideshow) {
-		$elementsComboBox->addItem($slideshow['slideshowid'], get_node_name_by_elid($slideshow['slideshowid'], null, ': ').$slideshow['name']);
+		$elementsComboBox->addItem($slideshow['slideshowid'], get_node_name_by_elid($slideshow['slideshowid'], null, NAME_DELIMITER).$slideshow['name']);
 	}
 	$slideForm->addItem(array(_('Slide show').SPACE, $elementsComboBox));
 
@@ -75,7 +75,7 @@ else {
 		if (!empty($this->data['page_groups'])) {
 			$groupsComboBox = new CComboBox('groupid', $this->data['page_groups']['selected'], 'javascript: submit();');
 			foreach ($this->data['page_groups']['groups'] as $groupid => $name) {
-				$groupsComboBox->addItem($groupid, get_node_name_by_elid($groupid, null, ': ').$name);
+				$groupsComboBox->addItem($groupid, get_node_name_by_elid($groupid, null, NAME_DELIMITER).$name);
 			}
 			$slideForm->addItem(array(SPACE._('Group').SPACE, $groupsComboBox));
 		}
@@ -85,7 +85,7 @@ else {
 			$this->data['page_hosts']['hosts']['0'] = _('Default');
 			$hostsComboBox = new CComboBox('hostid', $this->data['page_hosts']['selected'], 'javascript: submit();');
 			foreach ($this->data['page_hosts']['hosts'] as $hostid => $name) {
-				$hostsComboBox->addItem($hostid, get_node_name_by_elid($hostid, null, ': ').$name);
+				$hostsComboBox->addItem($hostid, get_node_name_by_elid($hostid, null, NAME_DELIMITER).$name);
 			}
 			$slideForm->addItem(array(SPACE._('Host').SPACE, $hostsComboBox));
 		}
