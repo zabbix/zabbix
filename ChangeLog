@@ -40,6 +40,7 @@ A.F.I...S. [ZBXNEXT-1186] increased length to 2048 characters of expression fiel
 ..F....... [ZBX-5127] regular expressions form redesign (Vedmak)
 
 Bug fixes:
+A......... [ZBX-5972] fixed template items, LLD rules, item prototypes and applications being inherited incorrectly when changing their name and an object with the same already exists on a linked host (Pavels)
 ........S. [ZBX-6221] added failure response to proxy config/heartbeat requests with not matching hostname (wiper)
 ..F....... [ZBX-869] fixed in Monitoring > Latest data that expand/collapse groups without application are expanded/collapsed all at the same time (Toms)
 A.F....... [ZBX-6192] improved trigger update, must update only changed fields (Eduard)
