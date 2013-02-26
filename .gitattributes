@@ -536,9 +536,6 @@ misc/init.d/freebsd/zabbix_server -text
 misc/init.d/tru64/zabbix_server -text
 src/libs/zbxmodules/Makefile.am -text
 src/libs/zbxmodules/modules.c -text
-src/modules/agent/dummy/Makefile -text
-src/modules/agent/dummy/README -text
-src/modules/agent/dummy/dummy.c -text
 src/modules/dummy/Makefile -text
 src/modules/dummy/README -text
 src/modules/dummy/dummy.c -text

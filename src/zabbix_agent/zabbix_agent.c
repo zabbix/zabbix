@@ -92,9 +92,9 @@ static void	zbx_load_config(int optional)
 			PARM_OPT,	0,			0},
 		{"UserParameter",		&CONFIG_USER_PARAMETERS,		TYPE_MULTISTRING,
 			PARM_OPT,	0,			0},
-		{"LoadModule",			&CONFIG_LOAD_MODULE,			TYPE_MULTISTRING,
-			PARM_OPT,	0,			0},
 		{"LoadModulePath",		&CONFIG_LOAD_MODULE_PATH,		TYPE_STRING,
+			PARM_OPT,	0,			0},
+		{"LoadModule",			&CONFIG_LOAD_MODULE,			TYPE_MULTISTRING,
 			PARM_OPT,	0,			0},
 		{NULL}
 	};
@@ -127,6 +127,7 @@ static void	zbx_load_config(int optional)
 static void	zbx_free_config()
 {
 	zbx_strarr_free(CONFIG_ALIASES);
+	zbx_strarr_free(CONFIG_LOAD_MODULE);
 	zbx_strarr_free(CONFIG_USER_PARAMETERS);
 }
 
@@ -203,7 +204,7 @@ int	main(int argc, char **argv)
 	if (FAIL == load_modules(CONFIG_LOAD_MODULE_PATH, CONFIG_LOAD_MODULE, CONFIG_TIMEOUT))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "loading modules failed, exiting...");
-		exit(FAIL);
+		exit(EXIT_FAILURE);
 	}
 
 	/* user parameters */
