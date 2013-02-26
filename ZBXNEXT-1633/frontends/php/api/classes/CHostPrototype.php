@@ -34,8 +34,9 @@ class CHostPrototype extends CZBXAPI {
 		parent::__construct();
 
 		$this->getOptions = array_merge($this->getOptions, array(
-			'sortfield' => '',
-			'sortorder' => ''
+			'discoveryids'  => null,
+			'sortfield'     => '',
+			'sortorder'     => ''
 		));
 	}
 
@@ -59,7 +60,12 @@ class CHostPrototype extends CZBXAPI {
 		while ($row = DBfetch($res)) {
 			// a count query, return a single result
 			if ($options['countOutput'] !== null) {
+			if ($options['groupCount'] !== null) {
+				$result[] = $row;
+			}
+			else {
 				$result = $row['rowscount'];
+			}
 			}
 			// a normal select query
 			else {
@@ -157,6 +163,19 @@ class CHostPrototype extends CZBXAPI {
 
 		// save the host prototypes
 		$hostPrototypeIds = DB::insert($this->tableName(), $hostPrototypes);
+
+		$hostPrototypeDiscoveryRules = array();
+		foreach ($hostPrototypes as $key => $hostPrototype) {
+			$hostPrototype['hostid'] = $hostPrototypeIds[$key];
+
+			$hostPrototypeDiscoveryRules[] = array(
+				'hostid' => $hostPrototype['hostid'],
+				'parent_itemid' => $hostPrototype['ruleid']
+			);
+		}
+
+		// link host prototypes to discovery rules
+		DB::insert('host_discovery', $hostPrototypeDiscoveryRules);
 
 		return array('hostids' => $hostPrototypeIds);
 	}
@@ -423,5 +442,24 @@ class CHostPrototype extends CZBXAPI {
 	 */
 	protected function checkHostPrototypesExist(array $hostPrototypes) {
 		// TODO: implement this check
+	}
+
+	protected function applyQueryFilterOptions($tableName, $tableAlias, array $options, array $sqlParts) {
+		$sqlParts = parent::applyQueryFilterOptions($tableName, $tableAlias, $options, $sqlParts);
+
+		// TODO: check permissions
+
+		// discoveryids
+		if ($options['discoveryids'] !== null) {
+			$sqlParts['from'][] = 'host_discovery hd';
+			$sqlParts['where'][] = $this->fieldId('hostid').'=hd.hostid';
+			$sqlParts['where'][] = dbConditionInt('hd.parent_itemid', (array) $options['discoveryids']);
+
+			if ($options['groupCount'] !== null) {
+				$sqlParts['group']['hd'] = 'hd.parent_itemid';
+			}
+		}
+
+		return $sqlParts;
 	}
 }

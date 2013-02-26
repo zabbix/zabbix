@@ -951,7 +951,7 @@ class CDiscoveryRule extends CItemGeneral {
 				$items = API::ItemPrototype()->get(array(
 					'output' => $options['selectItems'],
 					'nodeids' => $options['nodeids'],
-					'itemids' => $relationMap->getRelatedIds('items'),
+					'itemids' => $relationMap->getRelatedIds(),
 					'nopermissions' => true,
 					'preservekeys' => true
 				));
@@ -1052,12 +1052,26 @@ class CDiscoveryRule extends CItemGeneral {
 		// adding hosts
 		if ($options['selectHostPrototypes'] !== null) {
 			if ($options['selectHostPrototypes'] != API_OUTPUT_COUNT) {
-				$relationMap = new CRelationMap();
-				$hostPrototypes = array();
-				$result = $relationMap->mapMany($result, $hostPrototypes, 'hosts', $options['limitSelects']);
+				$relationMap = $this->createRelationMap($result, 'parent_itemid', 'hostid', 'host_discovery');
+				$hostPrototypes = API::HostPrototype()->get(array(
+					'output' => $options['selectHostPrototypes'],
+					'nodeids' => $options['nodeids'],
+					'hostids' => $relationMap->getRelatedIds(),
+					'nopermissions' => true,
+					'preservekeys' => true
+				));
+				$result = $relationMap->mapMany($result, $hostPrototypes, 'hostPrototypes', $options['limitSelects']);
 			}
 			else {
-				$hostPrototypes = array();
+				$hostPrototypes = API::HostPrototype()->get(array(
+					'nodeids' => $options['nodeids'],
+					'discoveryids' => $itemIds,
+					'nopermissions' => true,
+					'countOutput' => true,
+					'groupCount' => true
+				));
+				$hostPrototypes = zbx_toHash($hostPrototypes, 'parent_itemid');
+
 				foreach ($result as $itemid => $item) {
 					$result[$itemid]['hostPrototypes'] = isset($hostPrototypes[$itemid]) ? $hostPrototypes[$itemid]['rowscount'] : 0;
 				}
