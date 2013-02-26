@@ -46,7 +46,6 @@ A......... [ZBX-5972] fixed template items, LLD rules, item prototypes and appli
 A.F....... [ZBX-6192] improved trigger update, must update only changed fields (Eduard)
 A......... [ZBX-6256] fixed "limitSelect" in drule.get sorting dchecks and dhosts results by name instead of IDs (Pavels)
 A......... [ZBX-6256] fixed drule.exists "druleids" parameter not working (Pavels)
-A......... [ZBX-6255] removed unnecessary dcheck.isreadable and dcheck.iswritable methods (Pavels)
 ..F....... [ZBX-6276] fixed function to get URL parameter error message (Eduard)
 ..F....... [ZBX-6245] fixed monitoring trigger filter criteria saving (Eduard)
 ..F....... [ZBX-6237] fixed Y axis item adding field, now it is available also if item list is empty (Eduard)
