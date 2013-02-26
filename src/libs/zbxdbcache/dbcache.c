@@ -860,7 +860,7 @@ static void	DCadd_update_item_sql(size_t *sql_offset, DB_ITEM *item, ZBX_DC_HIST
 						item->prevorgvalue_null = 1;
 					}
 
-					h->value.dbl = DBmultiply_value_float(item, h->value_orig.dbl);
+					h->value.dbl = multiply_item_value_float(item, h->value_orig.dbl);
 
 					if (SUCCEED != DBchk_double(h->value.dbl))
 					{
@@ -876,7 +876,7 @@ static void	DCadd_update_item_sql(size_t *sql_offset, DB_ITEM *item, ZBX_DC_HIST
 						h->value.dbl = (h->value_orig.dbl - item->prevorgvalue.dbl) /
 								((h->ts.sec - item->lastclock) +
 									(double)(h->ts.ns - item->lastns) / 1000000000);
-						h->value.dbl = DBmultiply_value_float(item, h->value.dbl);
+						h->value.dbl = multiply_item_value_float(item, h->value.dbl);
 
 						if (SUCCEED != DBchk_double(h->value.dbl))
 						{
@@ -898,7 +898,7 @@ static void	DCadd_update_item_sql(size_t *sql_offset, DB_ITEM *item, ZBX_DC_HIST
 					if (0 == item->prevorgvalue_null && item->prevorgvalue.dbl <= h->value_orig.dbl)
 					{
 						h->value.dbl = h->value_orig.dbl - item->prevorgvalue.dbl;
-						h->value.dbl = DBmultiply_value_float(item, h->value.dbl);
+						h->value.dbl = multiply_item_value_float(item, h->value.dbl);
 
 						if (SUCCEED != DBchk_double(h->value.dbl))
 						{
@@ -946,7 +946,7 @@ static void	DCadd_update_item_sql(size_t *sql_offset, DB_ITEM *item, ZBX_DC_HIST
 						item->prevorgvalue_null = 1;
 					}
 
-					h->value.ui64 = DBmultiply_value_uint64(item, h->value_orig.ui64);
+					h->value.ui64 = multiply_item_value_uint64(item, h->value_orig.ui64);
 					break;
 				case ITEM_STORE_SPEED_PER_SECOND:
 					if (0 == item->prevorgvalue_null &&
@@ -957,7 +957,7 @@ static void	DCadd_update_item_sql(size_t *sql_offset, DB_ITEM *item, ZBX_DC_HIST
 						h->value.ui64 = (h->value_orig.ui64 - item->prevorgvalue.ui64) /
 								((h->ts.sec - item->lastclock) +
 									(double)(h->ts.ns - item->lastns) / 1000000000);
-						h->value.ui64 = DBmultiply_value_uint64(item, h->value.ui64);
+						h->value.ui64 = multiply_item_value_uint64(item, h->value.ui64);
 					}
 					else
 						h->value_null = 1;
@@ -970,7 +970,7 @@ static void	DCadd_update_item_sql(size_t *sql_offset, DB_ITEM *item, ZBX_DC_HIST
 					if (0 == item->prevorgvalue_null && item->prevorgvalue.ui64 <= h->value_orig.ui64)
 					{
 						h->value.ui64 = h->value_orig.ui64 - item->prevorgvalue.ui64;
-						h->value.ui64 = DBmultiply_value_uint64(item, h->value.ui64);
+						h->value.ui64 = multiply_item_value_uint64(item, h->value.ui64);
 					}
 					else
 						h->value_null = 1;
