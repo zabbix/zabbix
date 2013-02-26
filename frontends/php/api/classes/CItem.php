@@ -27,6 +27,16 @@ class CItem extends CItemGeneral {
 	protected $tableAlias = 'i';
 	protected $sortColumns = array('itemid', 'name', 'key_', 'delay', 'history', 'trends', 'type', 'status');
 
+	public function __construct() {
+		parent::__construct();
+
+		$this->errorMessages = array_merge($this->errorMessages, array(
+			self::ERROR_EXISTS_TEMPLATE => _('Item "%1$s" already exists on "%2$s", inherited from another template.'),
+			self::ERROR_EXISTS => _('Item "%1$s" already exists on "%2$s"')
+		));
+	}
+
+
 	/**
 	 * Get items data.
 	 *
