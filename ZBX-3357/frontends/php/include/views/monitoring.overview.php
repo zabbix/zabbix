@@ -38,18 +38,18 @@ $hintTable = new CTableInfo();
 $hintTable->setAttribute('style', 'width: 200px');
 
 if ($this->data['type'] == SHOW_TRIGGERS) {
-	$hintTable->addRow(array(new CCol(SPACE, 'normal'), _('Disabled')));
+	$hintTable->addRow(array(new CCol(SPACE, 'normal'), _('OK')));
 }
 
 for ($i = 0; $i < TRIGGER_SEVERITY_COUNT; $i++) {
-	$hintTable->addRow(array(getSeverityCell($i), _('Enabled')));
+	$hintTable->addRow(array(getSeverityCell($i), _('PROBLEM')));
 }
 
 if ($this->data['type'] == SHOW_TRIGGERS) {
 	// blinking preview in help popup (only if blinking is enabled)
 	$config = select_config();
 	if ($config['blink_period'] > 0) {
-		$col = new CCol(SPACE, 'not_classified');
+		$col = new CCol(SPACE);
 		$col->setAttribute('style', 'background-image: url(images/gradients/blink.gif); background-position: top left; background-repeat: repeat;');
 		$hintTable->addRow(array($col, _s('Age less than %s', convertUnitsS($config['blink_period']))));
 	}
@@ -57,7 +57,7 @@ if ($this->data['type'] == SHOW_TRIGGERS) {
 	$hintTable->addRow(array(new CCol(SPACE), _('No trigger')));
 }
 else {
-	$hintTable->addRow(array(new CCol(SPACE), _('Disabled or no trigger')));
+	$hintTable->addRow(array(new CCol(SPACE), _('OK or no trigger')));
 }
 
 $help = new CHelp('web.view.php', 'right');
