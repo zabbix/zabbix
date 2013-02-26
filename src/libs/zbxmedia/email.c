@@ -301,8 +301,8 @@ int	send_email(const char *smtp_server, const char *smtp_helo, const char *smtp_
 	/* =?charset?encoding?encoded text?= format must be used for subject field */
 
 	cmdp = zbx_dsprintf(cmdp,
-			"From: <%s>\r\n"
-			"To: <%s>\r\n"
+			"From: %s\r\n"
+			"To: %s\r\n"
 			"Date: %s\r\n"
 			"Subject: %s\r\n"
 			"MIME-Version: 1.0\r\n"
