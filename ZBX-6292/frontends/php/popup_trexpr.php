@@ -628,7 +628,6 @@ if ($paramtype == PARAM_TYPE_TIME) {
 		show_messages();
 		unset($_REQUEST['insert']);
 	}
-	unset($_REQUEST['insert']);
 }
 
 /*
