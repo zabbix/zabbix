@@ -4065,7 +4065,7 @@ void	DCrequeue_items(zbx_uint64_t *itemids, unsigned char *statuses, int *lastcl
 	UNLOCK_CACHE;
 }
 
-int DCconfig_update_host_availability(zbx_uint64_t hostid, unsigned char item_type, unsigned char available,
+int	DCconfig_update_host_availability(zbx_uint64_t hostid, unsigned char item_type, unsigned char available,
 		int errors_from, int disable_until)
 {
 	int		res = FAIL;
