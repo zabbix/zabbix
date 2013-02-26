@@ -471,7 +471,7 @@ if (isset($only_hostid)) {
 	}
 
 	$cmbHosts = new CComboBox('hostid', $hostid);
-	$cmbHosts->addItem($hostid, get_node_name_by_elid($hostid, null, ': ').$host['host']);
+	$cmbHosts->addItem($hostid, get_node_name_by_elid($hostid, null, NAME_DELIMITER).$host['host']);
 	$cmbHosts->setEnabled('disabled');
 	$cmbHosts->setAttribute('title', _('You can not switch hosts for current selection.'));
 	$frmTitle->addItem(array(SPACE, _('Host'), SPACE, $cmbHosts));
@@ -697,7 +697,7 @@ elseif ($srctbl == 'host_group') {
 		$group['node_name'] = isset($nodeName) ? '('.$nodeName.') ' : '';
 		$hostgroups[$gnum]['node_name'] = $group['node_name'];
 
-		$name = new CSpan(get_node_name_by_elid($group['groupid'], null, ': ').$group['name'], 'link');
+		$name = new CSpan(get_node_name_by_elid($group['groupid'], null, NAME_DELIMITER).$group['name'], 'link');
 		$name->attr('id', 'spanid'.$group['groupid']);
 
 		if ($multiselect) {
@@ -755,7 +755,7 @@ elseif ($srctbl == 'host_templates') {
 	order_result($templates, 'name');
 
 	foreach ($templates as $template) {
-		$name = new CSpan(get_node_name_by_elid($template['templateid'], null, ': ').$template['name'], 'link');
+		$name = new CSpan(get_node_name_by_elid($template['templateid'], null, NAME_DELIMITER).$template['name'], 'link');
 
 		if ($multiselect) {
 			$js_action = 'javascript: addValue('.zbx_jsvalue($reference).', '.zbx_jsvalue($template['templateid']).');';
@@ -851,7 +851,7 @@ elseif ($srctbl == 'usrgrp') {
 	order_result($userGroups, 'name');
 
 	foreach ($userGroups as $userGroup) {
-		$name = new CSpan(get_node_name_by_elid($userGroup['usrgrpid'], null, ': ').$userGroup['name'], 'link');
+		$name = new CSpan(get_node_name_by_elid($userGroup['usrgrpid'], null, NAME_DELIMITER).$userGroup['name'], 'link');
 		$name->attr('id', 'spanid'.$userGroup['usrgrpid']);
 
 		if ($multiselect) {
@@ -911,7 +911,7 @@ elseif ($srctbl == 'users') {
 	order_result($users, 'alias');
 
 	foreach ($users as $unum => $user) {
-		$alias = new CSpan(get_node_name_by_elid($user['userid'], null, ': ').$user['alias'], 'link');
+		$alias = new CSpan(get_node_name_by_elid($user['userid'], null, NAME_DELIMITER).$user['alias'], 'link');
 		$alias->attr('id', 'spanid'.$user['userid']);
 
 		if ($multiselect) {
@@ -1009,7 +1009,7 @@ elseif ($srctbl == 'triggers') {
 		$trigger['hostname'] = $host['name'];
 
 		$description = new CSpan($trigger['description'], 'link');
-		$trigger['description'] = $trigger['hostname'].': '.$trigger['description'];
+		$trigger['description'] = $trigger['hostname'].NAME_DELIMITER.$trigger['description'];
 
 		if ($multiselect) {
 			$js_action = 'addValue('.zbx_jsvalue($reference).', '.zbx_jsvalue($trigger['triggerid']).');';
@@ -1132,7 +1132,7 @@ elseif ($srctbl == 'items') {
 
 		$item['name'] = itemName($item);
 		$description = new CLink($item['name'], '#');
-		$item['name'] = $item['hostname'].': '.$item['name'];
+		$item['name'] = $item['hostname'].NAME_DELIMITER.$item['name'];
 
 		if ($multiselect) {
 			$js_action = 'javascript: addValue('.zbx_jsvalue($reference).', '.zbx_jsvalue($item['itemid']).');';
@@ -1230,7 +1230,7 @@ elseif ($srctbl == 'prototypes') {
 		$host = reset($item['hosts']);
 
 		$description = new CSpan(itemName($item), 'link');
-		$item['name'] = $host['name'].': '.$item['name'];
+		$item['name'] = $host['name'].NAME_DELIMITER.$item['name'];
 
 		if ($multiselect) {
 			$js_action = 'javascript: addValue('.zbx_jsvalue($reference).', '.zbx_jsvalue($item['itemid']).');';
@@ -1380,10 +1380,10 @@ elseif ($srctbl == 'graphs') {
 	foreach ($graphs as $graph) {
 		$host = reset($graph['hosts']);
 		$graph['hostname'] = $host['name'];
-		$graph['node_name'] = get_node_name_by_elid($graph['graphid'], null, ': ');
+		$graph['node_name'] = get_node_name_by_elid($graph['graphid'], null, NAME_DELIMITER);
 
 		if (!$simpleName) {
-			$graph['name'] = $graph['node_name'].$graph['hostname'].': '.$graph['name'];
+			$graph['name'] = $graph['node_name'].$graph['hostname'].NAME_DELIMITER.$graph['name'];
 		}
 		$description = new CSpan($graph['name'], 'link');
 
@@ -1504,7 +1504,7 @@ elseif ($srctbl == 'simple_graph') {
 		$description = new CLink($item['name'], '#');
 
 		if (!$simpleName) {
-			$item['name'] = $item['hostname'].': '.$item['name'];
+			$item['name'] = $item['hostname'].NAME_DELIMITER.$item['name'];
 		}
 
 		if ($multiselect) {
@@ -1649,7 +1649,7 @@ elseif ($srctbl == 'plain_text') {
 		$item['host'] = $host['name'];
 		$item['name'] = itemName($item);
 		$description = new CSpan($item['name'], 'link');
-		$item['name'] = $item['host'].': '.$item['name'];
+		$item['name'] = $item['host'].NAME_DELIMITER.$item['name'];
 
 		$action = get_window_opener($dstfrm, $dstfld1, $item[$srcfld1]).get_window_opener($dstfrm, $dstfld2, $item[$srcfld2]);
 		$description->setAttribute('onclick', $action.' close_window(); return false;');
