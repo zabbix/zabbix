@@ -2339,9 +2339,9 @@ char	*zbx_age2str(int age)
 	hours = (int)((double)(age - days * SEC_PER_DAY) / SEC_PER_HOUR);
 	minutes	= (int)((double)(age - days * SEC_PER_DAY - hours * SEC_PER_HOUR) / SEC_PER_MIN);
 
-	if (days)
+	if (0 != days)
 		offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, "%dd ", days);
-	if (days || hours)
+	if (0 != days || 0 != hours)
 		offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, "%dh ", hours);
 	offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, "%dm", minutes);
 
