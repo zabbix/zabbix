@@ -583,7 +583,7 @@ function add_elementNames(&$selements) {
 				break;
 			case SYSMAP_ELEMENT_TYPE_TRIGGER:
 				$hostname = reset($triggers[$selement['elementid']]['hosts']);
-				$selements[$snum]['elementName'] = $hostname['name'].':'.
+				$selements[$snum]['elementName'] = $hostname['name'].NAME_DELIMITER.
 					CMacrosResolverHelper::resolveTriggerName($triggers[$selement['elementid']]);
 				break;
 			case SYSMAP_ELEMENT_TYPE_HOST_GROUP:
@@ -1008,14 +1008,14 @@ function getSelementsInfo($sysmap) {
 		}
 	}
 
-	// get hosts data
+	// get host inventories
 	if ($sysmap['iconmapid']) {
 		$hostInventories = API::Host()->get(array(
 			'hostids' => $hostsToGetInventories,
 			'output' => array('hostid'),
 			'nopermissions' => true,
 			'preservekeys' => true,
-			'selectInventory' => array('hostid')
+			'selectInventory' => API_OUTPUT_EXTEND
 		));
 	}
 

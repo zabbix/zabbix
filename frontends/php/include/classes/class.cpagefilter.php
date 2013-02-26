@@ -491,7 +491,7 @@ class CPageFilter {
 		$items = $this->graphs;
 		if ($withNode) {
 			foreach ($items as $id => $item) {
-				$items[$id] = get_node_name_by_elid($id, null, ': ').$item;
+				$items[$id] = get_node_name_by_elid($id, null, NAME_DELIMITER).$item;
 			}
 		}
 
@@ -526,7 +526,7 @@ class CPageFilter {
 
 		if ($withNode) {
 			foreach ($items as $id => $item) {
-				$items[$id] = get_node_name_by_elid($id, null, ': ').$item;
+				$items[$id] = get_node_name_by_elid($id, null, NAME_DELIMITER).$item;
 			}
 		}
 
