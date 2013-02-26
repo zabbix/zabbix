@@ -825,6 +825,37 @@ static int	DBpatch_02010039()
 
 	return DBadd_field("hosts", &field);
 }
+
+static int	DBpatch_02010040()
+{
+	return DBcreate_table(DBget_table("host_discovery"));
+}
+
+static int	DBpatch_02010041()
+{
+	return DBcreate_index("host_discovery", "host_discovery_1", "hostid,parent_hostid,parent_itemid", 1);
+}
+
+static int	DBpatch_02010042()
+{
+	const ZBX_FIELD	field = {"hostid", NULL, "hosts", "hostid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("host_discovery", 1, &field);
+}
+
+static int	DBpatch_02010043()
+{
+	const ZBX_FIELD	field = {"parent_hostid", NULL, "hosts", "hostid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("host_discovery", 2, &field);
+}
+
+static int	DBpatch_02010044()
+{
+	const ZBX_FIELD	field = {"parent_itemid", NULL, "items", "itemid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("host_discovery", 3, &field);
+}
 #endif	/* not HAVE_SQLITE3 */
 
 static void	DBget_version(int *mandatory, int *optional)
@@ -902,6 +933,11 @@ int	DBcheck_version()
 		{DBpatch_02010037, 2010037, 0, 0},
 		{DBpatch_02010038, 2010038, 0, 0},
 		{DBpatch_02010039, 2010039, 0, 1},
+		{DBpatch_02010040, 2010040, 0, 1},
+		{DBpatch_02010041, 2010041, 0, 1},
+		{DBpatch_02010042, 2010042, 0, 1},
+		{DBpatch_02010043, 2010043, 0, 1},
+		{DBpatch_02010044, 2010044, 0, 1},
 		/* IMPORTANT! When adding a new mandatory DBPatch don't forget to update it for SQLite, too. */
 		{NULL}
 	};

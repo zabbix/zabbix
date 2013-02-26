@@ -1167,6 +1167,13 @@ FIELD		|lastcheck	|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
 FIELD		|ts_delete	|t_time		|'0'	|NOT NULL	|ZBX_NODATA
 UNIQUE		|1		|itemid,parent_itemid
 
+TABLE|host_discovery|hostdiscoveryid|ZBX_SYNC,ZBX_DATA
+FIELD		|hostdiscoveryid|t_id		|	|NOT NULL	|0
+FIELD		|hostid		|t_id		|	|NOT NULL	|ZBX_SYNC		|1|hosts
+FIELD		|parent_hostid	|t_id		|	|NOT NULL	|ZBX_SYNC		|2|hosts	|hostid
+FIELD		|parent_itemid	|t_id		|	|NOT NULL	|ZBX_SYNC		|3|items	|itemid
+UNIQUE		|1		|itemid,parent_hostid,parent_itemid
+
 TABLE|profiles|profileid|0
 FIELD		|profileid	|t_id		|	|NOT NULL	|0
 FIELD		|userid		|t_id		|	|NOT NULL	|0			|1|users
@@ -1212,4 +1219,4 @@ UNIQUE		|1		|userid
 TABLE|dbversion||
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|2010039	|2010039
+ROW		|2010044	|2010044
