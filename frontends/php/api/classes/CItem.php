@@ -1062,7 +1062,7 @@ class CItem extends CItemGeneral {
 				$graphs = API::Graph()->get(array(
 					'output' => $options['selectGraphs'],
 					'nodeids' => $options['nodeids'],
-					'graphids' => $relationMap->getRelatedIds('graphs'),
+					'graphids' => $relationMap->getRelatedIds(),
 					'preservekeys' => true
 				));
 
@@ -1123,7 +1123,7 @@ class CItem extends CItemGeneral {
 			$discoveryRules = API::DiscoveryRule()->get(array(
 				'output' => $options['selectDiscoveryRule'],
 				'nodeids' => $options['nodeids'],
-				'itemids' => $relationMap->getRelatedIds('discoveryRule'),
+				'itemids' => $relationMap->getRelatedIds(),
 				'nopermissions' => true,
 				'preservekeys' => true
 			));

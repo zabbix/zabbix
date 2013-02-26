@@ -733,7 +733,7 @@ class CItemPrototype extends CItemGeneral {
 				$graphs = API::GraphPrototype()->get(array(
 					'output' => $options['selectGraphs'],
 					'nodeids' => $options['nodeids'],
-					'graphids' => $relationMap->getRelatedIds('graphs'),
+					'graphids' => $relationMap->getRelatedIds(),
 					'preservekeys' => true
 				));
 
