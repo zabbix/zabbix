@@ -51,7 +51,7 @@ int     VM_MEMORY_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 		zbx_GlobalMemoryStatusEx(&ms_ex);
 
-		if (NULL == mode || '\0' == mode || 0 == strcmp(mode, "total"))
+		if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "total"))
 			SET_UI64_RESULT(result, ms_ex.ullTotalPhys);
 		else if (0 == strcmp(mode, "free"))
 			SET_UI64_RESULT(result, ms_ex.ullAvailPhys);
@@ -70,7 +70,7 @@ int     VM_MEMORY_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 	{
 		GlobalMemoryStatus(&ms);
 
-		if (NULL == mode || '\0' == mode || 0 == strcmp(mode, "total"))
+		if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "total"))
 			SET_UI64_RESULT(result, ms.dwTotalPhys);
 		else if (0 == strcmp(mode, "free"))
 			SET_UI64_RESULT(result, ms.dwAvailPhys);

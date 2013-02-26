@@ -412,7 +412,7 @@ int	NET_TCP_LISTEN(AGENT_REQUEST *request, AGENT_RESULT *result)
 	unsigned short	port;
 	char		*port_str;
 
-	if (1 <= request->nparam)
+	if (1 < request->nparam)
 		return SYSINFO_RET_FAIL;
 
 	port_str = get_rparam(request, 0);
