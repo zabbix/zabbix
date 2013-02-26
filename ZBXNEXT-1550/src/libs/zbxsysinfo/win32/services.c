@@ -39,7 +39,7 @@ int	SERVICE_STATE(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if (NULL == name || '\0' == *name)
 		return SYSINFO_RET_FAIL;
 
-	if (NULL == (mgr = OpenSCManager(NULL,NULL,GENERIC_READ)) )
+	if (NULL == (mgr = OpenSCManager(NULL, NULL, GENERIC_READ)))
 		return SYSINFO_RET_FAIL;
 
 	wname = zbx_utf8_to_unicode(name);

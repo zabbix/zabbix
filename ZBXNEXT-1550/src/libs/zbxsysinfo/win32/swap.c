@@ -25,8 +25,7 @@ int	SYSTEM_SWAP_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	MEMORYSTATUSEX	ms_ex;
 	MEMORYSTATUS	ms;
-
-	char *swapdev, *mode;
+	char		*swapdev, *mode;
 
 	if (2 < request->nparam)
 		return SYSINFO_RET_FAIL;
@@ -35,7 +34,7 @@ int	SYSTEM_SWAP_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 	mode = get_rparam(request, 1);
 
 	/* only 'all' parameter supported */
-	if (NULL == swapdev || '\0' == *swapdev || 0 != strcmp(swapdev, "all"))
+	if (NULL != swapdev && '\0' != *swapdev && 0 != strcmp(swapdev, "all"))
 		return SYSINFO_RET_FAIL;
 
 	if (NULL != zbx_GlobalMemoryStatusEx)
@@ -45,38 +44,22 @@ int	SYSTEM_SWAP_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 		zbx_GlobalMemoryStatusEx(&ms_ex);
 
 		if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "total"))
-		{
 			SET_UI64_RESULT(result, ms_ex.ullTotalPageFile);
-			return SYSINFO_RET_OK;
-		}
 		else if (0 == strcmp(mode, "free"))
-		{
 			SET_UI64_RESULT(result, ms_ex.ullAvailPageFile);
-			return SYSINFO_RET_OK;
-		}
 		else
-		{
 			return SYSINFO_RET_FAIL;
-		}
 	}
 	else
 	{
 		GlobalMemoryStatus(&ms);
 
-		if (NULL == mode || '\0' == *mode || 0 == strcmp(mode,"total"))
-		{
+		if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "total"))
 			SET_UI64_RESULT(result, ms.dwTotalPageFile);
-			return SYSINFO_RET_OK;
-		}
 		else if (0 == strcmp(mode,"free"))
-		{
 			SET_UI64_RESULT(result, ms.dwAvailPageFile);
-			return SYSINFO_RET_OK;
-		}
 		else
-		{
 			return SYSINFO_RET_FAIL;
-		}
 	}
 
 	return SYSINFO_RET_OK;
