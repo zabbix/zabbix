@@ -713,6 +713,171 @@ class testInheritanceItemPrototype extends CWebTest {
 		$this->assertAttribute("//input[@id='status']/@checked", 'checked');
 	}
 
+	public static function simple() {
+		return array(
+			array(
+				array('expected' => ITEM_GOOD,
+					'item' => 'itemSimple',
+					'key' => 'key-template-simple',
+					'hostCheck' => true,
+					'dbCheck' => true)
+			),
+			array(
+				array('expected' => ITEM_GOOD,
+					'item' => 'itemName',
+					'key' => 'key-template-item',
+					'hostCheck' => true)
+			),
+			array(
+				array('expected' => ITEM_GOOD,
+					'item' => 'itemTrigger',
+					'key' => 'key-template-trigger',
+					'hostCheck' => true,
+					'dbCheck' => true,
+					'remove' => true)
+			),
+			array(
+				array('expected' => ITEM_GOOD,
+					'item' => 'itemRemove',
+					'key' => 'key-template-remove',
+					'hostCheck' => true,
+					'dbCheck' => true,
+					'hostRemove' => true,
+					'remove' => true)
+			),
+			array(
+				array('expected' => ITEM_BAD,
+					'item' => 'itemInheritance',
+					'key' => 'key-item-inheritance',
+					'errors' => array(
+						'ERROR: Cannot add item',
+						'Item with key "key-item-inheritance" already exists on "Inheritance test template".')
+				)
+			)
+		);
+	}
+
+	/**
+	 * @dataProvider simple
+	 */
+	public function testInheritanceItemPrototype_simpleCreate($data) {
+		$this->zbxTestLogin('templates.php');
+
+		$template = 'Inheritance test template';
+		$host = 'Template inheritance test host';
+		$discoveryRule = 'discoveryRuleTest';
+
+		$itemName = $data['item'];
+		$keyName = $data['key'];
+
+		$this->zbxTestClickWait("link=$template");
+		$this->zbxTestClickWait("link=Discovery rules");
+		$this->zbxTestClickWait("link=$discoveryRule");
+		$this->zbxTestClickWait("link=Item prototypes");
+		$this->zbxTestClickWait('form');
+
+		$this->input_type('name', $itemName);
+		$this->input_type('key', $keyName);
+		$this->zbxTestClickWait('save');
+
+		switch ($data['expected']) {
+			case ITEM_GOOD:
+				$this->zbxTestTextPresent('Item added');
+				$this->checkTitle('Configuration of item prototypes');
+				$this->zbxTestTextPresent(array('CONFIGURATION OF ITEM PROTOTYPES', "Item prototypes of $discoveryRule"));
+				break;
+
+			case ITEM_BAD:
+				$this->checkTitle('Configuration of item prototypes');
+				$this->zbxTestTextPresent(array('CONFIGURATION OF ITEM PROTOTYPES', 'Item prototype'));
+				foreach ($data['errors'] as $msg) {
+					$this->zbxTestTextPresent($msg);
+				}
+				$this->zbxTestTextPresent(array('Name', 'Type', 'Key'));
+				break;
+		}
+
+		if (isset($data['hostCheck'])) {
+			$this->zbxTestOpenWait('hosts.php');
+			$this->zbxTestClickWait("link=$host");
+			$this->zbxTestClickWait("link=Discovery rules");
+			$this->zbxTestClickWait("link=$discoveryRule");
+			$this->zbxTestClickWait("link=Item prototypes");
+
+			$this->zbxTestTextPresent("$template: $itemName");
+			$this->zbxTestClickWait("link=$itemName");
+
+			$this->zbxTestTextPresent('Parent items');
+			$this->assertElementPresent("link=$template");
+			$this->assertElementValue('name', $itemName);
+			$this->assertElementValue('key', $keyName);
+		}
+
+		if (isset($data['dbCheck'])) {
+			// template
+			$result = DBselect("SELECT name, key_, hostid FROM items where name = '".$itemName."' limit 1");
+			while ($row = DBfetch($result)) {
+				$this->assertEquals($row['name'], $itemName);
+				$this->assertEquals($row['key_'], $keyName);
+				$hostid = $row['hostid'] + 1;
+			}
+			// host
+			$result = DBselect("SELECT name, key_ FROM items where name = '".$itemName."'  AND hostid = ".$hostid."");
+			while ($row = DBfetch($result)) {
+				$this->assertEquals($row['name'], $itemName);
+				$this->assertEquals($row['key_'], $keyName);
+			}
+		}
+
+		if (isset($data['hostRemove'])) {
+			$result = DBselect("SELECT hostid FROM items where name = '".$itemName."' limit 1");
+			while ($row = DBfetch($result)) {
+				$hostid = $row['hostid'] + 1;
+			}
+			$result = DBselect("SELECT name, key_, itemid FROM items where name = '".$itemName."'  AND hostid = ".$hostid."");
+			while ($row = DBfetch($result)) {
+				$itemId = $row['itemid'];
+			}
+
+			$this->zbxTestOpenWait('hosts.php');
+			$this->zbxTestClickWait("link=$host");
+			$this->zbxTestClickWait("link=$host");
+			$this->zbxTestClickWait("link=Discovery rules");
+			$this->zbxTestClickWait("link=$discoveryRule");
+			$this->zbxTestClickWait("link=Item prototypes");
+
+			$this->zbxTestCheckboxSelect("group_itemid_$itemId");
+			$this->zbxTestDropdownSelect('go', 'Delete selected');
+			$this->zbxTestClick('goButton');
+
+			$this->getConfirmation();
+			$this->wait();
+			$this->zbxTestTextPresent(array('ERROR: Cannot delete items', 'Cannot delete templated items'));
+		}
+
+		if (isset($data['remove'])) {
+			$result = DBselect("SELECT itemid FROM items where name = '".$itemName."' limit 1");
+			while ($row = DBfetch($result)) {
+				$itemId = $row['itemid'];
+			}
+
+			$this->zbxTestOpenWait('templates.php');
+			$this->zbxTestClickWait("link=$template");
+			$this->zbxTestClickWait("link=Discovery rules");
+			$this->zbxTestClickWait("link=$discoveryRule");
+			$this->zbxTestClickWait("link=Item prototypes");
+
+			$this->zbxTestCheckboxSelect("group_itemid_$itemId");
+			$this->zbxTestDropdownSelect('go', 'Delete selected');
+			$this->zbxTestClick('goButton');
+
+			$this->getConfirmation();
+			$this->wait();
+			$this->zbxTestTextPresent('Items deleted');
+			$this->zbxTestTextNotPresent("$template: $itemName");
+		}
+	}
+
 	/**
 	 * Restore the original tables.
 	 */
