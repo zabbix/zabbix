@@ -5579,6 +5579,38 @@ return array(
 			),
 		),
 	),
+	'host_discovery' => array(
+		'type' => DB::TABLE_TYPE_CONFIG,
+		'key' => 'hostdiscoveryid',
+		'fields' => array(
+			'hostdiscoveryid' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+			),
+			'hostid' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'hosts',
+				'ref_field' => 'hostid',
+			),
+			'parent_hostid' => array(
+				'null' => true,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'hosts',
+				'ref_field' => 'hostid',
+			),
+			'parent_itemid' => array(
+				'null' => true,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'items',
+				'ref_field' => 'itemid',
+			),
+		),
+	),
 	'profiles' => array(
 		'type' => DB::TABLE_TYPE_HISTORY,
 		'key' => 'profileid',
