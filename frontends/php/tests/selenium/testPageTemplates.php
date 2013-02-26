@@ -30,19 +30,19 @@ class testPageTemplates extends CWebTest {
 	* @dataProvider allTemplates
 	*/
 	public function testPageTemplates_CheckLayout($template) {
-		$this->login('templates.php');
-		$this->dropdown_select_wait('groupid', 'Templates');
-//		$this->wait();
+		$this->zbxTestLogin('templates.php');
+		$this->zbxTestDropdownSelectWait('groupid', 'Templates');
 		$this->checkTitle('Configuration of templates');
-		$this->ok('TEMPLATES');
-		$this->ok('Displaying');
-		// Header
-		$this->ok(array('Templates', 'Applications', 'Items', 'Triggers', 'Graphs', 'Screens', 'Discovery', 'Linked templates', 'Linked to'));
-		// Data
-		$this->ok(array($template['name']));
-		$this->dropdown_select('go', 'Export selected');
-		$this->dropdown_select('go', 'Delete selected');
-		$this->dropdown_select('go', 'Delete selected with linked elements');
+		$this->zbxTestTextPresent('TEMPLATES');
+		$this->zbxTestTextPresent('Displaying');
+
+		// header
+		$this->zbxTestTextPresent(array('Templates', 'Applications', 'Items', 'Triggers', 'Graphs', 'Screens', 'Discovery', 'Linked templates', 'Linked to'));
+
+		// data
+		$this->zbxTestTextPresent(array($template['name']));
+		$this->zbxTestDropdownHasOptions('go',
+				array('Export selected', 'Delete selected', 'Delete selected with linked elements'));
 	}
 
 	/**
@@ -61,20 +61,18 @@ class testPageTemplates extends CWebTest {
 		$sqlTriggers = "select * from triggers order by triggerid";
 		$oldHashTriggers = DBhash($sqlTriggers);
 
-		$this->login('templates.php');
-		$this->dropdown_select_wait('groupid', 'all');
+		$this->zbxTestLogin('templates.php');
+		$this->zbxTestDropdownSelectWait('groupid', 'all');
 
 		$this->checkTitle('Configuration of templates');
 
-		$this->ok($name); //link is present on the screen?
-		$this->click("link=$name");
-		$this->wait();
-		$this->button_click('save');
-		$this->wait();
+		$this->zbxTestTextPresent($name); // link is present on the screen?
+		$this->zbxTestClickWait('link='.$name);
+		$this->zbxTestClickWait('save');
 		$this->checkTitle('Configuration of templates');
-		$this->ok('Template updated');
-		$this->ok("$name");
-		$this->ok('TEMPLATES');
+		$this->zbxTestTextPresent('Template updated');
+		$this->zbxTestTextPresent("$name");
+		$this->zbxTestTextPresent('TEMPLATES');
 
 		$this->assertEquals($oldHashTemplate, DBhash($sqlTemplate));
 		$this->assertEquals($oldHashHosts, DBhash($sqlHosts));

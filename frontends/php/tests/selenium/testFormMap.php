@@ -69,9 +69,8 @@ class testFormMap extends CWebTest {
 		$db_map = DBfetch($db_result);
 		$this->assertTrue(isset($db_map['sysmapid']), 'Chuck Norris: Could not fetch map with name "'.$map_name.'" from DB. Here is what I got: '.print_r($db_map, true));
 
-		$this->login('sysmaps.php');
-		$this->click('link='.$map_name);
-		$this->wait();
+		$this->zbxTestLogin('sysmaps.php');
+		$this->zbxTestClickWait('link='.$map_name);
 
 		// checking if appropriate value for grid size is selected
 		$this->assertTrue(
@@ -81,36 +80,35 @@ class testFormMap extends CWebTest {
 
 		// grid should be shown by default
 		if ($db_map['grid_show'] == SYSMAP_GRID_SHOW_ON) {
-			$this->ok('Shown');
+			$this->zbxTestTextPresent('Shown');
 		}
 		else {
-			$this->ok('Hidden');
+			$this->zbxTestTextPresent('Hidden');
 		}
 
 		// auto align should be on by default
 		if ($db_map['grid_align'] == SYSMAP_GRID_ALIGN_ON) {
-			$this->ok('On');
+			$this->zbxTestTextPresent('On');
 		}
 		else {
-			$this->ok('Off');
+			$this->zbxTestTextPresent('Off');
 		}
 
 		// selecting new grid size
-		$this->dropdown_select('gridsize', $gridSize);
+		$this->zbxTestDropdownSelect('gridsize', $gridSize);
 		sleep(1);
 
 		// changing other two options if they are not already set as needed
 		if (($db_map['grid_show'] == SYSMAP_GRID_SHOW_ON && $showGrid == 0) || ($db_map['grid_show'] == SYSMAP_GRID_SHOW_OFF && $showGrid == 1)) {
-			$this->click("gridshow");
+			$this->zbxTestClick('gridshow');
 		}
 		if (($db_map['grid_align'] == SYSMAP_GRID_ALIGN_ON && $autoAlign == 0) || ($db_map['grid_align'] == SYSMAP_GRID_ALIGN_OFF && $autoAlign == 1)) {
-			$this->click("gridautoalign");
+			$this->zbxTestClick('gridautoalign');
 		}
 
 		// clicking "Save"
 		$this->chooseOkOnNextConfirmation();
-		$this->button_click('save');
-		$this->wait();
+		$this->zbxTestClickWait('save');
 		$this->getConfirmation();
 
 		// checking if DB was updated as expected
@@ -125,10 +123,8 @@ class testFormMap extends CWebTest {
 			'Chuck Norris: Database was not updated as expected. Here is what I got: '.print_r($db_map, true).'. Now compare it with data set provided.'
 		);
 
-
 		// returning to the map
-		$this->click('link='.$map_name);
-		$this->wait();
+		$this->zbxTestClickWait('link='.$map_name);
 
 		// checking if all options remain as they were set
 		$this->assertTrue(
@@ -137,17 +133,17 @@ class testFormMap extends CWebTest {
 		);
 
 		if ($showGrid) {
-			$this->ok('Shown');
+			$this->zbxTestTextPresent('Shown');
 		}
 		else {
-			$this->ok('Hidden');
+			$this->zbxTestTextPresent('Hidden');
 		}
 
 		if ($autoAlign) {
-			$this->ok('On');
+			$this->zbxTestTextPresent('On');
 		}
 		else {
-			$this->ok('Off');
+			$this->zbxTestTextPresent('Off');
 		}
 
 		// if we got until here, everything works as expected
