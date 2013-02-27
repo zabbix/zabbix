@@ -58,7 +58,7 @@ static void	DCclean_nextchecks()
  * Purpose: add item nextcheck to the array                                   *
  *                                                                            *
  ******************************************************************************/
-void	DCadd_nextcheck(zbx_uint64_t itemid, zbx_timespec_t *ts, const char *error_msg)
+void	DCadd_nextcheck(zbx_uint64_t itemid, const zbx_timespec_t *ts, const char *error_msg)
 {
 	const char	*__function_name = "DCadd_nextcheck";
 

@@ -838,6 +838,18 @@ static int	DBchk_double(double value)
 	return SUCCEED;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: DCadd_update_item_sql                                            *
+ *                                                                            *
+ * Purpose: 1) generate sql for updating item in database                     *
+ *          2) add events (item supported/not supported)                      *
+ *          3) update cache (requeue item, add nextcheck)                     *
+ *                                                                            *
+ * Parameters: item - [IN/OUT] item reference                                 *
+ *             h    - [IN/OUT] a reference to history cache value             *
+ *                                                                            *
+ ******************************************************************************/
 static void	DCadd_update_item_sql(size_t *sql_offset, DB_ITEM *item, ZBX_DC_HISTORY *h)
 {
 	char	*value_esc;
@@ -1037,6 +1049,8 @@ notsupported:
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "item [%s] became supported", zbx_host_key_string(item->itemid));
 
+			/* we know it's EVENT_OBJECT_ITEM because LLDRULE that becomes */
+			/* supported is handled in DBlld_process_discovery_rule()      */
 			add_event(0, EVENT_SOURCE_INTERNAL, EVENT_OBJECT_ITEM, item->itemid, &h->ts, h->state,
 					NULL, NULL, 0, 0);
 
