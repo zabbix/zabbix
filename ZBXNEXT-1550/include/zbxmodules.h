@@ -20,7 +20,7 @@
 #ifndef ZABBIX_ZBXMODULES_H
 #define ZABBIX_ZBXMODULES_H
 
-int	load_modules(const char *path, char **modules, int timeout);
+int	load_modules(const char *path, char **file_names, int timeout, int verbose);
 void	unload_modules();
 
 #endif

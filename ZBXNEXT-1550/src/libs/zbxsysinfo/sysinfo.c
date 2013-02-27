@@ -221,9 +221,6 @@ void	free_request(AGENT_REQUEST *request)
  *                                                                            *
  * Return value: request - structure filled with data from item key           *
  *                                                                            *
- * Comment: this function should be rewritten to get rid of buf and get_param *
- *          nparam must be 0 (not 1!) if no parameters given                  *
- *                                                                            *
  ******************************************************************************/
 int	parse_item_key(char *itemkey, AGENT_REQUEST *request)
 {
@@ -234,13 +231,13 @@ int	parse_item_key(char *itemkey, AGENT_REQUEST *request)
 	{
 		case ZBX_COMMAND_WITH_PARAMS:
 			if (0 == (request->nparam = num_param(params)))
-				return FAIL;
+				return FAIL;	/* key is badly formatted */
 			request->params = zbx_malloc(request->params, request->nparam * sizeof(char *));
 			for (i = 0; i < request->nparam; i++)
 				request->params[i] = get_param_dyn(params, i + 1);
 			break;
 		case ZBX_COMMAND_ERROR:
-			return FAIL;
+			return FAIL;	/* key is badly formatted */
 	}
 
 	request->key = zbx_strdup(NULL, key);

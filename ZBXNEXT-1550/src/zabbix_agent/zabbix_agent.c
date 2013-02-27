@@ -201,7 +201,7 @@ int	main(int argc, char **argv)
 	init_metrics();
 
 	/* loadable modules */
-	if (FAIL == load_modules(CONFIG_LOAD_MODULE_PATH, CONFIG_LOAD_MODULE, CONFIG_TIMEOUT))
+	if (FAIL == load_modules(CONFIG_LOAD_MODULE_PATH, CONFIG_LOAD_MODULE, CONFIG_TIMEOUT, 0))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "loading modules failed, exiting...");
 		exit(EXIT_FAILURE);

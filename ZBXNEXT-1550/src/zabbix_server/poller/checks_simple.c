@@ -32,6 +32,7 @@ int	get_value_simple(DC_ITEM *item, AGENT_RESULT *result)
 			__function_name, item->key_orig, item->interface.addr);
 
 	init_request(&request);
+
 	if (SUCCEED != parse_item_key(item->key, &request))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Key is badly formatted"));
