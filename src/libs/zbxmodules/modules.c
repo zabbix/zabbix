@@ -106,7 +106,6 @@ int	load_modules(const char *path, char **modules, int timeout)
 		zbx_snprintf(filename, sizeof(filename), "%s/%s", path, *module);
 
 		zabbix_log(LOG_LEVEL_DEBUG, "loading module \"%s\"", filename);
-
 		if (NULL == (lib = dlopen(filename, RTLD_NOW)))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "cannot load module \"%s\": %s", filename, dlerror());
@@ -116,8 +115,8 @@ int	load_modules(const char *path, char **modules, int timeout)
 		*(void **)(&func_version) = dlsym(lib, ZBX_MODULE_FUNC_API_VERSION);
 		if (NULL == func_version)
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "cannot find \"%s()\" function in module \"%s\": %s",
-					ZBX_MODULE_FUNC_API_VERSION, *module, dlerror());
+			zabbix_log(LOG_LEVEL_WARNING, "cannot find \"" ZBX_MODULE_FUNC_API_VERSION "()\""
+					" function in module \"%s\": %s", *module, dlerror());
 			dlclose(lib);
 			goto fail;
 		}
@@ -132,8 +131,8 @@ int	load_modules(const char *path, char **modules, int timeout)
 		*(void **)(&func_init) = dlsym(lib, ZBX_MODULE_FUNC_INIT);
 		if (NULL == func_init)
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "cannot find \"%s()\" function in module \"%s\": %s",
-					ZBX_MODULE_FUNC_INIT, *module, dlerror());
+			zabbix_log(LOG_LEVEL_WARNING, "cannot find \"" ZBX_MODULE_FUNC_INIT "()\""
+					" function in module \"%s\": %s", *module, dlerror());
 			dlclose(lib);
 			goto fail;
 		}
@@ -149,8 +148,8 @@ int	load_modules(const char *path, char **modules, int timeout)
 		*(void **)(&func_timeout) = dlsym(lib, ZBX_MODULE_FUNC_ITEM_TIMEOUT);
 		if (NULL == func_timeout)
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "cannot find \"%s()\" function in module \"%s\": %s",
-					ZBX_MODULE_FUNC_ITEM_TIMEOUT, *module, dlerror());
+			zabbix_log(LOG_LEVEL_DEBUG, "cannot find \"" ZBX_MODULE_FUNC_ITEM_TIMEOUT "()\""
+					" function in module \"%s\": %s", *module, dlerror());
 		}
 		else
 			func_timeout(timeout);
@@ -158,8 +157,8 @@ int	load_modules(const char *path, char **modules, int timeout)
 		*(void **)(&func_list) = dlsym(lib, ZBX_MODULE_FUNC_ITEM_LIST);
 		if (NULL == func_list)
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "cannot find \"%s()\" function in module \"%s\": %s",
-					ZBX_MODULE_FUNC_ITEM_LIST, *module, dlerror());
+			zabbix_log(LOG_LEVEL_WARNING, "cannot find \"" ZBX_MODULE_FUNC_ITEM_LIST "()\""
+					" function in module \"%s\": %s", *module, dlerror());
 			dlclose(lib);
 			continue;
 		}
@@ -210,7 +209,8 @@ void	unload_modules()
 		*(void **)(&func_uninit) = dlsym(*module, ZBX_MODULE_FUNC_UNINIT);
 		if (NULL == func_uninit)
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "cannot find uninit function: %s", dlerror());
+			zabbix_log(LOG_LEVEL_DEBUG, "cannot find \"" ZBX_MODULE_FUNC_UNINIT "()\" function: %s",
+					dlerror());
 			dlclose(*module);
 			continue;
 		}
