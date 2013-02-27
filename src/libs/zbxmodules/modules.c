@@ -37,17 +37,16 @@ static void	**modules = NULL;
  *                                                                            *
  * Function: register_module                                                  *
  *                                                                            *
- * Purpose: add module to the list of loaded modules (dynamic libraries)      *
+ * Purpose: Add module to the list of loaded modules (dynamic libraries).     *
  *          It skips a module if it is already registered.                    *
  *                                                                            *
  * Parameters: module - library handler                                       *
- *                                                                            *
- * Return value:                                                              *
  *                                                                            *
  ******************************************************************************/
 static void	register_module(void *module)
 {
 	const char	*__function_name = "register_module";
+
 	int		i = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
@@ -60,15 +59,15 @@ static void	register_module(void *module)
 
 	while (NULL != modules[i])
 	{
-		if (module == modules[i])
-			return;
+		if (module == modules[i])	/* a module is already registered */
+			goto out;
 		i++;
 	}
 
 	modules = zbx_realloc(modules, (i + 2) * sizeof(void *));
 	modules[i] = module;
 	modules[i + 1] = NULL;
-
+out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
@@ -90,14 +89,15 @@ static void	register_module(void *module)
 int	load_modules(const char *path, char **modules, int timeout)
 {
 	const char	*__function_name = "load_modules";
+
 	char		**module;
 	ZBX_METRIC	*metrics;
 	void		*lib;
 	char		filename[MAX_STRING_LEN];
 	int		(*func_init)(), (*func_version)();
 	ZBX_METRIC	*(*func_list)();
-	char		**(*func_timeout)();
-	int		i, ret = 0;
+	void		(*func_timeout)();
+	int		i, ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -105,72 +105,61 @@ int	load_modules(const char *path, char **modules, int timeout)
 	{
 		zbx_snprintf(filename, sizeof(filename), "%s/%s", path, *module);
 
-		zabbix_log(LOG_LEVEL_DEBUG, "Loading module \"%s\"", filename);
+		zabbix_log(LOG_LEVEL_DEBUG, "loading module \"%s\"", filename);
 
-		lib = dlopen(filename, RTLD_NOW);
-
-		if (NULL == lib)
+		if (NULL == (lib = dlopen(filename, RTLD_NOW)))
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "Loading module failed: %s", dlerror());
-			ret = FAIL;
-			goto ret;
+			zabbix_log(LOG_LEVEL_WARNING, "cannot load module \"%s\": %s", filename, dlerror());
+			goto fail;
 		}
 
 		*(void **)(&func_version) = dlsym(lib, ZBX_MODULE_FUNC_API_VERSION);
 		if (NULL == func_version)
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "Module \"%s\". Cannot find version function: %s",
-				filename, dlerror());
+			zabbix_log(LOG_LEVEL_WARNING, "cannot find \"%s()\" function in module \"%s\": %s",
+					ZBX_MODULE_FUNC_API_VERSION, *module, dlerror());
 			dlclose(lib);
-			ret = FAIL;
-			goto ret;
+			goto fail;
 		}
 
-		if (ZBX_MODULE_API_VERSION_ONE != func_version())
+		if (ZBX_MODULE_API_VERSION_ONE != (i = func_version()))
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "Module \"%s\". Unsupported module version.",
-				filename);
+			zabbix_log(LOG_LEVEL_WARNING, "unsupported module \"%s\" version: %d", *module, i);
 			dlclose(lib);
-			ret = FAIL;
-			goto ret;
+			goto fail;
 		}
 
 		*(void **)(&func_init) = dlsym(lib, ZBX_MODULE_FUNC_INIT);
 		if (NULL == func_init)
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "Module \"%s\". Cannot find initialization function: %s",
-				filename, dlerror());
+			zabbix_log(LOG_LEVEL_WARNING, "cannot find \"%s()\" function in module \"%s\": %s",
+					ZBX_MODULE_FUNC_INIT, *module, dlerror());
 			dlclose(lib);
-			ret = FAIL;
-			goto ret;
+			goto fail;
 		}
 
 		if (ZBX_MODULE_OK != func_init())
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "Module \"%s\". Initialization failed.",
-				filename);
+			zabbix_log(LOG_LEVEL_WARNING, "cannot initialize module \"%s\"", *module);
 			dlclose(lib);
-			ret = FAIL;
-			goto ret;
+			goto fail;
 		}
 
 		/* the function is optional, zabbix will load the module ieven if it is missing */
 		*(void **)(&func_timeout) = dlsym(lib, ZBX_MODULE_FUNC_ITEM_TIMEOUT);
-		if (NULL != func_timeout)
+		if (NULL == func_timeout)
 		{
-			func_timeout(timeout);
+			zabbix_log(LOG_LEVEL_DEBUG, "cannot find \"%s()\" function in module \"%s\": %s",
+					ZBX_MODULE_FUNC_ITEM_TIMEOUT, *module, dlerror());
 		}
 		else
-		{
-			zabbix_log(LOG_LEVEL_DEBUG, "Module \"%s\". Cannot find item timeout function: %s",
-				filename, dlerror());
-		}
+			func_timeout(timeout);
 
 		*(void **)(&func_list) = dlsym(lib, ZBX_MODULE_FUNC_ITEM_LIST);
 		if (NULL == func_list)
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "Module \"%s\". Finding item list function \"%s\" failed: %s",
-				filename, ZBX_MODULE_FUNC_ITEM_LIST, dlerror());
+			zabbix_log(LOG_LEVEL_WARNING, "cannot find \"%s()\" function in module \"%s\": %s",
+					ZBX_MODULE_FUNC_ITEM_LIST, *module, dlerror());
 			dlclose(lib);
 			continue;
 		}
@@ -178,9 +167,9 @@ int	load_modules(const char *path, char **modules, int timeout)
 		metrics = func_list();
 		for (i = 0; NULL != metrics[i].key; i++)
 		{
-			/* Accept only CF_HAVEPARAMS flag from module items */
+			/* accept only CF_HAVEPARAMS flag from module items */
 			metrics[i].flags &= CF_HAVEPARAMS;
-			/* The flag means that the items comes from a loadable module */
+			/* the flag means that the items comes from a loadable module */
 			metrics[i].flags |= CF_MODULE;
 			add_metric(&metrics[i]);
 		}
@@ -188,8 +177,9 @@ int	load_modules(const char *path, char **modules, int timeout)
 		register_module(lib);
 	}
 
-ret:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	ret = SUCCEED;
+fail:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
 }
@@ -198,12 +188,8 @@ ret:
  *                                                                            *
  * Function: unload_modules                                                   *
  *                                                                            *
- * Purpose: unload already loaded loadable modules (dynamic libraries)        *
- *          It is called on agent shutdown.                                   *
- *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
+ * Purpose: Unload already loaded loadable modules (dynamic libraries).       *
+ *          It is called on process shutdown.                                 *
  *                                                                            *
  ******************************************************************************/
 void	unload_modules()
@@ -221,21 +207,16 @@ void	unload_modules()
 
 	for (module = modules; NULL != *module; module++)
 	{
-		*(void **) (&func_uninit) = dlsym(*module, ZBX_MODULE_FUNC_UNINIT);
+		*(void **)(&func_uninit) = dlsym(*module, ZBX_MODULE_FUNC_UNINIT);
 		if (NULL == func_uninit)
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "Cannot find uninit function: %s",
-				dlerror());
+			zabbix_log(LOG_LEVEL_DEBUG, "cannot find uninit function: %s", dlerror());
 			dlclose(*module);
 			continue;
 		}
 
 		if (ZBX_MODULE_OK != func_uninit())
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "Uninitialization failed.");
-			dlclose(*module);
-			continue;
-		}
+			zabbix_log(LOG_LEVEL_WARNING, "uninitialization failed");
 
 		dlclose(*module);
 	}
@@ -243,6 +224,4 @@ void	unload_modules()
 	zbx_free(modules);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
-
-	return;
 }
