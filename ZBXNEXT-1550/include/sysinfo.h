@@ -107,22 +107,6 @@ extern int	CONFIG_ENABLE_REMOTE_COMMANDS;
 extern int	CONFIG_LOG_REMOTE_COMMANDS;
 extern int	CONFIG_UNSAFE_USER_PARAMETERS;
 
-typedef enum
-{
-	SYSINFO_RET_OK = 0,
-	SYSINFO_RET_FAIL
-}
-ZBX_SYSINFO_RET;
-
-typedef struct
-{
-	char		*key;
-	unsigned	flags;
-	int		(*function)();
-	char		*test_param; /* item test parameters; user parameter items keep command here */
-}
-ZBX_METRIC;
-
 /* collector */
 #define MAX_COLLECTOR_HISTORY	(15 * SEC_PER_MIN + 1)
 #define ZBX_AVG1		0
@@ -161,11 +145,6 @@ ZBX_METRIC;
 #define ZBX_DSTAT_W_BYTE	5
 #define ZBX_DSTAT_MAX		6
 int	get_diskstat(const char *devname, zbx_uint64_t *dstat);
-
-/* flags for command */
-#define CF_HAVEPARAMS		1	/* item accepts either optional or mandatory parameters */
-#define CF_MODULE		2	/* item is defined in a loadable module */
-#define CF_USERPARAMETER	4	/* item is defined as user parameter */
 
 /* flags for process */
 #define PROCESS_TEST		1
