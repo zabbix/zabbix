@@ -452,7 +452,24 @@ class CHostPrototype extends CZBXAPI {
 	protected function applyQueryFilterOptions($tableName, $tableAlias, array $options, array $sqlParts) {
 		$sqlParts = parent::applyQueryFilterOptions($tableName, $tableAlias, $options, $sqlParts);
 
-		// TODO: check permissions
+		if (CWebUser::getType() != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
+			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ;
+
+			$sqlParts['where'][] = 'EXISTS ('.
+				'SELECT NULL'.
+				' FROM '.
+					'host_discovery hd,items i,hosts_groups hgg'.
+					' JOIN rights r'.
+						' ON r.id=hgg.groupid'.
+						' AND '.dbConditionInt('r.groupid', getUserGroupsByUserId(self::$userData['userid'])).
+				' WHERE h.hostid=hd.hostid'.
+					' AND hd.parent_itemid=i.itemid'.
+					' AND i.hostid=hgg.hostid'.
+				' GROUP BY hgg.hostid'.
+				' HAVING MIN(r.permission)>'.PERM_DENY.
+				' AND MAX(r.permission)>='.$permission.
+				')';
+		}
 
 		// discoveryids
 		if ($options['discoveryids'] !== null) {
