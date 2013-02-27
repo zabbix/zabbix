@@ -505,14 +505,6 @@ int	main(int argc, char **argv)
 
 	zbx_load_config();
 
-	if (FAIL == load_modules(CONFIG_LOAD_MODULE_PATH, CONFIG_LOAD_MODULE, CONFIG_TIMEOUT))
-	{
-		zabbix_log(LOG_LEVEL_CRIT, "loading modules failed, exiting...");
-		exit(EXIT_FAILURE);
-	}
-
-	zbx_free_config();
-
 	if (ZBX_TASK_CONFIG_CACHE_RELOAD == task)
 		exit(SUCCEED == zbx_sigusr_send(ZBX_TASK_CONFIG_CACHE_RELOAD) ? EXIT_SUCCESS : EXIT_FAILURE);
 
@@ -600,6 +592,14 @@ int	MAIN_ZABBIX_ENTRY()
 		zabbix_log(LOG_LEVEL_INFORMATION, "NodeID:                    %3d", CONFIG_NODEID);
 		zabbix_log(LOG_LEVEL_INFORMATION, "******************************");
 	}
+
+	if (FAIL == load_modules(CONFIG_LOAD_MODULE_PATH, CONFIG_LOAD_MODULE, CONFIG_TIMEOUT, 1))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "loading modules failed, exiting...");
+		exit(EXIT_FAILURE);
+	}
+
+	zbx_free_config();
 
 	if (SUCCEED != DBcheck_version())
 		exit(EXIT_FAILURE);

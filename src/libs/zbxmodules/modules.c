@@ -42,12 +42,15 @@ static void	**modules = NULL;
  *                                                                            *
  * Parameters: module - library handler                                       *
  *                                                                            *
+ * Return value: SUCCEED - if module is successfully registered               *
+ *               FAIL - if module is already registered                       *
+ *                                                                            *
  ******************************************************************************/
-static void	register_module(void *module)
+static int	register_module(void *module)
 {
 	const char	*__function_name = "register_module";
 
-	int		i = 0;
+	int		i = 0, ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -67,8 +70,12 @@ static void	register_module(void *module)
 	modules = zbx_realloc(modules, (i + 2) * sizeof(void *));
 	modules[i] = module;
 	modules[i + 1] = NULL;
+
+	ret = SUCCEED;
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+
+	return ret;
 }
 
 /******************************************************************************
@@ -79,21 +86,21 @@ out:
  *          It skips a module in case of any errors                           *
  *                                                                            *
  * Parameters: path - directory where modules are located                     *
- *             modules - list of module names                                 *
+ *             file_names - list of module names                              *
  *             timeout - timeout in seconds for processing of items by module *
+ *             verbose - output list of loaded modules                        *
  *                                                                            *
- * Return value: 0 - success                                                  *
- *               -1 - loading of modules failed                               *
+ * Return value: SUCCEED - all modules is successfully loaded                 *
+ *               FAIL - loading of modules failed                             *
  *                                                                            *
  ******************************************************************************/
-int	load_modules(const char *path, char **modules, int timeout)
+int	load_modules(const char *path, char **file_names, int timeout, int verbose)
 {
 	const char	*__function_name = "load_modules";
 
-	char		**module;
-	ZBX_METRIC	*metrics;
+	char		**file_name, *buffer = NULL;
 	void		*lib;
-	char		filename[MAX_STRING_LEN];
+	char		fill_name[MAX_STRING_LEN];
 	int		(*func_init)(), (*func_version)();
 	ZBX_METRIC	*(*func_list)();
 	void		(*func_timeout)();
@@ -101,29 +108,30 @@ int	load_modules(const char *path, char **modules, int timeout)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	for (module = modules; NULL != *module; module++)
+	for (file_name = file_names; NULL != *file_name; file_name++)
 	{
-		zbx_snprintf(filename, sizeof(filename), "%s/%s", path, *module);
+		zbx_snprintf(fill_name, sizeof(fill_name), "%s/%s", path, *file_name);
 
-		zabbix_log(LOG_LEVEL_DEBUG, "loading module \"%s\"", filename);
-		if (NULL == (lib = dlopen(filename, RTLD_NOW)))
+		zabbix_log(LOG_LEVEL_DEBUG, "loading module \"%s\"", fill_name);
+
+		if (NULL == (lib = dlopen(fill_name, RTLD_NOW)))
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "cannot load module \"%s\": %s", *module, dlerror());
+			zabbix_log(LOG_LEVEL_CRIT, "cannot load module \"%s\": %s", *file_name, dlerror());
 			goto fail;
 		}
 
 		*(void **)(&func_version) = dlsym(lib, ZBX_MODULE_FUNC_API_VERSION);
 		if (NULL == func_version)
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "cannot find \"" ZBX_MODULE_FUNC_API_VERSION "()\""
-					" function in module \"%s\": %s", *module, dlerror());
+			zabbix_log(LOG_LEVEL_CRIT, "cannot find \"" ZBX_MODULE_FUNC_API_VERSION "()\""
+					" function in module \"%s\": %s", *file_name, dlerror());
 			dlclose(lib);
 			goto fail;
 		}
 
 		if (ZBX_MODULE_API_VERSION_ONE != (i = func_version()))
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "unsupported module \"%s\" version: %d", *module, i);
+			zabbix_log(LOG_LEVEL_CRIT, "unsupported module \"%s\" version: %d", *file_name, i);
 			dlclose(lib);
 			goto fail;
 		}
@@ -131,15 +139,15 @@ int	load_modules(const char *path, char **modules, int timeout)
 		*(void **)(&func_init) = dlsym(lib, ZBX_MODULE_FUNC_INIT);
 		if (NULL == func_init)
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "cannot find \"" ZBX_MODULE_FUNC_INIT "()\""
-					" function in module \"%s\": %s", *module, dlerror());
+			zabbix_log(LOG_LEVEL_CRIT, "cannot find \"" ZBX_MODULE_FUNC_INIT "()\""
+					" function in module \"%s\": %s", *file_name, dlerror());
 			dlclose(lib);
 			goto fail;
 		}
 
 		if (ZBX_MODULE_OK != func_init())
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "cannot initialize module \"%s\"", *module);
+			zabbix_log(LOG_LEVEL_CRIT, "cannot initialize module \"%s\"", *file_name);
 			dlclose(lib);
 			goto fail;
 		}
@@ -149,7 +157,7 @@ int	load_modules(const char *path, char **modules, int timeout)
 		if (NULL == func_timeout)
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "cannot find \"" ZBX_MODULE_FUNC_ITEM_TIMEOUT "()\""
-					" function in module \"%s\": %s", *module, dlerror());
+					" function in module \"%s\": %s", *file_name, dlerror());
 		}
 		else
 			func_timeout(timeout);
@@ -158,26 +166,42 @@ int	load_modules(const char *path, char **modules, int timeout)
 		if (NULL == func_list)
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "cannot find \"" ZBX_MODULE_FUNC_ITEM_LIST "()\""
-					" function in module \"%s\": %s", *module, dlerror());
+					" function in module \"%s\": %s", *file_name, dlerror());
 			dlclose(lib);
 			continue;
 		}
 
-		metrics = func_list();
-		for (i = 0; NULL != metrics[i].key; i++)
+		if (SUCCEED == register_module(lib))
 		{
-			/* accept only CF_HAVEPARAMS flag from module items */
-			metrics[i].flags &= CF_HAVEPARAMS;
-			/* the flag means that the items comes from a loadable module */
-			metrics[i].flags |= CF_MODULE;
-			add_metric(&metrics[i]);
-		}
+			ZBX_METRIC	*metrics;
 
-		register_module(lib);
+			metrics = func_list();
+
+			for (i = 0; NULL != metrics[i].key; i++)
+			{
+				/* accept only CF_HAVEPARAMS flag from module items */
+				metrics[i].flags &= CF_HAVEPARAMS;
+				/* the flag means that the items comes from a loadable module */
+				metrics[i].flags |= CF_MODULE;
+				add_metric(&metrics[i]);
+			}
+
+			if (1 == verbose)
+			{
+				if (NULL != buffer)
+					buffer = zbx_strdcat(buffer, ", ");
+				buffer = zbx_strdcat(buffer, *file_name);
+			}
+		}
 	}
+
+	if (NULL != buffer)
+		zabbix_log(LOG_LEVEL_WARNING, "loaded modules: %s", buffer);
 
 	ret = SUCCEED;
 fail:
+	zbx_free(buffer);
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;

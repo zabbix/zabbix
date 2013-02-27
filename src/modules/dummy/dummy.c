@@ -123,7 +123,7 @@ int	zbx_module_dummy_echo(AGENT_REQUEST *request, AGENT_RESULT *result)
  *                                 as not supported by zabbix                 *
  *               SYSINFO_RET_OK - success                                     *
  *                                                                            *
- * Comment: get_param(request, N-1) can be used to get a pointer to the Nth   *
+ * Comment: get_rparam(request, N-1) can be used to get a pointer to the Nth  *
  *          parameter starting from 0 (first parameter). Make sure it exists  *
  *          by checking value of request->nparam.                             *
  *                                                                            *

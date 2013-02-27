@@ -536,6 +536,13 @@ int	MAIN_ZABBIX_ENTRY()
 	zabbix_log(LOG_LEVEL_INFORMATION, "Starting Zabbix Agent [%s]. Zabbix %s (revision %s).",
 			CONFIG_HOSTNAME, ZABBIX_VERSION, ZABBIX_REVISION);
 
+#ifndef _WINDOWS
+	if (FAIL == load_modules(CONFIG_LOAD_MODULE_PATH, CONFIG_LOAD_MODULE, CONFIG_TIMEOUT, 1))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "loading modules failed, exiting...");
+		exit(EXIT_FAILURE);
+	}
+#endif
 	if (0 != CONFIG_PASSIVE_FORKS)
 	{
 		if (FAIL == zbx_tcp_listen(&listen_sock, CONFIG_LISTEN_IP, (unsigned short)CONFIG_LISTEN_PORT))
@@ -550,13 +557,6 @@ int	MAIN_ZABBIX_ENTRY()
 #ifdef _WINDOWS
 	init_perf_collector(1);
 	load_perf_counters(CONFIG_PERF_COUNTERS);
-#endif
-#ifndef _WINDOWS
-	if (FAIL == load_modules(CONFIG_LOAD_MODULE_PATH, CONFIG_LOAD_MODULE, CONFIG_TIMEOUT))
-	{
-		zabbix_log(LOG_LEVEL_CRIT, "loading modules failed, exiting...");
-		exit(EXIT_FAILURE);
-	}
 #endif
 	load_user_parameters(CONFIG_USER_PARAMETERS);
 	load_aliases(CONFIG_ALIASES);
@@ -753,10 +753,10 @@ int	main(int argc, char **argv)
 			load_perf_counters(CONFIG_PERF_COUNTERS);
 #endif
 #ifndef _WINDOWS
-			if (FAIL == load_modules(CONFIG_LOAD_MODULE_PATH, CONFIG_LOAD_MODULE, CONFIG_TIMEOUT))
+			if (FAIL == load_modules(CONFIG_LOAD_MODULE_PATH, CONFIG_LOAD_MODULE, CONFIG_TIMEOUT, 0))
 			{
 				zabbix_log(LOG_LEVEL_CRIT, "loading modules failed, exiting...");
-				exit(FAIL);
+				exit(EXIT_FAILURE);
 			}
 #endif
 			load_user_parameters(CONFIG_USER_PARAMETERS);

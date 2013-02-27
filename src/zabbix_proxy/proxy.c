@@ -535,14 +535,6 @@ int	main(int argc, char **argv)
 
 	zbx_load_config();
 
-	if (FAIL == load_modules(CONFIG_LOAD_MODULE_PATH, CONFIG_LOAD_MODULE, CONFIG_TIMEOUT))
-	{
-		zabbix_log(LOG_LEVEL_CRIT, "loading modules failed, exiting...");
-		exit(EXIT_FAILURE);
-	}
-
-	zbx_free_config();
-
 	if (ZBX_TASK_CONFIG_CACHE_RELOAD == task)
 		exit(SUCCEED == zbx_sigusr_send(ZBX_TASK_CONFIG_CACHE_RELOAD) ? EXIT_SUCCESS : EXIT_FAILURE);
 
@@ -607,6 +599,14 @@ int	MAIN_ZABBIX_ENTRY()
 	zabbix_log(LOG_LEVEL_INFORMATION, "SSH2 support:          " SSH2_FEATURE_STATUS);
 	zabbix_log(LOG_LEVEL_INFORMATION, "IPv6 support:          " IPV6_FEATURE_STATUS);
 	zabbix_log(LOG_LEVEL_INFORMATION, "**************************");
+
+	if (FAIL == load_modules(CONFIG_LOAD_MODULE_PATH, CONFIG_LOAD_MODULE, CONFIG_TIMEOUT, 1))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "loading modules failed, exiting...");
+		exit(EXIT_FAILURE);
+	}
+
+	zbx_free_config();
 
 	DBinit();
 	if (SUCCEED != DBcheck_version())
