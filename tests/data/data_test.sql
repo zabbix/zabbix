@@ -695,3 +695,9 @@ INSERT INTO hosts (host, name, status, hostid) VALUES ('Template inheritance tes
 INSERT INTO hosts_groups (hostid, groupid, hostgroupid) VALUES (30001, 4, 30001);
 INSERT INTO interface (type, ip, dns, useip, port, main, hostid, interfaceid) VALUES (1, '127.0.0.1', '', '1', '10050', '1', 30001, 30000);
 INSERT INTO hosts_templates (hosttemplateid, hostid, templateid) VALUES (30000, 30001, 30000);
+
+-- insert into discoveryRuleTest item prototype itemDiscovery
+INSERT INTO items (name, key_, hostid, value_type, itemid, flags) VALUES ('itemDiscovery', 'item-discovery-prototype', 30000, 3, 23600, 2);
+INSERT INTO items (name, key_, hostid, value_type, itemid, flags, templateid) VALUES ('itemDiscovery', 'item-discovery-prototype', 30001, 3, 23601, 2, 23600);
+INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid) values (301, 23600, 23500);
+INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid) values (302, 23601, 23501);
