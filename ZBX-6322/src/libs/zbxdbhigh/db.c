@@ -145,10 +145,6 @@ int	DBconnect(int flag)
 		zbx_sleep(ZBX_DB_WAIT_DOWN);
 	}
 
-#if defined(HAVE_ORACLE)
-	DBexecute("alter session set nls_numeric_characters='. '");
-#endif
-
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __function_name, err);
 
 	return err;
