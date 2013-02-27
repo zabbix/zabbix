@@ -108,7 +108,7 @@ int	load_modules(const char *path, char **modules, int timeout)
 		zabbix_log(LOG_LEVEL_DEBUG, "loading module \"%s\"", filename);
 		if (NULL == (lib = dlopen(filename, RTLD_NOW)))
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "cannot load module \"%s\": %s", filename, dlerror());
+			zabbix_log(LOG_LEVEL_WARNING, "cannot load module \"%s\": %s", *module, dlerror());
 			goto fail;
 		}
 

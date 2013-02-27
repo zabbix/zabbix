@@ -20,12 +20,28 @@
 #ifndef ZABBIX_MODULE_H
 #define ZABBIX_MODULE_H
 
+#include "zbxtypes.h"
+
 #define ZBX_MODULE_OK	0
 #define ZBX_MODULE_FAIL	-1
 
 #define ZBX_MODULE_API_VERSION_ONE	1
 
 #define get_rparam(request, num)	(request->nparam > num ? request->params[num] : NULL)
+
+/* flags for command */
+#define CF_HAVEPARAMS		0x01	/* item accepts either optional or mandatory parameters */
+#define CF_MODULE		0x02	/* item is defined in a loadable module */
+#define CF_USERPARAMETER	0x04	/* item is defined as user parameter */
+
+typedef struct
+{
+	char		*key;
+	unsigned	flags;
+	int		(*function)();
+	char		*test_param;	/* item test parameters; user parameter items keep command here */
+}
+ZBX_METRIC;
 
 /* agent request structure */
 typedef struct
@@ -89,5 +105,8 @@ AGENT_RESULT;
 	(res)->type |= AR_MESSAGE,		\
 	(res)->msg = (char *)(val)		\
 )
+
+#define SYSINFO_RET_OK		0
+#define SYSINFO_RET_FAIL	1
 
 #endif
