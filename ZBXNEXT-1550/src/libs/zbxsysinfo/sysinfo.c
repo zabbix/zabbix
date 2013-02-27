@@ -42,21 +42,23 @@
 
 static ZBX_METRIC	*commands = NULL;
 
-void	add_metric(ZBX_METRIC *metric)
+/******************************************************************************
+ *                                                                            *
+ * Function: add_metric                                                       *
+ *                                                                            *
+ * Purpose: registers a new item key into the system                          *
+ *                                                                            *
+ ******************************************************************************/
+int	add_metric(ZBX_METRIC *metric, char *error, size_t max_error_len)
 {
 	int	i = 0;
-
-	assert(metric);
-
-	if (NULL == metric->key)
-		return;
 
 	while (NULL != commands[i].key)
 	{
 		if (0 == strcmp(commands[i].key, metric->key))
 		{
-			zabbix_log(LOG_LEVEL_CRIT, "failed to add new metric \"%s\": duplicate key", metric->key);
-			exit(FAIL);
+			zbx_snprintf(error, max_error_len, "key \"%s\" already exists", metric->key);
+			return FAIL;	/* metric already exists */
 		}
 		i++;
 	}
@@ -68,9 +70,11 @@ void	add_metric(ZBX_METRIC *metric)
 
 	commands = zbx_realloc(commands, (i + 2) * sizeof(ZBX_METRIC));
 	memset(&commands[i + 1], 0, sizeof(ZBX_METRIC));
+
+	return SUCCEED;
 }
 
-int	add_user_parameter(const char *itemkey, char *command)
+int	add_user_parameter(const char *itemkey, char *command, char *error, size_t max_error_len)
 {
 	int		i;
 	char		key[MAX_STRING_LEN], parameters[MAX_STRING_LEN];
@@ -79,57 +83,77 @@ int	add_user_parameter(const char *itemkey, char *command)
 
 	if (ZBX_COMMAND_ERROR == (i = parse_command(itemkey, key, sizeof(key), parameters, sizeof(parameters))))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "failed to add UserParameter \"%s\": parsing error", itemkey);
+		zbx_strlcpy(error, "syntax error", max_error_len);
 		return FAIL;
 	}
 	else if (ZBX_COMMAND_WITH_PARAMS == i)
 	{
 		if (0 != strcmp(parameters, "*"))	/* must be '*' parameters */
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "failed to add UserParameter \"%s\": invalid key", itemkey);
+			zbx_strlcpy(error, "syntax error", max_error_len);
 			return FAIL;
 		}
 		flag |= CF_HAVEPARAMS;
 	}
 
-	metric.key = zbx_strdup(NULL, key);
+	metric.key = key;
 	metric.flags = flag;
 	metric.function = &EXECUTE_USER_PARAMETER;
-	metric.test_param = zbx_strdup(NULL, command);
+	metric.test_param = command;
 
-	add_metric(&metric);
-
-	zbx_free(metric.key);
-	zbx_free(metric.test_param);
-
-	return SUCCEED;
+	return add_metric(&metric, error, max_error_len);
 }
 
 void	init_metrics()
 {
 	int	i;
+	char	error[MAX_STRING_LEN];
 
 	commands = zbx_malloc(commands, sizeof(ZBX_METRIC));
 	commands[0].key = NULL;
 
 #ifdef WITH_AGENT_METRICS
 	for (i = 0; NULL != parameters_agent[i].key; i++)
-		add_metric(&parameters_agent[i]);
+	{
+		if (SUCCEED != add_metric(&parameters_agent[i], error, sizeof(error)))
+		{
+			zabbix_log(LOG_LEVEL_CRIT, "cannot add item key: %s", error);
+			exit(EXIT_FAILURE);
+		}
+	}
 #endif
 
 #ifdef WITH_COMMON_METRICS
 	for (i = 0; NULL != parameters_common[i].key; i++)
-		add_metric(&parameters_common[i]);
+	{
+		if (SUCCEED != add_metric(&parameters_common[i], error, sizeof(error)))
+		{
+			zabbix_log(LOG_LEVEL_CRIT, "cannot add item key: %s", error);
+			exit(EXIT_FAILURE);
+		}
+	}
 #endif
 
 #ifdef WITH_SPECIFIC_METRICS
 	for (i = 0; NULL != parameters_specific[i].key; i++)
-		add_metric(&parameters_specific[i]);
+	{
+		if (SUCCEED != add_metric(&parameters_specific[i], error, sizeof(error)))
+		{
+			zabbix_log(LOG_LEVEL_CRIT, "cannot add item key: %s", error);
+			exit(EXIT_FAILURE);
+		}
+	}
 #endif
 
 #ifdef WITH_SIMPLE_METRICS
 	for (i = 0; NULL != parameters_simple[i].key; i++)
-		add_metric(&parameters_simple[i]);
+	{
+		if (SUCCEED != add_metric(&parameters_simple[i], error, sizeof(error)))
+		{
+			zabbix_log(LOG_LEVEL_CRIT, "cannot add item key: %s", error);
+			exit(EXIT_FAILURE);
+		}
+	}
 #endif
 }
 

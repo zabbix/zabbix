@@ -153,12 +153,12 @@ int	get_diskstat(const char *devname, zbx_uint64_t *dstat);
 #define PROCESS_MODULE_COMMAND	8
 
 void	init_metrics();
-void    add_metric(ZBX_METRIC *new);
+int	add_metric(ZBX_METRIC *new, char *error, size_t max_error_len);
 void	free_metrics();
 
 int	process(const char *in_command, unsigned flags, AGENT_RESULT *result);
 
-int	add_user_parameter(const char *key, char *command);
+int	add_user_parameter(const char *key, char *command, char *error, size_t max_error_len);
 int	add_user_module(const char *key, int (*function)());
 void	test_parameters();
 void	test_parameter(const char *key, unsigned flags);
