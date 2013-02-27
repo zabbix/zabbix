@@ -31,7 +31,6 @@ dist-hook:
 	rm -f $(top_distdir)/include/config.h
 	rm -f $(top_distdir)/frontends/php/conf/zabbix.conf.php
 	rm -rf $(top_distdir)/frontends/php/tests
-	rm -rf $(top_distdir)/src/modules
 
 dbschema_ibm_db2:
 	create/bin/gen_data.pl ibm_db2 > database/ibm_db2/data.sql
