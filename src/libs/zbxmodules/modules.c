@@ -100,7 +100,7 @@ int	load_modules(const char *path, char **file_names, int timeout, int verbose)
 
 	char		**file_name, *buffer = NULL;
 	void		*lib;
-	char		fill_name[MAX_STRING_LEN];
+	char		fill_name[MAX_STRING_LEN], error[MAX_STRING_LEN];
 	int		(*func_init)(), (*func_version)();
 	ZBX_METRIC	*(*func_list)();
 	void		(*func_timeout)();
@@ -183,7 +183,11 @@ int	load_modules(const char *path, char **file_names, int timeout, int verbose)
 				metrics[i].flags &= CF_HAVEPARAMS;
 				/* the flag means that the items comes from a loadable module */
 				metrics[i].flags |= CF_MODULE;
-				add_metric(&metrics[i]);
+				if (SUCCEED != add_metric(&metrics[i], error, sizeof(error)))
+				{
+					zabbix_log(LOG_LEVEL_CRIT, "cannot load module \"%s\": %s", *file_name, error);
+					exit(EXIT_FAILURE);
+				}
 			}
 
 			if (1 == verbose)
