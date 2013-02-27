@@ -88,17 +88,21 @@ else {
  */
 if (isset($_REQUEST['delete']) && isset($_REQUEST['hostid'])) {
 
+	DBstart();
 	$result = API::HostPrototype()->delete(get_request('hostid'));
 
 	show_messages($result, _('Host prototype deleted'), _('Cannot delete host prototypes'));
 
 	unset($_REQUEST['hostid'], $_REQUEST['form']);
+	DBend($result);
 }
 elseif (isset($_REQUEST['clone']) && isset($_REQUEST['itemid'])) {
 	unset($_REQUEST['itemid']);
 	$_REQUEST['form'] = 'clone';
 }
 elseif (isset($_REQUEST['save'])) {
+	DBstart();
+
 	$newHostPrototype = array(
 		'host' => get_request('host'),
 		'name' => get_request('name'),
@@ -124,9 +128,12 @@ elseif (isset($_REQUEST['save'])) {
 	if ($result) {
 		unset($_REQUEST['itemid'], $_REQUEST['form']);
 	}
+
+	DBend($result);
 }
 // GO
 elseif (($_REQUEST['go'] == 'activate' || $_REQUEST['go'] == 'disable') && isset($_REQUEST['group_hostid'])) {
+	DBstart();
 	$update = array();
 	foreach ((array) get_request('group_hostid') as $hostPrototypeId) {
 		$update[] = array(
@@ -138,10 +145,13 @@ elseif (($_REQUEST['go'] == 'activate' || $_REQUEST['go'] == 'disable') && isset
 	$go_result = API::HostPrototype()->update($update);
 
 	show_messages($go_result, ($_REQUEST['go'] == 'activate') ? _('Host prototypes activated') : _('Host prototypes disabled'), null);
+	DBend($result);
 }
 elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['group_hostid'])) {
+	DBstart();
 	$go_result = API::HostPrototype()->delete($_REQUEST['group_hostid']);
 	show_messages($go_result, _('Host prototypes deleted'), _('Cannot delete host prototypes'));
+	DBend($result);
 }
 
 if ($_REQUEST['go'] != 'none' && isset($go_result) && $go_result) {
