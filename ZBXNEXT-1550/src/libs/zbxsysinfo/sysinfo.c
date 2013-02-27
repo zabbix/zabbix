@@ -451,7 +451,7 @@ int	process(const char *in_command, unsigned flags, AGENT_RESULT *result)
 	char		key[MAX_STRING_LEN];
 	char		parameters[MAX_STRING_LEN];
 	char		tmp[MAX_STRING_LEN];
-	char		newparameters[MAX_STRING_LEN], error[MAX_STRING_LEN];
+	char		error[MAX_STRING_LEN];
 
 	ZBX_METRIC	*command = NULL;
 	AGENT_REQUEST	request;
@@ -466,9 +466,11 @@ int	process(const char *in_command, unsigned flags, AGENT_RESULT *result)
 		goto notsupported;
 
 	/* system.run is not allowed by default except for getting hostname for daemons */
-	if ( 0 == strcmp(key, "system.run") && 1 != CONFIG_ENABLE_REMOTE_COMMANDS
-		&& 0 == (flags & PROCESS_LOCAL_COMMAND))
+	if (1 != CONFIG_ENABLE_REMOTE_COMMANDS && 0 == (flags & PROCESS_LOCAL_COMMAND) &&
+			0 == strcmp(key, "system.run"))
+	{
 		goto notsupported;
+	}
 
 	for (command = commands; NULL != command->key; command++)
 	{
@@ -484,28 +486,24 @@ int	process(const char *in_command, unsigned flags, AGENT_RESULT *result)
 	if (0 != (flags & PROCESS_MODULE_COMMAND) && 0 == (command->flags & CF_MODULE))
 		goto notsupported;
 
-	/* Command does not accept parameters but was called with parameters */
+	/* command does not accept parameters but was called with parameters */
 	if (0 == (command->flags & CF_HAVEPARAMS) && ZBX_COMMAND_WITH_PARAMS == rc)
 		goto notsupported;
 
-	/* In test mode replace actual item key parameters with test ones */
-	if (0 != (flags & PROCESS_USE_TEST_PARAM))
-	{
-		if (0 != (command->flags & CF_USERPARAMETER) || NULL == command->test_param)
-			strscpy(parameters, "");
-		else if (NULL != command->test_param)
-			strscpy(parameters, command->test_param);
-	}
-
-	*newparameters = '\0';
 	*error = '\0';
 
 	if (0 != (command->flags & CF_USERPARAMETER))
 	{
+		request.key = zbx_strdup(NULL, key);
+		request.nparam = 1;
+		request.params = zbx_malloc(request.params, request.nparam * sizeof(char *));
+
 		if (0 != (command->flags & CF_HAVEPARAMS))
 		{
+			request.params[0] = zbx_malloc(NULL, MAX_STRING_LEN);
+
 			if (FAIL == replace_param(command->test_param, parameters,
-					newparameters, sizeof(newparameters), error, sizeof(error)))
+					request.params[0], MAX_STRING_LEN, error, sizeof(error)))
 			{
 				if ('\0' != *error)
 					zabbix_log(LOG_LEVEL_WARNING, "item [%s] error: %s", in_command, error);
@@ -513,20 +511,13 @@ int	process(const char *in_command, unsigned flags, AGENT_RESULT *result)
 			}
 		}
 		else
-			strscpy(newparameters, command->test_param);
-
-		request.key = zbx_strdup(NULL, key);
-		request.nparam = 1;
-		request.params = zbx_malloc(request.params, request.nparam * sizeof(char *));
-		request.params[0] = zbx_strdup(NULL, newparameters);
+			request.params[0] = zbx_strdup(NULL, command->test_param);
 	}
 	else
 	{
-		strscpy(newparameters, parameters);
-		if (0 != (command->flags & CF_HAVEPARAMS))
-			zbx_snprintf(tmp, sizeof(tmp), "%s[%s]", key, newparameters);
-		else
-			zbx_snprintf(tmp, sizeof(tmp), "%s", key);
+		/* in test mode replace actual item key parameters with test ones */
+		if (0 != (flags & PROCESS_USE_TEST_PARAM) && NULL != command->test_param)
+			zbx_snprintf(tmp, sizeof(tmp), "%s[%s]", key, command->test_param);
 
 		if (SUCCEED != parse_item_key(tmp, &request))
 			goto notsupported;
@@ -547,16 +538,12 @@ notsupported:
 	if (0 != (flags & PROCESS_TEST))
 	{
 #define	COL_WIDTH	45
+		int	n1;
 
-		int	n1, n2 = 0;
+		n1 = printf("%s", tmp);
 
-		n1 = printf("%s", key);
-
-		if (0 < n1 && '\0' != *parameters)
-			n2 = printf("[%s]", parameters);
-
-		if (0 < n1 && 0 <= n2 && COL_WIDTH > n1 + n2)
-			printf("%-*s", COL_WIDTH - n1 - n2, " ");
+		if (0 < n1 && COL_WIDTH > n1)
+			printf("%-*s", COL_WIDTH - n1, " ");
 	}
 
 	if (NOTSUPPORTED == ret)
