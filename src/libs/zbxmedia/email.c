@@ -131,6 +131,24 @@ ssize_t smtp_readln(int fd, char *buf, int buf_len)
 	return read_bytes;
 }
 
+static void	smtp_prepare_return_path(char **path, const char *mail_from)
+{
+	char	*pstart, *pend;
+	int	size = 128, offset = 0;
+
+	*path = zbx_malloc(*path, size);
+
+	if ( NULL == (pstart = strchr(mail_from, '<')) || NULL == (pend = strchr(pstart, '>')))
+	{
+		zbx_snprintf_alloc(path, &size, &offset, "<%s>", mail_from);
+		if (NULL == pstart)
+			zabbix_log(LOG_LEVEL_WARNING, "Possibly invalid SMTP email set in "
+					"Administration/Media types/Email: %s", mail_from);
+	}
+	else
+		zbx_strncpy_alloc(path, &size, &offset, pstart, pend - pstart + 1);
+}
+
 int	send_email(const char *smtp_server, const char *smtp_helo, const char *smtp_email, const char *mailto,
 		const char *mailsubject, const char *mailbody, char *error, int max_error_len)
 {
@@ -140,7 +158,7 @@ int	send_email(const char *smtp_server, const char *smtp_helo, const char *smtp_
 	int		err, ret = FAIL;
 	char		cmd[MAX_STRING_LEN], *cmdp = NULL;
 	char		*tmp = NULL, *base64 = NULL, *base64_lf;
-	char		*localsubject = NULL, *localbody = NULL;
+	char		*localsubject = NULL, *localbody = NULL, *return_path = NULL;
 
 	char		str_time[MAX_STRING_LEN];
 	struct tm	*local_time = NULL;
@@ -202,7 +220,10 @@ int	send_email(const char *smtp_server, const char *smtp_helo, const char *smtp_
 
 	/* send MAIL FROM */
 
-	zbx_snprintf(cmd, sizeof(cmd), "MAIL FROM: <%s>\r\n", smtp_email);
+	smtp_prepare_return_path(&return_path, smtp_email);
+	zbx_snprintf(cmd, sizeof(cmd), "MAIL FROM: %s\r\n", return_path);
+	zbx_free(return_path);
+
 	if (-1 == write(s.socket, cmd, strlen(cmd)))
 	{
 		zbx_snprintf(error, max_error_len, "error sending MAIL FROM to mailserver: %s", zbx_strerror(errno));
@@ -357,7 +378,7 @@ out:
 	zbx_tcp_close(&s);
 close:
 	if ('\0' != *error)
-		zabbix_log(LOG_LEVEL_DEBUG, "%s", error);
+		zabbix_log(LOG_LEVEL_WARNING, "%s", error);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
