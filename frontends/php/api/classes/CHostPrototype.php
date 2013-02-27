@@ -136,7 +136,7 @@ class CHostPrototype extends CZBXAPI {
 		$this->checkTemplatePermissions(zbx_objectValues($templates, 'templateid'));
 
 		$this->checkDuplicates($hostPrototypes, 'host', _('Host prototype "%1$s" already exists.'));
-		$this->checkHostPrototypesExist($hostPrototypes);
+		$this->checkExistingHostPrototypes($hostPrototypes);
 	}
 
 	/**
@@ -198,6 +198,8 @@ class CHostPrototype extends CZBXAPI {
 			}
 		}
 
+		$hostPrototypes = zbx_toHash($hostPrototypes, 'hostid');
+
 		$this->checkHostPrototypePermissions(zbx_objectValues($hostPrototypes, 'hostid'));
 
 		$hostPrototypes = $this->extendObjects($this->tableName(), $hostPrototypes, array('host'));
@@ -235,8 +237,11 @@ class CHostPrototype extends CZBXAPI {
 		}
 		$this->checkTemplatePermissions(zbx_objectValues($templates, 'templateid'));
 
+		// check for duplicates
+		$relationMap = $this->createRelationMap($hostPrototypes, 'hostid', 'parent_itemid', 'host_discovery');
+		$hostPrototypes = $relationMap->mapIdOne($hostPrototypes, 'ruleid');
 		$this->checkDuplicates($hostPrototypes, 'host', _('Host prototype "%1$s" already exists.'));
-		$this->checkHostPrototypesExist($hostPrototypes);
+		$this->checkExistingHostPrototypes($hostPrototypes);
 	}
 
 	/**
@@ -439,14 +444,44 @@ class CHostPrototype extends CZBXAPI {
 	}
 
 	/**
-	 * Checks if any of the given prototypes already exist.
+	 * Check if any item from list already exists.
+	 * If items have item ids it will check for existing item with different itemid.
 	 *
-	 * @throws APIException if at least on prototype with the same host name already exists on the LLD rule
+	 * @throw APIException
 	 *
 	 * @param array $hostPrototypes
 	 */
-	protected function checkHostPrototypesExist(array $hostPrototypes) {
-		// TODO: implement this check
+	protected function checkExistingHostPrototypes(array $hostPrototypes) {
+		$hostsByDiscoveryRuleId = array();
+		$hostIds = array();
+		foreach ($hostPrototypes as $hostPrototype) {
+			$hostsByDiscoveryRuleId[$hostPrototype['ruleid']][] = $hostPrototype['host'];
+
+			if (isset($hostPrototype['hostid'])) {
+				$hostIds[] = $hostPrototype['hostid'];
+			}
+		}
+
+		$sqlWhere = array();
+		foreach ($hostsByDiscoveryRuleId as $discoveryRuleId => $hosts) {
+			$sqlWhere[] = '(hd.parent_itemid='.$discoveryRuleId.' AND '.dbConditionString('h.host', $hosts).')';
+		}
+
+		if ($sqlWhere) {
+			$sql = 'SELECT i.name,h.host'.
+				' FROM hosts h,host_discovery hd,items i'.
+				' WHERE h.hostid=hd.hostid AND hd.parent_itemid=i.itemid AND ('.implode(' OR ', $sqlWhere).')';
+
+			// if we update existing items we need to exclude them from result.
+			if ($hostIds) {
+				$sql .= ' AND '.dbConditionInt('h.hostid', $hostIds, true);
+			}
+			$query = DBselect($sql, 1);
+			while ($row = DBfetch($query)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Host prototype "%1$s" already exists in discovery rule "%2$s".', $row['host'], $row['name']));
+			}
+		}
 	}
 
 	protected function applyQueryFilterOptions($tableName, $tableAlias, array $options, array $sqlParts) {

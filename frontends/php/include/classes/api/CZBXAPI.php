@@ -775,7 +775,7 @@ class CZBXAPI {
 	 * @return void
 	 */
 	protected function checkDuplicates(array $objects, $uniqueField, $error) {
-		if ($duplicate = CArrayHelper::findDuplicate($objects, $uniqueField)) {
+		if ($duplicate = CArrayHelper::findDuplicate($objects, $uniqueField, 'ruleid')) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _s($error, $duplicate[$uniqueField]));
 		}
 	}
