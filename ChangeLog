@@ -41,6 +41,8 @@ A.F.I...S. [ZBXNEXT-1186] increased length to 2048 characters of expression fiel
 ..F....... [ZBX-5127] regular expressions form redesign (Vedmak)
 
 Bug fixes:
+..F....... [ZBX-3357] fixed confusing naming and coloring in Monitoring > Overview hint popup (Toms)
+..F....... [ZBX-3357] fixed incorrect blinking colors in non default themes (Toms)
 A......... [ZBX-5990] fixed permission check in graphs and triggers and fixed host full clone (Oleg, Toms)
 A......... [ZBX-5972] fixed template items, LLD rules, item prototypes and applications being inherited incorrectly when changing their name and an object with the same already exists on a linked host (Pavels)
 ........S. [ZBX-6221] added failure response to proxy config/heartbeat requests with not matching hostname (wiper)
