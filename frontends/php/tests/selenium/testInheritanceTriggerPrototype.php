@@ -257,7 +257,7 @@ class testInheritanceTriggerPrototype extends CWebTest {
 					'hostCheck' => true,
 					'dbCheck' => true)
 			),
-/*			array(
+			array(
 				array('expected' => TRIGGER_GOOD,
 					'description' => 'triggerName',
 					'hostCheck' => true)
@@ -284,7 +284,7 @@ class testInheritanceTriggerPrototype extends CWebTest {
 						'ERROR: Cannot add trigger',
 						'Trigger "triggerSimple" already exists on "Inheritance test template".')
 				)
-			)*/
+			)
 		);
 	}
 
@@ -294,36 +294,32 @@ class testInheritanceTriggerPrototype extends CWebTest {
 	public function testInheritanceTriggerPrototype_simpleCreate($data) {
 		$this->zbxTestLogin('templates.php');
 
-		$template = 'Inheritance test template';
-		$host = 'Template inheritance test host';
-		$discoveryRule = 'discoveryRuleTest';
-		$discoveryKey = 'discovery-rule-test';
-		$item = 'itemDiscovery';
-		$itemKey = 'item-discovery-prototype';
-
 		$description = $data['description'];
 		$expression = '{'.$this->template.':'.$this->itemKey.'.last(0)}=0';
-		$expressionHost = '{'.$host.':'.$itemKey.'.last(0)}=0';
+		$expressionHost = '{'.$this->host.':'.$this->itemKey.'.last(0)}=0';
 
-		$this->zbxTestOpen('templates.php');
-		$this->zbxTestClickWait("link=$template");
-		$this->zbxTestClickWait("//div[@class='w']//a[text()='Triggers']");
+		$this->zbxTestLogin('templates.php');
+		$this->zbxTestClickWait('link='.$this->template);
+		$this->zbxTestClickWait('link=Discovery rules');
+		$this->zbxTestClickWait('link='.$this->discoveryRule);
+		$this->zbxTestClickWait('link=Trigger prototypes');
 		$this->zbxTestClickWait('form');
+
 
 		$this->input_type('description', $description);
 		$this->input_type('expression', $expression);
 		$this->zbxTestClickWait('save');
 
-/*		switch ($data['expected']) {
+		switch ($data['expected']) {
 			case TRIGGER_GOOD:
 				$this->zbxTestTextPresent('Trigger added');
-				$this->checkTitle('Configuration of triggers');
-				$this->zbxTestTextPresent('CONFIGURATION OF TRIGGERS');
+				$this->checkTitle('Configuration of trigger prototypes');
+				$this->zbxTestTextPresent(array('CONFIGURATION OF TRIGGER PROTOTYPES', "Trigger prototypes of ".$this->discoveryRule));
 				break;
 
 			case TRIGGER_BAD:
-				$this->checkTitle('Configuration of triggers');
-				$this->zbxTestTextPresent('CONFIGURATION OF TRIGGERS');
+				$this->checkTitle('Configuration of trigger prototypes');
+				$this->zbxTestTextPresent(array('CONFIGURATION OF TRIGGER PROTOTYPES', 'Trigger prototype'));
 				foreach ($data['errors'] as $msg) {
 					$this->zbxTestTextPresent($msg);
 				}
@@ -331,13 +327,19 @@ class testInheritanceTriggerPrototype extends CWebTest {
 				break;
 		}
 
+
 		if (isset($data['hostCheck'])) {
 			$this->zbxTestOpenWait('hosts.php');
-			$this->zbxTestClickWait("link=$host");
-			$this->zbxTestClickWait("//div[@class='w']//a[text()='Triggers']");
+			$this->zbxTestClickWait('link='.$this->host);
+			$this->zbxTestClickWait("link=Discovery rules");
+			$this->zbxTestClickWait('link='.$this->discoveryRule);
+			$this->zbxTestClickWait("link=Trigger prototypes");
 
-			$this->zbxTestTextPresent("$template: $description");
+			$this->zbxTestTextPresent($this->template.": $description");
 			$this->zbxTestClickWait("link=$description");
+
+			$this->zbxTestTextPresent('Parent triggers');
+			$this->assertElementPresent('link='.$this->template);
 			$this->assertElementValue('description', $description);
 			$this->assertElementValue('expression', $expressionHost);
 		}
@@ -366,9 +368,11 @@ class testInheritanceTriggerPrototype extends CWebTest {
 				$triggerId = $row['triggerid'];
 			}
 
-			$this->zbxTestOpen('hosts.php');
-			$this->zbxTestClickWait("link=$host");
-			$this->zbxTestClickWait("//div[@class='w']//a[text()='Triggers']");
+			$this->zbxTestOpenWait('hosts.php');
+			$this->zbxTestClickWait('link='.$this->host);
+			$this->zbxTestClickWait("link=Discovery rules");
+			$this->zbxTestClickWait('link='.$this->discoveryRule);
+			$this->zbxTestClickWait("link=Trigger prototypes");
 
 			$this->zbxTestCheckboxSelect("g_triggerid_$triggerId");
 			$this->zbxTestDropdownSelect('go', 'Delete selected');
@@ -384,9 +388,12 @@ class testInheritanceTriggerPrototype extends CWebTest {
 			while ($row = DBfetch($result)) {
 				$triggerId = $row['triggerid'];
 			}
-			$this->zbxTestOpen('templates.php');
-			$this->zbxTestClickWait("link=$template");
-			$this->zbxTestClickWait("//div[@class='w']//a[text()='Triggers']");
+
+			$this->zbxTestOpenWait('templates.php');
+			$this->zbxTestClickWait('link='.$this->template);
+			$this->zbxTestClickWait("link=Discovery rules");
+			$this->zbxTestClickWait('link='.$this->discoveryRule);
+			$this->zbxTestClickWait("link=Trigger prototypes");
 
 			$this->zbxTestCheckboxSelect("g_triggerid_$triggerId");
 			$this->zbxTestDropdownSelect('go', 'Delete selected');
@@ -395,8 +402,8 @@ class testInheritanceTriggerPrototype extends CWebTest {
 			$this->getConfirmation();
 			$this->wait();
 			$this->zbxTestTextPresent('Triggers deleted');
-			$this->zbxTestTextNotPresent("$template: $description");
-		}*/
+			$this->zbxTestTextNotPresent($this->template.": $description");
+		}
 	}
 
 	/**
