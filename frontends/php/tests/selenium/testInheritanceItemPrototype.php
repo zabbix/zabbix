@@ -857,7 +857,6 @@ class testInheritanceItemPrototype extends CWebTest {
 
 			$this->zbxTestOpenWait('hosts.php');
 			$this->zbxTestClickWait('link='.$this->host);
-			$this->zbxTestClickWait('link='.$this->host);
 			$this->zbxTestClickWait("link=Discovery rules");
 			$this->zbxTestClickWait('link='.$this->discoveryRule);
 			$this->zbxTestClickWait("link=Item prototypes");
