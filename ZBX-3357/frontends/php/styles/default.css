@@ -325,7 +325,7 @@ div.hintbox {
 	-webkit-border-radius: 2px;
 	border-radius: 2px;
 }
-.overview-mon-severities { height: 100%; width: 100%;  }
+.overview-mon-severities { height: 100%; width: 100%; }
 
 /* node tree */
 div #div_node_tree {

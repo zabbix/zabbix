@@ -1363,7 +1363,8 @@ function get_trigger_overview_cells($triggerHosts, $hostName, $screenId = null) 
 		$tableColumn->setAttribute('style', $style);
 	}
 
-	if (isset($triggerHosts[$hostName]) && $config['blink_period'] > 0 && time() - $triggerHosts[$hostName]['lastchange'] < $config['blink_period']) {
+	if (isset($triggerHosts[$hostName]) && $config['blink_period'] > 0
+		&& time() - $triggerHosts[$hostName]['lastchange'] < $config['blink_period']) {
 		$tableColumn->addClass('blink');
 		$tableColumn->setAttribute('data-toggle-class', $css_class);
 	}
