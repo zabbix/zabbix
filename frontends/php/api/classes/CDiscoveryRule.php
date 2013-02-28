@@ -918,7 +918,7 @@ class CDiscoveryRule extends CItemGeneral {
 		}
 
 		// save graphs
-		$rs = API::Graph()->create($dstGraphs);
+		$rs = API::GraphPrototype()->create($dstGraphs);
 		if (!$rs) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot clone graph prototypes.'));
 		}
