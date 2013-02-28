@@ -1238,11 +1238,6 @@ function get_trigger_overview_cells($triggerHosts, $hostName, $screenId = null) 
 		}
 		$style = 'cursor: pointer; ';
 
-		// set blinking gif as background if trigger age is less then $config['blink_period']
-		if ($config['blink_period'] > 0 && time() - $triggerHosts[$hostName]['lastchange'] < $config['blink_period']) {
-			$style .= 'background-image: url(images/gradients/blink.gif); background-position: top left; background-repeat: repeat;';
-		}
-
 		unset($item_menu);
 		$tr_ov_menu = array(
 			// name, url, (target [tw], statusbar [sb]), css, submenu
@@ -1363,8 +1358,15 @@ function get_trigger_overview_cells($triggerHosts, $hostName, $screenId = null) 
 	else {
 		$tableColumn = new CCol(SPACE, $css_class.' hosts');
 	}
+
 	if (isset($style)) {
 		$tableColumn->setAttribute('style', $style);
+	}
+
+	if (isset($triggerHosts[$hostName]) && $config['blink_period'] > 0
+		&& time() - $triggerHosts[$hostName]['lastchange'] < $config['blink_period']) {
+		$tableColumn->addClass('blink');
+		$tableColumn->setAttribute('data-toggle-class', $css_class);
 	}
 
 	if (isset($tr_ov_menu)) {
