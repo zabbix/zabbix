@@ -29,6 +29,28 @@ define('ITEM_BAD', 1);
 class testInheritanceItemPrototype extends CWebTest {
 
 	/**
+	 * The name of the test template created in the test data set.
+	 *
+	 * @var string
+	 */
+	protected $template = 'Inheritance test template';
+
+	/**
+	 * The name of the test host created in the test data set.
+	 *
+	 * @var string
+	 */
+	protected $host = 'Template inheritance test host';
+
+	/**
+	 * The name of the test discovery rule created in the test data set.
+	 *
+	 * @var string
+	 */
+	protected $discoveryRule = 'discoveryRuleTest';
+
+
+	/**
 	 * Backup the tables that will be modified during the tests.
 	 */
 	public function testInheritanceItemPrototype_setup() {
@@ -199,17 +221,13 @@ class testInheritanceItemPrototype extends CWebTest {
 	public function testFormItem_CheckLayout($data) {
 		$this->zbxTestLogin('templates.php');
 
-		$template = 'Inheritance test template';
-		$host = 'Template inheritance test host';
-		$discoveryRule = 'discoveryRuleTest';
-
-		$this->zbxTestClickWait("link=$template");
+		$this->zbxTestClickWait('link='.$this->template);
 		$this->zbxTestClickWait("link=Discovery rules");
-		$this->zbxTestClickWait("link=$discoveryRule");
+		$this->zbxTestClickWait('link='.$this->discoveryRule);
 		$this->zbxTestClickWait("link=Item prototypes");
 
 		$this->checkTitle('Configuration of item prototypes');
-		$this->zbxTestTextPresent(array('CONFIGURATION OF ITEM PROTOTYPES', "Item prototypes of $discoveryRule"));
+		$this->zbxTestTextPresent(array('CONFIGURATION OF ITEM PROTOTYPES', "Item prototypes of ".$this->discoveryRule));
 
 		$this->zbxTestClickWait('form');
 		$this->checkTitle('Configuration of item prototypes');
@@ -713,6 +731,8 @@ class testInheritanceItemPrototype extends CWebTest {
 		$this->assertAttribute("//input[@id='status']/@checked", 'checked');
 	}
 
+
+	// returns data for simple create
 	public static function simple() {
 		return array(
 			array(
@@ -763,16 +783,12 @@ class testInheritanceItemPrototype extends CWebTest {
 	public function testInheritanceItemPrototype_simpleCreate($data) {
 		$this->zbxTestLogin('templates.php');
 
-		$template = 'Inheritance test template';
-		$host = 'Template inheritance test host';
-		$discoveryRule = 'discoveryRuleTest';
-
 		$itemName = $data['item'];
 		$keyName = $data['key'];
 
-		$this->zbxTestClickWait("link=$template");
+		$this->zbxTestClickWait('link='.$this->template);
 		$this->zbxTestClickWait("link=Discovery rules");
-		$this->zbxTestClickWait("link=$discoveryRule");
+		$this->zbxTestClickWait('link='.$this->discoveryRule);
 		$this->zbxTestClickWait("link=Item prototypes");
 		$this->zbxTestClickWait('form');
 
@@ -784,7 +800,7 @@ class testInheritanceItemPrototype extends CWebTest {
 			case ITEM_GOOD:
 				$this->zbxTestTextPresent('Item added');
 				$this->checkTitle('Configuration of item prototypes');
-				$this->zbxTestTextPresent(array('CONFIGURATION OF ITEM PROTOTYPES', "Item prototypes of $discoveryRule"));
+				$this->zbxTestTextPresent(array('CONFIGURATION OF ITEM PROTOTYPES', "Item prototypes of ".$this->discoveryRule));
 				break;
 
 			case ITEM_BAD:
@@ -799,16 +815,16 @@ class testInheritanceItemPrototype extends CWebTest {
 
 		if (isset($data['hostCheck'])) {
 			$this->zbxTestOpenWait('hosts.php');
-			$this->zbxTestClickWait("link=$host");
+			$this->zbxTestClickWait('link='.$this->host);
 			$this->zbxTestClickWait("link=Discovery rules");
-			$this->zbxTestClickWait("link=$discoveryRule");
+			$this->zbxTestClickWait('link='.$this->discoveryRule);
 			$this->zbxTestClickWait("link=Item prototypes");
 
-			$this->zbxTestTextPresent("$template: $itemName");
+			$this->zbxTestTextPresent($this->template.": $itemName");
 			$this->zbxTestClickWait("link=$itemName");
 
 			$this->zbxTestTextPresent('Parent items');
-			$this->assertElementPresent("link=$template");
+			$this->assertElementPresent('link='.$this->template);
 			$this->assertElementValue('name', $itemName);
 			$this->assertElementValue('key', $keyName);
 		}
@@ -840,10 +856,10 @@ class testInheritanceItemPrototype extends CWebTest {
 			}
 
 			$this->zbxTestOpenWait('hosts.php');
-			$this->zbxTestClickWait("link=$host");
-			$this->zbxTestClickWait("link=$host");
+			$this->zbxTestClickWait('link='.$this->host);
+			$this->zbxTestClickWait('link='.$this->host);
 			$this->zbxTestClickWait("link=Discovery rules");
-			$this->zbxTestClickWait("link=$discoveryRule");
+			$this->zbxTestClickWait('link='.$this->discoveryRule);
 			$this->zbxTestClickWait("link=Item prototypes");
 
 			$this->zbxTestCheckboxSelect("group_itemid_$itemId");
@@ -862,9 +878,9 @@ class testInheritanceItemPrototype extends CWebTest {
 			}
 
 			$this->zbxTestOpenWait('templates.php');
-			$this->zbxTestClickWait("link=$template");
+			$this->zbxTestClickWait('link='.$this->template);
 			$this->zbxTestClickWait("link=Discovery rules");
-			$this->zbxTestClickWait("link=$discoveryRule");
+			$this->zbxTestClickWait('link='.$this->discoveryRule);
 			$this->zbxTestClickWait("link=Item prototypes");
 
 			$this->zbxTestCheckboxSelect("group_itemid_$itemId");
@@ -874,7 +890,7 @@ class testInheritanceItemPrototype extends CWebTest {
 			$this->getConfirmation();
 			$this->wait();
 			$this->zbxTestTextPresent('Items deleted');
-			$this->zbxTestTextNotPresent("$template: $itemName");
+			$this->zbxTestTextNotPresent($this->template.': $itemName');
 		}
 	}
 
