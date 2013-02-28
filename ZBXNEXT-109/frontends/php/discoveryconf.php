@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2012 Zabbix SIA
+** Copyright (C) 2000-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -95,8 +95,9 @@ if (isset($_REQUEST['output']) && $_REQUEST['output'] == 'ajax') {
 	$ajaxResponse = new AjaxResponse;
 
 	if (isset($_REQUEST['ajaxaction']) && $_REQUEST['ajaxaction'] == 'validate') {
-		$ajaxdata = get_request('ajaxdata', array());
-		foreach ($ajaxdata as $check) {
+		$ajaxData = get_request('ajaxdata', array());
+
+		foreach ($ajaxData as $check) {
 			switch ($check['field']) {
 				case 'port':
 					if (!validate_port_list($check['value'])) {
@@ -105,6 +106,7 @@ if (isset($_REQUEST['output']) && $_REQUEST['output'] == 'ajax') {
 					break;
 				case 'itemKey':
 					$itemKey = new CItemKey($check['value']);
+
 					if (!$itemKey->isValid()) {
 						$ajaxResponse->error(_s('Incorrect key: "%1$s".', $itemKey->getError()));
 					}
@@ -112,6 +114,7 @@ if (isset($_REQUEST['output']) && $_REQUEST['output'] == 'ajax') {
 			}
 		}
 	}
+
 	$ajaxResponse->send();
 
 	require_once dirname(__FILE__).'/include/page_footer.php';
@@ -124,8 +127,9 @@ if (isset($_REQUEST['output']) && $_REQUEST['output'] == 'ajax') {
 if (isset($_REQUEST['save'])) {
 	$dChecks = get_request('dchecks', array());
 	$uniq = get_request('uniqueness_criteria', 0);
-	foreach($dChecks as $dcnum => $check){
-		$dChecks[$dcnum]['uniq'] = $uniq == $dcnum ? 1 : 0;
+
+	foreach ($dChecks as $dcnum => $check) {
+		$dChecks[$dcnum]['uniq'] = ($uniq == $dcnum) ? 1 : 0;
 	}
 
 	$discoveryRule = array(
@@ -150,6 +154,7 @@ if (isset($_REQUEST['save'])) {
 		$msg_ok = _('Discovery rule created');
 		$msg_fail = _('Cannot create discovery rule');
 	}
+
 	show_messages($result, $msg_ok, $msg_fail);
 
 	if ($result) {
@@ -179,6 +184,7 @@ elseif (str_in_array($_REQUEST['go'], array('activate', 'disable')) && isset($_R
 			$go_result = true;
 		}
 	}
+
 	show_messages($go_result, _('Discovery rules updated'));
 }
 elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['g_druleid'])) {
@@ -189,6 +195,7 @@ elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['g_druleid'])) {
 			$go_result = true;
 		}
 	}
+
 	show_messages($go_result, _('Discovery rules deleted'));
 }
 
