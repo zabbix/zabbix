@@ -17,8 +17,7 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
 require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
 class testFormUserProfile extends CWebTest {
@@ -27,23 +26,21 @@ class testFormUserProfile extends CWebTest {
 		$sqlHashUsers = 'select * from users order by userid';
 		$oldHashUsers = DBhash($sqlHashUsers);
 
-		$this->login('profile.php');
+		$this->zbxTestLogin('profile.php');
 
 		$this->checkTitle('User profile');
 
-		$this->button_click('save');
-		$this->wait();
-		$this->ok('Copyright');
+		$this->zbxTestClickWait('save');
+		$this->zbxTestTextPresent('Copyright');
 
 		$this->assertEquals($oldHashUsers, DBhash($sqlHashUsers));
 	}
 
 	public function testFormProfile_Cancel() {
-		$this->login('profile.php');
+		$this->zbxTestLogin('profile.php');
 
-		$this->button_click('save');
-		$this->wait();
-		$this->ok('Copyright');
+		$this->zbxTestClickWait('save');
+		$this->zbxTestTextPresent('Copyright');
 	}
 
 	public function testFormProfile_PasswordChange() {
@@ -52,16 +49,14 @@ class testFormUserProfile extends CWebTest {
 		$sqlHashUsers = 'select * from users where alias<>'.zbx_dbstr(PHPUNIT_LOGIN_NAME).' order by userid';
 		$oldHashUsers = DBhash($sqlHashUsers);
 
-		$this->login('profile.php');
+		$this->zbxTestLogin('profile.php');
 
-		$this->button_click('change_password');
-		$this->wait();
+		$this->zbxTestClickWait('change_password');
 		$this->input_type('password1', $pwd);
 		$this->input_type('password2', $pwd);
 
-		$this->button_click('save');
-		$this->wait();
-		$this->ok('Copyright');
+		$this->zbxTestClickWait('save');
+		$this->zbxTestTextPresent('Copyright');
 
 		$row = DBfetch(DBselect('select passwd from users where alias='.zbx_dbstr(PHPUNIT_LOGIN_NAME)));
 		$this->assertEquals(md5($pwd), $row['passwd']);
@@ -69,16 +64,14 @@ class testFormUserProfile extends CWebTest {
 		$this->assertEquals($oldHashUsers, DBhash($sqlHashUsers));
 
 		/* set default password */
-		$this->open('profile.php');
+		$this->zbxTestOpen('profile.php');
 
-		$this->button_click('change_password');
-		$this->wait();
+		$this->zbxTestClickWait('change_password');
 		$this->input_type('password1', PHPUNIT_LOGIN_PWD);
 		$this->input_type('password2', PHPUNIT_LOGIN_PWD);
 
-		$this->button_click('save');
-		$this->wait();
-		$this->ok('Copyright');
+		$this->zbxTestClickWait('save');
+		$this->zbxTestTextPresent('Copyright');
 
 		$this->assertEquals($oldHashUsers, DBhash($sqlHashUsers));
 	}
@@ -87,16 +80,14 @@ class testFormUserProfile extends CWebTest {
 		$sqlHashUsers = 'select * from users order by userid';
 		$oldHashUsers = DBhash($sqlHashUsers);
 
-		$this->login('profile.php');
+		$this->zbxTestLogin('profile.php');
 
-		$this->button_click('change_password');
-		$this->wait();
+		$this->zbxTestClickWait('change_password');
 		$this->input_type('password1', '');
 		$this->input_type('password2', '');
 
-		$this->button_click('save');
-		$this->wait();
-		$this->ok('ERROR: Password should not be empty');
+		$this->zbxTestClickWait('save');
+		$this->zbxTestTextPresent('ERROR: Password should not be empty');
 		$this->checkTitle('User profile');
 
 		$this->assertEquals($oldHashUsers, DBhash($sqlHashUsers));
@@ -106,16 +97,14 @@ class testFormUserProfile extends CWebTest {
 		$sqlHashUsers = 'select * from users order by userid';
 		$oldHashUsers = DBhash($sqlHashUsers);
 
-		$this->login('profile.php');
+		$this->zbxTestLogin('profile.php');
 
-		$this->button_click('change_password');
-		$this->wait();
+		$this->zbxTestClickWait('change_password');
 		$this->input_type('password1', 'abc');
 		$this->input_type('password2', 'def');
 
-		$this->button_click('save');
-		$this->wait();
-		$this->ok('ERROR: Cannot update user. Both passwords must be equal.');
+		$this->zbxTestClickWait('save');
+		$this->zbxTestTextPresent('ERROR: Cannot update user. Both passwords must be equal.');
 		$this->checkTitle('User profile');
 
 		$this->assertEquals($oldHashUsers, DBhash($sqlHashUsers));
@@ -125,12 +114,11 @@ class testFormUserProfile extends CWebTest {
 		$sqlHashUsers = 'select * from users where alias<>'.zbx_dbstr(PHPUNIT_LOGIN_NAME).' order by userid';
 		$oldHashUsers = DBhash($sqlHashUsers);
 
-		$this->login('profile.php');
+		$this->zbxTestLogin('profile.php');
 
-		$this->dropdown_select('theme', 'Original blue');
-		$this->button_click('save');
-		$this->wait();
-		$this->ok('Copyright');
+		$this->zbxTestDropdownSelect('theme', 'Original blue');
+		$this->zbxTestClickWait('save');
+		$this->zbxTestTextPresent('Copyright');
 
 		$row = DBfetch(DBselect('select theme from users where alias='.zbx_dbstr(PHPUNIT_LOGIN_NAME)));
 		$this->assertEquals('originalblue', $row['theme']);
@@ -142,24 +130,23 @@ class testFormUserProfile extends CWebTest {
 // TODO
 		$this->markTestIncomplete();
 /*
-		$this->login('profile.php');
+		$this->zbxTestLogin('profile.php');
 		$this->click('messages[enabled]');
 		// we wait for the first element after messaging checkbox to appear
 		$this->waitForVisible('timeout_row');
 		// and then check that the remaining elements are there as well
-		$this->ok('Play sound');
-		$this->ok('Trigger severity');
-		$this->ok('Recovery');
-		$this->ok('Not classified');
-		$this->ok('Information');
-		$this->ok('Warning');
-		$this->ok('Average');
-		$this->ok('High');
-		$this->ok('Disaster');
+		$this->zbxTestTextPresent('Play sound');
+		$this->zbxTestTextPresent('Trigger severity');
+		$this->zbxTestTextPresent('Recovery');
+		$this->zbxTestTextPresent('Not classified');
+		$this->zbxTestTextPresent('Information');
+		$this->zbxTestTextPresent('Warning');
+		$this->zbxTestTextPresent('Average');
+		$this->zbxTestTextPresent('High');
+		$this->zbxTestTextPresent('Disaster');
 		// should also save profile & revisit to check that it's still the same
 		// probably also should check in the db saved data
 		// and maybe individually toggle priority checkboxes and check in the db...
 */
 	}
 }
-?>

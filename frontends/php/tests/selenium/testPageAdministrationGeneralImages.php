@@ -17,8 +17,6 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
 require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
 class testPageAdministrationGeneralImages extends CWebTest {
@@ -36,15 +34,15 @@ class testPageAdministrationGeneralImages extends CWebTest {
 	*/
 	public function testPageAdministrationGeneralImages_CheckLayoutIcons($icon_name) {
 
-		$this->login('adm.images.php');
+		$this->zbxTestLogin('adm.images.php');
 		$this->assertElementPresent('configDropDown');
 		$this->assertElementPresent('form');
 		$this->checkTitle('Configuration of images');
-		$this->ok(array('CONFIGURATION OF IMAGES', 'Images', 'Type'));
+		$this->zbxTestTextPresent(array('CONFIGURATION OF IMAGES', 'Images', 'Type'));
 		$this->assertElementPresent('imagetype');
 		$this->assertElementPresent("//select[@id='imagetype']/option[text()='Icon']");
 		$this->assertElementPresent("//select[@id='imagetype']/option[text()='Background']");
-		$this->ok(array($icon_name['name']));
+		$this->zbxTestTextPresent(array($icon_name['name']));
 	}
 
 	/**
@@ -55,15 +53,15 @@ class testPageAdministrationGeneralImages extends CWebTest {
 		$BgImagesCount = DBdata('SELECT count(name) FROM images WHERE imagetype=2 ORDER BY imageid');
 
 		if ($BgImagesCount==0) {
-				$this->ok(array('No images defined.'));
+				$this->zbxTestTextPresent(array('No images defined.'));
 		}
 		else {
-				$this->login('adm.images.php');
+				$this->zbxTestLogin('adm.images.php');
 				$this->assertElementPresent('configDropDown');
-				$this->dropdown_select_wait('imagetype', 'Background');
+				$this->zbxTestDropdownSelectWait('imagetype', 'Background');
 				$this->assertElementPresent('form');
 				$this->checkTitle('Configuration of Zabbix');
-				$this->ok(array('CONFIGURATION OF IMAGES', 'Images', 'Type'));
+				$this->zbxTestTextPresent(array('CONFIGURATION OF IMAGES', 'Images', 'Type'));
 				$this->assertElementPresent('imagetype');
 				$this->assertElementPresent("//select[@id='imagetype']/option[text()='Icon']");
 				$this->assertElementPresent("//select[@id='imagetype']/option[text()='Background']");
@@ -79,18 +77,16 @@ class testPageAdministrationGeneralImages extends CWebTest {
 		$sqlIconImages = 'SELECT * FROM images WHERE imagetype=1 ORDER BY imageid limit 5';
 		$oldHashIconImages=DBhash($sqlIconImages);
 
-		$this->login('adm.images.php');
+		$this->zbxTestLogin('adm.images.php');
 		$this->assertElementPresent('form');
-		$this->dropdown_select_wait('imagetype', 'Icon');
-		$this->click('link='.$icon_name['name']);
-		$this->wait();
-		$this->ok(array('Name', 'Type', 'Upload', 'Image'));
+		$this->zbxTestDropdownSelectWait('imagetype', 'Icon');
+		$this->zbxTestClickWait('link='.$icon_name['name']);
+		$this->zbxTestTextPresent(array('Name', 'Type', 'Upload', 'Image'));
 		$this->assertElementPresent('save');
 		$this->assertElementPresent('delete');
 		$this->assertElementPresent('cancel');
-		$this->button_click('save');
-		$this->wait();
-		$this->ok('Image updated');
+		$this->zbxTestClickWait('save');
+		$this->zbxTestTextPresent('Image updated');
 
 		$newHashIconImages = DBhash($sqlIconImages);
 		$this->assertEquals($oldHashIconImages, $newHashIconImages, "Chuck Norris: no-change icon image update should not update data in table 'images'");
@@ -104,21 +100,18 @@ class testPageAdministrationGeneralImages extends CWebTest {
 		$sqlBgImages = 'SELECT * FROM images WHERE imagetype=2 ORDER BY imageid limit 5';
 		$oldHashBgImages=DBhash($sqlBgImages);
 
-		$this->login('adm.images.php');
+		$this->zbxTestLogin('adm.images.php');
 		$this->assertElementPresent('form');
-		$this->dropdown_select_wait('imagetype', 'Background');
-		$this->click('link='.$bgimage_name['name']);
-		$this->wait();
-		$this->ok(array('Name', 'Type', 'Upload', 'Image'));
+		$this->zbxTestDropdownSelectWait('imagetype', 'Background');
+		$this->zbxTestClickWait('link='.$bgimage_name['name']);
+		$this->zbxTestTextPresent(array('Name', 'Type', 'Upload', 'Image'));
 		$this->assertElementPresent('save');
 		$this->assertElementPresent('delete');
 		$this->assertElementPresent('cancel');
-		$this->button_click('save');
-		$this->wait();
-		$this->ok('Image updated');
+		$this->zbxTestClickWait('save');
+		$this->zbxTestTextPresent('Image updated');
 
 		$newHashBgImages = DBhash($sqlBgImages);
 		$this->assertEquals($oldHashBgImages, $newHashBgImages, "Chuck Norris: no-change background image update should not update data in table 'images'");
 	}
 }
-?>

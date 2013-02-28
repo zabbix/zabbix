@@ -87,7 +87,7 @@ check_fields($fields);
 	);
 	$groups = API::HostGroup()->get($options);
 	foreach($groups as $gnum => $row){
-		$groups[$gnum]['nodename'] = get_node_name_by_elid($row['groupid'], true, ':').$row['name'];
+		$groups[$gnum]['nodename'] = get_node_name_by_elid($row['groupid'], true, NAME_DELIMITER).$row['name'];
 		if($nodeid == 0) $groups[$gnum]['name'] = $groups[$gnum]['nodename'];
 	}
 

@@ -17,8 +17,7 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
 require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
 class testFormScreen extends CWebTest {
@@ -27,13 +26,10 @@ class testFormScreen extends CWebTest {
 	public function testFormScreen_Create() {
 		$this->chooseOkOnNextConfirmation();
 
-		$this->login('screenconf.php');
-		$this->button_click('form');
-		$this->wait();
+		$this->zbxTestLogin('screenconf.php');
+		$this->zbxTestClickWait('form');
 		$this->input_type('name', $this->testscreen);
-		$this->button_click('save');
-		$this->wait();
-		$this->ok('Screen added');
+		$this->zbxTestClickWait('save');
+		$this->zbxTestTextPresent('Screen added');
 	}
 }
-?>

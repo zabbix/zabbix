@@ -17,8 +17,7 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
 require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
 class testPageHosts extends CWebTest {
@@ -32,20 +31,19 @@ class testPageHosts extends CWebTest {
 	* @dataProvider allHosts
 	*/
 	public function testPageHosts_CheckLayout($host) {
-		$this->login('hosts.php');
-		$this->dropdown_select_wait('groupid', 'Zabbix servers');
+		$this->zbxTestLogin('hosts.php');
+		$this->zbxTestDropdownSelectWait('groupid', 'Zabbix servers');
 		$this->checkTitle('Hosts');
-		$this->ok('HOSTS');
-		$this->ok('Displaying');
-		// Header
-		$this->ok(array('Name', 'Applications', 'Items', 'Triggers', 'Graphs', 'Discovery', 'Interface', 'Templates', 'Status', 'Availability'));
-		// Data
-		$this->ok(array($host['name']));
-		$this->dropdown_select('go', 'Export selected');
-		$this->dropdown_select('go', 'Mass update');
-		$this->dropdown_select('go', 'Activate selected');
-		$this->dropdown_select('go', 'Disable selected');
-		$this->dropdown_select('go', 'Delete selected');
+		$this->zbxTestTextPresent('HOSTS');
+		$this->zbxTestTextPresent('Displaying');
+
+		// header
+		$this->zbxTestTextPresent(array('Name', 'Applications', 'Items', 'Triggers', 'Graphs', 'Discovery', 'Interface', 'Templates', 'Status', 'Availability'));
+
+		// data
+		$this->zbxTestTextPresent(array($host['name']));
+		$this->zbxTestDropdownHasOptions('go',
+				array('Export selected', 'Mass update', 'Activate selected', 'Disable selected', 'Delete selected'));
 	}
 
 	/**
@@ -75,21 +73,19 @@ class testPageHosts extends CWebTest {
 		$sql9 = "select * from host_inventory where hostid=$hostid";
 		$oldHashHostinventory = DBhash($sql9);
 
-		$this->login('hosts.php');
-		$this->dropdown_select_wait('groupid', 'all');
+		$this->zbxTestLogin('hosts.php');
+		$this->zbxTestDropdownSelectWait('groupid', 'all');
 		$this->checkTitle('Hosts');
-		$this->ok('HOSTS');
-		$this->ok('Displaying');
-		$this->nok('Displaying 0');
+		$this->zbxTestTextPresent('HOSTS');
+		$this->zbxTestTextPresent('Displaying');
+		$this->zbxTestTextNotPresent('Displaying 0');
 		// Header
-		$this->ok(array('Name', 'Applications', 'Items', 'Triggers', 'Graphs', 'Discovery', 'Interface', 'Templates', 'Status', 'Availability'));
+		$this->zbxTestTextPresent(array('Name', 'Applications', 'Items', 'Triggers', 'Graphs', 'Discovery', 'Interface', 'Templates', 'Status', 'Availability'));
 
-		$this->click("link=$name");
-		$this->wait();
-		$this->button_click('save');
-		$this->wait();
+		$this->zbxTestClickWait('link='.$name);
+		$this->zbxTestClickWait('save');
 		$this->checkTitle('Hosts');
-		$this->ok('Host updated');
+		$this->zbxTestTextPresent('Host updated');
 
 		$this->assertEquals($oldHashHosts, DBhash($sql1), "Chuck Norris: Host update changed data in table 'hosts'");
 		$this->assertEquals($oldHashItems, DBhash($sql2), "Chuck Norris: Host update changed data in table 'items'");
@@ -106,51 +102,47 @@ class testPageHosts extends CWebTest {
 	* @dataProvider allHosts
 	*/
 	public function testPageHosts_FilterHost($host) {
-		$this->login('hosts.php');
-		$this->click('flicker_icon_l');
+		$this->zbxTestLogin('hosts.php');
+		$this->zbxTestClick('flicker_icon_l');
 		$this->input_type('filter_host', $host['name']);
 		$this->input_type('filter_ip', '');
 		$this->input_type('filter_port', '');
-		$this->click('filter');
-		$this->wait();
-		$this->ok($host['name']);
+		$this->zbxTestClickWait('filter');
+		$this->zbxTestTextPresent($host['name']);
 	}
 
 	// Filter returns nothing
 	public function testPageHosts_FilterNone() {
-		$this->login('hosts.php');
+		$this->zbxTestLogin('hosts.php');
 
 		// Reset filter
-		$this->click('css=span.link_menu');
+		$this->zbxTestClick('css=span.link_menu');
 
 		$this->input_type('filter_host', '1928379128ksdhksdjfh');
-		$this->click('filter');
-		$this->wait();
-		$this->ok('Displaying 0 of 0 found');
+		$this->zbxTestClickWait('filter');
+		$this->zbxTestTextPresent('Displaying 0 of 0 found');
 	}
 
 	public function testPageHosts_FilterNone1() {
-		$this->login('hosts.php');
+		$this->zbxTestLogin('hosts.php');
 
 		// Reset filter
-		$this->click('css=span.link_menu');
+		$this->zbxTestClick('css=span.link_menu');
 
 		$this->input_type('filter_host', '_');
-		$this->click('filter');
-		$this->wait();
-		$this->ok('Displaying 0 of 0 found');
+		$this->zbxTestClickWait('filter');
+		$this->zbxTestTextPresent('Displaying 0 of 0 found');
 	}
 
 	public function testPageHosts_FilterNone2() {
-		$this->login('hosts.php');
+		$this->zbxTestLogin('hosts.php');
 
 		// Reset filter
-		$this->click('css=span.link_menu');
+		$this->zbxTestClick('css=span.link_menu');
 
 		$this->input_type('filter_host', '%');
-		$this->click('filter');
-		$this->wait();
-		$this->ok('Displaying 0 of 0 found');
+		$this->zbxTestClickWait('filter');
+		$this->zbxTestTextPresent('Displaying 0 of 0 found');
 	}
 
 	// Filter reset
@@ -159,11 +151,10 @@ class testPageHosts extends CWebTest {
 	* @dataProvider allHosts
 	*/
 	public function testPageHosts_FilterReset($host) {
-		$this->login('hosts.php');
-		$this->click('css=span.link_menu');
-		$this->click('filter');
-		$this->wait();
-		$this->ok($host['name']);
+		$this->zbxTestLogin('hosts.php');
+		$this->zbxTestClick('css=span.link_menu');
+		$this->zbxTestClickWait('filter');
+		$this->zbxTestTextPresent($host['name']);
 	}
 
 	/**
@@ -172,20 +163,20 @@ class testPageHosts extends CWebTest {
 	public function testPageHosts_Items($host) {
 		$hostid=$host['hostid'];
 
-		$this->login('hosts.php');
+		$this->zbxTestLogin('hosts.php');
 		$this->checkTitle('Hosts');
-		$this->dropdown_select_wait('groupid', 'all');
+		$this->zbxTestDropdownSelectWait('groupid', 'all');
 		$this->checkTitle('Hosts');
-		$this->ok('HOSTS');
-		$this->ok('Displaying');
+		$this->zbxTestTextPresent('HOSTS');
+		$this->zbxTestTextPresent('Displaying');
 		// Go to the list of items
 		$this->href_click("items.php?filter_set=1&hostid=$hostid&sid=");
 		$this->wait();
 		// We are in the list of items
 		$this->checkTitle('Configuration of items');
-		$this->ok('Displaying');
+		$this->zbxTestTextPresent('Displaying');
 		// Header
-		$this->ok(array('Wizard', 'Name', 'Triggers', 'Key', 'Interval', 'History', 'Trends', 'Type', 'Status', 'Applications', 'Error'));
+		$this->zbxTestTextPresent(array('Wizard', 'Name', 'Triggers', 'Key', 'Interval', 'History', 'Trends', 'Type', 'Status', 'Applications', 'Error'));
 	}
 
 	public function testPageHosts_MassExportAll() {
@@ -213,18 +204,17 @@ class testPageHosts extends CWebTest {
 
 		$this->chooseOkOnNextConfirmation();
 
-		$this->login('hosts.php');
+		$this->zbxTestLogin('hosts.php');
 		$this->checkTitle('Hosts');
-		$this->dropdown_select_wait('groupid', 'all');
+		$this->zbxTestDropdownSelectWait('groupid', 'all');
 
-		$this->checkbox_select("all_hosts");
-		$this->dropdown_select('go', 'Activate selected');
-		$this->button_click('goButton');
-		$this->wait();
+		$this->zbxTestCheckboxSelect('all_hosts');
+		$this->zbxTestDropdownSelect('go', 'Activate selected');
+		$this->zbxTestClickWait('goButton');
 
 		$this->getConfirmation();
 		$this->checkTitle('Hosts');
-		$this->ok('Host status updated');
+		$this->zbxTestTextPresent('Host status updated');
 
 		$sql="select * from hosts where status=".HOST_STATUS_NOT_MONITORED;
 		$this->assertEquals(0, DBcount($sql), "Chuck Norris: all hosts activated but DB does not match");
@@ -240,18 +230,17 @@ class testPageHosts extends CWebTest {
 
 		$hostid = $host['hostid'];
 
-		$this->login('hosts.php');
+		$this->zbxTestLogin('hosts.php');
 		$this->checkTitle('Hosts');
-		$this->dropdown_select_wait('groupid', 'all');
+		$this->zbxTestDropdownSelectWait('groupid', 'all');
 
-		$this->checkbox_select("hosts_$hostid");
-		$this->dropdown_select('go', 'Activate selected');
-		$this->button_click('goButton');
-		$this->wait();
+		$this->zbxTestCheckboxSelect('hosts_'.$hostid);
+		$this->zbxTestDropdownSelect('go', 'Activate selected');
+		$this->zbxTestClickWait('goButton');
 
 		$this->getConfirmation();
 		$this->checkTitle('Hosts');
-		$this->ok('Host status updated');
+		$this->zbxTestTextPresent('Host status updated');
 
 		$sql="select * from hosts where hostid=$hostid and status=".HOST_STATUS_MONITORED;
 		$this->assertEquals(1, DBcount($sql), "Chuck Norris: host $hostid activated but status is wrong in the DB");
@@ -262,18 +251,17 @@ class testPageHosts extends CWebTest {
 
 		$this->chooseOkOnNextConfirmation();
 
-		$this->login('hosts.php');
+		$this->zbxTestLogin('hosts.php');
 		$this->checkTitle('Hosts');
-		$this->dropdown_select_wait('groupid', 'all');
+		$this->zbxTestDropdownSelectWait('groupid', 'all');
 
-		$this->checkbox_select("all_hosts");
-		$this->dropdown_select('go', 'Disable selected');
-		$this->button_click('goButton');
-		$this->wait();
+		$this->zbxTestCheckboxSelect('all_hosts');
+		$this->zbxTestDropdownSelect('go', 'Disable selected');
+		$this->zbxTestClickWait('goButton');
 
 		$this->getConfirmation();
 		$this->checkTitle('Hosts');
-		$this->ok('Host status updated');
+		$this->zbxTestTextPresent('Host status updated');
 
 		$sql="select * from hosts where status=".HOST_STATUS_MONITORED;
 		$this->assertEquals(0, DBcount($sql), "Chuck Norris: all hosts disabled but DB does not match");
@@ -289,18 +277,17 @@ class testPageHosts extends CWebTest {
 
 		$hostid = $host['hostid'];
 
-		$this->login('hosts.php');
+		$this->zbxTestLogin('hosts.php');
 		$this->checkTitle('Hosts');
-		$this->dropdown_select_wait('groupid', 'all');
+		$this->zbxTestDropdownSelectWait('groupid', 'all');
 
-		$this->checkbox_select("hosts_$hostid");
-		$this->dropdown_select('go', 'Disable selected');
-		$this->button_click('goButton');
-		$this->wait();
+		$this->zbxTestCheckboxSelect('hosts_'.$hostid);
+		$this->zbxTestDropdownSelect('go', 'Disable selected');
+		$this->zbxTestClickWait('goButton');
 
 		$this->getConfirmation();
 		$this->checkTitle('Hosts');
-		$this->ok('Host status updated');
+		$this->zbxTestTextPresent('Host status updated');
 
 		$sql="select * from hosts where hostid=$hostid and status=".HOST_STATUS_NOT_MONITORED;
 		$this->assertEquals(1, DBcount($sql), "Chuck Norris: host $hostid disabled but status is wrong in the DB");
@@ -321,4 +308,3 @@ class testPageHosts extends CWebTest {
 		$this->markTestIncomplete();
 	}
 }
-?>

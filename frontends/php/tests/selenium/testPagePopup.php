@@ -17,8 +17,7 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
 require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
 class testPagePopup extends CWebTest {
@@ -36,12 +35,12 @@ class testPagePopup extends CWebTest {
 			'popup.php?srctbl=applications&srcfld1=name&dstfrm=form&dstfld1=fld1';
 
 	public function testPagePopupTemplates_CheckLayout() {
-		$this->login();
-		$this->open($this->urlPopupTemplates);
+		$this->zbxTestLogin();
+		$this->zbxTestOpen($this->urlPopupTemplates);
 		$this->checkTitle('Templates');
-		$this->ok('Templates');
-		$this->ok('Group');
-		$this->ok('Name');
+		$this->zbxTestTextPresent('Templates');
+		$this->zbxTestTextPresent('Group');
+		$this->zbxTestTextPresent('Name');
 		$this->assertElementPresent('groupid');
 		$this->assertElementPresent('select');
 		$this->assertSomethingSelected('groupid');
@@ -81,7 +80,7 @@ class testPagePopup extends CWebTest {
 		// checking window content
 
 		foreach ($ddGroups as $ddGroup) {
-			$this->dropdown_select_wait('groupid', $ddGroup['content']);
+			$this->zbxTestDropdownSelectWait('groupid', $ddGroup['content']);
 
 			$result = DBselect(
 				'SELECT h.hostid,h.name'.
@@ -96,18 +95,18 @@ class testPagePopup extends CWebTest {
 
 				$this->assertAttribute('//*[@id="templates_'.$row['hostid'].'"]/@value', $row['name']);
 
-				$this->ok($row['name']);
+				$this->zbxTestTextPresent($row['name']);
 			}
 		}
 	}
 
 	public function testPagePopupHostTemplates_CheckLayout() {
-		$this->login();
-		$this->open($this->urlPopupHostTemplates);
+		$this->zbxTestLogin();
+		$this->zbxTestOpen($this->urlPopupHostTemplates);
 		$this->checkTitle('Templates');
-		$this->ok('Templates');
-		$this->ok('Group');
-		$this->ok('Name');
+		$this->zbxTestTextPresent('Templates');
+		$this->zbxTestTextPresent('Group');
+		$this->zbxTestTextPresent('Name');
 		$this->assertElementPresent('groupid');
 		$this->assertSomethingSelected('groupid');
 
@@ -146,7 +145,7 @@ class testPagePopup extends CWebTest {
 		// checking window content
 
 		foreach ($ddGroups as $ddGroup) {
-			$this->dropdown_select_wait('groupid', $ddGroup['content']);
+			$this->zbxTestDropdownSelectWait('groupid', $ddGroup['content']);
 
 			$result = DBselect(
 				'SELECT h.name'.
@@ -157,18 +156,18 @@ class testPagePopup extends CWebTest {
 					' AND g.groupid='.$ddGroup['id']
 			);
 			while ($row = DBfetch($result)) {
-				$this->ok($row['name']);
+				$this->zbxTestTextPresent($row['name']);
 			}
 		}
 	}
 
 	public function testPagePopupHostsAndTemplates_CheckLayout() {
-		$this->login();
-		$this->open($this->urlPopupHostsAndTemplates);
+		$this->zbxTestLogin();
+		$this->zbxTestOpen($this->urlPopupHostsAndTemplates);
 		$this->checkTitle('Hosts and templates');
-		$this->ok('Hosts and templates');
-		$this->ok('Group');
-		$this->ok('Name');
+		$this->zbxTestTextPresent('Hosts and templates');
+		$this->zbxTestTextPresent('Group');
+		$this->zbxTestTextPresent('Name');
 		$this->assertElementPresent('groupid');
 		$this->assertElementPresent('empty');
 		$this->assertSomethingSelected('groupid');
@@ -208,7 +207,7 @@ class testPagePopup extends CWebTest {
 		// checking window content
 
 		foreach ($ddGroups as $ddGroup) {
-			$this->dropdown_select_wait('groupid', $ddGroup['content']);
+			$this->zbxTestDropdownSelectWait('groupid', $ddGroup['content']);
 
 			$result = DBselect(
 				'SELECT h.name'.
@@ -219,18 +218,18 @@ class testPagePopup extends CWebTest {
 					' AND g.groupid='.$ddGroup['id']
 			);
 			while ($row = DBfetch($result)) {
-				$this->ok($row['name']);
+				$this->zbxTestTextPresent($row['name']);
 			}
 		}
 	}
 
 	public function testPagePopupHosts_CheckLayout() {
-		$this->login();
-		$this->open($this->urlPopupHosts);
+		$this->zbxTestLogin();
+		$this->zbxTestOpen($this->urlPopupHosts);
 		$this->checkTitle('Hosts');
-		$this->ok('Hosts');
-		$this->ok('Group');
-		$this->ok(array('Name', 'DNS', 'IP', 'Port', 'Status', 'Availability'));
+		$this->zbxTestTextPresent('Hosts');
+		$this->zbxTestTextPresent('Group');
+		$this->zbxTestTextPresent(array('Name', 'DNS', 'IP', 'Port', 'Status', 'Availability'));
 		$this->assertElementPresent('groupid');
 		$this->assertElementPresent('empty');
 		$this->assertSomethingSelected('groupid');
@@ -270,7 +269,7 @@ class testPagePopup extends CWebTest {
 		// checking window content
 
 		foreach ($ddGroups as $ddGroup) {
-			$this->dropdown_select_wait('groupid', $ddGroup['content']);
+			$this->zbxTestDropdownSelectWait('groupid', $ddGroup['content']);
 
 			$result = DBselect(
 				'SELECT h.name'.
@@ -281,17 +280,17 @@ class testPagePopup extends CWebTest {
 					' AND g.groupid='.$ddGroup['id']
 			);
 			while ($row = DBfetch($result)) {
-				$this->ok($row['name']);
+				$this->zbxTestTextPresent($row['name']);
 			}
 		}
 	}
 
 	public function testPagePopupProxies_CheckLayout() {
-		$this->login();
-		$this->open($this->urlPopupProxies);
+		$this->zbxTestLogin();
+		$this->zbxTestOpen($this->urlPopupProxies);
 		$this->checkTitle('Proxies');
-		$this->ok('Proxies');
-		$this->ok(array('Name'));
+		$this->zbxTestTextPresent('Proxies');
+		$this->zbxTestTextPresent(array('Name'));
 
 		$result = DBselect(
 			'SELECT host'.
@@ -299,17 +298,17 @@ class testPagePopup extends CWebTest {
 			' WHERE status IN ('.HOST_STATUS_PROXY_ACTIVE.','.HOST_STATUS_PROXY_PASSIVE.')'
 		);
 		while ($row = DBfetch($result)) {
-			$this->ok($row['host']);
+			$this->zbxTestTextPresent($row['host']);
 		}
 	}
 
 	public function testPagePopupApplications_CheckLayout() {
-		$this->login();
-		$this->open($this->urlPopupApplications);
+		$this->zbxTestLogin();
+		$this->zbxTestOpen($this->urlPopupApplications);
 		$this->checkTitle('Applications');
-		$this->ok('Applications');
-		$this->ok(array('Group', 'Host'));
-		$this->ok('Name');
+		$this->zbxTestTextPresent('Applications');
+		$this->zbxTestTextPresent(array('Group', 'Host'));
+		$this->zbxTestTextPresent('Name');
 		$this->assertElementPresent('groupid');
 		$this->assertElementPresent('hostid');
 		$this->assertSomethingSelected('groupid');
@@ -353,4 +352,3 @@ class testPagePopup extends CWebTest {
 		// TODO checkind windows content and hosts dropdown
 	}
 }
-?>

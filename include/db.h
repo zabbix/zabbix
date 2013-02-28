@@ -298,7 +298,6 @@ typedef struct
 	DB_TRIGGER	trigger;
 	zbx_uint64_t	eventid;
 	zbx_uint64_t	objectid;
-	zbx_uint64_t	ack_eventid;
 	int		source;
 	int		object;
 	int		clock;
@@ -610,4 +609,6 @@ int	DBtxn_ongoing();
 int	DBtable_exists(const char *table_name);
 int	DBfield_exists(const char *table_name, const char *field_name);
 
+void	zbx_create_services_lock();
+void	zbx_destroy_services_lock();
 #endif

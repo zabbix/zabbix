@@ -17,8 +17,7 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
 require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
 class testPageQueueOverviewByProxy extends CWebTest {
@@ -31,12 +30,12 @@ class testPageQueueOverviewByProxy extends CWebTest {
 	* @dataProvider allProxies
 	*/
 	public function testPageQueueOverviewByProxy_CheckLayout($proxy) {
-		$this->login('queue.php?config=1');
+		$this->zbxTestLogin('queue.php?config=1');
 		$this->checkTitle('Queue \[refreshed every 30 sec\]');
-		$this->ok('Queue');
-		$this->ok('QUEUE OF ITEMS TO BE UPDATED');
+		$this->zbxTestTextPresent('Queue');
+		$this->zbxTestTextPresent('QUEUE OF ITEMS TO BE UPDATED');
 		// Header
-		$this->ok(
+		$this->zbxTestTextPresent(
 			array(
 				'Proxy',
 				'5 seconds',
@@ -48,8 +47,8 @@ class testPageQueueOverviewByProxy extends CWebTest {
 			)
 		);
 		// Data
-		$this->ok($proxy['host']);
-		$this->ok('Server');
+		$this->zbxTestTextPresent($proxy['host']);
+		$this->zbxTestTextPresent('Server');
 	}
 
 	public function testPageQueueOverviewByProxy_VerifyDisplayedNumbers() {
@@ -57,4 +56,3 @@ class testPageQueueOverviewByProxy extends CWebTest {
 		$this->markTestIncomplete();
 	}
 }
-?>

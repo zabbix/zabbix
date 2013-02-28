@@ -17,8 +17,7 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
 require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
 class testFormAdministrationGeneralWorkperiod extends CWebTest {
@@ -31,11 +30,11 @@ class testFormAdministrationGeneralWorkperiod extends CWebTest {
 	*/
 	public function testFormAdministrationGeneralWorkperiod_CheckLayout($WorkingTime) {
 
-		$this->login('adm.workingtime.php');
+		$this->zbxTestLogin('adm.workingtime.php');
 		$this->assertElementPresent('configDropDown');
-		$this->dropdown_select_wait('configDropDown', 'Working time');
+		$this->zbxTestDropdownSelectWait('configDropDown', 'Working time');
 		$this->checkTitle('Configuration of working time');
-		$this->ok(array('CONFIGURATION OF WORKING TIME', 'Working time', 'Working time'));
+		$this->zbxTestTextPresent(array('CONFIGURATION OF WORKING TIME', 'Working time', 'Working time'));
 		$this->assertElementPresent('work_period');
 		$this->assertAttribute("//input[@id='work_period']/@maxlength", '255');
 		$this->assertAttribute("//input[@id='work_period']/@size", '50');
@@ -45,11 +44,11 @@ class testFormAdministrationGeneralWorkperiod extends CWebTest {
 
 	public function testFormAdministrationGeneralWorkperiod_SavingWorkperiod() {
 
-		$this->login('adm.workingtime.php');
+		$this->zbxTestLogin('adm.workingtime.php');
 		$this->assertElementPresent('configDropDown');
-		$this->dropdown_select_wait('configDropDown', 'Working time');
+		$this->zbxTestDropdownSelectWait('configDropDown', 'Working time');
 		$this->checkTitle('Configuration of working time');
-		$this->ok(array('CONFIGURATION OF WORKING TIME', 'Working time'));
+		$this->zbxTestTextPresent(array('CONFIGURATION OF WORKING TIME', 'Working time'));
 
 		$sqlHash = 'SELECT configid,alert_history,event_history,refresh_unsupported,alert_usrgrpid,'.
 				'event_ack_enable,event_expire,event_show_max,default_theme,authentication_type,'.
@@ -64,9 +63,8 @@ class testFormAdministrationGeneralWorkperiod extends CWebTest {
 		$oldHash = DBhash($sqlHash);
 
 		$this->input_type('work_period', '1-7,09:00-20:00');
-		$this->button_click('save');
-		$this->wait();
-		$this->ok('Configuration updated');
+		$this->zbxTestClickWait('save');
+		$this->zbxTestTextPresent('Configuration updated');
 
 		$result = DBselect('SELECT work_period FROM config');
 		if ($row = DBfetch($result)) {
@@ -77,23 +75,20 @@ class testFormAdministrationGeneralWorkperiod extends CWebTest {
 		$this->assertEquals($oldHash, $newHash, "Values in some other DB fields also changed, but shouldn't.");
 
 		// checking also for the following error: ERROR: Configuration was not updated | Incorrect working time: "1-8,09:00-25:00".
-		$this->dropdown_select_wait('configDropDown', 'Working time');
+		$this->zbxTestDropdownSelectWait('configDropDown', 'Working time');
 		$this->checkTitle('Configuration of working time');
-		$this->ok('CONFIGURATION OF WORKING TIME');
-		$this->ok('Working time');
+		$this->zbxTestTextPresent('CONFIGURATION OF WORKING TIME');
+		$this->zbxTestTextPresent('Working time');
 		$this->input_type('work_period', '1-8,09:00-25:00');
-		$this->button_click('save');
-		$this->wait();
-		$this->ok(array('ERROR: Cannot update configuration', 'Incorrect working time.'));
+		$this->zbxTestClickWait('save');
+		$this->zbxTestTextPresent(array('ERROR: Cannot update configuration', 'Incorrect working time.'));
 
 		// trying to save empty work period
-		$this->dropdown_select_wait('configDropDown', 'Working time');
+		$this->zbxTestDropdownSelectWait('configDropDown', 'Working time');
 		$this->checkTitle('Configuration of working time');
-		$this->ok(array('CONFIGURATION OF WORKING TIME', 'Working time'));
+		$this->zbxTestTextPresent(array('CONFIGURATION OF WORKING TIME', 'Working time'));
 		$this->input_type('work_period', '');
-		$this->button_click('save');
-		$this->wait();
-		$this->ok(array('ERROR: Cannot update configuration', 'Incorrect working time.'));
+		$this->zbxTestClickWait('save');
+		$this->zbxTestTextPresent(array('ERROR: Cannot update configuration', 'Incorrect working time.'));
 	}
 }
-?>

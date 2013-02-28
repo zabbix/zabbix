@@ -17,25 +17,23 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
 require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
 class testPageOverview extends CWebTest {
 	public function testPageOverview_CheckLayout() {
-		$this->login('overview.php');
+		$this->zbxTestLogin('overview.php');
 		$this->checkTitle('Overview \[refreshed every 30 sec\]');
-		$this->ok('OVERVIEW');
-		$this->ok('Hosts location');
-		$this->ok('Group');
-		$this->ok('Type');
+		$this->zbxTestTextPresent('OVERVIEW');
+		$this->zbxTestTextPresent('Hosts location');
+		$this->zbxTestTextPresent('Group');
+		$this->zbxTestTextPresent('Type');
 	}
 
 // Check that no real host or template names displayed
 	public function testPageOverview_NoHostNames() {
-		$this->login('overview.php');
+		$this->zbxTestLogin('overview.php');
 		$this->checkTitle('Overview \[refreshed every 30 sec\]');
 		$this->checkNoRealHostnames();
 	}
 }
-?>

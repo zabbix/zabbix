@@ -17,8 +17,7 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
 require_once dirname(__FILE__) . '/../include/class.cwebtest.php';
 
 class testPageItems extends CWebTest {
@@ -34,22 +33,22 @@ class testPageItems extends CWebTest {
 	public function testPageItems_CheckLayout($host) {
 		$hostid = $host['hostid'];
 
-		$this->login('hosts.php');
-		$this->dropdown_select_wait('groupid', 'all');
+		$this->zbxTestLogin('hosts.php');
+		$this->zbxTestDropdownSelectWait('groupid', 'all');
 
 		$this->checkTitle('Configuration of hosts');
-		$this->ok('HOSTS');
+		$this->zbxTestTextPresent('HOSTS');
 		// Go to the list of items
 		$this->href_click("items.php?filter_set=1&hostid=$hostid&sid=");
 		$this->wait();
 		// We are in the list of items
 		$this->checkTitle('Configuration of items');
-		$this->ok('CONFIGURATION OF ITEMS');
-		$this->ok('Items');
-		$this->ok('Displaying');
-		$this->ok('Host list');
+		$this->zbxTestTextPresent('CONFIGURATION OF ITEMS');
+		$this->zbxTestTextPresent('Items');
+		$this->zbxTestTextPresent('Displaying');
+		$this->zbxTestTextPresent('Host list');
 		// Header
-		$this->ok(
+		$this->zbxTestTextPresent(
 			array(
 				'Wizard',
 				'Name',
@@ -66,12 +65,13 @@ class testPageItems extends CWebTest {
 		);
 		// someday should check that interval is not shown for trapper items, trends not shown for non-numeric items etc
 
-		$this->dropdown_select('go', 'Enable selected');
-		$this->dropdown_select('go', 'Disable selected');
-		$this->dropdown_select('go', 'Mass update');
-		$this->dropdown_select('go', 'Copy selected to ...');
-		$this->dropdown_select('go', 'Clear history for selected');
-		$this->dropdown_select('go', 'Delete selected');
+		$this->zbxTestDropdownHasOptions('go', array(
+				'Enable selected',
+				'Disable selected',
+				'Mass update',
+				'Copy selected to ...',
+				'Clear history for selected',
+				'Delete selected'
+		));
 	}
 }
-?>
