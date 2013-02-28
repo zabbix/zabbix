@@ -364,7 +364,7 @@
 		toggleInputs('newCheckSecNameRow', isset(dcheckType, secNameRowTypes));
 		toggleInputs('newCheckSecLevRow', isset(dcheckType, secNameRowTypes));
 
-		if (ZBX_SVC.icmp != dcheckType) {
+		if (ZBX_SVC.icmp != dcheckType && jQuery('#ports').val().length == 0) {
 			jQuery('#ports').val(discoveryCheckDefaultPort(dcheckType));
 		}
 
