@@ -889,7 +889,7 @@ class testInheritanceItemPrototype extends CWebTest {
 			$this->getConfirmation();
 			$this->wait();
 			$this->zbxTestTextPresent('Items deleted');
-			$this->zbxTestTextNotPresent($this->template.': $itemName');
+			$this->zbxTestTextNotPresent($this->template.": $itemName");
 		}
 	}
 
