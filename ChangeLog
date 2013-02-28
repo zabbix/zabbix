@@ -2,7 +2,7 @@ Changes for 2.0.6rc1
 
 New features:
 A.F....... [ZBX-1357] added Lithuanian translation; thanks to Zabbix translators (Richlv)
-A.F....... [ZBX-1357] updated Brazilian Portuguese, German, Latvian, Slovak, Russian, Turkish and Ukrainian translations; thanks to Zabbix translators (Richlv)
+A.F....... [ZBX-1357] updated Brazilian Portuguese, German, Hungarian, Latvian, Slovak, Spanish, Russian, Turkish and Ukrainian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
 ..F....... [ZBX-6306] fixed frontend layout for latest Google Chrome 25 (Eduard)

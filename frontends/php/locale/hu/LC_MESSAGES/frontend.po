@@ -2,9 +2,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-02-20 19:46+0200\n"
-"PO-Revision-Date: 2013-01-10 20:21+0200\n"
-"Last-Translator: Robert <szenasy.robert@gmail.com>\n"
+"POT-Creation-Date: 2013-02-28 18:54+0200\n"
+"PO-Revision-Date: 2013-02-25 15:11+0200\n"
+"Last-Translator: halt <kisst@bgk.bme.hu>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: hu\n"
 "MIME-Version: 1.0\n"
@@ -84,7 +84,7 @@ msgstr "(0 - végtelenített )"
 #: include/views/configuration.hostgroups.list.php:31
 #: include/views/configuration.template.edit.php:143
 msgid "(Only super admins can create groups)"
-msgstr ""
+msgstr "( Csak super adminok tudnak létrehozni csoportokat )"
 
 #: include/forms.inc.php:539 include/forms.inc.php:554
 msgid "(in days)"
@@ -439,7 +439,7 @@ msgstr "Szolgáltatás hozzáadása"
 msgid "Add to"
 msgstr "Hozzáadás"
 
-#: charts.php:93 history.php:94 host_screen.php:88 include/html.inc.php:256
+#: charts.php:93 history.php:94 host_screen.php:88 include/html.inc.php:249
 #: maps.php:70 screens.php:89
 msgid "Add to favourites"
 msgstr "Hozzáadás a kedvencekhez"
@@ -498,7 +498,7 @@ msgstr "Ügynök interfészei"
 
 #: hosts.php:56
 msgid "Agent or SNMP or JMX or IPMI interface"
-msgstr ""
+msgstr "Ügynök vagy SNMP vagy JMX vagy IPMI intefész"
 
 #: include/hosts.inc.php:119 include/views/administration.users.edit.php:49
 #: include/views/administration.users.list.php:54 popup.php:897 users.php:43
@@ -537,7 +537,7 @@ msgstr "Minden csoport"
 
 #: jsLoader.php:154
 msgid "All links should have \"Name\" and \"URL\" specified"
-msgstr ""
+msgstr "Minden hivatkozásnál meg kell adni a \"Név\" és az \"URL\" mezőket"
 
 #: include/page_header.php:121
 msgid "All nodes"
@@ -602,7 +602,7 @@ msgid "Application with ID \"%1$s\" is not available on \"%2$s\"."
 msgstr ""
 
 #: hosts.php:683 hosts.php:759 include/forms.inc.php:823
-#: include/html.inc.php:397 include/html.inc.php:401
+#: include/html.inc.php:390 include/html.inc.php:394
 #: include/views/configuration.application.list.php:40
 #: include/views/configuration.host.edit.php:318
 #: include/views/configuration.item.edit.php:402
@@ -637,7 +637,7 @@ msgstr "Április"
 
 #: include/classes/class.cbuttonqmessage.php:49
 msgid "Are you sure you want perform this action?"
-msgstr ""
+msgstr "Biztos vagy benne hogy végrehajtod ezt műveletet?"
 
 #: include/views/js/common.macros.js.php:53
 msgid "Are you sure you want to delete"
@@ -669,7 +669,7 @@ msgstr ""
 
 #: include/maintenances.inc.php:54 include/maintenances.inc.php:57
 msgid "At"
-msgstr ""
+msgstr "-kor"
 
 #: include/forms.inc.php:1682
 msgid "At (hour:minute)"
@@ -685,7 +685,7 @@ msgstr "Legalább egy karbantartási periódust létre kell hozni."
 
 #: include/classes/class.frontendsetup.php:292
 msgid "At least one of MySQL, PostgreSQL, Oracle, SQLite3 or IBM DB2 should be supported"
-msgstr ""
+msgstr "Legalább egy adatbázisnak támogatottnak kell lennie (MySQL, PostgreSQL, Oracle, SQLite3 vagy IBM DB2)"
 
 #: include/menu.inc.php:266
 msgid "Audit"
@@ -728,11 +728,11 @@ msgstr "Autentikációs mód HTTP-re változott"
 
 #: authentication.php:121 authentication.php:122
 msgid "Authentication method changed to LDAP"
-msgstr ""
+msgstr "Autentikációs mód LDAP-ra változott"
 
 #: authentication.php:83 authentication.php:84
 msgid "Authentication method changed to Zabbix internal"
-msgstr ""
+msgstr "Autentikációs mód Zabbix belső felhasználó kezelésre változott"
 
 #: include/views/configuration.action.list.php:35
 msgid "Auto registration"
@@ -861,7 +861,7 @@ msgstr "Vastag vonal"
 
 #: include/items.inc.php:131
 msgid "Boolean"
-msgstr ""
+msgstr "Boolean"
 
 #: include/views/configuration.screen.constructor.edit.php:602
 #: include/views/configuration.sysmap.edit.php:132
@@ -898,26 +898,26 @@ msgstr ""
 #: include/views/configuration.application.edit.php:23
 #: include/views/configuration.application.list.php:33
 msgid "CONFIGURATION OF APPLICATIONS"
-msgstr "ALKALMAZÁSOK KONFIURÁCIÓJA"
+msgstr "ALKALMAZÁSOK KONFIGURÁCIÓJA"
 
 #: include/views/administration.authentication.edit.php:23
 msgid "CONFIGURATION OF AUTHENTICATION"
-msgstr ""
+msgstr "AUTENTIKÁCIÓ KONFIGURÁCIÓJA"
 
 #: include/views/configuration.discovery.edit.php:25
 #: include/views/configuration.discovery.list.php:28
 msgid "CONFIGURATION OF DISCOVERY RULE"
-msgstr ""
+msgstr "FELDERÍTÉSI SZABÁLY KONFIGURÁCIÓJA"
 
 #: host_discovery.php:263
 #: include/views/configuration.host.discovery.list.php:30
 msgid "CONFIGURATION OF DISCOVERY RULES"
-msgstr ""
+msgstr "FELDERÍTÉSI SZABÁLYOK KONFIGURÁCIÓJA"
 
 #: include/views/configuration.graph.edit.php:25
 #: include/views/configuration.graph.list.php:31
 msgid "CONFIGURATION OF GRAPH PROTOTYPES"
-msgstr ""
+msgstr "GRAFIKON PROTOTÍPUSOK KONFIGURÁCIÓJA"
 
 #: include/views/configuration.graph.edit.php:29
 #: include/views/configuration.graph.list.php:50
@@ -935,11 +935,11 @@ msgstr "HOSZT CSOPORTOK KONFIGURÁCIÓJA"
 
 #: hosts.php:570 hosts.php:619 hosts.php:639
 msgid "CONFIGURATION OF HOSTS"
-msgstr ""
+msgstr "HOSZOK KONFIGURÁCIÓJA"
 
 #: adm.housekeeper.php:86
 msgid "CONFIGURATION OF HOUSEKEEPER"
-msgstr ""
+msgstr "ADAT-KARBANTARTÓ KONFIGURÁCIÓJA"
 
 #: adm.iconmapping.php:127
 msgid "CONFIGURATION OF ICON MAPPING"
@@ -947,7 +947,7 @@ msgstr ""
 
 #: adm.images.php:149
 msgid "CONFIGURATION OF IMAGES"
-msgstr ""
+msgstr "KÉPEK KONFIGURÁCIÓJA"
 
 #: include/views/configuration.services.edit.php:28
 #: include/views/configuration.services.list.php:25
@@ -967,7 +967,7 @@ msgstr "ELEMEK KONFIGURÁLÁSA"
 
 #: adm.macros.php:173
 msgid "CONFIGURATION OF MACROS"
-msgstr ""
+msgstr "MAKRÓK KONFIGURÁLÁSA"
 
 #: include/views/configuration.maintenance.edit.php:23
 #: include/views/configuration.maintenance.list.php:28
@@ -995,7 +995,7 @@ msgstr "PROXY KONFIGURÁCIÓ"
 
 #: adm.regexps.php:226
 msgid "CONFIGURATION OF REGULAR EXPRESSIONS"
-msgstr ""
+msgstr "REGULÁRIS KIFEJEZÉSEK KONFIGURÁCIÓJA"
 
 #: include/views/configuration.screen.constructor.list.php:25
 msgid "CONFIGURATION OF SCREEN"
@@ -1018,13 +1018,13 @@ msgstr "BEMUTATÓK KONFIGURÁCIÓJA"
 
 #: templates.php:422 templates.php:442
 msgid "CONFIGURATION OF TEMPLATES"
-msgstr ""
+msgstr "MINTÁK KONFIGURÁCIÓJA"
 
 #: include/views/configuration.triggers.edit.php:37
 #: include/views/configuration.triggers.list.php:41
 #: include/views/configuration.triggers.massupdate.php:37
 msgid "CONFIGURATION OF TRIGGER PROTOTYPES"
-msgstr ""
+msgstr "TIGGER PROTOTÍPUSOK KONFIGURÁCIÓJA"
 
 #: adm.triggerseverities.php:94
 msgid "CONFIGURATION OF TRIGGER SEVERITIES"
@@ -1038,16 +1038,16 @@ msgstr "TRIGGEREK KONFIGURÁCIÓJA"
 
 #: include/views/administration.users.edit.php:30
 msgid "CONFIGURATION OF USER"
-msgstr ""
+msgstr "A FELHASZNÁLÓK KONFIGURÁCIÓJA"
 
 #: include/views/administration.usergroups.edit.php:23
 msgid "CONFIGURATION OF USER GROUP"
-msgstr ""
+msgstr "FELHASZNÁLÓI CSOPORTOK KONFIGURÁCIÓJA"
 
 #: include/views/administration.usergroups.list.php:31
 #: include/views/administration.users.list.php:31
 msgid "CONFIGURATION OF USERS AND USER GROUPS"
-msgstr "FELHASZNÁLÓK ÉS CSOPORTOK KONFIGURÁCIÓJA"
+msgstr "FELHASZNÁLÓK ÉS FELHASZNÁLÓI CSOPORTOK KONFIGURÁCIÓJA"
 
 #: adm.valuemapping.php:143
 msgid "CONFIGURATION OF VALUE MAPPING"
@@ -1060,7 +1060,7 @@ msgstr "WEB FELÜGYELET BEÁLLÍTÁSAI"
 
 #: adm.workingtime.php:76
 msgid "CONFIGURATION OF WORKING TIME"
-msgstr ""
+msgstr "MUNKAIDŐ KONFIGURÁCIÓJA"
 
 #: adm.triggerdisplayoptions.php:89
 msgid "CONFIGURATION OF ZABBIX"
@@ -1073,11 +1073,11 @@ msgstr ""
 #: include/items.inc.php:92 include/views/configuration.graph.edit.php:162
 #: include/views/configuration.graph.edit.php:220
 msgid "Calculated"
-msgstr "Kalkulált"
+msgstr "Számított"
 
 #: include/views/administration.usergroups.edit.php:114
 msgid "Calculated permissions"
-msgstr ""
+msgstr "Számított jogosultságok"
 
 #: include/hosts.inc.php:66
 msgid "Callback"
@@ -1132,7 +1132,7 @@ msgstr "Alkalmazás felvétele sikertelen"
 
 #: api/classes/CTrigger.php:1800
 msgid "Cannot add dependency from a host to a template."
-msgstr ""
+msgstr "A Függőség a hoszttól nem adható a mintához"
 
 #: include/triggers.inc.php:501
 #, php-format
@@ -1177,12 +1177,12 @@ msgstr "Karbantartás hozzáadása sikertelen"
 
 #: media_types.php:118
 msgid "Cannot add media type"
-msgstr ""
+msgstr "Nem adható hozzá média típus"
 
 #: api/classes/CGraphGeneral.php:84
 #, php-format
 msgid "Cannot add more than one item with type \"Graph sum\" on graph \"%1$s\"."
-msgstr ""
+msgstr "Nem adhat hozzá egynél több \"Grafikon összeg\"-et a(z) \"%1$s\" grafikonhoz"
 
 #: sysmaps.php:170
 msgid "Cannot add network map"
@@ -1190,7 +1190,7 @@ msgstr "Hálózati térkép létrehozása sikertelen"
 
 #: httpconf.php:256
 msgid "Cannot add new application."
-msgstr ""
+msgstr "Nem adhat hozzá új alkalmazást"
 
 #: nodes.php:77
 msgid "Cannot add node"
@@ -2679,42 +2679,42 @@ msgstr ""
 #: include/validate.inc.php:375
 #, php-format
 msgid "Critical error. Field \"%1$s\" contains Multibyte chars."
-msgstr ""
+msgstr "Kritikus hiba. A(z) \"%1$s\" mező Multibyte karaktereket tartalmaz."
 
 #: include/validate.inc.php:436
 #, php-format
 msgid "Critical error. Field \"%1$s\" is mandatory."
-msgstr ""
+msgstr "Kritikus hiba. A(z) \"%1$s\" kitöltése kötelező."
 
 #: include/validate.inc.php:315
 #, php-format
 msgid "Critical error. Field \"%1$s\" is not IP range."
-msgstr ""
+msgstr "Kritikus hiba. A(z) \"%1$s\" nem érvényes IP tartomány."
 
 #: include/validate.inc.php:301
 #, php-format
 msgid "Critical error. Field \"%1$s\" is not IP."
-msgstr ""
+msgstr "Kritkikus hiba. A(z) \"%1$s\" mező nem érvényes IP cím."
 
 #: include/validate.inc.php:387
 #, php-format
 msgid "Critical error. Field \"%1$s\" is not a colour."
-msgstr ""
+msgstr "Kritikus hiba. A(z) \"%1$s\" mező nem egy szín."
 
 #: include/validate.inc.php:353
 #, php-format
 msgid "Critical error. Field \"%1$s\" is not decimal number."
-msgstr ""
+msgstr "Kritikus hiba. A(z) \"%1$s\" mező nem decimális szám."
 
 #: include/validate.inc.php:329
 #, php-format
 msgid "Critical error. Field \"%1$s\" is not integer list or range."
-msgstr ""
+msgstr "Kritikus hiba. A(z) \"%1$s\" mező nem valós szám vagy sorozat."
 
 #: include/validate.inc.php:342
 #, php-format
 msgid "Critical error. Field \"%1$s\" is not integer."
-msgstr ""
+msgstr "Kritikus hiba. A(z) \"%1$s\" mező nem valós szám."
 
 #: include/validate.inc.php:364
 #, php-format
@@ -2724,22 +2724,22 @@ msgstr ""
 #: include/validate.inc.php:453
 #, php-format
 msgid "Critical error. Field \"%1$s\" must be missing."
-msgstr ""
+msgstr "Kritikus hiba. A(z) \"%1$s\" mező hiányzik."
 
 #: include/validate.inc.php:507
 #, php-format
 msgid "Critical error. Incorrect value \"%1$s\" for \"%2$s\" field."
-msgstr ""
+msgstr "Kritikus hiba. A(z) \"%1$s\" hibás érték a(z) \"%2$s\" mezőben."
 
 #: include/validate.inc.php:497
 #, php-format
 msgid "Critical error. Incorrect value \"%1$s\" for \"%2$s\" field: must be between %3$s and %4$s."
-msgstr ""
+msgstr "Kritikus Hiba. A \"%1$s\" hibás érték a \"%2$s\" mezőben, az értéknek %3$s és %4$s közt kell lennie."
 
 #: include/validate.inc.php:488
 #, php-format
 msgid "Critical error. Incorrect value for field \"%1$s\": cannot be empty."
-msgstr ""
+msgstr "Kritikus hiba. Hibás érték, a(z) \"%1$s\" mező nem lehet üres."
 
 #: popup_trexpr.php:348
 msgid "Current date is < N"
@@ -3687,7 +3687,7 @@ msgid "Discovered device"
 msgstr "Felderített eszköz"
 
 #: events.php:310 hosts.php:687 hosts.php:767 include/events.inc.php:27
-#: include/html.inc.php:387 include/menu.inc.php:77 include/menu.inc.php:211
+#: include/html.inc.php:380 include/menu.inc.php:77 include/menu.inc.php:211
 #: include/views/configuration.action.list.php:34 templates.php:463
 #: templates.php:531
 msgid "Discovery"
@@ -3705,7 +3705,7 @@ msgstr "Felderítés"
 msgid "Discovery checks"
 msgstr ""
 
-#: include/html.inc.php:385
+#: include/html.inc.php:378
 msgid "Discovery list"
 msgstr ""
 
@@ -3753,7 +3753,7 @@ msgstr "Felderítési szabály törölve"
 msgid "Discovery rule updated"
 msgstr "Felderítési szabály frissítve"
 
-#: include/html.inc.php:496 include/html.inc.php:500
+#: include/html.inc.php:489 include/html.inc.php:493
 #: include/views/configuration.host.discovery.list.php:33
 #: include/views/configuration.host.edit.php:423
 #: include/views/configuration.template.edit.php:303
@@ -4499,7 +4499,7 @@ msgid "Filled region"
 msgstr "Kitöltés"
 
 #: dashconf.php:265 events.php:373 hostinventories.php:134 hosts.php:657
-#: include/classes/class.cwidget.php:134 include/forms.inc.php:574
+#: include/classes/class.cwidget.php:130 include/forms.inc.php:574
 #: include/reports.inc.php:178
 #: include/views/administration.auditacts.list.php:49
 #: include/views/administration.auditlogs.list.php:65
@@ -4609,7 +4609,7 @@ msgstr ""
 msgid "Full clone"
 msgstr "Teljes klón"
 
-#: include/html.inc.php:267
+#: include/html.inc.php:260
 msgid "Fullscreen"
 msgstr "Teljes képernyő"
 
@@ -4807,7 +4807,7 @@ msgstr ""
 msgid "Graph prototype must have at least one prototype."
 msgstr ""
 
-#: include/html.inc.php:460 include/html.inc.php:464
+#: include/html.inc.php:453 include/html.inc.php:457
 #: include/views/configuration.host.discovery.list.php:90
 #: include/views/configuration.host.edit.php:494
 #: include/views/configuration.template.edit.php:365
@@ -4843,7 +4843,7 @@ msgid "Graph with same name but other type exist."
 msgstr ""
 
 #: dashboard.php:260 hosts.php:686 hosts.php:765 include/blocks.inc.php:1218
-#: include/html.inc.php:471 include/html.inc.php:475 include/items.inc.php:802
+#: include/html.inc.php:464 include/html.inc.php:468 include/items.inc.php:802
 #: include/menu.inc.php:62 include/triggers.inc.php:1311
 #: include/views/configuration.graph.list.php:56
 #: include/views/configuration.host.discovery.list.php:54
@@ -5042,7 +5042,7 @@ msgid "Hidden"
 msgstr ""
 
 #: include/classes/class.cuiwidget.php:58
-#: include/classes/class.cwidget.php:222 include/html.inc.php:146
+#: include/classes/class.cwidget.php:183 include/html.inc.php:146
 msgid "Hide"
 msgstr "Elrejtés"
 
@@ -5114,7 +5114,7 @@ msgstr "Vízszintes igazítás"
 #: include/classes/screens/CScreenHostgroupTriggers.php:121
 #: include/classes/screens/CScreenHostTriggers.php:63
 #: include/classes/screens/CScreenHostTriggers.php:123
-#: include/forms.inc.php:504 include/html.inc.php:379 include/maps.inc.php:24
+#: include/forms.inc.php:504 include/html.inc.php:372 include/maps.inc.php:24
 #: include/reports.inc.php:112 include/setup.inc.php:310
 #: include/triggers.inc.php:1183 include/triggers.inc.php:1603
 #: include/views/configuration.application.edit.php:44
@@ -5257,7 +5257,7 @@ msgstr ""
 msgid "Host label type"
 msgstr ""
 
-#: include/html.inc.php:350
+#: include/html.inc.php:343
 msgid "Host list"
 msgstr ""
 
@@ -6590,7 +6590,7 @@ msgstr "Elem törölve"
 msgid "Item prototype"
 msgstr ""
 
-#: include/html.inc.php:410 include/html.inc.php:414
+#: include/html.inc.php:403 include/html.inc.php:407
 #: include/views/configuration.host.discovery.list.php:88
 #: include/views/configuration.host.edit.php:443
 #: include/views/configuration.template.edit.php:323
@@ -6652,8 +6652,8 @@ msgstr ""
 msgid "Item with key \"%s\" already exists."
 msgstr ""
 
-#: hosts.php:684 hosts.php:761 include/html.inc.php:421
-#: include/html.inc.php:425 include/items.inc.php:733
+#: hosts.php:684 hosts.php:761 include/html.inc.php:414
+#: include/html.inc.php:418 include/items.inc.php:733
 #: include/reports.inc.php:329 include/reports.inc.php:465
 #: include/views/configuration.application.list.php:73
 #: include/views/configuration.graph.edit.php:280
@@ -7491,7 +7491,7 @@ msgstr ""
 msgid "Max count of events per trigger to show"
 msgstr "Triggerenkénti maximálisan megjelenített eseményszám"
 
-#: include/classes/class.cwidget.php:128 include/classes/class.cwidget.php:131
+#: include/classes/class.cwidget.php:124 include/classes/class.cwidget.php:127
 #: include/config.inc.php:346
 msgid "Maximize"
 msgstr "Maximalizál"
@@ -7602,7 +7602,7 @@ msgstr "Tagok"
 msgid "Memory limit: %s"
 msgstr ""
 
-#: dashboard.php:301 include/html.inc.php:273
+#: dashboard.php:301 include/html.inc.php:266
 #: include/views/configuration.item.list.php:206
 #: include/views/monitoring.slides.php:45
 msgid "Menu"
@@ -7663,7 +7663,7 @@ msgstr ""
 msgid "Min severity"
 msgstr "Minimum súlyosság"
 
-#: include/classes/class.cwidget.php:128 include/classes/class.cwidget.php:131
+#: include/classes/class.cwidget.php:124 include/classes/class.cwidget.php:127
 #: include/config.inc.php:346
 msgid "Minimize"
 msgstr "Minimalizál"
@@ -7763,7 +7763,7 @@ msgstr ""
 msgid "Monday"
 msgstr "Hétfő"
 
-#: hosts.php:793 include/html.inc.php:369
+#: hosts.php:793 include/html.inc.php:362
 #: include/views/configuration.host.edit.php:295
 #: include/views/configuration.host.massupdate.php:75 popup.php:569
 msgid "Monitored"
@@ -8643,7 +8643,7 @@ msgstr "Nincs"
 msgid "Normal"
 msgstr "Normál"
 
-#: include/html.inc.php:267
+#: include/html.inc.php:260
 msgid "Normal view"
 msgstr ""
 
@@ -8681,7 +8681,7 @@ msgstr "Nincs osztályozva"
 msgid "Not connected"
 msgstr "Nincs csatlakozva"
 
-#: hosts.php:801 include/html.inc.php:372 include/triggers.inc.php:980
+#: hosts.php:801 include/html.inc.php:365 include/triggers.inc.php:980
 #: include/views/configuration.host.edit.php:296
 #: include/views/configuration.host.massupdate.php:76 popup.php:572
 msgid "Not monitored"
@@ -9939,7 +9939,7 @@ msgstr "Elem eltávolítása"
 msgid "Remove from"
 msgstr "Eltávolítás"
 
-#: charts.php:85 history.php:86 host_screen.php:80 include/html.inc.php:249
+#: charts.php:85 history.php:86 host_screen.php:80 include/html.inc.php:242
 #: maps.php:63 screens.php:82
 msgid "Remove from favourites"
 msgstr ""
@@ -10034,7 +10034,7 @@ msgid "Required string"
 msgstr ""
 
 #: events.php:371 hostinventories.php:137 hosts.php:660
-#: include/forms.inc.php:571 include/html.inc.php:276
+#: include/forms.inc.php:571 include/html.inc.php:269
 #: include/reports.inc.php:180 include/reports.inc.php:341
 #: include/reports.inc.php:479 include/reports.inc.php:717
 #: include/views/administration.auditacts.list.php:51
@@ -10579,8 +10579,8 @@ msgstr ""
 msgid "Screen with name \"%s\" does not exist."
 msgstr ""
 
-#: dashboard.php:267 include/blocks.inc.php:1356 include/html.inc.php:484
-#: include/html.inc.php:488 include/menu.inc.php:67 include/menu.inc.php:197
+#: dashboard.php:267 include/blocks.inc.php:1356 include/html.inc.php:477
+#: include/html.inc.php:481 include/menu.inc.php:67 include/menu.inc.php:197
 #: include/views/configuration.screen.list.php:38
 #: include/views/configuration.template.edit.php:386
 #: include/views/conf.import.php:35 include/views/monitoring.screen.php:29
@@ -10934,7 +10934,7 @@ msgid "Severity name cannot be empty."
 msgstr ""
 
 #: include/classes/class.cuiwidget.php:58
-#: include/classes/class.cwidget.php:222 include/html.inc.php:146
+#: include/classes/class.cwidget.php:183 include/html.inc.php:146
 #: include/reports.inc.php:339 include/reports.inc.php:477
 #: include/reports.inc.php:715
 #: include/views/configuration.application.list.php:55
@@ -11525,7 +11525,7 @@ msgid "Telnet"
 msgstr ""
 
 #: include/audit.inc.php:51 include/forms.inc.php:541
-#: include/forms.inc.php:843 include/html.inc.php:364
+#: include/forms.inc.php:843 include/html.inc.php:357
 #: include/reports.inc.php:54 include/views/configuration.template.edit.php:38
 #: include/views/configuration.template.edit.php:390
 #: include/views/configuration.triggers.list.php:111
@@ -11567,7 +11567,7 @@ msgstr ""
 msgid "Template linkage"
 msgstr "Minta csatolások"
 
-#: include/html.inc.php:347
+#: include/html.inc.php:340
 msgid "Template list"
 msgstr ""
 
@@ -11980,7 +11980,7 @@ msgstr ""
 msgid "Trigger prototype"
 msgstr ""
 
-#: include/html.inc.php:435 include/html.inc.php:439
+#: include/html.inc.php:428 include/html.inc.php:432
 #: include/views/configuration.host.discovery.list.php:89
 #: include/views/configuration.host.edit.php:470
 #: include/views/configuration.template.edit.php:344
@@ -12017,7 +12017,7 @@ msgid "Trigger value"
 msgstr "Trigger érték"
 
 #: hosts.php:685 hosts.php:763 include/events.inc.php:25
-#: include/forms.inc.php:517 include/html.inc.php:446 include/html.inc.php:450
+#: include/forms.inc.php:517 include/html.inc.php:439 include/html.inc.php:443
 #: include/menu.inc.php:52 include/triggers.inc.php:1162
 #: include/views/configuration.action.list.php:33
 #: include/views/configuration.host.discovery.list.php:53
@@ -12279,7 +12279,7 @@ msgstr "Egységek"
 #: include/discovery.inc.php:128 include/discovery.inc.php:162
 #: include/events.inc.php:29 include/graphs.inc.php:37
 #: include/graphs.inc.php:77 include/hosts.inc.php:53 include/hosts.inc.php:80
-#: include/html.inc.php:375 include/httptest.inc.php:39
+#: include/html.inc.php:368 include/httptest.inc.php:39
 #: include/httptest.inc.php:56 include/items.inc.php:41
 #: include/items.inc.php:102 include/items.inc.php:126
 #: include/items.inc.php:143 include/items.inc.php:160
@@ -13416,7 +13416,7 @@ msgstr "Zeta"
 
 #: jsLoader.php:88
 msgid "Zoom"
-msgstr ""
+msgstr "Nagyítás"
 
 #: include/classes/screens/CScreenHostgroupTriggers.php:127
 #: include/classes/screens/CScreenHostTriggers.php:127
@@ -13435,7 +13435,7 @@ msgstr ""
 
 #: include/hosts.inc.php:467
 msgid "agent"
-msgstr ""
+msgstr "ügynök"
 
 #: include/classes/class.cchart.php:1761
 #: include/classes/class.cpagefilter.php:631
@@ -13525,7 +13525,7 @@ msgstr ""
 
 #: include/classes/class.cchart.php:1230 include/classes/class.cchart.php:1283
 msgid "d.m"
-msgstr ""
+msgstr "n.h"
 
 #: include/classes/class.cchart.php:1252 include/classes/class.cchart.php:1267
 #: include/classes/class.cchart.php:1286
@@ -13534,7 +13534,7 @@ msgstr "m.d H:i"
 
 #: include/translateDefines.inc.php:49
 msgid "d.m.y"
-msgstr ""
+msgstr "n.h.é"
 
 #: include/maintenances.inc.php:60 include/maintenances.inc.php:112
 msgid "day"
@@ -13579,7 +13579,7 @@ msgstr "minden"
 
 #: hostinventories.php:123
 msgid "exactly"
-msgstr ""
+msgstr "pontosan"
 
 #: include/actions.inc.php:835
 #: include/views/administration.auditacts.list.php:89
@@ -13610,11 +13610,11 @@ msgstr "óó"
 
 #: api/classes/CMap.php:575
 msgid "host"
-msgstr ""
+msgstr "hoszt"
 
 #: api/classes/CMap.php:574
 msgid "host group"
-msgstr ""
+msgstr "hoszt csoport"
 
 #: api/classes/CMap.php:572
 msgid "icon"
@@ -13710,7 +13710,7 @@ msgstr "ms"
 
 #: include/views/administration.authentication.edit.php:63
 msgid "must be a valid LDAP user"
-msgstr ""
+msgstr "valós LDAP felhasználónak kell lennie"
 
 #: include/classes/class.frontendsetup.php:289
 #: include/classes/class.frontendsetup.php:317
@@ -13855,7 +13855,7 @@ msgstr "-nak/-nek"
 
 #: api/classes/CMap.php:576
 msgid "trigger"
-msgstr ""
+msgstr "trigger"
 
 #: include/classes/class.frontendsetup.php:213
 #: include/classes/class.frontendsetup.php:376
@@ -13914,4 +13914,4 @@ msgstr "éééé"
 #: include/func.inc.php:561
 msgctxt "Micro short"
 msgid "µ"
-msgstr ""
+msgstr "µ"
