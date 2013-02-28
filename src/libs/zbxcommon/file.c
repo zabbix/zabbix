@@ -63,34 +63,38 @@ int	zbx_read(int fd, char *buf, size_t count, const char *encoding)
 	off_t		offset;
 #endif
 
+#ifdef _WINDOWS
+	offset = _lseeki64(fd, 0, SEEK_CUR);
+#else
 	offset = lseek(fd, 0, SEEK_CUR);
+#endif
 
 	if (0 >= (nbytes = (int)read(fd, buf, count)))
 		return nbytes;
 
-	if (0 == strcmp(encoding, "UNICODE") || 0 == strcmp(encoding, "UNICODELITTLE") ||
-			0 == strcmp(encoding, "UTF-16") || 0 == strcmp(encoding, "UTF-16LE") ||
-			0 == strcmp(encoding, "UTF16") || 0 == strcmp(encoding, "UTF16LE"))
+	if (0 == strcasecmp(encoding, "UNICODE") || 0 == strcasecmp(encoding, "UNICODELITTLE") ||
+			0 == strcasecmp(encoding, "UTF-16") || 0 == strcasecmp(encoding, "UTF-16LE") ||
+			0 == strcasecmp(encoding, "UTF16") || 0 == strcasecmp(encoding, "UTF16LE"))
 	{
 		cr = "\r\0";
 		lf = "\n\0";
 		szbyte = 2;
 	}
-	else if (0 == strcmp(encoding, "UNICODEBIG") || 0 == strcmp(encoding, "UNICODEFFFE") ||
-			0 == strcmp(encoding, "UTF-16BE") || 0 == strcmp(encoding, "UTF16BE"))
+	else if (0 == strcasecmp(encoding, "UNICODEBIG") || 0 == strcasecmp(encoding, "UNICODEFFFE") ||
+			0 == strcasecmp(encoding, "UTF-16BE") || 0 == strcasecmp(encoding, "UTF16BE"))
 	{
 		cr = "\0\r";
 		lf = "\0\n";
 		szbyte = 2;
 	}
-	else if (0 == strcmp(encoding, "UTF-32") || 0 == strcmp(encoding, "UTF-32LE") ||
-			0 == strcmp(encoding, "UTF32") || 0 == strcmp(encoding, "UTF32LE"))
+	else if (0 == strcasecmp(encoding, "UTF-32") || 0 == strcasecmp(encoding, "UTF-32LE") ||
+			0 == strcasecmp(encoding, "UTF32") || 0 == strcasecmp(encoding, "UTF32LE"))
 	{
 		cr = "\r\0\0\0";
 		lf = "\n\0\0\0";
 		szbyte = 4;
 	}
-	else if (0 == strcmp(encoding, "UTF-32BE") || 0 == strcmp(encoding, "UTF32BE"))
+	else if (0 == strcasecmp(encoding, "UTF-32BE") || 0 == strcasecmp(encoding, "UTF32BE"))
 	{
 		cr = "\0\0\0\r";
 		lf = "\0\0\0\n";
@@ -120,7 +124,11 @@ int	zbx_read(int fd, char *buf, size_t count, const char *encoding)
 		}
 	}
 
+#ifdef _WINDOWS
+	_lseeki64(fd, offset + i, SEEK_SET);
+#else
 	lseek(fd, offset + i, SEEK_SET);
+#endif
 
 	return (int)i;
 }
