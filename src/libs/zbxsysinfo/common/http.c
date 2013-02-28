@@ -28,7 +28,7 @@
 
 #define ZBX_MAX_WEBPAGE_SIZE	(1 * 1024 * 1024)
 
-static int	get_http_page(const char *host, const char *path, unsigned short port, char *buffer, int max_buffer_len)
+static int	get_http_page(const char *host, const char *path, unsigned short port, char *buffer, size_t max_buffer_len)
 {
 	int		ret;
 	char		*recv_buffer;
@@ -164,7 +164,7 @@ int	WEB_PAGE_REGEXP(const char *cmd, const char *param, unsigned flags, AGENT_RE
 
 	if (0 != get_param(param, 5, len_str, sizeof(len_str)) || '\0' == *len_str)
 		zbx_snprintf(len_str, sizeof(len_str), "%d", MAX_BUFFER_LEN - 1);
-	else if (FAIL == is_uint31(len_str, NULL))
+	else if (FAIL == is_uint31(len_str, &len) || ZBX_UINT31_MAX == len)
 		return SYSINFO_RET_FAIL;
 
 	buffer = zbx_malloc(buffer, ZBX_MAX_WEBPAGE_SIZE);
@@ -173,11 +173,11 @@ int	WEB_PAGE_REGEXP(const char *cmd, const char *param, unsigned flags, AGENT_RE
 	{
 		if (NULL != (found = zbx_regexp_match(buffer, regexp, &found_len)))
 		{
-			len = atoi(len_str) + 1;
+			len++;	/* make space for terminating '\0' */
 			len = MIN(len, found_len + 1);
-			len = MIN(len, sizeof(back));
+			len = MIN(len, (int)sizeof(back));
 
-			zbx_strlcpy(back, found, len);
+			zbx_strlcpy(back, found, (size_t)len);
 			SET_STR_RESULT(result, strdup(back));
 		}
 		else

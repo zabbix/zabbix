@@ -225,11 +225,9 @@ static int	get_next_point_to_node(int current_nodeid, int slave_nodeid, int *nod
  ******************************************************************************/
 int	node_process_command(zbx_sock_t *sock, const char *data, struct zbx_json_parse *jp)
 {
-	char		*result = NULL, *send, tmp[64];
-	const char	*response;
-	int		next_nodeid, ret = FAIL;
+	char		*result = NULL, *send = NULL, tmp[64];
+	int		nodeid = -1, next_nodeid, ret = FAIL;
 	zbx_uint64_t	scriptid, hostid;
-	uint32_t	nodeid;
 	struct zbx_json	j;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In node_process_command()");
