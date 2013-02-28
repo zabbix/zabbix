@@ -4,16 +4,19 @@
 			<span class="bold"> #{name} </span>
 		</td>
 		<td>
-			<input type="button" class="input link_menu" name="edit" value="<?php echo CHtml::encode(_('Edit')); ?>" onclick="javascript: showNewCheckForm(null, null, #{dcheckid});" />
+			<input type="button" class="input link_menu" name="edit" value="<?php echo CHtml::encode(_('Edit')); ?>"
+				onclick="javascript: showNewCheckForm(null, null, #{dcheckid});" />
 		</td>
 		<td>
-			<input type="button" class="input link_menu" name="remove" value="<?php echo CHtml::encode(_('Remove')); ?>" onclick="javascript: removeDCheckRow(#{dcheckid});" />
+			<input type="button" class="input link_menu" name="remove" value="<?php echo CHtml::encode(_('Remove')); ?>"
+				onclick="javascript: removeDCheckRow(#{dcheckid});" />
 		</td>
 	</tr>
 </script>
 <script type="text/x-jquery-tmpl" id="uniqRowTPL">
 	<div id="uniqueness_criteria_row_#{dcheckid}">
-		<input type="radio" id="uniqueness_criteria_#{dcheckid}" name="uniqueness_criteria" value="#{dcheckid}" class="input radio">
+		<input type="radio" id="uniqueness_criteria_#{dcheckid}" name="uniqueness_criteria" class="input radio"
+			value="#{dcheckid}" />
 		<label for="uniqueness_criteria_#{dcheckid}">#{name}</label>
 	</div>
 </script>
@@ -28,7 +31,9 @@
 				</tr>
 				<tr id="newCheckPortsRow" class="hidden">
 					<td><label for="ports"><?php echo _('Port range'); ?></label></td>
-					<td><input type="text" id="ports" name="ports" value="" class="input text" size="16" maxlength="255"></td>
+					<td>
+						<input type="text" id="ports" name="ports" value="" class="input text" size="16" maxlength="255">
+					</td>
 				</tr>
 				<tr id="newCheckCommunityRow" class="hidden">
 					<td><label for="snmp_community"><?php echo _('SNMP community'); ?></label></td>
@@ -37,7 +42,9 @@
 				</tr>
 				<tr id="newCheckKeyRow" class="hidden">
 					<td><label for="key_"><?php echo _('SNMP Key'); ?></label></td>
-					<td><input type="text" id="key_" name="key_" value="" class="input text" size="20" maxlength="255"></td>
+					<td>
+						<input type="text" id="key_" name="key_" value="" class="input text" size="20" maxlength="255">
+					</td>
 				</tr>
 				<tr id="newCheckSecNameRow" class="hidden">
 					<td><label for="snmpv3_securityname"><?php echo _('Security name'); ?></label></td>
@@ -58,8 +65,10 @@
 					<td><label for="snmpv3_authprotocol"><?php echo _('Authentication protocol'); ?></label></td>
 					<td>
 						<div class="jqueryinputset">
-							<input name="snmpv3_authprotocol" value="<?php echo ITEM_AUTHPROTOCOL_MD5; ?>" id="snmpv3_authprotocol_0" type="radio" checked="checked">
-							<input name="snmpv3_authprotocol" value="<?php echo ITEM_AUTHPROTOCOL_SHA; ?>" id="snmpv3_authprotocol_1" type="radio">
+							<input name="snmpv3_authprotocol" id="snmpv3_authprotocol_0" type="radio" checked="checked"
+								value="<?php echo ITEM_AUTHPROTOCOL_MD5; ?>" />
+							<input name="snmpv3_authprotocol" id="snmpv3_authprotocol_1" type="radio"
+								value="<?php echo ITEM_AUTHPROTOCOL_SHA; ?>" />
 							<label for="snmpv3_authprotocol_0"><?php echo _('MD5'); ?></label><label for="snmpv3_authprotocol_1"><?php echo _('SHA'); ?></label>
 						</div>
 					</td>
@@ -73,8 +82,10 @@
 					<td><label for="snmpv3_authprotocol"><?php echo _('Authentication protocol'); ?></label></td>
 					<td>
 						<div class="jqueryinputset">
-							<input name="snmpv3_privprotocol" value="<?php echo ITEM_PRIVPROTOCOL_DES; ?>" id="snmpv3_privprotocol_0" type="radio" checked="checked">
-							<input name="snmpv3_privprotocol" value="<?php echo ITEM_PRIVPROTOCOL_AES; ?>" id="snmpv3_privprotocol_1" type="radio">
+							<input name="snmpv3_privprotocol" id="snmpv3_privprotocol_0" type="radio" checked="checked"
+								value="<?php echo ITEM_PRIVPROTOCOL_DES; ?>" />
+							<input name="snmpv3_privprotocol" id="snmpv3_privprotocol_1" type="radio"
+								value="<?php echo ITEM_PRIVPROTOCOL_AES; ?>" />
 							<label for="snmpv3_privprotocol_0"><?php echo _('DES'); ?></label><label for="snmpv3_privprotocol_1"><?php echo _('AES'); ?></label>
 						</div>
 					</td>
@@ -411,14 +422,16 @@
 		else {
 			dCheck.dcheckid = jQuery('#dcheckList tr[id^=dcheckRow_]').length;
 
-			while (jQuery('#uniqueness_criteria_' + dCheck.dcheckid).length || jQuery('#dcheckRow_' + dCheck.dcheckid).length) {
+			while (jQuery('#uniqueness_criteria_' + dCheck.dcheckid).length
+						|| jQuery('#dcheckRow_' + dCheck.dcheckid).length) {
 				dCheck.dcheckid++;
 			}
 
 			for (var dcheckid in ZBX_CHECKLIST) {
 				if ((typeof dCheck['key_'] == 'undefined' || ZBX_CHECKLIST[dcheckid]['key_'] === dCheck['key_'])
 						&& (typeof dCheck['type'] == 'undefined' || ZBX_CHECKLIST[dcheckid]['type'] === dCheck['type'])
-						&& (typeof dCheck['ports'] == 'undefined' || ZBX_CHECKLIST[dcheckid]['ports'] === dCheck['ports'])
+						&& (typeof dCheck['ports'] == 'undefined'
+								|| ZBX_CHECKLIST[dcheckid]['ports'] === dCheck['ports'])
 						&& (typeof dCheck['snmp_community'] == 'undefined'
 							|| ZBX_CHECKLIST[dcheckid]['snmp_community'] === dCheck['snmp_community'])
 						&& (typeof dCheck['snmpv3_authprotocol'] == 'undefined'
