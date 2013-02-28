@@ -21,34 +21,32 @@
 #include "sysinfo.h"
 
 ZBX_METRIC	parameters_specific[] =
-/* 	KEY			FLAG		FUNCTION 	ADD_PARAM	TEST_PARAM */
+/* 	KEY			FLAG		FUNCTION 		TEST PARAMETERS */
 {
-	{"vfs.fs.size",		CF_USEUPARAM,	VFS_FS_SIZE,		NULL,	"/,free"},
-	{"vfs.fs.inode",	CF_USEUPARAM,	VFS_FS_INODE,		NULL,	"/,free"},
-	{"vfs.fs.discovery",	0,		VFS_FS_DISCOVERY,	NULL,	NULL},
+	{"vfs.fs.size",		CF_HAVEPARAMS,	VFS_FS_SIZE,		"/,free"},
+	{"vfs.fs.inode",	CF_HAVEPARAMS,	VFS_FS_INODE,		"/,free"},
+	{"vfs.fs.discovery",	0,		VFS_FS_DISCOVERY,	NULL},
 
-	{"net.if.in",		CF_USEUPARAM,	NET_IF_IN,		NULL,	"lo0,bytes"},
-	{"net.if.out",		CF_USEUPARAM,	NET_IF_OUT,		NULL,	"lo0,bytes"},
-	{"net.if.total",	CF_USEUPARAM,	NET_IF_TOTAL,		NULL,	"lo0,bytes"},
-	{"net.if.collisions",	CF_USEUPARAM,	NET_IF_COLLISIONS,	NULL,	"lo0"},
-	{"net.if.discovery",	0,		NET_IF_DISCOVERY,	NULL,	NULL},
+	{"net.if.in",		CF_HAVEPARAMS,	NET_IF_IN,		"lo0,bytes"},
+	{"net.if.out",		CF_HAVEPARAMS,	NET_IF_OUT,		"lo0,bytes"},
+	{"net.if.total",	CF_HAVEPARAMS,	NET_IF_TOTAL,		"lo0,bytes"},
+	{"net.if.collisions",	CF_HAVEPARAMS,	NET_IF_COLLISIONS,	"lo0"},
+	{"net.if.discovery",	0,		NET_IF_DISCOVERY,	NULL},
 
-	{"vm.memory.size",	CF_USEUPARAM,	VM_MEMORY_SIZE,		NULL,	"free"},
+	{"vm.memory.size",	CF_HAVEPARAMS,	VM_MEMORY_SIZE,		"free"},
 
-	{"proc.num",		CF_USEUPARAM,	PROC_NUM,		NULL,	"inetd,,"},
-	{"proc.mem",		CF_USEUPARAM,	PROC_MEM,		NULL,	"inetd,,"},
+	{"proc.num",		CF_HAVEPARAMS,	PROC_NUM,		"inetd,,"},
+	{"proc.mem",		CF_HAVEPARAMS,	PROC_MEM,		"inetd,,"},
 
-	{"system.cpu.switches",	0,		SYSTEM_CPU_SWITCHES,	NULL,	NULL},
-	{"system.cpu.intr",	0,		SYSTEM_CPU_INTR,	NULL,	NULL},
-	{"system.cpu.util",	CF_USEUPARAM,	SYSTEM_CPU_UTIL,	NULL,	"all,user,avg1"},
-	{"system.cpu.load",	CF_USEUPARAM,	SYSTEM_CPU_LOAD,	NULL,	"all,avg1"},
-	{"system.cpu.num",	CF_USEUPARAM,	SYSTEM_CPU_NUM,		NULL,	"online"},
+	{"system.cpu.switches",	0,		SYSTEM_CPU_SWITCHES,	NULL},
+	{"system.cpu.intr",	0,		SYSTEM_CPU_INTR,	NULL},
+	{"system.cpu.util",	CF_HAVEPARAMS,	SYSTEM_CPU_UTIL,	"all,user,avg1"},
+	{"system.cpu.load",	CF_HAVEPARAMS,	SYSTEM_CPU_LOAD,	"all,avg1"},
+	{"system.cpu.num",	CF_HAVEPARAMS,	SYSTEM_CPU_NUM,		"online"},
 
-	{"system.uptime",	0,		SYSTEM_UPTIME,		NULL,	NULL},
+	{"system.uptime",	0,		SYSTEM_UPTIME,		NULL},
 
-	{"system.stat",		CF_USEUPARAM,	SYSTEM_STAT,		NULL,	"page,fi"},
-
-	{"system.swap.size",	CF_USEUPARAM,	SYSTEM_SWAP_SIZE,	NULL,	"all,free"},
-
-	{0}
+	{"system.stat",		CF_HAVEPARAMS,	SYSTEM_STAT,		"page,fi"},
+	{"system.swap.size",	CF_USEUPARAM,	SYSTEM_SWAP_SIZE,	"all,free"},
+	{NULL}
 };
