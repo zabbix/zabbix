@@ -114,11 +114,13 @@ if (isset($this->data['functions'][$this->data['function'].'['.$this->data['oper
 					&& substr($this->data['expr_type'], 0, 6) != 'regexp'
 					&& substr($this->data['expr_type'], 0, 7) != 'iregexp') {
 				$paramTypeElement = SPACE._('Time');
+				$paramField = new CTextBox('param['.$paramId.']', $paramValue, 10, $paramIsReadonly);
 			}
-
-			$paramField = ($this->data['paramtype'] == PARAM_TYPE_COUNTS)
-				? new CNumericBox('param['.$paramId.']', (int) $paramValue, 10, $paramIsReadonly)
-				: new CTextBox('param['.$paramId.']', $paramValue, 10, $paramIsReadonly);
+			else {
+				$paramField = ($this->data['paramtype'] == PARAM_TYPE_COUNTS)
+					? new CNumericBox('param['.$paramId.']', (int) $paramValue, 10, $paramIsReadonly)
+					: new CTextBox('param['.$paramId.']', $paramValue, 10, $paramIsReadonly);
+			}
 
 			$expressionFormList->addRow($paramFunction['C'].' ', array($paramField, $paramTypeElement));
 		}

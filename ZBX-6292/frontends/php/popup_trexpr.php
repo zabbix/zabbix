@@ -615,19 +615,17 @@ if (!is_array($param)) {
 }
 
 // validate parameter value
-if ($paramtype == PARAM_TYPE_TIME) {
-	foreach ($param as $p) {
-		if ($p && !preg_match('/^[\-0-9]+(d|h|m|s|w)$/', $p)) {
-			error(_s('Parameter time "%s" not supported.', $p));
-		}
+foreach ($param as $p) {
+	if ($p && preg_match('/[a-zA-Z]/', $p) && !preg_match('/^[\-0-9]+('.ZBX_TIME_SUFFIXES_OR.')$/', $p)) {
+		error(_s('Time parameter "%s" not supported.', $p));
 	}
+}
 
-	global $ZBX_MESSAGES;
+global $ZBX_MESSAGES;
 
-	if ($ZBX_MESSAGES) {
-		show_messages();
-		unset($_REQUEST['insert']);
-	}
+if ($ZBX_MESSAGES) {
+	show_messages();
+	unset($_REQUEST['insert']);
 }
 
 /*
