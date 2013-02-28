@@ -50,7 +50,8 @@ zabbix_proxy_LDADD = \
 	$(top_srcdir)/src/libs/zbxicmpping/libzbxicmpping.a \
 	$(top_srcdir)/src/libs/zbxdbupgrade/libzbxdbupgrade.a \
 	$(top_srcdir)/src/libs/zbxdbhigh/libzbxdbhigh.a \
-	$(top_srcdir)/src/libs/zbxdb/libzbxdb.a
+	$(top_srcdir)/src/libs/zbxdb/libzbxdb.a \
+	$(top_srcdir)/src/libs/zbxmodules/libzbxmodules.a
 
 zabbix_proxy_LDADD += @PROXY_LIBS@
 
@@ -59,13 +60,16 @@ zabbix_proxy_LDFLAGS = @PROXY_LDFLAGS@
 zabbix_proxy_CFLAGS = \
 	-DZABBIX_DAEMON \
 	-DSYSCONFDIR="\"@sysconfdir@\"" \
-	-DDATADIR="\"@datadir@\""
+	-DDATADIR="\"@datadir@\"" \
+	-DLIBDIR="\"@libdir@\""
 
 PROXY_CONFIG = zabbix_proxy.conf
 INCLUDE_DIR = $(DESTDIR)@sysconfdir@/$(PROXY_CONFIG).d
 EXSCRIPTS_DIR = $(DESTDIR)@datadir@/zabbix/externalscripts
+MODULES_DIR = $(DESTDIR)@libdir@
 
 install-data-hook:
 	$(MKDIR_P) "$(INCLUDE_DIR)"
 	$(MKDIR_P) "$(EXSCRIPTS_DIR)"
+	$(MKDIR_P) "$(MODULES_DIR)"
 	test -f "$(DESTDIR)@sysconfdir@/$(PROXY_CONFIG)" || cp "../../conf/$(PROXY_CONFIG)" "$(DESTDIR)@sysconfdir@"
