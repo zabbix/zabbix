@@ -1496,7 +1496,8 @@ int	is_int_prefix(const char *str)
  * Parameters: str   - [IN] string to check                                   *
  *             n     - [IN] string length or ZBX_MAX_UINT64_LEN               *
  *             bits  - [IN] the maximum number of bits in resulting value     *
- *             value - [OUT] a pointer to converted value (optional)          *
+ *             value - [OUT] a pointer to output buffer where the converted   *
+ *                     value is to be written (optional, can be NULL)         *
  *             size  - [IN] size of the output buffer (optional)              *
  *                                                                            *
  * Return value:  SUCCEED - the string is unsigned integer                    *
@@ -1504,19 +1505,20 @@ int	is_int_prefix(const char *str)
  *                       specified number of bits or output buffer is too     *
  *                       small                                                *
  *                                                                            *
- * Note that the output value is not zeroed. So if its size is larger than    *
- * necessary to store the requested number of bits, it should be zeroed by    *
- * caller.                                                                    *
+ * Notes: unused bytes of output buffer are not filled with zeros.            *
+ *        If the size of the output buffer is larger than necessary for       *
+ *        storing the requested number of bits, the unused bytes should be    *
+ *        zeroed by caller.                                                   *
  *                                                                            *
  * Author: Alexander Vladishev, Andris Zeila                                  *
  *                                                                            *
  ******************************************************************************/
-int	is_uint_n_bits(const char *str, size_t n, int bits, void *value, size_t size)
+int	is_uint_n_bits(const char *str, size_t n, unsigned int bits, void *value, size_t size)
 {
 	const zbx_uint64_t	max_uint64 = ~(zbx_uint64_t)(0LL) >> (64 - bits);
 	zbx_uint64_t		value_uint64 = 0, c;
 
-	if ('\0' == *str || 0 == n || 0 == bits)
+	if ('\0' == *str || 0 == n || 0 == bits || bits > 64)
 		return FAIL;
 
 	while ('\0' != *str && 0 < n--)
@@ -1540,13 +1542,13 @@ int	is_uint_n_bits(const char *str, size_t n, int bits, void *value, size_t size
 		/* while on big endian architecture it will be stored into the last value_bytes. We     */
 		/* handle it by storing the offset in the most significant byte of short value and then */
 		/* use the first byte as source offset.                                                 */
-		int value_bytes = ((bits - 1) >> 3) + 1;
-		unsigned short value_offset = (sizeof(zbx_uint64_t) - value_bytes) << 8;
+		unsigned int value_bytes = ((bits - 1) >> 3) + 1;
+		unsigned short value_offset = (unsigned short)(((unsigned int)sizeof(zbx_uint64_t) - value_bytes) << 8);
 
 		if (value_bytes > size)
 			return FAIL;
 
-		memcpy(value, (char*)&value_uint64 + *((unsigned char*)&value_offset) , value_bytes);
+		memcpy(value, (char*)&value_uint64 + *((unsigned char*)&value_offset) , (size_t)value_bytes);
 	}
 
 	return SUCCEED;

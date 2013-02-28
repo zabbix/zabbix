@@ -60,16 +60,15 @@ int	SYSTEM_CPU_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RES
 
 int	SYSTEM_CPU_UTIL(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	char		tmp[16];
-	int		state, mode;
-	uint32_t	cpu_num;
+	char	tmp[16];
+	int	cpu_num, state, mode;
 
 	if (3 < num_param(param))
 		return SYSINFO_RET_FAIL;
 
 	if (0 != get_param(param, 1, tmp, sizeof(tmp)) || '\0' == *tmp || 0 == strcmp(tmp, "all"))
 		cpu_num = 0;
-	else if (SUCCEED != is_uint31(tmp, &cpu_num))
+	else if (SUCCEED != is_uint31(tmp, &cpu_num) || ZBX_UINT31_MAX == cpu_num)
 		return SYSINFO_RET_FAIL;
 	else
 		cpu_num++;
