@@ -279,7 +279,7 @@ else {
 			$data['drules'][$druleid]['description'] = array();
 			if (!empty($drule['proxy_hostid'])) {
 				$proxy = get_host_by_hostid($drule['proxy_hostid']);
-				array_push($data['drules'][$druleid]['description'], $proxy['host'].':');
+				array_push($data['drules'][$druleid]['description'], $proxy['host'].NAME_DELIMITER);
 			}
 		}
 		order_result($data['drules'], getPageSortOrder());

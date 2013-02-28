@@ -17,8 +17,7 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
 require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
 class testPageActionsTriggers extends CWebTest {
@@ -146,21 +145,19 @@ class testPageActionsTriggers extends CWebTest {
 	* @dataProvider allActions
 	*/
 	public function testPageActionsTriggers_CheckLayout($action) {
-		$this->login('actionconf.php?eventsource='.EVENT_SOURCE_TRIGGERS);
+		$this->zbxTestLogin('actionconf.php?eventsource='.EVENT_SOURCE_TRIGGERS);
 		$this->checkTitle('Configuration of actions');
 
 // eventsource is used for a hidden field, so it does not work. See above: ?eventsource=0 is used instead
-//		$this->dropdown_select('eventsource', 'Triggers');
+//		$this->zbxTestDropdownSelect('eventsource', 'Triggers');
 
-		$this->ok('Event source');
-		$this->ok('Displaying');
+		$this->zbxTestTextPresent('Event source');
+		$this->zbxTestTextPresent('Displaying');
 		// Header
-		$this->ok(array('Name', 'Conditions', 'Operations', 'Status'));
+		$this->zbxTestTextPresent(array('Name', 'Conditions', 'Operations', 'Status'));
 		// Data
-		$this->ok(array($action['name']));
-		$this->dropdown_select('go', 'Enable selected');
-		$this->dropdown_select('go', 'Disable selected');
-		$this->dropdown_select('go', 'Delete selected');
+		$this->zbxTestTextPresent(array($action['name']));
+		$this->zbxTestDropdownHasOptions('go', array('Enable selected', 'Disable selected', 'Delete selected'));
 	}
 
 	/**
@@ -169,15 +166,13 @@ class testPageActionsTriggers extends CWebTest {
 	public function testPageActionsTriggers_SimpleUpdate($action) {
 		$this->calculateHash($action['actionid']);
 
-		$this->login('actionconf.php?eventsource='.EVENT_SOURCE_TRIGGERS);
+		$this->zbxTestLogin('actionconf.php?eventsource='.EVENT_SOURCE_TRIGGERS);
 		$this->checkTitle('Configuration of actions');
-		$this->click('link='.$action['name']);
-		$this->wait();
-		$this->button_click('save');
-		$this->wait();
+		$this->zbxTestClickWait('link='.$action['name']);
+		$this->zbxTestClickWait('save');
 		$this->checkTitle('Configuration of actions');
-		$this->ok('Action updated');
-		$this->ok($action['name']);
+		$this->zbxTestTextPresent('Action updated');
+		$this->zbxTestTextPresent($action['name']);
 
 		$this->verifyHash();
 	}
@@ -188,7 +183,7 @@ class testPageActionsTriggers extends CWebTest {
 	public function testPageActionsTriggers_SingleEnableDisable($action) {
 		$actionid = $action['actionid'];
 
-		$this->login('actionconf.php?eventsource='.EVENT_SOURCE_TRIGGERS);
+		$this->zbxTestLogin('actionconf.php?eventsource='.EVENT_SOURCE_TRIGGERS);
 		$this->checkTitle('Configuration of actions');
 		switch ($action['status']) {
 			case ACTION_STATUS_ENABLED:
@@ -201,7 +196,7 @@ class testPageActionsTriggers extends CWebTest {
 		$this->wait();
 
 		$this->checkTitle('Configuration of actions');
-		$this->ok('Status updated');
+		$this->zbxTestTextPresent('Status updated');
 
 		switch ($action['status']) {
 			case ACTION_STATUS_ENABLED:
@@ -232,18 +227,17 @@ class testPageActionsTriggers extends CWebTest {
 
 		$this->chooseOkOnNextConfirmation();
 
-		$this->login('actionconf.php?eventsource='.EVENT_SOURCE_TRIGGERS);
+		$this->zbxTestLogin('actionconf.php?eventsource='.EVENT_SOURCE_TRIGGERS);
 		$this->checkTitle('Configuration of actions');
-		$this->checkbox_select("g_actionid[$actionid]");
-		$this->dropdown_select('go', 'Disable selected');
-		$this->button_click('goButton');
-		$this->wait();
+		$this->zbxTestCheckboxSelect('g_actionid['.$actionid.']');
+		$this->zbxTestDropdownSelect('go', 'Disable selected');
+		$this->zbxTestClickWait('goButton');
 
 		$this->getConfirmation();
 
 		$this->checkTitle('Configuration of actions');
-		$this->ok('Status updated');
-		$this->ok('Disabled');
+		$this->zbxTestTextPresent('Status updated');
+		$this->zbxTestTextPresent('Disabled');
 
 		$sql = "SELECT * FROM actions WHERE actionid=$actionid AND status=1";
 		$this->assertEquals(1, DBcount($sql));
@@ -262,18 +256,17 @@ class testPageActionsTriggers extends CWebTest {
 
 		$this->chooseOkOnNextConfirmation();
 
-		$this->login('actionconf.php?eventsource='.EVENT_SOURCE_TRIGGERS);
+		$this->zbxTestLogin('actionconf.php?eventsource='.EVENT_SOURCE_TRIGGERS);
 		$this->checkTitle('Configuration of actions');
-		$this->checkbox_select("g_actionid[$actionid]");
-		$this->dropdown_select('go', 'Enable selected');
-		$this->button_click('goButton');
-		$this->wait();
+		$this->zbxTestCheckboxSelect('g_actionid['.$actionid.']');
+		$this->zbxTestDropdownSelect('go', 'Enable selected');
+		$this->zbxTestClickWait('goButton');
 
 		$this->getConfirmation();
 
 		$this->checkTitle('Configuration of actions');
-		$this->ok('Status updated');
-		$this->ok('Enabled');
+		$this->zbxTestTextPresent('Status updated');
+		$this->zbxTestTextPresent('Enabled');
 
 		$sql = "SELECT * FROM actions WHERE actionid=$actionid AND status=0";
 		$this->assertEquals(1, DBcount($sql));
@@ -294,17 +287,16 @@ class testPageActionsTriggers extends CWebTest {
 
 		DBsave_tables('actions');
 
-		$this->login('actionconf.php?eventsource='.EVENT_SOURCE_TRIGGERS);
+		$this->zbxTestLogin('actionconf.php?eventsource='.EVENT_SOURCE_TRIGGERS);
 		$this->checkTitle('Configuration of actions');
-		$this->checkbox_select("g_actionid[$actionid]");
-		$this->dropdown_select('go', 'Delete selected');
-		$this->button_click('goButton');
-		$this->wait();
+		$this->zbxTestCheckboxSelect('g_actionid['.$actionid.']');
+		$this->zbxTestDropdownSelect('go', 'Delete selected');
+		$this->zbxTestClickWait('goButton');
 
 		$this->getConfirmation();
 
 		$this->checkTitle('Configuration of actions');
-		$this->ok('Selected actions deleted');
+		$this->zbxTestTextPresent('Selected actions deleted');
 
 		$sql = "SELECT * FROM actions WHERE actionid=$actionid";
 		$this->assertEquals(0, DBcount($sql));
@@ -321,4 +313,3 @@ class testPageActionsTriggers extends CWebTest {
 		$this->markTestIncomplete();
 	}
 }
-?>

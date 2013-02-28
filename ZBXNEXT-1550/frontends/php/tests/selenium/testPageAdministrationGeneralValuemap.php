@@ -17,8 +17,7 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
 require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
 class testPageAdministrationGeneralValuemap extends CWebTest {
@@ -31,53 +30,44 @@ class testPageAdministrationGeneralValuemap extends CWebTest {
 	* @dataProvider allValuemaps
 	*/
 	public function testPageAdministrationGeneralValuemap_CheckLayout($valuemap) {
-
-		$this->login('adm.valuemapping.php');
+		$this->zbxTestLogin('adm.valuemapping.php');
 		$this->checkTitle('Configuration of value mapping');
-		$this->ok('CONFIGURATION OF VALUE MAPPING');
-		$this->ok('Value mapping');
-		$this->ok(array('Name', 'Value map'));
+		$this->zbxTestTextPresent('CONFIGURATION OF VALUE MAPPING');
+		$this->zbxTestTextPresent('Value mapping');
+		$this->zbxTestTextPresent(array('Name', 'Value map'));
 		$this->assertElementPresent('form');
 		// checking that all valuemaps are present in the report
-		$this->ok(array($valuemap['name']));
+		$this->zbxTestTextPresent($valuemap['name']);
 
 		// checking that in the "Value map" column are correct values
-		$sqlMappings = 'SELECT m.value FROM mappings m WHERE m.valuemapid='.$valuemap['valuemapid'];
-		$result = DBfetch(DBselect($sqlMappings));
-		$value = $result['value'];
-
-		$sqlValuemaps = 'SELECT m.newvalue FROM mappings m WHERE m.valuemapid='.$valuemap['valuemapid'];
-		$result = DBfetch(DBselect($sqlValuemaps));
-		$new_value = $result['newvalue'];
-
-		$this->ok("$value ? $new_value");
-
+		$sqlMappings = 'SELECT value,newvalue FROM mappings WHERE valuemapid='.$valuemap['valuemapid'];
+		$result = DBselect($sqlMappings);
+		while ($row = DBfetch($result)) {
+			$this->zbxTestTextPresent($row['value'].' ⇒ '.$row['newvalue']);
+		}
 	}
 
 	/**
 	* @dataProvider allValuemaps
 	*/
 	public function testPageAdministrationGeneralValuemap_SimpleUpdate($valuemap) {
-
 		$sqlValuemaps = 'select * from valuemaps order by valuemapid';
-		$oldHashValuemap=DBhash($sqlValuemaps);
+		$oldHashValuemap = DBhash($sqlValuemaps);
 
 		$sqlMappings = 'select * from mappings order by mappingid';
-		$oldHashMappings=DBhash($sqlMappings);
+		$oldHashMappings = DBhash($sqlMappings);
 
-		$this->login('adm.valuemapping.php');
-		// checking that can click on each valuemap and then save it without any changes
-		$this->click('link='.$valuemap['name']);
-		$this->wait();
-		$this->button_click('save');
-		$this->wait();
-		$this->ok('Value map updated');
+		$this->zbxTestLogin('adm.valuemapping.php');
+		$this->zbxTestClickWait('link='.$valuemap['name']);
+		$this->zbxTestClickWait('save');
+		$this->zbxTestTextPresent('Value map updated');
 
 		$newHashValuemap = DBhash($sqlValuemaps);
-		$this->assertEquals($oldHashValuemap, $newHashValuemap, "Chuck Norris: no-change valuemap update should not update data in table 'valuemaps'");
+		$this->assertEquals($oldHashValuemap, $newHashValuemap,
+				"Chuck Norris: no-change valuemap update should not update data in table 'valuemaps'");
 
 		$newHashMappings = DBhash($sqlMappings);
-		$this->assertEquals($oldHashMappings, $newHashMappings, "Chuck Norris: no-change valuemap update should not update data in table 'mappings'");
+		$this->assertEquals($oldHashMappings, $newHashMappings,
+				"Chuck Norris: no-change valuemap update should not update data in table 'mappings'");
 	}
 }
-?>
