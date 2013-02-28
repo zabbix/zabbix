@@ -248,6 +248,157 @@ class testInheritanceTriggerPrototype extends CWebTest {
 		$this->assertAttribute("//input[@id='cancel']/@value", 'Cancel');
 	}
 
+
+	public static function simple() {
+		return array(
+			array(
+				array('expected' => TRIGGER_GOOD,
+					'description' => 'triggerSimple',
+					'hostCheck' => true,
+					'dbCheck' => true)
+			),
+/*			array(
+				array('expected' => TRIGGER_GOOD,
+					'description' => 'triggerName',
+					'hostCheck' => true)
+			),
+			array(
+				array('expected' => TRIGGER_GOOD,
+					'description' => 'triggerRemove',
+					'hostCheck' => true,
+					'dbCheck' => true,
+					'remove' => true)
+			),
+			array(
+				array('expected' => TRIGGER_GOOD,
+					'description' => 'triggerNotRemove',
+					'hostCheck' => true,
+					'dbCheck' => true,
+					'hostRemove' => true,
+					'remove' => true)
+			),
+			array(
+				array('expected' => TRIGGER_BAD,
+					'description' => 'triggerSimple',
+					'errors' => array(
+						'ERROR: Cannot add trigger',
+						'Trigger "triggerSimple" already exists on "Inheritance test template".')
+				)
+			)*/
+		);
+	}
+
+	/**
+	 * @dataProvider simple
+	 */
+	public function testInheritanceTriggerPrototype_simpleCreate($data) {
+		$this->zbxTestLogin('templates.php');
+
+		$template = 'Inheritance test template';
+		$host = 'Template inheritance test host';
+		$discoveryRule = 'discoveryRuleTest';
+		$discoveryKey = 'discovery-rule-test';
+		$item = 'itemDiscovery';
+		$itemKey = 'item-discovery-prototype';
+
+		$description = $data['description'];
+		$expression = '{'.$this->template.':'.$this->itemKey.'.last(0)}=0';
+		$expressionHost = '{'.$host.':'.$itemKey.'.last(0)}=0';
+
+		$this->zbxTestOpen('templates.php');
+		$this->zbxTestClickWait("link=$template");
+		$this->zbxTestClickWait("//div[@class='w']//a[text()='Triggers']");
+		$this->zbxTestClickWait('form');
+
+		$this->input_type('description', $description);
+		$this->input_type('expression', $expression);
+		$this->zbxTestClickWait('save');
+
+/*		switch ($data['expected']) {
+			case TRIGGER_GOOD:
+				$this->zbxTestTextPresent('Trigger added');
+				$this->checkTitle('Configuration of triggers');
+				$this->zbxTestTextPresent('CONFIGURATION OF TRIGGERS');
+				break;
+
+			case TRIGGER_BAD:
+				$this->checkTitle('Configuration of triggers');
+				$this->zbxTestTextPresent('CONFIGURATION OF TRIGGERS');
+				foreach ($data['errors'] as $msg) {
+					$this->zbxTestTextPresent($msg);
+				}
+				$this->zbxTestTextPresent(array('Name', 'Expression', 'Description'));
+				break;
+		}
+
+		if (isset($data['hostCheck'])) {
+			$this->zbxTestOpenWait('hosts.php');
+			$this->zbxTestClickWait("link=$host");
+			$this->zbxTestClickWait("//div[@class='w']//a[text()='Triggers']");
+
+			$this->zbxTestTextPresent("$template: $description");
+			$this->zbxTestClickWait("link=$description");
+			$this->assertElementValue('description', $description);
+			$this->assertElementValue('expression', $expressionHost);
+		}
+
+		if (isset($data['dbCheck'])) {
+			// template
+			$result = DBselect("SELECT description, triggerid FROM triggers where description = '".$description."' limit 1");
+			while ($row = DBfetch($result)) {
+				$this->assertEquals($row['description'], $description);
+				$templateid = $row['triggerid'];
+			}
+			// host
+			$result = DBselect("SELECT description FROM triggers where description = '".$description."'  AND templateid = ".$templateid."");
+			while ($row = DBfetch($result)) {
+				$this->assertEquals($row['description'], $description);
+			}
+		}
+
+		if (isset($data['hostRemove'])) {
+			$result = DBselect("SELECT description, triggerid FROM triggers where description = '".$description."' limit 1");
+			while ($row = DBfetch($result)) {
+				$templateid = $row['triggerid'];
+			}
+			$result = DBselect("SELECT triggerid FROM triggers where description = '".$description."'  AND templateid = ".$templateid."");
+			while ($row = DBfetch($result)) {
+				$triggerId = $row['triggerid'];
+			}
+
+			$this->zbxTestOpen('hosts.php');
+			$this->zbxTestClickWait("link=$host");
+			$this->zbxTestClickWait("//div[@class='w']//a[text()='Triggers']");
+
+			$this->zbxTestCheckboxSelect("g_triggerid_$triggerId");
+			$this->zbxTestDropdownSelect('go', 'Delete selected');
+			$this->zbxTestClick('goButton');
+
+			$this->getConfirmation();
+			$this->wait();
+			$this->zbxTestTextPresent(array('ERROR: Cannot delete triggers', 'Cannot delete templated trigger'));
+		}
+
+		if (isset($data['remove'])) {
+			$result = DBselect("SELECT triggerid FROM triggers where description = '".$description."' limit 1");
+			while ($row = DBfetch($result)) {
+				$triggerId = $row['triggerid'];
+			}
+			$this->zbxTestOpen('templates.php');
+			$this->zbxTestClickWait("link=$template");
+			$this->zbxTestClickWait("//div[@class='w']//a[text()='Triggers']");
+
+			$this->zbxTestCheckboxSelect("g_triggerid_$triggerId");
+			$this->zbxTestDropdownSelect('go', 'Delete selected');
+			$this->zbxTestClick('goButton');
+
+			$this->getConfirmation();
+			$this->wait();
+			$this->zbxTestTextPresent('Triggers deleted');
+			$this->zbxTestTextNotPresent("$template: $description");
+		}*/
+	}
+
 	/**
 	 * Restore the original tables.
 	 */
