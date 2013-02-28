@@ -100,7 +100,7 @@ int	load_modules(const char *path, char **file_names, int timeout, int verbose)
 
 	char		**file_name, *buffer = NULL;
 	void		*lib;
-	char		fill_name[MAX_STRING_LEN], error[MAX_STRING_LEN];
+	char		full_name[MAX_STRING_LEN], error[MAX_STRING_LEN];
 	int		(*func_init)(), (*func_version)();
 	ZBX_METRIC	*(*func_list)();
 	void		(*func_timeout)();
@@ -110,11 +110,11 @@ int	load_modules(const char *path, char **file_names, int timeout, int verbose)
 
 	for (file_name = file_names; NULL != *file_name; file_name++)
 	{
-		zbx_snprintf(fill_name, sizeof(fill_name), "%s/%s", path, *file_name);
+		zbx_snprintf(full_name, sizeof(full_name), "%s/%s", path, *file_name);
 
-		zabbix_log(LOG_LEVEL_DEBUG, "loading module \"%s\"", fill_name);
+		zabbix_log(LOG_LEVEL_DEBUG, "loading module \"%s\"", full_name);
 
-		if (NULL == (lib = dlopen(fill_name, RTLD_NOW)))
+		if (NULL == (lib = dlopen(full_name, RTLD_NOW)))
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "cannot load module \"%s\": %s", *file_name, dlerror());
 			goto fail;
