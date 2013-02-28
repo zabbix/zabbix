@@ -1172,7 +1172,7 @@ FIELD		|hostdiscoveryid|t_id		|	|NOT NULL	|0
 FIELD		|hostid		|t_id		|	|NOT NULL	|ZBX_SYNC		|1|hosts
 FIELD		|parent_hostid	|t_id		|	|NULL	|ZBX_SYNC		|2|hosts	|hostid
 FIELD		|parent_itemid	|t_id		|	|NULL	|ZBX_SYNC		|3|items	|itemid
-UNIQUE		|1		|itemid,parent_hostid,parent_itemid
+UNIQUE		|1		|hostid,parent_hostid,parent_itemid
 
 TABLE|profiles|profileid|0
 FIELD		|profileid	|t_id		|	|NOT NULL	|0
