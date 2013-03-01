@@ -873,6 +873,20 @@ static int	DBpatch_02010044()
 
 	return DBadd_foreign_key("host_discovery", 3, &field);
 }
+
+static int	DBpatch_02010045()
+{
+	const ZBX_FIELD field = {"templateid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBadd_field("hosts", &field);
+}
+
+static int	DBpatch_02010046()
+{
+	const ZBX_FIELD	field = {"templateid", NULL, "hosts", "hostid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("hosts", 3, &field);
+}
 #endif	/* not HAVE_SQLITE3 */
 
 static void	DBget_version(int *mandatory, int *optional)
@@ -955,11 +969,13 @@ int	DBcheck_version()
 		{DBpatch_02010042, 2010042, 0, 1},
 		{DBpatch_02010043, 2010043, 0, 1},
 		{DBpatch_02010044, 2010044, 0, 1},
+		{DBpatch_02010045, 2010045, 0, 1},
+		{DBpatch_02010046, 2010046, 0, 1},
 		/* IMPORTANT! When adding a new mandatory DBPatch don't forget to update it for SQLite, too. */
 		{NULL}
 	};
 #else
-	required = 2010044;	/* <---- Update mandatory DBpatch for SQLite here. */
+	required = 2010046;	/* <---- Update mandatory DBpatch for SQLite here. */
 #endif
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
