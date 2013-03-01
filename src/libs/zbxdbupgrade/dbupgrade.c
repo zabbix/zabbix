@@ -466,14 +466,18 @@ static int	DBdrop_foreign_key(const char *table_name, int id)
 
 static int	DBcreate_dbversion_table()
 {
-	const ZBX_TABLE	*table;
+	const ZBX_TABLE	table =
+			{"dbversion", "", 0,
+				{
+					{"mandatory", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"optional", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{NULL}
+				}
+			};
 	int		ret;
 
-	if (NULL == (table = DBget_table("dbversion")))
-		assert(0);
-
 	DBbegin();
-	if (SUCCEED == (ret = DBcreate_table(table)))
+	if (SUCCEED == (ret = DBcreate_table(&table)))
 	{
 		if (ZBX_DB_OK > DBexecute("insert into dbversion (mandatory,optional) values (%d,%d)",
 				ZBX_FIRST_DB_VERSION, ZBX_FIRST_DB_VERSION))
@@ -830,7 +834,18 @@ static int	DBpatch_02010039()
 
 static int	DBpatch_02010040()
 {
-	return DBcreate_table(DBget_table("host_discovery"));
+	const ZBX_TABLE	table =
+			{"host_discovery", "hostdiscoveryid", 0,
+				{
+					{"hostdiscoveryid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"hostid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"parent_hostid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0},
+					{"parent_itemid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0},
+					{NULL}
+				}
+			};
+
+	return DBcreate_table(&table);
 }
 
 static int	DBpatch_02010041()
