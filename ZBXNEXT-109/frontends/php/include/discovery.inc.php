@@ -84,24 +84,26 @@ function discovery_check_type2str($type = null) {
 }
 
 function discovery_check2str($type, $key, $port) {
-	$external_param = '';
+	$externalParam = '';
 
-	if (!empty($key)) {
+	if ($key !== '') {
 		switch ($type) {
 			case SVC_SNMPv1:
 			case SVC_SNMPv2c:
 			case SVC_SNMPv3:
 			case SVC_AGENT:
-				$external_param = ' "'.$key.'"';
+				$externalParam = ' "'.$key.'"';
 				break;
 		}
 	}
+
 	$result = discovery_check_type2str($type);
-	if (svc_default_port($type) != $port || $type == SVC_TCP) {
+
+	if (svc_default_port($type) !== $port || $type === SVC_TCP) {
 		$result .= ' ('.$port.')';
 	}
-	$result .= $external_param;
-	return $result;
+
+	return $result.$externalParam;
 }
 
 function discovery_port2str($type_int, $port) {

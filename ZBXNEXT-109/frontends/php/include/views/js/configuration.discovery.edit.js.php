@@ -1,7 +1,7 @@
 <script type="text/x-jquery-tmpl" id="dcheckRowTPL">
 	<tr id="dcheckRow_#{dcheckid}">
 		<td id="dcheckCell_#{dcheckid}">
-			<span class="bold"> #{name} </span>
+			<span class="bold">#{name}</span>
 		</td>
 		<td>
 			<input type="button" class="input link_menu" name="edit" value="<?php echo CHtml::encode(_('Edit')); ?>"
@@ -198,8 +198,11 @@
 	}
 
 	function addPopupValues(list) {
-		var uniqTypeList = [ZBX_SVC.agent, ZBX_SVC.snmpv1, ZBX_SVC.snmpv2, ZBX_SVC.snmpv3],
-			dcheckRowTpl = new Template(jQuery('#dcheckRowTPL').html()),
+		// available type for device uniqueness criteria
+		var uniqTypeList = [ZBX_SVC.agent, ZBX_SVC.snmpv1, ZBX_SVC.snmpv2, ZBX_SVC.snmpv3];
+
+		// templates
+		var dcheckRowTpl = new Template(jQuery('#dcheckRowTPL').html()),
 			uniqRowTpl = new Template(jQuery('#uniqRowTPL').html());
 
 		for (var i = 0; i < list.length; i++) {
@@ -226,10 +229,6 @@
 						jQuery('#dcheckCell_' + value.dcheckid).append(input);
 					}
 				}
-
-				if (jQuery.inArray(parseInt(value.type, 10), uniqTypeList) !== -1) {
-					jQuery('#uniqList').append(uniqRowTpl.evaluate(value));
-				}
 			}
 
 			// update
@@ -255,7 +254,31 @@
 					}
 				}
 
+				// update check name
 				jQuery('#dcheckCell_' + value.dcheckid + ' .bold').text(value['name']);
+			}
+
+			// update device uniqueness criteria
+			var uniquenessCriteria = jQuery('#uniqueness_criteria_' + value.dcheckid);
+
+			if (jQuery.inArray(parseInt(value.type, 10), uniqTypeList) !== -1) {
+				if (uniquenessCriteria.length) {
+					jQuery('label[for=uniqueness_criteria_' + value.dcheckid + ']').text(value['name']);
+				}
+				else {
+					jQuery('#uniqList').append(uniqRowTpl.evaluate(value));
+				}
+			}
+			else {
+				if (uniquenessCriteria.length) {
+					uniquenessCriteria.remove();
+					jQuery('label[for=uniqueness_criteria_' + value.dcheckid + ']').remove();
+
+					// check first device
+					if (jQuery('#uniqList input').length < 2) {
+						jQuery('#uniqList input').attr('checked', true);
+					}
+				}
 			}
 		}
 	}
@@ -284,7 +307,9 @@
 			jQuery('#dcheckList').after(tpl.evaluate());
 
 			// display fields dependent from type
-			jQuery('#type').change(updateNewDCheckType);
+			jQuery('#type').change(function() {
+				updateNewDCheckType(dcheckId);
+			});
 
 			// display addition snmpv3 security level fields dependent from snmpv3 security level
 			jQuery('#snmpv3_securitylevel').change(updateNewDCheckSNMPType);
@@ -329,22 +354,31 @@
 		// restore form values
 		if (isUpdate) {
 			jQuery('#dcheckCell_' + dcheckId + ' input').each(function(i, item) {
-				var obj = jQuery(item);
+				var itemObj = jQuery(item);
 
-				var name = obj.attr('name').replace('dchecks[' + dcheckId + '][', '');
+				var name = itemObj.attr('name').replace('dchecks[' + dcheckId + '][', '');
 				name = name.substring(0, name.length - 1);
 
 				// ignore "name" value bacause it is virtual
 				if (name !== 'name') {
-					jQuery('#' + name).val(obj.val());
+					jQuery('#' + name).val(itemObj.val());
+
+					// set radio button value
+					var radioObj = jQuery('input[name=' + name + ']');
+
+					if (radioObj.attr('type') == 'radio') {
+						radioObj.removeAttr('checked');
+
+						jQuery('#' + name + '_' + itemObj.val()).attr('checked', true);
+					}
 				}
 			});
 		}
 
-		updateNewDCheckType(e);
+		updateNewDCheckType(dcheckId);
 	}
 
-	function updateNewDCheckType(e) {
+	function updateNewDCheckType(dcheckId) {
 		var dcheckType = parseInt(jQuery('#type').val(), 10);
 
 		var keyRowTypes = {};
@@ -375,14 +409,18 @@
 		toggleInputs('newCheckSecNameRow', isset(dcheckType, secNameRowTypes));
 		toggleInputs('newCheckSecLevRow', isset(dcheckType, secNameRowTypes));
 
-		if (ZBX_SVC.icmp != dcheckType && jQuery('#ports').val().length == 0) {
-			jQuery('#ports').val(discoveryCheckDefaultPort(dcheckType));
+		// set default port
+		var port = jQuery('#ports'),
+			oldType = (typeof(dcheckId) != 'undefined') ? ZBX_CHECKLIST[dcheckId].type : '';
+
+		if (ZBX_SVC.icmp != dcheckType && dcheckType != oldType) {
+			port.val(discoveryCheckDefaultPort(dcheckType));
 		}
 
-		updateNewDCheckSNMPType(e);
+		updateNewDCheckSNMPType();
 	}
 
-	function updateNewDCheckSNMPType(e) {
+	function updateNewDCheckSNMPType() {
 		var dcheckType = parseInt(jQuery('#type').val(), 10),
 			dcheckSecLevType = parseInt(jQuery('#snmpv3_securitylevel').val(), 10);
 
@@ -426,12 +464,15 @@
 						|| jQuery('#dcheckRow_' + dCheck.dcheckid).length) {
 				dCheck.dcheckid++;
 			}
+		}
 
-			for (var dcheckid in ZBX_CHECKLIST) {
+		for (var dcheckid in ZBX_CHECKLIST) {
+			if (typeof(dcheckId) == 'undefined' || (typeof(dcheckId) != 'undefined') && dcheckId != dcheckid) {
 				if ((typeof dCheck['key_'] == 'undefined' || ZBX_CHECKLIST[dcheckid]['key_'] === dCheck['key_'])
-						&& (typeof dCheck['type'] == 'undefined' || ZBX_CHECKLIST[dcheckid]['type'] === dCheck['type'])
+						&& (typeof dCheck['type'] == 'undefined'
+							|| ZBX_CHECKLIST[dcheckid]['type'] === dCheck['type'])
 						&& (typeof dCheck['ports'] == 'undefined'
-								|| ZBX_CHECKLIST[dcheckid]['ports'] === dCheck['ports'])
+							|| ZBX_CHECKLIST[dcheckid]['ports'] === dCheck['ports'])
 						&& (typeof dCheck['snmp_community'] == 'undefined'
 							|| ZBX_CHECKLIST[dcheckid]['snmp_community'] === dCheck['snmp_community'])
 						&& (typeof dCheck['snmpv3_authprotocol'] == 'undefined'
