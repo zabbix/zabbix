@@ -498,7 +498,7 @@ static void	DBlld_save_items(zbx_uint64_t hostid, zbx_vector_ptr_t *items, unsig
  * Purpose: add or update items for discovered items                          *
  *                                                                            *
  ******************************************************************************/
-void	DBlld_update_items(zbx_uint64_t hostid, zbx_uint64_t discovery_itemid, struct zbx_json_parse *jp_data,
+void	DBlld_update_items(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, struct zbx_json_parse *jp_data,
 		char **error, const char *f_macro, const char *f_regexp, ZBX_REGEXP *regexps, int regexps_num,
 		int lastcheck)
 {
@@ -524,7 +524,7 @@ void	DBlld_update_items(zbx_uint64_t hostid, zbx_uint64_t discovery_itemid, stru
 			" from items i,item_discovery id"
 			" where i.itemid=id.itemid"
 				" and id.parent_itemid=" ZBX_FS_UI64,
-			discovery_itemid);
+			lld_ruleid);
 
 	while (NULL != (row = DBfetch(result)))
 	{

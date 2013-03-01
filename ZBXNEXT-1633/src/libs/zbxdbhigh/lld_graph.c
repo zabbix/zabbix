@@ -519,7 +519,7 @@ static void	DBlld_save_graphs(zbx_vector_ptr_t *graphs, int width, int height, d
  *             jp_data - [IN] received data                                   *
  *                                                                            *
  ******************************************************************************/
-void	DBlld_update_graphs(zbx_uint64_t hostid, zbx_uint64_t discovery_itemid, struct zbx_json_parse *jp_data,
+void	DBlld_update_graphs(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, struct zbx_json_parse *jp_data,
 		char **error, const char *f_macro, const char *f_regexp, ZBX_REGEXP *regexps, int regexps_num)
 {
 	const char		*__function_name = "DBlld_update_graphs";
@@ -549,7 +549,7 @@ void	DBlld_update_graphs(zbx_uint64_t hostid, zbx_uint64_t discovery_itemid, str
 				" and i.itemid=gi.itemid"
 				" and gi.graphid=g.graphid"
 				" and id.parent_itemid=" ZBX_FS_UI64,
-			discovery_itemid);
+			lld_ruleid);
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -572,7 +572,7 @@ void	DBlld_update_graphs(zbx_uint64_t hostid, zbx_uint64_t discovery_itemid, str
 				" and i.itemid=gi.itemid"
 				" and gi.graphid=g.graphid"
 				" and id.parent_itemid=" ZBX_FS_UI64,
-			discovery_itemid);
+			lld_ruleid);
 
 	while (NULL != (row = DBfetch(result)))
 	{
