@@ -23,15 +23,15 @@ jQuery(function($) {
 	/**
 	 * Create multi select input element.
 	 *
-	 * @param string $options['url']
-	 * @param string $options['name']
-	 * @param int    $options['limit']
-	 * @param bool   $options['disabled']
-	 * @param object $options['labels']
-	 * @param object $options['data']
-	 * @param string $options['data'][id]
-	 * @param string $options['data'][name]
-	 * @param string $options['data'][prefix]
+	 * @param string options['url']
+	 * @param string options['name']
+	 * @param int    options['limit']
+	 * @param bool   options['disabled']
+	 * @param object options['labels']
+	 * @param object options['data']
+	 * @param string options['data'][id]
+	 * @param string options['data'][name]
+	 * @param string options['data'][prefix]
 	 *
 	 * @return object
 	 */
@@ -297,7 +297,7 @@ jQuery(function($) {
 			$.each(data, function(i, item) {
 				addSelected(item, obj, values, options);
 			});
-		};
+		}
 
 		function loadAvailable(data, obj, values, options) {
 			cleanAvailable(obj, values);
@@ -335,7 +335,7 @@ jQuery(function($) {
 			}
 
 			showAvailable(obj, values);
-		};
+		}
 
 		function addSelected(item, obj, values, options) {
 			if (typeof(values.selected[item.id]) == 'undefined') {
@@ -376,7 +376,7 @@ jQuery(function($) {
 					$('.selected ul', obj).append(li.append(text));
 				}
 			}
-		};
+		}
 
 		function removeSelected(id, obj, values, options) {
 			// remove
@@ -392,7 +392,7 @@ jQuery(function($) {
 			cleanAvailable(obj, values);
 			cleanLastSearch(obj);
 			$('input[type="text"]', obj).focus();
-		};
+		}
 
 		function addAvailable(item, obj, values, options) {
 			if (empty(options.limit) || (options.limit > 0 && $('.available li', obj).length < options.limit)) {
@@ -431,7 +431,7 @@ jQuery(function($) {
 			else {
 				values.isMoreMatchesFound = true;
 			}
-		};
+		}
 
 		function select(id, obj, values, options) {
 			if (values.isAjaxLoaded && !values.isWaiting) {
@@ -454,11 +454,11 @@ jQuery(function($) {
 				$('.available li.hover', obj).removeClass('hover');
 				$('.available li:first-child', obj).addClass('hover');
 			}
-		};
+		}
 
 		function hideAvailable(obj) {
 			$('.available', obj).fadeOut(0);
-		};
+		}
 
 		function cleanAvailable(obj, values) {
 			$('.label-empty-result', obj).remove();
@@ -466,7 +466,7 @@ jQuery(function($) {
 			$('.available li', obj).remove();
 			values.available = {};
 			values.isMoreMatchesFound = false;
-		};
+		}
 
 		function cleanLastSearch(obj) {
 			var input = $('input[type="text"]', obj);
@@ -521,7 +521,7 @@ jQuery(function($) {
 				'padding-left': left,
 				width: values.width - left
 			});
-		};
+		}
 
 		function scrollAvailable(obj) {
 			var hover = $('.available li.hover', obj);
@@ -556,6 +556,6 @@ jQuery(function($) {
 			}
 
 			return length;
-		};
+		}
 	};
 });
