@@ -22,25 +22,28 @@
 
 #define ZBX_PERFSTAT_PAGE_SHIFT	12	/* 4 KB */
 
-int	SYSTEM_SWAP_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	SYSTEM_SWAP_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 #ifdef HAVE_LIBPERFSTAT
 	perfstat_memory_total_t	mem;
-	char			*swapdev, *mode;
+	char			swapdev[32], mode[32];
 
-	if (2 < request->nparam)
+	if (2 < num_param(param))
 		return SYSINFO_RET_FAIL;
 
-	swapdev = get_rparam(request, 0);
-	mode = get_rparam(request, 1);
+	if (0 != get_param(param, 1, swapdev, sizeof(swapdev)))
+		*swapdev = '\0';
 
-	if (NULL != swapdev && '\0' != *swapdev && 0 != strcmp(swapdev, "all"))
+	if ('\0' != *swapdev && 0 != strcmp(swapdev, "all"))
 		return SYSINFO_RET_FAIL;
+
+	if (0 != get_param(param, 2, mode, sizeof(mode)))
+		*mode = '\0';
 
 	if(1 != perfstat_memory_total(NULL, &mem, sizeof(perfstat_memory_total_t), 1))
 		return SYSINFO_RET_FAIL;
 
-	if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "free"))
+	if ('\0' == *mode || 0 == strcmp(mode, "free"))
 		SET_UI64_RESULT(result, mem.pgsp_free << ZBX_PERFSTAT_PAGE_SHIFT);
 	else if (0 == strcmp(mode, "total"))
 		SET_UI64_RESULT(result, mem.pgsp_total << ZBX_PERFSTAT_PAGE_SHIFT);

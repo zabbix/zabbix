@@ -18,8 +18,7 @@ agents_ldadd = \
 	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
 	$(top_srcdir)/src/libs/zbxcrypto/libzbxcrypto.a \
 	$(top_srcdir)/src/libs/zbxjson/libzbxjson.a \
-	$(top_srcdir)/src/libs/zbxexec/libzbxexec.a \
-	$(top_srcdir)/src/libs/zbxmodules/libzbxmodules.a
+	$(top_srcdir)/src/libs/zbxexec/libzbxexec.a
 
 agents_ldadd += @AGENT_LIBS@
 
@@ -56,22 +55,18 @@ zabbix_agentd_LDFLAGS = @AGENT_LDFLAGS@
 
 zabbix_agentd_CFLAGS = \
 	-DZABBIX_DAEMON \
-	-DSYSCONFDIR="\"@sysconfdir@\"" \
-	-DLIBDIR="\"@libdir@\""
+	-DSYSCONFDIR="\"@sysconfdir@\""
 
 zabbix_agent_CFLAGS = \
-	-DSYSCONFDIR="\"@sysconfdir@\"" \
-	-DLIBDIR="\"@libdir@\""
+	-DSYSCONFDIR="\"@sysconfdir@\""
 
 AGENT_CONFIG = zabbix_agent.conf
 AGENTD_CONFIG = zabbix_agentd.conf
 AGENT_INCLUDE_DIR = $(DESTDIR)@sysconfdir@/$(AGENT_CONFIG).d
 AGENTD_INCLUDE_DIR = $(DESTDIR)@sysconfdir@/$(AGENTD_CONFIG).d
-MODULES_DIR = $(DESTDIR)@libdir@
 
 install-data-hook:
 	$(MKDIR_P) "$(AGENT_INCLUDE_DIR)"
 	$(MKDIR_P) "$(AGENTD_INCLUDE_DIR)"
-	$(MKDIR_P) "$(MODULES_DIR)"
 	test -f "$(DESTDIR)@sysconfdir@/$(AGENT_CONFIG)" || cp "../../conf/$(AGENT_CONFIG)" "$(DESTDIR)@sysconfdir@"
 	test -f "$(DESTDIR)@sysconfdir@/$(AGENTD_CONFIG)" || cp "../../conf/$(AGENTD_CONFIG)" "$(DESTDIR)@sysconfdir@"

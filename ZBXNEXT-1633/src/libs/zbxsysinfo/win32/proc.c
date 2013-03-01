@@ -94,23 +94,26 @@ lbl_err:
 	return res;
 }
 
-int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	HANDLE	hProcess;
 	DWORD	procList[MAX_PROCESSES], dwSize;
 	int	i, proccount, max_proc_cnt,
 		proc_ok = 0,
 		user_ok = 0;
-	char	*procName,
-		*userName,
+	char	procName[MAX_PATH],
+		userName[MAX_PATH],
 		baseName[MAX_PATH],
 		uname[MAX_NAME];
 
-	if (2 < request->nparam)
+	if (num_param(param) > 2)
 		return SYSINFO_RET_FAIL;
 
-	procName = get_rparam(request, 0);
-	userName = get_rparam(request, 1);
+	if (0 != get_param(param, 1, procName, sizeof(procName)))
+		return SYSINFO_RET_FAIL;
+
+	if (0 != get_param(param, 2, userName, sizeof(userName)))
+		*userName = '\0';
 
 	if (0 == EnumProcesses(procList, sizeof(DWORD) * MAX_PROCESSES, &dwSize))
 		return SYSINFO_RET_FAIL;
@@ -125,7 +128,7 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 		if (NULL != (hProcess = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, procList[i])))
 		{
-			if (NULL != procName && '\0' != *procName)
+			if ('\0' != *procName)
 			{
 				if (SUCCEED == zbx_get_processname(hProcess, baseName))
 					if (0 == stricmp(baseName, procName))
@@ -134,7 +137,7 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 			else
 				proc_ok = 1;
 
-			if (0 != proc_ok && NULL != userName && '\0' != *userName)
+			if (0 != proc_ok && '\0' != *userName)
 			{
 				if (SUCCEED == zbx_get_process_username(hProcess, uname))
 					if (0 == stricmp(uname, userName))
@@ -297,53 +300,51 @@ static int	GetProcessAttribute(HANDLE hProcess,int attr,int type,int count,doubl
  */
 
 
-int	PROC_INFO(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	PROC_INFO(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	DWORD		*procList, dwSize;
 	HANDLE		hProcess;
-	char		*proc_name, *attr, *type, baseName[MAX_PATH];
+	char		proc_name[MAX_PATH],
+			attr[MAX_PATH],
+			type[MAX_PATH],
+			baseName[MAX_PATH];
 	const char	*attrList[] = {"vmsize", "wkset", "pf", "ktime", "utime", "gdiobj", "userobj", "io_read_b", "io_read_op",
 					"io_write_b", "io_write_op", "io_other_b", "io_other_op", NULL},
 			*typeList[] = {"min", "max", "avg", "sum", NULL};
 	double		value;
 	int		i, proc_cnt, counter, attr_id, type_id, ret = SYSINFO_RET_OK;
 
-	if (3 < request->nparam)
+	if (num_param(param) > 3)
 		return SYSINFO_RET_FAIL;
 
-	proc_name = get_rparam(request, 0);
-	attr = get_rparam(request, 1);
-	type = get_rparam(request, 2);
+	if (0 != get_param(param, 1, proc_name, sizeof(proc_name)))
+		*proc_name = '\0';
 
-	if (NULL == proc_name || '\0' == *proc_name)
+	if ('\0' == *proc_name)
 		return SYSINFO_RET_FAIL;
+
+	if (0 != get_param(param, 2, attr, sizeof(attr)))
+		*attr = '\0';
+
+	if ('\0' == *attr)	/* default parameter */
+		zbx_snprintf(attr, sizeof(attr), "%s", attrList[0]);
+
+	if (0 != get_param(param, 3, type, sizeof(type)))
+		*type = '\0';
+
+	if ('\0' == *type)	/* default parameter */
+		zbx_snprintf(type, sizeof(type), "%s", typeList[2]);
 
 	/* Get attribute code from string */
-	if (NULL == attr || '\0' == *attr)
-	{
-		for (attr_id = 0; NULL != attrList[attr_id] && 0 != strcmp(attrList[attr_id], "vmsize"); attr_id++)
-			;
-	}
-	else
-	{
-		for (attr_id = 0; NULL != attrList[attr_id] && 0 != strcmp(attrList[attr_id], attr); attr_id++)
-			;
-	}
+	for (attr_id = 0; NULL != attrList[attr_id] && 0 != strcmp(attrList[attr_id], attr); attr_id++)
+		;
 
 	if (NULL == attrList[attr_id])     /* Unsupported attribute */
 		return SYSINFO_RET_FAIL;
 
 	/* Get type code from string */
-	if (NULL == type || '\0' == *type)
-	{
-		for (type_id = 0; NULL != typeList[type_id] && 0 != strcmp(typeList[type_id], "avg"); type_id++)
-			;
-	}
-	else
-	{
-		for (type_id = 0; NULL != typeList[type_id] && 0 != strcmp(typeList[type_id], type); type_id++)
-			;
-	}
+	for (type_id = 0; NULL != typeList[type_id] && 0 != strcmp(typeList[type_id], type); type_id++)
+		;
 
 	if (NULL == typeList[type_id])
 		return SYSINFO_RET_FAIL;     /* Unsupported type */

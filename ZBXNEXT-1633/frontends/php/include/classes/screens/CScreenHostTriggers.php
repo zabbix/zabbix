@@ -60,7 +60,7 @@ class CScreenHostTriggers extends CScreenBase {
 			));
 			$host = reset($hosts);
 
-			$item = new CSpan(_('Host').NAME_DELIMITER.$host['host'], 'white');
+			$item = new CSpan(_('Host').': '.$host['host'], 'white');
 			$params['hostids'] = $host['hostid'];
 		}
 		else {
@@ -105,13 +105,13 @@ class CScreenHostTriggers extends CScreenBase {
 			$groupComboBox = new CComboBox('tr_groupid', $groupid, 'submit()');
 			$groupComboBox->addItem(0, _('all'));
 			foreach ($groups as $group) {
-				$groupComboBox->addItem($group['groupid'], get_node_name_by_elid($group['groupid'], null, NAME_DELIMITER).$group['name']);
+				$groupComboBox->addItem($group['groupid'], get_node_name_by_elid($group['groupid'], null, ': ').$group['name']);
 			}
 
 			$hostsComboBox = new CComboBox('tr_hostid', $hostid, 'submit()');
 			$hostsComboBox->addItem(0, _('all'));
 			foreach ($hosts as $host) {
-				$hostsComboBox->addItem($host['hostid'], get_node_name_by_elid($host['hostid'], null, NAME_DELIMITER).$host['host']);
+				$hostsComboBox->addItem($host['hostid'], get_node_name_by_elid($host['hostid'], null, ': ').$host['host']);
 			}
 
 			if ($this->mode == SCREEN_MODE_EDIT) {

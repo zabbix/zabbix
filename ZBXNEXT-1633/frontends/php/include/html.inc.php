@@ -213,40 +213,47 @@ function hide_form_items(&$obj) {
 	}
 }
 
-function get_table_header($columnLeft, $columnRights = SPACE) {
+function get_table_header($col1, $col2 = SPACE) {
 	if (isset($_REQUEST['print'])) {
-		hide_form_items($columnLeft);
-		hide_form_items($columnRights);
+		hide_form_items($col1);
+		hide_form_items($col2);
 
-		if ($columnLeft == SPACE && $columnRights == SPACE) {
+		// if empty header than do not show it
+		if ($col1 == SPACE && $col2 == SPACE) {
 			return new CJSscript('');
 		}
 	}
+	$td_l = new CCol(SPACE, 'header_r');
+	$td_l->setAttribute('width', '100%');
+	$right_row = array($td_l);
 
-	$rights = array();
-
-	if ($columnRights) {
-		if (!is_array($columnRights)) {
-			$columnRights = array($columnRights);
+	if (!is_null($col2)) {
+		if (!is_array($col2)) {
+			$col2 = array($col2);
 		}
 
-		foreach ($columnRights as $columnRight) {
-			$rights[] = new CDiv($columnRight, 'floatright');
+		foreach ($col2 as $r_item) {
+			$right_row[] = new CCol($r_item, 'header_r');
 		}
-
-		$rights = array_reverse($rights);
 	}
 
-	$table = new CTable(null, 'ui-widget-header ui-corner-all header maxwidth');
+	$right_tab = new CTable(null, 'nowrap');
+	$right_tab->setAttribute('width', '100%');
+	$right_tab->addRow($right_row);
+
+	$table = new CTable(null, 'header maxwidth ui-widget-header ui-corner-all');
 	$table->setCellSpacing(0);
 	$table->setCellPadding(1);
-	$table->addRow(array(new CCol($columnLeft, 'header_l left'), new CCol($rights, 'header_r right')));
 
+	$td_r = new CCol($right_tab, 'header_r right');
+	$td_r->setAttribute('align', 'right');
+
+	$table->addRow(array(new CCol($col1, 'header_l left'), $td_r));
 	return $table;
 }
 
-function show_table_header($columnLeft, $columnRights = SPACE){
-	$table = get_table_header($columnLeft, $columnRights);
+function show_table_header($col1, $col2 = SPACE){
+	$table = get_table_header($col1, $col2);
 	$table->show();
 }
 
@@ -386,12 +393,12 @@ function get_header_host_table($currentElement, $hostid, $discoveryid = null) {
 	$description = '';
 	if ($dbHost['proxy_hostid']) {
 		$proxy = get_host_by_hostid($dbHost['proxy_hostid']);
-		$description .= $proxy['host'].NAME_DELIMITER;
+		$description .= $proxy['host'].': ';
 	}
 	$description .= $dbHost['name'];
 
 	if ($dbHost['status'] == HOST_STATUS_TEMPLATE) {
-		$list->addItem(array(bold(_('Template').NAME_DELIMITER), new CLink($description, 'templates.php?form=update&templateid='.$dbHost['hostid'])));
+		$list->addItem(array(bold(_('Template').': '), new CLink($description, 'templates.php?form=update&templateid='.$dbHost['hostid'])));
 	}
 	else {
 		switch ($dbHost['status']) {
@@ -406,7 +413,7 @@ function get_header_host_table($currentElement, $hostid, $discoveryid = null) {
 				break;
 		}
 
-		$list->addItem(array(bold(_('Host').NAME_DELIMITER), new CLink($description, 'hosts.php?form=update&hostid='.$dbHost['hostid'])));
+		$list->addItem(array(bold(_('Host').': '), new CLink($description, 'hosts.php?form=update&hostid='.$dbHost['hostid'])));
 		$list->addItem($status);
 		$list->addItem(getAvailabilityTable($dbHost));
 	}
@@ -414,7 +421,7 @@ function get_header_host_table($currentElement, $hostid, $discoveryid = null) {
 	if (!empty($dbDiscovery)) {
 		$list->addItem(array('&laquo; ', new CLink(_('Discovery list'), 'host_discovery.php?hostid='.$dbHost['hostid'].url_param('groupid'))));
 		$list->addItem(array(
-			bold(_('Discovery').NAME_DELIMITER),
+			bold(_('Discovery').': '),
 			new CLink($dbDiscovery['name'], 'host_discovery.php?form=update&itemid='.$dbDiscovery['itemid'])
 		));
 	}

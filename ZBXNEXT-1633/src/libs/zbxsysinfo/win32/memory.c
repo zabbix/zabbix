@@ -21,19 +21,20 @@
 #include "sysinfo.h"
 #include "symbols.h"
 
-int     VM_MEMORY_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
+int     VM_MEMORY_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	PERFORMANCE_INFORMATION pfi;
 	MEMORYSTATUSEX		ms_ex;
 	MEMORYSTATUS		ms;
-	char			*mode;
+	char			mode[16];
 
-	if (1 < request->nparam)
+	if (1 < num_param(param))
 		return SYSINFO_RET_FAIL;
 
-	mode = get_rparam(request, 0);
+	if (0 != get_param(param, 1, mode, sizeof(mode)) || '\0' == *mode)
+		strscpy(mode, "total");
 
-	if (NULL != mode && 0 == strcmp(mode, "cached"))
+	if (0 == strcmp(mode, "cached"))
 	{
 		if (NULL == zbx_GetPerformanceInfo)
 			return SYSINFO_RET_FAIL;
@@ -51,7 +52,7 @@ int     VM_MEMORY_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 		zbx_GlobalMemoryStatusEx(&ms_ex);
 
-		if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "total"))
+		if (0 == strcmp(mode, "total"))
 			SET_UI64_RESULT(result, ms_ex.ullTotalPhys);
 		else if (0 == strcmp(mode, "free"))
 			SET_UI64_RESULT(result, ms_ex.ullAvailPhys);
@@ -70,7 +71,7 @@ int     VM_MEMORY_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 	{
 		GlobalMemoryStatus(&ms);
 
-		if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "total"))
+		if (0 == strcmp(mode, "total"))
 			SET_UI64_RESULT(result, ms.dwTotalPhys);
 		else if (0 == strcmp(mode, "free"))
 			SET_UI64_RESULT(result, ms.dwAvailPhys);

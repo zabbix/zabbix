@@ -230,7 +230,7 @@ function update_item_status($itemids, $status) {
 			if ($result) {
 				$host = get_host_by_hostid($item['hostid']);
 				$item_new = get_item_by_itemid($item['itemid']);
-				add_audit_ext(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ITEM, $item['itemid'], $host['host'].NAME_DELIMITER.$item['name'], 'items', $item, $item_new);
+				add_audit_ext(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ITEM, $item['itemid'], $host['host'].':'.$item['name'], 'items', $item, $item_new);
 			}
 		}
 	}
@@ -712,7 +712,7 @@ function get_items_data_overview($hostids, $application, $view_style) {
 	$items = array();
 	while ($row = DBfetch($db_items)) {
 		$descr = itemName($row);
-		$row['hostname'] = get_node_name_by_elid($row['hostid'], null, NAME_DELIMITER).$row['hostname'];
+		$row['hostname'] = get_node_name_by_elid($row['hostid'], null, ': ').$row['hostname'];
 		$hostnames[$row['hostid']] = $row['hostname'];
 
 		// a little tricky check for attempt to overwrite active trigger (value=1) with
@@ -926,13 +926,12 @@ function delete_trends_by_itemid($itemIds) {
  * First format the value according to the configuration of the item. Then apply the value mapping to the formatted (!)
  * value.
  *
- * @param array		$item
- * @param string	$unknownString	the text to be used if the item has no data
- * @param bool		$ellipsis		text will be cutted and ellipsis "..." added if set to true
+ * @param array $item
+ * @param string $unknownString the text to be used if the item has no data
  *
  * @return string
  */
-function formatItemValue(array $item, $unknownString = '-', $ellipsis = true) {
+function formatItemValue(array $item, $unknownString = '-') {
 	if (!isset($item['lastvalue']) || $item['lastclock'] == 0) {
 		return $unknownString;
 	}
@@ -945,7 +944,7 @@ function formatItemValue(array $item, $unknownString = '-', $ellipsis = true) {
 
 		$mapping = getMappedValue($value, $item['valuemapid']);
 
-		if ($ellipsis && zbx_strlen($value) > 20) {
+		if (zbx_strlen($value) > 20) {
 			$value = zbx_substr($value, 0, 20).'...';
 		}
 		$value = nbsp(htmlspecialchars($value));

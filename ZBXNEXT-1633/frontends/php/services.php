@@ -422,7 +422,7 @@ if (isset($_REQUEST['form'])) {
 		));
 		$trigger = reset($trigger);
 		$host = reset($trigger['hosts']);
-		$data['trigger'] = $host['name'].NAME_DELIMITER.$trigger['description'];
+		$data['trigger'] = $host['name'].':'.$trigger['description'];
 	}
 	else {
 		$data['trigger'] = '';

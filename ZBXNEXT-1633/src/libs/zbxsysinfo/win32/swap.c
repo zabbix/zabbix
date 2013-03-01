@@ -21,45 +21,78 @@
 #include "sysinfo.h"
 #include "symbols.h"
 
-int	SYSTEM_SWAP_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	SYSTEM_SWAP_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	MEMORYSTATUSEX	ms_ex;
 	MEMORYSTATUS	ms;
-	char		*swapdev, *mode;
 
-	if (2 < request->nparam)
+	char swapdev[10];
+	char mode[10];
+
+	if(num_param(param) > 2)
+	{
 		return SYSINFO_RET_FAIL;
+	}
 
-	swapdev = get_rparam(request, 0);
-	mode = get_rparam(request, 1);
-
-	/* only 'all' parameter supported */
-	if (NULL != swapdev && '\0' != *swapdev && 0 != strcmp(swapdev, "all"))
+	if(get_param(param, 1, swapdev, sizeof(swapdev)) != 0)
+	{
+		swapdev[0] = '\0';
+	}
+	if(swapdev[0] == '\0')
+	{
+		/* default parameter */
+		zbx_snprintf(swapdev, sizeof(swapdev), "all");
+	}
+	if(strncmp(swapdev, "all", sizeof(swapdev)))
+	{  /* only 'all' parameter supported */
 		return SYSINFO_RET_FAIL;
+	}
 
-	if (NULL != zbx_GlobalMemoryStatusEx)
+	if(get_param(param, 2, mode, sizeof(mode)) != 0)
+	{
+		mode[0] = '\0';
+	}
+	if(mode[0] == '\0')
+	{
+		/* default parameter */
+		zbx_snprintf(mode, sizeof(mode), "total");
+	}
+
+	if(NULL != zbx_GlobalMemoryStatusEx)
 	{
 		ms_ex.dwLength = sizeof(MEMORYSTATUSEX);
 
 		zbx_GlobalMemoryStatusEx(&ms_ex);
 
-		if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "total"))
+		if (strcmp(mode, "total") == 0)
+		{
 			SET_UI64_RESULT(result, ms_ex.ullTotalPageFile);
-		else if (0 == strcmp(mode, "free"))
+			return SYSINFO_RET_OK;
+		}
+		else if (strcmp(mode, "free") == 0)
+		{
 			SET_UI64_RESULT(result, ms_ex.ullAvailPageFile);
+			return SYSINFO_RET_OK;
+		}
 		else
+		{
 			return SYSINFO_RET_FAIL;
+		}
 	}
 	else
 	{
 		GlobalMemoryStatus(&ms);
 
-		if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "total"))
+		if (strcmp(mode,"total") == 0)
+		{
 			SET_UI64_RESULT(result, ms.dwTotalPageFile);
-		else if (0 == strcmp(mode,"free"))
+			return SYSINFO_RET_OK;
+		}
+		else if (strcmp(mode,"free") == 0)
+		{
 			SET_UI64_RESULT(result, ms.dwAvailPageFile);
-		else
-			return SYSINFO_RET_FAIL;
+			return SYSINFO_RET_OK;
+		}
 	}
 
 	return SYSINFO_RET_OK;

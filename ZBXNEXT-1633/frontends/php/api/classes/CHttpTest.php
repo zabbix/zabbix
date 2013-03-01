@@ -280,7 +280,7 @@ class CHttpTest extends CZBXAPI {
 		$this->validateCreate($httpTests);
 
 		$httpTestManager = new CHttpTestManager();
-		$httpTests = $httpTestManager->persist($httpTests);
+		$httpTestManager->persist($httpTests);
 
 		return array('httptestids' => zbx_objectValues($httpTests, 'httptestid'));
 	}
@@ -455,7 +455,7 @@ class CHttpTest extends CZBXAPI {
 		$this->checkNames($httpTests);
 
 		foreach ($httpTests as $httpTest) {
-			$missingKeys = checkRequiredKeys($httpTest, array('name', 'hostid', 'steps'));
+			$missingKeys = checkRequiredKeys($httpTest, array('name', 'hostid', 'status', 'steps'));
 			if (!empty($missingKeys)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Web scenario missing parameters: %1$s', implode(', ', $missingKeys)));
 			}

@@ -59,7 +59,7 @@ class CScreenPlainText extends CScreenBase {
 		$host = get_host_by_itemid($this->screenitem['resourceid']);
 
 		$table = new CTableInfo(_('No data defined.'));
-		$table->setHeader(array(_('Timestamp'), $host['name'].NAME_DELIMITER.itemName($item)));
+		$table->setHeader(array(_('Timestamp'), $host['name'].': '.itemName($item)));
 
 		$stime = zbxDateToTime($this->timeline['stime']);
 

@@ -1116,7 +1116,7 @@ function get_triggers_overview($hostids, $application, $view_style = null, $scre
 	foreach ($dbTriggers as $trigger) {
 		$trigger['host'] = $trigger['hosts'][0]['name'];
 		$trigger['hostid'] = $trigger['hosts'][0]['hostid'];
-		$trigger['host'] = get_node_name_by_elid($trigger['hostid'], null, NAME_DELIMITER).$trigger['host'];
+		$trigger['host'] = get_node_name_by_elid($trigger['hostid'], null, ': ').$trigger['host'];
 		$trigger['description'] = CMacrosResolverHelper::resolveTriggerReference($trigger['expression'], $trigger['description']);
 
 		$hostNames[$trigger['hostid']] = $trigger['host'];
@@ -1238,6 +1238,11 @@ function get_trigger_overview_cells($triggerHosts, $hostName, $screenId = null) 
 		}
 		$style = 'cursor: pointer; ';
 
+		// set blinking gif as background if trigger age is less then $config['blink_period']
+		if ($config['blink_period'] > 0 && time() - $triggerHosts[$hostName]['lastchange'] < $config['blink_period']) {
+			$style .= 'background-image: url(images/gradients/blink.gif); background-position: top left; background-repeat: repeat;';
+		}
+
 		unset($item_menu);
 		$tr_ov_menu = array(
 			// name, url, (target [tw], statusbar [sb]), css, submenu
@@ -1314,7 +1319,7 @@ function get_trigger_overview_cells($triggerHosts, $hostName, $screenId = null) 
 
 		$dep_table = new CTableInfo();
 		$dep_table->setAttribute('style', 'width: 200px;');
-		$dep_table->addRow(bold(_('Depends on').NAME_DELIMITER));
+		$dep_table->addRow(bold(_('Depends on').':'));
 
 		$dependency = false;
 		$dep_res = DBselect('SELECT td.* FROM trigger_depends td WHERE td.triggerid_down='.$triggerid);
@@ -1334,7 +1339,7 @@ function get_trigger_overview_cells($triggerHosts, $hostName, $screenId = null) 
 		// triggers that depend on this
 		$dep_table = new CTableInfo();
 		$dep_table->setAttribute('style', 'width: 200px;');
-		$dep_table->addRow(bold(_('Dependent').NAME_DELIMITER));
+		$dep_table->addRow(bold(_('Dependent').':'));
 
 		$dependency = false;
 		$dep_res = DBselect('SELECT td.* FROM trigger_depends td WHERE td.triggerid_up='.$triggerid);
@@ -1358,15 +1363,8 @@ function get_trigger_overview_cells($triggerHosts, $hostName, $screenId = null) 
 	else {
 		$tableColumn = new CCol(SPACE, $css_class.' hosts');
 	}
-
 	if (isset($style)) {
 		$tableColumn->setAttribute('style', $style);
-	}
-
-	if (isset($triggerHosts[$hostName]) && $config['blink_period'] > 0
-		&& time() - $triggerHosts[$hostName]['lastchange'] < $config['blink_period']) {
-		$tableColumn->addClass('blink');
-		$tableColumn->setAttribute('data-toggle-class', $css_class);
 	}
 
 	if (isset($tr_ov_menu)) {
