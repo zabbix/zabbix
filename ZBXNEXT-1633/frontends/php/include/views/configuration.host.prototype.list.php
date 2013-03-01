@@ -56,16 +56,53 @@ $hostTable->setHeader(array(
 	make_sorting_header(_('Status'),'status', $sortLink)
 ));
 
-foreach ($this->data['hostPrototypes'] as $host) {
-	$status = new CLink(item_status2str($host['status']),
-		'?group_hostid='.$host['hostid'].'&parent_discoveryid='.$discoverRule['itemid'].'&parent_hostid='.$this->data['parent_hostid'].
-		'&go='.($host['status'] ? 'activate' : 'disable'), item_status2style($host['status'])
+foreach ($this->data['hostPrototypes'] as $hostPrototype) {
+	// template list
+	if (empty($hostPrototype['templates'])) {
+		$hostTemplates = '-';
+	}
+	else {
+		$hostTemplates = array();
+		order_result($hostPrototype['templates'], 'name');
+
+		foreach ($hostPrototype['templates'] as $template) {
+
+			$caption = array();
+			$caption[] = new CLink($template['name'], 'templates.php?form=update&templateid='.$template['templateid'], 'unknown');
+
+			$parentTemplates = $this->data['parentTemplates'][$template['templateid']]['parentTemplates'];
+			if ($parentTemplates) {
+				order_result($parentTemplates, 'name');
+
+				$caption[] = ' (';
+				foreach ($parentTemplates as $tpl) {
+					$caption[] = new CLink($tpl['name'],'templates.php?form=update&templateid='.$tpl['templateid'], 'unknown');
+					$caption[] = ', ';
+				}
+				array_pop($caption);
+
+				$caption[] = ')';
+			}
+
+			$hostTemplates[] = $caption;
+			$hostTemplates[] = ', ';
+		}
+
+		if ($hostTemplates) {
+			array_pop($hostTemplates);
+		}
+	}
+
+	// status
+	$status = new CLink(item_status2str($hostPrototype['status']),
+		'?group_hostid='.$hostPrototype['hostid'].'&parent_discoveryid='.$discoverRule['itemid'].'&parent_hostid='.$this->data['parent_hostid'].
+		'&go='.($hostPrototype['status'] ? 'activate' : 'disable'), item_status2style($hostPrototype['status'])
 	);
 
 	$hostTable->addRow(array(
-		new CCheckBox('group_hostid['.$host['hostid'].']', null, null, $host['hostid']),
-		new CLink($host['name'], '?form=update&parent_discoveryid='.$discoverRule['itemid'].'&parent_hostid='.$this->data['parent_hostid'].'&hostid='.$host['hostid']),
-		'',
+		new CCheckBox('group_hostid['.$hostPrototype['hostid'].']', null, null, $hostPrototype['hostid']),
+		new CLink($hostPrototype['name'], '?form=update&parent_discoveryid='.$discoverRule['itemid'].'&parent_hostid='.$this->data['parent_hostid'].'&hostid='.$hostPrototype['hostid']),
+		new CCol($hostTemplates, 'wraptext'),
 		$status
 	));
 }

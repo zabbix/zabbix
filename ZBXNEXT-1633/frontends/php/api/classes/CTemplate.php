@@ -24,8 +24,6 @@
  */
 class CTemplate extends CHostGeneral {
 
-	protected $tableName = 'hosts';
-	protected $tableAlias = 'h';
 	protected $sortColumns = array('hostid', 'host', 'name');
 
 	/**

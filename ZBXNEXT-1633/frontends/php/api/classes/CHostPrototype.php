@@ -24,19 +24,18 @@
  *
  * @package API
  */
-class CHostPrototype extends CZBXAPI {
+class CHostPrototype extends CHostBase {
 
-	protected $tableName = 'hosts';
-	protected $tableAlias = 'h';
 	protected $sortColumns = array('hostid', 'host', 'name', 'status');
 
 	public function __construct() {
 		parent::__construct();
 
 		$this->getOptions = array_merge($this->getOptions, array(
-			'discoveryids'  => null,
-			'sortfield'     => '',
-			'sortorder'     => ''
+			'discoveryids'  	=> null,
+			'selectTemplates' 	=> null,
+			'sortfield'    		=> '',
+			'sortorder'     	=> ''
 		));
 	}
 
@@ -126,15 +125,6 @@ class CHostPrototype extends CZBXAPI {
 
 		$this->checkDiscoveryRulePermissions(zbx_objectValues($hostPrototypes, 'ruleid'));
 
-		// template permissions
-		$templates = array();
-		foreach ($hostPrototypes as $hostPrototype) {
-			if (isset($hostPrototype['templates'])) {
-				$templates = array_merge($templates, $hostPrototype['templates']);
-			}
-		}
-		$this->checkTemplatePermissions(zbx_objectValues($templates, 'templateid'));
-
 		$this->checkDuplicates($hostPrototypes, 'host', _('Host prototype "%1$s" already exists.'));
 		$this->checkExistingHostPrototypes($hostPrototypes);
 	}
@@ -167,6 +157,10 @@ class CHostPrototype extends CZBXAPI {
 		$hostPrototypeDiscoveryRules = array();
 		foreach ($hostPrototypes as $key => $hostPrototype) {
 			$hostPrototype['hostid'] = $hostPrototypeIds[$key];
+
+			if (isset($hostPrototype['templates'])) {
+				$this->link(zbx_objectValues($hostPrototype['templates'], 'templateid'), array($hostPrototype['hostid']));
+			}
 
 			$hostPrototypeDiscoveryRules[] = array(
 				'hostid' => $hostPrototype['hostid'],
@@ -228,15 +222,6 @@ class CHostPrototype extends CZBXAPI {
 
 		$this->checkDiscoveryRulePermissions(zbx_objectValues($hostPrototypes, 'ruleid'));
 
-		// template permissions
-		$templates = array();
-		foreach ($hostPrototypes as $hostPrototype) {
-			if (isset($hostPrototype['templates'])) {
-				$templates = array_merge($templates, $hostPrototype['templates']);
-			}
-		}
-		$this->checkTemplatePermissions(zbx_objectValues($templates, 'templateid'));
-
 		// check for duplicates
 		$relationMap = $this->createRelationMap($hostPrototypes, 'hostid', 'parent_itemid', 'host_discovery');
 		$hostPrototypes = $relationMap->mapIdOne($hostPrototypes, 'ruleid');
@@ -263,8 +248,27 @@ class CHostPrototype extends CZBXAPI {
 		$this->validateUpdate($hostPrototypes);
 
 		// save the host prototypes
+		$newTemplatesByHostPrototypeId = array();
 		foreach ($hostPrototypes as $hostPrototype) {
 			DB::updateByPk($this->tableName(), $hostPrototype['hostid'], $hostPrototype);
+
+			if (isset($hostPrototype['templates'])) {
+				$newTemplatesByHostPrototypeId[$hostPrototype['hostid']] = $hostPrototype['templates'];
+			}
+		}
+
+		// update templates
+		$hostPrototypeTemplates = $this->get(array(
+			'output' => array('hostid'),
+			'selectTemplates' => array('templateid'),
+			'hostids' => array_keys($newTemplatesByHostPrototypeId),
+			'preservekeys' => true
+		));
+		foreach ($newTemplatesByHostPrototypeId as $hostId => $templates) {
+			$existingTemplateIds = zbx_objectValues($hostPrototypeTemplates[$hostId]['templates'], 'templateid');
+			$newTemplateIds = zbx_objectValues($templates, 'templateid');
+			$this->unlink(array_diff($existingTemplateIds, $newTemplateIds), array($hostId));
+			$this->link(array_diff($newTemplateIds, $existingTemplateIds), array($hostId));
 		}
 
 		// TODO: inheritance
@@ -333,7 +337,17 @@ class CHostPrototype extends CZBXAPI {
 	 * @return bool
 	 */
 	public function isWritable(array $ids) {
-		return $this->isReadable($ids);
+		if (empty($ids)) {
+			return true;
+		}
+		$ids = array_unique($ids);
+
+		$count = $this->get(array(
+			'hostids' => $ids,
+			'editable' => true,
+			'countOutput' => true
+		));
+		return count($ids) == $count;
 	}
 
 	/**
@@ -413,19 +427,6 @@ class CHostPrototype extends CZBXAPI {
 	 */
 	protected function checkDiscoveryRulePermissions(array $discoveryRuleIds) {
 		if (!API::DiscoveryRule()->isWritable($discoveryRuleIds)) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
-		}
-	}
-
-	/**
-	 * Checks if the current user has access to the given templates.
-	 *
-	 * @throws APIException if the user doesn't have write permissions for the given templates.
-	 *
-	 * @param array $templateIds
-	 */
-	protected function checkTemplatePermissions(array $templateIds) {
-		if (!API::Template()->isWritable($templateIds)) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 	}
@@ -518,5 +519,39 @@ class CHostPrototype extends CZBXAPI {
 		}
 
 		return $sqlParts;
+	}
+
+	protected function addRelatedObjects(array $options, array $result) {
+		$result = parent::addRelatedObjects($options, $result);
+
+		$hostids = array_keys($result);
+
+		// adding templates
+		if ($options['selectTemplates'] !== null) {
+			if ($options['selectTemplates'] != API_OUTPUT_COUNT) {
+				$relationMap = $this->createRelationMap($result, 'hostid', 'templateid', 'hosts_templates');
+				$templates = API::Template()->get(array(
+					'output' => $options['selectTemplates'],
+					'nodeids' => $options['nodeids'],
+					'templateids' => $relationMap->getRelatedIds(),
+					'preservekeys' => true
+				));
+				$result = $relationMap->mapMany($result, $templates, 'templates');
+			}
+			else {
+				$templates = API::Template()->get(array(
+					'nodeids' => $options['nodeids'],
+					'hostids' => $hostids,
+					'countOutput' => true,
+					'groupCount' => true
+				));
+				$templates = zbx_toHash($templates, 'hostid');
+				foreach ($result as $hostid => $host) {
+					$result[$hostid]['templates'] = isset($templates[$hostid]) ? $templates[$hostid]['rowscount'] : 0;
+				}
+			}
+		}
+
+		return $result;
 	}
 }

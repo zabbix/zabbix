@@ -72,16 +72,9 @@ $divTabs->addTab('hostTab', _('Host'), $hostList);
 // templates
 $tmplList = new CFormList('tmpllist');
 
-foreach ($hostPrototype['templates'] as $tid => $temp_name) {
-	$frmHost->addVar('templates['.$tid.']', $temp_name);
-	$tmplList->addRow($temp_name, array(
-		new CSubmit('unlink['.$tid.']', _('Unlink'), null, 'link_menu'),
-		SPACE,
-		SPACE,
-		isset($original_templates[$tid])
-			? new CSubmit('unlink_and_clear['.$tid.']', _('Unlink and clear'), null, 'link_menu')
-			: SPACE
-	));
+foreach ($hostPrototype['templates'] as $templateId => $name) {
+	$frmHost->addVar('templates['.$templateId.']', $name);
+	$tmplList->addRow($name, new CSubmit('unlink['.$templateId.']', _('Unlink'), null, 'link_menu'));
 }
 
 $tmplAdd = new CButton('add', _('Add'),
