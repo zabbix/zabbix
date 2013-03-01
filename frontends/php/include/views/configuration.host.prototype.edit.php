@@ -98,7 +98,7 @@ $others = array();
 if ($hostPrototype['hostid'] && $_REQUEST['form'] != 'full_clone') {
 	$others[] = new CSubmit('clone', _('Clone'));
 	$others[] = new CSubmit('full_clone', _('Full clone'));
-	$others[] = new CButtonDelete(_('Delete selected host prototype?'), url_param('form').url_param('hostid').url_param('groupid'));
+	$others[] = new CButtonDelete(_('Delete selected host prototype?'), url_param('form').url_param('hostid').url_param('parent_hostid').url_param('parent_discoveryid'));
 }
 $others[] = new CButtonCancel(url_param('parent_hostid').url_param('parent_discoveryid'));
 
