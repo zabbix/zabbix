@@ -33,6 +33,11 @@ class CDiscoveryRule extends CItemGeneral {
 
 	public function __construct() {
 		parent::__construct();
+
+		$this->errorMessages = array_merge($this->errorMessages, array(
+			self::ERROR_EXISTS_TEMPLATE => _('Discovery rule "%1$s" already exists on "%2$s", inherited from another template.'),
+			self::ERROR_EXISTS => _('Discovery rule "%1$s" already exists on "%2$s"')
+		));
 	}
 
 	/**
@@ -648,9 +653,7 @@ class CDiscoveryRule extends CItemGeneral {
 		}
 
 		// prepare the child items
-		$newItems = $this->prepareInheritedItems($items, $hostids, array(
-			'exists' => _('Discovery rule "%1$s" already exists on "%2$s", inherited from another template.')
-		));
+		$newItems = $this->prepareInheritedItems($items, $hostids);
 		if (!$newItems) {
 			return true;
 		}
@@ -916,7 +919,7 @@ class CDiscoveryRule extends CItemGeneral {
 		}
 
 		// save graphs
-		$rs = API::Graph()->create($dstGraphs);
+		$rs = API::GraphPrototype()->create($dstGraphs);
 		if (!$rs) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot clone graph prototypes.'));
 		}

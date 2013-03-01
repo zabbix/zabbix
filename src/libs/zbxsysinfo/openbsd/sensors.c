@@ -129,22 +129,23 @@ static int	get_device_sensors(int do_task, int *mib, const struct sensordev *sen
 	return SUCCEED;
 }
 
-int	GET_SENSOR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+int	GET_SENSOR(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	char	device[MAX_STRING_LEN], name[MAX_STRING_LEN], function[8];
+	char	*device, *name, *function;
 	int	do_task, mib[5], dev, cnt = 0;
 	double	aggr = 0;
 
-	if (num_param(param) > 3)
+	if (3 < request->nparam)
 		return SYSINFO_RET_FAIL;
 
-	if (0 != get_param(param, 1, device, sizeof(device)))
+	device = get_rparam(request, 0);
+	name = get_rparam(request, 1);
+	function = get_rparam(request, 2);
+
+	if (NULL == device || NULL == name)
 		return SYSINFO_RET_FAIL;
 
-	if (0 != get_param(param, 2, name, sizeof(name)))
-		return SYSINFO_RET_FAIL;
-
-	if (0 != get_param(param, 3, function, sizeof(function)))
+	if (NULL == function || '\0' == *function)
 		do_task = DO_ONE;
 	else if (0 == strcmp(function, "avg"))
 		do_task = DO_AVG;
@@ -196,7 +197,7 @@ int	GET_SENSOR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT 
 
 #else
 
-int	GET_SENSOR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+int	GET_SENSOR(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	return SYSINFO_RET_FAIL;
 }

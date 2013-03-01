@@ -107,7 +107,7 @@ switch ($page['type']) {
 		// page title
 		$page_title = '';
 		if (isset($ZBX_SERVER_NAME) && !zbx_empty($ZBX_SERVER_NAME)) {
-			$page_title = $ZBX_SERVER_NAME.': ';
+			$page_title = $ZBX_SERVER_NAME.NAME_DELIMITER;
 		}
 		$page_title .= isset($page['title']) ? $page['title'] : _('Zabbix');
 
