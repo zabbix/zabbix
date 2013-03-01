@@ -378,8 +378,12 @@ class CHostPrototype extends CHostBase {
 			);
 		}
 
-		if (!preg_match('/^'.ZBX_PREG_HOST_FORMAT.'$/', $host['host'])) {
+		if (!preg_match('/^('.ZBX_PREG_INTERNAL_NAMES.'|\{#'.ZBX_PREG_MACRO_NAME_LLD.'\})+$/', $host['host'])) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect characters used for host "%s".', $host['host']));
+		}
+		// a host prototype must contain macros in the host name
+		if (!preg_match('/(\{#'.ZBX_PREG_MACRO_NAME_LLD.'\})+/', $host['host'])) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Host name for host prototype "%s" must contain macros.', $host['host']));
 		}
 	}
 
