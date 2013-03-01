@@ -69,14 +69,16 @@ if (get_request('parent_discoveryid')) {
 		access_deny();
 	}
 
-	$hostPrototype = API::HostPrototype()->get(array(
-		'hostids' => get_request('hostid'),
-		'output' => API_OUTPUT_EXTEND,
-		'editable' => true
-	));
-	$hostPrototype = reset($hostPrototype);
-	if (!$hostPrototype) {
-		access_deny();
+	if (get_request('hostid')) {
+		$hostPrototype = API::HostPrototype()->get(array(
+			'hostids' => get_request('hostid'),
+			'output' => API_OUTPUT_EXTEND,
+			'editable' => true
+		));
+		$hostPrototype = reset($hostPrototype);
+		if (!$hostPrototype) {
+			access_deny();
+		}
 	}
 }
 else {
