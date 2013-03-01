@@ -42,6 +42,7 @@ $fields = array(
 	'name' =>	            array(T_ZBX_STR, O_OPT, null,		null,		'isset({save})'),
 	'status' =>		        array(T_ZBX_INT, O_OPT, null,		        IN(array(HOST_STATUS_NOT_MONITORED, HOST_STATUS_MONITORED)), 'isset({save})'),
 	'templates' =>		    array(T_ZBX_STR, O_OPT, null, NOT_EMPTY,	null),
+	'unlink' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,		null),
 	'group_hostid' =>		array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
 	'go' =>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'save' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
@@ -73,6 +74,7 @@ if (get_request('parent_discoveryid')) {
 		$hostPrototype = API::HostPrototype()->get(array(
 			'hostids' => get_request('hostid'),
 			'output' => API_OUTPUT_EXTEND,
+			'selectTemplates' => array('templateid', 'name'),
 			'editable' => true
 		));
 		$hostPrototype = reset($hostPrototype);
@@ -88,7 +90,12 @@ else {
 /*
  * Actions
  */
-if (isset($_REQUEST['delete']) && isset($_REQUEST['hostid'])) {
+if (get_request('unlink')) {
+	foreach (get_request('unlink') as $templateId => $value) {
+		unset($_REQUEST['templates'][$templateId]);
+	}
+}
+elseif (isset($_REQUEST['delete']) && isset($_REQUEST['hostid'])) {
 
 	DBstart();
 	$result = API::HostPrototype()->delete(get_request('hostid'));
@@ -109,7 +116,7 @@ elseif (isset($_REQUEST['save'])) {
 		'host' => get_request('host'),
 		'name' => get_request('name'),
 		'status' => get_request('status'),
-		'templates' => get_request('templates'),
+		'templates' => zbx_toObject(array_keys(get_request('templates', array())), 'templateid'),
 		'status' => get_request('status')
 	);
 
@@ -178,8 +185,12 @@ if (isset($_REQUEST['form'])) {
 		)
 	);
 
-	if (get_request('hostid')) {
+	if (get_request('hostid') && !get_request('form_refresh')) {
 		$data['host_prototype'] = array_merge($data['host_prototype'], $hostPrototype);
+		$data['host_prototype']['templates'] = array();
+		foreach ($hostPrototype['templates'] as $template) {
+			$data['host_prototype']['templates'][$template['templateid']] = $template['name'];
+		}
 	}
 
 	// render view
@@ -200,6 +211,7 @@ else {
 	$data['hostPrototypes'] = API::HostPrototype()->get(array(
 		'discoveryids' => $data['parent_discoveryid'],
 		'output' => API_OUTPUT_EXTEND,
+		'selectTemplates' => array('templateid', 'name'),
 		'editable' => true,
 		'sortfield' => $sortfield,
 		'limit' => $config['search_limit'] + 1
@@ -209,6 +221,19 @@ else {
 		order_result($data['hostPrototypes'], $sortfield, getPageSortOrder());
 	}
 	$data['paging'] = getPagingLine($data['hostPrototypes']);
+
+	// selecting linked templates to templates linked to host prototypes
+	$templateIds = array();
+	foreach ($data['hostPrototypes'] as $hostPrototype) {
+		$templateIds = array_merge($templateIds, zbx_objectValues($hostPrototype['templates'], 'templateid'));
+	}
+	$templateIds = array_unique($templateIds);
+
+	$parentTemplates = API::Template()->get(array(
+		'templateids' => $templateIds,
+		'selectParentTemplates' => array('hostid', 'name')
+	));
+	$data['parentTemplates'] = zbx_toHash($parentTemplates, 'templateid');
 
 	// render view
 	$itemView = new CView('configuration.host.prototype.list', $data);
