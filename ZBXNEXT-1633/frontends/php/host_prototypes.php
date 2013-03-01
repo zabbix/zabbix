@@ -154,13 +154,13 @@ elseif (($_REQUEST['go'] == 'activate' || $_REQUEST['go'] == 'disable') && isset
 	$go_result = API::HostPrototype()->update($update);
 
 	show_messages($go_result, ($_REQUEST['go'] == 'activate') ? _('Host prototypes activated') : _('Host prototypes disabled'), null);
-	DBend($result);
+	DBend($go_result);
 }
 elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['group_hostid'])) {
 	DBstart();
 	$go_result = API::HostPrototype()->delete($_REQUEST['group_hostid']);
 	show_messages($go_result, _('Host prototypes deleted'), _('Cannot delete host prototypes'));
-	DBend($result);
+	DBend($go_result);
 }
 
 if ($_REQUEST['go'] != 'none' && isset($go_result) && $go_result) {
