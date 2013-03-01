@@ -20,23 +20,20 @@
 #include "common.h"
 #include "sysinfo.h"
 
-int	KERNEL_MAXPROC(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+int	KERNEL_MAXPROC(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	int		ret = SYSINFO_RET_FAIL;
 	kstat_ctl_t	*kc;
 	kstat_t		*kt;
 	struct var	*v;
 
-	kc = kstat_open();
-	if(kc)
+	if (NULL != (kc = kstat_open()))
 	{
-		kt = kstat_lookup(kc, "unix", 0, "var");
-		if(kt)
+		if (NULL != (kt = kstat_lookup(kc, "unix", 0, "var")))
 		{
-			if((kt->ks_type == KSTAT_TYPE_RAW) &&
-				(kstat_read(kc, kt, NULL) != -1))
+			if (KSTAT_TYPE_RAW == kt->ks_type && -1 != kstat_read(kc, kt, NULL))
 			{
-				v = (struct var *) kt->ks_data;
+				v = (struct var *)kt->ks_data;
 
 				/* int	v_proc;	    Max processes system wide */
 				SET_UI64_RESULT(result, v->v_proc);

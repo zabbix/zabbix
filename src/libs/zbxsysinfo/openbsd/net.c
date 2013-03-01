@@ -31,10 +31,11 @@ static struct nlist kernel_symbols[] =
 
 #define IFNET_ID 0
 
-static int	get_ifdata(const char *if_name, zbx_uint64_t *ibytes, zbx_uint64_t *ipackets, zbx_uint64_t *ierrors, zbx_uint64_t *idropped,
-						zbx_uint64_t *obytes, zbx_uint64_t *opackets, zbx_uint64_t *oerrors,
-						zbx_uint64_t *tbytes, zbx_uint64_t *tpackets, zbx_uint64_t *terrors,
-						zbx_uint64_t *icollisions)
+static int	get_ifdata(const char *if_name,
+		zbx_uint64_t *ibytes, zbx_uint64_t *ipackets, zbx_uint64_t *ierrors, zbx_uint64_t *idropped,
+		zbx_uint64_t *obytes, zbx_uint64_t *opackets, zbx_uint64_t *oerrors,
+		zbx_uint64_t *tbytes, zbx_uint64_t *tpackets, zbx_uint64_t *terrors,
+		zbx_uint64_t *icollisions)
 {
 	struct ifnet_head	head;
 	struct ifnet		*ifp;
@@ -42,6 +43,9 @@ static int	get_ifdata(const char *if_name, zbx_uint64_t *ibytes, zbx_uint64_t *i
 	kvm_t	*kp;
 	int	len = 0;
 	int	ret = SYSINFO_RET_FAIL;
+
+	if (NULL == if_name || '\0' == *if_name)
+		return SYSINFO_RET_FAIL;
 
 	/* if(i)_ibytes;	total number of octets received */
 	/* if(i)_ipackets;	packets received on interface */
@@ -96,7 +100,7 @@ static int	get_ifdata(const char *if_name, zbx_uint64_t *ibytes, zbx_uint64_t *i
 					if (kvm_read(kp, (u_long)ifp, &v, len) < len)
 						break;
 
-					if ('\0' == *if_name || 0 == strcmp(if_name, v.if_xname))
+					if (0 == strcmp(if_name, v.if_xname))
 					{
 						if (ibytes)
 							*ibytes += v.if_ibytes;
@@ -176,24 +180,21 @@ clean:
 	return ret;
 }
 
-int	NET_IF_IN(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+int	NET_IF_IN(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	char		if_name[MAX_STRING_LEN], mode[16];
+	char		*if_name, *mode;
 	zbx_uint64_t	ibytes, ipackets, ierrors, idropped;
 
-	if (num_param(param) > 2)
+	if (2 < request->nparam)
 		return SYSINFO_RET_FAIL;
 
-	if (0 != get_param(param, 1, if_name, sizeof(if_name)))
-		*if_name = '\0';
-
-	if (0 != get_param(param, 2, mode, sizeof(mode)))
-		*mode = '\0';
+	if_name = get_rparam(request, 0);
+	mode = get_rparam(request, 1);
 
 	if (SYSINFO_RET_OK != get_ifdata(if_name, &ibytes, &ipackets, &ierrors, &idropped, NULL, NULL, NULL, NULL, NULL, NULL, NULL))
 		return SYSINFO_RET_FAIL;
 
-	if ('\0' == *mode || 0 == strcmp(mode, "bytes"))	/* default parameter */
+	if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "bytes"))	/* default parameter */
 		SET_UI64_RESULT(result, ibytes);
 	else if (0 == strcmp(mode, "packets"))
 		SET_UI64_RESULT(result, ipackets);
@@ -207,24 +208,21 @@ int	NET_IF_IN(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *
 	return SYSINFO_RET_OK;
 }
 
-int	NET_IF_OUT(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+int	NET_IF_OUT(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	char		if_name[MAX_STRING_LEN], mode[16];
+	char		*if_name, *mode;
 	zbx_uint64_t	obytes, opackets, oerrors;
 
-	if (num_param(param) > 2)
+	if (2 < request->nparam)
 		return SYSINFO_RET_FAIL;
 
-	if (0 != get_param(param, 1, if_name, sizeof(if_name)))
-		*if_name = '\0';
-
-	if (0 != get_param(param, 2, mode, sizeof(mode)))
-		*mode = '\0';
+	if_name = get_rparam(request, 0);
+	mode = get_rparam(request, 1);
 
 	if (SYSINFO_RET_OK != get_ifdata(if_name, NULL, NULL, NULL, NULL, &obytes, &opackets, &oerrors, NULL, NULL, NULL, NULL))
 		return SYSINFO_RET_FAIL;
 
-	if ('\0' == *mode || 0 == strcmp(mode, "bytes"))	/* default parameter */
+	if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "bytes"))	/* default parameter */
 		SET_UI64_RESULT(result, obytes);
 	else if (0 == strcmp(mode, "packets"))
 		SET_UI64_RESULT(result, opackets);
@@ -236,24 +234,21 @@ int	NET_IF_OUT(const char *cmd, const char *param, unsigned flags, AGENT_RESULT 
 	return SYSINFO_RET_OK;
 }
 
-int	NET_IF_TOTAL(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+int	NET_IF_TOTAL(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	char		if_name[MAX_STRING_LEN], mode[16];
+	char		*if_name, *mode;
 	zbx_uint64_t	tbytes, tpackets, terrors;
 
-	if (num_param(param) > 2)
+	if (2 < request->nparam)
 		return SYSINFO_RET_FAIL;
 
-	if (0 != get_param(param, 1, if_name, sizeof(if_name)))
-		*if_name = '\0';
-
-	if (0 != get_param(param, 2, mode, sizeof(mode)))
-		*mode = '\0';
+	if_name = get_rparam(request, 0);
+	mode = get_rparam(request, 1);
 
 	if (SYSINFO_RET_OK != get_ifdata(if_name, NULL, NULL, NULL, NULL, NULL, NULL, NULL, &tbytes, &tpackets, &terrors, NULL))
 		return SYSINFO_RET_FAIL;
 
-	if ('\0' == *mode || 0 == strcmp(mode, "bytes"))	/* default parameter */
+	if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "bytes"))	/* default parameter */
 		SET_UI64_RESULT(result, tbytes);
 	else if (0 == strcmp(mode, "packets"))
 		SET_UI64_RESULT(result, tpackets);
@@ -265,16 +260,15 @@ int	NET_IF_TOTAL(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 	return SYSINFO_RET_OK;
 }
 
-int	NET_IF_COLLISIONS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+int	NET_IF_COLLISIONS(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	char		if_name[MAX_STRING_LEN];
+	char		*if_name;
 	zbx_uint64_t	icollisions;
 
-	if (num_param(param) > 1)
+	if (1 < request->nparam)
 		return SYSINFO_RET_FAIL;
 
-	if (0 != get_param(param, 1, if_name, sizeof(if_name)))
-		*if_name = '\0';
+	if_name = get_rparam(request, 0);
 
 	if (SYSINFO_RET_OK != get_ifdata(if_name, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, &icollisions))
 		return SYSINFO_RET_FAIL;

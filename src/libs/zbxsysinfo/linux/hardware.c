@@ -196,26 +196,25 @@ close:
 	return ret;
 }
 
-int	SYSTEM_HW_CHASSIS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+int	SYSTEM_HW_CHASSIS(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	char	tmp[8], buf[MAX_STRING_LEN];
+	char	*mode, buf[MAX_STRING_LEN];
 	int	ret = SYSINFO_RET_FAIL;
 
-	if (1 < num_param(param))
+	if (1 < request->nparam)
 		return ret;
 
-	if (0 != get_param(param, 1, tmp, sizeof(tmp)))
-		*tmp = '\0';
+	mode = get_rparam(request, 0);
 
-	if ('\0' == *tmp || 0 == strcmp(tmp, "full"))	/* show full info by default */
+	if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "full"))	/* show full info by default */
 		ret = get_dmi_info(buf, sizeof(buf), DMI_GET_TYPE | DMI_GET_VENDOR | DMI_GET_MODEL | DMI_GET_SERIAL);
-	else if (0 == strcmp(tmp, "type"))
+	else if (0 == strcmp(mode, "type"))
 		ret = get_dmi_info(buf, sizeof(buf), DMI_GET_TYPE);
-	else if (0 == strcmp(tmp, "vendor"))
+	else if (0 == strcmp(mode, "vendor"))
 		ret = get_dmi_info(buf, sizeof(buf), DMI_GET_VENDOR);
-	else if (0 == strcmp(tmp, "model"))
+	else if (0 == strcmp(mode, "model"))
 		ret = get_dmi_info(buf, sizeof(buf), DMI_GET_MODEL);
-	else if (0 == strcmp(tmp, "serial"))
+	else if (0 == strcmp(mode, "serial"))
 		ret = get_dmi_info(buf, sizeof(buf), DMI_GET_SERIAL);
 
 	if (SYSINFO_RET_OK == ret)
@@ -275,32 +274,36 @@ static size_t	print_freq(char *buffer, size_t size, int filter, int cpu, zbx_uin
 	return offset;
 }
 
-int     SYSTEM_HW_CPU(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+int     SYSTEM_HW_CPU(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	int		ret = SYSINFO_RET_FAIL, filter, cpu, cur_cpu = -1, offset = 0;
 	zbx_uint64_t	maxfreq = FAIL, curfreq = FAIL;
-	char		line[MAX_STRING_LEN], name[MAX_STRING_LEN], tmp[MAX_STRING_LEN], buffer[MAX_BUFFER_LEN];
+	char		line[MAX_STRING_LEN], name[MAX_STRING_LEN], tmp[MAX_STRING_LEN], buffer[MAX_BUFFER_LEN], *param;
 	FILE		*f;
 
-	if (2 < num_param(param))
+	if (2 < request->nparam)
 		return ret;
 
-	if (0 != get_param(param, 1, tmp, sizeof(tmp)) || '\0' == *tmp || 0 == strcmp(tmp, "all"))
+	param = get_rparam(request, 0);
+
+	if (NULL == param || '\0' == *param || 0 == strcmp(param, "all"))
 		cpu = HW_CPU_ALL_CPUS;	/* show all CPUs by default */
-	else if (FAIL == is_uint(tmp))
+	else if (FAIL == is_uint(param))
 		return ret;
 	else
-		cpu = atoi(tmp);
+		cpu = atoi(param);
 
-	if (0 != get_param(param, 2, tmp, sizeof(tmp)) || '\0' == *tmp || 0 == strcmp(tmp, "full"))
+	param = get_rparam(request, 1);
+
+	if (NULL == param || '\0' == *param || 0 == strcmp(param, "full"))
 		filter = HW_CPU_SHOW_ALL;	/* show full info by default */
-	else if (0 == strcmp(tmp, "maxfreq"))
+	else if (0 == strcmp(param, "maxfreq"))
 		filter = HW_CPU_SHOW_MAXFREQ;
-	else if (0 == strcmp(tmp, "vendor"))
+	else if (0 == strcmp(param, "vendor"))
 		filter = HW_CPU_SHOW_VENDOR;
-	else if (0 == strcmp(tmp, "model"))
+	else if (0 == strcmp(param, "model"))
 		filter = HW_CPU_SHOW_MODEL;
-	else if (0 == strcmp(tmp, "curfreq"))
+	else if (0 == strcmp(param, "curfreq"))
 		filter = HW_CPU_SHOW_CURFREQ;
 	else
 		return ret;
@@ -369,39 +372,41 @@ int     SYSTEM_HW_CPU(const char *cmd, const char *param, unsigned flags, AGENT_
 	return ret;
 }
 
-int	SYSTEM_HW_DEVICES(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+int	SYSTEM_HW_DEVICES(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	char	tmp[MAX_STRING_LEN];
+	char	*type;
 
-	if (1 < num_param(param))
+	if (1 < request->nparam)
 		return SYSINFO_RET_FAIL;
 
-	if (0 != get_param(param, 1, tmp, sizeof(tmp)) || '\0' == *tmp || 0 == strcmp(tmp, "pci"))
-		return EXECUTE_STR(cmd, "lspci", flags, result);	/* list PCI devices by default */
-	else if (0 == strcmp(tmp, "usb"))
-		return EXECUTE_STR(cmd, "lsusb", flags, result);
+	type = get_rparam(request, 0);
+
+	if (NULL == type || '\0' == *type || 0 == strcmp(type, "pci"))
+		return EXECUTE_STR("lspci", result);	/* list PCI devices by default */
+	else if (0 == strcmp(type, "usb"))
+		return EXECUTE_STR("lsusb", result);
 
 	return SYSINFO_RET_FAIL;
 }
 
-int     SYSTEM_HW_MACADDR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+int     SYSTEM_HW_MACADDR(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	size_t			offset;
 	int			ret = SYSINFO_RET_FAIL, s, i, show_names;
-	char			*p, regex[MAX_STRING_LEN], address[MAX_STRING_LEN], buffer[MAX_STRING_LEN];
+	char			*format, *p, *regex, address[MAX_STRING_LEN], buffer[MAX_STRING_LEN];
 	struct ifreq		*ifr;
 	struct ifconf		ifc;
 	zbx_vector_str_t	addresses;
 
-	if (2 < num_param(param))
+	if (2 < request->nparam)
 		return ret;
 
-	if (0 != get_param(param, 1, regex, sizeof(regex)) || 0 == strcmp(regex, "all"))
-		*regex = '\0';
+	regex = get_rparam(request, 0);
+	format = get_rparam(request, 1);
 
-	if (0 != get_param(param, 2, buffer, sizeof(buffer)) || '\0' == *buffer || 0 == strcmp(buffer, "full"))
+	if (NULL == format || '\0' == *format || 0 == strcmp(format, "full"))
 		show_names = 1;	/* show interface names */
-	else if (0 == strcmp(buffer, "short"))
+	else if (0 == strcmp(format, "short"))
 		show_names = 0;
 	else
 		return ret;
@@ -423,7 +428,7 @@ int     SYSTEM_HW_MACADDR(const char *cmd, const char *param, unsigned flags, AG
 	/* go through the list */
 	for (i = ifc.ifc_len / sizeof(struct ifreq); 0 < i--; ifr++)
 	{
-		if ('\0' != *regex && NULL == zbx_regexp_match(ifr->ifr_name, regex, NULL))
+		if (NULL != regex && '\0' != *regex && NULL == zbx_regexp_match(ifr->ifr_name, regex, NULL))
 			continue;
 
 		if (-1 != ioctl(s, SIOCGIFFLAGS, ifr) &&		/* get the interface */

@@ -73,45 +73,45 @@ class testFormAdministrationScripts extends CWebTest {
 	}
 
 	public function testFormAdministrationScripts_testLayout() {
-		$this->login('scripts.php?form=1');
+		$this->zbxTestLogin('scripts.php?form=1');
 		$this->checkTitle('Configuration of scripts');
 
-		$this->ok('Script');
+		$this->zbxTestTextPresent('Script');
 
-		$this->ok(array('Name'));
+		$this->zbxTestTextPresent(array('Name'));
 		$this->assertElementPresent('name');
 
-		$this->ok(array('Type'));
+		$this->zbxTestTextPresent(array('Type'));
 		$this->assertElementPresent('type');
 		$this->assertSelectHasOption('type', 'IPMI');
 		$this->assertSelectHasOption('type', 'Script');
 
-		$this->ok(array('Execute on', 'Zabbix agent', 'Zabbix server'));
+		$this->zbxTestTextPresent(array('Execute on', 'Zabbix agent', 'Zabbix server'));
 		$this->assertElementPresent('execute_on_1');
 		$this->assertElementPresent('execute_on_2');
 
-		$this->ok(array('Command'));
+		$this->zbxTestTextPresent(array('Command'));
 		$this->assertElementPresent('command');
 
-		$this->ok(array('Description'));
+		$this->zbxTestTextPresent(array('Description'));
 		$this->assertElementPresent('description');
 
-		$this->ok(array('User groups'));
+		$this->zbxTestTextPresent(array('User groups'));
 		$this->assertElementPresent('usrgrpid');
 
-		$this->ok(array('Host groups'));
+		$this->zbxTestTextPresent(array('Host groups'));
 		$this->assertElementPresent('groupid');
 
-		$this->ok(array('Required host permissions'));
+		$this->zbxTestTextPresent(array('Required host permissions'));
 		$this->assertElementPresent('access');
 		$this->assertSelectHasOption('access', 'Read');
 		$this->assertSelectHasOption('access', 'Write');
 
-		$this->ok(array('Enable confirmation'));
+		$this->zbxTestTextPresent(array('Enable confirmation'));
 		$this->assertElementPresent('enableConfirmation');
 		$this->assertNotChecked('enableConfirmation');
 
-		$this->ok(array('Confirmation text'));
+		$this->zbxTestTextPresent(array('Confirmation text'));
 		$this->assertElementPresent('confirmation');
 	}
 
@@ -122,7 +122,7 @@ class testFormAdministrationScripts extends CWebTest {
 
 		DBsave_tables('scripts');
 
-		$this->login('scripts.php?form=1');
+		$this->zbxTestLogin('scripts.php?form=1');
 
 		foreach ($data as $field) {
 			switch ($field['type']) {
@@ -151,12 +151,10 @@ class testFormAdministrationScripts extends CWebTest {
 			$DBhash = DBhash($sql);
 		}
 
-		$this->click('save');
-		$this->wait();
-
+		$this->zbxTestClickWait('save');
 
 		if ($resultSave) {
-			$this->ok('Script added');
+			$this->zbxTestTextPresent('Script added');
 
 			$dbres = DBfetch(DBselect($sql));
 			foreach ($dbres as $field => $value) {
@@ -164,7 +162,7 @@ class testFormAdministrationScripts extends CWebTest {
 			}
 		}
 		else {
-			$this->ok('ERROR:');
+			$this->zbxTestTextPresent('ERROR:');
 			$this->assertEquals($DBhash, DBhash($sql), "DB fields changed after unsuccessful save.");
 		}
 

@@ -21,50 +21,66 @@
 #include "sysinfo.h"
 #include "../common/common.h"
 
-int	SYSTEM_CPU_UTIL(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+int	SYSTEM_CPU_UTIL(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	char	tmp[16];
+	char	*tmp;
+	int	ret = SYSINFO_RET_FAIL;
 
-	if (3 < num_param(param))
+	if (3 < request->nparam)
 		return SYSINFO_RET_FAIL;
+
+	tmp = get_rparam(request, 0);
 
 	/* only "all" (default) for parameter "cpu" is supported */
-	if (0 == get_param(param, 1, tmp, sizeof(tmp)) && '\0' != *tmp && 0 != strcmp(tmp, "all"))
+	if (NULL != tmp && '\0' != *tmp && 0 != strcmp(tmp, "all"))
 		return SYSINFO_RET_FAIL;
+
+	tmp = get_rparam(request, 2);
 
 	/* only "avg1" (default) for parameter "mode" is supported */
-	if (0 == get_param(param, 3, tmp, sizeof(tmp)) && '\0' != *tmp && 0 != strcmp(tmp, "avg1"))
+	if (NULL != tmp && '\0' != *tmp && 0 != strcmp(tmp, "avg1"))
 		return SYSINFO_RET_FAIL;
 
-	if (0 != get_param(param, 2, tmp, sizeof(tmp)) || '\0' == *tmp || 0 == strcmp(tmp, "user"))
-		return EXECUTE_DBL(cmd, "iostat 1 2 | tail -n 1 | awk '{printf(\"%s\",$(NF-3))}'", flags, result);
-	else if (0 == strcmp(tmp, "nice"))
-		return EXECUTE_DBL(cmd, "iostat 1 2 | tail -n 1 | awk '{printf(\"%s\",$(NF-2))}'", flags, result);
-	else if (0 == strcmp(tmp, "system"))
-		return EXECUTE_DBL(cmd, "iostat 1 2 | tail -n 1 | awk '{printf(\"%s\",$(NF-1))}'", flags, result);
-	else if (0 == strcmp(tmp, "idle"))
-		return EXECUTE_DBL(cmd, "iostat 1 2 | tail -n 1 | awk '{printf(\"%s\",$(NF))}'", flags, result);
+	tmp = get_rparam(request, 1);
 
-	return SYSINFO_RET_FAIL;
+	if (NULL == tmp || '\0' == *tmp || 0 == strcmp(tmp, "user"))
+		ret = EXECUTE_DBL("iostat 1 2 | tail -n 1 | awk '{printf(\"%s\",$(NF-3))}'", result);
+	else if (0 == strcmp(tmp, "nice"))
+		ret = EXECUTE_DBL("iostat 1 2 | tail -n 1 | awk '{printf(\"%s\",$(NF-2))}'", result);
+	else if (0 == strcmp(tmp, "system"))
+		ret = EXECUTE_DBL("iostat 1 2 | tail -n 1 | awk '{printf(\"%s\",$(NF-1))}'", result);
+	else if (0 == strcmp(tmp, "idle"))
+		ret = EXECUTE_DBL("iostat 1 2 | tail -n 1 | awk '{printf(\"%s\",$(NF))}'", result);
+	else
+		ret = SYSINFO_RET_FAIL;
+
+	return ret;
 }
 
-int	SYSTEM_CPU_LOAD(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+int	SYSTEM_CPU_LOAD(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	char	tmp[16];
+	char	*tmp;
+	int	ret = SYSINFO_RET_FAIL;
 
-	if (2 < num_param(param))
+	if (2 < request->nparam)
 		return SYSINFO_RET_FAIL;
+
+	tmp = get_rparam(request, 0);
 
 	/* only "all" (default) for parameter "cpu" is supported */
-	if (0 == get_param(param, 1, tmp, sizeof(tmp)) && '\0' != *tmp && 0 != strcmp(tmp, "all"))
+	if (NULL != tmp && '\0' != *tmp && 0 != strcmp(tmp, "all"))
 		return SYSINFO_RET_FAIL;
 
-	if (0 != get_param(param, 2, tmp, sizeof(tmp)) || '\0' == *tmp || 0 == strcmp(tmp, "avg1"))
-		return EXECUTE_DBL(cmd, "uptime | awk '{printf(\"%s\", $(NF))}' | sed 's/[ ,]//g'", flags, result);
-	else if (0 == strcmp(tmp, "avg5"))
-		return EXECUTE_DBL(cmd, "uptime | awk '{printf(\"%s\", $(NF-1))}' | sed 's/[ ,]//g'", flags, result);
-	else if (0 == strcmp(tmp, "avg15"))
-		return EXECUTE_DBL(cmd, "uptime | awk '{printf(\"%s\", $(NF-2))}' | sed 's/[ ,]//g'", flags, result);
+	tmp = get_rparam(request, 1);
 
-	return SYSINFO_RET_FAIL;
+	if (NULL == tmp || '\0' == *tmp || 0 == strcmp(tmp, "avg1"))
+		ret = EXECUTE_DBL("uptime | awk '{printf(\"%s\", $(NF))}' | sed 's/[ ,]//g'", result);
+	else if (0 == strcmp(tmp, "avg5"))
+		ret = EXECUTE_DBL("uptime | awk '{printf(\"%s\", $(NF-1))}' | sed 's/[ ,]//g'", result);
+	else if (0 == strcmp(tmp, "avg15"))
+		ret = EXECUTE_DBL(cmd, "uptime | awk '{printf(\"%s\", $(NF-2))}' | sed 's/[ ,]//g'", result);
+	else
+		ret = SYSINFO_RET_FAIL;
+
+	return ret;
 }
