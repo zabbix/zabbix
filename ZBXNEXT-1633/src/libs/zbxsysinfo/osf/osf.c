@@ -21,25 +21,25 @@
 #include "sysinfo.h"
 
 ZBX_METRIC	parameters_specific[] =
-/* 	KEY			FLAG		FUNCTION 	ADD_PARAM	TEST_PARAM */
+/* 	KEY			FLAG		FUNCTION 		TEST PARAMETERS */
 {
-	{"kernel.maxfiles",	0,		KERNEL_MAXFILES,	0,	0},
-	{"kernel.maxproc",	0,		KERNEL_MAXPROC, 	0,	0},
+	{"kernel.maxfiles",	0,		KERNEL_MAXFILES,	NULL},
+	{"kernel.maxproc",	0,		KERNEL_MAXPROC, 	NULL},
 
-	{"vfs.fs.size",		CF_USEUPARAM,	VFS_FS_SIZE,		0,	"/,free"},
-	{"vfs.fs.inode",	CF_USEUPARAM,	VFS_FS_INODE,		0,	"/,free"},
+	{"vfs.fs.size",		CF_HAVEPARAMS,	VFS_FS_SIZE,		"/,free"},
+	{"vfs.fs.inode",	CF_HAVEPARAMS,	VFS_FS_INODE,		"/,free"},
 
-	{"vm.memory.size",	CF_USEUPARAM,	VM_MEMORY_SIZE,		0,	"free"},
+	{"vm.memory.size",	CF_HAVEPARAMS,	VM_MEMORY_SIZE,		"free"},
 
-	{"proc.num",		CF_USEUPARAM,	PROC_NUM,		0,	"inetd,,"},
-	{"proc.mem",		CF_USEUPARAM,	PROC_MEM,		0,	"inetd,,"},
+	{"proc.num",		CF_HAVEPARAMS,	PROC_NUM,		"inetd,,"},
+	{"proc.mem",		CF_HAVEPARAMS,	PROC_MEM,		"inetd,,"},
 
-	{"system.cpu.util",	CF_USEUPARAM,	SYSTEM_CPU_UTIL,	0,	"all,user,avg1"},
-	{"system.cpu.load",	CF_USEUPARAM,	SYSTEM_CPU_LOAD,	0,	"all,avg1"},
+	{"system.cpu.util",	CF_HAVEPARAMS,	SYSTEM_CPU_UTIL,	"all,user,avg1"},
+	{"system.cpu.load",	CF_HAVEPARAMS,	SYSTEM_CPU_LOAD,	"all,avg1"},
 
-	{"system.swap.size",	CF_USEUPARAM,	SYSTEM_SWAP_SIZE,	0,	"all,free"},
+	{"system.swap.size",	CF_HAVEPARAMS,	SYSTEM_SWAP_SIZE,	"all,free"},
 
-	{"system.uptime",	0,		SYSTEM_UPTIME,		0,	0},
+	{"system.uptime",	0,		SYSTEM_UPTIME,		NULL},
 
-	{0}
+	{NULL}
 };

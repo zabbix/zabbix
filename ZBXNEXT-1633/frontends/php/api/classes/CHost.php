@@ -1538,6 +1538,9 @@ class CHost extends CHostGeneral {
 			add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_HOST, $host['hostid'], $host['name'], 'hosts', NULL, NULL);
 		}
 
+		// remove Monitoring > Latest data toggle profile values related to given hosts
+		CProfile::delete('web.latest.toggle_other', $hostIds);
+
 		return array('hostids' => $hostIds);
 	}
 

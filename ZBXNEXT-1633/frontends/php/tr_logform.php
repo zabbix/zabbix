@@ -260,7 +260,7 @@ if(isset($_REQUEST['sform'])){
 	while($db_item = DBfetch($db_items)){
 		if($db_item['templateid']){
 			$template_host = get_realhost_by_itemid($db_item['templateid']);
-			$item = $template_host['host'].':';
+			$item = $template_host['host'].NAME_DELIMITER;
 		}
 
 		$item .= itemName($db_item,$db_item['key_']);
