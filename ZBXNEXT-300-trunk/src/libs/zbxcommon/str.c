@@ -2459,10 +2459,8 @@ const char	*zbx_permission_string(int perm)
 	{
 		case PERM_DENY:
 			return "dn";
-		case PERM_READ_LIST:
-			return "rl";
-		case PERM_READ_ONLY:
-			return "ro";
+		case PERM_READ:
+			return "r";
 		case PERM_READ_WRITE:
 			return "rw";
 		default:
@@ -2798,6 +2796,12 @@ static LPTSTR	zbx_to_unicode(unsigned int codepage, LPCSTR cp_string)
 LPTSTR	zbx_acp_to_unicode(LPCSTR acp_string)
 {
 	return zbx_to_unicode(CP_ACP, acp_string);
+}
+
+/* convert from Windows OEM code page to unicode */
+LPTSTR	zbx_oemcp_to_unicode(LPCSTR oemcp_string)
+{
+	return zbx_to_unicode(CP_OEMCP, oemcp_string);
 }
 
 int	zbx_acp_to_unicode_static(LPCSTR acp_string, LPTSTR wide_string, int wide_size)

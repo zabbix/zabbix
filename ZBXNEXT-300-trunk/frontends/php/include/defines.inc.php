@@ -624,10 +624,8 @@ define('ACCESS_DENY_PAGE', 1);
 define('GROUP_DEBUG_MODE_DISABLED', 0);
 define('GROUP_DEBUG_MODE_ENABLED',	1);
 
-define('PERM_MAX',			3);
 define('PERM_READ_WRITE',	3);
 define('PERM_READ',			2);
-define('PERM_READ_LIST',	1);
 define('PERM_DENY',			0);
 
 define('PERM_RES_IDS_ARRAY',	1); // return array of nodes id - array(1,2,3,4)
@@ -768,6 +766,7 @@ define('SBR',	"<br/>\n");
 define('SPACE',	'&nbsp;');
 define('RARR',	'&rArr;');
 define('SQUAREBRACKETS', '%5B%5D');
+define('NAME_DELIMITER', ': ');
 
 // affects multibyte strings [in mb_ereg char "-" must be backslashed]!!!
 if (in_array(ini_get('mbstring.func_overload'), array(2,3,6,7))) {

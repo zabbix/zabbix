@@ -803,6 +803,21 @@ static int	DBpatch_02010036()
 
 	return FAIL;
 }
+
+static int	DBpatch_02010037()
+{
+	if (ZBX_DB_OK <= DBexecute("update config set server_check_interval=10"))
+		return SUCCEED;
+
+	return FAIL;
+}
+
+static int	DBpatch_02010038()
+{
+	const ZBX_FIELD	field = {"server_check_interval", "10", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBset_default("config", &field);
+}
 #endif	/* not HAVE_SQLITE3 */
 
 static void	DBget_version(int *mandatory, int *optional)
@@ -877,6 +892,8 @@ int	DBcheck_version()
 		{DBpatch_02010034, 2010034, 0, 1},
 		{DBpatch_02010035, 2010035, 0, 0},
 		{DBpatch_02010036, 2010036, 0, 0},
+		{DBpatch_02010037, 2010037, 0, 0},
+		{DBpatch_02010038, 2010038, 0, 0},
 		/* IMPORTANT! When adding a new mandatory DBPatch don't forget to update it for SQLite, too. */
 		{NULL}
 	};

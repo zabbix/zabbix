@@ -196,7 +196,7 @@
 				case 'groupid':
 					tpl = new Template(jQuery('#opCmdGroupRowTPL').html());
 
-					value.objectCaption = <?php echo CJs::encodeJson(_('Host group').': '); ?>;
+					value.objectCaption = <?php echo CJs::encodeJson(_('Host group').NAME_DELIMITER); ?>;
 
 					container = jQuery('#opCmdListFooter');
 					if (jQuery('#opCmdGroupRow_' + value.groupid).length == 0) {
@@ -207,7 +207,7 @@
 					tpl = new Template(jQuery('#opCmdHostRowTPL').html());
 
 					if (value.hostid.toString() != '0') {
-						value.objectCaption = <?php echo CJs::encodeJson(_('Host').': '); ?>;
+						value.objectCaption = <?php echo CJs::encodeJson(_('Host').NAME_DELIMITER); ?>;
 					}
 					else {
 						value.name = <?php echo CJs::encodeJson(_('Current host')); ?>;

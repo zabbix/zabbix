@@ -33,9 +33,7 @@ static int	get_fs_size_stat(const char *fsname, zbx_uint64_t *total, zbx_uint64_
 #endif
 	struct ZBX_STATFS	s;
 
-	assert(fsname);
-
-	if (0 != ZBX_STATFS(fsname, &s))
+	if (NULL == fsname || '\0' == *fsname || 0 != ZBX_STATFS(fsname, &s))
 		return SYSINFO_RET_FAIL;
 
 	if (total)
@@ -64,25 +62,22 @@ static int	get_fs_size_stat(const char *fsname, zbx_uint64_t *total, zbx_uint64_
 	return SYSINFO_RET_OK;
 }
 
-int	VFS_FS_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+int	VFS_FS_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	char		fsname[MAX_STRING_LEN], mode[8];
+	char		*fsname, *mode;
 	zbx_uint64_t	total, free, used;
 	double		pfree, pused;
 
-	if (2 < num_param(param))
+	if (2 < request->nparam)
 		return SYSINFO_RET_FAIL;
 
-	if (0 != get_param(param, 1, fsname, sizeof(fsname)))
-		return SYSINFO_RET_FAIL;
-
-	if (0 != get_param(param, 2, mode, sizeof(mode)))
-		*mode = '\0';
+	fsname = get_rparam(request, 0);
+	mode = get_rparam(request, 1);
 
 	if (SYSINFO_RET_OK != get_fs_size_stat(fsname, &total, &free, &used, &pfree, &pused))
 		return SYSINFO_RET_FAIL;
 
-	if ('\0' == *mode || 0 == strcmp(mode, "total"))	/* default parameter */
+	if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "total"))	/* default parameter */
 		SET_UI64_RESULT(result, total);
 	else if (0 == strcmp(mode, "free"))
 		SET_UI64_RESULT(result, free);
@@ -98,7 +93,7 @@ int	VFS_FS_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 	return SYSINFO_RET_OK;
 }
 
-int	VFS_FS_DISCOVERY(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+int	VFS_FS_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	int		ret = SYSINFO_RET_FAIL;
 	char		line[MAX_STRING_LEN], *p, *mpoint, *mtype;

@@ -21,30 +21,30 @@
 #include "sysinfo.h"
 
 ZBX_METRIC	parameters_specific[] =
-/* 	KEY			FLAG		FUNCTION 	ADD_PARAM	TEST_PARAM */
+/* 	KEY			FLAG		FUNCTION 		TEST PARAMETERS */
 {
-	{"kernel.maxfiles",	0,		KERNEL_MAXFILES,	NULL,	NULL},
-	{"kernel.maxproc",	0,		KERNEL_MAXPROC, 	NULL,	NULL},
+	{"kernel.maxfiles",	0,		KERNEL_MAXFILES,	NULL},
+	{"kernel.maxproc",	0,		KERNEL_MAXPROC, 	NULL},
 
-	{"vfs.fs.size",		CF_USEUPARAM,	VFS_FS_SIZE,		NULL,	"/,free"},
-	{"vfs.fs.inode",	CF_USEUPARAM,	VFS_FS_INODE,		NULL,	"/,free"},
-	{"vfs.fs.discovery",	0,		VFS_FS_DISCOVERY,	NULL,	NULL},
+	{"vfs.fs.size",		CF_HAVEPARAMS,	VFS_FS_SIZE,		"/,free"},
+	{"vfs.fs.inode",	CF_HAVEPARAMS,	VFS_FS_INODE,		"/,free"},
+	{"vfs.fs.discovery",	0,		VFS_FS_DISCOVERY,	NULL},
 
-	{"vm.memory.size",	CF_USEUPARAM,	VM_MEMORY_SIZE,		NULL,	"free"},
+	{"vm.memory.size",	CF_HAVEPARAMS,	VM_MEMORY_SIZE,		"free"},
 
-	{"net.tcp.listen",      CF_USEUPARAM,   NET_TCP_LISTEN, 	NULL,	"80"},
-	{"net.udp.listen",      CF_USEUPARAM,   NET_UDP_LISTEN, 	NULL,	"68"},
+	{"net.tcp.listen",      CF_HAVEPARAMS,	NET_TCP_LISTEN, 	"80"},
+	{"net.udp.listen",      CF_HAVEPARAMS,	NET_UDP_LISTEN, 	"68"},
 
-	{"net.if.in",		CF_USEUPARAM,	NET_IF_IN,		NULL,	"en0,bytes"},
-	{"net.if.out",		CF_USEUPARAM,	NET_IF_OUT,		NULL,	"en0,bytes"},
-	{"net.if.total",	CF_USEUPARAM,	NET_IF_TOTAL,		NULL,	"en0,bytes"},
-	{"net.if.collisions",   CF_USEUPARAM,   NET_IF_COLLISIONS,      NULL,	"en0"},
+	{"net.if.in",		CF_HAVEPARAMS,	NET_IF_IN,		"en0,bytes"},
+	{"net.if.out",		CF_HAVEPARAMS,	NET_IF_OUT,		"en0,bytes"},
+	{"net.if.total",	CF_HAVEPARAMS,	NET_IF_TOTAL,		"en0,bytes"},
+	{"net.if.collisions",   CF_HAVEPARAMS,	NET_IF_COLLISIONS,      "en0"},
 
-	{"system.cpu.num",	CF_USEUPARAM,	SYSTEM_CPU_NUM,		NULL,	"online"},
-	{"system.cpu.load",	CF_USEUPARAM,	SYSTEM_CPU_LOAD,	NULL,	"all,avg1"},
+	{"system.cpu.num",	CF_HAVEPARAMS,	SYSTEM_CPU_NUM,		"online"},
+	{"system.cpu.load",	CF_HAVEPARAMS,	SYSTEM_CPU_LOAD,	"all,avg1"},
 
-	{"system.uptime",	0,		SYSTEM_UPTIME,		NULL,	NULL},
-	{"system.boottime",	0,		SYSTEM_BOOTTIME,	NULL,	NULL},
+	{"system.uptime",	0,		SYSTEM_UPTIME,		NULL},
+	{"system.boottime",	0,		SYSTEM_BOOTTIME,	NULL},
 
-	{0}
+	{NULL}
 };

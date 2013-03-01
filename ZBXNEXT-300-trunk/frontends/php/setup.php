@@ -115,7 +115,7 @@ zbx_setcookie('ZBX_CONFIG', serialize($ZBX_CONFIG));
 // page title
 $pageTitle = '';
 if (isset($ZBX_SERVER_NAME) && !zbx_empty($ZBX_SERVER_NAME)) {
-	$pageTitle = $ZBX_SERVER_NAME.': ';
+	$pageTitle = $ZBX_SERVER_NAME.NAME_DELIMITER;
 }
 $pageTitle .= _('Installation');
 
