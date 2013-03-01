@@ -164,7 +164,7 @@ int	WEB_PAGE_REGEXP(const char *cmd, const char *param, unsigned flags, AGENT_RE
 
 	if (0 != get_param(param, 5, len_str, sizeof(len_str)) || '\0' == *len_str)
 		zbx_snprintf(len_str, sizeof(len_str), "%d", MAX_BUFFER_LEN - 1);
-	else if (FAIL == is_uint31(len_str, &len) || ZBX_UINT31_MAX == len)
+	else if (FAIL == is_uint31_1(len_str, &len))
 		return SYSINFO_RET_FAIL;
 
 	buffer = zbx_malloc(buffer, ZBX_MAX_WEBPAGE_SIZE);
