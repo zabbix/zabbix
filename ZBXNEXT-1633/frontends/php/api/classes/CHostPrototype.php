@@ -185,7 +185,7 @@ class CHostPrototype extends CHostBase {
 	 *
 	 * @return void
 	 */
-	public function validateUpdate(array $hostPrototypes) {
+	protected function validateUpdate(array $hostPrototypes) {
 		foreach ($hostPrototypes as $host) {
 			if (empty($host['hostid'])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Invalid method parameters.'));
@@ -285,7 +285,7 @@ class CHostPrototype extends CHostBase {
 	 *
 	 * @return void
 	 */
-	public function validateDelete($hostPrototypeIds) {
+	protected function validateDelete($hostPrototypeIds) {
 		if (!$hostPrototypeIds) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 		}
