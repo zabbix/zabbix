@@ -91,7 +91,7 @@ jQuery(function($) {
 					var search = input.val();
 
 					if (!empty(search)) {
-						if (input.attr('data-lastSearch') != search) {
+						if (input.data('lastSearch') != search) {
 							if (!values.isWaiting) {
 								values.isWaiting = true;
 
@@ -101,10 +101,10 @@ jQuery(function($) {
 									var search = input.val();
 
 									// re-check search after delay
-									if (!empty(search) && input.attr('data-lastSearch') != search) {
+									if (!empty(search) && input.data('lastSearch') != search) {
 										values.search = search;
 
-										input.attr('data-lastSearch', values.search);
+										input.data('lastSearch', values.search);
 
 										if (!empty(jqxhr)) {
 											jqxhr.abort();
@@ -137,9 +137,7 @@ jQuery(function($) {
 						}
 					}
 					else {
-						if (input.attr('data-lastSearch') !== '') {
-							hideAvailable(obj);
-						}
+						hideAvailable(obj);
 					}
 				})
 				.on('keypress keydown', function(e) {
