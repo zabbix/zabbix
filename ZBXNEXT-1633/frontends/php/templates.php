@@ -516,7 +516,7 @@ else {
 		$templates_output = array();
 		if($template['proxy_hostid']){
 			$proxy = get_host_by_hostid($template['proxy_hostid']);
-			$templates_output[] = $proxy['host'].':';
+			$templates_output[] = $proxy['host'].NAME_DELIMITER;
 		}
 		$templates_output[] = new CLink($template['name'], 'templates.php?form=update&templateid='.$template['templateid'].url_param('groupid'));
 

@@ -20,7 +20,7 @@
 #include "common.h"
 #include "sysinfo.h"
 
-int	SYSTEM_UPTIME(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+int	SYSTEM_UPTIME(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	int		mib[] = {CTL_KERN, KERN_BOOTTIME};
 	struct timeval	boottime;
