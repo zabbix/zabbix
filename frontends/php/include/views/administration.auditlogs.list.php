@@ -95,7 +95,7 @@ foreach ($this->data['actions'] as $action) {
 	$details = array();
 	if (is_array($action['details'])) {
 		foreach ($action['details'] as $detail) {
-			$details[] = array($detail['table_name'].'.'.$detail['field_name'].': '.$detail['oldvalue'].' => '.$detail['newvalue'], BR());
+			$details[] = array($detail['table_name'].'.'.$detail['field_name'].NAME_DELIMITER.$detail['oldvalue'].' => '.$detail['newvalue'], BR());
 		}
 	}
 	else {

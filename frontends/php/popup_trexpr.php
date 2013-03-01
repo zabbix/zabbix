@@ -593,7 +593,7 @@ if ($itemid) {
 	$item_key = $item_data['key_'];
 	$item_host = reset($item_data['hosts']);
 	$item_host = $item_host['host'];
-	$description = $item_host.':'.itemName($item_data);
+	$description = $item_host.NAME_DELIMITER.itemName($item_data);
 }
 else {
 	$item_key = $item_host = $description = '';

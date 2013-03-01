@@ -76,7 +76,7 @@ function make_favorite_graphs() {
 			$host = reset($item['hosts']);
 			$item['name'] = itemName($item);
 
-			$link = new CLink(get_node_name_by_elid($sourceid, null, ': ').$host['name'].':'.$item['name'], 'history.php?action=showgraph&itemid='.$sourceid);
+			$link = new CLink(get_node_name_by_elid($sourceid, null, NAME_DELIMITER).$host['name'].NAME_DELIMITER.$item['name'], 'history.php?action=showgraph&itemid='.$sourceid);
 			$link->setTarget('blank');
 		}
 		else {
@@ -86,7 +86,7 @@ function make_favorite_graphs() {
 			$graph = $graphs[$sourceid];
 			$ghost = reset($graph['hosts']);
 
-			$link = new CLink(get_node_name_by_elid($sourceid, null, ': ').$ghost['name'].':'.$graph['name'], 'charts.php?graphid='.$sourceid);
+			$link = new CLink(get_node_name_by_elid($sourceid, null, NAME_DELIMITER).$ghost['name'].NAME_DELIMITER.$graph['name'], 'charts.php?graphid='.$sourceid);
 			$link->setTarget('blank');
 		}
 		$favList->addItem($link, 'nowrap');
@@ -128,7 +128,7 @@ function make_favorite_screens() {
 				continue;
 			}
 
-			$link = new CLink(get_node_name_by_elid($sourceid, null, ': ').$slide['name'], 'slides.php?elementid='.$sourceid);
+			$link = new CLink(get_node_name_by_elid($sourceid, null, NAME_DELIMITER).$slide['name'], 'slides.php?elementid='.$sourceid);
 			$link->setTarget('blank');
 		}
 		else {
@@ -137,7 +137,7 @@ function make_favorite_screens() {
 			}
 			$screen = $screens[$sourceid];
 
-			$link = new CLink(get_node_name_by_elid($sourceid, null, ': ').$screen['name'], 'screens.php?elementid='.$sourceid);
+			$link = new CLink(get_node_name_by_elid($sourceid, null, NAME_DELIMITER).$screen['name'], 'screens.php?elementid='.$sourceid);
 			$link->setTarget('blank');
 		}
 		$favList->addItem($link, 'nowrap');
@@ -165,7 +165,7 @@ function make_favorite_maps() {
 	foreach ($sysmaps as $sysmap) {
 		$sysmapid = $sysmap['sysmapid'];
 
-		$link = new CLink(get_node_name_by_elid($sysmapid, null, ': ').$sysmap['name'], 'maps.php?sysmapid='.$sysmapid);
+		$link = new CLink(get_node_name_by_elid($sysmapid, null, NAME_DELIMITER).$sysmap['name'], 'maps.php?sysmapid='.$sysmapid);
 		$link->setTarget('blank');
 
 		$favList->addItem($link, 'nowrap');
@@ -1098,7 +1098,7 @@ function make_discovery_status() {
 	foreach ($drules as $drule) {
 		$table->addRow(array(
 			$drule['nodename'],
-			new CLink($drule['nodename'].($drule['nodename'] ? ': ' : '').$drule['name'], 'discovery.php?druleid='.$drule['druleid']),
+			new CLink($drule['nodename'].($drule['nodename'] ? NAME_DELIMITER : '').$drule['name'], 'discovery.php?druleid='.$drule['druleid']),
 			new CSpan($drule['up'], 'green'),
 			new CSpan($drule['down'], ($drule['down'] > 0) ? 'red' : 'green')
 		));
@@ -1190,7 +1190,7 @@ function make_graph_submenu() {
 			$host = reset($item['hosts']);
 			$item['name'] = itemName($item);
 			$favGraphs[] = array(
-				'name' => $host['host'].':'.$item['name'],
+				'name' => $host['host'].NAME_DELIMITER.$item['name'],
 				'favobj' => 'itemid',
 				'favid' => $sourceid,
 				'favaction' => 'remove'
@@ -1204,7 +1204,7 @@ function make_graph_submenu() {
 			$graph = $graphs[$sourceid];
 			$ghost = reset($graph['hosts']);
 			$favGraphs[] = array(
-				'name' => $ghost['host'].':'.$graph['name'],
+				'name' => $ghost['host'].NAME_DELIMITER.$graph['name'],
 				'favobj' => 'graphid',
 				'favid' => $sourceid,
 				'favaction' => 'remove'

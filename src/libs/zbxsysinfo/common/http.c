@@ -65,28 +65,32 @@ static int	get_http_page(const char *host, const char *path, unsigned short port
 	return SYSINFO_RET_OK;
 }
 
-int	WEB_PAGE_GET(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+int	WEB_PAGE_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	char	hostname[MAX_STRING_LEN];
-	char	path[MAX_STRING_LEN];
-	char	port_str[8];
-	char	buffer[MAX_BUFFER_LEN];
+	char		*hostname, *path_str, *port_str, buffer[MAX_BUFFER_LEN], path[MAX_STRING_LEN];
+	unsigned short	port;
 
-        if (num_param(param) > 3)
-                return SYSINFO_RET_FAIL;
-
-	if (0 != get_param(param, 1, hostname, sizeof(hostname)))
-                return SYSINFO_RET_FAIL;
-
-	if (0 != get_param(param, 2, path, sizeof(path)))
-		*path = '\0';
-
-	if (0 != get_param(param, 3, port_str, sizeof(port_str)) || '\0' == *port_str)
-		zbx_snprintf(port_str, sizeof(port_str), "%d", ZBX_DEFAULT_HTTP_PORT);
-	else if (FAIL == is_uint(port_str))
+	if (3 < request->nparam)
 		return SYSINFO_RET_FAIL;
 
-	if (SYSINFO_RET_OK == get_http_page(hostname, path, (unsigned short)atoi(port_str), buffer, sizeof(buffer)))
+	hostname = get_rparam(request, 0);
+	path_str = get_rparam(request, 1);
+	port_str = get_rparam(request, 2);
+
+	if (NULL == hostname || '\0' == *hostname)
+                return SYSINFO_RET_FAIL;
+
+	if (NULL == path_str)
+		*path = '\0';
+	else
+		strscpy(path, path_str);
+
+	if (NULL == port_str || '\0' == *port_str)
+		port = ZBX_DEFAULT_HTTP_PORT;
+	else if (SUCCEED != is_ushort(port_str, &port))
+		return SYSINFO_RET_FAIL;
+
+	if (SYSINFO_RET_OK == get_http_page(hostname, path, port, buffer, sizeof(buffer)))
 	{
 		zbx_rtrim(buffer, "\r\n");
 		SET_TEXT_RESULT(result, strdup(buffer));
@@ -97,79 +101,88 @@ int	WEB_PAGE_GET(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 	return SYSINFO_RET_OK;
 }
 
-int	WEB_PAGE_PERF(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+int	WEB_PAGE_PERF(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	char	hostname[MAX_STRING_LEN];
-	char	path[MAX_STRING_LEN];
-	char	port_str[8];
-	double	start_time;
+	char		*hostname, path[MAX_STRING_LEN], *port_str, *path_str;
+	double		start_time;
+	unsigned short	port;
 
-        if (num_param(param) > 3)
+	if (3 < request->nparam)
+		return SYSINFO_RET_FAIL;
+
+	hostname = get_rparam(request, 0);
+	path_str = get_rparam(request, 1);
+	port_str = get_rparam(request, 2);
+
+	if (NULL == hostname || '\0' == *hostname)
                 return SYSINFO_RET_FAIL;
 
-	if (0 != get_param(param, 1, hostname, sizeof(hostname)))
-                return SYSINFO_RET_FAIL;
-
-	if (0 != get_param(param, 2, path, sizeof(path)))
+	if (NULL == path_str || '\0' == *path_str)
 		*path = '\0';
+	else
+		strscpy(path, path_str);
 
-	if (0 != get_param(param, 3, port_str, sizeof(port_str)) || '\0' == *port_str)
-		zbx_snprintf(port_str, sizeof(port_str), "%d", ZBX_DEFAULT_HTTP_PORT);
-	else if (FAIL == is_uint(port_str))
+	if (NULL == port_str || '\0' == *port_str)
+		port = ZBX_DEFAULT_HTTP_PORT;
+	else if (SUCCEED != is_ushort(port_str, &port))
 		return SYSINFO_RET_FAIL;
 
 	start_time = zbx_time();
 
-	if (SYSINFO_RET_OK == get_http_page(hostname, path, (unsigned short)atoi(port_str), NULL, 0))
-	{
+	if (SYSINFO_RET_OK == get_http_page(hostname, path, port, NULL, 0))
 		SET_DBL_RESULT(result, zbx_time() - start_time);
-	}
 	else
 		SET_DBL_RESULT(result, 0.0);
 
 	return SYSINFO_RET_OK;
 }
 
-int	WEB_PAGE_REGEXP(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+int	WEB_PAGE_REGEXP(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	char	hostname[MAX_STRING_LEN];
-	char	path[MAX_STRING_LEN];
-	char	port_str[8];
-	char	regexp[MAX_STRING_LEN];
-	char	len_str[16];
-	char	back[MAX_BUFFER_LEN];
-	char	*buffer = NULL, *found;
-	int	len, found_len;
+	char		*hostname, *path_str, *port_str, *regexp, *length_str, path[MAX_STRING_LEN],
+			back[MAX_BUFFER_LEN], *buffer = NULL, *found;
+	int		length, len, found_len;
+	unsigned short	port;
 
-        if (num_param(param) > 5)
-                return SYSINFO_RET_FAIL;
-
-	if (0 != get_param(param, 1, hostname, sizeof(hostname)))
-                return SYSINFO_RET_FAIL;
-
-	if (0 != get_param(param, 2, path, sizeof(path)))
-		*path = '\0';
-
-	if (0 != get_param(param, 3, port_str, sizeof(port_str)) || '\0' == *port_str)
-		zbx_snprintf(port_str, sizeof(port_str), "%d", ZBX_DEFAULT_HTTP_PORT);
-	else if (FAIL == is_uint(port_str))
+	if (5 < request->nparam)
 		return SYSINFO_RET_FAIL;
 
-	if (0 != get_param(param, 4, regexp, sizeof(regexp)))
+	hostname = get_rparam(request, 0);
+	path_str = get_rparam(request, 1);
+	port_str = get_rparam(request, 2);
+	regexp = get_rparam(request, 3);
+	length_str = get_rparam(request, 4);
+
+	if (NULL == hostname || '\0' == *hostname)
                 return SYSINFO_RET_FAIL;
 
-	if (0 != get_param(param, 5, len_str, sizeof(len_str)) || '\0' == *len_str)
-		zbx_snprintf(len_str, sizeof(len_str), "%d", MAX_BUFFER_LEN - 1);
-	else if (FAIL == is_uint(len_str))
+	if (NULL == path_str || '\0' == *path_str)
+		*path = '\0';
+	else
+		strscpy(path, path_str);
+
+	if (NULL == port_str || '\0' == *port_str)
+		port = ZBX_DEFAULT_HTTP_PORT;
+	else if (SUCCEED != is_ushort(port_str, &port))
+		return SYSINFO_RET_FAIL;
+
+	if (NULL == regexp)
+                return SYSINFO_RET_FAIL;
+
+	if (NULL == length_str || '\0' == *length_str)
+		length = MAX_BUFFER_LEN - 1;
+	else if (FAIL != is_uint(length_str))
+		length = atoi(length_str);
+	else
 		return SYSINFO_RET_FAIL;
 
 	buffer = zbx_malloc(buffer, ZBX_MAX_WEBPAGE_SIZE);
 
-	if (SYSINFO_RET_OK == get_http_page(hostname, path, (unsigned short)atoi(port_str), buffer, ZBX_MAX_WEBPAGE_SIZE))
+	if (SYSINFO_RET_OK == get_http_page(hostname, path, port, buffer, ZBX_MAX_WEBPAGE_SIZE))
 	{
 		if (NULL != (found = zbx_regexp_match(buffer, regexp, &found_len)))
 		{
-			len = atoi(len_str) + 1;
+			len = length + 1;
 			len = MIN(len, found_len + 1);
 			len = MIN(len, sizeof(back));
 
