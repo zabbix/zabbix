@@ -1488,37 +1488,31 @@ int	is_int_prefix(const char *str)
 
 /******************************************************************************
  *                                                                            *
- * Function: is_uint_n_bits                                                   *
+ * Function: is_uint_n_range                                                  *
  *                                                                            *
- * Purpose: check if the string is unsigned integer and optionally store      *
- *          it into value parameter                                           *
+ * Purpose: check if the string is unsigned integer within the specified      *
+ *          range and optionally store it into value parameter                *
  *                                                                            *
  * Parameters: str   - [IN] string to check                                   *
  *             n     - [IN] string length or ZBX_MAX_UINT64_LEN               *
- *             bits  - [IN] the maximum number of bits in resulting value     *
  *             value - [OUT] a pointer to output buffer where the converted   *
  *                     value is to be written (optional, can be NULL)         *
  *             size  - [IN] size of the output buffer (optional)              *
+ *             min   - [IN] the minimum value range                           *
+ *             max   - [IN] the maximum value range                           *
  *                                                                            *
  * Return value:  SUCCEED - the string is unsigned integer                    *
- *                FAIL - the string is not a number or its value exceeds the  *
- *                       specified number of bits or output buffer is too     *
- *                       small                                                *
- *                                                                            *
- * Notes: unused bytes of output buffer are not filled with zeros.            *
- *        If the size of the output buffer is larger than necessary for       *
- *        storing the requested number of bits, the unused bytes should be    *
- *        zeroed by caller.                                                   *
+ *                FAIL - the string is not a number or its value is outside   *
+ *                       the specified range                                  *
  *                                                                            *
  * Author: Alexander Vladishev, Andris Zeila                                  *
  *                                                                            *
  ******************************************************************************/
-int	is_uint_n_bits(const char *str, size_t n, unsigned int bits, void *value, size_t size)
+int	is_uint_n_range(const char *str, size_t n, void *value, size_t size, zbx_uint64_t min, zbx_uint64_t max)
 {
-	const zbx_uint64_t	max_uint64 = ~(zbx_uint64_t)(0LL) >> (64 - bits);
-	zbx_uint64_t		value_uint64 = 0, c;
+	zbx_uint64_t	value_uint64 = 0, c;
 
-	if ('\0' == *str || 0 == n || 0 == bits || bits > 64)
+	if ('\0' == *str || 0 == n || 0 == size || size > sizeof(zbx_uint64_t))
 		return FAIL;
 
 	while ('\0' != *str && 0 < n--)
@@ -1528,13 +1522,15 @@ int	is_uint_n_bits(const char *str, size_t n, unsigned int bits, void *value, si
 
 		c = (zbx_uint64_t)(unsigned char)(*str - '0');
 
-		if ((max_uint64 - c) / 10 < value_uint64)
-			return FAIL;	/* overflow */
+		if ((max - c) / 10 < value_uint64)
+			return FAIL;	/* maximum value exceeded */
 
 		value_uint64 = value_uint64 * 10 + c;
 
 		str++;
 	}
+	if (min > value_uint64)
+		return FAIL;
 
 	if (NULL != value)
 	{
@@ -1542,13 +1538,9 @@ int	is_uint_n_bits(const char *str, size_t n, unsigned int bits, void *value, si
 		/* while on big endian architecture it will be stored into the last value_bytes. We     */
 		/* handle it by storing the offset in the most significant byte of short value and then */
 		/* use the first byte as source offset.                                                 */
-		unsigned int value_bytes = ((bits - 1) >> 3) + 1;
-		unsigned short value_offset = (unsigned short)(((unsigned int)sizeof(zbx_uint64_t) - value_bytes) << 8);
+		unsigned short value_offset = (unsigned short)(((unsigned int)sizeof(zbx_uint64_t) - size) << 8);
 
-		if (value_bytes > size)
-			return FAIL;
-
-		memcpy(value, (char*)&value_uint64 + *((unsigned char*)&value_offset) , (size_t)value_bytes);
+		memcpy(value, (char*)&value_uint64 + *((unsigned char*)&value_offset) , (size_t)size);
 	}
 
 	return SUCCEED;
