@@ -123,6 +123,7 @@ frontends/php/images/general/zabbix_od.png -text
 frontends/php/images/general/zabbix_unavailable.png -text
 frontends/php/images/general/zabbix_unknown.png -text
 frontends/php/images/general/zero.png -text
+frontends/php/images/gradients/blink.gif -text svneol=unset#unset
 frontends/php/images/gradients/button.gif -text svneol=unset#unset
 frontends/php/images/gradients/gradient.png -text
 frontends/php/images/gradients/header_footer_blue.png -text svneol=unset#image/png
@@ -255,6 +256,7 @@ frontends/php/styles/themes/originalblue/images/icons_d40000.png -text
 frontends/php/styles/themes/originalblue/images/icons_ffffff.png -text
 frontends/php/styles/themes/originalblue/images/preloader.gif -text
 frontends/php/tests/bootstrap.php.template -text
+frontends/php/tests/general/urlParamTest.php -text
 man/zabbix_agentd.man -text
 man/zabbix_get.man -text
 man/zabbix_proxy.man -text

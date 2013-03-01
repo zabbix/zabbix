@@ -136,7 +136,7 @@ class CWebTest extends PHPUnit_Extensions_SeleniumTestCase {
 		global $ZBX_SERVER_NAME;
 
 		if ($ZBX_SERVER_NAME !== '') {
-			$title = $ZBX_SERVER_NAME.NAME_DELIMITER.$title;
+			$title = $ZBX_SERVER_NAME.': '.$title;
 		}
 
 		$this->assertTitle($title);

@@ -21,25 +21,26 @@
 #include "sysinfo.h"
 #include "log.h"
 
-int	SERVICE_STATE(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	SERVICE_STATE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	SC_HANDLE	mgr, service;
-	char		*name;
+	char		name[MAX_STRING_LEN];
 	LPTSTR		wname;
 	TCHAR		service_name[MAX_STRING_LEN];
 	DWORD		max_len_name = MAX_STRING_LEN;
 	int		i, ret = SYSINFO_RET_FAIL;
 	SERVICE_STATUS	status;
 
-	if (1 < request->nparam)
+	if (num_param(param) > 1)
 		return SYSINFO_RET_FAIL;
 
-	name = get_rparam(request, 0);
-
-	if (NULL == name || '\0' == *name)
+	if (get_param(param, 1, name, sizeof(name)) != 0)
 		return SYSINFO_RET_FAIL;
 
-	if (NULL == (mgr = OpenSCManager(NULL, NULL, GENERIC_READ)))
+	if ('\0' == *name)
+		return SYSINFO_RET_FAIL;
+
+	if (NULL == (mgr = OpenSCManager(NULL,NULL,GENERIC_READ)) )
 		return SYSINFO_RET_FAIL;
 
 	wname = zbx_utf8_to_unicode(name);
@@ -49,7 +50,7 @@ int	SERVICE_STATE(AGENT_REQUEST *request, AGENT_RESULT *result)
 		service = OpenService(mgr, service_name, SERVICE_QUERY_STATUS);
 	zbx_free(wname);
 
-	if (NULL == service)
+	if(NULL == service)
 	{
 		SET_UI64_RESULT(result, 255);
 	}
@@ -175,22 +176,22 @@ static int	check_service_state(SC_HANDLE h_srv, int service_state)
 	return FAIL;
 }
 
-int	SERVICES(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	SERVICES(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	int				start_type, service_state, ret;
-	char				*type, *state, *exclude, *buf = NULL, *utf8;
+	char				type[16], state[24], *buf = NULL, *utf8,
+					exclude[MAX_STRING_LEN];
 	SC_HANDLE			h_mgr;
 	ENUM_SERVICE_STATUS_PROCESS	*ssp = NULL;
 	DWORD				sz = 0, szn, i, services, resume_handle = 0;
 
-	if (3 < request->nparam)
+	if (num_param(param) > 3)
 		return SYSINFO_RET_FAIL;
 
-	type = get_rparam(request, 0);
-	state = get_rparam(request, 1);
-	exclude = get_rparam(request, 2);
+	if (0 != get_param(param, 1, type, sizeof(type)))
+		*type = '\0';
 
-	if (NULL == type || '\0' == *type || 0 == strcmp(type, "all"))	/* default parameter */
+	if ('\0' == *type || 0 == strcmp(type, "all"))	/* default parameter */
 		start_type = ZBX_SRV_STARTTYPE_ALL;
 	else if (0 == strcmp(type, "automatic"))
 		start_type = ZBX_SRV_STARTTYPE_AUTOMATIC;
@@ -201,7 +202,10 @@ int	SERVICES(AGENT_REQUEST *request, AGENT_RESULT *result)
 	else
 		return SYSINFO_RET_FAIL;
 
-	if (NULL == state || '\0' == *state || 0 == strcmp(state, "all"))	/* default parameter */
+	if (0 != get_param(param, 2, state, sizeof(state)))
+		*state = '\0';
+
+	if ('\0' == *state || 0 == strcmp(state, "all"))	/* default parameter */
 		service_state = ZBX_SRV_STATE_ALL;
 	else if (0 == strcmp(state, "stopped"))
 		service_state = ZBX_SRV_STATE_STOPPED;
@@ -222,6 +226,9 @@ int	SERVICES(AGENT_REQUEST *request, AGENT_RESULT *result)
 	else
 		return SYSINFO_RET_FAIL;
 
+	if (0 != get_param(param, 3, exclude, sizeof(exclude)))
+		*exclude = '\0';
+
 	if (NULL == (h_mgr = OpenSCManager(NULL, NULL, GENERIC_READ)))
 		return SYSINFO_RET_FAIL;
 
@@ -238,13 +245,10 @@ int	SERVICES(AGENT_REQUEST *request, AGENT_RESULT *result)
 			if (SUCCEED == check_service_starttype(h_srv, start_type))
 				if (SUCCEED == check_service_state(h_srv, service_state))
 				{
-					if (NULL == exclude || '\0' == *exclude)
-					{
-						utf8 = zbx_unicode_to_utf8(ssp[i].lpServiceName);
-						if (FAIL == str_in_list(exclude, utf8, ','))
-							buf = zbx_strdcatf(buf, "%s\n", utf8);
-						zbx_free(utf8);
-					}
+					utf8 = zbx_unicode_to_utf8(ssp[i].lpServiceName);
+					if (FAIL == str_in_list(exclude, utf8, ','))
+						buf = zbx_strdcatf(buf, "%s\n", utf8);
+					zbx_free(utf8);
 				}
 
 			CloseServiceHandle(h_srv);

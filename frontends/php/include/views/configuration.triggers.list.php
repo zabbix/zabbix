@@ -109,7 +109,7 @@ foreach ($this->data['triggers'] as $tnum => $trigger) {
 	if ($trigger['templateid'] > 0) {
 		if (!isset($this->data['realHosts'][$triggerid])) {
 			$description[] = new CSpan(empty($this->data['parent_discoveryid']) ? _('Host') : _('Template'), 'unknown');
-			$description[] = NAME_DELIMITER;
+			$description[] = ':'.SPACE;
 		}
 		else {
 			$real_hosts = $this->data['realHosts'][$triggerid];
@@ -122,14 +122,14 @@ foreach ($this->data['triggers'] as $tnum => $trigger) {
 			else {
 				$description[] = new CLink($real_host['name'], 'triggers.php?hostid='.$real_host['hostid'], 'unknown');
 			}
-			$description[] = NAME_DELIMITER;
+			$description[] = ':'.SPACE;
 		}
 	}
 
 	if (empty($this->data['parent_discoveryid'])) {
 		if (!empty($trigger['discoveryRule'])) {
 			$description[] = new CLink($trigger['discoveryRule']['name'], 'trigger_prototypes.php?hostid='.$this->data['hostid'].'&parent_discoveryid='.$trigger['discoveryRule']['itemid'], 'gold');
-			$description[] = NAME_DELIMITER.$trigger['description'];
+			$description[] = ':'.SPACE.$trigger['description'];
 		}
 		else {
 			$description[] = new CLink($trigger['description'], 'triggers.php?form=update&hostid='.$this->data['hostid'].'&triggerid='.$triggerid);
@@ -137,7 +137,7 @@ foreach ($this->data['triggers'] as $tnum => $trigger) {
 
 		$dependencies = $trigger['dependencies'];
 		if (count($dependencies) > 0) {
-			$description[] = array(BR(), bold(_('Depends on').NAME_DELIMITER));
+			$description[] = array(BR(), bold(_('Depends on').' : '));
 			foreach ($dependencies as $dep_trigger) {
 				$description[] = BR();
 
@@ -147,7 +147,7 @@ foreach ($this->data['triggers'] as $tnum => $trigger) {
 					$description[] = ', ';
 				}
 				array_pop($description);
-				$description[] = NAME_DELIMITER;
+				$description[] = ' : ';
 				$description[] = $dep_trigger['description'];
 			}
 		}

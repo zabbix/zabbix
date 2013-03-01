@@ -49,16 +49,12 @@ class CHttpTestManager {
 	 * Save http test to db.
 	 *
 	 * @param array $httpTests
-	 *
-	 * @return array
 	 */
 	public function persist(array $httpTests) {
 		$this->changedSteps = $this->findChangedStepNames($httpTests);
 
-		$httpTests = $this->save($httpTests);
-		$this->inherit($httpTests);
-
-		return $httpTests;
+		$HttpTests = $this->save($httpTests);
+		$this->inherit($HttpTests);
 	}
 
 	/**

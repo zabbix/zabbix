@@ -40,8 +40,7 @@ static int	get_net_stat(const char *if_name, net_stat_t *ns)
 	perfstat_netinterface_t	ps_netif;
 #endif
 
-	if (NULL == if_name || '\0' == *if_name)
-		return SYSINFO_RET_FAIL;
+	assert(ns);
 
 #if defined(HAVE_LIBPERFSTAT)
 	strscpy(ps_id.name, if_name);
@@ -65,26 +64,39 @@ static int	get_net_stat(const char *if_name, net_stat_t *ns)
 #endif
 }
 
-int	NET_IF_IN(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	NET_IF_IN(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	char		*if_name, *mode;
+	char		if_name[MAX_STRING_LEN], mode[MAX_STRING_LEN];
 	net_stat_t	ns;
 	int		ret = SYSINFO_RET_OK;
 
-	if (2 < request->nparam)
+	if (num_param(param) > 2)
 		return SYSINFO_RET_FAIL;
 
-	if_name = get_rparam(request, 0);
-	mode = get_rparam(request, 1);
+	if (0 != get_param(param, 1, if_name, sizeof(if_name)) || *if_name == '\0')
+		return SYSINFO_RET_FAIL;
+
+	if (0 != get_param(param, 2, mode, sizeof(mode)))
+		*mode = '\0';
+
+	/* default parameter */
+	if ('\0' == *mode)
+		zbx_snprintf(mode, sizeof(mode), "bytes");
 
 	if (SYSINFO_RET_OK == get_net_stat(if_name, &ns))
 	{
-		if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "bytes"))
+		if (0 == strcmp(mode, "bytes"))
+		{
 			SET_UI64_RESULT(result, ns.ibytes);
+		}
 		else if (0 == strcmp(mode, "packets"))
+		{
 			SET_UI64_RESULT(result, ns.ipackets);
+		}
 		else if (0 == strcmp(mode, "errors"))
+		{
 			SET_UI64_RESULT(result, ns.ierr);
+		}
 		else
 			ret = SYSINFO_RET_FAIL;
 	}
@@ -94,26 +106,39 @@ int	NET_IF_IN(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return ret;
 }
 
-int	NET_IF_OUT(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	NET_IF_OUT(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	char		*if_name, *mode;
+	char		if_name[MAX_STRING_LEN], mode[MAX_STRING_LEN];
 	net_stat_t	ns;
 	int		ret = SYSINFO_RET_OK;
 
-	if (2 < request->nparam)
+	if (num_param(param) > 2)
 		return SYSINFO_RET_FAIL;
 
-	if_name = get_rparam(request, 0);
-	mode = get_rparam(request, 1);
+	if (0 != get_param(param, 1, if_name, sizeof(if_name)) || *if_name == '\0')
+		return SYSINFO_RET_FAIL;
+
+	if (0 != get_param(param, 2, mode, sizeof(mode)))
+		*mode = '\0';
+
+	/* default parameter */
+	if ('\0' == *mode)
+		zbx_snprintf(mode, sizeof(mode), "bytes");
 
 	if (SYSINFO_RET_OK == get_net_stat(if_name, &ns))
 	{
-		if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "bytes"))
+		if (0 == strcmp(mode, "bytes"))
+		{
 			SET_UI64_RESULT(result, ns.obytes);
+		}
 		else if (0 == strcmp(mode, "packets"))
+		{
 			SET_UI64_RESULT(result, ns.opackets);
+		}
 		else if (0 == strcmp(mode, "errors"))
+		{
 			SET_UI64_RESULT(result, ns.oerr);
+		}
 		else
 			ret = SYSINFO_RET_FAIL;
 	}
@@ -123,26 +148,39 @@ int	NET_IF_OUT(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return ret;
 }
 
-int	NET_IF_TOTAL(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	NET_IF_TOTAL(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	char		*if_name, *mode;
+	char		if_name[MAX_STRING_LEN], mode[MAX_STRING_LEN];
 	net_stat_t	ns;
 	int		ret = SYSINFO_RET_OK;
 
-	if (2 < request->nparam)
+	if (num_param(param) > 2)
 		return SYSINFO_RET_FAIL;
 
-	if_name = get_rparam(request, 0);
-	mode = get_rparam(request, 1);
+	if (0 != get_param(param, 1, if_name, sizeof(if_name)) || *if_name == '\0')
+		return SYSINFO_RET_FAIL;
+
+	if (0 != get_param(param, 2, mode, sizeof(mode)))
+		*mode = '\0';
+
+	/* default parameter */
+	if ('\0' == *mode)
+		zbx_snprintf(mode, sizeof(mode), "bytes");
 
 	if (SYSINFO_RET_OK == get_net_stat(if_name, &ns))
 	{
-		if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "bytes"))
+		if (0 == strcmp(mode, "bytes"))
+		{
 			SET_UI64_RESULT(result, ns.ibytes + ns.obytes);
+		}
 		else if (0 == strcmp(mode, "packets"))
+		{
 			SET_UI64_RESULT(result, ns.ipackets + ns.opackets);
+		}
 		else if (0 == strcmp(mode, "errors"))
+		{
 			SET_UI64_RESULT(result, ns.ierr + ns.oerr);
+		}
 		else
 			ret = SYSINFO_RET_FAIL;
 	}
@@ -152,26 +190,29 @@ int	NET_IF_TOTAL(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return ret;
 }
 
-int	NET_IF_COLLISIONS(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	NET_IF_COLLISIONS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	char		*if_name;
+	char		if_name[MAX_STRING_LEN];
 	net_stat_t	ns;
+	int		ret = SYSINFO_RET_OK;
 
-	if (1 < request->nparam)
+	if (num_param(param) > 1)
 		return SYSINFO_RET_FAIL;
 
-	if_name = get_rparam(request, 0);
+	if (0 != get_param(param, 1, if_name, sizeof(if_name)))
+		return SYSINFO_RET_FAIL;
 
 	if (SYSINFO_RET_OK == get_net_stat(if_name, &ns))
 	{
 		SET_UI64_RESULT(result, ns.colls);
-		return SYSINFO_RET_OK;
 	}
+	else
+		ret = SYSINFO_RET_FAIL;
 
-	return SYSINFO_RET_FAIL;
+	return ret;
 }
 
-int	NET_IF_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	NET_IF_DISCOVERY(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 #if defined(HAVE_LIBPERFSTAT)
 	int			rc, i, ret = SYSINFO_RET_FAIL;

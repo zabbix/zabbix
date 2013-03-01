@@ -28,9 +28,6 @@ static int	get_ifmib_general(const char *if_name)
 	int	mib[6], ifcount;
 	size_t	len;
 
-	if (NULL == if_name || '\0'== *if_name)
-		return SYSINFO_RET_FAIL;
-
 	mib[0] = CTL_NET;
 	mib[1] = PF_LINK;
 	mib[2] = NETLINK_GENERIC;
@@ -64,20 +61,23 @@ static int	get_ifmib_general(const char *if_name)
 	return FAIL;
 }
 
-int	NET_IF_IN(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	NET_IF_IN(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	char	*if_name, *mode;
+	char	if_name[MAX_STRING_LEN], mode[32];
 
-	if (2 < request->nparam)
+	if (2 < num_param(param))
 		return SYSINFO_RET_FAIL;
 
-	if_name = get_rparam(request, 0);
-	mode = get_rparam(request, 1);
+	if (0 != get_param(param, 1, if_name, sizeof(if_name)))
+		return SYSINFO_RET_FAIL;
+
+	if (0 != get_param(param, 2, mode, sizeof(mode)))
+		*mode = '\0';
 
 	if (FAIL == get_ifmib_general(if_name))
 		return SYSINFO_RET_FAIL;
 
-	if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "bytes"))	/* default parameter */
+	if ('\0' == *mode || 0 == strcmp(mode, "bytes"))	/* default parameter */
 		SET_UI64_RESULT(result, ifmd.ifmd_data.ifi_ibytes);
 	else if (0 == strcmp(mode, "packets"))
 		SET_UI64_RESULT(result, ifmd.ifmd_data.ifi_ipackets);
@@ -91,20 +91,23 @@ int	NET_IF_IN(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
-int	NET_IF_OUT(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	NET_IF_OUT(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	char	*if_name, *mode;
+	char	if_name[MAX_STRING_LEN], mode[32];
 
-	if (2 < request->nparam)
+	if (2 < num_param(param))
 		return SYSINFO_RET_FAIL;
 
-	if_name = get_rparam(request, 0);
-	mode = get_rparam(request, 1);
+	if (0 != get_param(param, 1, if_name, sizeof(if_name)))
+		return SYSINFO_RET_FAIL;
+
+	if (0 != get_param(param, 2, mode, sizeof(mode)))
+		*mode = '\0';
 
 	if (FAIL == get_ifmib_general(if_name))
 		return SYSINFO_RET_FAIL;
 
-	if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "bytes"))	/* default parameter */
+	if ('\0' == *mode || 0 == strcmp(mode, "bytes"))	/* default parameter */
 		SET_UI64_RESULT(result, ifmd.ifmd_data.ifi_obytes);
 	else if (0 == strcmp(mode, "packets"))
 		SET_UI64_RESULT(result, ifmd.ifmd_data.ifi_opackets);
@@ -116,20 +119,23 @@ int	NET_IF_OUT(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
-int	NET_IF_TOTAL(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	NET_IF_TOTAL(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	char	*if_name, *mode;
+	char	if_name[MAX_STRING_LEN], mode[32];
 
-	if (2 < request->nparam)
+	if (2 < num_param(param))
 		return SYSINFO_RET_FAIL;
 
-	if_name = get_rparam(request, 0);
-	mode = get_rparam(request, 1);
+	if (0 != get_param(param, 1, if_name, sizeof(if_name)))
+		return SYSINFO_RET_FAIL;
+
+	if (0 != get_param(param, 2, mode, sizeof(mode)))
+		*mode = '\0';
 
 	if (FAIL == get_ifmib_general(if_name))
 		return SYSINFO_RET_FAIL;
 
-	if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "bytes"))	/* default parameter */
+	if ('\0' == *mode || 0 == strcmp(mode, "bytes"))	/* default parameter */
 		SET_UI64_RESULT(result, (zbx_uint64_t)ifmd.ifmd_data.ifi_ibytes + ifmd.ifmd_data.ifi_obytes);
 	else if (0 == strcmp(mode, "packets"))
 		SET_UI64_RESULT(result, (zbx_uint64_t)ifmd.ifmd_data.ifi_ipackets + ifmd.ifmd_data.ifi_opackets);
@@ -141,23 +147,24 @@ int	NET_IF_TOTAL(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
-int     NET_TCP_LISTEN(AGENT_REQUEST *request, AGENT_RESULT *result)
+int     NET_TCP_LISTEN(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	char		*port_str, command[64];
+	char		tmp[8], command[64];
 	unsigned short	port;
 	int		res;
 
-	if (1 < request->nparam)
+	if (1 < num_param(param))
 		return SYSINFO_RET_FAIL;
 
-	port_str = get_rparam(request, 0);
+	if (0 != get_param(param, 1, tmp, sizeof(tmp)))
+		return SYSINFO_RET_FAIL;
 
-	if (NULL == port_str || SUCCEED != is_ushort(port_str, &port))
+	if (FAIL == is_ushort(tmp, &port))
 		return SYSINFO_RET_FAIL;
 
 	zbx_snprintf(command, sizeof(command), "netstat -an | grep '^tcp.*\\.%hu[^.].*LISTEN' | wc -l", port);
 
-	if (SYSINFO_RET_FAIL == (res = EXECUTE_INT(command, result)))
+	if (SYSINFO_RET_FAIL == (res = EXECUTE_INT(NULL, command, flags, result)))
 		return res;
 
 	if (1 < result->ui64)
@@ -166,23 +173,24 @@ int     NET_TCP_LISTEN(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return res;
 }
 
-int     NET_UDP_LISTEN(AGENT_REQUEST *request, AGENT_RESULT *result)
+int     NET_UDP_LISTEN(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	char		*port_str, command[64];
+	char		tmp[8], command[64];
 	unsigned short	port;
 	int		res;
 
-	if (1 < request->nparam)
+	if (1 < num_param(param))
 		return SYSINFO_RET_FAIL;
 
-	port_str = get_rparam(request, 0);
+	if (0 != get_param(param, 1, tmp, sizeof(tmp)))
+		return SYSINFO_RET_FAIL;
 
-	if (NULL == port_str || SUCCEED != is_ushort(port_str, &port))
+	if (FAIL == is_ushort(tmp, &port))
 		return SYSINFO_RET_FAIL;
 
 	zbx_snprintf(command, sizeof(command), "netstat -an | grep '^udp.*\\.%hu[^.].*\\*\\.\\*' | wc -l", port);
 
-	if (SYSINFO_RET_FAIL == (res = EXECUTE_INT(command, result)))
+	if (SYSINFO_RET_FAIL == (res = EXECUTE_INT(NULL, command, flags, result)))
 		return res;
 
 	if (1 < result->ui64)
@@ -191,14 +199,15 @@ int     NET_UDP_LISTEN(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return res;
 }
 
-int     NET_IF_COLLISIONS(AGENT_REQUEST *request, AGENT_RESULT *result)
+int     NET_IF_COLLISIONS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	char	*if_name;
+	char	if_name[MAX_STRING_LEN], mode[32];
 
-	if (1 < request->nparam)
+	if (1 < num_param(param))
 		return SYSINFO_RET_FAIL;
 
-	if_name = get_rparam(request, 0);
+	if (0 != get_param(param, 1, if_name, sizeof(if_name)))
+		return SYSINFO_RET_FAIL;
 
 	if (FAIL == get_ifmib_general(if_name))
 		return SYSINFO_RET_FAIL;

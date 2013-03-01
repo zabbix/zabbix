@@ -24,8 +24,8 @@
 
 extern char	*CONFIG_SOURCE_IP;
 
-int	WEB_PAGE_GET(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	WEB_PAGE_PERF(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	WEB_PAGE_REGEXP(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	WEB_PAGE_GET(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
+int	WEB_PAGE_PERF(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
+int	WEB_PAGE_REGEXP(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 
 #endif /* ZABBIX_SYSINFO_COMMON_HTTP_H */

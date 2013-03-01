@@ -124,20 +124,19 @@ class CTrigger extends CTriggerGeneral {
 
 			$userGroups = getUserGroupsByUserId($userid);
 
-			$sqlParts['where'][] = 'NOT EXISTS ('.
-				'SELECT NULL'.
-				' FROM functions f,items i,hosts_groups hgg'.
-					' LEFT JOIN rights r'.
-						' ON r.id=hgg.groupid'.
-							' AND '.dbConditionInt('r.groupid', $userGroups).
-				' WHERE t.triggerid=f.triggerid '.
-					' AND f.itemid=i.itemid'.
-					' AND i.hostid=hgg.hostid'.
-				' GROUP BY i.hostid'.
-				' HAVING MAX(permission)<'.$permission.
-					' OR MIN(permission) IS NULL'.
-					' OR MIN(permission)='.PERM_DENY.
-			')';
+			$sqlParts['where'][] = 'EXISTS ('.
+					'SELECT NULL'.
+					' FROM functions f,items i,hosts_groups hgg'.
+						' JOIN rights r'.
+							' ON r.id=hgg.groupid'.
+								' AND '.dbConditionInt('r.groupid', $userGroups).
+					' WHERE t.triggerid=f.triggerid'.
+						' AND f.itemid=i.itemid'.
+						' AND i.hostid=hgg.hostid'.
+					' GROUP BY f.triggerid'.
+					' HAVING MIN(r.permission)>'.PERM_DENY.
+						' AND MAX(r.permission)>='.$permission.
+					')';
 		}
 
 		// groupids
@@ -707,8 +706,6 @@ class CTrigger extends CTriggerGeneral {
 	}
 
 	/**
-	 * Check input.
-	 *
 	 * @param $triggers
 	 * @param $method
 	 */
@@ -720,7 +717,6 @@ class CTrigger extends CTriggerGeneral {
 		// permissions
 		if ($update || $delete) {
 			$triggerDbFields = array('triggerid' => null);
-
 			$dbTriggers = $this->get(array(
 				'triggerids' => zbx_objectValues($triggers, 'triggerid'),
 				'output' => API_OUTPUT_EXTEND,
@@ -739,7 +735,7 @@ class CTrigger extends CTriggerGeneral {
 			);
 		}
 
-		if ($update) {
+		if ($update){
 			$triggers = $this->extendObjects($this->tableName(), $triggers, array('description'));
 		}
 
@@ -765,20 +761,8 @@ class CTrigger extends CTriggerGeneral {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect fields for trigger.'));
 			}
 
-			$expressionChanged = true;
-
 			if ($update) {
 				$dbTrigger = $dbTriggers[$trigger['triggerid']];
-
-				if (isset($trigger['expression'])) {
-					$expressionFull = explode_exp($dbTrigger['expression']);
-					if (strcmp($trigger['expression'], $expressionFull) == 0) {
-						$expressionChanged = false;
-					}
-				}
-				if (isset($trigger['description']) && strcmp($trigger['description'], $dbTrigger['description']) == 0) {
-					unset($trigger['description']);
-				}
 			}
 			elseif ($delete) {
 				if ($dbTriggers[$trigger['triggerid']]['templateid'] != 0) {
@@ -788,6 +772,40 @@ class CTrigger extends CTriggerGeneral {
 					);
 				}
 				continue;
+			}
+
+			$expressionChanged = true;
+			if ($update) {
+				if (isset($trigger['expression'])) {
+					$expressionFull = explode_exp($dbTrigger['expression']);
+					if (strcmp($trigger['expression'], $expressionFull) == 0) {
+						$expressionChanged = false;
+					}
+				}
+				if (isset($trigger['description']) && strcmp($trigger['description'], $dbTrigger['description']) == 0) {
+					unset($trigger['description']);
+				}
+				if (isset($trigger['priority']) && $trigger['priority'] == $dbTrigger['priority']) {
+					unset($trigger['priority']);
+				}
+				if (isset($trigger['type']) && $trigger['type'] == $dbTrigger['type']) {
+					unset($trigger['type']);
+				}
+				if (isset($trigger['comments']) && strcmp($trigger['comments'], $dbTrigger['comments']) == 0) {
+					unset($trigger['comments']);
+				}
+				if (isset($trigger['url']) && strcmp($trigger['url'], $dbTrigger['url']) == 0) {
+					unset($trigger['url']);
+				}
+				if (isset($trigger['status']) && $trigger['status'] == $dbTrigger['status']) {
+					unset($trigger['status']);
+				}
+				if (isset($trigger['dependencies'])) {
+					$dbTrigger['dependencies'] = zbx_objectValues($dbTrigger['dependencies'], 'triggerid');
+					if (array_equal($dbTrigger['dependencies'], $trigger['dependencies'])) {
+						unset($trigger['dependencies']);
+					}
+				}
 			}
 
 			// if some of the properties are unchanged, no need to update them in DB
@@ -983,7 +1001,9 @@ class CTrigger extends CTriggerGeneral {
 		return array('triggerids' => $delTriggerIds);
 	}
 
+
 	protected function deleteByPks(array $pks) {
+
 		// others idx should be deleted as well if they arise at some point
 		DB::delete('profiles', array(
 			'idx' => 'web.events.filter.triggerid',
@@ -1164,7 +1184,6 @@ class CTrigger extends CTriggerGeneral {
 		catch (APIException $e) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete dependency'));
 		}
-
 		return array('triggerids' => $triggerids);
 	}
 

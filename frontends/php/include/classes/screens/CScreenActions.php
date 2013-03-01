@@ -145,12 +145,12 @@ class CScreenActions extends CScreenBase {
 			}
 
 			$message = array(
-				bold(_('Subject').NAME_DELIMITER),
+				bold(_('Subject').': '),
 				br(),
 				$alert['subject'],
 				br(),
 				br(),
-				bold(_('Message').NAME_DELIMITER),
+				bold(_('Message').': '),
 				br(),
 				$alert['message']
 			);

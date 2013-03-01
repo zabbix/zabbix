@@ -108,20 +108,19 @@ class CTriggerPrototype extends CTriggerGeneral {
 
 			$userGroups = getUserGroupsByUserId($userid);
 
-			$sqlParts['where'][] = 'NOT EXISTS ('.
+			$sqlParts['where'][] = 'EXISTS ('.
 					'SELECT NULL'.
 					' FROM functions f,items i,hosts_groups hgg'.
-						' LEFT JOIN rights r'.
+						' JOIN rights r'.
 							' ON r.id=hgg.groupid'.
 								' AND '.dbConditionInt('r.groupid', $userGroups).
 					' WHERE t.triggerid=f.triggerid'.
 						' AND f.itemid=i.itemid'.
 						' AND i.hostid=hgg.hostid'.
-					' GROUP BY i.hostid'.
-					' HAVING MAX(permission)<'.$permission.
-						' OR MIN(permission) IS NULL'.
-						' OR MIN(permission)='.PERM_DENY.
-				')';
+					' GROUP BY f.triggerid'.
+					' HAVING MIN(r.permission)>'.PERM_DENY.
+						' AND MAX(r.permission)>='.$permission.
+					')';
 		}
 
 		// groupids
