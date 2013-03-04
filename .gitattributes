@@ -537,6 +537,7 @@ misc/init.d/tru64/zabbix_server -text
 src/libs/zbxdbhigh/lld.h -text
 src/libs/zbxdbhigh/lld_common.c -text
 src/libs/zbxdbhigh/lld_graph.c -text
+src/libs/zbxdbhigh/lld_host.c -text
 src/libs/zbxdbhigh/lld_item.c -text
 src/libs/zbxdbhigh/lld_trigger.c -text
 src/zabbix_java/lib/logback-classic-0.9.27.jar -text
