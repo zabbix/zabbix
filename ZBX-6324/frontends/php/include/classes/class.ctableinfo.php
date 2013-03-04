@@ -42,13 +42,14 @@ class CTableInfo extends CTable {
 			insert_js(
 				'jQuery(function($) {
 					$.fn.makeVerticalRotation = function () {
-						var cellsToRotate = $(".vertical_rotation", this);
-						var betterCells = [];
+						var cellsToRotate = $(".vertical_rotation", this),
+							betterCells = [];
 
 						// insert spans
 						cellsToRotate.each(function () {
 							var cell = $(this),
 								text = cell.text();
+
 							cell.text("").append($("<span>", {text: text}));
 						});
 
@@ -71,11 +72,21 @@ class CTableInfo extends CTable {
 								css["-ms-transform-origin"] = transform;
 							}
 
-							var divInner = $("<div>", {"class": "vertical_rotation_inner"}).css(css).append(span.text());
+							var divInner = $("<div>", {
+								"class": "vertical_rotation_inner"
+							})
+							.css(css)
+							.append(span.text());
 
-							var div = $("<div>", {height: width, width: height}).append(divInner);
+							var div = $("<div>", {
+								height: width,
+								width: height
+							})
+							.append(divInner);
+
 							betterCells.push(div);
 						});
+
 						cellsToRotate.each(function (i) {
 							$(this).html(betterCells[i]);
 						});
@@ -86,7 +97,10 @@ class CTableInfo extends CTable {
 								width = cell.width();
 
 							if (width > 30) {
-								cell.children().css({position: "relative", left: (width / 2 - 12)});
+								cell.children().css({
+									position: "relative",
+									left: width / 2 - 12
+								});
 							}
 						});
 					};
