@@ -193,9 +193,10 @@ function make_system_status($filter) {
 
 	// get host groups
 	$options = array(
+		'groupids' => $filter['groupids'],
+		'hostids' => isset($filter['hostids']) ? $filter['hostids'] : null,
 		'nodeids' => get_current_nodeid(),
 		'monitored_hosts' => true,
-		'groupids' => $filter['groupids'],
 		'output' => array('groupid', 'name'),
 		'preservekeys' => true
 	);
@@ -343,6 +344,7 @@ function make_system_status($filter) {
 		}
 		$table->addRow($group_row);
 	}
+
 	$script = new CJSScript(get_js("jQuery('#hat_syssum_footer').html('"._s('Updated: %s', zbx_date2str(_('H:i:s')))."')"));
 
 	return new CDiv(array($table, $script));
@@ -976,6 +978,7 @@ function make_latest_issues(array $filter = array()) {
 function make_webmon_overview($filter) {
 	$groups = API::HostGroup()->get(array(
 		'groupids' => $filter['groupids'],
+		'hostids' => isset($filter['hostids']) ? $filter['hostids'] : null,
 		'monitored_hosts' => true,
 		'with_monitored_httptests' => true,
 		'output' => array('groupid', 'name'),
@@ -1012,7 +1015,6 @@ function make_webmon_overview($filter) {
 		_('Failed'),
 		_('Unknown')
 	));
-
 
 	$data = array();
 
@@ -1053,6 +1055,7 @@ function make_webmon_overview($filter) {
 			));
 		}
 	}
+
 	$script = new CJSScript(get_js("jQuery('#hat_webovr_footer').html('"._s('Updated: %s', zbx_date2str(_('H:i:s')))."')"));
 
 	return new CDiv(array($table, $script));

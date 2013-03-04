@@ -483,6 +483,7 @@ jQuery(function($) {
 		// settings
 		var searchInputMinWidth = 50,
 			searchInputLeftPaddings = 4,
+			searchInputRightPaddings = 4,
 			searchInputTopPaddings = IE8 ? 7 : 0;
 
 		// calculate
@@ -519,7 +520,7 @@ jQuery(function($) {
 		$('input[type="text"]', obj).css({
 			'padding-top': top,
 			'padding-left': left,
-			width: values.width - left
+			width: values.width - left - searchInputRightPaddings
 		});
 	}
 
