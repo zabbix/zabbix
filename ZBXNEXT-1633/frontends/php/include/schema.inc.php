@@ -231,6 +231,13 @@ return array(
 				'length' => 10,
 				'default' => '0',
 			),
+			'templateid' => array(
+				'null' => true,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'hosts',
+				'ref_field' => 'hostid',
+			),
 		),
 	),
 	'groups' => array(
