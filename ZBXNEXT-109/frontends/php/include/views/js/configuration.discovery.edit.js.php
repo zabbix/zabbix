@@ -198,9 +198,6 @@
 	}
 
 	function addPopupValues(list) {
-		// available type for device uniqueness criteria
-		var uniqTypeList = [ZBX_SVC.agent, ZBX_SVC.snmpv1, ZBX_SVC.snmpv2, ZBX_SVC.snmpv3];
-
 		// templates
 		var dcheckRowTpl = new Template(jQuery('#dcheckRowTPL').html()),
 			uniqRowTpl = new Template(jQuery('#uniqRowTPL').html());
@@ -211,6 +208,10 @@
 			}
 
 			var value = list[i];
+
+			if (typeof(value.dcheckid) == 'undefined') {
+				value.dcheckid = createDCheckId();
+			}
 
 			// add
 			if (typeof(ZBX_CHECKLIST[value.dcheckid]) == 'undefined') {
@@ -259,9 +260,10 @@
 			}
 
 			// update device uniqueness criteria
-			var uniquenessCriteria = jQuery('#uniqueness_criteria_' + value.dcheckid);
+			var availableDeviceTypes = [ZBX_SVC.agent, ZBX_SVC.snmpv1, ZBX_SVC.snmpv2, ZBX_SVC.snmpv3],
+				uniquenessCriteria = jQuery('#uniqueness_criteria_' + value.dcheckid);
 
-			if (jQuery.inArray(parseInt(value.type, 10), uniqTypeList) !== -1) {
+			if (jQuery.inArray(parseInt(value.type), availableDeviceTypes) > -1) {
 				if (uniquenessCriteria.length) {
 					jQuery('label[for=uniqueness_criteria_' + value.dcheckid + ']').text(value['name']);
 				}
@@ -274,10 +276,7 @@
 					uniquenessCriteria.remove();
 					jQuery('label[for=uniqueness_criteria_' + value.dcheckid + ']').remove();
 
-					// check first device
-					if (jQuery('#uniqList input').length < 2) {
-						jQuery('#uniqList input').attr('checked', true);
-					}
+					selectUniquenessCriteriaDefault();
 				}
 			}
 		}
@@ -291,6 +290,8 @@
 		}
 
 		jQuery('#uniqueness_criteria_row_' + dcheckid).remove();
+
+		selectUniquenessCriteriaDefault();
 
 		delete(ZBX_CHECKLIST[dcheckid]);
 	}
@@ -369,7 +370,7 @@
 					if (radioObj.attr('type') == 'radio') {
 						radioObj.removeAttr('checked');
 
-						jQuery('#' + name + '_' + itemObj.val()).attr('checked', true);
+						jQuery('#' + name + '_' + itemObj.val()).attr('checked', 'checked');
 					}
 				}
 			});
@@ -409,12 +410,45 @@
 		toggleInputs('newCheckSecNameRow', isset(dcheckType, secNameRowTypes));
 		toggleInputs('newCheckSecLevRow', isset(dcheckType, secNameRowTypes));
 
-		// set default port
-		var port = jQuery('#ports'),
-			oldType = (typeof(dcheckId) != 'undefined') ? ZBX_CHECKLIST[dcheckId].type : '';
+		// get old type
+		var oldType = '';
 
+		if (typeof(dcheckId) != 'undefined') {
+			oldType = (typeof(ZBX_CHECKLIST[dcheckId].oldType) != 'undefined')
+				? ZBX_CHECKLIST[dcheckId].oldType
+				: ZBX_CHECKLIST[dcheckId].type;
+
+			ZBX_CHECKLIST[dcheckId]['oldType'] = dcheckType;
+		}
+
+		// type is changed
 		if (ZBX_SVC.icmp != dcheckType && dcheckType != oldType) {
-			port.val(discoveryCheckDefaultPort(dcheckType));
+			// reset values
+			var snmpTypes = [ZBX_SVC.snmpv1, ZBX_SVC.snmpv2, ZBX_SVC.snmpv3],
+				ignoreNames = ['druleid', 'name', 'ports', 'type'];
+
+			if (jQuery.inArray(dcheckType, snmpTypes) !== -1 && jQuery.inArray(oldType, snmpTypes) !== -1) {
+				// ignore value reset when change type from snmpt's
+			}
+			else {
+				jQuery('#dcheckCell_' + dcheckId + ' input').each(function(i, item) {
+					var itemObj = jQuery(item);
+
+					var name = itemObj.attr('name').replace('dchecks[' + dcheckId + '][', '');
+					name = name.substring(0, name.length - 1);
+
+					if (jQuery.inArray(name, ignoreNames) < 0) {
+						fieldObj = jQuery('#' + name);
+
+						if (fieldObj.length) {
+							fieldObj.val('');
+						}
+					}
+				});
+			}
+
+			// reset port to default
+			jQuery('#ports').val(discoveryCheckDefaultPort(dcheckType));
 		}
 
 		updateNewDCheckSNMPType();
@@ -454,11 +488,11 @@
 	function saveNewDCheckForm(dcheckId) {
 		var dCheck = jQuery('#new_check_form :input:enabled').serializeJSON();
 
-		if (dcheckId > 0) {
+		if (typeof(dcheckId) != 'undefined') {
 			dCheck.dcheckid = dcheckId;
 		}
 		else {
-			dCheck.dcheckid = jQuery('#dcheckList tr[id^=dcheckRow_]').length;
+			dCheck.dcheckid = createDCheckId();
 
 			while (jQuery('#uniqueness_criteria_' + dCheck.dcheckid).length
 						|| jQuery('#dcheckRow_' + dCheck.dcheckid).length) {
@@ -574,6 +608,14 @@
 				jQuery('#new_check_form').remove();
 			}
 		});
+	}
+
+	function createDCheckId() {
+		return jQuery('#dcheckList tr[id^=dcheckRow_]').length;
+	}
+
+	function selectUniquenessCriteriaDefault() {
+		jQuery('#uniqueness_criteria_ip').attr('checked', 'checked');
 	}
 
 	jQuery(document).ready(function() {
