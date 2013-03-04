@@ -612,4 +612,6 @@ int	DBfield_exists(const char *table_name, const char *field_name);
 
 void	zbx_create_services_lock();
 void	zbx_destroy_services_lock();
+
+void	DBadd_groups(zbx_uint64_t hostid, zbx_vector_uint64_t *groupids);
 #endif
