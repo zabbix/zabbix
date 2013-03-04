@@ -26,6 +26,27 @@ define('GRAPH_BAD', 1);
 
 class testFormItem extends CWebTest {
 
+	/**
+	 * The name of the host for the testing of the layout of the graphs created in the test data set.
+	 *
+	 * @var string
+	 */
+	protected $hostLayout = 'Host name';
+
+	/**
+	 * The name of the host for the testing of the create function created in the test data set.
+	 *
+	 * @var string
+	 */
+	protected $host = 'ЗАББИКС Сервер';
+
+	/**
+	 * The name of the item used in graph axis for create function created in the test data set.
+	 *
+	 * @var string
+	 */
+	protected $graphAxisItem = 'Agent ping';
+
 	// returns all possible item types
 	public static function graphTypes() {
 		return array(
@@ -90,7 +111,10 @@ class testFormItem extends CWebTest {
 	 */
 	public function testFormGraph_CheckLayout($data) {
 
-		$this->zbxTestLogin('graphs.php');
+		$this->zbxTestLogin('hosts.php');
+		$this->zbxTestClickWait('link='.$this->host);
+		$this->zbxTestClickWait("//div[@class='w']//a[text()='Graphs']");
+
 		$this->checkTitle('Configuration of graphs');
 		$this->zbxTestTextPresent('CONFIGURATION OF GRAPHS');
 
@@ -242,6 +266,12 @@ class testFormItem extends CWebTest {
 			$this->assertElementNotPresent('ymax_type');
 		}
 
+		// add general item
+		$this->zbxTestLaunchPopup('add_item');
+		$this->zbxTestClick('link='.$this->hostLayout);
+		sleep(1);
+		$this->selectWindow(null);
+
 		switch($ymin_type) {
 			case 'Fixed':
 				$this->assertVisible('yaxismin');
@@ -258,11 +288,6 @@ class testFormItem extends CWebTest {
 				$this->assertNotVisible('yaxismin');
 				break;
 			case 'Item':
-				$this->zbxTestLaunchPopup('add_item');
-				$this->zbxTestClick("link=Host name");
-				sleep(1);
-				$this->selectWindow(null);
-
 				$this->zbxTestDropdownSelectWait('ymin_type', 'Calculated');
 				$this->zbxTestDropdownSelectWait('ymin_type', 'Item');
 				$this->assertElementPresent('ymin_name');
@@ -295,11 +320,6 @@ class testFormItem extends CWebTest {
 				$this->assertNotVisible('yaxismax');
 				break;
 			case 'Item':
-				$this->zbxTestLaunchPopup('add_item');
-				$this->zbxTestClick("link=Host name");
-				sleep(1);
-				$this->selectWindow(null);
-
 				$this->zbxTestDropdownSelectWait('ymax_type', 'Calculated');
 				$this->zbxTestDropdownSelectWait('ymax_type', 'Item');
 				$this->assertElementPresent('ymax_name');
@@ -580,8 +600,6 @@ class testFormItem extends CWebTest {
 		$this->zbxTestClickWait('form');
 		$this->checkTitle('Configuration of graphs');
 
-		$host = 'ЗАББИКС Сервер';
-
 		if (isset($data['name'])) {
 			$this->input_type('name', $data['name']);
 		}
@@ -660,24 +678,24 @@ class testFormItem extends CWebTest {
 			$this->zbxTestLaunchPopup('yaxis_min' , 'zbx_popup_item');
 			$this->zbxTestDropdownSelectWait('groupid', 'Zabbix servers');
 			$this->zbxTestDropdownSelectWait('hostid', 'ЗАББИКС Сервер');
-			$this->zbxTestClick('link=Agent ping');
+			$this->zbxTestClick('link='.$this->graphAxisItem);
 			sleep(1);
 			$this->selectWindow(null);
 			$ymin_name = $data['ymin_name'];
 			$ymin_nameValue = $this->getValue('ymin_name');
-			$this->assertEquals($ymin_nameValue, "$host: $ymin_name");
+			$this->assertEquals($ymin_nameValue, $this->host.": $ymin_name");
 		}
 
 		if (isset($data['ymax_name'])) {
 			$this->zbxTestLaunchPopup('yaxis_max', 'zbx_popup_item');
 			$this->zbxTestDropdownSelectWait('groupid', 'Zabbix servers');
 			$this->zbxTestDropdownSelectWait('hostid', 'ЗАББИКС Сервер');
-			$this->zbxTestClick('link=Agent ping');
+			$this->zbxTestClick('link='.$this->graphAxisItem);
 			sleep(1);
 			$this->selectWindow(null);
 			$ymax_name = $data['ymax_name'];
 			$ymax_nameValue = $this->getValue('ymax_name');
-			$this->assertEquals($ymax_nameValue, "$host: $ymax_name");
+			$this->assertEquals($ymax_nameValue, $this->host.": $ymax_name");
 		}
 
 		$this->zbxTestClickWait('save');
