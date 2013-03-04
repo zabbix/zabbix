@@ -92,90 +92,6 @@ exit:
 
 /******************************************************************************
  *                                                                            *
- * Function: add_discovered_host_groups                                       *
- *                                                                            *
- * Purpose: add group to host if not added already                            *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
- ******************************************************************************/
-static void	add_discovered_host_groups(zbx_uint64_t hostid, zbx_vector_uint64_t *groupids)
-{
-	const char	*__function_name = "add_discovered_host_groups";
-
-	DB_RESULT	result;
-	DB_ROW		row;
-	zbx_uint64_t	groupid;
-	char		*sql = NULL;
-	size_t		sql_alloc = 256, sql_offset = 0;
-	int		i;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
-
-	sql = zbx_malloc(sql, sql_alloc);
-
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-			"select groupid"
-			" from hosts_groups"
-			" where hostid=" ZBX_FS_UI64
-				" and",
-			hostid);
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "groupid", groupids->values, groupids->values_num);
-
-	result = DBselect("%s", sql);
-
-	while (NULL != (row = DBfetch(result)))
-	{
-		ZBX_STR2UINT64(groupid, row[0]);
-
-		if (FAIL == (i = zbx_vector_uint64_bsearch(groupids, groupid, ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
-		{
-			THIS_SHOULD_NEVER_HAPPEN;
-			continue;
-		}
-
-		zbx_vector_uint64_remove_noorder(groupids, i);
-	}
-	DBfree_result(result);
-
-	if (0 != groupids->values_num)
-	{
-		const char	*ins_hosts_groups_sql = "insert into hosts_groups (hostgroupid,hostid,groupid) values ";
-		zbx_uint64_t	hostgroupid;
-
-		hostgroupid = DBget_maxid_num("hosts_groups", groupids->values_num);
-
-		sql_offset = 0;
-		DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
-#ifdef HAVE_MULTIROW_INSERT
-		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ins_hosts_groups_sql);
-#endif
-		for (i = 0; i < groupids->values_num; i++)
-		{
-#ifndef HAVE_MULTIROW_INSERT
-			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ins_hosts_groups_sql);
-#endif
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-					"(" ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 ")" ZBX_ROW_DL,
-					hostgroupid++, hostid, groupids->values[i]);
-		}
-
-#ifdef HAVE_MULTIROW_INSERT
-		sql_offset--;
-		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
-#endif
-		DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-		DBexecute("%s", sql);
-	}
-
-	zbx_free(sql);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: add_discovered_host                                              *
  *                                                                            *
  * Purpose: add discovered host if it was not added already                   *
@@ -308,7 +224,7 @@ static zbx_uint64_t	add_discovered_host(DB_EVENT *event)
 				zbx_free(host_unique);
 				zbx_free(host_esc);
 
-				add_discovered_host_groups(hostid, &groupids);
+				DBadd_groups(hostid, &groupids);
 			}
 			else
 			{
@@ -364,7 +280,7 @@ static zbx_uint64_t	add_discovered_host(DB_EVENT *event)
 
 				DBadd_interface(hostid, INTERFACE_TYPE_AGENT, 1, row[2], row[3], port);
 
-				add_discovered_host_groups(hostid, &groupids);
+				DBadd_groups(hostid, &groupids);
 			}
 			else
 			{
@@ -552,7 +468,7 @@ void	op_groups_add(DB_EVENT *event, zbx_vector_uint64_t *groupids)
 	if (0 == (hostid = add_discovered_host(event)))
 		return;
 
-	add_discovered_host_groups(hostid, groupids);
+	DBadd_groups(hostid, groupids);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
