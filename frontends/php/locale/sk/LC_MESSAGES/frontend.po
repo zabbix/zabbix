@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-03-02 12:11+0200\n"
-"PO-Revision-Date: 2013-03-02 10:17+0200\n"
+"POT-Creation-Date: 2013-03-04 22:38+0200\n"
+"PO-Revision-Date: 2013-03-02 18:02+0200\n"
 "Last-Translator: Jan <jan.garaj@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: sk\n"
@@ -70,9 +70,9 @@ msgstr[2] "Bolo detekovaných %1$s neúspešných pokusov o prihlásenie. Posled
 #, php-format
 msgid "%2$d of %1$d issue is shown"
 msgid_plural "%2$d of %1$d issues are shown"
-msgstr[0] "ukazujem %2$d z %1$d"
-msgstr[1] "ukazujem %2$d z %1$d"
-msgstr[2] "ukazujem %2$d z %1$d"
+msgstr[0] "zobrazujem %2$d z %1$d"
+msgstr[1] "zobrazujem %2$d z %1$d"
+msgstr[2] "zobrazujem %2$d z %1$d"
 
 #: include/views/monitoring.discovery.php:133
 #, php-format
@@ -220,7 +220,7 @@ msgstr "Konto je zablokované na %s sekúnd"
 #: include/events.inc.php:137 include/events.inc.php:208
 #: include/views/configuration.action.edit.php:938
 msgid "Ack"
-msgstr "Potvrdiť"
+msgstr "Potvrdenie"
 
 #: acknow.php:179 include/triggers.inc.php:1236 include/triggers.inc.php:1239
 #: tr_status.php:664
@@ -233,11 +233,11 @@ msgstr "Potvrdenie pridané"
 
 #: acknow.php:150 acknow.php:178
 msgid "Acknowledge alarm by"
-msgstr "Potvrdiť alarm podľa"
+msgstr "Potvrdiť alarm od"
 
 #: acknow.php:151 acknow.php:180
 msgid "Acknowledge and return"
-msgstr "Potvrdit a navrat"
+msgstr "Potvrdiť a návrat"
 
 #: tr_status.php:202
 msgid "Acknowledge status"
@@ -245,7 +245,7 @@ msgstr "Stav potvrdenia"
 
 #: include/events.inc.php:122 tr_status.php:290 tr_status.php:667
 msgid "Acknowledged"
-msgstr "Potvrdené"
+msgstr "Potvrdenie"
 
 #: include/views/administration.general.triggerDisplayOptions.edit.php:83
 msgid "Acknowledged OK events"
@@ -261,7 +261,7 @@ msgstr "Potvrdenia"
 
 #: include/views/configuration.sysmap.edit.php:144
 msgid "Acknowledging disabled"
-msgstr "Potvrdzovanie nepovolené"
+msgstr "Potvrdzovanie vypnuté"
 
 #: include/audit.inc.php:28 include/views/administration.auditlogs.list.php:62
 #: include/views/administration.auditlogs.list.php:89
@@ -311,7 +311,7 @@ msgstr "Akcia bola pridaná"
 
 #: actionconf.php:170
 msgid "Action deleted"
-msgstr "Akcia bola vymazaná"
+msgstr "Akcia bola zmazaná"
 
 #: include/views/configuration.action.edit.php:399
 msgid "Action operations"
@@ -319,7 +319,7 @@ msgstr "Operácie akcie"
 
 #: actionconf.php:145
 msgid "Action updated"
-msgstr "Akcia bola zmenená"
+msgstr "Akcia bola aktualizovaná"
 
 #: events.php:566 events.php:579 include/blocks.inc.php:853
 #: include/blocks.inc.php:1396 include/events.inc.php:138
@@ -410,7 +410,7 @@ msgstr "Pridať"
 
 #: acknow.php:173
 msgid "Add comment by"
-msgstr "Pridať komentár podľa"
+msgstr "Pridať komentár od"
 
 #: sysmap.php:144
 msgid "Add element"
@@ -431,7 +431,7 @@ msgstr "Pridať linku"
 
 #: include/views/conf.import.php:23
 msgid "Add missing"
-msgstr "Pridat chybajuce"
+msgstr "Pridať chýbajuce"
 
 #: include/views/configuration.graph.edit.php:114
 msgid "Add prototype"
@@ -482,16 +482,16 @@ msgstr "Rozšírené poznámky"
 #: include/events.inc.php:136 include/events.inc.php:208
 #: include/events.inc.php:211 tr_status.php:288
 msgid "Age"
-msgstr "Vek"
+msgstr "Trvanie"
 
 #: tr_status.php:236
 msgid "Age less than"
-msgstr "Vek menej ako"
+msgstr "Trvanie menšie ako"
 
 #: include/views/monitoring.overview.php:53
 #, php-format
 msgid "Age less than %s"
-msgstr "Vek menej ako %s"
+msgstr "Trvanie menšie ako %s"
 
 #: include/items.inc.php:185 include/views/administration.script.list.php:64
 #: include/views/configuration.httpconf.edit.php:114 popup.php:2016
@@ -584,7 +584,7 @@ msgstr "Aplikácia \"%1$s\" už existuje."
 #: api/classes/CApplication.php:633
 #, php-format
 msgid "Application \"%1$s\" used by scenario \"%2$s\" and can't be deleted."
-msgstr "Aplikácia \"%1$s\" je použitá v scenári \"%2$s\" a nemôže byť vymazaná."
+msgstr "Aplikácia \"%1$s\" je použitá v scenári \"%2$s\" a nemôže byť zmazaná."
 
 #: applications.php:128
 msgid "Application added"
@@ -679,7 +679,7 @@ msgstr "O"
 
 #: include/forms.inc.php:1682
 msgid "At (hour:minute)"
-msgstr "O (hodina:minuta)"
+msgstr "O (hodina:minúta)"
 
 #: api/classes/CMaintenance.php:403 api/classes/CMaintenance.php:595
 msgid "At least one host or group should be selected."
@@ -746,11 +746,11 @@ msgstr "Automatická registrácia"
 
 #: include/views/administration.users.edit.php:119
 msgid "Auto-login"
-msgstr "Automaticke prihlasenie"
+msgstr "Automatické prihlásenie"
 
 #: include/views/administration.users.edit.php:120 profile.php:47 users.php:60
 msgid "Auto-logout (min 90 seconds)"
-msgstr "Automaticke odhlásenie (minimalne 90 sekúnd)"
+msgstr "Automatické odhlásenie (min. 90 sekúnd)"
 
 #: include/views/configuration.host.edit.php:574
 #: include/views/configuration.host.massupdate.php:179
@@ -781,7 +781,7 @@ msgstr "Dostupný"
 #: adm.triggerseverities.php:60
 #: include/views/administration.general.triggerSeverity.edit.php:52
 msgid "Average"
-msgstr "Priemer"
+msgstr "Priemerná"
 
 #: include/reports.inc.php:677
 msgid "Average by"
@@ -912,22 +912,22 @@ msgstr "KONFIGURÁCIA PRIHLASOVANIA"
 #: include/views/configuration.discovery.edit.php:25
 #: include/views/configuration.discovery.list.php:28
 msgid "CONFIGURATION OF DISCOVERY RULE"
-msgstr "KONFIGURÁCIA PRAVIDLA ZISŤOVANIA"
+msgstr "KONFIGURÁCIA PRAVIDIEL ZISŤOVANIA"
 
 #: host_discovery.php:263
 #: include/views/configuration.host.discovery.list.php:30
 msgid "CONFIGURATION OF DISCOVERY RULES"
-msgstr "NASTAVENIA PRAVIDIEL ZISŤOVANIA"
+msgstr "NASTAVENIE PRAVIDIEL ZISŤOVANIA"
 
 #: include/views/configuration.graph.edit.php:25
 #: include/views/configuration.graph.list.php:31
 msgid "CONFIGURATION OF GRAPH PROTOTYPES"
-msgstr "NASTAVENIA PROTOTYPOV GRAFOV"
+msgstr "NASTAVENIE PROTOTYPOV GRAFOV"
 
 #: include/views/configuration.graph.edit.php:29
 #: include/views/configuration.graph.list.php:50
 msgid "CONFIGURATION OF GRAPHS"
-msgstr "NASTAVENIA GRAFOV"
+msgstr "NASTAVENIE GRAFOV"
 
 #: adm.gui.php:107
 msgid "CONFIGURATION OF GUI"
@@ -936,7 +936,7 @@ msgstr "KONFIGURÁCIA GUI"
 #: include/views/configuration.hostgroups.edit.php:23
 #: include/views/configuration.hostgroups.list.php:36
 msgid "CONFIGURATION OF HOST GROUPS"
-msgstr "NASTAVENIA SKUPÍN HOSTOV"
+msgstr "NASTAVENIE SKUPÍN HOSTOV"
 
 #: hosts.php:570 hosts.php:619 hosts.php:639
 msgid "CONFIGURATION OF HOSTS"
@@ -944,7 +944,7 @@ msgstr "KONFIGURÁCIA HOSTOV"
 
 #: adm.housekeeper.php:86
 msgid "CONFIGURATION OF HOUSEKEEPER"
-msgstr "NASTAVENIA HOUSEKEEPERA (ÚDRŽBY)"
+msgstr "NASTAVENIE ÚDRŽBY DATABÁZY"
 
 #: adm.iconmapping.php:127
 msgid "CONFIGURATION OF ICON MAPPING"
@@ -962,7 +962,7 @@ msgstr "NASTAVENIE IT SLUŽIEB"
 #: disc_prototypes.php:313
 #: include/views/configuration.item.prototype.list.php:29
 msgid "CONFIGURATION OF ITEM PROTOTYPES"
-msgstr "NASTAVENIA PROTOTYPOV POLOŽIEK"
+msgstr "NASTAVENIE PROTOTYPOV POLOŽIEK"
 
 #: include/views/configuration.item.copy.php:28
 #: include/views/configuration.item.list.php:31
@@ -977,12 +977,12 @@ msgstr "NASTAVENIE MAKIER"
 #: include/views/configuration.maintenance.edit.php:23
 #: include/views/configuration.maintenance.list.php:28
 msgid "CONFIGURATION OF MAINTENANCE PERIODS"
-msgstr "NASTAVENIA PLÁNOVANÝCH ODSTÁVOK"
+msgstr "NASTAVENIE PLÁNOVANÝCH ODSTÁVOK"
 
 #: include/views/administration.mediatypes.edit.php:23
 #: include/views/administration.mediatypes.list.php:27
 msgid "CONFIGURATION OF MEDIA TYPES"
-msgstr "NASTAVENIA TYPOV MÉDIÍ"
+msgstr "NASTAVENIE TYPOV MÉDIÍ"
 
 #: sysmap.php:121 sysmaps.php:215
 msgid "CONFIGURATION OF NETWORK MAPS"
@@ -991,7 +991,7 @@ msgstr "NASTAVENIE SIEŤOVÝCH MÁP"
 #: include/views/administration.node.edit.php:25
 #: include/views/administration.node.list.php:60
 msgid "CONFIGURATION OF NODES"
-msgstr "NASTAVENIA UZLOV"
+msgstr "NASTAVENIE UZLOV"
 
 #: include/views/administration.proxy.edit.php:23
 #: include/views/administration.proxy.list.php:33
@@ -1004,22 +1004,22 @@ msgstr "NASTAVENIE REGULÁRNYCH VÝRAZOV"
 
 #: include/views/configuration.screen.constructor.list.php:25
 msgid "CONFIGURATION OF SCREEN"
-msgstr "NASTAVENIA OBRAZOVKY"
+msgstr "NASTAVENIE OBRAZOVKY"
 
 #: include/views/configuration.screen.edit.php:23
 #: include/views/configuration.screen.list.php:35
 msgid "CONFIGURATION OF SCREENS"
-msgstr "NASTAVENIA OBRAZOVIEK"
+msgstr "NASTAVENIE OBRAZOVIEK"
 
 #: include/views/administration.script.edit.php:28
 #: include/views/administration.script.list.php:26
 msgid "CONFIGURATION OF SCRIPTS"
-msgstr "NASTAVENIA SKRIPTOV"
+msgstr "NASTAVENIE SKRIPTOV"
 
 #: include/views/configuration.slideconf.edit.php:25
 #: include/views/configuration.slideconf.list.php:28
 msgid "CONFIGURATION OF SLIDE SHOWS"
-msgstr "CONFIGURATION OF SLIDE SHOWS"
+msgstr "NASTAVENIE PREZENTÁCIÍ"
 
 #: templates.php:422 templates.php:442
 msgid "CONFIGURATION OF TEMPLATES"
@@ -1061,7 +1061,7 @@ msgstr "NASTAVENIE MAPOVANIA HODNÔT"
 #: include/views/configuration.httpconf.edit.php:25
 #: include/views/configuration.httpconf.list.php:37
 msgid "CONFIGURATION OF WEB MONITORING"
-msgstr "NASTAVENIE WEB MONITORINGU"
+msgstr "NASTAVENIE MONITORINGU WEBOV"
 
 #: adm.workingtime.php:76
 msgid "CONFIGURATION OF WORKING TIME"
@@ -1078,7 +1078,7 @@ msgstr "Výpočet SLA, akceptovateľná SLA (v %)"
 #: include/items.inc.php:92 include/views/configuration.graph.edit.php:162
 #: include/views/configuration.graph.edit.php:220
 msgid "Calculated"
-msgstr "Vypočítané"
+msgstr "Vypočítaná"
 
 #: include/views/administration.usergroups.edit.php:114
 msgid "Calculated permissions"
@@ -1215,7 +1215,7 @@ msgstr "Nie je možné pridať scenár"
 
 #: screenconf.php:178
 msgid "Cannot add screen"
-msgstr "Nie je možné pridať pohľad"
+msgstr "Nie je možné pridať obrazovku"
 
 #: scripts.php:87 scripts.php:91 scripts.php:117
 msgid "Cannot add script"
@@ -1348,7 +1348,7 @@ msgstr "Nie možné vytvoriť obrazovku."
 #: api/classes/CUser.php:370
 #, php-format
 msgid "Cannot delete Zabbix internal user \"%1$s\", try disabling that user."
-msgstr "Nie je možné vymazať interného Zabbix užívateľa \"%1$s\", skúste ho disablovať."
+msgstr "Nie je možné zmazať interného Zabbix používateľa \"%1$s\", skúste ho disablovať."
 
 #: actionconf.php:170
 msgid "Cannot delete action"
@@ -1365,7 +1365,7 @@ msgstr "Nie je možné zmazať závislosť"
 #: api/classes/CDiscoveryRule.php:628 discoveryconf.php:164
 #: host_discovery.php:166
 msgid "Cannot delete discovery rule"
-msgstr "Nie je možné vymazať pátračové pravidlo"
+msgstr "Nie je možné zmazať zisťovacie pravidlo"
 
 #: host_discovery.php:250
 msgid "Cannot delete discovery rules"
@@ -1794,31 +1794,31 @@ msgstr "Nie je možné odblokovať užívateľov"
 
 #: api/classes/CHostGeneral.php:704
 msgid "Cannot unlink and clear applications"
-msgstr "Nie je možné zrušiť prepojenie a vymazať aplikácie"
+msgstr "Nie je možné zrušiť prepojenie a zmazať aplikácie"
 
 #: api/classes/CHostGeneral.php:557
 msgid "Cannot unlink and clear discovery rules"
-msgstr "Nie je možné zrušiť prepojenie a vymazať zisťovacie pravidlá"
+msgstr "Nie je možné zrušiť prepojenie a zmazať zisťovacie pravidlá"
 
 #: api/classes/CHostGeneral.php:646
 msgid "Cannot unlink and clear graph prototypes"
-msgstr "Nie je možné zrušiť prepojenie a vymazať grafové prototypy"
+msgstr "Nie je možné zrušiť prepojenie a zmazať grafové prototypy"
 
 #: api/classes/CHostGeneral.php:664
 msgid "Cannot unlink and clear graphs."
-msgstr "Nie je možné zrušiť prepojenie a vymazať grafy."
+msgstr "Nie je možné zrušiť prepojenie a zmazať grafy."
 
 #: api/classes/CHostGeneral.php:593
 msgid "Cannot unlink and clear item prototypes"
-msgstr "Nie je možné zrušiť prepojenie a vymazať položkové prototypy"
+msgstr "Nie je možné zrušiť prepojenie a zmazať položkové prototypy"
 
 #: api/classes/CHostGeneral.php:575
 msgid "Cannot unlink and clear items"
-msgstr "Nie je možné zrušiť prepojenie a vymazať položky"
+msgstr "Nie je možné zrušiť prepojenie a zmazať položky"
 
 #: api/classes/CHostGeneral.php:495 api/classes/CHostGeneral.php:512
 msgid "Cannot unlink and clear triggers"
-msgstr "Nie je možné zrušiť prepojenie a vymazať spúšťače"
+msgstr "Nie je možné zrušiť prepojenie a zmazať spúšťače"
 
 #: api/classes/CHost.php:1849
 msgid "Cannot unlink template"
@@ -1943,7 +1943,7 @@ msgstr "Nie je možné upraviť makrá"
 
 #: maintenance.php:133
 msgid "Cannot update maintenance"
-msgstr "Nie je možné upraviť okno údržby"
+msgstr "Nie je možné upraviť údržbu"
 
 #: include/classes/import/CXmlImport18.php:807
 #, php-format
@@ -1992,7 +1992,7 @@ msgstr "Nie je možné upraviť službu"
 
 #: slideconf.php:97
 msgid "Cannot update slide show"
-msgstr "Nie je možné upraviť slide show"
+msgstr "Nie je možné upraviť prezentáciu"
 
 #: actionconf.php:298 trigger_prototypes.php:283 triggers.php:318
 msgid "Cannot update status"
@@ -2106,11 +2106,11 @@ msgstr "Vzdialený"
 
 #: include/locales.inc.php:47
 msgid "Chinese (zh_CN)"
-msgstr "Čínština (zh_CN)"
+msgstr "Čínsky (zh_CN)"
 
 #: include/locales.inc.php:48
 msgid "Chinese (zh_TW)"
-msgstr "Čínština (zh_TW)"
+msgstr "Čínsky (zh_TW)"
 
 #: api/classes/CMapElement.php:533
 #, php-format
@@ -2151,7 +2151,7 @@ msgstr "Vyčistiť históriu a trendy"
 #: include/views/configuration.httpconf.list.php:137
 #: include/views/configuration.item.list.php:251
 msgid "Clear history for selected"
-msgstr "Vyčistiť históriu vybraných"
+msgstr "Vyčistiť históriu označených"
 
 #: include/views/configuration.host.massupdate.php:119
 msgid "Clear when unlinking"
@@ -2236,7 +2236,7 @@ msgstr "Príkaz"
 
 #: tr_events.php:134
 msgid "Command actions"
-msgstr "Akcie príkazu"
+msgstr "Akcie príkazov"
 
 #: scripts.php:90
 msgid "Command cannot be empty."
@@ -2269,7 +2269,7 @@ msgstr "Porovnanie hodnôt pre viac časových období"
 
 #: include/views/administration.usergroups.edit.php:113
 msgid "Composing permissions"
-msgstr "Definovanie oprávnení"
+msgstr "Definícia oprávnení"
 
 #: popup_trexpr.php:25
 msgid "Condition"
@@ -2392,7 +2392,7 @@ msgstr "Nastavenie skriptov"
 
 #: slideconf.php:27
 msgid "Configuration of slide shows"
-msgstr "Nastavenie slide shows"
+msgstr "Nastavenie prezentácie"
 
 #: templates.php:38
 msgid "Configuration of templates"
@@ -2466,7 +2466,7 @@ msgstr "Pripojiť k"
 #: include/page_footer.php:98
 #, php-format
 msgid "Connected as '%1$s'"
-msgstr "Pripojené ako '%1$s'"
+msgstr "Prihlásený ako '%1$s'"
 
 #: include/page_footer.php:95
 #, php-format
@@ -2531,7 +2531,7 @@ msgstr "Kopírovať"
 #: include/views/configuration.item.list.php:248
 #: include/views/configuration.triggers.list.php:234
 msgid "Copy selected to ..."
-msgstr "Kopírovať vybrané do ..."
+msgstr "Kopírovať označené do ..."
 
 #: api/classes/CUser.php:985
 #, php-format
@@ -2604,7 +2604,7 @@ msgstr "Vytvoriť prototyp položky"
 
 #: include/views/configuration.maintenance.list.php:27
 msgid "Create maintenance period"
-msgstr "Vytvoriť okno údržby"
+msgstr "Vytvoriť údržbu"
 
 #: sysmaps.php:211
 msgid "Create map"
@@ -2628,11 +2628,11 @@ msgstr "Vytvoriť scenár"
 
 #: include/views/configuration.httpconf.list.php:33
 msgid "Create scenario (select host first)"
-msgstr "Vytvoriť scenár (naskôr vyberte hosta)"
+msgstr "Vytvoriť scenár (najprv vyberte hosta)"
 
 #: include/views/configuration.screen.list.php:27
 msgid "Create screen"
-msgstr "Vytvoriť Obrazovku"
+msgstr "Vytvoriť obrazovku"
 
 #: include/views/administration.script.list.php:24
 msgid "Create script"
@@ -2640,7 +2640,7 @@ msgstr "Vytvoriť skript"
 
 #: include/views/configuration.slideconf.list.php:27
 msgid "Create slide show"
-msgstr "Vytvoriť slide show"
+msgstr "Vytvoriť prezentáciu"
 
 #: templates.php:436
 msgid "Create template"
@@ -2834,7 +2834,7 @@ msgstr "Vlastný skript"
 
 #: include/views/administration.general.triggerSeverity.edit.php:26
 msgid "Custom severity"
-msgstr "Vlastná závažnosť"
+msgstr "Vlastné meno závažnosti"
 
 #: include/views/administration.general.triggerSeverity.edit.php:67
 msgid "Custom severity names affect all locales and require manual translation!"
@@ -2850,7 +2850,7 @@ msgstr "Vlastné prezentácie"
 
 #: include/locales.inc.php:49
 msgid "Czech (cs_CZ)"
-msgstr "Čeština (cs_CZ)"
+msgstr "Česky (cs_CZ)"
 
 #: include/classes/class.cchart.php:1227
 msgid "D"
@@ -2867,7 +2867,7 @@ msgstr "KONFIGURÁCIA KONZOLY"
 
 #: httpdetails.php:119
 msgid "DETAILS OF SCENARIO"
-msgstr "DETAILY SCENÁRA"
+msgstr "PODROBNOSTI SCENÁRA"
 
 #: include/maps.inc.php:635 include/maps.inc.php:727 include/maps.inc.php:822
 #: include/maps.inc.php:919
@@ -3040,7 +3040,7 @@ msgstr "Deň v týždni"
 
 #: popup_trexpr.php:364
 msgid "Day of week is < N"
-msgstr "Den v týždni je < N"
+msgstr "Deň v týždni je < N"
 
 #: popup_trexpr.php:372
 msgid "Day of week is = N"
@@ -3056,7 +3056,7 @@ msgstr "Deň v týždni NIE JE N"
 
 #: include/forms.inc.php:1697 tr_status.php:207 tr_status.php:209
 msgid "Days"
-msgstr "Dní"
+msgstr "dní"
 
 #: include/page_header.php:249
 msgid "Debug"
@@ -3107,7 +3107,7 @@ msgstr "Predvolené oneskorenie (v sekundách)"
 #: include/views/configuration.action.edit.php:51
 #: include/views/configuration.action.edit.php:534
 msgid "Default message"
-msgstr "Predvolená správa"
+msgstr "Predvolený text správy"
 
 #: actionconf.php:37 include/views/configuration.action.edit.php:44
 msgid "Default operation step duration"
@@ -3115,7 +3115,7 @@ msgstr "Predvolené trvanie prevádzkového kroku"
 
 #: include/views/configuration.action.edit.php:50
 msgid "Default subject"
-msgstr "Predvolený predmet"
+msgstr "Predvolený predmet správy"
 
 #: include/views/administration.general.gui.edit.php:31
 msgid "Default theme"
@@ -3145,11 +3145,11 @@ msgstr "Oneskorené o"
 #: include/views/configuration.triggers.edit.php:154 jsLoader.php:104
 #: tr_logform.php:332 tr_logform.php:349
 msgid "Delete"
-msgstr "Vymazať"
+msgstr "Zmazať"
 
 #: include/views/configuration.template.edit.php:438
 msgid "Delete and clear"
-msgstr "Vymazať a vyčistiť"
+msgstr "Zmazať a vyčistiť"
 
 #: templates.php:617
 msgid "Delete and clear selected templates? (Warning: all linked hosts will be cleared!)"
@@ -3183,11 +3183,11 @@ msgstr "Zmazať graf?"
 
 #: include/views/configuration.httpconf.list.php:138
 msgid "Delete history of selected WEB scenarios?"
-msgstr "Vymazať históriu označených WEB scenárov?"
+msgstr "Zmazať históriu označených WEB scenárov?"
 
 #: include/views/configuration.item.list.php:252
 msgid "Delete history of selected items?"
-msgstr "Vymazať históriu označených položiek?"
+msgstr "Zmazať históriu označených položiek?"
 
 #: include/views/administration.general.iconmap.edit.php:142
 msgid "Delete icon map?"
@@ -3357,11 +3357,11 @@ msgstr "Zmazať označené skripty?"
 
 #: include/views/configuration.slideconf.list.php:60
 msgid "Delete selected slide shows?"
-msgstr "Zmazať označené slide shows?"
+msgstr "Zmazať označené prezentácie?"
 
 #: templates.php:613
 msgid "Delete selected templates?"
-msgstr "Vymazať označené šablóny?"
+msgstr "Zmazať označené šablóny?"
 
 #: include/views/configuration.triggers.list.php:238
 msgid "Delete selected triggers?"
@@ -3369,7 +3369,7 @@ msgstr "Zmazať označené spúšťače?"
 
 #: include/views/administration.users.edit.php:324
 msgid "Delete selected user?"
-msgstr "Vymazať označeného používateľa?"
+msgstr "Zmazať označeného používateľa?"
 
 #: include/views/administration.users.list.php:141
 msgid "Delete selected users?"
@@ -3397,7 +3397,7 @@ msgstr "Zmazať službu"
 
 #: include/views/configuration.slideconf.edit.php:115
 msgid "Delete slide show?"
-msgstr "Zmazať slide show?"
+msgstr "Zmazať prezentáciu?"
 
 #: include/views/configuration.template.edit.php:437
 msgid "Delete template?"
@@ -3529,11 +3529,11 @@ msgstr "Poznámka"
 #: include/views/configuration.action.edit.php:317
 #: include/views/configuration.action.edit.php:321 jsrpc.php:136 queue.php:50
 msgid "Details"
-msgstr "Detaily"
+msgstr "Podrobnosti"
 
 #: httpdetails.php:27
 msgid "Details of scenario"
-msgstr "Detaily scenára"
+msgstr "Podrobnosti scenára"
 
 #: include/actions.inc.php:101
 msgid "Device"
@@ -3689,16 +3689,16 @@ msgstr "Zakázať označené spúšťače?"
 #: include/views/monitoring.overview.php:40 popup_media.php:137 popup.php:1044
 #: tr_logform.php:369
 msgid "Disabled"
-msgstr "Zakázané"
+msgstr "Vypnuté"
 
 #: include/views/monitoring.overview.php:59
 msgid "Disabled or no trigger"
-msgstr "Zakázané alebo žiadny spúšťač"
+msgstr "Vypnuté alebo bez spúšťača"
 
 #: adm.triggerseverities.php:64
 #: include/views/administration.general.triggerSeverity.edit.php:64
 msgid "Disaster"
-msgstr "Katastrofálny"
+msgstr "Katastrofálna"
 
 #: include/discovery.inc.php:151
 msgid "Discovered"
@@ -3741,7 +3741,7 @@ msgstr "Objekt zisťovania"
 #: include/views/configuration.discovery.list.php:29
 #: include/views/monitoring.discovery.php:34
 msgid "Discovery rule"
-msgstr "Pravidlo zisťovania"
+msgstr "Pravidlá zisťovania"
 
 #: api/classes/CDiscoveryRule.php:894
 #, php-format
@@ -3769,7 +3769,7 @@ msgstr "Zisťovacie pravidlo vytvorené"
 
 #: discoveryconf.php:164 host_discovery.php:166
 msgid "Discovery rule deleted"
-msgstr "Zisťovacie pravidlo vymazané"
+msgstr "Zisťovacie pravidlo zmazané"
 
 #: discoveryconf.php:144 host_discovery.php:229
 msgid "Discovery rule updated"
@@ -3790,11 +3790,11 @@ msgstr "Zisťovacie pravidlá povolené"
 
 #: discoveryconf.php:192 host_discovery.php:250
 msgid "Discovery rules deleted"
-msgstr "Zisťovacie pravidlá vymazané"
+msgstr "Zisťovacie pravidlá zmazané"
 
 #: host_discovery.php:246
 msgid "Discovery rules disabled"
-msgstr "Zisťovacie pravidlá zakázané"
+msgstr "Zisťovacie pravidlá vypnuté"
 
 #: discoveryconf.php:182
 msgid "Discovery rules updated"
@@ -3806,7 +3806,7 @@ msgstr "Stav zisťovania"
 
 #: include/views/administration.general.triggerDisplayOptions.edit.php:105
 msgid "Display OK triggers for"
-msgstr "Zobrazujem spúšťače v stave OK pre"
+msgstr "Zobrazovať spúšťače v stave OK po dobu"
 
 #: include/func.inc.php:1711
 msgid "Displaying"
@@ -4007,7 +4007,7 @@ msgstr "Upraviť"
 
 #: include/views/configuration.maintenance.edit.php:171
 msgid "Edit maintenance period"
-msgstr "Upraviť okno údržby"
+msgstr "Upraviť údržbu"
 
 #: include/views/js/configuration.sysmaps.js.php:7
 msgid "Edit map element"
@@ -4270,11 +4270,11 @@ msgstr "Potvrdenia udalosti \"%1$s\"."
 
 #: dashconf.php:260
 msgid "Event acknowledging disabled"
-msgstr "Potvrdzovanie udalostí je zakázané"
+msgstr "Potvrdzovanie udalostí je vypnuté"
 
 #: tr_events.php:30 tr_events.php:115
 msgid "Event details"
-msgstr "Detail udalosti"
+msgstr "Podrobnosti udalosti"
 
 #: include/triggers.inc.php:1607
 msgid "Event generation"
@@ -4282,7 +4282,7 @@ msgstr "Generovanie udalosti"
 
 #: tr_events.php:139
 msgid "Event list [previous 20]"
-msgstr "Zoznam udalostí [predchádzajúcich 20]"
+msgstr "Zoznam udalostí [posledných 20]"
 
 #: include/views/configuration.action.list.php:37
 msgid "Event source"
@@ -4290,7 +4290,7 @@ msgstr "Zdroj udalosti"
 
 #: tr_events.php:110
 msgid "Event source details"
-msgstr "Detaily zdroju udalosti"
+msgstr "Podrobnosti zdroju udalostí"
 
 #: events.php:317 include/menu.inc.php:57 include/triggers.inc.php:1267
 #: jsLoader.php:111 search.php:134 search.php:206 search.php:261
@@ -4528,7 +4528,7 @@ msgstr "Oblasť výplne"
 #: include/views/configuration.item.edit.php:334
 #: include/views/monitoring.history.php:124 latest.php:141 tr_status.php:248
 msgid "Filter"
-msgstr "Filter"
+msgstr "Filtrovať"
 
 #: include/reports.inc.php:108
 msgid "Filter by host group"
@@ -4552,7 +4552,7 @@ msgstr "Ukončiť"
 
 #: include/locales.inc.php:51
 msgid "Finnish (fi_FI)"
-msgstr "Fínština (fi_FI)"
+msgstr "Fínsky (fi_FI)"
 
 #: include/forms.inc.php:1597 include/maintenances.inc.php:103
 msgid "First"
@@ -4570,7 +4570,7 @@ msgstr "Prispôsobiť mape"
 #: include/views/configuration.graph.edit.php:163
 #: include/views/configuration.graph.edit.php:221
 msgid "Fixed"
-msgstr "Pevný"
+msgstr "Pevná"
 
 #: include/views/configuration.item.edit.php:296
 #: include/views/configuration.item.massupdate.php:298
@@ -4730,7 +4730,7 @@ msgstr "Spusti"
 
 #: include/views/js/monitoring.maps.js.php:51 jsLoader.php:177
 msgid "Go to"
-msgstr "Spusti"
+msgstr "Choď na"
 
 #: include/views/configuration.httpconf.edit.php:97
 msgid "Google Chrome"
@@ -4984,7 +4984,7 @@ msgstr "Skupiny"
 
 #: include/views/configuration.maintenance.edit.php:198
 msgid "Groups in maintenance"
-msgstr "Skupiny v údržbe"
+msgstr "Skupiny hostov v údržbe"
 
 #: include/translateDefines.inc.php:50
 msgid "H.i"
@@ -5032,15 +5032,15 @@ msgstr "HTTPS"
 
 #: include/hosts.inc.php:249
 msgid "HW architecture"
-msgstr "HW architectúra"
+msgstr "HW architektúra"
 
 #: include/hosts.inc.php:169
 msgid "Hardware"
-msgstr "Hardware"
+msgstr "Hardvér"
 
 #: include/hosts.inc.php:174
 msgid "Hardware (Full details)"
-msgstr "Hardware (úplné detaily)"
+msgstr "Hardvér (podrobnosti)"
 
 #: graphs.php:43 include/views/configuration.graph.edit.php:55
 #: include/views/configuration.graph.list.php:79
@@ -5079,7 +5079,7 @@ msgstr "Schovať neaktívne scenáre"
 #: include/views/configuration.triggers.list.php:54
 #: include/views/configuration.triggers.list.php:69
 msgid "Hide disabled triggers"
-msgstr "Skryť zakázané spúšťače"
+msgstr "Skryť vypnuté spúšťače"
 
 #: include/views/monitoring.history.php:108
 msgid "Hide selected"
@@ -5088,7 +5088,7 @@ msgstr "Skryť označené"
 #: adm.triggerseverities.php:62
 #: include/views/administration.general.triggerSeverity.edit.php:58
 msgid "High"
-msgstr "Kritický"
+msgstr "Kritická"
 
 #: history.php:27 include/forms.inc.php:853 include/page_header.php:455
 #: include/views/configuration.item.list.php:59
@@ -5198,7 +5198,7 @@ msgstr "Hostova IP"
 
 #: include/forms.inc.php:1717
 msgid "Host Inventory"
-msgstr "Hostov inventár"
+msgstr "Inventár hosta"
 
 #: include/views/administration.script.list.php:43
 msgid "Host access"
@@ -5265,7 +5265,7 @@ msgstr "Rozhranie hosta"
 
 #: hostinventories.php:26 jsLoader.php:180
 msgid "Host inventories"
-msgstr "Hostove inventáre"
+msgstr "Inventáre hosta"
 
 #: include/views/configuration.host.edit.php:630
 msgid "Host inventory"
@@ -5303,7 +5303,7 @@ msgstr "Hostove obrazovky"
 
 #: dashboard.php:310
 msgid "Host status"
-msgstr "Host status"
+msgstr "Stav hosta"
 
 #: include/triggers.inc.php:980
 #, php-format
@@ -5312,7 +5312,7 @@ msgstr "Stav hosta sa zmenil na \"%s\""
 
 #: hostgroups.php:196 hosts.php:521 hosts.php:544 proxies.php:166
 msgid "Host status updated"
-msgstr "Hostov status aktualizovaný"
+msgstr "Stav hosta aktualizovaný"
 
 #: include/hosts.inc.php:294
 msgid "Host subnet mask"
@@ -5391,7 +5391,7 @@ msgstr "Info o hostovi"
 #: include/views/configuration.screen.constructor.edit.php:559
 #: include/views/monitoring.overview.php:79
 msgid "Hosts location"
-msgstr "Poloha hostov"
+msgstr "Umiestnenie hostov"
 
 #: hosts.php:292
 msgid "Hosts updated"
@@ -5404,7 +5404,7 @@ msgstr "Hodinovo"
 
 #: include/forms.inc.php:1699
 msgid "Hours"
-msgstr "Hodiny"
+msgstr "hodín"
 
 #: adm.gui.php:93 adm.housekeeper.php:72 adm.iconmapping.php:110
 #: adm.images.php:132 adm.macros.php:159 adm.other.php:105 adm.regexps.php:209
@@ -5546,7 +5546,7 @@ msgstr "Ikona (predvolená)"
 
 #: include/views/js/configuration.sysmaps.js.php:266
 msgid "Icon (disabled)"
-msgstr "Ikona (zakázané)"
+msgstr "Ikona (vypnuté)"
 
 #: include/views/js/configuration.sysmaps.js.php:259
 msgid "Icon (maintenance)"
@@ -5736,7 +5736,7 @@ msgstr "Nie je možné filtrovať podľa inventárneho pola \"%s\", ktoré neexi
 
 #: screenedit.php:237 screenedit.php:252
 msgid "Impossible to remove last row and column."
-msgstr "Nie je možné vymazať posledný riadok a stĺpec."
+msgstr "Nie je možné zmazať posledný riadok a stĺpec."
 
 #: include/classes/class.ctweenbox.php:74
 #: include/classes/class.ctweenbox.php:101
@@ -6378,7 +6378,7 @@ msgstr "Info"
 #: adm.triggerseverities.php:56 include/items.inc.php:31
 #: include/views/administration.general.triggerSeverity.edit.php:40
 msgid "Information"
-msgstr "Informácia"
+msgstr "Informatívna"
 
 #: include/views/configuration.triggers.expression.php:129
 msgid "Insert"
@@ -6428,7 +6428,7 @@ msgstr "Rozhranie s IP \"%1$s\" nemôže mať prázdne DNS meno."
 #: include/users.inc.php:59
 #: include/views/administration.authentication.edit.php:35
 msgid "Internal"
-msgstr "Interný"
+msgstr "Interná"
 
 #: api/rpc/class.cjsonrpc.php:202
 msgid "Internal JSON-RPC error."
@@ -6707,7 +6707,7 @@ msgstr "Položky zmazané"
 
 #: applications.php:217 disc_prototypes.php:292 items.php:577
 msgid "Items disabled"
-msgstr "Položky zakázané"
+msgstr "Položky vypnuté"
 
 #: include/views/monitoring.history.php:101
 msgid "Items list"
@@ -6727,7 +6727,7 @@ msgstr "JMX agent"
 
 #: include/views/configuration.host.edit.php:265
 msgid "JMX interfaces"
-msgstr "JMX rozhranie"
+msgstr "JMX rozhrania"
 
 #: api/rpc/class.cjsonrpc.php:149
 #, php-format
@@ -6939,7 +6939,7 @@ msgstr "Posledná (nedávna) hodnota T NIE JE N"
 
 #: srv_status.php:82
 msgid "Last 24 hours"
-msgstr "Posledných 24 hodnín"
+msgstr "Posledných 24 hodín"
 
 #: srv_status.php:84
 msgid "Last 30 days"
@@ -6985,7 +6985,7 @@ msgstr "Posledných"
 
 #: include/views/administration.proxy.list.php:47
 msgid "Last seen (age)"
-msgstr "Posledný kontakt (vek)"
+msgstr "Posledný kontakt (trvanie)"
 
 #: latest.php:194
 msgid "Last value"
@@ -6998,7 +6998,7 @@ msgstr "Graf posledného týždňa"
 #: include/menu.inc.php:47 jsLoader.php:178 latest.php:26 report5.php:159
 #: search.php:132 search.php:204 search.php:259 search.php:311
 msgid "Latest data"
-msgstr "Posledné dáta"
+msgstr "Posledné údaje"
 
 #: events.php:41 include/views/js/monitoring.maps.js.php:40
 msgid "Latest events"
@@ -7053,7 +7053,7 @@ msgstr "Spojnica"
 #: include/views/js/configuration.sysmaps.js.php:310
 #: include/views/js/configuration.sysmaps.js.php:350
 msgid "Link indicators"
-msgstr "Ukazateľ stavu spojnice"
+msgstr "Ukazovateľ stavu spojnice"
 
 #: api/classes/CMap.php:631
 #, php-format
@@ -7219,7 +7219,7 @@ msgstr "Odhlásiť"
 #: include/views/administration.auditlogs.list.php:28
 #: include/views/administration.auditlogs.list.php:32
 msgid "Logs"
-msgstr "Logovacie súbory"
+msgstr "Log záznamy"
 
 #: include/discovery.inc.php:152
 msgid "Lost"
@@ -7445,7 +7445,7 @@ msgstr "Mapovaná hodnota \"%1$s\" nie je jedinečná."
 #: include/views/administration.general.iconmap.edit.php:132
 #: include/views/administration.general.valuemapping.edit.php:43
 msgid "Mappings"
-msgstr "Mapovania"
+msgstr "Mapovanie"
 
 #: dashboard.php:274 include/blocks.inc.php:1272 include/menu.inc.php:72
 #: include/menu.inc.php:206 include/views/conf.import.php:36 popup.php:101
@@ -7503,7 +7503,7 @@ msgstr "Hlavný uzol už existuje."
 
 #: adm.gui.php:38 include/views/administration.general.gui.edit.php:39
 msgid "Max count of elements to show inside table cell"
-msgstr "Maximálny počet zobrazovaných položiek v tabulke"
+msgstr "Maximálny počet zobrazovaných položiek v tabuľke"
 
 #: adm.gui.php:76
 #, php-format
@@ -7573,7 +7573,7 @@ msgstr "Máj"
 #: include/views/administration.users.edit.php:161
 #: include/views/administration.users.edit.php:287 popup_media.php:27
 msgid "Media"
-msgstr "Média"
+msgstr "Médiá"
 
 #: include/audit.inc.php:26 report4.php:82
 msgid "Media type"
@@ -7621,7 +7621,7 @@ msgstr "Mega"
 #: include/views/administration.usergroups.list.php:47
 #: include/views/configuration.hostgroups.list.php:52
 msgid "Members"
-msgstr "Členovia"
+msgstr "Členstvo/členovia"
 
 #: include/classes/debug/CProfiler.php:146
 #, php-format
@@ -7742,7 +7742,7 @@ msgstr "Minimálna hodnota pre periódu T je NOT N"
 
 #: include/forms.inc.php:1701
 msgid "Minutes"
-msgstr "Minúty"
+msgstr "minút"
 
 #: api/classes/CGraph.php:770 api/classes/CGraphPrototype.php:817
 msgid "Missing \"itemid\" field for item."
@@ -7798,7 +7798,7 @@ msgstr "Monitorovaný"
 #: include/views/configuration.host.edit.php:292
 #: include/views/configuration.host.massupdate.php:66
 msgid "Monitored by proxy"
-msgstr "Monitorovaný cez proxy"
+msgstr "Monitorovanie cez proxy"
 
 #: include/views/monitoring.discovery.php:44
 msgid "Monitored host"
@@ -7944,7 +7944,7 @@ msgstr "Sieťová mapa bola pridaná"
 
 #: sysmaps.php:191
 msgid "Network map deleted"
-msgstr "Sieťová mapa bola vymazaná"
+msgstr "Sieťová mapa bola zmazaná"
 
 #: sysmaps.php:160
 msgid "Network map updated"
@@ -8019,7 +8019,7 @@ msgstr "Nový regulárny výraz"
 
 #: include/views/configuration.services.edit.php:290
 msgid "New service time"
-msgstr "Nový servisný čas"
+msgstr "Nový čas služby"
 
 #: include/setup.inc.php:127
 msgid "Next"
@@ -8150,7 +8150,7 @@ msgstr "Žiadne závislosti nie sú definované."
 #: api/rpc/class.cjsonrpc.php:207 api/rpc/class.cjsonrpc.php:212
 #: api/rpc/class.cjsonrpc.php:217
 msgid "No details"
-msgstr "Bez detailov"
+msgstr "Bez podrobností"
 
 #: include/views/monitoring.discovery.php:38
 msgid "No discoveries defined."
@@ -8569,7 +8569,7 @@ msgstr "Žiadne definované šablóny."
 
 #: include/views/configuration.services.edit.php:113
 msgid "No times defined. Work 24x7."
-msgstr "Žiadne definované časy. Pracovný čas je 24x7."
+msgstr "Žiadne definované časy. Prevádzkový stav služby je 24x7."
 
 #: include/views/monitoring.overview.php:56
 msgid "No trigger"
@@ -8663,15 +8663,15 @@ msgstr "Uzly"
 #: include/views/configuration.item.edit.php:408
 #: include/views/configuration.item.massupdate.php:417
 msgid "None"
-msgstr "Žiadne"
+msgstr "Žiadny"
 
 #: include/graphs.inc.php:24 include/triggers.inc.php:1607 popup.php:1417
 msgid "Normal"
-msgstr "Normálne"
+msgstr "Normálny"
 
 #: include/html.inc.php:260
 msgid "Normal view"
-msgstr "Normálny pohľad"
+msgstr "Normálne zobrazenie"
 
 #: include/actions.inc.php:245 include/views/configuration.action.edit.php:937
 msgid "Not Ack"
@@ -8701,7 +8701,7 @@ msgstr "Nedostupný"
 #: adm.triggerseverities.php:54
 #: include/views/administration.general.triggerSeverity.edit.php:34
 msgid "Not classified"
-msgstr "Neklasifikované"
+msgstr "Neurčená"
 
 #: include/page_footer.php:92
 msgid "Not connected"
@@ -8719,7 +8719,7 @@ msgstr "Nie sú požadované premenné HTTP požiadavky."
 
 #: include/items.inc.php:151
 msgid "Not supported"
-msgstr "Nie je podporované"
+msgstr "Nepodporované"
 
 #: include/views/configuration.services.edit.php:115
 #: include/views/configuration.services.edit.php:212
@@ -8872,7 +8872,7 @@ msgstr "OS"
 
 #: include/hosts.inc.php:129
 msgid "OS (Full details)"
-msgstr "OS (Úplné detaily)"
+msgstr "OS (podrobnosti)"
 
 #: include/hosts.inc.php:134
 msgid "OS (Short)"
@@ -8916,7 +8916,7 @@ msgstr "Zapnuté"
 
 #: include/views/administration.general.triggerDisplayOptions.edit.php:111
 msgid "On status change triggers blink for"
-msgstr "Pri zmena stavu spúšťača blikať pre"
+msgstr "Pri zmena stavu spúšťača blikať po dobu"
 
 #: include/views/administration.users.edit.php:179
 msgid "Once"
@@ -8998,7 +8998,7 @@ msgstr "Len písmená sú povolené."
 
 #: include/blocks.inc.php:725
 msgid "Only items assigned to enabled hosts are counted"
-msgstr "Len položky priradené k povoleným hostom sú započítané"
+msgstr "Len položky priradené k monitorovaným hostom sú započítané"
 
 #: api/classes/CDRule.php:517
 msgid "Only one check can be unique."
@@ -9019,7 +9019,7 @@ msgstr "Len posledných 20%% indikátorov je zobrazených."
 
 #: include/blocks.inc.php:734
 msgid "Only triggers assigned to enabled hosts and depending on enabled items are counted"
-msgstr "Len spúšťače priradené k povoleným hostom alebo závislé na povolených položkách sú započítané"
+msgstr "Len spúšťače priradené k monitorovaným hostom alebo závislé na monitorovaných položkách sú započítané"
 
 #: include/views/js/administration.general.valuemapping.edit.js.php:6
 msgid "Only whole numbers"
@@ -9044,7 +9044,7 @@ msgstr "Podmienka operácie"
 
 #: include/views/configuration.action.edit.php:957
 msgid "Operation details"
-msgstr "Detaily operácie"
+msgstr "Podrobnosti operácie"
 
 #: api/classes/CAction.php:1591
 msgid "Operation has no group to operate."
@@ -9176,7 +9176,7 @@ msgstr "P"
 
 #: dashboard.php:225
 msgid "PERSONAL DASHBOARD"
-msgstr "OSOBNÝ PANEL"
+msgstr "OSOBNÁ KONZOLA"
 
 #: include/classes/class.frontendsetup.php:316
 msgid "PHP bcmath"
@@ -9433,7 +9433,7 @@ msgstr "Heslo (ešte raz)"
 
 #: api/classes/CMediatype.php:331 api/classes/CMediatype.php:395
 msgid "Password required for media type."
-msgstr "Heslo je požadované pre typ média."
+msgstr "Heslo je požadované pre daný typ média."
 
 #: profile.php:116 users.php:157
 msgid "Password should not be empty"
@@ -9481,7 +9481,7 @@ msgstr "Oprávnenia"
 
 #: include/views/administration.users.edit.php:308
 msgid "Permissions can be assigned for user groups only."
-msgstr "Oprávnenia môžu byť priradené len používateľskej skupine."
+msgstr "Oprávnenia môžu byť priradené len používateľskej skupine, nie k používateľovi."
 
 #: include/locales.inc.php:62
 msgid "Persian (fa_IR)"
@@ -9821,7 +9821,7 @@ msgstr "Zotavenie"
 #: actionconf.php:43 include/views/configuration.action.edit.php:54
 #: include/views/configuration.action.edit.php:57
 msgid "Recovery message"
-msgstr "Správa po zotavení"
+msgstr "Text správy po zotavení"
 
 #: actionconf.php:42 include/views/configuration.action.edit.php:56
 msgid "Recovery subject"
@@ -9968,15 +9968,15 @@ msgstr "Odobrať z"
 #: charts.php:85 history.php:86 host_screen.php:80 include/html.inc.php:242
 #: maps.php:63 screens.php:82
 msgid "Remove from favourites"
-msgstr "Vymazať z obľúbených"
+msgstr "Zmazať z obľúbených"
 
 #: include/actions.inc.php:558
 msgid "Remove from host group"
-msgstr "Vymazať zo skupiny"
+msgstr "Zmazať zo skupiny"
 
 #: include/actions.inc.php:367 include/views/configuration.action.edit.php:767
 msgid "Remove from host groups"
-msgstr "Vymazať zo skupín"
+msgstr "Zmazať zo skupín"
 
 #: include/actions.inc.php:341 include/actions.inc.php:554
 msgid "Remove host"
@@ -10029,7 +10029,7 @@ msgstr "Požadované"
 
 #: api/classes/CIconMap.php:514
 msgid "Required field \"expression\" is missing in icon mapping."
-msgstr "Požadované pole \"expression\" chýba v mapovaní ikôn."
+msgstr "Požadované pole \"expression\" chýba v mapovaní ikon."
 
 #: api/classes/CIconMap.php:520
 msgid "Required field \"iconid\" is missing in icon mapping."
@@ -10316,7 +10316,7 @@ msgstr "SNMP komunita"
 
 #: include/views/configuration.host.edit.php:250
 msgid "SNMP interfaces"
-msgstr "SNMP rozhranie"
+msgstr "SNMP rozhrania"
 
 #: include/items.inc.php:82
 msgid "SNMP trap"
@@ -10392,7 +10392,7 @@ msgstr "SSH agent"
 
 #: include/views/monitoring.discovery.php:30
 msgid "STATUS OF DISCOVERY"
-msgstr "STAV ZISŤOVANIA"
+msgstr "ZISŤOVANIE"
 
 #: include/classes/screens/CScreenHostgroupTriggers.php:127
 #: include/classes/screens/CScreenHostTriggers.php:127 tr_status.php:177
@@ -10401,7 +10401,7 @@ msgstr "STAV SPÚŠŤAČOV"
 
 #: httpmon.php:97
 msgid "STATUS OF WEB MONITORING"
-msgstr "STAV WEB MONITORINGU"
+msgstr "STAV MONITORINGU WEBOV"
 
 #: report1.php:32
 msgid "STATUS OF ZABBIX"
@@ -10472,7 +10472,7 @@ msgstr "Uložiť"
 
 #: acknow.php:175
 msgid "Save and return"
-msgstr "Uložiť a vráťiť sa"
+msgstr "Uložiť a návrat"
 
 #: include/reports.inc.php:223 include/reports.inc.php:669
 msgid "Scale"
@@ -10509,7 +10509,7 @@ msgstr "Scenár pridaný"
 
 #: httpconf.php:185 httpconf.php:358
 msgid "Scenario deleted"
-msgstr "Scenár vymazaný"
+msgstr "Scenár zmazaný"
 
 #: httpconf.php:331 httpconf.php:334
 msgid "Scenario disabled"
@@ -10686,38 +10686,38 @@ msgstr "Druhý"
 
 #: include/hosts.inc.php:439
 msgid "Secondary POC cell"
-msgstr "Druhá POC bunka"
+msgstr "Sekundárna POC bunka"
 
 #: include/hosts.inc.php:424
 msgid "Secondary POC email"
-msgstr "Druhý POC email"
+msgstr "Sekundárny POC email"
 
 #: include/hosts.inc.php:419
 msgid "Secondary POC name"
-msgstr "Druhé POC meno"
+msgstr "Sekundárne POC meno"
 
 #: include/hosts.inc.php:449
 msgid "Secondary POC notes"
-msgstr "Druhé POC poznámky"
+msgstr "Sekundárne POC poznámky"
 
 #: include/hosts.inc.php:429
 msgid "Secondary POC phone A"
-msgstr "Druhý POC telefón A"
+msgstr "Sekundárny POC telefón A"
 
 #: include/hosts.inc.php:434
 msgid "Secondary POC phone B"
-msgstr "Druhý POC telefón B"
+msgstr "Sekundárny POC telefón B"
 
 #: include/hosts.inc.php:444
 msgid "Secondary POC screen name"
-msgstr "Druhé POC meno obrazovky"
+msgstr "Sekundárne POC meno obrazovky"
 
 #: include/views/administration.users.edit.php:180
 #: include/views/configuration.triggers.expression.php:91
 #: include/views/configuration.triggers.expression.php:100
 #: include/views/configuration.triggers.expression.php:107 popup_trexpr.php:44
 msgid "Seconds"
-msgstr "Sekundy"
+msgstr "sekúnd"
 
 #: events.php:358 include/forms.inc.php:489 include/forms.inc.php:507
 #: include/forms.inc.php:529 include/page_header.php:358
@@ -10781,7 +10781,7 @@ msgstr "Označ prototyp"
 
 #: include/views/monitoring.history.php:102
 msgid "Select rows with value like"
-msgstr "Označ riadky s hodnotou ako"
+msgstr "Označ riadky s hodnotou obsahujúcou"
 
 #: dashconf.php:174 include/views/monitoring.history.php:123
 msgid "Selected"
@@ -10821,7 +10821,7 @@ msgstr "Poslať len na"
 
 #: popup_media.php:122
 msgid "Send to"
-msgstr "Poslať na"
+msgstr "Posielať na"
 
 #: include/views/configuration.action.edit.php:515
 msgid "Send to User groups"
@@ -10841,7 +10841,7 @@ msgstr "Sep"
 
 #: dashconf.php:255 include/views/configuration.sysmap.edit.php:139
 msgid "Separated"
-msgstr "Oddelený"
+msgstr "Oddelene"
 
 #: include/forms.inc.php:1553 include/func.inc.php:112
 #: include/func.inc.php:243 jsLoader.php:122
@@ -10850,11 +10850,11 @@ msgstr "September"
 
 #: hostinventories.php:162 include/hosts.inc.php:139
 msgid "Serial number A"
-msgstr "Seriové číslo A"
+msgstr "Sériové číslo A"
 
 #: include/hosts.inc.php:144
 msgid "Serial number B"
-msgstr "Seriové číslo B"
+msgstr "Sériové číslo B"
 
 #: include/views/administration.script.list.php:67 popup.php:2019
 #: queue.php:186
@@ -10919,7 +10919,7 @@ msgstr "Čas štartu služby musi byť menší ako jej koniec."
 
 #: include/views/configuration.services.edit.php:155
 msgid "Service times"
-msgstr "Servisné časy"
+msgstr "Časy služby"
 
 #: include/actions.inc.php:78
 msgid "Service type"
@@ -10939,7 +10939,7 @@ msgstr "Služby tvoria kruhovú závislosť."
 
 #: api/classes/CUser.php:1028
 msgid "Session terminated, re-login, please."
-msgstr "Sedenie ukončené. prosím prihláste sa znovu."
+msgstr "Sedenie ukončené, prosím prihláste sa znovu."
 
 #: events.php:563 events.php:576 include/classes/screens/CScreenEvents.php:49
 #: include/classes/screens/CScreenHistory.php:166
@@ -10967,15 +10967,15 @@ msgstr "Meno závažnosti nemôže byť prázdne."
 #: include/views/js/configuration.sysmaps.js.php:24 report2.php:249
 #: tr_status.php:717
 msgid "Show"
-msgstr "Ukázať"
+msgstr "Zobraziť"
 
 #: tr_status.php:207
 msgid "Show all"
-msgstr "Ukázať všetky"
+msgstr "Zobraziť všetky"
 
 #: tr_status.php:242
 msgid "Show details"
-msgstr "Ukázať detaily"
+msgstr "Zobraziť podrobnosti"
 
 #: include/views/configuration.httpconf.list.php:47
 msgid "Show disabled scenarios"
@@ -10984,41 +10984,41 @@ msgstr "Zobraziť neaktívne scenáre"
 #: include/views/configuration.triggers.list.php:54
 #: include/views/configuration.triggers.list.php:69
 msgid "Show disabled triggers"
-msgstr "Zobraziť zakázané spúšťače"
+msgstr "Zobraziť vypnuté spúšťače"
 
 #: adm.gui.php:73
 #, php-format
 msgid "Show events max \"%1$s\"."
-msgstr "Zobraz udalosti max \"%1$s\"."
+msgstr "Zobraziť udalosti max \"%1$s\"."
 
 #: adm.gui.php:34 include/views/administration.general.gui.edit.php:43
 msgid "Show events not older than (in days)"
-msgstr "Zobraz udalosti nie staršie ako (v dňoch)"
+msgstr "Zobraziť udalosti nie staršie ako (v dňoch)"
 
 #: adm.gui.php:72
 #, php-format
 msgid "Show events not older than (in days) \"%1$s\"."
-msgstr "Zobraz udalosti nie staršie ako (v dňoch) \"%1$s\"."
+msgstr "Zobraziť udalosti nie staršie ako (v dňoch) \"%1$s\"."
 
 #: include/triggers.inc.php:1287
 msgid "Show graph of item"
-msgstr "Zobraz položky grafu"
+msgstr "Zobraziť položky grafu"
 
 #: dashconf.php:227 tr_status.php:246
 msgid "Show hosts in maintenance"
-msgstr "Zobraz hostov v údržbe"
+msgstr "Zobraziť hostov v údržbe"
 
 #: latest.php:136
 msgid "Show items with name like"
-msgstr "Zobraz položky s menom ako"
+msgstr "Zobraziť položky s menom obsahujúcim"
 
 #: latest.php:137
 msgid "Show items without data"
-msgstr "Zobraz položky bez údajov"
+msgstr "Zobraziť aj položky bez údajov"
 
 #: include/views/configuration.graph.edit.php:126
 msgid "Show legend"
-msgstr "Zobraz legendu"
+msgstr "Zobraziť legendu"
 
 #: include/views/configuration.screen.constructor.edit.php:277
 #: include/views/configuration.screen.constructor.edit.php:337
@@ -11026,19 +11026,19 @@ msgstr "Zobraz legendu"
 #: include/views/configuration.screen.constructor.edit.php:375
 #: screenedit.php:47
 msgid "Show lines"
-msgstr "Zobraz riadky"
+msgstr "Zobraziť riadky"
 
 #: include/views/monitoring.history.php:107
 msgid "Show selected"
-msgstr "Zobraz označené"
+msgstr "Zobraziť označené"
 
 #: include/views/configuration.screen.constructor.edit.php:278
 msgid "Show text as HTML"
-msgstr "Zobraz text ako HTML"
+msgstr "Zobraziť text ako HTML"
 
 #: include/views/configuration.graph.edit.php:131
 msgid "Show triggers"
-msgstr "Zobraz spúšťače"
+msgstr "Zobraziť spúšťače"
 
 #: tr_status.php:209
 msgid "Show unacknowledged"
@@ -11046,24 +11046,24 @@ msgstr "Zobraziť len nepotvrdené"
 
 #: events.php:369
 msgid "Show unknown events"
-msgstr "Zobraz neznáme udalosti"
+msgstr "Zobraziť aj neznáme udalosti"
 
 #: include/views/configuration.item.edit.php:388
 #: include/views/configuration.item.massupdate.php:397
 msgid "Show value"
-msgstr "Zobraz hodnotu"
+msgstr "Zobraziť hodnotu"
 
 #: include/triggers.inc.php:1294
 msgid "Show values of item"
-msgstr "Zobraz hodnoty položiek"
+msgstr "Zobraziť hodnoty položiek"
 
 #: include/views/administration.general.gui.edit.php:47
 msgid "Show warning if Zabbix server is down"
-msgstr "Zobraz varovanie ak je Zabbix server vypnutý"
+msgstr "Zobraziť varovanie ak je Zabbix server vypnutý"
 
 #: include/views/configuration.graph.edit.php:130
 msgid "Show working time"
-msgstr "Zobraz pracovný čas"
+msgstr "Zobraziť pracovný čas"
 
 #: jsLoader.php:141 sysmap.php:158
 msgid "Shown"
@@ -11190,7 +11190,7 @@ msgstr "Softvér"
 
 #: include/hosts.inc.php:184
 msgid "Software (Full details)"
-msgstr "Softvér (úplné detaily)"
+msgstr "Softvér (podrobnosti)"
 
 #: include/hosts.inc.php:189
 msgid "Software application A"
@@ -11319,7 +11319,7 @@ msgstr "Stavové kódy"
 
 #: httpmon.php:24
 msgid "Status of Web monitoring"
-msgstr "Stav Web monitoringu"
+msgstr "Stav monitoringu webov"
 
 #: dashboard.php:295 include/classes/screens/CScreenSystemStatus.php:46
 #: include/menu.inc.php:124 report1.php:25
@@ -11388,7 +11388,7 @@ msgstr "Kroky"
 #: include/views/administration.users.edit.php:196
 #: include/views/administration.users.edit.php:232
 msgid "Stop"
-msgstr "Stop"
+msgstr "Zastaviť"
 
 #: include/views/configuration.item.edit.php:372
 #: include/views/configuration.item.massupdate.php:379
@@ -11467,7 +11467,7 @@ msgstr "Prepnutie autentifikačnej metódy spôsobí ukončenie všetkých seden
 
 #: include/users.inc.php:58 include/views/administration.users.edit.php:109
 msgid "System default"
-msgstr "Predvolené nastavenie systémom"
+msgstr "Predvolené nastavenie systému"
 
 #: api/rpc/class.cjsonrpc.php:211
 msgid "System error."
@@ -11542,7 +11542,7 @@ msgstr "Zoznam cieľov"
 #: include/views/configuration.copy.elements.php:48
 #: include/views/configuration.item.copy.php:44
 msgid "Target type"
-msgstr "Typ cieľu"
+msgstr "Typ cieľa"
 
 #: include/discovery.inc.php:71
 #: include/views/configuration.action.edit.php:648
@@ -11868,12 +11868,12 @@ msgstr "Priveľa rozhraní pre proxy \"%s\"."
 #: include/views/js/configuration.sysmaps.js.php:231
 #: include/views/monitoring.overview.php:74
 msgid "Top"
-msgstr "Vrch"
+msgstr "Hore"
 
 #: include/blocks.inc.php:366 include/classes/class.chostsinfo.php:128
 #: queue.php:289
 msgid "Total"
-msgstr "Dokopy"
+msgstr "Celkom"
 
 #: include/classes/debug/CProfiler.php:134
 #, php-format
@@ -12161,7 +12161,7 @@ msgstr "Typ"
 
 #: include/hosts.inc.php:109
 msgid "Type (Full details)"
-msgstr "Typ (úplné detaily)"
+msgstr "Typ (podrobnosti)"
 
 #: include/views/js/configuration.sysmaps.js.php:330
 msgid "Type (OK)"
@@ -12219,7 +12219,7 @@ msgstr "URL"
 
 #: include/views/administration.users.edit.php:123
 msgid "URL (after login)"
-msgstr "URL (po prihásení)"
+msgstr "URL (po prihlásení)"
 
 #: include/hosts.inc.php:274
 msgid "URL A"
@@ -12514,7 +12514,7 @@ msgstr "Aktualizované: Prototyp spúšťača \"%1$s\" na \"%2$s\"."
 
 #: include/views/administration.general.image.edit.php:35
 msgid "Upload"
-msgstr "Upload"
+msgstr "Nahrať"
 
 #: include/views/monitoring.maps.php:53
 msgid "Upper level maps"
@@ -12574,7 +12574,7 @@ msgstr "Používateľ si nemôže sám sebe zmeniť typ"
 
 #: api/classes/CUserGroup.php:560
 msgid "User cannot add himself to a disabled group or a group with disabled GUI access."
-msgstr "Používateľ nemôže sám seba pridať do zakázanej skupiny alebo do skupiny so zakázaným GUI prístupom."
+msgstr "Používateľ nemôže sám seba pridať do vypnutej skupiny alebo do skupiny so vypnutým GUI prístupom."
 
 #: include/users.inc.php:160
 msgid "User cannot change GUI access for himself."
@@ -12846,7 +12846,7 @@ msgstr "Str"
 #: include/views/administration.general.triggerSeverity.edit.php:46
 #: warning.php:24
 msgid "Warning"
-msgstr "Varovanie"
+msgstr "Varovná"
 
 #: chart7.php:76
 msgid "Warning. Cannot display more than one item with type \"Graph sum\"."
@@ -12957,7 +12957,7 @@ msgstr "Web položka s kľúčom \"%s\" už existuje."
 
 #: dashboard.php:324 include/items.inc.php:93
 msgid "Web monitoring"
-msgstr "Web monitoring"
+msgstr "Monitoring webov"
 
 #: api/classes/CWebCheck.php:505
 msgid "Webcheck must have at least one step."
@@ -12984,7 +12984,7 @@ msgstr "Týždenne"
 
 #: popup_media.php:123
 msgid "When active"
-msgstr "Ak je aktívny"
+msgstr "Iba v dňoch/časoch"
 
 #: graphs.php:42 include/views/configuration.graph.edit.php:54
 #: include/views/configuration.graph.list.php:78
@@ -13315,7 +13315,7 @@ msgstr "Nemáte oprávnenia na aktulizáciu používateľa alebo používateľ n
 
 #: include/config.inc.php:256
 msgid "You must login to view this page."
-msgstr "Musíte byť prihlásený pre zobraznie tejto stránky."
+msgstr "Musíte byť prihlásený pre zobrazenie tejto stránky."
 
 #: include/views/administration.node.list.php:28
 msgid "Your setup is not configured for distributed monitoring."
@@ -13342,7 +13342,7 @@ msgstr "Zabbix %s Copyright %s-%s by Zabbix SIA"
 #: include/views/general.login.php:47
 #, php-format
 msgid "Zabbix %s Copyright 2001-2012 by Zabbix SIA"
-msgstr "Zabbix %s Copyright 2001-2012 by Zabbix SIA"
+msgstr "Zabbix %s Copyright 2001-2013 by Zabbix SIA"
 
 #: include/users.inc.php:40
 msgid "Zabbix Admin"
@@ -13421,11 +13421,11 @@ msgstr "Zabbix server informácie"
 
 #: jsrpc.php:173
 msgid "Zabbix server is not running: the information displayed may not be current."
-msgstr "Zabbix server nebeží: zobrazované informácie nemusia byť aktuálne."
+msgstr "Zabbix server nie je v prevádzke: zobrazované informácie nemusia byť aktuálne."
 
 #: include/blocks.inc.php:711
 msgid "Zabbix server is running"
-msgstr "Zabbix server beží"
+msgstr "Zabbix server v prevádzke"
 
 #: adm.gui.php:77
 #, php-format
@@ -13660,7 +13660,7 @@ msgstr "obrázok"
 
 #: include/actions.inc.php:33
 msgid "in"
-msgstr "medzi"
+msgstr "v"
 
 #: include/classes/class.cserverinfo.php:46
 msgid "is"
@@ -13669,7 +13669,7 @@ msgstr "je"
 #: include/classes/class.cchart.php:1741 include/graphs.inc.php:92
 #: include/views/js/configuration.graph.edit.js.php:42
 msgid "last"
-msgstr "posledné"
+msgstr "naposledy"
 
 #: hostinventories.php:122 hosts.php:651 hosts.php:652 hosts.php:653
 #: include/actions.inc.php:29 include/forms.inc.php:457
@@ -13677,7 +13677,7 @@ msgstr "posledné"
 #: include/forms.inc.php:478 include/forms.inc.php:550
 #: include/forms.inc.php:561
 msgid "like"
-msgstr "ako"
+msgstr "obsahuje"
 
 #: include/func.inc.php:562
 msgctxt "Milli short"
@@ -13830,7 +13830,7 @@ msgstr "obnovené každých"
 
 #: include/views/administration.general.gui.edit.php:35
 msgid "remember selected"
-msgstr "pamätať si označené"
+msgstr "zapamätať si výbery"
 
 #: include/services.inc.php:103 include/services.inc.php:106
 #: include/services.inc.php:199
@@ -13838,7 +13838,7 @@ msgstr "pamätať si označené"
 #: include/views/configuration.services.parent.list.php:42
 #: include/views/configuration.services.parent.list.php:43
 msgid "root"
-msgstr "základ"
+msgstr "základná"
 
 #: include/classes/class.cserverinfo.php:36
 msgid "running"
@@ -13870,12 +13870,12 @@ msgstr "krátky opis"
 
 #: include/views/configuration.sysmap.edit.php:76
 msgid "show icon mappings"
-msgstr "ukázať mapovanie ikoniek"
+msgstr "zobraziť mapovanie ikon"
 
 #: include/views/configuration.item.edit.php:386
 #: include/views/configuration.item.massupdate.php:392
 msgid "show value mappings"
-msgstr "ukázať párovanie hodnôt"
+msgstr "zobraziť párovanie hodnôt"
 
 #: api/classes/CHostGeneral.php:156
 #, php-format
