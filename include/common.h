@@ -792,10 +792,10 @@ int	is_double_suffix(const char *str);
 int	is_double(const char *c);
 int	is_uint_suffix(const char *c, unsigned int *value);
 int	is_int_prefix(const char *c);
-int	is_uint_n_range(const char *str, unsigned int bits, void *value, size_t size, zbx_uint64_t min, zbx_uint64_t max);
+int	is_uint_n_range(const char *str, size_t n, void *value, size_t size, zbx_uint64_t min, zbx_uint64_t max);
 
 #define is_ushort(str, value) \
-	is_uint_n_range(str, (size_t)ZBX_MAX_UINT64_LEN, value, (size_t)2, 0x0LL, 0xFFFFLL)
+	is_uint_n_range(str, (size_t)ZBX_MAX_UINT64_LEN, value, sizeof(unsigned short), 0x0LL, 0xFFFFLL)
 
 #define is_uint32(str, value) \
 	is_uint_n_range(str, (size_t)ZBX_MAX_UINT64_LEN, value, (size_t)4, 0x0LL, 0xFFFFFFFFLL)
@@ -810,10 +810,10 @@ int	is_uint_n_range(const char *str, unsigned int bits, void *value, size_t size
 	is_uint_n_range(str, (size_t)ZBX_MAX_UINT64_LEN, value, (size_t)4, 0x0LL, 0x7FFFFFFFLL)
 
 #define is_uint31_1(str, value) \
-	is_uint_n_range(str, (size_t)ZBX_MAX_UINT64_LEN, value, (size_t)4, 0x0LL, 0x7FFFFFELL)
+	is_uint_n_range(str, (size_t)ZBX_MAX_UINT64_LEN, value, (size_t)4, 0x0LL, 0x7FFFFFFELL)
 
 #define is_uint_range(str, value, min, max) \
-	is_uint_n_range(str, (size_t)ZBX_MAX_UINT64_LEN, value, (size_t)4, min, max)
+	is_uint_n_range(str, (size_t)ZBX_MAX_UINT64_LEN, value, sizeof(unsigned int), min, max)
 
 
 int	is_boolean(const char *str, zbx_uint64_t *value);
