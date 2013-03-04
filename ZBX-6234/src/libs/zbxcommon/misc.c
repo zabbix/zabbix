@@ -1498,8 +1498,8 @@ int	is_int_prefix(const char *str)
  *             value - [OUT] a pointer to output buffer where the converted   *
  *                     value is to be written (optional, can be NULL)         *
  *             size  - [IN] size of the output buffer (optional)              *
- *             min   - [IN] the minimum value range                           *
- *             max   - [IN] the maximum value range                           *
+ *             min   - [IN] the minimum acceptable value                      *
+ *             max   - [IN] the maximum acceptable value                      *
  *                                                                            *
  * Return value:  SUCCEED - the string is unsigned integer                    *
  *                FAIL - the string is not a number or its value is outside   *
@@ -1512,7 +1512,7 @@ int	is_uint_n_range(const char *str, size_t n, void *value, size_t size, zbx_uin
 {
 	zbx_uint64_t	value_uint64 = 0, c;
 
-	if ('\0' == *str || 0 == n || 0 == size || size > sizeof(zbx_uint64_t))
+	if ('\0' == *str || 0 == n || sizeof(zbx_uint64_t) < size || (0 == size && NULL != value))
 		return FAIL;
 
 	while ('\0' != *str && 0 < n--)
@@ -1534,13 +1534,13 @@ int	is_uint_n_range(const char *str, size_t n, void *value, size_t size, zbx_uin
 
 	if (NULL != value)
 	{
-		/* On little endian architecture the output value will be stored into first value_bytes */
-		/* while on big endian architecture it will be stored into the last value_bytes. We     */
-		/* handle it by storing the offset in the most significant byte of short value and then */
-		/* use the first byte as source offset.                                                 */
-		unsigned short value_offset = (unsigned short)(((unsigned int)sizeof(zbx_uint64_t) - size) << 8);
+		/* On little endian architecture the output value will be stored starting from the first bytes */
+		/* of 'value' buffer while on big endian architecture it will be stored starting from the last */
+		/* bytes. We handle it by storing the offset in the most significant byte of short value and   */
+		/* then use the first byte as source offset.                                                   */
+		unsigned short value_offset = (unsigned short)((sizeof(zbx_uint64_t) - size) << 8);
 
-		memcpy(value, (char*)&value_uint64 + *((unsigned char*)&value_offset) , (size_t)size);
+		memcpy(value, (unsigned char*)&value_uint64 + *((unsigned char*)&value_offset), size);
 	}
 
 	return SUCCEED;
