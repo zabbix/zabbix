@@ -244,10 +244,8 @@ jQuery(function($) {
 					$('.selected ul', obj).addClass('active');
 				})
 				.focusout(function() {
-					if (!values.isAvailableOpenned) {
-						$('.selected ul', obj).removeClass('active');
-						cleanSearchInput(obj);
-					}
+					$('.selected ul', obj).removeClass('active');
+					cleanSearchInput(obj);
 				});
 				obj.append($('<div>', {style: 'position: relative;'}).append(input));
 			}
@@ -439,6 +437,8 @@ jQuery(function($) {
 			hideAvailable(obj);
 			cleanAvailable(obj, values);
 			cleanLastSearch(obj);
+
+			$('input[type="text"]', obj).focus();
 		}
 	}
 
@@ -471,7 +471,7 @@ jQuery(function($) {
 	function cleanLastSearch(obj) {
 		var input = $('input[type="text"]', obj);
 
-		input.attr('data-lastSearch', '');
+		input.data('lastSearch', '');
 		input.val('');
 	}
 
