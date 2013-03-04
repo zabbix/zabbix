@@ -71,7 +71,12 @@ $discoveryFormList->addRow(_('Device uniqueness criteria'),
 
 // append status to form list
 $discoveryFormList->addRow(_('Enabled'),
-	new CCheckBox('status', !empty($this->data['druleid']) ? ($this->data['drule']['status'] == 0 ? 'yes' : 'no') : 'yes', null, 1));
+	new CCheckBox(
+		'status',
+		($this->data['drule']['status'] === DRULE_STATUS_ACTIVE),
+		null,
+		1
+	));
 
 // append tabs to form
 $discoveryTabs = new CTabView();

@@ -411,18 +411,12 @@
 		toggleInputs('newCheckSecLevRow', isset(dcheckType, secNameRowTypes));
 
 		// get old type
-		var oldType = '';
+		var oldType = jQuery('#type').data('oldType');
 
-		if (typeof(dcheckId) != 'undefined') {
-			oldType = (typeof(ZBX_CHECKLIST[dcheckId].oldType) != 'undefined')
-				? ZBX_CHECKLIST[dcheckId].oldType
-				: ZBX_CHECKLIST[dcheckId].type;
-
-			ZBX_CHECKLIST[dcheckId]['oldType'] = dcheckType;
-		}
+		jQuery('#type').data('oldType', dcheckType);
 
 		// type is changed
-		if (ZBX_SVC.icmp != dcheckType && dcheckType != oldType) {
+		if (ZBX_SVC.icmp != dcheckType && typeof(oldType) != 'undefined' && dcheckType != oldType) {
 			// reset values
 			var snmpTypes = [ZBX_SVC.snmpv1, ZBX_SVC.snmpv2, ZBX_SVC.snmpv3],
 				ignoreNames = ['druleid', 'name', 'ports', 'type'];
@@ -431,18 +425,11 @@
 				// ignore value reset when change type from snmpt's
 			}
 			else {
-				jQuery('#dcheckCell_' + dcheckId + ' input').each(function(i, item) {
+				jQuery('#new_check_form input[type="text"]').each(function(i, item) {
 					var itemObj = jQuery(item);
 
-					var name = itemObj.attr('name').replace('dchecks[' + dcheckId + '][', '');
-					name = name.substring(0, name.length - 1);
-
-					if (jQuery.inArray(name, ignoreNames) < 0) {
-						fieldObj = jQuery('#' + name);
-
-						if (fieldObj.length) {
-							fieldObj.val('');
-						}
+					if (jQuery.inArray(itemObj.attr('id'), ignoreNames) < 0) {
+						itemObj.val('');
 					}
 				});
 			}
@@ -488,6 +475,7 @@
 	function saveNewDCheckForm(dcheckId) {
 		var dCheck = jQuery('#new_check_form :input:enabled').serializeJSON();
 
+		// get check id
 		if (typeof(dcheckId) != 'undefined') {
 			dCheck.dcheckid = dcheckId;
 		}
@@ -500,6 +488,7 @@
 			}
 		}
 
+		// check for duplicates
 		for (var dcheckid in ZBX_CHECKLIST) {
 			if (typeof(dcheckId) == 'undefined' || (typeof(dcheckId) != 'undefined') && dcheckId != dcheckid) {
 				if ((typeof dCheck['key_'] == 'undefined' || ZBX_CHECKLIST[dcheckid]['key_'] === dCheck['key_'])
@@ -528,6 +517,12 @@
 			}
 		}
 
+		// trim leading zeros from port
+		if (typeof(dCheck.ports) != 'undefined') {
+			dCheck.ports = dCheck.ports.replace(/^[0]+/g, '');
+		}
+
+		// validate
 		var validationErrors = [],
 			ajaxChecks = {
 				ajaxaction: 'validate',
