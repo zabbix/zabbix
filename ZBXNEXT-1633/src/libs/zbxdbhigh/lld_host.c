@@ -25,9 +25,10 @@
 
 typedef struct
 {
-	zbx_uint64_t	hostid;
-	char		*host;
-	char		*name;
+	zbx_uint64_t		hostid;
+	zbx_vector_uint64_t	groupids;
+	char			*host;
+	char			*name;
 }
 zbx_lld_host_t;
 
@@ -39,6 +40,7 @@ static void	DBlld_clean_hosts(zbx_vector_ptr_t *hosts)
 	{
 		host = (zbx_lld_host_t *)hosts->values[--hosts->values_num];
 
+		zbx_vector_uint64_destroy(&host->groupids);
 		zbx_free(host->host);
 		zbx_free(host->name);
 		zbx_free(host);
@@ -181,18 +183,115 @@ out:
 	return ret;
 }
 
+static void	DBlld_make_host_groups(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *hosts)
+{
+	const char		*__function_name = "DBlld_make_host_groups";
+
+	DB_RESULT		result;
+	DB_ROW			row;
+	int			i, j;
+	zbx_vector_uint64_t	groupids, hostids;
+	zbx_uint64_t		groupid, hostid;
+	zbx_lld_host_t		*host;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	zbx_vector_uint64_create(&groupids);
+	zbx_vector_uint64_create(&hostids);
+
+	result = DBselect(
+			"select hg.groupid"
+			" from hosts_groups hg,items i"
+			" where hg.hostid=i.hostid"
+				" and i.itemid=" ZBX_FS_UI64, lld_ruleid);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		ZBX_STR2UINT64(groupid, row[0]);
+		zbx_vector_uint64_append(&groupids, groupid);
+	}
+	DBfree_result(result);
+
+	zbx_vector_uint64_sort(&groupids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+	for (i = 0; i < hosts->values_num; i++)
+	{
+		host = (zbx_lld_host_t *)hosts->values[i];
+
+		zbx_vector_uint64_create(&host->groupids);
+		zbx_vector_uint64_reserve(&host->groupids, groupids.values_num);
+
+		for (j = 0; j < groupids.values_num; j++)
+			zbx_vector_uint64_append(&host->groupids, groupids.values[j]);
+
+		if (0 != host->hostid)
+			zbx_vector_uint64_append(&hostids, host->hostid);
+	}
+
+	if (0 != hostids.values_num)
+	{
+		char	*sql = NULL;
+		size_t	sql_alloc = 256, sql_offset = 0;
+
+		sql = zbx_malloc(sql, sql_alloc);
+
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
+				"select hostid,groupid"
+				" from hosts_groups"
+					" where");
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid", hostids.values, hostids.values_num);
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " and");
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "groupid", groupids.values, groupids.values_num);
+
+		result = DBselect("%s", sql);
+
+		while (NULL != (row = DBfetch(result)))
+		{
+			ZBX_STR2UINT64(hostid, row[0]);
+			ZBX_STR2UINT64(groupid, row[1]);
+
+			if (FAIL == (i = zbx_vector_ptr_bsearch(hosts, &hostid, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
+			{
+				THIS_SHOULD_NEVER_HAPPEN;
+				continue;
+			}
+
+			host = (zbx_lld_host_t *)hosts->values[i];
+
+			if (FAIL == (i = zbx_vector_uint64_bsearch(&host->groupids, groupid,
+					ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
+			{
+				THIS_SHOULD_NEVER_HAPPEN;
+				continue;
+			}
+
+			zbx_vector_uint64_remove(&host->groupids, i);
+		}
+		DBfree_result(result);
+
+		zbx_free(sql);
+	}
+
+	zbx_vector_uint64_destroy(&hostids);
+	zbx_vector_uint64_destroy(&groupids);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+}
+
 static void	DBlld_save_hosts(zbx_vector_ptr_t *hosts, unsigned char status, zbx_uint64_t parent_hostid)
 {
-	int		i, new_hosts = 0;
+	int		i, j, new_hosts = 0, new_host_groups = 0;
 	zbx_lld_host_t	*host;
-	zbx_uint64_t	hostid = 0, hostdiscoveryid = 0;
-	char		*sql1 = NULL, *sql2 = NULL, *sql3 = NULL, *host_esc, *name_esc;
+	zbx_uint64_t	hostid = 0, hostdiscoveryid = 0, hostgroupid = 0;
+	char		*sql1 = NULL, *sql2 = NULL, *sql3 = NULL, *sql4 = NULL, *host_esc, *name_esc;
 	size_t		sql1_alloc = 8 * ZBX_KIBIBYTE, sql1_offset = 0,
 			sql2_alloc = 2 * ZBX_KIBIBYTE, sql2_offset = 0,
-			sql3_alloc = 8 * ZBX_KIBIBYTE, sql3_offset = 0;
+			sql3_alloc = 8 * ZBX_KIBIBYTE, sql3_offset = 0,
+			sql4_alloc = ZBX_KIBIBYTE, sql4_offset = 0;
 	const char	*ins_hosts_sql = "insert into hosts (hostid,host,name,status,flags) values ";
 	const char	*ins_host_discovery_sql =
 			"insert into host_discovery (hostdiscoveryid,hostid,parent_hostid) values ";
+	const char	*ins_hosts_groups_sql = "insert into hosts_groups (hostgroupid,hostid,groupid) values ";
 
 	for (i = 0; i < hosts->values_num; i++)
 	{
@@ -200,6 +299,8 @@ static void	DBlld_save_hosts(zbx_vector_ptr_t *hosts, unsigned char status, zbx_
 
 		if (0 == host->hostid)
 			new_hosts++;
+
+		new_host_groups += host->groupids.values_num;
 	}
 
 	if (0 != new_hosts)
@@ -221,6 +322,17 @@ static void	DBlld_save_hosts(zbx_vector_ptr_t *hosts, unsigned char status, zbx_
 	{
 		sql3 = zbx_malloc(sql3, sql3_alloc);
 		DBbegin_multiple_update(&sql3, &sql3_alloc, &sql3_offset);
+	}
+
+	if (0 != new_host_groups)
+	{
+		hostgroupid = DBget_maxid_num("hosts_groups", new_host_groups);
+
+		sql4 = zbx_malloc(sql4, sql4_alloc);
+		DBbegin_multiple_update(&sql4, &sql4_alloc, &sql4_offset);
+#ifdef HAVE_MULTIROW_INSERT
+		zbx_strcpy_alloc(&sql4, &sql4_alloc, &sql4_offset, ins_hosts_groups_sql);
+#endif
 	}
 
 	for (i = 0; i < hosts->values_num; i++)
@@ -267,6 +379,16 @@ static void	DBlld_save_hosts(zbx_vector_ptr_t *hosts, unsigned char status, zbx_
 					key_proto_esc, lastcheck, host->hostid, parent_hostid);*/
 		}
 
+		for (j = 0; j < host->groupids.values_num; j++)
+		{
+#ifndef HAVE_MULTIROW_INSERT
+			zbx_strcpy_alloc(&sql4, &sql4_alloc, &sql4_offset, ins_hosts_groups_sql);
+#endif
+			zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset,
+					"(" ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 ")" ZBX_ROW_DL,
+					hostgroupid++, host->hostid, host->groupids.values[j]);
+		}
+
 		zbx_free(name_esc);
 		zbx_free(host_esc);
 	}
@@ -292,6 +414,17 @@ static void	DBlld_save_hosts(zbx_vector_ptr_t *hosts, unsigned char status, zbx_
 		DBend_multiple_update(&sql3, &sql3_alloc, &sql3_offset);
 		DBexecute("%s", sql3);
 		zbx_free(sql3);
+	}
+
+	if (0 != new_host_groups)
+	{
+#ifdef HAVE_MULTIROW_INSERT
+		sql4_offset--;
+		zbx_strcpy_alloc(&sql4, &sql4_alloc, &sql4_offset, ";\n");
+#endif
+		DBend_multiple_update(&sql4, &sql4_alloc, &sql4_offset);
+		DBexecute("%s", sql4);
+		zbx_free(sql4);
 	}
 }
 
@@ -352,6 +485,8 @@ void	DBlld_update_hosts(zbx_uint64_t lld_ruleid, struct zbx_json_parse *jp_data,
 		}
 
 		zbx_vector_ptr_sort(&hosts, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
+
+		DBlld_make_host_groups(lld_ruleid, &hosts);
 
 		DBlld_save_hosts(&hosts, status, parent_hostid);
 
