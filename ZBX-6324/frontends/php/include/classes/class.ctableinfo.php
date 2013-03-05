@@ -47,10 +47,17 @@ class CTableInfo extends CTable {
 
 						// insert spans
 						cellsToRotate.each(function () {
-							var cell = $(this),
-								text = cell.text();
+							var cell = $(this);
 
-							cell.text("").append($("<span>", {text: text}));
+							var text = $("<span>", {
+								text: cell.text()
+							});
+
+							if (IE) {
+								text.css({"font-family": "monospace"});
+							}
+
+							cell.text("").append(text);
 						});
 
 						// rotate cells
@@ -70,6 +77,10 @@ class CTableInfo extends CTable {
 
 							if (IE9) {
 								css["-ms-transform-origin"] = transform;
+							}
+
+							if (IE) {
+								css["font-family"] = "monospace";
 							}
 
 							var divInner = $("<div>", {
