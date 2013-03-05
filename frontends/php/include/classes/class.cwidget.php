@@ -59,20 +59,16 @@ private $items;
 			$this->css_class = $class;
 	}
 
-	public function addPageHeader($header, $headerright=SPACE){
-		zbx_value2array($headerright);
+	public function addPageHeader($left = SPACE, $right = SPACE) {
+		zbx_value2array($right);
 
-		if(is_null($header) && !is_null($headerright)) $header = SPACE;
-
-		$this->pageHeaders[] = array('left'=> $header, 'right'=>$headerright);
+		$this->pageHeaders[] = array('left' => $left, 'right' => $right);
 	}
 
-	public function addHeader($header=null, $headerright = SPACE){
-		zbx_value2array($headerright);
+	public function addHeader($left = SPACE, $right = SPACE) {
+		zbx_value2array($right);
 
-		if(is_null($header) && !is_null($headerright)) $header = SPACE;
-
-		$this->headers[] = array('left'=> $header, 'right'=>$headerright);
+		$this->headers[] = array('left' => $left, 'right' => $right);
 	}
 
 	public function addFlicker($items=null, $state = 0){
@@ -167,100 +163,51 @@ private $items;
 	return unpack_object($tab);
 	}
 
-	private function createPageHeader(){
+	private function createPageHeader() {
 		$pageHeader = array();
 
-		foreach($this->pageHeaders as $num => $header){
-			$pageHeader[] = $this->createPageHeaderRow($header['left'], $header['right']);
+		foreach ($this->pageHeaders as $header) {
+			$pageHeader[] = get_table_header($header['left'], $header['right']);
 		}
 
-		// $pageHeader[] = BR();
-
-	return $pageHeader;
+		return new CDiv($pageHeader);
 	}
 
-	private function createPageHeaderRow($col1, $col2=SPACE){
-		if(isset($_REQUEST['print'])){
-			hide_form_items($col1);
-			hide_form_items($col2);
-		//if empty header than do not show it
-			if(($col1 == SPACE) && ($col2 == SPACE)) return new CJSscript('');
+
+	private function createHeader() {
+		$header = reset($this->headers);
+
+		$columnRights = array();
+
+		if (!is_null($header['right'])) {
+			foreach ($header['right'] as $right) {
+				$columnRights[] = new CDiv($right, 'floatright');
+			}
 		}
 
-		$td_l = new CCol(SPACE);
-		$td_l->setAttribute('width','100%');
-
-		$right_row = array($td_l);
-
-		if(!is_null($col2)){
-			if(!is_array($col2)) $col2 = array($col2);
-
-			foreach($col2 as $num => $r_item)
-				$right_row[] = new CCol($r_item);
+		if (!is_null($this->state)) {
+			$icon = new CIcon(S_SHOW.'/'.S_HIDE, ($this->state ? 'arrowup' : 'arrowdown'), "change_hat_state(this, '".$this->domid."');");
+			$icon->setAttribute('id', $this->domid.'_icon');
+			$columnRights[] = $icon;
 		}
 
-		$right_tab = new CTable(null,'nowrap');
-		$right_tab->setAttribute('width','100%');
+		if ($columnRights) {
+			$columnRights = array_reverse($columnRights);
+		}
 
-//		$right_tab->addRow($right_row, 'textblackwhite');
-		$right_tab->addRow($right_row);
-
-		$table = new CTable(NULL,'header bottom_space');
-//		$table->setAttribute('border',0);
+		// header table
+		$table = new CTable(null, $this->css_class);
 		$table->setCellSpacing(0);
 		$table->setCellPadding(1);
+		$table->addRow($this->createHeaderRow($header['left'], $columnRights), 'first');
 
-		$td_r = new CCol($right_tab,'header_r');
-		$td_r->setAttribute('align','right');
-
-		$table->addRow(array(new CCol($col1,'header_l'), $td_r));
-
-	return $table;
-	}
-
-	private function createHeader(){
-		$header = array_shift($this->headers);
-
-
-		$td_l = new CCol(SPACE);
-		$td_l->setAttribute('width','100%');
-
-		$right_row = array($td_l);
-
-		if(!is_null($header['right'])){
-			foreach($header['right'] as $num => $r_item)
-				$right_row[] = new CCol($r_item);
+		foreach ($this->headers as $num => $header) {
+			if ($num > 0) {
+				$table->addRow($this->createHeaderRow($header['left'], $header['right']), 'next');
+			}
 		}
 
-		if(!is_null($this->state)){
-			$icon = new CIcon(S_SHOW.'/'.S_HIDE, $this->state?'arrowup':'arrowdown',
-					"change_hat_state(this,'".$this->domid."');");
-			$icon->setAttribute('id',$this->domid.'_icon');
-			$right_row[] = new CCol($icon);
-		}
-
-		$right_tab = new CTable(null,'nowrap');
-		$right_tab->setAttribute('width','100%');
-
-		$right_tab->addRow($right_row, 'textblackwhite');
-
-		$header['right'] = $right_tab;
-
-		$header_tab = new CTable(null,$this->css_class);
-		$header_tab->setCellSpacing(0);
-		$header_tab->setCellPadding(1);
-
-		if(!empty($this->flicker)){
-//			$header_tab->setAttribute('style','border-bottom: 0px;');
-		}
-
-		$header_tab->addRow($this->createHeaderRow($header['left'],$right_tab),'first');
-
-		foreach($this->headers as $num => $header){
-			$header_tab->addRow($this->createHeaderRow($header['left'],$header['right']), 'next');
-		}
-
-	return $header_tab;
+		return new CDiv($table);
 	}
 
 	private function createHeaderRow($col1, $col2=SPACE){

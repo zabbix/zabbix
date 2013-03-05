@@ -198,41 +198,36 @@
 		}
 	}
 
-	function get_table_header($col1, $col2=SPACE){
-		if(isset($_REQUEST['print'])){
-			hide_form_items($col1);
-			hide_form_items($col2);
-//if empty header than do not show it
-			if(($col1 == SPACE) && ($col2 == SPACE)) return new CJSscript('');
+	function get_table_header($columnLeft, $columnRights = SPACE) {
+		if (isset($_REQUEST['print'])) {
+			hide_form_items($columnLeft);
+			hide_form_items($columnRights);
+
+			if ($columnLeft == SPACE && $columnRights == SPACE) {
+				return new CJSscript('');
+			}
 		}
 
-		$td_l = new CCol(SPACE,'header_r');
-		$td_l->setAttribute('width','100%');
+		$rights = array();
 
-		$right_row = array($td_l);
+		if ($columnRights) {
+			if (!is_array($columnRights)) {
+				$columnRights = array($columnRights);
+			}
 
-		if(!is_null($col2)){
-			if(!is_array($col2)) $col2 = array($col2);
+			foreach ($columnRights as $columnRight) {
+				$rights[] = new CDiv($columnRight, 'floatright');
+			}
 
-			foreach($col2 as $num => $r_item)
-				$right_row[] = new CCol($r_item,'header_r');
+			$rights = array_reverse($rights);
 		}
 
-		$right_tab = new CTable(null,'nowrap');
-		$right_tab->setAttribute('width','100%');
-
-		$right_tab->addRow($right_row);
-
-		$table = new CTable(NULL,'header');
-//		$table->setAttribute('border',0);
+		$table = new CTable(null, 'header maxwidth');
 		$table->setCellSpacing(0);
 		$table->setCellPadding(1);
+		$table->addRow(array(new CCol($columnLeft, 'header_l left'), new CCol($rights, 'header_r')));
 
-		$td_r = new CCol($right_tab,'header_r');
-		$td_r->setAttribute('align','right');
-
-		$table->addRow(array(new CCol($col1,'header_l'), $td_r));
-	return $table;
+		return $table;
 	}
 
 	function show_table_header($col1, $col2=SPACE){

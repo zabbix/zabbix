@@ -133,6 +133,9 @@ img.borderless	{	border-width: 0px; vertical-align: bottom;	}
 .move:hover{
 	cursor: move;
 }
+
+.floatright { float: right; }
+
 /**************** HINT BOX *****************/
 
 #hint_box {
