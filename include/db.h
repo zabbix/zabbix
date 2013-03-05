@@ -298,7 +298,6 @@ typedef struct
 	DB_TRIGGER	trigger;
 	zbx_uint64_t	eventid;
 	zbx_uint64_t	objectid;
-	zbx_uint64_t	ack_eventid;
 	int		source;
 	int		object;
 	int		clock;
@@ -560,6 +559,8 @@ int	DBcopy_template_elements(zbx_uint64_t hostid, zbx_vector_uint64_t *lnk_templ
 int	DBdelete_template_elements(zbx_uint64_t hostid, zbx_vector_uint64_t *del_templateids);
 
 void	DBdelete_items(zbx_vector_uint64_t *itemids);
+void	DBdelete_triggers(zbx_vector_uint64_t *triggerids);
+void	DBdelete_graphs(zbx_vector_uint64_t *graphids);
 void	DBdelete_host(zbx_uint64_t hostid);
 void	DBget_graphitems(const char *sql, ZBX_GRAPH_ITEMS **gitems, size_t *gitems_alloc, size_t *gitems_num);
 void	DBupdate_services(zbx_uint64_t triggerid, int status, int clock);
@@ -608,4 +609,6 @@ int	DBtxn_ongoing();
 int	DBtable_exists(const char *table_name);
 int	DBfield_exists(const char *table_name, const char *field_name);
 
+void	zbx_create_services_lock();
+void	zbx_destroy_services_lock();
 #endif

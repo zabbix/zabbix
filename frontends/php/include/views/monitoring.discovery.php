@@ -115,7 +115,7 @@ foreach ($this->data['drules'] as $drule) {
 				if (isset($this->data['macros'][$key_])) {
 					$key_ = $this->data['macros'][$key_]['value'];
 				}
-				$key_ = ': '.$key_;
+				$key_ = NAME_DELIMITER.$key_;
 			}
 
 			$serviceName = discovery_check_type2str($dservice['type']).discovery_port2str($dservice['type'], $dservice['port']).$key_;

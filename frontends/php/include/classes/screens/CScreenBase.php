@@ -349,7 +349,7 @@ class CScreenBase {
 		$time = time();
 		$usertime = null;
 		$stimeNow = null;
-		$isNow = false;
+		$isNow = 0;
 
 		if (!empty($options['stime'])) {
 			$stimeUnix = zbxDateToTime($options['stime']);
@@ -358,16 +358,16 @@ class CScreenBase {
 				$stimeNow = $options['stime'];
 				$options['stime'] = date(TIMESTAMP_FORMAT, $time - $options['period']);
 				$usertime = date(TIMESTAMP_FORMAT, $time);
-				$isNow = true;
+				$isNow = 1;
 			}
 			else {
 				$usertime = date(TIMESTAMP_FORMAT, zbxAddSecondsToUnixtime($options['period'], $stimeUnix));
-				$isNow = false;
+				$isNow = 0;
 			}
 
 			if ($options['updateProfile'] && !empty($options['profileIdx'])) {
 				CProfile::update($options['profileIdx'].'.stime', $options['stime'], PROFILE_TYPE_STR, $options['profileIdx2']);
-				CProfile::update($options['profileIdx'].'.isnow', $isNow, PROFILE_TYPE_STR, $options['profileIdx2']);
+				CProfile::update($options['profileIdx'].'.isnow', $isNow, PROFILE_TYPE_INT, $options['profileIdx2']);
 			}
 		}
 		else {
@@ -392,11 +392,11 @@ class CScreenBase {
 				$options['stime'] = date(TIMESTAMP_FORMAT, $time - $options['period']);
 				$usertime = date(TIMESTAMP_FORMAT, $time);
 				$stimeNow = date(TIMESTAMP_FORMAT, zbxAddSecondsToUnixtime(SEC_PER_YEAR, $options['stime']));
-				$isNow = true;
+				$isNow = 1;
 
 				if ($options['updateProfile'] && !empty($options['profileIdx'])) {
 					CProfile::update($options['profileIdx'].'.stime', $options['stime'], PROFILE_TYPE_STR, $options['profileIdx2']);
-					CProfile::update($options['profileIdx'].'.isnow', $isNow, PROFILE_TYPE_STR, $options['profileIdx2']);
+					CProfile::update($options['profileIdx'].'.isnow', $isNow, PROFILE_TYPE_INT, $options['profileIdx2']);
 				}
 			}
 		}
@@ -422,7 +422,7 @@ class CScreenBase {
 	 * @param string	$options['stimeNow']
 	 * @param string	$options['starttime']
 	 * @param string	$options['usertime']
-	 * @param boolean	$options['isNow']
+	 * @param int		$options['isNow']
 	 */
 	public static function debugTime(array $time = array()) {
 		return 'period='.zbx_date2age(0, $time['period']).', ('.$time['period'].')<br/>'.

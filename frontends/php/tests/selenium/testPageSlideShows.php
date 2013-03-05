@@ -17,8 +17,7 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
 require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
 class testPageSlideShows extends CWebTest {
@@ -31,18 +30,18 @@ class testPageSlideShows extends CWebTest {
 	* @dataProvider allSlideShows
 	*/
 	public function testPageSlideShows_CheckLayout($slideshow) {
-		$this->login('slideconf.php');
+		$this->zbxTestLogin('slideconf.php');
 		$this->checkTitle('Configuration of slide shows');
 
-		$this->ok('CONFIGURATION OF SLIDE SHOWS');
-		$this->ok('SLIDE SHOWS');
-		$this->ok('Displaying');
-		$this->nok('Displaying 0');
+		$this->zbxTestTextPresent('CONFIGURATION OF SLIDE SHOWS');
+		$this->zbxTestTextPresent('SLIDE SHOWS');
+		$this->zbxTestTextPresent('Displaying');
+		$this->zbxTestTextNotPresent('Displaying 0');
 		// Header
-		$this->ok(array('Name', 'Delay', 'Count of slides'));
+		$this->zbxTestTextPresent(array('Name', 'Delay', 'Count of slides'));
 		// Data
-		$this->ok(array($slideshow['name']));
-		$this->dropdown_select('go', 'Delete selected');
+		$this->zbxTestTextPresent(array($slideshow['name']));
+		$this->zbxTestDropdownHasOptions('go', array('Delete selected'));
 	}
 
 	/**
@@ -57,36 +56,32 @@ class testPageSlideShows extends CWebTest {
 		$sqlSlide = "select * from slides where slideshowid=$slideshowid order by slideid";
 		$oldHashSlide = DBhash($sqlSlide);
 
-		$this->login('slideconf.php');
+		$this->zbxTestLogin('slideconf.php');
 		$this->checkTitle('Configuration of slide shows');
-		$this->click("link=$name");
-		$this->wait();
-		$this->button_click('save');
-		$this->wait();
+		$this->zbxTestClickWait('link='.$name);
+		$this->zbxTestClickWait('save');
 		$this->checkTitle('Configuration of slide shows');
-		$this->ok('Slide show updated');
-		$this->ok("$name");
-		$this->ok('CONFIGURATION OF SLIDE SHOWS');
+		$this->zbxTestTextPresent('Slide show updated');
+		$this->zbxTestTextPresent("$name");
+		$this->zbxTestTextPresent('CONFIGURATION OF SLIDE SHOWS');
 
 		$this->assertEquals($oldHashSlideShow, DBhash($sqlSlideShow), "Chuck Norris: Slide show update changed data in table 'slideshows'");
 		$this->assertEquals($oldHashSlide, DBhash($sqlSlide), "Chuck Norris: Slide show update changed data in table 'slides'");
 	}
 
 	public function testPageSlideShows_Create() {
-		$this->login('slideconf.php');
+		$this->zbxTestLogin('slideconf.php');
 		$this->checkTitle('Configuration of slide shows');
-		$this->button_click('form');
-		$this->wait();
+		$this->zbxTestClickWait('form');
 
-		$this->ok('CONFIGURATION OF SLIDE SHOWS');
-		$this->ok('Slide');
-		$this->ok('Name');
-		$this->ok('Default delay (in seconds)');
-		$this->ok('Slides');
-		$this->ok(array('Screen', 'Delay', 'Action'));
-		$this->button_click('cancel');
-		$this->wait();
-		$this->ok('SLIDE SHOWS');
+		$this->zbxTestTextPresent('CONFIGURATION OF SLIDE SHOWS');
+		$this->zbxTestTextPresent('Slide');
+		$this->zbxTestTextPresent('Name');
+		$this->zbxTestTextPresent('Default delay (in seconds)');
+		$this->zbxTestTextPresent('Slides');
+		$this->zbxTestTextPresent(array('Screen', 'Delay', 'Action'));
+		$this->zbxTestClickWait('cancel');
+		$this->zbxTestTextPresent('SLIDE SHOWS');
 	}
 
 	public function testPageSlideShows_MassDeleteAll() {
@@ -105,18 +100,17 @@ class testPageSlideShows extends CWebTest {
 
 		DBsave_tables('slideshows');
 
-		$this->login('slideconf.php');
+		$this->zbxTestLogin('slideconf.php');
 		$this->checkTitle('Configuration of slide shows');
-		$this->checkbox_select("shows[$slideshowid]");
-		$this->dropdown_select('go', 'Delete selected');
-		$this->button_click('goButton');
-		$this->wait();
+		$this->zbxTestCheckboxSelect('shows['.$slideshowid.']');
+		$this->zbxTestDropdownSelect('go', 'Delete selected');
+		$this->zbxTestClickWait('goButton');
 
 		$this->getConfirmation();
 
 		$this->checkTitle('Configuration of slide shows');
-		$this->ok('Slide show deleted');
-		$this->ok('CONFIGURATION OF SLIDE SHOWS');
+		$this->zbxTestTextPresent('Slide show deleted');
+		$this->zbxTestTextPresent('CONFIGURATION OF SLIDE SHOWS');
 
 		$sql = "select * from slideshows where slideshowid=$slideshowid";
 		$this->assertEquals(0, DBcount($sql));
@@ -131,4 +125,3 @@ class testPageSlideShows extends CWebTest {
 		$this->markTestIncomplete();
 	}
 }
-?>

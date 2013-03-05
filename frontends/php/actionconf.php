@@ -156,7 +156,7 @@ elseif (isset($_REQUEST['save'])) {
 		add_audit(
 			!isset($_REQUEST['actionid']) ? AUDIT_ACTION_ADD : AUDIT_ACTION_UPDATE,
 			AUDIT_RESOURCE_ACTION,
-			_('Name').': '.$_REQUEST['name']
+			_('Name').NAME_DELIMITER.$_REQUEST['name']
 		);
 
 		unset($_REQUEST['form']);

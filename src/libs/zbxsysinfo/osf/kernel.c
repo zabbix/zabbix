@@ -20,19 +20,19 @@
 #include "common.h"
 #include "sysinfo.h"
 
-int	KERNEL_MAXFILES(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+int	KERNEL_MAXFILES(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 #ifdef HAVE_FUNCTION_SYSCTL_KERN_MAXFILES
-	int	mib[2],len;
+	int	mib[2], len;
 	int	maxfiles;
 
-	mib[0]=CTL_KERN;
-	mib[1]=KERN_MAXFILES;
+	mib[0] = CTL_KERN;
+	mib[1] = KERN_MAXFILES;
 
-	len=sizeof(maxfiles);
+	len = sizeof(maxfiles);
 
-	if(sysctl(mib,2,&maxfiles,(size_t *)&len,NULL,0) != 0)
-		return	SYSINFO_RET_FAIL;
+	if (0 != sysctl(mib, 2, &maxfiles, (size_t *)&len, NULL, 0))
+		return SYSINFO_RET_FAIL;
 
      	SET_UI64_RESULT(result, maxfiles);
 
@@ -42,19 +42,19 @@ int	KERNEL_MAXFILES(const char *cmd, const char *param, unsigned flags, AGENT_RE
 #endif
 }
 
-int	KERNEL_MAXPROC(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+int	KERNEL_MAXPROC(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 #ifdef HAVE_FUNCTION_SYSCTL_KERN_MAXPROC
-	int	mib[2],len;
+	int	mib[2], len;
 	int	maxproc;
 
-	mib[0]=CTL_KERN;
-	mib[1]=KERN_MAXPROC;
+	mib[0] = CTL_KERN;
+	mib[1] = KERN_MAXPROC;
 
-	len=sizeof(maxproc);
+	len = sizeof(maxproc);
 
-	if(sysctl(mib,2,&maxproc,(size_t *)&len,NULL,0) != 0)
-		return	SYSINFO_RET_FAIL;
+	if (0 != sysctl(mib, 2, &maxproc, (size_t *)&len, NULL, 0))
+		return SYSINFO_RET_FAIL;
 
      	SET_UI64_RESULT(result, maxproc);
 	return SYSINFO_RET_OK;

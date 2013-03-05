@@ -287,6 +287,11 @@ int	node_process_command(zbx_sock_t *sock, const char *data, struct zbx_json_par
 		zabbix_log(LOG_LEVEL_WARNING, "NODE %d: Error sending result of command to node %d",
 				CONFIG_NODEID, nodeid);
 	}
+	else
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "NODE %d: Sending back command '%s' result '%s'",
+				CONFIG_NODEID, data, send);
+	}
 	alarm(0);
 
 	zbx_json_free(&j);

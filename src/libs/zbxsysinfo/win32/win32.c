@@ -23,37 +23,37 @@
 #include "service.h"
 
 ZBX_METRIC	parameters_specific[] =
-/* 	KEY			FLAG		FUNCTION 	ADD_PARAM	TEST_PARAM */
+/* 	KEY			FLAG		FUNCTION 		TEST PARAMETERS */
 {
-	{"vfs.fs.size",		CF_USEUPARAM,	VFS_FS_SIZE,		NULL,	"c:,free"},
-	{"vfs.fs.discovery",	0,		VFS_FS_DISCOVERY,	NULL,	NULL},
+	{"vfs.fs.size",		CF_HAVEPARAMS,	VFS_FS_SIZE,		"c:,free"},
+	{"vfs.fs.discovery",	0,		VFS_FS_DISCOVERY,	NULL},
 
-	{"net.tcp.listen",	CF_USEUPARAM,	NET_TCP_LISTEN,		NULL,	"80"},
+	{"net.tcp.listen",	CF_HAVEPARAMS,	NET_TCP_LISTEN,		"80"},
 
-	{"net.if.in",		CF_USEUPARAM,	NET_IF_IN,		NULL,	"MS TCP Loopback interface,bytes"},
-	{"net.if.out",		CF_USEUPARAM,	NET_IF_OUT,		NULL,	"MS TCP Loopback interface,bytes"},
-	{"net.if.total",	CF_USEUPARAM,	NET_IF_TOTAL,		NULL,	"MS TCP Loopback interface,bytes"},
-	{"net.if.discovery",	0,		NET_IF_DISCOVERY,	NULL,	NULL},
-	{"net.if.list",		0,		NET_IF_LIST,		NULL,	NULL},
+	{"net.if.in",		CF_HAVEPARAMS,	NET_IF_IN,		"MS TCP Loopback interface,bytes"},
+	{"net.if.out",		CF_HAVEPARAMS,	NET_IF_OUT,		"MS TCP Loopback interface,bytes"},
+	{"net.if.total",	CF_HAVEPARAMS,	NET_IF_TOTAL,		"MS TCP Loopback interface,bytes"},
+	{"net.if.discovery",	0,		NET_IF_DISCOVERY,	NULL},
+	{"net.if.list",		0,		NET_IF_LIST,		NULL},
 
-	{"vm.memory.size",	CF_USEUPARAM,	VM_MEMORY_SIZE,		NULL,	"free"},
+	{"vm.memory.size",	CF_HAVEPARAMS,	VM_MEMORY_SIZE,		"free"},
 
-	{"proc.num",		CF_USEUPARAM,	PROC_NUM,		NULL,	"svchost.exe,"},
+	{"proc.num",		CF_HAVEPARAMS,	PROC_NUM,		"svchost.exe,"},
 
-	{"system.cpu.util",	CF_USEUPARAM,	SYSTEM_CPU_UTIL,	NULL,	"all,system,avg1"},
-	{"system.cpu.load",	CF_USEUPARAM,	SYSTEM_CPU_LOAD,	NULL,	"all,avg1"},
-	{"system.cpu.num",	CF_USEUPARAM,	SYSTEM_CPU_NUM,		NULL,	"online"},
+	{"system.cpu.util",	CF_HAVEPARAMS,	SYSTEM_CPU_UTIL,	"all,system,avg1"},
+	{"system.cpu.load",	CF_HAVEPARAMS,	SYSTEM_CPU_LOAD,	"all,avg1"},
+	{"system.cpu.num",	CF_HAVEPARAMS,	SYSTEM_CPU_NUM,		"online"},
 
-	{"system.swap.size",	CF_USEUPARAM,	SYSTEM_SWAP_SIZE,	NULL,	"all,free"},
+	{"system.swap.size",	CF_HAVEPARAMS,	SYSTEM_SWAP_SIZE,	"all,free"},
 
-	{"system.uptime",	0,		SYSTEM_UPTIME,		NULL,	NULL},
+	{"system.uptime",	0,		SYSTEM_UPTIME,		NULL},
 
-	{"service_state",	CF_USEUPARAM,	SERVICE_STATE,		NULL,	ZABBIX_SERVICE_NAME},
-	{"services",		CF_USEUPARAM,	SERVICES,		NULL,	NULL},
-	{"perf_counter",	CF_USEUPARAM,	PERF_COUNTER,		NULL,	"\\System\\Processes"},
-	{"proc_info",		CF_USEUPARAM,	PROC_INFO,		NULL,	"svchost.exe"},
+	{"service_state",	CF_HAVEPARAMS,	SERVICE_STATE,		ZABBIX_SERVICE_NAME},
+	{"services",		CF_HAVEPARAMS,	SERVICES,		NULL},
+	{"perf_counter",	CF_HAVEPARAMS,	PERF_COUNTER,		"\\System\\Processes"},
+	{"proc_info",		CF_HAVEPARAMS,	PROC_INFO,		"svchost.exe"},
 
-	{"__UserPerfCounter",	CF_USEUPARAM,	USER_PERF_COUNTER,	NULL,	""},
+	{"__UserPerfCounter",	CF_HAVEPARAMS,	USER_PERF_COUNTER,	""},
 
-	{0}
+	{NULL}
 };

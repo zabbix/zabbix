@@ -69,11 +69,11 @@ foreach ($this->data['items'] as $item) {
 	$description = array();
 	if (!empty($item['template_host'])) {
 		$description[] = new CLink($item['template_host']['name'], '?hostid='.$item['template_host']['hostid'].'&filter_set=1', 'unknown');
-		$description[] = ':'.SPACE;
+		$description[] = NAME_DELIMITER;
 	}
 	if (!empty($item['discoveryRule'])) {
 		$description[] = new CLink($item['discoveryRule']['name'], 'disc_prototypes.php?parent_discoveryid='.$item['discoveryRule']['itemid'], 'gold');
-		$description[] = ':'.SPACE.$item['name_expanded'];
+		$description[] = NAME_DELIMITER.$item['name_expanded'];
 	}
 	else {
 		$description[] = new CLink($item['name_expanded'], '?form=update&hostid='.$item['hostid'].'&itemid='.$item['itemid']);
