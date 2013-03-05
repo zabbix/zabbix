@@ -17,30 +17,29 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
 require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
 class testPageAdministrationAuditActions extends CWebTest {
 
 	public function testPageAdministrationAuditActions_CheckLayout() {
 
-		$this->login('auditacts.php?stime=20130207090000&period=63072000');
+		$this->zbxTestLogin('auditacts.php?stime=20130207090000&period=63072000');
 		$this->checkTitle('Audit');
 		$this->assertElementPresent('config');
-		$this->ok('AUDIT ACTIONS');
-		$this->ok('ACTIONS');
+		$this->zbxTestTextPresent('AUDIT ACTIONS');
+		$this->zbxTestTextPresent('ACTIONS');
 
-		$this->click('flicker_icon_l');
+		$this->zbxTestClick('flicker_icon_l');
 
-		$this->ok('Recipient');
+		$this->zbxTestTextPresent('Recipient');
 		$this->assertElementPresent('alias');
 		$this->assertAttribute("//input[@id='alias']/@maxlength", '255');
 		$this->assertAttribute("//input[@id='alias']/@size", '20');
 		$this->assertElementPresent('btn1');
 		$this->assertElementPresent('filter');
 		$this->assertElementPresent('filter_rst');
-		$this->ok(array('Time', 'Type', 'Status', 'Retries left', 'Recipient(s)', 'Message', 'Error'));
+		$this->zbxTestTextPresent(array('Time', 'Type', 'Status', 'Retries left', 'Recipient(s)', 'Message', 'Error'));
 
 	}
 
@@ -53,13 +52,13 @@ class testPageAdministrationAuditActions extends CWebTest {
 	*/
 	public function testPageAdministrationAuditActions_CheckValues($auditactions) {
 
-		$this->login('auditacts.php?stime=20130207090000&period=63072000');
+		$this->zbxTestLogin('auditacts.php?stime=20130207090000&period=63072000');
 		$this->checkTitle('Audit');
 		$this->assertElementPresent('config');
-		$this->ok('AUDIT ACTIONS');
-		$this->ok('ACTIONS');
+		$this->zbxTestTextPresent('AUDIT ACTIONS');
+		$this->zbxTestTextPresent('ACTIONS');
 
-		$this->click('flicker_icon_l');
+		$this->zbxTestClick('flicker_icon_l');
 		$time = $auditactions['clock'];
 		$today = date("d M Y H:i:s", $time);
 
@@ -90,19 +89,15 @@ class testPageAdministrationAuditActions extends CWebTest {
 			$retries = $auditactions['retries'];
 		}
 
-		$this->ok(array($today, $type['description'], $status, $retries, $auditactions['sendto'], $auditactions['subject'], $auditactions['message'], $auditactions['error']));
+		$this->zbxTestTextPresent(array($today, $type['description'], $status, $retries, $auditactions['sendto'], $auditactions['subject'], $auditactions['message'], $auditactions['error']));
 
 		// checking that there are no records in the report for 'guest' user
-		$this->click('flicker_icon_l');
+		$this->zbxTestClick('flicker_icon_l');
 		$this->input_type('alias', 'guest');
-		$this->click("id=filter");
-		$this->wait();
-		$this->ok('No actions defined.');
+		$this->zbxTestClickWait('filter');
+		$this->zbxTestTextPresent('No actions defined.');
 
-		$this->click('flicker_icon_l');
-		$this->click('filter_rst');
-		$this->wait();
-
+		$this->zbxTestClick('flicker_icon_l');
+		$this->zbxTestClickWait('filter_rst');
 	}
 }
-?>

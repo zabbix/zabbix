@@ -267,7 +267,6 @@ int	zbx_execute(const char *command, char **buffer, char *error, size_t max_erro
 	STARTUPINFO				si;
 	PROCESS_INFORMATION			pi;
 	SECURITY_ATTRIBUTES			sa;
-	JOBOBJECT_EXTENDED_LIMIT_INFORMATION	limits;
 	HANDLE					job = NULL, hWrite = NULL, hRead = NULL;
 	char					*cmd = NULL;
 	LPTSTR					wcmd = NULL;
@@ -303,22 +302,6 @@ int	zbx_execute(const char *command, char **buffer, char *error, size_t max_erro
 	if (0 == (job = CreateJobObject(&sa, NULL)))
 	{
 		zbx_snprintf(error, max_error_len, "unable to create a job: %s", strerror_from_system(GetLastError()));
-		goto close;
-	}
-
-	/* get the current job limits */
-	if (0 == QueryInformationJobObject(job, JobObjectExtendedLimitInformation, &limits, sizeof(limits), 0))
-	{
-		zbx_snprintf(error, max_error_len, "unable to query job info: %s", strerror_from_system(GetLastError()));
-		goto close;
-	}
-
-	/* set job limits to kill all child processes when terminating the job */
-	limits.BasicLimitInformation.LimitFlags &= ~JOB_OBJECT_LIMIT_BREAKAWAY_OK;
-	limits.BasicLimitInformation.LimitFlags |= JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE;
-	if (0 == SetInformationJobObject(job, JobObjectExtendedLimitInformation, &limits, sizeof(limits)))
-	{
-		zbx_snprintf(error, max_error_len, "unable to set job info: %s", strerror_from_system(GetLastError()));
 		goto close;
 	}
 

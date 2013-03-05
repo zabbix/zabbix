@@ -111,34 +111,36 @@ static int	VM_MEMORY_CACHED(AGENT_RESULT *result)
 
 #endif
 
-int	VM_MEMORY_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+int	VM_MEMORY_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
+	int	ret = SYSINFO_RET_FAIL;
+
 #ifdef HAVE_LIBPERFSTAT
-	const MODE_FUNCTION	fl[] =
-	{
-		{"total",	VM_MEMORY_TOTAL},
-		{"pinned",	VM_MEMORY_PINNED},
-		{"free",	VM_MEMORY_FREE},
-		{"used",	VM_MEMORY_USED},
-		{"pused",	VM_MEMORY_PUSED},
-		{"available",	VM_MEMORY_AVAILABLE},
-		{"pavailable",	VM_MEMORY_PAVAILABLE},
-		{"cached",	VM_MEMORY_CACHED},
-		{NULL,		0}
-	};
+	char	*mode;
 
-	char	mode[MAX_STRING_LEN];
-	int	i;
-
-	if (1 < num_param(param))
+	if (1 < request->nparam)
 		return SYSINFO_RET_FAIL;
 
-	if (0 != get_param(param, 1, mode, sizeof(mode)) || '\0' == *mode)
-		strscpy(mode, "total");
+	mode = get_rparam(request, 0);
 
-	for (i = 0; NULL != fl[i].mode; i++)
-		if (0 == strcmp(mode, fl[i].mode))
-			return (fl[i].function)(result);
+	if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "total"))
+		ret = VM_MEMORY_TOTAL(result);
+	else if (0 == strcmp(mode, "pinned"))
+		ret = VM_MEMORY_PINNED(result);
+	else if (0 == strcmp(mode, "free"))
+		ret = VM_MEMORY_FREE(result);
+	else if (0 == strcmp(mode, "used"))
+		ret = VM_MEMORY_USED(result);
+	else if (0 == strcmp(mode, "pused"))
+		ret = VM_MEMORY_PUSED(result);
+	else if (0 == strcmp(mode, "available"))
+		ret = VM_MEMORY_AVAILABLE(result);
+	else if (0 == strcmp(mode, "pavailable"))
+		ret = VM_MEMORY_PAVAILABLE(result);
+	else if (0 == strcmp(mode, "cached"))
+		ret = VM_MEMORY_CACHED(result);
+	else
+		ret = SYSINFO_RET_FAIL;
 #endif
-	return SYSINFO_RET_FAIL;
+	return ret;
 }

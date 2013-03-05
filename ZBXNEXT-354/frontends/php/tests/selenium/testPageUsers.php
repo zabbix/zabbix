@@ -17,8 +17,7 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
 require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
 class testPageUsers extends CWebTest {
@@ -31,17 +30,16 @@ class testPageUsers extends CWebTest {
 	* @dataProvider allUsers
 	*/
 	public function testPageUsers_CheckLayout($user) {
-		$this->login('users.php');
+		$this->zbxTestLogin('users.php');
 		$this->checkTitle('Configuration of users');
 
-		$this->dropdown_select_wait('filter_usrgrpid', 'All');
+		$this->zbxTestDropdownSelectWait('filter_usrgrpid', 'All');
 
-		$this->ok('CONFIGURATION OF USERS AND USER GROUPS');
-		$this->ok('Displaying');
-		$this->ok(array('Alias', 'Name', 'Surname', 'User type', 'Groups', 'Is online?', 'Login', 'Frontend access', 'Debug mode', 'Status'));
-		$this->ok(array($user['alias'], $user['name'], $user['surname']));
-		$this->dropdown_select('go', 'Unblock selected');
-		$this->dropdown_select('go', 'Delete selected');
+		$this->zbxTestTextPresent('CONFIGURATION OF USERS AND USER GROUPS');
+		$this->zbxTestTextPresent('Displaying');
+		$this->zbxTestTextPresent(array('Alias', 'Name', 'Surname', 'User type', 'Groups', 'Is online?', 'Login', 'Frontend access', 'Debug mode', 'Status'));
+		$this->zbxTestTextPresent(array($user['alias'], $user['name'], $user['surname']));
+		$this->zbxTestDropdownHasOptions('go', array('Unblock selected', 'Delete selected'));
 	}
 
 	public function testPageUsers_FilterByHostGroup() {
@@ -68,18 +66,16 @@ class testPageUsers extends CWebTest {
 		$sqlHashMedia = 'select * from media where userid='.$userid.' order by mediaid';
 		$oldHashMedia = DBhash($sqlHashMedia);
 
-		$this->login('users.php');
+		$this->zbxTestLogin('users.php');
 		$this->checkTitle('Configuration of users');
-		$this->dropdown_select_wait('filter_usrgrpid', 'All');
+		$this->zbxTestDropdownSelectWait('filter_usrgrpid', 'All');
 
-		$this->click('link='.$alias);
-		$this->wait();
-		$this->button_click('save');
-		$this->wait();
+		$this->zbxTestClickWait('link='.$alias);
+		$this->zbxTestClickWait('save');
 		$this->checkTitle('Configuration of users');
-		$this->ok('User updated');
-		$this->ok($alias);
-		$this->ok('CONFIGURATION OF USERS AND USER GROUPS');
+		$this->zbxTestTextPresent('User updated');
+		$this->zbxTestTextPresent($alias);
+		$this->zbxTestTextPresent('CONFIGURATION OF USERS AND USER GROUPS');
 
 		$this->assertEquals($oldHashUser, DBhash($sqlHashUser));
 		$this->assertEquals($oldHashGroup, DBhash($sqlHashGroup), 'Chuck Norris: User update changed data in table users_groups');
@@ -101,18 +97,17 @@ class testPageUsers extends CWebTest {
 		while ($user = DBfetch($result)) {
 			$id = $user['userid'];
 
-			$this->login('users.php');
+			$this->zbxTestLogin('users.php');
 			$this->checkTitle('Configuration of users');
-			$this->dropdown_select_wait('filter_usrgrpid', 'All');
+			$this->zbxTestDropdownSelectWait('filter_usrgrpid', 'All');
 
-			$this->checkbox_select("group_userid[$id]");
-			$this->dropdown_select('go', 'Delete selected');
-			$this->button_click('goButton');
-			$this->wait();
+			$this->zbxTestCheckboxSelect('group_userid['.$id.']');
+			$this->zbxTestDropdownSelect('go', 'Delete selected');
+			$this->zbxTestClickWait('goButton');
 
 			$this->getConfirmation();
 			$this->checkTitle('Configuration of users');
-			$this->ok('User deleted');
+			$this->zbxTestTextPresent('User deleted');
 
 			$sql = "select * from users where userid=$id";
 			$this->assertEquals(0, DBcount($sql), "Chuck Norris: user $id deleted but still exists in table users");
@@ -135,18 +130,17 @@ class testPageUsers extends CWebTest {
 		while ($user = DBfetch($result)) {
 			$id = $user['userid'];
 
-			$this->login('users.php');
+			$this->zbxTestLogin('users.php');
 			$this->checkTitle('Configuration of users');
-			$this->dropdown_select_wait('filter_usrgrpid', 'All');
+			$this->zbxTestDropdownSelectWait('filter_usrgrpid', 'All');
 
-			$this->checkbox_select("group_userid[$id]");
-			$this->dropdown_select('go', 'Delete selected');
-			$this->button_click('goButton');
-			$this->wait();
+			$this->zbxTestCheckboxSelect('group_userid['.$id.']');
+			$this->zbxTestDropdownSelect('go', 'Delete selected');
+			$this->zbxTestClickWait('goButton');
 
 			$this->getConfirmation();
 			$this->checkTitle('Configuration of users');
-			$this->ok('Cannot delete user');
+			$this->zbxTestTextPresent('Cannot delete user');
 
 			$sql = "select * from users where userid=$id";
 			$this->assertNotEquals(0, DBcount($sql));
@@ -170,4 +164,3 @@ class testPageUsers extends CWebTest {
 		$this->markTestIncomplete();
 	}
 }
-?>

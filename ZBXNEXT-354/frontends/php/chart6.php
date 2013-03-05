@@ -96,7 +96,7 @@ if ($height <= 0) {
 
 $graph->setWidth($width);
 $graph->setHeight($height);
-$graph->setHeader($host['host'].': '.$db_data['name']);
+$graph->setHeader($host['host'].NAME_DELIMITER.$db_data['name']);
 
 if ($db_data['show_3d']) {
 	$graph->switchPie3D();

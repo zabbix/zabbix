@@ -17,8 +17,7 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
 require_once dirname(__FILE__) . '/../include/class.cwebtest.php';
 
 class testFormAdministrationGeneralTriggerSeverities extends CWebTest {
@@ -33,11 +32,11 @@ class testFormAdministrationGeneralTriggerSeverities extends CWebTest {
 	*/
 	public function testFormAdministrationGeneralTriggerSeverities_CheckLayout($allValues) {
 
-		$this->login('adm.triggerseverities.php');
+		$this->zbxTestLogin('adm.triggerseverities.php');
 		$this->assertElementPresent('configDropDown');
-		$this->dropdown_select_wait('configDropDown', 'Trigger severities');
+		$this->zbxTestDropdownSelectWait('configDropDown', 'Trigger severities');
 		$this->checkTitle('Configuration of Zabbix');
-		$this->ok(array('CONFIGURATION OF ZABBIX', 'Trigger severities', 'Custom severity', 'Colour'));
+		$this->zbxTestTextPresent(array('CONFIGURATION OF ZABBIX', 'Trigger severities', 'Custom severity', 'Colour'));
 
 		$this->assertElementPresent('severity_name_0');
 		$this->assertElementPresent('severity_name_1');
@@ -91,11 +90,11 @@ class testFormAdministrationGeneralTriggerSeverities extends CWebTest {
 
 	public function testFormAdministrationGeneralTriggerSeverities_ChangeTriggerSeverities() {
 
-		$this->login('adm.triggerseverities.php');
-		$this->dropdown_select_wait('configDropDown', 'Trigger severities');
+		$this->zbxTestLogin('adm.triggerseverities.php');
+		$this->zbxTestDropdownSelectWait('configDropDown', 'Trigger severities');
 		$this->checkTitle('Configuration of Zabbix');
-		$this->ok(array('CONFIGURATION OF ZABBIX', 'Trigger severities', 'Custom severity', 'Colour'));
-		$this->ok('Custom severity names affect all locales and require manual translation!');
+		$this->zbxTestTextPresent(array('CONFIGURATION OF ZABBIX', 'Trigger severities', 'Custom severity', 'Colour'));
+		$this->zbxTestTextPresent('Custom severity names affect all locales and require manual translation!');
 
 		$this->input_type('severity_name_0', 'Not classified2');
 		$this->input_type('severity_name_1', 'Information2');
@@ -104,27 +103,26 @@ class testFormAdministrationGeneralTriggerSeverities extends CWebTest {
 		$this->input_type('severity_name_4', 'High2');
 		$this->input_type('severity_name_5', 'Disaster2');
 
-		$this->click('lbl_severity_color_5');
-		$this->click("//div[@id='' and @onclick='set_color(\"880000\");']");
+		$this->zbxTestClick('lbl_severity_color_5');
+		$this->zbxTestClick("//div[@id='' and @onclick='set_color(\"880000\");']");
 
-		$this->click('lbl_severity_color_4');
-		$this->click("//div[@id='' and @onclick='set_color(\"FF3333\");']");
+		$this->zbxTestClick('lbl_severity_color_4');
+		$this->zbxTestClick("//div[@id='' and @onclick='set_color(\"FF3333\");']");
 
-		$this->click('lbl_severity_color_3');
-		$this->click("//div[@id='' and @onclick='set_color(\"FF6666\");']");
+		$this->zbxTestClick('lbl_severity_color_3');
+		$this->zbxTestClick("//div[@id='' and @onclick='set_color(\"FF6666\");']");
 
-		$this->click('lbl_severity_color_2');
-		$this->click("//div[@id='' and @onclick='set_color(\"DDDD00\");']");
+		$this->zbxTestClick('lbl_severity_color_2');
+		$this->zbxTestClick("//div[@id='' and @onclick='set_color(\"DDDD00\");']");
 
-		$this->click('lbl_severity_color_1');
-		$this->click("//div[@id='' and @onclick='set_color(\"00CCCC\");']");
+		$this->zbxTestClick('lbl_severity_color_1');
+		$this->zbxTestClick("//div[@id='' and @onclick='set_color(\"00CCCC\");']");
 
-		$this->click('lbl_severity_color_0');
-		$this->click("//div[@id='' and @onclick='set_color(\"999999\");']");
+		$this->zbxTestClick('lbl_severity_color_0');
+		$this->zbxTestClick("//div[@id='' and @onclick='set_color(\"999999\");']");
 
-		$this->button_click('save');
-		$this->wait();
-		$this->ok('Configuration updated');
+		$this->zbxTestClickWait('save');
+		$this->zbxTestTextPresent('Configuration updated');
 
 		$sql = 'SELECT severity_name_0 FROM config WHERE severity_name_0='.zbx_dbstr('Not classified2');
 		$this->assertEquals(1, DBcount($sql), 'Chuck Norris: Incorrect severity name in the DB field "severity_name_0"');
@@ -167,10 +165,10 @@ class testFormAdministrationGeneralTriggerSeverities extends CWebTest {
 
 	public function testFormAdministrationGeneralTriggerSeverities_ResetDefaults() {
 
-		$this->login('adm.triggerseverities.php');
-		$this->dropdown_select_wait('configDropDown', 'Trigger severities');
+		$this->zbxTestLogin('adm.triggerseverities.php');
+		$this->zbxTestDropdownSelectWait('configDropDown', 'Trigger severities');
 		$this->checkTitle('Configuration of Zabbix');
-		$this->ok(
+		$this->zbxTestTextPresent(
 			array(
 				'CONFIGURATION OF ZABBIX',
 				'Trigger severities',
@@ -179,13 +177,12 @@ class testFormAdministrationGeneralTriggerSeverities extends CWebTest {
 				'Custom severity names affect all locales and require manual translation!'
 			)
 		);
-		$this->button_click('resetDefaults');
-		$this->click("//button[@type='button']");
-		$this->click('save');
-		$this->wait();
-		$this->ok('Configuration updated');
-		$this->ok('CONFIGURATION OF ZABBIX');
-		$this->ok('Trigger severities');
+		$this->zbxTestClick('resetDefaults');
+		$this->zbxTestClick("//button[@type='button']");
+		$this->zbxTestClickWait('save');
+		$this->zbxTestTextPresent('Configuration updated');
+		$this->zbxTestTextPresent('CONFIGURATION OF ZABBIX');
+		$this->zbxTestTextPresent('Trigger severities');
 
 		// checking that values were reset in the DB
 		$sql = 'SELECT severity_name_0 FROM config WHERE severity_name_0='.zbx_dbstr('Not classified');
@@ -229,4 +226,3 @@ class testFormAdministrationGeneralTriggerSeverities extends CWebTest {
 
 	}
 }
-?>

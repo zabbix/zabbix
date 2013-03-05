@@ -450,7 +450,7 @@ class CChart extends CGraphDraw {
 				}
 
 				$trigger = API::UserMacro()->resolveTrigger($trigger);
-				if (!preg_match('/^\{([0-9]+)\}\s*?([\<\>\=]{1})\s*?([0-9\.]+)([TGMKsmhdw]?)$/', $trigger['expression'], $arr)) {
+				if (!preg_match('/^\{([0-9]+)\}\s*?([\<\>\=]{1})\s*?([\-0-9\.]+)([TGMKsmhdw]?)$/', $trigger['expression'], $arr)) {
 					continue;
 				}
 
@@ -463,7 +463,7 @@ class CChart extends CGraphDraw {
 					'skipdraw' => ($val <= $minY || $val >= $maxY),
 					'y' => $this->sizeY - (($val - $minY) / ($maxY - $minY)) * $this->sizeY + $this->shiftY,
 					'color' => getSeverityColor($trigger['priority']),
-					'description' => _('Trigger').': '.CMacrosResolverHelper::resolveTriggerName($trigger),
+					'description' => _('Trigger').NAME_DELIMITER.CMacrosResolverHelper::resolveTriggerName($trigger),
 					'constant' => '['.$arr[2].' '.$arr[3].$arr[4].']'
 				);
 				++$cnt;
@@ -1771,7 +1771,7 @@ class CChart extends CGraphDraw {
 				$item_caption = $this->items[$i]['name'];
 			}
 			else {
-				$item_caption = $this->items[$i]['hostname'].': '.$this->items[$i]['name'];
+				$item_caption = $this->items[$i]['hostname'].NAME_DELIMITER.$this->items[$i]['name'];
 			}
 
 			if (isset($data) && isset($data['min'])) {

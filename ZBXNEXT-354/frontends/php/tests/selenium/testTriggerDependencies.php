@@ -17,8 +17,7 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
 require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
 class testTriggerDependenciesFromHost extends CWebTest {
@@ -28,24 +27,22 @@ class testTriggerDependenciesFromHost extends CWebTest {
 	*/
 	public function testTriggerDependenciesFromHost_SimpleTest($hostId, $expected) {
 
-		$this->login('triggers.php?groupid=1&hostid='.$hostId);
+		$this->zbxTestLogin('triggers.php?groupid=1&hostid='.$hostId);
 
-		$this->button_click("link=/etc/inetd.conf has been changed on server {HOST.NAME}");
-		$this->wait();
-		$this->button_click("id=tab_dependenciesTab");
-		$this->button_click("id=bnt1");
+		$this->zbxTestClickWait("link=/etc/inetd.conf has been changed on server {HOST.NAME}");
+		$this->zbxTestClick("id=tab_dependenciesTab");
+		$this->zbxTestClick("id=bnt1");
 		$this->waitForPopUp("zbx_popup", "30000");
 		$this->selectWindow("name=zbx_popup");
 		$this->select("id=hostid", "label=Template_Linux");
 		$this->wait();
-		$this->button_click("triggers_'10015'");
-		$this->button_click("select");
+		$this->zbxTestClick("triggers_'10015'");
+		$this->zbxTestClick("select");
 		$this->selectWindow("Configuration of triggers");
 		$this->wait();
-		$this->ok('Template_Linux: /boot/vmlinuz has been changed on server {HOST.NAME}');
-		$this->button_click("save");
-		$this->wait();
-		$this->ok($expected);
+		$this->zbxTestTextPresent('Template_Linux: /boot/vmlinuz has been changed on server {HOST.NAME}');
+		$this->zbxTestClickWait("save");
+		$this->zbxTestTextPresent($expected);
 
 
 	}
@@ -57,4 +54,3 @@ class testTriggerDependenciesFromHost extends CWebTest {
 		);
 	}
 }
-?>

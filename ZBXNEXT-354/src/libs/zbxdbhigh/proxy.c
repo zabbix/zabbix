@@ -105,7 +105,7 @@ int	get_proxy_id(struct zbx_json_parse *jp, zbx_uint64_t *hostid, char *host, ch
 				"select hostid"
 				" from hosts"
 				" where host='%s'"
-					" and status in (%d)"
+					" and status=%d"
 					ZBX_SQL_NODE,
 				host_esc, HOST_STATUS_PROXY_ACTIVE, DBand_node_local("hostid"));
 
@@ -886,7 +886,8 @@ int	get_host_availability_data(struct zbx_json *j)
 	result = DBselect(
 			"select hostid,available,error,snmp_available,snmp_error,"
 				"ipmi_available,ipmi_error,jmx_available,jmx_error"
-			" from hosts");
+			" from hosts"
+			" where status=%d", HOST_STATUS_MONITORED);
 
 	while (NULL != (row = DBfetch(result)))
 	{

@@ -17,26 +17,24 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
 require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
 class testPageStatusOfTriggers extends CWebTest {
 	public function testPageStatusOfTriggers_CheckLayout() {
-		$this->login('tr_status.php');
+		$this->zbxTestLogin('tr_status.php');
 		$this->checkTitle('Status of triggers \[refreshed every 30 sec\]');
-		$this->ok('STATUS OF TRIGGERS');
-		$this->ok('Triggers');
-		$this->ok('Displaying');
-		$this->ok(array('Group', 'Host'));
-		$this->ok(array('Severity', 'Status', 'Info', 'Last change', 'Age', 'Acknowledged', 'Host', 'Name', 'Comments'));
+		$this->zbxTestTextPresent('STATUS OF TRIGGERS');
+		$this->zbxTestTextPresent('Triggers');
+		$this->zbxTestTextPresent('Displaying');
+		$this->zbxTestTextPresent(array('Group', 'Host'));
+		$this->zbxTestTextPresent(array('Severity', 'Status', 'Info', 'Last change', 'Age', 'Acknowledged', 'Host', 'Name', 'Comments'));
 	}
 
 // Check that no real host or template names displayed
 	public function testPageStatusOfTriggers_NoHostNames() {
-		$this->login('tr_status.php');
+		$this->zbxTestLogin('tr_status.php');
 		$this->checkTitle('Status of triggers \[refreshed every 30 sec\]');
 		$this->checkNoRealHostnames();
 	}
 }
-?>

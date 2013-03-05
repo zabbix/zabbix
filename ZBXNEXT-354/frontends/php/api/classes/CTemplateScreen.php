@@ -47,7 +47,7 @@ class CTemplateScreen extends CScreen {
 		$userid = self::$userData['userid'];
 
 		$sqlParts = array(
-			'select'	=> array('screens' => 's.screenid, s.templateid'),
+			'select'	=> array('screens' => 's.screenid,s.templateid'),
 			'from'		=> array('screens' => 'screens s'),
 			'where'		=> array('template' => 's.templateid IS NOT NULL'),
 			'order'		=> array(),

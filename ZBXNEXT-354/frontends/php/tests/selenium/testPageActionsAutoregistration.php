@@ -17,8 +17,7 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
 require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
 class testPageActionsAutoregistration extends CWebTest {
@@ -33,21 +32,19 @@ class testPageActionsAutoregistration extends CWebTest {
 	public function testPageActionsAutoregistration_CheckLayout($action) {
 		$name = $action['name'];
 
-		$this->login('actionconf.php?eventsource='.EVENT_SOURCE_AUTO_REGISTRATION);
+		$this->zbxTestLogin('actionconf.php?eventsource='.EVENT_SOURCE_AUTO_REGISTRATION);
 		$this->checkTitle('Configuration of actions');
 
 // eventsource is used for a hidden field, so it does not work. See above: ?eventsource=0 is used instead
-//		$this->dropdown_select('eventsource', 'Auto registration');
+//		$this->zbxTestDropdownSelect('eventsource', 'Auto registration');
 
-		$this->ok('Event source');
-		$this->ok('Displaying');
+		$this->zbxTestTextPresent('Event source');
+		$this->zbxTestTextPresent('Displaying');
 		// Header
-		$this->ok(array('Name', 'Conditions', 'Operations', 'Status'));
+		$this->zbxTestTextPresent(array('Name', 'Conditions', 'Operations', 'Status'));
 		// Data
-		$this->ok(array($action['name']));
-		$this->dropdown_select('go', 'Enable selected');
-		$this->dropdown_select('go', 'Disable selected');
-		$this->dropdown_select('go', 'Delete selected');
+		$this->zbxTestTextPresent(array($action['name']));
+		$this->zbxTestDropdownHasOptions('go', array('Enable selected', 'Disable selected', 'Delete selected'));
 	}
 
 	/**
@@ -64,15 +61,13 @@ class testPageActionsAutoregistration extends CWebTest {
 		$sqlConditions = "select * from conditions where actionid=$actionid order by conditionid";
 		$oldHashConditions = DBhash($sqlConditions);
 
-		$this->login('actionconf.php?eventsource='.EVENT_SOURCE_AUTO_REGISTRATION);
+		$this->zbxTestLogin('actionconf.php?eventsource='.EVENT_SOURCE_AUTO_REGISTRATION);
 		$this->checkTitle('Configuration of actions');
-		$this->click("link=$name");
-		$this->wait();
-		$this->button_click('save');
-		$this->wait();
+		$this->zbxTestClickWait('link='.$name);
+		$this->zbxTestClickWait('save');
 		$this->checkTitle('Configuration of actions');
-		$this->ok('Action updated');
-		$this->ok("$name");
+		$this->zbxTestTextPresent('Action updated');
+		$this->zbxTestTextPresent("$name");
 
 		$this->assertEquals($oldHashAction, DBhash($sqlAction), "Chuck Norris: Action update changed data in table 'actions'.");
 		$this->assertEquals($oldHashOperations, DBhash($sqlOperations), "Chuck Norris: Action update changed data in table 'operations'");
@@ -86,7 +81,7 @@ class testPageActionsAutoregistration extends CWebTest {
 		$actionid = $action['actionid'];
 		$name = $action['name'];
 
-		$this->login('actionconf.php?eventsource='.EVENT_SOURCE_AUTO_REGISTRATION);
+		$this->zbxTestLogin('actionconf.php?eventsource='.EVENT_SOURCE_AUTO_REGISTRATION);
 		$this->checkTitle('Configuration of actions');
 		switch ($action['status']) {
 			case ACTION_STATUS_ENABLED:
@@ -99,7 +94,7 @@ class testPageActionsAutoregistration extends CWebTest {
 		$this->wait();
 
 		$this->checkTitle('Configuration of actions');
-		$this->ok('Status updated');
+		$this->zbxTestTextPresent('Status updated');
 
 		switch ($action['status']) {
 			case ACTION_STATUS_ENABLED:
@@ -131,18 +126,17 @@ class testPageActionsAutoregistration extends CWebTest {
 
 		$this->chooseOkOnNextConfirmation();
 
-		$this->login('actionconf.php?eventsource='.EVENT_SOURCE_AUTO_REGISTRATION);
+		$this->zbxTestLogin('actionconf.php?eventsource='.EVENT_SOURCE_AUTO_REGISTRATION);
 		$this->checkTitle('Configuration of actions');
-		$this->checkbox_select("g_actionid[$actionid]");
-		$this->dropdown_select('go', 'Disable selected');
-		$this->button_click('goButton');
-		$this->wait();
+		$this->zbxTestCheckboxSelect('g_actionid['.$actionid.']');
+		$this->zbxTestDropdownSelect('go', 'Disable selected');
+		$this->zbxTestClickWait('goButton');
 
 		$this->getConfirmation();
 
 		$this->checkTitle('Configuration of actions');
-		$this->ok('Status updated');
-		$this->ok('Disabled');
+		$this->zbxTestTextPresent('Status updated');
+		$this->zbxTestTextPresent('Disabled');
 
 		$sql = "select * from actions where actionid=$actionid and status=1";
 		$this->assertEquals(1, DBcount($sql));
@@ -162,18 +156,17 @@ class testPageActionsAutoregistration extends CWebTest {
 
 		$this->chooseOkOnNextConfirmation();
 
-		$this->login('actionconf.php?eventsource='.EVENT_SOURCE_AUTO_REGISTRATION);
+		$this->zbxTestLogin('actionconf.php?eventsource='.EVENT_SOURCE_AUTO_REGISTRATION);
 		$this->checkTitle('Configuration of actions');
-		$this->checkbox_select("g_actionid[$actionid]");
-		$this->dropdown_select('go', 'Enable selected');
-		$this->button_click('goButton');
-		$this->wait();
+		$this->zbxTestCheckboxSelect('g_actionid['.$actionid.']');
+		$this->zbxTestDropdownSelect('go', 'Enable selected');
+		$this->zbxTestClickWait('goButton');
 
 		$this->getConfirmation();
 
 		$this->checkTitle('Configuration of actions');
-		$this->ok('Status updated');
-		$this->ok('Enabled');
+		$this->zbxTestTextPresent('Status updated');
+		$this->zbxTestTextPresent('Enabled');
 
 		$sql = "select * from actions where actionid=$actionid and status=0";
 		$this->assertEquals(1, DBcount($sql));
@@ -195,17 +188,16 @@ class testPageActionsAutoregistration extends CWebTest {
 
 		DBsave_tables('actions');
 
-		$this->login('actionconf.php?eventsource='.EVENT_SOURCE_AUTO_REGISTRATION);
+		$this->zbxTestLogin('actionconf.php?eventsource='.EVENT_SOURCE_AUTO_REGISTRATION);
 		$this->checkTitle('Configuration of actions');
-		$this->checkbox_select("g_actionid[$actionid]");
-		$this->dropdown_select('go', 'Delete selected');
-		$this->button_click('goButton');
-		$this->wait();
+		$this->zbxTestCheckboxSelect('g_actionid['.$actionid.']');
+		$this->zbxTestDropdownSelect('go', 'Delete selected');
+		$this->zbxTestClickWait('goButton');
 
 		$this->getConfirmation();
 
 		$this->checkTitle('Configuration of actions');
-		$this->ok('Selected actions deleted');
+		$this->zbxTestTextPresent('Selected actions deleted');
 
 		$sql = "select * from actions where actionid=$actionid";
 		$this->assertEquals(0, DBcount($sql));
@@ -222,4 +214,3 @@ class testPageActionsAutoregistration extends CWebTest {
 		$this->markTestIncomplete();
 	}
 }
-?>

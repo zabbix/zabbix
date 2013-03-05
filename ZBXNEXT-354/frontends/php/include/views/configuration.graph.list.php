@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2011 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -10,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -19,7 +19,6 @@
 **/
 
 
-$pageFilter = $this->data['pageFilter'];
 $graphWidget = new CWidget();
 
 // create new graph button
@@ -51,8 +50,8 @@ else {
 	$graphWidget->addPageHeader(_('CONFIGURATION OF GRAPHS'), $createForm);
 
 	$filterForm = new CForm('get');
-	$filterForm->addItem(array(_('Group').SPACE, $pageFilter->getGroupsCB()));
-	$filterForm->addItem(array(SPACE._('Host').SPACE, $pageFilter->getHostsCB()));
+	$filterForm->addItem(array(_('Group').SPACE, $this->data['pageFilter']->getGroupsCB()));
+	$filterForm->addItem(array(SPACE._('Host').SPACE, $this->data['pageFilter']->getHostsCB()));
 
 	$graphWidget->addHeader(_('Graphs'), $filterForm);
 
@@ -103,21 +102,21 @@ foreach ($this->data['graphs'] as $graph) {
 		$realHosts = get_realhosts_by_graphid($graph['templateid']);
 		$realHosts = DBfetch($realHosts);
 		$name[] = new CLink($realHosts['name'], 'graphs.php?hostid='.$realHosts['hostid'], 'unknown');
-		$name[] = ':'.SPACE;
+		$name[] = NAME_DELIMITER;
 		$name[] = new CLink($graph['name'],
-			'graphs.php?form=update&graphid='.$graphid.url_param('parent_discoveryid').'&hostid='.$pageFilter->hostid);
+			'graphs.php?form=update&graphid='.$graphid.url_param('parent_discoveryid').'&hostid='.$this->data['hostid']);
 
 		$isCheckboxEnabled = false;
 	}
 	elseif (!empty($graph['discoveryRule']) && empty($this->data['parent_discoveryid'])) {
 		$name[] = new CLink($graph['discoveryRule']['name'], 'host_discovery.php?form=update&itemid='.$graph['discoveryRule']['itemid'], 'gold');
-		$name[] = ':'.SPACE;
+		$name[] = NAME_DELIMITER;
 		$name[] = new CSpan($graph['name']);
 
 		$isCheckboxEnabled = false;
 	}
 	else {
-		$name[] = new CLink($graph['name'], 'graphs.php?form=update&graphid='.$graphid.url_param('parent_discoveryid').'&hostid='.$pageFilter->hostid);
+		$name[] = new CLink($graph['name'], 'graphs.php?form=update&graphid='.$graphid.url_param('parent_discoveryid').'&hostid='.$this->data['hostid']);
 	}
 
 	$checkBox = new CCheckBox('group_graphid['.$graphid.']', null, null, $graphid);
