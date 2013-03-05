@@ -180,7 +180,7 @@ class CTriggerFunctionValidator extends CValidator {
 		$argsIgnored = array(array('type' => 'str'));
 
 		$this->allowed = array(
-			'and' => array(
+			'band' => array(
 				'args' => array(
 					array('type' => 'sec', 'mandat' => true),	// mask. Type 'sec' is not quite right.
 					array('type' => 'sec_num', 'mandat' => true),

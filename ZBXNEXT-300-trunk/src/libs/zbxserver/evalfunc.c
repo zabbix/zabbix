@@ -1835,7 +1835,7 @@ clean:
 
 /******************************************************************************
  *                                                                            *
- * Function: evaluate_AND                                                     *
+ * Function: evaluate_BAND                                                    *
  *                                                                            *
  * Purpose: evaluate logical bitwise function 'and' for the item              *
  *                                                                            *
@@ -1850,9 +1850,9 @@ clean:
  *               FAIL - failed to evaluate function                           *
  *                                                                            *
  ******************************************************************************/
-static int	evaluate_AND(char *value, DB_ITEM *item, const char *function, const char *parameters, time_t now)
+static int	evaluate_BAND(char *value, DB_ITEM *item, const char *function, const char *parameters, time_t now)
 {
-	const char	*__function_name = "evaluate_AND";
+	const char	*__function_name = "evaluate_BAND";
 	char		*last_parameters = NULL;
 	int		mask, mask_flag, nth_val, nth_val_flag, time_shift, time_shift_flag, nparams, res = FAIL;
 	zbx_uint64_t	last_uint64;
@@ -2027,9 +2027,9 @@ int	evaluate_function(char *value, DB_ITEM *item, const char *function, const ch
 	{
 		ret = evaluate_LOGSOURCE(value, item, function, parameter, now);
 	}
-	else if (0 == strcmp(function, "and"))
+	else if (0 == strcmp(function, "band"))
 	{
-		ret = evaluate_AND(value, item, function, parameter, now);
+		ret = evaluate_BAND(value, item, function, parameter, now);
 	}
 	else
 	{
