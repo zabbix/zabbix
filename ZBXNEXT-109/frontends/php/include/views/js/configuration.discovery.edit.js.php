@@ -517,11 +517,6 @@
 			}
 		}
 
-		// trim leading zeros from port
-		if (typeof(dCheck.ports) != 'undefined') {
-			dCheck.ports = dCheck.ports.replace(/^[0]+/g, '');
-		}
-
 		// validate
 		var validationErrors = [],
 			ajaxChecks = {
