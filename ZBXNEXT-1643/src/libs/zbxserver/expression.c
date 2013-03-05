@@ -713,6 +713,150 @@ static int	DBget_host_name_by_hostid(zbx_uint64_t hostid, char **replace_to)
 
 /******************************************************************************
  *                                                                            *
+ * Function: DBget_templateid_by_triggerid                                    *
+ *                                                                            *
+ * Purpose: returns a template trigger ID from which the trigger is inherited *
+ *                                                                            *
+ * Return value: upon successful completion return SUCCEED                    *
+ *               otherwise FAIL                                               *
+ *                                                                            *
+ ******************************************************************************/
+static int	DBget_templateid_by_triggerid(zbx_uint64_t triggerid, zbx_uint64_t *templateid)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+	int		ret = FAIL;
+
+	result = DBselect(
+			"select templateid"
+			" from triggers"
+			" where triggerid=" ZBX_FS_UI64,
+			triggerid);
+
+	if (NULL != (row = DBfetch(result)))
+	{
+		ZBX_DBROW2UINT64(*templateid, row[0]);
+		ret = SUCCEED;
+	}
+	DBfree_result(result);
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DBget_trigger_template_name                                      *
+ *                                                                            *
+ * Purpose: returns comma-space separated trigger template names in which     *
+ *          the trigger is  defined                                           *
+ *                                                                            *
+ * Return value: upon successful completion return SUCCEED                    *
+ *               otherwise FAIL                                               *
+ *                                                                            *
+ * Comments: based on the patch submitted by Hmami Mohamed                    *
+ *                                                                            *
+ ******************************************************************************/
+static int	DBget_trigger_template_name(zbx_uint64_t triggerid, char **replace_to)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+	int		ret;
+	zbx_uint64_t	templateid;
+	size_t		replace_to_alloc = 64, replace_to_offset = 0;
+
+	/* use parent trigger ID for lld generated triggers */
+	result = DBselect(
+			"select parent_triggerid"
+			" from trigger_discovery"
+			" where triggerid=" ZBX_FS_UI64,
+			triggerid);
+
+	if (NULL != (row = DBfetch(result)))
+		ZBX_STR2UINT64(triggerid, row[0]);
+	DBfree_result(result);
+
+	/* no such trigger or trigger defined on host */
+	if (SUCCEED != DBget_templateid_by_triggerid(triggerid, &templateid) || 0 == templateid)
+		return FAIL;
+
+	do
+	{
+		triggerid = templateid;
+	}
+	while (SUCCEED == (ret = DBget_templateid_by_triggerid(triggerid, &templateid)) && 0 != templateid);
+
+	/* no such trigger */
+	if (SUCCEED != ret)
+		return FAIL;
+
+	*replace_to = zbx_realloc(*replace_to, replace_to_alloc);
+	**replace_to = '\0';
+
+	result = DBselect(
+			"select distinct h.name"
+			" from hosts h,items i,functions f"
+			" where h.hostid=i.hostid"
+				" and i.itemid=f.itemid"
+				" and f.triggerid=" ZBX_FS_UI64
+			" order by h.name",
+			triggerid);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		if (0 != replace_to_offset)
+			zbx_strcpy_alloc(replace_to, &replace_to_alloc, &replace_to_offset, ", ");
+		zbx_strcpy_alloc(replace_to, &replace_to_alloc, &replace_to_offset, row[0]);
+	}
+	DBfree_result(result);
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DBget_trigger_hostgroup_name                                     *
+ *                                                                            *
+ * Purpose: returns comma-space separated host group names in which           *
+ *          the trigger is defined                                            *
+ *                                                                            *
+ * Return value: upon successful completion return SUCCEED                    *
+ *               otherwise FAIL                                               *
+ *                                                                            *
+ ******************************************************************************/
+static int	DBget_trigger_hostgroup_name(zbx_uint64_t triggerid, char **replace_to)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+	int		ret = FAIL;
+	size_t		replace_to_alloc = 64, replace_to_offset = 0;
+
+	*replace_to = zbx_realloc(*replace_to, replace_to_alloc);
+	**replace_to = '\0';
+
+	result = DBselect(
+			"select distinct g.name"
+			" from groups g,hosts_groups hg,items i,functions f"
+			" where g.groupid=hg.groupid"
+				" and hg.hostid=i.hostid"
+				" and i.itemid=f.itemid"
+				" and f.triggerid=" ZBX_FS_UI64
+			" order by g.name",
+			triggerid);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		if (0 != replace_to_offset)
+			zbx_strcpy_alloc(replace_to, &replace_to_alloc, &replace_to_offset, ", ");
+		zbx_strcpy_alloc(replace_to, &replace_to_alloc, &replace_to_offset, row[0]);
+		ret = SUCCEED;
+	}
+	DBfree_result(result);
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: DBget_interface_value                                            *
  *                                                                            *
  * Purpose: request interface value by hostid                                 *
@@ -1749,6 +1893,8 @@ static int	get_autoreg_value_by_event(DB_EVENT *event, char **replace_to, const 
 #define MVAR_TRIGGER_SEVERITY		"{TRIGGER.SEVERITY}"
 #define MVAR_TRIGGER_NSEVERITY		"{TRIGGER.NSEVERITY}"
 #define MVAR_TRIGGER_STATUS		"{TRIGGER.STATUS}"
+#define MVAR_TRIGGER_TEMPLATE_NAME	"{TRIGGER.TEMPLATE.NAME}"
+#define MVAR_TRIGGER_HOSTGROUP_NAME	"{TRIGGER.HOSTGROUP.NAME}"
 #define MVAR_STATUS			"{STATUS}"			/* deprecated */
 #define MVAR_TRIGGER_VALUE		"{TRIGGER.VALUE}"
 #define MVAR_TRIGGER_URL		"{TRIGGER.URL}"
@@ -2338,6 +2484,10 @@ int	substitute_simple_macros(DB_EVENT *event, zbx_uint64_t *hostid, DC_HOST *dc_
 					ret = DBget_trigger_event_count(event->objectid, &replace_to, 1, 1);
 				else if (0 == strcmp(m, MVAR_TRIGGER_EVENTS_PROBLEM_UNACK))
 					ret = DBget_trigger_event_count(event->objectid, &replace_to, 1, 0);
+				else if (0 == strcmp(m, MVAR_TRIGGER_TEMPLATE_NAME))
+					ret = DBget_trigger_template_name(event->objectid, &replace_to);
+				else if (0 == strcmp(m, MVAR_TRIGGER_HOSTGROUP_NAME))
+					ret = DBget_trigger_hostgroup_name(event->objectid, &replace_to);
 				else if (0 == strcmp(m, MVAR_EVENT_ID))
 					replace_to = zbx_dsprintf(replace_to, ZBX_FS_UI64, event->eventid);
 				else if (0 == strcmp(m, MVAR_EVENT_DATE))
