@@ -29,6 +29,27 @@ define('GRAPH_BAD', 1);
 class testInheritanceGraph extends CWebTest {
 
 	/**
+	 * The name of the test template created in the test data set.
+	 *
+	 * @var string
+	 */
+	protected $template = 'Inheritance test template';
+
+	/**
+	 * The name of the test host created in the test data set.
+	 *
+	 * @var string
+	 */
+	protected $host = 'Template inheritance test host';
+
+	/**
+	 * The name of the test item created in the test data set.
+	 *
+	 * @var string
+	 */
+	protected $itemName = 'itemInheritance';
+
+	/**
 	 * Backup the tables that will be modified during the tests.
 	 */
 	public function testInheritanceGraph_setup() {
@@ -36,7 +57,12 @@ class testInheritanceGraph extends CWebTest {
 	}
 
 	public static function simple() {
-		return array(
+		return array(	// TODO change the variables to protected ones at the start of the program
+						// TODO copy from testFormGraph.php all the variations
+						// TODO add all the variations, Normal, Stacked, Pie, Exploded
+						// TODO add the Item/Calculated/Fixed all variations for Normal and Stacked Trigger type
+						// TODO add the error messages with GRAPH_BAD, when adding graph with empty item yaxismin/yaxis max
+						// TODO add the when empty the items section -no item is selected for graph in general
 			array(
 				array('expected' => GRAPH_GOOD,
 					'graphName' => 'graphSimple',
@@ -88,19 +114,15 @@ class testInheritanceGraph extends CWebTest {
 	public function testInheritanceGraph_simpleCreate($data) {
 		$this->zbxTestLogin('templates.php');
 
-		$template = 'Inheritance test template';
-		$host = 'Template inheritance test host';
-
-		$itemName = 'itemInheritance';
 		$graphName = $data['graphName'];
 
-		$this->zbxTestClickWait("link=$template");
+		$this->zbxTestClickWait('link='.$this->template);
 		$this->zbxTestClickWait("//div[@class='w']//a[text()='Graphs']");
 		$this->zbxTestClickWait('form');
 
 		$this->input_type('name', $graphName);
 		$this->zbxTestLaunchPopup('add_item');
-		$this->zbxTestClick("link=$itemName");
+		$this->zbxTestClick('link='.$this->itemName);
 		$this->selectWindow(null);
 		sleep(1);
 
@@ -127,7 +149,7 @@ class testInheritanceGraph extends CWebTest {
 			$this->zbxTestClickWait("link=$host");
 			$this->zbxTestClickWait("//div[@class='w']//a[text()='Graphs']");
 
-			$this->zbxTestTextPresent("$template: $graphName");
+			$this->zbxTestTextPresent($this->template.': '.$graphName);
 			$this->zbxTestClickWait("link=$graphName");
 
 			$this->assertElementValue('name', $graphName);

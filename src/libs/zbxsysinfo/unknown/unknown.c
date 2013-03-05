@@ -21,7 +21,7 @@
 #include "sysinfo.h"
 
 ZBX_METRIC	parameters_specific[] =
-/* 	KEY			FLAG		FUNCTION 	ADD_PARAM	TEST_PARAM */
+/* 	KEY			FLAG		FUNCTION 	TEST PARAMETERS */
 {
-	{0}
+	{NULL}
 };

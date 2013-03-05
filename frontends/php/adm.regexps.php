@@ -133,7 +133,7 @@ elseif (isset($_REQUEST['save'])) {
 
 	if ($result) {
 		add_audit(!isset($_REQUEST['regexpid']) ? AUDIT_ACTION_ADD : AUDIT_ACTION_UPDATE,
-			AUDIT_RESOURCE_REGEXP, _('Name').': '.$_REQUEST['name']);
+			AUDIT_RESOURCE_REGEXP, _('Name').NAME_DELIMITER.$_REQUEST['name']);
 
 		unset($_REQUEST['form']);
 	}

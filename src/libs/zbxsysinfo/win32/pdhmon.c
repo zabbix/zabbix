@@ -23,14 +23,23 @@
 #include "perfstat.h"
 #include "log.h"
 
-int	USER_PERF_COUNTER(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+int	USER_PERF_COUNTER(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	const char		*__function_name = "USER_PERF_COUNTER";
 	PERF_COUNTER_DATA	*perfs = NULL;
 	int			ret = SYSINFO_RET_FAIL;
 	double			value;
+	char			*counter;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	if (1 != request->nparam)
+		return SYSINFO_RET_FAIL;
+
+	counter = get_rparam(request, 0);
+
+	if (NULL == counter || '\0' == *counter)
+		return SYSINFO_RET_FAIL;
 
 	if (SUCCEED != perf_collector_started())
 	{
@@ -40,7 +49,7 @@ int	USER_PERF_COUNTER(const char *cmd, const char *param, unsigned flags, AGENT_
 
 	for (perfs = ppsd.pPerfCounterList; NULL != perfs; perfs = perfs->next)
 	{
-		if (NULL != perfs->name && 0 == strcmp(perfs->name, param))
+		if (NULL != perfs->name && 0 == strcmp(perfs->name, counter))
 		{
 			if (PERF_COUNTER_ACTIVE == perfs->status)
 			{
@@ -67,23 +76,27 @@ int	USER_PERF_COUNTER(const char *cmd, const char *param, unsigned flags, AGENT_
 	return ret;
 }
 
-int	PERF_COUNTER(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+int	PERF_COUNTER(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	const char		*__function_name = "PERF_COUNTER";
-	char			counterpath[PDH_MAX_COUNTER_PATH], tmp[MAX_STRING_LEN];
+	char			*counterpath, *tmp;
 	int			ret = SYSINFO_RET_FAIL, interval;
 	double			value;
 	PERF_COUNTER_DATA	*perfs = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	if (2 < num_param(param))
+	if (2 < request->nparam)
 		goto clean;
 
-	if (0 != get_param(param, 1, counterpath, sizeof(counterpath)) || '\0' == *counterpath)
+	counterpath = get_rparam(request, 0);
+
+	if (NULL == counterpath || '\0' == *counterpath)
 		goto clean;
 
-	if (0 != get_param(param, 2, tmp, sizeof(tmp)) || '\0' == *tmp)
+	tmp = get_rparam(request, 1);
+
+	if (NULL == tmp || '\0' == *tmp)
 		interval = 1;
 	else if (FAIL == is_uint(tmp))
 		goto clean;
