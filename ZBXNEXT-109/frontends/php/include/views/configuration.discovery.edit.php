@@ -73,7 +73,7 @@ $discoveryFormList->addRow(_('Device uniqueness criteria'),
 $discoveryFormList->addRow(_('Enabled'),
 	new CCheckBox(
 		'status',
-		($this->data['drule']['status'] === DRULE_STATUS_ACTIVE),
+		($this->data['drule']['status'] == DRULE_STATUS_ACTIVE),
 		null,
 		1
 	));
