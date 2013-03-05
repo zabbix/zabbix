@@ -500,9 +500,15 @@ static const char	*__zbx_json_rbracket(const char *p)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-int	zbx_json_open(char *buffer, struct zbx_json_parse *jp)
+int	zbx_json_open(const char *buffer, struct zbx_json_parse *jp)
 {
 	char *error = NULL;
+
+	STRIP_WHITESPACE(buffer);
+
+	/* return immediate failure without logging when opening empty string */
+	if ('\0' == *buffer)
+		return FAIL;
 
 	jp->start = buffer;
 	jp->end = NULL;
@@ -544,7 +550,7 @@ int	zbx_json_open(char *buffer, struct zbx_json_parse *jp)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-const char	*zbx_json_next(struct zbx_json_parse *jp, const char *p)
+const char	*zbx_json_next(const struct zbx_json_parse *jp, const char *p)
 {
 	int	level = 0;
 	int	state = 0; /* 0 - outside string; 1 - inside string */
@@ -820,7 +826,7 @@ static const char	*zbx_json_decodevalue_dyn(const char *p, char **string, size_t
 	}
 }
 
-const char	*zbx_json_pair_next(struct zbx_json_parse *jp, const char *p, char *name, size_t len)
+const char	*zbx_json_pair_next(const struct zbx_json_parse *jp, const char *p, char *name, size_t len)
 {
 	if (NULL == (p = zbx_json_next(jp, p)))
 		return NULL;
@@ -858,7 +864,7 @@ const char	*zbx_json_pair_next(struct zbx_json_parse *jp, const char *p, char *n
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-const char	*zbx_json_pair_by_name(struct zbx_json_parse *jp, const char *name)
+const char	*zbx_json_pair_by_name(const struct zbx_json_parse *jp, const char *name)
 {
 	char		buffer[MAX_STRING_LEN];
 	const char	*p = NULL;
@@ -887,7 +893,7 @@ const char	*zbx_json_pair_by_name(struct zbx_json_parse *jp, const char *name)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-const char	*zbx_json_next_value(struct zbx_json_parse *jp, const char *p, char *string, size_t len, int *is_null)
+const char	*zbx_json_next_value(const struct zbx_json_parse *jp, const char *p, char *string, size_t len, int *is_null)
 {
 	if (NULL == (p = zbx_json_next(jp, p)))
 		return NULL;
@@ -910,7 +916,7 @@ const char	*zbx_json_next_value(struct zbx_json_parse *jp, const char *p, char *
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-int	zbx_json_value_by_name(struct zbx_json_parse *jp, const char *name, char *string, size_t len)
+int	zbx_json_value_by_name(const struct zbx_json_parse *jp, const char *name, char *string, size_t len)
 {
 	const char	*p;
 
@@ -938,7 +944,7 @@ int	zbx_json_value_by_name(struct zbx_json_parse *jp, const char *name, char *st
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-int	zbx_json_value_by_name_dyn(struct zbx_json_parse *jp, const char *name, char **string, size_t *string_alloc)
+int	zbx_json_value_by_name_dyn(const struct zbx_json_parse *jp, const char *name, char **string, size_t *string_alloc)
 {
 	const char	*p;
 
@@ -967,13 +973,15 @@ int	zbx_json_value_by_name_dyn(struct zbx_json_parse *jp, const char *name, char
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-int	zbx_json_brackets_open(const char *p, struct zbx_json_parse *jp)
+int	zbx_json_brackets_open(const const char *p, struct zbx_json_parse *jp)
 {
 	if (NULL == (jp->end = __zbx_json_rbracket(p)))
 	{
 		zbx_set_json_strerror("Can't open JSON object or array \"%.64s\"", p);
 		return FAIL;
 	}
+
+	STRIP_WHITESPACE(p);
 
 	jp->start = p;
 
@@ -996,7 +1004,7 @@ int	zbx_json_brackets_open(const char *p, struct zbx_json_parse *jp)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-int	zbx_json_brackets_by_name(struct zbx_json_parse *jp, const char *name, struct zbx_json_parse *out)
+int	zbx_json_brackets_by_name(const struct zbx_json_parse *jp, const char *name, struct zbx_json_parse *out)
 {
 	const char	*p;
 
@@ -1025,7 +1033,7 @@ int	zbx_json_brackets_by_name(struct zbx_json_parse *jp, const char *name, struc
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-int	zbx_json_object_is_empty(struct zbx_json_parse *jp)
+int	zbx_json_object_is_empty(const struct zbx_json_parse *jp)
 {
 	return jp->end - jp->start > 1 ? FAIL : SUCCEED;
 }
@@ -1045,7 +1053,7 @@ int	zbx_json_object_is_empty(struct zbx_json_parse *jp)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-int	zbx_json_count(struct zbx_json_parse *jp)
+int	zbx_json_count(const struct zbx_json_parse *jp)
 {
 	int		num = 0;
 	const char	*p = NULL;
