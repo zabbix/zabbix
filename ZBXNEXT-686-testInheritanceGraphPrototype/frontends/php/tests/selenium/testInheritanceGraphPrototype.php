@@ -84,6 +84,20 @@ class testInheritanceGraphPrototype extends CWebTest {
 	 */
 	protected $itemKey = 'item-discovery-prototype';
 
+	/**
+	 * The value of the yaxismin field to be created in the test data set.
+	 *
+	 * @var int
+	 */
+	protected $yaxismin = 100;
+
+	/**
+	 * The value of the yaxismax field to be created in the test data set.
+	 *
+	 * @var int
+	 */
+	protected $yaxismax = 500;
+
 
 	/**
 	 * Backup the tables that will be modified during the tests.
@@ -104,6 +118,30 @@ class testInheritanceGraphPrototype extends CWebTest {
 			array(
 				array(
 					'graphtype' => 'Normal',
+				)
+			),
+			array(
+				array(
+					'graphtype' => 'Normal',
+					'noItem' => true,
+					'ymin_type' => 'Item',
+					'ymax_type' => 'Fixed'
+				)
+			),
+			array(
+				array(
+					'graphtype' => 'Normal',
+					'noItem' => true,
+					'ymin_type' => 'Item',
+					'ymax_type' => 'Item'
+				)
+			),
+			array(
+				array(
+					'graphtype' => 'Normal',
+					'noItem' => true,
+					'ymin_type' => 'Fixed',
+					'ymax_type' => 'Item'
 				)
 			),
 			array(
@@ -198,10 +236,14 @@ class testInheritanceGraphPrototype extends CWebTest {
 		$graphtype = $this->getSelectedLabel('graphtype');
 
 		if (isset($data['ymin_type'])) {
+			$this->assertElementNotPresent('ymin_name');
+			$this->assertElementNotPresent('yaxis_min');
 			$this->zbxTestDropdownSelectWait('ymin_type', $data['ymin_type']);
 		}
 
 		if (isset($data['ymax_type'])) {
+			$this->assertElementNotPresent('ymax_name');
+			$this->assertElementNotPresent('yaxis_max');
 			$this->zbxTestDropdownSelectWait('ymax_type', $data['ymax_type']);
 		}
 
@@ -309,40 +351,66 @@ class testInheritanceGraphPrototype extends CWebTest {
 			$this->assertElementNotPresent('ymax_type');
 		}
 
+		if (isset($data['noItem'])) {
+			switch($ymin_type) {
+				case 'Item':
+					$this->assertElementPresent('ymin_name');
+					$this->assertElementPresent('yaxis_min');
+					$this->assertElementPresent("//input[@id='yaxis_min' and @value='Select']");
+					//$this->assertElementPresent("//input[@id='yaxis_min' and @value='Select prototype']");TODO
+					$this->zbxTestTextNotPresent('Add graph items first');
+					break;
+				default:
+					break;
+			}
+			switch($ymax_type) {
+				case 'Item':
+					$this->assertElementPresent('ymax_name');
+					$this->assertElementPresent('yaxis_max');
+					$this->assertElementPresent("//input[@id='yaxis_max' and @value='Select']");
+					//$this->assertElementPresent("//input[@id='yaxis_max' and @value='Select prototype']");TODO
+					$this->zbxTestTextNotPresent('Add graph items first');
+					break;
+				default:
+					break;
+			}
+		}
+
+		// add general item
+		$this->assertVisible('add_item');
+		$this->assertAttribute("//input[@id='add_item']/@value", 'Add');
+
+		$this->zbxTestLaunchPopup('add_item');
+		$this->zbxTestClick('link='.$this->itemSimple);
+		sleep(1);
+		$this->selectWindow(null);
+
+		// add prototype
+		$this->assertVisible('add_protoitem');
+		$this->assertAttribute("//input[@id='add_protoitem']/@value", 'Add prototype');
+
+		$this->zbxTestLaunchPopup('add_protoitem');
+		$this->zbxTestClick("//span[text()='"."$this->item"."']");
+		sleep(1);
+		$this->selectWindow(null);
+
 		switch($ymin_type) {
 			case 'Fixed':
 				$this->assertVisible('yaxismin');
 				$this->assertAttribute("//input[@id='yaxismin']/@maxlength", '255');
 				$this->assertAttribute("//input[@id='yaxismin']/@size", '7');
 				$this->assertAttribute("//input[@id='yaxismin']/@value", '0.00');
-
-				$this->assertElementNotPresent('ymin_name');
-				$this->assertElementNotPresent('yaxis_min');
 				break;
 			case 'Calculated':
 				$this->assertElementNotPresent('ymin_name');
-				$this->assertElementNotPresent('yaxis_min');
+		//		$this->assertElementNotPresent('yaxis_min');TODO
 				$this->assertNotVisible('yaxismin');
 				break;
 			case 'Item':
-				$this->zbxTestLaunchPopup('add_item');
-				$this->zbxTestClick('link='.$this->itemSimple);
-				sleep(1);
-				$this->selectWindow(null);
-
-				$this->zbxTestLaunchPopup('add_protoitem');
-				$this->zbxTestClick('link='.$this->item);
-				sleep(1);
-				$this->selectWindow(null);
-
-				$this->zbxTestDropdownSelectWait('ymin_type', 'Calculated');
-				$this->zbxTestDropdownSelectWait('ymin_type', 'Item');
 				$this->assertElementPresent('ymin_name');
 				$this->assertElementPresent('yaxis_min');
-//*[@id="yaxis_min"]
-				$this->assertAttribute("//input[@id='yaxis_min']/@value", 'Select ');
-				$this->assertAttribute("//input[@id='yaxis_min']/@value", 'Select prototype');
-
+				$this->assertAttribute("//input[@id='yaxis_min']/@value", 'Select');
+				$this->assertElementPresent("//input[@id='yaxis_min' and @value='Select prototype']");
 				$this->assertNotVisible('yaxismin');
 				break;
 			default:
@@ -353,15 +421,12 @@ class testInheritanceGraphPrototype extends CWebTest {
 				break;
 		}
 
-	/*	switch($ymax_type) {
+		switch($ymax_type) {
 			case 'Fixed':
 				$this->assertVisible('yaxismax');
 				$this->assertAttribute("//input[@id='yaxismax']/@maxlength", '255');
 				$this->assertAttribute("//input[@id='yaxismax']/@size", '7');
 				$this->assertAttribute("//input[@id='yaxismax']/@value", '100.00');
-
-				$this->assertElementNotPresent('ymax_name');
-				$this->assertElementNotPresent('yaxis_max');
 				break;
 			case 'Calculated':
 				$this->assertElementNotPresent('ymax_name');
@@ -369,17 +434,10 @@ class testInheritanceGraphPrototype extends CWebTest {
 				$this->assertNotVisible('yaxismax');
 				break;
 			case 'Item':
-				$this->zbxTestLaunchPopup('add_item');
-				$this->zbxTestClick("link=Host name");
-				sleep(1);
-				$this->selectWindow(null);
-
-				$this->zbxTestDropdownSelectWait('ymax_type', 'Calculated');
-				$this->zbxTestDropdownSelectWait('ymax_type', 'Item');
 				$this->assertElementPresent('ymax_name');
 				$this->assertElementPresent('yaxis_max');
 				$this->assertAttribute("//input[@id='yaxis_max']/@value", 'Select');
-
+			//	$this->assertElementPresent("//input[@id='yaxis_max' and @value='Select prototype']");TODO
 				$this->assertNotVisible('yaxismax');
 				break;
 			default:
@@ -390,7 +448,7 @@ class testInheritanceGraphPrototype extends CWebTest {
 				break;
 		}
 
-	*/	switch ($graphtype) {
+		switch ($graphtype) {
 			case 'Normal':
 				$this->zbxTestTextPresent(array('Items', 'Name', 'Function', 'Draw style', 'Y axis side', 'Colour', 'Action'));
 				break;
@@ -403,12 +461,6 @@ class testInheritanceGraphPrototype extends CWebTest {
 				break;
 		}
 
-		$this->assertVisible('add_item');
-		$this->assertAttribute("//input[@id='add_item']/@value", 'Add');
-
-		$this->assertVisible('add_protoitem');
-		$this->assertAttribute("//input[@id='add_protoitem']/@value", 'Add prototype');
-
 		$this->zbxTestClick('link=Preview');
 
 		$this->assertVisible('save');
@@ -419,7 +471,7 @@ class testInheritanceGraphPrototype extends CWebTest {
 	}
 
 
-/*	public static function simple() {
+	public static function simple() {
 		return array(
 			array(
 				array('expected' => GRAPH_GOOD,
@@ -449,6 +501,125 @@ class testInheritanceGraphPrototype extends CWebTest {
 			),
 			array(
 				array('expected' => GRAPH_GOOD,
+					'graphName' => 'graphNormal1',
+					'graphtype' => 'Normal',
+					'hostCheck' => true,
+					'dbCheck' => true,
+					'hostRemove' => true,
+					'remove' => true)
+			),
+			array(
+				array('expected' => GRAPH_GOOD,
+					'graphName' => 'graphNormal2',
+					'graphtype' => 'Normal',
+					'ymin_type' => 'Fixed',
+					'ymax_type' => 'Calculated',
+					'hostCheck' => true,
+					'dbCheck' => true,
+					'hostRemove' => true,
+					'remove' => true)
+			),
+			array(
+				array('expected' => GRAPH_GOOD,
+					'graphName' => 'graphNormal3',
+					'ymin_type' => 'Item',
+					'ymax_type' => 'Fixed',
+					'hostCheck' => true,
+					'dbCheck' => true,
+					'hostRemove' => true,
+					'remove' => true)
+			),
+			array(
+				array('expected' => GRAPH_GOOD,
+					'graphName' => 'graphNormal4',
+					'ymin_type' => 'Fixed',
+					'ymax_type' => 'Item',
+					'hostCheck' => true,
+					'dbCheck' => true,
+					'hostRemove' => true,
+					'remove' => true)
+			),
+			array(
+				array('expected' => GRAPH_GOOD,
+					'graphName' => 'graphNormal5',
+					'ymin_type' => 'Item',
+					'ymax_type' => 'Item',
+					'hostCheck' => true,
+					'dbCheck' => true,
+					'hostRemove' => true,
+					'remove' => true)
+			),
+			array(
+				array('expected' => GRAPH_GOOD,
+					'graphName' => 'graphStacked1',
+					'graphtype' => 'Stacked',
+					'ymin_type' => 'Item',
+					'ymax_type' => 'Fixed',
+					'hostCheck' => true,
+					'dbCheck' => true,
+					'hostRemove' => true,
+					'remove' => true)
+			),
+			array(
+				array('expected' => GRAPH_GOOD,
+					'graphName' => 'graphStacked2',
+					'graphtype' => 'Stacked',
+					'ymin_type' => 'Fixed',
+					'ymax_type' => 'Fixed',
+					'hostCheck' => true,
+					'dbCheck' => true,
+					'hostRemove' => true,
+					'remove' => true)
+			),
+			array(
+				array('expected' => GRAPH_GOOD,
+					'graphName' => 'graphStacked3',
+					'graphtype' => 'Stacked',
+					'ymax_type' => 'Fixed',
+					'hostCheck' => true,
+					'dbCheck' => true,
+					'hostRemove' => true,
+					'remove' => true)
+			),
+			array(
+				array('expected' => GRAPH_GOOD,
+					'graphName' => 'graphStacked4',
+					'graphtype' => 'Stacked',
+					'ymax_type' => 'Item',
+					'hostCheck' => true,
+					'dbCheck' => true,
+					'hostRemove' => true,
+					'remove' => true)
+			),
+			array(
+				array('expected' => GRAPH_GOOD,
+					'graphName' => 'graphStacked5',
+					'graphtype' => 'Stacked',
+					'hostCheck' => true,
+					'dbCheck' => true,
+					'hostRemove' => true,
+					'remove' => true)
+			),
+			array(
+				array('expected' => GRAPH_GOOD,
+					'graphName' => 'graphPie',
+					'graphtype' => 'Pie',
+					'hostCheck' => true,
+					'dbCheck' => true,
+					'hostRemove' => true,
+					'remove' => true)
+			),
+			array(
+				array('expected' => GRAPH_GOOD,
+					'graphName' => 'graphExploded',
+					'graphtype' => 'Exploded',
+					'hostCheck' => true,
+					'dbCheck' => true,
+					'hostRemove' => true,
+					'remove' => true)
+			),
+			array(
+				array('expected' => GRAPH_GOOD,
 					'graphName' => 'graphSomeRemove',
 					'hostCheck' => true,
 					'dbCheck' => true,
@@ -462,31 +633,222 @@ class testInheritanceGraphPrototype extends CWebTest {
 						'ERROR: Cannot add graph',
 						'Graph with name "graphSimple" already exists in graphs or graph prototypes')
 				)
+			),
+			array(
+				array(
+					'expected' => GRAPH_GOOD,
+					'graphName' => 'graph!@#$%^&*()><>?:"|{},./;',
+					'graphtype' => 'Exploded',
+					'formCheck' => true,
+					'dbCheck' => true
+				)
+			),
+			array(
+				array(
+					'expected' => GRAPH_BAD,
+					'graphName' => 'graphSaveCheck',
+					'noItem' => true,
+					'errors' => array(
+						'ERROR: Cannot add graph',
+						'Missing items for graph "graphSaveCheck".'
+					)
+				)
+			),
+			array(
+				array(
+					'expected' => GRAPH_BAD,
+					'errors' => array(
+						'ERROR: Page received incorrect data',
+						'Warning. Incorrect value for field "Name": cannot be empty.'
+					)
+				)
+			),
+			array(
+				array(
+					'expected' => GRAPH_GOOD,
+					'graphName' => 'graphRemoveAddItem',
+					'removeItem' => true,
+					'dbCheck' => true,
+					'formCheck' => true
+				)
+			),
+			array(
+				array(
+					'expected' => GRAPH_BAD,
+					'graphName' => 'graphStackedSome',
+					'graphtype' => 'Stacked',
+					'noAxisItem' => true,
+					'ymin_type' => 'Item',
+					'ymax_type' => 'Fixed',
+					'errors' => array(
+						'ERROR: Cannot add graph',
+						'Incorrect item for axis value.'
+					)
+				)
+			),
+			array(
+				array(
+					'expected' => GRAPH_BAD,
+					'graphName' => 'graphStackedMore',
+					'width' => 'name',
+					'height' => 'name',
+					'graphtype' => 'Stacked',
+					'ymin_type' => 'Fixed',
+					'yaxismin' => 'name',
+					'ymax_type' => 'Fixed',
+					'yaxismax' => 'name',
+					'errors' => array(
+						'ERROR: Page received incorrect data',
+						'Warning. Incorrect value for field "Width (min:20, max:65535)": must be between 20 and 65535.',
+						'Warning. Incorrect value for field "Height (min:20, max:65535)": must be between 20 and 65535.'
+					)
+				)
+			),
+			array(
+				array(
+					'expected' => GRAPH_BAD,
+					'graphName' => 'graphStackedError',
+					'width' => '65536',
+					'height' => '-22',
+					'graphtype' => 'Stacked',
+					'ymin_type' => 'Fixed',
+					'ymax_type' => 'Fixed',
+					'errors' => array(
+						'ERROR: Page received incorrect data',
+						'Warning. Incorrect value for field "Width (min:20, max:65535)": must be between 20 and 65535.',
+						'Warning. Incorrect value for field "Height (min:20, max:65535)": must be between 20 and 65535.'
+					)
+				)
 			)
 		);
 	}
-*/
+
 	/**
 	 * @dataProvider simple
 	 */
-/*	public function testInheritanceGraphPrototype_simpleCreate($data) {
+	public function testInheritanceGraphPrototype_simpleCreate($data) {
+
 		$this->zbxTestLogin('templates.php');
+		$this->zbxTestClickWait('link='.$this->template);
+		$this->zbxTestClickWait('link=Discovery rules');
+		$this->zbxTestClickWait('link='.$this->discoveryRule);
+		$this->zbxTestClickWait('link=Graph prototypes');
 
-		$template = 'Inheritance test template';
-		$host = 'Template inheritance test host';
+		$itemName = $this->item;
 
-		$itemName = 'itemInheritance';
-		$graphName = $data['graphName'];
+	//	$this->checkTitle('Configuration of graph prototypes');TODO
+		$this->checkTitle('Configuration of graphs');
+		$this->zbxTestTextPresent(array('CONFIGURATION OF GRAPH PROTOTYPES', "Graph prototypes of ".$this->discoveryRule));
 
-		$this->zbxTestClickWait("link=$template");
-		$this->zbxTestClickWait("//div[@class='w']//a[text()='Graphs']");
 		$this->zbxTestClickWait('form');
+	// $this->checkTitle('Configuration of graph prototypes');TODO
+		$this->checkTitle('Configuration of graphs');
+		$this->zbxTestTextPresent(array('CONFIGURATION OF GRAPH PROTOTYPES', 'Graph prototype'));
 
-		$this->input_type('name', $graphName);
+		if (isset($data['graphtype'])) {
+			$this->zbxTestDropdownSelectWait('graphtype', $data['graphtype']);
+		}
+		$graphtype = $this->getSelectedLabel('graphtype');
+
+		if (isset($data['ymin_type'])) {
+			$this->zbxTestDropdownSelectWait('ymin_type', $data['ymin_type']);
+		}
+
+		if (isset($data['ymax_type'])) {
+			$this->zbxTestDropdownSelectWait('ymax_type', $data['ymax_type']);
+		}
+
+		if (!isset($data['noItem'])) {
 		$this->zbxTestLaunchPopup('add_item');
-		$this->zbxTestClick("link=$itemName");
+		$this->zbxTestClick('link='.$this->itemSimple);
 		$this->selectWindow(null);
 		sleep(1);
+
+		$this->zbxTestLaunchPopup('add_protoitem');
+		$this->zbxTestClick("//span[text()='"."$this->item"."']");
+		$this->selectWindow(null);
+		sleep(1);
+
+			if(isset($data['removeItem'])) {
+				$this->zbxTestClick('items_0_remove');// TODO wait add
+				sleep(1);
+				$this->zbxTestClick('items_0_remove');
+				sleep(1);
+
+				$this->zbxTestLaunchPopup('add_item');
+				$this->zbxTestClick('link='.$this->itemSimple);// TODO wait add
+				$this->selectWindow(null);
+				sleep(1);
+
+				$this->zbxTestLaunchPopup('add_protoitem');
+				$this->zbxTestClick("//span[text()='"."$this->item"."']");
+				$this->selectWindow(null);
+				sleep(1);
+			}
+		}
+		if (isset($data['width'])) {
+			$this->input_type('width', $data['width']);
+		}
+
+		if (isset($data['height'])) {
+			$this->input_type('height', $data['height']);
+		}
+
+		if (isset($data['graphName'])) {
+			$graphName = $data['graphName'];
+			$this->input_type('name', $graphName);
+		}
+		else {
+			$graphName = null;
+		}
+
+
+		if ($graphtype == 'Normal' || $graphtype == 'Stacked') {
+
+			$ymin_type = $this->getSelectedLabel('ymin_type');
+			$ymax_type = $this->getSelectedLabel('ymax_type');
+
+			switch($ymin_type) {
+				case 'Fixed':
+					$this->input_type('yaxismin', $this->yaxismin);
+					break;
+				case 'Item':
+					if (!isset($data['noAxisItem'])) {
+					//	$this->zbxTestLaunchPopup("yaxis_min' and @value='Select prototype", 'zbx_popup_item');TODO
+					//	$this->assertElementPresent("//a[text()='".$this->item."']");TODO
+					//	$this->zbxTestClick("//span[text()='".$this->item."']");TODO
+						$this->zbxTestLaunchPopup("yaxis_min' and @value='Select", 'zbx_popup_item');
+						$this->assertElementPresent("//a[text()='".$this->itemSimple."']");
+						$this->zbxTestClick('link='.$this->itemSimple);
+						$this->selectWindow(null);
+						sleep(1);
+					}
+					break;
+				case 'Calculated':
+					break;
+			}
+
+			switch($ymax_type) {
+				case 'Fixed':
+					$this->input_type('yaxismax', $this->yaxismax);
+					break;
+				case 'Item':
+					if (!isset($data['noAxisItem'])) {
+					//	$this->zbxTestLaunchPopup("yaxis_max' and @value='Select prototype", 'zbx_popup_item');TODO
+					//	$this->assertElementPresent("//a[text()='".$this->item."']");TODO
+					//	$this->zbxTestClick("//span[text()='".$this->item."']");TODO
+						$this->zbxTestLaunchPopup("yaxis_max' and @value='Select", 'zbx_popup_item');
+						$this->assertElementPresent("//a[text()='".$this->itemSimple."']");
+						$this->zbxTestClick('link='.$this->itemSimple);
+						$this->selectWindow(null);
+						sleep(1);
+					}
+					break;
+				case 'Calculated':
+					break;
+			}
+		}
+
 
 		$this->zbxTestClickWait('save');
 
@@ -494,12 +856,14 @@ class testInheritanceGraphPrototype extends CWebTest {
 			case GRAPH_GOOD:
 				$this->zbxTestTextPresent('Graph added');
 				$this->checkTitle('Configuration of graphs');
-				$this->zbxTestTextPresent('CONFIGURATION OF GRAPHS');
+			//	$this->checkTitle('Configuration of graph prototypes');TODO
+				$this->zbxTestTextPresent(array('CONFIGURATION OF GRAPH PROTOTYPES', "Graph prototypes of ".$this->discoveryRule));
 				break;
 
 			case GRAPH_BAD:
 				$this->checkTitle('Configuration of graphs');
-				$this->zbxTestTextPresent('CONFIGURATION OF GRAPHS');
+			//	$this->checkTitle('Configuration of graph prototypes');TODO
+				$this->zbxTestTextPresent(array('CONFIGURATION OF GRAPH PROTOTYPES', 'Graph prototype'));
 				foreach ($data['errors'] as $msg) {
 					$this->zbxTestTextPresent($msg);
 				}
@@ -508,14 +872,19 @@ class testInheritanceGraphPrototype extends CWebTest {
 
 		if (isset($data['hostCheck'])) {
 			$this->zbxTestOpenWait('hosts.php');
-			$this->zbxTestClickWait("link=$host");
-			$this->zbxTestClickWait("//div[@class='w']//a[text()='Graphs']");
+			$this->zbxTestClickWait('link='.$this->host);
+			$this->zbxTestClickWait("link=Discovery rules");
+			$this->zbxTestClickWait('link='.$this->discoveryRule);
+			$this->zbxTestClickWait("link=Graph prototypes");
 
-			$this->zbxTestTextPresent("$template: $graphName");
+			$this->zbxTestTextPresent($this->template.": $graphName");
 			$this->zbxTestClickWait("link=$graphName");
 
+	//		$this->zbxTestTextPresent('Parent graphs');TODO
+			$this->zbxTestTextPresent('Parent graph');
 			$this->assertElementValue('name', $graphName);
-			$this->assertElementPresent("//span[text()='$host: $itemName']");
+			$this->assertElementPresent("//span[text()='".$this->host.": ".$this->itemSimple."']");
+			$this->assertElementPresent("//span[text()='".$this->host.": ".$this->item."']");
 		}
 
 		if (isset($data['dbCheck'])) {
@@ -544,8 +913,10 @@ class testInheritanceGraphPrototype extends CWebTest {
 				$graphId = $row['graphid'];
 			}
 			$this->zbxTestOpenWait('hosts.php');
-			$this->zbxTestClickWait("link=$host");
-			$this->zbxTestClickWait("//div[@class='w']//a[text()='Graphs']");
+			$this->zbxTestClickWait('link='.$this->host);
+			$this->zbxTestClickWait("link=Discovery rules");
+			$this->zbxTestClickWait('link='.$this->discoveryRule);
+			$this->zbxTestClickWait("link=Graph prototypes");
 
 			$this->assertElementPresent("group_graphid_$graphId");
 			$this->assertAttribute("//input[@id='group_graphid_$graphId']/@disabled", 'disabled');
@@ -558,8 +929,10 @@ class testInheritanceGraphPrototype extends CWebTest {
 			}
 
 			$this->zbxTestOpenWait('templates.php');
-			$this->zbxTestClickWait("link=$template");
-			$this->zbxTestClickWait("//div[@class='w']//a[text()='Graphs']");
+			$this->zbxTestClickWait('link='.$this->template);
+			$this->zbxTestClickWait("link=Discovery rules");
+			$this->zbxTestClickWait('link='.$this->discoveryRule);
+			$this->zbxTestClickWait("link=Graph prototypes");
 
 			$this->zbxTestCheckboxSelect("group_graphid_$graphid");
 			$this->zbxTestDropdownSelect('go', 'Delete selected');
@@ -568,10 +941,10 @@ class testInheritanceGraphPrototype extends CWebTest {
 			$this->getConfirmation();
 			$this->wait();
 			$this->zbxTestTextPresent('Graphs deleted');
-			$this->zbxTestTextNotPresent("$template: $graphName");
+			$this->zbxTestTextNotPresent($this->template.": $graphName");
 		}
 	}
-*/
+
 	/**
 	 * Restore the original tables.
 	 */
