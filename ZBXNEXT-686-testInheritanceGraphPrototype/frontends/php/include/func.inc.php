@@ -808,7 +808,7 @@ function zbx_nl2br($str) {
 }
 
 function zbx_formatDomId($value) {
-	return str_replace(array('[',']'), array('_', ''), $value);
+	return str_replace(array('[', ']'), array('_', ''), $value);
 }
 
 function zbx_strlen($str) {
