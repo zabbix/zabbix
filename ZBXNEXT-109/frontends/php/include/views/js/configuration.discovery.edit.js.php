@@ -438,6 +438,11 @@
 			jQuery('#ports').val(discoveryCheckDefaultPort(dcheckType));
 		}
 
+		// set default port
+		if (jQuery('#ports').val() == '') {
+			jQuery('#ports').val(discoveryCheckDefaultPort(dcheckType));
+		}
+
 		updateNewDCheckSNMPType();
 	}
 
