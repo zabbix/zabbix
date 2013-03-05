@@ -261,7 +261,7 @@
 
 			// update device uniqueness criteria
 			var availableDeviceTypes = [ZBX_SVC.agent, ZBX_SVC.snmpv1, ZBX_SVC.snmpv2, ZBX_SVC.snmpv3],
-				uniquenessCriteria = jQuery('#uniqueness_criteria_' + value.dcheckid);
+				uniquenessCriteria = jQuery('#uniqueness_criteria_row_' + value.dcheckid);
 
 			if (jQuery.inArray(parseInt(value.type), availableDeviceTypes) > -1) {
 				if (uniquenessCriteria.length) {
@@ -274,7 +274,6 @@
 			else {
 				if (uniquenessCriteria.length) {
 					uniquenessCriteria.remove();
-					jQuery('label[for=uniqueness_criteria_' + value.dcheckid + ']').remove();
 
 					selectUniquenessCriteriaDefault();
 				}
@@ -285,13 +284,18 @@
 	function removeDCheckRow(dcheckid) {
 		jQuery('#dcheckRow_' + dcheckid).remove();
 
-		if (jQuery('#uniqueness_criteria_row_' + dcheckid).length) {
-			jQuery('#uniqueness_criteria_row_' + dcheckid).remove();
-
-			selectUniquenessCriteriaDefault();
-		}
-
 		delete(ZBX_CHECKLIST[dcheckid]);
+
+		// remove uniqueness criteria
+		var obj = jQuery('#uniqueness_criteria_' + dcheckid);
+
+		if (obj.length) {
+			if (obj.attr('checked') == 'checked') {
+				selectUniquenessCriteriaDefault();
+			}
+
+			jQuery('#uniqueness_criteria_row_' + dcheckid).remove();
+		}
 	}
 
 	function showNewCheckForm(e, dcheckType, dcheckId) {
