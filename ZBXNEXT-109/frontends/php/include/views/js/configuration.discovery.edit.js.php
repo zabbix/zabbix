@@ -285,13 +285,11 @@
 	function removeDCheckRow(dcheckid) {
 		jQuery('#dcheckRow_' + dcheckid).remove();
 
-		if (jQuery('#uniqueness_criteria_' + dcheckid).is(':checked')) {
-			jQuery('#uniqueness_criteria_1').attr('checked', 'checked');
+		if (jQuery('#uniqueness_criteria_row_' + dcheckid).length) {
+			jQuery('#uniqueness_criteria_row_' + dcheckid).remove();
+
+			selectUniquenessCriteriaDefault();
 		}
-
-		jQuery('#uniqueness_criteria_row_' + dcheckid).remove();
-
-		selectUniquenessCriteriaDefault();
 
 		delete(ZBX_CHECKLIST[dcheckid]);
 	}
