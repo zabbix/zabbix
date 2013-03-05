@@ -5,6 +5,7 @@ A.F....... [ZBX-1357] added Lithuanian translation; thanks to Zabbix translators
 A.F....... [ZBX-1357] updated Brazilian Portuguese, German, Hungarian, Latvian, Slovak, Spanish, Russian, Turkish and Ukrainian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+..F....... [ZBX-6324] improved text displaying in Overview table header in IE (Eduard)
 ..F....... [ZBX-6306] fixed frontend layout for latest Google Chrome 25 (Eduard)
 A......... [ZBX-6261] fixed service.getsla not working with Oracle database (Pavels)
 ........S. [ZBX-5797] fixed server SNMP interfaces ignoring IP/DNS toggle (wiper)
