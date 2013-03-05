@@ -53,7 +53,7 @@ static int	json_error(const char *message, const char* json_buffer, char** error
 	*error = zbx_malloc(NULL, size);
 
 	if (json_buffer)
-		zbx_snprintf_alloc(error, &size, &offset, "%s at: %s", message, json_buffer);
+		zbx_snprintf_alloc(error, &size, &offset, "%s at: '%s'", message, json_buffer);
 	else
 		zbx_snprintf_alloc(error, &size, &offset, "%s", message);
 
@@ -121,10 +121,6 @@ int	json_parse_string(const char **start, const char **end, char **error)
 		ptr++;
 	}
 	*end = ptr;
-
-	{
-		int a = (~0x0LLU) >> ((sizeof(zbx_uint64_t) - sizeof(unsigned short)) << 3);
-	}
 
 	return SUCCEED;
 }
