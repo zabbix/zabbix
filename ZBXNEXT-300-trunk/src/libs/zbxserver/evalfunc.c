@@ -310,7 +310,8 @@ clean:
 #define OP_LT	4
 #define OP_LE	5
 #define OP_LIKE	6
-#define OP_MAX	7
+#define OP_BAND	7
+#define OP_MAX	8
 
 static int	evaluate_COUNT_one(unsigned char value_type, int op, const char *value, const char *arg2)
 {
@@ -348,6 +349,10 @@ static int	evaluate_COUNT_one(unsigned char value_type, int op, const char *valu
 					break;
 				case OP_LE:
 					if (value_uint64 <= arg2_uint64)
+						return SUCCEED;
+					break;
+				case OP_BAND:
+					if (0 != value_uint64 & arg2_uint64)
 						return SUCCEED;
 					break;
 			}
@@ -517,6 +522,8 @@ static int	evaluate_COUNT(char *value, DB_ITEM *item, const char *function, cons
 			op = OP_LE;
 		else if (0 == strcmp(arg3, "like"))
 			op = OP_LIKE;
+		else if (0 == strcmp(arg3, "band"))
+			op = OP_BAND;
 		else
 			fail = 1;
 
@@ -619,6 +626,7 @@ exit:
 #undef OP_LT
 #undef OP_LE
 #undef OP_LIKE
+#undef OP_BAND
 #undef OP_MAX
 
 /******************************************************************************
