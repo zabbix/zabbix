@@ -756,13 +756,28 @@ static int	DBget_templateid_by_triggerid(zbx_uint64_t triggerid, zbx_uint64_t *t
  * Comments: based on the patch submitted by Hmami Mohamed                    *
  *                                                                            *
  ******************************************************************************/
-static int	DBget_trigger_template_name(zbx_uint64_t triggerid, char **replace_to)
+static int	DBget_trigger_template_name(zbx_uint64_t triggerid, zbx_uint64_t *userid, char **replace_to)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
 	int		ret;
 	zbx_uint64_t	templateid;
-	size_t		replace_to_alloc = 64, replace_to_offset = 0;
+	char		*sql = NULL;
+	size_t		replace_to_alloc = 64, replace_to_offset = 0,
+			sql_alloc = 256, sql_offset = 0;
+	int		user_type = -1;
+
+	if (NULL != userid)
+	{
+		result = DBselect("select type from users where userid=" ZBX_FS_UI64, *userid);
+
+		if (NULL != (row = DBfetch(result)) && FAIL == DBis_null(row[0]))
+			user_type = atoi(row[0]);
+		DBfree_result(result);
+
+		if (-1 == user_type)	/* can't check permissions */
+			return FAIL;
+	}
 
 	/* use parent trigger ID for lld generated triggers */
 	result = DBselect(
@@ -792,14 +807,33 @@ static int	DBget_trigger_template_name(zbx_uint64_t triggerid, char **replace_to
 	*replace_to = zbx_realloc(*replace_to, replace_to_alloc);
 	**replace_to = '\0';
 
-	result = DBselect(
+	sql = zbx_malloc(sql, sql_alloc);
+
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 			"select distinct h.name"
 			" from hosts h,items i,functions f"
 			" where h.hostid=i.hostid"
 				" and i.itemid=f.itemid"
-				" and f.triggerid=" ZBX_FS_UI64
-			" order by h.name",
+				" and f.triggerid=" ZBX_FS_UI64,
 			triggerid);
+	if (NULL != userid && USER_TYPE_SUPER_ADMIN != user_type)
+	{
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+				" and exists("
+					"select null"
+					" from hosts_groups hg,rights r,users_groups ug"
+					" where h.hostid=hg.hostid"
+						" and hg.groupid=r.id"
+						" and r.groupid=ug.usrgrpid"
+						" and ug.userid=" ZBX_FS_UI64
+					" group by hg.hostid"
+					" having min(r.permission)>=%d"
+				")",
+				*userid, PERM_READ_ONLY);
+	}
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " order by h.name");
+
+	result = DBselect("%s", sql);
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -823,25 +857,58 @@ static int	DBget_trigger_template_name(zbx_uint64_t triggerid, char **replace_to
  *               otherwise FAIL                                               *
  *                                                                            *
  ******************************************************************************/
-static int	DBget_trigger_hostgroup_name(zbx_uint64_t triggerid, char **replace_to)
+static int	DBget_trigger_hostgroup_name(zbx_uint64_t triggerid, zbx_uint64_t *userid, char **replace_to)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
 	int		ret = FAIL;
-	size_t		replace_to_alloc = 64, replace_to_offset = 0;
+	char		*sql = NULL;
+	size_t		replace_to_alloc = 64, replace_to_offset = 0,
+			sql_alloc = 256, sql_offset = 0;
+	int		user_type = -1;
+
+	if (NULL != userid)
+	{
+		result = DBselect("select type from users where userid=" ZBX_FS_UI64, *userid);
+
+		if (NULL != (row = DBfetch(result)) && FAIL == DBis_null(row[0]))
+			user_type = atoi(row[0]);
+		DBfree_result(result);
+
+		if (-1 == user_type)	/* can't check permissions */
+			return FAIL;
+	}
 
 	*replace_to = zbx_realloc(*replace_to, replace_to_alloc);
 	**replace_to = '\0';
 
-	result = DBselect(
+	sql = zbx_malloc(sql, sql_alloc);
+
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 			"select distinct g.name"
 			" from groups g,hosts_groups hg,items i,functions f"
 			" where g.groupid=hg.groupid"
 				" and hg.hostid=i.hostid"
 				" and i.itemid=f.itemid"
-				" and f.triggerid=" ZBX_FS_UI64
-			" order by g.name",
+				" and f.triggerid=" ZBX_FS_UI64,
 			triggerid);
+	if (NULL != userid && USER_TYPE_SUPER_ADMIN != user_type)
+	{
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+				" and exists("
+					"select null"
+					" from rights r,users_groups ug"
+					" where g.groupid=r.id"
+						" and r.groupid=ug.usrgrpid"
+						" and ug.userid=" ZBX_FS_UI64
+					" group by r.id"
+					" having min(r.permission)>=%d"
+				")",
+				*userid, PERM_READ_ONLY);
+	}
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " order by g.name");
+
+	result = DBselect("%s", sql);
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -1018,14 +1085,14 @@ static int	DBget_trigger_value(DB_TRIGGER *trigger, char **replace_to, int N_fun
 					if ('1' != *row[12] || INTERFACE_TYPE_AGENT == dc_item.interface.type)
 					{
 						addr = zbx_strdup(addr, row[8]);	/* ip */
-						substitute_simple_macros(NULL, NULL, &dc_item.host, NULL, NULL, &addr,
-								MACRO_TYPE_INTERFACE_ADDR_DB, NULL, 0);
+						substitute_simple_macros(NULL, NULL, NULL, &dc_item.host, NULL, NULL,
+								&addr, MACRO_TYPE_INTERFACE_ADDR_DB, NULL, 0);
 						strscpy(dc_item.interface.ip_orig, addr);
 						zbx_free(addr);
 
 						addr = zbx_strdup(addr, row[9]);	/* dns */
-						substitute_simple_macros(NULL, NULL, &dc_item.host, NULL, NULL, &addr,
-								MACRO_TYPE_INTERFACE_ADDR_DB, NULL, 0);
+						substitute_simple_macros(NULL, NULL, NULL, &dc_item.host, NULL, NULL,
+								&addr, MACRO_TYPE_INTERFACE_ADDR_DB, NULL, 0);
 						strscpy(dc_item.interface.dns_orig, addr);
 						zbx_free(addr);
 					}
@@ -2296,8 +2363,8 @@ fail:
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  ******************************************************************************/
-int	substitute_simple_macros(DB_EVENT *event, zbx_uint64_t *hostid, DC_HOST *dc_host, DC_ITEM *dc_item,
-		DB_ESCALATION *escalation, char **data, int macro_type, char *error, int maxerrlen)
+int	substitute_simple_macros(DB_EVENT *event, zbx_uint64_t *userid, zbx_uint64_t *hostid, DC_HOST *dc_host,
+		DC_ITEM *dc_item, DB_ESCALATION *escalation, char **data, int macro_type, char *error, int maxerrlen)
 {
 	const char	*__function_name = "substitute_simple_macros";
 
@@ -2361,8 +2428,8 @@ int	substitute_simple_macros(DB_EVENT *event, zbx_uint64_t *hostid, DC_HOST *dc_
 					if (0 != event->trigger.triggerid)
 					{
 						replace_to = zbx_strdup(replace_to, event->trigger.description);
-						substitute_simple_macros(event, hostid, dc_host, dc_item, escalation,
-								&replace_to, MACRO_TYPE_TRIGGER_DESCRIPTION,
+						substitute_simple_macros(event, NULL, hostid, dc_host, dc_item,
+								escalation, &replace_to, MACRO_TYPE_TRIGGER_DESCRIPTION,
 								error, maxerrlen);
 					}
 					else
@@ -2470,8 +2537,9 @@ int	substitute_simple_macros(DB_EVENT *event, zbx_uint64_t *hostid, DC_HOST *dc_
 					if (0 != event->trigger.triggerid)
 					{
 						replace_to = zbx_strdup(replace_to, event->trigger.url);
-						substitute_simple_macros(event, hostid, dc_host, dc_item, escalation,
-								&replace_to, MACRO_TYPE_TRIGGER_URL, error, maxerrlen);
+						substitute_simple_macros(event, NULL, hostid, dc_host, dc_item,
+								escalation, &replace_to, MACRO_TYPE_TRIGGER_URL,
+								error, maxerrlen);
 					}
 					else
 						ret = FAIL;
@@ -2485,9 +2553,9 @@ int	substitute_simple_macros(DB_EVENT *event, zbx_uint64_t *hostid, DC_HOST *dc_
 				else if (0 == strcmp(m, MVAR_TRIGGER_EVENTS_PROBLEM_UNACK))
 					ret = DBget_trigger_event_count(event->objectid, &replace_to, 1, 0);
 				else if (0 == strcmp(m, MVAR_TRIGGER_TEMPLATE_NAME))
-					ret = DBget_trigger_template_name(event->objectid, &replace_to);
+					ret = DBget_trigger_template_name(event->objectid, userid, &replace_to);
 				else if (0 == strcmp(m, MVAR_TRIGGER_HOSTGROUP_NAME))
-					ret = DBget_trigger_hostgroup_name(event->objectid, &replace_to);
+					ret = DBget_trigger_hostgroup_name(event->objectid, userid, &replace_to);
 				else if (0 == strcmp(m, MVAR_EVENT_ID))
 					replace_to = zbx_dsprintf(replace_to, ZBX_FS_UI64, event->eventid);
 				else if (0 == strcmp(m, MVAR_EVENT_DATE))
@@ -3297,7 +3365,7 @@ void	evaluate_expressions(zbx_vector_ptr_t *triggers)
 
 		zbx_remove_whitespace(tr->expression);
 
-		if (SUCCEED != substitute_simple_macros(&event, NULL, NULL, NULL, NULL, &tr->expression,
+		if (SUCCEED != substitute_simple_macros(&event, NULL, NULL, NULL, NULL, NULL, &tr->expression,
 				MACRO_TYPE_TRIGGER_EXPRESSION, err, sizeof(err)))
 		{
 			tr->new_error = zbx_strdup(tr->new_error, err);
@@ -3498,7 +3566,7 @@ int	substitute_key_macros(char **data, zbx_uint64_t *hostid, DC_ITEM *dc_item, s
 
 			if (NULL == jp_row)
 			{
-				substitute_simple_macros(NULL, hostid, NULL, dc_item, NULL,
+				substitute_simple_macros(NULL, NULL, hostid, NULL, dc_item, NULL,
 						&param, macro_type, NULL, 0);
 			}
 			else
@@ -3583,8 +3651,8 @@ int	substitute_key_macros(char **data, zbx_uint64_t *hostid, DC_ITEM *dc_item, s
 
 						if (NULL == jp_row)
 						{
-							substitute_simple_macros(NULL, hostid, NULL, dc_item, NULL,
-									&param, macro_type, NULL, 0);
+							substitute_simple_macros(NULL, NULL, hostid, NULL, dc_item,
+									NULL, &param, macro_type, NULL, 0);
 						}
 						else
 							substitute_discovery_macros(&param, jp_row);
@@ -3615,8 +3683,8 @@ int	substitute_key_macros(char **data, zbx_uint64_t *hostid, DC_ITEM *dc_item, s
 
 						if (NULL == jp_row)
 						{
-							substitute_simple_macros(NULL, hostid, NULL, dc_item, NULL,
-									&param, macro_type, NULL, 0);
+							substitute_simple_macros(NULL, NULL, hostid, NULL, dc_item,
+									NULL, &param, macro_type, NULL, 0);
 						}
 						else
 							substitute_discovery_macros(&param, jp_row);
