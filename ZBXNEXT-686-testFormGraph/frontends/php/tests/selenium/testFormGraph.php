@@ -27,13 +27,6 @@ define('GRAPH_BAD', 1);
 class testFormItem extends CWebTest {
 
 	/**
-	 * The name of the host for the testing of the layout of the graphs created in the test data set.
-	 *
-	 * @var string
-	 */
-	protected $hostLayout = 'Host name';
-
-	/**
 	 * The name of the host for the testing of the create function created in the test data set.
 	 *
 	 * @var string
@@ -41,11 +34,26 @@ class testFormItem extends CWebTest {
 	protected $host = 'ЗАББИКС Сервер';
 
 	/**
+	 * The name of the host for the testing of the simpleCreate of the graphs created in the test data set.
+	 *
+	 * @var string
+	 */
+	protected $hostSimple = 'Host for trigger description macros';
+
+	/**
+	 * The name of the host for the testing of the layout of the graphs created in the test data set.
+	 *
+	 * @var string
+	 */
+	protected $hostLayout = 'Host name';
+
+	/**
 	 * The name of the item used in graph axis for create function created in the test data set.
 	 *
 	 * @var string
 	 */
 	protected $graphAxisItem = 'Agent ping';
+
 
 	// returns all possible item types
 	public static function graphTypes() {
@@ -361,6 +369,33 @@ class testFormItem extends CWebTest {
 		$this->assertAttribute("//input[@id='cancel']/@value", 'Cancel');
 	}
 
+	// Returns list of graphs
+	public static function allGraphs() {
+		return DBdata("select * from graphs g left join graphs_items gi on gi.graphid=g.graphid where gi.itemid='23328'");
+	}
+
+	/**
+	 * @dataProvider allGraphs
+	 */
+	public function testFormGraph_simpleCreate($data) {
+		$name = $data['name'];
+
+		$sqlGraphs = "select * from graphs where name='$name' order by graphid";
+		$oldHashGraphs = DBhash($sqlGraphs);
+
+		$this->zbxTestLogin('hosts.php');
+		$this->zbxTestClickWait('link='.$this->hostSimple);
+		$this->zbxTestClickWait("//div[@class='w']//a[text()='Graphs']");
+		$this->zbxTestClickWait('link='.$name);
+		$this->zbxTestClickWait('save');
+		$this->checkTitle('Configuration of graphs');
+		$this->zbxTestTextPresent('Graph updated');
+		$this->zbxTestTextPresent("$name");
+		$this->zbxTestTextPresent('GRAPHS');
+
+		$this->assertEquals($oldHashGraphs, DBhash($sqlGraphs));
+	}
+
 	// Returns all possible item data
 	public static function dataCreate() {
 		return array(
@@ -593,9 +628,9 @@ class testFormItem extends CWebTest {
 	 */
 	public function testFormGraph_Create($data) {
 
-		$this->zbxTestLogin('graphs.php');
-		$this->checkTitle('Configuration of graphs');
-		$this->zbxTestTextPresent('CONFIGURATION OF GRAPHS');
+		$this->zbxTestLogin('hosts.php');
+		$this->zbxTestClickWait('link='.$this->host);
+		$this->zbxTestClickWait("//div[@class='w']//a[text()='Graphs']");
 
 		$this->zbxTestClickWait('form');
 		$this->checkTitle('Configuration of graphs');
