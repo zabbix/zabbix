@@ -105,8 +105,8 @@ elseif (isset($_REQUEST['delete']) && isset($_REQUEST['hostid'])) {
 	unset($_REQUEST['hostid'], $_REQUEST['form']);
 	DBend($result);
 }
-elseif (isset($_REQUEST['clone']) && isset($_REQUEST['itemid'])) {
-	unset($_REQUEST['itemid']);
+elseif (isset($_REQUEST['clone']) && isset($_REQUEST['hostid'])) {
+	unset($_REQUEST['hostid']);
 	$_REQUEST['form'] = 'clone';
 }
 elseif (isset($_REQUEST['save'])) {
