@@ -434,10 +434,10 @@
 						itemObj.val('');
 					}
 				});
-			}
 
-			// reset port to default
-			jQuery('#ports').val(discoveryCheckDefaultPort(dcheckType));
+				// reset port to default
+				jQuery('#ports').val(discoveryCheckDefaultPort(dcheckType));
+			}
 		}
 
 		// set default port
