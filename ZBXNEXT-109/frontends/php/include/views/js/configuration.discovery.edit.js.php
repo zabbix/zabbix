@@ -5,11 +5,11 @@
 		</td>
 		<td>
 			<input type="button" class="input link_menu" name="edit" value="<?php echo CHtml::encode(_('Edit')); ?>"
-				onclick="javascript: showNewCheckForm(null, null, #{dcheckid});" />
+				onclick="javascript: showNewCheckForm(null, null, '#{dcheckid}');" />
 		</td>
 		<td>
 			<input type="button" class="input link_menu" name="remove" value="<?php echo CHtml::encode(_('Remove')); ?>"
-				onclick="javascript: removeDCheckRow(#{dcheckid});" />
+				onclick="javascript: removeDCheckRow('#{dcheckid}');" />
 		</td>
 	</tr>
 </script>
@@ -263,7 +263,7 @@
 			var availableDeviceTypes = [ZBX_SVC.agent, ZBX_SVC.snmpv1, ZBX_SVC.snmpv2, ZBX_SVC.snmpv3],
 				uniquenessCriteria = jQuery('#uniqueness_criteria_row_' + value.dcheckid);
 
-			if (jQuery.inArray(parseInt(value.type), availableDeviceTypes) > -1) {
+			if (jQuery.inArray(parseInt(value.type, 10), availableDeviceTypes) > -1) {
 				if (uniquenessCriteria.length) {
 					jQuery('label[for=uniqueness_criteria_' + value.dcheckid + ']').text(value['name']);
 				}
@@ -583,7 +583,7 @@
 			else {
 				dCheck.name = jQuery('#type :selected').text();
 
-				if (typeof dCheck.ports != 'undefined' && dCheck.ports != discoveryCheckDefaultPort(dCheck.type)) {
+				if (typeof(dCheck.ports) != 'undefined' && dCheck.ports != discoveryCheckDefaultPort(dCheck.type)) {
 					dCheck.name += ' (' + dCheck.ports + ')';
 				}
 				if (dCheck.key_) {
