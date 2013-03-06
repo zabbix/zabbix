@@ -103,7 +103,7 @@ class testInheritanceGraphPrototype extends CWebTest {
 	 * Backup the tables that will be modified during the tests.
 	 */
 	public function testInheritanceGraphPrototype_setup() {
-		DBsave_tables('hosts');
+		DBsave_tables('graphs');
 	}
 
 	// returns all possible item types
@@ -193,13 +193,11 @@ class testInheritanceGraphPrototype extends CWebTest {
 		$this->zbxTestClickWait('link='.$this->discoveryRule);
 		$this->zbxTestClickWait('link=Graph prototypes');
 
-	//	$this->checkTitle('Configuration of graph prototypes');
-		$this->checkTitle('Configuration of graphs');
+		$this->checkTitle('Configuration of graph prototypes');
 		$this->zbxTestTextPresent(array('CONFIGURATION OF GRAPH PROTOTYPES', "Graph prototypes of ".$this->discoveryRule));
 
 		$this->zbxTestClickWait('form');
-	// $this->checkTitle('Configuration of graph prototypes');
-		$this->checkTitle('Configuration of graphs');
+		$this->checkTitle('Configuration of graph prototypes');
 		$this->zbxTestTextPresent(array('CONFIGURATION OF GRAPH PROTOTYPES', 'Graph prototype'));
 
 		$this->zbxTestTextPresent('Name');
@@ -470,8 +468,36 @@ class testInheritanceGraphPrototype extends CWebTest {
 		$this->assertAttribute("//input[@id='cancel']/@value", 'Cancel');
 	}
 
+	// Returns list of graphs
+	public static function allGraphs() {
+		return DBdata("select * from graphs g left join graphs_items gi on gi.graphid=g.graphid where gi.itemid='23600'");
+	}
 
-	public static function simple() {
+	/**
+	 * @dataProvider allGraphs
+	 */
+	public function testInheritanceGraphPrototype_simpleCreate($data) {
+		$name = $data['name'];
+
+		$sqlGraphs = "select * from graphs";
+		$oldHashGraphs = DBhash($sqlGraphs);
+
+		$this->zbxTestLogin('templates.php');
+		$this->zbxTestClickWait('link='.$this->template);
+		$this->zbxTestClickWait('link=Discovery rules');
+		$this->zbxTestClickWait('link='.$this->discoveryRule);
+		$this->zbxTestClickWait('link=Graph prototypes');
+		$this->zbxTestClickWait('link='.$name);
+		$this->zbxTestClickWait('save');
+		$this->checkTitle('Configuration of graph prototypes');
+		$this->zbxTestTextPresent(array('CONFIGURATION OF GRAPH PROTOTYPES', "Graph prototypes of ".$this->discoveryRule));
+		$this->zbxTestTextPresent('Graph updated');
+		$this->zbxTestTextPresent("$name");
+
+		$this->assertEquals($oldHashGraphs, DBhash($sqlGraphs));
+	}
+
+	public static function graphCreate() {
 		return array(
 			array(
 				array('expected' => GRAPH_GOOD,
@@ -724,9 +750,9 @@ class testInheritanceGraphPrototype extends CWebTest {
 	}
 
 	/**
-	 * @dataProvider simple
+	 * @dataProvider graphCreate
 	 */
-	public function testInheritanceGraphPrototype_simpleCreate($data) {
+	public function testInheritanceGraphPrototype_create($data) {
 
 		$this->zbxTestLogin('templates.php');
 		$this->zbxTestClickWait('link='.$this->template);
@@ -736,13 +762,11 @@ class testInheritanceGraphPrototype extends CWebTest {
 
 		$itemName = $this->item;
 
-	//	$this->checkTitle('Configuration of graph prototypes');TODO
-		$this->checkTitle('Configuration of graphs');
+		$this->checkTitle('Configuration of graph prototypes');
 		$this->zbxTestTextPresent(array('CONFIGURATION OF GRAPH PROTOTYPES', "Graph prototypes of ".$this->discoveryRule));
 
 		$this->zbxTestClickWait('form');
-	// $this->checkTitle('Configuration of graph prototypes');TODO
-		$this->checkTitle('Configuration of graphs');
+		$this->checkTitle('Configuration of graph prototypes');
 		$this->zbxTestTextPresent(array('CONFIGURATION OF GRAPH PROTOTYPES', 'Graph prototype'));
 
 		if (isset($data['graphtype'])) {
@@ -855,14 +879,12 @@ class testInheritanceGraphPrototype extends CWebTest {
 		switch ($data['expected']) {
 			case GRAPH_GOOD:
 				$this->zbxTestTextPresent('Graph added');
-				$this->checkTitle('Configuration of graphs');
-			//	$this->checkTitle('Configuration of graph prototypes');TODO
+				$this->checkTitle('Configuration of graph prototypes');
 				$this->zbxTestTextPresent(array('CONFIGURATION OF GRAPH PROTOTYPES', "Graph prototypes of ".$this->discoveryRule));
 				break;
 
 			case GRAPH_BAD:
-				$this->checkTitle('Configuration of graphs');
-			//	$this->checkTitle('Configuration of graph prototypes');TODO
+				$this->checkTitle('Configuration of graph prototypes');
 				$this->zbxTestTextPresent(array('CONFIGURATION OF GRAPH PROTOTYPES', 'Graph prototype'));
 				foreach ($data['errors'] as $msg) {
 					$this->zbxTestTextPresent($msg);
@@ -949,6 +971,6 @@ class testInheritanceGraphPrototype extends CWebTest {
 	 * Restore the original tables.
 	 */
 	public function testInheritanceGraphPrototype_teardown() {
-		DBrestore_tables('hosts');
+		DBrestore_tables('graphs');
 	}
 }
