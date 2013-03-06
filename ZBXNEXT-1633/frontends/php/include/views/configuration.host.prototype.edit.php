@@ -112,12 +112,11 @@ $frmHost->addItem($divTabs);
  */
 $main = array(new CSubmit('save', _('Save')));
 $others = array();
-if ($hostPrototype['hostid'] && $_REQUEST['form'] != 'full_clone') {
+if ($hostPrototype['hostid']) {
 	$btnDelete = new CButtonDelete(_('Delete selected host prototype?'), url_param('form').url_param('hostid').url_param('parent_hostid').url_param('parent_discoveryid'));
 	$btnDelete->setEnabled(!$hostPrototype['templateid']);
 
 	$others[] = new CSubmit('clone', _('Clone'));
-	$others[] = new CSubmit('full_clone', _('Full clone'));
 	$others[] = $btnDelete;
 }
 $others[] = new CButtonCancel(url_param('parent_hostid').url_param('parent_discoveryid'));
