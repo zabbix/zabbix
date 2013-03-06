@@ -210,7 +210,7 @@
 			var value = list[i];
 
 			if (typeof(value.dcheckid) == 'undefined') {
-				value.dcheckid = createDCheckId();
+				value.dcheckid = getUniqueId();
 			}
 
 			// add
@@ -483,40 +483,30 @@
 		var dCheck = jQuery('#new_check_form :input:enabled').serializeJSON();
 
 		// get check id
-		if (typeof(dcheckId) != 'undefined') {
-			dCheck.dcheckid = dcheckId;
-		}
-		else {
-			dCheck.dcheckid = createDCheckId();
-
-			while (jQuery('#uniqueness_criteria_' + dCheck.dcheckid).length
-						|| jQuery('#dcheckRow_' + dCheck.dcheckid).length) {
-				dCheck.dcheckid++;
-			}
-		}
+		dCheck.dcheckid = (typeof(dcheckId) == 'undefined') ? getUniqueId() : dcheckId;
 
 		// check for duplicates
-		for (var dcheckid in ZBX_CHECKLIST) {
-			if (typeof(dcheckId) == 'undefined' || (typeof(dcheckId) != 'undefined') && dcheckId != dcheckid) {
-				if ((typeof dCheck['key_'] == 'undefined' || ZBX_CHECKLIST[dcheckid]['key_'] === dCheck['key_'])
-						&& (typeof dCheck['type'] == 'undefined'
-							|| ZBX_CHECKLIST[dcheckid]['type'] === dCheck['type'])
-						&& (typeof dCheck['ports'] == 'undefined'
-							|| ZBX_CHECKLIST[dcheckid]['ports'] === dCheck['ports'])
-						&& (typeof dCheck['snmp_community'] == 'undefined'
-							|| ZBX_CHECKLIST[dcheckid]['snmp_community'] === dCheck['snmp_community'])
-						&& (typeof dCheck['snmpv3_authprotocol'] == 'undefined'
-							|| ZBX_CHECKLIST[dcheckid]['snmpv3_authprotocol'] === dCheck['snmpv3_authprotocol'])
-						&& (typeof dCheck['snmpv3_authpassphrase'] == 'undefined'
-							|| ZBX_CHECKLIST[dcheckid]['snmpv3_authpassphrase'] === dCheck['snmpv3_authpassphrase'])
-						&& (typeof dCheck['snmpv3_privprotocol'] == 'undefined'
-							|| ZBX_CHECKLIST[dcheckid]['snmpv3_privprotocol'] === dCheck['snmpv3_privprotocol'])
-						&& (typeof dCheck['snmpv3_privpassphrase'] == 'undefined'
-							|| ZBX_CHECKLIST[dcheckid]['snmpv3_privpassphrase'] === dCheck['snmpv3_privpassphrase'])
-						&& (typeof dCheck['snmpv3_securitylevel'] == 'undefined'
-							|| ZBX_CHECKLIST[dcheckid]['snmpv3_securitylevel'] === dCheck['snmpv3_securitylevel'])
-						&& (typeof dCheck['snmpv3_securityname'] == 'undefined'
-							|| ZBX_CHECKLIST[dcheckid]['snmpv3_securityname'] === dCheck['snmpv3_securityname'])) {
+		for (var zbxDcheckId in ZBX_CHECKLIST) {
+			if (typeof(dcheckId) == 'undefined' || (typeof(dcheckId) != 'undefined') && dcheckId != zbxDcheckId) {
+				if ((typeof(dCheck['key_']) == 'undefined' || ZBX_CHECKLIST[zbxDcheckId]['key_'] === dCheck['key_'])
+						&& (typeof(dCheck['type']) == 'undefined'
+							|| ZBX_CHECKLIST[zbxDcheckId]['type'] === dCheck['type'])
+						&& (typeof(dCheck['ports']) == 'undefined'
+							|| ZBX_CHECKLIST[zbxDcheckId]['ports'] === dCheck['ports'])
+						&& (typeof(dCheck['snmp_community']) == 'undefined'
+							|| ZBX_CHECKLIST[zbxDcheckId]['snmp_community'] === dCheck['snmp_community'])
+						&& (typeof(dCheck['snmpv3_authprotocol']) == 'undefined'
+							|| ZBX_CHECKLIST[zbxDcheckId]['snmpv3_authprotocol'] === dCheck['snmpv3_authprotocol'])
+						&& (typeof(dCheck['snmpv3_authpassphrase']) == 'undefined'
+							|| ZBX_CHECKLIST[zbxDcheckId]['snmpv3_authpassphrase'] === dCheck['snmpv3_authpassphrase'])
+						&& (typeof(dCheck['snmpv3_privprotocol']) == 'undefined'
+							|| ZBX_CHECKLIST[zbxDcheckId]['snmpv3_privprotocol'] === dCheck['snmpv3_privprotocol'])
+						&& (typeof(dCheck['snmpv3_privpassphrase']) == 'undefined'
+							|| ZBX_CHECKLIST[zbxDcheckId]['snmpv3_privpassphrase'] === dCheck['snmpv3_privpassphrase'])
+						&& (typeof(dCheck['snmpv3_securitylevel']) == 'undefined'
+							|| ZBX_CHECKLIST[zbxDcheckId]['snmpv3_securitylevel'] === dCheck['snmpv3_securitylevel'])
+						&& (typeof(dCheck['snmpv3_securityname']) == 'undefined'
+							|| ZBX_CHECKLIST[zbxDcheckId]['snmpv3_securityname'] === dCheck['snmpv3_securityname'])) {
 					alert(<?php echo CJs::encodeJson(_('Check already exists.')); ?>);
 
 					return null;
@@ -605,10 +595,6 @@
 				jQuery('#new_check_form').remove();
 			}
 		});
-	}
-
-	function createDCheckId() {
-		return jQuery('#dcheckList tr[id^=dcheckRow_]').length;
 	}
 
 	function selectUniquenessCriteriaDefault() {
