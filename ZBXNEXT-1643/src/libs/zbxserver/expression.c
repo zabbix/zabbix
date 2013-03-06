@@ -843,6 +843,8 @@ static int	DBget_trigger_template_name(zbx_uint64_t triggerid, zbx_uint64_t *use
 	}
 	DBfree_result(result);
 
+	zbx_free(sql);
+
 	return ret;
 }
 
@@ -918,6 +920,8 @@ static int	DBget_trigger_hostgroup_name(zbx_uint64_t triggerid, zbx_uint64_t *us
 		ret = SUCCEED;
 	}
 	DBfree_result(result);
+
+	zbx_free(sql);
 
 	return ret;
 }
