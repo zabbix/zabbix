@@ -51,10 +51,13 @@ int	CONFIG_BUFFER_SEND		= 5;
 
 int	CONFIG_MAX_LINES_PER_SECOND	= 100;
 
-char	**CONFIG_ALIASES                = NULL;
-char	**CONFIG_USER_PARAMETERS        = NULL;
+char	*CONFIG_LOAD_MODULE_PATH	= NULL;
+
+char	**CONFIG_ALIASES		= NULL;
+char	**CONFIG_LOAD_MODULE		= NULL;
+char	**CONFIG_USER_PARAMETERS	= NULL;
 #if defined(_WINDOWS)
-char	**CONFIG_PERF_COUNTERS          = NULL;
+char	**CONFIG_PERF_COUNTERS		= NULL;
 #endif
 
 /******************************************************************************
@@ -97,8 +100,6 @@ void	load_aliases(char **lines)
  *                                                                            *
  * Parameters: lines - user parameter entries from configuration file         *
  *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  * Author: Vladimir Levijev                                                   *
  *                                                                            *
  * Comments: calls add_user_parameter() for each entry                        *
@@ -106,18 +107,24 @@ void	load_aliases(char **lines)
  ******************************************************************************/
 void	load_user_parameters(char **lines)
 {
-	char	*command, **pline;
+	char	*p, **pline, error[MAX_STRING_LEN];
 
 	for (pline = lines; NULL != *pline; pline++)
 	{
-		if (NULL == (command = strchr(*pline, ',')))
+		if (NULL == (p = strchr(*pline, ',')))
 		{
-			zabbix_log(LOG_LEVEL_CRIT, "UserParameter \"%s\" FAILED: not comma-separated", *pline);
-			exit(FAIL);
+			zabbix_log(LOG_LEVEL_CRIT, "cannot add user parameter \"%s\": not comma-separated", *pline);
+			exit(EXIT_FAILURE);
 		}
-		*command++ = '\0';
+		*p = '\0';
 
-		add_user_parameter(*pline, command);
+		if (FAIL == add_user_parameter(*pline, p + 1, error, sizeof(error)))
+		{
+			*p = ',';
+			zabbix_log(LOG_LEVEL_CRIT, "cannot add user parameter \"%s\": %s", *pline, error);
+			exit(EXIT_FAILURE);
+		}
+		*p = ',';
 	}
 }
 

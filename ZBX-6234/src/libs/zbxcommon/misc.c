@@ -1381,7 +1381,7 @@ int	is_uint_suffix(const char *str, unsigned int *value)
 	const unsigned int	max_uint = ~0U;
 	unsigned int		value_uint = 0, c, factor = 1;
 
-	if ('\0' == *str || '1' > *str || *str > '9')
+	if ('\0' == *str || '0' > *str || *str > '9')
 		return FAIL;
 
 	while ('\0' != *str && 0 != isdigit(*str))

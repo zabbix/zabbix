@@ -288,6 +288,11 @@ finish:
 		zabbix_log(LOG_LEVEL_WARNING, "NODE %d: Error sending result of command to node %d",
 				CONFIG_NODEID, nodeid);
 	}
+	else
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "NODE %d: Sending back command '%s' result '%s'",
+				CONFIG_NODEID, data, send);
+	}
 	alarm(0);
 
 	zbx_json_free(&j);

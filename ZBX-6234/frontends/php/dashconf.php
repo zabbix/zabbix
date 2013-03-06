@@ -188,7 +188,7 @@ if ($grpswitch == 1) {
 	$groups = API::HostGroup()->get($options);
 
 	foreach ($groups as &$group) {
-		$group['nodename'] = get_node_name_by_elid($group['groupid'], true, ': ');
+		$group['nodename'] = get_node_name_by_elid($group['groupid'], true, NAME_DELIMITER);
 	}
 	unset($group);
 

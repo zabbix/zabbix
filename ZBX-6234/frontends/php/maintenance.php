@@ -204,7 +204,7 @@ elseif (isset($_REQUEST['save'])) {
 	}
 
 	if ($result) {
-		add_audit(!isset($_REQUEST['maintenanceid']) ? AUDIT_ACTION_ADD : AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_MAINTENANCE, _('Name').': '.$_REQUEST['mname']);
+		add_audit(!isset($_REQUEST['maintenanceid']) ? AUDIT_ACTION_ADD : AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_MAINTENANCE, _('Name').NAME_DELIMITER.$_REQUEST['mname']);
 		unset($_REQUEST['form']);
 	}
 	show_messages($result, $msg1, $msg2);
