@@ -88,15 +88,17 @@ int	json_parse_string(const char **start, const char **end, char **error)
 
 	while ('"' != *ptr)
 	{
-		/* unexpected end of string while reading object name, failing */
+		/* unexpected end of string data, failing */
 		if ('\0' == *ptr)
 			return json_error("unexpected end of string data", NULL, error);
 
 		if ('\\' == *ptr)
 		{
-			/* unexpected end of string while reading object name, failing */
+			char *escape_start = ptr;
+
+			/* unexpected end of string data, failing */
 			if ('\0' == *(++ptr))
-				return json_error("unexpected end of string data", NULL, error);
+				return json_error("invalid escape sequence in string", escape_start, error);
 
 			switch (*ptr)
 			{
@@ -108,8 +110,18 @@ int	json_parse_string(const char **start, const char **end, char **error)
 				case 'n':
 				case 'r':
 				case 't':
-				case 'u':
 					break;
+				case 'u':
+				{
+					int i;
+
+					/* check if the \u is followed with 4 hex digits */
+					for (i = 0; i < 4; i++)
+						if ( 0 == isxdigit(*(++ptr)) )
+							return json_error("invalid escape sequence in string", escape_start, error);
+
+					break;
+				}
 				default:
 					return json_error("invalid escape sequence in string data", ptr - 1, error);
 			}
