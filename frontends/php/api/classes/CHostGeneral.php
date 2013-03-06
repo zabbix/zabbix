@@ -156,6 +156,11 @@ abstract class CHostGeneral extends CHostBase {
 					'templateids' => $templateid
 				));
 
+				API::HostPrototype()->syncTemplates(array(
+					'hostids' => $targetid,
+					'templateids' => $templateid
+				));
+
 				API::Item()->syncTemplates(array(
 					'hostids' => $targetid,
 					'templateids' => $templateid
@@ -397,6 +402,39 @@ abstract class CHostGeneral extends CHostBase {
 			}
 		}
 		/* }}} ITEMS, DISCOVERY RULES */
+
+		// host prototypes
+		// we need only to unlink host prototypes. in case of unlink and clear they will be deleted together with LLD rules.
+		if (!$clear && isset($items[ZBX_FLAG_DISCOVERY])) {
+			$discoveryRuleIds = array_keys($items[ZBX_FLAG_DISCOVERY]);
+
+			$query = DBSelect(
+				'SELECT DISTINCT h.hostid,h.host,h3.host parent_host'.
+				' FROM hosts h'.
+					' INNER JOIN host_discovery hd ON h.hostid=hd.hostid'.
+					' INNER JOIN hosts h2 ON h.templateid=h2.hostid'.
+					' INNER JOIN host_discovery hd2 ON h.hostid=hd.hostid'.
+					' INNER JOIN items i ON hd.parent_itemid=i.itemid'.
+					' INNER JOIN hosts h3 ON i.hostid=h3.hostid'.
+				' WHERE '.dbConditionInt('hd.parent_itemid', $discoveryRuleIds)
+			);
+			$hostPrototypes = array();
+			while ($hostPrototype = DBfetch($query)) {
+				$hostPrototypes[$hostPrototype['hostid']] = array(
+					'host' => $hostPrototype['host'],
+					'parent_host' => $hostPrototype['parent_host']
+				);
+			}
+			if ($hostPrototypes) {
+				DB::update('hosts', array(
+					'values' => array('templateid' => 0),
+					'where' => array('hostid' => array_keys($hostPrototypes))
+				));
+				foreach ($hostPrototypes as $hostPrototype) {
+					info(_s('Unlinked: Host prototype "%1$s" on "%2$s".', $hostPrototype['host'], $hostPrototype['parent_host']));
+				}
+			}
+		}
 
 
 		/* GRAPHS {{{ */

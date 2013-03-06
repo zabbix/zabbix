@@ -178,11 +178,13 @@ if (isset($_REQUEST['form'])) {
 		'discovery_rule' => $discoveryRule,
 		'host_prototype' => array(
 			'hostid' => get_request('hostid'),
+			'templateid' => get_request('templateid'),
 			'host' => get_request('host'),
 			'name' => get_request('name'),
 			'status' => get_request('status', HOST_STATUS_MONITORED),
 			'templates' => get_request('templates', array())
-		)
+		),
+		'templates' => array()
 	);
 
 	if (get_request('hostid') && !get_request('form_refresh')) {
@@ -190,6 +192,27 @@ if (isset($_REQUEST['form'])) {
 		$data['host_prototype']['templates'] = array();
 		foreach ($hostPrototype['templates'] as $template) {
 			$data['host_prototype']['templates'][$template['templateid']] = $template['name'];
+		}
+
+		// add parent templates
+		if ($hostPrototype['templateid']) {
+			$data['parents'] = array();
+			$hostPrototypeId = $hostPrototype['templateid'];
+			while ($hostPrototypeId) {
+				$parentHostPrototype = API::HostPrototype()->get(array(
+					'output' => array('itemid', 'templateid'),
+					'selectHost' => array('hostid', 'name'),
+					'selectDiscoveryRule' => array('itemid'),
+					'hostids' => $hostPrototypeId
+				));
+				$parentHostPrototype = reset($parentHostPrototype);
+				$hostPrototypeId = null;
+
+				if ($parentHostPrototype) {
+					$data['parents'][] = $parentHostPrototype;
+					$hostPrototypeId = $parentHostPrototype['templateid'];
+				}
+			}
 		}
 	}
 
@@ -222,18 +245,41 @@ else {
 	}
 	$data['paging'] = getPagingLine($data['hostPrototypes']);
 
-	// selecting linked templates to templates linked to host prototypes
+	// fetch templates linked to the prototypes
 	$templateIds = array();
 	foreach ($data['hostPrototypes'] as $hostPrototype) {
 		$templateIds = array_merge($templateIds, zbx_objectValues($hostPrototype['templates'], 'templateid'));
 	}
 	$templateIds = array_unique($templateIds);
 
-	$parentTemplates = API::Template()->get(array(
+	$linkedTemplates = API::Template()->get(array(
 		'templateids' => $templateIds,
 		'selectParentTemplates' => array('hostid', 'name')
 	));
-	$data['parentTemplates'] = zbx_toHash($parentTemplates, 'templateid');
+	$data['linkedTemplates'] = zbx_toHash($linkedTemplates, 'templateid');
+
+	// fetch source templates
+	$hostPrototypeSourceIds = getHostPrototypeSourceParentIds(zbx_objectValues($data['hostPrototypes'], 'hostid'));
+	if ($hostPrototypeSourceIds) {
+		$hostPrototypeSourceTemplates = DBfetchArrayAssoc(DBSelect(
+			'SELECT h.hostid,h2.name,h2.hostid parent_hostid'.
+			' FROM hosts h,host_discovery hd,items i,hosts h2'.
+			' WHERE h.hostid=hd.hostid'.
+				' AND hd.parent_itemid=i.itemid'.
+				' AND i.hostid=h2.hostid'.
+				' AND '.dbConditionInt('h.hostid', $hostPrototypeSourceIds)
+		), 'hostid');
+		foreach ($data['hostPrototypes'] as &$hostPrototype) {
+			if ($hostPrototype['templateid']) {
+				$sourceTemplate = $hostPrototypeSourceTemplates[$hostPrototypeSourceIds[$hostPrototype['hostid']]];
+				$hostPrototype['sourceTemplate'] = array(
+					'hostid' => $sourceTemplate['parent_hostid'],
+					'name' => $sourceTemplate['name']
+				);
+			}
+		}
+		unset($hostPrototype);
+	}
 
 	// render view
 	$itemView = new CView('configuration.host.prototype.list', $data);

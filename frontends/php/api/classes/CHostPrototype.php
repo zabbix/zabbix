@@ -32,10 +32,12 @@ class CHostPrototype extends CHostBase {
 		parent::__construct();
 
 		$this->getOptions = array_merge($this->getOptions, array(
-			'discoveryids'  	=> null,
-			'selectTemplates' 	=> null,
-			'sortfield'    		=> '',
-			'sortorder'     	=> ''
+			'discoveryids'  		=> null,
+			'selectDiscoveryRule' 	=> null,
+			'selectHost'			=> null,
+			'selectTemplates' 		=> null,
+			'sortfield'    			=> '',
+			'sortorder'     		=> ''
 		));
 	}
 
@@ -146,17 +148,31 @@ class CHostPrototype extends CHostBase {
 		}
 
 		$this->validateCreate($hostPrototypes);
+		$hostPrototypes = $this->createReal($hostPrototypes);
+		$this->inherit($hostPrototypes);
 
+		return array('hostids' => zbx_objectValues($hostPrototypes, 'hostid'));
+	}
+
+	/**
+	 * Creates the host prototypes and inherits them to linked hosts and templates.
+	 *
+	 * @param array $hostPrototypes
+	 *
+	 * @return array	an array of host prototypes with host IDs
+	 */
+	protected function createReal(array $hostPrototypes) {
 		foreach ($hostPrototypes as &$hostPrototype) {
 			$hostPrototype['flags'] = ZBX_FLAG_DISCOVERY_CHILD;
 		}
+		unset($hostPrototype);
 
 		// save the host prototypes
 		$hostPrototypeIds = DB::insert($this->tableName(), $hostPrototypes);
 
 		$hostPrototypeDiscoveryRules = array();
 		foreach ($hostPrototypes as $key => $hostPrototype) {
-			$hostPrototype['hostid'] = $hostPrototypeIds[$key];
+			$hostPrototypes[$key]['hostid'] = $hostPrototype['hostid'] = $hostPrototypeIds[$key];
 
 			if (isset($hostPrototype['templates'])) {
 				$this->link(zbx_objectValues($hostPrototype['templates'], 'templateid'), array($hostPrototype['hostid']));
@@ -171,9 +187,7 @@ class CHostPrototype extends CHostBase {
 		// link host prototypes to discovery rules
 		DB::insert('host_discovery', $hostPrototypeDiscoveryRules);
 
-		// TODO: inheritance
-
-		return array('hostids' => $hostPrototypeIds);
+		return $hostPrototypes;
 	}
 
 	/**
@@ -246,7 +260,26 @@ class CHostPrototype extends CHostBase {
 		}
 
 		$this->validateUpdate($hostPrototypes);
+		$hostPrototypes = $this->updateReal($hostPrototypes);
 
+		// load additional data required for inheritance
+		$hostPrototypes = $this->extendObjects($this->tableName(), $hostPrototypes, array('host'));
+		$hostPrototypes = zbx_toHash($hostPrototypes, 'hostid');
+		$relationMap = $this->createRelationMap($hostPrototypes, 'hostid', 'parent_itemid', 'host_discovery');
+		$hostPrototypes = $relationMap->mapIdOne($hostPrototypes, 'ruleid');
+		$this->inherit($hostPrototypes);
+
+		return array('hostids' => zbx_objectValues($hostPrototypes, 'hostid'));
+	}
+
+	/**
+	 * Updates the host prototypes and propagates the changes to linked hosts and templates.
+	 *
+	 * @param array $hostPrototypes
+	 *
+	 * @return array
+	 */
+	protected function updateReal(array $hostPrototypes) {
 		// save the host prototypes
 		$newTemplatesByHostPrototypeId = array();
 		foreach ($hostPrototypes as $hostPrototype) {
@@ -271,9 +304,209 @@ class CHostPrototype extends CHostBase {
 			$this->link(array_diff($newTemplateIds, $existingTemplateIds), array($hostId));
 		}
 
-		// TODO: inheritance
+		return $hostPrototypes;
+	}
 
-		return array('hostids' => zbx_objectValues($hostPrototypes, 'hostid'));
+	/**
+	 * Updates the children of the host prototypes on the given hosts and propagates the inheritance to the child hosts.
+	 *
+	 * @param array $hostPrototypes		array of host prototypes to inherit
+	 * @param array $hostids   			array of hosts to inherit to; if set to null, the children will be updated on all
+	 *                              	child hosts
+	 *
+	 * @return bool
+	 */
+	protected function inherit(array $hostPrototypes, array $hostids = null) {
+		if (empty($hostPrototypes)) {
+			return true;
+		}
+
+		// prepare the child host prototypes
+		$newHostPrototypes = $this->prepareInheritedItems($hostPrototypes, $hostids);
+		if (!$newHostPrototypes) {
+			return true;
+		}
+
+		$insertHostPrototypes = array();
+		$updateHostPrototypes = array();
+		foreach ($newHostPrototypes as $newHostPrototype) {
+			if (isset($newHostPrototype['hostid'])) {
+				$updateHostPrototypes[] = $newHostPrototype;
+			}
+			else {
+				$insertHostPrototypes[] = $newHostPrototype;
+			}
+		}
+
+		// save the new host prototypes
+		if (!zbx_empty($insertHostPrototypes)) {
+			$insertHostPrototypes = $this->createReal($insertHostPrototypes);
+		}
+
+		if (!zbx_empty($updateHostPrototypes)) {
+			$updateHostPrototypes = $this->updateReal($updateHostPrototypes);
+		}
+
+		// propagate the inheritance to the children
+		return $this->inherit(array_merge($updateHostPrototypes, $insertHostPrototypes));
+	}
+
+
+	/**
+	 * Prepares and returns an array of child host prototypes, inherited from host prototypes $hostPrototypes
+	 * on the given hosts.
+	 *
+	 * Each host prototype must have the "ruleid" parameter set.
+	 *
+	 * @param array     $hostPrototypes
+	 * @param array		$hostIds
+	 *
+	 * @return array 	an array of unsaved child host prototypes
+	 */
+	protected function prepareInheritedItems(array $hostPrototypes, array $hostIds = null) {
+		// fetch the related discovery rules with their hosts
+		$discoveryRules = API::DiscoveryRule()->get(array(
+			'output' => array('itemid', 'hostid'),
+			'selectHosts' => array('hostid'),
+			'itemids' => zbx_objectValues($hostPrototypes, 'ruleid'),
+			'templated' => true,
+			'nopermissions' => true,
+			'preservekeys' => true
+		));
+
+		// fetch all child hosts to inherit to
+		$chdHosts = API::Host()->get(array(
+			'output' => array('hostid', 'host', 'status'),
+			'selectParentTemplates' => array('templateid'),
+			'templateids' => zbx_objectValues($discoveryRules, 'hostid'),
+			'hostids' => $hostIds,
+			'nopermissions' => true,
+			'templated_hosts' => true
+		));
+		if (empty($chdHosts)) {
+			return array();
+		}
+
+		// fetch the child discovery rules
+		$childDiscoveryRules = API::DiscoveryRule()->get(array(
+			'output' => array('itemid', 'templateid', 'hostid'),
+			'selectHostPrototypes' => array('hostid', 'host', 'templateid'),
+			'preservekeys' => true,
+			'filter' => array(
+				'templateid' => array_keys($discoveryRules)
+			)
+		));
+
+		// match each discovery that the parent host prototypes belong to to the child discovery rule for each host
+		$discoveryRuleChildren = array();
+		foreach ($childDiscoveryRules as $childRule) {
+			$discoveryRuleChildren[$childRule['templateid']][$childRule['hostid']] = $childRule['itemid'];
+		}
+
+		$newHostPrototypes = array();
+		foreach ($chdHosts as $host) {
+			$hostId = $host['hostid'];
+
+			// skip items not from parent templates of current host
+			$templateIds = zbx_toHash($host['parentTemplates'], 'templateid');
+			$parentHostPrototypes = array();
+			foreach ($hostPrototypes as $inum => $parentHostPrototype) {
+				$parentTemplateId = $discoveryRules[$parentHostPrototype['ruleid']]['hostid'];
+
+				if (isset($templateIds[$parentTemplateId])) {
+					$parentHostPrototypes[$inum] = $parentHostPrototype;
+				}
+			}
+
+			foreach ($parentHostPrototypes as $parentHostPrototype) {
+				$childDiscoveryRuleId = $discoveryRuleChildren[$parentHostPrototype['ruleid']][$hostId];
+				$exHostPrototype = null;
+
+				// check if the child discovery rule already has host prototypes
+				$exHostPrototypes = $childDiscoveryRules[$childDiscoveryRuleId]['hostPrototypes'];
+				if ($exHostPrototypes) {
+					$exHostPrototypesHosts = zbx_toHash($exHostPrototypes, 'host');
+					$exHostPrototypesTemplateIds = zbx_toHash($exHostPrototypes, 'templateid');
+
+					// look for an already created inherited host prototype
+					// if one exists - update it
+					if (isset($exHostPrototypesTemplateIds[$parentHostPrototype['hostid']])) {
+						$exHostPrototype = $exHostPrototypesTemplateIds[$parentHostPrototype['hostid']];
+
+						// check if there's a host prototype on the target host with the same host name but from a different template
+						// or no template
+						if (isset($exHostPrototypesHosts[$parentHostPrototype['host']])
+							&& !idcmp($exHostPrototypesHosts[$parentHostPrototype['host']]['templateid'], $parentHostPrototype['hostid'])) {
+
+							$discoveryRule = DBfetch(DBselect('SELECT i.name FROM items i WHERE i.itemid='.zbx_dbstr($exHostPrototype['discoveryRule']['itemid'])));
+							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Host prototype "%1$s" already exists on "%2$s".', $parentHostPrototype['host'], $discoveryRule['name']));
+						}
+					}
+
+					// look for a host prototype with the same host name
+					// if one exists - convert it to an inherited host prototype
+					if (isset($exHostPrototypesHosts[$parentHostPrototype['host']])) {
+						$exHostPrototype = $exHostPrototypesHosts[$parentHostPrototype['host']];
+
+						// check that this host prototype is not inherited from a different template
+						if ($exHostPrototype['templateid'] > 0 && !idcmp($exHostPrototype['templateid'], $parentHostPrototype['hostid'])) {
+							$discoveryRule = DBfetch(DBselect('SELECT i.name FROM items i WHERE i.itemid='.zbx_dbstr($exHostPrototype['discoveryRule']['itemid'])));
+							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Host prototype "%1$s" already exists on "%2$s", inherited from another template.', $parentHostPrototype['host'], $discoveryRule['name']));
+						}
+					}
+				}
+
+				// copy host prototype
+				$newHostPrototype = $parentHostPrototype;
+				$newHostPrototype['ruleid'] = $discoveryRuleChildren[$parentHostPrototype['ruleid']][$hostId];
+				$newHostPrototype['templateid'] = $parentHostPrototype['hostid'];
+
+				if ($exHostPrototype) {
+					$newHostPrototype['hostid'] = $exHostPrototype['hostid'];
+				}
+				else {
+					unset($newHostPrototype['hostid']);
+				}
+				$newHostPrototypes[] = $newHostPrototype;
+			}
+		}
+
+		return $newHostPrototypes;
+	}
+
+	/**
+	 * Inherits all host prototypes from the templates given in "templateids" to hosts or templates given in "hostids".
+	 *
+	 * @param array $data
+	 *
+	 * @return bool
+	 */
+	public function syncTemplates(array $data) {
+		$data['templateids'] = zbx_toArray($data['templateids']);
+		$data['hostids'] = zbx_toArray($data['hostids']);
+
+		$discoveryRules = API::DiscoveryRule()->get(array(
+			'output' => array('itemid'),
+			'hostids' => $data['templateids']
+		));
+		$hostPrototypes = $this->get(array(
+			'discoveryids' => zbx_objectValues($discoveryRules, 'itemid'),
+			'preservekeys' => true,
+			'output' => API_OUTPUT_EXTEND,
+			'selectTemplates' => array('templateid'),
+			'selectDiscoveryRule' => array('itemid')
+		));
+
+		// the ID of the discovery rule must be passed in the "ruleid" parameter
+		foreach ($hostPrototypes as &$hostPrototype) {
+			$hostPrototype['ruleid'] = $hostPrototype['discoveryRule']['itemid'];
+			unset($hostPrototype['discoveryRule']);
+		}
+		unset($hostPrototype);
+
+		$this->inherit($hostPrototypes, $data['hostids']);
+
+		return true;
 	}
 
 	/**
@@ -282,27 +515,46 @@ class CHostPrototype extends CHostBase {
 	 * @throws APIException if the input is invalid
 	 *
 	 * @param array $hostPrototypeIds
+	 * @param bool 	$nopermissions
 	 *
 	 * @return void
 	 */
-	protected function validateDelete($hostPrototypeIds) {
+	protected function validateDelete($hostPrototypeIds, $nopermissions) {
 		if (!$hostPrototypeIds) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 		}
 
-		$this->checkHostPrototypePermissions($hostPrototypeIds);
+		if (!$nopermissions) {
+			$this->checkHostPrototypePermissions($hostPrototypeIds);
+			$this->checkNotInherited($hostPrototypeIds);
+		}
 	}
 
 	/**
 	 * Delete host prototypes.
 	 *
-	 * @param $hostPrototypeIds
+	 * @param string|array 	$hostPrototypeIds
+	 * @param bool 			$nopermissions		if set to true, permission and template checks will be skipped
 	 *
 	 * @return array
 	 */
-	public function delete($hostPrototypeIds) {
+	public function delete($hostPrototypeIds, $nopermissions = false) {
 		$hostPrototypeIds = zbx_toArray($hostPrototypeIds);
-		$this->validateDelete($hostPrototypeIds);
+		$this->validateDelete($hostPrototypeIds, $nopermissions);
+
+		// include child IDs
+		$parentHostPrototypeIds = $hostPrototypeIds;
+		$childHostPrototypeIds = array();
+		do {
+			$query = DBselect('SELECT h.hostid FROM hosts h WHERE '.dbConditionInt('h.templateid', $parentHostPrototypeIds));
+			$parentHostPrototypeIds = array();
+			while ($hostPrototype = DBfetch($query)) {
+				$parentHostPrototypeIds[] = $hostPrototype['hostid'];
+				$childHostPrototypeIds[] = $hostPrototype['hostid'];
+			}
+		} while (!empty($parentHostPrototypeIds));
+
+		$hostPrototypeIds = array_merge($hostPrototypeIds, $childHostPrototypeIds);
 
 		DB::delete($this->tableName(), array('hostid' => $hostPrototypeIds));
 
@@ -449,6 +701,21 @@ class CHostPrototype extends CHostBase {
 	}
 
 	/**
+	 * Checks if the given host prototypes are not inherited from a template.
+	 *
+	 * @throws APIException 	if at least one host prototype is iherited
+	 *
+	 * @param array $hostPrototypeIds
+	 */
+	protected function checkNotInherited(array $hostPrototypeIds) {
+		$query = DBSelect('SELECT hostid FROM hosts h WHERE h.templateid>0 AND '.dbConditionInt('h.hostid', $hostPrototypeIds), 1);
+
+		if ($hostPrototype = DBfetch($query)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('Cannot delete templated host prototype.'));
+		}
+	}
+
+	/**
 	 * Check if any item from list already exists.
 	 * If items have item ids it will check for existing item with different itemid.
 	 *
@@ -528,7 +795,44 @@ class CHostPrototype extends CHostBase {
 	protected function addRelatedObjects(array $options, array $result) {
 		$result = parent::addRelatedObjects($options, $result);
 
-		$hostids = array_keys($result);
+		$hostPrototypeIds = array_keys($result);
+
+		// adding discovery rule
+		if ($options['selectDiscoveryRule'] !== null && $options['selectDiscoveryRule'] != API_OUTPUT_COUNT) {
+			$relationMap = $this->createRelationMap($result, 'hostid', 'parent_itemid', 'host_discovery');
+			$discoveryRules = API::DiscoveryRule()->get(array(
+				'output' => $options['selectDiscoveryRule'],
+				'nodeids' => $options['nodeids'],
+				'itemids' => $relationMap->getRelatedIds(),
+				'nopermissions' => true,
+				'preservekeys' => true,
+			));
+			$result = $relationMap->mapOne($result, $discoveryRules, 'discoveryRule');
+		}
+
+		// adding host
+		if ($options['selectHost'] !== null && $options['selectHost'] != API_OUTPUT_COUNT) {
+			$relationMap = new CRelationMap();
+			$dbRules = DBselect(
+				'SELECT hd.hostid,i.hostid parent_hostid'.
+					' FROM host_discovery hd,items i'.
+					' WHERE '.dbConditionInt('hd.hostid', $hostPrototypeIds).
+					' AND hd.parent_itemid=i.itemid'
+			);
+			while ($relation = DBfetch($dbRules)) {
+				$relationMap->addRelation($relation['hostid'], $relation['parent_hostid']);
+			}
+
+			$hosts = API::Host()->get(array(
+				'output' => $options['selectHost'],
+				'nodeids' => $options['nodeids'],
+				'hostids' => $relationMap->getRelatedIds(),
+				'templated_hosts' => true,
+				'nopermissions' => true,
+				'preservekeys' => true,
+			));
+			$result = $relationMap->mapOne($result, $hosts, 'host');
+		}
 
 		// adding templates
 		if ($options['selectTemplates'] !== null) {
@@ -545,7 +849,7 @@ class CHostPrototype extends CHostBase {
 			else {
 				$templates = API::Template()->get(array(
 					'nodeids' => $options['nodeids'],
-					'hostids' => $hostids,
+					'hostids' => $hostPrototypeIds,
 					'countOutput' => true,
 					'groupCount' => true
 				));
