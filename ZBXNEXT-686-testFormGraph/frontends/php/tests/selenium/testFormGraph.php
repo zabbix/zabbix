@@ -380,7 +380,7 @@ class testFormItem extends CWebTest {
 	public function testFormGraph_simpleCreate($data) {
 		$name = $data['name'];
 
-		$sqlGraphs = "select * from graphs where name='$name' order by graphid";
+		$sqlGraphs = "select * from graphs";
 		$oldHashGraphs = DBhash($sqlGraphs);
 
 		$this->zbxTestLogin('hosts.php');
