@@ -236,6 +236,21 @@
 			else {
 				ZBX_CHECKLIST[value.dcheckid] = value;
 
+				var ignoreNames = ['druleid', 'dcheckid', 'name', 'ports', 'type', 'uniq'];
+
+				// clean values
+				jQuery('#dcheckCell_' + value.dcheckid + ' input').each(function(i, item) {
+					var itemObj = jQuery(item);
+
+					var name = itemObj.attr('name').replace('dchecks[' + value.dcheckid + '][', '');
+					name = name.substring(0, name.length - 1);
+
+					if (jQuery.inArray(name, ignoreNames) == -1) {
+						itemObj.remove();
+					}
+				});
+
+				// set values
 				for (var fieldName in value) {
 					if (typeof(value[fieldName]) == 'string') {
 						var obj = jQuery('input[name="dchecks[' + value.dcheckid + '][' + fieldName + ']"]');
