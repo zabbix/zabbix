@@ -57,6 +57,16 @@ $hostTable->setHeader(array(
 ));
 
 foreach ($this->data['hostPrototypes'] as $hostPrototype) {
+	// name
+	$name = array();
+	if ($hostPrototype['templateid']) {
+		$sourceTemplate = $hostPrototype['sourceTemplate'];
+		$parentDiscoveryRuleId = get_realrule_by_itemid_and_hostid($discoverRule['itemid'], $sourceTemplate['hostid']);
+		$name[] = new CLink($sourceTemplate['name'], '?parent_discoveryid='.$parentDiscoveryRuleId.'&parent_hostid='.$sourceTemplate['hostid'], 'unknown');
+		$name[] = NAME_DELIMITER;
+	}
+	$name[] = new CLink($hostPrototype['name'], '?form=update&parent_discoveryid='.$discoverRule['itemid'].'&parent_hostid='.$this->data['parent_hostid'].'&hostid='.$hostPrototype['hostid']);
+
 	// template list
 	if (empty($hostPrototype['templates'])) {
 		$hostTemplates = '-';
@@ -70,12 +80,12 @@ foreach ($this->data['hostPrototypes'] as $hostPrototype) {
 			$caption = array();
 			$caption[] = new CLink($template['name'], 'templates.php?form=update&templateid='.$template['templateid'], 'unknown');
 
-			$parentTemplates = $this->data['parentTemplates'][$template['templateid']]['parentTemplates'];
-			if ($parentTemplates) {
-				order_result($parentTemplates, 'name');
+			$linkedTemplates = $this->data['linkedTemplates'][$template['templateid']]['parentTemplates'];
+			if ($linkedTemplates) {
+				order_result($linkedTemplates, 'name');
 
 				$caption[] = ' (';
-				foreach ($parentTemplates as $tpl) {
+				foreach ($linkedTemplates as $tpl) {
 					$caption[] = new CLink($tpl['name'],'templates.php?form=update&templateid='.$tpl['templateid'], 'unknown');
 					$caption[] = ', ';
 				}
@@ -101,7 +111,7 @@ foreach ($this->data['hostPrototypes'] as $hostPrototype) {
 
 	$hostTable->addRow(array(
 		new CCheckBox('group_hostid['.$hostPrototype['hostid'].']', null, null, $hostPrototype['hostid']),
-		new CLink($hostPrototype['name'], '?form=update&parent_discoveryid='.$discoverRule['itemid'].'&parent_hostid='.$this->data['parent_hostid'].'&hostid='.$hostPrototype['hostid']),
+		$name,
 		new CCol($hostTemplates, 'wraptext'),
 		$status
 	));

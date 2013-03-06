@@ -32,14 +32,6 @@ if (!isset($_REQUEST['form_refresh'])) {
 	$divTabs->setSelected(0);
 }
 
-$frm_title = _('Host');
-if ($hostPrototype['hostid']) {
-
-}
-else {
-	$original_templates = array();
-}
-
 $frmHost = new CForm();
 $frmHost->setName('hostPrototypeForm.');
 $frmHost->addVar('form', get_request('form', 1));
@@ -48,16 +40,30 @@ $frmHost->addVar('parent_discoveryid', $discoveryRule['itemid']);
 
 $hostList = new CFormList('hostlist');
 
+if ($hostPrototype['templateid'] && $data['parents']) {
+	$parents = array();
+	foreach (array_reverse($data['parents']) as $parent) {
+		$parents[] = new CLink(
+			$parent['host']['name'],
+			'?form=update&hostid='.$parent['hostid'].'&parent_hostid='.$parent['host']['hostid'].'&parent_discoveryid='.$parent['discoveryRule']['itemid'],
+			'highlight underline weight_normal'
+		);
+		$parents[] = SPACE.RARR.SPACE;
+	}
+	array_pop($parents);
+	$hostList->addRow(_('Parent discovery rules'), $parents);
+}
+
 if ($hostPrototype['hostid']) {
 	$frmHost->addVar('hostid', $hostPrototype['hostid']);
 }
 
-$hostTB = new CTextBox('host', $hostPrototype['host'], ZBX_TEXTBOX_STANDARD_SIZE);
+$hostTB = new CTextBox('host', $hostPrototype['host'], ZBX_TEXTBOX_STANDARD_SIZE, (bool) $hostPrototype['templateid']);
 $hostTB->setAttribute('maxlength', 64);
 $hostTB->setAttribute('autofocus', 'autofocus');
 $hostList->addRow(_('Host name'), $hostTB);
 
-$visiblenameTB = new CTextBox('name', $hostPrototype['name'], ZBX_TEXTBOX_STANDARD_SIZE);
+$visiblenameTB = new CTextBox('name', $hostPrototype['name'], ZBX_TEXTBOX_STANDARD_SIZE, (bool) $hostPrototype['templateid']);
 $visiblenameTB->setAttribute('maxlength', 64);
 $hostList->addRow(_('Visible name'), $visiblenameTB);
 
@@ -72,19 +78,30 @@ $divTabs->addTab('hostTab', _('Host'), $hostList);
 // templates
 $tmplList = new CFormList('tmpllist');
 
-foreach ($hostPrototype['templates'] as $templateId => $name) {
-	$frmHost->addVar('templates['.$templateId.']', $name);
-	$tmplList->addRow($name, new CSubmit('unlink['.$templateId.']', _('Unlink'), null, 'link_menu'));
+if ($hostPrototype['templates']) {
+	foreach ($hostPrototype['templates'] as $templateId => $name) {
+		$frmHost->addVar('templates['.$templateId.']', $name);
+		$row = array($name);
+		$tmplList->addRow(
+			$name,
+			(!$hostPrototype['templateid']) ? new CSubmit('unlink['.$templateId.']', _('Unlink'), null, 'link_menu') : ''
+		);
+	}
+}
+// for inherited prototypes with no templates display a text message
+elseif ($hostPrototype['templateid']) {
+	$tmplList->addRow(_('No templates linked.'), ' ');
 }
 
-$tmplAdd = new CButton('add', _('Add'),
-	'return PopUp("popup.php?srctbl=templates&srcfld1=hostid&srcfld2=host'.
-		'&dstfrm='.$frmHost->getName().'&dstfld1=new_template&templated_hosts=1'.
-		url_param($hostPrototype['templates'], false, 'existed_templates').'", 450, 450)',
-	'link_menu'
-);
-
-$tmplList->addRow($tmplAdd, SPACE);
+if (!$hostPrototype['templateid']) {
+	$tmplAdd = new CButton('add', _('Add'),
+		'return PopUp("popup.php?srctbl=templates&srcfld1=hostid&srcfld2=host'.
+			'&dstfrm='.$frmHost->getName().'&dstfld1=new_template&templated_hosts=1'.
+			url_param($hostPrototype['templates'], false, 'existed_templates').'", 450, 450)',
+		'link_menu'
+	);
+	$tmplList->addRow($tmplAdd, SPACE);
+}
 
 $divTabs->addTab('templateTab', _('Templates'), $tmplList);
 
@@ -96,9 +113,12 @@ $frmHost->addItem($divTabs);
 $main = array(new CSubmit('save', _('Save')));
 $others = array();
 if ($hostPrototype['hostid'] && $_REQUEST['form'] != 'full_clone') {
+	$btnDelete = new CButtonDelete(_('Delete selected host prototype?'), url_param('form').url_param('hostid').url_param('parent_hostid').url_param('parent_discoveryid'));
+	$btnDelete->setEnabled(!$hostPrototype['templateid']);
+
 	$others[] = new CSubmit('clone', _('Clone'));
 	$others[] = new CSubmit('full_clone', _('Full clone'));
-	$others[] = new CButtonDelete(_('Delete selected host prototype?'), url_param('form').url_param('hostid').url_param('parent_hostid').url_param('parent_discoveryid'));
+	$others[] = $btnDelete;
 }
 $others[] = new CButtonCancel(url_param('parent_hostid').url_param('parent_discoveryid'));
 

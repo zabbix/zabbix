@@ -393,6 +393,24 @@ class CDiscoveryRule extends CItemGeneral {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete discovery rule'));
 			}
 		}
+
+		// delete host prototypes
+		$hostPrototypeIds = array();
+		$dbItems = DBselect(
+			'SELECT hd.hostid'.
+			' FROM host_discovery hd'.
+			' WHERE '.dbConditionInt('hd.parent_itemid', $ruleids)
+		);
+		while ($item = DBfetch($dbItems)) {
+			$hostPrototypeIds[] = $item['hostid'];
+		}
+		if ($hostPrototypeIds) {
+			if (!API::HostPrototype()->delete($hostPrototypeIds, true)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete host prototype.'));
+			}
+		}
+
+		// delete LLD rules
 		DB::delete('items', array('itemid' => $ruleids));
 
 		// TODO: remove info from API

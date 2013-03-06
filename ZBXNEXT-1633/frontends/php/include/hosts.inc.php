@@ -1164,6 +1164,36 @@ function get_host_by_applicationid($applicationid) {
 }
 
 /**
+ * Returns the farthest host prototype ancestor for each given host prototype.
+ *
+ * @param array $hostPrototypeIds
+ * @param array $result
+ *
+ * @return array	an array of child ID - ancestor ID pairs
+ */
+function getHostPrototypeSourceParentIds(array $hostPrototypeIds, array $result = array()) {
+	$query = DBSelect(
+		'SELECT h.hostid,h.templateid'.
+		' FROM hosts h'.
+		' WHERE '.dbConditionInt('h.hostid', $hostPrototypeIds).
+			' AND h.templateid>0'
+	);
+
+	$hostPrototypeIds = array();
+	while ($hostPrototype = DBfetch($query)) {
+		if ($hostPrototypeId = array_search($hostPrototype['hostid'], $result)) {
+			$result[$hostPrototypeId] = $hostPrototype['templateid'];
+		}
+		else {
+			$result[$hostPrototype['hostid']] = $hostPrototype['templateid'];
+			$hostPrototypeIds[] = $hostPrototype['templateid'];
+		}
+	}
+
+	return ($hostPrototypeIds) ? getHostPrototypeSourceParentIds($hostPrototypeIds, $result) : $result;
+}
+
+/**
  * Function: validate_templates
  *
  * Description:
