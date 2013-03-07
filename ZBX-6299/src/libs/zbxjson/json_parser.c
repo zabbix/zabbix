@@ -94,7 +94,7 @@ int	json_parse_string(const char **start, const char **end, char **error)
 
 		if ('\\' == *ptr)
 		{
-			char *escape_start = ptr;
+			const char *escape_start = ptr;
 
 			/* unexpected end of string data, failing */
 			if ('\0' == *(++ptr))
