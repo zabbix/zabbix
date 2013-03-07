@@ -715,7 +715,7 @@ static int	DBget_host_name_by_hostid(zbx_uint64_t hostid, char **replace_to)
  *                                                                            *
  * Function: DBget_templateid_by_triggerid                                    *
  *                                                                            *
- * Purpose: returns a template trigger ID from which the trigger is inherited *
+ * Purpose: get template trigger ID from which the trigger is inherited       *
  *                                                                            *
  * Return value: upon successful completion return SUCCEED                    *
  *               otherwise FAIL                                               *
@@ -747,8 +747,8 @@ static int	DBget_templateid_by_triggerid(zbx_uint64_t triggerid, zbx_uint64_t *t
  *                                                                            *
  * Function: DBget_trigger_template_name                                      *
  *                                                                            *
- * Purpose: returns comma-space separated trigger template names in which     *
- *          the trigger is  defined                                           *
+ * Purpose: get comma-space separated trigger template names in which         *
+ *          the trigger is defined                                            *
  *                                                                            *
  * Return value: upon successful completion return SUCCEED                    *
  *               otherwise FAIL                                               *
@@ -756,16 +756,21 @@ static int	DBget_templateid_by_triggerid(zbx_uint64_t triggerid, zbx_uint64_t *t
  * Comments: based on the patch submitted by Hmami Mohamed                    *
  *                                                                            *
  ******************************************************************************/
-static int	DBget_trigger_template_name(zbx_uint64_t triggerid, zbx_uint64_t *userid, char **replace_to)
+static int	DBget_trigger_template_name(zbx_uint64_t triggerid, const zbx_uint64_t *userid, char **replace_to)
 {
+	const char	*__function_name = "DBget_trigger_template_name";
+
 	DB_RESULT	result;
 	DB_ROW		row;
-	int		ret;
+	int		ret = FAIL;
 	zbx_uint64_t	templateid;
 	char		*sql = NULL;
 	size_t		replace_to_alloc = 64, replace_to_offset = 0,
 			sql_alloc = 256, sql_offset = 0;
 	int		user_type = -1;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() triggerid:" ZBX_FS_UI64 " userid:" ZBX_FS_UI64, __function_name,
+			triggerid, *userid);
 
 	if (NULL != userid)
 	{
@@ -775,8 +780,11 @@ static int	DBget_trigger_template_name(zbx_uint64_t triggerid, zbx_uint64_t *use
 			user_type = atoi(row[0]);
 		DBfree_result(result);
 
-		if (-1 == user_type)	/* can't check permissions */
-			return FAIL;
+		if (-1 == user_type)
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "%s() cannot check permissions", __function_name);
+			goto out;
+		}
 	}
 
 	/* use parent trigger ID for lld generated triggers */
@@ -790,9 +798,11 @@ static int	DBget_trigger_template_name(zbx_uint64_t triggerid, zbx_uint64_t *use
 		ZBX_STR2UINT64(triggerid, row[0]);
 	DBfree_result(result);
 
-	/* no such trigger or trigger defined on host */
 	if (SUCCEED != DBget_templateid_by_triggerid(triggerid, &templateid) || 0 == templateid)
-		return FAIL;
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() trigger not found or not templated", __function_name);
+		goto out;
+	}
 
 	do
 	{
@@ -800,9 +810,11 @@ static int	DBget_trigger_template_name(zbx_uint64_t triggerid, zbx_uint64_t *use
 	}
 	while (SUCCEED == (ret = DBget_templateid_by_triggerid(triggerid, &templateid)) && 0 != templateid);
 
-	/* no such trigger */
 	if (SUCCEED != ret)
-		return FAIL;
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() trigger not found", __function_name);
+		goto out;
+	}
 
 	*replace_to = zbx_realloc(*replace_to, replace_to_alloc);
 	**replace_to = '\0';
@@ -835,6 +847,8 @@ static int	DBget_trigger_template_name(zbx_uint64_t triggerid, zbx_uint64_t *use
 
 	result = DBselect("%s", sql);
 
+	zbx_free(sql);
+
 	while (NULL != (row = DBfetch(result)))
 	{
 		if (0 != replace_to_offset)
@@ -842,8 +856,8 @@ static int	DBget_trigger_template_name(zbx_uint64_t triggerid, zbx_uint64_t *use
 		zbx_strcpy_alloc(replace_to, &replace_to_alloc, &replace_to_offset, row[0]);
 	}
 	DBfree_result(result);
-
-	zbx_free(sql);
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s templates:'%s'", __function_name, zbx_result_string(ret), *replace_to);
 
 	return ret;
 }
@@ -852,15 +866,17 @@ static int	DBget_trigger_template_name(zbx_uint64_t triggerid, zbx_uint64_t *use
  *                                                                            *
  * Function: DBget_trigger_hostgroup_name                                     *
  *                                                                            *
- * Purpose: returns comma-space separated host group names in which           *
- *          the trigger is defined                                            *
+ * Purpose: get comma-space separated host group names in which the trigger   *
+ *          is defined                                                        *
  *                                                                            *
  * Return value: upon successful completion return SUCCEED                    *
  *               otherwise FAIL                                               *
  *                                                                            *
  ******************************************************************************/
-static int	DBget_trigger_hostgroup_name(zbx_uint64_t triggerid, zbx_uint64_t *userid, char **replace_to)
+static int	DBget_trigger_hostgroup_name(zbx_uint64_t triggerid, const zbx_uint64_t *userid, char **replace_to)
 {
+	const char	*__function_name = "DBget_trigger_hostgroup_name";
+
 	DB_RESULT	result;
 	DB_ROW		row;
 	int		ret = FAIL;
@@ -868,6 +884,9 @@ static int	DBget_trigger_hostgroup_name(zbx_uint64_t triggerid, zbx_uint64_t *us
 	size_t		replace_to_alloc = 64, replace_to_offset = 0,
 			sql_alloc = 256, sql_offset = 0;
 	int		user_type = -1;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() triggerid:" ZBX_FS_UI64 " userid:" ZBX_FS_UI64, __function_name,
+			triggerid, *userid);
 
 	if (NULL != userid)
 	{
@@ -877,8 +896,11 @@ static int	DBget_trigger_hostgroup_name(zbx_uint64_t triggerid, zbx_uint64_t *us
 			user_type = atoi(row[0]);
 		DBfree_result(result);
 
-		if (-1 == user_type)	/* can't check permissions */
-			return FAIL;
+		if (-1 == user_type)
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "%s() cannot check permissions", __function_name);
+			goto out;
+		}
 	}
 
 	*replace_to = zbx_realloc(*replace_to, replace_to_alloc);
@@ -912,6 +934,8 @@ static int	DBget_trigger_hostgroup_name(zbx_uint64_t triggerid, zbx_uint64_t *us
 
 	result = DBselect("%s", sql);
 
+	zbx_free(sql);
+
 	while (NULL != (row = DBfetch(result)))
 	{
 		if (0 != replace_to_offset)
@@ -920,8 +944,8 @@ static int	DBget_trigger_hostgroup_name(zbx_uint64_t triggerid, zbx_uint64_t *us
 		ret = SUCCEED;
 	}
 	DBfree_result(result);
-
-	zbx_free(sql);
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s hostgroups:'%s'", __function_name, zbx_result_string(ret), *replace_to);
 
 	return ret;
 }
