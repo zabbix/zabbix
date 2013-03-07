@@ -371,7 +371,7 @@ class testInheritanceGraph extends CWebTest {
 	/**
 	 * @dataProvider allGraphs
 	 */
-	public function testInheritanceGraphPrototype_simpleCreate($data) {
+	public function testInheritanceGraph_simpleCreate($data) {
 		$name = $data['name'];
 
 		$sqlGraphs = "select * from graphs";
