@@ -95,6 +95,7 @@ class CXmlExportWriter extends CExportWriter {
 			'item_prototypes' => 'item_prototype',
 			'trigger_prototypes' => 'trigger_prototype',
 			'graph_prototypes' => 'graph_prototype',
+			'host_prototypes' => 'host_prototype',
 			'triggers' => 'trigger',
 			'dependencies' => 'dependency',
 			'screen_items' => 'screen_item',

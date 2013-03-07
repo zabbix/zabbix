@@ -195,6 +195,7 @@ class CConfigurationImport {
 		$screensRefs = array();
 		$macrosRefs = array();
 		$proxyRefs = array();
+		$hostPrototypeRefs = array();
 
 		foreach ($this->getFormattedGroups() as $group) {
 			$groupsRefs[$group['name']] = $group['name'];
@@ -290,6 +291,14 @@ class CConfigurationImport {
 					foreach ($graph['gitems'] as $gitem) {
 						$gitemItem = $gitem['item'];
 						$itemsRefs[$gitemItem['host']][$gitemItem['key']] = $gitemItem['key'];
+					}
+				}
+
+				foreach ($discoveryRule['host_prototypes'] as $hostPrototype) {
+					$hostPrototypeRefs[$host][$discoveryRule['key_']][$hostPrototype['host']] = $hostPrototype['host'];
+
+					foreach ($hostPrototype['templates'] as $template) {
+						$templatesRefs[$template['name']] = $template['name'];
 					}
 				}
 			}
@@ -442,6 +451,7 @@ class CConfigurationImport {
 		$this->referencer->addScreens($screensRefs);
 		$this->referencer->addMacros($macrosRefs);
 		$this->referencer->addProxies($proxyRefs);
+		$this->referencer->addHostPrototypes($hostPrototypeRefs);
 	}
 
 	/**
@@ -670,6 +680,8 @@ class CConfigurationImport {
 		// process prototypes
 		$prototypesToUpdate = array();
 		$prototypesToCreate = array();
+		$hostPrototypesToUpdate = array();
+		$hostPrototypesToCreate = array();
 		foreach ($allDiscoveryRules as $host => $discoveryRules) {
 			$hostid = $this->referencer->resolveHostOrTemplate($host);
 			foreach ($discoveryRules as $item) {
@@ -679,6 +691,7 @@ class CConfigurationImport {
 				}
 
 				$item['hostid'] = $hostid;
+				$itemId = $this->referencer->resolveItem($hostid, $item['key_']);
 
 				// prototypes
 				foreach ($item['item_prototypes'] as $prototype) {
@@ -709,6 +722,25 @@ class CConfigurationImport {
 					}
 				}
 
+				// host prototype
+				foreach ($item['host_prototypes'] as $hostPrototype) {
+					// resolve templates
+					$templateIds = array();
+					foreach ($hostPrototype['templates'] as $template) {
+						$templateIds[] = array('templateid' => $this->referencer->resolveTemplate($template['name']));
+					}
+					$hostPrototype['templates'] = $templateIds;
+
+					$hostPrototypeId = $this->referencer->resolveHostPrototype($hostid, $itemId, $hostPrototype['host']);
+					if ($hostPrototypeId) {
+						$hostPrototype['hostid'] = $hostPrototypeId;
+						$hostPrototypesToUpdate[] = $hostPrototype;
+					}
+					else {
+						$hostPrototype['ruleid'] = $itemId;
+						$hostPrototypesToCreate[] = $hostPrototype;
+					}
+				}
 
 				if (isset($item['interface_ref'])) {
 					$item['interfaceid'] = $this->referencer->interfacesCache[$hostid][$item['interface_ref']];
@@ -716,6 +748,7 @@ class CConfigurationImport {
 				unset($item['item_prototypes']);
 				unset($item['trigger_prototypes']);
 				unset($item['graph_prototypes']);
+				unset($item['host_prototypes']);
 
 				$itemsId = $this->referencer->resolveItem($hostid, $item['key_']);
 				if ($itemsId) {
@@ -727,7 +760,6 @@ class CConfigurationImport {
 				}
 			}
 		}
-
 
 		if ($prototypesToCreate) {
 			foreach ($prototypesToCreate as &$prototype) {
@@ -747,6 +779,13 @@ class CConfigurationImport {
 			unset($prototype);
 
 			API::ItemPrototype()->update($prototypesToUpdate);
+		}
+
+		if ($hostPrototypesToCreate) {
+			API::HostPrototype()->create($hostPrototypesToCreate);
+		}
+		if ($hostPrototypesToUpdate) {
+			API::HostPrototype()->update($hostPrototypesToUpdate);
 		}
 
 		// refresh prototypes because templated ones can be inherited to host and used in triggers prototypes or graph prototypes

@@ -285,6 +285,7 @@ class CConfigurationExportBuilder {
 				'item_prototypes' => $this->formatItems($discoveryRule['itemPrototypes']),
 				'trigger_prototypes' => $this->formatTriggers($discoveryRule['triggerPrototypes']),
 				'graph_prototypes' => $this->formatGraphs($discoveryRule['graphPrototypes']),
+				'host_prototypes' => $this->formatHostPrototypes($discoveryRule['hostPrototypes']),
 			);
 			if (isset($discoveryRule['interface_ref'])) {
 				$data['interface_ref'] = $discoveryRule['interface_ref'];
@@ -336,6 +337,29 @@ class CConfigurationExportBuilder {
 				'ymin_item_1' => $graph['ymin_itemid'],
 				'ymax_item_1' => $graph['ymax_itemid'],
 				'graph_items' => $this->formatGraphItems($graph['gitems'])
+			);
+		}
+
+		return $result;
+	}
+
+	/**
+	 * Format host prototypes.
+	 *
+	 * @param array $hostPrototypes
+	 *
+	 * @return array
+	 */
+	protected function formatHostPrototypes(array $hostPrototypes) {
+		$result = array();
+		order_result($hostPrototypes, 'host');
+
+		foreach ($hostPrototypes as $hostPrototype) {
+			$result[] = array(
+				'host' => $hostPrototype['host'],
+				'name' => $hostPrototype['name'],
+				'status' => $hostPrototype['status'],
+				'templates' => $this->formatTemplateLinkage($hostPrototype['templates'])
 			);
 		}
 

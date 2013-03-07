@@ -187,11 +187,13 @@ class CArrayHelper {
 			$value = $array[$uniqueField];
 
 			if ($uniqueBy) {
-				if (isset($uniqueValues[$uniqueBy]) && isset($uniqueValues[$uniqueBy][$value])) {
+				$uniqueByValue = $array[$uniqueBy];
+
+				if (isset($uniqueValues[$uniqueByValue]) && isset($uniqueValues[$uniqueByValue][$value])) {
 					return $array;
 				}
 				else {
-					$uniqueValues[$uniqueBy][$value] = $value;
+					$uniqueValues[$uniqueByValue][$value] = $value;
 				}
 			}
 			else {

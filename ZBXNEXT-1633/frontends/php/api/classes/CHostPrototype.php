@@ -128,7 +128,7 @@ class CHostPrototype extends CHostBase {
 
 		$this->checkDiscoveryRulePermissions(zbx_objectValues($hostPrototypes, 'ruleid'));
 
-		$this->checkDuplicates($hostPrototypes, 'host', _('Host prototype "%1$s" already exists.'));
+		$this->checkDuplicates($hostPrototypes, 'host', _('Host prototype "%1$s" already exists.'), 'ruleid');
 		$this->checkExistingHostPrototypes($hostPrototypes);
 	}
 
@@ -601,6 +601,14 @@ class CHostPrototype extends CHostBase {
 			'countOutput' => true
 		));
 		return count($ids) == $count;
+	}
+
+	protected function link(array $templateids, array $targetids) {
+		if (!$this->isWritable($targetids)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+		}
+
+		parent::link($templateids, $targetids);
 	}
 
 	/**

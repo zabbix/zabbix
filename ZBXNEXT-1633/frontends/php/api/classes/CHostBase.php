@@ -40,6 +40,11 @@ abstract class CHostBase extends CZBXAPI {
 			return;
 		}
 
+		// permission check
+		if (!API::Template()->isReadable($templateids)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+		}
+
 		// check if someone passed duplicate templates in the same query
 		$templateIdDuplicates = zbx_arrayFindDuplicates($templateids);
 		if (!zbx_empty($templateIdDuplicates)) {
@@ -223,14 +228,6 @@ abstract class CHostBase extends CZBXAPI {
 		// there is still possible cycles without root
 		if (count($visited) < count($all)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Circular template linkage is not allowed.'));
-		}
-
-		// permission check
-		if (!$this->isWritable($targetids)) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
-		}
-		if (!API::Template()->isReadable($templateids)) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 	}
 

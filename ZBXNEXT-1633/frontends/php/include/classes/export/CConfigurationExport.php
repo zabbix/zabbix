@@ -447,6 +447,7 @@ class CConfigurationExport {
 			$item['itemPrototypes'] = array();
 			$item['graphPrototypes'] = array();
 			$item['triggerPrototypes'] = array();
+			$item['hostPrototypes'] = array();
 		}
 		unset($item);
 
@@ -511,6 +512,20 @@ class CConfigurationExport {
 
 			$trigger['expression'] = explode_exp($trigger['expression']);
 			$items[$trigger['discoveryRule']['itemid']]['triggerPrototypes'][] = $trigger;
+		}
+
+		// gather trigger prototypes
+		$hostPrototypes = API::HostPrototype()->get(array(
+			'discoveryids' => zbx_objectValues($items, 'itemid'),
+			'output' => API_OUTPUT_EXTEND,
+			'selectDiscoveryRule' => API_OUTPUT_EXTEND,
+			'selectTemplates' => API_OUTPUT_EXTEND,
+			'inherited' => false,
+			'preservekeys' => true
+		));
+
+		foreach ($hostPrototypes as $hostPrototype) {
+			$items[$hostPrototype['discoveryRule']['itemid']]['hostPrototypes'][] = $hostPrototype;
 		}
 
 		return $items;

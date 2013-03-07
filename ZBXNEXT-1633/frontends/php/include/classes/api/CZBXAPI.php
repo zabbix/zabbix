@@ -766,16 +766,17 @@ class CZBXAPI {
 	/**
 	 * Checks if the array contains objects with duplicate values under the $uniqueField field.
 	 *
-	 * @param array    $objects
-	 * @param string   $uniqueField
-	 * @param string   $error
+	 * @param array    	$objects
+	 * @param string   	$uniqueField
+	 * @param string   	$error
+	 * @param string 	$uniqueBy
 	 *
 	 * @throws APIException
 	 *
 	 * @return void
 	 */
-	protected function checkDuplicates(array $objects, $uniqueField, $error) {
-		if ($duplicate = CArrayHelper::findDuplicate($objects, $uniqueField, 'ruleid')) {
+	protected function checkDuplicates(array $objects, $uniqueField, $error, $uniqueBy = null) {
+		if ($duplicate = CArrayHelper::findDuplicate($objects, $uniqueField, $uniqueBy)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _s($error, $duplicate[$uniqueField]));
 		}
 	}

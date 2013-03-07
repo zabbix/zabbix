@@ -133,6 +133,10 @@ abstract class CHostGeneral extends CHostBase {
 	}
 
 	protected function link(array $templateids, array $targetids) {
+		if (!API::Host()->isWritable($targetids)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+		}
+
 		parent::link($templateids, $targetids);
 
 		$appManager = new CApplicationManager();
