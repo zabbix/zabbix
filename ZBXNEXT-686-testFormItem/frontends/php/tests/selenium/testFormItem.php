@@ -26,6 +26,27 @@ define('ITEM_BAD', 1);
 
 class testFormItem extends CWebTest {
 
+	/**
+	 * The name of the test host created in the test data set.
+	 *
+	 * @var string
+	 */
+	protected $host = 'ЗАББИКС Сервер';
+
+	/**
+	 * The name of the test host for simpleCreate checks created in the test data set.
+	 *
+	 * @var string
+	 */
+	protected $hostSimple = 'Template inheritance test host';
+
+	/**
+	 * Backup the tables that will be modified during the tests.
+	 */
+	public function testFormItem_setup() {
+		DBsave_tables('items');
+	}
+
 	// returns all possible item types
 	public static function itemTypes() {
 		return array(
@@ -186,17 +207,13 @@ class testFormItem extends CWebTest {
 	}
 
 	/**
-	 * Backup the tables that will be modified during the tests.
-	 */
-	public function testFormItem_setup() {
-		DBsave_tables('items');
-	}
-
-	/**
 	 * @dataProvider itemTypes
 	 */
 	public function testFormItem_CheckLayout($data) {
-		$this->zbxTestLogin('items.php');
+		$this->zbxTestLogin('hosts.php');
+		$this->zbxTestClickWait('link='.$this->host);
+		$this->zbxTestClickWait("//div[@class='w']//a[text()='Items']");
+
 		$this->checkTitle('Configuration of items');
 		$this->zbxTestTextPresent('CONFIGURATION OF ITEMS');
 
@@ -822,6 +839,34 @@ class testFormItem extends CWebTest {
 		$this->assertVisible('status');
 		$this->zbxTestDropdownHasOptions('status', array('Enabled', 'Disabled', 'Not supported'));
 		$this->assertAttribute("//*[@id='status']/option[text()='Enabled']/@selected", 'selected');
+	}
+
+	// Returns list of items
+	public static function allItems() {
+		return DBdata("select * from items where hostid = 30001 and key_ LIKE 'test-item-form%'");
+	}
+
+	/**
+	 * @dataProvider allItems
+	 */
+	public function testFormItem_simpleCreate($data) {
+		$name = $data['name'];
+
+		$sqlItems = "select * from items";
+		$oldHashItems = DBhash($sqlItems);
+
+		$this->zbxTestLogin('templates.php');
+		$this->zbxTestClickWait('link='.$this->hostSimple);
+		$this->zbxTestClickWait("//div[@class='w']//a[text()='Items']");
+		$this->zbxTestClickWait('link='.$name);
+		$this->zbxTestClickWait('save');
+		$this->checkTitle('Configuration of items');
+		$this->zbxTestTextPresent('Item updated');
+		$this->zbxTestTextPresent("$name");
+		$this->zbxTestTextPresent('ITEMS');
+
+		$this->assertEquals($oldHashItems, DBhash($sqlItems));
+
 	}
 
 	// Returns all possible item data
@@ -1484,8 +1529,7 @@ class testFormItem extends CWebTest {
 		$this->checkTitle('Configuration of hosts');
 		$this->zbxTestTextPresent('CONFIGURATION OF HOSTS');
 
-		$host = 'ЗАББИКС Сервер';
-		$row = DBfetch(DBselect('select hostid from hosts where name='.zbx_dbstr($host)));
+		$row = DBfetch(DBselect('select hostid from hosts where name='.zbx_dbstr($this->host)));
 		$hostid = $row['hostid'];
 
 		$this->href_click('items.php?filter_set=1&hostid='.$hostid.'&sid=');
