@@ -39,7 +39,7 @@ $fields = array(
 	'iprange' =>		array(T_ZBX_STR, O_OPT, null,	null,		'isset({save})'),
 	'delay' =>			array(T_ZBX_INT, O_OPT, null,	null, 		'isset({save})'),
 	'status' =>			array(T_ZBX_INT, O_OPT, null,	IN('0,1'),	null),
-	'uniqueness_criteria' => array(T_ZBX_INT, O_OPT, null, null,	'isset({save})', _('Device uniqueness criteria')),
+	'uniqueness_criteria' => array(T_ZBX_STR, O_OPT, null, null,	'isset({save})', _('Device uniqueness criteria')),
 	'g_druleid' =>		array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
 	'dchecks' =>		array(null, O_OPT, null,		null,		null),
 	// actions
@@ -248,6 +248,7 @@ if (isset($_REQUEST['form'])) {
 				isset($dcheck['ports']) ? $dcheck['ports'] : ''
 			);
 		}
+
 		order_result($data['drule']['dchecks'], 'name');
 	}
 
