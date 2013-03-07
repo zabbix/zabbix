@@ -841,6 +841,7 @@ static int	DBpatch_02010040()
 					{"hostid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 					{"parent_hostid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0},
 					{"parent_itemid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0},
+					{"host", "", NULL, NULL, 64, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
 					{NULL}
 				}
 			};
