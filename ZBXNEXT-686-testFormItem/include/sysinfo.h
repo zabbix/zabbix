@@ -21,60 +21,7 @@
 #define ZABBIX_SYSINFO_H
 
 #include "common.h"
-
-/* agent return value */
-typedef struct
-{
-	int	 	type;
-	zbx_uint64_t	ui64;
-	double		dbl;
-	char		*str;
-	char		*text;
-	char		*msg;
-}
-AGENT_RESULT;
-
-/* agent result types */
-#define AR_UINT64	0x01
-#define AR_DOUBLE	0x02
-#define AR_STRING	0x04
-#define AR_TEXT		0x08
-#define AR_MESSAGE	0x10
-
-/* SET RESULT */
-
-#define SET_UI64_RESULT(res, val)		\
-(						\
-	(res)->type |= AR_UINT64,		\
-	(res)->ui64 = (zbx_uint64_t)(val)	\
-)
-
-#define SET_DBL_RESULT(res, val)		\
-(						\
-	(res)->type |= AR_DOUBLE,		\
-	(res)->dbl = (double)(val)		\
-)
-
-/* NOTE: always allocate new memory for val! DON'T USE STATIC OR STACK MEMORY!!! */
-#define SET_STR_RESULT(res, val)		\
-(						\
-	(res)->type |= AR_STRING,		\
-	(res)->str = (char *)(val)		\
-)
-
-/* NOTE: always allocate new memory for val! DON'T USE STATIC OR STACK MEMORY!!! */
-#define SET_TEXT_RESULT(res, val)		\
-(						\
-	(res)->type |= AR_TEXT,			\
-	(res)->text = (char *)(val)		\
-)
-
-/* NOTE: always allocate new memory for val! DON'T USE STATIC OR STACK MEMORY!!! */
-#define SET_MSG_RESULT(res, val)		\
-(						\
-	(res)->type |= AR_MESSAGE,		\
-	(res)->msg = (char *)(val)		\
-)
+#include "module.h"
 
 /* CHECK RESULT */
 
@@ -160,23 +107,6 @@ extern int	CONFIG_ENABLE_REMOTE_COMMANDS;
 extern int	CONFIG_LOG_REMOTE_COMMANDS;
 extern int	CONFIG_UNSAFE_USER_PARAMETERS;
 
-typedef enum
-{
-	SYSINFO_RET_OK = 0,
-	SYSINFO_RET_FAIL
-}
-ZBX_SYSINFO_RET;
-
-typedef struct
-{
-	char		*key;
-	unsigned	flags;
-	int		(*function)();
-	char		*main_param;
-	char		*test_param;
-}
-ZBX_METRIC;
-
 /* collector */
 #define MAX_COLLECTOR_HISTORY	(15 * SEC_PER_MIN + 1)
 #define ZBX_AVG1		0
@@ -216,77 +146,82 @@ ZBX_METRIC;
 #define ZBX_DSTAT_MAX		6
 int	get_diskstat(const char *devname, zbx_uint64_t *dstat);
 
-/* flags for command */
-#define CF_USEUPARAM	1	/* use user param */
-
 /* flags for process */
 #define PROCESS_TEST		1
 #define PROCESS_USE_TEST_PARAM	2
 #define PROCESS_LOCAL_COMMAND	4
+#define PROCESS_MODULE_COMMAND	8
 
 void	init_metrics();
+int	add_metric(ZBX_METRIC *new, char *error, size_t max_error_len);
 void	free_metrics();
 
 int	process(const char *in_command, unsigned flags, AGENT_RESULT *result);
 
-int	add_user_parameter(const char *key, char *command);
+int	add_user_parameter(const char *key, char *command, char *error, size_t max_error_len);
+int	add_user_module(const char *key, int (*function)());
 void	test_parameters();
 void	test_parameter(const char *key, unsigned flags);
 
 void	init_result(AGENT_RESULT *result);
 void	free_result(AGENT_RESULT *result);
 
+void	init_request(AGENT_REQUEST *request);
+void	free_request(AGENT_REQUEST *request);
+
+int	parse_item_key(char *cmd, AGENT_REQUEST *request);
+
 int	set_result_type(AGENT_RESULT *result, int value_type, int data_type, char *c);
 
 /* external system functions */
 
-int	GET_SENSOR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
-int	KERNEL_MAXFILES(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
-int	KERNEL_MAXPROC(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
-int	PROC_MEM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
-int	PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
-int	NET_IF_IN(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
-int	NET_IF_OUT(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
-int	NET_IF_TOTAL(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
-int	NET_IF_COLLISIONS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
-int	NET_IF_DISCOVERY(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
-int	NET_TCP_LISTEN(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
-int	NET_UDP_LISTEN(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
-int	SYSTEM_CPU_SWITCHES(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
-int	SYSTEM_CPU_INTR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
-int	SYSTEM_CPU_LOAD(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
-int	SYSTEM_CPU_UTIL(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
-int	SYSTEM_CPU_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
-int	SYSTEM_HW_CHASSIS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
-int	SYSTEM_HW_CPU(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
-int	SYSTEM_HW_DEVICES(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
-int	SYSTEM_HW_MACADDR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
-int	SYSTEM_SW_ARCH(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
-int	SYSTEM_SW_OS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
-int	SYSTEM_SW_PACKAGES(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
-int	SYSTEM_SWAP_IN(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
-int	SYSTEM_SWAP_OUT(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
-int	SYSTEM_SWAP_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
-int	SYSTEM_UPTIME(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
-int	SYSTEM_BOOTTIME(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
-int	VFS_DEV_READ(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
-int	VFS_DEV_WRITE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
-int	VFS_FS_INODE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
-int	VFS_FS_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
-int	VFS_FS_DISCOVERY(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
-int	VM_MEMORY_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
+int	GET_SENSOR(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	KERNEL_MAXFILES(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	KERNEL_MAXPROC(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	NET_IF_IN(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	NET_IF_OUT(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	NET_IF_TOTAL(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	NET_IF_COLLISIONS(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	NET_IF_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	NET_TCP_LISTEN(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	NET_UDP_LISTEN(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	SYSTEM_CPU_SWITCHES(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	SYSTEM_CPU_INTR(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	SYSTEM_CPU_LOAD(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	SYSTEM_CPU_UTIL(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	SYSTEM_CPU_NUM(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	SYSTEM_HW_CHASSIS(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	SYSTEM_HW_CPU(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	SYSTEM_HW_DEVICES(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	SYSTEM_HW_MACADDR(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	SYSTEM_SW_ARCH(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	SYSTEM_SW_OS(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	SYSTEM_SW_PACKAGES(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	SYSTEM_SWAP_IN(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	SYSTEM_SWAP_OUT(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	SYSTEM_SWAP_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	SYSTEM_UPTIME(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	SYSTEM_BOOTTIME(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	VFS_DEV_READ(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	VFS_DEV_WRITE(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	VFS_FS_INODE(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	VFS_FS_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	VFS_FS_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	VM_MEMORY_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result);
 
 #ifdef _WINDOWS
-int	USER_PERF_COUNTER(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
-int	PERF_COUNTER(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
-int	SERVICE_STATE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
-int	SERVICES(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
-int	PROC_INFO(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
-int	NET_IF_LIST(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
+int	USER_PERF_COUNTER(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	PERF_COUNTER(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	SERVICE_STATE(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	SERVICES(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	PROC_INFO(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	NET_IF_LIST(AGENT_REQUEST *request, AGENT_RESULT *result);
 #endif
 
 #ifdef _AIX
-int	SYSTEM_STAT(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
+int	SYSTEM_STAT(AGENT_REQUEST *request, AGENT_RESULT *result);
 #endif
 
 typedef struct
