@@ -33,6 +33,7 @@ class CHostPrototype extends CHostBase {
 
 		$this->getOptions = array_merge($this->getOptions, array(
 			'discoveryids'  		=> null,
+			'inherited'				=> null,
 			'selectDiscoveryRule' 	=> null,
 			'selectHost'			=> null,
 			'selectTemplates' 		=> null,
@@ -787,6 +788,11 @@ class CHostPrototype extends CHostBase {
 			if ($options['groupCount'] !== null) {
 				$sqlParts['group']['hd'] = 'hd.parent_itemid';
 			}
+		}
+
+		// inherited
+		if ($options['inherited'] !== null) {
+			$sqlParts['where'][] = ($options['inherited']) ? 'h.templateid IS NOT NULL' : 'h.templateid IS NULL';
 		}
 
 		return $sqlParts;

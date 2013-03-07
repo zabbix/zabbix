@@ -493,6 +493,25 @@ if ($_REQUEST['form'] == 'full_clone') {
 		$listBox->addItems($prototypeList);
 		$hostList->addRow(_('Graph prototypes'), $listBox);
 	}
+
+	// host prototypes
+	$hostPrototypes = API::HostPrototype()->get(array(
+		'discoveryids' => $hostDiscoveryRuleids,
+		'inherited' => false,
+		'output' => array('hostid', 'name')
+	));
+	if ($hostPrototypes) {
+		$prototypeList = array();
+		foreach ($hostPrototypes as $hostPrototype) {
+			$prototypeList[$hostPrototype['hostid']] = $hostPrototype['name'];
+		}
+		order_result($prototypeList);
+
+		$listBox = new CListBox('hostPrototypes', null, 8);
+		$listBox->setAttribute('disabled', 'disabled');
+		$listBox->addItems($prototypeList);
+		$hostList->addRow(_('Host prototypes'), $listBox);
+	}
 }
 $divTabs->addTab('hostTab', _('Host'), $hostList);
 

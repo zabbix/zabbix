@@ -772,6 +772,10 @@ class CDiscoveryRule extends CItemGeneral {
 			// copy triggers
 			$this->copyTriggerPrototypes($srcDiscovery, $dstDiscovery, $srcHost, $dstHost);
 		}
+
+		// copy host prototypes
+		$this->copyHostPrototypes($srcDiscovery, $dstDiscovery);
+
 		return true;
 	}
 
@@ -940,6 +944,43 @@ class CDiscoveryRule extends CItemGeneral {
 		$rs = API::GraphPrototype()->create($dstGraphs);
 		if (!$rs) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot clone graph prototypes.'));
+		}
+		return $rs;
+	}
+
+	/**
+	 * Copies all of the host prototypes from the source discovery to the target
+	 * discovery rule.
+	 *
+	 * @throws APIException if prototype saving fails
+	 *
+	 * @param array $srcDiscovery   The source discovery rule to copy from
+	 * @param array $dstDiscovery   The target discovery rule to copy to
+	 *
+	 * @return array
+	 */
+	protected function copyHostPrototypes(array $srcDiscovery, array $dstDiscovery) {
+		$prototypes = API::HostPrototype()->get(array(
+			'discoveryids' => $srcDiscovery['itemid'],
+			'output' => API_OUTPUT_EXTEND,
+			'selectTemplates' => array('templateid'),
+			'preservekeys' => true
+		));
+
+		$rs = array();
+		if ($prototypes) {
+			foreach ($prototypes as $key => $prototype) {
+				$prototype['ruleid'] = $dstDiscovery['itemid'];
+
+				unset($prototype['templateid']);
+
+				$prototypes[$key] = $prototype;
+			}
+
+			$rs = API::HostPrototype()->create($prototypes);
+			if (!$rs) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot clone host prototypes.'));
+			}
 		}
 		return $rs;
 	}
