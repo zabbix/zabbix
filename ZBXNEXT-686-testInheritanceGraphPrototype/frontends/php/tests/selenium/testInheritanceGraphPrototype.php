@@ -354,8 +354,9 @@ class testInheritanceGraphPrototype extends CWebTest {
 				case 'Item':
 					$this->assertElementPresent('ymin_name');
 					$this->assertElementPresent('yaxis_min');
-					$this->assertElementPresent("//input[@id='yaxis_min' and @value='Select']");
-					//$this->assertElementPresent("//input[@id='yaxis_min' and @value='Select prototype']");TODO
+					$this->assertAttribute("//input[@id='yaxis_min']/@value", 'Select');
+					$this->assertElementPresent('yaxis_min_prototype');
+					$this->assertAttribute("//input[@id='yaxis_min_prototype']/@value", 'Select prototype');
 					$this->zbxTestTextNotPresent('Add graph items first');
 					break;
 				default:
@@ -365,8 +366,9 @@ class testInheritanceGraphPrototype extends CWebTest {
 				case 'Item':
 					$this->assertElementPresent('ymax_name');
 					$this->assertElementPresent('yaxis_max');
-					$this->assertElementPresent("//input[@id='yaxis_max' and @value='Select']");
-					//$this->assertElementPresent("//input[@id='yaxis_max' and @value='Select prototype']");TODO
+					$this->assertAttribute("//input[@id='yaxis_max']/@value", 'Select');
+					$this->assertElementPresent('yaxis_max_prototype');
+					$this->assertAttribute("//input[@id='yaxis_max_prototype']/@value", 'Select prototype');
 					$this->zbxTestTextNotPresent('Add graph items first');
 					break;
 				default:
@@ -401,14 +403,15 @@ class testInheritanceGraphPrototype extends CWebTest {
 				break;
 			case 'Calculated':
 				$this->assertElementNotPresent('ymin_name');
-		//		$this->assertElementNotPresent('yaxis_min');TODO
+				$this->assertElementNotPresent('yaxis_min');
 				$this->assertNotVisible('yaxismin');
 				break;
 			case 'Item':
 				$this->assertElementPresent('ymin_name');
 				$this->assertElementPresent('yaxis_min');
 				$this->assertAttribute("//input[@id='yaxis_min']/@value", 'Select');
-				$this->assertElementPresent("//input[@id='yaxis_min' and @value='Select prototype']");
+				$this->assertElementPresent('yaxis_min_prototype');
+				$this->assertAttribute("//input[@id='yaxis_min_prototype']/@value", 'Select prototype');
 				$this->assertNotVisible('yaxismin');
 				break;
 			default:
@@ -435,7 +438,8 @@ class testInheritanceGraphPrototype extends CWebTest {
 				$this->assertElementPresent('ymax_name');
 				$this->assertElementPresent('yaxis_max');
 				$this->assertAttribute("//input[@id='yaxis_max']/@value", 'Select');
-			//	$this->assertElementPresent("//input[@id='yaxis_max' and @value='Select prototype']");TODO
+				$this->assertElementPresent('yaxis_max_prototype');
+				$this->assertAttribute("//input[@id='yaxis_max_prototype']/@value", 'Select prototype');
 				$this->assertNotVisible('yaxismax');
 				break;
 			default:
@@ -794,13 +798,13 @@ class testInheritanceGraphPrototype extends CWebTest {
 		sleep(1);
 
 			if(isset($data['removeItem'])) {
-				$this->zbxTestClick('items_0_remove');// TODO wait add
+				$this->zbxTestClick('items_0_remove');
 				sleep(1);
 				$this->zbxTestClick('items_0_remove');
 				sleep(1);
 
 				$this->zbxTestLaunchPopup('add_item');
-				$this->zbxTestClick('link='.$this->itemSimple);// TODO wait add
+				$this->zbxTestClick('link='.$this->itemSimple);
 				$this->selectWindow(null);
 				sleep(1);
 
@@ -838,12 +842,8 @@ class testInheritanceGraphPrototype extends CWebTest {
 					break;
 				case 'Item':
 					if (!isset($data['noAxisItem'])) {
-					//	$this->zbxTestLaunchPopup("yaxis_min' and @value='Select prototype", 'zbx_popup_item');TODO
-					//	$this->assertElementPresent("//a[text()='".$this->item."']");TODO
-					//	$this->zbxTestClick("//span[text()='".$this->item."']");TODO
-						$this->zbxTestLaunchPopup("yaxis_min' and @value='Select", 'zbx_popup_item');
-						$this->assertElementPresent("//a[text()='".$this->itemSimple."']");
-						$this->zbxTestClick('link='.$this->itemSimple);
+						$this->zbxTestLaunchPopup('yaxis_min_prototype', 'zbx_popup_item');
+						$this->zbxTestClick("//span[text()='".$this->item."']");
 						$this->selectWindow(null);
 						sleep(1);
 					}
@@ -858,12 +858,8 @@ class testInheritanceGraphPrototype extends CWebTest {
 					break;
 				case 'Item':
 					if (!isset($data['noAxisItem'])) {
-					//	$this->zbxTestLaunchPopup("yaxis_max' and @value='Select prototype", 'zbx_popup_item');TODO
-					//	$this->assertElementPresent("//a[text()='".$this->item."']");TODO
-					//	$this->zbxTestClick("//span[text()='".$this->item."']");TODO
-						$this->zbxTestLaunchPopup("yaxis_max' and @value='Select", 'zbx_popup_item');
-						$this->assertElementPresent("//a[text()='".$this->itemSimple."']");
-						$this->zbxTestClick('link='.$this->itemSimple);
+						$this->zbxTestLaunchPopup('yaxis_max_prototype', 'zbx_popup_item');
+						$this->zbxTestClick("//span[text()='".$this->item."']");
 						$this->selectWindow(null);
 						sleep(1);
 					}
