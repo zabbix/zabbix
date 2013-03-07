@@ -1,6 +1,7 @@
 Changes for 2.1.0
 
 New features:
+........S. [ZBXNEXT-354] added macro expansion for allowed hosts setting in trapper items (wiper)
 ..F....... [ZBXNEXT-109] implemented discovery rule check editing (Eduard)
 ...GI..PS. [ZBXNEXT-1550] added support of loadable modules for extending Zabbix Agent checks, also Server and Proxy simple checks (Alexei)
 ........S. [ZBX-6226] added command request (global script) result logging (wiper)
@@ -42,6 +43,7 @@ A.F.I...S. [ZBXNEXT-1186] increased length to 2048 characters of expression fiel
 ..F....... [ZBX-5127] regular expressions form redesign (Vedmak)
 
 Bug fixes:
+........S. [ZBX-6234] improved validation of command request (global scripts) tag values (wiper)
 ..F....... [ZBX-6331] fixed page title in Graph prototypes (Eduard)
 ..F....... [ZBX-3357] fixed confusing naming and coloring in Monitoring > Overview hint popup (Toms)
 ..F....... [ZBX-3357] fixed incorrect blinking colors in non default themes (Toms)
@@ -136,9 +138,10 @@ Changes for 2.0.6rc1
 
 New features:
 A.F....... [ZBX-1357] added Lithuanian translation; thanks to Zabbix translators (Richlv)
-A.F....... [ZBX-1357] updated Brazilian Portuguese, German, Hungarian, Latvian, Slovak, Spanish, Russian, Turkish and Ukrainian translations; thanks to Zabbix translators (Richlv)
+A.F....... [ZBX-1357] updated American English, Brazilian Portuguese, French, German, Hungarian, Latvian, Slovak, Spanish, Russian, Turkish and Ukrainian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+..F....... [ZBX-6328] fixed undefined index in proxy list (Eduard)
 ..F....... [ZBX-6324] improved text displaying in Overview table header in IE (Eduard)
 A......... [ZBX-6261] fixed service.getsla not working with Oracle database (Pavels)
 ........S. [ZBX-5797] fixed server SNMP interfaces ignoring IP/DNS toggle (wiper)
