@@ -7,4 +7,5 @@ libzbxnix_a_SOURCES = \
 	pid.c \
 	ipc.c \
 	fatal.c fatal.h \
-	sighandler.c
+	sighandler.c \
+	sigcommon.h

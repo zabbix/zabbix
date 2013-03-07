@@ -481,6 +481,10 @@ class CApplication extends CZBXAPI {
 			$host = reset($delApplication['hosts']);
 			info(_s('Deleted: Application "%1$s" on "%2$s".', $delApplication['name'], $host['name']));
 		}
+
+		// remove Monitoring > Latest data toggle profile values related to given aplications
+		CProfile::delete('web.latest.toggle', $delApplicationIds);
+
 		return array('applicationids' => $delApplicationIds);
 	}
 

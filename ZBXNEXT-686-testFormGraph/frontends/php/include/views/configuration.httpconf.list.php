@@ -65,7 +65,7 @@ foreach ($this->data['httpTests'] as $httpTestId => $httpTest) {
 	if (isset($this->data['parentTemplates'][$httpTestId])) {
 		$template = $this->data['parentTemplates'][$httpTestId];
 		$name[] = new CLink($template['name'], '?groupid=0&hostid='.$template['id'], 'unknown');
-		$name[] = ':'.SPACE;
+		$name[] = NAME_DELIMITER;
 	}
 	$name[] = new CLink($httpTest['name'], '?form=update'.'&httptestid='.$httpTest['httptestid'].'&hostid='.$httpTest['hostid']);
 

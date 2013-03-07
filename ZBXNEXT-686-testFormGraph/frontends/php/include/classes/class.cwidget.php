@@ -66,26 +66,22 @@ class CWidget {
 		}
 	}
 
-	public function addPageHeader($header, $headerright = SPACE) {
-		zbx_value2array($headerright);
-		if (is_null($header) && !is_null($headerright)) {
-			$header = SPACE;
-		}
-		$this->pageHeaders[] = array('left' => $header, 'right' => $headerright);
+	public function addPageHeader($left = SPACE, $right = SPACE) {
+		zbx_value2array($right);
+
+		$this->pageHeaders[] = array('left' => $left, 'right' => $right);
 	}
 
-	public function addHeader($header = null, $headerright = SPACE) {
-		zbx_value2array($headerright);
-		if (is_null($header) && !is_null($headerright)) {
-			$header = SPACE;
-		}
-		$this->headers[] = array('left' => $header, 'right' => $headerright);
+	public function addHeader($left = SPACE, $right = SPACE) {
+		zbx_value2array($right);
+
+		$this->headers[] = array('left' => $left, 'right' => $right);
 	}
 
-	public function addHeaderRowNumber($headerright = SPACE) {
+	public function addHeaderRowNumber($right = SPACE) {
 		$numRows = new CDiv();
 		$numRows->setAttribute('name', 'numrows');
-		$this->addHeader($numRows, $headerright);
+		$this->addHeader($numRows, $right);
 	}
 
 	public function addFlicker($items = null, $state = 0) {
@@ -158,92 +154,58 @@ class CWidget {
 
 	public function toString() {
 		$tab = $this->get();
+
 		return unpack_object($tab);
 	}
 
 	private function createPageHeader() {
 		$pageHeader = array();
+
 		foreach ($this->pageHeaders as $header) {
-			$pageHeader[] = $this->createPageHeaderRow($header['left'], $header['right']);
+			$pageHeader[] = get_table_header($header['left'], $header['right']);
 		}
+
 		return new CDiv($pageHeader);
-	}
-
-	private function createPageHeaderRow($col1, $col2 = SPACE) {
-		if (isset($_REQUEST['print'])) {
-			hide_form_items($col1);
-			hide_form_items($col2);
-			if ($col1 == SPACE && $col2 == SPACE) {
-				return new CJSscript('');
-			}
-		}
-
-		$td_l = new CCol(SPACE);
-		$td_l->setAttribute('width', '100%');
-
-		$right_row = array($td_l);
-
-		if (!is_null($col2)) {
-			if (!is_array($col2)) {
-				$col2 = array($col2);
-			}
-			foreach ($col2 as $r_item) {
-				$right_row[] = new CCol($r_item);
-			}
-		}
-
-		$right_tab = new CTable(null, 'nowrap');
-		$right_tab->setAttribute('width', '100%');
-		$right_tab->addRow($right_row);
-
-		$table = new CTable(null, 'ui-widget-header ui-corner-all header maxwidth');
-		$table->setCellSpacing(0);
-		$table->setCellPadding(1);
-
-		$td_r = new CCol($right_tab, 'header_r right');
-		$table->addRow(array(new CCol($col1, 'header_l left'), $td_r));
-		return $table;
 	}
 
 	private function createHeader() {
 		$header = reset($this->headers);
 
-		$td_l = new CCol(SPACE);
-		$td_l->setAttribute('width', '100%');
-
-		$right_row = array($td_l);
+		$columnRights = array();
 
 		if (!is_null($header['right'])) {
-			foreach ($header['right'] as $r_item) {
-				$right_row[] = new CCol($r_item);
+			foreach ($header['right'] as $right) {
+				$columnRights[] = new CDiv($right, 'floatright');
 			}
 		}
+
 		if (!is_null($this->state)) {
 			$icon = new CIcon(_('Show').'/'._('Hide'), ($this->state ? 'arrowup' : 'arrowdown'), "change_hat_state(this, '".$this->bodyId."');");
 			$icon->setAttribute('id', $this->bodyId.'_icon');
-			$right_row[] = new CCol($icon);
+			$columnRights[] = $icon;
 		}
 
-		$right_tab = new CTable(null, 'nowrap');
-		$right_tab->setAttribute('width', '100%');
-		$right_tab->addRow($right_row, 'textblackwhite');
-		$header['right'] = $right_tab;
+		if ($columnRights) {
+			$columnRights = array_reverse($columnRights);
+		}
 
-		$header_tab = new CTable(null, $this->css_class.' maxwidth');
+		// header table
+		$table = new CTable(null, $this->css_class.' maxwidth');
+		$table->setCellSpacing(0);
+		$table->setCellPadding(1);
+		$table->addRow($this->createHeaderRow($header['left'], $columnRights), 'first');
+
 		if ($this->css_class != 'header_wide') {
-			$header_tab->addClass('ui-widget-header ui-corner-all');
+			$table->addClass('ui-widget-header ui-corner-all');
 		}
-		$header_tab->setCellSpacing(0);
-		$header_tab->setCellPadding(1);
-		$header_tab->addRow($this->createHeaderRow($header['left'], $right_tab), 'first');
 
 		foreach ($this->headers as $num => $header) {
-			if ($num == 0) {
-				continue;
+			if ($num > 0) {
+				$table->addRow($this->createHeaderRow($header['left'], $header['right']), 'next');
 			}
-			$header_tab->addRow($this->createHeaderRow($header['left'], $header['right']), 'next');
 		}
-		return new CDiv($header_tab);
+
+		return new CDiv($table);
 	}
 
 	private function createHeaderRow($col1, $col2 = SPACE) {
