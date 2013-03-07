@@ -21,11 +21,8 @@
 
 #ifdef HAVE_OPENIPMI
 
-#if !IPMI_SENSOR_ID_SZ
 #define	IPMI_SENSOR_ID_SZ	17	/* max 16 bytes for sensor ID and terminating '\0' */
 					/* see SDR record format in IPMI v2 spec */
-#endif
-
 #include "log.h"
 
 #include <OpenIPMI/ipmiif.h>
@@ -71,16 +68,16 @@ typedef struct zbx_ipmi_host_s
 	int			port;
 	int			authtype;
 	int			privilege;
+	int			ret;
 	char			*username;
 	char			*password;
 	zbx_ipmi_sensor_t	*sensors;
-	int			sensor_count;
 	zbx_ipmi_control_t	*controls;
+	int			sensor_count;
 	int			control_count;
 	ipmi_con_t		*con;
 	int			domain_up, done;
 	char			*err;
-	int			ret;
 	struct zbx_ipmi_host_s	*next;
 }
 zbx_ipmi_host_t;
@@ -88,7 +85,7 @@ zbx_ipmi_host_t;
 static zbx_ipmi_host_t	*hosts = NULL;
 static os_handler_t	*os_hnd;
 
-static char *sensor_id_to_str(char *str, size_t str_sz, const char *id, int id_type, int id_sz)
+static char *sensor_id_to_str(char *str, size_t str_sz, const char *id, enum ipmi_str_type_e id_type, int id_sz)
 {
 	/* minimum size of 'str' buffer, str_sz, is 35 bytes to avoid truncation */
 	int	i;
@@ -964,7 +961,7 @@ static void	my_vlog(os_handler_t *handler, const char *format, enum ipmi_log_typ
 	zabbix_log(LOG_LEVEL_DEBUG, "%s%s", type, str);
 }
 
-int	init_ipmi_handler()
+int	init_ipmi_handler(void)
 {
 	const char	*__function_name = "init_ipmi_handler";
 	int	ret;
@@ -991,7 +988,7 @@ int	init_ipmi_handler()
 	return SUCCEED;
 }
 
-int	free_ipmi_handler()
+int	free_ipmi_handler(void)
 {
 	const char	*__function_name = "free_ipmi_handler";
 
