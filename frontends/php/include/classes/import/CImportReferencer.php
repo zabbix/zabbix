@@ -42,6 +42,7 @@ class CImportReferencer {
 	protected $screens = array();
 	protected $macros = array();
 	protected $proxies = array();
+	protected $hostPrototypes = array();
 	protected $groupsRefs;
 	protected $templatesRefs;
 	protected $hostsRefs;
@@ -54,6 +55,7 @@ class CImportReferencer {
 	protected $screensRefs;
 	protected $macrosRefs;
 	protected $proxiesRefs;
+	protected $hostPrototypeRefs;
 
 
 	/**
@@ -284,6 +286,28 @@ class CImportReferencer {
 		}
 
 		return isset($this->proxiesRefs[$name]) ? $this->proxiesRefs[$name] : false;
+	}
+
+	/**
+	 * Get proxy id by name.
+	 *
+	 * @param string $hostId
+	 * @param string $discoveryRuleId
+	 * @param string $hostPrototype
+	 *
+	 * @return string|bool
+	 */
+	public function resolveHostPrototype($hostId, $discoveryRuleId, $hostPrototype) {
+		if ($this->hostPrototypeRefs === null) {
+			$this->selectHostPrototypes();
+		}
+
+		if (isset($this->hostPrototypeRefs[$hostId][$discoveryRuleId][$hostPrototype])) {
+			return $this->hostPrototypeRefs[$hostId][$discoveryRuleId][$hostPrototype];
+		}
+		else {
+			return false;
+		}
 	}
 
 	/**
@@ -522,6 +546,37 @@ class CImportReferencer {
 	 */
 	public function addProxyRef($name, $proxyId) {
 		$this->proxiesRefs[$name] = $proxyId;
+	}
+
+	/**
+	 * Add host prototypes that need association with a database host prototype id.
+	 *
+	 * @param array $hostPrototypes
+	 */
+	public function addHostPrototypes(array $hostPrototypes) {
+		foreach ($hostPrototypes as $host => $discoveryRule) {
+			if (!isset($this->hostPrototypes[$host])) {
+				$this->hostPrototypes[$host] = array();
+			}
+			foreach ($discoveryRule as $discoveryRuleKey => $hostPrototypes) {
+				if (!isset($this->hostPrototypes[$host][$discoveryRuleKey])) {
+					$this->hostPrototypes[$host][$discoveryRuleKey] = array();
+				}
+				$this->hostPrototypes[$host][$discoveryRuleKey] = array_unique(
+					array_merge($this->hostPrototypes[$host][$discoveryRuleKey], $hostPrototypes)
+				);
+			}
+		}
+	}
+
+	/**
+	 * Add host prototype host association with host id.
+	 *
+	 * @param string $host
+	 * @param string $hostPrototypeId
+	 */
+	public function addHostPrototypeRef($host, $hostPrototypeId) {
+		$this->hostPrototypes[$host] = $hostPrototypeId;
 	}
 
 	/**
@@ -810,6 +865,39 @@ class CImportReferencer {
 			}
 
 			$this->proxies = array();
+		}
+	}
+
+	/**
+	 * Select host prototype ids for previously added host prototypes names.
+	 */
+	protected function selectHostPrototypes() {
+		if (!empty($this->hostPrototypes)) {
+			$this->hostPrototypeRefs = array();
+			$sqlWhere = array();
+			foreach ($this->hostPrototypes as $host => $discoveryRule) {
+				$hostId = $this->resolveHostOrTemplate($host);
+
+				foreach ($discoveryRule as $discoveryRuleKey => $hostPrototypes) {
+					$discoveryRuleId = $this->resolveItem($hostId, $discoveryRuleKey);
+					if ($hostId) {
+						$sqlWhere[] = '(hd.parent_itemid='.$discoveryRuleId.' AND '.dbConditionString('h.host', $hostPrototypes).')';
+					}
+				}
+			}
+
+			if ($sqlWhere) {
+				$query = DBselect(
+					'SELECT h.host,h.hostid,hd.parent_itemid,i.hostid parent_hostid '.
+					' FROM hosts h,host_discovery hd,items i'.
+					' WHERE h.hostid=hd.hostid'.
+						' AND hd.parent_itemid=i.itemid'.
+						' AND '.implode(' OR ', $sqlWhere)
+				);
+				while ($data = DBfetch($query)) {
+					$this->hostPrototypeRefs[$data['parent_hostid']][$data['parent_itemid']][$data['host']] = $data['hostid'];
+				}
+			}
 		}
 	}
 }
