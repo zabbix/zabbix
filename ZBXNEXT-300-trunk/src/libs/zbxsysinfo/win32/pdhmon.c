@@ -80,7 +80,7 @@ int	PERF_COUNTER(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	const char		*__function_name = "PERF_COUNTER";
 	char			*counterpath, *tmp;
-	int			ret = SYSINFO_RET_FAIL, interval;
+	int			interval, ret = SYSINFO_RET_FAIL;
 	double			value;
 	PERF_COUNTER_DATA	*perfs = NULL;
 
@@ -98,10 +98,8 @@ int	PERF_COUNTER(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (NULL == tmp || '\0' == *tmp)
 		interval = 1;
-	else if (FAIL == is_uint(tmp))
+	else if (FAIL == is_uint31(tmp, &interval))
 		goto clean;
-	else
-		interval = atoi(tmp);
 
 	if (FAIL == check_counter_path(counterpath))
 		goto clean;

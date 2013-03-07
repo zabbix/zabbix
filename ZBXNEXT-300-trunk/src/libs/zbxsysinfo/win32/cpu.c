@@ -68,8 +68,10 @@ int	SYSTEM_CPU_UTIL(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (NULL == tmp || '\0' == *tmp || 0 == strcmp(tmp, "all"))
 		cpu_num = 0;
-	else if (SUCCEED != is_uint(tmp) || 1 > (cpu_num = atoi(tmp) + 1) || cpu_num > collector->cpus.count)
+	else if (SUCCEED != is_uint_range(tmp, &cpu_num, 0, collector->cpus.count - 1))
 		return SYSINFO_RET_FAIL;
+	else
+		cpu_num++;
 
 	tmp = get_rparam(request, 1);
 
