@@ -173,7 +173,6 @@ private $items;
 		return new CDiv($pageHeader);
 	}
 
-
 	private function createHeader() {
 		$header = reset($this->headers);
 
@@ -188,7 +187,7 @@ private $items;
 		if (!is_null($this->state)) {
 			$icon = new CIcon(S_SHOW.'/'.S_HIDE, ($this->state ? 'arrowup' : 'arrowdown'), "change_hat_state(this, '".$this->domid."');");
 			$icon->setAttribute('id', $this->domid.'_icon');
-			$columnRights[] = $icon;
+			$columnRights[] = new CDiv($icon, 'floatright');
 		}
 
 		if ($columnRights) {

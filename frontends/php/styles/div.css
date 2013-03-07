@@ -157,6 +157,7 @@ div.menu_icon{
 	-moz-border-radius: 2px;
 	-o-border-radius: 2px;
 	border-radius: 2px;
+	margin-right: 2px;
 }
 div.menu_icon:hover{
 	-webkit-box-shadow: 0 0 6px white;
