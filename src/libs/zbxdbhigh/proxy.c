@@ -1576,11 +1576,23 @@ void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid,
 		if (0 == proxy_hostid && ITEM_TYPE_TRAPPER != items[i].type && ITEM_TYPE_ZABBIX_ACTIVE != items[i].type)
 			continue;
 
-		if (ITEM_TYPE_TRAPPER == items[i].type && 0 == proxy_hostid &&
-				FAIL == zbx_tcp_check_security(sock, items[i].trapper_hosts, 1))
+		if (ITEM_TYPE_TRAPPER == items[i].type && 0 == proxy_hostid)
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "process data failed: %s", zbx_tcp_strerror());
-			continue;
+			int	security_check;
+			char	*allowed_hosts;
+
+			allowed_hosts = zbx_strdup(NULL, items[i].trapper_hosts);
+			substitute_simple_macros(NULL, NULL, NULL, &items[i], NULL, &allowed_hosts,
+					MACRO_TYPE_PARAMS_FIELD, NULL, 0);
+			security_check = zbx_tcp_check_security(sock, allowed_hosts, 1);
+			zbx_free(allowed_hosts);
+
+			if (FAIL == security_check)
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "cannot process trapper item \"%s\": %s",
+						items[i].key_orig, zbx_tcp_strerror());
+				continue;
+			}
 		}
 
 		if (ITEM_STATUS_NOTSUPPORTED == values[i].status || 0 == strcmp(values[i].value, ZBX_NOTSUPPORTED))
