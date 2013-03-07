@@ -97,15 +97,15 @@ $param3_sec_val = array(
 		'T' => T_ZBX_INT // type
 	)
 );
-$paramIntSecCount = array(
-	array(
-		'C' => 'Mask', // caption
-		'T' => T_ZBX_STR
-	),
+$paramSecIntCount = array(
 	array(
 		'C' => _('Last of').' (T)', // caption
 		'T' => T_ZBX_INT, // type
 		'M' => $metrics // metrics
+	),
+	array(
+		'C' => 'Mask', // caption
+		'T' => T_ZBX_STR
 	),
 	array(
 		'C' => _('Time shift').' ', // caption
@@ -520,22 +520,22 @@ $functions = array(
 	),
 	'band[<]' => array(
 		'description' =>  _('Bitwise AND of last (most recent) T value is < N'),
-		'params' => $paramIntSecCount,
+		'params' => $paramSecIntCount,
 		'allowed_types' => $allowed_types_int
 	),
 	'band[>]' => array(
 		'description' =>  _('Bitwise AND of last (most recent) T value is > N'),
-		'params' => $paramIntSecCount,
+		'params' => $paramSecIntCount,
 		'allowed_types' => $allowed_types_int
 	),
 	'band[=]' => array(
 		'description' =>  _('Bitwise AND of last (most recent) T value is = N'),
-		'params' => $paramIntSecCount,
+		'params' => $paramSecIntCount,
 		'allowed_types' => $allowed_types_int
 	),
 	'band[#]' => array(
 		'description' =>  _('Bitwise AND of last (most recent) T value is NOT N'),
-		'params' => $paramIntSecCount,
+		'params' => $paramSecIntCount,
 		'allowed_types' => $allowed_types_int
 	)
 );
