@@ -352,7 +352,7 @@ static int	evaluate_COUNT_one(unsigned char value_type, int op, const char *valu
 						return SUCCEED;
 					break;
 				case OP_BAND:
-					if (0 != value_uint64 & arg2_uint64)
+					if (arg2_uint64 == (value_uint64 & arg2_uint64))
 						return SUCCEED;
 					break;
 			}
@@ -1850,9 +1850,13 @@ clean:
  * Parameters: value - buffer of size MAX_BUFFER_LEN                          *
  *             item - item (performance metric)                               *
  *             parameters - up to 3 comma-separated fields:                   *
- *                            (1) mask to bitwise AND with                    *
- *                            (2) Nth last value                              *
- *                            (3) time shift (optional)                       *
+ *                            (1) same as the 1st parameter for function      *
+ *                                evaluate_LAST() (see documentation of       *
+ *                                trigger function last()),                   *
+ *                            (2) mask to bitwise AND with (mandatory),       *
+ *                            (3) same as the 2nd parameter for function      *
+ *                                evaluate_LAST() (see documentation of       *
+ *                                trigger function last()).                   *
  *                                                                            *
  * Return value: SUCCEED - evaluated successfully, result is stored in 'value'*
  *               FAIL - failed to evaluate function                           *
@@ -1862,7 +1866,7 @@ static int	evaluate_BAND(char *value, DB_ITEM *item, const char *function, const
 {
 	const char	*__function_name = "evaluate_BAND";
 	char		*last_parameters = NULL;
-	int		mask, mask_flag, nth_val, nth_val_flag, time_shift, time_shift_flag, nparams, res = FAIL;
+	int		mask, mask_flag, nparams, res = FAIL;
 	zbx_uint64_t	last_uint64;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
@@ -1873,28 +1877,15 @@ static int	evaluate_BAND(char *value, DB_ITEM *item, const char *function, const
 	if (3 < (nparams = num_param(parameters)))
 		goto clean;
 
-	if (FAIL == get_function_parameter_uint(item->hostid, parameters, 1, &mask, &mask_flag) ||
-				ZBX_FLAG_SEC != mask_flag)
-		{
-			goto clean;
-		}
-
-	if (1 < nparams && FAIL == get_function_parameter_uint(item->hostid, parameters, 2, &nth_val, &nth_val_flag))
-		goto clean;
-
-	if (2 < nparams)
+	if (FAIL == get_function_parameter_uint(item->hostid, parameters, 2, &mask, &mask_flag) ||
+			ZBX_FLAG_SEC != mask_flag)
 	{
-		if (FAIL == get_function_parameter_uint(item->hostid, parameters, 3, &time_shift, &time_shift_flag) ||
-				ZBX_FLAG_SEC != time_shift_flag)
-		{
-			goto clean;
-		}
-
-		now -= time_shift;
+		goto clean;
 	}
 
+	/* prepare the 1st and the 3rd parameter for passing to evaluate_LAST() */
 	last_parameters = zbx_strdup(NULL, parameters);
-	remove_param(last_parameters, 1);
+	remove_param(last_parameters, 2);
 
 	if (SUCCEED == evaluate_LAST(value, item, "last", last_parameters, now))
 	{
