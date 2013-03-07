@@ -2,9 +2,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-02-20 19:46+0200\n"
-"PO-Revision-Date: 2013-02-20 20:11+0200\n"
-"Last-Translator: volter <volker27@gmx.at>\n"
+"POT-Creation-Date: 2013-03-07 09:39+0200\n"
+"PO-Revision-Date: 2013-03-06 13:04+0200\n"
+"Last-Translator: maxhq <jens@jebecs.de>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: de\n"
 "MIME-Version: 1.0\n"
@@ -331,7 +331,7 @@ msgid "Activate selected"
 msgstr "Aktivieren"
 
 #: include/views/administration.proxy.edit.php:40
-#: include/views/administration.proxy.list.php:76
+#: include/views/administration.proxy.list.php:84
 #: include/views/configuration.httpconf.edit.php:118
 msgid "Active"
 msgstr "Aktiv"
@@ -441,7 +441,7 @@ msgstr "Dienst hinzufügen"
 msgid "Add to"
 msgstr "Hinzufügen zu"
 
-#: charts.php:93 history.php:94 host_screen.php:88 include/html.inc.php:256
+#: charts.php:93 history.php:94 host_screen.php:88 include/html.inc.php:249
 #: maps.php:70 screens.php:89
 msgid "Add to favourites"
 msgstr "Zu Favoriten hinzufügen"
@@ -605,7 +605,7 @@ msgid "Application with ID \"%1$s\" is not available on \"%2$s\"."
 msgstr "Kategorie mit ID \"%1$s\" ist nicht verfügbar auf \"%2$s\"."
 
 #: hosts.php:683 hosts.php:759 include/forms.inc.php:823
-#: include/html.inc.php:397 include/html.inc.php:401
+#: include/html.inc.php:390 include/html.inc.php:394
 #: include/views/configuration.application.list.php:40
 #: include/views/configuration.host.edit.php:318
 #: include/views/configuration.item.edit.php:402
@@ -3249,7 +3249,7 @@ msgstr "Skript löschen?"
 #: include/reports.inc.php:417 include/reports.inc.php:459
 #: include/views/administration.general.regularexpressions.list.php:57
 #: include/views/administration.mediatypes.list.php:117
-#: include/views/administration.proxy.list.php:95
+#: include/views/administration.proxy.list.php:103
 #: include/views/administration.script.list.php:89
 #: include/views/administration.usergroups.edit.php:102
 #: include/views/administration.usergroups.edit.php:106
@@ -3351,7 +3351,7 @@ msgstr "Ausgewählte Medientypen löschen?"
 msgid "Delete selected node?"
 msgstr "Ausgewählten Knoten löschen?"
 
-#: include/views/administration.proxy.list.php:96
+#: include/views/administration.proxy.list.php:104
 msgid "Delete selected proxies?"
 msgstr "Ausgewählte Proxys löschen?"
 
@@ -3622,13 +3622,13 @@ msgstr "Host deaktivieren?"
 msgid "Disable hosts in the selected host groups?"
 msgstr "Hosts in der ausgewählten Gruppe löschen?"
 
-#: include/views/administration.proxy.list.php:92
+#: include/views/administration.proxy.list.php:100
 msgid "Disable hosts monitored by selected proxies?"
 msgstr "Hosts deaktivieren, die durch ausgewählte Proxys überwacht werden?"
 
 # Passive Form besser lesbar im Dropdown-Feld
 #: hosts.php:871 include/views/administration.mediatypes.list.php:113
-#: include/views/administration.proxy.list.php:91
+#: include/views/administration.proxy.list.php:99
 #: include/views/administration.usergroups.list.php:133
 #: include/views/configuration.action.list.php:97
 #: include/views/configuration.application.list.php:85
@@ -3721,7 +3721,7 @@ msgid "Discovered device"
 msgstr "Gefundenes Gerät"
 
 #: events.php:310 hosts.php:687 hosts.php:767 include/events.inc.php:27
-#: include/html.inc.php:387 include/menu.inc.php:77 include/menu.inc.php:211
+#: include/html.inc.php:380 include/menu.inc.php:77 include/menu.inc.php:211
 #: include/views/configuration.action.list.php:34 templates.php:463
 #: templates.php:531
 msgid "Discovery"
@@ -3739,7 +3739,7 @@ msgstr "Discovery-Prüfung"
 msgid "Discovery checks"
 msgstr "Discovery-Prüfungen"
 
-#: include/html.inc.php:385
+#: include/html.inc.php:378
 msgid "Discovery list"
 msgstr "Discovery-Liste"
 
@@ -3787,7 +3787,7 @@ msgstr "Discovery-Regel gelöscht"
 msgid "Discovery rule updated"
 msgstr "Discovery-Regel geändert"
 
-#: include/html.inc.php:496 include/html.inc.php:500
+#: include/html.inc.php:489 include/html.inc.php:493
 #: include/views/configuration.host.discovery.list.php:33
 #: include/views/configuration.host.edit.php:423
 #: include/views/configuration.template.edit.php:303
@@ -4122,13 +4122,13 @@ msgstr "Aktiviere Host"
 msgid "Enable host?"
 msgstr "Host aktivieren?"
 
-#: include/views/administration.proxy.list.php:88
+#: include/views/administration.proxy.list.php:96
 msgid "Enable hosts monitored by selected proxies?"
 msgstr "Hosts aktivieren, die durch ausgewählte Proxys überwacht werden?"
 
 # Passive Form besser lesbar im Dropdown-Feld
 #: hosts.php:867 include/views/administration.mediatypes.list.php:109
-#: include/views/administration.proxy.list.php:87
+#: include/views/administration.proxy.list.php:95
 #: include/views/administration.usergroups.list.php:129
 #: include/views/configuration.action.list.php:93
 #: include/views/configuration.application.list.php:81
@@ -4539,7 +4539,7 @@ msgid "Filled region"
 msgstr "Gefüllt"
 
 #: dashconf.php:265 events.php:373 hostinventories.php:134 hosts.php:657
-#: include/classes/class.cwidget.php:134 include/forms.inc.php:574
+#: include/classes/class.cwidget.php:130 include/forms.inc.php:574
 #: include/reports.inc.php:178
 #: include/views/administration.auditacts.list.php:49
 #: include/views/administration.auditlogs.list.php:65
@@ -4650,7 +4650,7 @@ msgstr "Benachrichtigung im Frontend"
 msgid "Full clone"
 msgstr "Vollständig klonen"
 
-#: include/html.inc.php:267
+#: include/html.inc.php:260
 msgid "Fullscreen"
 msgstr "Vollbild"
 
@@ -4726,7 +4726,7 @@ msgstr "Globale Skripts"
 #: hosts.php:879
 #: include/views/administration.general.regularexpressions.list.php:62
 #: include/views/administration.mediatypes.list.php:121
-#: include/views/administration.proxy.list.php:99
+#: include/views/administration.proxy.list.php:107
 #: include/views/administration.script.list.php:93
 #: include/views/administration.usergroups.list.php:149
 #: include/views/administration.users.list.php:144
@@ -4848,7 +4848,7 @@ msgstr "Diagrammprototyp \"%s\" gelöscht."
 msgid "Graph prototype must have at least one prototype."
 msgstr "Diagrammprototyp muss mindestens ein Prototypenelement haben."
 
-#: include/html.inc.php:460 include/html.inc.php:464
+#: include/html.inc.php:453 include/html.inc.php:457
 #: include/views/configuration.host.discovery.list.php:90
 #: include/views/configuration.host.edit.php:494
 #: include/views/configuration.template.edit.php:365
@@ -4884,7 +4884,7 @@ msgid "Graph with same name but other type exist."
 msgstr "Namensgleiches Diagramm anderen Typs existiert bereits."
 
 #: dashboard.php:260 hosts.php:686 hosts.php:765 include/blocks.inc.php:1218
-#: include/html.inc.php:471 include/html.inc.php:475 include/items.inc.php:802
+#: include/html.inc.php:464 include/html.inc.php:468 include/items.inc.php:802
 #: include/menu.inc.php:62 include/triggers.inc.php:1311
 #: include/views/configuration.graph.list.php:56
 #: include/views/configuration.host.discovery.list.php:54
@@ -5086,7 +5086,7 @@ msgid "Hidden"
 msgstr "Versteckt"
 
 #: include/classes/class.cuiwidget.php:58
-#: include/classes/class.cwidget.php:222 include/html.inc.php:146
+#: include/classes/class.cwidget.php:183 include/html.inc.php:146
 msgid "Hide"
 msgstr "Ausblenden"
 
@@ -5159,7 +5159,7 @@ msgstr "Horizontale Ausrichtung"
 #: include/classes/screens/CScreenHostgroupTriggers.php:121
 #: include/classes/screens/CScreenHostTriggers.php:63
 #: include/classes/screens/CScreenHostTriggers.php:123
-#: include/forms.inc.php:504 include/html.inc.php:379 include/maps.inc.php:24
+#: include/forms.inc.php:504 include/html.inc.php:372 include/maps.inc.php:24
 #: include/reports.inc.php:112 include/setup.inc.php:310
 #: include/triggers.inc.php:1183 include/triggers.inc.php:1603
 #: include/views/configuration.application.edit.php:44
@@ -5304,7 +5304,7 @@ msgstr "Überblick Hostinventar"
 msgid "Host label type"
 msgstr "Beschriftung Host"
 
-#: include/html.inc.php:350
+#: include/html.inc.php:343
 msgid "Host list"
 msgstr "Liste der Hosts"
 
@@ -5324,7 +5324,7 @@ msgstr "Router des Hosts"
 #: host_screen.php:27 include/views/js/monitoring.maps.js.php:28
 #: jsLoader.php:176
 msgid "Host screens"
-msgstr "Host-Anzeigetafeln"
+msgstr "Host-Übersichtstafeln"
 
 #: dashboard.php:310
 msgid "Host status"
@@ -6639,7 +6639,7 @@ msgstr "Element gelöscht"
 msgid "Item prototype"
 msgstr "Elementen-Prototyp"
 
-#: include/html.inc.php:410 include/html.inc.php:414
+#: include/html.inc.php:403 include/html.inc.php:407
 #: include/views/configuration.host.discovery.list.php:88
 #: include/views/configuration.host.edit.php:443
 #: include/views/configuration.template.edit.php:323
@@ -6701,8 +6701,8 @@ msgstr "Element mit Schlüssel \"%1$s\" existiert bereits auf \"%2$s\"."
 msgid "Item with key \"%s\" already exists."
 msgstr "Element mit Schlüssel \"%1$s\" existiert bereits."
 
-#: hosts.php:684 hosts.php:761 include/html.inc.php:421
-#: include/html.inc.php:425 include/items.inc.php:733
+#: hosts.php:684 hosts.php:761 include/html.inc.php:414
+#: include/html.inc.php:418 include/items.inc.php:733
 #: include/reports.inc.php:329 include/reports.inc.php:465
 #: include/views/configuration.application.list.php:73
 #: include/views/configuration.graph.edit.php:280
@@ -7542,7 +7542,7 @@ msgstr "Höchstanzal der gezeigten Elemente in Zelle \"%1$s\"."
 msgid "Max count of events per trigger to show"
 msgstr "Maximal anzeigbare Anzahl von Ereignissen pro Auslöser"
 
-#: include/classes/class.cwidget.php:128 include/classes/class.cwidget.php:131
+#: include/classes/class.cwidget.php:124 include/classes/class.cwidget.php:127
 #: include/config.inc.php:346
 msgid "Maximize"
 msgstr "Maximieren"
@@ -7653,7 +7653,7 @@ msgstr "Mitglieder"
 msgid "Memory limit: %s"
 msgstr "Speicherlimit: %s"
 
-#: dashboard.php:301 include/html.inc.php:273
+#: dashboard.php:301 include/html.inc.php:266
 #: include/views/configuration.item.list.php:206
 #: include/views/monitoring.slides.php:45
 msgid "Menu"
@@ -7714,7 +7714,7 @@ msgstr "Milli"
 msgid "Min severity"
 msgstr "Minimaler Schweregrad"
 
-#: include/classes/class.cwidget.php:128 include/classes/class.cwidget.php:131
+#: include/classes/class.cwidget.php:124 include/classes/class.cwidget.php:127
 #: include/config.inc.php:346
 msgid "Minimize"
 msgstr "Minimieren"
@@ -7814,7 +7814,7 @@ msgstr "Mo"
 msgid "Monday"
 msgstr "Montag"
 
-#: hosts.php:793 include/html.inc.php:369
+#: hosts.php:793 include/html.inc.php:362
 #: include/views/configuration.host.edit.php:295
 #: include/views/configuration.host.massupdate.php:75 popup.php:569
 msgid "Monitored"
@@ -8695,7 +8695,7 @@ msgstr "Kein"
 msgid "Normal"
 msgstr "Normal"
 
-#: include/html.inc.php:267
+#: include/html.inc.php:260
 msgid "Normal view"
 msgstr "Normale Ansicht"
 
@@ -8734,7 +8734,7 @@ msgstr "Nicht klassifiziert"
 msgid "Not connected"
 msgstr "Nicht angemeldet"
 
-#: hosts.php:801 include/html.inc.php:372 include/triggers.inc.php:980
+#: hosts.php:801 include/html.inc.php:365 include/triggers.inc.php:980
 #: include/views/configuration.host.edit.php:296
 #: include/views/configuration.host.massupdate.php:76 popup.php:572
 msgid "Not monitored"
@@ -9438,7 +9438,7 @@ msgid "Parse error"
 msgstr "Parsing-Fehler"
 
 #: include/views/administration.proxy.edit.php:41
-#: include/views/administration.proxy.list.php:76
+#: include/views/administration.proxy.list.php:84
 msgid "Passive"
 msgstr "Passiv"
 
@@ -9999,7 +9999,7 @@ msgstr "Entferne Element"
 msgid "Remove from"
 msgstr "Löschen von"
 
-#: charts.php:85 history.php:86 host_screen.php:80 include/html.inc.php:249
+#: charts.php:85 history.php:86 host_screen.php:80 include/html.inc.php:242
 #: maps.php:63 screens.php:82
 msgid "Remove from favourites"
 msgstr "Entfernen aus Favoriten"
@@ -10095,7 +10095,7 @@ msgid "Required string"
 msgstr "Geforderte Zeichenkette"
 
 #: events.php:371 hostinventories.php:137 hosts.php:660
-#: include/forms.inc.php:571 include/html.inc.php:276
+#: include/forms.inc.php:571 include/html.inc.php:269
 #: include/reports.inc.php:180 include/reports.inc.php:341
 #: include/reports.inc.php:479 include/reports.inc.php:717
 #: include/views/administration.auditacts.list.php:51
@@ -10436,7 +10436,7 @@ msgstr "STATUS VON DISCOVERY"
 #: include/classes/screens/CScreenHostgroupTriggers.php:127
 #: include/classes/screens/CScreenHostTriggers.php:127 tr_status.php:177
 msgid "STATUS OF TRIGGERS"
-msgstr "STATUS DES AUSLÖSERS"
+msgstr "AKTUELLE AUSLÖSER"
 
 #: httpmon.php:97
 msgid "STATUS OF WEB MONITORING"
@@ -10644,8 +10644,8 @@ msgstr "Übersichtstafel mit ID \"%s\" existiert nicht."
 msgid "Screen with name \"%s\" does not exist."
 msgstr "Übersichtstafel namens \"%s\" existiert nicht."
 
-#: dashboard.php:267 include/blocks.inc.php:1356 include/html.inc.php:484
-#: include/html.inc.php:488 include/menu.inc.php:67 include/menu.inc.php:197
+#: dashboard.php:267 include/blocks.inc.php:1356 include/html.inc.php:477
+#: include/html.inc.php:481 include/menu.inc.php:67 include/menu.inc.php:197
 #: include/views/configuration.screen.list.php:38
 #: include/views/configuration.template.edit.php:386
 #: include/views/conf.import.php:35 include/views/monitoring.screen.php:29
@@ -11001,7 +11001,7 @@ msgid "Severity name cannot be empty."
 msgstr "Name des Schweregrads darf nicht leer bleiben."
 
 #: include/classes/class.cuiwidget.php:58
-#: include/classes/class.cwidget.php:222 include/html.inc.php:146
+#: include/classes/class.cwidget.php:183 include/html.inc.php:146
 #: include/reports.inc.php:339 include/reports.inc.php:477
 #: include/reports.inc.php:715
 #: include/views/configuration.application.list.php:55
@@ -11388,7 +11388,7 @@ msgstr "Status der Auslöser des Hosts"
 #: include/views/js/monitoring.maps.js.php:24
 #: include/views/js/monitoring.maps.js.php:45 tr_status.php:25
 msgid "Status of triggers"
-msgstr "Status des Auslösers"
+msgstr "Aktuelle Auslöser"
 
 #: include/maps.inc.php:48
 msgid "Status only"
@@ -11465,7 +11465,7 @@ msgstr "Betreff"
 
 #: include/views/js/monitoring.maps.js.php:35
 msgid "Submap"
-msgstr "Unter-Karte"
+msgstr "Unterkarte"
 
 #: include/items.inc.php:39
 msgid "Success Audit"
@@ -11602,7 +11602,7 @@ msgid "Telnet"
 msgstr "Telnet"
 
 #: include/audit.inc.php:51 include/forms.inc.php:541
-#: include/forms.inc.php:843 include/html.inc.php:364
+#: include/forms.inc.php:843 include/html.inc.php:357
 #: include/reports.inc.php:54 include/views/configuration.template.edit.php:38
 #: include/views/configuration.template.edit.php:390
 #: include/views/configuration.triggers.list.php:111
@@ -11644,7 +11644,7 @@ msgstr "Vorlagen-Gruppe"
 msgid "Template linkage"
 msgstr "Vorlagenverlinkung"
 
-#: include/html.inc.php:347
+#: include/html.inc.php:340
 msgid "Template list"
 msgstr "Vorlagen-Liste"
 
@@ -12057,7 +12057,7 @@ msgstr "Auslöser-Name"
 msgid "Trigger prototype"
 msgstr "Auslöser-Prototyp"
 
-#: include/html.inc.php:435 include/html.inc.php:439
+#: include/html.inc.php:428 include/html.inc.php:432
 #: include/views/configuration.host.discovery.list.php:89
 #: include/views/configuration.host.edit.php:470
 #: include/views/configuration.template.edit.php:344
@@ -12082,7 +12082,7 @@ msgstr "Auslöserpriorität"
 
 #: triggers.php:288
 msgid "Trigger status became \"Disabled\"."
-msgstr "Status des Auslösers ist \"Disabled\"."
+msgstr "Status des Auslösers ist \"Deaktiviert\"."
 
 #: trigger_prototypes.php:163 trigger_prototypes.php:202 triggers.php:152
 #: triggers.php:203 tr_logform.php:112
@@ -12094,7 +12094,7 @@ msgid "Trigger value"
 msgstr "Auslöserwert"
 
 #: hosts.php:685 hosts.php:763 include/events.inc.php:25
-#: include/forms.inc.php:517 include/html.inc.php:446 include/html.inc.php:450
+#: include/forms.inc.php:517 include/html.inc.php:439 include/html.inc.php:443
 #: include/menu.inc.php:52 include/triggers.inc.php:1162
 #: include/views/configuration.action.list.php:33
 #: include/views/configuration.host.discovery.list.php:53
@@ -12357,7 +12357,7 @@ msgstr "Einheit"
 #: include/discovery.inc.php:128 include/discovery.inc.php:162
 #: include/events.inc.php:29 include/graphs.inc.php:37
 #: include/graphs.inc.php:77 include/hosts.inc.php:53 include/hosts.inc.php:80
-#: include/html.inc.php:375 include/httptest.inc.php:39
+#: include/html.inc.php:368 include/httptest.inc.php:39
 #: include/httptest.inc.php:56 include/items.inc.php:41
 #: include/items.inc.php:102 include/items.inc.php:126
 #: include/items.inc.php:143 include/items.inc.php:160
