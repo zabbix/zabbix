@@ -158,6 +158,10 @@ jQuery(function($) {
 						case KEY.ARROW_LEFT:
 						case KEY.DELETE:
 							if (empty(input.val())) {
+								if (e.which == KEY.DELETE && $('.selected li.pressed', obj).length == 0) {
+									return;
+								}
+
 								if ($('.selected li', obj).length > 0) {
 									if ($('.selected li.pressed', obj).length > 0) {
 										if (e.which == KEY.BACKSPACE || e.which == KEY.DELETE) {
