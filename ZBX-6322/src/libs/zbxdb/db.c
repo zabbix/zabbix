@@ -297,9 +297,7 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 	}
 
 	if (ZBX_DB_OK == ret)
-	{
 		DBexecute("alter session set nls_numeric_characters='. '");
-	}
 
 	zbx_free(connect);
 
