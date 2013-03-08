@@ -1104,7 +1104,7 @@ class testInheritanceItem extends CWebTest {
 			array(
 				array(
 					'expected' => ITEM_GOOD,
-					'name' =>'Item flex',
+					'name' =>'Item flex1',
 					'key' =>'item-flex-delay1',
 					'flexPeriod' => array(
 						array('flexTime' => '1,00:00-24:00'),
@@ -1143,7 +1143,7 @@ class testInheritanceItem extends CWebTest {
 			array(
 				array(
 					'expected' => ITEM_GOOD,
-					'name' =>'Item flex',
+					'name' =>'Item flex2',
 					'key' =>'item-flex-delay2',
 					'delay' => 0,
 					'flexPeriod' => array(
