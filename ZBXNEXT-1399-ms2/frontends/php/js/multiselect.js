@@ -292,6 +292,10 @@ jQuery(function($) {
 			if (!empty(options.data)) {
 				loadSelected(options.data, obj, values, options);
 			}
+			else {
+				// resize
+				resizeSelected(obj, values);
+			}
 		});
 	};
 
@@ -488,7 +492,7 @@ jQuery(function($) {
 		var searchInputMinWidth = 50,
 			searchInputLeftPaddings = 4,
 			searchInputRightPaddings = 4,
-			searchInputTopPaddings = IE8 ? 7 : 0;
+			searchInputTopPaddings = IE8 ? 4 : 0;
 
 		// calculate
 		var top, left, height;
@@ -537,10 +541,10 @@ jQuery(function($) {
 
 			if (offset < 0 || offset > available.height()) {
 				if (offset < 0) {
-					offset = available.scrollTop() + offset;
+					offset = 0;
 				}
 
-				available.animate({ scrollTop: offset }, 300);
+				available.animate({scrollTop: offset}, 300);
 			}
 		}
 	}
