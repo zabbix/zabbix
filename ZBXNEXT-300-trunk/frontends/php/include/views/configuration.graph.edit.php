@@ -193,7 +193,7 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 
 		// select prototype button
 		if (!empty($this->data['parent_discoveryid'])) {
-			$yaxisMinData[] = new CButton('yaxis_min', _('Select prototype'), 'javascript: '.
+			$yaxisMinData[] = new CButton('yaxis_min_prototype', _('Select prototype'), 'javascript: '.
 				'return PopUp("popup.php?dstfrm='.$graphForm->getName().
 					'&parent_discoveryid='.$this->data['parent_discoveryid'].
 					'&dstfld1=ymin_itemid'.
@@ -245,7 +245,7 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 
 		// select prototype button
 		if (!empty($this->data['parent_discoveryid'])) {
-			$yaxisMaxData[] = new CButton('yaxis_min', _('Select prototype'), 'javascript: '.
+			$yaxisMaxData[] = new CButton('yaxis_max_prototype', _('Select prototype'), 'javascript: '.
 				'return PopUp("popup.php?dstfrm='.$graphForm->getName().
 					'&parent_discoveryid='.$this->data['parent_discoveryid'].
 					'&dstfld1=ymax_itemid'.
