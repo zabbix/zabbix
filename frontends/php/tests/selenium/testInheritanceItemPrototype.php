@@ -49,6 +49,19 @@ class testInheritanceItemPrototype extends CWebTest {
 	 */
 	protected $discoveryRule = 'discoveryRuleTest';
 
+	/**
+	 * The id of the templated test host created in the test data set.
+	 *
+	 * @var string
+	 */
+	protected $templateid = 30000;
+
+	/**
+	 * The id of the test host created in the test data set.
+	 *
+	 * @var string
+	 */
+	protected $hostid = 30001;
 
 	/**
 	 * Backup the tables that will be modified during the tests.
@@ -732,25 +745,638 @@ class testInheritanceItemPrototype extends CWebTest {
 	}
 
 
+	// Returns list of items
+	public static function allItems() {
+		return DBdata("select * from items where hostid = 30000 and key_ LIKE 'item-prototype-test%'");
+	}
+
+	/**
+	 * @dataProvider allItems
+	 */
+	public function testInheritanceGraph_simpleCreate($data) {
+		$name = $data['name'];
+
+		$sqlItems = "select * from items";
+		$oldHashItems = DBhash($sqlItems);
+
+		$this->zbxTestLogin('templates.php');
+		$this->zbxTestClickWait('link='.$this->template);
+		$this->zbxTestClickWait('link=Discovery rules');
+		$this->zbxTestClickWait('link='.$this->discoveryRule);
+		$this->zbxTestClickWait('link=Item prototypes');
+		$this->zbxTestClickWait('link='.$name);
+		$this->zbxTestClickWait('save');
+		$this->checkTitle('Configuration of item prototypes');
+		$this->zbxTestTextPresent(array('Item updated', "$name", 'CONFIGURATION OF ITEM PROTOTYPES', 'Item prototypes of '.$this->discoveryRule));
+
+		$this->assertEquals($oldHashItems, DBhash($sqlItems));
+	}
+
 	// returns data for simple create
 	public static function simple() {
 		return array(
 			array(
+				array(
+					'expected' => ITEM_GOOD,
+					'name' => 'Checksum of $1',
+					'key' => 'vfs.file.cksum[/sbin/shutdown]',
+					'dbName' => 'Checksum of /sbin/shutdown',
+					'dbCheck' => true,
+					'hostCheck' =>true
+				)
+			),
+			// Duplicate item
+			array(
+				array(
+					'expected' => ITEM_BAD,
+					'name' => 'Checksum of $1',
+					'key' => 'vfs.file.cksum[/sbin/shutdown]',
+					'errors' => array(
+						'ERROR: Cannot add item',
+						'Item with key "vfs.file.cksum[/sbin/shutdown]" already exists on'
+					)
+				)
+			),
+			// Item name is missing
+			array(
+				array(
+					'expected' => ITEM_BAD,
+					'key' =>'item-name-missing',
+					'errors' => array(
+						'Page received incorrect data',
+						'Warning. Incorrect value for field "Name": cannot be empty.'
+					)
+				)
+			),
+			// Item key is missing
+			array(
+				array(
+					'expected' => ITEM_BAD,
+					'name' => 'Item name',
+					'errors' => array(
+						'Page received incorrect data',
+						'Warning. Incorrect value for field "Key": cannot be empty.'
+					)
+				)
+			),
+			// Empty formula
+			array(
+				array(
+					'expected' => ITEM_BAD,
+					'name' => 'Item formula',
+					'key' => 'item-formula-test',
+					'formula' => ' ',
+					'errors' => array(
+						'ERROR: Page received incorrect data',
+						'Warning. Field "Custom multiplier" is mandatory.'
+					)
+				)
+			),
+			// Incorrect formula
+			array(
+				array(
+					'expected' => ITEM_BAD,
+					'name' => 'Item formula',
+					'key' => 'item-formula-test',
+					'formula' => 'formula',
+					'errors' => array(
+						'ERROR: Page received incorrect data',
+						'Warning. Field "Custom multiplier" is not decimal number.'
+					)
+				)
+			),
+			// Incorrect formula
+			array(
+				array(
+					'expected' => ITEM_BAD,
+					'name' => 'Item formula',
+					'key' => 'item-formula-test',
+					'formula' => 'a1b2c3',
+					'errors' => array(
+						'ERROR: Page received incorrect data',
+						'Warning. Field "Custom multiplier" is not decimal number.'
+					)
+				)
+			),
+			// Incorrect formula
+			array(
+				array(
+					'expected' => ITEM_BAD,
+					'name' => 'Item formula',
+					'key' => 'item-formula-test',
+					'formula' => '321abc',
+					'errors' => array(
+						'ERROR: Page received incorrect data',
+						'Warning. Field "Custom multiplier" is not decimal number.'
+					)
+				)
+			),
+			// Empty timedelay
+			array(
+				array(
+					'expected' => ITEM_BAD,
+					'name' => 'Item delay',
+					'key' => 'item-delay-test',
+					'delay' => 0,
+					'errors' => array(
+						'ERROR: Cannot add item',
+						'Item will not be refreshed. Please enter a correct update interval.'
+					)
+				)
+			),
+			// Incorrect timedelay
+			array(
+				array(
+					'expected' => ITEM_BAD,
+					'name' => 'Item delay',
+					'key' => 'item-delay-test',
+					'delay' => '-30',
+					'errors' => array(
+						'ERROR: Page received incorrect data',
+						'Warning. Incorrect value for field "Update interval (in sec)": must be between 0 and 86400.'
+					)
+				)
+			),
+			// Incorrect timedelay
+			array(
+				array(
+					'expected' => ITEM_BAD,
+					'name' => 'Item delay',
+					'key' => 'item-delay-test',
+					'delay' => 86401,
+					'errors' => array(
+						'ERROR: Page received incorrect data',
+						'Warning. Incorrect value for field "Update interval (in sec)": must be between 0 and 86400.'
+					)
+				)
+			),
+			// Empty time flex period
+			array(
+				array(
+					'expected' => ITEM_BAD,
+					'name' => 'Item flex',
+					'key' => 'item-flex-test',
+					'flexPeriod' => array(
+						array('flexDelay' => '', 'flexTime' => '', 'instantCheck' => true)
+					),
+					'errors' => array(
+						'ERROR: Page received incorrect data',
+						'Warning. Incorrect value for field "New flexible interval": cannot be empty.'
+					)
+				)
+			),
+			// Incorrect flex period
+			array(
+				array(
+					'expected' => ITEM_BAD,
+					'name' => 'Item flex',
+					'key' => 'item-flex-test',
+					'flexPeriod' => array(
+						array('flexTime' => '1-11,00:00-24:00', 'instantCheck' => true)
+					),
+					'errors' => array(
+						'ERROR: Invalid time period',
+						'Incorrect time period "1-11,00:00-24:00".'
+					)
+				)
+			),
+			// Incorrect flex period
+			array(
+				array(
+					'expected' => ITEM_BAD,
+					'name' => 'Item flex',
+					'key' => 'item-flex-test',
+					'flexPeriod' => array(
+						array('flexTime' => '1-7,00:00-25:00', 'instantCheck' => true)
+					),
+					'errors' => array(
+						'ERROR: Invalid time period',
+						'Incorrect time period "1-7,00:00-25:00".'
+					)
+				)
+			),
+			// Incorrect flex period
+			array(
+				array(
+					'expected' => ITEM_BAD,
+					'name' => 'Item flex',
+					'key' => 'item-flex-test',
+					'flexPeriod' => array(
+						array('flexTime' => '1-7,24:00-00:00', 'instantCheck' => true)
+					),
+					'errors' => array(
+						'ERROR: Invalid time period',
+						'Incorrect time period "1-7,24:00-00:00" start time must be less than end time.'
+					)
+				)
+			),
+			// Incorrect flex period
+			array(
+				array(
+					'expected' => ITEM_BAD,
+					'name' => 'Item flex',
+					'key' => 'item-flex-test',
+					'flexPeriod' => array(
+						array('flexTime' => '1,00:00-24:00;2,00:00-24:00', 'instantCheck' => true)
+					),
+					'errors' => array(
+						'ERROR: Invalid time period',
+						'Incorrect time period "1,00:00-24:00;2,00:00-24:00".'
+					)
+				)
+			),
+			// Multiple flex periods
+			array(
+				array(
+					'expected' => ITEM_GOOD,
+					'name' => 'Item flex',
+					'key' => 'item-flex-test',
+					'flexPeriod' => array(
+						array('flexTime' => '1,00:00-24:00'),
+						array('flexTime' => '2,00:00-24:00'),
+						array('flexTime' => '1,00:00-24:00'),
+						array('flexTime' => '2,00:00-24:00')
+					)
+				)
+			),
+			// Delay combined with flex periods
+			array(
+				array(
+					'expected' => ITEM_BAD,
+					'name' => 'Item flex',
+					'key' => 'item-flex-delay',
+					'flexPeriod' => array(
+						array('flexDelay' => 0, 'flexTime' => '1,00:00-24:00'),
+						array('flexDelay' => 0, 'flexTime' => '2,00:00-24:00'),
+						array('flexDelay' => 0, 'flexTime' => '3,00:00-24:00'),
+						array('flexDelay' => 0, 'flexTime' => '4,00:00-24:00'),
+						array('flexDelay' => 0, 'flexTime' => '5,00:00-24:00'),
+						array('flexDelay' => 0, 'flexTime' => '6,00:00-24:00'),
+						array('flexDelay' => 0, 'flexTime' => '7,00:00-24:00')
+					),
+					'errors' => array(
+						'ERROR: Cannot add item',
+						'Item will not be refreshed. Please enter a correct update interval.'
+					)
+				)
+			),
+			// Delay combined with flex periods
+			array(
+				array(
+					'expected' => ITEM_GOOD,
+					'name' => 'Item flex1',
+					'key' => 'item-flex-delay1',
+					'flexPeriod' => array(
+						array('flexTime' => '1,00:00-24:00'),
+						array('flexTime' => '2,00:00-24:00'),
+						array('flexTime' => '3,00:00-24:00'),
+						array('flexTime' => '4,00:00-24:00'),
+						array('flexTime' => '5,00:00-24:00'),
+						array('flexTime' => '6,00:00-24:00'),
+						array('flexTime' => '7,00:00-24:00')
+					)
+				)
+			),
+			// Delay combined with flex periods
+			array(
+				array(
+					'expected' => ITEM_BAD,
+					'name' => 'Item flex',
+					'key' => 'item-flex-delay',
+					'delay' => 0,
+					'flexPeriod' => array(
+						array('flexDelay' => 0, 'flexTime' => '1,00:00-24:00'),
+						array('flexDelay' => 0, 'flexTime' => '2,00:00-24:00'),
+						array('flexDelay' => 0, 'flexTime' => '3,00:00-24:00'),
+						array('flexDelay' => 0, 'flexTime' => '4,00:00-24:00'),
+						array('flexDelay' => 0, 'flexTime' => '5,00:00-24:00'),
+						array('flexDelay' => 0, 'flexTime' => '6,00:00-24:00'),
+						array('flexDelay' => 0, 'flexTime' => '7,00:00-24:00')
+					),
+					'errors' => array(
+						'ERROR: Cannot add item',
+						'Item will not be refreshed. Please enter a correct update interval.'
+					)
+				)
+			),
+			// Delay combined with flex periods
+			array(
+				array(
+					'expected' => ITEM_GOOD,
+					'name' => 'Item flex2',
+					'key' => 'item-flex-delay2',
+					'delay' => 0,
+					'flexPeriod' => array(
+						array('flexTime' => '1-5,00:00-24:00'),
+						array('flexTime' => '6-7,00:00-24:00')
+					),
+					'dbCheck' => true,
+					'hostCheck' => true
+				)
+			),
+			// Delay combined with flex periods
+			array(
+				array(
+					'expected' => ITEM_BAD,
+					'name' => 'Item flex',
+					'key' => 'item-flex-delay',
+					'flexPeriod' => array(
+						array('flexDelay' => 0, 'flexTime' => '1-5,00:00-24:00'),
+						array('flexDelay' => 0, 'flexTime' => '6-7,00:00-24:00')
+					),
+					'errors' => array(
+						'ERROR: Cannot add item',
+						'Item will not be refreshed. Please enter a correct update interval.'
+					)
+				)
+			),
+			// Delay combined with flex periods
+			array(
+				array(
+					'expected' => ITEM_GOOD,
+					'name' => 'Item flex',
+					'key' => 'item-flex-delay3',
+					'flexPeriod' => array(
+						array('flexTime' => '1-5,00:00-24:00'),
+						array('flexTime' => '6-7,00:00-24:00')
+					)
+				)
+			),
+			// Delay combined with flex periods
+			array(
+				array(
+					'expected' => ITEM_GOOD,
+					'name' => 'Item flex',
+					'key' => 'item-flex-delay4',
+					'delay' => 0,
+					'flexPeriod' => array(
+						array('flexTime' => '1-7,00:00-24:00')
+					)
+				)
+			),
+			// Delay combined with flex periods
+			array(
+				array(
+					'expected' => ITEM_BAD,
+					'name' => 'Item flex',
+					'key' => 'item-flex-delay',
+					'flexPeriod' => array(
+						array('flexDelay' => 0, 'flexTime' => '1-7,00:00-24:00')
+					),
+					'errors' => array(
+						'ERROR: Cannot add item',
+						'Item will not be refreshed. Please enter a correct update interval.'
+					)
+				)
+			),
+			// Delay combined with flex periods
+			array(
+				array(
+					'expected' => ITEM_GOOD,
+					'name' => 'Item flex',
+					'key' => 'item-flex-delay5',
+					'flexPeriod' => array(
+						array('flexTime' => '1-7,00:00-24:00')
+					)
+				)
+			),
+			// Delay combined with flex periods
+			array(
+				array(
+					'expected' => ITEM_BAD,
+					'name' => 'Item flex',
+					'key' => 'item-flex-delay',
+					'flexPeriod' => array(
+						array('flexDelay' => 0, 'flexTime' => '1-5,00:00-24:00'),
+						array('flexDelay' => 0, 'flexTime' => '6-7,00:00-24:00'),
+						array('flexTime' => '1-5,00:00-24:00'),
+						array('flexTime' => '6-7,00:00-24:00')
+					),
+					'errors' => array(
+						'ERROR: Cannot add item',
+						'Item will not be refreshed. Please enter a correct update interval.'
+					)
+				)
+			),
+			// Delay combined with flex periods
+			array(
+				array(
+					'expected' => ITEM_BAD,
+					'name' => 'Item flex',
+					'key' => 'item-flex-delay',
+					'flexPeriod' => array(
+						array('flexTime' => '1-5,00:00-24:00'),
+						array('flexTime' => '6-7,00:00-24:00'),
+						array('flexDelay' => 0, 'flexTime' => '1-5,00:00-24:00'),
+						array('flexDelay' => 0, 'flexTime' => '6-7,00:00-24:00')
+					),
+					'errors' => array(
+						'ERROR: Cannot add item',
+						'Item will not be refreshed. Please enter a correct update interval.'
+					)
+				)
+			),
+			// Delay combined with flex periods
+			array(
+				array(
+					'expected' => ITEM_BAD,
+					'name' => 'Item flex',
+					'key' => 'item-flex-delay',
+					'flexPeriod' => array(
+						array('flexTime' => '1-7,00:00-24:00'),
+						array('flexDelay' => 0, 'flexTime' => '1-7,00:00-24:00')
+					),
+					'errors' => array(
+						'ERROR: Cannot add item',
+						'Item will not be refreshed. Please enter a correct update interval.'
+					)
+				)
+			),
+			// Delay combined with flex periods
+			array(
+				array(
+					'expected' => ITEM_BAD,
+					'name' => 'Item flex',
+					'key' => 'item-flex-delay',
+					'flexPeriod' => array(
+						array('flexDelay' => 0, 'flexTime' => '1-7,00:00-24:00'),
+						array('flexTime' => '1-7,00:00-24:00')
+					),
+					'errors' => array(
+						'ERROR: Cannot add item',
+						'Item will not be refreshed. Please enter a correct update interval.'
+					)
+				)
+			),
+			// Delay combined with flex periods
+			array(
+				array(
+					'expected' => ITEM_GOOD,
+					'name' => 'Item flex',
+					'key' => 'item-flex-delay6',
+					'flexPeriod' => array(
+						array('flexDelay' => 0, 'flexTime' => '1,00:00-24:00', 'remove' => true),
+						array('flexDelay' => 0, 'flexTime' => '2,00:00-24:00', 'remove' => true),
+						array('flexDelay' => 0, 'flexTime' => '3,00:00-24:00', 'remove' => true),
+						array('flexDelay' => 0, 'flexTime' => '4,00:00-24:00', 'remove' => true),
+						array('flexDelay' => 0, 'flexTime' => '5,00:00-24:00', 'remove' => true),
+						array('flexDelay' => 0, 'flexTime' => '6,00:00-24:00', 'remove' => true),
+						array('flexDelay' => 0, 'flexTime' => '7,00:00-24:00', 'remove' => true),
+						array('flexTime' => '1,00:00-24:00'),
+						array('flexTime' => '2,00:00-24:00'),
+						array('flexTime' => '3,00:00-24:00'),
+						array('flexTime' => '4,00:00-24:00'),
+						array('flexTime' => '5,00:00-24:00'),
+						array('flexTime' => '6,00:00-24:00'),
+						array('flexTime' => '7,00:00-24:00')
+					)
+				)
+			),
+			// Delay combined with flex periods
+			array(
+				array(
+					'expected' => ITEM_GOOD,
+					'name' => 'Item flex',
+					'key' => 'item-flex-delay7',
+					'flexPeriod' => array(
+						array('flexDelay' => 0, 'flexTime' => '1-7,00:00-24:00', 'remove' => true),
+						array('flexTime' => '1-7,00:00-24:00')
+					)
+				)
+			),
+			// Delay combined with flex periods
+			array(
+				array(
+					'expected' => ITEM_GOOD,
+					'name' => 'Item flex Check',
+					'key' => 'item-flex-delay8',
+					'flexPeriod' => array(
+						array('flexDelay' => 0, 'flexTime' => '1-5,00:00-24:00', 'remove' => true),
+						array('flexDelay' => 0, 'flexTime' => '6-7,00:00-24:00', 'remove' => true),
+						array('flexTime' => '1-5,00:00-24:00'),
+						array('flexTime' => '6-7,00:00-24:00')
+					),
+					'dbCheck' => true,
+					'hostCheck' => true
+				)
+			),
+			// History
+			array(
+				array(
+					'expected' => ITEM_GOOD,
+					'name' => 'Item history',
+					'key' => 'item-history-empty',
+					'history' => ''
+				)
+			),
+			// History
+			array(
+				array(
+					'expected' => ITEM_BAD,
+					'name' => 'Item history',
+					'key' => 'item-history-test',
+					'history' => 65536,
+					'errors' => array(
+						'ERROR: Page received incorrect data',
+						'Warning. Incorrect value for field "Keep history (in days)": must be between 0 and 65535.'
+					)
+				)
+			),
+			// History
+			array(
+				array(
+					'expected' => ITEM_BAD,
+					'name' => 'Item history',
+					'key' => 'item-history-test',
+					'history' => '-1',
+					'errors' => array(
+							'ERROR: Page received incorrect data',
+							'Warning. Incorrect value for field "Keep history (in days)": must be between 0 and 65535.'
+					)
+				)
+			),
+			// History
+			array(
+				array(
+					'expected' => ITEM_GOOD,
+					'name' => 'Item history',
+					'key' => 'item-history-test',
+					'history' => 'days'
+				)
+			),
+			// Trends
+			array(
+				array(
+					'expected' => ITEM_GOOD,
+					'name' => 'Item trends',
+					'key' => 'item-trends-empty',
+					'trends' => '',
+					'dbCheck' => true,
+					'hostCheck' => true
+				)
+			),
+			// Trends
+			array(
+				array(
+					'expected' => ITEM_BAD,
+					'name' => 'Item trends',
+					'key' => 'item-trends-test',
+					'trends' => '-1',
+					'errors' => array(
+							'ERROR: Page received incorrect data',
+							'Warning. Incorrect value for field "Keep trends (in days)": must be between 0 and 65535.'
+					)
+				)
+			),
+			// Trends
+			array(
+				array(
+					'expected' => ITEM_BAD,
+					'name' => 'Item trends',
+					'key' => 'item-trends-test',
+					'trends' => 65536,
+					'errors' => array(
+							'ERROR: Page received incorrect data',
+							'Warning. Incorrect value for field "Keep trends (in days)": must be between 0 and 65535.'
+					)
+				)
+			),
+			// Trends
+			array(
+				array(
+					'expected' => ITEM_GOOD,
+					'name' => 'Item trends Check',
+					'key' => 'item-trends-test',
+					'trends' => 'trends',
+					'dbCheck' => true,
+					'hostCheck' => true
+				)
+			),
+			array(
+				array(
+					'expected' => ITEM_GOOD,
+					'name' => '!@#$%^&*()_+-=[]{};:"|,./<>?',
+					'key' => 'item-symbols-test',
+					'dbCheck' => true,
+					'hostCheck' => true
+				)
+			),
+			array(
 				array('expected' => ITEM_GOOD,
-					'item' => 'itemSimple',
+					'name' => 'itemSimple',
 					'key' => 'key-template-simple',
 					'hostCheck' => true,
 					'dbCheck' => true)
 			),
 			array(
 				array('expected' => ITEM_GOOD,
-					'item' => 'itemName',
+					'name' => 'itemName',
 					'key' => 'key-template-item',
 					'hostCheck' => true)
 			),
 			array(
 				array('expected' => ITEM_GOOD,
-					'item' => 'itemTrigger',
+					'name' => 'itemTrigger',
 					'key' => 'key-template-trigger',
 					'hostCheck' => true,
 					'dbCheck' => true,
@@ -758,7 +1384,7 @@ class testInheritanceItemPrototype extends CWebTest {
 			),
 			array(
 				array('expected' => ITEM_GOOD,
-					'item' => 'itemRemove',
+					'name' => 'itemRemove',
 					'key' => 'key-template-remove',
 					'hostCheck' => true,
 					'dbCheck' => true,
@@ -767,7 +1393,7 @@ class testInheritanceItemPrototype extends CWebTest {
 			),
 			array(
 				array('expected' => ITEM_BAD,
-					'item' => 'itemInheritance',
+					'name' => 'itemInheritance',
 					'key' => 'key-item-inheritance',
 					'errors' => array(
 						'ERROR: Cannot add item',
@@ -783,8 +1409,12 @@ class testInheritanceItemPrototype extends CWebTest {
 	public function testInheritanceItemPrototype_simpleCreate($data) {
 		$this->zbxTestLogin('templates.php');
 
-		$itemName = $data['item'];
-		$keyName = $data['key'];
+		if (isset($data['name'])) {
+			$itemName = $data['name'];
+		}
+		if (isset($data['key'])) {
+			$keyName = $data['key'];
+		}
 
 		$this->zbxTestClickWait('link='.$this->template);
 		$this->zbxTestClickWait("link=Discovery rules");
@@ -792,25 +1422,87 @@ class testInheritanceItemPrototype extends CWebTest {
 		$this->zbxTestClickWait("link=Item prototypes");
 		$this->zbxTestClickWait('form');
 
-		$this->input_type('name', $itemName);
-		$this->input_type('key', $keyName);
-		$this->zbxTestClickWait('save');
+		if (isset($data['name'])) {
+			$this->input_type('name', $data['name']);
+		}
+		$name = $this->getValue('name');
 
-		switch ($data['expected']) {
-			case ITEM_GOOD:
-				$this->zbxTestTextPresent('Item added');
-				$this->checkTitle('Configuration of item prototypes');
-				$this->zbxTestTextPresent(array('CONFIGURATION OF ITEM PROTOTYPES', "Item prototypes of ".$this->discoveryRule));
-				break;
+		if (isset($data['key'])) {
+			$this->input_type('key', $data['key']);
+		}
+		$key = $this->getValue('key');
 
-			case ITEM_BAD:
-				$this->checkTitle('Configuration of item prototypes');
-				$this->zbxTestTextPresent(array('CONFIGURATION OF ITEM PROTOTYPES', 'Item prototype'));
-				foreach ($data['errors'] as $msg) {
-					$this->zbxTestTextPresent($msg);
+		if (isset($data['username'])) {
+			$this->input_type('username', $data['username']);
+		}
+
+		if (isset($data['params_es'])) {
+			$this->input_type('params_es', $data['params_es']);
+		}
+
+		if (isset($data['formula'])) {
+			$this->zbxTestCheckboxSelect('multiplier');
+			$this->input_type('formula', $data['formula']);
+		}
+
+		if (isset($data['delay']))	{
+			$this->input_type('delay', $data['delay']);
+		}
+
+		$itemFlexFlag = true;
+		if (isset($data['flexPeriod'])) {
+			foreach ($data['flexPeriod'] as $period) {
+				$this->input_type('new_delay_flex_period', $period['flexTime']);
+
+				if (isset($period['flexDelay'])) {
+					$this->input_type('new_delay_flex_delay', $period['flexDelay']);
 				}
-				$this->zbxTestTextPresent(array('Name', 'Type', 'Key'));
-				break;
+				$this->zbxTestClickWait('add_delay_flex');
+
+				if (isset($period['instantCheck'])) {
+					foreach ($data['errors'] as $msg) {
+						$this->zbxTestTextPresent($msg);
+					}
+					$itemFlexFlag = false;
+				}
+				if (isset($period['remove'])) {
+					$this->zbxTestClick('remove');
+					sleep(1);
+				}
+			}
+		}
+
+		if (isset($data['history'])) {
+			$this->input_type('history', $data['history']);
+		}
+
+		if (isset($data['trends'])) {
+			$this->input_type('trends', $data['trends']);
+		}
+
+		$type = $this->getSelectedLabel('type');
+		$value_type = $this->getSelectedLabel('value_type');
+		$data_type = $this->getSelectedLabel('data_type');
+
+		if ($itemFlexFlag == true) {
+			$this->zbxTestClickWait('save');
+			$expected = $data['expected'];
+			switch ($expected) {
+				case ITEM_GOOD:
+					$this->zbxTestTextPresent('Item added');
+					$this->checkTitle('Configuration of item prototypes');
+					$this->zbxTestTextPresent(array('CONFIGURATION OF ITEM PROTOTYPES', "Item prototypes of ".$this->discoveryRule));
+					break;
+
+				case ITEM_BAD:
+					$this->checkTitle('Configuration of item prototypes');
+					$this->zbxTestTextPresent(array('CONFIGURATION OF ITEM PROTOTYPES', 'Item prototype'));
+					foreach ($data['errors'] as $msg) {
+						$this->zbxTestTextPresent($msg);
+					}
+					$this->zbxTestTextPresent(array('Name', 'Type', 'Key'));
+					break;
+			}
 		}
 
 		if (isset($data['hostCheck'])) {
@@ -820,8 +1512,16 @@ class testInheritanceItemPrototype extends CWebTest {
 			$this->zbxTestClickWait('link='.$this->discoveryRule);
 			$this->zbxTestClickWait("link=Item prototypes");
 
-			$this->zbxTestTextPresent($this->template.": $itemName");
-			$this->zbxTestClickWait("link=$itemName");
+
+			if (isset ($data['dbName'])) {
+				$itemNameDB = $data['dbName'];
+				$this->zbxTestTextPresent($this->template.": $itemNameDB");
+				$this->zbxTestClickWait("link=$itemNameDB");
+			}
+			else {
+				$this->zbxTestTextPresent($this->template.": $itemName");
+				$this->zbxTestClickWait("link=$itemName");
+			}
 
 			$this->zbxTestTextPresent('Parent items');
 			$this->assertElementPresent('link='.$this->template);
@@ -831,14 +1531,13 @@ class testInheritanceItemPrototype extends CWebTest {
 
 		if (isset($data['dbCheck'])) {
 			// template
-			$result = DBselect("SELECT name, key_, hostid FROM items where name = '".$itemName."' limit 1");
+			$result = DBselect("SELECT name, key_, hostid FROM items where name = '".$itemName."' and hostid = ".$this->templateid);
 			while ($row = DBfetch($result)) {
 				$this->assertEquals($row['name'], $itemName);
 				$this->assertEquals($row['key_'], $keyName);
-				$hostid = $row['hostid'] + 1;
 			}
 			// host
-			$result = DBselect("SELECT name, key_ FROM items where name = '".$itemName."'  AND hostid = ".$hostid."");
+			$result = DBselect("SELECT name, key_ FROM items where name = '".$itemName."'  AND hostid = ".$this->hostid);
 			while ($row = DBfetch($result)) {
 				$this->assertEquals($row['name'], $itemName);
 				$this->assertEquals($row['key_'], $keyName);
@@ -846,11 +1545,7 @@ class testInheritanceItemPrototype extends CWebTest {
 		}
 
 		if (isset($data['hostRemove'])) {
-			$result = DBselect("SELECT hostid FROM items where name = '".$itemName."' limit 1");
-			while ($row = DBfetch($result)) {
-				$hostid = $row['hostid'] + 1;
-			}
-			$result = DBselect("SELECT name, key_, itemid FROM items where name = '".$itemName."'  AND hostid = ".$hostid."");
+			$result = DBselect("SELECT name, key_, itemid FROM items where name = '".$itemName."'  AND hostid = ".$this->hostid);
 			while ($row = DBfetch($result)) {
 				$itemId = $row['itemid'];
 			}
@@ -871,7 +1566,7 @@ class testInheritanceItemPrototype extends CWebTest {
 		}
 
 		if (isset($data['remove'])) {
-			$result = DBselect("SELECT itemid FROM items where name = '".$itemName."' limit 1");
+			$result = DBselect("SELECT itemid FROM items where name = '".$itemName."' and hostid = ".$this->templateid);
 			while ($row = DBfetch($result)) {
 				$itemId = $row['itemid'];
 			}
