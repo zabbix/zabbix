@@ -65,7 +65,7 @@ class testInheritanceItem extends CWebTest {
 	}
 
 	// returns all possible item types
-/*	public static function itemTypes() {
+	public static function itemTypes() {
 		return array(
 			array(
 				array('type' => 'Zabbix agent')
@@ -222,11 +222,11 @@ class testInheritanceItem extends CWebTest {
 			)
 		);
 	}
-*/
+
 	/**
 	 * @dataProvider itemTypes
 	 */
-/*	public function testItemInheritance_CheckLayout($data) {
+	public function testItemInheritance_CheckLayout($data) {
 		$this->zbxTestLogin('templates.php');
 		$this->zbxTestClickWait('link='.$this->template);
 		$this->zbxTestClickWait("//div[@class='w']//a[text()='Items']");
@@ -830,11 +830,11 @@ class testInheritanceItem extends CWebTest {
 	public static function allItems() {
 		return DBdata("select * from items where hostid = 30000 and key_ LIKE 'test-inheritance-item%'");
 	}
-*/
+
 	/**
 	 * @dataProvider allItems
 	 */
-/*	public function testInheritanceGraph_simpleCreate($data) {
+	public function testInheritanceGraph_simpleCreate($data) {
 		$name = $data['name'];
 
 		$sqlItems = "select * from items";
@@ -852,7 +852,7 @@ class testInheritanceItem extends CWebTest {
 
 		$this->assertEquals($oldHashItems, DBhash($sqlItems));
 	}
-*/
+
 	public static function create() {
 		return array(
 			array(
