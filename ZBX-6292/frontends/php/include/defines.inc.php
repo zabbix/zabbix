@@ -779,7 +779,6 @@ define('REGEXP_EXCLUDE', 1);
 // suffixes
 define('ZBX_BYTE_SUFFIXES', 'KMGT');
 define('ZBX_TIME_SUFFIXES', 'smhdw');
-define('ZBX_TIME_SUFFIXES_OR', 's|m|h|d|w');
 
 // preg
 define('ZBX_PREG_PRINT', '^\x{00}-\x{1F}');
