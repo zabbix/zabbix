@@ -87,11 +87,10 @@ static int	get_device_sensors(int do_task, int *mib, const struct sensordev *sen
 		if (i == SENSOR_MAX_TYPES)
 			return FAIL;
 
-		if (SUCCEED != is_uint(name + len))
+		if (SUCCEED != is_uint31(name + len, (uint32_t*)&mib[4]))
 			return FAIL;
 
 		mib[3] = i;
-		mib[4] = atoi(name + len);
 
 		if (-1 == sysctl(mib, 5, &sensor, &slen, NULL, 0))
 			return FAIL;

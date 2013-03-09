@@ -791,11 +791,31 @@ char	*string_replace(const char *str, const char *sub_str1, const char *sub_str2
 int	is_double_suffix(const char *str);
 int	is_double(const char *c);
 int	is_uint_suffix(const char *c, unsigned int *value);
-int	is_uint(const char *c);
 int	is_int_prefix(const char *c);
-#define is_uint64(src, value)	is_uint64_n(src, ZBX_MAX_UINT64_LEN, value)
-int	is_uint64_n(const char *str, size_t n, zbx_uint64_t *value);
-int	is_ushort(const char *str, unsigned short *value);
+int	is_uint_n_range(const char *str, size_t n, void *value, size_t size, zbx_uint64_t min, zbx_uint64_t max);
+
+#define is_ushort(str, value) \
+	is_uint_n_range(str, (size_t)ZBX_MAX_UINT64_LEN, value, sizeof(unsigned short), 0x0LL, 0xFFFFLL)
+
+#define is_uint32(str, value) \
+	is_uint_n_range(str, (size_t)ZBX_MAX_UINT64_LEN, value, (size_t)4, 0x0LL, 0xFFFFFFFFLL)
+
+#define is_uint64(str, value) \
+	is_uint_n_range(str, (size_t)ZBX_MAX_UINT64_LEN, value, (size_t)8, 0x0LL, 0xFFFFFFFFFFFFFFFFLL)
+
+#define is_uint64_n(str, n, value) \
+		is_uint_n_range(str, n, value, (size_t)8, 0x0LL, 0xFFFFFFFFFFFFFFFFLL)
+
+#define is_uint31(str, value) \
+	is_uint_n_range(str, (size_t)ZBX_MAX_UINT64_LEN, value, (size_t)4, 0x0LL, 0x7FFFFFFFLL)
+
+#define is_uint31_1(str, value) \
+	is_uint_n_range(str, (size_t)ZBX_MAX_UINT64_LEN, value, (size_t)4, 0x0LL, 0x7FFFFFFELL)
+
+#define is_uint_range(str, value, min, max) \
+	is_uint_n_range(str, (size_t)ZBX_MAX_UINT64_LEN, value, sizeof(unsigned int), min, max)
+
+
 int	is_boolean(const char *str, zbx_uint64_t *value);
 int	is_uoct(const char *str);
 int	is_uhex(const char *str);

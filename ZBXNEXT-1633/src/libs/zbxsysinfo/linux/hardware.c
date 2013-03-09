@@ -288,10 +288,8 @@ int     SYSTEM_HW_CPU(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (NULL == param || '\0' == *param || 0 == strcmp(param, "all"))
 		cpu = HW_CPU_ALL_CPUS;	/* show all CPUs by default */
-	else if (FAIL == is_uint(param))
+	else if (FAIL == is_uint31(param, (uint32_t*)&cpu))
 		return ret;
-	else
-		cpu = atoi(param);
 
 	param = get_rparam(request, 1);
 
