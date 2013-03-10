@@ -432,65 +432,46 @@ static void	DBlld_hostgroups_make(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *hos
 			zbx_vector_uint64_append(&hostids, host->hostid);
 	}
 
-	/* host groups which are already added */
-
-	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-			"select hostid,groupid"
-			" from hosts_groups"
-			" where");
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid", hostids.values, hostids.values_num);
-
-	result = DBselect("%s", sql);
-
-	while (NULL != (row = DBfetch(result)))
+	if (0 != hostids.values_num)
 	{
-		ZBX_STR2UINT64(hostid, row[0]);
-		ZBX_STR2UINT64(groupid, row[1]);
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
+				"select hostid,groupid,hostgroupid"
+				" from hosts_groups"
+				" where");
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid", hostids.values, hostids.values_num);
 
-		if (FAIL == (i = zbx_vector_ptr_bsearch(hosts, &hostid, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
+		result = DBselect("%s", sql);
+
+		while (NULL != (row = DBfetch(result)))
 		{
-			THIS_SHOULD_NEVER_HAPPEN;
-			continue;
+			ZBX_STR2UINT64(hostid, row[0]);
+			ZBX_STR2UINT64(groupid, row[1]);
+
+			if (FAIL == (i = zbx_vector_ptr_bsearch(hosts, &hostid, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
+			{
+				THIS_SHOULD_NEVER_HAPPEN;
+				continue;
+			}
+
+			host = (zbx_lld_host_t *)hosts->values[i];
+
+			if (FAIL == (i = zbx_vector_uint64_bsearch(&host->groupids, groupid,
+					ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
+			{
+				/* host groups which should be deleted */
+				ZBX_STR2UINT64(hostgroupid, row[2]);
+				zbx_vector_uint64_append(hostgroupids, hostgroupid);
+			}
+			else
+			{
+				/* host groups which are already added */
+				zbx_vector_uint64_remove(&host->groupids, i);
+			}
 		}
+		DBfree_result(result);
 
-		host = (zbx_lld_host_t *)hosts->values[i];
-
-		if (FAIL != (i = zbx_vector_uint64_bsearch(&host->groupids, groupid, ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
-		{
-			zbx_vector_uint64_remove(&host->groupids, i);
-		}
+		zbx_vector_uint64_sort(hostgroupids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 	}
-	DBfree_result(result);
-
-	/* host groups which should be deleted */
-
-	sql_offset = 0;
-	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-			"select hg.hostgroupid"
-			" from hosts_groups hg"
-			" where");
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hg.hostid", hostids.values, hostids.values_num);
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-				" and not exists ("
-					"select null"
-					" from hosts_groups hg2,items i"
-					" where hg.groupid=hg2.groupid"
-						" and hg2.hostid=i.hostid"
-						" and i.itemid=" ZBX_FS_UI64
-				")",
-			lld_ruleid);
-
-	result = DBselect("%s", sql);
-
-	while (NULL != (row = DBfetch(result)))
-	{
-		ZBX_STR2UINT64(hostgroupid, row[0]);
-
-		zbx_vector_uint64_append(hostgroupids, hostgroupid);
-	}
-	DBfree_result(result);
-
-	zbx_vector_uint64_sort(hostgroupids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	zbx_vector_uint64_destroy(&hostids);
 	zbx_vector_uint64_destroy(&groupids);
