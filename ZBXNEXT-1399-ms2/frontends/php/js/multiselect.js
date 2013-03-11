@@ -509,8 +509,16 @@ jQuery(function($) {
 			height = 0;
 		}
 
+		if (SF) {
+			top = top * 2;
+		}
+
 		if (left + searchInputMinWidth > values.width) {
 			var topPaddings = (height > 20) ? height / 2 : height;
+
+			if (SF) {
+				topPaddings = topPaddings * 2;
+			}
 
 			top += topPaddings;
 			left = searchInputLeftPaddings;
