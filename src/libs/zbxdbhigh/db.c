@@ -792,7 +792,7 @@ int	DBget_queue_count(int from, int to)
 				ITEM_TYPE_IPMI,
 			HOST_AVAILABLE_FALSE,
 				ITEM_TYPE_JMX,
-			ZBX_FLAG_DISCOVERY_CHILD,
+			ZBX_FLAG_DISCOVERY_PROTOTYPE,
 			DBand_node_local("i.itemid"));
 
 	while (NULL != (row = DBfetch(result)))

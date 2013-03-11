@@ -3017,7 +3017,7 @@ static void	DBcopy_template_items(zbx_uint64_t hostid, zbx_vector_uint64_t *temp
 
 			zbx_free(item[i].key_esc);
 
-			if (0 != (ZBX_FLAG_DISCOVERY_CHILD & item[i].flags))
+			if (0 != (ZBX_FLAG_DISCOVERY_PROTOTYPE & item[i].flags))
 				protoids[protoids_num++] = itemid;
 
 			itemid++;
