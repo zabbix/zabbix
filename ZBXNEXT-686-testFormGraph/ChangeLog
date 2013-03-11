@@ -43,6 +43,8 @@ A.F.I...S. [ZBXNEXT-1186] increased length to 2048 characters of expression fiel
 ..F....... [ZBX-5127] regular expressions form redesign (Vedmak)
 
 Bug fixes:
+..F....... [ZBX-6336] fixed "array to string conversion" error in triggers (Oleg)
+..F....... [ZBX-6332] fixed buttons ids in graph edit form (Eduard)
 ........S. [ZBX-6234] improved validation of command request (global scripts) tag values (wiper)
 ..F....... [ZBX-6331] fixed page title in Graph prototypes (Eduard)
 ..F....... [ZBX-3357] fixed confusing naming and coloring in Monitoring > Overview hint popup (Toms)
@@ -137,8 +139,9 @@ A......... [ZBX-5498] applications API refactoring (Vedmak)
 Changes for 2.0.6rc1
 
 New features:
+........S. [ZBXNEXT-1643] added support of {TRIGGER.TEMPLATE.NAME} and {TRIGGER.HOSTGROUP.NAME} notification macros; thanks to Hmami Mohamed (Sasha)
 A.F....... [ZBX-1357] added Lithuanian translation; thanks to Zabbix translators (Richlv)
-A.F....... [ZBX-1357] updated American English, Brazilian Portuguese, French, German, Hungarian, Latvian, Slovak, Spanish, Russian, Turkish and Ukrainian translations; thanks to Zabbix translators (Richlv)
+A.F....... [ZBX-1357] updated American English, Brazilian Portuguese, French, German, Greek, Hungarian, Latvian, Slovak, Spanish, Russian, Turkish and Ukrainian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
 ..F....... [ZBX-6328] fixed undefined index in proxy list (Eduard)
