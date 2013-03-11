@@ -223,20 +223,55 @@ div.footer .formrow .main:hover, div.ui-dialog-buttonpane div.ui-dialog-buttonse
 .objectgroup.footer { margin-top: 2px; }
 
 /* host interfaces */
-.host-edit .interface-row { margin-top: -3px; }
-.host-edit .interface-row .objectgroup { border-top-width: 0; padding-top: 4px; }
-.host-edit .interface-row-first { margin-top: 0; }
-.host-edit .interface-row-first .objectgroup { border-top-width: 1px; padding-top: 0; }
+.host-edit .interface-row,
+.hostprototype-edit .interface-row {
+	margin-top: -3px;
+}
+.host-edit .interface-row .objectgroup,
+.hostprototype-edit .interface-row .objectgroup {
+	border-top-width: 0; padding-top: 4px;
+}
+.host-edit .interface-row-first,
+.hostprototype-edit .interface-row-first {
+	margin-top: 0;
+}
+.host-edit .interface-row-first .objectgroup,
+.hostprototype-edit .interface-row-first .objectgroup {
+	border-top-width: 1px; padding-top: 0;
+}
 .host-edit .interface-row .interface-drag-control,
-.host-edit .interface-row .interface-add-control {
+.host-edit .interface-row .interface-add-control,
+.hostprototype-edit .interface-row .interface-drag-control,
+.hostprototype-edit .interface-row .interface-add-control
+{
 	width: 2em;
 }
-.host-edit .interface-row .interface-ip { width: 16.5em; }
-.host-edit .interface-row .interface-dns { width: 20em; }
-.host-edit .interface-row .interface-connect-to { width: 8em; white-space: nowrap; }
-.host-edit .interface-row .interface-port { width: 11em; }
-.host-edit .interface-row .interface-default { width: 4em; }
-.host-edit .dropArea .interface-add-control { visibility: hidden; }
+.host-edit .interface-row .interface-ip,
+.hostprototype-edit .interface-row .interface-ip {
+	width: 16.5em;
+}
+.host-edit .interface-row .interface-dns,
+.hostprototype-edit .interface-row .interface-dns {
+	width: 20em;
+}
+.host-edit .interface-row .interface-connect-to,
+.hostprototype-edit .interface-row .interface-connect-to {
+	width: 8em; white-space: nowrap;
+}
+.host-edit .interface-row .interface-port,
+.hostprototype-edit .interface-row .interface-port {
+	width: 11em;
+}
+.host-edit .interface-row .interface-default,
+.hostprototype-edit .interface-row .interface-default {
+	width: 4em;
+}
+.host-edit .dropArea .interface-add-control,
+.hostprototype-edit .dropArea .interface-add-control {
+	visibility: hidden;
+}
+
+.hostprototype-edit #groups { width: 280px; }
 
 .border_dotted { border: 1px dotted #6C80B9; }
 .footer { padding-left: 1.6em; }

@@ -20,10 +20,11 @@
 
 $discoveryRule = $data['discovery_rule'];
 $hostPrototype = $data['host_prototype'];
+$parentHost = $data['parent_host'];
 
 require_once dirname(__FILE__).'/js/configuration.host.edit.js.php';
 
-$widget = new CWidget();
+$widget = new CWidget(null, 'hostprototype-edit');
 $widget->addPageHeader(_('CONFIGURATION OF HOST PROTOTYPES'));
 $widget->addItem(get_header_host_table('hosts', $this->data['parent_hostid'], $discoveryRule['itemid']));
 
@@ -44,8 +45,8 @@ if ($hostPrototype['templateid'] && $data['parents']) {
 	$parents = array();
 	foreach (array_reverse($data['parents']) as $parent) {
 		$parents[] = new CLink(
-			$parent['host']['name'],
-			'?form=update&hostid='.$parent['hostid'].'&parent_hostid='.$parent['host']['hostid'].'&parent_discoveryid='.$parent['discoveryRule']['itemid'],
+			$parent['parentHost']['name'],
+			'?form=update&hostid='.$parent['hostid'].'&parent_hostid='.$parent['parentHost']['hostid'].'&parent_discoveryid='.$parent['discoveryRule']['itemid'],
 			'highlight underline weight_normal'
 		);
 		$parents[] = SPACE.RARR.SPACE;
@@ -66,6 +67,101 @@ $hostList->addRow(_('Host name'), $hostTB);
 $visiblenameTB = new CTextBox('name', $hostPrototype['name'], ZBX_TEXTBOX_STANDARD_SIZE, (bool) $hostPrototype['templateid']);
 $visiblenameTB->setAttribute('maxlength', 64);
 $hostList->addRow(_('Visible name'), $visiblenameTB);
+
+// display inherited parameters only for hosts prototypes on hosts
+if ($parentHost['status'] != HOST_STATUS_TEMPLATE) {
+	// host groups
+	$groupBox = new CComboBox('groups');
+	$groupBox->setAttribute('readonly', true);
+	$groupBox->setAttribute('size', 10);
+	foreach ($parentHost['groups'] as $group) {
+		$groupBox->addItem($group['groupid'], $group['name']);
+	}
+	$hostList->addRow(_('Groups'), $groupBox);
+
+	$interfaces = array();
+	$existingInterfaceTypes = array();
+	foreach ($parentHost['interfaces'] as $interface) {
+		$interface['locked'] = true;
+		$existingInterfaceTypes[$interface['type']] = true;
+		$interfaces[$interface['interfaceid']] = $interface;
+	}
+	zbx_add_post_js('hostInterfacesManager.add('.CJs::encodeJson($interfaces).');');
+	zbx_add_post_js('hostInterfacesManager.disable()');
+
+	// table for agent interfaces with footer
+	$ifTab = new CTable(null, 'formElementTable');
+	$ifTab->setAttribute('id', 'agentInterfaces');
+	$ifTab->setAttribute('data-type', 'agent');
+
+	// header
+	$ifTab->addRow(array(
+		new CCol(SPACE, 'interface-drag-control'),
+		new CCol(_('IP address'), 'interface-ip'),
+		new CCol(_('DNS name'), 'interface-dns'),
+		new CCol(_('Connect to'), 'interface-connect-to'),
+		new CCol(_('Port'), 'interface-port'),
+		new CCol(_('Default'), 'interface-default'),
+		new CCol(SPACE, 'interface-control')
+	));
+
+	$row = new CRow(null, null, 'agentIterfacesFooter');
+	if (!isset($existingInterfaceTypes[INTERFACE_TYPE_AGENT])) {
+		$row->addItem(new CCol(null, 'interface-drag-control'));
+		$row->addItem(new CCol(_('No agent interfaces defined.'), null, 5));
+	}
+	$ifTab->addRow($row);
+
+	$hostList->addRow(_('Agent interfaces'), new CDiv($ifTab, 'border_dotted objectgroup interface-group'), false, null, 'interface-row interface-row-first');
+
+	// table for SNMP interfaces with footer
+	$ifTab = new CTable(null, 'formElementTable');
+	$ifTab->setAttribute('id', 'SNMPInterfaces');
+	$ifTab->setAttribute('data-type', 'snmp');
+
+	$row = new CRow(null, null, 'SNMPIterfacesFooter');
+	if (!isset($existingInterfaceTypes[INTERFACE_TYPE_SNMP])) {
+		$row->addItem(new CCol(null, 'interface-drag-control'));
+		$row->addItem(new CCol(_('No SNMP interfaces defined.'), null, 5));
+	}
+	$ifTab->addRow($row);
+	$hostList->addRow(_('SNMP interfaces'), new CDiv($ifTab, 'border_dotted objectgroup'), false, null, 'interface-row');
+
+	// table for JMX interfaces with footer
+	$ifTab = new CTable(null, 'formElementTable');
+	$ifTab->setAttribute('id', 'JMXInterfaces');
+	$ifTab->setAttribute('data-type', 'jmx');
+
+	$row = new CRow(null, null, 'JMXIterfacesFooter');
+	if (!isset($existingInterfaceTypes[INTERFACE_TYPE_JMX])) {
+		$row->addItem(new CCol(null, 'interface-drag-control'));
+		$row->addItem(new CCol(_('No JMX interfaces defined.'), null, 5));
+	}
+	$ifTab->addRow($row);
+	$hostList->addRow(_('JMX interfaces'), new CDiv($ifTab, 'border_dotted objectgroup interface-group'), false, null, 'interface-row');
+
+	// table for IPMI interfaces with footer
+	$ifTab = new CTable(null, 'formElementTable');
+	$ifTab->setAttribute('id', 'IPMIInterfaces');
+	$ifTab->setAttribute('data-type', 'ipmi');
+
+	$row = new CRow(null, null, 'IPMIIterfacesFooter');
+	if (!isset($existingInterfaceTypes[INTERFACE_TYPE_IPMI])) {
+		$row->addItem(new CCol(null, 'interface-drag-control'));
+		$row->addItem(new CCol(_('No IPMI interfaces defined.'), null, 5));
+	}
+	$ifTab->addRow($row);
+	$hostList->addRow(_('IPMI interfaces'), new CDiv($ifTab, 'border_dotted objectgroup interface-group'), false, null, 'interface-row interface-row-last');
+
+	// proxy
+	if ($parentHost['proxy_hostid']) {
+		$proxyTb = new CTextBox('proxy_hostid', $this->data['proxy']['host'], null, true);
+	}
+	else {
+		$proxyTb = new CTextBox('proxy_hostid', _('(no proxy)'), null, true);
+	}
+	$hostList->addRow(_('Monitored by proxy'), $proxyTb);
+}
 
 $cmbStatus = new CComboBox('status', $hostPrototype['status']);
 $cmbStatus->addItem(HOST_STATUS_MONITORED, _('Monitored'));
@@ -104,6 +200,22 @@ if (!$hostPrototype['templateid']) {
 }
 
 $divTabs->addTab('templateTab', _('Templates'), $tmplList);
+
+// display inherited parameters only for hosts prototypes on hosts
+if ($parentHost['status'] != HOST_STATUS_TEMPLATE) {
+	// IPMI
+	$ipmiList = new CFormList('ipmilist');
+
+	$cmbIPMIAuthtype = new CTextBox('ipmi_authtype', ipmiAuthTypes($parentHost['ipmi_authtype']), ZBX_TEXTBOX_SMALL_SIZE, true);
+	$ipmiList->addRow(_('Authentication algorithm'), $cmbIPMIAuthtype);
+
+	$cmbIPMIPrivilege = new CTextBox('ipmi_privilege', ipmiPrivileges($parentHost['ipmi_privilege']), ZBX_TEXTBOX_SMALL_SIZE, true);
+	$ipmiList->addRow(_('Privilege level'), $cmbIPMIPrivilege);
+
+	$ipmiList->addRow(_('Username'), new CTextBox('ipmi_username', $parentHost['ipmi_username'], ZBX_TEXTBOX_SMALL_SIZE, true));
+	$ipmiList->addRow(_('Password'), new CTextBox('ipmi_password', $parentHost['ipmi_password'], ZBX_TEXTBOX_SMALL_SIZE, true));
+	$divTabs->addTab('ipmiTab', _('IPMI'), $ipmiList);
+}
 
 $frmHost->addItem($divTabs);
 
