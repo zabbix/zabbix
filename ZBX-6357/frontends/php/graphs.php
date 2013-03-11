@@ -159,29 +159,27 @@ if (CUser::$userData['type'] !== USER_TYPE_SUPER_ADMIN) {
  * Actions
  */
 if (isset($_REQUEST['clone']) && isset($_REQUEST['graphid'])) {
-	if (!empty($_REQUEST['graphid'])) {
-		// graph
-		$options = array(
-			'graphids' => $_REQUEST['graphid'],
-			'output' => API_OUTPUT_EXTEND
-		);
-		$graph = empty($_REQUEST['parent_discoveryid'])
-			? API::Graph()->get($options)
-			: API::GraphPrototype()->get($options);
-		$graph = reset($graph);
+	// graph
+	$options = array(
+		'graphids' => $_REQUEST['graphid'],
+		'output' => API_OUTPUT_EXTEND
+	);
+	$graph = empty($_REQUEST['parent_discoveryid'])
+		? API::Graph()->get($options)
+		: API::GraphPrototype()->get($options);
+	$graph = reset($graph);
 
-		$_REQUEST = array_merge($_REQUEST, $graph);
+	$_REQUEST = array_merge($_REQUEST, $graph);
 
-		// graph items
-		$_REQUEST['items'] = API::GraphItem()->get(array(
-			'graphids' => $_REQUEST['graphid'],
-			'sortfield' => 'gitemid',
-			'output' => API_OUTPUT_EXTEND,
-			'expandData' => true
-		));
+	// graph items
+	$_REQUEST['items'] = API::GraphItem()->get(array(
+		'graphids' => $_REQUEST['graphid'],
+		'sortfield' => 'gitemid',
+		'output' => API_OUTPUT_EXTEND,
+		'expandData' => true
+	));
 
-		unset($_REQUEST['graphid']);
-	}
+	unset($_REQUEST['graphid']);
 
 	$_REQUEST['form'] = 'clone';
 }
