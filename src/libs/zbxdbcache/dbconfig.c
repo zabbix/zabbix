@@ -2357,8 +2357,10 @@ void	DCsync_configuration()
 				"status,name"
 			" from hosts"
 			" where status in (%d,%d,%d)"
+				" and flags<>%d"
 				ZBX_SQL_NODE,
 			HOST_STATUS_MONITORED, HOST_STATUS_PROXY_ACTIVE, HOST_STATUS_PROXY_PASSIVE,
+			ZBX_FLAG_DISCOVERY_PROTOTYPE,
 			DBand_node_local("hostid"));
 	hsec = zbx_time() - sec;
 

@@ -318,9 +318,9 @@ static void	get_proxy_monitored_hosts(zbx_uint64_t proxy_hostid, zbx_vector_uint
 			"select hostid"
 			" from hosts"
 			" where proxy_hostid=" ZBX_FS_UI64
-				" and status in (%d,%d)",
-			proxy_hostid,
-			HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED);
+				" and status in (%d,%d)"
+				" and flags<>%d",
+			proxy_hostid, HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED, ZBX_FLAG_DISCOVERY_PROTOTYPE);
 
 	while (NULL != (row = DBfetch(result)))
 	{
