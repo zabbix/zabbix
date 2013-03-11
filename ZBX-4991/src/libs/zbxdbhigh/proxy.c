@@ -1062,7 +1062,7 @@ void	process_host_availability(struct zbx_json_parse *jp)
 	char			tmp[HOST_ERROR_LEN_MAX], *sql = NULL, *error_esc;
 	size_t			sql_alloc = 4 * ZBX_KIBIBYTE, sql_offset = 0, tmp_offset;
 	int			no_data, item_type = -1;
-	unsigned char		available;
+	unsigned char		available = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
