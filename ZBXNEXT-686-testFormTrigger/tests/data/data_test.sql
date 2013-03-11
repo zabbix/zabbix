@@ -695,3 +695,15 @@ INSERT INTO hosts (host, name, status, hostid) VALUES ('Template inheritance tes
 INSERT INTO hosts_groups (hostid, groupid, hostgroupid) VALUES (30001, 4, 30001);
 INSERT INTO interface (type, ip, dns, useip, port, main, hostid, interfaceid) VALUES (1, '127.0.0.1', '', '1', '10050', '1', 30001, 30000);
 INSERT INTO hosts_templates (hosttemplateid, hostid, templateid) VALUES (30000, 30001, 30000);
+
+-- add triggers for simpleCreate testing for testFormTrigger
+INSERT INTO triggers (triggerid, expression, description, comments) VALUES (14000, '{14000}=0', 'testFormTrigger1', '');
+INSERT INTO functions (functionid, itemid, triggerid, function, parameter) VALUES (14000, 30004 ,14000,'last',0);
+INSERT INTO triggers (triggerid, expression, description, comments) VALUES (14001, '{14001}=0', 'testFormTrigger2', '');
+INSERT INTO functions (functionid, itemid, triggerid, function, parameter) VALUES (14001, 30004 ,14001,'last',0);
+INSERT INTO triggers (triggerid, expression, description, comments) VALUES (14002, '{14002}=0', 'testFormTrigger3', '');
+INSERT INTO functions (functionid, itemid, triggerid, function, parameter) VALUES (14002, 30004 ,14002,'last',0);
+INSERT INTO triggers (triggerid, expression, description, comments) VALUES (14003, '{14003}=0', 'testFormTrigger4', '');
+INSERT INTO functions (functionid, itemid, triggerid, function, parameter) VALUES (14003, 30004 ,14003,'last',0);
+
+
