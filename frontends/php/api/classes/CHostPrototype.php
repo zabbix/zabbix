@@ -35,7 +35,7 @@ class CHostPrototype extends CHostBase {
 			'discoveryids'  		=> null,
 			'inherited'				=> null,
 			'selectDiscoveryRule' 	=> null,
-			'selectHost'			=> null,
+			'selectParentHost'		=> null,
 			'selectTemplates' 		=> null,
 			'sortfield'    			=> '',
 			'sortorder'     		=> ''
@@ -825,7 +825,7 @@ class CHostPrototype extends CHostBase {
 		}
 
 		// adding host
-		if ($options['selectHost'] !== null && $options['selectHost'] != API_OUTPUT_COUNT) {
+		if ($options['selectParentHost'] !== null && $options['selectParentHost'] != API_OUTPUT_COUNT) {
 			$relationMap = new CRelationMap();
 			$dbRules = DBselect(
 				'SELECT hd.hostid,i.hostid parent_hostid'.
@@ -838,14 +838,14 @@ class CHostPrototype extends CHostBase {
 			}
 
 			$hosts = API::Host()->get(array(
-				'output' => $options['selectHost'],
+				'output' => $options['selectParentHost'],
 				'nodeids' => $options['nodeids'],
 				'hostids' => $relationMap->getRelatedIds(),
 				'templated_hosts' => true,
 				'nopermissions' => true,
 				'preservekeys' => true,
 			));
-			$result = $relationMap->mapOne($result, $hosts, 'host');
+			$result = $relationMap->mapOne($result, $hosts, 'parentHost');
 		}
 
 		// adding templates

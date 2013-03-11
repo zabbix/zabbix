@@ -75,6 +75,7 @@ if (get_request('parent_discoveryid')) {
 			'hostids' => get_request('hostid'),
 			'output' => API_OUTPUT_EXTEND,
 			'selectTemplates' => array('templateid', 'name'),
+			'selectParentHost' => array('hostid'),
 			'editable' => true
 		));
 		$hostPrototype = reset($hostPrototype);
@@ -201,7 +202,7 @@ if (isset($_REQUEST['form'])) {
 			while ($hostPrototypeId) {
 				$parentHostPrototype = API::HostPrototype()->get(array(
 					'output' => array('itemid', 'templateid'),
-					'selectHost' => array('hostid', 'name'),
+					'selectParentHost' => array('hostid', 'name'),
 					'selectDiscoveryRule' => array('itemid'),
 					'hostids' => $hostPrototypeId
 				));
@@ -213,6 +214,27 @@ if (isset($_REQUEST['form'])) {
 					$hostPrototypeId = $parentHostPrototype['templateid'];
 				}
 			}
+		}
+
+		// add parent host
+		$parentHost = API::Host()->get(array(
+			'output' => API_OUTPUT_EXTEND,
+			'selectGroups' => array('groupid', 'name'),
+			'selectInterfaces' => API_OUTPUT_EXTEND,
+			'selectMacros' => API_OUTPUT_EXTEND,
+			'hostids' => $hostPrototype['parentHost']['hostid'],
+			'templated_hosts' => true
+		));
+		$parentHost = reset($parentHost);
+		$data['parent_host'] = $parentHost;
+
+		if ($parentHost['proxy_hostid']) {
+			$proxy = API::Proxy()->get(array(
+				'output' => array('host', 'proxyid'),
+				'proxyids' => $parentHost['proxy_hostid'],
+				'limit' => 1
+			));
+			$data['proxy'] = reset($proxy);
 		}
 	}
 
