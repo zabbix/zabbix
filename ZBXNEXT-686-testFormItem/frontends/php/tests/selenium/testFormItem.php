@@ -26,19 +26,13 @@ define('ITEM_BAD', 1);
 
 class testFormItem extends CWebTest {
 
-	/**
-	 * The name of the test host created in the test data set.
-	 *
-	 * @var string
-	 */
-	protected $host = 'ЗАББИКС Сервер';
 
 	/**
 	 * The name of the test host for simpleCreate checks created in the test data set.
 	 *
 	 * @var string
 	 */
-	protected $hostSimple = 'Template inheritance test host';
+	protected $host = 'Simple form test host';
 
 	/**
 	 * Backup the tables that will be modified during the tests.
@@ -843,7 +837,7 @@ class testFormItem extends CWebTest {
 
 	// Returns list of items
 	public static function allItems() {
-		return DBdata("select * from items where hostid = 30001 and key_ LIKE 'test-item-form%'");
+		return DBdata("select * from items where hostid = 40001 and key_ LIKE 'test-item-form%'");
 	}
 
 	/**
@@ -856,7 +850,7 @@ class testFormItem extends CWebTest {
 		$oldHashItems = DBhash($sqlItems);
 
 		$this->zbxTestLogin('templates.php');
-		$this->zbxTestClickWait('link='.$this->hostSimple);
+		$this->zbxTestClickWait('link='.$this->host);
 		$this->zbxTestClickWait("//div[@class='w']//a[text()='Items']");
 		$this->zbxTestClickWait('link='.$name);
 		$this->zbxTestClickWait('save');
