@@ -634,7 +634,7 @@ define('PERM_RES_DATA_ARRAY',	2);
 define('RESOURCE_TYPE_NODE',	0);
 define('RESOURCE_TYPE_GROUP',	1);
 
-define('PARAM_TYPE_SECONDS',	0);
+define('PARAM_TYPE_TIME',	0);
 define('PARAM_TYPE_COUNTS',		1);
 
 define('ZBX_NODE_CHILD',	0);
