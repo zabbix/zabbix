@@ -49,8 +49,8 @@
 
 int	evaluate_function(char *value, DB_ITEM *item, const char *function, const char *parameters, time_t now);
 
-int	substitute_simple_macros(DB_EVENT *event, zbx_uint64_t *hostid, DC_HOST *dc_host, DC_ITEM *dc_item,
-		DB_ESCALATION *escalation, char **data, int macro_type, char *error, int maxerrlen);
+int	substitute_simple_macros(DB_EVENT *event, zbx_uint64_t *userid, zbx_uint64_t *hostid, DC_HOST *dc_host,
+		DC_ITEM *dc_item, DB_ESCALATION *escalation, char **data, int macro_type, char *error, int maxerrlen);
 
 void	evaluate_expressions(zbx_vector_ptr_t *triggers);
 int	evaluate(double *value, char *exp, char *error, int maxerrlen);
