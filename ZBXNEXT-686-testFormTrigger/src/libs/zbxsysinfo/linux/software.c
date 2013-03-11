@@ -24,7 +24,7 @@
 #include "cfg.h"
 #include "software.h"
 
-int	SYSTEM_SW_ARCH(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+int	SYSTEM_SW_ARCH(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	struct utsname	name;
 
@@ -36,19 +36,18 @@ int	SYSTEM_SW_ARCH(const char *cmd, const char *param, unsigned flags, AGENT_RES
 	return SYSINFO_RET_OK;
 }
 
-int     SYSTEM_SW_OS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+int     SYSTEM_SW_OS(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	char	type[8], line[MAX_STRING_LEN];
+	char	*type, line[MAX_STRING_LEN];
 	int	ret = SYSINFO_RET_FAIL;
 	FILE	*f = NULL;
 
-	if (1 < num_param(param))
+	if (1 < request->nparam)
 		return ret;
 
-	if (0 != get_param(param, 1, type, sizeof(type)))
-		*type = '\0';
+	type = get_rparam(request, 0);
 
-	if ('\0' == *type || 0 == strcmp(type, "full"))
+	if (NULL == type || '\0' == *type || 0 == strcmp(type, "full"))
 		f = fopen(SW_OS_FULL, "r");
 	else if (0 == strcmp(type, "short"))
 		f = fopen(SW_OS_SHORT, "r");
@@ -115,30 +114,31 @@ static ZBX_PACKAGE_MANAGER	package_managers[] =
 	{"pkgtools",	"[ -d /var/log/packages ] && echo true",	"ls /var/log/packages",		NULL},
 	{"rpm",		"rpm --version 2> /dev/null",			"rpm -qa",			NULL},
 	{"pacman",	"pacman --version 2> /dev/null",		"pacman -Q",			NULL},
-	{0}
+	{NULL}
 };
 
-int     SYSTEM_SW_PACKAGES(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+int     SYSTEM_SW_PACKAGES(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	size_t			offset = 0;
-	int			ret = SYSINFO_RET_FAIL, show_pm, i, j;
-	char			buffer[MAX_BUFFER_LEN], regex[MAX_STRING_LEN], manager[MAX_STRING_LEN],
-				tmp[MAX_STRING_LEN], *buf = NULL, *package;
+	int			ret = SYSINFO_RET_FAIL, show_pm, i, j, check_regex, check_manager;
+	char			buffer[MAX_BUFFER_LEN], *regex, *manager, *mode, tmp[MAX_STRING_LEN], *buf = NULL,
+				*package;
 	zbx_vector_str_t	packages;
 	ZBX_PACKAGE_MANAGER	*mng;
 
-	if (3 < num_param(param))
+	if (3 < request->nparam)
 		return ret;
 
-	if (0 != get_param(param, 1, regex, sizeof(regex)) || 0 == strcmp(regex, "all"))
-		*regex = '\0';
+	regex = get_rparam(request, 0);
+	manager = get_rparam(request, 1);
+	mode = get_rparam(request, 2);
 
-	if (0 != get_param(param, 2, manager, sizeof(manager)) || 0 == strcmp(manager, "all"))
-		*manager = '\0';
+	check_regex = (NULL != regex && '\0' != *regex && 0 != strcmp(regex, "all"));
+	check_manager = (NULL != manager && '\0' != *manager && 0 != strcmp(manager, "all"));
 
-	if (0 != get_param(param, 3, tmp, sizeof(tmp)) || '\0' == *tmp || 0 == strcmp(tmp, "full"))
+	if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "full"))
 		show_pm = 1;	/* show package managers' names */
-	else if (0 == strcmp(tmp, "short"))
+	else if (0 == strcmp(mode, "short"))
 		show_pm = 0;
 	else
 		return ret;
@@ -150,7 +150,7 @@ int     SYSTEM_SW_PACKAGES(const char *cmd, const char *param, unsigned flags, A
 	{
 		mng = &package_managers[i];
 
-		if ('\0' != *manager && 0 != strcmp(manager, mng->name))
+		if (1 == check_manager && 0 != strcmp(manager, mng->name))
 			continue;
 
 		if (SUCCEED == zbx_execute(mng->test_cmd, &buf, tmp, sizeof(tmp), CONFIG_TIMEOUT) &&
@@ -173,7 +173,7 @@ int     SYSTEM_SW_PACKAGES(const char *cmd, const char *param, unsigned flags, A
 						goto next;
 				}
 
-				if ('\0' != *regex && NULL == zbx_regexp_match(package, regex, NULL))
+				if (1 == check_regex && NULL == zbx_regexp_match(package, regex, NULL))
 					goto next;
 
 				zbx_vector_str_append(&packages, zbx_strdup(NULL, package));

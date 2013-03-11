@@ -42,19 +42,16 @@ static int	get_function_parameter_uint(zbx_uint64_t hostid, const char *paramete
 	if (0 != get_param(parameters, Nparam, parameter, FUNCTION_PARAMETER_LEN_MAX))
 		goto clean;
 
-	if (SUCCEED == substitute_simple_macros(NULL, &hostid, NULL, NULL, NULL,
+	if (SUCCEED == substitute_simple_macros(NULL, NULL, &hostid, NULL, NULL, NULL,
 			&parameter, MACRO_TYPE_COMMON, NULL, 0))
 	{
 		if ('#' == *parameter)
 		{
 			*flag = ZBX_FLAG_VALUES;
-			if (SUCCEED == is_uint(parameter + 1))
-			{
-				sscanf(parameter + 1, "%u", value);
+			if (SUCCEED == is_uint31(parameter + 1, (uint32_t*)value))
 				res = SUCCEED;
-			}
 		}
-		else if (SUCCEED == is_uint_suffix(parameter, (unsigned int *)value))
+		else if (SUCCEED == is_uint_suffix(parameter, (unsigned int *)value) && 0 <= *value)
 		{
 			*flag = ZBX_FLAG_SEC;
 			res = SUCCEED;
@@ -83,7 +80,7 @@ static int	get_function_parameter_str(zbx_uint64_t hostid, const char *parameter
 	if (0 != get_param(parameters, Nparam, *value, FUNCTION_PARAMETER_LEN_MAX))
 		goto clean;
 
-	res = substitute_simple_macros(NULL, &hostid, NULL, NULL, NULL, value, MACRO_TYPE_COMMON, NULL, 0);
+	res = substitute_simple_macros(NULL, NULL, &hostid, NULL, NULL, NULL, value, MACRO_TYPE_COMMON, NULL, 0);
 clean:
 	if (SUCCEED == res)
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() value:'%s'", __function_name, *value);

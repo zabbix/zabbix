@@ -1230,11 +1230,11 @@ int	zbx_tcp_check_security(zbx_sock_t *s, const char *ip_list, int allow_if_empt
 	}
 #if defined(HAVE_IPV6)
 	if (0 == getnameinfo((struct sockaddr *)&name, sizeof(name), tmp, sizeof(tmp), NULL, 0, NI_NUMERICHOST))
-		zbx_set_tcp_strerror("Connection from [%s] rejected. Allowed servers are [%s].", tmp, ip_list);
+		zbx_set_tcp_strerror("connection from \"%s\" rejected, allowed hosts: \"%s\"", tmp, ip_list);
 	else
-		zbx_set_tcp_strerror("Connection rejected. Allowed servers are [%s].", ip_list);
+		zbx_set_tcp_strerror("connection rejected, allowed hosts: \"%s\"", ip_list);
 #else
-	zbx_set_tcp_strerror("Connection from [%s] rejected. Allowed servers are [%s].", inet_ntoa(name.sin_addr), ip_list);
+	zbx_set_tcp_strerror("connection from \"%s\" rejected, allowed hosts: \"%s\"", inet_ntoa(name.sin_addr), ip_list);
 #endif
 	return	FAIL;
 }

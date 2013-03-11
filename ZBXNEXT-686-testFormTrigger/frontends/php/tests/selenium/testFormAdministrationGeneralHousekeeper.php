@@ -30,11 +30,11 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 	* @dataProvider allValues
 	*/
 	public function testFormAdministrationGeneralHousekeeper_CheckLayout($allValues) {
-		$this->login('adm.gui.php');
+		$this->zbxTestLogin('adm.gui.php');
 		$this->assertElementPresent('configDropDown');
-		$this->dropdown_select_wait('configDropDown', 'Housekeeper');
+		$this->zbxTestDropdownSelectWait('configDropDown', 'Housekeeper');
 		$this->checkTitle('Configuration of housekeeper');
-		$this->ok(array('Housekeeper', 'Do not keep actions older than (in days)', 'Do not keep events older than (in days)'));
+		$this->zbxTestTextPresent(array('Housekeeper', 'Do not keep actions older than (in days)', 'Do not keep events older than (in days)'));
 		$this->assertElementPresent('configDropDown');
 		$this->assertElementPresent('alert_history');
 		$this->assertElementPresent('event_history');
@@ -50,11 +50,10 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 	public function testFormAdministrationGeneralHousekeeper_AlertHistory() {
 		// 0-65535
 
-		$this->login('adm.housekeeper.php');
+		$this->zbxTestLogin('adm.housekeeper.php');
 		$this->input_type('alert_history', '0');
-		$this->button_click('save');
-		$this->wait();
-		$this->ok(array('Configuration updated', 'CONFIGURATION OF HOUSEKEEPER', 'Housekeeper', 'Do not keep actions older than (in days)'));
+		$this->zbxTestClickWait('save');
+		$this->zbxTestTextPresent(array('Configuration updated', 'CONFIGURATION OF HOUSEKEEPER', 'Housekeeper', 'Do not keep actions older than (in days)'));
 
 		$sqlHash = 'SELECT configid,event_history,refresh_unsupported,work_period,alert_usrgrpid,event_ack_enable,event_expire,event_show_max,default_theme,authentication_type,ldap_host,ldap_port,ldap_base_dn,ldap_bind_dn,ldap_bind_password,ldap_search_attribute,dropdown_first_entry,dropdown_first_remember,discovery_groupid,max_in_table,search_limit,severity_color_0,severity_color_1,severity_color_2,severity_color_3,severity_color_4,severity_color_5,severity_name_0,severity_name_1,severity_name_2,severity_name_3,severity_name_4,severity_name_5,ok_period,blink_period,problem_unack_color,problem_ack_color,ok_unack_color,ok_ack_color,problem_unack_style,problem_ack_style,ok_unack_style,ok_ack_style,snmptrap_logging FROM config ORDER BY configid';
 		$oldHash = DBhash($sqlHash);
@@ -62,32 +61,29 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 		$sql = 'SELECT alert_history FROM config WHERE alert_history=0';
 		$this->assertEquals(1, DBcount($sql), 'Chuck Norris: Incorrect value in the DB field "alert_history"');
 
-		$this->dropdown_select_wait('configDropDown', 'Housekeeper');
+		$this->zbxTestDropdownSelectWait('configDropDown', 'Housekeeper');
 		$this->checkTitle('Configuration of housekeeper');
-		$this->ok('Housekeeper');
+		$this->zbxTestTextPresent('Housekeeper');
 		$this->input_type('alert_history', '65535');
-		$this->button_click('save');
-		$this->wait();
-		$this->ok(array('Configuration updated', 'CONFIGURATION OF HOUSEKEEPER', 'Housekeeper', 'Do not keep actions older than (in days)'));
+		$this->zbxTestClickWait('save');
+		$this->zbxTestTextPresent(array('Configuration updated', 'CONFIGURATION OF HOUSEKEEPER', 'Housekeeper', 'Do not keep actions older than (in days)'));
 
 		$sql = 'SELECT alert_history FROM config WHERE alert_history=65535';
 		$this->assertEquals(1, DBcount($sql), 'Chuck Norris: Incorrect value in the DB field "alert_history"');
 
-		$this->dropdown_select_wait('configDropDown', 'Housekeeper');
+		$this->zbxTestDropdownSelectWait('configDropDown', 'Housekeeper');
 		$this->checkTitle('Configuration of housekeeper');
-		$this->ok('Housekeeper');
+		$this->zbxTestTextPresent('Housekeeper');
 		$this->input_type('alert_history', '-1');
-		$this->button_click('save');
-		$this->wait();
-		$this->ok(array('ERROR: Page received incorrect data', 'Warning. Incorrect value for field "Do not keep actions older than (in days)": must be between 0 and 65535.', 'CONFIGURATION OF HOUSEKEEPER', 'Housekeeper', 'Do not keep actions older than (in days)'));
+		$this->zbxTestClickWait('save');
+		$this->zbxTestTextPresent(array('ERROR: Page received incorrect data', 'Warning. Incorrect value for field "Do not keep actions older than (in days)": must be between 0 and 65535.', 'CONFIGURATION OF HOUSEKEEPER', 'Housekeeper', 'Do not keep actions older than (in days)'));
 
-		$this->dropdown_select_wait('configDropDown', 'Housekeeper');
+		$this->zbxTestDropdownSelectWait('configDropDown', 'Housekeeper');
 		$this->checkTitle('Configuration of housekeeper');
-		$this->ok('Housekeeper');
+		$this->zbxTestTextPresent('Housekeeper');
 		$this->input_type('alert_history', '65536');
-		$this->button_click('save');
-		$this->wait();
-		$this->ok(array('ERROR: Page received incorrect data', 'Warning. Incorrect value for field "Do not keep actions older than (in days)": must be between 0 and 65535.', 'CONFIGURATION OF HOUSEKEEPER', 'Housekeeper'));
+		$this->zbxTestClickWait('save');
+		$this->zbxTestTextPresent(array('ERROR: Page received incorrect data', 'Warning. Incorrect value for field "Do not keep actions older than (in days)": must be between 0 and 65535.', 'CONFIGURATION OF HOUSEKEEPER', 'Housekeeper'));
 
 		$newHash = DBhash($sqlHash);
 		$this->assertEquals($oldHash, $newHash, "Values in some DB fields changed, but shouldn't.");
@@ -96,11 +92,10 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 	public function testFormAdministrationGeneralHousekeeper_EventHistory() {
 		// 0-65535
 
-		$this->login('adm.housekeeper.php');
+		$this->zbxTestLogin('adm.housekeeper.php');
 		$this->input_type('event_history', '0');
-		$this->button_click('save');
-		$this->wait();
-		$this->ok(array('Configuration updated', 'CONFIGURATION OF HOUSEKEEPER', 'Housekeeper', 'Do not keep events older than (in days)'));
+		$this->zbxTestClickWait('save');
+		$this->zbxTestTextPresent(array('Configuration updated', 'CONFIGURATION OF HOUSEKEEPER', 'Housekeeper', 'Do not keep events older than (in days)'));
 
 		$sqlHash = 'select configid,alert_history,refresh_unsupported,work_period,alert_usrgrpid,event_ack_enable,event_expire,event_show_max,default_theme,authentication_type,ldap_host,ldap_port,ldap_base_dn,ldap_bind_dn,ldap_bind_password,ldap_search_attribute,dropdown_first_entry,dropdown_first_remember,discovery_groupid,max_in_table,search_limit,severity_color_0,severity_color_1,severity_color_2,severity_color_3,severity_color_4,severity_color_5,severity_name_0,severity_name_1,severity_name_2,severity_name_3,severity_name_4,severity_name_5,ok_period,blink_period,problem_unack_color,problem_ack_color,ok_unack_color,ok_ack_color,problem_unack_style,problem_ack_style,ok_unack_style,ok_ack_style,snmptrap_logging from config order by configid';
 		$oldHash = DBhash($sqlHash);
@@ -108,33 +103,30 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 		$sql = 'SELECT event_history FROM config WHERE event_history=0';
 		$this->assertEquals(1, DBcount($sql), 'Chuck Norris: Incorrect value in the DB field "event_history"');
 
-		$this->dropdown_select_wait('configDropDown', 'Housekeeper');
+		$this->zbxTestDropdownSelectWait('configDropDown', 'Housekeeper');
 		$this->checkTitle('Configuration of housekeeper');
-		$this->ok('Housekeeper');
+		$this->zbxTestTextPresent('Housekeeper');
 		$this->input_type('event_history', '65535');
-		$this->button_click('save');
-		$this->wait();
-		$this->ok(array('Configuration updated', 'CONFIGURATION OF HOUSEKEEPER', 'Housekeeper', 'Do not keep events older than (in days)'));
+		$this->zbxTestClickWait('save');
+		$this->zbxTestTextPresent(array('Configuration updated', 'CONFIGURATION OF HOUSEKEEPER', 'Housekeeper', 'Do not keep events older than (in days)'));
 
 		$sql = 'SELECT event_history FROM config WHERE event_history=65535';
 		$this->assertEquals(1, DBcount($sql), 'Chuck Norris: Incorrect value in the DB field "event_history"');
 
-		$this->dropdown_select_wait('configDropDown', 'Housekeeper');
+		$this->zbxTestDropdownSelectWait('configDropDown', 'Housekeeper');
 		$this->checkTitle('Configuration of housekeeper');
-		$this->ok('Housekeeper');
+		$this->zbxTestTextPresent('Housekeeper');
 		$this->input_type('event_history', '-1');
-		$this->button_click('save');
-		$this->wait();
-		$this->ok(array('ERROR: Page received incorrect data', 'Warning. Incorrect value for field "Do not keep events older than (in days)": must be between 0 and 65535.', 'CONFIGURATION OF HOUSEKEEPER', 'Housekeeper', 'Do not keep events older than (in days)'));
+		$this->zbxTestClickWait('save');
+		$this->zbxTestTextPresent(array('ERROR: Page received incorrect data', 'Warning. Incorrect value for field "Do not keep events older than (in days)": must be between 0 and 65535.', 'CONFIGURATION OF HOUSEKEEPER', 'Housekeeper', 'Do not keep events older than (in days)'));
 
-		$this->dropdown_select_wait('configDropDown', 'Housekeeper');
+		$this->zbxTestDropdownSelectWait('configDropDown', 'Housekeeper');
 		$this->checkTitle('Configuration of housekeeper');
-		$this->ok('Housekeeper');
+		$this->zbxTestTextPresent('Housekeeper');
 		$this->input_type('event_history', '65536');
-		$this->button_click('save');
-		$this->wait();
-		//$this->ok(array('ERROR: Page received incorrect data', 'Warning. Incorrect value for field "event_history".', 'CONFIGURATION OF HOUSEKEEPER', 'Housekeeper', 'Do not keep events older than (in days)'));
-		$this->ok(array('ERROR: Page received incorrect data', 'Warning. Incorrect value for field "Do not keep events older than (in days)": must be between 0 and 65535.', 'CONFIGURATION OF HOUSEKEEPER', 'Housekeeper', 'Do not keep events older than (in days)'));
+		$this->zbxTestClickWait('save');
+		//$this->zbxTestTextPresent(array('ERROR: Page received incorrect data', 'Warning. Incorrect value for field "event_history".', 'CONFIGURATION OF HOUSEKEEPER', 'Housekeeper', 'Do not keep events older than (in days)'));
+		$this->zbxTestTextPresent(array('ERROR: Page received incorrect data', 'Warning. Incorrect value for field "Do not keep events older than (in days)": must be between 0 and 65535.', 'CONFIGURATION OF HOUSEKEEPER', 'Housekeeper', 'Do not keep events older than (in days)'));
 
 		$newHash = DBhash($sqlHash);
 		$this->assertEquals($oldHash, $newHash, "Values in some DB fields changed, but shouldn't.");

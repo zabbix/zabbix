@@ -45,7 +45,7 @@ class testGeneric extends CWebTest {
 
 			array('charts.php',		'Custom graphs \[refreshed every 30 sec\]'),
 			array('screens.php',	'Custom screens \[refreshed every 30 sec\]'),
-			array('slides.php',		'Custom slides'),
+			array('slides.php',		'Custom slides \[refreshed every 30 sec\]'),
 			array('maps.php',		'Network maps \[refreshed every 30 sec\]'),
 			array('srv_status.php',	'IT services \[refreshed every 30 sec\]'),
 
@@ -120,8 +120,8 @@ class testGeneric extends CWebTest {
 	* @dataProvider provider
 	*/
 	public function testTitles($a, $b) {
-		$this->login();
-		$this->open($a);
+		$this->zbxTestLogin();
+		$this->zbxTestOpen($a);
 		$this->checkTitle($b);
 	}
 
@@ -129,10 +129,10 @@ class testGeneric extends CWebTest {
 	* @dataProvider provider
 	*/
 	public function testNotExists($a, $b) {
-		$this->login();
-		$this->open($a);
+		$this->zbxTestLogin();
+		$this->zbxTestOpen($a);
 		foreach ($this->failIfExists as $str) {
-			$this->nok($str, 'assertTextNotPresent('.$a.','.$str.')');
+			$this->zbxTestTextNotPresent($str, 'assertTextNotPresent('.$a.','.$str.')');
 		}
 	}
 
@@ -140,10 +140,10 @@ class testGeneric extends CWebTest {
 	* @dataProvider provider
 	*/
 	public function testExists($a, $b) {
-		$this->login();
-		$this->open($a);
+		$this->zbxTestLogin();
+		$this->zbxTestOpen($a);
 		foreach ($this->failIfNotExists as $str) {
-			$this->ok($str, 'assertTextPresent('.$a.','.$str.')');
+			$this->zbxTestTextPresent($str, 'assertTextPresent('.$a.','.$str.')');
 		}
 	}
 }

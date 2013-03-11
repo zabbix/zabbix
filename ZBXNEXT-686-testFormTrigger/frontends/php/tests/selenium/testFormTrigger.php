@@ -501,7 +501,7 @@ class testFormTrigger extends CWebTest {
 	/**
 	 * @dataProvider dataCreate
 	 */
-	public function testFormTrigger_Create($data) {
+	public function testFormTrigger_Create($data) {// TODO host as protected variable
 
 		$this->zbxTestLogin('triggers.php');
 		$this->checkTitle('Configuration of triggers');

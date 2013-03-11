@@ -30,18 +30,16 @@ class testPageDiscovery extends CWebTest {
 	* @dataProvider allRules
 	*/
 	public function testPageDiscovery_CheckLayout($rule) {
-		$this->login('discoveryconf.php');
+		$this->zbxTestLogin('discoveryconf.php');
 		$this->checkTitle('Configuration of discovery');
 
-		$this->ok('DISCOVERY');
-		$this->ok('Displaying');
-		$this->ok(array('Name', 'IP range', 'Delay', 'Checks', 'Status'));
-		$this->ok($rule['name']);
-		$this->ok($rule['iprange']);
-		$this->ok($rule['delay']);
-		$this->dropdown_select('go', 'Enable selected');
-		$this->dropdown_select('go', 'Disable selected');
-		$this->dropdown_select('go', 'Delete selected');
+		$this->zbxTestTextPresent('DISCOVERY');
+		$this->zbxTestTextPresent('Displaying');
+		$this->zbxTestTextPresent(array('Name', 'IP range', 'Delay', 'Checks', 'Status'));
+		$this->zbxTestTextPresent($rule['name']);
+		$this->zbxTestTextPresent($rule['iprange']);
+		$this->zbxTestTextPresent($rule['delay']);
+		$this->zbxTestDropdownHasOptions('go', array('Enable selected', 'Disable selected', 'Delete selected'));
 	}
 
 	/**
@@ -56,16 +54,14 @@ class testPageDiscovery extends CWebTest {
 		$sqlChecks = "select * from dchecks where druleid=$druleid order by dcheckid";
 		$oldHashChecks = DBhash($sqlChecks);
 
-		$this->login('discoveryconf.php');
+		$this->zbxTestLogin('discoveryconf.php');
 		$this->checkTitle('Configuration of discovery');
-		$this->click("link=$name");
-		$this->wait();
-		$this->button_click('save');
-		$this->wait();
+		$this->zbxTestClickWait('link='.$name);
+		$this->zbxTestClickWait('save');
 		$this->checkTitle('Configuration of discovery');
-		$this->ok('Discovery rule updated');
-		$this->ok("$name");
-		$this->ok('DISCOVERY');
+		$this->zbxTestTextPresent('Discovery rule updated');
+		$this->zbxTestTextPresent("$name");
+		$this->zbxTestTextPresent('DISCOVERY');
 
 		$this->assertEquals($oldHashRules, DBhash($sqlRules));
 		$this->assertEquals($oldHashChecks, DBhash($sqlChecks));
@@ -81,16 +77,15 @@ class testPageDiscovery extends CWebTest {
 
 		$this->chooseOkOnNextConfirmation();
 
-		$this->login('discoveryconf.php');
+		$this->zbxTestLogin('discoveryconf.php');
 		$this->checkTitle('Configuration of discovery');
-		$this->checkbox_select("g_druleid[$druleid]");
-		$this->dropdown_select('go', 'Delete selected');
-		$this->button_click('goButton');
-		$this->wait();
+		$this->zbxTestCheckboxSelect('g_druleid['.$druleid.']');
+		$this->zbxTestDropdownSelect('go', 'Delete selected');
+		$this->zbxTestClickWait('goButton');
 
 		$this->getConfirmation();
 		$this->checkTitle('Configuration of discovery');
-		$this->ok('Discovery rules deleted');
+		$this->zbxTestTextPresent('Discovery rules deleted');
 
 		$sql = "select * from drules where druleid=$druleid";
 		$this->assertEquals(0, DBcount($sql));
@@ -113,16 +108,15 @@ class testPageDiscovery extends CWebTest {
 
 		$this->chooseOkOnNextConfirmation();
 
-		$this->login('discoveryconf.php');
+		$this->zbxTestLogin('discoveryconf.php');
 		$this->checkTitle('Configuration of discovery');
-		$this->checkbox_select("all_drules");
-		$this->dropdown_select('go', 'Enable selected');
-		$this->button_click('goButton');
-		$this->wait();
+		$this->zbxTestCheckboxSelect('all_drules');
+		$this->zbxTestDropdownSelect('go', 'Enable selected');
+		$this->zbxTestClickWait('goButton');
 
 		$this->getConfirmation();
 		$this->checkTitle('Configuration of discovery');
-		$this->ok('Discovery rules updated');
+		$this->zbxTestTextPresent('Discovery rules updated');
 
 		$sql = "select * from drules where status=".DRULE_STATUS_DISABLED;
 		$this->assertEquals(0, DBcount($sql));
@@ -138,16 +132,15 @@ class testPageDiscovery extends CWebTest {
 
 		$this->chooseOkOnNextConfirmation();
 
-		$this->login('discoveryconf.php');
+		$this->zbxTestLogin('discoveryconf.php');
 		$this->checkTitle('Configuration of discovery');
-		$this->checkbox_select("g_druleid[$druleid]");
-		$this->dropdown_select('go', 'Enable selected');
-		$this->button_click('goButton');
-		$this->wait();
+		$this->zbxTestCheckboxSelect('g_druleid['.$druleid.']');
+		$this->zbxTestDropdownSelect('go', 'Enable selected');
+		$this->zbxTestClickWait('goButton');
 
 		$this->getConfirmation();
 		$this->checkTitle('Configuration of discovery');
-		$this->ok('Discovery rules updated');
+		$this->zbxTestTextPresent('Discovery rules updated');
 
 		$sql = "select * from drules where druleid=$druleid and status=".DRULE_STATUS_ACTIVE;
 		$this->assertEquals(1, DBcount($sql));
@@ -158,16 +151,15 @@ class testPageDiscovery extends CWebTest {
 
 		$this->chooseOkOnNextConfirmation();
 
-		$this->login('discoveryconf.php');
+		$this->zbxTestLogin('discoveryconf.php');
 		$this->checkTitle('Configuration of discovery');
-		$this->checkbox_select("all_drules");
-		$this->dropdown_select('go', 'Disable selected');
-		$this->button_click('goButton');
-		$this->wait();
+		$this->zbxTestCheckboxSelect('all_drules');
+		$this->zbxTestDropdownSelect('go', 'Disable selected');
+		$this->zbxTestClickWait('goButton');
 
 		$this->getConfirmation();
 		$this->checkTitle('Configuration of discovery');
-		$this->ok('Discovery rules updated');
+		$this->zbxTestTextPresent('Discovery rules updated');
 
 		$sql = "select * from drules where status=".DRULE_STATUS_ACTIVE;
 		$this->assertEquals(0, DBcount($sql));
@@ -183,16 +175,15 @@ class testPageDiscovery extends CWebTest {
 
 		$this->chooseOkOnNextConfirmation();
 
-		$this->login('discoveryconf.php');
+		$this->zbxTestLogin('discoveryconf.php');
 		$this->checkTitle('Configuration of discovery');
-		$this->checkbox_select("g_druleid[$druleid]");
-		$this->dropdown_select('go', 'Disable selected');
-		$this->button_click('goButton');
-		$this->wait();
+		$this->zbxTestCheckboxSelect('g_druleid['.$druleid.']');
+		$this->zbxTestDropdownSelect('go', 'Disable selected');
+		$this->zbxTestClickWait('goButton');
 
 		$this->getConfirmation();
 		$this->checkTitle('Configuration of discovery');
-		$this->ok('Discovery rules updated');
+		$this->zbxTestTextPresent('Discovery rules updated');
 
 		$sql = "select * from drules where druleid=$druleid and status=".DRULE_STATUS_DISABLED;
 		$this->assertEquals(1, DBcount($sql));
