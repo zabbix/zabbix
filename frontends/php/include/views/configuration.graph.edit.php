@@ -48,7 +48,7 @@ $graphForm->addVar('ymax_itemid', $this->data['ymax_itemid']);
 // create form list
 $graphFormList = new CFormList('graphFormList');
 if (!empty($this->data['templates'])) {
-	$graphFormList->addRow(_('Parent graph'), $this->data['templates']);
+	$graphFormList->addRow(_('Parent graphs'), $this->data['templates']);
 }
 $nameTextBox = new CTextBox('name', $this->data['name'], ZBX_TEXTBOX_STANDARD_SIZE);
 $nameTextBox->attr('autofocus', 'autofocus');
@@ -274,7 +274,10 @@ $graphTab = new CTabView(array('remember' => true));
 if (!$this->data['form_refresh']) {
 	$graphTab->setSelected(0);
 }
-$graphTab->addTab('graphTab', _('Graph'), $graphFormList);
+$graphTab->addTab(
+	'graphTab',
+	empty($this->data['parent_discoveryid']) ? _('Graph') : _('Graph prototype'), $graphFormList
+);
 
 /*
  * Preview tab
