@@ -242,7 +242,7 @@ void	DBlld_hosts_validate(zbx_vector_ptr_t *hosts, char **error)
 						"host in (%s) or name in (%s)"
 					")",
 				HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED, HOST_STATUS_TEMPLATE,
-				ZBX_FLAG_DISCOVERY_CHILD,
+				ZBX_FLAG_DISCOVERY_PROTOTYPE,
 				tnames, vnames);
 		if (0 != hostids.values_num)
 		{

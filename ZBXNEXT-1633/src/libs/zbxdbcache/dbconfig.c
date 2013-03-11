@@ -378,7 +378,7 @@ static unsigned char	poller_by_item(zbx_uint64_t itemid, zbx_uint64_t proxy_host
 		return ZBX_NO_POLLER;
 	}
 
-	if (0 != (ZBX_FLAG_DISCOVERY_CHILD & flags))
+	if (0 != (ZBX_FLAG_DISCOVERY_PROTOTYPE & flags))
 		return ZBX_NO_POLLER;
 
 	switch (item_type)
@@ -2315,7 +2315,7 @@ void	DCsync_configuration()
 			HOST_STATUS_MONITORED,
 			ITEM_STATUS_ACTIVE, ITEM_STATUS_NOTSUPPORTED,
 			TRIGGER_STATUS_ENABLED,
-			ZBX_FLAG_DISCOVERY_CHILD,
+			ZBX_FLAG_DISCOVERY_PROTOTYPE,
 			DBand_node_local("h.hostid"));
 	tsec = zbx_time() - sec;
 
@@ -2343,7 +2343,7 @@ void	DCsync_configuration()
 			HOST_STATUS_MONITORED,
 			ITEM_STATUS_ACTIVE, ITEM_STATUS_NOTSUPPORTED,
 			TRIGGER_STATUS_ENABLED,
-			ZBX_FLAG_DISCOVERY_CHILD,
+			ZBX_FLAG_DISCOVERY_PROTOTYPE,
 			DBand_node_local("h.hostid"));
 	fsec = zbx_time() - sec;
 

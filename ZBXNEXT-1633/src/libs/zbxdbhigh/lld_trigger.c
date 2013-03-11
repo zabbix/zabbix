@@ -232,7 +232,7 @@ static void	DBlld_get_trigger_functions(zbx_uint64_t triggerid, struct zbx_json_
 		function->flags = (unsigned char)atoi(row[6]);
 		zbx_vector_ptr_append(functions, function);
 
-		if (NULL != jp_row && 0 != (function->flags & ZBX_FLAG_DISCOVERY_CHILD))
+		if (NULL != jp_row && 0 != (function->flags & ZBX_FLAG_DISCOVERY_PROTOTYPE))
 			substitute_key_macros(&function->key, NULL, NULL, jp_row, MACRO_TYPE_ITEM_KEY, NULL, 0);
 	}
 	DBfree_result(result);
@@ -477,7 +477,7 @@ static int	DBlld_make_trigger(zbx_uint64_t hostid, zbx_uint64_t parent_triggerid
 		{
 			function = (zbx_lld_function_t *)trigger->functions.values[i];
 
-			if (0 != (ZBX_FLAG_DISCOVERY_CHILD & function->flags))
+			if (0 != (ZBX_FLAG_DISCOVERY_PROTOTYPE & function->flags))
 			{
 				if (FAIL == (ret = DBlld_get_item(hostid, function->key, NULL, &function->itemid)))
 					break;

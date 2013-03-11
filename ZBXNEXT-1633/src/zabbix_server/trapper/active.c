@@ -145,7 +145,7 @@ static void	get_list_of_active_checks(zbx_uint64_t hostid, zbx_uint64_t **itemid
 				" and i.flags<>%d"
 				" and h.hostid=" ZBX_FS_UI64
 				" and h.proxy_hostid is null",
-			HOST_STATUS_MONITORED, ITEM_TYPE_ZABBIX_ACTIVE, ZBX_FLAG_DISCOVERY_CHILD, hostid);
+			HOST_STATUS_MONITORED, ITEM_TYPE_ZABBIX_ACTIVE, ZBX_FLAG_DISCOVERY_PROTOTYPE, hostid);
 
 	while (NULL != (row = DBfetch(result)))
 	{

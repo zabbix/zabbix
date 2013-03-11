@@ -182,7 +182,7 @@ static int	DBlld_make_graph(zbx_uint64_t hostid, zbx_uint64_t parent_graphid, zb
 		{
 			gitem = &graph->gitems[i];
 
-			if (0 != (ZBX_FLAG_DISCOVERY_CHILD & gitem->flags))
+			if (0 != (ZBX_FLAG_DISCOVERY_PROTOTYPE & gitem->flags))
 			{
 				if (FAIL == (res = DBlld_get_item(hostid, gitem->key, jp_row, &gitem->itemid)))
 					break;
@@ -200,7 +200,7 @@ static int	DBlld_make_graph(zbx_uint64_t hostid, zbx_uint64_t parent_graphid, zb
 	{
 		graph->ymin_itemid = ymin_itemid;
 
-		if (0 != (ZBX_FLAG_DISCOVERY_CHILD & ymin_flags) &&
+		if (0 != (ZBX_FLAG_DISCOVERY_PROTOTYPE & ymin_flags) &&
 				FAIL == (res = DBlld_get_item(hostid, ymin_key_proto, jp_row, &graph->ymin_itemid)))
 		{
 			goto out;
@@ -211,7 +211,7 @@ static int	DBlld_make_graph(zbx_uint64_t hostid, zbx_uint64_t parent_graphid, zb
 	{
 		graph->ymax_itemid = ymax_itemid;
 
-		if (0 != (ZBX_FLAG_DISCOVERY_CHILD & ymax_flags) &&
+		if (0 != (ZBX_FLAG_DISCOVERY_PROTOTYPE & ymax_flags) &&
 				FAIL == (res = DBlld_get_item(hostid, ymax_key_proto, jp_row, &graph->ymax_itemid)))
 		{
 			goto out;
