@@ -224,7 +224,7 @@ void	DBlld_hosts_validate(zbx_vector_ptr_t *hosts, char **error)
 		if (0 != hostids.values_num)
 		{
 			zbx_vector_uint64_sort(&hostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " and not");
+			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " and not");
 			DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid",
 					hostids.values, hostids.values_num);
 		}
@@ -233,8 +233,6 @@ void	DBlld_hosts_validate(zbx_vector_ptr_t *hosts, char **error)
 
 		while (NULL != (row = DBfetch(result)))
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "%s %s %s", row[0], row[1], row[2]);
-
 			for (i = 0; i < hosts->values_num; i++)
 			{
 				host_a = (zbx_lld_host_t *)hosts->values[i];
@@ -349,7 +347,7 @@ static void	DBlld_host_make(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts,
 		/* host technical name */
 		if (0 != strcmp(host->host_proto, host_proto))	/* the new host prototype differs */
 		{
-			host->host = zbx_strdup(host->host, host->host_proto);
+			host->host = zbx_strdup(host->host, host_proto);
 			substitute_discovery_macros(&host->host, jp_row, ZBX_MACRO_ANY, NULL, 0);
 			host->flags |= ZBX_FLAG_LLD_HOST_UPDATE_HOST;
 		}
