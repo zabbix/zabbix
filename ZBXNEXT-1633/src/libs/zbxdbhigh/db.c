@@ -1884,8 +1884,10 @@ char	*DBget_unique_hostname_by_sample(const char *host_name_sample)
 			"select host"
 			" from hosts"
 			" where host like '%s%%' escape '%c'"
+				" and flags<>%d"
 				ZBX_SQL_NODE,
-			host_name_sample_esc, ZBX_SQL_LIKE_ESCAPE_CHAR, DBand_node_local("hostid"));
+			host_name_sample_esc, ZBX_SQL_LIKE_ESCAPE_CHAR, ZBX_FLAG_DISCOVERY_PROTOTYPE,
+			DBand_node_local("hostid"));
 
 	zbx_free(host_name_sample_esc);
 
