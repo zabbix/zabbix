@@ -474,7 +474,7 @@ class testInheritanceGraphPrototype extends CWebTest {
 
 	// Returns list of graphs
 	public static function allGraphs() {
-		return DBdata("select * from graphs g left join graphs_items gi on gi.graphid=g.graphid where gi.itemid='23600'");
+		return DBdata("select * from graphs g left join graphs_items gi on gi.graphid=g.graphid where gi.itemid='23600' limit 1");
 	}
 
 	/**
@@ -898,8 +898,7 @@ class testInheritanceGraphPrototype extends CWebTest {
 			$this->zbxTestTextPresent($this->template.": $graphName");
 			$this->zbxTestClickWait("link=$graphName");
 
-	//		$this->zbxTestTextPresent('Parent graphs');TODO
-			$this->zbxTestTextPresent('Parent graph');
+			$this->zbxTestTextPresent('Parent graphs');
 			$this->assertElementValue('name', $graphName);
 			$this->assertElementPresent("//span[text()='".$this->host.": ".$this->itemSimple."']");
 			$this->assertElementPresent("//span[text()='".$this->host.": ".$this->item."']");
