@@ -25,6 +25,13 @@ define('TRIGGER_BAD', 1);
 
 class testFormTrigger extends CWebTest {
 
+	/**
+	 * The name of the Simple form test host created in the test data set.
+	 *
+	 * @var string
+	 */
+	protected $host = 'Simple form test host';
+
 	// returns all possible trigger data
 	public static function triggerData() {
 		return array(
@@ -73,7 +80,9 @@ class testFormTrigger extends CWebTest {
 	 */
 	public function testFormTrigger_CheckLayout($data) {
 
-		$this->zbxTestLogin('triggers.php');
+		$this->zbxTestLogin('hosts.php');
+		$this->zbxTestClickWait('link='.$this->host);
+		$this->zbxTestClickWait("//div[@class='w']//a[text()='Triggers']");
 		$this->checkTitle('Configuration of triggers');
 		$this->zbxTestTextPresent('CONFIGURATION OF TRIGGERS');
 
@@ -201,6 +210,33 @@ class testFormTrigger extends CWebTest {
 		$this->assertAttribute("//input[@id='bnt1']/@value", 'Add');
 	}
 
+	// Returns list of graphs
+	public static function allTriggers() {
+		return DBdata("select * from triggers where description LIKE 'testFormTrigger%'");
+	}
+
+	/**
+	 * @dataProvider allTriggers
+	 */
+	public function testFormTrigger_simpleCreate($data) {
+		$description = $data['description'];
+
+		$sqlTriggers = "select * from triggers";
+		$oldHashTriggers = DBhash($sqlTriggers);
+
+		$this->zbxTestLogin('hosts.php');
+		$this->zbxTestClickWait('link='.$this->host);
+		$this->zbxTestClickWait("//div[@class='w']//a[text()='Triggers']");
+		$this->zbxTestClickWait('link='.$description);
+		$this->zbxTestClickWait('save');
+		$this->checkTitle('Configuration of triggers');
+		$this->zbxTestTextPresent('Trigger updated');
+		$this->zbxTestTextPresent("$description");
+		$this->zbxTestTextPresent('TRIGGERS');
+
+		$this->assertEquals($oldHashTriggers, DBhash($sqlTriggers));
+	}
+
 	// Returns all possible item data
 	public static function dataCreate() {
 		return array(
@@ -249,10 +285,10 @@ class testFormTrigger extends CWebTest {
 				array(
 					'expected' => TRIGGER_BAD,
 					'description' => 'MyTrigger',
-					'expression' => '{Test host}',
+					'expression' => '{Simple form test host}',
 					'errors' => array(
 						'ERROR: Cannot add trigger',
-						'Incorrect trigger expression. Check expression part starting from "{Test host}".'
+						'Incorrect trigger expression. Check expression part starting from "{Simple form test host}".'
 					)
 				)
 			),
@@ -260,7 +296,7 @@ class testFormTrigger extends CWebTest {
 				array(
 					'expected' => TRIGGER_GOOD,
 					'description' => 'MyTrigger_sysUptime',
-					'expression' => '{Test host:system.uptime.last(0)}<0',
+					'expression' => '{Simple form test host:test-item-reuse.last(0)}<0',
 					'formCheck' => true,
 				)
 			),
@@ -268,7 +304,7 @@ class testFormTrigger extends CWebTest {
 				array(
 					'expected' => TRIGGER_GOOD,
 					'description' => '1234567890',
-					'expression' => '{Test host:system.uptime.last(0)}<0',
+					'expression' => '{Simple form test host:test-item-reuse.last(0)}<0',
 					'formCheck' => true,
 				)
 			),
@@ -276,7 +312,7 @@ class testFormTrigger extends CWebTest {
 				array(
 					'expected' => TRIGGER_GOOD,
 					'description' => 'a?aa+',
-					'expression' => '{Test host:system.uptime.last(0)}<0',
+					'expression' => '{Simple form test host:test-item-reuse.last(0)}<0',
 					'formCheck' => true,
 				)
 			),
@@ -284,7 +320,7 @@ class testFormTrigger extends CWebTest {
 				array(
 					'expected' => TRIGGER_GOOD,
 					'description' => '}aa]a{',
-					'expression' => '{Test host:system.uptime.last(0)}<0',
+					'expression' => '{Simple form test host:test-item-reuse.last(0)}<0',
 					'formCheck' => true,
 				)
 			),
@@ -292,7 +328,7 @@ class testFormTrigger extends CWebTest {
 				array(
 					'expected' => TRIGGER_GOOD,
 					'description' => '-aaa=%',
-					'expression' => '{Test host:system.uptime.last(0)}<0',
+					'expression' => '{Simple form test host:test-item-reuse.last(0)}<0',
 					'formCheck' => true,
 				)
 			),
@@ -300,7 +336,7 @@ class testFormTrigger extends CWebTest {
 				array(
 					'expected' => TRIGGER_GOOD,
 					'description' => 'aaa,;:',
-					'expression' => '{Test host:system.uptime.last(0)}<0',
+					'expression' => '{Simple form test host:test-item-reuse.last(0)}<0',
 					'formCheck' => true,
 				)
 			),
@@ -308,7 +344,7 @@ class testFormTrigger extends CWebTest {
 				array(
 					'expected' => TRIGGER_GOOD,
 					'description' => 'aaa><.',
-					'expression' => '{Test host:system.uptime.last(0)}<0',
+					'expression' => '{Simple form test host:test-item-reuse.last(0)}<0',
 					'formCheck' => true,
 				)
 			),
@@ -316,7 +352,7 @@ class testFormTrigger extends CWebTest {
 				array(
 					'expected' => TRIGGER_GOOD,
 					'description' => 'aaa*&_',
-					'expression' => '{Test host:system.uptime.last(0)}<0',
+					'expression' => '{Simple form test host:test-item-reuse.last(0)}<0',
 					'formCheck' => true,
 				)
 			),
@@ -324,7 +360,7 @@ class testFormTrigger extends CWebTest {
 				array(
 					'expected' => TRIGGER_GOOD,
 					'description' => 'aaa#@!',
-					'expression' => '{Test host:system.uptime.last(0)}<0',
+					'expression' => '{Simple form test host:test-item-reuse.last(0)}<0',
 					'formCheck' => true,
 				)
 			),
@@ -332,7 +368,7 @@ class testFormTrigger extends CWebTest {
 				array(
 					'expected' => TRIGGER_GOOD,
 					'description' => '([)$^',
-					'expression' => '{Test host:system.uptime.last(0)}<0',
+					'expression' => '{Simple form test host:test-item-reuse.last(0)}<0',
 					'formCheck' => true,
 				)
 			),
@@ -340,7 +376,7 @@ class testFormTrigger extends CWebTest {
 				array(
 					'expected' => TRIGGER_GOOD,
 					'description' => 'MyTrigger_generalCheck',
-					'expression' => '{Test host:system.uptime.last(0)}<5',
+					'expression' => '{Simple form test host:test-item-reuse.last(0)}<5',
 					'type' => true,
 					'comments' => 'Trigger status (expression) is recalculated every time Zabbix server receives new value, if this value is part of this expression. If time based functions are used in the expression, it is recalculated every 30 seconds by a zabbix timer process. ',
 					'url' => 'www.zabbix.com',
@@ -352,7 +388,7 @@ class testFormTrigger extends CWebTest {
 				array(
 					'expected' => TRIGGER_BAD,
 					'description' => 'MyTrigger',
-					'expression' => '{Zabbix host:system.uptime.last(0)}<0',
+					'expression' => '{Zabbix host:test-item-reuse.last(0)}<0',
 					'errors' => array(
 						'ERROR: Cannot add trigger',
 						'Incorrect trigger expression. Host "Zabbix host" does not exist or you have no access to this host.'
@@ -363,10 +399,10 @@ class testFormTrigger extends CWebTest {
 				array(
 					'expected' => TRIGGER_BAD,
 					'description' => 'MyTrigger',
-					'expression' => '{Test host:someItem.uptime.last(0)}<0',
+					'expression' => '{Simple form test host:someItem.uptime.last(0)}<0',
 					'errors' => array(
 						'ERROR: Cannot add trigger',
-						'Incorrect item key "someItem.uptime" provided for trigger expression on "Test host".'
+						'Incorrect item key "someItem.uptime" provided for trigger expression on "Simple form test host".'
 					)
 				)
 			),
@@ -374,10 +410,10 @@ class testFormTrigger extends CWebTest {
 				array(
 					'expected' => TRIGGER_BAD,
 					'description' => 'MyTrigger',
-					'expression' => '{Test host:system.uptime.somefunc(0)}<0',
+					'expression' => '{Simple form test host:test-item-reuse.somefunc(0)}<0',
 					'errors' => array(
 						'ERROR: Cannot add trigger',
-						'Cannot implode expression "{Test host:system.uptime.somefunc(0)}<0". Incorrect trigger function "somefunc" provided in expression. Unknown function.'
+						'Cannot implode expression "{Simple form test host:test-item-reuse.somefunc(0)}<0". Incorrect trigger function "somefunc" provided in expression. Unknown function.'
 					)
 				)
 			),
@@ -385,7 +421,7 @@ class testFormTrigger extends CWebTest {
 				array(
 					'expected' => TRIGGER_BAD,
 					'description' => 'MyTrigger',
-					'expression' => '{Test host:system.uptime.last(0)} | {#MACRO}',
+					'expression' => '{Simple form test host:test-item-reuse.last(0)} | {#MACRO}',
 					'errors' => array(
 						'ERROR: Cannot add trigger',
 						'Incorrect trigger expression. Check expression part starting from " {#MACRO}".'
@@ -396,7 +432,7 @@ class testFormTrigger extends CWebTest {
 				array(
 					'expected' => TRIGGER_BAD,
 					'description' => 'MyTrigger',
-					'expression' => '{Test host:system.uptime.last(0)} | {#MACRO}',
+					'expression' => '{Simple form test host:test-item-reuse.last(0)} | {#MACRO}',
 					'constructor' => array(array(
 						'text' => array('A | B', 'A', 'B'),
 						'elements' => array('expr_0_32', 'expr_36_43')
@@ -408,7 +444,7 @@ class testFormTrigger extends CWebTest {
 				array(
 					'expected' => TRIGGER_BAD,
 					'description' => 'MyTrigger',
-					'expression' => '{Zabbix host:system.uptime.last(0)}<0 | 8 & 9',
+					'expression' => '{Zabbix host:test-item-reuse.last(0)}<0 | 8 & 9',
 					'constructor' => array(array(
 						'text' => array('A | (B & C)', 'OR', 'AND', 'A', 'B', 'C'),
 						'elements' => array('expr_0_36', 'expr_40_40', 'expr_44_44'),
@@ -421,7 +457,7 @@ class testFormTrigger extends CWebTest {
 				array(
 					'expected' => TRIGGER_BAD,
 					'description' => 'MyTrigger',
-					'expression' => '{Test host:someItem.uptime.last(0)}<0 | 8 & 9 + {Test host:system.uptime.last(0)}',
+					'expression' => '{Simple form test host:someItem.uptime.last(0)}<0 | 8 & 9 + {Simple form test host:test-item-reuse.last(0)}',
 					'constructor' => array(array(
 						'text' => array('A | (B & C)', 'A', 'B', 'C'),
 						'elements' => array('expr_0_36', 'expr_40_40', 'expr_44_80'),
@@ -434,7 +470,7 @@ class testFormTrigger extends CWebTest {
 				array(
 					'expected' => TRIGGER_BAD,
 					'description' => 'MyTrigger',
-					'expression' => '{Test host:system.uptime.lasta(0)}<0 | 8 & 9 + {Test host:system.uptime.last(0)}',
+					'expression' => '{Simple form test host:test-item-reuse.lasta(0)}<0 | 8 & 9 + {Simple form test host:test-item-reuse.last(0)}',
 					'constructor' => array(array(
 						'text' => array('A | (B & C)', 'A', 'B', 'C'),
 						'elements' => array('expr_0_35', 'expr_39_39', 'expr_43_79'),
@@ -447,11 +483,11 @@ class testFormTrigger extends CWebTest {
 				array(
 					'expected' => TRIGGER_BAD,
 					'description' => 'MyTrigger',
-					'expression' => '{Test host@:system.uptime.last(0)}',
+					'expression' => '{Simple form test host@:test-item-reuse.last(0)}',
 					'constructor' => array(array(
 						'errors' => array(
 							'ERROR: Expression Syntax Error.',
-							'Incorrect trigger expression. Check expression part starting from "{Test host@:system.uptime.last(0)}".'),
+							'Incorrect trigger expression. Check expression part starting from "{Simple form test host@:test-item-reuse.last(0)}".'),
 						)
 					)
 				)
@@ -460,11 +496,11 @@ class testFormTrigger extends CWebTest {
 				array(
 					'expected' => TRIGGER_BAD,
 					'description' => 'MyTrigger',
-					'expression' => '{Test host:system .uptime.last(0)}',
+					'expression' => '{Simple form test host:system .uptime.last(0)}',
 					'constructor' => array(array(
 						'errors' => array(
 							'ERROR: Expression Syntax Error.',
-							'Incorrect trigger expression. Check expression part starting from "{Test host:system .uptime.last(0)}".'),
+							'Incorrect trigger expression. Check expression part starting from "{Simple form test host:system .uptime.last(0)}".'),
 						)
 					)
 				)
@@ -473,11 +509,11 @@ class testFormTrigger extends CWebTest {
 				array(
 					'expected' => TRIGGER_BAD,
 					'description' => 'MyTrigger',
-					'expression' => '{Test host:system .uptime.last(0)}',
+					'expression' => '{Simple form test host:system .uptime.last(0)}',
 					'constructor' => array(array(
 						'errors' => array(
 							'ERROR: Expression Syntax Error.',
-							'Incorrect trigger expression. Check expression part starting from "{Test host:system .uptime.last(0)}".'),
+							'Incorrect trigger expression. Check expression part starting from "{Simple form test host:system .uptime.last(0)}".'),
 						)
 					)
 				)
@@ -486,11 +522,11 @@ class testFormTrigger extends CWebTest {
 				array(
 					'expected' => TRIGGER_BAD,
 					'description' => 'MyTrigger',
-					'expression' => '{Test host:system.uptime.lastA(0)}',
+					'expression' => '{Simple form test host:test-item-reuse.lastA(0)}',
 					'constructor' => array(array(
 						'errors' => array(
 							'ERROR: Expression Syntax Error.',
-							'Incorrect trigger expression. Check expression part starting from "{Test host:system.uptime.lastA(0)}".'),
+							'Incorrect trigger expression. Check expression part starting from "{Simple form test host:test-item-reuse.lastA(0)}".'),
 						)
 					)
 				)
@@ -501,9 +537,11 @@ class testFormTrigger extends CWebTest {
 	/**
 	 * @dataProvider dataCreate
 	 */
-	public function testFormTrigger_Create($data) {// TODO host as protected variable
+	public function testFormTrigger_Create($data) {
 
-		$this->zbxTestLogin('triggers.php');
+		$this->zbxTestLogin('hosts.php');
+		$this->zbxTestClickWait('link='.$this->host);
+		$this->zbxTestClickWait("//div[@class='w']//a[text()='Triggers']");
 		$this->checkTitle('Configuration of triggers');
 		$this->zbxTestTextPresent('CONFIGURATION OF TRIGGERS');
 		$this->zbxTestDropdownSelectWait('groupid', 'all');
