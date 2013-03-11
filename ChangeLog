@@ -43,6 +43,7 @@ A.F.I...S. [ZBXNEXT-1186] increased length to 2048 characters of expression fiel
 ..F....... [ZBX-5127] regular expressions form redesign (Vedmak)
 
 Bug fixes:
+..F....... [ZBX-6292] added support of time postfixes in trigger expression test page (Eduard)
 ..F....... [ZBX-6336] fixed "array to string conversion" error in triggers (Oleg)
 ..F....... [ZBX-6332] fixed buttons ids in graph edit form (Eduard)
 ........S. [ZBX-6234] improved validation of command request (global scripts) tag values (wiper)
