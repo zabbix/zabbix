@@ -474,7 +474,7 @@ class testInheritanceGraphPrototype extends CWebTest {
 
 	// Returns list of graphs
 	public static function allGraphs() {
-		return DBdata("select * from graphs g left join graphs_items gi on gi.graphid=g.graphid where gi.itemid='23600' limit 1");
+		return DBdata("select * from graphs g left join graphs_items gi on gi.graphid=g.graphid where gi.itemid='23600'");
 	}
 
 	/**
