@@ -31,28 +31,14 @@ class testFormItem extends CWebTest {
 	 *
 	 * @var string
 	 */
-	protected $host = 'ЗАББИКС Сервер';
-
-	/**
-	 * The name of the host for the testing of the simpleCreate of the graphs created in the test data set.
-	 *
-	 * @var string
-	 */
-	protected $hostSimple = 'Host for trigger description macros';
+	protected $host = 'Simple form test host';
 
 	/**
 	 * The name of the host for the testing of the layout of the graphs created in the test data set.
 	 *
 	 * @var string
 	 */
-	protected $hostLayout = 'Host name';
-
-	/**
-	 * The name of the item used in graph axis for create function created in the test data set.
-	 *
-	 * @var string
-	 */
-	protected $graphAxisItem = 'Agent ping';
+	protected $item = 'testFormItem';
 
 
 	// returns all possible item types
@@ -276,7 +262,7 @@ class testFormItem extends CWebTest {
 
 		// add general item
 		$this->zbxTestLaunchPopup('add_item');
-		$this->zbxTestClick('link='.$this->hostLayout);
+		$this->zbxTestClick('link='.$this->item);
 		sleep(1);
 		$this->selectWindow(null);
 
@@ -296,8 +282,6 @@ class testFormItem extends CWebTest {
 				$this->assertNotVisible('yaxismin');
 				break;
 			case 'Item':
-				$this->zbxTestDropdownSelectWait('ymin_type', 'Calculated');
-				$this->zbxTestDropdownSelectWait('ymin_type', 'Item');
 				$this->assertElementPresent('ymin_name');
 				$this->assertElementPresent('yaxis_min');
 				$this->assertAttribute("//input[@id='yaxis_min']/@value", 'Select');
@@ -371,7 +355,7 @@ class testFormItem extends CWebTest {
 
 	// Returns list of graphs
 	public static function allGraphs() {
-		return DBdata("select * from graphs g left join graphs_items gi on gi.graphid=g.graphid where gi.itemid='23328'");
+		return DBdata("select * from graphs g left join graphs_items gi on gi.graphid=g.graphid where gi.itemid='30004'");
 	}
 
 	/**
@@ -384,7 +368,7 @@ class testFormItem extends CWebTest {
 		$oldHashGraphs = DBhash($sqlGraphs);
 
 		$this->zbxTestLogin('hosts.php');
-		$this->zbxTestClickWait('link='.$this->hostSimple);
+		$this->zbxTestClickWait('link='.$this->host);
 		$this->zbxTestClickWait("//div[@class='w']//a[text()='Graphs']");
 		$this->zbxTestClickWait('link='.$name);
 		$this->zbxTestClickWait('save');
@@ -413,8 +397,8 @@ class testFormItem extends CWebTest {
 					'expected' => GRAPH_GOOD,
 					'name' => 'graphSaveCheck',
 					'addItems' => array(
-						array('itemName' => 'CPU nice time', 'remove' => true),
-						array('itemName' => 'Host name')
+						array('itemName' => 'testFormItem', 'remove' => true),
+						array('itemName' => 'testFormItem')
 					),
 					'dbCheck' => true,
 					'formCheck' => true
@@ -425,7 +409,7 @@ class testFormItem extends CWebTest {
 					'expected' => GRAPH_BAD,
 					'name' => 'graphSaveCheck',
 					'addItems' => array(
-						array('itemName' => 'Host name')
+						array('itemName' => 'testFormItem')
 					),
 					'errors' => array(
 						'ERROR: Cannot add graph',
@@ -448,11 +432,11 @@ class testFormItem extends CWebTest {
 					'expected' => GRAPH_GOOD,
 					'name' => 'graphNormal1',
 					'addItems' => array(
-						array('itemName' => 'Host name')
+						array('itemName' => 'testFormItem')
 					),
 					'ymin_type' => 'Fixed',
 					'ymax_type' => 'Item',
-					'ymax_name' => 'Agent ping',
+					'ymax_name' => 'testFormItem',
 					'dbCheck' => true,
 					'formCheck' => true
 				)
@@ -462,12 +446,12 @@ class testFormItem extends CWebTest {
 					'expected' => GRAPH_GOOD,
 					'name' => 'graphNormal2',
 					'addItems' => array(
-						array('itemName' => 'Host name')
+						array('itemName' => 'testFormItem')
 					),
 					'ymin_type' => 'Item',
-					'ymin_name' => 'Agent ping',
+					'ymin_name' => 'testFormItem',
 					'ymax_type' => 'Item',
-					'ymax_name' => 'Agent ping',
+					'ymax_name' => 'testFormItem',
 					'dbCheck' => true,
 					'formCheck' => true
 				)
@@ -477,11 +461,11 @@ class testFormItem extends CWebTest {
 					'expected' => GRAPH_GOOD,
 					'name' => 'graphNormal3',
 					'addItems' => array(
-						array('itemName' => 'Host name')
+						array('itemName' => 'testFormItem')
 					),
 					'ymin_type' => 'Fixed',
 					'ymax_type' => 'Item',
-					'ymax_name' => 'Agent ping',
+					'ymax_name' => 'testFormItem',
 					'dbCheck' => true,
 					'formCheck' => true
 				)
@@ -492,7 +476,7 @@ class testFormItem extends CWebTest {
 					'name' => 'graphNormal4',
 					'graphtype' => 'Normal',
 					'addItems' => array(
-						array('itemName' => 'Host name')
+						array('itemName' => 'testFormItem')
 					)
 				)
 			),
@@ -502,7 +486,7 @@ class testFormItem extends CWebTest {
 					'name' => 'graphStacked1',
 					'graphtype' => 'Stacked',
 					'addItems' => array(
-						array('itemName' => 'Host name')
+						array('itemName' => 'testFormItem')
 					)
 				)
 			),
@@ -513,7 +497,7 @@ class testFormItem extends CWebTest {
 					'graphtype' => 'Stacked',
 					'ymin_type' => 'Fixed' ,
 					'addItems' => array(
-						array('itemName' => 'Host name')
+						array('itemName' => 'testFormItem')
 					)
 				)
 			),
@@ -523,10 +507,10 @@ class testFormItem extends CWebTest {
 					'name' => 'graphStacked3',
 					'graphtype' => 'Stacked',
 					'ymin_type' => 'Item',
-					'ymin_name' => 'Agent ping',
+					'ymin_name' => 'testFormItem',
 					'ymax_type' => 'Fixed',
 					'addItems' => array(
-						array('itemName' => 'Host name')
+						array('itemName' => 'testFormItem')
 					)
 				)
 			),
@@ -538,7 +522,7 @@ class testFormItem extends CWebTest {
 					'ymin_type' => 'Item',
 					'ymax_type' => 'Fixed',
 					'addItems' => array(
-						array('itemName' => 'Host name')
+						array('itemName' => 'testFormItem')
 					),
 					'errors' => array(
 						'ERROR: Cannot add graph',
@@ -558,7 +542,7 @@ class testFormItem extends CWebTest {
 					'ymax_type' => 'Fixed',
 					'yaxismax' => 'name',
 					'addItems' => array(
-						array('itemName' => 'Host name')
+						array('itemName' => 'testFormItem')
 					),
 					'errors' => array(
 						'ERROR: Page received incorrect data',
@@ -579,7 +563,7 @@ class testFormItem extends CWebTest {
 					'ymin_type' => 'Fixed',
 					'ymax_type' => 'Fixed',
 					'addItems' => array(
-						array('itemName' => 'Host name')
+						array('itemName' => 'testFormItem')
 					),
 					'errors' => array(
 						'ERROR: Page received incorrect data',
@@ -594,7 +578,7 @@ class testFormItem extends CWebTest {
 					'name' => 'graphPie',
 					'graphtype' => 'Pie',
 					'addItems' => array(
-						array('itemName' => 'Host name')
+						array('itemName' => 'testFormItem')
 					)
 				)
 			),
@@ -604,7 +588,7 @@ class testFormItem extends CWebTest {
 					'name' => 'graphExploded',
 					'graphtype' => 'Exploded',
 					'addItems' => array(
-						array('itemName' => 'Host name')
+						array('itemName' => 'testFormItem')
 					)
 				)
 			),
@@ -614,7 +598,7 @@ class testFormItem extends CWebTest {
 					'name' => 'graph!@#$%^&*()><>?:"|{},./;',
 					'graphtype' => 'Exploded',
 					'addItems' => array(
-						array('itemName' => 'Host name')
+						array('itemName' => 'testFormItem')
 					),
 					'dbCheck' => true,
 					'formCheck' => true
@@ -712,8 +696,8 @@ class testFormItem extends CWebTest {
 		if (isset($data['ymin_name'])) {
 			$this->zbxTestLaunchPopup('yaxis_min' , 'zbx_popup_item');
 			$this->zbxTestDropdownSelectWait('groupid', 'Zabbix servers');
-			$this->zbxTestDropdownSelectWait('hostid', 'ЗАББИКС Сервер');
-			$this->zbxTestClick('link='.$this->graphAxisItem);
+			$this->zbxTestDropdownSelectWait('hostid', $this->host);
+			$this->zbxTestClick('link='.$this->item);
 			sleep(1);
 			$this->selectWindow(null);
 			$ymin_name = $data['ymin_name'];
@@ -724,8 +708,8 @@ class testFormItem extends CWebTest {
 		if (isset($data['ymax_name'])) {
 			$this->zbxTestLaunchPopup('yaxis_max', 'zbx_popup_item');
 			$this->zbxTestDropdownSelectWait('groupid', 'Zabbix servers');
-			$this->zbxTestDropdownSelectWait('hostid', 'ЗАББИКС Сервер');
-			$this->zbxTestClick('link='.$this->graphAxisItem);
+			$this->zbxTestDropdownSelectWait('hostid', $this->host);
+			$this->zbxTestClick('link='.$this->item);
 			sleep(1);
 			$this->selectWindow(null);
 			$ymax_name = $data['ymax_name'];
