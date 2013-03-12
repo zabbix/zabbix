@@ -6,6 +6,7 @@ A.F....... [ZBX-1357] added Lithuanian translation; thanks to Zabbix translators
 A.F....... [ZBX-1357] updated American English, Brazilian Portuguese, French, German, Greek, Hungarian, Latvian, Slovak, Spanish, Russian, Turkish and Ukrainian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+.......PS. [ZBX-4991] fixed host availability checks with proxies (wiper)
 ........S. [ZBX-6322] enforced nls_numeric_characters setting for oracle db sessions (wiper)
 ..F....... [ZBX-6328] fixed undefined index in proxy list (Eduard)
 ..F....... [ZBX-6324] improved text displaying in Overview table header in IE (Eduard)
