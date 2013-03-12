@@ -42,7 +42,8 @@ static int	get_function_parameter_uint(zbx_uint64_t hostid, const char *paramete
 	if (0 != get_param(parameters, Nparam, parameter, FUNCTION_PARAMETER_LEN_MAX))
 		goto clean;
 
-	if (SUCCEED == substitute_simple_macros(NULL, &hostid, NULL, NULL, NULL, &parameter, MACRO_TYPE_FUNCTION_PARAMETER, NULL, 0))
+	if (SUCCEED == substitute_simple_macros(NULL, NULL, &hostid, NULL, NULL, NULL,
+			&parameter, MACRO_TYPE_FUNCTION_PARAMETER, NULL, 0))
 	{
 		if ('#' == *parameter)
 		{
@@ -82,7 +83,8 @@ static int	get_function_parameter_str(zbx_uint64_t hostid, const char *parameter
 	if (0 != get_param(parameters, Nparam, *value, FUNCTION_PARAMETER_LEN_MAX))
 		goto clean;
 
-	res = substitute_simple_macros(NULL, &hostid, NULL, NULL, NULL, value, MACRO_TYPE_FUNCTION_PARAMETER, NULL, 0);
+	res = substitute_simple_macros(NULL, NULL, &hostid, NULL, NULL, NULL,
+			value, MACRO_TYPE_FUNCTION_PARAMETER, NULL, 0);
 clean:
 	if (SUCCEED == res)
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() value:'%s'", __function_name, *value);
@@ -850,9 +852,11 @@ static int	evaluate_LAST(char *value, DB_ITEM *item, const char *function, const
 	else
 		goto clean;
 
-	if (0 == time_shift && 1 == arg1)
+	if (0 == time_shift && 1 <= arg1 && arg1 <= 2)
 	{
-		if (NULL != item->lastvalue[0])
+		int index = arg1 - 1;
+
+		if (NULL != item->lastvalue[index])
 		{
 			res = SUCCEED;
 
@@ -861,43 +865,17 @@ static int	evaluate_LAST(char *value, DB_ITEM *item, const char *function, const
 				case ITEM_VALUE_TYPE_FLOAT:
 				case ITEM_VALUE_TYPE_UINT64:
 				case ITEM_VALUE_TYPE_STR:
-					zbx_strlcpy(value, item->lastvalue[0], MAX_BUFFER_LEN);
+					zbx_strlcpy(value, item->lastvalue[index], MAX_BUFFER_LEN);
 					break;
 				default:
-					if (NULL == item->h_lastvalue[0])
+					if (NULL == item->h_lastvalue[index])
 					{
-						zbx_strlcpy(value, item->lastvalue[0], MAX_BUFFER_LEN);
-						if (ITEM_LASTVALUE_LEN == zbx_strlen_utf8(item->lastvalue[0]))
+						zbx_strlcpy(value, item->lastvalue[index], MAX_BUFFER_LEN);
+						if (ITEM_LASTVALUE_LEN == zbx_strlen_utf8(item->lastvalue[index]))
 							goto history;
 					}
 					else
-						zbx_strlcpy(value, item->h_lastvalue[0], MAX_BUFFER_LEN);
-					break;
-			}
-		}
-	}
-	else if (0 == time_shift && 2 == arg1)
-	{
-		if (NULL != item->lastvalue[1])
-		{
-			res = SUCCEED;
-
-			switch (item->value_type)
-			{
-				case ITEM_VALUE_TYPE_FLOAT:
-				case ITEM_VALUE_TYPE_UINT64:
-				case ITEM_VALUE_TYPE_STR:
-					zbx_strlcpy(value, item->lastvalue[1], MAX_BUFFER_LEN);
-					break;
-				default:
-					if (NULL == item->h_lastvalue[1])
-					{
-						zbx_strlcpy(value, item->lastvalue[1], MAX_BUFFER_LEN);
-						if (ITEM_LASTVALUE_LEN == zbx_strlen_utf8(item->lastvalue[1]))
-							goto history;
-					}
-					else
-						zbx_strlcpy(value, item->h_lastvalue[1], MAX_BUFFER_LEN);
+						zbx_strlcpy(value, item->h_lastvalue[index], MAX_BUFFER_LEN);
 					break;
 			}
 		}

@@ -1,10 +1,15 @@
 Changes for 2.0.6rc1
 
 New features:
+........S. [ZBXNEXT-1643] added support of {TRIGGER.TEMPLATE.NAME} and {TRIGGER.HOSTGROUP.NAME} notification macros; thanks to Hmami Mohamed (Sasha)
 A.F....... [ZBX-1357] added Lithuanian translation; thanks to Zabbix translators (Richlv)
-A.F....... [ZBX-1357] updated Brazilian Portuguese, German, Latvian, Slovak, Russian and Ukrainian translations; thanks to Zabbix translators (Richlv)
+A.F....... [ZBX-1357] updated American English, Brazilian Portuguese, French, German, Greek, Hungarian, Latvian, Slovak, Spanish, Russian, Turkish and Ukrainian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+........S. [ZBX-6322] enforced nls_numeric_characters setting for oracle db sessions (wiper)
+..F....... [ZBX-6328] fixed undefined index in proxy list (Eduard)
+..F....... [ZBX-6324] improved text displaying in Overview table header in IE (Eduard)
+A......... [ZBX-6261] fixed service.getsla not working with Oracle database (Pavels)
 ........S. [ZBX-5797] fixed server SNMP interfaces ignoring IP/DNS toggle (wiper)
 ..F....... [ZBX-6290] fixed icon mapping selection (Eduard)
 A.F....... [ZBX-5321] unified translation strings, fixed typo and SQL query formatting (Pavels, Richlv)
@@ -1266,6 +1271,8 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.17rc1
 
+..F....... [ZBX-6329] fixed form with "0" in trigger expression parser (Eduard)
+..F....... [ZBX-6306] fixed frontend layout for latest Google Chrome 25 (Eduard)
 ..F....... [ZBX-6258] updated Japanese translation; thanks to Kodai Terashima (Richlv)
 ..F....... [ZBX-6217] fixed inability to use HTML special characters in web scenario password (Toms)
 ...G...... [ZBX-6057] fixed using of ServerActive option by zabbix_sender (Sasha)
