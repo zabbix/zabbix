@@ -163,16 +163,7 @@ function get_icon_center_by_selement($element, $info, $map) {
 
 function myDrawLine($image, $x1, $y1, $x2, $y2, $color, $drawtype) {
 	if ($drawtype == MAP_LINK_DRAWTYPE_BOLD_LINE) {
-		imageline($image, $x1, $y1, $x2, $y2, $color);
-		if (abs($x1 - $x2) < abs($y1 - $y2)) {
-			$x1++;
-			$x2++;
-		}
-		else {
-			$y1++;
-			$y2++;
-		}
-		imageline($image, $x1, $y1, $x2, $y2, $color);
+		aline($image, $x1, $y1, $x2, $y2, $color, LINE_TYPE_BOLD);
 	}
 	elseif ($drawtype == MAP_LINK_DRAWTYPE_DASHED_LINE) {
 		if (function_exists('imagesetstyle')) {
@@ -194,7 +185,7 @@ function myDrawLine($image, $x1, $y1, $x2, $y2, $color, $drawtype) {
 		imageline($image, $x1, $y1, $x2, $y2, IMG_COLOR_STYLED);
 	}
 	else {
-		imageline($image, $x1, $y1, $x2, $y2, $color);
+		aline($image, $x1, $y1, $x2, $y2, $color);
 	}
 }
 
@@ -1717,7 +1708,7 @@ function drawMapLinkLabels(&$im, $map, $map_info, $resolveMacros = true) {
 				break;
 			case MAP_LINK_DRAWTYPE_BOLD_LINE:
 				imagerectangle($im, $boxX_left - 1, $boxY_top - 1, $boxX_right + 1, $boxY_bottom + 1, $color);
-				break;
+				// break; is not ne
 			case MAP_LINK_DRAWTYPE_LINE:
 			default:
 				imagerectangle($im, $boxX_left, $boxY_top, $boxX_right, $boxY_bottom, $color);
