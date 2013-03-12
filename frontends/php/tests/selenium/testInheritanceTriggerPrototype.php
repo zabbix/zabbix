@@ -84,7 +84,7 @@ class testInheritanceTriggerPrototype extends CWebTest {
 			array(
 				array('constructor' => 'open')
 			),
-			array(
+		/*	array(
 				array('constructor' => 'open_close')
 			),
 			array(
@@ -110,7 +110,7 @@ class testInheritanceTriggerPrototype extends CWebTest {
 			),
 			array(
 				array('severity' => 'Disaster')
-			)
+			)*/
 		);
 	}
 
@@ -130,7 +130,8 @@ class testInheritanceTriggerPrototype extends CWebTest {
 
 		$this->zbxTestClickWait('form');
 		$this->checkTitle('Configuration of trigger prototypes');
-		$this->zbxTestTextPresent(array('CONFIGURATION OF TRIGGER PROTOTYPES', 'Trigger prototype'));
+		$this->zbxTestTextPresent('CONFIGURATION OF TRIGGER PROTOTYPES');
+		$this->assertElementPresent("//div[@id='tab_triggersTab' and text()='Trigger prototype']");
 
 		if (isset($data['constructor'])) {
 			switch ($data['constructor']) {
@@ -257,7 +258,7 @@ class testInheritanceTriggerPrototype extends CWebTest {
 					'hostCheck' => true,
 					'dbCheck' => true)
 			),
-			array(
+		/*	array(
 				array('expected' => TRIGGER_GOOD,
 					'description' => 'triggerName',
 					'hostCheck' => true)
@@ -284,7 +285,7 @@ class testInheritanceTriggerPrototype extends CWebTest {
 						'ERROR: Cannot add trigger',
 						'Trigger "triggerSimple" already exists on "Inheritance test template".')
 				)
-			)
+			)*/
 		);
 	}
 
@@ -319,7 +320,8 @@ class testInheritanceTriggerPrototype extends CWebTest {
 
 			case TRIGGER_BAD:
 				$this->checkTitle('Configuration of trigger prototypes');
-				$this->zbxTestTextPresent(array('CONFIGURATION OF TRIGGER PROTOTYPES', 'Trigger prototype'));
+				$this->zbxTestTextPresent('CONFIGURATION OF TRIGGER PROTOTYPES');
+				$this->assertElementPresent("//div[@id='tab_triggersTab' and text()='Trigger prototype']");
 				foreach ($data['errors'] as $msg) {
 					$this->zbxTestTextPresent($msg);
 				}
