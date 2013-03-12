@@ -235,6 +235,34 @@ class testInheritanceTrigger extends CWebTest {
 		$this->assertAttribute("//input[@id='bnt1']/@value", 'Add');
 	}
 
+	// Returns list of triggers
+	public static function allTriggers() {
+		return DBdata("select * from triggers t left join functions f on f.triggerid=t.triggerid where f.itemid='23329' and t.description LIKE 'testInheritanceTrigger%'");
+	}
+
+	/**
+	 * @dataProvider allTriggers
+	 */
+	public function testFormTrigger_simpleCreate($data) {
+		$description = $data['description'];
+
+		$sqlTriggers = "select * from triggers";
+		$oldHashTriggers = DBhash($sqlTriggers);
+
+		$this->zbxTestLogin('templates.php');
+		$this->zbxTestClickWait('link='.$this->template);
+		$this->zbxTestClickWait("//div[@class='w']//a[text()='Triggers']");
+
+		$this->zbxTestClickWait('link='.$description);
+		$this->zbxTestClickWait('save');
+		$this->checkTitle('Configuration of triggers');
+		$this->zbxTestTextPresent('Trigger updated');
+		$this->zbxTestTextPresent("$description");
+		$this->zbxTestTextPresent('TRIGGERS');
+
+		$this->assertEquals($oldHashTriggers, DBhash($sqlTriggers));
+	}
+
 	public static function simple() {
 		return array(
 			array(
