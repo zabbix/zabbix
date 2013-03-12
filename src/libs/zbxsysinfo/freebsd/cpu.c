@@ -40,15 +40,17 @@ static int	get_cpu_num(int online)
 	return -1;
 }
 
-int	SYSTEM_CPU_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+int	SYSTEM_CPU_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	char	tmp[16];
+	char	*tmp;
 	int	online = 0, ncpu;
 
-	if (1 < num_param(param))
+	if (1 < request->nparam)
 		return SYSINFO_RET_FAIL;
 
-	if (0 != get_param(param, 1, tmp, sizeof(tmp)) || '\0' == *tmp || 0 == strcmp(tmp, "online"))
+	tmp = get_rparam(request, 0);
+
+	if (NULL == tmp || '\0' == *tmp || 0 == strcmp(tmp, "online"))
 		online = 1;
 	else if (0 != strcmp(tmp, "max"))
 		return SYSINFO_RET_FAIL;
@@ -61,20 +63,26 @@ int	SYSTEM_CPU_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RES
 	return SYSINFO_RET_OK;
 }
 
-int	SYSTEM_CPU_UTIL(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+int	SYSTEM_CPU_UTIL(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	char	tmp[16];
+	char	*tmp;
 	int	cpu_num, state, mode;
 
-	if (3 < num_param(param))
+	if (3 < request->nparam)
 		return SYSINFO_RET_FAIL;
 
-	if (0 != get_param(param, 1, tmp, sizeof(tmp)) || '\0' == *tmp || 0 == strcmp(tmp, "all"))
+	tmp = get_rparam(request, 0);
+
+	if (NULL == tmp || '\0' == *tmp || 0 == strcmp(tmp, "all"))
 		cpu_num = 0;
-	else if (SUCCEED != is_uint(tmp) || 1 > (cpu_num = atoi(tmp) + 1))
+	else if (SUCCEED != is_uint31_1(tmp, &cpu_num))
 		return SYSINFO_RET_FAIL;
+	else
+		cpu_num++;
 
-	if (0 != get_param(param, 2, tmp, sizeof(tmp)) || '\0' == *tmp || 0 == strcmp(tmp, "user"))
+	tmp = get_rparam(request, 1);
+
+	if (NULL == tmp || '\0' == *tmp || 0 == strcmp(tmp, "user"))
 		state = ZBX_CPU_STATE_USER;
 	else if (0 == strcmp(tmp, "nice"))
 		state = ZBX_CPU_STATE_NICE;
@@ -87,7 +95,9 @@ int	SYSTEM_CPU_UTIL(const char *cmd, const char *param, unsigned flags, AGENT_RE
 	else
 		return SYSINFO_RET_FAIL;
 
-	if (0 != get_param(param, 3, tmp, sizeof(tmp)) || '\0' == *tmp || 0 == strcmp(tmp, "avg1"))
+	tmp = get_rparam(request, 2);
+
+	if (NULL == tmp || '\0' == *tmp || 0 == strcmp(tmp, "avg1"))
 		mode = ZBX_AVG1;
 	else if (0 == strcmp(tmp, "avg5"))
 		mode = ZBX_AVG5;
@@ -99,21 +109,25 @@ int	SYSTEM_CPU_UTIL(const char *cmd, const char *param, unsigned flags, AGENT_RE
 	return get_cpustat(result, cpu_num, state, mode);
 }
 
-int	SYSTEM_CPU_LOAD(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+int	SYSTEM_CPU_LOAD(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	char	tmp[16];
+	char	*tmp;
 	int	mode, per_cpu = 1, cpu_num;
 	double	load[ZBX_AVG_COUNT], value;
 
-	if (2 < num_param(param))
+	if (2 < request->nparam)
 		return SYSINFO_RET_FAIL;
 
-	if (0 != get_param(param, 1, tmp, sizeof(tmp)) || '\0' == *tmp || 0 == strcmp(tmp, "all"))
+	tmp = get_rparam(request, 0);
+
+	if (NULL == tmp || '\0' == *tmp || 0 == strcmp(tmp, "all"))
 		per_cpu = 0;
 	else if (0 != strcmp(tmp, "percpu"))
 		return SYSINFO_RET_FAIL;
 
-	if (0 != get_param(param, 2, tmp, sizeof(tmp)) || '\0' == *tmp || 0 == strcmp(tmp, "avg1"))
+	tmp = get_rparam(request, 1);
+
+	if (NULL == tmp || '\0' == *tmp || 0 == strcmp(tmp, "avg1"))
 		mode = ZBX_AVG1;
 	else if (0 == strcmp(tmp, "avg5"))
 		mode = ZBX_AVG5;
@@ -139,7 +153,7 @@ int	SYSTEM_CPU_LOAD(const char *cmd, const char *param, unsigned flags, AGENT_RE
 	return SYSINFO_RET_OK;
 }
 
-int     SYSTEM_CPU_SWITCHES(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+int     SYSTEM_CPU_SWITCHES(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	u_int	v_swtch;
 	size_t	len;
@@ -154,7 +168,7 @@ int     SYSTEM_CPU_SWITCHES(const char *cmd, const char *param, unsigned flags, 
 	return SYSINFO_RET_OK;
 }
 
-int     SYSTEM_CPU_INTR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+int     SYSTEM_CPU_INTR(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	u_int	v_intr;
 	size_t	len;
