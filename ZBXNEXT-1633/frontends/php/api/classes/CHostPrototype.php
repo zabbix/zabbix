@@ -51,7 +51,7 @@ class CHostPrototype extends CHostBase {
 	 */
 	public function get(array $options) {
 		$options = zbx_array_merge($this->getOptions, $options);
-		$options['filter']['flags'] = ZBX_FLAG_DISCOVERY_CHILD;
+		$options['filter']['flags'] = ZBX_FLAG_DISCOVERY_PROTOTYPE;
 
 		// build and execute query
 		$sql = $this->createSelectQuery($this->tableName(), $options);
@@ -164,7 +164,7 @@ class CHostPrototype extends CHostBase {
 	 */
 	protected function createReal(array $hostPrototypes) {
 		foreach ($hostPrototypes as &$hostPrototype) {
-			$hostPrototype['flags'] = ZBX_FLAG_DISCOVERY_CHILD;
+			$hostPrototype['flags'] = ZBX_FLAG_DISCOVERY_PROTOTYPE;
 		}
 		unset($hostPrototype);
 

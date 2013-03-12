@@ -407,7 +407,7 @@ abstract class CItemGeneral extends CZBXAPI {
 			case ZBX_FLAG_DISCOVERY:
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Item with key "%1$s" already exists on "%2$s" as a discovery rule.', $key, $host));
 				break;
-			case ZBX_FLAG_DISCOVERY_CHILD:
+			case ZBX_FLAG_DISCOVERY_PROTOTYPE:
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Item with key "%1$s" already exists on "%2$s" as an item prototype.', $key, $host));
 				break;
 			case ZBX_FLAG_DISCOVERY_CREATED:
@@ -549,7 +549,7 @@ abstract class CItemGeneral extends CZBXAPI {
 
 		// make it work for both graphs and graph prototypes
 		$filter['flags'] = array(
-			ZBX_FLAG_DISCOVERY_CHILD,
+			ZBX_FLAG_DISCOVERY_PROTOTYPE,
 			ZBX_FLAG_DISCOVERY_NORMAL,
 			ZBX_FLAG_DISCOVERY_CREATED
 		);
