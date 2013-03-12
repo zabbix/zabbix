@@ -1124,7 +1124,7 @@ class CItem extends CItemGeneral {
 					' FROM item_discovery id,items i'.
 					' WHERE '.dbConditionInt('id.itemid', $itemids).
 					' AND i.itemid=id.itemid'.
-					' AND i.flags='.ZBX_FLAG_DISCOVERY_CHILD
+					' AND i.flags='.ZBX_FLAG_DISCOVERY_PROTOTYPE
 			);
 			while ($rule = DBfetch($dbRules)) {
 				$relationMap->addRelation($rule['itemid'], $rule['parent_itemid']);

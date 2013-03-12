@@ -228,7 +228,7 @@ abstract class CHostGeneral extends CHostBase {
 	protected function unlink($templateids, $targetids = null, $clear = false) {
 		$flags = ($clear)
 			? array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY)
-			: array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY, ZBX_FLAG_DISCOVERY_CHILD);
+			: array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY, ZBX_FLAG_DISCOVERY_PROTOTYPE);
 
 		/* TRIGGERS {{{ */
 		// check that all triggers on templates that we unlink, don't have items from another templates
@@ -276,7 +276,7 @@ abstract class CHostGeneral extends CHostBase {
 		$dbTriggers = DBSelect($sql);
 		$triggers = array(
 			ZBX_FLAG_DISCOVERY_NORMAL => array(),
-			ZBX_FLAG_DISCOVERY_CHILD => array()
+			ZBX_FLAG_DISCOVERY_PROTOTYPE => array()
 		);
 		$triggerids = array();
 		while ($trigger = DBfetch($dbTriggers)) {
@@ -308,18 +308,18 @@ abstract class CHostGeneral extends CHostBase {
 			}
 		}
 
-		if (!empty($triggers[ZBX_FLAG_DISCOVERY_CHILD])) {
+		if (!empty($triggers[ZBX_FLAG_DISCOVERY_PROTOTYPE])) {
 			if ($clear) {
-				$result = API::TriggerPrototype()->delete(array_keys($triggers[ZBX_FLAG_DISCOVERY_CHILD]), true);
+				$result = API::TriggerPrototype()->delete(array_keys($triggers[ZBX_FLAG_DISCOVERY_PROTOTYPE]), true);
 				if (!$result) self::exception(ZBX_API_ERROR_INTERNAL, _('Cannot unlink and clear triggers'));
 			}
 			else{
 				DB::update('triggers', array(
 					'values' => array('templateid' => 0),
-					'where' => array('triggerid' => array_keys($triggers[ZBX_FLAG_DISCOVERY_CHILD]))
+					'where' => array('triggerid' => array_keys($triggers[ZBX_FLAG_DISCOVERY_PROTOTYPE]))
 				));
 
-				foreach ($triggers[ZBX_FLAG_DISCOVERY_CHILD] as $trigger) {
+				foreach ($triggers[ZBX_FLAG_DISCOVERY_PROTOTYPE] as $trigger) {
 					info(_s('Unlinked: Trigger prototype "%1$s" on "%2$s".', $trigger['description'], $trigger['host']));
 				}
 			}
@@ -344,7 +344,7 @@ abstract class CHostGeneral extends CHostBase {
 		$items = array(
 			ZBX_FLAG_DISCOVERY_NORMAL => array(),
 			ZBX_FLAG_DISCOVERY => array(),
-			ZBX_FLAG_DISCOVERY_CHILD => array(),
+			ZBX_FLAG_DISCOVERY_PROTOTYPE => array(),
 		);
 		while ($item = DBfetch($dbItems)) {
 			$items[$item['flags']][$item['itemid']] = array(
@@ -389,18 +389,18 @@ abstract class CHostGeneral extends CHostBase {
 		}
 
 
-		if (!empty($items[ZBX_FLAG_DISCOVERY_CHILD])) {
+		if (!empty($items[ZBX_FLAG_DISCOVERY_PROTOTYPE])) {
 			if ($clear) {
-				$result = API::Itemprototype()->delete(array_keys($items[ZBX_FLAG_DISCOVERY_CHILD]), true);
+				$result = API::Itemprototype()->delete(array_keys($items[ZBX_FLAG_DISCOVERY_PROTOTYPE]), true);
 				if (!$result) self::exception(ZBX_API_ERROR_INTERNAL, _('Cannot unlink and clear item prototypes'));
 			}
 			else{
 				DB::update('items', array(
 					'values' => array('templateid' => 0),
-					'where' => array('itemid' => array_keys($items[ZBX_FLAG_DISCOVERY_CHILD]))
+					'where' => array('itemid' => array_keys($items[ZBX_FLAG_DISCOVERY_PROTOTYPE]))
 				));
 
-				foreach ($items[ZBX_FLAG_DISCOVERY_CHILD] as $item) {
+				foreach ($items[ZBX_FLAG_DISCOVERY_PROTOTYPE] as $item) {
 					info(_s('Unlinked: Item prototype "%1$s" on "%2$s".', $item['name'], $item['host']));
 				}
 			}
@@ -465,7 +465,7 @@ abstract class CHostGeneral extends CHostBase {
 		$dbGraphs = DBSelect($sql);
 		$graphs = array(
 			ZBX_FLAG_DISCOVERY_NORMAL => array(),
-			ZBX_FLAG_DISCOVERY_CHILD => array(),
+			ZBX_FLAG_DISCOVERY_PROTOTYPE => array(),
 		);
 		while ($graph = DBfetch($dbGraphs)) {
 			$graphs[$graph['flags']][$graph['graphid']] = array(
@@ -475,18 +475,18 @@ abstract class CHostGeneral extends CHostBase {
 			);
 		}
 
-		if (!empty($graphs[ZBX_FLAG_DISCOVERY_CHILD])) {
+		if (!empty($graphs[ZBX_FLAG_DISCOVERY_PROTOTYPE])) {
 			if ($clear) {
-				$result = API::GraphPrototype()->delete(array_keys($graphs[ZBX_FLAG_DISCOVERY_CHILD]), true);
+				$result = API::GraphPrototype()->delete(array_keys($graphs[ZBX_FLAG_DISCOVERY_PROTOTYPE]), true);
 				if (!$result) self::exception(ZBX_API_ERROR_INTERNAL, _('Cannot unlink and clear graph prototypes'));
 			}
 			else{
 				DB::update('graphs', array(
 					'values' => array('templateid' => 0),
-					'where' => array('graphid' => array_keys($graphs[ZBX_FLAG_DISCOVERY_CHILD]))
+					'where' => array('graphid' => array_keys($graphs[ZBX_FLAG_DISCOVERY_PROTOTYPE]))
 				));
 
-				foreach ($graphs[ZBX_FLAG_DISCOVERY_CHILD] as $graph) {
+				foreach ($graphs[ZBX_FLAG_DISCOVERY_PROTOTYPE] as $graph) {
 					info(_s('Unlinked: Graph prototype "%1$s" on "%2$s".', $graph['name'], $graph['host']));
 				}
 			}

@@ -724,7 +724,7 @@ function explode_exp($expression, $html = false, $resolve_macro = false, $src_ho
 					if ($function_data['flags'] == ZBX_FLAG_DISCOVERY_CREATED || $function_data['type'] == ITEM_TYPE_HTTPTEST) {
 						$link = new CSpan($function_data['host'].':'.$function_data['key_'], $style);
 					}
-					elseif ($function_data['flags'] == ZBX_FLAG_DISCOVERY_CHILD) {
+					elseif ($function_data['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
 						$link = new CLink($function_data['host'].':'.$function_data['key_'],
 							'disc_prototypes.php?form=update&itemid='.$function_data['itemid'].'&parent_discoveryid='.
 							$trigger['discoveryRuleid'].'&switch_node='.id2nodeid($function_data['itemid']), $style);
@@ -844,7 +844,7 @@ function triggerExpression($trigger, $html = false) {
 					if ($function_data['flags'] == ZBX_FLAG_DISCOVERY_CREATED || $function_data['type'] == ITEM_TYPE_HTTPTEST) {
 						$link = new CSpan($function_data['host'].':'.$function_data['key_'], $style);
 					}
-					elseif ($function_data['flags'] == ZBX_FLAG_DISCOVERY_CHILD) {
+					elseif ($function_data['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
 						$link = new CLink($function_data['host'].':'.$function_data['key_'],
 							'disc_prototypes.php?form=update&itemid='.$function_data['itemid'].'&parent_discoveryid='.
 							$trigger['discoveryRuleid'], $style);
@@ -927,7 +927,7 @@ function implode_exp($expression, $triggerid, &$hostnames = array()) {
 					'SELECT i.itemid,i.value_type,h.name'.
 					' FROM items i,hosts h'.
 					' WHERE i.key_='.zbx_dbstr($exprPart['item']).
-						' AND '.dbConditionInt('i.flags', array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED, ZBX_FLAG_DISCOVERY_CHILD)).
+						' AND '.dbConditionInt('i.flags', array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED, ZBX_FLAG_DISCOVERY_PROTOTYPE)).
 						' AND h.host='.zbx_dbstr($exprPart['host']).
 						' AND h.hostid=i.hostid'.
 						andDbNode('i.itemid')
