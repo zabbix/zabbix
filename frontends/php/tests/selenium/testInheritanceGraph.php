@@ -47,13 +47,13 @@ class testInheritanceGraph extends CWebTest {
 	 *
 	 * @var string
 	 */
-	protected $itemName = 'itemInheritance';
+	protected $item = 'itemInheritance';
 
 	/**
 	 * Backup the tables that will be modified during the tests.
 	 */
 	public function testInheritanceGraph_setup() {
-		DBsave_tables('hosts');
+		DBsave_tables('graphs');
 	}
 
 	// returns all possible item types
@@ -270,7 +270,7 @@ class testInheritanceGraph extends CWebTest {
 
 		// add general item
 		$this->zbxTestLaunchPopup('add_item');
-		$this->zbxTestClick('link='.$this->itemName);
+		$this->zbxTestClick('link='.$this->item);
 		$this->selectWindow(null);
 		sleep(1);
 
@@ -322,7 +322,6 @@ class testInheritanceGraph extends CWebTest {
 				$this->assertNotVisible('yaxismax');
 				break;
 			case 'Item':
-				$this->zbxTestDropdownSelectWait('ymax_type', 'Calculated');
 				$this->zbxTestDropdownSelectWait('ymax_type', 'Item');
 				$this->assertElementPresent('ymax_name');
 				$this->assertElementPresent('yaxis_max');
@@ -365,7 +364,7 @@ class testInheritanceGraph extends CWebTest {
 
 	// Returns list of graphs
 	public static function allGraphs() {
-		return DBdata("select * from graphs g left join graphs_items gi on gi.graphid=g.graphid where gi.itemid='23329' and g.graphid > 499999");
+		return DBdata("select * from graphs g left join graphs_items gi on gi.graphid=g.graphid where gi.itemid='23329' and g.name LIKE 'testInheritanceGraph%'");
 	}
 
 	/**
@@ -403,10 +402,10 @@ class testInheritanceGraph extends CWebTest {
 			array(
 				array(
 					'expected' => GRAPH_GOOD,
-					'graphName' => 'graphSaveCheck',
+					'name' => 'graphSaveCheck',
 					'addItems' => array(
-						array('itemName' => 'CPU nice time', 'remove' => true),
-						array('itemName' => 'Host name')
+						array('itemName' => 'itemInheritance', 'remove' => true),
+						array('itemName' => 'itemInheritance')
 					),
 					'dbCheck' => true,
 					'formCheck' => true
@@ -415,7 +414,7 @@ class testInheritanceGraph extends CWebTest {
 			array(
 				array(
 					'expected' => GRAPH_BAD,
-					'graphName' => 'graphSaveCheck',
+					'name' => 'graphSaveCheck',
 					'errors' => array(
 						'ERROR: Cannot add graph',
 						'Graph with name "graphSaveCheck" already exists in graphs or graph prototypes.'
@@ -425,7 +424,8 @@ class testInheritanceGraph extends CWebTest {
 			array(
 				array(
 					'expected' => GRAPH_BAD,
-					'graphName' => 'graphSaveCheck',
+					'name' => 'graphSaveCheck',
+					'noItems' => true,
 					'errors' => array(
 						'ERROR: Cannot add graph',
 						'Missing items for graph "graphSaveCheck".'
@@ -435,10 +435,10 @@ class testInheritanceGraph extends CWebTest {
 			array(
 				array(
 					'expected' => GRAPH_GOOD,
-					'graphName' => 'graphNormal1',
+					'name' => 'graphNormal1',
 					'ymin_type' => 'Fixed',
 					'ymax_type' => 'Item',
-					'ymax_name' => 'Agent ping',
+					'ymax_name' => 'itemInheritance',
 					'dbCheck' => true,
 					'formCheck' => true
 				)
@@ -446,11 +446,11 @@ class testInheritanceGraph extends CWebTest {
 			array(
 				array(
 					'expected' => GRAPH_GOOD,
-					'graphName' => 'graphNormal2',
+					'name' => 'graphNormal2',
 					'ymin_type' => 'Item',
-					'ymin_name' => 'Agent ping',
+					'ymin_name' => 'itemInheritance',
 					'ymax_type' => 'Item',
-					'ymax_name' => 'Agent ping',
+					'ymax_name' => 'itemInheritance',
 					'dbCheck' => true,
 					'formCheck' => true
 				)
@@ -458,10 +458,10 @@ class testInheritanceGraph extends CWebTest {
 			array(
 				array(
 					'expected' => GRAPH_GOOD,
-					'graphName' => 'graphNormal3',
+					'name' => 'graphNormal3',
 					'ymin_type' => 'Fixed',
 					'ymax_type' => 'Item',
-					'ymax_name' => 'Agent ping',
+					'ymax_name' => 'itemInheritance',
 					'dbCheck' => true,
 					'formCheck' => true
 				)
@@ -469,51 +469,39 @@ class testInheritanceGraph extends CWebTest {
 			array(
 				array(
 					'expected' => GRAPH_GOOD,
-					'graphName' => 'graphNormal4',
-					'graphtype' => 'Normal',
-					'addItems' => array(
-						array('itemName' => 'Host name')
-					)
+					'name' => 'graphNormal4',
+					'graphtype' => 'Normal'
 				)
 			),
 			array(
 				array(
 					'expected' => GRAPH_GOOD,
-					'graphName' => 'graphStacked1',
+					'name' => 'graphStacked1',
+					'graphtype' => 'Stacked'
+				)
+			),
+			array(
+				array(
+					'expected' => GRAPH_GOOD,
+					'name' => 'graphStacked2',
 					'graphtype' => 'Stacked',
-					'addItems' => array(
-						array('itemName' => 'Host name')
-					)
+					'ymin_type' => 'Fixed'
 				)
 			),
 			array(
 				array(
 					'expected' => GRAPH_GOOD,
-					'graphName' => 'graphStacked2',
-					'graphtype' => 'Stacked',
-					'ymin_type' => 'Fixed' ,
-					'addItems' => array(
-						array('itemName' => 'Host name')
-					)
-				)
-			),
-			array(
-				array(
-					'expected' => GRAPH_GOOD,
-					'graphName' => 'graphStacked3',
+					'name' => 'graphStacked3',
 					'graphtype' => 'Stacked',
 					'ymin_type' => 'Item',
-					'ymin_name' => 'Agent ping',
-					'ymax_type' => 'Fixed',
-					'addItems' => array(
-						array('itemName' => 'Host name')
-					)
+					'ymin_name' => 'itemInheritance',
+					'ymax_type' => 'Fixed'
 				)
 			),
 			array(
 				array(
 					'expected' => GRAPH_BAD,
-					'graphName' => 'graphStacked',
+					'name' => 'graphStacked',
 					'graphtype' => 'Stacked',
 					'ymin_type' => 'Item',
 					'ymax_type' => 'Fixed',
@@ -526,7 +514,7 @@ class testInheritanceGraph extends CWebTest {
 			array(
 				array(
 					'expected' => GRAPH_BAD,
-					'graphName' => 'graphStacked',
+					'name' => 'graphStacked',
 					'width' => 'name',
 					'height' => 'name',
 					'graphtype' => 'Stacked',
@@ -546,7 +534,7 @@ class testInheritanceGraph extends CWebTest {
 			array(
 				array(
 					'expected' => GRAPH_BAD,
-					'graphName' => 'graphStacked',
+					'name' => 'graphStacked',
 					'width' => '65536',
 					'height' => '-22',
 					'graphtype' => 'Stacked',
@@ -562,69 +550,67 @@ class testInheritanceGraph extends CWebTest {
 			array(
 				array(
 					'expected' => GRAPH_GOOD,
-					'graphName' => 'graphPie',
-					'graphtype' => 'Pie',
-					'addItems' => array(
-						array('itemName' => 'Host name')
-					)
+					'name' => 'graphPie',
+					'graphtype' => 'Pie'
 				)
 			),
 			array(
 				array(
 					'expected' => GRAPH_GOOD,
-					'graphName' => 'graphExploded',
-					'graphtype' => 'Exploded',
-					'addItems' => array(
-						array('itemName' => 'Host name')
-					)
+					'name' => 'graphExploded',
+					'graphtype' => 'Exploded'
 				)
 			),
 			array(
 				array(
 					'expected' => GRAPH_GOOD,
-					'graphName' => 'graph!@#$%^&*()><>?:"|{},./;',
+					'name' => 'graph!@#$%^&*()><>?:"|{},./;',
 					'graphtype' => 'Exploded',
 					'dbCheck' => true,
 					'formCheck' => true
 				)
-			)
+			),
 			array(
 				array('expected' => GRAPH_GOOD,
-					'graphName' => 'graphSimple',
+					'name' => 'graphSimple',
 					'hostCheck' => true,
-					'dbCheck' => true)
+					'dbCheck' => true
+				)
 			),
 			array(
 				array('expected' => GRAPH_GOOD,
-					'graphName' => 'graphName',
-					'hostCheck' => true)
+					'name' => 'name',
+					'hostCheck' => true
+				)
 			),
 			array(
 				array('expected' => GRAPH_GOOD,
-					'graphName' => 'graphRemove',
-					'hostCheck' => true,
-					'dbCheck' => true,
-					'remove' => true)
-			),
-			array(
-				array('expected' => GRAPH_GOOD,
-					'graphName' => 'graphNotRemove',
+					'name' => 'graphRemove',
 					'hostCheck' => true,
 					'dbCheck' => true,
-					'hostRemove' => true,
-					'remove' => true)
+					'remove' => true
+				)
 			),
 			array(
 				array('expected' => GRAPH_GOOD,
-					'graphName' => 'graphSomeRemove',
+					'name' => 'graphNotRemove',
 					'hostCheck' => true,
 					'dbCheck' => true,
 					'hostRemove' => true,
 					'remove' => true)
+			),
+			array(
+				array('expected' => GRAPH_GOOD,
+					'name' => 'graphSomeRemove',
+					'hostCheck' => true,
+					'dbCheck' => true,
+					'hostRemove' => true,
+					'remove' => true
+				)
 			),
 			array(
 				array('expected' => GRAPH_BAD,
-					'graphName' => 'graphSimple',
+					'name' => 'graphSimple',
 					'errors' => array(
 						'ERROR: Cannot add graph',
 						'Graph with name "graphSimple" already exists in graphs or graph prototypes')
@@ -639,20 +625,116 @@ class testInheritanceGraph extends CWebTest {
 	public function testInheritanceGraph_create($data) {
 		$this->zbxTestLogin('templates.php');
 
-		$graphName = $data['graphName'];
 
 		$this->zbxTestClickWait('link='.$this->template);
 		$this->zbxTestClickWait("//div[@class='w']//a[text()='Graphs']");
 		$this->zbxTestClickWait('form');
 
-		$this->input_type('name', $graphName);
-		$this->zbxTestLaunchPopup('add_item');
-		$this->zbxTestClick('link='.$this->itemName);
-		$this->selectWindow(null);
-		sleep(1);
+		if (isset($data['name'])) {
+			$this->input_type('name', $data['name']);
+		}
+		$graphName = $this->getValue('name');
+
+		if (isset($data['graphtype'])) {
+			$this->zbxTestDropdownSelectWait('graphtype', $data['graphtype']);
+		}
+		$graphtype = $this->getSelectedLabel('graphtype');
+
+		if (isset($data['addItems'])) {
+			foreach($data['addItems'] as $item) {
+				$this->zbxTestLaunchPopup('add_item');
+				$link = $item['itemName'];
+				$this->zbxTestClick("link=$link");
+				sleep(1);
+				$this->selectWindow(null);
+				if(isset($item['remove'])) {
+				$this->zbxTestClick('items_0_remove');
+				}
+			}
+		}
+		elseif (!isset($data['noItems'])) {
+			$this->zbxTestLaunchPopup('add_item');
+			$this->zbxTestClick('link='.$this->item);
+			sleep(1);
+			$this->selectWindow(null);
+
+		}
+
+		if (isset($data['width'])) {
+			$this->input_type('width', $data['width']);
+		}
+		$width = $this->getValue('width');
+
+		if (isset($data['height'])) {
+			$this->input_type('height', $data['height']);
+		}
+		$height = $this->getValue('height');
+
+		if (isset($data['ymin_type'])) {
+			$this->zbxTestDropdownSelectWait('ymin_type', $data['ymin_type']);
+			sleep(1);
+		}
+
+		if (isset($data['ymax_type'])) {
+			$this->zbxTestDropdownSelectWait('ymax_type', $data['ymax_type']);
+			sleep(1);
+		}
+
+		if ($graphtype == 'Normal' || $graphtype == 'Stacked') {
+			$ymin_type = $this->getSelectedLabel('ymin_type');
+			$ymax_type = $this->getSelectedLabel('ymax_type');
+		}
+		else {
+			$ymin_type = null;
+			$ymax_type = null;
+		}
+
+		if (isset($data['yaxismin'])) {
+			$this->input_type('yaxismin' ,$data['yaxismin']);
+			$yaxismin = $this->getValue('yaxismin');
+		}
+		elseif ($ymin_type == 'Fixed') {
+			$yaxismin = $this->getValue('yaxismin');
+		}
+		else {
+			$yaxismin = null;
+		}
+
+		if (isset($data['yaxismax'])) {
+			$this->input_type('yaxismax' ,$data['yaxismax']);
+			$yaxismin = $this->getValue('yaxismax');
+		}
+		elseif ($ymax_type == 'Fixed') {
+			$yaxismax = $this->getValue('yaxismax');
+		}
+		else {
+			$yaxismax = null;
+		}
+
+		if (isset($data['ymin_name'])) {
+			$this->zbxTestLaunchPopup('yaxis_min' , 'zbx_popup_item');
+			$this->zbxTestClick('link='.$this->item);
+			$this->selectWindow(null);
+			sleep(1);
+			$ymin_name = $data['ymin_name'];
+			$yminValue = $this->getValue('ymin_name');
+
+			$this->assertEquals($yminValue, $this->template.": $ymin_name");
+		}
+
+		if (isset($data['ymax_name'])) {
+			$this->zbxTestLaunchPopup('yaxis_max', 'zbx_popup_item');
+			$this->zbxTestClick('link='.$this->item);
+			$this->selectWindow(null);
+			sleep(1);
+			$ymax_name = $data['ymax_name'];
+			$ymaxValue = $this->getValue('ymax_name');
+
+			$this->assertEquals($ymaxValue, $this->template.": $ymax_name");
+		}
 
 		$this->zbxTestClickWait('save');
-
+		$expected = $data['expected'];
 		switch ($data['expected']) {
 			case GRAPH_GOOD:
 				$this->zbxTestTextPresent('Graph added');
@@ -678,7 +760,7 @@ class testInheritanceGraph extends CWebTest {
 			$this->zbxTestClickWait("link=$graphName");
 
 			$this->assertElementValue('name', $graphName);
-			$this->assertElementPresent("//span[text()='".$this->host.': '.$this->itemName"']");
+			$this->assertElementPresent("//span[text()='".$this->host.': '.$this->item."']");
 		}
 
 		if (isset($data['dbCheck'])) {
@@ -739,6 +821,6 @@ class testInheritanceGraph extends CWebTest {
 	 * Restore the original tables.
 	 */
 	public function testInheritanceGraph_teardown() {
-		DBrestore_tables('hosts');
+		DBrestore_tables('graphs');
 	}
 }
