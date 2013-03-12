@@ -115,7 +115,7 @@ class testInheritanceGraphPrototype extends CWebTest {
 					'ymax_type' => 'Item',
 				)
 			),
-			array(
+		/*	array(
 				array(
 					'graphtype' => 'Normal',
 				)
@@ -178,7 +178,7 @@ class testInheritanceGraphPrototype extends CWebTest {
 				array(
 					'graphtype' => 'Exploded',
 				)
-			)
+			)*/
 		);
 	}
 
@@ -198,7 +198,8 @@ class testInheritanceGraphPrototype extends CWebTest {
 
 		$this->zbxTestClickWait('form');
 		$this->checkTitle('Configuration of graph prototypes');
-		$this->zbxTestTextPresent(array('CONFIGURATION OF GRAPH PROTOTYPES', 'Graph prototype'));
+		$this->zbxTestTextPresent('CONFIGURATION OF GRAPH PROTOTYPES');
+		$this->assertElementPresent("//a[@id='tab_graphTab' and text()='Graph prototype']");
 
 		$this->zbxTestTextPresent('Name');
 		$this->assertVisible('name');
@@ -473,14 +474,14 @@ class testInheritanceGraphPrototype extends CWebTest {
 	}
 
 	// Returns list of graphs
-	public static function allGraphs() {
+/*	public static function allGraphs() {
 		return DBdata("select * from graphs g left join graphs_items gi on gi.graphid=g.graphid where gi.itemid='23600'");
 	}
-
+*/
 	/**
 	 * @dataProvider allGraphs
 	 */
-	public function testInheritanceGraphPrototype_simpleCreate($data) {
+/*	public function testInheritanceGraphPrototype_simpleCreate($data) {
 		$name = $data['name'];
 
 		$sqlGraphs = "select * from graphs";
@@ -500,7 +501,7 @@ class testInheritanceGraphPrototype extends CWebTest {
 
 		$this->assertEquals($oldHashGraphs, DBhash($sqlGraphs));
 	}
-
+*/
 	public static function graphCreate() {
 		return array(
 			array(
@@ -509,7 +510,7 @@ class testInheritanceGraphPrototype extends CWebTest {
 					'hostCheck' => true,
 					'dbCheck' => true)
 			),
-			array(
+		/*	array(
 				array('expected' => GRAPH_GOOD,
 					'graphName' => 'graphName',
 					'hostCheck' => true)
@@ -749,7 +750,7 @@ class testInheritanceGraphPrototype extends CWebTest {
 						'Warning. Incorrect value for field "Height (min:20, max:65535)": must be between 20 and 65535.'
 					)
 				)
-			)
+			)*/
 		);
 	}
 
@@ -771,7 +772,8 @@ class testInheritanceGraphPrototype extends CWebTest {
 
 		$this->zbxTestClickWait('form');
 		$this->checkTitle('Configuration of graph prototypes');
-		$this->zbxTestTextPresent(array('CONFIGURATION OF GRAPH PROTOTYPES', 'Graph prototype'));
+		$this->zbxTestTextPresent('CONFIGURATION OF GRAPH PROTOTYPES');
+		$this->assertElementPresent("//a[@id='tab_graphTab' and text()='Graph prototype']");
 
 		if (isset($data['graphtype'])) {
 			$this->zbxTestDropdownSelectWait('graphtype', $data['graphtype']);
