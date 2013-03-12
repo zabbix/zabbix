@@ -25,164 +25,117 @@
 #define DO_MIN 2
 #define DO_AVG 3
 
-int	PROC_MEM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	DIR	*dir;
 	int	proc;
 
 	struct dirent	*entries;
 	struct stat		buf;
-	struct passwd	*usrinfo = NULL;
+	struct passwd	*usrinfo;
 	struct prpsinfo	psinfo;
 
 	char	filename[MAX_STRING_LEN];
 
-	char	procname[MAX_STRING_LEN];
-	char	usrname[MAX_STRING_LEN];
-	char	mode[MAX_STRING_LEN];
-	char	proccomm[MAX_STRING_LEN];
-
-	int	do_task = DO_SUM;
+	char	*procname, *proccomm, *param;
 
 	double	memsize = -1;
 	int	pgsize = getpagesize();
-	int	proccount = 0;
+	int	proccount = 0, do_task;
 	pid_t	curr_pid = getpid();
 
-	if(num_param(param) > 4)
-	{
+	if (4 < request->nparam)
 		return SYSINFO_RET_FAIL;
-	}
 
-	if(get_param(param, 1, procname, MAX_STRING_LEN) != 0)
-	{
-		return SYSINFO_RET_FAIL;
-	}
+	procname = get_rparam(request, 0);
+	param = get_rparam(request, 1);
 
-	if(get_param(param, 2, usrname, MAX_STRING_LEN) != 0)
+	if (NULL != param && '\0' != *param)
 	{
-		usrname[0] = 0;
+		if (NULL == (usrinfo = getpwnam(param)))	/* incorrect user name */
+			return SYSINFO_RET_FAIL;
 	}
 	else
-        {
-		if(usrname[0] != 0)
-		{
-			usrinfo = getpwnam(usrname);
-			if(usrinfo == NULL)
-			{ /* incorrect user name */
-				return SYSINFO_RET_FAIL;
-			}
-		}
-	}
+		usrinfo = NULL;
 
-	if(get_param(param, 3, mode, MAX_STRING_LEN) != 0)
-	{
-		mode[0] = '\0';
-	}
+	param = get_rparam(request, 2);
 
-	if(mode[0] == '\0')
-	{
-		strscpy(mode, "sum");
-	}
-
-	if(strcmp(mode,"avg") == 0)
-	{
-		do_task = DO_AVG;
-	}
-	else if(strcmp(mode,"max") == 0)
-	{
-		do_task = DO_MAX;
-	}
-	else if(strcmp(mode,"min") == 0)
-	{
-		do_task = DO_MIN;
-	}
-	else if(strcmp(mode,"sum") == 0)
-	{
+	if (NULL == param || '\0' == *param || 0 == strcmp(param, "sum"))	/* default parameter */
 		do_task = DO_SUM;
-	}
+	else if (0 == strcmp(param, "avg"))
+		do_task = DO_AVG;
+	else if (0 == strcmp(param, "max"))
+		do_task = DO_MAX;
+	else if (0 == strcmp(param, "min"))
+		do_task = DO_MIN;
 	else
-	{
 		return SYSINFO_RET_FAIL;
-	}
 
-	if(get_param(param, 4, proccomm, MAX_STRING_LEN) != 0)
+	proccomm = get_rparam(request, 3);
+
+	if (NULL == (dir = opendir("/proc")))
+		return SYSINFO_RET_FAIL;
+
+	while (NULL != (entries = readdir(dir)))
 	{
-		proccomm[0] = '\0';
-	}
+		strscpy(filename, "/proc/");
+		zbx_strlcat(filename, entries->d_name, MAX_STRING_LEN);
 
-	dir=opendir("/proc");
-	if(NULL == dir)
-	{
-	    return SYSINFO_RET_FAIL;
-	}
-
-	while((entries=readdir(dir))!=NULL)
-	{
-		strscpy(filename,"/proc/");
-		zbx_strlcat(filename,entries->d_name,MAX_STRING_LEN);
-
-		if(stat(filename,&buf)==0)
+		if (0 == stat(filename, &buf))
 		{
-			proc = open(filename,O_RDONLY);
-			if(proc == -1)
+			proc = open(filename, O_RDONLY);
+			if (-1 == proc)
 				goto lbl_skip_procces;
 
-			if(ioctl(proc,PIOCPSINFO,&psinfo) == -1)
+			if (-1 == ioctl(proc, PIOCPSINFO, &psinfo))
 				goto lbl_skip_procces;
 
 			/* Self process information. It leads to incorrect results for proc_cnt[zabbix_agentd] */
-			if(psinfo.pr_pid == curr_pid)
+			if (psinfo.pr_pid == curr_pid)
 				goto lbl_skip_procces;
 
-			if(procname[0] != 0)
-				if(strcmp(procname,psinfo.pr_fname) != 0)
+			if (NULL != procname && '\0' != *procname)
+				if (0 == strcmp(procname, psinfo.pr_fname))
 					goto lbl_skip_procces;
 
-
-			if(usrinfo != NULL)
-				if(usrinfo->pw_uid != psinfo.pr_uid)
+			if (NULL != usrinfo)
+				if (usrinfo->pw_uid != psinfo.pr_uid)
 					goto lbl_skip_procces;
 
-			if(proccomm[0] != '\0')
-				if(zbx_regexp_match(psinfo.pr_psargs,proccomm,NULL) == NULL)
+			if (NULL != proccomm && '\0' != *proccomm)
+				if (NULL == zbx_regexp_match(psinfo.pr_psargs, proccomm, NULL))
 					goto lbl_skip_procces;
 
 			proccount++;
 
-			if(memsize < 0) /* First inicialization */
+			if (0 > memsize) /* First inicialization */
 			{
 				memsize = (double) (psinfo.pr_rssize * pgsize);
 			}
 			else
 			{
-				if(do_task == DO_MAX)
-				{
+				if (DO_MAX == do_task)
 					memsize = MAX(memsize, (double) (psinfo.pr_rssize * pgsize));
-				}
-				else if(do_task == DO_MIN)
-				{
+				else if (DO_MIN == do_task)
 					memsize = MIN(memsize, (double) (psinfo.pr_rssize * pgsize));
-				}
-				else /* SUM */
-				{
+				else	/* SUM */
 					memsize +=  (double) (psinfo.pr_rssize * pgsize);
-				}
 			}
 lbl_skip_procces:
-			if(proc) close(proc);
+			if (proc)
+				close(proc);
 		}
 	}
 
 	closedir(dir);
 
-	if(memsize < 0)
+	if (0 > memsize)
 	{
 		/* incorrect process name */
 		memsize = 0;
 	}
 
-	if(do_task == DO_AVG)
+	if (DO_AVG == do_task)
 	{
 		SET_DBL_RESULT(result, proccount == 0 ? 0 : ((double)memsize/(double)proccount));
 	}
@@ -194,134 +147,91 @@ lbl_skip_procces:
 	return SYSINFO_RET_OK;
 }
 
-int	PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	DIR	*dir;
 	int	proc;
 
 	struct  dirent	*entries;
 	struct  stat	buf;
-	struct passwd	*usrinfo = NULL;
+	struct passwd	*usrinfo;
 	struct prpsinfo	psinfo;
 
 	char	filename[MAX_STRING_LEN];
 
-	char	procname[MAX_STRING_LEN];
-	char	usrname[MAX_STRING_LEN];
-	char	procstat[MAX_STRING_LEN];
-	char	proccomm[MAX_STRING_LEN];
+	char	*procname, *proccomm, *param;
 
-	int	do_task = DO_SUM;
-
-	int	proccount = 0;
+	int	proccount = 0, zbx_proc_stat;
 	pid_t	curr_pid = getpid();
 
-	if(num_param(param) > 4)
-	{
+	if (4 < request->nparam)
 		return SYSINFO_RET_FAIL;
-	}
 
-	if(get_param(param, 1, procname, MAX_STRING_LEN) != 0)
-	{
-		return SYSINFO_RET_FAIL;
-	}
+	procname = get_rparam(request, 0);
+	param = get_rparam(request, 1);
 
-	if(get_param(param, 2, usrname, MAX_STRING_LEN) != 0)
+	if (NULL != param && '\0' != *param)
 	{
-		usrname[0] = 0;
+		if (NULL == (usrinfo = getpwnam(param)))	/* incorrect user name */
+			return SYSINFO_RET_FAIL;
 	}
 	else
-        {
-		if(usrname[0] != 0)
-		{
-			usrinfo = getpwnam(usrname);
-			if(usrinfo == NULL)
-			{ /* incorrect user name */
-				return SYSINFO_RET_FAIL;
-			}
-		}
-	}
+		usrinfo = NULL;
 
-	if(get_param(param, 3, procstat, MAX_STRING_LEN) != 0)
-	{
-		procstat[0] = '\0';
-	}
+	param = get_rparam(request, 2);
 
-	if(procstat[0] == '\0')
-	{
-		strscpy(procstat, "all");
-	}
+	if (NULL == param || '\0' == *param || 0 == strcmp(param, "all"))
+		zbx_proc_stat = -1;
+	else if (0 == strcmp(param, "run"))
+		zbx_proc_stat = PR_SRUN;
+	else if (0 == strcmp(param, "sleep"))
+		zbx_proc_stat = PR_SSLEEP;
+	else if (0 == strcmp(param, "zomb"))
+		zbx_proc_stat = PR_SZOMB;
 
-        if(strcmp(procstat,"run") == 0)
-        {
-		procstat[0] = PR_SRUN;		procstat[1] = '\0';
-        }
-        else if(strcmp(procstat,"sleep") == 0)
-        {
-		procstat[0] = PR_SSLEEP;	procstat[1] = '\0';
-        }
-        else if(strcmp(procstat,"zomb") == 0)
-        {
-		procstat[0] = PR_SZOMB;		procstat[1] = '\0';
-        }
-        else if(strcmp(procstat,"all") == 0)
-        {
-		procstat[0] = '\0';
-        }
-        else
-        {
+	proccomm = get_rparam(request, 3);
+
+	if (NULL == (dir = opendir("/proc")))
 		return SYSINFO_RET_FAIL;
-        }
 
-	if(get_param(param, 4, proccomm, MAX_STRING_LEN) != 0)
+	while(NULL != (entries=readdir(dir)))
 	{
-		proccomm[0] = '\0';
-	}
+		strscpy(filename, "/proc/");
+		zbx_strlcat(filename, entries->d_name,MAX_STRING_LEN);
 
-	dir=opendir("/proc");
-	if(NULL == dir)
-	{
-	    return SYSINFO_RET_FAIL;
-	}
-
-	while((entries=readdir(dir))!=NULL)
-	{
-		strscpy(filename,"/proc/");
-		zbx_strlcat(filename,entries->d_name,MAX_STRING_LEN);
-
-		if(stat(filename,&buf)==0)
+		if (0 == stat(filename,&buf))
 		{
-			proc = open(filename,O_RDONLY);
-			if(proc == -1)
+			proc = open(filename, O_RDONLY);
+			if (-1 == proc)
 				goto lbl_skip_procces;
 
-			if(ioctl(proc,PIOCPSINFO,&psinfo) == -1)
+			if (-1 == ioctl(proc,PIOCPSINFO,&psinfo))
 				goto lbl_skip_procces;
 
 			/* Self process information. It leads to incorrect results for proc_cnt[zabbix_agentd] */
-			if(psinfo.pr_pid == curr_pid)
+			if (psinfo.pr_pid == curr_pid)
 				goto lbl_skip_procces;
 
-			if(procname[0] != 0)
-				if(strcmp(procname,psinfo.pr_fname) != 0)
+			if (NULL != procname && '\0' != *procname)
+				if (0 != strcmp(procname, psinfo.pr_fname))
 					goto lbl_skip_procces;
 
-			if(usrinfo != NULL)
-				if(usrinfo->pw_uid != psinfo.pr_uid)
+			if (NULL != usrinfo)
+				if (usrinfo->pw_uid != psinfo.pr_uid)
 					goto lbl_skip_procces;
 
-			if(procstat[0] != '\0')
-				if(psinfo.pr_sname != procstat[0])
+			if (-1 != zbx_proc_stat)
+				if (psinfo.pr_sname != zbx_proc_stat)
 					goto lbl_skip_procces;
 
-			if(proccomm[0] != '\0')
-				if(zbx_regexp_match(psinfo.pr_psargs,proccomm,NULL) == NULL)
+			if (NULL != proccomm && '\0' != *proccomm)
+				if (NULL == zbx_regexp_match(psinfo.pr_psargs, proccomm, NULL))
 					goto lbl_skip_procces;
 
 			proccount++;
-
 lbl_skip_procces:
-			if(proc) close(proc);
+			if (proc)
+				close(proc);
 		}
 	}
 

@@ -78,25 +78,24 @@ int	tcp_expect(const char *host, unsigned short port, int timeout, const char *r
 	return SYSINFO_RET_OK;
 }
 
-int	NET_TCP_PORT(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+int	NET_TCP_PORT(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	unsigned short	port;
 	int		value_int, ret;
-	char		ip[64], port_str[8];
+	char		*ip_str, ip[64], *port_str;
 
-	if (2 < num_param(param))
+	if (2 < request->nparam)
 		return SYSINFO_RET_FAIL;
 
-	if (0 != get_param(param, 1, ip, sizeof(ip)))
-		*ip = '\0';
+	ip_str = get_rparam(request, 0);
+	port_str = get_rparam(request, 1);
 
-	if ('\0' == *ip)
+	if (NULL == ip_str || '\0' == *ip_str)
 		strscpy(ip, "127.0.0.1");
+	else
+		strscpy(ip, ip_str);
 
-	if (0 != get_param(param, 2, port_str, sizeof(port_str)))
-		*port_str = '\0';
-
-	if (SUCCEED != is_ushort(port_str, &port))
+	if (NULL == port_str || SUCCEED != is_ushort(port_str, &port))
 		return SYSINFO_RET_FAIL;
 
 	if (SYSINFO_RET_OK == (ret = tcp_expect(ip, port, CONFIG_TIMEOUT, NULL, NULL, NULL, &value_int)))
@@ -170,13 +169,13 @@ static char	*get_name(unsigned char *msg, unsigned char *msg_end, unsigned char 
 
 #endif	/* defined(HAVE_RES_QUERY) || defined(_WINDOWS) */
 
-static int	dns_query(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result, int short_answer)
+static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_answer)
 {
 #if defined(HAVE_RES_QUERY) || defined(_WINDOWS)
 
 	size_t		offset = 0;
 	int		res, type, retrans, retry, i, ret = SYSINFO_RET_FAIL;
-	char		ip[MAX_STRING_LEN], zone[MAX_STRING_LEN], tmp[MAX_STRING_LEN], buffer[MAX_STRING_LEN];
+	char		*ip, zone[MAX_STRING_LEN], buffer[MAX_STRING_LEN], *zone_str, *param;
 	struct in_addr	inaddr;
 
 	typedef struct
@@ -214,7 +213,7 @@ static int	dns_query(const char *cmd, const char *param, unsigned flags, AGENT_R
 #ifdef _WINDOWS
 	PDNS_RECORD	pQueryResults, pDnsRecord;
 	LPTSTR		wzone;
-	char		tmp2[MAX_STRING_LEN];
+	char		tmp2[MAX_STRING_LEN], tmp[MAX_STRING_LEN];
 #else
 	char		*name;
 	unsigned char	*msg_end, *msg_ptr, *p;
@@ -246,26 +245,26 @@ static int	dns_query(const char *cmd, const char *param, unsigned flags, AGENT_R
 
 	*buffer = '\0';
 
-	if (5 < num_param(param))
+	if (5 < request->nparam)
 		return SYSINFO_RET_FAIL;
 
-	if (0 != get_param(param, 1, ip, sizeof(ip)))
-		*ip = '\0';
+	ip = get_rparam(request, 0);
+	zone_str = get_rparam(request, 1);
 
-	if (0 != get_param(param, 2, zone, sizeof(zone)) || '\0' == *zone)
+	if (NULL == zone_str || '\0' == *zone_str)
 		strscpy(zone, "zabbix.com");
+	else
+		strscpy(zone, zone_str);
 
-	if (0 != get_param(param, 3, tmp, sizeof(tmp)) || '\0' == *tmp)
+	param = get_rparam(request, 2);
+
+	if (NULL == param || '\0' == *param)
 		type = T_SOA;
 	else
 	{
 		for (i = 0; NULL != qt[i].name; i++)
 		{
-#ifdef _WINDOWS
-			if (0 == lstrcmpiA(qt[i].name, tmp))
-#else
-			if (0 == strcasecmp(qt[i].name, tmp))
-#endif
+			if (0 == strcasecmp(qt[i].name, param))
 			{
 				type = qt[i].type;
 				break;
@@ -276,15 +275,19 @@ static int	dns_query(const char *cmd, const char *param, unsigned flags, AGENT_R
 			return SYSINFO_RET_FAIL;
 	}
 
-	if (0 != get_param(param, 4, tmp, sizeof(tmp)) || '\0' == *tmp)
+	param = get_rparam(request, 3);
+
+	if (NULL == param || '\0' == *param)
 		retrans = 1;
 	else
-		retrans = atoi(tmp);
+		retrans = atoi(param);
 
-	if (0 != get_param(param, 5, tmp, sizeof(tmp)) || '\0' == *tmp)
+	param = get_rparam(request, 4);
+
+	if (NULL == param || '\0' == *param)
 		retry = 2;
 	else
-		retry = atoi(tmp);
+		retry = atoi(param);
 
 #ifdef _WINDOWS
 	wzone = zbx_utf8_to_unicode(zone);
@@ -421,7 +424,7 @@ static int	dns_query(const char *cmd, const char *param, unsigned flags, AGENT_R
 	if (-1 == (res = res_mkquery(QUERY, zone, C_IN, type, NULL, 0, NULL, buf, sizeof(buf))))
 		return SYSINFO_RET_FAIL;
 
-	if ('\0' != *ip)
+	if (NULL != ip && '\0' != *ip)
 	{
 		if (0 == inet_aton(ip, &inaddr))
 			return SYSINFO_RET_FAIL;
@@ -669,11 +672,11 @@ clean:
 #endif	/* defined(HAVE_RES_QUERY) || defined(_WINDOWS) */
 }
 
-int	NET_DNS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+int	NET_DNS(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	return dns_query(cmd, param, flags, result, 1);
+	return dns_query(request, result, 1);
 }
-int	NET_DNS_RECORD(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+int	NET_DNS_RECORD(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	return dns_query(cmd, param, flags, result, 0);
+	return dns_query(request, result, 0);
 }
