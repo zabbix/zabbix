@@ -10,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -74,13 +74,9 @@ switch ($page['type']) {
 			define('ZBX_PAGE_NO_MENU', 1);
 		}
 		break;
-	case PAGE_TYPE_HTML_BLOCK:
-		header('Content-Type: text/plain; charset=UTF-8');
-		if (!defined('ZBX_PAGE_NO_MENU')) {
-			define('ZBX_PAGE_NO_MENU', 1);
-		}
-		break;
 	case PAGE_TYPE_TEXT:
+	case PAGE_TYPE_TEXT_RETURN_JSON:
+	case PAGE_TYPE_HTML_BLOCK:
 		header('Content-Type: text/plain; charset=UTF-8');
 		if (!defined('ZBX_PAGE_NO_MENU')) {
 			define('ZBX_PAGE_NO_MENU', 1);
@@ -105,23 +101,23 @@ switch ($page['type']) {
 		header('Content-Type: text/html; charset=UTF-8');
 
 		// page title
-		$page_title = '';
+		$pageTitle = '';
 		if (isset($ZBX_SERVER_NAME) && !zbx_empty($ZBX_SERVER_NAME)) {
-			$page_title = $ZBX_SERVER_NAME.NAME_DELIMITER;
+			$pageTitle = $ZBX_SERVER_NAME.NAME_DELIMITER;
 		}
-		$page_title .= isset($page['title']) ? $page['title'] : _('Zabbix');
+		$pageTitle .= isset($page['title']) ? $page['title'] : _('Zabbix');
 
 		if (ZBX_DISTRIBUTED) {
 			if (isset($ZBX_VIEWED_NODES) && $ZBX_VIEWED_NODES['selected'] == 0) { // all selected
-				$page_title .= ' ('._('All nodes').') ';
+				$pageTitle .= ' ('._('All nodes').') ';
 			}
 			elseif (!empty($ZBX_NODES)) {
-				$page_title .= ' ('.$ZBX_NODES[$ZBX_CURRENT_NODEID]['name'].')';
+				$pageTitle .= ' ('.$ZBX_NODES[$ZBX_CURRENT_NODEID]['name'].')';
 			}
 		}
 
 		if ((defined('ZBX_PAGE_DO_REFRESH') || defined('ZBX_PAGE_DO_JS_REFRESH')) && CWebUser::$data['refresh']) {
-			$page_title .= ' ['._('refreshed every').' '.CWebUser::$data['refresh'].' '._('sec').']';
+			$pageTitle .= ' ['._('refreshed every').' '.CWebUser::$data['refresh'].' '._('sec').']';
 		}
 		break;
 }
@@ -139,8 +135,8 @@ if ($denied_page_requested) {
 }
 
 if ($page['type'] == PAGE_TYPE_HTML) {
-	$pageHeader = new CPageHeader($page_title);
-	$pageHeader->addCssFile('css.css');
+	$pageHeader = new CPageHeader($pageTitle);
+	$pageHeader->addCssInit();
 
 	$css = ZBX_DEFAULT_THEME;
 	if (!ZBX_PAGE_NO_THEME) {
@@ -165,6 +161,7 @@ CSS;
 			}
 		}
 	}
+
 	$pageHeader->addCssFile('styles/themes/'.$css.'/main.css');
 
 	if ($page['file'] == 'sysmap.php') {
