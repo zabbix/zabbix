@@ -92,11 +92,9 @@ retry:
  *	Tested: FreeBSD 6.2_i386, 7.0_i386;
  */
 
-int     PROC_MEM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+int     PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	char	procname[MAX_STRING_LEN],
-		buffer[MAX_STRING_LEN],
-		proccomm[MAX_STRING_LEN], *args;
+	char	*procname, *proccomm, *param, *args;
 	int	do_task, pagesize, count, i,
 		proc_ok, comm_ok,
 		mib[4], mibs;
@@ -109,47 +107,34 @@ int     PROC_MEM(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 	struct kinfo_proc	*proc = NULL;
 	struct passwd		*usrinfo;
 
-	if (num_param(param) > 4)
+	if (4 < request->nparam)
 		return SYSINFO_RET_FAIL;
 
-	if (0 != get_param(param, 1, procname, sizeof(procname)))
-		*procname = '\0';
-	else if (strlen(procname) > ZBX_COMMLEN)
-		procname[ZBX_COMMLEN] = '\0';
+	procname = get_rparam(request, 0);
+	param = get_rparam(request, 1);
 
-	if (0 != get_param(param, 2, buffer, sizeof(buffer)))
-		*buffer = '\0';
-
-	if (*buffer != '\0')
+	if (NULL != param && '\0' != *param)
 	{
-		usrinfo = getpwnam(buffer);
-		if (usrinfo == NULL)	/* incorrect user name */
+		if (NULL == (usrinfo = getpwnam(param)))	/* incorrect user name */
 			return SYSINFO_RET_FAIL;
 	}
 	else
 		usrinfo = NULL;
 
-	if (0 != get_param(param, 3, buffer, sizeof(buffer)))
-		*buffer = '\0';
+	param = get_rparam(request, 2);
 
-	if (*buffer != '\0')
-	{
-		if (0 == strcmp(buffer, "avg"))
-			do_task = DO_AVG;
-		else if (0 == strcmp(buffer, "max"))
-			do_task = DO_MAX;
-		else if (0 == strcmp(buffer, "min"))
-			do_task = DO_MIN;
-		else if (0 == strcmp(buffer, "sum"))
-			do_task = DO_SUM;
-		else
-			return SYSINFO_RET_FAIL;
-	}
-	else
+	if (NULL == param || '\0' == *param || 0 == strcmp(param, "sum"))
 		do_task = DO_SUM;
+	else if (0 == strcmp(param, "avg"))
+		do_task = DO_AVG;
+	else if (0 == strcmp(param, "max"))
+		do_task = DO_MAX;
+	else if (0 == strcmp(param, "min"))
+		do_task = DO_MIN;
+	else
+		return SYSINFO_RET_FAIL;
 
-	if (0 != get_param(param, 4, proccomm, sizeof(proccomm)))
-		*proccomm = '\0';
+	proccomm = get_rparam(request, 3);
 
 	pagesize = getpagesize();
 
@@ -189,13 +174,13 @@ int     PROC_MEM(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 	{
 		proc_ok = 0;
 		comm_ok = 0;
-		if (*procname == '\0' || 0 == strcmp(procname, proc[i].ZBX_PROC_COMM))
+		if (NULL == procname || '\0' == *procname || 0 == strcmp(procname, proc[i].ZBX_PROC_COMM))
 			proc_ok = 1;
 
-		if (*proccomm != '\0')
+		if (NULL != proccomm && '\0' != *proccomm)
 		{
 			if (NULL != (args = get_commandline(&proc[i])))
-				if (zbx_regexp_match(args, proccomm, NULL) != NULL)
+				if (NULL != zbx_regexp_match(args, proccomm, NULL))
 					comm_ok = 1;
 		}
 		else
@@ -236,11 +221,9 @@ int     PROC_MEM(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
  *	Tested: FreeBSD 6.2_i386, 7.0_i386;
  */
 
-int	PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	char	procname[MAX_STRING_LEN],
-		buffer[MAX_STRING_LEN],
-		proccomm[MAX_STRING_LEN], *args;
+	char	*procname, *proccomm, *param, *args;
 	int	zbx_proc_stat, count, i,
 		proc_ok, stat_ok, comm_ok,
 		mib[4], mibs;
@@ -252,47 +235,34 @@ int	PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *r
 	struct kinfo_proc	*proc = NULL;
 	struct passwd		*usrinfo;
 
-	if (num_param(param) > 4)
+	if (4 < request->nparam)
 		return SYSINFO_RET_FAIL;
 
-	if (0 != get_param(param, 1, procname, sizeof(procname)))
-		*procname = '\0';
-	else if (strlen(procname) > ZBX_COMMLEN)
-		procname[ZBX_COMMLEN] = '\0';
+	procname = get_rparam(request, 0);
+	param = get_rparam(request, 1);
 
-	if (0 != get_param(param, 2, buffer, sizeof(buffer)))
-		*buffer = '\0';
-
-	if (*buffer != '\0')
+	if (NULL != param && '\0' != *param)
 	{
-		usrinfo = getpwnam(buffer);
-		if (usrinfo == NULL)	/* incorrect user name */
+		if (NULL == (usrinfo = getpwnam(param)))	/* incorrect user name */
 			return SYSINFO_RET_FAIL;
 	}
 	else
 		usrinfo = NULL;
 
-	if (0 != get_param(param, 3, buffer, sizeof(buffer)))
-		*buffer = '\0';
+	param = get_rparam(request, 2);
 
-	if (*buffer != '\0')
-	{
-		if (0 == strcmp(buffer, "run"))
-			zbx_proc_stat = ZBX_PROC_STAT_RUN;
-		else if (0 == strcmp(buffer, "sleep"))
-			zbx_proc_stat = ZBX_PROC_STAT_SLEEP;
-		else if (0 == strcmp(buffer, "zomb"))
-			zbx_proc_stat = ZBX_PROC_STAT_ZOMB;
-		else if (0 == strcmp(buffer, "all"))
-			zbx_proc_stat = ZBX_PROC_STAT_ALL;
-		else
-			return SYSINFO_RET_FAIL;
-	}
-	else
+	if (NULL == param || '\0' == *param || 0 == strcmp(param, "all"))
 		zbx_proc_stat = ZBX_PROC_STAT_ALL;
+	else if (0 == strcmp(param, "run"))
+		zbx_proc_stat = ZBX_PROC_STAT_RUN;
+	else if (0 == strcmp(param, "sleep"))
+		zbx_proc_stat = ZBX_PROC_STAT_SLEEP;
+	else if (0 == strcmp(param, "zomb"))
+		zbx_proc_stat = ZBX_PROC_STAT_ZOMB;
+	else
+		return SYSINFO_RET_FAIL;
 
-	if (0 != get_param(param, 4, proccomm, sizeof(proccomm)))
-		*proccomm = '\0';
+	proccomm = get_rparam(request, 3);
 
 	mib[0] = CTL_KERN;
 	mib[1] = KERN_PROC;
@@ -332,7 +302,7 @@ int	PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *r
 		stat_ok = 0;
 		comm_ok = 0;
 
-		if (*procname == '\0' || 0 == strcmp(procname, proc[i].ZBX_PROC_COMM))
+		if (NULL == procname || '\0' == *procname || 0 == strcmp(procname, proc[i].ZBX_PROC_COMM))
 			proc_ok = 1;
 
 		if (zbx_proc_stat != ZBX_PROC_STAT_ALL)
@@ -355,10 +325,10 @@ int	PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *r
 		else
 			stat_ok = 1;
 
-		if (*proccomm != '\0')
+		if (NULL != proccomm && '\0' != *proccomm)
 		{
 			if (NULL != (args = get_commandline(&proc[i])))
-				if (zbx_regexp_match(args, proccomm, NULL) != NULL)
+				if (NULL != zbx_regexp_match(args, proccomm, NULL))
 					comm_ok = 1;
 		}
 		else

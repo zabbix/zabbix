@@ -23,10 +23,10 @@
 
 #define ZBX_MAX_WAIT_VMSTAT	2	/* maximum seconds to wait for vmstat data on the first call */
 
-int	SYSTEM_STAT(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+int	SYSTEM_STAT(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	char	section[16], type[8];
-	int	nparams, wait = ZBX_MAX_WAIT_VMSTAT;
+	char	*section, *type;
+	int	wait = ZBX_MAX_WAIT_VMSTAT;
 
 	if (!VMSTAT_COLLECTOR_STARTED(collector))
 	{
@@ -50,16 +50,24 @@ int	SYSTEM_STAT(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 			return SYSINFO_RET_FAIL;
 	}
 
-	nparams = num_param(param);
-
-	if (nparams > 2)
+	if (2 < request->nparam)
 		return SYSINFO_RET_FAIL;
 
-	if (0 != get_param(param, 1, section, sizeof(section)))
+	section = get_rparam(request, 0);
+	type = get_rparam(request, 1);
+
+	if (NULL == section)
 		return SYSINFO_RET_FAIL;
 
-	if (0 != get_param(param, 2, type, sizeof(type)))
-		*type = '\0';
+	if (0 == strcmp(section, "ent"))
+	{
+		if (1 == request->nparam && collector->vmstat.shared_enabled)
+			SET_DBL_RESULT(result, collector->vmstat.ent);
+		else
+			return SYSINFO_RET_FAIL;
+	}
+	else if (NULL == type)
+		return SYSINFO_RET_FAIL;
 
 	if (0 == strcmp(section, "kthr"))
 	{
@@ -128,8 +136,6 @@ int	SYSTEM_STAT(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 		else
 			return SYSINFO_RET_FAIL;
 	}
-	else if (0 == strcmp(section, "ent") && nparams == 1 && collector->vmstat.shared_enabled)
-		SET_DBL_RESULT(result, collector->vmstat.ent);
 	else if (0 == strcmp(section, "memory"))
 	{
 		if (0 == strcmp(type, "avm") && collector->vmstat.aix52stats)

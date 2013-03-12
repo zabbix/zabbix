@@ -71,7 +71,11 @@ static ssize_t	telnet_socket_read(ZBX_SOCKET socket_fd, void *buf, size_t count)
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() rc:%d errno:%d error:[%s]",
 				__function_name, rc, error, strerror_from_system(error));
 
+#ifdef _WINDOWS
+		if (WSAEWOULDBLOCK == error)
+#else
 		if (EAGAIN == error)
+#endif
 		{
 			/* wait and if there is still an error or no input available */
 			/* we assume the other side has nothing more to say */
@@ -108,7 +112,11 @@ static ssize_t	telnet_socket_write(ZBX_SOCKET socket_fd, const void *buf, size_t
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() rc:%d errno:%d error:[%s]",
 				__function_name, rc, error, strerror_from_system(error));
 
+#ifdef _WINDOWS
+		if (WSAEWOULDBLOCK == error)
+#else
 		if (EAGAIN == error)
+#endif
 		{
 			telnet_waitsocket(socket_fd, WAIT_WRITE);
 			continue;

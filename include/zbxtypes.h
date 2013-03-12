@@ -75,6 +75,8 @@
 #	define PATH_SEPARATOR	'\\'
 #endif
 
+#	define strcasecmp	lstrcmpiA
+
 #else	/* _WINDOWS */
 
 #	define zbx_stat(path, buf)		stat(path, buf)
