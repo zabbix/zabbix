@@ -48,7 +48,7 @@ $graphForm->addVar('ymax_itemid', $this->data['ymax_itemid']);
 // create form list
 $graphFormList = new CFormList('graphFormList');
 if (!empty($this->data['templates'])) {
-	$graphFormList->addRow(_('Parent graph'), $this->data['templates']);
+	$graphFormList->addRow(_('Parent graphs'), $this->data['templates']);
 }
 $nameTextBox = new CTextBox('name', $this->data['name'], ZBX_TEXTBOX_STANDARD_SIZE);
 $nameTextBox->attr('autofocus', 'autofocus');
@@ -193,7 +193,7 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 
 		// select prototype button
 		if (!empty($this->data['parent_discoveryid'])) {
-			$yaxisMinData[] = new CButton('yaxis_min', _('Select prototype'), 'javascript: '.
+			$yaxisMinData[] = new CButton('yaxis_min_prototype', _('Select prototype'), 'javascript: '.
 				'return PopUp("popup.php?dstfrm='.$graphForm->getName().
 					'&parent_discoveryid='.$this->data['parent_discoveryid'].
 					'&dstfld1=ymin_itemid'.
@@ -245,7 +245,7 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 
 		// select prototype button
 		if (!empty($this->data['parent_discoveryid'])) {
-			$yaxisMaxData[] = new CButton('yaxis_min', _('Select prototype'), 'javascript: '.
+			$yaxisMaxData[] = new CButton('yaxis_max_prototype', _('Select prototype'), 'javascript: '.
 				'return PopUp("popup.php?dstfrm='.$graphForm->getName().
 					'&parent_discoveryid='.$this->data['parent_discoveryid'].
 					'&dstfld1=ymax_itemid'.
@@ -274,7 +274,10 @@ $graphTab = new CTabView(array('remember' => true));
 if (!$this->data['form_refresh']) {
 	$graphTab->setSelected(0);
 }
-$graphTab->addTab('graphTab', _('Graph'), $graphFormList);
+$graphTab->addTab(
+	'graphTab',
+	empty($this->data['parent_discoveryid']) ? _('Graph') : _('Graph prototype'), $graphFormList
+);
 
 /*
  * Preview tab
