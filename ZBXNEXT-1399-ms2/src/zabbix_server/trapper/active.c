@@ -413,7 +413,7 @@ int	send_list_of_active_checks_json(zbx_sock_t *sock, struct zbx_json_parse *jp)
 
 			if (ZBX_KEY_OTHER != item_key && ZBX_COMMAND_WITH_PARAMS == parse_command(dc_items[i].key, NULL, 0, params, sizeof(params)))
 			{
-				/* "params" paramater */
+				/* "params" parameter */
 				if (0 == get_param(params, 2, tmp, sizeof(tmp)) && '@' == *tmp)
 					add_regexp_name(&regexp, &regexp_alloc, &regexp_num, tmp + 1);
 

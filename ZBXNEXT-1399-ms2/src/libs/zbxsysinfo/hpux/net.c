@@ -133,7 +133,7 @@ end:
 }
 #endif	/* HPUX_VERSION < 1131 */
 
-int	NET_IF_DISCOVERY(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+int	NET_IF_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 #if HPUX_VERSION < 1131
 	char			*if_list = NULL, *if_name_end;

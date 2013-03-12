@@ -21,55 +21,55 @@
 #include "sysinfo.h"
 
 ZBX_METRIC	parameters_specific[] =
-/*	KEY			FLAG		FUNCTION	ADD_PARAM	TEST_PARAM */
+/*	KEY			FLAG		FUNCTION		TEST PARAMETERS */
 {
-	{"kernel.maxfiles",	0,		KERNEL_MAXFILES,	NULL,	NULL},
-	{"kernel.maxproc",	0,		KERNEL_MAXPROC,		NULL,	NULL},
+	{"kernel.maxfiles",	0,		KERNEL_MAXFILES,	NULL},
+	{"kernel.maxproc",	0,		KERNEL_MAXPROC,		NULL},
 
-	{"vfs.fs.size",		CF_USEUPARAM,	VFS_FS_SIZE,		NULL,	"/,free"},
-	{"vfs.fs.inode",	CF_USEUPARAM,	VFS_FS_INODE,		NULL,	"/,free"},
-	{"vfs.fs.discovery",	0,		VFS_FS_DISCOVERY,	NULL,	NULL},
+	{"vfs.fs.size",		CF_HAVEPARAMS,	VFS_FS_SIZE,		"/,free"},
+	{"vfs.fs.inode",	CF_HAVEPARAMS,	VFS_FS_INODE,		"/,free"},
+	{"vfs.fs.discovery",	0,		VFS_FS_DISCOVERY,	NULL},
 
-	{"vfs.dev.read",	CF_USEUPARAM,	VFS_DEV_READ,		NULL,	"sda,operations"},
-	{"vfs.dev.write",	CF_USEUPARAM,	VFS_DEV_WRITE,		NULL,	"sda,operations"},
+	{"vfs.dev.read",	CF_HAVEPARAMS,	VFS_DEV_READ,		"sda,operations"},
+	{"vfs.dev.write",	CF_HAVEPARAMS,	VFS_DEV_WRITE,		"sda,operations"},
 
-	{"net.tcp.listen",	CF_USEUPARAM,	NET_TCP_LISTEN,		NULL,	"80"},
-	{"net.udp.listen",	CF_USEUPARAM,	NET_UDP_LISTEN,		NULL,	"68"},
+	{"net.tcp.listen",	CF_HAVEPARAMS,	NET_TCP_LISTEN,		"80"},
+	{"net.udp.listen",	CF_HAVEPARAMS,	NET_UDP_LISTEN,		"68"},
 
-	{"net.if.in",		CF_USEUPARAM,	NET_IF_IN,		NULL,	"lo,bytes"},
-	{"net.if.out",		CF_USEUPARAM,	NET_IF_OUT,		NULL,	"lo,bytes"},
-	{"net.if.total",	CF_USEUPARAM,	NET_IF_TOTAL,		NULL,	"lo,bytes"},
-	{"net.if.collisions",	CF_USEUPARAM,	NET_IF_COLLISIONS,	NULL,	"lo"},
-	{"net.if.discovery",	0,		NET_IF_DISCOVERY,	NULL,	NULL},
+	{"net.if.in",		CF_HAVEPARAMS,	NET_IF_IN,		"lo,bytes"},
+	{"net.if.out",		CF_HAVEPARAMS,	NET_IF_OUT,		"lo,bytes"},
+	{"net.if.total",	CF_HAVEPARAMS,	NET_IF_TOTAL,		"lo,bytes"},
+	{"net.if.collisions",	CF_HAVEPARAMS,	NET_IF_COLLISIONS,	"lo"},
+	{"net.if.discovery",	0,		NET_IF_DISCOVERY,	NULL},
 
-	{"vm.memory.size",	CF_USEUPARAM,	VM_MEMORY_SIZE,		NULL,	"total"},
+	{"vm.memory.size",	CF_HAVEPARAMS,	VM_MEMORY_SIZE,		"total"},
 
-	{"proc.num",		CF_USEUPARAM,	PROC_NUM,		NULL,	"inetd,,,"},
-	{"proc.mem",		CF_USEUPARAM,	PROC_MEM,		NULL,	"inetd,,"},
+	{"proc.num",		CF_HAVEPARAMS,	PROC_NUM,		"inetd,,,"},
+	{"proc.mem",		CF_HAVEPARAMS,	PROC_MEM,		"inetd,,"},
 
-	{"system.cpu.switches", 0,		SYSTEM_CPU_SWITCHES,	NULL,	NULL},
-	{"system.cpu.intr",	0,		SYSTEM_CPU_INTR,	NULL,	NULL},
-	{"system.cpu.util",	CF_USEUPARAM,	SYSTEM_CPU_UTIL,	NULL,	"all,user,avg1"},
-	{"system.cpu.load",	CF_USEUPARAM,	SYSTEM_CPU_LOAD,	NULL,	"all,avg1"},
-	{"system.cpu.num",	CF_USEUPARAM,	SYSTEM_CPU_NUM,		NULL,	"online"},
+	{"system.cpu.switches", 0,		SYSTEM_CPU_SWITCHES,	NULL},
+	{"system.cpu.intr",	0,		SYSTEM_CPU_INTR,	NULL},
+	{"system.cpu.util",	CF_HAVEPARAMS,	SYSTEM_CPU_UTIL,	"all,user,avg1"},
+	{"system.cpu.load",	CF_HAVEPARAMS,	SYSTEM_CPU_LOAD,	"all,avg1"},
+	{"system.cpu.num",	CF_HAVEPARAMS,	SYSTEM_CPU_NUM,		"online"},
 
-	{"system.hw.chassis",	CF_USEUPARAM,	SYSTEM_HW_CHASSIS,	NULL,	NULL},
-	{"system.hw.cpu",	CF_USEUPARAM,	SYSTEM_HW_CPU,		NULL,	NULL},
-	{"system.hw.devices",	CF_USEUPARAM,	SYSTEM_HW_DEVICES,	NULL,	NULL},
-	{"system.hw.macaddr",	CF_USEUPARAM,	SYSTEM_HW_MACADDR,	NULL,	NULL},
+	{"system.hw.chassis",	CF_HAVEPARAMS,	SYSTEM_HW_CHASSIS,	NULL},
+	{"system.hw.cpu",	CF_HAVEPARAMS,	SYSTEM_HW_CPU,		NULL},
+	{"system.hw.devices",	CF_HAVEPARAMS,	SYSTEM_HW_DEVICES,	NULL},
+	{"system.hw.macaddr",	CF_HAVEPARAMS,	SYSTEM_HW_MACADDR,	NULL},
 
-	{"system.sw.arch",	0,		SYSTEM_SW_ARCH,		NULL,	NULL},
-	{"system.sw.os",	CF_USEUPARAM,	SYSTEM_SW_OS,		NULL,	NULL},
-	{"system.sw.packages",	CF_USEUPARAM,	SYSTEM_SW_PACKAGES,	NULL,	NULL},
+	{"system.sw.arch",	0,		SYSTEM_SW_ARCH,		NULL},
+	{"system.sw.os",	CF_HAVEPARAMS,	SYSTEM_SW_OS,		NULL},
+	{"system.sw.packages",	CF_HAVEPARAMS,	SYSTEM_SW_PACKAGES,	NULL},
 
-	{"system.swap.size",	CF_USEUPARAM,	SYSTEM_SWAP_SIZE,	NULL,	"all,free"},
-	{"system.swap.in",	CF_USEUPARAM,	SYSTEM_SWAP_IN,		NULL,	"all"},
-	{"system.swap.out",	CF_USEUPARAM,	SYSTEM_SWAP_OUT,	NULL,	"all"},
+	{"system.swap.size",	CF_HAVEPARAMS,	SYSTEM_SWAP_SIZE,	"all,free"},
+	{"system.swap.in",	CF_HAVEPARAMS,	SYSTEM_SWAP_IN,		"all"},
+	{"system.swap.out",	CF_HAVEPARAMS,	SYSTEM_SWAP_OUT,	"all"},
 
-	{"system.uptime",	0,		SYSTEM_UPTIME,		NULL,	NULL},
-	{"system.boottime",	0,		SYSTEM_BOOTTIME,	NULL,	NULL},
+	{"system.uptime",	0,		SYSTEM_UPTIME,		NULL},
+	{"system.boottime",	0,		SYSTEM_BOOTTIME,	NULL},
 
-	{"sensor",		CF_USEUPARAM,	GET_SENSOR,		NULL,	"w83781d-i2c-0-2d,temp1"},
+	{"sensor",		CF_HAVEPARAMS,	GET_SENSOR,		"w83781d-i2c-0-2d,temp1"},
 
-	{0}
+	{NULL}
 };
