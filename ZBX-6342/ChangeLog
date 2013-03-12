@@ -1,6 +1,6 @@
 Changes for 1.8.17rc1
 
-...G...PS. [ZBX-6342] fixed LDAP check that caused server crash when LDAP is running but no DIT has been defined
+...G...PS. [ZBX-6342] fixed LDAP check that caused server crash when LDAP is running but no DIT has been defined (Aleksej)
 ..F....... [ZBX-6329] fixed form with "0" in trigger expression parser (Eduard)
 ..F....... [ZBX-6306] fixed frontend layout for latest Google Chrome 25 (Eduard)
 ..F....... [ZBX-6258] updated Japanese translation; thanks to Kodai Terashima (Richlv)
