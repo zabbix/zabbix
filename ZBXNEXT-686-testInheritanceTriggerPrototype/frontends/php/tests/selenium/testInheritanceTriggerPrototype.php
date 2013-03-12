@@ -84,7 +84,7 @@ class testInheritanceTriggerPrototype extends CWebTest {
 			array(
 				array('constructor' => 'open')
 			),
-		/*	array(
+			array(
 				array('constructor' => 'open_close')
 			),
 			array(
@@ -110,7 +110,7 @@ class testInheritanceTriggerPrototype extends CWebTest {
 			),
 			array(
 				array('severity' => 'Disaster')
-			)*/
+			)
 		);
 	}
 
@@ -258,7 +258,7 @@ class testInheritanceTriggerPrototype extends CWebTest {
 					'hostCheck' => true,
 					'dbCheck' => true)
 			),
-		/*	array(
+			array(
 				array('expected' => TRIGGER_GOOD,
 					'description' => 'triggerName',
 					'hostCheck' => true)
@@ -285,7 +285,7 @@ class testInheritanceTriggerPrototype extends CWebTest {
 						'ERROR: Cannot add trigger',
 						'Trigger "triggerSimple" already exists on "Inheritance test template".')
 				)
-			)*/
+			)
 		);
 	}
 
