@@ -27,7 +27,9 @@ typedef struct
 {
 	zbx_uint64_t		hostid;
 	zbx_uint64_t		proxy_hostid;
-	zbx_vector_uint64_t	groupids;	/* host groups which should be added */
+	zbx_vector_uint64_t	new_groupids;		/* host groups which should be added */
+	zbx_vector_uint64_t	lnk_templateids;	/* templates which should be linked */
+	zbx_vector_uint64_t	del_templateids;	/* templates which should be unlinked */
 	char			*host_proto;
 	char			*host;
 	char			*name;
@@ -54,7 +56,9 @@ zbx_lld_host_t;
 
 static void	DBlld_host_free(zbx_lld_host_t *host)
 {
-	zbx_vector_uint64_destroy(&host->groupids);
+	zbx_vector_uint64_destroy(&host->new_groupids);
+	zbx_vector_uint64_destroy(&host->lnk_templateids);
+	zbx_vector_uint64_destroy(&host->del_templateids);
 	zbx_free(host->host_proto);
 	zbx_free(host->host);
 	zbx_free(host->name);
@@ -137,7 +141,9 @@ static void	DBlld_hosts_get(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts)
 		host->ipmi_privilege = (unsigned char)atoi(row[6]);
 		host->ipmi_username = zbx_strdup(NULL, row[7]);
 		host->ipmi_password = zbx_strdup(NULL, row[8]);
-		zbx_vector_uint64_create(&host->groupids);
+		zbx_vector_uint64_create(&host->new_groupids);
+		zbx_vector_uint64_create(&host->lnk_templateids);
+		zbx_vector_uint64_create(&host->del_templateids);
 		host->flags = 0x00;
 
 		zbx_vector_ptr_append(hosts, host);
@@ -362,7 +368,9 @@ static void	DBlld_host_make(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts,
 		substitute_discovery_macros(&host->host, jp_row, ZBX_MACRO_ANY, NULL, 0);
 		host->name = zbx_strdup(NULL, name_proto);
 		substitute_discovery_macros(&host->name, jp_row, ZBX_MACRO_ANY, NULL, 0);
-		zbx_vector_uint64_create(&host->groupids);
+		zbx_vector_uint64_create(&host->new_groupids);
+		zbx_vector_uint64_create(&host->lnk_templateids);
+		zbx_vector_uint64_create(&host->del_templateids);
 		host->ipmi_authtype = 0;
 		host->ipmi_privilege = 0;
 		host->ipmi_username = NULL;
@@ -471,8 +479,9 @@ static void	DBlld_hostgroups_make(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *hos
 	{
 		host = (zbx_lld_host_t *)hosts->values[i];
 
+		zbx_vector_uint64_reserve(&host->new_groupids, groupids.values_num);
 		for (j = 0; j < groupids.values_num; j++)
-			zbx_vector_uint64_append(&host->groupids, groupids.values[j]);
+			zbx_vector_uint64_append(&host->new_groupids, groupids.values[j]);
 
 		if (0 != host->hostid)
 			zbx_vector_uint64_append(&hostids, host->hostid);
@@ -501,7 +510,7 @@ static void	DBlld_hostgroups_make(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *hos
 
 			host = (zbx_lld_host_t *)hosts->values[i];
 
-			if (FAIL == (i = zbx_vector_uint64_bsearch(&host->groupids, groupid,
+			if (FAIL == (i = zbx_vector_uint64_bsearch(&host->new_groupids, groupid,
 					ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
 			{
 				/* host groups which should be deleted */
@@ -511,7 +520,7 @@ static void	DBlld_hostgroups_make(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *hos
 			else
 			{
 				/* host groups which are already added */
-				zbx_vector_uint64_remove(&host->groupids, i);
+				zbx_vector_uint64_remove(&host->new_groupids, i);
 			}
 		}
 		DBfree_result(result);
@@ -523,6 +532,120 @@ static void	DBlld_hostgroups_make(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *hos
 	zbx_vector_uint64_destroy(&groupids);
 
 	zbx_free(sql);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DBlld_templates_make                                             *
+ *                                                                            *
+ * Purpose: gets templates from a host prototype                              *
+ *                                                                            *
+ * Parameters: parent_hostid - [IN] host prototype identificator              *
+ *             hosts         - [IN/OUT] list of hosts                         *
+ *                             should be sorted by hostid                     *
+ *                                                                            *
+ ******************************************************************************/
+static void	DBlld_templates_make(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts)
+{
+	const char		*__function_name = "DBlld_templates_make";
+
+	DB_RESULT		result;
+	DB_ROW			row;
+	zbx_vector_uint64_t	templateids, hostids;
+	zbx_uint64_t		templateid, hostid;
+	zbx_lld_host_t		*host;
+	int			i, j;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	zbx_vector_uint64_create(&templateids);
+	zbx_vector_uint64_create(&hostids);
+
+	/* select templates which should be linked */
+
+	result = DBselect("select templateid from hosts_templates where hostid=" ZBX_FS_UI64, parent_hostid);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		ZBX_STR2UINT64(templateid, row[0]);
+		zbx_vector_uint64_append(&templateids, templateid);
+	}
+	DBfree_result(result);
+
+	zbx_vector_uint64_sort(&templateids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+	/* select list of already created hosts */
+
+	for (i = 0; i < hosts->values_num; i++)
+	{
+		host = (zbx_lld_host_t *)hosts->values[i];
+
+		zbx_vector_uint64_reserve(&host->lnk_templateids, templateids.values_num);
+		for (j = 0; j < templateids.values_num; j++)
+			zbx_vector_uint64_append(&host->lnk_templateids, templateids.values[j]);
+
+		if (0 != host->hostid)
+			zbx_vector_uint64_append(&hostids, host->hostid);
+	}
+
+	if (0 != hostids.values_num)
+	{
+		char	*sql = NULL;
+		size_t	sql_alloc = 256, sql_offset = 0;
+
+		sql = zbx_malloc(sql, sql_alloc);
+
+		/* select already linked temlates */
+
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
+				"select hostid,templateid"
+				" from hosts_templates"
+				" where");
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid", hostids.values, hostids.values_num);
+
+		result = DBselect("%s", sql);
+
+		zbx_free(sql);
+
+		while (NULL != (row = DBfetch(result)))
+		{
+			ZBX_STR2UINT64(hostid, row[0]);
+			ZBX_STR2UINT64(templateid, row[1]);
+
+			if (FAIL == (i = zbx_vector_ptr_bsearch(hosts, &hostid, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
+			{
+				THIS_SHOULD_NEVER_HAPPEN;
+				continue;
+			}
+
+			host = (zbx_lld_host_t *)hosts->values[i];
+
+			if (FAIL == (i = zbx_vector_uint64_bsearch(&host->lnk_templateids, templateid,
+					ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
+			{
+				/* templates which should be unlinked */
+				zbx_vector_uint64_append(&host->del_templateids, templateid);
+			}
+			else
+			{
+				/* templates which are already linked */
+				zbx_vector_uint64_remove(&host->lnk_templateids, i);
+			}
+		}
+		DBfree_result(result);
+
+		for (i = 0; i < hosts->values_num; i++)
+		{
+			host = (zbx_lld_host_t *)hosts->values[i];
+
+			zbx_vector_uint64_sort(&host->del_templateids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+		}
+	}
+
+	zbx_vector_uint64_destroy(&hostids);
+	zbx_vector_uint64_destroy(&templateids);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
@@ -576,7 +699,7 @@ static void	DBlld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts
 		else if (0 != (host->flags & ZBX_FLAG_LLD_HOST_UPDATE))
 			upd_hosts++;
 
-		new_hostgroups += host->groupids.values_num;
+		new_hostgroups += host->new_groupids.values_num;
 	}
 
 	if (0 != new_hosts)
@@ -738,14 +861,14 @@ static void	DBlld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts
 			}
 		}
 
-		for (j = 0; j < host->groupids.values_num; j++)
+		for (j = 0; j < host->new_groupids.values_num; j++)
 		{
 #ifndef HAVE_MULTIROW_INSERT
 			zbx_strcpy_alloc(&sql4, &sql4_alloc, &sql4_offset, ins_hosts_groups_sql);
 #endif
 			zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset,
 					"(" ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 ")" ZBX_ROW_DL,
-					hostgroupid++, host->hostid, host->groupids.values[j]);
+					hostgroupid++, host->hostid, host->new_groupids.values[j]);
 		}
 
 		zbx_free(name_esc);
@@ -805,6 +928,34 @@ static void	DBlld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts
 		DBend_multiple_update(&sql6, &sql6_alloc, &sql6_offset);
 		DBexecute("%s", sql6);
 		zbx_free(sql6);
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DBlld_templates_link                                             *
+ *                                                                            *
+ ******************************************************************************/
+static void	DBlld_templates_link(zbx_vector_ptr_t *hosts)
+{
+	const char	*__function_name = "DBlld_templates_link";
+
+	int		i;
+	zbx_lld_host_t	*host;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	for (i = 0; i < hosts->values_num; i++)
+	{
+		host = (zbx_lld_host_t *)hosts->values[i];
+
+		if (0 != host->lnk_templateids.values_num)
+			DBcopy_template_elements(host->hostid, &host->lnk_templateids);
+
+		if (0 != host->del_templateids.values_num)
+			DBdelete_template_elements(host->hostid, &host->del_templateids);
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
@@ -931,9 +1082,13 @@ void	DBlld_update_hosts(zbx_uint64_t lld_ruleid, struct zbx_json_parse *jp_data,
 		zbx_vector_ptr_sort(&hosts, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 
 		DBlld_hostgroups_make(lld_ruleid, &hosts, &hostgroupids);
+		DBlld_templates_make(parent_hostid, &hosts);
 
 		DBlld_hosts_save(parent_hostid, &hosts, host_proto, proxy_hostid, ipmi_authtype, ipmi_privilege,
 				ipmi_username, ipmi_password, status, &hostgroupids, &interfaces);
+
+		/* linking of the templates */
+		DBlld_templates_link(&hosts);
 
 		DBlld_hosts_free(&hosts);
 	}
