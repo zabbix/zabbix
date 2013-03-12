@@ -126,6 +126,7 @@ class CHost extends CHostGeneral {
 			'selectInterfaces'			=> null,
 			'selectInventory'			=> null,
 			'selectHttpTests'           => null,
+			'selectDiscoveryRule'		=> null,
 			'countOutput'				=> null,
 			'groupCount'				=> null,
 			'preservekeys'				=> null,
@@ -1692,6 +1693,30 @@ class CHost extends CHostGeneral {
 					$result[$hostid]['screens'] = isset($screens[$hostid]) ? $screens[$hostid]['rowscount'] : 0;
 				}
 			}
+		}
+
+		// adding discovery rule
+		if ($options['selectDiscoveryRule'] !== null && $options['selectDiscoveryRule'] != API_OUTPUT_COUNT) {
+			$relationMap = new CRelationMap();
+			// discovered items
+			$dbRules = DBselect(
+				'SELECT hd.hostid,hd2.parent_itemid'.
+					' FROM host_discovery hd,host_discovery hd2'.
+					' WHERE '.dbConditionInt('hd.hostid', $hostids).
+					' AND hd.parent_hostid=hd2.hostid'
+			);
+			while ($rule = DBfetch($dbRules)) {
+				$relationMap->addRelation($rule['hostid'], $rule['parent_itemid']);
+			}
+
+			$discoveryRules = API::DiscoveryRule()->get(array(
+				'output' => $options['selectDiscoveryRule'],
+				'nodeids' => $options['nodeids'],
+				'itemids' => $relationMap->getRelatedIds(),
+				'nopermissions' => true,
+				'preservekeys' => true,
+			));
+			$result = $relationMap->mapOne($result, $discoveryRules, 'discoveryRule');
 		}
 
 		return $result;
