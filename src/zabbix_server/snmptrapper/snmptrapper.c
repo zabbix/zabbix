@@ -135,8 +135,8 @@ static int	process_trap_for_interface(zbx_uint64_t interfaceid, char *trap, zbx_
 			result = DBselect("select e.expression,e.expression_type,e.exp_delimiter,e.case_sensitive"
 					" from regexps r,expressions e"
 					" where r.regexpid=e.regexpid"
-						" and r.name='%s'",
-					regex_esc);
+						" and r.name='%s'" DB_NODE,
+					regex_esc, DBnode_local("r.regexpid"));
 			zbx_free(regex_esc);
 
 			while (NULL != (row = DBfetch(result)))

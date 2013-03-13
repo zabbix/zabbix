@@ -2374,8 +2374,8 @@ void	DBlld_process_discovery_rule(zbx_uint64_t discovery_itemid, char *value, zb
 			result = DBselect("select e.expression,e.expression_type,e.exp_delimiter,e.case_sensitive"
 					" from regexps r,expressions e"
 					" where r.regexpid=e.regexpid"
-						" and r.name='%s'",
-					f_regexp_esc);
+						" and r.name='%s'" DB_NODE,
+					f_regexp_esc, DBnode_local("r.regexpid"));
 
 			zbx_free(f_regexp_esc);
 
