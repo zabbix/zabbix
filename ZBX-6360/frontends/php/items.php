@@ -848,8 +848,8 @@ else {
 		'limit' => $config['search_limit'] + 1
 	);
 	$preFilter = count($options, COUNT_RECURSIVE);
-	if (!empty($data['hostid'])) {
-		$options['hostids'] = $hostid;
+	if (isset($data['hostid'])) {
+		$options['hostids'] = $data['hostid'];
 	}
 	if (isset($_REQUEST['filter_group']) && !zbx_empty($_REQUEST['filter_group'])) {
 		$options['group'] = $_REQUEST['filter_group'];
