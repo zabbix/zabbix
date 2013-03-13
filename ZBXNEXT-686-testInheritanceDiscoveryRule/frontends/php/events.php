@@ -336,7 +336,7 @@ if (EVENT_SOURCE_TRIGGERS == $source) {
 		if ($dbTrigger) {
 			$dbTrigger = reset($dbTrigger);
 			$host = reset($dbTrigger['hosts']);
-			$trigger = $host['name'].':'.$dbTrigger['description'];
+			$trigger = $host['name'].NAME_DELIMITER.$dbTrigger['description'];
 		}
 		else {
 			$_REQUEST['triggerid'] = 0;
@@ -505,7 +505,7 @@ else {
 						$event_data['object_data']['port'] = _('Unknown');
 					}
 
-					$event_data['description'] = _('Service').': '.
+					$event_data['description'] = _('Service').NAME_DELIMITER.
 							discovery_check_type2str($event_data['object_data']['type']).
 							discovery_port2str($event_data['object_data']['type'], $event_data['object_data']['port']);
 

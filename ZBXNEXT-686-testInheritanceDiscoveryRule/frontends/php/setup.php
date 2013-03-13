@@ -115,12 +115,12 @@ zbx_setcookie('ZBX_CONFIG', serialize($ZBX_CONFIG));
 // page title
 $pageTitle = '';
 if (isset($ZBX_SERVER_NAME) && !zbx_empty($ZBX_SERVER_NAME)) {
-	$pageTitle = $ZBX_SERVER_NAME.': ';
+	$pageTitle = $ZBX_SERVER_NAME.NAME_DELIMITER;
 }
 $pageTitle .= _('Installation');
 
 $pageHeader = new CPageHeader($pageTitle);
-$pageHeader->addCssFile('css.css');
+$pageHeader->addCssInit();
 $pageHeader->addCssFile('styles/themes/originalblue/main.css');
 $pageHeader->addJsFile('js/jquery/jquery.js');
 $pageHeader->addJsFile('js/jquery/jquery-ui.js');

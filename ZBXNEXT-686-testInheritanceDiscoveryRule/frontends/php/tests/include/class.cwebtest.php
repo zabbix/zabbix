@@ -72,7 +72,7 @@ class CWebTest extends PHPUnit_Extensions_SeleniumTestCase {
 		global $DB;
 
 		$this->setHost(PHPUNIT_FRONTEND_HOST);
-		$this->setBrowser('*firefox');
+		$this->setBrowser('*custom /usr/lib/firefox/firefox');
 		if (strstr(PHPUNIT_URL, 'http://')) {
 			$this->setBrowserUrl(PHPUNIT_URL);
 		}
@@ -136,7 +136,7 @@ class CWebTest extends PHPUnit_Extensions_SeleniumTestCase {
 		global $ZBX_SERVER_NAME;
 
 		if ($ZBX_SERVER_NAME !== '') {
-			$title = $ZBX_SERVER_NAME.': '.$title;
+			$title = $ZBX_SERVER_NAME.NAME_DELIMITER.$title;
 		}
 
 		$this->assertTitle($title);
