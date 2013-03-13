@@ -89,7 +89,7 @@ foreach ($data['discoveries'] as $discovery) {
 		array(new CLink(_('Item prototypes'), 'disc_prototypes.php?hostid='.get_request('hostid').'&parent_discoveryid='.$discovery['itemid']), ' ('.$discovery['items'].')'),
 		array(new CLink(_('Trigger prototypes'), 'trigger_prototypes.php?hostid='.get_request('hostid').'&parent_discoveryid='.$discovery['itemid']), ' ('.$discovery['triggers'].')'),
 		array(new CLink(_('Graph prototypes'), 'graphs.php?hostid='.get_request('hostid').'&parent_discoveryid='.$discovery['itemid']), ' ('.$discovery['graphs'].')'),
-		array(new CLink(_('Host prototypes'), 'host_prototypes.php?parent_hostid='.get_request('hostid').'&parent_discoveryid='.$discovery['itemid']), ' ('.$discovery['hostPrototypes'].')'),
+		array(new CLink(_('Host prototypes'), 'host_prototypes.php?parent_discoveryid='.$discovery['itemid']), ' ('.$discovery['hostPrototypes'].')'),
 		$discovery['key_'],
 		$discovery['delay'],
 		item_type2str($discovery['type']),

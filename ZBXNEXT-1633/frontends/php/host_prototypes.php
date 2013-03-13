@@ -36,7 +36,6 @@ require_once dirname(__FILE__).'/include/page_header.php';
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = array(
 	'hostid' =>				array(T_ZBX_INT, O_NO,	P_SYS,	DB_ID,		'(isset({form})&&({form}=="update"))'),
-	'parent_hostid' =>		array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
 	'parent_discoveryid' =>	array(T_ZBX_INT, O_MAND, P_SYS,	DB_ID, null),
 	'host' =>		        array(T_ZBX_STR, O_OPT, null,		NOT_EMPTY,	'isset({save})', _('Host name')),
 	'name' =>	            array(T_ZBX_STR, O_OPT, null,		null,		'isset({save})'),
