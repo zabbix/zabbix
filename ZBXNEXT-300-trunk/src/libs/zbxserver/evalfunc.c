@@ -343,9 +343,9 @@ clean:
 #define OP_BAND	7
 #define OP_MAX	8
 
-static int	evaluate_COUNT_one(unsigned char value_type, int op, const char *value, const char *arg2)
+static int	evaluate_COUNT_one(unsigned char value_type, int op, const char *value, const char *arg2, const char *arg2_2)
 {
-	zbx_uint64_t	value_uint64 = 0, arg2_uint64;
+	zbx_uint64_t	value_uint64 = 0, arg2_uint64, arg2_2_uint64;
 	double		value_double = 0, arg2_double;
 
 	switch (value_type)
@@ -382,7 +382,15 @@ static int	evaluate_COUNT_one(unsigned char value_type, int op, const char *valu
 						return SUCCEED;
 					break;
 				case OP_BAND:
-					if (arg2_uint64 == (value_uint64 & arg2_uint64))
+					if (NULL != arg2_2)
+					{
+						if (SUCCEED != is_uint64(arg2_2, &arg2_2_uint64))
+							return FAIL;
+					}
+					else
+						arg2_2_uint64 = arg2_uint64;
+
+					if (arg2_uint64 == (value_uint64 & arg2_2_uint64))
 						return SUCCEED;
 					break;
 			}
@@ -450,7 +458,7 @@ static int	evaluate_COUNT_one(unsigned char value_type, int op, const char *valu
 	return FAIL;
 }
 
-static int	evaluate_COUNT_local(DB_ITEM *item, int op, int arg1, const char *arg2, int *count)
+static int	evaluate_COUNT_local(DB_ITEM *item, int op, int arg1, const char *arg2, const char *arg2_2, int *count)
 {
 	int	h_num;
 
@@ -481,7 +489,7 @@ static int	evaluate_COUNT_local(DB_ITEM *item, int op, int arg1, const char *arg
 		lastvalue = (NULL == item->h_lastvalue[h_num] ? item->lastvalue[h_num] :
 				item->h_lastvalue[h_num]);
 
-		if (SUCCEED == evaluate_COUNT_one(item->value_type, op, lastvalue, arg2))
+		if (SUCCEED == evaluate_COUNT_one(item->value_type, op, lastvalue, arg2, arg2_2))
 			(*count)++;
 	}
 
@@ -498,6 +506,11 @@ static int	evaluate_COUNT_local(DB_ITEM *item, int op, int arg1, const char *arg
  *             parameters - up to four comma-separated fields:                *
  *                            (1) number of seconds/values                    *
  *                            (2) value to compare with (optional)            *
+ *                                Exception is for comparison operator "band".*
+ *                                With "band" this parameter is mandatory and *
+ *                                can take one of 2 forms:                    *
+ *                                  - value_to_compare_with/mask              *
+ *                                  - mask                                    *
  *                            (3) comparison operator (optional)              *
  *                            (4) time shift (optional)                       *
  *                                                                            *
@@ -512,7 +525,7 @@ static int	evaluate_COUNT(char *value, DB_ITEM *item, const char *function, cons
 	const char	*__function_name = "evaluate_COUNT";
 	int		arg1, flag, op, numeric_search, nparams, count = 0, h_num, res = FAIL;
 	int		time_shift = 0, time_shift_flag;
-	char		*arg2 = NULL, *arg3 = NULL;
+	char		*arg2 = NULL, *arg2_2 = NULL, *arg3 = NULL;
 	char		**h_value;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
@@ -553,7 +566,15 @@ static int	evaluate_COUNT(char *value, DB_ITEM *item, const char *function, cons
 		else if (0 == strcmp(arg3, "like"))
 			op = OP_LIKE;
 		else if (0 == strcmp(arg3, "band"))
+		{
 			op = OP_BAND;
+
+			if (NULL != (arg2_2 = strchr(arg2, '/')))
+			{
+				*arg2_2 = '\0';	/* end of the 1st part of the 2nd parameter (number to compare with) */
+				arg2_2++;	/* start of the 2nd part of the 2nd parameter (mask) */
+			}
+		}
 		else
 			fail = 1;
 
@@ -601,7 +622,7 @@ static int	evaluate_COUNT(char *value, DB_ITEM *item, const char *function, cons
 	{
 		if (ZBX_FLAG_VALUES == flag)
 		{
-			if (0 == time_shift && SUCCEED == evaluate_COUNT_local(item, op, arg1, arg2, &count))
+			if (0 == time_shift && SUCCEED == evaluate_COUNT_local(item, op, arg1, arg2, arg2_2, &count))
 				goto skip_get_history;
 
 			h_value = DBget_history(item->itemid, item->value_type, ZBX_DB_GET_HIST_VALUE,
@@ -630,7 +651,7 @@ static int	evaluate_COUNT(char *value, DB_ITEM *item, const char *function, cons
 
 		for (h_num = 0; NULL != h_value[h_num]; h_num++)
 		{
-			if (NULL == arg2 || SUCCEED == evaluate_COUNT_one(item->value_type, op, h_value[h_num], arg2))
+			if (NULL == arg2 || SUCCEED == evaluate_COUNT_one(item->value_type, op, h_value[h_num], arg2, arg2_2))
 				count++;
 		}
 		DBfree_history(h_value);
