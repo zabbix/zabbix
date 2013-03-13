@@ -27,7 +27,7 @@ class testPageDiscoveryRules extends CWebTest {
 		$sql = 'SELECT h.hostid, i.itemid'.
 				' FROM hosts h, items i'.
 				' WHERE i.hostid=h.hostid'.
-					' AND i.flags='.ZBX_FLAG_DISCOVERY;
+					' AND i.flags='.ZBX_FLAG_DISCOVERY_PROTOTYPE;
 
 		return DBdata($sql);
 	}
@@ -53,7 +53,7 @@ class testPageDiscoveryRules extends CWebTest {
 		$this->zbxTestTextPresent('Discovery rule deleted');
 		$this->zbxTestTextPresent('CONFIGURATION OF DISCOVERY RULES');
 
-		$sql = "select * from items where itemid=$itemid AND flags=".ZBX_FLAG_DISCOVERY;
+		$sql = "select * from items where itemid=$itemid AND flags=".ZBX_FLAG_DISCOVERY_PROTOTYPE;
 		$this->assertEquals(0, DBcount($sql));
 		$sql = "select * from item_discovery where parent_itemid=$itemid";
 		$this->assertEquals(0, DBcount($sql));
