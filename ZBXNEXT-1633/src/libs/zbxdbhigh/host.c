@@ -2887,24 +2887,25 @@ static void	DBcopy_template_items(zbx_uint64_t hostid, zbx_vector_uint64_t *temp
 
 	if (0 != item_num)
 	{
-		zbx_uint64_t	itemid = 0;
-		int		new_items = item_num;
-		const char	*ins_items_sql =
-				"insert into items"
-				" (itemid,name,key_,hostid,type,value_type,data_type,delay,delay_flex,history,trends,"
-					"status,trapper_hosts,units,multiplier,delta,formula,logtimefmt,valuemapid,"
-					"params,ipmi_sensor,snmp_community,snmp_oid,snmpv3_securityname,"
-					"snmpv3_securitylevel,snmpv3_authprotocol,snmpv3_authpassphrase,"
-					"snmpv3_privprotocol,snmpv3_privpassphrase,authtype,username,password,"
-					"publickey,privatekey,templateid,flags,filter,description,inventory_link,"
-					"interfaceid,lifetime)"
-				" values ";
-		zbx_uint64_t	*itemids = NULL, *protoids = NULL;
-		size_t		itemids_num = 0, protoids_num = 0;
-		zbx_itemapp_t	*itemapp = NULL;
-		size_t		itemapp_alloc = 0, itemapp_num = 0;
+		zbx_uint64_t		itemid = 0;
+		int			new_items = item_num;
+		const char		*ins_items_sql =
+					"insert into items"
+					" (itemid,name,key_,hostid,type,value_type,data_type,delay,delay_flex,history,"
+						"trends,status,trapper_hosts,units,multiplier,delta,formula,logtimefmt,"
+						"valuemapid,params,ipmi_sensor,snmp_community,snmp_oid,"
+						"snmpv3_securityname,snmpv3_securitylevel,snmpv3_authprotocol,"
+						"snmpv3_authpassphrase,snmpv3_privprotocol,snmpv3_privpassphrase,"
+						"authtype,username,password,publickey,privatekey,templateid,flags,"
+						"filter,description,inventory_link,interfaceid,lifetime)"
+					" values ";
+		zbx_vector_uint64_t	itemids, protoids;
+		zbx_itemapp_t		*itemapp = NULL;
+		size_t			itemapp_alloc = 0, itemapp_num = 0;
 
-		itemids = zbx_malloc(itemids, item_num * sizeof(zbx_uint64_t));
+		zbx_vector_uint64_create(&itemids);
+		zbx_vector_uint64_reserve(&itemids, item_num);
+		zbx_vector_uint64_create(&protoids);
 
 		sql_offset = 0;
 		DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
@@ -2914,7 +2915,7 @@ static void	DBcopy_template_items(zbx_uint64_t hostid, zbx_vector_uint64_t *temp
 			if (0 == item[i].itemid)
 				continue;
 
-			itemids[itemids_num++] = item[i].itemid;
+			zbx_vector_uint64_append(&itemids, item[i].itemid);
 
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 					"update items"
@@ -2978,7 +2979,6 @@ static void	DBcopy_template_items(zbx_uint64_t hostid, zbx_vector_uint64_t *temp
 		if (0 != new_items)
 		{
 			itemid = DBget_maxid_num("items", new_items);
-			protoids = zbx_malloc(protoids, new_items * sizeof(zbx_uint64_t));
 #ifdef HAVE_MULTIROW_INSERT
 			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ins_items_sql);
 #endif
@@ -2988,8 +2988,6 @@ static void	DBcopy_template_items(zbx_uint64_t hostid, zbx_vector_uint64_t *temp
 		{
 			if (0 != item[i].itemid)
 				continue;
-
-			itemids[itemids_num++] = itemid;
 
 #ifndef HAVE_MULTIROW_INSERT
 			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ins_items_sql);
@@ -3018,9 +3016,9 @@ static void	DBcopy_template_items(zbx_uint64_t hostid, zbx_vector_uint64_t *temp
 			zbx_free(item[i].key_esc);
 
 			if (0 != (ZBX_FLAG_DISCOVERY_PROTOTYPE & item[i].flags))
-				protoids[protoids_num++] = itemid;
+				zbx_vector_uint64_append(&protoids, itemid);
 
-			itemid++;
+			zbx_vector_uint64_append(&itemids, itemid++);
 		}
 
 #ifdef HAVE_MULTIROW_INSERT
@@ -3067,7 +3065,7 @@ static void	DBcopy_template_items(zbx_uint64_t hostid, zbx_vector_uint64_t *temp
 				" from items_applications tia"
 					" join items hi on hi.templateid=tia.itemid"
 						" and");
-		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hi.itemid", itemids, itemids_num);
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hi.itemid", itemids.values, itemids.values_num);
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
 					" join applications ha on ha.templateid=tia.applicationid"
 						" and ha.hostid=hi.hostid"
@@ -3075,7 +3073,7 @@ static void	DBcopy_template_items(zbx_uint64_t hostid, zbx_vector_uint64_t *temp
 							" and hia.itemid=hi.itemid"
 				" where hia.itemappid is null");
 
-		zbx_free(itemids);
+		zbx_vector_uint64_destroy(&itemids);
 
 		result = DBselect("%s", sql);
 
@@ -3130,7 +3128,7 @@ static void	DBcopy_template_items(zbx_uint64_t hostid, zbx_vector_uint64_t *temp
 			zbx_free(itemapp);
 		}
 
-		if (0 != protoids_num)
+		if (0 != protoids.values_num)
 		{
 			zbx_proto_t	*proto = NULL;
 			size_t		proto_alloc = 0, proto_num = 0;
@@ -3144,7 +3142,8 @@ static void	DBcopy_template_items(zbx_uint64_t hostid, zbx_vector_uint64_t *temp
 						" and r.hostid=" ZBX_FS_UI64
 						" and",
 					hostid);
-			DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "i.itemid", protoids, protoids_num);
+			DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "i.itemid",
+					protoids.values, protoids.values_num);
 
 			result = DBselect("%s", sql);
 
@@ -3200,7 +3199,7 @@ static void	DBcopy_template_items(zbx_uint64_t hostid, zbx_vector_uint64_t *temp
 			}
 		}
 
-		zbx_free(protoids);
+		zbx_vector_uint64_destroy(&protoids);
 	}
 
 	zbx_free(sql);
