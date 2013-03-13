@@ -633,7 +633,7 @@ elseif (isset($_REQUEST['form'])) {
 
 		$host = API::Host()->get(array(
 			'output' => API_OUTPUT_EXTEND,
-			'selectDiscoveryRule' => array('itemid', 'name'),
+			'selectDiscoveryRule' => array('itemid', 'name', 'hostid'),
 			'selectGroups' => array('groupid', 'name'),
 			'selectParentTemplates' => array('templateid', 'name'),
 			'selectInterfaces' => API_OUTPUT_EXTEND,
