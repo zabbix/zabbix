@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-03-13 14:15+0200\n"
-"PO-Revision-Date: 2013-02-01 14:41+0200\n"
+"POT-Creation-Date: 2013-03-13 14:17+0200\n"
+"PO-Revision-Date: 2013-02-20 13:54+0200\n"
 "Last-Translator: dotneft <dotneft@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: ru\n"
@@ -210,7 +210,7 @@ msgstr "Доступ запрещен!"
 
 #: include/func.inc.php:1904
 msgid "Access denied."
-msgstr ""
+msgstr "Доступ запрещен."
 
 #: api/classes/CUser.php:869
 #, php-format
@@ -4783,7 +4783,7 @@ msgstr "Перейти к"
 
 #: include/func.inc.php:1922
 msgid "Go to dashboard"
-msgstr ""
+msgstr "Перейти на ПАНЕЛЬ"
 
 #: include/views/configuration.httpconf.edit.php:142
 msgid "Google Chrome"
