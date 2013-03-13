@@ -260,7 +260,10 @@ $triggersTab = new CTabView(array('remember' => true));
 if (!$this->data['form_refresh']) {
 	$triggersTab->setSelected(0);
 }
-$triggersTab->addTab('triggersTab', _('Trigger'), $triggersFormList);
+$triggersTab->addTab(
+	'triggersTab',
+	empty($this->data['parent_discoveryid']) ? _('Trigger') : _('Trigger prototype'), $triggersFormList
+);
 
 /*
  * Dependencies tab
