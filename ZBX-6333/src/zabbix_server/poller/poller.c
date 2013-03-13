@@ -281,9 +281,6 @@ static void	activate_host(DC_ITEM *item, zbx_timespec_t *ts)
 	if (0 == *errors_from && HOST_AVAILABLE_TRUE == *available)
 		return;
 
-	if (SUCCEED != DCconfig_activate_host(item))
-		return;
-
 	offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, "update hosts set ");
 
 	if (HOST_AVAILABLE_TRUE == *available)
@@ -309,9 +306,14 @@ static void	activate_host(DC_ITEM *item, zbx_timespec_t *ts)
 	offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, "%s=%d,%s=%d,%s='' where hostid=" ZBX_FS_UI64,
 			fld_errors_from, *errors_from, fld_disable_until, *disable_until, fld_error, item->host.hostid);
 
-	DBbegin();
-	DBexecute("%s", sql);
-	DBcommit();
+	if (SUCCEED == DCconfig_update_host_availability(item->host.hostid, item->type,	*available, *errors_from,
+			*disable_until))
+	{
+
+		DBbegin();
+		DBexecute("%s", sql);
+		DBcommit();
+	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
@@ -376,13 +378,6 @@ static void	deactivate_host(DC_ITEM *item, zbx_timespec_t *ts, const char *error
 			return;
 	}
 
-	if (SUCCEED != DCconfig_deactivate_host(item, ts->sec))
-		return;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() errors_from:%d available:%d", __function_name, *errors_from, *available);
-
-	DBbegin();
-
 	*error_msg = '\0';
 
 	offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, "update hosts set ");
@@ -435,8 +430,15 @@ static void	deactivate_host(DC_ITEM *item, zbx_timespec_t *ts, const char *error
 	offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, "%s=%d where hostid=" ZBX_FS_UI64,
 			fld_disable_until, *disable_until, item->host.hostid);
 
-	DBexecute("%s", sql);
-	DBcommit();
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() errors_from:%d available:%d", __function_name, *errors_from, *available);
+
+	if (SUCCEED == DCconfig_update_host_availability(item->host.hostid, item->type, *available, *errors_from,
+			*disable_until))
+	{
+		DBbegin();
+		DBexecute("%s", sql);
+		DBcommit();
+	}
 
 	if ('\0' != *error_msg)
 		zabbix_log(LOG_LEVEL_WARNING, "%s", error_msg);
@@ -603,7 +605,7 @@ static int	get_values(unsigned char poller_type)
 			case ITEM_TYPE_IPMI:
 			case ITEM_TYPE_JMX:
 				ZBX_STRDUP(port, items[i].interface.port_orig);
-				substitute_simple_macros(NULL, &items[i].host.hostid, NULL, NULL, NULL,
+				substitute_simple_macros(NULL, NULL, &items[i].host.hostid, NULL, NULL, NULL,
 						&port, MACRO_TYPE_INTERFACE_PORT, NULL, 0);
 				if (FAIL == is_ushort(port, &items[i].interface.port))
 				{
@@ -622,11 +624,11 @@ static int	get_values(unsigned char poller_type)
 				ZBX_STRDUP(items[i].snmpv3_authpassphrase, items[i].snmpv3_authpassphrase_orig);
 				ZBX_STRDUP(items[i].snmpv3_privpassphrase, items[i].snmpv3_privpassphrase_orig);
 
-				substitute_simple_macros(NULL, &items[i].host.hostid, NULL, NULL, NULL,
+				substitute_simple_macros(NULL, NULL, &items[i].host.hostid, NULL, NULL, NULL,
 						&items[i].snmpv3_securityname, MACRO_TYPE_ITEM_FIELD, NULL, 0);
-				substitute_simple_macros(NULL, &items[i].host.hostid, NULL, NULL, NULL,
+				substitute_simple_macros(NULL, NULL, &items[i].host.hostid, NULL, NULL, NULL,
 						&items[i].snmpv3_authpassphrase, MACRO_TYPE_ITEM_FIELD, NULL, 0);
-				substitute_simple_macros(NULL, &items[i].host.hostid, NULL, NULL, NULL,
+				substitute_simple_macros(NULL, NULL, &items[i].host.hostid, NULL, NULL, NULL,
 						&items[i].snmpv3_privpassphrase, MACRO_TYPE_ITEM_FIELD, NULL, 0);
 				/* break; is not missing here */
 			case ITEM_TYPE_SNMPv1:
@@ -634,7 +636,7 @@ static int	get_values(unsigned char poller_type)
 				ZBX_STRDUP(items[i].snmp_community, items[i].snmp_community_orig);
 				ZBX_STRDUP(items[i].snmp_oid, items[i].snmp_oid_orig);
 
-				substitute_simple_macros(NULL, &items[i].host.hostid, NULL, NULL, NULL,
+				substitute_simple_macros(NULL, NULL, &items[i].host.hostid, NULL, NULL, NULL,
 						&items[i].snmp_community, MACRO_TYPE_ITEM_FIELD, NULL, 0);
 				if (SUCCEED != substitute_key_macros(&items[i].snmp_oid, &items[i].host.hostid, NULL,
 						NULL, MACRO_TYPE_SNMP_OID, error, sizeof(error)))
@@ -648,31 +650,31 @@ static int	get_values(unsigned char poller_type)
 				ZBX_STRDUP(items[i].publickey, items[i].publickey_orig);
 				ZBX_STRDUP(items[i].privatekey, items[i].privatekey_orig);
 
-				substitute_simple_macros(NULL, &items[i].host.hostid, NULL, NULL, NULL,
+				substitute_simple_macros(NULL, NULL, &items[i].host.hostid, NULL, NULL, NULL,
 						&items[i].publickey, MACRO_TYPE_ITEM_FIELD, NULL, 0);
-				substitute_simple_macros(NULL, &items[i].host.hostid, NULL, NULL, NULL,
+				substitute_simple_macros(NULL, NULL, &items[i].host.hostid, NULL, NULL, NULL,
 						&items[i].privatekey, MACRO_TYPE_ITEM_FIELD, NULL, 0);
 				/* break; is not missing here */
 			case ITEM_TYPE_TELNET:
 				ZBX_STRDUP(items[i].username, items[i].username_orig);
 				ZBX_STRDUP(items[i].password, items[i].password_orig);
 
-				substitute_simple_macros(NULL, &items[i].host.hostid, NULL, NULL, NULL,
+				substitute_simple_macros(NULL, NULL, &items[i].host.hostid, NULL, NULL, NULL,
 						&items[i].username, MACRO_TYPE_ITEM_FIELD, NULL, 0);
-				substitute_simple_macros(NULL, &items[i].host.hostid, NULL, NULL, NULL,
+				substitute_simple_macros(NULL, NULL, &items[i].host.hostid, NULL, NULL, NULL,
 						&items[i].password, MACRO_TYPE_ITEM_FIELD, NULL, 0);
 				/* break; is not missing here */
 			case ITEM_TYPE_DB_MONITOR:
-				substitute_simple_macros(NULL, NULL, NULL, &items[i], NULL,
+				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i], NULL,
 						&items[i].params, MACRO_TYPE_PARAMS_FIELD, NULL, 0);
 				break;
 			case ITEM_TYPE_JMX:
 				ZBX_STRDUP(items[i].username, items[i].username_orig);
 				ZBX_STRDUP(items[i].password, items[i].password_orig);
 
-				substitute_simple_macros(NULL, &items[i].host.hostid, NULL, NULL, NULL,
+				substitute_simple_macros(NULL, NULL, &items[i].host.hostid, NULL, NULL, NULL,
 						&items[i].username, MACRO_TYPE_ITEM_FIELD, NULL, 0);
-				substitute_simple_macros(NULL, &items[i].host.hostid, NULL, NULL, NULL,
+				substitute_simple_macros(NULL, NULL, &items[i].host.hostid, NULL, NULL, NULL,
 						&items[i].password, MACRO_TYPE_ITEM_FIELD, NULL, 0);
 				break;
 		}

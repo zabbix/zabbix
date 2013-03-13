@@ -3677,7 +3677,7 @@ zbx_uint64_t	DBadd_interface(zbx_uint64_t hostid, unsigned char type,
 
 		zbx_free(tmp);
 		tmp = strdup(row[4]);
-		substitute_simple_macros(NULL, &hostid, NULL, NULL, NULL,
+		substitute_simple_macros(NULL, NULL, &hostid, NULL, NULL, NULL,
 				&tmp, MACRO_TYPE_INTERFACE_PORT, NULL, 0);
 		if (FAIL == is_ushort(tmp, &db_port) || db_port != port)
 			continue;

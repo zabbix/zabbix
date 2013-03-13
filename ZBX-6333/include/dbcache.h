@@ -254,4 +254,7 @@ void	DCrequeue_proxy(zbx_uint64_t hostid, unsigned char update_nextcheck);
 
 void	DCget_user_macro(zbx_uint64_t *hostids, int host_num, const char *macro, char **replace_to);
 
+int	DCconfig_update_host_availability(zbx_uint64_t hostid, unsigned char item_type, unsigned char available,
+		int errors_from, int disable_until);
+
 #endif

@@ -294,11 +294,11 @@ class CTriggerExpression {
 	private function parseFunctionMacro() {
 		$j = $this->pos;
 
-		if (!isset($this->expression[$j]) || $this->expression[$j++] != '{' || !($host = $this->parseHost($j))) {
+		if (!isset($this->expression[$j]) || $this->expression[$j++] != '{' || ($host = $this->parseHost($j)) === null) {
 			return false;
 		}
 
-		if (!isset($this->expression[$j]) || $this->expression[$j++] != ':' || !($item = $this->parseItem($j))) {
+		if (!isset($this->expression[$j]) || $this->expression[$j++] != ':' || ($item = $this->parseItem($j)) === null) {
 			return false;
 		}
 
