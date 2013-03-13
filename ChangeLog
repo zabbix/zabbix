@@ -1,6 +1,7 @@
 Changes for 2.1.0
 
 New features:
+..F....... [ZBXNEXT-1399] implemented multiselect in dashboard configuration (Eduard)
 ........S. [ZBXNEXT-354] added macro expansion for allowed hosts setting in trapper items (wiper)
 ..F....... [ZBXNEXT-109] implemented discovery rule check editing (Eduard)
 ...GI..PS. [ZBXNEXT-1550] added support of loadable modules for extending Zabbix Agent checks, also Server and Proxy simple checks (Alexei)
@@ -43,6 +44,7 @@ A.F.I...S. [ZBXNEXT-1186] increased length to 2048 characters of expression fiel
 ..F....... [ZBX-5127] regular expressions form redesign (Vedmak)
 
 Bug fixes:
+..F....... [ZBX-6369] fixed "Use custom multiplier" field validation in items (Oleg)
 ..F....... [ZBX-6366] fixed "New flexible interval" field validation in item prototypes (Oleg)
 ..F....... [ZBX-6334] fixed naming consistent in triggers and graph prototypes (Eduard)
 ..F....... [ZBX-6292] added support of time postfixes in trigger expression test page (Eduard)
@@ -147,6 +149,8 @@ A.F....... [ZBX-1357] added Lithuanian translation; thanks to Zabbix translators
 A.F....... [ZBX-1357] updated American English, Brazilian Portuguese, French, German, Greek, Hungarian, Latvian, Slovak, Spanish, Russian, Turkish and Ukrainian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+..F....... [ZBX-6352] fixed web scenario and discovery rule delay interval (Eduard)
+..F....... [ZBX-6357] fixed template graph cloning (Eduard)
 .......PS. [ZBX-4991] fixed host availability checks with proxies (wiper)
 ........S. [ZBX-6322] enforced nls_numeric_characters setting for oracle db sessions (wiper)
 ..F....... [ZBX-6328] fixed undefined index in proxy list (Eduard)
