@@ -184,6 +184,17 @@ void	DBlld_hosts_validate(zbx_vector_ptr_t *hosts, char **error)
 	{
 		host_a = (zbx_lld_host_t *)hosts->values[i];
 
+		if (0 == host_a->hostid || 0 != (host_a->flags & ZBX_FLAG_LLD_HOST_UPDATE_HOST))
+		{
+			if (SUCCEED != zbx_check_hostname(host_a->host))
+			{
+				*error = zbx_strdcatf(*error, "Cannot %s host: invalid host name \"%s\".\n",
+						(0 != host_a->hostid ? "update" : "create"), host_a->host);
+				host_a->flags = 0;
+				continue;
+			}
+		}
+
 		for (j = i + 1; j < hosts->values_num; j++)
 		{
 			host_b = (zbx_lld_host_t *)hosts->values[j];
@@ -213,26 +224,34 @@ void	DBlld_hosts_validate(zbx_vector_ptr_t *hosts, char **error)
 		if (0 != host_a->hostid)
 			zbx_vector_uint64_append(&hostids, host_a->hostid);
 
-		host_esc = DBdyn_escape_string_len(host_a->host, HOST_HOST_LEN);
-		name_esc = DBdyn_escape_string_len(host_a->name, HOST_NAME_LEN);
+		if (0 == host_a->hostid || 0 != (host_a->flags & ZBX_FLAG_LLD_HOST_UPDATE_HOST))
+		{
+			host_esc = DBdyn_escape_string_len(host_a->host, HOST_HOST_LEN);
 
-		if (0 != tnames_offset)
-			zbx_chrcpy_alloc(&tnames, &tnames_alloc, &tnames_offset, ',');
-		zbx_chrcpy_alloc(&tnames, &tnames_alloc, &tnames_offset, '\'');
-		zbx_strcpy_alloc(&tnames, &tnames_alloc, &tnames_offset, host_esc);
-		zbx_chrcpy_alloc(&tnames, &tnames_alloc, &tnames_offset, '\'');
+			if (0 != tnames_offset)
+				zbx_chrcpy_alloc(&tnames, &tnames_alloc, &tnames_offset, ',');
+			zbx_chrcpy_alloc(&tnames, &tnames_alloc, &tnames_offset, '\'');
+			zbx_strcpy_alloc(&tnames, &tnames_alloc, &tnames_offset, host_esc);
+			zbx_chrcpy_alloc(&tnames, &tnames_alloc, &tnames_offset, '\'');
 
-		if (0 != vnames_offset)
-			zbx_chrcpy_alloc(&vnames, &vnames_alloc, &vnames_offset, ',');
-		zbx_chrcpy_alloc(&vnames, &vnames_alloc, &vnames_offset, '\'');
-		zbx_strcpy_alloc(&vnames, &vnames_alloc, &vnames_offset, name_esc);
-		zbx_chrcpy_alloc(&vnames, &vnames_alloc, &vnames_offset, '\'');
+			zbx_free(host_esc);
+		}
 
-		zbx_free(name_esc);
-		zbx_free(host_esc);
+		if (0 == host_a->hostid || 0 != (host_a->flags & ZBX_FLAG_LLD_HOST_UPDATE_NAME))
+		{
+			name_esc = DBdyn_escape_string_len(host_a->name, HOST_NAME_LEN);
+
+			if (0 != vnames_offset)
+				zbx_chrcpy_alloc(&vnames, &vnames_alloc, &vnames_offset, ',');
+			zbx_chrcpy_alloc(&vnames, &vnames_alloc, &vnames_offset, '\'');
+			zbx_strcpy_alloc(&vnames, &vnames_alloc, &vnames_offset, name_esc);
+			zbx_chrcpy_alloc(&vnames, &vnames_alloc, &vnames_offset, '\'');
+
+			zbx_free(name_esc);
+		}
 	}
 
-	if (0 != tnames_offset)	/* we have the discovered hosts */
+	if (0 != tnames_offset || 0 != vnames_offset)
 	{
 		char	*sql = NULL;
 		size_t	sql_alloc = 256, sql_offset = 0;
@@ -244,12 +263,19 @@ void	DBlld_hosts_validate(zbx_vector_ptr_t *hosts, char **error)
 				" from hosts"
 				" where status in (%d,%d,%d)"
 					" and flags<>%d"
-					" and ("
-						"host in (%s) or name in (%s)"
-					")",
+					" and ",
 				HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED, HOST_STATUS_TEMPLATE,
-				ZBX_FLAG_DISCOVERY_PROTOTYPE,
-				tnames, vnames);
+				ZBX_FLAG_DISCOVERY_PROTOTYPE);
+		if (0 != tnames_offset && 0 != vnames_offset)
+			zbx_chrcpy_alloc(&sql, &sql_alloc, &sql_offset, '(');
+		if (0 != tnames_offset)
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "host in (%s)", tnames);
+		if (0 != tnames_offset && 0 != vnames_offset)
+			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " or ");
+		if (0 != vnames_offset)
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "name in (%s)", vnames);
+		if (0 != tnames_offset && 0 != vnames_offset)
+			zbx_chrcpy_alloc(&sql, &sql_alloc, &sql_offset, ')');
 		if (0 != hostids.values_num)
 		{
 			zbx_vector_uint64_sort(&hostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
@@ -353,6 +379,7 @@ static void	DBlld_host_make(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts,
 
 		buffer = zbx_strdup(buffer, host->host_proto);
 		substitute_discovery_macros(&buffer, jp_row, ZBX_MACRO_ANY, NULL, 0);
+		zbx_lrtrim(buffer, " ");
 
 		if (0 == strcmp(host->host, buffer))
 			break;
@@ -366,8 +393,12 @@ static void	DBlld_host_make(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts,
 		host->host_proto = NULL;
 		host->host = zbx_strdup(NULL, host_proto);
 		substitute_discovery_macros(&host->host, jp_row, ZBX_MACRO_ANY, NULL, 0);
+		zbx_lrtrim(host->host, " ");
 		host->name = zbx_strdup(NULL, name_proto);
 		substitute_discovery_macros(&host->name, jp_row, ZBX_MACRO_ANY, NULL, 0);
+		zbx_lrtrim(host->name, " ");
+		if ('\0' == *host->name)
+			host->name = zbx_strdup(host->name, host->host);
 		zbx_vector_uint64_create(&host->new_groupids);
 		zbx_vector_uint64_create(&host->lnk_templateids);
 		zbx_vector_uint64_create(&host->del_templateids);
@@ -385,12 +416,16 @@ static void	DBlld_host_make(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts,
 		{
 			host->host = zbx_strdup(host->host, host_proto);
 			substitute_discovery_macros(&host->host, jp_row, ZBX_MACRO_ANY, NULL, 0);
+			zbx_lrtrim(host->host, " ");
 			host->flags |= ZBX_FLAG_LLD_HOST_UPDATE_HOST;
 		}
 
 		/* host visible name */
 		buffer = zbx_strdup(buffer, name_proto);
 		substitute_discovery_macros(&buffer, jp_row, ZBX_MACRO_ANY, NULL, 0);
+		zbx_lrtrim(buffer, " ");
+		if ('\0' == *buffer)
+			buffer = zbx_strdup(buffer, host->host);
 		if (0 != strcmp(host->name, buffer))
 		{
 			zbx_free(host->name);
