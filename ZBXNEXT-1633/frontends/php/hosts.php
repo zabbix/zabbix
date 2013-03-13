@@ -216,7 +216,13 @@ elseif (isset($_REQUEST['go']) && $_REQUEST['go'] == 'massupdate' && isset($_REQ
 	try {
 		DBstart();
 
-		$hosts = array('hosts' => zbx_toObject($hostids, 'hostid'));
+		// filter only normal hosts, ignore discovered
+		$hosts = API::Host()->get(array(
+			'output' => array('hostid'),
+			'hostids' => $hostids,
+			'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL)
+		));
+		$hosts = array('hosts' => $hosts);
 
 		$properties = array('proxy_hostid', 'ipmi_authtype', 'ipmi_privilege', 'ipmi_username', 'ipmi_password', 'status');
 		$new_values = array();
