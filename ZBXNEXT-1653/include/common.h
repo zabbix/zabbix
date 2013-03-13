@@ -952,6 +952,7 @@ ZBX_REGEXP;
 /* regular expressions */
 char    *zbx_regexp_match(const char *string, const char *pattern, int *len);
 char    *zbx_iregexp_match(const char *string, const char *pattern, int *len);
+char	*zbx_regexp_sub(const char *string, const char *pattern, const char *output_template);
 
 void	clean_regexps_ex(ZBX_REGEXP *regexps, int *regexps_num);
 void	add_regexp_ex(ZBX_REGEXP **regexps, int *regexps_alloc, int *regexps_num,
