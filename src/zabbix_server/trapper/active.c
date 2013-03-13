@@ -471,6 +471,8 @@ int	send_list_of_active_checks_json(zbx_sock_t *sock, struct zbx_json_parse *jp)
 		}
 		zbx_chrcpy_alloc(&sql, &sql_alloc, &sql_offset, ')');
 
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ZBX_SQL_NODE, DBand_node_local("r.regexpid"));
+
 		result = DBselect("%s", sql);
 		while (NULL != (row = DBfetch(result)))
 		{
