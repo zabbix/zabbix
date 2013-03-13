@@ -175,7 +175,6 @@ if ($_REQUEST['go'] != 'none' && isset($go_result) && $go_result) {
  */
 if (isset($_REQUEST['form'])) {
 	$data = array(
-		'parent_hostid' => get_request('parent_hostid', null),
 		'discovery_rule' => $discoveryRule,
 		'host_prototype' => array(
 			'hostid' => get_request('hostid'),
@@ -194,7 +193,7 @@ if (isset($_REQUEST['form'])) {
 		'selectGroups' => array('groupid', 'name'),
 		'selectInterfaces' => API_OUTPUT_EXTEND,
 		'selectMacros' => API_OUTPUT_EXTEND,
-		'hostids' => get_request('parent_hostid'),
+		'hostids' => $discoveryRule['hostid'],
 		'templated_hosts' => true
 	));
 	$parentHost = reset($parentHost);
@@ -247,7 +246,6 @@ else {
 	$data = array(
 		'form' => get_request('form', null),
 		'parent_discoveryid' => get_request('parent_discoveryid', null),
-		'parent_hostid' => get_request('parent_hostid', null),
 		'discovery_rule' => $discoveryRule
 	);
 

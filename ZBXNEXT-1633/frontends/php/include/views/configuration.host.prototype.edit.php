@@ -26,7 +26,7 @@ require_once dirname(__FILE__).'/js/configuration.host.edit.js.php';
 
 $widget = new CWidget(null, 'hostprototype-edit');
 $widget->addPageHeader(_('CONFIGURATION OF HOST PROTOTYPES'));
-$widget->addItem(get_header_host_table('hosts', $this->data['parent_hostid'], $discoveryRule['itemid']));
+$widget->addItem(get_header_host_table('hosts', $discoveryRule['hostid'], $discoveryRule['itemid']));
 
 $divTabs = new CTabView(array('remember' => 1));
 if (!isset($_REQUEST['form_refresh'])) {
@@ -36,7 +36,6 @@ if (!isset($_REQUEST['form_refresh'])) {
 $frmHost = new CForm();
 $frmHost->setName('hostPrototypeForm.');
 $frmHost->addVar('form', get_request('form', 1));
-$frmHost->addVar('parent_hostid', $data['parent_hostid']);
 $frmHost->addVar('parent_discoveryid', $discoveryRule['itemid']);
 
 $hostList = new CFormList('hostlist');
@@ -46,7 +45,7 @@ if ($hostPrototype['templateid'] && $data['parents']) {
 	foreach (array_reverse($data['parents']) as $parent) {
 		$parents[] = new CLink(
 			$parent['parentHost']['name'],
-			'?form=update&hostid='.$parent['hostid'].'&parent_hostid='.$parent['parentHost']['hostid'].'&parent_discoveryid='.$parent['discoveryRule']['itemid'],
+			'?form=update&hostid='.$parent['hostid'].'&parent_discoveryid='.$parent['discoveryRule']['itemid'],
 			'highlight underline weight_normal'
 		);
 		$parents[] = SPACE.RARR.SPACE;
@@ -225,13 +224,13 @@ $frmHost->addItem($divTabs);
 $main = array(new CSubmit('save', _('Save')));
 $others = array();
 if ($hostPrototype['hostid']) {
-	$btnDelete = new CButtonDelete(_('Delete selected host prototype?'), url_param('form').url_param('hostid').url_param('parent_hostid').url_param('parent_discoveryid'));
+	$btnDelete = new CButtonDelete(_('Delete selected host prototype?'), url_param('form').url_param('hostid').url_param('parent_discoveryid'));
 	$btnDelete->setEnabled(!$hostPrototype['templateid']);
 
 	$others[] = new CSubmit('clone', _('Clone'));
 	$others[] = $btnDelete;
 }
-$others[] = new CButtonCancel(url_param('parent_hostid').url_param('parent_discoveryid'));
+$others[] = new CButtonCancel(url_param('parent_discoveryid'));
 
 $frmHost->addItem(makeFormFooter($main, $others));
 
