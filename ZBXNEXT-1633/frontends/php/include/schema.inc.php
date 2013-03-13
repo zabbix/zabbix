@@ -5616,6 +5616,12 @@ return array(
 				'ref_table' => 'items',
 				'ref_field' => 'itemid',
 			),
+			'host' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 64,
+				'default' => '',
+			),
 		),
 	),
 	'profiles' => array(
