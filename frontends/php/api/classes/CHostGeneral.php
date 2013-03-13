@@ -227,8 +227,8 @@ abstract class CHostGeneral extends CHostBase {
 	 */
 	protected function unlink($templateids, $targetids = null, $clear = false) {
 		$flags = ($clear)
-			? array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_PROTOTYPE)
-			: array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_PROTOTYPE, ZBX_FLAG_DISCOVERY_PROTOTYPE);
+			? array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY)
+			: array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY, ZBX_FLAG_DISCOVERY_PROTOTYPE);
 
 		/* TRIGGERS {{{ */
 		// check that all triggers on templates that we unlink, don't have items from another templates
@@ -343,7 +343,7 @@ abstract class CHostGeneral extends CHostBase {
 		$dbItems = DBSelect($sql);
 		$items = array(
 			ZBX_FLAG_DISCOVERY_NORMAL => array(),
-			ZBX_FLAG_DISCOVERY_PROTOTYPE => array(),
+			ZBX_FLAG_DISCOVERY => array(),
 			ZBX_FLAG_DISCOVERY_PROTOTYPE => array(),
 		);
 		while ($item = DBfetch($dbItems)) {
@@ -353,18 +353,18 @@ abstract class CHostGeneral extends CHostBase {
 			);
 		}
 
-		if (!empty($items[ZBX_FLAG_DISCOVERY_PROTOTYPE])) {
+		if (!empty($items[ZBX_FLAG_DISCOVERY])) {
 			if ($clear) {
-				$result = API::DiscoveryRule()->delete(array_keys($items[ZBX_FLAG_DISCOVERY_PROTOTYPE]), true);
+				$result = API::DiscoveryRule()->delete(array_keys($items[ZBX_FLAG_DISCOVERY]), true);
 				if (!$result) self::exception(ZBX_API_ERROR_INTERNAL, _('Cannot unlink and clear discovery rules'));
 			}
 			else{
 				DB::update('items', array(
 					'values' => array('templateid' => 0),
-					'where' => array('itemid' => array_keys($items[ZBX_FLAG_DISCOVERY_PROTOTYPE]))
+					'where' => array('itemid' => array_keys($items[ZBX_FLAG_DISCOVERY]))
 				));
 
-				foreach ($items[ZBX_FLAG_DISCOVERY_PROTOTYPE] as $discoveryRule) {
+				foreach ($items[ZBX_FLAG_DISCOVERY] as $discoveryRule) {
 					info(_s('Unlinked: Discovery rule "%1$s" on "%2$s".', $discoveryRule['name'], $discoveryRule['host']));
 				}
 			}
@@ -409,8 +409,8 @@ abstract class CHostGeneral extends CHostBase {
 
 		// host prototypes
 		// we need only to unlink host prototypes. in case of unlink and clear they will be deleted together with LLD rules.
-		if (!$clear && isset($items[ZBX_FLAG_DISCOVERY_PROTOTYPE])) {
-			$discoveryRuleIds = array_keys($items[ZBX_FLAG_DISCOVERY_PROTOTYPE]);
+		if (!$clear && isset($items[ZBX_FLAG_DISCOVERY])) {
+			$discoveryRuleIds = array_keys($items[ZBX_FLAG_DISCOVERY]);
 
 			$query = DBSelect(
 				'SELECT DISTINCT h.hostid,h.host,h3.host parent_host'.
