@@ -20,7 +20,7 @@
 #include "common.h"
 #include "sysinfo.h"
 
-int	VFS_FS_INODE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+int	VFS_FS_INODE(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 #ifdef HAVE_SYS_STATVFS_H
 #	define ZBX_STATFS	statvfs
@@ -29,23 +29,20 @@ int	VFS_FS_INODE(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 #	define ZBX_STATFS	statfs
 #	define ZBX_FFREE	f_ffree
 #endif
-	char			fsname[MAX_STRING_LEN], mode[8];
+	char			*fsname, *mode;
 	zbx_uint64_t		total;
 	struct ZBX_STATFS	s;
 
-	if (2 < num_param(param))
+	if (2 < request->nparam)
 		return SYSINFO_RET_FAIL;
 
-	if (0 != get_param(param, 1, fsname, sizeof(fsname)))
+	fsname = get_rparam(request, 0);
+	mode = get_rparam(request, 1);
+
+	if (NULL == fsname || '\0' == *fsname || 0 != ZBX_STATFS(fsname, &s))
 		return SYSINFO_RET_FAIL;
 
-	if (0 != get_param(param, 2, mode, sizeof(mode)))
-		*mode = '\0';
-
-	if (0 != ZBX_STATFS(fsname, &s))
-		return SYSINFO_RET_FAIL;
-
-	if ('\0' == *mode || 0 == strcmp(mode, "total"))	/* default parameter */
+	if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "total"))	/* default parameter */
 	{
 		SET_UI64_RESULT(result, s.f_files);
 	}

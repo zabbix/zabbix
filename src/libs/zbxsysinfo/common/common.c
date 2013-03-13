@@ -38,58 +38,68 @@
 
 extern int	CONFIG_TIMEOUT;
 
-static int	ONLY_ACTIVE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
-static int	SYSTEM_RUN(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
+static int	ONLY_ACTIVE(AGENT_REQUEST *request, AGENT_RESULT *result);
+static int	SYSTEM_RUN(AGENT_REQUEST *request, AGENT_RESULT *result);
 
 ZBX_METRIC	parameters_common[] =
-/*      KEY                     FLAG		FUNCTION        ADD_PARAM       TEST_PARAM */
+/*      KEY                     FLAG		FUNCTION        	TEST PARAMETERS */
 {
-	{"system.localtime",	CF_USEUPARAM,	SYSTEM_LOCALTIME,	0,	"utc"},
-	{"system.run",		CF_USEUPARAM,	SYSTEM_RUN,	 	0,	"echo test"},
+	{"system.localtime",	CF_HAVEPARAMS,	SYSTEM_LOCALTIME,	"utc"},
+	{"system.run",		CF_HAVEPARAMS,	SYSTEM_RUN,	 	"echo test"},
 
-	{"web.page.get",	CF_USEUPARAM,	WEB_PAGE_GET,	 	0,	"localhost,,80"},
-	{"web.page.perf",	CF_USEUPARAM,	WEB_PAGE_PERF,	 	0,	"localhost,,80"},
-	{"web.page.regexp",	CF_USEUPARAM,	WEB_PAGE_REGEXP,	0,	"localhost,,80,OK"},
+	{"web.page.get",	CF_HAVEPARAMS,	WEB_PAGE_GET,	 	"localhost,,80"},
+	{"web.page.perf",	CF_HAVEPARAMS,	WEB_PAGE_PERF,	 	"localhost,,80"},
+	{"web.page.regexp",	CF_HAVEPARAMS,	WEB_PAGE_REGEXP,	"localhost,,80,OK"},
 
-	{"vfs.file.size",	CF_USEUPARAM,	VFS_FILE_SIZE, 		0,	VFS_TEST_FILE},
-	{"vfs.file.time",	CF_USEUPARAM,	VFS_FILE_TIME,		0,	VFS_TEST_FILE ",modify"},
-	{"vfs.file.exists",	CF_USEUPARAM,	VFS_FILE_EXISTS,	0,	VFS_TEST_FILE},
-	{"vfs.file.contents",	CF_USEUPARAM,	VFS_FILE_CONTENTS,	0,	VFS_TEST_FILE},
-	{"vfs.file.regexp",	CF_USEUPARAM,	VFS_FILE_REGEXP,	0,	VFS_TEST_FILE "," VFS_TEST_REGEXP},
-	{"vfs.file.regmatch",	CF_USEUPARAM,	VFS_FILE_REGMATCH, 	0,	VFS_TEST_FILE "," VFS_TEST_REGEXP},
-	{"vfs.file.md5sum",	CF_USEUPARAM,	VFS_FILE_MD5SUM,	0,	VFS_TEST_FILE},
-	{"vfs.file.cksum",	CF_USEUPARAM,	VFS_FILE_CKSUM,		0,	VFS_TEST_FILE},
+	{"vfs.file.size",	CF_HAVEPARAMS,	VFS_FILE_SIZE, 		VFS_TEST_FILE},
+	{"vfs.file.time",	CF_HAVEPARAMS,	VFS_FILE_TIME,		VFS_TEST_FILE ",modify"},
+	{"vfs.file.exists",	CF_HAVEPARAMS,	VFS_FILE_EXISTS,	VFS_TEST_FILE},
+	{"vfs.file.contents",	CF_HAVEPARAMS,	VFS_FILE_CONTENTS,	VFS_TEST_FILE},
+	{"vfs.file.regexp",	CF_HAVEPARAMS,	VFS_FILE_REGEXP,	VFS_TEST_FILE "," VFS_TEST_REGEXP},
+	{"vfs.file.regmatch",	CF_HAVEPARAMS,	VFS_FILE_REGMATCH, 	VFS_TEST_FILE "," VFS_TEST_REGEXP},
+	{"vfs.file.md5sum",	CF_HAVEPARAMS,	VFS_FILE_MD5SUM,	VFS_TEST_FILE},
+	{"vfs.file.cksum",	CF_HAVEPARAMS,	VFS_FILE_CKSUM,		VFS_TEST_FILE},
 
-	{"net.dns",		CF_USEUPARAM,	NET_DNS,		0,	",zabbix.com"},
-	{"net.dns.record",	CF_USEUPARAM,	NET_DNS_RECORD,		0,	",zabbix.com"},
-	{"net.tcp.dns",		CF_USEUPARAM,	NET_DNS,		0,	",zabbix.com"}, /* deprecated */
-	{"net.tcp.dns.query",	CF_USEUPARAM,	NET_DNS_RECORD,		0,	",zabbix.com"}, /* deprecated */
-	{"net.tcp.port",	CF_USEUPARAM,	NET_TCP_PORT,		0,	",80"},
+	{"net.dns",		CF_HAVEPARAMS,	NET_DNS,		",zabbix.com"},
+	{"net.dns.record",	CF_HAVEPARAMS,	NET_DNS_RECORD,		",zabbix.com"},
+	{"net.tcp.dns",		CF_HAVEPARAMS,	NET_DNS,		",zabbix.com"}, /* deprecated */
+	{"net.tcp.dns.query",	CF_HAVEPARAMS,	NET_DNS_RECORD,		",zabbix.com"}, /* deprecated */
+	{"net.tcp.port",	CF_HAVEPARAMS,	NET_TCP_PORT,		",80"},
 
-	{"system.hostname",	CF_USEUPARAM,	SYSTEM_HOSTNAME,	0,	0},
-	{"system.uname",	0,		SYSTEM_UNAME,		0,	0},
+#ifdef _WINDOWS
+	{"system.hostname",	CF_HAVEPARAMS,	SYSTEM_HOSTNAME,	NULL},
+#else
+	{"system.hostname",	0,		SYSTEM_HOSTNAME,	NULL},
+#endif
+	{"system.uname",	0,		SYSTEM_UNAME,		NULL},
 
-	{"system.users.num",	0,		SYSTEM_USERS_NUM,	0,	0},
+	{"system.users.num",	0,		SYSTEM_USERS_NUM,	NULL},
 
-	{"log",			CF_USEUPARAM,	ONLY_ACTIVE, 		0,	"logfile"},
-	{"logrt",		CF_USEUPARAM,	ONLY_ACTIVE,		0,	"logfile"},
-	{"eventlog",		CF_USEUPARAM,	ONLY_ACTIVE, 		0,	"system"},
+	{"log",			CF_HAVEPARAMS,	ONLY_ACTIVE, 		"logfile"},
+	{"logrt",		CF_HAVEPARAMS,	ONLY_ACTIVE,		"logfile"},
+	{"eventlog",		CF_HAVEPARAMS,	ONLY_ACTIVE, 		"system"},
 
-	{0}
+	{NULL}
 };
 
-static int	ONLY_ACTIVE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+static int	ONLY_ACTIVE(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	SET_MSG_RESULT(result, zbx_strdup(NULL, "Accessible only as active check!"));
 
 	return SYSINFO_RET_FAIL;
 }
 
-int	EXECUTE_USER_PARAMETER(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+int	EXECUTE_USER_PARAMETER(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	int	ret;
+	char	*command;
 
-	ret = EXECUTE_STR(cmd, param, flags, result);
+	if (1 != request->nparam)
+		return SYSINFO_RET_FAIL;
+
+	command = get_rparam(request, 0);
+
+	ret = EXECUTE_STR(command, result);
 
 	if (SYSINFO_RET_FAIL == ret && 0 == result->type)
 	{
@@ -102,7 +112,7 @@ int	EXECUTE_USER_PARAMETER(const char *cmd, const char *param, unsigned flags, A
 	return ret;
 }
 
-int	EXECUTE_STR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+int	EXECUTE_STR(const char *command, AGENT_RESULT *result)
 {
 	int	ret = SYSINFO_RET_FAIL;
 	char	*cmd_result = NULL, error[MAX_STRING_LEN];
@@ -111,7 +121,7 @@ int	EXECUTE_STR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 
 	init_result(result);
 
-	if (SUCCEED != zbx_execute(param, &cmd_result, error, sizeof(error), CONFIG_TIMEOUT))
+	if (SUCCEED != zbx_execute(command, &cmd_result, error, sizeof(error), CONFIG_TIMEOUT))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, error));
 		goto lbl_exit;
@@ -120,7 +130,7 @@ int	EXECUTE_STR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 	zbx_rtrim(cmd_result, ZBX_WHITESPACE);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "Run remote command [%s] Result [%d] [%.20s]...",
-			param, strlen(cmd_result), cmd_result);
+			command, strlen(cmd_result), cmd_result);
 
 	if ('\0' == *cmd_result)	/* we got whitespace only */
 		goto lbl_exit;
@@ -134,14 +144,14 @@ lbl_exit:
 	return ret;
 }
 
-int	EXECUTE_DBL(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+int	EXECUTE_DBL(const char *command, AGENT_RESULT *result)
 {
-	if (SYSINFO_RET_OK != EXECUTE_STR(cmd, param, flags, result))
+	if (SYSINFO_RET_OK != EXECUTE_STR(command, result))
 		return SYSINFO_RET_FAIL;
 
 	if (NULL == GET_DBL_RESULT(result))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "Remote command [%s] result is not double", param);
+		zabbix_log(LOG_LEVEL_WARNING, "Remote command [%s] result is not double", command);
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -150,14 +160,14 @@ int	EXECUTE_DBL(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 	return SYSINFO_RET_OK;
 }
 
-int	EXECUTE_INT(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+int	EXECUTE_INT(const char *command, AGENT_RESULT *result)
 {
-	if (SYSINFO_RET_OK != EXECUTE_STR(cmd, param, flags, result))
+	if (SYSINFO_RET_OK != EXECUTE_STR(command, result))
 		return SYSINFO_RET_FAIL;
 
 	if (NULL == GET_UI64_RESULT(result))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "Remote command [%s] result is not unsigned integer", param);
+		zabbix_log(LOG_LEVEL_WARNING, "Remote command [%s] result is not unsigned integer", command);
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -166,20 +176,17 @@ int	EXECUTE_INT(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 	return SYSINFO_RET_OK;
 }
 
-static int	SYSTEM_RUN(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+static int	SYSTEM_RUN(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	char	command[MAX_STRING_LEN], flag[9];
+	char	*command, *flag;
 
-	if (1 != CONFIG_ENABLE_REMOTE_COMMANDS && 0 == (flags & PROCESS_LOCAL_COMMAND))
+	if (2 < request->nparam)
 		return SYSINFO_RET_FAIL;
 
-	if (2 < num_param(param))
-		return SYSINFO_RET_FAIL;
+	command = get_rparam(request, 0);
+	flag = get_rparam(request, 1);
 
-	if (0 != get_param(param, 1, command, sizeof(command)))
-		return SYSINFO_RET_FAIL;
-
-	if ('\0' == *command)
+	if (NULL == command || '\0' == *command)
 		return SYSINFO_RET_FAIL;
 
 	if (1 == CONFIG_LOG_REMOTE_COMMANDS)
@@ -187,11 +194,8 @@ static int	SYSTEM_RUN(const char *cmd, const char *param, unsigned flags, AGENT_
 	else
 		zabbix_log(LOG_LEVEL_DEBUG, "Executing command '%s'", command);
 
-	if (0 != get_param(param, 2, flag, sizeof(flag)))
-		*flag = '\0';
-
-	if ('\0' == *flag || 0 == strcmp(flag, "wait"))	/* default parameter */
-		return EXECUTE_STR(cmd, command, flags, result);
+	if (NULL == flag || '\0' == *flag || 0 == strcmp(flag, "wait"))	/* default parameter */
+		return EXECUTE_STR(command, result);
 	else if (0 != strcmp(flag, "nowait") || SUCCEED != zbx_execute_nowait(command))
 		return SYSINFO_RET_FAIL;
 

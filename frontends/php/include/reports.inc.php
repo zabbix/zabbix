@@ -43,10 +43,10 @@ function get_report2_filter($config, array $PAGE_GROUPS, array $PAGE_HOSTS, $opt
 	$cmbHosts = new CComboBox('filter_hostid',$PAGE_HOSTS['selected'],'javascript: submit();');
 
 	foreach($PAGE_GROUPS['groups'] as $groupid => $name){
-		$cmbGroups->addItem($groupid, get_node_name_by_elid($groupid, null, ': ').$name);
+		$cmbGroups->addItem($groupid, get_node_name_by_elid($groupid, null, NAME_DELIMITER).$name);
 	}
 	foreach($PAGE_HOSTS['hosts'] as $hostid => $name){
-		$cmbHosts->addItem($hostid, get_node_name_by_elid($hostid, null, ': ').$name);
+		$cmbHosts->addItem($hostid, get_node_name_by_elid($hostid, null, NAME_DELIMITER).$name);
 	}
 
 	if ($config == AVAILABILITY_REPORT_BY_TEMPLATE) {
@@ -69,7 +69,7 @@ function get_report2_filter($config, array $PAGE_GROUPS, array $PAGE_HOSTS, $opt
 		foreach ($hostGroups as $hostGroup) {
 			$cmbHGrps->addItem(
 				$hostGroup['groupid'],
-				get_node_name_by_elid($hostGroup['groupid'], null, ': ').$hostGroup['name']
+				get_node_name_by_elid($hostGroup['groupid'], null, NAME_DELIMITER).$hostGroup['name']
 			);
 		}
 		if (isset($_REQUEST['hostgroupid']) && !isset($hostGroups[$_REQUEST['hostgroupid']])) {
@@ -97,7 +97,7 @@ function get_report2_filter($config, array $PAGE_GROUPS, array $PAGE_HOSTS, $opt
 		foreach ($triggers as $trigger) {
 			$cmbTrigs->addItem(
 				$trigger['triggerid'],
-				get_node_name_by_elid($trigger['triggerid'], null, ': ').$trigger['description']
+				get_node_name_by_elid($trigger['triggerid'], null, NAME_DELIMITER).$trigger['description']
 			);
 		}
 		if (isset($_REQUEST['tpl_triggerid']) && !isset($triggers[$_REQUEST['tpl_triggerid']])) {
@@ -205,7 +205,7 @@ function bar_report_form(){
 					url_param($gid,false,'gid').
 					'",550,400,"graph_item_form");');
 
-			$description = $host['name'].': '.itemName($item);
+			$description = $host['name'].NAME_DELIMITER.itemName($item);
 
 			$items_table->addRow(array(
 					new CCheckBox('group_gid['.$gid.']',isset($group_gid[$gid])),
@@ -343,7 +343,7 @@ function bar_report_form2(){
 					url_param($gid,false,'gid').
 					'",550,400,"graph_item_form");');
 
-			$description = $host['name'].': '.itemName($item);
+			$description = $host['name'].NAME_DELIMITER.itemName($item);
 
 			$items_table->addRow(array(
 					new CCheckBox('group_gid['.$gid.']',isset($group_gid[$gid])),
