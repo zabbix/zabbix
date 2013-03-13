@@ -48,7 +48,7 @@ $graphForm->addVar('ymax_itemid', $this->data['ymax_itemid']);
 // create form list
 $graphFormList = new CFormList('graphFormList');
 if (!empty($this->data['templates'])) {
-	$graphFormList->addRow(_('Parent graph'), $this->data['templates']);
+	$graphFormList->addRow(_('Parent graphs'), $this->data['templates']);
 }
 $nameTextBox = new CTextBox('name', $this->data['name'], ZBX_TEXTBOX_STANDARD_SIZE);
 $nameTextBox->attr('autofocus', 'autofocus');
@@ -125,12 +125,12 @@ if (!empty($this->data['parent_discoveryid'])) {
 $itemsTable->addRow(new CRow(new CCol(array($addButton, SPACE, SPACE, SPACE, $addPrototypeButton), null, 8), null, 'itemButtonsRow'));
 
 // append legend to form list
-$graphFormList->addRow(_('Show legend'), new CCheckBox('legend', $this->data['legend'], null, 1));
+$graphFormList->addRow(_('Show legend'), new CCheckBox('show_legend', $this->data['show_legend'], null, 1));
 
 // append graph types to form list
 if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] == GRAPH_TYPE_STACKED) {
-	$graphFormList->addRow(_('Show working time'), new CCheckBox('showworkperiod', $this->data['showworkperiod'], null, 1));
-	$graphFormList->addRow(_('Show triggers'), new CCheckBox('showtriggers', $this->data['showtriggers'], null, 1));
+	$graphFormList->addRow(_('Show working time'), new CCheckBox('show_work_period', $this->data['show_work_period'], null, 1));
+	$graphFormList->addRow(_('Show triggers'), new CCheckBox('show_triggers', $this->data['show_triggers'], null, 1));
 
 	if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL) {
 		if (is_numeric($this->data['percent_left'])) {
@@ -264,7 +264,7 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 	$graphFormList->addRow(_('Y axis MAX value'), $yaxisMaxData);
 }
 else {
-	$graphFormList->addRow(_('3D view'), new CCheckBox('graph3d', $this->data['graph3d'], null, 1));
+	$graphFormList->addRow(_('3D view'), new CCheckBox('show_3d', $this->data['show_3d'], null, 1));
 }
 
 $graphFormList->addRow(_('Items'), new CDiv($itemsTable, 'objectgroup inlineblock border_dotted ui-corner-all'));
@@ -274,7 +274,10 @@ $graphTab = new CTabView(array('remember' => true));
 if (!$this->data['form_refresh']) {
 	$graphTab->setSelected(0);
 }
-$graphTab->addTab('graphTab', _('Graph'), $graphFormList);
+$graphTab->addTab(
+	'graphTab',
+	empty($this->data['parent_discoveryid']) ? _('Graph') : _('Graph prototype'), $graphFormList
+);
 
 /*
  * Preview tab
@@ -297,7 +300,6 @@ if (!empty($this->data['graphid'])) {
 	if (!empty($this->data['templateid'])) {
 		$saveButton->setEnabled(false);
 		$deleteButton->setEnabled(false);
-		$cloneButton->setEnabled(false);
 	}
 
 	$graphForm->addItem(makeFormFooter($saveButton, array($cloneButton, $deleteButton, $cancelButton)));
