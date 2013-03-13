@@ -188,34 +188,13 @@ if (isset($_REQUEST['form'])) {
 		'templates' => array()
 	);
 
-	// add parent templates
-	if ($hostPrototype['templateid']) {
-		$data['parents'] = array();
-		$hostPrototypeId = $hostPrototype['templateid'];
-		while ($hostPrototypeId) {
-			$parentHostPrototype = API::HostPrototype()->get(array(
-				'output' => array('itemid', 'templateid'),
-				'selectParentHost' => array('hostid', 'name'),
-				'selectDiscoveryRule' => array('itemid'),
-				'hostids' => $hostPrototypeId
-			));
-			$parentHostPrototype = reset($parentHostPrototype);
-			$hostPrototypeId = null;
-
-			if ($parentHostPrototype) {
-				$data['parents'][] = $parentHostPrototype;
-				$hostPrototypeId = $parentHostPrototype['templateid'];
-			}
-		}
-	}
-
 	// add parent host
 	$parentHost = API::Host()->get(array(
 		'output' => API_OUTPUT_EXTEND,
 		'selectGroups' => array('groupid', 'name'),
 		'selectInterfaces' => API_OUTPUT_EXTEND,
 		'selectMacros' => API_OUTPUT_EXTEND,
-		'hostids' => $hostPrototype['parentHost']['hostid'],
+		'hostids' => get_request('parent_hostid'),
 		'templated_hosts' => true
 	));
 	$parentHost = reset($parentHost);
@@ -235,6 +214,27 @@ if (isset($_REQUEST['form'])) {
 		$data['host_prototype']['templates'] = array();
 		foreach ($hostPrototype['templates'] as $template) {
 			$data['host_prototype']['templates'][$template['templateid']] = $template['name'];
+		}
+
+		// add parent templates
+		if ($hostPrototype['templateid']) {
+			$data['parents'] = array();
+			$hostPrototypeId = $hostPrototype['templateid'];
+			while ($hostPrototypeId) {
+				$parentHostPrototype = API::HostPrototype()->get(array(
+					'output' => array('itemid', 'templateid'),
+					'selectParentHost' => array('hostid', 'name'),
+					'selectDiscoveryRule' => array('itemid'),
+					'hostids' => $hostPrototypeId
+				));
+				$parentHostPrototype = reset($parentHostPrototype);
+				$hostPrototypeId = null;
+
+				if ($parentHostPrototype) {
+					$data['parents'][] = $parentHostPrototype;
+					$hostPrototypeId = $parentHostPrototype['templateid'];
+				}
+			}
 		}
 	}
 
