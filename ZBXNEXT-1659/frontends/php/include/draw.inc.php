@@ -22,6 +22,14 @@
 define('LINE_TYPE_NORMAL',	'0');
 define('LINE_TYPE_BOLD',	'1');
 
+/**
+ * Change luminosity of RGB color
+ *
+ * @param resource $image image reference
+ * @param array $f background color, array of RGB
+ * @param array $t foreground color, array of RGB
+ * @param float $p transformation index in range of 0-1
+ */
 function lip($image, $f, $t, $p) {
 	$p = round($p, 1);
 	$r = $f[0] + ($t[0] - $f[0]) * $p;
@@ -31,6 +39,17 @@ function lip($image, $f, $t, $p) {
 	return imagecolorresolvealpha($image, $r, $g, $b, 0);
 }
 
+/**
+ * Draw antialised line
+ *
+ * @param resource $image image reference
+ * @param int $x1 first x coordinate
+ * @param int $y1 first y coordinate
+ * @param int $x2 second x coordinate
+ * @param int $y2 second y coordinate
+ * @param int $color line color
+ * @param int $style line style, one of LINE_TYPE_NORMAL (default), LINE_TYPE_BOLD (bold line)
+ */
 function aline($image, $x1, $y1, $x2, $y2, $color, $style = LINE_TYPE_NORMAL) {
 	$x1 = round($x1);
 	$y1 = round($y1);
@@ -51,28 +70,28 @@ function aline($image, $x1, $y1, $x2, $y2, $color, $style = LINE_TYPE_NORMAL) {
 			$tmp = $y2; $y2 = $y1; $y1 = $tmp;
 		}
 		for ($x = $x1, $y = $y1; $x <= $x2; $x++, $y = $y1 + ($x - $x1) * $dy / $dx) {
-			$yint = round($y);
 			$yfrac = $y - floor($y);
+			$yint = round($y) - round($yfrac);
 
 			if (LINE_TYPE_BOLD == $style) {
-				$bc = imagecolorsforindex($image, imagecolorat($image, $x, $yint - 1 - round($yfrac)));
+				$bc = imagecolorsforindex($image, imagecolorat($image, $x, $yint - 1));
 				$bc = array($bc["red"], $bc["green"], $bc["blue"]);
-				imagesetpixel($image, $x, $yint - 1 - round($yfrac), lip($image, $lc, $bc, $yfrac));
+				imagesetpixel($image, $x, $yint - 1, lip($image, $lc, $bc, $yfrac));
 
-				$bc = imagecolorsforindex($image, imagecolorat($image, $x, $yint + 1 - round($yfrac)));
+				$bc = imagecolorsforindex($image, imagecolorat($image, $x, $yint + 1));
 				$bc = array($bc["red"], $bc["green"], $bc["blue"]);
-				imagesetpixel($image, $x, $yint + 1 - round($yfrac), lip($image, $lc, $bc, 1 - $yfrac));
+				imagesetpixel($image, $x, $yint + 1, lip($image, $lc, $bc, 1 - $yfrac));
 
-				imagesetpixel($image, $x, $yint - round($yfrac), $color);
+				imagesetpixel($image, $x, $yint, $color);
 			}
 			else {
-				$bc = imagecolorsforindex($image, imagecolorat($image, $x, $yint - round($yfrac)));
+				$bc = imagecolorsforindex($image, imagecolorat($image, $x, $yint));
 				$bc = array($bc["red"], $bc["green"], $bc["blue"]);
-				imagesetpixel($image, $x, $yint - round($yfrac), lip($image, $lc, $bc, $yfrac));
+				imagesetpixel($image, $x, $yint, lip($image, $lc, $bc, $yfrac));
 
-				$bc = imagecolorsforindex($image, imagecolorat($image, $x, $yint + 1 - round($yfrac)));
+				$bc = imagecolorsforindex($image, imagecolorat($image, $x, $yint + 1));
 				$bc = array($bc["red"], $bc["green"], $bc["blue"]);
-				imagesetpixel($image, $x, $yint + 1 - round($yfrac), lip($image, $lc, $bc, 1 - $yfrac));
+				imagesetpixel($image, $x, $yint + 1, lip($image, $lc, $bc, 1 - $yfrac));
 			}
 		}
 	}
@@ -84,28 +103,28 @@ function aline($image, $x1, $y1, $x2, $y2, $color, $style = LINE_TYPE_NORMAL) {
 		}
 		for ($y = $y1, $x = $x1; $y <= $y2; $y++, $x = $x1 + ($y - $y1) * $dx / $dy)
 		{
-			$xint = round($x);
 			$xfrac = $x - floor($x);
+			$xint = round($x) - round($xfrac);
 
 			if (LINE_TYPE_BOLD == $style) {
-				$bc = imagecolorsforindex($image, imagecolorat($image, $xint - 1 - round($xfrac), $y));
+				$bc = imagecolorsforindex($image, imagecolorat($image, $xint - 1, $y));
 				$bc = array($bc["red"], $bc["green"], $bc["blue"]);
-				imagesetpixel($image, $xint - 1 - round($xfrac), $y, lip($image, $lc, $bc, $xfrac));
+				imagesetpixel($image, $xint - 1, $y, lip($image, $lc, $bc, $xfrac));
 
-				$bc = imagecolorsforindex($image, imagecolorat($image, $xint + 1 - round($xfrac), $y));
+				$bc = imagecolorsforindex($image, imagecolorat($image, $xint + 1, $y));
 				$bc = array($bc["red"], $bc["green"], $bc["blue"]);
-				imagesetpixel($image, $xint + 1 - round($xfrac), $y, lip($image, $lc, $bc, 1 - $xfrac));
+				imagesetpixel($image, $xint + 1, $y, lip($image, $lc, $bc, 1 - $xfrac));
 
-				imagesetpixel($image, $xint - round($xfrac), $y, $color);
+				imagesetpixel($image, $xint, $y, $color);
 			}
 			else {
-				$bc = imagecolorsforindex($image, imagecolorat($image, $xint - round($xfrac), $y));
+				$bc = imagecolorsforindex($image, imagecolorat($image, $xint, $y));
 				$bc = array($bc["red"], $bc["green"], $bc["blue"]);
-				imagesetpixel($image, $xint - round($xfrac), $y, lip($image, $lc, $bc, $xfrac));
+				imagesetpixel($image, $xint, $y, lip($image, $lc, $bc, $xfrac));
 
-				$bc = imagecolorsforindex($image, imagecolorat($image, $xint + 1 - round($xfrac), $y));
+				$bc = imagecolorsforindex($image, imagecolorat($image, $xint + 1, $y));
 				$bc = array($bc["red"], $bc["green"], $bc["blue"]);
-				imagesetpixel($image, $xint + 1 - round($xfrac), $y, lip($image, $lc, $bc, 1 - $xfrac));
+				imagesetpixel($image, $xint + 1, $y, lip($image, $lc, $bc, 1 - $xfrac));
 			}
 		}
 	}
