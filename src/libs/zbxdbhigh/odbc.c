@@ -199,7 +199,7 @@ ZBX_ODBC_ROW	odbc_DBfetch(ZBX_ODBC_RESULT pdbh)
 		if (SQL_NULL_DATA == pdbh->data_len[i])
 			zbx_free(pdbh->row_data[i]);
 		else
-			rtrim_spaces(pdbh->row_data[i]);
+			zbx_rtrim(pdbh->row_data[i], " ");
 
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() fetched [%i col]: '%s'", __function_name, i,
 				NULL == pdbh->row_data[i] ? "NULL" : pdbh->row_data[i]);
