@@ -703,19 +703,19 @@ INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid) values (301,
 INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid) values (302, 23601, 23501);
 
 -- added item prototypes in discoveryRuleTest for testInheritanceItemPrototype
-INSERT INTO items (name, key_, hostid, value_type, itemid, flags, delay, params, description) VALUES ('itemPrototypeTest1', 'item-prototype-test1', 30000, 3, 23700, 2, 5, '', '');
-INSERT INTO items (name, key_, hostid, value_type, itemid, flags, templateid, delay, params, description) VALUES ('itemPrototypeTest1', 'item-prototype-test1', 30001, 3, 23701, 2, 23700, 5, '', '');
+INSERT INTO items (name, key_, hostid, value_type, itemid, flags, delay, params, description) VALUES ('testInheritanceItemPrototype1', 'item-prototype-test1', 30000, 3, 23700, 2, 5, '', '');
+INSERT INTO items (name, key_, hostid, value_type, itemid, flags, templateid, delay, params, description) VALUES ('testInheritanceItemPrototype1', 'item-prototype-test1', 30001, 3, 23701, 2, 23700, 5, '', '');
 INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid) values (401, 23700, 23500);
 INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid) values (402, 23701, 23501);
-INSERT INTO items (name, key_, hostid, value_type, itemid, flags, delay, params, description) VALUES ('itemPrototypeTest2', 'item-prototype-test2', 30000, 3, 23702, 2, 5, '', '');
-INSERT INTO items (name, key_, hostid, value_type, itemid, flags, templateid, delay, params, description) VALUES ('itemPrototypeTest2', 'item-prototype-test2', 30001, 3, 23703, 2, 23702, 5, '', '');
+INSERT INTO items (name, key_, hostid, value_type, itemid, flags, delay, params, description) VALUES ('testInheritanceItemPrototype2', 'item-prototype-test2', 30000, 3, 23702, 2, 5, '', '');
+INSERT INTO items (name, key_, hostid, value_type, itemid, flags, templateid, delay, params, description) VALUES ('testInheritanceItemPrototype2', 'item-prototype-test2', 30001, 3, 23703, 2, 23702, 5, '', '');
 INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid) values (403, 23702, 23500);
 INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid) values (404, 23703, 23501);
-INSERT INTO items (name, key_, hostid, value_type, itemid, flags, delay, params, description) VALUES ('itemPrototypeTest3', 'item-prototype-test3', 30000, 3, 23704, 2, 5, '', '');
-INSERT INTO items (name, key_, hostid, value_type, itemid, flags, templateid, delay, params, description) VALUES ('itemPrototypeTest3', 'item-prototype-test3', 30001, 3, 23705, 2, 23704, 5, '', '');
+INSERT INTO items (name, key_, hostid, value_type, itemid, flags, delay, params, description) VALUES ('testInheritanceItemPrototype3', 'item-prototype-test3', 30000, 3, 23704, 2, 5, '', '');
+INSERT INTO items (name, key_, hostid, value_type, itemid, flags, templateid, delay, params, description) VALUES ('testInheritanceItemPrototype3', 'item-prototype-test3', 30001, 3, 23705, 2, 23704, 5, '', '');
 INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid) values (405, 23704, 23500);
 INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid) values (406, 23705, 23501);
-INSERT INTO items (name, key_, hostid, value_type, itemid, flags, delay, params, description) VALUES ('itemPrototypeTest4', 'item-prototype-test4', 30000, 3, 23706, 2, 5, '', '');
-INSERT INTO items (name, key_, hostid, value_type, itemid, flags, templateid, delay, params, description) VALUES ('itemPrototypeTest4', 'item-prototype-test4', 30001, 3, 23707, 2, 23706, 5, '', '');
+INSERT INTO items (name, key_, hostid, value_type, itemid, flags, delay, params, description) VALUES ('testInheritanceItemPrototype4', 'item-prototype-test4', 30000, 3, 23706, 2, 5, '', '');
+INSERT INTO items (name, key_, hostid, value_type, itemid, flags, templateid, delay, params, description) VALUES ('testInheritanceItemPrototype4', 'item-prototype-test4', 30001, 3, 23707, 2, 23706, 5, '', '');
 INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid) values (407, 23706, 23500);
 INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid) values (408, 23707, 23501);
