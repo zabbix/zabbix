@@ -697,5 +697,5 @@ INSERT INTO interface (type, ip, dns, useip, port, main, hostid, interfaceid) VA
 INSERT INTO hosts_templates (hosttemplateid, hostid, templateid) VALUES (30000, 30001, 30000);
 
 -- add discoveryRuleTest for prototype testing
-INSERT INTO items (name, key_, hostid, value_type, itemid, flags) VALUES ('discoveryRuleTest', 'discovery-rule-test', 30000, 4, 23500, 1);
-INSERT INTO items (name, key_, hostid, value_type, itemid, flags, templateid) VALUES ('discoveryRuleTest', 'discovery-rule-test', 30001, 4, 23501, 1, 23500);
+INSERT INTO items (name, key_, hostid, value_type, itemid, flags, delay) VALUES ('discoveryRuleTest', 'discovery-rule-test', 30000, 4, 23500, 1, 50);
+INSERT INTO items (name, key_, hostid, value_type, itemid, flags, templateid, delay) VALUES ('discoveryRuleTest', 'discovery-rule-test', 30001, 4, 23501, 1, 23500, 50);
