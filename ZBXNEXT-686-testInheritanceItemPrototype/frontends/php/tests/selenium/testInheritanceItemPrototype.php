@@ -838,7 +838,8 @@ class testInheritanceItemPrototype extends CWebTest {
 					'expected' => ITEM_BAD,
 					'name' => 'Item formula',
 					'key' => 'item-formula-test',
-					'formula' => 'formula',
+					'formula' => ' ',
+					'formulaValue' => '',
 					'errors' => array(
 						'ERROR: Page received incorrect data',
 						'Warning. Field "Custom multiplier" is not decimal number.'
@@ -851,7 +852,50 @@ class testInheritanceItemPrototype extends CWebTest {
 					'expected' => ITEM_BAD,
 					'name' => 'Item formula',
 					'key' => 'item-formula-test',
-					'formula' => 'a1b2c3',
+					'formula' => 'form ula',
+					'formulaValue' => 'form ula',
+					'errors' => array(
+						'ERROR: Page received incorrect data',
+						'Warning. Field "Custom multiplier" is not decimal number.'
+					)
+				)
+			),
+			// Incorrect formula
+			array(
+				array(
+					'expected' => ITEM_BAD,
+					'name' => 'Item formula',
+					'key' => 'item-formula-test',
+					'formula' => ' a1b2 c3 ',
+					'formulaValue' => 'a1b2 c3',
+					'errors' => array(
+						'ERROR: Page received incorrect data',
+						'Warning. Field "Custom multiplier" is not decimal number.'
+					)
+				)
+			),
+			// Incorrect formula
+			array(
+				array(
+					'expected' => ITEM_BAD,
+					'name' => 'Item formula',
+					'key' => 'item-formula-test',
+					'formula' => ' 32 1 abc',
+					'formulaValue' => '32 1 abc',
+					'errors' => array(
+						'ERROR: Page received incorrect data',
+						'Warning. Field "Custom multiplier" is not decimal number.'
+					)
+				)
+			),
+			// Incorrect formula
+			array(
+				array(
+					'expected' => ITEM_BAD,
+					'name' => 'Item formula',
+					'key' => 'item-formula-test',
+					'formula' => '32 1 abc',
+					'formulaValue' => '32 1 abc',
 					'errors' => array(
 						'ERROR: Page received incorrect data',
 						'Warning. Field "Custom multiplier" is not decimal number.'
@@ -865,10 +909,21 @@ class testInheritanceItemPrototype extends CWebTest {
 					'name' => 'Item formula',
 					'key' => 'item-formula-test',
 					'formula' => '321abc',
+					'formulaValue' => '321abc',
 					'errors' => array(
 						'ERROR: Page received incorrect data',
 						'Warning. Field "Custom multiplier" is not decimal number.'
 					)
+				)
+			),
+			array(
+				array(
+					'expected' => ITEM_GOOD,
+					'name' => 'Item formula1',
+					'key' => 'item-formula-test',
+					'formula' => '5',
+					'dbCheck' => true,
+					'formCheck' => true
 				)
 			),
 			// Empty timedelay
@@ -1501,6 +1556,10 @@ class testInheritanceItemPrototype extends CWebTest {
 						$this->zbxTestTextPresent($msg);
 					}
 					$this->zbxTestTextPresent(array('Name', 'Type', 'Key'));
+					if (isset($data['formula'])) {
+						$formulaValue = $this->getValue('formula');
+						$this->assertEquals($data['formulaValue'], $formulaValue);
+					}
 					break;
 			}
 		}
