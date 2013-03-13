@@ -903,22 +903,10 @@ class testInheritanceItem extends CWebTest {
 			array(
 				array(
 					'expected' => ITEM_BAD,
-					'name' =>'Item formula',
-					'key' =>'item-formula-test',
+					'name' => 'Item formula',
+					'key' => 'item-formula-test',
 					'formula' => ' ',
-					'errors' => array(
-						'ERROR: Page received incorrect data',
-						'Warning. Field "Custom multiplier" is mandatory.'
-					)
-				)
-			),
-			// Incorrect formula
-			array(
-				array(
-					'expected' => ITEM_BAD,
-					'name' =>'Item formula',
-					'key' =>'item-formula-test',
-					'formula' => 'formula',
+					'formulaValue' => '',
 					'errors' => array(
 						'ERROR: Page received incorrect data',
 						'Warning. Field "Custom multiplier" is not decimal number.'
@@ -929,9 +917,10 @@ class testInheritanceItem extends CWebTest {
 			array(
 				array(
 					'expected' => ITEM_BAD,
-					'name' =>'Item formula',
-					'key' =>'item-formula-test',
-					'formula' => 'a1b2c3',
+					'name' => 'Item formula',
+					'key' => 'item-formula-test',
+					'formula' => 'form ula',
+					'formulaValue' => 'form ula',
 					'errors' => array(
 						'ERROR: Page received incorrect data',
 						'Warning. Field "Custom multiplier" is not decimal number.'
@@ -942,26 +931,66 @@ class testInheritanceItem extends CWebTest {
 			array(
 				array(
 					'expected' => ITEM_BAD,
-					'name' =>'Item formula',
-					'key' =>'item-formula-test',
+					'name' => 'Item formula',
+					'key' => 'item-formula-test',
+					'formula' => ' a1b2 c3 ',
+					'formulaValue' => 'a1b2 c3',
+					'errors' => array(
+						'ERROR: Page received incorrect data',
+						'Warning. Field "Custom multiplier" is not decimal number.'
+					)
+				)
+			),
+			// Incorrect formula
+			array(
+				array(
+					'expected' => ITEM_BAD,
+					'name' => 'Item formula',
+					'key' => 'item-formula-test',
+					'formula' => ' 32 1 abc',
+					'formulaValue' => '32 1 abc',
+					'errors' => array(
+						'ERROR: Page received incorrect data',
+						'Warning. Field "Custom multiplier" is not decimal number.'
+					)
+				)
+			),
+			// Incorrect formula
+			array(
+				array(
+					'expected' => ITEM_BAD,
+					'name' => 'Item formula',
+					'key' => 'item-formula-test',
+					'formula' => '32 1 abc',
+					'formulaValue' => '32 1 abc',
+					'errors' => array(
+						'ERROR: Page received incorrect data',
+						'Warning. Field "Custom multiplier" is not decimal number.'
+					)
+				)
+			),
+			// Incorrect formula
+			array(
+				array(
+					'expected' => ITEM_BAD,
+					'name' => 'Item formula',
+					'key' => 'item-formula-test',
 					'formula' => '321abc',
+					'formulaValue' => '321abc',
 					'errors' => array(
 						'ERROR: Page received incorrect data',
 						'Warning. Field "Custom multiplier" is not decimal number.'
 					)
 				)
 			),
-			// Empty timedelay
 			array(
 				array(
-					'expected' => ITEM_BAD,
-					'name' =>'Item delay',
-					'key' =>'item-delay-test',
-					'delay' => 0,
-					'errors' => array(
-						'ERROR: Cannot add item',
-						'Item will not be refreshed. Please enter a correct update interval.'
-					)
+					'expected' => ITEM_GOOD,
+					'name' => 'Item formula1',
+					'key' => 'item-formula-test',
+					'formula' => '5',
+					'dbCheck' => true,
+					'formCheck' => true
 				)
 			),
 			// Incorrect timedelay
@@ -1580,6 +1609,10 @@ class testInheritanceItem extends CWebTest {
 						$this->zbxTestTextPresent($msg);
 					}
 					$this->zbxTestTextPresent(array('Host', 'Name', 'Key'));
+					if (isset($data['formula'])) {
+						$formulaValue = $this->getValue('formula');
+						$this->assertEquals($data['formulaValue'], $formulaValue);
+					}
 					break;
 			}
 		}
