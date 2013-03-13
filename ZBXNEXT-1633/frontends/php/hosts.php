@@ -640,7 +640,10 @@ elseif (isset($_REQUEST['form'])) {
 			'hostids' => $hostid
 		));
 		$host = reset($host);
+	}
 
+	if (get_request('hostid') && $host['discoveryRule']) {
+		$proxy = array();
 		if ($host['proxy_hostid']) {
 			$proxy = API::Proxy()->get(array(
 				'output' => array('host', 'proxyid'),
@@ -655,9 +658,7 @@ elseif (isset($_REQUEST['form'])) {
 		foreach ($host['parentTemplates'] as $template) {
 			$templates['templates'][$template['templateid']] = $template['name'];
 		}
-	}
 
-	if (get_request('hostid') && $host['discoveryRule']) {
 		$hostForm = new CView('configuration.host.discovered.edit', array(
 			'host' => $host,
 			'proxy' => $proxy,
