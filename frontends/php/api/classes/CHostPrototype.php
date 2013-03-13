@@ -103,7 +103,6 @@ class CHostPrototype extends CHostBase {
 	protected function validateCreate(array $hostPrototypes) {
 		$parameters = array(
 			'host' => null,
-			'name' => null,
 			'ruleid' => null,
 			'status' => HOST_STATUS_MONITORED
 		);
@@ -142,11 +141,17 @@ class CHostPrototype extends CHostBase {
 	public function create(array $hostPrototypes) {
 		$hostPrototypes = zbx_toArray($hostPrototypes);
 
-		foreach ($hostPrototypes as $hostPrototype) {
+		foreach ($hostPrototypes as &$hostPrototype) {
+			// if the visible name is not set, use the technical name instead
+			if (!isset($hostPrototype['name']) || zbx_empty(trim($hostPrototype['name']))) {
+				$hostPrototype['name'] = $hostPrototype['host'];
+			}
+
 			if (isset($hostPrototype['templates'])) {
 				$hostPrototype['templates'] = zbx_toArray($hostPrototype['templates']);
 			}
 		}
+		unset($hostPrototype);
 
 		$this->validateCreate($hostPrototypes);
 		$hostPrototypes = $this->createReal($hostPrototypes);
@@ -254,17 +259,23 @@ class CHostPrototype extends CHostBase {
 	public function update(array $hostPrototypes) {
 		$hostPrototypes = zbx_toArray($hostPrototypes);
 
-		foreach ($hostPrototypes as $hostPrototype) {
+		$hostPrototypes = $this->extendObjects($this->tableName(), $hostPrototypes, array('host'));
+		foreach ($hostPrototypes as &$hostPrototype) {
 			if (isset($hostPrototype['templates'])) {
 				$hostPrototype['templates'] = zbx_toArray($hostPrototype['templates']);
 			}
+
+			// if the visible name is not set, use the technical name instead
+			if (isset($hostPrototype['name']) && zbx_empty(trim($hostPrototype['name']))) {
+				$hostPrototype['name'] = $hostPrototype['host'];
+			}
 		}
+		unset($hostPrototype);
 
 		$this->validateUpdate($hostPrototypes);
 		$hostPrototypes = $this->updateReal($hostPrototypes);
 
 		// load additional data required for inheritance
-		$hostPrototypes = $this->extendObjects($this->tableName(), $hostPrototypes, array('host'));
 		$hostPrototypes = zbx_toHash($hostPrototypes, 'hostid');
 		$relationMap = $this->createRelationMap($hostPrototypes, 'hostid', 'parent_itemid', 'host_discovery');
 		$hostPrototypes = $relationMap->mapIdOne($hostPrototypes, 'ruleid');
