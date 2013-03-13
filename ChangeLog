@@ -6,6 +6,7 @@ A.F....... [ZBX-1357] added Lithuanian translation; thanks to Zabbix translators
 A.F....... [ZBX-1357] updated American English, Brazilian Portuguese, French, German, Greek, Hungarian, Latvian, Slovak, Spanish, Russian, Turkish and Ukrainian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+..F....... [ZBX-6352] fixed web scenario and discovery rule delay interval (Eduard)
 ..F....... [ZBX-6357] fixed template graph cloning (Eduard)
 .......PS. [ZBX-4991] fixed host availability checks with proxies (wiper)
 ........S. [ZBX-6322] enforced nls_numeric_characters setting for oracle db sessions (wiper)
