@@ -51,7 +51,7 @@ class CDiscoveryRule extends CItemGeneral {
 		$sqlParts = array(
 			'select'	=> array('items' => 'i.itemid'),
 			'from'		=> array('items' => 'items i'),
-			'where'		=> array('i.flags='.ZBX_FLAG_DISCOVERY),
+			'where'		=> array('i.flags='.ZBX_FLAG_DISCOVERY_RULE),
 			'group'		=> array(),
 			'order'		=> array(),
 			'limit'		=> null
@@ -648,7 +648,7 @@ class CDiscoveryRule extends CItemGeneral {
 	protected function checkInput(array &$items, $update = false) {
 		// add the values that cannot be changed, but are required for further processing
 		foreach ($items as &$item) {
-			$item['flags'] = ZBX_FLAG_DISCOVERY;
+			$item['flags'] = ZBX_FLAG_DISCOVERY_RULE;
 			$item['value_type'] = ITEM_VALUE_TYPE_TEXT;
 		}
 		unset($item);
@@ -683,7 +683,7 @@ class CDiscoveryRule extends CItemGeneral {
 				$updateItems[] = $newItem;
 			}
 			else {
-				$newItem['flags'] = ZBX_FLAG_DISCOVERY;
+				$newItem['flags'] = ZBX_FLAG_DISCOVERY_RULE;
 				$insertItems[] = $newItem;
 			}
 		}
