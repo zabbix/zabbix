@@ -825,10 +825,11 @@ class testInheritanceItemPrototype extends CWebTest {
 					'expected' => ITEM_BAD,
 					'name' => 'Item formula',
 					'key' => 'item-formula-test',
-					'formula' => ' ',
+					'formula' => '',
+					'formulaValue' => '',
 					'errors' => array(
 						'ERROR: Page received incorrect data',
-						'Warning. Field "Custom multiplier" is mandatory.'
+						'Warning. Field "Custom multiplier" is not decimal number.'
 					)
 				)
 			),
