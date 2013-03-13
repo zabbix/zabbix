@@ -428,6 +428,23 @@ void	zbx_ltrim(char *str, const char *charlist)
 
 /******************************************************************************
  *                                                                            *
+ * Function: zbx_lrtrim                                                       *
+ *                                                                            *
+ * Purpose: Removes leading and trailing characters from the specified        *
+ *          character string                                                  *
+ *                                                                            *
+ * Parameters: str      - [IN/OUT] string for processing                      *
+ *             charlist - [IN] null terminated list of characters             *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_lrtrim(char *str, const char *charlist)
+{
+	zbx_rtrim(str, charlist);
+	zbx_ltrim(str, charlist);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: zbx_remove_chars                                                 *
  *                                                                            *
  * Purpose: Remove characters 'charlist' from the whole string                *
@@ -549,88 +566,6 @@ void	compress_signs(char *str)
 			}
 		}
 	}
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: rtrim_spaces                                                     *
- *                                                                            *
- * Purpose: delete all right spaces for the string                            *
- *                                                                            *
- * Parameters: c - string to trim spaces                                      *
- *                                                                            *
- * Return value: string without right spaces                                  *
- *                                                                            *
- * Author: Alexei Vladishev                                                   *
- *                                                                            *
- ******************************************************************************/
-void	rtrim_spaces(char *c)
-{
-	int i,len;
-
-	len = (int)strlen(c);
-	for(i=len-1;i>=0;i--)
-	{
-		if( c[i] == ' ')
-		{
-			c[i]=0;
-		}
-		else	break;
-	}
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: ltrim_spaces                                                     *
- *                                                                            *
- * Purpose: delete all left spaces for the string                             *
- *                                                                            *
- * Parameters: c - string to trim spaces                                      *
- *                                                                            *
- * Return value: string without left spaces                                   *
- *                                                                            *
- * Author: Alexei Vladishev                                                   *
- *                                                                            *
- ******************************************************************************/
-void	ltrim_spaces(char *c)
-{
-	int i;
-/* Number of left spaces */
-	int spaces=0;
-
-	for(i=0;c[i]!=0;i++)
-	{
-		if( c[i] == ' ')
-		{
-			spaces++;
-		}
-		else	break;
-	}
-	for(i=0;c[i+spaces]!=0;i++)
-	{
-		c[i]=c[i+spaces];
-	}
-
-	c[strlen(c)-spaces]=0;
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: lrtrim_spaces                                                    *
- *                                                                            *
- * Purpose: delete all left and right spaces for the string                   *
- *                                                                            *
- * Parameters: c - string to trim spaces                                      *
- *                                                                            *
- * Return value: string without left and right spaces                         *
- *                                                                            *
- * Author: Alexei Vladishev                                                   *
- *                                                                            *
- ******************************************************************************/
-void	lrtrim_spaces(char *c)
-{
-	ltrim_spaces(c);
-	rtrim_spaces(c);
 }
 
 /*
