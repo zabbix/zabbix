@@ -174,27 +174,27 @@ class testInheritanceGraph extends CWebTest {
 		}
 
 		$this->zbxTestTextPresent('Show legend');
-		$this->assertVisible('legend');
-		$this->assertAttribute("//*[@id='legend']/@checked", 'checked');
+		$this->assertVisible('show_legend');
+		$this->assertAttribute("//*[@id='show_legend']/@checked", 'checked');
 
 		if ($graphtype == 'Normal' || $graphtype == 'Stacked') {
 			$this->zbxTestTextPresent('Show working time');
-			$this->assertVisible('showworkperiod');
-			$this->assertAttribute("//*[@id='showworkperiod']/@checked", 'checked');
+			$this->assertVisible('show_work_period');
+			$this->assertAttribute("//*[@id='show_work_period']/@checked", 'checked');
 		}
 		else {
 			$this->zbxTestTextNotPresent('Show working time');
-			$this->assertElementNotPresent('showworkperiod');
+			$this->assertElementNotPresent('show_work_period');
 		}
 
 		if ($graphtype == 'Normal' || $graphtype == 'Stacked') {
 			$this->zbxTestTextPresent('Show triggers');
-			$this->assertVisible('showtriggers');
-			$this->assertAttribute("//*[@id='showtriggers']/@checked", 'checked');
+			$this->assertVisible('show_triggers');
+			$this->assertAttribute("//*[@id='show_triggers']/@checked", 'checked');
 		}
 		else {
 			$this->zbxTestTextNotPresent('Show triggers');
-			$this->assertElementNotPresent('showtriggers');
+			$this->assertElementNotPresent('show_triggers');
 		}
 
 		if ($graphtype == 'Normal') {
@@ -214,11 +214,11 @@ class testInheritanceGraph extends CWebTest {
 
 		if ($graphtype == 'Pie' || $graphtype == 'Exploded') {
 			$this->zbxTestTextPresent('3D view');
-			$this->assertVisible('graph3d');
+			$this->assertVisible('show_3d');
 		}
 		else {
 			$this->zbxTestTextNotPresent('3D view');
-			$this->assertElementNotPresent('graph3d');
+			$this->assertElementNotPresent('show_3d');
 		}
 
 		if ($graphtype == 'Normal' || $graphtype == 'Stacked') {
