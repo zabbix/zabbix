@@ -515,7 +515,7 @@ function get_header_host_table($currentElement, $hostid, $discoveryid = null) {
 		}
 		else {
 			$list->addItem(array(
-				new CLink(_('Host prototypes'), 'host_prototypes.php?parent_hostid='.$dbHost['hostid'].'&parent_discoveryid='.$dbDiscovery['itemid']),
+				new CLink(_('Host prototypes'), 'host_prototypes.php?parent_discoveryid='.$dbDiscovery['itemid']),
 				' ('.$dbDiscovery['hostPrototypes'].')'
 			));
 		}
