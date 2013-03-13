@@ -397,6 +397,8 @@ static void	DBlld_host_make(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts,
 		host->name = zbx_strdup(NULL, name_proto);
 		substitute_discovery_macros(&host->name, jp_row, ZBX_MACRO_ANY, NULL, 0);
 		zbx_lrtrim(host->name, " ");
+		if ('\0' == *host->name)
+			host->name = zbx_strdup(host->name, host->host);
 		zbx_vector_uint64_create(&host->new_groupids);
 		zbx_vector_uint64_create(&host->lnk_templateids);
 		zbx_vector_uint64_create(&host->del_templateids);
@@ -422,6 +424,8 @@ static void	DBlld_host_make(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts,
 		buffer = zbx_strdup(buffer, name_proto);
 		substitute_discovery_macros(&buffer, jp_row, ZBX_MACRO_ANY, NULL, 0);
 		zbx_lrtrim(buffer, " ");
+		if ('\0' == *buffer)
+			buffer = zbx_strdup(buffer, host->host);
 		if (0 != strcmp(host->name, buffer))
 		{
 			zbx_free(host->name);
