@@ -51,16 +51,18 @@ require_once dirname(__FILE__).'/include/translateDefines.inc.php';
 $availableJScripts = array(
 	'common.js' => '',
 	'menu.js' => '',
-	'prototype.js' => '',
-	'jquery.js' => 'jquery/',
-	'jquery-ui.js' => 'jquery/',
-	'activity-indicator.js' => 'vendors/',
 	'gtlc.js' => '',
 	'functions.js' => '',
 	'main.js' => '',
 	'dom.js' => '',
 	'servercheck.js' => '',
 	'flickerfreescreen.js' => '',
+	'multiselect.js' => '',
+	// vendors
+	'prototype.js' => '',
+	'jquery.js' => 'jquery/',
+	'jquery-ui.js' => 'jquery/',
+	'activity-indicator.js' => 'vendors/',
 	// classes
 	'class.bbcode.js' => '',
 	'class.calendar.js' => '',
