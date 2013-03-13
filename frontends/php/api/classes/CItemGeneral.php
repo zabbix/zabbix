@@ -404,7 +404,7 @@ abstract class CItemGeneral extends CZBXAPI {
 			case ZBX_FLAG_DISCOVERY_NORMAL:
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Item with key "%1$s" already exists on "%2$s" as an item.', $key, $host));
 				break;
-			case ZBX_FLAG_DISCOVERY:
+			case ZBX_FLAG_DISCOVERY_PROTOTYPE:
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Item with key "%1$s" already exists on "%2$s" as a discovery rule.', $key, $host));
 				break;
 			case ZBX_FLAG_DISCOVERY_PROTOTYPE:
