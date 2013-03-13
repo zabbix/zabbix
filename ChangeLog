@@ -44,6 +44,7 @@ A.F.I...S. [ZBXNEXT-1186] increased length to 2048 characters of expression fiel
 ..F....... [ZBX-5127] regular expressions form redesign (Vedmak)
 
 Bug fixes:
+..F....... [ZBX-6369] fixed "Use custom multiplier" field validation in items (Oleg)
 ..F....... [ZBX-6366] fixed "New flexible interval" field validation in item prototypes (Oleg)
 ..F....... [ZBX-6334] fixed naming consistent in triggers and graph prototypes (Eduard)
 ..F....... [ZBX-6292] added support of time postfixes in trigger expression test page (Eduard)
