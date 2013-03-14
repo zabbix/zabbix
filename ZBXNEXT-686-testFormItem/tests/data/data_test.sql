@@ -714,3 +714,8 @@ INSERT INTO items (itemid, type, snmp_community, snmp_oid, hostid, name, descrip
 -- add item for trigger creation on testFormItem
 INSERT INTO items (itemid, type, snmp_community, snmp_oid, hostid, name, description, key_, delay, history, trends, lastvalue, lastclock, prevvalue, status, value_type, trapper_hosts, units, multiplier, delta, prevorgvalue, snmpv3_securityname, snmpv3_securitylevel, snmpv3_authpassphrase, snmpv3_privpassphrase, formula, error, lastlogsize, logtimefmt, templateid, valuemapid, delay_flex, params, ipmi_sensor, data_type, authtype, username, password, publickey, privatekey, mtime, lastns, flags, interfaceid) VALUES (30004, 0, '', '', 40001, 'testFormItem', 'testFormItems','test-item-reuse', 30, 90, 365, NULL, NULL, NULL, 0, 0, '', '', 0, 0, NULL, '', 0, '', '', '1', '', 0, '', NULL, NULL, '', '', '', 0, 0, '', '', '', '', 0, NULL, 0, 40000);
 
+-- add interfaces for create test on testFormItem all item type testing
+INSERT INTO interface (type, ip, dns, useip, port, main, hostid, interfaceid) VALUES (1, '127.0.5.1', '', '1', '10051', '1', 40001, 40011);
+INSERT INTO interface (type, ip, dns, useip, port, main, hostid, interfaceid) VALUES (2, '127.0.5.2', '', '1', '10052', '1', 40001, 40012);
+INSERT INTO interface (type, ip, dns, useip, port, main, hostid, interfaceid) VALUES (3, '127.0.5.3', '', '1', '10053', '1', 40001, 40013);
+INSERT INTO interface (type, ip, dns, useip, port, main, hostid, interfaceid) VALUES (4, '127.0.5.4', '', '1', '10054', '1', 40001, 40014);

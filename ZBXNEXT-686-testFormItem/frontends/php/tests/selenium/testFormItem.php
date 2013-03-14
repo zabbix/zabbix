@@ -836,7 +836,7 @@ class testFormItem extends CWebTest {
 	}
 
 	// Returns list of items
-	public static function allItems() {
+/*	public static function allItems() {
 		return DBdata("select * from items where hostid = 40001 and key_ LIKE 'test-item-form%'");
 	}
 
@@ -1494,6 +1494,245 @@ class testFormItem extends CWebTest {
 					'formCheck' => true
 				)
 			),
+			// List of all item types
+			array(
+				array(
+					'expected' => ITEM_GOOD,
+					'type' => 'Zabbix agent',
+					'name' => 'Zabbix agent',
+					'key' => 'item-zabbix-agent',
+					'dbCheck' => true,
+					'formCheck' => true
+				)
+			),
+			array(
+				array(
+					'expected' => ITEM_GOOD,
+					'type' => 'Zabbix agent (active)',
+					'name' => 'Zabbix agent (active)',
+					'key' => 'item-zabbix-agent-active',
+					'dbCheck' => true,
+					'formCheck' => true
+				)
+			),
+			array(
+				array(
+					'expected' => ITEM_GOOD,
+					'type' => 'Simple check',
+					'name' => 'Simple check',
+					'key' => 'item-simple-check',
+					'dbCheck' => true,
+					'formCheck' => true
+				)
+			),
+			array(
+				array(
+					'expected' => ITEM_GOOD,
+					'type' => 'SNMPv1 agent',
+					'name' => 'SNMPv1 agent',
+					'key' => 'item-snmpv1-agent',
+					'dbCheck' => true,
+					'formCheck' => true
+				)
+			),
+			array(
+				array(
+					'expected' => ITEM_GOOD,
+					'type' => 'SNMPv2 agent',
+					'name' => 'SNMPv2 agent',
+					'key' => 'item-snmpv2-agent',
+					'dbCheck' => true,
+					'formCheck' => true
+				)
+			),
+			array(
+				array(
+					'expected' => ITEM_GOOD,
+					'type' => 'SNMPv3 agent',
+					'name' => 'SNMPv3 agent',
+					'key' => 'item-snmpv3-agent',
+					'dbCheck' => true,
+					'formCheck' => true
+				)
+			),
+			array(
+				array(
+					'expected' => ITEM_GOOD,
+					'type' => 'SNMP trap',
+					'name' => 'SNMP trap',
+					'key' => 'snmptrap.fallback',
+					'dbCheck' => true,
+					'formCheck' => true
+				)
+			),
+			array(
+				array(
+					'expected' => ITEM_GOOD,
+					'type' => 'Zabbix internal',
+					'name' => 'Zabbix internal',
+					'key' => 'item-zabbix-internal',
+					'dbCheck' => true,
+					'formCheck' => true
+				)
+			),
+			array(
+				array(
+					'expected' => ITEM_GOOD,
+					'type' => 'Zabbix trapper',
+					'name' => 'Zabbix trapper',
+					'key' => 'item-zabbix-trapper',
+					'dbCheck' => true,
+					'formCheck' => true
+				)
+			),
+			array(
+				array(
+					'expected' => ITEM_GOOD,
+					'type' => 'Zabbix aggregate',
+					'name' => 'Zabbix aggregate',
+					'key' => 'grpmax[Zabbix servers group,some-item-key,last,0]',
+					'dbCheck' => true,
+					'formCheck' => true
+				)
+			),
+			array(
+				array(
+					'expected' => ITEM_BAD,
+					'type' => 'Zabbix aggregate',
+					'name' => 'Zabbix aggregate',
+					'key' => 'item-zabbix-aggregate',
+					'errors' => array(
+						'ERROR: Cannot add item',
+						'Key "item-zabbix-aggregate" does not match'
+					)
+				)
+			),
+			array(
+				array(
+					'expected' => ITEM_GOOD,
+					'type' => 'External check',
+					'name' => 'External check',
+					'key' => 'item-external-check',
+					'dbCheck' => true,
+					'formCheck' => true
+				)
+			),
+			array(
+				array(
+					'expected' => ITEM_GOOD,
+					'type' => 'Database monitor',
+					'name' => 'Database monitor',
+					'key' => 'item-database-monitor',
+					'dbCheck' => true,
+					'formCheck' => true
+				)
+			),
+			array(
+				array(
+					'expected' => ITEM_GOOD,
+					'type' => 'IPMI agent',
+					'name' => 'IPMI agent',
+					'key' => 'item-ipmi-agent',
+					'ipmi_sensor' => 'ipmi_sensor',
+					'dbCheck' => true,
+					'formCheck' => true
+				)
+			),
+			array(
+				array(
+					'expected' => ITEM_GOOD,
+					'type' => 'SSH agent',
+					'name' => 'SSH agent',
+					'key' => 'item-ssh-agent',
+					'username' => 'zabbix',
+					'params_es' => 'executed script',
+					'dbCheck' => true,
+					'formCheck' => true
+				)
+			),
+			array(
+				array(
+					'expected' => ITEM_GOOD,
+					'type' => 'TELNET agent',
+					'name' => 'TELNET agent',
+					'key' => 'item-telnet-agent',
+					'username' => 'zabbix',
+					'params_es' => 'executed script',
+					'dbCheck' => true,
+					'formCheck' => true
+				)
+			),
+			array(
+				array(
+					'expected' => ITEM_BAD,
+					'type' => 'IPMI agent',
+					'name' => 'IPMI agent error',
+					'key' => 'item-ipmi-agent-error',
+					'errors' => array(
+							'ERROR: Page received incorrect data',
+							'Warning. Incorrect value for field "IPMI sensor": cannot be empty.'
+					)
+				)
+			),
+			array(
+				array(
+					'expected' => ITEM_BAD,
+					'type' => 'SSH agent',
+					'name' => 'SSH agent error',
+					'key' => 'item-ssh-agent-error',
+					'errors' => array(
+							'ERROR: Page received incorrect data',
+							'Warning. Incorrect value for field "username".',
+							'Warning. Incorrect value for field "Executed script": cannot be empty.'
+					)
+				)
+			),
+			array(
+				array(
+					'expected' => ITEM_BAD,
+					'type' => 'TELNET agent',
+					'name' => 'TELNET agent error',
+					'key' => 'item-telnet-agent-error',
+					'errors' => array(
+							'ERROR: Page received incorrect data',
+							'Warning. Incorrect value for field "username".',
+							'Warning. Incorrect value for field "Executed script": cannot be empty.'
+					)
+				)
+			),
+			array(
+				array(
+					'expected' => ITEM_GOOD,
+					'type' => 'JMX agent',
+					'name' => 'JMX agent',
+					'key' => 'item-jmx-agent',
+					'dbCheck' => true,
+					'formCheck' => true
+				)
+			),
+			array(
+				array(
+					'expected' => ITEM_GOOD,
+					'type' => 'Calculated',
+					'name' => 'Calculated',
+					'key' => 'item-calculated',
+					'params_f' => 'formula',
+					'dbCheck' => true,
+					'formCheck' => true
+				)
+			),
+			array(
+				array(
+					'expected' => ITEM_BAD,
+					'type' => 'Calculated',
+					'name' => 'Calculated',
+					'key' => 'item-calculated',
+					'errors' => array(
+							'ERROR: Page received incorrect data',
+							'Warning. Incorrect value for field "Formula": cannot be empty.'
+					)
+				)
+			),
 			// Default
 			array(
 				array(
@@ -1596,6 +1835,14 @@ class testFormItem extends CWebTest {
 			$this->input_type('username', $data['username']);
 		}
 
+		if (isset($data['ipmi_sensor'])) {
+			$this->input_type('ipmi_sensor', $data['ipmi_sensor']);
+		}
+
+		if (isset($data['params_f'])) {
+			$this->input_type('params_f', $data['params_f']);
+		}
+
 		if (isset($data['params_es'])) {
 			$this->input_type('params_es', $data['params_es']);
 		}
@@ -1641,7 +1888,25 @@ class testFormItem extends CWebTest {
 		}
 
 		$type = $this->getSelectedLabel('type');
-		$interfaceid = $this->getSelectedLabel('interfaceid');
+
+		switch ($data['type']) {
+			case 'Zabbix agent':
+			case 'Simple check':
+			case 'SNMPv1 agent':
+			case 'SNMPv2 agent':
+			case 'SNMPv3 agent':
+			case 'SNMP trap':
+			case 'External check':
+			case 'IPMI agent':
+			case 'SSH agent':
+			case 'TELNET agent':
+			case 'JMX agent':
+				$interfaceid = $this->getSelectedLabel('interfaceid');
+				break;
+			default:
+				$this->assertNotVisible('interfaceid');
+		}
+
 		$value_type = $this->getSelectedLabel('value_type');
 		$data_type = $this->getSelectedLabel('data_type');
 
@@ -1723,7 +1988,23 @@ class testFormItem extends CWebTest {
 			$this->assertAttribute("//input[@id='name']/@value", 'exact:'.$name);
 			$this->assertAttribute("//input[@id='key']/@value", 'exact:'.$key);
 			$this->assertElementPresent("//select[@id='type']/option[text()='$type']");
+			switch ($data['type']) {
+				case 'Zabbix agent':
+				case 'Simple check':
+				case 'SNMPv1 agent':
+				case 'SNMPv2 agent':
+				case 'SNMPv3 agent':
+				case 'SNMP trap':
+				case 'External check':
+				case 'IPMI agent':
+				case 'SSH agent':
+				case 'TELNET agent':
+				case 'JMX agent':
 			$this->assertElementPresent("//select[@id='interfaceid']/optgroup/option[text()='".$interfaceid."']");
+					break;
+				default:
+					$this->assertNotVisible('interfaceid');
+			}
 			$this->assertElementPresent("//select[@id='value_type']/option[text()='$value_type']");
 			$this->assertElementPresent("//select[@id='data_type']/option[text()='$data_type']");
 			}
