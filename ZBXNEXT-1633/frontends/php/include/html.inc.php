@@ -323,7 +323,8 @@ function get_header_host_table($currentElement, $hostid, $discoveryid = null) {
 	$options = array(
 		'hostids' => $hostid,
 		'output' => API_OUTPUT_EXTEND,
-		'templated_hosts' => true
+		'templated_hosts' => true,
+		'selectHostDiscovery' => array('ts_delete')
 	);
 	if (isset($elements['items'])) {
 		$options['selectItems'] = API_OUTPUT_COUNT;
@@ -613,7 +614,7 @@ function getSeverityControl($selectedSeverity = TRIGGER_SEVERITY_NOT_CLASSIFIED)
 }
 
 /**
- * Returns zbx, snmp, jmx, ipmi availability status icons.
+ * Returns zbx, snmp, jmx, ipmi availability status icons and the discovered host lifetime indicator.
  *
  * @param type $host
  *
@@ -642,6 +643,17 @@ function getAvailabilityTable($host) {
 				break;
 		}
 		$ad->addItem($ai);
+	}
+
+	// discovered host lifetime indicator
+	if ($host['flags'] == ZBX_FLAG_DISCOVERY_CREATED && $host['hostDiscovery']['ts_delete']) {
+		$deleteError = new CDiv(SPACE, 'status_icon status_icon_extra iconwarning');
+		$deleteError->setHint(
+			_s('The host is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s).',
+				zbx_date2age($host['hostDiscovery']['ts_delete']), zbx_date2str(_('d M Y'), $host['hostDiscovery']['ts_delete']),
+				zbx_date2str(_('H:i:s'), $host['hostDiscovery']['ts_delete'])
+			));
+		$ad->addItem($deleteError);
 	}
 
 	return $ad;
