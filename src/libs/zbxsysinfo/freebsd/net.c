@@ -241,7 +241,3 @@ int		NET_IF_DISCOVERY(const char *cmd, const char *param, unsigned flags, AGENT_
 
 		return ret;
 }
-
-												}
-								}
-}
