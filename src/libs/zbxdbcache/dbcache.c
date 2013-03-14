@@ -2954,7 +2954,7 @@ static void	dc_local_add_history_lld(zbx_uint64_t itemid, zbx_timespec_t *ts, co
 	item_value->itemid = itemid;
 	item_value->ts = *ts;
 	item_value->status = ITEM_STATUS_ACTIVE;
-	item_value->flags = ZBX_FLAG_DISCOVERY;
+	item_value->flags = ZBX_FLAG_DISCOVERY_RULE;
 	item_value->value.value_str.len = strlen(value_orig) + 1;
 
 	dc_string_buffer_realloc(item_value->value.value_str.len);
@@ -2982,7 +2982,7 @@ void	dc_add_history(zbx_uint64_t itemid, unsigned char value_type, unsigned char
 		return;
 	}
 
-	if (0 != (ZBX_FLAG_DISCOVERY & flags))
+	if (0 != (ZBX_FLAG_DISCOVERY_RULE & flags))
 	{
 		if (NULL == GET_TEXT_RESULT(value))
 			return;
@@ -3046,7 +3046,7 @@ void	dc_flush_history()
 		{
 			DCadd_history_notsupported(item_value);
 		}
-		else if (0 != (ZBX_FLAG_DISCOVERY & item_value->flags))
+		else if (0 != (ZBX_FLAG_DISCOVERY_RULE & item_value->flags))
 		{
 			DCadd_history_lld(item_value);
 		}

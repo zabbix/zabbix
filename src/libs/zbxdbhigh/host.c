@@ -2667,6 +2667,477 @@ static void	DBcopy_template_applications(zbx_uint64_t hostid, zbx_vector_uint64_
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
+typedef struct
+{
+	zbx_uint64_t		templateid;		/* link to parent template */
+	zbx_uint64_t		hostid;
+	zbx_uint64_t		itemid;			/* discovery rule id */
+	zbx_vector_uint64_t	lnk_templateids;	/* list of templates which should be linked */
+	char			*host;
+	char			*name;
+	unsigned char		status;
+#define ZBX_FLAG_HPLINK_UPDATE_NAME	0x01
+#define ZBX_FLAG_HPLINK_UPDATE_STATUS	0x02
+	unsigned char		flags;
+}
+zbx_host_prototype_t;
+
+static void	DBhost_prototypes_clean(zbx_vector_ptr_t *host_prototypes)
+{
+	int			i;
+	zbx_host_prototype_t	*host_prototype;
+
+	for (i = 0; i < host_prototypes->values_num; i++)
+	{
+		host_prototype = (zbx_host_prototype_t *)host_prototypes->values[i];
+
+		zbx_free(host_prototype->name);
+		zbx_free(host_prototype->host);
+		zbx_vector_uint64_destroy(&host_prototype->lnk_templateids);
+		zbx_free(host_prototype);
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DBhost_prototypes_make                                           *
+ *                                                                            *
+ * Comments: auxiliary function for DBhost_prototypes_copy()                  *
+ *                                                                            *
+ ******************************************************************************/
+static void	DBhost_prototypes_make(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids,
+		zbx_vector_ptr_t *host_prototypes)
+{
+	DB_RESULT		result;
+	DB_ROW			row;
+	char			*sql = NULL;
+	size_t			sql_alloc = ZBX_KIBIBYTE, sql_offset = 0;
+	zbx_vector_uint64_t	itemids;
+	zbx_host_prototype_t	*host_prototype;
+
+	zbx_vector_uint64_create(&itemids);
+
+	sql = zbx_malloc(sql, sql_alloc);
+
+	/* selects host prototypes from templates */
+
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+			"select hi.itemid,th.hostid,th.host,th.name,th.status"
+			" from items hi,items ti,host_discovery thd,hosts th"
+			" where hi.templateid=ti.itemid"
+				" and ti.itemid=thd.parent_itemid"
+				" and thd.hostid=th.hostid"
+				" and hi.hostid=" ZBX_FS_UI64
+				" and",
+			hostid);
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "ti.hostid", templateids->values, templateids->values_num);
+
+	result = DBselect("%s", sql);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		host_prototype = (zbx_host_prototype_t *)zbx_malloc(NULL, sizeof(zbx_host_prototype_t));
+
+		host_prototype->hostid = 0;
+		ZBX_STR2UINT64(host_prototype->itemid, row[0]);
+		ZBX_STR2UINT64(host_prototype->templateid, row[1]);
+		zbx_vector_uint64_create(&host_prototype->lnk_templateids);
+		host_prototype->host = zbx_strdup(NULL, row[2]);
+		host_prototype->name = zbx_strdup(NULL, row[3]);
+		host_prototype->status = (unsigned char)atoi(row[4]);
+		host_prototype->flags = 0;
+
+		zbx_vector_ptr_append(host_prototypes, host_prototype);
+		zbx_vector_uint64_append(&itemids, host_prototype->itemid);
+	}
+	DBfree_result(result);
+
+	if (0 != host_prototypes->values_num)
+	{
+		zbx_uint64_t	itemid;
+		unsigned char	status;
+		int		i;
+
+		zbx_vector_uint64_sort(&itemids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+		zbx_vector_uint64_uniq(&itemids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+		/* selects host prototypes from host */
+
+		sql_offset = 0;
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+				"select i.itemid,h.hostid,h.host,h.name,h.status"
+				" from items i,host_discovery hd,hosts h"
+				" where i.itemid=hd.parent_itemid"
+					" and hd.hostid=h.hostid"
+					" and i.hostid=" ZBX_FS_UI64
+					" and",
+				hostid);
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "i.itemid",
+				itemids.values, itemids.values_num);
+
+		result = DBselect("%s", sql);
+
+		while (NULL != (row = DBfetch(result)))
+		{
+			ZBX_STR2UINT64(itemid, row[0]);
+
+			for (i = 0; i < host_prototypes->values_num; i++)
+			{
+				host_prototype = (zbx_host_prototype_t *)host_prototypes->values[i];
+
+				if (host_prototype->itemid == itemid && 0 == strcmp(host_prototype->host, row[2]))
+				{
+					ZBX_STR2UINT64(host_prototype->hostid, row[1]);
+					if (0 != strcmp(host_prototype->name, row[3]))
+						host_prototype->flags |= ZBX_FLAG_HPLINK_UPDATE_NAME;
+					if (host_prototype->status != (status = (unsigned char)atoi(row[4])))
+						host_prototype->flags |= ZBX_FLAG_HPLINK_UPDATE_STATUS;
+					break;
+				}
+			}
+		}
+	}
+	DBfree_result(result);
+
+	zbx_free(sql);
+
+	zbx_vector_uint64_destroy(&itemids);
+
+	/* sort by templateid */
+	zbx_vector_ptr_sort(host_prototypes, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DBhost_prototypes_templates_make                                 *
+ *                                                                            *
+ * Parameters: host_prototypes     - [IN/OUT] list of host prototypes         *
+ *                                   should be sorted by templateid           *
+ *             del_hosttemplateids - [OUT] list of hosttemplateids which      *
+ *                                   should be deleted                        *
+ *                                                                            *
+ * Comments: auxiliary function for DBhost_prototypes_copy()                  *
+ *                                                                            *
+ ******************************************************************************/
+static void	DBhost_prototypes_templates_make(zbx_vector_ptr_t *host_prototypes,
+		zbx_vector_uint64_t *del_hosttemplateids)
+{
+	DB_RESULT		result;
+	DB_ROW			row;
+	char			*sql = NULL;
+	size_t			sql_alloc = ZBX_KIBIBYTE, sql_offset = 0;
+	zbx_vector_uint64_t	hostids;
+	zbx_uint64_t		hostid, templateid, hosttemplateid;
+	zbx_host_prototype_t	*host_prototype;
+	int			i;
+
+	sql = zbx_malloc(sql, sql_alloc);
+
+	zbx_vector_uint64_create(&hostids);
+
+	/* select list of templates which should be linked to host prototypes */
+
+	for (i = 0; i < host_prototypes->values_num; i++)
+	{
+		host_prototype = (zbx_host_prototype_t *)host_prototypes->values[i];
+
+		zbx_vector_uint64_append(&hostids, host_prototype->templateid);
+	}
+
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
+			"select hostid,templateid"
+			" from hosts_templates"
+			" where");
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid", hostids.values, hostids.values_num);
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " order by hostid,templateid");
+
+	result = DBselect("%s", sql);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		ZBX_STR2UINT64(hostid, row[0]);
+		ZBX_STR2UINT64(templateid, row[1]);
+
+		if (FAIL == (i = zbx_vector_ptr_bsearch(host_prototypes, &hostid, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
+		{
+			THIS_SHOULD_NEVER_HAPPEN;
+			continue;
+		}
+
+		host_prototype = (zbx_host_prototype_t *)host_prototypes->values[i];
+
+		zbx_vector_uint64_append(&host_prototype->lnk_templateids, templateid);
+	}
+	DBfree_result(result);
+
+	/* select list of templates which already linked to host prototypes */
+
+	hostids.values_num = 0;
+
+	for (i = 0; i < host_prototypes->values_num; i++)
+	{
+		host_prototype = (zbx_host_prototype_t *)host_prototypes->values[i];
+
+		if (0 == host_prototype->hostid)
+			continue;
+
+		zbx_vector_uint64_append(&hostids, host_prototype->hostid);
+	}
+
+	if (0 != hostids.values_num)
+	{
+		sql_offset = 0;
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
+				"select hostid,templateid,hosttemplateid"
+				" from hosts_templates"
+				" where");
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid", hostids.values, hostids.values_num);
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " order by hosttemplateid");
+
+		result = DBselect("%s", sql);
+
+		while (NULL != (row = DBfetch(result)))
+		{
+			ZBX_STR2UINT64(hostid, row[0]);
+			ZBX_STR2UINT64(templateid, row[1]);
+
+			for (i = 0; i < host_prototypes->values_num; i++)
+			{
+				host_prototype = (zbx_host_prototype_t *)host_prototypes->values[i];
+
+				if (host_prototype->hostid == hostid)
+					break;
+			}
+
+			if (i == host_prototypes->values_num)
+			{
+				THIS_SHOULD_NEVER_HAPPEN;
+				continue;
+			}
+
+			if (FAIL == (i = zbx_vector_uint64_bsearch(&host_prototype->lnk_templateids, templateid,
+						ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
+			{
+				ZBX_STR2UINT64(hosttemplateid, row[2]);
+				zbx_vector_uint64_append(del_hosttemplateids, hosttemplateid);
+			}
+			else
+				zbx_vector_uint64_remove(&host_prototype->lnk_templateids, i);
+		}
+		DBfree_result(result);
+	}
+
+	zbx_vector_uint64_destroy(&hostids);
+
+	zbx_free(sql);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DBhost_prototypes_save                                           *
+ *                                                                            *
+ * Comments: auxiliary function for DBhost_prototypes_copy()                  *
+ *                                                                            *
+ ******************************************************************************/
+static void	DBhost_prototypes_save(zbx_vector_ptr_t *host_prototypes, zbx_vector_uint64_t *del_hosttemplateids)
+{
+	char			*sql1 = NULL, *sql2 = NULL, *sql3 = NULL, *sql4 = NULL, *sql5 = NULL,
+				*host_esc, *name_esc;
+	size_t			sql1_alloc = ZBX_KIBIBYTE, sql1_offset = 0,
+				sql2_alloc = ZBX_KIBIBYTE, sql2_offset = 0,
+				sql3_alloc = ZBX_KIBIBYTE, sql3_offset = 0,
+				sql4_alloc = ZBX_KIBIBYTE, sql4_offset = 0,
+				sql5_alloc = ZBX_KIBIBYTE, sql5_offset = 0;
+	zbx_host_prototype_t	*host_prototype;
+	zbx_uint64_t		hostid = 0, hostdiscoveryid = 0, hosttemplateid = 0;
+	int			i, j, new_hosts = 0, new_hosts_templates = 0;
+	const char		*ins_host_discovery_sql =
+				"insert into host_discovery (hostdiscoveryid,hostid,parent_itemid) values ";
+	const char		*ins_hosts_sql = "insert into hosts (hostid,host,name,status,flags,templateid) values ";
+	const char		*ins_hosts_templates_sql =
+				"insert into hosts_templates (hosttemplateid,hostid,templateid) values ";
+
+	for (i = 0; i < host_prototypes->values_num; i++)
+	{
+		host_prototype = (zbx_host_prototype_t *)host_prototypes->values[i];
+
+		if (0 == host_prototype->hostid)
+			new_hosts++;
+
+		new_hosts_templates += host_prototype->lnk_templateids.values_num;
+	}
+
+	if (0 != new_hosts)
+	{
+		hostid = DBget_maxid_num("hosts", new_hosts);
+		hostdiscoveryid = DBget_maxid_num("host_discovery", new_hosts);
+
+		sql1 = zbx_malloc(sql1, sql1_alloc);
+		sql2 = zbx_malloc(sql2, sql2_alloc);
+		DBbegin_multiple_update(&sql1, &sql1_alloc, &sql1_offset);
+		DBbegin_multiple_update(&sql2, &sql2_alloc, &sql2_offset);
+#ifdef HAVE_MULTIROW_INSERT
+		zbx_strcpy_alloc(&sql1, &sql1_alloc, &sql1_offset, ins_hosts_sql);
+		zbx_strcpy_alloc(&sql2, &sql2_alloc, &sql2_offset, ins_host_discovery_sql);
+#endif
+	}
+
+	if (new_hosts != host_prototypes->values_num)
+	{
+		sql3 = zbx_malloc(sql3, sql3_alloc);
+		DBbegin_multiple_update(&sql3, &sql3_alloc, &sql3_offset);
+	}
+
+	if (0 != new_hosts_templates)
+	{
+		hosttemplateid = DBget_maxid_num("hosts_templates", new_hosts_templates);
+
+		sql4 = zbx_malloc(sql4, sql4_alloc);
+		DBbegin_multiple_update(&sql4, &sql4_alloc, &sql4_offset);
+#ifdef HAVE_MULTIROW_INSERT
+		zbx_strcpy_alloc(&sql4, &sql4_alloc, &sql4_offset, ins_hosts_templates_sql);
+#endif
+	}
+
+	if (0 != del_hosttemplateids->values_num)
+	{
+		sql5 = zbx_malloc(sql5, sql5_alloc);
+		zbx_strcpy_alloc(&sql5, &sql5_alloc, &sql5_offset, "delete from hosts_templates where");
+		DBadd_condition_alloc(&sql5, &sql5_alloc, &sql5_offset, "hosttemplateid",
+				del_hosttemplateids->values, del_hosttemplateids->values_num);
+	}
+
+	for (i = 0; i < host_prototypes->values_num; i++)
+	{
+		host_prototype = (zbx_host_prototype_t *)host_prototypes->values[i];
+
+		if (0 == host_prototype->hostid)
+		{
+			host_esc = DBdyn_escape_string(host_prototype->host);
+			name_esc = DBdyn_escape_string(host_prototype->name);
+
+			host_prototype->hostid = hostid++;
+#ifndef HAVE_MULTIROW_INSERT
+			zbx_strcpy_alloc(&sql1, &sql1_alloc, &sql1_offset, ins_hosts_sql);
+			zbx_strcpy_alloc(&sql2, &sql2_alloc, &sql2_offset, ins_host_discovery_sql);
+#endif
+			zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset,
+					"(" ZBX_FS_UI64 ",'%s','%s',%d,%d," ZBX_FS_UI64 ")" ZBX_ROW_DL,
+					host_prototype->hostid, host_esc, name_esc, (int)host_prototype->status,
+					ZBX_FLAG_DISCOVERY_PROTOTYPE, host_prototype->templateid);
+			zbx_snprintf_alloc(&sql2, &sql2_alloc, &sql2_offset,
+					"(" ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 ")" ZBX_ROW_DL,
+					hostdiscoveryid++, host_prototype->hostid, host_prototype->itemid);
+
+			zbx_free(name_esc);
+			zbx_free(host_esc);
+		}
+		else
+		{
+			zbx_snprintf_alloc(&sql3, &sql3_alloc, &sql3_offset, "update hosts set templateid=" ZBX_FS_UI64,
+					host_prototype->templateid);
+			if (0 != (host_prototype->flags & ZBX_FLAG_HPLINK_UPDATE_NAME))
+			{
+				name_esc = DBdyn_escape_string(host_prototype->name);
+				zbx_snprintf_alloc(&sql3, &sql3_alloc, &sql3_offset, ",name='%s'", name_esc);
+				zbx_free(name_esc);
+			}
+			if (0 != (host_prototype->flags & ZBX_FLAG_HPLINK_UPDATE_STATUS))
+			{
+				zbx_snprintf_alloc(&sql3, &sql3_alloc, &sql3_offset, ",status=%d",
+						host_prototype->status);
+			}
+			zbx_snprintf_alloc(&sql3, &sql3_alloc, &sql3_offset, " where hostid=" ZBX_FS_UI64 ";\n",
+					host_prototype->hostid);
+		}
+
+		for (j = 0; j < host_prototype->lnk_templateids.values_num; j++)
+		{
+#ifndef HAVE_MULTIROW_INSERT
+			zbx_strcpy_alloc(&sql4, &sql4_alloc, &sql4_offset, ins_hosts_templates_sql);
+#endif
+			zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset,
+					"(" ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 ")" ZBX_ROW_DL,
+					hosttemplateid++, host_prototype->hostid,
+					host_prototype->lnk_templateids.values[j]);
+		}
+	}
+
+	if (0 != new_hosts)
+	{
+#ifdef HAVE_MULTIROW_INSERT
+		sql1_offset--;
+		sql2_offset--;
+		zbx_strcpy_alloc(&sql1, &sql1_alloc, &sql1_offset, ";\n");
+		zbx_strcpy_alloc(&sql2, &sql2_alloc, &sql2_offset, ";\n");
+#endif
+		DBend_multiple_update(&sql1, &sql1_alloc, &sql1_offset);
+		DBend_multiple_update(&sql2, &sql2_alloc, &sql2_offset);
+		DBexecute("%s", sql1);
+		DBexecute("%s", sql2);
+		zbx_free(sql1);
+		zbx_free(sql2);
+	}
+
+	if (new_hosts != host_prototypes->values_num)
+	{
+		DBend_multiple_update(&sql3, &sql3_alloc, &sql3_offset);
+		DBexecute("%s", sql3);
+		zbx_free(sql3);
+	}
+
+	if (0 != new_hosts_templates)
+	{
+#ifdef HAVE_MULTIROW_INSERT
+		sql4_offset--;
+		zbx_strcpy_alloc(&sql4, &sql4_alloc, &sql4_offset, ";\n");
+#endif
+		DBend_multiple_update(&sql4, &sql4_alloc, &sql4_offset);
+		DBexecute("%s", sql4);
+		zbx_free(sql4);
+	}
+
+	if (0 != del_hosttemplateids->values_num)
+	{
+		DBexecute("%s", sql5);
+		zbx_free(sql5);
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DBhost_prototypes_copy                                           *
+ *                                                                            *
+ * Purpose: copy host prototypes from templates and create links between      *
+ *          them and discovery rules                                          *
+ *                                                                            *
+ * Comments: auxiliary function for DBcopy_template_items()                   *
+ *                                                                            *
+ ******************************************************************************/
+static void	DBhost_prototypes_copy(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids)
+{
+	zbx_vector_ptr_t	host_prototypes;
+
+	zbx_vector_ptr_create(&host_prototypes);
+
+	DBhost_prototypes_make(hostid, templateids, &host_prototypes);
+
+	if (0 != host_prototypes.values_num)
+	{
+		zbx_vector_uint64_t	del_hosttemplateids;
+
+		zbx_vector_uint64_create(&del_hosttemplateids);
+
+		DBhost_prototypes_templates_make(&host_prototypes, &del_hosttemplateids);
+		DBhost_prototypes_save(&host_prototypes, &del_hosttemplateids);
+
+		zbx_vector_uint64_destroy(&del_hosttemplateids);
+	}
+
+	DBhost_prototypes_clean(&host_prototypes);
+	zbx_vector_ptr_destroy(&host_prototypes);
+}
+
 /* auxiliary function for DBcopy_template_items() */
 static void	DBget_interfaces_by_hostid(zbx_uint64_t hostid, zbx_uint64_t *interfaceids)
 {
@@ -4375,6 +4846,7 @@ int	DBcopy_template_elements(zbx_uint64_t hostid, zbx_vector_uint64_t *lnk_templ
 
 	DBcopy_template_applications(hostid, lnk_templateids);
 	DBcopy_template_items(hostid, lnk_templateids);
+	DBhost_prototypes_copy(hostid, lnk_templateids);
 	if (SUCCEED == (res = DBcopy_template_triggers(hostid, lnk_templateids)))
 	{
 		DBcopy_template_graphs(hostid, lnk_templateids);
