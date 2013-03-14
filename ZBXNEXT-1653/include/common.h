@@ -959,6 +959,8 @@ void	add_regexp_ex(ZBX_REGEXP **regexps, int *regexps_alloc, int *regexps_num,
 		const char *name, const char *expression, int expression_type, char exp_delimiter, int case_sensitive);
 int	regexp_match_ex(ZBX_REGEXP *regexps, int regexps_num, const char *string, const char *pattern,
 		zbx_case_sensitive_t cs);
+int	regexp_sub_ex(ZBX_REGEXP *regexps, int regexps_num, const char *string, const char *pattern,
+		zbx_case_sensitive_t cs, const char *output_template, char **output);
 
 /* misc functions */
 #ifdef HAVE_IPV6
