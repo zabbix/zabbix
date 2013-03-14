@@ -270,6 +270,7 @@ class CConfigurationExport {
 			'selectMacros' => API_OUTPUT_EXTEND,
 			'selectGroups' => API_OUTPUT_EXTEND,
 			'selectParentTemplates' => API_OUTPUT_EXTEND,
+			'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL),
 			'preservekeys' => true
 		));
 
