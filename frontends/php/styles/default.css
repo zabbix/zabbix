@@ -800,6 +800,7 @@ table.filter tr td.label { border-right: 0 !important; }
 table.filter tr td.controls { text-align: center; }
 
 .host-list table.filter tr td { width: 25%; }
+.host-list .iconwarning, .host-edit .iconwarning { margin-left: 5px; }
 
 .item-list table.filter { text-align: left; min-width: 1024px; }
 .item-list table.filter tr td.label { text-align: right; }

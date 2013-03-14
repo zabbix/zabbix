@@ -790,7 +790,8 @@ else {
 		'selectGraphs' => API_OUTPUT_COUNT,
 		'selectApplications' => API_OUTPUT_COUNT,
 		'selectHttpTests' => API_OUTPUT_COUNT,
-		'selectDiscoveryRule' => array('itemid', 'name')
+		'selectDiscoveryRule' => array('itemid', 'name'),
+		'selectHostDiscovery' => array('ts_delete')
 	));
 	order_result($hosts, $sortfield, $sortorder);
 

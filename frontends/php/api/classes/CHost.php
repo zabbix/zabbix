@@ -127,6 +127,7 @@ class CHost extends CHostGeneral {
 			'selectInventory'			=> null,
 			'selectHttpTests'           => null,
 			'selectDiscoveryRule'		=> null,
+			'selectHostDiscovery'		=> null,
 			'countOutput'				=> null,
 			'groupCount'				=> null,
 			'preservekeys'				=> null,
@@ -1717,6 +1718,21 @@ class CHost extends CHostGeneral {
 				'preservekeys' => true,
 			));
 			$result = $relationMap->mapOne($result, $discoveryRules, 'discoveryRule');
+		}
+
+		// adding item discovery
+		if ($options['selectHostDiscovery'] !== null) {
+			$hostDiscoveries = API::getApi()->select('host_discovery', array(
+				'output' => $this->outputExtend('host_discovery', array('hostdiscoveryid', 'hostid'), $options['selectHostDiscovery']),
+				'filter' => array('itemid' => array_keys($result)),
+				'preservekeys' => true
+			));
+			$relationMap = $this->createRelationMap($hostDiscoveries, 'hostid', 'hostdiscoveryid');
+
+			$hostDiscoveries = $this->unsetExtraFields($hostDiscoveries, array('hostid', 'hostdiscoveryid'),
+				$options['selectHostDiscovery']
+			);
+			$result = $relationMap->mapOne($result, $hostDiscoveries, 'hostDiscovery');
 		}
 
 		return $result;
