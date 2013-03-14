@@ -1301,7 +1301,7 @@ var CScrollBar = Class.create(CDebug, {
 		this.dom.info_left = document.createElement('span');
 		this.dom.timeline.appendChild(this.dom.info_left);
 		this.dom.info_left.className = 'info_left link';
-		this.dom.info_left.appendChild(document.createTextNode('02.07.2009 12:15:12'));
+		this.dom.info_left.appendChild(document.createTextNode('01.01.1970 00:00:00'));
 		this.dom.info_left.setAttribute('data-timestamp', 1);
 
 		var sep = document.createElement('span');
@@ -1313,7 +1313,7 @@ var CScrollBar = Class.create(CDebug, {
 		this.dom.info_right = document.createElement('span');
 		this.dom.timeline.appendChild(this.dom.info_right);
 		this.dom.info_right.className = 'info_right link';
-		this.dom.info_right.appendChild(document.createTextNode('02.07.2009 12:15:12'));
+		this.dom.info_right.appendChild(document.createTextNode('01.01.1970 00:00:00'));
 		this.dom.info_right.setAttribute('data-timestamp', 1);
 
 		// <sublevel>

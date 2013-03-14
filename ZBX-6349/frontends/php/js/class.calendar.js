@@ -177,8 +177,8 @@ calendar.prototype = {
 					val = (IE) ? this.timeobjects[0].innerText : this.timeobjects[0].textContent;
 				}
 
-				if (jQuery(this.timeobjects[0]).data('timestamp') != 'undefined' && jQuery(this.timeobjects[0]).data('timestamp') > 0) {
-					this.setNow(jQuery(this.timeobjects[0]).data('timestamp'));
+				if (jQuery(this.timeobjects[0]).attr('data-timestamp') > 0) {
+					this.setNow(jQuery(this.timeobjects[0]).attr('data-timestamp'));
 				}
 				else {
 					if (is_string(val)) {
