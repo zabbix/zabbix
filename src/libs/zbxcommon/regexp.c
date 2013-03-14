@@ -80,7 +80,7 @@ char	*zbx_iregexp_match(const char *string, const char *pattern, int *len)
  *             match           - [IN] the captured group data                    *
  *             nsmatch         - [IN] the number of items in captured group data *
  *                                                                               *
- * Return value: Allocated string containing result value                        *
+ * Return value: Allocated string containing output value                        *
  *                                                                               *
  * Author: Andris Zeila                                                          *
  *                                                                               *
@@ -156,8 +156,9 @@ static char	*regexp_sub_replace(const char *text, const char *output_template, r
  *            flags            - [IN] the regcomp() function flags.              *
  *                                    See regcomp() manual.                      *
  *                                                                               *
- * Return value: Allocated string containing substot value if the input string   *
- *               matches the specified regular expression or NULL otherwise.     *
+ * Return value: Allocated string containing output value if the input           *
+ *               string matches the specified regular expression or NULL         *
+ *               otherwise.                                                      *
  *                                                                               *
  * Author: Andris Zeila                                                          *
  *                                                                               *
