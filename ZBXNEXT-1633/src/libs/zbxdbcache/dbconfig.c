@@ -794,7 +794,7 @@ static void	DCsync_items(DB_RESULT result)
 		item->flags = (unsigned char)atoi(row[26]);
 		ZBX_DBROW2UINT64(item->interfaceid, row[27]);
 
-		if (0 != (ZBX_FLAG_DISCOVERY & item->flags))
+		if (0 != (ZBX_FLAG_DISCOVERY_RULE & item->flags))
 			item->value_type = ITEM_VALUE_TYPE_TEXT;
 		else
 			item->value_type = (unsigned char)atoi(row[5]);

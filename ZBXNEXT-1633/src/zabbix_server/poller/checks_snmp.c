@@ -1202,7 +1202,7 @@ int	get_value_snmp(DC_ITEM *item, AGENT_RESULT *value)
 
 	num = num_key_param(item->snmp_oid);
 
-	if (0 != (ZBX_FLAG_DISCOVERY & item->flags))
+	if (0 != (ZBX_FLAG_DISCOVERY_RULE & item->flags))
 	{
 		switch (num)
 		{
