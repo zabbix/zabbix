@@ -518,22 +518,22 @@ $functions = array(
 		'allowed_types' => $allowed_types_any
 	),
 	'band[<]' => array(
-		'description' =>  _('Bitwise AND of last (most recent) T value is < N'),
+		'description' =>  _('Bitwise AND of last (most recent) T value and mask is < N'),
 		'params' => $paramSecIntCount,
 		'allowed_types' => $allowed_types_int
 	),
 	'band[>]' => array(
-		'description' =>  _('Bitwise AND of last (most recent) T value is > N'),
+		'description' =>  _('Bitwise AND of last (most recent) T value and mask is > N'),
 		'params' => $paramSecIntCount,
 		'allowed_types' => $allowed_types_int
 	),
 	'band[=]' => array(
-		'description' =>  _('Bitwise AND of last (most recent) T value is = N'),
+		'description' =>  _('Bitwise AND of last (most recent) T value and mask is = N'),
 		'params' => $paramSecIntCount,
 		'allowed_types' => $allowed_types_int
 	),
 	'band[#]' => array(
-		'description' =>  _('Bitwise AND of last (most recent) T value is NOT N'),
+		'description' =>  _('Bitwise AND of last (most recent) T value and mask is NOT N'),
 		'params' => $paramSecIntCount,
 		'allowed_types' => $allowed_types_int
 	)
