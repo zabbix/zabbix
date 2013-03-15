@@ -1005,7 +1005,7 @@ class CChart extends CGraphDraw {
 	// DRAW ELEMENTS
 	/********************************************************************************************************/
 	public function drawXYAxisScale() {
-		$gbcolor = $this->getColor($this->graphtheme['gridbordercolor'], 0);
+		$gbColor = $this->getColor($this->graphtheme['gridbordercolor'], 0);
 
 		dashedRectangle(
 			$this->im,
@@ -1023,7 +1023,7 @@ class CChart extends CGraphDraw {
 				$this->shiftY - 5,
 				$this->shiftXleft + $this->shiftXCaption - 1,
 				$this->sizeY + $this->shiftY + 4,
-				$gbcolor
+				$gbColor
 			);
 
 			imagefilledpolygon(
@@ -1040,13 +1040,13 @@ class CChart extends CGraphDraw {
 			/* draw left axis triangle */
 			imageline($this->im, $this->shiftXleft + $this->shiftXCaption - 4, $this->shiftY - 5,
 					$this->shiftXleft + $this->shiftXCaption + 2, $this->shiftY - 5,
-					$color);
-			aline($this->im, $this->shiftXleft + $this->shiftXCaption - 4, $this->shiftY - 5,
+					$gbColor);
+			zbx_imagealine($this->im, $this->shiftXleft + $this->shiftXCaption - 4, $this->shiftY - 5,
 					$this->shiftXleft + $this->shiftXCaption - 1, $this->shiftY - 10,
-					$color);
-			aline($this->im, $this->shiftXleft + $this->shiftXCaption + 2, $this->shiftY - 5,
+					$gbColor);
+			zbx_imagealine($this->im, $this->shiftXleft + $this->shiftXCaption + 2, $this->shiftY - 5,
 					$this->shiftXleft + $this->shiftXCaption - 1, $this->shiftY - 10,
-					$gbcolor);
+					$gbColor);
 		}
 
 		if ($this->yaxisright) {
@@ -1056,7 +1056,7 @@ class CChart extends CGraphDraw {
 				$this->shiftY - 5,
 				$this->sizeX + $this->shiftXleft + $this->shiftXCaption,
 				$this->sizeY + $this->shiftY + 4,
-				$gbcolor
+				$gbColor
 			);
 
 			imagefilledpolygon(
@@ -1073,13 +1073,13 @@ class CChart extends CGraphDraw {
 			/* draw right axis triangle */
 			imageline($this->im, $this->sizeX + $this->shiftXleft + $this->shiftXCaption - 3, $this->shiftY - 5,
 				$this->sizeX + $this->shiftXleft + $this->shiftXCaption + 3, $this->shiftY - 5,
-				$color);
-			aline($this->im, $this->sizeX + $this->shiftXleft + $this->shiftXCaption + 3, $this->shiftY - 5,
+				$gbColor);
+			zbx_imagealine($this->im, $this->sizeX + $this->shiftXleft + $this->shiftXCaption + 3, $this->shiftY - 5,
 				$this->sizeX + $this->shiftXleft + $this->shiftXCaption, $this->shiftY - 10,
-				$color);
-			aline($this->im, $this->sizeX + $this->shiftXleft + $this->shiftXCaption - 3, $this->shiftY - 5,
+				$gbColor);
+			zbx_imagealine($this->im, $this->sizeX + $this->shiftXleft + $this->shiftXCaption - 3, $this->shiftY - 5,
 				$this->sizeX + $this->shiftXleft + $this->shiftXCaption, $this->shiftY - 10,
-				$gbcolor);
+				$gbColor);
 		}
 
 		imageline(
@@ -1088,7 +1088,7 @@ class CChart extends CGraphDraw {
 			$this->sizeY + $this->shiftY + 1,
 			$this->sizeX + $this->shiftXleft + $this->shiftXCaption + 5,
 			$this->sizeY + $this->shiftY + 1,
-			$gbcolor
+			$gbColor
 		);
 
 		imagefilledpolygon(
@@ -1105,13 +1105,13 @@ class CChart extends CGraphDraw {
 		/* draw X axis triangle */
 		imageline($this->im, $this->sizeX + $this->shiftXleft + $this->shiftXCaption + 5, $this->sizeY + $this->shiftY - 2,
 			$this->sizeX + $this->shiftXleft + $this->shiftXCaption + 5, $this->sizeY + $this->shiftY + 4,
-			$bgcolor);
-		aline($this->im, $this->sizeX + $this->shiftXleft + $this->shiftXCaption + 5, $this->sizeY + $this->shiftY + 4,
+			$gbColor);
+		zbx_imagealine($this->im, $this->sizeX + $this->shiftXleft + $this->shiftXCaption + 5, $this->sizeY + $this->shiftY + 4,
 			$this->sizeX + $this->shiftXleft + $this->shiftXCaption + 10, $this->sizeY + $this->shiftY + 1,
-			$bgcolor);
-		aline($this->im, $this->sizeX + $this->shiftXleft + $this->shiftXCaption + 10, $this->sizeY + $this->shiftY + 1,
+			$gbColor);
+		zbx_imagealine($this->im, $this->sizeX + $this->shiftXleft + $this->shiftXCaption + 10, $this->sizeY + $this->shiftY + 1,
 			$this->sizeX + $this->shiftXleft + $this->shiftXCaption + 5, $this->sizeY + $this->shiftY - 2,
-			$bgcolor);
+			$gbColor);
 	}
 
 	/**
@@ -2072,28 +2072,28 @@ class CChart extends CGraphDraw {
 				if ($calc_fnc == CALC_FNC_ALL) {
 					imagefilledpolygon($this->im, $a, 4, $minmax_color);
 					if (!$y1x || !$y2x) {
-						aline($this->im, $x1, $y1max, $x2, $y2max, $max_color, LINE_TYPE_BOLD);
+						zbx_imagealine($this->im, $x1, $y1max, $x2, $y2max, $max_color, LINE_TYPE_BOLD);
 					}
 
 					if (!$y1n || !$y2n) {
-						aline($this->im, $x1, $y1min, $x2, $y2min, $min_color, LINE_TYPE_BOLD);
+						zbx_imagealine($this->im, $x1, $y1min, $x2, $y2min, $min_color, LINE_TYPE_BOLD);
 					}
 				}
 
-				aline($this->im, $x1, $y1, $x2, $y2, $avg_color, LINE_TYPE_BOLD);
+				zbx_imagealine($this->im, $x1, $y1, $x2, $y2, $avg_color, LINE_TYPE_BOLD);
 				break;
 			case GRAPH_ITEM_DRAWTYPE_LINE:
 				if ($calc_fnc == CALC_FNC_ALL) {
 					imagefilledpolygon($this->im, $a, 4, $minmax_color);
 					if (!$y1x || !$y2x) {
-						aline($this->im, $x1, $y1max, $x2, $y2max, $max_color);
+						zbx_imagealine($this->im, $x1, $y1max, $x2, $y2max, $max_color);
 					}
 					if (!$y1n || !$y2n) {
-						aline($this->im, $x1, $y1min, $x2, $y2min, $min_color);
+						zbx_imagealine($this->im, $x1, $y1min, $x2, $y2min, $min_color);
 					}
 				}
 
-				aline($this->im, $x1, $y1, $x2, $y2, $avg_color);
+				zbx_imagealine($this->im, $x1, $y1, $x2, $y2, $avg_color);
 				break;
 			case GRAPH_ITEM_DRAWTYPE_FILLED_REGION:
 				$a[0] = $x1;

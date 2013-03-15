@@ -18,29 +18,26 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-
-define('LINE_TYPE_NORMAL',	'0');
-define('LINE_TYPE_BOLD',	'1');
-
 /**
- * Change luminosity of RGB color
+ * Claculate new color based on bg/fg colors and transparence index
  *
  * @param resource $image image reference
- * @param array $f background color, array of RGB
- * @param array $t foreground color, array of RGB
- * @param float $p transformation index in range of 0-1
+ * @param array $bgColor background color, array of RGB
+ * @param array $fgColor foreground color, array of RGB
+ * @param float $alpha transparence index in range of 0-1, 1 returns unchanged fgColor color
+ *
+ * @return array new color
  */
-function lip($image, $f, $t, $p) {
-	$p = round($p, 1);
-	$r = $f[0] + ($t[0] - $f[0]) * $p;
-	$g = $f[1] + ($t[1] - $f[1]) * $p;
-	$b = $f[2] + ($t[2] - $f[2]) * $p;
+function zbx_colormix($image, $bgColor, $fgColor, $alpha) {
+	$r = $bgColor[0] + ($fgColor[0] - $bgColor[0]) * $alpha;
+	$g = $bgColor[1] + ($fgColor[1] - $bgColor[1]) * $alpha;
+	$b = $bgColor[2] + ($fgColor[2] - $bgColor[2]) * $alpha;
 
 	return imagecolorresolvealpha($image, $r, $g, $b, 0);
 }
 
 /**
- * Draw antialised line
+ * Draw antialiased line
  *
  * @param resource $image image reference
  * @param int $x1 first x coordinate
@@ -50,11 +47,16 @@ function lip($image, $f, $t, $p) {
  * @param int $color line color
  * @param int $style line style, one of LINE_TYPE_NORMAL (default), LINE_TYPE_BOLD (bold line)
  */
-function aline($image, $x1, $y1, $x2, $y2, $color, $style = LINE_TYPE_NORMAL) {
+function zbx_imagealine($image, $x1, $y1, $x2, $y2, $color, $style = LINE_TYPE_NORMAL) {
 	$x1 = round($x1);
 	$y1 = round($y1);
 	$x2 = round($x2);
 	$y2 = round($y2);
+
+	if ($x1 == $x2 && $y1 == $y2) {
+		imagesetpixel($image, $x1, $y1, $color);
+		return;
+	}
 
 	// Get foreground line color
 	$lc = imagecolorsforindex($image, $color);
@@ -65,66 +67,64 @@ function aline($image, $x1, $y1, $x2, $y2, $color, $style = LINE_TYPE_NORMAL) {
 
 	if (abs($dx) > abs($dy)) {
 		if ($dx < 0) {
-			$dx = -$dx; $dy = -$dy;
-			$tmp = $x2; $x2 = $x1; $x1 = $tmp;
-			$tmp = $y2; $y2 = $y1; $y1 = $tmp;
+			zbx_swap($x1, $x2);
+			$y1 = $y2;
 		}
 		for ($x = $x1, $y = $y1; $x <= $x2; $x++, $y = $y1 + ($x - $x1) * $dy / $dx) {
-			$yfrac = $y - floor($y);
-			$yint = round($y) - round($yfrac);
+			$yint = floor($y);
+			$yfrac = $y - $yint;
 
 			if (LINE_TYPE_BOLD == $style) {
 				$bc = imagecolorsforindex($image, imagecolorat($image, $x, $yint - 1));
 				$bc = array($bc["red"], $bc["green"], $bc["blue"]);
-				imagesetpixel($image, $x, $yint - 1, lip($image, $lc, $bc, $yfrac));
+				imagesetpixel($image, $x, $yint - 1, zbx_colormix($image, $lc, $bc, $yfrac));
 
 				$bc = imagecolorsforindex($image, imagecolorat($image, $x, $yint + 1));
 				$bc = array($bc["red"], $bc["green"], $bc["blue"]);
-				imagesetpixel($image, $x, $yint + 1, lip($image, $lc, $bc, 1 - $yfrac));
+				imagesetpixel($image, $x, $yint + 1, zbx_colormix($image, $lc, $bc, 1 - $yfrac));
 
 				imagesetpixel($image, $x, $yint, $color);
 			}
 			else {
 				$bc = imagecolorsforindex($image, imagecolorat($image, $x, $yint));
 				$bc = array($bc["red"], $bc["green"], $bc["blue"]);
-				imagesetpixel($image, $x, $yint, lip($image, $lc, $bc, $yfrac));
+				imagesetpixel($image, $x, $yint, zbx_colormix($image, $lc, $bc, $yfrac));
 
 				$bc = imagecolorsforindex($image, imagecolorat($image, $x, $yint + 1));
 				$bc = array($bc["red"], $bc["green"], $bc["blue"]);
-				imagesetpixel($image, $x, $yint + 1, lip($image, $lc, $bc, 1 - $yfrac));
+				imagesetpixel($image, $x, $yint + 1, zbx_colormix($image, $lc, $bc, 1 - $yfrac));
 			}
 		}
 	}
 	else {
 		if ($dy < 0) {
-			$dx = -$dx; $dy = -$dy;
-			$tmp = $x2; $x2 = $x1; $x1 = $tmp;
-			$tmp = $y2; $y2 = $y1; $y1 = $tmp;
+			zbx_swap($y1, $y2);
+			$x1 = $x2;
 		}
 		for ($y = $y1, $x = $x1; $y <= $y2; $y++, $x = $x1 + ($y - $y1) * $dx / $dy)
 		{
-			$xfrac = $x - floor($x);
-			$xint = round($x) - round($xfrac);
+			$xint = floor($x);
+			$xfrac = $x - $xint;
 
 			if (LINE_TYPE_BOLD == $style) {
 				$bc = imagecolorsforindex($image, imagecolorat($image, $xint - 1, $y));
 				$bc = array($bc["red"], $bc["green"], $bc["blue"]);
-				imagesetpixel($image, $xint - 1, $y, lip($image, $lc, $bc, $xfrac));
+				imagesetpixel($image, $xint - 1, $y, zbx_colormix($image, $lc, $bc, $xfrac));
 
 				$bc = imagecolorsforindex($image, imagecolorat($image, $xint + 1, $y));
 				$bc = array($bc["red"], $bc["green"], $bc["blue"]);
-				imagesetpixel($image, $xint + 1, $y, lip($image, $lc, $bc, 1 - $xfrac));
+				imagesetpixel($image, $xint + 1, $y, zbx_colormix($image, $lc, $bc, 1 - $xfrac));
 
 				imagesetpixel($image, $xint, $y, $color);
 			}
 			else {
 				$bc = imagecolorsforindex($image, imagecolorat($image, $xint, $y));
 				$bc = array($bc["red"], $bc["green"], $bc["blue"]);
-				imagesetpixel($image, $xint, $y, lip($image, $lc, $bc, $xfrac));
+				imagesetpixel($image, $xint, $y, zbx_colormix($image, $lc, $bc, $xfrac));
 
 				$bc = imagecolorsforindex($image, imagecolorat($image, $xint + 1, $y));
 				$bc = array($bc["red"], $bc["green"], $bc["blue"]);
-				imagesetpixel($image, $xint + 1, $y, lip($image, $lc, $bc, 1 - $xfrac));
+				imagesetpixel($image, $xint + 1, $y, zbx_colormix($image, $lc, $bc, 1 - $xfrac));
 			}
 		}
 	}
