@@ -1017,7 +1017,7 @@ class CChart extends CGraphDraw {
 		);
 
 		if ($this->yaxisleft) {
-			imageline(
+			zbx_imageline(
 				$this->im,
 				$this->shiftXleft + $this->shiftXCaption - 1,
 				$this->shiftY - 5,
@@ -1038,7 +1038,7 @@ class CChart extends CGraphDraw {
 			);
 
 			/* draw left axis triangle */
-			imageline($this->im, $this->shiftXleft + $this->shiftXCaption - 4, $this->shiftY - 5,
+			zbx_imageline($this->im, $this->shiftXleft + $this->shiftXCaption - 4, $this->shiftY - 5,
 					$this->shiftXleft + $this->shiftXCaption + 2, $this->shiftY - 5,
 					$gbColor);
 			zbx_imagealine($this->im, $this->shiftXleft + $this->shiftXCaption - 4, $this->shiftY - 5,
@@ -1050,7 +1050,7 @@ class CChart extends CGraphDraw {
 		}
 
 		if ($this->yaxisright) {
-			imageline(
+			zbx_imageline(
 				$this->im,
 				$this->sizeX + $this->shiftXleft + $this->shiftXCaption,
 				$this->shiftY - 5,
@@ -1071,7 +1071,7 @@ class CChart extends CGraphDraw {
 			);
 
 			/* draw right axis triangle */
-			imageline($this->im, $this->sizeX + $this->shiftXleft + $this->shiftXCaption - 3, $this->shiftY - 5,
+			zbx_imageline($this->im, $this->sizeX + $this->shiftXleft + $this->shiftXCaption - 3, $this->shiftY - 5,
 				$this->sizeX + $this->shiftXleft + $this->shiftXCaption + 3, $this->shiftY - 5,
 				$gbColor);
 			zbx_imagealine($this->im, $this->sizeX + $this->shiftXleft + $this->shiftXCaption + 3, $this->shiftY - 5,
@@ -1082,7 +1082,7 @@ class CChart extends CGraphDraw {
 				$gbColor);
 		}
 
-		imageline(
+		zbx_imageline(
 			$this->im,
 			$this->shiftXleft + $this->shiftXCaption - 4,
 			$this->sizeY + $this->shiftY + 1,
@@ -1103,7 +1103,7 @@ class CChart extends CGraphDraw {
 		);
 
 		/* draw X axis triangle */
-		imageline($this->im, $this->sizeX + $this->shiftXleft + $this->shiftXCaption + 5, $this->sizeY + $this->shiftY - 2,
+		zbx_imageline($this->im, $this->sizeX + $this->shiftXleft + $this->shiftXCaption + 5, $this->sizeY + $this->shiftY - 2,
 			$this->sizeX + $this->shiftXleft + $this->shiftXCaption + 5, $this->sizeY + $this->shiftY + 4,
 			$gbColor);
 		zbx_imagealine($this->im, $this->sizeX + $this->shiftXleft + $this->shiftXCaption + 5, $this->sizeY + $this->shiftY + 4,
@@ -1415,7 +1415,7 @@ class CChart extends CGraphDraw {
 		);
 
 		if ($this->zero[GRAPH_YAXIS_SIDE_LEFT] != ($this->sizeY + $this->shiftY) && $this->zero[GRAPH_YAXIS_SIDE_LEFT] != $this->shiftY) {
-			imageline(
+			zbx_imageline(
 				$this->im,
 				$this->shiftXleft,
 				$this->zero[GRAPH_YAXIS_SIDE_LEFT],
@@ -1525,7 +1525,7 @@ class CChart extends CGraphDraw {
 
 		if ($this->zero[GRAPH_YAXIS_SIDE_RIGHT] != $this->sizeY + $this->shiftY
 				&& $this->zero[GRAPH_YAXIS_SIDE_RIGHT] != $this->shiftY) {
-			imageline(
+			zbx_imageline(
 				$this->im,
 				$this->shiftXleft,
 				$this->zero[GRAPH_YAXIS_SIDE_RIGHT],
@@ -1591,7 +1591,7 @@ class CChart extends CGraphDraw {
 		imagefilledrectangle($this->im,
 			$this->shiftXleft + 1,
 			$this->shiftY,
-			$this->sizeX + $this->shiftXleft-2, // -2 border
+			$this->sizeX + $this->shiftXleft-1, // -2 border
 			$this->sizeY + $this->shiftY,
 			$this->getColor($this->graphtheme['graphcolor'], 0)
 		);
@@ -1618,7 +1618,7 @@ class CChart extends CGraphDraw {
 			$this->im,
 			$this->shiftXleft + 1,
 			$this->shiftY,
-			$this->sizeX + $this->shiftXleft - 2, // -2 border
+			$this->sizeX + $this->shiftXleft - 1, // -1 border
 			$this->sizeY + $this->shiftY,
 			$this->getColor($this->graphtheme['nonworktimecolor'], 0)
 		);
@@ -1649,7 +1649,7 @@ class CChart extends CGraphDraw {
 				$this->im,
 				$x1,
 				$this->shiftY,
-				$x2-2, // -2 border
+				$x2 - 1, // -1 border
 				$this->sizeY + $this->shiftY,
 				$this->getColor($this->graphtheme['graphcolor'], 0)
 			);
@@ -1679,7 +1679,7 @@ class CChart extends CGraphDraw {
 				}
 
 				$y = $this->sizeY - (($percentile['value'] - $minY) / ($maxY - $minY)) * $this->sizeY + $this->shiftY;
-				imageline(
+				zbx_imageline(
 					$this->im,
 					$this->shiftXleft,
 					$y,
@@ -2118,7 +2118,7 @@ class CChart extends CGraphDraw {
 					// use imagesetstyle+imageline instead of bugged imagedashedline
 					$style = array($avg_color, $avg_color, IMG_COLOR_TRANSPARENT, IMG_COLOR_TRANSPARENT);
 					imagesetstyle($this->im, $style);
-					imageline($this->im, $x1, $y1, $x2, $y2, IMG_COLOR_STYLED);
+					zbx_imageline($this->im, $x1, $y1, $x2, $y2, IMG_COLOR_STYLED);
 				}
 				else {
 					imagedashedline($this->im, $x1, $y1, $x2, $y2, $avg_color);

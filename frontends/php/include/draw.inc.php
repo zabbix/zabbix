@@ -37,6 +37,22 @@ function zbx_colormix($image, $bgColor, $fgColor, $alpha) {
 }
 
 /**
+ * Draw normal line.
+ * PHP imageline() function is broken because it drops fraction instead of correct rounding of X/Y coordnates.
+ * All calls to imageline() must be replaced by the wrapper function everywhere in the code.
+ *
+ * @param resource $image image reference
+ * @param int $x1 first x coordinate
+ * @param int $y1 first y coordinate
+ * @param int $x2 second x coordinate
+ * @param int $y2 second y coordinate
+ * @param int $color line color
+ */
+function zbx_imageline($image, $x1, $y1, $x2, $y2, $color) {
+		imageline($image, round($x1), round($y1), round($x2), round($y2), $color);
+}
+
+/**
  * Draw antialiased line
  *
  * @param resource $image image reference
@@ -60,7 +76,7 @@ function zbx_imagealine($image, $x1, $y1, $x2, $y2, $color, $style = LINE_TYPE_N
 
 	// Get foreground line color
 	$lc = imagecolorsforindex($image, $color);
-	$lc = array($lc["red"], $lc["green"], $lc["blue"]);
+	$lc = array($lc['red'], $lc['green'], $lc['blue']);
 
 	$dx = $x2 - $x1;
 	$dy = $y2 - $y1;
@@ -76,22 +92,22 @@ function zbx_imagealine($image, $x1, $y1, $x2, $y2, $color, $style = LINE_TYPE_N
 
 			if (LINE_TYPE_BOLD == $style) {
 				$bc = imagecolorsforindex($image, imagecolorat($image, $x, $yint - 1));
-				$bc = array($bc["red"], $bc["green"], $bc["blue"]);
+				$bc = array($bc['red'], $bc['green'], $bc['blue']);
 				imagesetpixel($image, $x, $yint - 1, zbx_colormix($image, $lc, $bc, $yfrac));
 
 				$bc = imagecolorsforindex($image, imagecolorat($image, $x, $yint + 1));
-				$bc = array($bc["red"], $bc["green"], $bc["blue"]);
+				$bc = array($bc['red'], $bc['green'], $bc['blue']);
 				imagesetpixel($image, $x, $yint + 1, zbx_colormix($image, $lc, $bc, 1 - $yfrac));
 
 				imagesetpixel($image, $x, $yint, $color);
 			}
 			else {
 				$bc = imagecolorsforindex($image, imagecolorat($image, $x, $yint));
-				$bc = array($bc["red"], $bc["green"], $bc["blue"]);
+				$bc = array($bc['red'], $bc['green'], $bc['blue']);
 				imagesetpixel($image, $x, $yint, zbx_colormix($image, $lc, $bc, $yfrac));
 
 				$bc = imagecolorsforindex($image, imagecolorat($image, $x, $yint + 1));
-				$bc = array($bc["red"], $bc["green"], $bc["blue"]);
+				$bc = array($bc['red'], $bc['green'], $bc['blue']);
 				imagesetpixel($image, $x, $yint + 1, zbx_colormix($image, $lc, $bc, 1 - $yfrac));
 			}
 		}
@@ -108,22 +124,22 @@ function zbx_imagealine($image, $x1, $y1, $x2, $y2, $color, $style = LINE_TYPE_N
 
 			if (LINE_TYPE_BOLD == $style) {
 				$bc = imagecolorsforindex($image, imagecolorat($image, $xint - 1, $y));
-				$bc = array($bc["red"], $bc["green"], $bc["blue"]);
+				$bc = array($bc['red'], $bc['green'], $bc['blue']);
 				imagesetpixel($image, $xint - 1, $y, zbx_colormix($image, $lc, $bc, $xfrac));
 
 				$bc = imagecolorsforindex($image, imagecolorat($image, $xint + 1, $y));
-				$bc = array($bc["red"], $bc["green"], $bc["blue"]);
+				$bc = array($bc['red'], $bc['green'], $bc['blue']);
 				imagesetpixel($image, $xint + 1, $y, zbx_colormix($image, $lc, $bc, 1 - $xfrac));
 
 				imagesetpixel($image, $xint, $y, $color);
 			}
 			else {
 				$bc = imagecolorsforindex($image, imagecolorat($image, $xint, $y));
-				$bc = array($bc["red"], $bc["green"], $bc["blue"]);
+				$bc = array($bc['red'], $bc['green'], $bc['blue']);
 				imagesetpixel($image, $xint, $y, zbx_colormix($image, $lc, $bc, $xfrac));
 
 				$bc = imagecolorsforindex($image, imagecolorat($image, $xint + 1, $y));
-				$bc = array($bc["red"], $bc["green"], $bc["blue"]);
+				$bc = array($bc['red'], $bc['green'], $bc['blue']);
 				imagesetpixel($image, $xint + 1, $y, zbx_colormix($image, $lc, $bc, 1 - $xfrac));
 			}
 		}

@@ -163,7 +163,7 @@ function get_icon_center_by_selement($element, $info, $map) {
 
 function myDrawLine($image, $x1, $y1, $x2, $y2, $color, $drawtype) {
 	if ($drawtype == MAP_LINK_DRAWTYPE_BOLD_LINE) {
-		aline($image, $x1, $y1, $x2, $y2, $color, LINE_TYPE_BOLD);
+		zbx_imagealine($image, $x1, $y1, $x2, $y2, $color, LINE_TYPE_BOLD);
 	}
 	elseif ($drawtype == MAP_LINK_DRAWTYPE_DASHED_LINE) {
 		if (function_exists('imagesetstyle')) {
@@ -173,7 +173,7 @@ function myDrawLine($image, $x1, $y1, $x2, $y2, $color, $drawtype) {
 				IMG_COLOR_TRANSPARENT, IMG_COLOR_TRANSPARENT, IMG_COLOR_TRANSPARENT, IMG_COLOR_TRANSPARENT
 			);
 			imagesetstyle($image, $style);
-			imageline($image, $x1, $y1, $x2, $y2, IMG_COLOR_STYLED);
+			zbx_imageline($image, $x1, $y1, $x2, $y2, IMG_COLOR_STYLED);
 		}
 		else {
 			imagedashedline($image, $x1, $y1, $x2, $y2, $color);
@@ -182,10 +182,10 @@ function myDrawLine($image, $x1, $y1, $x2, $y2, $color, $drawtype) {
 	elseif ($drawtype == MAP_LINK_DRAWTYPE_DOT && function_exists('imagesetstyle')) {
 		$style = array($color, IMG_COLOR_TRANSPARENT, IMG_COLOR_TRANSPARENT, IMG_COLOR_TRANSPARENT);
 		imagesetstyle($image, $style);
-		imageline($image, $x1, $y1, $x2, $y2, IMG_COLOR_STYLED);
+		zbx_imageline($image, $x1, $y1, $x2, $y2, IMG_COLOR_STYLED);
 	}
 	else {
-		aline($image, $x1, $y1, $x2, $y2, $color);
+		zbx_imagealine($image, $x1, $y1, $x2, $y2, $color);
 	}
 }
 

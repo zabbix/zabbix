@@ -392,7 +392,7 @@ class CBar extends CGraphDraw {
 			$this->getColor($this->graphtheme['gridcolor'], 0)
 		);
 
-		imageline($this->im,
+		zbx_imageline($this->im,
 			$this->shiftXleft + $this->shiftXCaptionLeft - 1,
 			$this->shiftY - 5,
 			$this->shiftXleft + $this->shiftXCaptionLeft - 1,
@@ -411,7 +411,7 @@ class CBar extends CGraphDraw {
 		);
 
 		// draw Y axis triangle
-		imageline($this->im, $this->shiftXleft + $this->shiftXCaptionLeft - 4, $this->shiftY - 5,
+		zbx_imageline($this->im, $this->shiftXleft + $this->shiftXCaptionLeft - 4, $this->shiftY - 5,
 			$this->shiftXleft + $this->shiftXCaptionLeft + 2, $this->shiftY - 5,
 			$gbColor);
 		zbx_imagealine($this->im, $this->shiftXleft + $this->shiftXCaptionLeft + 2, $this->shiftY - 5,
@@ -421,7 +421,7 @@ class CBar extends CGraphDraw {
 			$this->shiftXleft + $this->shiftXCaptionLeft - 4, $this->shiftY - 5,
 			$gbColor);
 
-		imageline($this->im,
+		zbx_imageline($this->im,
 			$this->shiftXleft + $this->shiftXCaptionLeft - 4,
 			$this->sizeY + $this->shiftY + 1,
 			$this->sizeX + $this->shiftXleft + $this->shiftXCaptionLeft + 5,
@@ -440,7 +440,7 @@ class CBar extends CGraphDraw {
 		);
 
 		// draw X axis triangle
-		imageline($this->im, $this->sizeX + $this->shiftXleft + $this->shiftXCaptionLeft + 5, $this->sizeY + $this->shiftY - 2,
+		zbx_imageline($this->im, $this->sizeX + $this->shiftXleft + $this->shiftXCaptionLeft + 5, $this->sizeY + $this->shiftY - 2,
 			$this->sizeX + $this->shiftXleft + $this->shiftXCaptionLeft + 5, $this->sizeY + $this->shiftY + 4,
 			$gbColor);
 		zbx_imagealine($this->im, $this->sizeX + $this->shiftXleft + $this->shiftXCaptionLeft + 5, $this->sizeY + $this->shiftY + 4,
