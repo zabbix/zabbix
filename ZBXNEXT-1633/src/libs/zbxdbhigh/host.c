@@ -2702,7 +2702,7 @@ static void	DBhost_prototypes_clean(zbx_vector_ptr_t *host_prototypes)
  *                                                                            *
  * Function: DBhost_prototypes_make                                           *
  *                                                                            *
- * Comments: auxiliary function for DBcopy_host_prototypes()                  *
+ * Comments: auxiliary function for DBcopy_template_host_prototypes()         *
  *                                                                            *
  ******************************************************************************/
 static void	DBhost_prototypes_make(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids,
@@ -2816,7 +2816,7 @@ static void	DBhost_prototypes_make(zbx_uint64_t hostid, zbx_vector_uint64_t *tem
  *             del_hosttemplateids - [OUT] list of hosttemplateids which      *
  *                                   should be deleted                        *
  *                                                                            *
- * Comments: auxiliary function for DBcopy_host_prototypes()                  *
+ * Comments: auxiliary function for DBcopy_template_host_prototypes()         *
  *                                                                            *
  ******************************************************************************/
 static void	DBhost_prototypes_templates_make(zbx_vector_ptr_t *host_prototypes,
@@ -2936,7 +2936,7 @@ static void	DBhost_prototypes_templates_make(zbx_vector_ptr_t *host_prototypes,
  *                                                                            *
  * Function: DBhost_prototypes_save                                           *
  *                                                                            *
- * Comments: auxiliary function for DBcopy_host_prototypes()                  *
+ * Comments: auxiliary function for DBcopy_template_host_prototypes()         *
  *                                                                            *
  ******************************************************************************/
 static void	DBhost_prototypes_save(zbx_vector_ptr_t *host_prototypes, zbx_vector_uint64_t *del_hosttemplateids)
@@ -3106,7 +3106,7 @@ static void	DBhost_prototypes_save(zbx_vector_ptr_t *host_prototypes, zbx_vector
 
 /******************************************************************************
  *                                                                            *
- * Function: DBcopy_host_prototypes                                           *
+ * Function: DBcopy_template_host_prototypes                                  *
  *                                                                            *
  * Purpose: copy host prototypes from templates and create links between      *
  *          them and discovery rules                                          *
@@ -3114,7 +3114,7 @@ static void	DBhost_prototypes_save(zbx_vector_ptr_t *host_prototypes, zbx_vector
  * Comments: auxiliary function for DBcopy_template_items()                   *
  *                                                                            *
  ******************************************************************************/
-static void	DBcopy_host_prototypes(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids)
+static void	DBcopy_template_host_prototypes(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids)
 {
 	zbx_vector_ptr_t	host_prototypes;
 
@@ -4846,7 +4846,7 @@ int	DBcopy_template_elements(zbx_uint64_t hostid, zbx_vector_uint64_t *lnk_templ
 
 	DBcopy_template_applications(hostid, lnk_templateids);
 	DBcopy_template_items(hostid, lnk_templateids);
-	DBcopy_host_prototypes(hostid, lnk_templateids);
+	DBcopy_template_host_prototypes(hostid, lnk_templateids);
 	if (SUCCEED == (res = DBcopy_template_triggers(hostid, lnk_templateids)))
 	{
 		DBcopy_template_graphs(hostid, lnk_templateids);
