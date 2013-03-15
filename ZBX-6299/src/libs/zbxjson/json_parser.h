@@ -24,11 +24,5 @@
 	while ('\0' != *src && NULL != strchr(ZBX_WHITESPACE, *src)) src++;
 
 int	json_parse_object(const char **start, const char **end, char **error);
-int	json_parse_string(const char **start, const char **end, char **error);
-int	json_parse_array(const char **start, const char **end, char **error);
-int	json_parse_number(const char **start, const char **end, char **error);
-int	json_parse_literal(const char **start, const char **end, const char *text, char **error);
-int	json_parse_value(const char **start, const char **end, char **error);
 
-
-#endif /* JSON_PARSER_H_ */
+#endif
