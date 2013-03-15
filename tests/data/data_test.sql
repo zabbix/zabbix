@@ -697,5 +697,15 @@ INSERT INTO interface (type, ip, dns, useip, port, main, hostid, interfaceid) VA
 INSERT INTO hosts_templates (hosttemplateid, hostid, templateid) VALUES (30000, 30001, 30000);
 
 -- add discoveryRuleTest for prototype testing
-INSERT INTO items (name, key_, hostid, value_type, itemid, flags, delay) VALUES ('discoveryRuleTest', 'discovery-rule-test', 30000, 4, 23500, 1, 50);
-INSERT INTO items (name, key_, hostid, value_type, itemid, flags, templateid, delay) VALUES ('discoveryRuleTest', 'discovery-rule-test', 30001, 4, 23501, 1, 23500, 50);
+INSERT INTO items (name, key_, hostid, value_type, itemid, flags, delay, params, description) VALUES ('discoveryRuleTest', 'discovery-rule-test', 30000, 4, 23500, 1, 50, '', '');
+INSERT INTO items (name, key_, hostid, value_type, itemid, flags, templateid, delay, params, description) VALUES ('discoveryRuleTest', 'discovery-rule-test', 30001, 4, 23501, 1, 23500, 50, '', '');
+
+-- add list of discovery rules for simpleCreate tests
+INSERT INTO items (name, key_, hostid, value_type, itemid, flags, delay, params, description) VALUES ('testInheritanceDiscoveryRule1', 'discovery-rule-inheritance1', 30000, 4, 33500, 1, 50, '', '');
+INSERT INTO items (name, key_, hostid, value_type, itemid, flags, templateid, delay, params, description) VALUES ('testInheritanceDiscoveryRule1', 'discovery-rule-inheritance1', 30001, 4, 33501, 1, 33500, 50, '', '');
+INSERT INTO items (name, key_, hostid, value_type, itemid, flags, delay, params, description) VALUES ('testInheritanceDiscoveryRule2', 'discovery-rule-inheritance2', 30000, 4, 33502, 1, 50, '', '');
+INSERT INTO items (name, key_, hostid, value_type, itemid, flags, templateid, delay, params, description) VALUES ('testInheritanceDiscoveryRule2', 'discovery-rule-inheritance2', 30001, 4, 33503, 1, 33502, 50, '', '');
+INSERT INTO items (name, key_, hostid, value_type, itemid, flags, delay, params, description) VALUES ('testInheritanceDiscoveryRule3', 'discovery-rule-inheritance3', 30000, 4, 33504, 1, 50, '', '');
+INSERT INTO items (name, key_, hostid, value_type, itemid, flags, templateid, delay, params, description) VALUES ('testInheritanceDiscoveryRule3', 'discovery-rule-inheritance3', 30001, 4, 33505, 1, 33504, 50, '', '');
+INSERT INTO items (name, key_, hostid, value_type, itemid, flags, delay, params, description) VALUES ('testInheritanceDiscoveryRule4', 'discovery-rule-inheritance4', 30000, 4, 33506, 1, 50, '', '');
+INSERT INTO items (name, key_, hostid, value_type, itemid, flags, templateid, delay, params, description) VALUES ('testInheritanceDiscoveryRule4', 'discovery-rule-inheritance4', 30001, 4, 33507, 1, 33506, 50, '', '');

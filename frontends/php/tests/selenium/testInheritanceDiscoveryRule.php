@@ -28,6 +28,20 @@ define('DISCOVERY_BAD', 1);
  */
 class testInheritanceDiscovery extends CWebTest {
 
+	/**
+	 * The name of the template created in the test data set.
+	 *
+	 * @var string
+	 */
+	protected $template  = 'Inheritance test template';
+
+	/**
+	 * The name of the test host created in the test data set.
+	 *
+	 * @var string
+	 */
+	protected $host = 'Template inheritance test host';
+
 
 	// returns all possible item types
 	public static function itemTypes() {
@@ -123,13 +137,10 @@ class testInheritanceDiscovery extends CWebTest {
 	public function testInheritanceDiscoveryRule_CheckLayout($data) {
 		$this->zbxTestLogin('templates.php');
 
-		$template = 'Inheritance test template';
-		$host = 'Template inheritance test host';
-
 		$this->checkTitle('Configuration of templates');
 		$this->zbxTestTextPresent('CONFIGURATION OF TEMPLATES');
 
-		$this->zbxTestClickWait("link=$template");
+		$this->zbxTestClickWait('link='.$this->template);
 		$this->zbxTestClickWait('link=Discovery rules');
 		$this->zbxTestClickWait('form');
 
@@ -486,6 +497,35 @@ class testInheritanceDiscovery extends CWebTest {
 		$this->assertAttribute("//*[@id='status']/option[text()='Enabled']/@selected", 'selected');
 	}
 
+	// Returns list of discovery rules
+	public static function allDiscovery() {
+		return DBdata("select * from items where hostid = 30000 and key_ LIKE 'discovery-rule-inheritance%'");
+	}
+
+	/**
+	 * @dataProvider allDiscovery
+	 */
+	public function testInheritanceDiscoveryRule_simpleCreate($data) {
+		$name = $data['name'];
+
+		$sqlDiscovery = 'select itemid, hostid, name, key_, delay, history, trends, value_type, formula, templateid, flags, lifetime from items';
+		$oldHashDiscovery = DBhash($sqlDiscovery);
+
+		$this->zbxTestLogin('templates.php');
+		$this->zbxTestClickWait('link='.$this->template);
+		$this->zbxTestClickWait('link=Discovery rules');
+		$this->zbxTestClickWait('link='.$name);
+		$this->zbxTestClickWait('save');
+		$this->checkTitle('Configuration of discovery rules');
+		$this->zbxTestTextPresent('Discovery rule updated');
+		$this->zbxTestTextPresent("$name");
+		$this->zbxTestTextPresent('DISCOVERY RULES');
+		$newHashDiscovery = DBhash($sqlDiscovery);
+
+		$this->assertEquals($oldHashDiscovery, $newHashDiscovery);
+
+	}
+
 	// returns data for discovery rule create
 	public static function discoveryRule() {
 		return array(
@@ -576,7 +616,7 @@ class testInheritanceDiscovery extends CWebTest {
 			// Empty time flex period
 			array(
 				array(
-					'expected' => ITEM_BAD,
+					'expected' => DISCOVERY_BAD,
 					'name' =>'Item flex',
 					'key' =>'item-flex-test',
 					'flexPeriod' => array(
@@ -591,7 +631,7 @@ class testInheritanceDiscovery extends CWebTest {
 			// Incorrect flex period
 			array(
 				array(
-					'expected' => ITEM_BAD,
+					'expected' => DISCOVERY_BAD,
 					'name' =>'Item flex',
 					'key' =>'item-flex-test',
 					'flexPeriod' => array(
@@ -606,7 +646,7 @@ class testInheritanceDiscovery extends CWebTest {
 			// Incorrect flex period
 			array(
 				array(
-					'expected' => ITEM_BAD,
+					'expected' => DISCOVERY_BAD,
 					'name' =>'Item flex',
 					'key' =>'item-flex-test',
 					'flexPeriod' => array(
@@ -621,7 +661,7 @@ class testInheritanceDiscovery extends CWebTest {
 			// Incorrect flex period
 			array(
 				array(
-					'expected' => ITEM_BAD,
+					'expected' => DISCOVERY_BAD,
 					'name' =>'Item flex',
 					'key' =>'item-flex-test',
 					'flexPeriod' => array(
@@ -636,7 +676,7 @@ class testInheritanceDiscovery extends CWebTest {
 			// Incorrect flex period
 			array(
 				array(
-					'expected' => ITEM_BAD,
+					'expected' => DISCOVERY_BAD,
 					'name' =>'Item flex',
 					'key' =>'item-flex-test',
 					'flexPeriod' => array(
@@ -651,7 +691,7 @@ class testInheritanceDiscovery extends CWebTest {
 			// Multiple flex periods
 			array(
 				array(
-					'expected' => ITEM_GOOD,
+					'expected' => DISCOVERY_GOOD,
 					'name' =>'Item flex',
 					'key' =>'item-flex-test',
 					'flexPeriod' => array(
@@ -665,7 +705,7 @@ class testInheritanceDiscovery extends CWebTest {
 			// Delay combined with flex periods
 			array(
 				array(
-					'expected' => ITEM_BAD,
+					'expected' => DISCOVERY_BAD,
 					'name' =>'Item flex',
 					'key' =>'item-flex-delay',
 					'flexPeriod' => array(
@@ -686,7 +726,7 @@ class testInheritanceDiscovery extends CWebTest {
 			// Delay combined with flex periods
 			array(
 				array(
-					'expected' => ITEM_GOOD,
+					'expected' => DISCOVERY_GOOD,
 					'name' =>'Item flex1',
 					'key' =>'item-flex-delay1',
 					'flexPeriod' => array(
@@ -703,7 +743,7 @@ class testInheritanceDiscovery extends CWebTest {
 			// Delay combined with flex periods
 			array(
 				array(
-					'expected' => ITEM_BAD,
+					'expected' => DISCOVERY_BAD,
 					'name' =>'Item flex',
 					'key' =>'item-flex-delay',
 					'delay' => 0,
@@ -725,7 +765,7 @@ class testInheritanceDiscovery extends CWebTest {
 			// Delay combined with flex periods
 			array(
 				array(
-					'expected' => ITEM_GOOD,
+					'expected' => DISCOVERY_GOOD,
 					'name' =>'Item flex2',
 					'key' =>'item-flex-delay2',
 					'delay' => 0,
@@ -740,7 +780,7 @@ class testInheritanceDiscovery extends CWebTest {
 			// Delay combined with flex periods
 			array(
 				array(
-					'expected' => ITEM_BAD,
+					'expected' => DISCOVERY_BAD,
 					'name' =>'Item flex',
 					'key' =>'item-flex-delay',
 					'flexPeriod' => array(
@@ -756,7 +796,7 @@ class testInheritanceDiscovery extends CWebTest {
 			// Delay combined with flex periods
 			array(
 				array(
-					'expected' => ITEM_GOOD,
+					'expected' => DISCOVERY_GOOD,
 					'name' =>'Item flex',
 					'key' =>'item-flex-delay3',
 					'flexPeriod' => array(
@@ -768,7 +808,7 @@ class testInheritanceDiscovery extends CWebTest {
 			// Delay combined with flex periods
 			array(
 				array(
-					'expected' => ITEM_GOOD,
+					'expected' => DISCOVERY_GOOD,
 					'name' =>'Item flex',
 					'key' =>'item-flex-delay4',
 					'delay' => 0,
@@ -780,7 +820,7 @@ class testInheritanceDiscovery extends CWebTest {
 			// Delay combined with flex periods
 			array(
 				array(
-					'expected' => ITEM_BAD,
+					'expected' => DISCOVERY_BAD,
 					'name' =>'Item flex',
 					'key' =>'item-flex-delay',
 					'flexPeriod' => array(
@@ -795,7 +835,7 @@ class testInheritanceDiscovery extends CWebTest {
 			// Delay combined with flex periods
 			array(
 				array(
-					'expected' => ITEM_GOOD,
+					'expected' => DISCOVERY_GOOD,
 					'name' =>'Item flex',
 					'key' =>'item-flex-delay5',
 					'flexPeriod' => array(
@@ -806,7 +846,7 @@ class testInheritanceDiscovery extends CWebTest {
 			// Delay combined with flex periods
 			array(
 				array(
-					'expected' => ITEM_BAD,
+					'expected' => DISCOVERY_BAD,
 					'name' =>'Item flex',
 					'key' =>'item-flex-delay',
 					'flexPeriod' => array(
@@ -824,7 +864,7 @@ class testInheritanceDiscovery extends CWebTest {
 			// Delay combined with flex periods
 			array(
 				array(
-					'expected' => ITEM_BAD,
+					'expected' => DISCOVERY_BAD,
 					'name' =>'Item flex',
 					'key' =>'item-flex-delay',
 					'flexPeriod' => array(
@@ -842,7 +882,7 @@ class testInheritanceDiscovery extends CWebTest {
 			// Delay combined with flex periods
 			array(
 				array(
-					'expected' => ITEM_BAD,
+					'expected' => DISCOVERY_BAD,
 					'name' =>'Item flex',
 					'key' =>'item-flex-delay',
 					'flexPeriod' => array(
@@ -858,7 +898,7 @@ class testInheritanceDiscovery extends CWebTest {
 			// Delay combined with flex periods
 			array(
 				array(
-					'expected' => ITEM_BAD,
+					'expected' => DISCOVERY_BAD,
 					'name' =>'Item flex',
 					'key' =>'item-flex-delay',
 					'flexPeriod' => array(
@@ -874,7 +914,7 @@ class testInheritanceDiscovery extends CWebTest {
 			// Delay combined with flex periods
 			array(
 				array(
-					'expected' => ITEM_GOOD,
+					'expected' => DISCOVERY_GOOD,
 					'name' =>'Item flex',
 					'key' =>'item-flex-delay6',
 					'flexPeriod' => array(
@@ -898,7 +938,7 @@ class testInheritanceDiscovery extends CWebTest {
 			// Delay combined with flex periods
 			array(
 				array(
-					'expected' => ITEM_GOOD,
+					'expected' => DISCOVERY_GOOD,
 					'name' =>'Item flex',
 					'key' =>'item-flex-delay7',
 					'flexPeriod' => array(
@@ -910,7 +950,7 @@ class testInheritanceDiscovery extends CWebTest {
 			// Delay combined with flex periods
 			array(
 				array(
-					'expected' => ITEM_GOOD,
+					'expected' => DISCOVERY_GOOD,
 					'name' =>'Item flex Check',
 					'key' =>'item-flex-delay8',
 					'flexPeriod' => array(
@@ -925,7 +965,7 @@ class testInheritanceDiscovery extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => ITEM_GOOD,
+					'expected' => DISCOVERY_GOOD,
 					'name' =>'!@#$%^&*()_+-=[]{};:"|,./<>?',
 					'key' =>'item-symbols-test',
 					'dbCheck' => true,
@@ -1297,14 +1337,11 @@ class testInheritanceDiscovery extends CWebTest {
 	public function testInheritanceDiscoveryRule_CreateDiscovery($data) {
 		$this->zbxTestLogin('templates.php');
 
-		$template = 'Inheritance test template';
-		$host = 'Template inheritance test host';
-
 		$this->checkTitle('Configuration of templates');
 		$this->zbxTestTextPresent('CONFIGURATION OF TEMPLATES');
 
 		// create a discovery rule on template
-		$this->zbxTestClickWait("link=$template");
+		$this->zbxTestClickWait('link='.$this->template);
 		$this->zbxTestClickWait('link=Discovery rules');
 		$this->zbxTestClickWait('form');
 
@@ -1406,11 +1443,11 @@ class testInheritanceDiscovery extends CWebTest {
 
 		if (isset($data['templateCheck'])) {
 			$this->zbxTestOpenWait('templates.php');
-			$this->zbxTestClickWait("link=$template");
+			$this->zbxTestClickWait('link='.$this->template);
 			$this->zbxTestClickWait('link=Discovery rules');
 
 			$this->zbxTestTextPresent("$name");
-			$this->zbxTestTextNotPresent("$template: $name");
+			$this->zbxTestTextNotPresent($this->template.": $name");
 			$this->zbxTestClickWait("link=$name");
 
 			$this->assertElementValue('name', $name);
@@ -1422,9 +1459,10 @@ class testInheritanceDiscovery extends CWebTest {
 			$this->zbxTestClickWait("link=$host");
 			$this->zbxTestClickWait('link=Discovery rules');
 
-			$this->zbxTestTextPresent("$template: $name");
+			$this->zbxTestTextPresent($this->template.": $name");
 			$this->zbxTestClickWait("link=$name");
 
+			$this->zbxTestTextPresent('Parent discovery rules', $this->template);
 			$this->assertElementValue('name', $name);
 			$this->assertAttribute("//*[@id='name']/@readonly", 'readonly');
 			$this->assertElementValue('key', $key);
@@ -1458,10 +1496,10 @@ class testInheritanceDiscovery extends CWebTest {
 			}
 
 			$this->zbxTestOpenWait('hosts.php');
-			$this->zbxTestClickWait("link=$host");
+			$this->zbxTestClickWait('link='.$this->host);
 			$this->zbxTestClickWait('link=Discovery rules');
 
-			$this->zbxTestTextPresent("$template: $name");
+			$this->zbxTestTextPresent($this->template.": $name");
 			$this->zbxTestCheckboxSelect("g_hostdruleid_$itemId");
 			$this->zbxTestDropdownSelect('go', 'Delete selected');
 			$this->zbxTestClick('goButton');
@@ -1478,7 +1516,7 @@ class testInheritanceDiscovery extends CWebTest {
 			}
 
 			$this->zbxTestOpenWait('templates.php');
-			$this->zbxTestClickWait("link=$template");
+			$this->zbxTestClickWait('link='.$this->template);
 			$this->zbxTestClickWait('link=Discovery rules');
 
 			$this->zbxTestCheckboxSelect("g_hostdruleid_$itemId");
@@ -1488,7 +1526,7 @@ class testInheritanceDiscovery extends CWebTest {
 			$this->getConfirmation();
 			$this->wait();
 			$this->zbxTestTextPresent('Discovery rules deleted');
-			$this->zbxTestTextNotPresent("$template: $name");
+			$this->zbxTestTextNotPresent($this->template.": $name");
 		}
 	}
 
