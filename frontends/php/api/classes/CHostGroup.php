@@ -738,6 +738,11 @@ class CHostGroup extends CZBXAPI {
 		$templateids = is_null($templates) ? array() : zbx_objectValues($templates, 'templateid');
 		$objectids = array_merge($hostids, $templateids);
 
+		// check if any of the hosts are discovered
+		$this->checkValidator($hostids, new CHostNotDiscoveredValidator(array(
+			'message' => _('Cannot update groups for discovered host "%1$s".')
+		)));
+
 		$linked = array();
 		$linkedDb = DBselect(
 			'SELECT hg.hostid,hg.groupid'.
@@ -788,6 +793,12 @@ class CHostGroup extends CZBXAPI {
 		}
 		$hostids = isset($data['hostids']) ? zbx_toArray($data['hostids']) : array();
 		$templateids = isset($data['templateids']) ? zbx_toArray($data['templateids']) : array();
+
+		// check if any of the hosts are discovered
+		$this->checkValidator($hostids, new CHostNotDiscoveredValidator(array(
+			'message' => _('Cannot update groups for discovered host "%1$s".')
+		)));
+
 		$objectidsToUnlink = array_merge($hostids, $templateids);
 		if (!empty($objectidsToUnlink)) {
 			$unlinkable = getUnlinkableHosts($groupids, $objectidsToUnlink);
@@ -834,18 +845,16 @@ class CHostGroup extends CZBXAPI {
 
 		// validate allowed hosts
 		if (!empty($hostIds)) {
-			$allowedHosts = API::Host()->get(array(
-				'hostids' => $hostIds,
-				'editable' => true,
-				'preservekeys' => true
-			));
-			foreach ($hostIds as $hostId) {
-				if (!isset($allowedHosts[$hostId])) {
-					self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
-				}
-
-				$workHostIds[$hostId] = $hostId;
+			if (!API::Host()->isWritable($hostIds)) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
 			}
+
+			// check if any of the hosts are discovered
+			$this->checkValidator($hostIds, new CHostNotDiscoveredValidator(array(
+				'message' => _('Cannot update groups for discovered host "%1$s".')
+			)));
+
+			$workHostIds = zbx_toHash($hostIds);
 		}
 
 		// validate allowed templates
@@ -865,10 +874,13 @@ class CHostGroup extends CZBXAPI {
 		}
 
 		// get old records
+		// skip discovered hosts
 		$oldRecords = DBfetchArray(DBselect(
 			'SELECT *'.
-			' FROM hosts_groups hg'.
-			' WHERE '.dbConditionInt('hg.groupid', $groupIds)
+			' FROM hosts_groups hg,hosts h'.
+			' WHERE '.dbConditionInt('hg.groupid', $groupIds).
+				' AND hg.hostid=h.hostid'.
+				' AND h.flags='.ZBX_FLAG_DISCOVERY_NORMAL
 		));
 
 		// calculate new records

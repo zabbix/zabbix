@@ -894,6 +894,18 @@ class CZBXAPI {
 	}
 
 	/**
+	 * Runs the given validator and throws an exception if it fails.
+	 *
+	 * @param $value
+	 * @param CValidator $validator
+	 */
+	protected function checkValidator($value, CValidator $validator) {
+		if (!$validator->validate($value)) {
+			self::exception(ZBX_API_ERROR_INTERNAL, $validator->getError());
+		}
+	}
+
+	/**
 	 * Adds a deprecated property to an array of resulting objects if it's requested in $output. The value for the
 	 * deprecated property will be taken from the new one.
 	 *

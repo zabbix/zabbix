@@ -771,6 +771,11 @@ class CTemplate extends CHostGeneral {
 
 		// link hosts to the given templates
 		if (isset($data['hosts']) && !empty($data['hosts'])) {
+			// check if any of the hosts are discovered
+			$this->checkValidator(zbx_objectValues($data['hosts'], 'hostid'), new CHostNotDiscoveredValidator(array(
+				'message' => _('Cannot update templates on discovered host "%1$s".')
+			)));
+
 			$this->link($templateids, zbx_objectValues($data['hosts'], 'hostid'));
 		}
 
@@ -943,7 +948,8 @@ class CTemplate extends CHostGeneral {
 		if (isset($data['hosts']) && !is_null($data['hosts'])) {
 			$templateHosts = API::Host()->get(array(
 				'templateids' => $templateids,
-				'templated_hosts' => 1
+				'templated_hosts' => 1,
+				'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL)
 			));
 			$templateHostids = zbx_objectValues($templateHosts, 'hostid');
 			$newHostids = zbx_objectValues($data['hosts'], 'hostid');
@@ -1036,6 +1042,11 @@ class CTemplate extends CHostGeneral {
 		}
 
 		if (isset($data['hostids'])) {
+			// check if any of the hosts are discovered
+			$this->checkValidator($data['hostids'], new CHostNotDiscoveredValidator(array(
+				'message' => _('Cannot update templates on discovered host "%1$s".')
+			)));
+
 			API::Template()->unlink($templateids, zbx_toArray($data['hostids']));
 		}
 

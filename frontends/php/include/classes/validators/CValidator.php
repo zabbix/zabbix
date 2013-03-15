@@ -27,12 +27,14 @@ abstract class CValidator {
 	 * @var array
 	 */
 	private $error;
-	protected $options = array();
 
 	public function __construct(array $options = array()) {
-		$this->initOptions();
-		$this->options = zbx_array_merge($this->options, $options);
+		// set options
+		foreach ($options as $key => $value) {
+			$this->{$key} = $value;
+		}
 	}
+
 	/**
 	 * @abstract
 	 *
@@ -60,5 +62,15 @@ abstract class CValidator {
 		$this->error = $error;
 	}
 
-	protected function initOptions() {}
+	/**
+	 * Throws an exception when trying to set an unexisting validator option.
+	 *
+	 * @param $name
+	 * @param $value
+	 *
+	 * @throws Exception
+	 */
+	public function __set($name, $value) {
+		throw new Exception(sprintf('Incorrect option "%1$s" for validator "%1$s".', $name, get_class($this)));
+	}
 }

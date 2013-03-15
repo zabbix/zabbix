@@ -51,7 +51,7 @@ foreach ($this->data['db_hosts'] as $host) {
 	}
 }
 foreach ($this->data['r_hosts'] as $host) {
-	if (isset($this->data['rw_hosts'][$host['hostid']])) {
+	if (isset($this->data['rw_hosts'][$host['hostid']]) && $host['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
 		$hostsComboBox->addItem($host['hostid'], $host['name']);
 	}
 	else {
