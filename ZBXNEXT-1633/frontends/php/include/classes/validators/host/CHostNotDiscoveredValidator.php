@@ -18,36 +18,37 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-/**
- * A class for validating LDAP credentials.
- */
-class CLdapAuthValidator extends CValidator {
 
-	public $conf = array(
-		'host' => null,
-		'port' => null,
-		'base_dn' => null,
-		'bind_dn' => null,
-		'bind_password' => null,
-		'search_attribute' => null
-	);
+class CHostNotDiscoveredValidator extends CValidator {
 
 	/**
-	 * Checks if the given user name and password are valid.
+	 * Error message
 	 *
-	 * The $value array must have the following attributes:
-	 * - user       - user name
-	 * - password   - password
-	 *
-	 * @param array $value
-	 *
-	 * @return bool
+	 * @var string
 	 */
-	public function validate($value) {
-		$ldap = new CLdap($this->conf);
-		$ldap->connect();
+	public $message = '';
 
-		return $ldap->checkPass($value['user'], $value['password']);
+	/**
+	 * Checks is any of the given hosts are discovered.
+	 *
+	 * @param $hostIds
+	 *
+	 * @return bool|void
+	 */
+	public function validate($hostIds) {
+		$hosts = API::Host()->get(array(
+			'output' => array('host'),
+			'hostids' => $hostIds,
+			'filter' => array('flags' => ZBX_FLAG_DISCOVERY_CREATED),
+			'limit' => 1
+		));
+
+		if ($hosts) {
+			$host = reset($hosts);
+			$this->setError(_s($this->message, $host['host']));
+			return false;
+		}
+
+		return true;
 	}
-
 }

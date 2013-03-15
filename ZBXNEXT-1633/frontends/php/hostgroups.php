@@ -72,7 +72,8 @@ elseif (isset($_REQUEST['save'])) {
 	$objects = get_request('hosts', array());
 	$hosts = API::Host()->get(array(
 		'hostids' => $objects,
-		'output' => array('hostid')
+		'output' => array('hostid'),
+		'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL)
 	));
 	$templates = API::Template()->get(array(
 		'templateids' => $objects,
@@ -243,26 +244,14 @@ if (isset($_REQUEST['form'])) {
 		$data['twb_groupid'] = $gr['groupid'];
 	}
 
-	if ($data['twb_groupid'] == 0) {
-		// get all hosts from all groups
-		$options = array(
-			'templated_hosts' => 1,
-			'sortfield' => 'name',
-			'editable' => 1,
-			'output' => API_OUTPUT_EXTEND
-		);
-	}
-	else {
-		// get hosts from selected twb_groupid combo
-		$options = array(
-			'groupids' => $data['twb_groupid'],
-			'templated_hosts' => 1,
-			'sortfield' => 'name',
-			'editable' => 1,
-			'output' => API_OUTPUT_EXTEND
-		);
-	}
-	$data['db_hosts'] = API::Host()->get($options);
+	$data['db_hosts'] = API::Host()->get(array(
+		'groupids' => ($data['twb_groupid']) ? $data['twb_groupid'] : null,
+		'templated_hosts' => 1,
+		'sortfield' => 'name',
+		'editable' => 1,
+		'output' => API_OUTPUT_EXTEND,
+		'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL)
+	));
 
 	// get selected hosts
 	$options = array(

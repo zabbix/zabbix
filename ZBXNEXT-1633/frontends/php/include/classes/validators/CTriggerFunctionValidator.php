@@ -39,121 +39,9 @@ class CTriggerFunctionValidator extends CValidator {
 	 */
 	private $allowed;
 
-	/**
-	 * Validate trigger function like last(0), time(), etc.
-	 * Examples:
-	 *   array('functionName' => 'last', 'functionParamList' => array(0 => '#15'), 'valueType' => 3)
-	 *
-	 * @param array $value
-	 * @param string $value['functionName']
-	 * @param array $value['functionParamList']
-	 * @param int $value['valueType']
-	 *
-	 * @return bool
-	 */
-	public function validate($value) {
-		$this->setError('');
+	public function __construct(array $options = array()) {
+		parent::__construct($options);
 
-		if (!isset($this->allowed[$value['functionName']])) {
-			$this->setError(_s('Incorrect trigger function "%1$s" provided in expression.', $value['functionName']).' '.
-					_('Unknown function.'));
-			return false;
-		}
-
-		if (!isset($this->allowed[$value['functionName']]['value_types'][$value['valueType']])) {
-			$this->setError(_s('Incorrect item value type "%1$s" provided for trigger function "%2$s".',
-					itemValueTypeString($value['valueType']), $value['functionName']));
-			return false;
-		}
-
-		if (count($this->allowed[$value['functionName']]['args']) < count($value['functionParamList'])) {
-			$this->setError(_s('Incorrect trigger function "%1$s" provided in expression.', $value['functionName']).' '.
-					_s('Function supports "%1$s" parameters.', count($this->allowed[$value['functionName']]['args'])));
-			return false;
-		}
-
-		foreach ($this->allowed[$value['functionName']]['args'] as $aNum => $arg) {
-			// mandatory check
-			if (isset($arg['mandat']) && $arg['mandat'] && !isset($value['functionParamList'][$aNum])) {
-				$this->setError(_s('Incorrect trigger function "%1$s" provided in expression.', $value['functionName']).' '.
-						_('Mandatory parameter is missing.'));
-				return false;
-			}
-
-			// type check
-			if (isset($arg['type']) && isset($value['functionParamList'][$aNum])) {
-				$userMacro = preg_match('/^'.ZBX_PREG_EXPRESSION_USER_MACROS.'$/', $value['functionParamList'][$aNum]);
-
-				if (!$userMacro) {
-					switch ($arg['type']) {
-						case 'str':
-							if (!is_string($value['functionParamList'][$aNum])) {
-								$this->setError(_s('Incorrect trigger function "%1$s" provided in expression.', $value['functionName']).' '.
-										_s('Parameter of type string or user macro expected, "%1$s" given.', $value['functionParamList'][$aNum]));
-								return false;
-							}
-							break;
-						case 'sec':
-							if (!$this->validateSec($value['functionParamList'][$aNum])) {
-								$this->setError(_s('Incorrect trigger function "%1$s" provided in expression.', $value['functionName']).' '.
-										_s('Parameter sec or user macro expected, "%1$s" given.', $value['functionParamList'][$aNum]));
-								return false;
-							}
-							break;
-						case 'sec_num':
-							if (!$this->validateSecNum($value['functionParamList'][$aNum])) {
-								$this->setError(_s('Incorrect trigger function "%1$s" provided in expression.', $value['functionName']).' '.
-										_s('Parameter sec or #num or user macro expected, "%1$s" given.', $value['functionParamList'][$aNum]));
-								return false;
-							}
-							break;
-						case 'num':
-							if (!is_numeric($value['functionParamList'][$aNum])) {
-								$this->setError(_s('Incorrect trigger function "%1$s" provided in expression.', $value['functionName']).' '.
-										_s('Parameter num or user macro expected, "%1$s" given.', $value['functionParamList'][$aNum]));
-								return false;
-							}
-							break;
-					}
-				}
-			}
-		}
-		return true;
-	}
-
-	/**
-	 * Validate trigger function parameter which can contain only seconds
-	 * Examples:
-	 *   5
-	 *   1w
-	 *
-	 * @param string $param
-	 *
-	 * @return bool
-	 */
-	private function validateSec($param) {
-		return preg_match('/^\d+['.ZBX_TIME_SUFFIXES.']{0,1}$/', $param) == 1;
-	}
-
-	/**
-	 * Validate trigger function parameter which can contain seconds or count
-	 * Examples:
-	 *   5
-	 *   1w
-	 *   #5
-	 *
-	 * @param string $param
-	 *
-	 * @return bool
-	 */
-	private function validateSecNum($param) {
-		if (preg_match('/^#\d+$/', $param)) {
-			return true;
-		}
-		return $this->validateSec($param);
-	}
-
-	protected function initOptions() {
 		$valueTypesAll = array(
 			ITEM_VALUE_TYPE_FLOAT => true,
 			ITEM_VALUE_TYPE_UINT64 => true,
@@ -321,5 +209,119 @@ class CTriggerFunctionValidator extends CValidator {
 				'value_types' => $valueTypesAll
 			)
 		);
+	}
+
+	/**
+	 * Validate trigger function like last(0), time(), etc.
+	 * Examples:
+	 *   array('functionName' => 'last', 'functionParamList' => array(0 => '#15'), 'valueType' => 3)
+	 *
+	 * @param array $value
+	 * @param string $value['functionName']
+	 * @param array $value['functionParamList']
+	 * @param int $value['valueType']
+	 *
+	 * @return bool
+	 */
+	public function validate($value) {
+		$this->setError('');
+
+		if (!isset($this->allowed[$value['functionName']])) {
+			$this->setError(_s('Incorrect trigger function "%1$s" provided in expression.', $value['functionName']).' '.
+					_('Unknown function.'));
+			return false;
+		}
+
+		if (!isset($this->allowed[$value['functionName']]['value_types'][$value['valueType']])) {
+			$this->setError(_s('Incorrect item value type "%1$s" provided for trigger function "%2$s".',
+					itemValueTypeString($value['valueType']), $value['functionName']));
+			return false;
+		}
+
+		if (count($this->allowed[$value['functionName']]['args']) < count($value['functionParamList'])) {
+			$this->setError(_s('Incorrect trigger function "%1$s" provided in expression.', $value['functionName']).' '.
+					_s('Function supports "%1$s" parameters.', count($this->allowed[$value['functionName']]['args'])));
+			return false;
+		}
+
+		foreach ($this->allowed[$value['functionName']]['args'] as $aNum => $arg) {
+			// mandatory check
+			if (isset($arg['mandat']) && $arg['mandat'] && !isset($value['functionParamList'][$aNum])) {
+				$this->setError(_s('Incorrect trigger function "%1$s" provided in expression.', $value['functionName']).' '.
+						_('Mandatory parameter is missing.'));
+				return false;
+			}
+
+			// type check
+			if (isset($arg['type']) && isset($value['functionParamList'][$aNum])) {
+				$userMacro = preg_match('/^'.ZBX_PREG_EXPRESSION_USER_MACROS.'$/', $value['functionParamList'][$aNum]);
+
+				if (!$userMacro) {
+					switch ($arg['type']) {
+						case 'str':
+							if (!is_string($value['functionParamList'][$aNum])) {
+								$this->setError(_s('Incorrect trigger function "%1$s" provided in expression.', $value['functionName']).' '.
+										_s('Parameter of type string or user macro expected, "%1$s" given.', $value['functionParamList'][$aNum]));
+								return false;
+							}
+							break;
+						case 'sec':
+							if (!$this->validateSec($value['functionParamList'][$aNum])) {
+								$this->setError(_s('Incorrect trigger function "%1$s" provided in expression.', $value['functionName']).' '.
+										_s('Parameter sec or user macro expected, "%1$s" given.', $value['functionParamList'][$aNum]));
+								return false;
+							}
+							break;
+						case 'sec_num':
+							if (!$this->validateSecNum($value['functionParamList'][$aNum])) {
+								$this->setError(_s('Incorrect trigger function "%1$s" provided in expression.', $value['functionName']).' '.
+										_s('Parameter sec or #num or user macro expected, "%1$s" given.', $value['functionParamList'][$aNum]));
+								return false;
+							}
+							break;
+						case 'num':
+							if (!is_numeric($value['functionParamList'][$aNum])) {
+								$this->setError(_s('Incorrect trigger function "%1$s" provided in expression.', $value['functionName']).' '.
+										_s('Parameter num or user macro expected, "%1$s" given.', $value['functionParamList'][$aNum]));
+								return false;
+							}
+							break;
+					}
+				}
+			}
+		}
+		return true;
+	}
+
+	/**
+	 * Validate trigger function parameter which can contain only seconds
+	 * Examples:
+	 *   5
+	 *   1w
+	 *
+	 * @param string $param
+	 *
+	 * @return bool
+	 */
+	private function validateSec($param) {
+		return preg_match('/^\d+['.ZBX_TIME_SUFFIXES.']{0,1}$/', $param) == 1;
+	}
+
+	/**
+	 * Validate trigger function parameter which can contain seconds or count
+	 * Examples:
+	 *   5
+	 *   1w
+	 *   #5
+	 *
+	 * @param string $param
+	 *
+	 * @return bool
+	 */
+	private function validateSecNum($param) {
+		if (preg_match('/^#\d+$/', $param)) {
+			return true;
+		}
+		return $this->validateSec($param);
 	}
 }

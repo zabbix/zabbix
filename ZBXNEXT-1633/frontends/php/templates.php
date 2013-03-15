@@ -160,7 +160,6 @@ elseif (isset($_REQUEST['save'])) {
 
 		$macros = get_request('macros', array());
 		$groups = get_request('groups', array());
-		$hosts = get_request('hosts', array());
 		$templates = get_request('templates', array());
 		$templates_clear = get_request('clear_templates', array());
 		$templateid = get_request('templateid', 0);
@@ -217,7 +216,12 @@ elseif (isset($_REQUEST['save'])) {
 		$templates = zbx_toObject($templates, 'templateid');
 		$templates_clear = zbx_toObject($templates_clear, 'templateid');
 
-		$hosts = zbx_toObject($hosts, 'hostid');
+		// skip discovered hosts
+		$hosts = API::Host()->get(array(
+			'hostids' => get_request('hosts', array()),
+			'output' => array('hostid'),
+			'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL)
+		));
 
 		$template = array(
 			'host' => $template_name,
