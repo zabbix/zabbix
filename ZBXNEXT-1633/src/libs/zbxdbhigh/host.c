@@ -1824,6 +1824,34 @@ static void	DBdelete_applications(zbx_uint64_t *applicationids, int applicationi
 
 /******************************************************************************
  *                                                                            *
+ * Function: DBdelete_host_prototypes                                         *
+ *                                                                            *
+ * Purpose: deletes host prototypes from database                             *
+ *                                                                            *
+ * Parameters: host_prototypesids - [IN] list of host prototypes              *
+ *                                                                            *
+ ******************************************************************************/
+static void	DBdelete_host_prototypes(zbx_vector_uint64_t *host_prototypesids)
+{
+	char	*sql = NULL;
+	size_t	sql_alloc = 256, sql_offset = 0;
+
+	if (0 == host_prototypesids->values_num)
+		return;
+
+	sql = zbx_malloc(sql, sql_alloc);
+
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from hosts where");
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid",
+			host_prototypesids->values, host_prototypesids->values_num);
+
+	DBexecute("%s", sql);
+
+	zbx_free(sql);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: DBdelete_template_httptests                                      *
  *                                                                            *
  * Purpose: delete template web scenatios from host                           *
@@ -1988,6 +2016,64 @@ static void	DBdelete_template_triggers(zbx_uint64_t hostid, zbx_vector_uint64_t 
 
 	zbx_vector_uint64_destroy(&triggerids);
 	zbx_free(sql);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DBdelete_template_host_prototypes                                *
+ *                                                                            *
+ * Purpose: delete template items from host                                   *
+ *                                                                            *
+ * Parameters: hostid      - [IN] host identificator from database            *
+ *             templateids - [IN] array of template IDs                       *
+ *                                                                            *
+ ******************************************************************************/
+static void	DBdelete_template_host_prototypes(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids)
+{
+	const char		*__function_name = "DBdelete_template_host_prototypes";
+
+	char			*sql = NULL;
+	size_t			sql_alloc = 256, sql_offset = 0;
+	DB_RESULT		result;
+	DB_ROW			row;
+	zbx_uint64_t		host_prorotypeid;
+	zbx_vector_uint64_t	host_prorotypeids;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	zbx_vector_uint64_create(&host_prorotypeids);
+
+	sql = zbx_malloc(sql, sql_alloc);
+
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+			"select hh.hostid"
+			" from items hi,items ti,host_discovery thd,hosts th,hosts hh"
+			" where hi.templateid=ti.itemid"
+				" and ti.itemid=thd.parent_itemid"
+				" and thd.hostid=th.hostid"
+				" and th.hostid=hh.templateid"
+				" and hi.hostid=" ZBX_FS_UI64
+				" and",
+			hostid);
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "ti.hostid", templateids->values, templateids->values_num);
+
+	result = DBselect("%s", sql);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		ZBX_STR2UINT64(host_prorotypeid, row[0]);
+		zbx_vector_uint64_append(&host_prorotypeids, host_prorotypeid);
+	}
+	DBfree_result(result);
+
+	zbx_vector_uint64_sort(&host_prorotypeids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	DBdelete_host_prototypes(&host_prorotypeids);
+
+	zbx_free(sql);
+
+	zbx_vector_uint64_destroy(&host_prorotypeids);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
@@ -2502,6 +2588,7 @@ int	DBdelete_template_elements(zbx_uint64_t hostid, zbx_vector_uint64_t *del_tem
 	DBdelete_template_httptests(hostid, del_templateids);
 	DBdelete_template_graphs(hostid, del_templateids);
 	DBdelete_template_triggers(hostid, del_templateids);
+	DBdelete_template_host_prototypes(hostid, del_templateids);
 	DBdelete_template_items(hostid, del_templateids);
 	DBdelete_template_applications(hostid, del_templateids);
 
