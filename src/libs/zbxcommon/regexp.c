@@ -89,8 +89,7 @@ static char	*regexp_sub_replace(const char *text, const char *output_template, r
 {
 	char		*ptr = NULL;
 	const char	*pstart = output_template, *pgroup;
-	size_t		size = 0, offset = 0;
-	int		group_index;
+	size_t		size = 0, offset = 0, group_index;
 
 	if (NULL == output_template || '\0' == *output_template)
 		return zbx_strdup(NULL, text);
@@ -380,7 +379,6 @@ static int	regexp_match_ex_substring_list(const char *string, char *pattern, zbx
 
 	return res;
 }
-
 
 /**********************************************************************************
  *                                                                                *

@@ -140,8 +140,8 @@ int	WEB_PAGE_PERF(AGENT_REQUEST *request, AGENT_RESULT *result)
 int	WEB_PAGE_REGEXP(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char		*hostname, *path_str, *port_str, *regexp, *length_str, path[MAX_STRING_LEN],
-			back[MAX_BUFFER_LEN], *buffer = NULL, *found, *ptr = NULL;
-	int		length, len, found_len;
+			*buffer = NULL, *ptr = NULL;
+	int		length;
 	const char	*output;
 	unsigned short	port_number;
 
