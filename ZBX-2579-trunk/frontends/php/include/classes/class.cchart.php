@@ -721,13 +721,13 @@ class CChart extends CGraphDraw {
 
 		// check if items use B or Bps units
 		for ($item = 0; $item < $this->num; $item++) {
-			if (($this->items[$item]['units'] == 'B' || $this->items[$item]['units'] == 'Bps')
-					&& $this->items[$item]['axisside'] == GRAPH_YAXIS_SIDE_LEFT) {
-				$leftBase8 = true;
-			}
-			if (($this->items[$item]['units'] == 'B' || $this->items[$item]['units'] == 'Bps')
-					&& $this->items[$item]['axisside'] == GRAPH_YAXIS_SIDE_RIGHT) {
-				$rightBase8 = true;
+			if ($this->items[$item]['units'] == 'B' || $this->items[$item]['units'] == 'Bps') {
+				if ($this->items[$item]['axisside'] == GRAPH_YAXIS_SIDE_LEFT) {
+					$leftBase1024 = true;
+				}
+				else {
+					$rightBase1024 = true;
+				}
 			}
 		}
 
@@ -763,15 +763,16 @@ class CChart extends CGraphDraw {
 			}
 		}
 
-		// sides
 		$side = GRAPH_YAXIS_SIDE_LEFT;
 		$other_side = GRAPH_YAXIS_SIDE_RIGHT;
+
+		// invert sides and it bases, if left side not exist
 		if (!isset($this->axis_valuetype[GRAPH_YAXIS_SIDE_LEFT])) {
 			$side = GRAPH_YAXIS_SIDE_RIGHT;
 			$other_side = GRAPH_YAXIS_SIDE_LEFT;
-			$tempBase = $leftBase8;
-			$leftBase8 = $rightBase8;
-			$rightBase8 = $tempBase;
+			$tempBase = $leftBase1024;
+			$leftBase1024 = $rightBase1024;
+			$rightBase1024 = $tempBase;
 		}
 
 		$tmp_minY = array();
@@ -813,36 +814,8 @@ class CChart extends CGraphDraw {
 		}
 
 		// calculate interval, if left side use B or Bps
-		if (isset($leftBase8)) {
-			$intervalData = convertBase8Values($interval);
-			$interval = $intervalData['value'];
-			if ($this->m_maxY[$side] > 0) {
-				$absMaxY = $this->m_maxY[$side];
-			}
-			else {
-				$absMaxY = bcmul($this->m_maxY[$side], '-1');
-			}
-			if ($this->m_minY[$side] > 0) {
-				$absMinY = $this->m_minY[$side];
-			}
-			else {
-				$absMinY = bcmul($this->m_minY[$side], '-1');
-			}
-			if ($absMaxY > $absMinY) {
-				$sideMaxData = convertBase8Values($this->m_maxY[$side]);
-			}
-			else {
-				$sideMaxData = convertBase8Values($this->m_minY[$side]);
-			}
-			if ($sideMaxData['pow'] != $intervalData['pow']) {
-				// interval correction, if Max Y have other unit, then interval unit = Max Y unit
-				if ($intervalData['pow'] < 0) {
-					$interval = sprintf('%.10f', bcmul($interval, 1.024, 10));
-				}
-				else {
-					$interval = sprintf('%.6f', round(bcmul($interval, 1.024), ZBX_UNITS_ROUNDOFF_UPPER_LIMIT));
-				}
-			}
+		if (isset($leftBase1024)) {
+			$interval = getBase1024Interval($interval, $this->m_minY[$side], $this->m_maxY[$side]);
 		}
 
 		$columnInterval = bcdiv(bcmul($this->gridPixelsVert, bcsub($this->m_maxY[$other_side], $this->m_minY[$other_side])), $this->sizeY);
@@ -876,36 +849,9 @@ class CChart extends CGraphDraw {
 		}
 
 		// calculate interval, if right side use B or Bps
-		if (isset($rightBase8)) {
-			$intervalOtherSideData = convertBase8Values($interval_other_side);
-			$interval_other_side = $intervalOtherSideData['value'];
-			if ($this->m_maxY[$other_side] > 0) {
-				$absMaxY = $this->m_maxY[$other_side];
-			}
-			else {
-				$absMaxY = bcmul($this->m_maxY[$other_side], '-1');
-			}
-			if ($this->m_minY[$other_side] > 0) {
-				$absMinY = $this->m_minY[$other_side];
-			}
-			else {
-				$absMinY = bcmul($this->m_minY[$other_side], '-1');
-			}
-			if ($absMaxY > $absMinY) {
-				$sideMaxData = convertBase8Values($this->m_maxY[$other_side]);
-			}
-			else {
-				$sideMaxData = convertBase8Values($this->m_minY[$other_side]);
-			}
-			if ($sideMaxData['pow'] != $interval_other_side['pow']) {
-				// interval correction, if Max Y have other unit, then interval unit = Max Y unit
-				if ($intervalOtherSideData['pow'] < 0) {
-					$interval_other_side = sprintf('%.10f', bcmul($interval_other_side, 1.024, 10));
-				}
-				else {
-					$interval_other_side = sprintf('%.6f', round(bcmul($interval_other_side, 1.024), ZBX_UNITS_ROUNDOFF_UPPER_LIMIT));
-				}
-			}
+		if (isset($rightBase1024)) {
+			$interval_other_side = getBase1024Interval($interval_other_side, $this->m_minY[$other_side],
+				$this->m_maxY[$other_side]);
 		}
 
 		// correcting MIN & MAX
@@ -954,36 +900,8 @@ class CChart extends CGraphDraw {
 			}
 
 			// calculate interval, if right side use B or Bps
-			if (isset($rightBase8)) {
-				$intervalData = convertBase8Values($interval);
-				$interval = $intervalData['value'];
-				if ($this->m_maxY[$other_side] > 0) {
-					$absMaxY = $this->m_maxY[$other_side];
-				}
-				else {
-					$absMaxY = bcmul($this->m_maxY[$other_side], '-1');
-				}
-				if ($this->m_minY[$other_side] > 0) {
-					$absMinY = $this->m_minY[$other_side];
-				}
-				else {
-					$absMinY = bcmul($this->m_minY[$other_side], '-1');
-				}
-				if ($absMaxY > $absMinY) {
-					$sideMaxData = convertBase8Values($this->m_maxY[$other_side]);
-				}
-				else {
-					$sideMaxData = convertBase8Values($this->m_minY[$other_side]);
-				}
-				if ($sideMaxData['pow'] != $intervalData['pow']) {
-					// interval correction, if Max Y have other unit, then interval unit = Max Y unit
-					if ($intervalData['pow'] < 0) {
-						$interval = sprintf('%.10f', bcmul($interval, 1.024, 10));
-					}
-					else {
-						$interval = sprintf('%.6f', round(bcmul($interval, 1.024), ZBX_UNITS_ROUNDOFF_UPPER_LIMIT));
-					}
-				}
+			if (isset($rightBase1024)) {
+				$interval = getBase1024Interval($interval, $this->m_minY[$side], $this->m_maxY[$side]);
 				// recorrecting MIN & MAX
 				$this->m_minY[$other_side] = bcmul(bcfloor(bcdiv($this->m_minY[$other_side], $interval)), $interval);
 				$this->m_maxY[$other_side] = bcmul(bcceil(bcdiv($this->m_maxY[$other_side], $interval)), $interval);
@@ -1523,11 +1441,11 @@ class CChart extends CGraphDraw {
 
 		$newPow = false;
 		if ($byteStep) {
-			$maxYPow = convertBase8Values($maxY, 1024);
-			$minYPow = convertBase8Values($minY, 1024);
+			$maxYPow = convertToBase1024($maxY, 1024);
+			$minYPow = convertToBase1024($minY, 1024);
 		} else {
-			$maxYPow = convertBase8Values($maxY);
-			$minYPow = convertBase8Values($minY);
+			$maxYPow = convertToBase1024($maxY);
+			$minYPow = convertToBase1024($minY);
 		}
 		if (abs($maxYPow['pow']) > abs($minYPow['pow']) && $maxYPow['value'] != 0) {
 			$newPow = $maxYPow['pow'];
@@ -1662,11 +1580,11 @@ class CChart extends CGraphDraw {
 
 		$newPow = false;
 		if ($byteStep) {
-			$maxYPow = convertBase8Values($maxY, 1024);
-			$minYPow = convertBase8Values($minY, 1024);
+			$maxYPow = convertToBase1024($maxY, 1024);
+			$minYPow = convertToBase1024($minY, 1024);
 		} else {
-			$maxYPow = convertBase8Values($maxY);
-			$minYPow = convertBase8Values($minY);
+			$maxYPow = convertToBase1024($maxY);
+			$minYPow = convertToBase1024($minY);
 		}
 		if (abs($maxYPow['pow']) > abs($minYPow['pow']) && $maxYPow['value'] != 0) {
 			$newPow = $maxYPow['pow'];
@@ -1764,7 +1682,6 @@ class CChart extends CGraphDraw {
 	 */
 	protected function getYStepMarkerValueOffset($yAxis, $stepNumber) {
 		$step = $this->gridStep[$yAxis];
-		$minY = abs($this->m_minY[$yAxis]);
 		if ($this->m_minY[$yAxis] > 0) {
 			$minY = $this->m_minY[$yAxis];
 		}

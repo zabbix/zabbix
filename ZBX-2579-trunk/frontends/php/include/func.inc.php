@@ -649,7 +649,7 @@ function convert_units($value, $units, $convert = ITEM_CONVERT_WITH_UNITS, $byte
 }
 
 /**
- * Converts Base10 values to Base8 and calc pow
+ * Converts Base1000 values to Base1024 and calc pow
  * Example:
  * 	200 KBytes convert to 0.2MB (204.8 KBytes)
  *
@@ -658,7 +658,7 @@ function convert_units($value, $units, $convert = ITEM_CONVERT_WITH_UNITS, $byte
  *
  * @return array
  */
-function convertBase8Values ($value ,$step = false) {
+function convertToBase1024 ($value ,$step = false) {
 	if (empty($step)) {
 		$step = 1000;
 	}
@@ -702,11 +702,9 @@ function convertBase8Values ($value ,$step = false) {
 		if ($valData['pow'] >= 0) {
 			$valData['value'] = bcdiv(sprintf('%.6f',$value), sprintf('%.6f', $valData['value']), 6);
 
-			for ($i = 0; $i < $valData['pow']; $i++) {
-				$valData['value'] = bcmul($valData['value'], 1024);
-			}
+			$valData['value'] = sprintf('%.6f', round(bcmul($valData['value'], bcpow(1024, $valData['pow'])),
+				ZBX_UNITS_ROUNDOFF_UPPER_LIMIT));
 
-			$valData['value'] = sprintf('%.6f', round($valData['value'], ZBX_UNITS_ROUNDOFF_UPPER_LIMIT));
 		}
 		else {
 			$valData['value'] = bcmul(sprintf('%.10f',$value), sprintf('%.10f', $valData['value']), 10);

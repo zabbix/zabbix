@@ -837,3 +837,46 @@ function find_period_end($periods, $time, $max_time) {
 
 	return -1;
 }
+
+/**
+ * Calculate interval for base 1024 values.
+ *
+ * @param $interval
+ * @param $minY
+ * @param $maxY
+ *
+ * @return float|int
+ */
+function getBase1024Interval($interval, $minY, $maxY) {
+	$intervalData = convertToBase1024($interval);
+	$interval = $intervalData['value'];
+	if ($maxY > 0) {
+		$absMaxY = $maxY;
+	}
+	else {
+		$absMaxY = bcmul($maxY, '-1');
+	}
+	if ($minY > 0) {
+		$absMinY = $minY;
+	}
+	else {
+		$absMinY = bcmul($minY, '-1');
+	}
+	if ($absMaxY > $absMinY) {
+		$sideMaxData = convertToBase1024($maxY);
+	}
+	else {
+		$sideMaxData = convertToBase1024($minY);
+	}
+	if ($sideMaxData['pow'] != $intervalData['pow']) {
+		// interval correction, if Max Y have other unit, then interval unit = Max Y unit
+		if ($intervalData['pow'] < 0) {
+			$interval = sprintf('%.10f', bcmul($interval, 1.024, 10));
+		}
+		else {
+			$interval = sprintf('%.6f', round(bcmul($interval, 1.024), ZBX_UNITS_ROUNDOFF_UPPER_LIMIT));
+		}
+	}
+
+	return $interval;
+}
