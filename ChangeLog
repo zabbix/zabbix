@@ -4,6 +4,7 @@ New features:
 ........S. [ZBXNEXT-1643] added support of {TRIGGER.TEMPLATE.NAME} and {TRIGGER.HOSTGROUP.NAME} notification macros; thanks to Hmami Mohamed (Sasha)
 A.F....... [ZBX-1357] added Lithuanian translation; thanks to Zabbix translators (Richlv)
 A.F....... [ZBX-1357] updated American English, Brazilian Portuguese, French, German, Greek, Hungarian, Latvian, Slovak, Spanish, Russian, Turkish and Ukrainian translations; thanks to Zabbix translators (Richlv)
+........S. [ZBXNEXT-1663] added support for notification macros {TRIGGER.NAME.ORIG}, {ITEM.NAME.ORIG}, {ITEM.KEY.ORIG} (dimir)
 
 Bug fixes:
 ..F....... [ZBX-6388] fixed regular expression namespace inside nodes (Eduard)

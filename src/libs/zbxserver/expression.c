@@ -1043,11 +1043,12 @@ static int	DBget_interface_value(zbx_uint64_t hostid, char **replace_to, int req
 #define ZBX_REQUEST_HOST_NAME		0
 #define ZBX_REQUEST_ITEM_ID		4
 #define ZBX_REQUEST_ITEM_NAME		5
-#define ZBX_REQUEST_ITEM_KEY		6
-#define ZBX_REQUEST_ITEM_KEY_ORIG	7
-#define ZBX_REQUEST_ITEM_DESCRIPTION	8
-#define ZBX_REQUEST_PROXY_NAME		9
-#define ZBX_REQUEST_HOST_HOST		10
+#define ZBX_REQUEST_ITEM_NAME_ORIG	6
+#define ZBX_REQUEST_ITEM_KEY		7
+#define ZBX_REQUEST_ITEM_KEY_ORIG	8
+#define ZBX_REQUEST_ITEM_DESCRIPTION	9
+#define ZBX_REQUEST_PROXY_NAME		10
+#define ZBX_REQUEST_HOST_HOST		11
 static int	DBget_trigger_value(DB_TRIGGER *trigger, char **replace_to, int N_functionid, int request)
 {
 	const char	*__function_name = "DBget_trigger_value";
@@ -1140,11 +1141,15 @@ static int	DBget_trigger_value(DB_TRIGGER *trigger, char **replace_to, int N_fun
 					item_description(replace_to, key, dc_item.host.hostid);
 					zbx_free(key);
 				}
-				else /* ZBX_REQUEST_ITEM_KEY */
+				else	/* ZBX_REQUEST_ITEM_KEY */
 				{
 					zbx_free(*replace_to);
 					*replace_to = key;
 				}
+				ret = SUCCEED;
+				break;
+			case ZBX_REQUEST_ITEM_NAME_ORIG:
+				*replace_to = zbx_strdup(*replace_to, row[5]);
 				ret = SUCCEED;
 				break;
 			case ZBX_REQUEST_ITEM_KEY_ORIG:
@@ -1968,7 +1973,9 @@ static int	get_autoreg_value_by_event(DB_EVENT *event, char **replace_to, const 
 #define MVAR_ITEM_VALUE			"{ITEM.VALUE}"
 #define MVAR_ITEM_ID			"{ITEM.ID}"
 #define MVAR_ITEM_NAME			"{ITEM.NAME}"
+#define MVAR_ITEM_NAME_ORIG		"{ITEM.NAME.ORIG}"
 #define MVAR_ITEM_KEY			"{ITEM.KEY}"
+#define MVAR_ITEM_KEY_ORIG		"{ITEM.KEY.ORIG}"
 #define MVAR_TRIGGER_KEY		"{TRIGGER.KEY}"			/* deprecated */
 #define MVAR_ITEM_DESCRIPTION		"{ITEM.DESCRIPTION}"
 #define MVAR_ITEM_LOG_DATE		"{ITEM.LOG.DATE}"
@@ -1982,6 +1989,7 @@ static int	get_autoreg_value_by_event(DB_EVENT *event, char **replace_to, const 
 #define MVAR_TRIGGER_COMMENT		"{TRIGGER.COMMENT}"		/* deprecated */
 #define MVAR_TRIGGER_ID			"{TRIGGER.ID}"
 #define MVAR_TRIGGER_NAME		"{TRIGGER.NAME}"
+#define MVAR_TRIGGER_NAME_ORIG		"{TRIGGER.NAME.ORIG}"
 #define MVAR_TRIGGER_EXPRESSION		"{TRIGGER.EXPRESSION}"
 #define MVAR_TRIGGER_SEVERITY		"{TRIGGER.SEVERITY}"
 #define MVAR_TRIGGER_NSEVERITY		"{TRIGGER.NSEVERITY}"
@@ -2127,8 +2135,8 @@ static const char	*ex_macros[] =
 	MVAR_PROFILE_CONTACT, MVAR_PROFILE_LOCATION, MVAR_PROFILE_NOTES,
 	MVAR_HOST_HOST, MVAR_HOST_NAME, MVAR_HOSTNAME, MVAR_PROXY_NAME,
 	MVAR_HOST_CONN, MVAR_HOST_DNS, MVAR_HOST_IP, MVAR_IPADDRESS,
-	MVAR_ITEM_ID, MVAR_ITEM_NAME, MVAR_ITEM_DESCRIPTION,
-	MVAR_ITEM_KEY, MVAR_TRIGGER_KEY,
+	MVAR_ITEM_ID, MVAR_ITEM_NAME, MVAR_ITEM_NAME_ORIG, MVAR_ITEM_DESCRIPTION,
+	MVAR_ITEM_KEY, MVAR_ITEM_KEY_ORIG, MVAR_TRIGGER_KEY,
 	MVAR_ITEM_LASTVALUE,
 	MVAR_ITEM_VALUE,
 	MVAR_ITEM_LOG_DATE, MVAR_ITEM_LOG_TIME, MVAR_ITEM_LOG_AGE, MVAR_ITEM_LOG_SOURCE,
@@ -2461,6 +2469,13 @@ int	substitute_simple_macros(DB_EVENT *event, zbx_uint64_t *userid, zbx_uint64_t
 					else
 						ret = FAIL;
 				}
+				if (0 == strcmp(m, MVAR_TRIGGER_NAME_ORIG))
+				{
+					if (0 != event->trigger.triggerid)
+						replace_to = zbx_strdup(replace_to, event->trigger.description);
+					else
+						ret = FAIL;
+				}
 				else if (0 == strcmp(m, MVAR_TRIGGER_EXPRESSION))
 				{
 					if (0 != event->trigger.triggerid)
@@ -2494,9 +2509,15 @@ int	substitute_simple_macros(DB_EVENT *event, zbx_uint64_t *userid, zbx_uint64_t
 				else if (0 == strcmp(m, MVAR_ITEM_NAME))
 					ret = DBget_trigger_value(&event->trigger, &replace_to, N_functionid,
 							ZBX_REQUEST_ITEM_NAME);
+				else if (0 == strcmp(m, MVAR_ITEM_NAME_ORIG))
+					ret = DBget_trigger_value(&event->trigger, &replace_to, N_functionid,
+							ZBX_REQUEST_ITEM_NAME_ORIG);
 				else if (0 == strcmp(m, MVAR_ITEM_KEY) || 0 == strcmp(m, MVAR_TRIGGER_KEY))
 					ret = DBget_trigger_value(&event->trigger, &replace_to, N_functionid,
 							ZBX_REQUEST_ITEM_KEY);
+				else if (0 == strcmp(m, MVAR_ITEM_KEY_ORIG))
+					ret = DBget_trigger_value(&event->trigger, &replace_to, N_functionid,
+							ZBX_REQUEST_ITEM_KEY_ORIG);
 				else if (0 == strcmp(m, MVAR_HOST_IP) || 0 == strcmp(m, MVAR_IPADDRESS))
 					ret = DBget_trigger_value(&event->trigger, &replace_to, N_functionid,
 							ZBX_REQUEST_HOST_IPADDRESS);
