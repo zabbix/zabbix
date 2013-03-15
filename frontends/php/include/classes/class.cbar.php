@@ -374,7 +374,7 @@ class CBar extends CGraphDraw {
 	//									DRAW									*
 	//***************************************************************************
 	public function drawSmallRectangle() {
-		$gbcolor = $this->getColor($this->graphtheme['gridbordercolor'], 0);
+		$gbColor = $this->getColor($this->graphtheme['gridbordercolor'], 0);
 
 		imagefilledrectangle($this->im,
 			$this->shiftXleft + $this->shiftXCaptionLeft - 1,
@@ -397,7 +397,7 @@ class CBar extends CGraphDraw {
 			$this->shiftY - 5,
 			$this->shiftXleft + $this->shiftXCaptionLeft - 1,
 			$this->sizeY + $this->shiftY + 4,
-			$gbcolor
+			$gbColor
 		);
 
 		imagefilledpolygon($this->im,
@@ -413,20 +413,20 @@ class CBar extends CGraphDraw {
 		// draw Y axis triangle
 		imageline($this->im, $this->shiftXleft + $this->shiftXCaptionLeft - 4, $this->shiftY - 5,
 			$this->shiftXleft + $this->shiftXCaptionLeft + 2, $this->shiftY - 5,
-			$gbcolor);
-		aline($this->im, $this->shiftXleft + $this->shiftXCaptionLeft + 2, $this->shiftY - 5,
+			$gbColor);
+		zbx_imagealine($this->im, $this->shiftXleft + $this->shiftXCaptionLeft + 2, $this->shiftY - 5,
 			$this->shiftXleft + $this->shiftXCaptionLeft - 1, $this->shiftY - 10,
-			$gbcolor);
-		aline($this->im, $this->shiftXleft + $this->shiftXCaptionLeft - 1, $this->shiftY - 10,
+			$gbColor);
+		zbx_imagealine($this->im, $this->shiftXleft + $this->shiftXCaptionLeft - 1, $this->shiftY - 10,
 			$this->shiftXleft + $this->shiftXCaptionLeft - 4, $this->shiftY - 5,
-			$gbcolor);
+			$gbColor);
 
 		imageline($this->im,
 			$this->shiftXleft + $this->shiftXCaptionLeft - 4,
 			$this->sizeY + $this->shiftY + 1,
 			$this->sizeX + $this->shiftXleft + $this->shiftXCaptionLeft + 5,
 			$this->sizeY + $this->shiftY + 1,
-			$gbcolor
+			$gbColor
 		);
 
 		imagefilledpolygon($this->im,
@@ -442,13 +442,13 @@ class CBar extends CGraphDraw {
 		// draw X axis triangle
 		imageline($this->im, $this->sizeX + $this->shiftXleft + $this->shiftXCaptionLeft + 5, $this->sizeY + $this->shiftY - 2,
 			$this->sizeX + $this->shiftXleft + $this->shiftXCaptionLeft + 5, $this->sizeY + $this->shiftY + 4,
-			$gbcolor);
-		aline($this->im, $this->sizeX + $this->shiftXleft + $this->shiftXCaptionLeft + 5, $this->sizeY + $this->shiftY + 4,
+			$gbColor);
+		zbx_imagealine($this->im, $this->sizeX + $this->shiftXleft + $this->shiftXCaptionLeft + 5, $this->sizeY + $this->shiftY + 4,
 			$this->sizeX + $this->shiftXleft + $this->shiftXCaptionLeft + 10, $this->sizeY + $this->shiftY + 1,
-			$gbcolor);
-		aline($this->im, $this->sizeX + $this->shiftXleft + $this->shiftXCaptionLeft + 10, $this->sizeY + $this->shiftY + 1,
+			$gbColor);
+		zbx_imagealine($this->im, $this->sizeX + $this->shiftXleft + $this->shiftXCaptionLeft + 10, $this->sizeY + $this->shiftY + 1,
 			$this->sizeX + $this->shiftXleft + $this->shiftXCaptionLeft + 5, $this->sizeY + $this->shiftY - 2,
-			$gbcolor);
+			$gbColor);
 	}
 
 	protected function drawGrid() {
