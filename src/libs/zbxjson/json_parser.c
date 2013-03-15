@@ -17,16 +17,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-
-#include <stdlib.h>
-#include <string.h>
-#include <ctype.h>
-
 #include "common.h"
-#include "log.h"
 
 #include "zbxjson.h"
 #include "json_parser.h"
+
+static int	json_parse_value(const char **start, const char **end, char **error);
 
 /******************************************************************************
  *                                                                            *
@@ -43,8 +39,6 @@
  *                                                                            *
  * Author: Andris Zeila                                                       *
  *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
  ******************************************************************************/
 static int	json_error(const char *message, const char* json_buffer, char** error)
 {
@@ -53,7 +47,7 @@ static int	json_error(const char *message, const char* json_buffer, char** error
 	*error = zbx_malloc(NULL, size);
 
 	if (json_buffer)
-		zbx_snprintf_alloc(error, &size, &offset, "%s at: '%s'", message, json_buffer);
+		zbx_snprintf_alloc(error, &size, &offset, "%s at: \"%s\"", message, json_buffer);
 	else
 		zbx_snprintf_alloc(error, &size, &offset, "%s", message);
 
@@ -76,14 +70,12 @@ static int	json_error(const char *message, const char* json_buffer, char** error
  *                                                                            *
  * Author: Andris Zeila                                                       *
  *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
  ******************************************************************************/
-int	json_parse_string(const char **start, const char **end, char **error)
+static int	json_parse_string(const char *start, const char **end, char **error)
 {
-	const char	*ptr = *start;
+	const char	*ptr = start;
 
-	/* copy starting '"' */
+	/* skip starting '"' */
 	ptr++;
 
 	while ('"' != *ptr)
@@ -94,7 +86,8 @@ int	json_parse_string(const char **start, const char **end, char **error)
 
 		if ('\\' == *ptr)
 		{
-			const char *escape_start = ptr;
+			const char	*escape_start = ptr;
+			int		i;
 
 			/* unexpected end of string data, failing */
 			if ('\0' == *(++ptr))
@@ -112,20 +105,23 @@ int	json_parse_string(const char **start, const char **end, char **error)
 				case 't':
 					break;
 				case 'u':
-				{
-					int i;
-
 					/* check if the \u is followed with 4 hex digits */
 					for (i = 0; i < 4; i++)
-						if ( 0 == isxdigit(*(++ptr)) )
-							return json_error("invalid escape sequence in string", escape_start, error);
+					{
+						if (0 == isxdigit(*(++ptr)))
+						{
+							return json_error("invalid escape sequence in string",
+									escape_start, error);
+						}
+					}
 
 					break;
-				}
 				default:
-					return json_error("invalid escape sequence in string data", ptr - 1, error);
+					return json_error("invalid escape sequence in string data",
+							escape_start, error);
 			}
 		}
+
 		/* found control character in string, failing */
 		if (0 != iscntrl(*ptr))
 			return json_error("invalid control character in string data", ptr, error);
@@ -143,9 +139,9 @@ int	json_parse_string(const char **start, const char **end, char **error)
  *                                                                            *
  * Purpose: Parses JSON array value                                           *
  *                                                                            *
- * Parameters: start  - [IN] the JSON data without leading whitespace         *
- *             end    - [OUT] the reference to the array ending character ']' *
- *             error  - [OUT] the parsing error message                       *
+ * Parameters: start - [IN] the JSON data without leading whitespace          *
+ *             end   - [OUT] the reference to the array ending character ']'  *
+ *             error - [OUT] the parsing error message                        *
  *                                                                            *
  * Return value: SUCCEED - the array was parsed successfully                  *
  *               FAIL    - an error occurred during parsing, the error        *
@@ -153,12 +149,10 @@ int	json_parse_string(const char **start, const char **end, char **error)
  *                                                                            *
  * Author: Andris Zeila                                                       *
  *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
  ******************************************************************************/
-int	json_parse_array(const char **start, const char **end, char **error)
+static int	json_parse_array(const char *start, const char **end, char **error)
 {
-	const char	*ptr = *start;
+	const char	*ptr = start;
 
 	do
 	{
@@ -172,13 +166,11 @@ int	json_parse_array(const char **start, const char **end, char **error)
 		ptr = *end + 1;
 
 		STRIP_WHITESPACE(ptr);
-
 	} while (',' == *ptr);
 
 	/* no closing ], failing */
 	if (']' != *ptr)
 		return json_error("invalid array format, expected closing character ']'", ptr, error);
-
 
 	*end = ptr;
 
@@ -191,10 +183,10 @@ int	json_parse_array(const char **start, const char **end, char **error)
  *                                                                            *
  * Purpose: Parses JSON number value                                          *
  *                                                                            *
- * Parameters: start  - [IN] the JSON data without leading whitespace         *
- *             end    - [OUT] the reference to the number ending character    *
- *                            (last valid numeric value character             *
- *             error  - [OUT] the parsing error message                       *
+ * Parameters: start - [IN] the JSON data without leading whitespace          *
+ *             end   - [OUT] the reference to the number ending character     *
+ *                           (last valid numeric value character              *
+ *             error - [OUT] the parsing error message                        *
  *                                                                            *
  * Return value: SUCCEED - the number was parsed successfully                 *
  *               FAIL    - an error occurred during parsing, the error        *
@@ -202,14 +194,11 @@ int	json_parse_array(const char **start, const char **end, char **error)
  *                                                                            *
  * Author: Andris Zeila                                                       *
  *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
  ******************************************************************************/
-int	json_parse_number(const char **start, const char **end, char **error)
+static int	json_parse_number(const char *start, const char **end, char **error)
 {
-	const char	*ptr = *start;
-	int	point = 0;
-	int	digit = 0;
+	const char	*ptr = start;
+	int		point = 0, digit = 0;
 
 	if ('-' == *ptr)
 		ptr++;
@@ -230,7 +219,7 @@ int	json_parse_number(const char **start, const char **end, char **error)
 	}
 	/* number does not contain any digits, failing */
 	if (0 == digit)
-		return json_error("invalid numeric value format", *start, error);
+		return json_error("invalid numeric value format", start, error);
 
 	if ('e' == *ptr || 'E' == *ptr)
 	{
@@ -262,9 +251,9 @@ int	json_parse_number(const char **start, const char **end, char **error)
  *                                                                            *
  * Purpose: Parses the specified literal value                                *
  *                                                                            *
- * Parameters: start  - [IN] the JSON data without leading whitespace         *
- *             end    - [OUT] the reference to the literal ending character   *
- *             error  - [OUT] the parsing error message                       *
+ * Parameters: start - [IN] the JSON data without leading whitespace          *
+ *             end   - [OUT] the reference to the literal ending character    *
+ *             error - [OUT] the parsing error message                        *
  *                                                                            *
  * Return value: SUCCEED - the literal was parsed successfully                *
  *               FAIL    - an error occurred during parsing, the error        *
@@ -276,17 +265,14 @@ int	json_parse_number(const char **start, const char **end, char **error)
  *           false.                                                           *
  *                                                                            *
  ******************************************************************************/
-int	json_parse_literal(const char **start, const char **end, const char *text, char **error)
+static int	json_parse_literal(const char *start, const char **end, const char *text, char **error)
 {
-	const char	*ptr = *start;
-
-	if ('\0' == *text)
-		return json_error("no literal parse value specified", NULL, error);
+	const char	*ptr = start;
 
 	while ('\0' != *text)
 	{
 		if (*ptr != *text)
-			return json_error("invalid literal value", *start, error);
+			return json_error("invalid literal value", start, error);
 		ptr++;
 		text++;
 	}
@@ -301,9 +287,10 @@ int	json_parse_literal(const char **start, const char **end, const char *text, c
  *                                                                            *
  * Purpose: Parses JSON object value                                          *
  *                                                                            *
- * Parameters: start  - [IN] the JSON data                                    *
- *             end    - [OUT] the reference to the value ending character     *
- *             error  - [OUT] the parsing error message                       *
+ * Parameters: start - [IN/OUT] the JSON data; returns the reference the real *
+ *                     data (without spaces)                                  *
+ *             end   - [OUT] the reference to the value ending character      *
+ *             error - [OUT] the parsing error message                        *
  *                                                                            *
  * Return value: SUCCEED - the value was parsed successfully                  *
  *               FAIL    - an error occurred during parsing, the error        *
@@ -311,10 +298,8 @@ int	json_parse_literal(const char **start, const char **end, const char *text, c
  *                                                                            *
  * Author: Andris Zeila                                                       *
  *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
  ******************************************************************************/
-int	json_parse_value(const char **start, const char **end, char **error)
+static int	json_parse_value(const char **start, const char **end, char **error)
 {
 	const char	*ptr = *start;
 
@@ -326,37 +311,30 @@ int	json_parse_value(const char **start, const char **end, char **error)
 	{
 		case '\0':
 			return json_error("unexpected end of object value", NULL, error);
-
 		case '"':
-			if (FAIL == json_parse_string(&ptr, end, error))
+			if (FAIL == json_parse_string(ptr, end, error))
 				return FAIL;
 			break;
-
 		case '{':
 			if (FAIL == json_parse_object(&ptr, end, error))
 				return FAIL;
 			break;
-
 		case '[':
-			if (FAIL == json_parse_array(&ptr, end, error))
+			if (FAIL == json_parse_array(ptr, end, error))
 				return FAIL;
 			break;
-
 		case 't':
-			if (FAIL == json_parse_literal(&ptr, end, "true", error))
+			if (FAIL == json_parse_literal(ptr, end, "true", error))
 				return FAIL;
 			break;
-
 		case 'f':
-			if (FAIL == json_parse_literal(&ptr, end, "false", error))
+			if (FAIL == json_parse_literal(ptr, end, "false", error))
 				return FAIL;
 			break;
-
 		case 'n':
-			if (FAIL == json_parse_literal(&ptr, end, "null", error))
+			if (FAIL == json_parse_literal(ptr, end, "null", error))
 				return FAIL;
 			break;
-
 		case '0':
 		case '1':
 		case '2':
@@ -368,14 +346,11 @@ int	json_parse_value(const char **start, const char **end, char **error)
 		case '8':
 		case '9':
 		case '-':
-		case '.':
-			if (FAIL == json_parse_number(&ptr, end, error))
+			if (FAIL == json_parse_number(ptr, end, error))
 				return FAIL;
 			break;
-
 		default:
 			return json_error("invalid JSON object value starting character", ptr, error);
-
 	}
 
 	return SUCCEED;
@@ -387,7 +362,8 @@ int	json_parse_value(const char **start, const char **end, char **error)
  *                                                                            *
  * Purpose: Parses JSON object                                                *
  *                                                                            *
- * Parameters: start - [IN] the JSON data                                     *
+ * Parameters: start - [IN/OUT] the JSON data; returns the reference the real *
+ *                     data (without spaces)                                  *
  *             end   - [OUT] the reference to the object ending character '}' *
  *             error - [OUT] the parsing error message                        *
  *                                                                            *
@@ -396,8 +372,6 @@ int	json_parse_value(const char **start, const char **end, char **error)
  *                         parameter contains allocated error message         *
  *                                                                            *
  * Author: Andris Zeila                                                       *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 int	json_parse_object(const char **start, const char **end, char **error)
@@ -421,7 +395,7 @@ int	json_parse_object(const char **start, const char **end, char **error)
 		STRIP_WHITESPACE(ptr);
 
 		/* cannot parse object name, failing */
-		if (FAIL == json_parse_string(&ptr, end, error))
+		if (FAIL == json_parse_string(ptr, end, error))
 			return FAIL;
 
 		ptr = *end + 1;
@@ -439,8 +413,8 @@ int	json_parse_object(const char **start, const char **end, char **error)
 		ptr = *end + 1;
 
 		STRIP_WHITESPACE(ptr);
-
-	} while (',' == *ptr);
+	}
+	while (',' == *ptr);
 
 	/* object is not properly closed, failing */
 	if ('}' != *ptr)
@@ -450,5 +424,3 @@ int	json_parse_object(const char **start, const char **end, char **error)
 
 	return SUCCEED;
 }
-
-
