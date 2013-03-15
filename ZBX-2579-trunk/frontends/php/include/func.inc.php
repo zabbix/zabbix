@@ -624,9 +624,10 @@ function convert_units($value, $units, $convert = ITEM_CONVERT_WITH_UNITS, $byte
 		}
 	}
 
-	if (round($valUnit['value'], 6) > 0) {
+	if (round($valUnit['value'], ZBX_UNITS_ROUNDOFF_LOWER_LIMIT) > 0) {
 		if ($valUnit['pow'] >= 0) {
-			$valUnit['value'] = bcdiv(sprintf('%.6f',$value), sprintf('%.6f', $valUnit['value']), 6);
+			$valUnit['value'] = bcdiv(sprintf('%.6f',$value), sprintf('%.6f', $valUnit['value']),
+				ZBX_UNITS_ROUNDOFF_LOWER_LIMIT);
 		}
 		else {
 			$valUnit['value'] = bcdiv(sprintf('%.10f',$value), sprintf('%.10f', $valUnit['value']), 10);
@@ -698,9 +699,10 @@ function convertToBase1024 ($value ,$step = false) {
 		}
 	}
 
-	if (round($valData['value'], 6) > 0) {
+	if (round($valData['value'], ZBX_UNITS_ROUNDOFF_LOWER_LIMIT) > 0) {
 		if ($valData['pow'] >= 0) {
-			$valData['value'] = bcdiv(sprintf('%.6f',$value), sprintf('%.6f', $valData['value']), 6);
+			$valData['value'] = bcdiv(sprintf('%.6f',$value), sprintf('%.6f', $valData['value']),
+				ZBX_UNITS_ROUNDOFF_LOWER_LIMIT);
 
 			$valData['value'] = sprintf('%.6f', round(bcmul($valData['value'], bcpow(1024, $valData['pow'])),
 				ZBX_UNITS_ROUNDOFF_UPPER_LIMIT));
