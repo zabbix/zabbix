@@ -917,13 +917,13 @@ function get_actions_hint_by_eventid($eventid, $status = null) {
 	return $tab_hint;
 }
 
-function get_event_actions_status($eventid) {
-	$actionTable = new CTable(' - ');
+function get_event_actions_status($eventId) {
+	$table = new CTable(' - ');
 
 	$alerts = DBfetch(DBselect(
 		'SELECT COUNT(a.alertid) AS cnt_all'.
 		' FROM alerts a'.
-		' WHERE a.eventid='.$eventid.
+		' WHERE a.eventid='.$eventId.
 			' AND a.alerttype IN ('.ALERT_TYPE_MESSAGE.','.ALERT_TYPE_COMMAND.')'
 	));
 
@@ -934,10 +934,11 @@ function get_event_actions_status($eventid) {
 		$tmp = DBfetch(DBselect(
 			'SELECT COUNT(a.alertid) AS sent'.
 			' FROM alerts a'.
-			' WHERE a.eventid='.$eventid.
+			' WHERE a.eventid='.$eventId.
 				' AND a.alerttype IN ('.ALERT_TYPE_MESSAGE.','.ALERT_TYPE_COMMAND.')'.
 				' AND a.status='.ALERT_STATUS_SENT
 		));
+
 		$alerts['sent'] = $tmp['sent'];
 		$mixed += $alerts['sent'] ? ALERT_STATUS_SENT : 0;
 
@@ -945,7 +946,7 @@ function get_event_actions_status($eventid) {
 		$tmp = DBfetch(DBselect(
 			'SELECT COUNT(a.alertid) AS inprogress'.
 			' FROM alerts a'.
-			' WHERE a.eventid='.$eventid.
+			' WHERE a.eventid='.$eventId.
 				' AND a.alerttype IN ('.ALERT_TYPE_MESSAGE.','.ALERT_TYPE_COMMAND.')'.
 				' AND a.status='.ALERT_STATUS_NOT_SENT
 		));
@@ -955,7 +956,7 @@ function get_event_actions_status($eventid) {
 		$tmp = DBfetch(DBselect(
 			'SELECT COUNT(a.alertid) AS failed'.
 			' FROM alerts a'.
-			' WHERE a.eventid='.$eventid.
+			' WHERE a.eventid='.$eventId.
 				' AND a.alerttype IN ('.ALERT_TYPE_MESSAGE.','.ALERT_TYPE_COMMAND.')'.
 				' AND a.status='.ALERT_STATUS_FAILED
 		));
@@ -980,9 +981,11 @@ function get_event_actions_status($eventid) {
 
 			$status = new CRow(array($tdl, $tdr));
 		}
-		$actionTable->addRow($status);
+
+		$table->addRow($status);
 	}
-	return $actionTable;
+
+	return $table;
 }
 
 function get_event_actions_stat_hints($eventid) {

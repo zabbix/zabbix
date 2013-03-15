@@ -198,10 +198,11 @@ function make_small_eventlist($startEvent) {
 	return $table;
 }
 
-function make_popup_eventlist($eventid, $trigger_type, $triggerid) {
+function make_popup_eventlist($triggerId, $eventId) {
 	$config = select_config();
 
 	$table = new CTableInfo();
+	$table->setAttribute('style', 'width: 400px;');
 
 	// if acknowledges are turned on, we show 'ack' column
 	if ($config['event_ack_enable']) {
@@ -211,26 +212,24 @@ function make_popup_eventlist($eventid, $trigger_type, $triggerid) {
 		$table->setHeader(array(_('Time'), _('Status'), _('Duration'), _('Age')));
 	}
 
-	$table->setAttribute('style', 'width: 400px;');
-
-	$options = array(
+	$events = API::Event()->get(array(
 		'output' => API_OUTPUT_EXTEND,
-		'triggerids' => $triggerid,
-		'eventid_till' => $eventid,
+		'triggerids' => $triggerId,
+		'eventid_till' => $eventId,
 		'filter' => array(
 			'object' => EVENT_OBJECT_TRIGGER,
 			'value_changed' => TRIGGER_VALUE_CHANGED_YES
 		),
-		'nopermissions' => 1,
+		'nopermissions' => true,
 		'select_acknowledges' => API_OUTPUT_COUNT,
 		'sortfield' => 'eventid',
 		'sortorder' => ZBX_SORT_DOWN,
 		'limit' => ZBX_WIDGET_ROWS
-	);
-	$db_events = API::Event()->get($options);
+	));
 
 	$lclock = time();
-	foreach ($db_events as $event) {
+
+	foreach ($events as $event) {
 		$duration = zbx_date2age($lclock, $event['clock']);
 		$lclock = $event['clock'];
 
@@ -239,14 +238,12 @@ function make_popup_eventlist($eventid, $trigger_type, $triggerid) {
 		// add colors and blinking to span depending on configuration and trigger parameters
 		addTriggerValueStyle($eventStatusSpan, $event['value'], $event['clock'], $event['acknowledged']);
 
-		$ack = getEventAckState($event, false, false);
-
 		$table->addRow(array(
 			zbx_date2str(_('d M Y H:i:s'), $event['clock']),
 			$eventStatusSpan,
 			$duration,
 			zbx_date2age($event['clock']),
-			$ack
+			getEventAckState($event, false, false)
 		));
 	}
 

@@ -86,6 +86,7 @@ class CTrigger extends CTriggerGeneral {
 			'withUnacknowledgedEvents'		=> null,
 			'withAcknowledgedEvents'		=> null,
 			'withLastEventUnacknowledged'	=> null,
+			'withLastEvent'					=> null,
 			'skipDependent'					=> null,
 			'nopermissions'					=> null,
 			'editable'						=> null,
@@ -338,6 +339,7 @@ class CTrigger extends CTriggerGeneral {
 						' AND e.acknowledged='.EVENT_NOT_ACKNOWLEDGED.
 					')';
 		}
+
 		// withAcknowledgedEvents
 		if (!is_null($options['withAcknowledgedEvents'])) {
 			$sqlParts['where']['ack'] = 'NOT EXISTS ('.
@@ -729,6 +731,29 @@ class CTrigger extends CTriggerGeneral {
 				if (!isset($correctTriggerids[$triggerid])) {
 					unset($result[$triggerid]);
 					unset($triggerids[$triggerid]);
+				}
+			}
+		}
+
+		if (!is_null($options['withLastEvent'])) {
+			foreach ($result as $triggerId => $trigger) {
+				$event = API::Event()->get(array(
+					'object' => EVENT_SOURCE_TRIGGERS,
+					'triggerids' => $triggerId,
+					'output' => API_OUTPUT_EXTEND,
+					'nopermissions' => true,
+					'filter' => array(
+						'object' => EVENT_OBJECT_TRIGGER,
+						'value' => TRIGGER_VALUE_TRUE,
+						'value_changed' => TRIGGER_VALUE_CHANGED_YES
+					),
+					'sortfield' => array('eventid'),
+					'sortorder' => ZBX_SORT_DOWN,
+					'limit' => 1
+				));
+
+				if ($event) {
+					$result[$triggerId]['event'] = reset($event);
 				}
 			}
 		}
