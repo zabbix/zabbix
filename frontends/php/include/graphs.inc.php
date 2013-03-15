@@ -850,24 +850,28 @@ function find_period_end($periods, $time, $max_time) {
 function getBase1024Interval($interval, $minY, $maxY) {
 	$intervalData = convertToBase1024($interval);
 	$interval = $intervalData['value'];
+
 	if ($maxY > 0) {
 		$absMaxY = $maxY;
 	}
 	else {
 		$absMaxY = bcmul($maxY, '-1');
 	}
+
 	if ($minY > 0) {
 		$absMinY = $minY;
 	}
 	else {
 		$absMinY = bcmul($minY, '-1');
 	}
+
 	if ($absMaxY > $absMinY) {
 		$sideMaxData = convertToBase1024($maxY);
 	}
 	else {
 		$sideMaxData = convertToBase1024($minY);
 	}
+
 	if ($sideMaxData['pow'] != $intervalData['pow']) {
 		// interval correction, if Max Y have other unit, then interval unit = Max Y unit
 		if ($intervalData['pow'] < 0) {

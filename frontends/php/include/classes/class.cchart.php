@@ -803,16 +803,6 @@ class CChart extends CGraphDraw {
 			}
 		}
 
-		// add 1 interval so max Y wouldn't be at the top
-		if ($this->m_maxY[$side] > 0 && bcmul($this->m_minY[$side], '-1') < $this->m_maxY[$side]) {
-			$this->m_maxY[$side] = bcadd($this->m_maxY[$side], $interval);
-		}
-
-		// add 1 interval so min Y wouldn't be at the top
-		if ($this->m_minY[$side] < 0 && bcmul($this->m_minY[$side], '-1') > $this->m_maxY[$side]) {
-			$this->m_minY[$side] = bcsub($this->m_minY[$side], $interval);
-		}
-
 		// calculate interval, if left side use B or Bps
 		if (isset($leftBase1024)) {
 			$interval = getBase1024Interval($interval, $this->m_minY[$side], $this->m_maxY[$side]);
@@ -838,20 +828,16 @@ class CChart extends CGraphDraw {
 			}
 		}
 
-		// add 1 interval so max Y wouldn't be at the top
-		if ($this->m_maxY[$other_side] > 0 && bcmul($this->m_minY[$other_side], '-1') < $this->m_maxY[$other_side]) {
-			$this->m_maxY[$other_side] = bcadd($this->m_maxY[$other_side], $interval_other_side);
-		}
-
-		// add 1 interval so min Y wouldn't be at the top
-		if ($this->m_minY[$other_side] < 0 && bcmul($this->m_minY[$other_side], '-1') > $this->m_maxY[$other_side]) {
-			$this->m_minY[$other_side] = bcsub($this->m_minY[$other_side], $interval_other_side);
-		}
-
 		// calculate interval, if right side use B or Bps
 		if (isset($rightBase1024)) {
 			$interval_other_side = getBase1024Interval($interval_other_side, $this->m_minY[$other_side],
 				$this->m_maxY[$other_side]);
+		}
+
+		// save original min and max items values
+		foreach ($sides as $graphSide) {
+			$minY[$graphSide] = $this->m_minY[$graphSide];
+			$maxY[$graphSide] = $this->m_maxY[$graphSide];
 		}
 
 		// correcting MIN & MAX
@@ -859,6 +845,16 @@ class CChart extends CGraphDraw {
 		$this->m_maxY[$side] = bcmul(bcceil(bcdiv($this->m_maxY[$side], $interval)), $interval);
 		$this->m_minY[$other_side] = bcmul(bcfloor(bcdiv($this->m_minY[$other_side], $interval_other_side)), $interval_other_side);
 		$this->m_maxY[$other_side] = bcmul(bcceil(bcdiv($this->m_maxY[$other_side], $interval_other_side)), $interval_other_side);
+
+		// add 1 interval so min/max Y wouldn't be at the top
+		foreach ($sides as $graphSide) {
+			if (bccomp($this->m_minY[$graphSide], $minY[$side]) == 0 && $this->m_minY[$graphSide] != 0) {
+				$this->m_minY[$graphSide] = bcsub($this->m_minY[$graphSide], $interval);
+			}
+			if (bccomp($this->m_maxY[$graphSide], $maxY[$graphSide]) == 0 && $this->m_maxY[$graphSide] != 0) {
+				$this->m_maxY[$graphSide] = bcadd($this->m_maxY[$graphSide], $interval);
+			}
+		}
 
 		// calculate interval count for main and other side
 		$this->gridLinesCount[$side] = bcceil(bcdiv(bcsub($this->m_maxY[$side], $this->m_minY[$side]), $interval));
@@ -912,7 +908,6 @@ class CChart extends CGraphDraw {
 			$this->gridStep[$other_side] = $interval;
 		}
 
-		$sides = array(GRAPH_YAXIS_SIDE_LEFT, GRAPH_YAXIS_SIDE_RIGHT);
 		foreach ($sides as $graphSide) {
 			if (!isset($this->axis_valuetype[$graphSide])) {
 				continue;
