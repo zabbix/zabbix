@@ -846,13 +846,19 @@ class CChart extends CGraphDraw {
 		$this->m_minY[$other_side] = bcmul(bcfloor(bcdiv($this->m_minY[$other_side], $interval_other_side)), $interval_other_side);
 		$this->m_maxY[$other_side] = bcmul(bcceil(bcdiv($this->m_maxY[$other_side], $interval_other_side)), $interval_other_side);
 
-		// add 1 interval so min/max Y wouldn't be at the top
+		// add intervals so min/max Y wouldn't be at the top
 		foreach ($sides as $graphSide) {
+			if ($graphSide == $side) {
+				$tmpInterval = $interval;
+			}
+			else {
+				$tmpInterval = $interval_other_side;
+			}
 			if (bccomp($this->m_minY[$graphSide], $minY[$side]) == 0 && $this->m_minY[$graphSide] != 0) {
-				$this->m_minY[$graphSide] = bcsub($this->m_minY[$graphSide], $interval);
+				$this->m_minY[$graphSide] = bcsub($this->m_minY[$graphSide], $tmpInterval);
 			}
 			if (bccomp($this->m_maxY[$graphSide], $maxY[$graphSide]) == 0 && $this->m_maxY[$graphSide] != 0) {
-				$this->m_maxY[$graphSide] = bcadd($this->m_maxY[$graphSide], $interval);
+				$this->m_maxY[$graphSide] = bcadd($this->m_maxY[$graphSide], $tmpInterval);
 			}
 		}
 

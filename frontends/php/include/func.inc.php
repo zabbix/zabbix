@@ -630,7 +630,7 @@ function convert_units($value, $units, $convert = ITEM_CONVERT_WITH_UNITS, $byte
 				ZBX_UNITS_ROUNDOFF_LOWER_LIMIT);
 		}
 		else {
-			$valUnit['value'] = bcdiv(sprintf('%.10f',$value), sprintf('%.10f', $valUnit['value']), 10);
+			$valUnit['value'] = bcdiv(sprintf('%.10f',$value), sprintf('%.10f', $valUnit['value']), ZBX_PRECISION_10);
 		}
 	}
 	else {
@@ -709,10 +709,10 @@ function convertToBase1024 ($value ,$step = false) {
 
 		}
 		else {
-			$valData['value'] = bcmul(sprintf('%.10f',$value), sprintf('%.10f', $valData['value']), 10);
+			$valData['value'] = bcmul(sprintf('%.10f',$value), sprintf('%.10f', $valData['value']), ZBX_PRECISION_10);
 
 			for ($i = 0; $i > $valData['pow']; $i--) {
-				$valData['value'] = bcdiv(bcmul($valData['value'], 1000, 10), 1.024, 10);
+				$valData['value'] = bcdiv(bcmul($valData['value'], 1000, ZBX_PRECISION_10), 1.024, ZBX_PRECISION_10);
 			}
 
 			$valData['value'] = sprintf('%.10f', $valData['value']);
