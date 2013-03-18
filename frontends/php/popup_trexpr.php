@@ -517,16 +517,6 @@ $functions = array(
 		'params' => $param1_sec,
 		'allowed_types' => $allowed_types_any
 	),
-	'band[<]' => array(
-		'description' =>  _('Bitwise AND of last (most recent) T value and mask is < N'),
-		'params' => $paramSecIntCount,
-		'allowed_types' => $allowed_types_int
-	),
-	'band[>]' => array(
-		'description' =>  _('Bitwise AND of last (most recent) T value and mask is > N'),
-		'params' => $paramSecIntCount,
-		'allowed_types' => $allowed_types_int
-	),
 	'band[=]' => array(
 		'description' =>  _('Bitwise AND of last (most recent) T value and mask is = N'),
 		'params' => $paramSecIntCount,
@@ -653,7 +643,15 @@ if (!is_array($param)) {
 }
 
 // validate parameter value
-foreach ($param as $p) {
+foreach ($param as $key => $p) {
+
+	// skip validation for count functions third parameter, if special word
+	if ($key === 2 && substr($expr_type, 0, 5) === 'count'
+		&& in_array($p, array('eq', 'ne', 'gt', 'ge', 'lt', 'le', 'like', 'band'), true) ) {
+		continue;
+	}
+
+	// if alpha character encountered, allow only number with time postfix
 	if ($p && preg_match('/[a-zA-Z]/', $p) && !preg_match('/^[\-0-9]+(['.ZBX_TIME_SUFFIXES.']{0,1})$/', $p)) {
 		error(_s('Time parameter "%s" not supported.', $p));
 	}
