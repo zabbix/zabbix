@@ -2883,8 +2883,8 @@ static void	DBhost_prototypes_make(zbx_uint64_t hostid, zbx_vector_uint64_t *tem
 				}
 			}
 		}
+		DBfree_result(result);
 	}
-	DBfree_result(result);
 
 	zbx_free(sql);
 
