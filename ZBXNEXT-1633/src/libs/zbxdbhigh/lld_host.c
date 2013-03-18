@@ -387,6 +387,7 @@ static void	DBlld_host_make(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts,
 		host->ipmi_privilege = 0;
 		host->ipmi_username = NULL;
 		host->ipmi_password = NULL;
+		host->flags = ZBX_FLAG_LLD_HOST_DISCOVERED;
 
 		zbx_vector_ptr_append(hosts, host);
 	}
@@ -434,9 +435,9 @@ static void	DBlld_host_make(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts,
 		/* IPMI password */
 		if (0 != strcmp(host->ipmi_password, ipmi_password))
 			host->flags |= ZBX_FLAG_LLD_HOST_UPDATE_IPMI_PASS;
-	}
 
-	host->flags |= ZBX_FLAG_LLD_HOST_DISCOVERED;
+		host->flags |= ZBX_FLAG_LLD_HOST_DISCOVERED;
+	}
 
 	zbx_free(buffer);
 
