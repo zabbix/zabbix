@@ -200,7 +200,6 @@ if (isset($_REQUEST['unlink']) || isset($_REQUEST['unlink_and_clear'])) {
 	}
 }
 elseif (isset($_REQUEST['clone']) && isset($_REQUEST['hostid'])) {
-	unset($_REQUEST['hostid']);
 	$_REQUEST['form'] = 'clone';
 }
 elseif (isset($_REQUEST['full_clone']) && isset($_REQUEST['hostid'])) {
@@ -648,7 +647,7 @@ elseif (isset($_REQUEST['form'])) {
 		$host = reset($host);
 	}
 
-	if (get_request('hostid') && $host['discoveryRule']) {
+	if (get_request('hostid') && $host['discoveryRule'] && get_request('form') == 'update') {
 		$proxy = array();
 		if ($host['proxy_hostid']) {
 			$proxy = API::Proxy()->get(array(

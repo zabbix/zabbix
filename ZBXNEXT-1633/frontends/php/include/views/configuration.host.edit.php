@@ -103,7 +103,7 @@ else {
 	$original_templates = array();
 }
 
-if ($_REQUEST['hostid'] > 0 && !isset($_REQUEST['form_refresh'])) {
+if ($_REQUEST['hostid'] > 0 && (!isset($_REQUEST['form_refresh']) || in_array(get_request('form'), array('clone', 'full_clone')))) {
 	$proxy_hostid = $dbHost['proxy_hostid'];
 	$host = $dbHost['host'];
 	$visiblename = $dbHost['name'];
@@ -158,7 +158,7 @@ $frmHost->addVar('clear_templates', $clear_templates);
 
 $hostList = new CFormList('hostlist');
 
-if ($_REQUEST['hostid'] > 0) {
+if ($_REQUEST['hostid'] > 0 && get_request('form') != 'clone') {
 	$frmHost->addVar('hostid', $_REQUEST['hostid']);
 }
 if ($_REQUEST['groupid'] > 0) {
