@@ -562,7 +562,7 @@ int	DBdelete_template_elements(zbx_uint64_t hostid, zbx_vector_uint64_t *del_tem
 void	DBdelete_items(zbx_vector_uint64_t *itemids);
 void	DBdelete_triggers(zbx_vector_uint64_t *triggerids);
 void	DBdelete_graphs(zbx_vector_uint64_t *graphids);
-void	DBdelete_host(zbx_uint64_t hostid);
+void	DBdelete_hosts(zbx_vector_uint64_t *hostids);
 void	DBget_graphitems(const char *sql, ZBX_GRAPH_ITEMS **gitems, size_t *gitems_alloc, size_t *gitems_num);
 void	DBupdate_services(zbx_uint64_t triggerid, int status, int clock);
 

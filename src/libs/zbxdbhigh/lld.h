@@ -39,6 +39,7 @@ void	DBlld_update_triggers(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, struct 
 		char **error, const char *f_macro, const char *f_regexp, ZBX_REGEXP *regexps, int regexps_num);
 
 void	DBlld_update_hosts(zbx_uint64_t discovery_itemid, struct zbx_json_parse *jp_data, char **error,
-		const char *f_macro, const char *f_regexp, ZBX_REGEXP *regexps, int regexps_num, int lastcheck);
+		const char *f_macro, const char *f_regexp, ZBX_REGEXP *regexps, int regexps_num,
+		unsigned short lifetime, int lastcheck);
 
 #endif
