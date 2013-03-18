@@ -920,50 +920,32 @@ function get_actions_hint_by_eventid($eventid, $status = null) {
 function get_event_actions_status($eventId) {
 	$table = new CTable(' - ');
 
-	$alerts = DBfetch(DBselect(
-		'SELECT COUNT(a.alertid) AS cnt_all'.
+	$alerts = DBfetchArray(DBselect(
+		'SELECT a.status, COUNT(a.alertid) AS cnt'.
 		' FROM alerts a'.
 		' WHERE a.eventid='.$eventId.
-			' AND a.alerttype IN ('.ALERT_TYPE_MESSAGE.','.ALERT_TYPE_COMMAND.')'
+			' AND a.alerttype IN ('.ALERT_TYPE_MESSAGE.','.ALERT_TYPE_COMMAND.')
+		GROUP BY status'
 	));
 
-	if (isset($alerts['cnt_all']) && $alerts['cnt_all'] > 0) {
+	if ($alerts) {
+		$alerts = zbx_toHash($alerts, 'status');
+
+		$sendCount = isset($alerts[ALERT_STATUS_SENT]) ? $alerts[ALERT_STATUS_SENT] : 0;
+		$notSendCount = isset($alerts[ALERT_STATUS_NOT_SENT]) ? $alerts[ALERT_STATUS_NOT_SENT] : 0;
+		$failedCount = isset($alerts[ALERT_STATUS_FAILED]) ? $alerts[ALERT_STATUS_FAILED] : 0;
+
+		// calculate total
 		$mixed = 0;
+		if ($sendCount > 0) {
+			$mixed += ALERT_STATUS_SENT;
+		}
+		if ($failedCount > 0) {
+			$mixed += ALERT_STATUS_FAILED;
+		}
 
-		// sent
-		$tmp = DBfetch(DBselect(
-			'SELECT COUNT(a.alertid) AS sent'.
-			' FROM alerts a'.
-			' WHERE a.eventid='.$eventId.
-				' AND a.alerttype IN ('.ALERT_TYPE_MESSAGE.','.ALERT_TYPE_COMMAND.')'.
-				' AND a.status='.ALERT_STATUS_SENT
-		));
-
-		$alerts['sent'] = $tmp['sent'];
-		$mixed += $alerts['sent'] ? ALERT_STATUS_SENT : 0;
-
-		// in progress
-		$tmp = DBfetch(DBselect(
-			'SELECT COUNT(a.alertid) AS inprogress'.
-			' FROM alerts a'.
-			' WHERE a.eventid='.$eventId.
-				' AND a.alerttype IN ('.ALERT_TYPE_MESSAGE.','.ALERT_TYPE_COMMAND.')'.
-				' AND a.status='.ALERT_STATUS_NOT_SENT
-		));
-		$alerts['inprogress'] = $tmp['inprogress'];
-
-		// failed
-		$tmp = DBfetch(DBselect(
-			'SELECT COUNT(a.alertid) AS failed'.
-			' FROM alerts a'.
-			' WHERE a.eventid='.$eventId.
-				' AND a.alerttype IN ('.ALERT_TYPE_MESSAGE.','.ALERT_TYPE_COMMAND.')'.
-				' AND a.status='.ALERT_STATUS_FAILED
-		));
-		$alerts['failed'] = $tmp['failed'];
-		$mixed += $alerts['failed'] ? ALERT_STATUS_FAILED : 0;
-
-		if ($alerts['inprogress']) {
+		// display
+		if ($notSendCount > 0) {
 			$status = new CSpan(_('In progress'), 'orange');
 		}
 		elseif ($mixed == ALERT_STATUS_SENT) {
@@ -973,13 +955,13 @@ function get_event_actions_status($eventId) {
 			$status = new CSpan(_('Failed'), 'red');
 		}
 		else {
-			$tdl = new CCol($alerts['sent'] ? new CSpan($alerts['sent'], 'green') : SPACE);
-			$tdl->setAttribute('width', '10');
+			$columnLeft = new CCol(($sendCount > 0) ? new CSpan($sendCount, 'green') : SPACE);
+			$columnLeft->setAttribute('width', '10');
 
-			$tdr = new CCol($alerts['failed'] ? new CSpan($alerts['failed'], 'red') : SPACE);
-			$tdr->setAttribute('width', '10');
+			$columnRight = new CCol(($failedCount > 0) ? new CSpan($failedCount, 'red') : SPACE);
+			$columnRight->setAttribute('width', '10');
 
-			$status = new CRow(array($tdl, $tdr));
+			$status = new CRow(array($columnLeft, $columnRight));
 		}
 
 		$table->addRow($status);
