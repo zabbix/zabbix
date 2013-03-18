@@ -667,7 +667,7 @@ function convertFunctionValue($value) {
  * Swap two values.
  *
  * @param mixed $a first value
- * @param array $b second value
+ * @param mixed $b second value
  */
 function zbx_swap(&$a, &$b) {
 	$tmp = $a;
