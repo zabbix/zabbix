@@ -63,13 +63,13 @@ $param1_sec = array(
 $param1_str = array(
 	array(
 		'C' => 'T', // caption
-		'T' => T_ZBX_STR
+		'T' => T_ZBX_STR // type
 	)
 );
 $param2_sec_count = array(
 	array(
 		'C' => 'V', // caption
-		'T' => T_ZBX_STR
+		'T' => T_ZBX_STR // type
 	),
 	array(
 		'C' => _('Last of').' (T)', // caption
@@ -85,11 +85,11 @@ $param3_sec_val = array(
 	),
 	array(
 		'C' => 'V', // caption
-		'T' => T_ZBX_STR
+		'T' => T_ZBX_STR // type
 	),
 	array(
 		'C' => 'O', // caption
-		'T' => T_ZBX_STR
+		'T' => T_ZBX_STR // type
 	),
 	array(
 		'C' => _('Time shift').' ', // caption
@@ -514,7 +514,7 @@ $fields = array(
 	'value' =>				array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({insert})'),
 	// action
 	'insert' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
-	'cancel' =>				array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
+	'cancel' =>				array(T_ZBX_STR, O_OPT, P_SYS,	null,		null)
 );
 check_fields($fields);
 
@@ -615,9 +615,12 @@ if (!is_array($param)) {
 }
 
 // validate parameter value
-foreach ($param as $p) {
-	if ($p && preg_match('/[a-zA-Z]/', $p) && !preg_match('/^[\-0-9]+(['.ZBX_TIME_SUFFIXES.']{0,1})$/', $p)) {
-		error(_s('Time parameter "%s" not supported.', $p));
+if (isset($functions[$expr_type]['params'])) {
+	foreach ($param as $pnum => $p) {
+		if (isset($functions[$expr_type]['params'][$pnum]) && $functions[$expr_type]['params'][$pnum]['T'] == T_ZBX_INT
+				&& $p && preg_match('/[a-zA-Z]/', $p) && !preg_match('/^[\-0-9]+(['.ZBX_TIME_SUFFIXES.']{0,1})$/', $p)) {
+			error(_s('Time parameter "%s" not supported.', $p));
+		}
 	}
 }
 
