@@ -75,7 +75,7 @@ class testInheritanceTriggerPrototype extends CWebTest {
 	 * Backup the tables that will be modified during the tests.
 	 */
 	public function testInheritanceTriggerPrototype_setup() {
-		DBsave_tables('hosts');
+		DBsave_tables('triggers');
 	}
 
 	// returns all possible trigger data
@@ -253,19 +253,283 @@ class testInheritanceTriggerPrototype extends CWebTest {
 	public static function simple() {
 		return array(
 			array(
+				array(
+					'expected' => TRIGGER_BAD,
+					'errors' => array(
+						'ERROR: Page received incorrect data',
+						'Warning. Incorrect value for field "Name": cannot be empty.',
+						'Warning. Incorrect value for field "expression": cannot be empty.'
+					)
+				)
+			),
+			array(
+				array(
+					'expected' => TRIGGER_BAD,
+					'description' => 'MyTrigger',
+					'errors' => array(
+						'ERROR: Page received incorrect data',
+						'Warning. Incorrect value for field "expression": cannot be empty.'
+					)
+				)
+			),
+			array(
+				array(
+					'expected' => TRIGGER_BAD,
+					'expression' => '6 & 0 | 0',
+					'errors' => array(
+						'ERROR: Page received incorrect data',
+						'Warning. Incorrect value for field "Name": cannot be empty.'
+					)
+				)
+			),
+			array(
+				array(
+					'expected' => TRIGGER_BAD,
+					'description' => 'MyTrigger',
+					'expression' => '{Inheritance test template}',
+					'errors' => array(
+						'ERROR: Cannot add trigger',
+						'Incorrect trigger expression. Check expression part starting from "{Inheritance test template}".'
+					)
+				)
+			),
+			array(
+				array(
+					'expected' => TRIGGER_GOOD,
+					'description' => 'MyTrigger_sysUptime',
+					'expression' => '{Inheritance test template:item-discovery-prototype.last(0)}<0',
+					'expressionHost' => '{Template inheritance test host:item-discovery-prototype.last(0)}<0',
+					'hostCheck' => true,
+				)
+			),
+			array(
+				array(
+					'expected' => TRIGGER_GOOD,
+					'description' => '1234567890',
+					'expression' => '{Inheritance test template:item-discovery-prototype.last(0)}<0',
+					'expressionHost' => '{Template inheritance test host:item-discovery-prototype.last(0)}<0',
+					'hostCheck' => true,
+				)
+			),
+			array(
+				array(
+					'expected' => TRIGGER_GOOD,
+					'description' => 'a?aa+',
+					'expression' => '{Inheritance test template:item-discovery-prototype.last(0)}<0',
+					'expressionHost' => '{Template inheritance test host:item-discovery-prototype.last(0)}<0',
+					'hostCheck' => true,
+				)
+			),
+			array(
+				array(
+					'expected' => TRIGGER_GOOD,
+					'description' => '}aa]a{',
+					'expression' => '{Inheritance test template:item-discovery-prototype.last(0)}<0',
+					'expressionHost' => '{Template inheritance test host:item-discovery-prototype.last(0)}<0',
+					'hostCheck' => true,
+				)
+			),
+			array(
+				array(
+					'expected' => TRIGGER_GOOD,
+					'description' => '-aaa=%',
+					'expression' => '{Inheritance test template:item-discovery-prototype.last(0)}<0',
+					'expressionHost' => '{Template inheritance test host:item-discovery-prototype.last(0)}<0',
+					'hostCheck' => true,
+				)
+			),
+			array(
+				array(
+					'expected' => TRIGGER_GOOD,
+					'description' => 'aaa,;:',
+					'expression' => '{Inheritance test template:item-discovery-prototype.last(0)}<0',
+					'expressionHost' => '{Template inheritance test host:item-discovery-prototype.last(0)}<0',
+					'hostCheck' => true,
+				)
+			),
+			array(
+				array(
+					'expected' => TRIGGER_GOOD,
+					'description' => 'aaa><.',
+					'expression' => '{Inheritance test template:item-discovery-prototype.last(0)}<0',
+					'hostCheck' => true,
+				)
+			),
+			array(
+				array(
+					'expected' => TRIGGER_GOOD,
+					'description' => 'aaa*&_',
+					'expression' => '{Inheritance test template:item-discovery-prototype.last(0)}<0',
+					'hostCheck' => true,
+				)
+			),
+			array(
+				array(
+					'expected' => TRIGGER_GOOD,
+					'description' => 'aaa#@!',
+					'expression' => '{Inheritance test template:item-discovery-prototype.last(0)}<0',
+					'hostCheck' => true,
+				)
+			),
+			array(
+				array(
+					'expected' => TRIGGER_GOOD,
+					'description' => '([)$^',
+					'expression' => '{Inheritance test template:item-discovery-prototype.last(0)}<0',
+					'hostCheck' => true,
+				)
+			),
+			array(
+				array(
+					'expected' => TRIGGER_GOOD,
+					'description' => 'MyTrigger_generalCheck',
+					'expression' => '{Inheritance test template:item-discovery-prototype.last(0)}<5',
+					'type' => true,
+					'comments' => 'Trigger status (expression) is recalculated every time Zabbix server receives new value, if this value is part of this expression. If time based functions are used in the expression, it is recalculated every 30 seconds by a zabbix timer process. ',
+					'url' => 'www.zabbix.com',
+					'severity' => 'High',
+					'status' => false,
+				)
+			),
+			array(
+				array(
+					'expected' => TRIGGER_BAD,
+					'description' => 'MyTrigger',
+					'expression' => '{Inheritance test template:someItem.uptime.last(0)}<0',
+					'errors' => array(
+						'ERROR: Cannot add trigger',
+						'Incorrect item key "someItem.uptime" provided for trigger expression on "Inheritance test template".'
+					)
+				)
+			),
+			array(
+				array(
+					'expected' => TRIGGER_BAD,
+					'description' => 'MyTrigger',
+					'expression' => '{Inheritance test template:item-discovery-prototype.somefunc(0)}<0',
+					'errors' => array(
+						'ERROR: Cannot add trigger',
+						'Cannot implode expression "{Inheritance test template:item-discovery-prototype.somefunc(0)}<0". Incorrect trigger function "somefunc" provided in expression. Unknown function.'
+					)
+				)
+			),
+			array(
+				array(
+					'expected' => TRIGGER_BAD,
+					'description' => 'MyTrigger',
+					'expression' => '{Inheritance test template:item-discovery-prototype.last(0)} | {#MACRO}',
+					'constructor' => array(array(
+						'text' => array('A | B', 'A', 'B'),
+						'elements' => array('expr_0_59', 'expr_63_70')
+						)
+					)
+				)
+			),
+			array(
+				array(
+					'expected' => TRIGGER_BAD,
+					'description' => 'MyTrigger',
+					'expression' => '{Zabbix host:item-discovery-prototype.last(0)}<0 | 8 & 9',
+					'constructor' => array(array(
+						'text' => array('A | (B & C)', 'OR', 'AND', 'A', 'B', 'C'),
+						'elements' => array('expr_0_47', 'expr_51_51', 'expr_55_55')
+						)
+					)
+				)
+			),
+			array(
+				array(
+					'expected' => TRIGGER_BAD,
+					'description' => 'MyTrigger',
+					'expression' => '{Inheritance test template:someItem.uptime.last(0)}<0 | 8 & 9 + {Inheritance test template:item-discovery-prototype.last(0)}',
+					'constructor' => array(array(
+						'text' => array('A | (B & C)', 'A', 'B', 'C'),
+						'elements' => array('expr_0_52', 'expr_56_56', 'expr_60_123')
+						)
+					)
+				)
+			),
+			array(
+				array(
+					'expected' => TRIGGER_BAD,
+					'description' => 'MyTrigger',
+					'expression' => '{Inheritance test template:item-discovery-prototype.lasta(0)}<0 | 8 & 9 + {Inheritance test template:item-discovery-prototype.last(0)}',
+					'constructor' => array(array(
+						'text' => array('A | (B & C)', 'A', 'B', 'C'),
+						'elements' => array('expr_0_62', 'expr_66_66', 'expr_70_133')
+						)
+					)
+				)
+			),
+			array(
+				array(
+					'expected' => TRIGGER_BAD,
+					'description' => 'MyTrigger',
+					'expression' => '{Inheritance test template@:item-discovery-prototype.last(0)}',
+					'constructor' => array(array(
+						'errors' => array(
+							'ERROR: Expression Syntax Error.',
+							'Incorrect trigger expression. Check expression part starting from "{Inheritance test template@:item-discovery-prototype.last(0)}".'),
+						)
+					)
+				)
+			),
+			array(
+				array(
+					'expected' => TRIGGER_BAD,
+					'description' => 'MyTrigger',
+					'expression' => '{Inheritance test template:system .uptime.last(0)}',
+					'constructor' => array(array(
+						'errors' => array(
+							'ERROR: Expression Syntax Error.',
+							'Incorrect trigger expression. Check expression part starting from "{Inheritance test template:system .uptime.last(0)}".'),
+						)
+					)
+				)
+			),
+			array(
+				array(
+					'expected' => TRIGGER_BAD,
+					'description' => 'MyTrigger',
+					'expression' => '{Inheritance test template:system .uptime.last(0)}',
+					'constructor' => array(array(
+						'errors' => array(
+							'ERROR: Expression Syntax Error.',
+							'Incorrect trigger expression. Check expression part starting from "{Inheritance test template:system .uptime.last(0)}".'),
+						)
+					)
+				)
+			),
+			array(
+				array(
+					'expected' => TRIGGER_BAD,
+					'description' => 'MyTrigger',
+					'expression' => '{Inheritance test template:item-discovery-prototype.lastA(0)}',
+					'constructor' => array(array(
+						'errors' => array(
+							'ERROR: Expression Syntax Error.',
+							'Incorrect trigger expression. Check expression part starting from "{Inheritance test template:item-discovery-prototype.lastA(0)}".'),
+						)
+					)
+				)
+			),
+			array(
 				array('expected' => TRIGGER_GOOD,
 					'description' => 'triggerSimple',
+					'expression' => 'default',
 					'hostCheck' => true,
 					'dbCheck' => true)
 			),
 			array(
 				array('expected' => TRIGGER_GOOD,
 					'description' => 'triggerName',
+					'expression' => 'default',
 					'hostCheck' => true)
 			),
 			array(
 				array('expected' => TRIGGER_GOOD,
 					'description' => 'triggerRemove',
+					'expression' => 'default',
 					'hostCheck' => true,
 					'dbCheck' => true,
 					'remove' => true)
@@ -273,6 +537,7 @@ class testInheritanceTriggerPrototype extends CWebTest {
 			array(
 				array('expected' => TRIGGER_GOOD,
 					'description' => 'triggerNotRemove',
+					'expression' => 'default',
 					'hostCheck' => true,
 					'dbCheck' => true,
 					'hostRemove' => true,
@@ -281,6 +546,7 @@ class testInheritanceTriggerPrototype extends CWebTest {
 			array(
 				array('expected' => TRIGGER_BAD,
 					'description' => 'triggerSimple',
+					'expression' => 'default',
 					'errors' => array(
 						'ERROR: Cannot add trigger',
 						'Trigger "triggerSimple" already exists on "Inheritance test template".')
@@ -293,11 +559,6 @@ class testInheritanceTriggerPrototype extends CWebTest {
 	 * @dataProvider simple
 	 */
 	public function testInheritanceTriggerPrototype_simpleCreate($data) {
-		$this->zbxTestLogin('templates.php');
-
-		$description = $data['description'];
-		$expression = '{'.$this->template.':'.$this->itemKey.'.last(0)}=0';
-		$expressionHost = '{'.$this->host.':'.$this->itemKey.'.last(0)}=0';
 
 		$this->zbxTestLogin('templates.php');
 		$this->zbxTestClickWait('link='.$this->template);
@@ -306,29 +567,107 @@ class testInheritanceTriggerPrototype extends CWebTest {
 		$this->zbxTestClickWait('link=Trigger prototypes');
 		$this->zbxTestClickWait('form');
 
-
-		$this->input_type('description', $description);
-		$this->input_type('expression', $expression);
-		$this->zbxTestClickWait('save');
-
-		switch ($data['expected']) {
-			case TRIGGER_GOOD:
-				$this->zbxTestTextPresent('Trigger added');
-				$this->checkTitle('Configuration of trigger prototypes');
-				$this->zbxTestTextPresent(array('CONFIGURATION OF TRIGGER PROTOTYPES', "Trigger prototypes of ".$this->discoveryRule));
-				break;
-
-			case TRIGGER_BAD:
-				$this->checkTitle('Configuration of trigger prototypes');
-				$this->zbxTestTextPresent('CONFIGURATION OF TRIGGER PROTOTYPES');
-				$this->assertElementPresent("//div[@id='tab_triggersTab' and text()='Trigger prototype']");
-				foreach ($data['errors'] as $msg) {
-					$this->zbxTestTextPresent($msg);
-				}
-				$this->zbxTestTextPresent(array('Name', 'Expression', 'Description'));
-				break;
+		if (isset($data['description'])) {
+			$this->input_type('description', $data['description']);
+			$description = $data['description'];
 		}
 
+		if (isset($data['expression'])) {
+			switch ($data['expression']) {
+				case 'default':
+					$expression = '{'.$this->template.':'.$this->itemKey.'.last(0)}=0';
+					$this->input_type('expression', $expression);
+					break;
+				default:
+					$expression = $data['expression'];
+					$this->input_type('expression', $expression);
+					break;
+			}
+		}
+
+
+		if (isset($data['type'])) {
+			$this->zbxTestCheckboxSelect('type');
+		}
+
+		if (isset($data['comments'])) {
+			$this->input_type('comments', $data['comments']);;
+		}
+
+		if (isset($data['url'])) {
+			$this->input_type('url', $data['url']);;
+		}
+
+		if (isset($data['severity'])) {
+			switch ($data['severity']) {
+				case 'Not classified':
+					$this->zbxTestClick('severity_0');
+					break;
+				case 'Information':
+					$this->zbxTestClick('severity_1');
+					break;
+				case 'Warning':
+					$this->zbxTestClick('severity_2');
+					break;
+				case 'Average':
+					$this->zbxTestClick('severity_3');
+					break;
+				case 'High':
+					$this->zbxTestClick('severity_4');
+					break;
+				case 'Disaster':
+					$this->zbxTestClick('severity_5');
+					break;
+			}
+		}
+
+		if (isset($data['status'])) {
+			$this->zbxTestCheckboxUnselect('status');
+		}
+
+		if (isset($data['constructor'])) {
+			$this->zbxTestClickWait("//span[text()='Expression constructor']");
+
+			foreach($data['constructor'] as $constructor) {
+				if (isset($constructor['errors'])) {
+					foreach($constructor['errors'] as $err) {
+						$this->zbxTestTextPresent($err);
+					}
+				}
+				else {
+					$this->assertElementPresent('test_expression');
+
+					$this->assertAttribute("//input[@id='or_expression']/@value", 'OR');
+					$this->assertElementPresent("//span[text()='Delete']");
+
+					if (isset($constructor['text'])) {
+						foreach($constructor['text'] as $txt) {
+							$this->zbxTestTextPresent($txt);
+						}
+					}
+				}
+			}
+		}
+
+		if (!isset($data['constructor'])) {
+			$this->zbxTestClickWait('save');
+			switch ($data['expected']) {
+				case TRIGGER_GOOD:
+					$this->zbxTestTextPresent('Trigger added');
+					$this->checkTitle('Configuration of trigger prototypes');
+					$this->zbxTestTextPresent(array('CONFIGURATION OF TRIGGER PROTOTYPES', "Trigger prototypes of ".$this->discoveryRule));
+					break;
+				case TRIGGER_BAD:
+					$this->checkTitle('Configuration of trigger prototypes');
+					$this->zbxTestTextPresent('CONFIGURATION OF TRIGGER PROTOTYPES');
+					$this->assertElementPresent("//div[@id='tab_triggersTab' and text()='Trigger prototype']");
+					foreach ($data['errors'] as $msg) {
+						$this->zbxTestTextPresent($msg);
+					}
+					$this->zbxTestTextPresent(array('Name', 'Expression', 'Description'));
+					break;
+			}
+		}
 
 		if (isset($data['hostCheck'])) {
 			$this->zbxTestOpenWait('hosts.php');
@@ -343,7 +682,10 @@ class testInheritanceTriggerPrototype extends CWebTest {
 			$this->zbxTestTextPresent('Parent triggers');
 			$this->assertElementPresent('link='.$this->template);
 			$this->assertElementValue('description', $description);
-			$this->assertElementValue('expression', $expressionHost);
+			if (isset($data['expressionHost'])) {
+				$expressionHost = $data['expressionHost'];
+				$this->assertElementValue('expression', $expressionHost);
+			}
 		}
 
 		if (isset($data['dbCheck'])) {
@@ -404,6 +746,7 @@ class testInheritanceTriggerPrototype extends CWebTest {
 			$this->getConfirmation();
 			$this->wait();
 			$this->zbxTestTextPresent('Triggers deleted');
+
 			$this->zbxTestTextNotPresent($this->template.": $description");
 		}
 	}
@@ -412,6 +755,6 @@ class testInheritanceTriggerPrototype extends CWebTest {
 	 * Restore the original tables.
 	 */
 	public function testInheritanceTriggerPrototype_teardown() {
-		DBrestore_tables('hosts');
+		DBrestore_tables('triggers');
 	}
 }
