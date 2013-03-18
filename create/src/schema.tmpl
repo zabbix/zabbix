@@ -1174,7 +1174,8 @@ FIELD		|hostid		|t_id		|	|NOT NULL	|ZBX_SYNC		|1|hosts
 FIELD		|parent_hostid	|t_id		|	|NULL		|ZBX_SYNC		|2|hosts	|hostid
 FIELD		|parent_itemid	|t_id		|	|NULL		|ZBX_SYNC		|3|items	|itemid
 FIELD		|host		|t_varchar(64)	|''	|NOT NULL	|ZBX_NODATA
-FIELD		|ts_delete	|t_time			|'0'|NOT NULL	|ZBX_NODATA
+FIELD		|lastcheck	|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
+FIELD		|ts_delete	|t_time		|'0'	|NOT NULL	|ZBX_NODATA
 UNIQUE		|1		|hostid,parent_hostid,parent_itemid
 
 TABLE|profiles|profileid|0
