@@ -435,8 +435,10 @@ void	op_host_add(DB_EVENT *event)
  ******************************************************************************/
 void	op_host_del(DB_EVENT *event)
 {
-	const char	*__function_name = "op_host_del";
-	zbx_uint64_t	hostid;
+	const char		*__function_name = "op_host_del";
+
+	zbx_vector_uint64_t	hostids;
+	zbx_uint64_t		hostid;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -449,7 +451,13 @@ void	op_host_del(DB_EVENT *event)
 	if (0 == (hostid = select_discovered_host(event)))
 		return;
 
-	DBdelete_host(hostid);
+	zbx_vector_uint64_create(&hostids);
+
+	zbx_vector_uint64_append(&hostids, hostid);
+
+	DBdelete_hosts(&hostids);
+
+	zbx_vector_uint64_destroy(&hostids);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }

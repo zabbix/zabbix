@@ -210,7 +210,7 @@ void	DBlld_process_discovery_rule(zbx_uint64_t lld_ruleid, char *value, zbx_time
 	DBlld_update_items(hostid, lld_ruleid, &jp_data, &error, f_macro, f_regexp, regexps, regexps_num, ts->sec);
 	DBlld_update_triggers(hostid, lld_ruleid, &jp_data, &error, f_macro, f_regexp, regexps, regexps_num);
 	DBlld_update_graphs(hostid, lld_ruleid, &jp_data, &error, f_macro, f_regexp, regexps, regexps_num);
-	DBlld_update_hosts(lld_ruleid, &jp_data, &error, f_macro, f_regexp, regexps, regexps_num, ts->sec);
+	DBlld_update_hosts(lld_ruleid, &jp_data, &error, f_macro, f_regexp, regexps, regexps_num, lifetime, ts->sec);
 	DBlld_remove_lost_resources(lld_ruleid, lifetime, ts->sec);
 
 	clean_regexps_ex(regexps, &regexps_num);

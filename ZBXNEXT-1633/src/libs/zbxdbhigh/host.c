@@ -4952,33 +4952,37 @@ clean:
  *                                                                            *
  * Purpose: delete host from database with all elements                       *
  *                                                                            *
- * Parameters: hostid - host identificator from database                      *
- *                                                                            *
- * Author: Eugene Grigorjev                                                   *
- *                                                                            *
- * Comments: !!! Don't forget to sync the code with PHP !!!                   *
+ * Parameters: hostids - [IN] host identificators from database               *
  *                                                                            *
  ******************************************************************************/
-void	DBdelete_host(zbx_uint64_t hostid)
+void	DBdelete_hosts(zbx_vector_uint64_t *hostids)
 {
 	const char		*__function_name = "DBdelete_host";
+
 	DB_RESULT		result;
 	DB_ROW			row;
 	zbx_uint64_t		elementid;
 	zbx_vector_uint64_t	itemids, httptestids;
+	char			*sql = NULL;
+	size_t			sql_alloc = 256, sql_offset;
+	int			i;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
+	sql = zbx_malloc(sql, sql_alloc);
+
 	zbx_vector_uint64_create(&httptestids);
-	zbx_vector_uint64_create(&itemids);
 
 	/* delete web tests */
-	result = DBselect(
-			"select distinct ht.httptestid"
-			" from httptest ht,applications a"
-			" where ht.applicationid=a.applicationid"
-				" and a.hostid=" ZBX_FS_UI64,
-			hostid);
+
+	sql_offset = 0;
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
+			"select httptestid"
+			" from httptest"
+			" where");
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid", hostids->values, hostids->values_num);
+
+	result = DBselect("%s", sql);
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -4990,12 +4994,20 @@ void	DBdelete_host(zbx_uint64_t hostid)
 	zbx_vector_uint64_sort(&httptestids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 	DBdelete_httptests(&httptestids);
 
+	zbx_vector_uint64_destroy(&httptestids);
+
 	/* delete items -> triggers -> graphs */
-	result = DBselect(
+
+	zbx_vector_uint64_create(&itemids);
+
+	sql_offset = 0;
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
 			"select itemid"
 			" from items"
-			" where hostid=" ZBX_FS_UI64,
-			hostid);
+			" where");
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid", hostids->values, hostids->values_num);
+
+	result = DBselect("%s", sql);
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -5008,16 +5020,22 @@ void	DBdelete_host(zbx_uint64_t hostid)
 	DBdelete_items(&itemids);
 
 	zbx_vector_uint64_destroy(&itemids);
-	zbx_vector_uint64_destroy(&httptestids);
 
 	/* delete host from maps */
-	DBdelete_sysmaps_elements(SYSMAP_ELEMENT_TYPE_HOST, &hostid, 1);
+	DBdelete_sysmaps_elements(SYSMAP_ELEMENT_TYPE_HOST, hostids->values, hostids->values_num);
 
 	/* delete action conditions */
-	DBdelete_action_conditions(CONDITION_TYPE_HOST, hostid);
+	for (i = 0; i < hostids->values_num; i++)
+		DBdelete_action_conditions(CONDITION_TYPE_HOST, hostids->values[i]);
 
 	/* delete host */
-	DBexecute("delete from hosts where hostid=" ZBX_FS_UI64, hostid);
+	sql_offset = 0;
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from hosts where");
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid", hostids->values, hostids->values_num);
+
+	DBexecute("%s", sql);
+
+	zbx_free(sql);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
