@@ -18,7 +18,6 @@
 **/
 
 #include "common.h"
-#include "log.h"
 #include "zbxjson.h"
 #include "json_parser.h"
 
@@ -519,14 +518,11 @@ int	zbx_json_open(const char *buffer, struct zbx_json_parse *jp)
 		if (error)
 		{
 			zbx_set_json_strerror("cannot open JSON object: %s", error);
-			zabbix_log(LOG_LEVEL_WARNING, "JSON error: %s while parsing: %s", error, buffer);
 			zbx_free(error);
 		}
 		else
-		{
 			zbx_set_json_strerror("cannot open JSON object \"%.64s\"", buffer);
-			zabbix_log(LOG_LEVEL_WARNING, "unknown JSON error while parsing: %s", buffer);
-		}
+
 		return FAIL;
 	}
 	jp->end = jp->start + len - 1;

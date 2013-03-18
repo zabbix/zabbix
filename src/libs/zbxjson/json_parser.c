@@ -34,9 +34,9 @@ static int	json_parse_value(const char *start, char **error);
  *                                                                            *
  * Parameters: message     - [IN] the error message                           *
  *             json_buffer - [IN] the failing data fragment                   *
- *             error       - [OUT] the parsing error message                  *
+ *             error       - [OUT] the parsing error message (can be NULL)    *
  *                                                                            *
- * Return value: FAIL - the json_error() function always returns FAIL value   *
+ * Return value: FAIL - the json_error() function always returns 0 value      *
  *                      so it can be used to return from failed parses        *
  *                                                                            *
  * Author: Andris Zeila                                                       *
@@ -46,12 +46,15 @@ static int	json_error(const char *message, const char* json_buffer, char** error
 {
 	size_t	size = 1024, offset = 0;
 
-	*error = zbx_malloc(NULL, size);
+	if (NULL != error)
+	{
+		*error = zbx_malloc(NULL, size);
 
-	if (json_buffer)
-		zbx_snprintf_alloc(error, &size, &offset, "%s at: '%s'", message, json_buffer);
-	else
-		zbx_snprintf_alloc(error, &size, &offset, "%s", message);
+		if (json_buffer)
+			zbx_snprintf_alloc(error, &size, &offset, "%s at: '%s'", message, json_buffer);
+		else
+			zbx_snprintf_alloc(error, &size, &offset, "%s", message);
+	}
 
 	return 0;
 }
@@ -63,12 +66,11 @@ static int	json_error(const char *message, const char* json_buffer, char** error
  * Purpose: Parses JSON string value or object name                           *
  *                                                                            *
  * Parameters: start - [IN] the JSON data without leading whitespace          *
- *             end   - [OUT] the reference to the string ending character '"' *
- *             error - [OUT] the parsing error message                        *
+ *             error - [OUT] the parsing error message (can be NULL)          *
  *                                                                            *
- * Return value: SUCCEED - the string was parsed successfully                 *
- *               FAIL    - an error occurred during parsing, the error        *
- *                         parameter contains allocated error message         *
+ * Return value: the number of characters parsed. On error 0 is returned and  *
+ *               error parameter (if not NULL) contains allocated error       *
+ *               message.                                                     *
  *                                                                            *
  * Author: Andris Zeila                                                       *
  *                                                                            *
@@ -140,12 +142,11 @@ static int	json_parse_string(const char *start, char **error)
  * Purpose: Parses JSON array value                                           *
  *                                                                            *
  * Parameters: start - [IN] the JSON data without leading whitespace          *
- *             end   - [OUT] the reference to the array ending character ']'  *
- *             error - [OUT] the parsing error message                        *
+ *             error - [OUT] the parsing error message (can be NULL)          *
  *                                                                            *
- * Return value: SUCCEED - the array was parsed successfully                  *
- *               FAIL    - an error occurred during parsing, the error        *
- *                         parameter contains allocated error message         *
+ * Return value: the number of characters parsed. On error 0 is returned and  *
+ *               error parameter (if not NULL) contains allocated error       *
+ *               message.                                                     *
  *                                                                            *
  * Author: Andris Zeila                                                       *
  *                                                                            *
@@ -155,23 +156,30 @@ static int	json_parse_array(const char *start, char **error)
 	const char	*ptr = start;
 	int		len;
 
-	do
-	{
-		/* skip the opening bracket '[' or element separator ',' */
-		ptr++;
+	ptr++;
+	STRIP_WHITESPACE(ptr);
 
-		/* json_parse_value strips leading whitespace, so we don't have to do it here */
-		if (0 == (len = json_parse_value(ptr, error)) )
-			return 0;
-
-		ptr += len;
-
-		STRIP_WHITESPACE(ptr);
-	} while (',' == *ptr);
-
-	/* no closing ], failing */
 	if (']' != *ptr)
-		return json_error("invalid array format, expected closing character ']'", ptr, error);
+	{
+		while (1)
+		{
+			/* json_parse_value strips leading whitespace, so we don't have to do it here */
+			if (0 == (len = json_parse_value(ptr, error)) )
+				return 0;
+
+			ptr += len;
+			STRIP_WHITESPACE(ptr);
+
+			if (',' != *ptr)
+				break;
+
+			ptr++;
+		}
+
+		/* no closing ], failing */
+		if (']' != *ptr)
+			return json_error("invalid array format, expected closing character ']'", ptr, error);
+	}
 
 	return ptr - start + 1;
 }
@@ -183,13 +191,11 @@ static int	json_parse_array(const char *start, char **error)
  * Purpose: Parses JSON number value                                          *
  *                                                                            *
  * Parameters: start - [IN] the JSON data without leading whitespace          *
- *             end   - [OUT] the reference to the number ending character     *
- *                           (last valid numeric value character              *
- *             error - [OUT] the parsing error message                        *
+ *             error - [OUT] the parsing error message (can be NULL)          *
  *                                                                            *
- * Return value: SUCCEED - the number was parsed successfully                 *
- *               FAIL    - an error occurred during parsing, the error        *
- *                         parameter contains allocated error message         *
+ * Return value: the number of characters parsed. On error 0 is returned and  *
+ *               error parameter (if not NULL) contains allocated error       *
+ *               message.                                                     *
  *                                                                            *
  * Author: Andris Zeila                                                       *
  *                                                                            *
@@ -197,10 +203,13 @@ static int	json_parse_array(const char *start, char **error)
 static int	json_parse_number(const char *start, char **error)
 {
 	const char	*ptr = start;
+	char		first_digit;
 	int		point = 0, digit = 0;
 
 	if ('-' == *ptr)
 		ptr++;
+
+	first_digit = *ptr;
 
 	while ('\0' != *ptr)
 	{
@@ -214,10 +223,15 @@ static int	json_parse_number(const char *start, char **error)
 			break;
 
 		ptr++;
-		digit++;
+		if (0 == point)
+			digit++;
 	}
 	/* number does not contain any digits, failing */
 	if (0 == digit)
+		return json_error("invalid numeric value format", start, error);
+
+	/* number has zero leading digit following by other digits, failing */
+	if ('0' == first_digit && 1 < (digit))
 		return json_error("invalid numeric value format", start, error);
 
 	if ('e' == *ptr || 'E' == *ptr)
@@ -249,12 +263,12 @@ static int	json_parse_number(const char *start, char **error)
  * Purpose: Parses the specified literal value                                *
  *                                                                            *
  * Parameters: start - [IN] the JSON data without leading whitespace          *
- *             end   - [OUT] the reference to the literal ending character    *
- *             error - [OUT] the parsing error message                        *
+ *             text  - [IN] the literal value to parse                        *
+ *             error - [OUT] the parsing error message (can be NULL)          *
  *                                                                            *
- * Return value: SUCCEED - the literal was parsed successfully                *
- *               FAIL    - an error occurred during parsing, the error        *
- *                         parameter contains allocated error message         *
+ * Return value: the number of characters parsed. On error 0 is returned and  *
+ *               error parameter (if not NULL) contains allocated error       *
+ *               message.                                                     *
  *                                                                            *
  * Author: Andris Zeila                                                       *
  *                                                                            *
@@ -284,12 +298,11 @@ static int	json_parse_literal(const char *start, const char *text, char **error)
  *                                                                            *
  * Parameters: start - [IN/OUT] the JSON data; returns the reference the real *
  *                     data (without spaces)                                  *
- *             end   - [OUT] the reference to the value ending character      *
- *             error - [OUT] the parsing error message                        *
+ *             error - [OUT] the parsing error message (can be NULL)          *
  *                                                                            *
- * Return value: SUCCEED - the value was parsed successfully                  *
- *               FAIL    - an error occurred during parsing, the error        *
- *                         parameter contains allocated error message         *
+ * Return value: the number of characters parsed. On error 0 is returned and  *
+ *               error parameter (if not NULL) contains allocated error       *
+ *               message.                                                     *
  *                                                                            *
  * Author: Andris Zeila                                                       *
  *                                                                            *
@@ -357,12 +370,11 @@ static int	json_parse_value(const char *start, char **error)
  *                                                                            *
  * Parameters: start - [IN/OUT] the JSON data; returns the reference the real *
  *                     data (without spaces)                                  *
- *             end   - [OUT] the reference to the object ending character '}' *
- *             error - [OUT] the parsing error message                        *
+ *             error - [OUT] the parsing error message (can be NULL)          *
  *                                                                            *
- * Return value: SUCCEED - the object was parsed successfully                 *
- *               FAIL    - an error occurred during parsing, the error        *
- *                         parameter contains allocated error message         *
+ * Return value: the number of characters parsed. On error 0 is returned and  *
+ *               error parameter (if not NULL) contains allocated error       *
+ *               message.                                                     *
  *                                                                            *
  * Author: Andris Zeila                                                       *
  *                                                                            *
@@ -379,39 +391,44 @@ int	json_parse_object(const char *start, char **error)
 	if ('{' != *ptr)
 		return json_error("invalid object format, expected opening character '{'", ptr, error);
 
-	do
-	{
-		/* skip the opening bracket '{' or element separator ',' */
-		ptr++;
+	ptr++;
+	STRIP_WHITESPACE(ptr);
 
-		STRIP_WHITESPACE(ptr);
-
-		/* cannot parse object name, failing */
-		if (0 == (len = json_parse_string(ptr, error)) )
-			return 0;
-
-		ptr += len;
-
-		/* parse name:value separator */
-		STRIP_WHITESPACE(ptr);
-
-		if (':' != *ptr)
-			return json_error("invalid object name/value separator", ptr, error);
-		ptr++;
-
-		if (0 == (len = json_parse_value(ptr, error)) )
-			return 0;
-
-		ptr += len;
-
-		STRIP_WHITESPACE(ptr);
-	}
-	while (',' == *ptr);
-
-	/* object is not properly closed, failing */
 	if ('}' != *ptr)
-		return json_error("invalid object format, expected closing character '}'", ptr, error);
+	{
+		while (1)
+		{
+			/* cannot parse object name, failing */
+			if (0 == (len = json_parse_string(ptr, error)) )
+				return 0;
 
+			ptr += len;
+
+			/* parse name:value separator */
+			STRIP_WHITESPACE(ptr);
+
+			if (':' != *ptr)
+				return json_error("invalid object name/value separator", ptr, error);
+			ptr++;
+
+			if (0 == (len = json_parse_value(ptr, error)) )
+				return 0;
+
+			ptr += len;
+
+			STRIP_WHITESPACE(ptr);
+
+			if (',' != *ptr)
+				break;
+
+			ptr++;
+			STRIP_WHITESPACE(ptr);
+		}
+
+		/* object is not properly closed, failing */
+		if ('}' != *ptr)
+			return json_error("invalid object format, expected closing character '}'", ptr, error);
+	}
 
 	return ptr - start + 1;
 }
@@ -424,18 +441,13 @@ int	json_parse_object(const char *start, char **error)
  * Purpose: Validates JSON object                                             *
  *                                                                            *
  * Parameters: start  - [IN]  the string to validate                          *
- *                    - [OUT] the reference to the first non whitespace       *
- *                            character in JSON string                        *
- *             end    - [OUT] the reference to the last non whitespace        *
- *                            character in JSON string                        *
  *             error  - [OUT] the parse error message. If the error value is  *
  *                            set it must be freed by caller after it has     *
- *                            been used.                                      *
+ *                            been used (can be NULL).                        *
  *                                                                            *
- * Return value: SUCCEED - the string contains valid JSON data                *
- *               FAIL    - the string contains invalid JSON data and error    *
- *                         message will be allocated and stored into          *
- *                         error parameter                                    *
+ * Return value: the number of characters parsed. On error 0 is returned and  *
+ *               error parameter (if not NULL) contains allocated error       *
+ *               message.                                                     *
  *                                                                            *
  * Author: Andris Zeila                                                       *
  *                                                                            *
