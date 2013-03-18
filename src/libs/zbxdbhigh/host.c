@@ -3036,10 +3036,10 @@ static void	DBhost_prototypes_save(zbx_vector_ptr_t *host_prototypes, zbx_vector
 				sql4_alloc = ZBX_KIBIBYTE, sql4_offset = 0,
 				sql5_alloc = ZBX_KIBIBYTE, sql5_offset = 0;
 	zbx_host_prototype_t	*host_prototype;
-	zbx_uint64_t		hostid = 0, hostdiscoveryid = 0, hosttemplateid = 0;
+	zbx_uint64_t		hostid = 0, hosttemplateid = 0;
 	int			i, j, new_hosts = 0, new_hosts_templates = 0;
 	const char		*ins_host_discovery_sql =
-				"insert into host_discovery (hostdiscoveryid,hostid,parent_itemid) values ";
+				"insert into host_discovery (hostid,parent_itemid) values ";
 	const char		*ins_hosts_sql = "insert into hosts (hostid,host,name,status,flags,templateid) values ";
 	const char		*ins_hosts_templates_sql =
 				"insert into hosts_templates (hosttemplateid,hostid,templateid) values ";
@@ -3057,7 +3057,6 @@ static void	DBhost_prototypes_save(zbx_vector_ptr_t *host_prototypes, zbx_vector
 	if (0 != new_hosts)
 	{
 		hostid = DBget_maxid_num("hosts", new_hosts);
-		hostdiscoveryid = DBget_maxid_num("host_discovery", new_hosts);
 
 		sql1 = zbx_malloc(sql1, sql1_alloc);
 		sql2 = zbx_malloc(sql2, sql2_alloc);
@@ -3113,8 +3112,8 @@ static void	DBhost_prototypes_save(zbx_vector_ptr_t *host_prototypes, zbx_vector
 					host_prototype->hostid, host_esc, name_esc, (int)host_prototype->status,
 					ZBX_FLAG_DISCOVERY_PROTOTYPE, host_prototype->templateid);
 			zbx_snprintf_alloc(&sql2, &sql2_alloc, &sql2_offset,
-					"(" ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 ")" ZBX_ROW_DL,
-					hostdiscoveryid++, host_prototype->hostid, host_prototype->itemid);
+					"(" ZBX_FS_UI64 "," ZBX_FS_UI64 ")" ZBX_ROW_DL,
+					host_prototype->hostid, host_prototype->itemid);
 
 			zbx_free(name_esc);
 			zbx_free(host_esc);
