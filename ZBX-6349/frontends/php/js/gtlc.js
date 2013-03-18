@@ -1057,9 +1057,9 @@ var CScrollBar = Class.create(CDebug, {
 		this.dom.info_period.innerHTML = formatTimestamp(period, false, true);
 
 		// info left
-		var userstarttime = usertime - period;
-		this.dom.info_left.innerHTML = new CDate((usertime - period) * 1000).format(locale['S_DATE_FORMAT']);
-		this.dom.info_left.setAttribute('data-timestamp', userstarttime);
+		var userStartTime = usertime - period;
+		this.dom.info_left.innerHTML = new CDate((userStartTime) * 1000).format(locale['S_DATE_FORMAT']);
+		this.dom.info_left.setAttribute('data-timestamp', userStartTime);
 
 		// info right
 		var right_info = new CDate(usertime * 1000).format(locale['S_DATE_FORMAT']);
