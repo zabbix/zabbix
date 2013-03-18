@@ -704,7 +704,7 @@ static void	DBlld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts
 	int			i, j, new_hosts = 0, upd_hosts = 0, new_hostgroups = 0, new_interfaces;
 	zbx_lld_host_t		*host;
 	zbx_lld_interface_t	*interface;
-	zbx_uint64_t		hostid = 0, hostdiscoveryid = 0, hostgroupid = 0, interfaceid = 0;
+	zbx_uint64_t		hostid = 0, hostgroupid = 0, interfaceid = 0;
 	char			*sql1 = NULL, *sql2 = NULL, *sql3 = NULL, *sql4 = NULL, *sql5 = NULL, *sql6 = NULL,
 				*host_esc, *name_esc, *host_proto_esc, *ipmi_username_esc, *ipmi_password_esc;
 	size_t			sql1_alloc = 8 * ZBX_KIBIBYTE, sql1_offset = 0,
@@ -718,7 +718,7 @@ static void	DBlld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts
 					"ipmi_username,ipmi_password,status,flags)"
 				" values ";
 	const char		*ins_host_discovery_sql =
-				"insert into host_discovery (hostdiscoveryid,hostid,parent_hostid,host) values ";
+				"insert into host_discovery (hostid,parent_hostid,host) values ";
 	const char		*ins_hosts_groups_sql = "insert into hosts_groups (hostgroupid,hostid,groupid) values ";
 	const char		*ins_interface_sql =
 				"insert into interface (interfaceid,hostid,type,main,useip,ip,dns,port) values ";
@@ -740,7 +740,6 @@ static void	DBlld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts
 	if (0 != new_hosts)
 	{
 		hostid = DBget_maxid_num("hosts", new_hosts);
-		hostdiscoveryid = DBget_maxid_num("host_discovery", new_hosts);
 
 		sql1 = zbx_malloc(sql1, sql1_alloc);
 		sql2 = zbx_malloc(sql2, sql2_alloc);
@@ -816,10 +815,8 @@ static void	DBlld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts
 			zbx_strcpy_alloc(&sql2, &sql2_alloc, &sql2_offset, ins_host_discovery_sql);
 #endif
 			zbx_snprintf_alloc(&sql2, &sql2_alloc, &sql2_offset,
-					"(" ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 ",'%s')" ZBX_ROW_DL,
-					hostdiscoveryid, host->hostid, parent_hostid, host_proto_esc);
-
-			hostdiscoveryid++;
+					"(" ZBX_FS_UI64 "," ZBX_FS_UI64 ",'%s')" ZBX_ROW_DL,
+					host->hostid, parent_hostid, host_proto_esc);
 
 			for (j = 0; j < interfaces->values_num; j++)
 			{
@@ -890,9 +887,8 @@ static void	DBlld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts
 				zbx_snprintf_alloc(&sql3, &sql3_alloc, &sql3_offset,
 						"update host_discovery"
 						" set host='%s'"
-						" where hostid=" ZBX_FS_UI64
-							" and parent_hostid=" ZBX_FS_UI64 ";\n",
-						host_proto_esc, host->hostid, parent_hostid);
+						" where hostid=" ZBX_FS_UI64 ";\n",
+						host_proto_esc, host->hostid);
 			}
 		}
 
@@ -973,7 +969,7 @@ static void	DBlld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts
  * Function: DBlld_templates_link                                             *
  *                                                                            *
  ******************************************************************************/
-static void	DBlld_templates_link(zbx_vector_ptr_t *hosts)
+static void	DBlld_templates_link(const zbx_vector_ptr_t *hosts)
 {
 	const char	*__function_name = "DBlld_templates_link";
 
@@ -998,13 +994,38 @@ static void	DBlld_templates_link(zbx_vector_ptr_t *hosts)
 
 /******************************************************************************
  *                                                                            *
+ * Function: DBlld_host_update_lastcheck                                      *
+ *                                                                            *
+ * Purpose: updates host_discovery.lastcheck field                            *
+ *                                                                            *
+ ******************************************************************************/
+static void	DBlld_host_update_lastcheck(zbx_vector_uint64_t *hostids, int lastcheck)
+{
+	char	*sql = NULL;
+	size_t	sql_alloc = 256, sql_offset = 0;
+
+	if (0 == hostids->values_num)
+		return;
+
+	sql = zbx_malloc(sql, sql_alloc);
+
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update host_discovery set lastcheck=%d where", lastcheck);
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid", hostids->values, hostids->values_num);
+
+	DBexecute("%s", sql);
+
+	zbx_free(sql);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: DBlld_update_hosts                                               *
  *                                                                            *
  * Purpose: add or update low-level discovered hosts                          *
  *                                                                            *
  ******************************************************************************/
 void	DBlld_update_hosts(zbx_uint64_t lld_ruleid, struct zbx_json_parse *jp_data, char **error,
-		const char *f_macro, const char *f_regexp, ZBX_REGEXP *regexps, int regexps_num)
+		const char *f_macro, const char *f_regexp, ZBX_REGEXP *regexps, int regexps_num, int lastcheck)
 {
 	const char		*__function_name = "DBlld_update_hosts";
 
@@ -1013,7 +1034,8 @@ void	DBlld_update_hosts(zbx_uint64_t lld_ruleid, struct zbx_json_parse *jp_data,
 	DB_RESULT		result;
 	DB_ROW			row;
 	zbx_vector_ptr_t	hosts, interfaces;
-	zbx_vector_uint64_t	hostgroupids;
+	zbx_vector_uint64_t	hostgroupids;	/* list of host groups which should be deleted */
+	zbx_vector_uint64_t	hostids;	/* list of discovered hosts */
 	zbx_lld_interface_t	*interface;
 	zbx_uint64_t		proxy_hostid;
 	char			*ipmi_username = NULL, *ipmi_password;
@@ -1047,6 +1069,7 @@ void	DBlld_update_hosts(zbx_uint64_t lld_ruleid, struct zbx_json_parse *jp_data,
 
 	zbx_vector_ptr_create(&hosts);
 	zbx_vector_uint64_create(&hostgroupids);
+	zbx_vector_uint64_create(&hostids);
 	zbx_vector_ptr_create(&interfaces);
 
 	result = DBselect(
@@ -1083,6 +1106,7 @@ void	DBlld_update_hosts(zbx_uint64_t lld_ruleid, struct zbx_json_parse *jp_data,
 		zbx_uint64_t	parent_hostid;
 		const char	*host_proto, *name_proto;
 		unsigned char	status;
+		int		i;
 
 		ZBX_STR2UINT64(parent_hostid, row[0]);
 		host_proto = row[1];
@@ -1122,15 +1146,24 @@ void	DBlld_update_hosts(zbx_uint64_t lld_ruleid, struct zbx_json_parse *jp_data,
 		DBlld_hosts_save(parent_hostid, &hosts, host_proto, proxy_hostid, ipmi_authtype, ipmi_privilege,
 				ipmi_username, ipmi_password, status, &hostgroupids, &interfaces);
 
+		for (i = 0; i < hosts.values_num; i++)
+			zbx_vector_uint64_append(&hostids, ((zbx_lld_host_t *)hosts.values[i])->hostid);
+
 		/* linking of the templates */
 		DBlld_templates_link(&hosts);
 
 		DBlld_hosts_free(&hosts);
+		hostgroupids.values_num = 0;
 	}
 	DBfree_result(result);
 
+	zbx_vector_uint64_sort(&hostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+	DBlld_host_update_lastcheck(&hostids, lastcheck);
+
 	DBlld_clean_interfaces(&interfaces);
 	zbx_vector_ptr_destroy(&interfaces);
+	zbx_vector_uint64_destroy(&hostids);
 	zbx_vector_uint64_destroy(&hostgroupids);
 	zbx_vector_ptr_destroy(&hosts);
 
