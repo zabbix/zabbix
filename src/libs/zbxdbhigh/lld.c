@@ -243,6 +243,7 @@ clean:
 	zbx_free(db_error);
 	zbx_free(filter);
 	zbx_free(discovery_key);
+	zbx_free(sql);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
