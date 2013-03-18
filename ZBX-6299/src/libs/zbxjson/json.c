@@ -502,7 +502,8 @@ static const char	*__zbx_json_rbracket(const char *p)
  ******************************************************************************/
 int	zbx_json_open(const char *buffer, struct zbx_json_parse *jp)
 {
-	char *error = NULL;
+	char	*error = NULL;
+	int	len;
 
 	STRIP_WHITESPACE(buffer);
 
@@ -513,7 +514,7 @@ int	zbx_json_open(const char *buffer, struct zbx_json_parse *jp)
 	jp->start = buffer;
 	jp->end = NULL;
 
-	if (FAIL == zbx_json_validate(&jp->start, &jp->end, &error))
+	if (0 == (len = zbx_json_validate(jp->start, &error)) )
 	{
 		if (error)
 		{
@@ -528,6 +529,7 @@ int	zbx_json_open(const char *buffer, struct zbx_json_parse *jp)
 		}
 		return FAIL;
 	}
+	jp->end = jp->start + len - 1;
 
 	return SUCCEED;
 }
@@ -1062,41 +1064,5 @@ int	zbx_json_count(const struct zbx_json_parse *jp)
 		num++;
 
 	return num;
-}
-
-
-/******************************************************************************
- *                                                                            *
- * Function: zbx_json_validate                                                *
- *                                                                            *
- * Purpose: Validates JSON object                                             *
- *                                                                            *
- * Parameters: start  - [IN]  the string to validate                          *
- *                    - [OUT] the reference to the first non whitespace       *
- *                            character in JSON string                        *
- *             end    - [OUT] the reference to the last non whitespace        *
- *                            character in JSON string                        *
- *             error  - [OUT] the parse error message. If the error value is  *
- *                            set it must be freed by caller after it has     *
- *                            been used.                                      *
- *                                                                            *
- * Return value: SUCCEED - the string contains valid JSON data                *
- *               FAIL    - the string contains invalid JSON data and error    *
- *                         message will be allocated and stored into          *
- *                         error parameter                                    *
- *                                                                            *
- * Author: Andris Zeila                                                       *
- *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
- ******************************************************************************/
-int	zbx_json_validate(const char **start, const char **end, char **error)
-{
-	if (FAIL == json_parse_object(start, end, error))
-	{
-		return FAIL;
-	}
-
-	return SUCCEED;
 }
 
