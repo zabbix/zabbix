@@ -57,10 +57,10 @@ $fields = array(
 		ITEM_TYPE_CALCULATED, ITEM_TYPE_SNMPTRAP)), 'isset({save})'),
 	'authtype' =>			array(T_ZBX_INT, O_OPT, null,	IN(ITEM_AUTHTYPE_PASSWORD.','.ITEM_AUTHTYPE_PUBLICKEY),
 		'isset({save})&&isset({type})&&({type}=='.ITEM_TYPE_SSH.')'),
-	'username' =>			array(T_ZBX_STR, O_OPT, null,	null,		'isset({save})&&isset({type})&&'.
-		IN(ITEM_TYPE_SSH.','.ITEM_TYPE_JMX.','.ITEM_TYPE_TELNET, 'type')),
-	'password' =>			array(T_ZBX_STR, O_OPT, null,	null,		'isset({save})&&isset({type})&&'.
-		IN(ITEM_TYPE_SSH.','.ITEM_TYPE_JMX.','.ITEM_TYPE_TELNET, 'type')),
+	'username' =>			array(T_ZBX_STR, O_OPT, null,	'{type}=='.ITEM_TYPE_JMX.'||'.NOT_EMPTY,
+		'isset({save})&&isset({type})&&'.IN(ITEM_TYPE_SSH.','.ITEM_TYPE_TELNET.','.ITEM_TYPE_JMX, 'type')),
+	'password' =>			array(T_ZBX_STR, O_OPT, null,	null,
+		'isset({save})&&isset({type})&&'.IN(ITEM_TYPE_SSH.','.ITEM_TYPE_TELNET.','.ITEM_TYPE_JMX, 'type')),
 	'publickey' =>			array(T_ZBX_STR, O_OPT, null,	null,
 		'isset({save})&&isset({type})&&({type})=='.ITEM_TYPE_SSH.'&&({authtype})=='.ITEM_AUTHTYPE_PUBLICKEY),
 	'privatekey' =>			array(T_ZBX_STR, O_OPT, null,	null,
