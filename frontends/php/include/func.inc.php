@@ -662,6 +662,19 @@ function convertFunctionValue($value) {
 }
 
 /************* ZBX MISC *************/
+
+/**
+ * Swap two values.
+ *
+ * @param mixed $a first value
+ * @param mixed $b second value
+ */
+function zbx_swap(&$a, &$b) {
+	$tmp = $a;
+	$a = $b;
+	$b = $tmp;
+}
+
 function zbx_avg($values) {
 	zbx_value2array($values);
 	$sum = 0;

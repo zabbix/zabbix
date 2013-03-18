@@ -1,6 +1,7 @@
 Changes for 2.1.0
 
 New features:
+..F....... [ZBXNEXT-1659] added support of anti-aliased normal and bold lines for graphs and map connectors (Alexei)
 ..F....... [ZBXNEXT-1399] implemented multiselect in dashboard configuration (Eduard)
 ........S. [ZBXNEXT-354] added macro expansion for allowed hosts setting in trapper items (wiper)
 ..F....... [ZBXNEXT-109] implemented discovery rule check editing (Eduard)
