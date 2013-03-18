@@ -23,6 +23,6 @@
 #define STRIP_WHITESPACE(src) \
 	while ('\0' != *src && NULL != strchr(ZBX_WHITESPACE, *src)) src++;
 
-int	json_parse_object(const char **start, const char **end, char **error);
+int	zbx_json_validate(const char *start, char **error);
 
 #endif
