@@ -193,6 +193,17 @@ class CHostPrototype extends CHostBase {
 		// link host prototypes to discovery rules
 		DB::insert('host_discovery', $hostPrototypeDiscoveryRules, false);
 
+		// TODO: REMOVE info
+		$createdHostPrototypes = $this->get(array(
+			'hostids' => $hostPrototypeIds,
+			'output' => array('host'),
+			'selectParentHost' => array('host'),
+			'nopermissions' => true
+		));
+		foreach ($createdHostPrototypes as $hostProtototype) {
+			info(_s('Created: Host prototype "%1$s" on "%2$s".', $hostProtototype['host'], $hostProtototype['parentHost']['host']));
+		}
+
 		return $hostPrototypes;
 	}
 
@@ -314,6 +325,17 @@ class CHostPrototype extends CHostBase {
 			$newTemplateIds = zbx_objectValues($templates, 'templateid');
 			$this->unlink(array_diff($existingTemplateIds, $newTemplateIds), array($hostId));
 			$this->link(array_diff($newTemplateIds, $existingTemplateIds), array($hostId));
+		}
+
+		// TODO: REMOVE info
+		$updatedHostPrototypes = $this->get(array(
+			'hostids' => zbx_objectValues($hostPrototypes, 'hostid'),
+			'output' => array('host'),
+			'selectParentHost' => array('host'),
+			'nopermissions' => true
+		));
+		foreach ($updatedHostPrototypes as $hostProtototype) {
+			info(_s('Updated: Host prototype "%1$s" on "%2$s".', $hostProtototype['host'], $hostProtototype['parentHost']['host']));
 		}
 
 		return $hostPrototypes;
@@ -568,7 +590,19 @@ class CHostPrototype extends CHostBase {
 
 		$hostPrototypeIds = array_merge($hostPrototypeIds, $childHostPrototypeIds);
 
+		$deleteHostPrototypes = $this->get(array(
+			'hostids' => $hostPrototypeIds,
+			'output' => array('host'),
+			'selectParentHost' => array('host'),
+			'nopermissions' => true
+		));
+
 		DB::delete($this->tableName(), array('hostid' => $hostPrototypeIds));
+
+		// TODO: REMOVE info
+		foreach ($deleteHostPrototypes as $hostProtototype) {
+			info(_s('Deleted: Host prototype "%1$s" on "%2$s".', $hostProtototype['host'], $hostProtototype['parentHost']['host']));
+		}
 
 		return array('hostids' => $hostPrototypeIds);
 	}
