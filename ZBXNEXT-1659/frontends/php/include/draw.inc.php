@@ -19,14 +19,14 @@
 **/
 
 /**
- * Claculate new color based on bg/fg colors and transparence index
+ * Calculate new color based on bg/fg colors and transparency index
  *
- * @param resource $image image reference
- * @param array $bgColor background color, array of RGB
- * @param array $fgColor foreground color, array of RGB
- * @param float $alpha transparence index in range of 0-1, 1 returns unchanged fgColor color
+ * @param   resource  $image      image reference
+ * @param   array     $bgColor    background color, array of RGB
+ * @param   array     $fgColor    foreground color, array of RGB
+ * @param   float     $alpha      transparency index in range of 0-1, 1 returns unchanged fgColor color
  *
- * @return array new color
+ * @return  array                 new color
  */
 function zbx_colormix($image, $bgColor, $fgColor, $alpha) {
 	$r = $bgColor[0] + ($fgColor[0] - $bgColor[0]) * $alpha;
@@ -41,12 +41,12 @@ function zbx_colormix($image, $bgColor, $fgColor, $alpha) {
  * PHP imageline() function is broken because it drops fraction instead of correct rounding of X/Y coordnates.
  * All calls to imageline() must be replaced by the wrapper function everywhere in the code.
  *
- * @param resource $image image reference
- * @param int $x1 first x coordinate
- * @param int $y1 first y coordinate
- * @param int $x2 second x coordinate
- * @param int $y2 second y coordinate
- * @param int $color line color
+ * @param resource  $image  image reference
+ * @param int       $x1     first x coordinate
+ * @param int       $y1     first y coordinate
+ * @param int       $x2     second x coordinate
+ * @param int       $y2     second y coordinate
+ * @param int       $color  line color
  */
 function zbx_imageline($image, $x1, $y1, $x2, $y2, $color) {
 		imageline($image, round($x1), round($y1), round($x2), round($y2), $color);
@@ -55,13 +55,13 @@ function zbx_imageline($image, $x1, $y1, $x2, $y2, $color) {
 /**
  * Draw antialiased line
  *
- * @param resource $image image reference
- * @param int $x1 first x coordinate
- * @param int $y1 first y coordinate
- * @param int $x2 second x coordinate
- * @param int $y2 second y coordinate
- * @param int $color line color
- * @param int $style line style, one of LINE_TYPE_NORMAL (default), LINE_TYPE_BOLD (bold line)
+ * @param resource  $image  image reference
+ * @param int       $x1     first x coordinate
+ * @param int       $y1     first y coordinate
+ * @param int       $x2     second x coordinate
+ * @param int       $y2     second y coordinate
+ * @param int       $color  line color
+ * @param int       $style  line style, one of LINE_TYPE_NORMAL (default), LINE_TYPE_BOLD (bold line)
  */
 function zbx_imagealine($image, $x1, $y1, $x2, $y2, $color, $style = LINE_TYPE_NORMAL) {
 	$x1 = round($x1);
