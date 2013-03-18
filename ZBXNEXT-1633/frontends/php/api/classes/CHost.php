@@ -1723,13 +1723,13 @@ class CHost extends CHostGeneral {
 		// adding item discovery
 		if ($options['selectHostDiscovery'] !== null) {
 			$hostDiscoveries = API::getApi()->select('host_discovery', array(
-				'output' => $this->outputExtend('host_discovery', array('hostdiscoveryid', 'hostid'), $options['selectHostDiscovery']),
+				'output' => $this->outputExtend('host_discovery', array('hostid'), $options['selectHostDiscovery']),
 				'filter' => array('itemid' => array_keys($result)),
 				'preservekeys' => true
 			));
-			$relationMap = $this->createRelationMap($hostDiscoveries, 'hostid', 'hostdiscoveryid');
+			$relationMap = $this->createRelationMap($hostDiscoveries, 'hostid', 'hostid');
 
-			$hostDiscoveries = $this->unsetExtraFields($hostDiscoveries, array('hostid', 'hostdiscoveryid'),
+			$hostDiscoveries = $this->unsetExtraFields($hostDiscoveries, array('hostid'),
 				$options['selectHostDiscovery']
 			);
 			$result = $relationMap->mapOne($result, $hostDiscoveries, 'hostDiscovery');

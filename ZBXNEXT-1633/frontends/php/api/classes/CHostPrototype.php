@@ -191,7 +191,7 @@ class CHostPrototype extends CHostBase {
 		}
 
 		// link host prototypes to discovery rules
-		DB::insert('host_discovery', $hostPrototypeDiscoveryRules);
+		DB::insert('host_discovery', $hostPrototypeDiscoveryRules, false);
 
 		return $hostPrototypes;
 	}
