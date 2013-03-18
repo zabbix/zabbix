@@ -835,9 +835,8 @@ static int	DBpatch_02010039()
 static int	DBpatch_02010040()
 {
 	const ZBX_TABLE	table =
-			{"host_discovery", "hostdiscoveryid", 0,
+			{"host_discovery", "hostid", 0,
 				{
-					{"hostdiscoveryid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 					{"hostid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 					{"parent_hostid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0},
 					{"parent_itemid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0},
@@ -853,38 +852,33 @@ static int	DBpatch_02010040()
 
 static int	DBpatch_02010041()
 {
-	return DBcreate_index("host_discovery", "host_discovery_1", "hostid,parent_hostid,parent_itemid", 1);
-}
-
-static int	DBpatch_02010042()
-{
 	const ZBX_FIELD	field = {"hostid", NULL, "hosts", "hostid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("host_discovery", 1, &field);
 }
 
-static int	DBpatch_02010043()
+static int	DBpatch_02010042()
 {
 	const ZBX_FIELD	field = {"parent_hostid", NULL, "hosts", "hostid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("host_discovery", 2, &field);
 }
 
-static int	DBpatch_02010044()
+static int	DBpatch_02010043()
 {
 	const ZBX_FIELD	field = {"parent_itemid", NULL, "items", "itemid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("host_discovery", 3, &field);
 }
 
-static int	DBpatch_02010045()
+static int	DBpatch_02010044()
 {
 	const ZBX_FIELD field = {"templateid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
 
 	return DBadd_field("hosts", &field);
 }
 
-static int	DBpatch_02010046()
+static int	DBpatch_02010045()
 {
 	const ZBX_FIELD	field = {"templateid", NULL, "hosts", "hostid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
@@ -973,12 +967,11 @@ int	DBcheck_version()
 		{DBpatch_02010043, 2010043, 0, 1},
 		{DBpatch_02010044, 2010044, 0, 1},
 		{DBpatch_02010045, 2010045, 0, 1},
-		{DBpatch_02010046, 2010046, 0, 1},
 		/* IMPORTANT! When adding a new mandatory DBPatch don't forget to update it for SQLite, too. */
 		{NULL}
 	};
 #else
-	required = 2010046;	/* <---- Update mandatory DBpatch for SQLite here. */
+	required = 2010045;	/* <---- Update mandatory DBpatch for SQLite here. */
 #endif
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
