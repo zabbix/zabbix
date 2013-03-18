@@ -5588,13 +5588,8 @@ return array(
 	),
 	'host_discovery' => array(
 		'type' => DB::TABLE_TYPE_CONFIG,
-		'key' => 'hostdiscoveryid',
+		'key' => 'hostid',
 		'fields' => array(
-			'hostdiscoveryid' => array(
-				'null' => false,
-				'type' => DB::FIELD_TYPE_ID,
-				'length' => 20,
-			),
 			'hostid' => array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
@@ -5621,6 +5616,12 @@ return array(
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 64,
 				'default' => '',
+			),
+			'lastcheck' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0',
 			),
 			'ts_delete' => array(
 				'null' => false,
