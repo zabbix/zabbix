@@ -268,8 +268,10 @@ static struct snmp_session	*snmp_open_session(DC_ITEM *item, char *err)
 			break;
 	}
 
-	session.retries = 0;				/* number of retries if first attempt fails (default = 5)  */
-	session.timeout = CONFIG_TIMEOUT * 1000 * 1000;	/* timeout of one attempt in microseconds (default = 1 second) */
+	session.retries = 0;				/* number of retries after failed attempt */
+							/* (net-snmp default = 5) */
+	session.timeout = CONFIG_TIMEOUT * 1000 * 1000;	/* timeout of one attempt in microseconds */
+							/* (net-snmp default = 1 second) */
 
 #ifdef HAVE_IPV6
 	if (SUCCEED != get_address_family(item->interface.addr, &family, err, MAX_STRING_LEN))
