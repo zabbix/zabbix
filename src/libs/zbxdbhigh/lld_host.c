@@ -446,15 +446,55 @@ static void	DBlld_host_make(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts,
 
 /******************************************************************************
  *                                                                            *
+ * Function: DBlld_hostgroups_get                                             *
+ *                                                                            *
+ * Purpose: retrieve list of host groups which should be present on the each  *
+ *          discovered host                                                   *
+ *                                                                            *
+ * Parameters: groupids - [OUT] sorted list of host groups                    *
+ *                                                                            *
+ ******************************************************************************/
+static void	DBlld_hostgroups_get(zbx_uint64_t lld_ruleid, zbx_vector_uint64_t *groupids)
+{
+	const char	*__function_name = "DBlld_hostgroups_get";
+
+	DB_RESULT	result;
+	DB_ROW		row;
+	zbx_uint64_t	groupid;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	result = DBselect(
+			"select hg.groupid"
+			" from hosts_groups hg,items i"
+			" where hg.hostid=i.hostid"
+				" and i.itemid=" ZBX_FS_UI64,
+			lld_ruleid);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		ZBX_STR2UINT64(groupid, row[0]);
+		zbx_vector_uint64_append(groupids, groupid);
+	}
+	DBfree_result(result);
+
+	zbx_vector_uint64_sort(groupids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: DBlld_hostgroups_make                                            *
  *                                                                            *
- * Parameters: hosts            - [IN/OUT] list of hosts                      *
+ * Parameters: groupids         - [IN] sorted list of host groups which       *
+ *                                     should be present on the each          *
+ *                                     discovered host                        *
+ *             hosts            - [IN/OUT] list of hosts                      *
  *                                         should be sorted by hostid         *
  *             del_hostgroupids - [OUT] list of host groups which should be   *
  *                                      deleted                               *
  *                                                                            *
  ******************************************************************************/
-static void	DBlld_hostgroups_make(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *hosts,
+static void	DBlld_hostgroups_make(const zbx_vector_uint64_t *groupids, zbx_vector_ptr_t *hosts,
 		zbx_vector_uint64_t *del_hostgroupids)
 {
 	const char		*__function_name = "DBlld_hostgroups_make";
@@ -462,31 +502,13 @@ static void	DBlld_hostgroups_make(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *hos
 	DB_RESULT		result;
 	DB_ROW			row;
 	int			i, j;
-	zbx_vector_uint64_t	groupids, hostids;
+	zbx_vector_uint64_t	hostids;
 	zbx_uint64_t		hostgroupid, hostid, groupid;
 	zbx_lld_host_t		*host;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	zbx_vector_uint64_create(&groupids);
 	zbx_vector_uint64_create(&hostids);
-
-	/* list of host groups which should be added */
-
-	result = DBselect(
-			"select hg.groupid"
-			" from hosts_groups hg,items i"
-			" where hg.hostid=i.hostid"
-				" and i.itemid=" ZBX_FS_UI64, lld_ruleid);
-
-	while (NULL != (row = DBfetch(result)))
-	{
-		ZBX_STR2UINT64(groupid, row[0]);
-		zbx_vector_uint64_append(&groupids, groupid);
-	}
-	DBfree_result(result);
-
-	zbx_vector_uint64_sort(&groupids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	for (i = 0; i < hosts->values_num; i++)
 	{
@@ -495,9 +517,9 @@ static void	DBlld_hostgroups_make(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *hos
 		if (0 == host->flags)
 			continue;
 
-		zbx_vector_uint64_reserve(&host->new_groupids, groupids.values_num);
-		for (j = 0; j < groupids.values_num; j++)
-			zbx_vector_uint64_append(&host->new_groupids, groupids.values[j]);
+		zbx_vector_uint64_reserve(&host->new_groupids, groupids->values_num);
+		for (j = 0; j < groupids->values_num; j++)
+			zbx_vector_uint64_append(&host->new_groupids, groupids->values[j]);
 
 		if (0 != host->hostid)
 			zbx_vector_uint64_append(&hostids, host->hostid);
@@ -552,7 +574,6 @@ static void	DBlld_hostgroups_make(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *hos
 	}
 
 	zbx_vector_uint64_destroy(&hostids);
-	zbx_vector_uint64_destroy(&groupids);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
@@ -1120,6 +1141,7 @@ void	DBlld_update_hosts(zbx_uint64_t lld_ruleid, struct zbx_json_parse *jp_data,
 	DB_RESULT		result;
 	DB_ROW			row;
 	zbx_vector_ptr_t	hosts, interfaces;
+	zbx_vector_uint64_t	groupids;		/* list of host groups which should be added */
 	zbx_vector_uint64_t	del_hostgroupids;	/* list of host groups which should be deleted */
 	zbx_uint64_t		proxy_hostid;
 	char			*ipmi_username = NULL, *ipmi_password;
@@ -1152,9 +1174,11 @@ void	DBlld_update_hosts(zbx_uint64_t lld_ruleid, struct zbx_json_parse *jp_data,
 	}
 
 	zbx_vector_ptr_create(&hosts);
+	zbx_vector_uint64_create(&groupids);
 	zbx_vector_uint64_create(&del_hostgroupids);
 	zbx_vector_ptr_create(&interfaces);
 
+	DBlld_hostgroups_get(lld_ruleid, &groupids);
 	DBlld_interfaces_get(lld_ruleid, &interfaces);
 
 	result = DBselect(
@@ -1198,7 +1222,7 @@ void	DBlld_update_hosts(zbx_uint64_t lld_ruleid, struct zbx_json_parse *jp_data,
 
 		DBlld_hosts_validate(&hosts, error);
 
-		DBlld_hostgroups_make(lld_ruleid, &hosts, &del_hostgroupids);
+		DBlld_hostgroups_make(&groupids, &hosts, &del_hostgroupids);
 		DBlld_templates_make(parent_hostid, &hosts);
 
 		DBlld_hosts_save(parent_hostid, &hosts, host_proto, proxy_hostid, ipmi_authtype, ipmi_privilege,
@@ -1217,6 +1241,7 @@ void	DBlld_update_hosts(zbx_uint64_t lld_ruleid, struct zbx_json_parse *jp_data,
 	DBlld_interfaces_free(&interfaces);
 	zbx_vector_ptr_destroy(&interfaces);
 	zbx_vector_uint64_destroy(&del_hostgroupids);
+	zbx_vector_uint64_destroy(&groupids);
 	zbx_vector_ptr_destroy(&hosts);
 
 	zbx_free(ipmi_password);
