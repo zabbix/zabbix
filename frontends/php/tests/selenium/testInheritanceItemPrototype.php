@@ -66,11 +66,11 @@ class testInheritanceItemPrototype extends CWebTest {
 	/**
 	 * Backup the tables that will be modified during the tests.
 	 */
-	public function testInheritanceItemPrototype_setup() {
+	public function testInheritanceItemPrototype_Setup() {
 		DBsave_tables('items');
 	}
-	// returns all possible item types
-	public static function itemTypes() {
+	// Returns layout data
+	public static function layout() {
 		return array(
 			array(
 				array('type' => 'Zabbix agent')
@@ -229,9 +229,9 @@ class testInheritanceItemPrototype extends CWebTest {
 	}
 
 	/**
-	 * @dataProvider itemTypes
+	 * @dataProvider layout
 	 */
-	public function testFormItem_CheckLayout($data) {
+	public function testInheritanceItemPrototype_CheckLayout($data) {
 		$this->zbxTestLogin('templates.php');
 
 		$this->zbxTestClickWait('link='.$this->template);
@@ -745,15 +745,15 @@ class testInheritanceItemPrototype extends CWebTest {
 	}
 
 
-	// Returns list of items
-	public static function allItems() {
+	// Returns update data
+	public static function update() {
 		return DBdata("select * from items where hostid = 30000 and key_ LIKE 'item-prototype-test%'");
 	}
 
 	/**
-	 * @dataProvider allItems
+	 * @dataProvider update
 	 */
-	public function testInheritanceGraph_simpleCreate($data) {
+	public function testInheritanceItemPrototype_SimpleUpdate($data) {
 		$name = $data['name'];
 
 		$sqlItems = "select * from items";
@@ -772,8 +772,8 @@ class testInheritanceItemPrototype extends CWebTest {
 		$this->assertEquals($oldHashItems, DBhash($sqlItems));
 	}
 
-	// returns data for simple create
-	public static function simple() {
+	// Returns create data
+	public static function create() {
 		return array(
 			array(
 				array(
@@ -1460,9 +1460,9 @@ class testInheritanceItemPrototype extends CWebTest {
 	}
 
 	/**
-	 * @dataProvider simple
+	 * @dataProvider create
 	 */
-	public function testInheritanceItemPrototype_simpleCreate($data) {
+	public function testInheritanceItemPrototype_SimpleCreate($data) {
 		$this->zbxTestLogin('templates.php');
 
 		if (isset($data['name'])) {
@@ -1651,7 +1651,7 @@ class testInheritanceItemPrototype extends CWebTest {
 	/**
 	 * Restore the original tables.
 	 */
-	public function testInheritanceItemPrototype_teardown() {
+	public function testInheritanceItemPrototype_Teardown() {
 		DBrestore_tables('items');
 	}
 }
