@@ -52,12 +52,12 @@ class testInheritanceGraph extends CWebTest {
 	/**
 	 * Backup the tables that will be modified during the tests.
 	 */
-	public function testInheritanceGraph_setup() {
+	public function testInheritanceGraph_Setup() {
 		DBsave_tables('graphs');
 	}
 
-	// returns all possible item types
-	public static function graphTypes() {
+	// Returns layout data
+	public static function layout() {
 		return array(
 			array(
 				array(
@@ -109,7 +109,7 @@ class testInheritanceGraph extends CWebTest {
 	}
 
 	/**
-	 * @dataProvider graphTypes
+	 * @dataProvider layout
 	 */
 	public function testInheritanceGraph_CheckLayout($data) {
 
@@ -362,15 +362,15 @@ class testInheritanceGraph extends CWebTest {
 		$this->assertAttribute("//input[@id='cancel']/@value", 'Cancel');
 	}
 
-	// Returns list of graphs
-	public static function allGraphs() {
+	// Returns update data
+	public static function update() {
 		return DBdata("select * from graphs g left join graphs_items gi on gi.graphid=g.graphid where gi.itemid='23329' and g.name LIKE 'testInheritanceGraph%'");
 	}
 
 	/**
-	 * @dataProvider allGraphs
+	 * @dataProvider update
 	 */
-	public function testInheritanceGraph_simpleCreate($data) {
+	public function testInheritanceGraph_SimpleUpdate($data) {
 		$name = $data['name'];
 
 		$sqlGraphs = "select * from graphs";
@@ -388,6 +388,8 @@ class testInheritanceGraph extends CWebTest {
 
 		$this->assertEquals($oldHashGraphs, DBhash($sqlGraphs));
 	}
+
+	// Returns create data
 	public static function create() {
 		return array(
 			array(
@@ -622,7 +624,7 @@ class testInheritanceGraph extends CWebTest {
 	/**
 	 * @dataProvider create
 	 */
-	public function testInheritanceGraph_create($data) {
+	public function testInheritanceGraph_SimpleCreate($data) {
 		$this->zbxTestLogin('templates.php');
 
 
@@ -820,7 +822,7 @@ class testInheritanceGraph extends CWebTest {
 	/**
 	 * Restore the original tables.
 	 */
-	public function testInheritanceGraph_teardown() {
+	public function testInheritanceGraph_Teardown() {
 		DBrestore_tables('graphs');
 	}
 }
