@@ -26,7 +26,7 @@ define('DISCOVERY_BAD', 1);
 /**
  * Test the creation of inheritance of new objects on a previously linked template.
  */
-class testInheritanceDiscovery extends CWebTest {
+class testInheritanceDiscoveryRule extends CWebTest {
 
 	/**
 	 * The name of the template created in the test data set.
@@ -42,9 +42,15 @@ class testInheritanceDiscovery extends CWebTest {
 	 */
 	protected $host = 'Template inheritance test host';
 
+	/**
+	 * Backup the tables that will be modified during the tests.
+	 */
+	public function testInheritanceDiscoveryRule_Setup() {
+		DBsave_tables('items');
+	}
 
-	// returns all possible item types
-	public static function itemTypes() {
+	// Returns layout data
+	public static function layout() {
 		return array(
 			array(
 				array('type' => 'Zabbix agent')
@@ -125,14 +131,7 @@ class testInheritanceDiscovery extends CWebTest {
 	}
 
 	/**
-	 * Backup the tables that will be modified during the tests.
-	 */
-	public function testInheritanceDiscoveryRule_setup() {
-		DBsave_tables('items');
-	}
-
-	/**
-	 * @dataProvider itemTypes
+	 * @dataProvider layout
 	 */
 	public function testInheritanceDiscoveryRule_CheckLayout($data) {
 		$this->zbxTestLogin('templates.php');
@@ -497,15 +496,15 @@ class testInheritanceDiscovery extends CWebTest {
 		$this->assertAttribute("//*[@id='status']/option[text()='Enabled']/@selected", 'selected');
 	}
 
-	// Returns list of discovery rules
-	public static function allDiscovery() {
+	// Returns update data
+	public static function update() {
 		return DBdata("select * from items where hostid = 30000 and key_ LIKE 'discovery-rule-inheritance%'");
 	}
 
 	/**
-	 * @dataProvider allDiscovery
+	 * @dataProvider update
 	 */
-	public function testInheritanceDiscoveryRule_simpleCreate($data) {
+	public function testInheritanceDiscoveryRule_SimpleUpdate($data) {
 		$name = $data['name'];
 
 		$sqlDiscovery = 'select itemid, hostid, name, key_, delay, history, trends, value_type, formula, templateid, flags, lifetime from items';
@@ -526,8 +525,8 @@ class testInheritanceDiscovery extends CWebTest {
 
 	}
 
-	// returns data for discovery rule create
-	public static function discoveryRule() {
+	// Returns create data
+	public static function create() {
 		return array(
 			array(
 				array(
@@ -1332,9 +1331,9 @@ class testInheritanceDiscovery extends CWebTest {
 	}
 
 	/**
-	 * @dataProvider discoveryRule
+	 * @dataProvider create
 	 */
-	public function testInheritanceDiscoveryRule_CreateDiscovery($data) {
+	public function testInheritanceDiscoveryRule_SimpleCreate($data) {
 		$this->zbxTestLogin('templates.php');
 
 		$this->checkTitle('Configuration of templates');
@@ -1533,7 +1532,7 @@ class testInheritanceDiscovery extends CWebTest {
 	/**
 	 * Restore the original tables.
 	 */
-	public function testInheritanceDiscoveryRule_teardown() {
+	public function testInheritanceDiscoveryRule_Teardown() {
 		DBrestore_tables('items');
 	}
 }
