@@ -608,6 +608,9 @@ define('ZBX_INTERNAL_GROUP',		1);
 define('GROUP_STATUS_DISABLED', 1);
 define('GROUP_STATUS_ENABLED',	0);
 
+define('LINE_TYPE_NORMAL',	0);
+define('LINE_TYPE_BOLD',	1);
+
 // IMPORTANT!!! by priority DESC
 define('GROUP_GUI_ACCESS_SYSTEM',	0);
 define('GROUP_GUI_ACCESS_INTERNAL', 1);

@@ -834,7 +834,7 @@ class testInheritanceItem extends CWebTest {
 	/**
 	 * @dataProvider allItems
 	 */
-	public function testInheritanceGraph_simpleCreate($data) {
+	public function testInheritanceItem_simpleCreate($data) {
 		$name = $data['name'];
 
 		$sqlItems = "select * from items";
