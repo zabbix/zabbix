@@ -37,12 +37,12 @@ class testFormItem extends CWebTest {
 	/**
 	 * Backup the tables that will be modified during the tests.
 	 */
-	public function testFormItem_setup() {
+	public function testFormItem_Setup() {
 		DBsave_tables('items');
 	}
 
-	// returns all possible item types
-	public static function itemTypes() {
+	// Returns layout data
+	public static function layout() {
 		return array(
 			array(
 				array('type' => 'Zabbix agent')
@@ -201,7 +201,7 @@ class testFormItem extends CWebTest {
 	}
 
 	/**
-	 * @dataProvider itemTypes
+	 * @dataProvider layout
 	 */
 	public function testFormItem_CheckLayout($data) {
 		$this->zbxTestLogin('hosts.php');
@@ -835,15 +835,15 @@ class testFormItem extends CWebTest {
 		$this->assertAttribute("//*[@id='status']/option[text()='Enabled']/@selected", 'selected');
 	}
 
-	// Returns list of items
-/*	public static function allItems() {
+	// Returns update data
+	public static function update() {
 		return DBdata("select * from items where hostid = 40001 and key_ LIKE 'test-item-form%'");
 	}
 
 	/**
-	 * @dataProvider allItems
+	 * @dataProvider update
 	 */
-	public function testFormItem_simpleCreate($data) {
+	public function testFormItem_SimpleUpdate($data) {
 		$name = $data['name'];
 
 		$sqlItems = "select * from items";
@@ -863,8 +863,8 @@ class testFormItem extends CWebTest {
 
 	}
 
-	// Returns all possible item data
-	public static function dataCreate() {
+	// Returns create data
+	public static function create() {
 		return array(
 			array(
 				array(
@@ -1791,9 +1791,9 @@ class testFormItem extends CWebTest {
 	}
 
 	/**
-	 * @dataProvider dataCreate
+	 * @dataProvider create
 	 */
-	public function testFormItem_Create($data) {
+	public function testFormItem_SimpleCreate($data) {
 		$this->zbxTestLogin('hosts.php');
 		$this->checkTitle('Configuration of hosts');
 		$this->zbxTestTextPresent('CONFIGURATION OF HOSTS');
@@ -2014,7 +2014,7 @@ class testFormItem extends CWebTest {
 	/**
 	 * Restore the original tables.
 	 */
-	public function testFormItem_teardown() {
+	public function testFormItem_Teardown() {
 		DBrestore_tables('items');
 	}
 }
