@@ -210,7 +210,7 @@ class testFormTrigger extends CWebTest {
 		$this->assertAttribute("//input[@id='bnt1']/@value", 'Add');
 	}
 
-	// Returns list of graphs
+	// Returns list of triggers
 	public static function allTriggers() {
 		return DBdata("select * from triggers where description LIKE 'testFormTrigger%'");
 	}

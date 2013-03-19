@@ -96,17 +96,18 @@ define('ZBX_DB_ORACLE',		'ORACLE');
 define('ZBX_DB_POSTGRESQL',	'POSTGRESQL');
 define('ZBX_DB_SQLITE3',	'SQLITE3');
 
-define('PAGE_TYPE_HTML',		0);
-define('PAGE_TYPE_IMAGE',		1);
-define('PAGE_TYPE_XML',			2);
-define('PAGE_TYPE_JS',			3); // javascript
-define('PAGE_TYPE_CSS',			4);
-define('PAGE_TYPE_HTML_BLOCK',	5); // simple block of html (as text)
-define('PAGE_TYPE_JSON',		6); // simple JSON
-define('PAGE_TYPE_JSON_RPC',	7); // api call
-define('PAGE_TYPE_TEXT_FILE',	8); // api call
-define('PAGE_TYPE_TEXT',		9); // simple text
-define('PAGE_TYPE_CSV',			10); // CSV format
+define('PAGE_TYPE_HTML',				0);
+define('PAGE_TYPE_IMAGE',				1);
+define('PAGE_TYPE_XML',					2);
+define('PAGE_TYPE_JS',					3); // javascript
+define('PAGE_TYPE_CSS',					4);
+define('PAGE_TYPE_HTML_BLOCK',			5); // simple block of html (as text)
+define('PAGE_TYPE_JSON',				6); // simple JSON
+define('PAGE_TYPE_JSON_RPC',			7); // api call
+define('PAGE_TYPE_TEXT_FILE',			8); // api call
+define('PAGE_TYPE_TEXT',				9); // simple text
+define('PAGE_TYPE_CSV',					10); // CSV format
+define('PAGE_TYPE_TEXT_RETURN_JSON',	11); // input plaintext output json
 
 define('ZBX_SESSION_ACTIVE',	0);
 define('ZBX_SESSION_PASSIVE',	1);
@@ -607,6 +608,9 @@ define('ZBX_INTERNAL_GROUP',		1);
 define('GROUP_STATUS_DISABLED', 1);
 define('GROUP_STATUS_ENABLED',	0);
 
+define('LINE_TYPE_NORMAL',	0);
+define('LINE_TYPE_BOLD',	1);
+
 // IMPORTANT!!! by priority DESC
 define('GROUP_GUI_ACCESS_SYSTEM',	0);
 define('GROUP_GUI_ACCESS_INTERNAL', 1);
@@ -634,7 +638,7 @@ define('PERM_RES_DATA_ARRAY',	2);
 define('RESOURCE_TYPE_NODE',	0);
 define('RESOURCE_TYPE_GROUP',	1);
 
-define('PARAM_TYPE_SECONDS',	0);
+define('PARAM_TYPE_TIME',	0);
 define('PARAM_TYPE_COUNTS',		1);
 
 define('ZBX_NODE_CHILD',	0);

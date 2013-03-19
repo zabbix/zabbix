@@ -136,8 +136,8 @@ static int	evaluate_LOGEVENTID(char *value, DB_ITEM *item, const char *function,
 		result = DBselect("select e.expression,e.expression_type,e.exp_delimiter,e.case_sensitive"
 				" from regexps r,expressions e"
 				" where r.regexpid=e.regexpid"
-					" and r.name='%s'",
-				arg1_esc);
+					" and r.name='%s'" ZBX_SQL_NODE,
+				arg1_esc, DBand_node_local("r.regexpid"));
 		zbx_free(arg1_esc);
 
 		while (NULL != (row = DBfetch(result)))
@@ -848,9 +848,11 @@ static int	evaluate_LAST(char *value, DB_ITEM *item, const char *function, const
 	else
 		goto clean;
 
-	if (0 == time_shift && 1 == arg1)
+	if (0 == time_shift && 1 <= arg1 && arg1 <= 2)
 	{
-		if (NULL != item->lastvalue[0])
+		int index = arg1 - 1;
+
+		if (NULL != item->lastvalue[index])
 		{
 			res = SUCCEED;
 
@@ -859,43 +861,17 @@ static int	evaluate_LAST(char *value, DB_ITEM *item, const char *function, const
 				case ITEM_VALUE_TYPE_FLOAT:
 				case ITEM_VALUE_TYPE_UINT64:
 				case ITEM_VALUE_TYPE_STR:
-					zbx_strlcpy(value, item->lastvalue[0], MAX_BUFFER_LEN);
+					zbx_strlcpy(value, item->lastvalue[index], MAX_BUFFER_LEN);
 					break;
 				default:
-					if (NULL == item->h_lastvalue[0])
+					if (NULL == item->h_lastvalue[index])
 					{
-						zbx_strlcpy(value, item->lastvalue[0], MAX_BUFFER_LEN);
-						if (ITEM_LASTVALUE_LEN == zbx_strlen_utf8(item->lastvalue[0]))
+						zbx_strlcpy(value, item->lastvalue[index], MAX_BUFFER_LEN);
+						if (ITEM_LASTVALUE_LEN == zbx_strlen_utf8(item->lastvalue[index]))
 							goto history;
 					}
 					else
-						zbx_strlcpy(value, item->h_lastvalue[0], MAX_BUFFER_LEN);
-					break;
-			}
-		}
-	}
-	else if (0 == time_shift && 2 == arg1)
-	{
-		if (NULL != item->lastvalue[1])
-		{
-			res = SUCCEED;
-
-			switch (item->value_type)
-			{
-				case ITEM_VALUE_TYPE_FLOAT:
-				case ITEM_VALUE_TYPE_UINT64:
-				case ITEM_VALUE_TYPE_STR:
-					zbx_strlcpy(value, item->lastvalue[1], MAX_BUFFER_LEN);
-					break;
-				default:
-					if (NULL == item->h_lastvalue[1])
-					{
-						zbx_strlcpy(value, item->lastvalue[1], MAX_BUFFER_LEN);
-						if (ITEM_LASTVALUE_LEN == zbx_strlen_utf8(item->lastvalue[1]))
-							goto history;
-					}
-					else
-						zbx_strlcpy(value, item->h_lastvalue[1], MAX_BUFFER_LEN);
+						zbx_strlcpy(value, item->h_lastvalue[index], MAX_BUFFER_LEN);
 					break;
 			}
 		}
@@ -1642,8 +1618,8 @@ static int	evaluate_STR(char *value, DB_ITEM *item, const char *function, const 
 		result = DBselect("select e.expression,e.expression_type,e.exp_delimiter,e.case_sensitive"
 				" from regexps r,expressions e"
 				" where r.regexpid=e.regexpid"
-					" and r.name='%s'",
-				arg1_esc);
+					" and r.name='%s'" ZBX_SQL_NODE,
+				arg1_esc, DBand_node_local("r.regexpid"));
 		zbx_free(arg1_esc);
 
 		while (NULL != (row = DBfetch(result)))
