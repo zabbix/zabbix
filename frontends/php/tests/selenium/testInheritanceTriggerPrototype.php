@@ -249,6 +249,36 @@ class testInheritanceTriggerPrototype extends CWebTest {
 		$this->assertAttribute("//input[@id='cancel']/@value", 'Cancel');
 	}
 
+	// Returns list of triggers
+	public static function allTriggers() {
+		return DBdata("select * from triggers t left join functions f on f.triggerid=t.triggerid where f.itemid='23600' and t.description LIKE 'testInheritanceTriggerPrototype%'");
+	}
+
+	/**
+	 * @dataProvider allTriggers
+	 */
+	public function testInheritanceTriggerPrototype_simpleCreate($data) {
+		$description = $data['description'];
+
+		$sqlTriggers = "select * from triggers";
+		$oldHashTriggers = DBhash($sqlTriggers);
+
+		$this->zbxTestLogin('templates.php');
+		$this->zbxTestClickWait('link='.$this->template);
+		$this->zbxTestClickWait('link=Discovery rules');
+		$this->zbxTestClickWait('link='.$this->discoveryRule);
+		$this->zbxTestClickWait('link=Trigger prototypes');
+
+		$this->zbxTestClickWait('link='.$description);
+		$this->zbxTestClickWait('save');
+		$this->zbxTestTextPresent('Trigger updated');
+		$this->checkTitle('Configuration of trigger prototypes');
+		$this->zbxTestTextPresent(array('CONFIGURATION OF TRIGGER PROTOTYPES', "Trigger prototypes of ".$this->discoveryRule));
+		$this->zbxTestTextPresent("$description");
+
+		$this->assertEquals($oldHashTriggers, DBhash($sqlTriggers));
+	}
+
 
 	public static function simple() {
 		return array(
