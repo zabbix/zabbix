@@ -102,12 +102,12 @@ class testInheritanceGraphPrototype extends CWebTest {
 	/**
 	 * Backup the tables that will be modified during the tests.
 	 */
-	public function testInheritanceGraphPrototype_setup() {
+	public function testInheritanceGraphPrototype_Setup() {
 		DBsave_tables('graphs');
 	}
 
-	// returns all possible item types
-	public static function graphTypes() {
+	// Returns layout data
+	public static function layout() {
 		return array(
 			array(
 				array(
@@ -183,7 +183,7 @@ class testInheritanceGraphPrototype extends CWebTest {
 	}
 
 	/**
-	 * @dataProvider graphTypes
+	 * @dataProvider layout
 	 */
 	public function testInheritanceGraphPrototype_CheckLayout($data) {
 
@@ -473,15 +473,15 @@ class testInheritanceGraphPrototype extends CWebTest {
 		$this->assertAttribute("//input[@id='cancel']/@value", 'Cancel');
 	}
 
-	// Returns list of graphs
-	public static function allGraphs() {
+	// Returns update data
+	public static function update() {
 		return DBdata("select * from graphs g left join graphs_items gi on gi.graphid=g.graphid where gi.itemid='23600'");
 	}
 
 	/**
-	 * @dataProvider allGraphs
+	 * @dataProvider update
 	 */
-	public function testInheritanceGraphPrototype_simpleCreate($data) {
+	public function testInheritanceGraphPrototype_SimpleUpdate($data) {
 		$name = $data['name'];
 
 		$sqlGraphs = "select * from graphs";
@@ -502,7 +502,8 @@ class testInheritanceGraphPrototype extends CWebTest {
 		$this->assertEquals($oldHashGraphs, DBhash($sqlGraphs));
 	}
 
-	public static function graphCreate() {
+	// Returns create data
+	public static function create() {
 		return array(
 			array(
 				array('expected' => GRAPH_GOOD,
@@ -755,9 +756,9 @@ class testInheritanceGraphPrototype extends CWebTest {
 	}
 
 	/**
-	 * @dataProvider graphCreate
+	 * @dataProvider create
 	 */
-	public function testInheritanceGraphPrototype_create($data) {
+	public function testInheritanceGraphPrototype_SimpleCreate($data) {
 
 		$this->zbxTestLogin('templates.php');
 		$this->zbxTestClickWait('link='.$this->template);
@@ -967,7 +968,7 @@ class testInheritanceGraphPrototype extends CWebTest {
 	/**
 	 * Restore the original tables.
 	 */
-	public function testInheritanceGraphPrototype_teardown() {
+	public function testInheritanceGraphPrototype_Teardown() {
 		DBrestore_tables('graphs');
 	}
 }
