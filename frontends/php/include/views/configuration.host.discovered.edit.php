@@ -179,6 +179,13 @@ $ipmiList->addRow(_('Username'), new CTextBox('ipmi_username', $host['ipmi_usern
 $ipmiList->addRow(_('Password'), new CTextBox('ipmi_password', $host['ipmi_password'], ZBX_TEXTBOX_SMALL_SIZE, true));
 $divTabs->addTab('ipmiTab', _('IPMI'), $ipmiList);
 
+// macros
+$macrosView = new CView('common.macros', array(
+	'macros' => $host['macros'],
+	'readonly' => true
+));
+$divTabs->addTab('macroTab', _('Macros'), $macrosView->render());
+
 $frmHost->addItem($divTabs);
 
 /*

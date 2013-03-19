@@ -185,7 +185,7 @@ if ($hostPrototype['templates']) {
 }
 // for inherited prototypes with no templates display a text message
 elseif ($hostPrototype['templateid']) {
-	$tmplList->addRow(_('No templates linked.'), ' ');
+	$tmplList->addRow(_('No templates linked.'));
 }
 
 if (!$hostPrototype['templateid']) {
@@ -214,6 +214,13 @@ if ($parentHost['status'] != HOST_STATUS_TEMPLATE) {
 	$ipmiList->addRow(_('Username'), new CTextBox('ipmi_username', $parentHost['ipmi_username'], ZBX_TEXTBOX_SMALL_SIZE, true));
 	$ipmiList->addRow(_('Password'), new CTextBox('ipmi_password', $parentHost['ipmi_password'], ZBX_TEXTBOX_SMALL_SIZE, true));
 	$divTabs->addTab('ipmiTab', _('IPMI'), $ipmiList);
+
+	// macros
+	$macrosView = new CView('common.macros', array(
+		'macros' => $parentHost['macros'],
+		'readonly' => true
+	));
+	$divTabs->addTab('macroTab', _('Macros'), $macrosView->render());
 }
 
 $frmHost->addItem($divTabs);
