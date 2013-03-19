@@ -60,12 +60,12 @@ class testInheritanceItem extends CWebTest {
 	/**
 	 * Backup the tables that will be modified during the tests.
 	 */
-	public function testInheritanceItem_setup() {
+	public function testInheritanceItem_Setup() {
 		DBsave_tables('items');
 	}
 
-	// returns all possible item types
-	public static function itemTypes() {
+	// Returns layout data
+	public static function layout() {
 		return array(
 			array(
 				array('type' => 'Zabbix agent')
@@ -224,9 +224,9 @@ class testInheritanceItem extends CWebTest {
 	}
 
 	/**
-	 * @dataProvider itemTypes
+	 * @dataProvider layout
 	 */
-	public function testItemInheritance_CheckLayout($data) {
+	public function testInheritanceItem_CheckLayout($data) {
 		$this->zbxTestLogin('templates.php');
 		$this->zbxTestClickWait('link='.$this->template);
 		$this->zbxTestClickWait("//div[@class='w']//a[text()='Items']");
@@ -826,15 +826,15 @@ class testInheritanceItem extends CWebTest {
 		$this->assertAttribute("//*[@id='status']/option[text()='Enabled']/@selected", 'selected');
 	}
 
-	// Returns list of items
-	public static function allItems() {
+	// Returns updata data
+	public static function update() {
 		return DBdata("select * from items where hostid = 30000 and key_ LIKE 'test-inheritance-item%'");
 	}
 
 	/**
-	 * @dataProvider allItems
+	 * @dataProvider update
 	 */
-	public function testInheritanceItem_simpleCreate($data) {
+	public function testInheritanceItem_SimpleUpdate($data) {
 		$name = $data['name'];
 
 		$sqlItems = "select * from items";
@@ -853,6 +853,7 @@ class testInheritanceItem extends CWebTest {
 		$this->assertEquals($oldHashItems, DBhash($sqlItems));
 	}
 
+	// Returns create data
 	public static function create() {
 		return array(
 			array(
@@ -1816,7 +1817,7 @@ class testInheritanceItem extends CWebTest {
 	/**
 	 * @dataProvider create
 	 */
-	public function testInheritanceItem_create($data) {
+	public function testInheritanceItem_SimpleCreate($data) {
 		$this->zbxTestLogin('templates.php');
 
 		if (isset($data['name'])) {
@@ -2005,7 +2006,7 @@ class testInheritanceItem extends CWebTest {
 	/**
 	 * Restore the original tables.
 	 */
-	public function testInheritanceItem_teardown() {
+	public function testInheritanceItem_Teardown() {
 		DBrestore_tables('items');
 	}
 }
