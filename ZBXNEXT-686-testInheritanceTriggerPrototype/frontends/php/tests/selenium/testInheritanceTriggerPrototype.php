@@ -74,14 +74,14 @@ class testInheritanceTriggerPrototype extends CWebTest {
 	/**
 	 * Backup the tables that will be modified during the tests.
 	 */
-	public function testInheritanceTriggerPrototype_setup() {
+	public function testInheritanceTriggerPrototype_Setup() {
 		DBsave_tables('triggers');
 	}
 
-	// returns all possible trigger data
-	public static function triggerData() {
+	// Returns layout data
+	public static function layout() {
 		return array(
-	/*		array(
+			array(
 				array('constructor' => 'open')
 			),
 			array(
@@ -110,12 +110,12 @@ class testInheritanceTriggerPrototype extends CWebTest {
 			),
 			array(
 				array('severity' => 'Disaster')
-			)*/
+			)
 		);
 	}
 
 	/**
-	 * @dataProvider triggerData
+	 * @dataProvider layout
 	 */
 	public function testInheritanceTriggerPrototype_CheckLayout($data) {
 
@@ -249,15 +249,15 @@ class testInheritanceTriggerPrototype extends CWebTest {
 		$this->assertAttribute("//input[@id='cancel']/@value", 'Cancel');
 	}
 
-	// Returns list of triggers
-	public static function allTriggers() {
-		return DBdata("select * from triggers t left join functions f on f.triggerid=t.triggerid where f.itemid='23329' and t.description LIKE 'testInheritanceTrigger%'");
+	// Returns update data
+	public static function update() {
+		return DBdata("select * from triggers t left join functions f on f.triggerid=t.triggerid where f.itemid='23600' and t.description LIKE 'testInheritanceTriggerPrototype%'");
 	}
 
 	/**
-	 * @dataProvider allTriggers
+	 * @dataProvider update
 	 */
-	public function testFormTrigger_simpleCreate($data) {
+	public function testInheritanceTriggerPrototype_SimpleUpdate($data) {
 		$description = $data['description'];
 
 		$sqlTriggers = "select * from triggers";
@@ -280,9 +280,9 @@ class testInheritanceTriggerPrototype extends CWebTest {
 	}
 
 
-	public static function simple() {
+	public static function zcreate() {
 		return array(
-		/*	array(
+			array(
 				array(
 					'expected' => TRIGGER_BAD,
 					'errors' => array(
@@ -581,14 +581,14 @@ class testInheritanceTriggerPrototype extends CWebTest {
 						'ERROR: Cannot add trigger',
 						'Trigger "triggerSimple" already exists on "Inheritance test template".')
 				)
-			)*/
+			)
 		);
 	}
 
 	/**
 	 * @dataProvider simple
 	 */
-	public function testInheritanceTriggerPrototype_simpleCreate($data) {
+	public function testInheritanceTriggerPrototype_SimpleCreate($data) {
 
 		$this->zbxTestLogin('templates.php');
 		$this->zbxTestClickWait('link='.$this->template);
@@ -784,7 +784,7 @@ class testInheritanceTriggerPrototype extends CWebTest {
 	/**
 	 * Restore the original tables.
 	 */
-	public function testInheritanceTriggerPrototype_teardown() {
+	public function testInheritanceTriggerPrototype_Teardown() {
 		DBrestore_tables('triggers');
 	}
 }
