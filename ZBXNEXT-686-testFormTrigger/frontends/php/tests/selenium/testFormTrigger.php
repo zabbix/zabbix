@@ -32,8 +32,8 @@ class testFormTrigger extends CWebTest {
 	 */
 	protected $host = 'Simple form test host';
 
-	// returns all possible trigger data
-	public static function triggerData() {
+	// Returns layout data
+	public static function layout() {
 		return array(
 			array(
 				array('constructor' => 'open')
@@ -71,12 +71,12 @@ class testFormTrigger extends CWebTest {
 	/**
 	 * Backup the tables that will be modified during the tests.
 	 */
-	public function testFormTrigger_setup() {
+	public function testFormTrigger_Setup() {
 		DBsave_tables('triggers');
 	}
 
 	/**
-	 * @dataProvider triggerData
+	 * @dataProvider layout
 	 */
 	public function testFormTrigger_CheckLayout($data) {
 
@@ -210,13 +210,13 @@ class testFormTrigger extends CWebTest {
 		$this->assertAttribute("//input[@id='bnt1']/@value", 'Add');
 	}
 
-	// Returns list of triggers
-	public static function allTriggers() {
+	// Returns update data
+	public static function update() {
 		return DBdata("select * from triggers where description LIKE 'testFormTrigger%'");
 	}
 
 	/**
-	 * @dataProvider allTriggers
+	 * @dataProvider update
 	 */
 	public function testFormTrigger_simpleCreate($data) {
 		$description = $data['description'];
@@ -237,8 +237,8 @@ class testFormTrigger extends CWebTest {
 		$this->assertEquals($oldHashTriggers, DBhash($sqlTriggers));
 	}
 
-	// Returns all possible item data
-	public static function dataCreate() {
+	// Returns create data
+	public static function create() {
 		return array(
 			array(
 				array(
@@ -535,7 +535,7 @@ class testFormTrigger extends CWebTest {
 	}
 
 	/**
-	 * @dataProvider dataCreate
+	 * @dataProvider create
 	 */
 	public function testFormTrigger_Create($data) {
 
@@ -670,7 +670,7 @@ class testFormTrigger extends CWebTest {
 	/**
 	 * Restore the original tables.
 	 */
-	public function testFormTrigger_teardown() {
+	public function testFormTrigger_Teardown() {
 		DBrestore_tables('triggers');
 	}
 }
