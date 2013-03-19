@@ -727,7 +727,7 @@ function dashedLine($image, $x1, $y1, $x2, $y2, $color) {
 	}
 
 	imagesetstyle($image, $style);
-	imageline($image, $x1, $y1, $x2, $y2, IMG_COLOR_STYLED);
+	zbx_imageline($image, $x1, $y1, $x2, $y2, IMG_COLOR_STYLED);
 }
 
 function dashedRectangle($image, $x1, $y1, $x2, $y2, $color) {
