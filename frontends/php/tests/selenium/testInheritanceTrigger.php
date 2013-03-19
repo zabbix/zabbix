@@ -49,16 +49,15 @@ class testInheritanceTrigger extends CWebTest {
 	 */
 	protected $itemKey = 'key-item-inheritance';
 
-
 	/**
 	 * Backup the tables that will be modified during the tests.
 	 */
-	public function testInheritanceTrigger_setup() {
+	public function testInheritanceTrigger_Setup() {
 		DBsave_tables('triggers');
 	}
 
-	// returns all possible trigger data
-	public static function triggerData() {
+	// Returns layout data
+	public static function layout() {
 		return array(
 			array(
 				array('constructor' => 'open')
@@ -94,16 +93,9 @@ class testInheritanceTrigger extends CWebTest {
 	}
 
 	/**
-	 * Backup the tables that will be modified during the tests.
+	 * @dataProvider layout
 	 */
-	public function testFormTrigger_setup() {
-		DBsave_tables('triggers');
-	}
-
-	/**
-	 * @dataProvider triggerData
-	 */
-	public function testInheritanceTrigger_checkLayout($data) {
+	public function testInheritanceTrigger_CheckLayout($data) {
 		$this->zbxTestLogin('templates.php');
 
 		$this->zbxTestClickWait('link='.$this->template);
@@ -235,15 +227,15 @@ class testInheritanceTrigger extends CWebTest {
 		$this->assertAttribute("//input[@id='bnt1']/@value", 'Add');
 	}
 
-	// Returns list of triggers
-	public static function allTriggers() {
+	// Returns update data
+	public static function update() {
 		return DBdata("select * from triggers t left join functions f on f.triggerid=t.triggerid where f.itemid='23329' and t.description LIKE 'testInheritanceTrigger%'");
 	}
 
 	/**
-	 * @dataProvider allTriggers
+	 * @dataProvider update
 	 */
-	public function testFormTrigger_simpleCreate($data) {
+	public function testInheritanceTrigger_SimpleUpdate($data) {
 		$description = $data['description'];
 
 		$sqlTriggers = "select * from triggers";
@@ -263,7 +255,7 @@ class testInheritanceTrigger extends CWebTest {
 		$this->assertEquals($oldHashTriggers, DBhash($sqlTriggers));
 	}
 
-	public static function simple() {
+	public static function create() {
 		return array(
 			array(
 				array('expected' => TRIGGER_GOOD,
@@ -605,9 +597,9 @@ class testInheritanceTrigger extends CWebTest {
 	}
 
 	/**
-	 * @dataProvider simple
+	 * @dataProvider create
 	 */
-	public function testInheritanceTrigger_simpleCreate($data) {
+	public function testInheritanceTrigger_SimpleCreate($data) {
 		$this->zbxTestLogin('templates.php');
 
 		$this->zbxTestClickWait('link='.$this->template);
@@ -805,7 +797,7 @@ class testInheritanceTrigger extends CWebTest {
 	/**
 	 * Restore the original tables.
 	 */
-	public function testInheritanceTrigger_teardown() {
+	public function testInheritanceTrigger_Teardown() {
 		DBrestore_tables('triggers');
 	}
 }
