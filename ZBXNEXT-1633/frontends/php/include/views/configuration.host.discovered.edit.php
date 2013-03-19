@@ -189,6 +189,7 @@ $main = array(new CSubmit('save', _('Save')));
 $others[] = new CSubmit('clone', _('Clone'));
 $others[] = new CSubmit('full_clone', _('Full clone'));
 $others[] = new CButtonDelete(_('Delete selected host?'), url_param('form').url_param('hostid').url_param('groupid'));
+$others[] = new CButtonCancel(url_param('groupid'));
 
 $frmHost->addItem(makeFormFooter($main, $others));
 
