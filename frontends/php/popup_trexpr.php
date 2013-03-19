@@ -103,7 +103,7 @@ $paramSecIntCount = array(
 		'M' => $metrics // metrics
 	),
 	array(
-		'C' => 'Mask', // caption
+		'C' => _('Mask'), // caption
 		'T' => T_ZBX_STR
 	),
 	array(

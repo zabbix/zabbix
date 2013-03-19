@@ -183,7 +183,7 @@ class CTriggerFunctionValidator extends CValidator {
 			'band' => array(
 				'args' => array(
 					array('type' => 'sec_num', 'mandat' => true),
-					array('type' => 'sec', 'mandat' => true),	// Mask. Type 'sec' is not quite right.
+					array('type' => 'num', 'mandat' => true),
 					array('type' => 'sec')
 				),
 				'value_types' => $valueTypesInt
