@@ -76,6 +76,7 @@ frontends/php/images/general/login/background.png -text
 frontends/php/images/general/login/logo.png -text
 frontends/php/images/general/login/username_pass_field.png -text
 frontends/php/images/general/minus.png -text
+frontends/php/images/general/multiselect.png -text
 frontends/php/images/general/no_icon.png -text
 frontends/php/images/general/ok.png -text
 frontends/php/images/general/ok_bb.png -text
@@ -122,7 +123,6 @@ frontends/php/images/general/zabbix_od.png -text
 frontends/php/images/general/zabbix_unavailable.png -text
 frontends/php/images/general/zabbix_unknown.png -text
 frontends/php/images/general/zero.png -text
-frontends/php/images/gradients/blink.gif -text svneol=unset#unset
 frontends/php/images/gradients/button.gif -text svneol=unset#unset
 frontends/php/images/gradients/gradient.png -text
 frontends/php/images/gradients/header_footer_blue.png -text svneol=unset#image/png
@@ -166,7 +166,11 @@ frontends/php/images/sysmaps/old/Printer.png -text svneol=unset#unset
 frontends/php/images/sysmaps/old/Router.png -text svneol=unset#unset
 frontends/php/images/sysmaps/old/Server.png -text svneol=unset#unset
 frontends/php/images/sysmaps/old/Workstation.png -text svneol=unset#unset
+frontends/php/include/classes/class.cmultiselect.php -text
+frontends/php/include/draw.inc.php -text
+frontends/php/include/views/monitoring.dashconf.php -text
 frontends/php/js/flickerfreescreen.js -text svneol=unset#text/plain
+frontends/php/js/multiselect.js -text svneol=unset#text/plain
 frontends/php/js/servercheck.js -text
 frontends/php/js/vendors/activity-indicator.js -text svneol=unset#text/plain
 frontends/php/locale/bg/LC_MESSAGES/frontend.po -text
@@ -255,8 +259,9 @@ frontends/php/styles/themes/originalblue/images/icons_d40000.png -text
 frontends/php/styles/themes/originalblue/images/icons_ffffff.png -text
 frontends/php/styles/themes/originalblue/images/preloader.gif -text
 frontends/php/tests/bootstrap.php.template -text
-frontends/php/tests/general/urlParamTest.php -text
 frontends/php/tests/selenium/testInheritanceTrigger.php -text
+include/module.h -text
+include/zbxmodules.h -text
 man/zabbix_agentd.man -text
 man/zabbix_get.man -text
 man/zabbix_proxy.man -text

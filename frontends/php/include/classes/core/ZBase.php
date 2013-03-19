@@ -94,6 +94,7 @@ class ZBase {
 		require_once $this->getRootDir().'/include/acknow.inc.php';
 		require_once $this->getRootDir().'/include/actions.inc.php';
 		require_once $this->getRootDir().'/include/discovery.inc.php';
+		require_once $this->getRootDir().'/include/draw.inc.php';
 		require_once $this->getRootDir().'/include/events.inc.php';
 		require_once $this->getRootDir().'/include/graphs.inc.php';
 		require_once $this->getRootDir().'/include/hosts.inc.php';
