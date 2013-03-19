@@ -157,7 +157,6 @@ $tmplList = new CFormList('tmpllist');
 
 if ($data['templates']) {
 	foreach ($data['templates'] as $templateId => $name) {
-		$row = array($name);
 		$tmplList->addRow($name, '');
 	}
 }
