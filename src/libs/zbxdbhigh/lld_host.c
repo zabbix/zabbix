@@ -1068,6 +1068,42 @@ static void	DBlld_remove_lost_resources(zbx_vector_ptr_t *hosts, unsigned short 
 
 /******************************************************************************
  *                                                                            *
+ * Function: DBlld_interfaces_get                                             *
+ *                                                                            *
+ * Purpose: retrieves list of interfaces from the lld rule's host             *
+ *                                                                            *
+ ******************************************************************************/
+static void	DBlld_interfaces_get(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *interfaces)
+{
+	DB_RESULT		result;
+	DB_ROW			row;
+	zbx_lld_interface_t	*interface;
+
+	result = DBselect(
+			"select hi.type,hi.main,hi.useip,hi.ip,hi.dns,hi.port"
+			" from interface hi,items i"
+			" where hi.hostid=i.hostid"
+				" and i.itemid=" ZBX_FS_UI64,
+			lld_ruleid);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		interface = zbx_malloc(NULL, sizeof(zbx_lld_interface_t));
+
+		interface->type = (unsigned char)atoi(row[0]);
+		interface->main = (unsigned char)atoi(row[1]);
+		interface->useip = (unsigned char)atoi(row[2]);
+		interface->ip_esc = DBdyn_escape_string(row[3]);
+		interface->dns_esc = DBdyn_escape_string(row[4]);
+		interface->port_esc = DBdyn_escape_string(row[5]);
+
+		zbx_vector_ptr_append(interfaces, interface);
+	}
+	DBfree_result(result);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: DBlld_update_hosts                                               *
  *                                                                            *
  * Purpose: add or update low-level discovered hosts                          *
@@ -1085,7 +1121,6 @@ void	DBlld_update_hosts(zbx_uint64_t lld_ruleid, struct zbx_json_parse *jp_data,
 	DB_ROW			row;
 	zbx_vector_ptr_t	hosts, interfaces;
 	zbx_vector_uint64_t	del_hostgroupids;	/* list of host groups which should be deleted */
-	zbx_lld_interface_t	*interface;
 	zbx_uint64_t		proxy_hostid;
 	char			*ipmi_username = NULL, *ipmi_password;
 	char			ipmi_authtype;
@@ -1120,27 +1155,7 @@ void	DBlld_update_hosts(zbx_uint64_t lld_ruleid, struct zbx_json_parse *jp_data,
 	zbx_vector_uint64_create(&del_hostgroupids);
 	zbx_vector_ptr_create(&interfaces);
 
-	result = DBselect(
-			"select hi.type,hi.main,hi.useip,hi.ip,hi.dns,hi.port"
-			" from interface hi,items i"
-			" where hi.hostid=i.hostid"
-				" and i.itemid=" ZBX_FS_UI64,
-			lld_ruleid);
-
-	while (NULL != (row = DBfetch(result)))
-	{
-		interface = zbx_malloc(NULL, sizeof(zbx_lld_interface_t));
-
-		interface->type = (unsigned char)atoi(row[0]);
-		interface->main = (unsigned char)atoi(row[1]);
-		interface->useip = (unsigned char)atoi(row[2]);
-		interface->ip_esc = DBdyn_escape_string(row[3]);
-		interface->dns_esc = DBdyn_escape_string(row[4]);
-		interface->port_esc = DBdyn_escape_string(row[5]);
-
-		zbx_vector_ptr_append(&interfaces, interface);
-	}
-	DBfree_result(result);
+	DBlld_interfaces_get(lld_ruleid, &interfaces);
 
 	result = DBselect(
 			"select h.hostid,h.host,h.name,h.status"
