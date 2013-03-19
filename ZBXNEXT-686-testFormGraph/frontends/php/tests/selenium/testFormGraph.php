@@ -40,9 +40,16 @@ class testFormItem extends CWebTest {
 	 */
 	protected $item = 'testFormItem';
 
+	/**
+	 * Backup the tables that will be modified during the tests.
+	 */
+	public function testFormGraph_Setup() {
+		DBsave_tables('graphs');
+	}
 
-	// returns all possible item types
-	public static function graphTypes() {
+
+	// Returns layout data
+	public static function layout() {
 		return array(
 			array(
 				array(
@@ -94,14 +101,7 @@ class testFormItem extends CWebTest {
 	}
 
 	/**
-	 * Backup the tables that will be modified during the tests.
-	 */
-	public function testFormGraph_setup() {
-		DBsave_tables('graphs');
-	}
-
-	/**
-	 * @dataProvider graphTypes
+	 * @dataProvider layout
 	 */
 	public function testFormGraph_CheckLayout($data) {
 
@@ -353,15 +353,15 @@ class testFormItem extends CWebTest {
 		$this->assertAttribute("//input[@id='cancel']/@value", 'Cancel');
 	}
 
-	// Returns list of graphs
-	public static function allGraphs() {
+	// Returns update data
+	public static function update() {
 		return DBdata("select * from graphs where name LIKE 'testFormGraph%'");
 	}
 
 	/**
-	 * @dataProvider allGraphs
+	 * @dataProvider update
 	 */
-	public function testFormGraph_simpleCreate($data) {
+	public function testFormGraph_SimpleUpdate($data) {
 		$name = $data['name'];
 
 		$sqlGraphs = "select * from graphs";
@@ -380,8 +380,8 @@ class testFormItem extends CWebTest {
 		$this->assertEquals($oldHashGraphs, DBhash($sqlGraphs));
 	}
 
-	// Returns all possible item data
-	public static function dataCreate() {
+	// Returns create data
+	public static function create() {
 		return array(
 			array(
 				array(
@@ -608,9 +608,9 @@ class testFormItem extends CWebTest {
 	}
 
 	/**
-	 * @dataProvider dataCreate
+	 * @dataProvider create
 	 */
-	public function testFormGraph_Create($data) {
+	public function testFormGraph_SimpleCreate($data) {
 
 		$this->zbxTestLogin('hosts.php');
 		$this->zbxTestClickWait('link='.$this->host);
@@ -756,7 +756,7 @@ class testFormItem extends CWebTest {
 	/**
 	 * Restore the original tables.
 	 */
-	public function testFormGraph_teardown() {
+	public function testFormGraph_Teardown() {
 		DBrestore_tables('graphs');
 	}
 }
