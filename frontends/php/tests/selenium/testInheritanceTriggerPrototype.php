@@ -81,7 +81,7 @@ class testInheritanceTriggerPrototype extends CWebTest {
 	// returns all possible trigger data
 	public static function triggerData() {
 		return array(
-			array(
+	/*		array(
 				array('constructor' => 'open')
 			),
 			array(
@@ -110,7 +110,7 @@ class testInheritanceTriggerPrototype extends CWebTest {
 			),
 			array(
 				array('severity' => 'Disaster')
-			)
+			)*/
 		);
 	}
 
@@ -251,13 +251,13 @@ class testInheritanceTriggerPrototype extends CWebTest {
 
 	// Returns list of triggers
 	public static function allTriggers() {
-		return DBdata("select * from triggers t left join functions f on f.triggerid=t.triggerid where f.itemid='23600' and t.description LIKE 'testInheritanceTriggerPrototype%'");
+		return DBdata("select * from triggers t left join functions f on f.triggerid=t.triggerid where f.itemid='23329' and t.description LIKE 'testInheritanceTrigger%'");
 	}
 
 	/**
 	 * @dataProvider allTriggers
 	 */
-	public function testInheritanceTriggerPrototype_simpleCreate($data) {
+	public function testFormTrigger_simpleCreate($data) {
 		$description = $data['description'];
 
 		$sqlTriggers = "select * from triggers";
@@ -282,7 +282,7 @@ class testInheritanceTriggerPrototype extends CWebTest {
 
 	public static function simple() {
 		return array(
-			array(
+		/*	array(
 				array(
 					'expected' => TRIGGER_BAD,
 					'errors' => array(
@@ -581,7 +581,7 @@ class testInheritanceTriggerPrototype extends CWebTest {
 						'ERROR: Cannot add trigger',
 						'Trigger "triggerSimple" already exists on "Inheritance test template".')
 				)
-			)
+			)*/
 		);
 	}
 

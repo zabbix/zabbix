@@ -1,6 +1,7 @@
 Changes for 2.1.0
 
 New features:
+..F....... [ZBXNEXT-1659] added support of anti-aliased normal and bold lines for graphs and map connectors (Alexei)
 ..F....... [ZBXNEXT-1399] implemented multiselect in dashboard configuration (Eduard)
 ........S. [ZBXNEXT-354] added macro expansion for allowed hosts setting in trapper items (wiper)
 ..F....... [ZBXNEXT-109] implemented discovery rule check editing (Eduard)
@@ -45,6 +46,8 @@ A.F.I...S. [ZBXNEXT-1186] increased length to 2048 characters of expression fiel
 ........S. [ZBXNEXT-1663] added support for notification macros {TRIGGER.NAME.ORIG}, {ITEM.NAME.ORIG}, {ITEM.KEY.ORIG} (dimir)
 
 Bug fixes:
+..F....... [ZBX-6360] fixed in items.php that all items were listed if nonexisting host where provided in filter "Host" field (Toms)
+..F....... [ZBX-6387] fixed navigation problems when opening profile page from trigger or graph prototype list (Toms)
 ..F....... [ZBX-6369] fixed "Use custom multiplier" field validation in items (Oleg)
 ..F....... [ZBX-6366] fixed "New flexible interval" field validation in item prototypes (Oleg)
 ..F....... [ZBX-6334] fixed naming consistent in triggers and graph prototypes (Eduard)
@@ -151,6 +154,7 @@ A.F....... [ZBX-1357] updated American English, Brazilian Portuguese, French, Ge
 ........S. [ZBXNEXT-1663] added support for notification macros {TRIGGER.NAME.ORIG}, {ITEM.NAME.ORIG}, {ITEM.KEY.ORIG} (dimir)
 
 Bug fixes:
+A.F....... [ZBX-6318] fixed undefined indices for large node Ids in DM (Toms)
 ..F....... [ZBX-6388] fixed regular expression namespace inside nodes (Eduard)
 ........S. [ZBX-6333] added node support for global regexps (wiper)
 ..F....... [ZBX-6352] fixed web scenario and discovery rule delay interval (Eduard)
@@ -187,6 +191,7 @@ A.F....... [ZBX-1357] updated American English, Brazilian Portuguese, Dutch, Fin
 .......PS. [ZBX-5920] added prefetching of 2 MB of data for Oracle SQL selects (dimir)
 
 Bug fixes:
+..F....... [ZBX-6349] fixed calendar popup in graphs, events and screens date/time filter (Oleg)
 ..F....... [ZBX-6217] fixed inability to use HTML special characters in web scenario password (Toms)
 ...G...... [ZBX-5358] fixed encoding of network interface names with non ASCII characters on Vista/Server 2008 + (wiper)
 ...G...... [ZBX-6216] fixed crash when zabbix_sender was used in realtime mode on windows (wiper)
