@@ -642,6 +642,7 @@ elseif (isset($_REQUEST['form'])) {
 			'selectGroups' => array('groupid', 'name'),
 			'selectParentTemplates' => array('templateid', 'name'),
 			'selectInterfaces' => API_OUTPUT_EXTEND,
+			'selectMacros' => API_OUTPUT_EXTEND,
 			'hostids' => $hostid
 		));
 		$host = reset($host);
