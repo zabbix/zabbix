@@ -179,7 +179,7 @@ if ($hostPrototype['templates']) {
 		$frmHost->addVar('templates['.$templateId.']', $name);
 		$tmplList->addRow(
 			$name,
-			(!$hostPrototype['templateid']) ? new CSubmit('unlink['.$templateId.']', _('Unlink'), null, 'link_menu') : ''
+			(!$hostPrototype['templateid']) ? new CSubmit('unlink['.$templateId.']', _('Unlink and clear'), null, 'link_menu') : ''
 		);
 	}
 }
