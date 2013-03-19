@@ -87,7 +87,7 @@ typedef struct
 }
 zbx_lld_interface_t;
 
-static void	DBlld_clean_interfaces(zbx_vector_ptr_t *interfaces)
+static void	DBlld_interfaces_free(zbx_vector_ptr_t *interfaces)
 {
 	zbx_lld_interface_t	*interface;
 
@@ -448,14 +448,14 @@ static void	DBlld_host_make(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts,
  *                                                                            *
  * Function: DBlld_hostgroups_make                                            *
  *                                                                            *
- * Parameters: hosts        - [IN/OUT] list of hosts                          *
- *                            should be sorted by hostid                      *
- *             hostgroupids - [OUT] list of host groups which should be       *
- *                            deleted                                         *
+ * Parameters: hosts            - [IN/OUT] list of hosts                      *
+ *                                         should be sorted by hostid         *
+ *             del_hostgroupids - [OUT] list of host groups which should be   *
+ *                                      deleted                               *
  *                                                                            *
  ******************************************************************************/
 static void	DBlld_hostgroups_make(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *hosts,
-		zbx_vector_uint64_t *hostgroupids)
+		zbx_vector_uint64_t *del_hostgroupids)
 {
 	const char		*__function_name = "DBlld_hostgroups_make";
 
@@ -465,12 +465,8 @@ static void	DBlld_hostgroups_make(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *hos
 	zbx_vector_uint64_t	groupids, hostids;
 	zbx_uint64_t		hostgroupid, hostid, groupid;
 	zbx_lld_host_t		*host;
-	char			*sql = NULL;
-	size_t			sql_alloc = 256, sql_offset = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
-
-	sql = zbx_malloc(sql, sql_alloc);
 
 	zbx_vector_uint64_create(&groupids);
 	zbx_vector_uint64_create(&hostids);
@@ -509,6 +505,11 @@ static void	DBlld_hostgroups_make(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *hos
 
 	if (0 != hostids.values_num)
 	{
+		char	*sql = NULL;
+		size_t	sql_alloc = 256, sql_offset = 0;
+
+		sql = zbx_malloc(sql, sql_alloc);
+
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
 				"select hostid,groupid,hostgroupid"
 				" from hosts_groups"
@@ -516,6 +517,8 @@ static void	DBlld_hostgroups_make(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *hos
 		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid", hostids.values, hostids.values_num);
 
 		result = DBselect("%s", sql);
+
+		zbx_free(sql);
 
 		while (NULL != (row = DBfetch(result)))
 		{
@@ -535,7 +538,7 @@ static void	DBlld_hostgroups_make(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *hos
 			{
 				/* host groups which should be deleted */
 				ZBX_STR2UINT64(hostgroupid, row[2]);
-				zbx_vector_uint64_append(hostgroupids, hostgroupid);
+				zbx_vector_uint64_append(del_hostgroupids, hostgroupid);
 			}
 			else
 			{
@@ -545,13 +548,11 @@ static void	DBlld_hostgroups_make(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *hos
 		}
 		DBfree_result(result);
 
-		zbx_vector_uint64_sort(hostgroupids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+		zbx_vector_uint64_sort(del_hostgroupids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 	}
 
 	zbx_vector_uint64_destroy(&hostids);
 	zbx_vector_uint64_destroy(&groupids);
-
-	zbx_free(sql);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
@@ -564,7 +565,7 @@ static void	DBlld_hostgroups_make(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *hos
  *                                                                            *
  * Parameters: parent_hostid - [IN] host prototype identificator              *
  *             hosts         - [IN/OUT] list of hosts                         *
- *                             should be sorted by hostid                     *
+ *                                      should be sorted by hostid            *
  *                                                                            *
  ******************************************************************************/
 static void	DBlld_templates_make(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts)
@@ -680,14 +681,15 @@ static void	DBlld_templates_make(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *h
  *                                                                            *
  * Function: DBlld_hosts_save                                                 *
  *                                                                            *
- * Parameters: hosts        - [IN] list of hosts; should be sorted by hostid  *
- *             status       - [IN] initial host satatus                       *
- *             hostgroupids - [IN] host groups which should be deleted        *
+ * Parameters: hosts            - [IN] list of hosts;                         *
+ *                                     should be sorted by hostid             *
+ *             status           - [IN] initial host satatus                   *
+ *             del_hostgroupids - [IN] host groups which should be deleted    *
  *                                                                            *
  ******************************************************************************/
 static void	DBlld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, const char *host_proto,
 		zbx_uint64_t proxy_hostid, char ipmi_authtype, unsigned char ipmi_privilege, const char *ipmi_username,
-		const char *ipmi_password, unsigned char status, zbx_vector_uint64_t *hostgroupids,
+		const char *ipmi_password, unsigned char status, zbx_vector_uint64_t *del_hostgroupids,
 		zbx_vector_ptr_t *interfaces)
 {
 	const char		*__function_name = "DBlld_hosts_save";
@@ -762,13 +764,13 @@ static void	DBlld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts
 #endif
 	}
 
-	if (0 != hostgroupids->values_num)
+	if (0 != del_hostgroupids->values_num)
 	{
 		sql5 = zbx_malloc(sql5, sql5_alloc);
 
 		zbx_strcpy_alloc(&sql5, &sql5_alloc, &sql5_offset, "delete from hosts_groups where");
 		DBadd_condition_alloc(&sql5, &sql5_alloc, &sql5_offset, "hostgroupid",
-				hostgroupids->values, hostgroupids->values_num);
+				del_hostgroupids->values, del_hostgroupids->values_num);
 	}
 
 	if (0 != (new_interfaces = new_hosts * interfaces->values_num))
@@ -941,7 +943,7 @@ static void	DBlld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts
 		zbx_free(sql4);
 	}
 
-	if (0 != hostgroupids->values_num)
+	if (0 != del_hostgroupids->values_num)
 	{
 		DBexecute("%s", sql5);
 		zbx_free(sql5);
@@ -1082,7 +1084,7 @@ void	DBlld_update_hosts(zbx_uint64_t lld_ruleid, struct zbx_json_parse *jp_data,
 	DB_RESULT		result;
 	DB_ROW			row;
 	zbx_vector_ptr_t	hosts, interfaces;
-	zbx_vector_uint64_t	hostgroupids;	/* list of host groups which should be deleted */
+	zbx_vector_uint64_t	del_hostgroupids;	/* list of host groups which should be deleted */
 	zbx_lld_interface_t	*interface;
 	zbx_uint64_t		proxy_hostid;
 	char			*ipmi_username = NULL, *ipmi_password;
@@ -1115,7 +1117,7 @@ void	DBlld_update_hosts(zbx_uint64_t lld_ruleid, struct zbx_json_parse *jp_data,
 	}
 
 	zbx_vector_ptr_create(&hosts);
-	zbx_vector_uint64_create(&hostgroupids);
+	zbx_vector_uint64_create(&del_hostgroupids);
 	zbx_vector_ptr_create(&interfaces);
 
 	result = DBselect(
@@ -1181,11 +1183,11 @@ void	DBlld_update_hosts(zbx_uint64_t lld_ruleid, struct zbx_json_parse *jp_data,
 
 		DBlld_hosts_validate(&hosts, error);
 
-		DBlld_hostgroups_make(lld_ruleid, &hosts, &hostgroupids);
+		DBlld_hostgroups_make(lld_ruleid, &hosts, &del_hostgroupids);
 		DBlld_templates_make(parent_hostid, &hosts);
 
 		DBlld_hosts_save(parent_hostid, &hosts, host_proto, proxy_hostid, ipmi_authtype, ipmi_privilege,
-				ipmi_username, ipmi_password, status, &hostgroupids, &interfaces);
+				ipmi_username, ipmi_password, status, &del_hostgroupids, &interfaces);
 
 		/* linking of the templates */
 		DBlld_templates_link(&hosts);
@@ -1193,13 +1195,13 @@ void	DBlld_update_hosts(zbx_uint64_t lld_ruleid, struct zbx_json_parse *jp_data,
 		DBlld_remove_lost_resources(&hosts, lifetime, lastcheck);
 
 		DBlld_hosts_free(&hosts);
-		hostgroupids.values_num = 0;
+		del_hostgroupids.values_num = 0;
 	}
 	DBfree_result(result);
 
-	DBlld_clean_interfaces(&interfaces);
+	DBlld_interfaces_free(&interfaces);
 	zbx_vector_ptr_destroy(&interfaces);
-	zbx_vector_uint64_destroy(&hostgroupids);
+	zbx_vector_uint64_destroy(&del_hostgroupids);
 	zbx_vector_ptr_destroy(&hosts);
 
 	zbx_free(ipmi_password);
