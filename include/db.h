@@ -230,7 +230,7 @@ zbx_graph_item_type;
 #define ZBX_DBROW2UINT64(uint, row)	if (SUCCEED == DBis_null(row))		\
 						uint = 0;			\
 					else					\
-						sscanf(row, ZBX_FS_UI64, &uint)
+						is_uint64(row, &uint)
 
 #define ZBX_MAX_SQL_LEN		65535
 
