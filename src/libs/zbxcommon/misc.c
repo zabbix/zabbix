@@ -1510,7 +1510,9 @@ int	is_int_prefix(const char *str)
  ******************************************************************************/
 int	is_uint_n_range(const char *str, size_t n, void *value, size_t size, zbx_uint64_t min, zbx_uint64_t max)
 {
-	zbx_uint64_t	value_uint64 = 0, c;
+	zbx_uint64_t		value_uint64 = 0, c;
+	const zbx_uint64_t	max_uint64 = ~(zbx_uint64_t)__UINT64_C(0);
+	unsigned char		len;
 
 	if ('\0' == *str || 0 == n || sizeof(zbx_uint64_t) < size || (0 == size && NULL != value))
 		return FAIL;
@@ -1522,14 +1524,14 @@ int	is_uint_n_range(const char *str, size_t n, void *value, size_t size, zbx_uin
 
 		c = (zbx_uint64_t)(unsigned char)(*str - '0');
 
-		if ((max - c) / 10 < value_uint64)
+		if (20 <= ++len && (max_uint64 - c) / 10 < value_uint64)
 			return FAIL;	/* maximum value exceeded */
 
 		value_uint64 = value_uint64 * 10 + c;
 
 		str++;
 	}
-	if (min > value_uint64)
+	if (min > value_uint64 || value_uint64 > max)
 		return FAIL;
 
 	if (NULL != value)
