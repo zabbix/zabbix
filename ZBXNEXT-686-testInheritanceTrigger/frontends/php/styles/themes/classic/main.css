@@ -37,8 +37,8 @@ table.tableinfo tr td { border-radius: 0; }
 table.tableinfo tr.header td { background: #CCC; }
 table.tableinfo tr.header td.hover_grey { background: #BBB; }
 table.tableinfo tr.header td.hover_grey:hover { background: #999; color: #EEE; }
-table.tableinfo tr.even_row > td{ background: #EEE; }
 table.tableinfo tr.odd_row > td { background: #DDD; }
+table.tableinfo tr.even_row > td{ background: #EEE; }
 
 ul.favorites { margin: 0; padding: 4px 4px 4px 1em; border: 1px solid #AAAAAA; }
 
@@ -128,3 +128,7 @@ table.ack_msgs tr.msg { background-color: #F8F8F8; }
 div.preloader {
 	background: url("images/preloader.gif") no-repeat;
 }
+
+/* multiselect */
+.multiselect .selected ul.active { border: 1px solid #6681B2; }
+.multiselect .available ul li.hover { background: #4F70A8; }

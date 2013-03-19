@@ -29,6 +29,7 @@
 #include "mutexs.h"
 
 #include "sysinfo.h"
+#include "zbxmodules.h"
 #include "zbxserver.h"
 
 #include "daemon.h"
@@ -184,6 +185,9 @@ int	CONFIG_PROXYPOLLER_FORKS	= 1;	/* parameters for passive proxies */
 int	CONFIG_PROXYCONFIG_FREQUENCY	= 3600;	/* 1h */
 int	CONFIG_PROXYDATA_FREQUENCY	= 1;	/* 1s */
 
+char	*CONFIG_LOAD_MODULE_PATH	= NULL;
+char	**CONFIG_LOAD_MODULE		= NULL;
+
 /* mutex for node syncs */
 ZBX_MUTEX	node_sync_access;
 
@@ -211,6 +215,9 @@ static void	zbx_set_defaults()
 
 	if (NULL == CONFIG_ALERT_SCRIPTS_PATH)
 		CONFIG_ALERT_SCRIPTS_PATH = zbx_strdup(CONFIG_ALERT_SCRIPTS_PATH, DATADIR "/zabbix/alertscripts");
+
+	if (NULL == CONFIG_LOAD_MODULE_PATH)
+		CONFIG_LOAD_MODULE_PATH = zbx_strdup(CONFIG_LOAD_MODULE_PATH, LIBDIR "/modules");
 
 	if (NULL == CONFIG_TMPDIR)
 		CONFIG_TMPDIR = zbx_strdup(CONFIG_TMPDIR, "/tmp");
@@ -390,8 +397,15 @@ static void	zbx_load_config()
 			PARM_OPT,	1,			SEC_PER_HOUR},
 		{"AllowRoot",			&CONFIG_ALLOW_ROOT,			TYPE_INT,
 			PARM_OPT,	0,			1},
+		{"LoadModulePath",		&CONFIG_LOAD_MODULE_PATH,		TYPE_STRING,
+			PARM_OPT,	0,			0},
+		{"LoadModule",			&CONFIG_LOAD_MODULE,			TYPE_MULTISTRING,
+			PARM_OPT,	0,			0},
 		{NULL}
 	};
+
+	/* initialize multistrings */
+	zbx_strarr_init(&CONFIG_LOAD_MODULE);
 
 	parse_cfg_file(CONFIG_FILE, cfg, ZBX_CFG_FILE_REQUIRED, ZBX_CFG_STRICT);
 
@@ -417,6 +431,18 @@ void	zbx_sigusr_handler(zbx_task_t task)
 	}
 }
 #endif
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_free_config                                                  *
+ *                                                                            *
+ * Purpose: free configuration memory                                         *
+ *                                                                            *
+ ******************************************************************************/
+static void	zbx_free_config()
+{
+	zbx_strarr_free(CONFIG_LOAD_MODULE);
+}
 
 /******************************************************************************
  *                                                                            *
@@ -566,6 +592,14 @@ int	MAIN_ZABBIX_ENTRY()
 		zabbix_log(LOG_LEVEL_INFORMATION, "NodeID:                    %3d", CONFIG_NODEID);
 		zabbix_log(LOG_LEVEL_INFORMATION, "******************************");
 	}
+
+	if (FAIL == load_modules(CONFIG_LOAD_MODULE_PATH, CONFIG_LOAD_MODULE, CONFIG_TIMEOUT, 1))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "loading modules failed, exiting...");
+		exit(EXIT_FAILURE);
+	}
+
+	zbx_free_config();
 
 	if (SUCCEED != DBcheck_version())
 		exit(EXIT_FAILURE);
@@ -832,6 +866,8 @@ void	zbx_on_exit()
 #endif
 
 	free_selfmon_collector();
+
+	unload_modules();
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "Zabbix Server stopped. Zabbix %s (revision %s).",
 			ZABBIX_VERSION, ZABBIX_REVISION);

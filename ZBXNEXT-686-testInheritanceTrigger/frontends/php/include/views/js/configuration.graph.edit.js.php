@@ -283,11 +283,11 @@
 						+ '&width=' + jQuery('#width').val()
 						+ '&height=' + jQuery('#height').val()
 						+ '&graphtype=' + jQuery('#graphtype').val()
-						+ '&legend=' + (jQuery('#legend').is(':checked') ? 1 : 0);
+						+ '&legend=' + (jQuery('#show_legend').is(':checked') ? 1 : 0);
 
 			<?php if ($this->data['graphtype'] == GRAPH_TYPE_PIE || $this->data['graphtype'] == GRAPH_TYPE_EXPLODED): ?>
 				name = 'chart7.php';
-				src += '&graph3d=' + (jQuery('#graph3d').is(':checked') ? 1 : 0);
+				src += '&graph3d=' + (jQuery('#show_3d').is(':checked') ? 1 : 0);
 
 			<?php else: ?>
 				<?php if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL): ?>
@@ -301,8 +301,8 @@
 							+ '&yaxismax=' + jQuery('#yaxismax').val()
 							+ '&ymin_itemid=' + jQuery('#ymin_itemid').val()
 							+ '&ymax_itemid=' + jQuery('#ymax_itemid').val()
-							+ '&showworkperiod=' + (jQuery('#showworkperiod').is(':checked') ? 1 : 0)
-							+ '&showtriggers=' + (jQuery('#showtriggers').is(':checked') ? 1 : 0);
+							+ '&showworkperiod=' + (jQuery('#show_work_period').is(':checked') ? 1 : 0)
+							+ '&showtriggers=' + (jQuery('#show_triggers').is(':checked') ? 1 : 0);
 			<?php endif; ?>
 
 			jQuery('#itemsTable tr.sortable').find('*[name]').each(function(index, value) {

@@ -232,7 +232,7 @@ class CDRule extends CZBXAPI {
 			'limit' => 1
 		);
 		if (isset($object['name'])) $options['filter']['name'] = $object['name'];
-		if (isset($object['hostids'])) $options['druleids'] = zbx_toArray($object['druleids']);
+		if (isset($object['druleids'])) $options['druleids'] = zbx_toArray($object['druleids']);
 
 		if (isset($object['node']))
 			$options['nodeids'] = getNodeIdByNodeName($object['node']);
@@ -691,7 +691,7 @@ class CDRule extends CZBXAPI {
 					'preservekeys' => true
 				));
 				if (!is_null($options['limitSelects'])) {
-					order_result($dchecks, 'name');
+					order_result($dchecks, 'dcheckid');
 				}
 				$result = $relationMap->mapMany($result, $dchecks, 'dchecks', $options['limitSelects']);
 			}
@@ -724,7 +724,7 @@ class CDRule extends CZBXAPI {
 					'preservekeys' => true
 				));
 				if (!is_null($options['limitSelects'])) {
-					order_result($dhosts, 'name');
+					order_result($dhosts, 'dhostid');
 				}
 				$result = $relationMap->mapMany($result, $dhosts, 'dhosts', $options['limitSelects']);
 			}
