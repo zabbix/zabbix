@@ -661,7 +661,7 @@ elseif (isset($_REQUEST['form'])) {
 		// templates
 		$templates = array();
 		foreach ($host['parentTemplates'] as $template) {
-			$templates['templates'][$template['templateid']] = $template['name'];
+			$templates[$template['templateid']] = $template['name'];
 		}
 
 		$hostForm = new CView('configuration.host.discovered.edit', array(

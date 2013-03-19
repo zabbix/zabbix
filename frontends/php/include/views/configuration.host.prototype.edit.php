@@ -177,7 +177,6 @@ $tmplList = new CFormList('tmpllist');
 if ($hostPrototype['templates']) {
 	foreach ($hostPrototype['templates'] as $templateId => $name) {
 		$frmHost->addVar('templates['.$templateId.']', $name);
-		$row = array($name);
 		$tmplList->addRow(
 			$name,
 			(!$hostPrototype['templateid']) ? new CSubmit('unlink['.$templateId.']', _('Unlink'), null, 'link_menu') : ''
