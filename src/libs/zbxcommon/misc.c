@@ -1744,7 +1744,7 @@ int	uint64_in_list(char *list, zbx_uint64_t value)
 		}
 		else
 		{
-			ZBX_STR2UINT64(tmp_uint64,start);
+			sscanf(start, ZBX_FS_UI64, &tmp_uint64);
 			if (tmp_uint64 == value)
 			{
 				ret = SUCCEED;
