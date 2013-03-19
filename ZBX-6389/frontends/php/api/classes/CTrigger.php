@@ -752,9 +752,7 @@ class CTrigger extends CTriggerGeneral {
 					'limit' => 1
 				));
 
-				if ($event) {
-					$result[$triggerId]['event'] = reset($event);
-				}
+				$result[$triggerId]['event'] = $event ? reset($event) : array();
 			}
 		}
 
@@ -980,6 +978,7 @@ class CTrigger extends CTriggerGeneral {
 		if (is_null($options['preservekeys'])) {
 			$result = zbx_cleanHashes($result);
 		}
+
 		return $result;
 	}
 

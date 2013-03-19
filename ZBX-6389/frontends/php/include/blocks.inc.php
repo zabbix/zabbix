@@ -233,7 +233,6 @@ function make_system_status($filter) {
 		'maintenance' => $filter['maintenance'],
 		'skipDependent' => true,
 		'withLastEventUnacknowledged' => ($filter['extAck'] == EXTACK_OPTION_UNACK) ? true : null,
-		'withLastEvent' => true,
 		'expandDescription' => true,
 		'filter' => array(
 			'priority' => $filter['severity'],
@@ -246,11 +245,18 @@ function make_system_status($filter) {
 		'preservekeys' => true
 	));
 
+	// get events
+	$events = API::Trigger()->get(array(
+		'triggerids' => zbx_objectValues($triggers, 'triggerid'),
+		'withLastEvent' => true,
+		'preservekeys' => true
+	));
+
 	// get acknowledges
 	$eventIds = array();
-	foreach ($triggers as $trigger) {
-		if (!empty($trigger['event'])) {
-			$eventIds[$trigger['event']['eventid']] = $trigger['event']['eventid'];
+	foreach ($events as $event) {
+		if (!empty($event['event'])) {
+			$eventIds[$event['event']['eventid']] = $event['event']['eventid'];
 		}
 	}
 	if ($eventIds) {
@@ -263,6 +269,9 @@ function make_system_status($filter) {
 
 	foreach ($triggers as $trigger) {
 		// event
+		if (isset($events[$trigger['triggerid']])) {
+			$trigger['event'] = $events[$trigger['triggerid']]['event'];
+		}
 		if (empty($trigger['event'])) {
 			$trigger['event'] = array(
 				'acknowledged' => false,
@@ -784,7 +793,6 @@ function make_latest_issues(array $filter = array()) {
 		'monitored' => true,
 		'maintenance' => $filter['maintenance'],
 		'withLastEventUnacknowledged' => (!empty($filter['extAck']) && $filter['extAck'] == EXTACK_OPTION_UNACK) ? true : null,
-		'withLastEvent' => true,
 		'skipDependent' => true,
 		'filter' => array(
 			'priority' => $filter['severity'],
@@ -803,11 +811,18 @@ function make_latest_issues(array $filter = array()) {
 	unset($options['limit']);
 	$triggersTotalCount = API::Trigger()->get($options);
 
+	// get events
+	$events = API::Trigger()->get(array(
+		'triggerids' => zbx_objectValues($triggers, 'triggerid'),
+		'withLastEvent' => true,
+		'preservekeys' => true
+	));
+
 	// get acknowledges
 	$eventIds = array();
-	foreach ($triggers as $trigger) {
-		if (!empty($trigger['event'])) {
-			$eventIds[$trigger['event']['eventid']] = $trigger['event']['eventid'];
+	foreach ($events as $event) {
+		if (!empty($event['event'])) {
+			$eventIds[$event['event']['eventid']] = $event['event']['eventid'];
 		}
 	}
 	if ($eventIds) {
@@ -875,6 +890,9 @@ function make_latest_issues(array $filter = array()) {
 
 	foreach ($triggers as $trigger) {
 		// event
+		if (isset($events[$trigger['triggerid']])) {
+			$trigger['event'] = $events[$trigger['triggerid']]['event'];
+		}
 		if (!empty($trigger['event'])) {
 			$trigger['event']['acknowledges'] = isset($eventAcknowledges[$trigger['event']['eventid']])
 				? $eventAcknowledges[$trigger['event']['eventid']]['acknowledges']
