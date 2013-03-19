@@ -1087,7 +1087,7 @@ function dbConditionInt($fieldName, array $values, $notIn = false) {
 	while (false !== ($valueR = next($values))) {
 		$valueL = bcadd($valueL, 1, 0);
 
-		if ($valueR != $valueL) {
+		if (bccomp($valueR, $valueL) != 0) {
 			if ($len >= $MIN_NUM_BETWEEN) {
 				$betweens[] = array(bcsub($valueL, $len, 0), bcsub($valueL, 1, 0));
 			}
