@@ -3554,7 +3554,7 @@ void	DCconfig_get_time_based_triggers(DC_TRIGGER **trigger_info, zbx_vector_ptr_
 
 				if ('}' == *q)
 				{
-					ZBX_STR2UINT64(functionid, p + 1);
+					sscanf(p + 1, ZBX_FS_UI64, &functionid);
 
 					if (NULL != (dc_function = zbx_hashset_search(&config->functions, &functionid)) &&
 							SUCCEED == is_time_function(dc_function->function) &&
