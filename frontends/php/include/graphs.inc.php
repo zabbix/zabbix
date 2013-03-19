@@ -839,58 +839,9 @@ function find_period_end($periods, $time, $max_time) {
 }
 
 /**
- * Calculate interval for base 1024 values.
+ * Converts Base1000 values to Base1024 and calc pow
  * Example:
- * 	Convert 1000 to 1024
- *
- * @param $interval
- * @param $minY
- * @param $maxY
- *
- * @return float|int
- */
-function getBase1024Interval($interval, $minY, $maxY) {
-	$intervalData = convertToBase1024($interval);
-	$interval = $intervalData['value'];
-
-	if ($maxY > 0) {
-		$absMaxY = $maxY;
-	}
-	else {
-		$absMaxY = bcmul($maxY, '-1');
-	}
-
-	if ($minY > 0) {
-		$absMinY = $minY;
-	}
-	else {
-		$absMinY = bcmul($minY, '-1');
-	}
-
-	if ($absMaxY > $absMinY) {
-		$sideMaxData = getPowForInterval($maxY);
-	}
-	else {
-		$sideMaxData = getPowForInterval($minY);
-	}
-
-	if ($sideMaxData != $intervalData) {
-		// interval correction, if Max Y have other unit, then interval unit = Max Y unit
-		if ($intervalData < 0) {
-			$interval = sprintf('%.10f', bcmul($interval, 1.024, 10));
-		}
-		else {
-			$interval = sprintf('%.6f', round(bcmul($interval, 1.024), ZBX_UNITS_ROUNDOFF_UPPER_LIMIT));
-		}
-	}
-
-	return $interval;
-}
-
-/**
- * Converts Base1000 values to Base1024 and calculate pow
- * Example:
- * 	204800 (200 KBytes) with '1024' step convert to 209715,2 (0.2MB (204.8 KBytes))
+ * 	200 KBytes convert to 0.2MB (204.8 KBytes)
  *
  * @param string $value
  * @param string $step
@@ -909,8 +860,12 @@ function convertToBase1024 ($value, $step = false) {
 		$abs = $value;
 	}
 
+	// set default values
+	$valData['pow'] = 0;
+	$valData['value'] = 0;
+
 	// supported pows ('-2' - '8')
-	for ($i = -2; $i < 9 ; $i++) {
+	for ($i = -2; $i < 9; $i++) {
 		$val = bcpow($step, $i);
 		if (bccomp($abs, $val) > -1) {
 			$valData['pow'] = $i;
@@ -948,34 +903,50 @@ function convertToBase1024 ($value, $step = false) {
 }
 
 /**
- * Calculate pow level for interval.
+ * Calculate interval for base 1024 values.
  * Example:
- * 	1000000 with '1024' step is 1 and with '1000' step is 2
+ * 	Convert 1000 to 1024
  *
  * @param $interval
- * @param $step
+ * @param $minY
+ * @param $maxY
  *
- * @return int
+ * @return float|int
  */
-function getPowForInterval($value, $step) {
-	if (empty($step)) {
-		$step = 1000;
-	}
+function getBase1024Interval($interval, $minY, $maxY) {
+	$intervalData = convertToBase1024($interval);
+	$interval = $intervalData['value'];
 
-	if ($value < 0) {
-		$abs = bcmul($value, '-1');
+	if ($maxY > 0) {
+		$absMaxY = $maxY;
 	}
 	else {
-		$abs = $value;
+		$absMaxY = bcmul($maxY, '-1');
 	}
 
-	// supported pows ('-2' - '8')
-	for ($i = -2; $i < 9 ; $i++) {
-		if (bccomp($abs, bcpow($step, $i)) > -1) {
-			$minPow = $i;
+	if ($minY > 0) {
+		$absMinY = $minY;
+	}
+	else {
+		$absMinY = bcmul($minY, '-1');
+	}
+
+	if ($absMaxY > $absMinY) {
+		$sideMaxData = convertToBase1024($maxY);
+	}
+	else {
+		$sideMaxData = convertToBase1024($minY);
+	}
+
+	if ($sideMaxData['pow'] != $intervalData['pow']) {
+		// interval correction, if Max Y have other unit, then interval unit = Max Y unit
+		if ($intervalData['pow'] < 0) {
+			$interval = sprintf('%.10f', bcmul($interval, 1.024, 10));
 		}
 		else {
-			return $minPow;
+			$interval = sprintf('%.6f', round(bcmul($interval, 1.024), ZBX_UNITS_ROUNDOFF_UPPER_LIMIT));
 		}
 	}
+
+	return $interval;
 }
