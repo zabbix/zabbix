@@ -46,16 +46,16 @@ $fields = array(
 	'graphtype' =>			array(T_ZBX_INT, O_OPT, null,		IN('0,1,2,3'),	'isset({save})'),
 	'yaxismin' =>			array(T_ZBX_DBL, O_OPT, null,		null,			'isset({save})&&(({graphtype}==0)||({graphtype}==1))'),
 	'yaxismax' =>			array(T_ZBX_DBL, O_OPT, null,		null,			'isset({save})&&(({graphtype}==0)||({graphtype}==1))'),
-	'graph3d' =>			array(T_ZBX_INT, O_OPT, P_NZERO,	IN('0,1'),		null),
-	'legend' =>				array(T_ZBX_INT, O_OPT, P_NZERO,	IN('0,1'),		null),
+	'show_3d' =>			array(T_ZBX_INT, O_OPT, P_NZERO,	IN('0,1'),		null),
+	'show_legend' =>		array(T_ZBX_INT, O_OPT, P_NZERO,	IN('0,1'),		null),
 	'ymin_itemid' =>		array(T_ZBX_INT, O_OPT, null,		DB_ID,			'isset({save})&&isset({ymin_type})&&({ymin_type}==3)'),
 	'ymax_itemid' =>		array(T_ZBX_INT, O_OPT, null,		DB_ID,			'isset({save})&&isset({ymax_type})&&({ymax_type}==3)'),
 	'percent_left' =>		array(T_ZBX_DBL, O_OPT, null,		BETWEEN(0, 100), null, _('Percentile line (left)')),
 	'percent_right' =>		array(T_ZBX_DBL, O_OPT, null,		BETWEEN(0, 100), null, _('Percentile line (right)')),
 	'visible' =>			array(T_ZBX_INT, O_OPT, null,		BETWEEN(0, 1),	null),
 	'items' =>				array(T_ZBX_STR, O_OPT, null,		null,			null),
-	'showworkperiod' =>		array(T_ZBX_INT, O_OPT, null,		IN('1'),		null),
-	'showtriggers' =>		array(T_ZBX_INT, O_OPT, null,		IN('1'),		null),
+	'show_work_period' =>	array(T_ZBX_INT, O_OPT, null,		IN('1'),		null),
+	'show_triggers' =>		array(T_ZBX_INT, O_OPT, null,		IN('1'),		null),
 	'group_graphid' =>		array(T_ZBX_INT, O_OPT, null,		DB_ID,			null),
 	'copy_targetid' =>		array(T_ZBX_INT, O_OPT, null,		DB_ID,			null),
 	'filter_groupid' =>		array(T_ZBX_INT, O_OPT, P_SYS,		DB_ID,			'isset({copy})&&(isset({copy_type})&&({copy_type}==0))'),
@@ -88,8 +88,8 @@ validate_sort_and_sortorder('name', ZBX_SORT_UP);
 
 $_REQUEST['go'] = get_request('go', 'none');
 $_REQUEST['items'] = get_request('items', array());
-$_REQUEST['graph3d'] = get_request('graph3d', 0);
-$_REQUEST['legend'] = get_request('legend', 0);
+$_REQUEST['show_3d'] = get_request('show_3d', 0);
+$_REQUEST['show_legend'] = get_request('show_legend', 0);
 
 /*
  * Permissions
@@ -159,7 +159,28 @@ if (CUser::$userData['type'] !== USER_TYPE_SUPER_ADMIN) {
  * Actions
  */
 if (isset($_REQUEST['clone']) && isset($_REQUEST['graphid'])) {
+	// graph
+	$options = array(
+		'graphids' => $_REQUEST['graphid'],
+		'output' => API_OUTPUT_EXTEND
+	);
+	$graph = empty($_REQUEST['parent_discoveryid'])
+		? API::Graph()->get($options)
+		: API::GraphPrototype()->get($options);
+	$graph = reset($graph);
+
+	$_REQUEST = array_merge($_REQUEST, $graph);
+
+	// graph items
+	$_REQUEST['items'] = API::GraphItem()->get(array(
+		'graphids' => $_REQUEST['graphid'],
+		'sortfield' => 'gitemid',
+		'output' => API_OUTPUT_EXTEND,
+		'expandData' => true
+	));
+
 	unset($_REQUEST['graphid']);
+
 	$_REQUEST['form'] = 'clone';
 }
 elseif (isset($_REQUEST['save'])) {
@@ -178,11 +199,11 @@ elseif (isset($_REQUEST['save'])) {
 			'yaxismax' => get_request('yaxismax', 0),
 			'ymin_itemid' => $_REQUEST['ymin_itemid'],
 			'ymax_itemid' => $_REQUEST['ymax_itemid'],
-			'show_work_period' => get_request('showworkperiod', 0),
-			'show_triggers' => get_request('showtriggers', 0),
+			'show_work_period' => get_request('show_work_period', 0),
+			'show_triggers' => get_request('show_triggers', 0),
 			'graphtype' => $_REQUEST['graphtype'],
-			'show_legend' => get_request('legend', 1),
-			'show_3d' => get_request('graph3d', 0),
+			'show_legend' => get_request('show_legend', 1),
+			'show_3d' => get_request('show_3d', 0),
 			'percent_left' => get_request('percent_left', 0),
 			'percent_right' => get_request('percent_right', 0),
 			'gitems' => $items
@@ -348,7 +369,7 @@ elseif (isset($_REQUEST['form'])) {
 			'output' => API_OUTPUT_EXTEND,
 			'selectHosts' => array('hostid')
 		);
-		$graph = !empty($data['parent_discoveryid']) ? API::GraphPrototype()->get($options) : API::Graph()->get($options);
+		$graph = empty($data['parent_discoveryid']) ? API::Graph()->get($options) : API::GraphPrototype()->get($options);
 		$graph = reset($graph);
 
 		$data['name'] = $graph['name'];
@@ -360,11 +381,11 @@ elseif (isset($_REQUEST['form'])) {
 		$data['yaxismax'] = $graph['yaxismax'];
 		$data['ymin_itemid'] = $graph['ymin_itemid'];
 		$data['ymax_itemid'] = $graph['ymax_itemid'];
-		$data['showworkperiod'] = $graph['show_work_period'];
-		$data['showtriggers'] = $graph['show_triggers'];
+		$data['show_work_period'] = $graph['show_work_period'];
+		$data['show_triggers'] = $graph['show_triggers'];
 		$data['graphtype'] = $graph['graphtype'];
-		$data['legend'] = $graph['show_legend'];
-		$data['graph3d'] = $graph['show_3d'];
+		$data['show_legend'] = $graph['show_legend'];
+		$data['show_3d'] = $graph['show_3d'];
 		$data['percent_left'] = $graph['percent_left'];
 		$data['percent_right'] = $graph['percent_right'];
 		$data['templateid'] = $graph['templateid'];
@@ -444,10 +465,10 @@ elseif (isset($_REQUEST['form'])) {
 		$data['yaxismax'] = get_request('yaxismax', '100.00');
 		$data['ymin_itemid'] = get_request('ymin_itemid', 0);
 		$data['ymax_itemid'] = get_request('ymax_itemid', 0);
-		$data['showworkperiod'] = get_request('showworkperiod', 0);
-		$data['showtriggers'] = get_request('showtriggers', 0);
-		$data['legend'] = get_request('legend', 0);
-		$data['graph3d'] = get_request('graph3d', 0);
+		$data['show_work_period'] = get_request('show_work_period', 0);
+		$data['show_triggers'] = get_request('show_triggers', 0);
+		$data['show_legend'] = get_request('show_legend', 0);
+		$data['show_3d'] = get_request('show_3d', 0);
 		$data['visible'] = get_request('visible');
 		$data['percent_left'] = 0;
 		$data['percent_right'] = 0;
@@ -463,9 +484,9 @@ elseif (isset($_REQUEST['form'])) {
 	}
 
 	if (empty($data['graphid']) && !isset($_REQUEST['form_refresh'])) {
-		$data['legend'] = $_REQUEST['legend'] = 1;
-		$data['showworkperiod'] = $_REQUEST['showworkperiod'] = 1;
-		$data['showtriggers'] = $_REQUEST['showtriggers'] = 1;
+		$data['show_legend'] = $_REQUEST['show_legend'] = 1;
+		$data['show_work_period'] = $_REQUEST['show_work_period'] = 1;
+		$data['show_triggers'] = $_REQUEST['show_triggers'] = 1;
 	}
 
 	$_REQUEST['items'] = $data['items'];
@@ -478,11 +499,11 @@ elseif (isset($_REQUEST['form'])) {
 	$_REQUEST['yaxismax'] = $data['yaxismax'];
 	$_REQUEST['ymin_itemid'] = $data['ymin_itemid'];
 	$_REQUEST['ymax_itemid'] = $data['ymax_itemid'];
-	$_REQUEST['showworkperiod'] = $data['showworkperiod'];
-	$_REQUEST['showtriggers'] = $data['showtriggers'];
+	$_REQUEST['show_work_period'] = $data['show_work_period'];
+	$_REQUEST['show_triggers'] = $data['show_triggers'];
 	$_REQUEST['graphtype'] = $data['graphtype'];
-	$_REQUEST['legend'] = $data['legend'];
-	$_REQUEST['graph3d'] = $data['graph3d'];
+	$_REQUEST['show_legend'] = $data['show_legend'];
+	$_REQUEST['show_3d'] = $data['show_3d'];
 	$_REQUEST['percent_left'] = $data['percent_left'];
 	$_REQUEST['percent_right'] = $data['percent_right'];
 

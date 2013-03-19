@@ -120,7 +120,7 @@ if (isset($ZBX_SERVER_NAME) && !zbx_empty($ZBX_SERVER_NAME)) {
 $pageTitle .= _('Installation');
 
 $pageHeader = new CPageHeader($pageTitle);
-$pageHeader->addCssFile('css.css');
+$pageHeader->addCssInit();
 $pageHeader->addCssFile('styles/themes/originalblue/main.css');
 $pageHeader->addJsFile('js/jquery/jquery.js');
 $pageHeader->addJsFile('js/jquery/jquery-ui.js');
