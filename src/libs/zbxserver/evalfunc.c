@@ -136,8 +136,8 @@ static int	evaluate_LOGEVENTID(char *value, DB_ITEM *item, const char *function,
 		result = DBselect("select e.expression,e.expression_type,e.exp_delimiter,e.case_sensitive"
 				" from regexps r,expressions e"
 				" where r.regexpid=e.regexpid"
-					" and r.name='%s'",
-				arg1_esc);
+					" and r.name='%s'" ZBX_SQL_NODE,
+				arg1_esc, DBand_node_local("r.regexpid"));
 		zbx_free(arg1_esc);
 
 		while (NULL != (row = DBfetch(result)))
@@ -1618,8 +1618,8 @@ static int	evaluate_STR(char *value, DB_ITEM *item, const char *function, const 
 		result = DBselect("select e.expression,e.expression_type,e.exp_delimiter,e.case_sensitive"
 				" from regexps r,expressions e"
 				" where r.regexpid=e.regexpid"
-					" and r.name='%s'",
-				arg1_esc);
+					" and r.name='%s'" ZBX_SQL_NODE,
+				arg1_esc, DBand_node_local("r.regexpid"));
 		zbx_free(arg1_esc);
 
 		while (NULL != (row = DBfetch(result)))
