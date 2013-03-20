@@ -137,7 +137,7 @@ $fields = array(
 	'multiplier' =>				array(T_ZBX_INT, O_OPT, null,	null,		null),
 	'delta' =>					array(T_ZBX_INT, O_OPT, null,	IN('0,1,2'), 'isset({save})&&isset({value_type})&&'.
 		IN('0,3','value_type').'(isset({data_type})&&({data_type}!='.ITEM_DATA_TYPE_BOOLEAN.'))'),
-	'formula' =>				array(T_ZBX_DBL, O_OPT, P_UNSET_EMPTY,		'({value_type}==0&&{}!=0)||({value_type}==3&&{}>0)',
+	'formula' =>				array(T_ZBX_DBL, O_OPT, null,		'({value_type}==0&&{}!=0)||({value_type}==3&&{}>0)',
 		'isset({save})&&isset({multiplier})&&({multiplier}==1)', _('Custom multiplier')),
 	'logtimefmt' =>				array(T_ZBX_STR, O_OPT, null,	null,
 		'isset({save})&&(isset({value_type})&&({value_type}==2))'),
@@ -855,8 +855,8 @@ else {
 		'limit' => $config['search_limit'] + 1
 	);
 	$preFilter = count($options, COUNT_RECURSIVE);
-	if (!empty($data['hostid'])) {
-		$options['hostids'] = $hostid;
+	if (isset($data['hostid'])) {
+		$options['hostids'] = $data['hostid'];
 	}
 	if (isset($_REQUEST['filter_group']) && !zbx_empty($_REQUEST['filter_group'])) {
 		$options['group'] = $_REQUEST['filter_group'];

@@ -59,7 +59,7 @@ order_result($images, 'name');
 foreach ($images as $image) {
 	$cmbImg->addItem(
 		$image['imageid'],
-		get_node_name_by_elid($image['imageid'], null, ': ').$image['name']
+		get_node_name_by_elid($image['imageid'], null, NAME_DELIMITER).$image['name']
 	);
 }
 $sysmapList->addRow(_('Background image'), $cmbImg);
