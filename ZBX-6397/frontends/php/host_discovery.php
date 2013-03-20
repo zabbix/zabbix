@@ -38,7 +38,7 @@ $fields = array(
 	'hostid' =>				array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		'!isset({form})'),
 	'itemid' =>				array(T_ZBX_INT, O_NO,	P_SYS,	DB_ID,		'(isset({form})&&({form}=="update"))'),
 	'interfaceid' =>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID, null, _('Interface')),
-	'name' =>			array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY, 'isset({save})', _('Name')),
+	'name' =>				array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY, 'isset({save})', _('Name')),
 	'description' =>		array(T_ZBX_STR, O_OPT, null,	null,		'isset({save})'),
 	'filter_macro' =>		array(T_ZBX_STR, O_OPT, null,	null,		'isset({save})'),
 	'filter_value' =>		array(T_ZBX_STR, O_OPT, null,	null,		'isset({save})'),
