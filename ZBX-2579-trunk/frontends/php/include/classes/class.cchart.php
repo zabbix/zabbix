@@ -854,10 +854,14 @@ class CChart extends CGraphDraw {
 			else {
 				$tmpInterval = $interval_other_side;
 			}
-			if (bccomp($this->m_minY[$graphSide], $minY[$side]) == 0 && $this->m_minY[$graphSide] != 0) {
+
+			if (bccomp($this->m_minY[$graphSide], $minY[$side]) == 0
+					&& $this->m_minY[$graphSide] != null && $this->m_minY[$graphSide] != 0) {
 				$this->m_minY[$graphSide] = bcsub($this->m_minY[$graphSide], $tmpInterval);
 			}
-			if (bccomp($this->m_maxY[$graphSide], $maxY[$graphSide]) == 0 && $this->m_maxY[$graphSide] != 0) {
+
+			if (bccomp($this->m_maxY[$graphSide], $maxY[$graphSide]) == 0
+					&& $this->m_maxY[$graphSide] != null && $this->m_maxY[$graphSide] != 0) {
 				$this->m_maxY[$graphSide] = bcadd($this->m_maxY[$graphSide], $tmpInterval);
 			}
 		}
@@ -2305,64 +2309,67 @@ class CChart extends CGraphDraw {
 
 		$this->selectData();
 
-		$this->m_minY[GRAPH_YAXIS_SIDE_LEFT] = $this->calculateMinY(GRAPH_YAXIS_SIDE_LEFT);
-		$this->m_minY[GRAPH_YAXIS_SIDE_RIGHT] = $this->calculateMinY(GRAPH_YAXIS_SIDE_RIGHT);
-		$this->m_maxY[GRAPH_YAXIS_SIDE_LEFT] = $this->calculateMaxY(GRAPH_YAXIS_SIDE_LEFT);
-		$this->m_maxY[GRAPH_YAXIS_SIDE_RIGHT] = $this->calculateMaxY(GRAPH_YAXIS_SIDE_RIGHT);
+		$sides = array(GRAPH_YAXIS_SIDE_LEFT, GRAPH_YAXIS_SIDE_RIGHT);
 
-		if ($this->m_minY[GRAPH_YAXIS_SIDE_LEFT] == $this->m_maxY[GRAPH_YAXIS_SIDE_LEFT]) {
-			if ($this->graphOrientation[GRAPH_YAXIS_SIDE_LEFT] == '-') {
-				$this->m_maxY[GRAPH_YAXIS_SIDE_LEFT] = 0;
-			}
-			elseif ($this->m_minY[GRAPH_YAXIS_SIDE_LEFT] == 0) {
-				$this->m_maxY[GRAPH_YAXIS_SIDE_LEFT] = 1;
-			}
-			else {
-				$this->m_minY[GRAPH_YAXIS_SIDE_LEFT] = 0;
-			}
-		}
-		elseif ($this->m_minY[GRAPH_YAXIS_SIDE_LEFT] > $this->m_maxY[GRAPH_YAXIS_SIDE_LEFT]) {
-			if ($this->graphOrientation[GRAPH_YAXIS_SIDE_LEFT] == '-') {
-				$this->m_minY[GRAPH_YAXIS_SIDE_LEFT] = bcmul($this->m_maxY[GRAPH_YAXIS_SIDE_LEFT],0.2);
-			}
-			else {
-				$this->m_minY[GRAPH_YAXIS_SIDE_LEFT] = 0;
-			}
-		}
+		foreach ($sides as $graphSide) {
+			$this->m_minY[$graphSide] = $this->calculateMinY($graphSide);
+			$this->m_maxY[$graphSide] = $this->calculateMaxY($graphSide);
 
-		if ($this->m_minY[GRAPH_YAXIS_SIDE_RIGHT] == $this->m_maxY[GRAPH_YAXIS_SIDE_RIGHT]) {
-			if ($this->graphOrientation[GRAPH_YAXIS_SIDE_RIGHT] == '-') {
-				$this->m_maxY[GRAPH_YAXIS_SIDE_RIGHT] = 0;
+			if ($this->m_minY[$graphSide] == $this->m_maxY[$graphSide]) {
+				if ($this->graphOrientation[$graphSide] == '-') {
+					$this->m_maxY[$graphSide] = 0;
+				}
+				elseif ($this->m_minY[$graphSide] == 0) {
+					$this->m_maxY[$graphSide] = 1;
+				}
+				else {
+					$this->m_minY[$graphSide] = 0;
+				}
 			}
-			elseif ($this->m_minY[GRAPH_YAXIS_SIDE_RIGHT] == 0) {
-				$this->m_maxY[GRAPH_YAXIS_SIDE_RIGHT] = 1;
+			elseif ($this->m_minY[$graphSide] > $this->m_maxY[$graphSide]) {
+				if ($this->graphOrientation[$graphSide] == '-') {
+					$this->m_minY[$graphSide] = bcmul($this->m_maxY[$graphSide], 0.2);
+				}
+				else {
+					$this->m_minY[$graphSide] = 0;
+				}
 			}
-			else {
-				$this->m_minY[GRAPH_YAXIS_SIDE_RIGHT] = 0;
-			}
-		}
-		elseif ($this->m_minY[GRAPH_YAXIS_SIDE_RIGHT] > $this->m_maxY[GRAPH_YAXIS_SIDE_RIGHT]) {
-			if ($this->graphOrientation[GRAPH_YAXIS_SIDE_RIGHT] == '-') {
-				$this->m_minY[GRAPH_YAXIS_SIDE_RIGHT] = bcmul($this->m_maxY[GRAPH_YAXIS_SIDE_RIGHT],0.2);
-			}
-			else {
-				$this->m_minY[GRAPH_YAXIS_SIDE_RIGHT] = 0;
-			}
-		}
 
-		// If max Y-scale bigger min Y-scale only for 10% or less, then we don't allow Y-scale duplicate
-		if ($this->m_maxY[GRAPH_YAXIS_SIDE_LEFT] != 0) {
-			if (bcdiv(($this->m_maxY[GRAPH_YAXIS_SIDE_LEFT] - $this->m_minY[GRAPH_YAXIS_SIDE_LEFT]),
-				$this->m_maxY[GRAPH_YAXIS_SIDE_LEFT]) <= 0.1) {
-				$this->m_minY[GRAPH_YAXIS_SIDE_LEFT] = bcmul($this->m_minY[GRAPH_YAXIS_SIDE_LEFT],0.95);
-				$this->m_maxY[GRAPH_YAXIS_SIDE_LEFT] = bcmul($this->m_maxY[GRAPH_YAXIS_SIDE_LEFT],1.05);
-			}
-		}
-		if ($this->m_maxY[GRAPH_YAXIS_SIDE_LEFT] != 0) {
-			if (bcdiv(($this->m_maxY[GRAPH_YAXIS_SIDE_RIGHT] - $this->m_minY[GRAPH_YAXIS_SIDE_RIGHT]),
-				$this->m_maxY[GRAPH_YAXIS_SIDE_RIGHT]) <= 0.1) {
-				$this->m_minY[GRAPH_YAXIS_SIDE_RIGHT] = bcmul($this->m_minY[GRAPH_YAXIS_SIDE_RIGHT],0.95);
-				$this->m_maxY[GRAPH_YAXIS_SIDE_RIGHT] = bcmul($this->m_maxY[GRAPH_YAXIS_SIDE_RIGHT],1.05);
+			// If max Y-scale bigger min Y-scale only for 10% or less, then we don't allow Y-scale duplicate
+			if (!empty($this->m_maxY[$graphSide]) && !empty($this->m_minY[$graphSide])) {
+				if ($this->m_minY[$graphSide] < 0) {
+					$absMinY = bcmul($this->m_minY[$graphSide], '-1');
+				}
+				else {
+					$absMinY = $this->m_minY[$graphSide];
+				}
+				if ($this->m_maxY[$graphSide] < 0) {
+					$absMaxY = bcmul($this->m_maxY[$graphSide], '-1');
+				}
+				else {
+					$absMaxY = $this->m_maxY[$graphSide];
+				}
+
+				if ($absMaxY < $absMinY) {
+					$oldAbMaxY = $absMaxY;
+					$absMaxY = $absMinY;
+					$absMinY = $oldAbMaxY;
+				}
+
+				if (bcdiv((bcsub($absMaxY, $absMinY)), $absMaxY) <= 0.1) {
+					if ($this->m_minY[$graphSide] > 0) {
+						$this->m_minY[$graphSide] = bcmul($this->m_minY[$graphSide], 0.95);
+					}
+					else {
+						$this->m_minY[$graphSide] = bcmul($this->m_minY[$graphSide], 1.05);
+					}
+					if ($this->m_maxY[$graphSide] > 0) {
+						$this->m_maxY[$graphSide] = bcmul($this->m_maxY[$graphSide], 1.05);
+					}
+					else {
+						$this->m_maxY[$graphSide] = bcmul($this->m_maxY[$graphSide], 0.95);
+					}
+				}
 			}
 		}
 
