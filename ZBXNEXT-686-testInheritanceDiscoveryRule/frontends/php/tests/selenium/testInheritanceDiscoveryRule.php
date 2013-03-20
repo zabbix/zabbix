@@ -89,22 +89,13 @@ class testInheritanceDiscoveryRule extends CWebTest {
 				)
 			),
 			array(
-				array('type' => 'SNMP trap')
-			),
-			array(
 				array('type' => 'Zabbix internal')
 			),
 			array(
 				array('type' => 'Zabbix trapper')
 			),
 			array(
-				array('type' => 'Zabbix aggregate')
-			),
-			array(
 				array('type' => 'External check')
-			),
-			array(
-				array('type' => 'Database monitor')
 			),
 			array(
 				array('type' => 'IPMI agent')
@@ -123,9 +114,6 @@ class testInheritanceDiscoveryRule extends CWebTest {
 			),
 			array(
 				array('type' => 'JMX agent')
-			),
-			array(
-				array('type' => 'Calculated')
 			)
 		);
 	}
@@ -162,17 +150,13 @@ class testInheritanceDiscoveryRule extends CWebTest {
 			'SNMPv1 agent',
 			'SNMPv2 agent',
 			'SNMPv3 agent',
-			'SNMP trap',
 			'Zabbix internal',
 			'Zabbix trapper',
-			'Zabbix aggregate',
 			'External check',
-			'Database monitor',
 			'IPMI agent',
 			'SSH agent',
 			'TELNET agent',
-			'JMX agent',
-			'Calculated'
+			'JMX agent'
 		));
 		$this->zbxTestDropdownSelect('type', $data['type']);
 
@@ -183,9 +167,6 @@ class testInheritanceDiscoveryRule extends CWebTest {
 
 		$keyValue = $this->getValue('key');
 		switch($data['type']) {
-			case 'Database monitor':
-				$this->assertEquals($keyValue, "db.odbc.select[<unique short description>]");
-				break;
 			case 'SSH agent':
 				$this->assertEquals($keyValue, "ssh.run[<unique short description>,<ip>,<port>,<encoding>]");
 				break;
@@ -204,18 +185,8 @@ class testInheritanceDiscoveryRule extends CWebTest {
 			$snmpv3_securitylevel = $this->getSelectedLabel('snmpv3_securitylevel');
 		}
 
-
-		if ($data['type'] == 'Database monitor') {
-			$this->zbxTestTextPresent('Additional parameters');
-			$this->assertVisible('params_ap');
-			$this->assertAttribute("//textarea[@id='params_ap']/@rows", 7);
-			$addParams = $this->getValue('params_ap');
-			$this->assertEquals($addParams, "DSN=<database source name>\nuser=<user name>\npassword=<password>\nsql=<query>");
-		}
-		else {
-			$this->zbxTestTextNotPresent('Additional parameters');
-			$this->assertNotVisible('params_ap');
-		}
+		$this->zbxTestTextNotPresent('Additional parameters');
+		$this->assertNotVisible('params_ap');
 
 		if ($data['type'] == 'SSH agent' || $data['type'] == 'TELNET agent' ) {
 			$this->zbxTestTextPresent('Executed script');
@@ -227,15 +198,8 @@ class testInheritanceDiscoveryRule extends CWebTest {
 			$this->assertNotVisible('params_es');
 		}
 
-		if ($data['type'] == 'Calculated') {
-			$this->zbxTestTextPresent('Formula');
-			$this->assertVisible('params_f');
-			$this->assertAttribute("//textarea[@id='params_f']/@rows", 7);
-		}
-		else {
-			$this->zbxTestTextNotPresent('Formula');
-			$this->assertNotVisible('params_f');
-		}
+		$this->zbxTestTextNotPresent('Formula');
+		$this->assertNotVisible('params_f');
 
 		if ($data['type'] == 'IPMI agent') {
 			$this->zbxTestTextPresent('IPMI sensor');
@@ -399,14 +363,11 @@ class testInheritanceDiscoveryRule extends CWebTest {
 			case 'SNMPv2 agent':
 			case 'SNMPv3 agent':
 			case 'Zabbix internal':
-			case 'Zabbix aggregate':
 			case 'External check':
-			case 'Database monitor':
 			case 'IPMI agent':
 			case 'SSH agent':
 			case 'TELNET agent':
 			case 'JMX agent':
-			case 'Calculated':
 				$this->zbxTestTextPresent('Update interval (in sec)');
 				$this->assertVisible('delay');
 				$this->assertAttribute("//input[@id='delay']/@maxlength", 5);
@@ -431,14 +392,11 @@ class testInheritanceDiscoveryRule extends CWebTest {
 			case 'SNMPv2 agent':
 			case 'SNMPv3 agent':
 			case 'Zabbix internal':
-			case 'Zabbix aggregate':
 			case 'External check':
-			case 'Database monitor':
 			case 'IPMI agent':
 			case 'SSH agent':
 			case 'TELNET agent':
 			case 'JMX agent':
-			case 'Calculated':
 				$this->zbxTestTextPresent(array('Flexible intervals', 'Interval', 'Period', 'No flexible intervals defined.'));
 				$this->assertVisible('delayFlexTable');
 
@@ -611,366 +569,6 @@ class testInheritanceDiscoveryRule extends CWebTest {
 					)
 				)
 			),
-
-			// Empty time flex period
-			array(
-				array(
-					'expected' => DISCOVERY_BAD,
-					'name' =>'Item flex',
-					'key' =>'item-flex-test',
-					'flexPeriod' => array(
-						array('flexDelay' => '', 'flexTime' => '', 'instantCheck' => true)
-					),
-					'errors' => array(
-						'ERROR: Page received incorrect data',
-						'Warning. Incorrect value for field "New flexible interval": cannot be empty.'
-					)
-				)
-			),
-			// Incorrect flex period
-			array(
-				array(
-					'expected' => DISCOVERY_BAD,
-					'name' =>'Item flex',
-					'key' =>'item-flex-test',
-					'flexPeriod' => array(
-						array('flexTime' => '1-11,00:00-24:00', 'instantCheck' => true)
-					),
-					'errors' => array(
-						'ERROR: Invalid time period',
-						'Incorrect time period "1-11,00:00-24:00".'
-					)
-				)
-			),
-			// Incorrect flex period
-			array(
-				array(
-					'expected' => DISCOVERY_BAD,
-					'name' =>'Item flex',
-					'key' =>'item-flex-test',
-					'flexPeriod' => array(
-						array('flexTime' => '1-7,00:00-25:00', 'instantCheck' => true)
-					),
-					'errors' => array(
-						'ERROR: Invalid time period',
-						'Incorrect time period "1-7,00:00-25:00".'
-					)
-				)
-			),
-			// Incorrect flex period
-			array(
-				array(
-					'expected' => DISCOVERY_BAD,
-					'name' =>'Item flex',
-					'key' =>'item-flex-test',
-					'flexPeriod' => array(
-						array('flexTime' => '1-7,24:00-00:00', 'instantCheck' => true)
-					),
-					'errors' => array(
-						'ERROR: Invalid time period',
-						'Incorrect time period "1-7,24:00-00:00" start time must be less than end time.'
-					)
-				)
-			),
-			// Incorrect flex period
-			array(
-				array(
-					'expected' => DISCOVERY_BAD,
-					'name' =>'Item flex',
-					'key' =>'item-flex-test',
-					'flexPeriod' => array(
-						array('flexTime' => '1,00:00-24:00;2,00:00-24:00', 'instantCheck' => true)
-					),
-					'errors' => array(
-						'ERROR: Invalid time period',
-						'Incorrect time period "1,00:00-24:00;2,00:00-24:00".'
-					)
-				)
-			),
-			// Multiple flex periods
-			array(
-				array(
-					'expected' => DISCOVERY_GOOD,
-					'name' =>'Item flex',
-					'key' =>'item-flex-test',
-					'flexPeriod' => array(
-						array('flexTime' => '1,00:00-24:00'),
-						array('flexTime' => '2,00:00-24:00'),
-						array('flexTime' => '1,00:00-24:00'),
-						array('flexTime' => '2,00:00-24:00')
-					)
-				)
-			),
-			// Delay combined with flex periods
-			array(
-				array(
-					'expected' => DISCOVERY_BAD,
-					'name' =>'Item flex',
-					'key' =>'item-flex-delay',
-					'flexPeriod' => array(
-						array('flexDelay' => 0, 'flexTime' => '1,00:00-24:00'),
-						array('flexDelay' => 0, 'flexTime' => '2,00:00-24:00'),
-						array('flexDelay' => 0, 'flexTime' => '3,00:00-24:00'),
-						array('flexDelay' => 0, 'flexTime' => '4,00:00-24:00'),
-						array('flexDelay' => 0, 'flexTime' => '5,00:00-24:00'),
-						array('flexDelay' => 0, 'flexTime' => '6,00:00-24:00'),
-						array('flexDelay' => 0, 'flexTime' => '7,00:00-24:00')
-					),
-					'errors' => array(
-						'ERROR: Cannot add item',
-						'Item will not be refreshed. Please enter a correct update interval.'
-					)
-				)
-			),
-			// Delay combined with flex periods
-			array(
-				array(
-					'expected' => DISCOVERY_GOOD,
-					'name' =>'Item flex1',
-					'key' =>'item-flex-delay1',
-					'flexPeriod' => array(
-						array('flexTime' => '1,00:00-24:00'),
-						array('flexTime' => '2,00:00-24:00'),
-						array('flexTime' => '3,00:00-24:00'),
-						array('flexTime' => '4,00:00-24:00'),
-						array('flexTime' => '5,00:00-24:00'),
-						array('flexTime' => '6,00:00-24:00'),
-						array('flexTime' => '7,00:00-24:00')
-					)
-				)
-			),
-			// Delay combined with flex periods
-			array(
-				array(
-					'expected' => DISCOVERY_BAD,
-					'name' =>'Item flex',
-					'key' =>'item-flex-delay',
-					'delay' => 0,
-					'flexPeriod' => array(
-						array('flexDelay' => 0, 'flexTime' => '1,00:00-24:00'),
-						array('flexDelay' => 0, 'flexTime' => '2,00:00-24:00'),
-						array('flexDelay' => 0, 'flexTime' => '3,00:00-24:00'),
-						array('flexDelay' => 0, 'flexTime' => '4,00:00-24:00'),
-						array('flexDelay' => 0, 'flexTime' => '5,00:00-24:00'),
-						array('flexDelay' => 0, 'flexTime' => '6,00:00-24:00'),
-						array('flexDelay' => 0, 'flexTime' => '7,00:00-24:00')
-					),
-					'errors' => array(
-						'ERROR: Cannot add item',
-						'Item will not be refreshed. Please enter a correct update interval.'
-					)
-				)
-			),
-			// Delay combined with flex periods
-			array(
-				array(
-					'expected' => DISCOVERY_GOOD,
-					'name' =>'Item flex2',
-					'key' =>'item-flex-delay2',
-					'delay' => 0,
-					'flexPeriod' => array(
-						array('flexTime' => '1-5,00:00-24:00'),
-						array('flexTime' => '6-7,00:00-24:00')
-					),
-					'dbCheck' => true,
-					'hostCheck' => true
-				)
-			),
-			// Delay combined with flex periods
-			array(
-				array(
-					'expected' => DISCOVERY_BAD,
-					'name' =>'Item flex',
-					'key' =>'item-flex-delay',
-					'flexPeriod' => array(
-						array('flexDelay' => 0, 'flexTime' => '1-5,00:00-24:00'),
-						array('flexDelay' => 0, 'flexTime' => '6-7,00:00-24:00')
-					),
-					'errors' => array(
-						'ERROR: Cannot add item',
-						'Item will not be refreshed. Please enter a correct update interval.'
-					)
-				)
-			),
-			// Delay combined with flex periods
-			array(
-				array(
-					'expected' => DISCOVERY_GOOD,
-					'name' =>'Item flex',
-					'key' =>'item-flex-delay3',
-					'flexPeriod' => array(
-						array('flexTime' => '1-5,00:00-24:00'),
-						array('flexTime' => '6-7,00:00-24:00')
-					)
-				)
-			),
-			// Delay combined with flex periods
-			array(
-				array(
-					'expected' => DISCOVERY_GOOD,
-					'name' =>'Item flex',
-					'key' =>'item-flex-delay4',
-					'delay' => 0,
-					'flexPeriod' => array(
-						array('flexTime' => '1-7,00:00-24:00')
-					)
-				)
-			),
-			// Delay combined with flex periods
-			array(
-				array(
-					'expected' => DISCOVERY_BAD,
-					'name' =>'Item flex',
-					'key' =>'item-flex-delay',
-					'flexPeriod' => array(
-						array('flexDelay' => 0, 'flexTime' => '1-7,00:00-24:00')
-					),
-					'errors' => array(
-						'ERROR: Cannot add item',
-						'Item will not be refreshed. Please enter a correct update interval.'
-					)
-				)
-			),
-			// Delay combined with flex periods
-			array(
-				array(
-					'expected' => DISCOVERY_GOOD,
-					'name' =>'Item flex',
-					'key' =>'item-flex-delay5',
-					'flexPeriod' => array(
-						array('flexTime' => '1-7,00:00-24:00')
-					)
-				)
-			),
-			// Delay combined with flex periods
-			array(
-				array(
-					'expected' => DISCOVERY_BAD,
-					'name' =>'Item flex',
-					'key' =>'item-flex-delay',
-					'flexPeriod' => array(
-						array('flexDelay' => 0, 'flexTime' => '1-5,00:00-24:00'),
-						array('flexDelay' => 0, 'flexTime' => '6-7,00:00-24:00'),
-						array('flexTime' => '1-5,00:00-24:00'),
-						array('flexTime' => '6-7,00:00-24:00')
-					),
-					'errors' => array(
-						'ERROR: Cannot add item',
-						'Item will not be refreshed. Please enter a correct update interval.'
-					)
-				)
-			),
-			// Delay combined with flex periods
-			array(
-				array(
-					'expected' => DISCOVERY_BAD,
-					'name' =>'Item flex',
-					'key' =>'item-flex-delay',
-					'flexPeriod' => array(
-						array('flexTime' => '1-5,00:00-24:00'),
-						array('flexTime' => '6-7,00:00-24:00'),
-						array('flexDelay' => 0, 'flexTime' => '1-5,00:00-24:00'),
-						array('flexDelay' => 0, 'flexTime' => '6-7,00:00-24:00')
-					),
-					'errors' => array(
-						'ERROR: Cannot add item',
-						'Item will not be refreshed. Please enter a correct update interval.'
-					)
-				)
-			),
-			// Delay combined with flex periods
-			array(
-				array(
-					'expected' => DISCOVERY_BAD,
-					'name' =>'Item flex',
-					'key' =>'item-flex-delay',
-					'flexPeriod' => array(
-						array('flexTime' => '1-7,00:00-24:00'),
-						array('flexDelay' => 0, 'flexTime' => '1-7,00:00-24:00')
-					),
-					'errors' => array(
-						'ERROR: Cannot add item',
-						'Item will not be refreshed. Please enter a correct update interval.'
-					)
-				)
-			),
-			// Delay combined with flex periods
-			array(
-				array(
-					'expected' => DISCOVERY_BAD,
-					'name' =>'Item flex',
-					'key' =>'item-flex-delay',
-					'flexPeriod' => array(
-						array('flexDelay' => 0, 'flexTime' => '1-7,00:00-24:00'),
-						array('flexTime' => '1-7,00:00-24:00')
-					),
-					'errors' => array(
-						'ERROR: Cannot add item',
-						'Item will not be refreshed. Please enter a correct update interval.'
-					)
-				)
-			),
-			// Delay combined with flex periods
-			array(
-				array(
-					'expected' => DISCOVERY_GOOD,
-					'name' =>'Item flex',
-					'key' =>'item-flex-delay6',
-					'flexPeriod' => array(
-						array('flexDelay' => 0, 'flexTime' => '1,00:00-24:00', 'remove' => true),
-						array('flexDelay' => 0, 'flexTime' => '2,00:00-24:00', 'remove' => true),
-						array('flexDelay' => 0, 'flexTime' => '3,00:00-24:00', 'remove' => true),
-						array('flexDelay' => 0, 'flexTime' => '4,00:00-24:00', 'remove' => true),
-						array('flexDelay' => 0, 'flexTime' => '5,00:00-24:00', 'remove' => true),
-						array('flexDelay' => 0, 'flexTime' => '6,00:00-24:00', 'remove' => true),
-						array('flexDelay' => 0, 'flexTime' => '7,00:00-24:00', 'remove' => true),
-						array('flexTime' => '1,00:00-24:00'),
-						array('flexTime' => '2,00:00-24:00'),
-						array('flexTime' => '3,00:00-24:00'),
-						array('flexTime' => '4,00:00-24:00'),
-						array('flexTime' => '5,00:00-24:00'),
-						array('flexTime' => '6,00:00-24:00'),
-						array('flexTime' => '7,00:00-24:00')
-					)
-				)
-			),
-			// Delay combined with flex periods
-			array(
-				array(
-					'expected' => DISCOVERY_GOOD,
-					'name' =>'Item flex',
-					'key' =>'item-flex-delay7',
-					'flexPeriod' => array(
-						array('flexDelay' => 0, 'flexTime' => '1-7,00:00-24:00', 'remove' => true),
-						array('flexTime' => '1-7,00:00-24:00')
-					)
-				)
-			),
-			// Delay combined with flex periods
-			array(
-				array(
-					'expected' => DISCOVERY_GOOD,
-					'name' =>'Item flex Check',
-					'key' =>'item-flex-delay8',
-					'flexPeriod' => array(
-						array('flexDelay' => 0, 'flexTime' => '1-5,00:00-24:00', 'remove' => true),
-						array('flexDelay' => 0, 'flexTime' => '6-7,00:00-24:00', 'remove' => true),
-						array('flexTime' => '1-5,00:00-24:00'),
-						array('flexTime' => '6-7,00:00-24:00')
-					),
-					'dbCheck' => true,
-					'hostCheck' => true
-				)
-			),
-			array(
-				array(
-					'expected' => DISCOVERY_GOOD,
-					'name' =>'!@#$%^&*()_+-=[]{};:"|,./<>?',
-					'key' =>'item-symbols-test',
-					'dbCheck' => true,
-					'hostCheck' => true
-				)
-			),
 			// Incorrect timedelay
 			array(
 				array(
@@ -995,6 +593,365 @@ class testInheritanceDiscoveryRule extends CWebTest {
 						'ERROR: Page received incorrect data',
 						'Warning. Incorrect value for field "Update interval (in sec)": must be between 0 and 86400.'
 					)
+				)
+			),
+			// Empty time flex period
+			array(
+				array(
+					'expected' => DISCOVERY_BAD,
+					'name' =>'Discovery flex',
+					'key' =>'discovery-flex-test',
+					'flexPeriod' => array(
+						array('flexDelay' => '', 'flexTime' => '', 'instantCheck' => true)
+					),
+					'errors' => array(
+						'ERROR: Page received incorrect data',
+						'Warning. Incorrect value for field "New flexible interval": cannot be empty.'
+					)
+				)
+			),
+			// Incorrect flex period
+			array(
+				array(
+					'expected' => DISCOVERY_BAD,
+					'name' =>'Discovery flex',
+					'key' =>'discovery-flex-test',
+					'flexPeriod' => array(
+						array('flexTime' => '1-11,00:00-24:00', 'instantCheck' => true)
+					),
+					'errors' => array(
+						'ERROR: Invalid time period',
+						'Incorrect time period "1-11,00:00-24:00".'
+					)
+				)
+			),
+			// Incorrect flex period
+			array(
+				array(
+					'expected' => DISCOVERY_BAD,
+					'name' =>'Discovery flex',
+					'key' =>'discovery-flex-test',
+					'flexPeriod' => array(
+						array('flexTime' => '1-7,00:00-25:00', 'instantCheck' => true)
+					),
+					'errors' => array(
+						'ERROR: Invalid time period',
+						'Incorrect time period "1-7,00:00-25:00".'
+					)
+				)
+			),
+			// Incorrect flex period
+			array(
+				array(
+					'expected' => DISCOVERY_BAD,
+					'name' =>'Discovery flex',
+					'key' =>'discovery-flex-test',
+					'flexPeriod' => array(
+						array('flexTime' => '1-7,24:00-00:00', 'instantCheck' => true)
+					),
+					'errors' => array(
+						'ERROR: Invalid time period',
+						'Incorrect time period "1-7,24:00-00:00" start time must be less than end time.'
+					)
+				)
+			),
+			// Incorrect flex period
+			array(
+				array(
+					'expected' => DISCOVERY_BAD,
+					'name' =>'Discovery flex',
+					'key' =>'discovery-flex-test',
+					'flexPeriod' => array(
+						array('flexTime' => '1,00:00-24:00;2,00:00-24:00', 'instantCheck' => true)
+					),
+					'errors' => array(
+						'ERROR: Invalid time period',
+						'Incorrect time period "1,00:00-24:00;2,00:00-24:00".'
+					)
+				)
+			),
+			// Multiple flex periods
+			array(
+				array(
+					'expected' => DISCOVERY_GOOD,
+					'name' =>'Discovery flex',
+					'key' =>'discovery-flex-test',
+					'flexPeriod' => array(
+						array('flexTime' => '1,00:00-24:00'),
+						array('flexTime' => '2,00:00-24:00'),
+						array('flexTime' => '1,00:00-24:00'),
+						array('flexTime' => '2,00:00-24:00')
+					)
+				)
+			),
+			// Delay combined with flex periods
+			array(
+				array(
+					'expected' => DISCOVERY_BAD,
+					'name' =>'Discovery flex',
+					'key' =>'discovery-flex-delay',
+					'flexPeriod' => array(
+						array('flexDelay' => 0, 'flexTime' => '1,00:00-24:00'),
+						array('flexDelay' => 0, 'flexTime' => '2,00:00-24:00'),
+						array('flexDelay' => 0, 'flexTime' => '3,00:00-24:00'),
+						array('flexDelay' => 0, 'flexTime' => '4,00:00-24:00'),
+						array('flexDelay' => 0, 'flexTime' => '5,00:00-24:00'),
+						array('flexDelay' => 0, 'flexTime' => '6,00:00-24:00'),
+						array('flexDelay' => 0, 'flexTime' => '7,00:00-24:00')
+					),
+					'errors' => array(
+						'ERROR: Cannot add discovery rule',
+						'Discovery rule will not be refreshed. Please enter a correct update interval.'
+					)
+				)
+			),
+			// Delay combined with flex periods
+			array(
+				array(
+					'expected' => DISCOVERY_GOOD,
+					'name' =>'Discovery flex1',
+					'key' =>'discovery-flex-delay1',
+					'flexPeriod' => array(
+						array('flexTime' => '1,00:00-24:00'),
+						array('flexTime' => '2,00:00-24:00'),
+						array('flexTime' => '3,00:00-24:00'),
+						array('flexTime' => '4,00:00-24:00'),
+						array('flexTime' => '5,00:00-24:00'),
+						array('flexTime' => '6,00:00-24:00'),
+						array('flexTime' => '7,00:00-24:00')
+					)
+				)
+			),
+			// Delay combined with flex periods
+			array(
+				array(
+					'expected' => DISCOVERY_BAD,
+					'name' =>'Discovery flex',
+					'key' =>'discovery-flex-delay',
+					'delay' => 0,
+					'flexPeriod' => array(
+						array('flexDelay' => 0, 'flexTime' => '1,00:00-24:00'),
+						array('flexDelay' => 0, 'flexTime' => '2,00:00-24:00'),
+						array('flexDelay' => 0, 'flexTime' => '3,00:00-24:00'),
+						array('flexDelay' => 0, 'flexTime' => '4,00:00-24:00'),
+						array('flexDelay' => 0, 'flexTime' => '5,00:00-24:00'),
+						array('flexDelay' => 0, 'flexTime' => '6,00:00-24:00'),
+						array('flexDelay' => 0, 'flexTime' => '7,00:00-24:00')
+					),
+					'errors' => array(
+						'ERROR: Cannot add discovery rule',
+						'Discovery rule will not be refreshed. Please enter a correct update interval.'
+					)
+				)
+			),
+			// Delay combined with flex periods
+			array(
+				array(
+					'expected' => DISCOVERY_GOOD,
+					'name' =>'Discovery flex2',
+					'key' =>'discovery-flex-delay2',
+					'delay' => 0,
+					'flexPeriod' => array(
+						array('flexTime' => '1-5,00:00-24:00'),
+						array('flexTime' => '6-7,00:00-24:00')
+					),
+					'dbCheck' => true,
+					'hostCheck' => true
+				)
+			),
+			// Delay combined with flex periods
+			array(
+				array(
+					'expected' => DISCOVERY_BAD,
+					'name' =>'Discovery flex',
+					'key' =>'discovery-flex-delay',
+					'flexPeriod' => array(
+						array('flexDelay' => 0, 'flexTime' => '1-5,00:00-24:00'),
+						array('flexDelay' => 0, 'flexTime' => '6-7,00:00-24:00')
+					),
+					'errors' => array(
+						'ERROR: Cannot add discovery rule',
+						'Discovery rule will not be refreshed. Please enter a correct update interval.'
+					)
+				)
+			),
+			// Delay combined with flex periods
+			array(
+				array(
+					'expected' => DISCOVERY_GOOD,
+					'name' =>'Discovery flex',
+					'key' =>'discovery-flex-delay3',
+					'flexPeriod' => array(
+						array('flexTime' => '1-5,00:00-24:00'),
+						array('flexTime' => '6-7,00:00-24:00')
+					)
+				)
+			),
+			// Delay combined with flex periods
+			array(
+				array(
+					'expected' => DISCOVERY_GOOD,
+					'name' =>'Discovery flex',
+					'key' =>'discovery-flex-delay4',
+					'delay' => 0,
+					'flexPeriod' => array(
+						array('flexTime' => '1-7,00:00-24:00')
+					)
+				)
+			),
+			// Delay combined with flex periods
+			array(
+				array(
+					'expected' => DISCOVERY_BAD,
+					'name' =>'Discovery flex',
+					'key' =>'discovery-flex-delay',
+					'flexPeriod' => array(
+						array('flexDelay' => 0, 'flexTime' => '1-7,00:00-24:00')
+					),
+					'errors' => array(
+						'ERROR: Cannot add discovery rule',
+						'Discovery rule will not be refreshed. Please enter a correct update interval.'
+					)
+				)
+			),
+			// Delay combined with flex periods
+			array(
+				array(
+					'expected' => DISCOVERY_GOOD,
+					'name' =>'Discovery flex',
+					'key' =>'discovery-flex-delay5',
+					'flexPeriod' => array(
+						array('flexTime' => '1-7,00:00-24:00')
+					)
+				)
+			),
+			// Delay combined with flex periods
+			array(
+				array(
+					'expected' => DISCOVERY_BAD,
+					'name' =>'Discovery flex',
+					'key' =>'discovery-flex-delay',
+					'flexPeriod' => array(
+						array('flexDelay' => 0, 'flexTime' => '1-5,00:00-24:00'),
+						array('flexDelay' => 0, 'flexTime' => '6-7,00:00-24:00'),
+						array('flexTime' => '1-5,00:00-24:00'),
+						array('flexTime' => '6-7,00:00-24:00')
+					),
+					'errors' => array(
+						'ERROR: Cannot add discovery rule',
+						'Discovery rule will not be refreshed. Please enter a correct update interval.'
+					)
+				)
+			),
+			// Delay combined with flex periods
+			array(
+				array(
+					'expected' => DISCOVERY_BAD,
+					'name' =>'Discovery flex',
+					'key' =>'discovery-flex-delay',
+					'flexPeriod' => array(
+						array('flexTime' => '1-5,00:00-24:00'),
+						array('flexTime' => '6-7,00:00-24:00'),
+						array('flexDelay' => 0, 'flexTime' => '1-5,00:00-24:00'),
+						array('flexDelay' => 0, 'flexTime' => '6-7,00:00-24:00')
+					),
+					'errors' => array(
+						'ERROR: Cannot add discovery rule',
+						'Discovery rule will not be refreshed. Please enter a correct update interval.'
+					)
+				)
+			),
+			// Delay combined with flex periods
+			array(
+				array(
+					'expected' => DISCOVERY_BAD,
+					'name' =>'Discovery flex',
+					'key' =>'discovery-flex-delay',
+					'flexPeriod' => array(
+						array('flexTime' => '1-7,00:00-24:00'),
+						array('flexDelay' => 0, 'flexTime' => '1-7,00:00-24:00')
+					),
+					'errors' => array(
+						'ERROR: Cannot add discovery rule',
+						'Discovery rule will not be refreshed. Please enter a correct update interval.'
+					)
+				)
+			),
+			// Delay combined with flex periods
+			array(
+				array(
+					'expected' => DISCOVERY_BAD,
+					'name' =>'Discovery flex',
+					'key' =>'discovery-flex-delay',
+					'flexPeriod' => array(
+						array('flexDelay' => 0, 'flexTime' => '1-7,00:00-24:00'),
+						array('flexTime' => '1-7,00:00-24:00')
+					),
+					'errors' => array(
+						'ERROR: Cannot add discovery rule',
+						'Discovery rule will not be refreshed. Please enter a correct update interval.'
+					)
+				)
+			),
+			// Delay combined with flex periods
+			array(
+				array(
+					'expected' => DISCOVERY_GOOD,
+					'name' =>'Discovery flex',
+					'key' =>'discovery-flex-delay6',
+					'flexPeriod' => array(
+						array('flexDelay' => 0, 'flexTime' => '1,00:00-24:00', 'remove' => true),
+						array('flexDelay' => 0, 'flexTime' => '2,00:00-24:00', 'remove' => true),
+						array('flexDelay' => 0, 'flexTime' => '3,00:00-24:00', 'remove' => true),
+						array('flexDelay' => 0, 'flexTime' => '4,00:00-24:00', 'remove' => true),
+						array('flexDelay' => 0, 'flexTime' => '5,00:00-24:00', 'remove' => true),
+						array('flexDelay' => 0, 'flexTime' => '6,00:00-24:00', 'remove' => true),
+						array('flexDelay' => 0, 'flexTime' => '7,00:00-24:00', 'remove' => true),
+						array('flexTime' => '1,00:00-24:00'),
+						array('flexTime' => '2,00:00-24:00'),
+						array('flexTime' => '3,00:00-24:00'),
+						array('flexTime' => '4,00:00-24:00'),
+						array('flexTime' => '5,00:00-24:00'),
+						array('flexTime' => '6,00:00-24:00'),
+						array('flexTime' => '7,00:00-24:00')
+					)
+				)
+			),
+			// Delay combined with flex periods
+			array(
+				array(
+					'expected' => DISCOVERY_GOOD,
+					'name' =>'Discovery flex',
+					'key' =>'discovery-flex-delay7',
+					'flexPeriod' => array(
+						array('flexDelay' => 0, 'flexTime' => '1-7,00:00-24:00', 'remove' => true),
+						array('flexTime' => '1-7,00:00-24:00')
+					)
+				)
+			),
+			// Delay combined with flex periods
+			array(
+				array(
+					'expected' => DISCOVERY_GOOD,
+					'name' =>'Discovery flex Check',
+					'key' =>'discovery-flex-delay8',
+					'flexPeriod' => array(
+						array('flexDelay' => 0, 'flexTime' => '1-5,00:00-24:00', 'remove' => true),
+						array('flexDelay' => 0, 'flexTime' => '6-7,00:00-24:00', 'remove' => true),
+						array('flexTime' => '1-5,00:00-24:00'),
+						array('flexTime' => '6-7,00:00-24:00')
+					),
+					'dbCheck' => true,
+					'hostCheck' => true
+				)
+			),
+			array(
+				array(
+					'expected' => DISCOVERY_GOOD,
+					'name' =>'!@#$%^&*()_+-=[]{};:"|,./<>?',
+					'key' =>'discovery-symbols-test',
+					'dbCheck' => true,
+					'hostCheck' => true
 				)
 			),
 			// List of all item types
@@ -1060,19 +1017,6 @@ class testInheritanceDiscoveryRule extends CWebTest {
 			),
 			array(
 				array(
-					'expected' => DISCOVERY_GOOD,
-					'type' => 'SNMP trap',
-					'name' => 'SNMP trap',
-					'key' => 'discovery-snmp-trap',
-					'dbCheck' => true,
-					'templateCheck' => true,
-					'hostCheck' => true,
-					'hostRemove' => true,
-					'remove' => true
-				)
-			),
-			array(
-				array(
 					'expected' => DISCOVERY_BAD,
 					'type' => 'SNMPv1 agent',
 					'name' => 'SNMPv1 agent',
@@ -1122,41 +1066,9 @@ class testInheritanceDiscoveryRule extends CWebTest {
 			array(
 				array(
 					'expected' => DISCOVERY_GOOD,
-					'type' => 'Zabbix aggregate',
-					'name' => 'Zabbix aggregate',
-					'key' => 'grpmax[Zabbix servers group,discovery-aggregate-key,last,0]',
-					'dbCheck' => true,
-					'templateCheck' => true
-				)
-			),
-			array(
-				array(
-					'expected' => DISCOVERY_BAD,
-					'type' => 'Zabbix aggregate',
-					'name' => 'Zabbix aggregate',
-					'key' => 'discovery-zabbix-aggregate',
-					'errors' => array(
-						'ERROR: Cannot add discovery rule',
-						'Key "discovery-zabbix-aggregate" does not match <grpmax|grpmin|grpsum|grpavg>["Host group(s)", "Item key", "<last|min|max|avg|sum|count>", "parameter"]'
-					)
-				)
-			),
-			array(
-				array(
-					'expected' => DISCOVERY_GOOD,
 					'type' => 'External check',
 					'name' => 'External check',
 					'key' => 'discovery-external-check',
-					'dbCheck' => true,
-					'templateCheck' => true
-				)
-			),
-			array(
-				array(
-					'expected' => DISCOVERY_GOOD,
-					'type' => 'Database monitor',
-					'name' => 'Database monitor',
-					'key' => 'discovery-database-monitor',
 					'dbCheck' => true,
 					'templateCheck' => true
 				)
@@ -1248,41 +1160,6 @@ class testInheritanceDiscoveryRule extends CWebTest {
 					'hostCheck' => true,
 					'hostRemove' => true,
 					'remove' => true
-				)
-			),
-			array(
-				array(
-					'expected' => DISCOVERY_GOOD,
-					'type' => 'Calculated',
-					'name' => 'Calculated',
-					'key' => 'discovery-calculated',
-					'params_f' => 'formula',
-					'dbCheck' => true,
-					'templateCheck' => true
-				)
-			),
-			array(
-				array(
-					'expected' => DISCOVERY_BAD,
-					'type' => 'Calculated',
-					'name' => 'Calculated',
-					'key' => 'discovery-calculated',
-					'errors' => array(
-							'ERROR: Page received incorrect data',
-							'Warning. Incorrect value for field "Formula": cannot be empty.'
-					)
-				)
-			),
-			// Default
-			array(
-				array(
-					'expected' => DISCOVERY_BAD,
-					'type' => 'Database monitor',
-					'name' => 'Database monitor',
-					'errors' => array(
-							'ERROR: Cannot add discovery rule',
-							'Check the key, please. Default example was passed.'
-					)
 				)
 			),
 			// Default
@@ -1455,7 +1332,7 @@ class testInheritanceDiscoveryRule extends CWebTest {
 
 		if (isset($data['hostCheck'])) {
 			$this->zbxTestOpenWait('hosts.php');
-			$this->zbxTestClickWait("link=$host");
+			$this->zbxTestClickWait('link='.$this->host);
 			$this->zbxTestClickWait('link=Discovery rules');
 
 			$this->zbxTestTextPresent($this->template.": $name");
