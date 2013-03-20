@@ -17,6 +17,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "checks_simple_vmware.h"
 #include "checks_simple.h"
 #include "simple.h"
 #include "log.h"
@@ -47,6 +48,61 @@ int	get_value_simple(DC_ITEM *item, AGENT_RESULT *result)
 	else if (0 == strcmp(request.key, "net.tcp.service.perf"))
 	{
 		if (SYSINFO_RET_OK == check_service(&request, item->interface.addr, result, 1))
+			ret = SUCCEED;
+	}
+	else if (0 == strcmp(request.key, "virt.vmware.host.uptime"))
+	{
+		if (SYSINFO_RET_OK == check_vmware_hostuptime(&request, result))
+			ret = SUCCEED;
+	}
+	else if (0 == strcmp(request.key, "virt.vmware.vm.list"))
+	{
+		if (SYSINFO_RET_OK == check_vmware_vmlist(&request, result))
+			ret = SUCCEED;
+	}
+	else if (0 == strcmp(request.key, "virt.vmware.vm.cpu.num"))
+	{
+		if (SYSINFO_RET_OK == check_vmware_vmcpunum(&request, result))
+			ret = SUCCEED;
+	}
+	else if (0 == strcmp(request.key, "virt.vmware.vm.cpu.usage"))
+	{
+		if (SYSINFO_RET_OK == check_vmware_vmcpuusage(&request, result))
+			ret = SUCCEED;
+	}
+	else if (0 == strcmp(request.key, "virt.vmware.vm.memory.size"))
+	{
+		if (SYSINFO_RET_OK == check_vmware_vmmemsize(&request, result))
+			ret = SUCCEED;
+	}
+	else if (0 == strcmp(request.key, "virt.vmware.vm.memory.size.ballooned"))
+	{
+		if (SYSINFO_RET_OK == check_vmware_vmmemsizeballooned(&request, result))
+			ret = SUCCEED;
+	}
+	else if (0 == strcmp(request.key, "virt.vmware.vm.memory.size.swapped"))
+	{
+		if (SYSINFO_RET_OK == check_vmware_vmmemsizeswapped(&request, result))
+			ret = SUCCEED;
+	}
+	else if (0 == strcmp(request.key, "virt.vmware.vm.storage.commited"))
+	{
+		if (SYSINFO_RET_OK == check_vmware_vmstoragecommited(&request, result))
+			ret = SUCCEED;
+	}
+	else if (0 == strcmp(request.key, "virt.vmware.vm.storage.additional"))
+	{
+		if (SYSINFO_RET_OK == check_vmware_vmstorageuncommited(&request, result))
+			ret = SUCCEED;
+	}
+	else if (0 == strcmp(request.key, "virt.vmware.vm.storage.additional"))
+	{
+		if (SYSINFO_RET_OK == check_vmware_vmstorageunshared(&request, result))
+			ret = SUCCEED;
+	}
+	else if (0 == strcmp(request.key, "virt.vmware.vm.uptime"))
+	{
+		if (SYSINFO_RET_OK == check_vmware_vmuptime(&request, result))
 			ret = SUCCEED;
 	}
 	else
