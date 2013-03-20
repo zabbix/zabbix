@@ -839,9 +839,9 @@ function find_period_end($periods, $time, $max_time) {
 }
 
 /**
- * Converts Base1000 values to Base1024 and calc pow
+ * Converts Base1000 values to Base1024 and calculate pow
  * Example:
- * 	200 KBytes convert to 0.2MB (204.8 KBytes)
+ * 	204800 (200 KBytes) with '1024' step convert to 209715,2 (0.2MB (204.8 KBytes))
  *
  * @param string $value
  * @param string $step
