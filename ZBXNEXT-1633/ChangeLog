@@ -46,6 +46,9 @@ A.F.I...S. [ZBXNEXT-1186] increased length to 2048 characters of expression fiel
 ........S. [ZBXNEXT-1663] added support for notification macros {TRIGGER.NAME.ORIG}, {ITEM.NAME.ORIG}, {ITEM.KEY.ORIG} (dimir)
 
 Bug fixes:
+..F....... [ZBX-6400] fixed type list in discovery rule form (Eduard)
+..F....... [ZBX-6360] fixed in items.php that all items were listed if nonexisting host where provided in filter "Host" field (Toms)
+..F....... [ZBX-6387] fixed navigation problems when opening profile page from trigger or graph prototype list (Toms)
 ..F....... [ZBX-6369] fixed "Use custom multiplier" field validation in items (Oleg)
 ..F....... [ZBX-6366] fixed "New flexible interval" field validation in item prototypes (Oleg)
 ..F....... [ZBX-6334] fixed naming consistent in triggers and graph prototypes (Eduard)
@@ -152,6 +155,8 @@ A.F....... [ZBX-1357] updated American English, Brazilian Portuguese, French, Ge
 ........S. [ZBXNEXT-1663] added support for notification macros {TRIGGER.NAME.ORIG}, {ITEM.NAME.ORIG}, {ITEM.KEY.ORIG} (dimir)
 
 Bug fixes:
+..F....... [ZBX-6306] fixed frontend layout for latest Google Chrome 25 (Eduard)
+A.F....... [ZBX-6318] fixed undefined indices for large node Ids in DM (Toms)
 ..F....... [ZBX-6388] fixed regular expression namespace inside nodes (Eduard)
 ........S. [ZBX-6333] added node support for global regexps (wiper)
 ..F....... [ZBX-6352] fixed web scenario and discovery rule delay interval (Eduard)
