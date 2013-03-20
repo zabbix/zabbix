@@ -61,22 +61,24 @@ typedef struct
 	char			*ipmi_password;
 	int			lastcheck;
 	int			ts_delete;
-	char			ipmi_authtype;
-	unsigned char		ipmi_privilege;
-#define ZBX_FLAG_LLD_HOST_DISCOVERED		0x01	/* hosts which should be updated or added */
-#define ZBX_FLAG_LLD_HOST_UPDATE_HOST		0x02	/* hosts.host and host_discovery.host fields should be updated  */
-#define ZBX_FLAG_LLD_HOST_UPDATE_NAME		0x04	/* hosts.name field should be updated */
-#define ZBX_FLAG_LLD_HOST_UPDATE_PROXY		0x08	/* hosts.proxy_hostid field should be updated */
-#define ZBX_FLAG_LLD_HOST_UPDATE_IPMI_AUTH	0x10	/* hosts.ipmi_authtype field should be updated */
-#define ZBX_FLAG_LLD_HOST_UPDATE_IPMI_PRIV	0x20	/* hosts.ipmi_privilege field should be updated */
-#define ZBX_FLAG_LLD_HOST_UPDATE_IPMI_USER	0x40	/* hosts.ipmi_username field should be updated */
-#define ZBX_FLAG_LLD_HOST_UPDATE_IPMI_PASS	0x80	/* hosts.ipmi_password field should be updated */
+#define ZBX_FLAG_LLD_HOST_DISCOVERED		0x0001	/* hosts which should be updated or added */
+#define ZBX_FLAG_LLD_HOST_UPDATE_HOST		0x0002	/* hosts.host and host_discovery.host fields should be updated  */
+#define ZBX_FLAG_LLD_HOST_UPDATE_NAME		0x0004	/* hosts.name field should be updated */
+#define ZBX_FLAG_LLD_HOST_UPDATE_PROXY		0x0008	/* hosts.proxy_hostid field should be updated */
+#define ZBX_FLAG_LLD_HOST_UPDATE_IPMI_AUTH	0x0010	/* hosts.ipmi_authtype field should be updated */
+#define ZBX_FLAG_LLD_HOST_UPDATE_IPMI_PRIV	0x0020	/* hosts.ipmi_privilege field should be updated */
+#define ZBX_FLAG_LLD_HOST_UPDATE_IPMI_USER	0x0040	/* hosts.ipmi_username field should be updated */
+#define ZBX_FLAG_LLD_HOST_UPDATE_IPMI_PASS	0x0080	/* hosts.ipmi_password field should be updated */
 #define ZBX_FLAG_LLD_HOST_UPDATE								\
 		(ZBX_FLAG_LLD_HOST_UPDATE_HOST | ZBX_FLAG_LLD_HOST_UPDATE_NAME |		\
 		ZBX_FLAG_LLD_HOST_UPDATE_PROXY | ZBX_FLAG_LLD_HOST_UPDATE_IPMI_AUTH |		\
 		ZBX_FLAG_LLD_HOST_UPDATE_IPMI_PRIV | ZBX_FLAG_LLD_HOST_UPDATE_IPMI_USER |	\
 		ZBX_FLAG_LLD_HOST_UPDATE_IPMI_PASS)
-	unsigned char		flags;
+#define ZBX_FLAG_LLD_HOST_PROCESS_INVENTORY	0x0100	/* host_inventory.inventory_mode field should be processed */
+	unsigned short		flags;
+	char			ipmi_authtype;
+	unsigned char		ipmi_privilege;
+	char			inventory_mode;
 }
 zbx_lld_host_t;
 
@@ -152,10 +154,12 @@ static void	DBlld_hosts_get(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts)
 
 	result = DBselect(
 			"select hd.hostid,hd.host,hd.lastcheck,hd.ts_delete,h.host,h.name,h.proxy_hostid,"
-				"h.ipmi_authtype,h.ipmi_privilege,h.ipmi_username,h.ipmi_password"
+				"h.ipmi_authtype,h.ipmi_privilege,h.ipmi_username,h.ipmi_password,hi.inventory_mode"
 			" from host_discovery hd"
 				" join hosts h"
-					" on h.hostid=hd.hostid"
+					" on hd.hostid=h.hostid"
+				" left join host_inventory hi"
+					" on hd.hostid=hi.hostid"
 			" where hd.parent_hostid=" ZBX_FS_UI64,
 			parent_hostid);
 
@@ -176,6 +180,10 @@ static void	DBlld_hosts_get(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts)
 		host->ipmi_privilege = (unsigned char)atoi(row[8]);
 		host->ipmi_username = zbx_strdup(NULL, row[9]);
 		host->ipmi_password = zbx_strdup(NULL, row[10]);
+		if (SUCCEED == DBis_null(row[11]))
+			host->inventory_mode = HOST_INVENTORY_DISABLED;
+		else
+			host->inventory_mode = (char)atoi(row[11]);
 		zbx_vector_uint64_create(&host->new_groupids);
 		zbx_vector_uint64_create(&host->lnk_templateids);
 		zbx_vector_uint64_create(&host->del_templateids);
@@ -494,7 +502,8 @@ void	DBlld_hosts_validate(zbx_vector_ptr_t *hosts, char **error)
 
 static void	DBlld_host_make(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, const char *host_proto,
 		const char *name_proto, zbx_uint64_t proxy_hostid, char ipmi_authtype, unsigned char ipmi_privilege,
-		const char *ipmi_username, const char *ipmi_password, struct zbx_json_parse *jp_row)
+		const char *ipmi_username, const char *ipmi_password, char inventory_mode,
+		struct zbx_json_parse *jp_row)
 {
 	const char	*__function_name = "DBlld_host_make";
 
@@ -545,6 +554,7 @@ static void	DBlld_host_make(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts,
 		host->ipmi_privilege = 0;
 		host->ipmi_username = NULL;
 		host->ipmi_password = NULL;
+		host->inventory_mode = HOST_INVENTORY_DISABLED;
 		host->flags = ZBX_FLAG_LLD_HOST_DISCOVERED;
 
 		zbx_vector_ptr_append(hosts, host);
@@ -594,6 +604,10 @@ static void	DBlld_host_make(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts,
 		/* IPMI password */
 		if (0 != strcmp(host->ipmi_password, ipmi_password))
 			host->flags |= ZBX_FLAG_LLD_HOST_UPDATE_IPMI_PASS;
+
+		/* IPMI password */
+		if (host->inventory_mode != inventory_mode)
+			host->flags |= ZBX_FLAG_LLD_HOST_PROCESS_INVENTORY;
 
 		host->flags |= ZBX_FLAG_LLD_HOST_DISCOVERED;
 	}
@@ -1029,26 +1043,28 @@ static void	DBlld_templates_make(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *h
  ******************************************************************************/
 static void	DBlld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, const char *host_proto,
 		zbx_uint64_t proxy_hostid, char ipmi_authtype, unsigned char ipmi_privilege, const char *ipmi_username,
-		const char *ipmi_password, unsigned char status, zbx_vector_uint64_t *del_hostgroupids,
-		zbx_vector_uint64_t *del_hostmacroids, zbx_vector_ptr_t *interfaces)
+		const char *ipmi_password, unsigned char status, char inventory_mode,
+		zbx_vector_uint64_t *del_hostgroupids, zbx_vector_uint64_t *del_hostmacroids,
+		zbx_vector_ptr_t *interfaces)
 {
 	const char		*__function_name = "DBlld_hosts_save";
 
-	int			i, j, new_hosts = 0, upd_hosts = 0, new_hostgroups = 0, new_hostmacros = 0,
-				upd_hostmacros = 0, new_interfaces;
+	int			i, j, new_hosts = 0, new_host_inventories = 0, upd_hosts = 0, new_hostgroups = 0,
+				new_hostmacros = 0, upd_hostmacros = 0, new_interfaces;
 	zbx_lld_host_t		*host;
 	zbx_lld_hostmacro_t	*hostmacro;
 	zbx_lld_interface_t	*interface;
+	zbx_vector_uint64_t	upd_host_inventory_hostids, del_host_inventory_hostids;
 	zbx_uint64_t		hostid = 0, hostgroupid = 0, hostmacroid = 0, interfaceid = 0;
 	char			*sql1 = NULL, *sql2 = NULL, *sql3 = NULL, *sql4 = NULL, *sql5 = NULL, *sql6 = NULL,
-				*sql7 = NULL, *sql8 = NULL, *host_esc, *name_esc, *host_proto_esc, *ipmi_username_esc,
-				*ipmi_password_esc, *macro_esc, *value_esc;
+				*sql7 = NULL, *sql8 = NULL, *host_esc, *name_esc, *host_proto_esc,
+				*ipmi_username_esc, *ipmi_password_esc, *macro_esc, *value_esc;
 	size_t			sql1_alloc = 8 * ZBX_KIBIBYTE, sql1_offset = 0,
 				sql2_alloc = 2 * ZBX_KIBIBYTE, sql2_offset = 0,
-				sql3_alloc = 8 * ZBX_KIBIBYTE, sql3_offset = 0,
-				sql4_alloc = 2 * ZBX_KIBIBYTE, sql4_offset = 0,
+				sql3_alloc = 2 * ZBX_KIBIBYTE, sql3_offset = 0,
+				sql4_alloc = 8 * ZBX_KIBIBYTE, sql4_offset = 0,
 				sql5_alloc = 2 * ZBX_KIBIBYTE, sql5_offset = 0,
-				sql6_alloc = 256, sql6_offset = 0,
+				sql6_alloc = 2 * ZBX_KIBIBYTE, sql6_offset = 0,
 				sql7_alloc = 256, sql7_offset = 0,
 				sql8_alloc = 2 * ZBX_KIBIBYTE, sql8_offset = 0;
 	const char		*ins_hosts_sql =
@@ -1057,12 +1073,16 @@ static void	DBlld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts
 				" values ";
 	const char		*ins_host_discovery_sql =
 				"insert into host_discovery (hostid,parent_hostid,host) values ";
+	const char		*ins_host_inventory_sql = "insert into host_inventory (hostid,inventory_mode) values ";
 	const char		*ins_hosts_groups_sql = "insert into hosts_groups (hostgroupid,hostid,groupid) values ";
 	const char		*ins_hostmacro_sql = "insert into hostmacro (hostmacroid,hostid,macro,value) values ";
 	const char		*ins_interface_sql =
 				"insert into interface (interfaceid,hostid,type,main,useip,ip,dns,port) values ";
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	zbx_vector_uint64_create(&upd_host_inventory_hostids);
+	zbx_vector_uint64_create(&del_host_inventory_hostids);
 
 	for (i = 0; i < hosts->values_num; i++)
 	{
@@ -1072,9 +1092,26 @@ static void	DBlld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts
 			continue;
 
 		if (0 == host->hostid)
+		{
 			new_hosts++;
-		else if (0 != (host->flags & ZBX_FLAG_LLD_HOST_UPDATE))
-			upd_hosts++;
+			if (HOST_INVENTORY_DISABLED != inventory_mode)
+				new_host_inventories++;
+		}
+		else
+		{
+			if (0 != (host->flags & ZBX_FLAG_LLD_HOST_UPDATE))
+				upd_hosts++;
+
+			if (0 != (host->flags & ZBX_FLAG_LLD_HOST_PROCESS_INVENTORY))
+			{
+				if (HOST_INVENTORY_DISABLED == inventory_mode)
+					zbx_vector_uint64_append(&del_host_inventory_hostids, host->hostid);
+				else if (HOST_INVENTORY_DISABLED == host->inventory_mode)
+					new_host_inventories++;
+				else
+					zbx_vector_uint64_append(&upd_host_inventory_hostids, host->hostid);
+			}
+		}
 
 		new_hostgroups += host->new_groupids.values_num;
 
@@ -1103,20 +1140,29 @@ static void	DBlld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts
 #endif
 	}
 
-	if (0 != upd_hosts || 0 != upd_hostmacros)
+	if (0 != new_host_inventories)
 	{
 		sql3 = zbx_malloc(sql3, sql3_alloc);
 		DBbegin_multiple_update(&sql3, &sql3_alloc, &sql3_offset);
+#ifdef HAVE_MULTIROW_INSERT
+		zbx_strcpy_alloc(&sql3, &sql3_alloc, &sql3_offset, ins_host_inventory_sql);
+#endif
+	}
+
+	if (0 != upd_hosts || 0 != upd_hostmacros)
+	{
+		sql4 = zbx_malloc(sql4, sql4_alloc);
+		DBbegin_multiple_update(&sql4, &sql4_alloc, &sql4_offset);
 	}
 
 	if (0 != new_hostgroups)
 	{
 		hostgroupid = DBget_maxid_num("hosts_groups", new_hostgroups);
 
-		sql4 = zbx_malloc(sql4, sql4_alloc);
-		DBbegin_multiple_update(&sql4, &sql4_alloc, &sql4_offset);
+		sql5 = zbx_malloc(sql5, sql5_alloc);
+		DBbegin_multiple_update(&sql5, &sql5_alloc, &sql5_offset);
 #ifdef HAVE_MULTIROW_INSERT
-		zbx_strcpy_alloc(&sql4, &sql4_alloc, &sql4_offset, ins_hosts_groups_sql);
+		zbx_strcpy_alloc(&sql5, &sql5_alloc, &sql5_offset, ins_hosts_groups_sql);
 #endif
 	}
 
@@ -1124,29 +1170,11 @@ static void	DBlld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts
 	{
 		hostmacroid = DBget_maxid_num("hostmacro", new_hostmacros);
 
-		sql5 = zbx_malloc(sql5, sql5_alloc);
-		DBbegin_multiple_update(&sql5, &sql5_alloc, &sql5_offset);
-#ifdef HAVE_MULTIROW_INSERT
-		zbx_strcpy_alloc(&sql5, &sql5_alloc, &sql5_offset, ins_hostmacro_sql);
-#endif
-	}
-
-	if (0 != del_hostgroupids->values_num)
-	{
 		sql6 = zbx_malloc(sql6, sql6_alloc);
-
-		zbx_strcpy_alloc(&sql6, &sql6_alloc, &sql6_offset, "delete from hosts_groups where");
-		DBadd_condition_alloc(&sql6, &sql6_alloc, &sql6_offset, "hostgroupid",
-				del_hostgroupids->values, del_hostgroupids->values_num);
-	}
-
-	if (0 != del_hostmacroids->values_num)
-	{
-		sql7 = zbx_malloc(sql7, sql7_alloc);
-
-		zbx_strcpy_alloc(&sql7, &sql7_alloc, &sql7_offset, "delete from hostmacro where");
-		DBadd_condition_alloc(&sql7, &sql7_alloc, &sql7_offset, "hostmacroid",
-				del_hostmacroids->values, del_hostmacroids->values_num);
+		DBbegin_multiple_update(&sql6, &sql6_alloc, &sql6_offset);
+#ifdef HAVE_MULTIROW_INSERT
+		zbx_strcpy_alloc(&sql6, &sql6_alloc, &sql6_offset, ins_hostmacro_sql);
+#endif
 	}
 
 	if (0 != (new_interfaces = new_hosts * interfaces->values_num))
@@ -1193,6 +1221,15 @@ static void	DBlld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts
 					"(" ZBX_FS_UI64 "," ZBX_FS_UI64 ",'%s')" ZBX_ROW_DL,
 					host->hostid, parent_hostid, host_proto_esc);
 
+			if (HOST_INVENTORY_DISABLED != inventory_mode)
+			{
+#ifndef HAVE_MULTIROW_INSERT
+				zbx_strcpy_alloc(&sql3, &sql3_alloc, &sql3_offset, ins_host_inventory_sql);
+#endif
+				zbx_snprintf_alloc(&sql3, &sql3_alloc, &sql3_offset, "(" ZBX_FS_UI64 ",%d)" ZBX_ROW_DL,
+						host->hostid, (int)inventory_mode);
+			}
+
 			for (j = 0; j < interfaces->values_num; j++)
 			{
 				interface = (zbx_lld_interface_t *)interfaces->values[j];
@@ -1212,54 +1249,64 @@ static void	DBlld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts
 			{
 				const char	*d = "";
 
-				zbx_strcpy_alloc(&sql3, &sql3_alloc, &sql3_offset, "update hosts set ");
+				zbx_strcpy_alloc(&sql4, &sql4_alloc, &sql4_offset, "update hosts set ");
 				if (0 != (host->flags & ZBX_FLAG_LLD_HOST_UPDATE_HOST))
 				{
-					zbx_snprintf_alloc(&sql3, &sql3_alloc, &sql3_offset, "host='%s'", host_esc);
+					zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset, "host='%s'", host_esc);
 					d = ",";
 				}
 				if (0 != (host->flags & ZBX_FLAG_LLD_HOST_UPDATE_NAME))
 				{
-					zbx_snprintf_alloc(&sql3, &sql3_alloc, &sql3_offset,
+					zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset,
 							"%sname='%s'", d, name_esc);
 					d = ",";
 				}
 				if (0 != (host->flags & ZBX_FLAG_LLD_HOST_UPDATE_PROXY))
 				{
-					zbx_snprintf_alloc(&sql3, &sql3_alloc, &sql3_offset,
+					zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset,
 							"%sproxy_hostid=%s", d, DBsql_id_ins(proxy_hostid));
 					d = ",";
 				}
 				if (0 != (host->flags & ZBX_FLAG_LLD_HOST_UPDATE_IPMI_AUTH))
 				{
-					zbx_snprintf_alloc(&sql3, &sql3_alloc, &sql3_offset,
+					zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset,
 							"%sipmi_authtype=%d", d, (int)ipmi_authtype);
 					d = ",";
 				}
 				if (0 != (host->flags & ZBX_FLAG_LLD_HOST_UPDATE_IPMI_PRIV))
 				{
-					zbx_snprintf_alloc(&sql3, &sql3_alloc, &sql3_offset,
+					zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset,
 							"%sipmi_privilege=%d", d, (int)ipmi_privilege);
 					d = ",";
 				}
 				if (0 != (host->flags & ZBX_FLAG_LLD_HOST_UPDATE_IPMI_USER))
 				{
-					zbx_snprintf_alloc(&sql3, &sql3_alloc, &sql3_offset,
+					zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset,
 							"%sipmi_username='%s'", d, ipmi_username_esc);
 					d = ",";
 				}
 				if (0 != (host->flags & ZBX_FLAG_LLD_HOST_UPDATE_IPMI_PASS))
 				{
-					zbx_snprintf_alloc(&sql3, &sql3_alloc, &sql3_offset,
+					zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset,
 							"%sipmi_password='%s'", d, ipmi_password_esc);
 				}
-				zbx_snprintf_alloc(&sql3, &sql3_alloc, &sql3_offset, " where hostid=" ZBX_FS_UI64 ";\n",
+				zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset, " where hostid=" ZBX_FS_UI64 ";\n",
 						host->hostid);
+			}
+
+			if (0 != (host->flags & ZBX_FLAG_LLD_HOST_PROCESS_INVENTORY) &&
+					HOST_INVENTORY_DISABLED == host->inventory_mode)
+			{
+#ifndef HAVE_MULTIROW_INSERT
+				zbx_strcpy_alloc(&sql3, &sql3_alloc, &sql3_offset, ins_host_inventory_sql);
+#endif
+				zbx_snprintf_alloc(&sql3, &sql3_alloc, &sql3_offset, "(" ZBX_FS_UI64 ",%d)" ZBX_ROW_DL,
+						host->hostid, (int)inventory_mode);
 			}
 
 			if (0 != (host->flags & ZBX_FLAG_LLD_HOST_UPDATE_HOST))
 			{
-				zbx_snprintf_alloc(&sql3, &sql3_alloc, &sql3_offset,
+				zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset,
 						"update host_discovery"
 						" set host='%s'"
 						" where hostid=" ZBX_FS_UI64 ";\n",
@@ -1270,9 +1317,9 @@ static void	DBlld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts
 		for (j = 0; j < host->new_groupids.values_num; j++)
 		{
 #ifndef HAVE_MULTIROW_INSERT
-			zbx_strcpy_alloc(&sql4, &sql4_alloc, &sql4_offset, ins_hosts_groups_sql);
+			zbx_strcpy_alloc(&sql5, &sql5_alloc, &sql5_offset, ins_hosts_groups_sql);
 #endif
-			zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset,
+			zbx_snprintf_alloc(&sql5, &sql5_alloc, &sql5_offset,
 					"(" ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 ")" ZBX_ROW_DL,
 					hostgroupid++, host->hostid, host->new_groupids.values[j]);
 		}
@@ -1286,11 +1333,11 @@ static void	DBlld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts
 			if (0 == hostmacro->hostmacroid)
 			{
 #ifndef HAVE_MULTIROW_INSERT
-				zbx_strcpy_alloc(&sql5, &sql5_alloc, &sql5_offset, ins_hostmacro_sql);
+				zbx_strcpy_alloc(&sql6, &sql6_alloc, &sql6_offset, ins_hostmacro_sql);
 #endif
 				macro_esc = DBdyn_escape_string(hostmacro->macro);
 
-				zbx_snprintf_alloc(&sql5, &sql5_alloc, &sql5_offset,
+				zbx_snprintf_alloc(&sql6, &sql6_alloc, &sql6_offset,
 						"(" ZBX_FS_UI64 "," ZBX_FS_UI64 ",'%s','%s')" ZBX_ROW_DL,
 						hostmacroid++, host->hostid, macro_esc, value_esc);
 
@@ -1298,7 +1345,7 @@ static void	DBlld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts
 			}
 			else
 			{
-				zbx_snprintf_alloc(&sql3, &sql3_alloc, &sql3_offset,
+				zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset,
 						"update hostmacro"
 						" set value='%s'"
 						" where hostmacroid=" ZBX_FS_UI64 ";\n",
@@ -1332,25 +1379,25 @@ static void	DBlld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts
 		zbx_free(sql2);
 	}
 
-	if (0 != upd_hosts || 0 != upd_hostmacros)
+	if (0 != new_host_inventories)
 	{
+#ifdef HAVE_MULTIROW_INSERT
+		sql3_offset--;
+		zbx_strcpy_alloc(&sql3, &sql3_alloc, &sql3_offset, ";\n");
+#endif
 		DBend_multiple_update(&sql3, &sql3_alloc, &sql3_offset);
 		DBexecute("%s", sql3);
 		zbx_free(sql3);
 	}
 
-	if (0 != new_hostgroups)
+	if (0 != upd_hosts || 0 != upd_hostmacros)
 	{
-#ifdef HAVE_MULTIROW_INSERT
-		sql4_offset--;
-		zbx_strcpy_alloc(&sql4, &sql4_alloc, &sql4_offset, ";\n");
-#endif
 		DBend_multiple_update(&sql4, &sql4_alloc, &sql4_offset);
 		DBexecute("%s", sql4);
 		zbx_free(sql4);
 	}
 
-	if (0 != new_hostmacros)
+	if (0 != new_hostgroups)
 	{
 #ifdef HAVE_MULTIROW_INSERT
 		sql5_offset--;
@@ -1361,14 +1408,57 @@ static void	DBlld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts
 		zbx_free(sql5);
 	}
 
-	if (0 != del_hostgroupids->values_num)
+	if (0 != new_hostmacros)
 	{
+#ifdef HAVE_MULTIROW_INSERT
+		sql6_offset--;
+		zbx_strcpy_alloc(&sql6, &sql6_alloc, &sql6_offset, ";\n");
+#endif
+		DBend_multiple_update(&sql6, &sql6_alloc, &sql6_offset);
 		DBexecute("%s", sql6);
 		zbx_free(sql6);
 	}
 
-	if (0 != del_hostmacroids->values_num)
+	if (0 != del_hostgroupids->values_num || 0 != del_hostmacroids->values_num ||
+			0 != upd_host_inventory_hostids.values_num || 0 != del_host_inventory_hostids.values_num)
 	{
+		sql7 = zbx_malloc(sql7, sql7_alloc);
+		DBbegin_multiple_update(&sql7, &sql7_alloc, &sql7_offset);
+
+		if (0 != del_hostgroupids->values_num)
+		{
+			zbx_strcpy_alloc(&sql7, &sql7_alloc, &sql7_offset, "delete from hosts_groups where");
+			DBadd_condition_alloc(&sql7, &sql7_alloc, &sql7_offset, "hostgroupid",
+					del_hostgroupids->values, del_hostgroupids->values_num);
+			zbx_strcpy_alloc(&sql7, &sql7_alloc, &sql7_offset, ";\n");
+		}
+
+		if (0 != del_hostmacroids->values_num)
+		{
+			zbx_strcpy_alloc(&sql7, &sql7_alloc, &sql7_offset, "delete from hostmacro where");
+			DBadd_condition_alloc(&sql7, &sql7_alloc, &sql7_offset, "hostmacroid",
+					del_hostmacroids->values, del_hostmacroids->values_num);
+			zbx_strcpy_alloc(&sql7, &sql7_alloc, &sql7_offset, ";\n");
+		}
+
+		if (0 != upd_host_inventory_hostids.values_num)
+		{
+			zbx_snprintf_alloc(&sql7, &sql7_alloc, &sql7_offset,
+					"update host_inventory set inventory_mode=%d where", (int)inventory_mode);
+			DBadd_condition_alloc(&sql7, &sql7_alloc, &sql7_offset, "hostid",
+					upd_host_inventory_hostids.values, upd_host_inventory_hostids.values_num);
+			zbx_strcpy_alloc(&sql7, &sql7_alloc, &sql7_offset, ";\n");
+		}
+
+		if (0 != del_host_inventory_hostids.values_num)
+		{
+			zbx_strcpy_alloc(&sql7, &sql7_alloc, &sql7_offset, "delete from host_inventory where");
+			DBadd_condition_alloc(&sql7, &sql7_alloc, &sql7_offset, "hostid",
+					del_host_inventory_hostids.values, del_host_inventory_hostids.values_num);
+			zbx_strcpy_alloc(&sql7, &sql7_alloc, &sql7_offset, ";\n");
+		}
+
+		DBend_multiple_update(&sql7, &sql7_alloc, &sql7_offset);
 		DBexecute("%s", sql7);
 		zbx_free(sql7);
 	}
@@ -1383,6 +1473,9 @@ static void	DBlld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts
 		DBexecute("%s", sql8);
 		zbx_free(sql8);
 	}
+
+	zbx_vector_uint64_destroy(&del_host_inventory_hostids);
+	zbx_vector_uint64_destroy(&upd_host_inventory_hostids);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
@@ -1549,10 +1642,8 @@ void	DBlld_update_hosts(zbx_uint64_t lld_ruleid, struct zbx_json_parse *jp_data,
 	zbx_vector_uint64_t	del_hostmacroids;	/* list of host macros which should be deleted */
 	zbx_uint64_t		proxy_hostid;
 	char			*ipmi_username = NULL, *ipmi_password;
-	char			ipmi_authtype;
+	char			ipmi_authtype, inventory_mode;
 	unsigned char		ipmi_privilege;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	result = DBselect(
 			"select h.proxy_hostid,h.ipmi_authtype,h.ipmi_privilege,h.ipmi_username,h.ipmi_password"
@@ -1589,8 +1680,10 @@ void	DBlld_update_hosts(zbx_uint64_t lld_ruleid, struct zbx_json_parse *jp_data,
 	DBlld_hostmacros_get(lld_ruleid, &hostmacros);
 
 	result = DBselect(
-			"select h.hostid,h.host,h.name,h.status"
+			"select h.hostid,h.host,h.name,h.status,hi.inventory_mode"
 			" from hosts h,host_discovery hd"
+				" left join host_inventory hi"
+					" on hd.hostid=hi.hostid"
 			" where h.hostid=hd.hostid"
 				" and hd.parent_itemid=" ZBX_FS_UI64,
 			lld_ruleid);
@@ -1605,6 +1698,10 @@ void	DBlld_update_hosts(zbx_uint64_t lld_ruleid, struct zbx_json_parse *jp_data,
 		host_proto = row[1];
 		name_proto = row[2];
 		status = (unsigned char)atoi(row[3]);
+		if (SUCCEED == DBis_null(row[4]))
+			inventory_mode = HOST_INVENTORY_DISABLED;
+		else
+			inventory_mode = (char)atoi(row[4]);
 
 		DBlld_hosts_get(parent_hostid, &hosts);
 
@@ -1622,7 +1719,7 @@ void	DBlld_update_hosts(zbx_uint64_t lld_ruleid, struct zbx_json_parse *jp_data,
 				continue;
 
 			DBlld_host_make(parent_hostid, &hosts, host_proto, name_proto, proxy_hostid, ipmi_authtype,
-					ipmi_privilege, ipmi_username, ipmi_password, &jp_row);
+					ipmi_privilege, ipmi_username, ipmi_password, inventory_mode, &jp_row);
 		}
 
 		zbx_vector_ptr_sort(&hosts, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
@@ -1634,8 +1731,8 @@ void	DBlld_update_hosts(zbx_uint64_t lld_ruleid, struct zbx_json_parse *jp_data,
 		DBlld_hostmacros_make(&hostmacros, &hosts, &del_hostmacroids);
 
 		DBlld_hosts_save(parent_hostid, &hosts, host_proto, proxy_hostid, ipmi_authtype, ipmi_privilege,
-				ipmi_username, ipmi_password, status, &del_hostgroupids, &del_hostmacroids,
-				&interfaces);
+				ipmi_username, ipmi_password, status, inventory_mode, &del_hostgroupids,
+				&del_hostmacroids, &interfaces);
 
 		/* linking of the templates */
 		DBlld_templates_link(&hosts);
