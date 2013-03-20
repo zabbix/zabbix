@@ -26,6 +26,7 @@ jQuery(function($) {
 	 * @param string options['url']
 	 * @param string options['name']
 	 * @param int    options['limit']
+	 * @param bool   options['single']
 	 * @param bool   options['disabled']
 	 * @param object options['labels']
 	 * @param object options['data']
@@ -41,6 +42,7 @@ jQuery(function($) {
 			name: '',
 			limit: null,
 			data: {},
+			single: false,
 			disabled: false,
 			labels: {
 				emptyResult: 'No matches found',
@@ -85,6 +87,12 @@ jQuery(function($) {
 				.on('keyup change', function(e) {
 					if (e.which == KEY.ESCAPE) {
 						cleanSearchInput(obj);
+						return false;
+					}
+
+					if ($('.selected li', obj).length > 0 && options.single) {
+						cleanSearchInput(obj);
+						input.attr('disabled', true);
 						return false;
 					}
 
@@ -398,6 +406,11 @@ jQuery(function($) {
 		cleanAvailable(obj, values);
 		cleanLastSearch(obj);
 		$('input[type="text"]', obj).focus();
+
+		// remove readonly
+		if ($('.selected li', obj).length == 0 && options.single) {
+			$('input[type="text"]', obj).attr('disabled', false);
+		}
 	}
 
 	function addAvailable(item, obj, values, options) {

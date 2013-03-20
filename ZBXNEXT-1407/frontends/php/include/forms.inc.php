@@ -1027,7 +1027,7 @@
 		}
 
 		// hostname
-		if (empty($data['hostname'])) {
+		if (empty($data['is_discovery_rule']) && empty($data['hostname'])) {
 			if (!empty($data['hostid'])) {
 				$hostInfo = API::Host()->get(array(
 					'hostids' => $data['hostid'],
@@ -1035,10 +1035,15 @@
 					'templated_hosts' => true
 				));
 				$hostInfo = reset($hostInfo);
-				$data['hostname'] = $hostInfo['name'];
+
+				$data['hostname'] = array(
+					'id' => $data['hostid'],
+					'name' => $hostInfo['name'],
+					'prefix' => ''
+				);
 			}
 			else {
-				$data['hostname'] = _('not selected');
+				$data['hostname'] = array();
 			}
 		}
 

@@ -26,6 +26,7 @@ class CMultiSelect extends CTag {
 	 * @param string $options['objectName']
 	 * @param array  $options['data']
 	 * @param bool   $options['disabled']
+	 * @param bool   $options['single']
 	 * @param int    $options['width']
 	 * @param int    $options['limit']
 	 */
@@ -33,11 +34,13 @@ class CMultiSelect extends CTag {
 		parent::__construct('div', 'yes');
 		$this->attr('id', zbx_formatDomId($options['name']));
 		$this->addClass('multiselect');
-		$this->addStyle('width: '.(isset($options['width']) ? $options['width'] : ZBX_TEXTAREA_STANDARD_WIDTH).'px;');
+		$this->addStyle('width: '.(isset($options['width']) ? $options['width'] : ZBX_MULTISELECT_STANDARD_WIDTH).'px;');
 
 		// data
 		$data = '[]';
 		if (!empty($options['data'])) {
+			$options['data'] = zbx_toArray($options['data']);
+
 			$json = new CJSON();
 
 			$data = $json->encode($options['data']);
@@ -58,6 +61,7 @@ class CMultiSelect extends CTag {
 				emptyResult: "'._('No matches found').'",
 				moreMatchesFound: "'._('More matches found...').'"
 			},
+			single: '.($options['single'] ? 'true' : 'false').',
 			disabled: '.($options['disabled'] ? 'true' : 'false').'
 		});');
 	}
