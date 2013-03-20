@@ -50,9 +50,69 @@ int	get_value_simple(DC_ITEM *item, AGENT_RESULT *result)
 		if (SYSINFO_RET_OK == check_service(&request, item->interface.addr, result, 1))
 			ret = SUCCEED;
 	}
+	else if (0 == strcmp(request.key, "virt.vmware.host.hw.vendor"))
+	{
+		if (SYSINFO_RET_OK == check_vmware_hosthwvendor(&request, result))
+			ret = SUCCEED;
+	}
+	else if (0 == strcmp(request.key, "virt.vmware.host.hw.model"))
+	{
+		if (SYSINFO_RET_OK == check_vmware_hosthwmodel(&request, result))
+			ret = SUCCEED;
+	}
+	else if (0 == strcmp(request.key, "virt.vmware.host.hw.uuid"))
+	{
+		if (SYSINFO_RET_OK == check_vmware_hosthwuuid(&request, result))
+			ret = SUCCEED;
+	}
+	else if (0 == strcmp(request.key, "virt.vmware.host.hw.memory"))
+	{
+		if (SYSINFO_RET_OK == check_vmware_hosthwmemory(&request, result))
+			ret = SUCCEED;
+	}
+	else if (0 == strcmp(request.key, "virt.vmware.host.hw.cpumodel"))
+	{
+		if (SYSINFO_RET_OK == check_vmware_hosthwcpumodel(&request, result))
+			ret = SUCCEED;
+	}
+	else if (0 == strcmp(request.key, "virt.vmware.host.hw.cpufreq"))
+	{
+		if (SYSINFO_RET_OK == check_vmware_hosthwcpufreq(&request, result))
+			ret = SUCCEED;
+	}
+	else if (0 == strcmp(request.key, "virt.vmware.host.hw.cpucores"))
+	{
+		if (SYSINFO_RET_OK == check_vmware_hosthwcpucores(&request, result))
+			ret = SUCCEED;
+	}
+	else if (0 == strcmp(request.key, "virt.vmware.host.hw.cputhreads"))
+	{
+		if (SYSINFO_RET_OK == check_vmware_hosthwcputhreads(&request, result))
+			ret = SUCCEED;
+	}
 	else if (0 == strcmp(request.key, "virt.vmware.host.uptime"))
 	{
 		if (SYSINFO_RET_OK == check_vmware_hostuptime(&request, result))
+			ret = SUCCEED;
+	}
+	else if (0 == strcmp(request.key, "virt.vmware.host.fullname"))
+	{
+		if (SYSINFO_RET_OK == check_vmware_hostfullname(&request, result))
+			ret = SUCCEED;
+	}
+	else if (0 == strcmp(request.key, "virt.vmware.host.version"))
+	{
+		if (SYSINFO_RET_OK == check_vmware_hostversion(&request, result))
+			ret = SUCCEED;
+	}
+	else if (0 == strcmp(request.key, "virt.vmware.host.memory.used"))
+	{
+		if (SYSINFO_RET_OK == check_vmware_hostmemoryused(&request, result))
+			ret = SUCCEED;
+	}
+	else if (0 == strcmp(request.key, "virt.vmware.host.cpu.usage"))
+	{
+		if (SYSINFO_RET_OK == check_vmware_hostcpuusage(&request, result))
 			ret = SUCCEED;
 	}
 	else if (0 == strcmp(request.key, "virt.vmware.vm.list"))

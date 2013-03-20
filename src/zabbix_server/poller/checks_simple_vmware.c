@@ -202,7 +202,7 @@ clean:
 	return SUCCEED;
 }
 
-int	get_guestids(CURL *easyhandle, zbx_vector_str_t *guestids)
+static int	get_guestids(CURL *easyhandle, zbx_vector_str_t *guestids)
 {
 	int	err, opt;
 
@@ -232,6 +232,7 @@ int	get_guestids(CURL *easyhandle, zbx_vector_str_t *guestids)
 		"</SOAP-ENV:Envelope>"
 
 	char	*err_str = NULL;
+	int	ret = FAIL;
 
 	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_POSTFIELDS, ZBX_POST_VMLIST)))
 	{
@@ -257,10 +258,12 @@ int	get_guestids(CURL *easyhandle, zbx_vector_str_t *guestids)
 		goto clean;
 	}
 
+	ret = SUCCEED;
+
 clean:
 	zbx_free(err_str);
 
-	return SUCCEED;
+	return ret;
 }
 
 int	get_hostdata(CURL *easyhandle)
@@ -268,6 +271,7 @@ int	get_hostdata(CURL *easyhandle)
 	const char		*__function_name = "get_hostdata";
 	int	err, opt;
 
+	int ret = FAIL;
 
 #	define ZBX_POST_HOSTDETAILS											\
 		"<?xml version=\"1.0\" encoding=\"UTF-8\"?>"							\
@@ -315,8 +319,10 @@ int	get_hostdata(CURL *easyhandle)
 		goto clean;
 	}
 
+	ret = SUCCEED;
+
 clean:
-	return SUCCEED;
+	return ret;
 }
 
 int	get_vmdata(CURL *easyhandle, const char *vmid)
@@ -811,3 +817,218 @@ int	check_vmware_hostuptime(AGENT_REQUEST *request, AGENT_RESULT *result)
 		"//*[local-name()='quickStats']/*[local-name()='uptime']", result);
 }
 
+int	check_vmware_hostmemoryused(AGENT_REQUEST *request, AGENT_RESULT *result)
+{
+	const char		*__function_name = "check_vmware_hostuptime";
+	char			*url, *username, *userpwd;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s'", __function_name, request->key);
+
+	if (3 < request->nparam)
+		return SYSINFO_RET_FAIL;
+
+	url = get_rparam(request, 0);
+	username = get_rparam(request, 1);
+	userpwd = get_rparam(request, 2);
+
+	return get_vmware_hoststat(url, username, userpwd,
+		"//*[local-name()='quickStats']/*[local-name()='overallMemoryUsage']", result);
+}
+
+int	check_vmware_hostcpuusage(AGENT_REQUEST *request, AGENT_RESULT *result)
+{
+	const char		*__function_name = "check_vmware_hostuptime";
+	char			*url, *username, *userpwd;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s'", __function_name, request->key);
+
+	if (3 < request->nparam)
+		return SYSINFO_RET_FAIL;
+
+	url = get_rparam(request, 0);
+	username = get_rparam(request, 1);
+	userpwd = get_rparam(request, 2);
+
+	return get_vmware_hoststat(url, username, userpwd,
+		"//*[local-name()='quickStats']/*[local-name()='overallCpuUsage']", result);
+}
+
+int	check_vmware_hostfullname(AGENT_REQUEST *request, AGENT_RESULT *result)
+{
+	const char		*__function_name = "check_vmware_hostfullname";
+	char			*url, *username, *userpwd;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s'", __function_name, request->key);
+
+	if (3 < request->nparam)
+		return SYSINFO_RET_FAIL;
+
+	url = get_rparam(request, 0);
+	username = get_rparam(request, 1);
+	userpwd = get_rparam(request, 2);
+
+	return get_vmware_hoststat(url, username, userpwd,
+		"//*[local-name()='product']/*[local-name()='fullName']", result);
+}
+
+int	check_vmware_hostversion(AGENT_REQUEST *request, AGENT_RESULT *result)
+{
+	const char		*__function_name = "check_vmware_hostversion";
+	char			*url, *username, *userpwd;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s'", __function_name, request->key);
+
+	if (3 < request->nparam)
+		return SYSINFO_RET_FAIL;
+
+	url = get_rparam(request, 0);
+	username = get_rparam(request, 1);
+	userpwd = get_rparam(request, 2);
+
+	return get_vmware_hoststat(url, username, userpwd,
+		"//*[local-name()='product']/*[local-name()='version']", result);
+}
+
+int	check_vmware_hosthwvendor(AGENT_REQUEST *request, AGENT_RESULT *result)
+{
+	const char		*__function_name = "check_vmware_hosthwvendor";
+	char			*url, *username, *userpwd;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s'", __function_name, request->key);
+
+	if (3 < request->nparam)
+		return SYSINFO_RET_FAIL;
+
+	url = get_rparam(request, 0);
+	username = get_rparam(request, 1);
+	userpwd = get_rparam(request, 2);
+
+	return get_vmware_hoststat(url, username, userpwd,
+		"//*[local-name()='hardware']/*[local-name()='vendor']", result);
+}
+
+int	check_vmware_hosthwmodel(AGENT_REQUEST *request, AGENT_RESULT *result)
+{
+	const char		*__function_name = "check_vmware_hosthwmodel";
+	char			*url, *username, *userpwd;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s'", __function_name, request->key);
+
+	if (3 < request->nparam)
+		return SYSINFO_RET_FAIL;
+
+	url = get_rparam(request, 0);
+	username = get_rparam(request, 1);
+	userpwd = get_rparam(request, 2);
+
+	return get_vmware_hoststat(url, username, userpwd,
+		"//*[local-name()='hardware']/*[local-name()='model']", result);
+}
+
+int	check_vmware_hosthwuuid(AGENT_REQUEST *request, AGENT_RESULT *result)
+{
+	const char		*__function_name = "check_vmware_hosthwuuid";
+	char			*url, *username, *userpwd;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s'", __function_name, request->key);
+
+	if (3 < request->nparam)
+		return SYSINFO_RET_FAIL;
+
+	url = get_rparam(request, 0);
+	username = get_rparam(request, 1);
+	userpwd = get_rparam(request, 2);
+
+	return get_vmware_hoststat(url, username, userpwd,
+		"//*[local-name()='hardware']/*[local-name()='uuid']", result);
+}
+
+int	check_vmware_hosthwmemory(AGENT_REQUEST *request, AGENT_RESULT *result)
+{
+	const char		*__function_name = "check_vmware_hosthwmemory";
+	char			*url, *username, *userpwd;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s'", __function_name, request->key);
+
+	if (3 < request->nparam)
+		return SYSINFO_RET_FAIL;
+
+	url = get_rparam(request, 0);
+	username = get_rparam(request, 1);
+	userpwd = get_rparam(request, 2);
+
+	return get_vmware_hoststat(url, username, userpwd,
+		"//*[local-name()='hardware']/*[local-name()='memorySize']", result);
+}
+
+int	check_vmware_hosthwcpumodel(AGENT_REQUEST *request, AGENT_RESULT *result)
+{
+	const char		*__function_name = "check_vmware_hosthwcpumodel";
+	char			*url, *username, *userpwd;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s'", __function_name, request->key);
+
+	if (3 < request->nparam)
+		return SYSINFO_RET_FAIL;
+
+	url = get_rparam(request, 0);
+	username = get_rparam(request, 1);
+	userpwd = get_rparam(request, 2);
+
+	return get_vmware_hoststat(url, username, userpwd,
+		"//*[local-name()='hardware']/*[local-name()='cpuModel']", result);
+}
+
+int	check_vmware_hosthwcpufreq(AGENT_REQUEST *request, AGENT_RESULT *result)
+{
+	const char		*__function_name = "check_vmware_hosthwcpufreq";
+	char			*url, *username, *userpwd;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s'", __function_name, request->key);
+
+	if (3 < request->nparam)
+		return SYSINFO_RET_FAIL;
+
+	url = get_rparam(request, 0);
+	username = get_rparam(request, 1);
+	userpwd = get_rparam(request, 2);
+
+	return get_vmware_hoststat(url, username, userpwd,
+		"//*[local-name()='hardware']/*[local-name()='cpuMhz']", result);
+}
+
+int	check_vmware_hosthwcpucores(AGENT_REQUEST *request, AGENT_RESULT *result)
+{
+	const char		*__function_name = "check_vmware_hosthwcpucores";
+	char			*url, *username, *userpwd;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s'", __function_name, request->key);
+
+	if (3 < request->nparam)
+		return SYSINFO_RET_FAIL;
+
+	url = get_rparam(request, 0);
+	username = get_rparam(request, 1);
+	userpwd = get_rparam(request, 2);
+
+	return get_vmware_hoststat(url, username, userpwd,
+		"//*[local-name()='hardware']/*[local-name()='numCpuCores']", result);
+}
+
+int	check_vmware_hosthwcputhreads(AGENT_REQUEST *request, AGENT_RESULT *result)
+{
+	const char		*__function_name = "check_vmware_hosthwcputhreads";
+	char			*url, *username, *userpwd;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s'", __function_name, request->key);
+
+	if (3 < request->nparam)
+		return SYSINFO_RET_FAIL;
+
+	url = get_rparam(request, 0);
+	username = get_rparam(request, 1);
+	userpwd = get_rparam(request, 2);
+
+	return get_vmware_hoststat(url, username, userpwd,
+		"//*[local-name()='hardware']/*[local-name()='numCpuThreads']", result);
+}
