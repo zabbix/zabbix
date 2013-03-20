@@ -7,6 +7,7 @@ A.F....... [ZBX-1357] updated American English, Brazilian Portuguese, French, Ge
 ........S. [ZBXNEXT-1663] added support for notification macros {TRIGGER.NAME.ORIG}, {ITEM.NAME.ORIG}, {ITEM.KEY.ORIG} (dimir)
 
 Bug fixes:
+..F....... [ZBX-6306] fixed frontend layout for latest Google Chrome 25 (Eduard)
 A.F....... [ZBX-6318] fixed undefined indices for large node Ids in DM (Toms)
 ..F....... [ZBX-6388] fixed regular expression namespace inside nodes (Eduard)
 ........S. [ZBX-6333] added node support for global regexps (wiper)
