@@ -338,7 +338,9 @@ elseif (isset($_REQUEST['save'])) {
 		if (!$create_new && $hostOld['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
 			$host = array(
 				'hostid' => get_request('hostid'),
-				'status' => get_request('status')
+				'status' => get_request('status'),
+				'inventory' => (get_request('inventory_mode') != HOST_INVENTORY_DISABLED) ? get_request('host_inventory', array()) : array(),
+				'inventory_mode' => get_request('inventory_mode')
 			);
 		}
 		// creating or updating a normal host
@@ -643,6 +645,7 @@ elseif (isset($_REQUEST['form'])) {
 			'selectParentTemplates' => array('templateid', 'name'),
 			'selectInterfaces' => API_OUTPUT_EXTEND,
 			'selectMacros' => API_OUTPUT_EXTEND,
+			'selectInventory' => API_OUTPUT_EXTEND,
 			'hostids' => $hostid
 		));
 		$host = reset($host);

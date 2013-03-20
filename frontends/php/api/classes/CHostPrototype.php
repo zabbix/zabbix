@@ -37,6 +37,7 @@ class CHostPrototype extends CHostBase {
 			'selectDiscoveryRule' 	=> null,
 			'selectParentHost'		=> null,
 			'selectTemplates' 		=> null,
+			'selectInventory' 		=> null,
 			'editable'				=> null,
 			'nopermissions'			=> null,
 			'sortfield'    			=> '',
@@ -116,7 +117,7 @@ class CHostPrototype extends CHostBase {
 
 			$this->checkUnsupportedFields($this->tableName(), $hostPrototype,
 				_s('Wrong fields for host prototype "%1$s".', $hostPrototype['host']),
-				array('ruleid', 'templates')
+				array('ruleid', 'templates', 'inventory')
 			);
 
 			$this->checkHost($hostPrototype);
@@ -179,6 +180,7 @@ class CHostPrototype extends CHostBase {
 		$hostPrototypeIds = DB::insert($this->tableName(), $hostPrototypes);
 
 		$hostPrototypeDiscoveryRules = array();
+		$hostPrototypeInventory = array();
 		foreach ($hostPrototypes as $key => $hostPrototype) {
 			$hostPrototypes[$key]['hostid'] = $hostPrototype['hostid'] = $hostPrototypeIds[$key];
 
@@ -186,10 +188,20 @@ class CHostPrototype extends CHostBase {
 				'hostid' => $hostPrototype['hostid'],
 				'parent_itemid' => $hostPrototype['ruleid']
 			);
+
+			if (isset($hostPrototype['inventory']) && $hostPrototype['inventory']) {
+				$hostPrototypeInventory[] = array(
+					'hostid' => $hostPrototype['hostid'],
+					'inventory_mode' => $hostPrototype['inventory']['inventory_mode']
+				);
+			}
 		}
 
 		// link host prototypes to discovery rules
 		DB::insert('host_discovery', $hostPrototypeDiscoveryRules, false);
+
+		// save inventory
+		DB::insert('host_inventory', $hostPrototypeInventory, false);
 
 		// link templates
 		foreach ($hostPrototypes as $hostPrototype) {
@@ -237,7 +249,7 @@ class CHostPrototype extends CHostBase {
 		foreach ($hostPrototypes as $hostPrototype) {
 			$this->checkUnsupportedFields($this->tableName(), $hostPrototype,
 				_s('Wrong fields for host prototype "%1$s".', $hostPrototype['host']),
-				array('ruleid', 'templates')
+				array('ruleid', 'templates', 'inventory')
 			);
 
 			if (isset($hostPrototype['host'])) {
@@ -309,28 +321,58 @@ class CHostPrototype extends CHostBase {
 	 */
 	protected function updateReal(array $hostPrototypes) {
 		// save the host prototypes
-		$newTemplatesByHostPrototypeId = array();
 		foreach ($hostPrototypes as $hostPrototype) {
 			DB::updateByPk($this->tableName(), $hostPrototype['hostid'], $hostPrototype);
+		}
 
+		$exHostPrototypes = $this->get(array(
+			'output' => array('hostid'),
+			'selectTemplates' => array('templateid'),
+			'selectInventory' => API_OUTPUT_EXTEND,
+			'hostids' => zbx_objectValues($hostPrototypes, 'hostid'),
+			'preservekeys' => true
+		));
+
+		// update related objects
+		$inventoryCreate = array();
+		$inventoryDeleteIds = array();
+		foreach ($hostPrototypes as $hostPrototype) {
+			// templates
 			if (isset($hostPrototype['templates'])) {
-				$newTemplatesByHostPrototypeId[$hostPrototype['hostid']] = $hostPrototype['templates'];
+				$existingTemplateIds = zbx_objectValues($exHostPrototypes[$hostPrototype['hostid']]['templates'], 'templateid');
+				$newTemplateIds = zbx_objectValues($hostPrototype['templates'], 'templateid');
+				$this->unlink(array_diff($existingTemplateIds, $newTemplateIds), array($hostPrototype['hostid']));
+				$this->link(array_diff($newTemplateIds, $existingTemplateIds), array($hostPrototype['hostid']));
+			}
+
+			// inventory
+			if (isset($hostPrototype['inventory']) ) {
+				$inventory = zbx_array_mintersect(array('inventory_mode'), $hostPrototype['inventory']);
+				$inventory['hostid'] = $hostPrototype['hostid'];
+
+				if ($hostPrototype['inventory']
+					&& (!isset($hostPrototype['inventory']['inventory_mode']) || $hostPrototype['inventory']['inventory_mode'] != HOST_INVENTORY_DISABLED)) {
+
+					if ($exHostPrototypes[$hostPrototype['hostid']]['inventory']) {
+						DB::update('host_inventory', array(
+							'values' => $inventory,
+							'where' => array('hostid' => $inventory['hostid'])
+						));
+					}
+					else {
+						$inventoryCreate[] = $inventory;
+					}
+
+				}
+				else {
+					$inventoryDeleteIds[] = $hostPrototype['hostid'];
+				}
 			}
 		}
 
-		// update templates
-		$hostPrototypeTemplates = $this->get(array(
-			'output' => array('hostid'),
-			'selectTemplates' => array('templateid'),
-			'hostids' => array_keys($newTemplatesByHostPrototypeId),
-			'preservekeys' => true
-		));
-		foreach ($newTemplatesByHostPrototypeId as $hostId => $templates) {
-			$existingTemplateIds = zbx_objectValues($hostPrototypeTemplates[$hostId]['templates'], 'templateid');
-			$newTemplateIds = zbx_objectValues($templates, 'templateid');
-			$this->unlink(array_diff($existingTemplateIds, $newTemplateIds), array($hostId));
-			$this->link(array_diff($newTemplateIds, $existingTemplateIds), array($hostId));
-		}
+		// save inventory
+		DB::insert('host_inventory', $inventoryCreate, false);
+		DB::delete('host_inventory', array('hostid' => $inventoryDeleteIds));
 
 		// TODO: REMOVE info
 		$updatedHostPrototypes = $this->get(array(
@@ -922,6 +964,25 @@ class CHostPrototype extends CHostBase {
 					$result[$hostid]['templates'] = isset($templates[$hostid]) ? $templates[$hostid]['rowscount'] : 0;
 				}
 			}
+		}
+
+		// adding inventory
+		if ($options['selectInventory'] !== null) {
+			$relationMap = $this->createRelationMap($result, 'hostid', 'hostid');
+
+			// only allow to retrieve the hostid and inventory_mode fields
+			$output = array();
+			if ($this->outputIsRequested('hostid', $options['selectInventory'])) {
+				$output[] = 'hostid';
+			}
+			if ($this->outputIsRequested('inventory_mode', $options['selectInventory'])) {
+				$output[] = 'inventory_mode';
+			}
+			$inventory = API::getApi()->select('host_inventory', array(
+				'output' => $output,
+				'filter' => array('hostid' => $hostPrototypeIds)
+			));
+			$result = $relationMap->mapOne($result, zbx_toHash($inventory, 'hostid'), 'inventory');
 		}
 
 		return $result;
