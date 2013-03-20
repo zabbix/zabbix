@@ -2147,28 +2147,12 @@ static void	DCsync_interfaces(DB_RESULT result)
 
 		if (INTERFACE_TYPE_SNMP == interface->type)	/* used only for SNMP traps */
 		{
-			if ('\0' != *(interface_snmpaddr_local.addr = interface->ip))
+			if ('\0' != *(interface_snmpaddr_local.addr = ('\0' != interface->useip) ?
+					interface->ip : interface->dns))
 			{
 				if (NULL == (interface_snmpaddr = zbx_hashset_search(&config->interface_snmpaddrs, &interface_snmpaddr_local)))
 				{
-					interface_snmpaddr_local.addr = zbx_strpool_acquire(interface->ip);
-
-					interface_snmpaddr = zbx_hashset_insert(&config->interface_snmpaddrs,
-							&interface_snmpaddr_local, sizeof(ZBX_DC_INTERFACE_ADDR));
-					zbx_vector_uint64_create_ext(&interface_snmpaddr->interfaceids,
-							__config_mem_malloc_func,
-							__config_mem_realloc_func,
-							__config_mem_free_func);
-				}
-
-				zbx_vector_uint64_append(&interface_snmpaddr->interfaceids, interfaceid);
-			}
-
-			if ('\0' != *(interface_snmpaddr_local.addr = interface->dns))
-			{
-				if (NULL == (interface_snmpaddr = zbx_hashset_search(&config->interface_snmpaddrs, &interface_snmpaddr_local)))
-				{
-					interface_snmpaddr_local.addr = zbx_strpool_acquire(interface->dns);
+					zbx_strpool_acquire(interface_snmpaddr_local.addr);
 
 					interface_snmpaddr = zbx_hashset_insert(&config->interface_snmpaddrs,
 							&interface_snmpaddr_local, sizeof(ZBX_DC_INTERFACE_ADDR));
@@ -2232,7 +2216,7 @@ static void	DCsync_interfaces(DB_RESULT result)
 				if (0 != (macros & 0x01))
 				{
 					addr = zbx_strdup(NULL, interface->ip);
-					substitute_simple_macros(NULL, NULL, &host, NULL, NULL, &addr,
+					substitute_simple_macros(NULL, NULL, NULL, &host, NULL, NULL, &addr,
 							MACRO_TYPE_INTERFACE_ADDR, NULL, 0);
 					DCstrpool_replace(1, &interface->ip, addr);
 					zbx_free(addr);
@@ -2241,7 +2225,7 @@ static void	DCsync_interfaces(DB_RESULT result)
 				if (0 != (macros & 0x02))
 				{
 					addr = zbx_strdup(NULL, interface->dns);
-					substitute_simple_macros(NULL, NULL, &host, NULL, NULL, &addr,
+					substitute_simple_macros(NULL, NULL, NULL, &host, NULL, NULL, &addr,
 							MACRO_TYPE_INTERFACE_ADDR, NULL, 0);
 					DCstrpool_replace(1, &interface->dns, addr);
 					zbx_free(addr);
@@ -4076,137 +4060,47 @@ void	DCrequeue_items(zbx_uint64_t *itemids, unsigned char *states, int *lastcloc
 	UNLOCK_CACHE;
 }
 
-int	DCconfig_activate_host(DC_ITEM *item)
+int	DCconfig_update_host_availability(zbx_uint64_t hostid, unsigned char item_type, unsigned char available,
+		int errors_from, int disable_until)
 {
 	int		res = FAIL;
 	ZBX_DC_HOST	*dc_host;
 
 	LOCK_CACHE;
 
-	if (NULL == (dc_host = zbx_hashset_search(&config->hosts, &item->host.hostid)))
+	if (NULL == (dc_host = zbx_hashset_search(&config->hosts, &hostid)))
 		goto unlock;
 
-	switch (item->type)
+	switch (item_type)
 	{
 		case ITEM_TYPE_ZABBIX:
-			item->host.errors_from = dc_host->errors_from;
-			item->host.available = dc_host->available;
-			item->host.disable_until = dc_host->disable_until;
-			dc_host->errors_from = 0;
-			dc_host->available = HOST_AVAILABLE_TRUE;
-			dc_host->disable_until = 0;
+			dc_host->errors_from = errors_from;
+			dc_host->available = available;
+			dc_host->disable_until = disable_until;
 			break;
 		case ITEM_TYPE_SNMPv1:
 		case ITEM_TYPE_SNMPv2c:
 		case ITEM_TYPE_SNMPv3:
-			item->host.snmp_errors_from = dc_host->snmp_errors_from;
-			item->host.snmp_available = dc_host->snmp_available;
-			item->host.snmp_disable_until = dc_host->snmp_disable_until;
-			dc_host->snmp_errors_from = 0;
-			dc_host->snmp_available = HOST_AVAILABLE_TRUE;
-			dc_host->snmp_disable_until = 0;
+			dc_host->snmp_errors_from = errors_from;
+			dc_host->snmp_available = available;
+			dc_host->snmp_disable_until = disable_until;
 			break;
 		case ITEM_TYPE_IPMI:
-			item->host.ipmi_errors_from = dc_host->ipmi_errors_from;
-			item->host.ipmi_available = dc_host->ipmi_available;
-			item->host.ipmi_disable_until = dc_host->ipmi_disable_until;
-			dc_host->ipmi_errors_from = 0;
-			dc_host->ipmi_available = HOST_AVAILABLE_TRUE;
-			dc_host->ipmi_disable_until = 0;
+			dc_host->ipmi_errors_from = errors_from;
+			dc_host->ipmi_available = available;
+			dc_host->ipmi_disable_until = available;
 			break;
 		case ITEM_TYPE_JMX:
-			item->host.jmx_errors_from = dc_host->jmx_errors_from;
-			item->host.jmx_available = dc_host->jmx_available;
-			item->host.jmx_disable_until = dc_host->jmx_disable_until;
-			dc_host->jmx_errors_from = 0;
-			dc_host->jmx_available = HOST_AVAILABLE_TRUE;
-			dc_host->jmx_disable_until = 0;
+			dc_host->jmx_errors_from = errors_from;
+			dc_host->jmx_available = available;
+			dc_host->jmx_disable_until = disable_until;
 			break;
 		default:
 			goto unlock;
 	}
 
 	res = SUCCEED;
-unlock:
-	UNLOCK_CACHE;
 
-	return res;
-}
-
-int	DCconfig_deactivate_host(DC_ITEM *item, int now)
-{
-	int		res = FAIL;
-	ZBX_DC_HOST	*dc_host;
-	int		*errors_from;
-	int		*disable_until;
-	unsigned char	*available;
-
-	LOCK_CACHE;
-
-	if (NULL == (dc_host = zbx_hashset_search(&config->hosts, &item->host.hostid)))
-		goto unlock;
-
-	switch (item->type)
-	{
-		case ITEM_TYPE_ZABBIX:
-			item->host.errors_from = dc_host->errors_from;
-			item->host.available = dc_host->available;
-			item->host.disable_until = dc_host->disable_until;
-			errors_from = &dc_host->errors_from;
-			available = &dc_host->available;
-			disable_until = &dc_host->disable_until;
-			break;
-		case ITEM_TYPE_SNMPv1:
-		case ITEM_TYPE_SNMPv2c:
-		case ITEM_TYPE_SNMPv3:
-			item->host.snmp_errors_from = dc_host->snmp_errors_from;
-			item->host.snmp_available = dc_host->snmp_available;
-			item->host.snmp_disable_until = dc_host->snmp_disable_until;
-			errors_from = &dc_host->snmp_errors_from;
-			available = &dc_host->snmp_available;
-			disable_until = &dc_host->snmp_disable_until;
-			break;
-		case ITEM_TYPE_IPMI:
-			item->host.ipmi_errors_from = dc_host->ipmi_errors_from;
-			item->host.ipmi_available = dc_host->ipmi_available;
-			item->host.ipmi_disable_until = dc_host->ipmi_disable_until;
-			errors_from = &dc_host->ipmi_errors_from;
-			available = &dc_host->ipmi_available;
-			disable_until = &dc_host->ipmi_disable_until;
-			break;
-		case ITEM_TYPE_JMX:
-			item->host.jmx_errors_from = dc_host->jmx_errors_from;
-			item->host.jmx_available = dc_host->jmx_available;
-			item->host.jmx_disable_until = dc_host->jmx_disable_until;
-			errors_from = &dc_host->jmx_errors_from;
-			available = &dc_host->jmx_available;
-			disable_until = &dc_host->jmx_disable_until;
-			break;
-		default:
-			goto unlock;
-	}
-
-	/* first error */
-	if (0 == *errors_from)
-	{
-		*errors_from = now;
-		*disable_until = now + CONFIG_UNREACHABLE_DELAY;
-	}
-	else
-	{
-		if (CONFIG_UNREACHABLE_PERIOD >= now - *errors_from)
-		{
-			/* still unavailable, but won't change status to UNAVAILABLE yet */
-			*disable_until = now + CONFIG_UNREACHABLE_DELAY;
-		}
-		else
-		{
-			*disable_until = now + CONFIG_UNAVAILABLE_DELAY;
-			*available = HOST_AVAILABLE_FALSE;
-		}
-	}
-
-	res = SUCCEED;
 unlock:
 	UNLOCK_CACHE;
 

@@ -327,21 +327,21 @@ static void	process_httptest(DC_HOST *host, DB_HTTPTEST *httptest)
 		httpstep.name = row[2];
 
 		httpstep.url = zbx_strdup(NULL, row[3]);
-		substitute_simple_macros(NULL, NULL, host, NULL, NULL,
+		substitute_simple_macros(NULL, NULL, NULL, host, NULL, NULL,
 				&httpstep.url, MACRO_TYPE_HTTPTEST_FIELD, NULL, 0);
 
 		httpstep.timeout = atoi(row[4]);
 
 		httpstep.posts = zbx_strdup(NULL, row[5]);
-		substitute_simple_macros(NULL, NULL, host, NULL, NULL,
+		substitute_simple_macros(NULL, NULL, NULL, host, NULL, NULL,
 				&httpstep.posts, MACRO_TYPE_HTTPTEST_FIELD, NULL, 0);
 
 		httpstep.required = zbx_strdup(NULL, row[6]);
-		substitute_simple_macros(NULL, NULL, host, NULL, NULL,
+		substitute_simple_macros(NULL, NULL, NULL, host, NULL, NULL,
 				&httpstep.required, MACRO_TYPE_HTTPTEST_FIELD, NULL, 0);
 
 		httpstep.status_codes = zbx_strdup(NULL, row[7]);
-		substitute_simple_macros(NULL, &host->hostid, NULL, NULL, NULL,
+		substitute_simple_macros(NULL, NULL, &host->hostid, NULL, NULL, NULL,
 				&httpstep.status_codes, MACRO_TYPE_COMMON, NULL, 0);
 
 		memset(&stat, 0, sizeof(stat));
@@ -600,26 +600,26 @@ void	process_httptests(int httppoller_num, int now)
 		httptest.name = row[4];
 
 		httptest.macros = zbx_strdup(NULL, row[5]);
-		substitute_simple_macros(NULL, NULL, &host, NULL, NULL,
+		substitute_simple_macros(NULL, NULL, NULL, &host, NULL, NULL,
 				&httptest.macros, MACRO_TYPE_HTTPTEST_FIELD, NULL, 0);
 
 		httptest.agent = zbx_strdup(NULL, row[6]);
-		substitute_simple_macros(NULL, &host.hostid, NULL, NULL, NULL,
+		substitute_simple_macros(NULL, NULL, &host.hostid, NULL, NULL, NULL,
 				&httptest.agent, MACRO_TYPE_COMMON, NULL, 0);
 
 		if (HTTPTEST_AUTH_NONE != (httptest.authentication = atoi(row[7])))
 		{
 			httptest.http_user = zbx_strdup(NULL, row[8]);
-			substitute_simple_macros(NULL, &host.hostid, NULL, NULL, NULL,
+			substitute_simple_macros(NULL, NULL, &host.hostid, NULL, NULL, NULL,
 					&httptest.http_user, MACRO_TYPE_COMMON, NULL, 0);
 
 			httptest.http_password = zbx_strdup(NULL, row[9]);
-			substitute_simple_macros(NULL, &host.hostid, NULL, NULL, NULL,
+			substitute_simple_macros(NULL, NULL, &host.hostid, NULL, NULL, NULL,
 					&httptest.http_password, MACRO_TYPE_COMMON, NULL, 0);
 		}
 
 		httptest.http_proxy = zbx_strdup(NULL, row[10]);
-		substitute_simple_macros(NULL, &host.hostid, NULL, NULL, NULL,
+		substitute_simple_macros(NULL, NULL, &host.hostid, NULL, NULL, NULL,
 				&httptest.http_proxy, MACRO_TYPE_COMMON, NULL, 0);
 
 		httptest.retries = atoi(row[11]);

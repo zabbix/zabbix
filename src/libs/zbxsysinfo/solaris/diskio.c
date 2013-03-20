@@ -88,76 +88,79 @@ clean:
 	return result;
 }
 
-static int	VFS_DEV_READ_BYTES(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+static int	VFS_DEV_READ_BYTES(const char *devname, AGENT_RESULT *result)
 {
 	int	ret;
 
-	if (SYSINFO_RET_OK == (ret = get_kstat_io(param, &zbx_kstat)))
+	if (SYSINFO_RET_OK == (ret = get_kstat_io(devname, &zbx_kstat)))
 		SET_UI64_RESULT(result, zbx_kstat.nread);
 
 	return ret;
 }
 
-static int	VFS_DEV_READ_OPERATIONS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+static int	VFS_DEV_READ_OPERATIONS(const char *devname, AGENT_RESULT *result)
 {
 	int	ret;
 
-	if (SYSINFO_RET_OK == (ret = get_kstat_io(param, &zbx_kstat)))
+	if (SYSINFO_RET_OK == (ret = get_kstat_io(devname, &zbx_kstat)))
 		SET_UI64_RESULT(result, zbx_kstat.reads);
 
 	return ret;
 }
 
-static int	VFS_DEV_WRITE_BYTES(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+static int	VFS_DEV_WRITE_BYTES(const char *devname, AGENT_RESULT *result)
 {
 	int	ret;
 
-	if (SYSINFO_RET_OK == (ret = get_kstat_io(param, &zbx_kstat)))
+	if (SYSINFO_RET_OK == (ret = get_kstat_io(devname, &zbx_kstat)))
 		SET_UI64_RESULT(result, zbx_kstat.nwritten);
 
 	return ret;
 }
 
-static int	VFS_DEV_WRITE_OPERATIONS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+static int	VFS_DEV_WRITE_OPERATIONS(const char *devname, AGENT_RESULT *result)
 {
 	int	ret;
 
-	if (SYSINFO_RET_OK == (ret = get_kstat_io(param, &zbx_kstat)))
+	if (SYSINFO_RET_OK == (ret = get_kstat_io(devname, &zbx_kstat)))
 		SET_UI64_RESULT(result, zbx_kstat.writes);
 
 	return ret;
 }
 
-static int	process_mode_function(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result, const MODE_FUNCTION *fl)
+static int	process_mode_function(AGENT_REQUEST *request, AGENT_RESULT *result, const MODE_FUNCTION *fl)
 {
 	char	devname[MAX_STRING_LEN], mode[16];
+	char	*devname_str, *mode_str;
 	int	i;
 
-	if (2 < num_param(param))
+	if (2 < request->nparam)
 		return SYSINFO_RET_FAIL;
 
-	if (0 != get_param(param, 1, devname, sizeof(mode)) || 0 == strcmp("all", devname))
+	devname_str = get_rparam(request, 0);
+
+	if (NULL == devname_str || 0 == strcmp("all", devname_str))
 		*devname = '\0';
+	else
+		strscpy(devname, devname_str);
 
-	if (0 != get_param(param, 2, mode, sizeof(mode)))
-		*mode = '\0';
+	mode_str = get_rparam(request, 1);
 
-	if ('\0' == *mode)
-	{
-		/* default parameter */
+	if (NULL == mode_str || '\0' == *mode_str)
 		strscpy(mode, "bytes");
-	}
+	else
+		strscpy(mode, mode_str);
 
 	for (i = 0; NULL != fl[i].mode; i++)
 	{
 		if (0 == strcmp(mode, fl[i].mode))
-			return (fl[i].function)(cmd, devname, flags, result);
+			return (fl[i].function)(devname, result);
 	}
 
 	return SYSINFO_RET_FAIL;
 }
 
-int	VFS_DEV_WRITE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+int	VFS_DEV_WRITE(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	const MODE_FUNCTION	fl[] =
 	{
@@ -166,10 +169,10 @@ int	VFS_DEV_WRITE(const char *cmd, const char *param, unsigned flags, AGENT_RESU
 		{NULL,		NULL}
 	};
 
-	return process_mode_function(cmd, param, flags, result, fl);
+	return process_mode_function(request, result, fl);
 }
 
-int	VFS_DEV_READ(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+int	VFS_DEV_READ(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	const MODE_FUNCTION	fl[] =
 	{
@@ -178,5 +181,5 @@ int	VFS_DEV_READ(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 		{NULL,		NULL}
 	};
 
-	return process_mode_function(cmd, param, flags, result, fl);
+	return process_mode_function(request, result, fl);
 }

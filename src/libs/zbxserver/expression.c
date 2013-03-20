@@ -662,6 +662,243 @@ static int	DBget_host_name_by_hostid(zbx_uint64_t hostid, char **replace_to)
 
 /******************************************************************************
  *                                                                            *
+ * Function: DBget_templateid_by_triggerid                                    *
+ *                                                                            *
+ * Purpose: get template trigger ID from which the trigger is inherited       *
+ *                                                                            *
+ * Return value: upon successful completion return SUCCEED                    *
+ *               otherwise FAIL                                               *
+ *                                                                            *
+ ******************************************************************************/
+static int	DBget_templateid_by_triggerid(zbx_uint64_t triggerid, zbx_uint64_t *templateid)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+	int		ret = FAIL;
+
+	result = DBselect(
+			"select templateid"
+			" from triggers"
+			" where triggerid=" ZBX_FS_UI64,
+			triggerid);
+
+	if (NULL != (row = DBfetch(result)))
+	{
+		ZBX_DBROW2UINT64(*templateid, row[0]);
+		ret = SUCCEED;
+	}
+	DBfree_result(result);
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DBget_trigger_template_name                                      *
+ *                                                                            *
+ * Purpose: get comma-space separated trigger template names in which         *
+ *          the trigger is defined                                            *
+ *                                                                            *
+ * Return value: upon successful completion return SUCCEED                    *
+ *               otherwise FAIL                                               *
+ *                                                                            *
+ * Comments: based on the patch submitted by Hmami Mohamed                    *
+ *                                                                            *
+ ******************************************************************************/
+static int	DBget_trigger_template_name(zbx_uint64_t triggerid, const zbx_uint64_t *userid, char **replace_to)
+{
+	const char	*__function_name = "DBget_trigger_template_name";
+
+	DB_RESULT	result;
+	DB_ROW		row;
+	int		ret = FAIL;
+	zbx_uint64_t	templateid;
+	char		*sql = NULL;
+	size_t		replace_to_alloc = 64, replace_to_offset = 0,
+			sql_alloc = 256, sql_offset = 0;
+	int		user_type = -1;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	if (NULL != userid)
+	{
+		result = DBselect("select type from users where userid=" ZBX_FS_UI64, *userid);
+
+		if (NULL != (row = DBfetch(result)) && FAIL == DBis_null(row[0]))
+			user_type = atoi(row[0]);
+		DBfree_result(result);
+
+		if (-1 == user_type)
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "%s() cannot check permissions", __function_name);
+			goto out;
+		}
+	}
+
+	/* use parent trigger ID for lld generated triggers */
+	result = DBselect(
+			"select parent_triggerid"
+			" from trigger_discovery"
+			" where triggerid=" ZBX_FS_UI64,
+			triggerid);
+
+	if (NULL != (row = DBfetch(result)))
+		ZBX_STR2UINT64(triggerid, row[0]);
+	DBfree_result(result);
+
+	if (SUCCEED != DBget_templateid_by_triggerid(triggerid, &templateid) || 0 == templateid)
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() trigger not found or not templated", __function_name);
+		goto out;
+	}
+
+	do
+	{
+		triggerid = templateid;
+	}
+	while (SUCCEED == (ret = DBget_templateid_by_triggerid(triggerid, &templateid)) && 0 != templateid);
+
+	if (SUCCEED != ret)
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() trigger not found", __function_name);
+		goto out;
+	}
+
+	*replace_to = zbx_realloc(*replace_to, replace_to_alloc);
+	**replace_to = '\0';
+
+	sql = zbx_malloc(sql, sql_alloc);
+
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+			"select distinct h.name"
+			" from hosts h,items i,functions f"
+			" where h.hostid=i.hostid"
+				" and i.itemid=f.itemid"
+				" and f.triggerid=" ZBX_FS_UI64,
+			triggerid);
+	if (NULL != userid && USER_TYPE_SUPER_ADMIN != user_type)
+	{
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+				" and exists("
+					"select null"
+					" from hosts_groups hg,rights r,users_groups ug"
+					" where h.hostid=hg.hostid"
+						" and hg.groupid=r.id"
+						" and r.groupid=ug.usrgrpid"
+						" and ug.userid=" ZBX_FS_UI64
+					" group by hg.hostid"
+					" having min(r.permission)>=%d"
+				")",
+				*userid, PERM_READ);
+	}
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " order by h.name");
+
+	result = DBselect("%s", sql);
+
+	zbx_free(sql);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		if (0 != replace_to_offset)
+			zbx_strcpy_alloc(replace_to, &replace_to_alloc, &replace_to_offset, ", ");
+		zbx_strcpy_alloc(replace_to, &replace_to_alloc, &replace_to_offset, row[0]);
+	}
+	DBfree_result(result);
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DBget_trigger_hostgroup_name                                     *
+ *                                                                            *
+ * Purpose: get comma-space separated host group names in which the trigger   *
+ *          is defined                                                        *
+ *                                                                            *
+ * Return value: upon successful completion return SUCCEED                    *
+ *               otherwise FAIL                                               *
+ *                                                                            *
+ ******************************************************************************/
+static int	DBget_trigger_hostgroup_name(zbx_uint64_t triggerid, const zbx_uint64_t *userid, char **replace_to)
+{
+	const char	*__function_name = "DBget_trigger_hostgroup_name";
+
+	DB_RESULT	result;
+	DB_ROW		row;
+	int		ret = FAIL;
+	char		*sql = NULL;
+	size_t		replace_to_alloc = 64, replace_to_offset = 0,
+			sql_alloc = 256, sql_offset = 0;
+	int		user_type = -1;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	if (NULL != userid)
+	{
+		result = DBselect("select type from users where userid=" ZBX_FS_UI64, *userid);
+
+		if (NULL != (row = DBfetch(result)) && FAIL == DBis_null(row[0]))
+			user_type = atoi(row[0]);
+		DBfree_result(result);
+
+		if (-1 == user_type)
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "%s() cannot check permissions", __function_name);
+			goto out;
+		}
+	}
+
+	*replace_to = zbx_realloc(*replace_to, replace_to_alloc);
+	**replace_to = '\0';
+
+	sql = zbx_malloc(sql, sql_alloc);
+
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+			"select distinct g.name"
+			" from groups g,hosts_groups hg,items i,functions f"
+			" where g.groupid=hg.groupid"
+				" and hg.hostid=i.hostid"
+				" and i.itemid=f.itemid"
+				" and f.triggerid=" ZBX_FS_UI64,
+			triggerid);
+	if (NULL != userid && USER_TYPE_SUPER_ADMIN != user_type)
+	{
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+				" and exists("
+					"select null"
+					" from rights r,users_groups ug"
+					" where g.groupid=r.id"
+						" and r.groupid=ug.usrgrpid"
+						" and ug.userid=" ZBX_FS_UI64
+					" group by r.id"
+					" having min(r.permission)>=%d"
+				")",
+				*userid, PERM_READ);
+	}
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " order by g.name");
+
+	result = DBselect("%s", sql);
+
+	zbx_free(sql);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		if (0 != replace_to_offset)
+			zbx_strcpy_alloc(replace_to, &replace_to_alloc, &replace_to_offset, ", ");
+		zbx_strcpy_alloc(replace_to, &replace_to_alloc, &replace_to_offset, row[0]);
+		ret = SUCCEED;
+	}
+	DBfree_result(result);
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: DBget_interface_value                                            *
  *                                                                            *
  * Purpose: request interface value by hostid                                 *
@@ -748,11 +985,12 @@ static int	DBget_interface_value(zbx_uint64_t hostid, char **replace_to, int req
 #define ZBX_REQUEST_HOST_NAME		0
 #define ZBX_REQUEST_ITEM_ID		4
 #define ZBX_REQUEST_ITEM_NAME		5
-#define ZBX_REQUEST_ITEM_KEY		6
-#define ZBX_REQUEST_ITEM_KEY_ORIG	7
-#define ZBX_REQUEST_ITEM_DESCRIPTION	8
-#define ZBX_REQUEST_PROXY_NAME		9
-#define ZBX_REQUEST_HOST_HOST		10
+#define ZBX_REQUEST_ITEM_NAME_ORIG	6
+#define ZBX_REQUEST_ITEM_KEY		7
+#define ZBX_REQUEST_ITEM_KEY_ORIG	8
+#define ZBX_REQUEST_ITEM_DESCRIPTION	9
+#define ZBX_REQUEST_PROXY_NAME		10
+#define ZBX_REQUEST_HOST_HOST		11
 static int	DBget_item_value(zbx_uint64_t itemid, char **replace_to, int request)
 {
 	const char	*__function_name = "DBget_item_value";
@@ -811,14 +1049,14 @@ static int	DBget_item_value(zbx_uint64_t itemid, char **replace_to, int request)
 					if ('1' != *row[12] || INTERFACE_TYPE_AGENT == dc_item.interface.type)
 					{
 						addr = zbx_strdup(addr, row[8]);	/* ip */
-						substitute_simple_macros(NULL, NULL, &dc_item.host, NULL, NULL, &addr,
-								MACRO_TYPE_INTERFACE_ADDR_DB, NULL, 0);
+						substitute_simple_macros(NULL, NULL, NULL, &dc_item.host, NULL, NULL,
+								&addr, MACRO_TYPE_INTERFACE_ADDR_DB, NULL, 0);
 						strscpy(dc_item.interface.ip_orig, addr);
 						zbx_free(addr);
 
 						addr = zbx_strdup(addr, row[9]);	/* dns */
-						substitute_simple_macros(NULL, NULL, &dc_item.host, NULL, NULL, &addr,
-								MACRO_TYPE_INTERFACE_ADDR_DB, NULL, 0);
+						substitute_simple_macros(NULL, NULL, NULL, &dc_item.host, NULL, NULL,
+								&addr, MACRO_TYPE_INTERFACE_ADDR_DB, NULL, 0);
 						strscpy(dc_item.interface.dns_orig, addr);
 						zbx_free(addr);
 					}
@@ -840,11 +1078,15 @@ static int	DBget_item_value(zbx_uint64_t itemid, char **replace_to, int request)
 					item_description(replace_to, key, dc_item.host.hostid);
 					zbx_free(key);
 				}
-				else /* ZBX_REQUEST_ITEM_KEY */
+				else	/* ZBX_REQUEST_ITEM_KEY */
 				{
 					zbx_free(*replace_to);
 					*replace_to = key;
 				}
+				ret = SUCCEED;
+				break;
+			case ZBX_REQUEST_ITEM_NAME_ORIG:
+				*replace_to = zbx_strdup(*replace_to, row[5]);
 				ret = SUCCEED;
 				break;
 			case ZBX_REQUEST_ITEM_KEY_ORIG:
@@ -1701,7 +1943,9 @@ static int	get_autoreg_value_by_event(DB_EVENT *event, char **replace_to, const 
 #define MVAR_ITEM_VALUE			"{ITEM.VALUE}"
 #define MVAR_ITEM_ID			"{ITEM.ID}"
 #define MVAR_ITEM_NAME			"{ITEM.NAME}"
+#define MVAR_ITEM_NAME_ORIG		"{ITEM.NAME.ORIG}"
 #define MVAR_ITEM_KEY			"{ITEM.KEY}"
+#define MVAR_ITEM_KEY_ORIG		"{ITEM.KEY.ORIG}"
 #define MVAR_ITEM_STATE			"{ITEM.STATE}"
 #define MVAR_TRIGGER_KEY		"{TRIGGER.KEY}"			/* deprecated */
 #define MVAR_ITEM_DESCRIPTION		"{ITEM.DESCRIPTION}"
@@ -1716,11 +1960,14 @@ static int	get_autoreg_value_by_event(DB_EVENT *event, char **replace_to, const 
 #define MVAR_TRIGGER_COMMENT		"{TRIGGER.COMMENT}"		/* deprecated */
 #define MVAR_TRIGGER_ID			"{TRIGGER.ID}"
 #define MVAR_TRIGGER_NAME		"{TRIGGER.NAME}"
+#define MVAR_TRIGGER_NAME_ORIG		"{TRIGGER.NAME.ORIG}"
 #define MVAR_TRIGGER_EXPRESSION		"{TRIGGER.EXPRESSION}"
 #define MVAR_TRIGGER_SEVERITY		"{TRIGGER.SEVERITY}"
 #define MVAR_TRIGGER_NSEVERITY		"{TRIGGER.NSEVERITY}"
 #define MVAR_TRIGGER_STATUS		"{TRIGGER.STATUS}"
 #define MVAR_TRIGGER_STATE		"{TRIGGER.STATE}"
+#define MVAR_TRIGGER_TEMPLATE_NAME	"{TRIGGER.TEMPLATE.NAME}"
+#define MVAR_TRIGGER_HOSTGROUP_NAME	"{TRIGGER.HOSTGROUP.NAME}"
 #define MVAR_STATUS			"{STATUS}"			/* deprecated */
 #define MVAR_TRIGGER_VALUE		"{TRIGGER.VALUE}"
 #define MVAR_TRIGGER_URL		"{TRIGGER.URL}"
@@ -1733,7 +1980,9 @@ static int	get_autoreg_value_by_event(DB_EVENT *event, char **replace_to, const 
 #define MVAR_LLDRULE_DESCRIPTION		"{LLDRULE.DESCRIPTION}"
 #define MVAR_LLDRULE_ID				"{LLDRULE.ID}"
 #define MVAR_LLDRULE_KEY			"{LLDRULE.KEY}"
+#define MVAR_LLDRULE_KEY_ORIG			"{LLDRULE.KEY.ORIG}"
 #define MVAR_LLDRULE_NAME			"{LLDRULE.NAME}"
+#define MVAR_LLDRULE_NAME_ORIG			"{LLDRULE.NAME.ORIG}"
 #define MVAR_LLDRULE_STATE			"{LLDRULE.STATE}"
 
 #define MVAR_INVENTORY				"{INVENTORY."			/* a prefix for all inventory macros */
@@ -1866,8 +2115,8 @@ static const char	*ex_macros[] =
 	MVAR_PROFILE_CONTACT, MVAR_PROFILE_LOCATION, MVAR_PROFILE_NOTES,
 	MVAR_HOST_HOST, MVAR_HOST_NAME, MVAR_HOSTNAME, MVAR_PROXY_NAME,
 	MVAR_HOST_CONN, MVAR_HOST_DNS, MVAR_HOST_IP, MVAR_IPADDRESS,
-	MVAR_ITEM_ID, MVAR_ITEM_NAME, MVAR_ITEM_DESCRIPTION,
-	MVAR_ITEM_KEY, MVAR_TRIGGER_KEY,
+	MVAR_ITEM_ID, MVAR_ITEM_NAME, MVAR_ITEM_NAME_ORIG, MVAR_ITEM_DESCRIPTION,
+	MVAR_ITEM_KEY, MVAR_ITEM_KEY_ORIG, MVAR_TRIGGER_KEY,
 	MVAR_ITEM_LASTVALUE,
 	MVAR_ITEM_STATE,
 	MVAR_ITEM_VALUE,
@@ -2154,8 +2403,8 @@ fail:
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  ******************************************************************************/
-int	substitute_simple_macros(DB_EVENT *event, zbx_uint64_t *hostid, DC_HOST *dc_host, DC_ITEM *dc_item,
-		DB_ESCALATION *escalation, char **data, int macro_type, char *error, int maxerrlen)
+int	substitute_simple_macros(DB_EVENT *event, zbx_uint64_t *userid, zbx_uint64_t *hostid, DC_HOST *dc_host,
+		DC_ITEM *dc_item, DB_ESCALATION *escalation, char **data, int macro_type, char *error, int maxerrlen)
 {
 	const char	*__function_name = "substitute_simple_macros";
 
@@ -2292,6 +2541,11 @@ int	substitute_simple_macros(DB_EVENT *event, zbx_uint64_t *hostid, DC_HOST *dc_
 					ret = DBget_trigger_value(event->trigger.expression, &replace_to, N_functionid,
 							ZBX_REQUEST_ITEM_KEY);
 				}
+				else if (0 == strcmp(m, MVAR_ITEM_KEY_ORIG))
+				{
+					ret = DBget_trigger_value(event->trigger.expression, &replace_to, N_functionid,
+							ZBX_REQUEST_ITEM_KEY_ORIG);
+				}
 				else if (0 == strcmp(m, MVAR_ITEM_LASTVALUE))
 				{
 					ret = DBitem_lastvalue(event->trigger.expression, &replace_to, N_functionid);
@@ -2343,6 +2597,11 @@ int	substitute_simple_macros(DB_EVENT *event, zbx_uint64_t *hostid, DC_HOST *dc_
 					ret = DBget_trigger_value(event->trigger.expression, &replace_to, N_functionid,
 							ZBX_REQUEST_ITEM_NAME);
 				}
+				else if (0 == strcmp(m, MVAR_ITEM_NAME_ORIG))
+				{
+					ret = DBget_trigger_value(event->trigger.expression, &replace_to, N_functionid,
+							ZBX_REQUEST_ITEM_NAME_ORIG);
+				}
 				else if (0 == strcmp(m, MVAR_ITEM_VALUE))
 				{
 					ret = DBitem_value(event->trigger.expression, &replace_to, N_functionid,
@@ -2371,7 +2630,7 @@ int	substitute_simple_macros(DB_EVENT *event, zbx_uint64_t *hostid, DC_HOST *dc_
 						0 == strcmp(m, MVAR_TRIGGER_COMMENT))
 				{
 					replace_to = zbx_strdup(replace_to, event->trigger.comments);
-					substitute_simple_macros(event, hostid, dc_host, dc_item, escalation,
+					substitute_simple_macros(event, userid, hostid, dc_host, dc_item, escalation,
 							&replace_to, MACRO_TYPE_TRIGGER_COMMENTS, error, maxerrlen);
 				}
 				else if (0 == strcmp(m, MVAR_TRIGGER_EVENTS_ACK))
@@ -2395,6 +2654,10 @@ int	substitute_simple_macros(DB_EVENT *event, zbx_uint64_t *hostid, DC_HOST *dc_
 					replace_to = zbx_strdup(replace_to, event->trigger.expression);
 					DCexpand_trigger_expression(&replace_to);
 				}
+				else if (0 == strcmp(m, MVAR_TRIGGER_HOSTGROUP_NAME))
+				{
+					ret = DBget_trigger_hostgroup_name(event->objectid, userid, &replace_to);
+				}
 				else if (0 == strcmp(m, MVAR_TRIGGER_ID))
 				{
 					replace_to = zbx_dsprintf(replace_to, ZBX_FS_UI64, event->objectid);
@@ -2402,8 +2665,12 @@ int	substitute_simple_macros(DB_EVENT *event, zbx_uint64_t *hostid, DC_HOST *dc_
 				else if (0 == strcmp(m, MVAR_TRIGGER_NAME))
 				{
 					replace_to = zbx_strdup(replace_to, event->trigger.description);
-					substitute_simple_macros(event, hostid, dc_host, dc_item, escalation,
+					substitute_simple_macros(event, userid, hostid, dc_host, dc_item, escalation,
 							&replace_to, MACRO_TYPE_TRIGGER_DESCRIPTION, error, maxerrlen);
+				}
+				else if (0 == strcmp(m, MVAR_TRIGGER_NAME_ORIG))
+				{
+					replace_to = zbx_strdup(replace_to, event->trigger.description);
 				}
 				else if (0 == strcmp(m, MVAR_TRIGGER_NSEVERITY))
 				{
@@ -2418,10 +2685,14 @@ int	substitute_simple_macros(DB_EVENT *event, zbx_uint64_t *hostid, DC_HOST *dc_
 				{
 					ret = DCget_trigger_severity_name(event->trigger.priority, &replace_to);
 				}
+				else if (0 == strcmp(m, MVAR_TRIGGER_TEMPLATE_NAME))
+				{
+					ret = DBget_trigger_template_name(event->objectid, userid, &replace_to);
+				}
 				else if (0 == strcmp(m, MVAR_TRIGGER_URL))
 				{
 					replace_to = zbx_strdup(replace_to, event->trigger.url);
-					substitute_simple_macros(event, hostid, dc_host, dc_item, escalation,
+					substitute_simple_macros(event, userid, hostid, dc_host, dc_item, escalation,
 							&replace_to, MACRO_TYPE_TRIGGER_URL, error, maxerrlen);
 				}
 				else if (0 == strcmp(m, MVAR_TRIGGER_VALUE))
@@ -2508,10 +2779,20 @@ int	substitute_simple_macros(DB_EVENT *event, zbx_uint64_t *hostid, DC_HOST *dc_
 					ret = DBget_trigger_value(event->trigger.expression, &replace_to, N_functionid,
 							ZBX_REQUEST_ITEM_KEY);
 				}
+				else if (0 == strcmp(m, MVAR_ITEM_KEY_ORIG))
+				{
+					ret = DBget_trigger_value(event->trigger.expression, &replace_to, N_functionid,
+							ZBX_REQUEST_ITEM_KEY_ORIG);
+				}
 				else if (0 == strcmp(m, MVAR_ITEM_NAME))
 				{
 					ret = DBget_trigger_value(event->trigger.expression, &replace_to, N_functionid,
 							ZBX_REQUEST_ITEM_NAME);
+				}
+				else if (0 == strcmp(m, MVAR_ITEM_NAME_ORIG))
+				{
+					ret = DBget_trigger_value(event->trigger.expression, &replace_to, N_functionid,
+							ZBX_REQUEST_ITEM_NAME_ORIG);
 				}
 				else if (0 == strcmp(m, MVAR_NODE_ID))
 				{
@@ -2536,13 +2817,17 @@ int	substitute_simple_macros(DB_EVENT *event, zbx_uint64_t *hostid, DC_HOST *dc_
 						0 == strcmp(m, MVAR_TRIGGER_COMMENT))
 				{
 					replace_to = zbx_strdup(replace_to, event->trigger.comments);
-					substitute_simple_macros(event, hostid, dc_host, dc_item, escalation,
+					substitute_simple_macros(event, userid, hostid, dc_host, dc_item, escalation,
 							&replace_to, MACRO_TYPE_TRIGGER_COMMENTS, error, maxerrlen);
 				}
 				else if (0 == strcmp(m, MVAR_TRIGGER_EXPRESSION))
 				{
 					replace_to = zbx_strdup(replace_to, event->trigger.expression);
 					DCexpand_trigger_expression(&replace_to);
+				}
+				else if (0 == strcmp(m, MVAR_TRIGGER_HOSTGROUP_NAME))
+				{
+					ret = DBget_trigger_hostgroup_name(event->objectid, userid, &replace_to);
 				}
 				else if (0 == strcmp(m, MVAR_TRIGGER_ID))
 				{
@@ -2551,8 +2836,12 @@ int	substitute_simple_macros(DB_EVENT *event, zbx_uint64_t *hostid, DC_HOST *dc_
 				else if (0 == strcmp(m, MVAR_TRIGGER_NAME))
 				{
 					replace_to = zbx_strdup(replace_to, event->trigger.description);
-					substitute_simple_macros(event, hostid, dc_host, dc_item, escalation,
+					substitute_simple_macros(event, userid, hostid, dc_host, dc_item, escalation,
 							&replace_to, MACRO_TYPE_TRIGGER_DESCRIPTION, error, maxerrlen);
+				}
+				else if (0 == strcmp(m, MVAR_TRIGGER_NAME_ORIG))
+				{
+					replace_to = zbx_strdup(replace_to, event->trigger.description);
 				}
 				else if (0 == strcmp(m, MVAR_TRIGGER_NSEVERITY))
 				{
@@ -2566,10 +2855,14 @@ int	substitute_simple_macros(DB_EVENT *event, zbx_uint64_t *hostid, DC_HOST *dc_
 				{
 					replace_to = zbx_strdup(replace_to, zbx_trigger_state_string(event->value));
 				}
+				else if (0 == strcmp(m, MVAR_TRIGGER_TEMPLATE_NAME))
+				{
+					ret = DBget_trigger_template_name(event->objectid, userid, &replace_to);
+				}
 				else if (0 == strcmp(m, MVAR_TRIGGER_URL))
 				{
 					replace_to = zbx_strdup(replace_to, event->trigger.url);
-					substitute_simple_macros(event, hostid, dc_host, dc_item, escalation,
+					substitute_simple_macros(event, userid, hostid, dc_host, dc_item, escalation,
 							&replace_to, MACRO_TYPE_TRIGGER_URL, error, maxerrlen);
 				}
 			}
@@ -2814,9 +3107,17 @@ int	substitute_simple_macros(DB_EVENT *event, zbx_uint64_t *hostid, DC_HOST *dc_
 				{
 					ret = DBget_item_value(event->objectid, &replace_to, ZBX_REQUEST_ITEM_KEY);
 				}
+				else if (0 == strcmp(m, MVAR_ITEM_KEY_ORIG))
+				{
+					ret = DBget_item_value(event->objectid, &replace_to, ZBX_REQUEST_ITEM_KEY_ORIG);
+				}
 				else if (0 == strcmp(m, MVAR_ITEM_NAME))
 				{
 					ret = DBget_item_value(event->objectid, &replace_to, ZBX_REQUEST_ITEM_NAME);
+				}
+				else if (0 == strcmp(m, MVAR_ITEM_NAME_ORIG))
+				{
+					ret = DBget_item_value(event->objectid, &replace_to, ZBX_REQUEST_ITEM_NAME_ORIG);
 				}
 				else if (0 == strcmp(m, MVAR_ITEM_STATE))
 				{
@@ -2903,9 +3204,17 @@ int	substitute_simple_macros(DB_EVENT *event, zbx_uint64_t *hostid, DC_HOST *dc_
 				{
 					ret = DBget_item_value(event->objectid, &replace_to, ZBX_REQUEST_ITEM_KEY);
 				}
+				else if (0 == strcmp(m, MVAR_LLDRULE_KEY_ORIG))
+				{
+					ret = DBget_item_value(event->objectid, &replace_to, ZBX_REQUEST_ITEM_KEY_ORIG);
+				}
 				else if (0 == strcmp(m, MVAR_LLDRULE_NAME))
 				{
 					ret = DBget_item_value(event->objectid, &replace_to, ZBX_REQUEST_ITEM_NAME);
+				}
+				else if (0 == strcmp(m, MVAR_LLDRULE_NAME_ORIG))
+				{
+					ret = DBget_item_value(event->objectid, &replace_to, ZBX_REQUEST_ITEM_NAME_ORIG);
 				}
 				else if (0 == strcmp(m, MVAR_LLDRULE_STATE))
 				{
@@ -3622,7 +3931,7 @@ void	evaluate_expressions(zbx_vector_ptr_t *triggers)
 
 		zbx_remove_whitespace(tr->expression);
 
-		if (SUCCEED != substitute_simple_macros(&event, NULL, NULL, NULL, NULL, &tr->expression,
+		if (SUCCEED != substitute_simple_macros(&event, NULL, NULL, NULL, NULL, NULL, &tr->expression,
 				MACRO_TYPE_TRIGGER_EXPRESSION, err, sizeof(err)))
 		{
 			tr->new_error = zbx_strdup(tr->new_error, err);
@@ -3855,7 +4164,7 @@ int	substitute_key_macros(char **data, zbx_uint64_t *hostid, DC_ITEM *dc_item, s
 
 			if (NULL == jp_row)
 			{
-				substitute_simple_macros(NULL, hostid, NULL, dc_item, NULL,
+				substitute_simple_macros(NULL, NULL, hostid, NULL, dc_item, NULL,
 						&param, macro_type, NULL, 0);
 			}
 			else
@@ -3940,8 +4249,8 @@ int	substitute_key_macros(char **data, zbx_uint64_t *hostid, DC_ITEM *dc_item, s
 
 						if (NULL == jp_row)
 						{
-							substitute_simple_macros(NULL, hostid, NULL, dc_item, NULL,
-									&param, macro_type, NULL, 0);
+							substitute_simple_macros(NULL, NULL, hostid, NULL, dc_item,
+									NULL, &param, macro_type, NULL, 0);
 						}
 						else
 						{
@@ -3975,8 +4284,8 @@ int	substitute_key_macros(char **data, zbx_uint64_t *hostid, DC_ITEM *dc_item, s
 
 						if (NULL == jp_row)
 						{
-							substitute_simple_macros(NULL, hostid, NULL, dc_item, NULL,
-									&param, macro_type, NULL, 0);
+							substitute_simple_macros(NULL, NULL, hostid, NULL, dc_item,
+									NULL, &param, macro_type, NULL, 0);
 						}
 						else
 						{

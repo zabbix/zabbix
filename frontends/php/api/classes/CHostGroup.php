@@ -690,13 +690,18 @@ class CHostGroup extends CZBXAPI {
 			$delOperationids[$dbOperation['operationid']] = $dbOperation['operationid'];
 		}
 
-		DB::delete('operations', array(
-			'operationid' => $delOperationids,
+		DB::delete('operations', array('operationid' => $delOperationids));
+
+		DB::delete('groups', array('groupid' => $groupids));
+
+		DB::delete('profiles', array(
+			'idx' => 'web.dashconf.groups.groupids',
+			'value_id' => $groupids
 		));
 
-		// host groups
-		DB::delete('groups', array(
-			'groupid' => $groupids
+		DB::delete('profiles', array(
+			'idx' => 'web.dashconf.groups.hide.groupids',
+			'value_id' => $groupids
 		));
 
 		// TODO: remove audit

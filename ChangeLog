@@ -1,6 +1,12 @@
 Changes for 2.1.0
 
 New features:
+..F....... [ZBXNEXT-1659] added support of anti-aliased normal and bold lines for graphs and map connectors (Alexei)
+..F....... [ZBXNEXT-1399] implemented multiselect in dashboard configuration (Eduard)
+........S. [ZBXNEXT-354] added macro expansion for allowed hosts setting in trapper items (wiper)
+..F....... [ZBXNEXT-109] implemented discovery rule check editing (Eduard)
+...GI..PS. [ZBXNEXT-1550] added support of loadable modules for extending Zabbix Agent checks, also Server and Proxy simple checks (Alexei)
+........S. [ZBX-6226] added command request (global script) result logging (wiper)
 ...G...... [ZBXNEXT-1243] added support for agent system.swap.size key on AIX (wiper)
 A.F.I...S. [ZBXNEXT-1574] removed unknown event support (Pavel, Sasha)
 A...I..... [ZBXNEXT-1574] dropped the event value_changed property (Pavel, Sasha)
@@ -37,8 +43,33 @@ A.F.I...S. [ZBXNEXT-1186] increased length to 2048 characters of expression fiel
 ..F....... [ZBX-5180] maintenance periods form redesign (Vedmak)
 .......PS. [ZBXNEXT-1335] pingers work without connection to a database (Sasha)
 ..F....... [ZBX-5127] regular expressions form redesign (Vedmak)
+........S. [ZBXNEXT-1663] added support for notification macros {TRIGGER.NAME.ORIG}, {ITEM.NAME.ORIG}, {ITEM.KEY.ORIG} (dimir)
 
 Bug fixes:
+..F....... [ZBX-6400] fixed type list in discovery rule form (Eduard)
+..F....... [ZBX-6360] fixed in items.php that all items were listed if nonexisting host where provided in filter "Host" field (Toms)
+..F....... [ZBX-6387] fixed navigation problems when opening profile page from trigger or graph prototype list (Toms)
+..F....... [ZBX-6369] fixed "Use custom multiplier" field validation in items (Oleg)
+..F....... [ZBX-6366] fixed "New flexible interval" field validation in item prototypes (Oleg)
+..F....... [ZBX-6334] fixed naming consistent in triggers and graph prototypes (Eduard)
+..F....... [ZBX-6292] added support of time postfixes in trigger expression test page (Eduard)
+..F....... [ZBX-6336] fixed "array to string conversion" error in triggers (Oleg)
+..F....... [ZBX-6332] fixed buttons ids in graph edit form (Eduard)
+........S. [ZBX-6234] improved validation of command request (global scripts) tag values (wiper)
+..F....... [ZBX-6331] fixed page title in Graph prototypes (Eduard)
+..F....... [ZBX-3357] fixed confusing naming and coloring in Monitoring > Overview hint popup (Toms)
+..F....... [ZBX-3357] fixed incorrect blinking colors in non default themes (Toms)
+A......... [ZBX-5990] fixed permission check in graphs and triggers and fixed host full clone (Oleg, Toms)
+A......... [ZBX-5972] fixed template items, LLD rules, item prototypes and applications being inherited incorrectly when changing their name and an object with the same already exists on a linked host (Pavels)
+........S. [ZBX-6221] added failure response to proxy config/heartbeat requests with not matching hostname (wiper)
+..F....... [ZBX-869] fixed in Monitoring > Latest data that expand/collapse groups without application are expanded/collapsed all at the same time (Toms)
+A.F....... [ZBX-6192] improved trigger update, must update only changed fields (Eduard)
+A......... [ZBX-6256] fixed "limitSelect" in drule.get sorting dchecks and dhosts results by name instead of IDs (Pavels)
+A......... [ZBX-6256] fixed drule.exists "druleids" parameter not working (Pavels)
+..F....... [ZBX-6276] fixed function to get URL parameter error message (Eduard)
+..F....... [ZBX-6245] fixed monitoring trigger filter criteria saving (Eduard)
+..F....... [ZBX-6237] fixed Y axis item adding field, now it is available also if item list is empty (Eduard)
+........S. [ZBX-6123] ensured sequential IT services updates by database syncers (dimir)
 ....I..... [ZBX-5668] added upgrade patch for change "server_check_interval" field value to 10 (Sasha)
 ...G...PS. [ZBX-3078] added signal handling to agent also when it's not ran as daemon (wiper)
 .....J.... [ZBX-6229] removed pretty formatting from java gateway JSON responses (wiper)
@@ -70,7 +101,7 @@ A......... [ZBX-6126] implemented empty parameter validation in user.delete (Pav
 ..F....... [ZBX-6102] fixed type of web.httpconf.showdisabled profile record (Sasha)
 A.F....... [ZBX-6099] fixed event.get select_acknowledges count returning incorrect results if no acknowledgements exist (Pavels)
 ........S. [ZBX-6065] removed useless deletes when housekeeper deletes old history (Sasha)
-A......... [ZBX-6078] fixed graph item creating (Eduards)
+A......... [ZBX-6078] fixed graph item creating (Eduard)
 A......... [ZBX-6050] fixed duplicate step name validation in httptest.create and httptest.update (Pavels)
 A......... [ZBX-5846] removed the graphitem.getobjects method (Pavels)
 A......... [ZBX-5706] fixed trigger.adddependencies returning an object instead of an array of trigger IDs (Pavels)
@@ -118,8 +149,27 @@ A......... [ZBX-5498] applications API refactoring (Vedmak)
 Changes for 2.0.6rc1
 
 New features:
+........S. [ZBXNEXT-1643] added support of {TRIGGER.TEMPLATE.NAME} and {TRIGGER.HOSTGROUP.NAME} notification macros; thanks to Hmami Mohamed (Sasha)
+A.F....... [ZBX-1357] added Lithuanian translation; thanks to Zabbix translators (Richlv)
+A.F....... [ZBX-1357] updated American English, Brazilian Portuguese, French, German, Greek, Hungarian, Latvian, Slovak, Spanish, Russian, Turkish and Ukrainian translations; thanks to Zabbix translators (Richlv)
+........S. [ZBXNEXT-1663] added support for notification macros {TRIGGER.NAME.ORIG}, {ITEM.NAME.ORIG}, {ITEM.KEY.ORIG} (dimir)
 
 Bug fixes:
+A.F....... [ZBX-6318] fixed undefined indices for large node Ids in DM (Toms)
+..F....... [ZBX-6388] fixed regular expression namespace inside nodes (Eduard)
+........S. [ZBX-6333] added node support for global regexps (wiper)
+..F....... [ZBX-6352] fixed web scenario and discovery rule delay interval (Eduard)
+..F....... [ZBX-6357] fixed template graph cloning (Eduard)
+.......PS. [ZBX-4991] fixed host availability checks with proxies (wiper)
+........S. [ZBX-6322] enforced nls_numeric_characters setting for oracle db sessions (wiper)
+..F....... [ZBX-6328] fixed undefined index in proxy list (Eduard)
+..F....... [ZBX-6324] improved text displaying in Overview table header in IE (Eduard)
+A......... [ZBX-6261] fixed service.getsla not working with Oracle database (Pavels)
+........S. [ZBX-5797] fixed server SNMP interfaces ignoring IP/DNS toggle (wiper)
+..F....... [ZBX-6290] fixed icon mapping selection (Eduard)
+A.F....... [ZBX-5321] unified translation strings, fixed typo and SQL query formatting (Pavels, Richlv)
+..F....... [ZBX-5982] fixed read only items being listed in popup for trigger expression (Toms)
+........S. [ZBX-6123] ensured sequential IT services updates by database syncers (dimir)
 ....I..... [ZBX-5635] changed value types to float for qps items in "Template App MySQL" (Sasha)
 ....I..... [ZBX-5622] fixed grammatical error of snmptrap.fallback in help_items; thanks to Kodai Terashima (Sasha)
 ....I..... [ZBX-6191] fixed state of unsupported items in data.sql (Sasha)
@@ -142,6 +192,7 @@ A.F....... [ZBX-1357] updated American English, Brazilian Portuguese, Dutch, Fin
 .......PS. [ZBX-5920] added prefetching of 2 MB of data for Oracle SQL selects (dimir)
 
 Bug fixes:
+..F....... [ZBX-6349] fixed calendar popup in graphs, events and screens date/time filter (Oleg)
 ..F....... [ZBX-6217] fixed inability to use HTML special characters in web scenario password (Toms)
 ...G...... [ZBX-5358] fixed encoding of network interface names with non ASCII characters on Vista/Server 2008 + (wiper)
 ...G...... [ZBX-6216] fixed crash when zabbix_sender was used in realtime mode on windows (wiper)
@@ -1376,6 +1427,8 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.17rc1
 
+..F....... [ZBX-6329] fixed form with "0" in trigger expression parser (Eduard)
+..F....... [ZBX-6306] fixed frontend layout for latest Google Chrome 25 (Eduard)
 ..F....... [ZBX-6258] updated Japanese translation; thanks to Kodai Terashima (Richlv)
 ..F....... [ZBX-6217] fixed inability to use HTML special characters in web scenario password (Toms)
 ...G...... [ZBX-6057] fixed using of ServerActive option by zabbix_sender (Sasha)
