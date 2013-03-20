@@ -138,7 +138,7 @@ static void	smtp_prepare_return_path(char **path, const char *mail_from)
 
 	*path = zbx_malloc(*path, size);
 
-	if ( NULL == (pstart = strchr(mail_from, '<')) || NULL == (pend = strchr(pstart, '>')))
+	if (NULL == (pstart = strchr(mail_from, '<')) || NULL == (pend = strchr(pstart, '>')))
 	{
 		zbx_snprintf_alloc(path, &size, &offset, "<%s>", mail_from);
 		if (NULL == pstart)
@@ -221,7 +221,7 @@ int	send_email(const char *smtp_server, const char *smtp_helo, const char *smtp_
 	/* send MAIL FROM */
 
 	smtp_prepare_return_path(&return_path, smtp_email);
-	zbx_snprintf(cmd, sizeof(cmd), "MAIL FROM: %s\r\n", return_path);
+	zbx_snprintf(cmd, sizeof(cmd), "MAIL FROM:%s\r\n", return_path);
 	zbx_free(return_path);
 
 	if (-1 == write(s.socket, cmd, strlen(cmd)))
@@ -242,7 +242,7 @@ int	send_email(const char *smtp_server, const char *smtp_helo, const char *smtp_
 
 	/* send RCPT TO */
 
-	zbx_snprintf(cmd, sizeof(cmd), "RCPT TO: <%s>\r\n", mailto);
+	zbx_snprintf(cmd, sizeof(cmd), "RCPT TO:<%s>\r\n", mailto);
 	if (-1 == write(s.socket, cmd, strlen(cmd)))
 	{
 		zbx_snprintf(error, max_error_len, "error sending RCPT TO to mailserver: %s", zbx_strerror(errno));
