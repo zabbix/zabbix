@@ -871,6 +871,13 @@
 		return $form;
 	}
 
+	/**
+	 * Get data for item view.
+	 *
+	 * @param bool $options['is_discovery_rule']
+	 *
+	 * @return array
+	 */
 	function getItemFormData($options = array()) {
 		$ifm = get_request('filter_macro');
 		$ifv = get_request('filter_value');
@@ -949,21 +956,25 @@
 		// types, http items only for internal processes
 		$data['types'] = item_type2str();
 		unset($data['types'][ITEM_TYPE_HTTPTEST]);
+		if (!empty($options['is_discovery_rule'])) {
+			unset($data['types'][ITEM_TYPE_AGGREGATE], $data['types'][ITEM_TYPE_CALCULATED],
+					$data['types'][ITEM_TYPE_SNMPTRAP], $data['types'][ITEM_TYPE_DB_MONITOR]);
+		}
 
 		// item
 		if (!empty($data['itemid'])) {
-			$options = array(
+			$params = array(
 				'itemids' => $data['itemid'],
 				'output' => API_OUTPUT_EXTEND
 			);
 			if ($data['is_discovery_rule']) {
-				$options['hostids'] = $data['hostid'];
-				$options['editable'] = true;
-				$data['item'] = API::DiscoveryRule()->get($options);
+				$params['hostids'] = $data['hostid'];
+				$params['editable'] = true;
+				$data['item'] = API::DiscoveryRule()->get($params);
 			}
 			else {
-				$options['filter'] = array('flags' => null);
-				$data['item'] = API::Item()->get($options);
+				$params['filter'] = array('flags' => null);
+				$data['item'] = API::Item()->get($params);
 			}
 			$data['item'] = reset($data['item']);
 			$data['hostid'] = !empty($data['hostid']) ? $data['hostid'] : $data['item']['hostid'];
@@ -972,18 +983,18 @@
 			// get templates
 			$itemid = $data['itemid'];
 			do {
-				$options = array(
+				$params = array(
 					'itemids' => $itemid,
 					'output' => array('itemid', 'templateid'),
 					'selectHosts' => array('name')
 				);
 				if ($data['is_discovery_rule']) {
-					$item = API::DiscoveryRule()->get($options);
+					$item = API::DiscoveryRule()->get($params);
 				}
 				else {
-					$options['selectDiscoveryRule'] = array('itemid');
-					$options['filter'] = array('flags' => null);
-					$item = API::Item()->get($options);
+					$params['selectDiscoveryRule'] = array('itemid');
+					$params['filter'] = array('flags' => null);
+					$item = API::Item()->get($params);
 				}
 				$item = reset($item);
 

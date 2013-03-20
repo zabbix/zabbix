@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2000-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -10,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -51,10 +51,10 @@ $fields = array(
 	'new_delay_flex' => array(T_ZBX_STR, O_OPT, null, NOT_EMPTY, 'isset({add_delay_flex})&&(isset({type})&&({type}!=2))',
 		_('New flexible interval')),
 	'status' =>				array(T_ZBX_INT, O_OPT, null,	BETWEEN(0, 65535), 'isset({save})'),
-	'type' =>				array(T_ZBX_INT, O_OPT, null,	IN(array(-1, ITEM_TYPE_ZABBIX, ITEM_TYPE_SNMPV1, ITEM_TYPE_TRAPPER,
-		ITEM_TYPE_SIMPLE, ITEM_TYPE_SNMPV2C, ITEM_TYPE_INTERNAL, ITEM_TYPE_SNMPV3, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_AGGREGATE,
-		ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_JMX,
-		ITEM_TYPE_CALCULATED, ITEM_TYPE_SNMPTRAP)), 'isset({save})'),
+	'type' =>				array(T_ZBX_INT, O_OPT, null,
+		IN(array(-1, ITEM_TYPE_ZABBIX, ITEM_TYPE_SNMPV1, ITEM_TYPE_TRAPPER, ITEM_TYPE_SIMPLE, ITEM_TYPE_SNMPV2C,
+			ITEM_TYPE_INTERNAL, ITEM_TYPE_SNMPV3, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_EXTERNAL, ITEM_TYPE_IPMI,
+			ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_JMX)), 'isset({save})'),
 	'authtype' =>			array(T_ZBX_INT, O_OPT, null,	IN(ITEM_AUTHTYPE_PASSWORD.','.ITEM_AUTHTYPE_PUBLICKEY),
 		'isset({save})&&isset({type})&&({type}=='.ITEM_TYPE_SSH.')'),
 	'username' =>			array(T_ZBX_STR, O_OPT, null,	null,		'isset({save})&&isset({type})&&'.
