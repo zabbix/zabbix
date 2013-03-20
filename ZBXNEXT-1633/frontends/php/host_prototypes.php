@@ -40,6 +40,7 @@ $fields = array(
 	'host' =>		        array(T_ZBX_STR, O_OPT, null,		NOT_EMPTY,	'isset({save})', _('Host name')),
 	'name' =>	            array(T_ZBX_STR, O_OPT, null,		null,		'isset({save})'),
 	'status' =>		        array(T_ZBX_INT, O_OPT, null,		        IN(array(HOST_STATUS_NOT_MONITORED, HOST_STATUS_MONITORED)), 'isset({save})'),
+	'inventory_mode' =>	array(T_ZBX_INT, O_OPT, null, IN(array(HOST_INVENTORY_DISABLED, HOST_INVENTORY_MANUAL, HOST_INVENTORY_AUTOMATIC)), null),
 	'templates' =>		    array(T_ZBX_STR, O_OPT, null, NOT_EMPTY,	null),
 	'unlink' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,		null),
 	'group_hostid' =>		array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
@@ -75,6 +76,7 @@ if (get_request('parent_discoveryid')) {
 			'output' => API_OUTPUT_EXTEND,
 			'selectTemplates' => array('templateid', 'name'),
 			'selectParentHost' => array('hostid'),
+			'selectInventory' => API_OUTPUT_EXTEND,
 			'editable' => true
 		));
 		$hostPrototype = reset($hostPrototype);
@@ -86,7 +88,6 @@ if (get_request('parent_discoveryid')) {
 else {
 	access_deny();
 }
-
 /*
  * Actions
  */
@@ -117,7 +118,10 @@ elseif (isset($_REQUEST['save'])) {
 		'name' => get_request('name'),
 		'status' => get_request('status'),
 		'templates' => zbx_toObject(array_keys(get_request('templates', array())), 'templateid'),
-		'status' => get_request('status')
+		'status' => get_request('status'),
+		'inventory' => array(
+			'inventory_mode' => get_request('inventory_mode')
+		)
 	);
 
 	if (get_request('hostid')) {
@@ -181,7 +185,10 @@ if (isset($_REQUEST['form'])) {
 			'host' => get_request('host'),
 			'name' => get_request('name'),
 			'status' => get_request('status', HOST_STATUS_MONITORED),
-			'templates' => get_request('templates', array())
+			'templates' => get_request('templates', array()),
+			'inventory' => get_request('inventory', array(
+				'inventory_mode' => HOST_INVENTORY_DISABLED
+			))
 		),
 		'templates' => array()
 	);

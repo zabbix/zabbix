@@ -186,6 +186,83 @@ $macrosView = new CView('common.macros', array(
 ));
 $divTabs->addTab('macroTab', _('Macros'), $macrosView->render());
 
+$inventoryFormList = new CFormList('inventorylist');
+
+// radio buttons for inventory type choice
+$inventoryMode = (isset($host['inventory']['inventory_mode'])) ? $host['inventory']['inventory_mode'] : HOST_INVENTORY_DISABLED;
+$inventoryTypeRadioButton = array(
+	new CRadioButton('inventory_mode', HOST_INVENTORY_DISABLED, null, 'host_inventory_radio_'.HOST_INVENTORY_DISABLED,
+		$inventoryMode == HOST_INVENTORY_DISABLED
+	),
+	new CLabel(_('Disabled'), 'host_inventory_radio_'.HOST_INVENTORY_DISABLED),
+
+	new CRadioButton('inventory_mode', HOST_INVENTORY_MANUAL, null, 'host_inventory_radio_'.HOST_INVENTORY_MANUAL,
+		$inventoryMode == HOST_INVENTORY_MANUAL
+	),
+	new CLabel(_('Manual'), 'host_inventory_radio_'.HOST_INVENTORY_MANUAL),
+
+	new CRadioButton('inventory_mode', HOST_INVENTORY_AUTOMATIC, null, 'host_inventory_radio_'.HOST_INVENTORY_AUTOMATIC,
+		$inventoryMode == HOST_INVENTORY_AUTOMATIC
+	),
+	new CLabel(_('Automatic'), 'host_inventory_radio_'.HOST_INVENTORY_AUTOMATIC),
+);
+$inventoryFormList->addRow(new CDiv($inventoryTypeRadioButton, 'jqueryinputset'));
+
+$hostInventoryTable = DB::getSchema('host_inventory');
+$hostInventoryFields = getHostInventories();
+
+$hostInventory = $host['inventory'];
+foreach ($hostInventoryFields as $inventoryNo => $inventoryInfo) {
+	if (!isset($hostInventory[$inventoryInfo['db_field']])) {
+		$hostInventory[$inventoryInfo['db_field']] = '';
+	}
+
+	if ($hostInventoryTable['fields'][$inventoryInfo['db_field']]['type'] == DB::FIELD_TYPE_TEXT) {
+		$input = new CTextArea('host_inventory['.$inventoryInfo['db_field'].']', $hostInventory[$inventoryInfo['db_field']]);
+		$input->addStyle('width: 64em;');
+	}
+	else {
+		$fieldLength = $hostInventoryTable['fields'][$inventoryInfo['db_field']]['length'];
+		$input = new CTextBox('host_inventory['.$inventoryInfo['db_field'].']', $hostInventory[$inventoryInfo['db_field']]);
+		$input->setAttribute('maxlength', $fieldLength);
+		$input->addStyle('width: '.($fieldLength > 64 ? 64 : $fieldLength).'em;');
+	}
+	if ($inventoryMode == HOST_INVENTORY_DISABLED) {
+		$input->setAttribute('disabled', 'disabled');
+	}
+
+	// link to populating item at the right side (if any)
+	if (isset($hostItemsToInventory[$inventoryNo])) {
+		$itemName = itemName($hostItemsToInventory[$inventoryNo]);
+		$populatingLink = new CLink($itemName, 'items.php?form=update&itemid='.$hostItemsToInventory[$inventoryNo]['itemid']);
+		$populatingLink->setAttribute('title', _s('This field is automatically populated by item "%s".', $itemName));
+		$populatingItemCell = array(' &larr; ', $populatingLink);
+
+		$input->addClass('linked_to_item'); // this will be used for disabling fields via jquery
+		if ($inventoryMode == HOST_INVENTORY_AUTOMATIC) {
+			$input->setAttribute('disabled', 'disabled');
+		}
+	}
+	else {
+		$populatingItemCell = '';
+	}
+	$input->addStyle('float: left;');
+
+	$populatingItem = new CSpan($populatingItemCell, 'populating_item');
+	if ($inventoryMode != HOST_INVENTORY_AUTOMATIC) { // those links are visible only in automatic mode
+		$populatingItem->addStyle('display: none');
+	}
+
+	$inventoryFormList->addRow($inventoryInfo['title'], array($input, $populatingItem));
+}
+
+// clearing the float
+$clearFixDiv = new CDiv();
+$clearFixDiv->addStyle('clear: both;');
+$inventoryFormList->addRow('', $clearFixDiv);
+
+$divTabs->addTab('inventoryTab', _('Host inventory'), $inventoryFormList);
+
 $frmHost->addItem($divTabs);
 
 /*
