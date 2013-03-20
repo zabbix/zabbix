@@ -43,6 +43,9 @@ static char *get_value(char *data, char *xpath)
 
 	char		*ret = NULL;
 
+	if (NULL == data)
+		return NULL;
+
 	if (NULL == (doc = xmlReadMemory(data, strlen(data), "noname.xml", NULL, 0)))
 		return NULL;
 
@@ -63,9 +66,11 @@ static char *get_value(char *data, char *xpath)
 
 	if (root_element->type == XML_ELEMENT_NODE)
 	{
-		val = xmlNodeGetContent(root_element);
-		ret =  zbx_strdup(NULL, (char *)val);
-		xmlFree(val);
+		if (NULL != (val = xmlNodeGetContent(root_element)))
+		{
+			ret =  zbx_strdup(NULL, (char *)val);
+			xmlFree(val);
+		}
 	}
 
 	xmlXPathFreeObject(xpathObj);
@@ -83,6 +88,9 @@ static int	get_ids(char *data, zbx_vector_str_t *guestids)
 	xmlXPathContext *xpathCtx;
 	xmlXPathObject * xpathObj;
 	xmlChar* val;
+
+	if (NULL == data)
+		return FAIL;
 
 	if (NULL == (doc = xmlReadMemory(data, strlen(data), "noname.xml", NULL, 0)))
 		return FAIL;
@@ -106,9 +114,12 @@ static int	get_ids(char *data, zbx_vector_str_t *guestids)
 	{
 		if (cur_node->type == XML_ELEMENT_NODE)
 		{
-			val = xmlNodeGetContent(cur_node);
-			zbx_vector_str_append(guestids, zbx_strdup(NULL, (char *)val));
-			xmlFree(val);
+			if (NULL != (val = xmlNodeGetContent(cur_node)))
+			{
+				val = xmlNodeGetContent(cur_node);
+				zbx_vector_str_append(guestids, zbx_strdup(NULL, (char *)val));
+				xmlFree(val);
+			}
 		}
 	}
 
@@ -1031,4 +1042,22 @@ int	check_vmware_hosthwcputhreads(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	return get_vmware_hoststat(url, username, userpwd,
 		"//*[local-name()='hardware']/*[local-name()='numCpuThreads']", result);
+}
+
+int	check_vmware_hoststatus(AGENT_REQUEST *request, AGENT_RESULT *result)
+{
+	const char		*__function_name = "check_vmware_hoststatus";
+	char			*url, *username, *userpwd;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s'", __function_name, request->key);
+
+	if (3 < request->nparam)
+		return SYSINFO_RET_FAIL;
+
+	url = get_rparam(request, 0);
+	username = get_rparam(request, 1);
+	userpwd = get_rparam(request, 2);
+
+	return get_vmware_hoststat(url, username, userpwd,
+		"//*[local-name()='val']/*[local-name()='overallStatus']", result);
 }

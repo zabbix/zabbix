@@ -50,6 +50,11 @@ int	get_value_simple(DC_ITEM *item, AGENT_RESULT *result)
 		if (SYSINFO_RET_OK == check_service(&request, item->interface.addr, result, 1))
 			ret = SUCCEED;
 	}
+	else if (0 == strcmp(request.key, "virt.vmware.host.status"))
+	{
+		if (SYSINFO_RET_OK == check_vmware_hoststatus(&request, result))
+			ret = SUCCEED;
+	}
 	else if (0 == strcmp(request.key, "virt.vmware.host.hw.vendor"))
 	{
 		if (SYSINFO_RET_OK == check_vmware_hosthwvendor(&request, result))
