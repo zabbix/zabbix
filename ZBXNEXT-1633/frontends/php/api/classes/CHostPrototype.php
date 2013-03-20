@@ -37,6 +37,8 @@ class CHostPrototype extends CHostBase {
 			'selectDiscoveryRule' 	=> null,
 			'selectParentHost'		=> null,
 			'selectTemplates' 		=> null,
+			'editable'				=> null,
+			'nopermissions'			=> null,
 			'sortfield'    			=> '',
 			'sortorder'     		=> ''
 		));
