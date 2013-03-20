@@ -17,8 +17,7 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
 
 require_once dirname(__FILE__).'/include/config.inc.php';
 require_once dirname(__FILE__).'/include/setup.inc.php';
@@ -138,5 +137,3 @@ $ZBX_SETUP_WIZARD->show();
 unset($_POST);
 
 require_once dirname(__FILE__).'/include/page_footer.php';
-
-?>

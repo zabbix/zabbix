@@ -17,8 +17,8 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
+
 require_once dirname(__FILE__).'/include/config.inc.php';
 
 $page['file'] = 'tr_status.php';
@@ -27,8 +27,8 @@ $page['hist_arg'] = array('groupid', 'hostid');
 $page['scripts'] = array('class.cswitcher.js');
 
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
-?>
-<?php
+
+
 if($page['type'] == PAGE_TYPE_HTML){
 	define('ZBX_PAGE_DO_REFRESH', 1);
 }
@@ -37,8 +37,8 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 // js templates
 require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php';
-?>
-<?php
+
+
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
 		'groupid'=>				array(T_ZBX_INT, O_OPT,	 	P_SYS,	DB_ID, 					null),
@@ -54,6 +54,7 @@ require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php'
 		'ack_status'=>			array(T_ZBX_INT, O_OPT,		P_SYS,	null,	null),
 		'show_severity'=>		array(T_ZBX_INT, O_OPT,		P_SYS,	null,	null),
 		'show_details'=>		array(T_ZBX_INT, O_OPT,  	null,	null, 	null),
+		'show_maintenance'=>	array(T_ZBX_INT, O_OPT,  	null,	null, 	null),
 		'status_change_days'=>	array(T_ZBX_INT, O_OPT,  	null,	null, 	null),
 		'status_change'=>		array(T_ZBX_INT, O_OPT,  	null,	null, 	null),
 		'txt_select'=>			array(T_ZBX_STR, O_OPT,  	null,	null, 	null),
@@ -99,6 +100,7 @@ require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php'
 /* FILTER */
 	if(isset($_REQUEST['filter_rst'])){
 		$_REQUEST['show_details'] =	0;
+		$_REQUEST['show_maintenance'] =	1;
 		$_REQUEST['show_triggers'] = TRIGGERS_OPTION_ONLYTRUE;
 		$_REQUEST['show_events'] = EVENTS_OPTION_NOEVENT;
 		$_REQUEST['ack_status'] = ZBX_ACK_STS_ANY;
@@ -110,11 +112,13 @@ require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php'
 	else{
 		if(isset($_REQUEST['filter_set'])){
 			$_REQUEST['show_details'] = get_request('show_details', 0);
+			$_REQUEST['show_maintenance'] = get_request('show_maintenance', 0);
 			$_REQUEST['status_change'] = get_request('status_change', 0);
 			$_REQUEST['show_triggers'] = get_request('show_triggers', TRIGGERS_OPTION_ONLYTRUE);
 		}
 		else{
 			$_REQUEST['show_details'] = get_request('show_details',	CProfile::get('web.tr_status.filter.show_details', 0));
+			$_REQUEST['show_maintenance'] = get_request('show_maintenance',	CProfile::get('web.tr_status.filter.show_maintenance', 1));
 			$_REQUEST['status_change'] = get_request('status_change', CProfile::get('web.tr_status.filter.status_change', 0));
 			$_REQUEST['show_triggers'] = TRIGGERS_OPTION_ONLYTRUE;
 		}
@@ -141,6 +145,7 @@ require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php'
 
 	if(isset($_REQUEST['filter_set']) || isset($_REQUEST['filter_rst'])){
 		CProfile::update('web.tr_status.filter.show_details', $_REQUEST['show_details'], PROFILE_TYPE_INT);
+		CProfile::update('web.tr_status.filter.show_maintenance', $_REQUEST['show_maintenance'], PROFILE_TYPE_INT);
 		CProfile::update('web.tr_status.filter.show_events', $_REQUEST['show_events'], PROFILE_TYPE_INT);
 		CProfile::update('web.tr_status.filter.ack_status', $_REQUEST['ack_status'], PROFILE_TYPE_INT);
 		CProfile::update('web.tr_status.filter.show_severity', $_REQUEST['show_severity'], PROFILE_TYPE_INT);
@@ -160,8 +165,7 @@ require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php'
 	if(isset($audio) && !$mute){
 		play_sound($audio);
 	}
-?>
-<?php
+
 	$trigg_wdgt = new CWidget();
 
 	$r_form = new CForm('get');
@@ -238,6 +242,8 @@ require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php'
 	$filterForm->addRow(_('Show details'), new CCheckBox('show_details', $_REQUEST['show_details'], null, 1));
 
 	$filterForm->addRow(_('Filter by name'), new CTextBox('txt_select', $_REQUEST['txt_select'], 40));
+
+	$filterForm->addRow(_('Show hosts in maintenance'), new CCheckBox('show_maintenance', $_REQUEST['show_maintenance'], null, 1));
 
 	$filterForm->addItemToBottomRow(new CSubmit('filter_set', _('Filter')));
 	$filterForm->addItemToBottomRow(new CSubmit('filter_rst', _('Reset')));
@@ -329,6 +335,9 @@ require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php'
 	if($_REQUEST['status_change']){
 		$options['lastChangeSince'] = time() - $_REQUEST['status_change_days'] * SEC_PER_DAY;
 	}
+	if (!get_request('show_maintenance')) {
+		$options['maintenance'] = false;
+	}
 
 	$triggers = API::Trigger()->get($options);
 
@@ -341,7 +350,7 @@ require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php'
 		'triggerids' => zbx_objectValues($triggers, 'triggerid'),
 		'output' => API_OUTPUT_EXTEND,
 		'selectHosts' => array('hostid', 'name', 'maintenance_status', 'maintenance_type', 'maintenanceid', 'description'),
-		'selectItems' => API_OUTPUT_EXTEND,
+		'selectItems' =>  array('hostid', 'name', 'key_', 'value_type'),
 		'selectDependencies' => API_OUTPUT_EXTEND,
 		'expandDescription' => true
 	);
@@ -354,7 +363,7 @@ require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php'
 
 	$triggerids = zbx_objectValues($triggers, 'triggerid');
 
-	if($config['event_ack_enable']){
+	if ($config['event_ack_enable']) {
 		$options = array(
 			'countOutput' => true,
 			'groupCount' => true,
@@ -367,12 +376,42 @@ require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php'
 			),
 			'nopermissions' => true
 		);
+		// get all unacknowledged events, if trigger has unacknowledged even => it has events
 		$event_counts = API::Event()->get($options);
-		foreach ($triggers as $tnum => $trigger) {
-			$triggers[$tnum]['event_count'] = 0;
-		}
 		foreach ($event_counts as $event_count) {
+			$triggers[$event_count['objectid']]['hasEvents'] = true;
 			$triggers[$event_count['objectid']]['event_count'] = $event_count['rowscount'];
+		}
+
+		// gather ids of triggers which don't have unack. events
+		$triggerIdsWithoutUnackEvents = array();
+		foreach ($triggers as $tnum => $trigger) {
+			if (!isset($trigger['hasEvents'])) {
+				$triggerIdsWithoutUnackEvents[] = $trigger['triggerid'];
+			}
+			if (!isset($trigger['event_count'])) {
+				$triggers[$tnum]['event_count'] = 0;
+			}
+		}
+		if (!empty($triggerIdsWithoutUnackEvents)) {
+			$options = array(
+				'countOutput' => true,
+				'groupCount' => true,
+				'triggerids' => $triggerIdsWithoutUnackEvents,
+				'filter' => array(
+					'object' => EVENT_OBJECT_TRIGGER,
+					'value_changed' => TRIGGER_VALUE_CHANGED_YES
+				),
+				'nopermissions' => true
+			);
+			// for triggers without unack. events we try to select any event
+			$allEventCounts = API::Event()->get($options);
+			$allEventCounts = zbx_toHash($allEventCounts, 'objectid');
+			foreach ($triggers as $tnum => $trigger) {
+				if (!isset($trigger['hasEvents'])) {
+					$triggers[$tnum]['hasEvents'] = isset($allEventCounts[$trigger['triggerid']]);
+				}
+			}
 		}
 	}
 
@@ -394,7 +433,7 @@ require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php'
 		'hostids' => $tr_hostids,
 		'preservekeys' => true,
 		'selectScreens' => API_OUTPUT_COUNT,
-		'selectInventory' => true
+		'selectInventory' => array('hostid')
 	));
 
 	if($show_events != EVENTS_OPTION_NOEVENT){
@@ -436,7 +475,7 @@ require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php'
 	$dep_res = DBselect(
 		'SELECT triggerid_down,triggerid_up'.
 		' FROM trigger_depends'.
-		' WHERE '.DBcondition('triggerid_up', $triggerids)
+		' WHERE '.dbConditionInt('triggerid_up', $triggerids)
 	);
 	$triggerids_down = array();
 	while ($row = DBfetch($dep_res)) {
@@ -470,8 +509,8 @@ require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php'
 		// trigger js menu
 		$menu_trigger_conf = 'null';
 		if($admin_links && $trigger['flags'] == ZBX_FLAG_DISCOVERY_NORMAL){
-			$str_tmp = CJs::encodeJson("triggers.php?form=update&triggerid=".$trigger['triggerid']."&switch_node=".id2nodeid($trigger['triggerid']));
-			$menu_trigger_conf = "['"._('Configuration of triggers')."',". $str_tmp .",
+			$configurationUrl = 'triggers.php?form=update&triggerid='.$trigger['triggerid'].'&hostid='.$pageFilter->hostid.'&switch_node='.id2nodeid($trigger['triggerid']);
+			$menu_trigger_conf = "['"._('Configuration of triggers')."',".CJs::encodeJson($configurationUrl).",
 				null, {'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}]";
 		}
 		$menu_trigger_url = 'null';
@@ -506,7 +545,7 @@ require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php'
 				$dep_table->addRow(' - '.CTriggerHelper::expandDescriptionById($dep['triggerid']));
 			}
 
-			$img = new Cimg('images/general/down_icon.png', 'DEP_UP');
+			$img = new Cimg('images/general/arrow_down2.png', 'DEP_UP');
 			$img->setAttribute('style', 'vertical-align: middle; border: 0px;');
 			$img->setHint($dep_table);
 
@@ -527,7 +566,7 @@ require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php'
 		}
 
 		if($dependency){
-			$img = new Cimg('images/general/up_icon.png', 'DEP_UP');
+			$img = new Cimg('images/general/arrow_up2.png', 'DEP_UP');
 			$img->setAttribute('style', 'vertical-align: middle; border: 0px;');
 			$img->setHint($dep_table);
 
@@ -544,6 +583,8 @@ require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php'
 		foreach($trigger['hosts'] as $trigger_host){
 			$host = $hosts[$trigger_host['hostid']];
 
+			$hosts_span = new CDiv(null, 'floatleft');
+
 			// fetch scripts for the host JS menu
 			$menuScripts = array();
 			if (isset($scripts_by_hosts[$trigger_host['hostid']])) {
@@ -556,38 +597,51 @@ require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php'
 				}
 			}
 
-			$maint_span = null;
-			if($trigger_host['maintenance_status']){
-				$text = $trigger_host['maintenance_type'] ? _('Maintenance without data collection') : _('Maintenance with data collection');
-				$text = ' ['.$text.']';
-				$maint_span = new CSpan($text, 'orange pointer');
-
-				$maintenanceOptions = array(
-					'maintenanceids' => $trigger_host['maintenanceid'],
-					'output' => API_OUTPUT_EXTEND
-				);
-				$maintenances = API::Maintenance()->get($maintenanceOptions);
-				$maintenance = reset($maintenances);
-
-				$maint_hint = new CSpan($maintenance['name'].($maintenance['description']=='' ? '' : ': '.$maintenance['description']));
-
-				$maint_span->setHint($maint_hint);
-			}
-
-			$hosts_span = new CSpan($trigger_host['name'], 'link_menu menu-host');
-			$hosts_span->setAttribute('data-menu', array(
+			$hosts_name = new CSpan($trigger_host['name'], 'link_menu menu-host');
+			$hosts_name->setAttribute('data-menu', array(
 				'scripts' => $menuScripts,
 				'hostid' => $trigger_host['hostid'],
 				'hasScreens' => (bool) $host['screens'],
 				'hasInventory' => (bool) $host['inventory']
 			));
 
+			$hosts_span->addItem($hosts_name);
+
+			// add maintenance icon with hint if host is in maintenance
+			if($trigger_host['maintenance_status']){
+				$mntIco = new CDiv(null, 'icon-maintenance-inline');
+
+				$maintenances = API::Maintenance()->get(array(
+					'maintenanceids' => $trigger_host['maintenanceid'],
+					'output' => API_OUTPUT_EXTEND,
+					'limit'	=> 1
+				));
+
+				if ($maintenance = reset($maintenances)) {
+					$hint = $maintenance['name'].' ['.($trigger_host['maintenance_type']
+						? _('Maintenance without data collection')
+						: _('Maintenance with data collection')).']';
+
+					if (isset($maintenance['description'])) {
+						// double quotes mandatory
+						$hint .= "\n".$maintenance['description'];
+					}
+
+					$mntIco->setHint($hint);
+					$mntIco->addClass('pointer');
+				}
+
+				$hosts_span ->addItem($mntIco);
+			}
+
+			// add comma after hosts, except last
+			if (next($trigger['hosts'])) {
+				$hosts_span->addItem(','.SPACE);
+			}
+
 			$hosts_list[] = $hosts_span;
-			$hosts_list[] = $maint_span;
-			$hosts_list[] = ', ';
 		}
 
-		array_pop($hosts_list);
 		$host = new CCol($hosts_list);
 		$host->addStyle('white-space: normal;');
 // }}} host JS menu
@@ -605,11 +659,16 @@ require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php'
 		//.'&stime='.date('YmdHis', $trigger['lastchange']
 
 		if($config['event_ack_enable']){
-			if($trigger['event_count']){
-				$to_ack = new CCol(array(new CLink(_('Acknowledge'), 'acknow.php?triggers[]='.$trigger['triggerid'].'&backurl='.$page['file'], 'on'), ' ('.$trigger['event_count'].')'));
+			if ($trigger['hasEvents']) {
+				if($trigger['event_count']){
+					$to_ack = new CCol(array(new CLink(_('Acknowledge'), 'acknow.php?triggers[]='.$trigger['triggerid'].'&backurl='.$page['file'], 'on'), ' ('.$trigger['event_count'].')'));
+				}
+				else{
+					$to_ack = new CCol(_('Acknowledged'), 'off');
+				}
 			}
-			else{
-				$to_ack = new CCol(_('Acknowledged'), 'off');
+			else {
+				$to_ack = new CCol(_('No events'), 'unknown');
 			}
 		}
 		else{
@@ -739,5 +798,3 @@ require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php'
 	zbx_add_post_js('var switcher = new CSwitcher(\''.$switcherName.'\');');
 
 require_once dirname(__FILE__).'/include/page_footer.php';
-
-?>

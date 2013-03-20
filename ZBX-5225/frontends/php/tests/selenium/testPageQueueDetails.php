@@ -17,19 +17,18 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
 require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
 class testPageQueueDetails extends CWebTest {
 	public function testPageQueueDetails_CheckLayout() {
-		$this->login('queue.php?config=2');
+		$this->zbxTestLogin('queue.php?config=2');
 		$this->checkTitle('Queue \[refreshed every 30 sec\]');
-		$this->ok('Queue');
-		$this->ok('QUEUE OF ITEMS TO BE UPDATED');
+		$this->zbxTestTextPresent('Queue');
+		$this->zbxTestTextPresent('QUEUE OF ITEMS TO BE UPDATED');
 		// Header
-		$this->ok(array('Next check', 'Delayed by', 'Host', 'Name'));
-		$this->ok('Total:');
+		$this->zbxTestTextPresent(array('Next check', 'Delayed by', 'Host', 'Name'));
+		$this->zbxTestTextPresent('Total:');
 	}
 
 	public function testPageQeueOverviewDetails_VerifyDisplayedNumbers() {
@@ -37,4 +36,3 @@ class testPageQueueDetails extends CWebTest {
 		$this->markTestIncomplete();
 	}
 }
-?>

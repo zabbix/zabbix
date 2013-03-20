@@ -17,8 +17,7 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
 require_once dirname(__FILE__).'/testGeneric.php';
 require_once dirname(__FILE__).'/testClicks.php';
 require_once dirname(__FILE__).'/testPageActionsAutoregistration.php';
@@ -68,12 +67,14 @@ require_once dirname(__FILE__).'/testFormAdministrationGeneralRegexp.php';
 require_once dirname(__FILE__).'/testFormAdministrationGeneralTrigDisplOptions.php';
 require_once dirname(__FILE__).'/testFormAdministrationGeneralValuemap.php';
 require_once dirname(__FILE__).'/testFormAdministrationGeneralWorkperiod.php';
+require_once dirname(__FILE__).'/testFormAdministrationGeneralInstallation.php';
 require_once dirname(__FILE__).'/testFormAdministrationMediaTypes.php';
 require_once dirname(__FILE__).'/testFormAdministrationScripts.php';
 require_once dirname(__FILE__).'/testFormConfigTriggerSeverity.php';
 require_once dirname(__FILE__).'/testFormHost.php';
 require_once dirname(__FILE__).'/testFormHostGroup.php';
 require_once dirname(__FILE__).'/testFormItem.php';
+require_once dirname(__FILE__).'/testFormTrigger.php';
 require_once dirname(__FILE__).'/testFormLogin.php';
 require_once dirname(__FILE__).'/testFormMap.php';
 require_once dirname(__FILE__).'/testFormUserProfile.php';
@@ -137,12 +138,14 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormAdministrationGeneralTrigDisplOptions');
 		$suite->addTestSuite('testFormAdministrationGeneralValuemap');
 		$suite->addTestSuite('testFormAdministrationGeneralWorkperiod');
+		$suite->addTestSuite('testFormAdministrationGeneralInstallation');
 		$suite->addTestSuite('testFormAdministrationMediaTypes');
 		$suite->addTestSuite('testFormAdministrationScripts');
 		$suite->addTestSuite('testFormConfigTriggerSeverity');
 		$suite->addTestSuite('testFormHost');
 		$suite->addTestSuite('testFormHostGroup');
 		$suite->addTestSuite('testFormItem');
+		$suite->addTestSuite('testFormTrigger');
 		$suite->addTestSuite('testFormLogin');
 		$suite->addTestSuite('testFormUserProfile');
 		$suite->addTestSuite('testFormScreen');
@@ -155,4 +158,3 @@ class SeleniumTests {
 		return $suite;
 	}
 }
-?>

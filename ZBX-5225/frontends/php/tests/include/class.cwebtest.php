@@ -53,7 +53,8 @@ class CWebTest extends PHPUnit_Extensions_SeleniumTestCase {
 		'Parse error',
 		'syntax error',
 		'Try to read inaccessible property',
-		'.php:'
+		'Illegal string offset',
+		'must be an array'
 	);
 
 	// List of strings that SHOULD appear on every page
@@ -95,33 +96,37 @@ class CWebTest extends PHPUnit_Extensions_SeleniumTestCase {
 		// DBclose();
 	}
 
-	public function login($url = null) {
+	public function zbxTestOpen($url) {
+		$this->open($url);
+	}
+
+	public function zbxTestOpenWait($url) {
+		$this->zbxTestOpen($url);
+		$this->wait();
+	}
+
+	public function zbxTestLogin($url = null) {
 		global $ZBX_SERVER_NAME;
 
-		$this->open('index.php');
-		$this->wait();
+		$this->zbxTestOpenWait('index.php');
 		// Login if not logged in already
 		if ($this->isElementPresent('id=password')) {
 			$this->input_type('name', PHPUNIT_LOGIN_NAME);
 			$this->input_type('password', PHPUNIT_LOGIN_PWD);
-			$this->click('enter');
-			$this->wait();
+			$this->zbxTestClickWait('enter');
 		}
 		if (isset($url)) {
-			$this->open($url);
-			$this->wait();
+			$this->zbxTestOpenWait($url);
 		}
-		$this->ok($ZBX_SERVER_NAME);
-		$this->ok('Admin');
-		$this->nok('Login name or password is incorrect');
+		$this->zbxTestTextPresent(array($ZBX_SERVER_NAME, 'Admin'));
+		$this->zbxTestTextNotPresent('Login name or password is incorrect');
 	}
 
-	public function logout() {
-		$this->click('link=Logout');
-		$this->wait();
+	public function zbxTestLogout() {
+		$this->zbxTestClickWait('link=Logout');
 	}
 
-	public function checkFatalErrors() {
+	public function zbxTestCheckFatalErrors() {
 		foreach ($this->failIfExists as $str) {
 			$this->assertTextNotPresent($str, "Chuck Norris: I do not expect string '$str' here.");
 		}
@@ -137,16 +142,16 @@ class CWebTest extends PHPUnit_Extensions_SeleniumTestCase {
 		$this->assertTitle($title);
 	}
 
-	public function ok($strings) {
+	public function zbxTestTextPresent($strings) {
 		if (!is_array($strings)) {
 			$strings = array($strings);
 		}
 		foreach ($strings as $string) {
-			$this->assertTextPresent($string, "Chuck Norris: I expect string '$string' here");
+			$this->assertTextPresent('exact:'.$string, 'Chuck Norris: I expect string "'.$string.'" here');
 		}
 	}
 
-	public function nok($strings) {
+	public function zbxTestTextNotPresent($strings) {
 		if (!is_array($strings)) {
 			$strings = array($strings);
 		}
@@ -155,21 +160,26 @@ class CWebTest extends PHPUnit_Extensions_SeleniumTestCase {
 		}
 	}
 
-	public function button_click($a) {
-		$this->click($a);
+	public function zbxTestClick($id) {
+		$this->click($id);
+	}
+
+	public function zbxTestClickWait($id) {
+		$this->zbxTestClick($id);
+		$this->wait();
 	}
 
 	public function href_click($a) {
 		$this->click("xpath=//a[contains(@href,'$a')]");
 	}
 
-	public function checkbox_select($a) {
+	public function zbxTestCheckboxSelect($a) {
 		if (!$this->isChecked($a)) {
 			$this->click($a);
 		}
 	}
 
-	public function checkbox_unselect($a) {
+	public function zbxTestCheckboxUnselect($a) {
 		if ($this->isChecked($a)) {
 			$this->click($a);
 		}
@@ -179,14 +189,20 @@ class CWebTest extends PHPUnit_Extensions_SeleniumTestCase {
 		$this->type($id, $str);
 	}
 
-	public function dropdown_select($id, $str) {
-		$this->assertSelectHasOption($id, $str);
+	public function zbxTestDropdownHasOptions($id, array $strings) {
+		foreach ($strings as $string) {
+			$this->assertSelectHasOption($id, $string);
+		}
+	}
+
+	public function zbxTestDropdownSelect($id, $str) {
+		$this->zbxTestDropdownHasOptions($id, array($str));
 		$this->select($id, $str);
 	}
 
-	public function dropdown_select_wait($id, $str) {
+	public function zbxTestDropdownSelectWait($id, $str) {
 		$selected = $this->getSelectedLabel($id);
-		$this->dropdown_select($id, $str);
+		$this->zbxTestDropdownSelect($id, $str);
 		// Wait only if drop down selection was changed
 		if ($selected != $str) {
 			$this->wait();
@@ -195,24 +211,23 @@ class CWebTest extends PHPUnit_Extensions_SeleniumTestCase {
 
 	public function wait() {
 		$this->waitForPageToLoad();
-		$this->checkFatalErrors();
+		$this->zbxTestCheckFatalErrors();
 	}
 
 	public function tab_switch($tab) {
 		// switches tab by receiving tab title text
 		$this->click("xpath=//div[@id='tabs']/ul/li/a[text()='$tab']");
 		$this->waitForElementPresent("xpath=//li[contains(@class, 'ui-tabs-selected')]/a[text()='$tab']");
-		$this->checkFatalErrors();
+		$this->zbxTestCheckFatalErrors();
 	}
 
 	// zbx_popup is the default opened window id if none is passed
-	public function zbxLaunchPopup($buttonId, $windowId = 'zbx_popup') {
-		// $this->button_click('add');
+	public function zbxTestLaunchPopup($buttonId, $windowId = 'zbx_popup') {
 		// the above does not seem to work, thus this ugly method has to be used - at least until buttons get unique names...
 		$this->click("//input[@id='$buttonId' and contains(@onclick, 'return PopUp')]");
 		$this->waitForPopUp($windowId, 6000);
 		$this->selectWindow($windowId);
-		$this->checkFatalErrors();
+		$this->zbxTestCheckFatalErrors();
 	}
 
 	public function zbxGetDropDownElements($dropdownId) {
@@ -278,28 +293,26 @@ class CWebTest extends PHPUnit_Extensions_SeleniumTestCase {
 		// $templateid = $row['hostid'];
 
 		// Link a template to a host from host properties page
-		$this->login('hosts.php');
-		$this->dropdown_select_wait('groupid', 'all');
-		$this->click("link=$host");
-		$this->wait();
+		$this->zbxTestLogin('hosts.php');
+		$this->zbxTestDropdownSelectWait('groupid', 'all');
+		$this->zbxTestClickWait('link='.$host);
 		$this->tab_switch("Templates");
-		$this->nok("$template");
+		$this->zbxTestTextNotPresent($template);
 
 		// adds template $template to the list of linked templates
 		// for now, ignores the fact that template might be already linked
-		$this->zbxLaunchPopup('add');
-		$this->dropdown_select_wait('groupid', 'Templates');
+		$this->zbxTestLaunchPopup('add');
+		$this->zbxTestDropdownSelectWait('groupid', 'Templates');
 		$this->check("//input[@value='$template' and @type='checkbox']");
-		$this->button_click('select');
+		$this->zbxTestClick('select');
 		$this->selectWindow();
 		$this->wait();
-		$this->button_click('save');
-		$this->wait();
+		$this->zbxTestClickWait('save');
 		$this->checkTitle('Configuration of hosts');
-		$this->ok('Host updated');
+		$this->zbxTestTextPresent('Host updated');
 		// no entities should be deleted, they all should be updated
-		$this->nok('deleted');
-		$this->nok('created');
+		$this->zbxTestTextNotPresent('deleted');
+		$this->zbxTestTextNotPresent('created');
 
 		// linking finished, checks proceed
 		// should check that items, triggers, graphs and applications exist on the host and are linked to the template
@@ -307,18 +320,17 @@ class CWebTest extends PHPUnit_Extensions_SeleniumTestCase {
 		// currently doing something very brutal - just looking whether Template_Linux is present on entity pages
 		$this->href_click("items.php?filter_set=1&hostid=$hostid&sid=");
 		$this->wait();
-		$this->ok("$template:");
+		$this->zbxTestTextPresent($template.':');
 		// using "host navigation bar" at the top of entity list
 		$this->href_click("triggers.php?hostid=$hostid&sid=");
 		$this->wait();
-		$this->ok("$template:");
+		$this->zbxTestTextPresent($template.':');
 		// default data.sql has a problem - graphs are not present in the template
 		// $this->href_click("graphs.php?hostid=$hostid&sid=");
 		// $this->wait();
-		// $this->ok("$template:");
 		$this->href_click("applications.php?hostid=$hostid&sid=");
 		$this->wait();
-		$this->ok("$template:");
+		$this->zbxTestTextPresent($template.':');
 
 		// tests that items that should have interfaceid don't have it set to NULL
 		// checks all items on enabled and disabled hosts (types 0 and 1) except:
@@ -346,7 +358,7 @@ class CWebTest extends PHPUnit_Extensions_SeleniumTestCase {
 				' AND name <> host'
 		);
 		while ($row = DBfetch($result)) {
-			$this->nok($row['host']);
+			$this->zbxTestTextNotPresent($row['host']);
 		}
 	}
 }

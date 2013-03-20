@@ -143,6 +143,7 @@ if ($page['type'] == PAGE_TYPE_HTML) {
 <!doctype html>
 <html>
 	<head>
+		<meta http-equiv="X-UA-Compatible" content="IE=Edge"/>
 		<title><?php echo $page_title; ?></title>
 		<meta name="Author" content="Zabbix SIA" />
 		<meta charset="utf-8" />
@@ -154,6 +155,7 @@ if ($page['type'] == PAGE_TYPE_HTML) {
 		if (!empty($DB['DB'])) {
 			$config = select_config();
 			$css = getUserTheme(CWebUser::$data);
+
 			echo '<style type="text/css">'."\n".
 					'.disaster { background: #'.$config['severity_color_5'].' !important; }'."\n".
 					'.high { background: #'.$config['severity_color_4'].' !important; }'."\n".
@@ -161,7 +163,6 @@ if ($page['type'] == PAGE_TYPE_HTML) {
 					'.warning { background: #'.$config['severity_color_2'].' !important; }'."\n".
 					'.information { background: #'.$config['severity_color_1'].' !important; }'."\n".
 					'.not_classified { background: #'.$config['severity_color_0'].' !important; }'."\n".
-					'.trigger_unknown { background: #DBDBDB !important; }'."\n".
 				'</style>';
 
 			// perform Zabbix server check only for standard pages
@@ -183,8 +184,9 @@ if ($page['type'] == PAGE_TYPE_HTML) {
 <script type="text/javascript" src="js/browsers.js"></script>
 <script type="text/javascript">var PHP_TZ_OFFSET = <?php echo date('Z'); ?>;</script>
 <?php
-	// is menu is frontend messaging
-	$path = 'jsLoader.php?ver='.ZABBIX_VERSION.'&amp;lang='.CWebUser::$data['lang'].'&isMenu='.(defined('ZBX_PAGE_NO_MENU') ? 0 : 1);
+	// show GUI messages in pages with menus and in fullscreen mode
+	$showGuiMessaging = (!defined('ZBX_PAGE_NO_MENU') || (isset($_REQUEST['fullscreen']) && $_REQUEST['fullscreen'])) ? 1 : 0;
+	$path = 'jsLoader.php?ver='.ZABBIX_VERSION.'&amp;lang='.CWebUser::$data['lang'].'&showGuiMessaging='.$showGuiMessaging;
 	echo '<script type="text/javascript" src="'.$path.'"></script>'."\n";
 
 	if (!empty($page['scripts']) && is_array($page['scripts'])) {
@@ -466,7 +468,7 @@ if ($denied_page_requested) {
 	access_deny();
 }
 
-if ($page['type'] == PAGE_TYPE_HTML && !defined('ZBX_PAGE_NO_MENU')) {
+if ($page['type'] == PAGE_TYPE_HTML && $showGuiMessaging) {
 	zbx_add_post_js('var msglistid = initMessages({});');
 }
 
@@ -476,11 +478,11 @@ if ($failedAttempts = CProfile::get('web.login.attempt.failed', 0)) {
 	$attempdate = CProfile::get('web.login.attempt.clock', 0);
 
 	$error_msg = _n('%1$s failed login attempt logged. Last failed attempt was from %2$s on %3$s at %4$s.',
-			'%1$s failed login attempts logged. Last failed attempt was from %2$s on %3$s at %4$s.',
-			$failedAttempts,
-			$attempip,
-			zbx_date2str(_('d M Y'), $attempdate),
-			zbx_date2str(_('H:i'), $attempdate)
+		'%1$s failed login attempts logged. Last failed attempt was from %2$s on %3$s at %4$s.',
+		$failedAttempts,
+		$attempip,
+		zbx_date2str(_('d M Y'), $attempdate),
+		zbx_date2str(_('H:i'), $attempdate)
 	);
 	error($error_msg);
 

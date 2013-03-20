@@ -17,8 +17,8 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
+
 $screenWidget = new CWidget();
 
 // create new screen button
@@ -79,4 +79,3 @@ $screenForm->addItem(array($this->data['paging'], $screenTable, $this->data['pag
 // append form to widget
 $screenWidget->addItem($screenForm);
 return $screenWidget;
-?>

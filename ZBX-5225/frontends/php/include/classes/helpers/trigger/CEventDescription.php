@@ -29,6 +29,6 @@ class CEventDescription extends CTriggerDescription {
 			$trigger['ns']
 		);
 
-		return formatItemValue($item);
+		return formatItemValue($item, UNRESOLVED_MACRO_STRING);
 	}
 }

@@ -59,8 +59,9 @@
 	#define ZBX_THREAD_ENTRY(entry_name, arg_name)	\
 		unsigned entry_name(void *arg_name)
 
+	/* Calling _exit() to terminate child process immediately is important. See ZBX-5732 for details. */
 	#define zbx_thread_exit(status) \
-		exit((int)(status)); \
+		_exit((int)(status)); \
 		return ((unsigned)(status))
 
 	#define zbx_sleep(sec) sleep((sec))

@@ -58,9 +58,6 @@ class CMaintenance extends CZBXAPI {
 		// allowed columns for sorting
 		$sortColumns = array('maintenanceid', 'name', 'maintenance_type');
 
-		// allowed output options for [ select_* ] params
-		$subselectsAllowedOutputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND);
-
 		$sqlParts = array(
 			'select'	=> array('maintenance' => 'm.maintenanceid'),
 			'from'		=> array('maintenances' => 'maintenances m'),
@@ -89,6 +86,7 @@ class CMaintenance extends CZBXAPI {
 			'output'					=> API_OUTPUT_REFER,
 			'selectGroups'				=> null,
 			'selectHosts'				=> null,
+			'selectTimeperiods'			=> null,
 			'countOutput'				=> null,
 			'groupCount'				=> null,
 			'preservekeys'				=> null,
@@ -107,7 +105,7 @@ class CMaintenance extends CZBXAPI {
 					$res = DBselect(
 						'SELECT mmg.maintenanceid'.
 						' FROM maintenances_groups mmg'.
-						' WHERE '.DBcondition('mmg.groupid', $options['groupids'])
+						' WHERE '.dbConditionInt('mmg.groupid', $options['groupids'])
 					);
 					while ($maintenance = DBfetch($res)) {
 						$maintenanceids[] = $maintenance['maintenanceid'];
@@ -120,88 +118,66 @@ class CMaintenance extends CZBXAPI {
 
 				if (!is_null($options['groupids'])) {
 					zbx_value2array($options['groupids']);
-					$sql .= ' AND '.DBcondition('hg.groupid', $options['groupids']);
+					$sql .= ' AND '.dbConditionInt('hg.groupid', $options['groupids']);
 				}
 
 				if (!is_null($options['hostids'])) {
 					zbx_value2array($options['hostids']);
-					$sql .= ' AND '.DBcondition('hg.hostid', $options['hostids']);
+					$sql .= ' AND '.dbConditionInt('hg.hostid', $options['hostids']);
 				}
 				$res = DBselect($sql);
 				while ($maintenance = DBfetch($res)) {
 					$maintenanceids[] = $maintenance['maintenanceid'];
 				}
-				$sqlParts['where'][] = DBcondition('m.maintenanceid', $maintenanceids);
+				$sqlParts['where'][] = dbConditionInt('m.maintenanceid', $maintenanceids);
 			}
 		}
 		else {
 			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ_ONLY;
 
-			$sql = 'SELECT DISTINCT m.maintenanceid'.
+			$userGroups = getUserGroupsByUserId($userid);
+
+			$sql = 'SELECT m.maintenanceid'.
 					' FROM maintenances m'.
 					' WHERE NOT EXISTS ('.
-						' SELECT mh3.maintenanceid'.
-						' FROM maintenances_hosts mh3,rights r3,users_groups ug3,hosts_groups hg3'.
-						' WHERE mh3.maintenanceid=m.maintenanceid'.
-							' AND r3.groupid=ug3.usrgrpid'.
-							' AND hg3.hostid=mh3.hostid'.
-							' AND r3.id=hg3.groupid'.
-							' AND ug3.userid='.$userid.
-							' AND r3.permission<'.$permission.
-					')'.
+						'SELECT NULL'.
+						' FROM maintenances_hosts mh,hosts_groups hg'.
+							' LEFT JOIN rights r'.
+								' ON r.id=hg.groupid'.
+									' AND '.dbConditionInt('r.groupid', $userGroups).
+						' WHERE m.maintenanceid=mh.maintenanceid'.
+							' AND mh.hostid=hg.hostid'.
+						' GROUP by mh.hostid'.
+						' HAVING MIN(r.permission) IS NULL'.
+							' OR MIN(r.permission)<'.$permission.
+						')'.
 					' AND NOT EXISTS ('.
-						'SELECT mh4.maintenanceid'.
-						' FROM maintenances_hosts mh4'.
-						' WHERE mh4.maintenanceid=m.maintenanceid'.
-							' AND NOT EXISTS('.
-								'SELECT r5.id'.
-								' FROM rights r5,users_groups ug5,hosts_groups hg5'.
-								' WHERE r5.groupid=ug5.usrgrpid'.
-									' AND hg5.hostid=mh4.hostid'.
-									' AND r5.id=hg5.groupid'.
-									' AND ug5.userid='.$userid.
-							')'.
-					')'.
-					' AND NOT EXISTS ('.
-						'SELECT mg2.maintenanceid'.
-						' FROM maintenances_groups mg2,rights r3,users_groups ug3'.
-						' WHERE mg2.maintenanceid=m.maintenanceid'.
-							' AND r3.groupid=ug3.usrgrpid'.
-							' AND r3.id=mg2.groupid'.
-							' AND ug3.userid='.$userid.
-							' AND r3.permission<'.$permission.
-					')'.
-					' AND NOT EXISTS ('.
-						'SELECT mg3.maintenanceid'.
-						' FROM maintenances_groups mg3'.
-						' WHERE mg3.maintenanceid=m.maintenanceid'.
-							' AND NOT EXISTS ('.
-								'SELECT r5.id'.
-								' FROM rights r5,users_groups ug5,hosts_groups hg5'.
-								' WHERE r5.groupid=ug5.usrgrpid'.
-									' AND r5.id=mg3.groupid'.
-									' AND ug5.userid='.$userid.
-							')'.
-					')';
+						'SELECT NULL'.
+						' FROM maintenances_groups mg'.
+							' LEFT JOIN rights r'.
+								' ON r.id=mg.groupid'.
+									' AND '.dbConditionInt('r.groupid', $userGroups).
+						' WHERE m.maintenanceid=mg.maintenanceid'.
+						' GROUP by mg.groupid'.
+						' HAVING MIN(r.permission) IS NULL'.
+							' OR MIN(r.permission)<'.$permission.
+						')';
 
 			if (!is_null($options['groupids'])) {
 				zbx_value2array($options['groupids']);
-
 				$sql .= ' AND ('.
-							// filtering using groups attached to maintenence
-							'EXISTS ('.
-								'SELECT mgf.maintenanceid'.
-								' FROM maintenances_groups mgf'.
-								' WHERE mgf.maintenanceid=m.maintenanceid'.
-									' AND '.DBcondition('mgf.groupid', $options['groupids']).
+						'EXISTS ('.
+							'SELECT NULL'.
+								' FROM maintenances_groups mg'.
+								' WHERE m.maintenanceid=mg.maintenanceid'.
+								' AND '.dbConditionInt('mg.groupid', $options['groupids']).
 							')'.
-							// filtering by hostgroups of hosts attached to maintenance
-							' OR EXISTS ('.
-								' SELECT mh.maintenanceid'.
+						' OR EXISTS ('.
+							'SELECT NULL'.
 								' FROM maintenances_hosts mh,hosts_groups hg'.
-								' WHERE mh.maintenanceid=m.maintenanceid'.
-									' AND hg.hostid=mh.hostid'.
-									' AND '.DBcondition('hg.groupid', $options['groupids']).
+								' WHERE m.maintenanceid=mh.maintenanceid'.
+									' AND mh.hostid=hg.hostid'.
+									' AND '.dbConditionInt('hg.groupid', $options['groupids']).
 							')'.
 						')';
 			}
@@ -209,17 +185,23 @@ class CMaintenance extends CZBXAPI {
 			if (!is_null($options['hostids'])) {
 				zbx_value2array($options['hostids']);
 				$sql .= ' AND EXISTS ('.
-							' SELECT mh.maintenanceid'.
+						'SELECT NULL'.
 							' FROM maintenances_hosts mh'.
-							' WHERE mh.maintenanceid=m.maintenanceid'.
-								' AND '.DBcondition('mh.hostid', $options['hostids']).
-							')';
+							' WHERE m.maintenanceid=mh.maintenanceid'.
+								' AND '.dbConditionInt('mh.hostid', $options['hostids']).
+						')';
 			}
+
+			if (!is_null($options['maintenanceids'])) {
+				zbx_value2array($options['maintenanceids']);
+				$sql .= ' AND '.dbConditionInt('m.maintenanceid', $options['maintenanceids']);
+			}
+
 			$res = DBselect($sql);
 			while ($maintenance = DBfetch($res)) {
 				$maintenanceids[] = $maintenance['maintenanceid'];
 			}
-			$sqlParts['where'][] = DBcondition('m.maintenanceid', $maintenanceids);
+			$sqlParts['where'][] = dbConditionInt('m.maintenanceid', $maintenanceids);
 		}
 
 		// nodeids
@@ -239,7 +221,7 @@ class CMaintenance extends CZBXAPI {
 		if (!is_null($options['maintenanceids'])) {
 			zbx_value2array($options['maintenanceids']);
 
-			$sqlParts['where'][] = DBcondition('m.maintenanceid', $options['maintenanceids']);
+			$sqlParts['where'][] = dbConditionInt('m.maintenanceid', $options['maintenanceids']);
 		}
 
 		// output
@@ -262,7 +244,7 @@ class CMaintenance extends CZBXAPI {
 
 		// filter
 		if (is_array($options['filter'])) {
-			zbx_db_filter('maintenances m', $options, $sqlParts);
+			$this->dbFilter('maintenances m', $options, $sqlParts);
 		}
 
 		// search
@@ -367,40 +349,8 @@ class CMaintenance extends CZBXAPI {
 			return $result;
 		}
 
-		// selectGroups
-		if (is_array($options['selectGroups']) || str_in_array($options['selectGroups'], $subselectsAllowedOutputs)) {
-			$objParams = array(
-				'nodeids' => $nodeids,
-				'maintenanceids' => $maintenanceids,
-				'preservekeys' => true,
-				'output' => $options['selectGroups']
-			);
-			$groups = API::HostGroup()->get($objParams);
-			foreach ($groups as $group) {
-				$gmaintenances = $group['maintenances'];
-				unset($group['maintenances']);
-				foreach ($gmaintenances as $maintenance) {
-					$result[$maintenance['maintenanceid']]['groups'][] = $group;
-				}
-			}
-		}
-
-		// selectHosts
-		if (is_array($options['selectHosts']) || str_in_array($options['selectHosts'], $subselectsAllowedOutputs)) {
-			$objParams = array(
-				'nodeids' => $nodeids,
-				'maintenanceids' => $maintenanceids,
-				'preservekeys' => true,
-				'output' => $options['selectHosts']
-			);
-			$hosts = API::Host()->get($objParams);
-			foreach ($hosts as $host) {
-				$hmaintenances = $host['maintenances'];
-				unset($host['maintenances']);
-				foreach ($hmaintenances as $maintenance) {
-					$result[$maintenance['maintenanceid']]['hosts'][] = $host;
-				}
-			}
+		if ($result) {
+			$result = $this->addRelatedObjects($options, $result);
 		}
 
 		if (is_null($options['preservekeys'])) {
@@ -438,7 +388,7 @@ class CMaintenance extends CZBXAPI {
 	public function create(array $maintenances) {
 		$maintenances = zbx_toArray($maintenances);
 		if (self::$userData['type'] == USER_TYPE_ZABBIX_USER) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation'));
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
 		$hostids = array();
@@ -450,7 +400,7 @@ class CMaintenance extends CZBXAPI {
 
 		// validate hosts & groups
 		if (empty($hostids) && empty($groupids)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('At least one host or group should be selected'));
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('At least one host or group should be selected.'));
 		}
 
 		// hosts permissions
@@ -463,7 +413,7 @@ class CMaintenance extends CZBXAPI {
 		$updHosts = API::Host()->get($options);
 		foreach ($hostids as $hostid) {
 			if (!isset($updHosts[$hostid])) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
+				self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 			}
 		}
 		// groups permissions
@@ -476,7 +426,7 @@ class CMaintenance extends CZBXAPI {
 		$updGroups = API::HostGroup()->get($options);
 		foreach ($groupids as $groupid) {
 			if (!isset($updGroups[$groupid])) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
+				self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 			}
 		}
 
@@ -504,23 +454,23 @@ class CMaintenance extends CZBXAPI {
 			}
 
 			// validate maintenance active since
-			if (!validateMaxTime($maintenance['active_since'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('"%s" must be between 1970.01.01 and 2038.01.18', _('Active since')));
+			if (!validateUnixTime($maintenance['active_since'])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('"%s" must be between 1970.01.01 and 2038.01.18.', _('Active since')));
 			}
 
 			// validate maintenance active till
-			if (!validateMaxTime($maintenance['active_till'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('"%s" must be between 1970.01.01 and 2038.01.18', _('Active till')));
+			if (!validateUnixTime($maintenance['active_till'])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('"%s" must be between 1970.01.01 and 2038.01.18.', _('Active till')));
 			}
 
 			// validate maintenance active interval
 			if ($maintenance['active_since'] > $maintenance['active_till']) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Maintenance active since cannot be bigger than active till.'));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Maintenance "Active since" value cannot be bigger than "Active till".'));
 			}
 
 			// validate timeperiods
 			if (empty($maintenance['timeperiods'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('At least one maintenance period must be created'));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('At least one maintenance period must be created.'));
 			}
 
 			$insert[$mnum] = $maintenance;
@@ -584,24 +534,24 @@ class CMaintenance extends CZBXAPI {
 
 		// validate maintenance permissions
 		if (self::$userData['type'] == USER_TYPE_ZABBIX_USER) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
 		$hostids = array();
 		$groupids = array();
-		$options = array(
+		$updMaintenances = $this->get(array(
 			'maintenanceids' => zbx_objectValues($maintenances, 'maintenanceid'),
 			'editable' => true,
 			'output' => API_OUTPUT_EXTEND,
 			'selectGroups' => API_OUTPUT_REFER,
 			'selectHosts' => API_OUTPUT_REFER,
+			'selectTimeperiods' => API_OUTPUT_EXTEND,
 			'preservekeys' => true
-		);
-		$updMaintenances = $this->get($options);
+		));
 
 		foreach ($maintenances as $maintenance) {
 			if (!isset($updMaintenances[$maintenance['maintenanceid']])) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
+				self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 			}
 
 			// Checking whether a maintenance with this name already exists. First, getting all maintenances with the same name as this
@@ -617,23 +567,23 @@ class CMaintenance extends CZBXAPI {
 			}
 
 			// validate maintenance active since
-			if (!validateMaxTime($maintenance['active_since'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('"%s" must be between 1970.01.01 and 2038.01.18', _('Active since')));
+			if (!validateUnixTime($maintenance['active_since'])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('"%s" must be between 1970.01.01 and 2038.01.18.', _('Active since')));
 			}
 
 			// validate maintenance active till
-			if (!validateMaxTime($maintenance['active_till'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('"%s" must be between 1970.01.01 and 2038.01.18', _('Active till')));
+			if (!validateUnixTime($maintenance['active_till'])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('"%s" must be between 1970.01.01 and 2038.01.18.', _('Active till')));
 			}
 
 			// validate maintenance active interval
 			if ($maintenance['active_since'] > $maintenance['active_till']) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Maintenance active since cannot be bigger than active till.'));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Maintenance "Active since" value cannot be bigger than "Active till".'));
 			}
 
 			// validate timeperiods
 			if (empty($maintenance['timeperiods'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('At least one maintenance period must be created'));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('At least one maintenance period must be created.'));
 			}
 
 			$hostids = array_merge($hostids, $maintenance['hostids']);
@@ -642,7 +592,7 @@ class CMaintenance extends CZBXAPI {
 
 		// validate hosts & groups
 		if (empty($hostids) && empty($groupids)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('At least one host or group should be selected'));
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('At least one host or group should be selected.'));
 		}
 
 		// validate hosts permissions
@@ -668,13 +618,12 @@ class CMaintenance extends CZBXAPI {
 		$updGroups = API::HostGroup()->get($options);
 		foreach ($groupids as $groupid) {
 			if (!isset($updGroups[$groupid])) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
+				self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 			}
 		}
 
 		$this->removeSecondsFromTimes($maintenances);
 
-		$tid = 0;
 		$update = array();
 		foreach ($maintenances as $mnum => $maintenance) {
 			$dbFields = array(
@@ -691,71 +640,8 @@ class CMaintenance extends CZBXAPI {
 				'where' => array('maintenanceid' => $maintenance['maintenanceid'])
 			);
 
-			// getting current time periods
-			$timeperiodids = $timeperiods = array();
-			$dbTimeperiods = DBselect(
-				'SELECT tp.*'.
-				' FROM timeperiods tp,maintenances_windows mw'.
-				' WHERE '.DBcondition('mw.maintenanceid', array($maintenance['maintenanceid'])).
-					' AND tp.timeperiodid=mw.timeperiodid'
-			);
-			while ($timeperiod = DBfetch($dbTimeperiods)) {
-				$timeperiodids[] = $timeperiod['timeperiodid'];
-				$timeperiods[] = $timeperiod;
-			}
-
-			// have time periods changed?
-			$timePeriodsChanged = false;
-			if (count($timeperiods) != count($maintenance['timeperiods'])) {
-				$timePeriodsChanged = true;
-			}
-			else {
-				foreach ($maintenance['timeperiods'] as $i => $currentTimePeriod) {
-					// if records are not completely identical
-					if ($currentTimePeriod['timeperiod_type'] != $timeperiods[$i]['timeperiod_type']
-							|| $currentTimePeriod['every'] != $timeperiods[$i]['every']
-							|| $currentTimePeriod['month'] != $timeperiods[$i]['month']
-							|| $currentTimePeriod['dayofweek'] != $timeperiods[$i]['dayofweek']
-							|| $currentTimePeriod['day'] != $timeperiods[$i]['day']
-							|| $currentTimePeriod['start_time'] != $timeperiods[$i]['start_time']
-							|| $currentTimePeriod['start_date'] != $timeperiods[$i]['start_date']
-							|| $currentTimePeriod['period'] != $timeperiods[$i]['period']) {
-						// this means, that time periods have changed (at least one of them)
-						$timePeriodsChanged = true;
-						break;
-					}
-				}
-			}
-
-			// if time periods have changed
-			if ($timePeriodsChanged) {
-				// wiping them out to insert new ones
-				DB::delete('timeperiods', array('timeperiodid' => $timeperiodids));
-				DB::delete('maintenances_windows', array('maintenanceid' => $maintenance['maintenanceid']));
-
-				// gathering the new ones to create
-				$insertTimeperiods = array();
-				foreach ($maintenance['timeperiods'] as $timeperiod) {
-					$tid++;
-					$insertTimeperiods[$tid] = $timeperiod;
-					$timeperiods[$tid] = $mnum;
-				}
-
-				if (!empty($insertTimeperiods)) {
-					// inserting them and getting back id's that were just inserted
-					$insertedTimepePiodids = DB::insert('timeperiods', $insertTimeperiods);
-
-					// inserting references to maintenances_windows table
-					$insertWindows = array();
-					foreach ($insertedTimepePiodids as $insertedTimepePiodid) {
-						$insertWindows[] = array(
-							'timeperiodid' => $insertedTimepePiodid,
-							'maintenanceid' => $maintenance['maintenanceid']
-						);
-					}
-					DB::insert('maintenances_windows', $insertWindows);
-				}
-			}
+			// update time periods
+			$this->replaceTimePeriods($updMaintenances[$maintenance['maintenanceid']], $maintenance);
 		}
 		DB::update('maintenances', $update);
 
@@ -846,7 +732,7 @@ class CMaintenance extends CZBXAPI {
 			$dbTimeperiods = DBselect(
 				'SELECT DISTINCT tp.timeperiodid'.
 				' FROM timeperiods tp,maintenances_windows mw'.
-				' WHERE '.DBcondition('mw.maintenanceid', $maintenanceids).
+				' WHERE '.dbConditionInt('mw.maintenanceid', $maintenanceids).
 					' AND tp.timeperiodid=mw.timeperiodid'
 			);
 			while ($timeperiod = DBfetch($dbTimeperiods)) {
@@ -904,5 +790,96 @@ class CMaintenance extends CZBXAPI {
 		}
 		unset($maintenance);
 	}
+
+	/**
+	 * Updates maintenance time periods.
+	 *
+	 * @param array $maintenance
+	 * @param array $oldMaintenance
+	 */
+	protected function replaceTimePeriods(array $oldMaintenance, array $maintenance) {
+		// replace time periods
+		$timePeriods = DB::replace('timeperiods', $oldMaintenance['timeperiods'], $maintenance['timeperiods']);
+
+		// link new time periods to maintenance
+		$oldTimePeriods = zbx_toHash($oldMaintenance['timeperiods'], 'timeperiodid');
+		$newMaintenanceWindows = array();
+		foreach ($timePeriods as $tp) {
+			if (!isset($oldTimePeriods[$tp['timeperiodid']])) {
+				$newMaintenanceWindows[] = array(
+					'maintenanceid' => $maintenance['maintenanceid'],
+					'timeperiodid' => $tp['timeperiodid']
+				);
+			}
+		}
+		DB::insert('maintenances_windows', $newMaintenanceWindows);
+	}
+
+	protected function addRelatedObjects(array $options, array $result) {
+		$result = parent::addRelatedObjects($options, $result);
+
+		$maintenanceIds = array_keys($result);
+
+		$subselectsAllowedOutputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND);
+
+		// selectGroups
+		if (is_array($options['selectGroups']) || str_in_array($options['selectGroups'], $subselectsAllowedOutputs)) {
+			$objParams = array(
+				'output' => $options['selectGroups'],
+				'maintenanceids' => $maintenanceIds,
+				'preservekeys' => true
+			);
+			$groups = API::HostGroup()->get($objParams);
+			foreach ($groups as $group) {
+				$gmaintenances = $group['maintenances'];
+				unset($group['maintenances']);
+				foreach ($gmaintenances as $maintenance) {
+					$result[$maintenance['maintenanceid']]['groups'][] = $group;
+				}
+			}
+		}
+
+		// selectHosts
+		if (is_array($options['selectHosts']) || str_in_array($options['selectHosts'], $subselectsAllowedOutputs)) {
+			$objParams = array(
+				'output' => $options['selectHosts'],
+				'maintenanceids' => $maintenanceIds,
+				'preservekeys' => true
+			);
+			$hosts = API::Host()->get($objParams);
+			foreach ($hosts as $host) {
+				$hmaintenances = $host['maintenances'];
+				unset($host['maintenances']);
+				foreach ($hmaintenances as $maintenance) {
+					$result[$maintenance['maintenanceid']]['hosts'][] = $host;
+				}
+			}
+		}
+
+		// selectTimeperiods
+		if ($options['selectTimeperiods'] !== null) {
+			foreach ($result as &$maintenance) {
+				$maintenance['timeperiods'] = array();
+			}
+			unset($maintenance);
+
+			// create the SELECT part of the query
+			$sqlParts = $this->applyQueryOutputOptions('timeperiods', 'tp', array(
+				'output' => $options['selectTimeperiods']
+			), array('select' => array('tp.timeperiodid')));
+			$query = DBSelect(
+				'SELECT '.implode($sqlParts['select'], ',').',mw.maintenanceid'.
+				' FROM timeperiods tp,maintenances_windows mw'.
+				' WHERE '.dbConditionInt('mw.maintenanceid', $maintenanceIds).
+					' AND tp.timeperiodid=mw.timeperiodid'
+			);
+			while ($tp = DBfetch($query)) {
+				$refId = $tp['maintenanceid'];
+				$tp = $this->unsetExtraFields('timeperiods', $tp, $options['selectTimeperiods']);
+				$result[$refId]['timeperiods'][] = $tp;
+			}
+		}
+
+		return $result;
+	}
 }
-?>

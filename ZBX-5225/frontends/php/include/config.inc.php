@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2000-2012 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -10,12 +10,12 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 **/
 
 
@@ -77,6 +77,11 @@ require_once dirname(__FILE__).'/js.inc.php';
 require_once dirname(__FILE__).'/validate.inc.php';
 
 function zbx_err_handler($errno, $errstr, $errfile, $errline) {
+	// necessary to surpress errors when calling with error control operator like @function_name()
+	if (error_reporting() === 0) {
+		return true;
+	}
+
 	$pathLength = strlen(__FILE__);
 
 	$pathLength -= 22;
@@ -204,6 +209,9 @@ else {
 	CWebUser::setDefault();
 }
 
+// should be after locale initialization
+require_once dirname(__FILE__).'/translateDefines.inc.php';
+
 set_zbx_locales();
 
 // init mb strings if it's available
@@ -236,7 +244,7 @@ function access_deny() {
 		show_error_message(_('No permissions to referred object or it does not exist!'));
 	}
 	else {
-		$url = new CUrl($_SERVER['REQUEST_URI']);
+		$url = new CUrl(!empty($_REQUEST['request']) ? $_REQUEST['request'] : '');
 		$url->setArgument('sid', null);
 		$url = urlencode($url->toString());
 
@@ -255,6 +263,7 @@ function access_deny() {
 		));
 		$warning->show();
 	}
+
 	require_once dirname(__FILE__).'/page_footer.php';
 }
 
@@ -263,27 +272,21 @@ function detect_page_type($default = PAGE_TYPE_HTML) {
 		switch (strtolower($_REQUEST['output'])) {
 			case 'text':
 				return PAGE_TYPE_TEXT;
-				break;
 			case 'ajax':
 				return PAGE_TYPE_JS;
-				break;
 			case 'json':
 				return PAGE_TYPE_JSON;
-				break;
 			case 'json-rpc':
 				return PAGE_TYPE_JSON_RPC;
-				break;
 			case 'html':
 				return PAGE_TYPE_HTML_BLOCK;
-				break;
 			case 'img':
 				return PAGE_TYPE_IMAGE;
-				break;
 			case 'css':
 				return PAGE_TYPE_CSS;
-				break;
 		}
 	}
+
 	return $default;
 }
 
@@ -560,14 +563,15 @@ function get_status() {
 	$status['zabbix_server'] = zabbixIsRunning() ? _('Yes') : _('No');
 
 	// triggers
-	$dbTriggers = DBselect('SELECT COUNT(DISTINCT t.triggerid) AS cnt,t.status,t.value'.
-			' FROM triggers t'.
-				' INNER JOIN functions f ON t.triggerid=f.triggerid'.
-				' INNER JOIN items i ON f.itemid=i.itemid'.
-				' INNER JOIN hosts h ON i.hostid=h.hostid'.
-			' WHERE i.status='.ITEM_STATUS_ACTIVE.
-				' AND h.status='.HOST_STATUS_MONITORED.
-			' GROUP BY t.status,t.value');
+	$dbTriggers = DBselect(
+		'SELECT COUNT(DISTINCT t.triggerid) AS cnt,t.status,t.value'.
+		' FROM triggers t'.
+			' INNER JOIN functions f ON t.triggerid=f.triggerid'.
+			' INNER JOIN items i ON f.itemid=i.itemid'.
+			' INNER JOIN hosts h ON i.hostid=h.hostid'.
+		' WHERE i.status='.ITEM_STATUS_ACTIVE.
+			' AND h.status='.HOST_STATUS_MONITORED.
+		' GROUP BY t.status,t.value');
 	while ($dbTrigger = DBfetch($dbTriggers)) {
 		switch ($dbTrigger['status']) {
 			case TRIGGER_STATUS_ENABLED:
@@ -593,12 +597,13 @@ function get_status() {
 	$status['triggers_count'] = $status['triggers_count_enabled'] + $status['triggers_count_disabled'];
 
 	// items
-	$dbItems = DBselect('SELECT COUNT(*) AS cnt,i.status'.
-			' FROM items i'.
-				' INNER JOIN hosts h ON i.hostid=h.hostid'.
-			' WHERE h.status='.HOST_STATUS_MONITORED.
-				' AND '.DBcondition('i.status', array(ITEM_STATUS_ACTIVE, ITEM_STATUS_DISABLED, ITEM_STATUS_NOTSUPPORTED)).
-			' GROUP BY i.status');
+	$dbItems = DBselect(
+		'SELECT COUNT(*) AS cnt,i.status'.
+		' FROM items i'.
+			' INNER JOIN hosts h ON i.hostid=h.hostid'.
+		' WHERE h.status='.HOST_STATUS_MONITORED.
+			' AND '.dbConditionInt('i.status', array(ITEM_STATUS_ACTIVE, ITEM_STATUS_DISABLED, ITEM_STATUS_NOTSUPPORTED)).
+		' GROUP BY i.status');
 	while ($dbItem = DBfetch($dbItems)) {
 		switch ($dbItem['status']) {
 			case ITEM_STATUS_ACTIVE:
@@ -616,10 +621,11 @@ function get_status() {
 		+ $status['items_count_not_supported'];
 
 	// hosts
-	$dbHosts = DBselect('SELECT COUNT(*) AS cnt,h.status'.
-			' FROM hosts h'.
-			' WHERE h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.','.HOST_STATUS_TEMPLATE.' )'.
-			' GROUP BY h.status');
+	$dbHosts = DBselect(
+		'SELECT COUNT(*) AS cnt,h.status'.
+		' FROM hosts h'.
+		' WHERE h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.','.HOST_STATUS_TEMPLATE.' )'.
+		' GROUP BY h.status');
 	while ($dbHost = DBfetch($dbHosts)) {
 		switch ($dbHost['status']) {
 			case HOST_STATUS_MONITORED:

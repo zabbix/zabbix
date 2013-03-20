@@ -225,7 +225,11 @@ class Curl {
 		return $this->port;
 	}
 
-	public function setArgument($key, $value='') {
+	public function removeArgument($key) {
+		unset($this->arguments[$key]);
+	}
+
+	public function setArgument($key, $value = '') {
 		$this->arguments[$key] = $value;
 	}
 

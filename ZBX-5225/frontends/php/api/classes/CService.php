@@ -549,15 +549,13 @@ class CService extends CZBXAPI {
 	 * @return array    as array(serviceId2 => data1, serviceId2 => data2, ...)
 	 */
 	public function getSla(array $options) {
-		$serviceIds = (isset($options['serviceids'])) ? zbx_toArray($options['serviceids']) : null;
 		$intervals = (isset($options['intervals'])) ? zbx_toArray($options['intervals']) : array();
+		$serviceIds = (isset($options['serviceids'])) ? zbx_toArray($options['serviceids']) : null;
 
-		// fetch services
 		$services = $this->get(array(
 			'output' => array('serviceid', 'name', 'status', 'algorithm'),
 			'selectTimes' => API_OUTPUT_EXTEND,
 			'selectParentDependencies' => array('serviceupid'),
-			'selectTrigger' => API_OUTPUT_EXTEND,
 			'serviceids' => $serviceIds,
 			'preservekeys' => true
 		));
@@ -599,7 +597,7 @@ class CService extends CZBXAPI {
 				$query = DBselect(
 					'SELECT *'.
 					' FROM service_alarms sa'.
-					' WHERE '.DBcondition('sa.serviceid', $usedSeviceIds).
+					' WHERE '.dbConditionInt('sa.serviceid', $usedSeviceIds).
 						' AND ('.implode(' OR ', $intervalConditions).')'.
 					' ORDER BY sa.clock,sa.servicealarmid'
 				);
@@ -761,7 +759,7 @@ class CService extends CZBXAPI {
 			elseif ($time['type'] == SERVICE_TIME_TYPE_DOWNTIME) {
 				$this->expandPeriodicalTimes($data, $periodStart, $periodEnd, $time['ts_from'], $time['ts_to'], 'dt');
 			}
-			elseif($time['type'] == SERVICE_TIME_TYPE_ONETIME_DOWNTIME && $time['ts_to'] >= $periodStart && $time['ts_from'] <= $periodEnd) {
+			elseif ($time['type'] == SERVICE_TIME_TYPE_ONETIME_DOWNTIME && $time['ts_to'] >= $periodStart && $time['ts_from'] <= $periodEnd) {
 				if ($time['ts_from'] < $periodStart) {
 					$time['ts_from'] = $periodStart;
 				}
@@ -928,16 +926,14 @@ class CService extends CZBXAPI {
 	 * @return array    in the form of array(serviceId1 => array(triggerId => trigger), ...)
 	 */
 	protected function fetchProblemTriggers(array $serviceIds) {
+		$sql = 'SELECT s.serviceid,t.triggerid'.
+				' FROM services s,triggers t'.
+				' WHERE s.status>0'.
+					' AND t.triggerid=s.triggerid'.
+					' AND '.dbConditionInt('s.serviceid', $serviceIds);
+
 		// get service reason
-		$triggers = DBfetchArray(DBSelect(
-			'SELECT s.serviceid,t.*'.
-			' FROM services s,triggers t'.
-			' WHERE s.status>0'.
-				' AND t.triggerid=s.triggerid'.
-				' AND '.DBcondition('t.triggerid', get_accessible_triggers(PERM_READ_ONLY)).
-				' AND '.DBcondition('s.serviceid', $serviceIds).
-			' ORDER BY s.status DESC,t.description'
-		));
+		$triggers = DBfetchArray(DBSelect($sql));
 
 		$rs = array();
 		foreach ($triggers as $trigger) {
@@ -1007,15 +1003,17 @@ class CService extends CZBXAPI {
 		// the query will return the alarms with the maximum timestamp for each service
 		// since multiple alarms can have the same timestamp, we only need to save the last one
 		$query = DBSelect(
-			'SELECT sa.serviceid,sa.value
-				FROM service_alarms sa
-					LEFT OUTER JOIN service_alarms sa2 ON (sa.serviceid=sa2.serviceid AND sa.clock<sa2.clock AND sa2.clock<'.zbx_dbstr($beforeTime).')
-				WHERE sa2.servicealarmid IS NULL
-					AND sa.clock<'.zbx_dbstr($beforeTime).'
-					AND '.DBcondition('sa.serviceid', $serviceIds).'
-				ORDER BY sa.servicealarmid'
+			'SELECT sa.serviceid,sa.value'.
+			' FROM (SELECT MAX(sa3.servicealarmid) servicealarmid'.
+					' FROM (SELECT sa2.serviceid,MAX(sa2.clock) clock'.
+							' FROM service_alarms sa2'.
+							' WHERE sa2.clock<'.zbx_dbstr($beforeTime).
+								' AND '.dbConditionInt('sa2.serviceid', $serviceIds).
+							' GROUP BY sa2.serviceid) ss'.
+					' JOIN service_alarms sa3 ON sa3.serviceid = ss.serviceid and sa3.clock = ss.clock'.
+					' GROUP BY sa3.serviceid) ss2'.
+			' JOIN service_alarms sa ON sa.servicealarmid = ss2.servicealarmid'
 		);
-
 		$rs = array();
 		while ($alarm = DBfetch($query)) {
 			$rs[$alarm['serviceid']] = $alarm['value'];
@@ -1046,7 +1044,7 @@ class CService extends CZBXAPI {
 
 		// add permission filter
 		if (CWebUser::getType() != USER_TYPE_SUPER_ADMIN) {
-			$sqlParts['where'][] = '('.$this->fieldId('triggerid').' IS NULL OR '.DBcondition($this->fieldId('triggerid'), get_accessible_triggers(PERM_READ_ONLY)).')';
+			$sqlParts = $this->addPermissionFilter($sqlParts);
 		}
 
 		$sql = $this->createSelectQueryFromParts($sqlParts);
@@ -1077,7 +1075,7 @@ class CService extends CZBXAPI {
 
 		// add permission filter
 		if (CWebUser::getType() != USER_TYPE_SUPER_ADMIN) {
-			$sqlParts['where'][] = '('.$this->fieldId('triggerid').' IS NULL OR '.DBcondition($this->fieldId('triggerid'), get_accessible_triggers(PERM_READ_ONLY)).')';
+			$sqlParts = $this->addPermissionFilter($sqlParts);
 		}
 
 		$sql = $this->createSelectQueryFromParts($sqlParts);
@@ -1393,7 +1391,7 @@ class CService extends CZBXAPI {
 			$query = DBselect(
 				'SELECT s.triggerid,s.name'.
 					' FROM services s '.
-					' WHERE '.DBcondition('s.serviceid', $parentServiceIds).
+					' WHERE '.dbConditionInt('s.serviceid', $parentServiceIds).
 					' AND s.triggerid IS NOT NULL', 1);
 			if ($parentService = DBfetch($query)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
@@ -1476,14 +1474,16 @@ class CService extends CZBXAPI {
 
 	protected function applyQueryFilterOptions($tableName, $tableAlias, array $options, array $sqlParts) {
 		if (CWebUser::getType() != USER_TYPE_SUPER_ADMIN) {
-			$accessibleTriggers = get_accessible_triggers(PERM_READ_ONLY);
 			// if services with specific trigger IDs were requested, return only the ones accessible to the current user.
 			if ($options['filter']['triggerid']) {
-				$options['filter']['triggerid'] = array_intersect($accessibleTriggers, $options['filter']['triggerid']);
+				$accessibleTriggers = API::Trigger()->get(array(
+					'triggerids' => $options['filter']['triggerid']
+				));
+				$options['filter']['triggerid'] = zbx_objectValues($accessibleTriggers, 'triggerid');
 			}
 			// otherwise return services with either no triggers, or any trigger accessible to the current user
 			else {
-				$sqlParts['where'][] = '('.$this->fieldId('triggerid').' IS NULL OR '.DBcondition($this->fieldId('triggerid'), $accessibleTriggers).')';
+				$sqlParts = $this->addPermissionFilter($sqlParts);
 			}
 		}
 
@@ -1493,13 +1493,13 @@ class CService extends CZBXAPI {
 		if ($options['parentids'] !== null) {
 			$sqlParts['from'][] = 'services_links slp';
 			$sqlParts['where'][] = $this->fieldId('serviceid').'=slp.servicedownid AND slp.soft=0';
-			$sqlParts['where'][] = DBcondition('slp.serviceupid', (array) $options['parentids']);
+			$sqlParts['where'][] = dbConditionInt('slp.serviceupid', (array) $options['parentids']);
 		}
 		// childids
 		if ($options['childids'] !== null) {
 			$sqlParts['from'][] = 'services_links slc';
 			$sqlParts['where'][] = $this->fieldId('serviceid').'=slc.serviceupid AND slc.soft=0';
-			$sqlParts['where'][] = DBcondition('slc.servicedownid', (array) $options['childids']);
+			$sqlParts['where'][] = dbConditionInt('slc.servicedownid', (array) $options['childids']);
 		}
 
 		return $sqlParts;
@@ -1567,7 +1567,8 @@ class CService extends CZBXAPI {
 
 		// selectTimes
 		if ($options['selectTimes'] !== null) {
-			$timesOutput = $this->extendOutputOption('services_times', 'serviceid', $options['selectTimes']);
+			$timesOutput = $this->extendOutputOption('services_times', array('serviceid', 'type'), $options['selectTimes']);
+
 			$serviceTimes = API::getApi()->select('services_times', array(
 				'output' => $timesOutput,
 				'filter' => array('serviceid' => $serviceIds)
@@ -1576,8 +1577,20 @@ class CService extends CZBXAPI {
 				$service['times'] = array();
 			}
 			unset($service);
+
 			foreach ($serviceTimes as $serviceTime) {
 				$refId = $serviceTime['serviceid'];
+
+				// convert periodical service time timestamps from old 1.8 format
+				if ($serviceTime['type'] == SERVICE_TIME_TYPE_UPTIME || $serviceTime['type'] == SERVICE_TIME_TYPE_DOWNTIME) {
+					if (isset($serviceTime['ts_from'])) {
+						$serviceTime['ts_from'] = prepareServiceTime($serviceTime['ts_from']);
+					}
+					if (isset($serviceTime['ts_to'])) {
+						$serviceTime['ts_to'] = prepareServiceTime($serviceTime['ts_to']);
+					}
+				}
+
 				$serviceTime = $this->unsetExtraFields('services_times', $serviceTime, $options['selectTimes']);
 				$result[$refId]['times'][] = $serviceTime;
 			}
@@ -1608,6 +1621,7 @@ class CService extends CZBXAPI {
 				'triggerids' => array_unique(zbx_objectValues($result, 'triggerid')),
 				'preservekeys' => true
 			));
+
 			foreach ($result as &$service) {
 				$service['trigger'] = ($service['triggerid']) ? $triggers[$service['triggerid']] : array();
 			}
@@ -1615,5 +1629,33 @@ class CService extends CZBXAPI {
 		}
 
 		return $result;
+	}
+
+	/**
+	 * Add permission filter SQL query part
+	 *
+	 * @param array $sqlParts
+	 *
+	 * @return string
+	 */
+	protected function addPermissionFilter($sqlParts) {
+		$userid = self::$userData['userid'];
+		$userGroups = getUserGroupsByUserId($userid);
+
+		$sqlParts['where'][] = '(EXISTS ('.
+									'SELECT NULL'.
+									' FROM functions f,items i,hosts_groups hgg'.
+									' JOIN rights r'.
+										' ON r.id=hgg.groupid'.
+										' AND '.dbConditionInt('r.groupid', $userGroups).
+									' WHERE s.triggerid=f.triggerid'.
+										' AND f.itemid=i.itemid'.
+										' AND i.hostid=hgg.hostid'.
+									' GROUP BY f.triggerid'.
+									' HAVING MIN(r.permission)>='.PERM_READ_ONLY.
+									')'.
+								' OR s.triggerid IS NULL)';
+
+		return $sqlParts;
 	}
 }

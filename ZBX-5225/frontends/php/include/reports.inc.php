@@ -18,14 +18,20 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-
-function get_report2_filter($config,&$PAGE_GROUPS, &$PAGE_HOSTS){
-	$available_hosts = $PAGE_HOSTS['hostids'];
-
-
-/************************* FILTER *************************/
-/***********************************************************/
-	$filterForm = new CFormTable();//,'events.php?filter_set=1','POST',null,'sform');
+/**
+ * Creates the availability report page filter and modifies trigger retrieval options.
+ *
+ * Possible $config values are AVAILABILITY_REPORT_BY_HOST or AVAILABILITY_REPORT_BY_TEMPLATE.
+ *
+ * @param int $config			report mode
+ * @param array $PAGE_GROUPS	the data for the host/template group filter select
+ * @param array $PAGE_HOSTS		the data for the host/template filter select
+ * @param array $options		trigger retrieval options, to be modified
+ *
+ * @return array returns form table and modified options: array('form' => CFormTable, 'options' => array)
+ */
+function get_report2_filter($config, array $PAGE_GROUPS, array $PAGE_HOSTS, $options){
+	$filterForm = new CFormTable();
 	$filterForm->setAttribute('name','zbx_filter');
 	$filterForm->setAttribute('id','zbx_filter');
 
@@ -43,45 +49,39 @@ function get_report2_filter($config,&$PAGE_GROUPS, &$PAGE_HOSTS){
 		$cmbHosts->addItem($hostid, get_node_name_by_elid($hostid, null, ': ').$name);
 	}
 
-	$filterForm->addRow(_('Template group'),$cmbGroups);
-	$filterForm->addRow(_('Template'),$cmbHosts);
+	if ($config == AVAILABILITY_REPORT_BY_TEMPLATE) {
+		$filterForm->addRow(_('Template group'),$cmbGroups);
+		$filterForm->addRow(_('Template'),$cmbHosts);
 
-	if(1 == $config){
 		$cmbTrigs = new CComboBox('tpl_triggerid',get_request('tpl_triggerid',0),'submit()');
 		$cmbHGrps = new CComboBox('hostgroupid',get_request('hostgroupid',0),'submit()');
 
 		$cmbTrigs->addItem(0, _('all'));
 		$cmbHGrps->addItem(0, _('all'));
 
-		$sql_cond = ' AND h.hostid=ht.hostid ';
-		if($_REQUEST['hostid'] > 0)	$sql_cond.=' AND ht.templateid='.$_REQUEST['hostid'];
-
-		if(isset($_REQUEST['tpl_triggerid']) && ($_REQUEST['tpl_triggerid'] > 0))
-			$sql_cond.= ' AND t.templateid='.$_REQUEST['tpl_triggerid'];
-
-		$result = DBselect('SELECT DISTINCT g.groupid,g.name '.
-			' FROM triggers t,hosts h,items i,functions f, hosts_templates ht, groups g, hosts_groups hg '.
-			' WHERE f.itemid=i.itemid '.
-				' AND h.hostid=i.hostid '.
-				' AND hg.hostid=h.hostid'.
-				' AND g.groupid=hg.groupid '.
-				' AND '.DBcondition('h.hostid',$available_hosts).
-				' AND t.status='.TRIGGER_STATUS_ENABLED.
-				' AND t.triggerid=f.triggerid '.
-				' AND '.DBin_node('t.triggerid').
-				' AND i.status='.ITEM_STATUS_ACTIVE.
-				' AND h.status='.HOST_STATUS_MONITORED.
-				$sql_cond.
-			' ORDER BY g.name');
-
-		while($row=DBfetch($result)){
+		// fetch the groups, that the used hosts belong to
+		$hostGroups = API::HostGroup()->get(array(
+			'output' => array('name', 'groupid'),
+			'hostids' => $options['hostids'],
+			'monitored_hosts' => true,
+			'preservekeys' => true
+		));
+		foreach ($hostGroups as $hostGroup) {
 			$cmbHGrps->addItem(
-				$row['groupid'],
-				get_node_name_by_elid($row['groupid'], null, ': ').$row['name']
-				);
+				$hostGroup['groupid'],
+				get_node_name_by_elid($hostGroup['groupid'], null, ': ').$hostGroup['name']
+			);
+		}
+		if (isset($_REQUEST['hostgroupid']) && !isset($hostGroups[$_REQUEST['hostgroupid']])) {
+			unset($options['groupids']);
 		}
 
-		$sql_cond=($_REQUEST['hostid'] > 0)?' AND h.hostid='.$_REQUEST['hostid']:' AND '.DBcondition('h.hostid',$available_hosts);
+		if ($PAGE_HOSTS['selected']) {
+			$sql_cond = ' AND h.hostid='.$PAGE_HOSTS['selected'];
+		}
+		else {
+			$sql_cond = ' AND '.dbConditionInt('h.hostid', $PAGE_HOSTS['hostids']);
+		}
 		$sql = 'SELECT DISTINCT t.triggerid,t.description '.
 			' FROM triggers t,hosts h,items i,functions f '.
 			' WHERE f.itemid=i.itemid '.
@@ -93,17 +93,23 @@ function get_report2_filter($config,&$PAGE_GROUPS, &$PAGE_HOSTS){
 				' AND i.status='.ITEM_STATUS_ACTIVE.
 				$sql_cond.
 			' ORDER BY t.description';
-		$result=DBselect($sql);
-
-		while ($row = DBfetch($result)) {
+		$triggers = DBfetchArrayAssoc(DBselect($sql), 'triggerid');
+		foreach ($triggers as $trigger) {
 			$cmbTrigs->addItem(
-				$row['triggerid'],
-				get_node_name_by_elid($row['triggerid'], null, ': ').CTriggerHelper::expandDescriptionById($row['triggerid'])
+				$trigger['triggerid'],
+				get_node_name_by_elid($trigger['triggerid'], null, ': ').$trigger['description']
 			);
+		}
+		if (isset($_REQUEST['tpl_triggerid']) && !isset($triggers[$_REQUEST['tpl_triggerid']])) {
+			unset($options['filter']['templateid']);
 		}
 
 		$filterForm->addRow(_('Template trigger'),$cmbTrigs);
 		$filterForm->addRow(_('Filter by host group'),$cmbHGrps);
+	}
+	elseif ($config == AVAILABILITY_REPORT_BY_HOST) {
+		$filterForm->addRow(_('Host group'), $cmbGroups);
+		$filterForm->addRow(_('Host'), $cmbHosts);
 	}
 
 //*
@@ -175,7 +181,7 @@ function get_report2_filter($config,&$PAGE_GROUPS, &$PAGE_HOSTS){
 
 	$filterForm->addItemToBottomRow($reset);
 
-	return $filterForm;
+	return array('form' => $filterForm, 'options' => $options);
 }
 
 function bar_report_form(){

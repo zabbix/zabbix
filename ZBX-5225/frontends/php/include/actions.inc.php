@@ -20,63 +20,90 @@
 
 
 function condition_operator2str($operator) {
-	$str_op[CONDITION_OPERATOR_EQUAL] = '=';
-	$str_op[CONDITION_OPERATOR_NOT_EQUAL] = '<>';
-	$str_op[CONDITION_OPERATOR_LIKE] = _('like');
-	$str_op[CONDITION_OPERATOR_NOT_LIKE] = _('not like');
-	$str_op[CONDITION_OPERATOR_IN] = _('in');
-	$str_op[CONDITION_OPERATOR_MORE_EQUAL] = '>=';
-	$str_op[CONDITION_OPERATOR_LESS_EQUAL] = '<=';
-	$str_op[CONDITION_OPERATOR_NOT_IN] = _('not in');
-
-	if (isset($str_op[$operator])) {
-		return $str_op[$operator];
+	switch ($operator) {
+		case CONDITION_OPERATOR_EQUAL:
+			return '=';
+		case CONDITION_OPERATOR_NOT_EQUAL:
+			return '<>';
+		case CONDITION_OPERATOR_LIKE:
+			return _('like');
+		case CONDITION_OPERATOR_NOT_LIKE:
+			return _('not like');
+		case CONDITION_OPERATOR_IN:
+			return _('in');
+		case CONDITION_OPERATOR_MORE_EQUAL:
+			return '>=';
+		case CONDITION_OPERATOR_LESS_EQUAL:
+			return '<=';
+		case CONDITION_OPERATOR_NOT_IN:
+			return _('not in');
+		default:
+			return _('Unknown');
 	}
-
-	return _('Unknown');
 }
 
-function condition_type2str($conditiontype) {
-	$str_type[CONDITION_TYPE_HOST_GROUP] = _('Host group');
-	$str_type[CONDITION_TYPE_HOST_TEMPLATE] = _('Host template');
-	$str_type[CONDITION_TYPE_TRIGGER] = _('Trigger');
-	$str_type[CONDITION_TYPE_HOST] = _('Host');
-	$str_type[CONDITION_TYPE_TRIGGER_NAME] = _('Trigger name');
-	$str_type[CONDITION_TYPE_TRIGGER_VALUE] = _('Trigger value');
-	$str_type[CONDITION_TYPE_TRIGGER_SEVERITY] = _('Trigger severity');
-	$str_type[CONDITION_TYPE_TIME_PERIOD] = _('Time period');
-	$str_type[CONDITION_TYPE_MAINTENANCE] = _('Maintenance status');
-	$str_type[CONDITION_TYPE_NODE] = _('Node');
-	$str_type[CONDITION_TYPE_DRULE] = _('Discovery rule');
-	$str_type[CONDITION_TYPE_DCHECK] = _('Discovery check');
-	$str_type[CONDITION_TYPE_DOBJECT] = _('Discovery object');
-	$str_type[CONDITION_TYPE_DHOST_IP] = _('Host IP');
-	$str_type[CONDITION_TYPE_DSERVICE_TYPE] = _('Service type');
-	$str_type[CONDITION_TYPE_DSERVICE_PORT] = _('Service port');
-	$str_type[CONDITION_TYPE_DSTATUS] = _('Discovery status');
-	$str_type[CONDITION_TYPE_DUPTIME] = _('Uptime/Downtime');
-	$str_type[CONDITION_TYPE_DVALUE] = _('Received value');
-	$str_type[CONDITION_TYPE_EVENT_ACKNOWLEDGED] = _('Event acknowledged');
-	$str_type[CONDITION_TYPE_APPLICATION] = _('Application');
-	$str_type[CONDITION_TYPE_PROXY] = _('Proxy');
-	$str_type[CONDITION_TYPE_HOST_NAME] = _('Host name');
-
-	if (isset($str_type[$conditiontype])) {
-		return $str_type[$conditiontype];
+function condition_type2str($conditionType) {
+	switch ($conditionType) {
+		case CONDITION_TYPE_TRIGGER_VALUE:
+			return _('Trigger value');
+		case CONDITION_TYPE_MAINTENANCE:
+			return _('Maintenance status');
+		case CONDITION_TYPE_TRIGGER_NAME:
+			return _('Trigger name');
+		case CONDITION_TYPE_TRIGGER_SEVERITY:
+			return _('Trigger severity');
+		case CONDITION_TYPE_TRIGGER:
+			return _('Trigger');
+		case CONDITION_TYPE_HOST_NAME:
+			return _('Host name');
+		case CONDITION_TYPE_HOST_GROUP:
+			return _('Host group');
+		case CONDITION_TYPE_HOST_TEMPLATE:
+			return _('Host template');
+		case CONDITION_TYPE_HOST:
+			return _('Host');
+		case CONDITION_TYPE_TIME_PERIOD:
+			return _('Time period');
+		case CONDITION_TYPE_NODE:
+			return _('Node');
+		case CONDITION_TYPE_DRULE:
+			return _('Discovery rule');
+		case CONDITION_TYPE_DCHECK:
+			return _('Discovery check');
+		case CONDITION_TYPE_DOBJECT:
+			return _('Discovery object');
+		case CONDITION_TYPE_DHOST_IP:
+			return _('Host IP');
+		case CONDITION_TYPE_DSERVICE_TYPE:
+			return _('Service type');
+		case CONDITION_TYPE_DSERVICE_PORT:
+			return _('Service port');
+		case CONDITION_TYPE_DSTATUS:
+			return _('Discovery status');
+		case CONDITION_TYPE_DUPTIME:
+			return _('Uptime/Downtime');
+		case CONDITION_TYPE_DVALUE:
+			return _('Received value');
+		case CONDITION_TYPE_EVENT_ACKNOWLEDGED:
+			return _('Event acknowledged');
+		case CONDITION_TYPE_APPLICATION:
+			return _('Application');
+		case CONDITION_TYPE_PROXY:
+			return _('Proxy');
+		default:
+			return _('Unknown');
 	}
-
-	return _('Unknown');
 }
 
 function discovery_object2str($object) {
-	$str_object[EVENT_OBJECT_DHOST] = _('Device');
-	$str_object[EVENT_OBJECT_DSERVICE] = _('Service');
-
-	if (isset($str_object[$object])) {
-		return $str_object[$object];
+	switch ($object) {
+		case EVENT_OBJECT_DHOST:
+			return _('Device');
+		case EVENT_OBJECT_DSERVICE:
+			return _('Service');
+		default:
+			return _('Unknown');
 	}
-
-	return _('Unknown');
 }
 
 function condition_value2str($conditiontype, $value) {
@@ -84,48 +111,60 @@ function condition_value2str($conditiontype, $value) {
 		case CONDITION_TYPE_HOST_GROUP:
 			$groups = API::HostGroup()->get(array(
 				'groupids' => $value,
-				'output' => API_OUTPUT_EXTEND,
+				'output' => array('name'),
 				'nodeids' => get_current_nodeid(true),
 				'limit' => 1
 			));
 
-			if (!$group = reset($groups)) {
-				error(_s('No host groups with groupid "%s".', $value));
-			}
+			if ($groups) {
+				$group = reset($groups);
 
-			$str_val = '';
-			if (id2nodeid($value) != get_current_nodeid()) {
-				$str_val = get_node_name_by_elid($value, true, ': ');
+				$str_val = '';
+				if (id2nodeid($value) != get_current_nodeid()) {
+					$str_val = get_node_name_by_elid($value, true, ': ');
+				}
+				$str_val .= $group['name'];
 			}
-
-			$str_val .= $group['name'];
+			else {
+				return _('Unknown');
+			}
 			break;
 		case CONDITION_TYPE_TRIGGER:
 			$trigs = API::Trigger()->get(array(
 				'triggerids' => $value,
 				'expandDescription' => true,
-				'output' => API_OUTPUT_EXTEND,
+				'output' => array('description'),
 				'selectHosts' => array('name'),
 				'nodeids' => get_current_nodeid(true),
 				'limit' => 1
 			));
-			$trig = reset($trigs);
-			$host = reset($trig['hosts']);
-			$str_val = '';
-			if (id2nodeid($value) != get_current_nodeid()) {
-				$str_val = get_node_name_by_elid($value, true, ': ');
-			}
 
-			$str_val .= $host['name'].': '.$trig['description'];
+			if ($trigs) {
+				$trig = reset($trigs);
+				$host = reset($trig['hosts']);
+
+				$str_val = '';
+				if (id2nodeid($value) != get_current_nodeid()) {
+					$str_val = get_node_name_by_elid($value, true, ': ');
+				}
+				$str_val .= $host['name'].': '.$trig['description'];
+			}
+			else {
+				return _('Unknown');
+			}
 			break;
 		case CONDITION_TYPE_HOST:
 		case CONDITION_TYPE_HOST_TEMPLATE:
-			$host = get_host_by_hostid($value);
-			$str_val = '';
-			if (id2nodeid($value) != get_current_nodeid()) {
-				$str_val = get_node_name_by_elid($value, true, ': ');
+			if ($host = get_host_by_hostid($value)) {
+				$str_val = '';
+				if (id2nodeid($value) != get_current_nodeid()) {
+					$str_val = get_node_name_by_elid($value, true, ': ');
+				}
+				$str_val .= $host['name'];
 			}
-			$str_val.= $host['name'];
+			else {
+				return _('Unknown');
+			}
 			break;
 		case CONDITION_TYPE_TRIGGER_NAME:
 		case CONDITION_TYPE_HOST_NAME:
@@ -144,28 +183,45 @@ function condition_value2str($conditiontype, $value) {
 			$str_val = _('maintenance');
 			break;
 		case CONDITION_TYPE_NODE:
-			$node = get_node_by_nodeid($value);
-			$str_val = $node['name'];
+			if ($node = get_node_by_nodeid($value)) {
+				$str_val = $node['name'];
+			}
+			else {
+				return _('Unknown');
+			}
 			break;
 		case CONDITION_TYPE_DRULE:
-			$drule = get_discovery_rule_by_druleid($value);
-			$str_val = $drule['name'];
+			if ($drule = get_discovery_rule_by_druleid($value)) {
+				$str_val = $drule['name'];
+			}
+			else {
+				return _('Unknown');
+			}
 			break;
 		case CONDITION_TYPE_DCHECK:
 			$row = DBfetch(DBselect(
-				'SELECT DISTINCT dr.name,c.dcheckid,c.type,c.key_,c.ports'.
-				' FROM drules dr,dchecks c '.
-				' WHERE dr.druleid=c.druleid '.
-					' AND c.dcheckid='.$value
+					'SELECT dr.name,c.dcheckid,c.type,c.key_,c.ports'.
+					' FROM drules dr,dchecks c'.
+					' WHERE dr.druleid=c.druleid'.
+						' AND c.dcheckid='.$value
 			));
-			$str_val = $row['name'].': '.discovery_check2str($row['type'], $row['key_'], $row['ports']);
+			if ($row) {
+				$str_val = $row['name'].': '.discovery_check2str($row['type'], $row['key_'], $row['ports']);
+			}
+			else {
+				return _('Unknown');
+			}
 			break;
 		case CONDITION_TYPE_DOBJECT:
 			$str_val = discovery_object2str($value);
 			break;
 		case CONDITION_TYPE_PROXY:
-			$host = get_host_by_hostid($value);
-			$str_val = $host['host'];
+			if ($host = get_host_by_hostid($value)) {
+				$str_val = $host['host'];
+			}
+			else {
+				return _('Unknown');
+			}
 			break;
 		case CONDITION_TYPE_DHOST_IP:
 			$str_val = $value;
@@ -193,7 +249,6 @@ function condition_value2str($conditiontype, $value) {
 			break;
 		default:
 			return _('Unknown');
-			break;
 	}
 
 	return '"'.$str_val.'"';
@@ -668,96 +723,6 @@ function count_operations_delay($operations, $def_period = 0) {
 	return $delays;
 }
 
-function get_history_of_actions($limit, &$last_clock = null, $sql_cond = '') {
-	validate_sort_and_sortorder('clock', ZBX_SORT_DOWN);
-	$available_triggers = get_accessible_triggers(PERM_READ_ONLY, array());
-
-	$alerts = array();
-	$clock = array();
-	$table = new CTableInfo(_('No actions found.'));
-	$table->setHeader(array(
-		is_show_all_nodes() ? make_sorting_header(_('Nodes'), 'a.alertid') : null,
-		make_sorting_header(_('Time'), 'clock'),
-		make_sorting_header(_('Type'), 'description'),
-		make_sorting_header(_('Status'), 'status'),
-		make_sorting_header(_('Retries left'), 'retries'),
-		make_sorting_header(_('Recipient(s)'), 'sendto'),
-		_('Message'),
-		_('Error')
-	));
-
-	$sql = 'SELECT a.alertid,a.clock,mt.description,a.sendto,a.subject,a.message,a.status,a.retries,a.error'.
-			' FROM events e,alerts a'.
-				' LEFT JOIN media_type mt ON mt.mediatypeid=a.mediatypeid '.
-			' WHERE e.eventid=a.eventid'.
-				' AND alerttype IN ('.ALERT_TYPE_MESSAGE.') '.
-				$sql_cond.
-				' AND '.DBcondition('e.objectid', $available_triggers).
-				' AND '.DBin_node('a.alertid').
-			' ORDER BY a.clock DESC';
-	$result = DBselect($sql, $limit);
-	while ($row = DBfetch($result)) {
-		$alerts[] = $row;
-		$clock[] = $row['clock'];
-	}
-
-	$last_clock = !empty($clock) ? min($clock) : null;
-
-	$sortfield = getPageSortField('clock');
-	$sortorder = getPageSortOrder();
-
-	order_result($alerts, $sortfield, $sortorder);
-
-	foreach ($alerts as $row) {
-		$time = zbx_date2str(HISTORY_OF_ACTIONS_DATE_FORMAT, $row['clock']);
-
-		if ($row['status'] == ALERT_STATUS_SENT) {
-			$status = new CSpan(_('sent'), 'green');
-			$retries = new CSpan(SPACE, 'green');
-		}
-		elseif ($row['status'] == ALERT_STATUS_NOT_SENT) {
-			$status = new CSpan(_('In progress'), 'orange');
-			$retries = new CSpan(ALERT_MAX_RETRIES - $row['retries'], 'orange');
-		}
-		else {
-			$status = new CSpan(_('not sent'), 'red');
-			$retries = new CSpan(0, 'red');
-		}
-		$sendto = $row['sendto'];
-
-		$message = array(
-			bold(_('Subject').': '),
-			br(),
-			$row['subject'],
-			br(),
-			br(),
-			bold(_('Message').': '),
-			br(),
-			$row['message']
-		);
-
-		if (empty($row['error'])) {
-			$error = new CSpan(SPACE, 'off');
-		}
-		else {
-			$error = new CSpan($row['error'], 'on');
-		}
-
-		$table->addRow(array(
-			get_node_name_by_elid($row['alertid']),
-			new CCol($time, 'top'),
-			new CCol($row['description'], 'top'),
-			new CCol($status, 'top'),
-			new CCol($retries, 'top'),
-			new CCol($sendto, 'top'),
-			new CCol($message, 'top'),
-			new CCol($error, 'wraptext top')
-		));
-	}
-
-	return $table;
-}
-
 function get_action_msgs_for_event($event) {
 	$table = new CTableInfo(_('No actions found.'));
 	$table->setHeader(array(
@@ -895,18 +860,6 @@ function get_action_cmds_for_event($event) {
 }
 
 function get_actions_hint_by_eventid($eventid, $status = null) {
-	$hostids = array();
-	$sql = 'SELECT DISTINCT i.hostid'.
-			' FROM events e,functions f,items i'.
-			' WHERE e.eventid='.$eventid.
-				' AND e.object='.EVENT_SOURCE_TRIGGERS.
-				' AND f.triggerid=e.objectid '.
-				' AND i.itemid=f.itemid';
-	if ($host = DBfetch(DBselect($sql, 1))) {
-		$hostids[$host['hostid']] = $host['hostid'];
-	}
-	$available_triggers = get_accessible_triggers(PERM_READ_ONLY, $hostids);
-
 	$tab_hint = new CTableInfo(_('No actions found.'));
 	$tab_hint->setAttribute('style', 'width: 300px;');
 	$tab_hint->setHeader(array(
@@ -924,7 +877,6 @@ function get_actions_hint_by_eventid($eventid, $status = null) {
 				(is_null($status)?'':' AND a.status='.$status).
 				' AND e.eventid=a.eventid'.
 				' AND a.alerttype IN ('.ALERT_TYPE_MESSAGE.','.ALERT_TYPE_COMMAND.')'.
-				' AND '.DBcondition('e.objectid',$available_triggers).
 				' AND '.DBin_node('a.alertid').
 			' ORDER BY a.alertid';
 	$result = DBselect($sql, 30);
@@ -1034,7 +986,7 @@ function get_event_actions_status($eventid) {
 }
 
 function get_event_actions_stat_hints($eventid) {
-	$actionTable = new CTable(' - ');
+	$actionCont = new CDiv(null, 'event-action-cont');
 
 	$alerts = DBfetch(DBselect(
 		'SELECT COUNT(a.alertid) AS cnt'.
@@ -1056,8 +1008,7 @@ function get_event_actions_stat_hints($eventid) {
 		if ($alerts['sent']) {
 			$alert_cnt->setHint(get_actions_hint_by_eventid($eventid, ALERT_STATUS_SENT));
 		}
-		$columnLeft = new CCol($alerts['sent'] ? $alert_cnt : SPACE);
-		$columnLeft->setAttribute('width', '10');
+		$left = new CDiv($alerts['sent'] ? $alert_cnt : SPACE);
 
 		// center
 		$alerts = DBfetch(DBselect(
@@ -1071,8 +1022,7 @@ function get_event_actions_stat_hints($eventid) {
 		if ($alerts['inprogress']) {
 			$alert_cnt->setHint(get_actions_hint_by_eventid($eventid, ALERT_STATUS_NOT_SENT));
 		}
-		$columnCenter = new CCol($alerts['inprogress'] ? $alert_cnt : SPACE);
-		$columnCenter->setAttribute('width', '10');
+		$center = new CDiv($alerts['inprogress'] ? $alert_cnt : SPACE);
 
 		// right
 		$alerts = DBfetch(DBselect(
@@ -1086,10 +1036,12 @@ function get_event_actions_stat_hints($eventid) {
 		if ($alerts['failed']) {
 			$alert_cnt->setHint(get_actions_hint_by_eventid($eventid, ALERT_STATUS_FAILED));
 		}
-		$columnRight = new CCol($alerts['failed'] ? $alert_cnt : SPACE);
-		$columnRight->setAttribute('width', '10');
+		$right = new CDiv($alerts['failed'] ? $alert_cnt : SPACE);
 
-		$actionTable->addRow(array($columnLeft, $columnCenter, $columnRight));
+		$actionCont->addItem(array($left, $center, $right));
 	}
-	return $actionTable;
+	else {
+		$actionCont->addItem('-');
+	}
+	return $actionCont;
 }

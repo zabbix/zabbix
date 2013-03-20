@@ -41,11 +41,9 @@ AC_HELP_STRING([--with-net-snmp@<:@=ARG@:>@],
 
   if test "x$want_netsnmp" != "xno"; then
 
-        if test -z "$_libnetsnmp_config" -o test; then
-            AC_PATH_PROG([_libnetsnmp_config], [net-snmp-config], [no])
-        fi
+        AC_PATH_PROG([_libnetsnmp_config], [net-snmp-config], [])
 
-	if test -f $_libnetsnmp_config; then
+	if test -x "$_libnetsnmp_config"; then
 
 		_full_libnetsnmp_cflags="`$_libnetsnmp_config --cflags`"
 		for i in $_full_libnetsnmp_cflags; do

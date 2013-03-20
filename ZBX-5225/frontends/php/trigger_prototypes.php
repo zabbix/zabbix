@@ -33,6 +33,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 //	VAR		TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 $fields = array(
 	'parent_discoveryid' => array(T_ZBX_INT, O_MAND, P_SYS,	DB_ID,		null),
+	'hostid' =>				array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
 	'triggerid' =>			array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		'(isset({form})&&({form}=="update"))'),
 	'copy_type' =>			array(T_ZBX_INT, O_OPT, P_SYS,	IN('0,1'),	'isset({copy})'),
 	'copy_mode' =>			array(T_ZBX_INT, O_OPT, P_SYS,	IN('0'),	null),
@@ -99,7 +100,6 @@ if (get_request('parent_discoveryid')) {
 	if (!$discovery_rule) {
 		access_deny();
 	}
-	$_REQUEST['hostid'] = $discovery_rule['hostid'];
 
 	if (isset($_REQUEST['triggerid'])) {
 		$triggerPrototype = API::TriggerPrototype()->get(array(
@@ -323,20 +323,18 @@ else {
 		'editable' => true,
 		'output' => API_OUTPUT_SHORTEN,
 		'discoveryids' => $data['parent_discoveryid'],
-		'filter' => array('flags' => ZBX_FLAG_DISCOVERY_CHILD),
 		'sortfield' => $sortfield,
 		'limit' => $config['search_limit'] + 1
 	);
 	if (empty($data['showdisabled'])) {
 		$options['filter']['status'] = TRIGGER_STATUS_ENABLED;
 	}
-	$data['triggers'] = API::Trigger()->get($options);
+	$data['triggers'] = API::TriggerPrototype()->get($options);
 	$data['paging'] = getPagingLine($data['triggers']);
 
-	$data['triggers'] = API::Trigger()->get(array(
+	$data['triggers'] = API::TriggerPrototype()->get(array(
 		'triggerids' => zbx_objectValues($data['triggers'], 'triggerid'),
 		'output' => API_OUTPUT_EXTEND,
-		'filter' => array('flags' => ZBX_FLAG_DISCOVERY_CHILD),
 		'selectHosts' => API_OUTPUT_EXTEND,
 		'selectItems' => API_OUTPUT_EXTEND,
 		'selectFunctions' => API_OUTPUT_EXTEND

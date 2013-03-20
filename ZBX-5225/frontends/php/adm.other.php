@@ -17,8 +17,8 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
+
 require_once dirname(__FILE__).'/include/config.inc.php';
 
 $page['title'] = _('Other configuration parameters');
@@ -43,6 +43,8 @@ check_fields($fields);
  * Actions
  */
 if (isset($_REQUEST['save'])) {
+	DBstart();
+
 	$orig_config = select_config(false);
 
 	$configs = array(
@@ -88,6 +90,8 @@ if (isset($_REQUEST['save'])) {
 
 		add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ZABBIX_CONFIG, implode('; ', $msg));
 	}
+
+	DBend($result);
 }
 
 /*
@@ -139,4 +143,3 @@ $cnf_wdgt->addItem($otherForm->render());
 $cnf_wdgt->show();
 
 require_once dirname(__FILE__).'/include/page_footer.php';
-?>

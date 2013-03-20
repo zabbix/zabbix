@@ -17,8 +17,7 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
 require_once dirname(__FILE__) . '/../include/class.cwebtest.php';
 
 class testPageApplications extends CWebTest {
@@ -34,25 +33,22 @@ class testPageApplications extends CWebTest {
 	public function testPageApplications_CheckLayout($host) {
 		$hostid = $host['hostid'];
 
-		$this->login('hosts.php');
-		$this->dropdown_select_wait('groupid', 'all');
+		$this->zbxTestLogin('hosts.php');
+		$this->zbxTestDropdownSelectWait('groupid', 'all');
 
 		$this->checkTitle('Configuration of hosts');
-		$this->ok('HOSTS');
+		$this->zbxTestTextPresent('HOSTS');
 		// Go to the list of applications
 		$this->href_click("applications.php?groupid=0&hostid=$hostid&sid=");
 		$this->wait();
 		// We are in the list of applications
 		$this->checkTitle('Configuration of applications');
-		$this->ok('CONFIGURATION OF APPLICATIONS');
-		$this->ok('Displaying');
-		$this->ok('Host list');
+		$this->zbxTestTextPresent('CONFIGURATION OF APPLICATIONS');
+		$this->zbxTestTextPresent('Displaying');
+		$this->zbxTestTextPresent('Host list');
 		// Header
-		$this->ok(array('Applications', 'Show'));
+		$this->zbxTestTextPresent(array('Applications', 'Show'));
 
-		$this->dropdown_select('go', 'Enable selected');
-		$this->dropdown_select('go', 'Disable selected');
-		$this->dropdown_select('go', 'Delete selected');
+		$this->zbxTestDropdownHasOptions('go', array('Enable selected', 'Disable selected', 'Delete selected'));
 	}
 }
-?>

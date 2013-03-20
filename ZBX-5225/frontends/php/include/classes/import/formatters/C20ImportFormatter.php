@@ -88,6 +88,9 @@ class C20ImportFormatter extends CImportFormatter {
 					$host['inventory_mode'] = $host['inventory']['inventory_mode'];
 					unset($host['inventory']['inventory_mode']);
 				}
+				else {
+					$host['inventory_mode'] = HOST_INVENTORY_DISABLED;
+				}
 
 				$hostsData[] = CArrayHelper::getByKeys($host, array(
 					'inventory', 'proxy', 'groups', 'templates', 'macros', 'interfaces', 'host', 'status',
@@ -228,12 +231,20 @@ class C20ImportFormatter extends CImportFormatter {
 
 		if (!empty($this->data['maps'])) {
 			foreach ($this->data['maps'] as $map) {
-				if (!empty($map['selements'])) {
-					$map['selements'] = array_values($map['selements']);
+				CArrayHelper::convertFieldToArray($map, 'selements');
+				foreach ($map['selements'] as &$selement) {
+					CArrayHelper::convertFieldToArray($selement, 'urls');
 				}
-				if (!empty($map['links'])) {
-					$map['links'] = array_values($map['links']);
+				unset($selement);
+
+				CArrayHelper::convertFieldToArray($map, 'links');
+				foreach ($map['links'] as &$link) {
+					CArrayHelper::convertFieldToArray($link, 'linktriggers');
 				}
+				unset($link);
+
+				CArrayHelper::convertFieldToArray($map, 'urls');
+
 				$mapsData[] = $map;
 			}
 		}
@@ -247,6 +258,7 @@ class C20ImportFormatter extends CImportFormatter {
 		if (!empty($this->data['screens'])) {
 			foreach ($this->data['screens'] as $screen) {
 				$screen = $this->renameData($screen, array('screen_items' => 'screenitems'));
+				CArrayHelper::convertFieldToArray($screen, 'screenitems');
 				$screensData[] = $screen;
 			}
 		}
@@ -262,6 +274,7 @@ class C20ImportFormatter extends CImportFormatter {
 				if (!empty($template['screens'])) {
 					foreach ($template['screens'] as $screen) {
 						$screen = $this->renameData($screen, array('screen_items' => 'screenitems'));
+						CArrayHelper::convertFieldToArray($screen, 'screenitems');
 						$screensData[$template['template']][$screen['name']] = $screen;
 					}
 				}
@@ -301,6 +314,7 @@ class C20ImportFormatter extends CImportFormatter {
 		if (!empty($discoveryRule['item_prototypes'])) {
 			foreach ($discoveryRule['item_prototypes'] as &$prototype) {
 				$prototype = $this->renameItemFields($prototype);
+				CArrayHelper::convertFieldToArray($prototype, 'applications');
 			}
 			unset($prototype);
 		}

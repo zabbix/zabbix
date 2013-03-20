@@ -42,7 +42,8 @@ static int	get_function_parameter_uint(zbx_uint64_t hostid, const char *paramete
 	if (0 != get_param(parameters, Nparam, parameter, FUNCTION_PARAMETER_LEN_MAX))
 		goto clean;
 
-	if (SUCCEED == substitute_simple_macros(NULL, &hostid, NULL, NULL, &parameter, MACRO_TYPE_FUNCTION_PARAMETER, NULL, 0))
+	if (SUCCEED == substitute_simple_macros(NULL, NULL, &hostid, NULL, NULL, NULL,
+			&parameter, MACRO_TYPE_FUNCTION_PARAMETER, NULL, 0))
 	{
 		if ('#' == *parameter)
 		{
@@ -82,7 +83,8 @@ static int	get_function_parameter_str(zbx_uint64_t hostid, const char *parameter
 	if (0 != get_param(parameters, Nparam, *value, FUNCTION_PARAMETER_LEN_MAX))
 		goto clean;
 
-	res = substitute_simple_macros(NULL, &hostid, NULL, NULL, value, MACRO_TYPE_FUNCTION_PARAMETER, NULL, 0);
+	res = substitute_simple_macros(NULL, NULL, &hostid, NULL, NULL, NULL,
+			value, MACRO_TYPE_FUNCTION_PARAMETER, NULL, 0);
 clean:
 	if (SUCCEED == res)
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() value:'%s'", __function_name, *value);
@@ -135,17 +137,17 @@ static int	evaluate_LOGEVENTID(char *value, DB_ITEM *item, const char *function,
 		DB_ROW		row;
 
 		arg1_esc = DBdyn_escape_string(arg1 + 1);
-		result = DBselect("select r.name,e.expression,e.expression_type,e.exp_delimiter,e.case_sensitive"
+		result = DBselect("select e.expression,e.expression_type,e.exp_delimiter,e.case_sensitive"
 				" from regexps r,expressions e"
 				" where r.regexpid=e.regexpid"
-					" and r.name='%s'",
-				arg1_esc);
+					" and r.name='%s'" DB_NODE,
+				arg1_esc, DBnode_local("r.regexpid"));
 		zbx_free(arg1_esc);
 
 		while (NULL != (row = DBfetch(result)))
 		{
 			add_regexp_ex(&regexps, &regexps_alloc, &regexps_num,
-					row[0], row[1], atoi(row[2]), row[3][0], atoi(row[4]));
+					arg1 + 1, row[0], atoi(row[1]), row[2][0], atoi(row[3]));
 		}
 		DBfree_result(result);
 	}
@@ -176,7 +178,10 @@ static int	evaluate_LOGEVENTID(char *value, DB_ITEM *item, const char *function,
 	}
 
 	if ('@' == *arg1)
+	{
+		clean_regexps_ex(regexps, &regexps_num);
 		zbx_free(regexps);
+	}
 	zbx_free(arg1);
 clean:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(res));
@@ -299,26 +304,6 @@ clean:
 	return res;
 }
 
-/******************************************************************************
- *                                                                            *
- * Function: evaluate_COUNT                                                   *
- *                                                                            *
- * Purpose: evaluate function 'count' for the item                            *
- *                                                                            *
- * Parameters: item - item (performance metric)                               *
- *             parameters - up to four comma-separated fields:                *
- *                            (1) number of seconds/values                    *
- *                            (2) value to compare with (optional)            *
- *                            (3) comparison operator (optional)              *
- *                            (4) time shift (optional)                       *
- *                                                                            *
- * Return value: SUCCEED - evaluated successfully, result is stored in 'value'*
- *               FAIL - failed to evaluate function                           *
- *                                                                            *
- * Author: Alexei Vladishev, Aleksandrs Saveljevs                             *
- *                                                                            *
- ******************************************************************************/
-
 #define OP_EQ	0
 #define OP_NE	1
 #define OP_GT	2
@@ -336,8 +321,9 @@ static int	evaluate_COUNT_one(unsigned char value_type, int op, const char *valu
 	switch (value_type)
 	{
 		case ITEM_VALUE_TYPE_UINT64:
+			if (SUCCEED != str2uint64(arg2, "KMGTsmhdw", &arg2_uint64))
+				return FAIL;
 			ZBX_STR2UINT64(value_uint64, value);
-			ZBX_STR2UINT64(arg2_uint64, arg2);
 
 			switch (op)
 			{
@@ -369,8 +355,10 @@ static int	evaluate_COUNT_one(unsigned char value_type, int op, const char *valu
 
 			break;
 		case ITEM_VALUE_TYPE_FLOAT:
+			if (SUCCEED != is_double_suffix(arg2))
+				return FAIL;
+			arg2_double = str2double(arg2);
 			value_double = atof(value);
-			arg2_double = atof(arg2);
 
 			switch (op)
 			{
@@ -423,8 +411,6 @@ static int	evaluate_COUNT_one(unsigned char value_type, int op, const char *valu
 						return SUCCEED;
 					break;
 			}
-
-			break;
 	}
 
 	return FAIL;
@@ -468,6 +454,25 @@ static int	evaluate_COUNT_local(DB_ITEM *item, int op, int arg1, const char *arg
 	return SUCCEED;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: evaluate_COUNT                                                   *
+ *                                                                            *
+ * Purpose: evaluate function 'count' for the item                            *
+ *                                                                            *
+ * Parameters: item - item (performance metric)                               *
+ *             parameters - up to four comma-separated fields:                *
+ *                            (1) number of seconds/values                    *
+ *                            (2) value to compare with (optional)            *
+ *                            (3) comparison operator (optional)              *
+ *                            (4) time shift (optional)                       *
+ *                                                                            *
+ * Return value: SUCCEED - evaluated successfully, result is stored in 'value'*
+ *               FAIL - failed to evaluate function                           *
+ *                                                                            *
+ * Author: Alexei Vladishev, Aleksandrs Saveljevs                             *
+ *                                                                            *
+ ******************************************************************************/
 static int	evaluate_COUNT(char *value, DB_ITEM *item, const char *function, const char *parameters, time_t now)
 {
 	const char	*__function_name = "evaluate_COUNT";
@@ -847,9 +852,11 @@ static int	evaluate_LAST(char *value, DB_ITEM *item, const char *function, const
 	else
 		goto clean;
 
-	if (0 == time_shift && 1 == arg1)
+	if (0 == time_shift && 1 <= arg1 && arg1 <= 2)
 	{
-		if (NULL != item->lastvalue[0])
+		int index = arg1 - 1;
+
+		if (NULL != item->lastvalue[index])
 		{
 			res = SUCCEED;
 
@@ -858,43 +865,17 @@ static int	evaluate_LAST(char *value, DB_ITEM *item, const char *function, const
 				case ITEM_VALUE_TYPE_FLOAT:
 				case ITEM_VALUE_TYPE_UINT64:
 				case ITEM_VALUE_TYPE_STR:
-					zbx_strlcpy(value, item->lastvalue[0], MAX_BUFFER_LEN);
+					zbx_strlcpy(value, item->lastvalue[index], MAX_BUFFER_LEN);
 					break;
 				default:
-					if (NULL == item->h_lastvalue[0])
+					if (NULL == item->h_lastvalue[index])
 					{
-						zbx_strlcpy(value, item->lastvalue[0], MAX_BUFFER_LEN);
-						if (ITEM_LASTVALUE_LEN == zbx_strlen_utf8(item->lastvalue[0]))
+						zbx_strlcpy(value, item->lastvalue[index], MAX_BUFFER_LEN);
+						if (ITEM_LASTVALUE_LEN == zbx_strlen_utf8(item->lastvalue[index]))
 							goto history;
 					}
 					else
-						zbx_strlcpy(value, item->h_lastvalue[0], MAX_BUFFER_LEN);
-					break;
-			}
-		}
-	}
-	else if (0 == time_shift && 2 == arg1)
-	{
-		if (NULL != item->lastvalue[1])
-		{
-			res = SUCCEED;
-
-			switch (item->value_type)
-			{
-				case ITEM_VALUE_TYPE_FLOAT:
-				case ITEM_VALUE_TYPE_UINT64:
-				case ITEM_VALUE_TYPE_STR:
-					zbx_strlcpy(value, item->lastvalue[1], MAX_BUFFER_LEN);
-					break;
-				default:
-					if (NULL == item->h_lastvalue[1])
-					{
-						zbx_strlcpy(value, item->lastvalue[1], MAX_BUFFER_LEN);
-						if (ITEM_LASTVALUE_LEN == zbx_strlen_utf8(item->lastvalue[1]))
-							goto history;
-					}
-					else
-						zbx_strlcpy(value, item->h_lastvalue[1], MAX_BUFFER_LEN);
+						zbx_strlcpy(value, item->h_lastvalue[index], MAX_BUFFER_LEN);
 					break;
 			}
 		}
@@ -1638,17 +1619,17 @@ static int	evaluate_STR(char *value, DB_ITEM *item, const char *function, const 
 	if ((ZBX_FUNC_REGEXP == func || ZBX_FUNC_IREGEXP == func) && '@' == *arg1)
 	{
 		arg1_esc = DBdyn_escape_string(arg1 + 1);
-		result = DBselect("select r.name,e.expression,e.expression_type,e.exp_delimiter,e.case_sensitive"
+		result = DBselect("select e.expression,e.expression_type,e.exp_delimiter,e.case_sensitive"
 				" from regexps r,expressions e"
 				" where r.regexpid=e.regexpid"
-					" and r.name='%s'",
-				arg1_esc);
+					" and r.name='%s'" DB_NODE,
+				arg1_esc, DBnode_local("r.regexpid"));
 		zbx_free(arg1_esc);
 
 		while (NULL != (row = DBfetch(result)))
 		{
 			add_regexp_ex(&regexps, &regexps_alloc, &regexps_num,
-					row[0], row[1], atoi(row[2]), row[3][0], atoi(row[4]));
+					arg1 + 1, row[0], atoi(row[1]), row[2][0], atoi(row[3]));
 		}
 		DBfree_result(result);
 	}
@@ -1710,7 +1691,10 @@ skip_get_history:
 	res = SUCCEED;
 clean:
 	if ((ZBX_FUNC_REGEXP == func || ZBX_FUNC_IREGEXP == func) && '@' == *arg1)
+	{
+		clean_regexps_ex(regexps, &regexps_num);
 		zbx_free(regexps);
+	}
 
 	zbx_free(arg1);
 exit:

@@ -17,8 +17,7 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
 require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
 class testFormAdministrationGeneralMacro extends CWebTest {
@@ -34,6 +33,8 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 	private $newMacro = '{$NEW_MACRO}';
 	private $newValue = 'Value of the new macro';
 
+	private $newEmptyMacro = '{$NEW_EMPTY_MACRO}';
+
 	private $oldGlobalMacroId = 7;
 	private $updMacro = '{$UPD_MACRO}';
 	private $updValue = 'Value of the updated macro';
@@ -42,15 +43,15 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 	private $oldHashGlobalMacros = '';
 
 	private function openGlobalMacros() {
-		$this->login('adm.gui.php');
+		$this->zbxTestLogin('adm.gui.php');
 		$this->assertElementPresent('configDropDown');
-		$this->dropdown_select_wait('configDropDown', 'Macros');
+		$this->zbxTestDropdownSelectWait('configDropDown', 'Macros');
 		$this->assertElementPresent('configDropDown');
 
 		$this->checkTitle('Configuration of macros');
-		$this->ok('CONFIGURATION OF MACROS');
-		$this->ok('Macros');
-		$this->ok(array('Macro', 'Value'));
+		$this->zbxTestTextPresent('CONFIGURATION OF MACROS');
+		$this->zbxTestTextPresent('Macros');
+		$this->zbxTestTextPresent(array('Macro', 'Value'));
 	}
 
 	private function checkGlobalMacrosOrder($skip_index = -1) {
@@ -80,16 +81,16 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 	}
 
 	private function saveGlobalMacros($confirmation = false, $wait = true) {
-		$this->button_click('save');
+		$this->zbxTestClick('save');
 		if ($confirmation) {
 			$this->waitForConfirmation();
 		}
 		if ($wait) {
 			$this->wait();
 
-			$this->ok('CONFIGURATION OF MACROS');
-			$this->ok('Macros');
-			$this->ok(array('Macro', 'Value'));
+			$this->zbxTestTextPresent('CONFIGURATION OF MACROS');
+			$this->zbxTestTextPresent('Macros');
+			$this->zbxTestTextPresent(array('Macro', 'Value'));
 		}
 	}
 
@@ -143,7 +144,7 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 		$this->assertElementPresent('macro_add');
 		$this->assertElementPresent('save');
 
-		$this->click('id=macro_add');
+		$this->zbxTestClick('macro_add');
 		$this->waitForVisible('macros['.$countGlobalMacros.'][macro]');
 
 		for ($i = 0; $i <= $countGlobalMacros; $i++) {
@@ -175,7 +176,7 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 		$this->openGlobalMacros();
 
 		$this->saveGlobalMacros();
-		$this->ok('Macros updated');
+		$this->zbxTestTextPresent('Macros updated');
 
 		$this->checkGlobalMacrosOrder();
 
@@ -189,11 +190,11 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 
 		$this->openGlobalMacros();
 
-		$this->click('id=macro_add');
+		$this->zbxTestClick('macro_add');
 		$this->waitForVisible('macros['.$countGlobalMacros.'][macro]');
 
 		$this->saveGlobalMacros();
-		$this->ok('Macros updated');
+		$this->zbxTestTextPresent('Macros updated');
 
 		$this->checkGlobalMacrosOrder();
 
@@ -214,45 +215,19 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 
 		$this->openGlobalMacros();
 
-		$this->click('id=macro_add');
+		$this->zbxTestClick('macro_add');
 		$this->waitForVisible('macros['.$countGlobalMacros.'][macro]');
 
 		$this->input_type('macros['.$countGlobalMacros.'][macro]', $macro);
 		$this->input_type('macros['.$countGlobalMacros.'][value]', $this->newValue);
 
 		$this->saveGlobalMacros();
-		$this->ok('ERROR: Cannot update macros');
-		$this->ok('Wrong macro "'.$macro.'".');
-		$this->ok('Cannot add macro.');
+		$this->zbxTestTextPresent('ERROR: Cannot update macros');
+		$this->zbxTestTextPresent('Wrong macro "'.$macro.'".');
+		$this->zbxTestTextPresent('Cannot add macro.');
 
 		$this->assertEquals($this->getValue('macros['.$countGlobalMacros.'][macro]'), $macro);
 		$this->assertEquals($this->getValue('macros['.$countGlobalMacros.'][value]'), $this->newValue);
-
-		$this->checkGlobalMacrosOrder();
-
-		$this->verifyHash();
-	}
-
-	public function testFormAdministrationGeneralMacros_CreateWrongEmptyValue() {
-		$this->calculateHash();
-
-		$countGlobalMacros = DBcount('SELECT globalmacroid FROM globalmacro');
-
-		$this->openGlobalMacros();
-
-		$this->click('id=macro_add');
-		$this->waitForVisible('macros['.$countGlobalMacros.'][macro]');
-
-		$this->input_type('macros['.$countGlobalMacros.'][macro]', $this->newMacro);
-		$this->input_type('macros['.$countGlobalMacros.'][value]', '');
-
-		$this->saveGlobalMacros();
-		$this->ok('ERROR: Cannot update macros');
-		$this->ok('Empty value for macro "'.$this->newMacro.'".');
-		$this->ok('Cannot add macro.');
-
-		$this->assertEquals($this->getValue('macros['.$countGlobalMacros.'][macro]'), $this->newMacro);
-		$this->assertEquals($this->getValue('macros['.$countGlobalMacros.'][value]'), '');
 
 		$this->checkGlobalMacrosOrder();
 
@@ -266,16 +241,16 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 
 		$this->openGlobalMacros();
 
-		$this->click('id=macro_add');
+		$this->zbxTestClick('macro_add');
 		$this->waitForVisible('macros['.$countGlobalMacros.'][macro]');
 
 		$this->input_type('macros['.$countGlobalMacros.'][macro]', '');
 		$this->input_type('macros['.$countGlobalMacros.'][value]', $this->newValue);
 
 		$this->saveGlobalMacros();
-		$this->ok('ERROR: Cannot update macros');
-		$this->ok('Empty macro.');
-		$this->ok('Cannot add macro.');
+		$this->zbxTestTextPresent('ERROR: Cannot update macros');
+		$this->zbxTestTextPresent('Empty macro.');
+		$this->zbxTestTextPresent('Cannot add macro.');
 
 		$this->assertEquals($this->getValue('macros['.$countGlobalMacros.'][macro]'), '');
 		$this->assertEquals($this->getValue('macros['.$countGlobalMacros.'][value]'), $this->newValue);
@@ -294,14 +269,14 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 
 		$this->openGlobalMacros();
 
-		$this->click('id=macro_add');
+		$this->zbxTestClick('macro_add');
 		$this->waitForVisible('macros['.$countGlobalMacros.'][macro]');
 
 		$this->input_type('macros['.$countGlobalMacros.'][macro]', $this->newMacro);
 		$this->input_type('macros['.$countGlobalMacros.'][value]', $this->newValue);
 
 		$this->saveGlobalMacros();
-		$this->ok('Macros updated');
+		$this->zbxTestTextPresent('Macros updated');
 
 		$this->checkGlobalMacrosOrder();
 
@@ -315,6 +290,36 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 		$this->assertEquals(1, $count, 'Chuck Norris: Macro has not been created in the DB.');
 	}
 
+	public function testFormAdministrationGeneralMacros_CreateEmptyValue() {
+		$row = DBfetch(DBselect('SELECT MAX(globalmacroid) AS globalmacroid FROM globalmacro'));
+
+		$this->calculateHash('globalmacroid<='.$row['globalmacroid']);
+
+		$countGlobalMacros = DBcount('SELECT globalmacroid FROM globalmacro');
+
+		$this->openGlobalMacros();
+
+		$this->zbxTestClick('macro_add');
+		$this->waitForVisible('macros['.$countGlobalMacros.'][macro]');
+
+		$this->input_type('macros['.$countGlobalMacros.'][macro]', $this->newEmptyMacro);
+		$this->input_type('macros['.$countGlobalMacros.'][value]', '');
+
+		$this->saveGlobalMacros();
+		$this->zbxTestTextPresent('Macros updated');
+
+		$this->checkGlobalMacrosOrder();
+
+		$this->verifyHash();
+
+		$count = DBcount(
+			'SELECT globalmacroid FROM globalmacro'.
+			' WHERE macro='.zbx_dbstr($this->newEmptyMacro).
+				' AND value='.zbx_dbstr('')
+		);
+		$this->assertEquals(1, $count, 'Chuck Norris: Macro has not been created in the DB.');
+	}
+
 	public function testFormAdministrationGeneralMacros_CreateDuplicate() {
 		$this->calculateHash();
 
@@ -322,16 +327,16 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 
 		$this->openGlobalMacros();
 
-		$this->click('id=macro_add');
+		$this->zbxTestClick('macro_add');
 		$this->waitForVisible('macros['.$countGlobalMacros.'][macro]');
 
 		$this->input_type('macros['.$countGlobalMacros.'][macro]', $this->newMacro);
 		$this->input_type('macros['.$countGlobalMacros.'][value]', $this->newValue);
 
 		$this->saveGlobalMacros();
-		$this->ok('ERROR: Cannot update macros');
-		$this->ok('Macro "'.$this->newMacro.'" already exists.');
-		$this->ok('Cannot add macro.');
+		$this->zbxTestTextPresent('ERROR: Cannot update macros');
+		$this->zbxTestTextPresent('Macro "'.$this->newMacro.'" already exists.');
+		$this->zbxTestTextPresent('Cannot add macro.');
 
 		$this->assertEquals($this->getValue('macros['.$countGlobalMacros.'][macro]'), $this->newMacro);
 		$this->assertEquals($this->getValue('macros['.$countGlobalMacros.'][value]'), $this->newValue);
@@ -353,33 +358,12 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 		$this->input_type('macros[0][value]', $this->updValue);
 
 		$this->saveGlobalMacros();
-		$this->ok('ERROR: Cannot update macros');
-		$this->ok('Wrong macro "'.$macro.'".');
-		$this->ok('Cannot update macro.');
+		$this->zbxTestTextPresent('ERROR: Cannot update macros');
+		$this->zbxTestTextPresent('Wrong macro "'.$macro.'".');
+		$this->zbxTestTextPresent('Cannot update macro.');
 
 		$this->assertEquals($this->getValue('macros[0][macro]'), $macro);
 		$this->assertEquals($this->getValue('macros[0][value]'), $this->updValue);
-
-		$this->checkGlobalMacrosOrder(0);
-
-		$this->verifyHash();
-	}
-
-	public function testFormAdministrationGeneralMacros_UpdateWrongEmptyValue() {
-		$this->calculateHash();
-
-		$this->openGlobalMacros();
-
-		$this->input_type('macros[0][macro]', $this->updMacro);
-		$this->input_type('macros[0][value]', '');
-
-		$this->saveGlobalMacros();
-		$this->ok('ERROR: Cannot update macros');
-		$this->ok('Empty value for macro "'.$this->updMacro.'".');
-		$this->ok('Cannot update macro.');
-
-		$this->assertEquals($this->getValue('macros[0][macro]'), $this->updMacro);
-		$this->assertEquals($this->getValue('macros[0][value]'), '');
 
 		$this->checkGlobalMacrosOrder(0);
 
@@ -395,9 +379,9 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 		$this->input_type('macros[0][value]', $this->updValue);
 
 		$this->saveGlobalMacros();
-		$this->ok('ERROR: Cannot update macros');
-		$this->ok('Empty macro.');
-		$this->ok('Cannot update macro.');
+		$this->zbxTestTextPresent('ERROR: Cannot update macros');
+		$this->zbxTestTextPresent('Empty macro.');
+		$this->zbxTestTextPresent('Cannot update macro.');
 
 		$this->assertEquals($this->getValue('macros[0][macro]'), '');
 		$this->assertEquals($this->getValue('macros[0][value]'), $this->updValue);
@@ -416,9 +400,9 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 		$this->input_type('macros[0][value]', '');
 
 		$this->saveGlobalMacros();
-		$this->ok('ERROR: Cannot update macros');
-		$this->ok('Empty macro.');
-		$this->ok('Cannot update macro.');
+		$this->zbxTestTextPresent('ERROR: Cannot update macros');
+		$this->zbxTestTextPresent('Empty macro.');
+		$this->zbxTestTextPresent('Cannot update macro.');
 
 		$this->assertEquals($this->getValue('macros[0][macro]'), '');
 		$this->assertEquals($this->getValue('macros[0][value]'), '');
@@ -446,7 +430,7 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 		$this->input_type('macros['.$i.'][value]', $this->updValue);
 
 		$this->saveGlobalMacros();
-		$this->ok('Macros updated');
+		$this->zbxTestTextPresent('Macros updated');
 
 		$this->checkGlobalMacrosOrder($i);
 
@@ -455,6 +439,41 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 			' WHERE globalmacroid='.$this->oldGlobalMacroId.
 				' AND macro='.zbx_dbstr($this->updMacro).
 				' AND value='.zbx_dbstr($this->updValue)
+		);
+		$this->assertEquals(1, $count,
+				'Chuck Norris: Value of the macro has not been updated in the DB.'.
+				' Perhaps it was saved with different globalmacroid.');
+
+		$this->verifyHash();
+	}
+
+	public function testFormAdministrationGeneralMacros_UpdateEmptyValue() {
+		$this->calculateHash('globalmacroid<>'.$this->oldGlobalMacroId);
+
+		$countGlobalMacros = DBcount('SELECT globalmacroid FROM globalmacro');
+
+		$this->openGlobalMacros();
+
+		for ($i = 0; $i < $countGlobalMacros; $i++) {
+			if ($this->getValue('macros['.$i.'][globalmacroid]') == $this->oldGlobalMacroId) {
+				break;
+			}
+		}
+		$this->assertNotEquals($i, $countGlobalMacros);
+
+		$this->input_type('macros['.$i.'][macro]', $this->updMacro);
+		$this->input_type('macros['.$i.'][value]', '');
+
+		$this->saveGlobalMacros();
+		$this->zbxTestTextPresent('Macros updated');
+
+		$this->checkGlobalMacrosOrder($i);
+
+		$count = DBcount(
+			'SELECT globalmacroid FROM globalmacro'.
+			' WHERE globalmacroid='.$this->oldGlobalMacroId.
+				' AND macro='.zbx_dbstr($this->updMacro).
+				' AND value='.zbx_dbstr('')
 		);
 		$this->assertEquals(1, $count,
 				'Chuck Norris: Value of the macro has not been updated in the DB.'.
@@ -481,9 +500,9 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 		$this->input_type('macros['.$i.'][value]', $this->newValue);
 
 		$this->saveGlobalMacros();
-		$this->ok('ERROR: Cannot update macros');
-		$this->ok('Macro "'.$this->newMacro.'" already exists.');
-		$this->ok('Cannot update macro.');
+		$this->zbxTestTextPresent('ERROR: Cannot update macros');
+		$this->zbxTestTextPresent('Macro "'.$this->newMacro.'" already exists.');
+		$this->zbxTestTextPresent('Cannot update macro.');
 
 		$this->assertEquals($this->getValue('macros['.$i.'][macro]'), $this->newMacro);
 		$this->assertEquals($this->getValue('macros['.$i.'][value]'), $this->newValue);
@@ -507,7 +526,7 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 		}
 		$this->assertNotEquals($i, $countGlobalMacros);
 
-		$this->click('id=macros_'.$i.'_remove');
+		$this->zbxTestClick('macros_'.$i.'_remove');
 
 		$this->saveGlobalMacros(true, false);
 
@@ -536,10 +555,10 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 		}
 		$this->assertNotEquals($i, $countGlobalMacros);
 
-		$this->click('id=macros_'.$i.'_remove');
+		$this->zbxTestClick('macros_'.$i.'_remove');
 
 		$this->saveGlobalMacros(true);
-		$this->ok('Macros updated');
+		$this->zbxTestTextPresent('Macros updated');
 
 		$this->checkGlobalMacrosOrder();
 
@@ -554,13 +573,13 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 
 		$this->openGlobalMacros();
 
-		$this->click('id=macro_add');
+		$this->zbxTestClick('macro_add');
 		$this->waitForVisible('macros['.$countGlobalMacros.'][macro]');
 
-		$this->click('id=macros_'.$countGlobalMacros.'_remove');
+		$this->zbxTestClick('macros_'.$countGlobalMacros.'_remove');
 
 		$this->saveGlobalMacros();
-		$this->ok('Macros updated');
+		$this->zbxTestTextPresent('Macros updated');
 
 		$this->checkGlobalMacrosOrder();
 
@@ -571,4 +590,3 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 		DBrestore_tables('globalmacro');
 	}
 }
-?>

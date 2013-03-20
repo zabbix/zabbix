@@ -595,12 +595,12 @@ class CImportReferencer {
 			foreach ($this->applications as $host => $applications) {
 				$hostId = $this->resolveHostOrTemplate($host);
 				if ($hostId) {
-					$sqlWhere[] = '(hostid='.$hostId.' AND '.DBcondition('name', $applications).')';
+					$sqlWhere[] = '(hostid='.$hostId.' AND '.dbConditionString('name', $applications).')';
 				}
 			}
 
 			if ($sqlWhere) {
-				$dbApplications = DBselect('SELECT applicationid, hostid, name FROM applications WHERE '.implode(' OR ', $sqlWhere));
+				$dbApplications = DBselect('SELECT applicationid,hostid,name FROM applications WHERE '.implode(' OR ', $sqlWhere));
 				while ($dbApplication = DBfetch($dbApplications)) {
 					$this->applicationsRefs[$dbApplication['hostid']][$dbApplication['name']] = $dbApplication['applicationid'];
 				}
@@ -626,7 +626,7 @@ class CImportReferencer {
 			foreach ($this->items as $host => $keys) {
 				$hostId = $this->resolveHostOrTemplate($host);
 				if ($hostId) {
-					$sqlWhere[] = '(i.hostid='.$hostId.' AND '.DBcondition('i.key_', $keys).')';
+					$sqlWhere[] = '(i.hostid='.$hostId.' AND '.dbConditionString('i.key_', $keys).')';
 				}
 			}
 
@@ -653,7 +653,7 @@ class CImportReferencer {
 		if (!empty($this->valueMaps)) {
 			$this->valueMapsRefs = array();
 
-			$dbitems = DBselect('SELECT v.name,v.valuemapid FROM valuemaps v WHERE '.DBcondition('v.name', $this->valueMaps));
+			$dbitems = DBselect('SELECT v.name,v.valuemapid FROM valuemaps v WHERE '.dbConditionString('v.name', $this->valueMaps));
 			while ($dbItem = DBfetch($dbitems)) {
 				$this->valueMapsRefs[$dbItem['name']] = $dbItem['valuemapid'];
 			}
@@ -670,9 +670,9 @@ class CImportReferencer {
 			$this->triggersRefs = array();
 
 			$triggerIds = array();
-			$sql = 'SELECT t.triggerid,t.expression,t.description
-				FROM triggers t
-				WHERE '.DBcondition('t.description', array_keys($this->triggers));
+			$sql = 'SELECT t.triggerid,t.expression,t.description'.
+				' FROM triggers t'.
+				' WHERE '.dbConditionString('t.description', array_keys($this->triggers));
 			$dbTriggers = DBselect($sql);
 			while ($dbTrigger = DBfetch($dbTriggers)) {
 				$dbExpr = explode_exp($dbTrigger['expression']);
@@ -759,7 +759,7 @@ class CImportReferencer {
 
 			$dbScreens = DBselect('SELECT s.screenid,s.name FROM screens s WHERE'.
 					' s.templateid IS NULL '.
-					' AND '.DBcondition('s.name', $this->screens));
+					' AND '.dbConditionString('s.name', $this->screens));
 			while ($dbScreen = DBfetch($dbScreens)) {
 				$this->screensRefs[$dbScreen['name']] = $dbScreen['screenid'];
 			}
@@ -778,7 +778,7 @@ class CImportReferencer {
 			foreach ($this->macros as $host => $macros) {
 				$hostId = $this->resolveHostOrTemplate($host);
 				if ($hostId) {
-					$sqlWhere[] = '(hm.hostid='.$hostId.' AND '.DBcondition('hm.macro', $macros).')';
+					$sqlWhere[] = '(hm.hostid='.$hostId.' AND '.dbConditionString('hm.macro', $macros).')';
 				}
 			}
 

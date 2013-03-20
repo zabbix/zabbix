@@ -17,14 +17,20 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
 require_once dirname(__FILE__) . '/../include/class.cwebtest.php';
 
 class testPageHistory extends CWebTest {
 	// Returns all enabled items that belong to enabled hosts
 	public static function allEnabledItems() {
-		return DBdata('select * from items left join hosts on hosts.hostid=items.hostid where hosts.status='.HOST_STATUS_MONITORED.' and items.status='.ITEM_STATUS_ACTIVE);
+		return DBdata(
+				'SELECT i.itemid'.
+				' FROM items i,hosts h'.
+				' WHERE i.hostid=h.hostid'.
+					' AND h.status='.HOST_STATUS_MONITORED.
+					' AND i.status='.ITEM_STATUS_ACTIVE.
+					' AND i.flags='.ZBX_FLAG_DISCOVERY_NORMAL
+		);
 	}
 
 	/**
@@ -36,23 +42,19 @@ class testPageHistory extends CWebTest {
 		// should switch to graph for numeric items, should check filter for history & text items
 		// also different header for log items (different for eventlog items ?)
 		$itemid = $item['itemid'];
-		$this->login("history.php?action=showvalues&itemid=$itemid");
+		$this->zbxTestLogin("history.php?action=showvalues&itemid=$itemid");
 		$this->checkTitle('History');
 		// Header
-		$this->ok(array('Timestamp', 'Value'));
-		$this->dropdown_select_wait('action', '500 latest values');
+		$this->zbxTestTextPresent(array('Timestamp', 'Value'));
+		$this->zbxTestDropdownSelectWait('action', '500 latest values');
 		$this->checkTitle('History');
-		$this->button_click('plaintext');
-		$this->wait();
+		$this->zbxTestClickWait('plaintext');
 
 		// there surely is a better way to get out of the plaintext page than just clicking 'back'...
 		$this->goBack();
 		$this->wait();
-		$this->dropdown_select_wait('action', 'Values');
+		$this->zbxTestDropdownSelectWait('action', 'Values');
 		$this->checkTitle('History');
-		$this->button_click('plaintext');
-		$this->wait();
-
+		$this->zbxTestClickWait('plaintext');
 	}
 }
-?>

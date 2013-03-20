@@ -17,8 +17,8 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
+
 include('include/views/js/administration.general.iconmap.js.php');
 
 $iconMapTab = new CFormList('scriptsTab');
@@ -110,8 +110,8 @@ $iconMapTable->addRow($hiddenRowTemplate);
 
 // add row button
 $addCol = new CCol(new CButton('addMapping', _('Add'), '', 'link_menu'));
-$addCol->setColSpan(6);
-$iconMapTable->addRow(array(SPACE, $addCol));
+$addCol->setColSpan(7);
+$iconMapTable->addRow($addCol);
 
 // <default icon row>
 $numSpan = new CSpan($i++.':');
@@ -145,4 +145,3 @@ if (isset($this->data['iconmapid'])) {
 $iconMapForm->addItem(makeFormFooter(array(new CSubmit('save', _('Save'))), $secondaryActions));
 
 return $iconMapForm;
-?>

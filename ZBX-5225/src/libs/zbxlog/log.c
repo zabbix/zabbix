@@ -176,6 +176,9 @@ void zabbix_errlog(zbx_err_codes_t err, ...)
 		case ERR_Z3006:
 			msg = "fetch failed: [%d] %s";
 			break;
+		case ERR_Z3007:
+			msg = "query failed: [%d] %s";
+			break;
 		default:
 			msg = "unknown error";
 	}

@@ -149,7 +149,7 @@ if (get_request('parent_discoveryid', false)) {
 
 	if (isset($_REQUEST['itemid'])) {
 		$itemPrototype = API::ItemPrototype()->get(array(
-			'triggerids' => $_REQUEST['itemid'],
+			'itemids' => $_REQUEST['itemid'],
 			'output' => API_OUTPUT_SHORTEN,
 			'editable' => true,
 			'preservekeys' => true
@@ -328,7 +328,7 @@ else {
 
 	// get items
 	$sortfield = getPageSortField('name');
-	$data['items'] = API::Itemprototype()->get(array(
+	$data['items'] = API::ItemPrototype()->get(array(
 		'discoveryids' => $data['parent_discoveryid'],
 		'output' => API_OUTPUT_EXTEND,
 		'editable' => true,

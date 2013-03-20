@@ -44,37 +44,37 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 
 //		VAR						TYPE		OPTIONAL FLAGS			VALIDATION	EXCEPTION
-$fields=array(
-	'hosts'				=> array(T_ZBX_INT,	O_OPT,	P_SYS,		DB_ID, 		NULL),
-	'groups'			=> array(T_ZBX_INT, O_OPT,	P_SYS,		DB_ID, 		NULL),
-	'clear_templates'	=> array(T_ZBX_INT, O_OPT,	P_SYS,		DB_ID, 		NULL),
-	'templates'			=> array(T_ZBX_STR, O_OPT,	NULL,		NULL,		NULL),
+$fields = array(
+	'hosts'				=> array(T_ZBX_INT,	O_OPT,	P_SYS,		DB_ID, 		null),
+	'groups'			=> array(T_ZBX_INT, O_OPT,	P_SYS,		DB_ID, 		null),
+	'clear_templates'	=> array(T_ZBX_INT, O_OPT,	P_SYS,		DB_ID, 		null),
+	'templates'			=> array(T_ZBX_STR, O_OPT,	null,		null,		null),
 	'templateid'		=> array(T_ZBX_INT,	O_OPT,	P_SYS,		DB_ID,		'isset({form})&&({form}=="update")'),
-	'template_name'		=> array(T_ZBX_STR,	O_OPT,	NOT_EMPTY,	NULL,		'isset({save})'),
-	'visiblename'		=> array(T_ZBX_STR,	O_OPT,	NULL,		NULL,		'isset({save})'),
-	'groupid'			=> array(T_ZBX_INT, O_OPT,	P_SYS,		DB_ID,		NULL),
-	'twb_groupid'		=> array(T_ZBX_INT, O_OPT,	P_SYS,		DB_ID,		NULL),
-	'newgroup'			=> array(T_ZBX_STR, O_OPT,	NULL,		NULL,		NULL),
+	'template_name'		=> array(T_ZBX_STR,	O_OPT,	NOT_EMPTY,	null,		'isset({save})'),
+	'visiblename'		=> array(T_ZBX_STR,	O_OPT,	null,		null,		'isset({save})'),
+	'groupid'			=> array(T_ZBX_INT, O_OPT,	P_SYS,		DB_ID,		null),
+	'twb_groupid'		=> array(T_ZBX_INT, O_OPT,	P_SYS,		DB_ID,		null),
+	'newgroup'			=> array(T_ZBX_STR, O_OPT,	null,		null,		null),
 
-	'macros_rem'		=> array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
-	'macros'			=> array(T_ZBX_STR, O_OPT, P_SYS,		NULL,	NULL),
-	'macro_new'			=> array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	'isset({macro_add})'),
-	'value_new'			=> array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	'isset({macro_add})'),
-	'macro_add'			=> array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
+	'macros_rem'		=> array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+	'macros'			=> array(T_ZBX_STR, O_OPT, P_SYS,		null,	null),
+	'macro_new'			=> array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	'isset({macro_add})'),
+	'value_new'			=> array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	'isset({macro_add})'),
+	'macro_add'			=> array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
 // actions
-	'go'				=> array(T_ZBX_STR, O_OPT,	P_SYS|P_ACT,	NULL,		NULL),
+	'go'				=> array(T_ZBX_STR, O_OPT,	P_SYS|P_ACT,	null,		null),
 //form
-	'unlink'			=> array(T_ZBX_STR, O_OPT,	P_SYS|P_ACT,	NULL,		NULL),
-	'unlink_and_clear'	=> array(T_ZBX_STR, O_OPT,	P_SYS|P_ACT,	NULL,		NULL),
-	'save'				=> array(T_ZBX_STR, O_OPT,	P_SYS|P_ACT,	NULL,		NULL),
-	'clone'				=> array(T_ZBX_STR, O_OPT,	P_SYS|P_ACT,	NULL,		NULL),
-	'full_clone'		=> array(T_ZBX_STR, O_OPT,	P_SYS|P_ACT,	NULL,		NULL),
-	'delete'			=> array(T_ZBX_STR, O_OPT,	P_SYS|P_ACT,	NULL,		NULL),
-	'delete_and_clear'	=> array(T_ZBX_STR, O_OPT,	P_SYS|P_ACT,	NULL,		NULL),
-	'cancel'			=> array(T_ZBX_STR, O_OPT,	P_SYS,			NULL,		NULL),
+	'unlink'			=> array(T_ZBX_STR, O_OPT,	P_SYS|P_ACT,	null,		null),
+	'unlink_and_clear'	=> array(T_ZBX_STR, O_OPT,	P_SYS|P_ACT,	null,		null),
+	'save'				=> array(T_ZBX_STR, O_OPT,	P_SYS|P_ACT,	null,		null),
+	'clone'				=> array(T_ZBX_STR, O_OPT,	P_SYS|P_ACT,	null,		null),
+	'full_clone'		=> array(T_ZBX_STR, O_OPT,	P_SYS|P_ACT,	null,		null),
+	'delete'			=> array(T_ZBX_STR, O_OPT,	P_SYS|P_ACT,	null,		null),
+	'delete_and_clear'	=> array(T_ZBX_STR, O_OPT,	P_SYS|P_ACT,	null,		null),
+	'cancel'			=> array(T_ZBX_STR, O_OPT,	P_SYS,			null,		null),
 // other
-	'form'				=> array(T_ZBX_STR, O_OPT,	P_SYS,			NULL,		NULL),
-	'form_refresh'		=> array(T_ZBX_STR, O_OPT,	NULL,			NULL,		NULL),
+	'form'				=> array(T_ZBX_STR, O_OPT,	P_SYS,			null,		null),
+	'form_refresh'		=> array(T_ZBX_STR, O_OPT,	null,			null,		null),
 );
 
 // OUTER DATA
@@ -102,11 +102,11 @@ if ($EXPORT_DATA) {
 	$export->setBuilder(new CConfigurationExportBuilder());
 	$export->setWriter(CExportWriterFactory::getWriter(CExportWriterFactory::XML));
 	$exportData = $export->export();
-	if (!no_errors()) {
-		show_messages();
+	if (no_errors()) {
+		print($exportData);
 	}
 	else {
-		print($exportData);
+		show_messages();
 	}
 	exit();
 }
@@ -189,7 +189,6 @@ elseif (isset($_REQUEST['save'])) {
 			}
 		}
 
-		$duplicatedMacros = array();
 		foreach ($macros as $mnum => $macro) {
 			// transform macros to uppercase {$aaa} => {$AAA}
 			$macros[$mnum]['macro'] = zbx_strtoupper($macro['macro']);
@@ -278,7 +277,7 @@ elseif (isset($_REQUEST['save'])) {
 				'output' => API_OUTPUT_REFER
 			));
 			$result = true;
-			foreach ($db_graphs as $gnum => $db_graph) {
+			foreach ($db_graphs as $db_graph) {
 				$result &= (bool) copy_graph_to_host($db_graph['graphid'], $templateid);
 			}
 			if (!$result) {
@@ -299,11 +298,26 @@ elseif (isset($_REQUEST['save'])) {
 					throw new Exception();
 				}
 			}
+
+			// clone screens
+			$screens = API::TemplateScreen()->get(array(
+				'templateids' => $clone_templateid,
+				'output' => API_OUTPUT_SHORTEN,
+				'preservekeys' => true,
+				'inherited' => false
+			));
+			if ($screens) {
+				$screensCopied = API::TemplateScreen()->copy(array(
+					'screenIds' => zbx_objectValues($screens, 'screenid'),
+					'templateIds' => $templateid
+				));
+				if (!$screensCopied) {
+					throw new Exception();
+				}
+			}
 		}
 
-		if (!DBend(true)) {
-			throw new Exception();
-		}
+		DBend(true);
 		show_messages(true, $msg_ok, $msg_fail);
 
 		if ($created) {
@@ -479,7 +493,7 @@ else {
 	$options = array(
 		'templateids' => zbx_objectValues($templates, 'templateid'),
 		'editable' => 1,
-		'output' => API_OUTPUT_EXTEND,
+		'output' => array('name', 'proxy_hostid'),
 		'selectHosts' => array('hostid', 'name', 'status'),
 		'selectTemplates' => array('hostid', 'name', 'status'),
 		'selectParentTemplates' => array('hostid', 'name', 'status'),
@@ -496,7 +510,7 @@ else {
 	order_result($templates, $sortfield, $sortorder);
 //-----
 
-	foreach($templates as $tnum => $template){
+	foreach($templates as $template){
 		$templates_output = array();
 		if($template['proxy_hostid']){
 			$proxy = get_host_by_hostid($template['proxy_hostid']);
@@ -521,7 +535,7 @@ else {
 		$i = 0;
 		$linked_templates_output = array();
 		order_result($template['parentTemplates'], 'name');
-		foreach($template['parentTemplates'] as $snum => $linked_template){
+		foreach($template['parentTemplates'] as $linked_template){
 			$i++;
 			if($i > $config['max_in_table']){
 				$linked_templates_output[] = '...';

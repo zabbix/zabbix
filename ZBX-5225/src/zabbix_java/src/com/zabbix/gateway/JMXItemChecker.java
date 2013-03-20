@@ -122,19 +122,36 @@ class JMXItemChecker extends ItemChecker
 
 			ObjectName objectName = new ObjectName(item.getArgument(1));
 			String attributeName = item.getArgument(2);
+			String realAttributeName;
+			String fieldNames = "";
+			int sep;
 
-			logger.trace("looking for value of primitive type for '{},{}'", objectName, attributeName);
+			//
+			// Attribute name and composite data field names are separated by dots. On the other hand the
+			// name may contain a dot too. In this case user needs to escape it with a backslash. Also the
+			// backslash symbols in the name must be escaped. So a real separator is unescaped dot and
+			// separatorIndex() is used to locate it.
+			//
 
-			String subAttributeNames = "";
-			int dot = attributeName.indexOf('.');
+			sep = HelperFunctionChest.separatorIndex(attributeName);
 
-			if (-1 != dot)
+			if (-1 != sep)
 			{
-				subAttributeNames = attributeName.substring(dot + 1);
-				attributeName = attributeName.substring(0, dot);
-			}
+				logger.trace("'{}' contains composite data", attributeName);
 
-			return getPrimitiveAttributeValue(mbsc.getAttribute(objectName, attributeName), subAttributeNames);
+				realAttributeName = attributeName.substring(0, sep);
+				fieldNames = attributeName.substring(sep + 1);
+			}
+			else
+				realAttributeName = attributeName;
+
+			// unescape possible dots or backslashes that were escaped by user
+			realAttributeName = HelperFunctionChest.unescapeUserInput(realAttributeName);
+
+			logger.trace("attributeName:'{}'", realAttributeName);
+			logger.trace("fieldNames:'{}'", fieldNames);
+
+			return getPrimitiveAttributeValue(mbsc.getAttribute(objectName, realAttributeName), fieldNames);
 		}
 		else if (item.getKeyId().equals("jmx.discovery"))
 		{
@@ -179,33 +196,47 @@ class JMXItemChecker extends ItemChecker
 			throw new ZabbixException("key ID '%s' is not supported", item.getKeyId());
 	}
 
-	private String getPrimitiveAttributeValue(Object attribute, String subAttributeNames) throws ZabbixException
+	private String getPrimitiveAttributeValue(Object dataObject, String fieldNames) throws ZabbixException
 	{
-		logger.trace("drilling down with attribute '{}' and subattributes '{}'", attribute, subAttributeNames);
+		logger.trace("drilling down with data object '{}' and field names '{}'", dataObject, fieldNames);
 
-		if (null == attribute)
-			throw new ZabbixException("attribute is null");
+		if (null == dataObject)
+			throw new ZabbixException("data object is null");
 
-		if (subAttributeNames.equals(""))
+		if (fieldNames.equals(""))
 		{
-			if (isPrimitiveAttributeType(attribute.getClass()))
-				return attribute.toString();
+			if (isPrimitiveAttributeType(dataObject.getClass()))
+				return dataObject.toString();
 			else
-				throw new ZabbixException("attribute type is not primitive: %s" + attribute.getClass());
+				throw new ZabbixException("data object type is not primitive: %s" + dataObject.getClass());
 		}
-		else if (attribute instanceof CompositeData)
+
+		if (dataObject instanceof CompositeData)
 		{
-			CompositeData comp = (CompositeData)attribute;
+			logger.trace("'{}' contains composite data", dataObject);
 
-			int dot = subAttributeNames.indexOf('.');
+			CompositeData comp = (CompositeData)dataObject;
 
-			if (-1 == dot)
-				return getPrimitiveAttributeValue(comp.get(subAttributeNames), "");
+			String dataObjectName;
+			String newFieldNames = "";
+
+			int sep = HelperFunctionChest.separatorIndex(fieldNames);
+
+			if (-1 != sep)
+			{
+				dataObjectName = fieldNames.substring(0, sep);
+				newFieldNames = fieldNames.substring(sep + 1);
+			}
 			else
-				return getPrimitiveAttributeValue(comp.get(subAttributeNames.substring(0, dot)), subAttributeNames.substring(dot + 1));
+				dataObjectName = fieldNames;
+
+			// unescape possible dots or backslashes that were escaped by user
+			dataObjectName = HelperFunctionChest.unescapeUserInput(dataObjectName);
+
+			return getPrimitiveAttributeValue(comp.get(dataObjectName), newFieldNames);
 		}
 		else
-			throw new ZabbixException("unsupported attribute type along the path: %s", attribute.getClass());
+			throw new ZabbixException("unsupported data object type along the path: %s", dataObject.getClass());
 	}
 
 	private void findPrimitiveAttributes(JSONArray counters, ObjectName name, String descr, String attrPath, Object attribute) throws JSONException

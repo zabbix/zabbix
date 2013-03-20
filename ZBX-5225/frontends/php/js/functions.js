@@ -177,7 +177,7 @@ function add_logexpr() {
 	td.setAttribute(IE ? 'cssText' : 'style', 'white-space: nowrap;');
 
 	var img = document.createElement('img');
-	img.setAttribute('src', 'images/general/arrowup.gif');
+	img.setAttribute('src', 'images/general/arrow_up.png');
 	img.setAttribute('border', '0');
 	img.setAttribute('alt', 'up');
 
@@ -190,7 +190,7 @@ function add_logexpr() {
 	td.appendChild(document.createTextNode(' '));
 
 	var img = document.createElement('img');
-	img.setAttribute('src', 'images/general/arrowdown.gif');
+	img.setAttribute('src', 'images/general/arrow_down.png');
 	img.setAttribute('border', '0');
 	img.setAttribute('alt', 'down');
 
@@ -577,7 +577,7 @@ function create_page_menu(e, id) {
 
 // triggers js menu
 function create_mon_trigger_menu(e, args, items) {
-	var tr_menu = [['Triggers', null, null, {'outer' : ['pum_oheader'], 'inner' : ['pum_iheader']}], ['Events', 'events.php?triggerid=' + args[0].triggerid + '&nav_time=' + args[0].lastchange, null]];
+	var tr_menu = [[t('Triggers'), null, null, {'outer' : ['pum_oheader'], 'inner' : ['pum_iheader']}], [t('Events'), 'events.php?triggerid=' + args[0].triggerid + '&nav_time=' + args[0].lastchange, null]];
 	if (args.length > 1 && !is_null(args[1])) {
 		tr_menu.push(args[1]);
 	}
@@ -612,15 +612,15 @@ function create_mon_trigger_menu(e, args, items) {
 	var history_section_caption = '';
 	// we have chars and numbers, or we have none (probably 'value_type' key was not set)
 	if (has_char_items == has_int_items) {
-		history_section_caption = locale['S_HISTORY_AND_SIMPLE_GRAPHS'];
+		history_section_caption = t('History and simple graphs');
 	}
 	// we have only character items, so 'history' should be shown
 	else if (has_char_items) {
-		history_section_caption = locale['S_HISTORY'];
+		history_section_caption = t('History');
 	}
 	// we have only numeric items, so 'simple graphs' should be shown
 	else {
-		history_section_caption = locale['S_SIMPLE_GRAPHS'];
+		history_section_caption = t('Simple graphs');
 	}
 
 	tr_menu.push([history_section_caption, null, null, {'outer' : ['pum_oheader'], 'inner' : ['pum_iheader']}]);
@@ -813,11 +813,11 @@ function getNextColor(paletteType) {
  * @return true
  */
 function moveListBoxSelectedItem(formname, objname, from, to, action) {
-	to = jQuery("#"+to);
-	jQuery("#"+from).find("option:selected").each(function(i, fromel){
+	to = jQuery('#' + to);
 
+	jQuery('#' + from).find('option:selected').each(function(i, fromel) {
 		var notApp = true;
-		to.find("option").each(function(j, toel){
+		to.find('option').each(function(j, toel) {
 			if (toel.innerHTML.toLowerCase() > fromel.innerHTML.toLowerCase()) {
 				jQuery(toel).before(fromel);
 				notApp = false;
@@ -828,16 +828,95 @@ function moveListBoxSelectedItem(formname, objname, from, to, action) {
 			to.append(fromel);
 		}
 		fromel = jQuery(fromel);
-		if (action.toLowerCase() == "add") {
-			jQuery(document.forms[formname]).append("<input name='" + objname + "["+fromel.val() + "]"
-				+ "' id='" + objname + "_" + fromel.val() + "' value='" + fromel.val() + "' hidden>");
+		if (action.toLowerCase() == 'add') {
+			jQuery(document.forms[formname]).append("<input name='" + objname + '[' + fromel.val() + ']'
+				+ "' id='" + objname + '_' + fromel.val() + "' value='" + fromel.val() + "' type='hidden'>");
 		}
-		else if (action.toLowerCase() == "rmv") {
-			jQuery("#"+objname + "_" + fromel.val()).remove();
+		else if (action.toLowerCase() == 'rmv') {
+			jQuery('#' + objname + '_' + fromel.val()).remove();
 		}
-
-
 	});
 
 	return true;
+}
+
+/**
+ * Returns the number of properties of an object.
+ *
+ * @param obj
+ *
+ * @return int
+ */
+function objectSize(obj) {
+	var size = 0, key;
+
+	for (key in obj) {
+		if (obj.hasOwnProperty(key)) {
+			size++;
+		}
+	}
+
+	return size;
+}
+
+/**
+ * Optimization:
+ *
+ * 86400 = 24 * 60 * 60
+ * 31536000 = 365 * 86400
+ * 2592000 = 30 * 86400
+ * 604800 = 7 * 86400
+ *
+ * @param int timestamp
+ * @param boolean isTsDouble
+ * @param boolean isExtend
+ *
+ * @return string
+ */
+function formatTimestamp(timestamp, isTsDouble, isExtend) {
+	timestamp = timestamp || 0;
+	var years = 0,
+		months = 0,
+		weeks = 0;
+
+	if (isExtend) {
+		years = parseInt(timestamp / 31536000);
+		months = parseInt((timestamp - years * 31536000) / 2592000);
+		//weeks = parseInt((timestamp - years * 31536000 - months * 2592000) / 604800);
+	}
+
+	var days = parseInt((timestamp - years * 31536000 - months * 2592000 - weeks * 604800) / 86400);
+	var hours = parseInt((timestamp - years * 31536000 - months * 2592000 - weeks * 604800 - days * 86400) / 3600);
+	//var minutes = parseInt((timestamp - years * 31536000 - months * 2592000 - weeks * 604800 - days * 86400 - hours * 3600) / 60);
+
+	if (isTsDouble) {
+		if (months.toString().length == 1) {
+			months = '0' + months;
+		}
+		if (weeks.toString().length == 1) {
+			weeks = '0' + weeks;
+		}
+		if (days.toString().length == 1) {
+			days = '0' + days;
+		}
+		if (hours.toString().length == 1) {
+			hours = '0' + hours;
+		}
+		/*if (minutes.toString().length == 1) {
+			minutes = '0' + minutes;
+		}*/
+	}
+
+	var str = (years == 0) ? '' : years + locale['S_YEAR_SHORT'] + ' ';
+	str += (months == 0) ? '' : months + locale['S_MONTH_SHORT'] + ' ';
+	str += (weeks == 0) ? '' : weeks + locale['S_WEEK_SHORT'] + ' ';
+	str += (isExtend && isTsDouble)
+		? days + locale['S_DAY_SHORT'] + ' '
+		: (days == 0)
+			? ''
+			: days + locale['S_DAY_SHORT'] + ' ';
+	str += (hours == 0) ? '' : hours + locale['S_HOUR_SHORT'] + ' ';
+	//str += (minutes == 0) ? '' : minutes + locale['S_MINUTE_SHORT'] + ' ';
+
+	return str;
 }

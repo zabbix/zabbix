@@ -479,7 +479,8 @@ void	get_proxyconfig_data(zbx_uint64_t proxy_hostid, struct zbx_json *j)
 
 	for (i = 0; NULL != pt[i].table; i++)
 	{
-		assert(NULL != (table = DBget_table(pt[i].table)));
+		table = DBget_table(pt[i].table);
+		assert(NULL != table);
 
 		get_proxyconfig_table(proxy_hostid, j, table, &hosts, &httptests);
 	}
@@ -1060,7 +1061,8 @@ void	process_host_availability(struct zbx_json_parse *jp)
 	const char		*p = NULL;
 	char			tmp[HOST_ERROR_LEN_MAX], *sql = NULL, *error_esc;
 	size_t			sql_alloc = 4 * ZBX_KIBIBYTE, sql_offset = 0, tmp_offset;
-	int			no_data;
+	int			no_data, item_type = -1;
+	unsigned char		available = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -1095,26 +1097,34 @@ void	process_host_availability(struct zbx_json_parse *jp)
 
 		if (SUCCEED == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_AVAILABLE, tmp, sizeof(tmp)))
 		{
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "available=%d,", atoi(tmp));
+			available = atoi(tmp);
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "available=%d,", available);
 			no_data = 0;
+			item_type = ITEM_TYPE_ZABBIX;
 		}
 
 		if (SUCCEED == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_SNMP_AVAILABLE, tmp, sizeof(tmp)))
 		{
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "snmp_available=%d,", atoi(tmp));
+			available = atoi(tmp);
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "snmp_available=%d,", available);
 			no_data = 0;
+			item_type = ITEM_TYPE_SNMPv1;
 		}
 
 		if (SUCCEED == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_IPMI_AVAILABLE, tmp, sizeof(tmp)))
 		{
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "ipmi_available=%d,", atoi(tmp));
+			available = atoi(tmp);
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "ipmi_available=%d,", available);
 			no_data = 0;
+			item_type = ITEM_TYPE_IPMI;
 		}
 
 		if (SUCCEED == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_JMX_AVAILABLE, tmp, sizeof(tmp)))
 		{
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "jmx_available=%d,", atoi(tmp));
+			available = atoi(tmp);
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "jmx_available=%d,", available);
 			no_data = 0;
+			item_type = ITEM_TYPE_JMX;
 		}
 
 		if (SUCCEED == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_ERROR, tmp, sizeof(tmp)))
@@ -1177,6 +1187,10 @@ void	process_host_availability(struct zbx_json_parse *jp)
 	DBcommit();
 
 	zbx_free(sql);
+
+	if (-1 != item_type)
+		DCconfig_update_host_availability(hostid, item_type, available, 0, 0);
+
 exit:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
@@ -1438,8 +1452,17 @@ void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid,
 	AGENT_RESULT	agent;
 	DC_ITEM		item;
 	int		i;
+	zbx_uint64_t	*itemids = NULL;
+	unsigned char	*statuses = NULL;
+	int		*lastclocks = NULL, *errcodes = NULL;
+	size_t		num = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	itemids = zbx_malloc(itemids, sizeof(zbx_uint64_t) * value_num);
+	statuses = zbx_malloc(statuses, sizeof(unsigned char) * value_num);
+	lastclocks = zbx_malloc(lastclocks, sizeof(int) * value_num);
+	errcodes = zbx_malloc(errcodes, sizeof(int) * value_num);
 
 	for (i = 0; i < value_num; i++)
 	{
@@ -1469,8 +1492,9 @@ void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid,
 
 		if (ITEM_STATUS_NOTSUPPORTED == values[i].status || 0 == strcmp(values[i].value, ZBX_NOTSUPPORTED))
 		{
+			item.status = ITEM_STATUS_NOTSUPPORTED;
 			dc_add_history(item.itemid, item.value_type, item.flags, NULL, &values[i].ts,
-					ITEM_STATUS_NOTSUPPORTED, values[i].value, 0, NULL, 0, 0, 0, 0);
+					item.status, values[i].value, 0, NULL, 0, 0, 0, 0);
 
 			if (NULL != processed)
 				(*processed)++;
@@ -1488,8 +1512,9 @@ void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid,
 				if (NULL != values[i].source)
 					zbx_replace_invalid_utf8(values[i].source);
 
+				item.status = ITEM_STATUS_ACTIVE;
 				dc_add_history(item.itemid, item.value_type, item.flags, &agent, &values[i].ts,
-						ITEM_STATUS_ACTIVE, NULL, values[i].timestamp, values[i].source,
+						item.status, NULL, values[i].timestamp, values[i].source,
 						values[i].severity, values[i].logeventid, values[i].lastlogsize,
 						values[i].mtime);
 
@@ -1501,17 +1526,31 @@ void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid,
 				zabbix_log(LOG_LEVEL_DEBUG, "item [%s:%s] error: %s",
 						item.host.host, item.key_orig, agent.msg);
 
+				item.status = ITEM_STATUS_NOTSUPPORTED;
 				dc_add_history(item.itemid, item.value_type, item.flags, NULL, &values[i].ts,
-						ITEM_STATUS_NOTSUPPORTED, agent.msg, 0, NULL, 0, 0, 0, 0);
+						item.status, agent.msg, 0, NULL, 0, 0, 0, 0);
 			}
 			else
 				THIS_SHOULD_NEVER_HAPPEN; /* set_result_type() always sets MSG result if not SUCCEED */
 
 			free_result(&agent);
 		}
+
+		itemids[num] = item.itemid;
+		statuses[num] = item.status;
+		lastclocks[num] = values[i].ts.sec;
+		errcodes[num] = SUCCEED;
+		num++;
 clean:
 		DCconfig_clean_items(&item, NULL, 1);
 	}
+
+	DCrequeue_items(itemids, statuses, lastclocks, errcodes, num);
+
+	zbx_free(errcodes);
+	zbx_free(lastclocks);
+	zbx_free(statuses);
+	zbx_free(itemids);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
@@ -1594,6 +1633,8 @@ int	process_hist_data(zbx_sock_t *sock, struct zbx_json_parse *jp,
 		if (FAIL == (ret = zbx_json_brackets_open(p, &jp_row)))
 			break;
 
+		total_num++;
+
 		av = &values[value_num];
 
 		memset(av, 0, sizeof(AGENT_VALUE));
@@ -1660,7 +1701,6 @@ int	process_hist_data(zbx_sock_t *sock, struct zbx_json_parse *jp,
 			process_mass_data(sock, proxy_hostid, values, value_num, &processed);
 
 			clean_agent_values(values, value_num);
-			total_num += value_num;
 			value_num = 0;
 		}
 	}
@@ -1671,7 +1711,6 @@ int	process_hist_data(zbx_sock_t *sock, struct zbx_json_parse *jp,
 		process_mass_data(sock, proxy_hostid, values, value_num, &processed);
 
 	clean_agent_values(values, value_num);
-	total_num += value_num;
 
 	if (NULL != info)
 	{

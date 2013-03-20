@@ -17,17 +17,21 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
-/**
- * @package API
- */
+
+
 class CWebCheck extends CZBXAPI {
 	protected $tableName = 'httptest';
 	protected $tableAlias = 'ht';
 	private $history = 30;
 	private $trends = 90;
 
+	/**
+	 * Get data about web scenarios.
+	 *
+	 * @param array $options
+	 *
+	 * @return array
+	 */
 	public function get($options = array()) {
 		$result = array();
 		$userType = self::$userData['type'];
@@ -75,29 +79,22 @@ class CWebCheck extends CZBXAPI {
 		$options = zbx_array_merge($defOptions, $options);
 
 		// editable + PERMISSION CHECK
-		if (USER_TYPE_SUPER_ADMIN == $userType || $options['nopermissions']) {
-		}
-		else {
-			$permission = $options['editable']?PERM_READ_WRITE:PERM_READ_ONLY;
+		if ($userType != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
+			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ_ONLY;
 
-			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
-			$sqlParts['from']['rights'] = 'rights r';
-			$sqlParts['from']['applications'] = 'applications a';
-			$sqlParts['from']['users_groups'] = 'users_groups ug';
-			$sqlParts['where'][] = 'a.applicationid=ht.applicationid';
-			$sqlParts['where'][] = 'hg.hostid=a.hostid';
-			$sqlParts['where'][] = 'r.id=hg.groupid ';
-			$sqlParts['where'][] = 'r.groupid=ug.usrgrpid';
-			$sqlParts['where'][] = 'ug.userid='.$userid;
-			$sqlParts['where'][] = 'r.permission>='.$permission;
-			$sqlParts['where'][] = 'NOT EXISTS ('.
-									' SELECT hgg.groupid'.
-									' FROM hosts_groups hgg,rights rr,users_groups gg'.
-									' WHERE hgg.hostid=hg.hostid'.
-										' AND rr.id=hgg.groupid'.
-										' AND rr.groupid=gg.usrgrpid'.
-										' AND gg.userid='.$userid.
-										' AND rr.permission<'.$permission.')';
+			$userGroups = getUserGroupsByUserId($userid);
+
+			$sqlParts['where'][] = 'EXISTS ('.
+					'SELECT NULL'.
+					' FROM applications a,hosts_groups hgg'.
+						' JOIN rights r'.
+							' ON r.id=hgg.groupid'.
+								' AND '.dbConditionInt('r.groupid', $userGroups).
+					' WHERE a.applicationid=ht.applicationid'.
+						' AND a.hostid=hgg.hostid'.
+					' GROUP BY a.applicationid'.
+					' HAVING MIN(r.permission)>='.$permission.
+					')';
 		}
 
 		// nodeids
@@ -110,7 +107,7 @@ class CWebCheck extends CZBXAPI {
 			if ($options['output'] != API_OUTPUT_SHORTEN) {
 				$sqlParts['select']['httptestid'] = 'ht.httptestid';
 			}
-			$sqlParts['where']['httptestid'] = DBcondition('ht.httptestid', $options['httptestids']);
+			$sqlParts['where']['httptestid'] = dbConditionInt('ht.httptestid', $options['httptestids']);
 		}
 
 		// hostids
@@ -122,7 +119,7 @@ class CWebCheck extends CZBXAPI {
 			}
 			$sqlParts['from']['applications'] = 'applications a';
 			$sqlParts['where'][] = 'a.applicationid=ht.applicationid';
-			$sqlParts['where']['hostid'] = DBcondition('a.hostid', $options['hostids']);
+			$sqlParts['where']['hostid'] = dbConditionInt('a.hostid', $options['hostids']);
 
 			if (!is_null($options['groupCount'])) {
 				$sqlParts['group']['hostid'] = 'a.hostid';
@@ -136,7 +133,7 @@ class CWebCheck extends CZBXAPI {
 			if ($options['output'] != API_OUTPUT_EXTEND) {
 				$sqlParts['select']['applicationid'] = 'a.applicationid';
 			}
-			$sqlParts['where'][] = DBcondition('ht.applicationid', $options['applicationids']);
+			$sqlParts['where'][] = dbConditionInt('ht.applicationid', $options['applicationids']);
 		}
 
 		// output
@@ -164,7 +161,7 @@ class CWebCheck extends CZBXAPI {
 
 		// filter
 		if (is_array($options['filter'])) {
-			zbx_db_filter('httptest ht', $options, $sqlParts);
+			$this->dbFilter('httptest ht', $options, $sqlParts);
 		}
 
 		// sorting
@@ -278,7 +275,7 @@ class CWebCheck extends CZBXAPI {
 			$dbSteps = DBselect(
 				'SELECT h.*'.
 				' FROM httpstep h'.
-				' WHERE '.DBcondition('h.httptestid', $httpTestIds)
+				' WHERE '.dbConditionInt('h.httptestid', $httpTestIds)
 			);
 			while ($step = DBfetch($dbSteps)) {
 				$stepid = $step['httpstepid'];
@@ -295,42 +292,43 @@ class CWebCheck extends CZBXAPI {
 		return $result;
 	}
 
+	/**
+	 * Create web scenario.
+	 *
+	 * @param $httpTests
+	 *
+	 * @return array
+	 */
 	public function create($httpTests) {
 		$httpTests = zbx_toArray($httpTests);
-		$httpTestsNames = zbx_objectValues($httpTests, 'name');
 
-		if (!preg_grep('/^(['.ZBX_PREG_PRINT.'])+$/u', $httpTestsNames)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Only characters are allowed.'));
-		}
-
-		$dbHttpTests = $this->get(array(
-			'filter' => array('name' => $httpTestsNames),
-			'output' => API_OUTPUT_EXTEND,
-			'nopermissions' => true,
-			'preservekeys' => true
-		));
-		foreach ($dbHttpTests as $httpTest) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Scenario "%s" already exists.', $httpTest['name']));
-		}
+		$this->validateCreate($httpTests);
 
 		$httpTestIds = DB::insert('httptest', $httpTests);
 
 		foreach ($httpTests as $wnum => $httpTest) {
-			if (empty($httpTest['steps'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Webcheck must have at least one step.'));
-			}
 			$httpTest['httptestid'] = $httpTestIds[$wnum];
 
 			$this->createCheckItems($httpTest);
 			$this->createStepsReal($httpTest, $httpTest['steps']);
 		}
+
 		return array('httptestids' => $httpTestIds);
 	}
 
+	/**
+	 * Update web scenario.
+	 *
+	 * @param $httpTests
+	 *
+	 * @return array
+	 */
 	public function update($httpTests) {
 		$httpTests = zbx_toArray($httpTests);
-		$httpTestIds = zbx_objectValues($httpTests, 'httptestid');
 
+		$this->validateUpdate($httpTests);
+
+		$httpTestIds = zbx_objectValues($httpTests, 'httptestid');
 		$dbHttpTest = $this->get(array(
 			'output' => API_OUTPUT_EXTEND,
 			'httptestids' => $httpTestIds,
@@ -340,32 +338,6 @@ class CWebCheck extends CZBXAPI {
 		));
 
 		foreach ($httpTests as $httpTest) {
-			if (!isset($dbHttpTest[$httpTest['httptestid']])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('You do not have permission to perform this operation.'));
-			}
-
-			if (!check_db_fields(array('httptestid' => null), $httpTest)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
-			}
-
-			if (isset($httpTest['name'])) {
-				if (!preg_match('/^(['.ZBX_PREG_PRINT.'])+$/u', $httpTest['name'])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('Only characters are allowed.'));
-				}
-
-				$httpTestExist = $this->get(array(
-					'filter' => array('name' => $httpTest['name']),
-					'preservekeys' => true,
-					'nopermissions' => true,
-					'output' => API_OUTPUT_SHORTEN
-				));
-				$httpTestExist = reset($httpTestExist);
-
-				if ($httpTestExist && (bccomp($httpTestExist['httptestid'], $httpTestExist['httptestid']) != 0)) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Scenario "%s" already exists.', $httpTest['name']));
-				}
-			}
-
 			DB::update('httptest', array(
 				'values' => $httpTest,
 				'where' => array('httptestid' => $httpTest['httptestid'])
@@ -433,19 +405,27 @@ class CWebCheck extends CZBXAPI {
 			}
 			$stepidsDelete = array_keys($dbSteps);
 
-			if (!empty($stepsCreate)) {
-				$this->createStepsReal($httpTest, $stepsCreate);
+			if (!empty($stepidsDelete)) {
+				$this->deleteStepsReal($stepidsDelete);
 			}
 			if (!empty($stepsUpdate)) {
 				$this->updateStepsReal($httpTest, $stepsUpdate);
 			}
-			if (!empty($stepidsDelete)) {
-				$this->deleteStepsReal($stepidsDelete);
+			if (!empty($stepsCreate)) {
+				$this->createStepsReal($httpTest, $stepsCreate);
 			}
 		}
+
 		return array('httptestids' => $httpTestIds);
 	}
 
+	/**
+	 * Delete web scenario.
+	 *
+	 * @param $httpTestIds
+	 *
+	 * @return array|bool
+	 */
 	public function delete($httpTestIds) {
 		if (empty($httpTestIds)) {
 			return true;
@@ -469,7 +449,7 @@ class CWebCheck extends CZBXAPI {
 		$dbTestItems = DBselect(
 			'SELECT hsi.itemid'.
 			' FROM httptestitem hsi'.
-			' WHERE '.DBcondition('hsi.httptestid', $httpTestIds)
+			' WHERE '.dbConditionInt('hsi.httptestid', $httpTestIds)
 		);
 		while ($testitem = DBfetch($dbTestItems)) {
 			$itemidsDel[] = $testitem['itemid'];
@@ -478,7 +458,7 @@ class CWebCheck extends CZBXAPI {
 		$dbStepItems = DBselect(
 			'SELECT DISTINCT hsi.itemid'.
 			' FROM httpstepitem hsi,httpstep hs'.
-			' WHERE '.DBcondition('hs.httptestid', $httpTestIds).
+			' WHERE '.dbConditionInt('hs.httptestid', $httpTestIds).
 				' AND hs.httpstepid=hsi.httpstepid'
 		);
 		while ($stepitem = DBfetch($dbStepItems)) {
@@ -506,6 +486,130 @@ class CWebCheck extends CZBXAPI {
 		return array('httptestids' => $httpTestIds);
 	}
 
+	/**
+	 * Validate web scenario parameters for create method.
+	 *  - check if web scenario with same name already exists
+	 *  - check if web scenario has at least one step
+	 *
+	 * @param array $httpTests
+	 */
+	protected function validateCreate(array $httpTests) {
+		$httpTestsNames = $this->checkNames($httpTests);
+
+		if ($name = DBfetch(DBselect('SELECT ht.name FROM httptest ht WHERE '.dbConditionString('ht.name', $httpTestsNames), 1))) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Scenario "%s" already exists.', $name['name']));
+		}
+
+		foreach ($httpTests as $httpTest) {
+			if (empty($httpTest['steps'])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Webcheck must have at least one step.'));
+			}
+			$this->checkSteps($httpTest['steps']);
+		}
+	}
+
+	/**
+	 * Validate web scenario parameters for update method.
+	 *  - check permissions
+	 *  - check if web scenario with same name already exists
+	 *  - check that each web scenario object has httptestid defined
+	 *
+	 * @param array $httpTests
+	 */
+	protected function validateUpdate(array $httpTests) {
+		$httpTestIds = zbx_objectValues($httpTests, 'httptestid');
+
+		if (!$this->isWritable($httpTestIds)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('You do not have permission to perform this operation.'));
+		}
+
+		$httpTestsNames = $this->checkNames($httpTests);
+
+		$nameExists = DBfetch(DBselect('SELECT ht.name FROM httptest ht WHERE '.
+				dbConditionString('ht.name', $httpTestsNames).
+				' AND '.dbConditionInt('ht.httptestid', $httpTestIds, true), 1));
+		if ($nameExists) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Scenario "%s" already exists.', $nameExists['name']));
+		}
+
+		foreach ($httpTests as $httpTest) {
+			if (!check_db_fields(array('httptestid' => null), $httpTest)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
+			}
+			if (isset($httpTest['steps'])) {
+				$this->checkSteps($httpTest['steps']);
+			}
+		}
+	}
+
+	/**
+	 * Check web scenario steps.
+	 *  - check status_codes field
+	 *
+	 * @param array $steps
+	 */
+	protected function checkSteps(array $steps) {
+		foreach ($steps as $step) {
+			if (isset($step['status_codes'])) {
+				$this->checkStatusCode($step['status_codes']);
+			}
+		}
+	}
+
+	/**
+	 * Validate http response code reange.
+	 * Range can contain ',' and '-'
+	 * Range can be empty string.
+	 *
+	 * Examples: '100-199, 301, 404, 500-550'
+	 *
+	 * @param string $statusCodeRange
+	 *
+	 * @return bool
+	 */
+	protected  function checkStatusCode($statusCodeRange) {
+		if ($statusCodeRange == '') {
+			return true;
+		}
+
+		foreach (explode(',', $statusCodeRange) as $range) {
+			$range = explode('-', $range);
+			if (count($range) > 2) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid response code range "%1$s".', $statusCodeRange));
+			}
+
+			foreach ($range as $value) {
+				if (!is_numeric($value)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid response code "%1$s".', $value));
+				}
+			}
+		}
+
+		return true;
+	}
+
+
+	/**
+	 * Check web scenario names.
+	 *
+	 * @param array $httpTests
+	 *
+	 * @return array|null
+	 */
+	protected function checkNames(array $httpTests) {
+		$httpTestsNames = zbx_objectValues($httpTests, 'name');
+		if (!preg_grep('/^(['.ZBX_PREG_PRINT.'])+$/u', $httpTestsNames)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Only characters are allowed.'));
+		}
+
+		return $httpTestsNames;
+	}
+
+	/**
+	 * Create items required for web scenario.
+	 *
+	 * @param $httpTest
+	 */
 	protected function createCheckItems($httpTest) {
 		$checkitems = array(
 			array(
@@ -574,6 +678,12 @@ class CWebCheck extends CZBXAPI {
 		}
 	}
 
+	/**
+	 * Create web scenario steps with items.
+	 *
+	 * @param $httpTest
+	 * @param $websteps
+	 */
 	protected function createStepsReal($httpTest, $websteps) {
 		$webstepsNames = zbx_objectValues($websteps, 'name');
 
@@ -584,7 +694,7 @@ class CWebCheck extends CZBXAPI {
 		$sql = 'SELECT h.httpstepid,h.name'.
 				' FROM httpstep h'.
 				' WHERE h.httptestid='.$httpTest['httptestid'].
-					' AND '.DBcondition('h.name', $webstepsNames);
+					' AND '.dbConditionString('h.name', $webstepsNames);
 		if ($httpstepData = DBfetch(DBselect($sql))) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Step "%s" already exists.', $httpstepData['name']));
 		}
@@ -668,6 +778,12 @@ class CWebCheck extends CZBXAPI {
 		}
 	}
 
+	/**
+	 * Update web scenario steps.
+	 *
+	 * @param $httpTest
+	 * @param $websteps
+	 */
 	protected function updateStepsReal($httpTest, $websteps) {
 		$webstepsNames = zbx_objectValues($websteps, 'name');
 
@@ -680,7 +796,7 @@ class CWebCheck extends CZBXAPI {
 		$dbKeys = DBfetchArray(DBselect(
 			'SELECT i.key_'.
 			' FROM items i,httpstepitem hi'.
-			' WHERE '.DBcondition('hi.httpstepid', $webstepids).
+			' WHERE '.dbConditionInt('hi.httpstepid', $webstepids).
 				' AND hi.itemid=i.itemid'
 		));
 		$dbKeys = zbx_toHash($dbKeys, 'key_');
@@ -748,12 +864,17 @@ class CWebCheck extends CZBXAPI {
 		}
 	}
 
+	/**
+	 * Delete web scenario steps.
+	 *
+	 * @param $webstepids
+	 */
 	protected function deleteStepsReal($webstepids) {
 		$itemids = array();
 		$dbStepItems = DBselect(
 			'SELECT i.itemid'.
 			' FROM items i,httpstepitem hi'.
-			' WHERE '.DBcondition('hi.httpstepid', $webstepids).
+			' WHERE '.dbConditionInt('hi.httpstepid', $webstepids).
 				' AND hi.itemid=i.itemid'
 		);
 		while ($stepitem = DBfetch($dbStepItems)) {
@@ -766,5 +887,53 @@ class CWebCheck extends CZBXAPI {
 			API::Item()->delete($itemids, true);
 		}
 	}
+
+	/**
+	 * Check if user has read permissions on http test with given ids.
+	 *
+	 * @param array $ids
+	 *
+	 * @return bool
+	 */
+	public function isReadable(array $ids) {
+		if (empty($ids)) {
+			return true;
+		}
+
+		$ids = array_unique($ids);
+
+		$count = $this->get(array(
+			'nodeids' => get_current_nodeid(true),
+			'httptestids' => $ids,
+			'output' => API_OUTPUT_SHORTEN,
+			'countOutput' => true
+		));
+
+		return (count($ids) == $count);
+	}
+
+	/**
+	 * Check if user has write permissions on http test with given ids.
+	 *
+	 * @param array $ids
+	 *
+	 * @return bool
+	 */
+	public function isWritable(array $ids) {
+		if (empty($ids)) {
+			return true;
+		}
+
+		$ids = array_unique($ids);
+
+		$count = $this->get(array(
+			'nodeids' => get_current_nodeid(true),
+			'httptestids' => $ids,
+			'output' => API_OUTPUT_SHORTEN,
+			'editable' => true,
+			'countOutput' => true
+		));
+
+		return (count($ids) == $count);
+	}
 }
-?>

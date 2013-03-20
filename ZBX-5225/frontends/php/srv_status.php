@@ -31,8 +31,7 @@ $page['hist_arg'] = array();
 define('ZBX_PAGE_DO_REFRESH', 1);
 
 include_once('include/page_header.php');
-?>
-<?php
+
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = array(
 	'serviceid' =>	array(T_ZBX_INT, O_OPT, P_SYS|P_NZERO, DB_ID,	null),
@@ -59,24 +58,20 @@ if ($page['type'] == PAGE_TYPE_JS || $page['type'] == PAGE_TYPE_HTML_BLOCK) {
 	exit();
 }
 
-$available_triggers = get_accessible_triggers(PERM_READ_ONLY, array());
+if (isset($_REQUEST['serviceid']) && isset($_REQUEST['showgraph'])) {
+	$service = API::Service()->get(array(
+		'serviceids' => $_REQUEST['serviceid'],
+		'preservekeys' => true
+	));
 
-if (isset($_REQUEST['serviceid'])) {
-	if ($service = DBfetch(DBselect('SELECT DISTINCT s.serviceid,s.triggerid FROM services s WHERE s.serviceid='.$_REQUEST['serviceid']))) {
-		if ($service['triggerid'] && !isset($available_triggers[$service['triggerid']])) {
-			access_deny();
-		}
+	if ($service) {
+		$table = new CTable(null, 'chart');
+		$table->addRow(new CImg('chart5.php?serviceid='.key($service).url_param('path')));
+		$table->show();
 	}
 	else {
-		unset($service);
+		access_deny();
 	}
-}
-unset($_REQUEST['serviceid']);
-
-if (isset($service) && isset($_REQUEST['showgraph'])) {
-	$table = new CTable(null, 'chart');
-	$table->addRow(new CImg('chart5.php?serviceid='.$service['serviceid'].url_param('path')));
-	$table->show();
 }
 else {
 	$periods = array(
@@ -116,13 +111,14 @@ else {
 	// fetch services
 	$services = API::Service()->get(array(
 		'output' => array('name', 'serviceid', 'showsla', 'goodsla', 'algorithm'),
-		'selectParent' => API_OUTPUT_EXTEND,
+		'selectParent' => array('serviceid'),
 		'selectDependencies' => array('servicedownid', 'soft', 'linkid'),
 		'selectTrigger' => array('description', 'triggerid', 'expression'),
 		'preservekeys' => true,
 		'sortfield' => 'sortorder',
 		'sortorder' => ZBX_SORT_UP
 	));
+
 	// expand trigger descriptions
 	$triggers = zbx_objectValues($services, 'trigger');
 
@@ -137,12 +133,12 @@ else {
 
 	// fetch sla
 	$slaData = API::Service()->getSla(array(
-		'serviceids' => zbx_objectValues($services, 'serviceid'),
 		'intervals' => array(array(
 			'from' => $period_start,
 			'to' => $period_end
 		))
 	));
+
 	// expand problem trigger descriptions
 	foreach ($slaData as &$serviceSla) {
 		foreach ($serviceSla['problems'] as &$problemTrigger) {

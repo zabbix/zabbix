@@ -18,7 +18,6 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-
 require_once dirname(__FILE__).'/include/config.inc.php';
 require_once dirname(__FILE__).'/include/hosts.inc.php';
 require_once dirname(__FILE__).'/include/graphs.inc.php';
@@ -47,16 +46,16 @@ $fields = array(
 	'graphtype' =>			array(T_ZBX_INT, O_OPT, null,		IN('0,1,2,3'),	'isset({save})'),
 	'yaxismin' =>			array(T_ZBX_DBL, O_OPT, null,		null,			'isset({save})&&(({graphtype}==0)||({graphtype}==1))'),
 	'yaxismax' =>			array(T_ZBX_DBL, O_OPT, null,		null,			'isset({save})&&(({graphtype}==0)||({graphtype}==1))'),
-	'graph3d' =>			array(T_ZBX_INT, O_OPT, P_NZERO,	IN('0,1'),		null),
-	'legend' =>				array(T_ZBX_INT, O_OPT, P_NZERO,	IN('0,1'),		null),
+	'show_3d' =>			array(T_ZBX_INT, O_OPT, P_NZERO,	IN('0,1'),		null),
+	'show_legend' =>		array(T_ZBX_INT, O_OPT, P_NZERO,	IN('0,1'),		null),
 	'ymin_itemid' =>		array(T_ZBX_INT, O_OPT, null,		DB_ID,			'isset({save})&&isset({ymin_type})&&({ymin_type}==3)'),
 	'ymax_itemid' =>		array(T_ZBX_INT, O_OPT, null,		DB_ID,			'isset({save})&&isset({ymax_type})&&({ymax_type}==3)'),
-	'percent_left' =>		array(T_ZBX_DBL, O_OPT, null,		BETWEEN(0, 100), null, _('Percentile line (Left)')),
-	'percent_right' =>		array(T_ZBX_DBL, O_OPT, null,		BETWEEN(0, 100), null, _('Percentile line (Right)')),
+	'percent_left' =>		array(T_ZBX_DBL, O_OPT, null,		BETWEEN(0, 100), null, _('Percentile line (left)')),
+	'percent_right' =>		array(T_ZBX_DBL, O_OPT, null,		BETWEEN(0, 100), null, _('Percentile line (right)')),
 	'visible' =>			array(T_ZBX_INT, O_OPT, null,		BETWEEN(0, 1),	null),
 	'items' =>				array(T_ZBX_STR, O_OPT, null,		null,			null),
-	'showworkperiod' =>		array(T_ZBX_INT, O_OPT, null,		IN('1'),		null),
-	'showtriggers' =>		array(T_ZBX_INT, O_OPT, null,		IN('1'),		null),
+	'show_work_period' =>	array(T_ZBX_INT, O_OPT, null,		IN('1'),		null),
+	'show_triggers' =>		array(T_ZBX_INT, O_OPT, null,		IN('1'),		null),
 	'group_graphid' =>		array(T_ZBX_INT, O_OPT, null,		DB_ID,			null),
 	'copy_targetid' =>		array(T_ZBX_INT, O_OPT, null,		DB_ID,			null),
 	'filter_groupid' =>		array(T_ZBX_INT, O_OPT, P_SYS,		DB_ID,			'isset({copy})&&(isset({copy_type})&&({copy_type}==0))'),
@@ -89,8 +88,8 @@ validate_sort_and_sortorder('name', ZBX_SORT_UP);
 
 $_REQUEST['go'] = get_request('go', 'none');
 $_REQUEST['items'] = get_request('items', array());
-$_REQUEST['graph3d'] = get_request('graph3d', 0);
-$_REQUEST['legend'] = get_request('legend', 0);
+$_REQUEST['show_3d'] = get_request('show_3d', 0);
+$_REQUEST['show_legend'] = get_request('show_legend', 0);
 
 /*
  * Permissions
@@ -160,7 +159,28 @@ if (CUser::$userData['type'] !== USER_TYPE_SUPER_ADMIN) {
  * Actions
  */
 if (isset($_REQUEST['clone']) && isset($_REQUEST['graphid'])) {
+	// graph
+	$options = array(
+		'graphids' => $_REQUEST['graphid'],
+		'output' => API_OUTPUT_EXTEND
+	);
+	$graph = empty($_REQUEST['parent_discoveryid'])
+		? API::Graph()->get($options)
+		: API::GraphPrototype()->get($options);
+	$graph = reset($graph);
+
+	$_REQUEST = array_merge($_REQUEST, $graph);
+
+	// graph items
+	$_REQUEST['items'] = API::GraphItem()->get(array(
+		'graphids' => $_REQUEST['graphid'],
+		'sortfield' => 'gitemid',
+		'output' => API_OUTPUT_EXTEND,
+		'expandData' => true
+	));
+
 	unset($_REQUEST['graphid']);
+
 	$_REQUEST['form'] = 'clone';
 }
 elseif (isset($_REQUEST['save'])) {
@@ -179,11 +199,11 @@ elseif (isset($_REQUEST['save'])) {
 			'yaxismax' => get_request('yaxismax', 0),
 			'ymin_itemid' => $_REQUEST['ymin_itemid'],
 			'ymax_itemid' => $_REQUEST['ymax_itemid'],
-			'show_work_period' => get_request('showworkperiod', 0),
-			'show_triggers' => get_request('showtriggers', 0),
+			'show_work_period' => get_request('show_work_period', 0),
+			'show_triggers' => get_request('show_triggers', 0),
 			'graphtype' => $_REQUEST['graphtype'],
-			'show_legend' => get_request('legend', 1),
-			'show_3d' => get_request('graph3d', 0),
+			'show_legend' => get_request('show_legend', 1),
+			'show_3d' => get_request('show_3d', 0),
 			'percent_left' => get_request('percent_left', 0),
 			'percent_right' => get_request('percent_right', 0),
 			'gitems' => $items
@@ -316,8 +336,15 @@ $pageFilter = new CPageFilter(array(
 	'groupid' => get_request('groupid', null),
 	'hostid' => get_request('hostid', null)
 ));
-$_REQUEST['groupid'] = $pageFilter->groupid;
-$_REQUEST['hostid'] = $pageFilter->hostid;
+
+if (empty($_REQUEST['parent_discoveryid'])) {
+	if ($pageFilter->groupid > 0) {
+		$_REQUEST['groupid'] = $pageFilter->groupid;
+	}
+	if ($pageFilter->hostid > 0) {
+		$_REQUEST['hostid'] = $pageFilter->hostid;
+	}
+}
 
 if ($_REQUEST['go'] == 'copy_to' && isset($_REQUEST['group_graphid'])) {
 	// render view
@@ -333,19 +360,16 @@ elseif (isset($_REQUEST['form'])) {
 		'parent_discoveryid' => get_request('parent_discoveryid'),
 		'group_gid' => get_request('group_gid', array()),
 		'hostid' => get_request('hostid', 0),
-		'is_template' => isTemplate(get_request('hostid', 0)),
 		'normal_only' => get_request('normal_only')
 	);
 
 	if (!empty($data['graphid']) && !isset($_REQUEST['form_refresh'])) {
 		$options = array(
 			'graphids' => $data['graphid'],
-			'output' => API_OUTPUT_EXTEND
+			'output' => API_OUTPUT_EXTEND,
+			'selectHosts' => array('hostid')
 		);
-		$graph = !empty($data['parent_discoveryid'])
-			? API::GraphPrototype()->get($options)
-			: API::Graph()->get($options);
-
+		$graph = empty($data['parent_discoveryid']) ? API::Graph()->get($options) : API::GraphPrototype()->get($options);
 		$graph = reset($graph);
 
 		$data['name'] = $graph['name'];
@@ -357,28 +381,57 @@ elseif (isset($_REQUEST['form'])) {
 		$data['yaxismax'] = $graph['yaxismax'];
 		$data['ymin_itemid'] = $graph['ymin_itemid'];
 		$data['ymax_itemid'] = $graph['ymax_itemid'];
-		$data['showworkperiod'] = $graph['show_work_period'];
-		$data['showtriggers'] = $graph['show_triggers'];
+		$data['show_work_period'] = $graph['show_work_period'];
+		$data['show_triggers'] = $graph['show_triggers'];
 		$data['graphtype'] = $graph['graphtype'];
-		$data['legend'] = $graph['show_legend'];
-		$data['graph3d'] = $graph['show_3d'];
+		$data['show_legend'] = $graph['show_legend'];
+		$data['show_3d'] = $graph['show_3d'];
 		$data['percent_left'] = $graph['percent_left'];
 		$data['percent_right'] = $graph['percent_right'];
 		$data['templateid'] = $graph['templateid'];
 		$data['templates'] = array();
+
+		// if no host has been selected for the navigation panel, use the first graph host
+		if (empty($data['hostid'])) {
+			$host = reset($graph['hosts']);
+			$data['hostid'] = $host['hostid'];
+		}
 
 		// templates
 		if (!empty($data['templateid'])) {
 			$parentGraphid = $data['templateid'];
 			do {
 				$parentGraph = get_graph_by_graphid($parentGraphid);
-				$parentTemplate = get_hosts_by_graphid($parentGraph['graphid']);
-				$parentTemplate = DBfetch($parentTemplate);
 
-				$data['templates'][] = new CLink($parentTemplate['host'],
-					'graphs.php?form=update&graphid='.$parentGraph['graphid'].'&hostid='.$parentTemplate['hostid'].url_param('parent_discoveryid'));
-				$data['templates'][] = SPACE.RARR.SPACE;
+				// parent graph prototype link
+				if (get_request('parent_discoveryid')) {
+					$parentGraphPrototype = API::GraphPrototype()->get(array(
+						'graphids' => $parentGraph['graphid'],
+						'selectTemplates' => API_OUTPUT_EXTEND,
+						'selectDiscoveryRule' => array('itemid')
+					));
+					if ($parentGraphPrototype) {
+						$parentGraphPrototype = reset($parentGraphPrototype);
+						$parentTemplate = reset($parentGraphPrototype['templates']);
 
+						$link = new CLink($parentTemplate['name'],
+							'graphs.php?form=update&graphid='.$parentGraphPrototype['graphid'].'&hostid='.$parentTemplate['hostid'].'&parent_discoveryid='.$parentGraphPrototype['discoveryRule']['itemid']
+						);
+					}
+				}
+				// parent graph link
+				else {
+					$parentTemplate = get_hosts_by_graphid($parentGraph['graphid']);
+					$parentTemplate = DBfetch($parentTemplate);
+
+					$link = new CLink($parentTemplate['name'],
+						'graphs.php?form=update&graphid='.$parentGraph['graphid'].'&hostid='.$parentTemplate['hostid']
+					);
+				}
+				if (isset($link)) {
+					$data['templates'][] = $link;
+					$data['templates'][] = SPACE.RARR.SPACE;
+				}
 				$parentGraphid = $parentGraph['templateid'];
 			} while ($parentGraphid != 0);
 			$data['templates'] = array_reverse($data['templates']);
@@ -412,10 +465,10 @@ elseif (isset($_REQUEST['form'])) {
 		$data['yaxismax'] = get_request('yaxismax', '100.00');
 		$data['ymin_itemid'] = get_request('ymin_itemid', 0);
 		$data['ymax_itemid'] = get_request('ymax_itemid', 0);
-		$data['showworkperiod'] = get_request('showworkperiod', 0);
-		$data['showtriggers'] = get_request('showtriggers', 0);
-		$data['legend'] = get_request('legend', 0);
-		$data['graph3d'] = get_request('graph3d', 0);
+		$data['show_work_period'] = get_request('show_work_period', 0);
+		$data['show_triggers'] = get_request('show_triggers', 0);
+		$data['show_legend'] = get_request('show_legend', 0);
+		$data['show_3d'] = get_request('show_3d', 0);
 		$data['visible'] = get_request('visible');
 		$data['percent_left'] = 0;
 		$data['percent_right'] = 0;
@@ -431,9 +484,9 @@ elseif (isset($_REQUEST['form'])) {
 	}
 
 	if (empty($data['graphid']) && !isset($_REQUEST['form_refresh'])) {
-		$data['legend'] = $_REQUEST['legend'] = 1;
-		$data['showworkperiod'] = $_REQUEST['showworkperiod'] = 1;
-		$data['showtriggers'] = $_REQUEST['showtriggers'] = 1;
+		$data['show_legend'] = $_REQUEST['show_legend'] = 1;
+		$data['show_work_period'] = $_REQUEST['show_work_period'] = 1;
+		$data['show_triggers'] = $_REQUEST['show_triggers'] = 1;
 	}
 
 	$_REQUEST['items'] = $data['items'];
@@ -446,11 +499,11 @@ elseif (isset($_REQUEST['form'])) {
 	$_REQUEST['yaxismax'] = $data['yaxismax'];
 	$_REQUEST['ymin_itemid'] = $data['ymin_itemid'];
 	$_REQUEST['ymax_itemid'] = $data['ymax_itemid'];
-	$_REQUEST['showworkperiod'] = $data['showworkperiod'];
-	$_REQUEST['showtriggers'] = $data['showtriggers'];
+	$_REQUEST['show_work_period'] = $data['show_work_period'];
+	$_REQUEST['show_triggers'] = $data['show_triggers'];
 	$_REQUEST['graphtype'] = $data['graphtype'];
-	$_REQUEST['legend'] = $data['legend'];
-	$_REQUEST['graph3d'] = $data['graph3d'];
+	$_REQUEST['show_legend'] = $data['show_legend'];
+	$_REQUEST['show_3d'] = $data['show_3d'];
 	$_REQUEST['percent_left'] = $data['percent_left'];
 	$_REQUEST['percent_right'] = $data['percent_right'];
 
@@ -476,73 +529,66 @@ elseif (isset($_REQUEST['form'])) {
 	asort_by_key($data['items'], 'sortorder');
 	$data['items'] = array_values($data['items']);
 
+	// is template
+	$data['is_template'] = isTemplate($data['hostid']);
+
 	// render view
 	$graphView = new CView('configuration.graph.edit', $data);
 	$graphView->render();
 	$graphView->show();
 }
 else {
-	if (isset($_REQUEST['graphid']) && $_REQUEST['graphid'] == 0) {
-		unset($_REQUEST['graphid']);
-	}
-
 	$data = array(
 		'pageFilter' => $pageFilter,
-		'hostid' => get_request('hostid'),
+		'hostid' => ($pageFilter->hostid > 0) ? $pageFilter->hostid : get_request('hostid'),
 		'parent_discoveryid' => get_request('parent_discoveryid'),
-		'graphs' => array()
+		'graphs' => array(),
+		'discovery_rule' => empty($_REQUEST['parent_discoveryid']) ? null : $discovery_rule
 	);
-	if (!empty($_REQUEST['parent_discoveryid'])) {
-		$data['discovery_rule'] = $discovery_rule;
-	}
 
 	$sortfield = getPageSortField('name');
 	$sortorder = getPageSortOrder();
 
-	if ($pageFilter->hostsSelected) {
-		$options = array(
-			'editable' => true,
-			'output' => array('graphid', 'name', 'graphtype'),
-			'limit' => $config['search_limit'] + 1
-		);
-		if ($pageFilter->hostid > 0) {
-			$options['hostids'] = $pageFilter->hostid;
-		}
-		elseif ($pageFilter->groupid > 0) {
-			$options['groupids'] = $pageFilter->groupid;
-		}
-		if (!empty($_REQUEST['parent_discoveryid'])) {
-			$options['discoveryids'] = $_REQUEST['parent_discoveryid'];
-		}
-		$data['graphs'] = !empty($_REQUEST['parent_discoveryid'])
-			? API::GraphPrototype()->get($options)
-			: API::Graph()->get($options);
-	}
+	// get graphs
+	$options = array(
+		'hostids' => $data['hostid'] ? $data['hostid'] : null,
+		'groupids' => (!$data['hostid'] && $pageFilter->groupid > 0) ? $pageFilter->groupid : null,
+		'discoveryids' => empty($_REQUEST['parent_discoveryid']) ? null : get_request('parent_discoveryid'),
+		'editable' => true,
+		'output' => array('graphid', 'name', 'graphtype'),
+		'limit' => $config['search_limit'] + 1
+	);
+
+	$data['graphs'] = empty($_REQUEST['parent_discoveryid'])
+		? API::Graph()->get($options)
+		: API::GraphPrototype()->get($options);
 
 	if ($sortfield == 'graphtype') {
 		foreach ($data['graphs'] as $gnum => $graph) {
 			$data['graphs'][$gnum]['graphtype'] = graphType($graph['graphtype']);
 		}
 	}
+
 	order_result($data['graphs'], $sortfield, $sortorder);
 	$data['paging'] = getPagingLine($data['graphs']);
 
+	// get graphs after paging
 	$options = array(
 		'graphids' => zbx_objectValues($data['graphs'], 'graphid'),
 		'output' => array('graphid', 'name', 'templateid', 'graphtype', 'width', 'height'),
 		'selectDiscoveryRule' => array('itemid', 'name'),
+		'selectHosts' => $data['hostid'] ? null : array('name'),
+		'selectTemplates' => $data['hostid'] ? null : array('name')
 	);
-	if ($pageFilter->hostid == 0) {
-		$options['selectHosts'] = array('name');
-		$options['selectTemplates'] = array('name');
-	}
-	$data['graphs'] = !empty($_REQUEST['parent_discoveryid'])
-		? API::GraphPrototype()->get($options)
-		: API::Graph()->get($options);
+
+	$data['graphs'] = empty($_REQUEST['parent_discoveryid'])
+		? API::Graph()->get($options)
+		: API::GraphPrototype()->get($options);
 
 	foreach ($data['graphs'] as $gnum => $graph) {
 		$data['graphs'][$gnum]['graphtype'] = graphType($graph['graphtype']);
 	}
+
 	order_result($data['graphs'], $sortfield, $sortorder);
 
 	// render view

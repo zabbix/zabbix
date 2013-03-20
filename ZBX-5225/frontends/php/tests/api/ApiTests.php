@@ -17,22 +17,20 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
 //require_once 'Framework/ClassTest.php';
 //require_once dirname(__FILE__).'/classes/class.cdrule.php';
-require_once dirname(__FILE__).'/classes/class.triggerexpressionTest.php';
+//require_once dirname(__FILE__).'/classes/class.triggerexpressionTest.php';
 //require_once dirname(__FILE__).'/classes/class.citemtest.php';
 // ...
 //class Package_GeneralTests
 class ApiTests {
 	public static function suite() {
 		$suite = new PHPUnit_Framework_TestSuite();
-		$suite->addTestSuite('class_triggerexpressionTest');
+//		$suite->addTestSuite('class_triggerexpressionTest');
 //		$suite->addTestSuite('CItemTest');
 //		$suite->addTestSuite('CDRuleTest');
 
 		return $suite;
 	}
 }
-?>

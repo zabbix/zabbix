@@ -73,7 +73,7 @@ class CTriggersInfo extends CTable {
 		$db_priority = DBselect(
 			'SELECT t.priority,t.value,count(DISTINCT t.triggerid) AS cnt'.
 			' FROM triggers t'.
-			' WHERE '.DBcondition('t.triggerid', $triggers).
+			' WHERE '.dbConditionInt('t.triggerid', $triggers).
 			' GROUP BY t.priority,t.value'
 		);
 		while ($row = DBfetch($db_priority)) {

@@ -92,12 +92,12 @@ else {
 // append key to form list
 $itemFormList->addRow(_('Key'), array(
 	new CTextBox('key', $this->data['key'], ZBX_TEXTBOX_STANDARD_SIZE, $this->data['limited']),
-	!$this->data['limited']
-	? new CButton('keyButton', _('Select'),
-		'return PopUp("popup.php?srctbl=help_items&srcfld1=key_'.
-			'&dstfrm='.$itemForm->getName().'&dstfld1=key&itemtype="+jQuery("#type option:selected").val());',
-		'formlist')
-	: null
+	!$this->data['limited'] && !$this->data['is_discovery_rule']
+		? new CButton('keyButton', _('Select'),
+			'return PopUp("popup.php?srctbl=help_items&srcfld1=key_'.
+				'&dstfrm='.$itemForm->getName().'&dstfld1=key&itemtype="+jQuery("#type option:selected").val());',
+			'formlist')
+		: null
 ));
 
 // append interfaces to form list
@@ -184,7 +184,7 @@ $itemFormList->addRow(_('Password'),
 	new CTextBox('password', $this->data['password'], ZBX_TEXTBOX_SMALL_SIZE, 'no', 64), false, 'row_password'
 );
 $itemFormList->addRow(_('Executed script'),
-	new CTextArea('params_es', $this->data['params'], ZBX_TEXTAREA_STANDARD_ROWS, ZBX_TEXTAREA_STANDARD_WIDTH),
+	new CTextArea('params_es', $this->data['params'], array('rows' => ZBX_TEXTAREA_STANDARD_ROWS, 'width' => ZBX_TEXTAREA_STANDARD_WIDTH)),
 	false, 'label_executed_script'
 );
 $itemFormList->addRow(_('Additional parameters'),
@@ -192,14 +192,13 @@ $itemFormList->addRow(_('Additional parameters'),
 		!empty($this->data['params'])
 			? $this->data['params']
 			: 'DSN=<database source name>'."\n".'user=<user name>'."\n".'password=<password>'."\n".'sql=<query>',
-		ZBX_TEXTAREA_STANDARD_ROWS,
-		ZBX_TEXTAREA_STANDARD_WIDTH
+		array('rows' => ZBX_TEXTAREA_STANDARD_ROWS, 'width' => ZBX_TEXTAREA_STANDARD_WIDTH)
 	),
 	false,
 	'label_params'
 );
 $itemFormList->addRow(_('Formula'),
-	new CTextArea('params_f', $this->data['params'], ZBX_TEXTAREA_STANDARD_ROWS, ZBX_TEXTAREA_STANDARD_WIDTH),
+	new CTextArea('params_f', $this->data['params'], array('rows' => ZBX_TEXTAREA_STANDARD_ROWS, 'width' => ZBX_TEXTAREA_STANDARD_WIDTH)),
 	false, 'label_formula'
 );
 
@@ -208,7 +207,7 @@ if (!$this->data['is_discovery_rule']) {
 	if ($this->data['limited']) {
 		$itemForm->addVar('value_type', $this->data['value_type']);
 		$itemFormList->addRow(_('Type of information'),
-			new CTextBox('value_type_name', item_value_type2str($this->data['value_type']), ZBX_TEXTBOX_STANDARD_SIZE, 'yes')
+			new CTextBox('value_type_name', itemValueTypeString($this->data['value_type']), ZBX_TEXTBOX_STANDARD_SIZE, 'yes')
 		);
 	}
 	else {
@@ -244,12 +243,11 @@ if (!$this->data['is_discovery_rule']) {
 		$multiplierCheckBox->setAttribute('disabled', 'disabled');
 		$multiplierCheckBox->setAttribute('style', 'vertical-align: middle;');
 		$multiplier[] = $multiplierCheckBox;
-		if ($this->data['multiplier']) {
-			$multiplier[] = SPACE;
-			$formulaTextBox = new CTextBox('formula', $this->data['formula'], ZBX_TEXTBOX_SMALL_SIZE, 1);
-			$formulaTextBox->setAttribute('style', 'text-align: right;');
-			$multiplier[] = $formulaTextBox;
-		}
+
+		$multiplier[] = SPACE;
+		$formulaTextBox = new CTextBox('formula', $this->data['formula'], ZBX_TEXTBOX_SMALL_SIZE, 1);
+		$formulaTextBox->setAttribute('style', 'text-align: right;');
+		$multiplier[] = $formulaTextBox;
 	}
 	else {
 		$multiplierCheckBox = new CCheckBox('multiplier', $this->data['multiplier'] == 1 ? 'yes': 'no',
@@ -358,10 +356,19 @@ else {
 	);
 
 	// append delta to form list
-	$deltaComboBox= new CComboBox('delta', $this->data['delta']);
-	$deltaComboBox->addItem(0, _('As is'));
-	$deltaComboBox->addItem(1, _('Delta (speed per second)'));
-	$deltaComboBox->addItem(2, _('Delta (simple change)'));
+	$deltaOptions = array(
+		0 => _('As is'),
+		1 => _('Delta (speed per second)'),
+		2 => _('Delta (simple change)')
+	);
+	if ($this->data['limited']) {
+		$itemForm->addVar('delta', $this->data['delta']);
+		$deltaComboBox = new CTextBox('delta_name', $deltaOptions[$this->data['delta']], null, 'yes');
+	}
+	else {
+		$deltaComboBox= new CComboBox('delta', $this->data['delta']);
+		$deltaComboBox->addItems($deltaOptions);
+	}
 	$itemFormList->addRow(_('Store value'), $deltaComboBox, false, 'row_delta');
 
 	// append valuemap to form list

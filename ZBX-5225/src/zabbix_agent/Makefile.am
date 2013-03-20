@@ -1,6 +1,7 @@
 ## Process this file with automake to produce Makefile.in
 EXTRA_DIST = \
-	eventlog.c eventlog.h
+	eventlog.c eventlog.h \
+	perfstat.c perfstat.h
 
 agents_ldadd = \
 	$(top_srcdir)/src/libs/zbxsysinfo/libzbxagentsysinfo.a \
@@ -30,7 +31,6 @@ zabbix_agent_SOURCES = \
 	stats.c stats.h \
 	cpustat.c cpustat.h \
 	diskdevices.c diskdevices.h \
-	perfstat.c perfstat.h \
 	vmstats.c vmstats.h \
 	zbxconf.c zbxconf.h
 
@@ -43,7 +43,6 @@ zabbix_agentd_SOURCES = \
 	stats.c stats.h \
 	cpustat.c cpustat.h \
 	diskdevices.c diskdevices.h \
-	perfstat.c perfstat.h \
 	vmstats.c vmstats.h \
 	logfiles.c logfiles.h \
 	zabbix_agentd.c \

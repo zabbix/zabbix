@@ -63,7 +63,7 @@ function getMessageSettings() {
 		'SELECT p.idx,p.source,p.value_str'.
 		' FROM profiles p'.
 		' WHERE p.userid='.CWebUser::$data['userid'].
-			' AND '.DBcondition('p.idx', array('web.messages'))
+			' AND '.dbConditionString('p.idx', array('web.messages'))
 	);
 	while ($profile = DBfetch($dbProfiles)) {
 		$messages[$profile['source']] = $profile['value_str'];
@@ -90,7 +90,7 @@ function updateMessageSettings($messages) {
 		'SELECT p.profileid,p.idx,p.source,p.value_str'.
 		' FROM profiles p'.
 		' WHERE p.userid='.CWebUser::$data['userid'].
-			' AND '.DBcondition('p.idx', array('web.messages'))
+			' AND '.dbConditionString('p.idx', array('web.messages'))
 	);
 	while ($profile = DBfetch($dbProfiles)) {
 		$profile['value'] = $profile['value_str'];

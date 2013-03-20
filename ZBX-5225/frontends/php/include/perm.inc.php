@@ -192,24 +192,33 @@ function get_accessible_groups_by_user($user_data, $perm, $perm_res = PERM_RES_I
 
 	$processed = array();
 
-	$db_groups = DBselect(
-		'SELECT n.nodeid AS nodeid,n.name AS node_name,hg.groupid,hg.name,MIN(r.permission) AS permission,g.userid'.
-		' FROM groups hg'.
-			' LEFT JOIN rights r ON r.id=hg.groupid'.
-			' LEFT JOIN users_groups g ON r.groupid=g.usrgrpid'.
-			' LEFT JOIN nodes n ON '.DBid2nodeid('hg.groupid').'=n.nodeid'.
-		' WHERE g.userid='.$userid.
-			' AND '.DBin_node('hg.groupid', $nodeid).
-		' GROUP BY n.nodeid,n.name,hg.groupid,hg.name,g.userid,g.userid'.
-		' ORDER BY node_name,hg.name,permission'
-	);
+	if ($user_type == USER_TYPE_SUPER_ADMIN) {
+		$sql = 'SELECT n.nodeid AS nodeid,n.name AS node_name,hg.groupid,hg.name'.
+				' FROM groups hg'.
+					' LEFT JOIN nodes n ON '.DBid2nodeid('hg.groupid').'=n.nodeid'.
+				' WHERE '.DBin_node('hg.groupid', $nodeid).
+				' GROUP BY n.nodeid,n.name,hg.groupid,hg.name'.
+				' ORDER BY node_name,hg.name';
+	}
+	else {
+		$sql = 'SELECT n.nodeid AS nodeid,n.name AS node_name,hg.groupid,hg.name,MIN(r.permission) AS permission,g.userid'.
+				' FROM groups hg'.
+					' LEFT JOIN rights r ON r.id=hg.groupid'.
+					' LEFT JOIN users_groups g ON r.groupid=g.usrgrpid'.
+					' LEFT JOIN nodes n ON '.DBid2nodeid('hg.groupid').'=n.nodeid'.
+				' WHERE g.userid='.$userid.
+					' AND '.DBin_node('hg.groupid', $nodeid).
+				' GROUP BY n.nodeid,n.name,hg.groupid,hg.name,g.userid'.
+				' ORDER BY node_name,hg.name,permission';
+	}
+	$db_groups = DBselect($sql);
 	while ($group_data = DBfetch($db_groups)) {
 		if (zbx_empty($group_data['nodeid'])) {
 			$group_data['nodeid'] = id2nodeid($group_data['groupid']);
 		}
 
 		// deny if no rights defined
-		if (USER_TYPE_SUPER_ADMIN == $user_type) {
+		if ($user_type == USER_TYPE_SUPER_ADMIN) {
 			$group_data['permission'] = PERM_MAX;
 		}
 		elseif (isset($processed[$group_data['groupid']])) {
@@ -234,7 +243,7 @@ function get_accessible_groups_by_user($user_data, $perm, $perm_res = PERM_RES_I
 				$result[$group_data['groupid']] = $group_data;
 				break;
 			default:
-				$result[$group_data['groupid']] = $group_data["groupid"];
+				$result[$group_data['groupid']] = $group_data['groupid'];
 				break;
 		}
 	}
@@ -529,4 +538,26 @@ function get_accessible_nodes_by_rights(&$rights, $user_type, $perm, $perm_res =
 
 	return $result;
 }
+
+/**
+ * Returns array of user groups by $userId
+ *
+ * @param integer $userId
+ *
+ * @return array
+ */
+function getUserGroupsByUserId($userId) {
+	static $userGroups;
+
+	if (!isset($userGroups[$userId])) {
+		$userGroups[$userId] = array();
+
+		$result = DBselect('SELECT usrgrpid FROM users_groups WHERE userid='.$userId);
+		while ($row = DBfetch($result)) {
+			$userGroups[$userId][] = $row['usrgrpid'];
+		}
+	}
+	return $userGroups[$userId];
+}
+
 ?>

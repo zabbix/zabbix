@@ -368,6 +368,7 @@ elseif (isset($_REQUEST['save']) && $_REQUEST['form_hostid'] > 0) {
 	}
 
 	DBstart();
+	$result = true;
 
 	if (!zbx_empty($_REQUEST['new_application'])) {
 		$new_appid = API::Application()->create(array(
@@ -378,67 +379,77 @@ elseif (isset($_REQUEST['save']) && $_REQUEST['form_hostid'] > 0) {
 			$new_appid = reset($new_appid['applicationids']);
 			$applications[$new_appid] = $new_appid;
 		}
-	}
-
-	$item = array(
-		'name' => get_request('name'),
-		'description' => get_request('description'),
-		'key_' => get_request('key'),
-		'hostid' => get_request('form_hostid'),
-		'interfaceid' => get_request('interfaceid', 0),
-		'delay' => get_request('delay'),
-		'history' => get_request('history'),
-		'status' => get_request('status'),
-		'type' => get_request('type'),
-		'snmp_community' => get_request('snmp_community'),
-		'snmp_oid' => get_request('snmp_oid'),
-		'value_type' => get_request('value_type'),
-		'trapper_hosts' => get_request('trapper_hosts'),
-		'port' => get_request('port'),
-		'units' => get_request('units'),
-		'multiplier' => get_request('multiplier', 0),
-		'delta' => get_request('delta'),
-		'snmpv3_securityname' => get_request('snmpv3_securityname'),
-		'snmpv3_securitylevel' => get_request('snmpv3_securitylevel'),
-		'snmpv3_authpassphrase' => get_request('snmpv3_authpassphrase'),
-		'snmpv3_privpassphrase' => get_request('snmpv3_privpassphrase'),
-		'formula' => get_request('formula'),
-		'trends' => get_request('trends'),
-		'logtimefmt' => get_request('logtimefmt'),
-		'valuemapid' => get_request('valuemapid'),
-		'delay_flex' => $db_delay_flex,
-		'authtype' => get_request('authtype'),
-		'username' => get_request('username'),
-		'password' => get_request('password'),
-		'publickey' => get_request('publickey'),
-		'privatekey' => get_request('privatekey'),
-		'params' => get_request('params'),
-		'ipmi_sensor' => get_request('ipmi_sensor'),
-		'data_type' => get_request('data_type'),
-		'applications' => $applications,
-		'inventory_link' => get_request('inventory_link')
-	);
-
-	if (isset($_REQUEST['itemid'])) {
-		$db_item = get_item_by_itemid_limited($_REQUEST['itemid']);
-		$db_item['applications'] = get_applications_by_itemid($_REQUEST['itemid']);
-
-		foreach ($item as $field => $value) {
-			if ($item[$field] == $db_item[$field]) {
-				unset($item[$field]);
-			}
+		else {
+			$result = false;
 		}
-		$item['itemid'] = $_REQUEST['itemid'];
-		$result = API::Item()->update($item);
-
-		show_messages($result, _('Item updated'), _('Cannot update item'));
 	}
-	else {
-		$result = API::Item()->create($item);
-		show_messages($result, _('Item added'), _('Cannot add item'));
+
+	if ($result) {
+		$item = array(
+			'name' => get_request('name'),
+			'description' => get_request('description'),
+			'key_' => get_request('key'),
+			'hostid' => get_request('form_hostid'),
+			'interfaceid' => get_request('interfaceid', 0),
+			'delay' => get_request('delay'),
+			'history' => get_request('history'),
+			'status' => get_request('status'),
+			'type' => get_request('type'),
+			'snmp_community' => get_request('snmp_community'),
+			'snmp_oid' => get_request('snmp_oid'),
+			'value_type' => get_request('value_type'),
+			'trapper_hosts' => get_request('trapper_hosts'),
+			'port' => get_request('port'),
+			'units' => get_request('units'),
+			'multiplier' => get_request('multiplier', 0),
+			'delta' => get_request('delta'),
+			'snmpv3_securityname' => get_request('snmpv3_securityname'),
+			'snmpv3_securitylevel' => get_request('snmpv3_securitylevel'),
+			'snmpv3_authpassphrase' => get_request('snmpv3_authpassphrase'),
+			'snmpv3_privpassphrase' => get_request('snmpv3_privpassphrase'),
+			'formula' => get_request('formula'),
+			'trends' => get_request('trends'),
+			'logtimefmt' => get_request('logtimefmt'),
+			'valuemapid' => get_request('valuemapid'),
+			'delay_flex' => $db_delay_flex,
+			'authtype' => get_request('authtype'),
+			'username' => get_request('username'),
+			'password' => get_request('password'),
+			'publickey' => get_request('publickey'),
+			'privatekey' => get_request('privatekey'),
+			'params' => get_request('params'),
+			'ipmi_sensor' => get_request('ipmi_sensor'),
+			'data_type' => get_request('data_type'),
+			'applications' => $applications,
+			'inventory_link' => get_request('inventory_link')
+		);
+
+		if (isset($_REQUEST['itemid'])) {
+			$db_item = get_item_by_itemid_limited($_REQUEST['itemid']);
+			$db_item['applications'] = get_applications_by_itemid($_REQUEST['itemid']);
+
+			foreach ($item as $field => $value) {
+				if ($item[$field] == $db_item[$field]) {
+					unset($item[$field]);
+				}
+			}
+			$item['itemid'] = $_REQUEST['itemid'];
+			$result = API::Item()->update($item);
+		}
+		else {
+			$result = API::Item()->create($item);
+		}
 	}
 
 	$result = DBend($result);
+
+	if (isset($_REQUEST['itemid'])) {
+		show_messages($result, _('Item updated'), _('Cannot update item'));
+	}
+	else {
+		show_messages($result, _('Item added'), _('Cannot add item'));
+	}
+
 	if ($result) {
 		unset($_REQUEST['itemid'], $_REQUEST['form']);
 	}
@@ -580,7 +591,7 @@ elseif ($_REQUEST['go'] == 'copy_to' && isset($_REQUEST['copy']) && isset($_REQU
 				'SELECT DISTINCT h.hostid'.
 				' FROM hosts h,hosts_groups hg'.
 				' WHERE h.hostid=hg.hostid'.
-					' AND '.DBcondition('hg.groupid', $group_ids)
+					' AND '.dbConditionInt('hg.groupid', $group_ids)
 			);
 			while ($db_host = DBfetch($db_hosts)) {
 				$hosts_ids[] = $db_host['hostid'];
@@ -602,7 +613,7 @@ elseif ($_REQUEST['go'] == 'copy_to' && isset($_REQUEST['copy']) && isset($_REQU
 elseif ($_REQUEST['go'] == 'clean_history' && isset($_REQUEST['group_itemid'])) {
 	DBstart();
 	$go_result = delete_history_by_itemid($_REQUEST['group_itemid']);
-	DBexecute('UPDATE items SET lastvalue=null,lastclock=null,prevvalue=null WHERE '.DBcondition('itemid', $_REQUEST['group_itemid']));
+	DBexecute('UPDATE items SET lastvalue=null,lastclock=null,prevvalue=null WHERE '.dbConditionInt('itemid', $_REQUEST['group_itemid']));
 
 	foreach ($_REQUEST['group_itemid'] as $id) {
 		if (!$item = get_item_by_itemid($id)) {
@@ -617,6 +628,7 @@ elseif ($_REQUEST['go'] == 'clean_history' && isset($_REQUEST['group_itemid'])) 
 	show_messages($go_result, _('History cleared'), $go_result);
 }
 elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['group_itemid'])) {
+	DBstart();
 	$group_itemid = $_REQUEST['group_itemid'];
 
 	$itemsToDelete = API::Item()->get(array(
@@ -626,22 +638,17 @@ elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['group_itemid'])) {
 		'preservekeys' => true
 	));
 
-	$rs = API::Item()->delete($group_itemid);
+	$go_result = API::Item()->delete($group_itemid);
 
-	if ($rs) {
-		foreach ($rs['itemids'] as $itemId) {
-			$item = $itemsToDelete[$itemId];
+	if ($go_result) {
+		foreach ($itemsToDelete as $item) {
 			$host = reset($item['hosts']);
-
 			add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_ITEM, _('Item').' ['.$item['key_'].'] ['.$item['itemid'].'] '.
 				_('Host').' ['.$host['name'].']');
 		}
+	}
 
-		show_messages(true, _('Items deleted'));
-	}
-	else {
-		show_messages(false, null, _('Cannot delete items'));
-	}
+	show_messages(DBend($go_result), _('Items deleted'), _('Cannot delete items'));
 }
 if ($_REQUEST['go'] != 'none' && !empty($go_result)) {
 	$url = new CUrl();
@@ -803,7 +810,6 @@ else {
 
 	// items
 	$options = array(
-		'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)),
 		'search' => array(),
 		'output' => API_OUTPUT_EXTEND,
 		'editable' => true,
@@ -897,7 +903,7 @@ else {
 				'SELECT i.itemid,h.name,h.hostid'.
 				' FROM hosts h,items i'.
 				' WHERE i.hostid=h.hostid'.
-					' AND '.DBcondition('i.itemid', zbx_objectValues($data['items'], 'templateid'))
+					' AND '.dbConditionInt('i.itemid', zbx_objectValues($data['items'], 'templateid'))
 		);
 		while ($dbHostItem = DBfetch($dbHostItems)) {
 			foreach ($data['items'] as $itemid => $item) {
@@ -987,7 +993,6 @@ else {
 	}
 	$data['itemTriggers'] = API::Trigger()->get(array(
 		'triggerids' => $itemTriggerIds,
-		'expandDescription' => true,
 		'output' => API_OUTPUT_EXTEND,
 		'selectHosts' => array('hostid', 'name', 'host'),
 		'selectFunctions' => API_OUTPUT_EXTEND,

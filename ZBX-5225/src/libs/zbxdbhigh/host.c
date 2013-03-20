@@ -23,6 +23,12 @@
 #include "log.h"
 #include "dbcache.h"
 #include "zbxserver.h"
+#include "mutexs.h"
+
+#define LOCK_SERVICES	zbx_mutex_lock(&services_lock)
+#define UNLOCK_SERVICES	zbx_mutex_unlock(&services_lock)
+
+static ZBX_MUTEX	services_lock;
 
 /******************************************************************************
  *                                                                            *
@@ -36,7 +42,7 @@
  *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
- * Comments: !!! Don't forget sync code with PHP !!!                          *
+ * Comments: !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
  ******************************************************************************/
 static int	validate_linked_templates(zbx_vector_uint64_t *templateids, char *error, size_t max_error_len)
@@ -254,7 +260,7 @@ out:
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
- * Comments: !!! Don't forget sync code with PHP !!!                          *
+ * Comments: !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
  ******************************************************************************/
 static int	DBcmp_triggers(zbx_uint64_t triggerid1, const char *expression1,
@@ -317,7 +323,7 @@ static int	DBcmp_triggers(zbx_uint64_t triggerid1, const char *expression1,
  *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
- * Comments: !!! Don't forget sync code with PHP !!!                          *
+ * Comments: !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
  ******************************************************************************/
 static int	validate_inventory_links(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids,
@@ -456,7 +462,7 @@ void	DBget_graphitems(const char *sql, ZBX_GRAPH_ITEMS **gitems, size_t *gitems_
  *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
- * Comments: !!! Don't forget sync code with PHP !!!                          *
+ * Comments: !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
  ******************************************************************************/
 static int	DBcmp_graphitems(ZBX_GRAPH_ITEMS *gitems1, int gitems1_num,
@@ -494,7 +500,7 @@ clean:
  *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
- * Comments: !!! Don't forget sync code with PHP !!!                          *
+ * Comments: !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
  ******************************************************************************/
 static int	validate_host(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids,
@@ -697,7 +703,7 @@ out:
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
- * Comments: !!! Don't forget sync code with PHP !!!                          *
+ * Comments: !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
  ******************************************************************************/
 static void	DBclear_parents_from_trigger()
@@ -731,7 +737,7 @@ static void	DBclear_parents_from_trigger()
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
- * Comments: !!! Don't forget sync code with PHP !!!                          *
+ * Comments: !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
  ******************************************************************************/
 static int	DBget_service_status(zbx_uint64_t serviceid, int algorithm, zbx_uint64_t triggerid)
@@ -847,7 +853,7 @@ static void	DBadd_service_alarm(zbx_uint64_t serviceid, int status, int clock)
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
  * Comments: recursive function                                               *
- *           !!! Don't forget sync code with PHP !!!                          *
+ *           !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
  ******************************************************************************/
 static void	DBupdate_services_rec(zbx_uint64_t serviceid, int clock)
@@ -901,7 +907,7 @@ static void	DBupdate_services_rec(zbx_uint64_t serviceid, int clock)
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
- * Comments: !!! Don't forget sync code with PHP !!!                          *
+ * Comments: !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
  ******************************************************************************/
 static void	DBupdate_services_status_all()
@@ -965,7 +971,7 @@ static void	DBupdate_services_status_all()
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
- * Comments: !!! Don't forget sync code with PHP !!!                          *
+ * Comments: !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
  ******************************************************************************/
 void	DBupdate_services(zbx_uint64_t triggerid, int status, int clock)
@@ -976,6 +982,8 @@ void	DBupdate_services(zbx_uint64_t triggerid, int status, int clock)
 
 	result = DBselect("select serviceid from services where triggerid=" ZBX_FS_UI64, triggerid);
 
+	LOCK_SERVICES;
+
 	while (NULL != (row = DBfetch(result)))
 	{
 		ZBX_STR2UINT64(serviceid, row[0]);
@@ -985,6 +993,8 @@ void	DBupdate_services(zbx_uint64_t triggerid, int status, int clock)
 		DBadd_service_alarm(serviceid, status, clock);
 		DBupdate_services_rec(serviceid, clock);
 	}
+
+	UNLOCK_SERVICES;
 
 	DBfree_result(result);
 }
@@ -1000,7 +1010,7 @@ void	DBupdate_services(zbx_uint64_t triggerid, int status, int clock)
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
- * Comments: !!! Don't forget sync code with PHP !!!                          *
+ * Comments: !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
  ******************************************************************************/
 static void	DBdelete_services_by_triggerids(zbx_uint64_t *triggerids, int triggerids_num)
@@ -1033,7 +1043,7 @@ static void	DBdelete_services_by_triggerids(zbx_uint64_t *triggerids, int trigge
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
- * Comments: !!! Don't forget sync code with PHP !!!                          *
+ * Comments: !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
  ******************************************************************************/
 static void	DBdelete_sysmaps_elements(int elementtype, zbx_uint64_t *elementids, int elementids_num)
@@ -1072,7 +1082,7 @@ static void DBdelete_action_conditions(int conditiontype, zbx_uint64_t elementid
 	DB_RESULT	result;
 	DB_ROW		row;
 
-/* disable actions */
+	/* disable actions */
 	result = DBselect("select distinct actionid from conditions where conditiontype=%d and value='" ZBX_FS_UI64 "'",
 			conditiontype, elementid);
 
@@ -1081,7 +1091,7 @@ static void DBdelete_action_conditions(int conditiontype, zbx_uint64_t elementid
 
 	DBfree_result(result);
 
-/* delete action conditions */
+	/* delete action conditions */
 	DBexecute("delete from conditions where conditiontype=%d and value='" ZBX_FS_UI64 "'",
 			conditiontype, elementid);
 }
@@ -1092,15 +1102,10 @@ static void DBdelete_action_conditions(int conditiontype, zbx_uint64_t elementid
  *                                                                            *
  * Purpose: delete trigger from database                                      *
  *                                                                            *
- * Parameters: triggerids     - [IN] trigger identificators from database     *
- *             triggerids_num - [IN] number of triggers                       *
- *                                                                            *
- * Author: Eugene Grigorjev                                                   *
- *                                                                            *
- * Comments: !!! Don't forget sync code with PHP !!!                          *
+ * Parameters: triggerids - [IN] trigger identificators from database         *
  *                                                                            *
  ******************************************************************************/
-static void	DBdelete_triggers(zbx_uint64_t **triggerids, int *triggerids_alloc, int *triggerids_num)
+void	DBdelete_triggers(zbx_vector_uint64_t *triggerids)
 {
 	char		*sql = NULL;
 	size_t		sql_alloc = 256, sql_offset;
@@ -1109,37 +1114,42 @@ static void	DBdelete_triggers(zbx_uint64_t **triggerids, int *triggerids_alloc, 
 	DB_ROW		row;
 	zbx_uint64_t	triggerid;
 
-	if (0 == *triggerids_num)
+	if (0 == triggerids->values_num)
 		return;
 
 	sql = zbx_malloc(sql, sql_alloc);
 
-	do /* add child triggers (auto-created) */
+	/* add child triggers (auto-created) */
+	do
 	{
-		num = *triggerids_num;
+		num = triggerids->values_num;
 		sql_offset = 0;
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
 				"select triggerid"
 				" from trigger_discovery"
 				" where");
-		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "parent_triggerid", *triggerids, *triggerids_num);
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "parent_triggerid",
+				triggerids->values, triggerids->values_num);
 
 		result = DBselect("%s", sql);
 
 		while (NULL != (row = DBfetch(result)))
 		{
 			ZBX_STR2UINT64(triggerid, row[0]);
-			uint64_array_add(triggerids, triggerids_alloc, triggerids_num, triggerid, 64);
+			zbx_vector_uint64_append(triggerids, triggerid);
 		}
 		DBfree_result(result);
+
+		zbx_vector_uint64_sort(triggerids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+		zbx_vector_uint64_uniq(triggerids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 	}
-	while (num != *triggerids_num);
+	while (num != triggerids->values_num);
 
-	DBdelete_services_by_triggerids(*triggerids, *triggerids_num);
-	DBdelete_sysmaps_elements(SYSMAP_ELEMENT_TYPE_TRIGGER, *triggerids, *triggerids_num);
+	DBdelete_services_by_triggerids(triggerids->values, triggerids->values_num);
+	DBdelete_sysmaps_elements(SYSMAP_ELEMENT_TYPE_TRIGGER, triggerids->values, triggerids->values_num);
 
-	for (i = 0; i < *triggerids_num; i++)
-		DBdelete_action_conditions(CONDITION_TYPE_TRIGGER, (*triggerids)[i]);
+	for (i = 0; i < triggerids->values_num; i++)
+		DBdelete_action_conditions(CONDITION_TYPE_TRIGGER, triggerids->values[i]);
 
 	sql_offset = 0;
 	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
@@ -1150,13 +1160,21 @@ static void	DBdelete_triggers(zbx_uint64_t **triggerids, int *triggerids_alloc, 
 				" and object=%d"
 				" and",
 			EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER);
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "objectid", *triggerids, *triggerids_num);
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "objectid", triggerids->values, triggerids->values_num);
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
+
+	/* delete from profiles */
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
+			"delete from profiles"
+			" where idx='web.events.filter.triggerid'"
+				" and");
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "value_id", triggerids->values, triggerids->values_num);
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
 
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
 			"delete from triggers"
 			" where");
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "triggerid", *triggerids, *triggerids_num);
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "triggerid", triggerids->values, triggerids->values_num);
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
 
 	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
@@ -1176,18 +1194,19 @@ static void	DBdelete_triggers(zbx_uint64_t **triggerids, int *triggerids_alloc, 
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
- * Comments: !!! Don't forget sync code with PHP !!!                          *
+ * Comments: !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
  ******************************************************************************/
 static void	DBdelete_triggers_by_itemids(zbx_vector_uint64_t *itemids)
 {
-	const char	*__function_name = "DBdelete_triggers_by_itemids";
-	DB_RESULT	result;
-	DB_ROW		row;
-	zbx_uint64_t	*triggerids = NULL, triggerid;
-	int		triggerids_alloc = 0, triggerids_num = 0;
-	char		*sql = NULL;
-	size_t		sql_alloc = 512, sql_offset = 0;
+	const char		*__function_name = "DBdelete_triggers_by_itemids";
+
+	char			*sql = NULL;
+	size_t			sql_alloc = 512, sql_offset = 0;
+	DB_RESULT		result;
+	DB_ROW			row;
+	zbx_uint64_t		triggerid;
+	zbx_vector_uint64_t	triggerids;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() values_num:%d", __function_name, itemids->values_num);
 
@@ -1195,6 +1214,7 @@ static void	DBdelete_triggers_by_itemids(zbx_vector_uint64_t *itemids)
 		goto out;
 
 	sql = zbx_malloc(sql, sql_alloc);
+	zbx_vector_uint64_create(&triggerids);
 
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
 			"select distinct triggerid"
@@ -1207,13 +1227,14 @@ static void	DBdelete_triggers_by_itemids(zbx_vector_uint64_t *itemids)
 	while (NULL != (row = DBfetch(result)))
 	{
 		ZBX_STR2UINT64(triggerid, row[0]);
-		uint64_array_add(&triggerids, &triggerids_alloc, &triggerids_num, triggerid, 64);
+		zbx_vector_uint64_append(&triggerids, triggerid);
 	}
 	DBfree_result(result);
 
-	DBdelete_triggers(&triggerids, &triggerids_alloc, &triggerids_num);
+	zbx_vector_uint64_sort(&triggerids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	DBdelete_triggers(&triggerids);
 
-	zbx_free(triggerids);
+	zbx_vector_uint64_destroy(&triggerids);
 	zbx_free(sql);
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
@@ -1229,7 +1250,7 @@ out:
  *                                                                            *
  * Author: Eugene Grigorjev, Alexander Vladishev                              *
  *                                                                            *
- * Comments: !!! Don't forget sync code with PHP !!!                          *
+ * Comments: !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
  ******************************************************************************/
 static void	DBdelete_history_by_itemids(zbx_vector_uint64_t *itemids)
@@ -1240,11 +1261,6 @@ static void	DBdelete_history_by_itemids(zbx_vector_uint64_t *itemids)
 	int		i, j;
 	zbx_uint64_t	housekeeperid;
 	const char	*ins_housekeeper_sql = "insert into housekeeper (housekeeperid,tablename,field,value) values ";
-#ifdef HAVE_MULTIROW_INSERT
-	const char	*row_dl = ",";
-#else
-	const char	*row_dl = ";\n";
-#endif
 #define	ZBX_HISTORY_TABLES_COUNT	7
 	const char	*tables[ZBX_HISTORY_TABLES_COUNT] = {"history", "history_str", "history_uint", "history_log",
 			"history_text", "trends", "trends_uint"};
@@ -1257,6 +1273,7 @@ static void	DBdelete_history_by_itemids(zbx_vector_uint64_t *itemids)
 	housekeeperid = DBget_maxid_num("housekeeper", ZBX_HISTORY_TABLES_COUNT * itemids->values_num);
 
 	sql = zbx_malloc(sql, sql_alloc);
+
 	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 #ifdef HAVE_MULTIROW_INSERT
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ins_housekeeper_sql);
@@ -1269,21 +1286,17 @@ static void	DBdelete_history_by_itemids(zbx_vector_uint64_t *itemids)
 			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ins_housekeeper_sql);
 #endif
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-					"(" ZBX_FS_UI64 ",'%s','itemid'," ZBX_FS_UI64 ")%s",
-					housekeeperid++, tables[j], itemids->values[i], row_dl);
+					"(" ZBX_FS_UI64 ",'%s','itemid'," ZBX_FS_UI64 ")" ZBX_ROW_DL,
+					housekeeperid++, tables[j], itemids->values[i]);
 		}
 	}
 
-	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-	if (sql_offset > 16)	/* In ORACLE always present begin..end; */
-	{
 #ifdef HAVE_MULTIROW_INSERT
-		sql_offset--;
-		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
+	sql_offset--;
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
 #endif
-		DBexecute("%s", sql);
-	}
+	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+	DBexecute("%s", sql);
 
 	zbx_free(sql);
 
@@ -1298,16 +1311,11 @@ static void	DBdelete_history_by_itemids(zbx_vector_uint64_t *itemids)
  *                                                                            *
  * Parameters: graphids - [IN] array of graph id's from database              *
  *                                                                            *
- * Return value: upon successful completion return SUCCEED                    *
- *                                                                            *
- * Author: Eugene Grigorjev, Alexander Vladishev                              *
- *                                                                            *
- * Comments: !!! Don't forget sync code with PHP !!!                          *
- *                                                                            *
  ******************************************************************************/
-static void	DBdelete_graphs(zbx_vector_uint64_t *graphids)
+void	DBdelete_graphs(zbx_vector_uint64_t *graphids)
 {
 	const char	*__function_name = "DBdelete_graphs";
+
 	char		*sql = NULL;
 	size_t		sql_alloc = 256, sql_offset;
 	int		num;
@@ -1463,14 +1471,11 @@ out:
  *                                                                            *
  * Parameters: itemids - [IN] array of item identificators from database      *
  *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments: !!! Don't forget sync code with PHP !!!                          *
- *                                                                            *
  ******************************************************************************/
 void	DBdelete_items(zbx_vector_uint64_t *itemids)
 {
 	const char	*__function_name = "DBdelete_items";
+
 	char		*sql = NULL;
 	size_t		sql_alloc = 256, sql_offset;
 	int		num;
@@ -1560,7 +1565,7 @@ out:
  *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
- * Comments: !!! Don't forget sync code with PHP !!!                          *
+ * Comments: !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
  ******************************************************************************/
 static void	DBdelete_httptests(zbx_vector_uint64_t *htids)
@@ -1660,7 +1665,7 @@ out:
  *                                                                            *
  * Author: Eugene Grigorjev, Alexander Vladishev                              *
  *                                                                            *
- * Comments: !!! Don't forget sync code with PHP !!!                          *
+ * Comments: !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
  ******************************************************************************/
 static void	DBdelete_applications(zbx_uint64_t *applicationids, int applicationids_num)
@@ -1734,7 +1739,7 @@ static void	DBdelete_applications(zbx_uint64_t *applicationids, int applicationi
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
- * Comments: !!! Don't forget sync code with PHP !!!                          *
+ * Comments: !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
  ******************************************************************************/
 static void	DBdelete_template_graphs(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids)
@@ -1792,23 +1797,24 @@ static void	DBdelete_template_graphs(zbx_uint64_t hostid, zbx_vector_uint64_t *t
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
- * Comments: !!! Don't forget sync code with PHP !!!                          *
+ * Comments: !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
  ******************************************************************************/
 static void	DBdelete_template_triggers(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids)
 {
-	const char	*__function_name = "DBdelete_template_triggers";
+	const char		*__function_name = "DBdelete_template_triggers";
 
-	char		*sql = NULL;
-	size_t		sql_alloc = 256, sql_offset = 0;
-	DB_RESULT	result;
-	DB_ROW		row;
-	zbx_uint64_t	*triggerids = NULL, triggerid;
-	int		triggerids_alloc = 0, triggerids_num = 0;
+	char			*sql = NULL;
+	size_t			sql_alloc = 256, sql_offset = 0;
+	DB_RESULT		result;
+	DB_ROW			row;
+	zbx_uint64_t		triggerid;
+	zbx_vector_uint64_t	triggerids;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	sql = zbx_malloc(sql, sql_alloc);
+	zbx_vector_uint64_create(&triggerids);
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 			"select distinct f.triggerid"
@@ -1825,13 +1831,14 @@ static void	DBdelete_template_triggers(zbx_uint64_t hostid, zbx_vector_uint64_t 
 	while (NULL != (row = DBfetch(result)))
 	{
 		ZBX_STR2UINT64(triggerid, row[0]);
-		uint64_array_add(&triggerids, &triggerids_alloc, &triggerids_num, triggerid, 64);
+		zbx_vector_uint64_append(&triggerids, triggerid);
 	}
 	DBfree_result(result);
 
-	DBdelete_triggers(&triggerids, &triggerids_alloc, &triggerids_num);
+	zbx_vector_uint64_sort(&triggerids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	DBdelete_triggers(&triggerids);
 
-	zbx_free(triggerids);
+	zbx_vector_uint64_destroy(&triggerids);
 	zbx_free(sql);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
@@ -1848,7 +1855,7 @@ static void	DBdelete_template_triggers(zbx_uint64_t hostid, zbx_vector_uint64_t 
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
- * Comments: !!! Don't forget sync code with PHP !!!                          *
+ * Comments: !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
  ******************************************************************************/
 static void	DBdelete_template_items(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids)
@@ -1905,7 +1912,7 @@ static void	DBdelete_template_items(zbx_uint64_t hostid, zbx_vector_uint64_t *te
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
- * Comments: !!! Don't forget sync code with PHP !!!                          *
+ * Comments: !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
  ******************************************************************************/
 static void	DBdelete_template_applications(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids)
@@ -1970,7 +1977,7 @@ static void	DBdelete_template_applications(zbx_uint64_t hostid, zbx_vector_uint6
  *                                                                            *
  * Author: Eugene Grigorjev, Alexander Vladishev                              *
  *                                                                            *
- * Comments: !!! Don't forget sync code with PHP !!!                          *
+ * Comments: !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
  ******************************************************************************/
 static int	DBcopy_trigger_to_host(zbx_uint64_t *new_triggerid, zbx_uint64_t hostid,
@@ -2148,7 +2155,7 @@ static int	DBcopy_trigger_to_host(zbx_uint64_t *new_triggerid, zbx_uint64_t host
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
- * Comments: !!! Don't forget sync code with PHP !!!                          *
+ * Comments: !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
  ******************************************************************************/
 static int	DBadd_template_dependencies_for_new_triggers(zbx_uint64_t *trids, int trids_num)
@@ -2299,7 +2306,7 @@ static void	get_templates_by_hostid(zbx_uint64_t hostid, zbx_vector_uint64_t *te
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
- * Comments: !!! Don't forget sync code with PHP !!!                          *
+ * Comments: !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
  ******************************************************************************/
 int	DBdelete_template_elements(zbx_uint64_t hostid, zbx_vector_uint64_t *del_templateids)
@@ -2376,7 +2383,7 @@ clean:
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
- * Comments: !!! Don't forget sync code with PHP !!!                          *
+ * Comments: !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
  ******************************************************************************/
 static void	DBcopy_template_applications(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids)
@@ -2441,17 +2448,12 @@ static void	DBcopy_template_applications(zbx_uint64_t hostid, zbx_vector_uint64_
 
 	if (0 != app_num)
 	{
-		zbx_uint64_t	applicationid;
+		zbx_uint64_t	applicationid = 0;
 		int		i, new_applications = app_num;
 		const char	*ins_applications_sql =
 				"insert into applications"
 				" (applicationid,hostid,name,templateid)"
 				" values ";
-#ifdef HAVE_MULTIROW_INSERT
-		const char	*row_dl = ",";
-#else
-		const char	*row_dl = ";\n";
-#endif
 
 		sql_offset = 0;
 		DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
@@ -2487,8 +2489,8 @@ static void	DBcopy_template_applications(zbx_uint64_t hostid, zbx_vector_uint64_
 			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ins_applications_sql);
 #endif
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-					"(" ZBX_FS_UI64 "," ZBX_FS_UI64 ",'%s'," ZBX_FS_UI64 ")%s",
-					applicationid++, hostid, app[i].name_esc, app[i].templateid, row_dl);
+					"(" ZBX_FS_UI64 "," ZBX_FS_UI64 ",'%s'," ZBX_FS_UI64 ")" ZBX_ROW_DL,
+					applicationid++, hostid, app[i].name_esc, app[i].templateid);
 
 			zbx_free(app[i].name_esc);
 		}
@@ -2512,7 +2514,7 @@ static void	DBcopy_template_applications(zbx_uint64_t hostid, zbx_vector_uint64_
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
-/* Auxiliary function for DBcopy_template_items() */
+/* auxiliary function for DBcopy_template_items() */
 static void	DBget_interfaces_by_hostid(zbx_uint64_t hostid, zbx_uint64_t *interfaceids)
 {
 	DB_RESULT	result;
@@ -2546,7 +2548,7 @@ static void	DBget_interfaces_by_hostid(zbx_uint64_t hostid, zbx_uint64_t *interf
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
- * Comments: !!! Don't forget sync code with PHP !!!                          *
+ * Comments: !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
  ******************************************************************************/
 static void	DBcopy_template_items(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids)
@@ -2577,6 +2579,7 @@ static void	DBcopy_template_items(zbx_uint64_t hostid, zbx_vector_uint64_t *temp
 		char		*privatekey_esc;
 		char		*filter_esc;
 		char		*description_esc;
+		char		*lifetime_esc;
 		int		delay;
 		int		history;
 		int		trends;
@@ -2635,7 +2638,8 @@ static void	DBcopy_template_items(zbx_uint64_t hostid, zbx_vector_uint64_t *temp
 				"ti.formula,ti.logtimefmt,ti.valuemapid,ti.params,ti.ipmi_sensor,ti.snmp_community,"
 				"ti.snmp_oid,ti.snmpv3_securityname,ti.snmpv3_securitylevel,ti.snmpv3_authpassphrase,"
 				"ti.snmpv3_privpassphrase,ti.authtype,ti.username,ti.password,ti.publickey,"
-				"ti.privatekey,ti.flags,ti.filter,ti.description,ti.inventory_link,hi.itemid"
+				"ti.privatekey,ti.flags,ti.filter,ti.description,ti.inventory_link,ti.lifetime,"
+				"hi.itemid"
 			" from items ti"
 			" left join items hi on hi.key_=ti.key_"
 				" and hi.hostid=" ZBX_FS_UI64
@@ -2690,6 +2694,7 @@ static void	DBcopy_template_items(zbx_uint64_t hostid, zbx_vector_uint64_t *temp
 		item[item_num].filter_esc = DBdyn_escape_string(row[32]);
 		item[item_num].description_esc = DBdyn_escape_string(row[33]);
 		item[item_num].inventory_link = (unsigned char)atoi(row[34]);
+		item[item_num].lifetime_esc = DBdyn_escape_string(row[35]);
 
 		switch (interface_type = get_interface_type_by_item_type(item[item_num].type))
 		{
@@ -2708,10 +2713,10 @@ static void	DBcopy_template_items(zbx_uint64_t hostid, zbx_vector_uint64_t *temp
 				item[item_num].interfaceid = interfaceids[interface_type - 1];
 		}
 
-		if (SUCCEED != (DBis_null(row[35])))
+		if (SUCCEED != DBis_null(row[36]))
 		{
 			item[item_num].key_esc = NULL;
-			ZBX_STR2UINT64(item[item_num].itemid, row[35]);
+			ZBX_STR2UINT64(item[item_num].itemid, row[36]);
 		}
 		else
 		{
@@ -2734,17 +2739,12 @@ static void	DBcopy_template_items(zbx_uint64_t hostid, zbx_vector_uint64_t *temp
 					"params,ipmi_sensor,snmp_community,snmp_oid,snmpv3_securityname,"
 					"snmpv3_securitylevel,snmpv3_authpassphrase,snmpv3_privpassphrase,authtype,"
 					"username,password,publickey,privatekey,templateid,flags,filter,description,"
-					"inventory_link,interfaceid)"
+					"inventory_link,interfaceid,lifetime)"
 				" values ";
 		zbx_uint64_t	*itemids = NULL, *protoids = NULL;
 		size_t		itemids_num = 0, protoids_num = 0;
 		zbx_itemapp_t	*itemapp = NULL;
 		size_t		itemapp_alloc = 0, itemapp_num = 0;
-#ifdef HAVE_MULTIROW_INSERT
-		const char	*row_dl = ",";
-#else
-		const char	*row_dl = ";\n";
-#endif
 
 		itemids = zbx_malloc(itemids, item_num * sizeof(zbx_uint64_t));
 
@@ -2794,7 +2794,8 @@ static void	DBcopy_template_items(zbx_uint64_t hostid, zbx_vector_uint64_t *temp
 						"filter='%s',"
 						"description='%s',"
 						"inventory_link=%d,"
-						"interfaceid=%s"
+						"interfaceid=%s,"
+						"lifetime='%s'"
 					" where itemid=" ZBX_FS_UI64 ";\n",
 					item[i].name_esc, (int)item[i].type, (int)item[i].value_type,
 					(int)item[i].data_type, item[i].delay, item[i].delay_flex_esc,
@@ -2807,7 +2808,8 @@ static void	DBcopy_template_items(zbx_uint64_t hostid, zbx_vector_uint64_t *temp
 					(int)item[i].authtype, item[i].username_esc, item[i].password_esc,
 					item[i].publickey_esc, item[i].privatekey_esc, item[i].templateid,
 					(int)item[i].flags, item[i].filter_esc, item[i].description_esc,
-					(int)item[i].inventory_link, DBsql_id_ins(item[i].interfaceid), item[i].itemid);
+					(int)item[i].inventory_link, DBsql_id_ins(item[i].interfaceid),
+					item[i].lifetime_esc, item[i].itemid);
 
 			new_items--;
 		}
@@ -2834,7 +2836,7 @@ static void	DBcopy_template_items(zbx_uint64_t hostid, zbx_vector_uint64_t *temp
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 					"(" ZBX_FS_UI64 ",'%s','%s'," ZBX_FS_UI64 ",%d,%d,%d,%d,'%s',%d,%d,%d,'%s',"
 						"'%s',%d,%d,'%s','%s',%s,'%s','%s','%s','%s','%s',%d,'%s','%s',%d,'%s',"
-						"'%s','%s','%s'," ZBX_FS_UI64 ",%d,'%s','%s',%d,%s)%s",
+						"'%s','%s','%s'," ZBX_FS_UI64 ",%d,'%s','%s',%d,%s,'%s')" ZBX_ROW_DL,
 					itemid, item[i].name_esc, item[i].key_esc, hostid, (int)item[i].type,
 					(int)item[i].value_type, (int)item[i].data_type, item[i].delay,
 					item[i].delay_flex_esc, item[i].history, item[i].trends, (int)item[i].status,
@@ -2847,7 +2849,8 @@ static void	DBcopy_template_items(zbx_uint64_t hostid, zbx_vector_uint64_t *temp
 					(int)item[i].authtype, item[i].username_esc, item[i].password_esc,
 					item[i].publickey_esc, item[i].privatekey_esc, item[i].templateid,
 					(int)item[i].flags, item[i].filter_esc, item[i].description_esc,
-					(int)item[i].inventory_link, DBsql_id_ins(item[i].interfaceid), row_dl);
+					(int)item[i].inventory_link, DBsql_id_ins(item[i].interfaceid),
+					item[i].lifetime_esc);
 
 			zbx_free(item[i].key_esc);
 
@@ -2870,6 +2873,7 @@ static void	DBcopy_template_items(zbx_uint64_t hostid, zbx_vector_uint64_t *temp
 
 		for (i = 0; i < item_num; i++)
 		{
+			zbx_free(item[i].lifetime_esc);
 			zbx_free(item[i].description_esc);
 			zbx_free(item[i].filter_esc);
 			zbx_free(item[i].privatekey_esc);
@@ -2948,8 +2952,8 @@ static void	DBcopy_template_items(zbx_uint64_t hostid, zbx_vector_uint64_t *temp
 				zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ins_itemapps_sql);
 #endif
 				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-						"(" ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 ")%s",
-						itemappid++, itemapp[i].itemid, itemapp[i].applicationid, row_dl);
+						"(" ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 ")" ZBX_ROW_DL,
+						itemappid++, itemapp[i].itemid, itemapp[i].applicationid);
 			}
 
 #ifdef HAVE_MULTIROW_INSERT
@@ -3017,9 +3021,8 @@ static void	DBcopy_template_items(zbx_uint64_t hostid, zbx_vector_uint64_t *temp
 					zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ins_item_discovery_sql);
 #endif
 					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-							"(" ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 ")%s",
-							itemdiscoveryid++, proto[i].itemid, proto[i].parent_itemid,
-							row_dl);
+							"(" ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 ")" ZBX_ROW_DL,
+							itemdiscoveryid++, proto[i].itemid, proto[i].parent_itemid);
 				}
 
 #ifdef HAVE_MULTIROW_INSERT
@@ -3055,7 +3058,7 @@ static void	DBcopy_template_items(zbx_uint64_t hostid, zbx_vector_uint64_t *temp
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
- * Comments: !!! Don't forget sync code with PHP !!!                          *
+ * Comments: !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
  ******************************************************************************/
 static int	DBcopy_template_triggers(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids)
@@ -3130,7 +3133,7 @@ static int	DBcopy_template_triggers(zbx_uint64_t hostid, zbx_vector_uint64_t *te
  *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
- * Comments: !!! Don't forget sync code with PHP !!!                          *
+ * Comments: !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
  ******************************************************************************/
 static zbx_uint64_t	DBget_same_itemid(zbx_uint64_t hostid, zbx_uint64_t titemid)
@@ -3176,7 +3179,7 @@ static zbx_uint64_t	DBget_same_itemid(zbx_uint64_t hostid, zbx_uint64_t titemid)
  *                                                                            *
  * Author: Eugene Grigorjev, Alexander Vladishev                              *
  *                                                                            *
- * Comments: !!! Don't forget sync code with PHP !!!                          *
+ * Comments: !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
  ******************************************************************************/
 static int	DBcopy_graph_to_host(zbx_uint64_t hostid, zbx_uint64_t graphid,
@@ -3390,7 +3393,7 @@ static int	DBcopy_graph_to_host(zbx_uint64_t hostid, zbx_uint64_t graphid,
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
- * Comments: !!! Don't forget sync code with PHP !!!                          *
+ * Comments: !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
  ******************************************************************************/
 static int	DBcopy_template_graphs(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids)
@@ -3468,7 +3471,7 @@ static int	DBcopy_template_graphs(zbx_uint64_t hostid, zbx_vector_uint64_t *temp
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
- * Comments: !!! Don't forget sync code with PHP !!!                          *
+ * Comments: !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
  ******************************************************************************/
 int	DBcopy_template_elements(zbx_uint64_t hostid, zbx_vector_uint64_t *lnk_templateids)
@@ -3546,7 +3549,7 @@ clean:
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
- * Comments: !!! Don't forget sync code with PHP !!!                          *
+ * Comments: !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
  ******************************************************************************/
 void	DBdelete_host(zbx_uint64_t hostid)
@@ -3674,7 +3677,7 @@ zbx_uint64_t	DBadd_interface(zbx_uint64_t hostid, unsigned char type,
 
 		zbx_free(tmp);
 		tmp = strdup(row[4]);
-		substitute_simple_macros(NULL, &hostid, NULL, NULL,
+		substitute_simple_macros(NULL, NULL, &hostid, NULL, NULL, NULL,
 				&tmp, MACRO_TYPE_INTERFACE_PORT, NULL, 0);
 		if (FAIL == is_ushort(tmp, &db_port) || db_port != port)
 			continue;
@@ -3706,4 +3709,18 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():" ZBX_FS_UI64, __function_name, interfaceid);
 
 	return interfaceid;
+}
+
+void	zbx_create_services_lock()
+{
+	if (ZBX_MUTEX_ERROR == zbx_mutex_create_force(&services_lock, ZBX_MUTEX_SERVICES))
+	{
+		zbx_error("cannot create mutex for IT services");
+		exit(FAIL);
+	}
+}
+
+void	zbx_destroy_services_lock()
+{
+	zbx_mutex_destroy(&services_lock);
 }

@@ -23,7 +23,7 @@
 
 static ALIAS	*aliasList = NULL;
 
-int	add_alias(const char *name, const char *value)
+void	add_alias(const char *name, const char *value)
 {
 	ALIAS	*alias = NULL;
 
@@ -45,7 +45,7 @@ int	add_alias(const char *name, const char *value)
 			aliasList = alias;
 
 			zabbix_log(LOG_LEVEL_DEBUG, "Alias added: \"%s\" -> \"%s\"", name, value);
-			return SUCCEED;
+			break;
 		}
 
 		/* treat duplicate Alias as error */
@@ -55,10 +55,6 @@ int	add_alias(const char *name, const char *value)
 			exit(FAIL);
 		}
 	}
-
-	zabbix_log(LOG_LEVEL_WARNING, "Alias handling FAILED: \"%s\" -> \"%s\"", name, value);
-
-	return FAIL;
 }
 
 void	alias_list_free()

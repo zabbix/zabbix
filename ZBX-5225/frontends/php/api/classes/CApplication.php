@@ -94,27 +94,21 @@ class CApplication extends CZBXAPI {
 		$options = zbx_array_merge($defOptions, $options);
 
 		// editable + PERMISSION CHECK
-		if (USER_TYPE_SUPER_ADMIN == $userType || $options['nopermissions']) {
-		}
-		else {
+		if ($userType != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
 			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ_ONLY;
 
-			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
-			$sqlParts['from']['rights'] = 'rights r';
-			$sqlParts['from']['users_groups'] = 'users_groups ug';
-			$sqlParts['where'][] = 'hg.hostid=a.hostid';
-			$sqlParts['where'][] = 'r.id=hg.groupid ';
-			$sqlParts['where'][] = 'r.groupid=ug.usrgrpid';
-			$sqlParts['where'][] = 'ug.userid='.$userid;
-			$sqlParts['where'][] = 'r.permission>='.$permission;
-			$sqlParts['where'][] = 'NOT EXISTS('.
-								' SELECT hgg.groupid'.
-								' FROM hosts_groups hgg,rights rr,users_groups gg'.
-								' WHERE hgg.hostid=hg.hostid'.
-									' AND rr.id=hgg.groupid'.
-									' AND rr.groupid=gg.usrgrpid'.
-									' AND gg.userid='.$userid.
-									' AND rr.permission<'.$permission.')';
+			$userGroups = getUserGroupsByUserId($userid);
+
+			$sqlParts['where'][] = 'EXISTS ('.
+					'SELECT NULL'.
+					' FROM hosts_groups hgg'.
+						' JOIN rights r'.
+							' ON r.id=hgg.groupid'.
+								' AND '.dbConditionInt('r.groupid', $userGroups).
+					' WHERE a.hostid=hgg.hostid'.
+					' GROUP BY hgg.hostid'.
+					' HAVING MIN(r.permission)>='.$permission.
+					')';
 		}
 
 		// nodeids
@@ -128,7 +122,7 @@ class CApplication extends CZBXAPI {
 			}
 			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
 			$sqlParts['where']['ahg'] = 'a.hostid=hg.hostid';
-			$sqlParts['where'][] = DBcondition('hg.groupid', $options['groupids']);
+			$sqlParts['where'][] = dbConditionInt('hg.groupid', $options['groupids']);
 
 			if (!is_null($options['groupCount'])) {
 				$sqlParts['group']['hg'] = 'hg.groupid';
@@ -155,7 +149,7 @@ class CApplication extends CZBXAPI {
 			if ($options['output'] != API_OUTPUT_EXTEND) {
 				$sqlParts['select']['hostid'] = 'a.hostid';
 			}
-			$sqlParts['where']['hostid'] = DBcondition('a.hostid', $options['hostids']);
+			$sqlParts['where']['hostid'] = dbConditionInt('a.hostid', $options['hostids']);
 
 			if (!is_null($options['groupCount'])) {
 				$sqlParts['group']['hostid'] = 'a.hostid';
@@ -177,7 +171,7 @@ class CApplication extends CZBXAPI {
 				$sqlParts['select']['itemid'] = 'ia.itemid';
 			}
 			$sqlParts['from']['items_applications'] = 'items_applications ia';
-			$sqlParts['where'][] = DBcondition('ia.itemid', $options['itemids']);
+			$sqlParts['where'][] = dbConditionInt('ia.itemid', $options['itemids']);
 			$sqlParts['where']['aia'] = 'a.applicationid=ia.applicationid';
 		}
 
@@ -188,7 +182,7 @@ class CApplication extends CZBXAPI {
 			if ($options['output'] != API_OUTPUT_SHORTEN) {
 				$sqlParts['select']['applicationid'] = 'a.applicationid';
 			}
-			$sqlParts['where'][] = DBcondition('a.applicationid', $options['applicationids']);
+			$sqlParts['where'][] = dbConditionInt('a.applicationid', $options['applicationids']);
 		}
 
 		// templated
@@ -239,7 +233,7 @@ class CApplication extends CZBXAPI {
 
 		// filter
 		if (is_array($options['filter'])) {
-			zbx_db_filter('applications a', $options, $sqlParts);
+			$this->dbFilter('applications a', $options, $sqlParts);
 		}
 
 		// sorting
@@ -367,9 +361,8 @@ class CApplication extends CZBXAPI {
 			$objParams = array(
 				'output' => $options['selectItems'],
 				'applicationids' => $applicationids,
-				'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)),
-				'nopermissions' => 1,
-				'preservekeys' => 1
+				'nopermissions' => true,
+				'preservekeys' => true
 			);
 			$items = API::Item()->get($objParams);
 			foreach ($items as $itemid => $item) {
@@ -434,11 +427,14 @@ class CApplication extends CZBXAPI {
 			));
 		}
 
+		if ($update){
+			$applications = $this->extendObjects($this->tableName(), $applications, array('name'));
+		}
+
 		foreach ($applications as &$application) {
 			if (!check_db_fields($itemDbFields, $application)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function'));
 			}
-			unset($application['templateid']);
 
 			// check permissions by hostid
 			if ($create) {
@@ -452,6 +448,17 @@ class CApplication extends CZBXAPI {
 				if (!isset($dbApplications[$application['applicationid']])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
 				}
+			}
+
+			// check for "templateid", because it is not allowed
+			if (array_key_exists('templateid', $application)) {
+				if ($update) {
+					$error = _s('Cannot update "templateid" for application "%1$s".', $application['name']);
+				}
+				else {
+					$error = _s('Cannot set "templateid" for application "%1$s".', $application['name']);
+				}
+				self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 			}
 
 			// check on operating with templated applications
@@ -598,7 +605,7 @@ class CApplication extends CZBXAPI {
 		$parentApplicationids = $applicationids;
 		$childApplicationids = array();
 		do {
-			$dbApplications = DBselect('SELECT a.applicationid FROM applications a WHERE '.DBcondition('a.templateid', $parentApplicationids));
+			$dbApplications = DBselect('SELECT a.applicationid FROM applications a WHERE '.dbConditionInt('a.templateid', $parentApplicationids));
 			$parentApplicationids = array();
 			while ($dbApplication = DBfetch($dbApplications)) {
 				$parentApplicationids[] = $dbApplication['applicationid'];
@@ -620,7 +627,7 @@ class CApplication extends CZBXAPI {
 		// check if app is used by web scenario
 		$sql = 'SELECT ht.name,ht.applicationid'.
 				' FROM httptest ht'.
-				' WHERE '.DBcondition('ht.applicationid', $applicationids);
+				' WHERE '.dbConditionInt('ht.applicationid', $applicationids);
 		$res = DBselect($sql);
 		if ($info = DBfetch($res)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Application "%1$s" used by scenario "%2$s" and can\'t be deleted.', $delApplications[$info['applicationid']]['name'], $info['name']));
@@ -668,13 +675,20 @@ class CApplication extends CZBXAPI {
 			}
 		}
 
-		$itemOptions = array(
+		$allowedItems = API::Item()->get(array(
 			'itemids' => $itemids,
-			'editable' => 1,
+			'editable' => true,
 			'output' => API_OUTPUT_EXTEND,
-			'preservekeys' => 1
-		);
-		$allowedItems = API::Item()->get($itemOptions);
+			'preservekeys' => true,
+			'filter' => array(
+				'flags' => array(
+					ZBX_FLAG_DISCOVERY_NORMAL,
+					ZBX_FLAG_DISCOVERY_CHILD,
+					ZBX_FLAG_DISCOVERY_CREATED
+				)
+			)
+		));
+
 		foreach ($items as $num => $item) {
 			if (!isset($allowedItems[$item['itemid']])) {
 				self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
@@ -682,15 +696,14 @@ class CApplication extends CZBXAPI {
 		}
 
 		$linkedDb = DBselect(
-			'SELECT ia.itemid, ia.applicationid'.
+			'SELECT ia.itemid,ia.applicationid'.
 			' FROM items_applications ia'.
-			' WHERE '.DBcondition('ia.itemid', $itemids).
-				' AND '.DBcondition('ia.applicationid', $applicationids)
+			' WHERE '.dbConditionInt('ia.itemid', $itemids).
+				' AND '.dbConditionInt('ia.applicationid', $applicationids)
 		);
 		while ($pair = DBfetch($linkedDb)) {
 			$linked[$pair['applicationid']] = array($pair['itemid'] => $pair['itemid']);
 		}
-
 		$appsInsert = array();
 		foreach ($applicationids as $applicationid) {
 			foreach ($itemids as $inum => $itemid) {
@@ -703,7 +716,6 @@ class CApplication extends CZBXAPI {
 				);
 			}
 		}
-
 		DB::insert('items_applications', $appsInsert);
 
 		foreach ($itemids as $inum => $itemid) {
@@ -714,7 +726,7 @@ class CApplication extends CZBXAPI {
 					' FROM applications a1,applications a2'.
 					' WHERE a1.name=a2.name'.
 						' AND a1.hostid='.$child['hostid'].
-						' AND '.DBcondition('a2.applicationid', $applicationids)
+						' AND '.dbConditionInt('a2.applicationid', $applicationids)
 				);
 				$childApplications = array();
 				while ($app = DBfetch($dbApps)) {
@@ -812,37 +824,11 @@ class CApplication extends CZBXAPI {
 		$data['templateids'] = zbx_toArray($data['templateids']);
 		$data['hostids'] = zbx_toArray($data['hostids']);
 
-		$options = array(
-			'hostids' => $data['hostids'],
-			'editable' => 1,
-			'preservekeys' => 1,
-			'templated_hosts' => 1,
-			'output' => API_OUTPUT_SHORTEN
-		);
-		$allowedHosts = API::Host()->get($options);
-		foreach ($data['hostids'] as $hostid) {
-			if (!isset($allowedHosts[$hostid])) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
-			}
-		}
-		$options = array(
-			'templateids' => $data['templateids'],
-			'preservekeys' => 1,
-			'output' => API_OUTPUT_SHORTEN
-		);
-		$allowedTemplates = API::Template()->get($options);
-		foreach ($data['templateids'] as $templateid) {
-			if (!isset($allowedTemplates[$templateid])) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
-			}
-		}
-
-		$options = array(
+		$applications = $this->get(array(
 			'hostids' => $data['templateids'],
-			'preservekeys' => 1,
+			'preservekeys' => true,
 			'output' => API_OUTPUT_EXTEND
-		);
-		$applications = $this->get($options);
+		));
 		$this->inherit($applications, $data['hostids']);
 
 		return true;

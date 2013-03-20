@@ -32,12 +32,12 @@ class CMapPainter {
 				'borderColor' => 'black',
 				'titleColor' => 'darkred',
 				'border' => true,
-				'drawAreas' => true,
+				'drawAreas' => true
 			),
 			'grid' => array(
 				'size' => 50,
-				'color' => 'black',
-			),
+				'color' => 'black'
+			)
 		);
 		foreach ($options as $key => $option) {
 			$this->options[$key] = array_merge($this->options[$key], $option);
@@ -49,7 +49,6 @@ class CMapPainter {
 	}
 
 	public function paint() {
-
 		$this->paintBackground();
 		$this->paintTitle();
 		$this->paintGrid();
@@ -82,7 +81,7 @@ class CMapPainter {
 
 	protected function paintGrid() {
 		$size = $this->options['grid']['size'];
-		if (!$size) {
+		if (empty($size)) {
 			return;
 		}
 

@@ -45,7 +45,6 @@ define('YEAR_LEFT_SHIFT', 5);
 
 $service = API::Service()->get(array(
 	'output' => array('serviceid', 'name', 'showsla', 'goodsla'),
-	'selectTimes' => API_OUTPUT_EXTEND,
 	'serviceids' => $_REQUEST['serviceid']
 ));
 $service = reset($service);

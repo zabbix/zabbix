@@ -28,7 +28,7 @@ if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
 	$tmp_item = new CSubmit('form', _('Create host group'));
 }
 else {
-	$tmp_item = new CSubmit('form', _('Create host group').SPACE._('(Only Super Admins can create group)'));
+	$tmp_item = new CSubmit('form', _('Create host group').SPACE._('(Only super admins can create groups)'));
 	$tmp_item->setEnabled(false);
 }
 $createForm->addItem($tmp_item);

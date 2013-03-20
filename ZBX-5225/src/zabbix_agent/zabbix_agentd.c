@@ -28,7 +28,9 @@
 #include "alias.h"
 
 #include "stats.h"
-#include "perfstat.h"
+#ifdef _WINDOWS
+#	include "perfstat.h"
+#endif
 #include "active.h"
 #include "listener.h"
 
@@ -301,80 +303,33 @@ static int	add_activechk_host(const char *host, unsigned short port)
 
 /******************************************************************************
  *                                                                            *
- * Function: parse_active_hosts                                               *
+ * Function: get_serveractive_hosts                                           *
  *                                                                            *
  * Purpose: parse string like IP<:port>,[IPv6]<:port>                         *
  *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
  ******************************************************************************/
-static void	parse_active_hosts(char *active_hosts)
+static void	get_serveractive_hosts(char *active_hosts)
 {
-	char		*l = active_hosts, *r, *r3, *pos;
-#ifdef HAVE_IPV6
-	char		*r2;
-#endif
-	unsigned short	port;
-	int		rc = SUCCEED;
+	char	*l = active_hosts, *r;
+	int	rc = SUCCEED;
 
 	do
 	{
+		char		*host = NULL;
+		unsigned short	port;
+
 		if (NULL != (r = strchr(l, ',')))
 			*r = '\0';
 
-		port = ZBX_DEFAULT_SERVER_PORT;
-		pos = l;
-		r3 = NULL;
-#ifdef HAVE_IPV6
-		r2 = NULL;
+		if (SUCCEED != parse_serveractive_element(l, &host, &port, (unsigned short)ZBX_DEFAULT_SERVER_PORT))
+			goto fail;
 
-		if ('[' == *l)
-		{
-			l++;
+		rc = add_activechk_host(host, port);
 
-			if (NULL == (r2 = strchr(l, ']')))
-				goto fail;
+		zbx_free(host);
 
-			if (':' != r2[1] && '\0' != r2[1])
-				goto fail;
-
-			if (':' == r2[1] && SUCCEED != is_ushort(r2 + 2, &port))
-				goto fail;
-
-			*r2 = '\0';
-
-			if (SUCCEED != is_ip6(l))
-				goto fail;
-
-			if (SUCCEED != (rc = add_activechk_host(l, port)))
-				goto fail;
-
-			*r2 = ']';
-		}
-		else if (SUCCEED == is_ip6(l))
-		{
-			if (SUCCEED != (rc = add_activechk_host(l, port)))
-				goto fail;
-		}
-		else
-		{
-#endif
-			if (NULL != (r3 = strchr(l, ':')))
-			{
-				if (SUCCEED != is_ushort(r3 + 1, &port))
-					goto fail;
-
-				*r3 = '\0';
-			}
-
-			if (SUCCEED != (rc = add_activechk_host(l, port)))
-				goto fail;
-
-			if (NULL != r3)
-				*r3 = ':';
-#ifdef HAVE_IPV6
-		}
-#endif
+		if (SUCCEED != rc)
+			goto fail;
 
 		if (NULL != r)
 		{
@@ -386,17 +341,10 @@ static void	parse_active_hosts(char *active_hosts)
 
 	return;
 fail:
-#ifdef HAVE_IPV6
-	if (NULL != r2)
-		*r2 = ']';
-#endif
-	if (NULL != r3)
-		*r3 = ':';
-
 	if (SUCCEED != rc)
-		zbx_error("error parsing a \"ServerActive\" option: address \"%s\" specified more than once", pos);
+		zbx_error("error parsing a \"ServerActive\" option: address \"%s\" specified more than once", l);
 	else
-		zbx_error("error parsing a \"ServerActive\" option: address \"%s\" is invalid", pos);
+		zbx_error("error parsing a \"ServerActive\" option: address \"%s\" is invalid", l);
 
 	if (NULL != r)
 		*r = ',';
@@ -494,7 +442,7 @@ static void	zbx_load_config(int requirement)
 	}
 
 	if (NULL != active_hosts && '\0' != *active_hosts)
-		parse_active_hosts(active_hosts);
+		get_serveractive_hosts(active_hosts);
 
 	zbx_free(active_hosts);
 
@@ -577,6 +525,7 @@ int	MAIN_ZABBIX_ENTRY()
 	init_collector_data();
 
 #ifdef _WINDOWS
+	init_perf_collector(1);
 	load_perf_counters(CONFIG_PERF_COUNTERS);
 #endif
 	load_user_parameters(CONFIG_USER_PARAMETERS);
@@ -685,7 +634,7 @@ void	zbx_on_exit()
 		zbx_free(threads);
 	}
 
-#if !defined(_WINDOWS)
+#ifndef _WINDOWS
 	zbx_sleep(2);	/* wait for all processes to exit */
 #endif
 
@@ -697,6 +646,9 @@ void	zbx_on_exit()
 	free_metrics();
 	alias_list_free();
 	free_collector_data();
+#ifdef _WINDOWS
+	free_perf_collector();
+#endif
 
 	exit(SUCCEED);
 }
@@ -764,7 +716,7 @@ int	main(int argc, char **argv)
 		case ZBX_TASK_PRINT_SUPPORTED:
 			zbx_load_config(ZBX_CFG_FILE_OPTIONAL);
 #ifdef _WINDOWS
-			init_collector_data();	/* required for reading PerfCounter */
+			init_perf_collector(0);
 			load_perf_counters(CONFIG_PERF_COUNTERS);
 #endif
 			load_user_parameters(CONFIG_USER_PARAMETERS);
@@ -775,7 +727,7 @@ int	main(int argc, char **argv)
 			else
 				test_parameters();
 #ifdef _WINDOWS
-			free_collector_data();
+			free_perf_collector();	/* cpu_collector must be freed before perf_collector is freed */
 #endif
 			free_metrics();
 			alias_list_free();

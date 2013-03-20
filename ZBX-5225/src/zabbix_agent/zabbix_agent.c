@@ -183,7 +183,7 @@ int	main(int argc, char **argv)
 	else
 		zbx_load_config(ZBX_CFG_FILE_REQUIRED);
 
-	/* metrics should be initialized befor loading user parameters */
+	/* metrics should be initialized before loading user parameters */
 	init_metrics();
 
 	/* user parameters */

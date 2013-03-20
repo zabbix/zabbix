@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2000-2012 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -10,15 +10,15 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 **/
-?>
-<?php
+
+
 include('include/views/js/configuration.httpconf.popup.js.php');
 
 $httpPopupWidget = new CWidget();
@@ -26,26 +26,26 @@ $httpPopupWidget = new CWidget();
 if (isset($_REQUEST['save'])) {
 	if (!isset($_REQUEST['stepid'])) {
 		insert_js('add_httpstep('.
-			zbx_jsvalue($_REQUEST['dstfrm']).','.
-			zbx_jsvalue($_REQUEST['name']).','.
-			zbx_jsvalue($_REQUEST['timeout']).','.
-			zbx_jsvalue($_REQUEST['url']).','.
-			zbx_jsvalue($_REQUEST['posts']).','.
-			zbx_jsvalue($_REQUEST['required']).','.
-			zbx_jsvalue($_REQUEST['status_codes']).");\n"
+					zbx_jsvalue($_REQUEST['dstfrm']).','.
+					zbx_jsvalue($_REQUEST['name']).','.
+					zbx_jsvalue($_REQUEST['timeout']).','.
+					zbx_jsvalue($_REQUEST['url']).','.
+					zbx_jsvalue($_REQUEST['posts']).','.
+					zbx_jsvalue($_REQUEST['required']).','.
+					zbx_jsvalue($_REQUEST['status_codes']).");\n"
 		);
 	}
 	else {
 		insert_js('update_httpstep('.
-			zbx_jsvalue($_REQUEST['dstfrm']).','.
-			zbx_jsvalue($_REQUEST['list_name']).','.
-			zbx_jsvalue($_REQUEST['stepid']).','.
-			zbx_jsvalue($_REQUEST['name']).','.
-			zbx_jsvalue($_REQUEST['timeout']).','.
-			zbx_jsvalue($_REQUEST['url']).','.
-			zbx_jsvalue($_REQUEST['posts']).','.
-			zbx_jsvalue($_REQUEST['required']).','.
-			zbx_jsvalue($_REQUEST['status_codes']).");\n"
+					zbx_jsvalue($_REQUEST['dstfrm']).','.
+					zbx_jsvalue($_REQUEST['list_name']).','.
+					zbx_jsvalue($_REQUEST['stepid']).','.
+					zbx_jsvalue($_REQUEST['name']).','.
+					zbx_jsvalue($_REQUEST['timeout']).','.
+					zbx_jsvalue($_REQUEST['url']).','.
+					zbx_jsvalue($_REQUEST['posts']).','.
+					zbx_jsvalue($_REQUEST['required']).','.
+					zbx_jsvalue($_REQUEST['status_codes']).");\n"
 		);
 	}
 }
@@ -77,5 +77,6 @@ else {
 
 	$httpPopupWidget->addItem($httpPopupForm);
 }
+
 return $httpPopupWidget;
-?>
+

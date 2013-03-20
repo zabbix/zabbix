@@ -144,7 +144,7 @@ if(isset($_REQUEST['save_trigger'])){
 			// $result = $triggerid;
 			$audit_action = AUDIT_ACTION_ADD;
 
-			show_messages($triggerid, _('Trigger added'), _('Cannot add trigger'));
+			show_messages($result, _('Trigger added'), _('Cannot add trigger'));
 		}
 
 		if($result){
@@ -305,13 +305,12 @@ if(isset($_REQUEST['sform'])){
 	$maxid=0;
 
 	$bExprResult = true;
-	$exprData = new CTriggerExpression(array(
-		'expression'=> empty($expressions) ? '' : construct_expression($itemid,$expressions)
-	));
-	if(isset($_REQUEST['triggerid']) && !isset($_REQUEST['save_trigger'])
-			&& !empty($exprData->errors) && !isset($_REQUEST['form_refresh'])){
+	$expressionData = new CTriggerExpression();
+	if (isset($_REQUEST['triggerid']) && !isset($_REQUEST['save_trigger'])
+			&& !$expressionData->parse(empty($expressions) ? '' : construct_expression($itemid, $expressions))
+			&& !isset($_REQUEST['form_refresh'])) {
 
-		info($exprData->errors);
+		info($expressionData->error);
 
 		unset($expressions);
 		$expressions[0]['value'] = $expr_incase;
@@ -322,11 +321,11 @@ if(isset($_REQUEST['sform'])){
 
 	foreach($expressions as $id => $expr){
 
-		$imgup = new CImg('images/general/arrowup.gif','up',12,14);
+		$imgup = new CImg('images/general/arrow_up.png','up',12,14);
 		$imgup->setAttribute('onclick','javascript:  element_up("logtr'.$id.'");');
 		$imgup->setAttribute('onmouseover','javascript: this.style.cursor = "pointer";');
 
-		$imgdn = new CImg('images/general/arrowdown.gif','down',12,14);
+		$imgdn = new CImg('images/general/arrow_down.png','down',12,14);
 		$imgdn->setAttribute('onclick','javascript:  element_down("logtr'.$id.'");');
 		$imgdn->setAttribute('onmouseover','javascript: this.style.cursor = "pointer";');
 

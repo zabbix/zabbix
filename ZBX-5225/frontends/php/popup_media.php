@@ -69,8 +69,8 @@ if (isset($_REQUEST['add'])) {
 		echo '<script type="text/javascript">
 				add_media("'.$_REQUEST['dstfrm'].'",'.
 				$_REQUEST['media'].','.
-				zbx_jsvalue($_REQUEST['mediatypeid']).',"'.
-				$_REQUEST['sendto'].'","'.
+				zbx_jsvalue($_REQUEST['mediatypeid']).','.
+				CJs::encodeJson($_REQUEST['sendto']).',"'.
 				$_REQUEST['period'].'",'.
 				$_REQUEST['active'].','.
 				$severity.');'.

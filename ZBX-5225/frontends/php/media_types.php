@@ -55,8 +55,35 @@ $fields = array(
 check_fields($fields);
 validate_sort_and_sortorder('description', ZBX_SORT_UP);
 
-$_REQUEST['go'] = get_request('go', 'none');
 $mediatypeid = get_request('mediatypeid');
+
+/*
+ * Permissions
+ */
+if (isset($_REQUEST['mediatypeid'])) {
+	$mediaTypes = API::Mediatype()->get(array(
+		'mediatypeids' => $mediatypeid,
+		'output' => API_OUTPUT_EXTEND
+	));
+	if (empty($mediaTypes)) {
+		access_deny();
+	}
+}
+if (isset($_REQUEST['go'])) {
+	if (!isset($_REQUEST['mediatypeids']) || !is_array($_REQUEST['mediatypeids'])) {
+		access_deny();
+	}
+	else {
+		$mediaTypeChk = API::Mediatype()->get(array(
+			'mediatypeids' => $_REQUEST['mediatypeids'],
+			'countOutput' => true
+		));
+		if ($mediaTypeChk != count($_REQUEST['mediatypeids'])) {
+			access_deny();
+		}
+	}
+}
+$_REQUEST['go'] = get_request('go', 'none');
 
 /*
  * Actions
@@ -157,13 +184,8 @@ if (!empty($data['form'])) {
 	$data['mediatypeid'] = $mediatypeid;
 	$data['form_refresh'] = get_request('form_refresh', 0);
 
-	if (!empty($data['mediatypeid']) && empty($_REQUEST['form_refresh'])) {
-		$options = array(
-			'mediatypeids' => $data['mediatypeid'],
-			'output' => API_OUTPUT_EXTEND
-		);
-		$mediatypes = API::Mediatype()->get($options);
-		$mediatype = reset($mediatypes);
+	if (isset($data['mediatypeid']) && empty($_REQUEST['form_refresh'])) {
+		$mediatype = reset($mediaTypes);
 
 		$data['type'] = $mediatype['type'];
 		$data['description'] = $mediatype['description'];

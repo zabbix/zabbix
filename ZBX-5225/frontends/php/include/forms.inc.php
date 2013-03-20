@@ -33,6 +33,7 @@
 				$options['nodeids'] = id2nodeid($userid);
 			}
 			$users = API::User()->get($options);
+
 			$user = reset($users);
 			$data['title'] = _('User').' "'.$user['alias'].'"';
 		}
@@ -120,7 +121,7 @@
 			$mediaTypeDescriptions = array();
 			$dbMediaTypes = DBselect(
 				'SELECT mt.mediatypeid,mt.description FROM media_type mt WHERE '.
-					DBcondition('mt.mediatypeid', zbx_objectValues($data['user_medias'], 'mediatypeid'))
+					dbConditionInt('mt.mediatypeid', zbx_objectValues($data['user_medias'], 'mediatypeid'))
 			);
 			while ($dbMediaType = DBfetch($dbMediaTypes)) {
 				$mediaTypeDescriptions[$dbMediaType['mediatypeid']] = $dbMediaType['description'];
@@ -143,7 +144,7 @@
 			if (count($group_ids) == 0) {
 				$group_ids = array(-1);
 			}
-			$db_rights = DBselect('SELECT r.* FROM rights r WHERE '.DBcondition('r.groupid', $group_ids));
+			$db_rights = DBselect('SELECT r.* FROM rights r WHERE '.dbConditionInt('r.groupid', $group_ids));
 
 			$tmp_permitions = array();
 			while ($db_right = DBfetch($db_rights)) {
@@ -672,10 +673,11 @@
 			if ($filter_value_type == -1) {
 				if (!isset($item_params['value_types'][$item['value_type']])) {
 					$item_params['value_types'][$item['value_type']] = array(
-						'name' => item_value_type2str($item['value_type']),
+						'name' => itemValueTypeString($item['value_type']),
 						'count' => 0
 					);
 				}
+
 				$show_item = true;
 				foreach ($item['subfilters'] as $name => $value) {
 					if ($name == 'subfilter_value_types') {
@@ -951,10 +953,13 @@
 			);
 			if ($data['is_discovery_rule']) {
 				$options['hostids'] = $data['hostid'];
-				$options['filter'] = array('flags' => ZBX_FLAG_DISCOVERY);
 				$options['editable'] = true;
+				$data['item'] = API::DiscoveryRule()->get($options);
 			}
-			$data['item'] = API::Item()->get($options);
+			else {
+				$options['filter'] = array('flags' => null);
+				$data['item'] = API::Item()->get($options);
+			}
 			$data['item'] = reset($data['item']);
 			$data['hostid'] = !empty($data['hostid']) ? $data['hostid'] : $data['item']['hostid'];
 			$data['limited'] = $data['item']['templateid'] != 0;
@@ -965,13 +970,16 @@
 				$options = array(
 					'itemids' => $itemid,
 					'output' => array('itemid', 'templateid'),
-					'selectHosts' => array('name'),
-					'selectDiscoveryRule' => array('itemid')
+					'selectHosts' => array('name')
 				);
 				if ($data['is_discovery_rule']) {
-					$options['filter'] = array('flags' => ZBX_FLAG_DISCOVERY);
+					$item = API::DiscoveryRule()->get($options);
 				}
-				$item = API::Item()->get($options);
+				else {
+					$options['selectDiscoveryRule'] = array('itemid');
+					$options['filter'] = array('flags' => null);
+					$item = API::Item()->get($options);
+				}
 				$item = reset($item);
 
 				if (!empty($item)) {
@@ -1195,17 +1203,9 @@
 			'go' => get_request('go', 'massupdate'),
 			'g_triggerid' => get_request('g_triggerid', array()),
 			'priority' => get_request('priority', 0),
-			'config' => select_config()
+			'config' => select_config(),
+			'hostid' => get_request('hostid', 0)
 		);
-
-		// get hostid
-		$pageFilter = new CPageFilter(array(
-			'groups' => array('not_proxy_hosts' => true, 'editable' => true),
-			'hosts' => array('templated_hosts' => true, 'editable' => true),
-			'groupid' => get_request('groupid', null),
-			'hostid' => get_request('hostid', null)
-		));
-		$data['hostid'] = $pageFilter->hostid;
 
 		// get dependencies
 		$data['dependencies'] = API::Trigger()->get(array(
@@ -1243,21 +1243,19 @@
 			'url' => get_request('url', ''),
 			'input_method' => get_request('input_method', IM_ESTABLISHED),
 			'limited' => null,
-			'templates' => array()
+			'templates' => array(),
+			'hostid' => get_request('hostid', 0)
 		);
-
-		// get hostid
-		$pageFilter = new CPageFilter(array(
-			'groups' => array('not_proxy_hosts' => true, 'editable' => true),
-			'hosts' => array('templated_hosts' => true, 'editable' => true),
-			'groupid' => get_request('groupid', null),
-			'hostid' => get_request('hostid', null)
-		));
-		$data['hostid'] = $pageFilter->hostid;
 
 		if (!empty($data['triggerid'])) {
 			// get trigger
-			$data['trigger'] = get_trigger_by_triggerid($data['triggerid']);
+			$options = array(
+				'output' => API_OUTPUT_EXTEND,
+				'selectHosts' => array('hostid'),
+				'triggerids' => $data['triggerid']
+			);
+			$trigger = ($data['parent_discoveryid']) ? API::TriggerPrototype()->get($options) : API::Trigger()->get($options);
+			$data['trigger'] = reset($trigger);
 			if (!empty($data['trigger']['description'])) {
 				$data['description'] = $data['trigger']['description'];
 			}
@@ -1266,17 +1264,23 @@
 			$tmp_triggerid = $data['triggerid'];
 			do {
 				$db_triggers = DBfetch(DBselect(
-					'SELECT t.triggerid,t.templateid,h.name'.
-					' FROM triggers t,functions f,items i,hosts h'.
-					' WHERE t.triggerid='.$tmp_triggerid.
-						' AND h.hostid=i.hostid'.
-						' AND i.itemid=f.itemid'.
-						' AND f.triggerid=t.triggerid'
+					'SELECT t.triggerid,t.templateid,id.parent_itemid,h.name,h.hostid'.
+					' FROM triggers t'.
+						' LEFT JOIN functions f ON t.triggerid=f.triggerid'.
+						' LEFT JOIN items i ON f.itemid=i.itemid'.
+						' LEFT JOIN hosts h ON i.hostid=h.hostid'.
+						' LEFT JOIN item_discovery id ON i.itemid=id.itemid'.
+					' WHERE t.triggerid='.$tmp_triggerid
 				));
 				if (bccomp($data['triggerid'], $tmp_triggerid) != 0) {
-					$link = empty($data['parent_discoveryid'])
-						? 'triggers.php?form=update&triggerid='.$db_triggers['triggerid']
-						: 'trigger_prototypes.php?form=update&triggerid='.$db_triggers['triggerid'].'&parent_discoveryid='.$data['parent_discoveryid'];
+					// parent trigger prototype link
+					if ($data['parent_discoveryid']) {
+						$link = 'trigger_prototypes.php?form=update&triggerid='.$db_triggers['triggerid'].'&parent_discoveryid='.$db_triggers['parent_itemid'].'&hostid='.$db_triggers['hostid'];
+					}
+					// parent trigger link
+					else {
+						$link = 'triggers.php?form=update&triggerid='.$db_triggers['triggerid'].'&hostid='.$db_triggers['hostid'];
+					}
 
 					$data['templates'][] = new CLink($db_triggers['name'], $link, 'highlight underline weight_normal');
 					$data['templates'][] = SPACE.RARR.SPACE;
@@ -1287,6 +1291,12 @@
 			array_shift($data['templates']);
 
 			$data['limited'] = $data['trigger']['templateid'] ? 'yes' : null;
+
+			// if no host has been selected for the navigation panel, use the first trigger host
+			if (!$data['hostid']) {
+				$hosts = reset($data['trigger']['hosts']);
+				$data['hostid'] = $hosts['hostid'];
+			}
 		}
 
 		if ((!empty($data['triggerid']) && !isset($_REQUEST['form_refresh'])) || !empty($data['limited'])) {
@@ -1315,14 +1325,15 @@
 		}
 
 		if ($data['input_method'] == IM_TREE) {
-			$analyze = analyze_expression($data['expression']);
+			$analyze = analyzeExpression($data['expression']);
 			if ($analyze !== false) {
 				list($data['outline'], $data['eHTMLTree']) = $analyze;
 				if (isset($_REQUEST['expr_action']) && $data['eHTMLTree'] != null) {
-					$new_expr = remake_expression($data['expression'], $_REQUEST['expr_target_single'], $_REQUEST['expr_action'], $data['expr_temp']);
+					$new_expr = remakeExpression($data['expression'], $_REQUEST['expr_target_single'],
+							$_REQUEST['expr_action'], $data['expr_temp']);
 					if ($new_expr !== false) {
 						$data['expression'] = $new_expr;
-						$analyze = analyze_expression($data['expression']);
+						$analyze = analyzeExpression($data['expression']);
 						if ($analyze !== false) {
 							list($data['outline'], $data['eHTMLTree']) = $analyze;
 						}
@@ -1381,8 +1392,13 @@
 		$new_timeperiod = get_request('new_timeperiod', array());
 		$new = is_array($new_timeperiod);
 
-		if (is_array($new_timeperiod) && isset($new_timeperiod['id'])) {
-			$tblPeriod->addItem(new CVar('new_timeperiod[id]', $new_timeperiod['id']));
+		if (is_array($new_timeperiod)) {
+			if (isset($new_timeperiod['id'])) {
+				$tblPeriod->addItem(new CVar('new_timeperiod[id]', $new_timeperiod['id']));
+			}
+			if (isset($new_timeperiod['timeperiodid'])) {
+				$tblPeriod->addItem(new CVar('new_timeperiod[timeperiodid]', $new_timeperiod['timeperiodid']));
+			}
 		}
 		if (!is_array($new_timeperiod)) {
 			$new_timeperiod = array();
@@ -1621,17 +1637,38 @@
 			$filtertimetab->setCellPadding(0);
 			$filtertimetab->setCellSpacing(0);
 
-			$start_date = zbxDateToTime($new_timeperiod['start_date']);
+			$startDate = zbxDateToTime($new_timeperiod['start_date']);
+			if (isset($_REQUEST['add_timeperiod'])) {
+				$newTimePeriodYear = get_request('new_timeperiod_year');
+				$newTimePeriodMonth = get_request('new_timeperiod_month');
+				$newTimePeriodDay = get_request('new_timeperiod_day');
+				$newTimePeriodHours = get_request('new_timeperiod_hour');
+				$newTimePeriodMinutes = get_request('new_timeperiod_minute');
+			}
+			elseif ($startDate > 0) {
+				$newTimePeriodYear = date('Y', $startDate );
+				$newTimePeriodMonth = date('m', $startDate );
+				$newTimePeriodDay = date('d', $startDate );
+				$newTimePeriodHours = date('H', $startDate );
+				$newTimePeriodMinutes = date('i', $startDate );
+			}
+			else {
+				$newTimePeriodYear = '';
+				$newTimePeriodMonth = '';
+				$newTimePeriodDay = '';
+				$newTimePeriodHours = '';
+				$newTimePeriodMinutes = '';
+			}
 			$filtertimetab->addRow(array(
-				new CNumericBox('new_timeperiod_day', ($start_date > 0) ? date('d', $start_date) : '', 2),
+				new CNumericBox('new_timeperiod_day', $newTimePeriodDay, 2),
 				'/',
-				new CNumericBox('new_timeperiod_month', ($start_date > 0) ? date('m', $start_date) : '', 2),
+				new CNumericBox('new_timeperiod_month', $newTimePeriodMonth, 2),
 				'/',
-				new CNumericBox('new_timeperiod_year', ($start_date > 0) ? date('Y', $start_date) : '', 4),
+				new CNumericBox('new_timeperiod_year', $newTimePeriodYear, 4),
 				SPACE,
-				new CNumericBox('new_timeperiod_hour', ($start_date > 0) ? date('H', $start_date) : '', 2),
+				new CNumericBox('new_timeperiod_hour', $newTimePeriodHours, 2),
 				':',
-				new CNumericBox('new_timeperiod_minute', ($start_date > 0) ? date('i', $start_date) : '', 2),
+				new CNumericBox('new_timeperiod_minute', $newTimePeriodMinutes, 2),
 				$clndr_icon
 			));
 			zbx_add_post_js('create_calendar(null, ["new_timeperiod_day", "new_timeperiod_month", "new_timeperiod_year", "new_timeperiod_hour", "new_timeperiod_minute"], "new_timeperiod_date", "new_timeperiod_start_date");');

@@ -99,8 +99,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 // 2nd header
 	$options = array(
 		'groups' => array(
-			'monitored_hosts' => 1,
-			'with_monitored_httptests' => 1,
+			'with_monitored_httptests' => true,
 		),
 		'hosts' => array(
 			'monitored_hosts' => 1,
@@ -130,10 +129,10 @@ require_once dirname(__FILE__).'/include/page_header.php';
 	$form->addVar('hostid', $_REQUEST['hostid']);
 
 	if (isset($show_all_apps)) {
-		$link = new CLink(new CImg('images/general/opened.gif'),'?close=1'.url_param('groupid').url_param('hostid'));
+		$link = new CLink(new CImg('images/general/minus.png'),'?close=1'.url_param('groupid').url_param('hostid'));
 	}
 	else {
-		$link = new CLink(new CImg('images/general/closed.gif'),'?open=1'.url_param('groupid').url_param('hostid'));
+		$link = new CLink(new CImg('images/general/plus.png'),'?open=1'.url_param('groupid').url_param('hostid'));
 	}
 
 	$table = new CTableInfo(_('No web checks defined.'));
@@ -161,7 +160,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 			' FROM applications a,hosts h'.
 			' WHERE a.hostid=h.hostid'.
 				$sql_where.
-				' AND '.DBcondition('h.hostid',$available_hosts).
+				' AND '.dbConditionInt('h.hostid',$available_hosts).
 			order_by('a.applicationid,h.name,h.hostid','a.name')
 	);
 	while ($row = DBfetch($result)) {
@@ -179,7 +178,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 			' FROM httptest wt,applications a,hosts h'.
 			' WHERE wt.applicationid=a.applicationid'.
 				' AND a.hostid=h.hostid'.
-				' AND '.DBcondition('a.applicationid', $db_appids).
+				' AND '.dbConditionInt('a.applicationid', $db_appids).
 				' AND wt.status<>1'.
 			order_by('wt.name', 'h.host')
 	);
@@ -196,7 +195,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 	$result = DBselect(
 			'SELECT hs.httptestid,COUNT(hs.httpstepid) AS cnt'.
 			' FROM httpstep hs'.
-			' WHERE '.DBcondition('hs.httptestid', $db_httptestids).
+			' WHERE '.dbConditionInt('hs.httptestid', $db_httptestids).
 			' GROUP BY hs.httptestid'
 	);
 	while ($row = DBfetch($result)) {
@@ -209,7 +208,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 			' WHERE hti.itemid=i.itemid'.
 				' AND hti.type IN ('.HTTPSTEP_ITEM_TYPE_LASTSTEP.','.HTTPSTEP_ITEM_TYPE_LASTERROR.')'.
 				' AND i.lastclock IS NOT NULL'.
-				' AND '.DBcondition('hti.httptestid', $db_httptestids)
+				' AND '.dbConditionInt('hti.httptestid', $db_httptestids)
 	);
 	while ($row = DBfetch($result)) {
 		if ($row['type'] == HTTPSTEP_ITEM_TYPE_LASTSTEP) {
@@ -277,13 +276,13 @@ require_once dirname(__FILE__).'/include/page_header.php';
 		$db_app = &$db_apps[$appid];
 
 		if (uint_in_array($db_app['applicationid'], $_REQUEST['applications']) || isset($show_all_apps)) {
-			$link = new CLink(new CImg('images/general/opened.gif'),
+			$link = new CLink(new CImg('images/general/minus.png'),
 				'?close=1&applicationid='.$db_app['applicationid'].
 				url_param('groupid').url_param('hostid').url_param('applications').
 				url_param('select'));
 		}
 		else {
-			$link = new CLink(new CImg('images/general/closed.gif'),
+			$link = new CLink(new CImg('images/general/plus.png'),
 				'?open=1&applicationid='.$db_app['applicationid'].
 				url_param('groupid').url_param('hostid').url_param('applications').
 				url_param('select'));

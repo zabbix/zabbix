@@ -17,20 +17,19 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
 require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
 class testPageQueueOverview extends CWebTest {
 	public function testPageQueueOverview_CheckLayout() {
-		$this->login('queue.php?config=0');
+		$this->zbxTestLogin('queue.php?config=0');
 		$this->checkTitle('Queue \[refreshed every 30 sec\]');
-		$this->ok('Queue');
-		$this->ok('QUEUE OF ITEMS TO BE UPDATED');
+		$this->zbxTestTextPresent('Queue');
+		$this->zbxTestTextPresent('QUEUE OF ITEMS TO BE UPDATED');
 		// Header
-		$this->ok(array('Items', '5 seconds', '10 seconds', '30 seconds', '1 minute', '5 minutes', 'More than 10 minutes'));
+		$this->zbxTestTextPresent(array('Items', '5 seconds', '10 seconds', '30 seconds', '1 minute', '5 minutes', 'More than 10 minutes'));
 		// Data
-		$this->ok(
+		$this->zbxTestTextPresent(
 			array(
 				'Zabbix agent',
 				'Zabbix agent (active)',
@@ -54,4 +53,3 @@ class testPageQueueOverview extends CWebTest {
 		$this->markTestIncomplete();
 	}
 }
-?>

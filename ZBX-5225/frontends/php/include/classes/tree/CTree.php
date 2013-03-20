@@ -130,7 +130,7 @@ class CTree {
 				case 'L':
 					$td->setAttribute('valign', 'top');
 					$div = new CTag('div', 'yes');
-					$div->setAttribute('style', 'height: 10px; width:22px; margin-left: -1px; background-image:url(images/general/tree/pointc.gif);');
+					$div->setAttribute('style', 'height: 10px; width:22px; margin-left: -3px; background-image:url(images/general/tree/pointc.gif);');
 
 					if ($this->tree[$id]['nodetype'] == 2) {
 						$img = new CImg('images/general/tree/plus.gif', 'y', '22', '14');
@@ -152,6 +152,7 @@ class CTree {
 						$img->setAttribute('onclick', $this->treename.'.closeSNodeX("'.$id.'",this);');
 						$img->setAttribute('id', 'idi_'.$id);
 						$img->setAttribute('class', 'pointer');
+						$img->setAttribute('style', 'top:2px;left:-3px;position:relative;');
 					}
 					else {
 						$td->setAttribute('style', 'width:22px; background-image:url(images/general/tree/pointc.gif);');

@@ -63,9 +63,9 @@ AC_DEFUN([LIBCURL_CHECK_CONFIG],
 If you want to use cURL library:
 AC_HELP_STRING([--with-libcurl@<:@=DIR@:>@],[use cURL package @<:@default=no@:>@, optionally specify path to curl-config])],
         [
-        if test "$withval" = "no"; then
+        if test "x$withval" = "xno"; then
             want_curl="no"
-        elif test "$withval" = "yes"; then
+        elif test "x$withval" = "xyes"; then
             want_curl="yes"
         else
             want_curl="yes"
@@ -74,7 +74,7 @@ AC_HELP_STRING([--with-libcurl@<:@=DIR@:>@],[use cURL package @<:@default=no@:>@
         ],
         [want_curl=ifelse([$1],,[no],[$1])])
 
-  if test "$want_curl" != "no" ; then
+  if test "x$want_curl" != "xno"; then
 
      AC_PROG_AWK
 
@@ -82,11 +82,9 @@ AC_HELP_STRING([--with-libcurl@<:@=DIR@:>@],[use cURL package @<:@default=no@:>@
 
      _libcurl_try_link=no
 
-     if test -z "$_libcurl_config" -o test; then
-         AC_PATH_PROG([_libcurl_config], [curl-config], [no])
-     fi
+     AC_PATH_PROG([_libcurl_config], [curl-config], [])
 
-     if test -f $_libcurl_config; then
+     if test -x "$_libcurl_config"; then
         AC_CACHE_CHECK([for the version of libcurl],
 	   [libcurl_cv_lib_curl_version],
            [libcurl_cv_lib_curl_version=`$_libcurl_config --version | $AWK '{print $[]2}'`])
@@ -94,11 +92,11 @@ AC_HELP_STRING([--with-libcurl@<:@=DIR@:>@],[use cURL package @<:@default=no@:>@
 	_libcurl_version=`echo $libcurl_cv_lib_curl_version | $_libcurl_version_parse`
 	_libcurl_wanted=`echo ifelse([$2],,[0],[$2]) | $_libcurl_version_parse`
 
-        if test $_libcurl_wanted -gt 0 ; then
+        if test $_libcurl_wanted -gt 0; then
 	   AC_CACHE_CHECK([for libcurl >= version $2],
 	      [libcurl_cv_lib_version_ok],
               [
-   	      if test $_libcurl_version -ge $_libcurl_wanted ; then
+   	      if test $_libcurl_version -ge $_libcurl_wanted; then
 	         libcurl_cv_lib_version_ok=yes
       	      else
 	         libcurl_cv_lib_version_ok=no
@@ -106,11 +104,11 @@ AC_HELP_STRING([--with-libcurl@<:@=DIR@:>@],[use cURL package @<:@default=no@:>@
               ])
         fi
 
-	if test $_libcurl_wanted -eq 0 || test x$libcurl_cv_lib_version_ok = xyes ; then
-           if test x"$LIBCURL_CFLAGS" = "x"; then
+	if test $_libcurl_wanted -eq 0 || test "x$libcurl_cv_lib_version_ok" = "xyes"; then
+           if test "x$LIBCURL_CFLAGS" = "x"; then
               LIBCURL_CFLAGS=`$_libcurl_config --cflags`
            fi
-           if test x"$LIBCURL_LIBS" = "x"; then
+           if test "x$LIBCURL_LIBS" = "x"; then
 		_full_libcurl_libs=`$_libcurl_config --libs`
 		for i in $_full_libcurl_libs; do
 			case $i in
@@ -172,7 +170,7 @@ AC_HELP_STRING([--with-libcurl@<:@=DIR@:>@],[use cURL package @<:@default=no@:>@
 	   _libcurl_features=`$_libcurl_config --feature`
 
            # Is it modern enough to have --protocols? (7.12.4)
-	   if test $_libcurl_version -ge 461828 ; then
+	   if test $_libcurl_version -ge 461828; then
               _libcurl_protocols=`$_libcurl_config --protocols`
            fi
 
@@ -181,7 +179,7 @@ AC_HELP_STRING([--with-libcurl@<:@=DIR@:>@],[use cURL package @<:@default=no@:>@
 
 	unset _libcurl_wanted
      fi
-     if test $_libcurl_try_link = yes ; then
+     if test "x$_libcurl_try_link" = "xyes"; then
         # we didn't find curl-config, so let's see if the user-supplied
         # link line (or failing that, "-lcurl") is enough.
         LIBCURL_LIBS=${LIBCURL_LIBS-"$_libcurl_libs -lcurl"}
@@ -220,7 +218,7 @@ x=CURLOPT_VERBOSE;
 		unset _save_curl_cflags
 	])
 
-	if test $libcurl_cv_lib_curl_usable = no ; then
+	if test "x$libcurl_cv_lib_curl_usable" = "xno"; then
 		link_mode="dynamic"
 		if test "x$enable_static" = "xyes"; then
 			link_mode="static"
@@ -265,12 +263,12 @@ x=CURLOPT_VERBOSE;
 		eval AS_TR_SH(libcurl_feature_$_libcurl_feature)=yes
 	done
 
-	if test "x$_libcurl_protocols" = "x" ; then
+	if test "x$_libcurl_protocols" = "x"; then
 		# We don't have --protocols, so just assume that all
 		# protocols are available
 		_libcurl_protocols="HTTP FTP FILE TELNET LDAP DICT"
 
-		if test x$libcurl_feature_SSL = xyes ; then
+		if test "x$libcurl_feature_SSL" = "xyes"; then
 			_libcurl_protocols="$_libcurl_protocols HTTPS"
 
 			# FTPS wasn't standards-compliant until version
@@ -301,7 +299,7 @@ x=CURLOPT_VERBOSE;
      unset _libcurl_libs
   fi
 
-  if test x$want_curl = xno || test x$libcurl_cv_lib_curl_usable != xyes ; then
+  if test "x$want_curl" = "xno" || test "x$libcurl_cv_lib_curl_usable" != "xyes"; then
      # This is the IF-NO path
      ifelse([$4],,:,[$4])
   else

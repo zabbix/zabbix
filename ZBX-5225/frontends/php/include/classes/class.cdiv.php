@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2000-2012 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,7 +24,7 @@ class CDiv extends CTag {
 	public function __construct($items = null, $class = null, $id = null) {
 		parent::__construct('div', 'yes');
 		$this->attr('class', $class);
-		if ($id !== null) {
+		if (!empty($id)) {
 			$this->attr('id', zbx_formatDomId($id));
 		}
 		$this->addItem($items);

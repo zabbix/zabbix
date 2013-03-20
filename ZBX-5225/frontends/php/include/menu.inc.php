@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2000-2012 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -10,15 +10,14 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
 
 global $ZBX_MENU;
 
@@ -83,9 +82,6 @@ $ZBX_MENU = array(
 				'label' => _('IT services'),
 				'force_disable_all_nodes' => true,
 				'sub_pages' => array('report3.php', 'chart5.php')
-			),
-			array(
-				'url' => 'vtext.php'
 			),
 			array(
 				'url' => 'chart3.php'
@@ -300,7 +296,8 @@ $ZBX_MENU = array(
 	)
 );
 
-/* NOTE - menu array format:
+/**
+ * NOTE - menu array format:
  * first level:
  *	'label' = main menu title.
  *	'default_page_id	= default page url from 'pages' then opened menu.
@@ -398,6 +395,7 @@ function zbx_construct_menu(&$main_menu, &$sub_menus, &$page) {
 	if (!$page_exists && $page['type'] != PAGE_TYPE_XML && $page['type'] != PAGE_TYPE_CSV && $page['type'] != PAGE_TYPE_TEXT_FILE) {
 		$denied_page_requested = true;
 	}
+
 	return $denied_page_requested;
 }
 
@@ -416,4 +414,3 @@ function zbx_define_menu_restrictions($page, $ZBX_MENU) {
 		}
 	}
 }
-?>

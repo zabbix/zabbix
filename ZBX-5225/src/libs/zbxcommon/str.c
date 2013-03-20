@@ -1373,7 +1373,7 @@ int	num_param(const char *p)
  * Purpose: return parameter by index (num) from parameter list (param)       *
  *                                                                            *
  * Parameters:                                                                *
- *      param   - parameter list                                              *
+ *      p       - parameter list                                              *
  *      num     - requested parameter index                                   *
  *      buf     - pointer of output buffer                                    *
  *      max_len - size of output buffer                                       *
@@ -2645,6 +2645,30 @@ const char	*zbx_nodetype_string(unsigned char nodetype)
 	}
 }
 
+const char	*zbx_alert_type_string(unsigned char type)
+{
+	switch (type)
+	{
+		case ALERT_TYPE_MESSAGE:
+			return "message";
+		default:
+			return "script";
+	}
+}
+
+const char	*zbx_alert_status_string(unsigned char type, unsigned char status)
+{
+	switch (status)
+	{
+		case ALERT_STATUS_SENT:
+			return (ALERT_TYPE_MESSAGE == type ? "sent" : "executed");
+		case ALERT_STATUS_NOT_SENT:
+			return "in progress";
+		default:
+			return "failed";
+	}
+}
+
 const char	*zbx_escalation_status_string(unsigned char status)
 {
 	switch (status)
@@ -2774,6 +2798,12 @@ static LPTSTR	zbx_to_unicode(unsigned int codepage, LPCSTR cp_string)
 LPTSTR	zbx_acp_to_unicode(LPCSTR acp_string)
 {
 	return zbx_to_unicode(CP_ACP, acp_string);
+}
+
+/* convert from Windows OEM code page to unicode */
+LPTSTR	zbx_oemcp_to_unicode(LPCSTR oemcp_string)
+{
+	return zbx_to_unicode(CP_OEMCP, oemcp_string);
 }
 
 int	zbx_acp_to_unicode_static(LPCSTR acp_string, LPTSTR wide_string, int wide_size)
@@ -2937,25 +2967,50 @@ size_t	zbx_strlen_utf8(const char *text)
 
 /******************************************************************************
  *                                                                            *
+ * Function: zbx_utf8_char_len                                                *
+ *                                                                            *
+ * Purpose: Returns the size (in bytes) of an UTF-8 encoded character or 0    *
+ *          if the character is not a valid UTF-8.                            *
+ *                                                                            *
+ * Parameters: text - [IN] pointer to the 1st byte of UTF-8 character         *
+ *                                                                            *
+ ******************************************************************************/
+size_t	zbx_utf8_char_len(const char *text)
+{
+	if (0 == (*text & 0x80))		/* ASCII */
+		return 1;
+	else if (0xc0 == (*text & 0xe0))	/* 11000010-11011111 starts a 2-byte sequence */
+		return 2;
+	else if (0xe0 == (*text & 0xf0))	/* 11100000-11101111 starts a 3-byte sequence */
+		return 3;
+	else if (0xf0 == (*text & 0xf8))	/* 11110000-11110100 starts a 4-byte sequence */
+		return 4;
+	return 0;				/* not a valid UTF-8 character */
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: zbx_strlen_utf8_n                                                *
  *                                                                            *
  * Purpose: calculates number of bytes in utf8 text limited by utf8_maxlen    *
  * characters                                                                 *
  *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
  ******************************************************************************/
 size_t	zbx_strlen_utf8_n(const char *text, size_t utf8_maxlen)
 {
-	size_t	sz = 0;
+	size_t		sz = 0, csz = 0;
+	const char	*next;
 
-	utf8_maxlen++;
-
-	for (; '\0' != *text; text++)
+	while ('\0' != *text && 0 < utf8_maxlen && 0 != (csz = zbx_utf8_char_len(text)))
 	{
-		if (0x80 != (0xc0 & *text) && 0 == --utf8_maxlen)
-			break;
-		sz++;
+		next = text + csz;
+		while (next > text)
+		{
+			if ('\0' == *text++)
+				return sz;
+		}
+		sz += csz;
+		utf8_maxlen--;
 	}
 
 	return sz;

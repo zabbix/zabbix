@@ -228,7 +228,8 @@ static int	check_trigger_condition(DB_EVENT *event, DB_CONDITION *condition)
 	{
 		tmp_str = zbx_strdup(tmp_str, event->trigger.description);
 
-		substitute_simple_macros(event, NULL, NULL, NULL, &tmp_str, MACRO_TYPE_TRIGGER_DESCRIPTION, NULL, 0);
+		substitute_simple_macros(event, NULL, NULL, NULL, NULL, NULL,
+				&tmp_str, MACRO_TYPE_TRIGGER_DESCRIPTION, NULL, 0);
 
 		switch (condition->operator)
 		{
@@ -1170,24 +1171,28 @@ static void	execute_operations(DB_EVENT *event, zbx_uint64_t actionid)
 	if (0 != lnk_templateids.values_num)
 	{
 		zbx_vector_uint64_sort(&lnk_templateids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+		zbx_vector_uint64_uniq(&lnk_templateids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 		op_template_add(event, &lnk_templateids);
 	}
 
 	if (0 != del_templateids.values_num)
 	{
 		zbx_vector_uint64_sort(&del_templateids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+		zbx_vector_uint64_uniq(&del_templateids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 		op_template_del(event, &del_templateids);
 	}
 
 	if (0 != new_groupids.values_num)
 	{
 		zbx_vector_uint64_sort(&new_groupids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+		zbx_vector_uint64_uniq(&new_groupids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 		op_groups_add(event, &new_groupids);
 	}
 
 	if (0 != del_groupids.values_num)
 	{
 		zbx_vector_uint64_sort(&del_groupids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+		zbx_vector_uint64_uniq(&del_groupids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 		op_groups_del(event, &del_groupids);
 	}
 

@@ -72,7 +72,6 @@ class CGraph extends CGraphGeneral {
 			'hostids'					=> null,
 			'graphids'					=> null,
 			'itemids'					=> null,
-			'discoveryids'				=> null,
 			'type'						=> null,
 			'templated'					=> null,
 			'inherited'					=> null,
@@ -116,36 +115,23 @@ class CGraph extends CGraphGeneral {
 		}
 
 		// permission check
-		if (USER_TYPE_SUPER_ADMIN == $userType || $options['nopermissions']) {
-		}
-		else {
+		if ($userType != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
 			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ_ONLY;
 
-			$sqlParts['from']['graphs_items'] = 'graphs_items gi';
-			$sqlParts['from']['items'] = 'items i';
-			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
-			$sqlParts['from']['rights'] = 'rights r';
-			$sqlParts['from']['users_groups'] = 'users_groups ug';
-			$sqlParts['where']['gig'] = 'gi.graphid=g.graphid';
-			$sqlParts['where']['igi'] = 'i.itemid=gi.itemid';
-			$sqlParts['where']['hgi'] = 'hg.hostid=i.hostid';
-			$sqlParts['where'][] = 'r.id=hg.groupid ';
-			$sqlParts['where'][] = 'r.groupid=ug.usrgrpid';
-			$sqlParts['where'][] = 'ug.userid='.$userid;
-			$sqlParts['where'][] = 'r.permission>='.$permission;
-			$sqlParts['where'][] = 'NOT EXISTS ('.
-				' SELECT gii.graphid'.
-				' FROM graphs_items gii,items ii'.
-				' WHERE gii.graphid=g.graphid'.
-					' AND gii.itemid=ii.itemid'.
-					' AND EXISTS ('.
-						' SELECT hgg.groupid'.
-						' FROM hosts_groups hgg,rights rr,users_groups ugg'.
-						' WHERE ii.hostid=hgg.hostid'.
-							' AND rr.id=hgg.groupid'.
-							' AND rr.groupid=ugg.usrgrpid'.
-							' AND ugg.userid='.$userid.
-							' AND rr.permission<'.$permission.'))';
+			$userGroups = getUserGroupsByUserId($userid);
+
+			$sqlParts['where'][] = 'EXISTS ('.
+				'SELECT NULL'.
+				' FROM graphs_items gi,items i,hosts_groups hgg'.
+					' JOIN rights r'.
+						' ON r.id=hgg.groupid'.
+							' AND '.dbConditionInt('r.groupid', $userGroups).
+				' WHERE g.graphid=gi.graphid'.
+					' AND gi.itemid=i.itemid'.
+					' AND i.hostid=hgg.hostid'.
+				' GROUP BY gi.graphid'.
+				' HAVING MIN(r.permission)>='.$permission.
+				')';
 		}
 
 		// groupids
@@ -158,7 +144,7 @@ class CGraph extends CGraphGeneral {
 			$sqlParts['from']['graphs_items'] = 'graphs_items gi';
 			$sqlParts['from']['items'] = 'items i';
 			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
-			$sqlParts['where'][] = DBcondition('hg.groupid', $options['groupids']);
+			$sqlParts['where'][] = dbConditionInt('hg.groupid', $options['groupids']);
 			$sqlParts['where'][] = 'hg.hostid=i.hostid';
 			$sqlParts['where']['gig'] = 'gi.graphid=g.graphid';
 			$sqlParts['where']['igi'] = 'i.itemid=gi.itemid';
@@ -190,7 +176,7 @@ class CGraph extends CGraphGeneral {
 			}
 			$sqlParts['from']['graphs_items'] = 'graphs_items gi';
 			$sqlParts['from']['items'] = 'items i';
-			$sqlParts['where'][] = DBcondition('i.hostid', $options['hostids']);
+			$sqlParts['where'][] = dbConditionInt('i.hostid', $options['hostids']);
 			$sqlParts['where']['gig'] = 'gi.graphid=g.graphid';
 			$sqlParts['where']['igi'] = 'i.itemid=gi.itemid';
 
@@ -203,7 +189,7 @@ class CGraph extends CGraphGeneral {
 		if (!is_null($options['graphids'])) {
 			zbx_value2array($options['graphids']);
 
-			$sqlParts['where'][] = DBcondition('g.graphid', $options['graphids']);
+			$sqlParts['where'][] = dbConditionInt('g.graphid', $options['graphids']);
 		}
 
 		// itemids
@@ -214,27 +200,10 @@ class CGraph extends CGraphGeneral {
 			}
 			$sqlParts['from']['graphs_items'] = 'graphs_items gi';
 			$sqlParts['where']['gig'] = 'gi.graphid=g.graphid';
-			$sqlParts['where'][] = DBcondition('gi.itemid', $options['itemids']);
+			$sqlParts['where'][] = dbConditionInt('gi.itemid', $options['itemids']);
 
 			if (!is_null($options['groupCount'])) {
 				$sqlParts['group']['gi'] = 'gi.itemid';
-			}
-		}
-
-		// discoveryids
-		if (!is_null($options['discoveryids'])) {
-			zbx_value2array($options['discoveryids']);
-			if ($options['output'] != API_OUTPUT_SHORTEN) {
-				$sqlParts['select']['itemid'] = 'id.parent_itemid';
-			}
-			$sqlParts['from']['graphs_items'] = 'graphs_items gi';
-			$sqlParts['from']['item_discovery'] = 'item_discovery id';
-			$sqlParts['where']['gig'] = 'gi.graphid=g.graphid';
-			$sqlParts['where']['giid'] = 'gi.itemid=id.itemid';
-			$sqlParts['where'][] = DBcondition('id.parent_itemid', $options['discoveryids']);
-
-			if (!is_null($options['groupCount'])) {
-				$sqlParts['group']['id'] = 'id.parent_itemid';
 			}
 		}
 
@@ -303,7 +272,7 @@ class CGraph extends CGraphGeneral {
 				$options['filter']['flags'] = array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED);
 			}
 
-			zbx_db_filter('graphs g', $options, $sqlParts);
+			$this->dbFilter('graphs g', $options, $sqlParts);
 
 			if (isset($options['filter']['host'])) {
 				zbx_value2array($options['filter']['host']);
@@ -314,7 +283,7 @@ class CGraph extends CGraphGeneral {
 				$sqlParts['where']['gig'] = 'gi.graphid=g.graphid';
 				$sqlParts['where']['igi'] = 'i.itemid=gi.itemid';
 				$sqlParts['where']['hi'] = 'h.hostid=i.hostid';
-				$sqlParts['where']['host'] = DBcondition('h.host', $options['filter']['host']);
+				$sqlParts['where']['host'] = dbConditionString('h.host', $options['filter']['host']);
 			}
 
 			if (isset($options['filter']['hostid'])) {
@@ -324,7 +293,7 @@ class CGraph extends CGraphGeneral {
 				$sqlParts['from']['items'] = 'items i';
 				$sqlParts['where']['gig'] = 'gi.graphid=g.graphid';
 				$sqlParts['where']['igi'] = 'i.itemid=gi.itemid';
-				$sqlParts['where']['hostid'] = DBcondition('i.hostid', $options['filter']['hostid']);
+				$sqlParts['where']['hostid'] = dbConditionInt('i.hostid', $options['filter']['hostid']);
 			}
 		}
 
@@ -504,7 +473,7 @@ class CGraph extends CGraphGeneral {
 			$dbRules = DBselect(
 				'SELECT id.parent_itemid,gd.graphid'.
 				' FROM graph_discovery gd,item_discovery id,graphs_items gi'.
-				' WHERE '.DBcondition('gd.graphid', $graphids).
+				' WHERE '.dbConditionInt('gd.graphid', $graphids).
 					' AND gd.parent_graphid=gi.graphid'.
 					' AND gi.itemid=id.itemid'
 			);
@@ -522,7 +491,7 @@ class CGraph extends CGraphGeneral {
 
 			if (is_array($options['selectDiscoveryRule']) || str_in_array($options['selectDiscoveryRule'], $subselectsAllowedOutputs)) {
 				$objParams['output'] = $options['selectDiscoveryRule'];
-				$discoveryRules = API::Item()->get($objParams);
+				$discoveryRules = API::DiscoveryRule()->get($objParams);
 
 				foreach ($result as $graphid => $graph) {
 					if (isset($ruleMap[$graphid]) && isset($discoveryRules[$ruleMap[$graphid]])) {
@@ -670,44 +639,21 @@ class CGraph extends CGraphGeneral {
 	}
 
 	/**
-	 * Inherit template graphs from template to host
+	 * Inherit template graphs from template to host.
 	 *
 	 * @param array $data
+	 *
 	 * @return bool
 	 */
 	public function syncTemplates($data) {
 		$data['templateids'] = zbx_toArray($data['templateids']);
 		$data['hostids'] = zbx_toArray($data['hostids']);
 
-		$allowedHosts = API::Host()->get(array(
-			'hostids' => $data['hostids'],
-			'editable' => true,
-			'preservekeys' => true,
-			'templated_hosts' => true,
-			'output' => API_OUTPUT_SHORTEN
-		));
-		foreach ($data['hostids'] as $hostid) {
-			if (!isset($allowedHosts[$hostid])) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
-			}
-		}
-
-		$allowedTemplates = API::Template()->get(array(
-			'templateids' => $data['templateids'],
-			'preservekeys' => true,
-			'output' => API_OUTPUT_SHORTEN
-		));
-		foreach ($data['templateids'] as $templateid) {
-			if (!isset($allowedTemplates[$templateid])) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
-			}
-		}
-
 		$dbLinks = DBSelect(
 			'SELECT ht.hostid,ht.templateid'.
 			' FROM hosts_templates ht'.
-			' WHERE '.DBcondition('ht.hostid', $data['hostids']).
-				' AND '.DBcondition('ht.templateid', $data['templateids'])
+			' WHERE '.dbConditionInt('ht.hostid', $data['hostids']).
+				' AND '.dbConditionInt('ht.templateid', $data['templateids'])
 		);
 		$linkage = array();
 		while ($link = DBfetch($dbLinks)) {
@@ -771,7 +717,7 @@ class CGraph extends CGraphGeneral {
 
 		$parentGraphids = $graphids;
 		do {
-			$dbGraphs = DBselect('SELECT g.graphid FROM graphs g WHERE '.DBcondition('g.templateid', $parentGraphids));
+			$dbGraphs = DBselect('SELECT g.graphid FROM graphs g WHERE '.dbConditionInt('g.templateid', $parentGraphids));
 			$parentGraphids = array();
 			while ($dbGraph = DBfetch($dbGraphs)) {
 				$parentGraphids[] = $dbGraph['graphid'];
@@ -803,82 +749,42 @@ class CGraph extends CGraphGeneral {
 	}
 
 	/**
-	 * Check $graphs:
-	 *	whether graphs have name field
-	 *	whether graphs has at least one item
-	 *	whether all graph items has ids
-	 *	whether Pie and Exploded graphs has at most one sum item
-	 *	whether all graph items are editable by user
-	 *	whether not creating graphs with the same name
+	 * Check graph data
 	 *
 	 * @param array $graphs
 	 * @param boolean $update
-	 * @return true
+	 *
+	 * @return void
 	 */
 	protected function checkInput($graphs, $update = false) {
 		$itemids = array();
-
-		foreach ($graphs as $gnum => $graph) {
-			// graph fields
-			$fields = array('name' => null);
-			if (!$update && !check_db_fields($fields, $graph)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Missing "name" field for graph.'));
-			}
-
+		foreach ($graphs as $graph) {
 			// no items
 			if (!isset($graph['gitems']) || !is_array($graph['gitems']) || empty($graph['gitems'])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Missing items for graph "%1$s".', $graph['name']));
 			}
 
-			// items fields
 			$fields = array('itemid' => null);
 			foreach ($graph['gitems'] as $gitem) {
 				if (!check_db_fields($fields, $gitem)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('Missing "itemid" field for item.'));
 				}
 
-				// check color
-				if (!preg_match('/^[A-F0-9]{6}$/i', $gitem['color'])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect colour "%1$s".', $gitem['color']));
-				}
-
-				// assigning with key preservs unique itemids
+				// assigning with key preserves unique itemids
 				$itemids[$gitem['itemid']] = $gitem['itemid'];
 			}
-
-			// more than one sum type item for pie graph
-			if ($graph['graphtype'] == GRAPH_TYPE_PIE || $graph['graphtype'] == GRAPH_TYPE_EXPLODED) {
-				$sumItems = 0;
-				foreach ($graph['gitems'] as $gitem) {
-					if ($gitem['type'] == GRAPH_ITEM_SUM) {
-						$sumItems++;
-					}
-				}
-				if ($sumItems > 1) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot add more than one item with type "Graph sum" on graph "%1$s".', $graph['name']));
-				}
-			}
-
-			// Y axis MIN value < Y axis MAX value
-			if (($graph['graphtype'] == GRAPH_TYPE_NORMAL || $graph['graphtype'] == GRAPH_TYPE_STACKED)
-					&& $graph['ymin_type'] == GRAPH_YAXIS_TYPE_FIXED
-					&& $graph['yaxismin'] >= $graph['yaxismax']) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Y axis MAX value must be greater than Y axis MIN value.'));
-			}
 		}
-
-
-		$allowedItems = API::Item()->get(array(
-			'nodeids' => get_current_nodeid(true),
-			'itemids' => $itemids,
-			'webitems' => true,
-			'editable' => true,
-			'output' => API_OUTPUT_EXTEND,
-			'preservekeys' => true
-		));
-
 		// check permissions only for non super admins
-		if (USER_TYPE_SUPER_ADMIN !== CUser::$userData['type']) {
+		if (CUser::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+			$allowedItems = API::Item()->get(array(
+				'nodeids' => get_current_nodeid(true),
+				'itemids' => $itemids,
+				'webitems' => true,
+				'editable' => true,
+				'output' => API_OUTPUT_EXTEND,
+				'preservekeys' => true
+			));
+
 			foreach ($itemids as $itemid) {
 				if (!isset($allowedItems[$itemid])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
@@ -886,49 +792,7 @@ class CGraph extends CGraphGeneral {
 			}
 		}
 
-
-		$graphNames = array();
-		foreach ($graphs as $graph) {
-
-			// check if the host has any graphs in DB with the same name within host
-			$hosts = API::Host()->get(array(
-				'itemids' => zbx_objectValues($graph['gitems'], 'itemid'),
-				'output' => API_OUTPUT_SHORTEN,
-				'nopermissions' => true,
-				'preservekeys' => true
-			));
-
-			$hostids = array_keys($hosts);
-			$graphsExists = $this->get(array(
-				'hostids' => $hostids,
-				'output' => API_OUTPUT_SHORTEN,
-				'filter' => array('name' => $graph['name'], 'flags' => null), // 'flags' => null overrides default behaviour
-				'nopermissions' => true,
-				'preservekeys' => true, // faster
-				'limit' => 1 // one match enough for check
-			));
-
-			// if graph exists with given name and it is create action or update action with ids not matching, rise exception
-			foreach ($graphsExists as $graphExists) {
-				if (!$update || (bccomp($graphExists['graphid'], $graph['graphid']) != 0)) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Graph with name "%1$s" already exists.', $graph['name']));
-				}
-			}
-			// cheks that there is no two graphs with the same name within host
-			foreach ($hostids as $hostid) {
-				if (!isset($graphNames[$graph['name']])) {
-					$graphNames[$graph['name']] = array();
-				}
-				if (isset($graphNames[$graph['name']][$hostid])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('More than one graph with name "%1$s" within host.', $graph['name']));
-				}
-				else {
-					$graphNames[$graph['name']][$hostid] = true;
-				}
-			}
-		}
-
-		return true;
+		parent::checkInput($graphs, $update);
 	}
 
 	protected function applyQueryNodeOptions($tableName, $tableAlias, array $options, array $sqlParts) {
@@ -937,8 +801,7 @@ class CGraph extends CGraphGeneral {
 				$options['templateids'] === null &&
 				$options['hostids'] === null &&
 				$options['groupids'] === null &&
-				$options['itemids'] === null &&
-				$options['discoveryids'] === null) {
+				$options['itemids'] === null) {
 
 			$sqlParts = parent::applyQueryNodeOptions($tableName, $tableAlias, $options, $sqlParts);
 		}

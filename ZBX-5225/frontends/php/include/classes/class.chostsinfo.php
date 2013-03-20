@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2000-2012 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,8 +17,7 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
 
 class CHostsInfo extends CTable {
 
@@ -67,7 +66,7 @@ class CHostsInfo extends CTable {
 			' FROM hosts h'.$cond_from.
 			' WHERE h.available='.HOST_AVAILABLE_TRUE.
 				' AND h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.')'.
-				' AND '.DBcondition('h.hostid', $hostIds).
+				' AND '.dbConditionInt('h.hostid', $hostIds).
 				$cond_where
 		);
 
@@ -80,7 +79,7 @@ class CHostsInfo extends CTable {
 			' FROM hosts h'.$cond_from.
 			' WHERE h.available='.HOST_AVAILABLE_FALSE.
 				' AND h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.')'.
-				' AND '.DBcondition('h.hostid', $hostIds).
+				' AND '.dbConditionInt('h.hostid', $hostIds).
 				$cond_where
 		);
 
@@ -93,7 +92,7 @@ class CHostsInfo extends CTable {
 			' FROM hosts h'.$cond_from.
 			' WHERE h.available='.HOST_AVAILABLE_UNKNOWN.
 				' AND h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.')'.
-				' AND '.DBcondition('h.hostid', $hostIds).
+				' AND '.dbConditionInt('h.hostid', $hostIds).
 				$cond_where
 		);
 
@@ -141,4 +140,3 @@ class CHostsInfo extends CTable {
 		return parent::bodyToString();
 	}
 }
-?>

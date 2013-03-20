@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2000-2012 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -42,6 +42,7 @@ function get_tr_event_by_eventid($eventid) {
 function get_events_unacknowledged($db_element, $value_trigger = null, $value_event = null, $ack = false) {
 	$elements = array('hosts' => array(), 'hosts_groups' => array(), 'triggers' => array());
 	get_map_elements($db_element, $elements);
+
 	if (empty($elements['hosts_groups']) && empty($elements['hosts']) && empty($elements['triggers'])) {
 		return 0;
 	}
@@ -68,7 +69,7 @@ function get_events_unacknowledged($db_element, $value_trigger = null, $value_ev
 	}
 	$triggerids = API::Trigger()->get($options);
 
-	$options = array(
+	return API::Event()->get(array(
 		'countOutput' => 1,
 		'triggerids' => zbx_objectValues($triggerids, 'triggerid'),
 		'filter' => array(
@@ -77,9 +78,8 @@ function get_events_unacknowledged($db_element, $value_trigger = null, $value_ev
 			'acknowledged' => $ack ? 1 : 0
 		),
 		'object' => EVENT_OBJECT_TRIGGER,
-		'nopermissions' => 1
-	);
-	return API::Event()->get($options);
+		'nopermissions' => true
+	));
 }
 
 function get_next_event($currentEvent, array $eventList = array(), $showUnknown = false) {
@@ -116,9 +116,12 @@ function make_event_details($event, $trigger) {
 	$table->addRow(array(_('Time'), zbx_date2str(_('d M Y H:i:s'), $event['clock'])));
 
 	if ($config['event_ack_enable']) {
+		// to make resulting link not have hint with acknowledges
+		$event['acknowledges'] = count($event['acknowledges']);
 		$ack = getEventAckState($event, true);
 		$table->addRow(array(_('Acknowledged'), $ack));
 	}
+
 	return $table;
 }
 
@@ -191,6 +194,7 @@ function make_small_eventlist($startEvent) {
 			$actions
 		));
 	}
+
 	return $table;
 }
 
@@ -245,12 +249,28 @@ function make_popup_eventlist($eventid, $trigger_type, $triggerid) {
 			$ack
 		));
 	}
+
 	return $table;
 }
 
-function getEventAckState($event, $isBackurl = false, $isLink = true, $params = array()) {
+/**
+ * Create element with event acknowledges info.
+ * If $event has subarray 'acknowledges', returned link will have hint with acknowledges.
+ *
+ * @param array			$event   event data
+ * @param int			$event['value_changed']
+ * @param int			$event['acknowledged']
+ * @param int			$event['eventid']
+ * @param int			$event['objectid']
+ * @param array			$event['acknowledges']
+ * @param bool|string	$backUrl if true, add backurl param to link with current page file name
+ * @param bool			$isLink  if true, return link otherwise span
+ * @param array			$params  additional params for link
+ *
+ * @return array|CLink|CSpan|null|string
+ */
+function getEventAckState($event, $backUrl = false, $isLink = true, $params = array()) {
 	$config = select_config();
-	global $page;
 
 	if (!$config['event_ack_enable']) {
 		return null;
@@ -261,8 +281,14 @@ function getEventAckState($event, $isBackurl = false, $isLink = true, $params = 
 	}
 
 	if ($isLink) {
-		if ($isBackurl) {
-			$backurl = '&backurl='.$page['file'];
+		if (!empty($backUrl)) {
+			if (is_bool($backUrl)) {
+				global $page;
+				$backurl = '&backurl='.$page['file'];
+			}
+			else {
+				$backurl = '&backurl='.$backUrl;
+			}
 		}
 		else {
 			$backurl = '';
@@ -278,12 +304,16 @@ function getEventAckState($event, $isBackurl = false, $isLink = true, $params = 
 		}
 		else {
 			$ackLink = new CLink(_('Yes'), 'acknow.php?eventid='.$event['eventid'].'&triggerid='.$event['objectid'].$backurl.$additionalParams, 'enabled');
-			$ackLinkHints = make_acktab_by_eventid($event);
-			if (!empty($ackLinkHints)) {
-				$ackLink->setHint($ackLinkHints, '', '', false);
+			if (is_array($event['acknowledges'])) {
+				$ackLinkHints = makeAckTab($event);
+				if (!empty($ackLinkHints)) {
+					$ackLink->setHint($ackLinkHints, '', '', false);
+				}
+				$ack = array($ackLink, ' ('.count($event['acknowledges']).')');
 			}
-
-			$ack = array($ackLink, ' ('.(is_array($event['acknowledges']) ? count($event['acknowledges']) : $event['acknowledges']).')');
+			else {
+				$ack = array($ackLink, ' ('.$event['acknowledges'].')');
+			}
 		}
 	}
 	else {
@@ -294,6 +324,7 @@ function getEventAckState($event, $isBackurl = false, $isLink = true, $params = 
 			$ack = array(new CSpan(_('Yes'), 'off'), ' ('.(is_array($event['acknowledges']) ? count($event['acknowledges']) : $event['acknowledges']).')');
 		}
 	}
+
 	return $ack;
 }
 
@@ -309,7 +340,7 @@ function getLastEvents($options) {
 		'output' => API_OUTPUT_EXTEND,
 		'sortfield' => 'lastchange',
 		'sortorder' => ZBX_SORT_DOWN,
-		'limit' => $options['limit']
+		'limit' => $options['triggerLimit']
 	);
 
 	$eventOptions = array(
@@ -319,9 +350,12 @@ function getLastEvents($options) {
 			'value_changed' => TRIGGER_VALUE_CHANGED_YES
 		),
 		'sortfield' => 'eventid',
-		'sortorder' => ZBX_SORT_DOWN,
-		'limit' => $options['limit']
+		'sortorder' => ZBX_SORT_DOWN
 	);
+
+	if (isset($options['eventLimit'])) {
+		$eventOptions['limit'] = $options['eventLimit'];
+	}
 
 	if (isset($options['nodeids'])) {
 		$triggerOptions['nodeids'] = $options['nodeids'];
@@ -355,6 +389,7 @@ function getLastEvents($options) {
 		if (!isset($triggers[$event['objectid']])) {
 			continue;
 		}
+
 		$events[$enum]['trigger'] = $triggers[$event['objectid']];
 		$events[$enum]['host'] = reset($events[$enum]['trigger']['hosts']);
 		$sortClock[$enum] = $event['clock'];

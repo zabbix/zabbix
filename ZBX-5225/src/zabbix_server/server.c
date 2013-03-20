@@ -302,13 +302,13 @@ static void	zbx_load_config()
 		{"StartSNMPTrapper",		&CONFIG_SNMPTRAPPER_FORKS,		TYPE_INT,
 			PARM_OPT,	0,			1},
 		{"CacheSize",			&CONFIG_CONF_CACHE_SIZE,		TYPE_INT,
-			PARM_OPT,	128 * ZBX_KIBIBYTE,	ZBX_GIBIBYTE},
+			PARM_OPT,	128 * ZBX_KIBIBYTE,	0x7fffffff},	/* just below 2GB */
 		{"HistoryCacheSize",		&CONFIG_HISTORY_CACHE_SIZE,		TYPE_INT,
-			PARM_OPT,	128 * ZBX_KIBIBYTE,	ZBX_GIBIBYTE},
+			PARM_OPT,	128 * ZBX_KIBIBYTE,	0x7fffffff},	/* just below 2GB */
 		{"TrendCacheSize",		&CONFIG_TRENDS_CACHE_SIZE,		TYPE_INT,
-			PARM_OPT,	128 * ZBX_KIBIBYTE,	ZBX_GIBIBYTE},
+			PARM_OPT,	128 * ZBX_KIBIBYTE,	0x7fffffff},	/* just below 2GB */
 		{"HistoryTextCacheSize",	&CONFIG_TEXT_CACHE_SIZE,		TYPE_INT,
-			PARM_OPT,	128 * ZBX_KIBIBYTE,	ZBX_GIBIBYTE},
+			PARM_OPT,	128 * ZBX_KIBIBYTE,	0x7fffffff},	/* just below 2GB */
 		{"CacheUpdateFrequency",	&CONFIG_CONFSYNCER_FREQUENCY,		TYPE_INT,
 			PARM_OPT,	1,			SEC_PER_HOUR},
 		{"HousekeepingFrequency",	&CONFIG_HOUSEKEEPING_FREQUENCY,		TYPE_INT,
@@ -581,6 +581,8 @@ int	MAIN_ZABBIX_ENTRY()
 	init_configuration_cache();
 	init_selfmon_collector();
 
+	zbx_create_services_lock();
+
 	DCload_config();
 
 	/* need to set trigger status to UNKNOWN since last run */
@@ -809,6 +811,9 @@ void	zbx_on_exit()
 	DBconnect(ZBX_DB_CONNECT_EXIT);
 	free_database_cache();
 	free_configuration_cache();
+
+	zbx_destroy_services_lock();
+
 	DBclose();
 
 	zbx_mutex_destroy(&node_sync_access);

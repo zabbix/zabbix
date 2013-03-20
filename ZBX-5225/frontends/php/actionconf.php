@@ -39,8 +39,8 @@ $fields = array(
 	'def_shortdata' =>		array(T_ZBX_STR, O_OPT, null,	null,		'isset({save})'),
 	'def_longdata' =>		array(T_ZBX_STR, O_OPT, null,	null,		'isset({save})'),
 	'recovery_msg' =>		array(T_ZBX_INT, O_OPT, null,	null,		null),
-	'r_shortdata' =>		array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({recovery_msg})&&isset({save})', _('Recovery subject')),
-	'r_longdata' =>			array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({recovery_msg})&&isset({save})', _('Recovery message')),
+	'r_shortdata' =>		array(T_ZBX_STR, O_OPT, null,	null,		'isset({recovery_msg})&&isset({save})', _('Recovery subject')),
+	'r_longdata' =>			array(T_ZBX_STR, O_OPT, null,	null,		'isset({recovery_msg})&&isset({save})', _('Recovery message')),
 	'g_actionid' =>			array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
 	'conditions' =>			array(null,		O_OPT,	null,	null,		null),
 	'new_condition' =>		array(null,		O_OPT,	null,	null,		'isset({add_condition})'),
@@ -118,10 +118,10 @@ elseif (isset($_REQUEST['save'])) {
 	}
 
 	$action = array(
-		'name'			=> get_request('name'),
+		'name'		=> get_request('name'),
 		'eventsource'	=> get_request('eventsource', 0),
-		'evaltype'		=> get_request('evaltype', 0),
-		'status'		=> get_request('status', ACTION_STATUS_DISABLED),
+		'evaltype'	=> get_request('evaltype', 0),
+		'status'	=> get_request('status', ACTION_STATUS_DISABLED),
 		'esc_period'	=> get_request('esc_period', 0),
 		'def_shortdata'	=> get_request('def_shortdata', ''),
 		'def_longdata'	=> get_request('def_longdata', ''),
@@ -284,7 +284,7 @@ elseif (str_in_array($_REQUEST['go'], array('activate', 'disable')) && isset($_R
 		'SELECT DISTINCT a.actionid'.
 		' FROM actions a'.
 		' WHERE '.DBin_node('a.actionid', $nodes).
-			' AND '.DBcondition('a.actionid', $_REQUEST['g_actionid'])
+			' AND '.dbConditionInt('a.actionid', $_REQUEST['g_actionid'])
 	);
 	while ($row = DBfetch($go_result)) {
 		$res = DBexecute('UPDATE actions SET status='.$status.' WHERE actionid='.$row['actionid']);

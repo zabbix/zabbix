@@ -121,8 +121,11 @@ function DBconnect(&$error) {
 					}
 				}
 
-				$DB['DB']= ociplogon($DB['USER'], $DB['PASSWORD'], $connect);
-				if (!$DB['DB']) {
+				$DB['DB'] = ociplogon($DB['USER'], $DB['PASSWORD'], $connect);
+				if ($DB['DB']) {
+					DBexecute('ALTER SESSION SET NLS_NUMERIC_CHARACTERS='.zbx_dbstr('. '));
+				}
+				else {
 					$error = 'Error connecting to database';
 					$result = false;
 				}
@@ -555,7 +558,7 @@ function DBexecute($query, $skip_error_messages = 0) {
 	return (bool) $result;
 }
 
-function DBfetch(&$cursor) {
+function DBfetch(&$cursor, $convertNulls = true) {
 	global $DB;
 
 	$result = false;
@@ -593,6 +596,16 @@ function DBfetch(&$cursor) {
 			if (!$result = db2_fetch_assoc($cursor)) {
 				db2_free_result($cursor);
 			}
+			else {
+				// cast all of the values to string to be consistent with other DB drivers: all of them return
+				// only strings.
+				foreach ($result as &$value) {
+					if ($value !== null) {
+						$value = (string) $value;
+					}
+				}
+				unset($value);
+			}
 			break;
 		case ZBX_DB_SQLITE3:
 			if ($DB['TRANSACTIONS'] == 0) {
@@ -615,7 +628,7 @@ function DBfetch(&$cursor) {
 			break;
 	}
 
-	if ($result) {
+	if ($convertNulls && $result) {
 		foreach ($result as $key => $val) {
 			if (is_null($val)) {
 				$result[$key] = '0';
@@ -641,7 +654,7 @@ if (isset($DB['TYPE']) && $DB['TYPE'] == ZBX_DB_MYSQL) {
 		return ' CAST('.$field.' AS UNSIGNED) ';
 	}
 
-	function zbx_limit($min = 1, $max = null) {
+	function zbx_limit($min = 1, $max = null, $afterWhere = true) {
 		return !empty($max) ? 'LIMIT '.$min.','.$max : 'LIMIT '.$min;
 	}
 }
@@ -660,7 +673,7 @@ elseif (isset($DB['TYPE']) && $DB['TYPE'] == ZBX_DB_POSTGRESQL) {
 		return ' CAST('.$field.' AS BIGINT) ';
 	}
 
-	function zbx_limit($min = 1, $max = null) {
+	function zbx_limit($min = 1, $max = null, $afterWhere = true) {
 		return !empty($max) ? 'LIMIT '.$min.','.$max : 'LIMIT '.$min;
 	}
 }
@@ -679,8 +692,13 @@ elseif (isset($DB['TYPE']) && $DB['TYPE'] == ZBX_DB_ORACLE) {
 		return ' CAST('.$field.' AS NUMBER(20)) ';
 	}
 
-	function zbx_limit($min = 1, $max = null) {
-		return !empty($max) ? 'ROWNUM BETWEEN '.$min.' AND '.$max : 'ROWNUM <='.$min;
+	function zbx_limit($min = 1, $max = null, $afterWhere = true) {
+		if ($afterWhere) {
+			return !empty($max) ? ' AND ROWNUM BETWEEN '.$min.' AND '.$max : ' AND ROWNUM <='.$min;
+		}
+		else {
+			return !empty($max) ? ' WHERE ROWNUM BETWEEN '.$min.' AND '.$max : ' WHERE ROWNUM <='.$min;
+		}
 	}
 }
 elseif (isset($DB['TYPE']) && $DB['TYPE'] == ZBX_DB_DB2) {
@@ -698,8 +716,13 @@ elseif (isset($DB['TYPE']) && $DB['TYPE'] == ZBX_DB_DB2) {
 		return ' CAST('.$field.' AS BIGINT) ';
 	}
 
-	function zbx_limit($min = 1, $max = null) {
-		return !empty($max) ? 'ROWNUM BETWEEN '.$min.' AND '.$max : 'ROWNUM <='.$min;
+	function zbx_limit($min = 1, $max = null, $afterWhere = true) {
+		if ($afterWhere) {
+			return !empty($max) ? ' AND ROWNUM BETWEEN '.$min.' AND '.$max : ' AND ROWNUM <='.$min;
+		}
+		else {
+			return !empty($max) ? ' WHERE ROWNUM BETWEEN '.$min.' AND '.$max : ' WHERE ROWNUM <='.$min;
+		}
 	}
 }
 elseif (isset($DB['TYPE']) && $DB['TYPE'] == ZBX_DB_SQLITE3) {
@@ -719,7 +742,7 @@ elseif (isset($DB['TYPE']) && $DB['TYPE'] == ZBX_DB_SQLITE3) {
 		return ' CAST('.$field.' AS BIGINT) ';
 	}
 
-	function zbx_limit($min = 1, $max = null) {
+	function zbx_limit($min = 1, $max = null, $afterWhere = true) {
 		return !empty($max) ? 'LIMIT '.$min.','.$max : 'LIMIT '.$min;
 	}
 }
@@ -965,35 +988,6 @@ function zbx_db_search($table, $options, &$sql_parts) {
 	return false;
 }
 
-function zbx_db_filter($table, $options, &$sql_parts) {
-	list($table, $tableShort) = explode(' ', $table);
-
-	$tableSchema = DB::getSchema($table);
-	if (!$tableSchema) {
-		info(_s('Error in search request for table "%1$s".', $table));
-	}
-
-	$filter = array();
-	foreach ($options['filter'] as $field => $value) {
-		if (!isset($tableSchema['fields'][$field]) || zbx_empty($value)) {
-			continue;
-		}
-		zbx_value2array($value);
-		$filter[$field] = DBcondition($tableShort.'.'.$field, $value);
-	}
-
-	if (!empty($filter)) {
-		if (isset($sql_parts['where']['filter'])) {
-			$filter[] = $sql_parts['where']['filter'];
-		}
-
-		$glue = (is_null($options['searchByAny']) || $options['searchByAny'] === false) ? ' AND ' : ' OR ';
-		$sql_parts['where']['filter'] = '( '.implode($glue, $filter).' )';
-		return true;
-	}
-	return false;
-}
-
 function zbx_db_sorting(&$sql_parts, $options, $sort_columns, $alias) {
 	if (!zbx_empty($options['sortfield'])) {
 		if (!is_array($options['sortfield'])) {
@@ -1063,26 +1057,143 @@ function check_db_fields($db_fields, &$args) {
 	return true;
 }
 
-function DBcondition($fieldname, $array, $notin = false) {
+/**
+ * Takes an initial part of SQL query and appends a generated WHERE condition.
+ * The WHERE condidion is generated from the given list of values as a mix of
+ * <fieldname> BETWEEN <id1> AND <idN>" and "<fieldname> IN (<id1>,<id2>,...,<idN>)" elements.
+ *
+ * @param string $fieldName  field name to be used in SQL WHERE condition
+ * @param array  $values     array of numerical values sorted in ascending order to be included in WHERE
+ * @param bool   $notIn      builds inverted condition
+ *
+ * @return string
+ */
+function dbConditionInt($fieldName, array $values, $notIn = false) {
+	$MAX_EXPRESSIONS = 950; // maximum  number of values for using "IN (id1>,<id2>,...,<idN>)"
+	$MIN_NUM_BETWEEN = 5; // minimum number of consecutive values for using "BETWEEN <id1> AND <idN>"
+
+	if (count($values) == 0) {
+		return '1=0';
+	}
+
 	$condition = '';
 
-	if (!is_array($array)) {
-		throw new APIException(1, 'DBcondition Error: ['.$fieldname.'] = '.$array);
-		return ' 1=0 ';
+	$betweens = array();
+	$ins = array();
+
+	$pos = 1;
+	$len = 1;
+	$valueL = reset($values);
+	while (false !== ($valueR = next($values))) {
+		$valueL = bcadd($valueL, 1, 0);
+
+		if (bccomp($valueR, $valueL) != 0) {
+			if ($len >= $MIN_NUM_BETWEEN) {
+				$betweens[] = array(bcsub($valueL, $len, 0), bcsub($valueL, 1, 0));
+			}
+			else {
+				$ins = array_merge($ins, array_slice($values, $pos - $len, $len));
+			}
+
+			$len = 1;
+			$valueL = $valueR;
+		}
+		else {
+			$len++;
+		}
+		$pos++;
 	}
 
-	$in = $notin ? ' NOT IN ':' IN ';
-	$concat = $notin ? ' AND ':' OR ';
+	if ($len >= $MIN_NUM_BETWEEN) {
+		$betweens[] = array(bcadd(bcsub($valueL, $len, 0), 1, 0), $valueL);
+	}
+	else {
+		$ins = array_merge($ins, array_slice($values, $pos - $len, $len));
+	}
 
-	$items = array_chunk($array, 950);
+	$operand = $notIn ? 'AND' : 'OR';
+	$not = $notIn ? 'NOT ' : '';
+	$inNum = count($ins);
+	$betweenNum = count($betweens);
+
+	if ($MAX_EXPRESSIONS < $inNum || 1 < $betweenNum || (0 < $inNum && 0 < $betweenNum)) {
+		$condition .= '(';
+	}
+
+	// compose "BETWEEN"s
+	$first = true;
+	foreach ($betweens as $between) {
+		if (!$first) {
+			$condition .= ' '.$operand.' ';
+		}
+		$condition .= $not.$fieldName.' BETWEEN '.zbx_dbstr($between[0]).' AND '.zbx_dbstr($between[1]);
+		$first = false;
+	}
+
+	if (0 < $inNum && 0 < $betweenNum) {
+		$condition .= ' '.$operand.' ';
+	}
+
+	if ($inNum == 1) {
+		foreach ($ins as $insValue) {
+			$condition .= $notIn
+				? $fieldName.'!='.zbx_dbstr($insValue)
+				: $fieldName.'='.zbx_dbstr($insValue);
+			break;
+		}
+	}
+
+	// compose "IN"s
+	else {
+		$first = true;
+		foreach (array_chunk($ins, $MAX_EXPRESSIONS) as $in) {
+			if (!$first) {
+				$condition .= ' '.$operand.' ';
+			}
+
+			$in = array_map('zbx_dbstr', $in);
+			$condition .= $fieldName.' '.$not.'IN ('.implode(',', $in).')';
+			$first = false;
+		}
+	}
+
+	if ($MAX_EXPRESSIONS < $inNum || 1 < $betweenNum || (0 < $inNum && 0 < $betweenNum)) {
+		$condition .= ')';
+	}
+
+	return $condition;
+}
+
+/**
+ * Takes an initial part of SQL query and appends a generated WHERE condition.
+ *
+ * @param string $fieldName  field name to be used in SQL WHERE condition
+ * @param array  $values     array of string values sorted in ascending order to be included in WHERE
+ * @param bool   $notIn      builds inverted condition
+ *
+ * @return string
+ */
+function dbConditionString($fieldName, array $values, $notIn = false) {
+	switch (count($values)) {
+		case 0:
+			return '1=0';
+		case 1:
+			return $notIn
+				? $fieldName.'!='.zbx_dbstr(reset($values))
+				: $fieldName.'='.zbx_dbstr(reset($values));
+	}
+
+	$in = $notIn ? ' NOT IN ' : ' IN ';
+	$concat = $notIn ? ' AND ' : ' OR ';
+	$items = array_chunk($values, 950);
+
+	$condition = '';
 	foreach ($items as $values) {
-		$condition .= !empty($condition) ? ')'.$concat.$fieldname.$in.'(' : '';
+		$condition .= !empty($condition) ? ')'.$concat.$fieldName.$in.'(' : '';
 		$condition .= implode(',', zbx_dbstr($values));
 	}
-	if (zbx_empty($condition)) {
-		return ' 1=0 ';
-	}
-	return ' ('.$fieldname.$in.'('.$condition.')) ';
+
+	return $fieldName.$in.'('.$condition.')';
 }
 
 function zero2null($val) {
@@ -1160,7 +1271,7 @@ function unlock_sqlite3_access() {
  * @return bool
  */
 function idcmp($id1, $id2) {
-	return $id1 === $id2;
+	return (string) $id1 === (string) $id2;
 }
 
 /**

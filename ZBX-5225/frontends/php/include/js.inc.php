@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2000-2012 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -494,7 +494,7 @@ function insert_js_function($fnct_name) {
 		case 'check_all':
 			insert_js('
 				function check_all(objname, value) {
-					$(objname).getInputs("checkbox").each(function(e){
+					$(objname).getInputs("checkbox").each(function(e) {
 						e.checked = value;
 					});
 				}');
@@ -534,4 +534,19 @@ function get_js($script, $jQueryDocumentReady = false) {
 	return $jQueryDocumentReady
 		? '<script type="text/javascript">// <![CDATA['."\n".'jQuery(document).ready(function() { '.$script.' });'."\n".'// ]]></script>'
 		: '<script type="text/javascript">// <![CDATA['."\n".$script."\n".'// ]]></script>';
+}
+
+function insertPagePostJs() {
+	global $ZBX_PAGE_POST_JS;
+
+	if (!empty($ZBX_PAGE_POST_JS)) {
+		$js = '';
+		foreach ($ZBX_PAGE_POST_JS as $script) {
+			$js .= $script."\n";
+		}
+
+		if (!empty($js)) {
+			echo get_js($js, true);
+		}
+	}
 }

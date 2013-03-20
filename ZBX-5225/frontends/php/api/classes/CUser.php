@@ -119,7 +119,7 @@ class CUser extends CZBXAPI {
 		// userids
 		if (!is_null($options['userids'])) {
 			zbx_value2array($options['userids']);
-			$sqlParts['where'][] = DBcondition('u.userid', $options['userids']);
+			$sqlParts['where'][] = dbConditionInt('u.userid', $options['userids']);
 		}
 
 		// usrgrpids
@@ -129,7 +129,7 @@ class CUser extends CZBXAPI {
 				$sqlParts['select']['usrgrpid'] = 'ug.usrgrpid';
 			}
 			$sqlParts['from']['users_groups'] = 'users_groups ug';
-			$sqlParts['where'][] = DBcondition('ug.usrgrpid', $options['usrgrpids']);
+			$sqlParts['where'][] = dbConditionInt('ug.usrgrpid', $options['usrgrpids']);
 			$sqlParts['where']['uug'] = 'u.userid=ug.userid';
 		}
 
@@ -140,7 +140,7 @@ class CUser extends CZBXAPI {
 				$sqlParts['select']['mediaid'] = 'm.mediaid';
 			}
 			$sqlParts['from']['media'] = 'media m';
-			$sqlParts['where'][] = DBcondition('m.mediaid', $options['mediaids']);
+			$sqlParts['where'][] = dbConditionInt('m.mediaid', $options['mediaids']);
 			$sqlParts['where']['mu'] = 'm.userid=u.userid';
 		}
 
@@ -151,7 +151,7 @@ class CUser extends CZBXAPI {
 				$sqlParts['select']['mediatypeid'] = 'm.mediatypeid';
 			}
 			$sqlParts['from']['media'] = 'media m';
-			$sqlParts['where'][] = DBcondition('m.mediatypeid', $options['mediatypeids']);
+			$sqlParts['where'][] = dbConditionInt('m.mediatypeid', $options['mediatypeids']);
 			$sqlParts['where']['mu'] = 'm.userid=u.userid';
 		}
 
@@ -171,7 +171,7 @@ class CUser extends CZBXAPI {
 			if (isset($options['filter']['passwd'])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('It is not possible to filter by user password.'));
 			}
-			zbx_db_filter('users u', $options, $sqlParts);
+			$this->dbFilter('users u', $options, $sqlParts);
 		}
 
 		// search
@@ -289,7 +289,7 @@ class CUser extends CZBXAPI {
 				'SELECT ug.userid,MAX(g.gui_access) AS gui_access,'.
 					' MAX(g.debug_mode) AS debug_mode,MAX(g.users_status) AS users_status'.
 					' FROM usrgrp g,users_groups ug'.
-					' WHERE '.DBcondition('ug.userid', $userids).
+					' WHERE '.dbConditionInt('ug.userid', $userids).
 						' AND g.usrgrpid=ug.usrgrpid'.
 					' GROUP BY ug.userid'
 			);
@@ -577,7 +577,7 @@ class CUser extends CZBXAPI {
 				$newUsrgrpids = zbx_objectValues($user['usrgrps'], 'usrgrpid');
 
 				// deleting all relations with groups, but not touching those, where user still must be after update
-				DBexecute('DELETE FROM users_groups WHERE userid='.$user['userid'].' AND '.DBcondition('usrgrpid', $newUsrgrpids, true));
+				DBexecute('DELETE FROM users_groups WHERE userid='.$user['userid'].' AND '.dbConditionInt('usrgrpid', $newUsrgrpids, true));
 
 				// getting the list of groups user is currently in
 				$dbGroupsUserIn = DBSelect('SELECT usrgrpid FROM users_groups WHERE userid='.$user['userid']);
@@ -633,7 +633,7 @@ class CUser extends CZBXAPI {
 		$dbOperations = DBselect(
 			'SELECT DISTINCT om.operationid'.
 			' FROM opmessage_usr om'.
-			' WHERE '.DBcondition('om.userid', $userids)
+			' WHERE '.dbConditionInt('om.userid', $userids)
 		);
 		while ($dbOperation = DBfetch($dbOperations)) {
 			$operationids[$dbOperation['operationid']] = $dbOperation['operationid'];
@@ -646,7 +646,7 @@ class CUser extends CZBXAPI {
 		$dbOperations = DBselect(
 			'SELECT DISTINCT o.operationid'.
 			' FROM operations o'.
-			' WHERE '.DBcondition('o.operationid', $operationids).
+			' WHERE '.dbConditionInt('o.operationid', $operationids).
 				' AND NOT EXISTS(SELECT om.opmessage_usrid FROM opmessage_usr om WHERE om.operationid=o.operationid)'
 		);
 		while ($dbOperation = DBfetch($dbOperations)) {
@@ -722,7 +722,7 @@ class CUser extends CZBXAPI {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Only Zabbix Admins can remove user media.'));
 		}
 
-		$sql = 'DELETE FROM media WHERE '.DBcondition('mediaid', $mediaids);
+		$sql = 'DELETE FROM media WHERE '.dbConditionInt('mediaid', $mediaids);
 		if (!DBexecute($sql)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
 		}
@@ -759,7 +759,7 @@ class CUser extends CZBXAPI {
 		$result = DBselect(
 			'SELECT m.mediaid'.
 			' FROM media m'.
-			' WHERE '.DBcondition('userid', $userids)
+			' WHERE '.dbConditionInt('userid', $userids)
 		);
 		while ($media = DBfetch($result)) {
 			$delMedias[$media['mediaid']] = $media;
@@ -822,15 +822,12 @@ class CUser extends CZBXAPI {
 	// ******************************************************************************
 	// LOGIN Methods
 	// ******************************************************************************
-	public function ldapLogin($user) {
-		$cnf = isset($user['cnf']) ? $user['cnf'] : null;
-
-		if (is_null($cnf)) {
-			$config = select_config();
-			foreach ($config as $id => $value) {
-				if (zbx_strpos($id, 'ldap_') !== false) {
-					$cnf[str_replace('ldap_', '', $id)] = $config[$id];
-				}
+	protected function ldapLogin($user) {
+		$config = select_config();
+		$cnf = array();
+		foreach ($config as $id => $value) {
+			if (zbx_strpos($id, 'ldap_') !== false) {
+				$cnf[str_replace('ldap_', '', $id)] = $config[$id];
 			}
 		}
 
@@ -867,13 +864,15 @@ class CUser extends CZBXAPI {
 		}
 	}
 
-	public function logout($sessionid) {
+	public function logout() {
 		global $ZBX_LOCALNODEID;
 
+		$sessionId = CWebUser::$data['sessionid'];
+
 		$session = DBfetch(DBselect(
-			'SELECT s.*'.
+			'SELECT s.userid'.
 			' FROM sessions s'.
-			' WHERE s.sessionid='.zbx_dbstr($sessionid).
+			' WHERE s.sessionid='.zbx_dbstr($sessionId).
 				' AND s.status='.ZBX_SESSION_ACTIVE.
 				' AND '.DBin_node('s.userid', $ZBX_LOCALNODEID)
 		));
@@ -882,7 +881,7 @@ class CUser extends CZBXAPI {
 		}
 
 		DBexecute('DELETE FROM sessions WHERE status='.ZBX_SESSION_PASSIVE.' AND userid='.zbx_dbstr($session['userid']));
-		DBexecute('UPDATE sessions SET status='.ZBX_SESSION_PASSIVE.' WHERE sessionid='.zbx_dbstr($sessionid));
+		DBexecute('UPDATE sessions SET status='.ZBX_SESSION_PASSIVE.' WHERE sessionid='.zbx_dbstr($sessionId));
 
 		return true;
 	}

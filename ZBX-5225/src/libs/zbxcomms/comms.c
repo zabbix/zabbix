@@ -937,6 +937,15 @@ ssize_t	zbx_tcp_recv_ext(zbx_sock_t *s, char **data, unsigned char flags, int ti
 		nbytes = ZBX_TCP_READ(s->socket, (void *)&expected_len, left);
 		expected_len = zbx_letoh_uint64(expected_len);
 
+		if (ZBX_MAX_RECV_DATA_SIZE < expected_len)
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "Message size " ZBX_FS_UI64 " exceeds the maximum size "
+					ZBX_FS_UI64 " bytes. Message ignored.", expected_len,
+					(zbx_uint64_t)ZBX_MAX_RECV_DATA_SIZE);
+			total_bytes = FAIL;
+			goto cleanup;
+		}
+
 		flags |= ZBX_TCP_READ_UNTIL_CLOSE;
 	}
 	else if (ZBX_TCP_ERROR != nbytes)

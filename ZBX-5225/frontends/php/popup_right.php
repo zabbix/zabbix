@@ -57,7 +57,7 @@ check_fields($fields);
 
 		$sql = 'SELECT name,nodeid '.
 			' FROM nodes '.
-			' WHERE '.DBcondition('nodeid',$available_nodes);
+			' WHERE '.dbConditionInt('nodeid', $available_nodes);
 		$db_nodes = DBselect($sql);
 		while($node = DBfetch($db_nodes)){
 			$cmbResourceNode->addItem($node['nodeid'], $node['name']);

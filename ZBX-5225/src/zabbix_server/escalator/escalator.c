@@ -191,7 +191,7 @@ static int	get_trigger_permission(zbx_uint64_t userid, zbx_uint64_t triggerid)
 }
 
 static void	add_user_msg(zbx_uint64_t userid, zbx_uint64_t mediatypeid, ZBX_USER_MSG **user_msg,
-		char *subject, char *message, unsigned char source, zbx_uint64_t triggerid)
+		const char *subject, const char *message, unsigned char source, zbx_uint64_t triggerid)
 {
 	const char	*__function_name = "add_user_msg";
 	ZBX_USER_MSG	*p;
@@ -221,8 +221,8 @@ static void	add_user_msg(zbx_uint64_t userid, zbx_uint64_t mediatypeid, ZBX_USER
 
 		p->userid = userid;
 		p->mediatypeid = mediatypeid;
-		p->subject = strdup(subject);
-		p->message = strdup(message);
+		p->subject = zbx_strdup(NULL, subject);
+		p->message = zbx_strdup(NULL, message);
 		p->next = *user_msg;
 
 		*user_msg = p;
@@ -232,7 +232,7 @@ static void	add_user_msg(zbx_uint64_t userid, zbx_uint64_t mediatypeid, ZBX_USER
 }
 
 static void	add_object_msg(zbx_uint64_t operationid, zbx_uint64_t mediatypeid, ZBX_USER_MSG **user_msg,
-		char *subject, char *message, unsigned char source, zbx_uint64_t triggerid)
+		const char *subject, const char *message, unsigned char source, zbx_uint64_t triggerid)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -485,7 +485,8 @@ static void	execute_commands(DB_EVENT *event, zbx_uint64_t actionid, zbx_uint64_
 		if (ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT != script.type)
 		{
 			script.command = zbx_strdup(script.command, row[11]);
-			substitute_simple_macros(event, NULL, NULL, NULL, &script.command, MACRO_TYPE_MESSAGE, NULL, 0);
+			substitute_simple_macros(event, NULL, NULL, NULL, NULL, NULL,
+					&script.command, MACRO_TYPE_MESSAGE, NULL, 0);
 		}
 
 		if (SUCCEED == rc)
@@ -499,6 +500,7 @@ static void	execute_commands(DB_EVENT *event, zbx_uint64_t actionid, zbx_uint64_
 					script.authtype = (unsigned char)atoi(row[6]);
 					script.publickey = zbx_strdup(script.publickey, row[9]);
 					script.privatekey = zbx_strdup(script.privatekey, row[10]);
+					/* break; is not missing here */
 				case ZBX_SCRIPT_TYPE_TELNET:
 					script.port = zbx_strdup(script.port, row[5]);
 					script.username = zbx_strdup(script.username, row[7]);
@@ -524,7 +526,7 @@ static void	execute_commands(DB_EVENT *event, zbx_uint64_t actionid, zbx_uint64_
 }
 
 static void	add_message_alert(DB_ESCALATION *escalation, DB_EVENT *event, DB_ACTION *action,
-		zbx_uint64_t userid, zbx_uint64_t mediatypeid, char *subject, char *message)
+		zbx_uint64_t userid, zbx_uint64_t mediatypeid, const char *subject, const char *message)
 {
 	const char	*__function_name = "add_message_alert";
 
@@ -532,14 +534,23 @@ static void	add_message_alert(DB_ESCALATION *escalation, DB_EVENT *event, DB_ACT
 	DB_ROW		row;
 	zbx_uint64_t	alertid;
 	int		now, severity, medias = 0;
-	char		*sendto_esc, *subject_esc, *message_esc, *error_esc;
+	char		*subject_dyn, *message_dyn, *sendto_esc, *subject_esc, *message_esc, *error_esc;
 	char		error[MAX_STRING_LEN];
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	now		= time(NULL);
-	subject_esc	= DBdyn_escape_string_len(subject, ALERT_SUBJECT_LEN);
-	message_esc	= DBdyn_escape_string(message);
+	subject_dyn = zbx_strdup(NULL, subject);
+	message_dyn = zbx_strdup(NULL, message);
+
+	substitute_simple_macros(event, &userid, NULL, NULL, NULL, NULL, &subject_dyn, MACRO_TYPE_MESSAGE, NULL, 0);
+	substitute_simple_macros(event, &userid, NULL, NULL, NULL, NULL, &message_dyn, MACRO_TYPE_MESSAGE, NULL, 0);
+
+	now = time(NULL);
+	subject_esc = DBdyn_escape_string_len(subject_dyn, ALERT_SUBJECT_LEN);
+	message_esc = DBdyn_escape_string(message_dyn);
+
+	zbx_free(subject_dyn);
+	zbx_free(message_dyn);
 
 	if (0 == mediatypeid)
 	{
@@ -823,7 +834,7 @@ static void	execute_operations(DB_ESCALATION *escalation, DB_EVENT *event, DB_AC
 		if (SUCCEED == check_operation_conditions(event, operation.operationid, operation.evaltype))
 		{
 			unsigned char	default_msg;
-			char		*subject = NULL, *message = NULL;
+			char		*subject, *message;
 			zbx_uint64_t	mediatypeid;
 
 			zabbix_log(LOG_LEVEL_DEBUG, "Conditions match our event. Execute operation.");
@@ -842,13 +853,8 @@ static void	execute_operations(DB_ESCALATION *escalation, DB_EVENT *event, DB_AC
 
 					if (0 == default_msg)
 					{
-						subject = zbx_strdup(subject, row[6]);
-						message = zbx_strdup(message, row[7]);
-
-						substitute_simple_macros(event, NULL, NULL, NULL, &subject,
-								MACRO_TYPE_MESSAGE, NULL, 0);
-						substitute_simple_macros(event, NULL, NULL, NULL, &message,
-								MACRO_TYPE_MESSAGE, NULL, 0);
+						subject = row[6];
+						message = row[7];
 					}
 					else
 					{
@@ -858,18 +864,10 @@ static void	execute_operations(DB_ESCALATION *escalation, DB_EVENT *event, DB_AC
 
 					add_object_msg(operation.operationid, mediatypeid, &user_msg, subject, message,
 							event->source, event->objectid);
-
-					if (0 == default_msg)
-					{
-						zbx_free(subject);
-						zbx_free(message);
-					}
 					break;
 				case OPERATION_TYPE_COMMAND:
 					execute_commands(event, action->actionid, operation.operationid, escalation->esc_step);
 					break;
-				default:
-					;
 			}
 		}
 		else
@@ -1136,7 +1134,7 @@ static void	execute_escalation(DB_ESCALATION *escalation)
 		ZBX_STR2UINT64(action.actionid, row[0]);
 		action.eventsource	= atoi(row[1]);
 		action.esc_period	= atoi(row[2]);
-		action.shortdata	= strdup(row[3]);
+		action.shortdata	= row[3];
 		action.recovery_msg	= atoi(row[5]);
 
 		if (ACTION_STATUS_ACTIVE != atoi(row[6]))
@@ -1147,40 +1145,26 @@ static void	execute_escalation(DB_ESCALATION *escalation)
 					error, row[4]);
 		}
 		else
-			action.longdata = strdup(row[4]);
+			action.longdata = row[4];
 
 		switch (escalation->status)
 		{
 			case ESCALATION_STATUS_ACTIVE:
 				if (SUCCEED == get_event_info(escalation->eventid, &event))
-				{
-					substitute_simple_macros(&event, NULL, NULL, NULL,
-							&action.shortdata, MACRO_TYPE_MESSAGE, NULL, 0);
-					substitute_simple_macros(&event, NULL, NULL, NULL,
-							&action.longdata, MACRO_TYPE_MESSAGE, NULL, 0);
-
 					execute_operations(escalation, &event, &action);
-				}
 				free_event_info(&event);
 				break;
 			case ESCALATION_STATUS_RECOVERY:
 				if (SUCCEED == get_event_info(escalation->r_eventid, &event))
-				{
-					substitute_simple_macros(&event, NULL, NULL, escalation,
-							&action.shortdata, MACRO_TYPE_MESSAGE, NULL, 0);
-					substitute_simple_macros(&event, NULL, NULL, escalation,
-							&action.longdata, MACRO_TYPE_MESSAGE, NULL, 0);
-
 					process_recovery_msg(escalation, &event, &action);
-				}
 				free_event_info(&event);
 				break;
 			default:
 				break;
 		}
 
-		zbx_free(action.shortdata);
-		zbx_free(action.longdata);
+		if (NULL != error)
+			zbx_free(action.longdata);
 	}
 	else
 		error = zbx_dsprintf(error, "action [" ZBX_FS_UI64 "] deleted", escalation->actionid);

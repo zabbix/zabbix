@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2000-2012 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,8 +17,8 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
+
 /**
  * File containing CHistory class for API.
  * @package API
@@ -28,6 +28,7 @@
  *
  */
 class CHistory extends CZBXAPI {
+
 	public function __construct() {
 		// considering the quirky nature of the history API,
 		// the parent::__construct() method should not be called.
@@ -117,7 +118,6 @@ class CHistory extends CZBXAPI {
 		}
 		else {
 			$itemOptions = array(
-				'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)),
 				'editable' => $options['editable'],
 				'preservekeys' => true,
 				'webitems' => true
@@ -135,7 +135,7 @@ class CHistory extends CZBXAPI {
 		// itemids
 		if (!is_null($options['itemids'])) {
 			zbx_value2array($options['itemids']);
-			$sqlParts['where']['itemid'] = DBcondition('h.itemid', $options['itemids']);
+			$sqlParts['where']['itemid'] = dbConditionInt('h.itemid', $options['itemids']);
 
 			if (!$nodeCheck) {
 				$nodeCheck = true;
@@ -151,7 +151,7 @@ class CHistory extends CZBXAPI {
 				$sqlParts['select']['hostid'] = 'i.hostid';
 			}
 			$sqlParts['from']['items'] = 'items i';
-			$sqlParts['where']['i'] = DBcondition('i.hostid', $options['hostids']);
+			$sqlParts['where']['i'] = dbConditionInt('i.hostid', $options['hostids']);
 			$sqlParts['where']['hi'] = 'h.itemid=i.itemid';
 
 			if (!$nodeCheck) {
@@ -180,7 +180,7 @@ class CHistory extends CZBXAPI {
 
 		// filter
 		if (is_array($options['filter'])) {
-			zbx_db_filter($sqlParts['from']['history'], $options, $sqlParts);
+			$this->dbFilter($sqlParts['from']['history'], $options, $sqlParts);
 		}
 
 		// search
@@ -313,4 +313,3 @@ class CHistory extends CZBXAPI {
 	public function delete($itemids = array()) {
 	}
 }
-?>

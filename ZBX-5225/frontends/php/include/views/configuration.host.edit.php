@@ -190,7 +190,7 @@ $newgroupTB = new CTextBox('newgroup', $newgroup, ZBX_TEXTBOX_SMALL_SIZE);
 $newgroupTB->setAttribute('maxlength', 64);
 $tmp_label = _('New host group');
 if ($USER_DETAILS['type'] != USER_TYPE_SUPER_ADMIN) {
-	$tmp_label .= SPACE._('(Only superadmins can create group)');
+	$tmp_label .= SPACE._('(Only super admins can create groups)');
 	$newgroupTB->setReadonly(true);
 }
 $hostList->addRow(array(new CLabel($tmp_label, 'newgroup'), BR(), $newgroupTB), null, null, null, 'new');
@@ -298,6 +298,26 @@ $cmbStatus->addItem(HOST_STATUS_NOT_MONITORED, _('Not monitored'));
 $hostList->addRow(_('Status'), $cmbStatus);
 
 if ($_REQUEST['form'] == 'full_clone') {
+	// host applications
+	$hostApps = API::Application()->get(array(
+		'hostids' => $_REQUEST['hostid'],
+		'inherited' => false,
+		'output' => API_OUTPUT_EXTEND,
+		'preservekeys' => true
+	));
+	if (!empty($hostApps)) {
+		$applicationsList = array();
+		foreach ($hostApps as $hostAppId => $hostApp) {
+			$applicationsList[$hostAppId] = $hostApp['name'];
+		}
+		order_result($applicationsList);
+
+		$listBox = new CListBox('applications', null, 8);
+		$listBox->setAttribute('disabled', 'disabled');
+		$listBox->addItems($applicationsList);
+		$hostList->addRow(_('Applications'), $listBox);
+	}
+
 	// host items
 	$hostItems = API::Item()->get(array(
 		'hostids' => $_REQUEST['hostid'],
@@ -404,7 +424,7 @@ if ($_REQUEST['form'] == 'full_clone') {
 	}
 
 	// item prototypes
-	$hostItemPrototypes = API::Itemprototype()->get(array(
+	$hostItemPrototypes = API::ItemPrototype()->get(array(
 		'hostids' => $_REQUEST['hostid'],
 		'discoveryids' => $hostDiscoveryRuleids,
 		'inherited' => false,

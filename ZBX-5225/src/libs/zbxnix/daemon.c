@@ -277,7 +277,7 @@ int	daemon_start(int allow_root)
 
 	/* Set SIGCHLD now to avoid race conditions when a child process is created before */
 	/* sigaction() is called. To avoid problems when scripts exit in zbx_execute() and */
-	/* other cases, SIGCHLD is set to SIG_IGN in zbx_child_fork(). */
+	/* other cases, SIGCHLD is set to SIG_DFL in zbx_child_fork(). */
 	phan.sa_sigaction = parent_signal_handler;
 	sigaction(SIGCHLD, &phan, NULL);
 

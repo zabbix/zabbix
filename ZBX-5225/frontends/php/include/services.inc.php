@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2011 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -10,15 +10,14 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
 
 /*
  * Function: get_service_status
@@ -484,10 +483,10 @@ function checkServiceTime(array $serviceTime) {
 
 	// one-time downtime validation
 	if ($serviceTime['type'] == SERVICE_TIME_TYPE_ONETIME_DOWNTIME) {
-		if (!isset($serviceTime['ts_from']) || !validateMaxTime($serviceTime['ts_from'])) {
+		if (!isset($serviceTime['ts_from']) || !validateUnixTime($serviceTime['ts_from'])) {
 			throw new APIException(ZBX_API_ERROR_PARAMETERS, _('Incorrect service start time.'));
 		}
-		if (!isset($serviceTime['ts_to']) || !validateMaxTime($serviceTime['ts_to'])) {
+		if (!isset($serviceTime['ts_to']) || !validateUnixTime($serviceTime['ts_to'])) {
 			throw new APIException(ZBX_API_ERROR_PARAMETERS, _('Incorrect service end time.'));
 		}
 	}
@@ -504,4 +503,17 @@ function checkServiceTime(array $serviceTime) {
 	if ($serviceTime['ts_from'] >= $serviceTime['ts_to']) {
 		throw new APIException(ZBX_API_ERROR_PARAMETERS, _('Service start time must be less than end time.'));
 	}
+}
+
+/**
+ * Convert 1.8 service time format (unixtime) to 2.0 format (seconds starting from Sunday).
+ *
+ * @param int $time
+ *
+ * @return int
+ */
+function prepareServiceTime($time) {
+	return ($time > SEC_PER_WEEK * 2)
+		? date('w', $time) * SEC_PER_DAY + ($time - mktime(null, null, null, date('n', $time), date('j', $time), date('Y', $time)))
+		: $time;
 }

@@ -44,7 +44,18 @@ function sdi($msg = 'SDI') {
 	echo SBR;
 }
 
-function sdii($msg = 'SDII', $for = '') {
+function sdii($msg = 'SDII', $for = '', $showInvisible = true) {
+	if ($showInvisible) {
+		if ($msg === null) {
+			$msg = 'NULL';
+		}
+		elseif ($msg === false) {
+			$msg = 'FALSE';
+		}
+		elseif ($msg === TRUE) {
+			$msg = 'TRUE';
+		}
+	}
 	echo 'DEBUG INFO: '.$for;
 	echo '<pre>'.print_r($msg, true).'</pre>';
 	echo SBR;
@@ -131,5 +142,14 @@ function timer($timer = null) {
 		$timers[$timer]['start'] = $mtime;
 		$timers[$timer]['last'] = $mtime;
 	}
+}
+
+/**
+ * Shorthand for throwing exception
+ *
+ * @param string $ex	exception text
+ */
+function sdex($ex = 'My exception') {
+	throw new APIException(ZBX_API_ERROR_INTERNAL, $ex);
 }
 ?>

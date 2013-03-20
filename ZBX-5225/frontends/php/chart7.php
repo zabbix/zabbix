@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2000-2012 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,8 +17,8 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
+
 require_once dirname(__FILE__).'/include/config.inc.php';
 require_once dirname(__FILE__).'/include/graphs.inc.php';
 
@@ -52,8 +52,10 @@ asort_by_key($items, 'sortorder');
 $dbItems = API::Item()->get(array(
 	'webitems' => true,
 	'itemids' => zbx_objectValues($items, 'itemid'),
-	'nodeids' => get_current_nodeid(true)
+	'nodeids' => get_current_nodeid(true),
+	'filter' => array('flags' => null)
 ));
+
 $dbItems = zbx_toHash($dbItems, 'itemid');
 foreach ($items as $item) {
 	if (!isset($dbItems[$item['itemid']])) {
@@ -115,4 +117,3 @@ if ($isDataValid) {
 }
 
 require_once dirname(__FILE__).'/include/page_footer.php';
-?>

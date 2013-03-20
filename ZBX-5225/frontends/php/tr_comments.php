@@ -80,14 +80,14 @@ show_table_header(_('TRIGGER COMMENTS'));
 // if user has no permissions to edit comments, no "save" button for him
 $triggerEditable = API::Trigger()->get(array(
 	'editable' => true,
-	'trigegrids' => $_REQUEST['triggerid'],
+	'triggerids' => $_REQUEST['triggerid'],
 	'output' => API_OUTPUT_SHORTEN
 ));
 $triggerEditable = !empty($triggerEditable);
 
 $frmComent = new CFormTable(_('Comments').' for "'.$trigger['description'].'"');
 $frmComent->addVar('triggerid', $_REQUEST['triggerid']);
-$frmComent->addRow(_('Comments'), new CTextArea('comments', $trigger['comments'], 25, ZBX_TEXTAREA_BIG_WIDTH, !$triggerEditable));
+$frmComent->addRow(_('Comments'), new CTextArea('comments', $trigger['comments'], array('rows' => 25, 'width' => ZBX_TEXTAREA_BIG_WIDTH, 'readonly' => !$triggerEditable)));
 
 if ($triggerEditable) {
 	$frmComent->addItemToBottomRow(new CSubmit('save', _('Save')));

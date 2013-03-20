@@ -17,8 +17,7 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
 require_once dirname(__FILE__) . '/../include/class.cwebtest.php';
 
 class testFormAdministrationMediaTypes extends CWebTest {
@@ -57,17 +56,16 @@ class testFormAdministrationMediaTypes extends CWebTest {
 	* @dataProvider allMediaTypes
 	*/
 	public function testFormAdministrationMediaTypes_CheckLayout($allMediaTypes) {
-		$this->login('media_types.php');
+		$this->zbxTestLogin('media_types.php');
 		$this->checkTitle('Configuration of media types');
 
-		$this->click('form');
-		$this->wait();
+		$this->zbxTestClickWait('form');
 
-		$this->ok('Media types');
-		$this->ok('CONFIGURATION OF MEDIA TYPES');
-		$this->ok('Media');
-		$this->nok('Displaying');
-		$this->ok(array('Description', 'Type', 'SMTP server', 'SMTP helo', 'SMTP email'));
+		$this->zbxTestTextPresent('Media types');
+		$this->zbxTestTextPresent('CONFIGURATION OF MEDIA TYPES');
+		$this->zbxTestTextPresent('Media');
+		$this->zbxTestTextNotPresent('Displaying');
+		$this->zbxTestTextPresent(array('Description', 'Type', 'SMTP server', 'SMTP helo', 'SMTP email'));
 
 		$this->assertElementPresent('description');
 		$this->assertAttribute("//input[@id='description']/@maxlength", '100');
@@ -103,8 +101,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 			$this->assertElementPresent("//input[@id='status' and (@checked)]");
 		}
 
-		$this->click('cancel');
-		$this->wait();
+		$this->zbxTestClickWait('cancel');
 
 		$this->checkTitle('Configuration of media types');
 	}
@@ -113,54 +110,48 @@ class testFormAdministrationMediaTypes extends CWebTest {
 	* @dataProvider newMediaTypes
 	*/
 	public function testFormAdministrationMediaTypes_Create($type, $data) {
-		$this->login('media_types.php');
+		$this->zbxTestLogin('media_types.php');
 		$this->checkTitle('Configuration of media types');
-		$this->button_click('form');
-		$this->wait();
+		$this->zbxTestClickWait('form');
 
 		switch ($type) {
 			case 'Email':
-				$this->dropdown_select('type', $type);
+				$this->zbxTestDropdownSelect('type', $type);
 				$this->input_type('description', $data['Description']);
 				$this->input_type('smtp_server', $data['SMTP server']);
 				$this->input_type('smtp_helo', $data['SMTP helo']);
 				$this->input_type('smtp_email', $data['SMTP email']);
 				break;
 			case 'Script':
-				$this->dropdown_select('type', $type);
-				$this->wait();
+				$this->zbxTestDropdownSelectWait('type', $type);
 				$this->input_type('description', $data['Description']);
 				$this->input_type('exec_path', $data['Script']);
 				break;
 			case 'SMS':
-				$this->dropdown_select('type', $type);
-				$this->wait();
+				$this->zbxTestDropdownSelectWait('type', $type);
 				$this->input_type('description', $data['Description']);
 				$this->input_type('gsm_modem', $data['GSM modem']);
 				break;
 			case 'Jabber':
-				$this->dropdown_select('type', $type);
-				$this->wait();
+				$this->zbxTestDropdownSelectWait('type', $type);
 				$this->input_type('description', $data['Description']);
 				$this->input_type('username', $data['Jabber identifier']);
 				$this->input_type('password', $data['Password']);
 				break;
 			case 'Ez Texting':
-				$this->dropdown_select('type', $type);
-				$this->wait();
+				$this->zbxTestDropdownSelectWait('type', $type);
 				$this->input_type('description', $data['Description']);
 				$this->input_type('username', $data['Username']);
 				$this->input_type('password', $data['Password']);
 				break;
 		}
 
-		$this->click('save');
-		$this->wait();
+		$this->zbxTestClickWait('save');
 
 		$this->checkTitle('Configuration of media types');
-		$this->nok('ERROR');
-		$this->ok($data['Description']);
-		$this->ok('CONFIGURATION OF MEDIA TYPES');
+		$this->zbxTestTextNotPresent('ERROR');
+		$this->zbxTestTextPresent($data['Description']);
+		$this->zbxTestTextPresent('CONFIGURATION OF MEDIA TYPES');
 	}
 
 	/**
@@ -172,15 +163,13 @@ class testFormAdministrationMediaTypes extends CWebTest {
 		$sql = 'SELECT * FROM media_type ORDER BY mediatypeid';
 		$oldHashMediaType = DBhash($sql);
 
-		$this->login('media_types.php');
+		$this->zbxTestLogin('media_types.php');
 		$this->checkTitle('Configuration of media types');
-		$this->click('link='.$name);
-		$this->wait();
-		$this->button_click('cancel');
-		$this->wait();
+		$this->zbxTestClickWait('link='.$name);
+		$this->zbxTestClickWait('cancel');
 		$this->checkTitle('Configuration of media types');
-		$this->ok("$name");
-		$this->ok('CONFIGURATION OF MEDIA TYPES');
+		$this->zbxTestTextPresent("$name");
+		$this->zbxTestTextPresent('CONFIGURATION OF MEDIA TYPES');
 
 		$this->assertEquals($oldHashMediaType, DBhash($sql), 'Chuck Norris: Media type values in the DB should not be changed in this case');
 	}
@@ -194,14 +183,12 @@ class testFormAdministrationMediaTypes extends CWebTest {
 		$sqlMediaType = 'SELECT * FROM  media_type ORDER BY description';
 		$oldHashMediaType=DBhash($sqlMediaType);
 
-		$this->login('media_types.php');
+		$this->zbxTestLogin('media_types.php');
 		$this->checkTitle('Configuration of media types');
-		$this->ok('CONFIGURATION OF MEDIA TYPES');
-		$this->click('link='.$name);
-		$this->wait();
-		$this->button_click('save');
-		$this->wait();
-		$this->ok('Media type updated');
+		$this->zbxTestTextPresent('CONFIGURATION OF MEDIA TYPES');
+		$this->zbxTestClickWait('link='.$name);
+		$this->zbxTestClickWait('save');
+		$this->zbxTestTextPresent('Media type updated');
 
 		$newHashMediaType = DBhash($sqlMediaType);
 		$this->assertEquals($oldHashMediaType, $newHashMediaType, "Chuck Norris: no-change media type update should not update data in table 'media_type'");
@@ -221,24 +208,24 @@ class testFormAdministrationMediaTypes extends CWebTest {
 
 		DBsave_tables('media_type');
 
-		$this->login('media_types.php');
+		$this->zbxTestLogin('media_types.php');
 		$this->checkTitle('Configuration of media types');
-		$this->click('link='.$name);
+		$this->zbxTestClick('link='.$name);
 		$this->chooseOkOnNextConfirmation();
 		$this->wait();
 
-		$this->button_click('delete');
+		$this->zbxTestClick('delete');
 
 		$this->getConfirmation();
 		$this->wait();
 		$this->checkTitle('Configuration of media types');
 		if ($used_by_operations) {
-				$this->nok('Media type deleted');
-				$this->ok('Cannot delete media type');
-				$this->ok('Media types used by action');
+				$this->zbxTestTextNotPresent('Media type deleted');
+				$this->zbxTestTextPresent('Cannot delete media type');
+				$this->zbxTestTextPresent('Media types used by action');
 		}
 		else {
-				$this->ok('Media type deleted');
+				$this->zbxTestTextPresent('Media type deleted');
 				$sql = 'SELECT count(*) AS cnt FROM media_type WHERE mediatypeid='.zbx_dbstr($id).'';
 				//$this->assertEquals(0, DBcount($sql), "Chuck Norris: Media type has not been deleted from the DB");
 		}
@@ -246,4 +233,3 @@ class testFormAdministrationMediaTypes extends CWebTest {
 		DBrestore_tables('media_type');
 	}
 }
-?>

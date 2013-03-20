@@ -72,12 +72,7 @@ class testGeneric extends CWebTest {
 			array('hostinventories.php',	'Host inventories'),
 
 			// Reports
-			// TODO Does not work under SQLite well. Extremely slow!
-//			array('report2.php',	'Availability report'),
-
-//			array('report2.php?config=0',	'Availability report'),
-//			array('report2.php?config=1',	'Availability report'),
-
+			array('report2.php',	'Availability report'),
 			array('report5.php',				'Most busy triggers top 100'),
 			array('report5.php?period=day',		'Most busy triggers top 100'),
 			array('report5.php?period=week',	'Most busy triggers top 100'),
@@ -95,7 +90,7 @@ class testGeneric extends CWebTest {
 			array('adm.valuemapping.php', 'Configuration of value mapping'),
 			array('adm.workingtime.php', 'Configuration of working time'),
 			array('adm.triggerseverities.php', 'Configuration of trigger severities'),
-			array('adm.triggerdisplayoptions.php', 'Configuration of Zabbix'),
+			array('adm.triggerdisplayoptions.php', 'Configuration of trigger displaying options'),
 			array('adm.other.php', 'Other configuration parameters'),
 
 			array('nodes.php',	'Configuration of nodes'),
@@ -114,7 +109,6 @@ class testGeneric extends CWebTest {
 			array('queue.php?config=2',	'Queue \[refreshed every 30 sec\]'),
 
 			array('report4.php',	'Notification report'),
-			// array('setup.php',	'Installation'),
 
 			// Misc
 			array('search.php?search=server',	'Search'),
@@ -126,8 +120,8 @@ class testGeneric extends CWebTest {
 	* @dataProvider provider
 	*/
 	public function testTitles($a, $b) {
-		$this->login();
-		$this->open($a);
+		$this->zbxTestLogin();
+		$this->zbxTestOpen($a);
 		$this->checkTitle($b);
 	}
 
@@ -135,10 +129,10 @@ class testGeneric extends CWebTest {
 	* @dataProvider provider
 	*/
 	public function testNotExists($a, $b) {
-		$this->login();
-		$this->open($a);
+		$this->zbxTestLogin();
+		$this->zbxTestOpen($a);
 		foreach ($this->failIfExists as $str) {
-			$this->nok($str, 'assertTextNotPresent('.$a.','.$str.')');
+			$this->zbxTestTextNotPresent($str, 'assertTextNotPresent('.$a.','.$str.')');
 		}
 	}
 
@@ -146,10 +140,10 @@ class testGeneric extends CWebTest {
 	* @dataProvider provider
 	*/
 	public function testExists($a, $b) {
-		$this->login();
-		$this->open($a);
+		$this->zbxTestLogin();
+		$this->zbxTestOpen($a);
 		foreach ($this->failIfNotExists as $str) {
-			$this->ok($str, 'assertTextPresent('.$a.','.$str.')');
+			$this->zbxTestTextPresent($str, 'assertTextPresent('.$a.','.$str.')');
 		}
 	}
 }

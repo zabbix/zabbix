@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2000-2012 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -39,6 +39,7 @@ class CList extends CTag {
 		if (!is_null($value)) {
 			$value = new CListItem($value, $class, $id);
 		}
+
 		return $value;
 	}
 
@@ -48,11 +49,6 @@ class CList extends CTag {
 			$this->items = array();
 		}
 
-		if (is_array($value)) {
-			parent::addItem($this->prepareItem($value, $class, $id));
-		}
-		else {
-			parent::addItem($this->prepareItem($value, $class, $id));
-		}
+		parent::addItem($this->prepareItem($value, $class, $id));
 	}
 }

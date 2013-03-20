@@ -392,6 +392,7 @@ class CConfigurationImport {
 
 						case SCREEN_RESOURCE_SIMPLE_GRAPH:
 						case SCREEN_RESOURCE_PLAIN_TEXT:
+							$hostsRefs[$resource['host']] = $resource['host'];
 							$itemsRefs[$resource['host']][$resource['key']] = $resource['key'];
 							break;
 
@@ -420,6 +421,7 @@ class CConfigurationImport {
 
 							case SCREEN_RESOURCE_SIMPLE_GRAPH:
 							case SCREEN_RESOURCE_PLAIN_TEXT:
+								$hostsRefs[$resource['host']] = $resource['host'];
 								$itemsRefs[$resource['host']][$resource['key']] = $resource['key'];
 								break;
 						}
@@ -518,10 +520,12 @@ class CConfigurationImport {
 		}
 
 		// create the applications and create a hash hostid->name->applicationid
-		$newApplicationsIds = API::Application()->create($applicationsToCreate);
-		foreach ($newApplicationsIds['applicationids'] as $anum => $applicationId) {
-			$application = $applicationsToCreate[$anum];
-			$this->referencer->addApplicationRef($application['hostid'], $application['name'], $applicationId);
+		if (!empty($applicationsToCreate)) {
+			$newApplicationsIds = API::Application()->create($applicationsToCreate);
+			foreach ($newApplicationsIds['applicationids'] as $anum => $applicationId) {
+				$application = $applicationsToCreate[$anum];
+				$this->referencer->addApplicationRef($application['hostid'], $application['name'], $applicationId);
+			}
 		}
 
 		// refresh applications beacuse templated ones can be inherited to host and used in items
@@ -798,12 +802,12 @@ class CConfigurationImport {
 
 
 					// TODO: do this for all graphs at once
-					$sql = 'SELECT g.graphid
-							FROM graphs g,graphs_items gi,items i
-							WHERE g.graphid=gi.graphid
-								AND gi.itemid=i.itemid
-								AND g.name='.zbx_dbstr($graph['name']).'
-								AND '.DBcondition('i.hostid', $graphHostIds);
+					$sql = 'SELECT g.graphid'.
+							' FROM graphs g,graphs_items gi,items i'.
+							' WHERE g.graphid=gi.graphid'.
+								' AND gi.itemid=i.itemid'.
+								' AND g.name='.zbx_dbstr($graph['name']).
+								' AND '.dbConditionInt('i.hostid', $graphHostIds);
 					$graphExists = DBfetch(DBselect($sql));
 
 					if ($graphExists) {
@@ -813,7 +817,7 @@ class CConfigurationImport {
 							'editable' => true
 						));
 						if (empty($dbGraph)) {
-							throw new Exception(_s('No permission for Graph "%1$s".', $graph['name']));
+							throw new Exception(_s('No permission for graph "%1$s".', $graph['name']));
 						}
 						$graph['graphid'] = $graphExists['graphid'];
 						$graphsToUpdate[] = $graph;
@@ -875,12 +879,12 @@ class CConfigurationImport {
 			unset($gitem);
 
 			// TODO: do this for all graphs at once
-			$sql = 'SELECT g.graphid
-					FROM graphs g,graphs_items gi,items i
-					WHERE g.graphid=gi.graphid
-						AND gi.itemid=i.itemid
-						AND g.name='.zbx_dbstr($graph['name']).'
-						AND '.DBcondition('i.hostid', $graphHostIds);
+			$sql = 'SELECT g.graphid'.
+					' FROM graphs g,graphs_items gi,items i'.
+					' WHERE g.graphid=gi.graphid'.
+						' AND gi.itemid=i.itemid'.
+						' AND g.name='.zbx_dbstr($graph['name']).
+						' AND '.dbConditionInt('i.hostid', $graphHostIds);
 			$graphExists = DBfetch(DBselect($sql));
 
 			if ($graphExists) {
@@ -890,7 +894,7 @@ class CConfigurationImport {
 					'editable' => true
 				));
 				if (empty($dbGraph)) {
-					throw new Exception(_s('No permission for Graph "%1$s".', $graph['name']));
+					throw new Exception(_s('No permission for graph "%1$s".', $graph['name']));
 				}
 				$graph['graphid'] = $graphExists['graphid'];
 				$graphsToUpdate[] = $graph;
@@ -926,7 +930,11 @@ class CConfigurationImport {
 			if ($triggerId) {
 				$deps = array();
 				foreach ($trigger['dependencies'] as $dependency) {
-					$deps[] = array('triggerid' => $this->referencer->resolveTrigger($dependency['name'], $dependency['expression']));
+					$depTriggerId = $this->referencer->resolveTrigger($dependency['name'], $dependency['expression']);
+					if (!$depTriggerId) {
+						throw new Exception(_s('Trigger "%1$s" depends on trigger "%2$s", which does not exist.', $trigger['description'], $dependency['name']));
+					}
+					$deps[] = array('triggerid' => $depTriggerId);
 				}
 
 				$trigger['dependencies'] = $deps;
@@ -941,11 +949,14 @@ class CConfigurationImport {
 		}
 
 		$triggerDependencies = array();
+		$newTriggers = array();
 		if ($this->options['triggers']['createMissing'] && $triggersToCreate) {
 			$newTriggerIds = API::Trigger()->create($triggersToCreate);
 			foreach ($newTriggerIds['triggerids'] as $tnum => $triggerId) {
 				$trigger = $triggersToCreate[$tnum];
 				$this->referencer->addTriggerRef($trigger['description'], $trigger['expression'], $triggerId);
+
+				$newTriggers[$triggerId] = $trigger;
 			}
 		}
 
@@ -954,7 +965,12 @@ class CConfigurationImport {
 			foreach ($newTriggerIds['triggerids'] as $tnum => $triggerId) {
 				$deps = array();
 				foreach ($triggersToCreateDependencies[$tnum] as $dependency) {
-					$deps[] = array('triggerid' => $this->referencer->resolveTrigger($dependency['name'], $dependency['expression']));
+					$depTriggerId = $this->referencer->resolveTrigger($dependency['name'], $dependency['expression']);
+					if (!$depTriggerId) {
+						$trigger = $newTriggers[$triggerId];
+						throw new Exception(_s('Trigger "%1$s" depends on trigger "%2$s", which does not exist.', $trigger['description'], $dependency['name']));
+					}
+					$deps[] = array('triggerid' => $depTriggerId);
 				}
 
 				if (!empty($deps)) {
@@ -992,7 +1008,7 @@ class CConfigurationImport {
 		$imagesToUpdate = array();
 		$allImages = zbx_toHash($allImages, 'name');
 
-		$dbImages = DBselect('SELECT i.imageid,i.name FROM images i WHERE '.DBcondition('i.name', array_keys($allImages)));
+		$dbImages = DBselect('SELECT i.imageid,i.name FROM images i WHERE '.dbConditionString('i.name', array_keys($allImages)));
 		while ($dbImage = DBfetch($dbImages)) {
 			$dbImage['image'] = $allImages[$dbImage['name']]['image'];
 			$imagesToUpdate[] = $dbImage;

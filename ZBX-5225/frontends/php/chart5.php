@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2011 Zabbix SIA
+** Copyright (C) 2001-2012 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,8 +17,8 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
+
 require_once dirname(__FILE__).'/include/config.inc.php';
 require_once dirname(__FILE__).'/include/services.inc.php';
 
@@ -37,8 +37,7 @@ check_fields($fields);
  * Permissions
  */
 $service = API::Service()->get(array(
-	'output' => array('serviceid', 'name', 'showsla', 'goodsla'),
-	'selectTimes' => API_OUTPUT_EXTEND,
+	'output' => array('serviceid', 'name'),
 	'serviceids' => $_REQUEST['serviceid']
 ));
 $service = reset($service);
@@ -124,7 +123,7 @@ $sla = API::Service()->getSla(array(
 $sla = reset($sla);
 
 foreach ($sla['sla'] as $i => $intervalSla) {
-	$problem[$i] = 100 - $intervalSla['problem'];
+	$problem[$i] = 100 - $intervalSla['problemTime'];
 	$ok[$i] = $intervalSla['sla'];
 	$count_now[$i] = 1;
 }
@@ -205,4 +204,3 @@ imageOut($im);
 imagedestroy($im);
 
 include_once('include/page_footer.php');
-?>

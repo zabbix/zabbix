@@ -177,22 +177,27 @@ calendar.prototype = {
 					val = (IE) ? this.timeobjects[0].innerText : this.timeobjects[0].textContent;
 				}
 
-				if (is_string(val)) {
-					var datetime = val.split(' ');
-					var date = datetime[0].split('.');
-					var time = new Array();
+				if (jQuery(this.timeobjects[0]).attr('data-timestamp') > 0) {
+					this.setNow(jQuery(this.timeobjects[0]).attr('data-timestamp'));
+				}
+				else {
+					if (is_string(val)) {
+						var datetime = val.split(' ');
+						var date = datetime[0].split('.');
+						var time = new Array();
 
-					if (datetime.length > 1) {
-						var time = datetime[1].split(':');
-					}
-					if (date.length == 3) {
-						result = this.setSDateDMY(date[0], date[1], date[2]);
-						if (time.length == 2) {
-							if (time[0] > -1 && time[0] < 24) {
-								this.sdt.setHours(time[0]);
-							}
-							if (time[1] > -1 && time[1] < 60) {
-								this.sdt.setMinutes(time[1]);
+						if (datetime.length > 1) {
+							var time = datetime[1].split(':');
+						}
+						if (date.length == 3) {
+							result = this.setSDateDMY(date[0], date[1], date[2]);
+							if (time.length == 2) {
+								if (time[0] > -1 && time[0] < 24) {
+									this.sdt.setHours(time[0]);
+								}
+								if (time[1] > -1 && time[1] < 60) {
+									this.sdt.setMinutes(time[1]);
+								}
 							}
 						}
 					}
@@ -263,12 +268,7 @@ calendar.prototype = {
 			result = true;
 		}
 
-		if (y > 71 && y < 1970) {
-			this.sdt.setYear(y);
-			result = true;
-		}
-
-		if (y > 1970 && y < 2100) {
+		if (y > 1969) {
 			this.sdt.setFullYear(y);
 			result = true;
 		}
@@ -378,8 +378,8 @@ calendar.prototype = {
 		}
 	},
 
-	setNow: function() {
-		var now = new Date();
+	setNow: function(timestamp) {
+		var now = (typeof(timestamp) == 'undefined') ? new Date() : new Date(timestamp * 1000);
 		this.day = now.getDate();
 		this.month = now.getMonth();
 		this.year = now.getFullYear();
@@ -462,13 +462,16 @@ calendar.prototype = {
 	},
 
 	yearup: function() {
+		if (this.year >= 2038) {
+			return ;
+		}
 		this.year++;
 		this.syncCDT();
 		this.setCDate();
 	},
 
 	yeardown: function() {
-		if ((this.year-1) < 1970) {
+		if (this.year <= 1970) {
 			return ;
 		}
 		this.year--;

@@ -25,7 +25,7 @@
 #
 #   This macro calls:
 #
-#     AC_SUBST(POSTGRESQL_CPPFLAGS)
+#     AC_SUBST(POSTGRESQL_CFLAGS)
 #     AC_SUBST(POSTGRESQL_LDFLAGS)
 #     AC_SUBST(POSTGRESQL_LIBS)
 #     AC_SUBST(POSTGRESQL_VERSION)
@@ -55,9 +55,9 @@ AC_DEFUN([AX_LIB_POSTGRESQL],
             [use PostgreSQL library @<:@default=no@:>@, optionally specify path to pg_config]
         ),
         [
-        if test "$withval" = "no"; then
+        if test "x$withval" = "xno"; then
             want_postgresql="no"
-        elif test "$withval" = "yes"; then
+        elif test "x$withval" = "xyes"; then
             want_postgresql="yes"
         else
             want_postgresql="yes"
@@ -67,7 +67,7 @@ AC_DEFUN([AX_LIB_POSTGRESQL],
         [want_postgresql="no"]
     )
 
-    POSTGRESQL_CPPFLAGS=""
+    POSTGRESQL_CFLAGS=""
     POSTGRESQL_LDFLAGS=""
     POSTGRESQL_LIBS=""
     POSTGRESQL_VERSION=""
@@ -76,45 +76,68 @@ AC_DEFUN([AX_LIB_POSTGRESQL],
     dnl Check PostgreSQL libraries (libpq)
     dnl
 
-    if test "$want_postgresql" = "yes"; then
+    if test "x$want_postgresql" = "xyes"; then
+        AC_PATH_PROG([PG_CONFIG], [pg_config], [])
 
-        if test -z "$PG_CONFIG" -o test; then
-            AC_PATH_PROG([PG_CONFIG], [pg_config], [no])
-        fi
-
-        if test -f "$PG_CONFIG"; then
-            AC_MSG_CHECKING([for PostgreSQL libraries])
-
-            POSTGRESQL_CPPFLAGS="-I`$PG_CONFIG --includedir`"
-            POSTGRESQL_LDFLAGS="-L`$PG_CONFIG --libdir`"
+        if test -x "$PG_CONFIG"; then
+            POSTGRESQL_CFLAGS="`$PG_CONFIG --includedir`"
+            if test -n "$POSTGRESQL_CFLAGS"; then
+                POSTGRESQL_CFLAGS="-I$POSTGRESQL_CFLAGS";
+            fi
+            POSTGRESQL_LDFLAGS="`$PG_CONFIG --libdir`"
+            if test -n "$POSTGRESQL_LDFLAGS"; then
+                POSTGRESQL_LDFLAGS="-L$POSTGRESQL_LDFLAGS";
+            fi
             POSTGRESQL_LIBS="-lpq"
 
-            POSTGRESQL_VERSION=`$PG_CONFIG --version | sed -e 's#PostgreSQL ##'`
+            _save_postgresql_cflags="${CFLAGS}"
+            _save_postgresql_ldflags="${LDFLAGS}"
+            _save_postgresql_libs="${LIBS}"
+            CFLAGS="${CFLAGS} ${POSTGRESQL_CFLAGS}"
+            LDFLAGS="${LDFLAGS} ${POSTGRESQL_LDFLAGS}"
+            LIBS="${LIBS} ${POSTGRESQL_LIBS}"
 
-            AC_DEFINE([HAVE_POSTGRESQL], [1],
-                [Define to 1 if PostgreSQL libraries are available])
-
+            AC_MSG_CHECKING([for PostgreSQL libraries])
+            AC_TRY_LINK(
+[
+#include <libpq-fe.h>
+],
+[
+PGconn	*conn;
+conn = PQsetdbLogin(NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+],
+            AC_DEFINE([HAVE_POSTGRESQL], [1], [Define to 1 if PostgreSQL libraries are available])
             found_postgresql="yes"
-            AC_MSG_RESULT([yes])
-        else
-            found_postgresql="no"
-            AC_MSG_RESULT([no])
+            AC_MSG_RESULT(yes),
+            AC_MSG_RESULT(no))
+
+            CFLAGS="${_save_postgresql_cflags}"
+            LDFLAGS="${_save_postgresql_ldflags}"
+            LIBS="${_save_postgresql_libs}"
+            unset _save_postgresql_cflags
+            unset _save_postgresql_ldflags
+            unset _save_postgresql_libs
+
+            if test "x$found_postgresql" = "xyes"; then
+                POSTGRESQL_VERSION=`$PG_CONFIG --version | sed -e 's#PostgreSQL ##'`
+            fi
         fi
     fi
 
-    dnl
-    dnl Check for function PQserverVersion()
-    dnl
+    if test "x$found_postgresql" = "xyes"; then
+        dnl
+        dnl Check for function PQserverVersion()
+        dnl
 
-    _save_postgresql_cflags="${CFLAGS}"
-    _save_postgresql_ldflags="${LDFLAGS}"
-    _save_postgresql_libs="${LIBS}"
-    CFLAGS="${CFLAGS} ${POSTGRESQL_CPPFLAGS}"
-    LDFLAGS="${LDFLAGS} ${POSTGRESQL_LDFLAGS}"
-    LIBS="${LIBS} ${POSTGRESQL_LIBS}"
+        _save_postgresql_cflags="${CFLAGS}"
+        _save_postgresql_ldflags="${LDFLAGS}"
+        _save_postgresql_libs="${LIBS}"
+        CFLAGS="${CFLAGS} ${POSTGRESQL_CFLAGS}"
+        LDFLAGS="${LDFLAGS} ${POSTGRESQL_LDFLAGS}"
+        LIBS="${LIBS} ${POSTGRESQL_LIBS}"
 
-    AC_MSG_CHECKING(for function PQserverVersion())
-    AC_TRY_LINK(
+        AC_MSG_CHECKING(for function PQserverVersion())
+        AC_TRY_LINK(
 [
 #include <libpq-fe.h>
 ],
@@ -122,25 +145,25 @@ AC_DEFUN([AX_LIB_POSTGRESQL],
 PGconn	*conn = NULL;
 PQserverVersion(conn);
 ],
-    AC_DEFINE(HAVE_FUNCTION_PQSERVERVERSION,1,[Define to 1 if 'PQserverVersion' exist.])
-    AC_MSG_RESULT(yes),
-    AC_MSG_RESULT(no))
+        AC_DEFINE(HAVE_FUNCTION_PQSERVERVERSION,1,[Define to 1 if 'PQserverVersion' exist.])
+        AC_MSG_RESULT(yes),
+        AC_MSG_RESULT(no))
 
-    CFLAGS="${_save_postgresql_cflags}"
-    LDFLAGS="${_save_postgresql_ldflags}"
-    LIBS="${_save_postgresql_libs}"
-    unset _save_postgresql_cflags
-    unset _save_postgresql_ldflags
-    unset _save_postgresql_libs
+        CFLAGS="${_save_postgresql_cflags}"
+        LDFLAGS="${_save_postgresql_ldflags}"
+        LIBS="${_save_postgresql_libs}"
+        unset _save_postgresql_cflags
+        unset _save_postgresql_ldflags
+        unset _save_postgresql_libs
+    fi
 
     dnl
     dnl Check if required version of PostgreSQL is available
     dnl
 
-
     postgresql_version_req=ifelse([$1], [], [], [$1])
 
-    if test "$found_postgresql" = "yes"; then
+    if test "x$found_postgresql" = "xyes" -a -n "$postgresql_version_req"; then
 
         dnl Decompose version string of installed PostgreSQL
         dnl and calculate its number representation
@@ -183,7 +206,7 @@ PQserverVersion(conn);
 
     fi
 
-    AC_SUBST([POSTGRESQL_CPPFLAGS])
+    AC_SUBST([POSTGRESQL_CFLAGS])
     AC_SUBST([POSTGRESQL_LDFLAGS])
     AC_SUBST([POSTGRESQL_LIBS])
     AC_SUBST([POSTGRESQL_VERSION])

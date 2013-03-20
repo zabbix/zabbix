@@ -101,12 +101,11 @@ elseif ($_REQUEST['config'] == ZBX_AUTH_LDAP) {
 			$config['authentication_type'] = $_REQUEST['config'];
 
 			// check login/password
-			$login = API::User()->ldapLogin(array(
-				'user' => get_request('user', $USER_DETAILS['alias']),
-				'password' => get_request('user_password', ''),
-				'cnf' => $ldap_cnf
-			));
+			$ldap = new CLdap($ldap_cnf);
+			$ldap->connect();
+			$login = $ldap->checkPass(get_request('user', $USER_DETAILS['alias']), get_request('user_password', ''));
 			if (!$login) {
+				error(_('Login name or password is incorrect'));
 				throw new Exception();
 			}
 
@@ -129,12 +128,13 @@ elseif ($_REQUEST['config'] == ZBX_AUTH_LDAP) {
 	}
 	elseif (isset($_REQUEST['test'])) {
 		// check login/password
-		$result = API::User()->ldapLogin(array(
-			'user' => get_request('user', $USER_DETAILS['alias']),
-			'password' => get_request('user_password', ''),
-			'cnf' => $ldap_cnf
-		));
+		$ldap = new CLdap($ldap_cnf);
+		$ldap->connect();
+		$result = $ldap->checkPass(get_request('user', $USER_DETAILS['alias']), get_request('user_password', ''));
 
+		if (!$result)
+			error(_('Login name or password is incorrect'));{
+		}
 		show_messages($result, _('LDAP login successful'), _('LDAP login was not successful'));
 	}
 }

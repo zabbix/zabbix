@@ -60,6 +60,7 @@
 .darkorange .ui-widget .ui-widget { font-size: 1em; }
 .darkorange .ui-widget input, .darkorange .ui-widget select, .darkorange .ui-widget textarea, .darkorange .ui-widget button { font-family: Verdana, Arial, sans-serif; font-size: 1em; }
 .darkorange .ui-widget-content { border: 1px solid #444; background: #1f1f1f url(images/bg_flat_25.png) 50% 50% repeat-x; color: #dfdfdf; }
+.darkorange .ui-widget-content a { color: #F50; }
 .darkorange .ui-widget-header { border: 1px solid #444; background: #4f4f4f url(images/bg_h-hard_30.png) 50% 50% repeat-x; color: #dfdfdf; font-weight: bold; }
 .darkorange .ui-widget-header a { color: #dfdfdf; }
 

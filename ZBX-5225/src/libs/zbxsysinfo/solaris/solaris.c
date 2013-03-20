@@ -29,8 +29,8 @@ ZBX_METRIC	parameters_specific[] =
 	{"vfs.fs.inode",	CF_USEUPARAM,	VFS_FS_INODE,		NULL,	"/,free"},
 	{"vfs.fs.discovery",	0,		VFS_FS_DISCOVERY,	NULL,	NULL},
 
-	{"vfs.dev.read",	CF_USEUPARAM,	VFS_DEV_READ,		NULL,	"sd0,bytes"},
-	{"vfs.dev.write",	CF_USEUPARAM,	VFS_DEV_WRITE,		NULL,	"sd0,bytes"},
+	{"vfs.dev.read",	CF_USEUPARAM,	VFS_DEV_READ,		NULL,	"sd0,operations"},
+	{"vfs.dev.write",	CF_USEUPARAM,	VFS_DEV_WRITE,		NULL,	"sd0,operations"},
 
 	{"net.tcp.listen",	CF_USEUPARAM,	NET_TCP_LISTEN,		NULL,	"80"},
 	{"net.udp.listen",	CF_USEUPARAM,	NET_UDP_LISTEN,		NULL,	"68"},

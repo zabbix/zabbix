@@ -54,6 +54,9 @@ class CWebUser {
 				CProfile::flush();
 			}
 
+			// remove guest session after successful login
+			DBexecute('DELETE FROM sessions WHERE sessionid='.zbx_dbstr(get_cookie('zbx_sessionid')));
+
 			zbx_setcookie('zbx_sessionid', self::$data['sessionid'], self::$data['autologin'] ? time() + SEC_PER_DAY * 31 : 0);
 
 			self::makeGlobal();
@@ -65,8 +68,9 @@ class CWebUser {
 		}
 	}
 
-	public static function logout($sessionid) {
-		self::$data = API::User()->logout($sessionid);
+	public static function logout() {
+		self::$data['sessionid'] = get_cookie('zbx_sessionid');
+		self::$data = API::User()->logout();
 		zbx_unsetcookie('zbx_sessionid');
 	}
 
@@ -135,4 +139,3 @@ class CWebUser {
 		return self::$data['type'];
 	}
 }
-?>

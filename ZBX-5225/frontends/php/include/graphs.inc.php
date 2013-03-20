@@ -176,9 +176,9 @@ function get_hosts_by_graphid($graphid) {
 	);
 }
 
-/*
+/**
  * Description:
- *     Return the time of the 1st appearance of items included in graph in trends
+ *	Return the time of the 1st appearance of items included in graph in trends
  * Comment:
  *	sql is split to many sql's to optimize search on history tables
  */
@@ -196,9 +196,12 @@ function get_min_itemclock_by_graphid($graphid) {
 	return get_min_itemclock_by_itemid($itemids);
 }
 
-/*
- * Description:
- *     Return the time of the 1st appearance of item in trends
+/**
+ * Return the time of the 1st appearance of item in trends.
+ *
+ * @param array|int $itemids
+ *
+ * @return int (unixtime)
  */
 function get_min_itemclock_by_itemid($itemids) {
 	zbx_value2array($itemids);
@@ -216,7 +219,7 @@ function get_min_itemclock_by_itemid($itemids) {
 	$dbItems = DBselect(
 		'SELECT i.itemid,i.value_type'.
 		' FROM items i'.
-		' WHERE '.DBcondition('i.itemid', $itemids)
+		' WHERE '.dbConditionInt('i.itemid', $itemids)
 	);
 
 	while ($item = DBfetch($dbItems)) {
@@ -233,7 +236,7 @@ function get_min_itemclock_by_itemid($itemids) {
 
 		$sql = 'SELECT MAX(i.history) AS history,MAX(i.trends) AS trends'.
 				' FROM items i'.
-				' WHERE '.DBcondition('i.itemid', $itemids_numeric);
+				' WHERE '.dbConditionInt('i.itemid', $itemids_numeric);
 		if ($table_for_numeric = DBfetch(DBselect($sql))) {
 			$sql_from_num = ($table_for_numeric['history'] > $table_for_numeric['trends']) ? 'history' : 'trends';
 			$result = time() - (SEC_PER_DAY * max($table_for_numeric['history'], $table_for_numeric['trends']));
@@ -265,19 +268,15 @@ function get_min_itemclock_by_itemid($itemids) {
 				$sql_from = 'history';
 		}
 
-		$res = DBselect(
-			'SELECT ht.itemid,MIN(ht.clock) AS min_clock'.
+		$dbMin = DBfetch(DBselect(
+			'SELECT MIN(ht.clock) AS min_clock'.
 			' FROM '.$sql_from.' ht'.
-			' WHERE '.DBcondition('ht.itemid', $itemids).
-			' GROUP BY ht.itemid'
-		);
-		while ($min_tmp = DBfetch($res)) {
-			$min = (is_null($min)) ? $min_tmp['min_clock'] : min($min, $min_tmp['min_clock']);
-		}
+			' WHERE '.dbConditionInt('ht.itemid', $itemids)
+		));
+		$min = empty($min) ? $dbMin['min_clock'] : min($min, $dbMin['min_clock']);
 	}
-	$result = is_null($min) ? $result : $min;
 
-	return $result;
+	return empty($min) ? $result : $min;
 }
 
 function get_graph_by_graphid($graphid) {
@@ -368,24 +367,26 @@ function copy_graph_to_host($graphid, $hostid) {
 	}
 
 	$graph['gitems'] = $new_gitems;
+	unset($graph['templateid']);
 	$result = API::Graph()->create($graph);
 
 	return $result;
 }
 
 function navigation_bar_calc($idx = null, $idx2 = 0, $update = false) {
-	if (!is_null($idx)) {
+	if (!empty($idx)) {
 		if ($update) {
-			if (isset($_REQUEST['period']) && $_REQUEST['period'] >= ZBX_MIN_PERIOD) {
+			if (!empty($_REQUEST['period']) && $_REQUEST['period'] >= ZBX_MIN_PERIOD) {
 				CProfile::update($idx.'.period', $_REQUEST['period'], PROFILE_TYPE_INT, $idx2);
 			}
-			if (isset($_REQUEST['stime'])) {
+			if (!empty($_REQUEST['stime'])) {
 				CProfile::update($idx.'.stime', $_REQUEST['stime'], PROFILE_TYPE_STR, $idx2);
 			}
 		}
 		$_REQUEST['period'] = get_request('period', CProfile::get($idx.'.period', ZBX_PERIOD_DEFAULT, $idx2));
 		$_REQUEST['stime'] = get_request('stime', CProfile::get($idx.'.stime', null, $idx2));
 	}
+
 	$_REQUEST['period'] = get_request('period', ZBX_PERIOD_DEFAULT);
 	$_REQUEST['stime'] = get_request('stime', null);
 
@@ -404,7 +405,7 @@ function navigation_bar_calc($idx = null, $idx2 = 0, $update = false) {
 		$_REQUEST['period'] = ZBX_MAX_PERIOD;
 	}
 
-	if (isset($_REQUEST['stime'])) {
+	if (!empty($_REQUEST['stime'])) {
 		$time = zbxDateToTime($_REQUEST['stime']);
 		if (($time + $_REQUEST['period']) > time()) {
 			$_REQUEST['stime'] = date('YmdHis', time() - $_REQUEST['period']);
@@ -413,6 +414,7 @@ function navigation_bar_calc($idx = null, $idx2 = 0, $update = false) {
 	else {
 		$_REQUEST['stime'] = date('YmdHis', time() - $_REQUEST['period']);
 	}
+
 	return $_REQUEST['period'];
 }
 

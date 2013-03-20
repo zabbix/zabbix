@@ -109,7 +109,7 @@ class CView {
 		$data = $this->data;
 		ob_start();
 		$this->template = include($this->filePath);
-		if (false === $this->template) {
+		if ($this->template === false) {
 			throw new Exception(_s('Cannot include view file "%s".', $this->filePath));
 		}
 		$this->scripts = ob_get_clean();

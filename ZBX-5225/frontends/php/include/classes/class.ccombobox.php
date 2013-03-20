@@ -67,7 +67,9 @@ class CComboBox extends CTag {
 		}
 		else {
 			$title = false;
-			if (zbx_strlen($caption) > 44) {
+			// if caption is too long ( > 44 symbols), we add new class - 'selectShorten',
+			// so that the select box would not stretch
+			if (zbx_strlen($caption) > 44 && !$this->hasClass('selectShorten')) {
 				$this->setAttribute('class', $this->getAttribute('class').' selectShorten');
 				$title = true;
 			}

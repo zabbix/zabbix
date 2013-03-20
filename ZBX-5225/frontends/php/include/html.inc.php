@@ -197,47 +197,40 @@ function hide_form_items(&$obj) {
 	}
 }
 
-function get_table_header($col1, $col2 = SPACE) {
+function get_table_header($columnLeft, $columnRights = SPACE) {
 	if (isset($_REQUEST['print'])) {
-		hide_form_items($col1);
-		hide_form_items($col2);
+		hide_form_items($columnLeft);
+		hide_form_items($columnRights);
 
-		// if empty header than do not show it
-		if ($col1 == SPACE && $col2 == SPACE) {
+		if ($columnLeft == SPACE && $columnRights == SPACE) {
 			return new CJSscript('');
 		}
 	}
-	$td_l = new CCol(SPACE, 'header_r');
-	$td_l->setAttribute('width', '100%');
-	$right_row = array($td_l);
 
-	if (!is_null($col2)) {
-		if (!is_array($col2)) {
-			$col2 = array($col2);
+	$rights = array();
+
+	if ($columnRights) {
+		if (!is_array($columnRights)) {
+			$columnRights = array($columnRights);
 		}
 
-		foreach ($col2 as $r_item) {
-			$right_row[] = new CCol($r_item, 'header_r');
+		foreach ($columnRights as $columnRight) {
+			$rights[] = new CDiv($columnRight, 'floatright');
 		}
+
+		$rights = array_reverse($rights);
 	}
 
-	$right_tab = new CTable(null, 'nowrap');
-	$right_tab->setAttribute('width', '100%');
-	$right_tab->addRow($right_row);
-
-	$table = new CTable(null, 'header maxwidth ui-widget-header ui-corner-all');
+	$table = new CTable(null, 'ui-widget-header ui-corner-all header maxwidth');
 	$table->setCellSpacing(0);
 	$table->setCellPadding(1);
+	$table->addRow(array(new CCol($columnLeft, 'header_l left'), new CCol($rights, 'header_r right')));
 
-	$td_r = new CCol($right_tab, 'header_r right');
-	$td_r->setAttribute('align', 'right');
-
-	$table->addRow(array(new CCol($col1, 'header_l left'), $td_r));
 	return $table;
 }
 
-function show_table_header($col1, $col2 = SPACE){
-	$table = get_table_header($col1, $col2);
+function show_table_header($columnLeft, $columnRights = SPACE){
+	$table = get_table_header($columnLeft, $columnRights);
 	$table->show();
 }
 
@@ -273,7 +266,7 @@ function get_icon($name, $params = array()) {
 			$icon = new CIcon(_('Menu'), 'iconmenu', 'create_page_menu(event, "'.$params['menu'].'");');
 			break;
 		case 'reset':
-			$icon = new CIcon(_('Reset'), 'iconreset', 'timeControl.objectReset("'.$params['id'].'");');
+			$icon = new CIcon(_('Reset'), 'iconreset', 'timeControl.objectReset();');
 			break;
 	}
 	return $icon;
@@ -411,7 +404,7 @@ function get_header_host_table($currentElement, $hostid, $discoveryid = null) {
 			}
 			else {
 				$list->addItem(array(
-					new CLink(_('Item prototypes'), 'disc_prototypes.php?parent_discoveryid='.$dbDiscovery['itemid']),
+					new CLink(_('Item prototypes'), 'disc_prototypes.php?hostid='.$dbHost['hostid'].'&parent_discoveryid='.$dbDiscovery['itemid']),
 					' ('.$dbDiscovery['items'].')'
 				));
 			}
@@ -436,7 +429,7 @@ function get_header_host_table($currentElement, $hostid, $discoveryid = null) {
 			}
 			else {
 				$list->addItem(array(
-					new CLink(_('Trigger prototypes'), 'trigger_prototypes.php?parent_discoveryid='.$dbDiscovery['itemid']),
+					new CLink(_('Trigger prototypes'), 'trigger_prototypes.php?hostid='.$dbHost['hostid'].'&parent_discoveryid='.$dbDiscovery['itemid']),
 					' ('.$dbDiscovery['triggers'].')'
 				));
 			}
@@ -461,7 +454,7 @@ function get_header_host_table($currentElement, $hostid, $discoveryid = null) {
 			}
 			else {
 				$list->addItem(array(
-					new CLink(_('Graph prototypes'), 'graphs.php?parent_discoveryid='.$dbDiscovery['itemid']),
+					new CLink(_('Graph prototypes'), 'graphs.php?hostid='.$dbHost['hostid'].'&parent_discoveryid='.$dbDiscovery['itemid']),
 					' ('.$dbDiscovery['graphs'].')'
 				));
 			}

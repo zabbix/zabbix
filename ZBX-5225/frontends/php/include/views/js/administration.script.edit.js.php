@@ -63,8 +63,8 @@ jQuery(document).ready(function(){
 		var confirmation = jQuery('#confirmation').val();
 
 		var buttons = [
-			{text: '<?php echo _('Execute');?>', click: function(){} },
-			{text: '<?php echo _('Cancel');?>', click: function(){
+			{text: <?php echo CJs::encodeJson(_('Execute')); ?>, click: function(){} },
+			{text: <?php echo CJs::encodeJson(_('Cancel')); ?>, click: function(){
 				jQuery(this).dialog("destroy");
 				jQuery("#testConfirmation").focus();
 			}}

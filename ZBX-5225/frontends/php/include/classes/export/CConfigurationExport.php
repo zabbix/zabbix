@@ -159,7 +159,7 @@ class CConfigurationExport {
 	 */
 	protected function gatherGroups() {
 		$this->data['groups'] = API::HostGroup()->get(array(
-			'hostids' => $this->options['groups'],
+			'groupids' => $this->options['groups'],
 			'preservekeys' => true,
 			'output' => API_OUTPUT_EXTEND
 		));
@@ -175,16 +175,13 @@ class CConfigurationExport {
 			'selectMacros' => API_OUTPUT_EXTEND,
 			'selectGroups' => API_OUTPUT_EXTEND,
 			'selectParentTemplates' => API_OUTPUT_EXTEND,
-			'selectScreens' => API_OUTPUT_REFER,
 			'preservekeys' => true
 		));
 
 		// merge host groups with all groups
 		$templateGroups = array();
-		$templateScreenIds = array();
 		foreach ($templates as &$template) {
 			$templateGroups += zbx_toHash($template['groups'], 'groupid');
-			$templateScreenIds = array_merge($templateScreenIds, zbx_objectValues($template['screens'], 'screenid'));
 
 			$template['screens'] = array();
 			$template['applications'] = array();
@@ -211,8 +208,9 @@ class CConfigurationExport {
 
 		// screens
 		$screens = API::TemplateScreen()->get(array(
-			'screenids' => $templateScreenIds,
+			'templateids' => $this->options['templates'],
 			'selectScreenItems' => API_OUTPUT_EXTEND,
+			'noInheritance' => true,
 			'output' => API_OUTPUT_EXTEND,
 			'preservekeys' => true
 		));
@@ -274,7 +272,7 @@ class CConfigurationExport {
 
 		// proxies
 		$dbProxies = DBselect('SELECT h.hostid, h.host FROM hosts h WHERE '.
-				DBcondition('h.hostid', zbx_objectValues($hosts, 'proxy_hostid')));
+				dbConditionInt('h.hostid', zbx_objectValues($hosts, 'proxy_hostid')));
 		$proxies = array();
 		while ($proxy = DBfetch($dbProxies)) {
 			$proxies[$proxy['hostid']] = $proxy['host'];
@@ -356,7 +354,7 @@ class CConfigurationExport {
 	protected function prepareItems(array $items) {
 		// gather value maps
 		$valueMapIds = zbx_objectValues($items, 'valuemapid');
-		$dbValueMaps = DBselect('SELECT vm.valuemapid, vm.name FROM valuemaps vm WHERE '.DBcondition('vm.valuemapid', $valueMapIds));
+		$dbValueMaps = DBselect('SELECT vm.valuemapid, vm.name FROM valuemaps vm WHERE '.dbConditionInt('vm.valuemapid', $valueMapIds));
 		$valueMapNames = array();
 		while ($valueMap = DBfetch($dbValueMaps)) {
 			$valueMapNames[$valueMap['valuemapid']] = $valueMap['name'];
@@ -453,7 +451,7 @@ class CConfigurationExport {
 
 		// gather value maps
 		$valueMapIds = zbx_objectValues($prototypes, 'valuemapid');
-		$DbValueMaps = DBselect('SELECT vm.valuemapid, vm.name FROM valuemaps vm WHERE '.DBcondition('vm.valuemapid', $valueMapIds));
+		$DbValueMaps = DBselect('SELECT vm.valuemapid, vm.name FROM valuemaps vm WHERE '.dbConditionInt('vm.valuemapid', $valueMapIds));
 		$valueMaps = array();
 		while ($valueMap = DBfetch($DbValueMaps)) {
 			$valueMaps[$valueMap['valuemapid']] = $valueMap['name'];
@@ -552,7 +550,8 @@ class CConfigurationExport {
 			'output' => array('key_', 'flags', 'type'),
 			'webitems' => true,
 			'selectHosts' => array('host'),
-			'preservekeys' => true
+			'preservekeys' => true,
+			'filter' => array('flags' => null)
 		));
 
 		foreach ($graphs as $gnum => $graph) {
@@ -1034,7 +1033,8 @@ class CConfigurationExport {
 			'selectHosts' => array('host'),
 			'nodeids' => get_current_nodeid(true),
 			'webitems' => true,
-			'preservekeys' => true
+			'preservekeys' => true,
+			'filter' => array('flags' => null)
 		));
 		foreach ($items as $id => $item) {
 			$host = reset($item['hosts']);

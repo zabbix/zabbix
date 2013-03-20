@@ -132,7 +132,7 @@
 			domElement.children().first().append('<span class="ui-icon ui-icon-arrowthick-2-n-s state-disabled"></span>');
 			jQuery('.ui-icon', domElement).hover(
 				function (event) {
-					jQuery('<div><?php echo _('Interface is used by items that require this type of the interface.'); ?></div>')
+					jQuery('<div>' + <?php echo CJs::encodeJson(_('Interface is used by items that require this type of the interface.')); ?> + '</div>')
 						.css({position: 'absolute', opacity: 1, padding: '2px'})
 						.addClass('ui-state-highlight')
 						.appendTo(event.target.parentNode);

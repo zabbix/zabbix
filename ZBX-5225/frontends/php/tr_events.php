@@ -119,7 +119,7 @@ $right_col = array();
 
 // if acknowledges are not disabled in configuration, let's show them
 if ($config['event_ack_enable']) {
-	$event_ack = new CUIWidget('hat_eventack', make_acktab_by_eventid($event), CProfile::get('web.tr_events.hats.hat_eventack.state', 1));
+	$event_ack = new CUIWidget('hat_eventack', makeAckTab($event), CProfile::get('web.tr_events.hats.hat_eventack.state', 1));
 	$event_ack->setHeader(_('Acknowledges'));
 	$right_col[] = $event_ack;
 }

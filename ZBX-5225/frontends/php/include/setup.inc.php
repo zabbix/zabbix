@@ -17,8 +17,7 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
 
 function zbx_is_callable($var) {
 	foreach ($var as $e) {
@@ -463,7 +462,7 @@ class CsetupWizard extends CForm {
 					BR(), BR()
 				)
 				: array(
-					'Congratulations on successful instalation of Zabbix frontend.', BR(), BR()
+					'Congratulations on successful installation of Zabbix frontend.', BR(), BR()
 				),
 			'When done, press the '.($this->DISABLE_NEXT_BUTTON ? '"Retry"' : '"Finish"').' button'
 		);
@@ -589,4 +588,3 @@ class CsetupWizard extends CForm {
 		}
 	}
 }
-?>

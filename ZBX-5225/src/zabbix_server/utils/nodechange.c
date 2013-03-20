@@ -96,7 +96,8 @@ static void	convert_triggers_expression(int old_id, int new_id)
 	DB_ROW		row;
 	char		new_expression[MAX_STRING_LEN], *new_expression_esc;
 
-	assert(NULL != (r_table = DBget_table("functions")));
+	r_table = DBget_table("functions");
+	assert(NULL != r_table);
 
 	prefix = (zbx_uint64_t)__UINT64_C(100000000000000) * (zbx_uint64_t)new_id;
 	if (0 != (r_table->flags & ZBX_SYNC))
@@ -161,7 +162,8 @@ static void	convert_special_field(int old_id, int new_id, const char *table_name
 	zbx_uint64_t	prefix;
 	const ZBX_TABLE	*r_table;
 
-	assert(NULL != (r_table = DBget_table(rel_table_name)));
+	r_table = DBget_table(rel_table_name);
+	assert(NULL != r_table);
 
 	prefix = (zbx_uint64_t)__UINT64_C(100000000000000) * (zbx_uint64_t)new_id;
 	if (0 != (r_table->flags & ZBX_SYNC))
@@ -192,7 +194,8 @@ static void	convert_condition_values(int old_id, int new_id, const char *rel_tab
 	DB_ROW		row;
 	zbx_uint64_t	value;
 
-	assert(NULL != (r_table = DBget_table(rel_table_name)));
+	r_table = DBget_table(rel_table_name);
+	assert(NULL != r_table);
 
 	prefix = (zbx_uint64_t)__UINT64_C(100000000000000) * (zbx_uint64_t)new_id;
 	if (0 != (r_table->flags & ZBX_SYNC))
@@ -413,7 +416,8 @@ int	change_nodeid(int old_id, int new_id)
 			/* relations */
 			else if (NULL != tables[i].fields[j].fk_table)
 			{
-				assert(NULL != (r_table = DBget_table(tables[i].fields[j].fk_table)));
+				r_table = DBget_table(tables[i].fields[j].fk_table);
+				assert(NULL != r_table);
 
 				prefix = (zbx_uint64_t)__UINT64_C(100000000000000)*(zbx_uint64_t)new_id;
 

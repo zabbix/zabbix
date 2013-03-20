@@ -182,7 +182,7 @@ function delete_discovery_rule($druleid) {
 
 	// disabling actions with deleted conditions
 	if (!empty($actionids)) {
-		DBexecute('UPDATE actions SET status='.ACTION_STATUS_DISABLED.' WHERE '.DBcondition('actionid', $actionids));
+		DBexecute('UPDATE actions SET status='.ACTION_STATUS_DISABLED.' WHERE '.dbConditionInt('actionid', $actionids));
 		DBexecute('DELETE FROM conditions WHERE conditiontype='.CONDITION_TYPE_DRULE.' AND value=\''.$druleid.'\'');
 	}
 	return DBexecute('DELETE FROM drules WHERE druleid='.$druleid);

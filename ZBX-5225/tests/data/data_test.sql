@@ -681,7 +681,7 @@ INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, send
 -- delete from ids where table_name='auditlog' and field_name='auditid'
 
 -- host, item, trigger  for testing macro resolving in trigger description
-INSERT INTO hosts (host, name, status, hostid) VALUES ('Host for trigger description macros','Host for trigger description macros', 2, 20006);
+INSERT INTO hosts (host, name, status, hostid) VALUES ('Host for trigger description macros','Host for trigger description macros', 0, 20006);
 INSERT INTO hosts_groups (hostid, groupid, hostgroupid) VALUES (20006, 4, 101);
 INSERT INTO interface (type, ip, dns, useip, port, main, hostid, interfaceid) VALUES (1, '127.0.0.1', '', '1', '10050', '1', 20006, 10025);
 INSERT INTO items (name, key_, hostid, interfaceid, delay, value_type, lastvalue, itemid) VALUES ('item1', 'key1', 20006, 10025, 30, 3, 5, 23328);

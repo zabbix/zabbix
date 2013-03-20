@@ -312,7 +312,7 @@ void	main_housekeeper_loop()
 		d_history_and_trends = housekeeping_history_and_trends(now);
 
 		zbx_setproctitle("%s [removing deleted items data]", get_process_type_string(process_type));
-		d_cleanup = housekeeping_cleanup(now);
+		d_cleanup = housekeeping_cleanup();
 
 		zbx_setproctitle("%s [removing old events]", get_process_type_string(process_type));
 		d_events = housekeeping_events(now);

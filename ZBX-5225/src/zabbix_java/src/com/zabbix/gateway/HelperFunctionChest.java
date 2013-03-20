@@ -19,6 +19,8 @@
 
 package com.zabbix.gateway;
 
+import java.util.ArrayList;
+
 class HelperFunctionChest
 {
 	public static <T> boolean arrayContains(T[] array, T key)
@@ -28,5 +30,54 @@ class HelperFunctionChest
 				return true;
 
 		return false;
+	}
+
+	public static int separatorIndex(String input)
+	{
+		byte[] inputByteArray = input.getBytes();
+		int i, inputLength = inputByteArray.length;
+
+		for (i = 0; i < inputLength; i++)
+		{
+			if ('\\' == inputByteArray[i])
+			{
+				if (i + 1 < inputLength &&
+						('\\' == inputByteArray[i + 1] || '.' == inputByteArray[i + 1]))
+					i++;
+			}
+			else if ('.' == inputByteArray[i])
+				return i;
+		}
+
+		return -1;
+	}
+
+	public static String unescapeUserInput(String input)
+	{
+		byte[] inputByteArray = input.getBytes(), outputByteArray;
+		ArrayList<Byte> outputByteList = new ArrayList<Byte>();
+		int i, inputLength = inputByteArray.length;
+
+		for (i = 0; i < inputLength; i++)
+		{
+			if ('\\' == inputByteArray[i] && i + 1 < inputLength &&
+					('\\' == inputByteArray[i + 1] || '.' == inputByteArray[i + 1]))
+			{
+				i++;
+			}
+
+			outputByteList.add(inputByteArray[i]);
+		}
+
+		outputByteArray = new byte[outputByteList.size()];
+
+		i = 0;
+		for (Byte b : outputByteList)
+		{
+			outputByteArray[i] = b;
+			i++;
+		}
+
+		return new String(outputByteArray);
 	}
 }

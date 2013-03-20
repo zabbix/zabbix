@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2000-2012 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -10,12 +10,12 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 **/
 
 
@@ -45,7 +45,7 @@ $fields = array(
 	'url' =>				array(T_ZBX_STR, O_OPT, null,	null,		'isset({save})'),
 	'status' =>				array(T_ZBX_STR, O_OPT, null,	null,		null),
 	'input_method' =>		array(T_ZBX_INT, O_OPT, null,	NOT_EMPTY,	'isset({toggle_input_method})'),
-	'expr_temp' =>			array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'(isset({add_expression})||isset({and_expression})||isset({or_expression})||isset({replace_expression}))'),
+	'expr_temp' =>			array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'(isset({add_expression})||isset({and_expression})||isset({or_expression})||isset({replace_expression}))', _('Expression')),
 	'expr_target_single' => array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'(isset({and_expression})||isset({or_expression})||isset({replace_expression}))'),
 	'dependencies' =>		array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
 	'new_dependency' =>		array(T_ZBX_INT, O_OPT, null,	DB_ID.'{}>0', 'isset({add_dependency})'),
@@ -88,25 +88,23 @@ $_REQUEST['go'] = get_request('go', 'none');
 
 // validate permissions
 if (get_request('triggerid', false)) {
-	$options = array(
+	$triggers = API::Trigger()->get(array(
 		'triggerids' => $_REQUEST['triggerid'],
-		'editable' => true,
 		'preservekeys' => true,
-		'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL)
-	);
-	$triggers = API::Trigger()->get($options);
+		'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL),
+		'editable' => true
+	));
 	if (empty($triggers)) {
 		access_deny();
 	}
 }
 elseif (get_request('hostid', 0) > 0) {
-	$options = array(
+	$hosts = API::Host()->get(array(
 		'hostids' => $_REQUEST['hostid'],
 		'output' => API_OUTPUT_EXTEND,
 		'templated_hosts' => true,
 		'editable' => true
-	);
-	$hosts = API::Host()->get($options);
+	));
 	if (empty($hosts)) {
 		access_deny();
 	}
@@ -223,91 +221,100 @@ elseif (str_in_array($_REQUEST['go'], array('activate', 'disable')) && isset($_R
 		$statusNew = array('status' => TRIGGER_STATUS_DISABLED);
 	}
 
-	DBstart();
+	try {
+		DBstart();
 
-	// get requested triggers with permission check
-	$db_triggers = API::Trigger()->get(array(
-		'triggerids' => $_REQUEST['g_triggerid'],
-		'editable' => true,
-		'output' => array('triggerid', 'status'),
-		'preservekeys' => true
-	));
-
-	// triggerids which status must be changed
-	$triggerIdsToUpdate = array();
-	foreach ($db_triggers as $triggerid => $trigger){
-		if ($trigger['status'] != $status) {
-			$triggerIdsToUpdate[] = $triggerid;
-		}
-	}
-
-	// triggerids to gather child triggers
-	$childTriggerIds = array_keys($db_triggers);
-
-	do {
-		// gather all triggerids which status should be changed including child triggers
+		// get requested triggers with permission check
 		$db_triggers = API::Trigger()->get(array(
-			'filter' => array('templateid' => $childTriggerIds),
+			'triggerids' => $_REQUEST['g_triggerid'],
 			'output' => array('triggerid', 'status'),
 			'preservekeys' => true,
-			'nopermissions' => true
+			'editable' => true
 		));
-		foreach ($db_triggers as $triggerid => $trigger) {
+
+		// triggerids which status must be changed
+		$triggerIdsToUpdate = array();
+		foreach ($db_triggers as $triggerid => $trigger){
 			if ($trigger['status'] != $status) {
 				$triggerIdsToUpdate[] = $triggerid;
 			}
 		}
+
+		// triggerids to gather child triggers
 		$childTriggerIds = array_keys($db_triggers);
-	} while (!empty($childTriggerIds));
 
-	DB::update('triggers', array(
-		'values' => array('status' => $status),
-		'where' => array('triggerid' => $triggerIdsToUpdate)
-	));
+		do {
+			// gather all triggerids which status should be changed including child triggers
+			$db_triggers = API::Trigger()->get(array(
+				'filter' => array('templateid' => $childTriggerIds),
+				'output' => array('triggerid', 'status'),
+				'preservekeys' => true,
+				'nopermissions' => true
+			));
+			foreach ($db_triggers as $triggerid => $trigger) {
+				if ($trigger['status'] != $status) {
+					$triggerIdsToUpdate[] = $triggerid;
+				}
+			}
+			$childTriggerIds = array_keys($db_triggers);
+		} while (!empty($childTriggerIds));
 
-	// if disable trigger, unknown event must be created
-	if ($status == TRIGGER_STATUS_DISABLED) {
-		$valueTriggerIds = array();
-		$db_triggers = DBselect(
-			'SELECT t.triggerid'.
+		DB::update('triggers', array(
+			'values' => array('status' => $status),
+			'where' => array('triggerid' => $triggerIdsToUpdate)
+		));
+
+		// if disable trigger, unknown event must be created
+		if ($status == TRIGGER_STATUS_DISABLED) {
+			$valueTriggerIds = array();
+			$db_triggers = DBselect(
+				'SELECT t.triggerid'.
 				' FROM triggers t,functions f,items i,hosts h'.
 				' WHERE t.triggerid=f.triggerid'.
-				' AND f.itemid=i.itemid'.
-				' AND i.hostid=h.hostid'.
-				' AND '.DBcondition('t.triggerid', $triggerIdsToUpdate).
-				' AND t.value_flags='.TRIGGER_VALUE_FLAG_NORMAL.
-				' AND h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.')'
-		);
-		while ($row = DBfetch($db_triggers)) {
-			$valueTriggerIds[] = $row['triggerid'];
+					' AND f.itemid=i.itemid'.
+					' AND i.hostid=h.hostid'.
+					' AND '.dbConditionInt('t.triggerid', $triggerIdsToUpdate).
+					' AND t.value_flags='.TRIGGER_VALUE_FLAG_NORMAL.
+					' AND h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.')'
+			);
+			while ($row = DBfetch($db_triggers)) {
+				$valueTriggerIds[] = $row['triggerid'];
+			}
+
+			if (!empty($valueTriggerIds)) {
+				DB::update('triggers', array(
+					'values' => array(
+						'value_flags' => TRIGGER_VALUE_FLAG_UNKNOWN,
+						'error' => _('Trigger status became "Disabled".')
+					),
+					'where' => array('triggerid' => $valueTriggerIds)
+				));
+
+				addUnknownEvent($valueTriggerIds);
+			}
 		}
 
-		if (!empty($valueTriggerIds)) {
-			DB::update('triggers', array(
-				'values' => array(
-					'value_flags' => TRIGGER_VALUE_FLAG_UNKNOWN,
-					'error' => _('Trigger status became "Disabled".')
-				),
-				'where' => array('triggerid' => $valueTriggerIds)
-			));
-			addEvent($valueTriggerIds, TRIGGER_VALUE_UNKNOWN);
+		// get updated triggers with additional data
+		$db_triggers = API::Trigger()->get(array(
+			'triggerids' => $triggerIdsToUpdate,
+			'output' => array('triggerid', 'description'),
+			'preservekeys' => true,
+			'selectHosts' => API_OUTPUT_EXTEND,
+			'nopermissions' => true
+		));
+		foreach ($db_triggers as $triggerid => $trigger) {
+			$host = reset($trigger['hosts']);
+			add_audit_ext(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_TRIGGER, $triggerid,
+				$host['host'].':'.$trigger['description'], 'triggers', $statusOld, $statusNew);
 		}
+
+		DBend(true);
+	}
+	catch(Exception $e) {
+		DBend(false);
+		$go_result = false;
 	}
 
-	// get updated triggers with additional data
-	$db_triggers = API::Trigger()->get(array(
-		'triggerids' => $triggerIdsToUpdate,
-		'output' => array('triggerid', 'description'),
-		'preservekeys' => true,
-		'selectHosts' => API_OUTPUT_EXTEND,
-		'nopermissions' => true
-	));
-	foreach ($db_triggers as $triggerid => $trigger) {
-		$host = reset($trigger['hosts']);
-		add_audit_ext(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_TRIGGER, $triggerid,
-			$host['host'].':'.$trigger['description'], 'triggers', $statusOld, $statusNew);
-	}
-	$go_result = DBend($go_result);
 	show_messages($go_result, _('Status updated'), _('Cannot update status'));
 }
 elseif ($_REQUEST['go'] == 'copy_to' && isset($_REQUEST['copy']) && isset($_REQUEST['g_triggerid'])) {
@@ -321,9 +328,9 @@ elseif ($_REQUEST['go'] == 'copy_to' && isset($_REQUEST['copy']) && isset($_REQU
 
 			$db_hosts = DBselect(
 				'SELECT DISTINCT h.hostid'.
-					' FROM hosts h,hosts_groups hg'.
-					' WHERE h.hostid=hg.hostid'.
-						' AND '.DBcondition('hg.groupid', $group_ids)
+				' FROM hosts h,hosts_groups hg'.
+				' WHERE h.hostid=hg.hostid'.
+					' AND '.dbConditionInt('hg.groupid', $group_ids)
 			);
 			while ($db_host = DBfetch($db_hosts)) {
 				$hosts_ids[] = $db_host['hostid'];

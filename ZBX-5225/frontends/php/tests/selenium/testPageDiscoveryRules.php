@@ -17,8 +17,7 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
 require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
 class testPageDiscoveryRules extends CWebTest {
@@ -42,18 +41,17 @@ class testPageDiscoveryRules extends CWebTest {
 
 		DBsave_tables('triggers');
 
-		$this->login('host_discovery.php?&hostid='.$rule['hostid']);
+		$this->zbxTestLogin('host_discovery.php?&hostid='.$rule['hostid']);
 		$this->checkTitle('Configuration of discovery');
-		$this->checkbox_select("group_itemid[$itemid]");
-		$this->dropdown_select('go', 'Delete selected');
-		$this->button_click('goButton');
-		$this->wait();
+		$this->zbxTestCheckboxSelect('group_itemid['.$itemid.']');
+		$this->zbxTestDropdownSelect('go', 'Delete selected');
+		$this->zbxTestClickWait('goButton');
 
 		$this->getConfirmation();
 
 		$this->checkTitle('Configuration of discovery');
-		$this->ok('Discovery rule deleted');
-		$this->ok('CONFIGURATION OF DISCOVERY RULES');
+		$this->zbxTestTextPresent('Discovery rule deleted');
+		$this->zbxTestTextPresent('CONFIGURATION OF DISCOVERY RULES');
 
 		$sql = "select * from items where itemid=$itemid AND flags=".ZBX_FLAG_DISCOVERY;
 		$this->assertEquals(0, DBcount($sql));
@@ -67,4 +65,3 @@ class testPageDiscoveryRules extends CWebTest {
 		DBrestore_tables('triggers');
 	}
 }
-?>

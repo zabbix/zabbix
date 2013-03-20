@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2000-2012 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -172,16 +172,16 @@ if(isset($showAll)){
 		url_param('groupid').
 		url_param('hostid').
 		url_param('select');
-	$link = new CLink(new CImg('images/general/opened.gif'),$url);
-//		$link = new CLink(new CImg('images/general/opened.gif'),$url,null,"javascript: return updater.onetime_update('".ZBX_PAGE_MAIN_HAT."','".$url."');");
+	$link = new CLink(new CImg('images/general/minus.png'),$url);
+//		$link = new CLink(new CImg('images/general/minus.png'),$url,null,"javascript: return updater.onetime_update('".ZBX_PAGE_MAIN_HAT."','".$url."');");
 }
 else{
 	$url = '?open=1'.
 		url_param('groupid').
 		url_param('hostid').
 		url_param('select');
-	$link = new CLink(new CImg('images/general/closed.gif'),$url);
-//		$link = new CLink(new CImg('images/general/closed.gif'),$url,null,"javascript: return updater.onetime_update('".ZBX_PAGE_MAIN_HAT."','".$url."');");
+	$link = new CLink(new CImg('images/general/plus.png'),$url);
+//		$link = new CLink(new CImg('images/general/plus.png'),$url,null,"javascript: return updater.onetime_update('".ZBX_PAGE_MAIN_HAT."','".$url."');");
 }
 
 $table = new CTableInfo(_('No values found.'));
@@ -207,10 +207,8 @@ $db_appids = array();
 $options = array(
 	'output' => array('name', 'hostid'),
 	'hostids' => $available_hosts,
-	'selectAppllications' => API_OUTPUT_EXTEND,
 	'selectScreens' => API_OUTPUT_COUNT,
-	'selectInventory' => true,
-	'selectGroups' => API_OUTPUT_REFER,
+	'selectInventory' => array('hostid'),
 	'preservekeys' => true
 );
 
@@ -232,14 +230,16 @@ if($_REQUEST['hostid']>0){
 $hosts = API::Host()->get($options);
 
 // fetch scripts for the host JS menu
-$hostScripts = API::Script()->getScriptsByHosts($options['hostids']);
+if ($_REQUEST['hostid'] == 0) {
+	$hostScripts = API::Script()->getScriptsByHosts($options['hostids']);
+}
 
 // select hosts
 $sql = 'SELECT DISTINCT h.name as hostname,h.hostid, a.* '.
 		' FROM applications a, hosts h '.$sql_from.
 		' WHERE a.hostid=h.hostid'.
 			$sql_where.
-			' AND '.DBcondition('h.hostid', $available_hosts).
+			' AND '.dbConditionInt('h.hostid', $available_hosts).
 		order_by('h.name,h.hostid','a.name,a.applicationid');
 
 $db_app_res = DBselect($sql);
@@ -255,11 +255,11 @@ $tab_rows = array();
 // select items
 $sql = 'SELECT DISTINCT i.*, ia.applicationid '.
 		' FROM items i,items_applications ia'.
-		' WHERE '.DBcondition('ia.applicationid',$db_appids).
+		' WHERE '.dbConditionInt('ia.applicationid',$db_appids).
 			' AND i.itemid=ia.itemid'.
 			($_REQUEST['show_without_data'] ? '' : ' AND i.lastvalue IS NOT NULL').
 			' AND (i.status='.ITEM_STATUS_ACTIVE.' OR i.status='.ITEM_STATUS_NOTSUPPORTED.')'.
-			' AND '.DBcondition('i.flags', array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)).
+			' AND '.dbConditionInt('i.flags', array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)).
 		order_by('i.name,i.itemid,i.lastclock');
 
 $db_items = DBselect($sql);
@@ -292,16 +292,15 @@ while($db_item = DBfetch($db_items)){
 
 	$lastvalue = formatItemValue($db_item);
 
+	$digits = ($db_item['value_type'] == ITEM_VALUE_TYPE_FLOAT) ? 2 : 0;
 	if (isset($db_item['lastvalue']) && isset($db_item['prevvalue'])
 			&& ($db_item['value_type'] == ITEM_VALUE_TYPE_FLOAT || $db_item['value_type'] == ITEM_VALUE_TYPE_UINT64)
-			&& ($db_item['lastvalue'] - $db_item['prevvalue'] != 0)) {
+			&& (bcsub($db_item['lastvalue'], $db_item['prevvalue'], $digits) != 0)) {
 
 		$change = '';
 		if (($db_item['lastvalue'] - $db_item['prevvalue']) > 0) {
 			$change = '+';
 		}
-
-		$digits = ($db_item['value_type'] == ITEM_VALUE_TYPE_FLOAT) ? 2 : 0;
 
 		// for 'unixtime' change should be calculated as uptime
 		$change .= convert_units(
@@ -319,7 +318,7 @@ while($db_item = DBfetch($db_items)){
 		$actions = new CLink(_('Graph'),'history.php?action=showgraph&itemid='.$db_item['itemid']);
 	}
 	else{
-		$actions = new CLink(_('History'),'history.php?action=showvalues&period=3600&itemid='.$db_item['itemid']);
+		$actions = new CLink(_('History'),'history.php?action=showvalues&itemid='.$db_item['itemid']);
 	}
 
 	$item_status = $db_item['status'] == ITEM_STATUS_NOTSUPPORTED ? 'unknown' : null;
@@ -340,7 +339,6 @@ unset($db_app);
 
 foreach ($db_apps as $appid => $db_app) {
 	$host = $hosts[$db_app['hostid']];
-	$group = reset($host['groups']);
 
 	if(!isset($tab_rows[$appid])) continue;
 
@@ -353,12 +351,12 @@ foreach ($db_apps as $appid => $db_app) {
 	}
 
 	if(isset($showAll)){
-		if(!empty($apps) && !isset($apps[$db_app['applicationid']])) $img = new CImg('images/general/closed.gif');
-		else $img = new CImg('images/general/opened.gif');
+		if(!empty($apps) && !isset($apps[$db_app['applicationid']])) $img = new CImg('images/general/plus.png');
+		else $img = new CImg('images/general/minus.png');
 	}
 	else{
-		if(!empty($apps) && !isset($apps[$db_app['applicationid']])) $img = new CImg('images/general/opened.gif');
-		else $img = new CImg('images/general/closed.gif');
+		if(!empty($apps) && !isset($apps[$db_app['applicationid']])) $img = new CImg('images/general/minus.png');
+		else $img = new CImg('images/general/plus.png');
 	}
 
 	if(isset($showAll) && (!empty($tmp_apps) || empty($apps))){
@@ -379,14 +377,18 @@ foreach ($db_apps as $appid => $db_app) {
 
 	$col->setColSpan(5);
 	// host JS menu link
-	$hostSpan = new CSpan($host['name'], 'link_menu menu-host');
-	$scripts = ($hostScripts[$host['hostid']]) ? $hostScripts[$host['hostid']] : array();
-	$hostSpan->setAttribute('data-menu', hostMenuData($host, $scripts));
+
+	$hostSpan = null;
+	if ($_REQUEST['hostid'] == 0) {
+		$hostSpan = new CSpan($host['name'], 'link_menu menu-host');
+		$scripts = $hostScripts[$host['hostid']];
+		$hostSpan->setAttribute('data-menu', hostMenuData($host, $scripts));
+	}
 
 	$table->addRow(array(
 		$link,
 		get_node_name_by_elid($db_app['applicationid']),
-		($_REQUEST['hostid'] > 0) ? null : $hostSpan,
+		$hostSpan,
 		$col
 	));
 
@@ -407,8 +409,8 @@ $sql = 'SELECT DISTINCT h.name,h.hostid '.
 		' WHERE ia.itemid is NULL '.
 			$sql_where.
 			' AND h.hostid=i.hostid '.
-			' AND '.DBcondition('i.flags', array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)).
-			' AND '.DBcondition('h.hostid', $available_hosts).
+			' AND '.dbConditionInt('i.flags', array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)).
+			' AND '.dbConditionInt('h.hostid', $available_hosts).
 		' ORDER BY h.name';
 
 $db_host_res = DBselect($sql);
@@ -430,8 +432,8 @@ $sql = 'SELECT DISTINCT h.host as hostname,h.hostid,i.* '.
 			' AND h.hostid=i.hostid '.
 			($_REQUEST['show_without_data'] ? '' : ' AND i.lastvalue IS NOT NULL').
 			' AND (i.status='.ITEM_STATUS_ACTIVE.' OR i.status='.ITEM_STATUS_NOTSUPPORTED.')'.
-			' AND '.DBcondition('i.flags', array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)).
-			' AND '.DBcondition('h.hostid', $db_hostids).
+			' AND '.dbConditionInt('i.flags', array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)).
+			' AND '.dbConditionInt('h.hostid', $db_hostids).
 		' ORDER BY i.name,i.itemid';
 $db_items = DBselect($sql);
 while ($db_item = DBfetch($db_items)) {
@@ -466,16 +468,15 @@ while ($db_item = DBfetch($db_items)) {
 	$lastvalue = formatItemValue($db_item);
 
 	// column "change"
+	$digits = ($db_item['value_type'] == ITEM_VALUE_TYPE_FLOAT) ? 2 : 0;
 	if (isset($db_item['lastvalue']) && isset($db_item['prevvalue'])
 			&& ($db_item['value_type'] == ITEM_VALUE_TYPE_FLOAT || $db_item['value_type'] == ITEM_VALUE_TYPE_UINT64)
-			&& ($db_item['lastvalue'] - $db_item['prevvalue'] != 0)) {
+			&& (bcsub($db_item['lastvalue'], $db_item['prevvalue'], $digits) != 0)) {
 
 		$change = '';
-		if(($db_item['lastvalue'] - $db_item['prevvalue']) > 0) {
+		if (($db_item['lastvalue'] - $db_item['prevvalue']) > 0) {
 			$change = '+';
 		}
-
-		$digits = ($db_item['value_type'] == ITEM_VALUE_TYPE_FLOAT) ? 2 : 0;
 
 		// for 'unixtime' change should be calculated as uptime
 		$change .= convert_units(
@@ -494,7 +495,7 @@ while ($db_item = DBfetch($db_items)) {
 		$actions = new CLink(_('Graph'), 'history.php?action=showgraph&itemid='.$db_item['itemid']);
 	}
 	else{
-		$actions = new CLink(_('History'), 'history.php?action=showvalues&period=3600&itemid='.$db_item['itemid']);
+		$actions = new CLink(_('History'), 'history.php?action=showvalues&itemid='.$db_item['itemid']);
 	}
 
 	$item_status = $db_item['status'] == ITEM_STATUS_NOTSUPPORTED ? 'unknown' : null;
@@ -514,7 +515,6 @@ unset($db_host);
 
 foreach ($db_hosts as $hostid => $db_host) {
 	$host = $hosts[$db_host['hostid']];
-	$group = reset($host['groups']);
 
 	if(!isset($tab_rows[$hostid])) continue;
 	$app_rows = $tab_rows[$hostid];
@@ -526,12 +526,12 @@ foreach ($db_hosts as $hostid => $db_host) {
 	}
 
 	if(isset($showAll)){
-		if(!empty($apps) && !isset($apps[0])) $img = new CImg('images/general/closed.gif');
-		else $img = new CImg('images/general/opened.gif');
+		if(!empty($apps) && !isset($apps[0])) $img = new CImg('images/general/plus.png');
+		else $img = new CImg('images/general/minus.png');
 	}
 	else{
-		if(!empty($apps) && !isset($apps[0])) $img = new CImg('images/general/opened.gif');
-		else $img = new CImg('images/general/closed.gif');
+		if(!empty($apps) && !isset($apps[0])) $img = new CImg('images/general/minus.png');
+		else $img = new CImg('images/general/plus.png');
 	}
 
 	if(isset($showAll) && (!empty($tmp_apps) || empty($apps))){
@@ -553,14 +553,17 @@ foreach ($db_hosts as $hostid => $db_host) {
 	$col->setColSpan(5);
 
 	// host JS menu link
-	$hostSpan = new CSpan($host['name'], 'link_menu menu-host');
-	$scripts = ($hostScripts[$host['hostid']]) ? $hostScripts[$host['hostid']] : array();
-	$hostSpan->setAttribute('data-menu', hostMenuData($host, $scripts));
+	$hostSpan = null;
+	if ($_REQUEST['hostid'] == 0) {
+		$hostSpan = new CSpan($host['name'], 'link_menu menu-host');
+		$scripts = $hostScripts[$host['hostid']];
+		$hostSpan->setAttribute('data-menu', hostMenuData($host, $scripts));
+	}
 
 	$table->addRow(array(
 		$link,
 		get_node_name_by_elid($db_host['hostid']),
-		($_REQUEST['hostid'] > 0) ? null : $hostSpan,
+		$hostSpan,
 		$col
 	));
 

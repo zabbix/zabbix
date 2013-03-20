@@ -43,7 +43,7 @@ require_once 'include/page_header.php';
 
 		'list_name'=>	array(T_ZBX_STR, O_OPT,  P_SYS,	NOT_EMPTY,			'isset({save})&&isset({gid})'),
 		'caption'=>		array(T_ZBX_STR, O_OPT,  null,	null,			null),
-		'itemid'=> array(T_ZBX_INT, O_OPT, null, DB_ID.'({}!=0)', 'isset({save})', _('Parameter')),
+		'itemid'=> array(T_ZBX_INT, O_OPT, P_SYS, DB_ID.'({}!=0)', 'isset({save})', _('Parameter')),
 		'color'=> array(T_ZBX_CLR, O_OPT,  null, null, 'isset({save})', _('Colour')),
 		'calc_fnc'=>	array(T_ZBX_INT, O_OPT,	 null,	IN('0,1,2,4,7,9'),	'isset({save})'),
 		'axisside'=>	array(T_ZBX_INT, O_OPT,	 null,	IN(GRAPH_YAXIS_SIDE_LEFT.','.GRAPH_YAXIS_SIDE_RIGHT),	null),
@@ -60,7 +60,7 @@ require_once 'include/page_header.php';
 
 	$_REQUEST['caption'] = get_request('caption','');
 	$_REQUEST['axisside'] = get_request('axisside',	GRAPH_YAXIS_SIDE_LEFT);
-	if(zbx_empty($_REQUEST['caption']) && isset($_REQUEST['itemid']) && ($_REQUEST['itemid'] > 0)){
+	if (zbx_empty($_REQUEST['caption']) && isset($_REQUEST['itemid']) && $_REQUEST['itemid'] > 0) {
 		$_REQUEST['caption'] = itemName(get_item_by_itemid($_REQUEST['itemid']));
 	}
 
@@ -87,7 +87,6 @@ require_once 'include/page_header.php';
 			$_REQUEST['color']."',".
 			$_REQUEST['calc_fnc'].",".
 			$_REQUEST['axisside'].");\n");
-
 	}
 	else{
 		echo SBR;
@@ -107,12 +106,6 @@ require_once 'include/page_header.php';
 		$calc_fnc	= get_request('calc_fnc',	2);
 		$axisside	= get_request('axisside',	GRAPH_YAXIS_SIDE_LEFT);
 
-		$description = '';
-		if($itemid > 0){
-			$description = get_item_by_itemid($itemid);
-			$description = itemName($description);
-		}
-
 		$frmGItem->addVar('gid',$gid);
 		$frmGItem->addVar('config',$config);
 		$frmGItem->addVar('list_name',$list_name);
@@ -121,7 +114,7 @@ require_once 'include/page_header.php';
 		$frmGItem->addRow(array( new CVisibilityBox('caption_visible', !zbx_empty($caption), 'caption', _('Default')),
 			_('Caption')), new CTextBox('caption',$caption,32));
 
-		$txtCondVal = new CTextBox('name',$description,50,'yes');
+		$txtCondVal = new CTextBox('name',$caption,50,'yes');
 
 		$btnSelect = new CSubmit('btn1',_('Select'),
 				"return PopUp('popup.php?dstfrm=".$frmGItem->GetName().

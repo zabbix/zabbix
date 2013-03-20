@@ -30,7 +30,7 @@ static u_int	pagesize = 0;
 
 static int	VM_MEMORY_TOTAL(AGENT_RESULT *result)
 {
-	uint64_t	totalbytes;
+	unsigned long	totalbytes;
 	size_t		len;
 
 	ZBX_SYSCTLBYNAME("hw.physmem", totalbytes);
