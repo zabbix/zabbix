@@ -931,9 +931,9 @@ function get_event_actions_status($eventId) {
 	if ($alerts) {
 		$alerts = zbx_toHash($alerts, 'status');
 
-		$sendCount = isset($alerts[ALERT_STATUS_SENT]) ? $alerts[ALERT_STATUS_SENT] : 0;
-		$notSendCount = isset($alerts[ALERT_STATUS_NOT_SENT]) ? $alerts[ALERT_STATUS_NOT_SENT] : 0;
-		$failedCount = isset($alerts[ALERT_STATUS_FAILED]) ? $alerts[ALERT_STATUS_FAILED] : 0;
+		$sendCount = isset($alerts[ALERT_STATUS_SENT]) ? $alerts[ALERT_STATUS_SENT]['cnt'] : 0;
+		$notSendCount = isset($alerts[ALERT_STATUS_NOT_SENT]) ? $alerts[ALERT_STATUS_NOT_SENT]['cnt'] : 0;
+		$failedCount = isset($alerts[ALERT_STATUS_FAILED]) ? $alerts[ALERT_STATUS_FAILED]['cnt'] : 0;
 
 		// calculate total
 		$mixed = 0;
@@ -970,63 +970,51 @@ function get_event_actions_status($eventId) {
 	return $table;
 }
 
-function get_event_actions_stat_hints($eventid) {
-	$actionCont = new CDiv(null, 'event-action-cont');
+function get_event_actions_stat_hints($eventId) {
+	$action = new CDiv(null, 'event-action-cont');
 
-	$alerts = DBfetch(DBselect(
-		'SELECT COUNT(a.alertid) AS cnt'.
+	$alerts = DBfetchArray(DBselect(
+		'SELECT a.status, COUNT(a.alertid) AS cnt'.
 		' FROM alerts a'.
-		' WHERE a.eventid='.$eventid.
-			' AND a.alerttype IN ('.ALERT_TYPE_MESSAGE.','.ALERT_TYPE_COMMAND.')'
+		' WHERE a.eventid='.$eventId.
+			' AND a.alerttype IN ('.ALERT_TYPE_MESSAGE.','.ALERT_TYPE_COMMAND.')
+		GROUP BY status'
 	));
 
-	if (isset($alerts['cnt']) && $alerts['cnt'] > 0) {
-		// left
-		$alerts = DBfetch(DBselect(
-			'SELECT COUNT(a.alertid) AS sent'.
-			' FROM alerts a'.
-			' WHERE a.eventid='.$eventid.
-				' AND a.alerttype IN ('.ALERT_TYPE_MESSAGE.','.ALERT_TYPE_COMMAND.')'.
-				' AND a.status='.ALERT_STATUS_SENT
-		));
-		$alert_cnt = new CSpan($alerts['sent'], 'green');
-		if ($alerts['sent']) {
-			$alert_cnt->setHint(get_actions_hint_by_eventid($eventid, ALERT_STATUS_SENT));
-		}
-		$left = new CDiv($alerts['sent'] ? $alert_cnt : SPACE);
+	if ($alerts) {
+		$alerts = zbx_toHash($alerts, 'status');
 
-		// center
-		$alerts = DBfetch(DBselect(
-			'SELECT COUNT(a.alertid) AS inprogress'.
-			' FROM alerts a'.
-			' WHERE a.eventid='.$eventid.
-				' AND a.alerttype IN ('.ALERT_TYPE_MESSAGE.','.ALERT_TYPE_COMMAND.')'.
-				' AND a.status='.ALERT_STATUS_NOT_SENT
-		));
-		$alert_cnt = new CSpan($alerts['inprogress'], 'orange');
-		if ($alerts['inprogress']) {
-			$alert_cnt->setHint(get_actions_hint_by_eventid($eventid, ALERT_STATUS_NOT_SENT));
-		}
-		$center = new CDiv($alerts['inprogress'] ? $alert_cnt : SPACE);
+		$sendCount = isset($alerts[ALERT_STATUS_SENT]) ? $alerts[ALERT_STATUS_SENT]['cnt'] : 0;
+		$notSendCount = isset($alerts[ALERT_STATUS_NOT_SENT]) ? $alerts[ALERT_STATUS_NOT_SENT]['cnt'] : 0;
+		$failedCount = isset($alerts[ALERT_STATUS_FAILED]) ? $alerts[ALERT_STATUS_FAILED]['cnt'] : 0;
 
-		// right
-		$alerts = DBfetch(DBselect(
-			'SELECT COUNT(a.alertid) AS failed'.
-			' FROM alerts a'.
-			' WHERE a.eventid='.$eventid.
-				' AND a.alerttype IN ('.ALERT_TYPE_MESSAGE.','.ALERT_TYPE_COMMAND.')'.
-				' AND a.status='.ALERT_STATUS_FAILED
-		));
-		$alert_cnt = new CSpan($alerts['failed'], 'red');
-		if ($alerts['failed']) {
-			$alert_cnt->setHint(get_actions_hint_by_eventid($eventid, ALERT_STATUS_FAILED));
+		// sent
+		$sentHint = new CSpan($sendCount, 'green');
+		if ($sendCount) {
+			$sentHint->setHint(get_actions_hint_by_eventid($eventId, ALERT_STATUS_SENT));
 		}
-		$right = new CDiv($alerts['failed'] ? $alert_cnt : SPACE);
 
-		$actionCont->addItem(array($left, $center, $right));
+		// not sent
+		$notSentHint = new CSpan($notSendCount, 'orange');
+		if ($notSendCount) {
+			$notSentHint->setHint(get_actions_hint_by_eventid($eventId, ALERT_STATUS_NOT_SENT));
+		}
+
+		// failed
+		$failedHint = new CSpan($failedCount, 'red');
+		if ($failedCount) {
+			$failedHint->setHint(get_actions_hint_by_eventid($eventId, ALERT_STATUS_FAILED));
+		}
+
+		$action->addItem(array(
+			new CDiv($sendCount ? $sentHint : SPACE),
+			new CDiv($notSendCount ? $notSentHint : SPACE),
+			new CDiv($failedCount ? $failedHint : SPACE)
+		));
 	}
 	else {
-		$actionCont->addItem('-');
+		$action->addItem('-');
 	}
-	return $actionCont;
+
+	return $action;
 }
