@@ -182,10 +182,6 @@ class CHostPrototype extends CHostBase {
 		foreach ($hostPrototypes as $key => $hostPrototype) {
 			$hostPrototypes[$key]['hostid'] = $hostPrototype['hostid'] = $hostPrototypeIds[$key];
 
-			if (isset($hostPrototype['templates'])) {
-				$this->link(zbx_objectValues($hostPrototype['templates'], 'templateid'), array($hostPrototype['hostid']));
-			}
-
 			$hostPrototypeDiscoveryRules[] = array(
 				'hostid' => $hostPrototype['hostid'],
 				'parent_itemid' => $hostPrototype['ruleid']
@@ -194,6 +190,13 @@ class CHostPrototype extends CHostBase {
 
 		// link host prototypes to discovery rules
 		DB::insert('host_discovery', $hostPrototypeDiscoveryRules, false);
+
+		// link templates
+		foreach ($hostPrototypes as $hostPrototype) {
+			if (isset($hostPrototype['templates']) && $hostPrototype['templates']) {
+				$this->link(zbx_objectValues($hostPrototype['templates'], 'templateid'), array($hostPrototype['hostid']));
+			}
+		}
 
 		// TODO: REMOVE info
 		$createdHostPrototypes = $this->get(array(
