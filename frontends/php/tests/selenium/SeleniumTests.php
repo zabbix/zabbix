@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2000-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -84,6 +84,7 @@ require_once dirname(__FILE__).'/testFormTemplate.php';
 require_once dirname(__FILE__).'/testPageApplications.php';
 require_once dirname(__FILE__).'/testPageBrowserWarning.php';
 require_once dirname(__FILE__).'/testInheritanceItemPrototype.php';
+require_once dirname(__FILE__).'/testTemplateInheritance.php';
 
 class SeleniumTests {
 	public static function suite() {
@@ -154,6 +155,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testPageApplications');
 		$suite->addTestSuite('testPageBrowserWarning');
 		$suite->addTestSuite('testInheritanceItemPrototype');
+		$suite->addTestSuite('testTemplateInheritance');
 
 		return $suite;
 	}
