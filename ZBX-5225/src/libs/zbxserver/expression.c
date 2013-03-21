@@ -164,8 +164,7 @@ static int	evaluate_simple(double *result, char *exp, char *error, int maxerrlen
 	double	value1, value2;
 	char	*p, c;
 
-	/* remove left and right spaces */
-	lrtrim_spaces(exp);
+	zbx_lrtrim(exp, " ");
 
 	/* compress repeating - and + and add prefix N to negative numbers */
 	compress_signs(exp);
