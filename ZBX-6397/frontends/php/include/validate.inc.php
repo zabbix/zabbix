@@ -482,7 +482,7 @@ function check_field(&$fields, &$field, $checks) {
 	}
 
 	if ((is_null($exception) || $except) && $validation && !calc_exp($fields, $field, $validation)) {
-		if (strstr($validation, NOT_EMPTY)) {
+		if ($validation == NOT_EMPTY) {
 			if ($flags&P_SYS) {
 				info(_s('Critical error. Incorrect value for field "%1$s": cannot be empty.', $caption));
 			}
