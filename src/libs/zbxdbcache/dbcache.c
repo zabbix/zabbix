@@ -439,9 +439,10 @@ static void	DCflush_trends(ZBX_DC_TREND *trends, int *trends_num, int update_cac
 				if (value_max.ui64 > trend->value_max.ui64)
 					trend->value_max.ui64 = value_max.ui64;
 
+				/* calculate the trend average value */
 				umul64_64(&avg, num, value_avg.ui64);
 				uinc128_128(&trend->value_sum, &avg);
-				udiv128_64(&avg, &trend->value_sum, (trend->num + num));
+				udiv128_64(&avg, &trend->value_sum, trend->num + num);
 				trend->value_avg.ui64 = avg.lo;
 
 				trend->num += num;
@@ -547,6 +548,8 @@ static void	DCflush_trends(ZBX_DC_TREND *trends, int *trends_num, int update_cac
 	{
 		for (i = 0; i < trends_to; i++)
 		{
+			zbx_uint128_t	avg;
+
 			trend = &trends[i];
 
 			if (0 == trend->itemid)
@@ -554,6 +557,10 @@ static void	DCflush_trends(ZBX_DC_TREND *trends, int *trends_num, int update_cac
 
 			if (clock != trend->clock || value_type != trend->value_type)
 				continue;
+
+			/* calculate the trend average value */
+			udiv128_64(&avg, &trend->value_sum, trend->num);
+			trend->value_avg.ui64 = avg.lo;
 
 			if (0 == sql_offset)
 			{
