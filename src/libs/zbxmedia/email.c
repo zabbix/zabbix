@@ -131,22 +131,24 @@ ssize_t smtp_readln(int fd, char *buf, int buf_len)
 	return read_bytes;
 }
 
-static void	smtp_prepare_return_path(char **path, const char *mail_from)
+static char	*smtp_prepare_email_address(const char *email_option)
 {
-	char	*pstart, *pend;
+	char	*pstart, *pend = (char*)(-1);
 	int	size = 128, offset = 0;
+	char	*email_address;
 
-	*path = zbx_malloc(*path, size);
+	email_address = zbx_malloc(NULL, size);
 
-	if (NULL == (pstart = strchr(mail_from, '<')) || NULL == (pend = strchr(pstart, '>')))
+	if (NULL == (pstart = strchr(email_option, '<')) || NULL == (pend = strchr(pstart, '>')))
 	{
-		zbx_snprintf_alloc(path, &size, &offset, "<%s>", mail_from);
-		if (NULL == pstart)
-			zabbix_log(LOG_LEVEL_WARNING, "Possibly invalid SMTP email set in "
-					"Administration/Media types/Email: %s", mail_from);
+		zbx_snprintf_alloc(&email_address, &size, &offset, "<%s>", email_option);
+		if (NULL == pend)
+			zabbix_log(LOG_LEVEL_WARNING, "Possibly invalid SMTP email set: %s", email_option);
 	}
 	else
-		zbx_strncpy_alloc(path, &size, &offset, pstart, pend - pstart + 1);
+		zbx_strncpy_alloc(&email_address, &size, &offset, pstart, pend - pstart + 1);
+
+	return email_address;
 }
 
 int	send_email(const char *smtp_server, const char *smtp_helo, const char *smtp_email, const char *mailto,
@@ -158,7 +160,7 @@ int	send_email(const char *smtp_server, const char *smtp_helo, const char *smtp_
 	int		err, ret = FAIL;
 	char		cmd[MAX_STRING_LEN], *cmdp = NULL;
 	char		*tmp = NULL, *base64 = NULL, *base64_lf;
-	char		*localsubject = NULL, *localbody = NULL, *return_path = NULL;
+	char		*localsubject = NULL, *localbody = NULL, *email_address = NULL;
 
 	char		str_time[MAX_STRING_LEN];
 	struct tm	*local_time = NULL;
@@ -220,9 +222,9 @@ int	send_email(const char *smtp_server, const char *smtp_helo, const char *smtp_
 
 	/* send MAIL FROM */
 
-	smtp_prepare_return_path(&return_path, smtp_email);
-	zbx_snprintf(cmd, sizeof(cmd), "MAIL FROM:%s\r\n", return_path);
-	zbx_free(return_path);
+	email_address = smtp_prepare_email_address(smtp_email);
+	zbx_snprintf(cmd, sizeof(cmd), "MAIL FROM:%s\r\n", email_address);
+	zbx_free(email_address);
 
 	if (-1 == write(s.socket, cmd, strlen(cmd)))
 	{
@@ -242,7 +244,10 @@ int	send_email(const char *smtp_server, const char *smtp_helo, const char *smtp_
 
 	/* send RCPT TO */
 
-	zbx_snprintf(cmd, sizeof(cmd), "RCPT TO:<%s>\r\n", mailto);
+	email_address = smtp_prepare_email_address(mailto);
+	zbx_snprintf(cmd, sizeof(cmd), "RCPT TO:%s\r\n", email_address);
+	zbx_free(email_address);
+
 	if (-1 == write(s.socket, cmd, strlen(cmd)))
 	{
 		zbx_snprintf(error, max_error_len, "error sending RCPT TO to mailserver: %s", zbx_strerror(errno));
