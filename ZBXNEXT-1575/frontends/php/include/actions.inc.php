@@ -591,7 +591,7 @@ function get_operations_by_eventsource($eventsource) {
 		OPERATION_TYPE_HOST_DISABLE
 	);
 	$operations[EVENT_SOURCE_INTERNAL] = array(
-		OPERATION_TYPE_MESSAGE,
+		OPERATION_TYPE_MESSAGE
 	);
 
 	if (isset($operations[$eventsource])) {
