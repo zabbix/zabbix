@@ -724,20 +724,28 @@ $divTabs->addTab('macroTab', _('Macros'), $macrosView->render());
 $inventoryFormList = new CFormList('inventorylist');
 
 // radio buttons for inventory type choice
+$inventoryMode = (isset($dbHost['inventory']['inventory_mode'])) ? $dbHost['inventory']['inventory_mode'] : HOST_INVENTORY_DISABLED;
+$inventoryDisabledBtn = new CRadioButton('inventory_mode', HOST_INVENTORY_DISABLED, null, 'host_inventory_radio_'.HOST_INVENTORY_DISABLED,
+	$inventoryMode == HOST_INVENTORY_DISABLED
+);
+$inventoryDisabledBtn->setEnabled(!$isDiscovered);
+
+$inventoryManualBtn = new CRadioButton('inventory_mode', HOST_INVENTORY_MANUAL, null, 'host_inventory_radio_'.HOST_INVENTORY_MANUAL,
+	$inventoryMode == HOST_INVENTORY_MANUAL
+);
+$inventoryManualBtn->setEnabled(!$isDiscovered);
+
+$inventoryAutomaticBtn = new CRadioButton('inventory_mode', HOST_INVENTORY_AUTOMATIC, null, 'host_inventory_radio_'.HOST_INVENTORY_AUTOMATIC,
+	$inventoryMode == HOST_INVENTORY_AUTOMATIC
+);
+$inventoryAutomaticBtn->setEnabled(!$isDiscovered);
+
 $inventoryTypeRadioButton = array(
-	new CRadioButton('inventory_mode', HOST_INVENTORY_DISABLED, null, 'host_inventory_radio_'.HOST_INVENTORY_DISABLED,
-		$inventory_mode == HOST_INVENTORY_DISABLED
-	),
+	$inventoryDisabledBtn,
 	new CLabel(_('Disabled'), 'host_inventory_radio_'.HOST_INVENTORY_DISABLED),
-
-	new CRadioButton('inventory_mode', HOST_INVENTORY_MANUAL, null, 'host_inventory_radio_'.HOST_INVENTORY_MANUAL,
-		$inventory_mode == HOST_INVENTORY_MANUAL
-	),
+	$inventoryManualBtn,
 	new CLabel(_('Manual'), 'host_inventory_radio_'.HOST_INVENTORY_MANUAL),
-
-	new CRadioButton('inventory_mode', HOST_INVENTORY_AUTOMATIC, null, 'host_inventory_radio_'.HOST_INVENTORY_AUTOMATIC,
-		$inventory_mode == HOST_INVENTORY_AUTOMATIC
-	),
+	$inventoryAutomaticBtn,
 	new CLabel(_('Automatic'), 'host_inventory_radio_'.HOST_INVENTORY_AUTOMATIC),
 );
 $inventoryFormList->addRow(new CDiv($inventoryTypeRadioButton, 'jqueryinputset'));
