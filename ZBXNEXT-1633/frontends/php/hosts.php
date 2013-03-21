@@ -637,46 +637,9 @@ elseif (isset($_REQUEST['form'])) {
 
 	if ($hostid = get_request('hostid', 0)) {
 		$hosts_wdgt->addItem(get_header_host_table('', $_REQUEST['hostid']));
-
-		$host = API::Host()->get(array(
-			'output' => API_OUTPUT_EXTEND,
-			'selectDiscoveryRule' => array('itemid', 'name', 'hostid'),
-			'selectGroups' => array('groupid', 'name'),
-			'selectParentTemplates' => array('templateid', 'name'),
-			'selectInterfaces' => API_OUTPUT_EXTEND,
-			'selectMacros' => API_OUTPUT_EXTEND,
-			'selectInventory' => API_OUTPUT_EXTEND,
-			'hostids' => $hostid
-		));
-		$host = reset($host);
 	}
 
-	if (get_request('hostid') && $host['discoveryRule'] && get_request('form') == 'update') {
-		$proxy = array();
-		if ($host['proxy_hostid']) {
-			$proxy = API::Proxy()->get(array(
-				'output' => array('host', 'proxyid'),
-				'proxyids' => $host['proxy_hostid'],
-				'limit' => 1
-			));
-			$proxy = reset($proxy);
-		}
-
-		// templates
-		$templates = array();
-		foreach ($host['parentTemplates'] as $template) {
-			$templates[$template['templateid']] = $template['name'];
-		}
-
-		$hostForm = new CView('configuration.host.discovered.edit', array(
-			'host' => $host,
-			'proxy' => $proxy,
-			'templates' => $templates
-		));
-	}
-	else {
-		$hostForm = new CView('configuration.host.edit');
-	}
+	$hostForm = new CView('configuration.host.edit');
 	$hosts_wdgt->addItem($hostForm->render());
 	$hosts_wdgt->setRootClass('host-edit');
 }

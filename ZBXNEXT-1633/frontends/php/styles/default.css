@@ -271,7 +271,7 @@ div.footer .formrow .main:hover, div.ui-dialog-buttonpane div.ui-dialog-buttonse
 	visibility: hidden;
 }
 
-.hostprototype-edit #groups { width: 280px; }
+.host-edit #groups, .hostprototype-edit #groups { width: 280px; }
 
 .border_dotted { border: 1px dotted #6C80B9; }
 .footer { padding-left: 1.6em; }
