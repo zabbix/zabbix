@@ -233,7 +233,7 @@ function make_system_status($filter) {
 		'maintenance' => $filter['maintenance'],
 		'skipDependent' => true,
 		'withLastEventUnacknowledged' => ($filter['extAck'] == EXTACK_OPTION_UNACK) ? true : null,
-		'withLastEvent' => true,
+		'selectLastEvent' => API_OUTPUT_EXTEND,
 		'expandDescription' => true,
 		'filter' => array(
 			'priority' => $filter['severity'],
@@ -248,11 +248,16 @@ function make_system_status($filter) {
 
 	// get acknowledges
 	$eventIds = array();
-	foreach ($triggers as $trigger) {
+	foreach ($triggers as &$trigger) {
+		$trigger['event'] = $trigger['latestEvent'];
+		unset($trigger['latestEvent']);
+
 		if (!empty($trigger['event'])) {
 			$eventIds[$trigger['event']['eventid']] = $trigger['event']['eventid'];
 		}
 	}
+	unset($trigger);
+
 	if ($eventIds) {
 		$eventAcknowledges = API::Event()->get(array(
 			'eventids' => $eventIds,
@@ -805,16 +810,14 @@ function make_latest_issues(array $filter = array()) {
 	// get events
 	$events = API::Trigger()->get(array(
 		'triggerids' => zbx_objectValues($triggers, 'triggerid'),
-		'withLastEvent' => true,
+		'selectLastEvent' => API_OUTPUT_EXTEND,
 		'preservekeys' => true
 	));
 
 	// get acknowledges
 	$eventIds = array();
 	foreach ($events as $event) {
-		if (!empty($event['event'])) {
-			$eventIds[$event['event']['eventid']] = $event['event']['eventid'];
-		}
+		$eventIds[$event['latestEvent']['eventid']] = $event['latestEvent']['eventid'];
 	}
 	if ($eventIds) {
 		$eventAcknowledges = API::Event()->get(array(
@@ -882,7 +885,7 @@ function make_latest_issues(array $filter = array()) {
 	foreach ($triggers as $trigger) {
 		// event
 		if (isset($events[$trigger['triggerid']])) {
-			$trigger['event'] = $events[$trigger['triggerid']]['event'];
+			$trigger['event'] = $events[$trigger['triggerid']]['latestEvent'];
 		}
 		if (!empty($trigger['event'])) {
 			$trigger['event']['acknowledges'] = isset($eventAcknowledges[$trigger['event']['eventid']])

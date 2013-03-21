@@ -86,7 +86,6 @@ class CTrigger extends CTriggerGeneral {
 			'withUnacknowledgedEvents'		=> null,
 			'withAcknowledgedEvents'		=> null,
 			'withLastEventUnacknowledged'	=> null,
-			'withLastEvent'					=> null,
 			'skipDependent'					=> null,
 			'nopermissions'					=> null,
 			'editable'						=> null,
@@ -115,6 +114,7 @@ class CTrigger extends CTriggerGeneral {
 			'selectFunctions'				=> null,
 			'selectDependencies'			=> null,
 			'selectDiscoveryRule'			=> null,
+			'selectLastEvent'				=> null,
 			'countOutput'					=> null,
 			'groupCount'					=> null,
 			'preservekeys'					=> null,
@@ -735,24 +735,20 @@ class CTrigger extends CTriggerGeneral {
 			}
 		}
 
-		if (!is_null($options['withLastEvent'])) {
+		if (!is_null($options['selectLastEvent']) && str_in_array($options['selectLastEvent'], $subselectsAllowedOutputs)) {
 			foreach ($result as $triggerId => $trigger) {
-				$event = API::Event()->get(array(
+				$latestEvent = API::Event()->get(array(
 					'object' => EVENT_SOURCE_TRIGGERS,
 					'triggerids' => $triggerId,
-					'output' => API_OUTPUT_EXTEND,
+					'output' => $options['selectLastEvent'],
 					'nopermissions' => true,
-					'filter' => array(
-						'object' => EVENT_OBJECT_TRIGGER,
-						'value' => TRIGGER_VALUE_TRUE,
-						'value_changed' => TRIGGER_VALUE_CHANGED_YES
-					),
+					'filter' => array('value_changed' => TRIGGER_VALUE_CHANGED_YES),
 					'sortfield' => array('eventid'),
 					'sortorder' => ZBX_SORT_DOWN,
 					'limit' => 1
 				));
 
-				$result[$triggerId]['event'] = $event ? reset($event) : array();
+				$result[$triggerId]['latestEvent'] = $latestEvent ? reset($latestEvent) : array();
 			}
 		}
 
