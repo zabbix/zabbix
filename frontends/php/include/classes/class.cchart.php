@@ -1482,10 +1482,7 @@ class CChart extends CGraphDraw {
 			// using bc library, incase of large numbers
 			$val = bcadd(bcmul($i, $step), $minY);
 
-			if ((bccomp($minY, -1) == 1 && bccomp($minY, 0) == -1)
-					|| (bccomp($maxY, 1) == -1 && bccomp($maxY, 0) == 1)) {
-				$val = bcsub($val, $this->getYStepMarkerValueOffset(GRAPH_YAXIS_SIDE_LEFT, $i));
-			}
+			$val = bcsub($val, $this->getYStepMarkerValueOffset(GRAPH_YAXIS_SIDE_LEFT, $i));
 
 			if (bccomp(bcadd($val, bcdiv($step,2)), $maxY) == 1) {
 				continue;
@@ -1623,10 +1620,7 @@ class CChart extends CGraphDraw {
 			// using bc module in case of large numbers
 			$val = bcadd(bcmul($i, $step), $minY);
 
-			if ((bccomp($minY, -1) == 1 && bccomp($minY, 0) == -1)
-					|| (bccomp($maxY, 1) == -1 && bccomp($maxY, 0) == 1)) {
-				$val = bcsub($val, $this->getYStepMarkerValueOffset(GRAPH_YAXIS_SIDE_RIGHT, $i));
-			}
+			$val = bcsub($val, $this->getYStepMarkerValueOffset(GRAPH_YAXIS_SIDE_RIGHT, $i));
 
 			if (bccomp(bcadd($val, bcdiv($step, 2)), $maxY) == 1) {
 				continue;
@@ -1705,12 +1699,9 @@ class CChart extends CGraphDraw {
 		if ($this->m_minY[$yAxis] > 0) {
 			$minY = $this->m_minY[$yAxis];
 		}
-		else {
-			$minY = bcmul($this->m_minY[$yAxis], '-1');
-		}
 
 		$offset = 0;
-		if ($stepNumber > 0 && $minY) {
+		if ($stepNumber > 0 && isset($minY)) {
 			$offset = ($minY > $step) ? bcfmod($minY, $step) : $minY;
 		}
 
