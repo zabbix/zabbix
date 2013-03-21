@@ -979,8 +979,8 @@ class CTrigger extends CTriggerGeneral {
 
 		if (!$nopermissions) {
 			$this->checkPermissions($triggerIds);
+			$this->checkNotInherited($triggerIds);
 		}
-		$this->checkNotInherited($triggerIds);
 	}
 
 	protected function deleteByPks(array $pks) {
