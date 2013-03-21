@@ -60,15 +60,20 @@ if (!empty($this->data['templates'])) {
 if (!$this->data['is_discovery_rule']) {
 	// append host to form list
 	if (empty($this->data['parent_discoveryid'])) {
-		$itemForm->addVar('form_hostid', $this->data['hostid']);
-
-		$itemFormList->addRow(_('Host'), new CMultiSelect(array(
-			'name' => 'hostname',
-			'objectName' => 'host',
-			'data' => $this->data['hostname'],
-			'single' => true,
-			'disabled' => false
-		)));
+		if (isset($this->data['itemid'])) {
+			$itemForm->addVar('form_hostid', $this->data['hostid']);
+			$itemFormList->addRow(_('Host'), new CLink($this->data['hostname'], 'hosts.php?form=update&hostid='.$this->data['hostid']));
+		}
+		else {
+			$itemFormList->addRow(_('Host'), new CMultiSelect(array(
+				'name' => 'form_hostid',
+				'objectName' => 'hostsAndTemplates',
+				'data' => !empty($this->data['hostid'])
+					? array('id' => $this->data['hostid'], 'name' => $this->data['hostname'])
+					: null,
+				'single' => true
+			)));
+		}
 	}
 }
 

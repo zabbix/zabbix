@@ -259,7 +259,7 @@ switch ($data['method']) {
 				}
 				break;
 
-			case 'host':
+			case 'hostsAndTemplates':
 				$hosts = API::Host()->get(array(
 					'output' => array('hostid', 'name'),
 					'startSearch' => true,

@@ -389,6 +389,11 @@ jQuery(function($) {
 			else {
 				$('.selected ul', obj).append(li.append(text));
 			}
+
+			// set readonly
+			if (options.single) {
+				$('input[type="text"]', obj).attr('disabled', true);
+			}
 		}
 	}
 

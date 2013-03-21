@@ -1035,15 +1035,10 @@
 					'templated_hosts' => true
 				));
 				$hostInfo = reset($hostInfo);
-
-				$data['hostname'] = array(
-					'id' => $data['hostid'],
-					'name' => $hostInfo['name'],
-					'prefix' => ''
-				);
+				$data['hostname'] = $hostInfo['name'];
 			}
 			else {
-				$data['hostname'] = array();
+				$data['hostname'] = _('not selected');
 			}
 		}
 
