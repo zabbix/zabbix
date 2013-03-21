@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2012 Zabbix SIA
+** Copyright (C) 2000-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -10,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -26,7 +26,7 @@ require_once dirname(__FILE__).'/include/forms.inc.php';
 $page['title'] = _('Configuration of applications');
 $page['file'] = 'applications.php';
 $page['hist_arg'] = array('groupid', 'hostid');
-$page['scripts'] = array();
+$page['scripts'] = array('multiselect.js');
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
@@ -40,7 +40,7 @@ $fields = array(
 	'hostid' =>				array(T_ZBX_INT, O_OPT, null,	DB_ID,	null),
 	'groupid' =>			array(T_ZBX_INT, O_OPT, null,	DB_ID,	null),
 	'applicationid' =>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,	'isset({form})&&({form}=="update")'),
-	'appname' =>			array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY, 'isset({save})'),
+	'appname' =>			array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY, 'isset({save})'),
 	'apphostid' =>			array(T_ZBX_INT, O_OPT, null,	DB_ID.'{}>0', 'isset({save})'),
 	'apptemplateid' =>		array(T_ZBX_INT, O_OPT, null,	DB_ID,	null),
 	// actions
@@ -166,10 +166,10 @@ elseif ($_REQUEST['go'] == 'delete') {
 
 	DBstart();
 	$dbApplications = DBselect(
-			'SELECT a.applicationid,a.name,a.hostid'.
-			' FROM applications a'.
-			' WHERE '.dbConditionInt('a.applicationid', $applications).
-				andDbNode('a.applicationid')
+		'SELECT a.applicationid,a.name,a.hostid'.
+		' FROM applications a'.
+		' WHERE '.dbConditionInt('a.applicationid', $applications).
+			andDbNode('a.applicationid')
 	);
 	while ($db_app = DBfetch($dbApplications)) {
 		if (!isset($applications[$db_app['applicationid']])) {
@@ -192,13 +192,13 @@ elseif (str_in_array($_REQUEST['go'], array('activate', 'disable'))) {
 	DBstart();
 	foreach ($applications as $id => $appid) {
 		$db_items = DBselect(
-				'SELECT ia.itemid,i.hostid,i.key_'.
-				' FROM items_applications ia'.
-					' LEFT JOIN items i ON ia.itemid=i.itemid'.
-				' WHERE ia.applicationid='.$appid.
-					' AND i.hostid='.$_REQUEST['hostid'].
-					' AND i.type<>'.ITEM_TYPE_HTTPTEST.
-					andDbNode('ia.applicationid')
+			'SELECT ia.itemid,i.hostid,i.key_'.
+			' FROM items_applications ia'.
+				' LEFT JOIN items i ON ia.itemid=i.itemid'.
+			' WHERE ia.applicationid='.$appid.
+				' AND i.hostid='.$_REQUEST['hostid'].
+				' AND i.type<>'.ITEM_TYPE_HTTPTEST.
+				andDbNode('ia.applicationid')
 		);
 		while ($item = DBfetch($db_items)) {
 			if ($_REQUEST['go'] == 'activate') {
@@ -248,13 +248,8 @@ if (isset($_REQUEST['form'])) {
 	$data['hostid'] = get_request('hostid') ? get_request('hostid') : $data['apphostid'];
 
 	// get application hostid
-	$db_host = get_host_by_hostid($data['apphostid'], 1);
-	if ($db_host) {
-		$data['hostname'] = $db_host['name'];
-	}
-	else {
-		$data['hostname'] = '';
-	}
+	$dbHost = get_host_by_hostid($data['apphostid'], 1);
+	$data['hostname'] = $dbHost ? $dbHost['name'] : '';
 
 	// render view
 	$applicationView = new CView('configuration.application.edit', $data);
@@ -262,13 +257,12 @@ if (isset($_REQUEST['form'])) {
 	$applicationView->show();
 }
 else {
-	$options = array(
+	$data['pageFilter'] = new CPageFilter(array(
 		'groups' => array('editable' => 1, 'with_hosts_and_templates' => true),
 		'hosts' => array('editable' => 1, 'templated_hosts' => 1),
 		'hostid' => get_request('hostid', null),
 		'groupid' => get_request('groupid', null)
-	);
-	$data['pageFilter'] = new CPageFilter($options);
+	));
 	$data['groupid'] = $data['pageFilter']->groupid;
 	$data['hostid'] = $data['pageFilter']->hostid;
 
@@ -291,13 +285,12 @@ else {
 		$data['applications'] = API::Application()->get($options);
 
 		// get applications
-		$options = array(
+		$data['applications'] = API::Application()->get(array(
 			'applicationids' => zbx_objectValues($data['applications'], 'applicationid'),
 			'output' => API_OUTPUT_EXTEND,
 			'selectItems' => API_OUTPUT_REFER,
-			'expandData' => 1
-		);
-		$data['applications'] = API::Application()->get($options);
+			'expandData' => true
+		));
 		order_result($data['applications'], $sortfield, $sortorder);
 
 		// fill applications with templated hosts
@@ -321,4 +314,3 @@ else {
 }
 
 require_once dirname(__FILE__).'/include/page_footer.php';
-?>

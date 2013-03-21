@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2011 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -10,15 +10,15 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
+
 $applicationWidget = new CWidget();
 $applicationWidget->addPageHeader(_('CONFIGURATION OF APPLICATIONS'));
 
@@ -33,7 +33,6 @@ $applicationForm->setName('applicationForm');
 $applicationForm->addVar('form', $this->data['form']);
 $applicationForm->addVar('groupid', $this->data['groupid']);
 $applicationForm->addVar('hostid', $this->data['hostid']);
-$applicationForm->addVar('apphostid', $this->data['apphostid']);
 if (!empty($this->data['applicationid'])) {
 	$applicationForm->addVar('applicationid', $this->data['applicationid']);
 }
@@ -41,21 +40,18 @@ if (!empty($this->data['applicationid'])) {
 // create form list
 $applicationFormList = new CFormList('applicationFormList');
 if (empty($this->data['applicationid'])) {
-	$applicationFormList->addRow(_('Host'), array(
-		new CTextBox('hostname', $this->data['hostname'], ZBX_TEXTBOX_STANDARD_SIZE, 'yes'),
-		new CButton('btn1', _('Select'),
-			'return PopUp("popup.php?srctbl=hosts_and_templates&srcfld1=hostid&srcfld2=name'.
-				'&dstfrm='.$applicationForm->getName().'&dstfld1=apphostid&dstfld2=hostname'.
-				'&noempty=1", 450, 450);',
-			'formlist'
-		)
-	));
+	$applicationFormList->addRow(_('Host'), new CMultiSelect(array(
+		'name' => 'apphostid',
+		'objectName' => 'hostsAndTemplates',
+		'data' => !empty($this->data['hostid'])
+			? array('id' => $this->data['hostid'], 'name' => $this->data['hostname'])
+			: null,
+		'single' => true
+	)));
 }
 else {
-	// cannot change host for existing application
-	$applicationFormList->addRow(_('Host'), array(
-		new CTextBox('hostname', $this->data['hostname'], ZBX_TEXTBOX_STANDARD_SIZE, 'yes'),
-	));
+	$applicationForm->addVar('apphostid', $this->data['apphostid']);
+	$applicationFormList->addRow(_('Host'), new CLink($this->data['hostname'], 'hosts.php?form=update&hostid='.$this->data['hostid']));
 }
 $nameTextBox = new CTextBox('appname', $this->data['appname'], ZBX_TEXTBOX_STANDARD_SIZE);
 $nameTextBox->attr('autofocus', 'autofocus');
@@ -86,5 +82,5 @@ else {
 
 // append form to widget
 $applicationWidget->addItem($applicationForm);
+
 return $applicationWidget;
-?>
