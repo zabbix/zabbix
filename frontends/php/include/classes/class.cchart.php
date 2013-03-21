@@ -676,7 +676,13 @@ class CChart extends CGraphDraw {
 	}
 
 	protected function calcZero() {
-		$sides = array(GRAPH_YAXIS_SIDE_LEFT, GRAPH_YAXIS_SIDE_RIGHT);
+		if (isset($this->axis_valuetype[GRAPH_YAXIS_SIDE_RIGHT])) {
+			$sides[] = GRAPH_YAXIS_SIDE_RIGHT;
+		}
+
+		if (isset($this->axis_valuetype[GRAPH_YAXIS_SIDE_LEFT]) || !isset($sides)) {
+			$sides[] = GRAPH_YAXIS_SIDE_LEFT;
+		}
 
 		foreach ($sides as $num => $side) {
 			$this->unit2px[$side] = ($this->m_maxY[$side] - $this->m_minY[$side]) / $this->sizeY;
@@ -738,7 +744,14 @@ class CChart extends CGraphDraw {
 			}
 		}
 
-		$sides = array(GRAPH_YAXIS_SIDE_LEFT, GRAPH_YAXIS_SIDE_RIGHT);
+		if (isset($this->axis_valuetype[GRAPH_YAXIS_SIDE_RIGHT])) {
+			$sides[] = GRAPH_YAXIS_SIDE_RIGHT;
+		}
+
+		if (isset($this->axis_valuetype[GRAPH_YAXIS_SIDE_LEFT]) || !isset($sides)) {
+			$sides[] = GRAPH_YAXIS_SIDE_LEFT;
+		}
+
 		foreach ($sides as $snum => $side) {
 			if (!isset($this->axis_valuetype[$side])) {
 				continue;
@@ -1469,7 +1482,8 @@ class CChart extends CGraphDraw {
 			// using bc library, incase of large numbers
 			$val = bcadd(bcmul($i, $step), $minY);
 
-			if (bccomp($minY, -1) == 1 && bccomp($minY, 0) == -1) {
+			if ((bccomp($minY, -1) == 1 && bccomp($minY, 0) == -1)
+					|| (bccomp($maxY, 1) == -1 && bccomp($maxY, 0) == 1)) {
 				$val = bcsub($val, $this->getYStepMarkerValueOffset(GRAPH_YAXIS_SIDE_LEFT, $i));
 			}
 
@@ -1609,7 +1623,8 @@ class CChart extends CGraphDraw {
 			// using bc module in case of large numbers
 			$val = bcadd(bcmul($i, $step), $minY);
 
-			if (bccomp($minY, -1) == 1 && bccomp($minY, 0) == -1) {
+			if ((bccomp($minY, -1) == 1 && bccomp($minY, 0) == -1)
+					|| (bccomp($maxY, 1) == -1 && bccomp($maxY, 0) == 1)) {
 				$val = bcsub($val, $this->getYStepMarkerValueOffset(GRAPH_YAXIS_SIDE_RIGHT, $i));
 			}
 
@@ -2309,7 +2324,13 @@ class CChart extends CGraphDraw {
 
 		$this->selectData();
 
-		$sides = array(GRAPH_YAXIS_SIDE_LEFT, GRAPH_YAXIS_SIDE_RIGHT);
+		if (isset($this->axis_valuetype[GRAPH_YAXIS_SIDE_RIGHT])) {
+			$sides[] = GRAPH_YAXIS_SIDE_RIGHT;
+		}
+
+		if (isset($this->axis_valuetype[GRAPH_YAXIS_SIDE_LEFT]) || !isset($sides)) {
+			$sides[] = GRAPH_YAXIS_SIDE_LEFT;
+		}
 
 		foreach ($sides as $graphSide) {
 			$this->m_minY[$graphSide] = $this->calculateMinY($graphSide);
@@ -2497,8 +2518,13 @@ class CChart extends CGraphDraw {
 			}
 		}
 
-		$this->drawLeftSide();
-		$this->drawRightSide();
+		if (isset($this->axis_valuetype[GRAPH_YAXIS_SIDE_LEFT])) {
+			$this->drawLeftSide();
+		}
+
+		if (isset($this->axis_valuetype[GRAPH_YAXIS_SIDE_RIGHT])) {
+			$this->drawRightSide();
+		}
 
 		if ($this->drawLegend) {
 			$this->drawTriggers();
