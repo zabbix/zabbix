@@ -598,8 +598,11 @@ class CWebCheck extends CZBXAPI {
 	 */
 	protected function checkNames(array $httpTests) {
 		$httpTestsNames = zbx_objectValues($httpTests, 'name');
-		if (!preg_grep('/^(['.ZBX_PREG_PRINT.'])+$/u', $httpTestsNames)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Only characters are allowed.'));
+
+		foreach ($httpTestsNames as $httpTestsName) {
+			if (!preg_match('/^(['.ZBX_PREG_PRINT.'])+$/u', $httpTestsName)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Only characters are allowed.'));
+			}
 		}
 
 		return $httpTestsNames;
