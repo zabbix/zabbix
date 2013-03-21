@@ -181,14 +181,16 @@ foreach ($this->data['triggers'] as $tnum => $trigger) {
 	if (!empty($this->data['parent_discoveryid'])) {
 		$status = new CLink(
 			triggerIndicator($trigger['status']),
-			'trigger_prototypes.php?go='.($trigger['status'] == TRIGGER_STATUS_DISABLED ? 'activate' : 'disable').'&hostid='.$this->data['hostid'].'&g_triggerid='.$triggerid.'&parent_discoveryid='.$this->data['parent_discoveryid'],
+			'trigger_prototypes.php?go='.($trigger['status'] == TRIGGER_STATUS_DISABLED ? 'activate' : 'disable').
+				'&hostid='.$this->data['hostid'].'&g_triggerid='.$triggerid.'&parent_discoveryid='.$this->data['parent_discoveryid'],
 			triggerIndicatorStyle($trigger['status'])
 		);
 	}
 	else {
 		$status = new CLink(
 			triggerIndicator($trigger['status'], $trigger['state']),
-			'triggers.php?go='.($trigger['status'] == TRIGGER_STATUS_DISABLED ? 'activate' : 'disable').'&hostid='.$this->data['hostid'].'&g_triggerid='.$triggerid,
+			'triggers.php?go='.($trigger['status'] == TRIGGER_STATUS_DISABLED ? 'activate' : 'disable').
+				'&hostid='.$this->data['hostid'].'&g_triggerid='.$triggerid,
 			triggerIndicatorStyle($trigger['status'], $trigger['state'])
 		);
 	}

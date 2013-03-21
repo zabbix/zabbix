@@ -51,7 +51,7 @@ class CEvent extends CZBXAPI {
 			EVENT_SOURCE_TRIGGERS => _('trigger'),
 			EVENT_SOURCE_DISCOVERY => _('discovery'),
 			EVENT_SOURCE_AUTO_REGISTRATION => _('auto registration'),
-			EVENT_SOURCE_INTERNAL => _('internal'),
+			EVENT_SOURCE_INTERNAL => _('internal')
 		);
 
 		$this->objects = array(
@@ -60,7 +60,7 @@ class CEvent extends CZBXAPI {
 			EVENT_OBJECT_DSERVICE => _('discovered service'),
 			EVENT_OBJECT_AUTOREGHOST => _('auto-registered host'),
 			EVENT_OBJECT_ITEM => _('item'),
-			EVENT_OBJECT_LLDRULE => _('low-level discovery rule'),
+			EVENT_OBJECT_LLDRULE => _('low-level discovery rule')
 		);
 	}
 
@@ -102,7 +102,7 @@ class CEvent extends CZBXAPI {
 			'groupids'					=> null,
 			'hostids'					=> null,
 			'triggerids'				=> null,
-			'objectids'				    => null,
+			'objectids'					=> null,
 			'eventids'					=> null,
 			'editable'					=> null,
 			'object'					=> EVENT_OBJECT_TRIGGER,
@@ -127,7 +127,7 @@ class CEvent extends CZBXAPI {
 			'selectHosts'				=> null,
 			'selectItems'				=> null,
 			'selectTriggers'			=> null,
-			'selectRelatedObject'       => null,
+			'selectRelatedObject'		=> null,
 			'select_alerts'				=> null,
 			'select_acknowledges'		=> null,
 			'countOutput'				=> null,

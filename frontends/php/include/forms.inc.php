@@ -89,7 +89,7 @@
 			$data['theme']			= get_request('theme', THEME_DEFAULT);
 			$data['refresh']		= get_request('refresh', 30);
 			$data['rows_per_page']	= get_request('rows_per_page', 50);
-			$data['user_type']		= get_request('user_type', USER_TYPE_ZABBIX_USER);;
+			$data['user_type']		= get_request('user_type', USER_TYPE_ZABBIX_USER);
 			$data['user_groups']	= get_request('user_groups', array());
 			$data['change_password']= get_request('change_password', null);
 			$data['user_medias']	= get_request('user_medias', array());
@@ -456,7 +456,7 @@
 		$dataTypeLabel = new CSpan(bold(_('Data type').NAME_DELIMITER));
 		$dataTypeLabel->setAttribute('id', 'filter_data_type_label');
 
-		$dataTypeInput = new CComboBox('filter_data_type', $filter_data_type);;
+		$dataTypeInput = new CComboBox('filter_data_type', $filter_data_type);
 		$dataTypeInput->addItem(-1, _('all'));
 		$dataTypeInput->addItems(item_data_type2str());
 		$dataTypeInput->setEnabled('no');
@@ -510,7 +510,7 @@
 			new CCol(bold(_('Type of information').NAME_DELIMITER), 'label col3'),
 			new CCol($cmbValType, 'col3'),
 			new CCol(bold(_('Status').NAME_DELIMITER), 'label col4'),
-			new CCol($cmbStatus, 'col4'),
+			new CCol($cmbStatus, 'col4')
 		));
 		// row 2
 		$table->addRow(array(
@@ -528,7 +528,7 @@
 			new CCol($dataTypeLabel, 'label'),
 			new CCol($dataTypeInput),
 			new CCol(bold(_('State').NAME_DELIMITER), 'label'),
-			new CCol($cmbState, 'col4'),
+			new CCol($cmbState, 'col4')
 		));
 		// row 3
 		$table->addRow(array(
@@ -552,7 +552,7 @@
 				-1 => _('all'),
 				1 => _('With triggers'),
 				0 => _('Without triggers')
-			))),
+			)))
 		));
 		// row 4
 		$table->addRow(array(
@@ -567,7 +567,7 @@
 				-1 => _('all'),
 				1 => _('Templated items'),
 				0 => _('Not Templated items'),
-			))),
+			)))
 		));
 		// row 5
 		$table->addRow(array(
@@ -578,7 +578,7 @@
 			new CCol(null, 'label'),
 			new CCol(),
 			new CCol(null, 'label'),
-			new CCol(),
+			new CCol()
 		));
 
 		$reset = new CButton('reset', _('Reset'), "javascript: clearAllForm('zbx_filter');");

@@ -445,7 +445,10 @@ if (!empty($this->data['new_operation'])) {
 
 	// if multiple operation types are available, display a select
 	if (count($this->data['allowedOperations']) > 1) {
-		$operationTypeComboBox = new CComboBox('new_operation[operationtype]', $this->data['new_operation']['operationtype'], 'submit()');
+		$operationTypeComboBox = new CComboBox(
+			'new_operation[operationtype]',
+			$this->data['new_operation']['operationtype'], 'submit()'
+		);
 		foreach ($this->data['allowedOperations'] as $operation) {
 			$operationTypeComboBox->addItem($operation, operation_type2str($operation));
 		}
