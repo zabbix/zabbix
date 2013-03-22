@@ -388,7 +388,6 @@ else {
 	if (isset($_REQUEST['triggerid']) && ($_REQUEST['triggerid'] > 0)) {
 		$options['objectids'] = $_REQUEST['triggerid'];
 	}
-	$options['object'] = EVENT_OBJECT_TRIGGER;
 	$options['nodeids'] = get_current_nodeid();
 }
 
@@ -569,9 +568,6 @@ else {
 		if ($pageFilter->hostsSelected) {
 			$options = array(
 				'nodeids' => get_current_nodeid(),
-				'filter' => array(
-					'object' => EVENT_OBJECT_TRIGGER,
-				),
 				'time_from' => $from,
 				'time_till' => $till,
 				'output' => array('eventid'),
