@@ -1296,8 +1296,8 @@ static void	process_escalations(int now)
 			else
 			{
 				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-						"delete from escalations"
-						" where escalationid=" ZBX_FS_UI64, escalation.escalationid);
+						"delete from escalations where escalationid=" ZBX_FS_UI64,
+						escalation.escalationid);
 			}
 
 			DBexecute("%s", sql);
@@ -1321,7 +1321,9 @@ next:
 		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "escalationid",
 				escalationids.values, escalationids.values_num);
 
+		DBbegin();
 		DBexecute("%s", sql);
+		DBcommit();
 	}
 
 	zbx_free(sql);
