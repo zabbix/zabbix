@@ -516,7 +516,7 @@ class testInheritanceDiscoveryRule extends CWebTest {
 					)
 				)
 			),
-		/*	array(
+			array(
 				array(
 					'expected' => DISCOVERY_GOOD,
 					'name' => 'discoveryRuleNo1',
@@ -1111,7 +1111,7 @@ class testInheritanceDiscoveryRule extends CWebTest {
 					'formCheck' => true
 				)
 			),
-		*/	array(
+			array(
 				array(
 					'expected' => DISCOVERY_BAD,
 					'type' => 'IPMI agent',
