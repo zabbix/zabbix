@@ -1418,20 +1418,23 @@ class testInheritanceItemPrototype extends CWebTest {
 				)
 			),
 			array(
-				array('expected' => ITEM_GOOD,
+				array(
+					'expected' => ITEM_GOOD,
 					'name' => 'itemSimple',
 					'key' => 'key-template-simple',
 					'hostCheck' => true,
 					'dbCheck' => true)
 			),
 			array(
-				array('expected' => ITEM_GOOD,
+				array(
+					'expected' => ITEM_GOOD,
 					'name' => 'itemName',
 					'key' => 'key-template-item',
 					'hostCheck' => true)
 			),
 			array(
-				array('expected' => ITEM_GOOD,
+				array(
+					'expected' => ITEM_GOOD,
 					'name' => 'itemTrigger',
 					'key' => 'key-template-trigger',
 					'hostCheck' => true,
@@ -1439,7 +1442,8 @@ class testInheritanceItemPrototype extends CWebTest {
 					'remove' => true)
 			),
 			array(
-				array('expected' => ITEM_GOOD,
+				array(
+					'expected' => ITEM_GOOD,
 					'name' => 'itemRemove',
 					'key' => 'key-template-remove',
 					'hostCheck' => true,
@@ -1448,12 +1452,306 @@ class testInheritanceItemPrototype extends CWebTest {
 					'remove' => true)
 			),
 			array(
-				array('expected' => ITEM_BAD,
+				array(
+					'expected' => ITEM_BAD,
 					'name' => 'itemInheritance',
 					'key' => 'key-item-inheritance',
 					'errors' => array(
 						'ERROR: Cannot add item',
 						'Item with key "key-item-inheritance" already exists on "Inheritance test template".')
+				)
+			),
+			// List of all item types
+			array(
+				array(
+					'expected' => ITEM_GOOD,
+					'type' => 'Zabbix agent',
+					'name' => 'Zabbix agent',
+					'key' => 'item-zabbix-agent',
+					'dbCheck' => true,
+					'formCheck' => true
+				)
+			),
+			array(
+				array(
+					'expected' => ITEM_GOOD,
+					'type' => 'Zabbix agent (active)',
+					'name' => 'Zabbix agent (active)',
+					'key' => 'item-zabbix-agent-active',
+					'dbCheck' => true,
+					'formCheck' => true
+				)
+			),
+			array(
+				array(
+					'expected' => ITEM_GOOD,
+					'type' => 'Simple check',
+					'name' => 'Simple check',
+					'key' => 'item-simple-check',
+					'dbCheck' => true,
+					'formCheck' => true
+				)
+			),
+			array(
+				array(
+					'expected' => ITEM_GOOD,
+					'type' => 'SNMPv1 agent',
+					'name' => 'SNMPv1 agent',
+					'key' => 'item-snmpv1-agent',
+					'dbCheck' => true,
+					'formCheck' => true
+				)
+			),
+			array(
+				array(
+					'expected' => ITEM_GOOD,
+					'type' => 'SNMPv2 agent',
+					'name' => 'SNMPv2 agent',
+					'key' => 'item-snmpv2-agent',
+					'dbCheck' => true,
+					'formCheck' => true
+				)
+			),
+			array(
+				array(
+					'expected' => ITEM_GOOD,
+					'type' => 'SNMPv3 agent',
+					'name' => 'SNMPv3 agent',
+					'key' => 'item-snmpv3-agent',
+					'dbCheck' => true,
+					'formCheck' => true
+				)
+			),
+			array(
+				array(
+					'expected' => ITEM_GOOD,
+					'type' => 'SNMP trap',
+					'name' => 'SNMP trap',
+					'key' => 'snmptrap.fallback',
+					'dbCheck' => true,
+					'formCheck' => true
+				)
+			),
+			array(
+				array(
+					'expected' => ITEM_GOOD,
+					'type' => 'Zabbix internal',
+					'name' => 'Zabbix internal',
+					'key' => 'item-zabbix-internal',
+					'dbCheck' => true,
+					'formCheck' => true
+				)
+			),
+			array(
+				array(
+					'expected' => ITEM_GOOD,
+					'type' => 'Zabbix trapper',
+					'name' => 'Zabbix trapper',
+					'key' => 'item-zabbix-trapper',
+					'dbCheck' => true,
+					'formCheck' => true
+				)
+			),
+			array(
+				array(
+					'expected' => ITEM_GOOD,
+					'type' => 'Zabbix aggregate',
+					'name' => 'Zabbix aggregate',
+					'key' => 'grpmax[Zabbix servers group,some-item-key,last,0]',
+					'dbCheck' => true,
+					'formCheck' => true
+				)
+			),
+			array(
+				array(
+					'expected' => ITEM_BAD,
+					'type' => 'Zabbix aggregate',
+					'name' => 'Zabbix aggregate',
+					'key' => 'item-zabbix-aggregate',
+					'errors' => array(
+						'ERROR: Cannot add item',
+						'Key "item-zabbix-aggregate" does not match'
+					)
+				)
+			),
+			array(
+				array(
+					'expected' => ITEM_GOOD,
+					'type' => 'External check',
+					'name' => 'External check',
+					'key' => 'item-external-check',
+					'dbCheck' => true,
+					'formCheck' => true
+				)
+			),
+			array(
+				array(
+					'expected' => ITEM_GOOD,
+					'type' => 'Database monitor',
+					'name' => 'Database monitor',
+					'key' => 'item-database-monitor',
+					'dbCheck' => true,
+					'formCheck' => true
+				)
+			),
+			array(
+				array(
+					'expected' => ITEM_GOOD,
+					'type' => 'IPMI agent',
+					'name' => 'IPMI agent',
+					'key' => 'item-ipmi-agent',
+					'ipmi_sensor' => 'ipmi_sensor',
+					'dbCheck' => true,
+					'formCheck' => true
+				)
+			),
+			array(
+				array(
+					'expected' => ITEM_GOOD,
+					'type' => 'SSH agent',
+					'name' => 'SSH agent',
+					'key' => 'item-ssh-agent',
+					'username' => 'zabbix',
+					'params_es' => 'executed script',
+					'dbCheck' => true,
+					'formCheck' => true
+				)
+			),
+			array(
+				array(
+					'expected' => ITEM_GOOD,
+					'type' => 'TELNET agent',
+					'name' => 'TELNET agent',
+					'key' => 'item-telnet-agent',
+					'username' => 'zabbix',
+					'params_es' => 'executed script',
+					'dbCheck' => true,
+					'formCheck' => true
+				)
+			),
+			array(
+				array(
+					'expected' => ITEM_BAD,
+					'type' => 'IPMI agent',
+					'name' => 'IPMI agent error',
+					'key' => 'item-ipmi-agent-error',
+					'errors' => array(
+							'ERROR: Page received incorrect data',
+							'Warning. Incorrect value for field "IPMI sensor": cannot be empty.'
+					)
+				)
+			),
+			array(
+				array(
+					'expected' => ITEM_BAD,
+					'type' => 'SSH agent',
+					'name' => 'SSH agent error',
+					'key' => 'item-ssh-agent-error',
+					'errors' => array(
+							'ERROR: Page received incorrect data',
+							'Warning. Incorrect value for field "User name": cannot be empty.',
+							'Warning. Incorrect value for field "Executed script": cannot be empty.'
+					)
+				)
+			),
+			array(
+				array(
+					'expected' => ITEM_BAD,
+					'type' => 'TELNET agent',
+					'name' => 'TELNET agent error',
+					'key' => 'item-telnet-agent-error',
+					'errors' => array(
+							'ERROR: Page received incorrect data',
+							'Warning. Incorrect value for field "User name": cannot be empty.',
+							'Warning. Incorrect value for field "Executed script": cannot be empty.'
+					)
+				)
+			),
+			array(
+				array(
+					'expected' => ITEM_GOOD,
+					'type' => 'JMX agent',
+					'name' => 'JMX agent',
+					'key' => 'proto-jmx-agent',
+					'dbCheck' => true,
+					'formCheck' => true
+				)
+			),
+			array(
+				array(
+					'expected' => ITEM_GOOD,
+					'type' => 'Calculated',
+					'name' => 'Calculated',
+					'key' => 'item-calculated',
+					'params_f' => 'formula',
+					'dbCheck' => true,
+					'formCheck' => true
+				)
+			),
+			array(
+				array(
+					'expected' => ITEM_BAD,
+					'type' => 'Calculated',
+					'name' => 'Calculated',
+					'key' => 'item-calculated',
+					'errors' => array(
+							'ERROR: Page received incorrect data',
+							'Warning. Incorrect value for field "Formula": cannot be empty.'
+					)
+				)
+			),
+			// Default
+			array(
+				array(
+					'expected' => ITEM_BAD,
+					'type' => 'Database monitor',
+					'name' => 'Database monitor',
+					'errors' => array(
+							'ERROR: Cannot add item',
+							'Check the key, please. Default example was passed.'
+					)
+				)
+			),
+			// Default
+			array(
+				array(
+					'expected' => ITEM_BAD,
+					'type' => 'SSH agent',
+					'name' => 'SSH agent',
+					'username' => 'zabbix',
+					'params_es' => 'script to be executed',
+					'errors' => array(
+							'ERROR: Cannot add item',
+							'Check the key, please. Default example was passed.'
+					)
+				)
+			),
+			// Default
+			array(
+				array(
+					'expected' => ITEM_BAD,
+					'type' => 'TELNET agent',
+					'name' => 'TELNET agent',
+					'username' => 'zabbix',
+					'params_es' => 'script to be executed',
+					'errors' => array(
+							'ERROR: Cannot add item',
+							'Check the key, please. Default example was passed.'
+					)
+				)
+			),
+			// Default
+			array(
+				array(
+					'expected' => ITEM_BAD,
+					'type' => 'JMX agent',
+					'name' => 'JMX agent',
+					'username' => 'zabbix',
+					'params_es' => 'script to be executed',
+					'errors' => array(
+							'ERROR: Cannot add item',
+							'Check the key, please. Default example was passed.'
+					)
 				)
 			)
 		);
@@ -1478,6 +1776,10 @@ class testInheritanceItemPrototype extends CWebTest {
 		$this->zbxTestClickWait("link=Item prototypes");
 		$this->zbxTestClickWait('form');
 
+		if (isset($data['type'])) {
+			$this->zbxTestDropdownSelect('type', $data['type']);
+		}
+
 		if (isset($data['name'])) {
 			$this->input_type('name', $data['name']);
 		}
@@ -1490,6 +1792,10 @@ class testInheritanceItemPrototype extends CWebTest {
 
 		if (isset($data['username'])) {
 			$this->input_type('username', $data['username']);
+		}
+
+		if (isset($data['ipmi_sensor'])) {
+			$this->input_type('ipmi_sensor', $data['ipmi_sensor']);
 		}
 
 		if (isset($data['params_es'])) {
