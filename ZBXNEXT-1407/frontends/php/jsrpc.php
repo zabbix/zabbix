@@ -261,6 +261,9 @@ switch ($data['method']) {
 
 			case 'hostsAndTemplates':
 				$hosts = API::Host()->get(array(
+					'templated_hosts' => isset($data['templated_hosts']) ? $data['templated_hosts'] : null,
+					'writeonly' => isset($data['writeonly']) ? $data['writeonly'] : null,
+					'real_hosts' => isset($data['real_hosts']) ? $data['real_hosts'] : null,
 					'output' => array('hostid', 'name'),
 					'startSearch' => true,
 					'search' => isset($data['search']) ? array('name' => $data['search']) : null,

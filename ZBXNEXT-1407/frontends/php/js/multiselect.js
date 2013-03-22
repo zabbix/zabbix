@@ -25,14 +25,15 @@ jQuery(function($) {
 	 *
 	 * @param string options['url']
 	 * @param string options['name']
-	 * @param int    options['limit']
-	 * @param bool   options['single']
-	 * @param bool   options['disabled']
 	 * @param object options['labels']
 	 * @param object options['data']
 	 * @param string options['data'][id]
 	 * @param string options['data'][name]
 	 * @param string options['data'][prefix]
+	 * @param bool   options['disabled']
+	 * @param bool   options['displaySingle']
+	 * @param bool   options['single']
+	 * @param int    options['limit']
 	 *
 	 * @return object
 	 */
@@ -40,14 +41,15 @@ jQuery(function($) {
 		var defaults = {
 			url: '',
 			name: '',
-			limit: null,
-			data: {},
-			single: false,
-			disabled: false,
 			labels: {
 				emptyResult: 'No matches found',
 				moreMatchesFound: 'More matches found...'
-			}
+			},
+			data: {},
+			disabled: false,
+			displaySingle: false,
+			single: false,
+			limit: null
 		};
 		options = $.extend({}, defaults, options);
 
@@ -91,8 +93,7 @@ jQuery(function($) {
 					}
 
 					if ($('.selected li', obj).length > 0 && options.single) {
-						cleanSearchInput(obj);
-						input.attr('disabled', true);
+						setReadonly(obj);
 						return false;
 					}
 
@@ -253,7 +254,14 @@ jQuery(function($) {
 					}
 				})
 				.focusin(function() {
-					$('.selected ul', obj).addClass('active');
+					if (options.single) {
+						if ($('.selected li', obj).length == 0) {
+							$('.selected ul', obj).addClass('active');
+						}
+					}
+					else {
+						$('.selected ul', obj).addClass('active');
+					}
 				})
 				.focusout(function() {
 					$('.selected ul', obj).removeClass('active');
@@ -302,7 +310,7 @@ jQuery(function($) {
 			}
 			else {
 				// resize
-				resizeSelected(obj, values);
+				resizeSelected(obj, values, options);
 			}
 		});
 	};
@@ -384,7 +392,7 @@ jQuery(function($) {
 				$('.selected ul', obj).append(li.append(text, arrow));
 
 				// resize
-				resizeSelected(obj, values);
+				resizeSelected(obj, values, options);
 			}
 			else {
 				$('.selected ul', obj).append(li.append(text));
@@ -392,7 +400,7 @@ jQuery(function($) {
 
 			// set readonly
 			if (options.single) {
-				$('input[type="text"]', obj).attr('disabled', true);
+				setReadonly(obj);
 			}
 		}
 	}
@@ -405,7 +413,7 @@ jQuery(function($) {
 		delete values.selected[id];
 
 		// resize
-		resizeSelected(obj, values);
+		resizeSelected(obj, values, options);
 
 		// clean
 		cleanAvailable(obj, values);
@@ -505,12 +513,13 @@ jQuery(function($) {
 		$('input[type="text"]', obj).val('');
 	}
 
-	function resizeSelected(obj, values) {
+	function resizeSelected(obj, values, options) {
 		// settings
 		var searchInputMinWidth = 50,
 			searchInputLeftPaddings = 4,
 			searchInputRightPaddings = 4,
-			searchInputTopPaddings = IE8 ? 4 : 0;
+			searchInputTopPaddings = IE8 ? 4 : 0,
+			searchInputTopPaddingsInitial = options.displaySingle ? 0 : 3;
 
 		// calculate
 		var top, left, height;
@@ -522,7 +531,7 @@ jQuery(function($) {
 			height = $('.selected li:last-child', obj).height();
 		}
 		else {
-			top = 3 + searchInputTopPaddings;
+			top = searchInputTopPaddingsInitial + searchInputTopPaddings;
 			left = searchInputLeftPaddings;
 			height = 0;
 		}
@@ -573,6 +582,12 @@ jQuery(function($) {
 				available.animate({scrollTop: offset}, 300);
 			}
 		}
+	}
+
+	function setReadonly(obj) {
+		cleanSearchInput(obj);
+		$('input[type="text"]', obj).attr('disabled', true);
+		$('.selected ul', obj).removeClass('active');
 	}
 
 	function getLimit(values, options) {

@@ -24,8 +24,10 @@ class CMultiSelect extends CTag {
 	/**
 	 * @param string $options['name']
 	 * @param string $options['objectName']
+	 * @param array  $options['objectOptions']
 	 * @param array  $options['data']
 	 * @param bool   $options['disabled']
+	 * @param bool   $options['displaySingle']
 	 * @param bool   $options['single']
 	 * @param int    $options['width']
 	 * @param int    $options['limit']
@@ -33,8 +35,12 @@ class CMultiSelect extends CTag {
 	public function __construct(array $options = array()) {
 		parent::__construct('div', 'yes');
 		$this->attr('id', zbx_formatDomId($options['name']));
-		$this->addClass('multiselect');
 		$this->addStyle('width: '.(isset($options['width']) ? $options['width'] : ZBX_MULTISELECT_STANDARD_WIDTH).'px;');
+		$this->addClass('multiselect');
+
+		if (!empty($options['displaySingle'])) {
+			$this->addClass('multiselect_single');
+		}
 
 		// data
 		$data = '[]';
@@ -52,17 +58,24 @@ class CMultiSelect extends CTag {
 		$url->setArgument('method', 'multiselect.get');
 		$url->setArgument('objectName', $options['objectName']);
 
+		if (!empty($options['objectOptions'])) {
+			foreach ($options['objectOptions'] as $optionName => $optionvalue) {
+				$url->setArgument($optionName, $optionvalue);
+			}
+		}
+
 		zbx_add_post_js('jQuery("#'.$this->getAttribute('id').'").multiSelect({
 			url: "'.$url->getUrl().'",
 			name: "'.$options['name'].'",
-			data: '.$data.',
-			limit: '.(isset($options['limit']) ? $options['limit'] : '20').',
 			labels: {
 				emptyResult: "'._('No matches found').'",
 				moreMatchesFound: "'._('More matches found...').'"
 			},
+			data: '.$data.',
+			disabled: '.(!empty($options['disabled']) ? 'true' : 'false').',
+			displaySingle: '.(!empty($options['displaySingle']) ? 'true' : 'false').',
 			single: '.(!empty($options['single']) ? 'true' : 'false').',
-			disabled: '.(!empty($options['disabled']) ? 'true' : 'false').'
+			limit: '.(isset($options['limit']) ? $options['limit'] : '20').'
 		});');
 	}
 }
