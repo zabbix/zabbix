@@ -144,12 +144,12 @@ static void	DBlld_items_get(zbx_uint64_t parent_itemid, zbx_vector_ptr_t *items,
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	result = DBselect(
-			"select id.itemid,id.key_,id.lastcheck,id.ts_delete,i.name,i.key_,i.type,i.value_type,i.data_type,i.delay,i.delay_flex,"
-				"i.history,i.trends,i.trapper_hosts,i.units,i.multiplier,i.delta,i.formula,"
-				"i.logtimefmt,i.valuemapid,i.params,i.ipmi_sensor,i.snmp_community,i.snmp_oid,i.port,"
-				"i.snmpv3_securityname,i.snmpv3_securitylevel,i.snmpv3_authpassphrase,"
-				"i.snmpv3_privpassphrase,i.authtype,i.username,i.password,i.publickey,i.privatekey,"
-				"i.description,i.interfaceid"
+			"select id.itemid,id.key_,id.lastcheck,id.ts_delete,i.name,i.key_,i.type,i.value_type,"
+				"i.data_type,i.delay,i.delay_flex,i.history,i.trends,i.trapper_hosts,i.units,"
+				"i.multiplier,i.delta,i.formula,i.logtimefmt,i.valuemapid,i.params,i.ipmi_sensor,"
+				"i.snmp_community,i.snmp_oid,i.port,i.snmpv3_securityname,i.snmpv3_securitylevel,"
+				"i.snmpv3_authpassphrase,i.snmpv3_privpassphrase,i.authtype,i.username,i.password,"
+				"i.publickey,i.privatekey,i.description,i.interfaceid"
 			" from item_discovery id"
 				" join items i"
 					" on id.itemid=i.itemid"
@@ -262,7 +262,6 @@ static void	DBlld_items_get(zbx_uint64_t parent_itemid, zbx_vector_ptr_t *items,
 			item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_INTERFACEID;
 
 		zbx_vector_uint64_create(&item->new_applicationids);
-		item->flags = __UINT64_C(0x0000000000000000);
 
 		zbx_vector_ptr_append(items, item);
 	}
@@ -318,7 +317,7 @@ static void	DBlld_applications_get(zbx_uint64_t parent_itemid, zbx_vector_uint64
 void	DBlld_validate_item_field(zbx_lld_item_t *item, char **field, char **field_orig, zbx_uint64_t flag,
 		size_t field_len, char **error)
 {
-	if (0 == item->flags)
+	if (0 == (item->flags & ZBX_FLAG_LLD_ITEM_DISCOVERED))
 		return;
 
 	/* only new items or items with a new data will be validated */
@@ -348,7 +347,7 @@ void	DBlld_validate_item_field(zbx_lld_item_t *item, char **field, char **field_
 		item->flags &= ~flag;
 	}
 	else
-		item->flags = 0;
+		item->flags &= ~ZBX_FLAG_LLD_ITEM_DISCOVERED;
 }
 
 /******************************************************************************
@@ -382,7 +381,7 @@ void	DBlld_items_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *items, char **e
 		item = (zbx_lld_item_t *)items->values[i];
 
 		DBlld_validate_item_field(item, &item->name, &item->name_orig,
-				ZBX_FLAG_LLD_ITEM_UPDATE_KEY, ITEM_NAME_LEN, error);
+				ZBX_FLAG_LLD_ITEM_UPDATE_NAME, ITEM_NAME_LEN, error);
 		DBlld_validate_item_field(item, &item->key, &item->key_orig,
 				ZBX_FLAG_LLD_ITEM_UPDATE_KEY, ITEM_KEY_LEN, error);
 		DBlld_validate_item_field(item, &item->params, &item->params_orig,
@@ -396,7 +395,7 @@ void	DBlld_items_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *items, char **e
 	{
 		item = (zbx_lld_item_t *)items->values[i];
 
-		if (0 == item->flags)
+		if (0 == (item->flags & ZBX_FLAG_LLD_ITEM_DISCOVERED))
 			continue;
 
 		/* only new items or items with a new key will be validated */
@@ -407,7 +406,7 @@ void	DBlld_items_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *items, char **e
 		{
 			item_b = (zbx_lld_item_t *)items->values[j];
 
-			if (0 == item_b->flags || i == j)
+			if (0 == (item_b->flags & ZBX_FLAG_LLD_ITEM_DISCOVERED) || i == j)
 				continue;
 
 			if (0 != strcmp(item->key, item_b->key))
@@ -426,7 +425,7 @@ void	DBlld_items_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *items, char **e
 				item->flags &= ~ZBX_FLAG_LLD_ITEM_UPDATE_KEY;
 			}
 			else
-				item->flags = 0;
+				item->flags &= ~ZBX_FLAG_LLD_ITEM_DISCOVERED;
 			break;
 		}
 	}
@@ -437,7 +436,7 @@ void	DBlld_items_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *items, char **e
 	{
 		item = (zbx_lld_item_t *)items->values[i];
 
-		if (0 == item->flags)
+		if (0 == (item->flags & ZBX_FLAG_LLD_ITEM_DISCOVERED))
 			continue;
 
 		if (0 != item->itemid)
@@ -486,7 +485,7 @@ void	DBlld_items_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *items, char **e
 			{
 				item = (zbx_lld_item_t *)items->values[i];
 
-				if (0 == item->flags)
+				if (0 == (item->flags & ZBX_FLAG_LLD_ITEM_DISCOVERED))
 					continue;
 
 				if (0 == strcmp(item->key, row[0]))
@@ -504,7 +503,7 @@ void	DBlld_items_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *items, char **e
 						item->flags &= ~ZBX_FLAG_LLD_ITEM_UPDATE_KEY;
 					}
 					else
-						item->flags = 0;
+						item->flags &= ~ZBX_FLAG_LLD_ITEM_DISCOVERED;
 
 					continue;
 				}
@@ -545,7 +544,7 @@ static void	DBlld_item_make(zbx_vector_ptr_t *items, const char *name_proto, con
 	{
 		item = (zbx_lld_item_t *)items->values[i];
 
-		if (0 != item->flags)
+		if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_DISCOVERED))
 			continue;
 
 		buffer = zbx_strdup(buffer, item->key_proto);
@@ -673,7 +672,7 @@ static void	DBlld_applications_make(zbx_uint64_t parent_itemid, zbx_vector_ptr_t
 	{
 		item = (zbx_lld_item_t *)items->values[i];
 
-		if (0 == item->flags)
+		if (0 == (item->flags & ZBX_FLAG_LLD_ITEM_DISCOVERED))
 			continue;
 
 		zbx_vector_uint64_reserve(&item->new_applicationids, applicationids.values_num);
@@ -797,7 +796,7 @@ static void	DBlld_items_save(zbx_uint64_t hostid, zbx_uint64_t parent_itemid, zb
 	{
 		item = (zbx_lld_item_t *)items->values[i];
 
-		if (0 == item->flags)
+		if (0 == (item->flags & ZBX_FLAG_LLD_ITEM_DISCOVERED))
 			continue;
 
 		if (0 == item->itemid)
@@ -885,7 +884,7 @@ static void	DBlld_items_save(zbx_uint64_t hostid, zbx_uint64_t parent_itemid, zb
 	{
 		item = (zbx_lld_item_t *)items->values[i];
 
-		if (0 == item->flags)
+		if (0 == (item->flags & ZBX_FLAG_LLD_ITEM_DISCOVERED))
 			continue;
 
 		if (0 == item->itemid)
@@ -1252,7 +1251,7 @@ static void	DBlld_remove_lost_resources(zbx_vector_ptr_t *items, unsigned short 
 		if (0 == item->itemid)
 			continue;
 
-		if (0 == item->flags)
+		if (0 == (item->flags & ZBX_FLAG_LLD_ITEM_DISCOVERED))
 		{
 			if (item->lastcheck < lastcheck - lifetime_sec)
 			{
