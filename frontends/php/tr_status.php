@@ -449,7 +449,6 @@ if ($config['event_ack_enable']) {
 		'groupCount' => true,
 		'objectids' => $triggerIds,
 		'filter' => array(
-			'object' => EVENT_OBJECT_TRIGGER,
 			'acknowledged' => 0,
 			'value' => TRIGGER_VALUE_TRUE
 		),
@@ -476,9 +475,6 @@ if ($config['event_ack_enable']) {
 			'countOutput' => true,
 			'groupCount' => true,
 			'objectids' => $triggerIdsWithoutUnackEvents,
-			'filter' => array(
-				'object' => EVENT_OBJECT_TRIGGER
-			),
 			'nopermissions' => true
 		));
 		$allEventCounts = zbx_toHash($allEventCounts, 'objectid');

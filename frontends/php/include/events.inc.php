@@ -76,7 +76,6 @@ function get_events_unacknowledged($db_element, $value_trigger = null, $value_ev
 			'value' => is_null($value_event) ? array(TRIGGER_VALUE_TRUE, TRIGGER_VALUE_FALSE) : $value_event,
 			'acknowledged' => $ack ? 1 : 0
 		),
-		'object' => EVENT_OBJECT_TRIGGER,
 		'nopermissions' => true
 	));
 }
@@ -215,9 +214,6 @@ function make_popup_eventlist($eventid, $trigger_type, $triggerid) {
 		'output' => API_OUTPUT_EXTEND,
 		'objectids' => $triggerid,
 		'eventid_till' => $eventid,
-		'filter' => array(
-			'object' => EVENT_OBJECT_TRIGGER
-		),
 		'nopermissions' => 1,
 		'select_acknowledges' => API_OUTPUT_COUNT,
 		'sortfield' => 'eventid',
@@ -337,9 +333,6 @@ function getLastEvents($options) {
 
 	$eventOptions = array(
 		'output' => API_OUTPUT_EXTEND,
-		'filter' => array(
-			'object' => EVENT_OBJECT_TRIGGER
-		),
 		'sortfield' => 'eventid',
 		'sortorder' => ZBX_SORT_DOWN
 	);
