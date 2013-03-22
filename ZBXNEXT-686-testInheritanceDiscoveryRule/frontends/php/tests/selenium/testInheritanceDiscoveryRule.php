@@ -492,7 +492,7 @@ class testInheritanceDiscoveryRule extends CWebTest {
 					'errors' => array(
 							'ERROR: Page received incorrect data',
 							'Warning. Incorrect value for field "Name": cannot be empty.',
-							'Warning. Incorrect value for field "key": cannot be empty.'
+							'Warning. Incorrect value for field "Key": cannot be empty.'
 					)
 				)
 			),
@@ -502,7 +502,7 @@ class testInheritanceDiscoveryRule extends CWebTest {
 					'name' => 'discoveryRuleError',
 					'errors' => array(
 							'ERROR: Page received incorrect data',
-							'Warning. Incorrect value for field "key": cannot be empty.'
+							'Warning. Incorrect value for field "Key": cannot be empty.'
 					)
 				)
 			),
@@ -516,7 +516,7 @@ class testInheritanceDiscoveryRule extends CWebTest {
 					)
 				)
 			),
-			array(
+		/*	array(
 				array(
 					'expected' => DISCOVERY_GOOD,
 					'name' => 'discoveryRuleNo1',
@@ -1111,7 +1111,7 @@ class testInheritanceDiscoveryRule extends CWebTest {
 					'formCheck' => true
 				)
 			),
-			array(
+		*/	array(
 				array(
 					'expected' => DISCOVERY_BAD,
 					'type' => 'IPMI agent',
@@ -1131,7 +1131,7 @@ class testInheritanceDiscoveryRule extends CWebTest {
 					'key' => 'discovery-ssh-agent-error',
 					'errors' => array(
 							'ERROR: Page received incorrect data',
-							'Warning. Incorrect value for field "username".',
+							'Warning. Incorrect value for field "User name": cannot be empty.',
 							'Warning. Incorrect value for field "Executed script": cannot be empty.'
 					)
 				)
@@ -1144,7 +1144,7 @@ class testInheritanceDiscoveryRule extends CWebTest {
 					'key' => 'discovery-telnet-agent-error',
 					'errors' => array(
 							'ERROR: Page received incorrect data',
-							'Warning. Incorrect value for field "username".',
+							'Warning. Incorrect value for field "User name": cannot be empty.',
 							'Warning. Incorrect value for field "Executed script": cannot be empty.'
 					)
 				)
