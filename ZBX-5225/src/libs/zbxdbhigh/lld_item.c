@@ -25,73 +25,19 @@
 
 typedef struct
 {
-	zbx_uint64_t		itemid;
-	zbx_uint64_t		flags;
-#define ZBX_FLAG_LLD_ITEM_DISCOVERED			__UINT64_C(0x0000000000000001)
-#define ZBX_FLAG_LLD_ITEM_UPDATE_NAME			__UINT64_C(0x0000000000000002)
-#define ZBX_FLAG_LLD_ITEM_UPDATE_KEY			__UINT64_C(0x0000000000000004)
-#define ZBX_FLAG_LLD_ITEM_UPDATE_TYPE			__UINT64_C(0x0000000000000008)
-#define ZBX_FLAG_LLD_ITEM_UPDATE_VALUE_TYPE		__UINT64_C(0x0000000000000010)
-#define ZBX_FLAG_LLD_ITEM_UPDATE_DATA_TYPE		__UINT64_C(0x0000000000000020)
-#define ZBX_FLAG_LLD_ITEM_UPDATE_DELAY			__UINT64_C(0x0000000000000040)
-#define ZBX_FLAG_LLD_ITEM_UPDATE_DELAY_FLEX		__UINT64_C(0x0000000000000080)
-#define ZBX_FLAG_LLD_ITEM_UPDATE_HISTORY		__UINT64_C(0x0000000000000100)
-#define ZBX_FLAG_LLD_ITEM_UPDATE_TRENDS			__UINT64_C(0x0000000000000200)
-#define ZBX_FLAG_LLD_ITEM_UPDATE_TRAPPER_HOSTS		__UINT64_C(0x0000000000000400)
-#define ZBX_FLAG_LLD_ITEM_UPDATE_UNITS			__UINT64_C(0x0000000000000800)
-#define ZBX_FLAG_LLD_ITEM_UPDATE_MULTIPLIER		__UINT64_C(0x0000000000001000)
-#define ZBX_FLAG_LLD_ITEM_UPDATE_DELTA			__UINT64_C(0x0000000000002000)
-#define ZBX_FLAG_LLD_ITEM_UPDATE_FORMULA		__UINT64_C(0x0000000000004000)
-#define ZBX_FLAG_LLD_ITEM_UPDATE_LOGTIMEFMT		__UINT64_C(0x0000000000008000)
-#define ZBX_FLAG_LLD_ITEM_UPDATE_VALUEMAPID		__UINT64_C(0x0000000000010000)
-#define ZBX_FLAG_LLD_ITEM_UPDATE_PARAMS			__UINT64_C(0x0000000000020000)
-#define ZBX_FLAG_LLD_ITEM_UPDATE_IPMI_SENSOR		__UINT64_C(0x0000000000040000)
-#define ZBX_FLAG_LLD_ITEM_UPDATE_SNMP_COMMUNITY		__UINT64_C(0x0000000000080000)
-#define ZBX_FLAG_LLD_ITEM_UPDATE_SNMP_OID		__UINT64_C(0x0000000000100000)
-#define ZBX_FLAG_LLD_ITEM_UPDATE_PORT			__UINT64_C(0x0000000000200000)
-#define ZBX_FLAG_LLD_ITEM_UPDATE_SNMPV3_SECURITYNAME	__UINT64_C(0x0000000000400000)
-#define ZBX_FLAG_LLD_ITEM_UPDATE_SNMPV3_SECURITYLEVEL	__UINT64_C(0x0000000000800000)
-#define ZBX_FLAG_LLD_ITEM_UPDATE_SNMPV3_AUTHPASSPHRASE	__UINT64_C(0x0000000001000000)
-#define ZBX_FLAG_LLD_ITEM_UPDATE_SNMPV3_PRIVPASSPHRASE	__UINT64_C(0x0000000002000000)
-#define ZBX_FLAG_LLD_ITEM_UPDATE_AUTHTYPE		__UINT64_C(0x0000000004000000)
-#define ZBX_FLAG_LLD_ITEM_UPDATE_USERNAME		__UINT64_C(0x0000000008000000)
-#define ZBX_FLAG_LLD_ITEM_UPDATE_PASSWORD		__UINT64_C(0x0000000010000000)
-#define ZBX_FLAG_LLD_ITEM_UPDATE_PUBLICKEY		__UINT64_C(0x0000000020000000)
-#define ZBX_FLAG_LLD_ITEM_UPDATE_PRIVATEKEY		__UINT64_C(0x0000000040000000)
-#define ZBX_FLAG_LLD_ITEM_UPDATE_DESCRIPTION		__UINT64_C(0x0000000080000000)
-#define ZBX_FLAG_LLD_ITEM_UPDATE_INTERFACEID		__UINT64_C(0x0000000100000000)
-#define ZBX_FLAG_LLD_ITEM_UPDATE										\
-		(ZBX_FLAG_LLD_ITEM_UPDATE_NAME | ZBX_FLAG_LLD_ITEM_UPDATE_KEY | ZBX_FLAG_LLD_ITEM_UPDATE_TYPE |	\
-		ZBX_FLAG_LLD_ITEM_UPDATE_VALUE_TYPE | ZBX_FLAG_LLD_ITEM_UPDATE_DATA_TYPE |			\
-		ZBX_FLAG_LLD_ITEM_UPDATE_DELAY | ZBX_FLAG_LLD_ITEM_UPDATE_DELAY_FLEX |				\
-		ZBX_FLAG_LLD_ITEM_UPDATE_HISTORY | ZBX_FLAG_LLD_ITEM_UPDATE_TRENDS |				\
-		ZBX_FLAG_LLD_ITEM_UPDATE_TRAPPER_HOSTS | ZBX_FLAG_LLD_ITEM_UPDATE_UNITS |			\
-		ZBX_FLAG_LLD_ITEM_UPDATE_MULTIPLIER | ZBX_FLAG_LLD_ITEM_UPDATE_DELTA |				\
-		ZBX_FLAG_LLD_ITEM_UPDATE_FORMULA | ZBX_FLAG_LLD_ITEM_UPDATE_LOGTIMEFMT |			\
-		ZBX_FLAG_LLD_ITEM_UPDATE_VALUEMAPID | ZBX_FLAG_LLD_ITEM_UPDATE_PARAMS |				\
-		ZBX_FLAG_LLD_ITEM_UPDATE_IPMI_SENSOR | ZBX_FLAG_LLD_ITEM_UPDATE_SNMP_COMMUNITY |		\
-		ZBX_FLAG_LLD_ITEM_UPDATE_SNMP_OID | ZBX_FLAG_LLD_ITEM_UPDATE_PORT |				\
-		ZBX_FLAG_LLD_ITEM_UPDATE_SNMPV3_SECURITYNAME | ZBX_FLAG_LLD_ITEM_UPDATE_SNMPV3_SECURITYLEVEL |	\
-		ZBX_FLAG_LLD_ITEM_UPDATE_SNMPV3_AUTHPASSPHRASE |						\
-		ZBX_FLAG_LLD_ITEM_UPDATE_SNMPV3_PRIVPASSPHRASE |						\
-		ZBX_FLAG_LLD_ITEM_UPDATE_AUTHTYPE | ZBX_FLAG_LLD_ITEM_UPDATE_USERNAME |				\
-		ZBX_FLAG_LLD_ITEM_UPDATE_PASSWORD | ZBX_FLAG_LLD_ITEM_UPDATE_PUBLICKEY |			\
-		ZBX_FLAG_LLD_ITEM_UPDATE_PRIVATEKEY | ZBX_FLAG_LLD_ITEM_UPDATE_DESCRIPTION |			\
-		ZBX_FLAG_LLD_ITEM_UPDATE_INTERFACEID)
-	char			*key_proto;
-	char			*name;
-	char			*name_orig;
-	char			*key;
-	char			*key_orig;
-	char			*params;
-	char			*params_orig;
-	char			*snmp_oid;
-	char			*snmp_oid_orig;
-	zbx_vector_uint64_t	new_applicationids;
+	zbx_uint64_t	itemid;
+	char		*key;
+	char		*name;
+	char		*snmp_oid;
+	char		*params;
+	zbx_uint64_t	*new_appids;
+	zbx_uint64_t	*del_appids;
+	int		new_appids_num;
+	int		del_appids_num;
 }
 zbx_lld_item_t;
 
-static void	DBlld_items_free(zbx_vector_ptr_t *items)
+static void	DBlld_clean_items(zbx_vector_ptr_t *items)
 {
 	zbx_lld_item_t	*item;
 
@@ -99,736 +45,223 @@ static void	DBlld_items_free(zbx_vector_ptr_t *items)
 	{
 		item = (zbx_lld_item_t *)items->values[--items->values_num];
 
-		zbx_free(item->key_proto);
-		zbx_free(item->name);
-		zbx_free(item->name_orig);
 		zbx_free(item->key);
-		zbx_free(item->key_orig);
-		zbx_free(item->params);
-		zbx_free(item->params_orig);
+		zbx_free(item->name);
 		zbx_free(item->snmp_oid);
-		zbx_free(item->snmp_oid_orig);
-		zbx_vector_uint64_destroy(&item->new_applicationids);
+		zbx_free(item->params);
+		zbx_free(item->new_appids);
+		zbx_free(item->del_appids);
 		zbx_free(item);
 	}
 }
 
 /******************************************************************************
  *                                                                            *
- * Function: DBlld_items_get                                                  *
+ * Function: DBget_applications_by_itemid                                     *
  *                                                                            *
- * Purpose: retrieves existing hosts for the specified host prototype         *
+ * Purpose: retrieve applications for specified item                          *
  *                                                                            *
- * Parameters: parent_itemid - [IN] item prototype identificator              *
- *             items         - [OUT] list of items                            *
+ * Parameters:  itemid - item identificator from database                     *
+ *              appids - result buffer                                        *
  *                                                                            *
- ******************************************************************************/
-static void	DBlld_items_get(zbx_uint64_t parent_itemid, zbx_vector_ptr_t *items,
-		unsigned char type, unsigned char value_type, unsigned char data_type, int delay,
-		const char *delay_flex, int history, int trends, const char *trapper_hosts, const char *units,
-		unsigned char multiplier, unsigned char delta, const char *formula, const char *logtimefmt,
-		zbx_uint64_t valuemapid, const char *ipmi_sensor, const char *snmp_community, const char *port,
-		const char *snmpv3_securityname, unsigned char snmpv3_securitylevel, const char *snmpv3_authpassphrase,
-		const char *snmpv3_privpassphrase, unsigned char authtype, const char *username, const char *password,
-		const char *publickey, const char *privatekey, const char *description, zbx_uint64_t interfaceid)
-{
-	const char	*__function_name = "DBlld_items_get";
-
-	DB_RESULT	result;
-	DB_ROW		row;
-	zbx_lld_item_t	*item;
-	zbx_uint64_t	db_valuemapid, db_interfaceid;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
-
-	result = DBselect(
-			"select id.itemid,id.key_,i.name,i.key_,i.type,i.value_type,i.data_type,i.delay,i.delay_flex,"
-				"i.history,i.trends,i.trapper_hosts,i.units,i.multiplier,i.delta,i.formula,"
-				"i.logtimefmt,i.valuemapid,i.params,i.ipmi_sensor,i.snmp_community,i.snmp_oid,i.port,"
-				"i.snmpv3_securityname,i.snmpv3_securitylevel,i.snmpv3_authpassphrase,"
-				"i.snmpv3_privpassphrase,i.authtype,i.username,i.password,i.publickey,i.privatekey,"
-				"i.description,i.interfaceid"
-			" from item_discovery id"
-				" join items i"
-					" on id.itemid=i.itemid"
-			" where id.parent_itemid=" ZBX_FS_UI64,
-			parent_itemid);
-
-	while (NULL != (row = DBfetch(result)))
-	{
-		item = zbx_malloc(NULL, sizeof(zbx_lld_item_t));
-
-		ZBX_STR2UINT64(item->itemid, row[0]);
-		item->key_proto = zbx_strdup(NULL, row[1]);
-		item->name = zbx_strdup(NULL, row[2]);
-		item->name_orig = NULL;
-		item->key = zbx_strdup(NULL, row[3]);
-		item->key_orig = NULL;
-
-		if ((unsigned char)atoi(row[4]) != type)
-			item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_TYPE;
-
-		if ((unsigned char)atoi(row[5]) != value_type)
-			item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_VALUE_TYPE;
-
-		if ((unsigned char)atoi(row[6]) != data_type)
-			item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_DATA_TYPE;
-
-		if (atoi(row[7]) != delay)
-			item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_DELAY;
-
-		if (0 != strcmp(row[8], delay_flex))
-			item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_DELAY_FLEX;
-
-		if (atoi(row[9]) != history)
-			item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_HISTORY;
-
-		if (atoi(row[10]) != trends)
-			item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_TRENDS;
-
-		if (0 != strcmp(row[11], trapper_hosts))
-			item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_TRAPPER_HOSTS;
-
-		if (0 != strcmp(row[12], units))
-			item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_UNITS;
-
-		if ((unsigned char)atoi(row[13]) != multiplier)
-			item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_MULTIPLIER;
-
-		if ((unsigned char)atoi(row[14]) != delta)
-			item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_DELTA;
-
-		if (0 != strcmp(row[15], formula))
-			item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_FORMULA;
-
-		if (0 != strcmp(row[16], logtimefmt))
-			item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_LOGTIMEFMT;
-
-		ZBX_DBROW2UINT64(db_valuemapid, row[17]);
-		if (db_valuemapid != valuemapid)
-			item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_VALUEMAPID;
-
-		item->params = zbx_strdup(NULL, row[18]);
-		item->params_orig = NULL;
-
-		if (0 != strcmp(row[19], ipmi_sensor))
-			item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_IPMI_SENSOR;
-
-		if (0 != strcmp(row[20], snmp_community))
-			item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_SNMP_COMMUNITY;
-
-		item->snmp_oid = zbx_strdup(NULL, row[21]);
-		item->snmp_oid_orig = NULL;
-
-		if (0 != strcmp(row[22], port))
-			item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_PORT;
-
-		if (0 != strcmp(row[23], snmpv3_securityname))
-			item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_SNMPV3_SECURITYNAME;
-
-		if ((unsigned char)atoi(row[24]) != snmpv3_securitylevel)
-			item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_SNMPV3_SECURITYLEVEL;
-
-		if (0 != strcmp(row[25], snmpv3_authpassphrase))
-			item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_SNMPV3_AUTHPASSPHRASE;
-
-		if (0 != strcmp(row[26], snmpv3_privpassphrase))
-			item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_SNMPV3_PRIVPASSPHRASE;
-
-		if ((unsigned char)atoi(row[27]) != authtype)
-			item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_AUTHTYPE;
-
-		if (0 != strcmp(row[28], username))
-			item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_USERNAME;
-
-		if (0 != strcmp(row[29], password))
-			item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_PASSWORD;
-
-		if (0 != strcmp(row[30], publickey))
-			item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_PUBLICKEY;
-
-		if (0 != strcmp(row[31], privatekey))
-			item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_PRIVATEKEY;
-
-		if (0 != strcmp(row[32], description))
-			item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_DESCRIPTION;
-
-		ZBX_DBROW2UINT64(db_interfaceid, row[33]);
-		if (db_interfaceid != interfaceid)
-			item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_INTERFACEID;
-
-		zbx_vector_uint64_create(&item->new_applicationids);
-		item->flags = __UINT64_C(0x0000000000000000);
-
-		zbx_vector_ptr_append(items, item);
-	}
-	DBfree_result(result);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: DBlld_applications_get                                           *
- *                                                                            *
- * Purpose: retrieve list of application which should be assigned to the each *
- *          discovered item                                                   *
- *                                                                            *
- * Parameters: parent_itemid  - [IN] item prototype id                        *
- *             applicationids - [OUT] sorted list of applications             *
+ * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
-static void	DBlld_applications_get(zbx_uint64_t parent_itemid, zbx_vector_uint64_t *applicationids)
+static void	DBget_applications_by_itemid(zbx_uint64_t itemid,
+		zbx_uint64_t **appids, int *appids_alloc, int *appids_num)
 {
-	const char	*__function_name = "DBlld_applications_get";
-
 	DB_RESULT	result;
 	DB_ROW		row;
 	zbx_uint64_t	applicationid;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	result = DBselect(
 			"select applicationid"
 			" from items_applications"
 			" where itemid=" ZBX_FS_UI64,
-			parent_itemid);
+			itemid);
 
 	while (NULL != (row = DBfetch(result)))
 	{
 		ZBX_STR2UINT64(applicationid, row[0]);
-		zbx_vector_uint64_append(applicationids, applicationid);
+		uint64_array_add(appids, appids_alloc, appids_num, applicationid, 4);
 	}
 	DBfree_result(result);
-
-	zbx_vector_uint64_sort(applicationids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 }
 
 /******************************************************************************
  *                                                                            *
- * Function: DBlld_items_validate                                             *
+ * Function: DBlld_item_exists                                                *
  *                                                                            *
- * Parameters: items - [IN] list of items; should be sorted by itemid         *
+ * Purpose: check if item exists either in triggers list or in the database   *
+ *                                                                            *
+ * Parameters: hostid - host identificator from database                      *
+ *             itemid - item identificator from database                      *
+ *             key - new key descriptor with substituted macros               *
+ *             items - list of already checked items                          *
+ *                                                                            *
+ * Return value: SUCCEED if item exists otherwise FAIL                        *
+ *                                                                            *
+ * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
-void	DBlld_items_validate(zbx_vector_ptr_t *items, char **error)
+int	DBlld_item_exists(zbx_uint64_t hostid, zbx_uint64_t itemid, const char *key, zbx_vector_ptr_t *items)
 {
-	const char		*__function_name = "DBlld_items_validate";
+	char		*key_esc, *sql = NULL;
+	size_t		sql_alloc = 256, sql_offset = 0;
+	DB_RESULT	result;
+	int		i, res = FAIL;
 
-	char			*keys = NULL, *host_esc, *name_esc;
-	size_t			keys_alloc = 256, keys_offset = 0;
-	DB_RESULT		result;
-	DB_ROW			row;
-	int			i, j;
-	zbx_lld_host_t		*host, *host_b;
-	zbx_vector_uint64_t	itemids;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
-
-	zbx_vector_uint64_create(&itemids);
-
-	keys = zbx_malloc(keys, keys_alloc);	/* list of item keys */
-
-	/* checking an item key validity */
 	for (i = 0; i < items->values_num; i++)
 	{
-		item = (zbx_lld_item_t *)items->values[i];
-
-		if (0 == item->flags)
-			continue;
-
-		/* only new items or items with a new item key will be validated */
-		if (0 != item->itemid && 0 == (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_KEY))
-			continue;
-
-		/* check for valid utf8 sequence and length */
-		if (SUCCEED == zbx_is_utf8(item->key) && ITEM_KEY_LEN >= zbx_strlen_utf8(item->key))
-			continue;
-
-		zbx_replace_invalid_utf8(item->key);
-		*error = zbx_strdcatf(*error, "Cannot %s item: invalid item key \"%s\".\n",
-				(0 != host->hostid ? "update" : "create"), item->key);
-
-		if (0 != item->itemid)
-		{
-			/* return an original key and drop the correspond flag */
-			zbx_free(item->key);
-			item->key = item->key_orig;
-			item->key_orig = NULL;
-			item->flags &= ~ZBX_FLAG_LLD_HOST_UPDATE_HOST;
-		}
-		else
-			item->flags = 0;
+		if (0 == strcmp(key, ((zbx_lld_item_t *)items->values[i])->key))
+			return SUCCEED;
 	}
 
-	/* checking a visible item name validity */
-	for (i = 0; i < hosts->values_num; i++)
-	{
-		host = (zbx_lld_host_t *)hosts->values[i];
+	sql = zbx_malloc(sql, sql_alloc);
+	key_esc = DBdyn_escape_string_len(key, ITEM_KEY_LEN);
 
-		if (0 == host->flags)
-			continue;
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+			"select itemid"
+			" from items"
+			" where hostid=" ZBX_FS_UI64
+				" and key_='%s'",
+			hostid, key_esc);
+	if (0 != itemid)
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " and itemid<>" ZBX_FS_UI64, itemid);
 
-		/* only new hosts or hosts with a new visible host name will be validated */
-		if (0 != host->hostid && 0 == (host->flags & ZBX_FLAG_LLD_HOST_UPDATE_NAME))
-			continue;
+	result = DBselect("%s", sql);
 
-		/* visible host name is valid utf8 sequence and has a valid length */
-		if (SUCCEED == zbx_is_utf8(host->name) && HOST_NAME_LEN >= zbx_strlen_utf8(host->name))
-			continue;
+	if (NULL != DBfetch(result))
+		res = SUCCEED;
+	DBfree_result(result);
 
-		zbx_replace_invalid_utf8(host->name);
-		*error = zbx_strdcatf(*error, "Cannot %s host: invalid visible host name \"%s\".\n",
-				(0 != host->hostid ? "update" : "create"), host->name);
+	zbx_free(key_esc);
+	zbx_free(sql);
 
-		if (0 != host->hostid)
-		{
-			/* return an original visible host name and drop the correspond flag */
-			zbx_free(host->name);
-			host->name = host->name_orig;
-			host->name_orig = NULL;
-			host->flags &= ~ZBX_FLAG_LLD_HOST_UPDATE_NAME;
-		}
-		else
-			host->flags = 0;
-	}
-
-	/* checking duplicated host names */
-	for (i = 0; i < hosts->values_num; i++)
-	{
-		host = (zbx_lld_host_t *)hosts->values[i];
-
-		if (0 == host->flags)
-			continue;
-
-		/* only new hosts or hosts with a new host name will be validated */
-		if (0 != host->hostid && 0 == (host->flags & ZBX_FLAG_LLD_HOST_UPDATE_HOST))
-			continue;
-
-		for (j = 0; j < hosts->values_num; j++)
-		{
-			host_b = (zbx_lld_host_t *)hosts->values[j];
-
-			if (0 == host_b->flags || i == j)
-				continue;
-
-			if (0 != strcmp(host->host, host_b->host))
-				continue;
-
-			*error = zbx_strdcatf(*error, "Cannot %s host:"
-						" host with the same name \"%s\" already exists.\n",
-						(0 != host->hostid ? "update" : "create"), host->host);
-
-			if (0 != host->hostid)
-			{
-				/* return an original host name and drop the correspond flag */
-				zbx_free(host->host);
-				host->host = host->host_orig;
-				host->host_orig = NULL;
-				host->flags &= ~ZBX_FLAG_LLD_HOST_UPDATE_HOST;
-			}
-			else
-				host->flags = 0;
-		}
-	}
-
-	/* checking duplicated visible host names */
-	for (i = 0; i < hosts->values_num; i++)
-	{
-		host = (zbx_lld_host_t *)hosts->values[i];
-
-		if (0 == host->flags)
-			continue;
-
-		/* only new hosts or hosts with a new visible host name will be validated */
-		if (0 != host->hostid && 0 == (host->flags & ZBX_FLAG_LLD_HOST_UPDATE_NAME))
-			continue;
-
-		for (j = 0; j < hosts->values_num; j++)
-		{
-			host_b = (zbx_lld_host_t *)hosts->values[j];
-
-			if (0 == host_b->flags || i == j)
-				continue;
-
-			if (0 != strcmp(host->name, host_b->name))
-				continue;
-
-			*error = zbx_strdcatf(*error, "Cannot %s host:"
-					" host with the same visible name \"%s\" already exists.\n",
-					(0 != host->hostid ? "update" : "create"), host->name);
-
-			if (0 != host->hostid)
-			{
-				/* return an original visible host name and drop the correspond flag */
-				zbx_free(host->name);
-				host->name = host->name_orig;
-				host->name_orig = NULL;
-				host->flags &= ~ZBX_FLAG_LLD_HOST_UPDATE_NAME;
-			}
-			else
-				host->flags = 0;
-		}
-	}
-
-	/* checking duplicated host names and visible host names in DB */
-
-	for (i = 0; i < hosts->values_num; i++)
-	{
-		host = (zbx_lld_host_t *)hosts->values[i];
-
-		if (0 == host->flags)
-			continue;
-
-		if (0 != host->hostid)
-			zbx_vector_uint64_append(&hostids, host->hostid);
-
-		if (0 == host->hostid || 0 != (host->flags & ZBX_FLAG_LLD_HOST_UPDATE_HOST))
-		{
-			host_esc = DBdyn_escape_string(host->host);
-
-			if (0 != keys_offset)
-				zbx_chrcpy_alloc(&keys, &keys_alloc, &keys_offset, ',');
-			zbx_chrcpy_alloc(&keys, &keys_alloc, &keys_offset, '\'');
-			zbx_strcpy_alloc(&keys, &keys_alloc, &keys_offset, host_esc);
-			zbx_chrcpy_alloc(&keys, &keys_alloc, &keys_offset, '\'');
-
-			zbx_free(host_esc);
-		}
-	}
-
-	if (0 != keys_offset)
-	{
-		char	*sql = NULL;
-		size_t	sql_alloc = 256, sql_offset = 0;
-
-		sql = zbx_malloc(sql, sql_alloc);
-
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-				"select host,name"
-				" from hosts"
-				" where status in (%d,%d,%d)"
-					" and flags<>%d"
-					" and ",
-				HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED, HOST_STATUS_TEMPLATE,
-				ZBX_FLAG_DISCOVERY_PROTOTYPE);
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "host in (%s)", keys);
-		if (0 != hostids.values_num)
-		{
-			zbx_vector_uint64_sort(&hostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " and not");
-			DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid",
-					hostids.values, hostids.values_num);
-		}
-
-		result = DBselect("%s", sql);
-
-		while (NULL != (row = DBfetch(result)))
-		{
-			for (i = 0; i < hosts->values_num; i++)
-			{
-				host = (zbx_lld_host_t *)hosts->values[i];
-
-				if (0 == host->flags)
-					continue;
-
-				if (0 == strcmp(host->host, row[0]))
-				{
-					*error = zbx_strdcatf(*error, "Cannot %s host:"
-							" host with the same name \"%s\" already exists.\n",
-							(0 != host->hostid ? "update" : "create"), host->host);
-
-					if (0 != host->hostid)
-					{
-						/* return an original host name and drop the correspond flag */
-						zbx_free(host->host);
-						host->host = host->host_orig;
-						host->host_orig = NULL;
-						host->flags &= ~ZBX_FLAG_LLD_HOST_UPDATE_HOST;
-					}
-					else
-						host->flags = 0;
-
-					continue;
-				}
-
-				if (0 == strcmp(host->name, row[1]))
-				{
-					*error = zbx_strdcatf(*error, "Cannot %s host:"
-							" host with the same visible name \"%s\" already exists.\n",
-							(0 != host->hostid ? "update" : "create"), host->name);
-
-					if (0 != host->hostid)
-					{
-						/* return an original visible host name and drop the correspond flag */
-						zbx_free(host->name);
-						host->name = host->name_orig;
-						host->name_orig = NULL;
-						host->flags &= ~ZBX_FLAG_LLD_HOST_UPDATE_NAME;
-					}
-					else
-						host->flags = 0;
-				}
-			}
-		}
-		DBfree_result(result);
-
-		zbx_free(sql);
-	}
-
-	zbx_free(keys);
-
-	zbx_vector_uint64_destroy(&itemids);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	return res;
 }
 
-static void	DBlld_item_make(zbx_vector_ptr_t *items, const char *name_proto, const char *key_proto,
-		unsigned char type, unsigned char value_type, unsigned char data_type, int delay,
-		const char *delay_flex, int history, int trends, const char *trapper_hosts, const char *units,
-		unsigned char multiplier, unsigned char delta, const char *formula, const char *logtimefmt,
-		zbx_uint64_t valuemapid, const char *params_proto, const char *ipmi_sensor, const char *snmp_community,
-		const char *snmp_oid_proto, const char *port, const char *snmpv3_securityname,
-		unsigned char snmpv3_securitylevel, const char *snmpv3_authpassphrase,
-		const char *snmpv3_privpassphrase, unsigned char authtype, const char *username, const char *password,
-		const char *publickey, const char *privatekey, const char *description, zbx_uint64_t interfaceid,
-		struct zbx_json_parse *jp_row)
+static int	DBlld_make_item(zbx_uint64_t hostid, zbx_uint64_t parent_itemid, zbx_vector_ptr_t *items,
+		const char *name_proto, const char *key_proto, unsigned char type, const char *params_proto,
+		const char *snmp_oid_proto, struct zbx_json_parse *jp_row, char **error)
 {
 	const char	*__function_name = "DBlld_make_item";
 
-	char		*buffer;
-	int		i;
+	DB_RESULT	result;
+	DB_ROW		row;
+	char		*key_esc;
+	int		new_appids_alloc = 0, del_appids_alloc = 0,
+			res = SUCCEED;
 	zbx_lld_item_t	*item;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	for (i = 0; i < items->values_num; i++)
+	item = zbx_calloc(NULL, 1, sizeof(zbx_lld_item_t));
+	item->key = zbx_strdup(NULL, key_proto);
+	substitute_key_macros(&item->key, NULL, NULL, jp_row, MACRO_TYPE_ITEM_KEY, NULL, 0);
+
+	key_esc = DBdyn_escape_string_len(item->key, ITEM_KEY_LEN);
+
+	result = DBselect(
+			"select distinct i.itemid"
+			" from items i,item_discovery id"
+			" where i.itemid=id.itemid"
+				" and id.parent_itemid=" ZBX_FS_UI64
+				" and i.key_='%s'",
+			parent_itemid, key_esc);
+
+	if (NULL != (row = DBfetch(result)))
+		ZBX_STR2UINT64(item->itemid, row[0]);
+	DBfree_result(result);
+
+	if (0 == item->itemid)
 	{
-		item = (zbx_lld_item_t *)items->values[i];
-
-		if (0 != item->flags)
-			continue;
-
-		buffer = zbx_strdup(buffer, item->key_proto);
-		substitute_key_macros(&buffer, NULL, NULL, jp_row, MACRO_TYPE_ITEM_KEY, NULL, 0);
-
-		if (0 == strcmp(item->key, buffer))
-			break;
-	}
-
-	if (i == items->values_num)	/* no item found */
-	{
-		item = zbx_malloc(NULL, sizeof(zbx_lld_item_t));
-
-		item->itemid = 0;
-		item->key_proto = NULL;
-
-		item->name = zbx_strdup(NULL, name_proto);
-		item->name_orig = NULL;
-		substitute_discovery_macros(&item->name, jp_row);
-		zbx_lrtrim(item->name, ZBX_WHITESPACE);
-
-		item->key = zbx_strdup(NULL, key_proto);
-		item->key_orig = NULL;
-		substitute_key_macros(&item->key, NULL, NULL, jp_row, MACRO_TYPE_ITEM_KEY, NULL, 0);
-
-		item->params = zbx_strdup(NULL, params_proto);
-		item->params_orig = NULL;
-		substitute_discovery_macros(&item->params, jp_row);
-		zbx_lrtrim(item->params, ZBX_WHITESPACE);
-
-		item->snmp_oid = zbx_strdup(NULL, snmp_oid_proto);
-		item->snmp_oid_orig = NULL;
-		substitute_key_macros(&item->snmp_oid, NULL, NULL, jp_row, MACRO_TYPE_SNMP_OID, NULL, 0);
-		zbx_lrtrim(item->snmp_oid, ZBX_WHITESPACE);
-
-		zbx_vector_uint64_create(&item->new_applicationids);
-		item->flags = ZBX_FLAG_LLD_ITEM_DISCOVERED;
-
-		zbx_vector_ptr_append(items, item);
-	}
-	else
-	{
-		buffer = zbx_strdup(buffer, name_proto);
-		substitute_discovery_macros(&buffer, jp_row);
-		zbx_lrtrim(buffer, ZBX_WHITESPACE);
-		if (0 != strcmp(item->name, buffer))
-		{
-			item->name_orig = item->name;
-			item->name = buffer;
-			buffer = NULL;
-			item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_NAME;
-		}
-
-		if (0 != strcmp(item->key_proto, key_proto))
-		{
-			item->key_orig = item->key;
-			item->key = zbx_strdup(NULL, key_proto);
-			substitute_key_macros(&item->key, NULL, NULL, jp_row, MACRO_TYPE_ITEM_KEY, NULL, 0);
-			item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_KEY;
-		}
-
-		buffer = zbx_strdup(buffer, params_proto);
-		substitute_discovery_macros(&buffer, jp_row);
-		zbx_lrtrim(buffer, ZBX_WHITESPACE);
-		if (0 != strcmp(item->params, buffer))
-		{
-			item->params_orig = item->params;
-			item->params = buffer;
-			buffer = NULL;
-			item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_PARAMS;
-		}
-
-		buffer = zbx_strdup(buffer, snmp_oid_proto);
-		substitute_discovery_macros(&buffer, jp_row);
-		zbx_lrtrim(buffer, ZBX_WHITESPACE);
-		if (0 != strcmp(item->snmp_oid, buffer))
-		{
-			item->snmp_oid_orig = item->snmp_oid;
-			item->snmp_oid = buffer;
-			buffer = NULL;
-			item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_SNMP_OID;
-		}
-
-		item->flags = ZBX_FLAG_LLD_ITEM_DISCOVERED;
-	}
-
-	zbx_free(buffer);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
-}
-
-
-/******************************************************************************
- *                                                                            *
- * Function: DBlld_applications_make                                          *
- *                                                                            *
- * Parameters: parent_itemid  - [IN] item prototype id                        *
- *             items          - [IN/OUT] sorted list of items                 *
- *             del_itemappids - [OUT] items_applications which should be      *
- *                                    deleted                                 *
- *                                                                            *
- ******************************************************************************/
-static void	DBlld_applications_make(zbx_uint64_t parent_itemid, zbx_vector_ptr_t *items,
-		zbx_vector_uint64_t *del_itemappids)
-{
-	const char		*__function_name = "DBlld_applications_make";
-
-	DB_RESULT		result;
-	DB_ROW			row;
-	int			i, j;
-	zbx_vector_uint64_t	applicationids, itemids;
-	zbx_uint64_t		itemappid, applicationid, itemid;
-	zbx_lld_item_t		*item;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
-
-	zbx_vector_uint64_create(&applicationids);
-	zbx_vector_uint64_create(&itemids);
-
-	DBlld_applications_get(parent_itemid, &applicationids);
-
-	for (i = 0; i < items->values_num; i++)
-	{
-		item = (zbx_lld_item_t *)items->values[i];
-
-		if (0 == item->flags)
-			continue;
-
-		zbx_vector_uint64_reserve(&item->new_applicationids, applicationids.values_num);
-		for (j = 0; j < applicationids.values_num; j++)
-			zbx_vector_uint64_append(&item->new_applicationids, applicationids.values[j]);
-
-		if (0 != item->itemid)
-			zbx_vector_uint64_append(&itemids, item->itemid);
-	}
-
-	if (0 != itemids.values_num)
-	{
-		char	*sql = NULL;
-		size_t	sql_alloc = 256, sql_offset = 0;
-
-		sql = zbx_malloc(sql, sql_alloc);
-
-		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-				"select itemappid,applicationid,itemid"
-				" from items_applications"
-				" where");
-		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", itemids.values, itemids.values_num);
-
-		result = DBselect("%s", sql);
-
-		zbx_free(sql);
+		result = DBselect(
+				"select distinct i.itemid,id.key_,i.key_"
+				" from items i,item_discovery id"
+				" where i.itemid=id.itemid"
+					" and id.parent_itemid=" ZBX_FS_UI64,
+				parent_itemid);
 
 		while (NULL != (row = DBfetch(result)))
 		{
-			ZBX_STR2UINT64(applicationid, row[1]);
-			ZBX_STR2UINT64(itemid, row[2]);
+			char	*old_key = NULL;
 
-			if (FAIL == (i = zbx_vector_ptr_bsearch(items, &itemid, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
-			{
-				THIS_SHOULD_NEVER_HAPPEN;
-				continue;
-			}
+			old_key = zbx_strdup(old_key, row[1]);
+			substitute_key_macros(&old_key, NULL, NULL, jp_row, MACRO_TYPE_ITEM_KEY, NULL, 0);
 
-			item = (zbx_lld_item_t *)items->values[i];
+			if (0 == strcmp(old_key, row[2]))
+				ZBX_STR2UINT64(item->itemid, row[0]);
 
-			if (FAIL == (i = zbx_vector_uint64_bsearch(&item->new_applicationids, applicationid,
-					ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
-			{
-				/* item applications which should be deleted */
-				ZBX_STR2UINT64(itemappid, row[0]);
-				zbx_vector_uint64_append(del_itemappids, itemappid);
-			}
-			else
-			{
-				/* item applications which are already added */
-				zbx_vector_uint64_remove(&item->new_applicationids, i);
-			}
+			zbx_free(old_key);
+
+			if (0 != item->itemid)
+				break;
 		}
 		DBfree_result(result);
-
-		zbx_vector_uint64_sort(del_itemappids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 	}
 
-	zbx_vector_uint64_destroy(&itemids);
-	zbx_vector_uint64_destroy(&applicationids);
+	if (SUCCEED == DBlld_item_exists(hostid, item->itemid, item->key, items))
+	{
+		*error = zbx_strdcatf(*error, "Cannot %s item [%s]: item already exists\n",
+				0 != item->itemid ? "update" : "create", item->key);
+		res = FAIL;
+		goto out;
+	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	item->name = zbx_strdup(NULL, name_proto);
+	substitute_discovery_macros(&item->name, jp_row);
+
+	item->snmp_oid = zbx_strdup(NULL, snmp_oid_proto);
+	substitute_key_macros(&item->snmp_oid, NULL, NULL, jp_row, MACRO_TYPE_SNMP_OID, NULL, 0);
+
+	item->params = zbx_strdup(NULL, params_proto);
+	if (ITEM_TYPE_DB_MONITOR == type || ITEM_TYPE_SSH == type ||
+			ITEM_TYPE_TELNET == type || ITEM_TYPE_CALCULATED == type)
+	{
+		substitute_discovery_macros(&item->params, jp_row);
+	}
+
+	zbx_vector_ptr_append(items, item);
+
+	DBget_applications_by_itemid(parent_itemid, &item->new_appids, &new_appids_alloc, &item->new_appids_num);
+
+	if (0 != item->itemid)
+	{
+		DBget_applications_by_itemid(item->itemid, &item->del_appids, &del_appids_alloc, &item->del_appids_num);
+
+		uint64_array_remove_both(item->new_appids, &item->new_appids_num,
+				item->del_appids, &item->del_appids_num);
+	}
+out:
+	if (FAIL == res)
+	{
+		zbx_free(item->key);
+		zbx_free(item);
+	}
+
+	zbx_free(key_esc);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(res));
+
+	return res;
 }
 
-/******************************************************************************
- *                                                                            *
- * Function: DBlld_items_save                                                 *
- *                                                                            *
- * Parameters: hostid         - [IN] parent host id                           *
- *             parent_itemid  - [IN] item prototype id                        *
- *             status         - [IN] initial item satatus                     *
- *             del_itemappids - [IN] items_applications which should be       *
- *                                   deleted                                  *
- *                                                                            *
- ******************************************************************************/
-static void	DBlld_items_save(zbx_uint64_t hostid, zbx_uint64_t parent_itemid, zbx_vector_ptr_t *items,
-		const char *key_proto, unsigned char type, unsigned char value_type, unsigned char data_type, int delay,
-		const char *delay_flex, int history, int trends, unsigned char status, const char *trapper_hosts,
-		const char *units, unsigned char multiplier, unsigned char delta, const char *formula,
-		const char *logtimefmt, zbx_uint64_t valuemapid, const char *ipmi_sensor, const char *snmp_community,
-		const char *port, const char *snmpv3_securityname, unsigned char snmpv3_securitylevel,
-		const char *snmpv3_authpassphrase, const char *snmpv3_privpassphrase, unsigned char authtype,
-		const char *username, const char *password, const char *publickey, const char *privatekey,
-		const char *description, zbx_uint64_t interfaceid, zbx_vector_uint64_t *del_itemappids)
+static void	DBlld_save_items(zbx_uint64_t hostid, zbx_vector_ptr_t *items, unsigned char type,
+		unsigned char value_type, unsigned char data_type, int delay, const char *delay_flex_esc,
+		int history, int trends, unsigned char status, const char *trapper_hosts_esc, const char *units_esc,
+		int multiplier, int delta, const char *formula_esc, const char *logtimefmt_esc, zbx_uint64_t valuemapid,
+		const char *ipmi_sensor_esc, const char *snmp_community_esc, const char *port_esc,
+		const char *snmpv3_securityname_esc, unsigned char snmpv3_securitylevel,
+		const char *snmpv3_authpassphrase_esc, const char *snmpv3_privpassphrase_esc, unsigned char authtype,
+		const char *username_esc, const char *password_esc, const char *publickey_esc,
+		const char *privatekey_esc, const char *description_esc, zbx_uint64_t interfaceid,
+		zbx_uint64_t parent_itemid, const char *key_proto_esc, int lastcheck)
 {
-	const char	*__function_name = "DBlld_items_save";
-
-	int		i, j, new_items = 0, upd_items = 0, new_applications = 0;
+	int		i, j, new_items = 0, new_apps = 0;
 	zbx_lld_item_t	*item;
-	zbx_uint64_t	itemid = 0, itemdiscoveryid = 0, itemappid = 0, flags = __UINT64_C(0x0000000000000000);
+	zbx_uint64_t	itemid = 0, itemdiscoveryid = 0, itemappid = 0;
 	char		*sql1 = NULL, *sql2 = NULL, *sql3 = NULL, *sql4 = NULL,
-			*key_proto_esc = NULL, *delay_flex_esc = NULL, *trapper_hosts_esc = NULL, *units_esc = NULL,
-			*formula_esc = NULL, *logtimefmt_esc = NULL, *ipmi_sensor_esc = NULL,
-			*snmp_community_esc = NULL, *port_esc = NULL, *snmpv3_securityname_esc = NULL,
-			*snmpv3_authpassphrase_esc = NULL, *snmpv3_privpassphrase_esc = NULL, *username_esc = NULL,
-			*password_esc = NULL, *publickey_esc = NULL, *privatekey_esc = NULL, *description_esc = NULL,
 			*name_esc, *key_esc, *snmp_oid_esc, *params_esc;
 	size_t		sql1_alloc = 8 * ZBX_KIBIBYTE, sql1_offset = 0,
 			sql2_alloc = 2 * ZBX_KIBIBYTE, sql2_offset = 0,
@@ -846,30 +279,21 @@ static void	DBlld_items_save(zbx_uint64_t hostid, zbx_uint64_t parent_itemid, zb
 				"description,interfaceid,flags)"
 			" values ";
 	const char	*ins_item_discovery_sql =
-			"insert into item_discovery (itemdiscoveryid,itemid,parent_itemid,key_) values ";
+			"insert into item_discovery"
+			" (itemdiscoveryid,itemid,parent_itemid,key_,lastcheck)"
+			" values ";
 	const char	*ins_items_applications_sql =
-			"insert into items_applications (itemappid,itemid,applicationid) values ";
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+			"insert into items_applications"
+			" (itemappid,itemid,applicationid)"
+			" values ";
 
 	for (i = 0; i < items->values_num; i++)
 	{
 		item = (zbx_lld_item_t *)items->values[i];
 
-		if (0 == item->flags)
-			continue;
-
 		if (0 == item->itemid)
-		{
 			new_items++;
-		}
-		else if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE))
-		{
-			upd_items++;
-			flags |= item->flags;
-		}
-
-		new_applications += item->new_applicationids.values_num;
+		new_apps += item->new_appids_num;
 	}
 
 	if (0 != new_items)
@@ -885,12 +309,11 @@ static void	DBlld_items_save(zbx_uint64_t hostid, zbx_uint64_t parent_itemid, zb
 		zbx_strcpy_alloc(&sql1, &sql1_alloc, &sql1_offset, ins_items_sql);
 		zbx_strcpy_alloc(&sql2, &sql2_alloc, &sql2_offset, ins_item_discovery_sql);
 #endif
-		flags |= ZBX_FLAG_LLD_ITEM_UPDATE;
 	}
 
-	if (0 != new_applications)
+	if (0 != new_apps)
 	{
-		itemappid = DBget_maxid_num("items_applications", new_applications);
+		itemappid = DBget_maxid_num("items_applications", new_apps);
 
 		sql3 = zbx_malloc(sql3, sql3_alloc);
 		DBbegin_multiple_update(&sql3, &sql3_alloc, &sql3_offset);
@@ -899,53 +322,20 @@ static void	DBlld_items_save(zbx_uint64_t hostid, zbx_uint64_t parent_itemid, zb
 #endif
 	}
 
-	if (0 != upd_items || 0 != del_itemappids->values_num)
+	if (new_items < items->values_num)
 	{
 		sql4 = zbx_malloc(sql4, sql4_alloc);
 		DBbegin_multiple_update(&sql4, &sql4_alloc, &sql4_offset);
 	}
 
-	if (0 != (flags & ZBX_FLAG_LLD_ITEM_UPDATE_KEY))
-		key_proto_esc = DBdyn_escape_string(key_proto);
-	if (0 != (flags & ZBX_FLAG_LLD_ITEM_UPDATE_DELAY_FLEX))
-		delay_flex_esc = DBdyn_escape_string(delay_flex);
-	if (0 != (flags & ZBX_FLAG_LLD_ITEM_UPDATE_TRAPPER_HOSTS))
-		trapper_hosts_esc = DBdyn_escape_string(trapper_hosts);
-	if (0 != (flags & ZBX_FLAG_LLD_ITEM_UPDATE_UNITS))
-		units_esc = DBdyn_escape_string(units);
-	if (0 != (flags & ZBX_FLAG_LLD_ITEM_UPDATE_FORMULA))
-		formula_esc = DBdyn_escape_string(formula);
-	if (0 != (flags & ZBX_FLAG_LLD_ITEM_UPDATE_LOGTIMEFMT))
-		logtimefmt_esc = DBdyn_escape_string(logtimefmt);
-	if (0 != (flags & ZBX_FLAG_LLD_ITEM_UPDATE_IPMI_SENSOR))
-		ipmi_sensor_esc = DBdyn_escape_string(ipmi_sensor);
-	if (0 != (flags & ZBX_FLAG_LLD_ITEM_UPDATE_SNMP_COMMUNITY))
-		snmp_community_esc = DBdyn_escape_string(snmp_community);
-	if (0 != (flags & ZBX_FLAG_LLD_ITEM_UPDATE_PORT))
-		port_esc = DBdyn_escape_string(port);
-	if (0 != (flags & ZBX_FLAG_LLD_ITEM_UPDATE_SNMPV3_SECURITYNAME))
-		snmpv3_securityname_esc = DBdyn_escape_string(snmpv3_securityname);
-	if (0 != (flags & ZBX_FLAG_LLD_ITEM_UPDATE_SNMPV3_AUTHPASSPHRASE))
-		snmpv3_authpassphrase_esc = DBdyn_escape_string(snmpv3_authpassphrase);
-	if (0 != (flags & ZBX_FLAG_LLD_ITEM_UPDATE_SNMPV3_PRIVPASSPHRASE))
-		snmpv3_privpassphrase_esc = DBdyn_escape_string(snmpv3_privpassphrase);
-	if (0 != (flags & ZBX_FLAG_LLD_ITEM_UPDATE_USERNAME))
-		username_esc = DBdyn_escape_string(username);
-	if (0 != (flags & ZBX_FLAG_LLD_ITEM_UPDATE_PASSWORD))
-		password_esc = DBdyn_escape_string(password);
-	if (0 != (flags & ZBX_FLAG_LLD_ITEM_UPDATE_PUBLICKEY))
-		publickey_esc = DBdyn_escape_string(publickey);
-	if (0 != (flags & ZBX_FLAG_LLD_ITEM_UPDATE_PRIVATEKEY))
-		privatekey_esc = DBdyn_escape_string(privatekey);
-	if (0 != (flags & ZBX_FLAG_LLD_ITEM_UPDATE_DESCRIPTION))
-		description_esc = DBdyn_escape_string(description);
-
 	for (i = 0; i < items->values_num; i++)
 	{
 		item = (zbx_lld_item_t *)items->values[i];
 
-		if (0 == item->flags)
-			continue;
+		name_esc = DBdyn_escape_string_len(item->name, ITEM_NAME_LEN);
+		key_esc = DBdyn_escape_string_len(item->key, ITEM_KEY_LEN);
+		snmp_oid_esc = DBdyn_escape_string_len(item->snmp_oid, ITEM_SNMP_OID_LEN);
+		params_esc = DBdyn_escape_string_len(item->params, ITEM_PARAM_LEN);
 
 		if (0 == item->itemid)
 		{
@@ -953,18 +343,13 @@ static void	DBlld_items_save(zbx_uint64_t hostid, zbx_uint64_t parent_itemid, zb
 #ifndef HAVE_MULTIROW_INSERT
 			zbx_strcpy_alloc(&sql1, &sql1_alloc, &sql1_offset, ins_items_sql);
 #endif
-			name_esc = DBdyn_escape_string(item->name);
-			key_esc = DBdyn_escape_string(item->key);
-			params_esc = DBdyn_escape_string(item->params);
-			snmp_oid_esc = DBdyn_escape_string(item->snmp_oid);
-
 			zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset,
 					"(" ZBX_FS_UI64 ",'%s','%s'," ZBX_FS_UI64 ",%d,%d,%d,%d,'%s',%d,%d,%d,'%s',"
 						"'%s',%d,%d,'%s','%s',%s,'%s','%s','%s','%s','%s','%s',%d,'%s','%s',"
 						"%d,'%s','%s','%s','%s','%s',%s,%d)" ZBX_ROW_DL,
 					item->itemid, name_esc, key_esc, hostid, (int)type, (int)value_type,
 					(int)data_type, delay, delay_flex_esc, history, trends, (int)status,
-					trapper_hosts_esc, units_esc, (int)multiplier, (int)delta, formula_esc,
+					trapper_hosts_esc, units_esc, multiplier, delta, formula_esc,
 					logtimefmt_esc, DBsql_id_ins(valuemapid), params_esc, ipmi_sensor_esc,
 					snmp_community_esc, snmp_oid_esc, port_esc, snmpv3_securityname_esc,
 					(int)snmpv3_securitylevel, snmpv3_authpassphrase_esc,
@@ -972,263 +357,101 @@ static void	DBlld_items_save(zbx_uint64_t hostid, zbx_uint64_t parent_itemid, zb
 					publickey_esc, privatekey_esc, description_esc, DBsql_id_ins(interfaceid),
 					ZBX_FLAG_DISCOVERY_CREATED);
 
-			zbx_free(snmp_oid_esc);
-			zbx_free(params_esc);
-			zbx_free(key_esc);
-			zbx_free(name_esc);
-
 #ifndef HAVE_MULTIROW_INSERT
 			zbx_strcpy_alloc(&sql2, &sql2_alloc, &sql2_offset, ins_item_discovery_sql);
 #endif
 			zbx_snprintf_alloc(&sql2, &sql2_alloc, &sql2_offset,
-					"(" ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 ",'%s')" ZBX_ROW_DL,
-					itemdiscoveryid++, item->itemid, parent_itemid, key_proto_esc);
+					"(" ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 ",'%s',%d)" ZBX_ROW_DL,
+					itemdiscoveryid, item->itemid, parent_itemid, key_proto_esc, lastcheck);
+
+			itemdiscoveryid++;
 		}
 		else
 		{
-			if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE))
-			{
-				const char	*d = "";
+			zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset,
+					"update items"
+					" set name='%s',"
+						"key_='%s',"
+						"type=%d,"
+						"value_type=%d,"
+						"data_type=%d,"
+						"delay=%d,"
+						"delay_flex='%s',"
+						"history=%d,"
+						"trends=%d,"
+						"trapper_hosts='%s',"
+						"units='%s',"
+						"multiplier=%d,"
+						"delta=%d,"
+						"formula='%s',"
+						"logtimefmt='%s',"
+						"valuemapid=%s,"
+						"params='%s',"
+						"ipmi_sensor='%s',"
+						"snmp_community='%s',"
+						"snmp_oid='%s',"
+						"port='%s',"
+						"snmpv3_securityname='%s',"
+						"snmpv3_securitylevel=%d,"
+						"snmpv3_authpassphrase='%s',"
+						"snmpv3_privpassphrase='%s',"
+						"authtype=%d,"
+						"username='%s',"
+						"password='%s',"
+						"publickey='%s',"
+						"privatekey='%s',"
+						"description='%s',"
+						"interfaceid=%s,"
+						"flags=%d"
+					" where itemid=" ZBX_FS_UI64 ";\n",
+					name_esc, key_esc, (int)type, (int)value_type, (int)data_type, delay,
+					delay_flex_esc, history, trends, trapper_hosts_esc, units_esc,
+					multiplier, delta, formula_esc, logtimefmt_esc,
+					DBsql_id_ins(valuemapid), params_esc, ipmi_sensor_esc,
+					snmp_community_esc, snmp_oid_esc, port_esc, snmpv3_securityname_esc,
+					(int)snmpv3_securitylevel, snmpv3_authpassphrase_esc,
+					snmpv3_privpassphrase_esc, (int)authtype, username_esc, password_esc,
+					publickey_esc, privatekey_esc, description_esc, DBsql_id_ins(interfaceid),
+					ZBX_FLAG_DISCOVERY_CREATED, item->itemid);
 
-				zbx_strcpy_alloc(&sql4, &sql4_alloc, &sql4_offset, "update items set ");
-				if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_NAME))
-				{
-					name_esc = DBdyn_escape_string(item->name);
-					zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset, "name='%s'", name_esc);
-					zbx_free(name_esc);
-					d = ",";
-				}
-				if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_KEY))
-				{
-					key_esc = DBdyn_escape_string(item->key);
-					zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset, "%skey_='%s'", d, key_esc);
-					zbx_free(key_esc);
-					d = ",";
-				}
-				if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_TYPE))
-				{
-					zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset, "%stype=%d", d, (int)type);
-					d = ",";
-				}
-				if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_VALUE_TYPE))
-				{
-					zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset, "%svalue_type=%d",
-							d, (int)value_type);
-					d = ",";
-				}
-				if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_DATA_TYPE))
-				{
-					zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset, "%sdata_type=%d",
-							d, (int)data_type);
-					d = ",";
-				}
-				if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_DELAY))
-				{
-					zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset, "%sdelay=%d", d, delay);
-					d = ",";
-				}
-				if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_DELAY_FLEX))
-				{
-					zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset, "%sdelay_flex='%s'",
-							d, delay_flex_esc);
-					d = ",";
-				}
-				if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_HISTORY))
-				{
-					zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset, "%shistory=%d",
-							d, history);
-					d = ",";
-				}
-				if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_TRENDS))
-				{
-					zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset, "%strends=%d", d, trends);
-					d = ",";
-				}
-				if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_TRAPPER_HOSTS))
-				{
-					zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset, "%strapper_hosts='%s'",
-							d, trapper_hosts_esc);
-					d = ",";
-				}
-				if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_UNITS))
-				{
-					zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset, "%sunits='%s'",
-							d, units_esc);
-					d = ",";
-				}
-				if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_MULTIPLIER))
-				{
-					zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset, "%smultiplier=%d",
-							d, (int)multiplier);
-					d = ",";
-				}
-				if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_DELTA))
-				{
-					zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset, "%sdelta=%d",
-							d, (int)delta);
-					d = ",";
-				}
-				if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_FORMULA))
-				{
-					zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset, "%sformula='%s'",
-							d, formula_esc);
-					d = ",";
-				}
-				if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_LOGTIMEFMT))
-				{
-					zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset, "%slogtimefmt='%s'",
-							d, logtimefmt_esc);
-					d = ",";
-				}
-				if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_VALUEMAPID))
-				{
-					zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset, "%svaluemapid=%s",
-							d, DBsql_id_ins(valuemapid));
-					d = ",";
-				}
-				if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_PARAMS))
-				{
-					params_esc = DBdyn_escape_string(item->params);
-					zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset, "%sparams='%s'",
-							d, params_esc);
-					zbx_free(params_esc);
-					d = ",";
-				}
-				if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_IPMI_SENSOR))
-				{
-					zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset, "%sipmi_sensor='%s'",
-							d, ipmi_sensor_esc);
-					d = ",";
-				}
-				if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_SNMP_COMMUNITY))
-				{
-					zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset, "%ssnmp_community='%s'",
-							d, snmp_community_esc);
-					d = ",";
-				}
-				if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_SNMP_OID))
-				{
-					snmp_oid_esc = DBdyn_escape_string(item->snmp_oid);
-					zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset, "%ssnmp_oid='%s'",
-							d, snmp_oid_esc);
-					zbx_free(snmp_oid_esc);
-					d = ",";
-				}
-				if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_PORT))
-				{
-					zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset, "%sport='%s'",
-							d, port_esc);
-					d = ",";
-				}
-				if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_SNMPV3_SECURITYNAME))
-				{
-					zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset,
-							"%ssnmpv3_securityname='%s'", d, snmpv3_securityname_esc);
-					d = ",";
-				}
-				if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_SNMPV3_SECURITYLEVEL))
-				{
-					zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset,
-							"%ssnmpv3_securitylevel=%d", d, (int)snmpv3_securitylevel);
-					d = ",";
-				}
-				if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_SNMPV3_AUTHPASSPHRASE))
-				{
-					zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset,
-							"%ssnmpv3_authpassphrase='%s'", d, snmpv3_authpassphrase_esc);
-					d = ",";
-				}
-				if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_SNMPV3_PRIVPASSPHRASE))
-				{
-					zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset,
-							"%ssnmpv3_privpassphrase='%s'", d, snmpv3_privpassphrase_esc);
-					d = ",";
-				}
+			zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset,
+					"update item_discovery"
+					" set key_='%s',"
+						"lastcheck=%d,ts_delete=0"
+					" where itemid=" ZBX_FS_UI64
+						" and parent_itemid=" ZBX_FS_UI64 ";\n",
+					key_proto_esc, lastcheck, item->itemid, parent_itemid);
 
-				if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_AUTHTYPE))
-				{
-					zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset, "%sauthtype=%d",
-							d, (int)authtype);
-					d = ",";
-				}
-				if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_USERNAME))
-				{
-					zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset, "%susername='%s'",
-							d, username_esc);
-					d = ",";
-				}
-				if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_PASSWORD))
-				{
-					zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset, "%spassword='%s'",
-							d, password_esc);
-					d = ",";
-				}
-				if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_PUBLICKEY))
-				{
-					zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset, "%spublickey='%s'",
-							d, publickey_esc);
-					d = ",";
-				}
-				if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_PRIVATEKEY))
-				{
-					zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset, "%sprivatekey='%s'",
-							d, privatekey_esc);
-					d = ",";
-				}
-				if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_DESCRIPTION))
-				{
-					zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset, "%sdescription='%s'",
-							d, description_esc);
-					d = ",";
-				}
-				if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_INTERFACEID))
-				{
-					zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset, "%sinterfaceid=%s",
-							d, DBsql_id_ins(interfaceid));
-				}
-
-				zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset, " where itemid=" ZBX_FS_UI64 ";\n",
-						item->itemid);
-			}
-
-			if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_KEY))
+			if (0 != item->del_appids_num)
 			{
 				zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset,
-						"update item_discovery"
-						" set key_='%s'"
-						" where itemid=" ZBX_FS_UI64 ";\n",
-						key_proto_esc, item->itemid);
+						"delete from items_applications"
+						" where itemid=" ZBX_FS_UI64
+							" and",
+						item->itemid);
+				DBadd_condition_alloc(&sql4, &sql4_alloc, &sql4_offset,
+						"applicationid", item->del_appids, item->del_appids_num);
+				zbx_strcpy_alloc(&sql4, &sql4_alloc, &sql4_offset, ";\n");
 			}
 		}
 
-		for (j = 0; j < item->new_applicationids.values_num; j++)
+		for (j = 0; j < item->new_appids_num; j++)
 		{
 #ifndef HAVE_MULTIROW_INSERT
 			zbx_strcpy_alloc(&sql3, &sql3_alloc, &sql3_offset, ins_items_applications_sql);
 #endif
 			zbx_snprintf_alloc(&sql3, &sql3_alloc, &sql3_offset,
 					"(" ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 ")" ZBX_ROW_DL,
-					itemappid++, item->itemid, item->new_applicationids.values[j]);
-		}
-	}
+					itemappid, item->itemid, item->new_appids[j]);
 
-	zbx_free(description_esc);
-	zbx_free(privatekey_esc);
-	zbx_free(publickey_esc);
-	zbx_free(password_esc);
-	zbx_free(username_esc);
-	zbx_free(snmpv3_privpassphrase_esc);
-	zbx_free(snmpv3_authpassphrase_esc);
-	zbx_free(snmpv3_securityname_esc);
-	zbx_free(port_esc);
-	zbx_free(snmp_community_esc);
-	zbx_free(ipmi_sensor_esc);
-	zbx_free(logtimefmt_esc);
-	zbx_free(formula_esc);
-	zbx_free(units_esc);
-	zbx_free(trapper_hosts_esc);
-	zbx_free(delay_flex_esc);
-	zbx_free(key_proto_esc);
+			itemappid++;
+		}
+
+		zbx_free(params_esc);
+		zbx_free(snmp_oid_esc);
+		zbx_free(key_esc);
+		zbx_free(name_esc);
+	}
 
 	if (0 != new_items)
 	{
@@ -1246,7 +469,7 @@ static void	DBlld_items_save(zbx_uint64_t hostid, zbx_uint64_t parent_itemid, zb
 		zbx_free(sql2);
 	}
 
-	if (0 != new_applications)
+	if (0 != new_apps)
 	{
 #ifdef HAVE_MULTIROW_INSERT
 		sql3_offset--;
@@ -1257,22 +480,12 @@ static void	DBlld_items_save(zbx_uint64_t hostid, zbx_uint64_t parent_itemid, zb
 		zbx_free(sql3);
 	}
 
-	if (0 != upd_items || 0 != del_itemappids->values_num)
+	if (new_items < items->values_num)
 	{
-		if (0 != del_itemappids->values_num)
-		{
-			zbx_strcpy_alloc(&sql4, &sql4_alloc, &sql4_offset, "delete from items_applications where");
-			DBadd_condition_alloc(&sql4, &sql4_alloc, &sql4_offset, "itemappid",
-					del_itemappids->values, del_itemappids->values_num);
-			zbx_strcpy_alloc(&sql4, &sql4_alloc, &sql4_offset, ";\n");
-		}
-
 		DBend_multiple_update(&sql4, &sql4_alloc, &sql4_offset);
 		DBexecute("%s", sql4);
 		zbx_free(sql4);
 	}
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 /******************************************************************************
@@ -1292,12 +505,10 @@ void	DBlld_update_items(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, struct zbx
 	DB_RESULT		result;
 	DB_ROW			row;
 	zbx_vector_ptr_t	items;
-	zbx_vector_uint64_t	del_itemappids;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	zbx_vector_ptr_create(&items);
-	zbx_vector_uint64_create(&del_itemappids);
 
 	result = DBselect(
 			"select i.itemid,i.name,i.key_,i.type,i.value_type,i.data_type,i.delay,i.delay_flex,"
@@ -1314,91 +525,98 @@ void	DBlld_update_items(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, struct zbx
 	while (NULL != (row = DBfetch(result)))
 	{
 		zbx_uint64_t	parent_itemid, valuemapid, interfaceid;
-		const char	*name_proto, *key_proto, *params_proto, *snmp_oid_proto, *delay_flex, *trapper_hosts,
-				*units, *formula, *logtimefmt, *ipmi_sensor, *snmp_community, *port,
-				*snmpv3_securityname, *snmpv3_authpassphrase, *snmpv3_privpassphrase, *username,
-				*password, *publickey, *privatekey, *description;
-		unsigned char	type, value_type, data_type, status, multiplier, delta, snmpv3_securitylevel, authtype;
-		int		delay, history, trends;
+		char		*key_proto_esc, *delay_flex_esc, *trapper_hosts_esc, *units_esc, *formula_esc,
+				*logtimefmt_esc, *ipmi_sensor_esc, *snmp_community_esc, *port_esc,
+				*snmpv3_securityname_esc, *snmpv3_authpassphrase_esc, *snmpv3_privpassphrase_esc,
+				*username_esc, *password_esc, *publickey_esc, *privatekey_esc, *description_esc;
+		const char	*name_proto, *key_proto, *params_proto, *snmp_oid_proto;
+		unsigned char	type, value_type, data_type, status, snmpv3_securitylevel, authtype;
+		int		delay, history, trends, multiplier, delta;
 
 		ZBX_STR2UINT64(parent_itemid, row[0]);
 		name_proto = row[1];
 		key_proto = row[2];
+		key_proto_esc = DBdyn_escape_string(key_proto);
 		type = (unsigned char)atoi(row[3]);
 		value_type = (unsigned char)atoi(row[4]);
 		data_type = (unsigned char)atoi(row[5]);
 		delay = atoi(row[6]);
-		delay_flex = row[7];
+		delay_flex_esc = DBdyn_escape_string(row[7]);
 		history = atoi(row[8]);
 		trends = atoi(row[9]);
 		status = (unsigned char)atoi(row[10]);
-		trapper_hosts = row[11];
-		units = row[12];
-		multiplier = (unsigned char)atoi(row[13]);
-		delta = (unsigned char)atoi(row[14]);
-		formula = row[15];
-		logtimefmt = row[16];
+		trapper_hosts_esc = DBdyn_escape_string(row[11]);
+		units_esc = DBdyn_escape_string(row[12]);
+		multiplier = atoi(row[13]);
+		delta = atoi(row[14]);
+		formula_esc = DBdyn_escape_string(row[15]);
+		logtimefmt_esc = DBdyn_escape_string(row[16]);
 		ZBX_DBROW2UINT64(valuemapid, row[17]);
 		params_proto = row[18];
-		ipmi_sensor = row[19];
-		snmp_community = row[20];
+		ipmi_sensor_esc = DBdyn_escape_string(row[19]);
+		snmp_community_esc = DBdyn_escape_string(row[20]);
 		snmp_oid_proto = row[21];
-		port = row[22];
-		snmpv3_securityname = row[23];
+		port_esc = DBdyn_escape_string(row[22]);
+		snmpv3_securityname_esc = DBdyn_escape_string(row[23]);
 		snmpv3_securitylevel = (unsigned char)atoi(row[24]);
-		snmpv3_authpassphrase = row[25];
-		snmpv3_privpassphrase = row[26];
+		snmpv3_authpassphrase_esc = DBdyn_escape_string(row[25]);
+		snmpv3_privpassphrase_esc = DBdyn_escape_string(row[26]);
 		authtype = (unsigned char)atoi(row[27]);
-		username = row[28];
-		password = row[29];
-		publickey = row[30];
-		privatekey = row[31];
-		description = row[32];
+		username_esc = DBdyn_escape_string(row[28]);
+		password_esc = DBdyn_escape_string(row[29]);
+		publickey_esc = DBdyn_escape_string(row[30]);
+		privatekey_esc = DBdyn_escape_string(row[31]);
+		description_esc = DBdyn_escape_string(row[32]);
 		ZBX_DBROW2UINT64(interfaceid, row[33]);
 
-		DBlld_items_get(parent_itemid, &items, type, value_type, data_type, delay, delay_flex, history, trends,
-				trapper_hosts, units, multiplier, delta, formula, logtimefmt, valuemapid, ipmi_sensor,
-				snmp_community, port, snmpv3_securityname, snmpv3_securitylevel, snmpv3_authpassphrase,
-				snmpv3_privpassphrase, authtype, username, password, publickey, privatekey, description,
-				interfaceid);
-
 		p = NULL;
-		/* {"data":[{"{#IFNAME}":"eth0"},{"{#IFNAME}":"lo"},...]} */
-		/*          ^                                             */
+		/* {"net.if.discovery":[{"{#IFNAME}":"eth0"},{"{#IFNAME}":"lo"},...]} */
+		/*                      ^                                             */
 		while (NULL != (p = zbx_json_next(jp_data, p)))
 		{
-			/* {"data":[{"{#IFNAME}":"eth0"},{"{#IFNAME}":"lo"},...]} */
-			/*          ^------------------^                          */
+			/* {"net.if.discovery":[{"{#IFNAME}":"eth0"},{"{#IFNAME}":"lo"},...]} */
+			/*                      ^------------------^                          */
 			if (FAIL == zbx_json_brackets_open(p, &jp_row))
 				continue;
 
 			if (SUCCEED != lld_check_record(&jp_row, f_macro, f_regexp, regexps, regexps_num))
 				continue;
 
-			DBlld_item_make(&items, name_proto, key_proto, type, value_type, data_type, delay, delay_flex,
-					history, trends, trapper_hosts, units, multiplier, delta, formula, logtimefmt,
-					valuemapid, params_proto, ipmi_sensor, snmp_community, snmp_oid_proto, port,
-					snmpv3_securityname, snmpv3_securitylevel, snmpv3_authpassphrase,
-					snmpv3_privpassphrase, authtype, username, password, publickey, privatekey,
-					description, interfaceid, &jp_row);
+			DBlld_make_item(hostid, parent_itemid, &items, name_proto, key_proto, type,
+					params_proto, snmp_oid_proto, &jp_row, error);
 		}
 
 		zbx_vector_ptr_sort(&items, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 
-		DBlld_applications_make(parent_itemid, &items, &del_itemappids);
+		DBlld_save_items(hostid, &items, type, value_type, data_type, delay, delay_flex_esc, history, trends,
+				status, trapper_hosts_esc, units_esc, multiplier, delta, formula_esc, logtimefmt_esc,
+				valuemapid, ipmi_sensor_esc, snmp_community_esc, port_esc, snmpv3_securityname_esc,
+				snmpv3_securitylevel, snmpv3_authpassphrase_esc, snmpv3_privpassphrase_esc, authtype,
+				username_esc, password_esc, publickey_esc, privatekey_esc, description_esc,
+				interfaceid, parent_itemid, key_proto_esc, lastcheck);
 
-		DBlld_items_save(hostid, parent_itemid, &items, key_proto, type, value_type, data_type, delay,
-				delay_flex, history, trends, status, trapper_hosts, units, multiplier, delta, formula,
-				logtimefmt, valuemapid, ipmi_sensor, snmp_community, port, snmpv3_securityname,
-				snmpv3_securitylevel, snmpv3_authpassphrase, snmpv3_privpassphrase, authtype, username,
-				password, publickey, privatekey, description, interfaceid, &del_itemappids);
+		zbx_free(description_esc);
+		zbx_free(privatekey_esc);
+		zbx_free(publickey_esc);
+		zbx_free(password_esc);
+		zbx_free(username_esc);
+		zbx_free(snmpv3_privpassphrase_esc);
+		zbx_free(snmpv3_authpassphrase_esc);
+		zbx_free(snmpv3_securityname_esc);
+		zbx_free(port_esc);
+		zbx_free(snmp_community_esc);
+		zbx_free(ipmi_sensor_esc);
+		zbx_free(logtimefmt_esc);
+		zbx_free(formula_esc);
+		zbx_free(units_esc);
+		zbx_free(trapper_hosts_esc);
+		zbx_free(delay_flex_esc);
+		zbx_free(key_proto_esc);
 
-		DBlld_items_free(&items);
-		del_itemappids.values_num = 0;
+		DBlld_clean_items(&items);
 	}
 	DBfree_result(result);
 
-	zbx_vector_uint64_destroy(&del_itemappids);
 	zbx_vector_ptr_destroy(&items);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
