@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -10,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -481,7 +481,7 @@ function check_field(&$fields, &$field, $checks) {
 		return $err;
 	}
 
-	if ((is_null($exception) || $except) && $validation && !calc_exp($fields, $field, $validation)){
+	if ((is_null($exception) || $except) && $validation && !calc_exp($fields, $field, $validation)) {
 		if ($validation == NOT_EMPTY) {
 			if ($flags&P_SYS) {
 				info(_s('Critical error. Incorrect value for field "%1$s": cannot be empty.', $caption));
@@ -512,6 +512,7 @@ function check_field(&$fields, &$field, $checks) {
 
 		return ($flags&P_SYS) ? ZBX_VALID_ERROR : ZBX_VALID_WARNING;
 	}
+
 	return ZBX_VALID_OK;
 }
 
