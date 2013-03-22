@@ -168,6 +168,7 @@ static void	DBlld_items_get(zbx_uint64_t parent_itemid, zbx_vector_ptr_t *items,
 		item->name_orig = NULL;
 		item->key = zbx_strdup(NULL, row[5]);
 		item->key_orig = NULL;
+		item->flags = __UINT64_C(0x0000000000000000);
 
 		if ((unsigned char)atoi(row[6]) != type)
 			item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_TYPE;
