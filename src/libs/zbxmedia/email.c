@@ -152,7 +152,7 @@ static char	*smtp_prepare_email_address(const char *email_option)
 }
 
 int	send_email(const char *smtp_server, const char *smtp_helo, const char *smtp_email, const char *mailto,
-		const char *mailsubject, const char *mailbody, char *error, int max_error_len)
+		const char *mailsubject, const char *mailbody, char *error, size_t max_error_len)
 {
 	const char	*__function_name = "send_email";
 
