@@ -523,15 +523,7 @@ void	DBlld_items_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *items, char **e
 }
 
 static void	DBlld_item_make(zbx_vector_ptr_t *items, const char *name_proto, const char *key_proto,
-		unsigned char type, unsigned char value_type, unsigned char data_type, int delay,
-		const char *delay_flex, int history, int trends, const char *trapper_hosts, const char *units,
-		unsigned char multiplier, unsigned char delta, const char *formula, const char *logtimefmt,
-		zbx_uint64_t valuemapid, const char *params_proto, const char *ipmi_sensor, const char *snmp_community,
-		const char *snmp_oid_proto, const char *port, const char *snmpv3_securityname,
-		unsigned char snmpv3_securitylevel, const char *snmpv3_authpassphrase,
-		const char *snmpv3_privpassphrase, unsigned char authtype, const char *username, const char *password,
-		const char *publickey, const char *privatekey, const char *description, zbx_uint64_t interfaceid,
-		struct zbx_json_parse *jp_row)
+		const char *params_proto, const char *snmp_oid_proto, struct zbx_json_parse *jp_row)
 {
 	const char	*__function_name = "DBlld_make_item";
 
@@ -1410,12 +1402,7 @@ void	DBlld_update_items(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, struct zbx
 			if (SUCCEED != lld_check_record(&jp_row, f_macro, f_regexp, regexps, regexps_num))
 				continue;
 
-			DBlld_item_make(&items, name_proto, key_proto, type, value_type, data_type, delay, delay_flex,
-					history, trends, trapper_hosts, units, multiplier, delta, formula, logtimefmt,
-					valuemapid, params_proto, ipmi_sensor, snmp_community, snmp_oid_proto, port,
-					snmpv3_securityname, snmpv3_securitylevel, snmpv3_authpassphrase,
-					snmpv3_privpassphrase, authtype, username, password, publickey, privatekey,
-					description, interfaceid, &jp_row);
+			DBlld_item_make(&items, name_proto, key_proto, params_proto, snmp_oid_proto, &jp_row);
 		}
 
 		zbx_vector_ptr_sort(&items, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
