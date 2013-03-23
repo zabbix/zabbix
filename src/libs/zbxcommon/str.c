@@ -3014,7 +3014,6 @@ bad:
  * Return value: SUCCEED if string is valid or FAIL otherwise                 *
  *                                                                            *
  ******************************************************************************/
-#include "log.h"
 int	zbx_is_utf8(const char *text)
 {
 	unsigned int	utf32;
