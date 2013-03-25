@@ -21,7 +21,7 @@
 
 #define UINT64_BIT_COUNT	(sizeof(zbx_uint64_t) << 3)
 #define UINT32_BIT_COUNT	(UINT64_BIT_COUNT >> 1)
-#define UINT32_BIT_MASK		(~((~0ULL) << UINT32_BIT_COUNT))
+#define UINT32_BIT_MASK		(~((~__UINT64_C(0)) << UINT32_BIT_COUNT))
 
 /******************************************************************************
  *                                                                            *
@@ -248,7 +248,7 @@ void	umul64_64(zbx_uint128_t *result, zbx_uint64_t value, zbx_uint64_t factor)
 void	udiv128_64(zbx_uint128_t *result, const zbx_uint128_t *dividend, zbx_uint64_t value)
 {
 	zbx_uint128_t	reminder, divisor;
-	zbx_uint64_t	result_mask = 1ULL << (UINT64_BIT_COUNT - 1);
+	zbx_uint64_t	result_mask = __UINT64_C(1) << (UINT64_BIT_COUNT - 1);
 
 	/* first handle the simple 64bit/64bit case */
 	if (0 == dividend->hi)
