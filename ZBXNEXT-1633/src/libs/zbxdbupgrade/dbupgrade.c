@@ -884,6 +884,35 @@ static int	DBpatch_02010045()
 
 	return DBadd_foreign_key("hosts", 3, &field);
 }
+
+static int	DBpatch_02010046()
+{
+	const ZBX_TABLE	table =
+			{"interface_discovery", "interfaceid", 0,
+				{
+					{"interfaceid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"parent_interfaceid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{NULL}
+				}
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_02010047()
+{
+	const ZBX_FIELD	field = {"interfaceid", NULL, "interface", "interfaceid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("interface_discovery", 1, &field);
+}
+
+static int	DBpatch_02010048()
+{
+	const ZBX_FIELD	field =
+			{"parent_interfaceid", NULL, "interface", "interfaceid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("interface_discovery", 2, &field);
+}
 #endif	/* not HAVE_SQLITE3 */
 
 static void	DBget_version(int *mandatory, int *optional)
@@ -967,11 +996,14 @@ int	DBcheck_version()
 		{DBpatch_02010043, 2010043, 0, 1},
 		{DBpatch_02010044, 2010044, 0, 1},
 		{DBpatch_02010045, 2010045, 0, 1},
+		{DBpatch_02010046, 2010046, 0, 1},
+		{DBpatch_02010047, 2010047, 0, 1},
+		{DBpatch_02010048, 2010048, 0, 1},
 		/* IMPORTANT! When adding a new mandatory DBPatch don't forget to update it for SQLite, too. */
 		{NULL}
 	};
 #else
-	required = 2010045;	/* <---- Update mandatory DBpatch for SQLite here. */
+	required = 2010048;	/* <---- Update mandatory DBpatch for SQLite here. */
 #endif
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
