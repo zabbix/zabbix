@@ -1802,6 +1802,11 @@ class testInheritanceItemPrototype extends CWebTest {
 			$this->input_type('params_es', $data['params_es']);
 		}
 
+		if (isset($data['params_f'])) {
+			$this->input_type('params_es', $data['params_es']);
+		}
+
+
 		if (isset($data['formula'])) {
 			$this->zbxTestCheckboxSelect('multiplier');
 			$this->input_type('formula', $data['formula']);
