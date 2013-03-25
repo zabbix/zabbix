@@ -27,7 +27,7 @@ define('ITEM_BAD', 1);
 /**
  * Test the creation of inheritance of new objects on a previously linked template.
  */
-class testFormtemPrototype extends CWebTest {
+class testFormItemPrototype extends CWebTest {
 
 
 	/**
@@ -55,7 +55,7 @@ class testFormtemPrototype extends CWebTest {
 	/**
 	 * Backup the tables that will be modified during the tests.
 	 */
-	public function testFormtemPrototype_Setup() {
+	public function testFormItemPrototype_Setup() {
 		DBsave_tables('items');
 	}
 	// Returns layout data
@@ -220,7 +220,7 @@ class testFormtemPrototype extends CWebTest {
 	/**
 	 * @dataProvider layout
 	 */
-	public function testFormtemPrototype_CheckLayout($data) {
+	public function testFormItemPrototype_CheckLayout($data) {
 		$this->zbxTestLogin('hosts.php');
 
 		$this->zbxTestClickWait('link='.$this->host);
@@ -765,10 +765,38 @@ class testFormtemPrototype extends CWebTest {
 		$this->assertAttribute("//input[@id='status']/@checked", 'checked');
 	}
 
+
+	// Returns update data
+	public static function update() {
+		return DBdata("select * from items where hostid = 40001 and key_ LIKE 'item-prototype-form%'");
+	}
+
+	/**
+	 * @dataProvider update
+	 */
+	public function testFormItemPrototype_SimpleUpdate($data) {
+		$name = $data['name'];
+
+		$sqlItems = "select * from items";
+		$oldHashItems = DBhash($sqlItems);
+
+		$this->zbxTestLogin('hosts.php');
+		$this->zbxTestClickWait('link='.$this->host);
+		$this->zbxTestClickWait('link=Discovery rules');
+		$this->zbxTestClickWait('link='.$this->discoveryRule);
+		$this->zbxTestClickWait('link=Item prototypes');
+		$this->zbxTestClickWait('link='.$name);
+		$this->zbxTestClickWait('save');
+		$this->checkTitle('Configuration of item prototypes');
+		$this->zbxTestTextPresent(array('Item updated', "$name", 'CONFIGURATION OF ITEM PROTOTYPES', 'Item prototypes of '.$this->discoveryRule));
+
+		$this->assertEquals($oldHashItems, DBhash($sqlItems));
+	}
+
 	/**
 	 * Restore the original tables.
 	 */
-	public function testFormtemPrototype_Teardown() {
+	public function testFormItemPrototype_Teardown() {
 		DBrestore_tables('items');
 	}
 }
