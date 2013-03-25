@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2000-2012 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1057,10 +1057,13 @@ var CScrollBar = Class.create(CDebug, {
 		this.dom.info_period.innerHTML = formatTimestamp(period, false, true);
 
 		// info left
-		this.dom.info_left.innerHTML = new CDate((usertime - period) * 1000).format(locale['S_DATE_FORMAT']);
+		var userStartTime = usertime - period;
+		this.dom.info_left.innerHTML = new CDate(userStartTime * 1000).format(locale['S_DATE_FORMAT']);
+		this.dom.info_left.setAttribute('data-timestamp', userStartTime);
 
 		// info right
 		var right_info = new CDate(usertime * 1000).format(locale['S_DATE_FORMAT']);
+		this.dom.info_right.setAttribute('data-timestamp', usertime);
 
 		if (timeControl.timeline.now()) {
 			right_info += ' (' + locale['S_NOW_SMALL'] + '!) ';
@@ -1298,7 +1301,8 @@ var CScrollBar = Class.create(CDebug, {
 		this.dom.info_left = document.createElement('span');
 		this.dom.timeline.appendChild(this.dom.info_left);
 		this.dom.info_left.className = 'info_left link';
-		this.dom.info_left.appendChild(document.createTextNode('02.07.2009 12:15:12'));
+		this.dom.info_left.appendChild(document.createTextNode('01.01.1970 00:00:00'));
+		this.dom.info_left.setAttribute('data-timestamp', 1);
 
 		var sep = document.createElement('span');
 		sep.className = 'info_sep1';
@@ -1309,7 +1313,8 @@ var CScrollBar = Class.create(CDebug, {
 		this.dom.info_right = document.createElement('span');
 		this.dom.timeline.appendChild(this.dom.info_right);
 		this.dom.info_right.className = 'info_right link';
-		this.dom.info_right.appendChild(document.createTextNode('02.07.2009 12:15:12'));
+		this.dom.info_right.appendChild(document.createTextNode('01.01.1970 00:00:00'));
+		this.dom.info_right.setAttribute('data-timestamp', 1);
 
 		// <sublevel>
 		this.dom.sublevel = document.createElement('div');
