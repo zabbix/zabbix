@@ -47,21 +47,8 @@ class CEvent extends CZBXAPI {
 	public function __construct() {
 		parent::__construct();
 
-		$this->sources = array(
-			EVENT_SOURCE_TRIGGERS => _('trigger'),
-			EVENT_SOURCE_DISCOVERY => _('discovery'),
-			EVENT_SOURCE_AUTO_REGISTRATION => _('auto registration'),
-			EVENT_SOURCE_INTERNAL => _('internal')
-		);
-
-		$this->objects = array(
-			EVENT_OBJECT_TRIGGER => _('trigger'),
-			EVENT_OBJECT_DHOST => _('discovered host'),
-			EVENT_OBJECT_DSERVICE => _('discovered service'),
-			EVENT_OBJECT_AUTOREGHOST => _('auto-registered host'),
-			EVENT_OBJECT_ITEM => _('item'),
-			EVENT_OBJECT_LLDRULE => _('low-level discovery rule')
-		);
+		$this->sources = eventSource();
+		$this->objects = eventObject();
 	}
 
 	/**
@@ -410,9 +397,24 @@ class CEvent extends CZBXAPI {
 	 * @return void
 	 */
 	protected function validateGet(array $options) {
-		$this->checkSource($options);
-		$this->checkObject($options);
-		$this->checkSourceObject($options);
+		$sourceValidator = new CSetValidator(array(
+			'values' => array_keys(eventSource())
+		));
+		if (!$sourceValidator->validate($options['source'])) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect source value.'));
+		}
+
+		$objectValidator = new CSetValidator(array(
+			'values' => array_keys(eventObject())
+		));
+		if (!$objectValidator->validate($options['object'])) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect object value.'));
+		}
+
+		$sourceObjectValidator = new CEventSourceObjectValidator();
+		if (!$sourceObjectValidator->validate(array('source' => $options['source'], 'object' => $options['object']))) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $sourceObjectValidator->getError());
+		}
 	}
 
 	/**
@@ -672,83 +674,6 @@ class CEvent extends CZBXAPI {
 		}
 
 		return $result;
-	}
-
-	/**
-	 * Validates the "source" parameter.
-	 *
-	 * @throws APIException     if the source is incorrect
-	 *
-	 * @param array $data
-	 *
-	 * @return void
-	 */
-	protected function checkSource(array $data) {
-		if (!isset($this->sources[$data['source']])) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect source value.'));
-		}
-	}
-
-	/**
-	 * Validates the "object" parameter.
-	 *
-	 * @throws APIException     if the object is incorrect
-	 *
-	 * @param array $data
-	 *
-	 * @return void
-	 */
-	protected function checkObject(array $data) {
-		if (!isset($this->objects[$data['object']])) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect object value.'));
-		}
-	}
-
-	/**
-	 * Validates the given object is supported by the source.
-	 *
-	 * @throws APIException     if the object is not supported by the source
-	 *
-	 * @param array $data
-	 *
-	 * @return void
-	 */
-	protected function checkSourceObject(array $data) {
-		$pairs = array(
-			EVENT_SOURCE_TRIGGERS => array(
-				EVENT_OBJECT_TRIGGER => 1
-			),
-			EVENT_SOURCE_DISCOVERY => array(
-				EVENT_OBJECT_DHOST => 1,
-				EVENT_OBJECT_DSERVICE => 1
-			),
-			EVENT_SOURCE_AUTO_REGISTRATION => array(
-				EVENT_OBJECT_AUTOREGHOST => 1
-			),
-			EVENT_SOURCE_INTERNAL => array(
-				EVENT_OBJECT_TRIGGER => 1,
-				EVENT_OBJECT_ITEM => 1,
-				EVENT_OBJECT_LLDRULE => 1
-			)
-		);
-
-		$objects = $pairs[$data['source']];
-		if (!isset($objects[$data['object']])) {
-			$supportedObjects = '';
-			foreach ($objects as $object => $i) {
-				$supportedObjects .= $object.' - '.$this->objects[$object].', ';
-			}
-
-			self::exception(ZBX_API_ERROR_PARAMETERS,
-				_s('Incorrect object "%1$s" (%2$s) for source "%3$s" (%4$s), only the following objects are supported: %5$s.',
-					$data['object'],
-					$this->objects[$data['object']],
-					$data['source'],
-					$this->sources[$data['source']],
-					rtrim($supportedObjects, ', ')
-				)
-			);
-		}
 	}
 
 	/**
