@@ -1188,7 +1188,7 @@ static void	process_escalations(int now)
 	DB_ESCALATION		escalation, last_escalation;
 	zbx_vector_uint64_t	escalationids;
 	char			*sql = NULL;
-	size_t			sql_alloc = ZBX_KIBIBYTE, sql_offset = 0;
+	size_t			sql_alloc = ZBX_KIBIBYTE, sql_offset;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -1241,7 +1241,7 @@ static void	process_escalations(int now)
 				esc_superseded = (escalation.actionid == last_escalation.actionid &&
 						escalation.triggerid == last_escalation.triggerid);
 
-				if (0 != esc_superseded)
+				if (1 == esc_superseded)
 				{
 					if (0 != last_escalation.r_eventid)
 					{
@@ -1316,7 +1316,6 @@ next:
 	if (0 != escalationids.values_num)
 	{
 		sql_offset = 0;
-
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "delete from escalations where");
 		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "escalationid",
 				escalationids.values, escalationids.values_num);
