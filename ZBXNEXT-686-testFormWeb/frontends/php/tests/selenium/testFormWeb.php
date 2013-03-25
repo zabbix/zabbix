@@ -38,7 +38,7 @@ class testFormWeb extends CWebTest {
 	 * Backup the tables that will be modified during the tests.
 	 */
 	public function testFormWeb_Setup() {
-		DBsave_tables('items');
+		DBsave_tables('httptest');
 	}
 
 	// Returns layout data
@@ -328,10 +328,38 @@ class testFormWeb extends CWebTest {
 		$this->assertAttribute("//input[@id='cancel']/@role", 'button');
 	}
 
+	// Returns update data
+	public static function update() {
+		return DBdata("select * from httptest where hostid = 40001 and name LIKE 'testFormWeb%'");
+	}
+
+	/**
+	 * @dataProvider update
+	 */
+	public function testFormWeb_SimpleUpdate($data) {
+		$name = $data['name'];
+
+		$sqlItems = "select * from items";
+		$oldHashItems = DBhash($sqlItems);
+
+		$this->zbxTestLogin('hosts.php');
+		$this->zbxTestClickWait('link='.$this->host);
+		$this->zbxTestClickWait('link=Web scenarios');
+		$this->zbxTestClickWait('link='.$name);
+		$this->zbxTestClickWait('save');
+
+		$this->zbxTestTextPresent('Scenario updated');
+		$this->zbxTestTextPresent("$name");
+		$this->checkTitle('Configuration of web monitoring');
+		$this->zbxTestTextPresent('CONFIGURATION OF WEB MONITORING');
+
+		$this->assertEquals($oldHashItems, DBhash($sqlItems));
+	}
+
 	/**
 	 * Restore the original tables.
 	 */
 	public function testFormWeb_Teardown() {
-		DBrestore_tables('items');
+		DBrestore_tables('httptest');
 	}
 }
