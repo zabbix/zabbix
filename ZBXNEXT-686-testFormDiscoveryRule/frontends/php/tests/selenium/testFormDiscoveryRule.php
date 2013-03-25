@@ -490,6 +490,33 @@ class testFormDiscoveryRule extends CWebTest {
 		$this->assertAttribute("//*[@id='status']/option[text()='Enabled']/@selected", 'selected');
 	}
 
+	// Returns update data
+	public static function update() {
+		return DBdata("select * from items where hostid = 40001 and key_ LIKE 'discovery-rule-form%'");
+	}
+
+	/**
+	 * @dataProvider update
+	 */
+	public function testFormDiscoveryRule_SimpleUpdate($data) {
+		$name = $data['name'];
+
+		$sqlDiscovery = 'select itemid, hostid, name, key_, delay, history, trends, value_type, formula, templateid, flags, lifetime from items';
+		$oldHashDiscovery = DBhash($sqlDiscovery);
+
+		$this->zbxTestLogin('hosts.php');
+		$this->zbxTestClickWait('link='.$this->host);
+		$this->zbxTestClickWait('link=Discovery rules');
+		$this->zbxTestClickWait('link='.$name);
+		$this->zbxTestClickWait('save');
+		$this->checkTitle('Configuration of discovery rules');
+		$this->zbxTestTextPresent('Discovery rule updated');
+		$this->zbxTestTextPresent("$name");
+
+		$this->assertEquals($oldHashDiscovery, DBhash($sqlDiscovery));
+
+	}
+
 	// Returns create data
 	public static function create() {
 		return array(
