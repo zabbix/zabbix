@@ -101,14 +101,14 @@ typedef struct
 	history_value_t	value_min;
 	history_value_t	value_avg;
 	history_value_t	value_max;
-	int		clock;
-	int		num;
-	int		disable_from;
-	unsigned char	value_type;
 	/* Currently the value sum is calculated only for values of type UINT64.   */
 	/* If required for other value types then the following member must be     */
 	/* changed to an union of some type.                                       */
 	zbx_uint128_t	value_sum;
+	int		clock;
+	int		num;
+	int		disable_from;
+	unsigned char	value_type;
 }
 ZBX_DC_TREND;
 
