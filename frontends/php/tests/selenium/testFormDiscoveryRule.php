@@ -35,14 +35,14 @@ class testFormDiscoveryRule extends CWebTest {
 	 *
 	 * @var string
 	 */
-	protected $host = 'Template inheritance test host';
+	protected $host = 'Simple form test host';
 
 	/**
 	 * The id of the test host created in the test data set.
 	 *
 	 * @var integer
 	 */
-	protected $hostid = 30001;
+	protected $hostid = 40001;
 
 
 	/**
@@ -488,6 +488,906 @@ class testFormDiscoveryRule extends CWebTest {
 		$this->assertVisible('status');
 		$this->zbxTestDropdownHasOptions('status', array('Enabled', 'Disabled', 'Not supported'));
 		$this->assertAttribute("//*[@id='status']/option[text()='Enabled']/@selected", 'selected');
+	}
+
+	// Returns create data
+	public static function create() {
+		return array(
+			array(
+				array(
+					'expected' => DISCOVERY_BAD,
+					'errors' => array(
+							'ERROR: Page received incorrect data',
+							'Warning. Incorrect value for field "Name": cannot be empty.',
+							'Warning. Incorrect value for field "Key": cannot be empty.'
+					)
+				)
+			),
+			array(
+				array(
+					'expected' => DISCOVERY_BAD,
+					'name' => 'discoveryRuleError',
+					'errors' => array(
+							'ERROR: Page received incorrect data',
+							'Warning. Incorrect value for field "Key": cannot be empty.'
+					)
+				)
+			),
+			array(
+				array(
+					'expected' => DISCOVERY_BAD,
+					'key' => 'discovery-rule-error',
+					'errors' => array(
+							'ERROR: Page received incorrect data',
+							'Warning. Incorrect value for field "Name": cannot be empty.'
+					)
+				)
+			),
+			array(
+				array(
+					'expected' => DISCOVERY_GOOD,
+					'name' => 'discoveryRuleNo1',
+					'key' => 'discovery-key-no1',
+					'formCheck' =>true,
+					'dbCheck' => true
+				)
+			),
+			array(
+				array(
+					'expected' => DISCOVERY_GOOD,
+					'name' => 'discoveryRuleNo2',
+					'key' => 'discovery-key-no2',
+					'formCheck' =>true,
+					'dbCheck' => true,
+					'remove' => true
+				)
+			),
+			array(
+				array('expected' => DISCOVERY_BAD,
+					'name' => 'discoveryRuleNo1',
+					'key' => 'discovery-key-no1',
+					'errors' => array(
+						'ERROR: Cannot add discovery rule',
+						'Item with key "discovery-key-no1" already exists on "Simple form test host".')
+				)
+			),
+			array(
+				array('expected' => DISCOVERY_BAD,
+					'name' => 'discoveryRuleError',
+					'key' => 'discovery-key-no1',
+					'errors' => array(
+						'ERROR: Cannot add discovery rule',
+						'Item with key "discovery-key-no1" already exists on "Simple form test host".')
+				)
+			),
+			// Empty timedelay
+			array(
+				array(
+					'expected' => DISCOVERY_BAD,
+					'name' => 'Discovery delay',
+					'key' => 'discovery-delay-test',
+					'delay' => 0,
+					'errors' => array(
+						'ERROR: Cannot add discovery rule',
+						'Item will not be refreshed. Please enter a correct update interval.'
+					)
+				)
+			),
+			// Incorrect timedelay
+			array(
+				array(
+					'expected' => DISCOVERY_BAD,
+					'name' => 'Discovery delay',
+					'key' => 'discovery-delay-test',
+					'delay' => '-30',
+					'errors' => array(
+						'ERROR: Page received incorrect data',
+						'Warning. Incorrect value for field "Update interval (in sec)": must be between 0 and 86400.'
+					)
+				)
+			),
+			// Incorrect timedelay
+			array(
+				array(
+					'expected' => DISCOVERY_BAD,
+					'name' => 'Discovery delay',
+					'key' => 'discovery-delay-test',
+					'delay' => 86401,
+					'errors' => array(
+						'ERROR: Page received incorrect data',
+						'Warning. Incorrect value for field "Update interval (in sec)": must be between 0 and 86400.'
+					)
+				)
+			),
+			// Empty time flex period
+			array(
+				array(
+					'expected' => DISCOVERY_BAD,
+					'name' =>'Discovery flex',
+					'key' =>'discovery-flex-test',
+					'flexPeriod' => array(
+						array('flexDelay' => '', 'flexTime' => '', 'instantCheck' => true)
+					),
+					'errors' => array(
+						'ERROR: Page received incorrect data',
+						'Warning. Incorrect value for field "New flexible interval": cannot be empty.'
+					)
+				)
+			),
+			// Incorrect flex period
+			array(
+				array(
+					'expected' => DISCOVERY_BAD,
+					'name' =>'Discovery flex',
+					'key' =>'discovery-flex-test',
+					'flexPeriod' => array(
+						array('flexTime' => '1-11,00:00-24:00', 'instantCheck' => true)
+					),
+					'errors' => array(
+						'ERROR: Invalid time period',
+						'Incorrect time period "1-11,00:00-24:00".'
+					)
+				)
+			),
+			// Incorrect flex period
+			array(
+				array(
+					'expected' => DISCOVERY_BAD,
+					'name' =>'Discovery flex',
+					'key' =>'discovery-flex-test',
+					'flexPeriod' => array(
+						array('flexTime' => '1-7,00:00-25:00', 'instantCheck' => true)
+					),
+					'errors' => array(
+						'ERROR: Invalid time period',
+						'Incorrect time period "1-7,00:00-25:00".'
+					)
+				)
+			),
+			// Incorrect flex period
+			array(
+				array(
+					'expected' => DISCOVERY_BAD,
+					'name' =>'Discovery flex',
+					'key' =>'discovery-flex-test',
+					'flexPeriod' => array(
+						array('flexTime' => '1-7,24:00-00:00', 'instantCheck' => true)
+					),
+					'errors' => array(
+						'ERROR: Invalid time period',
+						'Incorrect time period "1-7,24:00-00:00" start time must be less than end time.'
+					)
+				)
+			),
+			// Incorrect flex period
+			array(
+				array(
+					'expected' => DISCOVERY_BAD,
+					'name' =>'Discovery flex',
+					'key' =>'discovery-flex-test',
+					'flexPeriod' => array(
+						array('flexTime' => '1,00:00-24:00;2,00:00-24:00', 'instantCheck' => true)
+					),
+					'errors' => array(
+						'ERROR: Invalid time period',
+						'Incorrect time period "1,00:00-24:00;2,00:00-24:00".'
+					)
+				)
+			),
+			// Multiple flex periods
+			array(
+				array(
+					'expected' => DISCOVERY_GOOD,
+					'name' =>'Discovery flex',
+					'key' =>'discovery-flex-test',
+					'flexPeriod' => array(
+						array('flexTime' => '1,00:00-24:00'),
+						array('flexTime' => '2,00:00-24:00'),
+						array('flexTime' => '1,00:00-24:00'),
+						array('flexTime' => '2,00:00-24:00')
+					)
+				)
+			),
+			// Delay combined with flex periods
+			array(
+				array(
+					'expected' => DISCOVERY_BAD,
+					'name' =>'Discovery flex',
+					'key' =>'discovery-flex-delay',
+					'flexPeriod' => array(
+						array('flexDelay' => 0, 'flexTime' => '1,00:00-24:00'),
+						array('flexDelay' => 0, 'flexTime' => '2,00:00-24:00'),
+						array('flexDelay' => 0, 'flexTime' => '3,00:00-24:00'),
+						array('flexDelay' => 0, 'flexTime' => '4,00:00-24:00'),
+						array('flexDelay' => 0, 'flexTime' => '5,00:00-24:00'),
+						array('flexDelay' => 0, 'flexTime' => '6,00:00-24:00'),
+						array('flexDelay' => 0, 'flexTime' => '7,00:00-24:00')
+					),
+					'errors' => array(
+						'ERROR: Cannot add discovery rule',
+						'Discovery rule will not be refreshed. Please enter a correct update interval.'
+					)
+				)
+			),
+			// Delay combined with flex periods
+			array(
+				array(
+					'expected' => DISCOVERY_GOOD,
+					'name' =>'Discovery flex1',
+					'key' =>'discovery-flex-delay1',
+					'flexPeriod' => array(
+						array('flexTime' => '1,00:00-24:00'),
+						array('flexTime' => '2,00:00-24:00'),
+						array('flexTime' => '3,00:00-24:00'),
+						array('flexTime' => '4,00:00-24:00'),
+						array('flexTime' => '5,00:00-24:00'),
+						array('flexTime' => '6,00:00-24:00'),
+						array('flexTime' => '7,00:00-24:00')
+					)
+				)
+			),
+			// Delay combined with flex periods
+			array(
+				array(
+					'expected' => DISCOVERY_BAD,
+					'name' =>'Discovery flex',
+					'key' =>'discovery-flex-delay',
+					'delay' => 0,
+					'flexPeriod' => array(
+						array('flexDelay' => 0, 'flexTime' => '1,00:00-24:00'),
+						array('flexDelay' => 0, 'flexTime' => '2,00:00-24:00'),
+						array('flexDelay' => 0, 'flexTime' => '3,00:00-24:00'),
+						array('flexDelay' => 0, 'flexTime' => '4,00:00-24:00'),
+						array('flexDelay' => 0, 'flexTime' => '5,00:00-24:00'),
+						array('flexDelay' => 0, 'flexTime' => '6,00:00-24:00'),
+						array('flexDelay' => 0, 'flexTime' => '7,00:00-24:00')
+					),
+					'errors' => array(
+						'ERROR: Cannot add discovery rule',
+						'Discovery rule will not be refreshed. Please enter a correct update interval.'
+					)
+				)
+			),
+			// Delay combined with flex periods
+			array(
+				array(
+					'expected' => DISCOVERY_GOOD,
+					'name' =>'Discovery flex2',
+					'key' =>'discovery-flex-delay2',
+					'delay' => 0,
+					'flexPeriod' => array(
+						array('flexTime' => '1-5,00:00-24:00'),
+						array('flexTime' => '6-7,00:00-24:00')
+					),
+					'dbCheck' => true,
+					'formCheck' => true
+				)
+			),
+			// Delay combined with flex periods
+			array(
+				array(
+					'expected' => DISCOVERY_BAD,
+					'name' =>'Discovery flex',
+					'key' =>'discovery-flex-delay',
+					'flexPeriod' => array(
+						array('flexDelay' => 0, 'flexTime' => '1-5,00:00-24:00'),
+						array('flexDelay' => 0, 'flexTime' => '6-7,00:00-24:00')
+					),
+					'errors' => array(
+						'ERROR: Cannot add discovery rule',
+						'Discovery rule will not be refreshed. Please enter a correct update interval.'
+					)
+				)
+			),
+			// Delay combined with flex periods
+			array(
+				array(
+					'expected' => DISCOVERY_GOOD,
+					'name' =>'Discovery flex',
+					'key' =>'discovery-flex-delay3',
+					'flexPeriod' => array(
+						array('flexTime' => '1-5,00:00-24:00'),
+						array('flexTime' => '6-7,00:00-24:00')
+					)
+				)
+			),
+			// Delay combined with flex periods
+			array(
+				array(
+					'expected' => DISCOVERY_GOOD,
+					'name' =>'Discovery flex',
+					'key' =>'discovery-flex-delay4',
+					'delay' => 0,
+					'flexPeriod' => array(
+						array('flexTime' => '1-7,00:00-24:00')
+					)
+				)
+			),
+			// Delay combined with flex periods
+			array(
+				array(
+					'expected' => DISCOVERY_BAD,
+					'name' =>'Discovery flex',
+					'key' =>'discovery-flex-delay',
+					'flexPeriod' => array(
+						array('flexDelay' => 0, 'flexTime' => '1-7,00:00-24:00')
+					),
+					'errors' => array(
+						'ERROR: Cannot add discovery rule',
+						'Discovery rule will not be refreshed. Please enter a correct update interval.'
+					)
+				)
+			),
+			// Delay combined with flex periods
+			array(
+				array(
+					'expected' => DISCOVERY_GOOD,
+					'name' =>'Discovery flex',
+					'key' =>'discovery-flex-delay5',
+					'flexPeriod' => array(
+						array('flexTime' => '1-7,00:00-24:00')
+					)
+				)
+			),
+			// Delay combined with flex periods
+			array(
+				array(
+					'expected' => DISCOVERY_BAD,
+					'name' =>'Discovery flex',
+					'key' =>'discovery-flex-delay',
+					'flexPeriod' => array(
+						array('flexDelay' => 0, 'flexTime' => '1-5,00:00-24:00'),
+						array('flexDelay' => 0, 'flexTime' => '6-7,00:00-24:00'),
+						array('flexTime' => '1-5,00:00-24:00'),
+						array('flexTime' => '6-7,00:00-24:00')
+					),
+					'errors' => array(
+						'ERROR: Cannot add discovery rule',
+						'Discovery rule will not be refreshed. Please enter a correct update interval.'
+					)
+				)
+			),
+			// Delay combined with flex periods
+			array(
+				array(
+					'expected' => DISCOVERY_BAD,
+					'name' =>'Discovery flex',
+					'key' =>'discovery-flex-delay',
+					'flexPeriod' => array(
+						array('flexTime' => '1-5,00:00-24:00'),
+						array('flexTime' => '6-7,00:00-24:00'),
+						array('flexDelay' => 0, 'flexTime' => '1-5,00:00-24:00'),
+						array('flexDelay' => 0, 'flexTime' => '6-7,00:00-24:00')
+					),
+					'errors' => array(
+						'ERROR: Cannot add discovery rule',
+						'Discovery rule will not be refreshed. Please enter a correct update interval.'
+					)
+				)
+			),
+			// Delay combined with flex periods
+			array(
+				array(
+					'expected' => DISCOVERY_BAD,
+					'name' =>'Discovery flex',
+					'key' =>'discovery-flex-delay',
+					'flexPeriod' => array(
+						array('flexTime' => '1-7,00:00-24:00'),
+						array('flexDelay' => 0, 'flexTime' => '1-7,00:00-24:00')
+					),
+					'errors' => array(
+						'ERROR: Cannot add discovery rule',
+						'Discovery rule will not be refreshed. Please enter a correct update interval.'
+					)
+				)
+			),
+			// Delay combined with flex periods
+			array(
+				array(
+					'expected' => DISCOVERY_BAD,
+					'name' =>'Discovery flex',
+					'key' =>'discovery-flex-delay',
+					'flexPeriod' => array(
+						array('flexDelay' => 0, 'flexTime' => '1-7,00:00-24:00'),
+						array('flexTime' => '1-7,00:00-24:00')
+					),
+					'errors' => array(
+						'ERROR: Cannot add discovery rule',
+						'Discovery rule will not be refreshed. Please enter a correct update interval.'
+					)
+				)
+			),
+			// Delay combined with flex periods
+			array(
+				array(
+					'expected' => DISCOVERY_GOOD,
+					'name' =>'Discovery flex',
+					'key' =>'discovery-flex-delay6',
+					'flexPeriod' => array(
+						array('flexDelay' => 0, 'flexTime' => '1,00:00-24:00', 'remove' => true),
+						array('flexDelay' => 0, 'flexTime' => '2,00:00-24:00', 'remove' => true),
+						array('flexDelay' => 0, 'flexTime' => '3,00:00-24:00', 'remove' => true),
+						array('flexDelay' => 0, 'flexTime' => '4,00:00-24:00', 'remove' => true),
+						array('flexDelay' => 0, 'flexTime' => '5,00:00-24:00', 'remove' => true),
+						array('flexDelay' => 0, 'flexTime' => '6,00:00-24:00', 'remove' => true),
+						array('flexDelay' => 0, 'flexTime' => '7,00:00-24:00', 'remove' => true),
+						array('flexTime' => '1,00:00-24:00'),
+						array('flexTime' => '2,00:00-24:00'),
+						array('flexTime' => '3,00:00-24:00'),
+						array('flexTime' => '4,00:00-24:00'),
+						array('flexTime' => '5,00:00-24:00'),
+						array('flexTime' => '6,00:00-24:00'),
+						array('flexTime' => '7,00:00-24:00')
+					)
+				)
+			),
+			// Delay combined with flex periods
+			array(
+				array(
+					'expected' => DISCOVERY_GOOD,
+					'name' =>'Discovery flex',
+					'key' =>'discovery-flex-delay7',
+					'flexPeriod' => array(
+						array('flexDelay' => 0, 'flexTime' => '1-7,00:00-24:00', 'remove' => true),
+						array('flexTime' => '1-7,00:00-24:00')
+					)
+				)
+			),
+			// Delay combined with flex periods
+			array(
+				array(
+					'expected' => DISCOVERY_GOOD,
+					'name' =>'Discovery flex Check',
+					'key' =>'discovery-flex-delay8',
+					'flexPeriod' => array(
+						array('flexDelay' => 0, 'flexTime' => '1-5,00:00-24:00', 'remove' => true),
+						array('flexDelay' => 0, 'flexTime' => '6-7,00:00-24:00', 'remove' => true),
+						array('flexTime' => '1-5,00:00-24:00'),
+						array('flexTime' => '6-7,00:00-24:00')
+					),
+					'dbCheck' => true,
+					'formCheck' => true
+				)
+			),
+			array(
+				array(
+					'expected' => DISCOVERY_GOOD,
+					'name' =>'!@#$%^&*()_+-=[]{};:"|,./<>?',
+					'key' =>'discovery-symbols-test',
+					'dbCheck' => true,
+					'formCheck' => true
+				)
+			),
+			// List of all item types
+			array(
+				array(
+					'expected' => DISCOVERY_GOOD,
+					'type' => 'Zabbix agent',
+					'name' => 'Zabbix agent',
+					'key' => 'discovery-zabbix-agent',
+					'dbCheck' => true
+				)
+			),
+			array(
+				array(
+					'expected' => DISCOVERY_GOOD,
+					'type' => 'Zabbix agent (active)',
+					'name' => 'Zabbix agent (active)',
+					'key' => 'discovery-zabbix-agent-active',
+					'dbCheck' => true,
+					'formCheck' => true
+				)
+			),
+			array(
+				array(
+					'expected' => DISCOVERY_GOOD,
+					'type' => 'Simple check',
+					'name' => 'Simple check',
+					'key' => 'discovery-simple-check',
+					'dbCheck' => true
+				)
+			),
+			array(
+				array(
+					'expected' => DISCOVERY_GOOD,
+					'type' => 'SNMPv1 agent',
+					'name' => 'SNMPv1 agent',
+					'key' => 'discovery-snmpv1-agent',
+					'dbCheck' => true
+				)
+			),
+			array(
+				array(
+					'expected' => DISCOVERY_GOOD,
+					'type' => 'SNMPv2 agent',
+					'name' => 'SNMPv2 agent',
+					'key' => 'discovery-snmpv2-agent',
+					'dbCheck' => true,
+					'formCheck' => true
+				)
+			),
+			array(
+				array(
+					'expected' => DISCOVERY_GOOD,
+					'type' => 'SNMPv3 agent',
+					'name' => 'SNMPv3 agent',
+					'key' => 'discovery-snmpv3-agent',
+					'dbCheck' => true
+				)
+			),
+			array(
+				array(
+					'expected' => DISCOVERY_BAD,
+					'type' => 'SNMPv1 agent',
+					'name' => 'SNMPv1 agent',
+					'key' => 'test-item-reuse',
+					'errors' => array(
+						'ERROR: Cannot add discovery rule',
+						'Item with key "test-item-reuse" already exists on "Simple form test host".'
+					)
+				)
+			),
+			array(
+				array(
+					'expected' => DISCOVERY_BAD,
+					'type' => 'SNMPv1 agent',
+					'name' => 'SNMPv1 agent',
+					'key' => 'test-item-form1',
+					'errors' => array(
+						'ERROR: Cannot add discovery rule',
+						'Item with key "test-item-form1" already exists on "Simple form test host".'
+					)
+				)
+			),
+			array(
+				array(
+					'expected' => DISCOVERY_GOOD,
+					'type' => 'Zabbix internal',
+					'name' => 'Zabbix internal',
+					'key' => 'discovery-zabbix-internal',
+					'dbCheck' => true
+				)
+			),
+			array(
+				array(
+					'expected' => DISCOVERY_GOOD,
+					'type' => 'Zabbix trapper',
+					'name' => 'Zabbix trapper',
+					'key' => 'snmptrap.fallback',
+					'dbCheck' => true,
+					'formCheck' => true,
+					'remove' => true
+				)
+			),
+			array(
+				array(
+					'expected' => DISCOVERY_GOOD,
+					'type' => 'External check',
+					'name' => 'External check',
+					'key' => 'discovery-external-check',
+					'dbCheck' => true
+				)
+			),
+			array(
+				array(
+					'expected' => DISCOVERY_GOOD,
+					'type' => 'IPMI agent',
+					'name' => 'IPMI agent',
+					'key' => 'discovery-ipmi-agent',
+					'ipmi_sensor' => 'ipmi_sensor',
+					'dbCheck' => true,
+					'formCheck' => true,
+					'remove' => true
+				)
+			),
+			array(
+				array(
+					'expected' => DISCOVERY_GOOD,
+					'type' => 'SSH agent',
+					'name' => 'SSH agent',
+					'key' => 'discovery-ssh-agent',
+					'username' => 'zabbix',
+					'params_es' => 'executed script',
+					'dbCheck' => true,
+					'remove' => true
+				)
+			),
+			array(
+				array(
+					'expected' => DISCOVERY_GOOD,
+					'type' => 'TELNET agent',
+					'name' => 'TELNET agent',
+					'key' => 'discovery-telnet-agent',
+					'username' => 'zabbix',
+					'params_es' => 'executed script',
+					'dbCheck' => true,
+					'formCheck' => true
+				)
+			),
+			array(
+				array(
+					'expected' => DISCOVERY_BAD,
+					'type' => 'IPMI agent',
+					'name' => 'IPMI agent error',
+					'key' => 'discovery-ipmi-agent-error',
+					'errors' => array(
+							'ERROR: Page received incorrect data',
+							'Warning. Incorrect value for field "IPMI sensor": cannot be empty.'
+					)
+				)
+			),
+			array(
+				array(
+					'expected' => DISCOVERY_BAD,
+					'type' => 'SSH agent',
+					'name' => 'SSH agent error',
+					'key' => 'discovery-ssh-agent-error',
+					'errors' => array(
+							'ERROR: Page received incorrect data',
+							'Warning. Incorrect value for field "User name": cannot be empty.',
+							'Warning. Incorrect value for field "Executed script": cannot be empty.'
+					)
+				)
+			),
+			array(
+				array(
+					'expected' => DISCOVERY_BAD,
+					'type' => 'TELNET agent',
+					'name' => 'TELNET agent error',
+					'key' => 'discovery-telnet-agent-error',
+					'errors' => array(
+							'ERROR: Page received incorrect data',
+							'Warning. Incorrect value for field "User name": cannot be empty.',
+							'Warning. Incorrect value for field "Executed script": cannot be empty.'
+					)
+				)
+			),
+			array(
+				array(
+					'expected' => DISCOVERY_GOOD,
+					'type' => 'JMX agent',
+					'name' => 'JMX agent',
+					'key' => 'discovery-jmx-agent',
+					'dbCheck' => true,
+					'formCheck' => true,
+					'remove' => true
+				)
+			),
+			// Default
+			array(
+				array(
+					'expected' => DISCOVERY_BAD,
+					'type' => 'SSH agent',
+					'name' => 'SSH agent',
+					'username' => 'zabbix',
+					'params_es' => 'script to be executed',
+					'errors' => array(
+							'ERROR: Cannot add discovery rule',
+							'Check the key, please. Default example was passed.'
+					)
+				)
+			),
+			// Default
+			array(
+				array(
+					'expected' => DISCOVERY_BAD,
+					'type' => 'TELNET agent',
+					'name' => 'TELNET agent',
+					'username' => 'zabbix',
+					'params_es' => 'script to be executed',
+					'errors' => array(
+							'ERROR: Cannot add discovery rule',
+							'Check the key, please. Default example was passed.'
+					)
+				)
+			),
+			// Default
+			array(
+				array(
+					'expected' => DISCOVERY_BAD,
+					'type' => 'JMX agent',
+					'name' => 'JMX agent',
+					'username' => 'zabbix',
+					'params_es' => 'script to be executed',
+					'errors' => array(
+							'ERROR: Cannot add discovery rule',
+							'Check the key, please. Default example was passed.'
+					)
+				)
+			)
+		);
+	}
+
+	/**
+	 * @dataProvider create
+	 */
+	public function testFormDiscoveryRule_SimpleCreate($data) {
+		$this->zbxTestLogin('hosts.php');
+		$this->checkTitle('Configuration of hosts');
+		$this->zbxTestTextPresent('CONFIGURATION OF HOSTS');
+
+		$this->zbxTestClickWait('link='.$this->host);
+		$this->zbxTestClickWait('link=Discovery rules');
+		$this->zbxTestClickWait('form');
+
+		$this->checkTitle('Configuration of discovery rules');
+		$this->zbxTestTextPresent('CONFIGURATION OF DISCOVERY RULES');
+		$this->zbxTestTextPresent('Discovery rule');
+
+		if (isset($data['type'])) {
+			$this->zbxTestDropdownSelect('type', $data['type']);
+		}
+		$type = $this->getSelectedLabel('type');
+
+		switch ($type) {
+			case 'Zabbix agent':
+			case 'Simple check':
+			case 'SNMPv1 agent':
+			case 'SNMPv2 agent':
+			case 'SNMPv3 agent':
+			case 'SNMP trap':
+			case 'External check':
+			case 'IPMI agent':
+			case 'SSH agent':
+			case 'TELNET agent':
+			case 'JMX agent':
+				$interfaceid = $this->getSelectedLabel('interfaceid');
+				break;
+			default:
+				$this->assertNotVisible('interfaceid');
+		}
+
+		if (isset($data['name'])) {
+			$this->input_type('name', $data['name']);
+		}
+		$name = $this->getValue('name');
+
+		if (isset($data['key'])) {
+			$this->input_type('key', $data['key']);
+		}
+		$key = $this->getValue('key');
+
+		if (isset($data['username'])) {
+			$this->input_type('username', $data['username']);
+		}
+
+		if (isset($data['ipmi_sensor'])) {
+			$this->input_type('ipmi_sensor', $data['ipmi_sensor']);
+		}
+
+		if (isset($data['params_f'])) {
+			$this->input_type('params_f', $data['params_f']);
+		}
+
+		if (isset($data['params_es'])) {
+			$this->input_type('params_es', $data['params_es']);
+		}
+
+		if (isset($data['formula'])) {
+			$this->zbxTestCheckboxSelect('multiplier');
+			$this->input_type('formula', $data['formula']);
+		}
+
+		if (isset($data['delay']))	{
+			$this->input_type('delay', $data['delay']);
+		}
+
+		$itemFlexFlag = true;
+		if (isset($data['flexPeriod'])) {
+			foreach ($data['flexPeriod'] as $period) {
+				$this->input_type('new_delay_flex_period', $period['flexTime']);
+
+				if (isset($period['flexDelay'])) {
+					$this->input_type('new_delay_flex_delay', $period['flexDelay']);
+				}
+				$this->zbxTestClickWait('add_delay_flex');
+
+				if (isset($period['instantCheck'])) {
+					foreach ($data['errors'] as $msg) {
+						$this->zbxTestTextPresent($msg);
+					}
+					$itemFlexFlag = false;
+				}
+				if (isset($period['remove'])) {
+					$this->zbxTestClick('remove');
+					sleep(1);
+				}
+			}
+		}
+
+		if (isset($data['history'])) {
+			$this->input_type('history', $data['history']);
+		}
+
+		if (isset($data['trends'])) {
+			$this->input_type('trends', $data['trends']);
+		}
+
+		if ($itemFlexFlag == true) {
+			$this->zbxTestClickWait('save');
+			$expected = $data['expected'];
+			switch ($expected) {
+				case DISCOVERY_GOOD:
+					$this->zbxTestTextPresent('Discovery rule created');
+					$this->checkTitle('Configuration of discovery rules');
+					$this->zbxTestTextPresent('CONFIGURATION OF DISCOVERY RULES');
+					$this->zbxTestTextPresent(array('Item prototypes',  'Trigger prototypes', 'Graph prototypes'));
+					break;
+
+				case DISCOVERY_BAD:
+					$this->checkTitle('Configuration of discovery rules');
+					$this->zbxTestTextPresent(array('CONFIGURATION OF DISCOVERY RULES','Discovery rule'));
+					foreach ($data['errors'] as $msg) {
+						$this->zbxTestTextPresent($msg);
+					}
+					$this->zbxTestTextPresent(array('Name', 'Type', 'Key'));
+					break;
+			}
+		}
+
+		if (isset($data['formCheck'])) {
+			$this->zbxTestOpenWait('hosts.php');
+			$this->zbxTestClickWait('link='.$this->host);
+			$this->zbxTestClickWait('link=Discovery rules');
+
+			if (isset ($data['dbName'])) {
+				$dbName = $data['dbName'];
+			}
+			else {
+				$dbName = $name;
+			}
+			$this->zbxTestClick("link=$dbName");
+			$this->wait();
+			$this->assertAttribute("//input[@id='name']/@value", 'exact:'.$name);
+			$this->assertAttribute("//input[@id='key']/@value", 'exact:'.$key);
+			$this->assertElementPresent("//select[@id='type']/option[text()='$type']");
+			switch ($type) {
+				case 'Zabbix agent':
+				case 'Simple check':
+				case 'SNMPv1 agent':
+				case 'SNMPv2 agent':
+				case 'SNMPv3 agent':
+				case 'SNMP trap':
+				case 'External check':
+				case 'IPMI agent':
+				case 'SSH agent':
+				case 'TELNET agent':
+				case 'JMX agent':
+			$this->assertElementPresent("//select[@id='interfaceid']/optgroup/option[text()='".$interfaceid."']");
+					break;
+				default:
+					$this->assertNotVisible('interfaceid');
+			}
+		}
+
+		if (isset($data['dbCheck'])) {
+			$result = DBselect("SELECT name, key_ FROM items where name = '".$name."' and hostid = ".$this->hostid);
+			while ($row = DBfetch($result)) {
+				$this->assertEquals($row['name'], $name);
+				$this->assertEquals($row['key_'], $key);
+			}
+		}
+
+		if (isset($data['remove'])) {
+			$result = DBselect("SELECT itemid FROM items where name = '".$name."' and hostid = ".$this->hostid);
+			while ($row = DBfetch($result)) {
+				$itemId = $row['itemid'];
+			}
+
+			$this->zbxTestOpenWait('hosts.php');
+			$this->zbxTestClickWait('link='.$this->host);
+			$this->zbxTestClickWait("link=Discovery rules");
+
+			$this->zbxTestCheckboxSelect("g_hostdruleid_$itemId");
+			$this->zbxTestDropdownSelect('go', 'Delete selected');
+			$this->zbxTestClick('goButton');
+
+			$this->getConfirmation();
+			$this->wait();
+			$this->zbxTestTextPresent('Discovery rules deleted');
+			$this->zbxTestTextNotPresent($name);
+
+		}
 	}
 
 	/**
