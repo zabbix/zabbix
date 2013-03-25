@@ -61,7 +61,7 @@ class testFormItemPrototype extends CWebTest {
 	// Returns layout data
 	public static function layout() {
 		return array(
-		/*	array(
+			array(
 				array('type' => 'Zabbix agent')
 			),
 			array(
@@ -213,7 +213,7 @@ class testFormItemPrototype extends CWebTest {
 			),
 			array(
 				array('type' => 'Calculated')
-			)*/
+			)
 		);
 	}
 
@@ -774,7 +774,7 @@ class testFormItemPrototype extends CWebTest {
 	/**
 	 * @dataProvider update
 	 */
-/*	public function testFormItemPrototype_SimpleUpdate($data) {
+	public function testFormItemPrototype_SimpleUpdate($data) {
 		$name = $data['name'];
 
 		$sqlItems = "select * from items";
@@ -792,7 +792,7 @@ class testFormItemPrototype extends CWebTest {
 
 		$this->assertEquals($oldHashItems, DBhash($sqlItems));
 	}
-*/
+
 	// Returns create data
 	public static function create() {
 		return array(
@@ -803,7 +803,7 @@ class testFormItemPrototype extends CWebTest {
 					'key' => 'vfs.file.cksum[/sbin/shutdown]',
 					'dbName' => 'Checksum of /sbin/shutdown',
 					'dbCheck' => true,
-					'hostCheck' =>true
+					'formCheck' =>true
 				)
 			),
 			// Duplicate item
@@ -897,7 +897,7 @@ class testFormItemPrototype extends CWebTest {
 				)
 			),
 			// Incorrect formula
-	/*		array(
+			array(
 				array(
 					'expected' => ITEM_BAD,
 					'name' => 'Item formula',
@@ -1148,7 +1148,7 @@ class testFormItemPrototype extends CWebTest {
 						array('flexTime' => '6-7,00:00-24:00')
 					),
 					'dbCheck' => true,
-					'hostCheck' => true
+					'formCheck' => true
 				)
 			),
 			// Delay combined with flex periods
@@ -1334,7 +1334,7 @@ class testFormItemPrototype extends CWebTest {
 						array('flexTime' => '6-7,00:00-24:00')
 					),
 					'dbCheck' => true,
-					'hostCheck' => true
+					'formCheck' => true
 				)
 			),
 			// History
@@ -1389,7 +1389,7 @@ class testFormItemPrototype extends CWebTest {
 					'key' => 'item-trends-empty',
 					'trends' => '',
 					'dbCheck' => true,
-					'hostCheck' => true
+					'formCheck' => true
 				)
 			),
 			// Trends
@@ -1426,7 +1426,7 @@ class testFormItemPrototype extends CWebTest {
 					'key' => 'item-trends-test',
 					'trends' => 'trends',
 					'dbCheck' => true,
-					'hostCheck' => true
+					'formCheck' => true
 				)
 			),
 			array(
@@ -1435,7 +1435,7 @@ class testFormItemPrototype extends CWebTest {
 					'name' => '!@#$%^&*()_+-=[]{};:"|,./<>?',
 					'key' => 'item-symbols-test',
 					'dbCheck' => true,
-					'hostCheck' => true
+					'formCheck' => true
 				)
 			),
 			array(
@@ -1443,43 +1443,46 @@ class testFormItemPrototype extends CWebTest {
 					'expected' => ITEM_GOOD,
 					'name' => 'itemSimple',
 					'key' => 'key-template-simple',
-					'hostCheck' => true,
-					'dbCheck' => true)
+					'formCheck' => true,
+					'dbCheck' => true
+				)
 			),
 			array(
 				array(
 					'expected' => ITEM_GOOD,
 					'name' => 'itemName',
 					'key' => 'key-template-item',
-					'hostCheck' => true)
+					'formCheck' => true
+				)
 			),
 			array(
 				array(
 					'expected' => ITEM_GOOD,
 					'name' => 'itemTrigger',
 					'key' => 'key-template-trigger',
-					'hostCheck' => true,
+					'formCheck' => true,
 					'dbCheck' => true,
-					'remove' => true)
+					'remove' => true
+				)
 			),
 			array(
 				array(
 					'expected' => ITEM_GOOD,
 					'name' => 'itemRemove',
 					'key' => 'key-template-remove',
-					'hostCheck' => true,
+					'formCheck' => true,
 					'dbCheck' => true,
-					'hostRemove' => true,
 					'remove' => true)
 			),
 			array(
 				array(
 					'expected' => ITEM_BAD,
 					'name' => 'itemInheritance',
-					'key' => 'key-item-inheritance',
+					'key' => 'test-item-reuse',
 					'errors' => array(
 						'ERROR: Cannot add item',
-						'Item with key "key-item-inheritance" already exists on "Inheritance test template".')
+						'Item with key "test-item-reuse" already exists on "Simple form test host".'
+					)
 				)
 			),
 			// List of all item types
@@ -1695,7 +1698,8 @@ class testFormItemPrototype extends CWebTest {
 					'name' => 'JMX agent',
 					'key' => 'proto-jmx-agent',
 					'dbCheck' => true,
-					'formCheck' => true
+					'formCheck' => true,
+					'remove' => true
 				)
 			),
 			array(
@@ -1706,7 +1710,8 @@ class testFormItemPrototype extends CWebTest {
 					'key' => 'item-calculated',
 					'params_f' => 'formula',
 					'dbCheck' => true,
-					'formCheck' => true
+					'formCheck' => true,
+					'remove' => true
 				)
 			),
 			array(
@@ -1774,7 +1779,7 @@ class testFormItemPrototype extends CWebTest {
 							'Check the key, please. Default example was passed.'
 					)
 				)
-			)*/
+			)
 		);
 	}
 
@@ -1800,6 +1805,7 @@ class testFormItemPrototype extends CWebTest {
 		if (isset($data['type'])) {
 			$this->zbxTestDropdownSelect('type', $data['type']);
 		}
+		$type = $this->getSelectedLabel('type');
 
 		if (isset($data['name'])) {
 			$this->input_type('name', $data['name']);
@@ -1821,6 +1827,10 @@ class testFormItemPrototype extends CWebTest {
 
 		if (isset($data['params_es'])) {
 			$this->input_type('params_es', $data['params_es']);
+		}
+
+		if (isset($data['params_f'])) {
+			$this->input_type('params_f', $data['params_f']);
 		}
 
 		if (isset($data['formula'])) {
@@ -1863,7 +1873,24 @@ class testFormItemPrototype extends CWebTest {
 			$this->input_type('trends', $data['trends']);
 		}
 
-		$type = $this->getSelectedLabel('type');
+		switch ($type) {
+			case 'Zabbix agent':
+			case 'Simple check':
+			case 'SNMPv1 agent':
+			case 'SNMPv2 agent':
+			case 'SNMPv3 agent':
+			case 'SNMP trap':
+			case 'External check':
+			case 'IPMI agent':
+			case 'SSH agent':
+			case 'TELNET agent':
+			case 'JMX agent':
+				$interfaceid = $this->getSelectedLabel('interfaceid');
+				break;
+			default:
+				$this->assertNotVisible('interfaceid');
+		}
+
 		$value_type = $this->getSelectedLabel('value_type');
 		$data_type = $this->getSelectedLabel('data_type');
 
@@ -1892,46 +1919,57 @@ class testFormItemPrototype extends CWebTest {
 			}
 		}
 
-	/*	if (isset($data['hostCheck'])) {
+		if (isset($data['formCheck'])) {
 			$this->zbxTestOpenWait('hosts.php');
 			$this->zbxTestClickWait('link='.$this->host);
 			$this->zbxTestClickWait("link=Discovery rules");
 			$this->zbxTestClickWait('link='.$this->discoveryRule);
 			$this->zbxTestClickWait("link=Item prototypes");
 
-
 			if (isset ($data['dbName'])) {
 				$itemNameDB = $data['dbName'];
-				$this->zbxTestTextPresent($this->template.": $itemNameDB");
+				$this->zbxTestTextPresent($itemNameDB);
 				$this->zbxTestClickWait("link=$itemNameDB");
 			}
 			else {
-				$this->zbxTestTextPresent($this->template.": $itemName");
+				$this->zbxTestTextPresent($itemName);
 				$this->zbxTestClickWait("link=$itemName");
 			}
 
-			$this->zbxTestTextPresent('Parent items');
-			$this->assertElementPresent('link='.$this->template);
 			$this->assertElementValue('name', $itemName);
 			$this->assertElementValue('key', $keyName);
+			$this->assertElementPresent("//select[@id='type']/option[text()='$type']");
+			switch ($type) {
+				case 'Zabbix agent':
+				case 'Simple check':
+				case 'SNMPv1 agent':
+				case 'SNMPv2 agent':
+				case 'SNMPv3 agent':
+				case 'SNMP trap':
+				case 'External check':
+				case 'IPMI agent':
+				case 'SSH agent':
+				case 'TELNET agent':
+				case 'JMX agent':
+			$this->assertElementPresent("//select[@id='interfaceid']/optgroup/option[text()='".$interfaceid."']");
+					break;
+				default:
+					$this->assertNotVisible('interfaceid');
+			}
+			$this->assertElementPresent("//select[@id='value_type']/option[text()='$value_type']");
+			$this->assertElementPresent("//select[@id='data_type']/option[text()='$data_type']");
 		}
 
 		if (isset($data['dbCheck'])) {
-			// template
-			$result = DBselect("SELECT name, key_, hostid FROM items where name = '".$itemName."' and hostid = ".$this->templateid);
-			while ($row = DBfetch($result)) {
-				$this->assertEquals($row['name'], $itemName);
-				$this->assertEquals($row['key_'], $keyName);
-			}
-			// host
 			$result = DBselect("SELECT name, key_ FROM items where name = '".$itemName."'  AND hostid = ".$this->hostid);
+
 			while ($row = DBfetch($result)) {
 				$this->assertEquals($row['name'], $itemName);
 				$this->assertEquals($row['key_'], $keyName);
 			}
 		}
 
-		if (isset($data['hostRemove'])) {
+		if (isset($data['remove'])) {
 			$result = DBselect("SELECT name, key_, itemid FROM items where name = '".$itemName."'  AND hostid = ".$this->hostid);
 			while ($row = DBfetch($result)) {
 				$itemId = $row['itemid'];
@@ -1949,30 +1987,9 @@ class testFormItemPrototype extends CWebTest {
 
 			$this->getConfirmation();
 			$this->wait();
-			$this->zbxTestTextPresent(array('ERROR: Cannot delete items', 'Cannot delete templated items'));
-		}
-
-		if (isset($data['remove'])) {
-			$result = DBselect("SELECT itemid FROM items where name = '".$itemName."' and hostid = ".$this->templateid);
-			while ($row = DBfetch($result)) {
-				$itemId = $row['itemid'];
-			}
-
-			$this->zbxTestOpenWait('templates.php');
-			$this->zbxTestClickWait('link='.$this->template);
-			$this->zbxTestClickWait("link=Discovery rules");
-			$this->zbxTestClickWait('link='.$this->discoveryRule);
-			$this->zbxTestClickWait("link=Item prototypes");
-
-			$this->zbxTestCheckboxSelect("group_itemid_$itemId");
-			$this->zbxTestDropdownSelect('go', 'Delete selected');
-			$this->zbxTestClick('goButton');
-
-			$this->getConfirmation();
-			$this->wait();
 			$this->zbxTestTextPresent('Items deleted');
-			$this->zbxTestTextNotPresent($this->template.": $itemName");
-		}*/
+			$this->zbxTestTextNotPresent($itemName);
+		}
 	}
 
 	/**
