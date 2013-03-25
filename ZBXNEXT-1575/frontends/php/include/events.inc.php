@@ -19,14 +19,63 @@
 **/
 
 
-function event_source2str($sourceid) {
-	switch ($sourceid) {
-		case EVENT_SOURCE_TRIGGERS:
-			return _('Triggers');
-		case EVENT_SOURCE_DISCOVERY:
-			return _('Discovery');
-		default:
-			return _('Unknown');
+/**
+ * Returns the names of supported event sources.
+ *
+ * If the $source parameter is passed, returns the name of the specific source, otherwise - returns an array of all
+ * supported sources.
+ *
+ * @param int $source
+ *
+ * @return array|string
+ */
+function eventSource($source = null) {
+	$sources = array(
+		EVENT_SOURCE_TRIGGERS => _('trigger'),
+		EVENT_SOURCE_DISCOVERY => _('discovery'),
+		EVENT_SOURCE_AUTO_REGISTRATION => _('auto registration'),
+		EVENT_SOURCE_INTERNAL => _('internal')
+	);
+
+	if ($source === null) {
+		return $sources;
+	}
+	elseif (isset($sources[$source])) {
+		return $sources[$source];
+	}
+	else {
+		return _('Unknown');
+	}
+}
+
+/**
+ * Returns the names of supported event objects.
+ *
+ * If the $source parameter is passed, returns the name of the specific object, otherwise - returns an array of all
+ * supported objects.
+ *
+ * @param int $object
+ *
+ * @return array|string
+ */
+function eventObject($object = null) {
+	$objects = array(
+		EVENT_OBJECT_TRIGGER => _('trigger'),
+		EVENT_OBJECT_DHOST => _('discovered host'),
+		EVENT_OBJECT_DSERVICE => _('discovered service'),
+		EVENT_OBJECT_AUTOREGHOST => _('auto-registered host'),
+		EVENT_OBJECT_ITEM => _('item'),
+		EVENT_OBJECT_LLDRULE => _('low-level discovery rule')
+	);
+
+	if ($object === null) {
+		return $objects;
+	}
+	elseif (isset($objects[$object])) {
+		return $objects[$object];
+	}
+	else {
+		return _('Unknown');
 	}
 }
 
