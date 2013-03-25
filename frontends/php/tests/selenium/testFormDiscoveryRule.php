@@ -1282,10 +1282,6 @@ class testFormDiscoveryRule extends CWebTest {
 			$this->input_type('ipmi_sensor', $data['ipmi_sensor']);
 		}
 
-		if (isset($data['params_f'])) {
-			$this->input_type('params_f', $data['params_f']);
-		}
-
 		if (isset($data['params_es'])) {
 			$this->input_type('params_es', $data['params_es']);
 		}
