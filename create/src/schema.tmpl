@@ -1176,6 +1176,10 @@ FIELD		|host		|t_varchar(64)	|''	|NOT NULL	|ZBX_NODATA
 FIELD		|lastcheck	|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
 FIELD		|ts_delete	|t_time		|'0'	|NOT NULL	|ZBX_NODATA
 
+TABLE|interface_discovery|interfaceid|ZBX_SYNC
+FIELD		|interfaceid	|t_id		|	|NOT NULL	|ZBX_SYNC		|1|interface
+FIELD		|parent_interfaceid|t_id	|	|NOT NULL	|ZBX_SYNC		|2|interface	|interfaceid
+
 TABLE|profiles|profileid|0
 FIELD		|profileid	|t_id		|	|NOT NULL	|0
 FIELD		|userid		|t_id		|	|NOT NULL	|0			|1|users
@@ -1221,4 +1225,4 @@ UNIQUE		|1		|userid
 TABLE|dbversion||
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|2010045	|2010045
+ROW		|2010048	|2010048
