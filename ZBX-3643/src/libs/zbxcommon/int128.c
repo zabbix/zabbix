@@ -32,12 +32,10 @@
  * Parameters: base   - [IN,OUT] the integer to decrement.                    *
  *             value  - [IN] the value to decrement by.                       *
  *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  * Author: Andris Zeila                                                       *
  *                                                                            *
  ******************************************************************************/
-static void udec128_128(zbx_uint128_t *base, const zbx_uint128_t *value)
+static void	udec128_128(zbx_uint128_t *base, const zbx_uint128_t *value)
 {
 	zbx_uint64_t	lo = base->lo;
 
@@ -56,12 +54,10 @@ static void udec128_128(zbx_uint128_t *base, const zbx_uint128_t *value)
  * Parameters: base  - [IN,OUT] the inital value and result                   *
  *             bits  - [IN] the number of bits to shift for.                  *
  *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  * Author: Andris Zeila                                                       *
  *                                                                            *
  ******************************************************************************/
-static void ushiftr128(zbx_uint128_t *base, unsigned int bits)
+static void	ushiftr128(zbx_uint128_t *base, unsigned int bits)
 {
 	if (0 == bits)
 		return;
@@ -89,12 +85,10 @@ static void ushiftr128(zbx_uint128_t *base, unsigned int bits)
  * Parameters: base  - [IN,OUT] the inital value and result                   *
  *             bits  - [IN] the number of bits to shift for.                  *
  *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  * Author: Andris Zeila                                                       *
  *                                                                            *
  ******************************************************************************/
-static void ushiftl128(zbx_uint128_t *base, unsigned int bits)
+static void	ushiftl128(zbx_uint128_t *base, unsigned int bits)
 {
 	if (0 == bits)
 		return;
@@ -128,7 +122,7 @@ static void ushiftl128(zbx_uint128_t *base, unsigned int bits)
  * Author: Andris Zeila                                                       *
  *                                                                            *
  ******************************************************************************/
-static int ucmp128_128(const zbx_uint128_t *value1, const zbx_uint128_t *value2)
+static int	ucmp128_128(const zbx_uint128_t *value1, const zbx_uint128_t *value2)
 {
 	if (value1->hi != value2->hi)
 		return value1->hi < value2->hi ? -1 : 1;
@@ -150,14 +144,12 @@ static int ucmp128_128(const zbx_uint128_t *value1, const zbx_uint128_t *value2)
  *             shift  - [IN] the number of bits to shift the result by before *
  *                      adding it to the base value.                          *
  *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  * Comments: This is a helper function for umul64_64 implementation.          *
  *                                                                            *
  * Author: Andris Zeila                                                       *
  *                                                                            *
  ******************************************************************************/
-static void umul64_32_shift(zbx_uint128_t *base, zbx_uint64_t value, zbx_uint64_t factor, int shift)
+static void	umul64_32_shift(zbx_uint128_t *base, zbx_uint64_t value, zbx_uint64_t factor, int shift)
 {
 	zbx_uint128_t	buffer;
 
@@ -180,12 +172,10 @@ static void umul64_32_shift(zbx_uint128_t *base, zbx_uint64_t value, zbx_uint64_
  * Parameters: base   - [IN,OUT] the integer to increment.                    *
  *             value  - [IN] the value to increment by.                       *
  *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  * Author: Andris Zeila                                                       *
  *                                                                            *
  ******************************************************************************/
-void uinc128_64(zbx_uint128_t *base, zbx_uint64_t value)
+void	uinc128_64(zbx_uint128_t *base, zbx_uint64_t value)
 {
 	zbx_uint64_t	low = base->lo;
 
@@ -205,12 +195,10 @@ void uinc128_64(zbx_uint128_t *base, zbx_uint64_t value)
  * Parameters: base   - [IN,OUT] the integer to increment.                    *
  *             value  - [IN] the value to increment by.                       *
  *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  * Author: Andris Zeila                                                       *
  *                                                                            *
  ******************************************************************************/
-void uinc128_128(zbx_uint128_t *base, const zbx_uint128_t *value)
+void	uinc128_128(zbx_uint128_t *base, const zbx_uint128_t *value)
 {
 	zbx_uint64_t	low = base->lo;
 
@@ -231,12 +219,10 @@ void uinc128_128(zbx_uint128_t *base, const zbx_uint128_t *value)
  *             value  - [IN] the value to multiply.                           *
  *             factor - [IN] the factor to multiply by.                       *
  *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  * Author: Andris Zeila                                                       *
  *                                                                            *
  ******************************************************************************/
-void umul64_64(zbx_uint128_t *result, zbx_uint64_t value, zbx_uint64_t factor)
+void	umul64_64(zbx_uint128_t *result, zbx_uint64_t value, zbx_uint64_t factor)
 {
 	uset128(result, 0, 0);
 	/* multiply the value with lower double word of factor and add the result */
@@ -256,12 +242,10 @@ void umul64_64(zbx_uint128_t *result, zbx_uint64_t value, zbx_uint64_t factor)
  *             dividend  - [IN] the dividend.                                 *
  *             value     - [IN] the divisor.                                  *
  *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  * Author: Andris Zeila                                                       *
  *                                                                            *
  ******************************************************************************/
-void udiv128_64(zbx_uint128_t *result, const zbx_uint128_t *dividend, zbx_uint64_t value)
+void	udiv128_64(zbx_uint128_t *result, const zbx_uint128_t *dividend, zbx_uint64_t value)
 {
 	zbx_uint128_t	reminder, divisor;
 	zbx_uint64_t	result_mask = 1ULL << (UINT64_BIT_COUNT - 1);
