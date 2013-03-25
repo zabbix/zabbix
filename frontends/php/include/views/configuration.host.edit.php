@@ -152,7 +152,7 @@ $clear_templates = array_diff($clear_templates, array_keys($templates));
 natcasesort($templates);
 
 // whether this is a discovered host
-$isDiscovered = ($dbHost['flags'] == ZBX_FLAG_DISCOVERY_CREATED && get_request('form') == 'update');
+$isDiscovered = (get_request('hostid') && $dbHost['flags'] == ZBX_FLAG_DISCOVERY_CREATED && get_request('form') == 'update');
 
 $frmHost = new CForm();
 $frmHost->setName('web.hosts.host.php.');
