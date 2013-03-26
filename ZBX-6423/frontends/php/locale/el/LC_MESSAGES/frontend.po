@@ -13327,8 +13327,8 @@ msgstr "Zabbix %s Πνευματικά δικαιώματα %s-%s από Zabbix 
 
 #: include/views/general.login.php:47
 #, php-format
-msgid "Zabbix %s Copyright 2001-2012 by Zabbix SIA"
-msgstr "Zabbix %s Πνευματικά δικαιώματα 2001-2012 απο Zabbix SIA"
+msgid "Zabbix %s Copyright 2001-2013 by Zabbix SIA"
+msgstr "Zabbix %s Πνευματικά δικαιώματα 2001-2013 απο Zabbix SIA"
 
 #: include/users.inc.php:40
 msgid "Zabbix Admin"

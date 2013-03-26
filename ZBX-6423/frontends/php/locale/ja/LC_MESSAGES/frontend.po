@@ -13299,8 +13299,8 @@ msgstr "Zabbix %s Copyright %s-%s by Zabbix SIA"
 
 #: include/views/general.login.php:47
 #, php-format
-msgid "Zabbix %s Copyright 2001-2012 by Zabbix SIA"
-msgstr "Zabbix %s Copyright 2001-2012 by Zabbix SIA"
+msgid "Zabbix %s Copyright 2001-2013 by Zabbix SIA"
+msgstr "Zabbix %s Copyright 2001-2013 by Zabbix SIA"
 
 #: include/users.inc.php:40
 msgid "Zabbix Admin"
