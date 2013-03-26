@@ -26,6 +26,7 @@
 typedef struct
 {
 	zbx_uint64_t		itemid;
+#define ZBX_FLAG_LLD_ITEM_UNSET				__UINT64_C(0x0000000000000000)
 #define ZBX_FLAG_LLD_ITEM_DISCOVERED			__UINT64_C(0x0000000000000001)
 #define ZBX_FLAG_LLD_ITEM_UPDATE_NAME			__UINT64_C(0x0000000000000002)
 #define ZBX_FLAG_LLD_ITEM_UPDATE_KEY			__UINT64_C(0x0000000000000004)
@@ -119,7 +120,7 @@ static void	DBlld_items_free(zbx_vector_ptr_t *items)
  *                                                                            *
  * Function: DBlld_items_get                                                  *
  *                                                                            *
- * Purpose: retrieves existing hosts for the specified host prototype         *
+ * Purpose: retrieves existing items for the specified item prototype         *
  *                                                                            *
  * Parameters: parent_itemid - [IN] item prototype identificator              *
  *             items         - [OUT] list of items                            *
@@ -168,7 +169,7 @@ static void	DBlld_items_get(zbx_uint64_t parent_itemid, zbx_vector_ptr_t *items,
 		item->name_orig = NULL;
 		item->key = zbx_strdup(NULL, row[5]);
 		item->key_orig = NULL;
-		item->flags = __UINT64_C(0x0000000000000000);
+		item->flags = ZBX_FLAG_LLD_ITEM_UNSET;
 
 		if ((unsigned char)atoi(row[6]) != type)
 			item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_TYPE;
@@ -315,7 +316,7 @@ static void	DBlld_applications_get(zbx_uint64_t parent_itemid, zbx_vector_uint64
  * Function: DBlld_validate_item_field                                        *
  *                                                                            *
  ******************************************************************************/
-void	DBlld_validate_item_field(zbx_lld_item_t *item, char **field, char **field_orig, zbx_uint64_t flag,
+static void	DBlld_validate_item_field(zbx_lld_item_t *item, char **field, char **field_orig, zbx_uint64_t flag,
 		size_t field_len, char **error)
 {
 	if (0 == (item->flags & ZBX_FLAG_LLD_ITEM_DISCOVERED))
@@ -328,7 +329,7 @@ void	DBlld_validate_item_field(zbx_lld_item_t *item, char **field, char **field_
 	if (SUCCEED != zbx_is_utf8(*field))
 	{
 		zbx_replace_invalid_utf8(*field);
-		*error = zbx_strdcatf(*error, "Cannot %s item: value \"%s\" has invalid UTF8 sequence.\n",
+		*error = zbx_strdcatf(*error, "Cannot %s item: value \"%s\" has invalid UTF-8 sequence.\n",
 				(0 != item->itemid ? "update" : "create"), *field);
 	}
 	else if (zbx_strlen_utf8(*field) > field_len)
@@ -341,7 +342,7 @@ void	DBlld_validate_item_field(zbx_lld_item_t *item, char **field, char **field_
 
 	if (0 != item->itemid)
 	{
-		/* return an original data and drop the correspond flag */
+		/* return an original data and drop the corresponding flag */
 		zbx_free(*field);
 		*field = *field_orig;
 		*field_orig = NULL;
@@ -358,7 +359,7 @@ void	DBlld_validate_item_field(zbx_lld_item_t *item, char **field, char **field_
  * Parameters: items - [IN] list of items; should be sorted by itemid         *
  *                                                                            *
  ******************************************************************************/
-void	DBlld_items_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *items, char **error)
+static void	DBlld_items_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *items, char **error)
 {
 	const char		*__function_name = "DBlld_items_validate";
 
@@ -419,7 +420,7 @@ void	DBlld_items_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *items, char **e
 
 			if (0 != item->itemid)
 			{
-				/* return an original key and drop the correspond flag */
+				/* return an original key and drop the corresponding flag */
 				zbx_free(item->key);
 				item->key = item->key_orig;
 				item->key_orig = NULL;
@@ -497,7 +498,7 @@ void	DBlld_items_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *items, char **e
 
 					if (0 != item->itemid)
 					{
-						/* return an original key and drop the correspond flag */
+						/* return an original key and drop the correspondqing flag */
 						zbx_free(item->key);
 						item->key = item->key_orig;
 						item->key_orig = NULL;
@@ -755,7 +756,7 @@ static void	DBlld_items_save(zbx_uint64_t hostid, zbx_uint64_t parent_itemid, zb
 
 	int		i, j, new_items = 0, upd_items = 0, new_applications = 0;
 	zbx_lld_item_t	*item;
-	zbx_uint64_t	itemid = 0, itemdiscoveryid = 0, itemappid = 0, flags = __UINT64_C(0x0000000000000000);
+	zbx_uint64_t	itemid = 0, itemdiscoveryid = 0, itemappid = 0, flags = ZBX_FLAG_LLD_ITEM_UNSET;
 	char		*sql1 = NULL, *sql2 = NULL, *sql3 = NULL, *sql4 = NULL,
 			*key_proto_esc = NULL, *delay_flex_esc = NULL, *trapper_hosts_esc = NULL, *units_esc = NULL,
 			*formula_esc = NULL, *logtimefmt_esc = NULL, *ipmi_sensor_esc = NULL,
@@ -1305,7 +1306,7 @@ static void	DBlld_remove_lost_resources(zbx_vector_ptr_t *items, unsigned short 
  *                                                                            *
  * Function: DBlld_update_items                                               *
  *                                                                            *
- * Purpose: add or update items for discovered items                          *
+ * Purpose: add or update discovered items                                    *
  *                                                                            *
  ******************************************************************************/
 void	DBlld_update_items(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, struct zbx_json_parse *jp_data, char **error,
