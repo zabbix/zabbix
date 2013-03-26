@@ -650,7 +650,9 @@ class CHostPrototype extends CHostBase {
 		$discoveredHosts = DBfetchArray(DBselect(
 			'SELECT hostid FROM host_discovery WHERE '.dbConditionInt('parent_hostid', $hostPrototypeIds)
 		));
-		API::Host()->delete(zbx_objectValues($discoveredHosts, 'hostid'));
+		if ($discoveredHosts) {
+			API::Host()->delete(zbx_objectValues($discoveredHosts, 'hostid'));
+		}
 
 		// delete host prototypes
 		DB::delete($this->tableName(), array('hostid' => $hostPrototypeIds));
