@@ -510,7 +510,7 @@ function get_header_host_table($currentElement, $hostid, $discoveryid = null) {
 		}
 	}
 
-	if (isset($elements['hosts'])) {
+	if (isset($elements['hosts']) && $dbHost['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
 		if ($currentElement == 'hosts') {
 			$list->addItem(_('Host prototypes').' ('.$dbDiscovery['hostPrototypes'].')');
 		}
