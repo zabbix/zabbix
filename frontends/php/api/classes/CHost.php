@@ -930,6 +930,12 @@ class CHost extends CHostGeneral {
 
 		$macros = array();
 		foreach ($hosts as $host) {
+			// fetch fields required to update host inventory
+			if (isset($host['inventory'])) {
+				$host['inventory']['hostid'] = $host['hostid'];
+				$host['inventory'] = $this->extendObject('host_inventory', $host['inventory'], array('inventory_mode'));
+			}
+
 			API::HostInterface()->replaceHostInterfaces($host);
 			unset($host['interfaces']);
 
