@@ -249,7 +249,7 @@ class CHostPrototype extends CHostBase {
 		foreach ($hostPrototypes as $hostPrototype) {
 			$this->checkUnsupportedFields($this->tableName(), $hostPrototype,
 				_s('Wrong fields for host prototype "%1$s".', $hostPrototype['host']),
-				array('ruleid', 'templates', 'inventory')
+				array('templates', 'inventory')
 			);
 
 			if (isset($hostPrototype['host'])) {
@@ -261,14 +261,7 @@ class CHostPrototype extends CHostBase {
 			if (isset($hostPrototype['status'])) {
 				$this->checkStatus($hostPrototype);
 			}
-			if (isset($hostPrototype['ruleid'])) {
-				$this->checkId($hostPrototype['ruleid'],
-					_s('Incorrect discovery rule ID for host prototype "%1$s".', $hostPrototype['host'])
-				);
-			}
 		}
-
-		$this->checkDiscoveryRulePermissions(zbx_objectValues($hostPrototypes, 'ruleid'));
 
 		// check for duplicates
 		$relationMap = $this->createRelationMap($hostPrototypes, 'hostid', 'parent_itemid', 'host_discovery');
