@@ -947,7 +947,7 @@ static void	process_recovery_msg(DB_ESCALATION *escalation, DB_EVENT *r_event, D
 		DBfree_result(result);
 	}
 	else
-		zabbix_log(LOG_LEVEL_DEBUG, "Escalation stopped: recovery message not defined",
+		zabbix_log(LOG_LEVEL_DEBUG, "escalation stopped: recovery message not defined",
 				escalation->actionid);
 
 	escalation->status = ESCALATION_STATUS_COMPLETED;
@@ -1188,16 +1188,12 @@ static void	process_escalations(int now)
 	DB_ESCALATION		escalation, last_escalation;
 	zbx_vector_uint64_t	escalationids;
 	char			*sql = NULL;
-	size_t			sql_alloc = ZBX_KIBIBYTE, sql_offset = 0;
+	size_t			sql_alloc = ZBX_KIBIBYTE, sql_offset;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	zbx_vector_uint64_create(&escalationids);
 	sql = zbx_malloc(sql, sql_alloc);
-
-	DBbegin();
-
-	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	result = DBselect(
 			"select escalationid,actionid,triggerid,eventid,r_eventid,esc_step,status,nextcheck"
@@ -1264,7 +1260,11 @@ static void	process_escalations(int now)
 
 			if (ESCALATION_STATUS_ACTIVE != escalation.status ||
 					(escalation.nextcheck > now && 0 == escalation.r_eventid))
+			{
 				goto next;
+			}
+
+			DBbegin();
 
 			if (escalation.nextcheck <= now)
 				execute_escalation(&escalation);
@@ -1278,6 +1278,8 @@ static void	process_escalations(int now)
 			else if (1 == esc_superseded)
 				escalation.status = ESCALATION_STATUS_COMPLETED;
 
+			sql_offset = 0;
+
 			if (ESCALATION_STATUS_COMPLETED != escalation.status)
 			{
 				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
@@ -1288,13 +1290,19 @@ static void	process_escalations(int now)
 							escalation.esc_step, escalation.nextcheck);
 				}
 				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-						" where escalationid=" ZBX_FS_UI64 ";\n", escalation.escalationid);
+						" where escalationid=" ZBX_FS_UI64, escalation.escalationid);
 
-				DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 			}
 			else
-				zbx_vector_uint64_append(&escalationids, escalation.escalationid);
+			{
+				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+						"delete from escalations where escalationid=" ZBX_FS_UI64,
+						escalation.escalationid);
+			}
 
+			DBexecute("%s", sql);
+
+			DBcommit();
 		}
 next:
 		if (NULL != row)
@@ -1304,21 +1312,18 @@ next:
 
 	DBfree_result(result);
 
-	/* delete completed */
+	/* delete completed escalations */
 	if (0 != escalationids.values_num)
 	{
+		sql_offset = 0;
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "delete from escalations where");
 		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "escalationid",
 				escalationids.values, escalationids.values_num);
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
-	}
 
-	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-	if (sql_offset > 16)	/* In ORACLE always present begin..end; */
+		DBbegin();
 		DBexecute("%s", sql);
-
-	DBcommit();
+		DBcommit();
+	}
 
 	zbx_free(sql);
 	zbx_vector_uint64_destroy(&escalationids);
