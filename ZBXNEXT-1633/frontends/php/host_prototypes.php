@@ -63,10 +63,11 @@ if (get_request('parent_discoveryid')) {
 	$discoveryRule = API::DiscoveryRule()->get(array(
 		'itemids' => $_REQUEST['parent_discoveryid'],
 		'output' => API_OUTPUT_EXTEND,
+		'selectHosts' => array('flags'),
 		'editable' => true
 	));
 	$discoveryRule = reset($discoveryRule);
-	if (!$discoveryRule) {
+	if (!$discoveryRule || $discoveryRule['hosts'][0]['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
 		access_deny();
 	}
 

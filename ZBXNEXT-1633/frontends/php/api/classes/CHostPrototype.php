@@ -130,6 +130,15 @@ class CHostPrototype extends CHostBase {
 
 		$this->checkDiscoveryRulePermissions(zbx_objectValues($hostPrototypes, 'ruleid'));
 
+		// check if the host is discovered
+		$discoveryRules = API::getApi()->select('items', array(
+			'output' => array('hostid'),
+			'itemids' => zbx_objectValues($hostPrototypes, 'ruleid')
+		));
+		$this->checkValidator(zbx_objectValues($discoveryRules, 'hostid'), new CHostNotDiscoveredValidator(array(
+			'message' => _('Cannot create a host prototype on a discovered host "%1$s".')
+		)));
+
 		$this->checkDuplicates($hostPrototypes, 'host', _('Host prototype "%1$s" already exists.'), 'ruleid');
 		$this->checkExistingHostPrototypes($hostPrototypes);
 	}
@@ -860,6 +869,15 @@ class CHostPrototype extends CHostBase {
 	protected function applyQueryFilterOptions($tableName, $tableAlias, array $options, array $sqlParts) {
 		$sqlParts = parent::applyQueryFilterOptions($tableName, $tableAlias, $options, $sqlParts);
 
+		// do not return host prototypes from discovered hosts
+		$sqlParts['from'][] = 'host_discovery hd';
+		$sqlParts['from'][] = 'items i';
+		$sqlParts['from'][] = 'hosts ph';
+		$sqlParts['where'][] = $this->fieldId('hostid').'=hd.hostid';
+		$sqlParts['where'][] = 'hd.parent_itemid=i.itemid';
+		$sqlParts['where'][] = 'i.hostid=ph.hostid';
+		$sqlParts['where'][] = 'ph.flags='.ZBX_FLAG_DISCOVERY_NORMAL;
+
 		if (CWebUser::getType() != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
 			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ;
 
@@ -881,8 +899,6 @@ class CHostPrototype extends CHostBase {
 
 		// discoveryids
 		if ($options['discoveryids'] !== null) {
-			$sqlParts['from'][] = 'host_discovery hd';
-			$sqlParts['where'][] = $this->fieldId('hostid').'=hd.hostid';
 			$sqlParts['where'][] = dbConditionInt('hd.parent_itemid', (array) $options['discoveryids']);
 
 			if ($options['groupCount'] !== null) {

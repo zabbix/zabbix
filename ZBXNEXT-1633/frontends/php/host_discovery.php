@@ -139,7 +139,8 @@ elseif (get_request('hostid', 0) > 0) {
 		'templated_hosts' => true,
 		'editable' => true
 	));
-	if (empty($hosts)) {
+	$host = reset($hosts);
+	if (!$host) {
 		access_deny();
 	}
 }
@@ -286,7 +287,10 @@ if (isset($_REQUEST['form'])) {
 	$itemView->show();
 }
 else {
-	$data = array('hostid' => get_request('hostid', 0));
+	$data = array(
+		'hostid' => get_request('hostid', 0),
+		'host' => $host
+	);
 	$sortfield = getPageSortField('name');
 
 	// discoveries

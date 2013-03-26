@@ -17,8 +17,9 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
+
+$host = $data['host'];
 
 $discoveryWidget = new CWidget();
 
@@ -52,7 +53,7 @@ $discoveryTable->setHeader(array(
 	_('Items'),
 	_('Triggers'),
 	_('Graphs'),
-	_('Hosts'),
+	($host['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) ? _('Hosts') : null,
 	make_sorting_header(_('Key'), 'key_', $sortLink),
 	make_sorting_header(_('Interval'), 'delay', $sortLink),
 	make_sorting_header(_('Type'), 'type', $sortLink),
@@ -89,7 +90,7 @@ foreach ($data['discoveries'] as $discovery) {
 		array(new CLink(_('Item prototypes'), 'disc_prototypes.php?hostid='.get_request('hostid').'&parent_discoveryid='.$discovery['itemid']), ' ('.$discovery['items'].')'),
 		array(new CLink(_('Trigger prototypes'), 'trigger_prototypes.php?hostid='.get_request('hostid').'&parent_discoveryid='.$discovery['itemid']), ' ('.$discovery['triggers'].')'),
 		array(new CLink(_('Graph prototypes'), 'graphs.php?hostid='.get_request('hostid').'&parent_discoveryid='.$discovery['itemid']), ' ('.$discovery['graphs'].')'),
-		array(new CLink(_('Host prototypes'), 'host_prototypes.php?parent_discoveryid='.$discovery['itemid']), ' ('.$discovery['hostPrototypes'].')'),
+		($host['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) ? array(new CLink(_('Host prototypes'), 'host_prototypes.php?parent_discoveryid='.$discovery['itemid']), ' ('.$discovery['hostPrototypes'].')') : null,
 		$discovery['key_'],
 		$discovery['delay'],
 		item_type2str($discovery['type']),
