@@ -644,6 +644,13 @@ class CHostPrototype extends CHostBase {
 			'nopermissions' => true
 		));
 
+		// delete discovered hosts
+		$discoveredHosts = DBfetchArray(DBselect(
+			'SELECT hostid FROM host_discovery WHERE '.dbConditionInt('parent_hostid', $hostPrototypeIds)
+		));
+		API::Host()->delete(zbx_objectValues($discoveredHosts, 'hostid'));
+
+		// delete host prototypes
 		DB::delete($this->tableName(), array('hostid' => $hostPrototypeIds));
 
 		// TODO: REMOVE info
