@@ -90,6 +90,7 @@ static char *sensor_id_to_str(char *str, size_t str_sz, const char *id, enum ipm
 	/* minimum size of 'str' buffer, str_sz, is 35 bytes to avoid truncation */
 	int	i;
 	char	*p = str;
+	size_t	id_len;
 
 	if (0 == id_sz)		/* id is meaningful only if length > 0 (see SDR record format in IPMI v2 spec) */
 	{
@@ -108,8 +109,10 @@ static char *sensor_id_to_str(char *str, size_t str_sz, const char *id, enum ipm
 	{
 		case IPMI_ASCII_STR:
 		case IPMI_UNICODE_STR:
-			memcpy(str, id, str_sz > (size_t)id_sz ? (size_t)id_sz : str_sz - 1);
-			*(str + (str_sz > (size_t)id_sz ? (size_t)id_sz : str_sz - 1)) = '\0';
+			/* NOTE: precalculate id length, easier to read this way */
+			id_len = str_sz > (size_t)id_sz ? (size_t)id_sz : str_sz - 1;
+			memcpy(str, id, id_len);
+			*(str + id_len) = '\0';
 			break;
 		case IPMI_BINARY_STR:
 			/* "BCD Plus" or "6-bit ASCII packed" encoding. OpenIPMI does not tell us which one. */
@@ -503,7 +506,6 @@ static void	got_discrete_states(ipmi_sensor_t *sensor, int err, ipmi_states_t *s
 	char			id_str[2 * IPMI_SENSOR_ID_SZ + 1];
 
 	int			id, i, val, ret, is_state_set;
-	const char		*e_string, *s_type_string, *s_reading_type_string;
 	ipmi_entity_t		*ent;
 	zbx_ipmi_host_t		*h = cb_data;
 	zbx_ipmi_sensor_t	*s;
@@ -530,9 +532,6 @@ static void	got_discrete_states(ipmi_sensor_t *sensor, int err, ipmi_states_t *s
 
 	ent = ipmi_sensor_get_entity(sensor);
 	id = ipmi_entity_get_entity_id(ent);
-	e_string = ipmi_get_entity_id_string(id);
-	s_type_string = ipmi_sensor_get_sensor_type_string(sensor);
-	s_reading_type_string = ipmi_sensor_get_event_reading_type_string(sensor);
 
 	/* Discrete values are 16-bit. We're storing them into a 64-bit uint. */
 #define MAX_DISCRETE_STATES	15
@@ -546,12 +545,19 @@ static void	got_discrete_states(ipmi_sensor_t *sensor, int err, ipmi_states_t *s
 
 		is_state_set = ipmi_is_state_set(states, i);
 
+		/*
+		 * NOTE: if zabbix_log() gets optimized to verify log level before calling zabbix_log,
+		 * then we can avoid retrieving excess information that is required only when zabbix_log()
+		 * is called.
+		 */
 		zabbix_log(LOG_LEVEL_DEBUG, "State [%s | %s | %s | %s | state %d value is %d]",
 				sensor_id_to_str(id_str, sizeof(id_str), s->id, s->id_type, s->id_sz),
-				e_string, s_type_string, s_reading_type_string, i, is_state_set);
+				ipmi_get_entity_id_string(id), ipmi_sensor_get_sensor_type_string(sensor),
+				ipmi_sensor_get_event_reading_type_string(sensor), i, is_state_set);
 
 		if (0 != is_state_set)
-			s->value.discrete += 1 << i;
+			/* NOTE: while the result is the same, using OR suggests that the result is bitmask */
+			s->value.discrete |= 1 << i;
 	}
 #undef MAX_DISCRETE_STATES
 out:
@@ -829,13 +835,19 @@ static void	sensor_change(enum ipmi_update_e op, ipmi_entity_t *ent, ipmi_sensor
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() phost:%p host:'[%s]:%d'", __function_name, h, h->ip, h->port);
 
-	if (op == IPMI_ADDED && 0 != ipmi_sensor_get_is_readable(sensor))	/* ignore non-readable sensors */
-	{									/* (e.g. Event-only) */
-		if (NULL == get_ipmi_sensor(h, sensor))
-			allocate_ipmi_sensor(h, sensor);
+	/* NOTE: if only readable sensors are added, then we can ignore delete event of non-readable sensors */
+	/* ignore non-readable sensors (e.g. Event-only) */
+	if (0 != ipmi_sensor_get_is_readable(sensor))
+	{
+		switch (op)
+		{
+			case IPMI_ADDED:
+				if (NULL == get_ipmi_sensor(h, sensor))
+					allocate_ipmi_sensor(h, sensor);
+				break;
+			case IPMI_DELETED:
+				delete_ipmi_sensor(h, sensor);
 	}
-	else if (op == IPMI_DELETED)
-		delete_ipmi_sensor(h, sensor);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }

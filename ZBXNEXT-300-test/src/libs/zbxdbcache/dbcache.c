@@ -101,6 +101,10 @@ typedef struct
 	history_value_t	value_min;
 	history_value_t	value_avg;
 	history_value_t	value_max;
+	/* Currently the value sum is calculated only for values of type UINT64.   */
+	/* If required for other value types then the following member must be     */
+	/* changed to an union of some type.                                       */
+	zbx_uint128_t	value_sum;
 	int		clock;
 	int		num;
 	int		disable_from;
@@ -424,6 +428,8 @@ static void	DCflush_trends(ZBX_DC_TREND *trends, int *trends_num, int update_cac
 			}
 			else
 			{
+				zbx_uint128_t avg;
+
 				ZBX_STR2UINT64(value_min.ui64, row[2]);
 				ZBX_STR2UINT64(value_avg.ui64, row[3]);
 				ZBX_STR2UINT64(value_max.ui64, row[4]);
@@ -432,8 +438,13 @@ static void	DCflush_trends(ZBX_DC_TREND *trends, int *trends_num, int update_cac
 					trend->value_min.ui64 = value_min.ui64;
 				if (value_max.ui64 > trend->value_max.ui64)
 					trend->value_max.ui64 = value_max.ui64;
-				trend->value_avg.ui64 = (trend->num * trend->value_avg.ui64
-						+ num * value_avg.ui64) / (trend->num + num);
+
+				/* calculate the trend average value */
+				umul64_64(&avg, num, value_avg.ui64);
+				uinc128_128(&trend->value_sum, &avg);
+				udiv128_64(&avg, &trend->value_sum, trend->num + num);
+				trend->value_avg.ui64 = avg.lo;
+
 				trend->num += num;
 
 				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
@@ -537,6 +548,8 @@ static void	DCflush_trends(ZBX_DC_TREND *trends, int *trends_num, int update_cac
 	{
 		for (i = 0; i < trends_to; i++)
 		{
+			zbx_uint128_t	avg;
+
 			trend = &trends[i];
 
 			if (0 == trend->itemid)
@@ -544,6 +557,10 @@ static void	DCflush_trends(ZBX_DC_TREND *trends, int *trends_num, int update_cac
 
 			if (clock != trend->clock || value_type != trend->value_type)
 				continue;
+
+			/* calculate the trend average value */
+			udiv128_64(&avg, &trend->value_sum, trend->num);
+			trend->value_avg.ui64 = avg.lo;
 
 			if (0 == sql_offset)
 			{
@@ -628,6 +645,7 @@ static void	DCflush_trend(ZBX_DC_TREND *trend, ZBX_DC_TREND **trends, int *trend
 	memset(&trend->value_min, 0, sizeof(history_value_t));
 	memset(&trend->value_avg, 0, sizeof(history_value_t));
 	memset(&trend->value_max, 0, sizeof(history_value_t));
+	memset(&trend->value_sum, 0, sizeof(zbx_uint128_t));
 }
 
 /******************************************************************************
@@ -669,8 +687,7 @@ static void	DCadd_trend(ZBX_DC_HISTORY *history, ZBX_DC_TREND **trends, int *tre
 				trend->value_min.ui64 = history->value.ui64;
 			if (trend->num == 0 || history->value.ui64 > trend->value_max.ui64)
 				trend->value_max.ui64 = history->value.ui64;
-			trend->value_avg.ui64 = (trend->num * trend->value_avg.ui64
-				+ history->value.ui64) / (trend->num + 1);
+			uinc128_64(&trend->value_sum, history->value.ui64);
 			break;
 	}
 	trend->num++;
