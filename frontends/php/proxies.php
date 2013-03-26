@@ -230,12 +230,13 @@ if (isset($_REQUEST['form'])) {
 		}
 	}
 
-	// hosts
+	// fetch available hosts, skip host prototypes
 	$data['dbHosts'] = DBfetchArray(DBselect(
 		'SELECT h.hostid,h.proxy_hostid,h.name,h.flags'.
 		' FROM hosts h'.
 		' WHERE h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.')'.
-			andDbNode('h.hostid')
+			andDbNode('h.hostid').
+			' AND h.flags<>'.ZBX_FLAG_DISCOVERY_PROTOTYPE
 	));
 	order_result($data['dbHosts'], 'name');
 

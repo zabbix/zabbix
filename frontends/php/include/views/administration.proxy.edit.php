@@ -74,7 +74,9 @@ if ($this->data['status'] == HOST_STATUS_PROXY_PASSIVE) {
 // append hosts to form list
 $hostsTweenBox = new CTweenBox($proxyForm, 'hosts', $this->data['hosts']);
 foreach ($this->data['dbHosts'] as $host) {
-	if (idcmp($this->data['proxyid'], $host['proxy_hostid']) || $host['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
+	// show only normal hosts, and discovered hosts monitored by the current proxy
+	// for new proxies display only normal hosts
+	if (($this->data['proxyid'] && idcmp($this->data['proxyid'], $host['proxy_hostid'])) || $host['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
 		$hostsTweenBox->addItem(
 			$host['hostid'],
 			$host['name'],
