@@ -164,8 +164,7 @@ static int	evaluate_simple(double *result, char *exp, char *error, int maxerrlen
 	double	value1, value2;
 	char	*p, c;
 
-	/* remove left and right spaces */
-	lrtrim_spaces(exp);
+	zbx_lrtrim(exp, " ");
 
 	/* compress repeating - and + and add prefix N to negative numbers */
 	compress_signs(exp);
@@ -2561,7 +2560,7 @@ int	substitute_simple_macros(DB_EVENT *event, zbx_uint64_t *userid, zbx_uint64_t
 					if (SUCCEED == (ret = DBget_history_log_value(&event->trigger, &replace_to,
 									N_functionid, "severity", event->clock, event->ns)))
 						replace_to = zbx_strdup(replace_to,
-								zbx_item_logtype_string((zbx_item_logtype_t)atoi(replace_to)));
+								zbx_item_logtype_string(atoi(replace_to)));
 				}
 				else if (0 == strcmp(m, MVAR_ITEM_LOG_NSEVERITY))
 					ret = DBget_history_log_value(&event->trigger, &replace_to, N_functionid,

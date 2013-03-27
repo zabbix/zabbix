@@ -428,6 +428,23 @@ void	zbx_ltrim(char *str, const char *charlist)
 
 /******************************************************************************
  *                                                                            *
+ * Function: zbx_lrtrim                                                       *
+ *                                                                            *
+ * Purpose: Removes leading and trailing characters from the specified        *
+ *          character string                                                  *
+ *                                                                            *
+ * Parameters: str      - [IN/OUT] string for processing                      *
+ *             charlist - [IN] null terminated list of characters             *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_lrtrim(char *str, const char *charlist)
+{
+	zbx_rtrim(str, charlist);
+	zbx_ltrim(str, charlist);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: zbx_remove_chars                                                 *
  *                                                                            *
  * Purpose: Remove characters 'charlist' from the whole string                *
@@ -549,88 +566,6 @@ void	compress_signs(char *str)
 			}
 		}
 	}
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: rtrim_spaces                                                     *
- *                                                                            *
- * Purpose: delete all right spaces for the string                            *
- *                                                                            *
- * Parameters: c - string to trim spaces                                      *
- *                                                                            *
- * Return value: string without right spaces                                  *
- *                                                                            *
- * Author: Alexei Vladishev                                                   *
- *                                                                            *
- ******************************************************************************/
-void	rtrim_spaces(char *c)
-{
-	int i,len;
-
-	len = (int)strlen(c);
-	for(i=len-1;i>=0;i--)
-	{
-		if( c[i] == ' ')
-		{
-			c[i]=0;
-		}
-		else	break;
-	}
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: ltrim_spaces                                                     *
- *                                                                            *
- * Purpose: delete all left spaces for the string                             *
- *                                                                            *
- * Parameters: c - string to trim spaces                                      *
- *                                                                            *
- * Return value: string without left spaces                                   *
- *                                                                            *
- * Author: Alexei Vladishev                                                   *
- *                                                                            *
- ******************************************************************************/
-void	ltrim_spaces(char *c)
-{
-	int i;
-/* Number of left spaces */
-	int spaces=0;
-
-	for(i=0;c[i]!=0;i++)
-	{
-		if( c[i] == ' ')
-		{
-			spaces++;
-		}
-		else	break;
-	}
-	for(i=0;c[i+spaces]!=0;i++)
-	{
-		c[i]=c[i+spaces];
-	}
-
-	c[strlen(c)-spaces]=0;
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: lrtrim_spaces                                                    *
- *                                                                            *
- * Purpose: delete all left and right spaces for the string                   *
- *                                                                            *
- * Parameters: c - string to trim spaces                                      *
- *                                                                            *
- * Return value: string without left and right spaces                         *
- *                                                                            *
- * Author: Alexei Vladishev                                                   *
- *                                                                            *
- ******************************************************************************/
-void	lrtrim_spaces(char *c)
-{
-	ltrim_spaces(c);
-	rtrim_spaces(c);
 }
 
 /*
@@ -3014,6 +2949,101 @@ size_t	zbx_strlen_utf8_n(const char *text, size_t utf8_maxlen)
 	}
 
 	return sz;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_is_utf8                                                      *
+ *                                                                            *
+ * Purpose: check UTF-8 sequences                                             *
+ *                                                                            *
+ * Parameters: text - [IN] pointer to the string                              *
+ *                                                                            *
+ * Return value: SUCCEED if string is valid or FAIL otherwise                 *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_is_utf8(const char *text)
+{
+	unsigned int	utf32;
+	unsigned char	*utf8;
+	size_t		i, mb_len, expecting_bytes = 0;
+
+	while ('\0' != *text)
+	{
+		/* single ASCII character */
+		if (0 == (*text & 0x80))
+		{
+			text++;
+			continue;
+		}
+
+		/* unexpected continuation byte or invalid UTF-8 bytes '\xfe' & '\xff' */
+		if (0x80 == (*text & 0xc0) || 0xfe == (*text & 0xfe))
+			return FAIL;
+
+		/* multibyte sequence */
+
+		utf8 = (unsigned char *)text;
+
+		if (0xc0 == (*text & 0xe0))		/* 2-bytes multibyte sequence */
+			expecting_bytes = 1;
+		else if (0xe0 == (*text & 0xf0))	/* 3-bytes multibyte sequence */
+			expecting_bytes = 2;
+		else if (0xf0 == (*text & 0xf8))	/* 4-bytes multibyte sequence */
+			expecting_bytes = 3;
+		else if (0xf8 == (*text & 0xfc))	/* 5-bytes multibyte sequence */
+			expecting_bytes = 4;
+		else if (0xfc == (*text & 0xfe))	/* 6-bytes multibyte sequence */
+			expecting_bytes = 5;
+
+		mb_len = expecting_bytes + 1;
+		text++;
+
+		for (; 0 != expecting_bytes; expecting_bytes--)
+		{
+			/* not a continuation byte */
+			if (0x80 != (*text++ & 0xc0))
+				return FAIL;
+		}
+
+		/* overlong sequence */
+		if (0xc0 == (utf8[0] & 0xfe) ||
+				(0xe0 == utf8[0] && 0x00 == (utf8[1] & 0x20)) ||
+				(0xf0 == utf8[0] && 0x00 == (utf8[1] & 0x30)) ||
+				(0xf8 == utf8[0] && 0x00 == (utf8[1] & 0x38)) ||
+				(0xfc == utf8[0] && 0x00 == (utf8[1] & 0x3c)))
+		{
+			return FAIL;
+		}
+
+		utf32 = 0;
+
+		if (0xc0 == (utf8[0] & 0xe0))
+			utf32 = utf8[0] & 0x1f;
+		else if (0xe0 == (utf8[0] & 0xf0))
+			utf32 = utf8[0] & 0x0f;
+		else if (0xf0 == (utf8[0] & 0xf8))
+			utf32 = utf8[0] & 0x07;
+		else if (0xf8 == (utf8[0] & 0xfc))
+			utf32 = utf8[0] & 0x03;
+		else if (0xfc == (utf8[0] & 0xfe))
+			utf32 = utf8[0] & 0x01;
+
+		for (i = 1; i < mb_len; i++)
+		{
+			utf32 <<= 6;
+			utf32 += utf8[i] & 0x3f;
+		}
+
+		/* according to the Unicode standard the high and low
+		 * surrogate halves used by UTF-16 (U+D800 through U+DFFF)
+		 * and values above U+10FFFF are not legal
+		 */
+		if (utf32 > 0x10ffff || 0xd800 == (utf32 & 0xf800))
+			return FAIL;
+	}
+
+	return SUCCEED;
 }
 
 /******************************************************************************
