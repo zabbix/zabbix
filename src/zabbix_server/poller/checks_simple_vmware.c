@@ -22,6 +22,12 @@
 #include "zbxjson.h"
 #include "checks_simple_vmware.h"
 
+#define ZBX_XPATH_LN(LN)	"//*[local-name()='" LN "']"
+#define ZBX_XPATH_LN2(LN1, LN2)	ZBX_XPATH_LN(LN1) "/*[local-name()='" LN2 "']"
+
+#define	ZBX_XML_HEADER1	"Soapaction:urn:vim25/4.1"
+#define ZBX_XML_HEADER2	"Content-Type:text/xml; charset=utf-8"
+
 typedef struct
 {
 	char	*data;
@@ -32,15 +38,13 @@ ZBX_HTTPPAGE;
 
 static ZBX_HTTPPAGE	page;
 
-static char *get_value(char *data, char *xpath)
+static char	*get_value(char *data, char *xpath)
 {
 	xmlDoc		*doc;
 	xmlNode		*root_element = NULL;
-
 	xmlXPathContext	*xpathCtx;
 	xmlXPathObject	*xpathObj;
 	xmlChar		*val;
-
 	char		*ret = NULL;
 
 	if (NULL == data)
@@ -56,8 +60,9 @@ static char *get_value(char *data, char *xpath)
 		return NULL;
 	}
 
-	if (xmlXPathNodeSetIsEmpty(xpathObj->nodesetval))
+	if (0 != xmlXPathNodeSetIsEmpty(xpathObj->nodesetval))
 	{
+		xmlXPathFreeObject(xpathObj);
 		xmlCleanupParser();
 		return NULL;
 	}
@@ -68,7 +73,7 @@ static char *get_value(char *data, char *xpath)
 	{
 		if (NULL != (val = xmlNodeGetContent(root_element)))
 		{
-			ret =  zbx_strdup(NULL, (char *)val);
+			ret = zbx_strdup(NULL, (char *)val);
 			xmlFree(val);
 		}
 	}
@@ -81,13 +86,11 @@ static char *get_value(char *data, char *xpath)
 
 static int	get_ids(char *data, zbx_vector_str_t *guestids)
 {
-	xmlDoc *doc;
-	xmlNode *root_element = NULL;
-	xmlNode *cur_node = NULL;
-
-	xmlXPathContext *xpathCtx;
-	xmlXPathObject * xpathObj;
-	xmlChar* val;
+	xmlDoc		*doc;
+	xmlNode		*root_element = NULL, *cur_node = NULL;
+	xmlXPathContext	*xpathCtx;
+	xmlXPathObject	*xpathObj;
+	xmlChar		*val;
 
 	if (NULL == data)
 		return FAIL;
@@ -96,7 +99,8 @@ static int	get_ids(char *data, zbx_vector_str_t *guestids)
 		return FAIL;
 
 	xpathCtx = xmlXPathNewContext(doc);
-	if (NULL == (xpathObj = xmlXPathEvalExpression((xmlChar*)"//*[local-name()='ManagedObjectReference'][@type]", xpathCtx)))
+	if (NULL == (xpathObj = xmlXPathEvalExpression((xmlChar *)ZBX_XPATH_LN("ManagedObjectReference") "[@type]",
+			xpathCtx)))
 	{
 		xmlCleanupParser();
 		return FAIL;
@@ -104,6 +108,7 @@ static int	get_ids(char *data, zbx_vector_str_t *guestids)
 
 	if (xmlXPathNodeSetIsEmpty(xpathObj->nodesetval))
 	{
+		xmlXPathFreeObject(xpathObj);
 		xmlCleanupParser();
 		return FAIL;
 	}
@@ -154,9 +159,6 @@ static size_t	HEADERFUNCTION2(void *ptr, size_t size, size_t nmemb, void *userda
 
 static int	authenticate(CURL *easyhandle, char *url, char *username, char *userpwd)
 {
-	const char	*__function_name = "authenticate";
-	int		err, opt;
-
 #	define ZBX_POST_AUTH										\
 		"<?xml version=\"1.0\" encoding=\"UTF-8\"?>"						\
 		"<SOAP-ENV:Envelope"									\
@@ -174,8 +176,9 @@ static int	authenticate(CURL *easyhandle, char *url, char *username, char *userp
 			"</ns1:Body>"									\
 		"</SOAP-ENV:Envelope>"
 
-	int	timeout = 5;
-	char	*err_str = NULL, postdata[MAX_STRING_LEN];
+	const char	*__function_name = "authenticate";
+	int		err, opt, timeout = 5;
+	char		*err_str = NULL, postdata[MAX_STRING_LEN];
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() url:'%s' username:'%s'", __function_name, url, username);
 
@@ -195,7 +198,7 @@ static int	authenticate(CURL *easyhandle, char *url, char *username, char *userp
 		err_str = zbx_strdup(err_str, curl_easy_strerror(err));
 		zabbix_log(LOG_LEVEL_ERR, "VMWare URL \"%s\" error: could not set cURL option [%d]: %s",
 				url, opt, err_str);
-		goto clean;
+		goto out;
 	}
 
 	memset(&page, 0, sizeof(page));
@@ -204,10 +207,9 @@ static int	authenticate(CURL *easyhandle, char *url, char *username, char *userp
 	{
 		err_str = zbx_strdup(err_str, curl_easy_strerror(err));
 		zabbix_log(LOG_LEVEL_ERR, "VMWare URL \"%s\" error: %s", url, err_str);
-		goto clean;
+		goto out;
 	}
-
-clean:
+out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 
 	return SUCCEED;
@@ -215,8 +217,6 @@ clean:
 
 static int	get_guestids(CURL *easyhandle, zbx_vector_str_t *guestids)
 {
-	int	err, opt;
-
 #	define ZBX_POST_VMLIST											\
 		"<?xml version=\"1.0\" encoding=\"UTF-8\"?>"							\
 		"<SOAP-ENV:Envelope"										\
@@ -242,8 +242,8 @@ static int	get_guestids(CURL *easyhandle, zbx_vector_str_t *guestids)
 			"</ns1:Body>"										\
 		"</SOAP-ENV:Envelope>"
 
+	int	err, opt, ret = FAIL;
 	char	*err_str = NULL;
-	int	ret = FAIL;
 
 	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_POSTFIELDS, ZBX_POST_VMLIST)))
 	{
@@ -270,21 +270,15 @@ static int	get_guestids(CURL *easyhandle, zbx_vector_str_t *guestids)
 	}
 
 	ret = SUCCEED;
-
 clean:
 	zbx_free(err_str);
 
 	return ret;
 }
 
-int	get_hostdata(CURL *easyhandle)
+static int	get_hostdata(CURL *easyhandle)
 {
-	const char		*__function_name = "get_hostdata";
-	int	err, opt;
-
-	int ret = FAIL;
-
-#	define ZBX_POST_HOSTDETAILS											\
+#	define ZBX_POST_HOSTDETAILS										\
 		"<?xml version=\"1.0\" encoding=\"UTF-8\"?>"							\
 		"<SOAP-ENV:Envelope"										\
 			" xmlns:ns0=\"urn:vim25\""								\
@@ -299,7 +293,7 @@ int	get_hostdata(CURL *easyhandle)
 						"<ns0:propSet>"							\
 							"<ns0:type>HostSystem</ns0:type>"			\
 							"<ns0:all>false</ns0:all>"				\
-							"<ns0:pathSet>summary</ns0:pathSet>"				\
+							"<ns0:pathSet>summary</ns0:pathSet>"			\
 						"</ns0:propSet>"						\
 						"<ns0:objectSet>"						\
 							"<ns0:obj type=\"HostSystem\">ha-host</ns0:obj>"	\
@@ -309,7 +303,9 @@ int	get_hostdata(CURL *easyhandle)
 			"</ns1:Body>"										\
 		"</SOAP-ENV:Envelope>"
 
-	char	*err_str = NULL;
+	const char	*__function_name = "get_hostdata";
+	int		err, opt, ret = FAIL;
+	char		*err_str = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -318,7 +314,7 @@ int	get_hostdata(CURL *easyhandle)
 		err_str = zbx_strdup(err_str, curl_easy_strerror(err));
 		zabbix_log(LOG_LEVEL_ERR, "VMWare error: could not set cURL option [%d]: %s",
 				opt, err_str);
-		goto clean;
+		goto out;
 	}
 
 	memset(&page, 0, sizeof(page));
@@ -327,22 +323,16 @@ int	get_hostdata(CURL *easyhandle)
 	{
 		err_str = zbx_strdup(err_str, curl_easy_strerror(err));
 		zabbix_log(LOG_LEVEL_ERR, "VMWare \"%s\" error: %s", err_str);
-		goto clean;
+		goto out;
 	}
 
 	ret = SUCCEED;
-
-clean:
+out:
 	return ret;
 }
 
-int	get_vmdata(CURL *easyhandle, const char *vmid)
+static int	get_vmdata(CURL *easyhandle, const char *vmid)
 {
-	const char		*__function_name = "get_vmdata";
-	int	err, opt;
-
-	char	tmp[MAX_STRING_LEN];
-
 #	define ZBX_POST_VMDETAILS 									\
 		"<?xml version=\"1.0\" encoding=\"UTF-8\"?>"						\
 		"<SOAP-ENV:Envelope "									\
@@ -369,7 +359,9 @@ int	get_vmdata(CURL *easyhandle, const char *vmid)
 			"</ns1:Body>"									\
 		"</SOAP-ENV:Envelope>"
 
-	char	*err_str = NULL;
+	const char	*__function_name = "get_vmdata";
+	int		err, opt, ret = FAIL;
+	char		*err_str = NULL, tmp[MAX_STRING_LEN];
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() vmid:'%s'", __function_name, vmid);
 
@@ -378,9 +370,8 @@ int	get_vmdata(CURL *easyhandle, const char *vmid)
 	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_POSTFIELDS, tmp)))
 	{
 		err_str = zbx_strdup(err_str, curl_easy_strerror(err));
-		zabbix_log(LOG_LEVEL_ERR, "VMWare error: could not set cURL option [%d]: %s",
-				opt, err_str);
-		goto clean;
+		zabbix_log(LOG_LEVEL_ERR, "VMWare error: could not set cURL option [%d]: %s", opt, err_str);
+		goto out;
 	}
 
 	memset(&page, 0, sizeof(page));
@@ -389,32 +380,29 @@ int	get_vmdata(CURL *easyhandle, const char *vmid)
 	{
 		err_str = zbx_strdup(err_str, curl_easy_strerror(err));
 		zabbix_log(LOG_LEVEL_ERR, "VMWare \"%s\" error: %s", err_str);
-		goto clean;
+		goto out;
 	}
 
-clean:
-	return SUCCEED;
+	ret = SUCCEED;
+out:
+	return ret;
 }
 
-static int get_vmware_hoststat(char *url, char *username, char *userpwd, char *xpath, AGENT_RESULT *result)
+static int	get_vmware_hoststat(char *url, char *username, char *userpwd, char *xpath, AGENT_RESULT *result)
 {
 	const char		*__function_name = "get_vmware_hoststat";
 	char			*value, *err_str = NULL;
-
 	CURL			*easyhandle = NULL;
-	struct	curl_slist	*headers = NULL;
-	const char		*header1="Soapaction:urn:vim25/4.1";
-	const char		*header2="Content-Type:text/xml; charset=utf-8";
-
+	struct curl_slist	*headers = NULL;
 	int			ret = SYSINFO_RET_FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	if (NULL == url || '\0' == *url || NULL == username || '\0' == *username || NULL == userpwd)
-		return SYSINFO_RET_FAIL;
+		goto out;
 
-	headers = curl_slist_append(headers, header1);
-	headers = curl_slist_append(headers, header2);
+	headers = curl_slist_append(headers, ZBX_XML_HEADER1);
+	headers = curl_slist_append(headers, ZBX_XML_HEADER2);
 
 	if (NULL == (easyhandle = curl_easy_init()))
 	{
@@ -423,55 +411,46 @@ static int get_vmware_hoststat(char *url, char *username, char *userpwd, char *x
 		goto clean;
 	}
 
-	if ( SUCCEED != authenticate(easyhandle, url, username, userpwd))
-	{
-		goto clean;
-	}
-
-	if ( SUCCEED != get_hostdata(easyhandle))
+	if (SUCCEED != authenticate(easyhandle, url, username, userpwd))
 		goto clean;
 
-	if (NULL == (value = get_value(page.data, xpath)))
-	{
-		ret = SYSINFO_RET_FAIL;
-	}
-	else
+	if (SUCCEED != get_hostdata(easyhandle))
+		goto clean;
+
+	if (NULL != (value = get_value(page.data, xpath)))
 	{
 		SET_STR_RESULT(result, value);
 		ret = SUCCEED;
 	}
-
 clean:
 	curl_easy_cleanup(easyhandle);
 	curl_slist_free_all(headers);
-
+out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 
 	return ret;
 }
 
-static int get_vmware_vmstat(char *url, char *username, char *userpwd, char *uuid, char *xpath, AGENT_RESULT *result)
+static int	get_vmware_vmstat(char *url, char *username, char *userpwd, char *uuid, char *xpath, AGENT_RESULT *result)
 {
 	const char		*__function_name = "get_vmware_vmstat";
 	CURL			*easyhandle = NULL;
 	int			i;
 	char			*uuidtmp, *value, *err_str = NULL;
 	zbx_vector_str_t	guestids;
-
-	struct	curl_slist	*headers = NULL;
-	const char		*header1="Soapaction:urn:vim25/4.1";
-	const char		*header2="Content-Type:text/xml; charset=utf-8";
-
+	struct curl_slist	*headers = NULL;
 	int			ret = SYSINFO_RET_FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	if (NULL == url || '\0' == *url || NULL == username || '\0' == *username || NULL == userpwd ||
-		NULL == uuid || '\0' == *uuid)
-		return SYSINFO_RET_FAIL;
+			NULL == uuid || '\0' == *uuid)
+		goto out;
 
-	headers = curl_slist_append(headers, header1);
-	headers = curl_slist_append(headers, header2);
+	headers = curl_slist_append(headers, ZBX_XML_HEADER1);
+	headers = curl_slist_append(headers, ZBX_XML_HEADER2);
+
+	zbx_vector_str_create(&guestids);
 
 	if (NULL == (easyhandle = curl_easy_init()))
 	{
@@ -480,44 +459,37 @@ static int get_vmware_vmstat(char *url, char *username, char *userpwd, char *uui
 		goto clean;
 	}
 
-	if ( SUCCEED != authenticate(easyhandle, url, username, userpwd))
-	{
+	if (SUCCEED != authenticate(easyhandle, url, username, userpwd))
 		goto clean;
-	}
 
-	zbx_vector_str_create(&guestids);
-	if ( SUCCEED != get_guestids(easyhandle, &guestids))
-	{
+	if (SUCCEED != get_guestids(easyhandle, &guestids))
 		goto clean;
-	}
 
 	for (i = 0; i < guestids.values_num; i++)
 	{
-		if ( SUCCEED != get_vmdata(easyhandle, guestids.values[i]))
+		if (SUCCEED != get_vmdata(easyhandle, guestids.values[i]))
 			goto clean;
-		uuidtmp = get_value(page.data, "//*[local-name()='uuid']");
+
+		uuidtmp = get_value(page.data, ZBX_XPATH_LN("uuid"));
 		if (NULL == uuidtmp)
 			continue;
 
 		if (0 == strcmp(uuid, uuidtmp))
 		{
-			if (NULL == (value = get_value(page.data, xpath)))
-			{
-				ret = SYSINFO_RET_FAIL;
-			}
-			else
+			if (NULL != (value = get_value(page.data, xpath)))
 			{
 				SET_STR_RESULT(result, value);
-				ret = SUCCEED;
+				ret = SYSINFO_RET_OK;
 			}
 			break;
 		}
 	}
-
 clean:
+	zbx_vector_str_destroy(&guestids);
+
 	curl_easy_cleanup(easyhandle);
 	curl_slist_free_all(headers);
-
+out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 
 	return ret;
@@ -528,28 +500,27 @@ int	check_vmware_vmlist(AGENT_REQUEST *request, AGENT_RESULT *result)
 	const char		*__function_name = "check_vmware_vmlist";
 	struct zbx_json		j;
 	CURL			*easyhandle = NULL;
-	int			i;
+	int			i, ret = SYSINFO_RET_FAIL;
 	char			*url, *username, *userpwd, *err_str = NULL;
 	zbx_vector_str_t	guestids;
-
-	struct	curl_slist	*headers = NULL;
-	const char		*header1="Soapaction:urn:vim25/4.1";
-	const char		*header2="Content-Type:text/xml; charset=utf-8";
+	struct curl_slist	*headers = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s'", __function_name, request->key);
 
 	if (3 < request->nparam)
-		return SYSINFO_RET_FAIL;
+		goto out;
 
 	url = get_rparam(request, 0);
 	username = get_rparam(request, 1);
 	userpwd = get_rparam(request, 2);
 
 	if (NULL == url || '\0' == *url || NULL == username || '\0' == *username || NULL == userpwd)
-		return SYSINFO_RET_FAIL;
+		goto out;
 
-	headers = curl_slist_append(headers, header1);
-	headers = curl_slist_append(headers, header2);
+	headers = curl_slist_append(headers, ZBX_XML_HEADER1);
+	headers = curl_slist_append(headers, ZBX_XML_HEADER2);
+
+	zbx_vector_str_create(&guestids);
 
 	if (NULL == (easyhandle = curl_easy_init()))
 	{
@@ -558,31 +529,27 @@ int	check_vmware_vmlist(AGENT_REQUEST *request, AGENT_RESULT *result)
 		goto clean;
 	}
 
-	if ( SUCCEED != authenticate(easyhandle, url, username, userpwd))
-	{
+	if (SUCCEED != authenticate(easyhandle, url, username, userpwd))
 		goto clean;
-	}
 
-	zbx_vector_str_create(&guestids);
-	if ( SUCCEED != get_guestids(easyhandle, &guestids))
-	{
+	if (SUCCEED != get_guestids(easyhandle, &guestids))
 		goto clean;
-	}
 
 	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
 	zbx_json_addarray(&j, ZBX_PROTO_TAG_DATA);
 
 	for (i = 0; i < guestids.values_num; i++)
 	{
-		if ( SUCCEED != get_vmdata(easyhandle, guestids.values[i]))
+		if (SUCCEED != get_vmdata(easyhandle, guestids.values[i]))
+		{
+			zbx_json_free(&j);
 			goto clean;
+		}
+
 		zbx_json_addobject(&j, NULL);
-		zbx_json_addstring(&j, "{#UUID}", get_value(page.data,
-					"//*[local-name()='uuid']"),
-					ZBX_JSON_TYPE_STRING);
-		zbx_json_addstring(&j, "{#NAME}", get_value(page.data,
-					"//*[local-name()='config']/*[local-name()='name']"),
-					ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(&j, "{#UUID}", get_value(page.data, ZBX_XPATH_LN("uuid")), ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(&j, "{#NAME}", get_value(page.data, ZBX_XPATH_LN2("config", "name")),
+				ZBX_JSON_TYPE_STRING);
 		zbx_json_close(&j);
 	}
 
@@ -590,15 +557,18 @@ int	check_vmware_vmlist(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	SET_STR_RESULT(result, strdup(j.buffer));
 
-	zbx_json_free(&j);
+	ret = SYSINFO_RET_OK;
 
+	zbx_json_free(&j);
 clean:
+	zbx_vector_str_destroy(&guestids);
+
 	curl_easy_cleanup(easyhandle);
 	curl_slist_free_all(headers);
-
+out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 
-	return SUCCEED;
+	return ret;
 }
 
 int	check_vmware_vmcpunum(AGENT_REQUEST *request, AGENT_RESULT *result)
@@ -616,8 +586,7 @@ int	check_vmware_vmcpunum(AGENT_REQUEST *request, AGENT_RESULT *result)
 	userpwd = get_rparam(request, 2);
 	uuid = get_rparam(request, 3);
 
-	return get_vmware_vmstat(url, username, userpwd, uuid,
-		"//*[local-name()='config']/*[local-name()='numCpu']", result);
+	return get_vmware_vmstat(url, username, userpwd, uuid, ZBX_XPATH_LN2("config", "numCpu"), result);
 }
 
 int	check_vmware_vmmemsize(AGENT_REQUEST *request, AGENT_RESULT *result)
@@ -635,8 +604,7 @@ int	check_vmware_vmmemsize(AGENT_REQUEST *request, AGENT_RESULT *result)
 	userpwd = get_rparam(request, 2);
 	uuid = get_rparam(request, 3);
 
-	return get_vmware_vmstat(url, username, userpwd, uuid,
-		"//*[local-name()='config']/*[local-name()='memorySizeMB']", result);
+	return get_vmware_vmstat(url, username, userpwd, uuid, ZBX_XPATH_LN2("config", "memorySizeMB"), result);
 }
 
 int	check_vmware_vmuptime(AGENT_REQUEST *request, AGENT_RESULT *result)
@@ -654,8 +622,7 @@ int	check_vmware_vmuptime(AGENT_REQUEST *request, AGENT_RESULT *result)
 	userpwd = get_rparam(request, 2);
 	uuid = get_rparam(request, 3);
 
-	return get_vmware_vmstat(url, username, userpwd, uuid,
-		"//*[local-name()='quickStats']/*[local-name()='uptimeSeconds']", result);
+	return get_vmware_vmstat(url, username, userpwd, uuid, ZBX_XPATH_LN2("quickStats", "uptimeSeconds"), result);
 }
 
 int	check_vmware_vmmemsizeballooned(AGENT_REQUEST *request, AGENT_RESULT *result)
@@ -673,8 +640,7 @@ int	check_vmware_vmmemsizeballooned(AGENT_REQUEST *request, AGENT_RESULT *result
 	userpwd = get_rparam(request, 2);
 	uuid = get_rparam(request, 3);
 
-	return get_vmware_vmstat(url, username, userpwd, uuid,
-		"//*[local-name()='quickStats']/*[local-name()='balloonedMemory']", result);
+	return get_vmware_vmstat(url, username, userpwd, uuid, ZBX_XPATH_LN2("quickStats", "balloonedMemory"), result);
 }
 
 int	check_vmware_vmmemsizecompressed(AGENT_REQUEST *request, AGENT_RESULT *result)
@@ -692,8 +658,7 @@ int	check_vmware_vmmemsizecompressed(AGENT_REQUEST *request, AGENT_RESULT *resul
 	userpwd = get_rparam(request, 2);
 	uuid = get_rparam(request, 3);
 
-	return get_vmware_vmstat(url, username, userpwd, uuid,
-		"//*[local-name()='quickStats']/*[local-name()='compressedMemory']", result);
+	return get_vmware_vmstat(url, username, userpwd, uuid, ZBX_XPATH_LN2("quickStats", "compressedMemory"), result);
 }
 
 int	check_vmware_vmmemsizeswapped(AGENT_REQUEST *request, AGENT_RESULT *result)
@@ -711,8 +676,7 @@ int	check_vmware_vmmemsizeswapped(AGENT_REQUEST *request, AGENT_RESULT *result)
 	userpwd = get_rparam(request, 2);
 	uuid = get_rparam(request, 3);
 
-	return get_vmware_vmstat(url, username, userpwd, uuid,
-		"//*[local-name()='quickStats']/*[local-name()='swappedMemory']", result);
+	return get_vmware_vmstat(url, username, userpwd, uuid, ZBX_XPATH_LN2("quickStats", "swappedMemory"), result);
 }
 
 int	check_vmware_vmstoragecommited(AGENT_REQUEST *request, AGENT_RESULT *result)
@@ -730,8 +694,7 @@ int	check_vmware_vmstoragecommited(AGENT_REQUEST *request, AGENT_RESULT *result)
 	userpwd = get_rparam(request, 2);
 	uuid = get_rparam(request, 3);
 
-	return get_vmware_vmstat(url, username, userpwd, uuid,
-		"//*[local-name()='storage']/*[local-name()='committed']", result);
+	return get_vmware_vmstat(url, username, userpwd, uuid, ZBX_XPATH_LN2("storage", "committed"), result);
 }
 
 int	check_vmware_vmstorageuncommited(AGENT_REQUEST *request, AGENT_RESULT *result)
@@ -749,8 +712,7 @@ int	check_vmware_vmstorageuncommited(AGENT_REQUEST *request, AGENT_RESULT *resul
 	userpwd = get_rparam(request, 2);
 	uuid = get_rparam(request, 3);
 
-	return get_vmware_vmstat(url, username, userpwd, uuid,
-		"//*[local-name()='storage']/*[local-name()='uncommitted']", result);
+	return get_vmware_vmstat(url, username, userpwd, uuid, ZBX_XPATH_LN2("storage", "uncommitted"), result);
 }
 
 int	check_vmware_vmstorageunshared(AGENT_REQUEST *request, AGENT_RESULT *result)
@@ -768,8 +730,7 @@ int	check_vmware_vmstorageunshared(AGENT_REQUEST *request, AGENT_RESULT *result)
 	userpwd = get_rparam(request, 2);
 	uuid = get_rparam(request, 3);
 
-	return get_vmware_vmstat(url, username, userpwd, uuid,
-		"//*[local-name()='storage']/*[local-name()='unshared']", result);
+	return get_vmware_vmstat(url, username, userpwd, uuid, ZBX_XPATH_LN2("storage", "unshared"), result);
 }
 
 int	check_vmware_vmpowerstate(AGENT_REQUEST *request, AGENT_RESULT *result)
@@ -787,8 +748,7 @@ int	check_vmware_vmpowerstate(AGENT_REQUEST *request, AGENT_RESULT *result)
 	userpwd = get_rparam(request, 2);
 	uuid = get_rparam(request, 3);
 
-	return get_vmware_vmstat(url, username, userpwd, uuid,
-		"//*[local-name()='runtime']/*[local-name()='powerState']", result);
+	return get_vmware_vmstat(url, username, userpwd, uuid, ZBX_XPATH_LN2("runtime", "powerState"), result);
 }
 
 int	check_vmware_vmcpuusage(AGENT_REQUEST *request, AGENT_RESULT *result)
@@ -806,8 +766,7 @@ int	check_vmware_vmcpuusage(AGENT_REQUEST *request, AGENT_RESULT *result)
 	userpwd = get_rparam(request, 2);
 	uuid = get_rparam(request, 3);
 
-	return get_vmware_vmstat(url, username, userpwd, uuid,
-		"//*[local-name()='runtime']/*[local-name()='maxCpuUsage']", result);
+	return get_vmware_vmstat(url, username, userpwd, uuid, ZBX_XPATH_LN2("runtime", "maxCpuUsage"), result);
 }
 
 int	check_vmware_hostuptime(AGENT_REQUEST *request, AGENT_RESULT *result)
@@ -824,8 +783,7 @@ int	check_vmware_hostuptime(AGENT_REQUEST *request, AGENT_RESULT *result)
 	username = get_rparam(request, 1);
 	userpwd = get_rparam(request, 2);
 
-	return get_vmware_hoststat(url, username, userpwd,
-		"//*[local-name()='quickStats']/*[local-name()='uptime']", result);
+	return get_vmware_hoststat(url, username, userpwd, ZBX_XPATH_LN2("quickStats", "uptime"), result);
 }
 
 int	check_vmware_hostmemoryused(AGENT_REQUEST *request, AGENT_RESULT *result)
@@ -842,8 +800,7 @@ int	check_vmware_hostmemoryused(AGENT_REQUEST *request, AGENT_RESULT *result)
 	username = get_rparam(request, 1);
 	userpwd = get_rparam(request, 2);
 
-	return get_vmware_hoststat(url, username, userpwd,
-		"//*[local-name()='quickStats']/*[local-name()='overallMemoryUsage']", result);
+	return get_vmware_hoststat(url, username, userpwd, ZBX_XPATH_LN2("quickStats", "overallMemoryUsage"), result);
 }
 
 int	check_vmware_hostcpuusage(AGENT_REQUEST *request, AGENT_RESULT *result)
@@ -860,8 +817,7 @@ int	check_vmware_hostcpuusage(AGENT_REQUEST *request, AGENT_RESULT *result)
 	username = get_rparam(request, 1);
 	userpwd = get_rparam(request, 2);
 
-	return get_vmware_hoststat(url, username, userpwd,
-		"//*[local-name()='quickStats']/*[local-name()='overallCpuUsage']", result);
+	return get_vmware_hoststat(url, username, userpwd, ZBX_XPATH_LN2("quickStats", "overallCpuUsage"), result);
 }
 
 int	check_vmware_hostfullname(AGENT_REQUEST *request, AGENT_RESULT *result)
@@ -878,8 +834,7 @@ int	check_vmware_hostfullname(AGENT_REQUEST *request, AGENT_RESULT *result)
 	username = get_rparam(request, 1);
 	userpwd = get_rparam(request, 2);
 
-	return get_vmware_hoststat(url, username, userpwd,
-		"//*[local-name()='product']/*[local-name()='fullName']", result);
+	return get_vmware_hoststat(url, username, userpwd, ZBX_XPATH_LN2("product", "fullName"), result);
 }
 
 int	check_vmware_hostversion(AGENT_REQUEST *request, AGENT_RESULT *result)
@@ -896,8 +851,7 @@ int	check_vmware_hostversion(AGENT_REQUEST *request, AGENT_RESULT *result)
 	username = get_rparam(request, 1);
 	userpwd = get_rparam(request, 2);
 
-	return get_vmware_hoststat(url, username, userpwd,
-		"//*[local-name()='product']/*[local-name()='version']", result);
+	return get_vmware_hoststat(url, username, userpwd, ZBX_XPATH_LN2("product", "version"), result);
 }
 
 int	check_vmware_hosthwvendor(AGENT_REQUEST *request, AGENT_RESULT *result)
@@ -914,8 +868,7 @@ int	check_vmware_hosthwvendor(AGENT_REQUEST *request, AGENT_RESULT *result)
 	username = get_rparam(request, 1);
 	userpwd = get_rparam(request, 2);
 
-	return get_vmware_hoststat(url, username, userpwd,
-		"//*[local-name()='hardware']/*[local-name()='vendor']", result);
+	return get_vmware_hoststat(url, username, userpwd, ZBX_XPATH_LN2("hardware", "vendor"), result);
 }
 
 int	check_vmware_hosthwmodel(AGENT_REQUEST *request, AGENT_RESULT *result)
@@ -932,8 +885,7 @@ int	check_vmware_hosthwmodel(AGENT_REQUEST *request, AGENT_RESULT *result)
 	username = get_rparam(request, 1);
 	userpwd = get_rparam(request, 2);
 
-	return get_vmware_hoststat(url, username, userpwd,
-		"//*[local-name()='hardware']/*[local-name()='model']", result);
+	return get_vmware_hoststat(url, username, userpwd, ZBX_XPATH_LN2("hardware", "model"), result);
 }
 
 int	check_vmware_hosthwuuid(AGENT_REQUEST *request, AGENT_RESULT *result)
@@ -950,8 +902,7 @@ int	check_vmware_hosthwuuid(AGENT_REQUEST *request, AGENT_RESULT *result)
 	username = get_rparam(request, 1);
 	userpwd = get_rparam(request, 2);
 
-	return get_vmware_hoststat(url, username, userpwd,
-		"//*[local-name()='hardware']/*[local-name()='uuid']", result);
+	return get_vmware_hoststat(url, username, userpwd, ZBX_XPATH_LN2("hardware", "uuid"), result);
 }
 
 int	check_vmware_hosthwmemory(AGENT_REQUEST *request, AGENT_RESULT *result)
@@ -968,8 +919,7 @@ int	check_vmware_hosthwmemory(AGENT_REQUEST *request, AGENT_RESULT *result)
 	username = get_rparam(request, 1);
 	userpwd = get_rparam(request, 2);
 
-	return get_vmware_hoststat(url, username, userpwd,
-		"//*[local-name()='hardware']/*[local-name()='memorySize']", result);
+	return get_vmware_hoststat(url, username, userpwd, ZBX_XPATH_LN2("hardware", "memorySize"), result);
 }
 
 int	check_vmware_hosthwcpumodel(AGENT_REQUEST *request, AGENT_RESULT *result)
@@ -986,8 +936,7 @@ int	check_vmware_hosthwcpumodel(AGENT_REQUEST *request, AGENT_RESULT *result)
 	username = get_rparam(request, 1);
 	userpwd = get_rparam(request, 2);
 
-	return get_vmware_hoststat(url, username, userpwd,
-		"//*[local-name()='hardware']/*[local-name()='cpuModel']", result);
+	return get_vmware_hoststat(url, username, userpwd, ZBX_XPATH_LN2("hardware", "cpuModel"), result);
 }
 
 int	check_vmware_hosthwcpufreq(AGENT_REQUEST *request, AGENT_RESULT *result)
@@ -1004,8 +953,7 @@ int	check_vmware_hosthwcpufreq(AGENT_REQUEST *request, AGENT_RESULT *result)
 	username = get_rparam(request, 1);
 	userpwd = get_rparam(request, 2);
 
-	return get_vmware_hoststat(url, username, userpwd,
-		"//*[local-name()='hardware']/*[local-name()='cpuMhz']", result);
+	return get_vmware_hoststat(url, username, userpwd, ZBX_XPATH_LN2("hardware", "cpuMhz"), result);
 }
 
 int	check_vmware_hosthwcpucores(AGENT_REQUEST *request, AGENT_RESULT *result)
@@ -1022,8 +970,7 @@ int	check_vmware_hosthwcpucores(AGENT_REQUEST *request, AGENT_RESULT *result)
 	username = get_rparam(request, 1);
 	userpwd = get_rparam(request, 2);
 
-	return get_vmware_hoststat(url, username, userpwd,
-		"//*[local-name()='hardware']/*[local-name()='numCpuCores']", result);
+	return get_vmware_hoststat(url, username, userpwd, ZBX_XPATH_LN2("hardware", "numCpuCores"), result);
 }
 
 int	check_vmware_hosthwcputhreads(AGENT_REQUEST *request, AGENT_RESULT *result)
@@ -1040,8 +987,7 @@ int	check_vmware_hosthwcputhreads(AGENT_REQUEST *request, AGENT_RESULT *result)
 	username = get_rparam(request, 1);
 	userpwd = get_rparam(request, 2);
 
-	return get_vmware_hoststat(url, username, userpwd,
-		"//*[local-name()='hardware']/*[local-name()='numCpuThreads']", result);
+	return get_vmware_hoststat(url, username, userpwd, ZBX_XPATH_LN2("hardware", "numCpuThreads"), result);
 }
 
 int	check_vmware_hoststatus(AGENT_REQUEST *request, AGENT_RESULT *result)
@@ -1058,6 +1004,5 @@ int	check_vmware_hoststatus(AGENT_REQUEST *request, AGENT_RESULT *result)
 	username = get_rparam(request, 1);
 	userpwd = get_rparam(request, 2);
 
-	return get_vmware_hoststat(url, username, userpwd,
-		"//*[local-name()='val']/*[local-name()='overallStatus']", result);
+	return get_vmware_hoststat(url, username, userpwd, ZBX_XPATH_LN2("val", "overallStatus"), result);
 }
