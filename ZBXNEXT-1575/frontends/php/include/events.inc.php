@@ -79,6 +79,23 @@ function eventObject($object = null) {
 	}
 }
 
+/**
+ * Returns all supported event source-object pairs.
+ *
+ * @return array
+ */
+function eventSourceObjects() {
+	return array(
+		array('source' => EVENT_SOURCE_TRIGGERS, 'object' => EVENT_OBJECT_TRIGGER),
+		array('source' => EVENT_SOURCE_DISCOVERY, 'object' => EVENT_OBJECT_DHOST),
+		array('source' => EVENT_SOURCE_DISCOVERY, 'object' => EVENT_OBJECT_DSERVICE),
+		array('source' => EVENT_SOURCE_AUTO_REGISTRATION, 'object' => EVENT_OBJECT_AUTOREGHOST),
+		array('source' => EVENT_SOURCE_INTERNAL, 'object' => EVENT_OBJECT_TRIGGER),
+		array('source' => EVENT_SOURCE_INTERNAL, 'object' => EVENT_OBJECT_ITEM),
+		array('source' => EVENT_SOURCE_INTERNAL, 'object' => EVENT_OBJECT_LLDRULE)
+	);
+}
+
 function get_tr_event_by_eventid($eventid) {
 	$sql = 'SELECT e.*,t.triggerid,t.description,t.expression,t.priority,t.status,t.type'.
 			' FROM events e,triggers t'.
