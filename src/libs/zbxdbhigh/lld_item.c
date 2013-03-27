@@ -614,7 +614,7 @@ static void	DBlld_item_make(zbx_vector_ptr_t *items, const char *name_proto, con
 		}
 
 		buffer = zbx_strdup(buffer, snmp_oid_proto);
-		substitute_discovery_macros(&buffer, jp_row);
+		substitute_key_macros(&buffer, NULL, NULL, jp_row, MACRO_TYPE_SNMP_OID, NULL, 0);
 		zbx_lrtrim(buffer, ZBX_WHITESPACE);
 		if (0 != strcmp(item->snmp_oid, buffer))
 		{
