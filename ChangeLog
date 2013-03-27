@@ -46,7 +46,6 @@ A.F.I...S. [ZBXNEXT-1186] increased length to 2048 characters of expression fiel
 ........S. [ZBXNEXT-1663] added support for notification macros {TRIGGER.NAME.ORIG}, {ITEM.NAME.ORIG}, {ITEM.KEY.ORIG} (dimir)
 
 Bug fixes:
-........S. [ZBX-6423] fixed escalator to allow alerts while processing huge amount of escalations (dimir)
 ........S. [ZBX-3643] fixed trend average calculation for 64 bit unsigned integer values (wiper)
 ..F....... [ZBX-6397] synchronized discovery rule username/password field validation with items (Eduard)
 ..F....... [ZBX-6400] fixed type list in discovery rule form (Eduard)
