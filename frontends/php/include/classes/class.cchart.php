@@ -764,14 +764,29 @@ class CChart extends CGraphDraw {
 
 			if ($this->ymax_type == GRAPH_YAXIS_TYPE_FIXED) {
 				$this->m_maxY[$side] = $this->yaxismax;
-				$this->m_minY[$side] = 0;
+				if ($this->ymin_type == GRAPH_YAXIS_TYPE_CALCULATED
+						&& ($this->m_minY[$side] == null || bccomp($this->m_maxY[$side], $this->m_minY[$side]) == 0
+								|| bccomp($this->m_maxY[$side], $this->m_minY[$side]) == -1)) {
+					if ($this->m_maxY[$side] > 0) {
+						$this->m_minY[$side] = bcmul($this->m_maxY[$side], 0.8);
+					}
+					else {
+						$this->m_minY[$side] = bcmul($this->m_maxY[$side], 1.2);
+					}
+				}
 			}
 
 			if ($this->ymin_type == GRAPH_YAXIS_TYPE_FIXED) {
 				$this->m_minY[$side] = $this->yaxismin;
-
-				if (($this->ymax_type == GRAPH_YAXIS_TYPE_CALCULATED) && bccomp($this->m_maxY[$side], $this->m_minY[$side]) == -1) {
-					$this->m_maxY[$side] = bcmul($this->m_minY[$side], 1.2);
+				if ($this->ymax_type == GRAPH_YAXIS_TYPE_CALCULATED
+						&& ($this->m_maxY[$side] == null || bccomp($this->m_maxY[$side], $this->m_minY[$side]) == 0
+								|| bccomp($this->m_maxY[$side], $this->m_minY[$side]) == -1)) {
+					if ($this->m_minY[$side] > 0) {
+						$this->m_maxY[$side] = bcmul($this->m_minY[$side], 1.2);
+					}
+					else {
+						$this->m_maxY[$side] = bcmul($this->m_minY[$side], 0.8);
+					}
 				}
 			}
 		}
@@ -942,7 +957,6 @@ class CChart extends CGraphDraw {
 
 			if ($this->ymax_type == GRAPH_YAXIS_TYPE_FIXED) {
 				$this->m_maxY[$graphSide] = $this->yaxismax;
-				$this->m_minY[$graphSide] = 0;
 			}
 			elseif ($this->ymax_type == GRAPH_YAXIS_TYPE_ITEM_VALUE) {
 				$this->m_maxY[$graphSide] = $tmp_maxY[$graphSide];
@@ -1461,15 +1475,24 @@ class CChart extends CGraphDraw {
 		if ($byteStep) {
 			$maxYPow = convertToBase1024($maxY, 1024);
 			$minYPow = convertToBase1024($minY, 1024);
+			$powStep = 1024;
 		} else {
 			$maxYPow = convertToBase1024($maxY);
 			$minYPow = convertToBase1024($minY);
+			$powStep = 1000;
 		}
+
 		if (abs($maxYPow['pow']) > abs($minYPow['pow']) && $maxYPow['value'] != 0) {
 			$newPow = $maxYPow['pow'];
+			if (abs(bcdiv($minYPow['value'], bcpow($powStep, $maxYPow['pow']))) > 1000) {
+				$newPow = $minYPow['pow'];
+			}
 		}
 		if (abs($maxYPow['pow']) < abs($minYPow['pow']) && $minYPow['value'] != 0) {
 			$newPow = $minYPow['pow'];
+			if (abs(bcdiv($maxYPow['value'], bcpow($powStep, $minYPow['pow']))) > 1000) {
+				$newPow = $maxYPow['pow'];
+			}
 		}
 		if ($maxYPow['pow'] == $minYPow['pow']) {
 			$newPow = $maxYPow['pow'];
@@ -1598,15 +1621,24 @@ class CChart extends CGraphDraw {
 		if ($byteStep) {
 			$maxYPow = convertToBase1024($maxY, 1024);
 			$minYPow = convertToBase1024($minY, 1024);
+			$powStep = 1024;
 		} else {
 			$maxYPow = convertToBase1024($maxY);
 			$minYPow = convertToBase1024($minY);
+			$powStep = 1000;
 		}
+
 		if (abs($maxYPow['pow']) > abs($minYPow['pow']) && $maxYPow['value'] != 0) {
 			$newPow = $maxYPow['pow'];
+			if (abs(bcdiv($minYPow['value'], bcpow($powStep, $maxYPow['pow']))) > 1000) {
+				$newPow = $minYPow['pow'];
+			}
 		}
 		if (abs($maxYPow['pow']) < abs($minYPow['pow']) && $minYPow['value'] != 0) {
 			$newPow = $minYPow['pow'];
+			if (abs(bcdiv($maxYPow['value'], bcpow($powStep, $minYPow['pow']))) > 1000) {
+				$newPow = $maxYPow['pow'];
+			}
 		}
 		if ($maxYPow['pow'] == $minYPow['pow']) {
 			$newPow = $maxYPow['pow'];
