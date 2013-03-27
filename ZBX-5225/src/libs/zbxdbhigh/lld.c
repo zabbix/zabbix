@@ -805,6 +805,9 @@ static void	DBlld_save_triggers(zbx_vector_ptr_t *triggers, unsigned char status
 		zbx_free(description_esc);
 	}
 
+	if (0 != new_triggers || new_triggers < triggers->values_num || 0 != new_functions)
+		DBbegin();
+
 	if (0 != new_triggers)
 	{
 #ifdef HAVE_MULTIROW_INSERT
@@ -839,6 +842,9 @@ static void	DBlld_save_triggers(zbx_vector_ptr_t *triggers, unsigned char status
 		DBexecute("%s", sql3);
 		zbx_free(sql3);
 	}
+
+	if (0 != new_triggers || new_triggers < triggers->values_num || 0 != new_functions)
+		DBcommit();
 }
 
 /******************************************************************************
@@ -1389,6 +1395,9 @@ static void	DBlld_save_graphs(zbx_vector_ptr_t *graphs, int width, int height, d
 		zbx_free(name_esc);
 	}
 
+	if (0 != new_graphs || 0 != new_graphs_items || new_graphs < graphs->values_num)
+		DBbegin();
+
 	if (0 != new_graphs)
 	{
 #ifdef HAVE_MULTIROW_INSERT
@@ -1422,6 +1431,9 @@ static void	DBlld_save_graphs(zbx_vector_ptr_t *graphs, int width, int height, d
 		DBexecute("%s", sql4);
 		zbx_free(sql4);
 	}
+
+	if (0 != new_graphs || 0 != new_graphs_items || new_graphs < graphs->values_num)
+		DBcommit();
 }
 
 /******************************************************************************
@@ -1672,8 +1684,6 @@ void	DBlld_process_discovery_rule(zbx_uint64_t discovery_itemid, char *value, zb
 	if (0 == hostid)
 		goto clean;
 
-	DBbegin();
-
 	error = zbx_strdup(error, "");
 
 	if (SUCCEED != zbx_json_open(value, &jp))
@@ -1750,6 +1760,8 @@ error:
 	}
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " where itemid=" ZBX_FS_UI64, discovery_itemid);
+
+	DBbegin();
 
 	DBexecute("%s", sql);
 

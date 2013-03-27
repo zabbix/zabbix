@@ -1164,6 +1164,9 @@ static void	DBlld_items_save(zbx_uint64_t hostid, zbx_uint64_t parent_itemid, zb
 	zbx_free(delay_flex_esc);
 	zbx_free(key_proto_esc);
 
+	if (0 != new_items || 0 != new_applications || 0 != upd_items || 0 != del_itemappids->values_num)
+		DBbegin();
+
 	if (0 != new_items)
 	{
 #ifdef HAVE_MULTIROW_INSERT
@@ -1205,6 +1208,9 @@ static void	DBlld_items_save(zbx_uint64_t hostid, zbx_uint64_t parent_itemid, zb
 		DBexecute("%s", sql4);
 		zbx_free(sql4);
 	}
+
+	if (0 != new_items || 0 != new_applications || 0 != upd_items || 0 != del_itemappids->values_num)
+		DBcommit();
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
@@ -1288,7 +1294,13 @@ static void	DBlld_remove_lost_resources(zbx_vector_ptr_t *items, unsigned short 
 	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	if (16 < sql_offset)	/* in ORACLE always present begin..end; */
+	{
+		DBbegin();
+
 		DBexecute("%s", sql);
+
+		DBcommit();
+	}
 
 	zbx_free(sql);
 
