@@ -338,7 +338,7 @@ $maxFlexMsg = new CSpan(_('Maximum number of flexible intervals added'), 'red');
 $maxFlexMsg->setAttribute('id', 'row-new-delay-flex-max-reached');
 $maxFlexMsg->setAttribute('style', 'display: none;');
 
-$itemFormList->addRow( _('New flexible interval'), array($newFlexInt, $maxFlexMsg), false, 'row_new_delay_flex', 'new');
+$itemFormList->addRow(_('New flexible interval'), array($newFlexInt, $maxFlexMsg), false, 'row_new_delay_flex', 'new');
 
 if ($this->data['is_discovery_rule']) {
 	$itemFormList->addRow(_('Keep lost resources period (in days)'), new CTextBox('lifetime', $this->data['lifetime'], ZBX_TEXTBOX_SMALL_SIZE, false, 64));
