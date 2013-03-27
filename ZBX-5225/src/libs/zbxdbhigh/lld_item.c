@@ -498,7 +498,7 @@ static void	DBlld_items_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *items, c
 
 					if (0 != item->itemid)
 					{
-						/* return an original key and drop the correspondqing flag */
+						/* return an original key and drop the corresponding flag */
 						zbx_free(item->key);
 						item->key = item->key_orig;
 						item->key_orig = NULL;
