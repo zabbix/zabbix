@@ -207,7 +207,6 @@ validate_sort_and_sortorder('name', ZBX_SORT_UP);
 $_REQUEST['go'] = get_request('go', 'none');
 $_REQUEST['params'] = get_request($paramsFieldName, '');
 unset($_REQUEST[$paramsFieldName]);
-$_REQUEST['status'] = isset($_REQUEST['status']) ? ITEM_STATUS_ACTIVE : ITEM_STATUS_DISABLED;
 
 // permissions
 if (get_request('itemid', false)) {
@@ -409,7 +408,7 @@ elseif (isset($_REQUEST['save']) && $_REQUEST['form_hostid'] > 0) {
 			'interfaceid' => get_request('interfaceid', 0),
 			'delay' => get_request('delay'),
 			'history' => get_request('history'),
-			'status' => get_request('status'),
+			'status' => get_request('status', ITEM_STATUS_DISABLED),
 			'type' => get_request('type'),
 			'snmp_community' => get_request('snmp_community'),
 			'snmp_oid' => get_request('snmp_oid'),
@@ -536,7 +535,7 @@ elseif (isset($_REQUEST['update']) && isset($_REQUEST['massupdate']) && isset($_
 		'description' => get_request('description'),
 		'delay' => get_request('delay'),
 		'history' => get_request('history'),
-		'status' => get_request('status'),
+		'status' => get_request('status', ITEM_STATUS_DISABLED),
 		'type' => get_request('type'),
 		'snmp_community' => get_request('snmp_community'),
 		'snmp_oid' => get_request('snmp_oid'),

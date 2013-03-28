@@ -932,7 +932,7 @@
 			'hostname' => get_request('hostname', null),
 			'delay' => get_request('delay', ZBX_ITEM_DELAY_DEFAULT),
 			'history' => get_request('history', 90),
-			'status' => get_request('status', 0),
+			'status' => get_request('status', isset($_REQUEST['form_refresh']) ? 1 : 0),
 			'type' => get_request('type', 0),
 			'snmp_community' => get_request('snmp_community', 'public'),
 			'snmp_oid' => get_request('snmp_oid', 'interfaces.ifTable.ifEntry.ifInOctets.1'),
