@@ -1939,15 +1939,17 @@ class testFormItem extends CWebTest {
 						$this->zbxTestTextPresent($msg);
 					}
 					$itemFlexFlag = false;
-					if (isset($period['maximumItems'])) {
-						$this->assertNotVisible('new_delay_flex_delay');
-						$this->assertNotVisible('new_delay_flex_period');
-					}
-					else {
-						$this->assertVisible('new_delay_flex_delay');
-						$this->assertVisible('new_delay_flex_period');
-					}
 				}
+
+				if (isset($period['maximumItems'])) {
+					$this->assertNotVisible('new_delay_flex_delay');
+					$this->assertNotVisible('new_delay_flex_period');
+				}
+				else {
+					$this->assertVisible('new_delay_flex_delay');
+					$this->assertVisible('new_delay_flex_period');
+				}
+
 				if (isset($period['remove'])) {
 					$this->zbxTestClick('remove');
 					sleep(1);
