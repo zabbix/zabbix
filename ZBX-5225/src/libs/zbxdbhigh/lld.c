@@ -652,6 +652,9 @@ static void	DBlld_save_triggers(zbx_vector_ptr_t *triggers, unsigned char status
 				" (functionid,itemid,triggerid,function,parameter)"
 				" values ";
 
+	if (0 == triggers->values_num)
+		return;
+
 	for (i = 0; i < triggers->values_num; i++)
 	{
 		trigger = (zbx_lld_trigger_t *)triggers->values[i];
@@ -804,9 +807,6 @@ static void	DBlld_save_triggers(zbx_vector_ptr_t *triggers, unsigned char status
 
 		zbx_free(description_esc);
 	}
-
-	if (0 == new_triggers && new_triggers >= triggers->values_num && 0 == new_functions)
-		return;
 
 	DBbegin();
 
@@ -1226,6 +1226,9 @@ static void	DBlld_save_graphs(zbx_vector_ptr_t *graphs, int width, int height, d
 			" (gitemid,graphid,itemid,drawtype,sortorder,color,yaxisside,calc_fnc,type)"
 			" values ";
 
+	if (0 == graphs->values_num)
+		return;
+
 	for (i = 0; i < graphs->values_num; i++)
 	{
 		graph = (zbx_lld_graph_t *)graphs->values[i];
@@ -1395,9 +1398,6 @@ static void	DBlld_save_graphs(zbx_vector_ptr_t *graphs, int width, int height, d
 
 		zbx_free(name_esc);
 	}
-
-	if (0 == new_graphs && 0 == new_graphs_items && new_graphs >= graphs->values_num)
-		return;
 
 	DBbegin();
 
