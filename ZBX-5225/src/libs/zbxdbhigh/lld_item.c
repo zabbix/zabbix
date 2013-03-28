@@ -1164,8 +1164,10 @@ static void	DBlld_items_save(zbx_uint64_t hostid, zbx_uint64_t parent_itemid, zb
 	zbx_free(delay_flex_esc);
 	zbx_free(key_proto_esc);
 
-	if (0 != new_items || 0 != new_applications || 0 != upd_items || 0 != del_itemappids->values_num)
-		DBbegin();
+	if (0 == new_items && 0 == new_applications && 0 == upd_items && 0 == del_itemappids->values_num)
+		goto out;
+
+	DBbegin();
 
 	if (0 != new_items)
 	{
@@ -1209,9 +1211,8 @@ static void	DBlld_items_save(zbx_uint64_t hostid, zbx_uint64_t parent_itemid, zb
 		zbx_free(sql4);
 	}
 
-	if (0 != new_items || 0 != new_applications || 0 != upd_items || 0 != del_itemappids->values_num)
-		DBcommit();
-
+	DBcommit();
+out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
@@ -1307,7 +1308,13 @@ static void	DBlld_remove_lost_resources(zbx_vector_ptr_t *items, unsigned short 
 	zbx_vector_uint64_sort(&del_itemids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	if (0 != del_itemids.values_num)
+	{
+		DBbegin();
+
 		DBdelete_items(&del_itemids);
+
+		DBcommit();
+	}
 
 	zbx_vector_uint64_destroy(&ts_itemids);
 	zbx_vector_uint64_destroy(&lc_itemids);

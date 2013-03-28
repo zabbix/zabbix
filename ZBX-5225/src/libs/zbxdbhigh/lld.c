@@ -805,8 +805,10 @@ static void	DBlld_save_triggers(zbx_vector_ptr_t *triggers, unsigned char status
 		zbx_free(description_esc);
 	}
 
-	if (0 != new_triggers || new_triggers < triggers->values_num || 0 != new_functions)
-		DBbegin();
+	if (0 == new_triggers && new_triggers >= triggers->values_num && 0 == new_functions)
+		return;
+
+	DBbegin();
 
 	if (0 != new_triggers)
 	{
@@ -843,8 +845,7 @@ static void	DBlld_save_triggers(zbx_vector_ptr_t *triggers, unsigned char status
 		zbx_free(sql3);
 	}
 
-	if (0 != new_triggers || new_triggers < triggers->values_num || 0 != new_functions)
-		DBcommit();
+	DBcommit();
 }
 
 /******************************************************************************
@@ -1395,8 +1396,10 @@ static void	DBlld_save_graphs(zbx_vector_ptr_t *graphs, int width, int height, d
 		zbx_free(name_esc);
 	}
 
-	if (0 != new_graphs || 0 != new_graphs_items || new_graphs < graphs->values_num)
-		DBbegin();
+	if (0 == new_graphs && 0 == new_graphs_items && new_graphs >= graphs->values_num)
+		return;
+
+	DBbegin();
 
 	if (0 != new_graphs)
 	{
@@ -1432,8 +1435,7 @@ static void	DBlld_save_graphs(zbx_vector_ptr_t *graphs, int width, int height, d
 		zbx_free(sql4);
 	}
 
-	if (0 != new_graphs || 0 != new_graphs_items || new_graphs < graphs->values_num)
-		DBcommit();
+	DBcommit();
 }
 
 /******************************************************************************
