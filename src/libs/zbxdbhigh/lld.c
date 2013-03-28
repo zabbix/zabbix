@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -9,7 +9,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -22,71 +22,6 @@
 #include "log.h"
 #include "zbxalgo.h"
 #include "zbxserver.h"
-
-static void	DBlld_remove_lost_resources(zbx_uint64_t lld_ruleid, unsigned short lifetime, int now)
-{
-	const char		*__function_name = "DBlld_remove_lost_resources";
-
-	DB_RESULT		result;
-	DB_ROW			row;
-	zbx_uint64_t		itemdiscoveryid, itemid;
-	int			lastcheck, ts_delete, lifetime_sec;
-	zbx_vector_uint64_t	itemids;
-	char			*sql = NULL;
-	size_t			sql_alloc = 512, sql_offset = 0;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() lifetime:%hu", __function_name, lifetime);
-
-	sql = zbx_malloc(sql, sql_alloc);
-	zbx_vector_uint64_create(&itemids);
-
-	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-	lifetime_sec = lifetime * SEC_PER_DAY;
-
-	result = DBselect(
-			"select id2.itemdiscoveryid,id2.itemid,id2.lastcheck,id2.ts_delete"
-			" from item_discovery id1,item_discovery id2"
-			" where id1.itemid=id2.parent_itemid"
-				" and id1.parent_itemid=" ZBX_FS_UI64
-				" and id2.lastcheck<%d",
-			lld_ruleid, now);
-
-	while (NULL != (row = DBfetch(result)))
-	{
-		ZBX_STR2UINT64(itemdiscoveryid, row[0]);
-		ZBX_STR2UINT64(itemid, row[1]);
-		lastcheck = atoi(row[2]);
-		ts_delete = atoi(row[3]);
-
-		if (lastcheck < now - lifetime_sec)
-		{
-			zbx_vector_uint64_append(&itemids, itemid);
-		}
-		else if (ts_delete != lastcheck + lifetime_sec)
-		{
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-					"update item_discovery"
-					" set ts_delete=%d"
-					" where itemdiscoveryid=" ZBX_FS_UI64 ";\n",
-					lastcheck + lifetime_sec, itemdiscoveryid);
-		}
-	}
-	DBfree_result(result);
-
-	zbx_vector_uint64_sort(&itemids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-
-	DBdelete_items(&itemids);
-
-	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
-	if (16 < sql_offset)	/* in ORACLE always present begin..end; */
-		DBexecute("%s", sql);
-
-	zbx_vector_uint64_destroy(&itemids);
-	zbx_free(sql);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
-}
 
 /******************************************************************************
  *                                                                            *
@@ -207,11 +142,11 @@ void	DBlld_process_discovery_rule(zbx_uint64_t lld_ruleid, char *value, zbx_time
 				__function_name, f_macro, f_regexp);
 	}
 
-	DBlld_update_items(hostid, lld_ruleid, &jp_data, &error, f_macro, f_regexp, regexps, regexps_num, ts->sec);
+	DBlld_update_items(hostid, lld_ruleid, &jp_data, &error, f_macro, f_regexp, regexps, regexps_num, lifetime,
+			ts->sec);
 	DBlld_update_triggers(hostid, lld_ruleid, &jp_data, &error, f_macro, f_regexp, regexps, regexps_num);
 	DBlld_update_graphs(hostid, lld_ruleid, &jp_data, &error, f_macro, f_regexp, regexps, regexps_num);
 	DBlld_update_hosts(lld_ruleid, &jp_data, &error, f_macro, f_regexp, regexps, regexps_num, lifetime, ts->sec);
-	DBlld_remove_lost_resources(lld_ruleid, lifetime, ts->sec);
 
 	clean_regexps_ex(regexps, &regexps_num);
 	zbx_free(regexps);

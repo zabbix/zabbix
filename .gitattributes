@@ -540,6 +540,7 @@ misc/init.d/fedora/core5/zabbix_agentd -text
 misc/init.d/freebsd/zabbix_agentd -text
 misc/init.d/freebsd/zabbix_server -text
 misc/init.d/tru64/zabbix_server -text
+src/libs/zbxcommon/int128.c -text
 src/libs/zbxdbhigh/lld.h -text
 src/libs/zbxdbhigh/lld_common.c -text
 src/libs/zbxdbhigh/lld_graph.c -text
