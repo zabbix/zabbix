@@ -337,33 +337,33 @@ $itemFormList->addRow(
 	array(
 		_('Flexible intervals'),
 		SPACE,
-		new CVisibilityBox('delay_flex_visible', get_request('delay_flex_visible'), array('delayFlexDiv', 'newDelayFlexDiv'), _('Original'))
+		new CVisibilityBox('delay_flex_visible', get_request('delay_flex_visible'), array('delayFlexDiv', 'row-new-delay-flex-fields'), _('Original'))
 	),
 	new CDiv($delayFlexTable, 'objectgroup inlineblock border_dotted ui-corner-all', 'delayFlexDiv')
 );
 
 // append new delay to form list
-$itemFormList->addRow(
-	_('New flexible interval'),
-	new CDiv(
-		array(
-			_('Interval (in sec)'),
-			SPACE,
-			new CNumericBox('new_delay_flex[delay]', 50, 5),
-			SPACE,
-			_('Period'),
-			SPACE,
-			new CTextBox('new_delay_flex[period]', ZBX_DEFAULT_INTERVAL, 20),
-			SPACE,
-			new CSubmit('add_delay_flex', _('Add'), null, 'formlist')
-		),
-		null,
-		'newDelayFlexDiv'
+$newFlexInt = new CDiv(
+	array(
+		_('Interval (in sec)'),
+		SPACE,
+		new CNumericBox('new_delay_flex[delay]', 50, 5),
+		SPACE,
+		_('Period'),
+		SPACE,
+		new CTextBox('new_delay_flex[period]', ZBX_DEFAULT_INTERVAL, 20),
+		SPACE,
+		new CSubmit('add_delay_flex', _('Add'), null, 'formlist')
 	),
-	$this->data['maxReached'],
-	'row_new_delay_flex',
-	'new'
+	null,
+	'row-new-delay-flex-fields'
 );
+
+$maxFlexMsg = new CSpan(_('Maximum number of flexible intervals added'), 'red');
+$maxFlexMsg->setAttribute('id', 'row-new-delay-flex-max-reached');
+$maxFlexMsg->setAttribute('style', 'display: none;');
+
+$itemFormList->addRow(_('New flexible interval'), array($newFlexInt, $maxFlexMsg), false, 'row_new_delay_flex', 'new');
 
 // append history to form list
 $itemFormList->addRow(
