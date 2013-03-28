@@ -1911,7 +1911,7 @@ static void	dc_add_proxy_history_text_sql(ZBX_DC_HISTORY *history, int history_n
 		DBbind_parameter(1, &history[i].itemid, ZBX_TYPE_ID);
 		DBbind_parameter(2, &history[i].clock, ZBX_TYPE_INT);
 		DBbind_parameter(3, &history[i].ns, ZBX_TYPE_INT);
-		DBbind_parameter(4, history[i].value_orig.str, ZBX_TYPE_TEXT);
+		DBbind_parameter(4, history[i].value_orig.str, ZBX_TYPE_LONGTEXT);
 
 		DBstatement_execute();
 	}
@@ -1984,7 +1984,7 @@ static void	dc_add_proxy_history_log_sql(ZBX_DC_HISTORY *history, int history_nu
 		DBbind_parameter(4, &history[i].timestamp, ZBX_TYPE_INT);
 		DBbind_parameter(5, NULL == history[i].value.str ? "" : history[i].value.str, ZBX_TYPE_TEXT);
 		DBbind_parameter(6, &history[i].severity, ZBX_TYPE_INT);
-		DBbind_parameter(7, history[i].value_orig.str, ZBX_TYPE_TEXT);
+		DBbind_parameter(7, history[i].value_orig.str, ZBX_TYPE_LONGTEXT);
 		DBbind_parameter(8, &history[i].logeventid, ZBX_TYPE_INT);
 
 		DBstatement_execute();
