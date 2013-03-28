@@ -28,7 +28,7 @@ class testFormItem extends CWebTest {
 
 
 	/**
-	 * The name of the test host for simpleCreate checks created in the test data set.
+	 * The name of the test host created in the test data set.
 	 *
 	 * @var string
 	 */
@@ -1676,6 +1676,18 @@ class testFormItem extends CWebTest {
 			),
 			array(
 				array(
+					'expected' => ITEM_GOOD,
+					'type' => 'IPMI agent',
+					'name' => 'IPMI agent with spaces',
+					'key' => 'item-ipmi-agent-spaces',
+					'ipmi_sensor' => 'ipmi_sensor',
+					'ipmiSpaces' => true,
+					'dbCheck' => true,
+					'formCheck' => true
+				)
+			),
+			array(
+				array(
 					'expected' => ITEM_BAD,
 					'type' => 'SSH agent',
 					'name' => 'SSH agent error',
@@ -1795,20 +1807,8 @@ class testFormItem extends CWebTest {
 	 */
 	public function testFormItem_SimpleCreate($data) {
 		$this->zbxTestLogin('hosts.php');
-		$this->checkTitle('Configuration of hosts');
-		$this->zbxTestTextPresent('CONFIGURATION OF HOSTS');
-
-		$this->zbxTestDropdownSelectWait('groupid', 'all');
-		$this->zbxTestTextPresent('CONFIGURATION OF HOSTS');
-		$this->zbxTestDropdownSelectWait('groupid', 'all');
-		$this->checkTitle('Configuration of hosts');
-		$this->zbxTestTextPresent('CONFIGURATION OF HOSTS');
-
-		$row = DBfetch(DBselect('select hostid from hosts where name='.zbx_dbstr($this->host)));
-		$hostid = $row['hostid'];
-
-		$this->href_click('items.php?filter_set=1&hostid='.$hostid.'&sid=');
-		$this->wait();
+		$this->zbxTestClickWait('link='.$this->host);
+		$this->zbxTestClickWait("//div[@class='w']//a[text()='Items']");
 
 		$this->checkTitle('Configuration of items');
 		$this->zbxTestTextPresent('CONFIGURATION OF ITEMS');
@@ -1816,6 +1816,7 @@ class testFormItem extends CWebTest {
 		$this->zbxTestClickWait('form');
 		$this->checkTitle('Configuration of items');
 		$this->zbxTestTextPresent('CONFIGURATION OF ITEMS');
+		$this->zbxTestTextPresent('Item');
 
 		if (isset($data['type'])) {
 			$this->zbxTestDropdownSelect('type', $data['type']);
@@ -1836,7 +1837,14 @@ class testFormItem extends CWebTest {
 		}
 
 		if (isset($data['ipmi_sensor'])) {
-			$this->input_type('ipmi_sensor', $data['ipmi_sensor']);
+			if (isset($data['ipmiSpaces'])) {
+				$this->getEval("this.browserbot.findElement('ipmi_sensor').value = '    ipmi_sensor    ';");
+				$ipmi_sensor = $this->getEval("this.browserbot.findElement('ipmi_sensor').value;");
+			}
+			else {
+				$this->input_type('ipmi_sensor', $data['ipmi_sensor']);
+				$ipmi_sensor = $this->getValue('ipmi_sensor');
+			}
 		}
 
 		if (isset($data['params_f'])) {
@@ -1983,8 +1991,7 @@ class testFormItem extends CWebTest {
 			else {
 				$dbName = $name;
 			}
-			$this->zbxTestClick("link=$dbName");
-			$this->wait();
+			$this->zbxTestClickWait('link='.$dbName);
 			$this->assertAttribute("//input[@id='name']/@value", 'exact:'.$name);
 			$this->assertAttribute("//input[@id='key']/@value", 'exact:'.$key);
 			$this->assertElementPresent("//select[@id='type']/option[text()='$type']");
@@ -2007,6 +2014,16 @@ class testFormItem extends CWebTest {
 			}
 			$this->assertElementPresent("//select[@id='value_type']/option[text()='$value_type']");
 			$this->assertElementPresent("//select[@id='data_type']/option[text()='$data_type']");
+
+			if (isset($data['ipmi_sensor'])) {
+				if (isset($data['ipmiSpaces'])) {
+					$ipmiValue = $this->getEval("this.browserbot.findElement('ipmi_sensor').value;");
+				}
+				else {
+					$ipmiValue = $this->getValue('ipmi_sensor');
+				}
+				$this->assertEquals($ipmi_sensor, $ipmiValue);
+				}
 			}
 		}
 	}
