@@ -116,7 +116,6 @@ validate_sort_and_sortorder('name', ZBX_SORT_UP);
 $_REQUEST['go'] = get_request('go', 'none');
 $_REQUEST['params'] = get_request($paramsFieldName, '');
 unset($_REQUEST[$paramsFieldName]);
-$_REQUEST['status'] = isset($_REQUEST['status']) ? ITEM_STATUS_ACTIVE : ITEM_STATUS_DISABLED;
 
 /*
  * Permissions
@@ -196,7 +195,7 @@ elseif (isset($_REQUEST['save'])) {
 		'key_' => get_request('key'),
 		'hostid' => get_request('hostid'),
 		'delay' => get_request('delay'),
-		'status' => get_request('status'),
+		'status' => get_request('status', ITEM_STATUS_DISABLED),
 		'type' => get_request('type'),
 		'snmp_community' => get_request('snmp_community'),
 		'snmp_oid' => get_request('snmp_oid'),
