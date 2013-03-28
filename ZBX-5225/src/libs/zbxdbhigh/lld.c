@@ -666,6 +666,8 @@ static void	DBlld_save_triggers(zbx_vector_ptr_t *triggers, unsigned char status
 			new_functions += trigger->functions.values_num;
 	}
 
+	DBbegin();
+
 	if (0 != new_triggers)
 	{
 		triggerid = DBget_maxid_num("triggers", new_triggers);
@@ -807,8 +809,6 @@ static void	DBlld_save_triggers(zbx_vector_ptr_t *triggers, unsigned char status
 
 		zbx_free(description_esc);
 	}
-
-	DBbegin();
 
 	if (0 != new_triggers)
 	{
@@ -1243,6 +1243,8 @@ static void	DBlld_save_graphs(zbx_vector_ptr_t *graphs, int width, int height, d
 		}
 	}
 
+	DBbegin();
+
 	if (0 != new_graphs)
 	{
 		graphid = DBget_maxid_num("graphs", new_graphs);
@@ -1398,8 +1400,6 @@ static void	DBlld_save_graphs(zbx_vector_ptr_t *graphs, int width, int height, d
 
 		zbx_free(name_esc);
 	}
-
-	DBbegin();
 
 	if (0 != new_graphs)
 	{
