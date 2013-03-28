@@ -226,16 +226,14 @@ else {
 				break;
 			}
 
-			if (!isset($summary[$alert['userid']])) {
-				continue;
-			}
-
-			$summary[$alert['userid']]['total']++;
-			if (isset($summary[$alert['userid']]['medias'][$alert['mediatypeid']])) {
-				$summary[$alert['userid']]['medias'][$alert['mediatypeid']]++;
-			}
-			else {
-				$summary[$alert['userid']]['medias'][$alert['mediatypeid']] = 1;
+			if (isset($summary[$alert['userid']])) {
+				$summary[$alert['userid']]['total']++;
+				if (isset($summary[$alert['userid']]['medias'][$alert['mediatypeid']])) {
+					$summary[$alert['userid']]['medias'][$alert['mediatypeid']]++;
+				}
+				else {
+					$summary[$alert['userid']]['medias'][$alert['mediatypeid']] = 1;
+				}
 			}
 
 			next($alerts);
