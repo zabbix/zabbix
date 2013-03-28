@@ -58,7 +58,8 @@ typedef struct
 {
 	ipmi_control_t		*control;
 	char			*c_name;
-	int			*val, num_values;
+	int			num_values;	/* order of structure elements changed to avoid padding */
+	int			*val;		/* when the structure is an element of array */
 }
 zbx_ipmi_control_t;
 
