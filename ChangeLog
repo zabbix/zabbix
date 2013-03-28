@@ -7,6 +7,7 @@ A.F....... [ZBX-1357] updated American English, Brazilian Portuguese, French, Ge
 ........S. [ZBXNEXT-1663] added support for notification macros {TRIGGER.NAME.ORIG}, {ITEM.NAME.ORIG}, {ITEM.KEY.ORIG} (dimir)
 
 Bug fixes:
+........S. [ZBX-5225] fixed deadlocks while processing lld rules; each prototype will be processed in own transaction (Sasha)
 A......... [ZBX-6413] fixed that Zabbix API function 'webcheck.update' incorrectly requires 'name' (Toms)
 ........S. [ZBX-5225] improved performance of processing discovered items by the low-level discovery rule (Sasha)
 ........S. [ZBX-6423] fixed escalator to allow alerts while processing huge amount of escalations (dimir)

@@ -652,6 +652,9 @@ static void	DBlld_save_triggers(zbx_vector_ptr_t *triggers, unsigned char status
 				" (functionid,itemid,triggerid,function,parameter)"
 				" values ";
 
+	if (0 == triggers->values_num)
+		return;
+
 	for (i = 0; i < triggers->values_num; i++)
 	{
 		trigger = (zbx_lld_trigger_t *)triggers->values[i];
@@ -662,6 +665,8 @@ static void	DBlld_save_triggers(zbx_vector_ptr_t *triggers, unsigned char status
 		if (1 == trigger->update_expression)
 			new_functions += trigger->functions.values_num;
 	}
+
+	DBbegin();
 
 	if (0 != new_triggers)
 	{
@@ -839,6 +844,8 @@ static void	DBlld_save_triggers(zbx_vector_ptr_t *triggers, unsigned char status
 		DBexecute("%s", sql3);
 		zbx_free(sql3);
 	}
+
+	DBcommit();
 }
 
 /******************************************************************************
@@ -1219,6 +1226,9 @@ static void	DBlld_save_graphs(zbx_vector_ptr_t *graphs, int width, int height, d
 			" (gitemid,graphid,itemid,drawtype,sortorder,color,yaxisside,calc_fnc,type)"
 			" values ";
 
+	if (0 == graphs->values_num)
+		return;
+
 	for (i = 0; i < graphs->values_num; i++)
 	{
 		graph = (zbx_lld_graph_t *)graphs->values[i];
@@ -1232,6 +1242,8 @@ static void	DBlld_save_graphs(zbx_vector_ptr_t *graphs, int width, int height, d
 				new_graphs_items++;
 		}
 	}
+
+	DBbegin();
 
 	if (0 != new_graphs)
 	{
@@ -1422,6 +1434,8 @@ static void	DBlld_save_graphs(zbx_vector_ptr_t *graphs, int width, int height, d
 		DBexecute("%s", sql4);
 		zbx_free(sql4);
 	}
+
+	DBcommit();
 }
 
 /******************************************************************************
@@ -1672,8 +1686,6 @@ void	DBlld_process_discovery_rule(zbx_uint64_t discovery_itemid, char *value, zb
 	if (0 == hostid)
 		goto clean;
 
-	DBbegin();
-
 	error = zbx_strdup(error, "");
 
 	if (SUCCEED != zbx_json_open(value, &jp))
@@ -1750,6 +1762,8 @@ error:
 	}
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " where itemid=" ZBX_FS_UI64, discovery_itemid);
+
+	DBbegin();
 
 	DBexecute("%s", sql);
 
