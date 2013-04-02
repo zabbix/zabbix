@@ -1357,6 +1357,66 @@ class testFormItemPrototype extends CWebTest {
 					)
 				)
 			),
+			// Maximum flexfields allowed reached- error
+			array(
+				array(
+					'expected' => ITEM_BAD,
+					'name' => 'Item flex-maximum entries',
+					'key' => 'item-flex-maximum',
+					'flexPeriod' => array(
+						array('flexTime' => '1-7,00:00-24:00'),
+						array('flexTime' => '1-7,00:00-24:00'),
+						array('flexTime' => '1-7,00:00-24:00'),
+						array('flexTime' => '1-7,00:00-24:00'),
+						array('flexTime' => '1-7,00:00-24:00'),
+						array('flexTime' => '1-7,00:00-24:00'),
+						array('flexTime' => '1-7,00:00-24:00', 'instantCheck' => true, 'maximumItems' => true)
+					),
+					'errors' => array(
+						'Maximum number of flexible intervals added'
+					)
+				)
+			),
+			// Maximum flexfields allowed reached- save OK
+			array(
+				array(
+					'expected' => ITEM_GOOD,
+					'name' => 'Item flex-maximum save OK',
+					'key' => 'item-flex-maximum-save',
+					'flexPeriod' => array(
+						array('flexTime' => '1-7,00:00-24:00'),
+						array('flexTime' => '1-7,00:00-24:00'),
+						array('flexTime' => '1-7,00:00-24:00'),
+						array('flexTime' => '1-7,00:00-24:00'),
+						array('flexTime' => '1-7,00:00-24:00'),
+						array('flexTime' => '1-7,00:00-24:00'),
+						array('flexTime' => '1-7,00:00-24:00', 'maximumItems' => true)
+					),
+					'dbCheck' => true,
+					'formCheck' => true
+				)
+			),
+			// Maximum flexfields allowed reached- remove one item
+			array(
+				array(
+					'expected' => ITEM_BAD,
+					'name' => 'Item flex-maximum with remove',
+					'key' => 'item-flex-maximum-remove',
+					'flexPeriod' => array(
+						array('flexTime' => '1-7,00:00-24:00'),
+						array('flexTime' => '1-7,00:00-24:00'),
+						array('flexTime' => '1-7,00:00-24:00'),
+						array('flexTime' => '1-7,00:00-24:00'),
+						array('flexTime' => '1-7,00:00-24:00'),
+						array('flexTime' => '1-7,00:00-24:00'),
+						array('flexTime' => '1-7,00:00-24:00', 'instantCheck' => true, 'maximumItems' => true, 'remove' => true),
+						array('flexTime' => '1-7,00:00-24:00', 'instantCheck' => true, 'maximumItems' => true)
+					),
+					'errors' => array(
+						'Maximum number of flexible intervals added'
+					)
+				)
+			),
 			// History
 			array(
 				array(
@@ -1873,6 +1933,15 @@ class testFormItemPrototype extends CWebTest {
 						$this->zbxTestTextPresent($msg);
 					}
 					$itemFlexFlag = false;
+				}
+
+				if (isset($period['maximumItems'])) {
+					$this->assertNotVisible('new_delay_flex_delay');
+					$this->assertNotVisible('new_delay_flex_period');
+				}
+				else {
+					$this->assertVisible('new_delay_flex_delay');
+					$this->assertVisible('new_delay_flex_period');
 				}
 
 				if (isset($period['remove'])) {
