@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-02-20 19:46+0200\n"
+"POT-Creation-Date: 2013-04-02 18:12+0300\n"
 "PO-Revision-Date: 2012-12-25 07:09+0200\n"
 "Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
@@ -323,7 +323,7 @@ msgid "Activate selected"
 msgstr "選択を有効"
 
 #: include/views/administration.proxy.edit.php:40
-#: include/views/administration.proxy.list.php:76
+#: include/views/administration.proxy.list.php:84
 #: include/views/configuration.httpconf.edit.php:118
 msgid "Active"
 msgstr "有効"
@@ -433,7 +433,7 @@ msgstr "サービスを追加"
 msgid "Add to"
 msgstr "次に追加"
 
-#: charts.php:93 history.php:94 host_screen.php:88 include/html.inc.php:256
+#: charts.php:93 history.php:94 host_screen.php:88 include/html.inc.php:249
 #: maps.php:70 screens.php:89
 msgid "Add to favourites"
 msgstr "お気に入りに追加"
@@ -547,7 +547,7 @@ msgstr "許可されたホスト"
 msgid "Any"
 msgstr "すべて"
 
-#: include/regexp.inc.php:181
+#: include/regexp.inc.php:194
 msgid "Any character string included"
 msgstr "いずれかの文字列が含まれる"
 
@@ -596,7 +596,7 @@ msgid "Application with ID \"%1$s\" is not available on \"%2$s\"."
 msgstr "\"%2$s\"にID\"%1$s\"を持つアプリケーションは利用できません。"
 
 #: hosts.php:683 hosts.php:759 include/forms.inc.php:823
-#: include/html.inc.php:397 include/html.inc.php:401
+#: include/html.inc.php:390 include/html.inc.php:394
 #: include/views/configuration.application.list.php:40
 #: include/views/configuration.host.edit.php:318
 #: include/views/configuration.item.edit.php:402
@@ -1136,7 +1136,7 @@ msgstr "トリガー\"%1$s:%2$s\"から存在しないトリガー\"%3$s:%4$s\"�
 msgid "Cannot add discovery rule"
 msgstr "ディスカバリのルールを追加できません"
 
-#: graphs.php:225
+#: graphs.php:246
 msgid "Cannot add graph"
 msgstr "グラフを追加できません"
 
@@ -1274,7 +1274,7 @@ msgstr "トリガーのプロトタイプを複製できません"
 msgid "Cannot connect to the trapper port of zabbix server daemon, but it should be available to run the script."
 msgstr "ZabbixサーバーデーモンのTrapperポートに接続できません。スクリプトを実行するためには適切に設定を行ってください。"
 
-#: graphs.php:289
+#: graphs.php:310
 msgid "Cannot copy graphs"
 msgstr "グラフをコピーできません"
 
@@ -1359,7 +1359,7 @@ msgstr "ディスカバリのルールを削除できません"
 msgid "Cannot delete discovery rules"
 msgstr "ディスカバリルールを削除できません"
 
-#: graphs.php:236
+#: graphs.php:257
 msgid "Cannot delete graph"
 msgstr "グラフを削除できません"
 
@@ -1371,7 +1371,7 @@ msgstr "グラフのプロトタイプを削除できません"
 msgid "Cannot delete graph."
 msgstr "グラフを削除できません"
 
-#: graphs.php:243
+#: graphs.php:264
 msgid "Cannot delete graphs"
 msgstr "グラフを削除できません"
 
@@ -1870,7 +1870,7 @@ msgstr "ディスカバリのルールを更新できません"
 msgid "Cannot update frontend access"
 msgstr "フロントエンドのアクセスを更新できません"
 
-#: graphs.php:222
+#: graphs.php:243
 msgid "Cannot update graph"
 msgstr "グラフを更新できません"
 
@@ -2043,11 +2043,11 @@ msgstr "パスワード変更"
 msgid "Character"
 msgstr "文字列"
 
-#: include/regexp.inc.php:178
+#: include/regexp.inc.php:192
 msgid "Character string included"
 msgstr "文字列が含まれる"
 
-#: include/regexp.inc.php:184
+#: include/regexp.inc.php:196
 msgid "Character string not included"
 msgstr "文字列が含まれない"
 
@@ -3217,7 +3217,7 @@ msgstr "スクリプトを削除しますか？"
 #: include/reports.inc.php:417 include/reports.inc.php:459
 #: include/views/administration.general.regularexpressions.list.php:57
 #: include/views/administration.mediatypes.list.php:117
-#: include/views/administration.proxy.list.php:95
+#: include/views/administration.proxy.list.php:103
 #: include/views/administration.script.list.php:89
 #: include/views/administration.usergroups.edit.php:102
 #: include/views/administration.usergroups.edit.php:106
@@ -3319,7 +3319,7 @@ msgstr "選択したメディアタイプを削除しますか？"
 msgid "Delete selected node?"
 msgstr "選択したノードを削除しますか？"
 
-#: include/views/administration.proxy.list.php:96
+#: include/views/administration.proxy.list.php:104
 msgid "Delete selected proxies?"
 msgstr "選択したプロキシを削除しますか？"
 
@@ -3589,12 +3589,12 @@ msgstr "ホストを無効にしますか？"
 msgid "Disable hosts in the selected host groups?"
 msgstr "選択したホストグループのホストを無効にしますか？"
 
-#: include/views/administration.proxy.list.php:92
+#: include/views/administration.proxy.list.php:100
 msgid "Disable hosts monitored by selected proxies?"
 msgstr "選択したプロキシによるホストの監視を無効にしますか？"
 
 #: hosts.php:871 include/views/administration.mediatypes.list.php:113
-#: include/views/administration.proxy.list.php:91
+#: include/views/administration.proxy.list.php:99
 #: include/views/administration.usergroups.list.php:133
 #: include/views/configuration.action.list.php:97
 #: include/views/configuration.application.list.php:85
@@ -3687,7 +3687,7 @@ msgid "Discovered device"
 msgstr "発見されたホスト"
 
 #: events.php:310 hosts.php:687 hosts.php:767 include/events.inc.php:27
-#: include/html.inc.php:387 include/menu.inc.php:77 include/menu.inc.php:211
+#: include/html.inc.php:380 include/menu.inc.php:77 include/menu.inc.php:211
 #: include/views/configuration.action.list.php:34 templates.php:463
 #: templates.php:531
 msgid "Discovery"
@@ -3705,7 +3705,7 @@ msgstr "ディスカバリチェック"
 msgid "Discovery checks"
 msgstr "ディスカバリチェック"
 
-#: include/html.inc.php:385
+#: include/html.inc.php:378
 msgid "Discovery list"
 msgstr "ディスカバリリスト"
 
@@ -3753,7 +3753,7 @@ msgstr "ディスカバリのルールを削除しました"
 msgid "Discovery rule updated"
 msgstr "ディスカバリのルールを更新しました"
 
-#: include/html.inc.php:496 include/html.inc.php:500
+#: include/html.inc.php:489 include/html.inc.php:493
 #: include/views/configuration.host.discovery.list.php:33
 #: include/views/configuration.host.edit.php:423
 #: include/views/configuration.template.edit.php:303
@@ -3850,12 +3850,12 @@ msgctxt "discovery status"
 msgid "Down"
 msgstr "Down"
 
-#: api/classes/CWebCheck.php:616
+#: api/classes/CWebCheck.php:619
 #, php-format
 msgid "Download speed for scenario \"%s\"."
 msgstr "シナリオ\"%s\"のダウンロード速度"
 
-#: api/classes/CWebCheck.php:715
+#: api/classes/CWebCheck.php:718
 #, php-format
 msgid "Download speed for step \"%1$s\" of scenario \"%2$s\"."
 msgstr "シナリオ\"%2$s\"のステップ\"%1$s\"のダウンロード速度"
@@ -4084,12 +4084,12 @@ msgstr "ホストを有効"
 msgid "Enable host?"
 msgstr "ホストを有効にしますか？"
 
-#: include/views/administration.proxy.list.php:88
+#: include/views/administration.proxy.list.php:96
 msgid "Enable hosts monitored by selected proxies?"
 msgstr "選択したプロキシによるホストの監視を有効にしますか？"
 
 #: hosts.php:867 include/views/administration.mediatypes.list.php:109
-#: include/views/administration.proxy.list.php:87
+#: include/views/administration.proxy.list.php:95
 #: include/views/administration.usergroups.list.php:129
 #: include/views/configuration.action.list.php:93
 #: include/views/configuration.application.list.php:81
@@ -4422,7 +4422,7 @@ msgstr "失敗"
 msgid "Failed"
 msgstr "失敗"
 
-#: api/classes/CWebCheck.php:623
+#: api/classes/CWebCheck.php:626
 #, php-format
 msgid "Failed step of scenario \"%s\"."
 msgstr "シナリオ\"%s\"のステップが失敗"
@@ -4499,7 +4499,7 @@ msgid "Filled region"
 msgstr "面"
 
 #: dashconf.php:265 events.php:373 hostinventories.php:134 hosts.php:657
-#: include/classes/class.cwidget.php:134 include/forms.inc.php:574
+#: include/classes/class.cwidget.php:130 include/forms.inc.php:574
 #: include/reports.inc.php:178
 #: include/views/administration.auditacts.list.php:49
 #: include/views/administration.auditlogs.list.php:65
@@ -4609,7 +4609,7 @@ msgstr "フロントエンドメッセージング"
 msgid "Full clone"
 msgstr "すべて複製"
 
-#: include/html.inc.php:267
+#: include/html.inc.php:260
 msgid "Fullscreen"
 msgstr "フルスクリーン"
 
@@ -4685,7 +4685,7 @@ msgstr "グローバルスクリプト"
 #: hosts.php:879
 #: include/views/administration.general.regularexpressions.list.php:62
 #: include/views/administration.mediatypes.list.php:121
-#: include/views/administration.proxy.list.php:99
+#: include/views/administration.proxy.list.php:107
 #: include/views/administration.script.list.php:93
 #: include/views/administration.usergroups.list.php:149
 #: include/views/administration.users.list.php:144
@@ -4773,11 +4773,11 @@ msgstr "グラフ\"%1$s\"はスキップされました - ユーザの指定。"
 msgid "Graph \"%1$s\" with templated items cannot contain items from other hosts."
 msgstr "テンプレートのアイテムを含むグラフ\"%1$s\"には他のホストのアイテムを設定できません。"
 
-#: graphs.php:225
+#: graphs.php:246
 msgid "Graph added"
 msgstr "グラフを追加しました"
 
-#: graphs.php:236
+#: graphs.php:257
 msgid "Graph deleted"
 msgstr "グラフを削除しました"
 
@@ -4807,7 +4807,7 @@ msgstr "グラフのプロトタイプ\"%s\"を削除しました。"
 msgid "Graph prototype must have at least one prototype."
 msgstr "グラフのプロトタイプは少なくとも1つ以上のプロトタイプを設定する必要があります。"
 
-#: include/html.inc.php:460 include/html.inc.php:464
+#: include/html.inc.php:453 include/html.inc.php:457
 #: include/views/configuration.host.discovery.list.php:90
 #: include/views/configuration.host.edit.php:494
 #: include/views/configuration.template.edit.php:365
@@ -4828,7 +4828,7 @@ msgstr "グラフの合計値"
 msgid "Graph type"
 msgstr "グラフのタイプ"
 
-#: graphs.php:222
+#: graphs.php:243
 msgid "Graph updated"
 msgstr "グラフを更新しました"
 
@@ -4843,7 +4843,7 @@ msgid "Graph with same name but other type exist."
 msgstr "同じ名前で異なるタイプのグラフが存在します。"
 
 #: dashboard.php:260 hosts.php:686 hosts.php:765 include/blocks.inc.php:1218
-#: include/html.inc.php:471 include/html.inc.php:475 include/items.inc.php:802
+#: include/html.inc.php:464 include/html.inc.php:468 include/items.inc.php:802
 #: include/menu.inc.php:62 include/triggers.inc.php:1311
 #: include/views/configuration.graph.list.php:56
 #: include/views/configuration.host.discovery.list.php:54
@@ -4855,11 +4855,11 @@ msgstr "同じ名前で異なるタイプのグラフが存在します。"
 msgid "Graphs"
 msgstr "グラフ"
 
-#: graphs.php:289
+#: graphs.php:310
 msgid "Graphs copied"
 msgstr "グラフをコピーしました"
 
-#: graphs.php:243
+#: graphs.php:264
 msgid "Graphs deleted"
 msgstr "グラフを削除しました"
 
@@ -5042,7 +5042,7 @@ msgid "Hidden"
 msgstr "非表示"
 
 #: include/classes/class.cuiwidget.php:58
-#: include/classes/class.cwidget.php:222 include/html.inc.php:146
+#: include/classes/class.cwidget.php:183 include/html.inc.php:146
 msgid "Hide"
 msgstr "非表示"
 
@@ -5114,7 +5114,7 @@ msgstr "横位置"
 #: include/classes/screens/CScreenHostgroupTriggers.php:121
 #: include/classes/screens/CScreenHostTriggers.php:63
 #: include/classes/screens/CScreenHostTriggers.php:123
-#: include/forms.inc.php:504 include/html.inc.php:379 include/maps.inc.php:24
+#: include/forms.inc.php:504 include/html.inc.php:372 include/maps.inc.php:24
 #: include/reports.inc.php:112 include/setup.inc.php:310
 #: include/triggers.inc.php:1183 include/triggers.inc.php:1603
 #: include/views/configuration.application.edit.php:44
@@ -5257,7 +5257,7 @@ msgstr "ホストインベントリの概要"
 msgid "Host label type"
 msgstr "ホストのラベルタイプ"
 
-#: include/html.inc.php:350
+#: include/html.inc.php:343
 msgid "Host list"
 msgstr "ホストリスト"
 
@@ -5897,8 +5897,8 @@ msgstr "実行するアクションの設定が正しくありません。"
 msgid "Incorrect algorithm for service \"%1$s\"."
 msgstr "サービス\"%1$s\"のアルゴリズムが正しくありません。"
 
-#: api/classes/CApplication.php:436 include/regexp.inc.php:52
-#: include/regexp.inc.php:85 include/regexp.inc.php:150
+#: api/classes/CApplication.php:436 include/regexp.inc.php:53
+#: include/regexp.inc.php:91 include/regexp.inc.php:162
 msgid "Incorrect arguments passed to function"
 msgstr "設定項目が間違っています"
 
@@ -6590,7 +6590,7 @@ msgstr "アイテムを削除しました"
 msgid "Item prototype"
 msgstr "アイテムのプロトタイプ"
 
-#: include/html.inc.php:410 include/html.inc.php:414
+#: include/html.inc.php:403 include/html.inc.php:407
 #: include/views/configuration.host.discovery.list.php:88
 #: include/views/configuration.host.edit.php:443
 #: include/views/configuration.template.edit.php:323
@@ -6647,13 +6647,13 @@ msgstr "キー\"%1$s\"が設定されたアイテムはホスト\"%2$s\"に不�
 msgid "Item with key \"%1$s\" already exists on \"%2$s\"."
 msgstr "キー\"%1$s\"が設定されたアイテムは指定したホスト\"%2$s\"にすでに存在します。"
 
-#: api/classes/CWebCheck.php:644
+#: api/classes/CWebCheck.php:647
 #, php-format
 msgid "Item with key \"%s\" already exists."
 msgstr "キー\"%s\"が設定されたアイテムはすでに存在します。"
 
-#: hosts.php:684 hosts.php:761 include/html.inc.php:421
-#: include/html.inc.php:425 include/items.inc.php:733
+#: hosts.php:684 hosts.php:761 include/html.inc.php:414
+#: include/html.inc.php:418 include/items.inc.php:733
 #: include/reports.inc.php:329 include/reports.inc.php:465
 #: include/views/configuration.application.list.php:73
 #: include/views/configuration.graph.edit.php:280
@@ -6941,7 +6941,7 @@ msgstr "最新の変更 (降順)"
 msgid "Last check"
 msgstr "最新のチェック"
 
-#: api/classes/CWebCheck.php:630
+#: api/classes/CWebCheck.php:633
 #, php-format
 msgid "Last error message of scenario \"%s\"."
 msgstr "シナリオ\"%s\"の最新エラーメッセージ"
@@ -7490,7 +7490,7 @@ msgstr "一覧表示の最大項目数 \"%1$s\"。"
 msgid "Max count of events per trigger to show"
 msgstr "トリガーあたりのイベント表示の最大数"
 
-#: include/classes/class.cwidget.php:128 include/classes/class.cwidget.php:131
+#: include/classes/class.cwidget.php:124 include/classes/class.cwidget.php:127
 #: include/config.inc.php:346
 msgid "Maximize"
 msgstr "最大化"
@@ -7598,7 +7598,7 @@ msgstr "メンバー"
 msgid "Memory limit: %s"
 msgstr "メモリ制限: %s"
 
-#: dashboard.php:301 include/html.inc.php:273
+#: dashboard.php:301 include/html.inc.php:266
 #: include/views/configuration.item.list.php:206
 #: include/views/monitoring.slides.php:45
 msgid "Menu"
@@ -7659,7 +7659,7 @@ msgstr "ミリ"
 msgid "Min severity"
 msgstr "最小の深刻度"
 
-#: include/classes/class.cwidget.php:128 include/classes/class.cwidget.php:131
+#: include/classes/class.cwidget.php:124 include/classes/class.cwidget.php:127
 #: include/config.inc.php:346
 msgid "Minimize"
 msgstr "最小化"
@@ -7759,7 +7759,7 @@ msgstr "月"
 msgid "Monday"
 msgstr "月曜"
 
-#: hosts.php:793 include/html.inc.php:369
+#: hosts.php:793 include/html.inc.php:362
 #: include/views/configuration.host.edit.php:295
 #: include/views/configuration.host.massupdate.php:75 popup.php:569
 msgid "Monitored"
@@ -8528,7 +8528,7 @@ msgstr "ステップが設定されていません。"
 msgid "No target selected"
 msgstr "何も選択されていません"
 
-#: graphs.php:293 items.php:609
+#: graphs.php:314 items.php:609
 msgid "No target selected."
 msgstr "何も選択されていません。"
 
@@ -8639,7 +8639,7 @@ msgstr "なし"
 msgid "Normal"
 msgstr "ノーマル"
 
-#: include/html.inc.php:267
+#: include/html.inc.php:260
 msgid "Normal view"
 msgstr "通常表示"
 
@@ -8677,7 +8677,7 @@ msgstr "未分類"
 msgid "Not connected"
 msgstr "未ログイン"
 
-#: hosts.php:801 include/html.inc.php:372 include/triggers.inc.php:980
+#: hosts.php:801 include/html.inc.php:365 include/triggers.inc.php:980
 #: include/views/configuration.host.edit.php:296
 #: include/views/configuration.host.massupdate.php:76 popup.php:572
 msgid "Not monitored"
@@ -8962,7 +8962,7 @@ msgstr "特権管理者のみがユーザーのメディアを変更できます
 msgid "Only Zabbix Admins can remove user media."
 msgstr "特権管理者のみがユーザーのメディアを削除できます。"
 
-#: api/classes/CWebCheck.php:602
+#: api/classes/CWebCheck.php:604
 msgid "Only characters are allowed."
 msgstr "文字列のみ使用することができます。"
 
@@ -9375,7 +9375,7 @@ msgid "Parse error"
 msgstr "パースエラー"
 
 #: include/views/administration.proxy.edit.php:41
-#: include/views/administration.proxy.list.php:76
+#: include/views/administration.proxy.list.php:84
 msgid "Passive"
 msgstr "パッシブ"
 
@@ -9827,7 +9827,7 @@ msgstr "正規表現"
 msgid "Regular expression"
 msgstr "正規表現"
 
-#: include/regexp.inc.php:58 include/regexp.inc.php:92
+#: include/regexp.inc.php:62 include/regexp.inc.php:102
 #, php-format
 msgid "Regular expression \"%s\" already exists."
 msgstr "正規表現\"%s\"はすでに存在します。"
@@ -9857,7 +9857,7 @@ msgid "Regular expression deleted"
 msgid_plural "Regular expressions deleted"
 msgstr[0] "正規表現を削除しました"
 
-#: include/regexp.inc.php:79
+#: include/regexp.inc.php:85
 msgid "Regular expression does not exist."
 msgstr "正規表現は存在しません"
 
@@ -9933,7 +9933,7 @@ msgstr "アイコンの削除"
 msgid "Remove from"
 msgstr "次から削除"
 
-#: charts.php:85 history.php:86 host_screen.php:80 include/html.inc.php:249
+#: charts.php:85 history.php:86 host_screen.php:80 include/html.inc.php:242
 #: maps.php:63 screens.php:82
 msgid "Remove from favourites"
 msgstr "お気に入りから削除"
@@ -10028,7 +10028,7 @@ msgid "Required string"
 msgstr "要求文字列"
 
 #: events.php:371 hostinventories.php:137 hosts.php:660
-#: include/forms.inc.php:571 include/html.inc.php:276
+#: include/forms.inc.php:571 include/html.inc.php:269
 #: include/reports.inc.php:180 include/reports.inc.php:341
 #: include/reports.inc.php:479 include/reports.inc.php:717
 #: include/views/administration.auditacts.list.php:51
@@ -10072,7 +10072,7 @@ msgstr "リソース"
 msgid "Response code"
 msgstr "レスポンスコード"
 
-#: api/classes/CWebCheck.php:729
+#: api/classes/CWebCheck.php:732
 #, php-format
 msgid "Response code for step \"%1$s\" of scenario \"%2$s\"."
 msgstr "シナリオ\"%2$s\"のステップ\"%1$s\"のレスポンスコード"
@@ -10081,7 +10081,7 @@ msgstr "シナリオ\"%2$s\"のステップ\"%1$s\"のレスポンスコード"
 msgid "Response time"
 msgstr "レスポンスタイム"
 
-#: api/classes/CWebCheck.php:722
+#: api/classes/CWebCheck.php:725
 #, php-format
 msgid "Response time for step \"%1$s\" of scenario \"%2$s\"."
 msgstr "シナリオ\"%2$s\"のステップ\"%1$s\"のレスポンスタイム"
@@ -10091,11 +10091,11 @@ msgstr "シナリオ\"%2$s\"のステップ\"%1$s\"のレスポンスタイム"
 msgid "Result"
 msgstr "結果"
 
-#: include/regexp.inc.php:190
+#: include/regexp.inc.php:200
 msgid "Result is FALSE"
 msgstr "結果が偽"
 
-#: include/regexp.inc.php:187
+#: include/regexp.inc.php:198
 msgid "Result is TRUE"
 msgstr "結果が真"
 
@@ -10483,11 +10483,11 @@ msgstr "シナリオを削除しました"
 msgid "Scenario disabled"
 msgstr "シナリオを無効にしました"
 
-#: api/classes/CWebCheck.php:691 api/classes/CWebCheck.php:791
+#: api/classes/CWebCheck.php:694 api/classes/CWebCheck.php:794
 msgid "Scenario step name should contain only printable characters."
 msgstr "シナリオのステップ名には表示可能な文字のみ使用できます"
 
-#: api/classes/CWebCheck.php:705 api/classes/CWebCheck.php:806
+#: api/classes/CWebCheck.php:708 api/classes/CWebCheck.php:809
 msgid "Scenario step number cannot be less than 1."
 msgstr "シナリオのステップ数は1以下にはできません。"
 
@@ -10573,8 +10573,8 @@ msgstr "ID \"%s\"を持つスクリーンは存在しません。"
 msgid "Screen with name \"%s\" does not exist."
 msgstr "スクリーン\"%s\"は存在しません。"
 
-#: dashboard.php:267 include/blocks.inc.php:1356 include/html.inc.php:484
-#: include/html.inc.php:488 include/menu.inc.php:67 include/menu.inc.php:197
+#: dashboard.php:267 include/blocks.inc.php:1356 include/html.inc.php:477
+#: include/html.inc.php:481 include/menu.inc.php:67 include/menu.inc.php:197
 #: include/views/configuration.screen.list.php:38
 #: include/views/configuration.template.edit.php:386
 #: include/views/conf.import.php:35 include/views/monitoring.screen.php:29
@@ -10928,7 +10928,7 @@ msgid "Severity name cannot be empty."
 msgstr "深刻度を設定してください。"
 
 #: include/classes/class.cuiwidget.php:58
-#: include/classes/class.cwidget.php:222 include/html.inc.php:146
+#: include/classes/class.cwidget.php:183 include/html.inc.php:146
 #: include/reports.inc.php:339 include/reports.inc.php:477
 #: include/reports.inc.php:715
 #: include/views/configuration.application.list.php:55
@@ -11329,7 +11329,7 @@ msgstr "ステップ"
 msgid "Step \"%1$s\" [%2$s of %3$s] failed: %4$s"
 msgstr "ステップ\"%1$s\" [%3$sの%2$s] 失敗: %4$s"
 
-#: api/classes/CWebCheck.php:699
+#: api/classes/CWebCheck.php:702
 #, php-format
 msgid "Step \"%s\" already exists."
 msgstr "ステップ\"%s\"はすでに存在します。"
@@ -11519,7 +11519,7 @@ msgid "Telnet"
 msgstr "Telnet"
 
 #: include/audit.inc.php:51 include/forms.inc.php:541
-#: include/forms.inc.php:843 include/html.inc.php:364
+#: include/forms.inc.php:843 include/html.inc.php:357
 #: include/reports.inc.php:54 include/views/configuration.template.edit.php:38
 #: include/views/configuration.template.edit.php:390
 #: include/views/configuration.triggers.list.php:111
@@ -11561,7 +11561,7 @@ msgstr "テンプレートグループ"
 msgid "Template linkage"
 msgstr "テンプレートのリンク"
 
-#: include/html.inc.php:347
+#: include/html.inc.php:340
 msgid "Template list"
 msgstr "テンプレートリスト"
 
@@ -11971,7 +11971,7 @@ msgstr "トリガー名"
 msgid "Trigger prototype"
 msgstr "トリガーのプロトタイプ"
 
-#: include/html.inc.php:435 include/html.inc.php:439
+#: include/html.inc.php:428 include/html.inc.php:432
 #: include/views/configuration.host.discovery.list.php:89
 #: include/views/configuration.host.edit.php:470
 #: include/views/configuration.template.edit.php:344
@@ -12008,7 +12008,7 @@ msgid "Trigger value"
 msgstr "トリガーの値"
 
 #: hosts.php:685 hosts.php:763 include/events.inc.php:25
-#: include/forms.inc.php:517 include/html.inc.php:446 include/html.inc.php:450
+#: include/forms.inc.php:517 include/html.inc.php:439 include/html.inc.php:443
 #: include/menu.inc.php:52 include/triggers.inc.php:1162
 #: include/views/configuration.action.list.php:33
 #: include/views/configuration.host.discovery.list.php:53
@@ -12270,14 +12270,14 @@ msgstr "単位"
 #: include/discovery.inc.php:128 include/discovery.inc.php:162
 #: include/events.inc.php:29 include/graphs.inc.php:37
 #: include/graphs.inc.php:77 include/hosts.inc.php:53 include/hosts.inc.php:80
-#: include/html.inc.php:375 include/httptest.inc.php:39
+#: include/html.inc.php:368 include/httptest.inc.php:39
 #: include/httptest.inc.php:56 include/items.inc.php:41
 #: include/items.inc.php:102 include/items.inc.php:126
 #: include/items.inc.php:143 include/items.inc.php:160
 #: include/maintenances.inc.php:41 include/maps.inc.php:39
 #: include/maps.inc.php:709 include/maps.inc.php:799 include/maps.inc.php:896
 #: include/media.inc.php:39 include/nodes.inc.php:257 include/perm.inc.php:30
-#: include/regexp.inc.php:193 include/screens.inc.php:55
+#: include/regexp.inc.php:202 include/screens.inc.php:55
 #: include/triggers.inc.php:62 include/triggers.inc.php:173
 #: include/triggers.inc.php:191 include/users.inc.php:50
 #: include/users.inc.php:65
@@ -12903,12 +12903,12 @@ msgstr "ウェブ"
 msgid "Web checks"
 msgstr "ウェブ監視"
 
-#: api/classes/CWebCheck.php:677 api/classes/CWebCheck.php:776
+#: api/classes/CWebCheck.php:680 api/classes/CWebCheck.php:779
 #, php-format
 msgid "Web item \"%s\" created."
 msgstr "Webアイテム\"%s\"を作成しました。"
 
-#: api/classes/CWebCheck.php:742
+#: api/classes/CWebCheck.php:745
 #, php-format
 msgid "Web item with key \"%s\" already exists."
 msgstr "キー\"%s\"を持つWebアイテムはすでに存在します。"

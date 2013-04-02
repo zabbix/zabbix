@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-03-07 09:39+0200\n"
+"POT-Creation-Date: 2013-04-02 18:12+0300\n"
 "PO-Revision-Date: 2013-03-06 13:45+0200\n"
 "Last-Translator: Sébastien <sebastien@tiramiseb.fr>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -553,7 +553,7 @@ msgstr "Hôtes autorisés"
 msgid "Any"
 msgstr "Tous"
 
-#: include/regexp.inc.php:181
+#: include/regexp.inc.php:194
 msgid "Any character string included"
 msgstr "Toute chaîne de caractères inclue"
 
@@ -1142,7 +1142,7 @@ msgstr "Impossible d'ajouter la dépendance du déclencheur \"%1$s:%2$s\" au dé
 msgid "Cannot add discovery rule"
 msgstr "Impossible d'ajouter la règle de découverte"
 
-#: graphs.php:225
+#: graphs.php:246
 msgid "Cannot add graph"
 msgstr "Impossible d'ajouter le graphique"
 
@@ -1280,7 +1280,7 @@ msgstr "Impossible de cloner les prototypes de déclencheurs."
 msgid "Cannot connect to the trapper port of zabbix server daemon, but it should be available to run the script."
 msgstr "Impossible de se connecter au port \"trapper\" du serveur Zabbix, il doit être disponible pour exécuter le script."
 
-#: graphs.php:289
+#: graphs.php:310
 msgid "Cannot copy graphs"
 msgstr "Impossible de copier le graphique"
 
@@ -1365,7 +1365,7 @@ msgstr "Impossible de supprimer la règle de découverte"
 msgid "Cannot delete discovery rules"
 msgstr "Impossible d'effacer les règles de découverte"
 
-#: graphs.php:236
+#: graphs.php:257
 msgid "Cannot delete graph"
 msgstr "Impossible de supprimer le graphique"
 
@@ -1377,7 +1377,7 @@ msgstr "Impossible de supprimer le prototype de graphique"
 msgid "Cannot delete graph."
 msgstr "Impossible de supprimer le graphique."
 
-#: graphs.php:243
+#: graphs.php:264
 msgid "Cannot delete graphs"
 msgstr "Impossible de supprimer les graphiques"
 
@@ -1881,7 +1881,7 @@ msgstr "Impossible de mettre à jour la règle de découverte"
 msgid "Cannot update frontend access"
 msgstr "Impossible de mettre à jour l'accès à l'interface"
 
-#: graphs.php:222
+#: graphs.php:243
 msgid "Cannot update graph"
 msgstr "Impossible de mettre à jour le graphique"
 
@@ -2054,11 +2054,11 @@ msgstr "Changer le mot de passe"
 msgid "Character"
 msgstr "Caractère"
 
-#: include/regexp.inc.php:178
+#: include/regexp.inc.php:192
 msgid "Character string included"
 msgstr "Chaîne de caractères inclue"
 
-#: include/regexp.inc.php:184
+#: include/regexp.inc.php:196
 msgid "Character string not included"
 msgstr "Chaîne de caractères non inclue"
 
@@ -3862,12 +3862,12 @@ msgctxt "discovery status"
 msgid "Down"
 msgstr "Arrêté"
 
-#: api/classes/CWebCheck.php:616
+#: api/classes/CWebCheck.php:619
 #, php-format
 msgid "Download speed for scenario \"%s\"."
 msgstr "Vitesse de téléchargement pour le scénario \"%s\"."
 
-#: api/classes/CWebCheck.php:715
+#: api/classes/CWebCheck.php:718
 #, php-format
 msgid "Download speed for step \"%1$s\" of scenario \"%2$s\"."
 msgstr "Vitesse de téléchargement pour l'étape \"%1$s\" du scénario \"%2$s\"."
@@ -4434,7 +4434,7 @@ msgstr "Échec"
 msgid "Failed"
 msgstr "Échoué"
 
-#: api/classes/CWebCheck.php:623
+#: api/classes/CWebCheck.php:626
 #, php-format
 msgid "Failed step of scenario \"%s\"."
 msgstr "Étape d'échec du scénario \"%s\"."
@@ -4785,11 +4785,11 @@ msgstr "Graphique \"%1$s\" sauté - règle utilisateur."
 msgid "Graph \"%1$s\" with templated items cannot contain items from other hosts."
 msgstr "Le graphique \"%1$s\" avec des éléments de modèles ne peut pas contenir d'éléments d'autres hôtes."
 
-#: graphs.php:225
+#: graphs.php:246
 msgid "Graph added"
 msgstr "Graphique ajouté"
 
-#: graphs.php:236
+#: graphs.php:257
 msgid "Graph deleted"
 msgstr "Graphique supprimé"
 
@@ -4840,7 +4840,7 @@ msgstr "Somme du graphique"
 msgid "Graph type"
 msgstr "Type de graphique"
 
-#: graphs.php:222
+#: graphs.php:243
 msgid "Graph updated"
 msgstr "Graphique mis à jour"
 
@@ -4867,11 +4867,11 @@ msgstr "Un graphique avec le même nom mais un autre type existe déjà."
 msgid "Graphs"
 msgstr "Graphiques"
 
-#: graphs.php:289
+#: graphs.php:310
 msgid "Graphs copied"
 msgstr "Graphique copié"
 
-#: graphs.php:243
+#: graphs.php:264
 msgid "Graphs deleted"
 msgstr "Graphiques supprimés"
 
@@ -5909,8 +5909,8 @@ msgstr "Identifiant d'opération d'action incorrect."
 msgid "Incorrect algorithm for service \"%1$s\"."
 msgstr "Algorithme incorrect pour le service \"%1$s\"."
 
-#: api/classes/CApplication.php:436 include/regexp.inc.php:52
-#: include/regexp.inc.php:85 include/regexp.inc.php:150
+#: api/classes/CApplication.php:436 include/regexp.inc.php:53
+#: include/regexp.inc.php:91 include/regexp.inc.php:162
 msgid "Incorrect arguments passed to function"
 msgstr "Arguments incorrects passés à la fonction"
 
@@ -6659,7 +6659,7 @@ msgstr "Un élément avec la clé \"%1$s\" existe déjà sur \"%2$s\" comme él�
 msgid "Item with key \"%1$s\" already exists on \"%2$s\"."
 msgstr "Un élément avec la clé \"%1$s\" existe déjà sur \"%2$s\"."
 
-#: api/classes/CWebCheck.php:644
+#: api/classes/CWebCheck.php:647
 #, php-format
 msgid "Item with key \"%s\" already exists."
 msgstr "Un élément avec la clé \"%1$s\" existe déjà."
@@ -6954,7 +6954,7 @@ msgstr "Derniers changements (décroissant)"
 msgid "Last check"
 msgstr "Dernière vérification"
 
-#: api/classes/CWebCheck.php:630
+#: api/classes/CWebCheck.php:633
 #, php-format
 msgid "Last error message of scenario \"%s\"."
 msgstr "Dernier message d'erreur du scénario \"%s\"."
@@ -8544,7 +8544,7 @@ msgstr "Aucune étpa définie."
 msgid "No target selected"
 msgstr "Aucune cible sélectionnée"
 
-#: graphs.php:293 items.php:609
+#: graphs.php:314 items.php:609
 msgid "No target selected."
 msgstr "Aucune cible sélectionnée."
 
@@ -8978,7 +8978,7 @@ msgstr "Seuls les administrateurs Zabbix peuvent changer les médias utilisateur
 msgid "Only Zabbix Admins can remove user media."
 msgstr "Seuls les administrateurs Zabbix peuvent supprimer des médias utilisateurs."
 
-#: api/classes/CWebCheck.php:602
+#: api/classes/CWebCheck.php:604
 msgid "Only characters are allowed."
 msgstr "Seuls des caractères sont autorisés."
 
@@ -9843,7 +9843,7 @@ msgstr "Regexp"
 msgid "Regular expression"
 msgstr "Expression rationnelle"
 
-#: include/regexp.inc.php:58 include/regexp.inc.php:92
+#: include/regexp.inc.php:62 include/regexp.inc.php:102
 #, php-format
 msgid "Regular expression \"%s\" already exists."
 msgstr "L'expression rationnelle \"%s\" existe déjà."
@@ -9874,7 +9874,7 @@ msgid_plural "Regular expressions deleted"
 msgstr[0] "Expression rationnelle supprimée"
 msgstr[1] "Expressions rationnelles supprimées"
 
-#: include/regexp.inc.php:79
+#: include/regexp.inc.php:85
 msgid "Regular expression does not exist."
 msgstr "L'expression rationnelle n'existe pas."
 
@@ -10089,7 +10089,7 @@ msgstr "Ressource"
 msgid "Response code"
 msgstr "Code de réponse"
 
-#: api/classes/CWebCheck.php:729
+#: api/classes/CWebCheck.php:732
 #, php-format
 msgid "Response code for step \"%1$s\" of scenario \"%2$s\"."
 msgstr "Code de réponse pour l'étape \"%1$s\" du scénario \"%2$s\"."
@@ -10098,7 +10098,7 @@ msgstr "Code de réponse pour l'étape \"%1$s\" du scénario \"%2$s\"."
 msgid "Response time"
 msgstr "Temps de réponse"
 
-#: api/classes/CWebCheck.php:722
+#: api/classes/CWebCheck.php:725
 #, php-format
 msgid "Response time for step \"%1$s\" of scenario \"%2$s\"."
 msgstr "Temps de réponse pour l'étape \"%1$s\" du scénario \"%2$s\"."
@@ -10108,11 +10108,11 @@ msgstr "Temps de réponse pour l'étape \"%1$s\" du scénario \"%2$s\"."
 msgid "Result"
 msgstr "Résultat"
 
-#: include/regexp.inc.php:190
+#: include/regexp.inc.php:200
 msgid "Result is FALSE"
 msgstr "Le résultat est FAUX"
 
-#: include/regexp.inc.php:187
+#: include/regexp.inc.php:198
 msgid "Result is TRUE"
 msgstr "Le résultat est VRAI"
 
@@ -10500,11 +10500,11 @@ msgstr "Scénario supprimé"
 msgid "Scenario disabled"
 msgstr "Scénario désactivé"
 
-#: api/classes/CWebCheck.php:691 api/classes/CWebCheck.php:791
+#: api/classes/CWebCheck.php:694 api/classes/CWebCheck.php:794
 msgid "Scenario step name should contain only printable characters."
 msgstr "Le nom d'une étape de scénario ne doit contenir que des caractères imprimables."
 
-#: api/classes/CWebCheck.php:705 api/classes/CWebCheck.php:806
+#: api/classes/CWebCheck.php:708 api/classes/CWebCheck.php:809
 msgid "Scenario step number cannot be less than 1."
 msgstr "Le nombre d'étapes d'un scénario ne peut pas être inférieur à 1."
 
@@ -11346,7 +11346,7 @@ msgstr "Étape"
 msgid "Step \"%1$s\" [%2$s of %3$s] failed: %4$s"
 msgstr "Étape \"%1$s\" [%2$s sur %3$s] échouée : %4$s"
 
-#: api/classes/CWebCheck.php:699
+#: api/classes/CWebCheck.php:702
 #, php-format
 msgid "Step \"%s\" already exists."
 msgstr "L'étape \"%s\" existe déjà."
@@ -12297,7 +12297,7 @@ msgstr "Unités"
 #: include/maintenances.inc.php:41 include/maps.inc.php:39
 #: include/maps.inc.php:709 include/maps.inc.php:799 include/maps.inc.php:896
 #: include/media.inc.php:39 include/nodes.inc.php:257 include/perm.inc.php:30
-#: include/regexp.inc.php:193 include/screens.inc.php:55
+#: include/regexp.inc.php:202 include/screens.inc.php:55
 #: include/triggers.inc.php:62 include/triggers.inc.php:173
 #: include/triggers.inc.php:191 include/users.inc.php:50
 #: include/users.inc.php:65
@@ -12925,12 +12925,12 @@ msgstr "Web"
 msgid "Web checks"
 msgstr "Vérifications web"
 
-#: api/classes/CWebCheck.php:677 api/classes/CWebCheck.php:776
+#: api/classes/CWebCheck.php:680 api/classes/CWebCheck.php:779
 #, php-format
 msgid "Web item \"%s\" created."
 msgstr "Élément web \"%s\" créé."
 
-#: api/classes/CWebCheck.php:742
+#: api/classes/CWebCheck.php:745
 #, php-format
 msgid "Web item with key \"%s\" already exists."
 msgstr "L'élément web avec la clé \"%s\" existe déjà."

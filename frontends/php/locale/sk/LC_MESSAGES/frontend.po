@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-03-04 22:38+0200\n"
+"POT-Creation-Date: 2013-04-02 18:12+0300\n"
 "PO-Revision-Date: 2013-03-02 18:02+0200\n"
 "Last-Translator: Jan <jan.garaj@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
@@ -335,7 +335,7 @@ msgid "Activate selected"
 msgstr "Aktivovať označené"
 
 #: include/views/administration.proxy.edit.php:40
-#: include/views/administration.proxy.list.php:76
+#: include/views/administration.proxy.list.php:84
 #: include/views/configuration.httpconf.edit.php:118
 msgid "Active"
 msgstr "Aktívny"
@@ -559,7 +559,7 @@ msgstr "Povolené hosty"
 msgid "Any"
 msgstr "Akékoľvek"
 
-#: include/regexp.inc.php:181
+#: include/regexp.inc.php:194
 msgid "Any character string included"
 msgstr "Obsahuje ktorýkoľvek reťazec"
 
@@ -1148,7 +1148,7 @@ msgstr "Nie je možné pridať závislosť zo spúšťača \"%1$s:%2$s\" pre nee
 msgid "Cannot add discovery rule"
 msgstr "Nie je možné pridať pravidlo pre pátrača"
 
-#: graphs.php:225
+#: graphs.php:246
 msgid "Cannot add graph"
 msgstr "Nie je možné pridať graf"
 
@@ -1286,7 +1286,7 @@ msgstr "Nie je možné klonovať prototypy spúšťačov."
 msgid "Cannot connect to the trapper port of zabbix server daemon, but it should be available to run the script."
 msgstr "Pripojenie na Trapper port Zabbix servera zlyhalo, ale je potrebné pre spustenie skriptu."
 
-#: graphs.php:289
+#: graphs.php:310
 msgid "Cannot copy graphs"
 msgstr "Nie je možné kopírovať grafy"
 
@@ -1371,7 +1371,7 @@ msgstr "Nie je možné zmazať zisťovacie pravidlo"
 msgid "Cannot delete discovery rules"
 msgstr "Nie je možné zmazať zisťovacie pravidlá"
 
-#: graphs.php:236
+#: graphs.php:257
 msgid "Cannot delete graph"
 msgstr "Nie je možné zmazať graf"
 
@@ -1383,7 +1383,7 @@ msgstr "Nie je možné zmazať prototyp grafu"
 msgid "Cannot delete graph."
 msgstr "Nie je možné zmazať graf."
 
-#: graphs.php:243
+#: graphs.php:264
 msgid "Cannot delete graphs"
 msgstr "Nie je možné zmazať grafy"
 
@@ -1889,7 +1889,7 @@ msgstr "Nie je možné upraviť zisťovacie pravidlo"
 msgid "Cannot update frontend access"
 msgstr "Nie je možné aktualizovať frontend prístup"
 
-#: graphs.php:222
+#: graphs.php:243
 msgid "Cannot update graph"
 msgstr "Nie je možné aktualizovať graf"
 
@@ -2062,11 +2062,11 @@ msgstr "Zmeniť heslo"
 msgid "Character"
 msgstr "Znak"
 
-#: include/regexp.inc.php:178
+#: include/regexp.inc.php:192
 msgid "Character string included"
 msgstr "Obsahuje reťazec"
 
-#: include/regexp.inc.php:184
+#: include/regexp.inc.php:196
 msgid "Character string not included"
 msgstr "Neobsahuje reťazec"
 
@@ -3237,7 +3237,7 @@ msgstr "Zmazať skript?"
 #: include/reports.inc.php:417 include/reports.inc.php:459
 #: include/views/administration.general.regularexpressions.list.php:57
 #: include/views/administration.mediatypes.list.php:117
-#: include/views/administration.proxy.list.php:95
+#: include/views/administration.proxy.list.php:103
 #: include/views/administration.script.list.php:89
 #: include/views/administration.usergroups.edit.php:102
 #: include/views/administration.usergroups.edit.php:106
@@ -3339,7 +3339,7 @@ msgstr "Zmazať označené typy médií?"
 msgid "Delete selected node?"
 msgstr "Zmazať označený uzol?"
 
-#: include/views/administration.proxy.list.php:96
+#: include/views/administration.proxy.list.php:104
 msgid "Delete selected proxies?"
 msgstr "Zmazať označené proxy?"
 
@@ -3611,12 +3611,12 @@ msgstr "Zakázať host?"
 msgid "Disable hosts in the selected host groups?"
 msgstr "Zakázať hostov v označených skupinách?"
 
-#: include/views/administration.proxy.list.php:92
+#: include/views/administration.proxy.list.php:100
 msgid "Disable hosts monitored by selected proxies?"
 msgstr "Zakázať hostov monitorovaných cez označené proxy?"
 
 #: hosts.php:871 include/views/administration.mediatypes.list.php:113
-#: include/views/administration.proxy.list.php:91
+#: include/views/administration.proxy.list.php:99
 #: include/views/administration.usergroups.list.php:133
 #: include/views/configuration.action.list.php:97
 #: include/views/configuration.application.list.php:85
@@ -3872,12 +3872,12 @@ msgctxt "discovery status"
 msgid "Down"
 msgstr "Nedostupné"
 
-#: api/classes/CWebCheck.php:616
+#: api/classes/CWebCheck.php:619
 #, php-format
 msgid "Download speed for scenario \"%s\"."
 msgstr "Rýchlosť sťahovania pre WEB scenár \"%s\"."
 
-#: api/classes/CWebCheck.php:715
+#: api/classes/CWebCheck.php:718
 #, php-format
 msgid "Download speed for step \"%1$s\" of scenario \"%2$s\"."
 msgstr "Rýchlosť sťahovania pre krok \"%1$s\" WEB scenára \"%2$s\"."
@@ -4106,12 +4106,12 @@ msgstr "Povoliť hosta"
 msgid "Enable host?"
 msgstr "Povoliť hosta?"
 
-#: include/views/administration.proxy.list.php:88
+#: include/views/administration.proxy.list.php:96
 msgid "Enable hosts monitored by selected proxies?"
 msgstr "Povoliť hostov monitorovaných cez označené proxy?"
 
 #: hosts.php:867 include/views/administration.mediatypes.list.php:109
-#: include/views/administration.proxy.list.php:87
+#: include/views/administration.proxy.list.php:95
 #: include/views/administration.usergroups.list.php:129
 #: include/views/configuration.action.list.php:93
 #: include/views/configuration.application.list.php:81
@@ -4444,7 +4444,7 @@ msgstr "Zlyhalo"
 msgid "Failed"
 msgstr "Zlyhalo"
 
-#: api/classes/CWebCheck.php:623
+#: api/classes/CWebCheck.php:626
 #, php-format
 msgid "Failed step of scenario \"%s\"."
 msgstr "Zlyhaný krok scenára \"%s\"."
@@ -4707,7 +4707,7 @@ msgstr "Globálne skripty"
 #: hosts.php:879
 #: include/views/administration.general.regularexpressions.list.php:62
 #: include/views/administration.mediatypes.list.php:121
-#: include/views/administration.proxy.list.php:99
+#: include/views/administration.proxy.list.php:107
 #: include/views/administration.script.list.php:93
 #: include/views/administration.usergroups.list.php:149
 #: include/views/administration.users.list.php:144
@@ -4795,11 +4795,11 @@ msgstr "Graf \"%1$s\" preskočený - používateľovo pravidlo."
 msgid "Graph \"%1$s\" with templated items cannot contain items from other hosts."
 msgstr "Graph \"%1$s\" so šablónovými položkami nemôže obsahovať položky z iných hostov."
 
-#: graphs.php:225
+#: graphs.php:246
 msgid "Graph added"
 msgstr "Graf pridaný"
 
-#: graphs.php:236
+#: graphs.php:257
 msgid "Graph deleted"
 msgstr "Graf zmazaný"
 
@@ -4850,7 +4850,7 @@ msgstr "Sumár grafov"
 msgid "Graph type"
 msgstr "Typ grafu"
 
-#: graphs.php:222
+#: graphs.php:243
 msgid "Graph updated"
 msgstr "Graf aktualizovaný"
 
@@ -4877,11 +4877,11 @@ msgstr "Graf s totožným menom, ale iným typom už existuje."
 msgid "Graphs"
 msgstr "Grafy"
 
-#: graphs.php:289
+#: graphs.php:310
 msgid "Graphs copied"
 msgstr "Grafy skopírované"
 
-#: graphs.php:243
+#: graphs.php:264
 msgid "Graphs deleted"
 msgstr "Grafy zmazané"
 
@@ -5919,8 +5919,8 @@ msgstr "Neplatný operationid akcie."
 msgid "Incorrect algorithm for service \"%1$s\"."
 msgstr "Neplatný algoritmus pre službu \"%1$s\"."
 
-#: api/classes/CApplication.php:436 include/regexp.inc.php:52
-#: include/regexp.inc.php:85 include/regexp.inc.php:150
+#: api/classes/CApplication.php:436 include/regexp.inc.php:53
+#: include/regexp.inc.php:91 include/regexp.inc.php:162
 msgid "Incorrect arguments passed to function"
 msgstr "Funkcii boli predané neplatné argumenty"
 
@@ -6669,7 +6669,7 @@ msgstr "Položka s kľúčom \"%1$s\" už existuje na \"%2$s\" ako neznámy elem
 msgid "Item with key \"%1$s\" already exists on \"%2$s\"."
 msgstr "Položka s kľúčom \"%1$s\" už existuje na \"%2$s\"."
 
-#: api/classes/CWebCheck.php:644
+#: api/classes/CWebCheck.php:647
 #, php-format
 msgid "Item with key \"%s\" already exists."
 msgstr "Položka s kľúčom \"%s\" už existuje."
@@ -6965,7 +6965,7 @@ msgstr "Posledná zmena (vzostupne)"
 msgid "Last check"
 msgstr "Posledná kontrola"
 
-#: api/classes/CWebCheck.php:630
+#: api/classes/CWebCheck.php:633
 #, php-format
 msgid "Last error message of scenario \"%s\"."
 msgstr "Posledná chybová správa zo scenára \"%s\"."
@@ -8558,7 +8558,7 @@ msgstr "Žiadne definované kroky."
 msgid "No target selected"
 msgstr "Nie je vybraný cieľ"
 
-#: graphs.php:293 items.php:609
+#: graphs.php:314 items.php:609
 msgid "No target selected."
 msgstr "Nie je vybraný cieľ."
 
@@ -8992,7 +8992,7 @@ msgstr "Len Zabbix Admini môžu zmeniť použivateľské médiá."
 msgid "Only Zabbix Admins can remove user media."
 msgstr "Len Zabbix Admini môžu zmazať použivateľské médiá."
 
-#: api/classes/CWebCheck.php:602
+#: api/classes/CWebCheck.php:604
 msgid "Only characters are allowed."
 msgstr "Len písmená sú povolené."
 
@@ -9405,7 +9405,7 @@ msgid "Parse error"
 msgstr "Parsovacia chyba"
 
 #: include/views/administration.proxy.edit.php:41
-#: include/views/administration.proxy.list.php:76
+#: include/views/administration.proxy.list.php:84
 msgid "Passive"
 msgstr "Pasívny"
 
@@ -9857,7 +9857,7 @@ msgstr "Regulárny výraz"
 msgid "Regular expression"
 msgstr "Regulárny výraz"
 
-#: include/regexp.inc.php:58 include/regexp.inc.php:92
+#: include/regexp.inc.php:62 include/regexp.inc.php:102
 #, php-format
 msgid "Regular expression \"%s\" already exists."
 msgstr "Regulárny výraz \"%s\" už existuje."
@@ -9889,7 +9889,7 @@ msgstr[0] "Regulárny výraz zmazaný"
 msgstr[1] "Regulárne výrazy zmazané"
 msgstr[2] "Regulárne výrazy zmazané"
 
-#: include/regexp.inc.php:79
+#: include/regexp.inc.php:85
 msgid "Regular expression does not exist."
 msgstr "Regulárny výraz neexistuje."
 
@@ -10104,7 +10104,7 @@ msgstr "Zdroj"
 msgid "Response code"
 msgstr "Návratový kód"
 
-#: api/classes/CWebCheck.php:729
+#: api/classes/CWebCheck.php:732
 #, php-format
 msgid "Response code for step \"%1$s\" of scenario \"%2$s\"."
 msgstr "Návratový kód pre krok \"%1$s\" scenára \"%2$s\"."
@@ -10113,7 +10113,7 @@ msgstr "Návratový kód pre krok \"%1$s\" scenára \"%2$s\"."
 msgid "Response time"
 msgstr "Čas odozvy"
 
-#: api/classes/CWebCheck.php:722
+#: api/classes/CWebCheck.php:725
 #, php-format
 msgid "Response time for step \"%1$s\" of scenario \"%2$s\"."
 msgstr "Čas odozvy pre krok \"%1$s\" scenára \"%2$s\"."
@@ -10123,11 +10123,11 @@ msgstr "Čas odozvy pre krok \"%1$s\" scenára \"%2$s\"."
 msgid "Result"
 msgstr "Výsledok"
 
-#: include/regexp.inc.php:190
+#: include/regexp.inc.php:200
 msgid "Result is FALSE"
 msgstr "Výsledok je NEPRAVDA"
 
-#: include/regexp.inc.php:187
+#: include/regexp.inc.php:198
 msgid "Result is TRUE"
 msgstr "Výsledok je PRAVDA"
 
@@ -10515,11 +10515,11 @@ msgstr "Scenár zmazaný"
 msgid "Scenario disabled"
 msgstr "Scenár deaktivovaný"
 
-#: api/classes/CWebCheck.php:691 api/classes/CWebCheck.php:791
+#: api/classes/CWebCheck.php:694 api/classes/CWebCheck.php:794
 msgid "Scenario step name should contain only printable characters."
 msgstr "Meno kroku scenára by malo obsahovať len tlačitelné znaky."
 
-#: api/classes/CWebCheck.php:705 api/classes/CWebCheck.php:806
+#: api/classes/CWebCheck.php:708 api/classes/CWebCheck.php:809
 msgid "Scenario step number cannot be less than 1."
 msgstr "Číslo kroku scenára nesmie byť menšie ako 1."
 
@@ -11361,7 +11361,7 @@ msgstr "Krok"
 msgid "Step \"%1$s\" [%2$s of %3$s] failed: %4$s"
 msgstr "Krok \"%1$s\" [%2$s z %3$s] zlyhal: %4$s"
 
-#: api/classes/CWebCheck.php:699
+#: api/classes/CWebCheck.php:702
 #, php-format
 msgid "Step \"%s\" already exists."
 msgstr "Krok \"%s\" už existuje."
@@ -12315,7 +12315,7 @@ msgstr "Jednotky"
 #: include/maintenances.inc.php:41 include/maps.inc.php:39
 #: include/maps.inc.php:709 include/maps.inc.php:799 include/maps.inc.php:896
 #: include/media.inc.php:39 include/nodes.inc.php:257 include/perm.inc.php:30
-#: include/regexp.inc.php:193 include/screens.inc.php:55
+#: include/regexp.inc.php:202 include/screens.inc.php:55
 #: include/triggers.inc.php:62 include/triggers.inc.php:173
 #: include/triggers.inc.php:191 include/users.inc.php:50
 #: include/users.inc.php:65
@@ -12945,12 +12945,12 @@ msgstr "Web"
 msgid "Web checks"
 msgstr "Web kontroly"
 
-#: api/classes/CWebCheck.php:677 api/classes/CWebCheck.php:776
+#: api/classes/CWebCheck.php:680 api/classes/CWebCheck.php:779
 #, php-format
 msgid "Web item \"%s\" created."
 msgstr "Web položka \"%s\" created."
 
-#: api/classes/CWebCheck.php:742
+#: api/classes/CWebCheck.php:745
 #, php-format
 msgid "Web item with key \"%s\" already exists."
 msgstr "Web položka s kľúčom \"%s\" už existuje."
