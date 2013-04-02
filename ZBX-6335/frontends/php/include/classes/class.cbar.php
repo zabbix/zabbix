@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -10,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -374,6 +374,8 @@ class CBar extends CGraphDraw {
 	//									DRAW									*
 	//***************************************************************************
 	public function drawSmallRectangle() {
+		$gbColor = $this->getColor($this->graphtheme['gridbordercolor'], 0);
+
 		imagefilledrectangle($this->im,
 			$this->shiftXleft + $this->shiftXCaptionLeft - 1,
 			$this->shiftY - 1 + $this->shiftYCaptionTop,
@@ -390,12 +392,12 @@ class CBar extends CGraphDraw {
 			$this->getColor($this->graphtheme['gridcolor'], 0)
 		);
 
-		imageline($this->im,
+		zbx_imageline($this->im,
 			$this->shiftXleft + $this->shiftXCaptionLeft - 1,
 			$this->shiftY - 5,
 			$this->shiftXleft + $this->shiftXCaptionLeft - 1,
 			$this->sizeY + $this->shiftY + 4,
-			$this->getColor($this->graphtheme['gridbordercolor'], 0)
+			$gbColor
 		);
 
 		imagefilledpolygon($this->im,
@@ -408,22 +410,23 @@ class CBar extends CGraphDraw {
 			$this->getColor('White')
 		);
 
-		imagepolygon($this->im,
-			array(
-				$this->shiftXleft + $this->shiftXCaptionLeft - 4, $this->shiftY - 5,
-				$this->shiftXleft + $this->shiftXCaptionLeft + 2, $this->shiftY - 5,
-				$this->shiftXleft + $this->shiftXCaptionLeft - 1, $this->shiftY - 10,
-			),
-			3,
-			$this->getColor($this->graphtheme['gridbordercolor'], 0)
-		);
+		// draw Y axis triangle
+		zbx_imageline($this->im, $this->shiftXleft + $this->shiftXCaptionLeft - 4, $this->shiftY - 5,
+			$this->shiftXleft + $this->shiftXCaptionLeft + 2, $this->shiftY - 5,
+			$gbColor);
+		zbx_imagealine($this->im, $this->shiftXleft + $this->shiftXCaptionLeft + 2, $this->shiftY - 5,
+			$this->shiftXleft + $this->shiftXCaptionLeft - 1, $this->shiftY - 10,
+			$gbColor);
+		zbx_imagealine($this->im, $this->shiftXleft + $this->shiftXCaptionLeft - 1, $this->shiftY - 10,
+			$this->shiftXleft + $this->shiftXCaptionLeft - 4, $this->shiftY - 5,
+			$gbColor);
 
-		imageline($this->im,
+		zbx_imageline($this->im,
 			$this->shiftXleft + $this->shiftXCaptionLeft - 4,
 			$this->sizeY + $this->shiftY + 1,
 			$this->sizeX + $this->shiftXleft + $this->shiftXCaptionLeft + 5,
 			$this->sizeY + $this->shiftY + 1,
-			$this->getColor($this->graphtheme['gridbordercolor'], 0)
+			$gbColor
 		);
 
 		imagefilledpolygon($this->im,
@@ -436,15 +439,16 @@ class CBar extends CGraphDraw {
 			$this->getColor('White')
 		);
 
-		imagepolygon($this->im,
-			array(
-				$this->sizeX + $this->shiftXleft + $this->shiftXCaptionLeft + 5, $this->sizeY + $this->shiftY - 2,
-				$this->sizeX + $this->shiftXleft + $this->shiftXCaptionLeft + 5, $this->sizeY + $this->shiftY + 4,
-				$this->sizeX + $this->shiftXleft + $this->shiftXCaptionLeft + 10, $this->sizeY + $this->shiftY + 1,
-			),
-			3,
-			$this->getColor($this->graphtheme['gridbordercolor'], 0)
-		);
+		// draw X axis triangle
+		zbx_imageline($this->im, $this->sizeX + $this->shiftXleft + $this->shiftXCaptionLeft + 5, $this->sizeY + $this->shiftY - 2,
+			$this->sizeX + $this->shiftXleft + $this->shiftXCaptionLeft + 5, $this->sizeY + $this->shiftY + 4,
+			$gbColor);
+		zbx_imagealine($this->im, $this->sizeX + $this->shiftXleft + $this->shiftXCaptionLeft + 5, $this->sizeY + $this->shiftY + 4,
+			$this->sizeX + $this->shiftXleft + $this->shiftXCaptionLeft + 10, $this->sizeY + $this->shiftY + 1,
+			$gbColor);
+		zbx_imagealine($this->im, $this->sizeX + $this->shiftXleft + $this->shiftXCaptionLeft + 10, $this->sizeY + $this->shiftY + 1,
+			$this->sizeX + $this->shiftXleft + $this->shiftXCaptionLeft + 5, $this->sizeY + $this->shiftY - 2,
+			$gbColor);
 	}
 
 	protected function drawGrid() {

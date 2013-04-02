@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -9,7 +9,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -823,14 +823,12 @@ int	is_hex_string(const char *str);
 int	is_ascii_string(const char *str);
 int	zbx_rtrim(char *str, const char *charlist);
 void	zbx_ltrim(char *str, const char *charlist);
+void	zbx_lrtrim(char *str, const char *charlist);
 void	zbx_remove_chars(register char *str, const char *charlist);
 #define ZBX_WHITESPACE			" \t\r\n"
 #define zbx_remove_spaces(str)		zbx_remove_chars(str, " ")
 #define zbx_remove_whitespace(str)	zbx_remove_chars(str, ZBX_WHITESPACE)
 void	compress_signs(char *str);
-void	ltrim_spaces(char *c);
-void	rtrim_spaces(char *c);
-void	lrtrim_spaces(char *c);
 void	del_zeroes(char *s);
 int	get_param(const char *param, int num, char *buf, size_t max_len);
 int	num_param(const char *param);
@@ -1014,6 +1012,7 @@ size_t	zbx_utf8_char_len(const char *text);
 size_t	zbx_strlen_utf8(const char *text);
 size_t	zbx_strlen_utf8_n(const char *text, size_t utf8_maxlen);
 
+int	zbx_is_utf8(const char *text);
 #define ZBX_UTF8_REPLACE_CHAR	'?'
 char	*zbx_replace_utf8(const char *text);
 void	zbx_replace_invalid_utf8(char *text);
@@ -1060,5 +1059,13 @@ void	zbx_replace_string(char **data, size_t l, size_t *r, const char *value);
 void	zbx_trim_str_list(char *list, char delimiter);
 
 int	parse_serveractive_element(char *str, char **host, unsigned short *port, unsigned short port_default);
+
+/* 128 bit unsigned integer handling */
+#define uset128(base, hi64, lo64)	(base)->hi = hi64; (base)->lo = lo64
+
+void uinc128_64(zbx_uint128_t *base, zbx_uint64_t value);
+void uinc128_128(zbx_uint128_t *base, const zbx_uint128_t *value);
+void udiv128_64(zbx_uint128_t *result, const zbx_uint128_t *base, zbx_uint64_t value);
+void umul64_64(zbx_uint128_t *result, zbx_uint64_t value, zbx_uint64_t factor);
 
 #endif

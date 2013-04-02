@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2013 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -156,23 +156,28 @@ elseif (isset($_REQUEST['save'])) {
 		$oldTrigger = reset($oldTrigger);
 		$oldTrigger['dependencies'] = zbx_toHash(zbx_objectValues($oldTrigger['dependencies'], 'triggerid'));
 
+		$newDependencies = $trigger['dependencies'];
+		$oldDependencies = $oldTrigger['dependencies'];
+		unset($trigger['dependencies']);
+		unset($oldTrigger['dependencies']);
+
 		$triggerToUpdate = array_diff_assoc($trigger, $oldTrigger);
 		$triggerToUpdate['triggerid'] = $_REQUEST['triggerid'];
 
 		// dependencies
 		$updateDepencencies = false;
-		if (count($trigger['dependencies']) != count($oldTrigger['dependencies'])) {
+		if (count($newDependencies) != count($oldDependencies)) {
 			$updateDepencencies = true;
 		}
 		else {
-			foreach ($trigger['dependencies'] as $dependency) {
-				if (!isset($oldTrigger['dependencies'][$dependency['triggerid']])) {
+			foreach ($newDependencies as $dependency) {
+				if (!isset($oldDependencies[$dependency['triggerid']])) {
 					$updateDepencencies = true;
 				}
 			}
 		}
 		if ($updateDepencencies) {
-			$triggerToUpdate['dependencies'] = $trigger['dependencies'];
+			$triggerToUpdate['dependencies'] = $newDependencies;
 		}
 
 		$result = API::Trigger()->update($triggerToUpdate);

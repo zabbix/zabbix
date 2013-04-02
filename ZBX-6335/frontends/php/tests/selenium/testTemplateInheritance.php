@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -10,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -244,9 +244,9 @@ class testTemplateInheritance extends CWebTest {
 		$this->input_type('width', '950');
 		$this->input_type('height', '250');
 		$this->zbxTestDropdownSelect('graphtype', 'Normal');
-		$this->zbxTestCheckboxUnselect('legend');
-		$this->zbxTestCheckboxUnselect('showworkperiod');
-		$this->zbxTestCheckboxUnselect('showtriggers');
+		$this->zbxTestCheckboxUnselect('show_legend');
+		$this->zbxTestCheckboxUnselect('show_work_period');
+		$this->zbxTestCheckboxUnselect('show_triggers');
 		$this->zbxTestCheckboxSelect('visible_percent_left');
 		$this->input_type('percent_left', '4');
 		$this->input_type('percent_right', '5');
@@ -273,9 +273,9 @@ class testTemplateInheritance extends CWebTest {
 		$this->assertElementValue('width', '950');
 		$this->assertElementValue('height', '250');
 		$this->assertAttribute('//*[@id="graphtype"]/option[1]/@selected', 'selected');
-		$this->assertFalse($this->isChecked('legend'));
-		$this->assertFalse($this->isChecked('showworkperiod'));
-		$this->assertFalse($this->isChecked('showtriggers'));
+		$this->assertFalse($this->isChecked('show_legend'));
+		$this->assertFalse($this->isChecked('show_work_period'));
+		$this->assertFalse($this->isChecked('show_triggers'));
 		$this->assertTrue($this->isChecked('visible_percent_left'));
 		$this->assertElementValue('percent_left', '4.00');
 		$this->assertTrue($this->isChecked('visible_percent_right'));
@@ -448,9 +448,9 @@ class testTemplateInheritance extends CWebTest {
 		$this->input_type('width', '950');
 		$this->input_type('height', '250');
 		$this->zbxTestDropdownSelect('graphtype', 'Normal');
-		$this->zbxTestCheckboxUnselect('legend');
-		$this->zbxTestCheckboxUnselect('showworkperiod');
-		$this->zbxTestCheckboxUnselect('showtriggers');
+		$this->zbxTestCheckboxUnselect('show_legend');
+		$this->zbxTestCheckboxUnselect('show_work_period');
+		$this->zbxTestCheckboxUnselect('show_triggers');
 		$this->zbxTestCheckboxSelect('visible_percent_left');
 		$this->input_type('percent_left', '4');
 		$this->input_type('percent_right', '5');
@@ -488,9 +488,9 @@ class testTemplateInheritance extends CWebTest {
 		$this->assertElementValue('width', '950');
 		$this->assertElementValue('height', '250');
 		$this->assertAttribute('//*[@id="graphtype"]/option[1]/@selected', 'selected');
-		$this->assertFalse($this->isChecked('legend'));
-		$this->assertFalse($this->isChecked('showworkperiod'));
-		$this->assertFalse($this->isChecked('showtriggers'));
+		$this->assertFalse($this->isChecked('show_legend'));
+		$this->assertFalse($this->isChecked('show_work_period'));
+		$this->assertFalse($this->isChecked('show_triggers'));
 		$this->assertTrue($this->isChecked('visible_percent_left'));
 		$this->assertElementValue('percent_left', '4.00');
 		$this->assertTrue($this->isChecked('visible_percent_right'));

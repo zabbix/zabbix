@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2012 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -10,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -47,7 +47,7 @@ $result = array();
 switch ($data['method']) {
 	case 'host.get':
 		$result = API::Host()->get(array(
-			'startSearch' => 1,
+			'startSearch' => true,
 			'search' => $data['params']['search'],
 			'output' => array('hostid', 'host', 'name'),
 			'sortfield' => 'name',
@@ -221,19 +221,64 @@ switch ($data['method']) {
 		}
 		break;
 
+	/**
+	 * Create multi select data.
+	 * Supported objects: "hostGroup"
+	 *
+	 * @param string $data['objectName']
+	 * @param string $data['search']
+	 * @param int    $data['limit']
+	 *
+	 * @return array(int => array('value' => int, 'text' => string))
+	 */
+	case 'multiselect.get':
+		if ($data['objectName'] == 'hostGroup') {
+			$hostGroups = API::HostGroup()->get(array(
+				'output' => array('groupid', 'name'),
+				'startSearch' => true,
+				'search' => isset($data['search']) ? array('name' => $data['search']) : null,
+				'limit' => isset($data['limit']) ? $data['limit'] : null
+			));
+			foreach ($hostGroups as &$hostGroup) {
+				$hostGroup['nodename'] = get_node_name_by_elid($hostGroup['groupid'], true, ': ');
+			}
+			unset($hostGroup);
+
+			CArrayHelper::sort($hostGroups, array(
+				array('field' => 'nodename', 'order' => ZBX_SORT_UP),
+				array('field' => 'name', 'order' => ZBX_SORT_UP)
+			));
+
+			foreach ($hostGroups as $hostGroup) {
+				$result[] = array(
+					'id' => $hostGroup['groupid'],
+					'prefix' => (string) $hostGroup['nodename'],
+					'name' => $hostGroup['name']
+				);
+			}
+		}
+		break;
+
 	default:
 		fatal_error('Wrong RPC call to JS RPC!');
 }
 
 if ($requestType == PAGE_TYPE_JSON) {
 	if (isset($data['id'])) {
-		$rpcResp = array(
+		echo $json->encode(array(
 			'jsonrpc' => '2.0',
 			'result' => $result,
 			'id' => $data['id']
-		);
-		echo $json->encode($rpcResp);
+		));
 	}
+}
+elseif ($requestType == PAGE_TYPE_TEXT_RETURN_JSON) {
+	$json = new CJSON();
+
+	echo $json->encode(array(
+		'jsonrpc' => '2.0',
+		'result' => $result
+	));
 }
 elseif ($requestType == PAGE_TYPE_TEXT || $requestType == PAGE_TYPE_JS) {
 	echo $result;
