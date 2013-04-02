@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2013 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -37,9 +37,9 @@ $fields = array(
 	'name' =>			array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({save})'),
 	'proxy_hostid' =>	array(T_ZBX_INT, O_OPT, null,	DB_ID,		'isset({save})'),
 	'iprange' =>		array(T_ZBX_STR, O_OPT, null,	null,		'isset({save})'),
-	'delay' =>			array(T_ZBX_INT, O_OPT, null,	null, 		'isset({save})'),
+	'delay' =>			array(T_ZBX_INT, O_OPT, null,	BETWEEN(1, SEC_PER_WEEK), 'isset({save})'),
 	'status' =>			array(T_ZBX_INT, O_OPT, null,	IN('0,1'),	null),
-	'uniqueness_criteria' => array(T_ZBX_INT, O_OPT, null, null,	'isset({save})', _('Device uniqueness criteria')),
+	'uniqueness_criteria' => array(T_ZBX_STR, O_OPT, null, null,	'isset({save})', _('Device uniqueness criteria')),
 	'g_druleid' =>		array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
 	'dchecks' =>		array(null, O_OPT, null,		null,		null),
 	// actions
@@ -248,6 +248,7 @@ if (isset($_REQUEST['form'])) {
 				isset($dcheck['ports']) ? $dcheck['ports'] : ''
 			);
 		}
+
 		order_result($data['drule']['dchecks'], 'name');
 	}
 

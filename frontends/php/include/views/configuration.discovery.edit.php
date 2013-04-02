@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2013 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -70,13 +70,11 @@ $discoveryFormList->addRow(_('Device uniqueness criteria'),
 	new CDiv($uniquenessCriteriaRadio, 'objectgroup inlineblock border_dotted ui-corner-all', 'uniqList'));
 
 // append status to form list
-$discoveryFormList->addRow(_('Enabled'),
-	new CCheckBox(
-		'status',
-		($this->data['drule']['status'] === DRULE_STATUS_ACTIVE),
-		null,
-		1
-	));
+$status = (empty($this->data['druleid']) && empty($this->data['form_refresh']))
+	? true
+	: ($this->data['drule']['status'] == DRULE_STATUS_ACTIVE);
+
+$discoveryFormList->addRow(_('Enabled'), new CCheckBox('status', $status, null, 1));
 
 // append tabs to form
 $discoveryTabs = new CTabView();

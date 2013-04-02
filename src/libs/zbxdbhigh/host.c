@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -9,7 +9,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -4527,7 +4527,7 @@ zbx_uint64_t	DBadd_interface(zbx_uint64_t hostid, unsigned char type,
 
 		zbx_free(tmp);
 		tmp = strdup(row[4]);
-		substitute_simple_macros(NULL, &hostid, NULL, NULL, NULL, &tmp, MACRO_TYPE_COMMON, NULL, 0);
+		substitute_simple_macros(NULL, NULL, &hostid, NULL, NULL, NULL, &tmp, MACRO_TYPE_COMMON, NULL, 0);
 		if (FAIL == is_ushort(tmp, &db_port) || db_port != port)
 			continue;
 
