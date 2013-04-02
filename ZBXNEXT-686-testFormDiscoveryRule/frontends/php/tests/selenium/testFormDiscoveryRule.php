@@ -976,6 +976,66 @@ class testFormDiscoveryRule extends CWebTest {
 					'formCheck' => true
 				)
 			),
+			// Maximum flexfields allowed reached- error
+			array(
+				array(
+					'expected' => DISCOVERY_BAD,
+					'name' => 'Discovery flex-maximum entries',
+					'key' => 'discovery-flex-maximum',
+					'flexPeriod' => array(
+						array('flexTime' => '1-7,00:00-24:00'),
+						array('flexTime' => '1-7,00:00-24:00'),
+						array('flexTime' => '1-7,00:00-24:00'),
+						array('flexTime' => '1-7,00:00-24:00'),
+						array('flexTime' => '1-7,00:00-24:00'),
+						array('flexTime' => '1-7,00:00-24:00'),
+						array('flexTime' => '1-7,00:00-24:00', 'instantCheck' => true, 'maximumItems' => true)
+					),
+					'errors' => array(
+						'Maximum number of flexible intervals added'
+					)
+				)
+			),
+			// Maximum flexfields allowed reached- save OK
+			array(
+				array(
+					'expected' => DISCOVERY_GOOD,
+					'name' => 'Discovery flex-maximum save OK',
+					'key' => 'discovery-flex-maximum-save',
+					'flexPeriod' => array(
+						array('flexTime' => '1-7,00:00-24:00'),
+						array('flexTime' => '1-7,00:00-24:00'),
+						array('flexTime' => '1-7,00:00-24:00'),
+						array('flexTime' => '1-7,00:00-24:00'),
+						array('flexTime' => '1-7,00:00-24:00'),
+						array('flexTime' => '1-7,00:00-24:00'),
+						array('flexTime' => '1-7,00:00-24:00', 'maximumItems' => true)
+					),
+					'dbCheck' => true,
+					'formCheck' => true
+				)
+			),
+			// Maximum flexfields allowed reached- remove one item
+			array(
+				array(
+					'expected' => DISCOVERY_BAD,
+					'name' => 'Discovery flex-maximum with remove',
+					'key' => 'discovery-flex-maximum-remove',
+					'flexPeriod' => array(
+						array('flexTime' => '1-7,00:00-24:00'),
+						array('flexTime' => '1-7,00:00-24:00'),
+						array('flexTime' => '1-7,00:00-24:00'),
+						array('flexTime' => '1-7,00:00-24:00'),
+						array('flexTime' => '1-7,00:00-24:00'),
+						array('flexTime' => '1-7,00:00-24:00'),
+						array('flexTime' => '1-7,00:00-24:00', 'instantCheck' => true, 'maximumItems' => true, 'remove' => true),
+						array('flexTime' => '1-7,00:00-24:00', 'instantCheck' => true, 'maximumItems' => true)
+					),
+					'errors' => array(
+						'Maximum number of flexible intervals added'
+					)
+				)
+			),
 			array(
 				array(
 					'expected' => DISCOVERY_GOOD,
@@ -1311,6 +1371,16 @@ class testFormDiscoveryRule extends CWebTest {
 					}
 					$itemFlexFlag = false;
 				}
+
+				if (isset($period['maximumItems'])) {
+					$this->assertNotVisible('new_delay_flex_delay');
+					$this->assertNotVisible('new_delay_flex_period');
+				}
+				else {
+					$this->assertVisible('new_delay_flex_delay');
+					$this->assertVisible('new_delay_flex_period');
+				}
+
 				if (isset($period['remove'])) {
 					$this->zbxTestClick('remove');
 					sleep(1);
