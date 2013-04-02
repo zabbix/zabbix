@@ -887,14 +887,14 @@ static int	DBpatch_02010038()
 }
 static int	DBpatch_02010039()
 {
-	const ZBX_FIELD	field = {"variables", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"variables", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
 
 	return DBrename_field("httptest", "macros", &field);
 }
 
 static int	DBpatch_02010040()
 {
-	const ZBX_FIELD	field = {"variables", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"variables", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("httpstep", &field);
 }
