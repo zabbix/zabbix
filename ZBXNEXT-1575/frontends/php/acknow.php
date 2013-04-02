@@ -75,6 +75,28 @@ if (!isset($_REQUEST['events']) && !isset($_REQUEST['eventid']) && !isset($_REQU
 	show_message(_('No events to acknowledge'));
 	require_once dirname(__FILE__).'/include/page_footer.php';
 }
+// check event permissions
+elseif (get_request('eventid')) {
+	$event = API::Event()->get(array(
+		'output' => array('eventid'),
+		'eventids' => get_request('eventid'),
+		'limit' => 1
+	));
+	if (!$event) {
+		access_deny();
+	}
+}
+// check trigger permissions
+elseif (get_request('triggers')) {
+	$trigger = API::Trigger()->get(array(
+		'output' => array('triggerid'),
+		'triggerids' => get_request('triggers'),
+		'limit' => 1
+	));
+	if (!$trigger) {
+		access_deny();
+	}
+}
 
 $bulk = !isset($_REQUEST['eventid']);
 $_REQUEST['backurl'] = get_request('backurl', 'tr_status.php');
