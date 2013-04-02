@@ -4,9 +4,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-04-02 18:12+0300\n"
-"PO-Revision-Date: 2013-01-24 17:54+0200\n"
-"Last-Translator: Raymond <qix@the-wired.net>\n"
+"POT-Creation-Date: 2013-04-02 20:18+0300\n"
+"PO-Revision-Date: 2013-03-26 11:46+0200\n"
+"Last-Translator: DavidWouda <d.wouda@kpnplanet.nl>\n"
 "Language-Team: NL\n"
 "Language: nl\n"
 "MIME-Version: 1.0\n"
@@ -86,7 +86,7 @@ msgstr "(0 - oneindig)"
 #: include/views/configuration.hostgroups.list.php:31
 #: include/views/configuration.template.edit.php:143
 msgid "(Only super admins can create groups)"
-msgstr ""
+msgstr "(Alleen super admins kunnen groepen creëren)"
 
 #: include/forms.inc.php:539 include/forms.inc.php:554
 msgid "(in days)"
@@ -683,7 +683,7 @@ msgstr "Er moet minimaal een host of groep geselecteerd worden."
 
 #: api/classes/CMaintenance.php:473 api/classes/CMaintenance.php:586
 msgid "At least one maintenance period must be created."
-msgstr ""
+msgstr "Er moet minimaal één maintenance periode gemaakt zijn,"
 
 #: include/classes/class.frontendsetup.php:292
 msgid "At least one of MySQL, PostgreSQL, Oracle, SQLite3 or IBM DB2 should be supported"
@@ -726,7 +726,7 @@ msgstr "Authenticatie methode"
 
 #: authentication.php:158 authentication.php:159
 msgid "Authentication method changed to HTTP"
-msgstr ""
+msgstr "Authenticatie methode veranderd naar HTTP"
 
 #: authentication.php:121 authentication.php:122
 msgid "Authentication method changed to LDAP"
@@ -806,7 +806,7 @@ msgstr "As positie"
 #: include/func.inc.php:401
 msgctxt "Byte short"
 msgid "B"
-msgstr ""
+msgstr "B"
 
 #: include/page_header.php:224
 msgid "BACK"
@@ -877,7 +877,7 @@ msgstr "Lichter maken"
 
 #: include/locales.inc.php:46
 msgid "Bulgarian (bg_BG)"
-msgstr ""
+msgstr "Bulgarian (bg_BG)"
 
 #: tr_status.php:780
 msgid "Bulk acknowledge"
@@ -1162,7 +1162,7 @@ msgstr "Kan afbeelding niet toevoegen"
 
 #: include/classes/import/CXmlImport18.php:632
 msgid "Cannot add image."
-msgstr ""
+msgstr "Kan afbeelding niet toevoegen"
 
 #: disc_prototypes.php:277 items.php:450 screenedit.php:180
 msgid "Cannot add item"
@@ -1170,7 +1170,7 @@ msgstr "Kan item niet toevoegen"
 
 #: adm.macros.php:120
 msgid "Cannot add macro."
-msgstr ""
+msgstr "Kan macro niet toevoegen"
 
 #: maintenance.php:137
 msgid "Cannot add maintenance"
@@ -1252,15 +1252,15 @@ msgstr "Kan niet map waarde bijwerken"
 
 #: authentication.php:163
 msgid "Cannot change authentication method to HTTP"
-msgstr ""
+msgstr "Kan authenticatie methode niet veranderen naar HTTP"
 
 #: authentication.php:126
 msgid "Cannot change authentication method to LDAP"
-msgstr ""
+msgstr "Kan authenticatie methode niet veranderen naar LDAP"
 
 #: authentication.php:88
 msgid "Cannot change authentication method to Zabbix internal"
-msgstr ""
+msgstr "Kan authenticatie methode niet veranderen naar Zabbix internal"
 
 #: items.php:472
 msgid "Cannot clear history"
@@ -1305,7 +1305,7 @@ msgstr ""
 
 #: api/classes/CTrigger.php:1806
 msgid "Cannot create dependency on trigger itself."
-msgstr ""
+msgstr "Kan geen afhankelijkheid creëren op de trekker zelf."
 
 #: discoveryconf.php:151
 msgid "Cannot create discovery rule"
@@ -1339,7 +1339,7 @@ msgstr "Kan nieuw element niet aanmaken"
 
 #: include/classes/import/CXmlImport18.php:1709
 msgid "Cannot create screen."
-msgstr ""
+msgstr "Kan geen schermafbeelding creëren"
 
 #: api/classes/CUser.php:370
 #, php-format
@@ -1373,7 +1373,7 @@ msgstr "Kan grafiek niet verwijderen"
 
 #: api/classes/CItemPrototype.php:768
 msgid "Cannot delete graph prototype"
-msgstr ""
+msgstr "Kan de prototype grafiek niet verwijderen"
 
 #: api/classes/CItem.php:981
 msgid "Cannot delete graph."
@@ -1444,11 +1444,10 @@ msgid "Cannot delete proxy"
 msgstr "Kan proxy niet verwijderen"
 
 #: adm.regexps.php:139
-#, fuzzy
 msgid "Cannot delete regular expression"
 msgid_plural "Cannot delete regular expressions"
 msgstr[0] "Kan reguliere expressie niet verwijderen"
-msgstr[1] "Kan reguliere expressie niet verwijderen"
+msgstr[1] "Kan reguliere expressies niet verwijderen"
 
 #: httpconf.php:185
 msgid "Cannot delete scenario"
@@ -1502,7 +1501,7 @@ msgstr "Kan een template item niet verwijderen."
 
 #: api/classes/CItemPrototype.php:729
 msgid "Cannot delete templated items"
-msgstr ""
+msgstr "Kan template items niet verwijderen"
 
 #: api/classes/CDiscoveryRule.php:587
 msgid "Cannot delete templated items."
@@ -1519,7 +1518,7 @@ msgstr "Kan trigger niet verwijderen"
 
 #: api/classes/CItemPrototype.php:800
 msgid "Cannot delete trigger prototype"
-msgstr ""
+msgstr "Kan trekker prototype niet verwijderen"
 
 #: api/classes/CItem.php:997
 msgid "Cannot delete trigger."
@@ -1557,7 +1556,7 @@ msgstr "Kan mediatype niet inschakelen"
 #: include/classes/import/importers/CMapImporter.php:188
 #, php-format
 msgid "Cannot find background image \"%1$s\" used in map \"%2$s\"."
-msgstr ""
+msgstr "Kan achtergrondafbeelding \"%1$s\" niet vinden in map \"%2$s\""
 
 #: include/classes/import/CXmlImport18.php:506
 #: include/classes/import/CXmlImport18.php:1666
@@ -1570,7 +1569,7 @@ msgstr "Kan grafiek \"%1$s\" in scherm \"%2$s\" niet vinden."
 #: include/classes/import/importers/CMapImporter.php:210
 #, php-format
 msgid "Cannot find group \"%1$s\" used in map \"%2$s\"."
-msgstr ""
+msgstr "Kan groep \"%1$s\" in map \"%2$s\" niet vinden"
 
 #: include/classes/import/CXmlImport18.php:483
 #: include/classes/import/importers/CAbstractScreenImporter.php:53
@@ -1582,7 +1581,7 @@ msgstr "Kan groep \"%1$s\" in scherm \"%2$s\" niet vinden."
 #: include/classes/import/importers/CMapImporter.php:218
 #, php-format
 msgid "Cannot find host \"%1$s\" used in map \"%2$s\"."
-msgstr ""
+msgstr "Kan host \"%1$s\" in map \"%2$s\" niet vinden"
 
 #: include/classes/import/CXmlImport18.php:495
 #: include/classes/import/importers/CAbstractScreenImporter.php:61
@@ -1601,12 +1600,12 @@ msgstr "Kan de host interface op \"%1$s\" voor item key \"%2$s\" niet vinden."
 #: include/classes/import/importers/CMapImporter.php:247
 #, php-format
 msgid "Cannot find icon \"%1$s\" used in map \"%2$s\"."
-msgstr ""
+msgstr "Kan icoon \"%1$s\" in map \"%2$s\" niet vinden"
 
 #: include/classes/import/importers/CMapImporter.php:180
-#, php-format
+#, fuzzy, php-format
 msgid "Cannot find icon map \"%1$s\" used in map \"%2$s\"."
-msgstr ""
+msgstr "Kan icoon map \"%1$s\" in map \"%2$s\" niet vinden"
 
 #: include/classes/import/CXmlImport18.php:519
 #: include/classes/import/CXmlImport18.php:1679
@@ -1618,12 +1617,12 @@ msgstr "Kan item \"%1$s\" gebruikt in scherm \"%2$s\" niet vinden."
 #: include/classes/import/CXmlImport18.php:712
 #, php-format
 msgid "Cannot find map \"%1$s\" used in exported map \"%2$s\"."
-msgstr ""
+msgstr "Kan map \"%1$s\" geëxporteerd in map \"%2$s\" niet vinden"
 
 #: include/classes/import/importers/CMapImporter.php:202
 #, php-format
 msgid "Cannot find map \"%1$s\" used in map \"%2$s\"."
-msgstr ""
+msgstr "Kan map \"%1$s\" in map \"%2$s\" niet vinden"
 
 #: include/classes/import/CXmlImport18.php:530
 #: include/classes/import/importers/CAbstractScreenImporter.php:90
@@ -1647,7 +1646,7 @@ msgstr "Kan scherm \"%1$s\" gebruikt in scherm \"%2$s\" niet vinden."
 #: include/classes/import/importers/CMapImporter.php:268
 #, php-format
 msgid "Cannot find trigger \"%1$s\" used in map \"%2$s\"."
-msgstr ""
+msgstr "Kan trekker \"%1$s\" in map \"%2$s\" niet vinden"
 
 #: srv_status.php:186
 msgid "Cannot format Tree. Check logic structure in service links."
@@ -1655,7 +1654,7 @@ msgstr "Kan boom niet opmaken. Controleer de structuur van de service links."
 
 #: services.php:477
 msgid "Cannot format tree."
-msgstr ""
+msgstr "Kan boom niet formateren"
 
 #: api/classes/CTemplate.php:1380
 msgid "Cannot have empty visible template name"
@@ -1664,7 +1663,7 @@ msgstr "Zichtbare template naam mag niet leeg zijn"
 #: api/classes/CTrigger.php:1559 api/classes/CTrigger.php:1634
 #: api/classes/CTriggerPrototype.php:1006
 #: api/classes/CTriggerPrototype.php:1064
-#, fuzzy, php-format
+#, php-format
 msgid "Cannot implode expression \"%s\"."
 msgstr "Kan expressie \"%s\" niet imploderen."
 
@@ -1683,7 +1682,7 @@ msgstr[0] "Kan template \"%2$s\" niet importen, de gekoppelde template \"%3$s\" 
 msgstr[1] "Kan template \"%2$s\" niet importen, de gekoppelde templates \"%3$s\" bestaan niet."
 
 #: include/classes/class.cview.php:113
-#, fuzzy, php-format
+#, php-format
 msgid "Cannot include view file \"%s\"."
 msgstr "Kan view bestand \"%s\" niet invoegen."
 
@@ -1716,7 +1715,7 @@ msgid "Cannot mass update visible template name"
 msgstr "Kan de zichtbare templatenaam niet in bulk bijwerken"
 
 #: api/classes/CHostGeneral.php:160
-#, fuzzy, php-format
+#, php-format
 msgid "Cannot pass duplicate template IDs for the linkage: %s."
 msgstr "Kan dubbele template IDs niet verwerken bij koppelen: %s."
 
@@ -1741,7 +1740,7 @@ msgstr "Kan macro niet verwijderen."
 
 #: api/classes/CUser.php:380
 msgid "Cannot rename guest user."
-msgstr ""
+msgstr "Kan gast gebruiker niet hernoemen"
 
 #: api/classes/CDRule.php:445
 msgid "Cannot save discovery rule without checks."
@@ -1750,32 +1749,32 @@ msgstr "Kan de discovery regel niet opslaan zonder checks."
 #: api/classes/CApplication.php:459
 #, php-format
 msgid "Cannot set \"templateid\" for application \"%1$s\"."
-msgstr ""
+msgstr "Kan \"templateld\" voor applicatie \"%1$s\" niet instellen"
 
 #: api/classes/CGraphGeneral.php:62
 #, php-format
 msgid "Cannot set \"templateid\" for graph \"%1$s\"."
-msgstr ""
+msgstr "Kan \"templateld\" voor grafiek \"%1$s\" niet instellen"
 
 #: api/classes/CItemGeneral.php:223
 #, php-format
 msgid "Cannot set \"templateid\" for item \"%1$s\"."
-msgstr ""
+msgstr "Kan \"templateld\" voor item \"%1$s\" niet instellen"
 
 #: api/classes/CScreen.php:437
 #, php-format
 msgid "Cannot set \"templateid\" for screen \"%1$s\"."
-msgstr ""
+msgstr "Kan \"templateld\" voor scherm \"%1$s\" niet instellen"
 
 #: api/classes/CTrigger.php:1099
 #, php-format
 msgid "Cannot set \"templateid\" for trigger \"%1$s\"."
-msgstr ""
+msgstr "Kan \"templateld\" voor trekker \"%1$s\" niet instellen"
 
 #: api/classes/CTriggerPrototype.php:759
 #, php-format
 msgid "Cannot set \"templateid\" for trigger prototype \"%1$s\"."
-msgstr ""
+msgstr "Kan \"templateld\" voor trekker prototype \"%1$s\" niet instellen"
 
 #: api/classes/CHostInterface.php:510
 msgid "Cannot switch host for interface."
@@ -1825,32 +1824,32 @@ msgstr "Kan trigger \"%s\" niet ontkoppelen, bevat items uit een template die ge
 #: api/classes/CApplication.php:456
 #, php-format
 msgid "Cannot update \"templateid\" for application \"%1$s\"."
-msgstr ""
+msgstr "Kan \"templateld\" voor applicatie \"%1$s\" niet updaten"
 
 #: api/classes/CGraphGeneral.php:59
 #, php-format
 msgid "Cannot update \"templateid\" for graph \"%1$s\"."
-msgstr ""
+msgstr "Kan \"templateld\" voor grafiek \"%1$s\" niet updaten"
 
 #: api/classes/CItemGeneral.php:184
 #, php-format
 msgid "Cannot update \"templateid\" for item \"%1$s\"."
-msgstr ""
+msgstr "Kan \"templateld\" voor item \"%1$s\" niet updaten"
 
 #: api/classes/CScreen.php:508 api/classes/CTemplateScreen.php:739
 #, php-format
 msgid "Cannot update \"templateid\" for screen \"%1$s\"."
-msgstr ""
+msgstr "Kan \"templateld\" voor scherm \"%1$s\" niet updaten"
 
 #: api/classes/CTrigger.php:1096
 #, php-format
 msgid "Cannot update \"templateid\" for trigger \"%1$s\"."
-msgstr ""
+msgstr "Kan \"templateld\" voor trekker \"%1$s\" niet updaten"
 
 #: api/classes/CTriggerPrototype.php:831
 #, php-format
 msgid "Cannot update \"templateid\" for trigger prototype \"%1$s\"."
-msgstr ""
+msgstr "Kan \"templateld\" voor trekker prototype \"%1$s\" niet updaten"
 
 #: actionconf.php:145
 msgid "Cannot update action"
@@ -1916,7 +1915,7 @@ msgstr "Kan afbeelding niet bijwerken"
 
 #: include/classes/import/CXmlImport18.php:639
 msgid "Cannot update image."
-msgstr ""
+msgstr "Kan afbeelding niet updaten"
 
 #: disc_prototypes.php:273 items.php:447 screenedit.php:173
 msgid "Cannot update item"
@@ -1928,7 +1927,7 @@ msgstr "Kan items niet bijwerken"
 
 #: adm.macros.php:93
 msgid "Cannot update macro."
-msgstr ""
+msgstr "kan macro niet updaten"
 
 #: adm.macros.php:147
 msgid "Cannot update macros"
@@ -1973,7 +1972,7 @@ msgstr "Kan scherm niet bijwerken"
 
 #: include/classes/import/CXmlImport18.php:1701
 msgid "Cannot update screen."
-msgstr ""
+msgstr "Kan scherm niet updaten"
 
 #: scripts.php:110
 msgid "Cannot update script"
@@ -2042,7 +2041,7 @@ msgstr "Aanpassen"
 #: latest.php:195
 msgctxt "noun in latest data"
 msgid "Change"
-msgstr ""
+msgstr "Aanpassen"
 
 #: include/views/administration.mediatypes.edit.php:68
 #: include/views/administration.users.edit.php:64
@@ -2078,24 +2077,24 @@ msgstr ""
 
 #: api/classes/CItemGeneral.php:262
 msgid "Check the key, please. Default example was passed."
-msgstr ""
+msgstr "Controleer de code, alstublieft. Standaard voorbeeld werd gepasseerd"
 
 #: include/views/js/configuration.discovery.edit.js.php:23
 msgid "Check type"
-msgstr ""
+msgstr "Controleer type"
 
 #: include/views/configuration.discovery.edit.php:61
 #: include/views/configuration.discovery.list.php:43
 msgid "Checks"
-msgstr ""
+msgstr "Controles"
 
 #: api/classes/CDRule.php:558
 msgid "Checks should be unique."
-msgstr ""
+msgstr "Controles moeten uniek zijn."
 
 #: include/nodes.inc.php:248
 msgid "Child"
-msgstr ""
+msgstr "Kind"
 
 #: include/locales.inc.php:47
 msgid "Chinese (zh_CN)"
@@ -2103,7 +2102,7 @@ msgstr "Chinese (zh_CN)"
 
 #: include/locales.inc.php:48
 msgid "Chinese (zh_TW)"
-msgstr ""
+msgstr "Chinese (zh_TW)"
 
 #: api/classes/CMapElement.php:533
 #, php-format
@@ -13304,7 +13303,7 @@ msgstr ""
 #: include/func.inc.php:570
 msgctxt "Zetta short"
 msgid "Z"
-msgstr ""
+msgstr "Z"
 
 #: index.php:30
 msgid "ZABBIX"
@@ -13317,7 +13316,7 @@ msgstr "Zabbix"
 #: include/page_footer.php:103
 #, php-format
 msgid "Zabbix %s Copyright %s-%s by Zabbix SIA"
-msgstr ""
+msgstr "Zabbix %s Copyright %s-%s by Zabbix SIA"
 
 #: include/views/general.login.php:47
 #, php-format
@@ -13354,7 +13353,7 @@ msgstr "ZABBIX aggregate"
 
 #: include/validate.inc.php:521
 msgid "Zabbix has received an incorrect request."
-msgstr ""
+msgstr "Zabbix heeft een incorrect verzoek gekregen"
 
 #: include/items.inc.php:83
 msgid "Zabbix internal"
@@ -13362,11 +13361,11 @@ msgstr "ZABBIX intern"
 
 #: authentication.php:182
 msgid "Zabbix internal authentication"
-msgstr ""
+msgstr "Zabbix interne authenticatie"
 
 #: warning.php:54
 msgid "Zabbix is temporarily unavailable!"
-msgstr ""
+msgstr "Zabbix is tijdelijk niet beschikbaar!"
 
 #: include/classes/class.cserverinfo.php:39
 #: include/classes/class.cserverinfo.php:40 include/setup.inc.php:367
@@ -13383,22 +13382,25 @@ msgid ""
 "1. Incorrect server IP/DNS in the \"zabbix.conf.php\";\n"
 "2. Incorrect network configuration.\n"
 msgstr ""
+"Zabbix server \"%s\" kan niet bereikt worden. Mogelijke redenen:\n"
+"1. Onjuist server IP/DNS in de \"zabbix.conf.php\";\n"
+"2. Onjuiste netwerk configuratie.\n"
 
 #: include/blocks.inc.php:713
 msgid "Zabbix server IP or port is not set!"
-msgstr ""
+msgstr "Zabbix server IP of poort is niet ingesteld!"
 
 #: adm.gui.php:40
 msgid "Zabbix server activity check interval"
-msgstr ""
+msgstr "Zabbix server controleert actief de interval"
 
 #: include/classes/class.cserverinfo.php:42
 msgid "Zabbix server info"
-msgstr ""
+msgstr "Zabbix server informatie"
 
 #: jsrpc.php:173
 msgid "Zabbix server is not running: the information displayed may not be current."
-msgstr ""
+msgstr "Zabbis server draait niet: de getoonde informatie is mogelijk niet actueel."
 
 #: include/blocks.inc.php:711
 msgid "Zabbix server is running"
@@ -13407,7 +13409,7 @@ msgstr "Zabbix server is actief"
 #: adm.gui.php:77
 #, php-format
 msgid "Zabbix server is running check interval \"%1$s\"."
-msgstr ""
+msgstr "Zabbix server draait, Controle interval \"%1$s\"."
 
 #: include/setup.inc.php:369
 msgid "Zabbix server name"
@@ -13437,16 +13439,17 @@ msgstr "[H:i:s]"
 #: include/func.inc.php:133
 #, php-format
 msgid "[Wrong value for day: \"%s\" ]"
-msgstr ""
+msgstr "[Verkeerde waarde voor dag: \"%s\" ]"
 
 #: include/func.inc.php:118
 #, php-format
 msgid "[Wrong value for month: \"%s\" ]"
-msgstr ""
+msgstr "[Verkeerde waarde voor maand: \"%s\" ]"
 
 #: include/hosts.inc.php:467
+#, fuzzy
 msgid "agent"
-msgstr ""
+msgstr "agent"
 
 #: include/classes/class.cchart.php:1761
 #: include/classes/class.cpagefilter.php:631
@@ -13500,7 +13503,7 @@ msgstr "gmd"
 #: include/func.inc.php:472 jsLoader.php:95
 msgctxt "day short"
 msgid "d"
-msgstr ""
+msgstr "d"
 
 #: include/maintenances.inc.php:57 include/page_header.php:484
 #: include/translateDefines.inc.php:42
@@ -13560,7 +13563,7 @@ msgstr "dagen"
 #: include/views/configuration.services.edit.php:202
 #: include/views/configuration.services.edit.php:243
 msgid "dd"
-msgstr ""
+msgstr "dd"
 
 #: include/setup.inc.php:352 include/views/configuration.slideconf.edit.php:64
 #: include/views/js/configuration.slideconf.edit.js.php:13
@@ -13585,7 +13588,6 @@ msgid "esc_step_from and esc_step_to must be set together."
 msgstr "esc_step_from en esc_step_to moeten samen gezet worden."
 
 #: include/maintenances.inc.php:60 include/maintenances.inc.php:74
-#, fuzzy
 msgid "every"
 msgstr "elke"
 
@@ -13599,7 +13601,6 @@ msgid "executed"
 msgstr "uitgevoerd"
 
 #: jsLoader.php:89
-#, fuzzy
 msgid "fixed"
 msgstr "opgelost"
 
@@ -13610,7 +13611,7 @@ msgstr "gevonden"
 #: include/func.inc.php:480 jsLoader.php:96
 msgctxt "hour short"
 msgid "h"
-msgstr ""
+msgstr "h"
 
 #: include/views/configuration.maintenance.edit.php:77
 #: include/views/configuration.maintenance.edit.php:117
@@ -13619,7 +13620,7 @@ msgstr ""
 #: include/views/configuration.services.edit.php:269
 #: include/views/configuration.services.edit.php:275
 msgid "hh"
-msgstr ""
+msgstr "hh"
 
 #: api/classes/CMap.php:575
 msgid "host"
@@ -13643,11 +13644,10 @@ msgstr "in"
 
 #: include/classes/class.cserverinfo.php:46
 msgid "is"
-msgstr ""
+msgstr "is"
 
 #: include/classes/class.cchart.php:1741 include/graphs.inc.php:92
 #: include/views/js/configuration.graph.edit.js.php:42
-#, fuzzy
 msgid "last"
 msgstr "laatste"
 
@@ -13656,24 +13656,23 @@ msgstr "laatste"
 #: include/forms.inc.php:464 include/forms.inc.php:471
 #: include/forms.inc.php:478 include/forms.inc.php:550
 #: include/forms.inc.php:561
-#, fuzzy
 msgid "like"
 msgstr "als"
 
 #: include/func.inc.php:562
 msgctxt "Milli short"
 msgid "m"
-msgstr ""
+msgstr "m"
 
 #: include/func.inc.php:488 jsLoader.php:97
 msgctxt "minute short"
 msgid "m"
-msgstr ""
+msgstr "m"
 
 #: include/func.inc.php:464 jsLoader.php:93
 msgctxt "month short"
 msgid "m"
-msgstr ""
+msgstr "m"
 
 #: include/views/js/common.macros.js.php:53
 msgid "macro(s)"
@@ -13703,7 +13702,7 @@ msgstr "min"
 
 #: include/views/configuration.action.edit.php:46
 msgid "minimum 60 seconds"
-msgstr ""
+msgstr "minimaal 60 seconden"
 
 #: include/views/configuration.maintenance.edit.php:73
 #: include/views/configuration.maintenance.edit.php:79
@@ -13716,16 +13715,16 @@ msgstr ""
 #: include/views/configuration.services.edit.php:272
 #: include/views/configuration.services.edit.php:278
 msgid "mm"
-msgstr ""
+msgstr "mm"
 
 #: include/func.inc.php:442 include/func.inc.php:498
 msgctxt "millisecond short"
 msgid "ms"
-msgstr ""
+msgstr "ms"
 
 #: include/views/administration.authentication.edit.php:63
 msgid "must be a valid LDAP user"
-msgstr ""
+msgstr "Moet een geldige LDAP gebruiker zijn"
 
 #: include/classes/class.frontendsetup.php:289
 #: include/classes/class.frontendsetup.php:317
@@ -13740,7 +13739,6 @@ msgstr ""
 #: include/classes/class.frontendsetup.php:567
 #: include/classes/class.frontendsetup.php:586
 #: include/classes/class.frontendsetup.php:605
-#, fuzzy
 msgid "no"
 msgstr "geen"
 
@@ -13811,18 +13809,16 @@ msgid "refreshed every"
 msgstr "ververs elke"
 
 #: include/views/administration.general.gui.edit.php:35
-#, fuzzy
 msgid "remember selected"
-msgstr "onthoud geslecteerden"
+msgstr "onthoud geselecteerden"
 
 #: include/services.inc.php:103 include/services.inc.php:106
 #: include/services.inc.php:199
 #: include/views/configuration.services.parent.list.php:41
 #: include/views/configuration.services.parent.list.php:42
 #: include/views/configuration.services.parent.list.php:43
-#, fuzzy
 msgid "root"
-msgstr "wortel"
+msgstr "root"
 
 #: include/classes/class.cserverinfo.php:36
 msgid "running"
@@ -13831,7 +13827,7 @@ msgstr "Lopende"
 #: include/func.inc.php:442 include/func.inc.php:493
 msgctxt "second short"
 msgid "s"
-msgstr ""
+msgstr "s"
 
 #: include/page_header.php:129
 #: include/views/configuration.httpconf.edit.php:188
@@ -13867,7 +13863,6 @@ msgid "template ID \"%1$s\" is passed %2$s times"
 msgstr "template ID \"%1$s\" is %2$s keer verwerkt"
 
 #: include/func.inc.php:1714
-#, fuzzy
 msgid "to"
 msgstr "tot"
 
@@ -13888,7 +13883,7 @@ msgstr "waarde"
 #: jsLoader.php:94
 msgctxt "week short"
 msgid "w"
-msgstr ""
+msgstr "W"
 
 #: include/maintenances.inc.php:74
 msgid "week"
@@ -13930,6 +13925,7 @@ msgid "yyyy"
 msgstr "JJJJ"
 
 #: include/func.inc.php:561
+#, fuzzy
 msgctxt "Micro short"
 msgid "µ"
-msgstr ""
+msgstr "µ"
