@@ -321,23 +321,24 @@ $itemFormList->addRow(_('Flexible intervals'),
 );
 
 // append new flexible interval to form list
-$itemFormList->addRow(
-	_('New flexible interval'),
-	array(
-		_('Interval (in sec)'),
-		SPACE,
-		new CNumericBox('new_delay_flex[delay]', $this->data['new_delay_flex']['delay'], 5),
-		SPACE,
-		_('Period'),
-		SPACE,
-		new CTextBox('new_delay_flex[period]', $this->data['new_delay_flex']['period'], 20),
-		SPACE,
-		new CSubmit('add_delay_flex', _('Add'), null, 'formlist')
-	),
-	$this->data['maxReached'],
-	'row_new_delay_flex',
-	'new'
-);
+$newFlexInt = new CSpan(array(
+	_('Interval (in sec)'),
+	SPACE,
+	new CNumericBox('new_delay_flex[delay]', $this->data['new_delay_flex']['delay'], 5),
+	SPACE,
+	_('Period'),
+	SPACE,
+	new CTextBox('new_delay_flex[period]', $this->data['new_delay_flex']['period'], 20),
+	SPACE,
+	new CSubmit('add_delay_flex', _('Add'), null, 'formlist')
+));
+$newFlexInt->setAttribute('id', 'row-new-delay-flex-fields');
+
+$maxFlexMsg = new CSpan(_('Maximum number of flexible intervals added'), 'red');
+$maxFlexMsg->setAttribute('id', 'row-new-delay-flex-max-reached');
+$maxFlexMsg->setAttribute('style', 'display: none;');
+
+$itemFormList->addRow(_('New flexible interval'), array($newFlexInt, $maxFlexMsg), false, 'row_new_delay_flex', 'new');
 
 if ($this->data['is_discovery_rule']) {
 	$itemFormList->addRow(_('Keep lost resources period (in days)'), new CTextBox('lifetime', $this->data['lifetime'], ZBX_TEXTBOX_SMALL_SIZE, false, 64));
