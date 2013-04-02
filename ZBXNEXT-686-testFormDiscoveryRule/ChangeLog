@@ -1,6 +1,7 @@
 Changes for 2.1.0
 
 New features:
+..F....PS. [ZBXNEXT-300] added support of IPMI discrete sensors (Andris, Sasha, Toms)
 ..F....... [ZBXNEXT-1659] added support of anti-aliased normal and bold lines for graphs and map connectors (Alexei)
 ..F....... [ZBXNEXT-1399] implemented multiselect in dashboard configuration (Eduard)
 ........S. [ZBXNEXT-354] added macro expansion for allowed hosts setting in trapper items (wiper)
@@ -46,6 +47,10 @@ A.F.I...S. [ZBXNEXT-1186] increased length to 2048 characters of expression fiel
 ........S. [ZBXNEXT-1663] added support for notification macros {TRIGGER.NAME.ORIG}, {ITEM.NAME.ORIG}, {ITEM.KEY.ORIG} (dimir)
 
 Bug fixes:
+..F....... [ZBX-6427] added message noting that maximum number of flexible intervals reached (Toms)
+..F....... [ZBX-6427] fixed that new flex interval is not hidden when max number of flexible intervals reached (Toms)
+..F....... [ZBX-6393] fixed missing "New flexible interval" field validation in discovery rule edit form (Toms)
+........S. [ZBX-3643] fixed trend average calculation for 64 bit unsigned integer values (wiper)
 ..F....... [ZBX-6397] synchronized discovery rule username/password field validation with items (Eduard)
 ..F....... [ZBX-6400] fixed type list in discovery rule form (Eduard)
 ..F....... [ZBX-6360] fixed in items.php that all items were listed if nonexisting host where provided in filter "Host" field (Toms)
@@ -156,6 +161,10 @@ A.F....... [ZBX-1357] updated American English, Brazilian Portuguese, French, Ge
 ........S. [ZBXNEXT-1663] added support for notification macros {TRIGGER.NAME.ORIG}, {ITEM.NAME.ORIG}, {ITEM.KEY.ORIG} (dimir)
 
 Bug fixes:
+........S. [ZBX-5225] fixed deadlocks while processing lld rules; each prototype will be processed in own transaction (Sasha)
+A......... [ZBX-6413] fixed that Zabbix API function 'webcheck.update' incorrectly requires 'name' (Toms)
+........S. [ZBX-5225] improved performance of processing discovered items by the low-level discovery rule (Sasha)
+........S. [ZBX-6423] fixed escalator to allow alerts while processing huge amount of escalations (dimir)
 ..F....... [ZBX-6306] fixed frontend layout for latest Google Chrome 25 (Eduard)
 A.F....... [ZBX-6318] fixed undefined indices for large node Ids in DM (Toms)
 ..F....... [ZBX-6388] fixed regular expression namespace inside nodes (Eduard)
