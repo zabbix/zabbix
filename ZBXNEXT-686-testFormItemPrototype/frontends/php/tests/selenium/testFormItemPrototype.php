@@ -1357,46 +1357,6 @@ class testFormItemPrototype extends CWebTest {
 					)
 				)
 			),
-			// Maximum flexfields allowed reached- save OK
-			array(
-				array(
-					'expected' => ITEM_GOOD,
-					'name' => 'Item flex-maximum save OK',
-					'key' => 'item-flex-maximum-save',
-					'flexPeriod' => array(
-						array('flexTime' => '1-7,00:00-24:00'),
-						array('flexTime' => '1-7,00:00-24:00'),
-						array('flexTime' => '1-7,00:00-24:00'),
-						array('flexTime' => '1-7,00:00-24:00'),
-						array('flexTime' => '1-7,00:00-24:00'),
-						array('flexTime' => '1-7,00:00-24:00'),
-						array('flexTime' => '1-7,00:00-24:00', 'maximumItems' => true)
-					),
-					'dbCheck' => true,
-					'formCheck' => true
-				)
-			),
-			// Maximum flexfields allowed reached- remove one item
-			array(
-				array(
-					'expected' => ITEM_BAD,
-					'name' => 'Item flex-maximum with remove',
-					'key' => 'item-flex-maximum-remove',
-					'flexPeriod' => array(
-						array('flexTime' => '1-7,00:00-24:00'),
-						array('flexTime' => '1-7,00:00-24:00'),
-						array('flexTime' => '1-7,00:00-24:00'),
-						array('flexTime' => '1-7,00:00-24:00'),
-						array('flexTime' => '1-7,00:00-24:00'),
-						array('flexTime' => '1-7,00:00-24:00'),
-						array('flexTime' => '1-7,00:00-24:00', 'instantCheck' => true, 'maximumItems' => true, 'remove' => true),
-						array('flexTime' => '1-7,00:00-24:00', 'instantCheck' => true, 'maximumItems' => true)
-					),
-					'errors' => array(
-						'Maximum number of flexible intervals added'
-					)
-				)
-			),
 			// History
 			array(
 				array(
@@ -1725,19 +1685,6 @@ class testFormItemPrototype extends CWebTest {
 					)
 				)
 			),
-			// ipmi_sensor with spaces, checing that is not trimming them
-			array(
-				array(
-					'expected' => ITEM_GOOD,
-					'type' => 'IPMI agent',
-					'name' => 'IPMI agent with spaces',
-					'key' => 'item-ipmi-agent-spaces',
-					'ipmi_sensor' => 'ipmi_sensor',
-					'ipmiSpaces' => true,
-					'dbCheck' => true,
-					'formCheck' => true
-				)
-			),
 			array(
 				array(
 					'expected' => ITEM_BAD,
@@ -1894,18 +1841,6 @@ class testFormItemPrototype extends CWebTest {
 			$this->input_type('username', $data['username']);
 		}
 
-		if (isset($data['ipmi_sensor'])) {
-			if (isset($data['ipmiSpaces'])) {
-				$this->getEval("this.browserbot.findElement('ipmi_sensor').value = '    ipmi_sensor    ';");
-				$ipmi_sensor = $this->getEval("this.browserbot.findElement('ipmi_sensor').value;");
-			}
-			else {
-				$this->input_type('ipmi_sensor', $data['ipmi_sensor']);
-				$ipmi_sensor = $this->getValue('ipmi_sensor');
-			}
-var_dump($ipmi_sensor);
-		}
-
 		if (isset($data['params_es'])) {
 			$this->input_type('params_es', $data['params_es']);
 		}
@@ -1938,15 +1873,6 @@ var_dump($ipmi_sensor);
 						$this->zbxTestTextPresent($msg);
 					}
 					$itemFlexFlag = false;
-				}
-
-				if (isset($period['maximumItems'])) {
-					$this->assertNotVisible('new_delay_flex_delay');
-					$this->assertNotVisible('new_delay_flex_period');
-				}
-				else {
-					$this->assertVisible('new_delay_flex_delay');
-					$this->assertVisible('new_delay_flex_period');
 				}
 
 				if (isset($period['remove'])) {
@@ -2049,16 +1975,6 @@ var_dump($ipmi_sensor);
 			}
 			$this->assertElementPresent("//select[@id='value_type']/option[text()='$value_type']");
 			$this->assertElementPresent("//select[@id='data_type']/option[text()='$data_type']");
-
-			if (isset($data['ipmi_sensor'])) {
-				if (isset($data['ipmiSpaces'])) {
-					$ipmiValue = $this->getEval("this.browserbot.findElement('ipmi_sensor').value;");
-				}
-				else {
-					$ipmiValue = $this->getValue('ipmi_sensor');
-				}
-				$this->assertEquals($ipmi_sensor, $ipmiValue);
-			}
 		}
 
 
