@@ -697,7 +697,7 @@ INSERT INTO interface (type, ip, dns, useip, port, main, hostid, interfaceid) VA
 INSERT INTO hosts_templates (hosttemplateid, hostid, templateid) VALUES (30000, 30001, 30000);
 
 -- add list of discovery rules for simpleCreate tests
-INSERT INTO items (name, key_, hostid, value_type, itemid, flags, delay, params, description, interfaceid) VALUES ('testFormDiscoveryRule1', 'discovery-rule-form1', 40001, 4, 33700, 1,  50, '', '', 40000);
-INSERT INTO items (name, key_, hostid, value_type, itemid, flags, delay, params, description, interfaceid) VALUES ('testFormDiscoveryRule2', 'discovery-rule-form2', 40001, 4, 33701, 1,  50, '', '', 40000);
-INSERT INTO items (name, key_, hostid, value_type, itemid, flags, delay, params, description, interfaceid) VALUES ('testFormDiscoveryRule3', 'discovery-rule-form3', 40001, 4, 33702, 1,  50, '', '', 40000);
-INSERT INTO items (name, key_, hostid, value_type, itemid, flags, delay, params, description, interfaceid) VALUES ('testFormDiscoveryRule4', 'discovery-rule-form4', 40001, 4, 33703, 1,  50, '', '', 40000);
+INSERT INTO items (name, key_, hostid, value_type, itemid, flags, delay, params, description, interfaceid) VALUES ('testFormDiscoveryRule1', 'discovery-rule-form1', 40001, 4, 33700, 1,  50, '', '', 40011);
+INSERT INTO items (name, key_, hostid, value_type, itemid, flags, delay, params, description, interfaceid) VALUES ('testFormDiscoveryRule2', 'discovery-rule-form2', 40001, 4, 33701, 1,  50, '', '', 40011);
+INSERT INTO items (name, key_, hostid, value_type, itemid, flags, delay, params, description, interfaceid) VALUES ('testFormDiscoveryRule3', 'discovery-rule-form3', 40001, 4, 33702, 1,  50, '', '', 40011);
+INSERT INTO items (name, key_, hostid, value_type, itemid, flags, delay, params, description, interfaceid) VALUES ('testFormDiscoveryRule4', 'discovery-rule-form4', 40001, 4, 33703, 1,  50, '', '', 40011);
