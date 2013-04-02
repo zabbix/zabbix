@@ -732,7 +732,7 @@ class testFormDiscoveryRule extends CWebTest {
 					),
 					'errors' => array(
 						'ERROR: Cannot add discovery rule',
-						'Discovery rule will not be refreshed. Please enter a correct update interval.'
+						'Item will not be refreshed. Please enter a correct update interval.'
 					)
 				)
 			),
@@ -771,7 +771,7 @@ class testFormDiscoveryRule extends CWebTest {
 					),
 					'errors' => array(
 						'ERROR: Cannot add discovery rule',
-						'Discovery rule will not be refreshed. Please enter a correct update interval.'
+						'Item will not be refreshed. Please enter a correct update interval.'
 					)
 				)
 			),
@@ -802,7 +802,7 @@ class testFormDiscoveryRule extends CWebTest {
 					),
 					'errors' => array(
 						'ERROR: Cannot add discovery rule',
-						'Discovery rule will not be refreshed. Please enter a correct update interval.'
+						'Item will not be refreshed. Please enter a correct update interval.'
 					)
 				)
 			),
@@ -841,7 +841,7 @@ class testFormDiscoveryRule extends CWebTest {
 					),
 					'errors' => array(
 						'ERROR: Cannot add discovery rule',
-						'Discovery rule will not be refreshed. Please enter a correct update interval.'
+						'Item will not be refreshed. Please enter a correct update interval.'
 					)
 				)
 			),
@@ -870,7 +870,7 @@ class testFormDiscoveryRule extends CWebTest {
 					),
 					'errors' => array(
 						'ERROR: Cannot add discovery rule',
-						'Discovery rule will not be refreshed. Please enter a correct update interval.'
+						'Item will not be refreshed. Please enter a correct update interval.'
 					)
 				)
 			),
@@ -888,7 +888,7 @@ class testFormDiscoveryRule extends CWebTest {
 					),
 					'errors' => array(
 						'ERROR: Cannot add discovery rule',
-						'Discovery rule will not be refreshed. Please enter a correct update interval.'
+						'Item will not be refreshed. Please enter a correct update interval.'
 					)
 				)
 			),
@@ -904,7 +904,7 @@ class testFormDiscoveryRule extends CWebTest {
 					),
 					'errors' => array(
 						'ERROR: Cannot add discovery rule',
-						'Discovery rule will not be refreshed. Please enter a correct update interval.'
+						'Item will not be refreshed. Please enter a correct update interval.'
 					)
 				)
 			),
@@ -920,7 +920,7 @@ class testFormDiscoveryRule extends CWebTest {
 					),
 					'errors' => array(
 						'ERROR: Cannot add discovery rule',
-						'Discovery rule will not be refreshed. Please enter a correct update interval.'
+						'Item will not be refreshed. Please enter a correct update interval.'
 					)
 				)
 			),
