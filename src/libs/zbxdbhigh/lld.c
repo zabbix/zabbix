@@ -20,6 +20,7 @@
 #include "lld.h"
 #include "db.h"
 #include "log.h"
+#include "events.h"
 #include "zbxalgo.h"
 #include "zbxserver.h"
 
@@ -649,7 +650,7 @@ static void	DBlld_save_triggers(zbx_vector_ptr_t *triggers, unsigned char status
 	zbx_lld_trigger_t	*trigger;
 	zbx_lld_function_t	*function;
 	zbx_uint64_t		triggerid = 0, triggerdiscoveryid = 0, functionid = 0;
-	char			*sql1 = NULL, *sql2 = NULL, *sql3 = NULL, *sql4 = NULL, *error_esc = NULL;
+	char			*sql1 = NULL, *sql2 = NULL, *sql3 = NULL, *sql4 = NULL;
 	size_t			sql1_alloc = 8 * ZBX_KIBIBYTE, sql1_offset = 0,
 				sql2_alloc = 2 * ZBX_KIBIBYTE, sql2_offset = 0,
 				sql3_alloc = 2 * ZBX_KIBIBYTE, sql3_offset = 0,
@@ -657,7 +658,7 @@ static void	DBlld_save_triggers(zbx_vector_ptr_t *triggers, unsigned char status
 	const char		*ins_triggers_sql =
 				"insert into triggers"
 				" (triggerid,description,expression,priority,status,"
-					"comments,url,type,value,value_flags,flags,error)"
+					"comments,url,type,value,state,flags)"
 				" values ";
 	const char		*ins_trigger_discovery_sql =
 				"insert into trigger_discovery"
@@ -697,7 +698,6 @@ static void	DBlld_save_triggers(zbx_vector_ptr_t *triggers, unsigned char status
 		zbx_strcpy_alloc(&sql1, &sql1_alloc, &sql1_offset, ins_triggers_sql);
 		zbx_strcpy_alloc(&sql2, &sql2_alloc, &sql2_offset, ins_trigger_discovery_sql);
 #endif
-		error_esc = DBdyn_escape_string_len("Trigger just added. No status update so far.", TRIGGER_ERROR_LEN);
 	}
 
 	if (0 != new_functions)
@@ -770,10 +770,10 @@ static void	DBlld_save_triggers(zbx_vector_ptr_t *triggers, unsigned char status
 #endif
 			expression_esc = DBdyn_escape_string_len(trigger->expression, TRIGGER_EXPRESSION_LEN);
 			zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset,
-					"(" ZBX_FS_UI64 ",'%s','%s',%d,%d,'%s','%s',%d,%d,%d,%d,'%s')" ZBX_ROW_DL,
+					"(" ZBX_FS_UI64 ",'%s','%s',%d,%d,'%s','%s',%d,%d,%d,%d)" ZBX_ROW_DL,
 					trigger->triggerid, description_esc, expression_esc, (int)priority, (int)status,
-					comments_esc, url_esc, (int)type, TRIGGER_VALUE_OK,
-					TRIGGER_VALUE_FLAG_UNKNOWN, ZBX_FLAG_DISCOVERY_CREATED, error_esc);
+					comments_esc, url_esc, (int)type, TRIGGER_VALUE_OK, TRIGGER_STATE_NORMAL,
+					ZBX_FLAG_DISCOVERY_CREATED);
 			zbx_free(expression_esc);
 
 #ifndef HAVE_MULTIROW_INSERT
@@ -842,7 +842,6 @@ static void	DBlld_save_triggers(zbx_vector_ptr_t *triggers, unsigned char status
 		DBexecute("%s", sql2);
 		zbx_free(sql1);
 		zbx_free(sql2);
-		zbx_free(error_esc);
 	}
 
 	if (new_triggers < triggers->values_num)
@@ -1654,7 +1653,7 @@ void	DBlld_process_discovery_rule(zbx_uint64_t discovery_itemid, char *value, zb
 	zbx_uint64_t		hostid = 0;
 	struct zbx_json_parse	jp, jp_data;
 	char			*discovery_key = NULL, *filter = NULL, *error = NULL, *db_error = NULL, *error_esc;
-	unsigned char		status = 0;
+	unsigned char		state = 0;
 	unsigned short		lifetime;
 	char			*f_macro = NULL, *f_regexp = NULL;
 	ZBX_REGEXP		*regexps = NULL;
@@ -1669,7 +1668,7 @@ void	DBlld_process_discovery_rule(zbx_uint64_t discovery_itemid, char *value, zb
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update items set lastclock=%d,lastns=%d", ts->sec, ts->ns);
 
 	result = DBselect(
-			"select hostid,key_,status,filter,error,lifetime"
+			"select hostid,key_,state,filter,error,lifetime"
 			" from items"
 			" where itemid=" ZBX_FS_UI64,
 			discovery_itemid);
@@ -1680,7 +1679,7 @@ void	DBlld_process_discovery_rule(zbx_uint64_t discovery_itemid, char *value, zb
 
 		ZBX_STR2UINT64(hostid, row[0]);
 		discovery_key = zbx_strdup(discovery_key, row[1]);
-		status = (unsigned char)atoi(row[2]);
+		state = (unsigned char)atoi(row[2]);
 		filter = zbx_strdup(filter, row[3]);
 		db_error = zbx_strdup(db_error, row[4]);
 
@@ -1760,12 +1759,16 @@ void	DBlld_process_discovery_rule(zbx_uint64_t discovery_itemid, char *value, zb
 	clean_regexps_ex(regexps, &regexps_num);
 	zbx_free(regexps);
 
-	if (ITEM_STATUS_NOTSUPPORTED == status)
+	if (ITEM_STATE_NOTSUPPORTED == state)
 	{
 		zabbix_log(LOG_LEVEL_WARNING,  "discovery rule [" ZBX_FS_UI64 "][%s] became supported",
 				discovery_itemid, zbx_host_key_string(discovery_itemid));
 
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ",status=%d", ITEM_STATUS_ACTIVE);
+		add_event(0, EVENT_SOURCE_INTERNAL, EVENT_OBJECT_LLDRULE, discovery_itemid, ts, ITEM_STATE_NORMAL,
+				NULL, NULL, 0, 0);
+		process_events();
+
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ",state=%d", ITEM_STATE_NORMAL);
 	}
 error:
 	if (NULL != error && 0 != strcmp(error, db_error))

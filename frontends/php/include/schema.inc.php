@@ -1149,6 +1149,12 @@ return array(
 				'length' => 10,
 				'default' => '0',
 			),
+			'state' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0',
+			),
 		),
 	),
 	'httpstepitem' => array(
@@ -2316,7 +2322,7 @@ return array(
 				'length' => 10,
 				'default' => '0',
 			),
-			'value_flags' => array(
+			'state' => array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
@@ -4345,7 +4351,7 @@ return array(
 				'length' => 10,
 				'default' => '0',
 			),
-			'status' => array(
+			'state' => array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,

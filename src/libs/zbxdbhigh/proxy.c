@@ -207,11 +207,9 @@ static void	get_proxyconfig_table(zbx_uint64_t proxy_hostid, struct zbx_json *j,
 				",hosts r where t.hostid=r.hostid"
 					" and r.proxy_hostid=" ZBX_FS_UI64
 					" and r.status in (%d,%d)"
-					" and t.status in (%d,%d,%d)"
 					" and t.type in (%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d)",
 				proxy_hostid,
 				HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED,
-				ITEM_STATUS_ACTIVE, ITEM_STATUS_DISABLED, ITEM_STATUS_NOTSUPPORTED,
 				ITEM_TYPE_ZABBIX, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_SNMPv1, ITEM_TYPE_SNMPv2c,
 				ITEM_TYPE_SNMPv3, ITEM_TYPE_IPMI, ITEM_TYPE_TRAPPER, ITEM_TYPE_SIMPLE,
 				ITEM_TYPE_HTTPTEST, ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_SSH,
@@ -1318,7 +1316,7 @@ static int	proxy_get_history_data(struct zbx_json *j, zbx_uint64_t *lastid)
 		int		timestamp;
 		int		severity;
 		int		logeventid;
-		unsigned char	status;
+		unsigned char	state;
 	}
 	zbx_history_data_t;
 
@@ -1346,7 +1344,7 @@ static int	proxy_get_history_data(struct zbx_json *j, zbx_uint64_t *lastid)
 	proxy_get_lastid("proxy_history", "history_lastid", &id);
 
 	zbx_snprintf(sql, sizeof(sql),
-			"select id,itemid,clock,ns,timestamp,source,severity,value,logeventid,status"
+			"select id,itemid,clock,ns,timestamp,source,severity,value,logeventid,state"
 			" from proxy_history"
 			" where id>" ZBX_FS_UI64
 			" order by id",
@@ -1373,7 +1371,7 @@ static int	proxy_get_history_data(struct zbx_json *j, zbx_uint64_t *lastid)
 		hd->timestamp = atoi(row[4]);
 		hd->severity = atoi(row[6]);
 		hd->logeventid = atoi(row[8]);
-		hd->status = (unsigned char)atoi(row[9]);
+		hd->state = (unsigned char)atoi(row[9]);
 
 		len1 = strlen(row[5]) + 1;
 		len2 = strlen(row[7]) + 1;
@@ -1421,8 +1419,8 @@ static int	proxy_get_history_data(struct zbx_json *j, zbx_uint64_t *lastid)
 		zbx_json_addstring(j, ZBX_PROTO_TAG_VALUE, &string_buffer[data[i].pvalue], ZBX_JSON_TYPE_STRING);
 		if (0 != data[i].logeventid)
 			zbx_json_adduint64(j, ZBX_PROTO_TAG_LOGEVENTID, data[i].logeventid);
-		if (0 != data[i].status)
-			zbx_json_adduint64(j, ZBX_PROTO_TAG_STATUS, data[i].status);
+		if (0 != data[i].state)
+			zbx_json_adduint64(j, ZBX_PROTO_TAG_STATE, data[i].state);
 
 		zbx_json_close(j);
 
@@ -1547,7 +1545,7 @@ void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid,
 	zbx_host_key_t	*keys = NULL;
 	size_t		i;
 	zbx_uint64_t	*itemids = NULL;
-	unsigned char	*statuses = NULL;
+	unsigned char	*states = NULL;
 	int		*lastclocks = NULL, *errcodes = NULL, *errcodes2 = NULL;
 	size_t		num = 0;
 
@@ -1557,7 +1555,7 @@ void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid,
 	items = zbx_malloc(items, sizeof(DC_ITEM) * values_num);
 	errcodes = zbx_malloc(errcodes, sizeof(int) * values_num);
 	itemids = zbx_malloc(itemids, sizeof(zbx_uint64_t) * values_num);
-	statuses = zbx_malloc(statuses, sizeof(unsigned char) * values_num);
+	states = zbx_malloc(states, sizeof(unsigned char) * values_num);
 	lastclocks = zbx_malloc(lastclocks, sizeof(int) * values_num);
 	errcodes2 = zbx_malloc(errcodes2, sizeof(int) * values_num);
 
@@ -1608,11 +1606,11 @@ void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid,
 			}
 		}
 
-		if (ITEM_STATUS_NOTSUPPORTED == values[i].status || 0 == strcmp(values[i].value, ZBX_NOTSUPPORTED))
+		if (ITEM_STATE_NOTSUPPORTED == values[i].state || 0 == strcmp(values[i].value, ZBX_NOTSUPPORTED))
 		{
-			items[i].status = ITEM_STATUS_NOTSUPPORTED;
+			items[i].state = ITEM_STATE_NOTSUPPORTED;
 			dc_add_history(items[i].itemid, items[i].value_type, items[i].flags, NULL, &values[i].ts,
-					items[i].status, values[i].value, 0, NULL, 0, 0, 0, 0);
+					items[i].state, values[i].value, 0, NULL, 0, 0, 0, 0);
 
 			if (NULL != processed)
 				(*processed)++;
@@ -1630,9 +1628,9 @@ void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid,
 				if (NULL != values[i].source)
 					zbx_replace_invalid_utf8(values[i].source);
 
-				items[i].status = ITEM_STATUS_ACTIVE;
+				items[i].state = ITEM_STATE_NORMAL;
 				dc_add_history(items[i].itemid, items[i].value_type, items[i].flags, &agent,
-						&values[i].ts, items[i].status, NULL, values[i].timestamp,
+						&values[i].ts, items[i].state, NULL, values[i].timestamp,
 						values[i].source, values[i].severity, values[i].logeventid,
 						values[i].lastlogsize, values[i].mtime);
 
@@ -1644,9 +1642,9 @@ void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid,
 				zabbix_log(LOG_LEVEL_DEBUG, "item [%s:%s] error: %s",
 						items[i].host.host, items[i].key_orig, agent.msg);
 
-				items[i].status = ITEM_STATUS_NOTSUPPORTED;
+				items[i].state = ITEM_STATE_NOTSUPPORTED;
 				dc_add_history(items[i].itemid, items[i].value_type, items[i].flags, NULL,
-						&values[i].ts, items[i].status, agent.msg, 0, NULL, 0, 0, 0, 0);
+						&values[i].ts, items[i].state, agent.msg, 0, NULL, 0, 0, 0, 0);
 			}
 			else
 				THIS_SHOULD_NEVER_HAPPEN; /* set_result_type() always sets MSG result if not SUCCEED */
@@ -1655,7 +1653,7 @@ void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid,
 		}
 
 		itemids[num] = items[i].itemid;
-		statuses[num] = items[i].status;
+		states[num] = items[i].state;
 		lastclocks[num] = values[i].ts.sec;
 		errcodes2[num] = SUCCEED;
 		num++;
@@ -1663,11 +1661,11 @@ void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid,
 
 	DCconfig_clean_items(items, errcodes, values_num);
 
-	DCrequeue_items(itemids, statuses, lastclocks, errcodes2, num);
+	DCrequeue_items(itemids, states, lastclocks, errcodes2, num);
 
 	zbx_free(errcodes2);
 	zbx_free(lastclocks);
-	zbx_free(statuses);
+	zbx_free(states);
 	zbx_free(itemids);
 	zbx_free(errcodes);
 	zbx_free(items);
@@ -1811,8 +1809,8 @@ int	process_hist_data(zbx_sock_t *sock, struct zbx_json_parse *jp,
 		if (SUCCEED == zbx_json_value_by_name_dyn(&jp_row, ZBX_PROTO_TAG_LOGEVENTID, &tmp, &tmp_alloc))
 			av->logeventid = atoi(tmp);
 
-		if (SUCCEED == zbx_json_value_by_name_dyn(&jp_row, ZBX_PROTO_TAG_STATUS, &tmp, &tmp_alloc))
-			av->status = (unsigned char)atoi(tmp);
+		if (SUCCEED == zbx_json_value_by_name_dyn(&jp_row, ZBX_PROTO_TAG_STATE, &tmp, &tmp_alloc))
+			av->state = (unsigned char)atoi(tmp);
 
 		values_num++;
 
