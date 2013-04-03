@@ -254,8 +254,7 @@ function make_system_status($filter) {
 	foreach ($triggers as $trigger) {
 		$options = array(
 			'nodeids' => get_current_nodeid(),
-			'object' => EVENT_SOURCE_TRIGGERS,
-			'triggerids' => $trigger['triggerid'],
+			'objectids' => $trigger['triggerid'],
 			'filter'=> array(
 				'value' => TRIGGER_VALUE_TRUE
 			),
@@ -791,7 +790,7 @@ function make_latest_issues(array $filter = array()) {
 			'value' => TRIGGER_VALUE_TRUE
 		),
 		'selectHosts' => array('hostid', 'name'),
-		'output' => array('triggerid', 'value_flags', 'error', 'url', 'expression', 'description', 'priority', 'type'),
+		'output' => array('triggerid', 'state', 'error', 'url', 'expression', 'description', 'priority', 'type'),
 		'sortfield' => isset($filter['sortfield']) ? $filter['sortfield'] : 'lastchange',
 		'sortorder' => isset($filter['sortorder']) ? $filter['sortorder'] : ZBX_SORT_DOWN,
 		'limit' => isset($filter['limit']) ? $filter['limit'] : DEFAULT_LATEST_ISSUES_CNT
@@ -899,7 +898,7 @@ function make_latest_issues(array $filter = array()) {
 
 		// unknown triggers
 		$unknown = SPACE;
-		if ($trigger['value_flags'] == TRIGGER_VALUE_FLAG_UNKNOWN) {
+		if ($trigger['state'] == TRIGGER_STATE_UNKNOWN) {
 			$unknown = new CDiv(SPACE, 'status_icon iconunknown');
 			$unknown->setHint($trigger['error'], '', 'on');
 		}
@@ -907,10 +906,9 @@ function make_latest_issues(array $filter = array()) {
 		$events = API::Event()->get(array(
 			'output' => API_OUTPUT_EXTEND,
 			'select_acknowledges' => API_OUTPUT_EXTEND,
-			'triggerids' => $trigger['triggerid'],
+			'objectids' => $trigger['triggerid'],
 			'acknowledged' => (!empty($filter['extAck']) && $filter['extAck'] == EXTACK_OPTION_UNACK) ? 0 : null,
 			'filter' => array(
-				'object' => EVENT_OBJECT_TRIGGER,
 				'value' => TRIGGER_VALUE_TRUE
 			),
 			'sortfield' => array('eventid'),
@@ -1423,7 +1421,7 @@ function makeTriggersPopup(array $triggers, array $ackParams) {
 
 		// unknown triggers
 		$unknown = SPACE;
-		if ($trigger['value_flags'] == TRIGGER_VALUE_FLAG_UNKNOWN) {
+		if ($trigger['state'] == TRIGGER_STATE_UNKNOWN) {
 			$unknown = new CDiv(SPACE, 'status_icon iconunknown');
 			$unknown->setHint($trigger['error'], '', 'on');
 		}

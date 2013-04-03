@@ -91,7 +91,6 @@ zbx_graph_item_type;
 #define TRIGGER_EXPRESSION_LEN		2048
 #define TRIGGER_EXPRESSION_LEN_MAX	TRIGGER_EXPRESSION_LEN+1
 #define TRIGGER_ERROR_LEN		128
-#define TRIGGER_ERROR_LEN_MAX		TRIGGER_ERROR_LEN+1
 #if defined(HAVE_IBM_DB2) || defined(HAVE_ORACLE)
 #	define TRIGGER_COMMENTS_LEN	2048
 #else
@@ -197,7 +196,7 @@ zbx_graph_item_type;
 
 #define ZBX_SQL_ITEM_FIELDS	"i.itemid,i.key_,h.host,i.type,i.history,i.lastvalue,"		\
 				"i.prevvalue,i.hostid,i.value_type,i.delta,i.prevorgvalue,"	\
-				"i.lastclock,i.units,i.multiplier,i.formula,i.status,"		\
+				"i.lastclock,i.units,i.multiplier,i.formula,i.state,"		\
 				"i.valuemapid,i.trends,i.data_type"
 #define ZBX_SQL_ITEM_TABLES	"hosts h,items i"
 #define ZBX_SQL_TIME_FUNCTIONS	"'nodata','date','dayofmonth','dayofweek','time','now'"
@@ -313,7 +312,6 @@ typedef struct
 	zbx_uint64_t		hostid;
 	zbx_item_type_t		type;
 	zbx_item_data_type_t	data_type;
-	zbx_item_status_t	status;
 	char			*key;
 	char			*host_name;
 	int			history;
@@ -335,6 +333,8 @@ typedef struct
 	char			*h_lasteventid;
 	char			*h_lastsource;
 	char			*h_lastseverity;
+	unsigned char		state;
+	unsigned char		flags;
 }
 DB_ITEM;
 
@@ -366,21 +366,11 @@ DB_ACTION;
 
 typedef struct
 {
-	zbx_uint64_t	operationid;
-	zbx_uint64_t	actionid;
-	int		operationtype;
-	int		esc_period;
-	unsigned char	evaltype;
-}
-DB_OPERATION;
-
-typedef struct
-{
 	zbx_uint64_t	conditionid;
 	zbx_uint64_t	actionid;
-	zbx_condition_type_t	conditiontype;
-	zbx_condition_op_t	operator;
 	char		*value;
+	unsigned char	conditiontype;
+	unsigned char	operator;
 }
 DB_CONDITION;
 
@@ -522,11 +512,7 @@ typedef struct
 ZBX_GRAPH_ITEMS;
 
 int	DBupdate_item_status_to_notsupported(DB_ITEM *item, int clock, const char *error);
-void	DBstart_escalation(zbx_uint64_t actionid, zbx_uint64_t triggerid, zbx_uint64_t eventid);
-void	DBstop_escalation(zbx_uint64_t actionid, zbx_uint64_t triggerid, zbx_uint64_t eventid);
-int	DBget_trigger_update_sql(char **sql, size_t *sql_alloc, size_t *sql_offset, zbx_uint64_t triggerid,
-		unsigned char type, int value, int value_flags, const char *error, int lastchange,
-		int new_value, const char *new_error, int new_lastchange, unsigned char *add_event);
+void	process_triggers(zbx_vector_ptr_t *triggers);
 int	DBget_row_count(const char *table_name);
 int	DBget_items_unsupported_count();
 int	DBget_queue_count(int from, int to);
@@ -575,8 +561,8 @@ const char	*zbx_host_key_string(zbx_uint64_t itemid);
 const char	*zbx_host_key_string_by_item(DB_ITEM *item);
 const char	*zbx_user_string(zbx_uint64_t userid);
 
-double	DBmultiply_value_float(DB_ITEM *item, double value);
-zbx_uint64_t	DBmultiply_value_uint64(DB_ITEM *item, zbx_uint64_t value);
+double	multiply_item_value_float(DB_ITEM *item, double value);
+zbx_uint64_t	multiply_item_value_uint64(DB_ITEM *item, zbx_uint64_t value);
 
 void	DBregister_host(zbx_uint64_t proxy_hostid, const char *host, const char *ip, const char *dns, unsigned short port, int now);
 void	DBproxy_register_host(const char *host, const char *ip, const char *dns, unsigned short port);

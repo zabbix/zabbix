@@ -89,7 +89,7 @@
 			$data['theme']			= get_request('theme', THEME_DEFAULT);
 			$data['refresh']		= get_request('refresh', 30);
 			$data['rows_per_page']	= get_request('rows_per_page', 50);
-			$data['user_type']		= get_request('user_type', USER_TYPE_ZABBIX_USER);;
+			$data['user_type']		= get_request('user_type', USER_TYPE_ZABBIX_USER);
 			$data['user_groups']	= get_request('user_groups', array());
 			$data['change_password']= get_request('change_password', null);
 			$data['user_medias']	= get_request('user_medias', array());
@@ -340,6 +340,7 @@
 		$filter_history				= $_REQUEST['filter_history'];
 		$filter_trends				= $_REQUEST['filter_trends'];
 		$filter_status				= $_REQUEST['filter_status'];
+		$filter_state				= $_REQUEST['filter_state'];
 		$filter_templated_items		= $_REQUEST['filter_templated_items'];
 		$filter_with_triggers		= $_REQUEST['filter_with_triggers'];
 		$subfilter_hosts			= $_REQUEST['subfilter_hosts'];
@@ -347,6 +348,7 @@
 		$subfilter_types			= $_REQUEST['subfilter_types'];
 		$subfilter_value_types		= $_REQUEST['subfilter_value_types'];
 		$subfilter_status			= $_REQUEST['subfilter_status'];
+		$subfilter_state			= $_REQUEST['subfilter_state'];
 		$subfilter_templated_items	= $_REQUEST['subfilter_templated_items'];
 		$subfilter_with_triggers	= $_REQUEST['subfilter_with_triggers'];
 		$subfilter_history			= $_REQUEST['subfilter_history'];
@@ -362,6 +364,7 @@
 		$form->addVar('subfilter_types', $subfilter_types);
 		$form->addVar('subfilter_value_types', $subfilter_value_types);
 		$form->addVar('subfilter_status', $subfilter_status);
+		$form->addVar('subfilter_state', $subfilter_state);
 		$form->addVar('subfilter_templated_items', $subfilter_templated_items);
 		$form->addVar('subfilter_with_triggers', $subfilter_with_triggers);
 		$form->addVar('subfilter_history', $subfilter_history);
@@ -431,8 +434,15 @@
 		// status select
 		$cmbStatus = new CComboBox('filter_status', $filter_status);
 		$cmbStatus->addItem(-1, _('all'));
-		foreach (array(ITEM_STATUS_ACTIVE, ITEM_STATUS_DISABLED, ITEM_STATUS_NOTSUPPORTED) as $status) {
+		foreach (array(ITEM_STATUS_ACTIVE, ITEM_STATUS_DISABLED) as $status) {
 			$cmbStatus->addItem($status, item_status2str($status));
+		}
+
+		// state select
+		$cmbState = new CComboBox('filter_state', $filter_state);
+		$cmbState->addItem(-1, _('all'));
+		foreach (array(ITEM_STATE_NORMAL, ITEM_STATE_NOTSUPPORTED) as $state) {
+			$cmbState->addItem($state, itemState($state));
 		}
 
 		// update interval
@@ -446,7 +456,7 @@
 		$dataTypeLabel = new CSpan(bold(_('Data type').NAME_DELIMITER));
 		$dataTypeLabel->setAttribute('id', 'filter_data_type_label');
 
-		$dataTypeInput = new CComboBox('filter_data_type', $filter_data_type);;
+		$dataTypeInput = new CComboBox('filter_data_type', $filter_data_type);
 		$dataTypeInput->addItem(-1, _('all'));
 		$dataTypeInput->addItems(item_data_type2str());
 		$dataTypeInput->setEnabled('no');
@@ -500,7 +510,7 @@
 			new CCol(bold(_('Type of information').NAME_DELIMITER), 'label col3'),
 			new CCol($cmbValType, 'col3'),
 			new CCol(bold(_('Status').NAME_DELIMITER), 'label col4'),
-			new CCol($cmbStatus, 'col4'),
+			new CCol($cmbStatus, 'col4')
 		));
 		// row 2
 		$table->addRow(array(
@@ -517,12 +527,8 @@
 			new CCol($updateIntervalInput),
 			new CCol($dataTypeLabel, 'label'),
 			new CCol($dataTypeInput),
-			new CCol(bold(_('Triggers').NAME_DELIMITER), 'label'),
-			new CCol(new CComboBox('filter_with_triggers', $filter_with_triggers, null, array(
-				-1 => _('all'),
-				1 => _('With triggers'),
-				0 => _('Without triggers')
-			))),
+			new CCol(bold(_('State').NAME_DELIMITER), 'label'),
+			new CCol($cmbState, 'col4')
 		));
 		// row 3
 		$table->addRow(array(
@@ -541,12 +547,12 @@
 			new CCol(array($snmpCommunityField, $snmpSecurityField)),
 			new CCol(array(bold(_('Keep history')), SPACE._('(in days)').NAME_DELIMITER), 'label'),
 			new CCol(new CNumericBox('filter_history', $filter_history, 8, null, true)),
-			new CCol(bold(_('Template').NAME_DELIMITER), 'label'),
-			new CCol(new CComboBox('filter_templated_items', $filter_templated_items, null, array(
+			new CCol(bold(_('Triggers').NAME_DELIMITER), 'label'),
+			new CCol(new CComboBox('filter_with_triggers', $filter_with_triggers, null, array(
 				-1 => _('all'),
-				1 => _('Templated items'),
-				0 => _('Not Templated items'),
-			))),
+				1 => _('With triggers'),
+				0 => _('Without triggers')
+			)))
 		));
 		// row 4
 		$table->addRow(array(
@@ -556,8 +562,12 @@
 			new CCol($snmpOidField),
 			new CCol(array(bold(_('Keep trends')), SPACE._('(in days)').NAME_DELIMITER), 'label'),
 			new CCol(new CNumericBox('filter_trends', $filter_trends, 8, null, true)),
-			new CCol(null, 'label'),
-			new CCol(),
+			new CCol(bold(_('Template').NAME_DELIMITER), 'label'),
+			new CCol(new CComboBox('filter_templated_items', $filter_templated_items, null, array(
+				-1 => _('all'),
+				1 => _('Templated items'),
+				0 => _('Not Templated items'),
+			)))
 		));
 		// row 5
 		$table->addRow(array(
@@ -568,7 +578,7 @@
 			new CCol(null, 'label'),
 			new CCol(),
 			new CCol(null, 'label'),
-			new CCol(),
+			new CCol()
 		));
 
 		$reset = new CButton('reset', _('Reset'), "javascript: clearAllForm('zbx_filter');");
@@ -595,6 +605,7 @@
 			'types' => array(),
 			'value_types' => array(),
 			'status' => array(),
+			'state' => array(),
 			'templated_items' => array(),
 			'with_triggers' => array(),
 			'history' => array(),
@@ -710,6 +721,26 @@
 				}
 				if ($show_item) {
 					$item_params['status'][$item['status']]['count']++;
+				}
+			}
+
+			// state
+			if ($filter_state == -1) {
+				if (!isset($item_params['state'][$item['state']])) {
+					$item_params['state'][$item['state']] = array(
+						'name' => itemState($item['state']),
+						'count' => 0
+					);
+				}
+				$show_item = true;
+				foreach ($item['subfilters'] as $name => $value) {
+					if ($name == 'subfilter_state') {
+						continue;
+					}
+					$show_item &= $value;
+				}
+				if ($show_item) {
+					$item_params['state'][$item['state']]['count']++;
 				}
 			}
 
@@ -841,6 +872,11 @@
 			$table_subfilter->addRow(array(_('Status'), $status_output));
 		}
 
+		if ($filter_state == -1 && count($item_params['state']) > 1) {
+			$state_output = prepare_subfilter_output($item_params['state'], $subfilter_state, 'subfilter_state');
+			$table_subfilter->addRow(array(_('State'), $state_output));
+		}
+
 		if ($filter_templated_items == -1 && count($item_params['templated_items']) > 1) {
 			$templated_items_output = prepare_subfilter_output($item_params['templated_items'], $subfilter_templated_items, 'subfilter_templated_items');
 			$table_subfilter->addRow(array(_('Template'), $templated_items_output));
@@ -896,7 +932,7 @@
 			'hostname' => get_request('hostname', null),
 			'delay' => get_request('delay', ZBX_ITEM_DELAY_DEFAULT),
 			'history' => get_request('history', 90),
-			'status' => get_request('status', 0),
+			'status' => get_request('status', isset($_REQUEST['form_refresh']) ? 1 : 0),
 			'type' => get_request('type', 0),
 			'snmp_community' => get_request('snmp_community', 'public'),
 			'snmp_oid' => get_request('snmp_oid', 'interfaces.ifTable.ifEntry.ifInOctets.1'),
