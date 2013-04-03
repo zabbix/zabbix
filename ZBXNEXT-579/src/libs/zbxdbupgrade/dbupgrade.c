@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -9,7 +9,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -818,6 +818,11 @@ static int	DBpatch_02010038()
 
 	return DBset_default("config", &field);
 }
+
+static int	DBpatch_02010039()
+{
+	return DBdrop_field("alerts", "nextcheck");
+}
 #endif	/* not HAVE_SQLITE3 */
 
 static void	DBget_version(int *mandatory, int *optional)
@@ -894,6 +899,7 @@ int	DBcheck_version()
 		{DBpatch_02010036, 2010036, 0, 0},
 		{DBpatch_02010037, 2010037, 0, 0},
 		{DBpatch_02010038, 2010038, 0, 0},
+		{DBpatch_02010039, 2010039, 0, 0},
 		/* IMPORTANT! When adding a new mandatory DBPatch don't forget to update it for SQLite, too. */
 		{NULL}
 	};
