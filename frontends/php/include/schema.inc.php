@@ -3958,12 +3958,6 @@ return array(
 				'length' => 128,
 				'default' => '',
 			),
-			'nextcheck' => array(
-				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '0',
-			),
 			'esc_step' => array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
