@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2012 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -260,7 +260,10 @@ $triggersTab = new CTabView(array('remember' => true));
 if (!$this->data['form_refresh']) {
 	$triggersTab->setSelected(0);
 }
-$triggersTab->addTab('triggersTab', _('Trigger'), $triggersFormList);
+$triggersTab->addTab(
+	'triggersTab',
+	empty($this->data['parent_discoveryid']) ? _('Trigger') : _('Trigger prototype'), $triggersFormList
+);
 
 /*
  * Dependencies tab
@@ -276,7 +279,7 @@ if (empty($this->data['parent_discoveryid'])) {
 		$triggersForm->addVar('dependencies[]', $dependency['triggerid'], 'dependencies_'.$dependency['triggerid']);
 
 		$row = new CRow(array(
-			$dependency['host'].': '.$dependency['description'],
+			$dependency['host'].NAME_DELIMITER.$dependency['description'],
 			new CButton('remove', _('Remove'), 'javascript: removeDependency("'.$dependency['triggerid'].'");', 'link_menu')
 		));
 		$row->setAttribute('id', 'dependency_'.$dependency['triggerid']);

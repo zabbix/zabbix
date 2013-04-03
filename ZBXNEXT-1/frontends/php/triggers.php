@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2012 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -147,8 +147,40 @@ elseif (isset($_REQUEST['save'])) {
 	);
 
 	if (isset($_REQUEST['triggerid'])) {
-		$trigger['triggerid'] = $_REQUEST['triggerid'];
-		$result = API::Trigger()->update($trigger);
+		// update only changed fields
+		$oldTrigger = API::Trigger()->get(array(
+			'triggerids' => $_REQUEST['triggerid'],
+			'output' => API_OUTPUT_EXTEND,
+			'selectDependencies' => array('triggerid')
+		));
+		$oldTrigger = reset($oldTrigger);
+		$oldTrigger['dependencies'] = zbx_toHash(zbx_objectValues($oldTrigger['dependencies'], 'triggerid'));
+
+		$newDependencies = $trigger['dependencies'];
+		$oldDependencies = $oldTrigger['dependencies'];
+		unset($trigger['dependencies']);
+		unset($oldTrigger['dependencies']);
+
+		$triggerToUpdate = array_diff_assoc($trigger, $oldTrigger);
+		$triggerToUpdate['triggerid'] = $_REQUEST['triggerid'];
+
+		// dependencies
+		$updateDepencencies = false;
+		if (count($newDependencies) != count($oldDependencies)) {
+			$updateDepencencies = true;
+		}
+		else {
+			foreach ($newDependencies as $dependency) {
+				if (!isset($oldDependencies[$dependency['triggerid']])) {
+					$updateDepencencies = true;
+				}
+			}
+		}
+		if ($updateDepencencies) {
+			$triggerToUpdate['dependencies'] = $newDependencies;
+		}
+
+		$result = API::Trigger()->update($triggerToUpdate);
 		show_messages($result, _('Trigger updated'), _('Cannot update trigger'));
 	}
 	else {
@@ -264,7 +296,7 @@ elseif (str_in_array($_REQUEST['go'], array('activate', 'disable')) && isset($_R
 			'where' => array('triggerid' => $triggerIdsToUpdate)
 		));
 
-		// if disable trigger, unknown event must be created
+		// if we're disabling a monitored trigger, set it's value flag to UNKNOWN
 		if ($status == TRIGGER_STATUS_DISABLED) {
 			$valueTriggerIds = array();
 			$db_triggers = DBselect(
@@ -289,8 +321,6 @@ elseif (str_in_array($_REQUEST['go'], array('activate', 'disable')) && isset($_R
 					),
 					'where' => array('triggerid' => $valueTriggerIds)
 				));
-
-				addUnknownEvent($valueTriggerIds);
 			}
 		}
 
@@ -305,7 +335,7 @@ elseif (str_in_array($_REQUEST['go'], array('activate', 'disable')) && isset($_R
 		foreach ($db_triggers as $triggerid => $trigger) {
 			$host = reset($trigger['hosts']);
 			add_audit_ext(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_TRIGGER, $triggerid,
-				$host['host'].':'.$trigger['description'], 'triggers', $statusOld, $statusNew);
+				$host['host'].NAME_DELIMITER.$trigger['description'], 'triggers', $statusOld, $statusNew);
 		}
 
 		DBend(true);

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2012 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -10,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -63,7 +63,7 @@ $sizeY		= 300;
 
 $shiftX		= 12;
 $shiftYup	= 17;
-$shiftYdown	= 25 + 15 * 3;
+$shiftYdown	= 25 + 15 * 2;
 
 $im = imagecreate($sizeX + $shiftX + 61, $sizeY + $shiftYup + $shiftYdown + 10);
 
@@ -95,7 +95,6 @@ $now = time(null);
 $count_now = array();
 $true = array();
 $false = array();
-$unknown = array();
 
 $start = mktime(0, 0, 0, 1, 1, date('Y'));
 
@@ -114,7 +113,6 @@ for ($i = 0; $i < $weeks; $i++) {
 	$stat = calculate_availability($_REQUEST['triggerid'], $period_start, $period_end);
 	$true[$i] = $stat['true'];
 	$false[$i] = $stat['false'];
-	$unknown[$i] = $stat['unknown'];
 	$count_now[$i] = 1;
 }
 
@@ -143,11 +141,6 @@ for ($i = 1; $i <= $weeks; $i++) {
 		imagefilledrectangle($im, $x1 + $shiftX, $shiftYup, $x1 + $shiftX + 8, $yt + $shiftYup, imagecolorallocate($im, 235, 120, 120)); // red
 	}
 
-	$yu = (int) ($sizeY * $unknown[$i - 1] / 100 + 0.5);
-	if ($yu > 0) {
-		imagefilledrectangle($im, $x1 + $shiftX, $yt + $shiftYup, $x1 + $shiftX + 8, $yt + $yu + $shiftYup, imagecolorallocate($im, 235, 235, 235)); // unknown
-	}
-
 	$yf = $sizeY * $false[$i - 1] / 100;
 	if ($yf > 0) {
 		imagefilledrectangle($im, $x1 + $shiftX, $yt + $yu + $shiftYup, $x1 + $shiftX + 8, $sizeY + $shiftYup, imagecolorallocate($im, 120, 235, 120)); // green
@@ -169,10 +162,6 @@ imageText($im, 8, 0, $shiftX + 9, $sizeY + $shiftYup + 15 * 0 + 45, $black, _('O
 imagefilledrectangle($im, $shiftX, $sizeY + $shiftYup + 39 + 15 * 1, $shiftX + 5, $sizeY + $shiftYup + 35 + 9 + 15 * 1, imagecolorallocate($im, 235, 120, 120));
 imagerectangle($im, $shiftX, $sizeY + $shiftYup + 39 + 15 * 1, $shiftX + 5, $sizeY + $shiftYup + 15 + 9 + 35 * 1, $black);
 imageText($im, 8, 0, $shiftX + 9, $sizeY + $shiftYup + 15 * 1 + 45, $black, _('Problems').' (%)');
-
-imagefilledrectangle($im, $shiftX, $sizeY + $shiftYup + 39 + 15 * 2, $shiftX + 5, $sizeY + $shiftYup + 35 + 9 + 15 * 2, imagecolorallocate($im, 220, 220, 220));
-imagerectangle($im, $shiftX, $sizeY + $shiftYup + 39 + 15 * 2, $shiftX + 5, $sizeY + $shiftYup + 35 + 9 + 15 * 2, $black);
-imageText($im, 8, 0, $shiftX + 9, $sizeY + $shiftYup + 15 * 2 + 45, $black, _('Unknown').' (%)');
 
 imagestringup($im, 0, imagesx($im) - 10, imagesy($im) - 50, 'http://www.zabbix.com', $gray);
 

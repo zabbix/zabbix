@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2012 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -10,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -33,11 +33,6 @@ class CScreenEvents extends CScreenBase {
 			'triggerLimit' => $this->screenitem['elements'],
 			'eventLimit' => $this->screenitem['elements']
 		);
-
-		$showUnknown = CProfile::get('web.events.filter.showUnknown', 0);
-		if ($showUnknown) {
-			$options['value'] = array(TRIGGER_VALUE_TRUE, TRIGGER_VALUE_FALSE);
-		}
 
 		$item = new CTableInfo(_('No events defined.'));
 		$item->setHeader(array(

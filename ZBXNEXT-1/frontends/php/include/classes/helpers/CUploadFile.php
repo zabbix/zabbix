@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2012 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -54,7 +54,7 @@ class CUploadFile {
 	 */
 	public function __construct($file) {
 		if (!ini_get('file_uploads')) {
-			throw new Exception(_('Unable to uploade file because "file_uploads" is disabled.'));
+			throw new Exception(_('Unable to upload file because "file_uploads" is disabled.'));
 		}
 
 		$this->name = $file['name'];

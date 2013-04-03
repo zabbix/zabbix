@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -9,7 +9,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -58,8 +58,7 @@ static void	update_triggers_status_to_unknown(zbx_uint64_t hostid, zbx_item_type
 	const char	*__function_name = "update_triggers_status_to_unknown";
 	DB_RESULT	result;
 	DB_ROW		row;
-	DC_TRIGGER	*tr = NULL, *trigger;
-	int		tr_alloc = 0, tr_num = 0, i, events_num = 0;
+	DC_TRIGGER	trigger;
 	char		*sql = NULL, failed_type_buf[8];
 	size_t		sql_alloc = 16 * ZBX_KIBIBYTE, sql_offset = 0;
 
@@ -108,7 +107,7 @@ static void	update_triggers_status_to_unknown(zbx_uint64_t hostid, zbx_item_type
 	 *     item and MYITEM types differ AND item host status is AVAILABLE    *
 	 *************************************************************************/
 	result = DBselect(
-			"select distinct t.triggerid,t.type,t.value,t.value_flags,t.error"
+			"select distinct t.triggerid,t.type,t.value,t.value_flags,t.error,t.lastchange"
 			" from items i,functions f,triggers t,hosts h"
 			" where i.itemid=f.itemid"
 				" and f.triggerid=t.triggerid"
@@ -158,33 +157,21 @@ static void	update_triggers_status_to_unknown(zbx_uint64_t hostid, zbx_item_type
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		if (tr_num == tr_alloc)
-		{
-			tr_alloc += 64;
-			tr = zbx_realloc(tr, tr_alloc * sizeof(DC_TRIGGER));
-		}
+		ZBX_STR2UINT64(trigger.triggerid, row[0]);
+		trigger.type = (unsigned char)atoi(row[1]);
+		trigger.value = atoi(row[2]);
+		trigger.value_flags = atoi(row[3]);
+		strscpy(trigger.error, row[4]);
+		trigger.lastchange = atoi(row[5]);
 
-		trigger = &tr[tr_num++];
-
-		ZBX_STR2UINT64(trigger->triggerid, row[0]);
-		trigger->type = (unsigned char)atoi(row[1]);
-		trigger->value = atoi(row[2]);
-		trigger->value_flags = atoi(row[3]);
-		trigger->new_value = TRIGGER_VALUE_UNKNOWN;
-		strscpy(trigger->error, row[4]);
-		trigger->timespec = *ts;
-
-		if (SUCCEED == DBget_trigger_update_sql(&sql, &sql_alloc, &sql_offset, trigger->triggerid,
-				trigger->type, trigger->value, trigger->value_flags, trigger->error, trigger->new_value, reason,
-				&trigger->timespec, &trigger->add_event, &trigger->value_changed))
+		if (SUCCEED == DBget_trigger_update_sql(&sql, &sql_alloc, &sql_offset, trigger.triggerid, trigger.type,
+				trigger.value, trigger.value_flags, trigger.error, trigger.lastchange,
+				TRIGGER_VALUE_UNKNOWN, reason, ts->sec, &trigger.add_event))
 		{
 			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
 
 			DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 		}
-
-		if (1 == trigger->add_event)
-			events_num++;
 	}
 	DBfree_result(result);
 
@@ -194,26 +181,6 @@ static void	update_triggers_status_to_unknown(zbx_uint64_t hostid, zbx_item_type
 		DBexecute("%s", sql);
 
 	zbx_free(sql);
-
-	if (0 != events_num)
-	{
-		zbx_uint64_t	eventid;
-
-		eventid = DBget_maxid_num("events", events_num);
-
-		for (i = 0; i < tr_num; i++)
-		{
-			trigger = &tr[i];
-
-			if (1 != trigger->add_event)
-				continue;
-
-			process_event(eventid++, EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, trigger->triggerid,
-					&trigger->timespec, trigger->new_value, trigger->value_changed, 0, 0);
-		}
-	}
-
-	zbx_free(tr);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
@@ -281,9 +248,6 @@ static void	activate_host(DC_ITEM *item, zbx_timespec_t *ts)
 	if (0 == *errors_from && HOST_AVAILABLE_TRUE == *available)
 		return;
 
-	if (SUCCEED != DCconfig_activate_host(item))
-		return;
-
 	offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, "update hosts set ");
 
 	if (HOST_AVAILABLE_TRUE == *available)
@@ -309,9 +273,14 @@ static void	activate_host(DC_ITEM *item, zbx_timespec_t *ts)
 	offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, "%s=%d,%s=%d,%s='' where hostid=" ZBX_FS_UI64,
 			fld_errors_from, *errors_from, fld_disable_until, *disable_until, fld_error, item->host.hostid);
 
-	DBbegin();
-	DBexecute("%s", sql);
-	DBcommit();
+	if (SUCCEED == DCconfig_update_host_availability(item->host.hostid, item->type,	*available, *errors_from,
+			*disable_until))
+	{
+
+		DBbegin();
+		DBexecute("%s", sql);
+		DBcommit();
+	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
@@ -376,13 +345,6 @@ static void	deactivate_host(DC_ITEM *item, zbx_timespec_t *ts, const char *error
 			return;
 	}
 
-	if (SUCCEED != DCconfig_deactivate_host(item, ts->sec))
-		return;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() errors_from:%d available:%d", __function_name, *errors_from, *available);
-
-	DBbegin();
-
 	*error_msg = '\0';
 
 	offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, "update hosts set ");
@@ -435,8 +397,15 @@ static void	deactivate_host(DC_ITEM *item, zbx_timespec_t *ts, const char *error
 	offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, "%s=%d where hostid=" ZBX_FS_UI64,
 			fld_disable_until, *disable_until, item->host.hostid);
 
-	DBexecute("%s", sql);
-	DBcommit();
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() errors_from:%d available:%d", __function_name, *errors_from, *available);
+
+	if (SUCCEED == DCconfig_update_host_availability(item->host.hostid, item->type, *available, *errors_from,
+			*disable_until))
+	{
+		DBbegin();
+		DBexecute("%s", sql);
+		DBcommit();
+	}
 
 	if ('\0' != *error_msg)
 		zabbix_log(LOG_LEVEL_WARNING, "%s", error_msg);
@@ -603,7 +572,7 @@ static int	get_values(unsigned char poller_type)
 			case ITEM_TYPE_IPMI:
 			case ITEM_TYPE_JMX:
 				ZBX_STRDUP(port, items[i].interface.port_orig);
-				substitute_simple_macros(NULL, &items[i].host.hostid, NULL, NULL, NULL,
+				substitute_simple_macros(NULL, NULL, &items[i].host.hostid, NULL, NULL, NULL,
 						&port, MACRO_TYPE_COMMON, NULL, 0);
 				if (FAIL == is_ushort(port, &items[i].interface.port))
 				{
@@ -622,11 +591,11 @@ static int	get_values(unsigned char poller_type)
 				ZBX_STRDUP(items[i].snmpv3_authpassphrase, items[i].snmpv3_authpassphrase_orig);
 				ZBX_STRDUP(items[i].snmpv3_privpassphrase, items[i].snmpv3_privpassphrase_orig);
 
-				substitute_simple_macros(NULL, &items[i].host.hostid, NULL, NULL, NULL,
+				substitute_simple_macros(NULL, NULL, &items[i].host.hostid, NULL, NULL, NULL,
 						&items[i].snmpv3_securityname, MACRO_TYPE_COMMON, NULL, 0);
-				substitute_simple_macros(NULL, &items[i].host.hostid, NULL, NULL, NULL,
+				substitute_simple_macros(NULL, NULL, &items[i].host.hostid, NULL, NULL, NULL,
 						&items[i].snmpv3_authpassphrase, MACRO_TYPE_COMMON, NULL, 0);
-				substitute_simple_macros(NULL, &items[i].host.hostid, NULL, NULL, NULL,
+				substitute_simple_macros(NULL, NULL, &items[i].host.hostid, NULL, NULL, NULL,
 						&items[i].snmpv3_privpassphrase, MACRO_TYPE_COMMON, NULL, 0);
 				/* break; is not missing here */
 			case ITEM_TYPE_SNMPv1:
@@ -634,7 +603,7 @@ static int	get_values(unsigned char poller_type)
 				ZBX_STRDUP(items[i].snmp_community, items[i].snmp_community_orig);
 				ZBX_STRDUP(items[i].snmp_oid, items[i].snmp_oid_orig);
 
-				substitute_simple_macros(NULL, &items[i].host.hostid, NULL, NULL, NULL,
+				substitute_simple_macros(NULL, NULL, &items[i].host.hostid, NULL, NULL, NULL,
 						&items[i].snmp_community, MACRO_TYPE_COMMON, NULL, 0);
 				if (SUCCEED != substitute_key_macros(&items[i].snmp_oid, &items[i].host.hostid, NULL,
 						NULL, MACRO_TYPE_SNMP_OID, error, sizeof(error)))
@@ -648,31 +617,31 @@ static int	get_values(unsigned char poller_type)
 				ZBX_STRDUP(items[i].publickey, items[i].publickey_orig);
 				ZBX_STRDUP(items[i].privatekey, items[i].privatekey_orig);
 
-				substitute_simple_macros(NULL, &items[i].host.hostid, NULL, NULL, NULL,
+				substitute_simple_macros(NULL, NULL, &items[i].host.hostid, NULL, NULL, NULL,
 						&items[i].publickey, MACRO_TYPE_COMMON, NULL, 0);
-				substitute_simple_macros(NULL, &items[i].host.hostid, NULL, NULL, NULL,
+				substitute_simple_macros(NULL, NULL, &items[i].host.hostid, NULL, NULL, NULL,
 						&items[i].privatekey, MACRO_TYPE_COMMON, NULL, 0);
 				/* break; is not missing here */
 			case ITEM_TYPE_TELNET:
 				ZBX_STRDUP(items[i].username, items[i].username_orig);
 				ZBX_STRDUP(items[i].password, items[i].password_orig);
 
-				substitute_simple_macros(NULL, &items[i].host.hostid, NULL, NULL, NULL,
+				substitute_simple_macros(NULL, NULL, &items[i].host.hostid, NULL, NULL, NULL,
 						&items[i].username, MACRO_TYPE_COMMON, NULL, 0);
-				substitute_simple_macros(NULL, &items[i].host.hostid, NULL, NULL, NULL,
+				substitute_simple_macros(NULL, NULL, &items[i].host.hostid, NULL, NULL, NULL,
 						&items[i].password, MACRO_TYPE_COMMON, NULL, 0);
 				/* break; is not missing here */
 			case ITEM_TYPE_DB_MONITOR:
-				substitute_simple_macros(NULL, NULL, NULL, &items[i], NULL,
+				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i], NULL,
 						&items[i].params, MACRO_TYPE_PARAMS_FIELD, NULL, 0);
 				break;
 			case ITEM_TYPE_JMX:
 				ZBX_STRDUP(items[i].username, items[i].username_orig);
 				ZBX_STRDUP(items[i].password, items[i].password_orig);
 
-				substitute_simple_macros(NULL, &items[i].host.hostid, NULL, NULL, NULL,
+				substitute_simple_macros(NULL, NULL, &items[i].host.hostid, NULL, NULL, NULL,
 						&items[i].username, MACRO_TYPE_COMMON, NULL, 0);
-				substitute_simple_macros(NULL, &items[i].host.hostid, NULL, NULL, NULL,
+				substitute_simple_macros(NULL, NULL, &items[i].host.hostid, NULL, NULL, NULL,
 						&items[i].password, MACRO_TYPE_COMMON, NULL, 0);
 				break;
 		}

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -9,7 +9,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -146,12 +146,12 @@ typedef struct
 	char		error[TRIGGER_ERROR_LEN_MAX];
 	char		*new_error;
 	zbx_timespec_t	timespec;
+	int		lastchange;
 	unsigned char	type;
 	unsigned char	value;
 	unsigned char	value_flags;
 	unsigned char	new_value;
 	unsigned char	add_event;
-	unsigned char	value_changed;
 }
 DC_TRIGGER;
 
@@ -250,7 +250,7 @@ int	DCconfig_deactivate_host(DC_ITEM *item, int now);
 int	DCconfig_check_trigger_dependencies(zbx_uint64_t triggerid);
 
 void	DCconfig_set_trigger_value(zbx_uint64_t triggerid, unsigned char value,
-		unsigned char value_flags, const char *error);
+		unsigned char value_flags, const char *error, int *lastchange);
 void	DCconfig_set_maintenance(zbx_uint64_t hostid, int maintenance_status,
 		int maintenance_type, int maintenance_from);
 
@@ -265,5 +265,8 @@ int	DCconfig_get_proxypoller_nextcheck();
 void	DCrequeue_proxy(zbx_uint64_t hostid, unsigned char update_nextcheck);
 
 void	DCget_user_macro(zbx_uint64_t *hostids, int host_num, const char *macro, char **replace_to);
+
+int	DCconfig_update_host_availability(zbx_uint64_t hostid, unsigned char item_type, unsigned char available,
+		int errors_from, int disable_until);
 
 #endif

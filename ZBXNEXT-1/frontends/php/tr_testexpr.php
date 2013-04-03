@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2012 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -30,7 +30,6 @@ define('COMBO_PATTERN', 'str_in_array({},array(');
 define('COMBO_PATTERN_LENGTH', zbx_strlen(COMBO_PATTERN));
 
 $definedErrorPhrases = array(
-	EXPRESSION_VALUE_TYPE_UNKNOWN => _('Unknown variable type, testing not available'),
 	EXPRESSION_HOST_UNKNOWN => _('Unknown host, no such host present in system'),
 	EXPRESSION_HOST_ITEM_UNKNOWN => _('Unknown host item, no such item in selected host'),
 	EXPRESSION_NOT_A_MACRO_ERROR => _('Given expression is not a macro'),

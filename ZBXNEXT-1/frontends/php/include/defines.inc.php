@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -10,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -21,10 +21,10 @@
 
 define('ZABBIX_VERSION',     '2.1.0');
 define('ZABBIX_API_VERSION', '2.1.0');
-define('ZABBIX_DB_VERSION',	 2010032);
+define('ZABBIX_DB_VERSION',	 2010034);
 
 define('ZABBIX_COPYRIGHT_FROM', '2001');
-define('ZABBIX_COPYRIGHT_TO',   '2012');
+define('ZABBIX_COPYRIGHT_TO',   '2013');
 
 define('ZBX_LOGIN_ATTEMPTS',	5);
 define('ZBX_LOGIN_BLOCK',		30); // sec
@@ -96,17 +96,18 @@ define('ZBX_DB_ORACLE',		'ORACLE');
 define('ZBX_DB_POSTGRESQL',	'POSTGRESQL');
 define('ZBX_DB_SQLITE3',	'SQLITE3');
 
-define('PAGE_TYPE_HTML',		0);
-define('PAGE_TYPE_IMAGE',		1);
-define('PAGE_TYPE_XML',			2);
-define('PAGE_TYPE_JS',			3); // javascript
-define('PAGE_TYPE_CSS',			4);
-define('PAGE_TYPE_HTML_BLOCK',	5); // simple block of html (as text)
-define('PAGE_TYPE_JSON',		6); // simple JSON
-define('PAGE_TYPE_JSON_RPC',	7); // api call
-define('PAGE_TYPE_TEXT_FILE',	8); // api call
-define('PAGE_TYPE_TEXT',		9); // simple text
-define('PAGE_TYPE_CSV',			10); // CSV format
+define('PAGE_TYPE_HTML',				0);
+define('PAGE_TYPE_IMAGE',				1);
+define('PAGE_TYPE_XML',					2);
+define('PAGE_TYPE_JS',					3); // javascript
+define('PAGE_TYPE_CSS',					4);
+define('PAGE_TYPE_HTML_BLOCK',			5); // simple block of html (as text)
+define('PAGE_TYPE_JSON',				6); // simple JSON
+define('PAGE_TYPE_JSON_RPC',			7); // api call
+define('PAGE_TYPE_TEXT_FILE',			8); // api call
+define('PAGE_TYPE_TEXT',				9); // simple text
+define('PAGE_TYPE_CSV',					10); // CSV format
+define('PAGE_TYPE_TEXT_RETURN_JSON',	11); // input plaintext output json
 
 define('ZBX_SESSION_ACTIVE',	0);
 define('ZBX_SESSION_PASSIVE',	1);
@@ -608,6 +609,9 @@ define('ZBX_INTERNAL_GROUP',		1);
 define('GROUP_STATUS_DISABLED', 1);
 define('GROUP_STATUS_ENABLED',	0);
 
+define('LINE_TYPE_NORMAL',	0);
+define('LINE_TYPE_BOLD',	1);
+
 // IMPORTANT!!! by priority DESC
 define('GROUP_GUI_ACCESS_SYSTEM',	0);
 define('GROUP_GUI_ACCESS_INTERNAL', 1);
@@ -625,10 +629,8 @@ define('ACCESS_DENY_PAGE', 1);
 define('GROUP_DEBUG_MODE_DISABLED', 0);
 define('GROUP_DEBUG_MODE_ENABLED',	1);
 
-define('PERM_MAX',			3);
 define('PERM_READ_WRITE',	3);
 define('PERM_READ',			2);
-define('PERM_READ_LIST',	1);
 define('PERM_DENY',			0);
 
 define('PERM_RES_IDS_ARRAY',	1); // return array of nodes id - array(1,2,3,4)
@@ -637,7 +639,7 @@ define('PERM_RES_DATA_ARRAY',	2);
 define('RESOURCE_TYPE_NODE',	0);
 define('RESOURCE_TYPE_GROUP',	1);
 
-define('PARAM_TYPE_SECONDS',	0);
+define('PARAM_TYPE_TIME',	0);
 define('PARAM_TYPE_COUNTS',		1);
 
 define('ZBX_NODE_CHILD',	0);
@@ -758,7 +760,6 @@ define('HOST_INVENTORY_DISABLED',	-1);
 define('HOST_INVENTORY_MANUAL',		0);
 define('HOST_INVENTORY_AUTOMATIC',	1);
 
-define('EXPRESSION_VALUE_TYPE_UNKNOWN',	'#ERROR_VALUE_TYPE#');
 define('EXPRESSION_HOST_UNKNOWN',		'#ERROR_HOST#');
 define('EXPRESSION_HOST_ITEM_UNKNOWN',	'#ERROR_ITEM#');
 define('EXPRESSION_NOT_A_MACRO_ERROR',	'#ERROR_MACRO#');
@@ -770,6 +771,7 @@ define('SBR',	"<br/>\n");
 define('SPACE',	'&nbsp;');
 define('RARR',	'&rArr;');
 define('SQUAREBRACKETS', '%5B%5D');
+define('NAME_DELIMITER', ': ');
 
 // affects multibyte strings [in mb_ereg char "-" must be backslashed]!!!
 if (in_array(ini_get('mbstring.func_overload'), array(2,3,6,7))) {

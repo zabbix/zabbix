@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2012 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -115,7 +115,7 @@ foreach ($this->data['drules'] as $drule) {
 				if (isset($this->data['macros'][$key_])) {
 					$key_ = $this->data['macros'][$key_]['value'];
 				}
-				$key_ = ': '.$key_;
+				$key_ = NAME_DELIMITER.$key_;
 			}
 
 			$serviceName = discovery_check_type2str($dservice['type']).discovery_port2str($dservice['type'], $dservice['port']).$key_;

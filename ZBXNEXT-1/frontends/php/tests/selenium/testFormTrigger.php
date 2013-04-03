@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -10,15 +10,14 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
 require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
 define('TRIGGER_GOOD', 0);
@@ -38,32 +37,31 @@ class testFormTrigger extends CWebTest {
 	 */
 	public function testFormTrigger_CheckLayout() {
 
-		$this->login('triggers.php');
+		$this->zbxTestLogin('triggers.php');
 		$this->checkTitle('Configuration of triggers');
-		$this->ok('CONFIGURATION OF TRIGGERS');
+		$this->zbxTestTextPresent('CONFIGURATION OF TRIGGERS');
 
-		$this->button_click('form');
-		$this->wait();
+		$this->zbxTestClickWait('form');
 		$this->checkTitle('Configuration of triggers');
 
-		$this->ok('Name');
-		$this->ok('Expression');
-		$this->ok('Expression constructor');
-		$this->ok('Multiple PROBLEM events generation');
-		$this->ok('Description');
-		$this->ok('URL');
-		$this->ok('Severity');
-		$this->ok('Enabled');
-		$this->ok('Not classified');
-		$this->ok('Information');
-		$this->ok('Warning');
-		$this->ok('Average');
-		$this->ok('High');
-		$this->ok('Disaster');
-		$this->ok('Dependencies');
-		$this->ok('No dependencies defined.');
-		$this->ok('Name');
-		$this->ok('Action');
+		$this->zbxTestTextPresent('Name');
+		$this->zbxTestTextPresent('Expression');
+		$this->zbxTestTextPresent('Expression constructor');
+		$this->zbxTestTextPresent('Multiple PROBLEM events generation');
+		$this->zbxTestTextPresent('Description');
+		$this->zbxTestTextPresent('URL');
+		$this->zbxTestTextPresent('Severity');
+		$this->zbxTestTextPresent('Enabled');
+		$this->zbxTestTextPresent('Not classified');
+		$this->zbxTestTextPresent('Information');
+		$this->zbxTestTextPresent('Warning');
+		$this->zbxTestTextPresent('Average');
+		$this->zbxTestTextPresent('High');
+		$this->zbxTestTextPresent('Disaster');
+		$this->zbxTestTextPresent('Dependencies');
+		$this->zbxTestTextPresent('No dependencies defined.');
+		$this->zbxTestTextPresent('Name');
+		$this->zbxTestTextPresent('Action');
 
 		$this->assertElementPresent('description');
 		$this->assertAttribute("//input[@id='description']/@maxlength", '255');
@@ -74,14 +72,14 @@ class testFormTrigger extends CWebTest {
 		$this->assertElementPresent("//*/span[text()='Expression constructor']");
 
 		// expression constructor
-		$this->button_click("//*/span[text()='Expression constructor']");
+		$this->zbxTestClick("//*/span[text()='Expression constructor']");
 		sleep(1);
 
-		$this->ok('Target');
-		$this->ok('Expression');
-		$this->ok('Error');
-		$this->ok('Action');
-		$this->ok('Close expression constructor');
+		$this->zbxTestTextPresent('Target');
+		$this->zbxTestTextPresent('Expression');
+		$this->zbxTestTextPresent('Error');
+		$this->zbxTestTextPresent('Action');
+		$this->zbxTestTextPresent('Close expression constructor');
 
 		$this->assertElementPresent('insert');
 		$this->assertElementPresent('insert_macro');
@@ -89,10 +87,10 @@ class testFormTrigger extends CWebTest {
 		$this->assertAttribute("//textarea[@id='expr_temp']/@readonly", 'readonly');
 		$this->assertElementPresent("//*/span[text()='Close expression constructor']");
 
-		$this->button_click("//*/span[text()='Close expression constructor']");
+		$this->zbxTestClick("//*/span[text()='Close expression constructor']");
 		sleep(1);
-		$this->nok('Insert macro');
-		$this->nok('Close expression constructor');
+		$this->zbxTestTextNotPresent('Insert macro');
+		$this->zbxTestTextNotPresent('Close expression constructor');
 
 		$this->assertElementPresent('type');
 		$this->assertAttribute("//input[@id='type']/@type", 'checkbox');
@@ -128,9 +126,9 @@ class testFormTrigger extends CWebTest {
 
 		$this->assertElementPresent('save');
 		$this->assertElementPresent('cancel');
-		$this->button_click('link=Dependencies');
+		$this->zbxTestClick('link=Dependencies');
 		$this->assertElementPresent('bnt1');
-		$this->button_click('link=Trigger');
+		$this->zbxTestClick('link=Trigger');
 	}
 
 	/**
@@ -140,4 +138,3 @@ class testFormTrigger extends CWebTest {
 		DBrestore_tables('triggers');
 	}
 }
-?>

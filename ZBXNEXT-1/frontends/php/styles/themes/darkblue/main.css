@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -9,7 +9,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -288,30 +288,19 @@ table.triggers_info tr td.header {
 	background: #3C759B url(images/bg_i-soft_25.png) 50% 50% repeat-x;
 }
 
-table.hosts_info tr td.header {
-	background: #3C759B url(images/bg_i-soft_25.png) 50% 50% repeat-x;
-}
+/* host info module */
+table.hosts_info tr td.header { background: #3C759B url(images/bg_i-soft_25.png) 50% 50% repeat-x; }
+table.hosts_info tr td.total { color: inherit; }
 
-table.server_info{
-	border: 1px #77B7DA solid;
-}
-
-table.server_info tr td.header {
-	background: #3C759B url(images/bg_i-soft_25.png) 50% 50% repeat-x;
-}
-
-table.server_info tr.footer td {
-	background: #3C759B url(images/bg_i-soft_25.png) 50% 50% repeat-x;
-}
+/* server information module */
+table.server_info { border: 1px #77B7DA solid; }
+table.server_info tr td { background-color: #1D4161; }
+table.server_info tr td.header { background: #3C759B url(images/bg_i-soft_25.png) 50% 50% repeat-x; }
+table.server_info tr.footer td { background: #3C759B url(images/bg_i-soft_25.png) 50% 50% repeat-x; }
 
 table.history td.caption{
 	color: #77B7DA;
 }
-
-table.server_info {
-	background-color:#000E19;
-}
-
 
 /* MESSAGES */
 table.msgok{
@@ -540,3 +529,28 @@ div.control-severity label span:hover {
 div.preloader {
 	background: url("images/preloader.gif") no-repeat;
 }
+
+/* multiselect */
+.multiselect input { color: white; }
+.multiselect .selected ul {
+	border: 1px solid #B3C9D6; background: #001C31;
+	background-image: -webkit-gradient(linear, 0 0, 0 100%, color-stop(1%, #03111C), color-stop(15%, #001C31));
+	background-image: -webkit-linear-gradient(top, #03111C 1%, #001C31 15%);
+	background-image: -moz-linear-gradient(top, #03111C 1%, #001C31 15%);
+	background-image: -o-linear-gradient(top, #03111C 1%, #001C31 15%);
+	background-image: linear-gradient(#03111C 1%, #001C31 15%);
+}
+.multiselect .selected ul.active { border: 1px solid #41789D; }
+.multiselect .selected ul li {
+	border: 1px solid #B3C9D6; background: #32698E; color: #FFFFFF;
+	background-image: -webkit-gradient(linear, 0 0, 0 100%, color-stop(1%, #2F6588), color-stop(15%, #3A7AA6));
+	background-image: -webkit-linear-gradient(top, #2F6588 1%, #3A7AA6 15%);
+	background-image: -moz-linear-gradient(top, #2F6588 1%, #3A7AA6 15%);
+	background-image: -o-linear-gradient(top, #2F6588 1%, #3A7AA6 15%);
+	background-image: linear-gradient(#2F6588 1%, #3A7AA6 15%);
+}
+.multiselect .selected ul li.pressed { background: #285473; }
+.multiselect .available { background: #001C31; border: 1px solid #285473; }
+.multiselect .available .prefix { color: #77B7DA; }
+.multiselect .available ul li.hover { background: #4A7FA2; }
+.multiselect .available ul li.hover .prefix { color: #F1F1F1; }

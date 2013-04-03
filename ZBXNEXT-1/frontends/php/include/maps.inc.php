@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2012 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -10,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -163,16 +163,7 @@ function get_icon_center_by_selement($element, $info, $map) {
 
 function myDrawLine($image, $x1, $y1, $x2, $y2, $color, $drawtype) {
 	if ($drawtype == MAP_LINK_DRAWTYPE_BOLD_LINE) {
-		imageline($image, $x1, $y1, $x2, $y2, $color);
-		if (abs($x1 - $x2) < abs($y1 - $y2)) {
-			$x1++;
-			$x2++;
-		}
-		else {
-			$y1++;
-			$y2++;
-		}
-		imageline($image, $x1, $y1, $x2, $y2, $color);
+		zbx_imagealine($image, $x1, $y1, $x2, $y2, $color, LINE_TYPE_BOLD);
 	}
 	elseif ($drawtype == MAP_LINK_DRAWTYPE_DASHED_LINE) {
 		if (function_exists('imagesetstyle')) {
@@ -182,7 +173,7 @@ function myDrawLine($image, $x1, $y1, $x2, $y2, $color, $drawtype) {
 				IMG_COLOR_TRANSPARENT, IMG_COLOR_TRANSPARENT, IMG_COLOR_TRANSPARENT, IMG_COLOR_TRANSPARENT
 			);
 			imagesetstyle($image, $style);
-			imageline($image, $x1, $y1, $x2, $y2, IMG_COLOR_STYLED);
+			zbx_imageline($image, $x1, $y1, $x2, $y2, IMG_COLOR_STYLED);
 		}
 		else {
 			imagedashedline($image, $x1, $y1, $x2, $y2, $color);
@@ -191,10 +182,10 @@ function myDrawLine($image, $x1, $y1, $x2, $y2, $color, $drawtype) {
 	elseif ($drawtype == MAP_LINK_DRAWTYPE_DOT && function_exists('imagesetstyle')) {
 		$style = array($color, IMG_COLOR_TRANSPARENT, IMG_COLOR_TRANSPARENT, IMG_COLOR_TRANSPARENT);
 		imagesetstyle($image, $style);
-		imageline($image, $x1, $y1, $x2, $y2, IMG_COLOR_STYLED);
+		zbx_imageline($image, $x1, $y1, $x2, $y2, IMG_COLOR_STYLED);
 	}
 	else {
-		imageline($image, $x1, $y1, $x2, $y2, $color);
+		zbx_imagealine($image, $x1, $y1, $x2, $y2, $color);
 	}
 }
 
@@ -551,7 +542,7 @@ function add_elementNames(&$selements) {
 				break;
 			case SYSMAP_ELEMENT_TYPE_TRIGGER:
 				$hostname = reset($triggers[$selement['elementid']]['hosts']);
-				$selements[$snum]['elementName'] = $hostname['name'].':'.
+				$selements[$snum]['elementName'] = $hostname['name'].NAME_DELIMITER.
 					CMacrosResolverHelper::resolveTriggerName($triggers[$selement['elementid']]);
 				break;
 			case SYSMAP_ELEMENT_TYPE_HOST_GROUP:
@@ -615,8 +606,8 @@ function getTriggersInfo($selement, $i, $showUnack) {
 		'iconid' => $selement['iconid_off']
 	);
 
-	if($i['problem'] && ($i['problem_unack'] && $showUnack == EXTACK_OPTION_UNACK
-		|| in_array($showUnack, array(EXTACK_OPTION_ALL, EXTACK_OPTION_BOTH)))) {
+	if ($i['problem'] && ($i['problem_unack'] && $showUnack == EXTACK_OPTION_UNACK
+			|| in_array($showUnack, array(EXTACK_OPTION_ALL, EXTACK_OPTION_BOTH)))) {
 
 		$info['iconid'] = $selement['iconid_on'];
 		$info['icon_type'] = SYSMAP_ELEMENT_ICON_ON;
@@ -628,22 +619,14 @@ function getTriggersInfo($selement, $i, $showUnack) {
 	elseif ($i['trigger_disabled']) {
 		$info['iconid'] = $selement['iconid_disabled'];
 		$info['icon_type'] = SYSMAP_ELEMENT_ICON_DISABLED;
-		$info['info'] = array(
-			'status' => array(
-				'msg' => _('DISABLED'),
-				'color' => $colors['Dark Red']
-			)
+		$info['info']['status'] = array(
+			'msg' => _('DISABLED'),
+			'color' => $colors['Dark Red']
 		);
 	}
 	else {
 		$info['iconid'] = $selement['iconid_off'];
 		$info['icon_type'] = SYSMAP_ELEMENT_ICON_OFF;
-		$info['info'] = array(
-			'unknown' => array(
-				'msg' => _('OK'),
-				'color' => $colors['Dark Green']
-			)
-		);
 	}
 
 	return $info;
@@ -695,18 +678,11 @@ function getHostsInfo($selement, $i, $show_unack) {
 			);
 		}
 
-		// set element to problem state if it has problem events, ignore unknown events
+		// set element to problem state if it has problem events
 		if ($info['info']) {
 			$info['iconid'] = $selement['iconid_on'];
 			$info['icon_type'] = SYSMAP_ELEMENT_ICON_ON;
 			$has_problem = true;
-		}
-
-		if ($i['unknown']) {
-			$info['info']['unknown'] = array(
-				'msg' => $i['unknown'].' '._('Unknown'),
-				'color' => $colors['Gray']
-			);
 		}
 	}
 
@@ -729,10 +705,6 @@ function getHostsInfo($selement, $i, $show_unack) {
 	elseif (!$has_problem) {
 		$info['iconid'] = $selement['iconid_off'];
 		$info['icon_type'] = SYSMAP_ELEMENT_ICON_OFF;
-		$info['info']['unknown'] = array(
-			'msg' => _('OK'),
-			'color' => $colors['Dark Green']
-		);
 	}
 
 	return $info;
@@ -785,18 +757,11 @@ function getHostGroupsInfo($selement, $i, $show_unack) {
 			);
 		}
 
-		// set element to problem state if it has problem events, ignore unknown events
+		// set element to problem state if it has problem events
 		if ($info['info']) {
 			$info['iconid'] = $selement['iconid_on'];
 			$info['icon_type'] = SYSMAP_ELEMENT_ICON_ON;
 			$has_problem = true;
-		}
-
-		if ($i['unknown']) {
-			$info['info']['unknown'] = array(
-				'msg' => $i['unknown'].' '._('Unknown'),
-				'color' => $colors['Gray']
-			);
 		}
 	}
 
@@ -826,10 +791,6 @@ function getHostGroupsInfo($selement, $i, $show_unack) {
 	if (!$has_status && !$has_problem) {
 		$info['icon_type'] = SYSMAP_ELEMENT_ICON_OFF;
 		$info['iconid'] = $selement['iconid_off'];
-		$info['info']['unknown'] = array(
-			'msg' => _('OK'),
-			'color' => $colors['Dark Green']
-		);
 	}
 
 	return $info;
@@ -888,13 +849,6 @@ function getMapsInfo($selement, $i, $show_unack) {
 			$info['icon_type'] = SYSMAP_ELEMENT_ICON_ON;
 			$has_problem = true;
 		}
-
-		if ($i['unknown']) {
-			$info['info']['unknown'] = array(
-				'msg' => $i['unknown'].' '._('Unknown'),
-				'color' => $colors['Gray']
-			);
-		}
 	}
 
 	if ($i['maintenance']) {
@@ -923,10 +877,6 @@ function getMapsInfo($selement, $i, $show_unack) {
 	if (!$has_status && !$has_problem) {
 		$info['icon_type'] = SYSMAP_ELEMENT_ICON_OFF;
 		$info['iconid'] = $selement['iconid_off'];
-		$info['info']['unknown'] = array(
-			'msg' => _('OK'),
-			'color' => $colors['Dark Green']
-		);
 	}
 
 	return $info;
@@ -1017,14 +967,14 @@ function getSelementsInfo($sysmap) {
 		}
 	}
 
-	// get hosts data
+	// get host inventories
 	if ($sysmap['iconmapid']) {
 		$hostInventories = API::Host()->get(array(
 			'hostids' => $hostsToGetInventories,
 			'output' => array('hostid'),
 			'nopermissions' => true,
 			'preservekeys' => true,
-			'selectInventory' => array('hostid')
+			'selectInventory' => API_OUTPUT_EXTEND
 		));
 	}
 
@@ -1161,7 +1111,6 @@ function getSelementsInfo($sysmap) {
 			'maintenance' => 0,
 			'problem' => 0,
 			'problem_unack' => 0,
-			'unknown' => 0,
 			'priority' => 0,
 			'trigger_disabled' => 0,
 			'latelyChanged' => false,
@@ -1727,7 +1676,7 @@ function drawMapLinkLabels(&$im, $map, $map_info, $resolveMacros = true) {
 				break;
 			case MAP_LINK_DRAWTYPE_BOLD_LINE:
 				imagerectangle($im, $boxX_left - 1, $boxY_top - 1, $boxX_right + 1, $boxY_bottom + 1, $color);
-				break;
+				// break; is not ne
 			case MAP_LINK_DRAWTYPE_LINE:
 			default:
 				imagerectangle($im, $boxX_left, $boxY_top, $boxX_right, $boxY_bottom, $color);
@@ -1827,7 +1776,7 @@ function drawMapLabels(&$im, $map, $map_info, $resolveMacros = true) {
 
 		$el_info = $map_info[$selementid];
 
-		$el_msgs = array('problem', 'unack', 'maintenance', 'unknown', 'ok', 'status');
+		$el_msgs = array('problem', 'unack', 'maintenance', 'ok', 'status');
 		foreach ($el_msgs as $caption) {
 			if (!isset($el_info['info'][$caption]) || zbx_empty($el_info['info'][$caption]['msg'])) {
 				continue;

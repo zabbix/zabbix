@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2012 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -156,7 +156,7 @@ elseif (isset($_REQUEST['save'])) {
 		add_audit(
 			!isset($_REQUEST['actionid']) ? AUDIT_ACTION_ADD : AUDIT_ACTION_UPDATE,
 			AUDIT_RESOURCE_ACTION,
-			_('Name').': '.$_REQUEST['name']
+			_('Name').NAME_DELIMITER.$_REQUEST['name']
 		);
 
 		unset($_REQUEST['form']);

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2012 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -254,8 +254,8 @@ switch ($this->data['new_condition']['conditiontype']) {
 		break;
 	case CONDITION_TYPE_DSERVICE_TYPE:
 		$conditionValueComboBox = new CComboBox('new_condition[value]');
-		foreach (array(SVC_SSH, SVC_LDAP, SVC_SMTP, SVC_FTP, SVC_HTTP, SVC_POP, SVC_NNTP, SVC_IMAP, SVC_TCP, SVC_AGENT,
-				SVC_SNMPv1, SVC_SNMPv2c, SVC_SNMPv3, SVC_ICMPPING) as $svc) {
+		foreach (array(SVC_SSH, SVC_LDAP, SVC_SMTP, SVC_FTP, SVC_HTTP, SVC_HTTPS, SVC_POP, SVC_NNTP, SVC_IMAP, SVC_TCP, SVC_AGENT,
+				SVC_SNMPv1, SVC_SNMPv2c, SVC_SNMPv3, SVC_ICMPPING, SVC_TELNET) as $svc) {
 			$conditionValueComboBox->addItem($svc,discovery_check_type2str($svc));
 		}
 		$rowCondition[] = $conditionValueComboBox;

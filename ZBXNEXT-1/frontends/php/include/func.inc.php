@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2012 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -10,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -662,6 +662,19 @@ function convertFunctionValue($value) {
 }
 
 /************* ZBX MISC *************/
+
+/**
+ * Swap two values.
+ *
+ * @param mixed $a first value
+ * @param mixed $b second value
+ */
+function zbx_swap(&$a, &$b) {
+	$tmp = $a;
+	$a = $b;
+	$b = $tmp;
+}
+
 function zbx_avg($values) {
 	zbx_value2array($values);
 	$sum = 0;
@@ -808,7 +821,7 @@ function zbx_nl2br($str) {
 }
 
 function zbx_formatDomId($value) {
-	return str_replace(array('[',']'), array('_', ''), $value);
+	return str_replace(array('[', ']'), array('_', ''), $value);
 }
 
 function zbx_strlen($str) {
@@ -1330,6 +1343,17 @@ function zbx_toObject($value, $field) {
 	return $result;
 }
 
+/**
+ * Converts the given value to a numeric array:
+ * - a scalar value will be converted to an array and added as the only element;
+ * - an array with first element key containing only numeric characters will be converted to plain zero-based numeric array.
+ * This is used for reseting nonsequential numeric arrays;
+ * - an associative array will be returned in an array as the only element, except if first element key contains only numeric characters.
+ *
+ * @param mixed $value
+ *
+ * @return array
+ */
 function zbx_toArray($value) {
 	if ($value === null) {
 		return $value;
@@ -2215,7 +2239,6 @@ function get_status() {
 		'triggers_count_disabled' => 0,
 		'triggers_count_off' => 0,
 		'triggers_count_on' => 0,
-		'triggers_count_unknown' => 0,
 		'items_count' => 0,
 		'items_count_monitored' => 0,
 		'items_count_disabled' => 0,
@@ -2251,9 +2274,6 @@ function get_status() {
 					case TRIGGER_VALUE_TRUE:
 						$status['triggers_count_on'] = $dbTrigger['cnt'];
 						break;
-					case TRIGGER_VALUE_UNKNOWN:
-						$status['triggers_count_unknown'] = $dbTrigger['cnt'];
-						break;
 				}
 				break;
 			case TRIGGER_STATUS_DISABLED:
@@ -2261,8 +2281,7 @@ function get_status() {
 				break;
 		}
 	}
-	$status['triggers_count_enabled'] = $status['triggers_count_off'] + $status['triggers_count_on']
-			+ $status['triggers_count_unknown'];
+	$status['triggers_count_enabled'] = $status['triggers_count_off'] + $status['triggers_count_on'];
 	$status['triggers_count'] = $status['triggers_count_enabled'] + $status['triggers_count_disabled'];
 
 	// items

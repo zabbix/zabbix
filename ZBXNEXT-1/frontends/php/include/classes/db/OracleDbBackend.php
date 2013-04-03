@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2012 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -10,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -38,5 +38,26 @@ class OracleDbBackend extends DbBackend {
 		}
 
 		return true;
+	}
+
+	/**
+	 * Create INSERT SQL query.
+	 * Creation example:
+	 *	BEGIN
+	 *	INSERT INTO usrgrp (usrgrpid, name, gui_access, users_status, debug_mode)
+	 *		VALUES ('20', 'admins', '1', '0', '1');
+	 *	INSERT INTO usrgrp (usrgrpid, name, gui_access, users_status, debug_mode)
+	 *		VALUES ('21', 'users', '0', '0', '0');
+	 *  END;
+	 */
+	public function createInsertQuery($table, array $fields, array $values) {
+		$sql = 'BEGIN';
+		$fields = '('.implode(',', $fields).')';
+		foreach ($values as $row) {
+			$sql .= ' INSERT INTO '.$table.' '.$fields.' VALUES ('.implode(',', array_values($row)).');';
+		}
+		$sql .= ' END;';
+
+		return $sql;
 	}
 }

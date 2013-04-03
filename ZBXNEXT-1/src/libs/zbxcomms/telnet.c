@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -9,7 +9,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -71,7 +71,11 @@ static ssize_t	telnet_socket_read(ZBX_SOCKET socket_fd, void *buf, size_t count)
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() rc:%d errno:%d error:[%s]",
 				__function_name, rc, error, strerror_from_system(error));
 
+#ifdef _WINDOWS
+		if (WSAEWOULDBLOCK == error)
+#else
 		if (EAGAIN == error)
+#endif
 		{
 			/* wait and if there is still an error or no input available */
 			/* we assume the other side has nothing more to say */
@@ -108,7 +112,11 @@ static ssize_t	telnet_socket_write(ZBX_SOCKET socket_fd, const void *buf, size_t
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() rc:%d errno:%d error:[%s]",
 				__function_name, rc, error, strerror_from_system(error));
 
+#ifdef _WINDOWS
+		if (WSAEWOULDBLOCK == error)
+#else
 		if (EAGAIN == error)
+#endif
 		{
 			telnet_waitsocket(socket_fd, WAIT_WRITE);
 			continue;

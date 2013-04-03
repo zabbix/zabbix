@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -9,7 +9,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -298,12 +298,10 @@ typedef struct
 	DB_TRIGGER	trigger;
 	zbx_uint64_t	eventid;
 	zbx_uint64_t	objectid;
-	zbx_uint64_t	ack_eventid;
 	int		source;
 	int		object;
 	int		clock;
 	int		value;
-	unsigned char	value_changed;
 	int		acknowledged;
 	int		ns;
 }
@@ -526,10 +524,9 @@ ZBX_GRAPH_ITEMS;
 int	DBupdate_item_status_to_notsupported(DB_ITEM *item, int clock, const char *error);
 void	DBstart_escalation(zbx_uint64_t actionid, zbx_uint64_t triggerid, zbx_uint64_t eventid);
 void	DBstop_escalation(zbx_uint64_t actionid, zbx_uint64_t triggerid, zbx_uint64_t eventid);
-void	DBupdate_triggers_status_after_restart();
 int	DBget_trigger_update_sql(char **sql, size_t *sql_alloc, size_t *sql_offset, zbx_uint64_t triggerid,
-		unsigned char type, int value, int value_flags, const char *error, int new_value, const char *new_error,
-		const zbx_timespec_t *ts, unsigned char *add_event, unsigned char *value_changed);
+		unsigned char type, int value, int value_flags, const char *error, int lastchange,
+		int new_value, const char *new_error, int new_lastchange, unsigned char *add_event);
 int	DBget_row_count(const char *table_name);
 int	DBget_items_unsupported_count();
 int	DBget_queue_count(int from, int to);
@@ -562,6 +559,8 @@ int	DBcopy_template_elements(zbx_uint64_t hostid, zbx_vector_uint64_t *lnk_templ
 int	DBdelete_template_elements(zbx_uint64_t hostid, zbx_vector_uint64_t *del_templateids);
 
 void	DBdelete_items(zbx_vector_uint64_t *itemids);
+void	DBdelete_triggers(zbx_vector_uint64_t *triggerids);
+void	DBdelete_graphs(zbx_vector_uint64_t *graphids);
 void	DBdelete_host(zbx_uint64_t hostid);
 void	DBget_graphitems(const char *sql, ZBX_GRAPH_ITEMS **gitems, size_t *gitems_alloc, size_t *gitems_num);
 void	DBupdate_services(zbx_uint64_t triggerid, int status, int clock);
@@ -610,4 +609,6 @@ int	DBtxn_ongoing();
 int	DBtable_exists(const char *table_name);
 int	DBfield_exists(const char *table_name, const char *field_name);
 
+void	zbx_create_services_lock();
+void	zbx_destroy_services_lock();
 #endif

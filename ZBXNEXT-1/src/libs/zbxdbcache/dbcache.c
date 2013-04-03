@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -9,7 +9,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -56,7 +56,6 @@ extern int		CONFIG_NODE_NOHISTORY;
 
 static int		ZBX_HISTORY_SIZE = 0;
 int			ZBX_SYNC_MAX = 1000;	/* must be less than ZBX_HISTORY_SIZE */
-static int		ZBX_ITEMIDS_SIZE = 0;
 
 #define ZBX_IDS_SIZE	10
 
@@ -96,11 +95,26 @@ typedef struct
 }
 ZBX_DC_HISTORY;
 
+/* value_avg_t structure is used for item average value trend calculations. */
+/*                                                                          */
+/* For double values the average value is calculated on the fly with the    */
+/* following formula: avg = (dbl * count + value) / (count + 1) and stored  */
+/* into dbl member.                                                         */
+/* For uint64 values the item values are summed into ui64 member and the    */
+/* average value is calculated before flushing trends to database:          */
+/* avg = ui64 / count                                                       */
+typedef union
+{
+	double		dbl;
+	zbx_uint128_t	ui64;
+}
+value_avg_t;
+
 typedef struct
 {
 	zbx_uint64_t	itemid;
 	history_value_t	value_min;
-	history_value_t	value_avg;
+	value_avg_t	value_avg;
 	history_value_t	value_max;
 	int		clock;
 	int		num;
@@ -425,6 +439,8 @@ static void	DCflush_trends(ZBX_DC_TREND *trends, int *trends_num, int update_cac
 			}
 			else
 			{
+				zbx_uint128_t avg;
+
 				ZBX_STR2UINT64(value_min.ui64, row[2]);
 				ZBX_STR2UINT64(value_avg.ui64, row[3]);
 				ZBX_STR2UINT64(value_max.ui64, row[4]);
@@ -433,8 +449,12 @@ static void	DCflush_trends(ZBX_DC_TREND *trends, int *trends_num, int update_cac
 					trend->value_min.ui64 = value_min.ui64;
 				if (value_max.ui64 > trend->value_max.ui64)
 					trend->value_max.ui64 = value_max.ui64;
-				trend->value_avg.ui64 = (trend->num * trend->value_avg.ui64
-						+ num * value_avg.ui64) / (trend->num + num);
+
+				/* calculate the trend average value */
+				umul64_64(&avg, num, value_avg.ui64);
+				uinc128_128(&trend->value_avg.ui64, &avg);
+				udiv128_64(&avg, &trend->value_avg.ui64, trend->num + num);
+
 				trend->num += num;
 
 				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
@@ -442,7 +462,7 @@ static void	DCflush_trends(ZBX_DC_TREND *trends, int *trends_num, int update_cac
 						",value_max=" ZBX_FS_UI64 " where itemid=" ZBX_FS_UI64 " and clock=%d;\n",
 						trend->num,
 						trend->value_min.ui64,
-						trend->value_avg.ui64,
+						avg.lo,
 						trend->value_max.ui64,
 						trend->itemid,
 						trend->clock);
@@ -538,6 +558,8 @@ static void	DCflush_trends(ZBX_DC_TREND *trends, int *trends_num, int update_cac
 	{
 		for (i = 0; i < trends_to; i++)
 		{
+			zbx_uint128_t	avg;
+
 			trend = &trends[i];
 
 			if (0 == trend->itemid)
@@ -545,6 +567,9 @@ static void	DCflush_trends(ZBX_DC_TREND *trends, int *trends_num, int update_cac
 
 			if (clock != trend->clock || value_type != trend->value_type)
 				continue;
+
+			/* calculate the trend average value */
+			udiv128_64(&avg, &trend->value_avg.ui64, trend->num);
 
 			if (0 == sql_offset)
 			{
@@ -562,7 +587,7 @@ static void	DCflush_trends(ZBX_DC_TREND *trends, int *trends_num, int update_cac
 					trend->clock,
 					trend->num,
 					trend->value_min.ui64,
-					trend->value_avg.ui64,
+					avg.lo,
 					trend->value_max.ui64);
 #else
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
@@ -572,7 +597,7 @@ static void	DCflush_trends(ZBX_DC_TREND *trends, int *trends_num, int update_cac
 					trend->clock,
 					trend->num,
 					trend->value_min.ui64,
-					trend->value_avg.ui64,
+					avg.lo,
 					trend->value_max.ui64);
 #endif
 			trend->itemid = 0;
@@ -627,7 +652,7 @@ static void	DCflush_trend(ZBX_DC_TREND *trend, ZBX_DC_TREND **trends, int *trend
 	trend->clock = 0;
 	trend->num = 0;
 	memset(&trend->value_min, 0, sizeof(history_value_t));
-	memset(&trend->value_avg, 0, sizeof(history_value_t));
+	memset(&trend->value_avg, 0, sizeof(value_avg_t));
 	memset(&trend->value_max, 0, sizeof(history_value_t));
 }
 
@@ -670,8 +695,7 @@ static void	DCadd_trend(ZBX_DC_HISTORY *history, ZBX_DC_TREND **trends, int *tre
 				trend->value_min.ui64 = history->value.ui64;
 			if (trend->num == 0 || history->value.ui64 > trend->value_max.ui64)
 				trend->value_max.ui64 = history->value.ui64;
-			trend->value_avg.ui64 = (trend->num * trend->value_avg.ui64
-				+ history->value.ui64) / (trend->num + 1);
+			uinc128_64(&trend->value_avg.ui64, history->value.ui64);
 			break;
 	}
 	trend->num++;
@@ -827,8 +851,8 @@ static void	DCmass_update_triggers(ZBX_DC_HISTORY *history, int history_num)
 		trigger = (DC_TRIGGER *)trigger_order.values[i];
 
 		if (SUCCEED == DBget_trigger_update_sql(&sql, &sql_alloc, &sql_offset, trigger->triggerid,
-				trigger->type, trigger->value, trigger->value_flags, trigger->error, trigger->new_value,
-				trigger->new_error, &trigger->timespec, &trigger->add_event, &trigger->value_changed))
+				trigger->type, trigger->value, trigger->value_flags, trigger->error, trigger->lastchange,
+				trigger->new_value, trigger->new_error, trigger->timespec.sec, &trigger->add_event))
 		{
 			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
 
@@ -861,7 +885,7 @@ static void	DCmass_update_triggers(ZBX_DC_HISTORY *history, int history_num)
 				continue;
 
 			process_event(eventid++, EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, trigger->triggerid,
-					&trigger->timespec, trigger->new_value, trigger->value_changed, 0, 0);
+					&trigger->timespec, trigger->new_value, 0);
 		}
 	}
 clean_triggers:
@@ -3113,8 +3137,10 @@ static void	init_trend_cache()
 		exit(FAIL);
 	}
 
-	sz = zbx_mem_required_size(CONFIG_TRENDS_CACHE_SIZE, 1, "trend cache", "TrendCacheSize");
-	zbx_mem_create(&trend_mem, trend_shm_key, ZBX_NO_MUTEX, sz, "trend cache", "TrendCacheSize");
+	sz = zbx_mem_required_size(1, "trend cache", "TrendCacheSize");
+	zbx_mem_create(&trend_mem, trend_shm_key, ZBX_NO_MUTEX, CONFIG_TRENDS_CACHE_SIZE,
+			"trend cache", "TrendCacheSize");
+	CONFIG_TRENDS_CACHE_SIZE -= sz;
 
 	cache->trends_num = 0;
 
@@ -3146,7 +3172,8 @@ void	init_database_cache()
 {
 	const char	*__function_name = "init_database_cache";
 	key_t		history_shm_key, history_text_shm_key;
-	size_t		sz;
+	size_t		sz, sz_itemids, sz_min, sz_history;
+	int		itemids_alloc;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -3169,28 +3196,34 @@ void	init_database_cache()
 		exit(FAIL);
 	}
 
-	ZBX_HISTORY_SIZE = CONFIG_HISTORY_CACHE_SIZE / sizeof(ZBX_DC_HISTORY);
-	if (ZBX_SYNC_MAX > ZBX_HISTORY_SIZE)
-		ZBX_SYNC_MAX = ZBX_HISTORY_SIZE;
-	ZBX_ITEMIDS_SIZE = CONFIG_HISTSYNCER_FORKS * ZBX_SYNC_MAX;
+	itemids_alloc = CONFIG_HISTSYNCER_FORKS * ZBX_SYNC_MAX;
+	sz_itemids = itemids_alloc * sizeof(zbx_uint64_t);
 
 	/* history cache */
 
-	sz = sizeof(ZBX_DC_CACHE);
-	sz += ZBX_HISTORY_SIZE * sizeof(ZBX_DC_HISTORY);
-	sz += ZBX_ITEMIDS_SIZE * sizeof(zbx_uint64_t);
+	sz = zbx_mem_required_size(4, "history cache", "HistoryCacheSize");
+	sz += sizeof(ZBX_DC_CACHE);
+	sz += sz_itemids;
 	sz += sizeof(ZBX_DC_IDS);
-	sz = zbx_mem_required_size(sz, 4, "history cache", "HistoryCacheSize");
+
+	sz_min = sz + ZBX_SYNC_MAX * sizeof(ZBX_DC_HISTORY);
+	if (CONFIG_HISTORY_CACHE_SIZE < sz_min)
+		CONFIG_HISTORY_CACHE_SIZE = sz_min;
+
+	ZBX_HISTORY_SIZE = (CONFIG_HISTORY_CACHE_SIZE - sz) / sizeof(ZBX_DC_HISTORY);
+	sz_history = ZBX_HISTORY_SIZE * sizeof(ZBX_DC_HISTORY);
+
+	sz += sz_history;
 
 	zbx_mem_create(&history_mem, history_shm_key, ZBX_NO_MUTEX, sz, "history cache", "HistoryCacheSize");
 
 	cache = (ZBX_DC_CACHE *)__history_mem_malloc_func(NULL, sizeof(ZBX_DC_CACHE));
 
-	cache->history = (ZBX_DC_HISTORY *)__history_mem_malloc_func(NULL, ZBX_HISTORY_SIZE * sizeof(ZBX_DC_HISTORY));
+	cache->history = (ZBX_DC_HISTORY *)__history_mem_malloc_func(NULL, sz_history);
 	cache->history_first = 0;
 	cache->history_num = 0;
-	cache->itemids = (zbx_uint64_t *)__history_mem_malloc_func(NULL, ZBX_ITEMIDS_SIZE * sizeof(zbx_uint64_t));
-	cache->itemids_alloc = ZBX_ITEMIDS_SIZE;
+	cache->itemids = (zbx_uint64_t *)__history_mem_malloc_func(NULL, sz_itemids);
+	cache->itemids_alloc = itemids_alloc;
 	cache->itemids_num = 0;
 	memset(&cache->stats, 0, sizeof(ZBX_DC_STATS));
 
@@ -3199,9 +3232,11 @@ void	init_database_cache()
 
 	/* history text cache */
 
-	sz = zbx_mem_required_size(CONFIG_TEXT_CACHE_SIZE, 1, "history text cache", "HistoryTextCacheSize");
+	sz = zbx_mem_required_size(1, "history text cache", "HistoryTextCacheSize");
 
-	zbx_mem_create(&history_text_mem, history_text_shm_key, ZBX_NO_MUTEX, sz, "history text cache", "HistoryTextCacheSize");
+	zbx_mem_create(&history_text_mem, history_text_shm_key, ZBX_NO_MUTEX, CONFIG_TEXT_CACHE_SIZE,
+			"history text cache", "HistoryTextCacheSize");
+	CONFIG_TEXT_CACHE_SIZE -= sz;
 
 	cache->text = (char *)__history_text_mem_malloc_func(NULL, CONFIG_TEXT_CACHE_SIZE);
 	cache->last_text = cache->text;

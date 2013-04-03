@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -10,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -232,7 +232,7 @@ class CDRule extends CZBXAPI {
 			'limit' => 1
 		);
 		if (isset($object['name'])) $options['filter']['name'] = $object['name'];
-		if (isset($object['hostids'])) $options['druleids'] = zbx_toArray($object['druleids']);
+		if (isset($object['druleids'])) $options['druleids'] = zbx_toArray($object['druleids']);
 
 		if (isset($object['node']))
 			$options['nodeids'] = getNodeIdByNodeName($object['node']);
@@ -691,7 +691,7 @@ class CDRule extends CZBXAPI {
 					'preservekeys' => true
 				));
 				if (!is_null($options['limitSelects'])) {
-					order_result($dchecks, 'name');
+					order_result($dchecks, 'dcheckid');
 				}
 				$result = $relationMap->mapMany($result, $dchecks, 'dchecks', $options['limitSelects']);
 			}
@@ -724,7 +724,7 @@ class CDRule extends CZBXAPI {
 					'preservekeys' => true
 				));
 				if (!is_null($options['limitSelects'])) {
-					order_result($dhosts, 'name');
+					order_result($dhosts, 'dhostid');
 				}
 				$result = $relationMap->mapMany($result, $dhosts, 'dhosts', $options['limitSelects']);
 			}

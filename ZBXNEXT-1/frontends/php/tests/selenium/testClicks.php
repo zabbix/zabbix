@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -10,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -111,18 +111,18 @@ class testClicks extends CWebTest {
 	* @dataProvider provider
 	*/
 	public function testClick($url, $clicks, $title, $expected) {
-		$this->login();
-		$this->open($url);
+		$this->zbxTestLogin();
+		$this->zbxTestOpen($url);
 		foreach ($clicks as $click) {
-			$this->click($click);
+			$this->zbxTestClick($click);
 			$this->waitForPageToLoad();
 		}
 
 		foreach ($this->failIfNotExists as $str) {
-			$this->ok($str);
+			$this->zbxTestTextPresent($str);
 		}
 		$this->checkTitle($title);
-		$this->ok($expected);
-		$this->logout();
+		$this->zbxTestTextPresent($expected);
+		$this->zbxTestLogout();
 	}
 }

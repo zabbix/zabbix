@@ -3958,12 +3958,6 @@ return array(
 				'length' => 128,
 				'default' => '',
 			),
-			'nextcheck' => array(
-				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '0',
-			),
 			'esc_step' => array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
@@ -4478,12 +4472,6 @@ return array(
 				'default' => '0',
 			),
 			'ns' => array(
-				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '0',
-			),
-			'value_changed' => array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,

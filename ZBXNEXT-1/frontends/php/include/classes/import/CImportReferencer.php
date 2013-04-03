@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2012 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -10,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -600,7 +600,7 @@ class CImportReferencer {
 			}
 
 			if ($sqlWhere) {
-				$dbApplications = DBselect('SELECT applicationid, hostid, name FROM applications WHERE '.implode(' OR ', $sqlWhere));
+				$dbApplications = DBselect('SELECT applicationid,hostid,name FROM applications WHERE '.implode(' OR ', $sqlWhere));
 				while ($dbApplication = DBfetch($dbApplications)) {
 					$this->applicationsRefs[$dbApplication['hostid']][$dbApplication['name']] = $dbApplication['applicationid'];
 				}
@@ -670,9 +670,9 @@ class CImportReferencer {
 			$this->triggersRefs = array();
 
 			$triggerIds = array();
-			$sql = 'SELECT t.triggerid,t.expression,t.description
-				FROM triggers t
-				WHERE '.dbConditionString('t.description', array_keys($this->triggers));
+			$sql = 'SELECT t.triggerid,t.expression,t.description'.
+				' FROM triggers t'.
+				' WHERE '.dbConditionString('t.description', array_keys($this->triggers));
 			$dbTriggers = DBselect($sql);
 			while ($dbTrigger = DBfetch($dbTriggers)) {
 				$dbExpr = explode_exp($dbTrigger['expression']);

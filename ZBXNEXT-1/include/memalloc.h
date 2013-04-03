@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -9,7 +9,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -61,7 +61,7 @@ void	zbx_mem_clear(zbx_mem_info_t *info);
 
 void	zbx_mem_dump_stats(zbx_mem_info_t *info);
 
-size_t	zbx_mem_required_size(size_t size, int chunks_num, const char *descr, const char *param);
+size_t	zbx_mem_required_size(int chunks_num, const char *descr, const char *param);
 
 #define ZBX_MEM_FUNC1_DECL_MALLOC(__prefix)				\
 static void	*__prefix ## _mem_malloc_func(void *old, size_t size)

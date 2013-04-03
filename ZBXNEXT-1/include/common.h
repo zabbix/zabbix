@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -9,7 +9,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -144,6 +144,7 @@ const char	*zbx_result_string(int result);
 #define MAX_STRING_LEN		2048
 #define MAX_BUFFER_LEN		65536
 #define MAX_ZBX_HOSTNAME_LEN	64
+#define MAX_EXECUTE_OUTPUT_LEN	(512 * ZBX_KIBIBYTE)
 
 #define ZBX_MAX_UINT64_LEN	21
 #define ZBX_DM_DELIMITER	'\255'
@@ -564,17 +565,13 @@ typedef enum
 #define TRIGGER_STATUS_DISABLED	1
 
 /* trigger values */
-#define TRIGGER_VALUE_FALSE	0
-#define TRIGGER_VALUE_TRUE	1
-#define TRIGGER_VALUE_UNKNOWN	2 /* only in "events" table */
+#define TRIGGER_VALUE_OK	0
+#define TRIGGER_VALUE_PROBLEM	1
+#define TRIGGER_VALUE_UNKNOWN	2	/* only in server code, never in DB */
 
 /* trigger value flags */
 #define TRIGGER_VALUE_FLAG_NORMAL	0
 #define TRIGGER_VALUE_FLAG_UNKNOWN	1
-
-/* trigger value change flags */
-#define TRIGGER_VALUE_CHANGED_NO	0
-#define TRIGGER_VALUE_CHANGED_YES	1
 
 /* trigger severity */
 #define TRIGGER_SEVERITY_NOT_CLASSIFIED	0
@@ -654,10 +651,8 @@ typedef enum
 typedef enum
 {
 	PERM_DENY = 0,
-	PERM_READ_LIST,
-	PERM_READ_ONLY,
-	PERM_READ_WRITE,
-	PERM_MAX = 3
+	PERM_READ = 2,
+	PERM_READ_WRITE
 } zbx_user_permission_t;
 
 const char	*zbx_permission_string(int perm);
@@ -796,11 +791,31 @@ char	*string_replace(const char *str, const char *sub_str1, const char *sub_str2
 int	is_double_suffix(const char *str);
 int	is_double(const char *c);
 int	is_uint_suffix(const char *c, unsigned int *value);
-int	is_uint(const char *c);
 int	is_int_prefix(const char *c);
-#define is_uint64(src, value)	is_uint64_n(src, ZBX_MAX_UINT64_LEN, value)
-int	is_uint64_n(const char *str, size_t n, zbx_uint64_t *value);
-int	is_ushort(const char *str, unsigned short *value);
+int	is_uint_n_range(const char *str, size_t n, void *value, size_t size, zbx_uint64_t min, zbx_uint64_t max);
+
+#define is_ushort(str, value) \
+	is_uint_n_range(str, (size_t)ZBX_MAX_UINT64_LEN, value, sizeof(unsigned short), 0x0LL, 0xFFFFLL)
+
+#define is_uint32(str, value) \
+	is_uint_n_range(str, (size_t)ZBX_MAX_UINT64_LEN, value, (size_t)4, 0x0LL, 0xFFFFFFFFLL)
+
+#define is_uint64(str, value) \
+	is_uint_n_range(str, (size_t)ZBX_MAX_UINT64_LEN, value, (size_t)8, 0x0LL, 0xFFFFFFFFFFFFFFFFLL)
+
+#define is_uint64_n(str, n, value) \
+		is_uint_n_range(str, n, value, (size_t)8, 0x0LL, 0xFFFFFFFFFFFFFFFFLL)
+
+#define is_uint31(str, value) \
+	is_uint_n_range(str, (size_t)ZBX_MAX_UINT64_LEN, value, (size_t)4, 0x0LL, 0x7FFFFFFFLL)
+
+#define is_uint31_1(str, value) \
+	is_uint_n_range(str, (size_t)ZBX_MAX_UINT64_LEN, value, (size_t)4, 0x0LL, 0x7FFFFFFELL)
+
+#define is_uint_range(str, value, min, max) \
+	is_uint_n_range(str, (size_t)ZBX_MAX_UINT64_LEN, value, sizeof(unsigned int), min, max)
+
+
 int	is_boolean(const char *str, zbx_uint64_t *value);
 int	is_uoct(const char *str);
 int	is_uhex(const char *str);
@@ -808,14 +823,12 @@ int	is_hex_string(const char *str);
 int	is_ascii_string(const char *str);
 int	zbx_rtrim(char *str, const char *charlist);
 void	zbx_ltrim(char *str, const char *charlist);
+void	zbx_lrtrim(char *str, const char *charlist);
 void	zbx_remove_chars(register char *str, const char *charlist);
 #define ZBX_WHITESPACE			" \t\r\n"
 #define zbx_remove_spaces(str)		zbx_remove_chars(str, " ")
 #define zbx_remove_whitespace(str)	zbx_remove_chars(str, ZBX_WHITESPACE)
 void	compress_signs(char *str);
-void	ltrim_spaces(char *c);
-void	rtrim_spaces(char *c);
-void	lrtrim_spaces(char *c);
 void	del_zeroes(char *s);
 int	get_param(const char *param, int num, char *buf, size_t max_len);
 int	num_param(const char *param);
@@ -983,6 +996,7 @@ void	uint64_array_remove_both(zbx_uint64_t *values, int *num, zbx_uint64_t *rm_v
 
 #ifdef _WINDOWS
 LPTSTR	zbx_acp_to_unicode(LPCSTR acp_string);
+LPTSTR	zbx_oemcp_to_unicode(LPCSTR oemcp_string);
 int	zbx_acp_to_unicode_static(LPCSTR acp_string, LPTSTR wide_string, int wide_size);
 LPTSTR	zbx_utf8_to_unicode(LPCSTR utf8_string);
 LPSTR	zbx_unicode_to_utf8(LPCTSTR wide_string);
@@ -998,6 +1012,7 @@ size_t	zbx_utf8_char_len(const char *text);
 size_t	zbx_strlen_utf8(const char *text);
 size_t	zbx_strlen_utf8_n(const char *text, size_t utf8_maxlen);
 
+int	zbx_is_utf8(const char *text);
 #define ZBX_UTF8_REPLACE_CHAR	'?'
 char	*zbx_replace_utf8(const char *text);
 void	zbx_replace_invalid_utf8(char *text);
@@ -1044,5 +1059,13 @@ void	zbx_replace_string(char **data, size_t l, size_t *r, const char *value);
 void	zbx_trim_str_list(char *list, char delimiter);
 
 int	parse_serveractive_element(char *str, char **host, unsigned short *port, unsigned short port_default);
+
+/* 128 bit unsigned integer handling */
+#define uset128(base, hi64, lo64)	(base)->hi = hi64; (base)->lo = lo64
+
+void uinc128_64(zbx_uint128_t *base, zbx_uint64_t value);
+void uinc128_128(zbx_uint128_t *base, const zbx_uint128_t *value);
+void udiv128_64(zbx_uint128_t *result, const zbx_uint128_t *base, zbx_uint64_t value);
+void umul64_64(zbx_uint128_t *result, zbx_uint64_t value, zbx_uint64_t factor);
 
 #endif

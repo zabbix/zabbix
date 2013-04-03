@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -10,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -228,7 +228,7 @@ elseif (isset($_REQUEST['del_user_group'])) {
  */
 elseif (isset($_REQUEST['delete']) && isset($_REQUEST['userid'])) {
 	$user = reset($users);
-	$result = API::User()->delete($users);
+	$result = API::User()->delete(array($user['userid']));
 	show_messages($result, _('User deleted'), _('Cannot delete user'));
 	if ($result) {
 		add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_USER, 'User alias ['.$user['alias'].'] name ['.$user['name'].'] surname ['.$user['surname'].']');
@@ -309,7 +309,7 @@ elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['group_userid'])) {
 			continue;
 		}
 		$user_data = $db_users[$userid];
-		$go_result |= (bool) API::User()->delete($user_data);
+		$go_result |= (bool) API::User()->delete(array($userid));
 		if ($go_result) {
 			add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_USER, 'User alias ['.$user_data['alias'].'] name ['.$user_data['name'].'] surname ['.$user_data['surname'].']');
 		}

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2011 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -10,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -65,10 +65,6 @@ $fields = array(
 	'save_service' =>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'add_service_time' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'delete' =>							array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,		null),
-	// ajax
-	'favobj' =>							array(T_ZBX_STR, O_OPT, P_ACT,	IN("'hat'"), null),
-	'favref' =>							array(T_ZBX_STR, O_OPT, P_ACT,	NOT_EMPTY,	'isset({favobj})'),
-	'favstate' =>						array(T_ZBX_INT, O_OPT, P_ACT,	NOT_EMPTY,	'isset({favobj})'),
 	// others
 	'form' =>							array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
 	'form_refresh' =>					array(T_ZBX_INT, O_OPT, null,	null,		null),
@@ -76,19 +72,6 @@ $fields = array(
 	'cservices' =>						array(T_ZBX_INT, O_OPT, null,	null,		null)
 );
 check_fields($fields);
-
-/*
- * AJAX
- */
-if (isset($_REQUEST['favobj'])) {
-	if ($_REQUEST['favobj'] == 'hat') {
-		CProfile::update('web.services.hats.'.$_REQUEST['favref'].'.state', $_REQUEST['favstate'], PROFILE_TYPE_INT);
-	}
-}
-if (PAGE_TYPE_JS == $page['type'] || PAGE_TYPE_HTML_BLOCK == $page['type']) {
-	include_once('include/page_footer.php');
-	exit();
-}
 
 // check permissions
 if (!empty($_REQUEST['serviceid'])) {
@@ -439,7 +422,7 @@ if (isset($_REQUEST['form'])) {
 		));
 		$trigger = reset($trigger);
 		$host = reset($trigger['hosts']);
-		$data['trigger'] = $host['name'].':'.$trigger['description'];
+		$data['trigger'] = $host['name'].NAME_DELIMITER.$trigger['description'];
 	}
 	else {
 		$data['trigger'] = '';

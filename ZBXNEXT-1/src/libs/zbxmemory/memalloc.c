@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -9,7 +9,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -808,9 +808,11 @@ void	zbx_mem_dump_stats(zbx_mem_info_t *info)
 	UNLOCK_INFO;
 }
 
-size_t	zbx_mem_required_size(size_t size, int chunks_num, const char *descr, const char *param)
+size_t	zbx_mem_required_size(int chunks_num, const char *descr, const char *param)
 {
 	const char	*__function_name = "zbx_mem_required_size";
+
+	size_t		size = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() size:" ZBX_FS_SIZE_T " chunks_num:%d descr:'%s' param:'%s'",
 			__function_name, (zbx_fs_size_t)size, chunks_num, descr, param);
