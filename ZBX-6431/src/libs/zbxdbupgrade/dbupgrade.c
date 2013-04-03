@@ -818,6 +818,11 @@ static int	DBpatch_02010038()
 
 	return DBset_default("config", &field);
 }
+
+static int	DBpatch_02010039()
+{
+	return DBdrop_field("alerts", "nextcheck");
+}
 #endif	/* not HAVE_SQLITE3 */
 
 static void	DBget_version(int *mandatory, int *optional)
@@ -894,6 +899,7 @@ int	DBcheck_version()
 		{DBpatch_02010036, 2010036, 0, 0},
 		{DBpatch_02010037, 2010037, 0, 0},
 		{DBpatch_02010038, 2010038, 0, 0},
+		{DBpatch_02010039, 2010039, 0, 0},
 		/* IMPORTANT! When adding a new mandatory DBPatch don't forget to update it for SQLite, too. */
 		{NULL}
 	};
