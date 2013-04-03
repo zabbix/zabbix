@@ -84,6 +84,7 @@ $triggersEventCount = array();
 $sql = 'SELECT e.objectid,count(distinct e.eventid) AS cnt_event'.
 		' FROM triggers t,events e'.
 		' WHERE t.triggerid=e.objectid'.
+			' AND e.source='.EVENT_SOURCE_TRIGGERS.
 			' AND e.object='.EVENT_OBJECT_TRIGGER.
 			' AND e.clock>'.(time() - $time_dif);
 

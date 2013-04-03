@@ -33,6 +33,7 @@ $sourceComboBox = new CComboBox('eventsource', $this->data['eventsource'], 'subm
 $sourceComboBox->addItem(EVENT_SOURCE_TRIGGERS, _('Triggers'));
 $sourceComboBox->addItem(EVENT_SOURCE_DISCOVERY, _('Discovery'));
 $sourceComboBox->addItem(EVENT_SOURCE_AUTO_REGISTRATION, _('Auto registration'));
+$sourceComboBox->addItem(EVENT_SOURCE_INTERNAL, _('Internal'));
 $filterForm = new CForm('get');
 $filterForm->addItem(array(_('Event source'), SPACE, $sourceComboBox));
 
@@ -57,7 +58,8 @@ foreach ($this->data['actions'] as $action) {
 	$conditions = array();
 	order_result($action['conditions'], 'conditiontype', ZBX_SORT_DOWN);
 	foreach ($action['conditions'] as $condition) {
-		$conditions[] = array(get_condition_desc($condition['conditiontype'], $condition['operator'], $condition['value']), BR());
+		$conditions[] = get_condition_desc($condition['conditiontype'], $condition['operator'], $condition['value']);
+		$conditions[] = BR();
 	}
 
 	sortOperations($action['eventsource'], $action['operations']);
