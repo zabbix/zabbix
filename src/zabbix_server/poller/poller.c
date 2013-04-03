@@ -55,18 +55,17 @@ static int	is_bunch_poller(int poller_type)
 
 static void	update_triggers_status_to_unknown(zbx_uint64_t hostid, zbx_item_type_t type, zbx_timespec_t *ts, char *reason)
 {
-	const char	*__function_name = "update_triggers_status_to_unknown";
-	DB_RESULT	result;
-	DB_ROW		row;
-	DC_TRIGGER	trigger;
-	char		*sql = NULL, failed_type_buf[8];
-	size_t		sql_alloc = 16 * ZBX_KIBIBYTE, sql_offset = 0;
+	const char		*__function_name = "update_triggers_status_to_unknown";
+	DB_RESULT		result;
+	DB_ROW			row;
+	char			failed_type_buf[8];
+	zbx_vector_ptr_t	triggers;
+	DC_TRIGGER		*trigger;
+	int			i;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() hostid:" ZBX_FS_UI64, __function_name, hostid);
 
-	sql = zbx_malloc(sql, sql_alloc);
-
-	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_vector_ptr_create(&triggers);
 
 	/* determine failed item type */
 	switch (type)
@@ -95,6 +94,7 @@ static void	update_triggers_status_to_unknown(zbx_uint64_t hostid, zbx_item_type
 	 * Let's say an item MYITEM returns error. There is a trigger associated *
 	 * with it. We set that trigger status to UNKNOWN if ALL are true:       *
 	 * - MYITEM status is ACTIVE                                             *
+	 * - MYITEM state is NORMAL                                              *
 	 * - trigger does not reference time-based function                      *
 	 * - trigger status is ENABLED                                           *
 	 * - trigger and MYITEM reference the same host                          *
@@ -107,12 +107,14 @@ static void	update_triggers_status_to_unknown(zbx_uint64_t hostid, zbx_item_type
 	 *     item and MYITEM types differ AND item host status is AVAILABLE    *
 	 *************************************************************************/
 	result = DBselect(
-			"select distinct t.triggerid,t.type,t.value,t.value_flags,t.error,t.lastchange"
+			"select distinct t.triggerid,t.description,t.expression,t.priority,t.type,t.value,t.state,"
+				"t.error,t.lastchange"
 			" from items i,functions f,triggers t,hosts h"
 			" where i.itemid=f.itemid"
 				" and f.triggerid=t.triggerid"
 				" and i.hostid=h.hostid"
 				" and i.status=%d"
+				" and i.state=%d"
 				" and i.type in (%s)"
 				" and f.function not in (" ZBX_SQL_TIME_FUNCTIONS ")"
 				" and t.status=%d"
@@ -138,49 +140,56 @@ static void	update_triggers_status_to_unknown(zbx_uint64_t hostid, zbx_item_type
 						")"
 					")"
 					" and i2.status=%d"
+					" and i2.state=%d"
 					" and h2.status=%d"
 			")"
 			" order by t.triggerid",
 			ITEM_STATUS_ACTIVE,
+			ITEM_STATE_NORMAL,
 			failed_type_buf,
 			TRIGGER_STATUS_ENABLED,
 			hostid,
 			HOST_STATUS_MONITORED,
 			failed_type_buf,
-			ITEM_TYPE_ZABBIX, ITEM_TYPE_SNMPv1, ITEM_TYPE_SNMPv2c, ITEM_TYPE_SNMPv3, ITEM_TYPE_IPMI, ITEM_TYPE_JMX,
+			ITEM_TYPE_ZABBIX, ITEM_TYPE_SNMPv1, ITEM_TYPE_SNMPv2c, ITEM_TYPE_SNMPv3, ITEM_TYPE_IPMI,
+			ITEM_TYPE_JMX,
 			ITEM_TYPE_ZABBIX, HOST_AVAILABLE_TRUE,
 			ITEM_TYPE_SNMPv1, ITEM_TYPE_SNMPv2c, ITEM_TYPE_SNMPv3, HOST_AVAILABLE_TRUE,
 			ITEM_TYPE_IPMI, HOST_AVAILABLE_TRUE,
 			ITEM_TYPE_JMX, HOST_AVAILABLE_TRUE,
 			ITEM_STATUS_ACTIVE,
+			ITEM_STATE_NORMAL,
 			HOST_STATUS_MONITORED);
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		ZBX_STR2UINT64(trigger.triggerid, row[0]);
-		trigger.type = (unsigned char)atoi(row[1]);
-		trigger.value = atoi(row[2]);
-		trigger.value_flags = atoi(row[3]);
-		strscpy(trigger.error, row[4]);
-		trigger.lastchange = atoi(row[5]);
+		trigger = zbx_malloc(NULL, sizeof(trigger));
+		ZBX_STR2UINT64(trigger->triggerid, row[0]);
+		trigger->description = row[1];
+		trigger->expression_orig = row[2];
+		trigger->priority = (unsigned char)atoi(row[3]);
+		trigger->type = (unsigned char)atoi(row[4]);
+		trigger->value = atoi(row[5]);
+		trigger->state = atoi(row[6]);
+		trigger->error = row[7];
+		trigger->lastchange = atoi(row[8]);
+		trigger->new_value = TRIGGER_VALUE_UNKNOWN;
+		trigger->new_error = reason;
+		trigger->timespec = *ts;
 
-		if (SUCCEED == DBget_trigger_update_sql(&sql, &sql_alloc, &sql_offset, trigger.triggerid, trigger.type,
-				trigger.value, trigger.value_flags, trigger.error, trigger.lastchange,
-				TRIGGER_VALUE_UNKNOWN, reason, ts->sec, &trigger.add_event))
-		{
-			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
-
-			DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
-		}
+		zbx_vector_ptr_append(&triggers, trigger);
 	}
 	DBfree_result(result);
 
-	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_vector_ptr_sort(&triggers, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 
-	if (sql_offset > 16)	/* begin..end; is a must in case of ORACLE */
-		DBexecute("%s", sql);
+	process_triggers(&triggers);
 
-	zbx_free(sql);
+	process_events();
+
+	for (i = 0; i < triggers.values_num; i++)
+		zbx_free(triggers.values[i]);
+	zbx_vector_ptr_destroy(&triggers);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
@@ -686,18 +695,18 @@ static int	get_values(unsigned char poller_type)
 
 		if (SUCCEED == errcodes[i])
 		{
-			items[i].status = ITEM_STATUS_ACTIVE;
+			items[i].state = ITEM_STATE_NORMAL;
 			dc_add_history(items[i].itemid, items[i].value_type, items[i].flags, &results[i], &timespec,
-					items[i].status, NULL, 0, NULL, 0, 0, 0, 0);
+					items[i].state, NULL, 0, NULL, 0, 0, 0, 0);
 		}
 		else if (NOTSUPPORTED == errcodes[i] || AGENT_ERROR == errcodes[i])
 		{
-			items[i].status = ITEM_STATUS_NOTSUPPORTED;
+			items[i].state = ITEM_STATE_NOTSUPPORTED;
 			dc_add_history(items[i].itemid, items[i].value_type, items[i].flags, NULL, &timespec,
-					items[i].status, results[i].msg, 0, NULL, 0, 0, 0, 0);
+					items[i].state, results[i].msg, 0, NULL, 0, 0, 0, 0);
 		}
 
-		DCrequeue_items(&items[i].itemid, &items[i].status, &timespec.sec, &errcodes[i], 1);
+		DCrequeue_items(&items[i].itemid, &items[i].state, &timespec.sec, &errcodes[i], 1);
 
 		zbx_free(items[i].key);
 

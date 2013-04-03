@@ -48,6 +48,7 @@
 #define ZBX_PROTO_TAG_REQUEST		"request"
 #define ZBX_PROTO_TAG_RESPONSE		"response"
 #define ZBX_PROTO_TAG_STATUS		"status"
+#define ZBX_PROTO_TAG_STATE		"state"
 #define ZBX_PROTO_TAG_TYPE		"type"
 #define ZBX_PROTO_TAG_VALUE		"value"
 #define ZBX_PROTO_TAG_SCRIPTID		"scriptid"
