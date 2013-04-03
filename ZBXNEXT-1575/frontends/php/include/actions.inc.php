@@ -256,11 +256,26 @@ function condition_value2str($conditiontype, $value) {
 			return _('Unknown');
 	}
 
-	return '"'.$str_val.'"';
+	return $str_val;
 }
 
+/**
+ * Returns the HTML representation of an action condition.
+ *
+ * @param $conditiontype
+ * @param $operator
+ * @param $value
+ *
+ * @return array
+ */
 function get_condition_desc($conditiontype, $operator, $value) {
-	return condition_type2str($conditiontype).' '.condition_operator2str($operator).' '.condition_value2str($conditiontype, $value);
+	return array(
+		condition_type2str($conditiontype),
+		SPACE,
+		condition_operator2str($operator),
+		SPACE,
+		italic(condition_value2str($conditiontype, $value))
+	);
 }
 
 /**
