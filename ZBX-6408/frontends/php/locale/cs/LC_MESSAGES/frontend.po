@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-02-20 19:46+0200\n"
+"POT-Creation-Date: 2013-04-02 18:12+0300\n"
 "PO-Revision-Date: 2012-09-12 12:19+0200\n"
 "Last-Translator: jiri <jiri.pavliska@elvac.eu>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -335,7 +335,7 @@ msgid "Activate selected"
 msgstr "Aktivovat vybrané"
 
 #: include/views/administration.proxy.edit.php:40
-#: include/views/administration.proxy.list.php:76
+#: include/views/administration.proxy.list.php:84
 #: include/views/configuration.httpconf.edit.php:118
 msgid "Active"
 msgstr "Aktivní"
@@ -445,7 +445,7 @@ msgstr "Přidat službu"
 msgid "Add to"
 msgstr "Přidat do"
 
-#: charts.php:93 history.php:94 host_screen.php:88 include/html.inc.php:256
+#: charts.php:93 history.php:94 host_screen.php:88 include/html.inc.php:249
 #: maps.php:70 screens.php:89
 msgid "Add to favourites"
 msgstr "Přidat do oblíbených"
@@ -559,7 +559,7 @@ msgstr "Povolení hostitelé"
 msgid "Any"
 msgstr "Jakýkoliv"
 
-#: include/regexp.inc.php:181
+#: include/regexp.inc.php:194
 msgid "Any character string included"
 msgstr "Obsahuje libovolný řetězec"
 
@@ -608,7 +608,7 @@ msgid "Application with ID \"%1$s\" is not available on \"%2$s\"."
 msgstr "Aplikace s ID  \"%1$s\" není na \"%2$s\" dostupná."
 
 #: hosts.php:683 hosts.php:759 include/forms.inc.php:823
-#: include/html.inc.php:397 include/html.inc.php:401
+#: include/html.inc.php:390 include/html.inc.php:394
 #: include/views/configuration.application.list.php:40
 #: include/views/configuration.host.edit.php:318
 #: include/views/configuration.item.edit.php:402
@@ -1148,7 +1148,7 @@ msgstr ""
 msgid "Cannot add discovery rule"
 msgstr "Nelze přidat pravidlo pro průzkum"
 
-#: graphs.php:225
+#: graphs.php:246
 msgid "Cannot add graph"
 msgstr "Nelze přidat graf"
 
@@ -1286,7 +1286,7 @@ msgstr "Nelze klonovat předlohy spouštěčů."
 msgid "Cannot connect to the trapper port of zabbix server daemon, but it should be available to run the script."
 msgstr "Připojení na Trapper port daemona Zabbix serveru selhalo, pro spuštění skriptu, ale musí být port dostupný."
 
-#: graphs.php:289
+#: graphs.php:310
 msgid "Cannot copy graphs"
 msgstr "Nelze kopírovat grafy"
 
@@ -1371,7 +1371,7 @@ msgstr "Nelze smazat pravidlo pro průzkum"
 msgid "Cannot delete discovery rules"
 msgstr ""
 
-#: graphs.php:236
+#: graphs.php:257
 msgid "Cannot delete graph"
 msgstr "Nelze smazat graf"
 
@@ -1383,7 +1383,7 @@ msgstr ""
 msgid "Cannot delete graph."
 msgstr ""
 
-#: graphs.php:243
+#: graphs.php:264
 msgid "Cannot delete graphs"
 msgstr "Nelze smazat grafy"
 
@@ -1889,7 +1889,7 @@ msgstr "Nelze aktualizovat pravidlo pro průzkum"
 msgid "Cannot update frontend access"
 msgstr ""
 
-#: graphs.php:222
+#: graphs.php:243
 msgid "Cannot update graph"
 msgstr "Nelze upravit graf"
 
@@ -2062,11 +2062,11 @@ msgstr "Změnit heslo"
 msgid "Character"
 msgstr "Znak"
 
-#: include/regexp.inc.php:178
+#: include/regexp.inc.php:192
 msgid "Character string included"
 msgstr "Obsahuje řetězec"
 
-#: include/regexp.inc.php:184
+#: include/regexp.inc.php:196
 msgid "Character string not included"
 msgstr "Neobsahuje řetězec"
 
@@ -3225,7 +3225,7 @@ msgstr "Smazat skript?"
 #: include/reports.inc.php:417 include/reports.inc.php:459
 #: include/views/administration.general.regularexpressions.list.php:57
 #: include/views/administration.mediatypes.list.php:117
-#: include/views/administration.proxy.list.php:95
+#: include/views/administration.proxy.list.php:103
 #: include/views/administration.script.list.php:89
 #: include/views/administration.usergroups.edit.php:102
 #: include/views/administration.usergroups.edit.php:106
@@ -3327,7 +3327,7 @@ msgstr "Smazat vybrané typy médií?"
 msgid "Delete selected node?"
 msgstr "Smazat vybraný uzel?"
 
-#: include/views/administration.proxy.list.php:96
+#: include/views/administration.proxy.list.php:104
 msgid "Delete selected proxies?"
 msgstr "Smazat vybrané proxy?"
 
@@ -3599,12 +3599,12 @@ msgstr ""
 msgid "Disable hosts in the selected host groups?"
 msgstr ""
 
-#: include/views/administration.proxy.list.php:92
+#: include/views/administration.proxy.list.php:100
 msgid "Disable hosts monitored by selected proxies?"
 msgstr "Zakázat hostitele sledované přes vybrané proxy?"
 
 #: hosts.php:871 include/views/administration.mediatypes.list.php:113
-#: include/views/administration.proxy.list.php:91
+#: include/views/administration.proxy.list.php:99
 #: include/views/administration.usergroups.list.php:133
 #: include/views/configuration.action.list.php:97
 #: include/views/configuration.application.list.php:85
@@ -3697,7 +3697,7 @@ msgid "Discovered device"
 msgstr "Nalezené zařízení"
 
 #: events.php:310 hosts.php:687 hosts.php:767 include/events.inc.php:27
-#: include/html.inc.php:387 include/menu.inc.php:77 include/menu.inc.php:211
+#: include/html.inc.php:380 include/menu.inc.php:77 include/menu.inc.php:211
 #: include/views/configuration.action.list.php:34 templates.php:463
 #: templates.php:531
 msgid "Discovery"
@@ -3715,7 +3715,7 @@ msgstr "Kontrola průzkumu"
 msgid "Discovery checks"
 msgstr ""
 
-#: include/html.inc.php:385
+#: include/html.inc.php:378
 msgid "Discovery list"
 msgstr ""
 
@@ -3763,7 +3763,7 @@ msgstr "Pravidlo pro průzkum bylo smazáno"
 msgid "Discovery rule updated"
 msgstr "Pravidlo pro průzkum bylo aktualizováno"
 
-#: include/html.inc.php:496 include/html.inc.php:500
+#: include/html.inc.php:489 include/html.inc.php:493
 #: include/views/configuration.host.discovery.list.php:33
 #: include/views/configuration.host.edit.php:423
 #: include/views/configuration.template.edit.php:303
@@ -3860,12 +3860,12 @@ msgctxt "discovery status"
 msgid "Down"
 msgstr ""
 
-#: api/classes/CWebCheck.php:616
+#: api/classes/CWebCheck.php:619
 #, php-format
 msgid "Download speed for scenario \"%s\"."
 msgstr ""
 
-#: api/classes/CWebCheck.php:715
+#: api/classes/CWebCheck.php:718
 #, php-format
 msgid "Download speed for step \"%1$s\" of scenario \"%2$s\"."
 msgstr ""
@@ -4094,12 +4094,12 @@ msgstr "Povolit hostitele"
 msgid "Enable host?"
 msgstr ""
 
-#: include/views/administration.proxy.list.php:88
+#: include/views/administration.proxy.list.php:96
 msgid "Enable hosts monitored by selected proxies?"
 msgstr "Povolit hostitele sledované přes vybrané proxy?"
 
 #: hosts.php:867 include/views/administration.mediatypes.list.php:109
-#: include/views/administration.proxy.list.php:87
+#: include/views/administration.proxy.list.php:95
 #: include/views/administration.usergroups.list.php:129
 #: include/views/configuration.action.list.php:93
 #: include/views/configuration.application.list.php:81
@@ -4432,7 +4432,7 @@ msgstr "Selhalo"
 msgid "Failed"
 msgstr "Selhalo"
 
-#: api/classes/CWebCheck.php:623
+#: api/classes/CWebCheck.php:626
 #, php-format
 msgid "Failed step of scenario \"%s\"."
 msgstr ""
@@ -4509,7 +4509,7 @@ msgid "Filled region"
 msgstr "Oblast"
 
 #: dashconf.php:265 events.php:373 hostinventories.php:134 hosts.php:657
-#: include/classes/class.cwidget.php:134 include/forms.inc.php:574
+#: include/classes/class.cwidget.php:130 include/forms.inc.php:574
 #: include/reports.inc.php:178
 #: include/views/administration.auditacts.list.php:49
 #: include/views/administration.auditlogs.list.php:65
@@ -4619,7 +4619,7 @@ msgstr ""
 msgid "Full clone"
 msgstr "Vytvořit úplnou kopii"
 
-#: include/html.inc.php:267
+#: include/html.inc.php:260
 msgid "Fullscreen"
 msgstr "Celá obrazovka"
 
@@ -4695,7 +4695,7 @@ msgstr ""
 #: hosts.php:879
 #: include/views/administration.general.regularexpressions.list.php:62
 #: include/views/administration.mediatypes.list.php:121
-#: include/views/administration.proxy.list.php:99
+#: include/views/administration.proxy.list.php:107
 #: include/views/administration.script.list.php:93
 #: include/views/administration.usergroups.list.php:149
 #: include/views/administration.users.list.php:144
@@ -4783,11 +4783,11 @@ msgstr ""
 msgid "Graph \"%1$s\" with templated items cannot contain items from other hosts."
 msgstr ""
 
-#: graphs.php:225
+#: graphs.php:246
 msgid "Graph added"
 msgstr "Graf byl přidán"
 
-#: graphs.php:236
+#: graphs.php:257
 msgid "Graph deleted"
 msgstr "Graf byl smazán"
 
@@ -4817,7 +4817,7 @@ msgstr ""
 msgid "Graph prototype must have at least one prototype."
 msgstr ""
 
-#: include/html.inc.php:460 include/html.inc.php:464
+#: include/html.inc.php:453 include/html.inc.php:457
 #: include/views/configuration.host.discovery.list.php:90
 #: include/views/configuration.host.edit.php:494
 #: include/views/configuration.template.edit.php:365
@@ -4838,7 +4838,7 @@ msgstr "Souhrn grafu"
 msgid "Graph type"
 msgstr "Typ grafu"
 
-#: graphs.php:222
+#: graphs.php:243
 msgid "Graph updated"
 msgstr "Graf byl aktualizován"
 
@@ -4853,7 +4853,7 @@ msgid "Graph with same name but other type exist."
 msgstr ""
 
 #: dashboard.php:260 hosts.php:686 hosts.php:765 include/blocks.inc.php:1218
-#: include/html.inc.php:471 include/html.inc.php:475 include/items.inc.php:802
+#: include/html.inc.php:464 include/html.inc.php:468 include/items.inc.php:802
 #: include/menu.inc.php:62 include/triggers.inc.php:1311
 #: include/views/configuration.graph.list.php:56
 #: include/views/configuration.host.discovery.list.php:54
@@ -4865,11 +4865,11 @@ msgstr ""
 msgid "Graphs"
 msgstr "Grafy"
 
-#: graphs.php:289
+#: graphs.php:310
 msgid "Graphs copied"
 msgstr "Grafy byly zkopírovány"
 
-#: graphs.php:243
+#: graphs.php:264
 msgid "Graphs deleted"
 msgstr "Grafy byly smazány"
 
@@ -5052,7 +5052,7 @@ msgid "Hidden"
 msgstr "skryta"
 
 #: include/classes/class.cuiwidget.php:58
-#: include/classes/class.cwidget.php:222 include/html.inc.php:146
+#: include/classes/class.cwidget.php:183 include/html.inc.php:146
 msgid "Hide"
 msgstr "Skrýt"
 
@@ -5124,7 +5124,7 @@ msgstr "Vodorovné zarovnání"
 #: include/classes/screens/CScreenHostgroupTriggers.php:121
 #: include/classes/screens/CScreenHostTriggers.php:63
 #: include/classes/screens/CScreenHostTriggers.php:123
-#: include/forms.inc.php:504 include/html.inc.php:379 include/maps.inc.php:24
+#: include/forms.inc.php:504 include/html.inc.php:372 include/maps.inc.php:24
 #: include/reports.inc.php:112 include/setup.inc.php:310
 #: include/triggers.inc.php:1183 include/triggers.inc.php:1603
 #: include/views/configuration.application.edit.php:44
@@ -5267,7 +5267,7 @@ msgstr ""
 msgid "Host label type"
 msgstr ""
 
-#: include/html.inc.php:350
+#: include/html.inc.php:343
 msgid "Host list"
 msgstr ""
 
@@ -5907,8 +5907,8 @@ msgstr ""
 msgid "Incorrect algorithm for service \"%1$s\"."
 msgstr ""
 
-#: api/classes/CApplication.php:436 include/regexp.inc.php:52
-#: include/regexp.inc.php:85 include/regexp.inc.php:150
+#: api/classes/CApplication.php:436 include/regexp.inc.php:53
+#: include/regexp.inc.php:91 include/regexp.inc.php:162
 msgid "Incorrect arguments passed to function"
 msgstr "Funkci byly předány neplatné argumenty"
 
@@ -6600,7 +6600,7 @@ msgstr "Položka byla smazána"
 msgid "Item prototype"
 msgstr ""
 
-#: include/html.inc.php:410 include/html.inc.php:414
+#: include/html.inc.php:403 include/html.inc.php:407
 #: include/views/configuration.host.discovery.list.php:88
 #: include/views/configuration.host.edit.php:443
 #: include/views/configuration.template.edit.php:323
@@ -6657,13 +6657,13 @@ msgstr ""
 msgid "Item with key \"%1$s\" already exists on \"%2$s\"."
 msgstr ""
 
-#: api/classes/CWebCheck.php:644
+#: api/classes/CWebCheck.php:647
 #, php-format
 msgid "Item with key \"%s\" already exists."
 msgstr ""
 
-#: hosts.php:684 hosts.php:761 include/html.inc.php:421
-#: include/html.inc.php:425 include/items.inc.php:733
+#: hosts.php:684 hosts.php:761 include/html.inc.php:414
+#: include/html.inc.php:418 include/items.inc.php:733
 #: include/reports.inc.php:329 include/reports.inc.php:465
 #: include/views/configuration.application.list.php:73
 #: include/views/configuration.graph.edit.php:280
@@ -6953,7 +6953,7 @@ msgstr ""
 msgid "Last check"
 msgstr "Poslední kontrola"
 
-#: api/classes/CWebCheck.php:630
+#: api/classes/CWebCheck.php:633
 #, php-format
 msgid "Last error message of scenario \"%s\"."
 msgstr ""
@@ -7502,7 +7502,7 @@ msgstr ""
 msgid "Max count of events per trigger to show"
 msgstr "Největší zobrazovaný počet událostí spouštěče"
 
-#: include/classes/class.cwidget.php:128 include/classes/class.cwidget.php:131
+#: include/classes/class.cwidget.php:124 include/classes/class.cwidget.php:127
 #: include/config.inc.php:346
 msgid "Maximize"
 msgstr "Maximalizovat"
@@ -7616,7 +7616,7 @@ msgstr "Členové"
 msgid "Memory limit: %s"
 msgstr ""
 
-#: dashboard.php:301 include/html.inc.php:273
+#: dashboard.php:301 include/html.inc.php:266
 #: include/views/configuration.item.list.php:206
 #: include/views/monitoring.slides.php:45
 msgid "Menu"
@@ -7677,7 +7677,7 @@ msgstr "mili"
 msgid "Min severity"
 msgstr "Závažnost minimálně"
 
-#: include/classes/class.cwidget.php:128 include/classes/class.cwidget.php:131
+#: include/classes/class.cwidget.php:124 include/classes/class.cwidget.php:127
 #: include/config.inc.php:346
 msgid "Minimize"
 msgstr "Minimalizovat"
@@ -7777,7 +7777,7 @@ msgstr "po"
 msgid "Monday"
 msgstr "pondělí"
 
-#: hosts.php:793 include/html.inc.php:369
+#: hosts.php:793 include/html.inc.php:362
 #: include/views/configuration.host.edit.php:295
 #: include/views/configuration.host.massupdate.php:75 popup.php:569
 msgid "Monitored"
@@ -8546,7 +8546,7 @@ msgstr ""
 msgid "No target selected"
 msgstr "Není vybrán cíl"
 
-#: graphs.php:293 items.php:609
+#: graphs.php:314 items.php:609
 msgid "No target selected."
 msgstr ""
 
@@ -8657,7 +8657,7 @@ msgstr "Žádná"
 msgid "Normal"
 msgstr "Normální"
 
-#: include/html.inc.php:267
+#: include/html.inc.php:260
 msgid "Normal view"
 msgstr ""
 
@@ -8695,7 +8695,7 @@ msgstr "Neurčeno"
 msgid "Not connected"
 msgstr "Nepřihlášený"
 
-#: hosts.php:801 include/html.inc.php:372 include/triggers.inc.php:980
+#: hosts.php:801 include/html.inc.php:365 include/triggers.inc.php:980
 #: include/views/configuration.host.edit.php:296
 #: include/views/configuration.host.massupdate.php:76 popup.php:572
 msgid "Not monitored"
@@ -8980,7 +8980,7 @@ msgstr ""
 msgid "Only Zabbix Admins can remove user media."
 msgstr ""
 
-#: api/classes/CWebCheck.php:602
+#: api/classes/CWebCheck.php:604
 msgid "Only characters are allowed."
 msgstr ""
 
@@ -9393,7 +9393,7 @@ msgid "Parse error"
 msgstr ""
 
 #: include/views/administration.proxy.edit.php:41
-#: include/views/administration.proxy.list.php:76
+#: include/views/administration.proxy.list.php:84
 msgid "Passive"
 msgstr "Pasivní"
 
@@ -9845,7 +9845,7 @@ msgstr ""
 msgid "Regular expression"
 msgstr "Regulární výraz"
 
-#: include/regexp.inc.php:58 include/regexp.inc.php:92
+#: include/regexp.inc.php:62 include/regexp.inc.php:102
 #, php-format
 msgid "Regular expression \"%s\" already exists."
 msgstr ""
@@ -9878,7 +9878,7 @@ msgstr[0] "Regulární výraz byl smazán"
 msgstr[1] "Regulární výraz byl smazán"
 msgstr[2] "Regulární výraz byl smazán"
 
-#: include/regexp.inc.php:79
+#: include/regexp.inc.php:85
 msgid "Regular expression does not exist."
 msgstr ""
 
@@ -9954,7 +9954,7 @@ msgstr "Odstranit prvek"
 msgid "Remove from"
 msgstr "Odebrat z"
 
-#: charts.php:85 history.php:86 host_screen.php:80 include/html.inc.php:249
+#: charts.php:85 history.php:86 host_screen.php:80 include/html.inc.php:242
 #: maps.php:63 screens.php:82
 msgid "Remove from favourites"
 msgstr ""
@@ -10049,7 +10049,7 @@ msgid "Required string"
 msgstr ""
 
 #: events.php:371 hostinventories.php:137 hosts.php:660
-#: include/forms.inc.php:571 include/html.inc.php:276
+#: include/forms.inc.php:571 include/html.inc.php:269
 #: include/reports.inc.php:180 include/reports.inc.php:341
 #: include/reports.inc.php:479 include/reports.inc.php:717
 #: include/views/administration.auditacts.list.php:51
@@ -10093,7 +10093,7 @@ msgstr "Zdroj"
 msgid "Response code"
 msgstr "Kód odpovědi"
 
-#: api/classes/CWebCheck.php:729
+#: api/classes/CWebCheck.php:732
 #, php-format
 msgid "Response code for step \"%1$s\" of scenario \"%2$s\"."
 msgstr ""
@@ -10102,7 +10102,7 @@ msgstr ""
 msgid "Response time"
 msgstr "Odezva"
 
-#: api/classes/CWebCheck.php:722
+#: api/classes/CWebCheck.php:725
 #, php-format
 msgid "Response time for step \"%1$s\" of scenario \"%2$s\"."
 msgstr ""
@@ -10112,11 +10112,11 @@ msgstr ""
 msgid "Result"
 msgstr "Výsledek"
 
-#: include/regexp.inc.php:190
+#: include/regexp.inc.php:200
 msgid "Result is FALSE"
 msgstr "Výsledek je NEPRAVDA"
 
-#: include/regexp.inc.php:187
+#: include/regexp.inc.php:198
 msgid "Result is TRUE"
 msgstr "Výsledek je PRAVDA"
 
@@ -10504,11 +10504,11 @@ msgstr "Scénář byl smazán"
 msgid "Scenario disabled"
 msgstr "Scénář byl zakázán"
 
-#: api/classes/CWebCheck.php:691 api/classes/CWebCheck.php:791
+#: api/classes/CWebCheck.php:694 api/classes/CWebCheck.php:794
 msgid "Scenario step name should contain only printable characters."
 msgstr ""
 
-#: api/classes/CWebCheck.php:705 api/classes/CWebCheck.php:806
+#: api/classes/CWebCheck.php:708 api/classes/CWebCheck.php:809
 msgid "Scenario step number cannot be less than 1."
 msgstr ""
 
@@ -10594,8 +10594,8 @@ msgstr ""
 msgid "Screen with name \"%s\" does not exist."
 msgstr ""
 
-#: dashboard.php:267 include/blocks.inc.php:1356 include/html.inc.php:484
-#: include/html.inc.php:488 include/menu.inc.php:67 include/menu.inc.php:197
+#: dashboard.php:267 include/blocks.inc.php:1356 include/html.inc.php:477
+#: include/html.inc.php:481 include/menu.inc.php:67 include/menu.inc.php:197
 #: include/views/configuration.screen.list.php:38
 #: include/views/configuration.template.edit.php:386
 #: include/views/conf.import.php:35 include/views/monitoring.screen.php:29
@@ -10949,7 +10949,7 @@ msgid "Severity name cannot be empty."
 msgstr ""
 
 #: include/classes/class.cuiwidget.php:58
-#: include/classes/class.cwidget.php:222 include/html.inc.php:146
+#: include/classes/class.cwidget.php:183 include/html.inc.php:146
 #: include/reports.inc.php:339 include/reports.inc.php:477
 #: include/reports.inc.php:715
 #: include/views/configuration.application.list.php:55
@@ -11350,7 +11350,7 @@ msgstr "Krok"
 msgid "Step \"%1$s\" [%2$s of %3$s] failed: %4$s"
 msgstr ""
 
-#: api/classes/CWebCheck.php:699
+#: api/classes/CWebCheck.php:702
 #, php-format
 msgid "Step \"%s\" already exists."
 msgstr ""
@@ -11540,7 +11540,7 @@ msgid "Telnet"
 msgstr ""
 
 #: include/audit.inc.php:51 include/forms.inc.php:541
-#: include/forms.inc.php:843 include/html.inc.php:364
+#: include/forms.inc.php:843 include/html.inc.php:357
 #: include/reports.inc.php:54 include/views/configuration.template.edit.php:38
 #: include/views/configuration.template.edit.php:390
 #: include/views/configuration.triggers.list.php:111
@@ -11582,7 +11582,7 @@ msgstr ""
 msgid "Template linkage"
 msgstr "Propojení šablon"
 
-#: include/html.inc.php:347
+#: include/html.inc.php:340
 msgid "Template list"
 msgstr ""
 
@@ -11998,7 +11998,7 @@ msgstr ""
 msgid "Trigger prototype"
 msgstr ""
 
-#: include/html.inc.php:435 include/html.inc.php:439
+#: include/html.inc.php:428 include/html.inc.php:432
 #: include/views/configuration.host.discovery.list.php:89
 #: include/views/configuration.host.edit.php:470
 #: include/views/configuration.template.edit.php:344
@@ -12035,7 +12035,7 @@ msgid "Trigger value"
 msgstr "Hodnota spouštěče"
 
 #: hosts.php:685 hosts.php:763 include/events.inc.php:25
-#: include/forms.inc.php:517 include/html.inc.php:446 include/html.inc.php:450
+#: include/forms.inc.php:517 include/html.inc.php:439 include/html.inc.php:443
 #: include/menu.inc.php:52 include/triggers.inc.php:1162
 #: include/views/configuration.action.list.php:33
 #: include/views/configuration.host.discovery.list.php:53
@@ -12297,14 +12297,14 @@ msgstr "Jednotky"
 #: include/discovery.inc.php:128 include/discovery.inc.php:162
 #: include/events.inc.php:29 include/graphs.inc.php:37
 #: include/graphs.inc.php:77 include/hosts.inc.php:53 include/hosts.inc.php:80
-#: include/html.inc.php:375 include/httptest.inc.php:39
+#: include/html.inc.php:368 include/httptest.inc.php:39
 #: include/httptest.inc.php:56 include/items.inc.php:41
 #: include/items.inc.php:102 include/items.inc.php:126
 #: include/items.inc.php:143 include/items.inc.php:160
 #: include/maintenances.inc.php:41 include/maps.inc.php:39
 #: include/maps.inc.php:709 include/maps.inc.php:799 include/maps.inc.php:896
 #: include/media.inc.php:39 include/nodes.inc.php:257 include/perm.inc.php:30
-#: include/regexp.inc.php:193 include/screens.inc.php:55
+#: include/regexp.inc.php:202 include/screens.inc.php:55
 #: include/triggers.inc.php:62 include/triggers.inc.php:173
 #: include/triggers.inc.php:191 include/users.inc.php:50
 #: include/users.inc.php:65
@@ -12934,12 +12934,12 @@ msgstr "Web"
 msgid "Web checks"
 msgstr ""
 
-#: api/classes/CWebCheck.php:677 api/classes/CWebCheck.php:776
+#: api/classes/CWebCheck.php:680 api/classes/CWebCheck.php:779
 #, php-format
 msgid "Web item \"%s\" created."
 msgstr ""
 
-#: api/classes/CWebCheck.php:742
+#: api/classes/CWebCheck.php:745
 #, php-format
 msgid "Web item with key \"%s\" already exists."
 msgstr ""

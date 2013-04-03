@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-02-28 18:54+0200\n"
+"POT-Creation-Date: 2013-04-02 18:12+0300\n"
 "PO-Revision-Date: 2013-02-25 15:11+0200\n"
 "Last-Translator: halt <kisst@bgk.bme.hu>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -329,7 +329,7 @@ msgid "Activate selected"
 msgstr "Kiválasztott aktiválása"
 
 #: include/views/administration.proxy.edit.php:40
-#: include/views/administration.proxy.list.php:76
+#: include/views/administration.proxy.list.php:84
 #: include/views/configuration.httpconf.edit.php:118
 msgid "Active"
 msgstr "Aktív"
@@ -553,7 +553,7 @@ msgstr "Engedélyezett hosztok"
 msgid "Any"
 msgstr "Bármely"
 
-#: include/regexp.inc.php:181
+#: include/regexp.inc.php:194
 msgid "Any character string included"
 msgstr "Bármely szót tartalmaz"
 
@@ -1143,7 +1143,7 @@ msgstr ""
 msgid "Cannot add discovery rule"
 msgstr "Nem lehet hozzáadni felderítési szabályt"
 
-#: graphs.php:225
+#: graphs.php:246
 msgid "Cannot add graph"
 msgstr "Grafikon hozzáadása nem sikerült"
 
@@ -1281,7 +1281,7 @@ msgstr ""
 msgid "Cannot connect to the trapper port of zabbix server daemon, but it should be available to run the script."
 msgstr ""
 
-#: graphs.php:289
+#: graphs.php:310
 msgid "Cannot copy graphs"
 msgstr "Nem lehet másolni a grafikonokat"
 
@@ -1366,7 +1366,7 @@ msgstr "Nem lehet törölni a felderítési szabályt"
 msgid "Cannot delete discovery rules"
 msgstr ""
 
-#: graphs.php:236
+#: graphs.php:257
 msgid "Cannot delete graph"
 msgstr "A grafikon törlése nem sikerült"
 
@@ -1378,7 +1378,7 @@ msgstr ""
 msgid "Cannot delete graph."
 msgstr ""
 
-#: graphs.php:243
+#: graphs.php:264
 msgid "Cannot delete graphs"
 msgstr "A grafikonok törlése nem sikerült"
 
@@ -1880,7 +1880,7 @@ msgstr "Nem lehet módosítani a felderítési szabályt"
 msgid "Cannot update frontend access"
 msgstr ""
 
-#: graphs.php:222
+#: graphs.php:243
 msgid "Cannot update graph"
 msgstr "A grafikon frissítése nem sikerült"
 
@@ -2053,11 +2053,11 @@ msgstr "Jelszó módosítása"
 msgid "Character"
 msgstr "Betű"
 
-#: include/regexp.inc.php:178
+#: include/regexp.inc.php:192
 msgid "Character string included"
 msgstr "Tartalmazza a következő szót"
 
-#: include/regexp.inc.php:184
+#: include/regexp.inc.php:196
 msgid "Character string not included"
 msgstr "Nem tartalmazza a következő szót"
 
@@ -3216,7 +3216,7 @@ msgstr "Script törlése?"
 #: include/reports.inc.php:417 include/reports.inc.php:459
 #: include/views/administration.general.regularexpressions.list.php:57
 #: include/views/administration.mediatypes.list.php:117
-#: include/views/administration.proxy.list.php:95
+#: include/views/administration.proxy.list.php:103
 #: include/views/administration.script.list.php:89
 #: include/views/administration.usergroups.edit.php:102
 #: include/views/administration.usergroups.edit.php:106
@@ -3318,7 +3318,7 @@ msgstr ""
 msgid "Delete selected node?"
 msgstr "Töröljem a kiválasztott csomópontot?"
 
-#: include/views/administration.proxy.list.php:96
+#: include/views/administration.proxy.list.php:104
 msgid "Delete selected proxies?"
 msgstr "Törli a kiválasztott proxykat?"
 
@@ -3589,12 +3589,12 @@ msgstr ""
 msgid "Disable hosts in the selected host groups?"
 msgstr ""
 
-#: include/views/administration.proxy.list.php:92
+#: include/views/administration.proxy.list.php:100
 msgid "Disable hosts monitored by selected proxies?"
 msgstr "Letiltja a hosztokat a kiválasztott proxykon?"
 
 #: hosts.php:871 include/views/administration.mediatypes.list.php:113
-#: include/views/administration.proxy.list.php:91
+#: include/views/administration.proxy.list.php:99
 #: include/views/administration.usergroups.list.php:133
 #: include/views/configuration.action.list.php:97
 #: include/views/configuration.application.list.php:85
@@ -3850,12 +3850,12 @@ msgctxt "discovery status"
 msgid "Down"
 msgstr ""
 
-#: api/classes/CWebCheck.php:616
+#: api/classes/CWebCheck.php:619
 #, php-format
 msgid "Download speed for scenario \"%s\"."
 msgstr ""
 
-#: api/classes/CWebCheck.php:715
+#: api/classes/CWebCheck.php:718
 #, php-format
 msgid "Download speed for step \"%1$s\" of scenario \"%2$s\"."
 msgstr ""
@@ -4084,12 +4084,12 @@ msgstr "Hoszt engedélyezése"
 msgid "Enable host?"
 msgstr ""
 
-#: include/views/administration.proxy.list.php:88
+#: include/views/administration.proxy.list.php:96
 msgid "Enable hosts monitored by selected proxies?"
 msgstr "Engedélyezi a hosztokat a kiválasztott proxykon?"
 
 #: hosts.php:867 include/views/administration.mediatypes.list.php:109
-#: include/views/administration.proxy.list.php:87
+#: include/views/administration.proxy.list.php:95
 #: include/views/administration.usergroups.list.php:129
 #: include/views/configuration.action.list.php:93
 #: include/views/configuration.application.list.php:81
@@ -4422,7 +4422,7 @@ msgstr "Hiba"
 msgid "Failed"
 msgstr "Hiba"
 
-#: api/classes/CWebCheck.php:623
+#: api/classes/CWebCheck.php:626
 #, php-format
 msgid "Failed step of scenario \"%s\"."
 msgstr ""
@@ -4685,7 +4685,7 @@ msgstr ""
 #: hosts.php:879
 #: include/views/administration.general.regularexpressions.list.php:62
 #: include/views/administration.mediatypes.list.php:121
-#: include/views/administration.proxy.list.php:99
+#: include/views/administration.proxy.list.php:107
 #: include/views/administration.script.list.php:93
 #: include/views/administration.usergroups.list.php:149
 #: include/views/administration.users.list.php:144
@@ -4773,11 +4773,11 @@ msgstr ""
 msgid "Graph \"%1$s\" with templated items cannot contain items from other hosts."
 msgstr ""
 
-#: graphs.php:225
+#: graphs.php:246
 msgid "Graph added"
 msgstr "Grafikon hozzáadva"
 
-#: graphs.php:236
+#: graphs.php:257
 msgid "Graph deleted"
 msgstr "Grafikon törölve"
 
@@ -4828,7 +4828,7 @@ msgstr "Összesített grafikon"
 msgid "Graph type"
 msgstr "Grafikon típusa"
 
-#: graphs.php:222
+#: graphs.php:243
 msgid "Graph updated"
 msgstr "Grafikon frissítve"
 
@@ -4855,11 +4855,11 @@ msgstr ""
 msgid "Graphs"
 msgstr "Grafikonok"
 
-#: graphs.php:289
+#: graphs.php:310
 msgid "Graphs copied"
 msgstr "Grafikonok másolva"
 
-#: graphs.php:243
+#: graphs.php:264
 msgid "Graphs deleted"
 msgstr "Grafikonok törölve"
 
@@ -5897,8 +5897,8 @@ msgstr ""
 msgid "Incorrect algorithm for service \"%1$s\"."
 msgstr ""
 
-#: api/classes/CApplication.php:436 include/regexp.inc.php:52
-#: include/regexp.inc.php:85 include/regexp.inc.php:150
+#: api/classes/CApplication.php:436 include/regexp.inc.php:53
+#: include/regexp.inc.php:91 include/regexp.inc.php:162
 msgid "Incorrect arguments passed to function"
 msgstr "A funkció argumentuma hibás"
 
@@ -6647,7 +6647,7 @@ msgstr ""
 msgid "Item with key \"%1$s\" already exists on \"%2$s\"."
 msgstr ""
 
-#: api/classes/CWebCheck.php:644
+#: api/classes/CWebCheck.php:647
 #, php-format
 msgid "Item with key \"%s\" already exists."
 msgstr ""
@@ -6942,7 +6942,7 @@ msgstr ""
 msgid "Last check"
 msgstr "Utolsó ellenőrzés"
 
-#: api/classes/CWebCheck.php:630
+#: api/classes/CWebCheck.php:633
 #, php-format
 msgid "Last error message of scenario \"%s\"."
 msgstr ""
@@ -8532,7 +8532,7 @@ msgstr ""
 msgid "No target selected"
 msgstr "Nincs cél kiválasztva"
 
-#: graphs.php:293 items.php:609
+#: graphs.php:314 items.php:609
 msgid "No target selected."
 msgstr ""
 
@@ -8966,7 +8966,7 @@ msgstr ""
 msgid "Only Zabbix Admins can remove user media."
 msgstr ""
 
-#: api/classes/CWebCheck.php:602
+#: api/classes/CWebCheck.php:604
 msgid "Only characters are allowed."
 msgstr ""
 
@@ -9379,7 +9379,7 @@ msgid "Parse error"
 msgstr ""
 
 #: include/views/administration.proxy.edit.php:41
-#: include/views/administration.proxy.list.php:76
+#: include/views/administration.proxy.list.php:84
 msgid "Passive"
 msgstr ""
 
@@ -9831,7 +9831,7 @@ msgstr ""
 msgid "Regular expression"
 msgstr "Reguláris kifejezés"
 
-#: include/regexp.inc.php:58 include/regexp.inc.php:92
+#: include/regexp.inc.php:62 include/regexp.inc.php:102
 #, php-format
 msgid "Regular expression \"%s\" already exists."
 msgstr ""
@@ -9863,7 +9863,7 @@ msgid_plural "Regular expressions deleted"
 msgstr[0] "Reguláris kifejezés törölve"
 msgstr[1] "Reguláris kifejezés törölve"
 
-#: include/regexp.inc.php:79
+#: include/regexp.inc.php:85
 msgid "Regular expression does not exist."
 msgstr ""
 
@@ -10078,7 +10078,7 @@ msgstr "Forrás"
 msgid "Response code"
 msgstr "Válaszkód"
 
-#: api/classes/CWebCheck.php:729
+#: api/classes/CWebCheck.php:732
 #, php-format
 msgid "Response code for step \"%1$s\" of scenario \"%2$s\"."
 msgstr ""
@@ -10087,7 +10087,7 @@ msgstr ""
 msgid "Response time"
 msgstr "Válaszidő"
 
-#: api/classes/CWebCheck.php:722
+#: api/classes/CWebCheck.php:725
 #, php-format
 msgid "Response time for step \"%1$s\" of scenario \"%2$s\"."
 msgstr ""
@@ -10097,11 +10097,11 @@ msgstr ""
 msgid "Result"
 msgstr "Eredmény"
 
-#: include/regexp.inc.php:190
+#: include/regexp.inc.php:200
 msgid "Result is FALSE"
 msgstr "Az eredmény HAMIS"
 
-#: include/regexp.inc.php:187
+#: include/regexp.inc.php:198
 msgid "Result is TRUE"
 msgstr "Az eredmény IGAZ"
 
@@ -10489,11 +10489,11 @@ msgstr "Scenario törölve"
 msgid "Scenario disabled"
 msgstr "Scenario letiltva"
 
-#: api/classes/CWebCheck.php:691 api/classes/CWebCheck.php:791
+#: api/classes/CWebCheck.php:694 api/classes/CWebCheck.php:794
 msgid "Scenario step name should contain only printable characters."
 msgstr ""
 
-#: api/classes/CWebCheck.php:705 api/classes/CWebCheck.php:806
+#: api/classes/CWebCheck.php:708 api/classes/CWebCheck.php:809
 msgid "Scenario step number cannot be less than 1."
 msgstr ""
 
@@ -11335,7 +11335,7 @@ msgstr "Lépés"
 msgid "Step \"%1$s\" [%2$s of %3$s] failed: %4$s"
 msgstr ""
 
-#: api/classes/CWebCheck.php:699
+#: api/classes/CWebCheck.php:702
 #, php-format
 msgid "Step \"%s\" already exists."
 msgstr ""
@@ -12286,7 +12286,7 @@ msgstr "Egységek"
 #: include/maintenances.inc.php:41 include/maps.inc.php:39
 #: include/maps.inc.php:709 include/maps.inc.php:799 include/maps.inc.php:896
 #: include/media.inc.php:39 include/nodes.inc.php:257 include/perm.inc.php:30
-#: include/regexp.inc.php:193 include/screens.inc.php:55
+#: include/regexp.inc.php:202 include/screens.inc.php:55
 #: include/triggers.inc.php:62 include/triggers.inc.php:173
 #: include/triggers.inc.php:191 include/users.inc.php:50
 #: include/users.inc.php:65
@@ -12914,12 +12914,12 @@ msgstr "Web"
 msgid "Web checks"
 msgstr ""
 
-#: api/classes/CWebCheck.php:677 api/classes/CWebCheck.php:776
+#: api/classes/CWebCheck.php:680 api/classes/CWebCheck.php:779
 #, php-format
 msgid "Web item \"%s\" created."
 msgstr ""
 
-#: api/classes/CWebCheck.php:742
+#: api/classes/CWebCheck.php:745
 #, php-format
 msgid "Web item with key \"%s\" already exists."
 msgstr ""
