@@ -1393,6 +1393,7 @@ class testFormWeb extends CWebTest {
 				$this->assertEquals($row['delay'], $delay);
 				$this->assertEquals($row['hostid'], $this->hostid);
 				$this->assertEquals($row['retries'], $retries);
+				$httptestid = $row['httptestid'];
 			}
 		}
 		if (isset($data['formCheck'])) {
@@ -1405,6 +1406,8 @@ class testFormWeb extends CWebTest {
 			$this->zbxTestClick("link=$dbName");
 			$this->wait();
 			$this->assertAttribute("//input[@id='name']/@value", 'exact:'.$name);
+			$this->zbxTestClickWait('link='.$this->host);
+			$this->zbxTestClickWait('link=Web scenarios');
 		}
 
 		if (isset($data['createTriggers'])) {
@@ -1422,6 +1425,17 @@ class testFormWeb extends CWebTest {
 				$this->checkTitle('Configuration of triggers');
 				$this->zbxTestTextPresent('CONFIGURATION OF TRIGGERS');
 			}
+		}
+
+		if (isset($data['remove'])) {
+			$this->zbxTestCheckboxSelect("group_httptestid_$httptestid");
+			$this->zbxTestDropdownSelect('go', 'Delete selected');
+			$this->zbxTestClick('goButton');
+
+			$this->getConfirmation();
+			$this->wait();
+			$this->zbxTestTextPresent('Web scenario deleted');
+			$this->zbxTestTextNotPresent($data['name']);
 		}
 	}
 
