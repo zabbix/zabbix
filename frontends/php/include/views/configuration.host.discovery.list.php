@@ -84,13 +84,22 @@ foreach ($data['discoveries'] as $discovery) {
 		$error->setHint($discovery['error'], '', 'on');
 	}
 
+	// host prototype link
+	$hostPrototypeLink = null;
+	if ($host['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
+		$hostPrototypeLink = array(
+			new CLink(_('Host prototypes'), 'host_prototypes.php?parent_discoveryid='.$discovery['itemid']),
+			' ('.$discovery['hostPrototypes'].')'
+		);
+	}
+
 	$discoveryTable->addRow(array(
 		new CCheckBox('g_hostdruleid['.$discovery['itemid'].']', null, null, $discovery['itemid']),
 		$description,
 		array(new CLink(_('Item prototypes'), 'disc_prototypes.php?hostid='.get_request('hostid').'&parent_discoveryid='.$discovery['itemid']), ' ('.$discovery['items'].')'),
 		array(new CLink(_('Trigger prototypes'), 'trigger_prototypes.php?hostid='.get_request('hostid').'&parent_discoveryid='.$discovery['itemid']), ' ('.$discovery['triggers'].')'),
 		array(new CLink(_('Graph prototypes'), 'graphs.php?hostid='.get_request('hostid').'&parent_discoveryid='.$discovery['itemid']), ' ('.$discovery['graphs'].')'),
-		($host['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) ? array(new CLink(_('Host prototypes'), 'host_prototypes.php?parent_discoveryid='.$discovery['itemid']), ' ('.$discovery['hostPrototypes'].')') : null,
+		$hostPrototypeLink,
 		$discovery['key_'],
 		$discovery['delay'],
 		item_type2str($discovery['type']),
