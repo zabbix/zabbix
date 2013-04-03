@@ -259,7 +259,8 @@ class CTemplateScreen extends CScreen {
 				}
 			}
 
-			$screenItems = $this->unsetExtraFields($screenItems, array('screenid', 'screenitemid', 'resourceid', 'resourcetype'),
+			$screenItems = $this->unsetExtraFields($screenItems,
+				array('screenid', 'screenitemid', 'resourceid', 'resourcetype'),
 				$options['selectScreenItems']
 			);
 			$result = $relationMap->mapMany($result, $screenItems, 'screenitems');
@@ -327,7 +328,8 @@ class CTemplateScreen extends CScreen {
 
 		// hashing
 		$options['hostids'] = zbx_toHash($options['hostids']);
-		if (is_null($options['countOutput']) || (!is_null($options['countOutput']) && !is_null($options['groupCount']))) {
+		if (is_null($options['countOutput'])
+				|| (!is_null($options['countOutput']) && !is_null($options['groupCount']))) {
 			// creating copies of templated screens (inheritance)
 			// screenNum is needed due to we can't refer to screenid/hostid/templateid as they will repeat
 			$screenNum = 0;
