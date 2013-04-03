@@ -1620,48 +1620,38 @@ char	*get_param_dyn(const char *p, int num)
  *                                                                            *
  * Return value:                                                              *
  *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments: delimeter for parameters is ','                                  *
+ * Comments: delimiter for parameters is ','                                  *
  *                                                                            *
  ******************************************************************************/
 void	remove_param(char *p, int num)
 {
-/* 0 - init, 1 - inside quoted param, 2 - inside unquoted param */
-	int	state, idx = 1;
+	int	state = 0;	/* 0 - unquoted parameter, 1 - quoted parameter */
+	int	idx = 1;
 	char	*buf;
 
-	for (buf = p, state = 0; '\0' != *p; p++)
+	for (buf = p; '\0' != *p; p++)
 	{
+		switch (state)
+		{
+			case 0:			/* in unquoted parameter */
+				if (',' == *p)
+				{
+					if (1 == idx && 1 == num)
+						p++;
+					idx++;
+				}
+				else if ('"' == *p)
+					state = 1;
+				break;
+			case 1:			/* in quoted param */
+				if ('"' == *p)
+					state = 0;
+				else if ('\\' == *p && '"' == p[1])
+					p++;
+				break;
+		}
 		if (idx != num)
 			*buf++ = *p;
-
-		switch (state) {
-		/* Init state */
-		case 0:
-			if (',' == *p)
-				idx++;
-			else if ('"' == *p)
-				state = 1;
-			else if (' ' != *p)
-				state = 2;
-			break;
-		/* Quoted */
-		case 1:
-			if ('"' == *p)
-				state = 0;
-			else if ('\\' == *p && '"' == p[1])
-				p++;
-			break;
-		/* Unquoted */
-		case 2:
-			if (',' == *p)
-			{
-				idx++;
-				state = 0;
-			}
-			break;
-		}
 	}
 
 	*buf = '\0';
