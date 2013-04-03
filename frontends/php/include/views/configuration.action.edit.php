@@ -92,7 +92,7 @@ foreach ($this->data['action']['conditions'] as $condition) {
 	$conditionTable->addRow(
 		array(
 			$labelSpan,
-			get_condition_desc($condition['conditiontype'], $condition['operator'], $condition['value']).SPACE,
+			get_condition_desc($condition['conditiontype'], $condition['operator'], $condition['value']),
 			array(
 				new CButton('remove', _('Remove'), 'javascript: removeCondition('.$i.');', 'link_menu'),
 				new CVar('conditions['.$i.']', $condition)
