@@ -207,24 +207,22 @@ typedef enum
 } zbx_item_authtype_t;
 
 /* event sources */
-typedef enum
-{
-	EVENT_SOURCE_TRIGGERS = 0,
-	EVENT_SOURCE_DISCOVERY,
-	EVENT_SOURCE_AUTO_REGISTRATION
-} zbx_event_source_t;
+#define EVENT_SOURCE_TRIGGERS		0
+#define EVENT_SOURCE_DISCOVERY		1
+#define EVENT_SOURCE_AUTO_REGISTRATION	2
+#define EVENT_SOURCE_INTERNAL		3
 
 /* event objects */
-typedef enum
-{
-/* EVENT_SOURCE_TRIGGERS */
-	EVENT_OBJECT_TRIGGER = 0,
-/* EVENT_SOURCE_DISCOVERY */
-	EVENT_OBJECT_DHOST,
-	EVENT_OBJECT_DSERVICE,
-/* EVENT_SOURCE_AUTO_REGISTRATION */
-	EVENT_OBJECT_ZABBIX_ACTIVE
-} zbx_event_object_t;
+#define EVENT_OBJECT_TRIGGER		0
+#define EVENT_OBJECT_DHOST		1
+#define EVENT_OBJECT_DSERVICE		2
+#define EVENT_OBJECT_ZABBIX_ACTIVE	3
+#define EVENT_OBJECT_ITEM		4
+#define EVENT_OBJECT_LLDRULE		5
+
+/* acknowledged flags */
+#define EVENT_NOT_ACKNOWLEDGED		0
+#define EVENT_ACKNOWLEDGED		1
 
 typedef enum
 {
@@ -304,65 +302,62 @@ const char	*zbx_dservice_type_string(zbx_dservice_type_t service);
 #define ITEM_MULTIPLIER_USE			1
 
 /* item delta types */
-typedef enum
-{
-	ITEM_STORE_AS_IS = 0,
-	ITEM_STORE_SPEED_PER_SECOND,
-	ITEM_STORE_SIMPLE_CHANGE
-} zbx_item_store_type_t;
+#define ITEM_STORE_AS_IS			0
+#define ITEM_STORE_SPEED_PER_SECOND		1
+#define ITEM_STORE_SIMPLE_CHANGE		2
 
 /* object types for operations */
-#define OPERATION_OBJECT_USER	0
-#define OPERATION_OBJECT_GROUP	1
+#define OPERATION_OBJECT_USER			0
+#define OPERATION_OBJECT_GROUP			1
 
 /* condition evaluation types */
-typedef enum
-{
-	ACTION_EVAL_TYPE_AND_OR	= 0,
-	ACTION_EVAL_TYPE_AND,
-	ACTION_EVAL_TYPE_OR
-} zbx_action_eval_type_t;
+#define ACTION_EVAL_TYPE_AND_OR			0
+#define ACTION_EVAL_TYPE_AND			1
+#define ACTION_EVAL_TYPE_OR			2
 
 /* condition types */
-typedef enum
-{
-	CONDITION_TYPE_HOST_GROUP = 0,
-	CONDITION_TYPE_HOST,
-	CONDITION_TYPE_TRIGGER,
-	CONDITION_TYPE_TRIGGER_NAME,
-	CONDITION_TYPE_TRIGGER_SEVERITY,
-	CONDITION_TYPE_TRIGGER_VALUE,
-	CONDITION_TYPE_TIME_PERIOD,
-	CONDITION_TYPE_DHOST_IP,
-	CONDITION_TYPE_DSERVICE_TYPE,
-	CONDITION_TYPE_DSERVICE_PORT,
-	CONDITION_TYPE_DSTATUS,
-	CONDITION_TYPE_DUPTIME,
-	CONDITION_TYPE_DVALUE,
-	CONDITION_TYPE_HOST_TEMPLATE,
-	CONDITION_TYPE_EVENT_ACKNOWLEDGED,
-	CONDITION_TYPE_APPLICATION,
-	CONDITION_TYPE_MAINTENANCE,
-	CONDITION_TYPE_NODE,
-	CONDITION_TYPE_DRULE,
-	CONDITION_TYPE_DCHECK,
-	CONDITION_TYPE_PROXY,
-	CONDITION_TYPE_DOBJECT,
-	CONDITION_TYPE_HOST_NAME
-} zbx_condition_type_t;
+#define CONDITION_TYPE_HOST_GROUP		0
+#define CONDITION_TYPE_HOST			1
+#define CONDITION_TYPE_TRIGGER			2
+#define CONDITION_TYPE_TRIGGER_NAME		3
+#define CONDITION_TYPE_TRIGGER_SEVERITY		4
+#define CONDITION_TYPE_TRIGGER_VALUE		5
+#define CONDITION_TYPE_TIME_PERIOD		6
+#define CONDITION_TYPE_DHOST_IP			7
+#define CONDITION_TYPE_DSERVICE_TYPE		8
+#define CONDITION_TYPE_DSERVICE_PORT		9
+#define CONDITION_TYPE_DSTATUS			10
+#define CONDITION_TYPE_DUPTIME			11
+#define CONDITION_TYPE_DVALUE			12
+#define CONDITION_TYPE_HOST_TEMPLATE		13
+#define CONDITION_TYPE_EVENT_ACKNOWLEDGED	14
+#define CONDITION_TYPE_APPLICATION		15
+#define CONDITION_TYPE_MAINTENANCE		16
+#define CONDITION_TYPE_NODE			17
+#define CONDITION_TYPE_DRULE			18
+#define CONDITION_TYPE_DCHECK			19
+#define CONDITION_TYPE_PROXY			20
+#define CONDITION_TYPE_DOBJECT			21
+#define CONDITION_TYPE_HOST_NAME		22
+#define CONDITION_TYPE_EVENT_TYPE		23
 
 /* condition operators */
-typedef enum
-{
-	CONDITION_OPERATOR_EQUAL = 0,
-	CONDITION_OPERATOR_NOT_EQUAL,
-	CONDITION_OPERATOR_LIKE,
-	CONDITION_OPERATOR_NOT_LIKE,
-	CONDITION_OPERATOR_IN,
-	CONDITION_OPERATOR_MORE_EQUAL,
-	CONDITION_OPERATOR_LESS_EQUAL,
-	CONDITION_OPERATOR_NOT_IN
-} zbx_condition_op_t;
+#define CONDITION_OPERATOR_EQUAL		0
+#define CONDITION_OPERATOR_NOT_EQUAL		1
+#define CONDITION_OPERATOR_LIKE			2
+#define CONDITION_OPERATOR_NOT_LIKE		3
+#define CONDITION_OPERATOR_IN			4
+#define CONDITION_OPERATOR_MORE_EQUAL		5
+#define CONDITION_OPERATOR_LESS_EQUAL		6
+#define CONDITION_OPERATOR_NOT_IN		7
+
+/* event type action condition values */
+#define EVENT_TYPE_ITEM_NOTSUPPORTED		0
+#define EVENT_TYPE_ITEM_NORMAL			1
+#define EVENT_TYPE_LLDRULE_NOTSUPPORTED		2
+#define EVENT_TYPE_LLDRULE_NORMAL		3
+#define EVENT_TYPE_TRIGGER_UNKNOWN		4
+#define EVENT_TYPE_TRIGGER_NORMAL		5
 
 typedef enum
 {
@@ -467,22 +462,13 @@ typedef enum
 const char	*zbx_alert_type_string(unsigned char type);
 
 /* item statuses */
-typedef enum
-{
-	ITEM_STATUS_ACTIVE = 0,
-	ITEM_STATUS_DISABLED,
-/*ITEM_STATUS_TRAPPED		2*/
-	ITEM_STATUS_NOTSUPPORTED = 3,
-/*ITEM_STATUS_DELETED		4*/
-/*ITEM_STATUS_NOTAVAILABLE	5*/
-} zbx_item_status_t;
+#define ITEM_STATUS_ACTIVE		0
+#define ITEM_STATUS_DISABLED		1
 
-/* trigger types */
-typedef enum
-{
-	TRIGGER_TYPE_NORMAL = 0,
-	TRIGGER_TYPE_MULTIPLE_TRUE
-} zbx_trigger_type_t;
+/* item states */
+#define ITEM_STATE_NORMAL		0
+#define ITEM_STATE_NOTSUPPORTED		1
+const char	*zbx_item_state_string(unsigned char state);
 
 /* group statuses */
 typedef enum
@@ -556,22 +542,27 @@ typedef enum
 #define HOST_INVENTORY_AUTOMATIC	1
 
 /* host availability */
-#define HOST_AVAILABLE_UNKNOWN	0
-#define HOST_AVAILABLE_TRUE	1
-#define HOST_AVAILABLE_FALSE	2
+#define HOST_AVAILABLE_UNKNOWN		0
+#define HOST_AVAILABLE_TRUE		1
+#define HOST_AVAILABLE_FALSE		2
 
 /* trigger statuses */
-#define TRIGGER_STATUS_ENABLED	0
-#define TRIGGER_STATUS_DISABLED	1
+#define TRIGGER_STATUS_ENABLED		0
+#define TRIGGER_STATUS_DISABLED		1
+
+/* trigger types */
+#define TRIGGER_TYPE_NORMAL		0
+#define TRIGGER_TYPE_MULTIPLE_TRUE	1
 
 /* trigger values */
-#define TRIGGER_VALUE_OK	0
-#define TRIGGER_VALUE_PROBLEM	1
-#define TRIGGER_VALUE_UNKNOWN	2	/* only in server code, never in DB */
+#define TRIGGER_VALUE_OK		0
+#define TRIGGER_VALUE_PROBLEM		1
+#define TRIGGER_VALUE_UNKNOWN		2	/* only in server code, never in DB */
 
-/* trigger value flags */
-#define TRIGGER_VALUE_FLAG_NORMAL	0
-#define TRIGGER_VALUE_FLAG_UNKNOWN	1
+/* trigger states */
+#define TRIGGER_STATE_NORMAL		0
+#define TRIGGER_STATE_UNKNOWN		1
+const char	*zbx_trigger_state_string(unsigned char state);
 
 /* trigger severity */
 #define TRIGGER_SEVERITY_NOT_CLASSIFIED	0
@@ -582,15 +573,12 @@ typedef enum
 #define TRIGGER_SEVERITY_DISASTER	5
 #define TRIGGER_SEVERITY_COUNT		6	/* number of trigger severities */
 
-typedef enum
-{
-	ITEM_LOGTYPE_INFORMATION = 1,
-	ITEM_LOGTYPE_WARNING,
-	ITEM_LOGTYPE_ERROR = 4,
-	ITEM_LOGTYPE_FAILURE_AUDIT = 7,
-	ITEM_LOGTYPE_SUCCESS_AUDIT
-} zbx_item_logtype_t;
-const char	*zbx_item_logtype_string(zbx_item_logtype_t logtype);
+#define ITEM_LOGTYPE_INFORMATION	1
+#define ITEM_LOGTYPE_WARNING		2
+#define ITEM_LOGTYPE_ERROR		4
+#define ITEM_LOGTYPE_FAILURE_AUDIT	7
+#define ITEM_LOGTYPE_SUCCESS_AUDIT	8
+const char	*zbx_item_logtype_string(unsigned char logtype);
 
 /* media statuses */
 #define MEDIA_STATUS_ACTIVE	0

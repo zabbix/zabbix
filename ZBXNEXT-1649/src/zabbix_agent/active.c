@@ -80,7 +80,7 @@ static void	disable_all_metrics()
 	zabbix_log(LOG_LEVEL_DEBUG, "In disable_all_metrics()");
 
 	for (i = 0; NULL != active_metrics[i].key; i++)
-		active_metrics[i].status = ITEM_STATUS_NOTSUPPORTED;
+		active_metrics[i].state = ITEM_STATE_NOTSUPPORTED;
 }
 
 #ifdef _WINDOWS
@@ -109,7 +109,7 @@ static int	get_min_nextcheck()
 
 	for (i = 0; NULL != active_metrics[i].key; i++)
 	{
-		if (ITEM_STATUS_ACTIVE != active_metrics[i].status)
+		if (ITEM_STATE_NORMAL != active_metrics[i].state)
 			continue;
 
 		if (active_metrics[i].nextcheck < min || (-1) == min)
@@ -149,7 +149,7 @@ static void	add_check(const char *key, const char *key_orig, int refresh, zbx_ui
 			active_metrics[i].nextcheck = 0;
 			active_metrics[i].refresh = refresh;
 		}
-		active_metrics[i].status = ITEM_STATUS_ACTIVE;
+		active_metrics[i].state = ITEM_STATE_NORMAL;
 
 		goto out;
 	}
@@ -159,7 +159,7 @@ static void	add_check(const char *key, const char *key_orig, int refresh, zbx_ui
 	active_metrics[i].key_orig = zbx_strdup(NULL, key_orig);
 	active_metrics[i].refresh = refresh;
 	active_metrics[i].nextcheck = 0;
-	active_metrics[i].status = ITEM_STATUS_ACTIVE;
+	active_metrics[i].state = ITEM_STATE_NORMAL;
 	active_metrics[i].lastlogsize = lastlogsize;
 	active_metrics[i].mtime = mtime;
 	/* can skip existing log[] and eventlog[] data */
@@ -754,7 +754,7 @@ static void	process_active_checks(char *server, unsigned short port)
 		if (active_metrics[i].nextcheck > now)
 			continue;
 
-		if (ITEM_STATUS_ACTIVE != active_metrics[i].status)
+		if (ITEM_STATE_NORMAL != active_metrics[i].state)
 			continue;
 
 		/* special processing for log files without rotation */
@@ -848,7 +848,7 @@ static void	process_active_checks(char *server, unsigned short port)
 
 			if (FAIL == ret)
 			{
-				active_metrics[i].status = ITEM_STATUS_NOTSUPPORTED;
+				active_metrics[i].state = ITEM_STATE_NOTSUPPORTED;
 				zabbix_log(LOG_LEVEL_WARNING, "Active check [%s] is not supported. Disabled.",
 						active_metrics[i].key);
 
@@ -954,7 +954,7 @@ static void	process_active_checks(char *server, unsigned short port)
 
 			if (FAIL == ret)
 			{
-				active_metrics[i].status = ITEM_STATUS_NOTSUPPORTED;
+				active_metrics[i].state = ITEM_STATE_NOTSUPPORTED;
 				zabbix_log(LOG_LEVEL_WARNING, "Active check [%s] is not supported. Disabled.",
 						active_metrics[i].key);
 
@@ -1095,7 +1095,7 @@ static void	process_active_checks(char *server, unsigned short port)
 
 			if (FAIL == ret)
 			{
-				active_metrics[i].status = ITEM_STATUS_NOTSUPPORTED;
+				active_metrics[i].state = ITEM_STATE_NOTSUPPORTED;
 				zabbix_log(LOG_LEVEL_WARNING, "Active check [%s] is not supported. Disabled.",
 						active_metrics[i].key);
 
@@ -1121,7 +1121,7 @@ static void	process_active_checks(char *server, unsigned short port)
 
 				if (0 == strcmp(*pvalue, ZBX_NOTSUPPORTED))
 				{
-					active_metrics[i].status = ITEM_STATUS_NOTSUPPORTED;
+					active_metrics[i].state = ITEM_STATE_NOTSUPPORTED;
 					zabbix_log(LOG_LEVEL_WARNING, "Active check [%s] is not supported. Disabled.",
 							active_metrics[i].key);
 				}

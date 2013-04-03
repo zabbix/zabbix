@@ -1,6 +1,11 @@
 Changes for 2.1.0
 
 New features:
+A.F.....S. [ZBXNEXT-1575] implemented internal event and notification support (Pavels, Sasha)
+..F....... [ZBXNEXT-1575] the error icon in the item, LLD rule and trigger lists will no longer be displayed for disabled objects (Pavels)
+A.F.....S. [ZBXNEXT-1575] new triggers will now be created in OK state (Pavels, Sasha)
+..F....... [ZBXNEXT-1575] the status indicator in the trigger list will also display the "Unknown" status (Pavels)
+........S. [ZBXNEXT-1575] implemented new notification macros: {ITEM.STATE<1-9>}, {LLDRULE.ID}, {LLDRULE.NAME}, {LLDRULE.DESCRIPTION}, {LLDRULE.KEY}, {LLDRULE.STATE} and {TRIGGER.STATE} (Sasha)
 ...G...... [ZBXNEXT-579] added support of net.if.discovery for FreeBSD, NetBSD and OpenBSD (Aleksej)
 ..F....PS. [ZBXNEXT-300] added support of IPMI discrete sensors (Andris, Sasha, Toms)
 ..F....... [ZBXNEXT-1659] added support of anti-aliased normal and bold lines for graphs and map connectors (Alexei)
