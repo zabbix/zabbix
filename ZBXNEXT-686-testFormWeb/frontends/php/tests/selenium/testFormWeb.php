@@ -895,6 +895,93 @@ class testFormWeb extends CWebTest {
 					)
 				)
 			),
+			// testing created items using triggers
+			array(
+				array(
+					'expected' => WEB_GOOD,
+					'name' => 'Trigger create web test',
+					'add_step' => array(
+						array('step' => 'Trigger create web test')
+					),
+					'createTriggers' => array(
+						'web.test.in[Trigger create web test,,bps]',
+						'web.test.fail[Trigger create web test]',
+						'web.test.error[Trigger create web test]',
+						'web.test.in[Trigger create web test,Trigger create web test step,bps]',
+						'web.test.time[Trigger create web test,Trigger create web test step,resp]',
+						'web.test.rspcode[Trigger create web test,Trigger create web test step]'
+					)
+				)
+			),
+			// testing created items using triggers -multiple steps added
+			array(
+				array(
+					'expected' => WEB_GOOD,
+					'name' => 'Trigger create multiple steps web test',
+					'add_step' => array(
+						array('step' => 'Trigger create multiple steps web test1'),
+						array('step' => 'Trigger create multiple steps web test2'),
+						array('step' => 'Trigger create multiple steps web test3'),
+						array('step' => 'Trigger create multiple steps web test4'),
+					),
+					'createTriggers' => array(
+						'web.test.in[Trigger create multiple steps web test,,bps]',
+						'web.test.fail[Trigger create multiple steps web test]',
+						'web.test.error[Trigger create multiple steps web test]',
+						'web.test.in[Trigger create multiple steps web test,Trigger create multiple steps web test1 step,bps]',
+						'web.test.time[Trigger create multiple steps web test,Trigger create multiple steps web test1 step,resp]',
+						'web.test.rspcode[Trigger create multiple steps web test,Trigger create multiple steps web test1 step]',
+						'web.test.in[Trigger create multiple steps web test,Trigger create multiple steps web test2 step,bps]',
+						'web.test.time[Trigger create multiple steps web test,Trigger create multiple steps web test2 step,resp]',
+						'web.test.rspcode[Trigger create multiple steps web test,Trigger create multiple steps web test2 step]',
+						'web.test.in[Trigger create multiple steps web test,Trigger create multiple steps web test3 step,bps]',
+						'web.test.time[Trigger create multiple steps web test,Trigger create multiple steps web test3 step,resp]',
+						'web.test.rspcode[Trigger create multiple steps web test,Trigger create multiple steps web test3 step]',
+						'web.test.in[Trigger create multiple steps web test,Trigger create multiple steps web test4 step,bps]',
+						'web.test.time[Trigger create multiple steps web test,Trigger create multiple steps web test4 step,resp]',
+						'web.test.rspcode[Trigger create multiple steps web test,Trigger create multiple steps web test4 step]'
+					)
+				)
+			),
+		// many steps added
+			array(
+				array(
+					'expected' => WEB_GOOD,
+					'name' => 'Many websteps added web test',
+					'add_step' => array(
+						array('step' => 'Many websteps added web test1'),
+						array('step' => 'Many websteps added web test2'),
+						array('step' => 'Many websteps added web test3'),
+						array('step' => 'Many websteps added web test4'),
+						array('step' => 'Many websteps added web test5'),
+						array('step' => 'Many websteps added web test6'),
+						array('step' => 'Many websteps added web test7'),
+						array('step' => 'Many websteps added web test8'),
+						array('step' => 'Many websteps added web test9'),
+						array('step' => 'Many websteps added web test10'),
+						array('step' => 'Many websteps added web test11'),
+						array('step' => 'Many websteps added web test12'),
+						array('step' => 'Many websteps added web test13'),
+						array('step' => 'Many websteps added web test14'),
+						array('step' => 'Many websteps added web test15'),
+						array('step' => 'Many websteps added web test16'),
+						array('step' => 'Many websteps added web test17'),
+						array('step' => 'Many websteps added web test18'),
+						array('step' => 'Many websteps added web test19'),
+						array('step' => 'Many websteps added web test20'),
+						array('step' => 'Many websteps added web test21'),
+						array('step' => 'Many websteps added web test22'),
+						array('step' => 'Many websteps added web test23'),
+						array('step' => 'Many websteps added web test24'),
+						array('step' => 'Many websteps added web test25'),
+						array('step' => 'Many websteps added web test26'),
+						array('step' => 'Many websteps added web test27'),
+						array('step' => 'Many websteps added web test28'),
+						array('step' => 'Many websteps added web test29'),
+						array('step' => 'Many websteps added web test30')
+					)
+				)
+			),
 			// List of main agents
 			array(
 				array(
@@ -1258,9 +1345,9 @@ class testFormWeb extends CWebTest {
 				$this->waitForPopUp('zbx_popup', 6000);
 				$this->selectWindow('zbx_popup');
 				$this->zbxTestCheckFatalErrors();
-				$add_step = $item['step'];
-				$this->input_type('name',$add_step);
-				$url = $add_step." url";
+				$step = $item['step']." step";
+				$this->input_type('name',$step);
+				$url = $step." url";
 				$this->input_type('url', $url);
 				$this->zbxTestClick('save');
 				$this->selectWindow(null);
@@ -1271,7 +1358,7 @@ class testFormWeb extends CWebTest {
 				}
 				else {
 					$this->zbxTestClickWait('tab_scenarioTab');
-					$this->zbxTestClickWait('tab_stepTab');
+					$this->zbxTestClick('tab_stepTab');
 				}
 			}
 		}
@@ -1299,7 +1386,7 @@ class testFormWeb extends CWebTest {
 		if (isset($data['dbCheck'])) {
 			$result = DBselect("SELECT * FROM httptest test LEFT JOIN httpstep step ON ".
 				"step.httptestid = test.httptestid ".
-				"WHERE test.name = '".$name."' AND step.name = '".$add_step."'");
+				"WHERE test.name = '".$name."' AND step.name = '".$step."'");
 			while ($row = DBfetch($result)) {
 				$this->assertEquals($row['agent'], $agent);
 				$this->assertEquals($row['url'], $url);
@@ -1320,7 +1407,22 @@ class testFormWeb extends CWebTest {
 			$this->assertAttribute("//input[@id='name']/@value", 'exact:'.$name);
 		}
 
+		if (isset($data['createTriggers'])) {
+			$this->zbxTestClickWait("//div[@class='w']//a[text()='Triggers']");
 
+			foreach ($data['createTriggers'] as $trigger) {
+				$this->zbxTestClickWait('form');
+
+				$this->input_type('description', $trigger);
+				$expressionTrigger = '{'.$this->host.':'.$trigger.'.last(0)}=0';
+				$this->input_type('expression', $expressionTrigger);
+				$this->zbxTestClickWait('save');
+
+				$this->zbxTestTextPresent('Trigger added');
+				$this->checkTitle('Configuration of triggers');
+				$this->zbxTestTextPresent('CONFIGURATION OF TRIGGERS');
+			}
+		}
 	}
 
 	/**
