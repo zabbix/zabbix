@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -9,7 +9,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -32,6 +32,8 @@ extern int	CONFIG_LOG_LEVEL;
 extern int	CONFIG_MAX_LINES_PER_SECOND;
 extern char	**CONFIG_ALIASES;
 extern char	**CONFIG_USER_PARAMETERS;
+extern char	*CONFIG_LOAD_MODULE_PATH;
+extern char	**CONFIG_LOAD_MODULE;
 #ifdef _WINDOWS
 extern char	**CONFIG_PERF_COUNTERS;
 #endif

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -10,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -227,24 +227,28 @@ else {
 	$data['mediatypes'] = API::Mediatype()->get($options);
 
 	// get media types used in actions
-	$options = array(
+	$actions = API::Action()->get(array(
 		'mediatypeids' => zbx_objectValues($data['mediatypes'], 'mediatypeid'),
 		'output' => array('actionid', 'name'),
-		'preservekeys' => 1
-	);
-	$actions = API::Action()->get($options);
+		'selectOperations' => array('operationtype', 'opmessage'),
+		'preservekeys' => true
+	));
+
 	foreach ($data['mediatypes'] as $number => $mediatype) {
+		// list actions where the media type is used
 		$data['mediatypes'][$number]['listOfActions'] = array();
-		foreach ($actions as $actionid => $action) {
-			if (!empty($action['mediatypeids'])) {
-				foreach ($action['mediatypeids'] as $actionMediaTypeId) {
-					if ($mediatype['mediatypeid'] == $actionMediaTypeId) {
-						$data['mediatypes'][$number]['listOfActions'][] = array('actionid' => $actionid, 'name' => $action['name']);
-					}
+		foreach ($actions as $actionId => $action) {
+			foreach ($action['operations'] as $operation) {
+				if ($operation['operationtype'] == OPERATION_TYPE_MESSAGE
+						&& $operation['opmessage']['mediatypeid'] == $mediatype['mediatypeid']) {
+
+					$data['mediatypes'][$number]['listOfActions'][] = array(
+						'actionid' => $actionId,
+						'name' => $action['name']
+					);
 				}
 			}
 		}
-		$data['mediatypes'][$number]['usedInActions'] = !isset($mediatype['listOfActions']);
 
 		// allow sort by mediatype name
 		$data['mediatypes'][$number]['typeid'] = $data['mediatypes'][$number]['type'];

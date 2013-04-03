@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -10,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -108,19 +108,20 @@ class CTriggerPrototype extends CTriggerGeneral {
 
 			$userGroups = getUserGroupsByUserId($userid);
 
-			$sqlParts['where'][] = 'EXISTS ('.
+			$sqlParts['where'][] = 'NOT EXISTS ('.
 					'SELECT NULL'.
 					' FROM functions f,items i,hosts_groups hgg'.
-						' JOIN rights r'.
+						' LEFT JOIN rights r'.
 							' ON r.id=hgg.groupid'.
 								' AND '.dbConditionInt('r.groupid', $userGroups).
 					' WHERE t.triggerid=f.triggerid'.
 						' AND f.itemid=i.itemid'.
 						' AND i.hostid=hgg.hostid'.
-					' GROUP BY f.triggerid'.
-					' HAVING MIN(r.permission)>'.PERM_DENY.
-						' AND MAX(r.permission)>='.$permission.
-					')';
+					' GROUP BY i.hostid'.
+					' HAVING MAX(permission)<'.$permission.
+						' OR MIN(permission) IS NULL'.
+						' OR MIN(permission)='.PERM_DENY.
+				')';
 		}
 
 		// groupids
@@ -480,8 +481,7 @@ class CTriggerPrototype extends CTriggerGeneral {
 			$triggerDbFields = array(
 				'description' => null,
 				'expression' => null,
-				'error' => _('Trigger just added. No status update so far.'),
-				'value' => TRIGGER_VALUE_UNKNOWN
+				'error' => _('Trigger just added. No status update so far.')
 			);
 			if (!check_db_fields($triggerDbFields, $trigger)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Wrong fields for trigger.'));

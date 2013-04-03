@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2012 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -31,7 +31,7 @@ $icon = $fsIcon = null;
 if (!empty($this->data['maps'])) {
 	$mapComboBox = new CComboBox('sysmapid', get_request('sysmapid', 0), 'submit()');
 	foreach ($this->data['maps'] as $sysmapId => $map) {
-		$mapComboBox->addItem($sysmapId, get_node_name_by_elid($sysmapId, null, ': ').$map['name']);
+		$mapComboBox->addItem($sysmapId, get_node_name_by_elid($sysmapId, null, NAME_DELIMITER).$map['name']);
 	}
 
 	$headerForm = new CForm('get');

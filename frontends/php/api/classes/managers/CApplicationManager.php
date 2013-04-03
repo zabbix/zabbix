@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2012 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -10,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -199,6 +199,15 @@ class CApplicationManager {
 				// update by templateid
 				if (isset($hostApp['byTemplateId'][$appId])) {
 					$exApplication = $hostApp['byTemplateId'][$appId];
+
+					// check if there's an application on the target host with the same name but from a different template
+					// or no template
+					if (isset($hostApp['byName'][$application['name']])
+							&& !idcmp($hostApp['byName'][$application['name']]['templateid'], $appId)) {
+
+						$host = DBfetch(DBselect('SELECT h.name FROM hosts h WHERE h.hostid='.zbx_dbstr($hostId)));
+						throw new Exception(_s('Application "%1$s" already exists on "%2$s".', $application['name'], $host['name']));
+					}
 				}
 
 				// update by name
@@ -206,7 +215,7 @@ class CApplicationManager {
 					$exApplication = $hostApp['byName'][$application['name']];
 					if ($exApplication['templateid'] > 0 && !idcmp($exApplication['templateid'], $appId)) {
 						$host = DBfetch(DBselect('SELECT h.name FROM hosts h WHERE h.hostid='.zbx_dbstr($hostId)));
-						throw new Exception(_s('Application "%1$s" already exists for host "%2$s".', $exApplication['name'], $host['name']));
+						throw new Exception(_s('Application "%1$s" already exists on "%2$s", inherited from another template.', $exApplication['name'], $host['name']));
 					}
 				}
 

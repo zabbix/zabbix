@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2012 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -10,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -501,33 +501,38 @@ class CScreen extends CZBXAPI {
 	}
 
 	/**
-	 * Delete Screen
+	 * Delete Screen.
 	 *
 	 * @param array $screenids
-	 * @return boolean
+	 *
+	 * @return array
 	 */
-	public function delete($screenids) {
-		$screenids = zbx_toArray($screenids);
+	public function delete($screenIds) {
+		$screenIds = zbx_toArray($screenIds);
 
 		$delScreens = $this->get(array(
-			'screenids' => $screenids,
+			'screenids' => $screenIds,
 			'editable' => true,
 			'preservekeys' => true
 		));
-		foreach ($screenids as $screenid) {
-			if (!isset($delScreens[$screenid])) {
+		foreach ($screenIds as $screenId) {
+			if (!isset($delScreens[$screenId])) {
 				self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 			}
 		}
 
-		DB::delete('screens_items', array('screenid'=>$screenids));
-		DB::delete('screens_items', array('resourceid'=>$screenids, 'resourcetype'=>SCREEN_RESOURCE_SCREEN));
-		DB::delete('slides', array('screenid'=>$screenids));
-		DB::delete('screens', array('screenid'=>$screenids));
+		DB::delete('screens_items', array('screenid' => $screenIds));
+		DB::delete('screens_items', array('resourceid' => $screenIds, 'resourcetype' => SCREEN_RESOURCE_SCREEN));
+		DB::delete('slides', array('screenid' => $screenIds));
+		DB::delete('screens', array('screenid' => $screenIds));
+		DB::delete('profiles', array(
+			'idx' => 'web.favorite.screenids',
+			'source' => 'screenid',
+			'value_id' => $screenIds
+		));
 
-		return array('screenids' => $screenids);
+		return array('screenids' => $screenIds);
 	}
-
 
 	/**
 	 * Replaces all of the screen items of the given screen with the new ones.

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -9,7 +9,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -162,7 +162,6 @@ static int	process_record_event(int sender_nodeid, int nodeid, const ZBX_TABLE *
 {
 	const char	*r;
 	int		f, source = 0, object = 0, value = 0, acknowledged = 0;
-	unsigned char	value_changed = 0;
 	zbx_uint64_t	eventid = 0, objectid = 0;
 	zbx_timespec_t	ts;
 
@@ -193,13 +192,11 @@ static int	process_record_event(int sender_nodeid, int nodeid, const ZBX_TABLE *
 			ts.ns = atoi(buffer);
 		else if (0 == strcmp(table->fields[f].name, "value"))
 			value = atoi(buffer);
-		else if (0 == strcmp(table->fields[f].name, "value_changed"))
-			value_changed = (unsigned char)atoi(buffer);
 		else if (0 == strcmp(table->fields[f].name, "acknowledged"))
 			acknowledged = atoi(buffer);
 	}
 
-	return process_event(eventid, source, object, objectid, &ts, value, value_changed, acknowledged, 0);
+	return process_event(eventid, source, object, objectid, &ts, value, acknowledged);
 error:
 	zabbix_log(LOG_LEVEL_ERR, "NODE %d: received invalid record from node %d for node %d [%s]",
 			CONFIG_NODEID, sender_nodeid, nodeid, record);

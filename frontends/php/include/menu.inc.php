@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2012 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,7 +25,7 @@ $ZBX_MENU = array(
 	'view' => array(
 		'label'				=> _('Monitoring'),
 		'user_type'			=> USER_TYPE_ZABBIX_USER,
-		'node_perm'			=> PERM_READ_LIST,
+		'node_perm'			=> PERM_READ,
 		'default_page_id'	=> 0,
 		'pages' => array(
 			array(
@@ -100,7 +100,7 @@ $ZBX_MENU = array(
 	'cm' => array(
 		'label'				=> _('Inventory'),
 		'user_type'			=> USER_TYPE_ZABBIX_USER,
-		'node_perm'			=> PERM_READ_LIST,
+		'node_perm'			=> PERM_READ,
 		'default_page_id'	=> 0,
 		'pages' => array(
 			array(
@@ -116,7 +116,7 @@ $ZBX_MENU = array(
 	'reports' => array(
 		'label'				=> _('Reports'),
 		'user_type'			=> USER_TYPE_ZABBIX_USER,
-		'node_perm'			=> PERM_READ_LIST,
+		'node_perm'			=> PERM_READ,
 		'default_page_id'	=> 0,
 		'pages' => array(
 			array(
@@ -148,7 +148,7 @@ $ZBX_MENU = array(
 	'config' => array(
 		'label'				=> _('Configuration'),
 		'user_type'			=> USER_TYPE_ZABBIX_ADMIN,
-		'node_perm'			=> PERM_READ_LIST,
+		'node_perm'			=> PERM_READ,
 		'default_page_id'	=> 0,
 		'force_disable_all_nodes' => true,
 		'pages' => array(

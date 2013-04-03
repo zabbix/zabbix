@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2012 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -10,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -690,13 +690,18 @@ class CHostGroup extends CZBXAPI {
 			$delOperationids[$dbOperation['operationid']] = $dbOperation['operationid'];
 		}
 
-		DB::delete('operations', array(
-			'operationid' => $delOperationids,
+		DB::delete('operations', array('operationid' => $delOperationids));
+
+		DB::delete('groups', array('groupid' => $groupids));
+
+		DB::delete('profiles', array(
+			'idx' => 'web.dashconf.groups.groupids',
+			'value_id' => $groupids
 		));
 
-		// host groups
-		DB::delete('groups', array(
-			'groupid' => $groupids
+		DB::delete('profiles', array(
+			'idx' => 'web.dashconf.groups.hide.groupids',
+			'value_id' => $groupids
 		));
 
 		// TODO: remove audit
@@ -818,9 +823,9 @@ class CHostGroup extends CZBXAPI {
 		$hostIds = array_unique(zbx_objectValues(isset($data['hosts']) ? zbx_toArray($data['hosts']) : null, 'hostid'));
 		$templateIds = array_unique(zbx_objectValues(isset($data['templates']) ? zbx_toArray($data['templates']) : null, 'templateid'));
 
-		$newHostIds = array();
+		$workHostIds = array();
 
-		// check permission
+		// validate permission
 		$allowedGroups = $this->get(array(
 			'groupids' => $groupIds,
 			'editable' => true,
@@ -832,6 +837,7 @@ class CHostGroup extends CZBXAPI {
 			}
 		}
 
+		// validate allowed hosts
 		if (!empty($hostIds)) {
 			$allowedHosts = API::Host()->get(array(
 				'hostids' => $hostIds,
@@ -843,10 +849,11 @@ class CHostGroup extends CZBXAPI {
 					self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
 				}
 
-				array_push($newHostIds, $hostId);
+				$workHostIds[$hostId] = $hostId;
 			}
 		}
 
+		// validate allowed templates
 		if (!empty($templateIds)) {
 			$allowedTemplates = API::Template()->get(array(
 				'templateids' => $templateIds,
@@ -858,51 +865,69 @@ class CHostGroup extends CZBXAPI {
 					self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
 				}
 
-				array_push($newHostIds, $templateId);
+				$workHostIds[$templateId] = $templateId;
 			}
 		}
 
-		// get host groups
-		$dbHostGroups = DBfetchArray(DBselect(
+		// get old records
+		$oldRecords = DBfetchArray(DBselect(
 			'SELECT *'.
 			' FROM hosts_groups hg'.
 			' WHERE '.dbConditionInt('hg.groupid', $groupIds)
 		));
 
+		// calculate new records
+		$replaceRecords = array();
+		$newRecords = array();
+		$hostIdsToValidate = array();
+
 		foreach ($groupIds as $groupId) {
-			// old records
-			$oldHostGroups = array();
-			foreach ($dbHostGroups as $dbHostGroup) {
-				if ($dbHostGroup['groupid'] == $groupId) {
-					array_push($oldHostGroups, $dbHostGroup);
+			$groupRecords = array();
+			foreach ($oldRecords as $oldRecord) {
+				if ($oldRecord['groupid'] == $groupId) {
+					$groupRecords[] = $oldRecord;
 				}
 			}
 
-			// new records
-			$newHostGroups = array();
-			foreach ($newHostIds as $newHostId) {
-				$isNewRecord = true;
-
-				foreach ($oldHostGroups as $oldHostGroup) {
-					if ($oldHostGroup['hostid'] == $newHostId) {
-						array_push($newHostGroups, $oldHostGroup);
-
-						$isNewRecord = false;
-						break;
-					}
+			// find records for replace
+			foreach ($groupRecords as $groupRecord) {
+				if (isset($workHostIds[$groupRecord['hostid']])) {
+					$replaceRecords[] = $groupRecord;
 				}
+			}
 
-				if ($isNewRecord) {
-					array_push($newHostGroups, array(
+			// find records for create
+			$groupHostIds = zbx_toHash(zbx_objectValues($groupRecords, 'hostid'));
+			$newHostIds = array_diff($workHostIds, $groupHostIds);
+			if ($newHostIds) {
+				foreach ($newHostIds as $newHostId) {
+					$newRecords[] = array(
 						'groupid' => $groupId,
 						'hostid' => $newHostId
-					));
+					);
 				}
 			}
 
-			// save
-			DB::replace('hosts_groups', $oldHostGroups, $newHostGroups);
+			// find records for delete
+			$deleteHostIds = array_diff($groupHostIds, $workHostIds);
+			if ($deleteHostIds) {
+				foreach ($deleteHostIds as $deleteHostId) {
+					$hostIdsToValidate[$deleteHostId] = $deleteHostId;
+				}
+			}
 		}
+
+		// validate hosts without groups
+		if ($hostIdsToValidate) {
+			$unlinkable = getUnlinkableHosts($groupIds, $hostIdsToValidate);
+
+			if (count($unlinkable) != count($hostIdsToValidate)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, 'One of the objects is left without host group.');
+			}
+		}
+
+		// save
+		DB::replace('hosts_groups', $oldRecords, array_merge($replaceRecords, $newRecords));
 
 		return array('groupids' => $groupIds);
 	}

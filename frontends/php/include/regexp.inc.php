@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -10,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -47,25 +47,31 @@ function getRegexpExpressions($regexpId) {
 function addRegexp(array $regexp, array $expressions) {
 	try {
 		// check required fields
-		$db_fields = array('name' => null, 'test_string' => '');
-		if (!check_db_fields($db_fields, $regexp)) {
+		$dbFields = array('name' => null, 'test_string' => '');
+
+		if (!check_db_fields($dbFields, $regexp)) {
 			throw new Exception(_('Incorrect arguments passed to function').' [addRegexp]');
 		}
 
 		// check duplicate name
-		$sql = 'SELECT re.regexpid FROM regexps re WHERE re.name='.zbx_dbstr($regexp['name']);
+		$sql = 'SELECT re.regexpid '.
+				'FROM regexps re '.
+				'WHERE re.name='.zbx_dbstr($regexp['name']).
+					andDbNode('re.regexpid');
 		if (DBfetch(DBselect($sql))) {
 			throw new Exception(_s('Regular expression "%s" already exists.', $regexp['name']));
 		}
 
 		$regexpIds = DB::insert('regexps', array($regexp));
 		$regexpId = reset($regexpIds);
+
 		addRegexpExpressions($regexpId, $expressions);
 	}
 	catch (Exception $e) {
 		error($e->getMessage());
 		return false;
 	}
+
 	return true;
 }
 
@@ -80,15 +86,19 @@ function updateRegexp(array $regexp, array $expressions) {
 		}
 
 		// check required fields
-		$db_fields = array('name' => null);
-		if (!check_db_fields($db_fields, $regexp)) {
+		$dbFields = array('name' => null);
+		if (!check_db_fields($dbFields, $regexp)) {
 			throw new Exception(_('Incorrect arguments passed to function').' [updateRegexp]');
 		}
 
 		// check duplicate name
-		$sql = 'SELECT re.regexpid FROM regexps re WHERE re.name='.zbx_dbstr($regexp['name']);
-		$db_regexp = DBfetch(DBselect($sql));
-		if ($db_regexp && bccomp($regexpId, $db_regexp['regexpid']) != 0) {
+		$dbRegexp = DBfetch(DBselect(
+			'SELECT re.regexpid '.
+			'FROM regexps re '.
+			'WHERE re.name='.zbx_dbstr($regexp['name']).
+				andDbNode('re.regexpid')
+		));
+		if ($dbRegexp && bccomp($regexpId, $dbRegexp['regexpid']) != 0) {
 			throw new Exception(_s('Regular expression "%s" already exists.', $regexp['name']));
 		}
 
@@ -103,6 +113,7 @@ function updateRegexp(array $regexp, array $expressions) {
 		error($e->getMessage());
 		return false;
 	}
+
 	return true;
 }
 
@@ -144,11 +155,13 @@ function rewriteRegexpExpressions($regexpId, array $expressions) {
 }
 
 function addRegexpExpressions($regexpId, array $expressions) {
-	$db_fields = array('expression' => null, 'expression_type' => null);
+	$dbFields = array('expression' => null, 'expression_type' => null);
+
 	foreach ($expressions as &$expression) {
-		if (!check_db_fields($db_fields, $expression)) {
+		if (!check_db_fields($dbFields, $expression)) {
 			throw new Exception(_('Incorrect arguments passed to function').' [add_expression]');
 		}
+
 		$expression['regexpid'] = $regexpId;
 	}
 	unset($expression);
@@ -160,6 +173,7 @@ function updateRegexpExpressions(array $expressions) {
 	foreach ($expressions as &$expression) {
 		$expressionId = $expression['expressionid'];
 		unset($expression['expressionid']);
+
 		DB::update('expressions', array(
 			'values' => $expression,
 			'where' => array('expressionid' => $expressionId)

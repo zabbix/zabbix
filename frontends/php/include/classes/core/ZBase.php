@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2012 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -94,6 +94,7 @@ class ZBase {
 		require_once $this->getRootDir().'/include/acknow.inc.php';
 		require_once $this->getRootDir().'/include/actions.inc.php';
 		require_once $this->getRootDir().'/include/discovery.inc.php';
+		require_once $this->getRootDir().'/include/draw.inc.php';
 		require_once $this->getRootDir().'/include/events.inc.php';
 		require_once $this->getRootDir().'/include/graphs.inc.php';
 		require_once $this->getRootDir().'/include/hosts.inc.php';
@@ -249,12 +250,8 @@ class ZBase {
 				return true;
 			}
 
-			$pathLength = strlen(__FILE__);
-
-			$pathLength -= 22;
-			$errfile = substr($errfile, $pathLength);
-
-			error($errstr.' ['.$errfile.':'.$errline.']');
+			// don't show the call to this handler function
+			error($errstr.' ['.CProfiler::getInstance()->formatCallStack().']');
 		}
 
 		set_error_handler('zbx_err_handler');

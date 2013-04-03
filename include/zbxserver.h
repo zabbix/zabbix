@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -9,7 +9,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -48,8 +48,8 @@
 
 int	evaluate_function(char *value, DB_ITEM *item, const char *function, const char *parameters, time_t now);
 
-int	substitute_simple_macros(DB_EVENT *event, zbx_uint64_t *hostid, DC_HOST *dc_host, DC_ITEM *dc_item,
-		DB_ESCALATION *escalation, char **data, int macro_type, char *error, int maxerrlen);
+int	substitute_simple_macros(DB_EVENT *event, zbx_uint64_t *userid, zbx_uint64_t *hostid, DC_HOST *dc_host,
+		DC_ITEM *dc_item, DB_ESCALATION *escalation, char **data, int macro_type, char *error, int maxerrlen);
 
 void	evaluate_expressions(zbx_vector_ptr_t *triggers);
 int	evaluate(double *value, char *exp, char *error, int maxerrlen);

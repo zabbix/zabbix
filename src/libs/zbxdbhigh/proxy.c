@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -9,7 +9,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -105,7 +105,7 @@ int	get_proxy_id(struct zbx_json_parse *jp, zbx_uint64_t *hostid, char *host, ch
 				"select hostid"
 				" from hosts"
 				" where host='%s'"
-					" and status in (%d)"
+					" and status=%d"
 					ZBX_SQL_NODE,
 				host_esc, HOST_STATUS_PROXY_ACTIVE, DBand_node_local("hostid"));
 
@@ -886,7 +886,8 @@ int	get_host_availability_data(struct zbx_json *j)
 	result = DBselect(
 			"select hostid,available,error,snmp_available,snmp_error,"
 				"ipmi_available,ipmi_error,jmx_available,jmx_error"
-			" from hosts");
+			" from hosts"
+			" where status=%d", HOST_STATUS_MONITORED);
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -1022,7 +1023,8 @@ void	process_host_availability(struct zbx_json_parse *jp)
 	const char		*p = NULL;
 	char			tmp[HOST_ERROR_LEN_MAX], *sql = NULL, *error_esc;
 	size_t			sql_alloc = 4 * ZBX_KIBIBYTE, sql_offset = 0, tmp_offset;
-	int			no_data;
+	int			no_data, item_type = -1;
+	unsigned char		available = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -1057,26 +1059,34 @@ void	process_host_availability(struct zbx_json_parse *jp)
 
 		if (SUCCEED == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_AVAILABLE, tmp, sizeof(tmp)))
 		{
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "available=%d,", atoi(tmp));
+			available = atoi(tmp);
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "available=%d,", available);
 			no_data = 0;
+			item_type = ITEM_TYPE_ZABBIX;
 		}
 
 		if (SUCCEED == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_SNMP_AVAILABLE, tmp, sizeof(tmp)))
 		{
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "snmp_available=%d,", atoi(tmp));
+			available = atoi(tmp);
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "snmp_available=%d,", available);
 			no_data = 0;
+			item_type = ITEM_TYPE_SNMPv1;
 		}
 
 		if (SUCCEED == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_IPMI_AVAILABLE, tmp, sizeof(tmp)))
 		{
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "ipmi_available=%d,", atoi(tmp));
+			available = atoi(tmp);
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "ipmi_available=%d,", available);
 			no_data = 0;
+			item_type = ITEM_TYPE_IPMI;
 		}
 
 		if (SUCCEED == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_JMX_AVAILABLE, tmp, sizeof(tmp)))
 		{
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "jmx_available=%d,", atoi(tmp));
+			available = atoi(tmp);
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "jmx_available=%d,", available);
 			no_data = 0;
+			item_type = ITEM_TYPE_JMX;
 		}
 
 		if (SUCCEED == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_ERROR, tmp, sizeof(tmp)))
@@ -1139,6 +1149,10 @@ void	process_host_availability(struct zbx_json_parse *jp)
 	DBcommit();
 
 	zbx_free(sql);
+
+	if (-1 != item_type)
+		DCconfig_update_host_availability(hostid, item_type, available, 0, 0);
+
 exit:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
@@ -1575,11 +1589,23 @@ void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid,
 		if (0 == proxy_hostid && ITEM_TYPE_TRAPPER != items[i].type && ITEM_TYPE_ZABBIX_ACTIVE != items[i].type)
 			continue;
 
-		if (ITEM_TYPE_TRAPPER == items[i].type && 0 == proxy_hostid &&
-				FAIL == zbx_tcp_check_security(sock, items[i].trapper_hosts, 1))
+		if (ITEM_TYPE_TRAPPER == items[i].type && 0 == proxy_hostid)
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "process data failed: %s", zbx_tcp_strerror());
-			continue;
+			int	security_check;
+			char	*allowed_hosts;
+
+			allowed_hosts = zbx_strdup(NULL, items[i].trapper_hosts);
+			substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i], NULL, &allowed_hosts,
+					MACRO_TYPE_PARAMS_FIELD, NULL, 0);
+			security_check = zbx_tcp_check_security(sock, allowed_hosts, 1);
+			zbx_free(allowed_hosts);
+
+			if (FAIL == security_check)
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "cannot process trapper item \"%s\": %s",
+						items[i].key_orig, zbx_tcp_strerror());
+				continue;
+			}
 		}
 
 		if (ITEM_STATUS_NOTSUPPORTED == values[i].status || 0 == strcmp(values[i].value, ZBX_NOTSUPPORTED))

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -9,7 +9,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -59,20 +59,13 @@
 .iconclose		{ background-image: url('../images/general/bttn/close.png'); }
 .iconmove		{ background-image: url('../images/general/bttn/move.png'); cursor: move; }
 
-.filterclosed{
+.icon-plus-9x9, .filterclosed	{ background-image: url('../images/general/plus.png'); }
+.icon-minus-9x9, .filteropened	{ background-image: url('../images/general/minus.png'); }
+.icon-plus-9x9, .filterclosed, .icon-minus-9x9, .filteropened {
 	height: 9px;
 	width: 9px;
-	background-image: url('../images/general/plus.png');
-	background-repeat:no-repeat;
-	cursor:pointer;
-}
-
-.filteropened {
-	height: 9px;
-	width: 9px;
-	background: url('../images/general/minus.png') no-repeat;
-	cursor:pointer;
-	margin: 0 1px;
+	background-repeat: no-repeat;
+	cursor: pointer;
 }
 
 .status_icon {

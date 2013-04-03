@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -10,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -63,7 +63,7 @@ foreach ($data['discoveries'] as $discovery) {
 	if ($discovery['templateid']) {
 		$template_host = get_realhost_by_itemid($discovery['templateid']);
 		$description[] = new CLink($template_host['name'], '?hostid='.$template_host['hostid'], 'unknown');
-		$description[] = ': ';
+		$description[] = NAME_DELIMITER;
 	}
 	$discovery['name_expanded'] = itemName($discovery);
 	$description[] = new CLink($discovery['name_expanded'], '?form=update&itemid='.$discovery['itemid']);

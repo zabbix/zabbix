@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2012 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -10,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -599,6 +599,16 @@ function DBfetch($cursor, $convertNulls = true) {
 			if (!$result = db2_fetch_assoc($cursor)) {
 				db2_free_result($cursor);
 			}
+			else {
+				// cast all of the values to string to be consistent with other DB drivers: all of them return
+				// only strings.
+				foreach ($result as &$value) {
+					if ($value !== null) {
+						$value = (string) $value;
+					}
+				}
+				unset($value);
+			}
 			break;
 		case ZBX_DB_SQLITE3:
 			if ($DB['TRANSACTIONS'] == 0) {
@@ -1005,7 +1015,7 @@ function dbConditionInt($fieldName, array $values, $notIn = false) {
 	while (false !== ($valueR = next($values))) {
 		$valueL = bcadd($valueL, 1, 0);
 
-		if ($valueR != $valueL) {
+		if (bccomp($valueR, $valueL) != 0) {
 			if ($len >= $MIN_NUM_BETWEEN) {
 				$betweens[] = array(bcsub($valueL, $len, 0), bcsub($valueL, 1, 0));
 			}

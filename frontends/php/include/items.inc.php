@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2012 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -230,7 +230,7 @@ function update_item_status($itemids, $status) {
 			if ($result) {
 				$host = get_host_by_hostid($item['hostid']);
 				$item_new = get_item_by_itemid($item['itemid']);
-				add_audit_ext(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ITEM, $item['itemid'], $host['host'].':'.$item['name'], 'items', $item, $item_new);
+				add_audit_ext(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ITEM, $item['itemid'], $host['host'].NAME_DELIMITER.$item['name'], 'items', $item, $item_new);
 			}
 		}
 	}
@@ -712,7 +712,7 @@ function get_items_data_overview($hostids, $application, $view_style) {
 	$items = array();
 	while ($row = DBfetch($db_items)) {
 		$descr = itemName($row);
-		$row['hostname'] = get_node_name_by_elid($row['hostid'], null, ': ').$row['hostname'];
+		$row['hostname'] = get_node_name_by_elid($row['hostid'], null, NAME_DELIMITER).$row['hostname'];
 		$hostnames[$row['hostid']] = $row['hostname'];
 
 		// a little tricky check for attempt to overwrite active trigger (value=1) with
@@ -926,17 +926,18 @@ function delete_trends_by_itemid($itemIds) {
  * First format the value according to the configuration of the item. Then apply the value mapping to the formatted (!)
  * value.
  *
- * @param type $item
- * @param int $item['value_type'] type of the value: ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64, ...
- * @param mixed $item['lastvalue'] value of item
- * @param mixed $item['lastclock'] time when last value had stored
- * @param string $item['units'] units of item
- * @param int $item['valuemapid'] id of mapping set of values
- * @param string $unknownString the text to be used if the item has no data
+ * @param type      $item
+ * @param int       $item['value_type']     type of the value: ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64, ...
+ * @param mixed     $item['lastvalue']      value of item
+ * @param mixed     $item['lastclock']      time when last value had stored
+ * @param string    $item['units']          units of item
+ * @param int       $item['valuemapid']     id of mapping set of values
+ * @param string    $unknownString          the text to be used if the item has no data
+ * @param bool		$ellipsis		        text will be cutted and ellipsis "..." added if set to true
  *
  * @return string
  */
-function formatItemLastValue(array $item, $unknownString = '-') {
+function formatItemLastValue(array $item, $unknownString = '-', $ellipsis = true) {
 	if (!isset($item['lastvalue']) || $item['lastclock'] == 0) {
 		return $unknownString;
 	}
@@ -950,7 +951,7 @@ function formatItemLastValue(array $item, $unknownString = '-') {
 			// break; is not missing here
 		case ITEM_VALUE_TYPE_TEXT:
 		case ITEM_VALUE_TYPE_LOG:
-			if (zbx_strlen($value) > 20) {
+			if ($ellipsis && zbx_strlen($value) > 20) {
 				$value = zbx_substr($value, 0, 20).'...';
 			}
 			$value = nbsp(htmlspecialchars($value));
@@ -974,12 +975,11 @@ function formatItemLastValue(array $item, $unknownString = '-') {
  * @param type $item['itemid'] id of item
  * @param type $item['units'] units of item
  * @param type $function function to apply to time period from param, allowed: min, max and avg
- * @param type $param formated parameter for function, example: "2w" meaning 2 weeks
+ * @param type $param formatted parameter for function, example: "2w" meaning 2 weeks
  *
  * @return string item functional value from history
  */
 function getItemFunctionalValue($item, $function, $param) {
-
 	// check wether function is allowed
 	if (!in_array($function, array('min', 'max', 'avg'))) {
 		return UNRESOLVED_MACRO_STRING;

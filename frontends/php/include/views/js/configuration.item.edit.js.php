@@ -9,12 +9,20 @@
 
 	function displayNewDeleyFlexInterval() {
 		// delay_flex_visible is in massupdate, no delay_flex_visible in items
-		if ((jQuery('#delay_flex_visible').length == 0 || jQuery('#delay_flex_visible').is(':checked'))
-				&& jQuery('#delayFlexTable tr').length <= 7) {
-			jQuery('#row_new_delay_flex').css('display', 'block');
+		if (jQuery('#delay_flex_visible').length == 0 || jQuery('#delay_flex_visible').is(':checked')) {
+			jQuery('#row_new_delay_flex').show();
 		}
 		else {
-			jQuery('#row_new_delay_flex').css('display', 'none');
+			jQuery('#row_new_delay_flex').hide();
+		}
+
+		if (jQuery('#delayFlexTable tr').length <= 7) {
+			jQuery('#row-new-delay-flex-fields').show();
+			jQuery('#row-new-delay-flex-max-reached').hide();
+		}
+		else {
+			jQuery('#row-new-delay-flex-fields').hide();
+			jQuery('#row-new-delay-flex-max-reached').show();
 		}
 	}
 
@@ -122,7 +130,8 @@
 	}
 
 	function setAuthTypeLabel() {
-		if (jQuery('#authtype').val() == 1) {
+		if (jQuery('#authtype').val() == <?php echo CJs::encodeJson(ITEM_AUTHTYPE_PUBLICKEY); ?>
+				&& jQuery('#type').val() == <?php echo CJs::encodeJson(ITEM_TYPE_SSH); ?>) {
 			jQuery('#row_password label').html(<?php echo CJs::encodeJson(_('Key passphrase')); ?>);
 		}
 		else {
@@ -159,16 +168,12 @@
 			multpStat.onclick();
 		}
 
-		var maxReached = <?php echo $this->data['maxReached'] ? 'true' : 'false'; ?>;
-		if (maxReached) {
-			jQuery('#row_new_delay_flex').css('display', 'none');
-		}
-
 		jQuery('#type')
 			.change(function() {
 				// update the interface select with each item type change
 				organizeInterfaces(itemTypeInterface(parseInt(jQuery(this).val())));
 				displayKeyButton();
+				setAuthTypeLabel();
 			})
 			.trigger('change');
 		jQuery('#type_visible, #interface_visible').click(function() {
@@ -185,7 +190,6 @@
 		jQuery('#authtype').bind('change', function() {
 			setAuthTypeLabel();
 		});
-		setAuthTypeLabel();
 
 		// mass update page
 		if (jQuery('#delay_flex_visible').length != 0) {
@@ -205,5 +209,11 @@
 		jQuery('#privprotocol_visible').one('click', function() {
 			jQuery('#privprotocol_div').buttonset();
 		});
+
+		var maxReached = <?php echo $this->data['maxReached'] ? 'true' : 'false'; ?>;
+		if (maxReached) {
+			jQuery('#row-new-delay-flex-fields').hide();
+			jQuery('#row-new-delay-flex-max-reached').show();
+		}
 	});
 </script>

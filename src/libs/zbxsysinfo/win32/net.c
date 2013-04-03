@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -9,7 +9,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -21,6 +21,33 @@
 #include "sysinfo.h"
 #include "log.h"
 #include "zbxjson.h"
+
+/*
+ * returns interface description encoded in UTF-8 format
+ */
+static LPSTR	get_if_description(MIB_IFROW *pIfRow)
+{
+	static LPTSTR	(*mb_to_unicode)(LPCSTR) = NULL;
+	LPTSTR		wdescr;
+	LPSTR		utf8_descr;
+
+	if (NULL == mb_to_unicode)
+	{
+		OSVERSIONINFO	version_info = {sizeof(OSVERSIONINFO)};
+
+		/* starting with Windows Vista (Windows Server 2008) the interface description */
+		/* is encoded in OEM codepage while earlier versions used ANSI codepage */
+		if (TRUE == GetVersionEx(&version_info) && 6 <= version_info.dwMajorVersion)
+			mb_to_unicode = zbx_oemcp_to_unicode;
+		else
+			mb_to_unicode = zbx_acp_to_unicode;
+	}
+	wdescr = mb_to_unicode(pIfRow->bDescr);
+	utf8_descr = zbx_unicode_to_utf8(wdescr);
+	zbx_free(wdescr);
+
+	return utf8_descr;
+}
 
 /*
  * returns interface statistics by IP address or interface name
@@ -72,7 +99,6 @@ static int	get_if_stats(const char *if_name, MIB_IFROW *pIfRow)
 
 	for (i = 0; i < pIfTable->dwNumEntries; i++)
 	{
-		LPTSTR	wdescr;
 		LPSTR	utf8_descr;
 
 		pIfRow->dwIndex = pIfTable->table[i].dwIndex;
@@ -83,12 +109,10 @@ static int	get_if_stats(const char *if_name, MIB_IFROW *pIfRow)
 			continue;
 		}
 
-		wdescr = zbx_acp_to_unicode(pIfRow->bDescr);
-		utf8_descr = zbx_unicode_to_utf8(wdescr);
+		utf8_descr = get_if_description(pIfRow);
 		if (0 == strcmp(if_name, utf8_descr))
 			ret = SUCCEED;
 		zbx_free(utf8_descr);
-		zbx_free(wdescr);
 
 		if (SUCCEED == ret)
 			break;
@@ -117,126 +141,102 @@ clean:
 	return ret;
 }
 
-int	NET_IF_IN(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+int	NET_IF_IN(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	char		if_name[MAX_STRING_LEN], mode[32];
+	char		*if_name, *mode;
 	MIB_IFROW	pIfRow;
 
-	if (num_param(param) > 2)
+	if (2 < request->nparam)
 		return SYSINFO_RET_FAIL;
 
-	if (0 != get_param(param, 1, if_name, sizeof(if_name)))
-		return SYSINFO_RET_FAIL;
+	if_name = get_rparam(request, 0);
+	mode = get_rparam(request, 1);
 
-	if (0 != get_param(param, 2, mode, sizeof(mode)))
-		*mode = '\0';
+	if (NULL == if_name || '\0' == *if_name)
+		return SYSINFO_RET_FAIL;
 
 	if (FAIL == get_if_stats(if_name, &pIfRow))
 		return SYSINFO_RET_FAIL;
 
-	if ('\0' == *mode || 0 == strcmp(mode, "bytes"))	/* default parameter */
-	{
+	if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "bytes"))	/* default parameter */
 		SET_UI64_RESULT(result, pIfRow.dwInOctets);
-	}
 	else if (0 == strcmp(mode, "packets"))
-	{
 		SET_UI64_RESULT(result, pIfRow.dwInUcastPkts + pIfRow.dwInNUcastPkts);
-	}
 	else if (0 == strcmp(mode, "errors"))
-	{
 		SET_UI64_RESULT(result, pIfRow.dwInErrors);
-	}
 	else if (0 == strcmp(mode, "dropped"))
-	{
 		SET_UI64_RESULT(result, pIfRow.dwInDiscards + pIfRow.dwInUnknownProtos);
-	}
 	else
 		return SYSINFO_RET_FAIL;
 
 	return SYSINFO_RET_OK;
 }
 
-int	NET_IF_OUT(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+int	NET_IF_OUT(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	char		if_name[MAX_STRING_LEN], mode[32];
+	char		*if_name, *mode;
 	MIB_IFROW	pIfRow;
 
-	if (num_param(param) > 2)
+	if (2 < request->nparam)
 		return SYSINFO_RET_FAIL;
 
-	if (0 != get_param(param, 1, if_name, sizeof(if_name)))
-		return SYSINFO_RET_FAIL;
+	if_name = get_rparam(request, 0);
+	mode = get_rparam(request, 1);
 
-	if (0 != get_param(param, 2, mode, sizeof(mode)))
-		*mode = '\0';
+	if (NULL == if_name || '\0' == *if_name)
+		return SYSINFO_RET_FAIL;
 
 	if (FAIL == get_if_stats(if_name, &pIfRow))
 		return SYSINFO_RET_FAIL;
 
-	if ('\0' == *mode || 0 == strcmp(mode, "bytes"))	/* default parameter */
-	{
+	if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "bytes"))	/* default parameter */
 		SET_UI64_RESULT(result, pIfRow.dwOutOctets);
-	}
 	else if (0 == strcmp(mode, "packets"))
-	{
 		SET_UI64_RESULT(result, pIfRow.dwOutUcastPkts + pIfRow.dwOutNUcastPkts);
-	}
 	else if (0 == strcmp(mode, "errors"))
-	{
 		SET_UI64_RESULT(result, pIfRow.dwOutErrors);
-	}
 	else if (0 == strcmp(mode, "dropped"))
-	{
 		SET_UI64_RESULT(result, pIfRow.dwOutDiscards);
-	}
 	else
 		return SYSINFO_RET_FAIL;
 
 	return SYSINFO_RET_OK;
 }
 
-int	NET_IF_TOTAL(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+int	NET_IF_TOTAL(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	char		if_name[MAX_STRING_LEN], mode[32];
+	char		*if_name, *mode;
 	MIB_IFROW	pIfRow;
 
-	if (num_param(param) > 2)
+	if (2 < request->nparam)
 		return SYSINFO_RET_FAIL;
 
-	if (0 != get_param(param, 1, if_name, sizeof(if_name)))
-		return SYSINFO_RET_FAIL;
+	if_name = get_rparam(request, 0);
+	mode = get_rparam(request, 1);
 
-	if (0 != get_param(param, 2, mode, sizeof(mode)))
-		*mode = '\0';
+	if (NULL == if_name || '\0' == *if_name)
+		return SYSINFO_RET_FAIL;
 
 	if (FAIL == get_if_stats(if_name, &pIfRow))
 		return SYSINFO_RET_FAIL;
 
-	if ('\0' == *mode || 0 == strcmp(mode, "bytes"))	/* default parameter */
-	{
+	if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "bytes"))	/* default parameter */
 		SET_UI64_RESULT(result, pIfRow.dwInOctets + pIfRow.dwOutOctets);
-	}
 	else if (0 == strcmp(mode, "packets"))
-	{
 		SET_UI64_RESULT(result, pIfRow.dwInUcastPkts + pIfRow.dwInNUcastPkts +
 				pIfRow.dwOutUcastPkts + pIfRow.dwOutNUcastPkts);
-	}
 	else if (0 == strcmp(mode, "errors"))
-	{
 		SET_UI64_RESULT(result, pIfRow.dwInErrors + pIfRow.dwOutErrors);
-	}
 	else if (0 == strcmp(mode, "dropped"))
-	{
 		SET_UI64_RESULT(result, pIfRow.dwInDiscards + pIfRow.dwInUnknownProtos +
 				pIfRow.dwOutDiscards);
-	}
 	else
 		return SYSINFO_RET_FAIL;
 
 	return SYSINFO_RET_OK;
 }
 
-int	NET_IF_DISCOVERY(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+int	NET_IF_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	DWORD		dwSize, dwRetVal, i;
 	int		ret = SYSINFO_RET_FAIL;
@@ -244,7 +244,6 @@ int	NET_IF_DISCOVERY(const char *cmd, const char *param, unsigned flags, AGENT_R
 	MIB_IFTABLE	*pIfTable = NULL;
 	MIB_IFROW	pIfRow;
 	struct zbx_json	j;
-	LPTSTR		wdescr;
 	LPSTR		utf8_descr;
 
 	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
@@ -279,11 +278,9 @@ int	NET_IF_DISCOVERY(const char *cmd, const char *param, unsigned flags, AGENT_R
 
 		zbx_json_addobject(&j, NULL);
 
-		wdescr = zbx_acp_to_unicode(pIfRow.bDescr);
-		utf8_descr = zbx_unicode_to_utf8(wdescr);
+		utf8_descr = get_if_description(&pIfRow);
 		zbx_json_addstring(&j, "{#IFNAME}", utf8_descr, ZBX_JSON_TYPE_STRING);
 		zbx_free(utf8_descr);
-		zbx_free(wdescr);
 
 		zbx_json_close(&j);
 	}
@@ -328,7 +325,7 @@ static char	*get_if_adminstatus_string(DWORD status)
 	}
 }
 
-int	NET_IF_LIST(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+int	NET_IF_LIST(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	DWORD		dwSize, dwRetVal, i, j;
 	char		*buf = NULL;
@@ -381,7 +378,6 @@ int	NET_IF_LIST(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 	{
 		for (i = 0; i < (int)pIfTable->dwNumEntries; i++)
 		{
-			LPTSTR	wdescr;
 			LPSTR	utf8_descr;
 
 			pIfRow.dwIndex = pIfTable->table[i].dwIndex;
@@ -410,11 +406,9 @@ int	NET_IF_LIST(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 			if (j == pIPAddrTable->dwNumEntries)
 				zbx_strcpy_alloc(&buf, &buf_alloc, &buf_offset, " -");
 
-			wdescr = zbx_acp_to_unicode(pIfRow.bDescr);
-			utf8_descr = zbx_unicode_to_utf8(wdescr);
+			utf8_descr = get_if_description(&pIfRow);
 			zbx_snprintf_alloc(&buf, &buf_alloc, &buf_offset, " %s\n", utf8_descr);
 			zbx_free(utf8_descr);
-			zbx_free(wdescr);
 		}
 	}
 
@@ -428,25 +422,20 @@ clean:
 	return ret;
 }
 
-int	NET_TCP_LISTEN(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+int	NET_TCP_LISTEN(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	MIB_TCPTABLE	*pTcpTable = NULL;
 	DWORD		dwSize, dwRetVal;
 	int		i, ret = SYSINFO_RET_FAIL;
 	unsigned short	port;
-	char		tmp[8];
+	char		*port_str;
 
-	assert(result);
-
-	init_result(result);
-
-	if (num_param(param) > 1)
+	if (1 < request->nparam)
 		return SYSINFO_RET_FAIL;
 
-	if (0 != get_param(param, 1, tmp, sizeof(tmp)))
-		return SYSINFO_RET_FAIL;
+	port_str = get_rparam(request, 0);
 
-	if (SUCCEED != is_ushort(tmp, &port))
+	if (NULL == port_str || SUCCEED != is_ushort(port_str, &port))
 		return SYSINFO_RET_FAIL;
 
 	dwSize = sizeof(MIB_TCPTABLE);

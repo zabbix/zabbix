@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2012 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -119,8 +119,8 @@ function get_service_status_of_trigger($triggerid) {
  * Add color style and blinking to an object like CSpan or CDiv depending on trigger status
  * Settings and colors are kept in 'config' database table
  *
- * @param mixed $object object like CSpan, CDiv, etc.
- * @param int $triggerValue TRIGGER_VALUE_FALSE, TRIGGER_VALUE_TRUE or TRIGGER_VALUE_UNKNOWN
+ * @param mixed $object             object like CSpan, CDiv, etc.
+ * @param int $triggerValue         TRIGGER_VALUE_FALSE or TRIGGER_VALUE_TRUE
  * @param int $triggerLastChange
  * @param bool $isAcknowledged
  * @return void
@@ -164,7 +164,6 @@ function addTriggerValueStyle($object, $triggerValue, $triggerLastChange, $isAck
 function trigger_value2str($value) {
 	$str_val[TRIGGER_VALUE_FALSE] = _('OK');
 	$str_val[TRIGGER_VALUE_TRUE] = _('PROBLEM');
-	$str_val[TRIGGER_VALUE_UNKNOWN] = _('UNKNOWN');
 
 	if (isset($str_val[$value])) {
 		return $str_val[$value];
@@ -1006,58 +1005,9 @@ function updateTriggerValueToUnknownByHostId($hostids) {
 			),
 			'where' => array('triggerid' => $triggerids)
 		));
-
-		addUnknownEvent($triggerids);
 	}
 
 	return true;
-}
-
-/**
- * Create unknown type event for given triggers.
- *
- * @param int|array $triggerids triggers to whom add unknown type event
- *
- * @return array returns created event ids
- */
-function addUnknownEvent($triggerids) {
-	zbx_value2array($triggerids);
-
-	$triggers = API::Trigger()->get(array(
-		'triggerids' => $triggerids,
-		'output' => array('value'),
-		'preservekeys' => true
-	));
-
-	$eventids = array();
-	foreach ($triggerids as $triggerid) {
-		$event = array(
-			'source' => EVENT_SOURCE_TRIGGERS,
-			'object' => EVENT_OBJECT_TRIGGER,
-			'objectid' => $triggerid,
-			'clock' => time(),
-			'value' => TRIGGER_VALUE_UNKNOWN,
-			'acknowledged' => 0
-		);
-
-		// check if trigger exist in DB
-		if (isset($triggers[$event['objectid']])) {
-			if ($event['value'] != $triggers[$event['objectid']]['value']) {
-				$eventid = get_dbid('events', 'eventid');
-
-				$sql = 'INSERT INTO events (eventid,source,object,objectid,clock,value,acknowledged) '.
-						'VALUES ('.$eventid.','.$event['source'].','.$event['object'].','.$event['objectid'].','.
-									$event['clock'].','.$event['value'].','.$event['acknowledged'].')';
-				if (!DBexecute($sql)) {
-					throw new Exception();
-				}
-
-				$eventids[$eventid] = $eventid;
-			}
-		}
-	}
-
-	return $eventids;
 }
 
 function check_right_on_trigger_by_expression($permission, $expression) {
@@ -1166,7 +1116,7 @@ function get_triggers_overview($hostids, $application, $view_style = null, $scre
 	foreach ($dbTriggers as $trigger) {
 		$trigger['host'] = $trigger['hosts'][0]['name'];
 		$trigger['hostid'] = $trigger['hosts'][0]['hostid'];
-		$trigger['host'] = get_node_name_by_elid($trigger['hostid'], null, ': ').$trigger['host'];
+		$trigger['host'] = get_node_name_by_elid($trigger['hostid'], null, NAME_DELIMITER).$trigger['host'];
 		$trigger['description'] = CMacrosResolverHelper::resolveTriggerReference($trigger['expression'], $trigger['description']);
 
 		$hostNames[$trigger['hostid']] = $trigger['host'];
@@ -1260,8 +1210,8 @@ function get_trigger_overview_cells($triggerHosts, $hostName, $screenId = null) 
 	$config = select_config(); // for how long triggers should blink on status change (set by user in administration->general)
 
 	if (isset($triggerHosts[$hostName])) {
-		switch ($triggerHosts[$hostName]['value']) {
-			case TRIGGER_VALUE_TRUE:
+		// problem trigger
+		if ($triggerHosts[$hostName]['value'] == TRIGGER_VALUE_TRUE) {
 				$css_class = getSeverityStyle($triggerHosts[$hostName]['priority']);
 				$ack = null;
 
@@ -1281,19 +1231,12 @@ function get_trigger_overview_cells($triggerHosts, $hostName, $screenId = null) 
 						}
 					}
 				}
-				break;
-			case TRIGGER_VALUE_FALSE:
-				$css_class = 'normal';
-				break;
-			default:
-				$css_class = 'trigger_unknown';
+		}
+		// ok trigger
+		else {
+			$css_class = 'normal';
 		}
 		$style = 'cursor: pointer; ';
-
-		// set blinking gif as background if trigger age is less then $config['blink_period']
-		if ($config['blink_period'] > 0 && time() - $triggerHosts[$hostName]['lastchange'] < $config['blink_period']) {
-			$style .= 'background-image: url(images/gradients/blink.gif); background-position: top left; background-repeat: repeat;';
-		}
 
 		unset($item_menu);
 		$tr_ov_menu = array(
@@ -1371,7 +1314,7 @@ function get_trigger_overview_cells($triggerHosts, $hostName, $screenId = null) 
 
 		$dep_table = new CTableInfo();
 		$dep_table->setAttribute('style', 'width: 200px;');
-		$dep_table->addRow(bold(_('Depends on').':'));
+		$dep_table->addRow(bold(_('Depends on').NAME_DELIMITER));
 
 		$dependency = false;
 		$dep_res = DBselect('SELECT td.* FROM trigger_depends td WHERE td.triggerid_down='.$triggerid);
@@ -1391,7 +1334,7 @@ function get_trigger_overview_cells($triggerHosts, $hostName, $screenId = null) 
 		// triggers that depend on this
 		$dep_table = new CTableInfo();
 		$dep_table->setAttribute('style', 'width: 200px;');
-		$dep_table->addRow(bold(_('Dependent').':'));
+		$dep_table->addRow(bold(_('Dependent').NAME_DELIMITER));
 
 		$dependency = false;
 		$dep_res = DBselect('SELECT td.* FROM trigger_depends td WHERE td.triggerid_up='.$triggerid);
@@ -1415,8 +1358,15 @@ function get_trigger_overview_cells($triggerHosts, $hostName, $screenId = null) 
 	else {
 		$tableColumn = new CCol(SPACE, $css_class.' hosts');
 	}
+
 	if (isset($style)) {
 		$tableColumn->setAttribute('style', $style);
+	}
+
+	if (isset($triggerHosts[$hostName]) && $config['blink_period'] > 0
+		&& time() - $triggerHosts[$hostName]['lastchange'] < $config['blink_period']) {
+		$tableColumn->addClass('blink');
+		$tableColumn->setAttribute('data-toggle-class', $css_class);
 	}
 
 	if (isset($tr_ov_menu)) {
@@ -1430,7 +1380,7 @@ function get_trigger_overview_cells($triggerHosts, $hostName, $screenId = null) 
 }
 
 function calculate_availability($triggerid, $period_start, $period_end) {
-	$start_value = -1;
+	$start_value = TRIGGER_VALUE_FALSE;
 	if ($period_start > 0 && $period_start <= time()) {
 		$sql = 'SELECT e.eventid,e.value'.
 				' FROM events e'.
@@ -1470,10 +1420,8 @@ function calculate_availability($triggerid, $period_start, $period_end) {
 		else {
 			$ret['true_time'] = 0;
 			$ret['false_time'] = 0;
-			$ret['unknown_time'] = 0;
 			$ret['true'] = (TRIGGER_VALUE_TRUE == $start_value) ? 100 : 0;
 			$ret['false'] = (TRIGGER_VALUE_FALSE == $start_value) ? 100 : 0;
-			$ret['unknown'] = (TRIGGER_VALUE_UNKNOWN == $start_value || -1 == $start_value) ? 100 : 0;
 			return $ret;
 		}
 	}
@@ -1481,7 +1429,6 @@ function calculate_availability($triggerid, $period_start, $period_end) {
 	$state = $start_value;
 	$true_time = 0;
 	$false_time = 0;
-	$unknown_time = 0;
 	$time = $min;
 	if ($period_start == 0 && $period_end == 0) {
 		$max = time();
@@ -1506,28 +1453,12 @@ function calculate_availability($triggerid, $period_start, $period_end) {
 		$diff = $clock - $time;
 		$time = $clock;
 
-		if ($state == -1) {
-			$state = $value;
-			if ($state == 0) {
-				$false_time += $diff;
-			}
-			if ($state == 1) {
-				$true_time += $diff;
-			}
-			if ($state == 2) {
-				$unknown_time += $diff;
-			}
-		}
-		elseif ($state == 0) {
+		if ($state == 0) {
 			$false_time += $diff;
 			$state = $value;
 		}
 		elseif ($state == 1) {
 			$true_time += $diff;
-			$state = $value;
-		}
-		elseif ($state == 2) {
-			$unknown_time += $diff;
 			$state = $value;
 		}
 		$rows++;
@@ -1544,26 +1475,19 @@ function calculate_availability($triggerid, $period_start, $period_end) {
 	elseif ($state == TRIGGER_VALUE_TRUE) {
 		$true_time = $true_time + $period_end - $time;
 	}
-	elseif ($state == TRIGGER_VALUE_UNKNOWN) {
-		$unknown_time = $unknown_time + $period_end - $time;
-	}
-	$total_time = $true_time + $false_time + $unknown_time;
+	$total_time = $true_time + $false_time;
 
 	if ($total_time == 0) {
 		$ret['true_time'] = 0;
 		$ret['false_time'] = 0;
-		$ret['unknown_time'] = 0;
 		$ret['true'] = 0;
 		$ret['false'] = 0;
-		$ret['unknown'] = 100;
 	}
 	else {
 		$ret['true_time'] = $true_time;
 		$ret['false_time'] = $false_time;
-		$ret['unknown_time'] = $unknown_time;
 		$ret['true'] = (100 * $true_time) / $total_time;
 		$ret['false'] = (100 * $false_time) / $total_time;
-		$ret['unknown'] = (100 * $unknown_time) / $total_time;
 	}
 
 	return $ret;
@@ -1771,7 +1695,6 @@ function expressionHighLevelErrors($expression) {
 
 	if (!isset($errors)) {
 		$definedErrorPhrases = array(
-			EXPRESSION_VALUE_TYPE_UNKNOWN => _('Unknown variable type, testing not available'),
 			EXPRESSION_HOST_UNKNOWN => _('Unknown host, no such host present in system'),
 			EXPRESSION_HOST_ITEM_UNKNOWN => _('Unknown host item, no such item in selected host'),
 			EXPRESSION_NOT_A_MACRO_ERROR => _('Given expression is not a macro'),
@@ -2251,6 +2174,7 @@ function get_item_function_info($expr) {
 	);
 
 	$function_info = array(
+		'band' =>	    array('value_type' => _('Numeric (integer 64bit)'),	'type' => T_ZBX_INT, 'validation' => NOT_EMPTY),
 		'abschange' =>	array('value_type' => $value_type,	'type' => $type_of_value_type,	'validation' => NOT_EMPTY),
 		'avg' =>		array('value_type' => $value_type,	'type' => $type_of_value_type,	'validation' => NOT_EMPTY),
 		'change' =>		array('value_type' => $value_type,	'type' => $type_of_value_type,	'validation' => NOT_EMPTY),
@@ -2307,42 +2231,39 @@ function get_item_function_info($expr) {
 				'templated_hosts' => true
 			));
 
-			if (empty($hostFound)) {
+			if (!$hostFound) {
 				return EXPRESSION_HOST_UNKNOWN;
 			}
 
 			$itemFound = API::Item()->get(array(
+				'output' => array('value_type'),
 				'hostids' => zbx_objectValues($hostFound, 'hostid'),
 				'filter' => array(
 					'key_' => array($exprPart['item']),
-					'flags' => array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED, ZBX_FLAG_DISCOVERY_CHILD)
 				),
 				'webitems' => true
 			));
-			if (empty($itemFound)) {
-				return EXPRESSION_HOST_ITEM_UNKNOWN;
+
+			if (!$itemFound) {
+				$itemFound = API::ItemPrototype()->get(array(
+					'output' => array('value_type'),
+					'hostids' => zbx_objectValues($hostFound, 'hostid'),
+					'filter' => array(
+						'key_' => array($exprPart['item']),
+					)
+				));
+
+				if (!$itemFound) {
+					return EXPRESSION_HOST_ITEM_UNKNOWN;
+				}
 			}
 
+			$itemFound = reset($itemFound);
 			$result = $function_info[$exprPart['functionName']];
 
 			if (is_array($result['value_type'])) {
-				$value_type = null;
-				$item_data = API::Item()->get(array(
-					'itemids' => zbx_objectValues($itemFound, 'itemid'),
-					'output' => API_OUTPUT_EXTEND,
-					'webitems' => true
-				));
-
-				if ($item_data = reset($item_data)) {
-					$value_type = $item_data['value_type'];
-				}
-
-				if ($value_type == null) {
-					return EXPRESSION_VALUE_TYPE_UNKNOWN;
-				}
-
-				$result['value_type'] = $result['value_type'][$value_type];
-				$result['type'] = $result['type'][$value_type];
+				$result['value_type'] = $result['value_type'][$itemFound['value_type']];
+				$result['type'] = $result['type'][$itemFound['value_type']];
 
 				if ($result['type'] == T_ZBX_INT || $result['type'] == T_ZBX_DBL) {
 					$result['type'] = T_ZBX_STR;

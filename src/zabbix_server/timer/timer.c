@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -9,7 +9,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -77,9 +77,8 @@ static void	process_time_functions()
 		trigger = (DC_TRIGGER *)trigger_order.values[i];
 
 		if (SUCCEED == DBget_trigger_update_sql(&sql, &sql_alloc, &sql_offset, trigger->triggerid,
-				trigger->type, trigger->value, trigger->value_flags, trigger->error,
-				trigger->new_value, trigger->new_error, &trigger->timespec, &trigger->add_event,
-				&trigger->value_changed))
+				trigger->type, trigger->value, trigger->value_flags, trigger->error, trigger->lastchange,
+				trigger->new_value, trigger->new_error, trigger->timespec.sec, &trigger->add_event))
 		{
 			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
 
@@ -114,7 +113,7 @@ static void	process_time_functions()
 				continue;
 
 			process_event(eventid++, EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, trigger->triggerid,
-					&trigger->timespec, trigger->new_value, trigger->value_changed, 0, 0);
+					&trigger->timespec, trigger->new_value, 0);
 		}
 	}
 
@@ -338,7 +337,7 @@ static void	get_trigger_values(zbx_uint64_t triggerid, int maintenance_from, int
 			EVENT_OBJECT_TRIGGER,
 			triggerid,
 			maintenance_to,
-			TRIGGER_VALUE_FALSE, TRIGGER_VALUE_TRUE);
+			TRIGGER_VALUE_OK, TRIGGER_VALUE_PROBLEM);
 
 	result = DBselectN(sql, 1);
 
@@ -376,7 +375,7 @@ static void	get_trigger_values(zbx_uint64_t triggerid, int maintenance_from, int
 			EVENT_OBJECT_TRIGGER,
 			triggerid,
 			maintenance_from,
-			TRIGGER_VALUE_FALSE, TRIGGER_VALUE_TRUE);
+			TRIGGER_VALUE_OK, TRIGGER_VALUE_PROBLEM);
 
 	result = DBselectN(sql, 1);
 
@@ -406,7 +405,7 @@ static void	get_trigger_values(zbx_uint64_t triggerid, int maintenance_from, int
 			EVENT_OBJECT_TRIGGER,
 			triggerid,
 			maintenance_from, maintenance_to - 1,
-			*value_after == TRIGGER_VALUE_FALSE ? TRIGGER_VALUE_TRUE : TRIGGER_VALUE_FALSE);
+			*value_after == TRIGGER_VALUE_OK ? TRIGGER_VALUE_PROBLEM : TRIGGER_VALUE_OK);
 
 	if (NULL != (row = DBfetch(result)))
 		*value_inside = atoi(row[0]);
@@ -493,7 +492,7 @@ static void	generate_events(zbx_uint64_t hostid, int maintenance_from, int maint
 		for (i = 0; i < tr_num; i++)
 		{
 			process_event(eventid++, EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, tr[i].triggerid,
-					&ts, tr[i].new_value, TRIGGER_VALUE_CHANGED_NO, 0, 1);
+					&ts, tr[i].new_value, 0);
 		}
 	}
 

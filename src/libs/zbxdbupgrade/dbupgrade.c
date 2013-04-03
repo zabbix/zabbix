@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -9,7 +9,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -210,6 +210,13 @@ static void	DBadd_field_sql(char **sql, size_t *sql_alloc, size_t *sql_offset,
 	DBfield_definition_string(sql, sql_alloc, sql_offset, field);
 }
 
+static void	DBdrop_field_sql(char **sql, size_t *sql_alloc, size_t *sql_offset,
+		const char *table_name, const char *field_name)
+{
+	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "alter table" ZBX_DB_ONLY " %s drop column %s",
+			table_name, field_name);
+}
+
 static void	DBcreate_index_sql(char **sql, size_t *sql_alloc, size_t *sql_offset,
 		const char *table_name, const char *index_name, const char *fields, int unique)
 {
@@ -359,6 +366,24 @@ static int	DBdrop_not_null(const char *table_name, const ZBX_FIELD *field)
 
 	if (ZBX_DB_OK <= DBexecute("%s", sql))
 		ret = DBreorg_table(table_name);
+
+	zbx_free(sql);
+
+	return ret;
+}
+
+static int	DBdrop_field(const char *table_name, const char *field_name)
+{
+	char	*sql = NULL;
+	size_t	sql_alloc = 64, sql_offset = 0;
+	int	ret = FAIL;
+
+	sql = zbx_malloc(sql, sql_alloc);
+
+	DBdrop_field_sql(&sql, &sql_alloc, &sql_offset, table_name, field_name);
+
+	if (ZBX_DB_OK <= DBexecute("%s", sql))
+		ret = SUCCEED;
 
 	zbx_free(sql);
 
@@ -730,6 +755,74 @@ static int	DBpatch_02010032()
 
 	return DBset_default("users", &field);
 }
+
+static int	DBpatch_02010033()
+{
+	if (ZBX_DB_OK <= DBexecute(
+			"delete from events"
+			" where source=%d"
+				" and object=%d"
+				" and (value=%d or value_changed=%d)",
+			EVENT_SOURCE_TRIGGERS,
+			EVENT_OBJECT_TRIGGER,
+			TRIGGER_VALUE_UNKNOWN,
+			0))	/*TRIGGER_VALUE_CHANGED_NO*/
+	{
+		return SUCCEED;
+	}
+
+	return FAIL;
+}
+
+static int	DBpatch_02010034()
+{
+	return DBdrop_field("events", "value_changed");
+}
+
+static int	DBpatch_02010035()
+{
+	const char	*sql = "delete from profiles where idx='web.events.filter.showUnknown'";
+
+	if (ZBX_DB_OK <= DBexecute("%s", sql))
+		return SUCCEED;
+
+	return FAIL;
+}
+
+static int	DBpatch_02010036()
+{
+	const char	*sql =
+			"update profiles"
+			" set value_int=case when value_str='1' then 1 else 0 end,"
+				"value_str='',"
+				"type=2"	/* PROFILE_TYPE_INT */
+			" where idx like '%isnow'";
+
+	if (ZBX_DB_OK <= DBexecute("%s", sql))
+		return SUCCEED;
+
+	return FAIL;
+}
+
+static int	DBpatch_02010037()
+{
+	if (ZBX_DB_OK <= DBexecute("update config set server_check_interval=10"))
+		return SUCCEED;
+
+	return FAIL;
+}
+
+static int	DBpatch_02010038()
+{
+	const ZBX_FIELD	field = {"server_check_interval", "10", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBset_default("config", &field);
+}
+
+static int	DBpatch_02010039()
+{
+	return DBdrop_field("alerts", "nextcheck");
+}
 #endif	/* not HAVE_SQLITE3 */
 
 static void	DBget_version(int *mandatory, int *optional)
@@ -800,11 +893,18 @@ int	DBcheck_version()
 		{DBpatch_02010030, 2010030, 0, 0},
 		{DBpatch_02010031, 2010031, 0, 0},
 		{DBpatch_02010032, 2010032, 0, 1},
+		{DBpatch_02010033, 2010033, 0, 1},
+		{DBpatch_02010034, 2010034, 0, 1},
+		{DBpatch_02010035, 2010035, 0, 0},
+		{DBpatch_02010036, 2010036, 0, 0},
+		{DBpatch_02010037, 2010037, 0, 0},
+		{DBpatch_02010038, 2010038, 0, 0},
+		{DBpatch_02010039, 2010039, 0, 0},
 		/* IMPORTANT! When adding a new mandatory DBPatch don't forget to update it for SQLite, too. */
 		{NULL}
 	};
 #else
-	required = 2010032;	/* <---- Update mandatory DBpatch for SQLite here. */
+	required = 2010034;	/* <---- Update mandatory DBpatch for SQLite here. */
 #endif
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);

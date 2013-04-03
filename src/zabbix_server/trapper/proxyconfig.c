@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -9,7 +9,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -51,6 +51,7 @@ void	send_proxyconfig(zbx_sock_t *sock, struct zbx_json_parse *jp)
 
 	if (FAIL == get_proxy_id(jp, &proxy_hostid, host, error, sizeof(error)))
 	{
+		zbx_send_response(sock, FAIL, NULL, CONFIG_TIMEOUT);
 		zabbix_log(LOG_LEVEL_WARNING, "Proxy config request from active proxy on [%s] failed: %s",
 				get_ip_by_socket(sock), error);
 		return;
@@ -64,8 +65,7 @@ void	send_proxyconfig(zbx_sock_t *sock, struct zbx_json_parse *jp)
 
 	zabbix_log(LOG_LEVEL_WARNING, "Sending configuration data to proxy '%s'. Datalen " ZBX_FS_SIZE_T,
 			host, (zbx_fs_size_t)j.buffer_size);
-	zabbix_log(LOG_LEVEL_DEBUG, "%s",
-			j.buffer);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s", j.buffer);
 
 	alarm(CONFIG_TIMEOUT);
 

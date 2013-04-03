@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -10,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -79,7 +79,7 @@ function init_nodes() {
 			$ZBX_NODES_IDS[$node['nodeid']] = $node['nodeid'];
 		}
 
-		$ZBX_AVAILABLE_NODES = get_accessible_nodes_by_user(CWebUser::$data, PERM_READ_LIST, PERM_RES_IDS_ARRAY, $ZBX_NODES_IDS);
+		$ZBX_AVAILABLE_NODES = get_accessible_nodes_by_user(CWebUser::$data, PERM_READ, PERM_RES_IDS_ARRAY, $ZBX_NODES_IDS);
 		$ZBX_VIEWED_NODES = get_viewed_nodes();
 		$ZBX_CURRENT_NODEID = $ZBX_VIEWED_NODES['selected'];
 
@@ -159,7 +159,7 @@ function get_viewed_nodes() {
 	if (!defined('ZBX_NOT_ALLOW_ALL_NODES')) {
 		$result['nodes'][0] = array('nodeid' => 0, 'name' => _('All'));
 	}
-	$available_nodes = get_accessible_nodes_by_user(CWebUser::$data, PERM_READ_LIST, PERM_RES_DATA_ARRAY);
+	$available_nodes = get_accessible_nodes_by_user(CWebUser::$data, PERM_READ, PERM_RES_DATA_ARRAY);
 	$available_nodes = get_tree_by_parentid($ZBX_LOCALNODEID, $available_nodes, 'masterid'); // remove parent nodes
 	$selected_nodeids = get_request('selected_nodes', get_node_profile(array(CWebUser::$data['node']['nodeid'])));
 

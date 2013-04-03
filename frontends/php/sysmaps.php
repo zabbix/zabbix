@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2012 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -84,7 +84,8 @@ if (isset($_REQUEST['sysmapid'])) {
 	$maps = API::Map()->get(array(
 		'sysmapids' => $_REQUEST['sysmapid'],
 		'editable' => true,
-		'output' => API_OUTPUT_EXTEND
+		'output' => API_OUTPUT_EXTEND,
+		'selectUrls' => API_OUTPUT_EXTEND
 	));
 
 	if (empty($maps)) {

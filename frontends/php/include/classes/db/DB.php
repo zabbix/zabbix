@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2012 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -10,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -43,6 +43,42 @@ class DB {
 	private static $nodeId = null;
 	private static $maxNodeId = null;
 	private static $minNodeId = null;
+
+	/**
+	 * @var DbBackend
+	 */
+	private static $dbBackend;
+
+	/**
+	 * Get necessary DB class
+	 *
+	 * @return DbBackend
+	 */
+	public static function getDbBackend() {
+		global $DB;
+
+		if (!self::$dbBackend) {
+			switch ($DB['TYPE']) {
+				case ZBX_DB_MYSQL:
+					self::$dbBackend = new MysqlDbBackend();
+					break;
+				case ZBX_DB_POSTGRESQL:
+					self::$dbBackend = new PostgresqlDbBackend();
+					break;
+				case ZBX_DB_ORACLE:
+					self::$dbBackend = new OracleDbBackend();
+					break;
+				case ZBX_DB_DB2:
+					self::$dbBackend = new Db2DbBackend();
+					break;
+				case ZBX_DB_SQLITE3:
+					self::$dbBackend = new SqliteDbBackend();
+					break;
+			}
+		}
+
+		return self::$dbBackend;
+	}
 
 	private static function exception($code, $error) {
 		throw new DBException($error, $code);
@@ -429,30 +465,28 @@ class DB {
 		}
 		$resultIds = array();
 
-		if ($getids) {
-			$id = self::reserveIds($table, count($values));
-		}
-
 		$tableSchema = self::getSchema($table);
-
 		$values = self::addMissingFields($tableSchema, $values);
-
 		$fields = array_keys($values[0]);
 
-		$sql = 'INSERT INTO '.$table.' ('.implode(',', $fields).','.($getids ? $tableSchema['key'] : '').') VALUES ';
+		if ($getids) {
+			$id = self::reserveIds($table, count($values));
+			$fields[] = $tableSchema['key'];
+		}
 
+		$newValues = array();
 		foreach ($values as $key => $row) {
 			if ($getids) {
 				$resultIds[$key] = $id;
 				$row[$tableSchema['key']] = $id;
+				$values[$key][$tableSchema['key']] = $id;
 				$id = bcadd($id, 1, 0);
 			}
-
 			self::checkValueTypes($table, $row);
-
-			$sql .= '('.implode(',', array_values($row)).'),';
+			$newValues[] = $row;
 		}
-		$sql[strlen($sql) - 1] = ' ';
+
+		$sql = self::getDbBackend()->createInsertQuery($table, $fields, $newValues);
 
 		if (!DBexecute($sql)) {
 			self::exception(self::DBEXECUTE_ERROR, _s('SQL statement execution has failed "%1$s".', $sql));

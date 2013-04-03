@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2012 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -10,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -502,7 +502,7 @@ elseif (isset($_REQUEST['save'])) {
 }
 elseif (isset($_REQUEST['delete']) && isset($_REQUEST['hostid'])) {
 	DBstart();
-	$result = API::Host()->delete(array('hostid' => $_REQUEST['hostid']));
+	$result = API::Host()->delete(array($_REQUEST['hostid']));
 	$result = DBend($result);
 
 	show_messages($result, _('Host deleted'), _('Cannot delete host'));
@@ -526,7 +526,7 @@ elseif ($_REQUEST['go'] == 'delete') {
 	$hostids = get_request('hosts', array());
 
 	DBstart();
-	$go_result = API::Host()->delete(zbx_toObject($hostids,'hostid'));
+	$go_result = API::Host()->delete($hostids);
 	$go_result = DBend($go_result);
 
 	show_messages($go_result, _('Host deleted'), _('Cannot delete host'));
@@ -648,10 +648,10 @@ else {
 	// filter
 	$filter_table = new CTable('', 'filter');
 	$filter_table->addRow(array(
-		array(array(bold(_('Name')), SPACE._('like').': '), new CTextBox('filter_host', $_REQUEST['filter_host'], 20)),
-		array(array(bold(_('DNS')), SPACE._('like').': '), new CTextBox('filter_dns', $_REQUEST['filter_dns'], 20)),
-		array(array(bold(_('IP')), SPACE._('like').': '), new CTextBox('filter_ip', $_REQUEST['filter_ip'], 20)),
-		array(bold(_('Port').': '), new CTextBox('filter_port', $_REQUEST['filter_port'], 20))
+		array(array(bold(_('Name')), SPACE._('like').NAME_DELIMITER), new CTextBox('filter_host', $_REQUEST['filter_host'], 20)),
+		array(array(bold(_('DNS')), SPACE._('like').NAME_DELIMITER), new CTextBox('filter_dns', $_REQUEST['filter_dns'], 20)),
+		array(array(bold(_('IP')), SPACE._('like').NAME_DELIMITER), new CTextBox('filter_ip', $_REQUEST['filter_ip'], 20)),
+		array(bold(_('Port').NAME_DELIMITER), new CTextBox('filter_port', $_REQUEST['filter_port'], 20))
 	));
 
 	$filter = new CButton('filter', _('Filter'), "javascript: create_var('zbx_filter', 'filter_set', '1', true);");
@@ -778,13 +778,13 @@ else {
 				'output' => API_OUTPUT_EXTEND
 			));
 			$proxy = reset($proxy);
-			$description[] = $proxy['host'].':';
+			$description[] = $proxy['host'].NAME_DELIMITER;
 		}
 
 		$description[] = new CLink($host['name'], 'hosts.php?form=update&hostid='.$host['hostid'].url_param('groupid'));
 
 		$hostIF = ($interface['useip'] == INTERFACE_USE_IP) ? $interface['ip'] : $interface['dns'];
-		$hostIF .= empty($interface['port']) ? '' : ': '.$interface['port'];
+		$hostIF .= empty($interface['port']) ? '' : NAME_DELIMITER.$interface['port'];
 
 		$status_script = null;
 		switch ($host['status']) {

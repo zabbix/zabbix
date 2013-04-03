@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2012 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -197,8 +197,8 @@ elseif (isset($_REQUEST['save'])) {
 		}
 
 		if ($_REQUEST['authentication'] != HTTPTEST_AUTH_NONE) {
-			$httpTest['http_user'] = htmlspecialchars($_REQUEST['http_user']);
-			$httpTest['http_password'] = htmlspecialchars($_REQUEST['http_password']);
+			$httpTest['http_user'] = $_REQUEST['http_user'];
+			$httpTest['http_password'] = $_REQUEST['http_password'];
 		}
 		else {
 			$httpTest['http_user'] = '';
