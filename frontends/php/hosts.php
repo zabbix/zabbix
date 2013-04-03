@@ -339,8 +339,7 @@ elseif (isset($_REQUEST['save'])) {
 			$host = array(
 				'hostid' => get_request('hostid'),
 				'status' => get_request('status'),
-				'inventory' => (get_request('inventory_mode') != HOST_INVENTORY_DISABLED) ? get_request('host_inventory', array()) : array(),
-				'inventory_mode' => get_request('inventory_mode')
+				'inventory' => (get_request('inventory_mode') != HOST_INVENTORY_DISABLED) ? get_request('host_inventory', array()) : array()
 			);
 		}
 		// creating or updating a normal host
