@@ -61,6 +61,160 @@ char	*zbx_iregexp_match(const char *string, const char *pattern, int *len)
 	return zbx_regexp(string, pattern, len, REG_EXTENDED | REG_ICASE | REG_NEWLINE);
 }
 
+
+/*********************************************************************************
+ *                                                                               *
+ * Function: zbx_regexp_sub_replace                                              *
+ *                                                                               *
+ * Purpose: Constructs string from the specified template and regexp match.      *
+ *          If the template is NULL or empty a copy of the parsed string is      *
+ *          returned.                                                            *
+ *                                                                               *
+ * Parameters: text            - [IN] the input string.                          *
+ *             output_template - [IN] the output string template. The output     *
+ *                                    string is construed from template by       *
+ *                                    replacing \<n> sequences with the captured *
+ *                                    regexp group.                              *
+ *                                    If output template is NULL or contains     *
+ *                                    empty string then the whole input string   *
+ *                                    is used as output value.                   *
+ *             match           - [IN] the captured group data                    *
+ *             nsmatch         - [IN] the number of items in captured group data *
+ *                                                                               *
+ * Return value: Allocated string containing output value                        *
+ *                                                                               *
+ * Author: Andris Zeila                                                          *
+ *                                                                               *
+ *********************************************************************************/
+static char	*regexp_sub_replace(const char *text, const char *output_template, regmatch_t *match, size_t nmatch)
+{
+	char		*ptr = NULL;
+	const char	*pstart = output_template, *pgroup;
+	size_t		size = 0, offset = 0, group_index;
+
+	if (NULL == output_template || '\0' == *output_template)
+		return zbx_strdup(NULL, text);
+
+	while ( NULL != (pgroup = strchr(pstart, '\\')) )
+	{
+		switch (*(++pgroup))
+		{
+			case '\\':
+				zbx_strncpy_alloc(&ptr, &size, &offset, pstart, pgroup - pstart);
+				pstart = pgroup + 1;
+				continue;
+
+			case '0':
+			case '1':
+			case '2':
+			case '3':
+			case '4':
+			case '5':
+			case '6':
+			case '7':
+			case '8':
+			case '9':
+				zbx_strncpy_alloc(&ptr, &size, &offset, pstart, pgroup - pstart - 1);
+				group_index = *pgroup - '0';
+				if (group_index < nmatch - 1 && -1 != match[group_index].rm_so)
+				{
+					zbx_strncpy_alloc(&ptr, &size, &offset, text + match[group_index].rm_so,
+							match[group_index].rm_eo - match[group_index].rm_so);
+				}
+				pstart = pgroup + 1;
+				continue;
+
+			default:
+				zbx_strncpy_alloc(&ptr, &size, &offset, pstart, pgroup - pstart);
+				pstart = pgroup;
+		}
+	}
+	if ('\0' != *pstart)
+		zbx_strcpy_alloc(&ptr, &size, &offset, pstart);
+
+	return ptr;
+}
+
+
+/*********************************************************************************
+ *                                                                               *
+ * Function: regexp_sub                                                          *
+ *                                                                               *
+ * Purpose: Test if the string matches the specified regular expression and      *
+ *          creates return value by substituting '\<n>' sequences in output      *
+ *          template with the captured groups in output in the case of success.  *
+ *                                                                               *
+ * Parameters: string          - [IN] the string to parse                        *
+ *             pattern         - [IN] the regular expression.                    *
+ *             output_template - [IN] the output string template. The output     *
+ *                                    string is construed from template by       *
+ *                                    replacing \<n> sequences with the captured *
+ *                                    regexp group.                              *
+ *                                    If output template is NULL or contains     *
+ *                                    empty string then the whole input string   *
+ *                                    is used as output value.                   *
+ *            flags            - [IN] the regcomp() function flags.              *
+ *                                    See regcomp() manual.                      *
+ *                                                                               *
+ * Return value: Allocated string containing output value if the input           *
+ *               string matches the specified regular expression or NULL         *
+ *               otherwise.                                                      *
+ *                                                                               *
+ * Author: Andris Zeila                                                          *
+ *                                                                               *
+ *********************************************************************************/
+static char	*regexp_sub(const char *string, const char *pattern, const char *output_template, int flags)
+{
+	regex_t		re;
+	regmatch_t	match[10];
+	char		*ptr = NULL;
+
+	if (NULL == string)
+		return NULL;
+
+	if (NULL == output_template || '\0' == *output_template)
+		flags |= REG_NOSUB;
+
+	if (0 != regcomp(&re, pattern, flags))
+		return NULL;
+
+	if (0 == regexec(&re, string, sizeof(match) / sizeof(match[0]), match, 0))
+		ptr = regexp_sub_replace(string, output_template, match, sizeof(match) / sizeof(match[0]));
+
+	regfree(&re);
+
+	return ptr;
+}
+
+/*********************************************************************************
+ *                                                                               *
+ * Function: zbx_regexp_sub                                                      *
+ *                                                                               *
+ * Purpose: Test if the string matches specified regular expression and creates  *
+ *          return value by substituting \<n> in output template with captured   *
+ *          groups in output in the case of success.                             *
+ *                                                                               *
+ * Parameters: string          - [IN] the string to parse                        *
+ *             pattern         - [IN] the regular expression.                    *
+ *             output_template - [IN] the output string template. The output     *
+ *                                    string is construed from template by       *
+ *                                    replacing \<n> sequences with the captured *
+ *                                    regexp group.                              *
+ *                                                                               *
+ * Return value: Allocated string containing resulting value or NULL if          *
+ *               the input string does not match the specified regular           *
+ *               expression.                                                     *
+ *                                                                               *
+ * Comments: This function performs case sensitive match                         *
+ *                                                                               *
+ * Author: Andris Zeila                                                          *
+ *                                                                               *
+ *********************************************************************************/
+char	*zbx_regexp_sub(const char *string, const char *pattern, const char *output_template)
+{
+	return regexp_sub(string, pattern, output_template, REG_EXTENDED | REG_NEWLINE);
+}
+
 void	clean_regexps_ex(ZBX_REGEXP *regexps, int *regexps_num)
 {
 	int	i;

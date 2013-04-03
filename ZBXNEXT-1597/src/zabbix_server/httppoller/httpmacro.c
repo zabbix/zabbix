@@ -23,100 +23,244 @@
 
 #include "httpmacro.h"
 
-static int	http_get_macro_value(const char *macros, const char *macro, char **replace_to, size_t *replace_to_alloc)
+#define REGEXP_PREFIX		"regex:"
+#define REGEXP_PREFIX_SIZE	(sizeof(REGEXP_PREFIX) - 1)
+
+/******************************************************************************
+ *                                                                            *
+ * Function: httpmacro_comp_func                                              *
+ *                                                                            *
+ * Purpose: compare two macros by name                                        *
+ *                                                                            *
+ * Parameters: d1 - [IN] the first macro                                      *
+ *             d2 - [IN] the second macro                                     *
+ *                                                                            *
+ * Return value: <0 - the first macro name is 'less' than second              *
+ *                0 - the macro names are equal                               *
+ *               >0 - the first macro name is 'greater' than second           *
+ *                                                                            *
+ * Author: Andris Zeila                                                       *
+ *                                                                            *
+ ******************************************************************************/
+static int 	httpmacro_comp_func(const void *d1, const void *d2)
 {
-	size_t		sz_macro, replace_to_offset = 0;
-	const char	*pm, *pv, *p;
-	int		res = FAIL;
+	const zbx_ptr_pair_t	*pair1 = (const zbx_ptr_pair_t *)d1;
+	const zbx_ptr_pair_t	*pair2 = (const zbx_ptr_pair_t *)d2;
 
-	sz_macro = strlen(macro);
-
-	for (pm = macros; NULL != (pm = strstr(pm, macro)); pm += sz_macro)
-	{
-		if (pm != macros && '\r' != *(pm - 1) && '\n' != *(pm - 1))
-			continue;
-
-		pv = pm + sz_macro;
-
-		/* skip white spaces */
-		while (' ' == *pv || '\t' == *pv)
-			pv++;
-
-		if ('=' != *pv++)
-			continue;
-
-		/* skip white spaces */
-		while (' ' == *pv || '\t' == *pv)
-			pv++;
-
-		for (p = pv; '\0' != *p && '\r' != *p && '\n' != *p; p++)
-			;
-
-		/* trim white spaces */
-		while (p > pv && (' ' == *(p - 1) || '\t' == *(p - 1)))
-			p--;
-
-		zbx_strncpy_alloc(replace_to, replace_to_alloc, &replace_to_offset, pv, p - pv);
-
-		res = SUCCEED;
-		break;
-	}
-
-	return res;
+	return strcmp((char *)pair1->first, (char *)pair2->first);
 }
 
 /******************************************************************************
  *                                                                            *
- * Function: http_substitute_macros                                           *
+ * Function: httpmacro_append_pair                                            *
+ *                                                                            *
+ * Purpose: appends key,value pair to the http test macro cache.              *
+ *          If the value format is 'regex:<pattern>', then regular expression *
+ *          match is performed against the supplied data value and specified  *
+ *          pattern. The first captured group is assigned to the macro value. *
+ *                                                                            *
+ * Parameters: httptest - [IN/OUT] the http test data                         *
+ *             pkey     - [IN] a reference to the  macro name (key) data      *
+ *             nkey     - [IN] the key (macro name) size                      *
+ *             pvalue   - [IN] a reference to the macro value data            *
+ *             nvalue   - [IN] the value size                                 *
+ *             data     - [IN] the data for regexp matching (optional)        *
+ *                                                                            *
+ * Return value: SUCCEDED - the key/value pair was added successfully         *
+ *                   FAIL - key/value pair adding to cache failed.            *
+ *                          The failure reason can be either empty key/value, *
+ *                          wrong key format or failed regular expression     *
+ *                          match.                                            *
+ *                                                                            *
+ * Author: Andris Zeila                                                       *
+ *                                                                            *
+ ******************************************************************************/
+static int	httpmacro_append_pair(zbx_httptest_t *httptest, const char *pkey, size_t nkey,
+			const char *pvalue, size_t nvalue, const char *data)
+{
+	char 		*key_str = NULL, *value_str = NULL;
+	size_t		key_size = 0, key_offset = 0, value_size = 0, value_offset = 0;
+	zbx_ptr_pair_t	pair;
+	int		index;
+
+	if (0 == nkey || 0 == nvalue)
+		return FAIL;
+
+	if ('{' != pkey[0] || '}' != pkey[nkey - 1])
+		return FAIL;
+
+	/* get macro value */
+	zbx_strncpy_alloc(&value_str, &value_size, &value_offset, pvalue, nvalue);
+	if (!strncmp(REGEXP_PREFIX, value_str, REGEXP_PREFIX_SIZE))
+	{
+		/* the value contains regexp pattern, try to get first captured group */
+		if (NULL != data)
+			pair.second = (void *)zbx_regexp_sub(data, value_str + REGEXP_PREFIX_SIZE, "\\1");
+
+		zbx_free(value_str);
+
+		if (NULL == pair.second)
+			return FAIL;
+	}
+	else
+		pair.second = value_str;
+
+	/* get macro name */
+	zbx_strncpy_alloc(&key_str, &key_size, &key_offset, pkey, nkey);
+	pair.first = key_str;
+
+	/* remove existing macro if necessary */
+	index = zbx_vector_ptr_pair_search(&httptest->macros, pair, httpmacro_comp_func);
+	if (index != FAIL)
+	{
+		zbx_ptr_pair_t	*ppair = &httptest->macros.values[index];
+
+		zbx_free(ppair->first);
+		zbx_free(ppair->second);
+		zbx_vector_ptr_pair_remove_noorder(&httptest->macros, index);
+	}
+	zbx_vector_ptr_pair_append(&httptest->macros, pair);
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: http_substitute_variables                                        *
  *                                                                            *
  * Purpose: substitute macros in input string by value from http test config  *
  *                                                                            *
- * Parameters: macros - [IN]     macros from httptest                         *
+ * Parameters: macros - [IN]     the http test data                           *
  *             data   - [IN\OUT] string to substitute macros                  *
  *                                                                            *
- * Author: Alexei Vladishev                                                   *
+ * Author: Alexei Vladishev, Andris Zeila                                     *
  *                                                                            *
  ******************************************************************************/
-void	http_substitute_macros(const char *macros, char **data)
+void	http_substitute_variables(zbx_httptest_t *httptest, char **data)
 {
-	const char	*__function_name = "http_substitute_macros";
-
-	char		c, *replace_to = NULL;
-	size_t		l, r, replace_to_alloc = 64;
-	int		rc;
+	const char	*__function_name = "http_substitute_variables";
+	char		replace_char;
+	size_t		left, right;
+	int		index;
+	zbx_ptr_pair_t	pair;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() data:'%s'", __function_name, *data);
 
-	for (l = 0; '\0' != (*data)[l]; l++)
+	for (left = 0; '\0' != (*data)[left]; left++)
 	{
-		if ('{' != (*data)[l])
+		if ('{' != (*data)[left])
 			continue;
 
-		for (r = l + 1; '\0' != (*data)[r] && '}' != (*data)[r]; r++)
+		for (right = left + 1; '\0' != (*data)[right] && '}' != (*data)[right]; right++)
 			;
 
-		if ('}' != (*data)[r])
+		if ('}' != (*data)[right])
 			break;
 
-		if (NULL == replace_to)
-			replace_to = zbx_malloc(replace_to, replace_to_alloc);
+		replace_char = (*data)[right + 1];
+		(*data)[right + 1] = '\0';
 
-		c = (*data)[r + 1];
-		(*data)[r + 1] = '\0';
+		pair.first = *data + left;
+		index = zbx_vector_ptr_pair_search(&httptest->macros, pair, httpmacro_comp_func);
 
-		rc = http_get_macro_value(macros, &(*data)[l], &replace_to, &replace_to_alloc);
+		(*data)[right + 1] = replace_char;
 
-		(*data)[r + 1] = c;
-
-		if (SUCCEED != rc)
+		if (FAIL == index)
 			continue;
 
-		zbx_replace_string(data, l, &r, replace_to);
+		zbx_replace_string(data, left, &right, (char*)httptest->macros.values[index].second);
 
-		l = r;
+		left = right;
 	}
-
-	zbx_free(replace_to);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() data:'%s'", __function_name, *data);
 }
+
+#define		TRIM_LEADING_WHITESPACE(ptr)	while (' ' == *ptr || '\t' == *ptr) ptr++;
+#define		TRIM_TRAILING_WHITESPACE(ptr)	do { ptr--; } while (' ' == *ptr || '\t' == *ptr);
+
+/******************************************************************************
+ *                                                                            *
+ * Function: http_process_variables                                           *
+ *                                                                            *
+ * Purpose: parses http test/step variable string and stores results into     *
+ *          httptest macro cache.                                             *
+ *          The variables are specified in {<key>}=<value> format, one        *
+ *          variable per line.                                                *
+ *          If the value format is 'regex:<pattern>', then regular expression *
+ *          match is performed against the supplied data value and specified  *
+ *          pattern. The first captured group is assigned to the macro value. *
+ *                                                                            *
+ * Parameters: httptest  - [IN/OUT] the http test data                        *
+ *             variables - [IN] the variable string to parse                  *
+ *             data      - [IN] the data for variable regexp matching         *
+ *                         (optional).                                        *
+ *                                                                            *
+ * Return value: SUCCEED - the variable string was processed successfully     *
+ *               FAIL    - the variable string processing failed (either      *
+ *                         because of bad formatting or failed regexp match). *
+ *                                                                            *
+ * Author: Andris Zeila                                                       *
+ *                                                                            *
+ ******************************************************************************/
+int	http_process_variables(zbx_httptest_t *httptest, const char *variables, const char *data)
+{
+	const char	*__function_name = "http_process_variables";
+	const char	*pkey = variables, *pvalue;
+	size_t		nkey, nvalue;
+	int		rc = FAIL;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() variables:'%s'", __function_name, variables);
+
+	while ('\0' != *pkey)
+	{
+		const char	*ptr = pkey;
+
+		/* find end of the line */
+		while (NULL == strchr("\n\r", *ptr))
+			ptr++;
+
+		/* parse line */
+		pvalue = strchr(pkey, '=');
+		if (NULL != pvalue && pvalue < ptr)
+		{
+			const char	*ptail = pvalue++;
+
+			TRIM_LEADING_WHITESPACE(pkey);
+			if (pkey != ptail)
+			{
+				TRIM_TRAILING_WHITESPACE(ptail);
+				nkey = ptail - pkey + 1;
+			}
+			else
+				nkey = 0;
+
+			ptail = ptr;
+			TRIM_LEADING_WHITESPACE(pvalue);
+			if (pvalue != ptail)
+			{
+				TRIM_TRAILING_WHITESPACE(ptail);
+				nvalue = ptail - pvalue + 1;
+			}
+			else
+				nvalue = 0;
+
+			if (FAIL == httpmacro_append_pair(httptest, pkey, nkey, pvalue, nvalue, data))
+				goto finish;
+		}
+
+		/* skip LF/CR symbols until the next nonempty line */
+		while ('\n' == *ptr || '\r' == *ptr)
+			ptr++;
+
+		pkey = ptr;
+	}
+
+	rc = SUCCEED;
+finish:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(rc));
+
+	return rc;
+}
+
+
