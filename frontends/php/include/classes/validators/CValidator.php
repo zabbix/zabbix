@@ -31,7 +31,7 @@ abstract class CValidator {
 	public function __construct(array $options = array()) {
 		// set options
 		foreach ($options as $key => $value) {
-			$this->{$key} = $value;
+			$this->$key = $value;
 		}
 	}
 
@@ -71,6 +71,6 @@ abstract class CValidator {
 	 * @throws Exception
 	 */
 	public function __set($name, $value) {
-		throw new Exception(sprintf('Incorrect option "%1$s" for validator "%1$s".', $name, get_class($this)));
+		throw new Exception(sprintf('Incorrect option "%1$s" for validator "%2$s".', $name, get_class($this)));
 	}
 }
