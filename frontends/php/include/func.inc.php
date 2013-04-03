@@ -2286,23 +2286,22 @@ function get_status() {
 
 	// items
 	$dbItems = DBselect(
-		'SELECT COUNT(*) AS cnt,i.status'.
+		'SELECT COUNT(i.itemid) AS cnt,i.status,i.state'.
 				' FROM items i'.
 				' INNER JOIN hosts h ON i.hostid=h.hostid'.
 				' WHERE h.status='.HOST_STATUS_MONITORED.
-				' AND '.dbConditionInt('i.status', array(ITEM_STATUS_ACTIVE, ITEM_STATUS_DISABLED, ITEM_STATUS_NOTSUPPORTED)).
-				' GROUP BY i.status');
+				' GROUP BY i.status,i.state');
 	while ($dbItem = DBfetch($dbItems)) {
-		switch ($dbItem['status']) {
-			case ITEM_STATUS_ACTIVE:
+		if ($dbItem['status'] == ITEM_STATUS_ACTIVE) {
+			if ($dbItem['state'] == ITEM_STATE_NORMAL) {
 				$status['items_count_monitored'] = $dbItem['cnt'];
-				break;
-			case ITEM_STATUS_DISABLED:
-				$status['items_count_disabled'] = $dbItem['cnt'];
-				break;
-			case ITEM_STATUS_NOTSUPPORTED:
+			}
+			else {
 				$status['items_count_not_supported'] = $dbItem['cnt'];
-				break;
+			}
+		}
+		elseif ($dbItem['status'] == ITEM_STATUS_DISABLED) {
+			$status['items_count_disabled'] += $dbItem['cnt'];
 		}
 	}
 	$status['items_count'] = $status['items_count_monitored'] + $status['items_count_disabled']

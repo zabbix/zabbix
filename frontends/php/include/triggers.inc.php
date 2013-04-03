@@ -979,37 +979,6 @@ function implode_exp($expression, $triggerid, &$hostnames = array()) {
 	return $expression;
 }
 
-function updateTriggerValueToUnknownByHostId($hostids) {
-	zbx_value2array($hostids);
-	$triggerids = array();
-
-	$result = DBselect(
-		'SELECT DISTINCT t.triggerid'.
-		' FROM hosts h,items i,functions f,triggers t'.
-		' WHERE h.hostid=i.hostid'.
-			' AND i.itemid=f.itemid'.
-			' AND f.triggerid=t.triggerid'.
-			' AND '.dbConditionInt('h.hostid', $hostids).
-			' AND h.status='.HOST_STATUS_MONITORED.
-			' AND t.value_flags='.TRIGGER_VALUE_FLAG_NORMAL
-	);
-	while ($row = DBfetch($result)) {
-		$triggerids[] = $row['triggerid'];
-	}
-
-	if (!empty($triggerids)) {
-		DB::update('triggers', array(
-			'values' => array(
-				'value_flags' => TRIGGER_VALUE_FLAG_UNKNOWN,
-				'error' => _s('Host status became "%s"', _('Not monitored'))
-			),
-			'where' => array('triggerid' => $triggerids)
-		));
-	}
-
-	return true;
-}
-
 function check_right_on_trigger_by_expression($permission, $expression) {
 	$expressionData = new CTriggerExpression();
 	if (!$expressionData->parse($expression)) {
@@ -1385,6 +1354,7 @@ function calculate_availability($triggerid, $period_start, $period_end) {
 		$sql = 'SELECT e.eventid,e.value'.
 				' FROM events e'.
 				' WHERE e.objectid='.$triggerid.
+					' AND e.source='.EVENT_SOURCE_TRIGGERS.
 					' AND e.object='.EVENT_OBJECT_TRIGGER.
 					' AND e.clock<'.$period_start.
 				' ORDER BY e.eventid DESC';
@@ -1397,6 +1367,7 @@ function calculate_availability($triggerid, $period_start, $period_end) {
 	$sql = 'SELECT COUNT(e.eventid) AS cnt,MIN(e.clock) AS min_clock,MAX(e.clock) AS max_clock'.
 			' FROM events e'.
 			' WHERE e.objectid='.$triggerid.
+				' AND e.source='.EVENT_SOURCE_TRIGGERS.
 				' AND e.object='.EVENT_OBJECT_TRIGGER;
 	if ($period_start != 0) {
 		$sql .= ' AND clock>='.$period_start;
@@ -1442,6 +1413,7 @@ function calculate_availability($triggerid, $period_start, $period_end) {
 		'SELECT e.eventid,e.clock,e.value'.
 		' FROM events e'.
 		' WHERE e.objectid='.$triggerid.
+			' AND e.source='.EVENT_SOURCE_TRIGGERS.
 			' AND e.object='.EVENT_OBJECT_TRIGGER.
 			' AND e.clock BETWEEN '.$min.' AND '.$max.
 		' ORDER BY e.eventid'
@@ -2404,4 +2376,44 @@ function quoteFunctionParam($param)
 	}
 
 	return '"'.str_replace('"', '\\"', $param).'"';
+}
+
+/**
+ * Returns the text indicating the triggers status and state. If the $state parameter is not given, only the status of
+ * the trigger will be taken into account.
+ *
+ * @param int $status
+ * @param int $state
+ *
+ * @return string
+ */
+function triggerIndicator($status, $state = null) {
+	if ($status == TRIGGER_STATUS_ENABLED) {
+		return ($state == TRIGGER_STATE_UNKNOWN) ? _('Unknown') : _('Enabled');
+	}
+	elseif ($status == TRIGGER_STATUS_DISABLED) {
+		return _('Disabled');
+	}
+
+	return _('Unknown');
+}
+
+/**
+ * Returns the CSS class for the triggers status and state indicator. If the $state parameter is not given, only the
+ * status of the trigger will be taken into account.
+ *
+ * @param int $status
+ * @param int $state
+ *
+ * @return string
+ */
+function triggerIndicatorStyle($status, $state = null) {
+	if ($status == TRIGGER_STATUS_ENABLED) {
+		return ($state == TRIGGER_STATE_UNKNOWN) ? 'unknown' : 'enabled';
+	}
+	elseif ($status == TRIGGER_STATUS_DISABLED) {
+		return 'disabled';
+	}
+
+	return 'unknown';
 }

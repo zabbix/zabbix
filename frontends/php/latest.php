@@ -265,7 +265,7 @@ $sql = 'SELECT DISTINCT i.*, ia.applicationid '.
 		' WHERE '.dbConditionInt('ia.applicationid',$db_appids).
 			' AND i.itemid=ia.itemid'.
 			($_REQUEST['show_without_data'] ? '' : ' AND i.lastvalue IS NOT NULL').
-			' AND (i.status='.ITEM_STATUS_ACTIVE.' OR i.status='.ITEM_STATUS_NOTSUPPORTED.')'.
+			' AND i.status='.ITEM_STATUS_ACTIVE.
 			' AND '.dbConditionInt('i.flags', array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED));
 
 $dbItems = DBfetchArray(DBselect($sql));
@@ -339,7 +339,7 @@ foreach ($dbItems as $db_item){
 		$actions = new CLink(_('History'),'history.php?action=showvalues&itemid='.$db_item['itemid']);
 	}
 
-	$item_status = $db_item['status'] == ITEM_STATUS_NOTSUPPORTED ? 'unknown' : null;
+	$item_status = $db_item['state'] == ITEM_STATE_NOTSUPPORTED ? 'unknown' : null;
 
 	array_push($app_rows, new CRow(array(
 		SPACE,
@@ -445,7 +445,7 @@ $sql = 'SELECT DISTINCT h.host as hostname,h.hostid,i.* '.
 			$sql_where.
 			' AND h.hostid=i.hostid '.
 			($_REQUEST['show_without_data'] ? '' : ' AND i.lastvalue IS NOT NULL').
-			' AND (i.status='.ITEM_STATUS_ACTIVE.' OR i.status='.ITEM_STATUS_NOTSUPPORTED.')'.
+			' AND i.status='.ITEM_STATUS_ACTIVE.
 			' AND '.dbConditionInt('i.flags', array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)).
 			' AND '.dbConditionInt('h.hostid', $db_hostids);
 
@@ -527,7 +527,7 @@ foreach ($dbItems as $db_item){
 		$actions = new CLink(_('History'), 'history.php?action=showvalues&itemid='.$db_item['itemid']);
 	}
 
-	$item_status = $db_item['status'] == ITEM_STATUS_NOTSUPPORTED ? 'unknown' : null;
+	$item_status = $db_item['state'] == ITEM_STATE_NOTSUPPORTED ? 'unknown' : null;
 	array_push($app_rows, new CRow(array(
 		SPACE,
 		is_show_all_nodes() ? ($db_host['item_cnt'] ? SPACE : get_node_name_by_elid($db_item['itemid'])) : null,
