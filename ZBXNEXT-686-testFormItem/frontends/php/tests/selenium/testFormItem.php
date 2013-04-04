@@ -829,10 +829,9 @@ class testFormItem extends CWebTest {
 		$this->assertVisible('description');
 		$this->assertAttribute("//textarea[@id='description']/@rows", 7);
 
-		$this->zbxTestTextPresent('Status');
+		$this->zbxTestTextPresent('Enabled');
 		$this->assertVisible('status');
-		$this->zbxTestDropdownHasOptions('status', array('Enabled', 'Disabled', 'Not supported'));
-		$this->assertAttribute("//*[@id='status']/option[text()='Enabled']/@selected", 'selected');
+		$this->assertAttribute("//*[@id='status']/@checked", 'checked');
 	}
 
 	// Returns update data
@@ -1926,8 +1925,11 @@ class testFormItem extends CWebTest {
 
 		$itemFlexFlag = true;
 		if (isset($data['flexPeriod'])) {
+
+			$itemCount = 0;
 			foreach ($data['flexPeriod'] as $period) {
 				$this->input_type('new_delay_flex_period', $period['flexTime']);
+				$itemCount ++;
 
 				if (isset($period['flexDelay'])) {
 					$this->input_type('new_delay_flex_delay', $period['flexDelay']);
@@ -1941,7 +1943,7 @@ class testFormItem extends CWebTest {
 					$itemFlexFlag = false;
 				}
 
-				if (isset($period['maximumItems'])) {
+				if (isset($period['maximumItems']) || $itemCount == 7) {
 					$this->assertNotVisible('new_delay_flex_delay');
 					$this->assertNotVisible('new_delay_flex_period');
 				}
@@ -1951,6 +1953,7 @@ class testFormItem extends CWebTest {
 				}
 
 				if (isset($period['remove'])) {
+					$itemCount --;
 					$this->zbxTestClick('remove');
 					sleep(1);
 				}
