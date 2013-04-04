@@ -70,6 +70,7 @@ static void	init_active_metrics()
 		buffer.count = 0;
 		buffer.pcount = 0;
 		buffer.lastsent = (int)time(NULL);
+		buffer.first_error = 0;
 	}
 }
 
@@ -389,15 +390,15 @@ static int	refresh_active_checks(const char *host, unsigned short port)
 
 	if (SUCCEED == (ret = zbx_tcp_connect(&s, CONFIG_SOURCE_IP, host, port, CONFIG_TIMEOUT)))
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "Sending [%s]", json.buffer);
+		zabbix_log(LOG_LEVEL_DEBUG, "sending [%s]", json.buffer);
 
 		if (SUCCEED == (ret = zbx_tcp_send(&s, json.buffer)))
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "Before read");
+			zabbix_log(LOG_LEVEL_DEBUG, "before read");
 
 			if (SUCCEED == (ret = SUCCEED_OR_FAIL(zbx_tcp_recv_ext(&s, &buf, ZBX_TCP_READ_UNTIL_CLOSE, 0))))
 			{
-				zabbix_log(LOG_LEVEL_DEBUG, "Got [%s]", buf);
+				zabbix_log(LOG_LEVEL_DEBUG, "got [%s]", buf);
 				parse_list_of_checks(buf);
 			}
 		}
@@ -406,7 +407,8 @@ static int	refresh_active_checks(const char *host, unsigned short port)
 	}
 
 	if (SUCCEED != ret)
-		zabbix_log(LOG_LEVEL_DEBUG, "Get active checks error: %s", zbx_tcp_strerror());
+		zabbix_log(LOG_LEVEL_WARNING, "cannot connect to [%s:%u] for active check configuration (%s)",
+				host, port, zbx_tcp_strerror());
 
 	zbx_json_free(&json);
 
@@ -482,6 +484,7 @@ static int	send_buffer(const char *host, unsigned short port)
 	char				*buf = NULL;
 	int				ret = SUCCEED, i, now;
 	zbx_timespec_t			ts;
+	const char			*err_send_step = "";
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() host:'%s' port:%d values:%d/%d",
 			__function_name, host, port, buffer.count, CONFIG_BUFFER_SIZE);
@@ -551,15 +554,15 @@ static int	send_buffer(const char *host, unsigned short port)
 					zabbix_log(LOG_LEVEL_DEBUG, "OK");
 			}
 			else
-				zabbix_log(LOG_LEVEL_DEBUG, "Send value error: [recv] %s", zbx_tcp_strerror());
+				err_send_step = "[recv] ";
 		}
 		else
-			zabbix_log(LOG_LEVEL_DEBUG, "Send value error: [send] %s", zbx_tcp_strerror());
+			err_send_step = "[send] ";
 
 		zbx_tcp_close(&s);
 	}
 	else
-		zabbix_log(LOG_LEVEL_DEBUG, "Send value error: [connect] %s", zbx_tcp_strerror());
+		err_send_step = "[connect] ";
 
 	zbx_json_free(&json);
 
@@ -578,6 +581,21 @@ static int	send_buffer(const char *host, unsigned short port)
 		buffer.count = 0;
 		buffer.pcount = 0;
 		buffer.lastsent = now;
+		if (0 != buffer.first_error)
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "active item data uploading to [%s:%u] is working again", host, port);
+			buffer.first_error = 0;
+		}
+	}
+	else
+	{
+		if (0 == buffer.first_error)
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "active item data uploading to [%s:%u] started to fail: %s%s",
+					host, port, err_send_step, zbx_tcp_strerror());
+			buffer.first_error = now;
+		}
+		zabbix_log(LOG_LEVEL_DEBUG, "send value error: %s %s", err_send_step, zbx_tcp_strerror());
 	}
 ret:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
