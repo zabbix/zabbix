@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -9,7 +9,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -52,7 +52,7 @@ void	send_proxyconfig(zbx_sock_t *sock, struct zbx_json_parse *jp)
 	if (FAIL == get_proxy_id(jp, &proxy_hostid, host, error, sizeof(error)))
 	{
 		zbx_send_response(sock, FAIL, NULL, CONFIG_TIMEOUT);
-		zabbix_log(LOG_LEVEL_WARNING, "Proxy config request from active proxy on [%s] failed: %s",
+		zabbix_log(LOG_LEVEL_WARNING, "proxy configuration request from active proxy on \"%s\" failed: %s",
 				get_ip_by_socket(sock), error);
 		return;
 	}
@@ -63,15 +63,14 @@ void	send_proxyconfig(zbx_sock_t *sock, struct zbx_json_parse *jp)
 
 	get_proxyconfig_data(proxy_hostid, &j);
 
-	zabbix_log(LOG_LEVEL_WARNING, "Sending configuration data to proxy '%s'. Datalen " ZBX_FS_SIZE_T,
+	zabbix_log(LOG_LEVEL_WARNING, "sending configuration data to proxy \"%s\", datalen " ZBX_FS_SIZE_T,
 			host, (zbx_fs_size_t)j.buffer_size);
 	zabbix_log(LOG_LEVEL_DEBUG, "%s", j.buffer);
 
 	alarm(CONFIG_TIMEOUT);
 
 	if (FAIL == zbx_tcp_send(sock, j.buffer))
-		zabbix_log(LOG_LEVEL_WARNING, "Error while sending configuration. %s",
-				zbx_tcp_strerror());
+		zabbix_log(LOG_LEVEL_WARNING, "cannot send configuration: %s", zbx_tcp_strerror());
 
 	alarm(0);
 
@@ -104,10 +103,7 @@ void	recv_proxyconfig(zbx_sock_t *sock, struct zbx_json_parse *jp)
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	if (SUCCEED != (ret = zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_DATA, &jp_data)))
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "Invalid proxy configuration data. %s",
-				zbx_json_strerror());
-	}
+		zabbix_log(LOG_LEVEL_WARNING, "invalid proxy configuration data: %s", zbx_json_strerror());
 	else
 		process_proxyconfig(&jp_data);
 
