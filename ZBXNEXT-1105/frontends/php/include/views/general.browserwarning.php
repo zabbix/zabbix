@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -10,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -56,7 +56,8 @@
 						New browsers usually come with support for new technologies, increasing web page speed, better privacy settings and so on. They also resolve security and functional issues.
 					</div>
 					<div style="position: absolute; top: 420px; left: 23px;" class="browserwarningCopyright">
-						<a href="http://www.zabbix.com">Zabbix <?php echo ZABBIX_VERSION; ?> Copyright 2001-2012 by Zabbix SIA</a>
+						<a href="http://www.zabbix.com"><?php echo _s('Zabbix %1$s Copyright %2$s-%3$s by Zabbix SIA',
+							ZABBIX_VERSION, ZABBIX_COPYRIGHT_FROM, ZABBIX_COPYRIGHT_TO); ?></a>
 					</div>
 					<div style="position: absolute; top: 400px; left: 400px;" class="browserwarningLink"><a href="index.php" onClick="javascript: document.cookie='browserwarning_ignore=yes';">Continue despite this warning</a> &raquo;</div>
 				</div>
