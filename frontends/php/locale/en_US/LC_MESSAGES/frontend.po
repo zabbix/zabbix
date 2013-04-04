@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-04-02 18:12+0300\n"
+"POT-Creation-Date: 2013-04-04 11:16+0300\n"
 "PO-Revision-Date: 2013-03-06 15:51+0200\n"
 "Last-Translator: Mikhail <mikhail.dobrinin@redprairie.com>\n"
 "Language-Team: RedPrairie\n"
@@ -7178,7 +7178,7 @@ msgstr "Logged in as"
 msgid "Login"
 msgstr "Login"
 
-#: include/views/general.login.php:77
+#: include/views/general.login.php:78
 msgid "Login as Guest"
 msgstr "Login as Guest"
 
@@ -9405,7 +9405,7 @@ msgstr "Passive"
 #: include/views/configuration.item.edit.php:183
 #: include/views/configuration.item.massupdate.php:196
 #: include/views/configuration.item.massupdate.php:240
-#: include/views/general.login.php:65
+#: include/views/general.login.php:66
 #: include/views/js/configuration.item.edit.js.php:130
 msgid "Password"
 msgstr "Password"
@@ -9887,7 +9887,7 @@ msgstr "Regular expression updated"
 msgid "Regular expressions"
 msgstr "Regular expressions"
 
-#: include/views/general.login.php:71
+#: include/views/general.login.php:72
 msgid "Remember me for 30 days"
 msgstr "Remember me for 30 days"
 
@@ -11051,7 +11051,7 @@ msgstr "Show working time"
 msgid "Shown"
 msgstr "Shown"
 
-#: include/views/general.login.php:74 index.php:55 index.php:64
+#: include/views/general.login.php:75 index.php:55 index.php:64
 msgid "Sign in"
 msgstr "Sign in"
 
@@ -12660,7 +12660,7 @@ msgstr "User with alias \"%s\" already exists."
 #: include/views/administration.mediatypes.edit.php:83
 #: include/views/administration.mediatypes.list.php:63
 #: include/views/configuration.host.edit.php:541
-#: include/views/general.login.php:61 index.php:35
+#: include/views/general.login.php:62 index.php:35
 msgid "Username"
 msgstr "Username"
 
@@ -13311,15 +13311,11 @@ msgstr "ZABBIX"
 msgid "Zabbix"
 msgstr "Zabbix"
 
-#: include/page_footer.php:103
-#, php-format
-msgid "Zabbix %s Copyright %s-%s by Zabbix SIA"
-msgstr "Zabbix %s Copyright %s-%s by Zabbix SIA"
-
+#: include/page_footer.php:103 include/views/general.browserwarning.php:59
 #: include/views/general.login.php:47
 #, php-format
-msgid "Zabbix %s Copyright 2001-2013 by Zabbix SIA"
-msgstr "Zabbix %s Copyright 2001-2013 by Zabbix SIA"
+msgid "Zabbix %1$s Copyright %2$s-%3$s by Zabbix SIA"
+msgstr ""
 
 #: include/users.inc.php:40
 msgid "Zabbix Admin"

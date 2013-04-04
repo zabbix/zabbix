@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-04-02 18:12+0300\n"
+"POT-Creation-Date: 2013-04-04 11:16+0300\n"
 "PO-Revision-Date: 2013-02-21 10:59+0200\n"
 "Last-Translator: richlv <richlv@nakts.net>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -7179,7 +7179,7 @@ msgstr ""
 msgid "Login"
 msgstr "Pieslēgties"
 
-#: include/views/general.login.php:77
+#: include/views/general.login.php:78
 msgid "Login as Guest"
 msgstr ""
 
@@ -9409,7 +9409,7 @@ msgstr ""
 #: include/views/configuration.item.edit.php:183
 #: include/views/configuration.item.massupdate.php:196
 #: include/views/configuration.item.massupdate.php:240
-#: include/views/general.login.php:65
+#: include/views/general.login.php:66
 #: include/views/js/configuration.item.edit.js.php:130
 msgid "Password"
 msgstr "Parole"
@@ -9892,7 +9892,7 @@ msgstr ""
 msgid "Regular expressions"
 msgstr "Regulārās izteiksmes"
 
-#: include/views/general.login.php:71
+#: include/views/general.login.php:72
 msgid "Remember me for 30 days"
 msgstr ""
 
@@ -11056,7 +11056,7 @@ msgstr ""
 msgid "Shown"
 msgstr "Parādīts"
 
-#: include/views/general.login.php:74 index.php:55 index.php:64
+#: include/views/general.login.php:75 index.php:55 index.php:64
 msgid "Sign in"
 msgstr ""
 
@@ -12668,7 +12668,7 @@ msgstr ""
 #: include/views/administration.mediatypes.edit.php:83
 #: include/views/administration.mediatypes.list.php:63
 #: include/views/configuration.host.edit.php:541
-#: include/views/general.login.php:61 index.php:35
+#: include/views/general.login.php:62 index.php:35
 msgid "Username"
 msgstr ""
 
@@ -13321,14 +13321,10 @@ msgstr "ZABBIX"
 msgid "Zabbix"
 msgstr ""
 
-#: include/page_footer.php:103
-#, php-format
-msgid "Zabbix %s Copyright %s-%s by Zabbix SIA"
-msgstr ""
-
+#: include/page_footer.php:103 include/views/general.browserwarning.php:59
 #: include/views/general.login.php:47
 #, php-format
-msgid "Zabbix %s Copyright 2001-2013 by Zabbix SIA"
+msgid "Zabbix %1$s Copyright %2$s-%3$s by Zabbix SIA"
 msgstr ""
 
 #: include/users.inc.php:40

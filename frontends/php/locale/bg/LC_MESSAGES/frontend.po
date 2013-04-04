@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-04-02 18:12+0300\n"
+"POT-Creation-Date: 2013-04-04 11:16+0300\n"
 "PO-Revision-Date: 2013-01-12 23:52+0200\n"
 "Last-Translator: Fahri <fahri_hasan@hotmail.com>\n"
 "Language-Team: \n"
@@ -7196,7 +7196,7 @@ msgstr "Влезли сте като"
 msgid "Login"
 msgstr "Вход в системата"
 
-#: include/views/general.login.php:77
+#: include/views/general.login.php:78
 msgid "Login as Guest"
 msgstr "Вход като гост"
 
@@ -9428,7 +9428,7 @@ msgstr "Пасивен"
 #: include/views/configuration.item.edit.php:183
 #: include/views/configuration.item.massupdate.php:196
 #: include/views/configuration.item.massupdate.php:240
-#: include/views/general.login.php:65
+#: include/views/general.login.php:66
 #: include/views/js/configuration.item.edit.js.php:130
 msgid "Password"
 msgstr "Парола"
@@ -9910,7 +9910,7 @@ msgstr "Регулярен израз актуализиран"
 msgid "Regular expressions"
 msgstr "Регулярни изрази"
 
-#: include/views/general.login.php:71
+#: include/views/general.login.php:72
 msgid "Remember me for 30 days"
 msgstr "Запомни ме за 30 дни"
 
@@ -11077,7 +11077,7 @@ msgstr "Покажи работното време"
 msgid "Shown"
 msgstr "Показан"
 
-#: include/views/general.login.php:74 index.php:55 index.php:64
+#: include/views/general.login.php:75 index.php:55 index.php:64
 msgid "Sign in"
 msgstr "Влезте в профила си"
 
@@ -12687,7 +12687,7 @@ msgstr "Потребител с псевдоним \"%s\" вече същест�
 #: include/views/administration.mediatypes.edit.php:83
 #: include/views/administration.mediatypes.list.php:63
 #: include/views/configuration.host.edit.php:541
-#: include/views/general.login.php:61 index.php:35
+#: include/views/general.login.php:62 index.php:35
 msgid "Username"
 msgstr "Потребителско име"
 
@@ -13339,15 +13339,11 @@ msgstr "ZABBIX"
 msgid "Zabbix"
 msgstr "Zabbix"
 
-#: include/page_footer.php:103
-#, php-format
-msgid "Zabbix %s Copyright %s-%s by Zabbix SIA"
-msgstr "Zabbix %s Всички права запазени %s-%s от SIA Zabbix "
-
+#: include/page_footer.php:103 include/views/general.browserwarning.php:59
 #: include/views/general.login.php:47
 #, php-format
-msgid "Zabbix %s Copyright 2001-2013 by Zabbix SIA"
-msgstr "Zabbix %s Всички права запазени 2001-2013 от SIA Zabbix"
+msgid "Zabbix %1$s Copyright %2$s-%3$s by Zabbix SIA"
+msgstr ""
 
 #: include/users.inc.php:40
 msgid "Zabbix Admin"

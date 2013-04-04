@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-04-02 18:12+0300\n"
+"POT-Creation-Date: 2013-04-04 11:16+0300\n"
 "PO-Revision-Date: 2013-03-08 20:54+0200\n"
 "Last-Translator: ΓΙΑΝΝΗΣ <yannis@computerstudio.gr>\n"
 "Language-Team: none\n"
@@ -7185,7 +7185,7 @@ msgstr "Συνδεδεμένος ως"
 msgid "Login"
 msgstr "Σύνδεση"
 
-#: include/views/general.login.php:77
+#: include/views/general.login.php:78
 msgid "Login as Guest"
 msgstr "Σύνδεση ως φιλοξενούμενος"
 
@@ -9412,7 +9412,7 @@ msgstr "Παθητικός"
 #: include/views/configuration.item.edit.php:183
 #: include/views/configuration.item.massupdate.php:196
 #: include/views/configuration.item.massupdate.php:240
-#: include/views/general.login.php:65
+#: include/views/general.login.php:66
 #: include/views/js/configuration.item.edit.js.php:130
 msgid "Password"
 msgstr "Συνθηματικό"
@@ -9895,7 +9895,7 @@ msgstr "Κανονική έκφραση ενημερώθηκε"
 msgid "Regular expressions"
 msgstr "Κανονικές εκφράσεις"
 
-#: include/views/general.login.php:71
+#: include/views/general.login.php:72
 msgid "Remember me for 30 days"
 msgstr "Υπενθύμιση για 30 ημέρες"
 
@@ -11059,7 +11059,7 @@ msgstr "Εμφάνιση χρόνου εργασίας"
 msgid "Shown"
 msgstr "Ορατό"
 
-#: include/views/general.login.php:74 index.php:55 index.php:64
+#: include/views/general.login.php:75 index.php:55 index.php:64
 msgid "Sign in"
 msgstr "Υπογράφω"
 
@@ -12668,7 +12668,7 @@ msgstr "Χρήστης με ψευδώνυμο \"%s\" υπάρχει ήδη."
 #: include/views/administration.mediatypes.edit.php:83
 #: include/views/administration.mediatypes.list.php:63
 #: include/views/configuration.host.edit.php:541
-#: include/views/general.login.php:61 index.php:35
+#: include/views/general.login.php:62 index.php:35
 msgid "Username"
 msgstr "Όνομα χρήστη"
 
@@ -13320,15 +13320,11 @@ msgstr "ZABBIX"
 msgid "Zabbix"
 msgstr "Zabbix"
 
-#: include/page_footer.php:103
-#, php-format
-msgid "Zabbix %s Copyright %s-%s by Zabbix SIA"
-msgstr "Zabbix %s Πνευματικά δικαιώματα %s-%s από Zabbix SIA"
-
+#: include/page_footer.php:103 include/views/general.browserwarning.php:59
 #: include/views/general.login.php:47
 #, php-format
-msgid "Zabbix %s Copyright 2001-2013 by Zabbix SIA"
-msgstr "Zabbix %s Πνευματικά δικαιώματα 2001-2013 απο Zabbix SIA"
+msgid "Zabbix %1$s Copyright %2$s-%3$s by Zabbix SIA"
+msgstr ""
 
 #: include/users.inc.php:40
 msgid "Zabbix Admin"
