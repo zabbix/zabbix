@@ -22,6 +22,13 @@
 class CSetValidator extends CValidator {
 
 	/**
+	 * Allowed values.
+	 *
+	 * @var array
+	 */
+	public $values = array();
+
+	/**
 	 * Checks if the given value belongs to some set.
 	 *
 	 * @param $value
@@ -30,16 +37,7 @@ class CSetValidator extends CValidator {
 	 */
 	public function validate($value)
 	{
-		return in_array($value, $this->options['values']);
-	}
-
-	/**
-	 * Set default options.
-	 * Possible options:
-	 * - values		- supported values
-	 */
-	protected function initOptions() {
-		$this->options['values'] = array();
+		return in_array($value, $this->values);
 	}
 
 }
