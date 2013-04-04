@@ -591,7 +591,7 @@ static int	send_buffer(const char *host, unsigned short port)
 	{
 		if (0 == buffer.first_error)
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "active item data uploading to [%s:%u] started to fail: %s%s",
+			zabbix_log(LOG_LEVEL_WARNING, "active item data uploading to [%s:%u] started to fail (%s%s)",
 					host, port, err_send_step, zbx_tcp_strerror());
 			buffer.first_error = now;
 		}
