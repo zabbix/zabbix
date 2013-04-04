@@ -55,8 +55,8 @@ class CConfiguration extends CZBXAPI {
 	 * 	'format' => 'json'|'xml'
 	 * 	'source' => configuration data in specified format,
 	 * 	'rules' => array(
-	 * 		'hosts' => array('createMissing' => true, 'updateExisitng' => false),
-	 * 		'templates' => array('createMissing' => true, 'updateExisitng' => true),
+	 * 		'hosts' => array('createMissing' => true, 'updateExisting' => false),
+	 * 		'templates' => array('createMissing' => true, 'updateExisting' => true),
 	 * 		...
 	 * 	)
 	 * )

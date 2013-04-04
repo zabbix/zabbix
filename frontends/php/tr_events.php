@@ -85,7 +85,7 @@ $trigger = reset($triggers);
 // get events
 $options = array(
 	'eventids' => $_REQUEST['eventid'],
-	'triggerids' => $_REQUEST['triggerid'],
+	'objectids' => $_REQUEST['triggerid'],
 	'select_alerts' => API_OUTPUT_EXTEND,
 	'select_acknowledges' => API_OUTPUT_EXTEND,
 	'output' => API_OUTPUT_EXTEND,

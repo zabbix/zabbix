@@ -196,10 +196,12 @@ static int	calcitem_evaluate_expression(DC_ITEM *dc_item, expression_t *exp,
 			" where h.hostid=i.hostid"
 				" and h.status=%d"
 				" and i.status=%d"
+				" and i.state=%d"
 				" and (",
 			ZBX_SQL_ITEM_SELECT,
 			HOST_STATUS_MONITORED,
-			ITEM_STATUS_ACTIVE);
+			ITEM_STATUS_ACTIVE,
+			ITEM_STATE_NORMAL);
 
 	for (i = 0; i < exp->functions_num; i++)
 	{
