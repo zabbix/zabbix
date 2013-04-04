@@ -1721,7 +1721,7 @@ class CHost extends CHostGeneral {
 				'nodeids' => $options['nodeids'],
 				'itemids' => $relationMap->getRelatedIds(),
 				'nopermissions' => true,
-				'preservekeys' => true,
+				'preservekeys' => true
 			));
 			$result = $relationMap->mapOne($result, $discoveryRules, 'discoveryRule');
 		}
