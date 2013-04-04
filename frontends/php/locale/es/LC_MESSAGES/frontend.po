@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-04-04 11:16+0300\n"
-"PO-Revision-Date: 2013-02-27 22:54+0200\n"
+"POT-Creation-Date: 2013-04-04 12:14+0300\n"
+"PO-Revision-Date: 2013-04-02 20:11+0200\n"
 "Last-Translator: saulortega <saulortega.co@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: es\n"
@@ -292,12 +292,12 @@ msgstr "La acción \"%1$s\" tiene un valor incorrecto para \"esc_period\" (míni
 #: api/classes/CAction.php:880 api/classes/CAction.php:899
 #, php-format
 msgid "Action \"%s\" already exists."
-msgstr "Acción \"%s\" todavía existe."
+msgstr "La acción \"%s\" ya existe."
 
 #: api/classes/CAction.php:926
 #, php-format
 msgid "Action \"%s\" no operations defined."
-msgstr "Acción \"%s\" no tiene operaciones definidas."
+msgstr "La acción \"%s\" no tiene operaciones definidas."
 
 #: actionconf.php:149
 msgid "Action added"
@@ -332,7 +332,7 @@ msgstr "Activar"
 #: include/views/administration.proxy.list.php:84
 #: include/views/configuration.httpconf.edit.php:118
 msgid "Active"
-msgstr "Activado"
+msgstr "Activo"
 
 #: include/views/configuration.maintenance.list.php:61
 msgctxt "maintenance status"
@@ -421,7 +421,7 @@ msgstr "Añadir equipo"
 
 #: sysmap.php:150
 msgid "Add link"
-msgstr "Añadir link"
+msgstr "Agregar enlace"
 
 #: include/views/conf.import.php:23
 msgid "Add missing"
@@ -480,12 +480,12 @@ msgstr "Edad"
 
 #: tr_status.php:236
 msgid "Age less than"
-msgstr "Edad menor que"
+msgstr "Edad inferior a"
 
 #: include/views/monitoring.overview.php:53
 #, php-format
 msgid "Age less than %s"
-msgstr "Edad menor que %s"
+msgstr "Edad inferior a %s"
 
 #: include/items.inc.php:185 include/views/administration.script.list.php:64
 #: include/views/configuration.httpconf.edit.php:114 popup.php:2016
