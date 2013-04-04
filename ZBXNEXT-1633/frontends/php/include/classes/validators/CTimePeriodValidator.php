@@ -50,7 +50,7 @@ class CTimePeriodValidator extends CValidator {
 		if ($this->allowMultiple) {
 			// remove one last ';'
 			if ($periods[strlen($periods) - 1] === ';') {
-				$periods = substr($periods, 0, strlen($periods) - 1);;
+				$periods = substr($periods, 0, strlen($periods) - 1);
 			}
 
 			$periods = explode(';', $periods);

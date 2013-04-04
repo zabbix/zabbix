@@ -656,7 +656,7 @@ class CTemplate extends CHostGeneral {
 		$actionids = array();
 		$sql = 'SELECT DISTINCT actionid'.
 			' FROM conditions'.
-			' WHERE conditiontype='.CONDITION_TYPE_HOST.
+			' WHERE conditiontype='.CONDITION_TYPE_HOST_TEMPLATE.
 			' AND '.dbConditionString('value', $templateids);
 		$dbActions = DBselect($sql);
 		while ($dbAction = DBfetch($dbActions)) {
@@ -682,8 +682,8 @@ class CTemplate extends CHostGeneral {
 
 		// delete action conditions
 		DB::delete('conditions', array(
-			'conditiontype'=>CONDITION_TYPE_HOST,
-			'value'=>$templateids
+			'conditiontype' => CONDITION_TYPE_HOST_TEMPLATE,
+			'value' => $templateids
 		));
 
 		// delete action operation commands

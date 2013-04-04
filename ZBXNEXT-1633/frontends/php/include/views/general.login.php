@@ -44,7 +44,8 @@ require_once dirname(__FILE__).'/../page_header.php';
 			<div style="position: absolute; top: 39%; left: 2%;" class="loginLogo"></div>
 			<div style="position: absolute; bottom: 2px;">
 				<span class="bold textwhite" style="margin: 0 0 4px 4px; font-size: 0.9em; opacity: 0.7;">
-					<?php echo _s('Zabbix %s Copyright 2001-2013 by Zabbix SIA', ZABBIX_VERSION); ?>
+					<?php echo _s('Zabbix %1$s Copyright %2$s-%3$s by Zabbix SIA',
+						ZABBIX_VERSION, ZABBIX_COPYRIGHT_FROM, ZABBIX_COPYRIGHT_TO); ?>
 				</span>
 			</div>
 		</div>
