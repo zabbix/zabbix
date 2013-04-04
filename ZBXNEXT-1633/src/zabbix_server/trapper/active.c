@@ -70,7 +70,10 @@ static int	get_hostid_by_host(const char *host, const char *ip, unsigned short p
 				" and flags<>%d"
 		       		" and proxy_hostid is null"
 				ZBX_SQL_NODE,
-			host_esc, HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED, DBand_node_local("hostid"));
+			host_esc,
+			HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED,
+			ZBX_FLAG_DISCOVERY_PROTOTYPE,
+			DBand_node_local("hostid"));
 
 	if (NULL != (row = DBfetch(result)))
 	{

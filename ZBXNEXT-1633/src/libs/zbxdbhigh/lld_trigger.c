@@ -652,7 +652,7 @@ static void	DBlld_save_triggers(zbx_vector_ptr_t *triggers, unsigned char status
 					"(" ZBX_FS_UI64 ",'%s','%s',%d,%d,'%s','%s',%d,%d,%d,%d,'%s')" ZBX_ROW_DL,
 					trigger->triggerid, description_esc, expression_esc, (int)priority, (int)status,
 					comments_esc, url_esc, (int)type, TRIGGER_VALUE_OK,
-					TRIGGER_VALUE_FLAG_UNKNOWN, ZBX_FLAG_DISCOVERY_CREATED, error_esc);
+					TRIGGER_STATE_NORMAL, ZBX_FLAG_DISCOVERY_CREATED, error_esc);
 			zbx_free(expression_esc);
 
 #ifndef HAVE_MULTIROW_INSERT

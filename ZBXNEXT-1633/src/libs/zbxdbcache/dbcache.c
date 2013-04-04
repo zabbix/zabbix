@@ -1046,7 +1046,8 @@ notsupported:
 			zabbix_log(LOG_LEVEL_WARNING, "item [%s] became not supported: %s",
 					zbx_host_key_string(h->itemid), h->value_orig.err);
 
-			object = (0 != (ZBX_FLAG_DISCOVERY & item->flags) ? EVENT_OBJECT_LLDRULE : EVENT_OBJECT_ITEM);
+			object = (0 != (ZBX_FLAG_DISCOVERY_RULE & item->flags) ?
+					EVENT_OBJECT_LLDRULE : EVENT_OBJECT_ITEM);
 			add_event(0, EVENT_SOURCE_INTERNAL, object, item->itemid, &h->ts, h->state, NULL, NULL, 0, 0);
 
 			zbx_snprintf_alloc(&sql, &sql_alloc, sql_offset, ",state=%d", (int)h->state);

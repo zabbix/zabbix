@@ -141,6 +141,8 @@ static void	DBcreate_table_sql(char **sql, size_t *sql_alloc, size_t *sql_offset
 			zbx_strcpy_alloc(sql, sql_alloc, sql_offset, ",\n");
 		DBfield_definition_string(sql, sql_alloc, sql_offset, &table->fields[i]);
 	}
+	if ('\0' != *table->recid)
+		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, ",\nprimary key (%s)", table->recid);
 	zbx_strcpy_alloc(sql, sql_alloc, sql_offset, "\n)" ZBX_DB_TABLE_OPTIONS);
 }
 
@@ -208,6 +210,19 @@ static void	DBadd_field_sql(char **sql, size_t *sql_alloc, size_t *sql_offset,
 {
 	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "alter table" ZBX_DB_ONLY " %s add ", table_name);
 	DBfield_definition_string(sql, sql_alloc, sql_offset, field);
+}
+
+static void	DBrename_field_sql(char **sql, size_t *sql_alloc, size_t *sql_offset,
+		const char *table_name, const char *field_name, const ZBX_FIELD *field)
+{
+	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "alter table" ZBX_DB_ONLY " %s ", table_name);
+
+#if defined(HAVE_MYSQL)
+	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "change column %s ", field_name);
+	DBfield_definition_string(sql, sql_alloc, sql_offset, field);
+#else
+	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "rename column %s to %s", field_name, field->name);
+#endif
 }
 
 static void	DBdrop_field_sql(char **sql, size_t *sql_alloc, size_t *sql_offset,
@@ -300,6 +315,24 @@ static int	DBadd_field(const char *table_name, const ZBX_FIELD *field)
 	return ret;
 }
 
+static int	DBrename_field(const char *table_name, const char *field_name, const ZBX_FIELD *field)
+{
+	char	*sql = NULL;
+	size_t	sql_alloc = 64, sql_offset = 0;
+	int	ret = FAIL;
+
+	sql = zbx_malloc(sql, sql_alloc);
+
+	DBrename_field_sql(&sql, &sql_alloc, &sql_offset, table_name, field_name, field);
+
+	if (ZBX_DB_OK <= DBexecute("%s", sql))
+		ret = DBreorg_table(table_name);
+
+	zbx_free(sql);
+
+	return ret;
+}
+
 static int	DBmodify_field_type(const char *table_name, const ZBX_FIELD *field)
 {
 	char	*sql = NULL;
@@ -383,7 +416,7 @@ static int	DBdrop_field(const char *table_name, const char *field_name)
 	DBdrop_field_sql(&sql, &sql_alloc, &sql_offset, table_name, field_name);
 
 	if (ZBX_DB_OK <= DBexecute("%s", sql))
-		ret = SUCCEED;
+		ret = DBreorg_table(table_name);
 
 	zbx_free(sql);
 
@@ -464,14 +497,18 @@ static int	DBdrop_foreign_key(const char *table_name, int id)
 
 static int	DBcreate_dbversion_table()
 {
-	const ZBX_TABLE	*table;
+	const ZBX_TABLE	table =
+			{"dbversion", "", 0,
+				{
+					{"mandatory", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"optional", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{NULL}
+				}
+			};
 	int		ret;
 
-	if (NULL == (table = DBget_table("dbversion")))
-		assert(0);
-
 	DBbegin();
-	if (SUCCEED == (ret = DBcreate_table(table)))
+	if (SUCCEED == (ret = DBcreate_table(&table)))
 	{
 		if (ZBX_DB_OK > DBexecute("insert into dbversion (mandatory,optional) values (%d,%d)",
 				ZBX_FIRST_DB_VERSION, ZBX_FIRST_DB_VERSION))
@@ -1072,16 +1109,16 @@ int	DBcheck_version()
 		{DBpatch_02010047, 2010047, 0, 1},
 		{DBpatch_02010048, 2010048, 0, 0},
 		{DBpatch_02010049, 2010049, 0, 0},
-		{DBpatch_02010039, 2010050, 0, 1},
-		{DBpatch_02010040, 2010051, 0, 1},
-		{DBpatch_02010041, 2010052, 0, 1},
-		{DBpatch_02010042, 2010053, 0, 1},
-		{DBpatch_02010043, 2010054, 0, 1},
-		{DBpatch_02010044, 2010055, 0, 1},
-		{DBpatch_02010045, 2010056, 0, 1},
-		{DBpatch_02010046, 2010057, 0, 1},
-		{DBpatch_02010047, 2010058, 0, 1},
-		{DBpatch_02010048, 2010059, 0, 1},
+		{DBpatch_02010050, 2010050, 0, 1},
+		{DBpatch_02010051, 2010051, 0, 1},
+		{DBpatch_02010052, 2010052, 0, 1},
+		{DBpatch_02010053, 2010053, 0, 1},
+		{DBpatch_02010054, 2010054, 0, 1},
+		{DBpatch_02010055, 2010055, 0, 1},
+		{DBpatch_02010056, 2010056, 0, 1},
+		{DBpatch_02010057, 2010057, 0, 1},
+		{DBpatch_02010058, 2010058, 0, 1},
+		{DBpatch_02010059, 2010059, 0, 1},
 		/* IMPORTANT! When adding a new mandatory DBPatch don't forget to update it for SQLite, too. */
 		{NULL}
 	};
