@@ -485,7 +485,7 @@ static void	execute_commands(DB_EVENT *event, zbx_uint64_t actionid, zbx_uint64_
 		if (ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT != script.type)
 		{
 			script.command = zbx_strdup(script.command, row[11]);
-			substitute_simple_macros(event, NULL, NULL, NULL, NULL, NULL,
+			substitute_simple_macros(&actionid, event, NULL, NULL, NULL, NULL, NULL,
 					&script.command, MACRO_TYPE_MESSAGE, NULL, 0);
 		}
 
@@ -542,8 +542,10 @@ static void	add_message_alert(DB_ESCALATION *escalation, DB_EVENT *event, DB_ACT
 	subject_dyn = zbx_strdup(NULL, subject);
 	message_dyn = zbx_strdup(NULL, message);
 
-	substitute_simple_macros(event, &userid, NULL, NULL, NULL, NULL, &subject_dyn, MACRO_TYPE_MESSAGE, NULL, 0);
-	substitute_simple_macros(event, &userid, NULL, NULL, NULL, NULL, &message_dyn, MACRO_TYPE_MESSAGE, NULL, 0);
+	substitute_simple_macros(&action->actionid, event, &userid, NULL, NULL, NULL, NULL,
+			&subject_dyn, MACRO_TYPE_MESSAGE, NULL, 0);
+	substitute_simple_macros(&action->actionid, event, &userid, NULL, NULL, NULL, NULL,
+			&message_dyn, MACRO_TYPE_MESSAGE, NULL, 0);
 
 	now = time(NULL);
 	subject_esc = DBdyn_escape_string_len(subject_dyn, ALERT_SUBJECT_LEN);
