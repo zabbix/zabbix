@@ -28,6 +28,7 @@ INSERT INTO hosts (hostid, proxy_hostid, host, status, disable_until, error, ava
 INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, dns, port) VALUES (10018,20003,1,0,1,'127.0.0.1','proxy1.zabbix.com','10051');
 INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, dns, port) VALUES (10019,20004,1,0,1,'127.0.0.1','proxy2.zabbix.com','10333');
 INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, dns, port) VALUES (10020,20005,1,0,0,'127.0.0.1','proxy3.zabbix.com','10051');
+INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, dns, port) VALUES (10030,10084,1,4,1,'127.0.0.1','jmxagent.zabbix.com','10051');
 
 -- create an empty host "Template linkage test host"
 INSERT INTO hosts (hostid, proxy_hostid, host, status, disable_until, error, available, errors_from, lastaccess, ipmi_authtype, ipmi_privilege, ipmi_username, ipmi_password, ipmi_disable_until, ipmi_available, snmp_disable_until, snmp_available, maintenanceid, maintenance_status, maintenance_type, maintenance_from, ipmi_errors_from, snmp_errors_from, ipmi_error, snmp_error,name) VALUES (10053,NULL,'Template linkage test host',0,0,'',0,0,0,0,2,'','',0,0,0,0,NULL,0,0,0,0,0,'','','Visible host for template linkage');
@@ -689,8 +690,31 @@ INSERT INTO functions (functionid, itemid, triggerid, function, parameter) VALUE
 
 -- create an empty template for inheritance testing
 INSERT INTO hosts (hostid, proxy_hostid, host, status, disable_until, error, available, errors_from, lastaccess, ipmi_authtype, ipmi_privilege, ipmi_username, ipmi_password, ipmi_disable_until, ipmi_available, snmp_disable_until, snmp_available, maintenanceid, maintenance_status, maintenance_type, maintenance_from, ipmi_errors_from, snmp_errors_from, ipmi_error, snmp_error,name) VALUES (30000,NULL,'Inheritance test template',3,0,'',0,0,0,0,2,'','',0,0,0,0,NULL,0,0,0,0,0,'','','Inheritance test template');
-INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (30000,30000,1);
+INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (30000, 30000, 4);
 INSERT INTO hosts (host, name, status, hostid) VALUES ('Template inheritance test host','Template inheritance test host', 0, 30001);
-INSERT INTO hosts_groups (hostid, groupid, hostgroupid) VALUES (30001, 4, 30001);
-INSERT INTO interface (type, ip, dns, useip, port, main, hostid, interfaceid) VALUES (1, '127.0.0.1', '', '1', '10050', '1', 30001, 30000);
+INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (30001, 30001, 4);
+INSERT INTO interface (type, ip, dns, useip, port, main, hostid, interfaceid) VALUES (1, '127.0.0.1', '', 1, '10050', 1, 30001, 30000);
 INSERT INTO hosts_templates (hosttemplateid, hostid, templateid) VALUES (30000, 30001, 30000);
+
+-- create Form test template
+INSERT INTO hosts (hostid, proxy_hostid, host, status, disable_until, error, available, errors_from, lastaccess, ipmi_authtype, ipmi_privilege, ipmi_username, ipmi_password, ipmi_disable_until, ipmi_available, snmp_disable_until, snmp_available, maintenanceid, maintenance_status, maintenance_type, maintenance_from, ipmi_errors_from, snmp_errors_from, ipmi_error, snmp_error,name) VALUES (40000,NULL,'Form test template',3,0,'',0,0,0,0,2,'','',0,0,0,0,NULL,0,0,0,0,0,'','','Form test template');
+INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (40000, 40000, 4);
+-- create Simple form test
+INSERT INTO hosts (host, name, status, hostid) VALUES ('Simple form test host','Simple form test host', 0, 40001);
+INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (40001, 40001, 4);
+INSERT INTO hosts_templates (hosttemplateid, hostid, templateid) VALUES (40000, 40001, 40000);
+
+-- testFormItem interfaces
+INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, dns, port) VALUES (40011, 40001, 1, 1, 1, '127.0.5.1', '', '10051');
+INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, dns, port) VALUES (40012, 40001, 1, 2, 1, '127.0.5.2', '', '10052');
+INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, dns, port) VALUES (40013, 40001, 1, 3, 1, '127.0.5.3', '', '10053');
+INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, dns, port) VALUES (40014, 40001, 1, 4, 1, '127.0.5.4', '', '10054');
+
+-- testFormItem.SimpleUpdate
+INSERT INTO items (itemid, type, snmp_community, snmp_oid, hostid, name, description, key_, delay, history, trends, lastvalue, lastclock, prevvalue, status, value_type, trapper_hosts, units, multiplier, delta, prevorgvalue, snmpv3_securityname, snmpv3_securitylevel, snmpv3_authpassphrase, snmpv3_privpassphrase, formula, error, lastlogsize, logtimefmt, templateid, valuemapid, delay_flex, params, ipmi_sensor, data_type, authtype, username, password, publickey, privatekey, mtime, lastns, flags, interfaceid) VALUES (30000, 0, '', '', 40001, 'testFormItem1', 'testFormItems','test-item-form1', 30, 90, 365, NULL, NULL, NULL, 0, 0, '', '', 0, 0, NULL, '', 0, '', '', 1, '', 0, '', NULL, NULL, '', '', '', 0, 0, '', '', '', '', 0, NULL, 0, 40011);
+INSERT INTO items (itemid, type, snmp_community, snmp_oid, hostid, name, description, key_, delay, history, trends, lastvalue, lastclock, prevvalue, status, value_type, trapper_hosts, units, multiplier, delta, prevorgvalue, snmpv3_securityname, snmpv3_securitylevel, snmpv3_authpassphrase, snmpv3_privpassphrase, formula, error, lastlogsize, logtimefmt, templateid, valuemapid, delay_flex, params, ipmi_sensor, data_type, authtype, username, password, publickey, privatekey, mtime, lastns, flags, interfaceid) VALUES (30001, 0, '', '', 40001, 'testFormItem2', 'testFormItems','test-item-form2', 30, 90, 365, NULL, NULL, NULL, 0, 0, '', '', 0, 0, NULL, '', 0, '', '', 1, '', 0, '', NULL, NULL, '', '', '', 0, 0, '', '', '', '', 0, NULL, 0, 40011);
+INSERT INTO items (itemid, type, snmp_community, snmp_oid, hostid, name, description, key_, delay, history, trends, lastvalue, lastclock, prevvalue, status, value_type, trapper_hosts, units, multiplier, delta, prevorgvalue, snmpv3_securityname, snmpv3_securitylevel, snmpv3_authpassphrase, snmpv3_privpassphrase, formula, error, lastlogsize, logtimefmt, templateid, valuemapid, delay_flex, params, ipmi_sensor, data_type, authtype, username, password, publickey, privatekey, mtime, lastns, flags, interfaceid) VALUES (30002, 0, '', '', 40001, 'testFormItem3', 'testFormItems','test-item-form3', 30, 90, 365, NULL, NULL, NULL, 0, 0, '', '', 0, 0, NULL, '', 0, '', '', 1, '', 0, '', NULL, NULL, '', '', '', 0, 0, '', '', '', '', 0, NULL, 0, 40011);
+INSERT INTO items (itemid, type, snmp_community, snmp_oid, hostid, name, description, key_, delay, history, trends, lastvalue, lastclock, prevvalue, status, value_type, trapper_hosts, units, multiplier, delta, prevorgvalue, snmpv3_securityname, snmpv3_securitylevel, snmpv3_authpassphrase, snmpv3_privpassphrase, formula, error, lastlogsize, logtimefmt, templateid, valuemapid, delay_flex, params, ipmi_sensor, data_type, authtype, username, password, publickey, privatekey, mtime, lastns, flags, interfaceid) VALUES (30003, 0, '', '', 40001, 'testFormItem4', 'testFormItems','test-item-form4', 30, 90, 365, NULL, NULL, NULL, 0, 0, '', '', 0, 0, NULL, '', 0, '', '', 1, '', 0, '', NULL, NULL, '', '', '', 0, 0, '', '', '', '', 0, NULL, 0, 40011);
+
+-- testFormTrigger.SimpleCreate
+INSERT INTO items (itemid, type, snmp_community, snmp_oid, hostid, name, description, key_, delay, history, trends, lastvalue, lastclock, prevvalue, status, value_type, trapper_hosts, units, multiplier, delta, prevorgvalue, snmpv3_securityname, snmpv3_securitylevel, snmpv3_authpassphrase, snmpv3_privpassphrase, formula, error, lastlogsize, logtimefmt, templateid, valuemapid, delay_flex, params, ipmi_sensor, data_type, authtype, username, password, publickey, privatekey, mtime, lastns, flags, interfaceid) VALUES (30004, 0, '', '', 40001, 'testFormItem', 'testFormItems','test-item-reuse', 30, 90, 365, NULL, NULL, NULL, 0, 0, '', '', 0, 0, NULL, '', 0, '', '', 1, '', 0, '', NULL, NULL, '', '', '', 0, 0, '', '', '', '', 0, NULL, 0, 40000);
