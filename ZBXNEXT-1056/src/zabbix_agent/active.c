@@ -407,8 +407,11 @@ static int	refresh_active_checks(const char *host, unsigned short port)
 	}
 
 	if (SUCCEED != ret)
-		zabbix_log(LOG_LEVEL_WARNING, "cannot connect to [%s:%u] for active check configuration (%s)",
-				host, port, zbx_tcp_strerror());
+	{
+		const char	*operation = (NULL == active_metrics[0].key) ? "get" : "update";
+		zabbix_log(LOG_LEVEL_WARNING, "cannot connect to [%s:%u] to %s active checks list (%s)",
+				host, port, operation, zbx_tcp_strerror());
+	}
 
 	zbx_json_free(&json);
 
