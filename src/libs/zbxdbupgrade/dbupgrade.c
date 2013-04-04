@@ -79,31 +79,12 @@
 #endif
 
 #if defined(HAVE_IBM_DB2)
-#	define ZBX_TYPE_TEXT_STR	"varchar(2048)"
-#elif defined(HAVE_ORACLE)
-#	define ZBX_TYPE_TEXT_STR	"nclob"
-#else
-#	define ZBX_TYPE_TEXT_STR	"text"
-#endif
-
-#if defined(HAVE_IBM_DB2)
 #	define ZBX_TYPE_SHORTTEXT_STR	"varchar(2048)"
 #elif defined(HAVE_ORACLE)
 #	define ZBX_TYPE_SHORTTEXT_STR	"nvarchar2(2048)"
 #else
 #	define ZBX_TYPE_SHORTTEXT_STR	"text"
 #endif
-
-#if defined(HAVE_IBM_DB2)
-#	define ZBX_TYPE_LONGTEXT_STR	"varchar(2048)"
-#elif defined(HAVE_ORACLE)
-#	define ZBX_TYPE_LONGTEXT_STR	"nclob"
-#elif defined(HAVE_MYSQL)
-#	define ZBX_TYPE_LONGTEXT_STR	"longtext"
-#else
-#	define ZBX_TYPE_LONGTEXT_STR	"text"
-#endif
-
 
 #define ZBX_FIRST_DB_VERSION		2010000
 
@@ -135,14 +116,8 @@ static void	DBfield_type_string(char **sql, size_t *sql_alloc, size_t *sql_offse
 		case ZBX_TYPE_UINT:
 			zbx_strcpy_alloc(sql, sql_alloc, sql_offset, ZBX_TYPE_UINT_STR);
 			break;
-		case ZBX_TYPE_TEXT:
-			zbx_strcpy_alloc(sql, sql_alloc, sql_offset, ZBX_TYPE_TEXT_STR);
-			break;
 		case ZBX_TYPE_SHORTTEXT:
 			zbx_strcpy_alloc(sql, sql_alloc, sql_offset, ZBX_TYPE_SHORTTEXT_STR);
-			break;
-		case ZBX_TYPE_LONGTEXT:
-			zbx_strcpy_alloc(sql, sql_alloc, sql_offset, ZBX_TYPE_LONGTEXT_STR);
 			break;
 		default:
 			assert(0);
