@@ -1924,12 +1924,16 @@ static int	get_autoreg_value_by_event(DB_EVENT *event, char **replace_to, const 
 #define MVAR_ACTION_ID			MVAR_ACTION "ID}"
 #define MVAR_ACTION_NAME		MVAR_ACTION "NAME}"
 #define MVAR_DATE			"{DATE}"
-#define MVAR_EVENT_ID			"{EVENT.ID}"
-#define MVAR_EVENT_DATE			"{EVENT.DATE}"
-#define MVAR_EVENT_TIME			"{EVENT.TIME}"
-#define MVAR_EVENT_AGE			"{EVENT.AGE}"
-#define MVAR_EVENT_ACK_STATUS		"{EVENT.ACK.STATUS}"
-#define MVAR_EVENT_ACK_HISTORY		"{EVENT.ACK.HISTORY}"
+#define MVAR_EVENT			"{EVENT."			/* a prefix for all event macros */
+#define MVAR_EVENT_ACK_HISTORY		MVAR_EVENT "ACK.HISTORY}"
+#define MVAR_EVENT_ACK_STATUS		MVAR_EVENT "ACK.STATUS}"
+#define MVAR_EVENT_AGE			MVAR_EVENT "AGE}"
+#define MVAR_EVENT_DATE			MVAR_EVENT "DATE}"
+#define MVAR_EVENT_DURATION		MVAR_EVENT "DURATION}"
+#define MVAR_EVENT_ID			MVAR_EVENT "ID}"
+#define MVAR_EVENT_STATUS		MVAR_EVENT "STATUS}"
+#define MVAR_EVENT_TIME			MVAR_EVENT "TIME}"
+#define MVAR_EVENT_VALUE		MVAR_EVENT "VALUE}"
 #define MVAR_ESC_HISTORY		"{ESC.HISTORY}"
 #define MVAR_PROXY_NAME			"{PROXY.NAME}"
 #define MVAR_HOST_DNS			"{HOST.DNS}"
@@ -2220,6 +2224,16 @@ static inventory_field_t	inventory_fields[] =
 	{NULL}
 };
 
+/******************************************************************************
+ *                                                                            *
+ * Function: get_action_value                                                 *
+ *                                                                            *
+ * Purpose: request action value by macro                                     *
+ *                                                                            *
+ * Return value: upon successful completion return SUCCEED                    *
+ *               otherwise FAIL                                               *
+ *                                                                            *
+ ******************************************************************************/
 static int	get_action_value(const char *macro, zbx_uint64_t actionid, char **replace_to)
 {
 	int	ret = SUCCEED;
@@ -2337,6 +2351,90 @@ static int	get_host_inventory_by_itemid(const char *macro, zbx_uint64_t itemid, 
 	}
 
 	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: get_event_value                                                  *
+ *                                                                            *
+ * Purpose: request event value by macro                                      *
+ *                                                                            *
+ * Return value: upon successful completion return SUCCEED                    *
+ *               otherwise FAIL                                               *
+ *                                                                            *
+ ******************************************************************************/
+static int	get_event_macro_value(const char *macro, DB_EVENT *event, char **replace_to)
+{
+	int	ret = SUCCEED;
+
+	if (0 == strcmp(macro, MVAR_EVENT_AGE))
+	{
+		*replace_to = zbx_strdup(*replace_to, zbx_age2str(time(NULL) - event->clock));
+	}
+	else if (0 == strcmp(macro, MVAR_EVENT_DATE))
+	{
+		*replace_to = zbx_strdup(*replace_to, zbx_date2str(event->clock));
+	}
+	else if (0 == strcmp(macro, MVAR_EVENT_ID))
+	{
+		*replace_to = zbx_dsprintf(*replace_to, ZBX_FS_UI64, event->eventid);
+	}
+	else if (0 == strcmp(macro, MVAR_EVENT_TIME))
+	{
+		*replace_to = zbx_strdup(*replace_to, zbx_time2str(event->clock));
+	}
+	else if (EVENT_SOURCE_TRIGGERS == event->source || EVENT_SOURCE_INTERNAL == event->source)
+	{
+		if (EVENT_SOURCE_TRIGGERS == event->source)
+		{
+			if (0 == strcmp(macro, MVAR_EVENT_ACK_HISTORY))
+			{
+				ret = get_event_ack_history(event, replace_to);
+			}
+			else if (0 == strcmp(macro, MVAR_EVENT_ACK_STATUS))
+			{
+				*replace_to = zbx_strdup(*replace_to, event->acknowledged ? "Yes" : "No");
+			}
+		}
+		else if (0 == strcmp(macro, MVAR_EVENT_DURATION))
+		{
+			DB_RESULT	result;
+			DB_ROW		row;
+			char		sql[128];
+			int		clock;
+
+			zbx_snprintf(sql, sizeof(sql),
+					"select clock"
+					" from events"
+					" where source=%d"
+						" and object=%d"
+						" and objectid=" ZBX_FS_UI64
+						" and eventid>" ZBX_FS_UI64
+					" order by eventid",
+					event->source, event->object, event->objectid, event->eventid);
+
+			result = DBselectN(sql, 1);
+
+			if (NULL != (row = DBfetch(result)))
+				clock = atoi(row[0]);
+			else
+				clock = time(NULL);
+
+			*replace_to = zbx_strdup(*replace_to, zbx_age2str(clock - event->clock));
+
+			DBfree_result(result);
+		}
+		else if (0 == strcmp(macro, MVAR_EVENT_STATUS))
+		{
+			*replace_to = zbx_dsprintf(*replace_to, "%d", event->value);
+		}
+		else if (0 == strcmp(macro, MVAR_EVENT_VALUE))
+		{
+			*replace_to = zbx_strdup(*replace_to, event->value == TRIGGER_VALUE_PROBLEM ? "PROBLEM" : "OK");
+		}
+	}
+
+	return ret;
 }
 
 /******************************************************************************
@@ -2490,7 +2588,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, DB_EVENT *event, zbx_uint64
 
 		if (0 != (macro_type & MACRO_TYPE_MESSAGE))
 		{
-			if (EVENT_SOURCE_TRIGGERS == event->source && EVENT_OBJECT_TRIGGER == event->object)
+			if (EVENT_SOURCE_TRIGGERS == event->source)
 			{
 				if (0 == strncmp(m, MVAR_ACTION, sizeof(MVAR_ACTION) - 1))
 				{
@@ -2504,29 +2602,9 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, DB_EVENT *event, zbx_uint64
 				{
 					ret = get_escalation_history(event, escalation, &replace_to);
 				}
-				else if (0 == strcmp(m, MVAR_EVENT_ACK_HISTORY))
+				if (0 == strncmp(m, MVAR_EVENT, sizeof(MVAR_EVENT) - 1))
 				{
-					ret = get_event_ack_history(event, &replace_to);
-				}
-				else if (0 == strcmp(m, MVAR_EVENT_ACK_STATUS))
-				{
-					replace_to = zbx_strdup(replace_to, event->acknowledged ? "Yes" : "No");
-				}
-				else if (0 == strcmp(m, MVAR_EVENT_AGE))
-				{
-					replace_to = zbx_strdup(replace_to, zbx_age2str(time(NULL) - event->clock));
-				}
-				else if (0 == strcmp(m, MVAR_EVENT_DATE))
-				{
-					replace_to = zbx_strdup(replace_to, zbx_date2str(event->clock));
-				}
-				else if (0 == strcmp(m, MVAR_EVENT_ID))
-				{
-					replace_to = zbx_dsprintf(replace_to, ZBX_FS_UI64, event->eventid);
-				}
-				else if (0 == strcmp(m, MVAR_EVENT_TIME))
-				{
-					replace_to = zbx_strdup(replace_to, zbx_time2str(event->clock));
+					ret = get_event_macro_value(m, event, &replace_to);
 				}
 				else if (0 == strcmp(m, MVAR_HOST_CONN))
 				{
@@ -2757,21 +2835,9 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, DB_EVENT *event, zbx_uint64
 				{
 					ret = get_escalation_history(event, escalation, &replace_to);
 				}
-				else if (0 == strcmp(m, MVAR_EVENT_AGE))
+				if (0 == strncmp(m, MVAR_EVENT, sizeof(MVAR_EVENT) - 1))
 				{
-					replace_to = zbx_strdup(replace_to, zbx_age2str(time(NULL) - event->clock));
-				}
-				else if (0 == strcmp(m, MVAR_EVENT_DATE))
-				{
-					replace_to = zbx_strdup(replace_to, zbx_date2str(event->clock));
-				}
-				else if (0 == strcmp(m, MVAR_EVENT_ID))
-				{
-					replace_to = zbx_dsprintf(replace_to, ZBX_FS_UI64, event->eventid);
-				}
-				else if (0 == strcmp(m, MVAR_EVENT_TIME))
-				{
-					replace_to = zbx_strdup(replace_to, zbx_time2str(event->clock));
+					ret = get_event_macro_value(m, event, &replace_to);
 				}
 				else if (0 == strcmp(m, MVAR_HOST_CONN))
 				{
@@ -2919,21 +2985,9 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, DB_EVENT *event, zbx_uint64
 				{
 					replace_to = zbx_strdup(replace_to, zbx_date2str(time(NULL)));
 				}
-				else if (0 == strcmp(m, MVAR_EVENT_AGE))
+				if (0 == strncmp(m, MVAR_EVENT, sizeof(MVAR_EVENT) - 1))
 				{
-					replace_to = zbx_strdup(replace_to, zbx_age2str(time(NULL) - event->clock));
-				}
-				else if (0 == strcmp(m, MVAR_EVENT_DATE))
-				{
-					replace_to = zbx_strdup(replace_to, zbx_date2str(event->clock));
-				}
-				else if (0 == strcmp(m, MVAR_EVENT_ID))
-				{
-					replace_to = zbx_dsprintf(replace_to, ZBX_FS_UI64, event->eventid);
-				}
-				else if (0 == strcmp(m, MVAR_EVENT_TIME))
-				{
-					replace_to = zbx_strdup(replace_to, zbx_time2str(event->clock));
+					ret = get_event_macro_value(m, event, &replace_to);
 				}
 				else if (0 == strcmp(m, MVAR_DISCOVERY_DEVICE_IPADDRESS))
 				{
@@ -3038,21 +3092,9 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, DB_EVENT *event, zbx_uint64
 				{
 					replace_to = zbx_strdup(replace_to, zbx_date2str(time(NULL)));
 				}
-				else if (0 == strcmp(m, MVAR_EVENT_AGE))
+				if (0 == strncmp(m, MVAR_EVENT, sizeof(MVAR_EVENT) - 1))
 				{
-					replace_to = zbx_strdup(replace_to, zbx_age2str(time(NULL) - event->clock));
-				}
-				else if (0 == strcmp(m, MVAR_EVENT_DATE))
-				{
-					replace_to = zbx_strdup(replace_to, zbx_date2str(event->clock));
-				}
-				else if (0 == strcmp(m, MVAR_EVENT_ID))
-				{
-					replace_to = zbx_dsprintf(replace_to, ZBX_FS_UI64, event->eventid);
-				}
-				else if (0 == strcmp(m, MVAR_EVENT_TIME))
-				{
-					replace_to = zbx_strdup(replace_to, zbx_time2str(event->clock));
+					ret = get_event_macro_value(m, event, &replace_to);
 				}
 				else if (0 == strcmp(m, MVAR_HOST_HOST))
 				{
@@ -3108,21 +3150,9 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, DB_EVENT *event, zbx_uint64
 				{
 					ret = get_escalation_history(event, escalation, &replace_to);
 				}
-				else if (0 == strcmp(m, MVAR_EVENT_ID))
+				if (0 == strncmp(m, MVAR_EVENT, sizeof(MVAR_EVENT) - 1))
 				{
-					replace_to = zbx_dsprintf(replace_to, ZBX_FS_UI64, event->eventid);
-				}
-				else if (0 == strcmp(m, MVAR_EVENT_DATE))
-				{
-					replace_to = zbx_strdup(replace_to, zbx_date2str(event->clock));
-				}
-				else if (0 == strcmp(m, MVAR_EVENT_TIME))
-				{
-					replace_to = zbx_strdup(replace_to, zbx_time2str(event->clock));
-				}
-				else if (0 == strcmp(m, MVAR_EVENT_AGE))
-				{
-					replace_to = zbx_strdup(replace_to, zbx_age2str(time(NULL) - event->clock));
+					ret = get_event_macro_value(m, event, &replace_to);
 				}
 				else if (0 == strcmp(m, MVAR_HOST_CONN))
 				{
@@ -3209,21 +3239,9 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, DB_EVENT *event, zbx_uint64
 				{
 					ret = get_escalation_history(event, escalation, &replace_to);
 				}
-				else if (0 == strcmp(m, MVAR_EVENT_ID))
+				if (0 == strncmp(m, MVAR_EVENT, sizeof(MVAR_EVENT) - 1))
 				{
-					replace_to = zbx_dsprintf(replace_to, ZBX_FS_UI64, event->eventid);
-				}
-				else if (0 == strcmp(m, MVAR_EVENT_DATE))
-				{
-					replace_to = zbx_strdup(replace_to, zbx_date2str(event->clock));
-				}
-				else if (0 == strcmp(m, MVAR_EVENT_TIME))
-				{
-					replace_to = zbx_strdup(replace_to, zbx_time2str(event->clock));
-				}
-				else if (0 == strcmp(m, MVAR_EVENT_AGE))
-				{
-					replace_to = zbx_strdup(replace_to, zbx_age2str(time(NULL) - event->clock));
+					ret = get_event_macro_value(m, event, &replace_to);
 				}
 				else if (0 == strcmp(m, MVAR_HOST_CONN))
 				{
