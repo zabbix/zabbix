@@ -21,7 +21,7 @@
 <?php
 $itemsWidget = new CWidget();
 
-$discoverRule = $this->data['discovery_rule'];
+$discoveryRule = $this->data['discovery_rule'];
 
 // create new item button
 $createForm = new CForm('get');
@@ -33,7 +33,7 @@ $itemsWidget->addPageHeader(_('CONFIGURATION OF HOST PROTOTYPES'), $createForm);
 // header
 $itemsWidget->addHeader(array(_('Host prototypes of').SPACE, new CSpan($this->data['discovery_rule']['name'], 'gold')));
 $itemsWidget->addHeaderRowNumber();
-$itemsWidget->addItem(get_header_host_table('hosts', $discoverRule['hostid'], $this->data['parent_discoveryid']));
+$itemsWidget->addItem(get_header_host_table('hosts', $discoveryRule['hostid'], $this->data['parent_discoveryid']));
 
 // create form
 $itemForm = new CForm('get');
@@ -59,11 +59,10 @@ foreach ($this->data['hostPrototypes'] as $hostPrototype) {
 	$name = array();
 	if ($hostPrototype['templateid']) {
 		$sourceTemplate = $hostPrototype['sourceTemplate'];
-		$parentDiscoveryRuleId = get_realrule_by_itemid_and_hostid($discoverRule['itemid'], $sourceTemplate['hostid']);
-		$name[] = new CLink($sourceTemplate['name'], '?parent_discoveryid='.$parentDiscoveryRuleId, 'unknown');
+		$name[] = new CLink($sourceTemplate['name'], '?parent_discoveryid='.$hostPrototype['sourceDiscoveryRuleId'], 'unknown');
 		$name[] = NAME_DELIMITER;
 	}
-	$name[] = new CLink($hostPrototype['name'], '?form=update&parent_discoveryid='.$discoverRule['itemid'].'&hostid='.$hostPrototype['hostid']);
+	$name[] = new CLink($hostPrototype['name'], '?form=update&parent_discoveryid='.$discoveryRule['itemid'].'&hostid='.$hostPrototype['hostid']);
 
 	// template list
 	if (empty($hostPrototype['templates'])) {
@@ -103,7 +102,7 @@ foreach ($this->data['hostPrototypes'] as $hostPrototype) {
 
 	// status
 	$status = new CLink(item_status2str($hostPrototype['status']),
-		'?group_hostid='.$hostPrototype['hostid'].'&parent_discoveryid='.$discoverRule['itemid'].
+		'?group_hostid='.$hostPrototype['hostid'].'&parent_discoveryid='.$discoveryRule['itemid'].
 		'&go='.($hostPrototype['status'] ? 'activate' : 'disable'), itemIndicatorStyle($hostPrototype['status'])
 	);
 
