@@ -289,7 +289,7 @@ else {
 	$hostPrototypeSourceIds = getHostPrototypeSourceParentIds(zbx_objectValues($data['hostPrototypes'], 'hostid'));
 	if ($hostPrototypeSourceIds) {
 		$hostPrototypeSourceTemplates = DBfetchArrayAssoc(DBSelect(
-			'SELECT h.hostid,h2.name,h2.hostid parent_hostid'.
+			'SELECT h.hostid,h2.name,h2.hostid AS parent_hostid'.
 			' FROM hosts h,host_discovery hd,items i,hosts h2'.
 			' WHERE h.hostid=hd.hostid'.
 				' AND hd.parent_itemid=i.itemid'.
