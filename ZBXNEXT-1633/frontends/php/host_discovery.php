@@ -124,6 +124,7 @@ if (get_request('itemid', false)) {
 	$item = API::DiscoveryRule()->get(array(
 		'itemids' => $_REQUEST['itemid'],
 		'output' => API_OUTPUT_EXTEND,
+		'selectHosts' => API_OUTPUT_EXTEND,
 		'editable' => true
 	));
 	$item = reset($item);
@@ -131,6 +132,7 @@ if (get_request('itemid', false)) {
 		access_deny();
 	}
 	$_REQUEST['hostid'] = $item['hostid'];
+	$host = reset($item['hosts']);
 }
 elseif (get_request('hostid', 0) > 0) {
 	$hosts = API::Host()->get(array(
