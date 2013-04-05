@@ -412,7 +412,7 @@ abstract class CHostGeneral extends CHostBase {
 		if (!$clear && isset($items[ZBX_FLAG_DISCOVERY_RULE])) {
 			$discoveryRuleIds = array_keys($items[ZBX_FLAG_DISCOVERY_RULE]);
 
-			$query = DBSelect(
+			$hostPrototypes = DBfetchArrayAssoc(DBSelect(
 				'SELECT DISTINCT h.hostid,h.host,h3.host AS parent_host'.
 				' FROM hosts h'.
 					' INNER JOIN host_discovery hd ON h.hostid=hd.hostid'.
@@ -421,14 +421,7 @@ abstract class CHostGeneral extends CHostBase {
 					' INNER JOIN items i ON hd.parent_itemid=i.itemid'.
 					' INNER JOIN hosts h3 ON i.hostid=h3.hostid'.
 				' WHERE '.dbConditionInt('hd.parent_itemid', $discoveryRuleIds)
-			);
-			$hostPrototypes = array();
-			while ($hostPrototype = DBfetch($query)) {
-				$hostPrototypes[$hostPrototype['hostid']] = array(
-					'host' => $hostPrototype['host'],
-					'parent_host' => $hostPrototype['parent_host']
-				);
-			}
+			), 'hostid');
 			if ($hostPrototypes) {
 				DB::update('hosts', array(
 					'values' => array('templateid' => 0),
