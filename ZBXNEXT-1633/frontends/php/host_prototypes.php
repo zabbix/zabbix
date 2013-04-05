@@ -285,7 +285,7 @@ else {
 	));
 	$data['linkedTemplates'] = zbx_toHash($linkedTemplates, 'templateid');
 
-	// fetch source templates
+	// fetch source templates and LLD rules
 	$hostPrototypeSourceIds = getHostPrototypeSourceParentIds(zbx_objectValues($data['hostPrototypes'], 'hostid'));
 	if ($hostPrototypeSourceIds) {
 		$hostPrototypeSourceTemplates = DBfetchArrayAssoc(DBSelect(
@@ -303,6 +303,8 @@ else {
 					'hostid' => $sourceTemplate['parent_hostid'],
 					'name' => $sourceTemplate['name']
 				);
+				$sourceDiscoveryRuleId = get_realrule_by_itemid_and_hostid($discoveryRule['itemid'], $sourceTemplate['hostid']);
+				$hostPrototype['sourceDiscoveryRuleId'] = $sourceDiscoveryRuleId;
 			}
 		}
 		unset($hostPrototype);
