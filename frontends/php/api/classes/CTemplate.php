@@ -771,12 +771,14 @@ class CTemplate extends CHostGeneral {
 
 		// link hosts to the given templates
 		if (isset($data['hosts']) && !empty($data['hosts'])) {
+			$hostIds = zbx_objectValues($data['hosts'], 'hostid');
+
 			// check if any of the hosts are discovered
-			$this->checkValidator(zbx_objectValues($data['hosts'], 'hostid'), new CHostNotDiscoveredValidator(array(
+			$this->checkValidator($hostIds, new CHostNotDiscoveredValidator(array(
 				'message' => _('Cannot update templates on discovered host "%1$s".')
 			)));
 
-			$this->link($templateids, zbx_objectValues($data['hosts'], 'hostid'));
+			$this->link($templateids, $hostIds);
 		}
 
 		$data['hosts'] = array();
