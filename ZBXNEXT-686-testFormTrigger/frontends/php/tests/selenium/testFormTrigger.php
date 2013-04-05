@@ -435,7 +435,7 @@ class testFormTrigger extends CWebTest {
 					'expression' => '{Simple form test host:test-item-reuse.last(0)} | {#MACRO}',
 					'constructor' => array(array(
 						'text' => array('A | B', 'A', 'B'),
-						'elements' => array('expr_0_32', 'expr_36_43')
+						'elements' => array('expr_0_46', 'expr_50_57')
 						)
 					)
 				)
@@ -447,7 +447,7 @@ class testFormTrigger extends CWebTest {
 					'expression' => '{Zabbix host:test-item-reuse.last(0)}<0 | 8 & 9',
 					'constructor' => array(array(
 						'text' => array('A | (B & C)', 'OR', 'AND', 'A', 'B', 'C'),
-						'elements' => array('expr_0_36', 'expr_40_40', 'expr_44_44'),
+						'elements' => array('expr_0_38', 'expr_42_42', 'expr_46_46'),
 						'elementError' => true
 						)
 					)
@@ -460,7 +460,7 @@ class testFormTrigger extends CWebTest {
 					'expression' => '{Simple form test host:someItem.uptime.last(0)}<0 | 8 & 9 + {Simple form test host:test-item-reuse.last(0)}',
 					'constructor' => array(array(
 						'text' => array('A | (B & C)', 'A', 'B', 'C'),
-						'elements' => array('expr_0_36', 'expr_40_40', 'expr_44_80'),
+						'elements' => array('expr_0_48', 'expr_52_52', 'expr_56_106'),
 						'elementError' => true
 						)
 					)
@@ -473,7 +473,7 @@ class testFormTrigger extends CWebTest {
 					'expression' => '{Simple form test host:test-item-reuse.lasta(0)}<0 | 8 & 9 + {Simple form test host:test-item-reuse.last(0)}',
 					'constructor' => array(array(
 						'text' => array('A | (B & C)', 'A', 'B', 'C'),
-						'elements' => array('expr_0_35', 'expr_39_39', 'expr_43_79'),
+						'elements' => array('expr_0_49', 'expr_53_53', 'expr_57_107'),
 						'elementError' => true
 						)
 					)
@@ -601,8 +601,7 @@ class testFormTrigger extends CWebTest {
 		}
 
 		if (isset($data['constructor'])) {
-			$this->zbxTestClick("//span[text()='Expression constructor']");
-			sleep(1);
+			$this->zbxTestClickWait("//span[text()='Expression constructor']");
 
 			foreach($data['constructor'] as $constructor) {
 				if (isset($constructor['errors'])) {
