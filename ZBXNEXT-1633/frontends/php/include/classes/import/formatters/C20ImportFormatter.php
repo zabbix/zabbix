@@ -356,7 +356,7 @@ class C20ImportFormatter extends CImportFormatter {
 			foreach ($discoveryRule['host_prototypes'] as &$hostPrototype) {
 				CArrayHelper::convertFieldToArray($hostPrototype, 'templates');
 			}
-			unset($graph);
+			unset($hostPrototype);
 		}
 		else {
 			$discoveryRule['host_prototypes'] = array();
