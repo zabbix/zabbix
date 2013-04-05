@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -10,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -321,23 +321,24 @@ $itemFormList->addRow(_('Flexible intervals'),
 );
 
 // append new flexible interval to form list
-$itemFormList->addRow(
-	_('New flexible interval'),
-	array(
-		_('Interval (in sec)'),
-		SPACE,
-		new CNumericBox('new_delay_flex[delay]', $this->data['new_delay_flex']['delay'], 5),
-		SPACE,
-		_('Period'),
-		SPACE,
-		new CTextBox('new_delay_flex[period]', $this->data['new_delay_flex']['period'], 20),
-		SPACE,
-		new CSubmit('add_delay_flex', _('Add'), null, 'formlist')
-	),
-	$this->data['maxReached'],
-	'row_new_delay_flex',
-	'new'
-);
+$newFlexInt = new CSpan(array(
+	_('Interval (in sec)'),
+	SPACE,
+	new CNumericBox('new_delay_flex[delay]', $this->data['new_delay_flex']['delay'], 5),
+	SPACE,
+	_('Period'),
+	SPACE,
+	new CTextBox('new_delay_flex[period]', $this->data['new_delay_flex']['period'], 20),
+	SPACE,
+	new CSubmit('add_delay_flex', _('Add'), null, 'formlist')
+));
+$newFlexInt->setAttribute('id', 'row-new-delay-flex-fields');
+
+$maxFlexMsg = new CSpan(_('Maximum number of flexible intervals added'), 'red');
+$maxFlexMsg->setAttribute('id', 'row-new-delay-flex-max-reached');
+$maxFlexMsg->setAttribute('style', 'display: none;');
+
+$itemFormList->addRow(_('New flexible interval'), array($newFlexInt, $maxFlexMsg), false, 'row_new_delay_flex', 'new');
 
 if ($this->data['is_discovery_rule']) {
 	$itemFormList->addRow(_('Keep lost resources period (in days)'), new CTextBox('lifetime', $this->data['lifetime'], ZBX_TEXTBOX_SMALL_SIZE, false, 64));
@@ -457,16 +458,9 @@ $description->addStyle('margin-top: 5px;');
 $itemFormList->addRow(_('Description'), $description);
 
 // status
-if (isset($this->data['is_item_prototype'])) {
-	$enabledCheckBox = new CCheckBox('status', !$this->data['status'], null, ITEM_STATUS_ACTIVE);
-	$enabledCheckBox->addStyle('vertical-align: middle;');
-	$itemFormList->addRow(_('Enabled'), $enabledCheckBox);
-}
-else {
-	$statusComboBox = new CComboBox('status', $this->data['status']);
-	$statusComboBox->addItems(item_status2str());
-	$itemFormList->addRow(_('Status'), $statusComboBox);
-}
+$enabledCheckBox = new CCheckBox('status', !$this->data['status'], null, ITEM_STATUS_ACTIVE);
+$enabledCheckBox->addStyle('vertical-align: middle;');
+$itemFormList->addRow(_('Enabled'), $enabledCheckBox);
 
 // append tabs to form
 $itemTab = new CTabView();

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -9,7 +9,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -196,10 +196,12 @@ static int	calcitem_evaluate_expression(DC_ITEM *dc_item, expression_t *exp,
 			" where h.hostid=i.hostid"
 				" and h.status=%d"
 				" and i.status=%d"
+				" and i.state=%d"
 				" and (",
 			ZBX_SQL_ITEM_SELECT,
 			HOST_STATUS_MONITORED,
-			ITEM_STATUS_ACTIVE);
+			ITEM_STATUS_ACTIVE,
+			ITEM_STATE_NORMAL);
 
 	for (i = 0; i < exp->functions_num; i++)
 	{
