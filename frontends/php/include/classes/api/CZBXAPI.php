@@ -746,10 +746,6 @@ class CZBXAPI {
 	/**
 	 * Checks if the ID is valid.
 	 *
-	 * Required error messages:
-	 * - empty      - if the ID is empty
-	 * - invalid    - if the ID is not numeric
-	 *
 	 * @param string    $id
 	 * @param string    $error
 	 *
