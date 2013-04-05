@@ -413,7 +413,7 @@ abstract class CHostGeneral extends CHostBase {
 			$discoveryRuleIds = array_keys($items[ZBX_FLAG_DISCOVERY_RULE]);
 
 			$query = DBSelect(
-				'SELECT DISTINCT h.hostid,h.host,h3.host parent_host'.
+				'SELECT DISTINCT h.hostid,h.host,h3.host AS parent_host'.
 				' FROM hosts h'.
 					' INNER JOIN host_discovery hd ON h.hostid=hd.hostid'.
 					' INNER JOIN hosts h2 ON h.templateid=h2.hostid'.

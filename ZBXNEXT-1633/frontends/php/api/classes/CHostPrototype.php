@@ -938,7 +938,7 @@ class CHostPrototype extends CHostBase {
 		if ($options['selectParentHost'] !== null && $options['selectParentHost'] != API_OUTPUT_COUNT) {
 			$relationMap = new CRelationMap();
 			$dbRules = DBselect(
-				'SELECT hd.hostid,i.hostid parent_hostid'.
+				'SELECT hd.hostid,i.hostid AS parent_hostid'.
 					' FROM host_discovery hd,items i'.
 					' WHERE '.dbConditionInt('hd.hostid', $hostPrototypeIds).
 					' AND hd.parent_itemid=i.itemid'

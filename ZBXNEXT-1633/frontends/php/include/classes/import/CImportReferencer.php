@@ -889,7 +889,7 @@ class CImportReferencer {
 
 			if ($sqlWhere) {
 				$query = DBselect(
-					'SELECT h.host,h.hostid,hd.parent_itemid,i.hostid parent_hostid '.
+					'SELECT h.host,h.hostid,hd.parent_itemid,i.hostid AS parent_hostid '.
 					' FROM hosts h,host_discovery hd,items i'.
 					' WHERE h.hostid=hd.hostid'.
 						' AND hd.parent_itemid=i.itemid'.
