@@ -174,6 +174,23 @@ class CArrayHelper {
 	 * Checks if array $arrays contains arrays with duplicate values under the $uniqueField key. If a duplicate exists,
 	 * returns the first duplicate, otherwise returns null.
 	 *
+	 * Example 1:
+	 * $data = array(
+	 *     array('name' => 'CPU load'),
+	 * 	   array('name' => 'CPU load'),
+	 * 	   array('name' => 'Free memory')
+	 * );
+	 * var_dump(CArrayHelper::findDuplicate($data, 'name')); // returns array with index 1
+	 *
+	 * Example 2:
+	 * $data = array(
+	 *     array('host' => 'Zabbix server', 'name' => 'CPU load'),
+	 * 	   array('host' => 'Zabbix server', 'name' => 'Free memory'),
+	 * 	   array('host' => 'Linux server', 'name' => 'CPU load'),
+	 * 	   array('host' => 'Zabbix server', 'name' => 'CPU load')
+	 * );
+	 * var_dump(CArrayHelper::findDuplicate($data, 'name', 'host')); // returns array with index 4
+	 *
 	 * @param array $arrays         an array of arrays
 	 * @param string $uniqueField   key to be used as unique criteria
 	 * @param string $uniqueBy		second key to define the scope in which duplicates are not allowed
@@ -186,7 +203,7 @@ class CArrayHelper {
 		foreach ($arrays as $array) {
 			$value = $array[$uniqueField];
 
-			if ($uniqueBy) {
+			if ($uniqueBy !== null) {
 				$uniqueByValue = $array[$uniqueBy];
 
 				if (isset($uniqueValues[$uniqueByValue]) && isset($uniqueValues[$uniqueByValue][$value])) {
