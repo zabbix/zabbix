@@ -193,18 +193,18 @@ class CArrayHelper {
 	 *
 	 * @param array $arrays         an array of arrays
 	 * @param string $uniqueField   key to be used as unique criteria
-	 * @param string $uniqueBy		second key to define the scope in which duplicates are not allowed
+	 * @param string $uniqueField2	second key to be used as unique criteria
 	 *
 	 * @return null|array           the first duplicate found or null if there are no duplicates
 	 */
-	public static function findDuplicate(array $arrays, $uniqueField, $uniqueBy = null) {
+	public static function findDuplicate(array $arrays, $uniqueField, $uniqueField2 = null) {
 		$uniqueValues = array();
 
 		foreach ($arrays as $array) {
 			$value = $array[$uniqueField];
 
-			if ($uniqueBy !== null) {
-				$uniqueByValue = $array[$uniqueBy];
+			if ($uniqueField2 !== null) {
+				$uniqueByValue = $array[$uniqueField2];
 
 				if (isset($uniqueValues[$uniqueByValue]) && isset($uniqueValues[$uniqueByValue][$value])) {
 					return $array;
