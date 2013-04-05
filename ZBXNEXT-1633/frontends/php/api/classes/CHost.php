@@ -928,12 +928,29 @@ class CHost extends CHostGeneral {
 
 		$this->checkInput($hosts, __FUNCTION__);
 
+		// fetch fields required to update host inventory
+		$inventories = array();
+		foreach ($hosts as $host) {
+			$inventory = $host['inventory'];
+			$inventory['hostid'] = $host['hostid'];
+
+			$inventories[] = $inventory;
+		}
+		$inventories = $this->extendObjects('host_inventory', $inventories, array('inventory_mode'));
+		$inventories = zbx_toHash($inventories, 'hostid');
+
 		$macros = array();
 		foreach ($hosts as $host) {
-			// fetch fields required to update host inventory
+			// extend host inventory with the required data
 			if (isset($host['inventory'])) {
-				$host['inventory']['hostid'] = $host['hostid'];
-				$host['inventory'] = $this->extendObject('host_inventory', $host['inventory'], array('inventory_mode'));
+				$inventory = $inventories[$host['hostid']];
+
+				// if no host inventory record exists in the DB, it's disabled
+				if (!isset($inventory['inventory_mode'])) {
+					$inventory['inventory_mode'] = HOST_INVENTORY_DISABLED;
+				}
+
+				$host['inventory'] = $inventory;
 			}
 
 			API::HostInterface()->replaceHostInterfaces($host);
