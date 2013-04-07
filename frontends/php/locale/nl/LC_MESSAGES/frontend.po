@@ -5,7 +5,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2013-04-04 11:16+0300\n"
-"PO-Revision-Date: 2013-03-26 11:46+0200\n"
+"PO-Revision-Date: 2013-04-04 13:09+0200\n"
 "Last-Translator: DavidWouda <d.wouda@kpnplanet.nl>\n"
 "Language-Team: NL\n"
 "Language: nl\n"
@@ -785,19 +785,19 @@ msgstr "Gemiddeld met"
 
 #: popup_trexpr.php:138
 msgid "Average value of a period T is < N"
-msgstr ""
+msgstr "Gemiddelde waarde van een periode T is < N"
 
 #: popup_trexpr.php:148
 msgid "Average value of a period T is = N"
-msgstr ""
+msgstr "Gemiddelde waarde van een periode T is = N"
 
 #: popup_trexpr.php:143
 msgid "Average value of a period T is > N"
-msgstr ""
+msgstr "Gemiddelde waarde van een periode T is > N"
 
 #: popup_trexpr.php:153
 msgid "Average value of a period T is NOT N"
-msgstr ""
+msgstr "Gemiddelde waarde van een periode T is niet N"
 
 #: popup_bitem.php:140
 msgid "Axis side"
@@ -1138,7 +1138,7 @@ msgstr "Kan geen host afhankelijkheid toevoegen aan een template."
 #: include/triggers.inc.php:501
 #, php-format
 msgid "Cannot add dependency from trigger \"%1$s:%2$s\" to non existing trigger \"%3$s:%4$s\"."
-msgstr ""
+msgstr "Kan afhankelijkheid van trigger  \"%1$s:%2$s\" niet toevoegen aan een niet bestaande trigger \"%3$s:%4$s\"."
 
 #: host_discovery.php:233
 msgid "Cannot add discovery rule"
@@ -1538,7 +1538,7 @@ msgstr "Kan gebruiker niet verwijderen"
 
 #: api/classes/CUser.php:786
 msgid "Cannot delete user media."
-msgstr ""
+msgstr "Kan gebruikers gegevens niet verwijderen."
 
 #: adm.valuemapping.php:88
 msgid "Cannot delete value map"
@@ -1603,7 +1603,7 @@ msgid "Cannot find icon \"%1$s\" used in map \"%2$s\"."
 msgstr "Kan icoon \"%1$s\" in map \"%2$s\" niet vinden"
 
 #: include/classes/import/importers/CMapImporter.php:180
-#, fuzzy, php-format
+#, php-format
 msgid "Cannot find icon map \"%1$s\" used in map \"%2$s\"."
 msgstr "Kan icoon map \"%1$s\" in map \"%2$s\" niet vinden"
 
@@ -1671,8 +1671,8 @@ msgstr "Kan expressie \"%s\" niet imploderen."
 #, php-format
 msgid "Cannot import screen \"%2$s\": subscreen \"%3$s\" does not exist."
 msgid_plural "Cannot import screen \"%2$s\": subscreens \"%3$s\" do not exist."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Kan scherm \"%2$s\": niet importeren subscherm \"%3$s\" bestaat niet"
+msgstr[1] "Kan scherm \"%2$s\": niet importeren de subschermen \"%3$s\" bestaan niet"
 
 #: include/classes/import/importers/CTemplateImporter.php:114
 #, php-format
@@ -1688,7 +1688,7 @@ msgstr "Kan view bestand \"%s\" niet invoegen."
 
 #: api/classes/CUser.php:815
 msgid "Cannot insert user media."
-msgstr ""
+msgstr "Kan media van gebruiker niet invoegen."
 
 #: api/classes/CHost.php:1858
 msgid "Cannot link template"
@@ -2005,7 +2005,7 @@ msgstr "Kan gebruiker niet bijwerken"
 
 #: api/classes/CUser.php:807
 msgid "Cannot update user media."
-msgstr ""
+msgstr "Kan media van gebruiker niet updaten"
 
 #: profile.php:110 users.php:147
 msgid "Cannot update user. Both passwords must be equal."
@@ -2107,30 +2107,30 @@ msgstr "Chinese (zh_TW)"
 #: api/classes/CMapElement.php:533
 #, php-format
 msgid "Circular link cannot be created for map element \"%s\"."
-msgstr ""
+msgstr "Circulaire koppeling kan niet worden gemaakt voor map element \"%s\""
 
 #: include/classes/import/importers/CMapImporter.php:89
 #, php-format
 msgid "Circular reference in maps: %1$s."
-msgstr ""
+msgstr "Circulaire verwijzing in kaarten: %1$s."
 
 #: include/classes/import/importers/CScreenImporter.php:104
 #, php-format
 msgid "Circular reference in screens: %1$s."
-msgstr ""
+msgstr "Circulaire verwijzing in schermen: %1$s."
 
 #: include/classes/import/importers/CTemplateImporter.php:139
 #, php-format
 msgid "Circular reference in templates: %1$s."
-msgstr ""
+msgstr "Circulaire verwijzing in templates: %1$s."
 
 #: api/classes/CHostGeneral.php:335 api/classes/CHostGeneral.php:767
 msgid "Circular template linkage is not allowed."
-msgstr ""
+msgstr "Koppeling circulaire template is niet toegestaan."
 
 #: include/classes/core/ZBase.php:135
 msgid "Classic"
-msgstr ""
+msgstr "Klassiek"
 
 #: jsLoader.php:164
 msgid "Clear"
@@ -2138,7 +2138,7 @@ msgstr "Wissen"
 
 #: include/views/configuration.item.edit.php:460
 msgid "Clear history and trends"
-msgstr ""
+msgstr "Verwijder historie en ontwikkelingen"
 
 #: include/views/configuration.httpconf.list.php:137
 #: include/views/configuration.item.list.php:251

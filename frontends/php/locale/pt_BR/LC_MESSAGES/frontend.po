@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2013-04-04 11:16+0300\n"
-"PO-Revision-Date: 2013-02-21 00:37+0200\n"
+"PO-Revision-Date: 2013-04-04 15:22+0200\n"
 "Last-Translator: Adail <the.spaww@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pt_BR\n"
@@ -688,7 +688,7 @@ msgstr "No mínimo um período de manutenção deverá ser criado."
 
 #: include/classes/class.frontendsetup.php:292
 msgid "At least one of MySQL, PostgreSQL, Oracle, SQLite3 or IBM DB2 should be supported"
-msgstr "Pelo menos um dos MySQL, PostgreSQL, Oracle, SQLite3 ou IBM DB2 deve ser suportado."
+msgstr "Pelo menos um banco deve ser suportado: MySQL, PostgreSQL, Oracle, SQLite3 ou IBM DB2"
 
 #: include/menu.inc.php:266
 msgid "Audit"
@@ -1366,7 +1366,7 @@ msgstr "Regra de autobusca não pode ser removida"
 
 #: host_discovery.php:250
 msgid "Cannot delete discovery rules"
-msgstr "Não foi possível apagar a regra de descoberta."
+msgstr "Não foi possível apagar a regra de descoberta"
 
 #: graphs.php:257
 msgid "Cannot delete graph"
@@ -1374,7 +1374,7 @@ msgstr "Gráfico não foi removido"
 
 #: api/classes/CItemPrototype.php:768
 msgid "Cannot delete graph prototype"
-msgstr "Não foi possível excluir o protótipo de gráfico."
+msgstr "Não foi possível excluir o protótipo de gráfico"
 
 #: api/classes/CItem.php:981
 msgid "Cannot delete graph."
@@ -1464,7 +1464,7 @@ msgstr "Não foi possível remover script"
 
 #: api/classes/CScript.php:413
 msgid "Cannot delete scripts. Empty input parameter \"scriptids\"."
-msgstr "Não é possível deletar scripts. Parâmetro \"scriptids\" vazio."
+msgstr "Não é possível excluir scripts. Parâmetro \"scriptids\" vazio."
 
 #: api/classes/CScript.php:437
 #, php-format
@@ -1502,7 +1502,7 @@ msgstr "Não é possível deletar item do template."
 
 #: api/classes/CItemPrototype.php:729
 msgid "Cannot delete templated items"
-msgstr "Não é possível excluir itens de template."
+msgstr "Não é possível excluir itens de template"
 
 #: api/classes/CDiscoveryRule.php:587
 msgid "Cannot delete templated items."
@@ -1511,7 +1511,7 @@ msgstr "Não é possível deletar itens do template."
 #: api/classes/CTrigger.php:1114 api/classes/CTriggerPrototype.php:925
 #, php-format
 msgid "Cannot delete templated trigger \"%1$s:%2$s\"."
-msgstr "Não é possível deletar a trigger \"%1$s:%2$s\" do template."
+msgstr "Não é possível excluir a trigger \"%1$s:%2$s\" do template."
 
 #: trigger_prototypes.php:177 triggers.php:166
 msgid "Cannot delete trigger"
@@ -1547,7 +1547,7 @@ msgstr "Mapeamento não foi removido"
 
 #: media_types.php:163
 msgid "Cannot disable media type"
-msgstr "Não foi possível desabilitar o tipo de media."
+msgstr "Não foi possível desabilitar o tipo de midia"
 
 #: media_types.php:147
 msgid "Cannot enable media type"
@@ -1672,8 +1672,8 @@ msgstr "Não foi possível agrupar a expressão \"%s\"."
 #, php-format
 msgid "Cannot import screen \"%2$s\": subscreen \"%3$s\" does not exist."
 msgid_plural "Cannot import screen \"%2$s\": subscreens \"%3$s\" do not exist."
-msgstr[0] "Tela \"%2$s\" não foi importada: sub-tela \"%3$s\" não existe."
-msgstr[1] "Tela \"%2$s\" não foi importada: sub-telas \"%3$s\" não existem."
+msgstr[0] "A tela \"%2$s\" não foi importada: sub-tela \"%3$s\" não existe."
+msgstr[1] "A tela \"%2$s\" não foi importada: sub-telas \"%3$s\" não existem."
 
 #: include/classes/import/importers/CTemplateImporter.php:114
 #, php-format
@@ -1713,7 +1713,7 @@ msgstr "Não é possível atualizar em massa o nome de exibição dos hosts."
 
 #: api/classes/CTemplate.php:1312
 msgid "Cannot mass update visible template name"
-msgstr "Não é possível atualizar em massa o nome de exibição dos templates."
+msgstr "Não é possível atualizar em massa o nome de exibição dos templates"
 
 #: api/classes/CHostGeneral.php:160
 #, php-format
@@ -1741,7 +1741,7 @@ msgstr "Não foi possível remover a macro."
 
 #: api/classes/CUser.php:380
 msgid "Cannot rename guest user."
-msgstr "Não é possível renomear o usuário \"guest\" (convidado)."
+msgstr "Não é possível renomear o usuário guest (convidado)."
 
 #: api/classes/CDRule.php:445
 msgid "Cannot save discovery rule without checks."
@@ -1760,22 +1760,22 @@ msgstr "Não foi possível definir o ID de template para o gráfico \"%1$s\"."
 #: api/classes/CItemGeneral.php:223
 #, php-format
 msgid "Cannot set \"templateid\" for item \"%1$s\"."
-msgstr "Não foi possível definir o ID de template para o item \"%1$s\"."
+msgstr "Não foi possível definir o \"ID de template\" para o item \"%1$s\"."
 
 #: api/classes/CScreen.php:437
 #, php-format
 msgid "Cannot set \"templateid\" for screen \"%1$s\"."
-msgstr "Não foi possível definir o ID de template para a tela \"%1$s\"."
+msgstr "Não foi possível definir o \"ID de template\" para a tela \"%1$s\"."
 
 #: api/classes/CTrigger.php:1099
 #, php-format
 msgid "Cannot set \"templateid\" for trigger \"%1$s\"."
-msgstr "Não foi possível definir o ID de template para a trigger \"%1$s\"."
+msgstr "Não foi possível definir o \"ID de template\" para a trigger \"%1$s\"."
 
 #: api/classes/CTriggerPrototype.php:759
 #, php-format
 msgid "Cannot set \"templateid\" for trigger prototype \"%1$s\"."
-msgstr "Não foi possível definir o ID de template para o protótipo de trigger \"%1$s\"."
+msgstr "Não foi possível definir o \"ID de template\" para o protótipo de trigger \"%1$s\"."
 
 #: api/classes/CHostInterface.php:510
 msgid "Cannot switch host for interface."
@@ -1825,32 +1825,32 @@ msgstr "Não é possível desvincular a trigger \"%s\", tem itens do template qu
 #: api/classes/CApplication.php:456
 #, php-format
 msgid "Cannot update \"templateid\" for application \"%1$s\"."
-msgstr "Não foi possível atualizar o ID de template para a aplicação \"%1$s\"."
+msgstr "Não foi possível atualizar o \"ID de template\" para a aplicação \"%1$s\"."
 
 #: api/classes/CGraphGeneral.php:59
 #, php-format
 msgid "Cannot update \"templateid\" for graph \"%1$s\"."
-msgstr "Não foi possível atualizar o ID de template para o gráfico \"%1$s\"."
+msgstr "Não foi possível atualizar o \"ID de template\" para o gráfico \"%1$s\"."
 
 #: api/classes/CItemGeneral.php:184
 #, php-format
 msgid "Cannot update \"templateid\" for item \"%1$s\"."
-msgstr "Não foi possível atualizar o ID de template para o item \"%1$s\"."
+msgstr "Não foi possível atualizar o \"ID de template\" para o item \"%1$s\"."
 
 #: api/classes/CScreen.php:508 api/classes/CTemplateScreen.php:739
 #, php-format
 msgid "Cannot update \"templateid\" for screen \"%1$s\"."
-msgstr "Não foi possível atualizar o ID de template para a tela \"%1$s\"."
+msgstr "Não foi possível atualizar o \"ID de template\" para a tela \"%1$s\"."
 
 #: api/classes/CTrigger.php:1096
 #, php-format
 msgid "Cannot update \"templateid\" for trigger \"%1$s\"."
-msgstr "Não foi possível atualizar o ID de template para a trigger \"%1$s\"."
+msgstr "Não foi possível atualizar o \"ID de template\" para a trigger \"%1$s\"."
 
 #: api/classes/CTriggerPrototype.php:831
 #, php-format
 msgid "Cannot update \"templateid\" for trigger prototype \"%1$s\"."
-msgstr "Não foi possível atualizar o ID de template para o protótipo de trigger \"%1$s\"."
+msgstr "Não foi possível atualizar o \"ID de template\" para o protótipo de trigger \"%1$s\"."
 
 #: actionconf.php:145
 msgid "Cannot update action"
@@ -3930,7 +3930,7 @@ msgstr "Host duplicado. Já existe registro de outro Host usando o hostname \"%s
 #: api/classes/CHost.php:1393
 #, php-format
 msgid "Duplicate host. Host with the same visible name \"%s\" already exists in data."
-msgstr "Host duplicado. Já existe registro de outro Host usando o \"nome visível\" \"%s\"."
+msgstr "Host duplicado. Já existe registro de outro Host usando o nome de exibição \"%s\"."
 
 #: api/classes/CMap.php:560
 #, php-format
@@ -4066,7 +4066,7 @@ msgstr "Nome vazio."
 
 #: api/classes/CImage.php:510 api/rpc/class.czbxrpc.php:38
 msgid "Empty parameters"
-msgstr "Parâmetros vazios."
+msgstr "Parâmetros vazios"
 
 #: include/classes/validators/CTimePeriodValidator.php:39
 msgid "Empty time period."
@@ -4082,7 +4082,7 @@ msgstr "Habilitar DEBUG"
 
 #: include/views/administration.script.edit.php:101
 msgid "Enable confirmation"
-msgstr "Ativar confirmação."
+msgstr "Ativar confirmação"
 
 #: include/views/administration.usergroups.list.php:138
 msgid "Enable debug mode in selected groups?"
@@ -4090,7 +4090,7 @@ msgstr "Ativar modo debug nos grupos selecionados?"
 
 #: include/views/administration.general.gui.edit.php:41
 msgid "Enable event acknowledges"
-msgstr "Ativar reconhecimento de evento."
+msgstr "Ativar reconhecimento de evento"
 
 #: include/actions.inc.php:344 include/actions.inc.php:555
 msgid "Enable host"
@@ -4098,7 +4098,7 @@ msgstr "Ativar host"
 
 #: hosts.php:803
 msgid "Enable host?"
-msgstr "Ativar host ?"
+msgstr "Ativar host?"
 
 #: include/views/administration.proxy.list.php:96
 msgid "Enable hosts monitored by selected proxies?"
@@ -4247,7 +4247,7 @@ msgstr "Evento ID"
 
 #: popup_trexpr.php:426
 msgid "Event ID of last log entry matching regular expression T, then N = 1, 0 - otherwise"
-msgstr "O ID do evento da última entrada do log é compatível com a expressão regular T, quando N = 1, 0 - em outros casos."
+msgstr "O ID do evento da última entrada do log é compatível com a expressão regular T, quando N = 1, 0 - em outros casos"
 
 #: popup_trexpr.php:431
 msgid "Event ID of last log entry matching regular expression T, then N NOT 1, 0 - otherwise"
@@ -4487,7 +4487,7 @@ msgstr "O campo \"druleid\" é obrigatório."
 
 #: api/classes/CTemplate.php:991
 msgid "Field \"host\" is mandatory"
-msgstr "O campo \"host\" é de preenchimento obrigatório."
+msgstr "O campo \"host\" é de preenchimento obrigatório"
 
 #: api/classes/CDRule.php:534
 msgid "Field \"name\" is required."
@@ -4670,7 +4670,7 @@ msgstr "Geral"
 #: chart4.php:180 chart5.php:200 include/classes/class.cbar.php:739
 #, php-format
 msgid "Generated in %s sec"
-msgstr "Gerado em %s segundos."
+msgstr "Gerado em %s segundos"
 
 #: include/locales.inc.php:53
 msgid "German (de_DE)"
@@ -5172,7 +5172,7 @@ msgstr "O host \"%1$s\" já existe."
 #: api/classes/CProxy.php:643
 #, php-format
 msgid "Host \"%1$s\" is monitored with proxy \"%2$s\"."
-msgstr "O host \"%1$s\" é monitorado pelo proxy \"%2$s\""
+msgstr "O host \"%1$s\" é monitorado pelo proxy \"%2$s\"."
 
 #: api/classes/CTemplate.php:1004
 #, php-format
@@ -5324,7 +5324,7 @@ msgstr "Hora do host"
 
 #: api/classes/CHost.php:1573
 msgid "Host update failed."
-msgstr "Falha ao atualizar o host"
+msgstr "Falha ao atualizar o host."
 
 #: hosts.php:321
 msgid "Host updated"
@@ -5611,7 +5611,7 @@ msgstr "O mapeamento de ícone \"%s\" precisa ter pelo menos um mapeamento."
 
 #: adm.iconmapping.php:81
 msgid "Icon map created"
-msgstr "Mapeamento de ícones criado."
+msgstr "Mapeamento de ícones criado"
 
 #: adm.iconmapping.php:95
 msgid "Icon map deleted"
@@ -5646,7 +5646,7 @@ msgstr "Já existe entrada no mapeamento de ícone de \"%1$s\" contra \"%2$s\"."
 
 #: jsLoader.php:158
 msgid "Iconmap is not enabled"
-msgstr "O mapeamento de ícones não está ativado."
+msgstr "O mapeamento de ícones não está ativado"
 
 #: include/views/js/configuration.sysmaps.js.php:111
 msgid "Icons"
@@ -5948,7 +5948,7 @@ msgstr "Foram utilizados caracteres inválidos no nome do proxy \"%s\"."
 #: api/classes/CTemplate.php:995
 #, php-format
 msgid "Incorrect characters used for Template name [ %1$s ]"
-msgstr "Foram utilizados caracteres inválidos para o nome do template [\"%1$s\"]"
+msgstr "Foram utilizados caracteres inválidos para o nome do template [ %1$s ]"
 
 #: api/classes/CHost.php:1357 api/classes/CHost.php:1678
 #, php-format
@@ -5985,7 +5985,7 @@ msgstr "O nome para o campo \"%1$s\" é inválido ou o valor é incorreto para a
 
 #: api/classes/CMap.php:545
 msgid "Incorrect fields for sysmap"
-msgstr "Campos incorretos para o sysmap."
+msgstr "Campos incorretos para o sysmap"
 
 #: api/classes/CTrigger.php:1105
 msgid "Incorrect fields for trigger."
@@ -6480,7 +6480,7 @@ msgstr "Chave de item com formato inválido."
 
 #: maintenance.php:311
 msgid "Invalid maintenance period"
-msgstr "Período de manutenção inválido."
+msgstr "Período de manutenção inválido"
 
 #: api/classes/CScreenItem.php:148 api/classes/CScreenItem.php:228
 #: api/classes/CService.php:209 api/classes/CService.php:385
@@ -7061,7 +7061,7 @@ msgstr "O nome do link deve ser único para o mapa \"%s\"."
 #: api/classes/CMap.php:642
 #, php-format
 msgid "Link selementid1 field is pointing to a nonexistent map selement ID \"%1$s\" for map \"%2$s\"."
-msgstr "O campo \"selementid1\" possui vínculo apontando para um \"selementID\" \"%1$s\" inexistente para o mapa \"%2$s\"."
+msgstr "O campo \"selementid1\" possui vínculo apontando para um \"selement ID\" \"%1$s\" inexistente no mapa \"%2$s\"."
 
 #: api/classes/CMap.php:645
 #, php-format
@@ -7407,7 +7407,7 @@ msgstr "Mapa \"%s\""
 #: include/classes/import/CXmlImport18.php:819
 #, php-format
 msgid "Map \"%s\" created."
-msgstr "Mapa %s\" criado."
+msgstr "Mapa \"%s\" criado."
 
 #: include/classes/import/CXmlImport18.php:810
 #, php-format
@@ -7493,7 +7493,7 @@ msgstr "Nó mestre"
 
 #: include/nodes.inc.php:276
 msgid "Master node \"ID\" must be empty."
-msgstr "O ID do nó mestre não pode ser vazio."
+msgstr "O \"ID\" do nó mestre não pode ser vazio."
 
 #: include/nodes.inc.php:281
 msgid "Master node already exists."
@@ -7581,7 +7581,7 @@ msgstr "O tipo de mídia \"%s\" já existe."
 
 #: media_types.php:118
 msgid "Media type added"
-msgstr "Tipo de mídia adicionado."
+msgstr "Tipo de mídia adicionado"
 
 #: media_types.php:131 media_types.php:170
 msgid "Media type deleted"
@@ -8805,7 +8805,7 @@ msgstr "Número de valores obtidos com sucesso V (que cumprem o operador O) para
 
 #: include/blocks.inc.php:733
 msgid "Number of triggers (enabled/disabled)[problem/unknown/ok]"
-msgstr "Número de triggers (ativas/desativadas)[verdadeiro/desconhecido/falso]"
+msgstr "Número de triggers (ativas/desativadas)[incidente/desconhecido/ok]"
 
 #: include/blocks.inc.php:744
 msgid "Number of users (online)"
@@ -10318,7 +10318,7 @@ msgstr "SNMP trap"
 
 #: api/classes/CItemGeneral.php:285
 msgid "SNMP trap key is invalid."
-msgstr "A chave do SNMP trap é inválida"
+msgstr "A chave do SNMP trap é inválida."
 
 #: include/discovery.inc.php:67 include/items.inc.php:79
 #: include/views/js/configuration.discovery.edit.js.php:129
@@ -13053,7 +13053,7 @@ msgstr "Campos errado para o host \"%s\"."
 
 #: api/classes/CMapElement.php:792
 msgid "Wrong fields for linktrigger"
-msgstr "Campos errados para links entre triggers."
+msgstr "Campos errados para links entre triggers"
 
 #: api/classes/CMapElement.php:835
 msgid "Wrong fields for linktrigger delete"
@@ -13071,7 +13071,7 @@ msgstr "Campos errados para macro \"%1$s\"."
 
 #: api/classes/CMapElement.php:570
 msgid "Wrong fields for map link"
-msgstr "Campos errados para link entre mapas."
+msgstr "Campos errados para link entre mapas"
 
 #: api/classes/CMediatype.php:326 api/classes/CMediatype.php:377
 msgid "Wrong fields for media type."
@@ -13328,7 +13328,7 @@ msgstr "Zabbix"
 #: include/views/general.login.php:47
 #, php-format
 msgid "Zabbix %1$s Copyright %2$s-%3$s by Zabbix SIA"
-msgstr ""
+msgstr "Zabbix %1$s Copyright %2$s-%3$s por Zabbix SIA"
 
 #: include/users.inc.php:40
 msgid "Zabbix Admin"

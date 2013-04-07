@@ -3,8 +3,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2013-04-04 11:16+0300\n"
-"PO-Revision-Date: 2013-03-06 15:51+0200\n"
-"Last-Translator: Mikhail <mikhail.dobrinin@redprairie.com>\n"
+"PO-Revision-Date: 2013-04-04 13:29+0200\n"
+"Last-Translator: richlv <richlv@nakts.net>\n"
 "Language-Team: RedPrairie\n"
 "Language: en_US\n"
 "MIME-Version: 1.0\n"
@@ -13315,7 +13315,7 @@ msgstr "Zabbix"
 #: include/views/general.login.php:47
 #, php-format
 msgid "Zabbix %1$s Copyright %2$s-%3$s by Zabbix SIA"
-msgstr ""
+msgstr "Zabbix %1$s Copyright %2$s-%3$s by Zabbix SIA"
 
 #: include/users.inc.php:40
 msgid "Zabbix Admin"
