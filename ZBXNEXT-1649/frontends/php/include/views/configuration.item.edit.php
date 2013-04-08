@@ -371,9 +371,33 @@ if ($this->data['is_discovery_rule']) {
 		false, 'row_trapper_hosts');
 }
 else {
-	// append keep history to form list
-	$itemFormList->addRow(_('Keep history (in days)'), new CNumericBox('history', $this->data['history'], 8));
-	$itemFormList->addRow(_('Keep trends (in days)'), new CNumericBox('trends', $this->data['trends'], 8), false, 'row_trends');
+	$data['config'] = select_config(true);
+	$keepHistory = array();
+	$keepHistory[] =  new CNumericBox('history', $this->data['history'], 8);
+	if ($data['config']['hk_history_global'] == 1 && CWebUser::$data['type'] == USER_TYPE_SUPER_ADMIN) {
+		$keepHistory[] =  SPACE;
+		$keepHistory[] = new CSpan(_('Keep history (in days) ['.$data['config']['hk_history'].'] Overridden by'),
+			'adm.housekeeper.php');
+		$keepHistory[] =  SPACE;
+		$link = new CLink(_('global housekeeper settings.'), 'adm.housekeeper.php');
+		$link->setAttribute('target', '_blank');
+		$keepHistory[] =  $link;
+	}
+	$itemFormList->addRow(_('Keep history (in days)'), $keepHistory);
+
+	$keepTrend = array();
+	$keepTrend[] =  new CNumericBox('trends', $this->data['trends'], 8);
+	if ($data['config']['hk_trends_global'] == 1 && CWebUser::$data['type'] == USER_TYPE_SUPER_ADMIN) {
+		$keepTrend[] =  SPACE;
+		$keepTrend[] = new CSpan(_('Keep trends (in days) ['.$data['config']['hk_trends'].'] Overridden by'),
+			'adm.housekeeper.php');
+		$keepTrend[] =  SPACE;
+		$link = new CLink(_('global housekeeper settings.'), 'adm.housekeeper.php');
+		$link->setAttribute('target', '_blank');
+		$keepTrend[] =  $link;
+	}
+
+	$itemFormList->addRow(_('Keep trends (in days)'), $keepTrend, false, 'row_trends');
 	$itemFormList->addRow(_('Log time format'),
 		new CTextBox('logtimefmt', $this->data['logtimefmt'], ZBX_TEXTBOX_SMALL_SIZE, $this->data['limited'], 64),
 		false, 'row_logtimefmt'
