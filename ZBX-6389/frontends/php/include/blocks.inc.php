@@ -249,8 +249,8 @@ function make_system_status($filter) {
 	// get acknowledges
 	$eventIds = array();
 	foreach ($triggers as &$trigger) {
-		$trigger['event'] = $trigger['latestEvent'];
-		unset($trigger['latestEvent']);
+		$trigger['event'] = $trigger['lastEvent'];
+		unset($trigger['lastEvent']);
 
 		if (!empty($trigger['event'])) {
 			$eventIds[$trigger['event']['eventid']] = $trigger['event']['eventid'];
@@ -817,7 +817,7 @@ function make_latest_issues(array $filter = array()) {
 	// get acknowledges
 	$eventIds = array();
 	foreach ($events as $event) {
-		$eventIds[$event['latestEvent']['eventid']] = $event['latestEvent']['eventid'];
+		$eventIds[$event['lastEvent']['eventid']] = $event['lastEvent']['eventid'];
 	}
 	if ($eventIds) {
 		$eventAcknowledges = API::Event()->get(array(
@@ -885,7 +885,7 @@ function make_latest_issues(array $filter = array()) {
 	foreach ($triggers as $trigger) {
 		// event
 		if (isset($events[$trigger['triggerid']])) {
-			$trigger['event'] = $events[$trigger['triggerid']]['latestEvent'];
+			$trigger['event'] = $events[$trigger['triggerid']]['lastEvent'];
 		}
 		if (!empty($trigger['event'])) {
 			$trigger['event']['acknowledges'] = isset($eventAcknowledges[$trigger['event']['eventid']])

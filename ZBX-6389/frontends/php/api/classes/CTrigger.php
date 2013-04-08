@@ -737,7 +737,7 @@ class CTrigger extends CTriggerGeneral {
 
 		if (!is_null($options['selectLastEvent']) && str_in_array($options['selectLastEvent'], $subselectsAllowedOutputs)) {
 			foreach ($result as $triggerId => $trigger) {
-				$latestEvent = API::Event()->get(array(
+				$lastEvent = API::Event()->get(array(
 					'object' => EVENT_SOURCE_TRIGGERS,
 					'triggerids' => $triggerId,
 					'output' => $options['selectLastEvent'],
@@ -748,7 +748,7 @@ class CTrigger extends CTriggerGeneral {
 					'limit' => 1
 				));
 
-				$result[$triggerId]['latestEvent'] = $latestEvent ? reset($latestEvent) : array();
+				$result[$triggerId]['lastEvent'] = $lastEvent ? reset($lastEvent) : array();
 			}
 		}
 
