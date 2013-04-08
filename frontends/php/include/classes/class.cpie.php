@@ -158,7 +158,7 @@ class CPie extends CGraphDraw {
 
 			$sql_arr = array();
 
-			if ($data['config']['hk_trends_mode'] == 1 && $data['config']['hk_trends_global'] == 1) {
+			if ($data['config']['hk_trends_global'] == 1) {
 				$real_item['history'] = $data['config']['hk_trends'];
 			}
 
