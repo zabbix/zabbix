@@ -387,7 +387,7 @@ $itemFormList->addRow(
 
 // append status to form list
 $statusComboBox = new CComboBox('status', $this->data['status']);
-foreach (array(ITEM_STATUS_ACTIVE, ITEM_STATUS_DISABLED, ITEM_STATUS_NOTSUPPORTED) as $status) {
+foreach (array(ITEM_STATUS_ACTIVE, ITEM_STATUS_DISABLED) as $status) {
 	$statusComboBox->addItem($status, item_status2str($status));
 }
 $itemFormList->addRow(

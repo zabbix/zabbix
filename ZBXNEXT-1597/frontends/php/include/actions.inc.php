@@ -90,6 +90,8 @@ function condition_type2str($conditionType) {
 			return _('Application');
 		case CONDITION_TYPE_PROXY:
 			return _('Proxy');
+		case CONDITION_TYPE_EVENT_TYPE:
+			return _('Event type');
 		default:
 			return _('Unknown');
 	}
@@ -247,15 +249,33 @@ function condition_value2str($conditiontype, $value) {
 		case CONDITION_TYPE_APPLICATION:
 			$str_val = $value;
 			break;
+		case CONDITION_TYPE_EVENT_TYPE:
+			$str_val = eventType($value);
+			break;
 		default:
 			return _('Unknown');
 	}
 
-	return '"'.$str_val.'"';
+	return $str_val;
 }
 
+/**
+ * Returns the HTML representation of an action condition.
+ *
+ * @param $conditiontype
+ * @param $operator
+ * @param $value
+ *
+ * @return array
+ */
 function get_condition_desc($conditiontype, $operator, $value) {
-	return condition_type2str($conditiontype).' '.condition_operator2str($operator).' '.condition_value2str($conditiontype, $value);
+	return array(
+		condition_type2str($conditiontype),
+		SPACE,
+		condition_operator2str($operator),
+		SPACE,
+		italic(condition_value2str($conditiontype, $value))
+	);
 }
 
 /**
@@ -493,6 +513,13 @@ function get_operation_descr($type, $data) {
 	return $result;
 }
 
+/**
+ * Return an array of action conditions supported by the given event source.
+ *
+ * @param int $eventsource
+ *
+ * @return mixed
+ */
 function get_conditions_by_eventsource($eventsource) {
 	$conditions[EVENT_SOURCE_TRIGGERS] = array(
 		CONDITION_TYPE_APPLICATION,
@@ -522,9 +549,17 @@ function get_conditions_by_eventsource($eventsource) {
 		CONDITION_TYPE_HOST_NAME,
 		CONDITION_TYPE_PROXY
 	);
+	$conditions[EVENT_SOURCE_INTERNAL] = array(
+		CONDITION_TYPE_APPLICATION,
+		CONDITION_TYPE_EVENT_TYPE,
+		CONDITION_TYPE_HOST_GROUP,
+		CONDITION_TYPE_HOST_TEMPLATE,
+		CONDITION_TYPE_HOST
+	);
 
 	if (ZBX_DISTRIBUTED) {
 		array_push($conditions[EVENT_SOURCE_TRIGGERS], CONDITION_TYPE_NODE);
+		array_push($conditions[EVENT_SOURCE_INTERNAL], CONDITION_TYPE_NODE);
 	}
 
 	if (isset($conditions[$eventsource])) {
@@ -569,6 +604,9 @@ function get_operations_by_eventsource($eventsource) {
 		OPERATION_TYPE_GROUP_ADD,
 		OPERATION_TYPE_TEMPLATE_ADD,
 		OPERATION_TYPE_HOST_DISABLE
+	);
+	$operations[EVENT_SOURCE_INTERNAL] = array(
+		OPERATION_TYPE_MESSAGE
 	);
 
 	if (isset($operations[$eventsource])) {
@@ -623,6 +661,13 @@ function sortOperations($eventsource, &$operations) {
 	}
 }
 
+/**
+ * Return an array of operators supported by the given action condition.
+ *
+ * @param int $conditiontype
+ *
+ * @return array
+ */
 function get_operators_by_conditiontype($conditiontype) {
 	$operators[CONDITION_TYPE_HOST_GROUP] = array(
 		CONDITION_OPERATOR_EQUAL,
@@ -718,6 +763,9 @@ function get_operators_by_conditiontype($conditiontype) {
 	$operators[CONDITION_TYPE_HOST_NAME] = array(
 		CONDITION_OPERATOR_LIKE,
 		CONDITION_OPERATOR_NOT_LIKE
+	);
+	$operators[CONDITION_TYPE_EVENT_TYPE] = array(
+		CONDITION_OPERATOR_EQUAL
 	);
 
 	if (isset($operators[$conditiontype])) {
@@ -1076,4 +1124,35 @@ function get_event_actions_stat_hints($eventid) {
 		$actionCont->addItem('-');
 	}
 	return $actionCont;
+}
+
+/**
+ * Returns the names of the "Event type" action condition values.
+ *
+ * If the $type parameter is passed, returns the name of the specific value, otherwise - returns an array of all
+ * supported values.
+ *
+ * @param string $type
+ *
+ * @return array|string
+ */
+function eventType($type = null) {
+	$types = array(
+		EVENT_TYPE_ITEM_NOTSUPPORTED => _('Item in "not supported" state'),
+		EVENT_TYPE_ITEM_NORMAL => _('Item in "normal" state'),
+		EVENT_TYPE_LLDRULE_NOTSUPPORTED => _('Low-level discovery rule in "not supported" state'),
+		EVENT_TYPE_LLDRULE_NORMAL => _('Low-level discovery rule in "normal" state'),
+		EVENT_TYPE_TRIGGER_UNKNOWN => _('Trigger in "unknown" state'),
+		EVENT_TYPE_TRIGGER_NORMAL => _('Trigger in "normal" state')
+	);
+
+	if (is_null($type)) {
+		return $types;
+	}
+	elseif (isset($types[$type])) {
+		return $types[$type];
+	}
+	else {
+		return _('Unknown');
+	}
 }
