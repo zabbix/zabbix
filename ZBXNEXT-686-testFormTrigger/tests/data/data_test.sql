@@ -718,3 +718,13 @@ INSERT INTO items (itemid, type, snmp_community, snmp_oid, hostid, name, descrip
 
 -- testFormTrigger.SimpleCreate
 INSERT INTO items (itemid, type, snmp_community, snmp_oid, hostid, name, description, key_, delay, history, trends, lastvalue, lastclock, prevvalue, status, value_type, trapper_hosts, units, multiplier, delta, prevorgvalue, snmpv3_securityname, snmpv3_securitylevel, snmpv3_authpassphrase, snmpv3_privpassphrase, formula, error, lastlogsize, logtimefmt, templateid, valuemapid, delay_flex, params, ipmi_sensor, data_type, authtype, username, password, publickey, privatekey, mtime, lastns, flags, interfaceid) VALUES (30004, 0, '', '', 40001, 'testFormItem', 'testFormItems','test-item-reuse', 30, 90, 365, NULL, NULL, NULL, 0, 0, '', '', 0, 0, NULL, '', 0, '', '', 1, '', 0, '', NULL, NULL, '', '', '', 0, 0, '', '', '', '', 0, NULL, 0, 40011);
+
+--- add triggers for simpleCreate testing for testFormTrigger
+INSERT INTO triggers (triggerid, expression, description, comments) VALUES (14000, '{14000}=0', 'testFormTrigger1', '');
+INSERT INTO functions (functionid, itemid, triggerid, function, parameter) VALUES (14000, 30004 ,14000,'last',0);
+INSERT INTO triggers (triggerid, expression, description, comments) VALUES (14001, '{14001}=0', 'testFormTrigger2', '');
+INSERT INTO functions (functionid, itemid, triggerid, function, parameter) VALUES (14001, 30004 ,14001,'last',0);
+INSERT INTO triggers (triggerid, expression, description, comments) VALUES (14002, '{14002}=0', 'testFormTrigger3', '');
+INSERT INTO functions (functionid, itemid, triggerid, function, parameter) VALUES (14002, 30004 ,14002,'last',0);
+INSERT INTO triggers (triggerid, expression, description, comments) VALUES (14003, '{14003}=0', 'testFormTrigger4', '');
+INSERT INTO functions (functionid, itemid, triggerid, function, parameter) VALUES (14003, 30004 ,14003,'last',0);
