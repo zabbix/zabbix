@@ -838,6 +838,16 @@ function make_latest_issues(array $filter = array()) {
 		$trigger['hostid'] = $host['hostid'];
 		$trigger['hostname'] = $host['name'];
 
+		// set events
+		if (isset($events[$trigger['triggerid']])) {
+			$trigger['event'] = $events[$trigger['triggerid']]['lastEvent'];
+		}
+		if (!empty($trigger['event'])) {
+			$trigger['event']['acknowledges'] = isset($eventAcknowledges[$trigger['event']['eventid']])
+				? $eventAcknowledges[$trigger['event']['eventid']]['acknowledges']
+				: null;
+		}
+
 		$triggers[$tnum] = $trigger;
 	}
 
@@ -854,6 +864,9 @@ function make_latest_issues(array $filter = array()) {
 
 	// get scripts
 	$scripts_by_hosts = API::Script()->getScriptsByHosts($hostIds);
+
+	// actions
+	$actions = getEventActionsStatHints($eventIds);
 
 	// ack params
 	$ackParams = isset($filter['screenid']) ? array('screenid' => $filter['screenid']) : array();
@@ -882,17 +895,8 @@ function make_latest_issues(array $filter = array()) {
 		_('Actions')
 	));
 
+	// triggers
 	foreach ($triggers as $trigger) {
-		// event
-		if (isset($events[$trigger['triggerid']])) {
-			$trigger['event'] = $events[$trigger['triggerid']]['lastEvent'];
-		}
-		if (!empty($trigger['event'])) {
-			$trigger['event']['acknowledges'] = isset($eventAcknowledges[$trigger['event']['eventid']])
-				? $eventAcknowledges[$trigger['event']['eventid']]['acknowledges']
-				: null;
-		}
-
 		// check for dependencies
 		$host = $hosts[$trigger['hostid']];
 
@@ -938,9 +942,8 @@ function make_latest_issues(array $filter = array()) {
 			$unknown->setHint($trigger['error'], '', 'on');
 		}
 
-		if ($trigger['event']) {
+		if (!empty($trigger['event'])) {
 			$ack = getEventAckState($trigger['event'], empty($filter['backUrl']) ? true : $filter['backUrl'], true, $ackParams);
-			$actions = get_event_actions_stat_hints($trigger['event']['eventid']);
 			$clock = new CLink(zbx_date2str(_('d M Y H:i:s'), $trigger['event']['clock']), 'events.php?triggerid='.$trigger['triggerid'].'&source=0&show_unknown=1&nav_time='.$trigger['event']['clock']);
 
 			$description = CEventHelper::expandDescription(zbx_array_merge($trigger, array('clock' => $trigger['event']['clock'], 'ns' => $trigger['event']['ns'])));
@@ -959,10 +962,9 @@ function make_latest_issues(array $filter = array()) {
 				zbx_date2age($trigger['event']['clock']),
 				$unknown,
 				$ack,
-				$actions
+				isset($actions[$trigger['event']['eventid']]) ? $actions[$trigger['event']['eventid']] : SPACE
 			));
 		}
-		unset($trigger, $description, $actions);
 	}
 
 	// initialize blinking

@@ -156,6 +156,8 @@ function make_small_eventlist($startEvent) {
 	);
 	CArrayHelper::sort($events, $sortFields);
 
+	$actions = getEventActionsStatHints(zbx_objectValues($events, 'eventid'));
+
 	foreach ($events as $event) {
 		$lclock = $clock;
 		$duration = zbx_date2age($lclock, $event['clock']);
@@ -169,6 +171,7 @@ function make_small_eventlist($startEvent) {
 		}
 
 		$eventStatusSpan = new CSpan(trigger_value2str($event['value']));
+
 		// add colors and blinking to span depending on configuration and trigger parameters
 		addTriggerValueStyle(
 			$eventStatusSpan,
@@ -178,8 +181,6 @@ function make_small_eventlist($startEvent) {
 		);
 
 		$ack = getEventAckState($event, true);
-
-		$actions = get_event_actions_stat_hints($event['eventid']);
 
 		$table->addRow(array(
 			new CLink(
@@ -191,7 +192,7 @@ function make_small_eventlist($startEvent) {
 			$duration,
 			zbx_date2age($event['clock']),
 			$config['event_ack_enable'] ? $ack : null,
-			$actions
+			isset($actions[$event['eventid']]) ? $actions[$event['eventid']] : SPACE
 		));
 	}
 

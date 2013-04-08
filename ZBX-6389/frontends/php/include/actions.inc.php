@@ -970,51 +970,44 @@ function get_event_actions_status($eventId) {
 	return $table;
 }
 
-function get_event_actions_stat_hints($eventId) {
-	$action = new CDiv(null, 'event-action-cont');
+function getEventActionsStatHints($eventIds) {
+	$actions = array();
 
-	$alerts = DBfetchArray(DBselect(
-		'SELECT a.status, COUNT(a.alertid) AS cnt'.
+	$alerts = DBselect(
+		'SELECT a.eventid,a.status,COUNT(a.alertid) AS cnt'.
 		' FROM alerts a'.
-		' WHERE a.eventid='.$eventId.
-			' AND a.alerttype IN ('.ALERT_TYPE_MESSAGE.','.ALERT_TYPE_COMMAND.')
-		GROUP BY status'
-	));
+		' WHERE a.alerttype IN ('.ALERT_TYPE_MESSAGE.','.ALERT_TYPE_COMMAND.')'.
+			' AND '.dbConditionInt('a.eventid', $eventIds).
+		' GROUP BY eventid,status'
+	);
 
-	if ($alerts) {
-		$alerts = zbx_toHash($alerts, 'status');
+	while ($alert = DBfetch($alerts)) {
+		if ($alert['cnt'] > 0) {
+			if ($alert['status'] == ALERT_STATUS_SENT) {
+				$color = 'green';
+			}
+			elseif ($alert['status'] == ALERT_STATUS_NOT_SENT) {
+				$color = 'orange';
+			}
+			else {
+				$color = 'red';
+			}
 
-		$sendCount = isset($alerts[ALERT_STATUS_SENT]) ? $alerts[ALERT_STATUS_SENT]['cnt'] : 0;
-		$notSendCount = isset($alerts[ALERT_STATUS_NOT_SENT]) ? $alerts[ALERT_STATUS_NOT_SENT]['cnt'] : 0;
-		$failedCount = isset($alerts[ALERT_STATUS_FAILED]) ? $alerts[ALERT_STATUS_FAILED]['cnt'] : 0;
+			$hint = new CSpan($alert['cnt'], $color);
+			$hint->setHint(get_actions_hint_by_eventid($alert['eventid'], $alert['status']));
 
-		// sent
-		$sentHint = new CSpan($sendCount, 'green');
-		if ($sendCount) {
-			$sentHint->setHint(get_actions_hint_by_eventid($eventId, ALERT_STATUS_SENT));
+			$actions[$alert['eventid']][$alert['status']] = $hint;
 		}
+	}
 
-		// not sent
-		$notSentHint = new CSpan($notSendCount, 'orange');
-		if ($notSendCount) {
-			$notSentHint->setHint(get_actions_hint_by_eventid($eventId, ALERT_STATUS_NOT_SENT));
-		}
-
-		// failed
-		$failedHint = new CSpan($failedCount, 'red');
-		if ($failedCount) {
-			$failedHint->setHint(get_actions_hint_by_eventid($eventId, ALERT_STATUS_FAILED));
-		}
-
-		$action->addItem(array(
-			new CDiv($sendCount ? $sentHint : SPACE),
-			new CDiv($notSendCount ? $notSentHint : SPACE),
-			new CDiv($failedCount ? $failedHint : SPACE)
+	foreach ($actions as $eventId => $status) {
+		$actions[$eventId] = new CDiv(null, 'event-action-cont');
+		$actions[$eventId]->addItem(array(
+			new CDiv(isset($status[ALERT_STATUS_SENT]) ? $status[ALERT_STATUS_SENT] : SPACE),
+			new CDiv(isset($status[ALERT_STATUS_NOT_SENT]) ? $status[ALERT_STATUS_NOT_SENT] : SPACE),
+			new CDiv(isset($status[ALERT_STATUS_FAILED]) ? $status[ALERT_STATUS_FAILED] : SPACE)
 		));
 	}
-	else {
-		$action->addItem('-');
-	}
 
-	return $action;
+	return $actions;
 }
