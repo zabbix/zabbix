@@ -248,15 +248,14 @@ function make_system_status($filter) {
 
 	// get acknowledges
 	$eventIds = array();
-	foreach ($triggers as &$trigger) {
-		$trigger['event'] = $trigger['lastEvent'];
-		unset($trigger['lastEvent']);
-
-		if (!empty($trigger['event'])) {
-			$eventIds[$trigger['event']['eventid']] = $trigger['event']['eventid'];
+	foreach ($triggers as $tnum => $trigger) {
+		if (!empty($trigger['lastEvent'])) {
+			$eventIds[$trigger['lastEvent']['eventid']] = $trigger['lastEvent']['eventid'];
 		}
+
+		$triggers[$tnum]['event'] = $trigger['lastEvent'];
+		unset($triggers[$tnum]['lastEvent']);
 	}
-	unset($trigger);
 
 	if ($eventIds) {
 		$eventAcknowledges = API::Event()->get(array(
@@ -266,6 +265,10 @@ function make_system_status($filter) {
 		));
 	}
 
+	// actions
+	$actions = getEventActionsStatus($eventIds);
+
+	// triggers
 	foreach ($triggers as $trigger) {
 		// event
 		if (empty($trigger['event'])) {
@@ -322,13 +325,13 @@ function make_system_status($filter) {
 			$allTriggersNum = $data['count'];
 			if ($allTriggersNum) {
 				$allTriggersNum = new CSpan($allTriggersNum, 'pointer');
-				$allTriggersNum->setHint(makeTriggersPopup($data['triggers'], $ackParams));
+				$allTriggersNum->setHint(makeTriggersPopup($data['triggers'], $ackParams, $actions));
 			}
 
 			$unackTriggersNum = $data['count_unack'];
 			if ($unackTriggersNum) {
 				$unackTriggersNum = new CSpan($unackTriggersNum, 'pointer red bold');
-				$unackTriggersNum->setHint(makeTriggersPopup($data['triggers_unack'], $ackParams));
+				$unackTriggersNum->setHint(makeTriggersPopup($data['triggers_unack'], $ackParams, $actions));
 			}
 
 			switch ($filter['extAck']) {
@@ -1392,10 +1395,11 @@ function make_screen_submenu() {
  *
  * @param array $triggers
  * @param array $ackParams
+ * @param array $actions
  *
  * @return CTableInfo
  */
-function makeTriggersPopup(array $triggers, array $ackParams) {
+function makeTriggersPopup(array $triggers, array $ackParams, array $actions) {
 	$config = select_config();
 
 	$popupTable = new CTableInfo();
@@ -1416,10 +1420,6 @@ function makeTriggersPopup(array $triggers, array $ackParams) {
 	CArrayHelper::sort($triggers, array(array('field' => 'clock', 'order' => ZBX_SORT_DOWN)));
 
 	foreach ($triggers as $trigger) {
-		$ack = getEventAckState($trigger['event'], true, true, $ackParams);
-		$actions = isset($trigger['event']['eventid']) ? get_event_actions_status($trigger['event']['eventid']) : _('no data');
-		$trigger['hostname'] = $trigger['hosts'][0]['name'];
-
 		// unknown triggers
 		$unknown = SPACE;
 		if ($trigger['value_flags'] == TRIGGER_VALUE_FLAG_UNKNOWN) {
@@ -1427,14 +1427,19 @@ function makeTriggersPopup(array $triggers, array $ackParams) {
 			$unknown->setHint($trigger['error'], '', 'on');
 		}
 
+		// action
+		$action = (isset($trigger['event']['eventid']) && isset($actions[$trigger['event']['eventid']]))
+			? $actions[$trigger['event']['eventid']]
+			: _('no data');
+
 		$popupTable->addRow(array(
 			get_node_name_by_elid($trigger['triggerid']),
-			$trigger['hostname'],
+			$trigger['hosts'][0]['name'],
 			getSeverityCell($trigger['priority'], $trigger['description']),
 			zbx_date2age($trigger['clock']),
 			$unknown,
-			$config['event_ack_enable'] ? $ack : null,
-			$actions
+			$config['event_ack_enable'] ? getEventAckState($trigger['event'], true, true, $ackParams) : null,
+			$action
 		));
 	}
 

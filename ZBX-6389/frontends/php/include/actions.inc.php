@@ -917,23 +917,29 @@ function get_actions_hint_by_eventid($eventid, $status = null) {
 	return $tab_hint;
 }
 
-function get_event_actions_status($eventId) {
-	$table = new CTable(' - ');
+function getEventActionsStatus($eventIds) {
+	if (empty($eventIds)) {
+		return array();
+	}
 
-	$alerts = DBfetchArray(DBselect(
-		'SELECT a.status, COUNT(a.alertid) AS cnt'.
+	$actions = array();
+
+	$alerts = DBselect(
+		'SELECT a.eventid,a.status,COUNT(a.alertid) AS cnt'.
 		' FROM alerts a'.
-		' WHERE a.eventid='.$eventId.
-			' AND a.alerttype IN ('.ALERT_TYPE_MESSAGE.','.ALERT_TYPE_COMMAND.')
-		GROUP BY status'
-	));
+		' WHERE a.alerttype IN ('.ALERT_TYPE_MESSAGE.','.ALERT_TYPE_COMMAND.')'.
+			' AND '.dbConditionInt('a.eventid', $eventIds).
+		' GROUP BY eventid,status'
+	);
 
-	if ($alerts) {
-		$alerts = zbx_toHash($alerts, 'status');
+	while ($alert = DBfetch($alerts)) {
+		$actions[$alert['eventid']][$alert['status']] = $alert['cnt'];
+	}
 
-		$sendCount = isset($alerts[ALERT_STATUS_SENT]) ? $alerts[ALERT_STATUS_SENT]['cnt'] : 0;
-		$notSendCount = isset($alerts[ALERT_STATUS_NOT_SENT]) ? $alerts[ALERT_STATUS_NOT_SENT]['cnt'] : 0;
-		$failedCount = isset($alerts[ALERT_STATUS_FAILED]) ? $alerts[ALERT_STATUS_FAILED]['cnt'] : 0;
+	foreach ($actions as $eventId => $action) {
+		$sendCount = isset($action[ALERT_STATUS_SENT]) ? $action[ALERT_STATUS_SENT]['cnt'] : 0;
+		$notSendCount = isset($action[ALERT_STATUS_NOT_SENT]) ? $action[ALERT_STATUS_NOT_SENT]['cnt'] : 0;
+		$failedCount = isset($action[ALERT_STATUS_FAILED]) ? $action[ALERT_STATUS_FAILED]['cnt'] : 0;
 
 		// calculate total
 		$mixed = 0;
@@ -964,13 +970,18 @@ function get_event_actions_status($eventId) {
 			$status = new CRow(array($columnLeft, $columnRight));
 		}
 
-		$table->addRow($status);
+		$actions[$eventId] = new CTable(' - ');
+		$actions[$eventId]->addRow($status);
 	}
 
-	return $table;
+	return $actions;
 }
 
 function getEventActionsStatHints($eventIds) {
+	if (empty($eventIds)) {
+		return array();
+	}
+
 	$actions = array();
 
 	$alerts = DBselect(
@@ -1000,12 +1011,12 @@ function getEventActionsStatHints($eventIds) {
 		}
 	}
 
-	foreach ($actions as $eventId => $status) {
+	foreach ($actions as $eventId => $action) {
 		$actions[$eventId] = new CDiv(null, 'event-action-cont');
 		$actions[$eventId]->addItem(array(
-			new CDiv(isset($status[ALERT_STATUS_SENT]) ? $status[ALERT_STATUS_SENT] : SPACE),
-			new CDiv(isset($status[ALERT_STATUS_NOT_SENT]) ? $status[ALERT_STATUS_NOT_SENT] : SPACE),
-			new CDiv(isset($status[ALERT_STATUS_FAILED]) ? $status[ALERT_STATUS_FAILED] : SPACE)
+			new CDiv(isset($action[ALERT_STATUS_SENT]) ? $action[ALERT_STATUS_SENT] : SPACE),
+			new CDiv(isset($action[ALERT_STATUS_NOT_SENT]) ? $action[ALERT_STATUS_NOT_SENT] : SPACE),
+			new CDiv(isset($action[ALERT_STATUS_FAILED]) ? $action[ALERT_STATUS_FAILED] : SPACE)
 		));
 	}
 
