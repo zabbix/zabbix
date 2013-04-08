@@ -148,6 +148,8 @@ class CPie extends CGraphDraw {
 
 		$strvaluelength = 0; // we need to know how long in px will be our legend
 
+		$data['config'] = select_config(true);
+
 		for ($i = 0; $i < $this->num; $i++) {
 			$real_item = get_item_by_itemid($this->items[$i]['itemid']);
 			$type = $this->items[$i]['calc_type'];
@@ -156,8 +158,8 @@ class CPie extends CGraphDraw {
 
 			$sql_arr = array();
 
-			if (ZBX_HISTORY_DATA_UPKEEP > -1) {
-				$real_item['history'] = ZBX_HISTORY_DATA_UPKEEP;
+			if ($data['config']['hk_trends_mode'] == 1 && $data['config']['hk_trends_global'] == 1) {
+				$real_item['history'] = $data['config']['hk_trends'];
 			}
 
 			if (($real_item['history'] * SEC_PER_DAY) > (time() - ($from_time + $this->period / 2)) // should pick data from history or trends
