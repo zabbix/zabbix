@@ -1636,48 +1636,38 @@ char	*get_param_dyn(const char *p, int num)
  *                                                                            *
  * Return value:                                                              *
  *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments: delimeter for parameters is ','                                  *
+ * Comments: delimiter for parameters is ','                                  *
  *                                                                            *
  ******************************************************************************/
 void	remove_param(char *p, int num)
 {
-/* 0 - init, 1 - inside quoted param, 2 - inside unquoted param */
-	int	state, idx = 1;
+	int	state = 0;	/* 0 - unquoted parameter, 1 - quoted parameter */
+	int	idx = 1;
 	char	*buf;
 
-	for (buf = p, state = 0; '\0' != *p; p++)
+	for (buf = p; '\0' != *p; p++)
 	{
+		switch (state)
+		{
+			case 0:			/* in unquoted parameter */
+				if (',' == *p)
+				{
+					if (1 == idx && 1 == num)
+						p++;
+					idx++;
+				}
+				else if ('"' == *p)
+					state = 1;
+				break;
+			case 1:			/* in quoted param */
+				if ('"' == *p)
+					state = 0;
+				else if ('\\' == *p && '"' == p[1])
+					p++;
+				break;
+		}
 		if (idx != num)
 			*buf++ = *p;
-
-		switch (state) {
-		/* Init state */
-		case 0:
-			if (',' == *p)
-				idx++;
-			else if ('"' == *p)
-				state = 1;
-			else if (' ' != *p)
-				state = 2;
-			break;
-		/* Quoted */
-		case 1:
-			if ('"' == *p)
-				state = 0;
-			else if ('\\' == *p && '"' == p[1])
-				p++;
-			break;
-		/* Unquoted */
-		case 2:
-			if (',' == *p)
-			{
-				idx++;
-				state = 0;
-			}
-			break;
-		}
 	}
 
 	*buf = '\0';
@@ -2290,9 +2280,9 @@ char	*zbx_age2str(int age)
 	hours = (int)((double)(age - days * SEC_PER_DAY) / SEC_PER_HOUR);
 	minutes	= (int)((double)(age - days * SEC_PER_DAY - hours * SEC_PER_HOUR) / SEC_PER_MIN);
 
-	if (days)
+	if (0 != days)
 		offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, "%dd ", days);
-	if (days || hours)
+	if (0 != days || 0 != hours)
 		offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, "%dh ", hours);
 	offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, "%dm", minutes);
 
@@ -2525,7 +2515,7 @@ const char	*zbx_result_string(int result)
 	}
 }
 
-const char	*zbx_item_logtype_string(zbx_item_logtype_t logtype)
+const char	*zbx_item_logtype_string(unsigned char logtype)
 {
 	switch (logtype)
 	{
@@ -2630,6 +2620,32 @@ const char	*zbx_escalation_status_string(unsigned char status)
 			return "sleep";
 		case ESCALATION_STATUS_COMPLETED:
 			return "completed";
+		default:
+			return "unknown";
+	}
+}
+
+const char	*zbx_trigger_state_string(unsigned char state)
+{
+	switch (state)
+	{
+		case TRIGGER_STATE_NORMAL:
+			return "Normal";
+		case TRIGGER_STATE_UNKNOWN:
+			return "Unknown";
+		default:
+			return "unknown";
+	}
+}
+
+const char	*zbx_item_state_string(unsigned char state)
+{
+	switch (state)
+	{
+		case ITEM_STATE_NORMAL:
+			return "Normal";
+		case ITEM_STATE_NOTSUPPORTED:
+			return "Not supported";
 		default:
 			return "unknown";
 	}

@@ -20,7 +20,7 @@
 
 class CTriggerFunctionValidator extends CValidator {
 	/**
-	 * The array containing valid functions and parameres to them
+	 * The array containing valid functions and parameters to them
 	 *
 	 * Structure: array(
 	 *   '<function>' => array(
@@ -173,10 +173,21 @@ class CTriggerFunctionValidator extends CValidator {
 		$valueTypesLog = array(
 			ITEM_VALUE_TYPE_LOG => true
 		);
+		$valueTypesInt = array(
+			ITEM_VALUE_TYPE_UINT64 => true
+		);
 
 		$argsIgnored = array(array('type' => 'str'));
 
 		$this->allowed = array(
+			'band' => array(
+				'args' => array(
+					array('type' => 'sec_num', 'mandat' => true),
+					array('type' => 'num', 'mandat' => true),
+					array('type' => 'sec')
+				),
+				'value_types' => $valueTypesInt
+			),
 			'abschange' => array(
 				'args' => $argsIgnored,
 				'value_types' => $valueTypesAll

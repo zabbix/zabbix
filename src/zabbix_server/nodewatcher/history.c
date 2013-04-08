@@ -70,7 +70,7 @@ static int	get_history_lastid(int master_nodeid, int nodeid, const ZBX_TABLE *ta
 		if (0 == strncmp(answer, "FAIL", 4))
 		{
 			zabbix_log(LOG_LEVEL_ERR, "NODE %d: %s() FAIL from node %d for node %d",
-				CONFIG_NODEID, __function_name, master_nodeid, nodeid);
+					CONFIG_NODEID, __function_name, master_nodeid, nodeid);
 			goto disconnect;
 		}
 
