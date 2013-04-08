@@ -1041,7 +1041,7 @@ int	DBcheck_version()
 		{DBpatch_02010048, 2010048, 0, 0},
 		{DBpatch_02010049, 2010049, 0, 0},
 		{DBpatch_02010050, 2010050, 0, 1},
-		{DBpatch_02010041, 2010051, 0, 1},
+		{DBpatch_02010051, 2010051, 0, 1},
 		/* IMPORTANT! When adding a new mandatory DBPatch don't forget to update it for SQLite, too. */
 		{NULL}
 	};
