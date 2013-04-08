@@ -220,6 +220,7 @@ elseif (isset($_REQUEST['save'])) {
 		$hosts = API::Host()->get(array(
 			'hostids' => get_request('hosts', array()),
 			'output' => array('hostid'),
+			'templated_hosts' => true,
 			'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL)
 		));
 
