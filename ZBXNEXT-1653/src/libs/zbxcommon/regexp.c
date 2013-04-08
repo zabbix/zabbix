@@ -36,7 +36,7 @@ static char	*zbx_regexp(const char *string, const char *pattern, int *len, int f
 	{
 		if (0 == regcomp(&re, pattern, flags))
 		{
-			if (0 == regexec(&re, string, (size_t)1, &match, 0)) /* matched */
+			if (0 == regexec(&re, string, (size_t)1, &match, 0))	/* matched */
 			{
 				c = (char *)string + match.rm_so;
 
@@ -63,7 +63,7 @@ char	*zbx_iregexp_match(const char *string, const char *pattern, int *len)
 
 /*********************************************************************************
  *                                                                               *
- * Function: zbx_regexp_sub_replace                                              *
+ * Function: regexp_sub_replace                                                  *
  *                                                                               *
  * Purpose: Constructs string from the specified template and regexp match.      *
  *          If the template is NULL or empty a copy of the parsed string is      *
@@ -71,7 +71,7 @@ char	*zbx_iregexp_match(const char *string, const char *pattern, int *len)
  *                                                                               *
  * Parameters: text            - [IN] the input string.                          *
  *             output_template - [IN] the output string template. The output     *
- *                                    string is construed from template by       *
+ *                                    string is constructed from template by     *
  *                                    replacing \<n> sequences with the captured *
  *                                    regexp group.                              *
  *                                    If output template is NULL or contains     *
@@ -94,7 +94,7 @@ static char	*regexp_sub_replace(const char *text, const char *output_template, r
 	if (NULL == output_template || '\0' == *output_template)
 		return zbx_strdup(NULL, text);
 
-	while ( NULL != (pgroup = strchr(pstart, '\\')) )
+	while (NULL != (pgroup = strchr(pstart, '\\')))
 	{
 		switch (*(++pgroup))
 		{
@@ -128,6 +128,7 @@ static char	*regexp_sub_replace(const char *text, const char *output_template, r
 				pstart = pgroup;
 		}
 	}
+
 	if ('\0' != *pstart)
 		zbx_strcpy_alloc(&ptr, &size, &offset, pstart);
 
@@ -144,9 +145,9 @@ static char	*regexp_sub_replace(const char *text, const char *output_template, r
  *          template with the captured groups in output in the case of success.  *
  *                                                                               *
  * Parameters: string          - [IN] the string to parse                        *
- *             pattern         - [IN] the regular expression.                    *
+ *             pattern         - [IN] the regular expression                     *
  *             output_template - [IN] the output string template. The output     *
- *                                    string is construed from template by       *
+ *                                    string is constructed from template by     *
  *                                    replacing \<n> sequences with the captured *
  *                                    regexp group.                              *
  *                                    If output template is NULL or contains     *
@@ -177,8 +178,8 @@ static char	*regexp_sub(const char *string, const char *pattern, const char *out
 	if (0 != regcomp(&re, pattern, flags))
 		return NULL;
 
-	if (0 == regexec(&re, string, sizeof(match) / sizeof(match[0]), match, 0))
-		ptr = regexp_sub_replace(string, output_template, match, sizeof(match) / sizeof(match[0]));
+	if (0 == regexec(&re, string, ARRSIZE(match), match, 0))
+		ptr = regexp_sub_replace(string, output_template, match, ARRSIZE(match));
 
 	regfree(&re);
 
@@ -194,9 +195,9 @@ static char	*regexp_sub(const char *string, const char *pattern, const char *out
  *          groups in output in the case of success.                             *
  *                                                                               *
  * Parameters: string          - [IN] the string to parse                        *
- *             pattern         - [IN] the regular expression.                    *
+ *             pattern         - [IN] the regular expression                     *
  *             output_template - [IN] the output string template. The output     *
- *                                    string is construed from template by       *
+ *                                    string is constructed from template by     *
  *                                    replacing \<n> sequences with the captured *
  *                                    regexp group.                              *
  *                                                                               *
@@ -257,12 +258,12 @@ void	add_regexp_ex(ZBX_REGEXP **regexps, int *regexps_alloc, int *regexps_num,
  *          case sensitivity option and allocates output variable to store the    *
  *          result if necessary.                                                  *
  *                                                                                *
- * Parameters: string          - [IN] the string to check.                        *
- *             pattern         - [IN] the regular expression.                     *
+ * Parameters: string          - [IN] the string to check                         *
+ *             pattern         - [IN] the regular expression                      *
  *             cs              - [IN] ZBX_IGNORE_CASE - case insensitive match.   *
  *                                    ZBX_CASE_SENSITIVE - case sensitive match.  *
  *             output_template - [IN] the output string template. The output      *
- *                                    string is construed from the template by    *
+ *                                    string is constructed from the template by  *
  *                                    replacing \<n> sequences with the captured  *
  *                                    regexp group.                               *
  *                                    If output_template is NULL the the whole    *
@@ -272,9 +273,9 @@ void	add_regexp_ex(ZBX_REGEXP **regexps, int *regexps_alloc, int *regexps_num,
  *                                    (substitution) is stored.                   *
  *                                    Specify NULL to skip output value creation. *
  *                                                                                *
- * Return value: SUCCEED - the string matches the specified regular expression.   *
+ * Return value: SUCCEED - the string matches the specified regular expression    *
  *               FAIL    - the string does not match the specified regular        *
- *                         expression.                                            *
+ *                         expression                                             *
  *                                                                                *
  * Author: Andris Zeila                                                           *
  *                                                                                *
@@ -283,7 +284,7 @@ static int	regexp_match_ex_regsub(const char *string, const char *pattern, zbx_c
 		const char *output_template, char **output)
 {
 	char	*ptr = NULL;
-	int 	regexp_flags = REG_EXTENDED | REG_NEWLINE;
+	int	regexp_flags = REG_EXTENDED | REG_NEWLINE;
 
 	if (ZBX_IGNORE_CASE == cs)
 		regexp_flags |= REG_ICASE;
@@ -303,10 +304,10 @@ static int	regexp_match_ex_regsub(const char *string, const char *pattern, zbx_c
  * Purpose: Test if the string contains substring with the specified case         *
  *          sensitivity option.                                                   *
  *                                                                                *
- * Parameters: string          - [IN] the string to check.                        *
- *             pattern         - [IN] the substring to search.                    *
- *             cs              - [IN] ZBX_IGNORE_CASE - case insensitive search.  *
- *                                    ZBX_CASE_SENSITIVE - case sensitive search. *
+ * Parameters: string          - [IN] the string to check                         *
+ *             pattern         - [IN] the substring to search                     *
+ *             cs              - [IN] ZBX_IGNORE_CASE - case insensitive search   *
+ *                                    ZBX_CASE_SENSITIVE - case sensitive search  *
  *                                                                                *
  * Return value: SUCCEED - string contains the specified substring                *
  *               FAIL    - string does not contain the specified substring        *
@@ -338,15 +339,15 @@ static int	regexp_match_ex_substring(const char *string, const char *pattern, zb
  * Purpose: Test if the string contains a substring from list with the specified  *
  *          delimiter and case sensitivity option.                                *
  *                                                                                *
- * Parameters: string          - [IN] the string to check.                        *
- *             pattern         - [IN] the substring list.                         *
- *             cs              - [IN] ZBX_IGNORE_CASE - case insensitive search.  *
- *                                    ZBX_CASE_SENSITIVE - case sensitive search. *
+ * Parameters: string          - [IN] the string to check                         *
+ *             pattern         - [IN] the substring list                          *
+ *             cs              - [IN] ZBX_IGNORE_CASE - case insensitive search   *
+ *                                    ZBX_CASE_SENSITIVE - case sensitive search  *
  *             delimiter       - [IN] the delimiter separating items in the       *
- *                                    substring list.                             *
+ *                                    substring list                              *
  *                                                                                *
- * Return value: SUCCEED - string contains a substring from the list.             *
- *               FAIL    - string contains no substrings from the list.           *
+ * Return value: SUCCEED - string contains a substring from the list              *
+ *               FAIL    - string contains no substrings from the list            *
  *                                                                                *
  * Author: Andris Zeila                                                           *
  *                                                                                *
@@ -354,30 +355,26 @@ static int	regexp_match_ex_substring(const char *string, const char *pattern, zb
 static int	regexp_match_ex_substring_list(const char *string, char *pattern, zbx_case_sensitive_t cs,
 		char delimiter)
 {
-	int 	res = FAIL;
-	char 	*s, *c;
+	int	ret = FAIL;
+	char	*s, *c;
 
-	for (s = pattern; '\0' != *s && SUCCEED != res;)
+	for (s = pattern; '\0' != *s && SUCCEED != ret;)
 	{
 		if (NULL != (c = strchr(s, delimiter)))
 			*c = '\0';
 
-		res = regexp_match_ex_substring(string, s, cs);
+		ret = regexp_match_ex_substring(string, s, cs);
 
 		if (NULL != c)
 		{
 			*c = delimiter;
 			s = ++c;
-			c = NULL;
 		}
 		else
 			break;
 	}
 
-	if (NULL != c)
-		*c = delimiter;
-
-	return res;
+	return ret;
 }
 
 /**********************************************************************************
@@ -388,16 +385,16 @@ static int	regexp_match_ex_substring_list(const char *string, char *pattern, zbx
  *          case sensitivity option and allocates output variable to store the    *
  *          result if necessary.                                                  *
  *                                                                                *
- * Parameters: regexps         - [IN] the global regular expression array.        *
- *             regexps_num     - [IN] the number of global regular expressions.   *
- *             string          - [IN] the string to check.                        *
+ * Parameters: regexps         - [IN] the global regular expression array         *
+ *             regexps_num     - [IN] the number of global regular expressions    *
+ *             string          - [IN] the string to check                         *
  *             pattern         - [IN] the regular expression or global regular    *
  *                                    expression name (@<global regexp name>).    *
- *             cs              - [IN] ZBX_IGNORE_CASE - case insensitive match.   *
- *                                    ZBX_CASE_SENSITIVE - case sensitive match.  *
+ *             cs              - [IN] ZBX_IGNORE_CASE - case insensitive match    *
+ *                                    ZBX_CASE_SENSITIVE - case sensitive match   *
  *             output_template - [IN] the output string template. For regular     *
  *                                    expressions (type Result is TRUE) output    *
- *                                    string is construed from the template by    *
+ *                                    string is constructed from the template by  *
  *                                    replacing '\<n>' sequences with the         *
  *                                    captured regexp group.                      *
  *                                    If output_template is NULL then the whole   *
@@ -407,9 +404,9 @@ static int	regexp_match_ex_substring_list(const char *string, char *pattern, zbx
  *                                    (substitution) is stored.                   *
  *                                    Specify NULL to skip output value creation. *
  *                                                                                *
- * Return value: SUCCEED - the string matches the specified regular expression.   *
+ * Return value: SUCCEED - the string matches the specified regular expression    *
  *               FAIL    - the string does not match the specified regular        *
- *                         expression.                                            *
+ *                         expression                                             *
  *                                                                                *
  * Comments: For regular expressions and global regular expressions with 'Result  *
  *           is TRUE' type the output_template substitution result is stored into *
@@ -422,19 +419,19 @@ static int	regexp_match_ex_substring_list(const char *string, char *pattern, zbx
 int	regexp_sub_ex(ZBX_REGEXP *regexps, int regexps_num, const char *string, const char *pattern,
 		zbx_case_sensitive_t cs, const char *output_template, char **output)
 {
-	int	i, res = FAIL;
+	int	i, ret = FAIL;
 
 	if (NULL == pattern || '\0' == *pattern)
 	{
-		/* Always match when no pattern is specified.*/
-		res = SUCCEED;
-		goto finish;
+		/* always match when no pattern is specified */
+		ret = SUCCEED;
+		goto out;
 	}
 
 	if ('@' != *pattern)
 	{
-		res =  regexp_match_ex_regsub(string, pattern, cs, output_template, output);
-		goto finish;
+		ret = regexp_match_ex_regsub(string, pattern, cs, output_template, output);
+		goto out;
 	}
 
 	pattern++;
@@ -444,37 +441,37 @@ int	regexp_sub_ex(ZBX_REGEXP *regexps, int regexps_num, const char *string, cons
 		if (0 != strcmp(regexps[i].name, pattern))
 			continue;
 
-		res = FAIL;
+		ret = FAIL;
 
 		switch (regexps[i].expression_type)
 		{
 			case EXPRESSION_TYPE_TRUE:
-				res = regexp_match_ex_regsub(string, regexps[i].expression, regexps[i].case_sensitive,
+				ret = regexp_match_ex_regsub(string, regexps[i].expression, regexps[i].case_sensitive,
 						output_template, output);
 				break;
 			case EXPRESSION_TYPE_FALSE:
-				res =  regexp_match_ex_regsub(string, regexps[i].expression, regexps[i].case_sensitive,
+				ret = regexp_match_ex_regsub(string, regexps[i].expression, regexps[i].case_sensitive,
 						NULL, NULL);
 				/* invert output value */
-				res = (SUCCEED == res) ? FAIL : SUCCEED;
+				ret = (SUCCEED == ret) ? FAIL : SUCCEED;
 				break;
 			case EXPRESSION_TYPE_INCLUDED:
-				res = regexp_match_ex_substring(string, regexps[i].expression, regexps[i].case_sensitive);
+				ret = regexp_match_ex_substring(string, regexps[i].expression, regexps[i].case_sensitive);
 				break;
 			case EXPRESSION_TYPE_NOT_INCLUDED:
-				res = regexp_match_ex_substring(string, regexps[i].expression, regexps[i].case_sensitive);
+				ret = regexp_match_ex_substring(string, regexps[i].expression, regexps[i].case_sensitive);
 				/* invert output value */
-				res = (SUCCEED == res) ? FAIL : SUCCEED;
+				ret = (SUCCEED == ret) ? FAIL : SUCCEED;
 				break;
 			case EXPRESSION_TYPE_ANY_INCLUDED:
-				res = regexp_match_ex_substring_list(string, regexps[i].expression, regexps[i].case_sensitive,
+				ret = regexp_match_ex_substring_list(string, regexps[i].expression, regexps[i].case_sensitive,
 						regexps[i].exp_delimiter);
 				break;
 		}
 		break;
 	}
-finish:
-	if (SUCCEED == res && NULL != output && NULL == *output)
+out:
+	if (SUCCEED == ret && NULL != output && NULL == *output)
 	{
 		/* Handle output value allocation for global regular expression types   */
 		/* that cannot perform output_template substitution (practically        */
@@ -484,7 +481,7 @@ finish:
 		zbx_strcpy_alloc(output, &size, &offset, string);
 	}
 
-	return res;
+	return ret;
 }
 
 int	regexp_match_ex(ZBX_REGEXP *regexps, int regexps_num, const char *string, const char *pattern,
