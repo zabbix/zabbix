@@ -31,6 +31,9 @@ $houseKeeperEventsDiscovery = new CNumericBox('hk_events_discovery', $this->data
 $houseKeeperEventsAutoreg = new CNumericBox('hk_events_autoreg', $this->data['config']['hk_events_autoreg'], 5);
 if (!$this->data['config']['hk_events_mode']) {
 	$houseKeeperEventsTrigger->setAttribute('disabled', 'disabled');
+	$houseKeeperEventsInternal->setAttribute('disabled', 'disabled');
+	$houseKeeperEventsDiscovery->setAttribute('disabled', 'disabled');
+	$houseKeeperEventsAutoreg->setAttribute('disabled', 'disabled');
 }
 $houseKeeperTab->addRow(_('Remove trigger events and alerts older than (in days)'), $houseKeeperEventsTrigger);
 $houseKeeperTab->addRow(_('Remove internal events and alerts older than (in days)'), $houseKeeperEventsInternal);
