@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -9,7 +9,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -70,7 +70,12 @@ static int    check_ldap(const char *host, unsigned short port, int timeout, int
 		goto lbl_ret;
 	}
 
-	attr = ldap_first_attribute(ldap, msg, &ber);
+	if (NULL == (attr = ldap_first_attribute(ldap, msg, &ber)))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "LDAP - empty first entry result. [%s] [%s]", host, ldap_err2string(ldapErr));
+		goto lbl_ret;
+	}
+
 	valRes = ldap_get_values(ldap, msg, attr);
 
 	*value_int = 1;

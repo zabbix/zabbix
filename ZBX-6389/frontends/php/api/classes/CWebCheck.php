@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -10,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -598,8 +598,11 @@ class CWebCheck extends CZBXAPI {
 	 */
 	protected function checkNames(array $httpTests) {
 		$httpTestsNames = zbx_objectValues($httpTests, 'name');
-		if (!preg_grep('/^(['.ZBX_PREG_PRINT.'])+$/u', $httpTestsNames)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Only characters are allowed.'));
+
+		foreach ($httpTestsNames as $httpTestsName) {
+			if (!preg_match('/^(['.ZBX_PREG_PRINT.'])+$/u', $httpTestsName)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Only characters are allowed.'));
+			}
 		}
 
 		return $httpTestsNames;
