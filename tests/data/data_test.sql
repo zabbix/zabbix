@@ -690,7 +690,7 @@ INSERT INTO functions (functionid, itemid, triggerid, function, parameter) VALUE
 
 -- create an empty template for inheritance testing
 INSERT INTO hosts (hostid, proxy_hostid, host, status, disable_until, error, available, errors_from, lastaccess, ipmi_authtype, ipmi_privilege, ipmi_username, ipmi_password, ipmi_disable_until, ipmi_available, snmp_disable_until, snmp_available, maintenanceid, maintenance_status, maintenance_type, maintenance_from, ipmi_errors_from, snmp_errors_from, ipmi_error, snmp_error,name) VALUES (30000,NULL,'Inheritance test template',3,0,'',0,0,0,0,2,'','',0,0,0,0,NULL,0,0,0,0,0,'','','Inheritance test template');
-INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (30000, 30000, 4);
+INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (30000, 30000, 1);
 INSERT INTO hosts (host, name, status, hostid) VALUES ('Template inheritance test host','Template inheritance test host', 0, 30001);
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (30001, 30001, 4);
 INSERT INTO interface (type, ip, dns, useip, port, main, hostid, interfaceid) VALUES (1, '127.0.0.1', '', 1, '10050', 1, 30001, 30000);
@@ -698,7 +698,7 @@ INSERT INTO hosts_templates (hosttemplateid, hostid, templateid) VALUES (30000, 
 
 -- create Form test template
 INSERT INTO hosts (hostid, proxy_hostid, host, status, disable_until, error, available, errors_from, lastaccess, ipmi_authtype, ipmi_privilege, ipmi_username, ipmi_password, ipmi_disable_until, ipmi_available, snmp_disable_until, snmp_available, maintenanceid, maintenance_status, maintenance_type, maintenance_from, ipmi_errors_from, snmp_errors_from, ipmi_error, snmp_error,name) VALUES (40000,NULL,'Form test template',3,0,'',0,0,0,0,2,'','',0,0,0,0,NULL,0,0,0,0,0,'','','Form test template');
-INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (40000, 40000, 4);
+INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (40000, 40000, 1);
 -- create Simple form test
 INSERT INTO hosts (host, name, status, hostid) VALUES ('Simple form test host','Simple form test host', 0, 40001);
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (40001, 40001, 4);
