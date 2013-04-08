@@ -309,6 +309,9 @@ int	VFS_FILE_REGMATCH(AGENT_REQUEST *request, AGENT_RESULT *result)
 	else if (FAIL == is_uint32(end_line_str, &end_line))
 		goto err;
 
+	if (start_line > end_line)
+		goto err;
+
 	if (-1 == (f = zbx_open(filename, O_RDONLY)))
 		goto err;
 

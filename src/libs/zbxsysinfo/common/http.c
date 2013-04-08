@@ -93,10 +93,10 @@ int	WEB_PAGE_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if (SYSINFO_RET_OK == get_http_page(hostname, path, port_number, buffer, sizeof(buffer)))
 	{
 		zbx_rtrim(buffer, "\r\n");
-		SET_TEXT_RESULT(result, strdup(buffer));
+		SET_TEXT_RESULT(result, zbx_strdup(NULL, buffer));
 	}
 	else
-		SET_TEXT_RESULT(result, strdup(""));
+		SET_TEXT_RESULT(result, zbx_strdup(NULL, ""));
 
 	return SYSINFO_RET_OK;
 }
@@ -171,7 +171,7 @@ int	WEB_PAGE_REGEXP(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if (NULL == regexp)
                 return SYSINFO_RET_FAIL;
 
-	/* by default return the matched part of we page */
+	/* by default return the matched part of web page */
 	if (NULL == output || '\0' == *output)
 		output = "\\0";
 
@@ -188,7 +188,7 @@ int	WEB_PAGE_REGEXP(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if (NULL != ptr)
 		SET_STR_RESULT(result, ptr);
 	else
-		SET_STR_RESULT(result, strdup(""));
+		SET_STR_RESULT(result, zbx_strdup(NULL, ""));
 
 	zbx_free(buffer);
 
