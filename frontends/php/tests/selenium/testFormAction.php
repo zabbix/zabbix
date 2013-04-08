@@ -79,21 +79,20 @@ class testFormAction extends CWebTest {
 				case 'Trigger name':
 					$this->type("new_condition_value", $condition['value']);
 					$this->zbxTestClickWait('add_condition');
-					$this->zbxTestTextPresent('Trigger name like "'.$condition['value'].'"');
+					$this->zbxTestTextPresent('Trigger name like '.$condition['value']);
 					break;
 				case 'Trigger severity':
 					$this->zbxTestDropdownSelect('new_condition_value', $condition['value']);
 					$this->zbxTestClickWait('add_condition');
-					$this->zbxTestTextPresent('Trigger severity = "'.$condition['value'].'"');
+					$this->zbxTestTextPresent('Trigger severity = '.$condition['value']);
 					break;
 				case 'Application':
 					$this->type('new_condition_value', $condition['value']);
 					$this->zbxTestClickWait('add_condition');
-					$this->zbxTestTextPresent('Application = "'.$condition['value'].'"');
+					$this->zbxTestTextPresent('Application = '.$condition['value']);
 					break;
 			}
 		}
-
 		$this->zbxTestClick('link=Operations');
 
 		foreach ($action['operations'] as $operation) {
@@ -153,19 +152,19 @@ class testFormAction extends CWebTest {
 		$this->zbxTestClick('link=Conditions');
 		$this->type("new_condition_value", "trigger");
 		$this->zbxTestClickWait('add_condition');
-		$this->zbxTestTextPresent("Trigger name like \"trigger\"");
+		$this->zbxTestTextPresent("Trigger name like trigger");
 
 		$this->select("new_condition_conditiontype", "label=Trigger severity");
 		$this->wait();
 		$this->select("new_condition_value", "label=Average");
 		$this->zbxTestClickWait('add_condition');
-		$this->zbxTestTextPresent("Trigger severity = \"Average\"");
+		$this->zbxTestTextPresent("Trigger severity = Average");
 
 		$this->select("new_condition_conditiontype", "label=Application");
 		$this->wait();
 		$this->type("new_condition_value", "app");
 		$this->zbxTestClickWait('add_condition');
-		$this->zbxTestTextPresent("Application = \"app\"");
+		$this->zbxTestTextPresent("Application = app");
 
 // adding operations
 		$this->zbxTestClick('link=Operations');
