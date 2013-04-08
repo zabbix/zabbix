@@ -374,27 +374,37 @@ else {
 	$data['config'] = select_config(true);
 	$keepHistory = array();
 	$keepHistory[] =  new CNumericBox('history', $this->data['history'], 8);
-	if ($data['config']['hk_history_global'] == 1 && CWebUser::$data['type'] == USER_TYPE_SUPER_ADMIN) {
+	if ($data['config']['hk_history_global'] == 1) {
 		$keepHistory[] =  SPACE;
-		$keepHistory[] = new CSpan(_('Keep history (in days) ['.$data['config']['hk_history'].'] Overridden by'),
-			'adm.housekeeper.php');
-		$keepHistory[] =  SPACE;
-		$link = new CLink(_('global housekeeper settings.'), 'adm.housekeeper.php');
-		$link->setAttribute('target', '_blank');
-		$keepHistory[] =  $link;
+		if (CWebUser::$data['type'] == USER_TYPE_SUPER_ADMIN) {
+			$keepHistory[] = new CSpan(_('['.$data['config']['hk_history'].'] - Overridden by'));
+			$keepHistory[] =  SPACE;
+			$link = new CLink(_('global housekeeper settings.'), 'adm.housekeeper.php');
+			$link->setAttribute('target', '_blank');
+			$keepHistory[] =  $link;
+		}
+		else {
+			$keepHistory[] = new CSpan(_('['.$data['config']['hk_history'].'] -
+				Overridden by global housekeeper settings.'));
+		}
 	}
 	$itemFormList->addRow(_('Keep history (in days)'), $keepHistory);
 
 	$keepTrend = array();
 	$keepTrend[] =  new CNumericBox('trends', $this->data['trends'], 8);
-	if ($data['config']['hk_trends_global'] == 1 && CWebUser::$data['type'] == USER_TYPE_SUPER_ADMIN) {
+	if ($data['config']['hk_trends_global'] == 1) {
 		$keepTrend[] =  SPACE;
-		$keepTrend[] = new CSpan(_('Keep trends (in days) ['.$data['config']['hk_trends'].'] Overridden by'),
-			'adm.housekeeper.php');
-		$keepTrend[] =  SPACE;
-		$link = new CLink(_('global housekeeper settings.'), 'adm.housekeeper.php');
-		$link->setAttribute('target', '_blank');
-		$keepTrend[] =  $link;
+		if (CWebUser::$data['type'] == USER_TYPE_SUPER_ADMIN) {
+			$keepTrend[] = new CSpan(_('['.$data['config']['hk_trends'].'] - Overridden by'));
+			$keepTrend[] =  SPACE;
+			$link = new CLink(_('global housekeeper settings.'), 'adm.housekeeper.php');
+			$link->setAttribute('target', '_blank');
+			$keepTrend[] =  $link;
+		}
+		else {
+			$keepTrend[] = new CSpan(_('['.$data['config']['hk_trends'].'] -
+				Overridden by global housekeeper settings.'));
+		}
 	}
 
 	$itemFormList->addRow(_('Keep trends (in days)'), $keepTrend, false, 'row_trends');
