@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -10,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -30,22 +30,19 @@ class testPageMaintenance extends CWebTest {
 	* @dataProvider allMaintenances
 	*/
 	public function testPageMaintenance_CheckLayout($maintenance) {
-		$this->login('maintenance.php');
-		$this->dropdown_select_wait('groupid', 'all');
+		$this->zbxTestLogin('maintenance.php');
+		$this->zbxTestDropdownSelectWait('groupid', 'all');
 		$this->checkTitle('Configuration of maintenance');
 
-		$this->ok('Maintenance');
-		$this->ok('CONFIGURATION OF MAINTENANCE PERIODS');
-		$this->ok('Displaying');
-		$this->nok('Displaying 0');
-		$this->ok(array('Name', 'Type', 'State', 'Description'));
-		$this->ok($maintenance['name']);
-		if ($maintenance['maintenance_type'] == MAINTENANCE_TYPE_NORMAL)	$this->ok('With data collection');
-		if ($maintenance['maintenance_type'] == MAINTENANCE_TYPE_NODATA)	$this->ok('No data collection');
-		$this->dropdown_select('go', 'Delete selected');
-		// TODO
-		// $this->dropdown_select('go', 'Enable selected');
-		// $this->dropdown_select('go', 'Disable selected');
+		$this->zbxTestTextPresent('Maintenance');
+		$this->zbxTestTextPresent('CONFIGURATION OF MAINTENANCE PERIODS');
+		$this->zbxTestTextPresent('Displaying');
+		$this->zbxTestTextNotPresent('Displaying 0');
+		$this->zbxTestTextPresent(array('Name', 'Type', 'State', 'Description'));
+		$this->zbxTestTextPresent($maintenance['name']);
+		if ($maintenance['maintenance_type'] == MAINTENANCE_TYPE_NORMAL)	$this->zbxTestTextPresent('With data collection');
+		if ($maintenance['maintenance_type'] == MAINTENANCE_TYPE_NODATA)	$this->zbxTestTextPresent('No data collection');
+		$this->zbxTestDropdownHasOptions('go', array('Delete selected'));
 	}
 
 	/**
@@ -66,17 +63,15 @@ class testPageMaintenance extends CWebTest {
 		$sqlTimeperiods = "select * from timeperiods where timeperiodid in (select timeperiodid from maintenances_windows where maintenanceid=$maintenanceid) order by timeperiodid";
 		$oldHashTimeperiods = DBhash($sqlTimeperiods);
 
-		$this->login('maintenance.php');
-		$this->dropdown_select_wait('groupid', 'all');
+		$this->zbxTestLogin('maintenance.php');
+		$this->zbxTestDropdownSelectWait('groupid', 'all');
 		$this->checkTitle('Configuration of maintenance');
-		$this->click("link=$name");
-		$this->wait();
-		$this->button_click('save');
-		$this->wait();
+		$this->zbxTestClickWait('link='.$name);
+		$this->zbxTestClickWait('save');
 		$this->checkTitle('Configuration of maintenance');
-		$this->ok('Maintenance updated');
-		$this->ok("$name");
-		$this->ok('CONFIGURATION OF MAINTENANCE PERIODS');
+		$this->zbxTestTextPresent('Maintenance updated');
+		$this->zbxTestTextPresent("$name");
+		$this->zbxTestTextPresent('CONFIGURATION OF MAINTENANCE PERIODS');
 
 		$this->assertEquals($oldHashMaintenance, DBhash($sqlMaintenance), "Chuck Norris: Maintenance update changed data in table 'maintenances'");
 		$this->assertEquals($oldHashHosts, DBhash($sqlHosts), "Chuck Norris: Maintenance update changed data in table 'maintenances_hosts'");
@@ -100,17 +95,16 @@ class testPageMaintenance extends CWebTest {
 
 		$this->chooseOkOnNextConfirmation();
 
-		$this->login('maintenance.php');
-		$this->dropdown_select_wait('groupid', 'all');
+		$this->zbxTestLogin('maintenance.php');
+		$this->zbxTestDropdownSelectWait('groupid', 'all');
 		$this->checkTitle('Configuration of maintenance');
-		$this->checkbox_select("maintenanceids[$maintenanceid]");
-		$this->dropdown_select('go', 'Delete selected');
-		$this->button_click('goButton');
-		$this->wait();
+		$this->zbxTestCheckboxSelect('maintenanceids['.$maintenanceid.']');
+		$this->zbxTestDropdownSelect('go', 'Delete selected');
+		$this->zbxTestClickWait('goButton');
 
 		$this->getConfirmation();
 		$this->checkTitle('Configuration of maintenance');
-		$this->ok('Maintenance deleted');
+		$this->zbxTestTextPresent('Maintenance deleted');
 
 		$sql = "select * from maintenances where maintenanceid=$maintenanceid";
 		$this->assertEquals(0, DBcount($sql));

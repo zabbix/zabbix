@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2011 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -10,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -95,7 +95,7 @@ foreach ($this->data['actions'] as $action) {
 	$details = array();
 	if (is_array($action['details'])) {
 		foreach ($action['details'] as $detail) {
-			$details[] = array($detail['table_name'].'.'.$detail['field_name'].': '.$detail['oldvalue'].' => '.$detail['newvalue'], BR());
+			$details[] = array($detail['table_name'].'.'.$detail['field_name'].NAME_DELIMITER.$detail['oldvalue'].' => '.$detail['newvalue'], BR());
 		}
 	}
 	else {

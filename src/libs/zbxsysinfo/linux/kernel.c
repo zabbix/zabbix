@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -9,7 +9,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -39,7 +39,7 @@ static int	read_uint64_from_procfs(const char *path, zbx_uint64_t *value)
 	return ret;
 }
 
-int	KERNEL_MAXFILES(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+int	KERNEL_MAXFILES(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	int		ret = SYSINFO_RET_FAIL;
 	zbx_uint64_t	value;
@@ -53,7 +53,7 @@ int	KERNEL_MAXFILES(const char *cmd, const char *param, unsigned flags, AGENT_RE
 	return ret;
 }
 
-int	KERNEL_MAXPROC(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+int	KERNEL_MAXPROC(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	int		ret = SYSINFO_RET_FAIL;
 	zbx_uint64_t	value;

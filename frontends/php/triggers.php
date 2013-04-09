@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2012 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -147,8 +147,40 @@ elseif (isset($_REQUEST['save'])) {
 	);
 
 	if (isset($_REQUEST['triggerid'])) {
-		$trigger['triggerid'] = $_REQUEST['triggerid'];
-		$result = API::Trigger()->update($trigger);
+		// update only changed fields
+		$oldTrigger = API::Trigger()->get(array(
+			'triggerids' => $_REQUEST['triggerid'],
+			'output' => API_OUTPUT_EXTEND,
+			'selectDependencies' => array('triggerid')
+		));
+		$oldTrigger = reset($oldTrigger);
+		$oldTrigger['dependencies'] = zbx_toHash(zbx_objectValues($oldTrigger['dependencies'], 'triggerid'));
+
+		$newDependencies = $trigger['dependencies'];
+		$oldDependencies = $oldTrigger['dependencies'];
+		unset($trigger['dependencies']);
+		unset($oldTrigger['dependencies']);
+
+		$triggerToUpdate = array_diff_assoc($trigger, $oldTrigger);
+		$triggerToUpdate['triggerid'] = $_REQUEST['triggerid'];
+
+		// dependencies
+		$updateDepencencies = false;
+		if (count($newDependencies) != count($oldDependencies)) {
+			$updateDepencencies = true;
+		}
+		else {
+			foreach ($newDependencies as $dependency) {
+				if (!isset($oldDependencies[$dependency['triggerid']])) {
+					$updateDepencencies = true;
+				}
+			}
+		}
+		if ($updateDepencencies) {
+			$triggerToUpdate['dependencies'] = $newDependencies;
+		}
+
+		$result = API::Trigger()->update($triggerToUpdate);
 		show_messages($result, _('Trigger updated'), _('Cannot update trigger'));
 	}
 	else {
@@ -264,34 +296,6 @@ elseif (str_in_array($_REQUEST['go'], array('activate', 'disable')) && isset($_R
 			'where' => array('triggerid' => $triggerIdsToUpdate)
 		));
 
-		// if we're disabling a monitored trigger, set it's value flag to UNKNOWN
-		if ($status == TRIGGER_STATUS_DISABLED) {
-			$valueTriggerIds = array();
-			$db_triggers = DBselect(
-				'SELECT t.triggerid'.
-				' FROM triggers t,functions f,items i,hosts h'.
-				' WHERE t.triggerid=f.triggerid'.
-					' AND f.itemid=i.itemid'.
-					' AND i.hostid=h.hostid'.
-					' AND '.dbConditionInt('t.triggerid', $triggerIdsToUpdate).
-					' AND t.value_flags='.TRIGGER_VALUE_FLAG_NORMAL.
-					' AND h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.')'
-			);
-			while ($row = DBfetch($db_triggers)) {
-				$valueTriggerIds[] = $row['triggerid'];
-			}
-
-			if (!empty($valueTriggerIds)) {
-				DB::update('triggers', array(
-					'values' => array(
-						'value_flags' => TRIGGER_VALUE_FLAG_UNKNOWN,
-						'error' => _('Trigger status became "Disabled".')
-					),
-					'where' => array('triggerid' => $valueTriggerIds)
-				));
-			}
-		}
-
 		// get updated triggers with additional data
 		$db_triggers = API::Trigger()->get(array(
 			'triggerids' => $triggerIdsToUpdate,
@@ -303,7 +307,7 @@ elseif (str_in_array($_REQUEST['go'], array('activate', 'disable')) && isset($_R
 		foreach ($db_triggers as $triggerid => $trigger) {
 			$host = reset($trigger['hosts']);
 			add_audit_ext(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_TRIGGER, $triggerid,
-				$host['host'].':'.$trigger['description'], 'triggers', $statusOld, $statusNew);
+				$host['host'].NAME_DELIMITER.$trigger['description'], 'triggers', $statusOld, $statusNew);
 		}
 
 		DBend(true);

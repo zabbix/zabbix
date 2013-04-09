@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2012 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -10,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -326,7 +326,7 @@ class CHost extends CHostGeneral {
 					'SELECT NULL'.
 					' FROM items i'.
 					' WHERE h.hostid=i.hostid'.
-						' AND i.status IN ('.ITEM_STATUS_ACTIVE.','.ITEM_STATUS_NOTSUPPORTED.')'.
+						' AND i.status='.ITEM_STATUS_ACTIVE.
 						' AND i.lastvalue IS NOT NULL'.
 					')';
 		}
@@ -1537,6 +1537,9 @@ class CHost extends CHostGeneral {
 			info(_s('Deleted: Host "%1$s".', $host['name']));
 			add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_HOST, $host['hostid'], $host['name'], 'hosts', NULL, NULL);
 		}
+
+		// remove Monitoring > Latest data toggle profile values related to given hosts
+		CProfile::delete('web.latest.toggle_other', $hostIds);
 
 		return array('hostids' => $hostIds);
 	}

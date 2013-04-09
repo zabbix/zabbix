@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -10,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -24,10 +24,10 @@ require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 class testPageBrowserWarning extends CWebTest {
 
 	public function testPageBrowserWarning_CheckLayout() {
-		$this->open('browserwarning.php');
+		$this->zbxTestOpen('browserwarning.php');
 		$this->assertTitle('WARNING! You are using an outdated browser.');
-		$this->ok('WARNING! You are using an outdated browser.');
-		$this->ok(array(
+		$this->zbxTestTextPresent('WARNING! You are using an outdated browser.');
+		$this->zbxTestTextPresent(array(
 			'Google Chrome',
 			'Mozilla Firefox',
 			'Internet Explorer',

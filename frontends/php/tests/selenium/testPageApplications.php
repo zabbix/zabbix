@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -10,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -33,24 +33,22 @@ class testPageApplications extends CWebTest {
 	public function testPageApplications_CheckLayout($host) {
 		$hostid = $host['hostid'];
 
-		$this->login('hosts.php');
-		$this->dropdown_select_wait('groupid', 'all');
+		$this->zbxTestLogin('hosts.php');
+		$this->zbxTestDropdownSelectWait('groupid', 'all');
 
 		$this->checkTitle('Configuration of hosts');
-		$this->ok('HOSTS');
+		$this->zbxTestTextPresent('HOSTS');
 		// Go to the list of applications
 		$this->href_click("applications.php?groupid=0&hostid=$hostid&sid=");
 		$this->wait();
 		// We are in the list of applications
 		$this->checkTitle('Configuration of applications');
-		$this->ok('CONFIGURATION OF APPLICATIONS');
-		$this->ok('Displaying');
-		$this->ok('Host list');
+		$this->zbxTestTextPresent('CONFIGURATION OF APPLICATIONS');
+		$this->zbxTestTextPresent('Displaying');
+		$this->zbxTestTextPresent('Host list');
 		// Header
-		$this->ok(array('Applications', 'Show'));
+		$this->zbxTestTextPresent(array('Applications', 'Show'));
 
-		$this->dropdown_select('go', 'Enable selected');
-		$this->dropdown_select('go', 'Disable selected');
-		$this->dropdown_select('go', 'Delete selected');
+		$this->zbxTestDropdownHasOptions('go', array('Enable selected', 'Disable selected', 'Delete selected'));
 	}
 }

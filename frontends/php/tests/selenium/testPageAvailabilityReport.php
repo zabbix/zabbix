@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -10,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -22,33 +22,33 @@ require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
 class testPageAvailabilityReport extends CWebTest {
 	public function testPageAvailabilityReport_ByHost_CheckLayout() {
-		$this->login('report2.php?config=0');
+		$this->zbxTestLogin('report2.php?config=0');
 		$this->checkTitle('Availability report');
-		$this->ok('AVAILABILITY REPORT');
-		$this->ok('Mode');
-		$this->ok('Filter');
-		$this->ok(array('Host', 'Name', 'Problems', 'Ok', 'Graph'));
+		$this->zbxTestTextPresent('AVAILABILITY REPORT');
+		$this->zbxTestTextPresent('Mode');
+		$this->zbxTestTextPresent('Filter');
+		$this->zbxTestTextPresent(array('Host', 'Name', 'Problems', 'Ok', 'Graph'));
 	}
 
 // Check that no real host or template names displayed
 	public function testPageAvailabilityReport_ByHost_NoHostNames() {
-		$this->login('report2.php?config=0');
+		$this->zbxTestLogin('report2.php?config=0');
 		$this->checkTitle('Availability report');
 		$this->checkNoRealHostnames();
 	}
 
 	public function testPageAvailabilityReport_ByTriggerTemplate_CheckLayout() {
-		$this->login('report2.php?config=1');
+		$this->zbxTestLogin('report2.php?config=1');
 		$this->checkTitle('Availability report');
-		$this->ok('AVAILABILITY REPORT');
-		$this->ok('Mode');
-		$this->ok('Filter');
-		$this->ok(array('Host', 'Name', 'Problems', 'Ok', 'Graph'));
+		$this->zbxTestTextPresent('AVAILABILITY REPORT');
+		$this->zbxTestTextPresent('Mode');
+		$this->zbxTestTextPresent('Filter');
+		$this->zbxTestTextPresent(array('Host', 'Name', 'Problems', 'Ok', 'Graph'));
 	}
 
 // Check that no real host or template names displayed
 	public function testPageAvailabilityReport_ByTriggerTemplate_NoHostNames() {
-		$this->login('report2.php?config=1');
+		$this->zbxTestLogin('report2.php?config=1');
 		$this->checkNoRealHostnames();
 	}
 }

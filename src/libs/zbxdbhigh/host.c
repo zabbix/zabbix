@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -9,7 +9,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -2190,8 +2190,6 @@ static int	DBcopy_trigger_to_host(zbx_uint64_t *new_triggerid, zbx_uint64_t host
 	/* create trigger if no updated triggers */
 	if (SUCCEED != res)
 	{
-		char	*error_esc;
-
 		res = SUCCEED;
 
 		*new_triggerid = DBget_maxid("triggers");
@@ -2199,19 +2197,17 @@ static int	DBcopy_trigger_to_host(zbx_uint64_t *new_triggerid, zbx_uint64_t host
 
 		comments_esc = DBdyn_escape_string(comments);
 		url_esc = DBdyn_escape_string(url);
-		error_esc = DBdyn_escape_string_len("Trigger just added. No status update so far.", TRIGGER_ERROR_LEN);
 
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 				"insert into triggers"
 					" (triggerid,description,priority,status,"
-						"comments,url,type,value,value_flags,templateid,flags,error)"
+						"comments,url,type,value,state,templateid,flags)"
 					" values (" ZBX_FS_UI64 ",'%s',%d,%d,"
-						"'%s','%s',%d,%d,%d," ZBX_FS_UI64 ",%d,'%s');\n",
+						"'%s','%s',%d,%d,%d," ZBX_FS_UI64 ",%d);\n",
 					*new_triggerid, description_esc, (int)priority, (int)status, comments_esc,
-					url_esc, (int)type, TRIGGER_VALUE_OK, TRIGGER_VALUE_FLAG_UNKNOWN, triggerid,
-					(int)flags, error_esc);
+					url_esc, (int)type, TRIGGER_VALUE_OK, TRIGGER_STATE_NORMAL, triggerid,
+					(int)flags);
 
-		zbx_free(error_esc);
 		zbx_free(url_esc);
 		zbx_free(comments_esc);
 
@@ -4527,7 +4523,7 @@ zbx_uint64_t	DBadd_interface(zbx_uint64_t hostid, unsigned char type,
 
 		zbx_free(tmp);
 		tmp = strdup(row[4]);
-		substitute_simple_macros(NULL, &hostid, NULL, NULL, NULL, &tmp, MACRO_TYPE_COMMON, NULL, 0);
+		substitute_simple_macros(NULL, NULL, &hostid, NULL, NULL, NULL, &tmp, MACRO_TYPE_COMMON, NULL, 0);
 		if (FAIL == is_ushort(tmp, &db_port) || db_port != port)
 			continue;
 

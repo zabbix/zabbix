@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2012 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -27,6 +27,15 @@ class CItemPrototype extends CItemGeneral {
 	protected $tableName = 'items';
 	protected $tableAlias = 'i';
 	protected $sortColumns = array('itemid', 'name', 'key_', 'delay', 'type', 'status');
+
+	public function __construct() {
+		parent::__construct();
+
+		$this->errorMessages = array_merge($this->errorMessages, array(
+			self::ERROR_EXISTS_TEMPLATE => _('Item prototype "%1$s" already exists on "%2$s", inherited from another template.'),
+			self::ERROR_EXISTS => _('Item prototype "%1$s" already exists on "%2$s"')
+		));
+	}
 
 	/**
 	 * Get Itemprototype data

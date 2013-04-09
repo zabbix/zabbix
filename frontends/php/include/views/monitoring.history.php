@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2012 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -29,8 +29,8 @@ $headerPlaintext = array();
 if (count($this->data['items']) == 1) {
 	$itemName = itemName($this->data['item']);
 
-	$header['left'] = array(new CLink($this->data['item']['hostname'], 'latest.php?hostid='.$this->data['item']['hostid']), ': ', $itemName);
-	$headerPlaintext[] = $this->data['item']['hostname'].': '.$itemName;
+	$header['left'] = array(new CLink($this->data['item']['hostname'], 'latest.php?hostid='.$this->data['item']['hostid']), NAME_DELIMITER, $itemName);
+	$headerPlaintext[] = $this->data['item']['hostname'].NAME_DELIMITER.$itemName;
 
 	if ($this->data['action'] == 'showgraph') {
 		$header['right'][] = get_icon('favourite', array(
@@ -88,7 +88,7 @@ if ($this->data['action'] == 'showvalues' || $this->data['action'] == 'showlates
 
 			$host = reset($item['hosts']);
 			$itemsData[$itemid]['id'] = $itemid;
-			$itemsData[$itemid]['name'] = $host['name'].': '.itemName($item);
+			$itemsData[$itemid]['name'] = $host['name'].NAME_DELIMITER.itemName($item);
 		}
 
 		order_result($itemsData, 'name');

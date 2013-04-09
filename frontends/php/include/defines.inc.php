@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -10,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -21,10 +21,10 @@
 
 define('ZABBIX_VERSION',     '2.1.0');
 define('ZABBIX_API_VERSION', '2.1.0');
-define('ZABBIX_DB_VERSION',	 2010034);
+define('ZABBIX_DB_VERSION',	 2010047);
 
 define('ZABBIX_COPYRIGHT_FROM', '2001');
-define('ZABBIX_COPYRIGHT_TO',   '2012');
+define('ZABBIX_COPYRIGHT_TO',   '2013');
 
 define('ZBX_LOGIN_ATTEMPTS',	5);
 define('ZBX_LOGIN_BLOCK',		30); // sec
@@ -98,17 +98,18 @@ define('ZBX_DB_ORACLE',		'ORACLE');
 define('ZBX_DB_POSTGRESQL',	'POSTGRESQL');
 define('ZBX_DB_SQLITE3',	'SQLITE3');
 
-define('PAGE_TYPE_HTML',		0);
-define('PAGE_TYPE_IMAGE',		1);
-define('PAGE_TYPE_XML',			2);
-define('PAGE_TYPE_JS',			3); // javascript
-define('PAGE_TYPE_CSS',			4);
-define('PAGE_TYPE_HTML_BLOCK',	5); // simple block of html (as text)
-define('PAGE_TYPE_JSON',		6); // simple JSON
-define('PAGE_TYPE_JSON_RPC',	7); // api call
-define('PAGE_TYPE_TEXT_FILE',	8); // api call
-define('PAGE_TYPE_TEXT',		9); // simple text
-define('PAGE_TYPE_CSV',			10); // CSV format
+define('PAGE_TYPE_HTML',				0);
+define('PAGE_TYPE_IMAGE',				1);
+define('PAGE_TYPE_XML',					2);
+define('PAGE_TYPE_JS',					3); // javascript
+define('PAGE_TYPE_CSS',					4);
+define('PAGE_TYPE_HTML_BLOCK',			5); // simple block of html (as text)
+define('PAGE_TYPE_JSON',				6); // simple JSON
+define('PAGE_TYPE_JSON_RPC',			7); // api call
+define('PAGE_TYPE_TEXT_FILE',			8); // api call
+define('PAGE_TYPE_TEXT',				9); // simple text
+define('PAGE_TYPE_CSV',					10); // CSV format
+define('PAGE_TYPE_TEXT_RETURN_JSON',	11); // input plaintext output json
 
 define('ZBX_SESSION_ACTIVE',	0);
 define('ZBX_SESSION_PASSIVE',	1);
@@ -211,6 +212,7 @@ define('CONDITION_TYPE_DCHECK',				19);
 define('CONDITION_TYPE_PROXY',				20);
 define('CONDITION_TYPE_DOBJECT',			21);
 define('CONDITION_TYPE_HOST_NAME',			22);
+define('CONDITION_TYPE_EVENT_TYPE',			23);
 
 define('CONDITION_OPERATOR_EQUAL',		0);
 define('CONDITION_OPERATOR_NOT_EQUAL',	1);
@@ -220,6 +222,14 @@ define('CONDITION_OPERATOR_IN',			4);
 define('CONDITION_OPERATOR_MORE_EQUAL',	5);
 define('CONDITION_OPERATOR_LESS_EQUAL',	6);
 define('CONDITION_OPERATOR_NOT_IN',		7);
+
+// event type action condition values
+define('EVENT_TYPE_ITEM_NOTSUPPORTED',		0);
+define('EVENT_TYPE_ITEM_NORMAL',			1);
+define('EVENT_TYPE_LLDRULE_NOTSUPPORTED',	2);
+define('EVENT_TYPE_LLDRULE_NORMAL',			3);
+define('EVENT_TYPE_TRIGGER_UNKNOWN',		4);
+define('EVENT_TYPE_TRIGGER_NORMAL',			5);
 
 define('HOST_STATUS_MONITORED',		0);
 define('HOST_STATUS_NOT_MONITORED',	1);
@@ -359,6 +369,9 @@ define('ITEM_STATUS_ACTIVE',		0);
 define('ITEM_STATUS_DISABLED',		1);
 define('ITEM_STATUS_NOTSUPPORTED',	3);
 
+define('ITEM_STATE_NORMAL',			0);
+define('ITEM_STATE_NOTSUPPORTED',	1);
+
 define('ITEM_TYPE_SNMPTRAP', 17);
 
 define('ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV',	0);
@@ -414,8 +427,8 @@ define('TRIGGER_VALUE_FALSE',	0);
 define('TRIGGER_VALUE_TRUE',	1);
 define('TRIGGER_VALUE_UNKNOWN', 2); // only in "events" table
 
-define('TRIGGER_VALUE_FLAG_NORMAL',		0);
-define('TRIGGER_VALUE_FLAG_UNKNOWN',	1);
+define('TRIGGER_STATE_NORMAL',	0);
+define('TRIGGER_STATE_UNKNOWN',	1);
 
 define('TRIGGER_VALUE_CHANGED_NO',	0);
 define('TRIGGER_VALUE_CHANGED_YES', 1);
@@ -609,6 +622,9 @@ define('ZBX_INTERNAL_GROUP',		1);
 define('GROUP_STATUS_DISABLED', 1);
 define('GROUP_STATUS_ENABLED',	0);
 
+define('LINE_TYPE_NORMAL',	0);
+define('LINE_TYPE_BOLD',	1);
+
 // IMPORTANT!!! by priority DESC
 define('GROUP_GUI_ACCESS_SYSTEM',	0);
 define('GROUP_GUI_ACCESS_INTERNAL', 1);
@@ -636,7 +652,7 @@ define('PERM_RES_DATA_ARRAY',	2);
 define('RESOURCE_TYPE_NODE',	0);
 define('RESOURCE_TYPE_GROUP',	1);
 
-define('PARAM_TYPE_SECONDS',	0);
+define('PARAM_TYPE_TIME',		0);
 define('PARAM_TYPE_COUNTS',		1);
 
 define('ZBX_NODE_CHILD',	0);
@@ -669,13 +685,17 @@ define('EVENTS_NOFALSEFORB_STATUS_ALL',		0); // used with TRIGGERS_OPTION_NOFALS
 define('EVENTS_NOFALSEFORB_STATUS_FALSE',	1); // used with TRIGGERS_OPTION_NOFALSEFORB
 define('EVENTS_NOFALSEFORB_STATUS_TRUE',	2); // used with TRIGGERS_OPTION_NOFALSEFORB
 
-define('EVENT_SOURCE_TRIGGERS',			0);
-define('EVENT_SOURCE_DISCOVERY',		1);
-define('EVENT_SOURCE_AUTO_REGISTRATION',2);
+define('EVENT_SOURCE_TRIGGERS',				0);
+define('EVENT_SOURCE_DISCOVERY',			1);
+define('EVENT_SOURCE_AUTO_REGISTRATION',	2);
+define('EVENT_SOURCE_INTERNAL', 			3);
 
-define('EVENT_OBJECT_TRIGGER',		0);
-define('EVENT_OBJECT_DHOST',		1);
-define('EVENT_OBJECT_DSERVICE',		2);
+define('EVENT_OBJECT_TRIGGER',			0);
+define('EVENT_OBJECT_DHOST',			1);
+define('EVENT_OBJECT_DSERVICE',			2);
+define('EVENT_OBJECT_AUTOREGHOST',		3);
+define('EVENT_OBJECT_ITEM',				4);
+define('EVENT_OBJECT_LLDRULE',			5);
 
 define('GRAPH_YAXIS_TYPE_CALCULATED',	0);
 define('GRAPH_YAXIS_TYPE_FIXED',		1);
@@ -768,6 +788,7 @@ define('SBR',	"<br/>\n");
 define('SPACE',	'&nbsp;');
 define('RARR',	'&rArr;');
 define('SQUAREBRACKETS', '%5B%5D');
+define('NAME_DELIMITER', ': ');
 
 // affects multibyte strings [in mb_ereg char "-" must be backslashed]!!!
 if (in_array(ini_get('mbstring.func_overload'), array(2,3,6,7))) {

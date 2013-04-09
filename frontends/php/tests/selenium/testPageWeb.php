@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -10,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -22,17 +22,17 @@ require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
 class testPageWeb extends CWebTest {
 	public function testPageWeb_CheckLayout() {
-		$this->login('httpmon.php');
+		$this->zbxTestLogin('httpmon.php');
 		$this->checkTitle('Status of Web monitoring');
-		$this->ok('STATUS OF WEB MONITORING');
-		$this->ok('Web checks');
-		$this->ok(array('Group', 'Host'));
-		$this->ok(array('Host', 'Name', 'Number of steps', 'Last check', 'Status'));
+		$this->zbxTestTextPresent('STATUS OF WEB MONITORING');
+		$this->zbxTestTextPresent('Web checks');
+		$this->zbxTestTextPresent(array('Group', 'Host'));
+		$this->zbxTestTextPresent(array('Host', 'Name', 'Number of steps', 'Last check', 'Status'));
 	}
 
 // Check that no real host or template names displayed
 	public function testPageWeb_NoHostNames() {
-		$this->login('httpmon.php');
+		$this->zbxTestLogin('httpmon.php');
 		$this->checkTitle('Status of Web monitoring');
 		$this->checkNoRealHostnames();
 	}
