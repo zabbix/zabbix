@@ -374,6 +374,7 @@ $table = new CTableInfo(_('No events defined.'));
 
 // CHECK IF EVENTS EXISTS {{{
 // trigger events
+$firstEvent = array();
 if ($source == EVENT_OBJECT_TRIGGER) {
 	$firstEvent = API::Event()->get(array(
 		'output' => API_OUTPUT_EXTEND,
@@ -405,10 +406,10 @@ else {
 	));
 	$firstDServiceEvent = reset($firstDServiceEvent);
 
-	if ($firstDHostEvent['eventid'] < $firstDServiceEvent['eventid']) {
+	if ($firstDHostEvent && (!$firstDServiceEvent || $firstDHostEvent['eventid'] < $firstDServiceEvent['eventid'])) {
 		$firstEvent = $firstDHostEvent;
 	}
-	else {
+	elseif ($firstDServiceEvent) {
 		$firstEvent = $firstDServiceEvent;
 	}
 }
@@ -422,7 +423,7 @@ $till = $from + $effectiveperiod;
 
 $csv_disabled = true;
 
-if (empty($firstEvent)) {
+if (!$firstEvent) {
 	$starttime = null;
 	$events = array();
 	$paging = getPagingLine($events);
