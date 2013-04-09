@@ -54,6 +54,7 @@ A.F.I...S. [ZBXNEXT-1186] increased length to 2048 characters of expression fiel
 ........S. [ZBXNEXT-1663] added support for notification macros {TRIGGER.NAME.ORIG}, {ITEM.NAME.ORIG}, {ITEM.KEY.ORIG} (dimir)
 
 Bug fixes:
+..F....... [ZBX-6445] fixed unnecessary trimming for IPMI sensor field for item prototypes and discovery rules (Toms)
 ....I..... [ZBX-6335] removed unused alerts.nextcheck field (Sasha)
 ..F....... [ZBX-6427] added message noting that maximum number of flexible intervals reached (Toms)
 ..F....... [ZBX-6427] fixed that new flex interval is not hidden when max number of flexible intervals reached (Toms)
