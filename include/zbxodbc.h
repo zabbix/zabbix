@@ -46,6 +46,6 @@ void		odbc_DBclose(ZBX_ODBC_DBH *pdbh);
 ZBX_ODBC_RESULT odbc_DBselect(ZBX_ODBC_DBH *pdbh, const char *query);
 ZBX_ODBC_ROW    odbc_DBfetch(ZBX_ODBC_RESULT pdbh);
 
-const char	*get_last_odbc_strerror();
+const char	*get_last_odbc_strerror(void);
 
 #endif /* ZABBIX_ZODBC_H */
