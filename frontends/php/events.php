@@ -374,7 +374,6 @@ $table = new CTableInfo(_('No events defined.'));
 
 // CHECK IF EVENTS EXISTS {{{
 // trigger events
-$firstEvent = array();
 if ($source == EVENT_OBJECT_TRIGGER) {
 	$firstEvent = API::Event()->get(array(
 		'output' => API_OUTPUT_EXTEND,
@@ -387,7 +386,7 @@ if ($source == EVENT_OBJECT_TRIGGER) {
 }
 // discovery events
 else {
-	$firstDHostEvent = API::Event()->get(array(
+	$firstEvent = API::Event()->get(array(
 		'output' => API_OUTPUT_EXTEND,
 		'source' => EVENT_SOURCE_DISCOVERY,
 		'object' => EVENT_OBJECT_DHOST,
@@ -395,7 +394,8 @@ else {
 		'sortorder' => ZBX_SORT_UP,
 		'limit' => 1
 	));
-	$firstDHostEvent = reset($firstDHostEvent);
+	$firstEvent = reset($firstEvent);
+
 	$firstDServiceEvent = API::Event()->get(array(
 		'output' => API_OUTPUT_EXTEND,
 		'source' => EVENT_SOURCE_DISCOVERY,
@@ -406,10 +406,7 @@ else {
 	));
 	$firstDServiceEvent = reset($firstDServiceEvent);
 
-	if ($firstDHostEvent && (!$firstDServiceEvent || $firstDHostEvent['eventid'] < $firstDServiceEvent['eventid'])) {
-		$firstEvent = $firstDHostEvent;
-	}
-	elseif ($firstDServiceEvent) {
+	if ($firstDServiceEvent && (!$firstEvent || $firstDServiceEvent['eventid'] < $firstEvent['eventid'])) {
 		$firstEvent = $firstDServiceEvent;
 	}
 }
