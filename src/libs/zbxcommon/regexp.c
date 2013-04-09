@@ -95,7 +95,7 @@ static char	*regexp_sub_replace(const char *text, const char *output_template, r
 	if (NULL == output_template || '\0' == *output_template)
 		return zbx_strdup(NULL, text);
 
-	while ( NULL != (pgroup = strchr(pstart, '\\')) )
+	while (NULL != (pgroup = strchr(pstart, '\\')))
 	{
 		switch (*(++pgroup))
 		{
@@ -121,6 +121,15 @@ static char	*regexp_sub_replace(const char *text, const char *output_template, r
 					zbx_strncpy_alloc(&ptr, &size, &offset, text + match[group_index].rm_so,
 							match[group_index].rm_eo - match[group_index].rm_so);
 				}
+				pstart = pgroup + 1;
+				continue;
+
+			case '*':
+				/* artificial construct to handle exception that all data must be */
+				/* returned if regular expression pattern contains no groups      */
+				if (-1 == match[1].rm_so)
+					zbx_strcpy_alloc(&ptr, &size, &offset, text);
+
 				pstart = pgroup + 1;
 				continue;
 

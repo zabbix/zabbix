@@ -95,7 +95,7 @@ static int	httpmacro_append_pair(zbx_httptest_t *httptest, const char *pkey, siz
 	{
 		/* the value contains regexp pattern, try to get first captured group */
 		if (NULL != data)
-			pair.second = (void *)zbx_regexp_sub(data, value_str + REGEXP_PREFIX_SIZE, "\\1");
+			pair.second = (void *)zbx_regexp_sub(data, value_str + REGEXP_PREFIX_SIZE, "\\1\\*");
 
 		zbx_free(value_str);
 
