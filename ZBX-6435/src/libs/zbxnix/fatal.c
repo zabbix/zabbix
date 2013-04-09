@@ -66,6 +66,8 @@ const char	*get_signal_name(int sig)
 	}
 }
 
+#if defined(HAVE_SYS_UCONTEXT_H) && (defined(REG_EIP) || defined(REG_RIP))
+
 static const char	*get_register_name(int reg)
 {
 	switch (reg)
@@ -202,12 +204,15 @@ static const char	*get_register_name(int reg)
 		default:	return "unknown";
 	}
 }
+#endif	/* defned(HAVE_SYS_UCONTEXT_H) && (defined(REG_EIP) || defined(REG_RIP)) */
 
 void	print_fatal_info(int sig, siginfo_t *siginfo, void *context)
 {
 #ifdef	HAVE_SYS_UCONTEXT_H
 
+#if defined(REG_EIP) || defined(REG_RIP)
 	ucontext_t	*uctx = (ucontext_t *)context;
+#endif
 
 	/* look for GET_PC() macro in sigcontextinfo.h files */
 	/* of glibc if you wish to add more CPU architectures */
