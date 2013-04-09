@@ -836,7 +836,7 @@ class testFormItem extends CWebTest {
 
 	// Returns update data
 	public static function update() {
-		return DBdata("select * from items where hostid = 40001 and key_ LIKE 'test-item-form%'");
+		return DBdata("SELECT * FROM items WHERE hostid = 40001 AND key_ LIKE 'test-item-form%'");
 	}
 
 	/**
@@ -845,7 +845,7 @@ class testFormItem extends CWebTest {
 	public function testFormItem_SimpleUpdate($data) {
 		$name = $data['name'];
 
-		$sqlItems = "select * from items";
+		$sqlItems = "SELECT * FROM items ORDER BY itemid";
 		$oldHashItems = DBhash($sqlItems);
 
 		$this->zbxTestLogin('templates.php');
@@ -1195,7 +1195,7 @@ class testFormItem extends CWebTest {
 			array(
 				array(
 					'expected' => ITEM_GOOD,
-					'name' => 'Item flex',
+					'name' => 'Item flex combined with flex periods',
 					'key' => 'item-flex-delay2',
 					'delay' => 0,
 					'flexPeriod' => array(
