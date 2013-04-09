@@ -883,7 +883,6 @@ function convertToBase1024 ($value, $step = false) {
 
 			$valData['value'] = sprintf('%.6f', round(bcmul($valData['value'], bcpow(1024, $valData['pow'])),
 				ZBX_UNITS_ROUNDOFF_UPPER_LIMIT));
-
 		}
 		else {
 			$valData['value'] = bcmul(sprintf('%.10f',$value), sprintf('%.10f', $valData['value']), ZBX_PRECISION_10);
