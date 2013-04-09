@@ -19,13 +19,17 @@
 
 #include "config.h"
 
-#ifdef	HAVE_SIGNAL_H
-#	define	_GNU_SOURCE /* required for getting at program counter */
+#ifdef HAVE_SIGNAL_H
+#	if !defined(_GNU_SOURCE)
+#		define _GNU_SOURCE	/* required for getting at program counter */
+#	endif
 #	include <signal.h>
 #endif
 
-#ifdef	HAVE_SYS_UCONTEXT_H
-#	define	_GNU_SOURCE /* required for getting at program counter */
+#ifdef HAVE_SYS_UCONTEXT_H
+#	if !defined(_GNU_SOURCE)
+#		define _GNU_SOURCE	/* required for getting at program counter */
+#	endif
 #	include <sys/ucontext.h>
 #endif
 
