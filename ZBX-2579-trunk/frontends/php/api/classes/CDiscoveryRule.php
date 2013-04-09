@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -10,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -33,6 +33,11 @@ class CDiscoveryRule extends CItemGeneral {
 
 	public function __construct() {
 		parent::__construct();
+
+		$this->errorMessages = array_merge($this->errorMessages, array(
+			self::ERROR_EXISTS_TEMPLATE => _('Discovery rule "%1$s" already exists on "%2$s", inherited from another template.'),
+			self::ERROR_EXISTS => _('Discovery rule "%1$s" already exists on "%2$s"')
+		));
 	}
 
 	/**
@@ -647,9 +652,7 @@ class CDiscoveryRule extends CItemGeneral {
 		}
 
 		// prepare the child items
-		$newItems = $this->prepareInheritedItems($items, $hostids, array(
-			'exists' => _('Discovery rule "%1$s" already exists on "%2$s", inherited from another template.')
-		));
+		$newItems = $this->prepareInheritedItems($items, $hostids);
 		if (!$newItems) {
 			return true;
 		}
@@ -707,7 +710,7 @@ class CDiscoveryRule extends CItemGeneral {
 
 		$dstDiscovery = $srcDiscovery;
 		$dstDiscovery['hostid'] = $hostid;
-		unset($dstDiscovery['templateid']);
+		unset($dstDiscovery['templateid'], $dstDiscovery['state']);
 
 		// if this is a plain host, map discovery interfaces
 		if ($srcHost['status'] != HOST_STATUS_TEMPLATE) {
@@ -779,7 +782,7 @@ class CDiscoveryRule extends CItemGeneral {
 				$prototype['ruleid'] = $dstDiscovery['itemid'];
 				$prototype['hostid'] = $dstDiscovery['hostid'];
 
-				unset($prototype['templateid']);
+				unset($prototype['templateid'], $prototype['state']);
 
 				// map prototype interfaces
 				if ($dstHost['status'] != HOST_STATUS_TEMPLATE) {
@@ -915,7 +918,7 @@ class CDiscoveryRule extends CItemGeneral {
 		}
 
 		// save graphs
-		$rs = API::Graph()->create($dstGraphs);
+		$rs = API::GraphPrototype()->create($dstGraphs);
 		if (!$rs) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot clone graph prototypes.'));
 		}

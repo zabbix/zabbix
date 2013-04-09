@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2012 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -10,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -163,16 +163,7 @@ function get_icon_center_by_selement($element, $info, $map) {
 
 function myDrawLine($image, $x1, $y1, $x2, $y2, $color, $drawtype) {
 	if ($drawtype == MAP_LINK_DRAWTYPE_BOLD_LINE) {
-		imageline($image, $x1, $y1, $x2, $y2, $color);
-		if (abs($x1 - $x2) < abs($y1 - $y2)) {
-			$x1++;
-			$x2++;
-		}
-		else {
-			$y1++;
-			$y2++;
-		}
-		imageline($image, $x1, $y1, $x2, $y2, $color);
+		zbx_imagealine($image, $x1, $y1, $x2, $y2, $color, LINE_TYPE_BOLD);
 	}
 	elseif ($drawtype == MAP_LINK_DRAWTYPE_DASHED_LINE) {
 		if (function_exists('imagesetstyle')) {
@@ -182,7 +173,7 @@ function myDrawLine($image, $x1, $y1, $x2, $y2, $color, $drawtype) {
 				IMG_COLOR_TRANSPARENT, IMG_COLOR_TRANSPARENT, IMG_COLOR_TRANSPARENT, IMG_COLOR_TRANSPARENT
 			);
 			imagesetstyle($image, $style);
-			imageline($image, $x1, $y1, $x2, $y2, IMG_COLOR_STYLED);
+			zbx_imageline($image, $x1, $y1, $x2, $y2, IMG_COLOR_STYLED);
 		}
 		else {
 			imagedashedline($image, $x1, $y1, $x2, $y2, $color);
@@ -191,10 +182,10 @@ function myDrawLine($image, $x1, $y1, $x2, $y2, $color, $drawtype) {
 	elseif ($drawtype == MAP_LINK_DRAWTYPE_DOT && function_exists('imagesetstyle')) {
 		$style = array($color, IMG_COLOR_TRANSPARENT, IMG_COLOR_TRANSPARENT, IMG_COLOR_TRANSPARENT);
 		imagesetstyle($image, $style);
-		imageline($image, $x1, $y1, $x2, $y2, IMG_COLOR_STYLED);
+		zbx_imageline($image, $x1, $y1, $x2, $y2, IMG_COLOR_STYLED);
 	}
 	else {
-		imageline($image, $x1, $y1, $x2, $y2, $color);
+		zbx_imagealine($image, $x1, $y1, $x2, $y2, $color);
 	}
 }
 
@@ -583,7 +574,7 @@ function add_elementNames(&$selements) {
 				break;
 			case SYSMAP_ELEMENT_TYPE_TRIGGER:
 				$hostname = reset($triggers[$selement['elementid']]['hosts']);
-				$selements[$snum]['elementName'] = $hostname['name'].':'.
+				$selements[$snum]['elementName'] = $hostname['name'].NAME_DELIMITER.
 					CMacrosResolverHelper::resolveTriggerName($triggers[$selement['elementid']]);
 				break;
 			case SYSMAP_ELEMENT_TYPE_HOST_GROUP:
@@ -1008,14 +999,14 @@ function getSelementsInfo($sysmap) {
 		}
 	}
 
-	// get hosts data
+	// get host inventories
 	if ($sysmap['iconmapid']) {
 		$hostInventories = API::Host()->get(array(
 			'hostids' => $hostsToGetInventories,
 			'output' => array('hostid'),
 			'nopermissions' => true,
 			'preservekeys' => true,
-			'selectInventory' => array('hostid')
+			'selectInventory' => API_OUTPUT_EXTEND
 		));
 	}
 
@@ -1076,7 +1067,7 @@ function getSelementsInfo($sysmap) {
 		$triggers = API::Trigger()->get(array(
 			'nodeids' => get_current_nodeid(true),
 			'triggerids' => array_keys($triggers_map),
-			'filter' => array('value_flags' => null),
+			'filter' => array('state' => null),
 			'output' => API_OUTPUT_EXTEND,
 			'nopermissions' => true
 		));
@@ -1094,7 +1085,7 @@ function getSelementsInfo($sysmap) {
 		$triggers = API::Trigger()->get(array(
 			'nodeids' => get_current_nodeid(true),
 			'triggerids' => array_keys($triggers_map_submaps),
-			'filter' => array('value_flags' => null),
+			'filter' => array('state' => null),
 			'skipDependent' => true,
 			'output' => API_OUTPUT_EXTEND,
 			'nopermissions' => true
@@ -1115,7 +1106,7 @@ function getSelementsInfo($sysmap) {
 			'output' => array('status', 'value', 'priority', 'lastchange', 'description', 'expression'),
 			'selectHosts' => array('hostid'),
 			'nopermissions' => true,
-			'filter' => array('value_flags' => null),
+			'filter' => array('state' => null),
 			'nodeids' => get_current_nodeid(true),
 			'monitored' => true,
 			'skipDependent' => true
@@ -1141,7 +1132,7 @@ function getSelementsInfo($sysmap) {
 		'nodeids' => get_current_nodeid(true),
 		'nopermissions' => true,
 		'monitored' => true,
-		'filter' => array('value' => TRIGGER_VALUE_TRUE, 'value_flags' => null)
+		'filter' => array('value' => TRIGGER_VALUE_TRUE, 'state' => null)
 	));
 	$unack_triggerids = zbx_toHash($unack_triggerids, 'triggerid');
 
@@ -1717,7 +1708,7 @@ function drawMapLinkLabels(&$im, $map, $map_info, $resolveMacros = true) {
 				break;
 			case MAP_LINK_DRAWTYPE_BOLD_LINE:
 				imagerectangle($im, $boxX_left - 1, $boxY_top - 1, $boxX_right + 1, $boxY_bottom + 1, $color);
-				break;
+				// break; is not ne
 			case MAP_LINK_DRAWTYPE_LINE:
 			default:
 				imagerectangle($im, $boxX_left, $boxY_top, $boxX_right, $boxY_bottom, $color);

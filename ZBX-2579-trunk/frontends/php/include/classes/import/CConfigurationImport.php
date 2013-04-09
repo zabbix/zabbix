@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2012 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -10,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -802,12 +802,12 @@ class CConfigurationImport {
 
 
 					// TODO: do this for all graphs at once
-					$sql = 'SELECT g.graphid
-							FROM graphs g,graphs_items gi,items i
-							WHERE g.graphid=gi.graphid
-								AND gi.itemid=i.itemid
-								AND g.name='.zbx_dbstr($graph['name']).'
-								AND '.dbConditionInt('i.hostid', $graphHostIds);
+					$sql = 'SELECT g.graphid'.
+							' FROM graphs g,graphs_items gi,items i'.
+							' WHERE g.graphid=gi.graphid'.
+								' AND gi.itemid=i.itemid'.
+								' AND g.name='.zbx_dbstr($graph['name']).
+								' AND '.dbConditionInt('i.hostid', $graphHostIds);
 					$graphExists = DBfetch(DBselect($sql));
 
 					if ($graphExists) {
@@ -817,7 +817,7 @@ class CConfigurationImport {
 							'editable' => true
 						));
 						if (empty($dbGraph)) {
-							throw new Exception(_s('No permission for Graph "%1$s".', $graph['name']));
+							throw new Exception(_s('No permission for graph "%1$s".', $graph['name']));
 						}
 						$graph['graphid'] = $graphExists['graphid'];
 						$graphsToUpdate[] = $graph;
@@ -879,12 +879,12 @@ class CConfigurationImport {
 			unset($gitem);
 
 			// TODO: do this for all graphs at once
-			$sql = 'SELECT g.graphid
-					FROM graphs g,graphs_items gi,items i
-					WHERE g.graphid=gi.graphid
-						AND gi.itemid=i.itemid
-						AND g.name='.zbx_dbstr($graph['name']).'
-						AND '.dbConditionInt('i.hostid', $graphHostIds);
+			$sql = 'SELECT g.graphid'.
+					' FROM graphs g,graphs_items gi,items i'.
+					' WHERE g.graphid=gi.graphid'.
+						' AND gi.itemid=i.itemid'.
+						' AND g.name='.zbx_dbstr($graph['name']).
+						' AND '.dbConditionInt('i.hostid', $graphHostIds);
 			$graphExists = DBfetch(DBselect($sql));
 
 			if ($graphExists) {
@@ -894,7 +894,7 @@ class CConfigurationImport {
 					'editable' => true
 				));
 				if (empty($dbGraph)) {
-					throw new Exception(_s('No permission for Graph "%1$s".', $graph['name']));
+					throw new Exception(_s('No permission for graph "%1$s".', $graph['name']));
 				}
 				$graph['graphid'] = $graphExists['graphid'];
 				$graphsToUpdate[] = $graph;

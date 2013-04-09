@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2012 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,6 +23,10 @@
  * @package API
  */
 abstract class CItemGeneral extends CZBXAPI {
+
+	const ERROR_EXISTS_TEMPLATE = 'existsTemplate';
+	const ERROR_EXISTS = 'exists';
+	const ERROR_NO_INTERFACE = 'noInterface';
 
 	protected $fieldRules;
 
@@ -92,6 +96,12 @@ abstract class CItemGeneral extends CZBXAPI {
 			'inventory_link'		=> array(),
 			'lifetime'				=> array()
 		);
+
+		$this->errorMessages = array_merge($this->errorMessages, array(
+			self::ERROR_EXISTS_TEMPLATE => _('Item "%1$s" already exists on "%2$s", inherited from another template.'),
+			self::ERROR_EXISTS => _('Item "%1$s" already exists on "%2$s"'),
+			self::ERROR_NO_INTERFACE => _('Cannot find host interface on "%1$s" for item key "%2$s".')
+		));
 	}
 
 	/**
@@ -181,12 +191,11 @@ abstract class CItemGeneral extends CZBXAPI {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
 				}
 
-				// check for "templateid", because it is not allowed
-				if (array_key_exists('templateid', $item)) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot update "templateid" for item "%1$s".', $item['name']));
-				}
-
 				check_db_fields($dbItems[$item['itemid']], $fullItem);
+
+				$this->checkNoParameters($item, array('templateid', 'state'),
+					_s('Cannot update "%1$s" for item "%2$s".', '%1$s', $item['name'])
+				);
 
 				// apply rules
 				foreach ($this->fieldRules as $field => $rules) {
@@ -200,9 +209,6 @@ abstract class CItemGeneral extends CZBXAPI {
 				}
 				if (!isset($item['hostid'])) {
 					$item['hostid'] = $fullItem['hostid'];
-				}
-				if (isset($item['status']) && $item['status'] != ITEM_STATUS_NOTSUPPORTED) {
-					$item['error'] = '';
 				}
 
 				// if a templated item is being assigned to an interface with a different type, ignore it
@@ -220,10 +226,9 @@ abstract class CItemGeneral extends CZBXAPI {
 
 				check_db_fields($itemDbFields, $fullItem);
 
-				// check for "templateid", because it is not allowed
-				if (array_key_exists('templateid', $item)) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot set "templateid" for item "%1$s".', $item['name']));;
-				}
+				$this->checkNoParameters($item, array('templateid', 'state'),
+					_s('Cannot set "%1$s" for item "%2$s".', '%1$s', $item['name'])
+				);
 			}
 
 			$host = $dbHosts[$fullItem['hostid']];
@@ -593,19 +598,10 @@ abstract class CItemGeneral extends CZBXAPI {
 	 *
 	 * @param array      $itemsToInherit
 	 * @param array|null $hostIds
-	 * @param array      $errors         an array of messages to use for errors
 	 *
 	 * @return array an array of unsaved child items
 	 */
-	protected function prepareInheritedItems(array $itemsToInherit, array $hostIds = null, array $errors = array()) {
-		$errors = array_merge(
-			array(
-				'exists' => _('Item "%1$s" already exists on "%2$s", inherited from another template.'),
-				'noInterface' => _('Cannot find host interface on "%1$s" for item key "%2$s".')
-			),
-			$errors
-		);
-
+	protected function prepareInheritedItems(array $itemsToInherit, array $hostIds = null) {
 		// fetch all child hosts
 		$chdHosts = API::Host()->get(array(
 			'output' => array('hostid', 'host', 'status'),
@@ -648,19 +644,37 @@ abstract class CItemGeneral extends CZBXAPI {
 			foreach ($parentItems as $parentItem) {
 				$exItem = null;
 
-				// update by templateid
-				if (isset($exItemsTpl[$parentItem['itemid']])) {
-					$exItem = $exItemsTpl[$parentItem['itemid']];
-				}
-
-				// update by key
+				// check if an item of a different type with the same key exists
 				if (isset($exItemsKeys[$parentItem['key_']])) {
 					$exItem = $exItemsKeys[$parentItem['key_']];
 					if ($exItem['flags'] != $parentItem['flags']) {
 						$this->errorInheritFlags($exItem['flags'], $exItem['key_'], $host['host']);
 					}
-					elseif ($exItem['templateid'] > 0 && bccomp($exItem['templateid'], $parentItem['itemid']) != 0) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s($errors['exists'], $parentItem['key_'], $host['host']));
+				}
+
+				// update by templateid
+				if (isset($exItemsTpl[$parentItem['itemid']])) {
+					$exItem = $exItemsTpl[$parentItem['itemid']];
+
+					if (isset($exItemsKeys[$parentItem['key_']])
+						&& !idcmp($exItemsKeys[$parentItem['key_']]['templateid'], $parentItem['itemid'])) {
+						self::exception(
+							ZBX_API_ERROR_PARAMETERS,
+							_s($this->getErrorMsg(self::ERROR_EXISTS), $parentItem['key_'], $host['host'])
+						);
+					}
+				}
+
+				// update by key
+				if (isset($exItemsKeys[$parentItem['key_']])) {
+					$exItem = $exItemsKeys[$parentItem['key_']];
+
+					if ($exItem['templateid'] > 0 && !idcmp($exItem['templateid'], $parentItem['itemid'])) {
+
+						self::exception(
+							ZBX_API_ERROR_PARAMETERS,
+							_s($this->getErrorMsg(self::ERROR_EXISTS_TEMPLATE), $parentItem['key_'], $host['host'])
+						);
 					}
 				}
 
@@ -674,7 +688,10 @@ abstract class CItemGeneral extends CZBXAPI {
 						$parentItem['interfaceid'] = $interface['interfaceid'];
 					}
 					elseif ($interface !== false) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s($errors['noInterface'], $host['host'], $parentItem['key_']));
+						self::exception(
+							ZBX_API_ERROR_PARAMETERS,
+							_s($this->getErrorMsg(self::ERROR_NO_INTERFACE), $host['host'], $parentItem['key_'])
+						);
 					}
 				}
 				else {

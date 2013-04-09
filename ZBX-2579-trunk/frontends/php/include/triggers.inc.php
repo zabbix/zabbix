@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2012 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -979,37 +979,6 @@ function implode_exp($expression, $triggerid, &$hostnames = array()) {
 	return $expression;
 }
 
-function updateTriggerValueToUnknownByHostId($hostids) {
-	zbx_value2array($hostids);
-	$triggerids = array();
-
-	$result = DBselect(
-		'SELECT DISTINCT t.triggerid'.
-		' FROM hosts h,items i,functions f,triggers t'.
-		' WHERE h.hostid=i.hostid'.
-			' AND i.itemid=f.itemid'.
-			' AND f.triggerid=t.triggerid'.
-			' AND '.dbConditionInt('h.hostid', $hostids).
-			' AND h.status='.HOST_STATUS_MONITORED.
-			' AND t.value_flags='.TRIGGER_VALUE_FLAG_NORMAL
-	);
-	while ($row = DBfetch($result)) {
-		$triggerids[] = $row['triggerid'];
-	}
-
-	if (!empty($triggerids)) {
-		DB::update('triggers', array(
-			'values' => array(
-				'value_flags' => TRIGGER_VALUE_FLAG_UNKNOWN,
-				'error' => _s('Host status became "%s"', _('Not monitored'))
-			),
-			'where' => array('triggerid' => $triggerids)
-		));
-	}
-
-	return true;
-}
-
 function check_right_on_trigger_by_expression($permission, $expression) {
 	$expressionData = new CTriggerExpression();
 	if (!$expressionData->parse($expression)) {
@@ -1116,7 +1085,7 @@ function get_triggers_overview($hostids, $application, $view_style = null, $scre
 	foreach ($dbTriggers as $trigger) {
 		$trigger['host'] = $trigger['hosts'][0]['name'];
 		$trigger['hostid'] = $trigger['hosts'][0]['hostid'];
-		$trigger['host'] = get_node_name_by_elid($trigger['hostid'], null, ': ').$trigger['host'];
+		$trigger['host'] = get_node_name_by_elid($trigger['hostid'], null, NAME_DELIMITER).$trigger['host'];
 		$trigger['description'] = CMacrosResolverHelper::resolveTriggerReference($trigger['expression'], $trigger['description']);
 
 		$hostNames[$trigger['hostid']] = $trigger['host'];
@@ -1238,11 +1207,6 @@ function get_trigger_overview_cells($triggerHosts, $hostName, $screenId = null) 
 		}
 		$style = 'cursor: pointer; ';
 
-		// set blinking gif as background if trigger age is less then $config['blink_period']
-		if ($config['blink_period'] > 0 && time() - $triggerHosts[$hostName]['lastchange'] < $config['blink_period']) {
-			$style .= 'background-image: url(images/gradients/blink.gif); background-position: top left; background-repeat: repeat;';
-		}
-
 		unset($item_menu);
 		$tr_ov_menu = array(
 			// name, url, (target [tw], statusbar [sb]), css, submenu
@@ -1319,7 +1283,7 @@ function get_trigger_overview_cells($triggerHosts, $hostName, $screenId = null) 
 
 		$dep_table = new CTableInfo();
 		$dep_table->setAttribute('style', 'width: 200px;');
-		$dep_table->addRow(bold(_('Depends on').':'));
+		$dep_table->addRow(bold(_('Depends on').NAME_DELIMITER));
 
 		$dependency = false;
 		$dep_res = DBselect('SELECT td.* FROM trigger_depends td WHERE td.triggerid_down='.$triggerid);
@@ -1339,7 +1303,7 @@ function get_trigger_overview_cells($triggerHosts, $hostName, $screenId = null) 
 		// triggers that depend on this
 		$dep_table = new CTableInfo();
 		$dep_table->setAttribute('style', 'width: 200px;');
-		$dep_table->addRow(bold(_('Dependent').':'));
+		$dep_table->addRow(bold(_('Dependent').NAME_DELIMITER));
 
 		$dependency = false;
 		$dep_res = DBselect('SELECT td.* FROM trigger_depends td WHERE td.triggerid_up='.$triggerid);
@@ -1363,8 +1327,15 @@ function get_trigger_overview_cells($triggerHosts, $hostName, $screenId = null) 
 	else {
 		$tableColumn = new CCol(SPACE, $css_class.' hosts');
 	}
+
 	if (isset($style)) {
 		$tableColumn->setAttribute('style', $style);
+	}
+
+	if (isset($triggerHosts[$hostName]) && $config['blink_period'] > 0
+		&& time() - $triggerHosts[$hostName]['lastchange'] < $config['blink_period']) {
+		$tableColumn->addClass('blink');
+		$tableColumn->setAttribute('data-toggle-class', $css_class);
 	}
 
 	if (isset($tr_ov_menu)) {
@@ -1383,6 +1354,7 @@ function calculate_availability($triggerid, $period_start, $period_end) {
 		$sql = 'SELECT e.eventid,e.value'.
 				' FROM events e'.
 				' WHERE e.objectid='.$triggerid.
+					' AND e.source='.EVENT_SOURCE_TRIGGERS.
 					' AND e.object='.EVENT_OBJECT_TRIGGER.
 					' AND e.clock<'.$period_start.
 				' ORDER BY e.eventid DESC';
@@ -1395,6 +1367,7 @@ function calculate_availability($triggerid, $period_start, $period_end) {
 	$sql = 'SELECT COUNT(e.eventid) AS cnt,MIN(e.clock) AS min_clock,MAX(e.clock) AS max_clock'.
 			' FROM events e'.
 			' WHERE e.objectid='.$triggerid.
+				' AND e.source='.EVENT_SOURCE_TRIGGERS.
 				' AND e.object='.EVENT_OBJECT_TRIGGER;
 	if ($period_start != 0) {
 		$sql .= ' AND clock>='.$period_start;
@@ -1440,6 +1413,7 @@ function calculate_availability($triggerid, $period_start, $period_end) {
 		'SELECT e.eventid,e.clock,e.value'.
 		' FROM events e'.
 		' WHERE e.objectid='.$triggerid.
+			' AND e.source='.EVENT_SOURCE_TRIGGERS.
 			' AND e.object='.EVENT_OBJECT_TRIGGER.
 			' AND e.clock BETWEEN '.$min.' AND '.$max.
 		' ORDER BY e.eventid'
@@ -2172,6 +2146,7 @@ function get_item_function_info($expr) {
 	);
 
 	$function_info = array(
+		'band' =>	    array('value_type' => _('Numeric (integer 64bit)'),	'type' => T_ZBX_INT, 'validation' => NOT_EMPTY),
 		'abschange' =>	array('value_type' => $value_type,	'type' => $type_of_value_type,	'validation' => NOT_EMPTY),
 		'avg' =>		array('value_type' => $value_type,	'type' => $type_of_value_type,	'validation' => NOT_EMPTY),
 		'change' =>		array('value_type' => $value_type,	'type' => $type_of_value_type,	'validation' => NOT_EMPTY),
@@ -2401,4 +2376,44 @@ function quoteFunctionParam($param)
 	}
 
 	return '"'.str_replace('"', '\\"', $param).'"';
+}
+
+/**
+ * Returns the text indicating the triggers status and state. If the $state parameter is not given, only the status of
+ * the trigger will be taken into account.
+ *
+ * @param int $status
+ * @param int $state
+ *
+ * @return string
+ */
+function triggerIndicator($status, $state = null) {
+	if ($status == TRIGGER_STATUS_ENABLED) {
+		return ($state == TRIGGER_STATE_UNKNOWN) ? _('Unknown') : _('Enabled');
+	}
+	elseif ($status == TRIGGER_STATUS_DISABLED) {
+		return _('Disabled');
+	}
+
+	return _('Unknown');
+}
+
+/**
+ * Returns the CSS class for the triggers status and state indicator. If the $state parameter is not given, only the
+ * status of the trigger will be taken into account.
+ *
+ * @param int $status
+ * @param int $state
+ *
+ * @return string
+ */
+function triggerIndicatorStyle($status, $state = null) {
+	if ($status == TRIGGER_STATUS_ENABLED) {
+		return ($state == TRIGGER_STATE_UNKNOWN) ? 'unknown' : 'enabled';
+	}
+	elseif ($status == TRIGGER_STATUS_DISABLED) {
+		return 'disabled';
+	}
+
+	return 'unknown';
 }

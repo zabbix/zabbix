@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -10,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -45,7 +45,7 @@ class testGeneric extends CWebTest {
 
 			array('charts.php',		'Custom graphs \[refreshed every 30 sec\]'),
 			array('screens.php',	'Custom screens \[refreshed every 30 sec\]'),
-			array('slides.php',		'Custom slides'),
+			array('slides.php',		'Custom slides \[refreshed every 30 sec\]'),
 			array('maps.php',		'Network maps \[refreshed every 30 sec\]'),
 			array('srv_status.php',	'IT services \[refreshed every 30 sec\]'),
 
@@ -120,8 +120,8 @@ class testGeneric extends CWebTest {
 	* @dataProvider provider
 	*/
 	public function testTitles($a, $b) {
-		$this->login();
-		$this->open($a);
+		$this->zbxTestLogin();
+		$this->zbxTestOpen($a);
 		$this->checkTitle($b);
 	}
 
@@ -129,10 +129,10 @@ class testGeneric extends CWebTest {
 	* @dataProvider provider
 	*/
 	public function testNotExists($a, $b) {
-		$this->login();
-		$this->open($a);
+		$this->zbxTestLogin();
+		$this->zbxTestOpen($a);
 		foreach ($this->failIfExists as $str) {
-			$this->nok($str, 'assertTextNotPresent('.$a.','.$str.')');
+			$this->zbxTestTextNotPresent($str, 'assertTextNotPresent('.$a.','.$str.')');
 		}
 	}
 
@@ -140,10 +140,10 @@ class testGeneric extends CWebTest {
 	* @dataProvider provider
 	*/
 	public function testExists($a, $b) {
-		$this->login();
-		$this->open($a);
+		$this->zbxTestLogin();
+		$this->zbxTestOpen($a);
 		foreach ($this->failIfNotExists as $str) {
-			$this->ok($str, 'assertTextPresent('.$a.','.$str.')');
+			$this->zbxTestTextPresent($str, 'assertTextPresent('.$a.','.$str.')');
 		}
 	}
 }

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2012 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -10,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -84,9 +84,9 @@ CProfile::update('web.screens.graphid', $_REQUEST['graphid'], PROFILE_TYPE_ID);
 
 $chartHeader = '';
 if (id2nodeid($dbGraph['graphid']) != get_current_nodeid()) {
-	$chartHeader = get_node_name_by_elid($dbGraph['graphid'], true, ': ');
+	$chartHeader = get_node_name_by_elid($dbGraph['graphid'], true, NAME_DELIMITER);
 }
-$chartHeader .= $host['name'].': '.$dbGraph['name'];
+$chartHeader .= $host['name'].NAME_DELIMITER.$dbGraph['name'];
 
 $graph = new CChart($dbGraph['graphtype']);
 $graph->setHeader($chartHeader);

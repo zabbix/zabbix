@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -10,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -38,12 +38,12 @@ class CServerInfo extends CTable {
 			: _('Zabbix server');
 
 		$this->addRow(new CCol(_('Zabbix server info'), 'nowrap ui-corner-all ui-widget-header'));
-		$this->addRow(_('Updated').': '.zbx_date2str(SERVER_INFO_DATE_FORMAT, time()));
-		$this->addRow(_('Users (online)').': '.$status['users_count'].'('.$status['users_online'].')');
+		$this->addRow(_('Updated').NAME_DELIMITER.zbx_date2str(SERVER_INFO_DATE_FORMAT, time()));
+		$this->addRow(_('Users (online)').NAME_DELIMITER.$status['users_count'].'('.$status['users_online'].')');
 		$this->addRow(new CCol(array(_('Logged in as').SPACE, new CLink(CWebUser::$data['alias'], 'profile.php'))));
 		$this->addRow(new CCol(array($serverLink, SPACE._('is').SPACE, $server)), 'status');
 		$this->addRow(new CCol(array(
-			_('Hosts (m/n/t)').': '.$status['hosts_count'].'(',
+			_('Hosts (m/n/t)').NAME_DELIMITER.$status['hosts_count'].'(',
 			new CSpan($status['hosts_count_monitored'], 'off'),
 			'/',
 			new CSpan($status['hosts_count_not_monitored'], 'on'),
@@ -52,7 +52,7 @@ class CServerInfo extends CTable {
 			')'
 		)));
 		$this->addRow(new CCol(array(
-			_('Items (m/d/n)').': '.$status['items_count'].'(',
+			_('Items (m/d/n)').NAME_DELIMITER.$status['items_count'].'(',
 			new CSpan($status['items_count_monitored'], 'off'),
 			'/',
 			new CSpan($status['items_count_disabled'], 'on'),
@@ -61,7 +61,7 @@ class CServerInfo extends CTable {
 			')'
 		)));
 		$this->addRow(new CCol(array(
-			_('Triggers (e/d)[p/o]').': '.$status['triggers_count'].
+			_('Triggers (e/d)[p/o]').NAME_DELIMITER.$status['triggers_count'].
 			'('.$status['triggers_count_enabled'].'/'.$status['triggers_count_disabled'].')[',
 			new CSpan($status['triggers_count_on'], 'on'),
 			'/',

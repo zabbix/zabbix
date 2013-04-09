@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -10,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -280,7 +280,7 @@ class CHttpTest extends CZBXAPI {
 		$this->validateCreate($httpTests);
 
 		$httpTestManager = new CHttpTestManager();
-		$httpTestManager->persist($httpTests);
+		$httpTests = $httpTestManager->persist($httpTests);
 
 		return array('httptestids' => zbx_objectValues($httpTests, 'httptestid'));
 	}
@@ -455,7 +455,7 @@ class CHttpTest extends CZBXAPI {
 		$this->checkNames($httpTests);
 
 		foreach ($httpTests as $httpTest) {
-			$missingKeys = checkRequiredKeys($httpTest, array('name', 'hostid', 'status', 'steps'));
+			$missingKeys = checkRequiredKeys($httpTest, array('name', 'hostid', 'steps'));
 			if (!empty($missingKeys)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Web scenario missing parameters: %1$s', implode(', ', $missingKeys)));
 			}
@@ -737,7 +737,7 @@ class CHttpTest extends CZBXAPI {
 				$relationMap = $this->createRelationMap($httpSteps, 'httptestid', 'httpstepid');
 
 				// add the deprecated webstepid parameter if it's requested
-				$httpSteps = $this->addDeprecatedOutput($httpSteps, 'webstepid', 'httpstepid', $options['selectSteps']);
+				$httpSteps = $this->handleDeprecatedOutput($httpSteps, 'webstepid', 'httpstepid', $options['selectSteps']);
 
 				$httpSteps = $this->unsetExtraFields($httpSteps, array('httptestid', 'httpstepid'), $options['selectSteps']);
 

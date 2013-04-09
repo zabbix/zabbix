@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -9,7 +9,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -21,20 +21,19 @@
 #include "sysinfo.h"
 #include "symbols.h"
 
-int     VM_MEMORY_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+int     VM_MEMORY_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	PERFORMANCE_INFORMATION pfi;
 	MEMORYSTATUSEX		ms_ex;
 	MEMORYSTATUS		ms;
-	char			mode[16];
+	char			*mode;
 
-	if (1 < num_param(param))
+	if (1 < request->nparam)
 		return SYSINFO_RET_FAIL;
 
-	if (0 != get_param(param, 1, mode, sizeof(mode)) || '\0' == *mode)
-		strscpy(mode, "total");
+	mode = get_rparam(request, 0);
 
-	if (0 == strcmp(mode, "cached"))
+	if (NULL != mode && 0 == strcmp(mode, "cached"))
 	{
 		if (NULL == zbx_GetPerformanceInfo)
 			return SYSINFO_RET_FAIL;
@@ -52,7 +51,7 @@ int     VM_MEMORY_SIZE(const char *cmd, const char *param, unsigned flags, AGENT
 
 		zbx_GlobalMemoryStatusEx(&ms_ex);
 
-		if (0 == strcmp(mode, "total"))
+		if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "total"))
 			SET_UI64_RESULT(result, ms_ex.ullTotalPhys);
 		else if (0 == strcmp(mode, "free"))
 			SET_UI64_RESULT(result, ms_ex.ullAvailPhys);
@@ -71,7 +70,7 @@ int     VM_MEMORY_SIZE(const char *cmd, const char *param, unsigned flags, AGENT
 	{
 		GlobalMemoryStatus(&ms);
 
-		if (0 == strcmp(mode, "total"))
+		if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "total"))
 			SET_UI64_RESULT(result, ms.dwTotalPhys);
 		else if (0 == strcmp(mode, "free"))
 			SET_UI64_RESULT(result, ms.dwAvailPhys);

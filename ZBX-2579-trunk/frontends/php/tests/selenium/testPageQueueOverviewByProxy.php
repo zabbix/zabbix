@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -10,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -30,12 +30,12 @@ class testPageQueueOverviewByProxy extends CWebTest {
 	* @dataProvider allProxies
 	*/
 	public function testPageQueueOverviewByProxy_CheckLayout($proxy) {
-		$this->login('queue.php?config=1');
+		$this->zbxTestLogin('queue.php?config=1');
 		$this->checkTitle('Queue \[refreshed every 30 sec\]');
-		$this->ok('Queue');
-		$this->ok('QUEUE OF ITEMS TO BE UPDATED');
+		$this->zbxTestTextPresent('Queue');
+		$this->zbxTestTextPresent('QUEUE OF ITEMS TO BE UPDATED');
 		// Header
-		$this->ok(
+		$this->zbxTestTextPresent(
 			array(
 				'Proxy',
 				'5 seconds',
@@ -47,8 +47,8 @@ class testPageQueueOverviewByProxy extends CWebTest {
 			)
 		);
 		// Data
-		$this->ok($proxy['host']);
-		$this->ok('Server');
+		$this->zbxTestTextPresent($proxy['host']);
+		$this->zbxTestTextPresent('Server');
 	}
 
 	public function testPageQueueOverviewByProxy_VerifyDisplayedNumbers() {

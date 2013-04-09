@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -10,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -69,29 +69,32 @@ foreach ($this->data['items'] as $item) {
 	$description = array();
 	if (!empty($item['template_host'])) {
 		$description[] = new CLink($item['template_host']['name'], '?hostid='.$item['template_host']['hostid'].'&filter_set=1', 'unknown');
-		$description[] = ':'.SPACE;
+		$description[] = NAME_DELIMITER;
 	}
 	if (!empty($item['discoveryRule'])) {
 		$description[] = new CLink($item['discoveryRule']['name'], 'disc_prototypes.php?parent_discoveryid='.$item['discoveryRule']['itemid'], 'gold');
-		$description[] = ':'.SPACE.$item['name_expanded'];
+		$description[] = NAME_DELIMITER.$item['name_expanded'];
 	}
 	else {
 		$description[] = new CLink($item['name_expanded'], '?form=update&hostid='.$item['hostid'].'&itemid='.$item['itemid']);
 	}
 
 	// status
-	$status = new CCol(new CLink(item_status2str($item['status']), '?group_itemid='.$item['itemid'].'&hostid='.$item['hostid'].'&go='.
-		($item['status'] ? 'activate' : 'disable'), item_status2style($item['status']))
+	$status = new CCol(new CLink(itemIndicator($item['status'], $item['state']), '?group_itemid='.$item['itemid'].'&hostid='.$item['hostid'].'&go='.
+		($item['status'] ? 'activate' : 'disable'), itemIndicatorStyle($item['status'], $item['state']))
 	);
 
-	if (zbx_empty($item['error'])) {
-		$error = new CDiv(SPACE, 'status_icon iconok');
+	$statusIcons = array();
+	if ($item['status'] == ITEM_STATUS_ACTIVE) {
+		if (zbx_empty($item['error'])) {
+			$error = new CDiv(SPACE, 'status_icon iconok');
+		}
+		else {
+			$error = new CDiv(SPACE, 'status_icon iconerror');
+			$error->setHint($item['error'], '', 'on');
+		}
+		$statusIcons[] = $error;
 	}
-	else {
-		$error = new CDiv(SPACE, 'status_icon iconerror');
-		$error->setHint($item['error'], '', 'on');
-	}
-	$statusIcons = array($error);
 
 	// discovered item lifetime indicator
 	if ($item['flags'] == ZBX_FLAG_DISCOVERY_CREATED && $item['itemDiscovery']['ts_delete']) {
@@ -138,15 +141,8 @@ foreach ($this->data['items'] as $item) {
 				key($trigger['hosts']).'&triggerid='.$trigger['triggerid']);
 		}
 
-		if ($trigger['value_flags'] == TRIGGER_VALUE_FLAG_UNKNOWN) {
+		if ($trigger['state'] == TRIGGER_STATE_UNKNOWN) {
 			$trigger['error'] = '';
-		}
-
-		if ($trigger['status'] == TRIGGER_STATUS_DISABLED) {
-			$triggerStatus = new CSpan(_('Disabled'), 'disabled');
-		}
-		elseif ($trigger['status'] == TRIGGER_STATUS_ENABLED){
-			$triggerStatus = new CSpan(_('Enabled'), 'enabled');
 		}
 
 		$trigger['items'] = zbx_toHash($trigger['items'], 'itemid');
@@ -156,7 +152,10 @@ foreach ($this->data['items'] as $item) {
 			getSeverityCell($trigger['priority']),
 			$triggerDescription,
 			triggerExpression($trigger, true),
-			$triggerStatus,
+			new CSpan(
+				triggerIndicator($trigger['status'], $trigger['state']),
+				triggerIndicatorStyle($trigger['status'], $trigger['state'])
+			),
 		));
 
 		$item['triggers'][$num] = $trigger;
