@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2012 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -10,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -662,6 +662,19 @@ function convertFunctionValue($value) {
 }
 
 /************* ZBX MISC *************/
+
+/**
+ * Swap two values.
+ *
+ * @param mixed $a first value
+ * @param mixed $b second value
+ */
+function zbx_swap(&$a, &$b) {
+	$tmp = $a;
+	$a = $b;
+	$b = $tmp;
+}
+
 function zbx_avg($values) {
 	zbx_value2array($values);
 	$sum = 0;
@@ -2273,23 +2286,22 @@ function get_status() {
 
 	// items
 	$dbItems = DBselect(
-		'SELECT COUNT(*) AS cnt,i.status'.
+		'SELECT COUNT(i.itemid) AS cnt,i.status,i.state'.
 				' FROM items i'.
 				' INNER JOIN hosts h ON i.hostid=h.hostid'.
 				' WHERE h.status='.HOST_STATUS_MONITORED.
-				' AND '.dbConditionInt('i.status', array(ITEM_STATUS_ACTIVE, ITEM_STATUS_DISABLED, ITEM_STATUS_NOTSUPPORTED)).
-				' GROUP BY i.status');
+				' GROUP BY i.status,i.state');
 	while ($dbItem = DBfetch($dbItems)) {
-		switch ($dbItem['status']) {
-			case ITEM_STATUS_ACTIVE:
+		if ($dbItem['status'] == ITEM_STATUS_ACTIVE) {
+			if ($dbItem['state'] == ITEM_STATE_NORMAL) {
 				$status['items_count_monitored'] = $dbItem['cnt'];
-				break;
-			case ITEM_STATUS_DISABLED:
-				$status['items_count_disabled'] = $dbItem['cnt'];
-				break;
-			case ITEM_STATUS_NOTSUPPORTED:
+			}
+			else {
 				$status['items_count_not_supported'] = $dbItem['cnt'];
-				break;
+			}
+		}
+		elseif ($dbItem['status'] == ITEM_STATUS_DISABLED) {
+			$status['items_count_disabled'] += $dbItem['cnt'];
 		}
 	}
 	$status['items_count'] = $status['items_count_monitored'] + $status['items_count_disabled']
