@@ -445,7 +445,11 @@ table.tableinfo tr.vertical_header td.left { text-align: left; }
 table.tableinfo tr.vertical_header td.hover_grey:hover { cursor: pointer; }
 table.tableinfo tr.vertical_header td.vertical_rotation { white-space: nowrap; align: center; font-family:arial; font-size:11px; }
 table.tableinfo tr.vertical_header td.vertical_rotation .vertical_rotation_inner {
-	transform: rotate(270deg); -moz-transform: rotate(270deg); -webkit-transform: rotate(270deg); -o-transform: rotate(270deg);
+	transform:          rotate(270deg);
+	-moz-transform:     rotate(270deg);
+	-webkit-transform:  rotate(270deg);
+	-o-transform:       rotate(270deg);
+	-ms-transform:      rotate(180deg);
 	white-space: nowrap;
 }
 table.tableinfo tr.footer td { vertical-align: middle; padding-right: 5px; padding-left: 5px; }
