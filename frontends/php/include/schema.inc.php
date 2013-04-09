@@ -662,7 +662,7 @@ return array(
 				'length' => 10,
 				'default' => '0',
 			),
-			'macros' => array(
+			'variables' => array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_TEXT,
 				'default' => '',
@@ -774,6 +774,11 @@ return array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 255,
+				'default' => '',
+			),
+			'variables' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_TEXT,
 				'default' => '',
 			),
 		),
@@ -4990,6 +4995,13 @@ return array(
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
 				'default' => '0',
+			),
+			'itemid' => array(
+				'null' => true,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'items',
+				'ref_field' => 'itemid',
 			),
 		),
 	),
