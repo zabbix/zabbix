@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -9,7 +9,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -191,7 +191,7 @@ static int	get_trigger_permission(zbx_uint64_t userid, zbx_uint64_t triggerid)
 }
 
 static void	add_user_msg(zbx_uint64_t userid, zbx_uint64_t mediatypeid, ZBX_USER_MSG **user_msg,
-		const char *subject, const char *message, unsigned char source, zbx_uint64_t triggerid)
+		const char *subject, const char *message, unsigned char object, zbx_uint64_t triggerid)
 {
 	const char	*__function_name = "add_user_msg";
 	ZBX_USER_MSG	*p;
@@ -201,7 +201,7 @@ static void	add_user_msg(zbx_uint64_t userid, zbx_uint64_t mediatypeid, ZBX_USER
 	if (SUCCEED != check_perm2system(userid))
 		return;
 
-	if (EVENT_SOURCE_TRIGGERS == source && PERM_READ > get_trigger_permission(userid, triggerid))
+	if (EVENT_OBJECT_TRIGGER == object && PERM_READ > get_trigger_permission(userid, triggerid))
 		return;
 
 	p = *user_msg;
@@ -232,7 +232,7 @@ static void	add_user_msg(zbx_uint64_t userid, zbx_uint64_t mediatypeid, ZBX_USER
 }
 
 static void	add_object_msg(zbx_uint64_t operationid, zbx_uint64_t mediatypeid, ZBX_USER_MSG **user_msg,
-		const char *subject, const char *message, unsigned char source, zbx_uint64_t triggerid)
+		const char *subject, const char *message, unsigned char object, zbx_uint64_t triggerid)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -252,7 +252,7 @@ static void	add_object_msg(zbx_uint64_t operationid, zbx_uint64_t mediatypeid, Z
 	while (NULL != (row = DBfetch(result)))
 	{
 		ZBX_STR2UINT64(userid, row[0]);
-		add_user_msg(userid, mediatypeid, user_msg, subject, message, source, triggerid);
+		add_user_msg(userid, mediatypeid, user_msg, subject, message, object, triggerid);
 	}
 	DBfree_result(result);
 }
@@ -706,8 +706,9 @@ static int	check_operation_conditions(DB_EVENT *event, zbx_uint64_t operationid,
 	DB_ROW		row;
 	DB_CONDITION	condition;
 
-	int	ret = SUCCEED; /* SUCCEED required for ACTION_EVAL_TYPE_AND_OR */
-	int	cond, old_type = -1, exit = 0;
+	int		ret = SUCCEED; /* SUCCEED required for ACTION_EVAL_TYPE_AND_OR */
+	int		cond, exit = 0;
+	unsigned char	old_type = 0xff;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() operationid:" ZBX_FS_UI64, __function_name, operationid);
 
@@ -720,9 +721,9 @@ static int	check_operation_conditions(DB_EVENT *event, zbx_uint64_t operationid,
 	while (NULL != (row = DBfetch(result)) && 0 == exit)
 	{
 		memset(&condition, 0, sizeof(condition));
-		condition.conditiontype	= atoi(row[0]);
-		condition.operator	= atoi(row[1]);
-		condition.value		= row[2];
+		condition.conditiontype	= (unsigned char)atoi(row[0]);
+		condition.operator = (unsigned char)atoi(row[1]);
+		condition.value = row[2];
 
 		switch (evaltype)
 		{
@@ -782,9 +783,10 @@ static void	execute_operations(DB_ESCALATION *escalation, DB_EVENT *event, DB_AC
 	const char	*__function_name = "execute_operations";
 	DB_RESULT	result;
 	DB_ROW		row;
-	DB_OPERATION	operation;
-	int		esc_period = 0, operations = 0;
+	int		next_esc_period = 0, esc_period;
 	ZBX_USER_MSG	*user_msg = NULL, *p;
+	zbx_uint64_t	operationid;
+	unsigned char	operationtype, evaltype, operations = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -823,15 +825,12 @@ static void	execute_operations(DB_ESCALATION *escalation, DB_EVENT *event, DB_AC
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		memset(&operation, 0, sizeof(operation));
+		ZBX_STR2UINT64(operationid, row[0]);
+		operationtype = (unsigned char)atoi(row[1]);
+		esc_period = atoi(row[2]);
+		evaltype = (unsigned char)atoi(row[3]);
 
-		ZBX_STR2UINT64(operation.operationid, row[0]);
-		operation.actionid = action->actionid;
-		operation.operationtype = atoi(row[1]);
-		operation.esc_period = atoi(row[2]);
-		operation.evaltype = (unsigned char)atoi(row[3]);
-
-		if (SUCCEED == check_operation_conditions(event, operation.operationid, operation.evaltype))
+		if (SUCCEED == check_operation_conditions(event, operationid, evaltype))
 		{
 			unsigned char	default_msg;
 			char		*subject, *message;
@@ -839,10 +838,10 @@ static void	execute_operations(DB_ESCALATION *escalation, DB_EVENT *event, DB_AC
 
 			zabbix_log(LOG_LEVEL_DEBUG, "Conditions match our event. Execute operation.");
 
-			if (0 == esc_period || esc_period > operation.esc_period)
-				esc_period = operation.esc_period;
+			if (0 == next_esc_period || next_esc_period > esc_period)
+				next_esc_period = esc_period;
 
-			switch (operation.operationtype)
+			switch (operationtype)
 			{
 				case OPERATION_TYPE_MESSAGE:
 					if (SUCCEED == DBis_null(row[4]))
@@ -862,11 +861,11 @@ static void	execute_operations(DB_ESCALATION *escalation, DB_EVENT *event, DB_AC
 						message = action->longdata;
 					}
 
-					add_object_msg(operation.operationid, mediatypeid, &user_msg, subject, message,
-							event->source, event->objectid);
+					add_object_msg(operationid, mediatypeid, &user_msg, subject, message,
+							event->object, event->objectid);
 					break;
 				case OPERATION_TYPE_COMMAND:
-					execute_commands(event, action->actionid, operation.operationid, escalation->esc_step);
+					execute_commands(event, action->actionid, operationid, escalation->esc_step);
 					break;
 			}
 		}
@@ -897,20 +896,22 @@ static void	execute_operations(DB_ESCALATION *escalation, DB_EVENT *event, DB_AC
 	{
 		if (0 == operations)
 		{
-			result = DBselect("select operationid from operations where actionid=" ZBX_FS_UI64 " and esc_step_from>%d",
-					action->actionid,
-					escalation->esc_step);
+			result = DBselect(
+					"select null"
+					" from operations"
+					" where actionid=" ZBX_FS_UI64
+						" and esc_step_from>%d",
+					action->actionid, escalation->esc_step);
 
-			if (NULL != (row = DBfetch(result)) && SUCCEED != DBis_null(row[0]))
+			if (NULL != DBfetch(result))
 				operations = 1;
-
 			DBfree_result(result);
 		}
 
 		if (1 == operations)
 		{
-			esc_period = (0 != esc_period) ? esc_period : action->esc_period;
-			escalation->nextcheck = time(NULL) + esc_period;
+			next_esc_period = (0 != next_esc_period) ? next_esc_period : action->esc_period;
+			escalation->nextcheck = time(NULL) + next_esc_period;
 		}
 		else
 			escalation->status = (action->recovery_msg == 1) ? ESCALATION_STATUS_SLEEP : ESCALATION_STATUS_COMPLETED;
@@ -930,11 +931,14 @@ static void	process_recovery_msg(DB_ESCALATION *escalation, DB_EVENT *r_event, D
 
 	if (1 == action->recovery_msg)
 	{
-		result = DBselect("select distinct userid,mediatypeid from alerts where actionid=" ZBX_FS_UI64
-				" and eventid=" ZBX_FS_UI64 " and mediatypeid is not null and alerttype=%d",
-				action->actionid,
-				escalation->eventid,
-				ALERT_TYPE_MESSAGE);
+		result = DBselect(
+				"select distinct userid,mediatypeid"
+				" from alerts"
+				" where actionid=" ZBX_FS_UI64
+					" and eventid=" ZBX_FS_UI64
+					" and mediatypeid is not null"
+					" and alerttype=%d",
+				action->actionid, escalation->eventid, ALERT_TYPE_MESSAGE);
 
 		while (NULL != (row = DBfetch(result)))
 		{
@@ -942,13 +946,14 @@ static void	process_recovery_msg(DB_ESCALATION *escalation, DB_EVENT *r_event, D
 			ZBX_STR2UINT64(mediatypeid, row[1]);
 
 			escalation->esc_step = 0;
-			add_message_alert(escalation, r_event, action, userid, mediatypeid, action->shortdata, action->longdata);
+			add_message_alert(escalation, r_event, action, userid, mediatypeid, action->shortdata,
+					action->longdata);
 		}
 		DBfree_result(result);
 	}
 	else
-		zabbix_log(LOG_LEVEL_DEBUG, "Escalation stopped: recovery message not defined",
-				escalation->actionid);
+		zabbix_log(LOG_LEVEL_DEBUG, "escalation stopped: recovery message not defined (actionid:" ZBX_FS_UI64
+				")", escalation->actionid);
 
 	escalation->status = ESCALATION_STATUS_COMPLETED;
 
@@ -999,7 +1004,7 @@ static int	get_event_info(zbx_uint64_t eventid, DB_EVENT *event)
 	}
 	DBfree_result(result);
 
-	if (SUCCEED == res && EVENT_SOURCE_TRIGGERS == event->source)
+	if (SUCCEED == res && EVENT_OBJECT_TRIGGER == event->object)
 	{
 		result = DBselect("select description,expression,priority,comments,url"
 				" from triggers"
@@ -1040,7 +1045,7 @@ static int	get_event_info(zbx_uint64_t eventid, DB_EVENT *event)
  ******************************************************************************/
 static void	free_event_info(DB_EVENT *event)
 {
-	if (EVENT_SOURCE_TRIGGERS == event->source)
+	if (EVENT_OBJECT_TRIGGER == event->object)
 	{
 		zbx_free(event->trigger.description);
 		zbx_free(event->trigger.expression);
@@ -1057,19 +1062,19 @@ static void	execute_escalation(DB_ESCALATION *escalation)
 	DB_ACTION	action;
 	DB_EVENT	event;
 	char		*error = NULL;
-	int		source = (-1);
+	unsigned char	object = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() escalationid:" ZBX_FS_UI64 " status:%s",
 			__function_name, escalation->escalationid, zbx_escalation_status_string(escalation->status));
 
-	result = DBselect("select source from events where eventid=" ZBX_FS_UI64, escalation->eventid);
+	result = DBselect("select object from events where eventid=" ZBX_FS_UI64, escalation->eventid);
 	if (NULL == (row = DBfetch(result)))
 		error = zbx_dsprintf(error, "event [" ZBX_FS_UI64 "] deleted.", escalation->eventid);
 	else
-		source = atoi(row[0]);
+		object = (unsigned char)atoi(row[0]);
 	DBfree_result(result);
 
-	if (NULL == error && EVENT_SOURCE_TRIGGERS == source)
+	if (NULL == error && EVENT_OBJECT_TRIGGER == object)
 	{
 		/* trigger disabled? */
 		result = DBselect("select description,status from triggers where triggerid=" ZBX_FS_UI64,
@@ -1082,7 +1087,7 @@ static void	execute_escalation(DB_ESCALATION *escalation)
 		DBfree_result(result);
 	}
 
-	if (NULL == error && EVENT_SOURCE_TRIGGERS == source)
+	if (NULL == error && EVENT_OBJECT_TRIGGER == object)
 	{
 		/* item disabled? */
 		result = DBselect(
@@ -1098,7 +1103,7 @@ static void	execute_escalation(DB_ESCALATION *escalation)
 		DBfree_result(result);
 	}
 
-	if (NULL == error && EVENT_SOURCE_TRIGGERS == source)
+	if (NULL == error && EVENT_OBJECT_TRIGGER == object)
 	{
 		/* host disabled? */
 		result = DBselect(
@@ -1202,16 +1207,12 @@ static void	process_escalations(int now)
 	DB_ESCALATION		escalation, last_escalation;
 	zbx_vector_uint64_t	escalationids;
 	char			*sql = NULL;
-	size_t			sql_alloc = ZBX_KIBIBYTE, sql_offset = 0;
+	size_t			sql_alloc = ZBX_KIBIBYTE, sql_offset;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	zbx_vector_uint64_create(&escalationids);
 	sql = zbx_malloc(sql, sql_alloc);
-
-	DBbegin();
-
-	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	result = DBselect(
 			"select escalationid,actionid,triggerid,eventid,r_eventid,esc_step,status,nextcheck"
@@ -1258,7 +1259,7 @@ static void	process_escalations(int now)
 				esc_superseded = (escalation.actionid == last_escalation.actionid &&
 						escalation.triggerid == last_escalation.triggerid);
 
-				if (1 == esc_superseded)
+				if (0 != esc_superseded)
 				{
 					if (0 != last_escalation.r_eventid)
 					{
@@ -1277,7 +1278,11 @@ static void	process_escalations(int now)
 
 			if (ESCALATION_STATUS_ACTIVE != escalation.status ||
 					(escalation.nextcheck > now && 0 == escalation.r_eventid))
+			{
 				goto next;
+			}
+
+			DBbegin();
 
 			if (escalation.nextcheck <= now)
 				execute_escalation(&escalation);
@@ -1288,8 +1293,10 @@ static void	process_escalations(int now)
 				escalation.status = ESCALATION_STATUS_RECOVERY;
 				execute_escalation(&escalation);
 			}
-			else if (1 == esc_superseded)
+			else if (0 != esc_superseded)
 				escalation.status = ESCALATION_STATUS_COMPLETED;
+
+			sql_offset = 0;
 
 			if (ESCALATION_STATUS_COMPLETED != escalation.status)
 			{
@@ -1301,13 +1308,19 @@ static void	process_escalations(int now)
 							escalation.esc_step, escalation.nextcheck);
 				}
 				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-						" where escalationid=" ZBX_FS_UI64 ";\n", escalation.escalationid);
+						" where escalationid=" ZBX_FS_UI64, escalation.escalationid);
 
-				DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 			}
 			else
-				zbx_vector_uint64_append(&escalationids, escalation.escalationid);
+			{
+				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+						"delete from escalations where escalationid=" ZBX_FS_UI64,
+						escalation.escalationid);
+			}
 
+			DBexecute("%s", sql);
+
+			DBcommit();
 		}
 next:
 		if (NULL != row)
@@ -1317,21 +1330,18 @@ next:
 
 	DBfree_result(result);
 
-	/* delete completed */
+	/* delete completed escalations */
 	if (0 != escalationids.values_num)
 	{
+		sql_offset = 0;
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "delete from escalations where");
 		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "escalationid",
 				escalationids.values, escalationids.values_num);
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
-	}
 
-	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-	if (sql_offset > 16)	/* In ORACLE always present begin..end; */
+		DBbegin();
 		DBexecute("%s", sql);
-
-	DBcommit();
+		DBcommit();
+	}
 
 	zbx_free(sql);
 	zbx_vector_uint64_destroy(&escalationids);
