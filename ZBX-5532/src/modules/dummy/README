@@ -1,0 +1,5 @@
+This directory contains a sample module, which extends functionality of Zabbix
+ Agent. The dummy.c module is well commented, have a look at the sources to
+ learn how to create Zabbix modules.
+
+Run 'make' to build it. It should produce dummy.so.
