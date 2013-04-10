@@ -935,7 +935,7 @@ fieldset legend { margin: 0.2em 0.5em; }
 /* multiselect */
 .multiselect { margin: 1px 2px 1px 1px; }
 .multiselect input[type="text"] {
-	padding: 2px 0 0 4px; top: 0; left: 0; min-height: 22px; position: absolute; z-index: 10;
+	margin: 0; padding: 2px 0 0 4px; top: 0; left: 0; min-height: 22px; position: absolute; z-index: 10;
 	background: none; border: none; outline: none;
 }
 .multiselect .selected { top: 0; left: 0; position: relative; }
@@ -983,14 +983,14 @@ fieldset legend { margin: 0.2em 0.5em; }
 .multiselect .available .label-empty-result { padding: 4px 0 0 4px; }
 .multiselect .available .label-more-matches-found { padding: 4px 0 3px 4px; font-weight: bold; }
 .multiselect .available ul {
-	padding: 0; max-height: 300px;
+	margin: 0; padding: 0; max-height: 300px;
 	overflow-x: hidden; overflow-y: auto; -webkit-overflow-scrolling: touch;
 }
 .multiselect .available ul li { padding: 3px 2px 3px 4px; list-style: none outside none; cursor: pointer; }
 .multiselect .available ul li.hover { background: #7A9FC1; color: #FFFFFF; }
 .multiselect .available ul li.hover .prefix { color: #F1F1F1; }
 
-.multiselect_single input[type="text"] { padding-top: 0; }
-.multiselect_single .selected ul { padding: 0; min-height: 18px; }
-.multiselect_single .selected ul li { background: none; border: none; margin: 0; padding: 0; }
-.multiselect_single .selected ul li.pressed { background: none; }
+.multiselect_simple input[type="text"] {padding: 0 0 1px 3px; line-height: 1.8em; min-height: 20px; font-size: 10px; font-family: verdana, arial, helvetica, sans-serif;}
+.multiselect_simple .selected ul { padding: 0; min-height:18px; }
+.multiselect_simple .selected ul li { background: none; border: none; margin: 0; padding: 0; }
+.multiselect_simple .selected ul li.pressed { background: none; }

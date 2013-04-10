@@ -879,8 +879,12 @@ define('ZBX_TEXTBOX_SMALL_SIZE',		25);
 define('ZBX_TEXTBOX_FILTER_SIZE',		20);
 define('ZBX_TEXTAREA_STANDARD_WIDTH',	312);
 define('ZBX_MULTISELECT_STANDARD_WIDTH',320);
+define('ZBX_MULTISELECT_SMALL_WIDTH',	160);
 define('ZBX_TEXTAREA_BIG_WIDTH',		524);
 define('ZBX_TEXTAREA_STANDARD_ROWS',	7);
+
+// multiselect
+define('MULTISELECT_LIMIT', 20);
 
 // validation
 define('DB_ID',		"({}>=0&&bccomp('{}',\"10000000000000000000\")<0)&&");

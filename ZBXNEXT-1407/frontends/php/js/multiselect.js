@@ -21,6 +21,35 @@
 jQuery(function($) {
 
 	/**
+	 * Multi select helper.
+	 *
+	 * @param objectName options['objectName']
+	 *
+	 * @see $.fn.multiSelect
+	 */
+	$.fn.multiSelectHelper = function(options) {
+		// url
+		options.url = new Curl('jsrpc.php');
+		options.url.setArgument('type', 11); // PAGE_TYPE_TEXT_RETURN_JSON
+		options.url.setArgument('method', 'multiselect.get');
+		options.url.setArgument('objectName', options.objectName);
+		options.url = options.url.getUrl();
+
+		// labels
+		options.labels = {
+			emptyResult: locale['emptyResult'],
+			moreMatchesFound: locale['moreMatchesFound']
+		};
+
+		// limit
+		options.limit = 20; // MULTISELECT_LIMIT
+
+		return this.each(function() {
+			$(this).multiSelect(options);
+		});
+	};
+
+	/**
 	 * Create multi select input element.
 	 *
 	 * @param string options['url']
@@ -31,8 +60,8 @@ jQuery(function($) {
 	 * @param string options['data'][name]
 	 * @param string options['data'][prefix]
 	 * @param bool   options['disabled']
-	 * @param bool   options['displaySingle']
-	 * @param bool   options['single']
+	 * @param bool   options['simple']
+	 * @param int    options['selectedLimit']
 	 * @param int    options['limit']
 	 *
 	 * @return object
@@ -47,11 +76,15 @@ jQuery(function($) {
 			},
 			data: {},
 			disabled: false,
-			displaySingle: false,
-			single: false,
+			simple: false,
+			selectedLimit: null,
 			limit: null
 		};
 		options = $.extend({}, defaults, options);
+
+		if (options.simple) {
+			options.selectedLimit = 1;
+		}
 
 		var KEY = {
 			ARROW_DOWN: 40,
@@ -92,7 +125,7 @@ jQuery(function($) {
 						return false;
 					}
 
-					if ($('.selected li', obj).length > 0 && options.single) {
+					if ($('.selected li', obj).length > 0 && $('.selected li', obj).length == options.selectedLimit) {
 						setReadonly(obj);
 						return false;
 					}
@@ -254,7 +287,7 @@ jQuery(function($) {
 					}
 				})
 				.focusin(function() {
-					if (options.single) {
+					if (options.selectedLimit > 0) {
 						if ($('.selected li', obj).length == 0) {
 							$('.selected ul', obj).addClass('active');
 						}
@@ -367,7 +400,8 @@ jQuery(function($) {
 			obj.append($('<input>', {
 				type: 'hidden',
 				name: options.name,
-				value: item.id
+				value: item.id,
+				'data-name': item.name
 			}));
 
 			// add list item
@@ -399,7 +433,7 @@ jQuery(function($) {
 			}
 
 			// set readonly
-			if (options.single) {
+			if (options.selectedLimit > 0 && $('.selected li', obj).length == options.selectedLimit) {
 				setReadonly(obj);
 			}
 		}
@@ -421,7 +455,7 @@ jQuery(function($) {
 		$('input[type="text"]', obj).focus();
 
 		// remove readonly
-		if ($('.selected li', obj).length == 0 && options.single) {
+		if ($('.selected li', obj).length == 0 && options.selectedLimit > 0) {
 			$('input[type="text"]', obj).attr('disabled', false);
 		}
 	}
@@ -514,12 +548,15 @@ jQuery(function($) {
 	}
 
 	function resizeSelected(obj, values, options) {
+		if (options.simple) {
+			return;
+		}
+
 		// settings
 		var searchInputMinWidth = 50,
 			searchInputLeftPaddings = 4,
 			searchInputRightPaddings = 4,
-			searchInputTopPaddings = IE8 ? 4 : 0,
-			searchInputTopPaddingsInitial = options.displaySingle ? 0 : 3;
+			searchInputTopPaddings = IE8 ? 4 : 0;
 
 		// calculate
 		var top, left, height;
@@ -531,7 +568,7 @@ jQuery(function($) {
 			height = $('.selected li:last-child', obj).height();
 		}
 		else {
-			top = searchInputTopPaddingsInitial + searchInputTopPaddings;
+			top = 3 + searchInputTopPaddings;
 			left = searchInputLeftPaddings;
 			height = 0;
 		}

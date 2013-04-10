@@ -143,8 +143,7 @@ switch ($this->data['new_condition']['conditiontype']) {
 	case CONDITION_TYPE_HOST_TEMPLATE:
 		$rowCondition[] = new CDiv(new CMultiSelect(array(
 			'name' => 'new_condition[value]',
-			'single' => true,
-			'displaySingle' => true,
+			'simple' => true,
 			'objectName' => 'hostsAndTemplates',
 			'objectOptions' => array(
 				'templated_hosts' => true,
@@ -156,8 +155,7 @@ switch ($this->data['new_condition']['conditiontype']) {
 	case CONDITION_TYPE_HOST:
 		$rowCondition[] = new CDiv(new CMultiSelect(array(
 			'name' => 'new_condition[value]',
-			'single' => true,
-			'displaySingle' => true,
+			'simple' => true,
 			'objectName' => 'hostsAndTemplates',
 			'objectOptions' => array(
 				'real_hosts' => true,
@@ -572,6 +570,7 @@ if (!empty($this->data['new_operation'])) {
 				$newOperationsTable->addItem(new CVar('new_operation[opmessage][message]', $this->data['new_operation']['opmessage']['message']));
 			}
 			break;
+
 		case OPERATION_TYPE_COMMAND:
 			if (!isset($this->data['new_operation']['opcommand'])) {
 				$this->data['new_operation']['opcommand'] = array();
@@ -746,6 +745,7 @@ if (!empty($this->data['new_operation'])) {
 			$commandIpmiTextBox->attr('id', 'opcommand_command_ipmi');
 			$newOperationsTable->addRow(array(_('Commands'), $commandIpmiTextBox), 'class_opcommand_command_ipmi hidden indent_both');
 			break;
+
 		case OPERATION_TYPE_HOST_ADD:
 		case OPERATION_TYPE_HOST_REMOVE:
 		case OPERATION_TYPE_HOST_ENABLE:
@@ -755,6 +755,7 @@ if (!empty($this->data['new_operation'])) {
 			$newOperationsTable->addItem(new CVar('new_operation[shortdata]', ''));
 			$newOperationsTable->addItem(new CVar('new_operation[longdata]', ''));
 			break;
+
 		case OPERATION_TYPE_GROUP_ADD:
 		case OPERATION_TYPE_GROUP_REMOVE:
 			if (!isset($this->data['new_operation']['opgroup'])) {
@@ -788,6 +789,7 @@ if (!empty($this->data['new_operation'])) {
 
 			$newOperationsTable->addRow(array($caption, new CDiv($groupList, 'objectgroup inlineblock border_dotted ui-corner-all')));
 			break;
+
 		case OPERATION_TYPE_TEMPLATE_ADD:
 		case OPERATION_TYPE_TEMPLATE_REMOVE:
 			if (!isset($this->data['new_operation']['optemplate'])) {

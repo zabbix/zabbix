@@ -43,10 +43,10 @@ if (empty($this->data['applicationid'])) {
 	$applicationFormList->addRow(_('Host'), new CMultiSelect(array(
 		'name' => 'apphostid',
 		'objectName' => 'hostsAndTemplates',
-		'data' => !empty($this->data['hostid'])
-			? array('id' => $this->data['hostid'], 'name' => $this->data['hostname'])
-			: null,
-		'single' => true
+		'data' => empty($this->data['hostid'])
+			? null
+			: array('id' => $this->data['hostid'], 'name' => $this->data['hostname']),
+		'selectedLimit' => 1
 	)));
 }
 else {
