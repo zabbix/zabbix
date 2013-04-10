@@ -2095,9 +2095,9 @@ size_t	zbx_get_next_field(const char **line, char **output, size_t *olen, char s
  *                                                                            *
  * Purpose: check if string is contained in a list of delimited strings       *
  *                                                                            *
- * Parameters: list     - strings a,b,ccc,ddd                                 *
- *             value    - value                                               *
- *             delimiter- delimiter                                           *
+ * Parameters: list      - strings a,b,ccc,ddd                                *
+ *             value     - value                                              *
+ *             delimiter - delimiter                                          *
  *                                                                            *
  * Return value: SUCCEED - string is in the list, FAIL - otherwise            *
  *                                                                            *

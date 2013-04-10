@@ -93,7 +93,9 @@ static int	httpmacro_append_pair(zbx_httptest_t *httptest, const char *pkey, siz
 	zbx_strncpy_alloc(&value_str, &value_size, &value_offset, pvalue, nvalue);
 	if (!strncmp(REGEXP_PREFIX, value_str, REGEXP_PREFIX_SIZE))
 	{
-		/* the value contains regexp pattern, try to get first captured group */
+		/* The value contains regexp pattern, retrieve the first captured group or the whole string. */
+		/* If regular expression pattern contains groups, then \1 returns captured group and \*      */
+		/* returns empty string. Otherwise \1 returns empty string and \* returns the input text.    */
 		if (NULL != data)
 			pair.second = (void *)zbx_regexp_sub(data, value_str + REGEXP_PREFIX_SIZE, "\\1\\*");
 
