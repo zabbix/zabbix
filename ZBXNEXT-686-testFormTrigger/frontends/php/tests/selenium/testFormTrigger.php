@@ -36,34 +36,108 @@ class testFormTrigger extends CWebTest {
 	public static function layout() {
 		return array(
 			array(
-				array('constructor' => 'open')
+				array('constructor' => 'open', 'host' => 'Simple form test host')
 			),
 			array(
-				array('constructor' => 'open_close')
+				array('constructor' => 'open_close', 'host' => 'Simple form test host')
 			),
 			array(
-				array('constructor' => 'open', 'severity' => 'Warning')
+				array('constructor' => 'open', 'severity' => 'Warning', 'host' => 'Simple form test host')
 			),
 			array(
-				array('constructor' => 'open_close', 'severity' => 'Disaster')
+				array('constructor' => 'open_close', 'severity' => 'Disaster', 'host' => 'Simple form test host')
 			),
 			array(
-				array('severity' => 'Not classified')
+				array('severity' => 'Not classified', 'host' => 'Simple form test host')
 			),
 			array(
-				array('severity' => 'Information')
+				array('severity' => 'Information', 'host' => 'Simple form test host')
 			),
 			array(
-				array('severity' => 'Warning')
+				array('severity' => 'Warning', 'host' => 'Simple form test host')
 			),
 			array(
-				array('severity' => 'Average')
+				array('severity' => 'Average', 'host' => 'Simple form test host')
 			),
 			array(
-				array('severity' => 'High')
+				array('severity' => 'High', 'host' => 'Simple form test host')
 			),
 			array(
-				array('severity' => 'Disaster')
+				array('severity' => 'Disaster', 'host' => 'Simple form test host')
+			),
+			array(
+				array('constructor' => 'open', 'template' => 'Inheritance test template')
+			),
+			array(
+				array('constructor' => 'open_close', 'template' => 'Inheritance test template')
+			),
+			array(
+				array('constructor' => 'open', 'severity' => 'Warning', 'template' => 'Inheritance test template')
+			),
+			array(
+				array('constructor' => 'open_close', 'severity' => 'Disaster', 'template' => 'Inheritance test template')
+			),
+			array(
+				array('severity' => 'Not classified', 'template' => 'Inheritance test template')
+			),
+			array(
+				array('severity' => 'Information', 'template' => 'Inheritance test template')
+			),
+			array(
+				array('severity' => 'Warning', 'template' => 'Inheritance test template')
+			),
+			array(
+				array('severity' => 'Average', 'template' => 'Inheritance test template')
+			),
+			array(
+				array('severity' => 'High', 'template' => 'Inheritance test template')
+			),
+			array(
+				array('severity' => 'Disaster', 'template' => 'Inheritance test template')
+			),
+			array(
+				array('host' => 'Simple form test host', 'form' => 'testFormTrigger1')
+			),
+			array(
+				array('template' => 'Inheritance test template', 'form' => 'testInheritanceTrigger1')
+			),
+			array(
+				array(
+					'host' => 'Template inheritance test host',
+					'form' => 'testInheritanceTrigger1',
+					'templatedHost' => true,
+					'hostTemplate' => 'Inheritance test template'
+				)
+			),
+			array(
+				array(
+					'host' => 'Template inheritance test host',
+					'form' => 'testInheritanceTrigger2',
+					'templatedHost' => true,
+					'hostTemplate' => 'Inheritance test template'
+				)
+			),
+			array(
+				array(
+					'host' => 'Simple form test host',
+					'form' => 'testFormTrigger1',
+					'constructor' => 'open'
+				)
+			),
+			array(
+				array(
+					'template' => 'Inheritance test template',
+					'form' => 'testInheritanceTrigger1',
+					'constructor' => 'open'
+				)
+			),
+			array(
+				array(
+					'host' => 'Template inheritance test host',
+					'form' => 'testInheritanceTrigger1',
+					'templatedHost' => true,
+					'constructor' => 'open'
+				)
 			)
 		);
 	}
@@ -80,47 +154,76 @@ class testFormTrigger extends CWebTest {
 	 */
 	public function testFormTrigger_CheckLayout($data) {
 
-		$this->zbxTestLogin('hosts.php');
-		$this->zbxTestClickWait('link='.$this->host);
+		if (isset($data['template'])) {
+			$this->zbxTestLogin('templates.php');
+			$this->zbxTestClickWait('link='.$data['template']);
+		}
+
+		if (isset($data['host'])) {
+			$this->zbxTestLogin('hosts.php');
+			$this->zbxTestClickWait('link='.$data['host']);
+		}
+
 		$this->zbxTestClickWait("//div[@class='w']//a[text()='Triggers']");
 		$this->checkTitle('Configuration of triggers');
 		$this->zbxTestTextPresent('CONFIGURATION OF TRIGGERS');
 
-		$this->zbxTestClickWait('form');
+		if (isset($data['form'])) {
+			$this->zbxTestClickWait('link='.$data['form']);
+		}
+		else {
+			$this->zbxTestClickWait('form');
+		}
 		$this->checkTitle('Configuration of triggers');
 
 		if (isset($data['constructor'])) {
 			switch ($data['constructor']) {
 				case 'open':
-					$this->zbxTestClick("//span[text()='Expression constructor']");
-					sleep(1);
+					$this->zbxTestClickWait("//span[text()='Expression constructor']");
 					break;
 				case 'open_close':
-					$this->zbxTestClick("//span[text()='Expression constructor']");
-					sleep(1);
-					$this->zbxTestClick("//span[text()='Close expression constructor']");
-					sleep(1);
+					$this->zbxTestClickWait("//span[text()='Expression constructor']");
+					$this->zbxTestClickWait("//span[text()='Close expression constructor']");
 					break;
 			}
 		}
 
 		$this->zbxTestTextPresent('Trigger');
+
+		if (isset($data['templatedHost'])) {
+			$this->zbxTestTextPresent('Parent triggers');
+			if (isset($data['hostTemplate'])) {
+				$this->assertElementPresent("//a[text()='".$data['hostTemplate']."']");
+			}
+		}
+		else {
+			$this->zbxTestTextNotPresent('Parent triggers');
+		}
+
 		$this->zbxTestTextPresent('Name');
 		$this->assertVisible('description');
 		$this->assertAttribute("//input[@id='description']/@maxlength", '255');
 		$this->assertAttribute("//input[@id='description']/@size", '50');
 
-		if (!(isset($data['constructor'])) || $data['constructor'] == 'open_close') {
+		if (!isset($data['constructor']) || $data['constructor'] == 'open_close') {
 			$this->zbxTestTextPresent(array('Expression', 'Expression constructor'));
-			$this->assertVisible('expression');
+			$this->assertVisible("//textarea[@id='expression']");
 			$this->assertAttribute("//textarea[@id='expression']/@rows", '7');
+			if (isset($data['templatedHost'])) {
+				$this->assertAttribute("//textarea[@id='expression']/@readonly", 'readonly');
+			}
+
 			$this->assertVisible('insert');
 			$this->assertAttribute("//input[@id='insert']/@value", 'Add');
+			if (isset($data['templatedHost'])) {
+				$this->assertElementPresent("//input[@id='insert']/@disabled");
+			}
 
 			$this->assertElementNotPresent('add_expression');
 			$this->assertElementNotPresent('insert_macro');
 			$this->assertElementNotPresent('exp_list');
-		} else {
+		}
+		else {
 			$this->zbxTestTextPresent('Expression');
 			$this->assertVisible('expr_temp');
 			$this->assertAttribute("//textarea[@id='expr_temp']/@rows", '7');
@@ -128,16 +231,32 @@ class testFormTrigger extends CWebTest {
 			$this->zbxTestTextNotPresent('Expression constructor');
 			$this->assertNotVisible('expression');
 
-			$this->assertVisible('add_expression');
-			$this->assertAttribute("//input[@id='add_expression']/@value", 'Add');
+			if (!isset($data['form'])) {
+				$this->assertVisible('add_expression');
+				$this->assertAttribute("//input[@id='add_expression']/@value", 'Add');
+			}
+			else {
+				$this->assertElementNotPresent('add_expression');
+			}
 
 			$this->assertVisible('insert');
 			$this->assertAttribute("//input[@id='insert']/@value", 'Edit');
+			if (isset($data['templatedHost'])) {
+				$this->assertElementPresent("//input[@id='insert']/@disabled");
+			}
 
 			$this->assertVisible('insert_macro');
 			$this->assertAttribute("//input[@id='insert_macro']/@value", 'Insert macro');
+			if (isset($data['templatedHost'])) {
+				$this->assertElementPresent("//input[@id='insert_macro']/@disabled");
+			}
 
-			$this->zbxTestTextPresent(array('Target', 'Expression', 'Error', 'Action', 'Close expression constructor'));
+			if (!isset($data['templatedHost'])) {
+				$this->zbxTestTextPresent(array('Target', 'Expression', 'Error', 'Action', 'Close expression constructor'));
+			}
+			else {
+				$this->zbxTestTextPresent(array('Expression', 'Error', 'Close expression constructor'));
+			}
 			$this->assertVisible('exp_list');
 			$this->zbxTestTextPresent('Close expression constructor');
 		}
@@ -189,8 +308,6 @@ class testFormTrigger extends CWebTest {
 				case 'Disaster':
 					$this->zbxTestClick('severity_5');
 					break;
-				default:
-					break;
 			}
 		}
 
@@ -203,6 +320,21 @@ class testFormTrigger extends CWebTest {
 
 		$this->assertVisible('cancel');
 		$this->assertAttribute("//input[@id='cancel']/@value", 'Cancel');
+
+		if (isset($data['form'])) {
+			$this->assertVisible('clone');
+			$this->assertAttribute("//input[@id='clone']/@value", 'Clone');
+
+			$this->assertVisible('delete');
+			$this->assertAttribute("//input[@id='delete']/@value", 'Delete');
+			if (isset($data['templatedHost'])) {
+				$this->assertElementPresent("//input[@id='delete']/@disabled");
+			}
+		}
+		else {
+			$this->assertElementNotPresent('clone');
+			$this->assertElementNotPresent('delete');
+		}
 
 		$this->zbxTestClick('link=Dependencies');
 		$this->zbxTestTextPresent(array('Dependencies', 'Name', 'Action', 'No dependencies defined'));
@@ -218,7 +350,7 @@ class testFormTrigger extends CWebTest {
 	/**
 	 * @dataProvider update
 	 */
-	public function testFormTrigger_simpleCreate($data) {
+	public function testFormTrigger_SimpleUpdate($data) {
 		$description = $data['description'];
 
 		$sqlTriggers = "select * from triggers";
@@ -537,7 +669,7 @@ class testFormTrigger extends CWebTest {
 	/**
 	 * @dataProvider create
 	 */
-	public function testFormTrigger_Create($data) {
+	public function testFormTrigger_SimpleCreate($data) {
 
 		$this->zbxTestLogin('hosts.php');
 		$this->zbxTestClickWait('link='.$this->host);
