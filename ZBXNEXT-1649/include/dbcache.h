@@ -236,11 +236,9 @@ int	DCconfig_get_poller_items(unsigned char poller_type, DC_ITEM *items, int max
 int	DCconfig_get_snmp_interfaceids_by_addr(const char *addr, zbx_uint64_t **interfaceids);
 size_t	DCconfig_get_snmp_items_by_interfaceid(zbx_uint64_t interfaceid, DC_ITEM **items);
 
-#define	CONFIG_ALERT_HISTORY		1
-#define	CONFIG_EVENT_HISTORY		2
-#define	CONFIG_REFRESH_UNSUPPORTED	3
-#define	CONFIG_DISCOVERY_GROUPID	4
-#define	CONFIG_SNMPTRAP_LOGGING		5
+#define	CONFIG_REFRESH_UNSUPPORTED	1
+#define	CONFIG_DISCOVERY_GROUPID	2
+#define	CONFIG_SNMPTRAP_LOGGING		3
 void	*DCconfig_get_config_data(void *data, int type);
 int	DCget_trigger_severity_name(unsigned char priority, char **replace_to);
 
