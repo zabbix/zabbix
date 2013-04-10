@@ -145,12 +145,12 @@ typedef struct
 	/* a reference to housekeeping configuration enable value for this table */
 	unsigned int	*poption_mode;
 }
-zbx_hk_cleanup_tables_t;
+zbx_hk_cleanup_table_t;
 
 /* Housekeeper table mapping to housekeeping configuration values.    */
 /* This mapping is used to exclude disabled tables from housekeeping  */
 /* cleanup procedure.                                                 */
-static zbx_hk_cleanup_tables_t hk_cleanup_tables[] = {
+static zbx_hk_cleanup_table_t hk_cleanup_tables[] = {
 	{"history", &hk_config.history_mode},
 	{"history_log", &hk_config.history_mode},
 	{"history_str", &hk_config.history_mode},
@@ -622,8 +622,8 @@ int	housekeeping_history_and_trends(unsigned int now)
 		for (i = 0; i < rule->delete_queue.values_num; i++)
 		{
 			zbx_hk_delete_queue_t	*item_record = rule->delete_queue.values[i];
-			deleted += DBexecute("delete from %s where itemid=" ZBX_FS_UI64 " and %s<%d",
-					rule->table, item_record->itemid, rule->table, item_record->min_clock);
+			deleted += DBexecute("delete from %s where itemid=" ZBX_FS_UI64 " and clock<%d",
+					rule->table, item_record->itemid, item_record->min_clock);
 		}
 
 		/* clear history rule delete queue so it's ready for the next housekeeping cycle */
@@ -775,33 +775,31 @@ static int	housekeeping_cleanup()
 	zbx_vector_uint64_t	housekeeperids;
 	char			*sql_tables = NULL;
 	size_t			sql_size = 0, sql_offset = 0;
-	zbx_hk_cleanup_tables_t *table;
+	zbx_hk_cleanup_table_t *table;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	/* first handle the trivial case when history and trend housekeeping is disabled */
 	if (HK_OPTION_DISABLED == hk_config.history_mode && HK_OPTION_DISABLED == hk_config.trends_mode)
-		return 0;
+		goto out;
 
 	zbx_vector_uint64_create(&housekeeperids);
 
 	/* assemble list of tables excluded from housekeeping procedure */
-	*sql_tables = '\0';
-	for (table = hk_cleanup_tables; table->name; table++)
+	for (table = hk_cleanup_tables; NULL != table->name; table++)
 	{
 		if (HK_OPTION_ENABLED == *table->poption_mode)
 			continue;
 
-		if ('\0' != *sql_tables)
-			zbx_strcpy_alloc(&sql_tables, &sql_size, &sql_offset, " and ");
-		zbx_snprintf_alloc(&sql_tables, &sql_size, &sql_offset, "tablename<>'%s'", table->name);
+		zbx_strcpy_alloc(&sql_tables, &sql_size, &sql_offset, (NULL == sql_tables ? " where" : " and"));
+		zbx_snprintf_alloc(&sql_tables, &sql_size, &sql_offset, " tablename<>'%s'", table->name);
 	}
 
 	/* order by tablename to effectively use DB cache */
 	result = DBselect(
 			"select housekeeperid,tablename,field,value"
-			" from housekeeper%s%s"
-			" order by tablename", ('\0' != *sql_tables ? " where " : ""), sql_tables);
+			" from housekeeper%s"
+			" order by tablename", (NULL != sql_tables ? sql_tables : ""));
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -880,6 +878,7 @@ static int	housekeeping_cleanup()
 
 	zbx_vector_uint64_destroy(&housekeeperids);
 
+out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __function_name, deleted);
 
 	return deleted;
