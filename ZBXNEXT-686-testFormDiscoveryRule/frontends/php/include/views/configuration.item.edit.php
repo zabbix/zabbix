@@ -458,16 +458,9 @@ $description->addStyle('margin-top: 5px;');
 $itemFormList->addRow(_('Description'), $description);
 
 // status
-if (isset($this->data['is_item_prototype'])) {
-	$enabledCheckBox = new CCheckBox('status', !$this->data['status'], null, ITEM_STATUS_ACTIVE);
-	$enabledCheckBox->addStyle('vertical-align: middle;');
-	$itemFormList->addRow(_('Enabled'), $enabledCheckBox);
-}
-else {
-	$statusComboBox = new CComboBox('status', $this->data['status']);
-	$statusComboBox->addItems(item_status2str());
-	$itemFormList->addRow(_('Status'), $statusComboBox);
-}
+$enabledCheckBox = new CCheckBox('status', !$this->data['status'], null, ITEM_STATUS_ACTIVE);
+$enabledCheckBox->addStyle('vertical-align: middle;');
+$itemFormList->addRow(_('Enabled'), $enabledCheckBox);
 
 // append tabs to form
 $itemTab = new CTabView();
