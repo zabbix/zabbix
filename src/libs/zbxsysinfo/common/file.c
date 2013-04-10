@@ -108,7 +108,7 @@ int	VFS_FILE_CONTENTS(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char		*filename, *tmp, encoding[32];
 	char		read_buf[MAX_BUFFER_LEN], *utf8, *contents = NULL;
-	size_t		contents_alloc = 512, contents_offset = 0;
+	size_t		contents_alloc = 0, contents_offset = 0;
 	int		nbytes, flen, f = -1, ret = SYSINFO_RET_FAIL;
 	struct stat	stat_buf;
 	double		ts;
@@ -141,8 +141,6 @@ int	VFS_FILE_CONTENTS(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if (CONFIG_TIMEOUT < zbx_time() - ts)
 		goto err;
 
-	contents = zbx_malloc(contents, contents_alloc);
-
 	flen = 0;
 
 	while (0 < (nbytes = zbx_read(f, read_buf, sizeof(read_buf), encoding)))
@@ -167,7 +165,7 @@ int	VFS_FILE_CONTENTS(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if (0 == contents_offset) /* empty file */
 	{
 		zbx_free(contents);
-		contents = zbx_strdup(contents, "EOF");
+		contents = zbx_strdup(contents, "");
 	}
 
 	SET_TEXT_RESULT(result, contents);
@@ -182,19 +180,23 @@ err:
 
 int	VFS_FILE_REGEXP(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	char	*filename, *regexp, encoding[32];
-	char	buf[MAX_BUFFER_LEN], *utf8, *tmp;
-	int	nbytes, len, f = -1, ret = SYSINFO_RET_FAIL;
+	char	*filename, *regexp, encoding[32], *output, *start_line_str, *end_line_str;
+	char	buf[MAX_BUFFER_LEN], *utf8, *tmp, *ptr;
+	int	nbytes, f = -1, ret = SYSINFO_RET_FAIL;
+	size_t	start_line, end_line, current_line = 0;
 	double	ts;
 
 	ts = zbx_time();
 
-	if (3 < request->nparam)
+	if (6 < request->nparam)
 		goto err;
 
 	filename = get_rparam(request, 0);
 	regexp = get_rparam(request, 1);
 	tmp = get_rparam(request, 2);
+	start_line_str = get_rparam(request, 3);
+	end_line_str = get_rparam(request, 4);
+	output = get_rparam(request, 5);
 
 	if (NULL == filename || '\0' == *filename)
 		goto err;
@@ -206,6 +208,19 @@ int	VFS_FILE_REGEXP(AGENT_REQUEST *request, AGENT_RESULT *result)
 		*encoding = '\0';
 	else
 		strscpy(encoding, tmp);
+
+	if (NULL == start_line_str || '\0' == *start_line_str)
+		start_line = 0;
+	else if (FAIL == is_uint32(start_line_str, &start_line))
+		goto err;
+
+	if (NULL == end_line_str || '\0' == *end_line_str)
+		end_line = 0xffffffff;
+	else if (FAIL == is_uint32(end_line_str, &end_line))
+		goto err;
+
+	if (start_line > end_line)
+		goto err;
 
 	if (-1 == (f = zbx_open(filename, O_RDONLY)))
 		goto err;
@@ -218,21 +233,33 @@ int	VFS_FILE_REGEXP(AGENT_REQUEST *request, AGENT_RESULT *result)
 		if (CONFIG_TIMEOUT < zbx_time() - ts)
 			goto err;
 
+		if (++current_line < start_line)
+			continue;
+
 		utf8 = convert_to_utf8(buf, nbytes, encoding);
-		if (NULL != zbx_regexp_match(utf8, regexp, &len))
+		ptr = zbx_regexp_sub(utf8, regexp, output);
+		zbx_free(utf8);
+
+		if (NULL != ptr)
 		{
-			zbx_rtrim(utf8, "\r\n ");
-			SET_STR_RESULT(result, utf8);
+			zbx_rtrim(ptr, "\r\n ");
+			SET_STR_RESULT(result, ptr);
 			break;
 		}
-		zbx_free(utf8);
+
+		if (current_line >= end_line)
+		{
+			/* force EOF state */
+			nbytes = 0;
+			break;
+		}
 	}
 
 	if (-1 == nbytes)	/* error occurred */
 		goto err;
 
 	if (0 == nbytes)	/* EOF */
-		SET_STR_RESULT(result, zbx_strdup(NULL, "EOF"));
+		SET_STR_RESULT(result, zbx_strdup(NULL, ""));
 
 	ret = SYSINFO_RET_OK;
 err:
@@ -245,18 +272,21 @@ err:
 int	VFS_FILE_REGMATCH(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char	*filename, *regexp, *tmp, encoding[32];
-	char	buf[MAX_BUFFER_LEN], *utf8;
+	char	buf[MAX_BUFFER_LEN], *utf8, *start_line_str, *end_line_str;
 	int	nbytes, len, res, f = -1, ret = SYSINFO_RET_FAIL;
+	size_t	start_line, end_line, current_line = 0;
 	double	ts;
 
 	ts = zbx_time();
 
-	if (3 < request->nparam)
+	if (5 < request->nparam)
 		goto err;
 
 	filename = get_rparam(request, 0);
 	regexp = get_rparam(request, 1);
 	tmp = get_rparam(request, 2);
+	start_line_str = get_rparam(request, 3);
+	end_line_str = get_rparam(request, 4);
 
 	if (NULL == filename || '\0' == *filename)
 		goto err;
@@ -268,6 +298,19 @@ int	VFS_FILE_REGMATCH(AGENT_REQUEST *request, AGENT_RESULT *result)
 		*encoding = '\0';
 	else
 		strscpy(encoding, tmp);
+
+	if (NULL == start_line_str || '\0' == *start_line_str)
+		start_line = 0;
+	else if (FAIL == is_uint32(start_line_str, &start_line))
+		goto err;
+
+	if (NULL == end_line_str || '\0' == *end_line_str)
+		end_line = 0xffffffff;
+	else if (FAIL == is_uint32(end_line_str, &end_line))
+		goto err;
+
+	if (start_line > end_line)
+		goto err;
 
 	if (-1 == (f = zbx_open(filename, O_RDONLY)))
 		goto err;
@@ -282,10 +325,16 @@ int	VFS_FILE_REGMATCH(AGENT_REQUEST *request, AGENT_RESULT *result)
 		if (CONFIG_TIMEOUT < zbx_time() - ts)
 			goto err;
 
+		if (++current_line < start_line)
+			continue;
+
 		utf8 = convert_to_utf8(buf, nbytes, encoding);
 		if (NULL != zbx_regexp_match(utf8, regexp, &len))
 			res = 1;
 		zbx_free(utf8);
+
+		if (current_line >= end_line)
+			break;
 	}
 
 	if (-1 == nbytes)	/* error occurred */

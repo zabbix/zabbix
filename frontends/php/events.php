@@ -386,7 +386,7 @@ if ($source == EVENT_OBJECT_TRIGGER) {
 }
 // discovery events
 else {
-	$firstDHostEvent = API::Event()->get(array(
+	$firstEvent = API::Event()->get(array(
 		'output' => API_OUTPUT_EXTEND,
 		'source' => EVENT_SOURCE_DISCOVERY,
 		'object' => EVENT_OBJECT_DHOST,
@@ -394,7 +394,8 @@ else {
 		'sortorder' => ZBX_SORT_UP,
 		'limit' => 1
 	));
-	$firstDHostEvent = reset($firstDHostEvent);
+	$firstEvent = reset($firstEvent);
+
 	$firstDServiceEvent = API::Event()->get(array(
 		'output' => API_OUTPUT_EXTEND,
 		'source' => EVENT_SOURCE_DISCOVERY,
@@ -405,10 +406,7 @@ else {
 	));
 	$firstDServiceEvent = reset($firstDServiceEvent);
 
-	if ($firstDHostEvent['eventid'] < $firstDServiceEvent['eventid']) {
-		$firstEvent = $firstDHostEvent;
-	}
-	else {
+	if ($firstDServiceEvent && (!$firstEvent || $firstDServiceEvent['eventid'] < $firstEvent['eventid'])) {
 		$firstEvent = $firstDServiceEvent;
 	}
 }
@@ -422,7 +420,7 @@ $till = $from + $effectiveperiod;
 
 $csv_disabled = true;
 
-if (empty($firstEvent)) {
+if (!$firstEvent) {
 	$starttime = null;
 	$events = array();
 	$paging = getPagingLine($events);
