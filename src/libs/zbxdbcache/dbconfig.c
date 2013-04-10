@@ -315,8 +315,6 @@ typedef struct
 {
 	const char	*severity_name[TRIGGER_SEVERITY_COUNT];
 	zbx_uint64_t	discovery_groupid;
-	int		alert_history;
-	int		event_history;
 	int		refresh_unsupported;
 	unsigned char	snmptrap_logging;
 }
@@ -639,8 +637,6 @@ static void	DCupdate_proxy_queue(ZBX_DC_PROXY *proxy)
 		zbx_binary_heap_update_direct(&config->pqueue, &elem);
 }
 
-#define DEFAULT_ALERT_HISTORY		365
-#define DEFAULT_EVENT_HISTORY		365
 #define DEFAULT_REFRESH_UNSUPPORTED	600
 static char	*default_severity_names[] = {"Not classified", "Information", "Warning", "Average", "High", "Disaster"};
 
@@ -667,8 +663,6 @@ static int	DCsync_config(DB_RESULT result)
 		{
 			/* load default config data */
 
-			config->config->alert_history = DEFAULT_ALERT_HISTORY;
-			config->config->event_history = DEFAULT_EVENT_HISTORY;
 			config->config->refresh_unsupported = DEFAULT_REFRESH_UNSUPPORTED;
 			config->config->discovery_groupid = 0;
 
@@ -680,14 +674,12 @@ static int	DCsync_config(DB_RESULT result)
 	{
 		/* store the config data */
 
-		config->config->alert_history = atoi(row[0]);
-		config->config->event_history = atoi(row[1]);
-		config->config->refresh_unsupported = atoi(row[2]);
-		ZBX_STR2UINT64(config->config->discovery_groupid, row[3]);
-		config->config->snmptrap_logging = (unsigned char)atoi(row[4]);
+		config->config->refresh_unsupported = atoi(row[0]);
+		ZBX_STR2UINT64(config->config->discovery_groupid, row[1]);
+		config->config->snmptrap_logging = (unsigned char)atoi(row[2]);
 
 		for (i = 0; TRIGGER_SEVERITY_COUNT > i; i++)
-			DCstrpool_replace(found, &config->config->severity_name[i], row[5 + i]);
+			DCstrpool_replace(found, &config->config->severity_name[i], row[3 + i]);
 
 		if (NULL != (row = DBfetch(result)))	/* config table should have only one record */
 			zabbix_log(LOG_LEVEL_ERR, "table 'config' has multiple records");
@@ -2273,7 +2265,7 @@ void	DCsync_configuration()
 	sec = zbx_time();
 	conf_result = DBselect(
 			/* SQL statement must be synced with DCload_config() */
-			"select alert_history,event_history,refresh_unsupported,discovery_groupid,snmptrap_logging,"
+			"select refresh_unsupported,discovery_groupid,snmptrap_logging,"
 				"severity_name_0,severity_name_1,severity_name_2,"
 				"severity_name_3,severity_name_4,severity_name_5"
 			" from config"
@@ -2960,7 +2952,7 @@ void	DCload_config()
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	result = DBselect(
-			"select alert_history,event_history,refresh_unsupported,discovery_groupid,snmptrap_logging,"
+			"select refresh_unsupported,discovery_groupid,snmptrap_logging,"
 				"severity_name_0,severity_name_1,severity_name_2,"
 				"severity_name_3,severity_name_4,severity_name_5"
 			" from config"
@@ -3915,12 +3907,6 @@ void	*DCconfig_get_config_data(void *data, int type)
 
 	switch (type)
 	{
-		case CONFIG_ALERT_HISTORY:
-			*(int *)data = config->config->alert_history;
-			break;
-		case CONFIG_EVENT_HISTORY:
-			*(int *)data = config->config->event_history;
-			break;
 		case CONFIG_REFRESH_UNSUPPORTED:
 			*(int *)data = config->config->refresh_unsupported;
 			break;
