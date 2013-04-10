@@ -55,7 +55,7 @@ class testFormDiscoveryRule extends CWebTest {
 	// Returns layout data
 	public static function layout() {
 		return array(
-	/*		array(
+			array(
 				array('type' => 'Zabbix agent')
 			),
 			array(
@@ -117,7 +117,7 @@ class testFormDiscoveryRule extends CWebTest {
 			),
 			array(
 				array('type' => 'JMX agent')
-			)*/
+			)
 		);
 	}
 
@@ -491,13 +491,13 @@ class testFormDiscoveryRule extends CWebTest {
 
 	// Returns update data
 	public static function update() {
-	//	return DBdata("select * from items where hostid = 40001 and key_ LIKE 'discovery-rule-form%'");
+		return DBdata("select * from items where hostid = 40001 and key_ LIKE 'discovery-rule-form%'");
 	}
 
 	/**
 	 * @dataProvider update
 	 */
-/*	public function testFormDiscoveryRule_SimpleUpdate($data) {
+	public function testFormDiscoveryRule_SimpleUpdate($data) {
 		$name = $data['name'];
 
 		$sqlDiscovery = 'select itemid, hostid, name, key_, delay, history, trends, value_type, formula, templateid, flags, lifetime from items';
@@ -515,11 +515,11 @@ class testFormDiscoveryRule extends CWebTest {
 		$this->assertEquals($oldHashDiscovery, DBhash($sqlDiscovery));
 
 	}
-*/
+
 	// Returns create data
 	public static function create() {
 		return array(
-		/*	array(
+			array(
 				array(
 					'expected' => DISCOVERY_BAD,
 					'errors' => array(
@@ -1154,7 +1154,7 @@ class testFormDiscoveryRule extends CWebTest {
 					'dbCheck' => true
 				)
 			),
-	*/		array(
+			array(
 				array(
 					'expected' => DISCOVERY_GOOD,
 					'type' => 'IPMI agent',
@@ -1178,7 +1178,7 @@ class testFormDiscoveryRule extends CWebTest {
 					'formCheck' => true
 				)
 			),
-		/*	array(
+			array(
 				array(
 					'expected' => DISCOVERY_GOOD,
 					'type' => 'SSH agent',
@@ -1292,7 +1292,7 @@ class testFormDiscoveryRule extends CWebTest {
 							'Check the key, please. Default example was passed.'
 					)
 				)
-			)*/
+			)
 		);
 	}
 
