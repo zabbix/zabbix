@@ -820,7 +820,9 @@ function make_latest_issues(array $filter = array()) {
 	// get acknowledges
 	$eventIds = array();
 	foreach ($events as $event) {
-		$eventIds[$event['lastEvent']['eventid']] = $event['lastEvent']['eventid'];
+		if ($event['lastEvent']) {
+			$eventIds[$event['lastEvent']['eventid']] = $event['lastEvent']['eventid'];
+		}
 	}
 	if ($eventIds) {
 		$eventAcknowledges = API::Event()->get(array(
