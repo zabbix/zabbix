@@ -98,7 +98,7 @@ static void	httptest_remove_macros(zbx_httptest_t* httptest)
 		zbx_free(pair->first);
 		zbx_free(pair->second);
 	}
-	zbx_vector_ptr_pair_clear(&httptest->macros);
+	httptest->macros.values_num = 0;
 }
 
 static void	process_test_data(zbx_uint64_t httptestid, int lastfailedstep, double speed_download,
@@ -680,7 +680,7 @@ void	process_httptests(int httppoller_num, int now)
 		zbx_free(httptest.httptest.agent);
 		zbx_free(httptest.httptest.variables);
 
-		/* clear macro cache used in this http test */
+		/* clear the macro cache used in this http test */
 		httptest_remove_macros(&httptest);
 	}
 	/* destroy the macro cache used in http tests */

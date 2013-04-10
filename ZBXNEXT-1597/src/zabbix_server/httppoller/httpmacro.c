@@ -78,16 +78,19 @@ static int 	httpmacro_comp_func(const void *d1, const void *d2)
 static int	httpmacro_append_pair(zbx_httptest_t *httptest, const char *pkey, size_t nkey,
 			const char *pvalue, size_t nvalue, const char *data)
 {
-	char 		*key_str = NULL, *value_str = NULL;
+	const char	*__function_name = "httpmacro_append_pair";
+	char 		*value_str = NULL;
 	size_t		key_size = 0, key_offset = 0, value_size = 0, value_offset = 0;
-	zbx_ptr_pair_t	pair;
-	int		index;
+	zbx_ptr_pair_t	pair = {0};
+	int		index, ret = FAIL;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	if (0 == nkey || 0 == nvalue)
-		return FAIL;
+		goto out;
 
 	if ('{' != pkey[0] || '}' != pkey[nkey - 1])
-		return FAIL;
+		goto out;
 
 	/* get macro value */
 	zbx_strncpy_alloc(&value_str, &value_size, &value_offset, pvalue, nvalue);
@@ -102,14 +105,13 @@ static int	httpmacro_append_pair(zbx_httptest_t *httptest, const char *pkey, siz
 		zbx_free(value_str);
 
 		if (NULL == pair.second)
-			return FAIL;
+			goto out;
 	}
 	else
 		pair.second = value_str;
 
 	/* get macro name */
-	zbx_strncpy_alloc(&key_str, &key_size, &key_offset, pkey, nkey);
-	pair.first = key_str;
+	zbx_strncpy_alloc((char**)&pair.first, &key_size, &key_offset, pkey, nkey);
 
 	/* remove existing macro if necessary */
 	index = zbx_vector_ptr_pair_search(&httptest->macros, pair, httpmacro_comp_func);
@@ -123,7 +125,12 @@ static int	httpmacro_append_pair(zbx_httptest_t *httptest, const char *pkey, siz
 	}
 	zbx_vector_ptr_pair_append(&httptest->macros, pair);
 
-	return SUCCEED;
+	ret = SUCCEED;
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() ret:%d, macro:%s=%s, text:%s",
+			__function_name, ret, (char*)pair.first, (char*)pair.second, pkey);
+
+	return ret;
 }
 
 /******************************************************************************
@@ -248,7 +255,7 @@ int	http_process_variables(zbx_httptest_t *httptest, const char *variables, cons
 				nvalue = 0;
 
 			if (FAIL == httpmacro_append_pair(httptest, pkey, nkey, pvalue, nvalue, data))
-				goto finish;
+				goto out;
 		}
 
 		/* skip LF/CR symbols until the next nonempty line */
@@ -259,7 +266,7 @@ int	http_process_variables(zbx_httptest_t *httptest, const char *variables, cons
 	}
 
 	rc = SUCCEED;
-finish:
+out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(rc));
 
 	return rc;
