@@ -646,6 +646,7 @@ function convert_units($value, $units, $convert = ITEM_CONVERT_WITH_UNITS, $byte
 	$value = preg_replace('/^([\-0-9]+)(\.)([0-9]*)[0]+$/U','$1$2$3', round($valUnit['value'], ZBX_UNITS_ROUNDOFF_UPPER_LIMIT));
 	$value = rtrim($value, '.');
 
+	// fix negative zero
 	if (bccomp($value, 0) == 0) {
 		$value = 0;
 	}
