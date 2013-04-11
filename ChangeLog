@@ -7,6 +7,7 @@ A.F....... [ZBX-1357] updated American English, Brazilian Portuguese, Dutch, Fre
 ........S. [ZBXNEXT-1663] added support for notification macros {TRIGGER.NAME.ORIG}, {ITEM.NAME.ORIG}, {ITEM.KEY.ORIG} (dimir)
 
 Bug fixes:
+..F....... [ZBX-6468] fixed regex in trigger expression test (Oleg)
 A.F....... [ZBX-6389] performance improvement in Dashboard "System status" and "Last issues" widgets (Eduard)
 ..F....... [ZBX-6444] fixed vertical text alignments in Monitoring > Overview for IE8 and IE10 (Toms)
 A......... [ZBX-6408] fixed action conditions not being deleted and actions not being disabled when deleting a template (Pavels)
