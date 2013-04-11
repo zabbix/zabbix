@@ -187,6 +187,9 @@ class testFormWeb extends CWebTest {
 			$this->zbxTestDropdownSelect('agent', $data['agent']);
 			$agent = $this->getSelectedLabel('agent');
 		}
+		elseif (!isset($data['agent'])) {
+			$agent = $this->getSelectedLabel('agent');
+		}
 		else {
 			$this->zbxTestDropdownSelect('agent', 'Internet Explorer 10.0');
 			$this->zbxTestDropdownSelect('agent', $data['agent']);
@@ -234,6 +237,11 @@ class testFormWeb extends CWebTest {
 		$this->assertVisible('http_password');
 		$this->assertAttribute("//input[@id='http_password']/@maxlength", 64);
 		$this->assertAttribute("//input[@id='http_password']/@size", 50);
+		}
+		else {
+			$this->zbxTestTextNotPresent(array('User', 'Password');
+			$this->assertElementNotPresent('http_user');
+			$this->assertElementNotPresent('http_password');
 		}
 
 		$this->zbxTestTextPresent('Update interval (in sec)');
