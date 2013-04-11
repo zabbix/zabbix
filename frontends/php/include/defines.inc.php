@@ -50,6 +50,8 @@ define('ZBX_UNITS_ROUNDOFF_THRESHOLD',		0.01);
 define('ZBX_UNITS_ROUNDOFF_UPPER_LIMIT',	2);
 define('ZBX_UNITS_ROUNDOFF_LOWER_LIMIT',	6);
 
+define('ZBX_PRECISION_10',	10);
+
 define('ZBX_DEFAULT_INTERVAL', '1-7,00:00-24:00');
 
 // for partitioned DB installs!!
