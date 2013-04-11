@@ -1028,26 +1028,33 @@ static int	DBpatch_02010063()
 
 static int	DBpatch_02010064()
 {
-	const ZBX_FIELD field = {"hk_trends_mode", "1 ", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD field = {"hk_history_external", "90", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("config", &field);
 }
 
 static int	DBpatch_02010065()
 {
-	const ZBX_FIELD field = {"hk_trends_global", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD field = {"hk_trends_mode", "1 ", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("config", &field);
 }
 
 static int	DBpatch_02010066()
 {
-	const ZBX_FIELD field = {"hk_trends", "365", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD field = {"hk_trends_global", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("config", &field);
 }
 
 static int	DBpatch_02010067()
+{
+	const ZBX_FIELD field = {"hk_trends", "365", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("config", &field);
+}
+
+static int	DBpatch_02010068()
 {
 	if (ZBX_DB_OK <= DBexecute(
 			"update config"
@@ -1076,12 +1083,12 @@ static int	DBpatch_02010067()
 	return FAIL;
 }
 
-static int	DBpatch_02010068()
+static int	DBpatch_02010069()
 {
 	return DBdrop_field("config", "event_history");
 }
 
-static int	DBpatch_02010069()
+static int	DBpatch_02010070()
 {
 	return DBdrop_field("config", "alert_history");
 }
@@ -1190,13 +1197,14 @@ int	DBcheck_version()
 		{DBpatch_02010065, 2010065, 0, 1},
 		{DBpatch_02010066, 2010066, 0, 1},
 		{DBpatch_02010067, 2010067, 0, 1},
-		{DBpatch_02010068, 2010068, 0, 0},
+		{DBpatch_02010068, 2010068, 0, 1},
 		{DBpatch_02010069, 2010069, 0, 0},
+		{DBpatch_02010070, 2010070, 0, 0},
 		/* IMPORTANT! When adding a new mandatory DBPatch don't forget to update it for SQLite, too. */
 		{NULL}
 	};
 #else
-	required = 2010067;	/* <---- Update mandatory DBpatch for SQLite here. */
+	required = 2010068;	/* <---- Update mandatory DBpatch for SQLite here. */
 #endif
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
