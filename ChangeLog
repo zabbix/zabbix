@@ -1,6 +1,7 @@
 Changes for 2.1.0
 
 New features:
+........S. [ZBXNEXT-384] added support of new notification macros {ACTION.*} and {EVENT.RECOVERY.*}; {EVENT.*} macros now return information of the events which triggered an action (Sasha)
 ...G...PS. [ZBXNEXT-1105] added logging of used configuration file name for agentd, server and proxy daemons (Aleksej)
 A.F.....S. [ZBXNEXT-1575] implemented internal event and notification support (Pavels, Sasha)
 ..F....... [ZBXNEXT-1575] the error icon in the item, LLD rule and trigger lists will no longer be displayed for disabled objects (Pavels)
