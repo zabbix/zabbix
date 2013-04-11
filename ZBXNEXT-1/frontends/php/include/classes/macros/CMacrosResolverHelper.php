@@ -218,15 +218,17 @@ class CMacrosResolverHelper {
 	/**
 	 * Resolve positional macros and functional item macros, for example, {{HOST.HOST1}:key.func(param)}.
 	 *
-	 * @param array		$data				list of graphs
+	 * @param array		$data				list or hashmap of graphs
 	 * @param int		$data[]['graphid']	id of graph
 	 * @param string	$data[]['name']		name of graph
 	 *
-	 * @return array	inputed data with resolved names
+	 * @return array	inputted data with resolved names
 	 */
 	public static function resolveGraphNameByIds($data) {
 		self::init();
 		$graphIds = zbx_objectValues($data, 'graphid');
+		$originalKeys = array_keys($data);
+		$data = array_combine($graphIds, $data);
 
 		$items = DBfetchArray(DBselect(
 			'SELECT i.hostid,gi.graphid'.
@@ -242,6 +244,8 @@ class CMacrosResolverHelper {
 			}
 			$data[$item['graphid']]['items'][] = array('hostid' => $item['hostid']);
 		}
+
+		$data = array_combine($originalKeys, $data);
 
 		return self::$macrosResolver->resolve(array(
 			'config' => 'graphName',
