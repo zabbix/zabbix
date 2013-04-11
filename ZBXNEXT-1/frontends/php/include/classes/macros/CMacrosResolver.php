@@ -780,6 +780,7 @@ class CMacrosResolver {
 				'filter' => array(
 					'key_' => $matches['keys'][$i][0]
 				),
+				'webitems' => true,
 				'output' => array('lastclock', 'lastvalue', 'value_type', 'units', 'valuemapid')
 			));
 
