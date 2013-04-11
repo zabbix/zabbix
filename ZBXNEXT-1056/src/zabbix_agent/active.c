@@ -364,6 +364,7 @@ static int	refresh_active_checks(const char *host, unsigned short port)
 	char		*buf;
 	int		ret;
 	struct zbx_json	json;
+	static int	last_ret = SUCCEED;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "refresh_active_checks('%s',%u)", host, port);
 
@@ -406,11 +407,15 @@ static int	refresh_active_checks(const char *host, unsigned short port)
 		zbx_tcp_close(&s);
 	}
 
-	if (SUCCEED != ret)
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "cannot connect to [%s:%u] for active checks configuration, will retry after 60 seconds (%s)",
+	if (last_ret != ret)
+		if (SUCCEED != ret)
+			zabbix_log(LOG_LEVEL_WARNING, "active check configuration update from [%s:%u] started to fail (%s)",
 				host, port, zbx_tcp_strerror());
-	}
+		else
+			zabbix_log(LOG_LEVEL_WARNING, "active check configuration update from [%s:%u] is working again",
+				host, port);
+
+	last_ret = ret;
 
 	zbx_json_free(&json);
 
@@ -585,7 +590,7 @@ static int	send_buffer(const char *host, unsigned short port)
 		buffer.lastsent = now;
 		if (0 != buffer.first_error)
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "active item data uploading to [%s:%u] is working again", host, port);
+			zabbix_log(LOG_LEVEL_WARNING, "active check data upload to [%s:%u] is working again", host, port);
 			buffer.first_error = 0;
 		}
 	}
@@ -593,7 +598,7 @@ static int	send_buffer(const char *host, unsigned short port)
 	{
 		if (0 == buffer.first_error)
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "active item data uploading to [%s:%u] started to fail (%s%s)",
+			zabbix_log(LOG_LEVEL_WARNING, "active check data upload to [%s:%u] started to fail (%s%s)",
 					host, port, err_send_step, zbx_tcp_strerror());
 			buffer.first_error = now;
 		}
