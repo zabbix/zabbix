@@ -587,18 +587,18 @@ static void	add_message_alert(DB_ESCALATION *escalation, DB_EVENT *event, DB_EVE
 		ZBX_STR2UINT64(mediatypeid, row[0]);
 		severity = atoi(row[2]);
 
-		zabbix_log(LOG_LEVEL_DEBUG, "Trigger severity [%d] Media severity [%d] Period [%s]",
+		zabbix_log(LOG_LEVEL_DEBUG, "trigger severity:%d, media severity:%d, period:'%s'",
 				(int)c_event->trigger.priority, severity, row[3]);
 
 		if (((1 << c_event->trigger.priority) & severity) == 0)
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "Won't send message (severity)");
+			zabbix_log(LOG_LEVEL_DEBUG, "will not send message (severity)");
 			continue;
 		}
 
 		if (FAIL == check_time_period(row[3], (time_t)NULL))
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "Won't send message (period)");
+			zabbix_log(LOG_LEVEL_DEBUG, "will not send message (period)");
 			continue;
 		}
 
