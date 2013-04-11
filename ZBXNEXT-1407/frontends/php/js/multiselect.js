@@ -99,6 +99,33 @@ jQuery(function($) {
 		};
 
 		return this.each(function() {
+			/**
+			 * Clean multi select object values.
+			 */
+			$.fn.multiSelect.clean = function() {
+				for (var id in values.selected) {
+					removeSelected(id, obj, values, options);
+				}
+
+				cleanAvailable(obj, values);
+			};
+
+			/**
+			 * Get multi select selected data.
+			 */
+			$.fn.multiSelect.getData = function() {
+				var data = [];
+
+				for (var id in values.selected) {
+					data[data.length] = {
+						id: id,
+						name: $('input[value="' + id + '"]', obj).data('name')
+					};
+				}
+
+				return data;
+			};
+
 			var obj = $(this),
 				jqxhr = null,
 				values = {

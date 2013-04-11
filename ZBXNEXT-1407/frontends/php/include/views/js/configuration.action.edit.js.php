@@ -135,23 +135,6 @@
 		userscript: <?php echo ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT; ?>
 	};
 
-	function removeCondition(index) {
-		jQuery('#conditions_' + index).find('*').remove();
-		jQuery('#conditions_' + index).remove();
-
-		processTypeOfCalculation();
-	}
-
-	function removeOperation(index) {
-		jQuery('#operations_' + index).find('*').remove();
-		jQuery('#operations_' + index).remove();
-	}
-
-	function removeOperationCondition(index) {
-		jQuery('#opconditions_' + index).find('*').remove();
-		jQuery('#opconditions_' + index).remove();
-	}
-
 	function addPopupValues(list) {
 		var i,
 			value,
@@ -243,6 +226,23 @@
 				inlineContainers.last().addClass('ie8fix-inline').removeClass('ie8fix-inline');
 			}
 		}
+	}
+
+	function removeCondition(index) {
+		jQuery('#conditions_' + index).find('*').remove();
+		jQuery('#conditions_' + index).remove();
+
+		processTypeOfCalculation();
+	}
+
+	function removeOperation(index) {
+		jQuery('#operations_' + index).find('*').remove();
+		jQuery('#operations_' + index).remove();
+	}
+
+	function removeOperationCondition(index) {
+		jQuery('#opconditions_' + index).find('*').remove();
+		jQuery('#opconditions_' + index).remove();
 	}
 
 	function removeOpmsgUsrgrpRow(usrgrpid) {
@@ -350,7 +350,7 @@
 			}
 		}
 
-		addPopupValues({'object': object.object, 'values': [object]});
+		addPopupValues({object: object.object, values: [object]});
 		jQuery(objectForm).remove();
 	}
 
@@ -506,6 +506,26 @@
 		else {
 			jQuery('#conditionRow').css('display', 'none');
 		}
+	}
+
+	function addDiscoveryTemplates() {
+		var values = jQuery('#descoveryTemplates').multiSelect.getData();
+
+		for (var key in values) {
+			var data = values[key];
+
+			if (!empty(data.id)) {
+				addPopupValues({
+					object: 'dsc_templateid',
+					values: [{
+						templateid: data.id,
+						name: data.name
+					}]
+				});
+			}
+		}
+
+		jQuery('#dsc_templateid').multiSelect.clean();
 	}
 
 	jQuery(document).ready(function() {

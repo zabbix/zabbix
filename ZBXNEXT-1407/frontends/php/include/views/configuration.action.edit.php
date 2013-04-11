@@ -798,27 +798,35 @@ if (!empty($this->data['new_operation'])) {
 
 			$templateList = new CTable();
 			$templateList->setAttribute('id', 'opTemplateList');
+			$templateList->addRow(new CRow(
+				new CCol(array(
+					new CMultiSelect(array(
+						'name' => 'descoveryTemplates',
+						'objectName' => 'hostsAndTemplates',
+						'objectOptions' => array('templated_hosts' => 1)
+					)),
+					new CButton('add', _('Add'), 'return addDiscoveryTemplates();', 'link_menu')
+				), null, 2),
+				null,
+				'opTemplateListFooter'
+			));
 
-			$addUsrgrpBtn = new CButton('add', _('Add'),
-				'return PopUp("popup.php?srctbl=host_templates&srcfld1=templateid&srcfld2=name'.
-					'&dstfrm=action.edit&reference=dsc_templateid&templated_hosts=1&multiselect=1",450,450)',
-				'link_menu');
-			$templateList->addRow(new CRow(new CCol($addUsrgrpBtn, null, 2), null, 'opTemplateListFooter'));
-
-			// add participations
-			$templateids = isset($this->data['new_operation']['optemplate'])
+			// load templates
+			$templateIds = isset($this->data['new_operation']['optemplate'])
 				? zbx_objectValues($this->data['new_operation']['optemplate'], 'templateid')
 				: array();
 
-			$templates = API::Template()->get(array(
-				'templateids' => $templateids,
-				'output' => array('templateid', 'name')
-			));
-			order_result($templates, 'name');
+			if ($templateIds) {
+				$templates = API::Template()->get(array(
+					'templateids' => $templateIds,
+					'output' => array('templateid', 'name')
+				));
+				order_result($templates, 'name');
 
-			$jsInsert = '';
-			$jsInsert .= 'addPopupValues('.zbx_jsvalue(array('object' => 'dsc_templateid', 'values' => $templates)).');';
-			zbx_add_post_js($jsInsert);
+				$jsInsert = '';
+				$jsInsert .= 'addPopupValues('.zbx_jsvalue(array('object' => 'dsc_templateid', 'values' => $templates)).');';
+				zbx_add_post_js($jsInsert);
+			}
 
 			$caption = (OPERATION_TYPE_TEMPLATE_ADD == $this->data['new_operation']['operationtype'])
 				? _('Link with templates')
