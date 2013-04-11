@@ -55,6 +55,17 @@ A.F.I...S. [ZBXNEXT-1186] increased length to 2048 characters of expression fiel
 ........S. [ZBXNEXT-1663] added support for notification macros {TRIGGER.NAME.ORIG}, {ITEM.NAME.ORIG}, {ITEM.KEY.ORIG} (dimir)
 
 Bug fixes:
+..F....... [ZBX-3311] fixed duplicates in Y axis (Oleg)
+..F....... [ZBX-6287] added Milli and Micro support in graphs (Oleg)
+..F....... [ZBX-6263] fixed invisible negative points in graphs (Oleg)
+..F....... [ZBX-6271] removed positive intervals if graph is negative (Oleg)
+..F....... [ZBX-2579] fixed Y axis label rounding (Oleg)
+..F....... [ZBX-2579] fixed incorrect zero line definition (Oleg)
+..F....... [ZBX-2579] fixed intervals rewriting (Oleg)
+..F....... [ZBX-2579] fixed negative Y axis (Oleg)
+..F....... [ZBX-2579] fixed small value rounding to zero (Oleg)
+..F....... [ZBX-2579] fixed division by zero in graphs (Oleg)
+..F....... [ZBX-2579] fixed units types in Y axis (Oleg)
 ..F....... [ZBX-6445] fixed unnecessary trimming for IPMI sensor field for item prototypes and discovery rules (Toms)
 ....I..... [ZBX-6335] removed unused alerts.nextcheck field (Sasha)
 ..F....... [ZBX-6427] added message noting that maximum number of flexible intervals reached (Toms)
