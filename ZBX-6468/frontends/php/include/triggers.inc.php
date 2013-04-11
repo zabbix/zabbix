@@ -2330,7 +2330,7 @@ function evalExpressionData($expression, $rplcts, $oct = false) {
 	}
 
 	if ($oct) {
-		$evStr = preg_replace('/([0-9]+)\s*?(\=|\#|\!=|\<|\>)\s*?([0-9]+)/', '((float)ltrim("$1","0") $2 (float)ltrim("$3","0"))', $evStr);
+		$evStr = preg_replace('/([0-9]+) *(\=|\#|\!=|\<|\>) *([0-9]+)/', '((float)ltrim("$1","0") $2 (float)ltrim("$3","0"))', $evStr);
 	}
 
 	$switch = array('=' => '==', '#' => '!=', '&' => '&&', '|' => '||');
