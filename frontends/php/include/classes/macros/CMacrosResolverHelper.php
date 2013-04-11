@@ -227,8 +227,11 @@ class CMacrosResolverHelper {
 	public static function resolveGraphNameByIds($data) {
 		self::init();
 		$graphIds = zbx_objectValues($data, 'graphid');
-		$originalKeys = array_keys($data);
-		$data = array_combine($graphIds, $data);
+
+		$graphMap = array();
+		foreach ($data as $graph) {
+			$graphMap[$graph['graphid']] = array('graphid' => $graph['graphid'], 'name' => $graph['name']);
+		}
 
 		$items = DBfetchArray(DBselect(
 			'SELECT i.hostid,gi.graphid'.
@@ -239,18 +242,25 @@ class CMacrosResolverHelper {
 		));
 
 		foreach ($items as $item) {
-			if (!isset($data[$item['graphid']]['items'])) {
-				$data[$item['graphid']]['items'] = array();
+			if (!isset($graphMap[$item['graphid']]['items'])) {
+				$graphMap[$item['graphid']]['items'] = array();
 			}
-			$data[$item['graphid']]['items'][] = array('hostid' => $item['hostid']);
+			$graphMap[$item['graphid']]['items'][] = array('hostid' => $item['hostid']);
 		}
 
-		$data = array_combine($originalKeys, $data);
-
-		return self::$macrosResolver->resolve(array(
+		$graphMap = self::$macrosResolver->resolve(array(
 			'config' => 'graphName',
-			'data' => $data
+			'data' => $graphMap
 		));
+
+		$resolvedGraph = reset($graphMap);
+		foreach ($data as &$graph) {
+			$graph['name'] = $resolvedGraph['name'];
+			$resolvedGraph = next($graphMap);
+		}
+		unset($graph);
+
+		return $data;
 	}
 
 	/**

@@ -729,7 +729,7 @@ class CMacrosResolver {
 	 * @param array		$data[]['items']				list of graph items
 	 * @param array		$data[]['items'][n]['hostid']	graph n-th item corresponding host Id
 	 *
-	 * @return string	inputed data with resolved source field
+	 * @return string	inputted data with resolved source field
 	 */
 	private function resolveGraph($data) {
 		$source = $this->getSource();
@@ -748,7 +748,7 @@ class CMacrosResolver {
 	 * If macro can not be resolved it is replaced with UNRESOLVED_MACRO_STRING string i.e. "*UNKNOWN*"
 	 * Supports function "last", "min", "max" and "avg".
 	 * Supports seconds as parameters, except "last" function.
-	 * Supports postfixes s,m,h,d and w for paramter.
+	 * Supports postfixes s,m,h,d and w for parameter.
 	 *
 	 * @param string	$str				string in which macros should be resolved
 	 * @param array		$items				list of graph items
