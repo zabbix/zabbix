@@ -276,8 +276,11 @@ void	DBlld_hosts_validate(zbx_vector_ptr_t *hosts, char **error)
 			continue;
 
 		/* visible host name is valid utf8 sequence and has a valid length */
-		if (SUCCEED == zbx_is_utf8(host->name) && HOST_NAME_LEN >= zbx_strlen_utf8(host->name))
+		if (SUCCEED == zbx_is_utf8(host->name) && '\0' != *host->name &&
+				HOST_NAME_LEN >= zbx_strlen_utf8(host->name))
+		{
 			continue;
+		}
 
 		zbx_replace_invalid_utf8(host->name);
 		*error = zbx_strdcatf(*error, "Cannot %s host: invalid visible host name \"%s\".\n",
@@ -528,7 +531,7 @@ static void	DBlld_host_make(zbx_vector_ptr_t *hosts, const char *host_proto, con
 
 		buffer = zbx_strdup(buffer, host->host_proto);
 		substitute_discovery_macros(&buffer, jp_row, ZBX_MACRO_ANY, NULL, 0);
-		zbx_lrtrim(buffer, " ");
+		zbx_lrtrim(buffer, ZBX_WHITESPACE);
 
 		if (0 == strcmp(host->host, buffer))
 			break;
@@ -545,12 +548,10 @@ static void	DBlld_host_make(zbx_vector_ptr_t *hosts, const char *host_proto, con
 		host->host = zbx_strdup(NULL, host_proto);
 		host->host_orig = NULL;
 		substitute_discovery_macros(&host->host, jp_row, ZBX_MACRO_ANY, NULL, 0);
-		zbx_lrtrim(host->host, " ");
+		zbx_lrtrim(host->host, ZBX_WHITESPACE);
 		host->name = zbx_strdup(NULL, name_proto);
 		substitute_discovery_macros(&host->name, jp_row, ZBX_MACRO_ANY, NULL, 0);
 		zbx_lrtrim(host->name, ZBX_WHITESPACE);
-		if ('\0' == *host->name)
-			host->name = zbx_strdup(host->name, host->host);
 		host->name_orig = NULL;
 		zbx_vector_uint64_create(&host->new_groupids);
 		zbx_vector_uint64_create(&host->lnk_templateids);
@@ -568,7 +569,7 @@ static void	DBlld_host_make(zbx_vector_ptr_t *hosts, const char *host_proto, con
 			host->host_orig = host->host;
 			host->host = zbx_strdup(NULL, host_proto);
 			substitute_discovery_macros(&host->host, jp_row, ZBX_MACRO_ANY, NULL, 0);
-			zbx_lrtrim(host->host, " ");
+			zbx_lrtrim(host->host, ZBX_WHITESPACE);
 			host->flags |= ZBX_FLAG_LLD_HOST_UPDATE_HOST;
 		}
 
@@ -576,8 +577,6 @@ static void	DBlld_host_make(zbx_vector_ptr_t *hosts, const char *host_proto, con
 		buffer = zbx_strdup(buffer, name_proto);
 		substitute_discovery_macros(&buffer, jp_row, ZBX_MACRO_ANY, NULL, 0);
 		zbx_lrtrim(buffer, ZBX_WHITESPACE);
-		if ('\0' == *buffer)
-			buffer = zbx_strdup(buffer, host->host);
 		if (0 != strcmp(host->name, buffer))
 		{
 			host->name_orig = host->name;
