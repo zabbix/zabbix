@@ -325,15 +325,6 @@ class testFormWeb extends CWebTest {
 		$this->assertVisible('status');
 		$this->assertAttribute("//*[@id='status']/@checked", 'checked');
 
-		$this->zbxTestTextPresent('Steps');
-		$this->zbxTestTextPresent(array('Steps', 'Name', 'Timeout', 'URL', 'Required' ,'Status codes'));
-		$this->assertVisible('tab_stepTab');
-		$this->zbxTestClick('link=Steps');
-
-		$this->assertVisible('add_step');
-		$this->assertAttribute("//input[@id='add_step']/@value", 'Add');
-		$this->assertAttribute("//input[@id='add_step']/@type", 'button');
-
 		$this->assertVisible('save');
 		$this->assertAttribute("//input[@id='save']/@value", 'Save');
 		$this->assertAttribute("//input[@id='save']/@role", 'button');
@@ -341,6 +332,15 @@ class testFormWeb extends CWebTest {
 		$this->assertVisible('cancel');
 		$this->assertAttribute("//input[@id='cancel']/@value", 'Cancel');
 		$this->assertAttribute("//input[@id='cancel']/@role", 'button');
+
+		$this->zbxTestClick('link=Steps');
+		$this->zbxTestTextPresent('Steps');
+		$this->zbxTestTextPresent(array('Steps', 'Name', 'Timeout', 'URL', 'Required' ,'Status codes'));
+		$this->assertVisible('tab_stepTab');
+
+		$this->assertVisible('add_step');
+		$this->assertAttribute("//input[@id='add_step']/@value", 'Add');
+		$this->assertAttribute("//input[@id='add_step']/@type", 'button');
 	}
 
 	// Returns update data
