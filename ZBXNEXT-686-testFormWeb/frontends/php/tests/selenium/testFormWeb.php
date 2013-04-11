@@ -239,7 +239,7 @@ class testFormWeb extends CWebTest {
 		$this->assertAttribute("//input[@id='http_password']/@size", 50);
 		}
 		else {
-			$this->zbxTestTextNotPresent(array('User', 'Password');
+			$this->zbxTestTextNotPresent(array('User', 'Password'));
 			$this->assertElementNotPresent('http_user');
 			$this->assertElementNotPresent('http_password');
 		}
