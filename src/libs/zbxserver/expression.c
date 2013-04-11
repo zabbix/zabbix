@@ -1640,15 +1640,12 @@ fail:
  *                                                                            *
  * Parameters:                                                                *
  *                                                                            *
- * Return value: upon successful completion return SUCCEED                    *
- *               otherwise FAIL                                               *
- *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static int	get_escalation_history(DB_EVENT *event, DB_ESCALATION *escalation, char **replace_to)
+static void	get_escalation_history(DB_EVENT *event, DB_ESCALATION *escalation, char **replace_to)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -1745,8 +1742,6 @@ static int	get_escalation_history(DB_EVENT *event, DB_ESCALATION *escalation, ch
 		buf[--buf_offset] = '\0';
 
 	*replace_to = buf;
-
-	return SUCCEED;
 }
 
 /******************************************************************************
@@ -1757,15 +1752,12 @@ static int	get_escalation_history(DB_EVENT *event, DB_ESCALATION *escalation, ch
  *                                                                            *
  * Parameters:                                                                *
  *                                                                            *
- * Return value: upon successful completion return SUCCEED                    *
- *               otherwise FAIL                                               *
- *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static int	get_event_ack_history(DB_EVENT *event, char **replace_to)
+static void	get_event_ack_history(DB_EVENT *event, char **replace_to)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -1777,7 +1769,7 @@ static int	get_event_ack_history(DB_EVENT *event, char **replace_to)
 	if (0 == event->acknowledged)
 	{
 		*replace_to = zbx_strdup(*replace_to, "");
-		return SUCCEED;
+		return;
 	}
 
 	buf = zbx_malloc(buf, buf_alloc);
@@ -1810,8 +1802,6 @@ static int	get_event_ack_history(DB_EVENT *event, char **replace_to)
 	}
 
 	*replace_to = buf;
-
-	return SUCCEED;
 }
 
 /******************************************************************************
@@ -2362,15 +2352,12 @@ static int	get_host_inventory_by_itemid(const char *macro, zbx_uint64_t itemid, 
 
 /******************************************************************************
  *                                                                            *
- * Function: get_event_recovery_value                                         *
+ * Function: get_recovery_event_value                                         *
  *                                                                            *
  * Purpose: request recovery event value by macro                             *
  *                                                                            *
- * Return value: upon successful completion return SUCCEED                    *
- *               otherwise FAIL                                               *
- *                                                                            *
  ******************************************************************************/
-static int	get_event_recovery_value(const char *macro, DB_EVENT *r_event, char **replace_to)
+static void	get_recovery_event_value(const char *macro, DB_EVENT *r_event, char **replace_to)
 {
 	if (0 == strcmp(macro, MVAR_EVENT_RECOVERY_DATE))
 	{
@@ -2393,8 +2380,6 @@ static int	get_event_recovery_value(const char *macro, DB_EVENT *r_event, char *
 	{
 		*replace_to = zbx_dsprintf(*replace_to, "%d", r_event->value);
 	}
-
-	return SUCCEED;
 }
 
 /******************************************************************************
@@ -2403,14 +2388,9 @@ static int	get_event_recovery_value(const char *macro, DB_EVENT *r_event, char *
  *                                                                            *
  * Purpose: request event value by macro                                      *
  *                                                                            *
- * Return value: upon successful completion return SUCCEED                    *
- *               otherwise FAIL                                               *
- *                                                                            *
  ******************************************************************************/
-static int	get_event_value(const char *macro, DB_EVENT *event, char **replace_to)
+static void	get_event_value(const char *macro, DB_EVENT *event, char **replace_to)
 {
-	int	ret = SUCCEED;
-
 	if (0 == strcmp(macro, MVAR_EVENT_AGE))
 	{
 		*replace_to = zbx_strdup(*replace_to, zbx_age2str(time(NULL) - event->clock));
@@ -2442,7 +2422,7 @@ static int	get_event_value(const char *macro, DB_EVENT *event, char **replace_to
 		{
 			if (0 == strcmp(macro, MVAR_EVENT_ACK_HISTORY))
 			{
-				ret = get_event_ack_history(event, replace_to);
+				get_event_ack_history(event, replace_to);
 			}
 			else if (0 == strcmp(macro, MVAR_EVENT_ACK_STATUS))
 			{
@@ -2450,8 +2430,6 @@ static int	get_event_value(const char *macro, DB_EVENT *event, char **replace_to
 			}
 		}
 	}
-
-	return ret;
 }
 
 /******************************************************************************
@@ -2621,16 +2599,16 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, DB_EVENT *event, DB_EVENT *
 				}
 				else if (0 == strcmp(m, MVAR_ESC_HISTORY))
 				{
-					ret = get_escalation_history(c_event, escalation, &replace_to);
+					get_escalation_history(c_event, escalation, &replace_to);
 				}
 				else if (0 == strncmp(m, MVAR_EVENT_RECOVERY, sizeof(MVAR_EVENT_RECOVERY) - 1))
 				{
 					if (0 != (macro_type & MACRO_TYPE_MESSAGE_RECOVERY))
-						ret = get_event_recovery_value(m, r_event, &replace_to);
+						get_recovery_event_value(m, r_event, &replace_to);
 				}
 				else if (0 == strncmp(m, MVAR_EVENT, sizeof(MVAR_EVENT) - 1))
 				{
-					ret = get_event_value(m, event, &replace_to);
+					get_event_value(m, event, &replace_to);
 				}
 				else if (0 == strcmp(m, MVAR_HOST_CONN))
 				{
@@ -2858,16 +2836,16 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, DB_EVENT *event, DB_EVENT *
 				}
 				else if (0 == strcmp(m, MVAR_ESC_HISTORY))
 				{
-					ret = get_escalation_history(c_event, escalation, &replace_to);
+					get_escalation_history(c_event, escalation, &replace_to);
 				}
 				else if (0 == strncmp(m, MVAR_EVENT_RECOVERY, sizeof(MVAR_EVENT_RECOVERY) - 1))
 				{
 					if (0 != (macro_type & MACRO_TYPE_MESSAGE_RECOVERY))
-						ret = get_event_recovery_value(m, r_event, &replace_to);
+						get_recovery_event_value(m, r_event, &replace_to);
 				}
 				else if (0 == strncmp(m, MVAR_EVENT, sizeof(MVAR_EVENT) - 1))
 				{
-					ret = get_event_value(m, event, &replace_to);
+					get_event_value(m, event, &replace_to);
 				}
 				else if (0 == strcmp(m, MVAR_HOST_CONN))
 				{
@@ -3017,7 +2995,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, DB_EVENT *event, DB_EVENT *
 				}
 				else if (0 == strncmp(m, MVAR_EVENT, sizeof(MVAR_EVENT) - 1))
 				{
-					ret = get_event_value(m, event, &replace_to);
+					get_event_value(m, event, &replace_to);
 				}
 				else if (0 == strcmp(m, MVAR_DISCOVERY_DEVICE_IPADDRESS))
 				{
@@ -3124,7 +3102,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, DB_EVENT *event, DB_EVENT *
 				}
 				else if (0 == strncmp(m, MVAR_EVENT, sizeof(MVAR_EVENT) - 1))
 				{
-					ret = get_event_value(m, event, &replace_to);
+					get_event_value(m, event, &replace_to);
 				}
 				else if (0 == strcmp(m, MVAR_HOST_HOST))
 				{
@@ -3178,16 +3156,16 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, DB_EVENT *event, DB_EVENT *
 				}
 				else if (0 == strcmp(m, MVAR_ESC_HISTORY))
 				{
-					ret = get_escalation_history(c_event, escalation, &replace_to);
+					get_escalation_history(c_event, escalation, &replace_to);
 				}
 				else if (0 == strncmp(m, MVAR_EVENT_RECOVERY, sizeof(MVAR_EVENT_RECOVERY) - 1))
 				{
 					if (0 != (macro_type & MACRO_TYPE_MESSAGE_RECOVERY))
-						ret = get_event_recovery_value(m, r_event, &replace_to);
+						get_recovery_event_value(m, r_event, &replace_to);
 				}
 				else if (0 == strncmp(m, MVAR_EVENT, sizeof(MVAR_EVENT) - 1))
 				{
-					ret = get_event_value(m, event, &replace_to);
+					get_event_value(m, event, &replace_to);
 				}
 				else if (0 == strcmp(m, MVAR_HOST_CONN))
 				{
@@ -3274,16 +3252,16 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, DB_EVENT *event, DB_EVENT *
 				}
 				else if (0 == strcmp(m, MVAR_ESC_HISTORY))
 				{
-					ret = get_escalation_history(c_event, escalation, &replace_to);
+					get_escalation_history(c_event, escalation, &replace_to);
 				}
 				else if (0 == strncmp(m, MVAR_EVENT_RECOVERY, sizeof(MVAR_EVENT_RECOVERY) - 1))
 				{
 					if (0 != (macro_type & MACRO_TYPE_MESSAGE_RECOVERY))
-						ret = get_event_recovery_value(m, r_event, &replace_to);
+						get_recovery_event_value(m, r_event, &replace_to);
 				}
 				else if (0 == strncmp(m, MVAR_EVENT, sizeof(MVAR_EVENT) - 1))
 				{
-					ret = get_event_value(m, event, &replace_to);
+					get_event_value(m, event, &replace_to);
 				}
 				else if (0 == strcmp(m, MVAR_HOST_CONN))
 				{
