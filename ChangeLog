@@ -5,6 +5,7 @@ New features:
 A.F....... [ZBX-1357] added Lithuanian translation; thanks to Zabbix translators (Richlv)
 A.F....... [ZBX-1357] updated American English, Brazilian Portuguese, Dutch, French, German, Greek, Hungarian, Japanese, Latvian, Russian, Slovak, Spanish, Turkish and Ukrainian translations; thanks to Zabbix translators (Richlv)
 ........S. [ZBXNEXT-1663] added support for notification macros {TRIGGER.NAME.ORIG}, {ITEM.NAME.ORIG}, {ITEM.KEY.ORIG} (dimir)
+...G...... [ZBXNEXT-1056] added warning logging when active agent fails to connect server/proxy (wiper)
 
 Bug fixes:
 ..F....... [ZBX-6468] fixed regex in trigger expression test (Oleg)
