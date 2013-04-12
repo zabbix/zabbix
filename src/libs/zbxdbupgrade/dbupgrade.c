@@ -927,6 +927,42 @@ static int	DBpatch_02010049()
 {
 	return DBcreate_index("escalations", "escalations_1", "actionid,triggerid,itemid,escalationid", 1);
 }
+
+static int	DBpatch_02010050()
+{
+	char		*fields[] = {"ts_from", "ts_to", NULL};
+	DB_RESULT	result;
+	DB_ROW		row;
+	int		i;
+	time_t		ts;
+	struct tm	*tm;
+
+	for (i = 0; NULL != fields[i]; i++)
+	{
+		result = DBselect(
+				"select timeid,%s"
+				" from services_times"
+				" where type in (%d,%d)"
+					" and %s>%d",
+				fields[i], 0 /* SERVICE_TIME_TYPE_UPTIME */, 1 /* SERVICE_TIME_TYPE_DOWNTIME */,
+				fields[i], SEC_PER_WEEK);
+
+		while (NULL != (row = DBfetch(result)))
+		{
+			if (SEC_PER_WEEK < (ts = (time_t)atoi(row[1])))
+			{
+				tm = localtime(&ts);
+				ts = tm->tm_wday * SEC_PER_DAY + tm->tm_hour * SEC_PER_HOUR + tm->tm_min * SEC_PER_MIN;
+				DBexecute("update services_times set %s=%d where timeid=%s",
+						fields[i], (int)ts, row[0]);
+			}
+		}
+		DBfree_result(result);
+	}
+
+	return SUCCEED;
+}
+
 #endif	/* not HAVE_SQLITE3 */
 
 static void	DBget_version(int *mandatory, int *optional)
@@ -1014,11 +1050,12 @@ int	DBcheck_version()
 		{DBpatch_02010047, 2010047, 0, 1},
 		{DBpatch_02010048, 2010048, 0, 0},
 		{DBpatch_02010049, 2010049, 0, 0},
+		{DBpatch_02010050, 2010050, 0, 1},
 		/* IMPORTANT! When adding a new mandatory DBPatch don't forget to update it for SQLite, too. */
 		{NULL}
 	};
 #else
-	required = 2010047;	/* <---- Update mandatory DBpatch for SQLite here. */
+	required = 2010050;	/* <---- Update mandatory DBpatch for SQLite here. */
 #endif
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
