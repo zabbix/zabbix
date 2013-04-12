@@ -55,6 +55,7 @@ A.F.I...S. [ZBXNEXT-1186] increased length to 2048 characters of expression fiel
 ........S. [ZBXNEXT-1663] added support for notification macros {TRIGGER.NAME.ORIG}, {ITEM.NAME.ORIG}, {ITEM.KEY.ORIG} (dimir)
 
 Bug fixes:
+....I..... [ZBX-5532] updated 1.8 time format to 2.0 for "services_times" table (Sasha)
 ..F....... [ZBX-3311] fixed duplicates in Y axis (Oleg)
 ..F....... [ZBX-6287] added Milli and Micro support in graphs (Oleg)
 ..F....... [ZBX-6263] fixed invisible negative points in graphs (Oleg)
