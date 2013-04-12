@@ -1828,24 +1828,56 @@ static void	DBdelete_applications(zbx_uint64_t *applicationids, int applicationi
  *                                                                            *
  * Purpose: deletes host prototypes from database                             *
  *                                                                            *
- * Parameters: host_prototypesids - [IN] list of host prototypes              *
+ * Parameters: host_prototypeids - [IN] list of host prototypes               *
  *                                                                            *
  ******************************************************************************/
-static void	DBdelete_host_prototypes(zbx_vector_uint64_t *host_prototypesids)
+static void	DBdelete_host_prototypes(zbx_vector_uint64_t *host_prototypeids)
 {
-	char	*sql = NULL;
-	size_t	sql_alloc = 256, sql_offset = 0;
+	DB_RESULT		result;
+	DB_ROW			row;
+	char			*sql = NULL;
+	size_t			sql_alloc = 256, sql_offset = 0;
+	zbx_uint64_t		hostid;
+	zbx_vector_uint64_t	hostids;
 
-	if (0 == host_prototypesids->values_num)
+	if (0 == host_prototypeids->values_num)
 		return;
 
 	sql = zbx_malloc(sql, sql_alloc);
 
+	/* delete discovered hosts */
+
+	zbx_vector_uint64_create(&hostids);
+
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select hostid from host_discovery where");
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "parent_hostid",
+			host_prototypeids->values, host_prototypeids->values_num);
+
+	result = DBselect("%s", sql);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		ZBX_STR2UINT64(hostid, row[0]);
+		zbx_vector_uint64_append(&hostids, hostid);
+	}
+	DBfree_result(result);
+
+	if (0 != hostids.values_num)
+	{
+		zbx_vector_uint64_sort(&hostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+		DBdelete_hosts(&hostids);
+	}
+
+	/* delete host prototypes */
+
+	sql_offset = 0;
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from hosts where");
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid",
-			host_prototypesids->values, host_prototypesids->values_num);
+			host_prototypeids->values, host_prototypeids->values_num);
 
 	DBexecute("%s", sql);
+
+	zbx_vector_uint64_destroy(&hostids);
 
 	zbx_free(sql);
 }
@@ -2024,7 +2056,7 @@ static void	DBdelete_template_triggers(zbx_uint64_t hostid, zbx_vector_uint64_t 
  *                                                                            *
  * Function: DBdelete_template_host_prototypes                                *
  *                                                                            *
- * Purpose: delete template items from host                                   *
+ * Purpose: delete template host prototypes from host                         *
  *                                                                            *
  * Parameters: hostid      - [IN] host identificator from database            *
  *             templateids - [IN] array of template IDs                       *
@@ -2038,22 +2070,22 @@ static void	DBdelete_template_host_prototypes(zbx_uint64_t hostid, zbx_vector_ui
 	size_t			sql_alloc = 256, sql_offset = 0;
 	DB_RESULT		result;
 	DB_ROW			row;
-	zbx_uint64_t		host_prorotypeid;
-	zbx_vector_uint64_t	host_prorotypeids;
+	zbx_uint64_t		host_prototypeid;
+	zbx_vector_uint64_t	host_prototypeids;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	zbx_vector_uint64_create(&host_prorotypeids);
+	zbx_vector_uint64_create(&host_prototypeids);
 
 	sql = zbx_malloc(sql, sql_alloc);
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-			"select hh.hostid"
-			" from items hi,items ti,host_discovery thd,hosts th,hosts hh"
-			" where hi.templateid=ti.itemid"
-				" and ti.itemid=thd.parent_itemid"
-				" and thd.hostid=th.hostid"
-				" and th.hostid=hh.templateid"
+			"select hp.hostid"
+			" from items hi,host_discovery hhd,hosts hp,host_discovery thd,items ti"
+			" where hi.itemid=hhd.parent_itemid"
+				" and hhd.hostid=hp.hostid"
+				" and hp.templateid=thd.hostid"
+				" and thd.parent_itemid=ti.itemid"
 				" and hi.hostid=" ZBX_FS_UI64
 				" and",
 			hostid);
@@ -2063,17 +2095,17 @@ static void	DBdelete_template_host_prototypes(zbx_uint64_t hostid, zbx_vector_ui
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		ZBX_STR2UINT64(host_prorotypeid, row[0]);
-		zbx_vector_uint64_append(&host_prorotypeids, host_prorotypeid);
+		ZBX_STR2UINT64(host_prototypeid, row[0]);
+		zbx_vector_uint64_append(&host_prototypeids, host_prototypeid);
 	}
 	DBfree_result(result);
 
-	zbx_vector_uint64_sort(&host_prorotypeids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-	DBdelete_host_prototypes(&host_prorotypeids);
+	zbx_vector_uint64_sort(&host_prototypeids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	DBdelete_host_prototypes(&host_prototypeids);
 
 	zbx_free(sql);
 
-	zbx_vector_uint64_destroy(&host_prorotypeids);
+	zbx_vector_uint64_destroy(&host_prototypeids);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
@@ -2783,6 +2815,31 @@ static void	DBhost_prototypes_clean(zbx_vector_ptr_t *host_prototypes)
 
 /******************************************************************************
  *                                                                            *
+ * Function: DBis_regular_host                                                *
+ *                                                                            *
+ * Comments: auxiliary function for DBcopy_template_host_prototypes()         *
+ *                                                                            *
+ ******************************************************************************/
+static int	DBis_regular_host(zbx_uint64_t hostid)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+	int		ret = FAIL;
+
+	result = DBselect("select flags from hosts where hostid=" ZBX_FS_UI64, hostid);
+
+	if (NULL != (row = DBfetch(result)))
+	{
+		if (0 == atoi(row[0]))
+			ret = SUCCEED;
+	}
+	DBfree_result(result);
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: DBhost_prototypes_make                                           *
  *                                                                            *
  * Comments: auxiliary function for DBcopy_template_host_prototypes()         *
@@ -3199,6 +3256,10 @@ static void	DBhost_prototypes_save(zbx_vector_ptr_t *host_prototypes, zbx_vector
 static void	DBcopy_template_host_prototypes(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids)
 {
 	zbx_vector_ptr_t	host_prototypes;
+
+	/* only regular hosts can have host prototypes */
+	if (SUCCEED != DBis_regular_host(hostid))
+		return;
 
 	zbx_vector_ptr_create(&host_prototypes);
 
@@ -4868,10 +4929,6 @@ static void	DBcopy_template_httptests(zbx_uint64_t hostid, zbx_vector_uint64_t *
  *                                                                            *
  * Return value: upon successful completion return SUCCEED                    *
  *                                                                            *
- * Author: Eugene Grigorjev                                                   *
- *                                                                            *
- * Comments: !!! Don't forget to sync the code with PHP !!!                   *
- *                                                                            *
  ******************************************************************************/
 int	DBcopy_template_elements(zbx_uint64_t hostid, zbx_vector_uint64_t *lnk_templateids)
 {
@@ -4944,16 +5001,16 @@ clean:
 
 /******************************************************************************
  *                                                                            *
- * Function: DBdelete_host                                                    *
+ * Function: DBdelete_hosts                                                   *
  *                                                                            *
- * Purpose: delete host from database with all elements                       *
+ * Purpose: delete hosts from database with all elements                      *
  *                                                                            *
  * Parameters: hostids - [IN] host identificators from database               *
  *                                                                            *
  ******************************************************************************/
 void	DBdelete_hosts(zbx_vector_uint64_t *hostids)
 {
-	const char		*__function_name = "DBdelete_host";
+	const char		*__function_name = "DBdelete_hosts";
 
 	DB_RESULT		result;
 	DB_ROW			row;
