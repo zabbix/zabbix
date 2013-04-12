@@ -272,7 +272,7 @@ div.footer .formrow .main:hover, div.ui-dialog-buttonpane div.ui-dialog-buttonse
 }
 
 .host-edit #groups, .hostprototype-edit #groups { width: 280px; }
-.host-edit #templateTab .formlist .formrow { overflow: auto; }
+.host-edit #templateTab .formlist .formrow, .hostprototype-edit #templateTab .formlist .formrow { overflow: auto; }
 
 .border_dotted { border: 1px dotted #6C80B9; }
 .footer { padding-left: 1.6em; }
