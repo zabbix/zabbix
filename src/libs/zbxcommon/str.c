@@ -2625,6 +2625,19 @@ const char	*zbx_escalation_status_string(unsigned char status)
 	}
 }
 
+const char	*zbx_trigger_value_string(unsigned char value)
+{
+	switch (value)
+	{
+		case TRIGGER_VALUE_PROBLEM:
+			return "PROBLEM";
+		case TRIGGER_VALUE_OK:
+			return "OK";
+		default:
+			return "unknown";
+	}
+}
+
 const char	*zbx_trigger_state_string(unsigned char state)
 {
 	switch (state)
@@ -2649,6 +2662,26 @@ const char	*zbx_item_state_string(unsigned char state)
 		default:
 			return "unknown";
 	}
+}
+
+const char	*zbx_event_value_string(unsigned char source, unsigned char object, unsigned char value)
+{
+	if (EVENT_SOURCE_TRIGGERS == source)
+		return zbx_trigger_value_string(value);
+
+	if (EVENT_SOURCE_INTERNAL == source)
+	{
+		switch (object)
+		{
+			case EVENT_OBJECT_TRIGGER:
+				return zbx_trigger_state_string(value);
+			case EVENT_OBJECT_ITEM:
+			case EVENT_OBJECT_LLDRULE:
+				return zbx_item_state_string(value);
+		}
+	}
+
+	return "unknown";
 }
 
 #ifdef _WINDOWS
