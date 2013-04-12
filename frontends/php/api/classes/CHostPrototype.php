@@ -458,13 +458,15 @@ class CHostPrototype extends CHostBase {
 		));
 
 		// fetch all child hosts to inherit to
+		// do not inherit host prototypes on discovered hosts
 		$chdHosts = API::Host()->get(array(
 			'output' => array('hostid', 'host', 'status'),
 			'selectParentTemplates' => array('templateid'),
 			'templateids' => zbx_objectValues($discoveryRules, 'hostid'),
 			'hostids' => $hostIds,
 			'nopermissions' => true,
-			'templated_hosts' => true
+			'templated_hosts' => true,
+			'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL)
 		));
 		if (empty($chdHosts)) {
 			return array();
