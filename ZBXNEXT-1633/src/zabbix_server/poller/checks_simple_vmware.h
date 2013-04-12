@@ -21,7 +21,7 @@
 #define ZABBIX_CHECKS_SIMPLE_VMWARE_H
 
 #include "common.h"
-#ifdef HAVE_LIBXML2
+#if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
 #include "sysinfo.h"
 
 int	check_vmware_vmlist(AGENT_REQUEST *request, AGENT_RESULT *result);

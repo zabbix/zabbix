@@ -55,7 +55,7 @@ static char	*vmkeys[] =
 	NULL
 };
 
-#ifdef HAVE_LIBXML2
+#if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
 static vmfunc_t	vmfuncs[] =
 {
 	check_vmware_hostcpuusage,
@@ -93,7 +93,7 @@ static vmfunc_t	vmfuncs[] =
  *                                                                            *
  * Paramaters: key    - [IN] an item key (without parameters)                 *
  *             vmfunc - [OUT] a handler of the item key; can be NULL if       *
- *                            libxml2 is not compiled in                      *
+ *                            libxml2 or libcurl is not compiled in           *
  *                                                                            *
  * Return value: SUCCEED if key is a valid VMware key, FAIL - otherwise       *
  *                                                                            *
@@ -109,7 +109,7 @@ static int	get_vmware_function(const char *key, vmfunc_t *vmfunc)
 	{
 		if (0 == strcmp(key + sizeof(ZBX_VIRT_VMWARE_PREFIX) - 1, vmkeys[i]))
 		{
-#ifdef HAVE_LIBXML2
+#if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
 			*vmfunc = vmfuncs[i];
 #else
 			*vmfunc = NULL;
