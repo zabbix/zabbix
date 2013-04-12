@@ -259,12 +259,11 @@ switch ($data['method']) {
 				}
 				break;
 
-			case 'hostsAndTemplates':
+			case 'hosts':
 				$hosts = API::Host()->get(array(
 					'templated_hosts' => isset($data['templated_hosts']) ? $data['templated_hosts'] : null,
-					'writeonly' => isset($data['writeonly']) ? $data['writeonly'] : null,
-					'real_hosts' => isset($data['real_hosts']) ? $data['real_hosts'] : null,
-					'output' => array('hostid', 'name'),
+					'editable' => isset($data['editable']) ? $data['editable'] : null,
+					'output' => array('templateid', 'name'),
 					'startSearch' => true,
 					'search' => isset($data['search']) ? array('name' => $data['search']) : null,
 					'limit' => isset($data['limit']) ? $data['limit'] : null
@@ -275,6 +274,54 @@ switch ($data['method']) {
 						'id' => $host['hostid'],
 						'prefix' => '',
 						'name' => $host['name']
+					);
+				}
+				break;
+
+			case 'hostsAndTemplates':
+				$options = array(
+					'editable' => isset($data['editable']) ? $data['editable'] : null,
+					'output' => array('templateid', 'name'),
+					'startSearch' => true,
+					'search' => isset($data['search']) ? array('name' => $data['search']) : null,
+					'limit' => isset($data['limit']) ? $data['limit'] : null
+				);
+
+				// get templates
+				$templates = API::Template()->get($options);
+				foreach ($templates as $tnum => $template) {
+					$templates[$tnum]['hostid'] = $template['templateid'];
+				}
+
+				// get hosts
+				$options['templated_hosts'] = isset($data['templated_hosts']) ? $data['templated_hosts'] : null;
+				$hosts = API::Host()->get($options);
+
+				$hosts = array_merge($hosts, $templates);
+
+				foreach ($hosts as $host) {
+					$result[] = array(
+						'id' => $host['hostid'],
+						'prefix' => '',
+						'name' => $host['name']
+					);
+				}
+				break;
+
+			case 'hostTemplates':
+				$templates = API::Template()->get(array(
+					'editable' => isset($data['editable']) ? $data['editable'] : null,
+					'output' => array('templateid', 'name'),
+					'startSearch' => true,
+					'search' => isset($data['search']) ? array('name' => $data['search']) : null,
+					'limit' => isset($data['limit']) ? $data['limit'] : null
+				));
+
+				foreach ($templates as $template) {
+					$result[] = array(
+						'id' => $template['templateid'],
+						'prefix' => '',
+						'name' => $template['name']
 					);
 				}
 				break;

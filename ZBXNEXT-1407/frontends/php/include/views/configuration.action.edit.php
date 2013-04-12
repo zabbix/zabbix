@@ -144,10 +144,9 @@ switch ($this->data['new_condition']['conditiontype']) {
 		$rowCondition[] = new CDiv(new CMultiSelect(array(
 			'name' => 'new_condition[value]',
 			'simple' => true,
-			'objectName' => 'hostsAndTemplates',
+			'objectName' => 'hostTemplates',
 			'objectOptions' => array(
-				'templated_hosts' => true,
-				'writeonly' => true
+				'editable' => true
 			)
 		)), 'floatright');
 		break;
@@ -158,8 +157,7 @@ switch ($this->data['new_condition']['conditiontype']) {
 			'simple' => true,
 			'objectName' => 'hostsAndTemplates',
 			'objectOptions' => array(
-				'real_hosts' => true,
-				'writeonly' => true
+				'editable' => true
 			)
 		)), 'floatright');
 		break;

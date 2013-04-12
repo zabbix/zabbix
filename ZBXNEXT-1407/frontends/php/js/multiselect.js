@@ -119,7 +119,8 @@ jQuery(function($) {
 				for (var id in values.selected) {
 					data[data.length] = {
 						id: id,
-						name: $('input[value="' + id + '"]', obj).data('name')
+						name: $('input[value="' + id + '"]', obj).data('name'),
+						prefix: $('input[value="' + id + '"]', obj).data('prefix')
 					};
 				}
 
@@ -428,7 +429,8 @@ jQuery(function($) {
 				type: 'hidden',
 				name: options.name,
 				value: item.id,
-				'data-name': item.name
+				'data-name': item.name,
+				'data-prefix': item.prefix
 			}));
 
 			// add list item

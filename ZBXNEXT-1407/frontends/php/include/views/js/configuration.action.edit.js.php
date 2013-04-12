@@ -313,6 +313,7 @@
 
 			if (empty(object.name)) {
 				alert(<?php echo CJs::encodeJson(_('You did not specify host group for operation.')); ?>);
+
 				return true;
 			}
 
@@ -330,6 +331,7 @@
 
 			if (object.target != 'current' && empty(object.name)) {
 				alert(<?php echo CJs::encodeJson(_('You did not specify host for operation.')); ?>);
+
 				return true;
 			}
 
