@@ -575,10 +575,7 @@ out:
 
 int	check_vmware_vmcpunum(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	const char		*__function_name = "check_vmware_vmcpunum";
-	char			*url, *username, *userpwd, *uuid;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s'", __function_name, request->key);
+	char	*url, *username, *userpwd, *uuid;
 
 	if (4 < request->nparam)
 		return SYSINFO_RET_FAIL;
@@ -593,10 +590,7 @@ int	check_vmware_vmcpunum(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 int	check_vmware_vmmemsize(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	const char		*__function_name = "check_vmware_vmmemsize";
-	char			*url, *username, *userpwd, *uuid;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s'", __function_name, request->key);
+	char	*url, *username, *userpwd, *uuid;
 
 	if (4 < request->nparam)
 		return SYSINFO_RET_FAIL;
@@ -611,10 +605,7 @@ int	check_vmware_vmmemsize(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 int	check_vmware_vmuptime(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	const char		*__function_name = "check_vmware_vmuptime";
-	char			*url, *username, *userpwd, *uuid;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s'", __function_name, request->key);
+	char	*url, *username, *userpwd, *uuid;
 
 	if (4 < request->nparam)
 		return SYSINFO_RET_FAIL;
@@ -629,10 +620,7 @@ int	check_vmware_vmuptime(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 int	check_vmware_vmmemsizeballooned(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	const char		*__function_name = "check_vmware_vmmemsizeballooned";
-	char			*url, *username, *userpwd, *uuid;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s'", __function_name, request->key);
+	char	*url, *username, *userpwd, *uuid;
 
 	if (4 < request->nparam)
 		return SYSINFO_RET_FAIL;
@@ -647,10 +635,7 @@ int	check_vmware_vmmemsizeballooned(AGENT_REQUEST *request, AGENT_RESULT *result
 
 int	check_vmware_vmmemsizecompressed(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	const char		*__function_name = "check_vmware_vmmemsizecompressed";
-	char			*url, *username, *userpwd, *uuid;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s'", __function_name, request->key);
+	char	*url, *username, *userpwd, *uuid;
 
 	if (4 < request->nparam)
 		return SYSINFO_RET_FAIL;
@@ -665,10 +650,7 @@ int	check_vmware_vmmemsizecompressed(AGENT_REQUEST *request, AGENT_RESULT *resul
 
 int	check_vmware_vmmemsizeswapped(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	const char		*__function_name = "check_vmware_vmmemsizeswapped";
-	char			*url, *username, *userpwd, *uuid;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s'", __function_name, request->key);
+	char	*url, *username, *userpwd, *uuid;
 
 	if (4 < request->nparam)
 		return SYSINFO_RET_FAIL;
@@ -683,10 +665,7 @@ int	check_vmware_vmmemsizeswapped(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 int	check_vmware_vmstoragecommitted(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	const char		*__function_name = "check_vmware_vmstoragecommitted";
-	char			*url, *username, *userpwd, *uuid;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s'", __function_name, request->key);
+	char	*url, *username, *userpwd, *uuid;
 
 	if (4 < request->nparam)
 		return SYSINFO_RET_FAIL;
@@ -701,10 +680,7 @@ int	check_vmware_vmstoragecommitted(AGENT_REQUEST *request, AGENT_RESULT *result
 
 int	check_vmware_vmstorageuncommitted(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	const char		*__function_name = "check_vmware_vmstorageuncommitted";
-	char			*url, *username, *userpwd, *uuid;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s'", __function_name, request->key);
+	char	*url, *username, *userpwd, *uuid;
 
 	if (4 < request->nparam)
 		return SYSINFO_RET_FAIL;
@@ -719,10 +695,7 @@ int	check_vmware_vmstorageuncommitted(AGENT_REQUEST *request, AGENT_RESULT *resu
 
 int	check_vmware_vmstorageunshared(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	const char		*__function_name = "check_vmware_vmstorageunshared";
-	char			*url, *username, *userpwd, *uuid;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s'", __function_name, request->key);
+	char	*url, *username, *userpwd, *uuid;
 
 	if (4 < request->nparam)
 		return SYSINFO_RET_FAIL;
@@ -737,10 +710,7 @@ int	check_vmware_vmstorageunshared(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 int	check_vmware_vmpowerstate(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	const char		*__function_name = "check_vmware_vmpowerstate";
-	char			*url, *username, *userpwd, *uuid;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s'", __function_name, request->key);
+	char	*url, *username, *userpwd, *uuid;
 
 	if (4 < request->nparam)
 		return SYSINFO_RET_FAIL;
@@ -755,10 +725,7 @@ int	check_vmware_vmpowerstate(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 int	check_vmware_vmcpuusage(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	const char		*__function_name = "check_vmware_vmcpuusage";
-	char			*url, *username, *userpwd, *uuid;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s'", __function_name, request->key);
+	char	*url, *username, *userpwd, *uuid;
 
 	if (4 < request->nparam)
 		return SYSINFO_RET_FAIL;
@@ -773,10 +740,7 @@ int	check_vmware_vmcpuusage(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 int	check_vmware_hostuptime(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	const char		*__function_name = "check_vmware_hostuptime";
-	char			*url, *username, *userpwd;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s'", __function_name, request->key);
+	char	*url, *username, *userpwd;
 
 	if (3 < request->nparam)
 		return SYSINFO_RET_FAIL;
@@ -790,10 +754,7 @@ int	check_vmware_hostuptime(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 int	check_vmware_hostmemoryused(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	const char		*__function_name = "check_vmware_hostuptime";
-	char			*url, *username, *userpwd;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s'", __function_name, request->key);
+	char	*url, *username, *userpwd;
 
 	if (3 < request->nparam)
 		return SYSINFO_RET_FAIL;
@@ -807,10 +768,7 @@ int	check_vmware_hostmemoryused(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 int	check_vmware_hostcpuusage(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	const char		*__function_name = "check_vmware_hostuptime";
-	char			*url, *username, *userpwd;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s'", __function_name, request->key);
+	char	*url, *username, *userpwd;
 
 	if (3 < request->nparam)
 		return SYSINFO_RET_FAIL;
@@ -824,10 +782,7 @@ int	check_vmware_hostcpuusage(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 int	check_vmware_hostfullname(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	const char		*__function_name = "check_vmware_hostfullname";
-	char			*url, *username, *userpwd;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s'", __function_name, request->key);
+	char	*url, *username, *userpwd;
 
 	if (3 < request->nparam)
 		return SYSINFO_RET_FAIL;
@@ -841,10 +796,7 @@ int	check_vmware_hostfullname(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 int	check_vmware_hostversion(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	const char		*__function_name = "check_vmware_hostversion";
-	char			*url, *username, *userpwd;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s'", __function_name, request->key);
+	char	*url, *username, *userpwd;
 
 	if (3 < request->nparam)
 		return SYSINFO_RET_FAIL;
@@ -858,10 +810,7 @@ int	check_vmware_hostversion(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 int	check_vmware_hosthwvendor(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	const char		*__function_name = "check_vmware_hosthwvendor";
-	char			*url, *username, *userpwd;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s'", __function_name, request->key);
+	char	*url, *username, *userpwd;
 
 	if (3 < request->nparam)
 		return SYSINFO_RET_FAIL;
@@ -875,10 +824,7 @@ int	check_vmware_hosthwvendor(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 int	check_vmware_hosthwmodel(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	const char		*__function_name = "check_vmware_hosthwmodel";
-	char			*url, *username, *userpwd;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s'", __function_name, request->key);
+	char	*url, *username, *userpwd;
 
 	if (3 < request->nparam)
 		return SYSINFO_RET_FAIL;
@@ -892,10 +838,7 @@ int	check_vmware_hosthwmodel(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 int	check_vmware_hosthwuuid(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	const char		*__function_name = "check_vmware_hosthwuuid";
-	char			*url, *username, *userpwd;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s'", __function_name, request->key);
+	char	*url, *username, *userpwd;
 
 	if (3 < request->nparam)
 		return SYSINFO_RET_FAIL;
@@ -909,10 +852,7 @@ int	check_vmware_hosthwuuid(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 int	check_vmware_hosthwmemory(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	const char		*__function_name = "check_vmware_hosthwmemory";
-	char			*url, *username, *userpwd;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s'", __function_name, request->key);
+	char	*url, *username, *userpwd;
 
 	if (3 < request->nparam)
 		return SYSINFO_RET_FAIL;
@@ -926,10 +866,7 @@ int	check_vmware_hosthwmemory(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 int	check_vmware_hosthwcpumodel(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	const char		*__function_name = "check_vmware_hosthwcpumodel";
-	char			*url, *username, *userpwd;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s'", __function_name, request->key);
+	char	*url, *username, *userpwd;
 
 	if (3 < request->nparam)
 		return SYSINFO_RET_FAIL;
@@ -943,10 +880,7 @@ int	check_vmware_hosthwcpumodel(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 int	check_vmware_hosthwcpufreq(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	const char		*__function_name = "check_vmware_hosthwcpufreq";
-	char			*url, *username, *userpwd;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s'", __function_name, request->key);
+	char	*url, *username, *userpwd;
 
 	if (3 < request->nparam)
 		return SYSINFO_RET_FAIL;
@@ -960,10 +894,7 @@ int	check_vmware_hosthwcpufreq(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 int	check_vmware_hosthwcpucores(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	const char		*__function_name = "check_vmware_hosthwcpucores";
-	char			*url, *username, *userpwd;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s'", __function_name, request->key);
+	char	*url, *username, *userpwd;
 
 	if (3 < request->nparam)
 		return SYSINFO_RET_FAIL;
@@ -977,10 +908,7 @@ int	check_vmware_hosthwcpucores(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 int	check_vmware_hosthwcputhreads(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	const char		*__function_name = "check_vmware_hosthwcputhreads";
-	char			*url, *username, *userpwd;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s'", __function_name, request->key);
+	char	*url, *username, *userpwd;
 
 	if (3 < request->nparam)
 		return SYSINFO_RET_FAIL;
@@ -994,10 +922,7 @@ int	check_vmware_hosthwcputhreads(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 int	check_vmware_hoststatus(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	const char		*__function_name = "check_vmware_hoststatus";
-	char			*url, *username, *userpwd;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s'", __function_name, request->key);
+	char	*url, *username, *userpwd;
 
 	if (3 < request->nparam)
 		return SYSINFO_RET_FAIL;
