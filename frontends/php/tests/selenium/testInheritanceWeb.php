@@ -65,7 +65,7 @@ class testInheritanceWeb extends CWebTest {
 	// Returns layout data
 	public static function layout() {
 		return array(
-		/*	array(
+			array(
 				array(
 					'template' => 'Inheritance test template',
 					'agent' => 'Internet Explorer 10.0',
@@ -204,7 +204,7 @@ class testInheritanceWeb extends CWebTest {
 					'templatedHost' => true,
 					'hostTemplate' => 'Inheritance test template'
 				)
-			)*/
+			)
 		);
 	}
 
