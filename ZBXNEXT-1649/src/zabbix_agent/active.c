@@ -69,6 +69,7 @@ static void	init_active_metrics()
 		buffer.count = 0;
 		buffer.pcount = 0;
 		buffer.lastsent = (int)time(NULL);
+		buffer.first_error = 0;
 	}
 }
 
@@ -358,6 +359,7 @@ static int	refresh_active_checks(const char *host, unsigned short port)
 	char		*buf;
 	int		ret;
 	struct zbx_json	json;
+	static int	last_ret = SUCCEED;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In refresh_active_checks('%s',%u)", host, port);
 
@@ -400,8 +402,15 @@ static int	refresh_active_checks(const char *host, unsigned short port)
 		zbx_tcp_close(&s);
 	}
 
-	if (SUCCEED != ret)
-		zabbix_log(LOG_LEVEL_DEBUG, "get active checks error: %s", zbx_tcp_strerror());
+	if (last_ret != ret)
+		if (SUCCEED != ret)
+			zabbix_log(LOG_LEVEL_WARNING, "active check configuration update from [%s:%u] started to fail (%s)",
+				host, port, zbx_tcp_strerror());
+		else
+			zabbix_log(LOG_LEVEL_WARNING, "active check configuration update from [%s:%u] is working again",
+				host, port);
+
+	last_ret = ret;
 
 	zbx_json_free(&json);
 
@@ -477,6 +486,7 @@ static int	send_buffer(const char *host, unsigned short port)
 	char				*buf = NULL;
 	int				ret = SUCCEED, i, now;
 	zbx_timespec_t			ts;
+	const char			*err_send_step = "";
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() host:'%s' port:%d values:%d/%d",
 			__function_name, host, port, buffer.count, CONFIG_BUFFER_SIZE);
@@ -546,15 +556,15 @@ static int	send_buffer(const char *host, unsigned short port)
 					zabbix_log(LOG_LEVEL_DEBUG, "OK");
 			}
 			else
-				zabbix_log(LOG_LEVEL_DEBUG, "send value error: [recv] %s", zbx_tcp_strerror());
+				err_send_step = "[recv] ";
 		}
 		else
-			zabbix_log(LOG_LEVEL_DEBUG, "send value error: [send] %s", zbx_tcp_strerror());
+			err_send_step = "[send] ";
 
 		zbx_tcp_close(&s);
 	}
 	else
-		zabbix_log(LOG_LEVEL_DEBUG, "send value error: [connect] %s", zbx_tcp_strerror());
+		err_send_step = "[connect] ";
 
 	zbx_json_free(&json);
 
@@ -573,6 +583,21 @@ static int	send_buffer(const char *host, unsigned short port)
 		buffer.count = 0;
 		buffer.pcount = 0;
 		buffer.lastsent = now;
+		if (0 != buffer.first_error)
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "active check data upload to [%s:%u] is working again", host, port);
+			buffer.first_error = 0;
+		}
+	}
+	else
+	{
+		if (0 == buffer.first_error)
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "active check data upload to [%s:%u] started to fail (%s%s)",
+					host, port, err_send_step, zbx_tcp_strerror());
+			buffer.first_error = now;
+		}
+		zabbix_log(LOG_LEVEL_DEBUG, "send value error: %s %s", err_send_step, zbx_tcp_strerror());
 	}
 ret:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
