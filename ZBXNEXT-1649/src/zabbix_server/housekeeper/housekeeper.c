@@ -610,7 +610,7 @@ static void	hk_history_delete_queue_clear(zbx_hk_history_rule_t *rule)
 static int	housekeeping_history_and_trends(unsigned int now)
 {
 	const char		*__function_name = "housekeeping_history_and_trends";
-	int			deleted = 0, i;
+	int			deleted = 0, i, rc;
 	zbx_hk_history_rule_t 	*rule;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() now:%d", __function_name, now);
@@ -629,8 +629,11 @@ static int	housekeeping_history_and_trends(unsigned int now)
 		for (i = 0; i < rule->delete_queue.values_num; i++)
 		{
 			zbx_hk_delete_queue_t	*item_record = rule->delete_queue.values[i];
-			deleted += DBexecute("delete from %s where itemid=" ZBX_FS_UI64 " and clock<%d",
+
+			rc = DBexecute("delete from %s where itemid=" ZBX_FS_UI64 " and clock<%d",
 					rule->table, item_record->itemid, item_record->min_clock);
+			if (0 < rc)
+				deleted += rc;
 		}
 
 		/* clear history rule delete queue so it's ready for the next housekeeping cycle */
@@ -729,6 +732,7 @@ static int	housekeeping_process_rule(unsigned int now, zbx_hk_rule_t *rule)
 	DB_RESULT	result;
 	DB_ROW		row;
 	unsigned int	keep_from, deleted = 0;
+	int		rc;
 
 	/* initialize min_clock with the oldest record timestamp from database */
 	if (0 == rule->min_clock)
@@ -751,8 +755,11 @@ static int	housekeeping_process_rule(unsigned int now, zbx_hk_rule_t *rule)
 		rule->min_clock = MIN(keep_from, rule->min_clock +
 				HK_MAX_DELETE_PERIODS * CONFIG_HOUSEKEEPING_FREQUENCY * SEC_PER_HOUR);
 
-		deleted = DBexecute("delete from %s where %s%sclock<%d", rule->table, rule->filter,
+		rc = DBexecute("delete from %s where %s%sclock<%d", rule->table, rule->filter,
 				('\0' != *rule->filter ? " and " : ""), rule->min_clock);
+
+		if (0 <= rc)
+			deleted = rc;
 	}
 
 	return deleted;
@@ -897,12 +904,17 @@ out:
 static int	housekeeping_sessions(int now)
 {
 	const char	*__function_name = "housekeeping_sessions";
-	int		deleted = 0;
+	int		deleted = 0, rc;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() now:%d", __function_name, now);
 
 	if (HK_OPTION_ENABLED == hk_config.sessions_mode)
-		deleted = DBexecute("delete from sessions where lastaccess<%d", now - SEC_PER_DAY * hk_config.sessions);
+	{
+		rc = DBexecute("delete from sessions where lastaccess<%d", now - SEC_PER_DAY * hk_config.sessions);
+
+		if (0 <= rc)
+			deleted = rc;
+	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __function_name, deleted);
 
