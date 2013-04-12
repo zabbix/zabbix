@@ -980,7 +980,7 @@ function formatItemLastValue(array $item, $unknownString = '-', $ellipsis = true
  * @return string item functional value from history
  */
 function getItemFunctionalValue($item, $function, $param) {
-	// check wether function is allowed
+	// check whether function is allowed
 	if (!in_array($function, array('min', 'max', 'avg'))) {
 		return UNRESOLVED_MACRO_STRING;
 	}
