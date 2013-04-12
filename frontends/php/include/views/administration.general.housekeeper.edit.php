@@ -18,13 +18,14 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-include('include/views/js/administration.general.housekeeper.edit.js.php');
+require_once dirname(__FILE__).'/js/administration.general.housekeeper.edit.js.php';
 
 $houseKeeperTab = new CFormList('scriptsTab');
+$houseKeeperTab->addClass('housekeeperConfiguration');
 
 // remove events and alerts block
 $houseKeeperTab->addRow(_('Remove events and alerts'), new CCheckBox('hk_events_mode',
-	($this->data['config']['hk_events_mode'] == 0) ? 'no' : 'yes', null, 1));
+	($this->data['config']['hk_events_mode'] == 0) ? false : true, null, 1));
 $houseKeeperEventsTrigger = new CNumericBox('hk_events_trigger', $this->data['config']['hk_events_trigger'], 5);
 $houseKeeperEventsInternal = new CNumericBox('hk_events_internal', $this->data['config']['hk_events_internal'], 5);
 $houseKeeperEventsDiscovery = new CNumericBox('hk_events_discovery', $this->data['config']['hk_events_discovery'], 5);
@@ -38,21 +39,21 @@ if (!$this->data['config']['hk_events_mode']) {
 $houseKeeperTab->addRow(_('Remove trigger events and alerts older than (in days)'), $houseKeeperEventsTrigger);
 $houseKeeperTab->addRow(_('Remove internal events and alerts older than (in days)'), $houseKeeperEventsInternal);
 $houseKeeperTab->addRow(_('Remove discovery events and alerts older than (in days)'), $houseKeeperEventsDiscovery);
-$houseKeeperTab->addRow(_('Remove autoregistration events and alerts older than (in days)'),
+$houseKeeperTab->addRow(_('Remove auto-registration events and alerts older than (in days)'),
 	$houseKeeperEventsAutoreg);
 
-// remove IT services history block
-$houseKeeperTab->addRow(_('Remove IT services history'), new CCheckBox('hk_services_mode',
-	($this->data['config']['hk_services_mode'] == 0) ? 'no' : 'yes', null, 1));
+// remove IT service history block
+$houseKeeperTab->addRow(_('Remove IT service history'), new CCheckBox('hk_services_mode',
+	($this->data['config']['hk_services_mode'] == 0) ? false : true, null, 1));
 $houseKeeperServicesMode = new CNumericBox('hk_services', $this->data['config']['hk_services'], 5);
 if (!$this->data['config']['hk_services_mode']) {
 	$houseKeeperServicesMode->setAttribute('disabled', 'disabled');
 }
-$houseKeeperTab->addRow(_('Remove IT services history older than (in days)'), $houseKeeperServicesMode);
+$houseKeeperTab->addRow(_('Remove IT service history older than (in days)'), $houseKeeperServicesMode);
 
 // remove audit history block
 $houseKeeperTab->addRow(_('Remove audit history'), new CCheckBox('hk_audit_mode',
-	($this->data['config']['hk_audit_mode'] == 0) ? 'no' : 'yes', null, 1));
+	($this->data['config']['hk_audit_mode'] == 0) ? false : true, null, 1));
 $houseKeeperAuditMode = new CNumericBox('hk_audit', $this->data['config']['hk_audit'], 5);
 if (!$this->data['config']['hk_audit_mode']) {
 	$houseKeeperAuditMode->setAttribute('disabled', 'disabled');
@@ -61,7 +62,7 @@ $houseKeeperTab->addRow(_('Remove audit history older than (in days)'), $houseKe
 
 // remove audit history block
 $houseKeeperTab->addRow(_('Remove user sessions'), new CCheckBox('hk_sessions_mode',
-	($this->data['config']['hk_sessions_mode'] == 0) ? 'no' : 'yes', null, 1));
+	($this->data['config']['hk_sessions_mode'] == 0) ? false : true, null, 1));
 $houseKeeperSessionsMode = new CNumericBox('hk_sessions', $this->data['config']['hk_sessions'], 5);
 if (!$this->data['config']['hk_sessions_mode']) {
 	$houseKeeperSessionsMode->setAttribute('disabled', 'disabled');
@@ -70,9 +71,9 @@ $houseKeeperTab->addRow(_('Remove user sessions older than (in days)'), $houseKe
 
 // remove historical data block
 $houseKeeperTab->addRow(_('Remove historical data'), new CCheckBox('hk_history_mode',
-	($this->data['config']['hk_history_mode'] == 0) ? 'no' : 'yes', null, 1));
+	($this->data['config']['hk_history_mode'] == 0) ? false : true, null, 1));
 $houseKeeperHistoryGlobal = new CCheckBox('hk_history_global',
-	($this->data['config']['hk_history_global'] == 0) ? 'no' : 'yes', null, 1);
+	($this->data['config']['hk_history_global'] == 0) ? false : true, null, 1);
 if (!$this->data['config']['hk_history_mode']) {
 	$houseKeeperHistoryGlobal->setAttribute('disabled', 'disabled');
 }
@@ -85,9 +86,9 @@ $houseKeeperTab->addRow(_('Remove historical data older than (in days)'), $house
 
 // remove trend data block
 $houseKeeperTab->addRow(_('Remove trend data'), new CCheckBox('hk_trends_mode',
-	($this->data['config']['hk_trends_mode'] == 0) ? 'no' : 'yes', null, 1));
+	($this->data['config']['hk_trends_mode'] == 0) ? false : true, null, 1));
 $houseKeeperTrendsGlobal= new CCheckBox('hk_trends_global',
-	($this->data['config']['hk_trends_global'] == 0) ? 'no' : 'yes', null, 1);
+	($this->data['config']['hk_trends_global'] == 0) ? false : true, null, 1);
 if (!$this->data['config']['hk_trends_mode']) {
 	$houseKeeperTrendsGlobal->setAttribute('disabled', 'disabled');
 }

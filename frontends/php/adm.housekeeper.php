@@ -60,7 +60,7 @@ $fields = array(
 );
 check_fields($fields);
 
-$data['config'] = select_config(true);
+$data['config'] = select_config();
 
 /*
  * Actions

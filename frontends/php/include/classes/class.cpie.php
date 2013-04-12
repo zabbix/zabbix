@@ -30,6 +30,7 @@ class CPie extends CGraphDraw {
 		$this->exploderad3d = 3;
 		$this->graphheight3d = 12;
 		$this->shiftlegendright = 17 * 7 + 7 + 10; // count of static chars * px/char + for color rectangle + space
+		$this->configuration = select_config();
 	}
 
 	/********************************************************************************************************/
@@ -148,8 +149,6 @@ class CPie extends CGraphDraw {
 
 		$strvaluelength = 0; // we need to know how long in px will be our legend
 
-		$data['config'] = select_config(true);
-
 		for ($i = 0; $i < $this->num; $i++) {
 			$real_item = get_item_by_itemid($this->items[$i]['itemid']);
 			$type = $this->items[$i]['calc_type'];
@@ -158,8 +157,8 @@ class CPie extends CGraphDraw {
 
 			$sql_arr = array();
 
-			if ($data['config']['hk_trends_global'] == 1) {
-				$real_item['history'] = $data['config']['hk_trends'];
+			if ($this->configuration['hk_trends_global']) {
+				$real_item['history'] = $this->configuration['hk_trends'];
 			}
 
 			if (($real_item['history'] * SEC_PER_DAY) > (time() - ($from_time + $this->period / 2)) // should pick data from history or trends

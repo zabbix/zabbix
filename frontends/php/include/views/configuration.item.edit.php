@@ -371,39 +371,45 @@ if ($this->data['is_discovery_rule']) {
 		false, 'row_trapper_hosts');
 }
 else {
-	$data['config'] = select_config(true);
+	$data['config'] = select_config();
 	$keepHistory = array();
 	$keepHistory[] =  new CNumericBox('history', $this->data['history'], 8);
-	if ($data['config']['hk_history_global'] == 1) {
-		$keepHistory[] =  SPACE;
-		if (CWebUser::$data['type'] == USER_TYPE_SUPER_ADMIN) {
-			$keepHistory[] = new CSpan(_('['.$data['config']['hk_history'].'] - Overridden by'));
-			$keepHistory[] =  SPACE;
-			$link = new CLink(_('global housekeeper settings.'), 'adm.housekeeper.php');
+	if ($data['config']['hk_history_global']) {
+		$keepHistory[] = SPACE;
+		if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
+			$keepHistory[] = new CSpan(_s('Overridden by'));
+			$keepHistory[] = SPACE;
+			$link = new CLink(_('global housekeeper settings'), 'adm.housekeeper.php');
 			$link->setAttribute('target', '_blank');
 			$keepHistory[] =  $link;
+			$keepHistory[] = SPACE;
+			$keepHistory[] = new CSpan(_s('(%1$s %2$s)',
+				$data['config']['hk_history'], ngettext(_('day'), _('days'), $data['config']['hk_history'])));
 		}
 		else {
-			$keepHistory[] = new CSpan(_('['.$data['config']['hk_history'].'] -
-				Overridden by global housekeeper settings.'));
+			$keepHistory[] = new CSpan(_s('Overriden by global housekeeper settings (%1$s %2$s)',
+				$data['config']['hk_history'], ngettext(_('day'), _('days'), $data['config']['hk_history'])));
 		}
 	}
 	$itemFormList->addRow(_('Keep history (in days)'), $keepHistory);
 
 	$keepTrend = array();
 	$keepTrend[] =  new CNumericBox('trends', $this->data['trends'], 8);
-	if ($data['config']['hk_trends_global'] == 1) {
-		$keepTrend[] =  SPACE;
-		if (CWebUser::$data['type'] == USER_TYPE_SUPER_ADMIN) {
-			$keepTrend[] = new CSpan(_('['.$data['config']['hk_trends'].'] - Overridden by'));
-			$keepTrend[] =  SPACE;
-			$link = new CLink(_('global housekeeper settings.'), 'adm.housekeeper.php');
+	if ($data['config']['hk_trends_global']) {
+		$keepTrend[] = SPACE;
+		if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
+			$keepTrend[] = new CSpan(_s('Overridden by'));
+			$keepTrend[] = SPACE;
+			$link = new CLink(_('global housekeeper settings'), 'adm.housekeeper.php');
 			$link->setAttribute('target', '_blank');
 			$keepTrend[] =  $link;
+			$keepTrend[] = SPACE;
+			$keepTrend[] = new CSpan(_s('(%1$s %2$s)',
+				$data['config']['hk_trends'], ngettext(_('day'), _('days'), $data['config']['hk_trends'])));
 		}
 		else {
-			$keepTrend[] = new CSpan(_('['.$data['config']['hk_trends'].'] -
-				Overridden by global housekeeper settings.'));
+			$keepTrend[] = new CSpan(_s('Overriden by global housekeeper settings (%1$s %2$s)',
+				$data['config']['hk_trends'], ngettext(_('day'), _('days'), $data['config']['hk_trends'])));
 		}
 	}
 
