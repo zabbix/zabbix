@@ -18,8 +18,10 @@
 **/
 
 #include "common.h"
+#ifdef HAVE_LIBXML2
 #include "log.h"
 #include "zbxjson.h"
+#include "zbxalgo.h"
 #include "checks_simple_vmware.h"
 
 #define ZBX_XPATH_LN(LN)	"//*[local-name()='" LN "']"
@@ -679,9 +681,9 @@ int	check_vmware_vmmemsizeswapped(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return get_vmware_vmstat(url, username, userpwd, uuid, ZBX_XPATH_LN2("quickStats", "swappedMemory"), result);
 }
 
-int	check_vmware_vmstoragecommited(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	check_vmware_vmstoragecommitted(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	const char		*__function_name = "check_vmware_vmstoragecommited";
+	const char		*__function_name = "check_vmware_vmstoragecommitted";
 	char			*url, *username, *userpwd, *uuid;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s'", __function_name, request->key);
@@ -697,9 +699,9 @@ int	check_vmware_vmstoragecommited(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return get_vmware_vmstat(url, username, userpwd, uuid, ZBX_XPATH_LN2("storage", "committed"), result);
 }
 
-int	check_vmware_vmstorageuncommited(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	check_vmware_vmstorageuncommitted(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	const char		*__function_name = "check_vmware_vmstorageuncommited";
+	const char		*__function_name = "check_vmware_vmstorageuncommitted";
 	char			*url, *username, *userpwd, *uuid;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s'", __function_name, request->key);
@@ -1006,3 +1008,4 @@ int	check_vmware_hoststatus(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	return get_vmware_hoststat(url, username, userpwd, ZBX_XPATH_LN2("val", "overallStatus"), result);
 }
+#endif

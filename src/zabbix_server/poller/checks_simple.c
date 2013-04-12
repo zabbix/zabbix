@@ -22,11 +22,111 @@
 #include "simple.h"
 #include "log.h"
 
+typedef int	(*vmfunc_t)(AGENT_REQUEST *, AGENT_RESULT *);
+
+#define ZBX_VIRT_VMWARE_PREFIX	"virt.vmware."
+
+static char	*vmkeys[] =
+{
+	"host.cpu.usage",
+	"host.fullname",
+	"host.hw.cpucores",
+	"host.hw.cpufreq",
+	"host.hw.cpumodel",
+	"host.hw.cputhreads",
+	"host.hw.memory",
+	"host.hw.model",
+	"host.hw.uuid",
+	"host.hw.vendor",
+	"host.memory.used",
+	"host.status",
+	"host.uptime",
+	"host.version",
+	"vm.cpu.num",
+	"vm.cpu.usage",
+	"vm.list",
+	"vm.memory.size",
+	"vm.memory.size.ballooned",
+	"vm.memory.size.swapped",
+	"vm.storage.additional",
+	"vm.storage.committed",
+	"vm.storage.uncommitted",
+	"vm.uptime",
+	NULL
+};
+
+#ifdef HAVE_LIBXML2
+static vmfunc_t	vmfuncs[] =
+{
+	check_vmware_hostcpuusage,
+	check_vmware_hostfullname,
+	check_vmware_hosthwcpucores,
+	check_vmware_hosthwcpufreq,
+	check_vmware_hosthwcpumodel,
+	check_vmware_hosthwcputhreads,
+	check_vmware_hosthwmemory,
+	check_vmware_hosthwmodel,
+	check_vmware_hosthwuuid,
+	check_vmware_hosthwvendor,
+	check_vmware_hostmemoryused,
+	check_vmware_hoststatus,
+	check_vmware_hostuptime,
+	check_vmware_hostversion,
+	check_vmware_vmcpunum,
+	check_vmware_vmcpuusage,
+	check_vmware_vmlist,
+	check_vmware_vmmemsize,
+	check_vmware_vmmemsizeballooned,
+	check_vmware_vmmemsizeswapped,
+	check_vmware_vmstorageunshared,
+	check_vmware_vmstoragecommitted,
+	check_vmware_vmstorageuncommitted,
+	check_vmware_vmuptime
+};
+#endif
+
+/******************************************************************************
+ *                                                                            *
+ * Function: get_vmware_function                                              *
+ *                                                                            *
+ * Purpose: Retrieves a handler of the item key                               *
+ *                                                                            *
+ * Paramaters: key    - [IN] an item key (without parameters)                 *
+ *             vmfunc - [OUT] a handler of the item key; can be NULL if       *
+ *                            libxml2 is not compiled in                      *
+ *                                                                            *
+ * Return value: SUCCEED if key is a valid VMware key, FAIL - otherwise       *
+ *                                                                            *
+ ******************************************************************************/
+static int	get_vmware_function(const char *key, vmfunc_t *vmfunc)
+{
+	int	i;
+
+	if (0 != strncmp(key, ZBX_VIRT_VMWARE_PREFIX, sizeof(ZBX_VIRT_VMWARE_PREFIX) - 1))
+		return FAIL;
+
+	for (i = 0; NULL != vmkeys[i]; i++)
+	{
+		if (0 == strcmp(key + sizeof(ZBX_VIRT_VMWARE_PREFIX) - 1, vmkeys[i]))
+		{
+#ifdef HAVE_LIBXML2
+			*vmfunc = vmfuncs[i];
+#else
+			*vmfunc = NULL;
+#endif
+			return SUCCEED;
+		}
+	}
+
+	return FAIL;
+}
+
 int	get_value_simple(DC_ITEM *item, AGENT_RESULT *result)
 {
 	const char	*__function_name = "get_value_simple";
 
 	AGENT_REQUEST	request;
+	vmfunc_t	vmfunc;
 	int		ret = NOTSUPPORTED;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key_orig:'%s' addr:'%s'",
@@ -50,125 +150,12 @@ int	get_value_simple(DC_ITEM *item, AGENT_RESULT *result)
 		if (SYSINFO_RET_OK == check_service(&request, item->interface.addr, result, 1))
 			ret = SUCCEED;
 	}
-	else if (0 == strcmp(request.key, "virt.vmware.host.status"))
+	else if (SUCCEED == get_vmware_function(request.key, &vmfunc))
 	{
-		if (SYSINFO_RET_OK == check_vmware_hoststatus(&request, result))
-			ret = SUCCEED;
-	}
-	else if (0 == strcmp(request.key, "virt.vmware.host.hw.vendor"))
-	{
-		if (SYSINFO_RET_OK == check_vmware_hosthwvendor(&request, result))
-			ret = SUCCEED;
-	}
-	else if (0 == strcmp(request.key, "virt.vmware.host.hw.model"))
-	{
-		if (SYSINFO_RET_OK == check_vmware_hosthwmodel(&request, result))
-			ret = SUCCEED;
-	}
-	else if (0 == strcmp(request.key, "virt.vmware.host.hw.uuid"))
-	{
-		if (SYSINFO_RET_OK == check_vmware_hosthwuuid(&request, result))
-			ret = SUCCEED;
-	}
-	else if (0 == strcmp(request.key, "virt.vmware.host.hw.memory"))
-	{
-		if (SYSINFO_RET_OK == check_vmware_hosthwmemory(&request, result))
-			ret = SUCCEED;
-	}
-	else if (0 == strcmp(request.key, "virt.vmware.host.hw.cpumodel"))
-	{
-		if (SYSINFO_RET_OK == check_vmware_hosthwcpumodel(&request, result))
-			ret = SUCCEED;
-	}
-	else if (0 == strcmp(request.key, "virt.vmware.host.hw.cpufreq"))
-	{
-		if (SYSINFO_RET_OK == check_vmware_hosthwcpufreq(&request, result))
-			ret = SUCCEED;
-	}
-	else if (0 == strcmp(request.key, "virt.vmware.host.hw.cpucores"))
-	{
-		if (SYSINFO_RET_OK == check_vmware_hosthwcpucores(&request, result))
-			ret = SUCCEED;
-	}
-	else if (0 == strcmp(request.key, "virt.vmware.host.hw.cputhreads"))
-	{
-		if (SYSINFO_RET_OK == check_vmware_hosthwcputhreads(&request, result))
-			ret = SUCCEED;
-	}
-	else if (0 == strcmp(request.key, "virt.vmware.host.uptime"))
-	{
-		if (SYSINFO_RET_OK == check_vmware_hostuptime(&request, result))
-			ret = SUCCEED;
-	}
-	else if (0 == strcmp(request.key, "virt.vmware.host.fullname"))
-	{
-		if (SYSINFO_RET_OK == check_vmware_hostfullname(&request, result))
-			ret = SUCCEED;
-	}
-	else if (0 == strcmp(request.key, "virt.vmware.host.version"))
-	{
-		if (SYSINFO_RET_OK == check_vmware_hostversion(&request, result))
-			ret = SUCCEED;
-	}
-	else if (0 == strcmp(request.key, "virt.vmware.host.memory.used"))
-	{
-		if (SYSINFO_RET_OK == check_vmware_hostmemoryused(&request, result))
-			ret = SUCCEED;
-	}
-	else if (0 == strcmp(request.key, "virt.vmware.host.cpu.usage"))
-	{
-		if (SYSINFO_RET_OK == check_vmware_hostcpuusage(&request, result))
-			ret = SUCCEED;
-	}
-	else if (0 == strcmp(request.key, "virt.vmware.vm.list"))
-	{
-		if (SYSINFO_RET_OK == check_vmware_vmlist(&request, result))
-			ret = SUCCEED;
-	}
-	else if (0 == strcmp(request.key, "virt.vmware.vm.cpu.num"))
-	{
-		if (SYSINFO_RET_OK == check_vmware_vmcpunum(&request, result))
-			ret = SUCCEED;
-	}
-	else if (0 == strcmp(request.key, "virt.vmware.vm.cpu.usage"))
-	{
-		if (SYSINFO_RET_OK == check_vmware_vmcpuusage(&request, result))
-			ret = SUCCEED;
-	}
-	else if (0 == strcmp(request.key, "virt.vmware.vm.memory.size"))
-	{
-		if (SYSINFO_RET_OK == check_vmware_vmmemsize(&request, result))
-			ret = SUCCEED;
-	}
-	else if (0 == strcmp(request.key, "virt.vmware.vm.memory.size.ballooned"))
-	{
-		if (SYSINFO_RET_OK == check_vmware_vmmemsizeballooned(&request, result))
-			ret = SUCCEED;
-	}
-	else if (0 == strcmp(request.key, "virt.vmware.vm.memory.size.swapped"))
-	{
-		if (SYSINFO_RET_OK == check_vmware_vmmemsizeswapped(&request, result))
-			ret = SUCCEED;
-	}
-	else if (0 == strcmp(request.key, "virt.vmware.vm.storage.commited"))
-	{
-		if (SYSINFO_RET_OK == check_vmware_vmstoragecommited(&request, result))
-			ret = SUCCEED;
-	}
-	else if (0 == strcmp(request.key, "virt.vmware.vm.storage.additional"))
-	{
-		if (SYSINFO_RET_OK == check_vmware_vmstorageuncommited(&request, result))
-			ret = SUCCEED;
-	}
-	else if (0 == strcmp(request.key, "virt.vmware.vm.storage.additional"))
-	{
-		if (SYSINFO_RET_OK == check_vmware_vmstorageunshared(&request, result))
-			ret = SUCCEED;
-	}
-	else if (0 == strcmp(request.key, "virt.vmware.vm.uptime"))
-	{
-		if (SYSINFO_RET_OK == check_vmware_vmuptime(&request, result))
-			ret = SUCCEED;
+		if (NULL != vmfunc)
+			ret = vmfunc(&request, result);
+		else
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Support for VMware checks was not compiled in"));
 	}
 	else
 	{

@@ -21,7 +21,7 @@
 #define ZABBIX_CHECKS_SIMPLE_VMWARE_H
 
 #include "common.h"
-#include "dbcache.h"
+#ifdef HAVE_LIBXML2
 #include "sysinfo.h"
 
 int	check_vmware_vmlist(AGENT_REQUEST *request, AGENT_RESULT *result);
@@ -31,8 +31,8 @@ int	check_vmware_vmuptime(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	check_vmware_vmmemsizeballooned(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	check_vmware_vmmemsizecompressed(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	check_vmware_vmmemsizeswapped(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	check_vmware_vmstoragecommited(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	check_vmware_vmstorageuncommited(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	check_vmware_vmstoragecommitted(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	check_vmware_vmstorageuncommitted(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	check_vmware_vmstorageunshared(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	check_vmware_vmpowerstate(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	check_vmware_vmcpuusage(AGENT_REQUEST *request, AGENT_RESULT *result);
@@ -51,4 +51,5 @@ int	check_vmware_hosthwcpucores(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	check_vmware_hosthwcputhreads(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	check_vmware_hoststatus(AGENT_REQUEST *request, AGENT_RESULT *result);
 
+#endif
 #endif
