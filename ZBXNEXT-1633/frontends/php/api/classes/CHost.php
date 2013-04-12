@@ -1721,17 +1721,14 @@ class CHost extends CHostGeneral {
 
 		// adding discovery rule
 		if ($options['selectDiscoveryRule'] !== null && $options['selectDiscoveryRule'] != API_OUTPUT_COUNT) {
-			$relationMap = new CRelationMap();
 			// discovered items
-			$dbRules = DBselect(
+			$discoveryRules = DBFetchArray(DBselect(
 				'SELECT hd.hostid,hd2.parent_itemid'.
 					' FROM host_discovery hd,host_discovery hd2'.
 					' WHERE '.dbConditionInt('hd.hostid', $hostids).
 					' AND hd.parent_hostid=hd2.hostid'
-			);
-			while ($rule = DBfetch($dbRules)) {
-				$relationMap->addRelation($rule['hostid'], $rule['parent_itemid']);
-			}
+			));
+			$relationMap = $this->createRelationMap($discoveryRules, 'hostid', 'parent_itemid');
 
 			$discoveryRules = API::DiscoveryRule()->get(array(
 				'output' => $options['selectDiscoveryRule'],
