@@ -574,6 +574,7 @@ zbx_case_sensitive_t;
 #define TRIGGER_VALUE_OK		0
 #define TRIGGER_VALUE_PROBLEM		1
 #define TRIGGER_VALUE_UNKNOWN		2	/* only in server code, never in DB */
+const char	*zbx_trigger_value_string(unsigned char value);
 
 /* trigger states */
 #define TRIGGER_STATE_NORMAL		0
@@ -1005,6 +1006,8 @@ void	uint64_array_merge(zbx_uint64_t **values, int *alloc, int *num, zbx_uint64_
 int	uint64_array_exists(zbx_uint64_t *values, int num, zbx_uint64_t value);
 void	uint64_array_remove(zbx_uint64_t *values, int *num, zbx_uint64_t *rm_values, int rm_num);
 void	uint64_array_remove_both(zbx_uint64_t *values, int *num, zbx_uint64_t *rm_values, int *rm_num);
+
+const char	*zbx_event_value_string(unsigned char source, unsigned char object, unsigned char value);
 
 #ifdef _WINDOWS
 LPTSTR	zbx_acp_to_unicode(LPCSTR acp_string);
