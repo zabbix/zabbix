@@ -200,9 +200,10 @@ class CMacrosResolverHelper {
 	/**
 	 * Resolve positional macros and functional item macros, for example, {{HOST.HOST1}:key.func(param)}.
 	 *
-	 * @param type	$name				string in which macros should be resolved
-	 * @param array $items				list of graph items
-	 * @param array $items[n]['hostid'] graph n-th item corresponding host Id
+	 * @param type	    $name				string in which macros should be resolved
+	 * @param array     $items				list of graph items
+	 * @param int       $items[n]['hostid'] graph n-th item corresponding host Id
+	 * @param string    $items[n]['host']   graph n-th item corresponding host name
 	 *
 	 * @return string	string with macros replaced with corresponding values
 	 */
@@ -234,9 +235,9 @@ class CMacrosResolverHelper {
 		}
 
 		$items = DBfetchArray(DBselect(
-			'SELECT i.hostid,gi.graphid'.
-			' FROM graphs_items gi,items i'.
-			' WHERE gi.itemid=i.itemid'.
+			'SELECT i.hostid,gi.graphid,h.host'.
+			' FROM graphs_items gi,items i,hosts h'.
+			' WHERE gi.itemid=i.itemid AND i.hostid=h.hostid'.
 				' AND '.dbConditionInt('gi.graphid', $graphIds).
 			' ORDER BY gi.sortorder'
 		));
@@ -245,7 +246,7 @@ class CMacrosResolverHelper {
 			if (!isset($graphMap[$item['graphid']]['items'])) {
 				$graphMap[$item['graphid']]['items'] = array();
 			}
-			$graphMap[$item['graphid']]['items'][] = array('hostid' => $item['hostid']);
+			$graphMap[$item['graphid']]['items'][] = array('hostid' => $item['hostid'], 'host' => $item['host']);
 		}
 
 		$graphMap = self::$macrosResolver->resolve(array(
