@@ -65,7 +65,7 @@ class testInheritanceWeb extends CWebTest {
 	// Returns layout data
 	public static function layout() {
 		return array(
-			array(
+		/*	array(
 				array(
 					'template' => 'Inheritance test template',
 					'agent' => 'Internet Explorer 10.0',
@@ -204,7 +204,7 @@ class testInheritanceWeb extends CWebTest {
 					'templatedHost' => true,
 					'hostTemplate' => 'Inheritance test template'
 				)
-			)
+			)*/
 		);
 	}
 
@@ -463,6 +463,34 @@ class testInheritanceWeb extends CWebTest {
 			$this->assertElementNotPresent('add_step');
 			$this->assertElementNotPresent('remove_0');
 		}
+	}
+
+	// Returns update data
+	public static function update() {
+		return DBdata("select * from httptest where hostid = 30000 and name LIKE 'testInheritanceWeb%'");
+	}
+
+	/**
+	 * @dataProvider update
+	 */
+	public function testInheritanceWeb_SimpleUpdate($data) {
+		$name = $data['name'];
+
+		$sqlItems = "select * from items ORDER BY itemid";
+		$oldHashItems = DBhash($sqlItems);
+
+		$this->zbxTestLogin('templates.php');
+		$this->zbxTestClickWait('link='.$this->template);
+		$this->zbxTestClickWait('link=Web scenarios');
+		$this->zbxTestClickWait('link='.$name);
+		$this->zbxTestClickWait('save');
+
+		$this->zbxTestTextPresent('Scenario updated');
+		$this->zbxTestTextPresent("$name");
+		$this->checkTitle('Configuration of web monitoring');
+		$this->zbxTestTextPresent('CONFIGURATION OF WEB MONITORING');
+
+		$this->assertEquals($oldHashItems, DBhash($sqlItems));
 	}
 
 	/**
