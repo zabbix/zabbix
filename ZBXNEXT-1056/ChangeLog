@@ -3,10 +3,13 @@ Changes for 2.0.6rc1
 New features:
 ........S. [ZBXNEXT-1643] added support of {TRIGGER.TEMPLATE.NAME} and {TRIGGER.HOSTGROUP.NAME} notification macros; thanks to Hmami Mohamed (Sasha)
 A.F....... [ZBX-1357] added Lithuanian translation; thanks to Zabbix translators (Richlv)
-A.F....... [ZBX-1357] updated American English, Brazilian Portuguese, Dutch, French, German, Greek, Hungarian, Latvian, Slovak, Spanish, Russian, Turkish and Ukrainian translations; thanks to Zabbix translators (Richlv)
+A.F....... [ZBX-1357] updated American English, Brazilian Portuguese, Dutch, French, German, Greek, Hungarian, Japanese, Latvian, Russian, Slovak, Spanish, Turkish and Ukrainian translations; thanks to Zabbix translators (Richlv)
 ........S. [ZBXNEXT-1663] added support for notification macros {TRIGGER.NAME.ORIG}, {ITEM.NAME.ORIG}, {ITEM.KEY.ORIG} (dimir)
 
 Bug fixes:
+..F....... [ZBX-6468] fixed regex in trigger expression test (Oleg)
+A.F....... [ZBX-6389] performance improvement in Dashboard "System status" and "Last issues" widgets (Eduard)
+..F....... [ZBX-6444] fixed vertical text alignments in Monitoring > Overview for IE8 and IE10 (Toms)
 A......... [ZBX-6408] fixed action conditions not being deleted and actions not being disabled when deleting a template (Pavels)
 ........S. [ZBX-5225] fixed deadlocks while processing lld rules; each prototype will be processed in own transaction (Sasha)
 A......... [ZBX-6413] fixed that Zabbix API function 'webcheck.update' incorrectly requires 'name' (Toms)
@@ -1285,6 +1288,8 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.17rc1
 
+..F....... [ZBX-6474] fixed {ITEM.VALUE} macros expand in trigger names (Oleg)
+...G...PS. [ZBX-6342] fixed LDAP check that caused server crash when LDAP is running but no DIT has been defined (Aleksej)
 ..F....... [ZBX-6329] fixed form with "0" in trigger expression parser (Eduard)
 ..F....... [ZBX-6306] fixed frontend layout for latest Google Chrome 25 (Eduard)
 ..F....... [ZBX-6258] updated Japanese translation; thanks to Kodai Terashima (Richlv)

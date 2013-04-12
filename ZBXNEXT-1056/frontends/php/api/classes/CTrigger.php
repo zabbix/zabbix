@@ -114,6 +114,7 @@ class CTrigger extends CTriggerGeneral {
 			'selectFunctions'				=> null,
 			'selectDependencies'			=> null,
 			'selectDiscoveryRule'			=> null,
+			'selectLastEvent'				=> null,
 			'countOutput'					=> null,
 			'groupCount'					=> null,
 			'preservekeys'					=> null,
@@ -338,6 +339,7 @@ class CTrigger extends CTriggerGeneral {
 						' AND e.acknowledged='.EVENT_NOT_ACKNOWLEDGED.
 					')';
 		}
+
 		// withAcknowledgedEvents
 		if (!is_null($options['withAcknowledgedEvents'])) {
 			$sqlParts['where']['ack'] = 'NOT EXISTS ('.
@@ -733,6 +735,23 @@ class CTrigger extends CTriggerGeneral {
 			}
 		}
 
+		if (!is_null($options['selectLastEvent']) && str_in_array($options['selectLastEvent'], $subselectsAllowedOutputs)) {
+			foreach ($result as $triggerId => $trigger) {
+				$lastEvent = API::Event()->get(array(
+					'object' => EVENT_SOURCE_TRIGGERS,
+					'triggerids' => $triggerId,
+					'output' => $options['selectLastEvent'],
+					'nopermissions' => true,
+					'filter' => array('value_changed' => TRIGGER_VALUE_CHANGED_YES),
+					'sortfield' => array('eventid'),
+					'sortorder' => ZBX_SORT_DOWN,
+					'limit' => 1
+				));
+
+				$result[$triggerId]['lastEvent'] = $lastEvent ? reset($lastEvent) : array();
+			}
+		}
+
 		// limit selected triggers after result set is truncated by previous filters (skipDependent, withLastEventUnacknowledged)
 		if ($postLimit) {
 			$result = array_slice($result, 0, $postLimit, true);
@@ -955,6 +974,7 @@ class CTrigger extends CTriggerGeneral {
 		if (is_null($options['preservekeys'])) {
 			$result = zbx_cleanHashes($result);
 		}
+
 		return $result;
 	}
 

@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2013-04-04 11:16+0300\n"
-"PO-Revision-Date: 2013-03-02 18:02+0200\n"
+"PO-Revision-Date: 2013-04-04 14:10+0200\n"
 "Last-Translator: Jan <jan.garaj@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: sk\n"
@@ -13338,7 +13338,7 @@ msgstr "Zabbix"
 #: include/views/general.login.php:47
 #, php-format
 msgid "Zabbix %1$s Copyright %2$s-%3$s by Zabbix SIA"
-msgstr ""
+msgstr "Zabbix %1$s Copyright %2$s-%3$s by Zabbix SIA"
 
 #: include/users.inc.php:40
 msgid "Zabbix Admin"
