@@ -1747,7 +1747,7 @@ class CHost extends CHostGeneral {
 		if ($options['selectHostDiscovery'] !== null) {
 			$hostDiscoveries = API::getApi()->select('host_discovery', array(
 				'output' => $this->outputExtend('host_discovery', array('hostid'), $options['selectHostDiscovery']),
-				'filter' => array('itemid' => array_keys($result)),
+				'filter' => array('hostid' => array_keys($result)),
 				'preservekeys' => true
 			));
 			$relationMap = $this->createRelationMap($hostDiscoveries, 'hostid', 'hostid');
