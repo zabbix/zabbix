@@ -57,6 +57,7 @@ class CChart extends CGraphDraw {
 		$this->gridStep = array(); // grid step
 		$this->gridPixels = 25; // optimal grid size
 		$this->gridPixelsVert = 40;
+		$this->configuration = select_config();
 	}
 
 	/********************************************************************************************************/
@@ -190,7 +191,6 @@ class CChart extends CGraphDraw {
 		$x = $this->sizeX; // graph size in px
 
 		$this->itemsHost = null;
-		$data['config'] = select_config(true);
 
 		for ($i = 0; $i < $this->num; $i++) {
 			$real_item = get_item_by_itemid($this->items[$i]['itemid']);
@@ -215,8 +215,8 @@ class CChart extends CGraphDraw {
 
 			$sql_arr = array();
 
-			if ($data['config']['hk_trends_global'] == 1) {
-				$real_item['history'] = $data['config']['hk_trends'];
+			if ($this->configuration['hk_trends_global']) {
+				$real_item['history'] = $this->configuration['hk_trends'];
 			}
 
 			if (($real_item['history'] * SEC_PER_DAY) > (time() - ($this->from_time + $this->period / 2)) // should pick data from history or trends
