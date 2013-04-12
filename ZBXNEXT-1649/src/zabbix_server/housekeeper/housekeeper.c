@@ -65,6 +65,16 @@ typedef struct
 }
 zbx_hk_config_t;
 
+/* the housekeeping configuration */
+static zbx_hk_config_t	hk_config = {
+		1, 355, 355, 355, 355,
+		1, 355,
+		1, 355,
+		1, 355,
+		1, 0, 90,
+		1, 0, 355
+};
+
 /* Housekeeping configuration field definition.                  */
 /* This structure is used to map database config table fields to */
 /* housekeeper configuration data.                               */
@@ -81,9 +91,6 @@ typedef struct
 	unsigned int	max_value;
 }
 zbx_hk_db_config_t;
-
-/* the housekeeping configuration */
-static zbx_hk_config_t	hk_config;
 
 /* the housekeeping configuration field definition */
 #define	HK_FIELD_MAP(field, min, max) \
@@ -329,8 +336,8 @@ static void	hk_history_delete_queue_append(zbx_hk_history_rule_t *rule, unsigned
  ******************************************************************************/
 static void	hk_history_prepare(zbx_hk_history_rule_t *rule, unsigned int now)
 {
-	DB_RESULT       result;
-	DB_ROW          row;
+	DB_RESULT	result;
+	DB_ROW		row;
 
 	zbx_hashset_create(&rule->item_cache, 1024, zbx_default_uint64_hash_func, zbx_default_uint64_compare_func);
 
@@ -416,7 +423,7 @@ static void	hk_history_release(zbx_hk_history_rule_t *rule)
 static void	hk_history_item_update(zbx_hk_history_rule_t *rule, unsigned int now, zbx_uint64_t itemid,
 		unsigned int history)
 {
-	zbx_hk_item_cache_t		*item_record;
+	zbx_hk_item_cache_t	*item_record;
 
 	if (HK_OPTION_DISABLED == *rule->poption_mode)
 		return;
@@ -456,8 +463,8 @@ static void	hk_history_item_update(zbx_hk_history_rule_t *rule, unsigned int now
  ******************************************************************************/
 static void	hk_history_update(zbx_hk_history_rule_t *rules, unsigned int now)
 {
-	DB_RESULT       	result;
-	DB_ROW          	row;
+	DB_RESULT	result;
+	DB_ROW		row;
 
 	result = DBselect("select i.itemid,i.value_type,i.history,i.trends from items i,hosts h"
 			" where i.hostid=h.hostid and h.status in (%d,%d)",
@@ -529,9 +536,9 @@ static void	hk_history_update(zbx_hk_history_rule_t *rules, unsigned int now)
  ******************************************************************************/
 static void	hk_history_delete_queue_prepare_all(zbx_hk_history_rule_t *rules, unsigned int now)
 {
+	const char		*__function_name = "hk_history_delete_queue_prepare_all";
 	int			update_cache = 0;
 	zbx_hk_history_rule_t 	*rule;
-	const char	*__function_name = "hk_history_delete_queue_prepare_all";
 
 	/* prepare history item cache (hashset containing itemid:min_clock values) */
 	for (rule = rules; NULL != rule->table; rule++)
@@ -600,9 +607,9 @@ static void	hk_history_delete_queue_clear(zbx_hk_history_rule_t *rule)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-int	housekeeping_history_and_trends(unsigned int now)
+static int	housekeeping_history_and_trends(unsigned int now)
 {
-	const char	*__function_name = "housekeeping_history_and_trends";
+	const char		*__function_name = "housekeeping_history_and_trends";
 	int			deleted = 0, i;
 	zbx_hk_history_rule_t 	*rule;
 
@@ -686,7 +693,7 @@ static int	housekeeping_read_config()
 			pfield = &hk_db_fields[i];
 			if (FAIL == is_uint_range(row[i], pfield->pvalue, pfield->min_value, pfield->max_value))
 			{
-				zabbix_log(LOG_LEVEL_WARNING, "failed to read housekeeper configuration, invalid field value: hk_%s=%s",
+				zabbix_log(LOG_LEVEL_WARNING, "invalid housekeeper configuration field value: %s=%s",
 						pfield->field, row[i]);
 			}
 		}
@@ -719,8 +726,8 @@ static int	housekeeping_read_config()
  ******************************************************************************/
 static int	housekeeping_process_rule(unsigned int now, zbx_hk_rule_t *rule)
 {
-	DB_RESULT		result;
-	DB_ROW			row;
+	DB_RESULT	result;
+	DB_ROW		row;
 	unsigned int	keep_from, deleted = 0;
 
 	/* initialize min_clock with the oldest record timestamp from database */
@@ -791,9 +798,12 @@ static int	housekeeping_cleanup()
 		if (HK_OPTION_ENABLED == *table->poption_mode)
 			continue;
 
-		zbx_strcpy_alloc(&sql_tables, &sql_size, &sql_offset, (NULL == sql_tables ? " where" : " and"));
-		zbx_snprintf_alloc(&sql_tables, &sql_size, &sql_offset, " tablename<>'%s'", table->name);
+		zbx_strcpy_alloc(&sql_tables, &sql_size, &sql_offset,
+				(NULL == sql_tables ? " where tablename not in (" : ","));
+		zbx_snprintf_alloc(&sql_tables, &sql_size, &sql_offset, "'%s'", table->name);
 	}
+	if (NULL != sql_tables)
+		zbx_chrcpy_alloc(&sql_tables, &sql_size, &sql_offset, ')');
 
 	/* order by tablename to effectively use DB cache */
 	result = DBselect(
@@ -851,7 +861,7 @@ static int	housekeeping_cleanup()
 #endif
 		}
 
-		if (0 == d || 0 == CONFIG_MAX_HOUSEKEEPER_DELETE || CONFIG_MAX_HOUSEKEEPER_DELETE > d)
+		if (0 <= d && (0 == d || 0 == CONFIG_MAX_HOUSEKEEPER_DELETE || CONFIG_MAX_HOUSEKEEPER_DELETE > d))
 			zbx_vector_uint64_append(&housekeeperids, housekeeper.housekeeperid);
 
 		deleted += d;
@@ -901,9 +911,10 @@ static int	housekeeping_sessions(int now)
 
 static int	housekeeping_services(int now)
 {
+	static zbx_hk_rule_t	rule = {"service_alarms", "", 0, &hk_config.services};
+
 	const char		*__function_name = "housekeeping_services";
 	int			deleted = 0;
-	static zbx_hk_rule_t	rule = {"service_alarms", "", 0, &hk_config.services};
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() now:%d", __function_name, now);
 
@@ -917,9 +928,10 @@ static int	housekeeping_services(int now)
 
 static int	housekeeping_audit(int now)
 {
+	static zbx_hk_rule_t	rule = {"auditlog", "", 0, &hk_config.audit};
+
 	const char		*__function_name = "housekeeping_audit";
 	int			deleted = 0;
-	static zbx_hk_rule_t	rule = {"auditlog", "", 0, &hk_config.audit};
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() now:%d", __function_name, now);
 
@@ -933,9 +945,6 @@ static int	housekeeping_audit(int now)
 
 static int	housekeeping_events(int now)
 {
-	const char		*__function_name = "housekeeping_events";
-	int			deleted = 0;
-	zbx_hk_rule_t		*rule;
 	static zbx_hk_rule_t 	rules[] = {
 		{"events", "source="ZBX_STR(EVENT_SOURCE_TRIGGERS), 0, &hk_config.events_trigger},
 		{"events", "source="ZBX_STR(EVENT_SOURCE_INTERNAL), 0, &hk_config.events_internal},
@@ -943,6 +952,10 @@ static int	housekeeping_events(int now)
 		{"events", "source="ZBX_STR(EVENT_SOURCE_AUTO_REGISTRATION), 0, &hk_config.events_autoreg},
 		{0}
 	};
+
+	const char		*__function_name = "housekeeping_events";
+	int			deleted = 0;
+	zbx_hk_rule_t		*rule;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() now:%d", __function_name, now);
 
