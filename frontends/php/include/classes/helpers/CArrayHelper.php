@@ -189,7 +189,7 @@ class CArrayHelper {
 	 * 	   array('host' => 'Linux server', 'name' => 'CPU load'),
 	 * 	   array('host' => 'Zabbix server', 'name' => 'CPU load')
 	 * );
-	 * var_dump(CArrayHelper::findDuplicate($data, 'name', 'host')); // returns array with index 4
+	 * var_dump(CArrayHelper::findDuplicate($data, 'name', 'host')); // returns array with index 3
 	 *
 	 * @param array $arrays         an array of arrays
 	 * @param string $uniqueField   key to be used as unique criteria
