@@ -727,7 +727,8 @@ class CMacrosResolver {
 	 * @param array		$data							list or hashmap of graphs
 	 * @param type		$data[]['name']					string in which macros should be resolved
 	 * @param array		$data[]['items']				list of graph items
-	 * @param array		$data[]['items'][n]['hostid']	graph n-th item corresponding host Id
+	 * @param int		$data[]['items'][n]['hostid']	graph n-th item corresponding host Id
+	 * @param string	$data[]['items'][n]['host']	    graph n-th item corresponding host name
 	 *
 	 * @return string	inputted data with resolved source field
 	 */
@@ -764,6 +765,7 @@ class CMacrosResolver {
 	 * @param array 	$strList			    list of string in which macros should be resolved
 	 * @param array		$itemsList			    list of	lists of graph items
 	 * @param int		$items[n][m]['hostid']  n-th graph m-th item corresponding host Id
+	 * @param string	$items[n][m]['host']    n-th graph m-th item corresponding host name
 	 *
 	 * @return array	list of strings with macros replaced with corresponding values
 	 */
@@ -868,7 +870,8 @@ class CMacrosResolver {
 	 *
 	 * @param string	$str				string in which macros should be resolved
 	 * @param array		$items				list of graph items
-	 * @param array		$items[n]['hostid'] graph n-th item corresponding host Id
+	 * @param int 		$items[n]['hostid'] graph n-th item corresponding host Id
+	 * @param string	$items[n]['host']   graph n-th item corresponding host name
 	 *
 	 * @return string	string with macros replaces with corresponding values
 	 */
@@ -879,7 +882,6 @@ class CMacrosResolver {
 		// match found groups if ever regexp should change
 		$matches['macroType'] = $matches[2];
 		$matches['position'] = $matches[3];
-
 
 		// build structure of macros: $macroList['HOST.HOST'][2] = 'host name';
 		$macroList = array();
@@ -909,11 +911,7 @@ class CMacrosResolver {
 			switch ($matches['macroType'][$i]) {
 				case 'HOSTNAME':
 				case 'HOST.HOST':
-					$host = API::Host()->get(array(
-						'hostids' => $items[$posInItemList]['hostid'],
-						'output' => array('host')
-					));
-					$macroList[$matches['macroType'][$i]][$position] = ($host) ? $host[0]['host'] : UNRESOLVED_MACRO_STRING;
+					$macroList[$matches['macroType'][$i]][$position] = $items[$posInItemList]['host'];
 					break;
 			}
 		}
