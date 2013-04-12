@@ -787,10 +787,12 @@ class CMacrosResolver {
 			// resolve positional macros in host part and build host-key pair array
 			foreach ($matches['hosts'] as $i => $host) {
 				$matches['hosts'][$i][0] = $this->resolveGraphPositionalMacros($host[0], $items);
-				if (!isset($hostKeyPairs[$matches['hosts'][$i][0]])) {
-					$hostKeyPairs[$matches['hosts'][$i][0]] = array();
+				if ($matches['hosts'][$i][0] !== UNRESOLVED_MACRO_STRING) {
+					if (!isset($hostKeyPairs[$matches['hosts'][$i][0]])) {
+						$hostKeyPairs[$matches['hosts'][$i][0]] = array();
+					}
+					$hostKeyPairs[$matches['hosts'][$i][0]][$matches['keys'][$i][0]] = 1;
 				}
-				$hostKeyPairs[$matches['hosts'][$i][0]][$matches['keys'][$i][0]] = 1;
 			}
 
 			$matchesList[] = $matches;
@@ -835,11 +837,12 @@ class CMacrosResolver {
 			// iterate array backwards!
 			$i = count($matches['macros']);
 			while ($i--) {
-				// get item with key within host
-				$item = $hostKeyPairs[$matches['hosts'][$i][0]][$matches['keys'][$i][0]];
+				// host is real and item exists and has permissions
+				if ($matches['hosts'][$i][0] !== UNRESOLVED_MACRO_STRING &&
+					is_array($hostKeyPairs[$matches['hosts'][$i][0]][$matches['keys'][$i][0]])) {
 
-				// item exists and has permissions
-				if (is_array($item)) {
+					$item = $hostKeyPairs[$matches['hosts'][$i][0]][$matches['keys'][$i][0]];
+
 					// macro function is "last"
 					if ($matches['functions'][$i][0] == 'last') {
 						$value = formatItemLastValue($item, UNRESOLVED_MACRO_STRING);
