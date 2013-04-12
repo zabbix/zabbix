@@ -18,9 +18,6 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-
-$host = $data['host'];
-
 $discoveryWidget = new CWidget();
 
 // create new discovery rule button
@@ -53,7 +50,7 @@ $discoveryTable->setHeader(array(
 	_('Items'),
 	_('Triggers'),
 	_('Graphs'),
-	($host['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) ? _('Hosts') : null,
+	($data['host']['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) ? _('Hosts') : null,
 	make_sorting_header(_('Key'), 'key_', $sortLink),
 	make_sorting_header(_('Interval'), 'delay', $sortLink),
 	make_sorting_header(_('Type'), 'type', $sortLink),
@@ -89,7 +86,7 @@ foreach ($data['discoveries'] as $discovery) {
 
 	// host prototype link
 	$hostPrototypeLink = null;
-	if ($host['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
+	if ($data['host']['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
 		$hostPrototypeLink = array(
 			new CLink(_('Host prototypes'), 'host_prototypes.php?parent_discoveryid='.$discovery['itemid']),
 			' ('.$discovery['hostPrototypes'].')'
