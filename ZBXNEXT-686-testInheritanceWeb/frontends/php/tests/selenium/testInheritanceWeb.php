@@ -67,110 +67,142 @@ class testInheritanceWeb extends CWebTest {
 		return array(
 			array(
 				array(
+					'template' => 'Inheritance test template',
 					'agent' => 'Internet Explorer 10.0',
 					'authentication' => 'None'
 				)
 			),
 			array(
 				array(
+					'template' => 'Inheritance test template',
 					'agent' => 'Internet Explorer 10.0',
 					'authentication' => 'Basic authentication'
 				)
 			),
 			array(
 				array(
+					'template' => 'Inheritance test template',
 					'agent' => 'Internet Explorer 10.0',
 					'authentication' => 'NTLM authentication'
 				)
 			),
 			array(
 				array(
+					'template' => 'Inheritance test template',
 					'agent' => 'Mozilla Firefox 8.0',
 					'authentication' => 'None'
 				)
 			),
 			array(
 				array(
+					'template' => 'Inheritance test template',
 					'agent' => 'Mozilla Firefox 8.0',
 					'authentication' => 'Basic authentication'
 				)
 			),
 			array(
 				array(
+					'template' => 'Inheritance test template',
 					'agent' => 'Mozilla Firefox 8.0',
 					'authentication' => 'NTLM authentication'
 				)
 			),
 			array(
 				array(
+					'template' => 'Inheritance test template',
 					'agent' => 'Opera 12.00',
 					'authentication' => 'None'
 				)
 			),
 			array(
 				array(
+					'template' => 'Inheritance test template',
 					'agent' => 'Opera 12.00',
 					'authentication' => 'Basic authentication'
 				)
 			),
 			array(
 				array(
+					'template' => 'Inheritance test template',
 					'agent' => 'Opera 12.00',
 					'authentication' => 'NTLM authentication'
 				)
 			),
 			array(
 				array(
+					'template' => 'Inheritance test template',
 					'agent' => 'Safari 5.0',
 					'authentication' => 'None'
 				)
 			),
 			array(
 				array(
+					'template' => 'Inheritance test template',
 					'agent' => 'Safari 5.0',
 					'authentication' => 'Basic authentication'
 				)
 			),
 			array(
 				array(
+					'template' => 'Inheritance test template',
 					'agent' => 'Safari 5.0',
 					'authentication' => 'NTLM authentication'
 				)
 			),
 			array(
 				array(
+					'template' => 'Inheritance test template',
 					'agent' => 'Google Chrome 17',
 					'authentication' => 'None'
 				)
 			),
 			array(
 				array(
+					'template' => 'Inheritance test template',
 					'agent' => 'Google Chrome 17',
 					'authentication' => 'Basic authentication'
 				)
 			),
 			array(
 				array(
+					'template' => 'Inheritance test template',
 					'agent' => 'Google Chrome 17',
 					'authentication' => 'NTLM authentication'
 				)
 			),
 			array(
 				array(
+					'template' => 'Inheritance test template',
 					'agent' => '(other ...)',
 					'authentication' => 'None'
 				)
 			),
 			array(
 				array(
+					'template' => 'Inheritance test template',
 					'agent' => '(other ...)',
 					'authentication' => 'Basic authentication'
 				)
 			),
 			array(
 				array(
+					'template' => 'Inheritance test template',
 					'agent' => '(other ...)',
 					'authentication' => 'NTLM authentication'
+				)
+			),
+			array(
+				array(
+					'template' => 'Inheritance test template',
+					'form' => 'testInheritanceWeb1'
+				)
+			),
+			array(
+				array(
+					'host' => 'Template inheritance test host',
+					'form' => 'testInheritanceWeb1',
+					'templatedHost' => true,
+					'hostTemplate' => 'Inheritance test template'
 				)
 			)
 		);
@@ -180,17 +212,42 @@ class testInheritanceWeb extends CWebTest {
 	 * @dataProvider layout
 	 */
 	public function testInheritanceWeb_CheckLayout($data) {
-		$this->zbxTestLogin('templates.php');
-		$this->zbxTestClickWait('link='.$this->template);
+
+		if (isset($data['template'])) {
+			$this->zbxTestLogin('templates.php');
+			$this->zbxTestClickWait('link='.$data['template']);
+		}
+
+		if (isset($data['host'])) {
+			$this->zbxTestLogin('hosts.php');
+			$this->zbxTestClickWait('link='.$data['host']);
+		}
+
 		$this->zbxTestClickWait('link=Web scenarios');
 
 		$this->checkTitle('Configuration of web monitoring');
 		$this->zbxTestTextPresent('CONFIGURATION OF WEB MONITORING');
 
-		$this->zbxTestClickWait('form');
+		if (!isset($data['form'])) {
+			$this->zbxTestClickWait('form');
+		}
+		else {
+			$this->zbxTestClickWait('link='.$data['form']);
+		}
+
 		$this->checkTitle('Configuration of web monitoring');
 		$this->zbxTestTextPresent('CONFIGURATION OF WEB MONITORING');
 		$this->zbxTestTextPresent('Scenario');
+
+		if (isset($data['templatedHost'])) {
+			$this->zbxTestTextPresent('Parent web scenarios');
+			if (isset($data['hostTemplate'])) {
+				$this->assertElementPresent("//a[text()='".$data['hostTemplate']."']");
+			}
+		}
+		else {
+			$this->zbxTestTextNotPresent('Parent web scenarios');
+		}
 
 		if (isset($data['authentication'])) {
 			$this->zbxTestDropdownSelectWait('authentication', $data['authentication']);
@@ -201,27 +258,45 @@ class testInheritanceWeb extends CWebTest {
 			$this->zbxTestDropdownSelect('agent', $data['agent']);
 			$agent = $this->getSelectedLabel('agent');
 		}
-		else {
+		elseif (isset($data['agent']) && $data['agent']=='(other ...)') {
 			$this->zbxTestDropdownSelect('agent', 'Internet Explorer 10.0');
 			$this->zbxTestDropdownSelect('agent', $data['agent']);
 			$agent = $this->getValue("//div[@class='dd']/input[@name='agent']");
+		}
+		else {
+			$agent = $this->getSelectedLabel('agent');
 		}
 
 		$this->zbxTestTextPresent('Host');
 		$this->assertVisible('hostname');
 		$this->assertAttribute("//input[@id='hostname']/@maxlength", 255);
 		$this->assertAttribute("//input[@id='hostname']/@size", 50);
-		$this->assertAttribute("//*[@id='hostname']/@value", $this->template);
+		if (isset($data['template'])) {
+			$this->assertAttribute("//*[@id='hostname']/@value", $data['template']);
+		}
+		elseif (isset($data['host'])) {
+			$this->assertAttribute("//*[@id='hostname']/@value", $data['host']);
+		}
 		$this->assertAttribute("//*[@id='hostname']/@readonly", 'readonly');
 
-		$this->assertVisible('button_popup');
-		$this->assertAttribute("//input[@id='button_popup']/@value", 'Select');
+		if (!isset($data['form'])) {
+			$this->assertVisible('button_popup');
+			$this->assertAttribute("//input[@id='button_popup']/@value", 'Select');
+		}
+		else {
+			$this->assertElementNotPresent('button_popup');
+		}
 
 		$this->zbxTestTextPresent('Name');
 		$this->assertVisible('name');
 		$this->assertAttribute("//input[@id='name']/@maxlength", 64);
 		$this->assertAttribute("//input[@id='name']/@size", 50);
-		$this->assertAttribute("//input[@id='name']/@autofocus", 'autofocus');
+		if (isset($data['templatedHost'])) {
+			$this->assertAttribute("//input[@id='name']/@readonly", 'readonly');
+		}
+		else {
+			$this->assertAttribute("//input[@id='name']/@autofocus", 'autofocus');
+		}
 
 		$this->zbxTestTextPresent('Application');
 
@@ -249,6 +324,11 @@ class testInheritanceWeb extends CWebTest {
 		$this->assertAttribute("//input[@id='http_password']/@maxlength", 64);
 		$this->assertAttribute("//input[@id='http_password']/@size", 50);
 		}
+		else {
+			$this->zbxTestTextNotPresent(array('User', 'Password'));
+			$this->assertElementNotPresent('http_user');
+			$this->assertElementNotPresent('http_password');
+		}
 
 		$this->zbxTestTextPresent('Update interval (in sec)');
 		$this->assertVisible('delay');
@@ -262,10 +342,12 @@ class testInheritanceWeb extends CWebTest {
 		$this->assertAttribute("//input[@id='retries']/@size", 2);
 		$this->assertAttribute("//input[@id='retries']/@value", 1);
 
-		if ($data['agent']!='(other ...)') {
+		if ((isset($data['agent']) && $data['agent'] !='(other ...)') || !isset($data['agent'])) {
 			$this->zbxTestTextPresent('Agent');
 			$this->assertVisible('agent');
-			$this->assertElementPresent("//select[@id='agent']/option[text()='(other ...)']");
+			if (!isset($data['form'])) {
+				$this->assertElementPresent("//select[@id='agent']/option[text()='(other ...)']");
+			}
 			$this->assertElementPresent("//select[@id='agent']/optgroup[@label='Internet Explorer']");
 			$this->assertElementPresent("//select[@id='agent']/optgroup[@label='Internet Explorer']/option[text()='Internet Explorer 10.0']");
 			$this->assertElementPresent("//select[@id='agent']/optgroup[@label='Internet Explorer']/option[text()='Internet Explorer 9.0']");
@@ -331,14 +413,6 @@ class testInheritanceWeb extends CWebTest {
 		$this->assertVisible('status');
 		$this->assertAttribute("//*[@id='status']/@checked", 'checked');
 
-		$this->zbxTestTextPresent('Steps');
-		$this->zbxTestTextPresent(array('Steps', 'Name', 'Timeout', 'URL', 'Required' ,'Status codes'));
-		$this->assertVisible('tab_stepTab');
-		$this->zbxTestClick('link=Steps');
-
-		$this->assertVisible('add_step');
-		$this->assertAttribute("//input[@id='add_step']/@value", 'Add');
-		$this->assertAttribute("//input[@id='add_step']/@type", 'button');
 
 		$this->assertVisible('save');
 		$this->assertAttribute("//input[@id='save']/@value", 'Save');
@@ -347,6 +421,48 @@ class testInheritanceWeb extends CWebTest {
 		$this->assertVisible('cancel');
 		$this->assertAttribute("//input[@id='cancel']/@value", 'Cancel');
 		$this->assertAttribute("//input[@id='cancel']/@role", 'button');
+
+		if (isset($data['form']) && !isset($data['templatedHost'])) {
+			$this->assertVisible('clone');
+			$this->assertAttribute("//input[@id='clone']/@value", 'Clone');
+
+			$this->assertVisible('delete');
+			$this->assertAttribute("//input[@id='delete']/@value", 'Delete');
+		}
+		elseif (isset($data['form']) && isset($data['templatedHost']))  {
+			$this->assertVisible('clone');
+			$this->assertAttribute("//input[@id='clone']/@value", 'Clone');
+		}
+		else {
+			$this->assertElementNotPresent('clone');
+			$this->assertElementNotPresent('delete');
+		}
+
+		$this->zbxTestClick('link=Steps');
+		$this->zbxTestTextPresent('Steps');
+		$this->zbxTestTextPresent(array('Steps', 'Name', 'Timeout', 'URL', 'Required' ,'Status codes'));
+		$this->assertVisible('tab_stepTab');
+
+		if (isset($data['form']) && !isset($data['templatedHost'])) {
+			$this->assertVisible('add_step');
+			$this->assertAttribute("//input[@id='add_step']/@value", 'Add');
+			$this->assertAttribute("//input[@id='add_step']/@type", 'button');
+
+			$this->assertVisible('remove_0');
+			$this->assertAttribute("//input[@id='remove_0']/@value", 'Remove');
+			$this->assertAttribute("//input[@id='remove_0']/@type", 'button');
+		}
+		elseif (!isset($data['form'])) {
+			$this->assertVisible('add_step');
+			$this->assertAttribute("//input[@id='add_step']/@value", 'Add');
+			$this->assertAttribute("//input[@id='add_step']/@type", 'button');
+
+			$this->assertElementNotPresent('remove_0');
+		}
+		else {
+			$this->assertElementNotPresent('add_step');
+			$this->assertElementNotPresent('remove_0');
+		}
 	}
 
 	/**
