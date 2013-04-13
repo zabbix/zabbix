@@ -1517,17 +1517,15 @@ int	is_uint_n_range(const char *str, size_t n, void *value, size_t size, zbx_uin
 
 	while ('\0' != *str && 0 < n--)
 	{
-		zbx_uint64_t	old_value = value_uint64;
-
 		if (0 == isdigit(*str))
 			return FAIL;	/* not a digit */
 
 		c = (zbx_uint64_t)(unsigned char)(*str - '0');
 
-		value_uint64 = value_uint64 * 10 + c;
+		if ((max - c) / 10 < value_uint64)
+			return FAIL;	/* maximum value exceeded */
 
-		if (max < value_uint64 || value_uint64 < old_value)
-			return FAIL;
+		value_uint64 = value_uint64 * 10 + c;
 
 		str++;
 	}
