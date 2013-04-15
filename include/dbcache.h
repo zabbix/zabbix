@@ -177,6 +177,34 @@ typedef struct
 }
 zbx_host_key_t;
 
+/* housekeeping related configuration data*/
+typedef struct
+{
+	unsigned int	events_mode;
+	unsigned int	events_trigger;
+	unsigned int	events_internal;
+	unsigned int	events_discovery;
+	unsigned int	events_autoreg;
+
+	unsigned int	services_mode;
+	unsigned int	services;
+
+	unsigned int	audit_mode;
+	unsigned int	audit;
+
+	unsigned int	sessions_mode;
+	unsigned int	sessions;
+
+	unsigned int	history_mode;
+	unsigned int	history_global;
+	unsigned int	history;
+
+	unsigned int	trends_mode;
+	unsigned int	trends_global;
+	unsigned int	trends;
+}
+zbx_config_hk_t;
+
 void	dc_add_history(zbx_uint64_t itemid, unsigned char value_type, unsigned char flags, AGENT_RESULT *value,
 		zbx_timespec_t *ts, unsigned char state, const char *error, int timestamp, const char *source,
 		int severity, int logeventid, zbx_uint64_t lastlogsize, int mtime);
@@ -239,7 +267,12 @@ size_t	DCconfig_get_snmp_items_by_interfaceid(zbx_uint64_t interfaceid, DC_ITEM 
 #define	CONFIG_REFRESH_UNSUPPORTED	1
 #define	CONFIG_DISCOVERY_GROUPID	2
 #define	CONFIG_SNMPTRAP_LOGGING		3
+
+#define ZBX_HK_OPTION_DISABLED		0
+#define ZBX_HK_OPTION_ENABLED		1
+
 void	*DCconfig_get_config_data(void *data, int type);
+void	DCconfig_get_config_hk(zbx_config_hk_t *data);
 int	DCget_trigger_severity_name(unsigned char priority, char **replace_to);
 
 void	DCrequeue_items(zbx_uint64_t *itemids, unsigned char *states, int *lastclocks, int *errcodes, size_t num);
