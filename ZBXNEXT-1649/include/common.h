@@ -806,6 +806,9 @@ int	is_uint_suffix(const char *c, unsigned int *value);
 int	is_int_prefix(const char *c);
 int	is_uint_n_range(const char *str, size_t n, void *value, size_t size, zbx_uint64_t min, zbx_uint64_t max);
 
+#define is_uint8(str, value) \
+	is_uint_n_range(str, (size_t)ZBX_MAX_UINT64_LEN, value, sizeof(unsigned char), 0x0LL, 0xFFLL)
+
 #define is_ushort(str, value) \
 	is_uint_n_range(str, (size_t)ZBX_MAX_UINT64_LEN, value, sizeof(unsigned short), 0x0LL, 0xFFFFLL)
 

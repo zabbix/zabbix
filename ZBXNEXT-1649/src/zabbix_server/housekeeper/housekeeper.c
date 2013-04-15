@@ -29,51 +29,13 @@
 
 extern unsigned char	process_type;
 
-#define	HK_OPTION_DISABLED		0
-#define	HK_OPTION_ENABLED		1
-
 #define	HK_INITIAL_DELETE_QUEUE_SIZE	4096
 
 /* the maximum number of housekeeping periods to be removed per single housekeeping cycle */
 #define	HK_MAX_DELETE_PERIODS		4
 
-/* housekeeping configuration */
-typedef struct
-{
-	unsigned int	events_mode;
-	unsigned int	events_trigger;
-	unsigned int	events_internal;
-	unsigned int	events_discovery;
-	unsigned int	events_autoreg;
-
-	unsigned int	services_mode;
-	unsigned int	services;
-
-	unsigned int	audit_mode;
-	unsigned int	audit;
-
-	unsigned int	sessions_mode;
-	unsigned int	sessions;
-
-	unsigned int	history_mode;
-	unsigned int	history_global;
-	unsigned int	history;
-
-	unsigned int	trends_mode;
-	unsigned int	trends_global;
-	unsigned int	trends;
-}
-zbx_hk_config_t;
-
 /* the housekeeping configuration */
-static zbx_hk_config_t	hk_config = {
-		1, 355, 355, 355, 355,
-		1, 355,
-		1, 355,
-		1, 355,
-		1, 0, 90,
-		1, 0, 355
-};
+static zbx_config_hk_t	hk_config;
 
 /* Housekeeping configuration field definition.                  */
 /* This structure is used to map database config table fields to */
@@ -91,32 +53,6 @@ typedef struct
 	unsigned int	max_value;
 }
 zbx_hk_db_config_t;
-
-/* the housekeeping configuration field definition */
-#define	HK_FIELD_MAP(field, min, max) \
-		{&hk_config.field, "hk_" # field, min, max}
-
-/* mapping of housekeeping configuration fields from config table to configuration data */
-static zbx_hk_db_config_t	hk_db_fields[] = {
-		HK_FIELD_MAP(events_mode, 0, 1),
-		HK_FIELD_MAP(events_trigger, 1, 99999),
-		HK_FIELD_MAP(events_internal, 1, 99999),
-		HK_FIELD_MAP(events_discovery, 1, 99999),
-		HK_FIELD_MAP(events_autoreg, 1, 99999),
-		HK_FIELD_MAP(services_mode, 0, 1),
-		HK_FIELD_MAP(services, 1, 99999),
-		HK_FIELD_MAP(audit_mode, 0, 1),
-		HK_FIELD_MAP(audit, 1, 99999),
-		HK_FIELD_MAP(sessions_mode, 0, 1),
-		HK_FIELD_MAP(sessions, 1, 99999),
-		HK_FIELD_MAP(history_mode, 0, 1),
-		HK_FIELD_MAP(history_global, 0, 1),
-		HK_FIELD_MAP(history, 0, 99999),
-		HK_FIELD_MAP(trends_mode, 0, 1),
-		HK_FIELD_MAP(trends_global, 0, 1),
-		HK_FIELD_MAP(trends, 0, 99999),
-		{0}
-};
 
 /* Housekeeping rule definition.                                */
 /* A housekeeping rule describes table from which records older */
@@ -357,7 +293,7 @@ static void	hk_history_prepare(zbx_hk_history_rule_t *rule, unsigned int now)
 		if (FAIL == is_uint64(row[0], &itemid) || FAIL == is_uint32(row[1], &min_clock))
 			continue;
 
-		if (HK_OPTION_ENABLED == *rule->poption_global)
+		if (ZBX_HK_OPTION_ENABLED == *rule->poption_global)
 			history = *rule->poption;
 		else if (FAIL == is_uint32(row[2], &history))
 			continue;
@@ -425,7 +361,7 @@ static void	hk_history_item_update(zbx_hk_history_rule_t *rule, unsigned int now
 {
 	zbx_hk_item_cache_t	*item_record;
 
-	if (HK_OPTION_DISABLED == *rule->poption_mode)
+	if (ZBX_HK_OPTION_DISABLED == *rule->poption_mode)
 		return;
 
 	item_record = zbx_hashset_search(&rule->item_cache, &itemid);
@@ -485,7 +421,7 @@ static void	hk_history_update(zbx_hk_history_rule_t *rules, unsigned int now)
 			rule = rules + value_type;
 			if (0 == (rule->state & HK_ITEM_RULE_DELETE_QUEUE_PREPARED))
 			{
-				if (HK_OPTION_ENABLED == *rule->poption_global)
+				if (ZBX_HK_OPTION_ENABLED == *rule->poption_global)
 					history = *rule->poption;
 				hk_history_item_update(rule, now, itemid, history);
 			}
@@ -495,7 +431,7 @@ static void	hk_history_update(zbx_hk_history_rule_t *rules, unsigned int now)
 			rule = rules + HK_UPADTE_CACHE_OFFSET_TREND_FLOAT;
 			if (0 == (rule->state & HK_ITEM_RULE_DELETE_QUEUE_PREPARED))
 			{
-				if (HK_OPTION_ENABLED == *rule->poption_global)
+				if (ZBX_HK_OPTION_ENABLED == *rule->poption_global)
 					trends = *rule->poption;
 				hk_history_item_update(rule, now, itemid, trends);
 			}
@@ -506,7 +442,7 @@ static void	hk_history_update(zbx_hk_history_rule_t *rules, unsigned int now)
 
 			if (0 == (rule->state & HK_ITEM_RULE_DELETE_QUEUE_PREPARED))
 			{
-				if (HK_OPTION_ENABLED == *rule->poption_global)
+				if (ZBX_HK_OPTION_ENABLED == *rule->poption_global)
 					trends = *rule->poption;
 				hk_history_item_update(rule, now, itemid, trends);
 			}
@@ -543,7 +479,7 @@ static void	hk_history_delete_queue_prepare_all(zbx_hk_history_rule_t *rules, un
 	/* prepare history item cache (hashset containing itemid:min_clock values) */
 	for (rule = rules; NULL != rule->table; rule++)
 	{
-		if (HK_OPTION_ENABLED == *rule->poption_mode)
+		if (ZBX_HK_OPTION_ENABLED == *rule->poption_mode)
 		{
 			if (HK_ITEM_RULE_NOT_INITIALIZED == rule->state)
 				hk_history_prepare(rule, now);
@@ -620,7 +556,7 @@ static int	housekeeping_history_and_trends(unsigned int now)
 
 	for (rule = hk_history_rules; NULL != rule->table; rule++)
 	{
-		if (HK_OPTION_DISABLED == *rule->poption_mode) continue;
+		if (ZBX_HK_OPTION_DISABLED == *rule->poption_mode) continue;
 
 		/* process housekeeping rule */
 
@@ -643,70 +579,6 @@ static int	housekeeping_history_and_trends(unsigned int now)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __function_name, deleted);
 
 	return deleted;
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: housekeeping_read_config                                         *
- *                                                                            *
- * Purpose: read housekeeping configuration from database                     *
- *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value: SUCCEED - the configuration was read successfully            *
- *               FAIL    - failed to read configuration. This function fails  *
- *                         if it can't read the housekeeping parameters from  *
- *                         database or if the parameters are out of the       *
- *                         defined range.                                     *
- *                                                                            *
- * Author: Andris Zeila                                                       *
- *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
- ******************************************************************************/
-static int	housekeeping_read_config()
-{
-	const char		*__function_name = "housekeeping_read_config";
-	DB_RESULT       	result;
-	DB_ROW          	row;
-	int			i;
-	char			*sql_fields = NULL;
-	size_t			sql_size = 0, sql_offset = 0;
-	zbx_hk_db_config_t	*pfield;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
-
-	/* assemble field list for select statement */
-	pfield = hk_db_fields;
-	zbx_strcpy_alloc(&sql_fields, &sql_size, &sql_offset, pfield->field);
-
-	for (pfield++; NULL != pfield->pvalue; pfield++)
-	{
-		zbx_chrcpy_alloc(&sql_fields, &sql_size, &sql_offset, ',');
-		zbx_strcpy_alloc(&sql_fields, &sql_size, &sql_offset, pfield->field);
-	}
-
-	result = DBselect("select %s from config", sql_fields);
-	zbx_free(sql_fields);
-
-	if (NULL != (row = DBfetch(result)) && SUCCEED != DBis_null(row[0]))
-	{
-		for (i =  0; NULL != hk_db_fields[i].pvalue; i++)
-		{
-			pfield = &hk_db_fields[i];
-			if (FAIL == is_uint_range(row[i], pfield->pvalue, pfield->min_value, pfield->max_value))
-			{
-				zabbix_log(LOG_LEVEL_WARNING, "invalid housekeeper configuration field value: %s=%s",
-						pfield->field, row[i]);
-			}
-		}
-	}
-
-	DBfree_result(result);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
-
-	return SUCCEED;
 }
 
 /******************************************************************************
@@ -793,7 +665,7 @@ static int	housekeeping_cleanup()
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	/* first handle the trivial case when history and trend housekeeping is disabled */
-	if (HK_OPTION_DISABLED == hk_config.history_mode && HK_OPTION_DISABLED == hk_config.trends_mode)
+	if (ZBX_HK_OPTION_DISABLED == hk_config.history_mode && ZBX_HK_OPTION_DISABLED == hk_config.trends_mode)
 		goto out;
 
 	zbx_vector_uint64_create(&housekeeperids);
@@ -801,7 +673,7 @@ static int	housekeeping_cleanup()
 	/* assemble list of tables excluded from housekeeping procedure */
 	for (table = hk_cleanup_tables; NULL != table->name; table++)
 	{
-		if (HK_OPTION_ENABLED == *table->poption_mode)
+		if (ZBX_HK_OPTION_ENABLED == *table->poption_mode)
 			continue;
 
 		zbx_strcpy_alloc(&sql_tables, &sql_size, &sql_offset,
@@ -907,7 +779,7 @@ static int	housekeeping_sessions(int now)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() now:%d", __function_name, now);
 
-	if (HK_OPTION_ENABLED == hk_config.sessions_mode)
+	if (ZBX_HK_OPTION_ENABLED == hk_config.sessions_mode)
 	{
 		rc = DBexecute("delete from sessions where lastaccess<%d", now - SEC_PER_DAY * hk_config.sessions);
 
@@ -929,7 +801,7 @@ static int	housekeeping_services(int now)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() now:%d", __function_name, now);
 
-	if (HK_OPTION_ENABLED == hk_config.services_mode)
+	if (ZBX_HK_OPTION_ENABLED == hk_config.services_mode)
 		deleted = housekeeping_process_rule(now, &rule);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __function_name, deleted);
@@ -946,7 +818,7 @@ static int	housekeeping_audit(int now)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() now:%d", __function_name, now);
 
-	if (HK_OPTION_ENABLED == hk_config.audit_mode)
+	if (ZBX_HK_OPTION_ENABLED == hk_config.audit_mode)
 		deleted = housekeeping_process_rule(now, &rule);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __function_name, deleted);
@@ -970,7 +842,7 @@ static int	housekeeping_events(int now)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() now:%d", __function_name, now);
 
-	if (HK_OPTION_ENABLED == hk_config.events_mode)
+	if (ZBX_HK_OPTION_ENABLED == hk_config.events_mode)
 		for (rule = rules; NULL != rule->table; rule++)
 			deleted += housekeeping_process_rule(now, rule);
 
@@ -992,7 +864,10 @@ void	main_housekeeper_loop(void)
 		zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
 		DBconnect(ZBX_DB_CONNECT_NORMAL);
 
-		housekeeping_read_config();
+		DCconfig_get_config_hk(&hk_config);
+
+		zabbix_log(LOG_LEVEL_DEBUG, "WDN: hk_trends=%u, hk_trends_global=%u",
+				hk_config.trends, hk_config.trends_global);
 
 		zbx_setproctitle("%s [removing old history and trends]", get_process_type_string(process_type));
 		d_history_and_trends = housekeeping_history_and_trends(now);

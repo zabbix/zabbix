@@ -313,10 +313,12 @@ ZBX_DC_INTERFACE_ITEM;
 
 typedef struct
 {
-	const char	*severity_name[TRIGGER_SEVERITY_COUNT];
-	zbx_uint64_t	discovery_groupid;
-	int		refresh_unsupported;
-	unsigned char	snmptrap_logging;
+	const char		*severity_name[TRIGGER_SEVERITY_COUNT];
+	zbx_uint64_t		discovery_groupid;
+	int			refresh_unsupported;
+	unsigned char		snmptrap_logging;
+	/* housekeeping related configuration data */
+	zbx_config_hk_t		hk;
 }
 ZBX_DC_CONFIG_TABLE;
 
@@ -668,6 +670,30 @@ static int	DCsync_config(DB_RESULT result)
 
 			for (i = 0; TRIGGER_SEVERITY_COUNT > i; i++)
 				DCstrpool_replace(found, &config->config->severity_name[i], default_severity_names[i]);
+
+			/* set default housekeeper configuration */
+			config->config->hk.events_mode = 1;
+			config->config->hk.events_trigger = 365;
+			config->config->hk.events_internal = 365;
+			config->config->hk.events_autoreg = 365;
+			config->config->hk.events_discovery = 365;
+
+			config->config->hk.audit_mode = 1;
+			config->config->hk.audit = 365;
+
+			config->config->hk.services_mode = 1;
+			config->config->hk.services = 365;
+
+			config->config->hk.sessions_mode = 1;
+			config->config->hk.sessions = 365;
+
+			config->config->hk.history_mode = 1;
+			config->config->hk.history_global = 0;
+			config->config->hk.history = 90;
+
+			config->config->hk.trends_mode = 1;
+			config->config->hk.trends_global = 0;
+			config->config->hk.trends = 90;
 		}
 	}
 	else
@@ -680,6 +706,30 @@ static int	DCsync_config(DB_RESULT result)
 
 		for (i = 0; TRIGGER_SEVERITY_COUNT > i; i++)
 			DCstrpool_replace(found, &config->config->severity_name[i], row[3 + i]);
+
+		/* read housekeeper configuration */
+		config->config->hk.events_mode = atoi(row[9]);
+		config->config->hk.events_trigger = atoi(row[10]);
+		config->config->hk.events_internal = atoi(row[11]);
+		config->config->hk.events_discovery = atoi(row[12]);
+		config->config->hk.events_autoreg = atoi(row[13]);
+
+		config->config->hk.services_mode = atoi(row[14]);
+		config->config->hk.services = atoi(row[15]);
+
+		config->config->hk.audit_mode = atoi(row[16]);
+		config->config->hk.audit = atoi(row[17]);
+
+		config->config->hk.sessions_mode = atoi(row[18]);
+		config->config->hk.sessions = atoi(row[19]);
+
+		config->config->hk.history_mode = atoi(row[20]);
+		config->config->hk.history_global = atoi(row[21]);
+		config->config->hk.history = atoi(row[22]);
+
+		config->config->hk.trends_mode = atoi(row[23]);
+		config->config->hk.trends_global = atoi(row[24]);
+		config->config->hk.trends = atoi(row[25]);
 
 		if (NULL != (row = DBfetch(result)))	/* config table should have only one record */
 			zabbix_log(LOG_LEVEL_ERR, "table 'config' has multiple records");
@@ -2233,6 +2283,32 @@ static void	DCsync_interfaces(DB_RESULT result)
 
 /******************************************************************************
  *                                                                            *
+ * Function: DCsync_config_select                                             *
+ *                                                                            *
+ * Purpose: Executes SQL select statement used to synchronize configuration   *
+ *          data with DCsync_config()                                         *
+ *                                                                            *
+ * Author: Andris Zeila                                                       *
+ *                                                                            *
+ ******************************************************************************/
+static DB_RESULT	DCsync_config_select()
+{
+	return DBselect(
+			"select refresh_unsupported,discovery_groupid,snmptrap_logging,"
+				"severity_name_0,severity_name_1,severity_name_2,"
+				"severity_name_3,severity_name_4,severity_name_5,"
+				"hk_events_mode,hk_events_trigger,hk_events_internal,"
+				"hk_events_discovery,hk_events_autoreg,hk_services_mode,"
+				"hk_services,hk_audit_mode,hk_audit,hk_sessions_mode,hk_sessions,"
+				"hk_history_mode,hk_history_global,hk_history,hk_trends_mode,"
+				"hk_trends_global,hk_trends"
+			" from config"
+			ZBX_SQL_NODE,
+			DBwhere_node_local("configid"));
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: DCsync_configuration                                             *
  *                                                                            *
  * Purpose: Synchronize configuration data from database                      *
@@ -2263,14 +2339,7 @@ void	DCsync_configuration()
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	sec = zbx_time();
-	conf_result = DBselect(
-			/* SQL statement must be synced with DCload_config() */
-			"select refresh_unsupported,discovery_groupid,snmptrap_logging,"
-				"severity_name_0,severity_name_1,severity_name_2,"
-				"severity_name_3,severity_name_4,severity_name_5"
-			" from config"
-			ZBX_SQL_NODE,
-			DBwhere_node_local("configid"));
+	conf_result = DCsync_config_select();
 	csec = zbx_time() - sec;
 
 	sec = zbx_time();
@@ -2951,13 +3020,7 @@ void	DCload_config()
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	result = DBselect(
-			"select refresh_unsupported,discovery_groupid,snmptrap_logging,"
-				"severity_name_0,severity_name_1,severity_name_2,"
-				"severity_name_3,severity_name_4,severity_name_5"
-			" from config"
-			ZBX_SQL_NODE,
-			DBwhere_node_local("configid"));
+	result = DCsync_config_select();
 
 	LOCK_CACHE;
 
@@ -3921,6 +3984,28 @@ void	*DCconfig_get_config_data(void *data, int type)
 	UNLOCK_CACHE;
 
 	return data;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DCconfig_get_config_hk                                           *
+ *                                                                            *
+ * Purpose: get housekeeping configuration data                               *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Andris Zeila                                                       *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+void	DCconfig_get_config_hk(zbx_config_hk_t *data)
+{
+	LOCK_CACHE;
+
+	*data = config->config->hk;
+
+	UNLOCK_CACHE;
 }
 
 /******************************************************************************
