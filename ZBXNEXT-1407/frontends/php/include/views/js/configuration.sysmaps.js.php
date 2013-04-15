@@ -78,15 +78,13 @@
 			<tr id="hostGroupSelectRow">
 				<td><?php echo _('Host group'); ?></td>
 				<td>
-					<input readonly="readonly" size="50" id="elementNameHostGroup" name="elementName" class="input">
-					<span class="link" onclick="PopUp('popup.php?srctbl=host_group&srcfld1=groupid&srcfld2=name&dstfrm=selementForm&dstfld1=elementid&dstfld2=elementNameHostGroup&writeonly=1&noempty=1', 450, 450)"><?php echo _('Select'); ?></span>
+					<div id="elementNameHostGroup" class="multiselect" style="width: <?php echo ZBX_MULTISELECT_STANDARD_WIDTH; ?>px;"></div>
 				</td>
 			</tr>
 			<tr id="hostSelectRow">
 				<td><?php echo _('Host'); ?></td>
 				<td>
-					<input readonly="readonly" size="50" id="elementNameHost" name="elementName" class="input">
-					<span class="link" onclick="PopUp('popup.php?srctbl=hosts&srcfld1=hostid&srcfld2=name&dstfrm=selementForm&dstfld1=elementid&dstfld2=elementNameHost&real_hosts=1&writeonly=1&noempty=1', 450, 450)"><?php echo _('Select'); ?></span>
+					<div id="elementNameHost" class="multiselect" style="width: <?php echo ZBX_MULTISELECT_STANDARD_WIDTH; ?>px;"></div>
 				</td>
 			</tr>
 			<tr id="triggerSelectRow">

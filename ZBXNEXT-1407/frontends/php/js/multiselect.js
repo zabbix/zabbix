@@ -45,6 +45,7 @@ jQuery(function($) {
 		options.limit = 20; // MULTISELECT_LIMIT
 
 		return this.each(function() {
+			$(this).empty();
 			$(this).multiSelect(options);
 		});
 	};
