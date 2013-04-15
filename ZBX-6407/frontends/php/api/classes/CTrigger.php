@@ -564,10 +564,10 @@ class CTrigger extends CTriggerGeneral {
 		// limit
 		$limit = null;
 		if (zbx_ctype_digit($options['limit']) && $options['limit']) {
-			// for post SQL filtering we take at least TRIGGER_LIMIT_WITH_POST_SQL_FILTER rows, which is reasonably
-			// small number contrary not limiting at all, but reasonably large to not end with lots of queries
+			// for post SQL filtering we take at least twice as many rows for first query
 			if ($postSqlFiltering) {
-				$limit = max($options['limit'], TRIGGER_LIMIT_WITH_POST_SQL_FILTER);
+				$limit = 2 * $options['limit'];
+				$minLimit = $limit;
 			}
 			else {
 				$limit = $options['limit'];
@@ -750,7 +750,17 @@ class CTrigger extends CTriggerGeneral {
 				}
 			}
 
-			$offset += $limit;
+			// calculate $limit and $offset for next query
+			if ($postSqlFiltering && $limit !== null) {
+				$offset += $limit;
+				$minLimit *= 2;
+				// take care of division by zero
+				$triggerCount = count($triggers) ? count($triggers) : 1;
+				// we take $limit at least twice as large to not run in lots of queries in some cases or reasonable estimate
+				// to get all necessary data in two queries with high probability
+				$limit = max($minLimit, round(($options['limit'] - count($result)) / $triggerCount * $limit * 2));
+			}
+
 		} while (count($result) < $options['limit'] && $hasMore);
 
 		// return count for post SQL filtered result sets

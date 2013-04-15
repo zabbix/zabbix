@@ -800,7 +800,8 @@ function make_latest_issues(array $filter = array()) {
 
 	// how many issues are there at all with given parameters
 	$options['countOutput'] = true;
-	unset($options['limit']);
+	// we unset withLastEventUnacknowledged and skipDependent because of performance issues
+	unset($options['limit'], $options['withLastEventUnacknowledged'], $options['skipDependent']);
 	$triggersTotalCount = API::Trigger()->get($options);
 
 	foreach($triggers as $tnum => $trigger) {
