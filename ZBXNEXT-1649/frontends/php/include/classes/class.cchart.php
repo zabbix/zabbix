@@ -57,7 +57,6 @@ class CChart extends CGraphDraw {
 		$this->gridStep = array(); // grid step
 		$this->gridPixels = 25; // optimal grid size
 		$this->gridPixelsVert = 40;
-		$this->configuration = select_config();
 	}
 
 	/********************************************************************************************************/
@@ -174,6 +173,10 @@ class CChart extends CGraphDraw {
 		$this->percentile['right']['percent'] = $percentile;
 	}
 
+	public function setHistory($value) {
+		$this->setHistory = $value;
+	}
+
 	protected function selectData() {
 		$this->data = array();
 		$now = time(null);
@@ -215,8 +218,8 @@ class CChart extends CGraphDraw {
 
 			$sql_arr = array();
 
-			if ($this->configuration['hk_trends_global']) {
-				$real_item['history'] = $this->configuration['hk_trends'];
+			if ($this->setHistory) {
+				$real_item['history'] = $this->setHistory;
 			}
 
 			if (($real_item['history'] * SEC_PER_DAY) > (time() - ($this->from_time + $this->period / 2)) // should pick data from history or trends

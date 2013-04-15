@@ -148,6 +148,17 @@ if ($isDataValid) {
 	$graph->setLeftPercentage(get_request('percent_left', 0));
 	$graph->setRightPercentage(get_request('percent_right', 0));
 
+	$config = select_config();
+
+	if ($config['hk_history_global']) {
+		$hkHistory = $config['hk_history'];
+	}
+	else {
+		$hkHistory = false;
+	}
+
+	$graph->setHistory($hkHistory);
+
 	foreach ($items as $item) {
 		$graph->addItem(
 			$item['itemid'],

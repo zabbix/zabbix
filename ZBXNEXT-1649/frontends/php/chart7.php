@@ -110,6 +110,17 @@ if ($isDataValid) {
 	$graph->setWidth(get_request('width', 400));
 	$graph->setHeight(get_request('height', 300));
 
+	$config = select_config();
+
+	if ($config['hk_history_global']) {
+		$hkHistory = $config['hk_history'];
+	}
+	else {
+		$hkHistory = false;
+	}
+
+	$graph->setHistory($hkHistory);
+
 	foreach ($items as $item) {
 		$graph->addItem($item['itemid'], $item['calc_fnc'], $item['color'], $item['type']);
 	}

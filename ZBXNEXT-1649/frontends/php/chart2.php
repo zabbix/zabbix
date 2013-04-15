@@ -121,6 +121,17 @@ $graph->setYMaxItemId($dbGraph['ymax_itemid']);
 $graph->setLeftPercentage($dbGraph['percent_left']);
 $graph->setRightPercentage($dbGraph['percent_right']);
 
+$config = select_config();
+
+if ($config['hk_history_global']) {
+	$hkHistory = $config['hk_history'];
+}
+else {
+	$hkHistory = false;
+}
+
+$graph->setHistory($hkHistory);
+
 $dbGraphItems = DBselect(
 	'SELECT gi.*'.
 	' FROM graphs_items gi'.
