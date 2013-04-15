@@ -45,7 +45,7 @@ $actionFormList->addRow(_('Name'), $nameTextBox);
 $actionFormList->addRow(_('Default subject'), new CTextBox('def_shortdata', $this->data['action']['def_shortdata'], ZBX_TEXTBOX_STANDARD_SIZE));
 $actionFormList->addRow(_('Default message'), new CTextArea('def_longdata', $this->data['action']['def_longdata']));
 
-if ($this->data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
+if ($this->data['eventsource'] == EVENT_SOURCE_TRIGGERS || $this->data['eventsource'] == EVENT_SOURCE_INTERNAL) {
 	$actionFormList->addRow(_('Recovery message'), new CCheckBox('recovery_msg', $this->data['action']['recovery_msg'], 'javascript: submit();', 1));
 	if ($this->data['action']['recovery_msg']) {
 		$actionFormList->addRow(_('Recovery subject'), new CTextBox('r_shortdata', $this->data['action']['r_shortdata'], ZBX_TEXTBOX_STANDARD_SIZE));
@@ -92,7 +92,7 @@ foreach ($this->data['action']['conditions'] as $condition) {
 	$conditionTable->addRow(
 		array(
 			$labelSpan,
-			get_condition_desc($condition['conditiontype'], $condition['operator'], $condition['value']).SPACE,
+			get_condition_desc($condition['conditiontype'], $condition['operator'], $condition['value']),
 			array(
 				new CButton('remove', _('Remove'), 'javascript: removeCondition('.$i.');', 'link_menu'),
 				new CVar('conditions['.$i.']', $condition)
@@ -289,6 +289,9 @@ switch ($this->data['new_condition']['conditiontype']) {
 	case CONDITION_TYPE_HOST_NAME:
 		$rowCondition[] = new CTextBox('new_condition[value]', '', ZBX_TEXTBOX_STANDARD_SIZE);
 		break;
+	case CONDITION_TYPE_EVENT_TYPE:
+		$rowCondition[] = new CComboBox('new_condition[value]', null, null, eventType());
+		break;
 }
 
 $newConditionDiv = new CDiv(
@@ -305,7 +308,7 @@ $conditionFormList->addRow(_('New condition'), $newConditionDiv);
  */
 $operationFormList = new CFormList('operationlist');
 
-if ($this->data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
+if ($this->data['eventsource'] == EVENT_SOURCE_TRIGGERS || $this->data['eventsource'] == EVENT_SOURCE_INTERNAL) {
 	$operationFormList->addRow(_('Default operation step duration'), array(
 		new CNumericBox('esc_period', $this->data['action']['esc_period'], 6, 'no'),
 		' ('._('minimum 60 seconds').')')
@@ -315,7 +318,7 @@ if ($this->data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
 // create operation table
 $operationsTable = new CTable(_('No operations defined.'), 'formElementTable');
 $operationsTable->attr('style', 'min-width: 600px;');
-if ($this->data['action']['eventsource'] == EVENT_SOURCE_TRIGGERS) {
+if ($this->data['action']['eventsource'] == EVENT_SOURCE_TRIGGERS || $this->data['eventsource'] == EVENT_SOURCE_INTERNAL) {
 	$operationsTable->setHeader(array(_('Steps'), _('Details'), _('Start in'), _('Duration (sec)'), _('Action')));
 	$delay = count_operations_delay($this->data['action']['operations'], $this->data['action']['esc_period']);
 }
@@ -337,7 +340,7 @@ foreach ($this->data['action']['operations'] as $operationid => $operation) {
 	$details = new CSpan(get_operation_descr(SHORT_DESCRIPTION, $operation));
 	$details->setHint(get_operation_descr(LONG_DESCRIPTION, $operation));
 
-	if ($this->data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
+	if ($this->data['eventsource'] == EVENT_SOURCE_TRIGGERS || $this->data['eventsource'] == EVENT_SOURCE_INTERNAL) {
 		$esc_steps_txt = null;
 		$esc_period_txt = null;
 		$esc_delay_txt = null;
@@ -411,7 +414,7 @@ if (!empty($this->data['new_operation'])) {
 		$newOperationsTable->addItem(new CVar('new_operation[operationid]', $this->data['new_operation']['operationid']));
 	}
 
-	if ($this->data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
+	if ($this->data['eventsource'] == EVENT_SOURCE_TRIGGERS || $this->data['eventsource'] == EVENT_SOURCE_INTERNAL) {
 		$stepNumericBox = new CNumericBox('new_operation[esc_step_from]', $this->data['new_operation']['esc_step_from'], 5);
 		$stepNumericBox->addAction('onchange', 'javascript:'.$stepNumericBox->getAttribute('onchange').' if(this.value == 0) this.value=1;');
 
@@ -440,12 +443,26 @@ if (!empty($this->data['new_operation'])) {
 		$newOperationsTable->addRow(array(_('Step'), $stepTable));
 	}
 
-	$operationTypeComboBox = new CComboBox('new_operation[operationtype]', $this->data['new_operation']['operationtype'], 'submit()');
-	foreach ($this->data['allowedOperations'] as $operation) {
-		$operationTypeComboBox->addItem($operation, operation_type2str($operation));
+	// if multiple operation types are available, display a select
+	if (count($this->data['allowedOperations']) > 1) {
+		$operationTypeComboBox = new CComboBox(
+			'new_operation[operationtype]',
+			$this->data['new_operation']['operationtype'], 'submit()'
+		);
+		foreach ($this->data['allowedOperations'] as $operation) {
+			$operationTypeComboBox->addItem($operation, operation_type2str($operation));
+		}
+		$newOperationsTable->addRow(array(_('Operation type'), $operationTypeComboBox), 'indent_both');
+	}
+	// if only one operation is available - show only the label
+	else {
+		$operation = $this->data['allowedOperations'][0];
+		$newOperationsTable->addRow(array(
+			_('Operation type'),
+			array(operation_type2str($operation), new CVar('new_operation[operationtype]', $operation)),
+		), 'indent_both');
 	}
 
-	$newOperationsTable->addRow(array(_('Operation type'), $operationTypeComboBox), 'indent_both');
 	switch ($this->data['new_operation']['operationtype']) {
 		case OPERATION_TYPE_MESSAGE:
 			if (!isset($this->data['new_operation']['opmessage'])) {
@@ -463,6 +480,10 @@ if (!empty($this->data['new_operation'])) {
 				elseif ($this->data['eventsource'] == EVENT_SOURCE_AUTO_REGISTRATION) {
 					$this->data['new_operation']['opmessage']['subject'] = ACTION_DEFAULT_SUBJ_AUTOREG;
 					$this->data['new_operation']['opmessage']['message'] = ACTION_DEFAULT_MSG_AUTOREG;
+				}
+				else {
+					$this->data['new_operation']['opmessage']['subject'] = '';
+					$this->data['new_operation']['opmessage']['message'] = '';
 				}
 			}
 

@@ -326,7 +326,7 @@ class CHost extends CHostGeneral {
 					'SELECT NULL'.
 					' FROM items i'.
 					' WHERE h.hostid=i.hostid'.
-						' AND i.status IN ('.ITEM_STATUS_ACTIVE.','.ITEM_STATUS_NOTSUPPORTED.')'.
+						' AND i.status='.ITEM_STATUS_ACTIVE.
 						' AND i.lastvalue IS NOT NULL'.
 					')';
 		}
