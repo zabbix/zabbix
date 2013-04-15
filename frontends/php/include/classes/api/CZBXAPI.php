@@ -744,6 +744,23 @@ class CZBXAPI {
 	}
 
 	/**
+	 * Checks if an objects contains any of the given parameters.
+	 *
+	 * @throws APIException     if any of the parameters are present in the object
+	 *
+	 * @param array $object
+	 * @param array $params
+	 * @param $error
+	 */
+	protected function checkNoParameters(array $object, array $params, $error) {
+		foreach ($params as $param) {
+			if (array_key_exists($param, $object)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s($error, $param));
+			}
+		}
+	}
+
+	/**
 	 * Throws an API exception.
 	 *
 	 * @static
@@ -841,7 +858,11 @@ class CZBXAPI {
 	}
 
 	/**
-	 * Check if a parameter contains a deprecated value. Currently supports only array parameters.
+	 * Check if a set of parameters contains a deprecated parameter or a a parameter with a deprecated value.
+	 *
+	 * If $value is not set, the method will trigger a deprecated notice if $params contains the $paramName key.
+	 * If $value is set, the method will trigger a notice if the value of the parameter is equal to the deprecated value
+	 * or the parameter is an array and contains a deprecated value.
 	 *
 	 * @param array     $params
 	 * @param string    $paramName
@@ -849,9 +870,14 @@ class CZBXAPI {
 	 *
 	 * @return void
 	 */
-	protected function checkDeprecatedParam(array $params, $paramName, $value) {
-		if (isset($params[$paramName]) && is_array($params[$paramName]) && in_array($value, $params[$paramName])) {
-			self::deprecated('Value "'.$value.'" for parameter "'.$paramName.'" is deprecated.');
+	protected function checkDeprecatedParam(array $params, $paramName, $value = null) {
+		if (isset($params[$paramName])) {
+			if ($value === null) {
+				self::deprecated('Parameter "'.$paramName.'" is deprecated.');
+			}
+			elseif (is_array($params[$paramName]) && in_array($value, $params[$paramName]) || $params[$paramName] == $value) {
+				self::deprecated('Value "'.$value.'" for parameter "'.$paramName.'" is deprecated.');
+			}
 		}
 	}
 
@@ -866,7 +892,7 @@ class CZBXAPI {
 	 *
 	 * @return array
 	 */
-	protected function addDeprecatedOutput(array $objects, $deprecatedProperty, $newProperty, $output) {
+	protected function handleDeprecatedOutput(array $objects, $deprecatedProperty, $newProperty, $output) {
 		if ($this->outputIsRequested($deprecatedProperty, $output)) {
 			foreach ($objects as &$object) {
 				$object[$deprecatedProperty] = $object[$newProperty];

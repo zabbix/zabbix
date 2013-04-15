@@ -296,34 +296,6 @@ elseif (str_in_array($_REQUEST['go'], array('activate', 'disable')) && isset($_R
 			'where' => array('triggerid' => $triggerIdsToUpdate)
 		));
 
-		// if we're disabling a monitored trigger, set it's value flag to UNKNOWN
-		if ($status == TRIGGER_STATUS_DISABLED) {
-			$valueTriggerIds = array();
-			$db_triggers = DBselect(
-				'SELECT t.triggerid'.
-				' FROM triggers t,functions f,items i,hosts h'.
-				' WHERE t.triggerid=f.triggerid'.
-					' AND f.itemid=i.itemid'.
-					' AND i.hostid=h.hostid'.
-					' AND '.dbConditionInt('t.triggerid', $triggerIdsToUpdate).
-					' AND t.value_flags='.TRIGGER_VALUE_FLAG_NORMAL.
-					' AND h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.')'
-			);
-			while ($row = DBfetch($db_triggers)) {
-				$valueTriggerIds[] = $row['triggerid'];
-			}
-
-			if (!empty($valueTriggerIds)) {
-				DB::update('triggers', array(
-					'values' => array(
-						'value_flags' => TRIGGER_VALUE_FLAG_UNKNOWN,
-						'error' => _('Trigger status became "Disabled".')
-					),
-					'where' => array('triggerid' => $valueTriggerIds)
-				));
-			}
-		}
-
 		// get updated triggers with additional data
 		$db_triggers = API::Trigger()->get(array(
 			'triggerids' => $triggerIdsToUpdate,

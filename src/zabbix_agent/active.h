@@ -61,10 +61,10 @@ typedef struct
 	zbx_uint64_t	lastlogsize;
 	int		refresh;
 	int		nextcheck;
-	int		status;
 /* must be long for fseek() */
 	int		mtime;
 	unsigned char	skip_old_data;	/* for processing [event]log metrics */
+	unsigned char	state;
 }
 ZBX_ACTIVE_METRIC;
 
@@ -95,6 +95,7 @@ typedef struct
 {
 	ZBX_ACTIVE_BUFFER_ELEMENT	*data;
 	int	count, pcount, lastsent;
+	int	first_error;
 }
 ZBX_ACTIVE_BUFFER;
 

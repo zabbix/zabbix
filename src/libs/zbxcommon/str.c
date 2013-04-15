@@ -177,6 +177,15 @@ void	__zbx_zbx_snprintf_alloc(char **str, size_t *alloc_len, size_t *offset, con
 retry:
 	va_start(args, fmt);
 
+	if (NULL == *str)
+	{
+		/* zbx_vsnprintf() returns bytes actually written instead of bytes to write, */
+		/* so we have to use the standard function                                   */
+		*alloc_len = vsnprintf(NULL, 0, fmt, args) + 1;
+		*offset = 0;
+		*str = zbx_malloc(*str, *alloc_len);
+	}
+
 	avail_len = *alloc_len - *offset;
 	written_len = zbx_vsnprintf(*str + *offset, avail_len, fmt, args);
 
@@ -251,8 +260,15 @@ size_t	zbx_vsnprintf(char *str, size_t count, const char *fmt, va_list args)
  ******************************************************************************/
 void	zbx_strncpy_alloc(char **str, size_t *alloc_len, size_t *offset, const char *src, size_t n)
 {
-	if (*offset + n >= *alloc_len)
+	if (NULL == *str)
 	{
+		*alloc_len = n + 1;
+		*offset = 0;
+		*str = zbx_malloc(*str, *alloc_len);
+	}
+	else if (*offset + n >= *alloc_len)
+	{
+
 		while (*offset + n >= *alloc_len)
 			*alloc_len *= 2;
 		*str = zbx_realloc(*str, *alloc_len);
@@ -2079,9 +2095,9 @@ size_t	zbx_get_next_field(const char **line, char **output, size_t *olen, char s
  *                                                                            *
  * Purpose: check if string is contained in a list of delimited strings       *
  *                                                                            *
- * Parameters: list     - strings a,b,ccc,ddd                                 *
- *             value    - value                                               *
- *             delimiter- delimiter                                           *
+ * Parameters: list      - strings a,b,ccc,ddd                                *
+ *             value     - value                                              *
+ *             delimiter - delimiter                                          *
  *                                                                            *
  * Return value: SUCCEED - string is in the list, FAIL - otherwise            *
  *                                                                            *
@@ -2264,9 +2280,9 @@ char	*zbx_age2str(int age)
 	hours = (int)((double)(age - days * SEC_PER_DAY) / SEC_PER_HOUR);
 	minutes	= (int)((double)(age - days * SEC_PER_DAY - hours * SEC_PER_HOUR) / SEC_PER_MIN);
 
-	if (days)
+	if (0 != days)
 		offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, "%dd ", days);
-	if (days || hours)
+	if (0 != days || 0 != hours)
 		offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, "%dh ", hours);
 	offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, "%dm", minutes);
 
@@ -2499,7 +2515,7 @@ const char	*zbx_result_string(int result)
 	}
 }
 
-const char	*zbx_item_logtype_string(zbx_item_logtype_t logtype)
+const char	*zbx_item_logtype_string(unsigned char logtype)
 {
 	switch (logtype)
 	{
@@ -2607,6 +2623,65 @@ const char	*zbx_escalation_status_string(unsigned char status)
 		default:
 			return "unknown";
 	}
+}
+
+const char	*zbx_trigger_value_string(unsigned char value)
+{
+	switch (value)
+	{
+		case TRIGGER_VALUE_PROBLEM:
+			return "PROBLEM";
+		case TRIGGER_VALUE_OK:
+			return "OK";
+		default:
+			return "unknown";
+	}
+}
+
+const char	*zbx_trigger_state_string(unsigned char state)
+{
+	switch (state)
+	{
+		case TRIGGER_STATE_NORMAL:
+			return "Normal";
+		case TRIGGER_STATE_UNKNOWN:
+			return "Unknown";
+		default:
+			return "unknown";
+	}
+}
+
+const char	*zbx_item_state_string(unsigned char state)
+{
+	switch (state)
+	{
+		case ITEM_STATE_NORMAL:
+			return "Normal";
+		case ITEM_STATE_NOTSUPPORTED:
+			return "Not supported";
+		default:
+			return "unknown";
+	}
+}
+
+const char	*zbx_event_value_string(unsigned char source, unsigned char object, unsigned char value)
+{
+	if (EVENT_SOURCE_TRIGGERS == source)
+		return zbx_trigger_value_string(value);
+
+	if (EVENT_SOURCE_INTERNAL == source)
+	{
+		switch (object)
+		{
+			case EVENT_OBJECT_TRIGGER:
+				return zbx_trigger_state_string(value);
+			case EVENT_OBJECT_ITEM:
+			case EVENT_OBJECT_LLDRULE:
+				return zbx_item_state_string(value);
+		}
+	}
+
+	return "unknown";
 }
 
 #ifdef _WINDOWS

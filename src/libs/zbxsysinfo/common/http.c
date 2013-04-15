@@ -93,10 +93,10 @@ int	WEB_PAGE_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if (SYSINFO_RET_OK == get_http_page(hostname, path, port_number, buffer, sizeof(buffer)))
 	{
 		zbx_rtrim(buffer, "\r\n");
-		SET_TEXT_RESULT(result, strdup(buffer));
+		SET_TEXT_RESULT(result, zbx_strdup(NULL, buffer));
 	}
 	else
-		SET_TEXT_RESULT(result, strdup("EOF"));
+		SET_TEXT_RESULT(result, zbx_strdup(NULL, ""));
 
 	return SYSINFO_RET_OK;
 }
@@ -140,11 +140,12 @@ int	WEB_PAGE_PERF(AGENT_REQUEST *request, AGENT_RESULT *result)
 int	WEB_PAGE_REGEXP(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char		*hostname, *path_str, *port_str, *regexp, *length_str, path[MAX_STRING_LEN],
-			back[MAX_BUFFER_LEN], *buffer = NULL, *found;
-	int		length, len, found_len;
+			*buffer = NULL, *ptr = NULL;
+	int		length;
+	const char	*output;
 	unsigned short	port_number;
 
-	if (5 < request->nparam)
+	if (6 < request->nparam)
 		return SYSINFO_RET_FAIL;
 
 	hostname = get_rparam(request, 0);
@@ -152,6 +153,7 @@ int	WEB_PAGE_REGEXP(AGENT_REQUEST *request, AGENT_RESULT *result)
 	port_str = get_rparam(request, 2);
 	regexp = get_rparam(request, 3);
 	length_str = get_rparam(request, 4);
+	output = get_rparam(request, 5);
 
 	if (NULL == hostname || '\0' == *hostname)
                 return SYSINFO_RET_FAIL;
@@ -169,6 +171,10 @@ int	WEB_PAGE_REGEXP(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if (NULL == regexp)
                 return SYSINFO_RET_FAIL;
 
+	/* by default return the matched part of web page */
+	if (NULL == output || '\0' == *output)
+		output = "\\0";
+
 	if (NULL == length_str || '\0' == *length_str)
 		length = MAX_BUFFER_LEN - 1;
 	else if (FAIL == is_uint31_1(length_str, &length))
@@ -177,21 +183,12 @@ int	WEB_PAGE_REGEXP(AGENT_REQUEST *request, AGENT_RESULT *result)
 	buffer = zbx_malloc(buffer, ZBX_MAX_WEBPAGE_SIZE);
 
 	if (SYSINFO_RET_OK == get_http_page(hostname, path, port_number, buffer, ZBX_MAX_WEBPAGE_SIZE))
-	{
-		if (NULL != (found = zbx_regexp_match(buffer, regexp, &found_len)))
-		{
-			len = length + 1;
-			len = MIN(len, found_len + 1);
-			len = MIN(len, (int)sizeof(back));
+		ptr = zbx_regexp_sub(buffer, regexp, output);
 
-			zbx_strlcpy(back, found, (size_t)len);
-			SET_STR_RESULT(result, strdup(back));
-		}
-		else
-			SET_STR_RESULT(result, strdup("EOF"));
-	}
+	if (NULL != ptr)
+		SET_STR_RESULT(result, ptr);
 	else
-		SET_STR_RESULT(result, strdup("EOF"));
+		SET_STR_RESULT(result, zbx_strdup(NULL, ""));
 
 	zbx_free(buffer);
 

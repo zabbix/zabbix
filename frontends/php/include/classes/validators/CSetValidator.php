@@ -1,6 +1,7 @@
+<?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2000-2012 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -9,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -17,14 +18,28 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
 
-void	add_event(zbx_uint64_t eventid, unsigned char source, unsigned char object, zbx_uint64_t objectid,
-		const zbx_timespec_t *timespec, int value, const char *trigger_description,
-		const char *trigger_expression, unsigned char trigger_priority, unsigned char trigger_type)
-{
-}
+class CSetValidator extends CValidator {
 
-void	process_events()
-{
+	/**
+	 * Checks if the given value belongs to some set.
+	 *
+	 * @param $value
+	 *
+	 * @return bool
+	 */
+	public function validate($value)
+	{
+		return in_array($value, $this->options['values']);
+	}
+
+	/**
+	 * Set default options.
+	 * Possible options:
+	 * - values		- supported values
+	 */
+	protected function initOptions() {
+		$this->options['values'] = array();
+	}
+
 }

@@ -191,12 +191,11 @@ abstract class CItemGeneral extends CZBXAPI {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
 				}
 
-				// check for "templateid", because it is not allowed
-				if (array_key_exists('templateid', $item)) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot update "templateid" for item "%1$s".', $item['name']));
-				}
-
 				check_db_fields($dbItems[$item['itemid']], $fullItem);
+
+				$this->checkNoParameters($item, array('templateid', 'state'),
+					_s('Cannot update "%1$s" for item "%2$s".', '%1$s', $item['name'])
+				);
 
 				// apply rules
 				foreach ($this->fieldRules as $field => $rules) {
@@ -210,9 +209,6 @@ abstract class CItemGeneral extends CZBXAPI {
 				}
 				if (!isset($item['hostid'])) {
 					$item['hostid'] = $fullItem['hostid'];
-				}
-				if (isset($item['status']) && $item['status'] != ITEM_STATUS_NOTSUPPORTED) {
-					$item['error'] = '';
 				}
 
 				// if a templated item is being assigned to an interface with a different type, ignore it
@@ -230,10 +226,9 @@ abstract class CItemGeneral extends CZBXAPI {
 
 				check_db_fields($itemDbFields, $fullItem);
 
-				// check for "templateid", because it is not allowed
-				if (array_key_exists('templateid', $item)) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot set "templateid" for item "%1$s".', $item['name']));;
-				}
+				$this->checkNoParameters($item, array('templateid', 'state'),
+					_s('Cannot set "%1$s" for item "%2$s".', '%1$s', $item['name'])
+				);
 			}
 
 			$host = $dbHosts[$fullItem['hostid']];
