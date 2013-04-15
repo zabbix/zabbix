@@ -47,7 +47,7 @@
  *           Jairo Eduardo Lopez Fuentes Nacarino                             *
  *                                                                            *
  ******************************************************************************/
-void	str_base64_encode_rfc2047(const char *src, char **p_base64)
+static void	str_base64_encode_rfc2047(const char *src, char **p_base64)
 {
 	const char	*p0;			/* pointer in src to start encoding from */
 	const char	*p1;			/* pointer in src: 1st byte of UTF-8 character */
@@ -103,7 +103,7 @@ void	str_base64_encode_rfc2047(const char *src, char **p_base64)
  * Comments: reads until '\n'                                                 *
  *                                                                            *
  ******************************************************************************/
-ssize_t smtp_readln(int fd, char *buf, int buf_len)
+static ssize_t smtp_readln(int fd, char *buf, int buf_len)
 {
 	ssize_t	nbytes, read_bytes;
 
@@ -131,24 +131,96 @@ ssize_t smtp_readln(int fd, char *buf, int buf_len)
 	return read_bytes;
 }
 
-static char	*smtp_prepare_email_address(const char *email_option)
+static int	smtp_parse_mailbox(const char *mailbox, char *error, size_t max_error_len, char **display_name,
+				char **angle_addr)
 {
-	char	*pstart, *pend = (char*)(-1);
-	int	size = 128, offset = 0;
-	char	*email_address;
+	const char	*p, *pstart, *angle_addr_start = NULL, *domain_start = NULL, *utf8_end = NULL;
+	char 	*base64_buf = NULL;
+	size_t	size_angle_addr = 128, offset_angle_addr = 0, len, i;
+	int	ret = FAIL;
 
-	email_address = zbx_malloc(NULL, size);
+	/* Skip leading whitespace */
+	p = mailbox;
+	while (' ' == *p || '\t' == *p)
+		p++;
 
-	if (NULL == (pstart = strchr(email_option, '<')) || NULL == (pend = strchr(pstart, '>')))
+	pstart = p;
+	while ('\0' != *p)
 	{
-		zbx_snprintf_alloc(&email_address, &size, &offset, "<%s>", email_option);
-		if (NULL == pend)
-			zabbix_log(LOG_LEVEL_WARNING, "Possibly invalid SMTP email set: %s", email_option);
+		len = zbx_utf8_char_len(p);
+
+		if (1 == len)	/* ASCII character */
+		{
+			if ('<' == *p)
+			{
+				angle_addr_start = p;
+			}
+			else if ('@' == *p)
+			{
+				domain_start = p;
+			}
+			p++;
+		}
+		else if (1 < len)	/* multibyte UTF-8 character */
+		{
+			for (i = 1; i < len; i++)
+			{
+				if ('\0' == *(p + i))
+				{
+					zbx_snprintf(error, max_error_len, "invalid UTF-8 character in email"
+							" address: %s", mailbox);
+					goto out;
+				}
+			}
+			utf8_end = p + len - 1;
+			p += len;
+		}
+		else if (0 == len)	/* invalid UTF-8 character */
+		{
+			zbx_snprintf(error, max_error_len, "invalid UTF-8 character in email address: %s", mailbox);
+			goto out;
+		}
+	}
+
+	if (NULL == domain_start)
+	{
+		zbx_snprintf(error, max_error_len, "no '@' in email address: %s", mailbox);
+		goto out;
+	}
+
+	if (utf8_end > angle_addr_start)
+	{
+		zbx_snprintf(error, max_error_len, "email address local or domain part contains UTF-8 character: %s",
+				mailbox);
+		goto out;
+	}
+
+	*angle_addr = zbx_malloc(*angle_addr, size_angle_addr);
+
+	if (NULL != angle_addr_start)
+	{
+		zbx_snprintf_alloc(angle_addr, &size_angle_addr, &offset_angle_addr, "%s", angle_addr_start);
+
+		if (pstart < angle_addr_start)	/* display name */
+		{
+			*display_name = zbx_malloc(*display_name, (size_t)(angle_addr_start - pstart + 1));
+			memcpy(*display_name, pstart, (size_t)(angle_addr_start - pstart));
+			*((*display_name) + (angle_addr_start - pstart)) = '\0';
+
+			if (NULL != utf8_end)	/* UTF-8 display name */
+			{
+				str_base64_encode_rfc2047(*display_name, &base64_buf);
+				zbx_free(*display_name);
+				*display_name = base64_buf;
+			}
+		}
 	}
 	else
-		zbx_strncpy_alloc(&email_address, &size, &offset, pstart, pend - pstart + 1);
+		zbx_snprintf_alloc(angle_addr, &size_angle_addr, &offset_angle_addr, "<%s>", mailbox);
 
-	return email_address;
+	ret = SUCCEED;
+out:
+	return ret;
 }
 
 int	send_email(const char *smtp_server, const char *smtp_helo, const char *smtp_email, const char *mailto,
@@ -160,7 +232,9 @@ int	send_email(const char *smtp_server, const char *smtp_helo, const char *smtp_
 	int		err, ret = FAIL;
 	char		cmd[MAX_STRING_LEN], *cmdp = NULL;
 	char		*tmp = NULL, *base64 = NULL, *base64_lf;
-	char		*localsubject = NULL, *localbody = NULL, *email_address = NULL;
+	char		*localsubject = NULL, *localbody = NULL;
+	char		*from_display_name = NULL, *from_angle_addr = NULL;
+	char		*to_display_name = NULL, *to_angle_addr = NULL;
 
 	char		str_time[MAX_STRING_LEN];
 	struct tm	*local_time = NULL;
@@ -173,7 +247,6 @@ int	send_email(const char *smtp_server, const char *smtp_helo, const char *smtp_
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() smtp_server:'%s'", __function_name, smtp_server);
 
-	assert(error);
 	*error = '\0';
 
 	/* connect to and receive an initial greeting from SMTP server */
@@ -222,9 +295,10 @@ int	send_email(const char *smtp_server, const char *smtp_helo, const char *smtp_
 
 	/* send MAIL FROM */
 
-	email_address = smtp_prepare_email_address(smtp_email);
-	zbx_snprintf(cmd, sizeof(cmd), "MAIL FROM:%s\r\n", email_address);
-	zbx_free(email_address);
+	if (SUCCEED == smtp_parse_mailbox(smtp_email, error, max_error_len, &from_display_name, &from_angle_addr))
+		zbx_snprintf(cmd, sizeof(cmd), "MAIL FROM:%s\r\n", from_angle_addr);
+	else
+		goto out;
 
 	if (-1 == write(s.socket, cmd, strlen(cmd)))
 	{
@@ -244,9 +318,10 @@ int	send_email(const char *smtp_server, const char *smtp_helo, const char *smtp_
 
 	/* send RCPT TO */
 
-	email_address = smtp_prepare_email_address(mailto);
-	zbx_snprintf(cmd, sizeof(cmd), "RCPT TO:%s\r\n", email_address);
-	zbx_free(email_address);
+	if (SUCCEED == smtp_parse_mailbox(mailto, error, max_error_len, &to_display_name, &to_angle_addr))
+		zbx_snprintf(cmd, sizeof(cmd), "RCPT TO:%s\r\n", to_angle_addr);
+	else
+		goto out;
 
 	if (-1 == write(s.socket, cmd, strlen(cmd)))
 	{
@@ -327,8 +402,8 @@ int	send_email(const char *smtp_server, const char *smtp_helo, const char *smtp_
 	/* =?charset?encoding?encoded text?= format must be used for subject field */
 
 	cmdp = zbx_dsprintf(cmdp,
-			"From: %s\r\n"
-			"To: %s\r\n"
+			"From: %s%s\r\n"
+			"To: %s%s\r\n"
 			"Date: %s\r\n"
 			"Subject: %s\r\n"
 			"MIME-Version: 1.0\r\n"
@@ -336,7 +411,9 @@ int	send_email(const char *smtp_server, const char *smtp_helo, const char *smtp_
 			"Content-Transfer-Encoding: base64\r\n"
 			"\r\n"
 			"%s",
-			smtp_email, mailto, str_time, localsubject, localbody);
+			NULL != from_display_name ? from_display_name : "", from_angle_addr,
+			NULL != to_display_name ? to_display_name: "", to_angle_addr,
+			str_time, localsubject, localbody);
 
 	err = write(s.socket, cmdp, strlen(cmdp));
 
@@ -380,6 +457,10 @@ int	send_email(const char *smtp_server, const char *smtp_helo, const char *smtp_
 
 	ret = SUCCEED;
 out:
+	zbx_free(from_display_name);
+	zbx_free(to_display_name);
+	zbx_free(from_angle_addr);
+	zbx_free(to_angle_addr);
 	zbx_tcp_close(&s);
 close:
 	if ('\0' != *error)
