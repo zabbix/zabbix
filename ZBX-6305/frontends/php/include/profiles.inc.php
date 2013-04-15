@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -115,7 +115,7 @@ class CProfile {
 		}
 
 		// remove from DB
-		DBexecute('DELETE FROM profiles WHERE idx="'.$idx.'" AND '.dbConditionString('idx2', $idx2));
+		DBexecute('DELETE FROM profiles WHERE idx='.zbx_dbstr($idx).' AND '.dbConditionString('idx2', $idx2));
 
 		// remove from cache
 		if (!is_null(self::$profiles)) {

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -10,15 +10,15 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
+
 require_once dirname(__FILE__).'/include/config.inc.php';
 require_once dirname(__FILE__).'/include/users.inc.php';
 
@@ -28,8 +28,7 @@ $page['file'] = 'popup_trexpr.php';
 define('ZBX_PAGE_NO_MENU', 1);
 
 require_once dirname(__FILE__).'/include/page_header.php';
-?>
-<?php
+
 $operators = array(
 	'<' => '<',
 	'>' => '>',
@@ -41,7 +40,7 @@ $limited_operators = array(
 	'#' => 'NOT'
 );
 $metrics = array(
-	PARAM_TYPE_SECONDS => _('Seconds'),
+	PARAM_TYPE_TIME => _('Time'),
 	PARAM_TYPE_COUNTS => _('Count')
 );
 $param1_sec_count = array(
@@ -97,6 +96,21 @@ $param3_sec_val = array(
 		'T' => T_ZBX_INT // type
 	)
 );
+$paramSecIntCount = array(
+	array(
+		'C' => _('Last of').' (T)', // caption
+		'T' => T_ZBX_INT, // type
+		'M' => $metrics // metrics
+	),
+	array(
+		'C' => _('Mask'), // caption
+		'T' => T_ZBX_STR
+	),
+	array(
+		'C' => _('Time shift').' ', // caption
+		'T' => T_ZBX_INT // type
+	)
+);
 $allowed_types_any = array(
 	ITEM_VALUE_TYPE_FLOAT => 1,
 	ITEM_VALUE_TYPE_STR => 1,
@@ -115,6 +129,9 @@ $allowed_types_str = array(
 );
 $allowed_types_log = array(
 	ITEM_VALUE_TYPE_LOG => 1
+);
+$allowed_types_int = array(
+	ITEM_VALUE_TYPE_UINT64 => 1
 );
 
 $functions = array(
@@ -499,6 +516,16 @@ $functions = array(
 		'description' =>  _('No data received during period of time T, then N NOT 1, 0 - otherwise'),
 		'params' => $param1_sec,
 		'allowed_types' => $allowed_types_any
+	),
+	'band[=]' => array(
+		'description' =>  _('Bitwise AND of last (most recent) T value and mask is = N'),
+		'params' => $paramSecIntCount,
+		'allowed_types' => $allowed_types_int
+	),
+	'band[#]' => array(
+		'description' =>  _('Bitwise AND of last (most recent) T value and mask is NOT N'),
+		'params' => $paramSecIntCount,
+		'allowed_types' => $allowed_types_int
 	)
 );
 
@@ -511,7 +538,7 @@ $fields = array(
 	'parent_discoveryid' =>	array(T_ZBX_INT, O_OPT, null,	null,		null),
 	'expr_type'=>			array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({insert})'),
 	'param' =>				array(T_ZBX_STR, O_OPT, null,	0,			'isset({insert})'),
-	'paramtype' =>			array(T_ZBX_INT, O_OPT, null,	IN(PARAM_TYPE_SECONDS.','.PARAM_TYPE_COUNTS), 'isset({insert})'),
+	'paramtype' =>			array(T_ZBX_INT, O_OPT, null,	IN(PARAM_TYPE_TIME.','.PARAM_TYPE_COUNTS), 'isset({insert})'),
 	'value' =>				array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({insert})'),
 	// action
 	'insert' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
@@ -541,7 +568,7 @@ if (isset($_REQUEST['expression']) && $_REQUEST['dstfld1'] == 'expr_temp') {
 			$_REQUEST['param'][$param_no] = substr($_REQUEST['param'][$param_no], 1);
 		}
 		else {
-			$_REQUEST['paramtype'] = PARAM_TYPE_SECONDS;
+			$_REQUEST['paramtype'] = PARAM_TYPE_TIME;
 		}
 
 		if (isset($exprSymbols[2])) {
@@ -603,7 +630,7 @@ if (is_null($paramtype) && isset($functions[$expr_type]['params']['M'])) {
 	$paramtype = is_array($functions[$expr_type]['params']['M']) ? reset($functions[$expr_type]['params']['M']) : $functions[$expr_type]['params']['M'];
 }
 elseif (is_null($paramtype)) {
-	$paramtype = PARAM_TYPE_SECONDS;
+	$paramtype = PARAM_TYPE_TIME;
 }
 
 if (!is_array($param)) {
@@ -613,6 +640,23 @@ if (!is_array($param)) {
 	else {
 		$param = array($param);
 	}
+}
+
+// validate integer parameter values
+if (isset($functions[$expr_type]['params'])) {
+	foreach ($param as $pnum => $p) {
+		if (isset($functions[$expr_type]['params'][$pnum]) && $functions[$expr_type]['params'][$pnum]['T'] == T_ZBX_INT
+			&& $p && preg_match('/[a-zA-Z]/', $p) && !preg_match('/^[\-0-9]+(['.ZBX_TIME_SUFFIXES.']{0,1})$/', $p)) {
+			error(_s('Time parameter "%s" not supported.', $p));
+		}
+	}
+}
+
+global $ZBX_MESSAGES;
+
+if ($ZBX_MESSAGES) {
+	show_messages();
+	unset($_REQUEST['insert']);
 }
 
 /*
@@ -657,4 +701,3 @@ $expressionView->render();
 $expressionView->show();
 
 require_once dirname(__FILE__).'/include/page_footer.php';
-?>

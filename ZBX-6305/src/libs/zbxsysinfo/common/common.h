@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -9,7 +9,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -24,9 +24,9 @@
 
 extern ZBX_METRIC	parameters_common[];
 
-int	EXECUTE_USER_PARAMETER(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
-int	EXECUTE_STR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
-int	EXECUTE_DBL(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
-int	EXECUTE_INT(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
+int	EXECUTE_USER_PARAMETER(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	EXECUTE_STR(const char *command, AGENT_RESULT *result);
+int	EXECUTE_DBL(const char *command, AGENT_RESULT *result);
+int	EXECUTE_INT(const char *command, AGENT_RESULT *result);
 
 #endif

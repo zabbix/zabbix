@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -9,7 +9,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -23,12 +23,12 @@
 
 static int	VM_MEMORY_TOTAL(AGENT_RESULT *result)
 {
-	return EXECUTE_INT(NULL, "vmstat -s | awk 'BEGIN{pages=0}{gsub(\"[()]\",\"\");if($4==\"pagesize\")pgsize=($6);if(($2==\"inactive\"||$2==\"active\"||$2==\"wired\")&&$3==\"pages\")pages+=$1}END{printf (pages*pgsize)}'", 0, result);
+	return EXECUTE_INT("vmstat -s | awk 'BEGIN{pages=0}{gsub(\"[()]\",\"\");if($4==\"pagesize\")pgsize=($6);if(($2==\"inactive\"||$2==\"active\"||$2==\"wired\")&&$3==\"pages\")pages+=$1}END{printf (pages*pgsize)}'", result);
 }
 
 static int	VM_MEMORY_FREE(AGENT_RESULT *result)
 {
-	return EXECUTE_INT(NULL, "vmstat -s | awk '{gsub(\"[()]\",\"\");if($4==\"pagesize\")pgsize=($6);if($2==\"free\"&&$3==\"pages\")pages=($1)}END{printf (pages*pgsize)}'", 0, result);
+	return EXECUTE_INT("vmstat -s | awk '{gsub(\"[()]\",\"\");if($4==\"pagesize\")pgsize=($6);if($2==\"free\"&&$3==\"pages\")pages=($1)}END{printf (pages*pgsize)}'", result);
 }
 
 static int	VM_MEMORY_USED(AGENT_RESULT *result)
@@ -123,31 +123,30 @@ clean:
 	return ret;
 }
 
-int     VM_MEMORY_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+int     VM_MEMORY_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	const MODE_FUNCTION	fl[] =
-	{
-		{"total",	VM_MEMORY_TOTAL},
-		{"free",	VM_MEMORY_FREE},
-		{"used",	VM_MEMORY_USED},
-		{"pused",	VM_MEMORY_PUSED},
-		{"available",	VM_MEMORY_AVAILABLE},
-		{"pavailable",	VM_MEMORY_PAVAILABLE},
-		{NULL,		0}
-	};
+	char	*mode;
+	int	ret = SYSINFO_RET_FAIL;
 
-	char	mode[MAX_STRING_LEN];
-	int	i;
-
-	if (1 < num_param(param))
+	if (1 < request->nparam)
 		return SYSINFO_RET_FAIL;
 
-	if (0 != get_param(param, 1, mode, sizeof(mode)) || '\0' == *mode)
-		strscpy(mode, "total");
+	mode = get_rparam(request, 0);
 
-	for (i = 0; NULL != fl[i].mode; i++)
-		if (0 == strcmp(mode, fl[i].mode))
-			return (fl[i].function)(result);
+	if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "total"))
+		ret = VM_MEMORY_TOTAL(result);
+	else if (0 == strcmp(mode, "free"))
+		ret = VM_MEMORY_FREE(result);
+	else if (0 == strcmp(mode, "used"))
+		ret = VM_MEMORY_USED(result);
+	else if (0 == strcmp(mode, "pused"))
+		ret = VM_MEMORY_PUSED(result);
+	else if (0 == strcmp(mode, "available"))
+		ret = VM_MEMORY_AVAILABLE(result);
+	else if (0 == strcmp(mode, "pavailable"))
+		ret = VM_MEMORY_PAVAILABLE(result);
+	else
+		ret = SYSINFO_RET_FAIL;
 
-	return SYSINFO_RET_FAIL;
+	return ret;
 }

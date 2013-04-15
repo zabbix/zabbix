@@ -69,7 +69,8 @@ zabbix_server_LDADD = \
 	$(top_srcdir)/src/libs/zbxicmpping/libzbxicmpping.a \
 	$(top_srcdir)/src/libs/zbxdbupgrade/libzbxdbupgrade.a \
 	$(top_srcdir)/src/libs/zbxdbhigh/libzbxdbhigh.a \
-	$(top_srcdir)/src/libs/zbxdb/libzbxdb.a
+	$(top_srcdir)/src/libs/zbxdb/libzbxdb.a \
+	$(top_srcdir)/src/libs/zbxmodules/libzbxmodules.a
 
 zabbix_server_LDADD += @SERVER_LIBS@
 
@@ -78,15 +79,18 @@ zabbix_server_LDFLAGS = @SERVER_LDFLAGS@
 zabbix_server_CFLAGS = \
 	-DZABBIX_DAEMON \
 	-DSYSCONFDIR="\"@sysconfdir@\"" \
-	-DDATADIR="\"@datadir@\""
+	-DDATADIR="\"@datadir@\"" \
+	-DLIBDIR="\"@libdir@\""
 
 SERVER_CONFIG = zabbix_server.conf
 INCLUDE_DIR = $(DESTDIR)@sysconfdir@/$(SERVER_CONFIG).d
 EXSCRIPTS_DIR = $(DESTDIR)@datadir@/zabbix/externalscripts
 ALSCRIPTS_DIR = $(DESTDIR)@datadir@/zabbix/alertscripts
+MODULES_DIR = $(DESTDIR)@libdir@
 
 install-data-hook:
 	$(MKDIR_P) "$(INCLUDE_DIR)"
 	$(MKDIR_P) "$(EXSCRIPTS_DIR)"
 	$(MKDIR_P) "$(ALSCRIPTS_DIR)"
+	$(MKDIR_P) "$(MODULES_DIR)"
 	test -f "$(DESTDIR)@sysconfdir@/$(SERVER_CONFIG)" || cp "../../conf/$(SERVER_CONFIG)" "$(DESTDIR)@sysconfdir@"

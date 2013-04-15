@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -9,7 +9,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -22,13 +22,23 @@
 #include "perfmon.h"
 #include "sysinfo.h"
 
-int	SYSTEM_UPTIME(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+int	SYSTEM_UPTIME(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	char	counter_path[64];
+	char		counter_path[64];
+	AGENT_REQUEST	request_tmp;
+	int		ret;
 
 	zbx_snprintf(counter_path, sizeof(counter_path), "\\%d\\%d", PCI_SYSTEM, PCI_SYSTEM_UP_TIME);
 
-	if (SYSINFO_RET_FAIL == PERF_COUNTER(cmd, counter_path, flags, result))
+	request_tmp.nparam = 1;
+	request_tmp.params = zbx_malloc(NULL, request_tmp.nparam * sizeof(char *));
+	request_tmp.params[0] = counter_path;
+
+	ret = PERF_COUNTER(&request_tmp, result);
+
+	zbx_free(request_tmp.params);
+
+	if (SYSINFO_RET_FAIL == ret)
 		return SYSINFO_RET_FAIL;
 
 	/* result must be integer to correctly interpret it in frontend (uptime) */

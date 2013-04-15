@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -9,7 +9,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -75,6 +75,8 @@
 #	define PATH_SEPARATOR	'\\'
 #endif
 
+#	define strcasecmp	lstrcmpiA
+
 #else	/* _WINDOWS */
 
 #	define zbx_stat(path, buf)		stat(path, buf)
@@ -126,5 +128,10 @@
 #define ZBX_HEX2UINT64(uint, string) sscanf(string, ZBX_FS_UX64, &uint)
 
 #define ZBX_CONST_STRING(str) ""str
+
+typedef struct {
+	zbx_uint64_t	lo;
+	zbx_uint64_t	hi;
+} zbx_uint128_t;
 
 #endif
