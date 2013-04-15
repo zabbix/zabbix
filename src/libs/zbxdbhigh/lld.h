@@ -9,7 +9,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -17,21 +17,17 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_CHECKS_IPMI_H
-#define ZABBIX_CHECKS_IPMI_H
+#ifndef ZABBIX_LLD_H
+#define ZABBIX_LLD_H
 
 #include "common.h"
+#include "zbxjson.h"
 
-#ifdef HAVE_OPENIPMI
+int	lld_check_record(struct zbx_json_parse *jp_row, const char *f_macro, const char *f_regexp, ZBX_REGEXP *regexps,
+		int regexps_num);
 
-#include "dbcache.h"
-#include "sysinfo.h"
+void	DBlld_update_items(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, struct zbx_json_parse *jp_data,
+		char **error, const char *f_macro, const char *f_regexp, ZBX_REGEXP *regexps, int regexps_num,
+		unsigned short lifetime, int lastcheck);
 
-int	init_ipmi_handler(void);
-int	free_ipmi_handler(void);
-int	get_value_ipmi(DC_ITEM *item, AGENT_RESULT *value);
-int	parse_ipmi_command(const char *command, char *c_name, int *val, char *error, size_t max_error_len);
-int	set_ipmi_control_value(DC_ITEM *item, int value, char *error, size_t max_error_len);
-
-#endif	/* HAVE_OPENIPMI */
-#endif	/* ZABBIX_CHECKS_IPMI_H */
+#endif

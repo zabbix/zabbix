@@ -126,8 +126,8 @@ class testTemplateInheritance extends CWebTest {
 		$this->input_type('history', '54');
 		$this->input_type('trends', '55');
 		$this->input_type('description', 'description');
+		$this->assertAttribute('//*[@id="status"]/@checked', 'checked');
 		$this->zbxTestDropdownSelect('delta', 'Delta (simple change)');
-		$this->zbxTestDropdownSelect('status','Enabled');
 
 		$this->zbxTestClickWait('save');
 
@@ -307,7 +307,7 @@ class testTemplateInheritance extends CWebTest {
 		$this->input_type('filter_macro', 'macro');
 		$this->input_type('filter_value', 'regexp');
 		$this->input_type('description', 'description');
-		$this->zbxTestDropdownSelect('status', 'Disabled');
+		$this->assertAttribute('//*[@id="status"]/@checked', 'checked');
 
 		$this->zbxTestClickWait('save');
 
@@ -326,7 +326,7 @@ class testTemplateInheritance extends CWebTest {
 		$this->assertElementValue('filter_macro', 'macro');
 		$this->assertElementValue('filter_value', 'regexp');
 		$this->assertElementText('description', 'description');
-		$this->assertDrowpdownValueText('status', 'Disabled');
+		$this->zbxTestCheckboxUnselect('status');
 	}
 
 	/**
