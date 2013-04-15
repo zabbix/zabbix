@@ -140,6 +140,9 @@ src/libs/zbxmedia/Makefile.in
 src/libs/zbxmemory/.deps
 src/libs/zbxmemory/Makefile
 src/libs/zbxmemory/Makefile.in
+src/libs/zbxmodules/.deps
+src/libs/zbxmodules/Makefile
+src/libs/zbxmodules/Makefile.in
 src/libs/zbxnix/.deps
 src/libs/zbxnix/Makefile
 src/libs/zbxnix/Makefile.in

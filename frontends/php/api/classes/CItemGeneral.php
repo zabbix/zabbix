@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2012 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -191,12 +191,11 @@ abstract class CItemGeneral extends CZBXAPI {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
 				}
 
-				// check for "templateid", because it is not allowed
-				if (array_key_exists('templateid', $item)) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot update "templateid" for item "%1$s".', $item['name']));
-				}
-
 				check_db_fields($dbItems[$item['itemid']], $fullItem);
+
+				$this->checkNoParameters($item, array('templateid', 'state'),
+					_s('Cannot update "%1$s" for item "%2$s".', '%1$s', $item['name'])
+				);
 
 				// apply rules
 				foreach ($this->fieldRules as $field => $rules) {
@@ -210,9 +209,6 @@ abstract class CItemGeneral extends CZBXAPI {
 				}
 				if (!isset($item['hostid'])) {
 					$item['hostid'] = $fullItem['hostid'];
-				}
-				if (isset($item['status']) && $item['status'] != ITEM_STATUS_NOTSUPPORTED) {
-					$item['error'] = '';
 				}
 
 				// if a templated item is being assigned to an interface with a different type, ignore it
@@ -230,10 +226,9 @@ abstract class CItemGeneral extends CZBXAPI {
 
 				check_db_fields($itemDbFields, $fullItem);
 
-				// check for "templateid", because it is not allowed
-				if (array_key_exists('templateid', $item)) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot set "templateid" for item "%1$s".', $item['name']));;
-				}
+				$this->checkNoParameters($item, array('templateid', 'state'),
+					_s('Cannot set "%1$s" for item "%2$s".', '%1$s', $item['name'])
+				);
 			}
 
 			$host = $dbHosts[$fullItem['hostid']];
@@ -658,23 +653,29 @@ abstract class CItemGeneral extends CZBXAPI {
 				}
 
 				// update by templateid
-				if (isset($exItemsTpl[$parentItem['itemid']]) && isset($exItemsKeys[$parentItem['key_']])
-						&& !idcmp($exItemsKeys[$parentItem['key_']]['templateid'], $parentItem['itemid'])) {
+				if (isset($exItemsTpl[$parentItem['itemid']])) {
+					$exItem = $exItemsTpl[$parentItem['itemid']];
 
-					self::exception(
-						ZBX_API_ERROR_PARAMETERS,
-						_s($this->getErrorMsg(self::ERROR_EXISTS), $parentItem['key_'], $host['host'])
-					);
+					if (isset($exItemsKeys[$parentItem['key_']])
+						&& !idcmp($exItemsKeys[$parentItem['key_']]['templateid'], $parentItem['itemid'])) {
+						self::exception(
+							ZBX_API_ERROR_PARAMETERS,
+							_s($this->getErrorMsg(self::ERROR_EXISTS), $parentItem['key_'], $host['host'])
+						);
+					}
 				}
 
 				// update by key
-				if (isset($exItemsKeys[$parentItem['key_']]) && $exItemsKeys[$parentItem['key_']]['templateid'] > 0
-						&& !idcmp($exItemsKeys[$parentItem['key_']]['templateid'], $parentItem['itemid'])) {
+				if (isset($exItemsKeys[$parentItem['key_']])) {
+					$exItem = $exItemsKeys[$parentItem['key_']];
 
-					self::exception(
-						ZBX_API_ERROR_PARAMETERS,
-						_s($this->getErrorMsg(self::ERROR_EXISTS_TEMPLATE), $parentItem['key_'], $host['host'])
-					);
+					if ($exItem['templateid'] > 0 && !idcmp($exItem['templateid'], $parentItem['itemid'])) {
+
+						self::exception(
+							ZBX_API_ERROR_PARAMETERS,
+							_s($this->getErrorMsg(self::ERROR_EXISTS_TEMPLATE), $parentItem['key_'], $host['host'])
+						);
+					}
 				}
 
 				if ($host['status'] == HOST_STATUS_TEMPLATE || !isset($parentItem['type'])) {

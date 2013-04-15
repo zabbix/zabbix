@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -9,7 +9,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -22,9 +22,9 @@
 
 #include "sysinfo.h"
 
-int	SYSTEM_LOCALTIME(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
-int	SYSTEM_USERS_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
-int	SYSTEM_UNAME(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
-int	SYSTEM_HOSTNAME(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
+int	SYSTEM_LOCALTIME(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	SYSTEM_USERS_NUM(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	SYSTEM_UNAME(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	SYSTEM_HOSTNAME(AGENT_REQUEST *request, AGENT_RESULT *result);
 
 #endif /* ZABBIX_SYSINFO_COMMON_SYSTEM_H */

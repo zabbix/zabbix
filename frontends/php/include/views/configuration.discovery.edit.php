@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -10,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -65,13 +65,16 @@ $discoveryFormList->addRow(_('Checks'),
 
 // append uniqueness criteria to form list
 $uniquenessCriteriaRadio = new CRadioButtonList('uniqueness_criteria', $this->data['drule']['uniqueness_criteria']);
-$uniquenessCriteriaRadio->addValue(' '._('IP address'), -1);
+$uniquenessCriteriaRadio->addValue(' '._('IP address'), -1, true, zbx_formatDomId('uniqueness_criteria_ip'));
 $discoveryFormList->addRow(_('Device uniqueness criteria'),
 	new CDiv($uniquenessCriteriaRadio, 'objectgroup inlineblock border_dotted ui-corner-all', 'uniqList'));
 
 // append status to form list
-$discoveryFormList->addRow(_('Enabled'),
-	new CCheckBox('status', !empty($this->data['druleid']) ? ($this->data['drule']['status'] == 0 ? 'yes' : 'no') : 'yes', null, 1));
+$status = (empty($this->data['druleid']) && empty($this->data['form_refresh']))
+	? true
+	: ($this->data['drule']['status'] == DRULE_STATUS_ACTIVE);
+
+$discoveryFormList->addRow(_('Enabled'), new CCheckBox('status', $status, null, 1));
 
 // append tabs to form
 $discoveryTabs = new CTabView();
@@ -84,7 +87,7 @@ if (empty($this->data['druleid'])) {
 	$deleteButton->setAttribute('disabled', 'disabled');
 }
 $discoveryForm->addItem(makeFormFooter(
-	array(new CSubmit('save', _('Save'))),
+	new CSubmit('save', _('Save')),
 	array(
 		new CSubmit('clone', _('Clone')),
 		$deleteButton,
