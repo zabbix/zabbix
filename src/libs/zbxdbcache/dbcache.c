@@ -1236,12 +1236,13 @@ static void	DCmass_update_items(ZBX_DC_HISTORY *history, int history_num)
 
 		if (ZBX_HK_OPTION_ENABLED == config_hk.history_mode &&
 				ZBX_HK_OPTION_ENABLED == config_hk.history_global)
+		{
 			item.history = config_hk.history;
+		}
 		else
 			item.history = atoi(row[7]);
 
-		if (ZBX_HK_OPTION_ENABLED == config_hk.trends_mode &&
-				ZBX_HK_OPTION_ENABLED == config_hk.trends_global)
+		if (ZBX_HK_OPTION_ENABLED == config_hk.trends_mode && ZBX_HK_OPTION_ENABLED == config_hk.trends_global)
 			item.trends = config_hk.trends;
 		else
 			item.trends = atoi(row[8]);
