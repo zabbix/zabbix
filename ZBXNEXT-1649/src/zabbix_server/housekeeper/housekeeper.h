@@ -23,6 +23,6 @@
 extern int	CONFIG_HOUSEKEEPING_FREQUENCY;
 extern int	CONFIG_MAX_HOUSEKEEPER_DELETE;
 
-void	main_housekeeper_loop();
+void	main_housekeeper_loop(void);
 
 #endif

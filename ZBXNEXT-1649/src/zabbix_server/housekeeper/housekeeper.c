@@ -215,13 +215,13 @@ typedef struct
 	int			state;
 
 	/* a reference to the housekeeping configuration mode (enable) option for this table */
-	int			*poption_mode;
+	unsigned int		*poption_mode;
 
 	/* a reference to the housekeeping configuration overwrite option for this table */
-	int			*poption_global;
+	unsigned int		*poption_global;
 
 	/* a reference to the housekeeping configuration history value for this table */
-	int			*poption;
+	unsigned int		*poption;
 
 	/* the oldest item record timestamp cache for target table */
 	zbx_hashset_t		item_cache;
@@ -233,14 +233,14 @@ zbx_hk_history_rule_t;
 
 /* The history item rules, used for housekeeping history and trends tables */
 static zbx_hk_history_rule_t	hk_history_rules[] = {
-	{"history", "history", 0, &hk_config.history_mode, &hk_config.history_global, &hk_config.history},
-	{"history_str", "history", 0, &hk_config.history_mode, &hk_config.history_global, &hk_config.history},
-	{"history_log", "history", 0, &hk_config.history_mode, &hk_config.history_global, &hk_config.history},
-	{"history_uint", "history", 0, &hk_config.history_mode, &hk_config.history_global, &hk_config.history},
-	{"history_text", "history", 0, &hk_config.history_mode, &hk_config.history_global, &hk_config.history},
+	{"history", "history", 0, &hk_config.history_mode, &hk_config.history_global, &hk_config.history, {0}, {0}},
+	{"history_str", "history", 0, &hk_config.history_mode, &hk_config.history_global, &hk_config.history, {0}, {0}},
+	{"history_log", "history", 0, &hk_config.history_mode, &hk_config.history_global, &hk_config.history, {0}, {0}},
+	{"history_uint", "history", 0, &hk_config.history_mode, &hk_config.history_global, &hk_config.history, {0}, {0}},
+	{"history_text", "history", 0, &hk_config.history_mode, &hk_config.history_global, &hk_config.history, {0}, {0}},
 
-	{"trends", "trends", 0, &hk_config.trends_mode, &hk_config.trends_global, &hk_config.trends},
-	{"trends_uint","trends", 0, &hk_config.trends_mode, &hk_config.trends_global, &hk_config.trends},
+	{"trends", "trends", 0, &hk_config.trends_mode, &hk_config.trends_global, &hk_config.trends, {0}, {0}},
+	{"trends_uint","trends", 0, &hk_config.trends_mode, &hk_config.trends_global, &hk_config.trends, {0}, {0}},
 
 	{0}
 };
@@ -669,7 +669,7 @@ static int	housekeeping_read_config()
 	const char		*__function_name = "housekeeping_read_config";
 	DB_RESULT       	result;
 	DB_ROW          	row;
-	int			ret = FAIL, i;
+	int			i;
 	char			*sql_fields = NULL;
 	size_t			sql_size = 0, sql_offset = 0;
 	zbx_hk_db_config_t	*pfield;
@@ -700,7 +700,6 @@ static int	housekeeping_read_config()
 						pfield->field, row[i]);
 			}
 		}
-		ret = SUCCEED;
 	}
 
 	DBfree_result(result);
@@ -843,7 +842,7 @@ static int	housekeeping_cleanup()
 						" and rownum<=%d",
 					housekeeper.tablename,
 					housekeeper.field,
-					housekeeper.pvalue,
+					housekeeper.value,
 					CONFIG_MAX_HOUSEKEEPER_DELETE);
 #elif defined(HAVE_MYSQL)
 			d = DBexecute(
@@ -861,7 +860,7 @@ static int	housekeeping_cleanup()
 					housekeeper.tablename,
 					housekeeper.tablename,
 					housekeeper.field,
-					housekeeper.pvalue,
+					housekeeper.value,
 					CONFIG_MAX_HOUSEKEEPER_DELETE);
 #elif defined(HAVE_SQLITE3)
 			d = 0;
@@ -980,7 +979,7 @@ static int	housekeeping_events(int now)
 	return deleted;
 }
 
-void	main_housekeeper_loop()
+void	main_housekeeper_loop(void)
 {
 	int	now, d_history_and_trends, d_cleanup, d_events, d_sessions;
 	int	d_services, d_audit;
