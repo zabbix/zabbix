@@ -410,11 +410,16 @@ static int	refresh_active_checks(const char *host, unsigned short port)
 	if (last_ret != ret)
 	{
 		if (SUCCEED != ret)
-			zabbix_log(LOG_LEVEL_WARNING, "active check configuration update from [%s:%u] started to fail (%s)",
-				host, port, zbx_tcp_strerror());
+		{
+			zabbix_log(LOG_LEVEL_WARNING,
+					"active check configuration update from [%s:%u] started to fail (%s)",
+					host, port, zbx_tcp_strerror());
+		}
 		else
+		{
 			zabbix_log(LOG_LEVEL_WARNING, "active check configuration update from [%s:%u] is working again",
-				host, port);
+					host, port);
+		}
 	}
 
 	last_ret = ret;
