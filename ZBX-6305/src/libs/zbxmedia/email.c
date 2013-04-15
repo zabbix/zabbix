@@ -135,9 +135,10 @@ static int	smtp_parse_mailbox(const char *mailbox, char *error, size_t max_error
 				char **angle_addr)
 {
 	const char	*p, *pstart, *angle_addr_start = NULL, *domain_start = NULL, *utf8_end = NULL;
-	char 	*base64_buf = NULL;
-	size_t	size_angle_addr = 128, offset_angle_addr = 0, len, i;
-	int	ret = FAIL;
+	const char	*base64_like_start = NULL, *base64_like_end = NULL;
+	char		*base64_buf = NULL;
+	size_t		size_angle_addr = 128, offset_angle_addr = 0, len, i;
+	int		ret = FAIL;
 
 	/* Skip leading whitespace */
 	p = mailbox;
@@ -151,13 +152,22 @@ static int	smtp_parse_mailbox(const char *mailbox, char *error, size_t max_error
 
 		if (1 == len)	/* ASCII character */
 		{
-			if ('<' == *p)
+			switch (*p)
 			{
-				angle_addr_start = p;
-			}
-			else if ('@' == *p)
-			{
-				domain_start = p;
+				case '<':
+					angle_addr_start = p;
+					break;
+				case '@':
+					domain_start = p;
+					break;
+				/* if mailbox contains a sequence '=?'.*'?=' which looks like a Base64-encoded word */
+				case '=':
+					if ('?' == *(p + 1))
+						base64_like_start = p;
+					break;
+				case '?':
+					if (NULL != base64_like_start && base64_like_start + 1 < p && '=' == *(p + 1))
+						base64_like_end = p;
 			}
 			p++;
 		}
@@ -207,7 +217,8 @@ static int	smtp_parse_mailbox(const char *mailbox, char *error, size_t max_error
 			memcpy(*display_name, pstart, (size_t)(angle_addr_start - pstart));
 			*((*display_name) + (angle_addr_start - pstart)) = '\0';
 
-			if (NULL != utf8_end)	/* UTF-8 display name */
+			/* UTF-8 or Base64-looking display name */
+			if (NULL != utf8_end || (NULL != base64_like_end && angle_addr_start - 1 > base64_like_end))
 			{
 				str_base64_encode_rfc2047(*display_name, &base64_buf);
 				zbx_free(*display_name);
