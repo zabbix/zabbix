@@ -313,12 +313,12 @@ ZBX_DC_INTERFACE_ITEM;
 
 typedef struct
 {
-	const char		*severity_name[TRIGGER_SEVERITY_COUNT];
-	zbx_uint64_t		discovery_groupid;
-	int			refresh_unsupported;
-	unsigned char		snmptrap_logging;
+	const char	*severity_name[TRIGGER_SEVERITY_COUNT];
+	zbx_uint64_t	discovery_groupid;
+	int		refresh_unsupported;
+	unsigned char	snmptrap_logging;
 	/* housekeeping related configuration data */
-	zbx_config_hk_t		hk;
+	zbx_config_hk_t	hk;
 }
 ZBX_DC_CONFIG_TABLE;
 
@@ -693,7 +693,7 @@ static int	DCsync_config(DB_RESULT result)
 
 			config->config->hk.trends_mode = 1;
 			config->config->hk.trends_global = 0;
-			config->config->hk.trends = 90;
+			config->config->hk.trends = 365;
 		}
 	}
 	else
@@ -3992,11 +3992,7 @@ void	*DCconfig_get_config_data(void *data, int type)
  *                                                                            *
  * Purpose: get housekeeping configuration data                               *
  *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  * Author: Andris Zeila                                                       *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 void	DCconfig_get_config_hk(zbx_config_hk_t *data)

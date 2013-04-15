@@ -29,30 +29,13 @@
 
 extern unsigned char	process_type;
 
-#define	HK_INITIAL_DELETE_QUEUE_SIZE	4096
+#define HK_INITIAL_DELETE_QUEUE_SIZE	4096
 
 /* the maximum number of housekeeping periods to be removed per single housekeeping cycle */
-#define	HK_MAX_DELETE_PERIODS		4
+#define HK_MAX_DELETE_PERIODS		4
 
 /* the housekeeping configuration */
 static zbx_config_hk_t	hk_config;
-
-/* Housekeeping configuration field definition.                  */
-/* This structure is used to map database config table fields to */
-/* housekeeper configuration data.                               */
-typedef struct
-{
-	/* a reference to the housekeeping configuration value */
-	unsigned int	*pvalue;
-
-	/* the configuration field name in database */
-	const char	*field;
-
-	/* the acceptable value range */
-	unsigned int	min_value;
-	unsigned int	max_value;
-}
-zbx_hk_db_config_t;
 
 /* Housekeeping rule definition.                                */
 /* A housekeeping rule describes table from which records older */
@@ -93,7 +76,7 @@ zbx_hk_cleanup_table_t;
 /* Housekeeper table mapping to housekeeping configuration values.    */
 /* This mapping is used to exclude disabled tables from housekeeping  */
 /* cleanup procedure.                                                 */
-static zbx_hk_cleanup_table_t hk_cleanup_tables[] = {
+static zbx_hk_cleanup_table_t	hk_cleanup_tables[] = {
 	{"history", &hk_config.history_mode},
 	{"history_log", &hk_config.history_mode},
 	{"history_str", &hk_config.history_mode},
@@ -106,9 +89,9 @@ static zbx_hk_cleanup_table_t hk_cleanup_tables[] = {
 	{NULL, NULL}
 };
 
-/* Trends table offsets in the hk_cleanup_tables[] mapping  */
-#define	HK_UPADTE_CACHE_OFFSET_TREND_FLOAT	ITEM_VALUE_TYPE_COUNT
-#define	HK_UPADTE_CACHE_OFFSET_TREND_UINT	(HK_UPADTE_CACHE_OFFSET_TREND_FLOAT + 1)
+/* trends table offsets in the hk_cleanup_tables[] mapping  */
+#define HK_UPADTE_CACHE_OFFSET_TREND_FLOAT	ITEM_VALUE_TYPE_COUNT
+#define HK_UPADTE_CACHE_OFFSET_TREND_UINT	(HK_UPADTE_CACHE_OFFSET_TREND_FLOAT + 1)
 
 /* the oldest record timestamp cache for items in history tables */
 typedef struct
@@ -132,13 +115,13 @@ zbx_hk_delete_queue_t;
 /* the item rule state  */
 typedef enum
 {
-	HK_ITEM_RULE_NOT_INITIALIZED		= 0,
-	HK_ITEM_RULE_ITEM_CACHE_PREPARED	= 1,
-	HK_ITEM_RULE_DELETE_QUEUE_PREPARED	= 2
+	HK_ITEM_RULE_NOT_INITIALIZED = 0,
+	HK_ITEM_RULE_ITEM_CACHE_PREPARED,
+	HK_ITEM_RULE_DELETE_QUEUE_PREPARED
 }
 zbx_hk_item_rule_state_t;
 
-/* This structure is used to remove old records from history (trends) tables */
+/* this structure is used to remove old records from history (trends) tables */
 typedef struct
 {
 	/* the target table name */
@@ -167,18 +150,18 @@ typedef struct
 }
 zbx_hk_history_rule_t;
 
-/* The history item rules, used for housekeeping history and trends tables */
+/* the history item rules, used for housekeeping history and trends tables */
 static zbx_hk_history_rule_t	hk_history_rules[] = {
-	{"history", "history", 0, &hk_config.history_mode, &hk_config.history_global, &hk_config.history, {0}, {0}},
-	{"history_str", "history", 0, &hk_config.history_mode, &hk_config.history_global, &hk_config.history, {0}, {0}},
-	{"history_log", "history", 0, &hk_config.history_mode, &hk_config.history_global, &hk_config.history, {0}, {0}},
-	{"history_uint", "history", 0, &hk_config.history_mode, &hk_config.history_global, &hk_config.history, {0}, {0}},
-	{"history_text", "history", 0, &hk_config.history_mode, &hk_config.history_global, &hk_config.history, {0}, {0}},
+	{"history", "history", 0, &hk_config.history_mode, &hk_config.history_global, &hk_config.history},
+	{"history_str", "history", 0, &hk_config.history_mode, &hk_config.history_global, &hk_config.history},
+	{"history_log", "history", 0, &hk_config.history_mode, &hk_config.history_global, &hk_config.history},
+	{"history_uint", "history", 0, &hk_config.history_mode, &hk_config.history_global, &hk_config.history},
+	{"history_text", "history", 0, &hk_config.history_mode, &hk_config.history_global, &hk_config.history},
 
-	{"trends", "trends", 0, &hk_config.trends_mode, &hk_config.trends_global, &hk_config.trends, {0}, {0}},
-	{"trends_uint","trends", 0, &hk_config.trends_mode, &hk_config.trends_global, &hk_config.trends, {0}, {0}},
+	{"trends", "trends", 0, &hk_config.trends_mode, &hk_config.trends_global, &hk_config.trends},
+	{"trends_uint","trends", 0, &hk_config.trends_mode, &hk_config.trends_global, &hk_config.trends},
 
-	{0}
+	{NULL}
 };
 
 /******************************************************************************
@@ -201,8 +184,8 @@ static zbx_hk_history_rule_t	hk_history_rules[] = {
  ******************************************************************************/
 static int	hk_item_update_cache_compare(const void *d1, const void *d2)
 {
-	zbx_hk_delete_queue_t *r1 = *(zbx_hk_delete_queue_t**)d1;
-	zbx_hk_delete_queue_t *r2 = *(zbx_hk_delete_queue_t**)d2;
+	zbx_hk_delete_queue_t	*r1 = *(zbx_hk_delete_queue_t**)d1;
+	zbx_hk_delete_queue_t	*r2 = *(zbx_hk_delete_queue_t**)d2;
 
 	if (r1->itemid > r2->itemid) return 1;
 	if (r1->itemid < r2->itemid) return -1;
@@ -222,8 +205,6 @@ static int	hk_item_update_cache_compare(const void *d1, const void *d2)
  *             history     - [IN] a number of days the history data for       *
  *                           item_record must be kept.                        *
  *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  * Author: Andris Zeila                                                       *
  *                                                                            *
  * Comments: If item is added to delete queue, its oldest record timestamp    *
@@ -231,9 +212,9 @@ static int	hk_item_update_cache_compare(const void *d1, const void *d2)
  *                                                                            *
  ******************************************************************************/
 static void	hk_history_delete_queue_append(zbx_hk_history_rule_t *rule, unsigned int now,
-			zbx_hk_item_cache_t *item_record, unsigned int history)
+		zbx_hk_item_cache_t *item_record, unsigned int history)
 {
-	unsigned int keep_from = now - history * SEC_PER_DAY;
+	unsigned int	keep_from = now - history * SEC_PER_DAY;
 
 	if (keep_from > item_record->min_clock)
 	{
@@ -241,7 +222,7 @@ static void	hk_history_delete_queue_append(zbx_hk_history_rule_t *rule, unsigned
 
 		/* update oldest timestamp in item cache */
 		item_record->min_clock = MIN(keep_from, item_record->min_clock +
-			HK_MAX_DELETE_PERIODS * CONFIG_HOUSEKEEPING_FREQUENCY * SEC_PER_HOUR);
+				HK_MAX_DELETE_PERIODS * CONFIG_HOUSEKEEPING_FREQUENCY * SEC_PER_HOUR);
 
 		update_record = zbx_malloc(NULL, sizeof(zbx_hk_delete_queue_t));
 		update_record->itemid = item_record->itemid;
@@ -249,7 +230,6 @@ static void	hk_history_delete_queue_append(zbx_hk_history_rule_t *rule, unsigned
 		zbx_vector_ptr_append(&rule->delete_queue, update_record);
 	}
 }
-
 
 /******************************************************************************
  *                                                                            *
@@ -259,8 +239,6 @@ static void	hk_history_delete_queue_append(zbx_hk_history_rule_t *rule, unsigned
  *                                                                            *
  * Parameters: rule        - [IN/OUT] the history housekeeping rule           *
  *             now         - [IN] the current timestmap                       *
- *                                                                            *
- * Return value:                                                              *
  *                                                                            *
  * Author: Andris Zeila                                                       *
  *                                                                            *
@@ -286,9 +264,9 @@ static void	hk_history_prepare(zbx_hk_history_rule_t *rule, unsigned int now)
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		zbx_uint64_t			itemid;
-		unsigned int			min_clock, history;
-		zbx_hk_item_cache_t		item_record;
+		zbx_uint64_t		itemid;
+		unsigned int		min_clock, history;
+		zbx_hk_item_cache_t	item_record;
 
 		if (FAIL == is_uint64(row[0], &itemid) || FAIL == is_uint32(row[1], &min_clock))
 			continue;
@@ -317,8 +295,6 @@ static void	hk_history_prepare(zbx_hk_history_rule_t *rule, unsigned int now)
  *                                                                            *
  * Parameters: rule  - [IN/OUT] the history housekeeping rule                 *
  *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  * Author: Andris Zeila                                                       *
  *                                                                            *
  * Comments: This function is called to release resources allocated by        *
@@ -328,7 +304,8 @@ static void	hk_history_prepare(zbx_hk_history_rule_t *rule, unsigned int now)
  ******************************************************************************/
 static void	hk_history_release(zbx_hk_history_rule_t *rule)
 {
-	if (0 == rule->state) return;
+	if (0 == rule->state)
+		return;
 
 	zbx_hashset_destroy(&rule->item_cache);
 	zbx_vector_ptr_destroy(&rule->delete_queue);
@@ -349,11 +326,7 @@ static void	hk_history_release(zbx_hk_history_rule_t *rule)
  *             history - [IN] the number of days the item data should be kept *
  *                       in history                                           *
  *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  * Author: Andris Zeila                                                       *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 static void	hk_history_item_update(zbx_hk_history_rule_t *rule, unsigned int now, zbx_uint64_t itemid,
@@ -388,8 +361,6 @@ static void	hk_history_item_update(zbx_hk_history_rule_t *rule, unsigned int now
  * Parameters: rule  - [IN/OUT] the history housekeeping rule                 *
  *             now   - [IN] the current timestamp                             *
  *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  * Author: Andris Zeila                                                       *
  *                                                                            *
  * Comments: This function is called to release resources allocated by        *
@@ -402,15 +373,18 @@ static void	hk_history_update(zbx_hk_history_rule_t *rules, unsigned int now)
 	DB_RESULT	result;
 	DB_ROW		row;
 
-	result = DBselect("select i.itemid,i.value_type,i.history,i.trends from items i,hosts h"
-			" where i.hostid=h.hostid and h.status in (%d,%d)",
+	result = DBselect(
+			"select i.itemid,i.value_type,i.history,i.trends"
+			" from items i,hosts h"
+			" where i.hostid=h.hostid"
+				" and h.status in (%d,%d)",
 			HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED);
 
 	while (NULL != (row = DBfetch(result)))
 	{
 		zbx_uint64_t		itemid;
 		unsigned int		history, trends, value_type;
-		zbx_hk_history_rule_t 	*rule;
+		zbx_hk_history_rule_t	*rule;
 
 		if (FAIL == is_uint64(row[0], &itemid) ||  FAIL == is_uint32(row[1], &value_type) ||
 				FAIL == is_uint32(row[2], &history) || FAIL == is_uint32(row[3], &trends))
@@ -446,11 +420,9 @@ static void	hk_history_update(zbx_hk_history_rule_t *rules, unsigned int now)
 					trends = *rule->poption;
 				hk_history_item_update(rule, now, itemid, trends);
 			}
-
 		}
 	}
 }
-
 
 /******************************************************************************
  *                                                                            *
@@ -462,8 +434,6 @@ static void	hk_history_update(zbx_hk_history_rule_t *rules, unsigned int now)
  * Parameters: rules  - [IN/OUT] the history housekeeping rules               *
  *             now    - [IN] the current timestamp                            *
  *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  * Author: Andris Zeila                                                       *
  *                                                                            *
  * Comments: This function also handles history rule initializing/releasing   *
@@ -474,7 +444,7 @@ static void	hk_history_delete_queue_prepare_all(zbx_hk_history_rule_t *rules, un
 {
 	const char		*__function_name = "hk_history_delete_queue_prepare_all";
 	int			update_cache = 0;
-	zbx_hk_history_rule_t 	*rule;
+	zbx_hk_history_rule_t	*rule;
 
 	/* prepare history item cache (hashset containing itemid:min_clock values) */
 	for (rule = rules; NULL != rule->table; rule++)
@@ -508,11 +478,7 @@ static void	hk_history_delete_queue_prepare_all(zbx_hk_history_rule_t *rules, un
  * Parameters: rule   - [IN/OUT] the history housekeeping rule                *
  *             now    - [IN] the current timestamp                            *
  *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  * Author: Andris Zeila                                                       *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 static void	hk_history_delete_queue_clear(zbx_hk_history_rule_t *rule)
@@ -521,12 +487,11 @@ static void	hk_history_delete_queue_clear(zbx_hk_history_rule_t *rule)
 
 	for (i = 0; i < rule->delete_queue.values_num; i++)
 	{
-		free(rule->delete_queue.values[i]);
+		zbx_free(rule->delete_queue.values[i]);
 	}
 	rule->delete_queue.values_num = 0;
 	rule->state &= (~HK_ITEM_RULE_DELETE_QUEUE_PREPARED);
 }
-
 
 /******************************************************************************
  *                                                                            *
@@ -536,18 +501,14 @@ static void	hk_history_delete_queue_clear(zbx_hk_history_rule_t *rule)
  *                                                                            *
  * Parameters: now    - [IN] the current timestamp                            *
  *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  * Author: Andris Zeila                                                       *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 static int	housekeeping_history_and_trends(unsigned int now)
 {
 	const char		*__function_name = "housekeeping_history_and_trends";
 	int			deleted = 0, i, rc;
-	zbx_hk_history_rule_t 	*rule;
+	zbx_hk_history_rule_t	*rule;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() now:%d", __function_name, now);
 
@@ -556,7 +517,8 @@ static int	housekeeping_history_and_trends(unsigned int now)
 
 	for (rule = hk_history_rules; NULL != rule->table; rule++)
 	{
-		if (ZBX_HK_OPTION_DISABLED == *rule->poption_mode) continue;
+		if (ZBX_HK_OPTION_DISABLED == *rule->poption_mode)
+			continue;
 
 		/* process housekeeping rule */
 
@@ -594,8 +556,6 @@ static int	housekeeping_history_and_trends(unsigned int now)
  * Return value: the number of deleted records                                *
  *                                                                            *
  * Author: Andris Zeila                                                       *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 static int	housekeeping_process_rule(unsigned int now, zbx_hk_rule_t *rule)
@@ -843,8 +803,10 @@ static int	housekeeping_events(int now)
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() now:%d", __function_name, now);
 
 	if (ZBX_HK_OPTION_ENABLED == hk_config.events_mode)
+	{
 		for (rule = rules; NULL != rule->table; rule++)
 			deleted += housekeeping_process_rule(now, rule);
+	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __function_name, deleted);
 
@@ -853,8 +815,7 @@ static int	housekeeping_events(int now)
 
 void	main_housekeeper_loop(void)
 {
-	int	now, d_history_and_trends, d_cleanup, d_events, d_sessions;
-	int	d_services, d_audit;
+	int	now, d_history_and_trends, d_cleanup, d_events, d_sessions, d_services, d_audit;
 
 	for (;;)
 	{
@@ -864,6 +825,7 @@ void	main_housekeeper_loop(void)
 		zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
 		DBconnect(ZBX_DB_CONNECT_NORMAL);
 
+		zbx_setproctitle("%s [executing housekeeper]", get_process_type_string(process_type));
 		DCconfig_get_config_hk(&hk_config);
 
 		zabbix_log(LOG_LEVEL_DEBUG, "WDN: hk_trends=%u, hk_trends_global=%u",
