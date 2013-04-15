@@ -21,7 +21,6 @@
 require_once dirname(__FILE__).'/js/administration.general.housekeeper.edit.js.php';
 
 $houseKeeperTab = new CFormList('scriptsTab');
-$houseKeeperTab->addClass('housekeeperConfiguration');
 
 // remove events and alerts block
 $houseKeeperTab->addRow(_('Remove events and alerts'), new CCheckBox('hk_events_mode',
