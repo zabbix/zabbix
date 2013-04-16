@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2012 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -10,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -19,15 +19,81 @@
 **/
 
 
-function event_source2str($sourceid) {
-	switch ($sourceid) {
-		case EVENT_SOURCE_TRIGGERS:
-			return _('Triggers');
-		case EVENT_SOURCE_DISCOVERY:
-			return _('Discovery');
-		default:
-			return _('Unknown');
+/**
+ * Returns the names of supported event sources.
+ *
+ * If the $source parameter is passed, returns the name of the specific source, otherwise - returns an array of all
+ * supported sources.
+ *
+ * @param int $source
+ *
+ * @return array|string
+ */
+function eventSource($source = null) {
+	$sources = array(
+		EVENT_SOURCE_TRIGGERS => _('trigger'),
+		EVENT_SOURCE_DISCOVERY => _('discovery'),
+		EVENT_SOURCE_AUTO_REGISTRATION => _('auto registration'),
+		EVENT_SOURCE_INTERNAL => _('internal')
+	);
+
+	if ($source === null) {
+		return $sources;
 	}
+	elseif (isset($sources[$source])) {
+		return $sources[$source];
+	}
+	else {
+		return _('Unknown');
+	}
+}
+
+/**
+ * Returns the names of supported event objects.
+ *
+ * If the $source parameter is passed, returns the name of the specific object, otherwise - returns an array of all
+ * supported objects.
+ *
+ * @param int $object
+ *
+ * @return array|string
+ */
+function eventObject($object = null) {
+	$objects = array(
+		EVENT_OBJECT_TRIGGER => _('trigger'),
+		EVENT_OBJECT_DHOST => _('discovered host'),
+		EVENT_OBJECT_DSERVICE => _('discovered service'),
+		EVENT_OBJECT_AUTOREGHOST => _('auto-registered host'),
+		EVENT_OBJECT_ITEM => _('item'),
+		EVENT_OBJECT_LLDRULE => _('low-level discovery rule')
+	);
+
+	if ($object === null) {
+		return $objects;
+	}
+	elseif (isset($objects[$object])) {
+		return $objects[$object];
+	}
+	else {
+		return _('Unknown');
+	}
+}
+
+/**
+ * Returns all supported event source-object pairs.
+ *
+ * @return array
+ */
+function eventSourceObjects() {
+	return array(
+		array('source' => EVENT_SOURCE_TRIGGERS, 'object' => EVENT_OBJECT_TRIGGER),
+		array('source' => EVENT_SOURCE_DISCOVERY, 'object' => EVENT_OBJECT_DHOST),
+		array('source' => EVENT_SOURCE_DISCOVERY, 'object' => EVENT_OBJECT_DSERVICE),
+		array('source' => EVENT_SOURCE_AUTO_REGISTRATION, 'object' => EVENT_OBJECT_AUTOREGHOST),
+		array('source' => EVENT_SOURCE_INTERNAL, 'object' => EVENT_OBJECT_TRIGGER),
+		array('source' => EVENT_SOURCE_INTERNAL, 'object' => EVENT_OBJECT_ITEM),
+		array('source' => EVENT_SOURCE_INTERNAL, 'object' => EVENT_OBJECT_LLDRULE)
+	);
 }
 
 function get_tr_event_by_eventid($eventid) {
@@ -71,12 +137,11 @@ function get_events_unacknowledged($db_element, $value_trigger = null, $value_ev
 
 	return API::Event()->get(array(
 		'countOutput' => 1,
-		'triggerids' => zbx_objectValues($triggerids, 'triggerid'),
+		'objectids' => zbx_objectValues($triggerids, 'triggerid'),
 		'filter' => array(
 			'value' => is_null($value_event) ? array(TRIGGER_VALUE_TRUE, TRIGGER_VALUE_FALSE) : $value_event,
 			'acknowledged' => $ack ? 1 : 0
 		),
-		'object' => EVENT_OBJECT_TRIGGER,
 		'nopermissions' => true
 	));
 }
@@ -139,7 +204,7 @@ function make_small_eventlist($startEvent) {
 	$clock = $startEvent['clock'];
 
 	$options = array(
-		'triggerids' => $startEvent['objectid'],
+		'objectids' => $startEvent['objectid'],
 		'eventid_till' => $startEvent['eventid'],
 		'output' => API_OUTPUT_EXTEND,
 		'select_acknowledges' => API_OUTPUT_COUNT,
@@ -154,6 +219,8 @@ function make_small_eventlist($startEvent) {
 	);
 	CArrayHelper::sort($events, $sortFields);
 
+	$actions = getEventActionsStatHints(zbx_objectValues($events, 'eventid'));
+
 	foreach ($events as $event) {
 		$lclock = $clock;
 		$duration = zbx_date2age($lclock, $event['clock']);
@@ -167,6 +234,7 @@ function make_small_eventlist($startEvent) {
 		}
 
 		$eventStatusSpan = new CSpan(trigger_value2str($event['value']));
+
 		// add colors and blinking to span depending on configuration and trigger parameters
 		addTriggerValueStyle(
 			$eventStatusSpan,
@@ -176,8 +244,6 @@ function make_small_eventlist($startEvent) {
 		);
 
 		$ack = getEventAckState($event, true);
-
-		$actions = get_event_actions_stat_hints($event['eventid']);
 
 		$table->addRow(array(
 			new CLink(
@@ -189,17 +255,18 @@ function make_small_eventlist($startEvent) {
 			$duration,
 			zbx_date2age($event['clock']),
 			$config['event_ack_enable'] ? $ack : null,
-			$actions
+			isset($actions[$event['eventid']]) ? $actions[$event['eventid']] : SPACE
 		));
 	}
 
 	return $table;
 }
 
-function make_popup_eventlist($eventid, $trigger_type, $triggerid) {
+function make_popup_eventlist($triggerId, $eventId) {
 	$config = select_config();
 
 	$table = new CTableInfo();
+	$table->setAttribute('style', 'width: 400px;');
 
 	// if acknowledges are turned on, we show 'ack' column
 	if ($config['event_ack_enable']) {
@@ -209,25 +276,20 @@ function make_popup_eventlist($eventid, $trigger_type, $triggerid) {
 		$table->setHeader(array(_('Time'), _('Status'), _('Duration'), _('Age')));
 	}
 
-	$table->setAttribute('style', 'width: 400px;');
-
-	$options = array(
+	$events = API::Event()->get(array(
 		'output' => API_OUTPUT_EXTEND,
-		'triggerids' => $triggerid,
-		'eventid_till' => $eventid,
-		'filter' => array(
-			'object' => EVENT_OBJECT_TRIGGER
-		),
-		'nopermissions' => 1,
+		'objectids' => $triggerId,
+		'eventid_till' => $eventId,
+		'nopermissions' => true,
 		'select_acknowledges' => API_OUTPUT_COUNT,
 		'sortfield' => 'eventid',
 		'sortorder' => ZBX_SORT_DOWN,
 		'limit' => ZBX_WIDGET_ROWS
-	);
-	$db_events = API::Event()->get($options);
+	));
 
 	$lclock = time();
-	foreach ($db_events as $event) {
+
+	foreach ($events as $event) {
 		$duration = zbx_date2age($lclock, $event['clock']);
 		$lclock = $event['clock'];
 
@@ -236,14 +298,12 @@ function make_popup_eventlist($eventid, $trigger_type, $triggerid) {
 		// add colors and blinking to span depending on configuration and trigger parameters
 		addTriggerValueStyle($eventStatusSpan, $event['value'], $event['clock'], $event['acknowledged']);
 
-		$ack = getEventAckState($event, false, false);
-
 		$table->addRow(array(
 			zbx_date2str(_('d M Y H:i:s'), $event['clock']),
 			$eventStatusSpan,
 			$duration,
 			zbx_date2age($event['clock']),
-			$ack
+			getEventAckState($event, false, false)
 		));
 	}
 
@@ -337,9 +397,6 @@ function getLastEvents($options) {
 
 	$eventOptions = array(
 		'output' => API_OUTPUT_EXTEND,
-		'filter' => array(
-			'object' => EVENT_OBJECT_TRIGGER
-		),
 		'sortfield' => 'eventid',
 		'sortorder' => ZBX_SORT_DOWN
 	);
@@ -371,7 +428,7 @@ function getLastEvents($options) {
 	$triggers = zbx_toHash($triggers, 'triggerid');
 
 	// events
-	$eventOptions['triggerids'] = zbx_objectValues($triggers, 'triggerid');
+	$eventOptions['objectids'] = zbx_objectValues($triggers, 'triggerid');
 	$events = API::Event()->get($eventOptions);
 
 	$sortClock = array();
