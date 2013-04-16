@@ -123,14 +123,7 @@ $graph->setRightPercentage($dbGraph['percent_right']);
 
 $config = select_config();
 
-if ($config['hk_history_global']) {
-	$hkHistory = $config['hk_history'];
-}
-else {
-	$hkHistory = false;
-}
-
-$graph->setHistory($hkHistory);
+$graph->setHistoryPeriod(($config['hk_history_global']) ? $config['hk_history'] : null);
 
 $dbGraphItems = DBselect(
 	'SELECT gi.*'.
