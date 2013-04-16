@@ -69,7 +69,7 @@ if (!$this->data['config']['hk_sessions_mode']) {
 $houseKeeperTab->addRow(_('Remove user sessions older than (in days)'), $houseKeeperSessionsMode);
 
 // remove historical data block
-$houseKeeperTab->addRow(_('Remove historical data'), new CCheckBox('hk_history_mode',
+$houseKeeperTab->addRow(_('Remove history data'), new CCheckBox('hk_history_mode',
 	$this->data['config']['hk_history_mode'], null, 1));
 $houseKeeperHistoryGlobal = new CCheckBox('hk_history_global',
 	$this->data['config']['hk_history_global'], null, 1);
@@ -81,7 +81,7 @@ if (!$this->data['config']['hk_history_mode'] || !$this->data['config']['hk_hist
 	$houseKeeperHistoryModeGlobal->setAttribute('disabled', 'disabled');
 }
 $houseKeeperTab->addRow(_('Overwrite per-item historical data period'), $houseKeeperHistoryGlobal);
-$houseKeeperTab->addRow(_('Remove historical data older than (in days)'), $houseKeeperHistoryModeGlobal);
+$houseKeeperTab->addRow(_('Remove history data older than (in days)'), $houseKeeperHistoryModeGlobal);
 
 // remove trend data block
 $houseKeeperTab->addRow(_('Remove trend data'), new CCheckBox('hk_trends_mode',

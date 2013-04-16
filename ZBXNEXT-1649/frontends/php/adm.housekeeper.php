@@ -50,7 +50,7 @@ $fields = array(
 	'hk_history_mode' =>	array(T_ZBX_INT, O_OPT, null, IN('0,1'), null),
 	'hk_history_global' =>	array(T_ZBX_INT, O_OPT, null, IN('0,1'), null),
 	'hk_history' => 		array(T_ZBX_DBL, O_OPT, null, BETWEEN(0, 99999), null,
-		_('Remove historical data older than (in days)')),
+		_('Remove history data older than (in days)')),
 	'hk_trends_mode' =>		array(T_ZBX_INT, O_OPT, null, IN('0,1'), null),
 	'hk_trends_global' =>	array(T_ZBX_INT, O_OPT, null, IN('0,1'), null),
 	'hk_trends' => 			array(T_ZBX_DBL, O_OPT, null, BETWEEN(0, 99999), null,
@@ -103,7 +103,7 @@ if (isset($_REQUEST['save'])) {
 		$msg[] = _s('Remove IT service history older than (in days) "%1$s".', get_request('hk_services'));
 		$msg[] = _s('Remove audit history older than (in days) "%1$s".', get_request('hk_audit'));
 		$msg[] = _s('Remove user sessions older than (in days) "%1$s".', get_request('hk_sessions'));
-		$msg[] = _s('Remove historical data older than (in days) "%1$s".', get_request('hk_history'));
+		$msg[] = _s('Remove history data older than (in days) "%1$s".', get_request('hk_history'));
 		$msg[] = _s('Remove trend data older than (in days) "%1$s".', get_request('hk_trends'));
 
 		add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ZABBIX_CONFIG, implode('; ', $msg));
