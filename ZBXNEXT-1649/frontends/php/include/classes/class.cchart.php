@@ -21,6 +21,13 @@
 
 class CChart extends CGraphDraw {
 
+	/**
+	 * Global history period to override item-level "history" property.
+	 *
+	 * @var integer
+	 */
+	protected $historyPeriod;
+
 	public function __construct($type = GRAPH_TYPE_NORMAL) {
 		parent::__construct($type);
 		$this->yaxismin = null;
@@ -57,7 +64,6 @@ class CChart extends CGraphDraw {
 		$this->gridStep = array(); // grid step
 		$this->gridPixels = 25; // optimal grid size
 		$this->gridPixelsVert = 40;
-		$this->historyPeriod = null; // "hk_history" - housekeeper configuration parameter
 	}
 
 	/********************************************************************************************************/
@@ -175,9 +181,9 @@ class CChart extends CGraphDraw {
 	}
 
 	/**
-	 * Set housekeeper "hk_history" configuration parameter
+	 * Set the "historyPeriod" property.
 	 *
-	 * @param string $value
+	 * @param integer $value
 	 *
 	 * @return void
 	 */

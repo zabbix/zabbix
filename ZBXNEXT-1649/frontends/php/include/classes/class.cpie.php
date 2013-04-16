@@ -22,6 +22,13 @@
 
 class CPie extends CGraphDraw {
 
+	/**
+	 * Global history period to override item-level "history" property.
+	 *
+	 * @var integer
+	 */
+	protected $historyPeriod;
+
 	public function __construct($type = GRAPH_TYPE_PIE) {
 		parent::__construct($type);
 		$this->background = false;
@@ -30,7 +37,6 @@ class CPie extends CGraphDraw {
 		$this->exploderad3d = 3;
 		$this->graphheight3d = 12;
 		$this->shiftlegendright = 17 * 7 + 7 + 10; // count of static chars * px/char + for color rectangle + space
-		$this->historyPeriod = null; // "hk_history" - housekeeper configuration parameter
 	}
 
 	/********************************************************************************************************/
@@ -135,9 +141,9 @@ class CPie extends CGraphDraw {
 	}
 
 	/**
-	 * Set housekeeper "hk_history" configuration parameter
+	 * Set the "historyPeriod" property.
 	 *
-	 * @param string $value
+	 * @param integer $value
 	 *
 	 * @return void
 	 */
