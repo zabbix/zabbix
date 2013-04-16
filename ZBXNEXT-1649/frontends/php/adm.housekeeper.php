@@ -37,10 +37,10 @@ $fields = array(
 	'hk_events_discovery' =>array(T_ZBX_DBL, O_OPT, null, BETWEEN(1, 99999), null,
 		_('Remove discovery events and alerts older than (in days)')),
 	'hk_events_autoreg' => 	array(T_ZBX_DBL, O_OPT, null, BETWEEN(1, 99999), null,
-		_('Remove autoregistration events and alerts older than (in days)')),
+		_('Remove auto-registration events and alerts older than (in days)')),
 	'hk_services_mode' =>	array(T_ZBX_INT, O_OPT, null, IN('0,1'), null),
 	'hk_services' => 		array(T_ZBX_DBL, O_OPT, null, BETWEEN(1, 99999), null,
-		_('Remove IT services history older than (in days)')),
+		_('Remove IT service history older than (in days)')),
 	'hk_audit_mode' =>		array(T_ZBX_INT, O_OPT, null, IN('0,1'), null),
 	'hk_audit' => 			array(T_ZBX_DBL, O_OPT, null, BETWEEN(1, 99999), null,
 		_('Remove audit history older than (in days)')),
@@ -99,8 +99,8 @@ if (isset($_REQUEST['save'])) {
 		$msg[] = _s('Remove trigger events and alerts older than (in days) "%1$s".', get_request('hk_events_trigger'));
 		$msg[] = _s('Remove internal events and alerts older than (in days) "%1$s".', get_request('hk_events_internal'));
 		$msg[] = _s('Remove discovery events and alerts older than (in days) "%1$s".', get_request('hk_events_discovery'));
-		$msg[] = _s('Remove autoregistration events and alerts older than (in days) "%1$s".', get_request('hk_events_autoreg'));
-		$msg[] = _s('Remove IT services history older than (in days) "%1$s".', get_request('hk_services'));
+		$msg[] = _s('Remove auto-registration events and alerts older than (in days) "%1$s".', get_request('hk_events_autoreg'));
+		$msg[] = _s('Remove IT service history older than (in days) "%1$s".', get_request('hk_services'));
 		$msg[] = _s('Remove audit history older than (in days) "%1$s".', get_request('hk_audit'));
 		$msg[] = _s('Remove user sessions older than (in days) "%1$s".', get_request('hk_sessions'));
 		$msg[] = _s('Remove historical data older than (in days) "%1$s".', get_request('hk_history'));
