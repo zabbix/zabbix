@@ -119,6 +119,7 @@ ul li.linear { float: left; list-style-type: none; margin-right: 2px; }
 ul.formlist { list-style-type: none; margin: 0; padding: 0; }
 ul.formlist li { padding: 2px; height: 100%; vertical-align: middle; clear: both; }
 ul.formlist li .floatleft { padding-top: 2px; }
+ul.formlist .formrow .dd .checkbox  { vertical-align: middle; }
 
 /* any object list inline */
 ul.objectlist { padding: 0; list-style: none; margin: 0;}
@@ -994,5 +995,4 @@ fieldset legend { margin: 0.2em 0.5em; }
 .multiselect .available ul li.hover { background: #7A9FC1; color: #FFFFFF; }
 .multiselect .available ul li.hover .prefix { color: #F1F1F1; }
 
-.hk .formrow .dt { min-width: 375px; margin-right: 15px; }
-.formrow .dd .checkbox  { vertical-align: middle; }
+.hk .formlist .formrow .dt { min-width: 375px; margin-right: 15px; }
