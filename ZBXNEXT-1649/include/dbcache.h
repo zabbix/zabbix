@@ -180,28 +180,24 @@ zbx_host_key_t;
 /* housekeeping related configuration data*/
 typedef struct
 {
-	unsigned int	events_mode;
-	unsigned int	events_trigger;
-	unsigned int	events_internal;
-	unsigned int	events_discovery;
-	unsigned int	events_autoreg;
+	int		events_trigger;
+	int		events_internal;
+	int		events_discovery;
+	int		events_autoreg;
+	int		services;
+	int		audit;
+	int		sessions;
+	int		trends;
+	int		history;
 
-	unsigned int	services_mode;
-	unsigned int	services;
-
-	unsigned int	audit_mode;
-	unsigned int	audit;
-
-	unsigned int	sessions_mode;
-	unsigned int	sessions;
-
-	unsigned int	history_mode;
-	unsigned int	history_global;
-	unsigned int	history;
-
-	unsigned int	trends_mode;
-	unsigned int	trends_global;
-	unsigned int	trends;
+	unsigned char	services_mode;
+	unsigned char	audit_mode;
+	unsigned char	sessions_mode;
+	unsigned char	events_mode;
+	unsigned char	trends_mode;
+	unsigned char	trends_global;
+	unsigned char	history_mode;
+	unsigned char	history_global;
 }
 zbx_config_hk_t;
 

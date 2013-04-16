@@ -724,12 +724,20 @@ static int	DCsync_config(DB_RESULT result)
 		config->config->hk.sessions = atoi(row[19]);
 
 		config->config->hk.history_mode = atoi(row[20]);
-		config->config->hk.history_global = atoi(row[21]);
 		config->config->hk.history = atoi(row[22]);
 
+		if (ZBX_HK_OPTION_ENABLED == config->config->hk.history_mode)
+			config->config->hk.history_global = atoi(row[21]);
+		else
+			config->config->hk.history_global = ZBX_HK_OPTION_DISABLED;
+
 		config->config->hk.trends_mode = atoi(row[23]);
-		config->config->hk.trends_global = atoi(row[24]);
 		config->config->hk.trends = atoi(row[25]);
+
+		if (ZBX_HK_OPTION_ENABLED == config->config->hk.trends_mode)
+			config->config->hk.trends_global = atoi(row[24]);
+		else
+			config->config->hk.trends_global = ZBX_HK_OPTION_DISABLED;
 
 		if (NULL != (row = DBfetch(result)))	/* config table should have only one record */
 			zabbix_log(LOG_LEVEL_ERR, "table 'config' has multiple records");

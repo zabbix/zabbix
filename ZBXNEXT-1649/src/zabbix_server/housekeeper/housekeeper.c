@@ -44,19 +44,19 @@ static zbx_config_hk_t	hk_config;
 typedef struct
 {
 	/* target table name */
-	char		*table;
+	char	*table;
 
 	/* Optional filter, must be empty string if not used. Only the records matching */
 	/* filter are subject to housekeeping procedures.                               */
-	char		*filter;
+	char	*filter;
 
 	/* The oldest record in table (with filter in effect). The min_clock value is   */
 	/* read from the database when accessed for the first time and then during      */
 	/* housekeeping procedures updated to the last 'cutoff' value.                  */
-	unsigned int	min_clock;
+	int	min_clock;
 
 	/* a reference to the settings value specifying number of days the records must be kept */
-	unsigned int	*phistory;
+	int	*phistory;
 }
 zbx_hk_rule_t;
 
@@ -69,7 +69,7 @@ typedef struct
 	char		*name;
 
 	/* a reference to housekeeping configuration enable value for this table */
-	unsigned int	*poption_mode;
+	unsigned char	*poption_mode;
 }
 zbx_hk_cleanup_table_t;
 
@@ -97,7 +97,7 @@ static zbx_hk_cleanup_table_t	hk_cleanup_tables[] = {
 typedef struct
 {
 	zbx_uint64_t	itemid;
-	unsigned int	min_clock;
+	int		min_clock;
 }
 zbx_hk_item_cache_t;
 
@@ -108,7 +108,7 @@ zbx_hk_item_cache_t;
 typedef struct
 {
 	zbx_uint64_t	itemid;
-	unsigned int	min_clock;
+	int		min_clock;
 }
 zbx_hk_delete_queue_t;
 
@@ -134,13 +134,13 @@ typedef struct
 	int			state;
 
 	/* a reference to the housekeeping configuration mode (enable) option for this table */
-	unsigned int		*poption_mode;
+	unsigned char		*poption_mode;
 
 	/* a reference to the housekeeping configuration overwrite option for this table */
-	unsigned int		*poption_global;
+	unsigned char		*poption_global;
 
 	/* a reference to the housekeeping configuration history value for this table */
-	unsigned int		*poption;
+	int			*poption;
 
 	/* the oldest item record timestamp cache for target table */
 	zbx_hashset_t		item_cache;
@@ -160,7 +160,6 @@ static zbx_hk_history_rule_t	hk_history_rules[] = {
 
 	{"trends", "trends", 0, &hk_config.trends_mode, &hk_config.trends_global, &hk_config.trends},
 	{"trends_uint","trends", 0, &hk_config.trends_mode, &hk_config.trends_global, &hk_config.trends},
-
 	{NULL}
 };
 
@@ -211,10 +210,10 @@ static int	hk_item_update_cache_compare(const void *d1, const void *d2)
  *           (min_clock) is updated to the calculated 'cutoff' value.         *
  *                                                                            *
  ******************************************************************************/
-static void	hk_history_delete_queue_append(zbx_hk_history_rule_t *rule, unsigned int now,
-		zbx_hk_item_cache_t *item_record, unsigned int history)
+static void	hk_history_delete_queue_append(zbx_hk_history_rule_t *rule, int now,
+		zbx_hk_item_cache_t *item_record, int history)
 {
-	unsigned int	keep_from = now - history * SEC_PER_DAY;
+	int	keep_from = now - history * SEC_PER_DAY;
 
 	if (keep_from > item_record->min_clock)
 	{
@@ -248,7 +247,7 @@ static void	hk_history_delete_queue_append(zbx_hk_history_rule_t *rule, unsigned
  *           processed during the first run.                                  *
  *                                                                            *
  ******************************************************************************/
-static void	hk_history_prepare(zbx_hk_history_rule_t *rule, unsigned int now)
+static void	hk_history_prepare(zbx_hk_history_rule_t *rule, int now)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -265,16 +264,14 @@ static void	hk_history_prepare(zbx_hk_history_rule_t *rule, unsigned int now)
 	while (NULL != (row = DBfetch(result)))
 	{
 		zbx_uint64_t		itemid;
-		unsigned int		min_clock, history;
+		int			min_clock, history;
 		zbx_hk_item_cache_t	item_record;
 
-		if (FAIL == is_uint64(row[0], &itemid) || FAIL == is_uint32(row[1], &min_clock))
-			continue;
 
-		if (ZBX_HK_OPTION_ENABLED == *rule->poption_global)
-			history = *rule->poption;
-		else if (FAIL == is_uint32(row[2], &history))
-			continue;
+		ZBX_STR2UINT64(itemid, row[0]);
+		min_clock = atoi(row[1]);
+
+		history = (ZBX_HK_OPTION_ENABLED == *rule->poption_global) ? *rule->poption : atoi(row[2]);
 
 		item_record.itemid = itemid;
 		item_record.min_clock = min_clock;
@@ -329,8 +326,7 @@ static void	hk_history_release(zbx_hk_history_rule_t *rule)
  * Author: Andris Zeila                                                       *
  *                                                                            *
  ******************************************************************************/
-static void	hk_history_item_update(zbx_hk_history_rule_t *rule, unsigned int now, zbx_uint64_t itemid,
-		unsigned int history)
+static void	hk_history_item_update(zbx_hk_history_rule_t *rule, int now, zbx_uint64_t itemid, int history)
 {
 	zbx_hk_item_cache_t	*item_record;
 
@@ -368,7 +364,7 @@ static void	hk_history_item_update(zbx_hk_history_rule_t *rule, unsigned int now
  *           for the table referred by this rule.                             *
  *                                                                            *
  ******************************************************************************/
-static void	hk_history_update(zbx_hk_history_rule_t *rules, unsigned int now)
+static void	hk_history_update(zbx_hk_history_rule_t *rules, int now)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -383,12 +379,13 @@ static void	hk_history_update(zbx_hk_history_rule_t *rules, unsigned int now)
 	while (NULL != (row = DBfetch(result)))
 	{
 		zbx_uint64_t		itemid;
-		unsigned int		history, trends, value_type;
+		int			history, trends, value_type;
 		zbx_hk_history_rule_t	*rule;
 
-		if (FAIL == is_uint64(row[0], &itemid) ||  FAIL == is_uint32(row[1], &value_type) ||
-				FAIL == is_uint32(row[2], &history) || FAIL == is_uint32(row[3], &trends))
-			continue;
+		ZBX_STR2UINT64(itemid, row[0]);
+		value_type = atoi(row[1]);
+		history = atoi(row[2]);
+		trends = atoi(row[3]);
 
 		if (value_type < ITEM_VALUE_TYPE_COUNT)
 		{
@@ -440,7 +437,7 @@ static void	hk_history_update(zbx_hk_history_rule_t *rules, unsigned int now)
  *           when the rule just became enabled/disabled.                      *
  *                                                                            *
  ******************************************************************************/
-static void	hk_history_delete_queue_prepare_all(zbx_hk_history_rule_t *rules, unsigned int now)
+static void	hk_history_delete_queue_prepare_all(zbx_hk_history_rule_t *rules, int now)
 {
 	const char		*__function_name = "hk_history_delete_queue_prepare_all";
 	int			update_cache = 0;
@@ -504,7 +501,7 @@ static void	hk_history_delete_queue_clear(zbx_hk_history_rule_t *rule)
  * Author: Andris Zeila                                                       *
  *                                                                            *
  ******************************************************************************/
-static int	housekeeping_history_and_trends(unsigned int now)
+static int	housekeeping_history_and_trends(int now)
 {
 	const char		*__function_name = "housekeeping_history_and_trends";
 	int			deleted = 0, i, rc;
@@ -558,11 +555,11 @@ static int	housekeeping_history_and_trends(unsigned int now)
  * Author: Andris Zeila                                                       *
  *                                                                            *
  ******************************************************************************/
-static int	housekeeping_process_rule(unsigned int now, zbx_hk_rule_t *rule)
+static int	housekeeping_process_rule(int now, zbx_hk_rule_t *rule)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
-	unsigned int	keep_from, deleted = 0;
+	int		keep_from, deleted = 0;
 	int		rc;
 
 	/* initialize min_clock with the oldest record timestamp from database */
@@ -571,7 +568,7 @@ static int	housekeeping_process_rule(unsigned int now, zbx_hk_rule_t *rule)
 		result = DBselect("select min(clock) from %s%s%s", rule->table,
 				('\0' != *rule->filter ? " where " : ""), rule->filter);
 		if (NULL != (row = DBfetch(result)) && SUCCEED != DBis_null(row[0]))
-			is_uint32(row[0], &rule->min_clock);
+			rule->min_clock = atoi(row[0]);
 		else
 			rule->min_clock = now;
 
@@ -793,7 +790,7 @@ static int	housekeeping_events(int now)
 		{"events", "source="ZBX_STR(EVENT_SOURCE_INTERNAL), 0, &hk_config.events_internal},
 		{"events", "source="ZBX_STR(EVENT_SOURCE_DISCOVERY), 0, &hk_config.events_discovery},
 		{"events", "source="ZBX_STR(EVENT_SOURCE_AUTO_REGISTRATION), 0, &hk_config.events_autoreg},
-		{0}
+		{NULL}
 	};
 
 	const char		*__function_name = "housekeeping_events";
@@ -827,9 +824,6 @@ void	main_housekeeper_loop(void)
 
 		zbx_setproctitle("%s [executing housekeeper]", get_process_type_string(process_type));
 		DCconfig_get_config_hk(&hk_config);
-
-		zabbix_log(LOG_LEVEL_DEBUG, "WDN: hk_trends=%u, hk_trends_global=%u",
-				hk_config.trends, hk_config.trends_global);
 
 		zbx_setproctitle("%s [removing old history and trends]", get_process_type_string(process_type));
 		d_history_and_trends = housekeeping_history_and_trends(now);
