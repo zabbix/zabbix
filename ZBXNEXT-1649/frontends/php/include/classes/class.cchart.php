@@ -57,6 +57,7 @@ class CChart extends CGraphDraw {
 		$this->gridStep = array(); // grid step
 		$this->gridPixels = 25; // optimal grid size
 		$this->gridPixelsVert = 40;
+		$this->historyPeriod = null; // "hk_history" - housekeeper configuration parameter
 	}
 
 	/********************************************************************************************************/
@@ -173,8 +174,15 @@ class CChart extends CGraphDraw {
 		$this->percentile['right']['percent'] = $percentile;
 	}
 
-	public function setHistory($value) {
-		$this->setHistory = $value;
+	/**
+	 * Set housekeeper "hk_history" configuration parameter
+	 *
+	 * @param string $value
+	 *
+	 * @return void
+	 */
+	public function setHistoryPeriod($value) {
+		$this->historyPeriod = $value;
 	}
 
 	protected function selectData() {
@@ -218,8 +226,8 @@ class CChart extends CGraphDraw {
 
 			$sql_arr = array();
 
-			if ($this->setHistory) {
-				$real_item['history'] = $this->setHistory;
+			if ($this->historyPeriod !== null) {
+				$real_item['history'] = $this->historyPeriod;
 			}
 
 			if (($real_item['history'] * SEC_PER_DAY) > (time() - ($this->from_time + $this->period / 2)) // should pick data from history or trends

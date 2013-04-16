@@ -30,6 +30,7 @@ class CPie extends CGraphDraw {
 		$this->exploderad3d = 3;
 		$this->graphheight3d = 12;
 		$this->shiftlegendright = 17 * 7 + 7 + 10; // count of static chars * px/char + for color rectangle + space
+		$this->historyPeriod = null; // "hk_history" - housekeeper configuration parameter
 	}
 
 	/********************************************************************************************************/
@@ -133,8 +134,15 @@ class CPie extends CGraphDraw {
 		return array($sizeX, round($sizeY));
 	}
 
-	public function setHistory($value) {
-		$this->setHistory = $value;
+	/**
+	 * Set housekeeper "hk_history" configuration parameter
+	 *
+	 * @param string $value
+	 *
+	 * @return void
+	 */
+	public function setHistoryPeriod($value) {
+		$this->historyPeriod = $value;
 	}
 
 	protected function selectData() {
@@ -160,8 +168,8 @@ class CPie extends CGraphDraw {
 
 			$sql_arr = array();
 
-			if ($this->setHistory) {
-				$real_item['history'] = $this->setHistory;
+			if ($this->historyPeriod !== null) {
+				$real_item['history'] = $this->historyPeriod;
 			}
 
 			if (($real_item['history'] * SEC_PER_DAY) > (time() - ($from_time + $this->period / 2)) // should pick data from history or trends

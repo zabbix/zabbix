@@ -90,14 +90,7 @@ if (isset($_REQUEST['border'])) {
 
 $config = select_config();
 
-if ($config['hk_history_global']) {
-	$hkHistory = $config['hk_history'];
-}
-else {
-	$hkHistory = false;
-}
-
-$graph->setHistory($hkHistory);
+$graph->setHistoryPeriod(($config['hk_history_global']) ? $config['hk_history'] : null);
 
 $graph->addItem($_REQUEST['itemid'], GRAPH_YAXIS_SIDE_DEFAULT, CALC_FNC_ALL);
 $graph->draw();
