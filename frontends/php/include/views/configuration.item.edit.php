@@ -264,7 +264,6 @@ if (!$this->data['is_discovery_rule']) {
 
 		$multiplierCheckBox = new CCheckBox('multiplier', $this->data['multiplier'] == 1 ? 'yes':'no');
 		$multiplierCheckBox->setAttribute('disabled', 'disabled');
-		$multiplierCheckBox->setAttribute('style', 'vertical-align: middle;');
 		$multiplier[] = $multiplierCheckBox;
 
 		$multiplier[] = SPACE;
@@ -276,7 +275,6 @@ if (!$this->data['is_discovery_rule']) {
 		$multiplierCheckBox = new CCheckBox('multiplier', $this->data['multiplier'] == 1 ? 'yes': 'no',
 			'var editbx = document.getElementById(\'formula\'); if (editbx) { editbx.disabled = !this.checked; }', 1
 		);
-		$multiplierCheckBox->setAttribute('style', 'vertical-align: middle;');
 		$multiplier[] = $multiplierCheckBox;
 		$multiplier[] = SPACE;
 		$formulaTextBox = new CTextBox('formula', $this->data['formula'], ZBX_TEXTBOX_SMALL_SIZE);
@@ -500,7 +498,6 @@ $itemFormList->addRow(_('Description'), $description);
 
 // status
 $enabledCheckBox = new CCheckBox('status', !$this->data['status'], null, ITEM_STATUS_ACTIVE);
-$enabledCheckBox->addStyle('vertical-align: middle;');
 $itemFormList->addRow(_('Enabled'), $enabledCheckBox);
 
 // append tabs to form

@@ -131,7 +131,7 @@ $cmbConf->addItems(array(
 ));
 $form->addItem($cmbConf);
 
-$cnf_wdgt = new CWidget(null, 'hkConfiguration');
+$cnf_wdgt = new CWidget(null, 'hk');
 $cnf_wdgt->addPageHeader(_('CONFIGURATION OF HOUSEKEEPER'), $form);
 
 $data['form_refresh'] = get_request('form_refresh', 0);
