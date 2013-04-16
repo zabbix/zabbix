@@ -383,13 +383,12 @@ else {
 			$link->setAttribute('target', '_blank');
 			$keepHistory[] =  $link;
 			$keepHistory[] = SPACE;
-			$keepHistory[] = new CSpan('('. _n($dataConfig['hk_history'].' day',
-				$dataConfig['hk_history'].' days', $dataConfig['hk_history']). ')');
+			$keepHistory[] = new CSpan('('._n('%1$s day', '%1$s days', $dataConfig['hk_history']).')');
 		}
 		else {
-			$keepHistory[] = new CSpan(_xn('Overriden by global housekeeper settings (%1$s day)',
-				'Overriden by global housekeeper settings (%1$s days)',
-				$dataConfig['hk_history'], null, $dataConfig['hk_history']));
+			$keepHistory[] = new CSpan(
+				_('Overriden by global housekeeper settings').'('._n('%1$s day', '%1$s days', $dataConfig['hk_history']).')'
+			);
 		}
 	}
 	$itemFormList->addRow(_('Keep history (in days)'), $keepHistory);
@@ -409,9 +408,9 @@ else {
 				$dataConfig['hk_trends'].' days', $dataConfig['hk_trends']). ')');
 		}
 		else {
-			$keepTrend[] = new CSpan(_xn('Overriden by global housekeeper settings (%1$s day)',
-				'Overriden by global housekeeper settings (%1$s days)',
-				$dataConfig['hk_trends'], null, $dataConfig['hk_trends']));
+			$keepTrend[] = new CSpan(
+				_('Overriden by global housekeeper settings').'('._n('%1$s day', '%1$s days', $dataConfig['hk_trends']).')'
+			);
 		}
 	}
 
