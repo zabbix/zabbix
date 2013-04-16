@@ -372,7 +372,7 @@ else {
 	$dataConfig = select_config();
 	$keepHistory = array();
 	$keepHistory[] =  new CNumericBox('history', $this->data['history'], 8);
-	if ($dataConfig['hk_history_global']) {
+	if ($dataConfig['hk_history_global'] && !$data['parent_discoveryid'] && !$data['is_template']) {
 		$keepHistory[] = SPACE;
 		if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
 			$keepHistory[] = new CSpan(_x('Overridden by', 'item_form'));
@@ -393,7 +393,7 @@ else {
 
 	$keepTrend = array();
 	$keepTrend[] =  new CNumericBox('trends', $this->data['trends'], 8);
-	if ($dataConfig['hk_trends_global']) {
+	if ($dataConfig['hk_trends_global'] && !$data['parent_discoveryid'] && !$data['is_template']) {
 		$keepTrend[] = SPACE;
 		if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
 			$keepTrend[] = new CSpan(_x('Overridden by', 'item_form'));
