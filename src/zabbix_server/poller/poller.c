@@ -163,15 +163,15 @@ static void	update_triggers_status_to_unknown(zbx_uint64_t hostid, zbx_item_type
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		trigger = zbx_malloc(NULL, sizeof(trigger));
+		trigger = zbx_malloc(NULL, sizeof(DC_TRIGGER));
 		ZBX_STR2UINT64(trigger->triggerid, row[0]);
-		trigger->description = row[1];
-		trigger->expression_orig = row[2];
+		trigger->description = zbx_strdup(NULL, row[1]);
+		trigger->expression_orig = zbx_strdup(NULL, row[2]);
 		trigger->priority = (unsigned char)atoi(row[3]);
 		trigger->type = (unsigned char)atoi(row[4]);
 		trigger->value = atoi(row[5]);
 		trigger->state = atoi(row[6]);
-		trigger->error = row[7];
+		trigger->error = zbx_strdup(NULL, row[7]);
 		trigger->lastchange = atoi(row[8]);
 		trigger->new_value = TRIGGER_VALUE_UNKNOWN;
 		trigger->new_error = reason;
@@ -188,7 +188,14 @@ static void	update_triggers_status_to_unknown(zbx_uint64_t hostid, zbx_item_type
 	process_events();
 
 	for (i = 0; i < triggers.values_num; i++)
-		zbx_free(triggers.values[i]);
+	{
+		trigger = (DC_TRIGGER *)triggers.values[i];
+
+		zbx_free(trigger->error);
+		zbx_free(trigger->expression_orig);
+		zbx_free(trigger->description);
+		zbx_free(trigger);
+	}
 	zbx_vector_ptr_destroy(&triggers);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
