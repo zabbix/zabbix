@@ -80,7 +80,7 @@ $houseKeeperHistoryModeGlobal = new CNumericBox('hk_history', $this->data['confi
 if (!$this->data['config']['hk_history_mode'] || !$this->data['config']['hk_history_global']) {
 	$houseKeeperHistoryModeGlobal->setAttribute('disabled', 'disabled');
 }
-$houseKeeperTab->addRow(_('Overwrite per-item historical data period'), $houseKeeperHistoryGlobal);
+$houseKeeperTab->addRow(_('Overwrite per-item history data period'), $houseKeeperHistoryGlobal);
 $houseKeeperTab->addRow(_('Remove history data older than (in days)'), $houseKeeperHistoryModeGlobal);
 
 // remove trend data block
