@@ -131,6 +131,35 @@ static ssize_t smtp_readln(int fd, char *buf, int buf_len)
 	return read_bytes;
 }
 
+/********************************************************************************
+ *                                                                              *
+ * Function: smtp_parse_mailbox                                                 *
+ *                                                                              *
+ * Purpose: 1. Extract a display name and an angle address from mailbox string  *
+ *             for using in "MAIL FROM:", "RCPT TO:", "From:" and "To:" fields. *
+ *          2. If the display name contains multibyte UTF-8 characters encode   *
+ *             it into a base64 string as required by rfc2047. The encoding is  *
+ *             also applied if the display name looks like a base64-encoded     *
+ *             word.                                                            *
+ *                                                                              *
+ * Parameters: mailbox       - [IN] a null-terminated UTF-8 string              *
+ *             error         - [IN] pointer to string for reporting errors      *
+ *             max_error_len - [IN] size of 'error' string                      *
+ *             display_name  - [OUT] address of pointer to dynamically          *
+ *                             allocated 'display_name' string (ASCII or        *
+ *                             base64-encoded)                                  *
+ *             angle_addr    - [OUT] address of pointer to dynamically          *
+ *                             allocated 'angle_addr' string                    *
+ *                                                                              *
+ * Comments:   The function is very much simplified in comparison with full     *
+ *             RFC 5322-compliant parser. It does not recognize:                *
+ *                - comments,                                                   *
+ *                - quoted strings and quoted pairs,                            *
+ *                - folding whitespace.                                         *
+ *             For example, '<' and '@' are not supported in the display name   *
+ *             and the local part of email address.                             *
+ *                                                                              *
+ ********************************************************************************/
 static int	smtp_parse_mailbox(const char *mailbox, char *error, size_t max_error_len, char **display_name,
 				char **angle_addr)
 {
