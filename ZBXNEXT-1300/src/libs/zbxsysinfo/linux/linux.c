@@ -52,6 +52,7 @@ ZBX_METRIC	parameters_specific[] =
 	{"system.cpu.util",	CF_HAVEPARAMS,	SYSTEM_CPU_UTIL,	"all,user,avg1"},
 	{"system.cpu.load",	CF_HAVEPARAMS,	SYSTEM_CPU_LOAD,	"all,avg1"},
 	{"system.cpu.num",	CF_HAVEPARAMS,	SYSTEM_CPU_NUM,		"online"},
+	{"system.cpu.discovery",	CF_HAVEPARAMS,	SYSTEM_CPU_DISCOVERY,		"all, avg1"},
 
 	{"system.hw.chassis",	CF_HAVEPARAMS,	SYSTEM_HW_CHASSIS,	NULL},
 	{"system.hw.cpu",	CF_HAVEPARAMS,	SYSTEM_HW_CPU,		NULL},

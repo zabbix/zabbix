@@ -18,8 +18,11 @@
 **/
 
 #include "common.h"
+#include "../common/common.h"
 #include "sysinfo.h"
+#include "hardware.h"
 #include "stats.h"
+#include "zbxjson.h"
 
 int	SYSTEM_CPU_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
@@ -97,6 +100,64 @@ int	SYSTEM_CPU_UTIL(AGENT_REQUEST *request, AGENT_RESULT *result)
 		return SYSINFO_RET_FAIL;
 
 	return get_cpustat(result, cpu_num, state, mode);
+}
+
+int SYSTEM_CPU_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
+{
+	char *type, line[MAX_STRING_LEN], tmp[MAX_STRING_LEN];
+	int stype, cpuids[2];
+	long ncpu, i;
+	struct zbx_json j;
+	FILE	*f;
+	int ret = SYSINFO_RET_FAIL;
+
+	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
+
+	zbx_json_addarray(&j, ZBX_PROTO_TAG_DATA);
+
+	type = get_rparam(request, 0);
+
+	if (NULL == type || '\0' == *type || 0 == strcmp(type, "online"))
+		stype = _SC_NPROCESSORS_ONLN;
+	else if (0 == strcmp(type, "all"))
+		stype = _SC_NPROCESSORS_CONF;
+	else
+		return SYSINFO_RET_FAIL;
+
+	if (-1 == (ncpu = sysconf(_SC_NPROCESSORS_CONF)))
+		return SYSINFO_RET_FAIL;
+
+	if (NULL == (f = fopen(HW_STAT_FILE, "r")))
+		return SYSINFO_RET_FAIL;
+
+	while (NULL != fgets(line, sizeof(line), f))
+	{
+		if (1 == sscanf(line, "cpu%[0-9]", tmp))
+			cpuids[strtol(tmp, NULL, 10)] = 1;
+	}
+
+	for (i = 0; i < ncpu; i++)
+	{
+		if (0 < cpuids[i] || stype == _SC_NPROCESSORS_CONF)
+		{
+			zbx_json_addobject(&j, NULL);
+
+			zbx_json_adduint64(&j, ZBX_MACRO_CPUID, i);
+			zbx_json_addstring(&j, ZBX_MACRO_CPU_STATUS, (0 < cpuids[i] ? "online" : "offline"), ZBX_JSON_TYPE_STRING);
+
+			zbx_json_close(&j);
+		}
+	}
+
+	zbx_json_close(&j);
+
+	ret = SYSINFO_RET_OK;
+
+	SET_STR_RESULT(result, strdup(j.buffer));
+
+	zbx_json_free(&j);
+
+	return ret;
 }
 
 int	SYSTEM_CPU_LOAD(AGENT_REQUEST *request, AGENT_RESULT *result)

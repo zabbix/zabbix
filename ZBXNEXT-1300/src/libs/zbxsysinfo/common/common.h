@@ -22,6 +22,9 @@
 
 #include "sysinfo.h"
 
+#define ZBX_MACRO_CPUID	"{#CPUID}"
+#define ZBX_MACRO_CPU_STATUS	"{#STATUS}"
+
 extern ZBX_METRIC	parameters_common[];
 
 int	EXECUTE_USER_PARAMETER(AGENT_REQUEST *request, AGENT_RESULT *result);
