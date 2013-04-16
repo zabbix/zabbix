@@ -128,6 +128,9 @@ jQuery(function($) {
 				return data;
 			};
 
+			/**
+			 * MultiSelect object
+			 */
 			var obj = $(this),
 				jqxhr = null,
 				values = {
@@ -329,21 +332,24 @@ jQuery(function($) {
 					$('.selected ul', obj).removeClass('active');
 					cleanSearchInput(obj);
 				});
-				obj.append($('<div>', {style: 'position: relative;'}).append(input));
+				obj.append(input);
 			}
 
 			// selected
-			obj.append($('<div>', {
-				'class': 'selected',
+			var selectedDiv = $('<div>', {
+				'class': 'selected'
+			});
+			var selectedUl = $('<ul>', {
 				css: {width: values.width}
-			}).append($('<ul>')));
+			});
+			obj.append(selectedDiv.append(selectedUl));
 
 			// available
 			if (!options.disabled) {
 				var available = $('<div>', {
 					'class': 'available',
 					css: {
-						width: values.width - 2,
+						width: values.width + 2,
 						display: 'none'
 					}
 				})
@@ -356,7 +362,7 @@ jQuery(function($) {
 				});
 
 				// multi select
-				obj.append($('<div>', {style: 'position: relative;'}).append(available))
+				obj.append(available)
 				.focusout(function() {
 					setTimeout(function() {
 						if (!values.isAvailableOpenned && $('.available', obj).is(':visible')) {
@@ -370,10 +376,10 @@ jQuery(function($) {
 			if (!empty(options.data)) {
 				loadSelected(options.data, obj, values, options);
 			}
-			else {
-				// resize
-				resizeSelected(obj, values, options);
-			}
+
+			// resize
+			resizeSelected(obj, values, options);
+			resizeAvailable(obj);
 		});
 	};
 
@@ -444,7 +450,10 @@ jQuery(function($) {
 				text: empty(item.prefix) ? item.name : item.prefix + item.name
 			});
 
-			if (!options.disabled) {
+			if (options.disabled) {
+				$('.selected ul', obj).append(li.append(text));
+			}
+			else {
 				var arrow = $('<span>', {
 					'class': 'arrow',
 					'data-id': item.id
@@ -454,18 +463,16 @@ jQuery(function($) {
 				});
 
 				$('.selected ul', obj).append(li.append(text, arrow));
-
-				// resize
-				resizeSelected(obj, values, options);
-			}
-			else {
-				$('.selected ul', obj).append(li.append(text));
 			}
 
 			// set readonly
 			if (options.selectedLimit > 0 && $('.selected li', obj).length == options.selectedLimit) {
 				setReadonly(obj);
 			}
+
+			// resize
+			resizeSelected(obj, values, options);
+			resizeAvailable(obj);
 		}
 	}
 
@@ -478,6 +485,7 @@ jQuery(function($) {
 
 		// resize
 		resizeSelected(obj, values, options);
+		resizeAvailable(obj);
 
 		// clean
 		cleanAvailable(obj, values);
@@ -592,7 +600,10 @@ jQuery(function($) {
 		var top, left, height;
 
 		if ($('.selected li', obj).length > 0) {
-			var position = $('.selected li:last-child .arrow', obj).position();
+			var position = options.disabled
+				? $('.selected li:last-child', obj).position()
+				: $('.selected li:last-child .arrow', obj).position();
+
 			top = position.top + searchInputTopPaddings;
 			left = position.left + 20;
 			height = $('.selected li:last-child', obj).height();
@@ -631,6 +642,14 @@ jQuery(function($) {
 			'padding-top': top,
 			'padding-left': left,
 			width: values.width - left - searchInputRightPaddings
+		});
+	}
+
+	function resizeAvailable(obj) {
+		var selectedHeight = $('.selected', obj).height();
+
+		$('.available', obj).css({
+			top: (selectedHeight > 0) ? selectedHeight : 20
 		});
 	}
 
