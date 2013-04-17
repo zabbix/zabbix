@@ -495,7 +495,7 @@ ZABBIX.apps.map = (function($) {
 						case '0':
 							$('#elementNameHost').multiSelectHelper({
 								objectName: 'hosts',
-								name: 'elementid',
+								name: 'elementValue',
 								selectedLimit: 1
 							});
 							break;
@@ -504,7 +504,7 @@ ZABBIX.apps.map = (function($) {
 						case '3':
 							$('#elementNameHostGroup').multiSelectHelper({
 								objectName: 'hostGroup',
-								name: 'elementid',
+								name: 'elementValue',
 								selectedLimit: 1
 							});
 							break;
@@ -1303,7 +1303,7 @@ ZABBIX.apps.map = (function($) {
 					case '0':
 						$('#elementNameHost').multiSelectHelper({
 							objectName: 'hosts',
-							name: 'elementid',
+							name: 'elementValue',
 							data: [{id: selement.elementid, name: selement.elementName}],
 							selectedLimit: 1
 						});
@@ -1313,7 +1313,7 @@ ZABBIX.apps.map = (function($) {
 					case '3':
 						$('#elementNameHostGroup').multiSelectHelper({
 							objectName: 'hostGroup',
-							name: 'elementid',
+							name: 'elementValue',
 							data: [{id: selement.elementid, name: selement.elementName}],
 							selectedLimit: 1
 						});
@@ -1377,6 +1377,37 @@ ZABBIX.apps.map = (function($) {
 					}
 				}
 
+				// set element id and name
+				switch (data.elementtype) {
+					// host
+					case '0':
+						var elementData = $('#elementNameHost').multiSelect.getData();
+
+						if (empty(elementData)) {
+							data.elementid = '0';
+							data.elementName = '';
+						}
+						else {
+							data.elementid = elementData[0].id;
+							data.elementName = elementData[0].name;
+						}
+						break;
+
+					// host group
+					case '3':
+						var elementData = $('#elementNameHostGroup').multiSelect.getData();
+
+						if (empty(elementData)) {
+							data.elementid = '0';
+							data.elementName = '';
+						}
+						else {
+							data.elementid = elementData[0].id;
+							data.elementName = elementData[0].name;
+						}
+						break;
+				}
+
 				// validate urls
 				for (i in data.urls) {
 					if (data.urls[i].name === '' && data.urls[i].url === '') {
@@ -1411,21 +1442,6 @@ ZABBIX.apps.map = (function($) {
 						case '3': alert('Host group is not selected.');
 							return false;
 					}
-				}
-
-				// set element name
-				switch (data.elementtype) {
-					// host
-					case '0':
-						var elementData = $('#elementNameHost').multiSelect.getData();
-						data.elementName = empty(elementData) ? '' : elementData[0].name;
-						break;
-
-					// host group
-					case '3':
-						var elementData = $('#elementNameHostGroup').multiSelect.getData();
-						data.elementName = empty(elementData) ? '' : elementData[0].name;
-						break;
 				}
 
 				return data;
