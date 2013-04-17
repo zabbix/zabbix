@@ -149,7 +149,8 @@ include_once('include/page_header.php');
 		$p = $timetill - $timesince;				// graph size in time
 		$z = $p - ($timesince % $p);				// graphsize - mod(from_time,p) for Oracle...
 		$x = round($p / $scaleperiod);				// graph size in px
-		$calc_field = 'round('.$x.'*(mod('.zbx_dbcast_2bigint('clock').'+'.$z.','.$p.'))/('.$p.'),1)';  /* required for 'group by' support of Oracle */
+		$round = ($scaletype == TIMEPERIOD_TYPE_DAILY) ? 1 : 0;
+		$calc_field = 'round('.$x.'*(mod('.zbx_dbcast_2bigint('clock').'+'.$z.','.$p.'))/('.$p.'),'.$round.')';  /* required for 'group by' support of Oracle */
 
 		$period_step = $scaleperiod;
 
