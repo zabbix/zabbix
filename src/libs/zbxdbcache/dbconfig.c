@@ -672,27 +672,27 @@ static int	DCsync_config(DB_RESULT result)
 				DCstrpool_replace(found, &config->config->severity_name[i], default_severity_names[i]);
 
 			/* set default housekeeper configuration */
-			config->config->hk.events_mode = 1;
+			config->config->hk.events_mode = ZBX_HK_OPTION_ENABLED;
 			config->config->hk.events_trigger = 365;
 			config->config->hk.events_internal = 365;
 			config->config->hk.events_autoreg = 365;
 			config->config->hk.events_discovery = 365;
 
-			config->config->hk.audit_mode = 1;
+			config->config->hk.audit_mode = ZBX_HK_OPTION_ENABLED;
 			config->config->hk.audit = 365;
 
-			config->config->hk.services_mode = 1;
+			config->config->hk.services_mode = ZBX_HK_OPTION_ENABLED;
 			config->config->hk.services = 365;
 
-			config->config->hk.sessions_mode = 1;
+			config->config->hk.sessions_mode = ZBX_HK_OPTION_ENABLED;
 			config->config->hk.sessions = 365;
 
-			config->config->hk.history_mode = 1;
-			config->config->hk.history_global = 0;
+			config->config->hk.history_mode = ZBX_HK_OPTION_ENABLED;
+			config->config->hk.history_global = ZBX_HK_OPTION_DISABLED;
 			config->config->hk.history = 90;
 
-			config->config->hk.trends_mode = 1;
-			config->config->hk.trends_global = 0;
+			config->config->hk.trends_mode = ZBX_HK_OPTION_ENABLED;
+			config->config->hk.trends_global = ZBX_HK_OPTION_DISABLED;
 			config->config->hk.trends = 365;
 		}
 	}
