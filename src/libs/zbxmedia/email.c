@@ -103,7 +103,7 @@ static void	str_base64_encode_rfc2047(const char *src, char **p_base64)
  * Comments: reads until '\n'                                                 *
  *                                                                            *
  ******************************************************************************/
-static ssize_t smtp_readln(int fd, char *buf, int buf_len)
+static ssize_t	smtp_readln(int fd, char *buf, int buf_len)
 {
 	ssize_t	nbytes, read_bytes;
 
@@ -166,7 +166,7 @@ static int	smtp_parse_mailbox(const char *mailbox, char *error, size_t max_error
 	const char	*p, *pstart, *angle_addr_start = NULL, *domain_start = NULL, *utf8_end = NULL;
 	const char	*base64_like_start = NULL, *base64_like_end = NULL;
 	char		*base64_buf = NULL;
-	size_t		size_angle_addr = 128, offset_angle_addr = 0, len, i;
+	size_t		size_angle_addr = 0, offset_angle_addr = 0, len, i;
 	int		ret = FAIL;
 
 	/* Skip leading whitespace */
@@ -192,11 +192,11 @@ static int	smtp_parse_mailbox(const char *mailbox, char *error, size_t max_error
 				/* if mailbox contains a sequence '=?'.*'?=' which looks like a Base64-encoded word */
 				case '=':
 					if ('?' == *(p + 1))
-						base64_like_start = p;
+						base64_like_start = p++;
 					break;
 				case '?':
-					if (NULL != base64_like_start && base64_like_start + 1 < p && '=' == *(p + 1))
-						base64_like_end = p;
+					if (NULL != base64_like_start && '=' == *(p + 1))
+						base64_like_end = p++;
 			}
 			p++;
 		}
@@ -233,8 +233,6 @@ static int	smtp_parse_mailbox(const char *mailbox, char *error, size_t max_error
 				mailbox);
 		goto out;
 	}
-
-	*angle_addr = zbx_malloc(*angle_addr, size_angle_addr);
 
 	if (NULL != angle_addr_start)
 	{
@@ -335,10 +333,10 @@ int	send_email(const char *smtp_server, const char *smtp_helo, const char *smtp_
 
 	/* send MAIL FROM */
 
-	if (SUCCEED == smtp_parse_mailbox(smtp_email, error, max_error_len, &from_display_name, &from_angle_addr))
-		zbx_snprintf(cmd, sizeof(cmd), "MAIL FROM:%s\r\n", from_angle_addr);
-	else
+	if (SUCCEED != smtp_parse_mailbox(smtp_email, error, max_error_len, &from_display_name, &from_angle_addr))
 		goto out;
+
+	zbx_snprintf(cmd, sizeof(cmd), "MAIL FROM:%s\r\n", from_angle_addr);
 
 	if (-1 == write(s.socket, cmd, strlen(cmd)))
 	{
@@ -358,10 +356,10 @@ int	send_email(const char *smtp_server, const char *smtp_helo, const char *smtp_
 
 	/* send RCPT TO */
 
-	if (SUCCEED == smtp_parse_mailbox(mailto, error, max_error_len, &to_display_name, &to_angle_addr))
-		zbx_snprintf(cmd, sizeof(cmd), "RCPT TO:%s\r\n", to_angle_addr);
-	else
+	if (SUCCEED != smtp_parse_mailbox(mailto, error, max_error_len, &to_display_name, &to_angle_addr))
 		goto out;
+
+	zbx_snprintf(cmd, sizeof(cmd), "RCPT TO:%s\r\n", to_angle_addr);
 
 	if (-1 == write(s.socket, cmd, strlen(cmd)))
 	{
