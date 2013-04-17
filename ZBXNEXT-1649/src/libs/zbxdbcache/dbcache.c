@@ -1234,17 +1234,8 @@ static void	DCmass_update_items(ZBX_DC_HISTORY *history, int history_num)
 		item.multiplier = atoi(row[5]);
 		item.formula = row[6];
 
-		if (ZBX_HK_OPTION_ENABLED == config_hk.history_global)
-		{
-			item.history = config_hk.history;
-		}
-		else
-			item.history = atoi(row[7]);
-
-		if (ZBX_HK_OPTION_ENABLED == config_hk.trends_global)
-			item.trends = config_hk.trends;
-		else
-			item.trends = atoi(row[8]);
+		item.history = (ZBX_HK_OPTION_ENABLED == config_hk.history_global ? config_hk.history : atoi(row[7]));
+		item.trends = (ZBX_HK_OPTION_ENABLED == config_hk.trends_global ? config_hk.trends : atoi(row[8]));
 
 		ZBX_STR2UINT64(item.hostid, row[10]);
 

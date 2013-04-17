@@ -82,11 +82,9 @@ static zbx_hk_cleanup_table_t	hk_cleanup_tables[] = {
 	{"history_str", &hk_config.history_mode},
 	{"history_text", &hk_config.history_mode},
 	{"history_uint", &hk_config.history_mode},
-
 	{"trends", &hk_config.trends_mode},
 	{"trends_uint", &hk_config.trends_mode},
-
-	{NULL, NULL}
+	{NULL}
 };
 
 /* trends table offsets in the hk_cleanup_tables[] mapping  */
@@ -113,13 +111,9 @@ typedef struct
 zbx_hk_delete_queue_t;
 
 /* the item rule state  */
-typedef enum
-{
-	HK_ITEM_RULE_NOT_INITIALIZED = 0,
-	HK_ITEM_RULE_ITEM_CACHE_PREPARED,
-	HK_ITEM_RULE_DELETE_QUEUE_PREPARED
-}
-zbx_hk_item_rule_state_t;
+#define HK_ITEM_RULE_NOT_INITIALIZED		0x00
+#define HK_ITEM_RULE_ITEM_CACHE_PREPARED	0x01
+#define HK_ITEM_RULE_DELETE_QUEUE_PREPARED	0x02
 
 /* this structure is used to remove old records from history (trends) tables */
 typedef struct
@@ -130,7 +124,7 @@ typedef struct
 	/* history setting field name in items table (history|trends) */
 	char			*history;
 
-	/* the cache status, see zbx_hk_item_rule_state_t enum */
+	/* the cache status, see HK_ITEM_RULE_* defines */
 	int			state;
 
 	/* a reference to the housekeeping configuration mode (enable) option for this table */
@@ -157,7 +151,6 @@ static zbx_hk_history_rule_t	hk_history_rules[] = {
 	{"history_log", "history", 0, &hk_config.history_mode, &hk_config.history_global, &hk_config.history},
 	{"history_uint", "history", 0, &hk_config.history_mode, &hk_config.history_global, &hk_config.history},
 	{"history_text", "history", 0, &hk_config.history_mode, &hk_config.history_global, &hk_config.history},
-
 	{"trends", "trends", 0, &hk_config.trends_mode, &hk_config.trends_global, &hk_config.trends},
 	{"trends_uint","trends", 0, &hk_config.trends_mode, &hk_config.trends_global, &hk_config.trends},
 	{NULL}
@@ -257,16 +250,23 @@ static void	hk_history_prepare(zbx_hk_history_rule_t *rule, int now)
 	zbx_vector_ptr_create(&rule->delete_queue);
 	zbx_vector_ptr_reserve(&rule->delete_queue, HK_INITIAL_DELETE_QUEUE_SIZE);
 
-	result = DBselect("select i.itemid,min(t.clock),i.%s from %s t,items i where"
-			" t.itemid=i.itemid group by itemid",
-			rule->history, rule->table);
+	if (ZBX_HK_OPTION_ENABLED != *rule->poption_global)
+	{
+		result = DBselect(
+				"select i.itemid,min(t.clock),i.%s"
+				" from %s t,items i"
+				" where t.itemid=i.itemid"
+				" group by i.itemid",
+				rule->history, rule->table);
+	}
+	else
+		result = DBselect("select itemid,min(clock) from %s group by itemid", rule->table);
 
 	while (NULL != (row = DBfetch(result)))
 	{
 		zbx_uint64_t		itemid;
 		int			min_clock, history;
 		zbx_hk_item_cache_t	item_record;
-
 
 		ZBX_STR2UINT64(itemid, row[0]);
 		min_clock = atoi(row[1]);
@@ -280,6 +280,7 @@ static void	hk_history_prepare(zbx_hk_history_rule_t *rule, int now)
 
 		zbx_hashset_insert(&rule->item_cache, &item_record, sizeof(zbx_hk_item_cache_t));
 	}
+	DBfree_result(result);
 
 	rule->state = HK_ITEM_RULE_ITEM_CACHE_PREPARED | HK_ITEM_RULE_DELETE_QUEUE_PREPARED;
 }
@@ -301,7 +302,7 @@ static void	hk_history_prepare(zbx_hk_history_rule_t *rule, int now)
  ******************************************************************************/
 static void	hk_history_release(zbx_hk_history_rule_t *rule)
 {
-	if (0 == rule->state)
+	if (HK_ITEM_RULE_NOT_INITIALIZED == rule->state)
 		return;
 
 	zbx_hashset_destroy(&rule->item_cache);
@@ -419,6 +420,7 @@ static void	hk_history_update(zbx_hk_history_rule_t *rules, int now)
 			}
 		}
 	}
+	DBfree_result(result);
 }
 
 /******************************************************************************
@@ -440,8 +442,11 @@ static void	hk_history_update(zbx_hk_history_rule_t *rules, int now)
 static void	hk_history_delete_queue_prepare_all(zbx_hk_history_rule_t *rules, int now)
 {
 	const char		*__function_name = "hk_history_delete_queue_prepare_all";
+
 	int			update_cache = 0;
 	zbx_hk_history_rule_t	*rule;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	/* prepare history item cache (hashset containing itemid:min_clock values) */
 	for (rule = rules; NULL != rule->table; rule++)
@@ -453,7 +458,7 @@ static void	hk_history_delete_queue_prepare_all(zbx_hk_history_rule_t *rules, in
 			else
 				update_cache = 1;
 		}
-		else if (rule->state & HK_ITEM_RULE_ITEM_CACHE_PREPARED)
+		else if (0 != (rule->state & HK_ITEM_RULE_ITEM_CACHE_PREPARED))
 			hk_history_release(rule);
 	}
 
@@ -504,6 +509,7 @@ static void	hk_history_delete_queue_clear(zbx_hk_history_rule_t *rule)
 static int	housekeeping_history_and_trends(int now)
 {
 	const char		*__function_name = "housekeeping_history_and_trends";
+
 	int			deleted = 0, i, rc;
 	zbx_hk_history_rule_t	*rule;
 
@@ -527,7 +533,7 @@ static int	housekeeping_history_and_trends(int now)
 
 			rc = DBexecute("delete from %s where itemid=" ZBX_FS_UI64 " and clock<%d",
 					rule->table, item_record->itemid, item_record->min_clock);
-			if (0 < rc)
+			if (ZBX_DB_OK < rc)
 				deleted += rc;
 		}
 
@@ -557,10 +563,15 @@ static int	housekeeping_history_and_trends(int now)
  ******************************************************************************/
 static int	housekeeping_process_rule(int now, zbx_hk_rule_t *rule)
 {
+	const char	*__function_name = "housekeeping_process_rule";
+
 	DB_RESULT	result;
 	DB_ROW		row;
 	int		keep_from, deleted = 0;
 	int		rc;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() table:'%s' filter:'%s' min_clock:%d now:%d",
+			__function_name, rule->table, rule->filter, rule->min_clock, now);
 
 	/* initialize min_clock with the oldest record timestamp from database */
 	if (0 == rule->min_clock)
@@ -586,13 +597,14 @@ static int	housekeeping_process_rule(int now, zbx_hk_rule_t *rule)
 		rc = DBexecute("delete from %s where %s%sclock<%d", rule->table, rule->filter,
 				('\0' != *rule->filter ? " and " : ""), rule->min_clock);
 
-		if (0 <= rc)
+		if (ZBX_DB_OK <= rc)
 			deleted = rc;
 	}
 
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __function_name, deleted);
+
 	return deleted;
 }
-
 
 /******************************************************************************
  *                                                                            *
@@ -610,13 +622,14 @@ static int	housekeeping_process_rule(int now, zbx_hk_rule_t *rule)
 static int	housekeeping_cleanup()
 {
 	const char		*__function_name = "housekeeping_cleanup";
+
 	DB_HOUSEKEEPER		housekeeper;
 	DB_RESULT		result;
 	DB_ROW			row;
 	int			d, deleted = 0;
 	zbx_vector_uint64_t	housekeeperids;
-	char			*sql_tables = NULL;
-	size_t			sql_size = 0, sql_offset = 0;
+	char			*sql = NULL, *table_name_esc;
+	size_t			sql_alloc = 0, sql_offset = 0;
 	zbx_hk_cleanup_table_t *table;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
@@ -627,24 +640,32 @@ static int	housekeeping_cleanup()
 
 	zbx_vector_uint64_create(&housekeeperids);
 
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
+			"select housekeeperid,tablename,field,value"
+			" from housekeeper"
+			" where tablename in (");
+
 	/* assemble list of tables excluded from housekeeping procedure */
 	for (table = hk_cleanup_tables; NULL != table->name; table++)
 	{
-		if (ZBX_HK_OPTION_ENABLED == *table->poption_mode)
+		if (ZBX_HK_OPTION_ENABLED != *table->poption_mode)
 			continue;
 
-		zbx_strcpy_alloc(&sql_tables, &sql_size, &sql_offset,
-				(NULL == sql_tables ? " where tablename not in (" : ","));
-		zbx_snprintf_alloc(&sql_tables, &sql_size, &sql_offset, "'%s'", table->name);
+		table_name_esc = DBdyn_escape_string(table->name);
+
+		zbx_chrcpy_alloc(&sql, &sql_alloc, &sql_offset, '\'');
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, table_name_esc);
+		zbx_chrcpy_alloc(&sql, &sql_alloc, &sql_offset, '\'');
+		zbx_chrcpy_alloc(&sql, &sql_alloc, &sql_offset, ',');
+
+		zbx_free(table_name_esc);
 	}
-	if (NULL != sql_tables)
-		zbx_chrcpy_alloc(&sql_tables, &sql_size, &sql_offset, ')');
+	sql_offset--;
 
 	/* order by tablename to effectively use DB cache */
-	result = DBselect(
-			"select housekeeperid,tablename,field,value"
-			" from housekeeper%s"
-			" order by tablename", (NULL != sql_tables ? sql_tables : ""));
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ") order by tablename");
+
+	result = DBselect("%s", sql);
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -696,33 +717,31 @@ static int	housekeeping_cleanup()
 #endif
 		}
 
-		if (0 <= d && (0 == d || 0 == CONFIG_MAX_HOUSEKEEPER_DELETE || CONFIG_MAX_HOUSEKEEPER_DELETE > d))
-			zbx_vector_uint64_append(&housekeeperids, housekeeper.housekeeperid);
+		if (ZBX_DB_OK <= d)
+		{
+			if (0 == CONFIG_MAX_HOUSEKEEPER_DELETE || CONFIG_MAX_HOUSEKEEPER_DELETE > d)
+				zbx_vector_uint64_append(&housekeeperids, housekeeper.housekeeperid);
 
-		deleted += d;
+			deleted += d;
+		}
 	}
 	DBfree_result(result);
 
 	if (0 != housekeeperids.values_num)
 	{
-		char	*sql = NULL;
-		size_t	sql_alloc = 512, sql_offset = 0;
-
-		sql = zbx_malloc(sql, sql_alloc);
-
 		zbx_vector_uint64_sort(&housekeeperids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
+		sql_offset = 0;
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from housekeeper where");
 		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "housekeeperid",
 				housekeeperids.values, housekeeperids.values_num);
 
 		DBexecute("%s", sql);
-
-		zbx_free(sql);
 	}
 
-	zbx_vector_uint64_destroy(&housekeeperids);
+	zbx_free(sql);
 
+	zbx_vector_uint64_destroy(&housekeeperids);
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __function_name, deleted);
 
@@ -732,6 +751,7 @@ out:
 static int	housekeeping_sessions(int now)
 {
 	const char	*__function_name = "housekeeping_sessions";
+
 	int		deleted = 0, rc;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() now:%d", __function_name, now);
@@ -740,7 +760,7 @@ static int	housekeeping_sessions(int now)
 	{
 		rc = DBexecute("delete from sessions where lastaccess<%d", now - SEC_PER_DAY * hk_config.sessions);
 
-		if (0 <= rc)
+		if (ZBX_DB_OK <= rc)
 			deleted = rc;
 	}
 
@@ -753,59 +773,40 @@ static int	housekeeping_services(int now)
 {
 	static zbx_hk_rule_t	rule = {"service_alarms", "", 0, &hk_config.services};
 
-	const char		*__function_name = "housekeeping_services";
-	int			deleted = 0;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() now:%d", __function_name, now);
-
 	if (ZBX_HK_OPTION_ENABLED == hk_config.services_mode)
-		deleted = housekeeping_process_rule(now, &rule);
+		return housekeeping_process_rule(now, &rule);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __function_name, deleted);
-
-	return deleted;
+	return 0;
 }
 
 static int	housekeeping_audit(int now)
 {
 	static zbx_hk_rule_t	rule = {"auditlog", "", 0, &hk_config.audit};
 
-	const char		*__function_name = "housekeeping_audit";
-	int			deleted = 0;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() now:%d", __function_name, now);
-
 	if (ZBX_HK_OPTION_ENABLED == hk_config.audit_mode)
-		deleted = housekeeping_process_rule(now, &rule);
+		return housekeeping_process_rule(now, &rule);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __function_name, deleted);
-
-	return deleted;
+	return 0;
 }
 
 static int	housekeeping_events(int now)
 {
 	static zbx_hk_rule_t 	rules[] = {
 		{"events", "source="ZBX_STR(EVENT_SOURCE_TRIGGERS), 0, &hk_config.events_trigger},
-		{"events", "source="ZBX_STR(EVENT_SOURCE_INTERNAL), 0, &hk_config.events_internal},
 		{"events", "source="ZBX_STR(EVENT_SOURCE_DISCOVERY), 0, &hk_config.events_discovery},
 		{"events", "source="ZBX_STR(EVENT_SOURCE_AUTO_REGISTRATION), 0, &hk_config.events_autoreg},
+		{"events", "source="ZBX_STR(EVENT_SOURCE_INTERNAL), 0, &hk_config.events_internal},
 		{NULL}
 	};
 
-	const char		*__function_name = "housekeeping_events";
 	int			deleted = 0;
 	zbx_hk_rule_t		*rule;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() now:%d", __function_name, now);
+	if (ZBX_HK_OPTION_ENABLED != hk_config.events_mode)
+		return 0;
 
-	if (ZBX_HK_OPTION_ENABLED == hk_config.events_mode)
-	{
-		for (rule = rules; NULL != rule->table; rule++)
-			deleted += housekeeping_process_rule(now, rule);
-	}
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __function_name, deleted);
+	for (rule = rules; NULL != rule->table; rule++)
+		deleted += housekeeping_process_rule(now, rule);
 
 	return deleted;
 }
@@ -822,7 +823,6 @@ void	main_housekeeper_loop(void)
 		zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
 		DBconnect(ZBX_DB_CONNECT_NORMAL);
 
-		zbx_setproctitle("%s [executing housekeeper]", get_process_type_string(process_type));
 		DCconfig_get_config_hk(&hk_config);
 
 		zbx_setproctitle("%s [removing old history and trends]", get_process_type_string(process_type));
