@@ -19,6 +19,7 @@
 **/
 
 require_once dirname(__FILE__).'/../include/class.cwebtest.php';
+require_once dirname(__FILE__).'/../../include/items.inc.php';
 
 define('TRIGGER_GOOD', 0);
 define('TRIGGER_BAD', 1);
@@ -61,14 +62,14 @@ class testFormTriggerPrototype extends CWebTest {
 	 *
 	 * @var string
 	 */
-	protected $item = 'itemDiscovery';
+	protected $item = 'testFormItemReuse';
 
 	/**
 	 * The name of the test item prototype key within test discovery rule created in the test data set.
 	 *
 	 * @var string
 	 */
-	protected $itemKey = 'item-discovery-prototype';
+	protected $itemKey = 'item-prototype-reuse';
 
 
 	/**
@@ -326,6 +327,453 @@ class testFormTriggerPrototype extends CWebTest {
 		$this->zbxTestTextPresent("$description");
 
 		$this->assertEquals($oldHashTriggers, DBhash($sqlTriggers));
+	}
+
+
+	public static function create() {
+		return array(
+			array(
+				array(
+					'expected' => TRIGGER_BAD,
+					'errors' => array(
+						'ERROR: Page received incorrect data',
+						'Warning. Incorrect value for field "Name": cannot be empty.',
+						'Warning. Incorrect value for field "expression": cannot be empty.'
+					)
+				)
+			),
+			array(
+				array(
+					'expected' => TRIGGER_BAD,
+					'description' => 'MyTrigger',
+					'errors' => array(
+						'ERROR: Page received incorrect data',
+						'Warning. Incorrect value for field "expression": cannot be empty.'
+					)
+				)
+			),
+			array(
+				array(
+					'expected' => TRIGGER_BAD,
+					'expression' => '6 & 0 | 0',
+					'errors' => array(
+						'ERROR: Page received incorrect data',
+						'Warning. Incorrect value for field "Name": cannot be empty.'
+					)
+				)
+			),
+			array(
+				array(
+					'expected' => TRIGGER_BAD,
+					'description' => 'MyTrigger',
+					'expression' => '{Simple form test host}',
+					'errors' => array(
+						'ERROR: Cannot add trigger',
+						'Incorrect trigger expression. Check expression part starting from "{Simple form test host}".'
+					)
+				)
+			),
+			array(
+				array(
+					'expected' => TRIGGER_GOOD,
+					'description' => 'MyTrigger_sysUptime',
+					'expression' => '{Simple form test host:item-prototype-reuse.last(0)}<0',
+				)
+			),
+			array(
+				array(
+					'expected' => TRIGGER_GOOD,
+					'description' => '1234567890',
+					'expression' => '{Simple form test host:item-prototype-reuse.last(0)}<0',
+				)
+			),
+			array(
+				array(
+					'expected' => TRIGGER_GOOD,
+					'description' => 'a?aa+',
+					'expression' => '{Simple form test host:item-prototype-reuse.last(0)}<0',
+				)
+			),
+			array(
+				array(
+					'expected' => TRIGGER_GOOD,
+					'description' => '}aa]a{',
+					'expression' => '{Simple form test host:item-prototype-reuse.last(0)}<0',
+				)
+			),
+			array(
+				array(
+					'expected' => TRIGGER_GOOD,
+					'description' => '-aaa=%',
+					'expression' => '{Simple form test host:item-prototype-reuse.last(0)}<0',
+				)
+			),
+			array(
+				array(
+					'expected' => TRIGGER_GOOD,
+					'description' => 'aaa,;:',
+					'expression' => '{Simple form test host:item-prototype-reuse.last(0)}<0',
+				)
+			),
+			array(
+				array(
+					'expected' => TRIGGER_GOOD,
+					'description' => 'aaa><.',
+					'expression' => '{Simple form test host:item-prototype-reuse.last(0)}<0',
+				)
+			),
+			array(
+				array(
+					'expected' => TRIGGER_GOOD,
+					'description' => 'aaa*&_',
+					'expression' => '{Simple form test host:item-prototype-reuse.last(0)}<0',
+				)
+			),
+			array(
+				array(
+					'expected' => TRIGGER_GOOD,
+					'description' => 'aaa#@!',
+					'expression' => '{Simple form test host:item-prototype-reuse.last(0)}<0',
+				)
+			),
+			array(
+				array(
+					'expected' => TRIGGER_GOOD,
+					'description' => '([)$^',
+					'expression' => '{Simple form test host:item-prototype-reuse.last(0)}<0',
+				)
+			),
+			array(
+				array(
+					'expected' => TRIGGER_GOOD,
+					'description' => 'MyTrigger_generalCheck',
+					'expression' => '{Simple form test host:item-prototype-reuse.last(0)}<5',
+					'type' => true,
+					'comments' => 'Trigger status (expression) is recalculated every time Zabbix server receives new value, if this value is part of this expression. If time based functions are used in the expression, it is recalculated every 30 seconds by a zabbix timer process. ',
+					'url' => 'www.zabbix.com',
+					'severity' => 'High',
+					'status' => false,
+				)
+			),
+			array(
+				array(
+					'expected' => TRIGGER_BAD,
+					'description' => 'MyTrigger',
+					'expression' => '{Simple form test host:someItem.uptime.last(0)}<0',
+					'errors' => array(
+						'ERROR: Cannot add trigger',
+						'Incorrect item key "someItem.uptime" provided for trigger expression on "Simple form test host".'
+					)
+				)
+			),
+			array(
+				array(
+					'expected' => TRIGGER_BAD,
+					'description' => 'MyTrigger',
+					'expression' => '{Simple form test host:item-prototype-reuse.somefunc(0)}<0',
+					'errors' => array(
+						'ERROR: Cannot add trigger',
+						'Cannot implode expression "{Simple form test host:item-prototype-reuse.somefunc(0)}<0". Incorrect trigger function "somefunc" provided in expression. Unknown function.'
+					)
+				)
+			),
+			array(
+				array(
+					'expected' => TRIGGER_BAD,
+					'description' => 'MyTrigger',
+					'expression' => '{Simple form test host:item-prototype-reuse.last(0)} | {#MACRO}',
+					'constructor' => array(array(
+						'text' => array('A | B', 'A', 'B'),
+						'elements' => array('expr_0_59', 'expr_63_70')
+						)
+					)
+				)
+			),
+			array(
+				array(
+					'expected' => TRIGGER_BAD,
+					'description' => 'MyTrigger',
+					'expression' => '{Zabbix host:item-prototype-reuse.last(0)}<0 | 8 & 9',
+					'constructor' => array(array(
+						'text' => array('A | (B & C)', 'OR', 'AND', 'A', 'B', 'C'),
+						'elements' => array('expr_0_47', 'expr_51_51', 'expr_55_55')
+						)
+					)
+				)
+			),
+			array(
+				array(
+					'expected' => TRIGGER_BAD,
+					'description' => 'MyTrigger',
+					'expression' => '{Simple form test host:someItem.uptime.last(0)}<0 | 8 & 9 + {Simple form test host:item-prototype-reuse.last(0)}',
+					'constructor' => array(array(
+						'text' => array('A | (B & C)', 'A', 'B', 'C'),
+						'elements' => array('expr_0_52', 'expr_56_56', 'expr_60_123')
+						)
+					)
+				)
+			),
+			array(
+				array(
+					'expected' => TRIGGER_BAD,
+					'description' => 'MyTrigger',
+					'expression' => '{Simple form test host:item-prototype-reuse.lasta(0)}<0 | 8 & 9 + {Simple form test host:item-prototype-reuse.last(0)}',
+					'constructor' => array(array(
+						'text' => array('A | (B & C)', 'A', 'B', 'C'),
+						'elements' => array('expr_0_62', 'expr_66_66', 'expr_70_133')
+						)
+					)
+				)
+			),
+			array(
+				array(
+					'expected' => TRIGGER_BAD,
+					'description' => 'MyTrigger',
+					'expression' => '{Simple form test host@:item-prototype-reuse.last(0)}',
+					'constructor' => array(array(
+						'errors' => array(
+							'ERROR: Expression Syntax Error.',
+							'Incorrect trigger expression. Check expression part starting from "{Simple form test host@:item-prototype-reuse.last(0)}".'),
+						)
+					)
+				)
+			),
+			array(
+				array(
+					'expected' => TRIGGER_BAD,
+					'description' => 'MyTrigger',
+					'expression' => '{Simple form test host:system .uptime.last(0)}',
+					'constructor' => array(array(
+						'errors' => array(
+							'ERROR: Expression Syntax Error.',
+							'Incorrect trigger expression. Check expression part starting from "{Simple form test host:system .uptime.last(0)}".'),
+						)
+					)
+				)
+			),
+			array(
+				array(
+					'expected' => TRIGGER_BAD,
+					'description' => 'MyTrigger',
+					'expression' => '{Simple form test host:system .uptime.last(0)}',
+					'constructor' => array(array(
+						'errors' => array(
+							'ERROR: Expression Syntax Error.',
+							'Incorrect trigger expression. Check expression part starting from "{Simple form test host:system .uptime.last(0)}".'),
+						)
+					)
+				)
+			),
+			array(
+				array(
+					'expected' => TRIGGER_BAD,
+					'description' => 'MyTrigger',
+					'expression' => '{Simple form test host:item-prototype-reuse.lastA(0)}',
+					'constructor' => array(array(
+						'errors' => array(
+							'ERROR: Expression Syntax Error.',
+							'Incorrect trigger expression. Check expression part starting from "{Simple form test host:item-prototype-reuse.lastA(0)}".'),
+						)
+					)
+				)
+			),
+			array(
+				array(
+					'expected' => TRIGGER_GOOD,
+					'description' => 'triggerSimple',
+					'expression' => 'default',
+					'formCheck' =>true,
+					'dbCheck' => true,
+					'remove' => true
+				)
+			),
+			array(
+				array(
+					'expected' => TRIGGER_GOOD,
+					'description' => 'triggerName',
+					'expression' => 'default'
+				)
+			),
+			array(
+				array(
+					'expected' => TRIGGER_GOOD,
+					'description' => 'triggerRemove',
+					'expression' => 'default',
+					'formCheck' =>true,
+					'dbCheck' => true,
+					'remove' => true
+				)
+			),
+			array(
+				array(
+					'expected' => TRIGGER_BAD,
+					'description' => 'triggerName',
+					'expression' => 'default',
+					'errors' => array(
+						'ERROR: Cannot add trigger',
+						'Trigger "triggerName" already exists on "Simple form test host".'
+					)
+				)
+			)
+		);
+	}
+
+	/**
+	 * @dataProvider create
+	 */
+	public function testFormTriggerPrototype_SimpleCreate($data) {
+
+		$this->zbxTestLogin('hosts.php');
+		$this->zbxTestClickWait('link='.$this->host);
+		$this->zbxTestClickWait('link=Discovery rules');
+		$this->zbxTestClickWait('link='.$this->discoveryRule);
+		$this->zbxTestClickWait('link=Trigger prototypes');
+		$this->zbxTestClickWait('form');
+
+		if (isset($data['description'])) {
+			$this->input_type('description', $data['description']);
+			$description = $data['description'];
+		}
+
+		if (isset($data['expression'])) {
+			switch ($data['expression']) {
+				case 'default':
+					$expression = '{'.$this->host.':'.$this->itemKey.'.last(0)}=0';
+					$this->input_type('expression', $expression);
+					break;
+				default:
+					$expression = $data['expression'];
+					$this->input_type('expression', $expression);
+					break;
+			}
+		}
+
+
+		if (isset($data['type'])) {
+			$this->zbxTestCheckboxSelect('type');
+		}
+
+		if (isset($data['comments'])) {
+			$this->input_type('comments', $data['comments']);;
+		}
+
+		if (isset($data['url'])) {
+			$this->input_type('url', $data['url']);;
+		}
+
+		if (isset($data['severity'])) {
+			switch ($data['severity']) {
+				case 'Not classified':
+					$this->zbxTestClick('severity_0');
+					break;
+				case 'Information':
+					$this->zbxTestClick('severity_1');
+					break;
+				case 'Warning':
+					$this->zbxTestClick('severity_2');
+					break;
+				case 'Average':
+					$this->zbxTestClick('severity_3');
+					break;
+				case 'High':
+					$this->zbxTestClick('severity_4');
+					break;
+				case 'Disaster':
+					$this->zbxTestClick('severity_5');
+					break;
+			}
+		}
+
+		if (isset($data['status'])) {
+			$this->zbxTestCheckboxUnselect('status');
+		}
+
+		if (isset($data['constructor'])) {
+			$this->zbxTestClickWait("//span[text()='Expression constructor']");
+
+			foreach($data['constructor'] as $constructor) {
+				if (isset($constructor['errors'])) {
+					foreach($constructor['errors'] as $err) {
+						$this->zbxTestTextPresent($err);
+					}
+				}
+				else {
+					$this->assertElementPresent('test_expression');
+
+					$this->assertAttribute("//input[@id='or_expression']/@value", 'OR');
+					$this->assertElementPresent("//span[text()='Delete']");
+
+					if (isset($constructor['text'])) {
+						foreach($constructor['text'] as $txt) {
+							$this->zbxTestTextPresent($txt);
+						}
+					}
+				}
+			}
+		}
+
+		if (!isset($data['constructor'])) {
+			$this->zbxTestClickWait('save');
+			switch ($data['expected']) {
+				case TRIGGER_GOOD:
+					$this->zbxTestTextPresent('Trigger added');
+					$this->checkTitle('Configuration of trigger prototypes');
+					$this->zbxTestTextPresent(array('CONFIGURATION OF TRIGGER PROTOTYPES', "Trigger prototypes of ".$this->discoveryRule));
+					break;
+				case TRIGGER_BAD:
+					$this->checkTitle('Configuration of trigger prototypes');
+					$this->zbxTestTextPresent('CONFIGURATION OF TRIGGER PROTOTYPES');
+					$this->assertElementPresent("//div[@id='tab_triggersTab' and text()='Trigger prototype']");
+					foreach ($data['errors'] as $msg) {
+						$this->zbxTestTextPresent($msg);
+					}
+					$this->zbxTestTextPresent(array('Name', 'Expression', 'Description'));
+					break;
+			}
+		}
+
+		if (isset($data['formCheck'])) {
+			$this->zbxTestOpenWait('hosts.php');
+			$this->zbxTestClickWait('link='.$this->host);
+			$this->zbxTestClickWait('link=Discovery rules');
+			$this->zbxTestClickWait('link='.$this->discoveryRule);
+			$this->zbxTestClickWait('link=Trigger prototypes');
+
+			$this->zbxTestClickWait('link='.$description);
+			$desc = $this->getValue('description');
+			$this->assertEquals($this->getValue('description'), $description);
+			$this->assertVisible("//textarea[@id='expression'][text()='".$expression."']");
+		}
+
+		if (isset($data['dbCheck'])) {
+			$result = DBselect("SELECT description FROM triggers where description = '".$description."' limit 1");
+			while ($row = DBfetch($result)) {
+				$this->assertEquals($row['description'], $description);
+			}
+		}
+
+		if (isset($data['remove'])) {
+			$result = DBselect("SELECT description, triggerid FROM triggers where description = '".$description."' limit 1");
+			while ($row = DBfetch($result)) {
+				$triggerId = $row['triggerid'];
+			}
+
+			$this->zbxTestOpenWait('hosts.php');
+			$this->zbxTestClickWait('link='.$this->host);
+			$this->zbxTestClickWait("link=Discovery rules");
+			$this->zbxTestClickWait('link='.$this->discoveryRule);
+			$this->zbxTestClickWait("link=Trigger prototypes");
+
+			$this->zbxTestCheckboxSelect("g_triggerid_$triggerId");
+			$this->zbxTestDropdownSelect('go', 'Delete selected');
+			$this->zbxTestClick('goButton');
+
+			$this->getConfirmation();
+			$this->wait();
+
+			$this->zbxTestTextPresent('Triggers deleted');
+			$this->zbxTestTextNotPresent($this->host.": $description");
+		}
 	}
 
 	/**
