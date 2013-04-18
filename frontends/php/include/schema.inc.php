@@ -2317,12 +2317,6 @@ return array(
 				'length' => 10,
 				'default' => '90',
 			),
-			'hk_history_external' => array(
-				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '90',
-			),
 			'hk_trends_mode' => array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
