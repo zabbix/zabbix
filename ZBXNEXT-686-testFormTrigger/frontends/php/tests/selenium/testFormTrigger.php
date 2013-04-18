@@ -384,7 +384,7 @@ class testFormTrigger extends CWebTest {
 					'errors' => array(
 						'ERROR: Page received incorrect data',
 						'Warning. Incorrect value for field "Name": cannot be empty.',
-						'Warning. Incorrect value for field "expression": cannot be empty.'
+						'Warning. Incorrect value for field "Expression": cannot be empty.'
 					)
 				)
 			),
@@ -394,7 +394,7 @@ class testFormTrigger extends CWebTest {
 					'description' => 'MyTrigger',
 					'errors' => array(
 						'ERROR: Page received incorrect data',
-						'Warning. Incorrect value for field "expression": cannot be empty.'
+						'Warning. Incorrect value for field "Expression": cannot be empty.'
 					)
 				)
 			),
