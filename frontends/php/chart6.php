@@ -103,10 +103,6 @@ if ($db_data['show_3d']) {
 }
 $graph->showLegend($db_data['show_legend']);
 
-$config = select_config();
-
-$graph->setHistoryPeriod(($config['hk_history_global']) ? $config['hk_history'] : null);
-
 $result = DBselect(
 	'SELECT gi.*'.
 	' FROM graphs_items gi'.

@@ -22,13 +22,6 @@
 
 class CPie extends CGraphDraw {
 
-	/**
-	 * Global history period to override item-level "history" property.
-	 *
-	 * @var integer
-	 */
-	protected $historyPeriod;
-
 	public function __construct($type = GRAPH_TYPE_PIE) {
 		parent::__construct($type);
 		$this->background = false;
@@ -140,17 +133,6 @@ class CPie extends CGraphDraw {
 		return array($sizeX, round($sizeY));
 	}
 
-	/**
-	 * Set the "historyPeriod" property.
-	 *
-	 * @param integer $value
-	 *
-	 * @return void
-	 */
-	public function setHistoryPeriod($value) {
-		$this->historyPeriod = $value;
-	}
-
 	protected function selectData() {
 		$this->data = array();
 		$now = time(null);
@@ -174,8 +156,8 @@ class CPie extends CGraphDraw {
 
 			$sql_arr = array();
 
-			if ($this->historyPeriod !== null) {
-				$real_item['history'] = $this->historyPeriod;
+			if (ZBX_HISTORY_DATA_UPKEEP > -1) {
+				$real_item['history'] = ZBX_HISTORY_DATA_UPKEEP;
 			}
 
 			if (($real_item['history'] * SEC_PER_DAY) > (time() - ($from_time + $this->period / 2)) // should pick data from history or trends
