@@ -351,8 +351,11 @@ class testFormTrigger extends CWebTest {
 	 * @dataProvider update
 	 */
 	public function testFormTrigger_SimpleUpdate($data) {
-		$sqlTriggers = 'select * from triggers';
+		$sqlTriggers = 'select * from triggers order by triggerid';
+		$sqlFunctions = 'select * from functions order by functionid';
+
 		$oldHashTriggers = DBhash($sqlTriggers);
+		$oldHashFunctions = DBhash($sqlFunctions);
 
 		$this->zbxTestLogin('hosts.php');
 		$this->zbxTestClickWait('link='.$this->host);
@@ -365,6 +368,7 @@ class testFormTrigger extends CWebTest {
 		$this->zbxTestTextPresent('TRIGGERS');
 
 		$this->assertEquals($oldHashTriggers, DBhash($sqlTriggers));
+		$this->assertEquals($oldHashFunctions, DBhash($sqlFunctions));
 	}
 
 	// Returns create data
