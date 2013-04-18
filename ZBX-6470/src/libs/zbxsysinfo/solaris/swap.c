@@ -129,7 +129,7 @@ int	SYSTEM_SWAP_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_R
 	if (0 == get_param(param, 1, swapdev, sizeof(swapdev)) && '\0' != *swapdev && 0 != strcmp("all", swapdev))
 		return SYSINFO_RET_FAIL;	/* first parameter must be one of missing, empty or "all" */
 
-	if (0 != get_param(param, 2, mode, sizeof(mode)))
+	if (0 != get_param(param, 2, mode, sizeof(mode)) || '\0' == *mode)
 		zbx_snprintf(mode, sizeof(mode), "free");	/* default parameter */
 
 	for (i = 0; NULL != fl[i].mode; i++)
