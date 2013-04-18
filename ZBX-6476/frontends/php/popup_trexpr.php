@@ -646,7 +646,7 @@ if (!is_array($param)) {
 if (isset($functions[$expr_type]['params'])) {
 	foreach ($param as $pnum => $p) {
 		if (isset($functions[$expr_type]['params'][$pnum]) && $functions[$expr_type]['params'][$pnum]['T'] == T_ZBX_INT
-			&& $p && preg_match('/[a-zA-Z]/', $p) && !preg_match('/^[\-0-9]+(['.ZBX_TIME_SUFFIXES.']{0,1})$/', $p)) {
+			&& $p && preg_match('/[a-zA-Z]/', $p) && !preg_match('/^\d+['.ZBX_TIME_SUFFIXES.']{0,1}$/', $p)) {
 			error(_s('Time parameter "%s" not supported.', $p));
 		}
 	}

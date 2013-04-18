@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 class CTriggerFunctionValidator extends CValidator {
 	/**
 	 * The array containing valid functions and parameters to them
@@ -93,6 +94,7 @@ class CTriggerFunctionValidator extends CValidator {
 								return false;
 							}
 							break;
+
 						case 'sec':
 							if (!$this->validateSec($value['functionParamList'][$aNum])) {
 								$this->setError(_s('Incorrect trigger function "%1$s" provided in expression.', $value['functionName']).' '.
@@ -100,6 +102,7 @@ class CTriggerFunctionValidator extends CValidator {
 								return false;
 							}
 							break;
+
 						case 'sec_num':
 							if (!$this->validateSecNum($value['functionParamList'][$aNum])) {
 								$this->setError(_s('Incorrect trigger function "%1$s" provided in expression.', $value['functionName']).' '.
@@ -107,6 +110,7 @@ class CTriggerFunctionValidator extends CValidator {
 								return false;
 							}
 							break;
+
 						case 'num':
 							if (!is_numeric($value['functionParamList'][$aNum])) {
 								$this->setError(_s('Incorrect trigger function "%1$s" provided in expression.', $value['functionName']).' '.
@@ -118,6 +122,7 @@ class CTriggerFunctionValidator extends CValidator {
 				}
 			}
 		}
+
 		return true;
 	}
 
@@ -132,7 +137,7 @@ class CTriggerFunctionValidator extends CValidator {
 	 * @return bool
 	 */
 	private function validateSec($param) {
-		return preg_match('/^\d+['.ZBX_TIME_SUFFIXES.']{0,1}$/', $param) == 1;
+		return (preg_match('/^\d+['.ZBX_TIME_SUFFIXES.']{0,1}$/', $param) == 1);
 	}
 
 	/**
@@ -148,8 +153,11 @@ class CTriggerFunctionValidator extends CValidator {
 	 */
 	private function validateSecNum($param) {
 		if (preg_match('/^#\d+$/', $param)) {
-			return true;
+			$value = substr($param, 1);
+
+			return (zbx_is_int($value) && $value > 0);
 		}
+
 		return $this->validateSec($param);
 	}
 
