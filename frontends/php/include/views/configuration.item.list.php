@@ -80,18 +80,21 @@ foreach ($this->data['items'] as $item) {
 	}
 
 	// status
-	$status = new CCol(new CLink(item_status2str($item['status']), '?group_itemid='.$item['itemid'].'&hostid='.$item['hostid'].'&go='.
-		($item['status'] ? 'activate' : 'disable'), item_status2style($item['status']))
+	$status = new CCol(new CLink(itemIndicator($item['status'], $item['state']), '?group_itemid='.$item['itemid'].'&hostid='.$item['hostid'].'&go='.
+		($item['status'] ? 'activate' : 'disable'), itemIndicatorStyle($item['status'], $item['state']))
 	);
 
-	if (zbx_empty($item['error'])) {
-		$error = new CDiv(SPACE, 'status_icon iconok');
+	$statusIcons = array();
+	if ($item['status'] == ITEM_STATUS_ACTIVE) {
+		if (zbx_empty($item['error'])) {
+			$error = new CDiv(SPACE, 'status_icon iconok');
+		}
+		else {
+			$error = new CDiv(SPACE, 'status_icon iconerror');
+			$error->setHint($item['error'], '', 'on');
+		}
+		$statusIcons[] = $error;
 	}
-	else {
-		$error = new CDiv(SPACE, 'status_icon iconerror');
-		$error->setHint($item['error'], '', 'on');
-	}
-	$statusIcons = array($error);
 
 	// discovered item lifetime indicator
 	if ($item['flags'] == ZBX_FLAG_DISCOVERY_CREATED && $item['itemDiscovery']['ts_delete']) {
@@ -138,15 +141,8 @@ foreach ($this->data['items'] as $item) {
 				key($trigger['hosts']).'&triggerid='.$trigger['triggerid']);
 		}
 
-		if ($trigger['value_flags'] == TRIGGER_VALUE_FLAG_UNKNOWN) {
+		if ($trigger['state'] == TRIGGER_STATE_UNKNOWN) {
 			$trigger['error'] = '';
-		}
-
-		if ($trigger['status'] == TRIGGER_STATUS_DISABLED) {
-			$triggerStatus = new CSpan(_('Disabled'), 'disabled');
-		}
-		elseif ($trigger['status'] == TRIGGER_STATUS_ENABLED){
-			$triggerStatus = new CSpan(_('Enabled'), 'enabled');
 		}
 
 		$trigger['items'] = zbx_toHash($trigger['items'], 'itemid');
@@ -156,7 +152,10 @@ foreach ($this->data['items'] as $item) {
 			getSeverityCell($trigger['priority']),
 			$triggerDescription,
 			triggerExpression($trigger, true),
-			$triggerStatus,
+			new CSpan(
+				triggerIndicator($trigger['status'], $trigger['state']),
+				triggerIndicatorStyle($trigger['status'], $trigger['state'])
+			),
 		));
 
 		$item['triggers'][$num] = $trigger;

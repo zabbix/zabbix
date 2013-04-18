@@ -129,7 +129,7 @@ static int	calcitem_parse_expression(DC_ITEM *dc_item, expression_t *exp,
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() expression:'%s'", __function_name, exp->exp);
 
-	if (FAIL == (ret = substitute_simple_macros(NULL, NULL, NULL, &dc_item->host, NULL, NULL,
+	if (FAIL == (ret = substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, &dc_item->host, NULL, NULL,
 				&exp->exp, MACRO_TYPE_ITEM_EXPRESSION, error, max_error_len)))
 		ret = NOTSUPPORTED;
 
@@ -196,10 +196,12 @@ static int	calcitem_evaluate_expression(DC_ITEM *dc_item, expression_t *exp,
 			" where h.hostid=i.hostid"
 				" and h.status=%d"
 				" and i.status=%d"
+				" and i.state=%d"
 				" and (",
 			ZBX_SQL_ITEM_SELECT,
 			HOST_STATUS_MONITORED,
-			ITEM_STATUS_ACTIVE);
+			ITEM_STATUS_ACTIVE,
+			ITEM_STATE_NORMAL);
 
 	for (i = 0; i < exp->functions_num; i++)
 	{
