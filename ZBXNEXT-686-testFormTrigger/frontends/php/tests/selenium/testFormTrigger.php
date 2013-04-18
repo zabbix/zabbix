@@ -344,26 +344,24 @@ class testFormTrigger extends CWebTest {
 
 	// Returns update data
 	public static function update() {
-		return DBdata("select * from triggers where description LIKE 'testFormTrigger%'");
+		return DBdata("select description from triggers where description LIKE 'testFormTrigger%'");
 	}
 
 	/**
 	 * @dataProvider update
 	 */
 	public function testFormTrigger_SimpleUpdate($data) {
-		$description = $data['description'];
-
-		$sqlTriggers = "select * from triggers";
+		$sqlTriggers = 'select * from triggers';
 		$oldHashTriggers = DBhash($sqlTriggers);
 
 		$this->zbxTestLogin('hosts.php');
 		$this->zbxTestClickWait('link='.$this->host);
 		$this->zbxTestClickWait("//div[@class='w']//a[text()='Triggers']");
-		$this->zbxTestClickWait('link='.$description);
+		$this->zbxTestClickWait('link='.$data['description']);
 		$this->zbxTestClickWait('save');
 		$this->checkTitle('Configuration of triggers');
 		$this->zbxTestTextPresent('Trigger updated');
-		$this->zbxTestTextPresent("$description");
+		$this->zbxTestTextPresent($data['description']);
 		$this->zbxTestTextPresent('TRIGGERS');
 
 		$this->assertEquals($oldHashTriggers, DBhash($sqlTriggers));
