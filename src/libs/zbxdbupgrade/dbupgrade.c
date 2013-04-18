@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -9,7 +9,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -210,6 +210,19 @@ static void	DBadd_field_sql(char **sql, size_t *sql_alloc, size_t *sql_offset,
 	DBfield_definition_string(sql, sql_alloc, sql_offset, field);
 }
 
+static void	DBrename_field_sql(char **sql, size_t *sql_alloc, size_t *sql_offset,
+		const char *table_name, const char *field_name, const ZBX_FIELD *field)
+{
+	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "alter table" ZBX_DB_ONLY " %s ", table_name);
+
+#if defined(HAVE_MYSQL)
+	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "change column %s ", field_name);
+	DBfield_definition_string(sql, sql_alloc, sql_offset, field);
+#else
+	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "rename column %s to %s", field_name, field->name);
+#endif
+}
+
 static void	DBdrop_field_sql(char **sql, size_t *sql_alloc, size_t *sql_offset,
 		const char *table_name, const char *field_name)
 {
@@ -291,6 +304,24 @@ static int	DBadd_field(const char *table_name, const ZBX_FIELD *field)
 	sql = zbx_malloc(sql, sql_alloc);
 
 	DBadd_field_sql(&sql, &sql_alloc, &sql_offset, table_name, field);
+
+	if (ZBX_DB_OK <= DBexecute("%s", sql))
+		ret = DBreorg_table(table_name);
+
+	zbx_free(sql);
+
+	return ret;
+}
+
+static int	DBrename_field(const char *table_name, const char *field_name, const ZBX_FIELD *field)
+{
+	char	*sql = NULL;
+	size_t	sql_alloc = 64, sql_offset = 0;
+	int	ret = FAIL;
+
+	sql = zbx_malloc(sql, sql_alloc);
+
+	DBrename_field_sql(&sql, &sql_alloc, &sql_offset, table_name, field_name, field);
 
 	if (ZBX_DB_OK <= DBexecute("%s", sql))
 		ret = DBreorg_table(table_name);
@@ -383,7 +414,7 @@ static int	DBdrop_field(const char *table_name, const char *field_name)
 	DBdrop_field_sql(&sql, &sql_alloc, &sql_offset, table_name, field_name);
 
 	if (ZBX_DB_OK <= DBexecute("%s", sql))
-		ret = SUCCEED;
+		ret = DBreorg_table(table_name);
 
 	zbx_free(sql);
 
@@ -818,6 +849,120 @@ static int	DBpatch_02010038()
 
 	return DBset_default("config", &field);
 }
+
+static int	DBpatch_02010039()
+{
+	return DBdrop_field("alerts", "nextcheck");
+}
+
+static int	DBpatch_02010040()
+{
+	const ZBX_FIELD	field = {"state", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBrename_field("triggers", "value_flags", &field);
+}
+
+static int	DBpatch_02010041()
+{
+	return DBdrop_index("events", "events_1");
+}
+
+static int	DBpatch_02010042()
+{
+	return DBcreate_index("events", "events_1", "source,object,objectid,eventid", 1);
+}
+
+static int	DBpatch_02010043()
+{
+	const ZBX_FIELD field = {"state", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("items", &field);
+}
+
+static int	DBpatch_02010044()
+{
+	if (ZBX_DB_OK <= DBexecute(
+			"update items"
+			" set state=%d,"
+				"status=%d"
+			" where status=%d",
+			ITEM_STATE_NOTSUPPORTED, ITEM_STATUS_ACTIVE, 3 /*ITEM_STATUS_NOTSUPPORTED*/))
+		return SUCCEED;
+
+	return FAIL;
+}
+
+static int	DBpatch_02010045()
+{
+	const ZBX_FIELD	field = {"state", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBrename_field("proxy_history", "status", &field);
+}
+
+static int	DBpatch_02010046()
+{
+	if (ZBX_DB_OK <= DBexecute(
+			"update proxy_history"
+			" set state=%d"
+			" where state=%d",
+			ITEM_STATE_NOTSUPPORTED, 3 /*ITEM_STATUS_NOTSUPPORTED*/))
+		return SUCCEED;
+
+	return FAIL;
+}
+
+static int	DBpatch_02010047()
+{
+	const ZBX_FIELD	field = {"itemid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBadd_field("escalations", &field);
+}
+
+static int	DBpatch_02010048()
+{
+	return DBdrop_index("escalations", "escalations_1");
+}
+
+static int	DBpatch_02010049()
+{
+	return DBcreate_index("escalations", "escalations_1", "actionid,triggerid,itemid,escalationid", 1);
+}
+
+static int	DBpatch_02010050()
+{
+	char		*fields[] = {"ts_from", "ts_to", NULL};
+	DB_RESULT	result;
+	DB_ROW		row;
+	int		i;
+	time_t		ts;
+	struct tm	*tm;
+
+	for (i = 0; NULL != fields[i]; i++)
+	{
+		result = DBselect(
+				"select timeid,%s"
+				" from services_times"
+				" where type in (%d,%d)"
+					" and %s>%d",
+				fields[i], 0 /* SERVICE_TIME_TYPE_UPTIME */, 1 /* SERVICE_TIME_TYPE_DOWNTIME */,
+				fields[i], SEC_PER_WEEK);
+
+		while (NULL != (row = DBfetch(result)))
+		{
+			if (SEC_PER_WEEK < (ts = (time_t)atoi(row[1])))
+			{
+				tm = localtime(&ts);
+				ts = tm->tm_wday * SEC_PER_DAY + tm->tm_hour * SEC_PER_HOUR + tm->tm_min * SEC_PER_MIN;
+				DBexecute("update services_times set %s=%d where timeid=%s",
+						fields[i], (int)ts, row[0]);
+			}
+		}
+		DBfree_result(result);
+	}
+
+	return SUCCEED;
+}
+
 #endif	/* not HAVE_SQLITE3 */
 
 static void	DBget_version(int *mandatory, int *optional)
@@ -894,11 +1039,23 @@ int	DBcheck_version()
 		{DBpatch_02010036, 2010036, 0, 0},
 		{DBpatch_02010037, 2010037, 0, 0},
 		{DBpatch_02010038, 2010038, 0, 0},
+		{DBpatch_02010039, 2010039, 0, 0},
+		{DBpatch_02010040, 2010040, 0, 1},
+		{DBpatch_02010041, 2010041, 0, 0},
+		{DBpatch_02010042, 2010042, 0, 0},
+		{DBpatch_02010043, 2010043, 0, 1},
+		{DBpatch_02010044, 2010044, 0, 1},
+		{DBpatch_02010045, 2010045, 0, 1},
+		{DBpatch_02010046, 2010046, 0, 1},
+		{DBpatch_02010047, 2010047, 0, 1},
+		{DBpatch_02010048, 2010048, 0, 0},
+		{DBpatch_02010049, 2010049, 0, 0},
+		{DBpatch_02010050, 2010050, 0, 1},
 		/* IMPORTANT! When adding a new mandatory DBPatch don't forget to update it for SQLite, too. */
 		{NULL}
 	};
 #else
-	required = 2010034;	/* <---- Update mandatory DBpatch for SQLite here. */
+	required = 2010050;	/* <---- Update mandatory DBpatch for SQLite here. */
 #endif
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
