@@ -51,7 +51,9 @@ $schema = DB::getSchema('config');
 			}
 		});
 
+		// reset button
 		jQuery("#reset").click(function(){
+			// events and alerts
 			<?php if ($schema['fields']['hk_events_mode']['default'] == 1): ?>
 				jQuery('#hk_events_mode').prop('checked', true);
 				jQuery('#hk_events_trigger').prop('disabled', false);
@@ -71,6 +73,7 @@ $schema = DB::getSchema('config');
 			jQuery('#hk_events_discovery').val("<?php echo $schema['fields']['hk_events_discovery']['default']; ?>");
 			jQuery('#hk_events_autoreg').val("<?php echo $schema['fields']['hk_events_autoreg']['default']; ?>");
 
+			// IT services
 			<?php if ($schema['fields']['hk_services_mode']['default'] == 1): ?>
 				jQuery('#hk_services_mode').prop('checked', true);
 				jQuery('#hk_services').prop('disabled', false);
@@ -81,6 +84,7 @@ $schema = DB::getSchema('config');
 
 			jQuery('#hk_services').val("<?php echo $schema['fields']['hk_services']['default']; ?>");
 
+			// audit
 			<?php if ($schema['fields']['hk_audit_mode']['default'] == 1): ?>
 				jQuery('#hk_audit_mode').prop('checked', true);
 				jQuery('#hk_audit').prop('disabled', false);
@@ -91,6 +95,7 @@ $schema = DB::getSchema('config');
 
 			jQuery('#hk_audit').val("<?php echo $schema['fields']['hk_audit']['default']; ?>");
 
+			// user sessions
 			<?php if ($schema['fields']['hk_sessions_mode']['default'] == 1): ?>
 				jQuery('#hk_sessions_mode').prop('checked', true);
 				jQuery('#hk_sessions').prop('disabled', false);
@@ -101,6 +106,7 @@ $schema = DB::getSchema('config');
 
 			jQuery('#hk_sessions').val("<?php echo $schema['fields']['hk_sessions']['default']; ?>");
 
+			// history
 			<?php if ($schema['fields']['hk_history_mode']['default'] == 1): ?>
 				jQuery('#hk_history_mode').prop('checked', true);
 				<?php if ($schema['fields']['hk_history_global']['default'] == 1): ?>
@@ -118,6 +124,7 @@ $schema = DB::getSchema('config');
 
 			jQuery('#hk_history').val("<?php echo $schema['fields']['hk_history']['default']; ?>");
 
+			// trends
 			<?php if ($schema['fields']['hk_trends_mode']['default'] == 1): ?>
 				jQuery('#hk_trends_mode').prop('checked', true);
 				<?php if ($schema['fields']['hk_trends_global']['default'] == 1): ?>
