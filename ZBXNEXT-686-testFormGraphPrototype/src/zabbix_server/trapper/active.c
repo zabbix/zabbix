@@ -69,10 +69,7 @@ static int	get_hostid_by_host(const char *host, const char *ip, unsigned short p
 				" and status in (%d,%d)"
 		       		" and proxy_hostid is null"
 				ZBX_SQL_NODE,
-			host_esc,
-			HOST_STATUS_MONITORED,
-			HOST_STATUS_NOT_MONITORED,
-			DBand_node_local("hostid"));
+			host_esc, HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED, DBand_node_local("hostid"));
 
 	if (NULL != (row = DBfetch(result)))
 	{
@@ -132,20 +129,13 @@ static void	get_list_of_active_checks(zbx_uint64_t hostid, zbx_uint64_t **itemid
 	DB_ROW		row;
 	size_t		items_alloc = 0;
 
-	assert(NULL == *itemids);
-	assert(NULL == *items);
-	assert(0 == *items_num);
-
 	result = DBselect(
-			"select i.itemid,i.lastlogsize,i.mtime"
-			" from items i,hosts h"
-			" where i.hostid=h.hostid"
-				" and h.status=%d"
-				" and i.type=%d"
-				" and i.flags<>%d"
-				" and h.hostid=" ZBX_FS_UI64
-				" and h.proxy_hostid is null",
-			HOST_STATUS_MONITORED, ITEM_TYPE_ZABBIX_ACTIVE, ZBX_FLAG_DISCOVERY_CHILD, hostid);
+			"select itemid,lastlogsize,mtime"
+			" from items"
+			" where type=%d"
+				" and flags<>%d"
+				" and hostid=" ZBX_FS_UI64,
+			ITEM_TYPE_ZABBIX_ACTIVE, ZBX_FLAG_DISCOVERY_CHILD, hostid);
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -235,7 +225,7 @@ int	send_list_of_active_checks(zbx_sock_t *sock, char *request)
 				continue;
 			}
 
-			if (ITEM_STATUS_NOTSUPPORTED == dc_items[i].status)
+			if (ITEM_STATE_NOTSUPPORTED == dc_items[i].state)
 			{
 				if (0 == refresh_unsupported || dc_items[i].lastclock + refresh_unsupported > now)
 					continue;
@@ -381,7 +371,7 @@ int	send_list_of_active_checks_json(zbx_sock_t *sock, struct zbx_json_parse *jp)
 				continue;
 			}
 
-			if (ITEM_STATUS_NOTSUPPORTED == dc_items[i].status)
+			if (ITEM_STATE_NOTSUPPORTED == dc_items[i].state)
 			{
 				if (0 == refresh_unsupported || dc_items[i].lastclock + refresh_unsupported > now)
 					continue;

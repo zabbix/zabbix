@@ -373,26 +373,43 @@ $events_wdgt->addFlicker($scroll_div, CProfile::get('web.events.filter.state', 0
 $table = new CTableInfo(_('No events defined.'));
 
 // CHECK IF EVENTS EXISTS {{{
-$options = array(
-	'output' => API_OUTPUT_EXTEND,
-	'sortfield' => 'eventid',
-	'sortorder' => ZBX_SORT_UP,
-	'nopermissions' => 1,
-	'limit' => 1
-);
-
-if ($source == EVENT_SOURCE_DISCOVERY) {
-	$options['source'] = EVENT_SOURCE_DISCOVERY;
+// trigger events
+if ($source == EVENT_OBJECT_TRIGGER) {
+	$firstEvent = API::Event()->get(array(
+		'output' => API_OUTPUT_EXTEND,
+		'objectids' => (get_request('triggerid')) ? get_request('triggerid') : null,
+		'sortfield' => 'eventid',
+		'sortorder' => ZBX_SORT_UP,
+		'limit' => 1
+	));
+	$firstEvent = reset($firstEvent);
 }
+// discovery events
 else {
-	if (isset($_REQUEST['triggerid']) && ($_REQUEST['triggerid'] > 0)) {
-		$options['triggerids'] = $_REQUEST['triggerid'];
-	}
-	$options['object'] = EVENT_OBJECT_TRIGGER;
-	$options['nodeids'] = get_current_nodeid();
-}
+	$firstEvent = API::Event()->get(array(
+		'output' => API_OUTPUT_EXTEND,
+		'source' => EVENT_SOURCE_DISCOVERY,
+		'object' => EVENT_OBJECT_DHOST,
+		'sortfield' => 'eventid',
+		'sortorder' => ZBX_SORT_UP,
+		'limit' => 1
+	));
+	$firstEvent = reset($firstEvent);
 
-$firstEvent = API::Event()->get($options);
+	$firstDServiceEvent = API::Event()->get(array(
+		'output' => API_OUTPUT_EXTEND,
+		'source' => EVENT_SOURCE_DISCOVERY,
+		'object' => EVENT_OBJECT_DSERVICE,
+		'sortfield' => 'eventid',
+		'sortorder' => ZBX_SORT_UP,
+		'limit' => 1
+	));
+	$firstDServiceEvent = reset($firstDServiceEvent);
+
+	if ($firstDServiceEvent && (!$firstEvent || $firstDServiceEvent['eventid'] < $firstEvent['eventid'])) {
+		$firstEvent = $firstDServiceEvent;
+	}
+}
 // }}} CHECK IF EVENTS EXISTS
 
 $_REQUEST['period'] = get_request('period', SEC_PER_WEEK);
@@ -403,37 +420,46 @@ $till = $from + $effectiveperiod;
 
 $csv_disabled = true;
 
-if (empty($firstEvent)) {
+if (!$firstEvent) {
 	$starttime = null;
 	$events = array();
 	$paging = getPagingLine($events);
 }
 else {
 	$config = select_config();
-	$firstEvent = reset($firstEvent);
 	$starttime = $firstEvent['clock'];
 
 	if ($source == EVENT_SOURCE_DISCOVERY) {
-		$options = array(
+		// fetch discovered service and discovered host events separately
+		$dHostEvents = API::Event()->get(array(
 			'source' => EVENT_SOURCE_DISCOVERY,
+			'object' => EVENT_OBJECT_DHOST,
 			'time_from' => $from,
 			'time_till' => $till,
 			'output' => array('eventid'),
-			'sortfield' => 'eventid',
-			'sortorder' => ZBX_SORT_DOWN,
 			'limit' => ($config['search_limit'] + 1)
-		);
-		$dsc_events = API::Event()->get($options);
-
+		));
+		$dServiceEvents = API::Event()->get(array(
+			'source' => EVENT_SOURCE_DISCOVERY,
+			'object' => EVENT_OBJECT_DSERVICE,
+			'time_from' => $from,
+			'time_till' => $till,
+			'output' => array('eventid'),
+			'limit' => ($config['search_limit'] + 1)
+		));
+		$dsc_events = array_merge($dHostEvents, $dServiceEvents);
+		order_result($dsc_events, 'eventid', ZBX_SORT_DOWN);
+		$dsc_events = array_slice($dsc_events, 0, $config['search_limit'] + 1);
 		$paging = getPagingLine($dsc_events);
 
-		$options = array(
-			'source' => EVENT_SOURCE_DISCOVERY,
-			'eventids' => zbx_objectValues($dsc_events, 'eventid'),
-			'output' => API_OUTPUT_EXTEND
-		);
-		$dsc_events = API::Event()->get($options);
-		order_result($dsc_events, 'eventid', ZBX_SORT_DOWN);
+		// fetch events for the current page
+		$dsc_events = DBfetchArray(DBselect(
+			'SELECT e.*'.
+			' FROM events e'.
+			' WHERE e.source='.EVENT_SOURCE_DISCOVERY.
+				' AND '.dbConditionInt('e.eventid', zbx_objectValues($dsc_events, 'eventid')).
+			' ORDER BY eventid DESC'
+		));
 
 		// do we need to make CVS export button enabled?
 		$csv_disabled = zbx_empty($dsc_events);
@@ -569,9 +595,6 @@ else {
 		if ($pageFilter->hostsSelected) {
 			$options = array(
 				'nodeids' => get_current_nodeid(),
-				'filter' => array(
-					'object' => EVENT_OBJECT_TRIGGER,
-				),
 				'time_from' => $from,
 				'time_till' => $till,
 				'output' => array('eventid'),
@@ -599,7 +622,7 @@ else {
 			$trigOpt['monitored'] = true;
 
 			$triggers = API::Trigger()->get($trigOpt);
-			$options['triggerids'] = zbx_objectValues($triggers, 'triggerid');
+			$options['objectids'] = zbx_objectValues($triggers, 'triggerid');
 
 			// query event with short data
 			$events = API::Event()->get($options);
@@ -652,6 +675,10 @@ else {
 				$hostScripts = API::Script()->getScriptsByHosts($hostids);
 			}
 
+			// actions
+			$actions = getEventActionsStatus(zbx_objectValues($events, 'eventid'));
+
+			// events
 			foreach ($events as $enum => $event) {
 				$trigger = $triggers[$event['objectid']];
 				$host = reset($trigger['hosts']);
@@ -669,9 +696,6 @@ else {
 					$i['name'] = itemName($item);
 					$items[] = $i;
 				}
-
-				// actions
-				$actions = get_event_actions_status($event['eventid']);
 
 				$ack = getEventAckState($event, true);
 
@@ -707,6 +731,9 @@ else {
 					$hostSpan->setAttribute('data-menu', hostMenuData($host, $scripts));
 				}
 
+				// action
+				$action = isset($actions[$event['eventid']]) ? $actions[$event['eventid']] : ' - ';
+
 				$table->addRow(array(
 					new CLink(zbx_date2str(EVENTS_ACTION_TIME_FORMAT, $event['clock']),
 							'tr_events.php?triggerid='.$event['objectid'].'&eventid='.$event['eventid'],
@@ -719,7 +746,7 @@ else {
 					getSeverityCell($trigger['priority'], null, !$event['value']),
 					$event['duration'],
 					($config['event_ack_enable']) ? $ack : null,
-					$actions
+					$action
 				));
 
 				if ($CSV_EXPORT) {
@@ -733,7 +760,7 @@ else {
 						$event['duration'],
 						($config['event_ack_enable']) ? ($event['acknowledges'] ? _('Yes') : _('No')) : null,
 						// ($config['event_ack_enable'])? $ack :NULL,
-						strip_tags((string) $actions)
+						strip_tags((string) $action)
 					);
 				}
 			}

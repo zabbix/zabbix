@@ -38,7 +38,7 @@ int	SYSTEM_SWAP_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 	swapdev = get_rparam(request, 0);
 	mode = get_rparam(request, 1);
 
-	sz = sizeof(mib) / sizeof(mib[0]);
+	sz = ARRSIZE(mib);
 	if (-1 == sysctlnametomib("vm.swap_info", mib, &sz))
 		return FAIL;
 

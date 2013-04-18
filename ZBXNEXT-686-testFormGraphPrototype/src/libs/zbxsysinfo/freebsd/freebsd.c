@@ -21,10 +21,10 @@
 #include "sysinfo.h"
 
 ZBX_METRIC	parameters_specific[] =
-/* 	KEY			FLAG		FUNCTION 		TEST PARAMETERS */
+/*	KEY			FLAG		FUNCTION		TEST PARAMETERS */
 {
 	{"kernel.maxfiles",	0,		KERNEL_MAXFILES,	NULL},
-	{"kernel.maxproc",	0,		KERNEL_MAXPROC, 	NULL},
+	{"kernel.maxproc",	0,		KERNEL_MAXPROC,		NULL},
 
 	{"vfs.fs.size",		CF_HAVEPARAMS,	VFS_FS_SIZE,		"/,free"},
 	{"vfs.fs.inode",	CF_HAVEPARAMS,	VFS_FS_INODE,		"/,free"},
@@ -33,13 +33,14 @@ ZBX_METRIC	parameters_specific[] =
 	{"vfs.dev.read",	CF_HAVEPARAMS,	VFS_DEV_READ,		"da0,operations"},
 	{"vfs.dev.write",	CF_HAVEPARAMS,	VFS_DEV_WRITE,		"da0,operations"},
 
-	{"net.tcp.listen",      CF_HAVEPARAMS,	NET_TCP_LISTEN, 	"80"},
-	{"net.udp.listen",      CF_HAVEPARAMS,	NET_UDP_LISTEN, 	"68"},
+	{"net.tcp.listen",	CF_HAVEPARAMS,	NET_TCP_LISTEN,		"80"},
+	{"net.udp.listen",	CF_HAVEPARAMS,	NET_UDP_LISTEN,		"68"},
 
 	{"net.if.in",		CF_HAVEPARAMS,	NET_IF_IN,		"lo0,bytes"},
 	{"net.if.out",		CF_HAVEPARAMS,	NET_IF_OUT,		"lo0,bytes"},
 	{"net.if.total",	CF_HAVEPARAMS,	NET_IF_TOTAL,		"lo0,bytes"},
-	{"net.if.collisions",   CF_HAVEPARAMS,	NET_IF_COLLISIONS,	"lo0"},
+	{"net.if.collisions",	CF_HAVEPARAMS,	NET_IF_COLLISIONS,	"lo0"},
+	{"net.if.discovery",	0,		NET_IF_DISCOVERY,	"lo0"},
 
 	{"vm.memory.size",	CF_HAVEPARAMS,	VM_MEMORY_SIZE,		"free"},
 

@@ -983,7 +983,7 @@ elseif ($srctbl == 'triggers') {
 	$options = array(
 		'nodeids' => $nodeid,
 		'hostids' => $hostid,
-		'output' => array('triggerid', 'description', 'expression', 'priority', 'status'),
+		'output' => array('triggerid', 'description', 'expression', 'priority', 'status', 'state'),
 		'selectHosts' => array('hostid', 'name'),
 		'selectDependencies' => API_OUTPUT_EXTEND,
 		'expandDescription' => true
@@ -1039,19 +1039,14 @@ elseif ($srctbl == 'triggers') {
 			}
 		}
 
-		switch ($trigger['status']) {
-			case TRIGGER_STATUS_DISABLED:
-				$status = new CSpan(_('Disabled'), 'disabled');
-				break;
-			case TRIGGER_STATUS_ENABLED:
-				$status = new CSpan(_('Enabled'), 'enabled');
-				break;
-		}
 		$table->addRow(array(
 			$multiselect ? new CCheckBox('triggers['.zbx_jsValue($trigger[$srcfld1]).']', null, null, $trigger['triggerid']) : null,
 			$description,
 			getSeverityCell($trigger['priority']),
-			$status
+			new CSpan(
+				triggerIndicator($trigger['status'], $trigger['state']),
+				triggerIndicatorStyle($trigger['status'], $trigger['state'])
+			)
 		));
 
 		// made to save memmory usage
@@ -1160,7 +1155,7 @@ elseif ($srctbl == 'items') {
 			$item['key_'],
 			item_type2str($item['type']),
 			itemValueTypeString($item['value_type']),
-			new CSpan(item_status2str($item['status']), item_status2style($item['status']))
+			new CSpan(itemIndicator($item['status'], $item['state']), itemIndicatorStyle($item['status'], $item['state']))
 		));
 
 		// made to save memory usage
@@ -1260,7 +1255,7 @@ elseif ($srctbl == 'prototypes') {
 			$item['key_'],
 			item_type2str($item['type']),
 			itemValueTypeString($item['value_type']),
-			new CSpan(item_status2str($item['status']), item_status2style($item['status']))
+			new CSpan(itemIndicator($item['status']), itemIndicatorStyle($item['status']))
 		));
 	}
 
@@ -1660,7 +1655,7 @@ elseif ($srctbl == 'plain_text') {
 			$item['key_'],
 			item_type2str($item['type']),
 			itemValueTypeString($item['value_type']),
-			new CSpan(item_status2str($item['status']), item_status2style($item['status']))
+			new CSpan(itemIndicator($item['status'], $item['state']), itemIndicatorStyle($item['status'], $item['state']))
 		));
 	}
 	$table->show();
