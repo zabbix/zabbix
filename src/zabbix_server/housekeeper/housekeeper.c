@@ -655,8 +655,7 @@ static int	housekeeping_cleanup()
 
 		zbx_chrcpy_alloc(&sql, &sql_alloc, &sql_offset, '\'');
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, table_name_esc);
-		zbx_chrcpy_alloc(&sql, &sql_alloc, &sql_offset, '\'');
-		zbx_chrcpy_alloc(&sql, &sql_alloc, &sql_offset, ',');
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "',");
 
 		zbx_free(table_name_esc);
 	}
