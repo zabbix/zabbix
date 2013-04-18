@@ -75,7 +75,11 @@ class testFormTrigger extends CWebTest {
 				array('constructor' => 'open', 'severity' => 'Warning', 'template' => 'Inheritance test template')
 			),
 			array(
-				array('constructor' => 'open_close', 'severity' => 'Disaster', 'template' => 'Inheritance test template')
+				array(
+					'constructor' => 'open_close',
+					'severity' => 'Disaster',
+					'template' => 'Inheritance test template'
+				)
 			),
 			array(
 				array('severity' => 'Not classified', 'template' => 'Inheritance test template')
@@ -431,7 +435,7 @@ class testFormTrigger extends CWebTest {
 					'expected' => TRIGGER_GOOD,
 					'description' => 'MyTrigger_sysUptime',
 					'expression' => '{Simple form test host:test-item-reuse.last(0)}<0',
-					'formCheck' => true,
+					'formCheck' => true
 				)
 			),
 			array(
@@ -439,7 +443,7 @@ class testFormTrigger extends CWebTest {
 					'expected' => TRIGGER_GOOD,
 					'description' => '1234567890',
 					'expression' => '{Simple form test host:test-item-reuse.last(0)}<0',
-					'formCheck' => true,
+					'formCheck' => true
 				)
 			),
 			array(
@@ -447,7 +451,7 @@ class testFormTrigger extends CWebTest {
 					'expected' => TRIGGER_GOOD,
 					'description' => 'a?aa+',
 					'expression' => '{Simple form test host:test-item-reuse.last(0)}<0',
-					'formCheck' => true,
+					'formCheck' => true
 				)
 			),
 			array(
@@ -455,7 +459,7 @@ class testFormTrigger extends CWebTest {
 					'expected' => TRIGGER_GOOD,
 					'description' => '}aa]a{',
 					'expression' => '{Simple form test host:test-item-reuse.last(0)}<0',
-					'formCheck' => true,
+					'formCheck' => true
 				)
 			),
 			array(
@@ -463,7 +467,7 @@ class testFormTrigger extends CWebTest {
 					'expected' => TRIGGER_GOOD,
 					'description' => '-aaa=%',
 					'expression' => '{Simple form test host:test-item-reuse.last(0)}<0',
-					'formCheck' => true,
+					'formCheck' => true
 				)
 			),
 			array(
@@ -471,7 +475,7 @@ class testFormTrigger extends CWebTest {
 					'expected' => TRIGGER_GOOD,
 					'description' => 'aaa,;:',
 					'expression' => '{Simple form test host:test-item-reuse.last(0)}<0',
-					'formCheck' => true,
+					'formCheck' => true
 				)
 			),
 			array(
@@ -479,7 +483,7 @@ class testFormTrigger extends CWebTest {
 					'expected' => TRIGGER_GOOD,
 					'description' => 'aaa><.',
 					'expression' => '{Simple form test host:test-item-reuse.last(0)}<0',
-					'formCheck' => true,
+					'formCheck' => true
 				)
 			),
 			array(
@@ -487,7 +491,7 @@ class testFormTrigger extends CWebTest {
 					'expected' => TRIGGER_GOOD,
 					'description' => 'aaa*&_',
 					'expression' => '{Simple form test host:test-item-reuse.last(0)}<0',
-					'formCheck' => true,
+					'formCheck' => true
 				)
 			),
 			array(
@@ -495,7 +499,7 @@ class testFormTrigger extends CWebTest {
 					'expected' => TRIGGER_GOOD,
 					'description' => 'aaa#@!',
 					'expression' => '{Simple form test host:test-item-reuse.last(0)}<0',
-					'formCheck' => true,
+					'formCheck' => true
 				)
 			),
 			array(
@@ -503,7 +507,7 @@ class testFormTrigger extends CWebTest {
 					'expected' => TRIGGER_GOOD,
 					'description' => '([)$^',
 					'expression' => '{Simple form test host:test-item-reuse.last(0)}<0',
-					'formCheck' => true,
+					'formCheck' => true
 				)
 			),
 			array(
@@ -512,10 +516,10 @@ class testFormTrigger extends CWebTest {
 					'description' => 'MyTrigger_generalCheck',
 					'expression' => '{Simple form test host:test-item-reuse.last(0)}<5',
 					'type' => true,
-					'comments' => 'Trigger status (expression) is recalculated every time Zabbix server receives new value, if this value is part of this expression. If time based functions are used in the expression, it is recalculated every 30 seconds by a zabbix timer process. ',
+					'comments' => 'Trigger status (expression) is recalculated every time Zabbix server receives new value, if this value is part of this expression. If time based functions are used in the expression, it is recalculated every 30 seconds by a zabbix timer process.',
 					'url' => 'www.zabbix.com',
 					'severity' => 'High',
-					'status' => false,
+					'status' => false
 				)
 			),
 			array(
@@ -684,7 +688,6 @@ class testFormTrigger extends CWebTest {
 		$this->checkTitle('Configuration of triggers');
 		$this->zbxTestTextPresent('CONFIGURATION OF TRIGGERS');
 
-
 		if (isset($data['description'])) {
 			$this->input_type('description', $data['description']);
 			$description = $data['description'];
@@ -776,24 +779,24 @@ class testFormTrigger extends CWebTest {
 			$this->zbxTestClickWait('save');
 			switch ($data['expected']) {
 				case TRIGGER_GOOD:
-				$this->zbxTestTextPresent('Trigger added');
-				$this->checkTitle('Configuration of triggers');
-				$this->zbxTestTextPresent('CONFIGURATION OF TRIGGERS');
-				break;
+					$this->zbxTestTextPresent('Trigger added');
+					$this->checkTitle('Configuration of triggers');
+					$this->zbxTestTextPresent('CONFIGURATION OF TRIGGERS');
+					break;
 				case TRIGGER_BAD:
-				$this->checkTitle('Configuration of triggers');
-				$this->zbxTestTextPresent('CONFIGURATION OF TRIGGERS');
-				foreach ($data['errors'] as $msg) {
-					$this->zbxTestTextPresent($msg);
-				}
-				$this->zbxTestTextPresent('Name');
-				$this->zbxTestTextPresent('Expression');
-				$this->zbxTestTextPresent('Description');
-				break;
+					$this->checkTitle('Configuration of triggers');
+					$this->zbxTestTextPresent('CONFIGURATION OF TRIGGERS');
+					foreach ($data['errors'] as $msg) {
+						$this->zbxTestTextPresent($msg);
+					}
+					$this->zbxTestTextPresent('Name');
+					$this->zbxTestTextPresent('Expression');
+					$this->zbxTestTextPresent('Description');
+					break;
 			}
 
 			if (isset($data['formCheck'])) {
-				$this->zbxTestClickWait("link=$description");
+				$this->zbxTestClickWait('link='.$description);
 				$this->assertAttribute("//input[@id='description']/@value", 'exact:'.$description);
 				$this->assertTrue(true, "//text()='$expression'");
 			}
