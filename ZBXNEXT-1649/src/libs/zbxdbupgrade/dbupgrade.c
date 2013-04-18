@@ -1095,13 +1095,13 @@ static int	DBpatch_02010068()
 				"hk_events_trigger="
 					"case when event_history>alert_history"
 					" then event_history else alert_history end,"
-				"hk_events_trigger="
+				"hk_events_discovery="
 					"case when event_history>alert_history"
 					" then event_history else alert_history end,"
-				"hk_events_trigger="
+				"hk_events_autoreg="
 					"case when event_history>alert_history"
 					" then event_history else alert_history end,"
-				"hk_events_trigger="
+				"hk_events_internal="
 					"case when event_history>alert_history"
 					" then event_history else alert_history end"))
 	{
