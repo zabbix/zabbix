@@ -699,61 +699,61 @@ INSERT INTO hosts_templates (hosttemplateid, hostid, templateid) VALUES (30000, 
 -- create Form test template
 INSERT INTO hosts (hostid, proxy_hostid, host, status, disable_until, error, available, errors_from, lastaccess, ipmi_authtype, ipmi_privilege, ipmi_username, ipmi_password, ipmi_disable_until, ipmi_available, snmp_disable_until, snmp_available, maintenanceid, maintenance_status, maintenance_type, maintenance_from, ipmi_errors_from, snmp_errors_from, ipmi_error, snmp_error,name) VALUES (40000,NULL,'Form test template',3,0,'',0,0,0,0,2,'','',0,0,0,0,NULL,0,0,0,0,0,'','','Form test template');
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (40000, 40000, 1);
+
 -- create Simple form test
-INSERT INTO hosts (host, name, status, hostid) VALUES ('Simple form test host','Simple form test host', 0, 40001);
+INSERT INTO hosts (hostid, host, name, status) VALUES (40001, 'Simple form test host','Simple form test host', 0);
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (40001, 40001, 4);
 INSERT INTO hosts_templates (hosttemplateid, hostid, templateid) VALUES (40000, 40001, 40000);
 
 -- testFormItem interfaces
-INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, dns, port) VALUES (40011, 40001, 1, 1, 1, '127.0.5.1', '', '10051');
-INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, dns, port) VALUES (40012, 40001, 1, 2, 1, '127.0.5.2', '', '10052');
-INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, dns, port) VALUES (40013, 40001, 1, 3, 1, '127.0.5.3', '', '10053');
-INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, dns, port) VALUES (40014, 40001, 1, 4, 1, '127.0.5.4', '', '10054');
+INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, port) VALUES (40011, 40001, 1, 1, 1, '127.0.5.1', '10051');
+INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, port) VALUES (40012, 40001, 1, 2, 1, '127.0.5.2', '10052');
+INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, port) VALUES (40013, 40001, 1, 3, 1, '127.0.5.3', '10053');
+INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, port) VALUES (40014, 40001, 1, 4, 1, '127.0.5.4', '10054');
 
 -- testFormItem.SimpleUpdate
-INSERT INTO items (itemid, type, snmp_community, snmp_oid, hostid, name, description, key_, delay, history, trends, lastvalue, lastclock, prevvalue, status, value_type, trapper_hosts, units, multiplier, delta, prevorgvalue, snmpv3_securityname, snmpv3_securitylevel, snmpv3_authpassphrase, snmpv3_privpassphrase, formula, error, lastlogsize, logtimefmt, templateid, valuemapid, delay_flex, params, ipmi_sensor, data_type, authtype, username, password, publickey, privatekey, mtime, lastns, flags, interfaceid) VALUES (30000, 0, '', '', 40001, 'testFormItem1', 'testFormItems','test-item-form1', 30, 90, 365, NULL, NULL, NULL, 0, 0, '', '', 0, 0, NULL, '', 0, '', '', 1, '', 0, '', NULL, NULL, '', '', '', 0, 0, '', '', '', '', 0, NULL, 0, 40011);
-INSERT INTO items (itemid, type, snmp_community, snmp_oid, hostid, name, description, key_, delay, history, trends, lastvalue, lastclock, prevvalue, status, value_type, trapper_hosts, units, multiplier, delta, prevorgvalue, snmpv3_securityname, snmpv3_securitylevel, snmpv3_authpassphrase, snmpv3_privpassphrase, formula, error, lastlogsize, logtimefmt, templateid, valuemapid, delay_flex, params, ipmi_sensor, data_type, authtype, username, password, publickey, privatekey, mtime, lastns, flags, interfaceid) VALUES (30001, 0, '', '', 40001, 'testFormItem2', 'testFormItems','test-item-form2', 30, 90, 365, NULL, NULL, NULL, 0, 0, '', '', 0, 0, NULL, '', 0, '', '', 1, '', 0, '', NULL, NULL, '', '', '', 0, 0, '', '', '', '', 0, NULL, 0, 40011);
-INSERT INTO items (itemid, type, snmp_community, snmp_oid, hostid, name, description, key_, delay, history, trends, lastvalue, lastclock, prevvalue, status, value_type, trapper_hosts, units, multiplier, delta, prevorgvalue, snmpv3_securityname, snmpv3_securitylevel, snmpv3_authpassphrase, snmpv3_privpassphrase, formula, error, lastlogsize, logtimefmt, templateid, valuemapid, delay_flex, params, ipmi_sensor, data_type, authtype, username, password, publickey, privatekey, mtime, lastns, flags, interfaceid) VALUES (30002, 0, '', '', 40001, 'testFormItem3', 'testFormItems','test-item-form3', 30, 90, 365, NULL, NULL, NULL, 0, 0, '', '', 0, 0, NULL, '', 0, '', '', 1, '', 0, '', NULL, NULL, '', '', '', 0, 0, '', '', '', '', 0, NULL, 0, 40011);
-INSERT INTO items (itemid, type, snmp_community, snmp_oid, hostid, name, description, key_, delay, history, trends, lastvalue, lastclock, prevvalue, status, value_type, trapper_hosts, units, multiplier, delta, prevorgvalue, snmpv3_securityname, snmpv3_securitylevel, snmpv3_authpassphrase, snmpv3_privpassphrase, formula, error, lastlogsize, logtimefmt, templateid, valuemapid, delay_flex, params, ipmi_sensor, data_type, authtype, username, password, publickey, privatekey, mtime, lastns, flags, interfaceid) VALUES (30003, 0, '', '', 40001, 'testFormItem4', 'testFormItems','test-item-form4', 30, 90, 365, NULL, NULL, NULL, 0, 0, '', '', 0, 0, NULL, '', 0, '', '', 1, '', 0, '', NULL, NULL, '', '', '', 0, 0, '', '', '', '', 0, NULL, 0, 40011);
+INSERT INTO items (itemid, type, hostid, name, description, key_, delay, interfaceid) VALUES (30000, 0, 40001, 'testFormItem1', 'testFormItems', 'test-item-form1', 30, 40011);
+INSERT INTO items (itemid, type, hostid, name, description, key_, delay, interfaceid) VALUES (30001, 0, 40001, 'testFormItem2', 'testFormItems', 'test-item-form2', 30, 40011);
+INSERT INTO items (itemid, type, hostid, name, description, key_, delay, interfaceid) VALUES (30002, 0, 40001, 'testFormItem3', 'testFormItems', 'test-item-form3', 30, 40011);
+INSERT INTO items (itemid, type, hostid, name, description, key_, delay, interfaceid) VALUES (30003, 0, 40001, 'testFormItem4', 'testFormItems', 'test-item-form4', 30, 40011);
 
 -- testFormTrigger.SimpleCreate
-INSERT INTO items (itemid, type, snmp_community, snmp_oid, hostid, name, description, key_, delay, history, trends, lastvalue, lastclock, prevvalue, status, value_type, trapper_hosts, units, multiplier, delta, prevorgvalue, snmpv3_securityname, snmpv3_securitylevel, snmpv3_authpassphrase, snmpv3_privpassphrase, formula, error, lastlogsize, logtimefmt, templateid, valuemapid, delay_flex, params, ipmi_sensor, data_type, authtype, username, password, publickey, privatekey, mtime, lastns, flags, interfaceid) VALUES (30004, 0, '', '', 40001, 'testFormItem', 'testFormItems','test-item-reuse', 30, 90, 365, NULL, NULL, NULL, 0, 0, '', '', 0, 0, NULL, '', 0, '', '', 1, '', 0, '', NULL, NULL, '', '', '', 0, 0, '', '', '', '', 0, NULL, 0, 40011);
+INSERT INTO items (itemid, type, hostid, name, description, key_, delay, interfaceid) VALUES (30004, 0, 40001, 'testFormItem' , 'testFormItems', 'test-item-reuse', 30, 40011);
 
 -- testFormTrigger.SimpleUpdate
 INSERT INTO triggers (triggerid, expression, description, comments) VALUES (14000, '{14000}=0', 'testFormTrigger1', '');
-INSERT INTO functions (functionid, itemid, triggerid, function, parameter) VALUES (14000, 30004 ,14000,'last',0);
+INSERT INTO functions (functionid, itemid, triggerid, function, parameter) VALUES (14000, 30004, 14000, 'last', '0');
+
 INSERT INTO triggers (triggerid, expression, description, comments) VALUES (14001, '{14001}=0', 'testFormTrigger2', '');
-INSERT INTO functions (functionid, itemid, triggerid, function, parameter) VALUES (14001, 30004 ,14001,'last',0);
+INSERT INTO functions (functionid, itemid, triggerid, function, parameter) VALUES (14001, 30004, 14001, 'last', '0');
+
 INSERT INTO triggers (triggerid, expression, description, comments) VALUES (14002, '{14002}=0', 'testFormTrigger3', '');
-INSERT INTO functions (functionid, itemid, triggerid, function, parameter) VALUES (14002, 30004 ,14002,'last',0);
+INSERT INTO functions (functionid, itemid, triggerid, function, parameter) VALUES (14002, 30004, 14002, 'last', '0');
+
 INSERT INTO triggers (triggerid, expression, description, comments) VALUES (14003, '{14003}=0', 'testFormTrigger4', '');
-INSERT INTO functions (functionid, itemid, triggerid, function, parameter) VALUES (14003, 30004 ,14003,'last',0);
+INSERT INTO functions (functionid, itemid, triggerid, function, parameter) VALUES (14003, 30004, 14003, 'last', '0');
 
 -- testFormTrigger.SimpleUpdate and testInheritanceTrigger.SimpleUpdate
-INSERT INTO items (name, key_, hostid, delay, value_type, lastvalue, itemid, params, description) VALUES ('itemInheritance', 'key-item-inheritance', 30000, 30, 3, 5, 23329, '', '');
-INSERT INTO items (name, key_, hostid, delay, value_type, lastvalue, itemid, templateid, params, description) VALUES ('itemInheritance', 'key-item-inheritance', 30001, 30, 3, 5, 23333, 30000, '', '');
+INSERT INTO items (itemid, name, key_, hostid, delay, value_type, templateid) VALUES (23332, 'itemInheritance', 'key-item-inheritance', 30000, 30, 3, NULL);
+INSERT INTO items (itemid, name, key_, hostid, delay, value_type, templateid) VALUES (23333, 'itemInheritance', 'key-item-inheritance', 30001, 30, 3, 30000);
 
 -- testFormTrigger.SimpleUpdate and testInheritanceTrigger.SimpleUpdate
-INSERT INTO triggers (triggerid, expression, description, comments) VALUES (15000, '{15000}=0', 'testInheritanceTrigger1', '');
-INSERT INTO functions (functionid, itemid, triggerid, function, parameter) VALUES (15000, 23329 ,15000, 'last', '0');
+INSERT INTO triggers (triggerid, expression, description, templateid) VALUES (15000, '{15000}=0', 'testInheritanceTrigger1', NULL);
+INSERT INTO triggers (triggerid, expression, description, templateid) VALUES (15001, '{15001}=0', 'testInheritanceTrigger1', 15000);
+INSERT INTO functions (functionid, itemid, triggerid, function, parameter) VALUES (15000, 23332, 15000, 'last', '0');
+INSERT INTO functions (functionid, itemid, triggerid, function, parameter) VALUES (15001, 23333, 15001, 'last', '0');
 
-INSERT INTO triggers (triggerid, expression, description, comments, templateid) VALUES (15001, '{15001}=0', 'testInheritanceTrigger1', '', 15000);
-INSERT INTO functions (functionid, itemid, triggerid, function, parameter) VALUES (15001, 23333 ,15001, 'last', '0');
+INSERT INTO triggers (triggerid, expression, description, templateid) VALUES (15002, '{15002}=0', 'testInheritanceTrigger2', NULL);
+INSERT INTO triggers (triggerid, expression, description, templateid) VALUES (15003, '{15003}=0', 'testInheritanceTrigger2', 15002);
+INSERT INTO functions (functionid, itemid, triggerid, function, parameter) VALUES (15002, 23332, 15002, 'last', '0');
+INSERT INTO functions (functionid, itemid, triggerid, function, parameter) VALUES (15003, 23333, 15003, 'last', '0');
 
-INSERT INTO triggers (triggerid, expression, description, comments) VALUES (15002, '{15002}=0', 'testInheritanceTrigger2', '');
-INSERT INTO functions (functionid, itemid, triggerid, function, parameter) VALUES (15002, 23329 ,15002, 'last', '0');
+INSERT INTO triggers (triggerid, expression, description, templateid) VALUES (15004, '{15004}=0', 'testInheritanceTrigger3', NULL);
+INSERT INTO triggers (triggerid, expression, description, templateid) VALUES (15005, '{15005}=0', 'testInheritanceTrigger3', 15004);
+INSERT INTO functions (functionid, itemid, triggerid, function, parameter) VALUES (15004, 23332, 15004, 'last', '0');
+INSERT INTO functions (functionid, itemid, triggerid, function, parameter) VALUES (15005, 23333, 15005, 'last', '0');
 
-INSERT INTO triggers (triggerid, expression, description, comments, templateid) VALUES (15003, '{15003}=0', 'testInheritanceTrigger2', '', 15002);
-INSERT INTO functions (functionid, itemid, triggerid, function, parameter) VALUES (15003, 23333 ,15003, 'last', 0);
-
-INSERT INTO triggers (triggerid, expression, description, comments) VALUES (15004, '{15004}=0', 'testInheritanceTrigger3', '');
-INSERT INTO functions (functionid, itemid, triggerid, function, parameter) VALUES (15004, 23329 ,15004, 'last', 0);
-
-INSERT INTO triggers (triggerid, expression, description, comments, templateid) VALUES (15005, '{15005}=0', 'testInheritanceTrigger3', '', 15004);
-INSERT INTO functions (functionid, itemid, triggerid, function, parameter) VALUES (15005, 23333 ,15005, 'last', 0);
-
-INSERT INTO triggers (triggerid, expression, description, comments) VALUES (15006, '{15006}=0', 'testInheritanceTrigger4', '');
-INSERT INTO functions (functionid, itemid, triggerid, function, parameter) VALUES (15006, 23329 ,15006, 'last', 0);
-
-INSERT INTO triggers (triggerid, expression, description, comments, templateid) VALUES (15007, '{15007}=0', 'testInheritanceTrigger4', '', 15006);
-INSERT INTO functions (functionid, itemid, triggerid, function, parameter) VALUES (15007, 23333 ,15007, 'last', 0);
+INSERT INTO triggers (triggerid, expression, description, templateid) VALUES (15006, '{15006}=0', 'testInheritanceTrigger4', NULL);
+INSERT INTO triggers (triggerid, expression, description, templateid) VALUES (15007, '{15007}=0', 'testInheritanceTrigger4', 15006);
+INSERT INTO functions (functionid, itemid, triggerid, function, parameter) VALUES (15006, 23332, 15006, 'last', '0');
+INSERT INTO functions (functionid, itemid, triggerid, function, parameter) VALUES (15007, 23333, 15007, 'last', '0');
