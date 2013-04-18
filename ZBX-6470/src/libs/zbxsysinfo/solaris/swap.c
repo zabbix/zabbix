@@ -126,18 +126,15 @@ int	SYSTEM_SWAP_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_R
 	if (2 < num_param(param))
 		return SYSINFO_RET_FAIL;
 
-	if (0 != get_param(param, 1, swapdev, sizeof(swapdev)))
-		return SYSINFO_RET_FAIL;
-
-	if ('\0' != *swapdev)
-		return SYSINFO_RET_FAIL;
+	if (0 == get_param(param, 1, swapdev, sizeof(swapdev)) && '\0' != *swapdev && 0 != strcmp("all", swapdev))
+		return SYSINFO_RET_FAIL;	/* first parameter must be one of missing, empty or "all" */
 
 	if (0 != get_param(param, 2, mode, sizeof(mode)))
 		zbx_snprintf(mode, sizeof(mode), "free");	/* default parameter */
 
-	for (i = 0; 0 != fl[i].mode; i++)
+	for (i = 0; NULL != fl[i].mode; i++)
 	{
-		if (0 == strncmp(mode, fl[i].mode, MAX_STRING_LEN))
+		if (0 == strcmp(mode, fl[i].mode))
 			return (fl[i].function)(cmd, param, flags, result);
 	}
 
