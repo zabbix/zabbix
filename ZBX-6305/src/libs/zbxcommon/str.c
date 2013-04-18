@@ -32,7 +32,7 @@
  *                            in each zabbix application                      *
  *                                                                            *
  ******************************************************************************/
-static void	app_title()
+static void	app_title(void)
 {
 	printf("%s v%s (revision %s) (%s)\n", title_message, ZABBIX_VERSION, ZABBIX_REVISION, ZABBIX_REVDATE);
 }
@@ -47,7 +47,7 @@ static void	app_title()
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  ******************************************************************************/
-void	version()
+void	version(void)
 {
 	app_title();
 	printf("Compilation time: %s %s\n", __DATE__, __TIME__);
@@ -65,7 +65,7 @@ void	version()
  *                            in each zabbix application                      *
  *                                                                            *
  ******************************************************************************/
-void	usage()
+void	usage(void)
 {
 	printf("usage: %s %s\n", progname, usage_message);
 }
@@ -83,7 +83,7 @@ void	usage()
  *                            in each zabbix application                      *
  *                                                                            *
  ******************************************************************************/
-void	help()
+void	help(void)
 {
 	const char	**p = help_message;
 

@@ -755,9 +755,9 @@ extern const char	*help_message[];
 
 #define ARRSIZE(a)	sizeof(a) / sizeof(*a)
 
-void	help();
-void	usage();
-void	version();
+void	help(void);
+void	usage(void);
+void	version(void);
 
 /* max length of base64 data */
 #define ZBX_MAX_B64_LEN 16 * 1024
