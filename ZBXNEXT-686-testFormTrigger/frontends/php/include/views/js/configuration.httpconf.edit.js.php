@@ -131,6 +131,7 @@
 					+ '<?php echo url_param($step['name'], false, 'name') ?>'
 					+ '<?php echo url_param($step['url'], false, 'url') ?>'
 					+ '<?php echo url_param($step['posts'], false, 'posts') ?>'
+					+ '<?php echo url_param($step['timeout'], false, 'timeout') ?>'
 					+ '<?php echo url_param($step['required'], false, 'required') ?>'
 					+ '<?php echo url_param($step['status_codes'], false, 'status_codes') ?>'
 					+ '<?php echo url_param($step['name'], false, 'old_name') ?>'

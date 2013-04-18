@@ -386,7 +386,7 @@ if ($source == EVENT_OBJECT_TRIGGER) {
 }
 // discovery events
 else {
-	$firstDHostEvent = API::Event()->get(array(
+	$firstEvent = API::Event()->get(array(
 		'output' => API_OUTPUT_EXTEND,
 		'source' => EVENT_SOURCE_DISCOVERY,
 		'object' => EVENT_OBJECT_DHOST,
@@ -394,7 +394,8 @@ else {
 		'sortorder' => ZBX_SORT_UP,
 		'limit' => 1
 	));
-	$firstDHostEvent = reset($firstDHostEvent);
+	$firstEvent = reset($firstEvent);
+
 	$firstDServiceEvent = API::Event()->get(array(
 		'output' => API_OUTPUT_EXTEND,
 		'source' => EVENT_SOURCE_DISCOVERY,
@@ -405,10 +406,7 @@ else {
 	));
 	$firstDServiceEvent = reset($firstDServiceEvent);
 
-	if ($firstDHostEvent['eventid'] < $firstDServiceEvent['eventid']) {
-		$firstEvent = $firstDHostEvent;
-	}
-	else {
+	if ($firstDServiceEvent && (!$firstEvent || $firstDServiceEvent['eventid'] < $firstEvent['eventid'])) {
 		$firstEvent = $firstDServiceEvent;
 	}
 }
@@ -422,7 +420,7 @@ $till = $from + $effectiveperiod;
 
 $csv_disabled = true;
 
-if (empty($firstEvent)) {
+if (!$firstEvent) {
 	$starttime = null;
 	$events = array();
 	$paging = getPagingLine($events);
@@ -677,6 +675,10 @@ else {
 				$hostScripts = API::Script()->getScriptsByHosts($hostids);
 			}
 
+			// actions
+			$actions = getEventActionsStatus(zbx_objectValues($events, 'eventid'));
+
+			// events
 			foreach ($events as $enum => $event) {
 				$trigger = $triggers[$event['objectid']];
 				$host = reset($trigger['hosts']);
@@ -694,9 +696,6 @@ else {
 					$i['name'] = itemName($item);
 					$items[] = $i;
 				}
-
-				// actions
-				$actions = get_event_actions_status($event['eventid']);
 
 				$ack = getEventAckState($event, true);
 
@@ -732,6 +731,9 @@ else {
 					$hostSpan->setAttribute('data-menu', hostMenuData($host, $scripts));
 				}
 
+				// action
+				$action = isset($actions[$event['eventid']]) ? $actions[$event['eventid']] : ' - ';
+
 				$table->addRow(array(
 					new CLink(zbx_date2str(EVENTS_ACTION_TIME_FORMAT, $event['clock']),
 							'tr_events.php?triggerid='.$event['objectid'].'&eventid='.$event['eventid'],
@@ -744,7 +746,7 @@ else {
 					getSeverityCell($trigger['priority'], null, !$event['value']),
 					$event['duration'],
 					($config['event_ack_enable']) ? $ack : null,
-					$actions
+					$action
 				));
 
 				if ($CSV_EXPORT) {
@@ -758,7 +760,7 @@ else {
 						$event['duration'],
 						($config['event_ack_enable']) ? ($event['acknowledges'] ? _('Yes') : _('No')) : null,
 						// ($config['event_ack_enable'])? $ack :NULL,
-						strip_tags((string) $actions)
+						strip_tags((string) $action)
 					);
 				}
 			}

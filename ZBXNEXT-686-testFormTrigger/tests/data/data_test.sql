@@ -735,18 +735,25 @@ INSERT INTO items (name, key_, hostid, delay, value_type, lastvalue, itemid, tem
 
 -- testFormTrigger.SimpleUpdate and testInheritanceTrigger.SimpleUpdate
 INSERT INTO triggers (triggerid, expression, description, comments) VALUES (15000, '{15000}=0', 'testInheritanceTrigger1', '');
-INSERT INTO functions (functionid, itemid, triggerid, function, parameter) VALUES (15000, 23329 ,15000,'last',0);
+INSERT INTO functions (functionid, itemid, triggerid, function, parameter) VALUES (15000, 23329 ,15000, 'last', '0');
+
 INSERT INTO triggers (triggerid, expression, description, comments, templateid) VALUES (15001, '{15001}=0', 'testInheritanceTrigger1', '', 15000);
-INSERT INTO functions (functionid, itemid, triggerid, function, parameter) VALUES (15001, 23333 ,15001,'last',0);
+INSERT INTO functions (functionid, itemid, triggerid, function, parameter) VALUES (15001, 23333 ,15001, 'last', '0');
+
 INSERT INTO triggers (triggerid, expression, description, comments) VALUES (15002, '{15002}=0', 'testInheritanceTrigger2', '');
-INSERT INTO functions (functionid, itemid, triggerid, function, parameter) VALUES (15002, 23329 ,15002,'last',0);
+INSERT INTO functions (functionid, itemid, triggerid, function, parameter) VALUES (15002, 23329 ,15002, 'last', '0');
+
 INSERT INTO triggers (triggerid, expression, description, comments, templateid) VALUES (15003, '{15003}=0', 'testInheritanceTrigger2', '', 15002);
-INSERT INTO functions (functionid, itemid, triggerid, function, parameter) VALUES (15003, 23333 ,15003,'last',0);
+INSERT INTO functions (functionid, itemid, triggerid, function, parameter) VALUES (15003, 23333 ,15003, 'last', 0);
+
 INSERT INTO triggers (triggerid, expression, description, comments) VALUES (15004, '{15004}=0', 'testInheritanceTrigger3', '');
-INSERT INTO functions (functionid, itemid, triggerid, function, parameter) VALUES (15004, 23329 ,15004,'last',0);
+INSERT INTO functions (functionid, itemid, triggerid, function, parameter) VALUES (15004, 23329 ,15004, 'last', 0);
+
 INSERT INTO triggers (triggerid, expression, description, comments, templateid) VALUES (15005, '{15005}=0', 'testInheritanceTrigger3', '', 15004);
-INSERT INTO functions (functionid, itemid, triggerid, function, parameter) VALUES (15005, 23333 ,15005,'last',0);
+INSERT INTO functions (functionid, itemid, triggerid, function, parameter) VALUES (15005, 23333 ,15005, 'last', 0);
+
 INSERT INTO triggers (triggerid, expression, description, comments) VALUES (15006, '{15006}=0', 'testInheritanceTrigger4', '');
-INSERT INTO functions (functionid, itemid, triggerid, function, parameter) VALUES (15006, 23329 ,15006,'last',0);
+INSERT INTO functions (functionid, itemid, triggerid, function, parameter) VALUES (15006, 23329 ,15006, 'last', 0);
+
 INSERT INTO triggers (triggerid, expression, description, comments, templateid) VALUES (15007, '{15007}=0', 'testInheritanceTrigger4', '', 15006);
-INSERT INTO functions (functionid, itemid, triggerid, function, parameter) VALUES (15007, 23333 ,15007,'last',0);
+INSERT INTO functions (functionid, itemid, triggerid, function, parameter) VALUES (15007, 23333 ,15007, 'last', 0);

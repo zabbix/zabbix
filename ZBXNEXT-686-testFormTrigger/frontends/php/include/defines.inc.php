@@ -21,7 +21,7 @@
 
 define('ZABBIX_VERSION',     '2.1.0');
 define('ZABBIX_API_VERSION', '2.1.0');
-define('ZABBIX_DB_VERSION',	 2010047);
+define('ZABBIX_DB_VERSION',	 2010050);
 
 define('ZABBIX_COPYRIGHT_FROM', '2001');
 define('ZABBIX_COPYRIGHT_TO',   '2013');
@@ -49,6 +49,8 @@ define('ZBX_MAX_IMAGE_SIZE', 1048576); // 1024 * 1024
 define('ZBX_UNITS_ROUNDOFF_THRESHOLD',		0.01);
 define('ZBX_UNITS_ROUNDOFF_UPPER_LIMIT',	2);
 define('ZBX_UNITS_ROUNDOFF_LOWER_LIMIT',	6);
+
+define('ZBX_PRECISION_10',	10);
 
 define('ZBX_DEFAULT_INTERVAL', '1-7,00:00-24:00');
 
@@ -468,7 +470,8 @@ define('ACTION_DEFAULT_MSG_TRIGGER', "Trigger: {TRIGGER.NAME}\nTrigger status: {
 		"Trigger severity: {TRIGGER.SEVERITY}\nTrigger URL: {TRIGGER.URL}\n\nItem values:\n\n".
 		"1. {ITEM.NAME1} ({HOST.NAME1}:{ITEM.KEY1}): {ITEM.VALUE1}\n".
 		"2. {ITEM.NAME2} ({HOST.NAME2}:{ITEM.KEY2}): {ITEM.VALUE2}\n".
-		"3. {ITEM.NAME3} ({HOST.NAME3}:{ITEM.KEY3}): {ITEM.VALUE3}"
+		"3. {ITEM.NAME3} ({HOST.NAME3}:{ITEM.KEY3}): {ITEM.VALUE3}\n\n".
+		"Original event ID: {EVENT.ID}"
 );
 define('ACTION_DEFAULT_MSG_AUTOREG', "Host name: {HOST.HOST}\nHost IP: {HOST.IP}\nAgent port: {HOST.PORT}");
 define('ACTION_DEFAULT_MSG_DISCOVERY', "Discovery rule: {DISCOVERY.RULE.NAME}\n\nDevice IP:{DISCOVERY.DEVICE.IPADDRESS}\n".

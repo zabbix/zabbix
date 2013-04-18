@@ -177,6 +177,15 @@ void	__zbx_zbx_snprintf_alloc(char **str, size_t *alloc_len, size_t *offset, con
 retry:
 	va_start(args, fmt);
 
+	if (NULL == *str)
+	{
+		/* zbx_vsnprintf() returns bytes actually written instead of bytes to write, */
+		/* so we have to use the standard function                                   */
+		*alloc_len = vsnprintf(NULL, 0, fmt, args) + 1;
+		*offset = 0;
+		*str = zbx_malloc(*str, *alloc_len);
+	}
+
 	avail_len = *alloc_len - *offset;
 	written_len = zbx_vsnprintf(*str + *offset, avail_len, fmt, args);
 
@@ -251,8 +260,15 @@ size_t	zbx_vsnprintf(char *str, size_t count, const char *fmt, va_list args)
  ******************************************************************************/
 void	zbx_strncpy_alloc(char **str, size_t *alloc_len, size_t *offset, const char *src, size_t n)
 {
-	if (*offset + n >= *alloc_len)
+	if (NULL == *str)
 	{
+		*alloc_len = n + 1;
+		*offset = 0;
+		*str = zbx_malloc(*str, *alloc_len);
+	}
+	else if (*offset + n >= *alloc_len)
+	{
+
 		while (*offset + n >= *alloc_len)
 			*alloc_len *= 2;
 		*str = zbx_realloc(*str, *alloc_len);
@@ -2079,9 +2095,9 @@ size_t	zbx_get_next_field(const char **line, char **output, size_t *olen, char s
  *                                                                            *
  * Purpose: check if string is contained in a list of delimited strings       *
  *                                                                            *
- * Parameters: list     - strings a,b,ccc,ddd                                 *
- *             value    - value                                               *
- *             delimiter- delimiter                                           *
+ * Parameters: list      - strings a,b,ccc,ddd                                *
+ *             value     - value                                              *
+ *             delimiter - delimiter                                          *
  *                                                                            *
  * Return value: SUCCEED - string is in the list, FAIL - otherwise            *
  *                                                                            *
@@ -2609,6 +2625,19 @@ const char	*zbx_escalation_status_string(unsigned char status)
 	}
 }
 
+const char	*zbx_trigger_value_string(unsigned char value)
+{
+	switch (value)
+	{
+		case TRIGGER_VALUE_PROBLEM:
+			return "PROBLEM";
+		case TRIGGER_VALUE_OK:
+			return "OK";
+		default:
+			return "unknown";
+	}
+}
+
 const char	*zbx_trigger_state_string(unsigned char state)
 {
 	switch (state)
@@ -2633,6 +2662,26 @@ const char	*zbx_item_state_string(unsigned char state)
 		default:
 			return "unknown";
 	}
+}
+
+const char	*zbx_event_value_string(unsigned char source, unsigned char object, unsigned char value)
+{
+	if (EVENT_SOURCE_TRIGGERS == source)
+		return zbx_trigger_value_string(value);
+
+	if (EVENT_SOURCE_INTERNAL == source)
+	{
+		switch (object)
+		{
+			case EVENT_OBJECT_TRIGGER:
+				return zbx_trigger_state_string(value);
+			case EVENT_OBJECT_ITEM:
+			case EVENT_OBJECT_LLDRULE:
+				return zbx_item_state_string(value);
+		}
+	}
+
+	return "unknown";
 }
 
 #ifdef _WINDOWS
