@@ -57,24 +57,6 @@ if (!empty($this->data['templates'])) {
 	}
 }
 
-if (!$this->data['is_discovery_rule']) {
-	// append host to form list
-	if (empty($this->data['parent_discoveryid'])) {
-		$itemForm->addVar('form_hostid', $this->data['hostid']);
-		$itemFormList->addRow(_('Host'), array(
-			new CTextBox('hostname', $this->data['hostname'], ZBX_TEXTBOX_STANDARD_SIZE, true),
-			empty($this->data['itemid'])
-				? new CButton('btn_host', _('Select'),
-					'return PopUp("popup.php?srctbl=hosts_and_templates&srcfld1=name&srcfld2=hostid'.
-						'&dstfrm='.$itemForm->getName().'&dstfld1=hostname&dstfld2=form_hostid'.
-						'&noempty=1&submitParent=1", 450, 450);',
-					'formlist'
-				)
-				: null
-		));
-	}
-}
-
 $nameTextBox = new CTextBox('name', $this->data['name'], ZBX_TEXTBOX_STANDARD_SIZE, $this->data['limited']);
 $nameTextBox->attr('autofocus', 'autofocus');
 $itemFormList->addRow(_('Name'), $nameTextBox);
