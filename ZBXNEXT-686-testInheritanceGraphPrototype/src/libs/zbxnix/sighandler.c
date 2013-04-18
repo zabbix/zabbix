@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2000-2013 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -9,7 +9,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -74,7 +74,7 @@ static void	terminate_signal_handler(int sig, siginfo_t *siginfo, void *context)
 		zabbix_log(sig_parent_pid == SIG_CHECKED_FIELD(siginfo, si_pid) ?
 				LOG_LEVEL_DEBUG : LOG_LEVEL_WARNING,
 				"Got signal [signal:%d(%s),sender_pid:%d,sender_uid:%d,"
-				"reason:%d]. sig_exiting ...",
+				"reason:%d]. Exiting ...",
 				sig, get_signal_name(sig),
 				SIG_CHECKED_FIELD(siginfo, si_pid),
 				SIG_CHECKED_FIELD(siginfo, si_uid),
@@ -89,7 +89,7 @@ static void	terminate_signal_handler(int sig, siginfo_t *siginfo, void *context)
 			zabbix_log(sig_parent_pid == SIG_CHECKED_FIELD(siginfo, si_pid) ?
 					LOG_LEVEL_DEBUG : LOG_LEVEL_WARNING,
 					"Got signal [signal:%d(%s),sender_pid:%d,sender_uid:%d,"
-					"reason:%d]. sig_exiting ...",
+					"reason:%d]. Exiting ...",
 					sig, get_signal_name(sig),
 					SIG_CHECKED_FIELD(siginfo, si_pid),
 					SIG_CHECKED_FIELD(siginfo, si_uid),
@@ -118,7 +118,7 @@ static void	child_signal_handler(int sig, siginfo_t *siginfo, void *context)
 	if (0 == sig_exiting)
 	{
 		sig_exiting = 1;
-		zabbix_log(LOG_LEVEL_CRIT, "One child process died (PID:%d,exitcode/signal:%d). sig_exiting ...",
+		zabbix_log(LOG_LEVEL_CRIT, "One child process died (PID:%d,exitcode/signal:%d). Exiting ...",
 				SIG_CHECKED_FIELD(siginfo, si_pid), SIG_CHECKED_FIELD(siginfo, si_status));
 		zbx_on_exit();
 	}

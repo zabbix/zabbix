@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2012 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -10,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -20,7 +20,7 @@
 
 class CTriggerFunctionValidator extends CValidator {
 	/**
-	 * The array containing valid functions and parameres to them
+	 * The array containing valid functions and parameters to them
 	 *
 	 * Structure: array(
 	 *   '<function>' => array(
@@ -173,10 +173,21 @@ class CTriggerFunctionValidator extends CValidator {
 		$valueTypesLog = array(
 			ITEM_VALUE_TYPE_LOG => true
 		);
+		$valueTypesInt = array(
+			ITEM_VALUE_TYPE_UINT64 => true
+		);
 
 		$argsIgnored = array(array('type' => 'str'));
 
 		$this->allowed = array(
+			'band' => array(
+				'args' => array(
+					array('type' => 'sec_num', 'mandat' => true),
+					array('type' => 'num', 'mandat' => true),
+					array('type' => 'sec')
+				),
+				'value_types' => $valueTypesInt
+			),
 			'abschange' => array(
 				'args' => $argsIgnored,
 				'value_types' => $valueTypesAll
