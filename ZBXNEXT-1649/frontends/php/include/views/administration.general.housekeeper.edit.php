@@ -23,7 +23,7 @@ require_once dirname(__FILE__).'/js/administration.general.housekeeper.edit.js.p
 $houseKeeperTab = new CFormList('scriptsTab');
 
 // remove events and alerts block
-$houseKeeperTab->addRow(_('Remove events and alerts'), new CCheckBox('hk_events_mode',
+$houseKeeperTab->addRow(_('Enable housekeeping'), new CCheckBox('hk_events_mode',
 	$this->data['config']['hk_events_mode'], null, 1));
 $houseKeeperEventsTrigger = new CNumericBox('hk_events_trigger', $this->data['config']['hk_events_trigger'], 5);
 $houseKeeperEventsInternal = new CNumericBox('hk_events_internal', $this->data['config']['hk_events_internal'], 5);
@@ -35,41 +35,41 @@ if (!$this->data['config']['hk_events_mode']) {
 	$houseKeeperEventsDiscovery->setAttribute('disabled', 'disabled');
 	$houseKeeperEventsAutoreg->setAttribute('disabled', 'disabled');
 }
-$houseKeeperTab->addRow(_('Remove trigger events and alerts older than (in days)'), $houseKeeperEventsTrigger);
-$houseKeeperTab->addRow(_('Remove internal events and alerts older than (in days)'), $houseKeeperEventsInternal);
-$houseKeeperTab->addRow(_('Remove discovery events and alerts older than (in days)'), $houseKeeperEventsDiscovery);
-$houseKeeperTab->addRow(_('Remove auto-registration events and alerts older than (in days)'),
+$houseKeeperTab->addRow(_('Keep trigger data for (in days)'), $houseKeeperEventsTrigger);
+$houseKeeperTab->addRow(_('Keep internal data for (in days)'), $houseKeeperEventsInternal);
+$houseKeeperTab->addRow(_('Keep network discovery data for (in days)'), $houseKeeperEventsDiscovery);
+$houseKeeperTab->addRow(_('Keep auto-registration data for (in days)'),
 	$houseKeeperEventsAutoreg);
 
 // remove IT service history block
-$houseKeeperTab->addRow(_('Remove IT service history'), new CCheckBox('hk_services_mode',
+$houseKeeperTab->addRow(_('Enable housekeeping'), new CCheckBox('hk_services_mode',
 	$this->data['config']['hk_services_mode'], null, 1));
 $houseKeeperServicesMode = new CNumericBox('hk_services', $this->data['config']['hk_services'], 5);
 if (!$this->data['config']['hk_services_mode']) {
 	$houseKeeperServicesMode->setAttribute('disabled', 'disabled');
 }
-$houseKeeperTab->addRow(_('Remove IT service history older than (in days)'), $houseKeeperServicesMode);
+$houseKeeperTab->addRow(_('Keep data for (in days)'), $houseKeeperServicesMode);
 
 // remove audit history block
-$houseKeeperTab->addRow(_('Remove audit history'), new CCheckBox('hk_audit_mode',
+$houseKeeperTab->addRow(_('Enable housekeeping'), new CCheckBox('hk_audit_mode',
 	$this->data['config']['hk_audit_mode'], null, 1));
 $houseKeeperAuditMode = new CNumericBox('hk_audit', $this->data['config']['hk_audit'], 5);
 if (!$this->data['config']['hk_audit_mode']) {
 	$houseKeeperAuditMode->setAttribute('disabled', 'disabled');
 }
-$houseKeeperTab->addRow(_('Remove audit history older than (in days)'), $houseKeeperAuditMode);
+$houseKeeperTab->addRow(_('Keep data for (in days)'), $houseKeeperAuditMode);
 
 // remove audit history block
-$houseKeeperTab->addRow(_('Remove user sessions'), new CCheckBox('hk_sessions_mode',
+$houseKeeperTab->addRow(_('Enable housekeeping'), new CCheckBox('hk_sessions_mode',
 	$this->data['config']['hk_sessions_mode'], null, 1));
 $houseKeeperSessionsMode = new CNumericBox('hk_sessions', $this->data['config']['hk_sessions'], 5);
 if (!$this->data['config']['hk_sessions_mode']) {
 	$houseKeeperSessionsMode->setAttribute('disabled', 'disabled');
 }
-$houseKeeperTab->addRow(_('Remove user sessions older than (in days)'), $houseKeeperSessionsMode);
+$houseKeeperTab->addRow(_('Keep data for (in days)'), $houseKeeperSessionsMode);
 
 // remove historical data block
-$houseKeeperTab->addRow(_('Remove history data'), new CCheckBox('hk_history_mode',
+$houseKeeperTab->addRow(_('Enable housekeeping'), new CCheckBox('hk_history_mode',
 	$this->data['config']['hk_history_mode'], null, 1));
 $houseKeeperHistoryGlobal = new CCheckBox('hk_history_global',
 	$this->data['config']['hk_history_global'], null, 1);
@@ -80,11 +80,11 @@ $houseKeeperHistoryModeGlobal = new CNumericBox('hk_history', $this->data['confi
 if (!$this->data['config']['hk_history_mode'] || !$this->data['config']['hk_history_global']) {
 	$houseKeeperHistoryModeGlobal->setAttribute('disabled', 'disabled');
 }
-$houseKeeperTab->addRow(_('Overwrite per-item history data period'), $houseKeeperHistoryGlobal);
-$houseKeeperTab->addRow(_('Remove history data older than (in days)'), $houseKeeperHistoryModeGlobal);
+$houseKeeperTab->addRow(_('Override item history period'), $houseKeeperHistoryGlobal);
+$houseKeeperTab->addRow(_('Keep data for (in days)'), $houseKeeperHistoryModeGlobal);
 
 // remove trend data block
-$houseKeeperTab->addRow(_('Remove trend data'), new CCheckBox('hk_trends_mode',
+$houseKeeperTab->addRow(_('Enable housekeeping'), new CCheckBox('hk_trends_mode',
 	$this->data['config']['hk_trends_mode'], null, 1));
 $houseKeeperTrendsGlobal= new CCheckBox('hk_trends_global',
 	$this->data['config']['hk_trends_global'], null, 1);
@@ -95,8 +95,8 @@ $houseKeeperTrendsModeGlobal = new CNumericBox('hk_trends', $this->data['config'
 if (!$this->data['config']['hk_trends_mode'] || !$this->data['config']['hk_trends_global']) {
 	$houseKeeperTrendsModeGlobal->setAttribute('disabled', 'disabled');
 }
-$houseKeeperTab->addRow(_('Overwrite per-item trend data period'), $houseKeeperTrendsGlobal);
-$houseKeeperTab->addRow(_('Remove trend data older than (in days)'), $houseKeeperTrendsModeGlobal);
+$houseKeeperTab->addRow(_('Override item trends period'), $houseKeeperTrendsGlobal);
+$houseKeeperTab->addRow(_('Keep data for (in days)'), $houseKeeperTrendsModeGlobal);
 
 $houseKeeperView = new CTabView();
 $houseKeeperView->addTab('houseKeeper', _('Housekeeper'), $houseKeeperTab);

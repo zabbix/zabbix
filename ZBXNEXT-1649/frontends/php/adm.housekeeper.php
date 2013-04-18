@@ -31,30 +31,30 @@ require_once dirname(__FILE__).'/include/page_header.php';
 $fields = array(
 	'hk_events_mode' =>		array(T_ZBX_INT, O_OPT, null, IN('0,1'), null),
 	'hk_events_trigger' => 	array(T_ZBX_DBL, O_OPT, null, BETWEEN(1, 99999), null,
-		_('Remove trigger events and alerts older than (in days)')),
+		_('Keep trigger event and alert data for (in days)')),
 	'hk_events_internal' => array(T_ZBX_DBL, O_OPT, null, BETWEEN(1, 99999), null,
-		_('Remove internal events and alerts older than (in days)')),
+		_('Keep internal event and alert data for (in days)')),
 	'hk_events_discovery' =>array(T_ZBX_DBL, O_OPT, null, BETWEEN(1, 99999), null,
-		_('Remove discovery events and alerts older than (in days)')),
+		_('Keep network discovery event and alert data for (in days)')),
 	'hk_events_autoreg' => 	array(T_ZBX_DBL, O_OPT, null, BETWEEN(1, 99999), null,
-		_('Remove auto-registration events and alerts older than (in days)')),
+		_('Keep auto-registration event and alert data for (in days)')),
 	'hk_services_mode' =>	array(T_ZBX_INT, O_OPT, null, IN('0,1'), null),
 	'hk_services' => 		array(T_ZBX_DBL, O_OPT, null, BETWEEN(1, 99999), null,
-		_('Remove IT service history older than (in days)')),
+		_('Keep IT service data for (in days)')),
 	'hk_audit_mode' =>		array(T_ZBX_INT, O_OPT, null, IN('0,1'), null),
 	'hk_audit' => 			array(T_ZBX_DBL, O_OPT, null, BETWEEN(1, 99999), null,
-		_('Remove audit history older than (in days)')),
+		_('Keep audit data for (in days)')),
 	'hk_sessions_mode' =>	array(T_ZBX_INT, O_OPT, null, IN('0,1'), null),
 	'hk_sessions' => 		array(T_ZBX_DBL, O_OPT, null, BETWEEN(1, 99999), null,
-		_('Remove user sessions older than (in days)')),
+		_('Keep user session data for (in days)')),
 	'hk_history_mode' =>	array(T_ZBX_INT, O_OPT, null, IN('0,1'), null),
 	'hk_history_global' =>	array(T_ZBX_INT, O_OPT, null, IN('0,1'), null),
 	'hk_history' => 		array(T_ZBX_DBL, O_OPT, null, BETWEEN(0, 99999), null,
-		_('Remove history data older than (in days)')),
+		_('Keep history data for (in days)')),
 	'hk_trends_mode' =>		array(T_ZBX_INT, O_OPT, null, IN('0,1'), null),
 	'hk_trends_global' =>	array(T_ZBX_INT, O_OPT, null, IN('0,1'), null),
 	'hk_trends' => 			array(T_ZBX_DBL, O_OPT, null, BETWEEN(0, 99999), null,
-		_('Remove trend data older than (in days)')),
+		_('Keep trend data for (in days)')),
 	'save' =>				array(T_ZBX_STR, O_OPT,	P_SYS|P_ACT, null, null),
 	'form_refresh' =>		array(T_ZBX_INT, O_OPT,	null, null, null)
 );
@@ -96,15 +96,15 @@ if (isset($_REQUEST['save'])) {
 
 	if ($result) {
 		$msg = array();
-		$msg[] = _s('Remove trigger events and alerts older than (in days) "%1$s".', get_request('hk_events_trigger'));
-		$msg[] = _s('Remove internal events and alerts older than (in days) "%1$s".', get_request('hk_events_internal'));
-		$msg[] = _s('Remove discovery events and alerts older than (in days) "%1$s".', get_request('hk_events_discovery'));
-		$msg[] = _s('Remove auto-registration events and alerts older than (in days) "%1$s".', get_request('hk_events_autoreg'));
-		$msg[] = _s('Remove IT service history older than (in days) "%1$s".', get_request('hk_services'));
-		$msg[] = _s('Remove audit history older than (in days) "%1$s".', get_request('hk_audit'));
-		$msg[] = _s('Remove user sessions older than (in days) "%1$s".', get_request('hk_sessions'));
-		$msg[] = _s('Remove history data older than (in days) "%1$s".', get_request('hk_history'));
-		$msg[] = _s('Remove trend data older than (in days) "%1$s".', get_request('hk_trends'));
+		$msg[] = _s('Keep trigger event and alert data for (in days) "%1$s".', get_request('hk_events_trigger'));
+		$msg[] = _s('Keep internal event and alert data for (in days) "%1$s".', get_request('hk_events_internal'));
+		$msg[] = _s('Keep network discovery event and alert data for (in days) "%1$s".', get_request('hk_events_discovery'));
+		$msg[] = _s('Keep auto-registration event and alert data for (in days) "%1$s".', get_request('hk_events_autoreg'));
+		$msg[] = _s('Keep IT service data for (in days) "%1$s".', get_request('hk_services'));
+		$msg[] = _s('Keep audit data for (in days) "%1$s".', get_request('hk_audit'));
+		$msg[] = _s('Keep user session data for (in days) "%1$s".', get_request('hk_sessions'));
+		$msg[] = _s('Keep history data for (in days) "%1$s".', get_request('hk_history'));
+		$msg[] = _s('Keep trend data for (in days) "%1$s".', get_request('hk_trends'));
 
 		add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ZABBIX_CONFIG, implode('; ', $msg));
 	}
