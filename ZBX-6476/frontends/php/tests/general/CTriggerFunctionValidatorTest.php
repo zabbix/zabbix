@@ -30,17 +30,26 @@ class CTriggerFunctionValidatorTest extends PHPUnit_Framework_TestCase {
 
 	public static function provider() {
 		return array(
-			array('regexp', array('10', '1'), 4, true),
-			array('regexp', array('10', '#'), 4, false),
-			array('regexp', array('10', '#0'), 4, false),
-			array('regexp', array('10', '#-1'), 4, false),
-			array('regexp', array('10', '#a'), 4, false),
-			array('regexp', array('10', '#1.0'), 4, false),
-			array('regexp', array('10', '#1.1'), 4, false),
-			array('regexp', array('10', '#0.1'), 4, false),
-			array('regexp', array('10', '#1a'), 4, false),
-			array('regexp', array('10', '#1'), 4, true),
-			array('regexp', array('10', '#123467890123456790'), 4, true),
+			// str
+			array('str', array('abc', '1'), 4, true),
+			array('str', array('abc', '0#'), 4, false),
+			array('str', array('abc', '#'), 4, false),
+			array('str', array('abc', '#0'), 4, false),
+			array('str', array('abc', '#-1'), 4, false),
+			array('str', array('abc', '#a'), 4, false),
+			array('str', array('abc', '#1.0'), 4, false),
+			array('str', array('abc', '#1.1'), 4, false),
+			array('str', array('abc', '#0.1'), 4, false),
+			array('str', array('abc', '#1a'), 4, false),
+			array('str', array('abc', '#1'), 4, true),
+			array('str', array('abc', '#123467890123456790'), 4, true),
+			// regexp
+			array('regexp', array('abc', '1'), 4, true),
+			array('regexp', array('abc', '123467890123456790'), 4, true),
+			array('regexp', array('abc', '0'), 4, false),
+			array('regexp', array('abc', '#'), 4, false),
+			array('regexp', array('abc', '0#'), 4, false),
+			array('regexp', array('abc', '#0'), 4, false),
 		);
 	}
 
