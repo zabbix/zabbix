@@ -128,7 +128,6 @@ $agentComboBox->addItemsInGroup(_('Google Chrome'), array(
 	'Mozilla/5.0 (Windows NT 6.1; en-US) AppleWebKit/534.30 (KHTML, like Gecko) Chrome/12.0.750.0 Safari/534.30' => 'Google Chrome 12'
 ));
 $agentComboBox->addItemsInGroup(_('Others'), array(
-	'Android-x86-1.6-r2 - Mozilla/5.0 (Linux; U; Android 1.6; en-us; eeepc Build/Donut) AppleWebKit/528.5+ (KHTML, like Gecko) Version/3.1.2 Mobile Safari/525.20.1' => 'Android',
 	'Mozilla/5.0 (X11; Linux 3.1.0-rc9+; en_US) KHTML/4.7.2 (like Gecko) Konqueror/4.7' => 'Konqueror 4.7',
 	'Mozilla/5.0 (compatible; Konqueror/4.6; Linux) KHTML/4.6.0 (like Gecko)' => 'Konqueror 4.6',
 	'Lynx/2.8.7rel.1 libwww-FM/2.14 SSL-MM/1.4.1 OpenSSL/0.9.8r' => 'Lynx 2.8.7rel.1',
