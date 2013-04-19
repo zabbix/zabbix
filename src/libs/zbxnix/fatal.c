@@ -19,13 +19,17 @@
 
 #include "config.h"
 
-#ifdef	HAVE_SIGNAL_H
-#	define	_GNU_SOURCE /* required for getting at program counter */
+#ifdef HAVE_SIGNAL_H
+#	if !defined(_GNU_SOURCE)
+#		define _GNU_SOURCE	/* required for getting at program counter */
+#	endif
 #	include <signal.h>
 #endif
 
-#ifdef	HAVE_SYS_UCONTEXT_H
-#	define	_GNU_SOURCE /* required for getting at program counter */
+#ifdef HAVE_SYS_UCONTEXT_H
+#	if !defined(_GNU_SOURCE)
+#		define _GNU_SOURCE	/* required for getting at program counter */
+#	endif
 #	include <sys/ucontext.h>
 #endif
 
@@ -61,6 +65,8 @@ const char	*get_signal_name(int sig)
 		default:	return "unknown";
 	}
 }
+
+#if defined(HAVE_SYS_UCONTEXT_H) && (defined(REG_EIP) || defined(REG_RIP))
 
 static const char	*get_register_name(int reg)
 {
@@ -198,12 +204,15 @@ static const char	*get_register_name(int reg)
 		default:	return "unknown";
 	}
 }
+#endif	/* defned(HAVE_SYS_UCONTEXT_H) && (defined(REG_EIP) || defined(REG_RIP)) */
 
 void	print_fatal_info(int sig, siginfo_t *siginfo, void *context)
 {
 #ifdef	HAVE_SYS_UCONTEXT_H
 
+#if defined(REG_EIP) || defined(REG_RIP)
 	ucontext_t	*uctx = (ucontext_t *)context;
+#endif
 
 	/* look for GET_PC() macro in sigcontextinfo.h files */
 	/* of glibc if you wish to add more CPU architectures */
