@@ -1,7 +1,7 @@
-<script>
+<script type="text/javascript">
 	function removeStep(obj) {
 		var step = obj.getAttribute('remove_step'),
-				table = jQuery('#httpStepTable');
+			table = jQuery('#httpStepTable');
 
 		jQuery('#steps_' + step).remove();
 		jQuery('#steps_' + step + '_httpstepid').remove();
@@ -17,6 +17,7 @@
 		if (table.find('tr.sortable').length <= 1) {
 			table.sortable('disable');
 		}
+
 		recalculateSortOrder();
 	}
 
@@ -43,13 +44,13 @@
 			// set order number
 			jQuery(this).attr('new_step', i);
 			jQuery(this).text((i + 1) + ':');
-			i++
+			i++;
 		});
 
 		// rewrite ids in new order
 		for (var n = 0; n < i; n++) {
 			var currStep = jQuery('#tmp_current_step_' + n),
-					newStep = currStep.attr('new_step');
+				newStep = currStep.attr('new_step');
 
 			jQuery('#tmp_remove_' + n).attr('id', 'remove_' + newStep);
 			jQuery('#tmp_name_' + n).attr('id', 'name_' + newStep);
@@ -102,7 +103,7 @@
 		});
 
 		// http step add pop up
-		<?php if(!$this->data['templated']) : ?>
+		<?php if (!$this->data['templated']) : ?>
 			$('#add_step').click(function() {
 				var form = $(this).parents('form');
 
@@ -113,12 +114,12 @@
 				});
 
 				return PopUp('popup_httpstep.php?dstfrm=httpForm' + stepNames, 600, 410);
-			})
+			});
 		<?php endif ?>
 
 		// http step edit pop up
 		<?php foreach ($this->data['steps'] as $i => $step): ?>
-			$('#name_<?php echo $i ?>').click(function() {
+			$('#name_<?php echo $i; ?>').click(function() {
 				// append existing step names
 				var stepNames = '';
 				var form = $(this).parents('form');
@@ -126,18 +127,17 @@
 					stepNames += '&steps_names[]=' + $(stepName).val();
 				});
 
-				return PopUp('popup_httpstep.php?dstfrm=httpForm&templated=<?php echo $this->data['templated'] ?>'
-					+ '&list_name=steps&stepid=' + jQuery(this).attr("name_step")
-					+ '<?php echo url_param($step['name'], false, 'name') ?>'
-					+ '<?php echo url_param($step['url'], false, 'url') ?>'
-					+ '<?php echo url_param($step['posts'], false, 'posts') ?>'
-					+ '<?php echo url_param($step['timeout'], false, 'timeout') ?>'
-					+ '<?php echo url_param($step['required'], false, 'required') ?>'
-					+ '<?php echo url_param($step['status_codes'], false, 'status_codes') ?>'
-					+ '<?php echo url_param($step['name'], false, 'old_name') ?>'
+				return PopUp('popup_httpstep.php?dstfrm=httpForm&templated=<?php echo $this->data['templated']; ?>'
+					+ '&list_name=steps&stepid=' + jQuery(this).attr('name_step')
+					+ '<?php echo url_param($step['name'], false, 'name'); ?>'
+					+ '<?php echo url_param($step['url'], false, 'url'); ?>'
+					+ '<?php echo url_param($step['posts'], false, 'posts'); ?>'
+					+ '<?php echo url_param($step['timeout'], false, 'timeout'); ?>'
+					+ '<?php echo url_param($step['required'], false, 'required'); ?>'
+					+ '<?php echo url_param($step['status_codes'], false, 'status_codes'); ?>'
+					+ '<?php echo url_param($step['name'], false, 'old_name'); ?>'
 					+ stepNames, 600, 410);
 			});
 		<?php endforeach ?>
 	});
 </script>
-

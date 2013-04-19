@@ -17,17 +17,22 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
+
 $itemsWidget = new CWidget(null, 'item-list');
 
 // create new item button
 $createForm = new CForm('get');
 $createForm->cleanItems();
-if (!empty($this->data['form_hostid'])) {
-	$createForm->addVar('form_hostid', $this->data['form_hostid']);
+
+if (empty($this->data['hostid'])) {
+	$createButton = new CSubmit('form', _('Create item (select host first)'));
+	$createButton->setEnabled(false);
+	$createForm->addItem($createButton);
 }
-$createForm->addItem(new CSubmit('form', _('Create item')));
+else {
+	$createForm->addItem(new CSubmit('form', _('Create item')));
+}
 $itemsWidget->addPageHeader(_('CONFIGURATION OF ITEMS'), $createForm);
 
 // header
@@ -264,5 +269,5 @@ $itemForm->addItem(array($this->data['paging'], $itemTable, $this->data['paging'
 
 // append form to widget
 $itemsWidget->addItem($itemForm);
+
 return $itemsWidget;
-?>
