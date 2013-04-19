@@ -17,19 +17,25 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
+
 $applicationWidget = new CWidget();
 
+$createForm = new CForm('get');
+$createForm->addVar('hostid', $this->data['hostid']);
+
 // append host summary to widget header
-if (!empty($this->data['hostid'])) {
+if (empty($this->data['hostid'])) {
+	$createButton = new CSubmit('form', _('Create application (select host first)'));
+	$createButton->setEnabled(false);
+	$createForm->addItem($createButton);
+}
+else {
+	$createForm->addItem(new CSubmit('form', _('Create application')));
+
 	$applicationWidget->addItem(get_header_host_table('applications', $this->data['hostid']));
 }
 
-// create new application button
-$createForm = new CForm('get');
-$createForm->addItem(new CSubmit('form', _('Create application')));
-$createForm->addVar('hostid', $this->data['hostid']);
 $applicationWidget->addPageHeader(_('CONFIGURATION OF APPLICATIONS'), $createForm);
 
 // create widget header
@@ -50,7 +56,7 @@ $applicationForm->addVar('hostid', $this->data['hostid']);
 $applicationTable = new CTableInfo(_('No applications defined.'));
 $applicationTable->setHeader(array(
 	new CCheckBox('all_applications', null, "checkAll('".$applicationForm->getName()."', 'all_applications', 'applications');"),
-	$this->data['hostid'] > 0 ? null : _('Host'),
+	($this->data['hostid'] > 0) ? null : _('Host'),
 	make_sorting_header(_('Application'), 'name'),
 	_('Show')
 ));
@@ -63,14 +69,15 @@ foreach ($this->data['applications'] as $application) {
 		);
 	}
 	else {
-		$name = new CLink($application['name'], 'applications.php?form=update&applicationid='.$application['applicationid'].'&hostid='.$this->data['hostid'].'&groupid='.$this->data['groupid']);
+		$name = new CLink($application['name'], 'applications.php?form=update&applicationid='.$application['applicationid'].'&hostid='.$application['hostid'].'&groupid='.$this->data['groupid']);
 	}
+
 	$applicationTable->addRow(array(
 		new CCheckBox('applications['.$application['applicationid'].']', null, null, $application['applicationid']),
-		$this->data['hostid'] > 0 ? null : $application['host'],
+		($this->data['hostid'] > 0) ? null : $application['host'],
 		$name,
 		array(
-			new CLink(_('Items'), 'items.php?hostid='.$this->data['hostid'].'&filter_set=1&filter_application='.urlencode($application['name'])),
+			new CLink(_('Items'), 'items.php?hostid='.$application['hostid'].'&filter_set=1&filter_application='.urlencode($application['name'])),
 			SPACE.'('.count($application['items']).')'
 		)
 	));
@@ -99,5 +106,5 @@ $applicationForm->addItem(array($this->data['paging'], $applicationTable, $this-
 
 // append form to widget
 $applicationWidget->addItem($applicationForm);
+
 return $applicationWidget;
-?>
