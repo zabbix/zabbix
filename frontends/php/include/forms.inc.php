@@ -986,7 +986,7 @@
 			$data['hostid'] = $discoveryRule['hostid'];
 		}
 		else {
-			$data['hostid'] = get_request('form_hostid', get_request('hostid', 0));
+			$data['hostid'] = get_request('hostid', 0);
 		}
 
 		// types, http items only for internal processes
