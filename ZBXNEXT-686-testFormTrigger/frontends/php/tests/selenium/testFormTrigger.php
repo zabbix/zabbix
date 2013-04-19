@@ -433,7 +433,36 @@ class testFormTrigger extends CWebTest {
 			array(
 				array(
 					'expected' => TRIGGER_GOOD,
-					'description' => 'MyTrigger_sysUptime',
+					'description' => 'MyTrigger_simple',
+					'expression' => '{Simple form test host:test-item-reuse.last(0)}<0',
+					'formCheck' => true
+				)
+			),
+			array(
+				array(
+					'expected' => TRIGGER_GOOD,
+					'description' => 'HTML_symbols&#8704;&forall;&#8734;&ne;&sup;&Eta;&#937;&#958;&pi;&#8194;&mdash;&#8364;&loz;',
+					'expression' => '{Simple form test host:test-item-reuse.last(0)}<0',
+					'formCheck' => true
+				)
+			),
+			array(
+				array(
+					'expected' => TRIGGER_GOOD,
+					'description' => 'ASCII_characters&#33;&#40;&#51;&#101;&#10;&#25;',
+					'expression' => '{Simple form test host:test-item-reuse.last(0)}<0',
+					'formCheck' => true
+				)
+			),
+			array(
+				array(
+					'expected' => TRIGGER_GOOD,
+					'description' => 'MyTrigger_allFields',
+					'type' => true,
+					'comments' => 'MyTrigger_allFields -Description textbox for comments',
+					'url' => 'MyTrigger_allFields -URL field for link',
+					'severity' => 'Disaster',
+					'status' => false,
 					'expression' => '{Simple form test host:test-item-reuse.last(0)}<0',
 					'formCheck' => true
 				)
@@ -442,6 +471,14 @@ class testFormTrigger extends CWebTest {
 				array(
 					'expected' => TRIGGER_GOOD,
 					'description' => '1234567890',
+					'expression' => '{Simple form test host:test-item-reuse.last(0)}<0',
+					'formCheck' => true
+				)
+			),
+			array(
+				array(
+					'expected' => TRIGGER_GOOD,
+					'description' => '0',
 					'expression' => '{Simple form test host:test-item-reuse.last(0)}<0',
 					'formCheck' => true
 				)
@@ -690,25 +727,32 @@ class testFormTrigger extends CWebTest {
 
 		if (isset($data['description'])) {
 			$this->input_type('description', $data['description']);
-			$description = $data['description'];
 		}
+		$description = $this->getValue('description');
 
 		if (isset($data['expression'])) {
 			$this->input_type('expression', $data['expression']);
-			$expression = $data['expression'];
 		}
+		$expression = $this->getValue('expression');
 
 		if (isset($data['type'])) {
 			$this->zbxTestCheckboxSelect('type');
+			$type = 'checked';
 		}
+		else {
+			$type = 'unchecked';
+		}
+
 
 		if (isset($data['comments'])) {
-			$this->input_type('comments', $data['comments']);;
+			$this->input_type('comments', $data['comments']);
 		}
+		$comments = $this->getValue('comments');
 
 		if (isset($data['url'])) {
-			$this->input_type('url', $data['url']);;
+			$this->input_type('url', $data['url']);
 		}
+		$url = $this->getValue('url');
 
 		if (isset($data['severity'])) {
 			switch ($data['severity']) {
@@ -731,10 +775,18 @@ class testFormTrigger extends CWebTest {
 					$this->zbxTestClick('severity_5');
 					break;
 			}
+			$severity = $data['severity'];
+		}
+		else {
+			$severity = 'Not classified';
 		}
 
 		if (isset($data['status'])) {
 			$this->zbxTestCheckboxUnselect('status');
+			$status = 'unchecked';
+		}
+		else {
+			$status = 'checked';
 		}
 
 		if (isset($data['constructor'])) {
@@ -782,6 +834,7 @@ class testFormTrigger extends CWebTest {
 					$this->zbxTestTextPresent('Trigger added');
 					$this->checkTitle('Configuration of triggers');
 					$this->zbxTestTextPresent('CONFIGURATION OF TRIGGERS');
+					$this->zbxTestTextPresent(array($description, $expression));
 					break;
 				case TRIGGER_BAD:
 					$this->checkTitle('Configuration of triggers');
@@ -798,7 +851,50 @@ class testFormTrigger extends CWebTest {
 			if (isset($data['formCheck'])) {
 				$this->zbxTestClickWait('link='.$description);
 				$this->assertAttribute("//input[@id='description']/@value", 'exact:'.$description);
-				$this->assertTrue(true, "//text()='$expression'");
+				$exp = $this->getValue('expression');
+
+				$this->assertEquals($exp, $expression);
+
+				if ($type == 'checked') {
+					$this->assertAttribute("//input[@id='type']/@checked", 'checked');
+				}
+				else {
+					$this->assertElementNotPresent("//input[@id='type']/@checked");
+				}
+
+				$comment = $this->getValue('comments');
+				$this->assertEquals($comment, $comments);
+
+				$url_ = $this->getValue('url');
+				$this->assertEquals($url_, $url);
+
+				switch ($severity) {
+					case 'Not classified':
+						$this->assertElementPresent("//label[@id='severity_label_0']/@aria-pressed");
+						break;
+					case 'Information':
+						$this->assertElementPresent("//label[@id='severity_label_1']/@aria-pressed");
+						break;
+					case 'Warning':
+						$this->assertElementPresent("//label[@id='severity_label_2']/@aria-pressed");
+						break;
+					case 'Average':
+						$this->assertElementPresent("//label[@id='severity_label_3']/@aria-pressed");
+						break;
+					case 'High':
+						$this->assertElementPresent("//label[@id='severity_label_4']/@aria-pressed");
+						break;
+					case 'Disaster':
+						$this->assertElementPresent("//label[@id='severity_label_5']/@aria-pressed");
+						break;
+				}
+
+				if ($status == 'checked') {
+					$this->assertAttribute("//input[@id='status']/@checked", 'checked');
+				}
+				else {
+					$this->assertElementNotPresent("//input[@id='status']/@checked");
+				}
 			}
 		}
 	}
