@@ -995,4 +995,4 @@ fieldset legend { margin: 0.2em 0.5em; }
 .multiselect .available ul li.hover { background: #7A9FC1; color: #FFFFFF; }
 .multiselect .available ul li.hover .prefix { color: #F1F1F1; }
 
-.hk .formlist .formrow .dt { min-width: 375px; margin-right: 15px; }
+.hkElementLabel { width: 235px; }
