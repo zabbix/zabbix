@@ -32,7 +32,7 @@
  *                            in each zabbix application                      *
  *                                                                            *
  ******************************************************************************/
-static void	app_title()
+static void	app_title(void)
 {
 	printf("%s v%s (revision %s) (%s)\n", title_message, ZABBIX_VERSION, ZABBIX_REVISION, ZABBIX_REVDATE);
 }
@@ -47,7 +47,7 @@ static void	app_title()
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  ******************************************************************************/
-void	version()
+void	version(void)
 {
 	app_title();
 	printf("Compilation time: %s %s\n", __DATE__, __TIME__);
@@ -65,7 +65,7 @@ void	version()
  *                            in each zabbix application                      *
  *                                                                            *
  ******************************************************************************/
-void	usage()
+void	usage(void)
 {
 	printf("usage: %s %s\n", progname, usage_message);
 }
@@ -83,7 +83,7 @@ void	usage()
  *                            in each zabbix application                      *
  *                                                                            *
  ******************************************************************************/
-void	help()
+void	help(void)
 {
 	const char	**p = help_message;
 
@@ -175,33 +175,31 @@ void	__zbx_zbx_snprintf_alloc(char **str, size_t *alloc_len, size_t *offset, con
 	va_list	args;
 	size_t	avail_len, written_len;
 retry:
-	va_start(args, fmt);
-
 	if (NULL == *str)
 	{
 		/* zbx_vsnprintf() returns bytes actually written instead of bytes to write, */
 		/* so we have to use the standard function                                   */
+		va_start(args, fmt);
 		*alloc_len = vsnprintf(NULL, 0, fmt, args) + 1;
+		va_end(args);
 		*offset = 0;
 		*str = zbx_malloc(*str, *alloc_len);
 	}
 
 	avail_len = *alloc_len - *offset;
+	va_start(args, fmt);
 	written_len = zbx_vsnprintf(*str + *offset, avail_len, fmt, args);
+	va_end(args);
 
 	if (written_len == avail_len - 1)
 	{
 		*alloc_len *= 2;
 		*str = zbx_realloc(*str, *alloc_len);
 
-		va_end(args);
-
 		goto retry;
 	}
 
 	*offset += written_len;
-
-	va_end(args);
 }
 
 /******************************************************************************
