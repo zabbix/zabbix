@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -9,7 +9,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -32,7 +32,7 @@
  *                            in each zabbix application                      *
  *                                                                            *
  ******************************************************************************/
-static void	app_title()
+static void	app_title(void)
 {
 	printf("%s v%s (revision %s) (%s)\n", title_message, ZABBIX_VERSION, ZABBIX_REVISION, ZABBIX_REVDATE);
 }
@@ -47,7 +47,7 @@ static void	app_title()
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  ******************************************************************************/
-void	version()
+void	version(void)
 {
 	app_title();
 	printf("Compilation time: %s %s\n", __DATE__, __TIME__);
@@ -65,7 +65,7 @@ void	version()
  *                            in each zabbix application                      *
  *                                                                            *
  ******************************************************************************/
-void	usage()
+void	usage(void)
 {
 	printf("usage: %s %s\n", progname, usage_message);
 }
@@ -83,7 +83,7 @@ void	usage()
  *                            in each zabbix application                      *
  *                                                                            *
  ******************************************************************************/
-void	help()
+void	help(void)
 {
 	const char	**p = help_message;
 
@@ -175,24 +175,31 @@ void	__zbx_zbx_snprintf_alloc(char **str, size_t *alloc_len, size_t *offset, con
 	va_list	args;
 	size_t	avail_len, written_len;
 retry:
-	va_start(args, fmt);
+	if (NULL == *str)
+	{
+		/* zbx_vsnprintf() returns bytes actually written instead of bytes to write, */
+		/* so we have to use the standard function                                   */
+		va_start(args, fmt);
+		*alloc_len = vsnprintf(NULL, 0, fmt, args) + 1;
+		va_end(args);
+		*offset = 0;
+		*str = zbx_malloc(*str, *alloc_len);
+	}
 
 	avail_len = *alloc_len - *offset;
+	va_start(args, fmt);
 	written_len = zbx_vsnprintf(*str + *offset, avail_len, fmt, args);
+	va_end(args);
 
 	if (written_len == avail_len - 1)
 	{
 		*alloc_len *= 2;
 		*str = zbx_realloc(*str, *alloc_len);
 
-		va_end(args);
-
 		goto retry;
 	}
 
 	*offset += written_len;
-
-	va_end(args);
 }
 
 /******************************************************************************
@@ -251,8 +258,15 @@ size_t	zbx_vsnprintf(char *str, size_t count, const char *fmt, va_list args)
  ******************************************************************************/
 void	zbx_strncpy_alloc(char **str, size_t *alloc_len, size_t *offset, const char *src, size_t n)
 {
-	if (*offset + n >= *alloc_len)
+	if (NULL == *str)
 	{
+		*alloc_len = n + 1;
+		*offset = 0;
+		*str = zbx_malloc(*str, *alloc_len);
+	}
+	else if (*offset + n >= *alloc_len)
+	{
+
 		while (*offset + n >= *alloc_len)
 			*alloc_len *= 2;
 		*str = zbx_realloc(*str, *alloc_len);
@@ -428,6 +442,23 @@ void	zbx_ltrim(char *str, const char *charlist)
 
 /******************************************************************************
  *                                                                            *
+ * Function: zbx_lrtrim                                                       *
+ *                                                                            *
+ * Purpose: Removes leading and trailing characters from the specified        *
+ *          character string                                                  *
+ *                                                                            *
+ * Parameters: str      - [IN/OUT] string for processing                      *
+ *             charlist - [IN] null terminated list of characters             *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_lrtrim(char *str, const char *charlist)
+{
+	zbx_rtrim(str, charlist);
+	zbx_ltrim(str, charlist);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: zbx_remove_chars                                                 *
  *                                                                            *
  * Purpose: Remove characters 'charlist' from the whole string                *
@@ -549,88 +580,6 @@ void	compress_signs(char *str)
 			}
 		}
 	}
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: rtrim_spaces                                                     *
- *                                                                            *
- * Purpose: delete all right spaces for the string                            *
- *                                                                            *
- * Parameters: c - string to trim spaces                                      *
- *                                                                            *
- * Return value: string without right spaces                                  *
- *                                                                            *
- * Author: Alexei Vladishev                                                   *
- *                                                                            *
- ******************************************************************************/
-void	rtrim_spaces(char *c)
-{
-	int i,len;
-
-	len = (int)strlen(c);
-	for(i=len-1;i>=0;i--)
-	{
-		if( c[i] == ' ')
-		{
-			c[i]=0;
-		}
-		else	break;
-	}
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: ltrim_spaces                                                     *
- *                                                                            *
- * Purpose: delete all left spaces for the string                             *
- *                                                                            *
- * Parameters: c - string to trim spaces                                      *
- *                                                                            *
- * Return value: string without left spaces                                   *
- *                                                                            *
- * Author: Alexei Vladishev                                                   *
- *                                                                            *
- ******************************************************************************/
-void	ltrim_spaces(char *c)
-{
-	int i;
-/* Number of left spaces */
-	int spaces=0;
-
-	for(i=0;c[i]!=0;i++)
-	{
-		if( c[i] == ' ')
-		{
-			spaces++;
-		}
-		else	break;
-	}
-	for(i=0;c[i+spaces]!=0;i++)
-	{
-		c[i]=c[i+spaces];
-	}
-
-	c[strlen(c)-spaces]=0;
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: lrtrim_spaces                                                    *
- *                                                                            *
- * Purpose: delete all left and right spaces for the string                   *
- *                                                                            *
- * Parameters: c - string to trim spaces                                      *
- *                                                                            *
- * Return value: string without left and right spaces                         *
- *                                                                            *
- * Author: Alexei Vladishev                                                   *
- *                                                                            *
- ******************************************************************************/
-void	lrtrim_spaces(char *c)
-{
-	ltrim_spaces(c);
-	rtrim_spaces(c);
 }
 
 /*
@@ -1685,48 +1634,38 @@ char	*get_param_dyn(const char *p, int num)
  *                                                                            *
  * Return value:                                                              *
  *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments: delimeter for parameters is ','                                  *
+ * Comments: delimiter for parameters is ','                                  *
  *                                                                            *
  ******************************************************************************/
 void	remove_param(char *p, int num)
 {
-/* 0 - init, 1 - inside quoted param, 2 - inside unquoted param */
-	int	state, idx = 1;
+	int	state = 0;	/* 0 - unquoted parameter, 1 - quoted parameter */
+	int	idx = 1;
 	char	*buf;
 
-	for (buf = p, state = 0; '\0' != *p; p++)
+	for (buf = p; '\0' != *p; p++)
 	{
+		switch (state)
+		{
+			case 0:			/* in unquoted parameter */
+				if (',' == *p)
+				{
+					if (1 == idx && 1 == num)
+						p++;
+					idx++;
+				}
+				else if ('"' == *p)
+					state = 1;
+				break;
+			case 1:			/* in quoted param */
+				if ('"' == *p)
+					state = 0;
+				else if ('\\' == *p && '"' == p[1])
+					p++;
+				break;
+		}
 		if (idx != num)
 			*buf++ = *p;
-
-		switch (state) {
-		/* Init state */
-		case 0:
-			if (',' == *p)
-				idx++;
-			else if ('"' == *p)
-				state = 1;
-			else if (' ' != *p)
-				state = 2;
-			break;
-		/* Quoted */
-		case 1:
-			if ('"' == *p)
-				state = 0;
-			else if ('\\' == *p && '"' == p[1])
-				p++;
-			break;
-		/* Unquoted */
-		case 2:
-			if (',' == *p)
-			{
-				idx++;
-				state = 0;
-			}
-			break;
-		}
 	}
 
 	*buf = '\0';
@@ -2154,9 +2093,9 @@ size_t	zbx_get_next_field(const char **line, char **output, size_t *olen, char s
  *                                                                            *
  * Purpose: check if string is contained in a list of delimited strings       *
  *                                                                            *
- * Parameters: list     - strings a,b,ccc,ddd                                 *
- *             value    - value                                               *
- *             delimiter- delimiter                                           *
+ * Parameters: list      - strings a,b,ccc,ddd                                *
+ *             value     - value                                              *
+ *             delimiter - delimiter                                          *
  *                                                                            *
  * Return value: SUCCEED - string is in the list, FAIL - otherwise            *
  *                                                                            *
@@ -2339,9 +2278,9 @@ char	*zbx_age2str(int age)
 	hours = (int)((double)(age - days * SEC_PER_DAY) / SEC_PER_HOUR);
 	minutes	= (int)((double)(age - days * SEC_PER_DAY - hours * SEC_PER_HOUR) / SEC_PER_MIN);
 
-	if (days)
+	if (0 != days)
 		offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, "%dd ", days);
-	if (days || hours)
+	if (0 != days || 0 != hours)
 		offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, "%dh ", hours);
 	offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, "%dm", minutes);
 
@@ -2574,7 +2513,7 @@ const char	*zbx_result_string(int result)
 	}
 }
 
-const char	*zbx_item_logtype_string(zbx_item_logtype_t logtype)
+const char	*zbx_item_logtype_string(unsigned char logtype)
 {
 	switch (logtype)
 	{
@@ -2682,6 +2621,65 @@ const char	*zbx_escalation_status_string(unsigned char status)
 		default:
 			return "unknown";
 	}
+}
+
+const char	*zbx_trigger_value_string(unsigned char value)
+{
+	switch (value)
+	{
+		case TRIGGER_VALUE_PROBLEM:
+			return "PROBLEM";
+		case TRIGGER_VALUE_OK:
+			return "OK";
+		default:
+			return "unknown";
+	}
+}
+
+const char	*zbx_trigger_state_string(unsigned char state)
+{
+	switch (state)
+	{
+		case TRIGGER_STATE_NORMAL:
+			return "Normal";
+		case TRIGGER_STATE_UNKNOWN:
+			return "Unknown";
+		default:
+			return "unknown";
+	}
+}
+
+const char	*zbx_item_state_string(unsigned char state)
+{
+	switch (state)
+	{
+		case ITEM_STATE_NORMAL:
+			return "Normal";
+		case ITEM_STATE_NOTSUPPORTED:
+			return "Not supported";
+		default:
+			return "unknown";
+	}
+}
+
+const char	*zbx_event_value_string(unsigned char source, unsigned char object, unsigned char value)
+{
+	if (EVENT_SOURCE_TRIGGERS == source)
+		return zbx_trigger_value_string(value);
+
+	if (EVENT_SOURCE_INTERNAL == source)
+	{
+		switch (object)
+		{
+			case EVENT_OBJECT_TRIGGER:
+				return zbx_trigger_state_string(value);
+			case EVENT_OBJECT_ITEM:
+			case EVENT_OBJECT_LLDRULE:
+				return zbx_item_state_string(value);
+		}
+	}
+
+	return "unknown";
 }
 
 #ifdef _WINDOWS
@@ -3012,6 +3010,101 @@ size_t	zbx_strlen_utf8_n(const char *text, size_t utf8_maxlen)
 	}
 
 	return sz;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_is_utf8                                                      *
+ *                                                                            *
+ * Purpose: check UTF-8 sequences                                             *
+ *                                                                            *
+ * Parameters: text - [IN] pointer to the string                              *
+ *                                                                            *
+ * Return value: SUCCEED if string is valid or FAIL otherwise                 *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_is_utf8(const char *text)
+{
+	unsigned int	utf32;
+	unsigned char	*utf8;
+	size_t		i, mb_len, expecting_bytes = 0;
+
+	while ('\0' != *text)
+	{
+		/* single ASCII character */
+		if (0 == (*text & 0x80))
+		{
+			text++;
+			continue;
+		}
+
+		/* unexpected continuation byte or invalid UTF-8 bytes '\xfe' & '\xff' */
+		if (0x80 == (*text & 0xc0) || 0xfe == (*text & 0xfe))
+			return FAIL;
+
+		/* multibyte sequence */
+
+		utf8 = (unsigned char *)text;
+
+		if (0xc0 == (*text & 0xe0))		/* 2-bytes multibyte sequence */
+			expecting_bytes = 1;
+		else if (0xe0 == (*text & 0xf0))	/* 3-bytes multibyte sequence */
+			expecting_bytes = 2;
+		else if (0xf0 == (*text & 0xf8))	/* 4-bytes multibyte sequence */
+			expecting_bytes = 3;
+		else if (0xf8 == (*text & 0xfc))	/* 5-bytes multibyte sequence */
+			expecting_bytes = 4;
+		else if (0xfc == (*text & 0xfe))	/* 6-bytes multibyte sequence */
+			expecting_bytes = 5;
+
+		mb_len = expecting_bytes + 1;
+		text++;
+
+		for (; 0 != expecting_bytes; expecting_bytes--)
+		{
+			/* not a continuation byte */
+			if (0x80 != (*text++ & 0xc0))
+				return FAIL;
+		}
+
+		/* overlong sequence */
+		if (0xc0 == (utf8[0] & 0xfe) ||
+				(0xe0 == utf8[0] && 0x00 == (utf8[1] & 0x20)) ||
+				(0xf0 == utf8[0] && 0x00 == (utf8[1] & 0x30)) ||
+				(0xf8 == utf8[0] && 0x00 == (utf8[1] & 0x38)) ||
+				(0xfc == utf8[0] && 0x00 == (utf8[1] & 0x3c)))
+		{
+			return FAIL;
+		}
+
+		utf32 = 0;
+
+		if (0xc0 == (utf8[0] & 0xe0))
+			utf32 = utf8[0] & 0x1f;
+		else if (0xe0 == (utf8[0] & 0xf0))
+			utf32 = utf8[0] & 0x0f;
+		else if (0xf0 == (utf8[0] & 0xf8))
+			utf32 = utf8[0] & 0x07;
+		else if (0xf8 == (utf8[0] & 0xfc))
+			utf32 = utf8[0] & 0x03;
+		else if (0xfc == (utf8[0] & 0xfe))
+			utf32 = utf8[0] & 0x01;
+
+		for (i = 1; i < mb_len; i++)
+		{
+			utf32 <<= 6;
+			utf32 += utf8[i] & 0x3f;
+		}
+
+		/* according to the Unicode standard the high and low
+		 * surrogate halves used by UTF-16 (U+D800 through U+DFFF)
+		 * and values above U+10FFFF are not legal
+		 */
+		if (utf32 > 0x10ffff || 0xd800 == (utf32 & 0xf800))
+			return FAIL;
+	}
+
+	return SUCCEED;
 }
 
 /******************************************************************************
