@@ -719,8 +719,8 @@ class CZBXAPI {
 				$elements = $this->applyPostSqlFiltering($elements, $options);
 
 				// truncate element set after post SQL filtering, if enough elements or more retrieved via SQL query
-				if ($options['limit'] && count($allElements) + count($elements) >=  $options['limit']) {
-					$allElements +=  array_slice($elements, 0, $options['limit'] - count($allElements), true);
+				if ($options['limit'] && count($allElements) + count($elements) >= $options['limit']) {
+					$allElements += array_slice($elements, 0, $options['limit'] - count($allElements), true);
 					break;
 				}
 
@@ -742,7 +742,7 @@ class CZBXAPI {
 			return $allElements;
 		}
 		else {
-			return  DBfetchArray(DBselect($query, $options['limit']));
+			return DBfetchArray(DBselect($query, $options['limit']));
 		}
 	}
 }
