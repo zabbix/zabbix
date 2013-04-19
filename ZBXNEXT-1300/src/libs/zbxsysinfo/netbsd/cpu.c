@@ -108,16 +108,10 @@ int	SYSTEM_CPU_UTIL(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 int	SYSTEM_CPU_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	char	*tmp;
-	long ncpu, i;
-	struct zbx_json j;
-	int ret = SYSINFO_RET_FAIL;
-
-	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
-
-	zbx_json_addarray(&j, ZBX_PROTO_TAG_DATA);
-
-	zbx_json_addobject(&j, NULL);
+	char		*tmp;
+	long 		ncpu, i;
+	struct zbx_json	j;
+	int		ret = SYSINFO_RET_FAIL;
 
 	if (1 < request->nparam)
 		return SYSINFO_RET_FAIL;
@@ -131,14 +125,24 @@ int	SYSTEM_CPU_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if (-1 == (ncpu = get_cpu_num()))
 		return SYSINFO_RET_FAIL;
 
-	for (i = 0; i<ncpu; i++)
+	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
+	zbx_json_addarray(&j, ZBX_PROTO_TAG_DATA);
+
+	for (i = 0; i < ncpu; i++)
+	{
+		zbx_json_addobject(&j, NULL);
+
 		zbx_json_adduint64(&j, ZBX_MACRO_CPUID, i);
+		zbx_json_addstring(&j, ZBX_MACRO_CPU_STATUS, "online", ZBX_JSON_TYPE_STRING);
+
+		zbx_json_close(&j);
+	}
 
 	zbx_json_close(&j);
 
 	ret = SYSINFO_RET_OK;
 
-	SET_STR_RESULT(result, strdup(j.buffer));
+	SET_STR_RESULT(result, zbx_strdup(result->str, j.buffer));
 
 	zbx_json_free(&j);
 

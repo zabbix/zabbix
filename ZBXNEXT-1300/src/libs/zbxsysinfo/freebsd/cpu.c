@@ -116,7 +116,10 @@ int SYSTEM_CPU_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 	char		*type, *end, *error[MAX_STRING_LEN], *output = NULL, id_part[64], match[8], *cpu_offline;
 	int		res, online = 0, ret = SYSINFO_RET_FAIL;
 	long		cpuid;
-	struct		zbx_json j;
+	struct zbx_json	j;
+
+	if (1 < request->nparam)
+		return SYSINFO_RET_FAIL;
 
 	type = get_rparam(request, 0);
 
@@ -125,47 +128,47 @@ int SYSTEM_CPU_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 	else if (0 != strcmp(type, "all"))
 		return SYSINFO_RET_FAIL;
 
-	if (SUCCEED == (res = zbx_execute("grep 'APIC ID:  [0-9]\\+\\( (disabled)\\)\\?$' /var/run/dmesg.boot -o", &output, error, sizeof(error), 10)))
+	if (SUCCEED != (res = zbx_execute("grep 'APIC ID:  [0-9]\\+\\( (disabled)\\)\\?$' /var/run/dmesg.boot -o",
+			&output, error, sizeof(error), 10)))
+		goto out;
+
+	while (NULL != (end = strstr(output, "APIC ID:  0\n")))
 	{
-		while (NULL != (end = strstr(output, "APIC ID:  0\n")))
-		{
-			output = end+1;
-		}
-
-		zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
-		zbx_json_addarray(&j, ZBX_PROTO_TAG_DATA);
-		zbx_json_addobject(&j, NULL);
-
-		while (NULL != (end = strchr(output, '\n')))
-		{
-			zbx_strlcpy(id_part, output, end-output+1);
-			cpu_offline = strstr(id_part, "disabled");
-			if (1 == online && NULL == cpu_offline || 0 == online)
-			{
-				zbx_json_addobject(&j, NULL);
-
-				cpuid = atoi(id_part+10);
-
-				zbx_json_adduint64(&j, ZBX_MACRO_CPUID, cpuid);
-				zbx_json_addstring(&j, ZBX_MACRO_CPU_STATUS, (NULL != cpu_offline ? "offline" : "online"), ZBX_JSON_TYPE_STRING);
-
-				zbx_json_close(&j);
-			}
-			output = end+1;
-		}
+		output = end + 1;
 	}
-	else
+
+	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
+	zbx_json_addarray(&j, ZBX_PROTO_TAG_DATA);
+
+	while (NULL != (end = strchr(output, '\n')))
 	{
-		return SYSINFO_RET_FAIL;
+		zbx_strlcpy(id_part, output, end - output + 1);
+		cpu_offline = strstr(id_part, "disabled");
+		if (1 == online && NULL == cpu_offline || 0 == online)
+		{
+			zbx_json_addobject(&j, NULL);
+
+			cpuid = atoi(id_part + 10);
+
+			zbx_json_adduint64(&j, ZBX_MACRO_CPUID, cpuid);
+			zbx_json_addstring(&j, ZBX_MACRO_CPU_STATUS, (NULL != cpu_offline ? "offline" : "online"),
+					ZBX_JSON_TYPE_STRING);
+
+			zbx_json_close(&j);
+		}
+		output = end + 1;
 	}
 
 	zbx_json_close(&j);
 
 	ret = SYSINFO_RET_OK;
 
-	SET_STR_RESULT(result, strdup(j.buffer));
+	SET_STR_RESULT(result, zbx_strdup(result->str, j.buffer));
 
 	zbx_json_free(&j);
+
+out:
+	zbx_free(output);
 
 	return ret;
 }
