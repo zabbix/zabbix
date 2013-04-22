@@ -586,7 +586,8 @@ class CTrigger extends CTriggerGeneral {
 			return count($triggers);
 		}
 
-		$triggerids = zbx_toHash(array_keys($triggers));
+		$triggerids = array_keys($triggers);
+		sort($triggerids);
 
 		// format result array
 		foreach ($triggers as $trigger) {
@@ -2013,25 +2014,10 @@ class CTrigger extends CTriggerGeneral {
 		return $sqlParts;
 	}
 
-	/**
-	 * Checks if post SQL filtering necessary.
-	 *
-	 * @param array $options    API call parameters
-	 *
-	 * @return bool             true if filtering necessary false otherwise
-	 */
 	protected function requiresPostSqlFiltering($options) {
 		return !is_null($options['skipDependent']) || !is_null($options['withLastEventUnacknowledged']);
 	}
 
-	/**
-	 * Removes triggers which could not be removed within SQL query.
-	 *
-	 * @param array     $triggers   list of triggers on whom perform filtering
-	 * @param array     $options    API call parameters
-	 *
-	 * @return array                input array $triggers with some elements removed
-	 */
 	protected function applyPostSqlFiltering($triggers, $options) {
 		$triggers = zbx_toHash($triggers, 'triggerid');
 

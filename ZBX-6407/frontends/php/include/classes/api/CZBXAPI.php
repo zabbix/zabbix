@@ -745,4 +745,24 @@ class CZBXAPI {
 			return DBfetchArray(DBselect($query, $options['limit']));
 		}
 	}
+
+	/**
+	 * Checks if post SQL filtering necessary.
+	 *
+	 * @param array $options    API call parameters
+	 *
+	 * @return bool             true if filtering necessary false otherwise
+	 */
+	protected function requiresPostSqlFiltering($options) { }
+
+	/**
+	 * Removes elements which could not be removed within SQL query.
+	 *
+	 * @param array     $triggers   list of elements on whom perform filtering
+	 * @param array     $options    API call parameters
+	 *
+	 * @return array                input array $elements with some elements removed
+	 */
+	protected function applyPostSqlFiltering($elements, $options) { }
+
 }
