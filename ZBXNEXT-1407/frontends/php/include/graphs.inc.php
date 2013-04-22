@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -10,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -836,4 +836,116 @@ function find_period_end($periods, $time, $max_time) {
 	}
 
 	return -1;
+}
+
+/**
+ * Converts Base1000 values to Base1024 and calculate pow
+ * Example:
+ * 	204800 (200 KBytes) with '1024' step convert to 209715,2 (0.2MB (204.8 KBytes))
+ *
+ * @param string $value
+ * @param string $step
+ *
+ * @return array
+ */
+function convertToBase1024 ($value, $step = false) {
+	if (empty($step)) {
+		$step = 1000;
+	}
+
+	if ($value < 0) {
+		$abs = bcmul($value, '-1');
+	}
+	else {
+		$abs = $value;
+	}
+
+	// set default values
+	$valData['pow'] = 0;
+	$valData['value'] = 0;
+
+	// supported pows ('-2' - '8')
+	for ($i = -2; $i < 9; $i++) {
+		$val = bcpow($step, $i);
+		if (bccomp($abs, $val) > -1) {
+			$valData['pow'] = $i;
+			$valData['value'] = $val;
+		}
+		else {
+			break;
+		}
+	}
+
+	if (round($valData['value'], ZBX_UNITS_ROUNDOFF_LOWER_LIMIT) > 0) {
+		if ($valData['pow'] >= 0) {
+			$valData['value'] = bcdiv(sprintf('%.6f',$value), sprintf('%.6f', $valData['value']),
+				ZBX_UNITS_ROUNDOFF_LOWER_LIMIT);
+
+			$valData['value'] = sprintf('%.6f', round(bcmul($valData['value'], bcpow(1024, $valData['pow'])),
+				ZBX_UNITS_ROUNDOFF_UPPER_LIMIT));
+		}
+		else {
+			$valData['value'] = bcmul(sprintf('%.10f',$value), sprintf('%.10f', $valData['value']), ZBX_PRECISION_10);
+
+			for ($i = 0; $i > $valData['pow']; $i--) {
+				$valData['value'] = bcdiv(bcmul($valData['value'], 1000, ZBX_PRECISION_10), 1.024, ZBX_PRECISION_10);
+			}
+
+			$valData['value'] = sprintf('%.10f', $valData['value']);
+		}
+	}
+	else {
+		$valData['value'] = 0;
+	}
+
+	return $valData;
+}
+
+/**
+ * Calculate interval for base 1024 values.
+ * Example:
+ * 	Convert 1000 to 1024
+ *
+ * @param $interval
+ * @param $minY
+ * @param $maxY
+ *
+ * @return float|int
+ */
+function getBase1024Interval($interval, $minY, $maxY) {
+	$intervalData = convertToBase1024($interval);
+	$interval = $intervalData['value'];
+
+	if ($maxY > 0) {
+		$absMaxY = $maxY;
+	}
+	else {
+		$absMaxY = bcmul($maxY, '-1');
+	}
+
+	if ($minY > 0) {
+		$absMinY = $minY;
+	}
+	else {
+		$absMinY = bcmul($minY, '-1');
+	}
+
+	if ($absMaxY > $absMinY) {
+		$sideMaxData = convertToBase1024($maxY);
+	}
+	else {
+		$sideMaxData = convertToBase1024($minY);
+	}
+
+	if ($sideMaxData['pow'] != $intervalData['pow']) {
+		// interval correction, if Max Y have other unit, then interval unit = Max Y unit
+		if ($intervalData['pow'] < 0) {
+			$interval = sprintf('%.10f', bcmul($interval, 1.024, 10));
+		}
+		else {
+			$interval = sprintf('%.6f', round(bcmul($interval, 1.024), ZBX_UNITS_ROUNDOFF_UPPER_LIMIT));
+		}
+	}
+
+	return $interval;
 }

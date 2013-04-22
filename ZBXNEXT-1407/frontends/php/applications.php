@@ -26,7 +26,7 @@ require_once dirname(__FILE__).'/include/forms.inc.php';
 $page['title'] = _('Configuration of applications');
 $page['file'] = 'applications.php';
 $page['hist_arg'] = array('groupid', 'hostid');
-$page['scripts'] = array('multiselect.js');
+$page['scripts'] = array();
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
@@ -227,6 +227,7 @@ if ($_REQUEST['go'] != 'none' && !empty($go_result)) {
  * Dsiplay
  */
 $data = array();
+
 if (isset($_REQUEST['form'])) {
 	$data['applicationid'] = get_request('applicationid');
 	$data['form'] = get_request('form');
@@ -235,6 +236,7 @@ if (isset($_REQUEST['form'])) {
 
 	if (isset($data['applicationid']) && !isset($_REQUEST['form_refresh'])) {
 		$dbApplication = reset($dbApplication);
+
 		$data['appname'] = $dbApplication['name'];
 		$data['apphostid'] = $dbApplication['hostid'];
 
@@ -247,10 +249,6 @@ if (isset($_REQUEST['form'])) {
 	// select the host for the navigation panel
 	$data['hostid'] = get_request('hostid') ? get_request('hostid') : $data['apphostid'];
 
-	// get application hostid
-	$dbHost = get_host_by_hostid($data['apphostid'], 1);
-	$data['hostname'] = $dbHost ? $dbHost['name'] : '';
-
 	// render view
 	$applicationView = new CView('configuration.application.edit', $data);
 	$applicationView->render();
@@ -258,21 +256,22 @@ if (isset($_REQUEST['form'])) {
 }
 else {
 	$data['pageFilter'] = new CPageFilter(array(
-		'groups' => array('editable' => 1, 'with_hosts_and_templates' => true),
-		'hosts' => array('editable' => 1, 'templated_hosts' => 1),
-		'hostid' => get_request('hostid', null),
-		'groupid' => get_request('groupid', null)
+		'groups' => array('editable' => true, 'with_hosts_and_templates' => true),
+		'hosts' => array('editable' => true, 'templated_hosts' => true),
+		'hostid' => get_request('hostid'),
+		'groupid' => get_request('groupid')
 	));
 	$data['groupid'] = $data['pageFilter']->groupid;
 	$data['hostid'] = $data['pageFilter']->hostid;
 
 	if ($data['pageFilter']->hostsSelected) {
-		// get application
+		// get application ids
 		$sortfield = getPageSortField('name');
 		$sortorder = getPageSortOrder();
+
 		$options = array(
 			'output' => array('applicationid'),
-			'editable' => 1,
+			'editable' => true,
 			'sortfield' => $sortfield,
 			'limit' => $config['search_limit'] + 1
 		);

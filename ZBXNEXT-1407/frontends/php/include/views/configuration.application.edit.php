@@ -23,9 +23,7 @@ $applicationWidget = new CWidget();
 $applicationWidget->addPageHeader(_('CONFIGURATION OF APPLICATIONS'));
 
 // append host summary to widget header
-if (!empty($this->data['hostid'])) {
-	$applicationWidget->addItem(get_header_host_table('applications', $this->data['hostid']));
-}
+$applicationWidget->addItem(get_header_host_table('applications', $this->data['hostid']));
 
 // create form
 $applicationForm = new CForm();
@@ -39,20 +37,6 @@ if (!empty($this->data['applicationid'])) {
 
 // create form list
 $applicationFormList = new CFormList('applicationFormList');
-if (empty($this->data['applicationid'])) {
-	$applicationFormList->addRow(_('Host'), new CMultiSelect(array(
-		'name' => 'apphostid',
-		'objectName' => 'hostsAndTemplates',
-		'data' => empty($this->data['hostid'])
-			? null
-			: array('id' => $this->data['hostid'], 'name' => $this->data['hostname']),
-		'selectedLimit' => 1
-	)));
-}
-else {
-	$applicationForm->addVar('apphostid', $this->data['apphostid']);
-	$applicationFormList->addRow(_('Host'), new CLink($this->data['hostname'], 'hosts.php?form=update&hostid='.$this->data['hostid']));
-}
 $nameTextBox = new CTextBox('appname', $this->data['appname'], ZBX_TEXTBOX_STANDARD_SIZE);
 $nameTextBox->attr('autofocus', 'autofocus');
 $applicationFormList->addRow(_('Name'), $nameTextBox);

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -9,7 +9,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -82,7 +82,7 @@ static void	process_test_data(zbx_uint64_t httptestid, int lastfailedstep, doubl
 
 	DB_RESULT	result;
 	DB_ROW		row;
-	unsigned char	types[3], statuses[3];
+	unsigned char	types[3], states[3];
 	DC_ITEM		items[3];
 	zbx_uint64_t	itemids[3];
 	int		lastclocks[3], errcodes[3];
@@ -147,17 +147,17 @@ static void	process_test_data(zbx_uint64_t httptestid, int lastfailedstep, doubl
 				break;
 		}
 
-		items[i].status = ITEM_STATUS_ACTIVE;
+		items[i].state = ITEM_STATE_NORMAL;
 		dc_add_history(items[i].itemid, items[i].value_type, 0, &value, ts,
-				items[i].status, NULL, 0, NULL, 0, 0, 0, 0);
+				items[i].state, NULL, 0, NULL, 0, 0, 0, 0);
 
-		statuses[i] = items[i].status;
+		states[i] = items[i].state;
 		lastclocks[i] = ts->sec;
 
 		free_result(&value);
 	}
 
-	DCrequeue_items(itemids, statuses, lastclocks, errcodes, num);
+	DCrequeue_items(itemids, states, lastclocks, errcodes, num);
 
 	DCconfig_clean_items(items, errcodes, num);
 
@@ -170,7 +170,7 @@ static void	process_step_data(zbx_uint64_t httpstepid, ZBX_HTTPSTAT *stat, zbx_t
 
 	DB_RESULT	result;
 	DB_ROW		row;
-	unsigned char	types[3], statuses[3];
+	unsigned char	types[3], states[3];
 	DC_ITEM		items[3];
 	zbx_uint64_t	itemids[3];
 	int		lastclocks[3], errcodes[3];
@@ -230,17 +230,17 @@ static void	process_step_data(zbx_uint64_t httpstepid, ZBX_HTTPSTAT *stat, zbx_t
 				break;
 		}
 
-		items[i].status = ITEM_STATUS_ACTIVE;
+		items[i].state = ITEM_STATE_NORMAL;
 		dc_add_history(items[i].itemid, items[i].value_type, 0, &value, ts,
-				items[i].status, NULL, 0, NULL, 0, 0, 0, 0);
+				items[i].state, NULL, 0, NULL, 0, 0, 0, 0);
 
-		statuses[i] = items[i].status;
+		states[i] = items[i].state;
 		lastclocks[i] = ts->sec;
 
 		free_result(&value);
 	}
 
-	DCrequeue_items(itemids, statuses, lastclocks, errcodes, num);
+	DCrequeue_items(itemids, states, lastclocks, errcodes, num);
 
 	DCconfig_clean_items(items, errcodes, num);
 
@@ -327,21 +327,21 @@ static void	process_httptest(DC_HOST *host, DB_HTTPTEST *httptest)
 		httpstep.name = row[2];
 
 		httpstep.url = zbx_strdup(NULL, row[3]);
-		substitute_simple_macros(NULL, NULL, NULL, host, NULL, NULL,
+		substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, host, NULL, NULL,
 				&httpstep.url, MACRO_TYPE_HTTPTEST_FIELD, NULL, 0);
 
 		httpstep.timeout = atoi(row[4]);
 
 		httpstep.posts = zbx_strdup(NULL, row[5]);
-		substitute_simple_macros(NULL, NULL, NULL, host, NULL, NULL,
+		substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, host, NULL, NULL,
 				&httpstep.posts, MACRO_TYPE_HTTPTEST_FIELD, NULL, 0);
 
 		httpstep.required = zbx_strdup(NULL, row[6]);
-		substitute_simple_macros(NULL, NULL, NULL, host, NULL, NULL,
+		substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, host, NULL, NULL,
 				&httpstep.required, MACRO_TYPE_HTTPTEST_FIELD, NULL, 0);
 
 		httpstep.status_codes = zbx_strdup(NULL, row[7]);
-		substitute_simple_macros(NULL, NULL, &host->hostid, NULL, NULL, NULL,
+		substitute_simple_macros(NULL, NULL, NULL, NULL, &host->hostid, NULL, NULL, NULL,
 				&httpstep.status_codes, MACRO_TYPE_COMMON, NULL, 0);
 
 		memset(&stat, 0, sizeof(stat));
@@ -600,26 +600,26 @@ void	process_httptests(int httppoller_num, int now)
 		httptest.name = row[4];
 
 		httptest.macros = zbx_strdup(NULL, row[5]);
-		substitute_simple_macros(NULL, NULL, NULL, &host, NULL, NULL,
+		substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, &host, NULL, NULL,
 				&httptest.macros, MACRO_TYPE_HTTPTEST_FIELD, NULL, 0);
 
 		httptest.agent = zbx_strdup(NULL, row[6]);
-		substitute_simple_macros(NULL, NULL, &host.hostid, NULL, NULL, NULL,
+		substitute_simple_macros(NULL, NULL, NULL, NULL, &host.hostid, NULL, NULL, NULL,
 				&httptest.agent, MACRO_TYPE_COMMON, NULL, 0);
 
 		if (HTTPTEST_AUTH_NONE != (httptest.authentication = atoi(row[7])))
 		{
 			httptest.http_user = zbx_strdup(NULL, row[8]);
-			substitute_simple_macros(NULL, NULL, &host.hostid, NULL, NULL, NULL,
+			substitute_simple_macros(NULL, NULL, NULL, NULL, &host.hostid, NULL, NULL, NULL,
 					&httptest.http_user, MACRO_TYPE_COMMON, NULL, 0);
 
 			httptest.http_password = zbx_strdup(NULL, row[9]);
-			substitute_simple_macros(NULL, NULL, &host.hostid, NULL, NULL, NULL,
+			substitute_simple_macros(NULL, NULL, NULL, NULL, &host.hostid, NULL, NULL, NULL,
 					&httptest.http_password, MACRO_TYPE_COMMON, NULL, 0);
 		}
 
 		httptest.http_proxy = zbx_strdup(NULL, row[10]);
-		substitute_simple_macros(NULL, NULL, &host.hostid, NULL, NULL, NULL,
+		substitute_simple_macros(NULL, NULL, NULL, NULL, &host.hostid, NULL, NULL, NULL,
 				&httptest.http_proxy, MACRO_TYPE_COMMON, NULL, 0);
 
 		httptest.retries = atoi(row[11]);
