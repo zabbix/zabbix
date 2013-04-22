@@ -270,24 +270,27 @@ $sql = 'SELECT DISTINCT i.*, ia.applicationid '.
 
 $dbItems = DBfetchArray(DBselect($sql));
 
+foreach ($dbItems as &$dbItem){
+	$dbItem['resolvedName'] = itemName($dbItem);
+}
+unset($dbItem);
+
 // if sortfield is item name
 if ($sortField == 'i.name') {
-	$sortFields = array(array('field' => 'name', 'order' => $sortOrder));
+	$sortFields = array(array('field' => 'resolvedName', 'order' => $sortOrder), 'itemid');
 }
 // if sortfield is item lastclock
 elseif ($sortField == 'i.lastclock') {
-	$sortFields = array(array('field' => 'lastclock', 'order' => $sortOrder), 'name');
+	$sortFields = array(array('field' => 'lastclock', 'order' => $sortOrder), 'resolvedName', 'itemid');
 }
 // by default
 else {
-	$sortFields = array('name');
+	$sortFields = array('resolvedName', 'itemid');
 }
 CArrayHelper::sort($dbItems, $sortFields);
 
 foreach ($dbItems as $db_item){
-	$description = itemName($db_item);
-
-	if(!empty($_REQUEST['select']) && !zbx_stristr($description, $_REQUEST['select']) ) continue;
+	if(!empty($_REQUEST['select']) && !zbx_stristr($db_item['resolvedName'], $_REQUEST['select']) ) continue;
 
 	if(strpos($db_item['units'], ',') !== false)
 		list($db_item['units'], $db_item['unitsLong']) = explode(',', $db_item['units']);
@@ -345,7 +348,7 @@ foreach ($dbItems as $db_item){
 		SPACE,
 		is_show_all_nodes()?SPACE:null,
 		($_REQUEST['hostid']>0)?NULL:SPACE,
-		new CCol(new CDiv(SPACE.SPACE.$description, $item_status)),
+		new CCol(new CDiv(SPACE.SPACE.$db_item['resolvedName'], $item_status)),
 		new CCol(new CDiv($lastclock, $item_status)),
 		new CCol(new CDiv($lastvalue, $item_status)),
 		new CCol(new CDiv($change, $item_status)),
