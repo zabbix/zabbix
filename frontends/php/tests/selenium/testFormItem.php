@@ -26,7 +26,6 @@ define('ITEM_BAD', 1);
 
 class testFormItem extends CWebTest {
 
-
 	/**
 	 * The name of the test host created in the test data set.
 	 *
@@ -37,10 +36,9 @@ class testFormItem extends CWebTest {
 	/**
 	 * The id of the test host created in the test data set.
 	 *
-	 * @var string
+	 * @var int
 	 */
 	protected $hostid = 40001;
-
 
 	/**
 	 * Backup the tables that will be modified during the tests.
