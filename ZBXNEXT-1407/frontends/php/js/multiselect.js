@@ -61,7 +61,6 @@ jQuery(function($) {
 	 * @param string options['data'][name]
 	 * @param string options['data'][prefix]
 	 * @param bool   options['disabled']
-	 * @param bool   options['simple']
 	 * @param int    options['selectedLimit']
 	 * @param int    options['limit']
 	 *
@@ -77,15 +76,10 @@ jQuery(function($) {
 			},
 			data: {},
 			disabled: false,
-			simple: false,
 			selectedLimit: null,
 			limit: null
 		};
 		options = $.extend({}, defaults, options);
-
-		if (options.simple) {
-			options.selectedLimit = 1;
-		}
 
 		var KEY = {
 			ARROW_DOWN: 40,
@@ -113,6 +107,8 @@ jQuery(function($) {
 
 			/**
 			 * Get multi select selected data.
+			 *
+			 * @return array
 			 */
 			$.fn.multiSelect.getData = function() {
 				var data = [];
@@ -349,7 +345,7 @@ jQuery(function($) {
 				var available = $('<div>', {
 					'class': 'available',
 					css: {
-						width: values.width + 2,
+						width: values.width + 1,
 						display: 'none'
 					}
 				})
@@ -586,31 +582,27 @@ jQuery(function($) {
 	}
 
 	function resizeSelected(obj, values, options) {
-		if (options.simple) {
-			return;
-		}
-
 		// settings
 		var searchInputMinWidth = 50,
-			searchInputLeftPaddings = 4,
 			searchInputRightPaddings = 4,
-			searchInputTopPaddings = IE8 ? 4 : 0;
+			searchInputTopPaddings = IE8 ? 1 : 0;
 
 		// calculate
-		var top, left, height;
+		var top = 0,
+			left = 0,
+			height = 0;
 
 		if ($('.selected li', obj).length > 0) {
 			var position = options.disabled
 				? $('.selected li:last-child', obj).position()
 				: $('.selected li:last-child .arrow', obj).position();
 
-			top = position.top + searchInputTopPaddings;
-			left = position.left + 20;
+			top = position.top + searchInputTopPaddings - 1;
+			left = position.left + 13;
 			height = $('.selected li:last-child', obj).height();
 		}
 		else {
 			top = 3 + searchInputTopPaddings;
-			left = searchInputLeftPaddings;
 			height = 0;
 		}
 
@@ -626,7 +618,6 @@ jQuery(function($) {
 			}
 
 			top += topPaddings;
-			left = searchInputLeftPaddings;
 
 			$('.selected ul', obj).css({
 				'padding-bottom': topPaddings

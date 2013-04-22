@@ -367,7 +367,7 @@
 
 			var opCmdTargetObject = jQuery('<div>', {
 				id: 'opCmdTargetObject',
-				'class': 'multiselect multiselect_simple',
+				'class': 'multiselect',
 				css: {width: <?php echo ZBX_MULTISELECT_SMALL_WIDTH; ?>}
 			});
 
@@ -376,7 +376,7 @@
 			jQuery(opCmdTargetObject).multiSelectHelper({
 				objectName: (opCmdTarget == 'host') ? 'hostsAndTemplates' : 'hostGroup',
 				name: 'opCmdTargetObjectName',
-				simple: true
+				selectedLimit: 1
 			});
 		}
 	}

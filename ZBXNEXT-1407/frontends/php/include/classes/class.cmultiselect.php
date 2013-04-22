@@ -27,7 +27,6 @@ class CMultiSelect extends CTag {
 	 * @param array  $options['objectOptions']
 	 * @param array  $options['data']
 	 * @param bool   $options['disabled']
-	 * @param bool   $options['simple']
 	 * @param int    $options['selectedLimit']
 	 * @param int    $options['width']
 	 * @param int    $options['limit']
@@ -37,10 +36,6 @@ class CMultiSelect extends CTag {
 		$this->attr('id', zbx_formatDomId($options['name']));
 		$this->addStyle('width: '.(isset($options['width']) ? $options['width'] : ZBX_MULTISELECT_STANDARD_WIDTH).'px;');
 		$this->addClass('multiselect');
-
-		if (!empty($options['simple'])) {
-			$this->addClass('multiselect_simple');
-		}
 
 		// data
 		$data = '[]';
@@ -73,7 +68,6 @@ class CMultiSelect extends CTag {
 			},
 			data: '.$data.',
 			disabled: '.(empty($options['disabled']) ? 'false' : 'true').',
-			simple: '.(empty($options['simple']) ? 'false' : 'true').',
 			selectedLimit: '.(isset($options['selectedLimit']) ? $options['selectedLimit'] : 'null').',
 			limit: '.(isset($options['limit']) ? $options['limit'] : MULTISELECT_LIMIT).'
 		});');

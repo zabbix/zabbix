@@ -939,11 +939,11 @@ fieldset legend { margin: 0.2em 0.5em; }
 /* multiselect */
 .multiselect { margin: 1px 2px 1px 1px; position: relative; }
 .multiselect input[type="text"] {
-	margin: 0; padding: 2px 0 0 4px; top: 0; left: 0; min-height: 22px; position: absolute; z-index: 10;
+	margin: 0 0 0 4px; padding: 2px 0 0 4px; top: 0; left: 0; min-height: 14px; position: absolute; z-index: 10;
 	background: none; border: none; outline: none;
 }
 .multiselect .selected ul {
-	padding: 2px 0 0 2px; min-height: 22px; background: #ffffff; border: 1px solid #AAAAAA;
+	padding: 0 0 0 1px; min-height: 18px; background: #ffffff; border: 1px solid #AAAAAA;
 	background-image: -webkit-gradient(linear, 0 0, 0 100%, color-stop(1%, #EEE), color-stop(15%, #ffffff));
 	background-image: -webkit-linear-gradient(top, #EEE 1%, #ffffff 15%);
 	background-image: -moz-linear-gradient(top, #EEE 1%, #ffffff 15%);
@@ -957,8 +957,8 @@ fieldset legend { margin: 0.2em 0.5em; }
 	border: 1px solid #5897FB;
 }
 .multiselect .selected ul li {
-	margin: 0 2px 2px 0; padding: 0 2px; list-style: none outside none; display: inline-block; border: 1px solid #AAAAAA;
-	background: #E8E8E8; vertical-align: top;
+	margin: 1px 1px 0 0; padding: 2px 0 0 0; min-height: 12px; line-height: 1em; vertical-align: top; display: inline-block;
+	background: #E8E8E8; list-style: none outside none; border: 1px solid #AAAAAA;
 	background-image: -webkit-gradient(linear, 0 0, 0 100%, color-stop(20%, #F4F4F4), color-stop(50%, #F0F0F0), color-stop(52%, #E8E8E8), color-stop(100%, #EEE));
 	background-image: -webkit-linear-gradient(top, #F4F4F4 20%, #F0F0F0 50%, #E8E8E8 52%, #EEE 100%);
 	background-image: -moz-linear-gradient(top, #F4F4F4 20%, #F0F0F0 50%, #E8E8E8 52%, #EEE 100%);
@@ -967,12 +967,12 @@ fieldset legend { margin: 0.2em 0.5em; }
 	border-radius: 3px; -webkit-border-radius: 3px; -moz-border-radius: 3px;
 }
 .multiselect .selected ul li.pressed { background: #D4D4D4; }
-.multiselect .selected ul li span.text { padding: 0 5px 0 3px; }
+.multiselect .selected ul li span.text { padding: 0 4px 0 4px; }
 .multiselect .selected ul li span.arrow {
-	padding: 2px 6px; cursor: pointer; position: relative; z-index: 11;
-	background: url("../images/general/multiselect.png") no-repeat -12px 3px;
+	padding: 0 6px; cursor: pointer; position: relative; z-index: 11;
+	background: url("../images/general/multiselect.png") no-repeat -12px 1px;
 }
-.multiselect .selected ul li span.arrow:hover { background-position: -12px -17px; }
+.multiselect .selected ul li span.arrow:hover { background-position: -12px -19px; }
 .multiselect .available {
 	top: 0; left: 0; min-height: 24px; position: absolute; z-index: 12;
 	background: #FFFFFF; border: 1px solid #AAAAAA; border-top: none;
@@ -992,8 +992,3 @@ fieldset legend { margin: 0.2em 0.5em; }
 .multiselect .available ul li { padding: 3px 2px 3px 4px; list-style: none outside none; cursor: pointer; }
 .multiselect .available ul li.hover { background: #7A9FC1; color: #FFFFFF; }
 .multiselect .available ul li.hover .prefix { color: #F1F1F1; }
-
-.multiselect_simple input[type="text"] { min-height: 18px; font-size: 10px; font-family: verdana, arial, helvetica, sans-serif;}
-.multiselect_simple .selected ul { padding: 0 0 0 2px; min-height: 18px; }
-.multiselect_simple .selected ul li { margin: 0; padding: 0; background: none; border: none; }
-.multiselect_simple .selected ul li.pressed { background: none; }
