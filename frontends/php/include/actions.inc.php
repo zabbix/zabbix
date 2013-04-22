@@ -274,7 +274,7 @@ function get_condition_desc($conditiontype, $operator, $value) {
 		SPACE,
 		condition_operator2str($operator),
 		SPACE,
-		italic(condition_value2str($conditiontype, $value))
+		italic(CHtml::encode(condition_value2str($conditiontype, $value)))
 	);
 }
 
