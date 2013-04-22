@@ -3,6 +3,7 @@ Changes for 2.0.7rc1
 New features:
 
 Bug fixes:
+...G...... [ZBX-6285] fixed message output from Zabbix sender (Andris)
 ..F....... [ZBX-6484] fixed bar report calculation (Oleg)
 ..F....... [ZBX-1236] added graph right side in bar reports (Oleg)
 ..F....... [ZBX-6498] fixed date format in update query for maintenance daily period (Oleg)
