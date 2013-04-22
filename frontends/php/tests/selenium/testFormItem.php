@@ -35,6 +35,14 @@ class testFormItem extends CWebTest {
 	protected $host = 'Simple form test host';
 
 	/**
+	 * The id of the test host created in the test data set.
+	 *
+	 * @var string
+	 */
+	protected $hostid = 40001;
+
+
+	/**
 	 * Backup the tables that will be modified during the tests.
 	 */
 	public function testFormItem_Setup() {
@@ -216,13 +224,7 @@ class testFormItem extends CWebTest {
 		$this->zbxTestTextPresent('CONFIGURATION OF ITEMS');
 		$this->zbxTestTextPresent('Item');
 
-		$this->zbxTestTextPresent('Host');
-		$this->assertVisible('hostname');
-		$this->assertAttribute("//*[@id='hostname']/@readonly", 'readonly');
-		$this->assertAttribute("//input[@id='hostname']/@maxlength", 255);
-		$this->assertAttribute("//input[@id='hostname']/@size", 50);
-		$this->assertVisible('btn_host');
-		$hostid = $this->getValue('hostid');
+		$hostid = $this->hostid;
 
 		$this->zbxTestTextPresent('Name');
 		$this->assertVisible('name');
