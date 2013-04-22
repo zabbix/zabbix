@@ -509,12 +509,16 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 			/* process variables defined in this step */
 			if (FAIL == http_process_variables(httptest, httpstep.variables, page.data))
 			{
+				size_t	err_size = 0, err_offset = 0;
+
 				zabbix_log(LOG_LEVEL_ERR, "web scenario step \"%s:%s\" error:"
-						" error matching variables: %s",
+						" error extracting variables: %s",
 						httptest->httptest.name, httpstep.name, httpstep.variables);
 
 				if (NULL == err_str)
-					err_str = zbx_strdup(err_str, "Required variable(s) not found");
+					zbx_snprintf_alloc(&err_str, &err_size, &err_offset,
+							"Failed to extract variables from '%s' step response",
+							httpstep.name);
 			}
 		}
 		else

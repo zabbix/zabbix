@@ -123,11 +123,17 @@ static char	*regexp_sub_replace(const char *text, const char *output_template, r
 				pstart = pgroup + 1;
 				continue;
 
-			case '*':
-				/* artificial construct to handle exception that all data must be */
-				/* returned if regular expression pattern contains no groups      */
+			case '@':
+				/* artificial construct to replace first captured group or fail if  */
+				/* the regular expression pattern contains no groups                */
 				if (-1 == match[1].rm_so)
-					zbx_strcpy_alloc(&ptr, &size, &offset, text);
+				{
+					zbx_free(ptr);
+					goto out;
+				}
+
+				zbx_strncpy_alloc(&ptr, &size, &offset, text + match[1].rm_so,
+						match[1].rm_eo - match[1].rm_so);
 
 				pstart = pgroup + 1;
 				continue;
@@ -141,6 +147,7 @@ static char	*regexp_sub_replace(const char *text, const char *output_template, r
 	if ('\0' != *pstart)
 		zbx_strcpy_alloc(&ptr, &size, &offset, pstart);
 
+out:
 	return ptr;
 }
 
@@ -222,6 +229,21 @@ static char	*regexp_sub(const char *string, const char *pattern, const char *out
 char	*zbx_regexp_sub(const char *string, const char *pattern, const char *output_template)
 {
 	return regexp_sub(string, pattern, output_template, REG_EXTENDED | REG_NEWLINE);
+}
+
+/*********************************************************************************
+ *                                                                               *
+ * Function: zbx_mregexp_sub                                                     *
+ *                                                                               *
+ * Purpose: This function is similar to zbx_regexp_sub() with exception that     *
+ *          multiline matches are accepted.                                      *
+ *                                                                               *
+ * Author: Andris Zeila                                                          *
+ *                                                                               *
+ *********************************************************************************/
+char	*zbx_mregexp_sub(const char *string, const char *pattern, const char *output_template)
+{
+	return regexp_sub(string, pattern, output_template, REG_EXTENDED);
 }
 
 void	clean_regexps_ex(ZBX_REGEXP *regexps, int *regexps_num)

@@ -100,7 +100,7 @@ static int	httpmacro_append_pair(zbx_httptest_t *httptest, const char *pkey, siz
 		/* If regular expression pattern contains groups, then \1 returns captured group and \*      */
 		/* returns empty string. Otherwise \1 returns empty string and \* returns the input text.    */
 		if (NULL != data)
-			pair.second = (void *)zbx_regexp_sub(data, value_str + REGEXP_PREFIX_SIZE, "\\1\\*");
+			pair.second = (void *)zbx_mregexp_sub(data, value_str + REGEXP_PREFIX_SIZE, "\\@");
 
 		zbx_free(value_str);
 
