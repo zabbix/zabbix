@@ -753,16 +753,24 @@ class CZBXAPI {
 	 *
 	 * @return  bool                true if filtering necessary false otherwise
 	 */
-	protected function requiresPostSqlFiltering(array $options) { }
+	protected function requiresPostSqlFiltering(array $options) {
+		// must be implemented in each API separately
+
+		return false;
+	}
 
 	/**
 	 * Removes elements which could not be removed within SQL query.
 	 *
-	 * @param   array   $triggers   list of elements on whom perform filtering
+	 * @param   array   $elements   list of elements on whom perform filtering
 	 * @param   array   $options    API call parameters
 	 *
 	 * @return  array               input array $elements with some elements removed
 	 */
-	protected function applyPostSqlFiltering(array $elements, array $options) { }
+	protected function applyPostSqlFiltering(array $elements, array $options) {
+		// must be implemented in each API separately
+
+		return $elements;
+	}
 
 }
