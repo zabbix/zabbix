@@ -2014,15 +2014,15 @@ class CTrigger extends CTriggerGeneral {
 		return $sqlParts;
 	}
 
-	protected function requiresPostSqlFiltering($options) {
-		return !is_null($options['skipDependent']) || !is_null($options['withLastEventUnacknowledged']);
+	protected function requiresPostSqlFiltering(array $options) {
+		return $options['skipDependent'] !== null || $options['withLastEventUnacknowledged'] !== null;
 	}
 
-	protected function applyPostSqlFiltering($triggers, $options) {
+	protected function applyPostSqlFiltering(array $triggers, array $options) {
 		$triggers = zbx_toHash($triggers, 'triggerid');
 
 		// unset triggers which are dependant on at least one problem trigger upstream into dependency tree
-		if (!is_null($options['skipDependent'])) {
+		if ($options['skipDependent'] !== null) {
 			$triggerIds = zbx_objectValues($triggers, 'triggerid');
 			$map = array();
 
@@ -2067,7 +2067,7 @@ class CTrigger extends CTriggerGeneral {
 		}
 
 		// unset triggers whose last event isn't unacknowledged
-		if (!is_null($options['withLastEventUnacknowledged'])) {
+		if ($options['withLastEventUnacknowledged'] !== null) {
 			$triggerIds = zbx_objectValues($triggers, 'triggerid');
 			$eventIds = array();
 			$eventsDb = DBselect(

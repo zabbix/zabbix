@@ -695,12 +695,12 @@ class CZBXAPI {
 	 * If post SQL filtering is necessary, several queries will be executed. SQL limit is calculated so that minimum
 	 * amount of queries would be executed and minimum amount of unnecessary data retrieved.
 	 *
-	 * @param string    $query      SQL query
-	 * @param array     $options    API call parameters
+	 * @param   string    $query      SQL query
+	 * @param   array     $options    API call parameters
 	 *
-	 * @return array
+	 * @return  array
 	 */
-	protected function customFetch($query, $options) {
+	protected function customFetch($query, array $options) {
 		if ($this->requiresPostSqlFiltering($options)) {
 			$offset = 0;
 			// we think that taking twice as necessary elements in first query is fair guess, this cast to int as well
@@ -749,20 +749,20 @@ class CZBXAPI {
 	/**
 	 * Checks if post SQL filtering necessary.
 	 *
-	 * @param array $options    API call parameters
+	 * @param   array   $options    API call parameters
 	 *
-	 * @return bool             true if filtering necessary false otherwise
+	 * @return  bool                true if filtering necessary false otherwise
 	 */
-	protected function requiresPostSqlFiltering($options) { }
+	protected function requiresPostSqlFiltering(array $options) { }
 
 	/**
 	 * Removes elements which could not be removed within SQL query.
 	 *
-	 * @param array     $triggers   list of elements on whom perform filtering
-	 * @param array     $options    API call parameters
+	 * @param   array   $triggers   list of elements on whom perform filtering
+	 * @param   array   $options    API call parameters
 	 *
-	 * @return array                input array $elements with some elements removed
+	 * @return  array               input array $elements with some elements removed
 	 */
-	protected function applyPostSqlFiltering($elements, $options) { }
+	protected function applyPostSqlFiltering(array $elements, array $options) { }
 
 }
