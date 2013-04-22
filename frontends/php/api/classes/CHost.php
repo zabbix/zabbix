@@ -1016,7 +1016,11 @@ class CHost extends CHostGeneral {
 	 */
 	public function massUpdate($data) {
 		$hosts = zbx_toArray($data['hosts']);
-		$hostids = zbx_objectValues($hosts, 'hostid');
+		$inputHostIds = zbx_objectValues($hosts, 'hostid');
+		// remove duplicate values
+		$hostids = zbx_toHash($inputHostIds);
+		// sort for DBConditionInt()
+		sort($hostids);
 
 		$updHosts = $this->get(array(
 			'hostids' => $hostids,
@@ -1252,8 +1256,22 @@ class CHost extends CHostGeneral {
 			}
 			else {
 				$hostsWithInventories = array();
-				$existingInventoriesDb = DBselect('SELECT hostid FROM host_inventory WHERE '.dbConditionInt('hostid', $hostids));
-				while ($existingInventory = DBfetch($existingInventoriesDb)) {
+				$existingInventoriesDb = DBfetchArrayAssoc(DBselect('
+					SELECT hostid
+					FROM host_inventory
+					WHERE '.dbConditionInt('hostid', $hostids)
+				), 'hostid');
+				// check for hosts with disabled inventory mode
+				if ($updateInventory['inventory_mode'] === null && count($existingInventoriesDb) !== count($hostids)) {
+					foreach ($hostids as $hostId) {
+						if (!isset($existingInventoriesDb[$hostId])) {
+							$host = get_host_by_hostid($hostId);
+							self::exception(ZBX_API_ERROR_PARAMETERS,
+								_s('Inventory disabled for host "%s".', $host['host']));
+						}
+					}
+				}
+				foreach ($existingInventoriesDb as $existingInventory) {
 					$hostsWithInventories[] = $existingInventory['hostid'];
 				}
 
@@ -1320,7 +1338,7 @@ class CHost extends CHostGeneral {
 			}
 		}
 
-		return array('hostids' => $hostids);
+		return array('hostids' => $inputHostIds);
 	}
 
 	/**
