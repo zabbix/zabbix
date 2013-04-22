@@ -704,7 +704,7 @@ class CZBXAPI {
 		if ($this->requiresPostSqlFiltering($options)) {
 			$offset = 0;
 			// we think that taking twice as necessary elements in first query is fair guess, this cast to int as well
-			$limit = 2 * $options['limit'];
+			$limit = $options['limit'] ? 2 * $options['limit'] : null;
 			// we use $minLimit for setting minimum limit twice as big for each consecutive query to not run in lots
 			// of queries for some cases
 			$minLimit = $limit;
