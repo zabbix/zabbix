@@ -283,7 +283,7 @@ elseif ($resourceType == SCREEN_RESOURCE_PLAIN_TEXT) {
 /*
  * Screen item: Status of triggers
  */
-else if(in_array($resourceType, array(SCREEN_RESOURCE_HOSTGROUP_TRIGGERS, SCREEN_RESOURCE_HOST_TRIGGERS))) {
+elseif (in_array($resourceType, array(SCREEN_RESOURCE_HOSTGROUP_TRIGGERS, SCREEN_RESOURCE_HOST_TRIGGERS))) {
 	$data = array();
 
 	if ($resourceType == SCREEN_RESOURCE_HOSTGROUP_TRIGGERS) {

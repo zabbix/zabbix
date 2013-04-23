@@ -22,14 +22,7 @@
 class CMultiSelect extends CTag {
 
 	/**
-	 * @param string $options['name']
-	 * @param string $options['objectName']
-	 * @param array  $options['objectOptions']
-	 * @param array  $options['data']
-	 * @param string $options['defaultValue']
-	 * @param bool   $options['disabled']
-	 * @param int    $options['selectedLimit']
-	 * @param int    $options['limit']
+	 * @see jQuery.multiSelect()
 	 */
 	public function __construct(array $options = array()) {
 		parent::__construct('div', 'yes');

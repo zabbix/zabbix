@@ -25,7 +25,7 @@ jQuery(function($) {
 	 *
 	 * @param objectName options['objectName']
 	 *
-	 * @see $.fn.multiSelect
+	 * @see jQuery.multiSelect()
 	 */
 	$.fn.multiSelectHelper = function(options) {
 		// url
@@ -53,17 +53,17 @@ jQuery(function($) {
 	/**
 	 * Create multi select input element.
 	 *
-	 * @param string options['url']
-	 * @param string options['name']
-	 * @param object options['labels']
-	 * @param object options['data']
+	 * @param string options['url']				backend url
+	 * @param string options['name']			input element name
+	 * @param object options['labels']			translated labels
+	 * @param object options['data']			preload data {id, name, prefix}
 	 * @param string options['data'][id]
 	 * @param string options['data'][name]
 	 * @param string options['data'][prefix]
-	 * @param string options['defaultValue']
-	 * @param bool   options['disabled']
-	 * @param int    options['selectedLimit']
-	 * @param int    options['limit']
+	 * @param string options['defaultValue']	default value for input element
+	 * @param bool   options['disabled']		turn on/off readonly state
+	 * @param int    options['selectedLimit']	how many items can be selected
+	 * @param int    options['limit']			how many available items can be received from backend
 	 *
 	 * @return object
 	 */
