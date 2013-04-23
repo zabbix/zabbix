@@ -26,6 +26,7 @@ class CMultiSelect extends CTag {
 	 * @param string $options['objectName']
 	 * @param array  $options['objectOptions']
 	 * @param array  $options['data']
+	 * @param string $options['defaultValue']
 	 * @param bool   $options['disabled']
 	 * @param int    $options['selectedLimit']
 	 * @param int    $options['width']
@@ -67,6 +68,7 @@ class CMultiSelect extends CTag {
 				moreMatchesFound: "'._('More matches found...').'"
 			},
 			data: '.$data.',
+			defaultValue: '.(isset($options['defaultValue']) ? $options['defaultValue'] : 'null').',
 			disabled: '.(empty($options['disabled']) ? 'false' : 'true').',
 			selectedLimit: '.(isset($options['selectedLimit']) ? $options['selectedLimit'] : 'null').',
 			limit: '.(isset($options['limit']) ? $options['limit'] : MULTISELECT_LIMIT).'

@@ -147,7 +147,8 @@ switch ($this->data['new_condition']['conditiontype']) {
 			'objectName' => 'hostTemplates',
 			'objectOptions' => array(
 				'editable' => true
-			)
+			),
+			'defaultValue' => 0
 		)), 'floatright');
 		break;
 
@@ -158,7 +159,8 @@ switch ($this->data['new_condition']['conditiontype']) {
 			'objectName' => 'hostsAndTemplates',
 			'objectOptions' => array(
 				'editable' => true
-			)
+			),
+			'defaultValue' => 0
 		)), 'floatright');
 		break;
 

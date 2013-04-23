@@ -60,6 +60,7 @@ jQuery(function($) {
 	 * @param string options['data'][id]
 	 * @param string options['data'][name]
 	 * @param string options['data'][prefix]
+	 * @param string options['defaultValue']
 	 * @param bool   options['disabled']
 	 * @param int    options['selectedLimit']
 	 * @param int    options['limit']
@@ -75,6 +76,7 @@ jQuery(function($) {
 				moreMatchesFound: 'More matches found...'
 			},
 			data: {},
+			defaultValue: null,
 			disabled: false,
 			selectedLimit: null,
 			limit: null
@@ -383,16 +385,20 @@ jQuery(function($) {
 	};
 
 	function setDefaultValue(obj, options) {
-		obj.append($('<input>', {
-			type: 'hidden',
-			name: options.name,
-			value: '',
-			'data-default': 1
-		}));
+		if (!empty(options.defaultValue)) {
+			obj.append($('<input>', {
+				type: 'hidden',
+				name: options.name,
+				value: options.defaultValue,
+				'data-default': 1
+			}));
+		}
 	}
 
-	function removeDefaultValue(obj) {
-		$('input[data-default="1"]', obj).remove();
+	function removeDefaultValue(obj, options) {
+		if (!empty(options.defaultValue)) {
+			$('input[data-default="1"]', obj).remove();
+		}
 	}
 
 	function loadSelected(data, obj, values, options) {
@@ -441,7 +447,7 @@ jQuery(function($) {
 
 	function addSelected(item, obj, values, options) {
 		if (typeof(values.selected[item.id]) == 'undefined') {
-			removeDefaultValue(obj);
+			removeDefaultValue(obj, options);
 
 			values.selected[item.id] = item;
 
