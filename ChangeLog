@@ -2,6 +2,8 @@ Changes for 2.0.7rc1
 
 New features:
 
+A.F....... [ZBX-1357] updated Spanish and Turkish translations; thanks to Zabbix translators (Richlv)
+
 Bug fixes:
 ...G...... [ZBX-6285] fixed message output from Zabbix sender (Andris)
 ..F....... [ZBX-6484] fixed bar report calculation (Oleg)
