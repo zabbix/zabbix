@@ -127,7 +127,7 @@ jQuery(function($) {
 			};
 
 			/**
-			 * MultiSelect object
+			 * MultiSelect object.
 			 */
 			var obj = $(this),
 				jqxhr = null,
@@ -508,18 +508,21 @@ jQuery(function($) {
 		resizeSelected(obj, values, options);
 		resizeAvailable(obj);
 
-		// clean
-		cleanAvailable(obj, values);
-		cleanLastSearch(obj);
-		$('input[type="text"]', obj).focus();
-
 		// remove readonly
 		if ($('.selected li', obj).length == 0) {
 			setDefaultValue(obj, options);
 
 			if (options.selectedLimit > 0) {
-				$('input[type="text"]', obj).attr('disabled', false);
+				$('input[type="text"]', obj).prop('disabled', false);
 			}
+		}
+
+		// clean
+		cleanAvailable(obj, values);
+		cleanLastSearch(obj);
+
+		if (!$('input[type="text"]', obj).prop('disabled')) {
+			$('input[type="text"]', obj).focus();
 		}
 	}
 
@@ -569,7 +572,9 @@ jQuery(function($) {
 			cleanAvailable(obj, values);
 			cleanLastSearch(obj);
 
-			$('input[type="text"]', obj).focus();
+			if (!$('input[type="text"]', obj).prop('disabled')) {
+				$('input[type="text"]', obj).focus();
+			}
 		}
 	}
 
@@ -698,7 +703,7 @@ jQuery(function($) {
 
 	function setReadonly(obj) {
 		cleanSearchInput(obj);
-		$('input[type="text"]', obj).attr('disabled', true);
+		$('input[type="text"]', obj).prop('disabled', true);
 		$('.selected ul', obj).removeClass('active');
 	}
 
