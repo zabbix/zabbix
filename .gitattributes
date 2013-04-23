@@ -167,6 +167,8 @@ frontends/php/images/sysmaps/old/Router.png -text svneol=unset#unset
 frontends/php/images/sysmaps/old/Server.png -text svneol=unset#unset
 frontends/php/images/sysmaps/old/Workstation.png -text svneol=unset#unset
 frontends/php/include/classes/class.cmultiselect.php -text
+frontends/php/include/classes/macros/CEventDescription.php -text
+frontends/php/include/classes/macros/CTriggerDescription.php -text
 frontends/php/include/classes/validators/CSetValidator.php -text
 frontends/php/include/classes/validators/event/CEventSourceObjectValidator.php -text
 frontends/php/include/draw.inc.php -text
