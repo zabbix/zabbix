@@ -270,7 +270,7 @@ $sql = 'SELECT DISTINCT i.*, ia.applicationid '.
 
 $dbItems = DBfetchArray(DBselect($sql));
 
-foreach ($dbItems as &$dbItem){
+foreach ($dbItems as &$dbItem) {
 	$dbItem['resolvedName'] = itemName($dbItem);
 }
 unset($dbItem);
@@ -456,7 +456,7 @@ $sql = 'SELECT DISTINCT h.host as hostname,h.hostid,i.* '.
 
 $dbItems = DBfetchArray(DBselect($sql));
 
-foreach ($dbItems as &$dbItem){
+foreach ($dbItems as &$dbItem) {
 	$dbItem['resolvedName'] = itemName($dbItem);
 }
 unset($dbItem);
