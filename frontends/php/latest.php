@@ -313,7 +313,7 @@ foreach ($dbItems as $db_item){
 		$lastclock = ' - ';
 	}
 
-	$lastvalue = formatItemValue($db_item, '-', false);
+	$lastvalue = formatItemLastValue($db_item, '-', false);
 
 	$digits = ($db_item['value_type'] == ITEM_VALUE_TYPE_FLOAT) ? 2 : 0;
 	if (isset($db_item['lastvalue']) && isset($db_item['prevvalue'])
@@ -501,7 +501,7 @@ foreach ($dbItems as $db_item){
 	}
 
 	// column "lastvalue"
-	$lastvalue = formatItemValue($db_item);
+	$lastvalue = formatItemLastValue($db_item);
 
 	// column "change"
 	$digits = ($db_item['value_type'] == ITEM_VALUE_TYPE_FLOAT) ? 2 : 0;
