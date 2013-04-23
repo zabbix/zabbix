@@ -161,7 +161,7 @@ $houseKeeperForm = new CForm();
 $houseKeeperForm->setName('houseKeeperForm');
 $houseKeeperForm->addVar('form_refresh', $this->data['form_refresh'] + 1);
 $houseKeeperForm->addItem($houseKeeperView);
-$houseKeeperForm->addItem(makeFormFooter(array(new CSubmit('save', _('Save'))), new CButton('reset', _('Reset'))));
+$houseKeeperForm->addItem(makeFormFooter(array(new CSubmit('save', _('Save'))), new CButton('resetDefaults', _('Reset defaults'))));
 
 return $houseKeeperForm;
 ?>
