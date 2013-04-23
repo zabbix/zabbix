@@ -52,21 +52,15 @@ $schema = DB::getSchema('config');
 		});
 
 		// reset button
-		jQuery("#reset").click(function(){
+		jQuery("#resetDefaults").click(function(){
 			// events and alerts
 			<?php if ($schema['fields']['hk_events_mode']['default'] == 1): ?>
 				jQuery('#hk_events_mode').prop('checked', true);
-				jQuery('#hk_events_trigger').prop('disabled', false);
-				jQuery('#hk_events_internal').prop('disabled', false);
-				jQuery('#hk_events_discovery').prop('disabled', false);
-				jQuery('#hk_events_autoreg').prop('disabled', false);
 			<?php else: ?>
 				jQuery('#hk_events_mode').prop('checked', false);
-				jQuery('#hk_events_trigger').prop('disabled', true);
-				jQuery('#hk_events_internal').prop('disabled', true);
-				jQuery('#hk_events_discovery').prop('disabled', true);
-				jQuery('#hk_events_autoreg').prop('disabled', true);
 			<?php endif; ?>
+
+			jQuery('#hk_events_mode').trigger('change');
 
 			jQuery('#hk_events_trigger').val("<?php echo $schema['fields']['hk_events_trigger']['default']; ?>");
 			jQuery('#hk_events_internal').val("<?php echo $schema['fields']['hk_events_internal']['default']; ?>");
@@ -76,69 +70,69 @@ $schema = DB::getSchema('config');
 			// IT services
 			<?php if ($schema['fields']['hk_services_mode']['default'] == 1): ?>
 				jQuery('#hk_services_mode').prop('checked', true);
-				jQuery('#hk_services').prop('disabled', false);
 			<?php else: ?>
 				jQuery('#hk_services_mode').prop('checked', false);
-				jQuery('#hk_services').prop('disabled', true);
 			<?php endif; ?>
+
+			jQuery('#hk_services_mode').trigger('change');
 
 			jQuery('#hk_services').val("<?php echo $schema['fields']['hk_services']['default']; ?>");
 
 			// audit
 			<?php if ($schema['fields']['hk_audit_mode']['default'] == 1): ?>
 				jQuery('#hk_audit_mode').prop('checked', true);
-				jQuery('#hk_audit').prop('disabled', false);
 			<?php else: ?>
 				jQuery('#hk_audit_mode').prop('checked', false);
-				jQuery('#hk_audit').prop('disabled', true);
 			<?php endif; ?>
+
+			jQuery('#hk_audit_mode').trigger('change');
 
 			jQuery('#hk_audit').val("<?php echo $schema['fields']['hk_audit']['default']; ?>");
 
 			// user sessions
 			<?php if ($schema['fields']['hk_sessions_mode']['default'] == 1): ?>
 				jQuery('#hk_sessions_mode').prop('checked', true);
-				jQuery('#hk_sessions').prop('disabled', false);
 			<?php else: ?>
 				jQuery('#hk_sessions_mode').prop('checked', false);
-				jQuery('#hk_sessions').prop('disabled', true);
 			<?php endif; ?>
+
+			jQuery('#hk_sessions_mode').trigger('change');
 
 			jQuery('#hk_sessions').val("<?php echo $schema['fields']['hk_sessions']['default']; ?>");
 
 			// history
 			<?php if ($schema['fields']['hk_history_mode']['default'] == 1): ?>
 				jQuery('#hk_history_mode').prop('checked', true);
-				<?php if ($schema['fields']['hk_history_global']['default'] == 1): ?>
-					jQuery('#hk_history_global').prop('checked', true);
-					jQuery('#hk_history').prop('disabled', false);
-				<?php else: ?>
-					jQuery('#hk_history_global').prop('checked', false);
-					jQuery('#hk_history').prop('disabled', true);
-				<?php endif; ?>
 			<?php else: ?>
 				jQuery('#hk_history_mode').prop('checked', false);
-				jQuery('#hk_history_global').prop('checked', false);
-				jQuery('#hk_history').prop('disabled', true);
 			<?php endif; ?>
+
+			<?php if ($schema['fields']['hk_history_global']['default'] == 1): ?>
+				jQuery('#hk_history_global').prop('checked', true);
+			<?php else: ?>
+				jQuery('#hk_history_global').prop('checked', false);
+			<?php endif; ?>
+
+			jQuery('#hk_history_global').trigger('change');
+			jQuery('#hk_history_mode').trigger('change');
 
 			jQuery('#hk_history').val("<?php echo $schema['fields']['hk_history']['default']; ?>");
 
 			// trends
 			<?php if ($schema['fields']['hk_trends_mode']['default'] == 1): ?>
 				jQuery('#hk_trends_mode').prop('checked', true);
-				<?php if ($schema['fields']['hk_trends_global']['default'] == 1): ?>
-					jQuery('#hk_trends_global').prop('checked', true);
-					jQuery('#hk_trends').prop('disabled', false);
-				<?php else: ?>
-					jQuery('#hk_trends_global').prop('checked', false);
-					jQuery('#hk_trends').prop('disabled', true);
-				<?php endif; ?>
 			<?php else: ?>
 				jQuery('#hk_trends_mode').prop('checked', false);
-				jQuery('#hk_trends_global').prop('checked', false);
-				jQuery('#hk_trends').prop('disabled', true);
 			<?php endif; ?>
+
+			<?php if ($schema['fields']['hk_trends_global']['default'] == 1): ?>
+				jQuery('#hk_trends_global').prop('checked', true);
+			<?php else: ?>
+				jQuery('#hk_trends_global').prop('checked', false);
+			<?php endif; ?>
+
+			jQuery('#hk_trends_global').trigger('change');
+			jQuery('#hk_trends_mode').trigger('change');
 
 			jQuery('#hk_trends').val("<?php echo $schema['fields']['hk_trends']['default']; ?>");
 		});
