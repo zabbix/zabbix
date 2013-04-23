@@ -583,9 +583,12 @@ jQuery(function($) {
 
 	function resizeSelected(obj, values, options) {
 		// settings
-		var searchInputMinWidth = 50,
-			searchInputRightPaddings = 4,
-			searchInputTopPaddings = IE8 ? 1 : 0;
+		var settingTopPaddings = IE8 ? 1 : 0,
+			settingTopPaddingsInit = 3,
+			settingRightPaddings = 4,
+			settingLeftPaddings = 13,
+			settingMinimumWidth = 50,
+			settingNewLineTopPaddings = 6;
 
 		// calculate
 		var top = 0,
@@ -597,12 +600,12 @@ jQuery(function($) {
 				? $('.selected li:last-child', obj).position()
 				: $('.selected li:last-child .arrow', obj).position();
 
-			top = position.top + searchInputTopPaddings - 1;
-			left = position.left + 13;
+			top = position.top + settingTopPaddings - 1;
+			left = position.left + settingLeftPaddings;
 			height = $('.selected li:last-child', obj).height();
 		}
 		else {
-			top = 3 + searchInputTopPaddings;
+			top = settingTopPaddingsInit + settingTopPaddings;
 			height = 0;
 		}
 
@@ -610,14 +613,17 @@ jQuery(function($) {
 			top = top * 2;
 		}
 
-		if (left + searchInputMinWidth > values.width) {
+		if (left + settingMinimumWidth > values.width) {
 			var topPaddings = (height > 20) ? height / 2 : height;
+
+			topPaddings += settingNewLineTopPaddings;
 
 			if (SF) {
 				topPaddings = topPaddings * 2;
 			}
 
 			top += topPaddings;
+			left = 0;
 
 			$('.selected ul', obj).css({
 				'padding-bottom': topPaddings
@@ -632,7 +638,7 @@ jQuery(function($) {
 		$('input[type="text"]', obj).css({
 			'padding-top': top,
 			'padding-left': left,
-			width: values.width - left - searchInputRightPaddings
+			width: values.width - left - settingRightPaddings
 		});
 	}
 

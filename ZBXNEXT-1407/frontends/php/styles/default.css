@@ -942,14 +942,7 @@ fieldset legend { margin: 0.2em 0.5em; }
 	margin: 0 0 0 4px; padding: 2px 0 0 4px; top: 0; left: 0; min-height: 14px; position: absolute; z-index: 10;
 	background: none; border: none; outline: none;
 }
-.multiselect .selected ul {
-	padding: 0 0 0 1px; min-height: 18px; background: #ffffff; border: 1px solid #AAAAAA;
-	background-image: -webkit-gradient(linear, 0 0, 0 100%, color-stop(1%, #EEE), color-stop(15%, #ffffff));
-	background-image: -webkit-linear-gradient(top, #EEE 1%, #ffffff 15%);
-	background-image: -moz-linear-gradient(top, #EEE 1%, #ffffff 15%);
-	background-image: -o-linear-gradient(top, #EEE 1%, #ffffff 15%);
-	background-image: linear-gradient(#EEE 1%, #ffffff 15%);
-}
+.multiselect .selected ul { padding: 0 0 0 1px; min-height: 18px; background: #ffffff; border: 1px solid #AAAAAA; }
 .multiselect .selected ul.active {
 	-webkit-box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
 	-moz-box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
