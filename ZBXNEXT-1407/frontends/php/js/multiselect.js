@@ -145,6 +145,7 @@ jQuery(function($) {
 			// search input
 			if (!options.disabled) {
 				var input = $('<input>', {
+					'class': 'input',
 					type: 'text',
 					value: '',
 					css: {width: values.width}
