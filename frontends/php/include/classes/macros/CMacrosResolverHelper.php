@@ -244,11 +244,12 @@ class CMacrosResolverHelper {
 			}
 		}
 
-		sort($graphIds);
+		sort($graphIds, SORT_NUMERIC);
 		$items = DBfetchArray(DBselect(
 			'SELECT i.hostid,gi.graphid,h.host'.
 			' FROM graphs_items gi,items i,hosts h'.
-			' WHERE gi.itemid=i.itemid AND i.hostid=h.hostid'.
+			' WHERE gi.itemid=i.itemid'.
+				' AND i.hostid=h.hostid'.
 				' AND '.dbConditionInt('gi.graphid', $graphIds).
 			' ORDER BY gi.sortorder'
 		));
