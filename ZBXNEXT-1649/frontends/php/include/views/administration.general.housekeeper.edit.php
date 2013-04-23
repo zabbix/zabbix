@@ -50,7 +50,7 @@ $eventAlertTab->addRow(array(new CLabel(_('Keep network discovery data for (in d
 	'hk_events_discovery'), $houseKeeperEventsDiscovery));
 $eventAlertTab->addRow(array(new CLabel(_('Keep auto-registration data for (in days)'),
 	'hk_events_autoreg'), $houseKeeperEventsAutoreg));
-$eventAlertTab->addClass('border_dotted objectgroup element-row');
+$eventAlertTab->addClass('border_dotted objectgroup element-row element-row-first');
 $houseKeeperTab->addRow(_('Events and alerts'), new CDiv($eventAlertTab));
 
 
@@ -70,7 +70,7 @@ if (!$this->data['config']['hk_services_mode']) {
 }
 $itServicesTab->addRow(array(new CLabel(_('Keep data for (in days)'),
 	'hk_services'), $houseKeeperServicesMode));
-$itServicesTab->addClass('border_dotted objectgroup element-row-second element-row');
+$itServicesTab->addClass('border_dotted objectgroup element-row');
 $houseKeeperTab->addRow(_('IT services'), new CDiv($itServicesTab));
 
 // audit
@@ -89,7 +89,7 @@ if (!$this->data['config']['hk_audit_mode']) {
 }
 $auditTab->addRow(array(new CLabel(_('Keep data for (in days)'),
 	'hk_audit'), $houseKeeperAuditMode));
-$auditTab->addClass('border_dotted objectgroup element-row-second element-row');
+$auditTab->addClass('border_dotted objectgroup element-row');
 $houseKeeperTab->addRow(_('Audit'), new CDiv($auditTab));
 
 // user session
@@ -108,7 +108,7 @@ if (!$this->data['config']['hk_sessions_mode']) {
 }
 $userSessionTab->addRow(array(new CLabel(_('Keep data for (in days)'),
 	'hk_sessions'), $houseKeeperSessionsMode));
-$userSessionTab->addClass('border_dotted objectgroup element-row-second element-row');
+$userSessionTab->addClass('border_dotted objectgroup element-row');
 $houseKeeperTab->addRow(_('User sessions'), new CDiv($userSessionTab));
 
 // history
@@ -129,7 +129,7 @@ $histortTab->addRow(array(new CLabel(_('Override item history period'),
 	'hk_history_global'), $houseKeeperHistoryGlobal));
 $histortTab->addRow(array(new CLabel(_('Keep data for (in days)'),
 	'hk_history'), $houseKeeperHistoryModeGlobal));
-$histortTab->addClass('border_dotted objectgroup element-row-second element-row');
+$histortTab->addClass('border_dotted objectgroup element-row');
 $houseKeeperTab->addRow(_('History'), new CDiv($histortTab));
 
 // trend
@@ -151,7 +151,7 @@ $trendTab->addRow(array(new CLabel(_('Override item trends period'),
 	'hk_trends_global'), $houseKeeperTrendGlobal));
 $trendTab->addRow(array(new CLabel(_('Keep data for (in days)'),
 	'hk_trends'), $houseKeeperTrendModeGlobal));
-$trendTab->addClass('border_dotted objectgroup element-row-second element-row');
+$trendTab->addClass('border_dotted objectgroup element-row');
 $houseKeeperTab->addRow(_('Trends'), new CDiv($trendTab));
 
 $houseKeeperView = new CTabView();
