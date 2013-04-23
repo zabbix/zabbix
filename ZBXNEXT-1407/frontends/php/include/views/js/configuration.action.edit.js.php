@@ -373,7 +373,7 @@
 			jQuery('#opCmdTargetSelect').append(opCmdTargetObject);
 
 			jQuery(opCmdTargetObject).multiSelectHelper({
-				objectName: (opCmdTarget == 'host') ? 'hostsAndTemplates' : 'hostGroup',
+				objectName: (opCmdTarget == 'host') ? 'hosts' : 'hostGroup',
 				name: 'opCmdTargetObjectName',
 				selectedLimit: 1
 			});

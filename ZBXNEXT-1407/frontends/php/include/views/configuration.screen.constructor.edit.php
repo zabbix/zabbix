@@ -304,7 +304,7 @@ elseif (in_array($resourceType, array(SCREEN_RESOURCE_HOSTGROUP_TRIGGERS, SCREEN
 		$screenFormList->addRow(_('Group'), new CMultiSelect(array(
 			'name' => 'resourceid',
 			'objectName' => 'hostGroup',
-			'data' => $data ? array('id' => $data['groupid'], 'name' => $data['name'], 'prefix' => $data['prefix']) : null,
+			'data' => $data ? array(array('id' => $data['groupid'], 'name' => $data['name'], 'prefix' => $data['prefix'])) : null,
 			'selectedLimit' => 1
 		)));
 	}
@@ -326,7 +326,7 @@ elseif (in_array($resourceType, array(SCREEN_RESOURCE_HOSTGROUP_TRIGGERS, SCREEN
 		$screenFormList->addRow(_('Host'), new CMultiSelect(array(
 			'name' => 'resourceid',
 			'objectName' => 'hosts',
-			'data' => $data ? array('id' => $data['hostid'], 'name' => $data['name'], 'prefix' => $data['prefix']) : null,
+			'data' => $data ? array(array('id' => $data['hostid'], 'name' => $data['name'], 'prefix' => $data['prefix'])) : null,
 			'selectedLimit' => 1
 		)));
 	}
@@ -377,31 +377,28 @@ elseif ($resourceType == SCREEN_RESOURCE_EVENTS) {
  * Screen item: Overviews
  */
 elseif (in_array($resourceType, array(SCREEN_RESOURCE_TRIGGERS_OVERVIEW, SCREEN_RESOURCE_DATA_OVERVIEW))) {
-	$caption = '';
-	$id = 0;
+	$data = array();
 
 	if ($resourceId > 0) {
-		$groups = API::HostGroup()->get(array(
+		$data = API::HostGroup()->get(array(
 			'groupids' => $resourceId,
-			'output' => API_OUTPUT_EXTEND,
+			'output' => array('groupid', 'name'),
 			'editable' => true
 		));
-		foreach ($groups as $group) {
-			$caption = get_node_name_by_elid($group['groupid'], true, NAME_DELIMITER).$group['name'];
-			$id = $resourceId;
+
+		if ($data) {
+			$data = reset($data);
+
+			$data['prefix'] = get_node_name_by_elid($data['groupid'], true, NAME_DELIMITER);
 		}
 	}
 
-	$screenFormList->addVar('resourceid', $id);
-	$screenFormList->addRow(_('Group'), array(
-		new CTextBox('caption', $caption, ZBX_TEXTBOX_STANDARD_SIZE, 'yes'),
-		new CButton('select', _('Select'),
-			'javascript: return PopUp("popup.php?srctbl=overview&srcfld1=groupid&srcfld2=name'.
-				'&dstfrm='.$screenForm->getName().'&dstfld1=resourceid&dstfld2=caption'.
-				'&writeonly=1", 800, 450);',
-			'formlist'
-		)
-	));
+	$screenFormList->addRow(_('Group'), new CMultiSelect(array(
+		'name' => 'resourceid',
+		'objectName' => 'hostGroup',
+		'data' => $data ? array(array('id' => $data['groupid'], 'name' => $data['name'], 'prefix' => $data['prefix'])) : null,
+		'selectedLimit' => 1
+	)));
 	$screenFormList->addRow(_('Application'), new CTextBox('application', $application, ZBX_TEXTBOX_STANDARD_SIZE, false, 255));
 }
 
@@ -453,38 +450,29 @@ elseif ($resourceType == SCREEN_RESOURCE_SCREEN) {
  * Screen item: Hosts info
  */
 elseif ($resourceType == SCREEN_RESOURCE_HOSTS_INFO || $resourceType == SCREEN_RESOURCE_TRIGGERS_INFO) {
-	$caption = '';
-	$id = 0;
+	$data = array();
 
-	if (remove_nodes_from_id($resourceId) > 0) {
-		$groups = API::HostGroup()->get(array(
+	if ($resourceId > 0) {
+		$data = API::HostGroup()->get(array(
 			'groupids' => $resourceId,
 			'nodeids' => get_current_nodeid(true),
-			'output' => array('name'),
-			'preservekeys' => true
+			'output' => array('groupid', 'name')
 		));
-		if ($group = reset($groups)) {
-			$caption = get_node_name_by_elid($resourceId, true, NAME_DELIMITER).$group['name'];
-			$id = $resourceId;
-		}
-	}
-	elseif (remove_nodes_from_id($resourceId) == 0) {
-		if ($nodeName = get_node_name_by_elid($resourceId, true, NAME_DELIMITER)) {
-			$caption = $nodeName._('- all groups -');
-			$id = $resourceId;
+
+		if ($data) {
+			$data = reset($data);
+
+			$data['prefix'] = get_node_name_by_elid($data['groupid'], true, NAME_DELIMITER);
 		}
 	}
 
-	$screenFormList->addVar('resourceid', $id);
-	$screenFormList->addRow(_('Group'), array(
-		new CTextBox('caption', $caption, ZBX_TEXTBOX_STANDARD_SIZE, 'yes'),
-		new CButton('select', _('Select'),
-			'javascript: return PopUp("popup.php?srctbl=host_group_scr&srcfld1=groupid&srcfld2=name'.
-				'&dstfrm='.$screenForm->getName().'&dstfld1=resourceid&dstfld2=caption'.
-				'&writeonly=1", 480, 450);',
-			'formlist'
-		)
-	));
+	$screenFormList->addRow(_('Group'), new CMultiSelect(array(
+		'name' => 'resourceid',
+		'objectName' => 'hostGroup',
+		'data' => $data ? array(array('id' => $data['groupid'], 'name' => $data['name'], 'prefix' => $data['prefix'])) : null,
+		'defaultValue' => 0,
+		'selectedLimit' => 1
+	)));
 }
 
 /*
