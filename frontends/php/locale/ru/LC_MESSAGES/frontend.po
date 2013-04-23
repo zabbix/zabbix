@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-04-23 13:57+0300\n"
-"PO-Revision-Date: 2013-02-20 13:54+0200\n"
+"POT-Creation-Date: 2013-04-23 14:01+0300\n"
+"PO-Revision-Date: 2013-04-03 08:36+0200\n"
 "Last-Translator: dotneft <dotneft@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: ru\n"
@@ -82,7 +82,7 @@ msgstr "(0 - бесконечно)"
 #: include/views/configuration.hostgroups.list.php:31
 #: include/views/configuration.template.edit.php:143
 msgid "(Only super admins can create groups)"
-msgstr ""
+msgstr "(Только Супер-Администраторы могут создавать группы)"
 
 #: include/forms.inc.php:548 include/forms.inc.php:563
 msgid "(in days)"
@@ -580,12 +580,12 @@ msgstr "Группа элементов данных"
 #: api/classes/managers/CApplicationManager.php:218
 #, php-format
 msgid "Application \"%1$s\" already exists on \"%2$s\", inherited from another template."
-msgstr ""
+msgstr "Группа элементов данных \"%1$s\" уже существует у \"%2$s\", она унаследована от другого шаблона."
 
 #: api/classes/managers/CApplicationManager.php:209
 #, php-format
 msgid "Application \"%1$s\" already exists on \"%2$s\"."
-msgstr ""
+msgstr "Группа элементов данных \"%1$s\" уже существует у \"%2$s\"."
 
 #: api/classes/CApplication.php:372
 #, php-format
@@ -2388,7 +2388,7 @@ msgstr "Настройка правил обнаружения"
 
 #: graphs.php:26
 msgid "Configuration of graph prototypes"
-msgstr ""
+msgstr "Настройка прототипов графиков"
 
 #: graphs.php:26
 msgid "Configuration of graphs"
@@ -3830,7 +3830,7 @@ msgstr "Правило обнаружения"
 #: api/classes/CDiscoveryRule.php:39
 #, php-format
 msgid "Discovery rule \"%1$s\" already exists on \"%2$s\""
-msgstr ""
+msgstr "Правило обнаружения \"%1$s\" уже существует у \"%2$s\""
 
 #: api/classes/CDiscoveryRule.php:38
 #, php-format
@@ -4900,7 +4900,7 @@ msgstr "Имя графика"
 
 #: include/views/configuration.graph.edit.php:279
 msgid "Graph prototype"
-msgstr ""
+msgstr "Прототип графиков"
 
 #: api/classes/CGraphPrototype.php:35
 #, php-format
@@ -5178,7 +5178,7 @@ msgstr "Скрыть выбранное"
 
 #: include/views/monitoring.dashconf.php:62
 msgid "Hide selected groups"
-msgstr ""
+msgstr "Скрыть выбранные группы"
 
 #: adm.triggerseverities.php:62
 #: include/views/administration.general.triggerSeverity.edit.php:58
@@ -6690,7 +6690,7 @@ msgstr "Элемент данных"
 #: api/classes/CItemGeneral.php:102
 #, php-format
 msgid "Item \"%1$s\" already exists on \"%2$s\""
-msgstr ""
+msgstr "Элемент данных \"%1$s\" уже существует у \"%2$s\""
 
 #: api/classes/CItemGeneral.php:101 api/classes/CItem.php:34
 #, php-format
@@ -6700,7 +6700,7 @@ msgstr "Элемент данных \"%1$s\" уже существует у \"%2
 #: api/classes/CItem.php:35
 #, php-format
 msgid "Item \"%1$s\" already exists on \"%2$s\"."
-msgstr ""
+msgstr "Элемент данных \"%1$s\" уже существует у \"%2$s\"."
 
 #: api/classes/CItem.php:929
 #, php-format
@@ -6760,12 +6760,12 @@ msgstr "Прототип элемента данных"
 #: api/classes/CItemPrototype.php:36
 #, php-format
 msgid "Item prototype \"%1$s\" already exists on \"%2$s\""
-msgstr ""
+msgstr "Прототип элемента данных \"%1$s\" уже существует у \"%2$s\""
 
 #: api/classes/CItemPrototype.php:35
 #, php-format
 msgid "Item prototype \"%1$s\" already exists on \"%2$s\", inherited from another template."
-msgstr ""
+msgstr "Прототип элемента данных \"%1$s\" уже существует у \"%2$s\", унаследован из другого шаблона."
 
 #: include/html.inc.php:428 include/html.inc.php:432
 #: include/views/configuration.host.discovery.list.php:91
@@ -7265,7 +7265,7 @@ msgstr "Список пустой"
 
 #: include/locales.inc.php:58
 msgid "Lithuanian (lt_LT)"
-msgstr ""
+msgstr "Литовский (lt_LT)"
 
 #: dashboard.php:327 dashboard.php:335 dashboard.php:342 dashboard.php:349
 #: dashboard.php:356 dashboard.php:371 include/views/monitoring.slides.php:108
