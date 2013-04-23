@@ -246,7 +246,6 @@ if (!$this->data['is_discovery_rule']) {
 
 		$multiplierCheckBox = new CCheckBox('multiplier', $this->data['multiplier'] == 1 ? 'yes':'no');
 		$multiplierCheckBox->setAttribute('disabled', 'disabled');
-		$multiplierCheckBox->setAttribute('style', 'vertical-align: middle;');
 		$multiplier[] = $multiplierCheckBox;
 
 		$multiplier[] = SPACE;
@@ -258,7 +257,6 @@ if (!$this->data['is_discovery_rule']) {
 		$multiplierCheckBox = new CCheckBox('multiplier', $this->data['multiplier'] == 1 ? 'yes': 'no',
 			'var editbx = document.getElementById(\'formula\'); if (editbx) { editbx.disabled = !this.checked; }', 1
 		);
-		$multiplierCheckBox->setAttribute('style', 'vertical-align: middle;');
 		$multiplier[] = $multiplierCheckBox;
 		$multiplier[] = SPACE;
 		$formulaTextBox = new CTextBox('formula', $this->data['formula'], ZBX_TEXTBOX_SMALL_SIZE);
@@ -353,9 +351,50 @@ if ($this->data['is_discovery_rule']) {
 		false, 'row_trapper_hosts');
 }
 else {
-	// append keep history to form list
-	$itemFormList->addRow(_('Keep history (in days)'), new CNumericBox('history', $this->data['history'], 8));
-	$itemFormList->addRow(_('Keep trends (in days)'), new CNumericBox('trends', $this->data['trends'], 8), false, 'row_trends');
+	$dataConfig = select_config();
+	$keepHistory = array();
+	$keepHistory[] =  new CNumericBox('history', $this->data['history'], 8);
+	if ($dataConfig['hk_history_global'] && !$data['parent_discoveryid'] && !$data['is_template']) {
+		$keepHistory[] = SPACE;
+		if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
+			$keepHistory[] = new CSpan(_x('Overridden by', 'item_form'));
+			$keepHistory[] = SPACE;
+			$link = new CLink(_x('global housekeeper settings', 'item_form'), 'adm.housekeeper.php');
+			$link->setAttribute('target', '_blank');
+			$keepHistory[] =  $link;
+			$keepHistory[] = SPACE;
+			$keepHistory[] = new CSpan('('._n('%1$s day', '%1$s days', $dataConfig['hk_history']).')');
+		}
+		else {
+			$keepHistory[] = new CSpan(
+				_('Overriden by global housekeeper settings').'('._n('%1$s day', '%1$s days', $dataConfig['hk_history']).')'
+			);
+		}
+	}
+	$itemFormList->addRow(_('Keep history (in days)'), $keepHistory);
+
+	$keepTrend = array();
+	$keepTrend[] =  new CNumericBox('trends', $this->data['trends'], 8);
+	if ($dataConfig['hk_trends_global'] && !$data['parent_discoveryid'] && !$data['is_template']) {
+		$keepTrend[] = SPACE;
+		if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
+			$keepTrend[] = new CSpan(_x('Overridden by', 'item_form'));
+			$keepTrend[] = SPACE;
+			$link = new CLink(_x('global housekeeper settings', 'item_form'), 'adm.housekeeper.php');
+			$link->setAttribute('target', '_blank');
+			$keepTrend[] =  $link;
+			$keepTrend[] = SPACE;
+			$keepTrend[] = new CSpan('('. _n($dataConfig['hk_trends'].' day',
+				$dataConfig['hk_trends'].' days', $dataConfig['hk_trends']). ')');
+		}
+		else {
+			$keepTrend[] = new CSpan(
+				_('Overriden by global housekeeper settings').'('._n('%1$s day', '%1$s days', $dataConfig['hk_trends']).')'
+			);
+		}
+	}
+
+	$itemFormList->addRow(_('Keep trends (in days)'), $keepTrend, false, 'row_trends');
 	$itemFormList->addRow(_('Log time format'),
 		new CTextBox('logtimefmt', $this->data['logtimefmt'], ZBX_TEXTBOX_SMALL_SIZE, $this->data['limited'], 64),
 		false, 'row_logtimefmt'
@@ -441,7 +480,6 @@ $itemFormList->addRow(_('Description'), $description);
 
 // status
 $enabledCheckBox = new CCheckBox('status', !$this->data['status'], null, ITEM_STATUS_ACTIVE);
-$enabledCheckBox->addStyle('vertical-align: middle;');
 $itemFormList->addRow(_('Enabled'), $enabledCheckBox);
 
 // append tabs to form

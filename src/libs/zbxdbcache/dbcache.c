@@ -1149,8 +1149,11 @@ static void	DCmass_update_items(ZBX_DC_HISTORY *history, int history_num)
 	zbx_vector_uint64_t	ids;
 	int			i;
 	unsigned char		inventory_link;
+	zbx_config_hk_t		config_hk;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	DCconfig_get_config_hk(&config_hk);
 
 	zbx_vector_uint64_create(&ids);
 	zbx_vector_uint64_reserve(&ids, history_num);
@@ -1226,11 +1229,14 @@ static void	DCmass_update_items(ZBX_DC_HISTORY *history, int history_num)
 		}
 		else
 			item.prevorgvalue_null = 1;
+
 		item.delta = atoi(row[4]);
 		item.multiplier = atoi(row[5]);
 		item.formula = row[6];
-		item.history = atoi(row[7]);
-		item.trends = atoi(row[8]);
+
+		item.history = (ZBX_HK_OPTION_ENABLED == config_hk.history_global ? config_hk.history : atoi(row[7]));
+		item.trends = (ZBX_HK_OPTION_ENABLED == config_hk.trends_global ? config_hk.trends : atoi(row[8]));
+
 		ZBX_STR2UINT64(item.hostid, row[10]);
 
 		if (SUCCEED != DBis_null(row[12]) && HOST_INVENTORY_AUTOMATIC == (unsigned char)atoi(row[12]))
