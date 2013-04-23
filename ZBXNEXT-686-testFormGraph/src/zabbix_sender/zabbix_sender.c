@@ -149,7 +149,10 @@ static int	check_response(char *response)
 		ret = FAIL;
 
 	if (SUCCEED == ret && SUCCEED == zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_INFO, info, sizeof(info)))
+	{
 		printf("info from server: \"%s\"\n", info);
+		fflush(stdout);
+	}
 
 	return ret;
 }

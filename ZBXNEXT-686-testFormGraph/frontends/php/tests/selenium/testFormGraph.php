@@ -55,22 +55,26 @@ class testFormItem extends CWebTest {
 				array(
 					'ymin_type' => 'Fixed',
 					'ymax_type' => 'Item',
+					'host' => 'Simple form test host'
 				)
 			),
 			array(
 				array(
 					'graphtype' => 'Normal',
+					'host' => 'Simple form test host'
 				)
 			),
 			array(
 				array(
 					'graphtype' => 'Stacked',
+					'host' => 'Simple form test host'
 				)
 			),
 			array(
 				array(
 					'graphtype' => 'Stacked',
 					'ymin_type' => 'Fixed' ,
+					'host' => 'Simple form test host'
 				)
 			),
 			array(
@@ -78,6 +82,7 @@ class testFormItem extends CWebTest {
 					'graphtype' => 'Stacked',
 					'ymin_type' => 'Item',
 					'ymax_type' => 'Fixed',
+					'host' => 'Simple form test host'
 				)
 			),
 			array(
@@ -85,16 +90,74 @@ class testFormItem extends CWebTest {
 					'graphtype' => 'Stacked',
 					'ymin_type' => 'Item',
 					'ymax_type' => 'Item',
+					'host' => 'Simple form test host'
 				)
 			),
 			array(
 				array(
 					'graphtype' => 'Pie',
+					'host' => 'Simple form test host'
 				)
 			),
 			array(
 				array(
 					'graphtype' => 'Exploded',
+					'host' => 'Simple form test host'
+				)
+			),
+//
+			array(
+				array(
+					'ymin_type' => 'Fixed',
+					'ymax_type' => 'Item',
+					'template' => 'Inheritance test template'
+				)
+			),
+			array(
+				array(
+					'graphtype' => 'Normal',
+					'template' => 'Inheritance test template'
+				)
+			),
+			array(
+				array(
+					'graphtype' => 'Stacked',
+					'template' => 'Inheritance test template'
+				)
+			),
+			array(
+				array(
+					'graphtype' => 'Stacked',
+					'ymin_type' => 'Fixed' ,
+					'template' => 'Inheritance test template'
+				)
+			),
+			array(
+				array(
+					'graphtype' => 'Stacked',
+					'ymin_type' => 'Item',
+					'ymax_type' => 'Fixed',
+					'template' => 'Inheritance test template'
+				)
+			),
+			array(
+				array(
+					'graphtype' => 'Stacked',
+					'ymin_type' => 'Item',
+					'ymax_type' => 'Item',
+					'template' => 'Inheritance test template'
+				)
+			),
+			array(
+				array(
+					'graphtype' => 'Pie',
+					'template' => 'Inheritance test template'
+				)
+			),
+			array(
+				array(
+					'graphtype' => 'Exploded',
+					'template' => 'Inheritance test template'
 				)
 			)
 		);

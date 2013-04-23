@@ -180,6 +180,24 @@ A......... [ZBX-5498] applications API refactoring (Vedmak)
 ..F....... [ZBX-1845] added tabs to host massupdate form (Vedmak)
 
 --------------------------------------------------------------------------------
+Changes for 2.0.7rc1
+
+New features:
+
+A.F....... [ZBX-1357] updated Spanish and Turkish translations; thanks to Zabbix translators (Richlv)
+
+Bug fixes:
+...G...... [ZBX-6285] fixed message output from Zabbix sender (Andris)
+..F....... [ZBX-6484] fixed bar report calculation (Oleg)
+..F....... [ZBX-1236] added graph right side in bar reports (Oleg)
+..F....... [ZBX-6498] fixed date format in update query for maintenance daily period (Oleg)
+
+--------------------------------------------------------------------------------
+Changes for 2.0.6
+
+2.0.6rc1 was released as 2.0.6 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 2.0.6rc1
 
 New features:
@@ -1471,6 +1489,8 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.17rc1
 
+..F....... [ZBX-6484] fixed bar report calculation (Oleg)
+..F....... [ZBX-1236] added graph right side in bar reports (Oleg)
 ..F....... [ZBX-6474] fixed {ITEM.VALUE} macros expand in trigger names (Oleg)
 ...G...PS. [ZBX-6342] fixed LDAP check that caused server crash when LDAP is running but no DIT has been defined (Aleksej)
 ..F....... [ZBX-6329] fixed form with "0" in trigger expression parser (Eduard)
