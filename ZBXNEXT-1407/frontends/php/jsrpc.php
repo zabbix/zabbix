@@ -261,12 +261,15 @@ switch ($data['method']) {
 
 			case 'hosts':
 				$hosts = API::Host()->get(array(
-					'templated_hosts' => isset($data['templated_hosts']) ? $data['templated_hosts'] : null,
 					'editable' => isset($data['editable']) ? $data['editable'] : null,
-					'output' => array('templateid', 'name'),
+					'output' => array('hostid', 'name'),
 					'startSearch' => true,
 					'search' => isset($data['search']) ? array('name' => $data['search']) : null,
 					'limit' => isset($data['limit']) ? $data['limit'] : null
+				));
+
+				CArrayHelper::sort($hosts, array(
+					array('field' => 'name', 'order' => ZBX_SORT_UP)
 				));
 
 				foreach ($hosts as $host) {
@@ -279,25 +282,18 @@ switch ($data['method']) {
 				break;
 
 			case 'hostsAndTemplates':
-				$options = array(
+				$hosts = API::Host()->get(array(
+					'templated_hosts' => true,
 					'editable' => isset($data['editable']) ? $data['editable'] : null,
-					'output' => array('templateid', 'name'),
+					'output' => array('hostid', 'name'),
 					'startSearch' => true,
 					'search' => isset($data['search']) ? array('name' => $data['search']) : null,
 					'limit' => isset($data['limit']) ? $data['limit'] : null
-				);
+				));
 
-				// get templates
-				$templates = API::Template()->get($options);
-				foreach ($templates as $tnum => $template) {
-					$templates[$tnum]['hostid'] = $template['templateid'];
-				}
-
-				// get hosts
-				$options['templated_hosts'] = isset($data['templated_hosts']) ? $data['templated_hosts'] : null;
-				$hosts = API::Host()->get($options);
-
-				$hosts = array_merge($hosts, $templates);
+				CArrayHelper::sort($hosts, array(
+					array('field' => 'name', 'order' => ZBX_SORT_UP)
+				));
 
 				foreach ($hosts as $host) {
 					$result[] = array(
@@ -308,13 +304,17 @@ switch ($data['method']) {
 				}
 				break;
 
-			case 'hostTemplates':
+			case 'templates':
 				$templates = API::Template()->get(array(
 					'editable' => isset($data['editable']) ? $data['editable'] : null,
 					'output' => array('templateid', 'name'),
 					'startSearch' => true,
 					'search' => isset($data['search']) ? array('name' => $data['search']) : null,
 					'limit' => isset($data['limit']) ? $data['limit'] : null
+				));
+
+				CArrayHelper::sort($templates, array(
+					array('field' => 'name', 'order' => ZBX_SORT_UP)
 				));
 
 				foreach ($templates as $template) {

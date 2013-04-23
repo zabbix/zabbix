@@ -144,7 +144,7 @@ switch ($this->data['new_condition']['conditiontype']) {
 		$rowCondition[] = new CDiv(new CMultiSelect(array(
 			'name' => 'new_condition[value]',
 			'selectedLimit' => 1,
-			'objectName' => 'hostTemplates',
+			'objectName' => 'templates',
 			'objectOptions' => array(
 				'editable' => true
 			),
@@ -156,7 +156,7 @@ switch ($this->data['new_condition']['conditiontype']) {
 		$rowCondition[] = new CDiv(new CMultiSelect(array(
 			'name' => 'new_condition[value]',
 			'selectedLimit' => 1,
-			'objectName' => 'hostsAndTemplates',
+			'objectName' => 'hosts',
 			'objectOptions' => array(
 				'editable' => true
 			),
@@ -822,9 +822,8 @@ if (!empty($this->data['new_operation'])) {
 			$templateList->addRow(new CRow(
 				new CCol(array(
 					new CMultiSelect(array(
-						'name' => 'descoveryTemplates',
-						'objectName' => 'hostsAndTemplates',
-						'objectOptions' => array('templated_hosts' => 1)
+						'name' => 'discoveryTemplates',
+						'objectName' => 'hostsAndTemplates'
 					)),
 					new CButton('add', _('Add'), 'return addDiscoveryTemplates();', 'link_menu')
 				), null, 2),

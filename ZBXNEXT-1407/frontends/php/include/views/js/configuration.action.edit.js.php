@@ -511,7 +511,7 @@
 	}
 
 	function addDiscoveryTemplates() {
-		var values = jQuery('#descoveryTemplates').multiSelect.getData();
+		var values = jQuery('#discoveryTemplates').multiSelect.getData();
 
 		for (var key in values) {
 			var data = values[key];
