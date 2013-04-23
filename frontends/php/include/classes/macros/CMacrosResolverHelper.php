@@ -219,6 +219,8 @@ class CMacrosResolverHelper {
 	/**
 	 * Resolve positional macros and functional item macros, for example, {{HOST.HOST1}:key.func(param)}.
 	 *
+	 *  ! if same graph will be passed more than once only name for first entry will be resolved.
+	 *
 	 * @param array		$data				list or hashmap of graphs
 	 * @param int		$data[]['graphid']	id of graph
 	 * @param string	$data[]['name']		name of graph
@@ -232,7 +234,7 @@ class CMacrosResolverHelper {
 		$graphMap = array();
 		foreach ($data as $graph) {
 			// skip graphs without macros
-			if (strpos($graph['name'], '{')) {
+			if (strpos($graph['name'], '{') !== false) {
 				$graphMap[$graph['graphid']] = array(
 					'graphid' => $graph['graphid'],
 					'name' => $graph['name'],
@@ -242,6 +244,7 @@ class CMacrosResolverHelper {
 			}
 		}
 
+		sort($graphIds);
 		$items = DBfetchArray(DBselect(
 			'SELECT i.hostid,gi.graphid,h.host'.
 			' FROM graphs_items gi,items i,hosts h'.
