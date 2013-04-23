@@ -963,6 +963,163 @@ static int	DBpatch_02010050()
 	return SUCCEED;
 }
 
+static int	DBpatch_02010051()
+{
+	const ZBX_FIELD field = {"hk_events_mode", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("config", &field);
+}
+
+static int	DBpatch_02010052()
+{
+	const ZBX_FIELD field = {"hk_events_trigger", "365", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("config", &field);
+}
+
+static int	DBpatch_02010053()
+{
+	const ZBX_FIELD field = {"hk_events_internal", "365", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("config", &field);
+}
+
+static int	DBpatch_02010054()
+{
+	const ZBX_FIELD field = {"hk_events_discovery", "365", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("config", &field);
+}
+
+static int	DBpatch_02010055()
+{
+	const ZBX_FIELD field = {"hk_events_autoreg", "365", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("config", &field);
+}
+
+static int	DBpatch_02010056()
+{
+	const ZBX_FIELD field = {"hk_services_mode", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("config", &field);
+}
+
+static int	DBpatch_02010057()
+{
+	const ZBX_FIELD field = {"hk_services", "365", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("config", &field);
+}
+
+static int	DBpatch_02010058()
+{
+	const ZBX_FIELD field = {"hk_audit_mode", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("config", &field);
+}
+
+static int	DBpatch_02010059()
+{
+	const ZBX_FIELD field = {"hk_audit", "365", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("config", &field);
+}
+
+static int	DBpatch_02010060()
+{
+	const ZBX_FIELD field = {"hk_sessions_mode", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("config", &field);
+}
+
+static int	DBpatch_02010061()
+{
+	const ZBX_FIELD field = {"hk_sessions", "365", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("config", &field);
+}
+
+static int	DBpatch_02010062()
+{
+	const ZBX_FIELD field = {"hk_history_mode", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("config", &field);
+}
+
+static int	DBpatch_02010063()
+{
+	const ZBX_FIELD field = {"hk_history_global", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("config", &field);
+}
+
+static int	DBpatch_02010064()
+{
+	const ZBX_FIELD field = {"hk_history", "90", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("config", &field);
+}
+
+static int	DBpatch_02010065()
+{
+	const ZBX_FIELD field = {"hk_trends_mode", "1 ", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("config", &field);
+}
+
+static int	DBpatch_02010066()
+{
+	const ZBX_FIELD field = {"hk_trends_global", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("config", &field);
+}
+
+static int	DBpatch_02010067()
+{
+	const ZBX_FIELD field = {"hk_trends", "365", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("config", &field);
+}
+
+static int	DBpatch_02010068()
+{
+	if (ZBX_DB_OK <= DBexecute(
+			"update config"
+			" set hk_events_mode=0,"
+				"hk_services_mode=0,"
+				"hk_audit_mode=0,"
+				"hk_sessions_mode=0,"
+				"hk_history_mode=0,"
+				"hk_trends_mode=0,"
+				"hk_events_trigger="
+					"case when event_history>alert_history"
+					" then event_history else alert_history end,"
+				"hk_events_discovery="
+					"case when event_history>alert_history"
+					" then event_history else alert_history end,"
+				"hk_events_autoreg="
+					"case when event_history>alert_history"
+					" then event_history else alert_history end,"
+				"hk_events_internal="
+					"case when event_history>alert_history"
+					" then event_history else alert_history end"))
+	{
+		return SUCCEED;
+	}
+
+	return FAIL;
+}
+
+static int	DBpatch_02010069()
+{
+	return DBdrop_field("config", "event_history");
+}
+
+static int	DBpatch_02010070()
+{
+	return DBdrop_field("config", "alert_history");
+}
 #endif	/* not HAVE_SQLITE3 */
 
 static void	DBget_version(int *mandatory, int *optional)
@@ -1051,11 +1208,31 @@ int	DBcheck_version()
 		{DBpatch_02010048, 2010048, 0, 0},
 		{DBpatch_02010049, 2010049, 0, 0},
 		{DBpatch_02010050, 2010050, 0, 1},
+		{DBpatch_02010051, 2010051, 0, 1},
+		{DBpatch_02010052, 2010052, 0, 1},
+		{DBpatch_02010053, 2010053, 0, 1},
+		{DBpatch_02010054, 2010054, 0, 1},
+		{DBpatch_02010055, 2010055, 0, 1},
+		{DBpatch_02010056, 2010056, 0, 1},
+		{DBpatch_02010057, 2010057, 0, 1},
+		{DBpatch_02010058, 2010058, 0, 1},
+		{DBpatch_02010059, 2010059, 0, 1},
+		{DBpatch_02010060, 2010060, 0, 1},
+		{DBpatch_02010061, 2010061, 0, 1},
+		{DBpatch_02010062, 2010062, 0, 1},
+		{DBpatch_02010063, 2010063, 0, 1},
+		{DBpatch_02010064, 2010064, 0, 1},
+		{DBpatch_02010065, 2010065, 0, 1},
+		{DBpatch_02010066, 2010066, 0, 1},
+		{DBpatch_02010067, 2010067, 0, 1},
+		{DBpatch_02010068, 2010068, 0, 1},
+		{DBpatch_02010069, 2010069, 0, 0},
+		{DBpatch_02010070, 2010070, 0, 0},
 		/* IMPORTANT! When adding a new mandatory DBPatch don't forget to update it for SQLite, too. */
 		{NULL}
 	};
 #else
-	required = 2010050;	/* <---- Update mandatory DBpatch for SQLite here. */
+	required = 2010068;	/* <---- Update mandatory DBpatch for SQLite here. */
 #endif
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
