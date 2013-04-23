@@ -367,8 +367,7 @@
 
 			var opCmdTargetObject = jQuery('<div>', {
 				id: 'opCmdTargetObject',
-				'class': 'multiselect',
-				css: {width: <?php echo ZBX_MULTISELECT_SMALL_WIDTH; ?>}
+				'class': 'multiselect'
 			});
 
 			jQuery('#opCmdTargetSelect').append(opCmdTargetObject);

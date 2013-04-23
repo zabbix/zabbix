@@ -78,13 +78,13 @@
 			<tr id="hostGroupSelectRow">
 				<td><?php echo _('Host group'); ?></td>
 				<td>
-					<div id="elementNameHostGroup" class="multiselect" style="width: <?php echo ZBX_MULTISELECT_STANDARD_WIDTH; ?>px;"></div>
+					<div id="elementNameHostGroup" class="multiselect"></div>
 				</td>
 			</tr>
 			<tr id="hostSelectRow">
 				<td><?php echo _('Host'); ?></td>
 				<td>
-					<div id="elementNameHost" class="multiselect" style="width: <?php echo ZBX_MULTISELECT_STANDARD_WIDTH; ?>px;"></div>
+					<div id="elementNameHost" class="multiselect"></div>
 				</td>
 			</tr>
 			<tr id="triggerSelectRow">

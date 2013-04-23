@@ -29,24 +29,12 @@ class CMultiSelect extends CTag {
 	 * @param string $options['defaultValue']
 	 * @param bool   $options['disabled']
 	 * @param int    $options['selectedLimit']
-	 * @param int    $options['width']
 	 * @param int    $options['limit']
 	 */
 	public function __construct(array $options = array()) {
 		parent::__construct('div', 'yes');
 		$this->attr('id', zbx_formatDomId($options['name']));
-		$this->addStyle('width: '.(isset($options['width']) ? $options['width'] : ZBX_MULTISELECT_STANDARD_WIDTH).'px;');
 		$this->addClass('multiselect');
-
-		// data
-		$data = '[]';
-		if (!empty($options['data'])) {
-			$options['data'] = zbx_toArray($options['data']);
-
-			$json = new CJSON();
-
-			$data = $json->encode($options['data']);
-		}
 
 		// url
 		$url = new Curl('jsrpc.php');
@@ -67,7 +55,7 @@ class CMultiSelect extends CTag {
 				emptyResult: "'._('No matches found').'",
 				moreMatchesFound: "'._('More matches found...').'"
 			},
-			data: '.$data.',
+			data: '.(empty($options['data']) ? '[]' : CJs::encodeJson($options['data'])).',
 			defaultValue: '.(isset($options['defaultValue']) ? $options['defaultValue'] : 'null').',
 			disabled: '.(empty($options['disabled']) ? 'false' : 'true').',
 			selectedLimit: '.(isset($options['selectedLimit']) ? $options['selectedLimit'] : 'null').',

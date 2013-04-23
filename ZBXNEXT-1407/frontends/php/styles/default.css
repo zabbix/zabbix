@@ -937,7 +937,7 @@ fieldset legend { margin: 0.2em 0.5em; }
 .flickerfreescreen .shadow { background-color: #000000; }
 
 /* multiselect */
-.multiselect { margin: 1px 2px 1px 1px; position: relative; }
+.multiselect { margin: 1px 2px 1px 1px; width: 320px; position: relative; }
 .multiselect input[type="text"] {
 	margin: 0 0 0 4px; padding: 2px 0 0 4px; top: 0; left: 0; min-height: 14px; position: absolute; z-index: 10;
 	background: none; border: none; outline: none;
