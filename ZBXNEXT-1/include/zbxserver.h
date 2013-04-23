@@ -27,9 +27,8 @@
 
 #define TRIGGER_EPSILON	0.000001
 
-#define MACRO_TYPE_MESSAGE_SUBJECT	0x0001
-#define MACRO_TYPE_MESSAGE_BODY		0x0002
-#define MACRO_TYPE_MESSAGE		0x0003	/* (MACRO_TYPE_MESSAGE_SUBJECT | MACRO_TYPE_MESSAGE_BODY) */
+#define MACRO_TYPE_MESSAGE_NORMAL	0x0001
+#define MACRO_TYPE_MESSAGE_RECOVERY	0x0002
 #define MACRO_TYPE_TRIGGER_URL		0x0004
 #define MACRO_TYPE_TRIGGER_EXPRESSION	0x0008
 #define MACRO_TYPE_TRIGGER_DESCRIPTION	0x0010	/* name */
@@ -48,8 +47,9 @@
 
 int	evaluate_function(char *value, DB_ITEM *item, const char *function, const char *parameters, time_t now);
 
-int	substitute_simple_macros(DB_EVENT *event, zbx_uint64_t *userid, zbx_uint64_t *hostid, DC_HOST *dc_host,
-		DC_ITEM *dc_item, DB_ESCALATION *escalation, char **data, int macro_type, char *error, int maxerrlen);
+int	substitute_simple_macros(zbx_uint64_t *actionid, DB_EVENT *event, DB_EVENT *r_event, zbx_uint64_t *userid,
+		zbx_uint64_t *hostid, DC_HOST *dc_host, DC_ITEM *dc_item, DB_ESCALATION *escalation, char **data,
+		int macro_type, char *error, int maxerrlen);
 
 void	evaluate_expressions(zbx_vector_ptr_t *triggers);
 int	evaluate(double *value, char *exp, char *error, int maxerrlen);

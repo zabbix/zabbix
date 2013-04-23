@@ -1149,6 +1149,12 @@ return array(
 				'length' => 10,
 				'default' => '0',
 			),
+			'state' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0',
+			),
 		),
 	),
 	'httpstepitem' => array(
@@ -1967,18 +1973,6 @@ return array(
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
 			),
-			'alert_history' => array(
-				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '0',
-			),
-			'event_history' => array(
-				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '0',
-			),
 			'refresh_unsupported' => array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
@@ -2239,6 +2233,108 @@ return array(
 				'length' => 10,
 				'default' => '10',
 			),
+			'hk_events_mode' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '1',
+			),
+			'hk_events_trigger' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '365',
+			),
+			'hk_events_internal' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '365',
+			),
+			'hk_events_discovery' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '365',
+			),
+			'hk_events_autoreg' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '365',
+			),
+			'hk_services_mode' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '1',
+			),
+			'hk_services' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '365',
+			),
+			'hk_audit_mode' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '1',
+			),
+			'hk_audit' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '365',
+			),
+			'hk_sessions_mode' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '1',
+			),
+			'hk_sessions' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '365',
+			),
+			'hk_history_mode' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '1',
+			),
+			'hk_history_global' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0',
+			),
+			'hk_history' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '90',
+			),
+			'hk_trends_mode' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '1',
+			),
+			'hk_trends_global' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0',
+			),
+			'hk_trends' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '365',
+			),
 		),
 	),
 	'triggers' => array(
@@ -2316,7 +2412,7 @@ return array(
 				'length' => 10,
 				'default' => '0',
 			),
-			'value_flags' => array(
+			'state' => array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
@@ -4345,7 +4441,7 @@ return array(
 				'length' => 10,
 				'default' => '0',
 			),
-			'status' => array(
+			'state' => array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
@@ -4984,6 +5080,13 @@ return array(
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
 				'default' => '0',
+			),
+			'itemid' => array(
+				'null' => true,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'items',
+				'ref_field' => 'itemid',
 			),
 		),
 	),
