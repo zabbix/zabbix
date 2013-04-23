@@ -89,7 +89,7 @@
 					<option value="hostGroup"><?php echo CHtml::encode(_('Host group')); ?></option>
 				</select>
 			</td>
-			<td>
+			<td style="padding-left: 0;">
 				<div id="opCmdTargetSelect" class="inlineblock">
 					<input name="action" type="hidden" value="#{action}" />
 					<input name="opCmdId" type="hidden" value="#{opcmdid}" />

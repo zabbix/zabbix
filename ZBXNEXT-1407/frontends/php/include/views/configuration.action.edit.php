@@ -823,7 +823,7 @@ if (!empty($this->data['new_operation'])) {
 				new CCol(array(
 					new CMultiSelect(array(
 						'name' => 'discoveryTemplates',
-						'objectName' => 'hostsAndTemplates'
+						'objectName' => 'templates'
 					)),
 					new CButton('add', _('Add'), 'return addDiscoveryTemplates();', 'link_menu')
 				), null, 2),
