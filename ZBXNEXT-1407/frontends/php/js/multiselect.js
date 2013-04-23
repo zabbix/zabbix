@@ -369,7 +369,10 @@ jQuery(function($) {
 			}
 
 			// preload data
-			if (!empty(options.data)) {
+			if (empty(options.data)) {
+				setDefaultValue(obj, options);
+			}
+			else {
 				loadSelected(options.data, obj, values, options);
 			}
 
@@ -378,6 +381,19 @@ jQuery(function($) {
 			resizeAvailable(obj);
 		});
 	};
+
+	function setDefaultValue(obj, options) {
+		obj.append($('<input>', {
+			type: 'hidden',
+			name: options.name,
+			value: '',
+			'data-default': 1
+		}));
+	}
+
+	function removeDefaultValue(obj) {
+		$('input[data-default="1"]', obj).remove();
+	}
 
 	function loadSelected(data, obj, values, options) {
 		$.each(data, function(i, item) {
@@ -425,6 +441,8 @@ jQuery(function($) {
 
 	function addSelected(item, obj, values, options) {
 		if (typeof(values.selected[item.id]) == 'undefined') {
+			removeDefaultValue(obj);
+
 			values.selected[item.id] = item;
 
 			// add hidden input
@@ -489,8 +507,12 @@ jQuery(function($) {
 		$('input[type="text"]', obj).focus();
 
 		// remove readonly
-		if ($('.selected li', obj).length == 0 && options.selectedLimit > 0) {
-			$('input[type="text"]', obj).attr('disabled', false);
+		if ($('.selected li', obj).length == 0) {
+			setDefaultValue(obj, options);
+
+			if (options.selectedLimit > 0) {
+				$('input[type="text"]', obj).attr('disabled', false);
+			}
 		}
 	}
 
