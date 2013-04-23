@@ -240,9 +240,9 @@ div.footer .formrow .main:hover, div.ui-dialog-buttonpane div.ui-dialog-buttonse
 .host-edit .dropArea .interface-add-control { visibility: hidden; }
 
 /* housekeeper elements */
-.hk .element-row { margin-top: -3px; }
+.hk .element-row { margin-top: -3px; border-top-width: 0; }
+.hk .element-row-first { border-top-width: 1px; }
 .hk .element-row label { width: 270px; text-align: right; display: block; }
-.hk .element-row-second { border-top-width: 0; }
 
 .border_dotted { border: 1px dotted #6C80B9; }
 .footer { padding-left: 1.6em; }
