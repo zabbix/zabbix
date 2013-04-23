@@ -23,7 +23,7 @@
 
 static char	zbx_last_odbc_strerror[255];
 
-const char	*get_last_odbc_strerror()
+const char	*get_last_odbc_strerror(void)
 {
 	return zbx_last_odbc_strerror;
 }
@@ -235,8 +235,8 @@ ZBX_ODBC_RESULT	odbc_DBselect(ZBX_ODBC_DBH *pdbh, const char *query)
 	pdbh->row_data = zbx_malloc(pdbh->row_data, sizeof(char *) * pdbh->col_num);
 	memset(pdbh->row_data, 0, sizeof(char *) * pdbh->col_num);
 
-	pdbh->data_len = zbx_malloc(pdbh->data_len, sizeof(SQLINTEGER) * pdbh->col_num);
-	memset(pdbh->data_len, 0, sizeof(SQLINTEGER) * pdbh->col_num);
+	pdbh->data_len = zbx_malloc(pdbh->data_len, sizeof(SQLLEN) * pdbh->col_num);
+	memset(pdbh->data_len, 0, sizeof(SQLLEN) * pdbh->col_num);
 
 	for (i = 0; i < pdbh->col_num; i++)
 	{

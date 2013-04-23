@@ -67,7 +67,6 @@ $fields = array(
 	'applications_visible' =>	array(T_ZBX_STR, O_OPT, null,	null,		null),
 	'groupid' =>				array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
 	'hostid' =>					array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
-	'form_hostid' =>			array(T_ZBX_INT, O_OPT, null,	DB_ID.NOT_ZERO, 'isset({save})', _('Host')),
 	'interfaceid' =>			array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null, _('Interface')),
 	'copy_type' =>				array(T_ZBX_INT, O_OPT, P_SYS,	IN('0,1'),	'isset({copy})'),
 	'copy_mode' =>				array(T_ZBX_INT, O_OPT, P_SYS,	IN('0'),	null),
@@ -82,7 +81,7 @@ $fields = array(
 		_('New flexible interval')),
 	'delay_flex' =>				array(T_ZBX_STR, O_OPT, null,	'',			null),
 	'history' =>				array(T_ZBX_INT, O_OPT, null,	BETWEEN(0, 65535), 'isset({save})', _('Keep history (in days)')),
-	'status' =>					array(T_ZBX_INT, O_OPT, null,	BETWEEN(0, 65535), 'isset({save})'),
+	'status' =>					array(T_ZBX_INT, O_OPT, null,	IN(ITEM_STATUS_ACTIVE), null),
 	'type' =>					array(T_ZBX_INT, O_OPT, null,
 		IN(array(-1, ITEM_TYPE_ZABBIX, ITEM_TYPE_SNMPV1, ITEM_TYPE_TRAPPER, ITEM_TYPE_SIMPLE, ITEM_TYPE_SNMPV2C,
 			ITEM_TYPE_INTERNAL, ITEM_TYPE_SNMPV3, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_AGGREGATE, ITEM_TYPE_EXTERNAL,
@@ -180,7 +179,8 @@ $fields = array(
 	'filter_delay' =>			array(T_ZBX_INT, O_OPT, P_UNSET_EMPTY, BETWEEN(0, SEC_PER_DAY), null, _('Update interval')),
 	'filter_history' =>			array(T_ZBX_INT, O_OPT, P_UNSET_EMPTY, BETWEEN(0, 65535), null, _('Keep history (in days)')),
 	'filter_trends' =>			array(T_ZBX_INT, O_OPT, P_UNSET_EMPTY, BETWEEN(0, 65535), null, _('Keep trends (in days)')),
-	'filter_status' =>			array(T_ZBX_INT, O_OPT, null,	IN('-1,0,1,3'), null),
+	'filter_status' =>			array(T_ZBX_INT, O_OPT, null,	IN(array(-1, ITEM_STATUS_ACTIVE, ITEM_STATUS_DISABLED)), null),
+	'filter_state' =>			array(T_ZBX_INT, O_OPT, null,	IN(array(-1, ITEM_STATE_NORMAL, ITEM_STATE_NOTSUPPORTED)), null),
 	'filter_templated_items' => array(T_ZBX_INT, O_OPT, null,	IN('-1,0,1'), null),
 	'filter_with_triggers' =>	array(T_ZBX_INT, O_OPT, null,	IN('-1,0,1'), null),
 	'filter_ipmi_sensor' =>		array(T_ZBX_STR, O_OPT, null,	null,		null),
@@ -189,6 +189,7 @@ $fields = array(
 	'subfilter_types' =>		array(T_ZBX_INT, O_OPT, null,	null,		null),
 	'subfilter_value_types' =>	array(T_ZBX_INT, O_OPT, null,	null,		null),
 	'subfilter_status' =>		array(T_ZBX_INT, O_OPT, null,	null,		null),
+	'subfilter_state' =>		array(T_ZBX_INT, O_OPT, null,	null,		null),
 	'subfilter_templated_items' => array(T_ZBX_INT, O_OPT, null, null,		null),
 	'subfilter_with_triggers' => array(T_ZBX_INT, O_OPT, null,	null,		null),
 	'subfilter_hosts' =>		array(T_ZBX_INT, O_OPT, null,	null,		null),
@@ -206,7 +207,9 @@ $_REQUEST['go'] = get_request('go', 'none');
 $_REQUEST['params'] = get_request($paramsFieldName, '');
 unset($_REQUEST[$paramsFieldName]);
 
-// permissions
+/*
+ * Permissions
+ */
 if (get_request('itemid', false)) {
 	$item = API::Item()->get(array(
 		'itemids' => $_REQUEST['itemid'],
@@ -231,7 +234,9 @@ elseif (get_request('hostid', 0) > 0) {
 	}
 }
 
-// ajax
+/*
+ * Ajax
+ */
 if (isset($_REQUEST['favobj'])) {
 	if ($_REQUEST['favobj'] == 'filter') {
 		CProfile::update('web.items.filter.state', $_REQUEST['favstate'], PROFILE_TYPE_INT);
@@ -266,6 +271,7 @@ if (isset($_REQUEST['filter_set'])) {
 	$_REQUEST['filter_history'] = get_request('filter_history');
 	$_REQUEST['filter_trends'] = get_request('filter_trends');
 	$_REQUEST['filter_status'] = get_request('filter_status', -1);
+	$_REQUEST['filter_state'] = get_request('filter_state', -1);
 	$_REQUEST['filter_templated_items'] = get_request('filter_templated_items', -1);
 	$_REQUEST['filter_with_triggers'] = get_request('filter_with_triggers', -1);
 	$_REQUEST['filter_ipmi_sensor'] = get_request('filter_ipmi_sensor');
@@ -286,6 +292,7 @@ if (isset($_REQUEST['filter_set'])) {
 	CProfile::update('web.items.filter_history', $_REQUEST['filter_history'], PROFILE_TYPE_STR);
 	CProfile::update('web.items.filter_trends', $_REQUEST['filter_trends'], PROFILE_TYPE_STR);
 	CProfile::update('web.items.filter_status', $_REQUEST['filter_status'], PROFILE_TYPE_INT);
+	CProfile::update('web.items.filter_state', $_REQUEST['filter_state'], PROFILE_TYPE_INT);
 	CProfile::update('web.items.filter_templated_items', $_REQUEST['filter_templated_items'], PROFILE_TYPE_INT);
 	CProfile::update('web.items.filter_with_triggers', $_REQUEST['filter_with_triggers'], PROFILE_TYPE_INT);
 	CProfile::update('web.items.filter_ipmi_sensor', $_REQUEST['filter_ipmi_sensor'], PROFILE_TYPE_STR);
@@ -307,28 +314,28 @@ else {
 	$_REQUEST['filter_history'] = CProfile::get('web.items.filter_history');
 	$_REQUEST['filter_trends'] = CProfile::get('web.items.filter_trends');
 	$_REQUEST['filter_status'] = CProfile::get('web.items.filter_status');
+	$_REQUEST['filter_state'] = CProfile::get('web.items.filter_state');
 	$_REQUEST['filter_templated_items'] = CProfile::get('web.items.filter_templated_items', -1);
 	$_REQUEST['filter_with_triggers'] = CProfile::get('web.items.filter_with_triggers', -1);
 	$_REQUEST['filter_ipmi_sensor'] = CProfile::get('web.items.filter_ipmi_sensor');
 }
 
 if (isset($_REQUEST['filter_hostname']) && !zbx_empty($_REQUEST['filter_hostname'])) {
-	$hostid = API::Host()->getObjects(array('name' => $_REQUEST['filter_hostname']));
-	if (empty($hostid)) {
-		$hostid = API::Template()->getObjects(array('name' => $_REQUEST['filter_hostname']));
+	$host = API::Host()->getObjects(array('name' => $_REQUEST['filter_hostname']));
+	if (empty($host)) {
+		$host = API::Template()->getObjects(array('name' => $_REQUEST['filter_hostname']));
 	}
-	$hostid = reset($hostid);
-	if ($hostid) {
-		$hostid = isset($hostid['hostid']) ? $hostid['hostid'] : $hostid['templateid'];
-	}
-	else {
-		$hostid = 0;
+	$host = reset($host);
+
+	if ($host) {
+		$_REQUEST['hostid'] = isset($host['hostid']) ? $host['hostid'] : $host['templateid'];
 	}
 }
 
 // subfilters
-foreach (array('subfilter_apps', 'subfilter_types', 'subfilter_value_types', 'subfilter_status', 'subfilter_templated_items',
-	'subfilter_with_triggers', 'subfilter_hosts', 'subfilter_interval', 'subfilter_history', 'subfilter_trends') as $name) {
+foreach (array('subfilter_apps', 'subfilter_types', 'subfilter_value_types', 'subfilter_status', 'subfilter_state',
+			'subfilter_templated_items', 'subfilter_with_triggers', 'subfilter_hosts', 'subfilter_interval',
+			'subfilter_history', 'subfilter_trends') as $name) {
 	$_REQUEST[$name] = isset($_REQUEST['filter_set']) ? array() : get_request($name, array());
 }
 
@@ -362,7 +369,7 @@ elseif (isset($_REQUEST['clone']) && isset($_REQUEST['itemid'])) {
 	unset($_REQUEST['itemid']);
 	$_REQUEST['form'] = 'clone';
 }
-elseif (isset($_REQUEST['save']) && $_REQUEST['form_hostid'] > 0) {
+elseif (isset($_REQUEST['save'])) {
 	$delay_flex = get_request('delay_flex', array());
 	$db_delay_flex = '';
 	foreach ($delay_flex as $value) {
@@ -382,7 +389,7 @@ elseif (isset($_REQUEST['save']) && $_REQUEST['form_hostid'] > 0) {
 	if (!zbx_empty($_REQUEST['new_application'])) {
 		$new_appid = API::Application()->create(array(
 			'name' => $_REQUEST['new_application'],
-			'hostid' => $_REQUEST['form_hostid']
+			'hostid' => get_request('hostid')
 		));
 		if ($new_appid) {
 			$new_appid = reset($new_appid['applicationids']);
@@ -398,11 +405,11 @@ elseif (isset($_REQUEST['save']) && $_REQUEST['form_hostid'] > 0) {
 			'name' => get_request('name'),
 			'description' => get_request('description'),
 			'key_' => get_request('key'),
-			'hostid' => get_request('form_hostid'),
+			'hostid' => get_request('hostid'),
 			'interfaceid' => get_request('interfaceid', 0),
 			'delay' => get_request('delay'),
 			'history' => get_request('history'),
-			'status' => get_request('status'),
+			'status' => get_request('status', ITEM_STATUS_DISABLED),
 			'type' => get_request('type'),
 			'snmp_community' => get_request('snmp_community'),
 			'snmp_oid' => get_request('snmp_oid'),
@@ -487,7 +494,7 @@ elseif (isset($_REQUEST['del_history']) && isset($_REQUEST['itemid'])) {
 	}
 	if ($result) {
 		DBexecute('UPDATE items SET lastvalue=null,lastclock=null,prevvalue=null WHERE itemid='.$_REQUEST['itemid']);
-		$host = get_host_by_hostid($item['hostid']);
+		$host = get_host_by_hostid($_REQUEST['hostid']);
 		add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ITEM, _('Item').' ['.$item['key_'].'] ['.$_REQUEST['itemid'].'] '.
 			_('Host').' ['.$host['name'].'] '._('History cleared'));
 	}
@@ -529,7 +536,7 @@ elseif (isset($_REQUEST['update']) && isset($_REQUEST['massupdate']) && isset($_
 		'description' => get_request('description'),
 		'delay' => get_request('delay'),
 		'history' => get_request('history'),
-		'status' => get_request('status'),
+		'status' => get_request('status', ITEM_STATUS_DISABLED),
 		'type' => get_request('type'),
 		'snmp_community' => get_request('snmp_community'),
 		'snmp_oid' => get_request('snmp_oid'),
@@ -690,8 +697,8 @@ if (isset($_REQUEST['form']) && str_in_array($_REQUEST['form'], array(_('Create 
 }
 elseif ($_REQUEST['go'] == 'massupdate' || isset($_REQUEST['massupdate']) && isset($_REQUEST['group_itemid'])) {
 	$data = array(
-		'form' => get_request('form', null),
-		'hostid' => get_request('hostid', null),
+		'form' => get_request('form'),
+		'hostid' => get_request('hostid'),
 		'itemids' => get_request('group_itemid', array()),
 		'description' => get_request('description', ''),
 		'delay' => get_request('delay', ZBX_ITEM_DELAY_DEFAULT),
@@ -825,17 +832,14 @@ elseif ($_REQUEST['go'] == 'copy_to' && isset($_REQUEST['group_itemid'])) {
 // list of items
 else {
 	$data = array(
-		'form' => get_request('form', null),
+		'form' => get_request('form'),
+		'hostid' => get_request('hostid'),
 		'sortfield' => getPageSortField('name')
 	);
 
-	if (isset($hostid)) {
-		$data['form_hostid'] = get_request('form_hostid', $hostid);
-		$data['hostid'] = $hostid;
-	}
-
 	// items
 	$options = array(
+		'hostids' => $data['hostid'],
 		'search' => array(),
 		'output' => API_OUTPUT_EXTEND,
 		'editable' => true,
@@ -848,9 +852,7 @@ else {
 		'limit' => $config['search_limit'] + 1
 	);
 	$preFilter = count($options, COUNT_RECURSIVE);
-	if (isset($data['hostid'])) {
-		$options['hostids'] = $data['hostid'];
-	}
+
 	if (isset($_REQUEST['filter_group']) && !zbx_empty($_REQUEST['filter_group'])) {
 		$options['group'] = $_REQUEST['filter_group'];
 	}
@@ -902,6 +904,9 @@ else {
 	if (isset($_REQUEST['filter_status']) && !zbx_empty($_REQUEST['filter_status']) && $_REQUEST['filter_status'] != -1) {
 		$options['filter']['status'] = $_REQUEST['filter_status'];
 	}
+	if (isset($_REQUEST['filter_state']) && !zbx_empty($_REQUEST['filter_state']) && $_REQUEST['filter_state'] != -1) {
+		$options['filter']['state'] = $_REQUEST['filter_state'];
+	}
 	if (isset($_REQUEST['filter_templated_items']) && !zbx_empty($_REQUEST['filter_templated_items'])
 			&& $_REQUEST['filter_templated_items'] != -1) {
 		$options['inherited'] = $_REQUEST['filter_templated_items'];
@@ -926,10 +931,10 @@ else {
 		// fill template host
 		fillItemsWithChildTemplates($data['items']);
 		$dbHostItems = DBselect(
-				'SELECT i.itemid,h.name,h.hostid'.
-				' FROM hosts h,items i'.
-				' WHERE i.hostid=h.hostid'.
-					' AND '.dbConditionInt('i.itemid', zbx_objectValues($data['items'], 'templateid'))
+			'SELECT i.itemid,h.name,h.hostid'.
+			' FROM hosts h,items i'.
+			' WHERE i.hostid=h.hostid'.
+				' AND '.dbConditionInt('i.itemid', zbx_objectValues($data['items'], 'templateid'))
 		);
 		while ($dbHostItem = DBfetch($dbHostItems)) {
 			foreach ($data['items'] as $itemid => $item) {
@@ -957,6 +962,8 @@ else {
 					|| uint_in_array($item['value_type'], $_REQUEST['subfilter_value_types']),
 				'subfilter_status' => empty($_REQUEST['subfilter_status'])
 					|| uint_in_array($item['status'], $_REQUEST['subfilter_status']),
+				'subfilter_state' => empty($_REQUEST['subfilter_state'])
+					|| uint_in_array($item['state'], $_REQUEST['subfilter_state']),
 				'subfilter_templated_items' => empty($_REQUEST['subfilter_templated_items'])
 					|| ($item['templateid'] == 0 && uint_in_array(0, $_REQUEST['subfilter_templated_items'])
 					|| ($item['templateid'] > 0 && uint_in_array(1, $_REQUEST['subfilter_templated_items']))),

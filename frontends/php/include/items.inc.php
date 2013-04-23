@@ -147,8 +147,7 @@ function item_data_type2str($type = null) {
 function item_status2str($type = null) {
 	$types = array(
 		ITEM_STATUS_ACTIVE => _('Enabled'),
-		ITEM_STATUS_DISABLED => _('Disabled'),
-		ITEM_STATUS_NOTSUPPORTED => _('Not supported')
+		ITEM_STATUS_DISABLED => _('Disabled')
 	);
 	if (is_null($type)) {
 		return $types;
@@ -161,20 +160,75 @@ function item_status2str($type = null) {
 	}
 }
 
-function item_status2style($status) {
-	switch ($status) {
-		case ITEM_STATUS_ACTIVE:
-			return 'off';
-		case ITEM_STATUS_DISABLED:
-			return 'on';
-		case ITEM_STATUS_NOTSUPPORTED:
-		default:
-			return 'unknown';
+/**
+ * Returns the names of supported item states.
+ *
+ * If the $state parameter is passed, returns the name of the specific state, otherwise - returns an array of all
+ * supported states.
+ *
+ * @param string $state
+ *
+ * @return array|string
+ */
+function itemState($state = null) {
+	$states = array(
+		ITEM_STATE_NORMAL => _('Normal'),
+		ITEM_STATE_NOTSUPPORTED => _('Not supported')
+	);
+
+	if ($state === null) {
+		return $states;
+	}
+	elseif (isset($states[$state])) {
+		return $states[$state];
+	}
+	else {
+		return _('Unknown');
 	}
 }
 
 /**
- * Returns the name of the given interface type.
+ * Returns the text indicating the items status and state. If the $state parameter is not given, only the status of
+ * the item will be taken into account.
+ *
+ * @param int $status
+ * @param int $state
+ *
+ * @return string
+ */
+function itemIndicator($status, $state = null) {
+	if ($status == ITEM_STATUS_ACTIVE) {
+		return ($state == ITEM_STATE_NOTSUPPORTED) ? _('Not supported') : _('Enabled');
+	}
+	elseif ($status == ITEM_STATUS_DISABLED) {
+		return _('Disabled');
+	}
+
+	return _('Unknown');
+}
+
+/**
+ * Returns the CSS class for the items status and state indicator. If the $state parameter is not given, only the status of
+ * the item will be taken into account.
+ *
+ * @param int $status
+ * @param int $state
+ *
+ * @return string
+ */
+function itemIndicatorStyle($status, $state = null) {
+	if ($status == ITEM_STATUS_ACTIVE) {
+		return ($state == ITEM_STATE_NOTSUPPORTED) ? 'unknown' : 'enabled';
+	}
+	elseif ($status == ITEM_STATUS_DISABLED) {
+		return 'disabled';
+	}
+
+	return 'unknown';
+}
+
+/**
+ * Returns the name of the given interface type. Items "status" and "state" properties must be defined.
  *
  * @param int $type
  *
@@ -225,7 +279,6 @@ function update_item_status($itemids, $status) {
 		$old_status = $item['status'];
 		if ($status != $old_status) {
 			$result &= DBexecute('UPDATE items SET status='.$status.
-				($status != ITEM_STATUS_NOTSUPPORTED ? ",error=''" : '').
 				' WHERE itemid='.$item['itemid']);
 			if ($result) {
 				$host = get_host_by_hostid($item['hostid']);
@@ -250,11 +303,6 @@ function copyItemsToHosts($srcItemIds, $dstHostIds) {
 		'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL),
 		'selectApplications' => API_OUTPUT_REFER
 	));
-	foreach ($srcItems as &$srcItem) {
-		if ($srcItem['status'] == ITEM_STATUS_NOTSUPPORTED) {
-			$srcItem['status'] = ITEM_STATUS_ACTIVE;
-		}
-	}
 
 	$dstHosts = API::Host()->get(array(
 		'output' => array('hostid', 'host', 'status'),
@@ -317,13 +365,6 @@ function copyItems($srcHostId, $dstHostId) {
 		'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL),
 		'selectApplications' => API_OUTPUT_REFER
 	));
-
-	foreach ($srcItems as &$srcItem) {
-		if ($srcItem['status'] == ITEM_STATUS_NOTSUPPORTED) {
-			$srcItem['status'] = ITEM_STATUS_ACTIVE;
-		}
-	}
-
 	$dstHosts = API::Host()->get(array(
 		'output' => array('hostid', 'host', 'status'),
 		'selectInterfaces' => array('interfaceid', 'type', 'main'),
