@@ -41,19 +41,20 @@ class CMultiSelect extends CTag {
 			}
 		}
 
-		zbx_add_post_js('jQuery("#'.$this->getAttribute('id').'").multiSelect({
-			url: "'.$url->getUrl().'",
-			name: "'.$options['name'].'",
-			labels: {
-				emptyResult: "'._('No matches found').'",
-				moreMatchesFound: "'._('More matches found...').'",
-				placeholder: "'._('type here to search').'"
-			},
-			data: '.(empty($options['data']) ? '[]' : CJs::encodeJson($options['data'])).',
-			defaultValue: '.(isset($options['defaultValue']) ? $options['defaultValue'] : 'null').',
-			disabled: '.(empty($options['disabled']) ? 'false' : 'true').',
-			selectedLimit: '.(isset($options['selectedLimit']) ? $options['selectedLimit'] : 'null').',
-			limit: '.(isset($options['limit']) ? $options['limit'] : MULTISELECT_LIMIT).'
-		});');
+		$params = array(
+			'url' => $url->getUrl(),
+			'name' => $options['name'],
+			'labels' => array(
+				'No matches found' => _('No matches found'),
+				'More matches found...' => _('More matches found...'),
+				'type here to search' => _('type here to search')
+			),
+			'data' => empty($options['data']) ? array() : $options['data'],
+			'defaultValue' => isset($options['defaultValue']) ? $options['defaultValue'] : null,
+			'disabled' => $options['disabled'],
+			'selectedLimit' => isset($options['selectedLimit']) ? $options['selectedLimit'] : null,
+		);
+
+		zbx_add_post_js('jQuery("#'.$this->getAttribute('id').'").multiSelect('.CJs::encodeJson($params).')');
 	}
 }

@@ -281,29 +281,6 @@ switch ($data['method']) {
 				}
 				break;
 
-			case 'hostsAndTemplates':
-				$hosts = API::Host()->get(array(
-					'templated_hosts' => true,
-					'editable' => isset($data['editable']) ? $data['editable'] : null,
-					'output' => array('hostid', 'name'),
-					'startSearch' => true,
-					'search' => isset($data['search']) ? array('name' => $data['search']) : null,
-					'limit' => isset($data['limit']) ? $data['limit'] : null
-				));
-
-				CArrayHelper::sort($hosts, array(
-					array('field' => 'name', 'order' => ZBX_SORT_UP)
-				));
-
-				foreach ($hosts as $host) {
-					$result[] = array(
-						'id' => $host['hostid'],
-						'prefix' => '',
-						'name' => $host['name']
-					);
-				}
-				break;
-
 			case 'templates':
 				$templates = API::Template()->get(array(
 					'editable' => isset($data['editable']) ? $data['editable'] : null,

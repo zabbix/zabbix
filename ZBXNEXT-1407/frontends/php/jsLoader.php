@@ -187,9 +187,9 @@ $tranStrings = array(
 		'Delete the selected service?' => _('Delete the selected service?')
 	),
 	'multiselect.js' => array(
-		'emptyResult' => _('No matches found'),
-		'moreMatchesFound' => _('More matches found...'),
-		'placeholder' => _('type here to search')
+		'No matches found' => _('No matches found'),
+		'More matches found...' => _('More matches found...'),
+		'type here to search' => _('type here to search')
 	)
 );
 

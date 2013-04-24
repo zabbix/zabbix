@@ -23,7 +23,7 @@ jQuery(function($) {
 	/**
 	 * Multi select helper.
 	 *
-	 * @param objectName options['objectName']
+	 * @param objectName options['objectName']	backend data source
 	 *
 	 * @see jQuery.multiSelect()
 	 */
@@ -37,13 +37,10 @@ jQuery(function($) {
 
 		// labels
 		options.labels = {
-			emptyResult: locale['emptyResult'],
-			moreMatchesFound: locale['moreMatchesFound'],
-			placeholder: locale['placeholder']
+			'No matches found': t('emptyResult'),
+			'More matches found...': t('moreMatchesFound'),
+			'type here to search': t('placeholder')
 		};
-
-		// limit
-		options.limit = 20; // MULTISELECT_LIMIT
 
 		return this.each(function() {
 			$(this).empty();
@@ -73,15 +70,15 @@ jQuery(function($) {
 			url: '',
 			name: '',
 			labels: {
-				emptyResult: 'No matches found',
-				moreMatchesFound: 'More matches found...',
-				placeholder: 'type here to search'
+				'No matches found': 'No matches found',
+				'More matches found...': 'More matches found...',
+				'type here to search': 'type here to search'
 			},
 			data: {},
 			defaultValue: null,
 			disabled: false,
 			selectedLimit: null,
-			limit: null
+			limit: 20
 		};
 		options = $.extend({}, defaults, options);
 
@@ -424,7 +421,7 @@ jQuery(function($) {
 		if (objectLength(values.available) == 0) {
 			var div = $('<div>', {
 				'class': 'label-empty-result',
-				text: options.labels.emptyResult
+				text: options.labels['No matches found']
 			})
 			.click(function() {
 				$('input[type="text"]', obj).focus();
@@ -437,7 +434,7 @@ jQuery(function($) {
 		if (values.isMoreMatchesFound) {
 			var div = $('<div>', {
 				'class': 'label-more-matches-found',
-				text: options.labels.moreMatchesFound
+				text: options.labels['More matches found...']
 			})
 			.click(function() {
 				$('input[type="text"]', obj).focus();
@@ -714,7 +711,7 @@ jQuery(function($) {
 	}
 
 	function setPlaceholder(obj, options) {
-		$('input[type="text"]', obj).prop('placeholder', options.labels.placeholder);
+		$('input[type="text"]', obj).prop('placeholder', options.labels['type here to search']);
 	}
 
 	function removePlaceholder(obj) {
