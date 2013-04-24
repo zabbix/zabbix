@@ -5,6 +5,7 @@ New features:
 A.F....... [ZBX-1357] updated Spanish and Turkish translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+.......PS. [ZBX-6526] fixed possible data uploading issues duing server startup or network problems (wiper)
 ...G...... [ZBX-6285] fixed message output from Zabbix sender (Andris)
 ..F....... [ZBX-6484] fixed bar report calculation (Oleg)
 ..F....... [ZBX-1236] added right side y axis support in bar reports (Oleg)
