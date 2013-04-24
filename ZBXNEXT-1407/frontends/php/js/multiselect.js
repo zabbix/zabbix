@@ -38,7 +38,8 @@ jQuery(function($) {
 		// labels
 		options.labels = {
 			emptyResult: locale['emptyResult'],
-			moreMatchesFound: locale['moreMatchesFound']
+			moreMatchesFound: locale['moreMatchesFound'],
+			placeholder: locale['placeholder']
 		};
 
 		// limit
@@ -73,7 +74,8 @@ jQuery(function($) {
 			name: '',
 			labels: {
 				emptyResult: 'No matches found',
-				moreMatchesFound: 'More matches found...'
+				moreMatchesFound: 'More matches found...',
+				placeholder: 'type here to search'
 			},
 			data: {},
 			defaultValue: null,
@@ -374,6 +376,7 @@ jQuery(function($) {
 			// preload data
 			if (empty(options.data)) {
 				setDefaultValue(obj, options);
+				setPlaceholder(obj, options);
 			}
 			else {
 				loadSelected(options.data, obj, values, options);
@@ -486,14 +489,16 @@ jQuery(function($) {
 				$('.selected ul', obj).append(li.append(text, arrow));
 			}
 
-			// set readonly
-			if (options.selectedLimit > 0 && $('.selected li', obj).length == options.selectedLimit) {
-				setReadonly(obj);
-			}
+			removePlaceholder(obj);
 
 			// resize
 			resizeSelected(obj, values, options);
 			resizeAvailable(obj);
+
+			// set readonly
+			if (options.selectedLimit > 0 && $('.selected li', obj).length == options.selectedLimit) {
+				setReadonly(obj);
+			}
 		}
 	}
 
@@ -511,6 +516,7 @@ jQuery(function($) {
 		// remove readonly
 		if ($('.selected li', obj).length == 0) {
 			setDefaultValue(obj, options);
+			setPlaceholder(obj, options);
 
 			if (options.selectedLimit > 0) {
 				$('input[type="text"]', obj).prop('disabled', false);
@@ -705,6 +711,14 @@ jQuery(function($) {
 		cleanSearchInput(obj);
 		$('input[type="text"]', obj).prop('disabled', true);
 		$('.selected ul', obj).removeClass('active');
+	}
+
+	function setPlaceholder(obj, options) {
+		$('input[type="text"]', obj).prop('placeholder', options.labels.placeholder);
+	}
+
+	function removePlaceholder(obj) {
+		$('input[type="text"]', obj).removeAttr('placeholder');
 	}
 
 	function getLimit(values, options) {

@@ -46,7 +46,8 @@ class CMultiSelect extends CTag {
 			name: "'.$options['name'].'",
 			labels: {
 				emptyResult: "'._('No matches found').'",
-				moreMatchesFound: "'._('More matches found...').'"
+				moreMatchesFound: "'._('More matches found...').'",
+				placeholder: "'._('type here to search').'"
 			},
 			data: '.(empty($options['data']) ? '[]' : CJs::encodeJson($options['data'])).',
 			defaultValue: '.(isset($options['defaultValue']) ? $options['defaultValue'] : 'null').',
