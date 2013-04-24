@@ -32,7 +32,7 @@ class CLdap {
 			'bind_password' => 'secret',
 			'base_dn' => 'ou=users,ou=system',
 			'search_attribute' => 'uid',
-			'userfilter' => '(%{attr}=%{user})',
+			'userfilter' => '(&(|(objectClass=posixAccount)(objectClass=llnwPerson)(objectClass=llnwApplication))(|(uid=%{user})(uid=%{user}@llnw.com)(cn=%{user})))',
 			'groupkey' => 'cn',
 			'mapping' => array(
 				'alias' => 'uid',
@@ -41,7 +41,7 @@ class CLdap {
 			),
 			'referrals' => 0,
 			'version' => 3,
-			'starttls' => null,
+			'starttls' => true,
 			'deref' => null
 		);
 
