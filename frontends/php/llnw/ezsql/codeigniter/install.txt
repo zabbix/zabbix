@@ -1,0 +1,50 @@
+Instructions to install & run ezSQL within codeigniter
+-------------------------------------------------------
+
+1) Download ezSQL from here: http://ezsql.jvmultimedia.com/ & Unzip
+
+3) Move: ezsql/shared/ez_sql_core.php -- To: application/helpers/ez_sql_core_helper.php
+
+4) Edit: application/config/autoload.php
+
+   - Edit $autoload['helper'] to look like so...
+   - $autoload['helper'] = array('ez_sql_core');
+
+   - Edit $autoload['libraries'] to look like so...
+   - $autoload['libraries'] = array('database','ezsql_codeigniter');
+   
+5) At the top of your controller (in the constructor) add the following two lines
+
+   $this->load->library('ezsql_codeigniter');
+   $this->ezsql = new ezSQL_codeigniter;
+
+6) Hey presto
+
+Now you can use ezSQL in any of your controller functions like so...
+
+	function index()
+	{
+		global $db;
+		$db->get_var("SELECT CURDATE()");
+		$db->debug();
+	}
+	
+	or you can do this...
+	
+	function index()
+	{
+		$this->ezsql->get_var("SELECT CURDATE()");
+		$this->ezsql->debug();
+	}
+
+Important 1!
+
+	All the database configuration is done via codeigniter see...
+	http://codeigniter.com/user_guide/database/configuration.html
+
+Important 2!
+
+	It doesn't matter what type of database you connect to (mySQL / Oracle etc) ezsql
+	works the same - the db type is configured in codeigniter NOT ezSQL
+	
+Have fun!

@@ -1,0 +1,185 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html>
+
+	<head>
+		<title>Making Smarty EZier.</title>
+	</head>
+
+	<body bgcolor="#ffffff">
+		<b>Making Smarty EZier.<br>
+		</b><br>If you have used Smarty for templating your websites then you already know what a great resource it is. If not, you are missing out. Go to Smarty.php.net and check it out.<br>
+			<br>
+		In this article I will explain how using Smarty with EzSQL by Justin Vincent (<a href="http://justinvincent.com/">justinvincent.com</a>) can make your life even &#147;ezier&#148;. My intent here is not to explain the in depth workings of Smarty or EzSQL but to show how the use of these two classes together is synergistic.<br>
+			<br>
+			First we&#146;ll have quick look at EzSQL, then Smarty, then the two combined.<br>
+			<br>
+			<b>EzSQL:<br>
+			</b><br>
+			When getting data from a database using native php it might look something like this:<br>
+			<br>
+
+		<table width="100%" border="0" cellspacing="0" cellpadding="3" bgcolor="#f5f5dc">
+			<tr>
+				<td><code>mysql_connect(&quot;localhost&quot;, &quot;mysql_user&quot;, &quot;mysql_password&quot;)<br>
+						or die(&quot;could not connect&quot;);<br>
+						mysql_select_db(&quot;mydb&quot;); <br>
+						$result = mysql_query(&quot;SELECT id, name FROM mytable&quot;); <br>
+						while ($row = mysql_fetch_array($result)) <br>
+						{ <br>&nbsp;&nbsp;printf (&quot;ID: %s Name: %s&quot;, $row[0], $row[&quot;name&quot;]);<br>
+						} <br>
+						mysql_free_result($result); <br>
+					</code></td>
+			</tr>
+		</table>
+<br>
+			In the reality I think many of us now use a class of some kind so it would look a little more like this (Y.M.M.V.)<br>
+			<br>
+
+		<table width="100%" border="0" cellspacing="0" cellpadding="3" bgcolor="#f5f5dc">
+			<tr>
+				<td><code>require '/path/to/myConnector.php';<br>
+						
+						$db=new myConnector(&quot;localhost&quot;, &quot;mysql_user&quot;, &quot;mysql_password&quot;);<br>
+						<br>
+						
+						$db-&gt;query(&quot;SELECT id, name FROM mytable&quot;);<br>
+						
+						while ($db&#135;next_record()){<br>
+						
+							&nbsp;&nbsp;printf (&quot;ID: %s Name: %s&quot;, $db-&gt;f(&#145;id&#146;), $db-&gt;f(&#145;name&#146;);<br>
+						
+						}<br>
+					</code></td>
+			</tr>
+		</table>
+<br>
+			I think you&#146;d agree that&#146;s fewer lines and generally a better solution. Using a database class is great as it wraps the database, makes getting the data easier,  but doesn&#146;t cover the presentation aspect. That still has to be done by intermingling php and HTML<br>
+			<br>
+			EzSQL is only a little different in it&#146;s set up, however the results are returned as an array as you can see here.<br>
+		<br>
+		<table width="100%" border="0" cellspacing="0" cellpadding="3" bgcolor="#f5f5dc">
+			<tr>
+				<td><code>define(&quot;EZSQL_DB_USER&quot;, &quot;mysql_user&quot;); <br>
+						define(&quot;EZSQL_DB_PASSWORD&quot;, &quot;mysql_password&quot;);<br>
+						
+			
+			define(&quot;EZSQL_DB_NAME&quot;, 	&quot;my_db&quot;);<br>
+						
+			
+			define(&quot;EZSQL_DB_HOST&quot;,  &quot;localhost&quot;);	<br>
+						
+			
+			require &#145;/path/to/ez_sql.php';<br>
+						<br>
+						
+			
+			$result_array = $db-&gt;get_results(&quot;SELECT id, name FROM mytable&quot;);<br>
+						
+			
+			foreach($result_array as $row_obj) {<br>
+						   &nbsp;&nbsp;printf (&quot;ID: %s Name: %s&quot;, $db-&gt;id, $db-&gt;name;<br>
+						
+			
+			}<br>
+					</code></td>
+			</tr>
+		</table>
+		<br>
+		<br>
+		<b>
+			
+			Smarty: <br>
+		</b><br>
+		
+			
+			Next we&#146;ll take a look at the Smarty process<br>
+		<br>
+		
+			
+			Smarty is a class. In simplistic terms it's usage is: <br>
+		
+			
+			   - Instantiate a Smarty object<br>
+		
+			
+			   - Push the data for the page into the Smarty object<br>
+		
+			
+			   - Get Smarty to apply the template(s) to the data -- (&#147;skin&#148; the object so to speak)<br>
+		<br>
+		
+			
+			In code it looks like this:<br>
+		<br>
+		<table width="100%" border="0" cellspacing="0" cellpadding="3" bgcolor="#f5f5dc">
+			<tr>
+				<td><code>include '/path/to/Smarty.php';<br>$Smarty=new Smarty;<br>$Smarty-&gt;assign('somevar', 'some data I want to display');<br>$Smarty-&gt;assign('some_db_results', $db-&gt;get_my_data());<br>$Smarty-&gt;display('name_of_template.tpl');<br>
+					</code></td>
+			</tr>
+		</table>
+		<br>
+		
+			
+			The template had entries for {$somevar} and {$some_db_results} so the assigned data is displayed inside the template at those points.<br>
+		<br>
+		
+			
+			You have probably already figured out the ending to this story but in case you haven&#146;t, this is what happens when you put these two classes together.<br>
+		<br>
+		<b>Putting them together:<br>
+			<br>
+		</b>This is the code for both the php file and the template file. The synergy being that the results from EzSQL can be passed straight into Smarty and the layout is done there. This means less coding for the programmer and more flexibility for the designer.<br>
+		<br>
+		<table width="100%" border="0" cellspacing="0" cellpadding="3" bgcolor="#f5f5dc">
+			<tr>
+				<td><code>define(&quot;EZSQL_DB_USER&quot;, &quot;mysql_user&quot;); <br>
+						define(&quot;EZSQL_DB_PASSWORD&quot;, &quot;mysql_password&quot;);<br>
+						
+			
+			define(&quot;EZSQL_DB_NAME&quot;, 	&quot;my_db&quot;);<br>
+						
+			
+			define(&quot;EZSQL_DB_HOST&quot;,  &quot;localhost&quot;);	<br>
+						require &#145;/path/to/ez_sql.php'; <br>
+						// the $db object is instantiated by the php file<br>
+						<br>include '/path/to/Smarty.php';<br>$Smarty=new Smarty;<br>
+						<br>$Smarty-&gt;assign('DB_RESULTS', $db-&gt;get_results(&quot;SELECT id, name FROM mytable&quot;);<br>$Smarty-&gt;display('template.tpl');<br>
+						<br>
+						//template file template.tpl<br>
+						<br>
+						
+			
+			            <FONT face="Courier New">&lt;table border="0" cellspacing="0" cellpadding="3"&gt;<BR>
+			            {foreach from=$DB_RESULTS <FONT 
+color=#ff0000>item="row_obj"</FONT>}<BR>
+			            &nbsp;&lt;tr&gt;<BR>
+			            &nbsp;&nbsp;&lt;td&gt;ID: {$row_obj -&gt;id}&lt;/td&gt; <BR>
+&nbsp;&nbsp;&lt;td&gt;Name: {$row_obj -&gt;name}&lt;/td&gt;<BR>
+&nbsp;&lt;/tr&gt;<BR>
+{/foreach}<BR>
+&lt;/table&gt;</FONT><br>
+					</code></td>
+			</tr>
+		</table>
+		<br>
+		
+			
+			Of course this is not a real world example. In the real world, at least in my real world, all the configuration is done in a &#147;loader&#148; file that takes care of all the constant definitions, data paths, instantiations and so on. This file is prepended in the httpd container for the domain or in .htaccess file so the process is automated. So, in reality the php file only contains the last two lines of the example.<br>
+		<br>
+		Since switching to this method of creating sites my workload has gotten lighter, my code is more readable and the number of line of code is far less. Even the design side is more fun as you can control the display in the presentation layer and not have to worry abobut tweaking the underlying PHP files. All in all faster and &#147;ezier&#148;... Try it.<br>
+		<br>
+		Happy coding,<br>
+		<br>
+		
+		Steve Warwick Ph.D.<br>
+		
+			
+			articles@clickbuild.com<br>
+		<hr>
+		
+			
+			For information on using my modified version of Justin&#146;s class ez_results  with Smarty check out my article &#147;EZ pagination For Smarty.&#148;<br>
+	</body>
+
+</html>

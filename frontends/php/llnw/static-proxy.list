@@ -1,0 +1,10 @@
+<?php
+$static_proxies['PHX01'] = 'zabbix-proxy01.phx2.llnw.net';
+$static_proxies['PHX02'] = 'zabbix-proxy02.phx2.llnw.net';
+$static_proxies['PHXEXT01'] = 'zabbix-proxy-ext01.phx2.llnw.net';
+$static_proxies['PHXEXT02'] = 'zabbix-proxy-ext02.phx2.llnw.net';
+$static_proxies['PHXINT01'] = 'zabbix-proxy-int01.phx2.llnw.net';
+$static_proxies['PHXINT02'] = 'zabbix-proxy-int02.phx2.llnw.net';
+$static_proxies['PHXSEC01'] = 'zabbix-proxy-sec01.phx4.llnw.net';
+$static_proxies['PHXSEC02'] = 'zabbix-proxy-sec02.phx4.llnw.net';
+?>

@@ -1,0 +1,40 @@
+
+/*
+GRANT ALL ON llnw.* TO 'llnwapi_usr'@'localhost' IDENTIFIED BY 'P2j42Chs9Ae8x';
+GRANT ALL ON llnw.* TO 'llnwapi_usr'@'69.28.166.132' IDENTIFIED BY 'P2j42Chs9Ae8x';
+GRANT ALL ON llnw.* TO 'llnwapi_usr'@'69.28.166.133' IDENTIFIED BY 'P2j42Chs9Ae8x';
+GRANT ALL ON llnw.* TO 'llnwapi_usr'@'69.28.166.134' IDENTIFIED BY 'P2j42Chs9Ae8x';
+*/
+
+CREATE TABLE squelch (
+  id int(11) UNSIGNED NOT NULL auto_increment,
+  hostname varchar(255) NOT NULL default '',
+  start datetime NOT NULL,
+  end datetime NOT NULL,
+  created_by varchar(32) NOT NULL default '',
+  created_date datetime NOT NULL,
+  updated_by varchar(32) NOT NULL default '',
+  updated_date datetime NOT NULL,
+  PRIMARY KEY (id),
+  KEY squelch1 (hostname),
+  KEY squelch2 (hostname, start, end)
+) TYPE=InnoDB CHARSET=latin1;
+
+CREATE TABLE squelch_log (
+  id int(11) UNSIGNED NOT NULL auto_increment,
+  squelch_id int(11) UNSIGNED NOT NULL default '0',
+  hostname varchar(255) NOT NULL default '',
+  start datetime NOT NULL,
+  end datetime NOT NULL,
+  reason varchar(255) NOT NULL default '',
+  comment text NOT NULL,
+  created_by varchar(32) NOT NULL default '',
+  created_date datetime NOT NULL,
+  updated_by varchar(32) NOT NULL default '',
+  updated_date datetime NOT NULL,
+  PRIMARY KEY (id),
+  KEY squelch_log1 (hostname),
+  KEY squelch_log2 (hostname, start, end),
+  KEY squelch_log3 (squelch_id, hostname)
+) TYPE=InnoDB CHARSET=latin1;
+
