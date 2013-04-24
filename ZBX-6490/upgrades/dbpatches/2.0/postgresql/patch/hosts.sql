@@ -176,8 +176,10 @@ DROP LANGUAGE 'plpgsql';
 
 -- adding web.test.error[<web check>] items
 
+CREATE LANGUAGE 'plpgsql';
 
-CREATE OR REPLACE FUNCTION zbx_add_web_error_items() RETURNS void LANGUAGE plpgsql AS $$
+CREATE OR REPLACE FUNCTION zbx_add_web_error_items()
+RETURNS void AS $$
 DECLARE
 	httptest_nodeid INT;
 	init_nodeid BIGINT;
@@ -236,11 +238,13 @@ BEGIN
 
 	CLOSE node_cursor;
 END;
-$$;
+$$ LANGUAGE 'plpgsql';
 
 SELECT zbx_add_web_error_items();
 
 DROP FUNCTION zbx_add_web_error_items();
+
+DROP LANGUAGE 'plpgsql';
 
 DELETE FROM ids WHERE table_name IN ('items', 'httptestitem', 'items_applications');
 
