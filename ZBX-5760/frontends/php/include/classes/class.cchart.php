@@ -1730,12 +1730,15 @@ class CChart extends CGraphDraw {
 		$leftXShift = 20;
 		$units = array('left' => 0, 'right' => 0);
 
-		$legend = new CImageTextTable($this->im, $leftXShift + 10, $this->sizeY + $this->shiftY + $this->legendOffsetY);
+		// draw item legend
+		$legend = new CImageTextTable($this->im, $leftXShift - 5, $this->sizeY + $this->shiftY + $this->legendOffsetY);
 		$legend->color = $this->getColor($this->graphtheme['textcolor'], 0);
 		$legend->rowheight = 14;
 		$legend->fontsize = 9;
 
+		// item legend table header
 		$row = array(
+			array('text' => '', 'marginRight' => 5),
 			array('text' => ''),
 			array('text' => ''),
 			array('text' => _('last'), 'align' => 1, 'fontsize' => 9),
@@ -1745,7 +1748,7 @@ class CChart extends CGraphDraw {
 		);
 
 		$legend->addRow($row);
-		$colNum = $legend->getNumRows();
+		$rowNum = $legend->getNumRows();
 
 		$i = ($this->type == GRAPH_TYPE_STACKED) ? $this->num - 1 : 0;
 		while ($i >= 0 && $i < $this->num) {
@@ -1767,6 +1770,18 @@ class CChart extends CGraphDraw {
 
 			$data = &$this->data[$this->items[$i]['itemid']][$this->items[$i]['calc_type']];
 
+			// draw color square
+			if (function_exists('imagecolorexactalpha') && function_exists('imagecreatetruecolor') && @imagecreatetruecolor(1, 1)) {
+				$colorSquare = imagecreatetruecolor(11, 11);
+			}
+			else {
+				$colorSquare = imagecreate(11, 11);
+			}
+			imagefill($colorSquare, 0, 0, $this->getColor($this->graphtheme['backgroundcolor'], 0));
+			imagefilledrectangle($colorSquare, 0, 0, 10, 10, $color);
+			imagerectangle($colorSquare, 0, 0, 10, 10, $this->getColor('Black'));
+
+			// item caption
 			if ($this->itemsHost) {
 				$item_caption = $this->items[$i]['name'];
 			}
@@ -1774,6 +1789,7 @@ class CChart extends CGraphDraw {
 				$item_caption = $this->items[$i]['hostname'].': '.$this->items[$i]['name'];
 			}
 
+			// draw legend of an item with data
 			if (isset($data) && isset($data['min'])) {
 				if ($this->items[$i]['axisside'] == GRAPH_YAXIS_SIDE_LEFT) {
 					$units['left'] = $this->items[$i]['units'];
@@ -1782,37 +1798,22 @@ class CChart extends CGraphDraw {
 					$units['right'] = $this->items[$i]['units'];
 				}
 
-				$legend->addCell($colNum, array('text' => $item_caption));
-				$legend->addCell($colNum, array('text' => '['.$fnc_name.']'));
-				$legend->addCell($colNum, array('text' => convert_units($this->getLastValue($i), $this->items[$i]['units'], ITEM_CONVERT_NO_UNITS), 'align' => 2));
-				$legend->addCell($colNum, array('text' => convert_units(min($data['min']), $this->items[$i]['units'], ITEM_CONVERT_NO_UNITS), 'align' => 2));
-				$legend->addCell($colNum, array('text' => convert_units($data['avg_orig'], $this->items[$i]['units'], ITEM_CONVERT_NO_UNITS), 'align' => 2));
-				$legend->addCell($colNum, array('text' => convert_units(max($data['max']), $this->items[$i]['units'], ITEM_CONVERT_NO_UNITS), 'align' => 2));
+				$legend->addCell($rowNum, array('image' => $colorSquare, 'marginRight' => 5));
+				$legend->addCell($rowNum, array('text' => $item_caption));
+				$legend->addCell($rowNum, array('text' => '['.$fnc_name.']'));
+				$legend->addCell($rowNum, array('text' => convert_units($this->getLastValue($i), $this->items[$i]['units'], ITEM_CONVERT_NO_UNITS), 'align' => 2));
+				$legend->addCell($rowNum, array('text' => convert_units(min($data['min']), $this->items[$i]['units'], ITEM_CONVERT_NO_UNITS), 'align' => 2));
+				$legend->addCell($rowNum, array('text' => convert_units($data['avg_orig'], $this->items[$i]['units'], ITEM_CONVERT_NO_UNITS), 'align' => 2));
+				$legend->addCell($rowNum, array('text' => convert_units(max($data['max']), $this->items[$i]['units'], ITEM_CONVERT_NO_UNITS), 'align' => 2));
 			}
+			// draw legend of an item without data
 			else {
-				$legend->addCell($colNum, array('text' => $item_caption));
-				$legend->addCell($colNum, array('text' => '[ '._('no data').' ]'));
+				$legend->addCell($rowNum, array('image' => $colorSquare, 'marginRight' => 5));
+				$legend->addCell($rowNum, array('text' => $item_caption));
+				$legend->addCell($rowNum, array('text' => '[ '._('no data').' ]'));
 			}
 
-			imagefilledrectangle(
-				$this->im,
-				$leftXShift - 5,
-				$this->sizeY + $this->shiftY + 14 * $colNum + $this->legendOffsetY - 10,
-				$leftXShift + 5,
-				$this->sizeY + $this->shiftY + 14 * $colNum + $this->legendOffsetY,
-				$color
-			);
-
-			imagerectangle(
-				$this->im,
-				$leftXShift - 5,
-				$this->sizeY + $this->shiftY + 14 * $colNum + $this->legendOffsetY - 10,
-				$leftXShift + 5,
-				$this->sizeY + $this->shiftY + 14 * $colNum + $this->legendOffsetY,
-				$this->getColor('Black')
-			);
-
-			$colNum++;
+			$rowNum++;
 
 			if ($this->type == GRAPH_TYPE_STACKED) {
 				$i--;
@@ -1831,7 +1832,7 @@ class CChart extends CGraphDraw {
 		$legend = new CImageTextTable(
 			$this->im,
 			$leftXShift + 10,
-			$this->sizeY + $this->shiftY + 14 * $colNum + $this->legendOffsetY
+			$this->sizeY + $this->shiftY + 14 * $rowNum + $this->legendOffsetY
 		);
 		$legend->color = $this->getColor($this->graphtheme['textcolor'], 0);
 		$legend->rowheight = 14;
@@ -1842,7 +1843,7 @@ class CChart extends CGraphDraw {
 			foreach ($this->percentile as $side => $percentile) {
 				if ($percentile['percent'] > 0 && $percentile['value']) {
 					$percentile['percent'] = (float) $percentile['percent'];
-					$legend->addCell($colNum, array(
+					$legend->addCell($rowNum, array(
 						'text' => $percentile['percent'].'th percentile: '.convert_units($percentile['value'], $units[$side]).' ('.$side.')',
 						ITEM_CONVERT_NO_UNITS
 					));
@@ -1856,9 +1857,9 @@ class CChart extends CGraphDraw {
 					imagefilledpolygon(
 						$this->im,
 						array(
-							$leftXShift + 5, $this->sizeY + $this->shiftY + 14 * $colNum + $this->legendOffsetY,
-							$leftXShift - 5, $this->sizeY + $this->shiftY + 14 * $colNum + $this->legendOffsetY,
-							$leftXShift, $this->sizeY + $this->shiftY + 14 * $colNum + $this->legendOffsetY - 10
+							$leftXShift + 5, $this->sizeY + $this->shiftY + 14 * $rowNum + $this->legendOffsetY,
+							$leftXShift - 5, $this->sizeY + $this->shiftY + 14 * $rowNum + $this->legendOffsetY,
+							$leftXShift, $this->sizeY + $this->shiftY + 14 * $rowNum + $this->legendOffsetY - 10
 						),
 						3,
 						$this->getColor($color)
@@ -1867,14 +1868,14 @@ class CChart extends CGraphDraw {
 					imagepolygon(
 						$this->im,
 						array(
-							$leftXShift + 5, $this->sizeY + $this->shiftY + 14 * $colNum + $this->legendOffsetY,
-							$leftXShift - 5, $this->sizeY + $this->shiftY + 14 * $colNum + $this->legendOffsetY,
-							$leftXShift, $this->sizeY + $this->shiftY + 14 * $colNum + $this->legendOffsetY - 10
+							$leftXShift + 5, $this->sizeY + $this->shiftY + 14 * $rowNum + $this->legendOffsetY,
+							$leftXShift - 5, $this->sizeY + $this->shiftY + 14 * $rowNum + $this->legendOffsetY,
+							$leftXShift, $this->sizeY + $this->shiftY + 14 * $rowNum + $this->legendOffsetY - 10
 						),
 						3,
 						$this->getColor('Black No Alpha')
 					);
-					$colNum++;
+					$rowNum++;
 				}
 			}
 		}
@@ -1884,7 +1885,7 @@ class CChart extends CGraphDraw {
 		$legend = new CImageTextTable(
 			$this->im,
 			$leftXShift + 10,
-			$this->sizeY + $this->shiftY + 14 * $colNum + $this->legendOffsetY + 5
+			$this->sizeY + $this->shiftY + 14 * $rowNum + $this->legendOffsetY + 5
 		);
 		$legend->color = $this->getColor($this->graphtheme['textcolor'], 0);
 		$legend->rowheight = 14;
@@ -1895,7 +1896,7 @@ class CChart extends CGraphDraw {
 			imagefilledellipse(
 				$this->im,
 				$leftXShift,
-				$this->sizeY + $this->shiftY + 14 * $colNum + $this->legendOffsetY,
+				$this->sizeY + $this->shiftY + 14 * $rowNum + $this->legendOffsetY,
 				10,
 				10,
 				$this->getColor($trigger['color'])
@@ -1904,7 +1905,7 @@ class CChart extends CGraphDraw {
 			imageellipse(
 				$this->im,
 				$leftXShift,
-				$this->sizeY + $this->shiftY + 14 * $colNum + $this->legendOffsetY,
+				$this->sizeY + $this->shiftY + 14 * $rowNum + $this->legendOffsetY,
 				10,
 				10,
 				$this->getColor('Black No Alpha')
@@ -1914,7 +1915,7 @@ class CChart extends CGraphDraw {
 				array('text' => $trigger['description']),
 				array('text' => $trigger['constant'])
 			));
-			$colNum++;
+			$rowNum++;
 		}
 
 		$legend->draw();
