@@ -190,6 +190,7 @@ class CChart extends CGraphDraw {
 		$x = $this->sizeX; // graph size in px
 
 		$this->itemsHost = null;
+
 		for ($i = 0; $i < $this->num; $i++) {
 			$real_item = get_item_by_itemid($this->items[$i]['itemid']);
 			if (is_null($this->itemsHost)) {

@@ -1,6 +1,8 @@
 Changes for 2.1.0
 
 New features:
+A.F.....S. [ZBXNEXT-1] added support of {host:key.last/min/avg/max()} macros in graph titles (Sasha, Toms)
+..F.I...S. [ZBXNEXT-1649] added fine grained control of housekeeper tasks (Oleg, wiper)
 ..F....... [ZBXNEXT-1712] improved create button for applications, items, triggers and web scenarios (Eduard)
 ..F....... [ZBXNEXT-1712] removed useless host name field in applications, items and web scenarios (Eduard)
 ........S. [ZBXNEXT-384] added support of new notification macros {ACTION.*} and {EVENT.RECOVERY.*}; {EVENT.*} macros now return information of the events which triggered an action (Sasha)
