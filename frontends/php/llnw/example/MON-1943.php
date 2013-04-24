@@ -1,0 +1,82 @@
+<?php
+
+$proxies = array(
+ "DAL01",
+ "ATL01",
+ "ATL02",
+ "SJC01",
+ "SJC02",
+ "DAL02",
+ "ORD01",
+ "ORD02",
+ "SEA01",
+ "SEA02",
+ "YMQ01",
+ "YMQ02",
+ "LGA01",
+ "LGA02",
+ "PAR01",
+ "PAR02",
+ "FRF01",
+ "FRF02",
+ "AMS01",
+ "AMS02",
+ "YVR02",
+ "HND01",
+ "IAD01",
+ "IAD02",
+ "LAX01",
+ "LAX02",
+ "HND02",
+ "MIA01",
+ "YYZ01",
+ "LON01",
+ "LON02",
+ "ARN01",
+ "ARN02",
+ "LIN01",
+ "LIN02",
+ "TLV02",
+ "PHX01",
+ "PHX02",
+ "ICN01",
+ "ICN02",
+ "MAD01",
+ "MEX01",
+ "PMO01",
+ "SIN01",
+ "SIN02",
+ "MIA02",
+ "PMO02",
+ "SYD02",
+ "YYZ02",
+ "SYD01",
+ "MEX02",
+ "MAA01",
+ "TLV01",
+ "HKG01",
+ "PHXEXT01",
+ "PHXEXT02",
+ "YVR01",
+ "MAD02",
+ "GRU01",
+ "GRU02",
+ "BAH01",
+ "BAH02",
+ "PHXINT01",
+ "PHXINT02",
+ "PHXSEC02",
+ "PHXSEC01",
+ "GRR01",
+		 );
+
+// TODO: Move this to a test on proxy.php
+foreach ($proxies as $proxy_name) {
+    preg_match('/(\D{3})(\d{2})/', $proxy_name, $m);
+    $site = strtolower($m[1]);
+    $num  = $m[2];
+    // HACK: Override phx2 hostname
+    $site = ($site == 'phx' ? 'phx2' : $site);
+    $proxy_fqdn = 'zabbix-proxy'.$num.'.'.$site.'.llnw.net';
+    var_dump($proxy_fqdn);
+}
