@@ -900,9 +900,6 @@ define('ZBX_TEXTAREA_STANDARD_WIDTH',	312);
 define('ZBX_TEXTAREA_BIG_WIDTH',		524);
 define('ZBX_TEXTAREA_STANDARD_ROWS',	7);
 
-// multiselect
-define('MULTISELECT_LIMIT', 20);
-
 // validation
 define('DB_ID',		"({}>=0&&bccomp('{}',\"10000000000000000000\")<0)&&");
 define('NOT_EMPTY',	"({}!='')&&");
