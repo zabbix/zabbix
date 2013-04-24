@@ -629,6 +629,9 @@ int	MAIN_ZABBIX_ENTRY()
 
 	DCload_config();
 
+	/* make initial configuration sync before worker processes are forked */
+	DCsync_configuration();
+
 	DBclose();
 
 	if (ZBX_MUTEX_ERROR == zbx_mutex_create_force(&node_sync_access, ZBX_MUTEX_NODE_SYNC))
