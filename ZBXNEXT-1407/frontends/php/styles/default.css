@@ -950,7 +950,7 @@ fieldset legend { margin: 0.2em 0.5em; }
 	border: 1px solid #5897FB;
 }
 .multiselect .selected ul li {
-	margin: 1px 1px 0 0; padding: 2px 0 0 0; min-height: 12px; line-height: 1em; vertical-align: top; display: inline-block;
+	margin: 1px 1px 0 0; padding: 2px 0 0 0; min-height: 12px; line-height: 12px; vertical-align: top; display: inline-block;
 	background: #E8E8E8; list-style: none outside none; border: 1px solid #AAAAAA;
 	background-image: -webkit-gradient(linear, 0 0, 0 100%, color-stop(20%, #F4F4F4), color-stop(50%, #F0F0F0), color-stop(52%, #E8E8E8), color-stop(100%, #EEE));
 	background-image: -webkit-linear-gradient(top, #F4F4F4 20%, #F0F0F0 50%, #E8E8E8 52%, #EEE 100%);

@@ -1297,29 +1297,6 @@ ZABBIX.apps.map = (function($) {
 					$('[name=' + elementName + ']', this.domNode).val([selement[elementName]]);
 				}
 
-				// set element id and name
-				switch (selement.elementtype) {
-					// host
-					case '0':
-						$('#elementNameHost').multiSelectHelper({
-							objectName: 'hosts',
-							name: 'elementValue',
-							data: [{id: selement.elementid, name: selement.elementName}],
-							selectedLimit: 1
-						});
-						break;
-
-					// host group
-					case '3':
-						$('#elementNameHostGroup').multiSelectHelper({
-							objectName: 'hostGroup',
-							name: 'elementValue',
-							data: [{id: selement.elementid, name: selement.elementName}],
-							selectedLimit: 1
-						});
-						break;
-				}
-
 				// set default icon state
 				if (empty(selement.iconid_on)) {
 					$('[name=iconid_on]', this.domNode).val(0);
@@ -1344,6 +1321,29 @@ ZABBIX.apps.map = (function($) {
 
 				if (this.sysmap.data.iconmapid === '0') {
 					$('#use_iconmap').prop('disabled', true);
+				}
+
+				// set element id and name
+				switch (selement.elementtype) {
+					// host
+					case '0':
+						$('#elementNameHost').multiSelectHelper({
+							objectName: 'hosts',
+							name: 'elementValue',
+							data: [{id: selement.elementid, name: selement.elementName}],
+							selectedLimit: 1
+						});
+						break;
+
+					// host group
+					case '3':
+						$('#elementNameHostGroup').multiSelectHelper({
+							objectName: 'hostGroup',
+							name: 'elementValue',
+							data: [{id: selement.elementid, name: selement.elementName}],
+							selectedLimit: 1
+						});
+						break;
 				}
 			},
 

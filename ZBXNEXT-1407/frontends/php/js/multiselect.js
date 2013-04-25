@@ -37,9 +37,9 @@ jQuery(function($) {
 
 		// labels
 		options.labels = {
-			'No matches found': t('emptyResult'),
-			'More matches found...': t('moreMatchesFound'),
-			'type here to search': t('placeholder')
+			'No matches found': t('No matches found'),
+			'More matches found...': t('More matches found...'),
+			'type here to search': t('type here to search')
 		};
 
 		return this.each(function() {
@@ -74,7 +74,7 @@ jQuery(function($) {
 				'More matches found...': 'More matches found...',
 				'type here to search': 'type here to search'
 			},
-			data: {},
+			data: [],
 			defaultValue: null,
 			disabled: false,
 			selectedLimit: null,

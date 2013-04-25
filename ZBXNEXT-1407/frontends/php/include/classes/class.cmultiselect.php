@@ -51,7 +51,7 @@ class CMultiSelect extends CTag {
 			),
 			'data' => empty($options['data']) ? array() : $options['data'],
 			'defaultValue' => isset($options['defaultValue']) ? $options['defaultValue'] : null,
-			'disabled' => $options['disabled'],
+			'disabled' => isset($options['disabled']) ? $options['disabled'] : false,
 			'selectedLimit' => isset($options['selectedLimit']) ? $options['selectedLimit'] : null,
 		);
 
