@@ -91,7 +91,7 @@ zbx_dbpatch_t;
 
 extern unsigned char	daemon_type;
 
-#if !defined(HAVE_SQLITE3)
+#ifndef HAVE_SQLITE3
 static void	DBfield_type_string(char **sql, size_t *sql_alloc, size_t *sql_offset, const ZBX_FIELD *field)
 {
 	switch (field->type)
@@ -1128,19 +1128,15 @@ static int	DBpatch_2010071()
 	return DBadd_field("sysmaps", &field);
 }
 
-# define DBPATCH_START()				zbx_dbpatch_t	patches[] = {
-
-# define DBPATCH_ADD(version, duplicates, mandatory)	{DBpatch_##version, version, duplicates, mandatory},
-
-# define DBPATCH_END()					{NULL} };
+#define DBPATCH_START()					zbx_dbpatch_t	patches[] = {
+#define DBPATCH_ADD(version, duplicates, mandatory)	{DBpatch_##version, version, duplicates, mandatory},
+#define DBPATCH_END()					{NULL}};
 
 #else
 
-# define DBPATCH_START()
-
-# define DBPATCH_ADD(version, duplicates, mandatory)	if (1 == mandatory) required = version;
-
-# define DBPATCH_END()
+#define DBPATCH_START()
+#define DBPATCH_ADD(version, duplicates, mandatory)	if (1 == mandatory) required = version;
+#define DBPATCH_END()
 
 #endif	/* not HAVE_SQLITE3 */
 
@@ -1174,7 +1170,7 @@ int	DBcheck_version()
 	const char	*dbversion_table_name = "dbversion";
 	int		db_mandatory, db_optional, required, ret = FAIL;
 
-#if !defined(HAVE_SQLITE3)
+#ifndef HAVE_SQLITE3
 	int		i, total = 0, current = 0, completed, last_completed = -1;
 #endif
 
@@ -1261,7 +1257,7 @@ int	DBcheck_version()
 
 	if (SUCCEED != DBtable_exists(dbversion_table_name))
 	{
-#if !defined(HAVE_SQLITE3)
+#ifndef HAVE_SQLITE3
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() \"%s\" doesn't exist",
 				__function_name, dbversion_table_name);
 
@@ -1285,7 +1281,7 @@ int	DBcheck_version()
 
 	DBget_version(&db_mandatory, &db_optional);
 
-#if !defined(HAVE_SQLITE3)
+#ifndef HAVE_SQLITE3
 	required = ZBX_FIRST_DB_VERSION;
 
 	for (i = 0; NULL != patches[i].function; i++)
@@ -1316,7 +1312,7 @@ int	DBcheck_version()
 
 	ret = SUCCEED;
 
-#if !defined(HAVE_SQLITE3)
+#ifndef HAVE_SQLITE3
 	if (0 == total)
 		goto out;
 
