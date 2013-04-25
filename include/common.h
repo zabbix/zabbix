@@ -241,7 +241,9 @@ typedef enum
 	ITEM_VALUE_TYPE_STR,
 	ITEM_VALUE_TYPE_LOG,
 	ITEM_VALUE_TYPE_UINT64,
-	ITEM_VALUE_TYPE_TEXT
+	ITEM_VALUE_TYPE_TEXT,
+	/* the number of defined value types */
+	ITEM_VALUE_TYPE_COUNT
 }
 zbx_item_value_type_t;
 const char	*zbx_item_value_type_string(zbx_item_value_type_t value_type);
