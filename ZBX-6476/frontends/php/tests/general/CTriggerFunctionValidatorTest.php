@@ -29,8 +29,7 @@ require_once dirname(__FILE__).'/../../include/classes/validators/CTriggerFuncti
 
 class CTriggerFunctionValidatorTest extends PHPUnit_Framework_TestCase {
 
-	private static function parameterSecNumPeriod_TestCases($func, array $valueTypes, array $params = array(), $no = 0)
-	{
+	private static function parameterSecNumPeriod_TestCases($func, array $valueTypes, array $params = array(), $no = 0) {
 		$valueTypesAny = array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_UINT64,
 				ITEM_VALUE_TYPE_TEXT);
 
@@ -65,8 +64,7 @@ class CTriggerFunctionValidatorTest extends PHPUnit_Framework_TestCase {
 		return $tests;
 	}
 
-	private static function parameterSecNumOffset_TestCases($func, array $valueTypes, array $params = array(), $no = 0)
-	{
+	private static function parameterSecNumOffset_TestCases($func, array $valueTypes, array $params = array(), $no = 0) {
 		$valueTypesAny = array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_UINT64,
 				ITEM_VALUE_TYPE_TEXT);
 
@@ -101,8 +99,7 @@ class CTriggerFunctionValidatorTest extends PHPUnit_Framework_TestCase {
 		return $tests;
 	}
 
-	private static function parameterTimeShift_TestCases($func, array $valueTypes, array $params = array(), $no = 0)
-	{
+	private static function parameterTimeShift_TestCases($func, array $valueTypes, array $params = array(), $no = 0) {
 		$valueTypesAny = array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_UINT64,
 				ITEM_VALUE_TYPE_TEXT);
 
@@ -137,8 +134,7 @@ class CTriggerFunctionValidatorTest extends PHPUnit_Framework_TestCase {
 		return $tests;
 	}
 
-	private static function parameterString_TestCases($func, array $valueTypes, array $params = array(), $no = 0)
-	{
+	private static function parameterString_TestCases($func, array $valueTypes, array $params = array(), $no = 0) {
 		$valueTypesAny = array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_UINT64,
 				ITEM_VALUE_TYPE_TEXT);
 
@@ -164,8 +160,7 @@ class CTriggerFunctionValidatorTest extends PHPUnit_Framework_TestCase {
 		return $tests;
 	}
 
-	private static function parameterOperator_TestCases($func, array $valueTypes, array $params = array(), $no = 0)
-	{
+	private static function parameterOperator_TestCases($func, array $valueTypes, array $params = array(), $no = 0) {
 		$valueTypesAny = array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_UINT64,
 				ITEM_VALUE_TYPE_TEXT);
 
@@ -323,10 +318,6 @@ class CTriggerFunctionValidatorTest extends PHPUnit_Framework_TestCase {
 			'functionParamList' => $functionParamList,
 			'valueType' => $valueType
 		));
-
-		if (!$result && $expectedResult) {
-			echo $triggerFunctionValidator->getError()."\n";
-		}
 
 		$this->assertSame($result, $expectedResult);
 	}
