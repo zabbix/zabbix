@@ -199,42 +199,76 @@ DROP FUNCTION zbx_key_exists;
 
 -- adding web.test.error[<web check>] items
 
-VARIABLE item_maxid number;
-VARIABLE httptestitem_maxid number;
-VARIABLE itemapp_maxid number;
+DECLARE
+	httptest_nodeid number(10);
+	min_nodeid number(20);
+	max_nodeid number(20);
+	init_nodeid number(20);
+	CURSOR node_cursor IS SELECT DISTINCT TRUNC(httptestid / 100000000000000) FROM httptest;
+
+	max_itemid number(20);
+	max_httptestitemid number(20);
+	max_itemappid number(20);
 BEGIN
-SELECT MAX(itemid) INTO :item_maxid FROM items;
-SELECT MAX(httptestitemid) INTO :httptestitem_maxid FROM httptestitem;
-SELECT MAX(itemappid) INTO :itemapp_maxid FROM items_applications;
+	OPEN node_cursor;
+
+	LOOP
+		FETCH node_cursor INTO httptest_nodeid;
+		EXIT WHEN node_cursor%NOTFOUND;
+
+		min_nodeid := httptest_nodeid * 100000000000000;
+		max_nodeid := min_nodeid + 99999999999999;
+		init_nodeid := (httptest_nodeid * 1000 + httptest_nodeid) * 100000000000;
+
+		SELECT MAX(itemid) INTO max_itemid FROM items WHERE itemid BETWEEN min_nodeid AND max_nodeid;
+		IF max_itemid IS NULL THEN
+			max_itemid := init_nodeid;
+		END IF;
+		EXECUTE IMMEDIATE 'CREATE SEQUENCE items_seq MINVALUE ' || (max_itemid + 1);
+
+		SELECT MAX(httptestitemid) INTO max_httptestitemid FROM httptestitem WHERE httptestitemid BETWEEN min_nodeid AND max_nodeid;
+		IF max_httptestitemid IS NULL THEN
+			max_httptestitemid := init_nodeid;
+		END IF;
+		EXECUTE IMMEDIATE 'CREATE SEQUENCE httptestitem_seq MINVALUE ' || (max_httptestitemid + 1);
+
+		SELECT MAX(itemappid) INTO max_itemappid FROM items_applications WHERE itemappid BETWEEN min_nodeid AND max_nodeid;
+		IF max_itemappid IS NULL THEN
+			max_itemappid := init_nodeid;
+		END IF;
+		EXECUTE IMMEDIATE 'CREATE SEQUENCE items_applications_seq MINVALUE ' || (max_itemappid + 1);
+
+		EXECUTE IMMEDIATE 'INSERT INTO items (itemid, hostid, type, name, key_, value_type, units, delay, history, trends, status)
+			SELECT items_seq.NEXTVAL, hostid, type, ''Last error message of scenario ''''$1'''''', ''web.test.error'' || SUBSTR(key_, INSTR(key_, ''['')), 1, '''', delay, history, 0, status
+			FROM items
+			WHERE type = 9
+				AND key_ LIKE ''web.test.fail%''
+				AND itemid BETWEEN ' || min_nodeid ||' AND ' || max_nodeid;
+
+		EXECUTE IMMEDIATE 'INSERT INTO httptestitem (httptestitemid, httptestid, itemid, type)
+			SELECT httptestitem_seq.NEXTVAL, ht.httptestid, i.itemid, 4
+			FROM httptest ht,applications a,items i
+			WHERE ht.applicationid=a.applicationid
+				AND a.hostid=i.hostid
+				AND ''web.test.error['' || ht.name || '']'' = i.key_
+				AND itemid BETWEEN ' || min_nodeid ||' AND ' || max_nodeid;
+
+		EXECUTE IMMEDIATE 'INSERT INTO items_applications (itemappid, applicationid, itemid)
+			SELECT items_applications_seq.NEXTVAL, ht.applicationid, hti.itemid
+			FROM httptest ht, httptestitem hti
+			WHERE ht.httptestid = hti.httptestid
+				AND hti.type = 4
+				AND itemid BETWEEN ' || min_nodeid ||' AND ' || max_nodeid;
+
+		EXECUTE IMMEDIATE 'DROP SEQUENCE items_seq';
+		EXECUTE IMMEDIATE 'DROP SEQUENCE httptestitem_seq';
+		EXECUTE IMMEDIATE 'DROP SEQUENCE items_applications_seq';
+
+	END LOOP;
+
+	CLOSE node_cursor;
 END;
 /
-
-CREATE SEQUENCE items_seq;
-CREATE SEQUENCE httptestitem_seq;
-CREATE SEQUENCE items_applications_seq;
-
-INSERT INTO items (itemid, hostid, type, name, key_, value_type, units, delay, history, trends, status)
-	SELECT :item_maxid + items_seq.NEXTVAL, hostid, type, 'Last error message of scenario ''$1''', 'web.test.error' || SUBSTR(key_, INSTR(key_, '[')), 1, '', delay, history, 0, status
-	FROM items
-	WHERE type = 9
-		AND key_ LIKE 'web.test.fail%';
-
-INSERT INTO httptestitem (httptestitemid, httptestid, itemid, type)
-	SELECT :httptestitem_maxid + httptestitem_seq.NEXTVAL, ht.httptestid, i.itemid, 4
-	FROM httptest ht,applications a,items i
-	WHERE ht.applicationid=a.applicationid
-		AND a.hostid=i.hostid
-		AND 'web.test.error[' || ht.name || ']' = i.key_;
-
-INSERT INTO items_applications (itemappid, applicationid, itemid)
-	SELECT :itemapp_maxid + items_applications_seq.NEXTVAL, ht.applicationid, hti.itemid
-	FROM httptest ht, httptestitem hti
-	WHERE ht.httptestid = hti.httptestid
-		AND hti.type = 4;
-
-DROP SEQUENCE items_applications_seq;
-DROP SEQUENCE httptestitem_seq;
-DROP SEQUENCE items_seq;
 
 DELETE FROM ids WHERE table_name IN ('items', 'httptestitem', 'items_applications');
 
