@@ -95,6 +95,7 @@ typedef struct
 {
 	ZBX_ACTIVE_BUFFER_ELEMENT	*data;
 	int	count, pcount, lastsent;
+	int	first_error;
 }
 ZBX_ACTIVE_BUFFER;
 

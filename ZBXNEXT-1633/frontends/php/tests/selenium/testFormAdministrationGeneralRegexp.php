@@ -158,6 +158,7 @@ class testFormAdministrationGeneralRegexp extends CWebTest {
 		// test #2 for the result=False
 		$this->zbxTestClickWait('link='.$this->regexp);
 		$this->click('link=Test');
+		$this->waitForCondition("selenium.browserbot.getCurrentWindow().jQuery.active == 0", 3000);
 
 		$this->input_type('test_string', 'abcdef');
 		$this->zbxTestClick('testExpression');
