@@ -1801,10 +1801,14 @@ class CChart extends CGraphDraw {
 				$legend->addCell($rowNum, array('image' => $colorSquare, 'marginRight' => 5));
 				$legend->addCell($rowNum, array('text' => $item_caption));
 				$legend->addCell($rowNum, array('text' => '['.$fnc_name.']'));
-				$legend->addCell($rowNum, array('text' => convert_units($this->getLastValue($i), $this->items[$i]['units'], ITEM_CONVERT_NO_UNITS), 'align' => 2));
-				$legend->addCell($rowNum, array('text' => convert_units(min($data['min']), $this->items[$i]['units'], ITEM_CONVERT_NO_UNITS), 'align' => 2));
-				$legend->addCell($rowNum, array('text' => convert_units($data['avg_orig'], $this->items[$i]['units'], ITEM_CONVERT_NO_UNITS), 'align' => 2));
-				$legend->addCell($rowNum, array('text' => convert_units(max($data['max']), $this->items[$i]['units'], ITEM_CONVERT_NO_UNITS), 'align' => 2));
+				$legend->addCell($rowNum, array('text' => convert_units($this->getLastValue($i),
+					$this->items[$i]['units'], ITEM_CONVERT_NO_UNITS), 'align' => 2));
+				$legend->addCell($rowNum, array('text' => convert_units(min($data['min']),
+					$this->items[$i]['units'], ITEM_CONVERT_NO_UNITS), 'align' => 2));
+				$legend->addCell($rowNum, array('text' => convert_units($data['avg_orig'],
+					$this->items[$i]['units'], ITEM_CONVERT_NO_UNITS), 'align' => 2));
+				$legend->addCell($rowNum, array('text' => convert_units(max($data['max']),
+					$this->items[$i]['units'], ITEM_CONVERT_NO_UNITS), 'align' => 2));
 			}
 			// draw legend of an item without data
 			else {
