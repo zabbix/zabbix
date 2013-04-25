@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2013-04-15 01:48+0300\n"
-"PO-Revision-Date: 2013-04-11 22:44+0200\n"
+"PO-Revision-Date: 2013-04-17 21:25+0200\n"
 "Last-Translator: Saúl <saulortega.co@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: es\n"
@@ -1837,17 +1837,18 @@ msgstr "No se pudo actualizar \"templateid\" para el ítem \"%1$s\"."
 #: api/classes/CScreen.php:508 api/classes/CTemplateScreen.php:739
 #, php-format
 msgid "Cannot update \"templateid\" for screen \"%1$s\"."
-msgstr ""
+msgstr "No se pudo actualizar \"templateid\" para la pantalla \"%1$s\"."
 
 #: api/classes/CTrigger.php:1116
 #, php-format
 msgid "Cannot update \"templateid\" for trigger \"%1$s\"."
-msgstr ""
+msgstr "No se pudo actualizar \"templateid\" para el disparador \"%1$s\"."
 
 #: api/classes/CTriggerPrototype.php:831
 #, php-format
 msgid "Cannot update \"templateid\" for trigger prototype \"%1$s\"."
 msgstr ""
+"No se pudo actualizar \"templateid\" para el prototipo de disparador \"%1$s\"."
 
 #: actionconf.php:145
 msgid "Cannot update action"
@@ -1936,7 +1937,7 @@ msgstr "No se pudo actualizar las macros"
 #: maintenance.php:133
 #, fuzzy
 msgid "Cannot update maintenance"
-msgstr "No se pudo actualizar la ventana de mantenimiento"
+msgstr "No se pudo actualizar el periodo de mantenimiento"
 
 #: include/classes/import/CXmlImport18.php:807
 #, php-format
@@ -2086,11 +2087,13 @@ msgid "Check the key, please. Default example was passed."
 msgstr "Verifique la cadena. Se pasó el ejemplo predeterminado."
 
 #: include/views/js/configuration.discovery.edit.js.php:23
+#, fuzzy
 msgid "Check type"
-msgstr ""
+msgstr "Verifique el tipo"
 
 #: include/views/configuration.discovery.edit.php:61
 #: include/views/configuration.discovery.list.php:43
+#, fuzzy
 msgid "Checks"
 msgstr "Comprobaciones"
 
@@ -2108,7 +2111,7 @@ msgstr "Chino (zh_CN)"
 
 #: include/locales.inc.php:48
 msgid "Chinese (zh_TW)"
-msgstr ""
+msgstr "Chino (zh_TW)"
 
 #: api/classes/CMapElement.php:533
 #, php-format
@@ -3003,22 +3006,22 @@ msgstr "Fecha"
 #: include/hosts.inc.php:334
 #, fuzzy
 msgid "Date HW decommissioned"
-msgstr "Fecha HW fuera de servicio"
+msgstr "Fecha en que se dio de baja el equipo"
 
 #: include/hosts.inc.php:324
 #, fuzzy
 msgid "Date HW installed"
-msgstr "Fecha HW instalada"
+msgstr "Fecha de instalación del equipo"
 
 #: include/hosts.inc.php:329
 #, fuzzy
 msgid "Date HW maintenance expires"
-msgstr "Fecha HW mantenimiento expira"
+msgstr "Fecha de expiración de mantenimiento del equipo"
 
 #: include/hosts.inc.php:319
 #, fuzzy
 msgid "Date HW purchased"
-msgstr "Fecha HW adquirida"
+msgstr "Fecha de adquisición del equipo"
 
 #: include/forms.inc.php:1591 report3.php:126 report4.php:161 report5.php:45
 #: tr_status.php:207 tr_status.php:209
@@ -3404,7 +3407,7 @@ msgstr[1] "¿Eliminar la equivalencia seleccionada? ¡Se utiliza en %d ítems!"
 
 #: templates.php:616
 msgid "Delete selected with linked elements"
-msgstr "Eliminar selección junto con los elementos vinculados"
+msgstr "Eliminar lo seleccionado junto con los elementos vinculados"
 
 #: jsLoader.php:183
 msgid "Delete service"
@@ -4280,21 +4283,27 @@ msgid "Event ID"
 msgstr "ID del evento"
 
 #: popup_trexpr.php:426
+#, fuzzy
 msgid "Event ID of last log entry matching regular expression T, then N = 1, 0 - otherwise"
 msgstr ""
+"Si ID del evento de la última entrada en el registro coincide con la "
+"expresión regular T, entonces N=1; de lo contrario, N=0"
 
 #: popup_trexpr.php:431
+#, fuzzy
 msgid "Event ID of last log entry matching regular expression T, then N NOT 1, 0 - otherwise"
 msgstr ""
+"Si ID del evento de la última entrada en el registro coincide con la "
+"expresión regular T, entonces N ≠1; de lo contrario, N ≠0"
 
 #: acknow.php:119 include/actions.inc.php:88
 msgid "Event acknowledged"
-msgstr ""
+msgstr "Evento admitido"
 
 #: adm.gui.php:71
-#, php-format
+#, fuzzy, php-format
 msgid "Event acknowledges \"%1$s\"."
-msgstr ""
+msgstr "Reconocimiento de evento \"%1$s\"."
 
 #: dashconf.php:260
 msgid "Event acknowledging disabled"
