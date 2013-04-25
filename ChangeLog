@@ -5,6 +5,7 @@ New features:
 A.F....... [ZBX-1357] updated Spanish and Turkish translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+...G...... [ZBX-6470] fixed incorrect swap calculation on Solaris (dimir)
 ..F....... [ZBX-5760] fixed graph item legend being rendered incorrectly if the names of the items contain certain local symbols (Pavels)
 .......PS. [ZBX-6526] fixed possible data uploading issues duing server startup or network problems (wiper)
 ...G...... [ZBX-6285] fixed message output from Zabbix sender (Andris)
