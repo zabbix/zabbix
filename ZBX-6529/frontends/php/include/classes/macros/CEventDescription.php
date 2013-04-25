@@ -1,6 +1,7 @@
+<?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2000-2012 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -9,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -17,12 +18,17 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_HOUSEKEEPER_H
-#define ZABBIX_HOUSEKEEPER_H
 
-extern int	CONFIG_HOUSEKEEPING_FREQUENCY;
-extern int	CONFIG_MAX_HOUSEKEEPER_DELETE;
+class CEventDescription extends CTriggerDescription {
 
-void	main_housekeeper_loop(void);
+	protected function resolveItemValueMacro(array $item, array $trigger) {
+		$item['lastvalue'] = item_get_history(
+			$item,
+			0,
+			$trigger['clock'],
+			$trigger['ns']
+		);
 
-#endif
+		return formatItemLastValue($item, UNRESOLVED_MACRO_STRING);
+	}
+}

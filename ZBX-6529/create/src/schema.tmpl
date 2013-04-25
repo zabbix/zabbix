@@ -423,8 +423,6 @@ INDEX		|1		|actionid
 
 TABLE|config|configid|ZBX_SYNC,ZBX_DATA
 FIELD		|configid	|t_id		|	|NOT NULL	|0
-FIELD		|alert_history	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|event_history	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|refresh_unsupported|t_integer	|'0'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|work_period	|t_varchar(100)	|'1-5,00:00-24:00'|NOT NULL|ZBX_SYNC
 FIELD		|alert_usrgrpid	|t_id		|	|NULL		|ZBX_SYNC		|1|usrgrp	|usrgrpid	|RESTRICT
@@ -468,6 +466,23 @@ FIELD		|ok_unack_style	|t_integer	|'1'	|NOT NULL	|ZBX_SYNC,ZBX_NODATA
 FIELD		|ok_ack_style	|t_integer	|'1'	|NOT NULL	|ZBX_SYNC,ZBX_NODATA
 FIELD		|snmptrap_logging|t_integer	|'1'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY,ZBX_NODATA
 FIELD		|server_check_interval|t_integer|'10'	|NOT NULL	|ZBX_SYNC,ZBX_NODATA
+FIELD		|hk_events_mode	|t_integer	|'1'	|NOT NULL	|ZBX_SYNC,ZBX_NODATA
+FIELD		|hk_events_trigger|t_integer	|'365'	|NOT NULL	|ZBX_SYNC,ZBX_NODATA
+FIELD		|hk_events_internal|t_integer	|'365'	|NOT NULL	|ZBX_SYNC,ZBX_NODATA
+FIELD		|hk_events_discovery|t_integer	|'365'	|NOT NULL	|ZBX_SYNC,ZBX_NODATA
+FIELD		|hk_events_autoreg|t_integer	|'365'	|NOT NULL	|ZBX_SYNC,ZBX_NODATA
+FIELD		|hk_services_mode|t_integer	|'1'	|NOT NULL	|ZBX_SYNC,ZBX_NODATA
+FIELD		|hk_services	|t_integer	|'365'	|NOT NULL	|ZBX_SYNC,ZBX_NODATA
+FIELD		|hk_audit_mode	|t_integer	|'1'	|NOT NULL	|ZBX_SYNC,ZBX_NODATA
+FIELD		|hk_audit	|t_integer	|'365'	|NOT NULL	|ZBX_SYNC,ZBX_NODATA
+FIELD		|hk_sessions_mode|t_integer	|'1'	|NOT NULL	|ZBX_SYNC,ZBX_NODATA
+FIELD		|hk_sessions	|t_integer	|'365'	|NOT NULL	|ZBX_SYNC,ZBX_NODATA
+FIELD		|hk_history_mode|t_integer	|'1'	|NOT NULL	|ZBX_SYNC,ZBX_NODATA
+FIELD		|hk_history_global|t_integer	|'0'	|NOT NULL	|ZBX_SYNC,ZBX_NODATA
+FIELD		|hk_history	|t_integer	|'90'	|NOT NULL	|ZBX_SYNC,ZBX_NODATA
+FIELD		|hk_trends_mode	|t_integer	|'1'	|NOT NULL	|ZBX_SYNC,ZBX_NODATA
+FIELD		|hk_trends_global|t_integer	|'0'	|NOT NULL	|ZBX_SYNC,ZBX_NODATA
+FIELD		|hk_trends	|t_integer	|'365'	|NOT NULL	|ZBX_SYNC,ZBX_NODATA
 
 TABLE|triggers|triggerid|ZBX_SYNC,ZBX_DATA
 FIELD		|triggerid	|t_id		|	|NOT NULL	|0
@@ -1212,4 +1227,4 @@ UNIQUE		|1		|userid
 TABLE|dbversion||
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|2010050	|2010050
+ROW		|2010068	|2010070

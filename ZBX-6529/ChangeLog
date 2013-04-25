@@ -1,6 +1,8 @@
 Changes for 2.1.0
 
 New features:
+A.F.....S. [ZBXNEXT-1] added support of {host:key.last/min/avg/max()} macros in graph titles (Sasha, Toms)
+..F.I...S. [ZBXNEXT-1649] added fine grained control of housekeeper tasks (Oleg, wiper)
 ..F....... [ZBXNEXT-1712] improved create button for applications, items, triggers and web scenarios (Eduard)
 ..F....... [ZBXNEXT-1712] removed useless host name field in applications, items and web scenarios (Eduard)
 ........S. [ZBXNEXT-384] added support of new notification macros {ACTION.*} and {EVENT.RECOVERY.*}; {EVENT.*} macros now return information of the events which triggered an action (Sasha)
@@ -184,7 +186,11 @@ Changes for 2.0.7rc1
 
 New features:
 
+A.F....... [ZBX-1357] updated Spanish and Turkish translations; thanks to Zabbix translators (Richlv)
+
 Bug fixes:
+..F....... [ZBX-5760] fixed graph item legend being rendered incorrectly if the names of the items contain certain local symbols (Pavels)
+.......PS. [ZBX-6526] fixed possible data uploading issues duing server startup or network problems (wiper)
 ...G...... [ZBX-6285] fixed message output from Zabbix sender (Andris)
 ..F....... [ZBX-6484] fixed bar report calculation (Oleg)
 ..F....... [ZBX-1236] added graph right side in bar reports (Oleg)
