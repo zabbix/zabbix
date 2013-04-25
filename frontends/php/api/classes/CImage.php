@@ -250,10 +250,10 @@ class CImage extends CZBXAPI {
 			);
 
 			if (!check_db_fields($imageDbFields, $image)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Wrong fields for image [ %s ]', $image['name']));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Wrong fields for image "%1$s".', $image['name']));
 			}
 			if ($this->exists(array('name' => $image['name']))) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Image [ %s ] already exists', $image['name']));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Image "%1$s" already exists.', $image['name']));
 			}
 
 			// decode BASE64
@@ -369,7 +369,7 @@ class CImage extends CZBXAPI {
 			$imageExists = reset($imageExists);
 
 			if ($imageExists && (bccomp($imageExists['imageid'], $image['imageid']) != 0)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Image [ %s ] already exists', $image['name']));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Image "%1$s" already exists.', $image['name']));
 			}
 
 			$values = array();
