@@ -241,7 +241,9 @@ typedef enum
 	ITEM_VALUE_TYPE_STR,
 	ITEM_VALUE_TYPE_LOG,
 	ITEM_VALUE_TYPE_UINT64,
-	ITEM_VALUE_TYPE_TEXT
+	ITEM_VALUE_TYPE_TEXT,
+	/* the number of defined value types */
+	ITEM_VALUE_TYPE_COUNT
 }
 zbx_item_value_type_t;
 const char	*zbx_item_value_type_string(zbx_item_value_type_t value_type);
@@ -757,9 +759,9 @@ extern const char	*help_message[];
 
 #define ARRSIZE(a)	sizeof(a) / sizeof(*a)
 
-void	help();
-void	usage();
-void	version();
+void	help(void);
+void	usage(void);
+void	version(void);
 
 /* max length of base64 data */
 #define ZBX_MAX_B64_LEN 16 * 1024

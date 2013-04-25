@@ -67,7 +67,6 @@ $fields = array(
 	'applications_visible' =>	array(T_ZBX_STR, O_OPT, null,	null,		null),
 	'groupid' =>				array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
 	'hostid' =>					array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
-	'form_hostid' =>			array(T_ZBX_INT, O_OPT, null,	DB_ID.NOT_ZERO, 'isset({save})', _('Host')),
 	'interfaceid' =>			array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null, _('Interface')),
 	'copy_type' =>				array(T_ZBX_INT, O_OPT, P_SYS,	IN('0,1'),	'isset({copy})'),
 	'copy_mode' =>				array(T_ZBX_INT, O_OPT, P_SYS,	IN('0'),	null),
@@ -208,7 +207,9 @@ $_REQUEST['go'] = get_request('go', 'none');
 $_REQUEST['params'] = get_request($paramsFieldName, '');
 unset($_REQUEST[$paramsFieldName]);
 
-// permissions
+/*
+ * Permissions
+ */
 if (get_request('itemid', false)) {
 	$item = API::Item()->get(array(
 		'itemids' => $_REQUEST['itemid'],
@@ -233,7 +234,9 @@ elseif (get_request('hostid', 0) > 0) {
 	}
 }
 
-// ajax
+/*
+ * Ajax
+ */
 if (isset($_REQUEST['favobj'])) {
 	if ($_REQUEST['favobj'] == 'filter') {
 		CProfile::update('web.items.filter.state', $_REQUEST['favstate'], PROFILE_TYPE_INT);
@@ -318,16 +321,14 @@ else {
 }
 
 if (isset($_REQUEST['filter_hostname']) && !zbx_empty($_REQUEST['filter_hostname'])) {
-	$hostid = API::Host()->getObjects(array('name' => $_REQUEST['filter_hostname']));
-	if (empty($hostid)) {
-		$hostid = API::Template()->getObjects(array('name' => $_REQUEST['filter_hostname']));
+	$host = API::Host()->getObjects(array('name' => $_REQUEST['filter_hostname']));
+	if (empty($host)) {
+		$host = API::Template()->getObjects(array('name' => $_REQUEST['filter_hostname']));
 	}
-	$hostid = reset($hostid);
-	if ($hostid) {
-		$hostid = isset($hostid['hostid']) ? $hostid['hostid'] : $hostid['templateid'];
-	}
-	else {
-		$hostid = 0;
+	$host = reset($host);
+
+	if ($host) {
+		$_REQUEST['hostid'] = isset($host['hostid']) ? $host['hostid'] : $host['templateid'];
 	}
 }
 
@@ -368,7 +369,7 @@ elseif (isset($_REQUEST['clone']) && isset($_REQUEST['itemid'])) {
 	unset($_REQUEST['itemid']);
 	$_REQUEST['form'] = 'clone';
 }
-elseif (isset($_REQUEST['save']) && $_REQUEST['form_hostid'] > 0) {
+elseif (isset($_REQUEST['save'])) {
 	$delay_flex = get_request('delay_flex', array());
 	$db_delay_flex = '';
 	foreach ($delay_flex as $value) {
@@ -388,7 +389,7 @@ elseif (isset($_REQUEST['save']) && $_REQUEST['form_hostid'] > 0) {
 	if (!zbx_empty($_REQUEST['new_application'])) {
 		$new_appid = API::Application()->create(array(
 			'name' => $_REQUEST['new_application'],
-			'hostid' => $_REQUEST['form_hostid']
+			'hostid' => get_request('hostid')
 		));
 		if ($new_appid) {
 			$new_appid = reset($new_appid['applicationids']);
@@ -404,7 +405,7 @@ elseif (isset($_REQUEST['save']) && $_REQUEST['form_hostid'] > 0) {
 			'name' => get_request('name'),
 			'description' => get_request('description'),
 			'key_' => get_request('key'),
-			'hostid' => get_request('form_hostid'),
+			'hostid' => get_request('hostid'),
 			'interfaceid' => get_request('interfaceid', 0),
 			'delay' => get_request('delay'),
 			'history' => get_request('history'),
@@ -493,7 +494,7 @@ elseif (isset($_REQUEST['del_history']) && isset($_REQUEST['itemid'])) {
 	}
 	if ($result) {
 		DBexecute('UPDATE items SET lastvalue=null,lastclock=null,prevvalue=null WHERE itemid='.$_REQUEST['itemid']);
-		$host = get_host_by_hostid($item['hostid']);
+		$host = get_host_by_hostid($_REQUEST['hostid']);
 		add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ITEM, _('Item').' ['.$item['key_'].'] ['.$_REQUEST['itemid'].'] '.
 			_('Host').' ['.$host['name'].'] '._('History cleared'));
 	}
@@ -696,8 +697,8 @@ if (isset($_REQUEST['form']) && str_in_array($_REQUEST['form'], array(_('Create 
 }
 elseif ($_REQUEST['go'] == 'massupdate' || isset($_REQUEST['massupdate']) && isset($_REQUEST['group_itemid'])) {
 	$data = array(
-		'form' => get_request('form', null),
-		'hostid' => get_request('hostid', null),
+		'form' => get_request('form'),
+		'hostid' => get_request('hostid'),
 		'itemids' => get_request('group_itemid', array()),
 		'description' => get_request('description', ''),
 		'delay' => get_request('delay', ZBX_ITEM_DELAY_DEFAULT),
@@ -831,17 +832,14 @@ elseif ($_REQUEST['go'] == 'copy_to' && isset($_REQUEST['group_itemid'])) {
 // list of items
 else {
 	$data = array(
-		'form' => get_request('form', null),
+		'form' => get_request('form'),
+		'hostid' => get_request('hostid'),
 		'sortfield' => getPageSortField('name')
 	);
 
-	if (isset($hostid)) {
-		$data['form_hostid'] = get_request('form_hostid', $hostid);
-		$data['hostid'] = $hostid;
-	}
-
 	// items
 	$options = array(
+		'hostids' => $data['hostid'],
 		'search' => array(),
 		'output' => API_OUTPUT_EXTEND,
 		'editable' => true,
@@ -854,9 +852,7 @@ else {
 		'limit' => $config['search_limit'] + 1
 	);
 	$preFilter = count($options, COUNT_RECURSIVE);
-	if (isset($data['hostid'])) {
-		$options['hostids'] = $data['hostid'];
-	}
+
 	if (isset($_REQUEST['filter_group']) && !zbx_empty($_REQUEST['filter_group'])) {
 		$options['group'] = $_REQUEST['filter_group'];
 	}
@@ -935,10 +931,10 @@ else {
 		// fill template host
 		fillItemsWithChildTemplates($data['items']);
 		$dbHostItems = DBselect(
-				'SELECT i.itemid,h.name,h.hostid'.
-				' FROM hosts h,items i'.
-				' WHERE i.hostid=h.hostid'.
-					' AND '.dbConditionInt('i.itemid', zbx_objectValues($data['items'], 'templateid'))
+			'SELECT i.itemid,h.name,h.hostid'.
+			' FROM hosts h,items i'.
+			' WHERE i.hostid=h.hostid'.
+				' AND '.dbConditionInt('i.itemid', zbx_objectValues($data['items'], 'templateid'))
 		);
 		while ($dbHostItem = DBfetch($dbHostItems)) {
 			foreach ($data['items'] as $itemid => $item) {

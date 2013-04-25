@@ -33,25 +33,12 @@ if (!empty($this->data['hostid'])) {
 $httpForm = new CForm();
 $httpForm->setName('httpForm');
 $httpForm->addVar('form', $this->data['form']);
+$httpForm->addVar('hostid', $this->data['hostid']);
 $httpForm->addVar('steps', $this->data['steps']);
 $httpForm->addVar('templated', $this->data['templated']);
 
-
 if (!empty($this->data['httptestid'])) {
 	$httpForm->addVar('httptestid', $this->data['httptestid']);
-	$hostButton = null;
-}
-else {
-	$hostButton = new CButtonPopup(array(
-		'srctbl' => 'hosts_and_templates',
-		'srcfld1' => 'name',
-		'srcfld2' => 'hostid',
-		'dstfrm' => $httpForm->getName(),
-		'dstfld1' => 'hostname',
-		'dstfld2' => 'hostid',
-		'noempty' => 1,
-		'submitParent' => 1
-	));
 }
 
 /*
@@ -63,13 +50,6 @@ $httpFormList = new CFormList('httpFormList');
 if (!empty($this->data['templates'])) {
 	$httpFormList->addRow(_('Parent web scenarios'), $this->data['templates']);
 }
-
-// Host
-$httpForm->addVar('hostid', $this->data['hostid']);
-$httpFormList->addRow(_('Host'), array(
-	new CTextBox('hostname', $this->data['hostname'], ZBX_TEXTBOX_STANDARD_SIZE, true),
-	$hostButton
-));
 
 // Name
 $nameTextBox = new CTextBox('name', $this->data['name'], ZBX_TEXTBOX_STANDARD_SIZE, $this->data['templated'], 64);

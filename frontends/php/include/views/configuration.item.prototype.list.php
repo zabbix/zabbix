@@ -17,8 +17,8 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
+
 $itemsWidget = new CWidget();
 
 // create new item button
@@ -122,5 +122,5 @@ $itemForm->addItem(array($this->data['paging'], $itemTable, $this->data['paging'
 
 // append form to widget
 $itemsWidget->addItem($itemForm);
+
 return $itemsWidget;
-?>

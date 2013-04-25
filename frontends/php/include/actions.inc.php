@@ -274,7 +274,7 @@ function get_condition_desc($conditiontype, $operator, $value) {
 		SPACE,
 		condition_operator2str($operator),
 		SPACE,
-		italic(condition_value2str($conditiontype, $value))
+		italic(CHtml::encode(condition_value2str($conditiontype, $value)))
 	);
 }
 
@@ -1017,9 +1017,9 @@ function getEventActionsStatus($eventIds) {
 	}
 
 	foreach ($actions as $eventId => $action) {
-		$sendCount = isset($action[ALERT_STATUS_SENT]) ? $action[ALERT_STATUS_SENT]['cnt'] : 0;
-		$notSendCount = isset($action[ALERT_STATUS_NOT_SENT]) ? $action[ALERT_STATUS_NOT_SENT]['cnt'] : 0;
-		$failedCount = isset($action[ALERT_STATUS_FAILED]) ? $action[ALERT_STATUS_FAILED]['cnt'] : 0;
+		$sendCount = isset($action[ALERT_STATUS_SENT]) ? $action[ALERT_STATUS_SENT] : 0;
+		$notSendCount = isset($action[ALERT_STATUS_NOT_SENT]) ? $action[ALERT_STATUS_NOT_SENT] : 0;
+		$failedCount = isset($action[ALERT_STATUS_FAILED]) ? $action[ALERT_STATUS_FAILED] : 0;
 
 		// calculate total
 		$mixed = 0;
