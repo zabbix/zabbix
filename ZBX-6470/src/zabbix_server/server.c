@@ -588,6 +588,9 @@ int	MAIN_ZABBIX_ENTRY()
 	/* need to set trigger status to UNKNOWN since last run */
 	DBupdate_triggers_status_after_restart();
 
+	/* make initial configuration sync before worker processes are forked */
+	DCsync_configuration();
+
 	DBclose();
 
 	if (ZBX_MUTEX_ERROR == zbx_mutex_create_force(&node_sync_access, ZBX_MUTEX_NODE_SYNC))
