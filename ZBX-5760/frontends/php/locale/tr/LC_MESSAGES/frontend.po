@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-04-15 01:48+0300\n"
-"PO-Revision-Date: 2013-02-23 21:10+0200\n"
+"POT-Creation-Date: 2013-04-04 11:16+0300\n"
+"PO-Revision-Date: 2013-04-22 13:00+0200\n"
 "Last-Translator: Murat <murat@profelis.com.tr>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: tr\n"
@@ -64,7 +64,7 @@ msgid_plural "%1$s failed login attempts logged. Last failed attempt was from %2
 msgstr[0] "%1$s başarısız giriş denemesi kayıt altına alındı. En son başarısız deneme  %2$s adresinden %3$s tarihinde %4$s zamanında olmuştur."
 msgstr[1] "%1$s başarısız giriş denemesi kayıt altına alındı. En son başarısız deneme  %2$s adresinden %3$s tarihinde %4$s zamanında olmuştur."
 
-#: include/blocks.inc.php:980
+#: include/blocks.inc.php:960
 #, php-format
 msgid "%2$d of %1$d issue is shown"
 msgid_plural "%2$d of %1$d issues are shown"
@@ -86,7 +86,7 @@ msgstr "(0 - belirsiz)"
 #: include/views/configuration.hostgroups.list.php:31
 #: include/views/configuration.template.edit.php:143
 msgid "(Only super admins can create groups)"
-msgstr ""
+msgstr "(Yalnızca süper adminler group oluşturabilir)"
 
 #: include/forms.inc.php:539 include/forms.inc.php:554
 msgid "(in days)"
@@ -212,8 +212,8 @@ msgid "Account is blocked for %s seconds"
 msgstr "Hesap %s saniye için bloklandı"
 
 #: events.php:565 events.php:578 include/actions.inc.php:245
-#: include/blocks.inc.php:899 include/blocks.inc.php:1415
-#: include/events.inc.php:137 include/events.inc.php:210
+#: include/blocks.inc.php:852 include/blocks.inc.php:1395
+#: include/events.inc.php:137 include/events.inc.php:208
 #: include/views/configuration.action.edit.php:938
 msgid "Ack"
 msgstr "Onay"
@@ -317,8 +317,8 @@ msgstr "Eylem işlemleri"
 msgid "Action updated"
 msgstr "Eylem güncellendi"
 
-#: events.php:566 events.php:579 include/blocks.inc.php:900
-#: include/blocks.inc.php:1416 include/events.inc.php:138
+#: events.php:566 events.php:579 include/blocks.inc.php:853
+#: include/blocks.inc.php:1396 include/events.inc.php:138
 #: include/menu.inc.php:193 include/views/administration.auditacts.list.php:29
 #: include/views/administration.auditacts.list.php:32
 #: include/views/administration.auditlogs.list.php:29
@@ -353,9 +353,9 @@ msgstr "den beri etkin"
 msgid "Active till"
 msgstr "dene kadar etkin"
 
-#: dashconf.php:211 include/blocks.inc.php:1139 include/blocks.inc.php:1145
-#: include/blocks.inc.php:1258 include/blocks.inc.php:1303
-#: include/blocks.inc.php:1309 include/forms.inc.php:1705
+#: dashconf.php:211 include/blocks.inc.php:1120 include/blocks.inc.php:1126
+#: include/blocks.inc.php:1239 include/blocks.inc.php:1284
+#: include/blocks.inc.php:1290 include/forms.inc.php:1705
 #: include/forms.inc.php:2009 include/reports.inc.php:332
 #: include/reports.inc.php:428 include/reports.inc.php:468
 #: include/views/administration.auditlogs.list.php:45
@@ -474,9 +474,9 @@ msgstr "Yönetim"
 msgid "Advanced labels"
 msgstr "Gelişmiş etiket"
 
-#: include/blocks.inc.php:897 include/blocks.inc.php:1413
-#: include/events.inc.php:136 include/events.inc.php:210
-#: include/events.inc.php:213 tr_status.php:288
+#: include/blocks.inc.php:850 include/blocks.inc.php:1393
+#: include/events.inc.php:136 include/events.inc.php:208
+#: include/events.inc.php:211 tr_status.php:288
 msgid "Age"
 msgstr "Süre"
 
@@ -511,9 +511,9 @@ msgstr "Rumuz"
 msgid "Align icons"
 msgstr "Simgeleri hizala"
 
-#: dashconf.php:173 dashconf.php:254 include/blocks.inc.php:1237
-#: include/blocks.inc.php:1246 include/blocks.inc.php:1291
-#: include/blocks.inc.php:1375 include/blocks.inc.php:1384
+#: dashconf.php:173 dashconf.php:254 include/blocks.inc.php:1218
+#: include/blocks.inc.php:1227 include/blocks.inc.php:1272
+#: include/blocks.inc.php:1356 include/blocks.inc.php:1365
 #: include/nodes.inc.php:156 include/page_header.php:331
 #: include/reports.inc.php:554
 #: include/views/administration.auditlogs.list.php:42
@@ -877,7 +877,7 @@ msgstr "Parlaklaştır"
 
 #: include/locales.inc.php:46
 msgid "Bulgarian (bg_BG)"
-msgstr ""
+msgstr "Bulgarca (bg_BG)"
 
 #: tr_status.php:780
 msgid "Bulk acknowledge"
@@ -1131,7 +1131,7 @@ msgstr "Eylem eklenemedi"
 msgid "Cannot add application"
 msgstr "Uygulama eklenemedi"
 
-#: api/classes/CTrigger.php:1820
+#: api/classes/CTrigger.php:1800
 msgid "Cannot add dependency from a host to a template."
 msgstr "Bir ana bilgisayardan bir şablona bağımlılık eklenemiyor."
 
@@ -1299,11 +1299,11 @@ msgstr "\"%1$s:%2$s\" tetikleyicisi kopyalanamıyor çünkü ifadede çoklu ana 
 msgid "Cannot create another database connection."
 msgstr "Başka bir veritabanı bağlantısı oluşturulamadı"
 
-#: api/classes/CTrigger.php:1854
+#: api/classes/CTrigger.php:1834
 msgid "Cannot create circular dependencies."
 msgstr "Dairesel bağımlılıklar oluşturulamıyor."
 
-#: api/classes/CTrigger.php:1826
+#: api/classes/CTrigger.php:1806
 msgid "Cannot create dependency on trigger itself."
 msgstr "Tetikleyicinin kendisi üzerinde bağımlılık oluşturulamıyor."
 
@@ -1354,7 +1354,7 @@ msgstr "Eylem silinemedi"
 msgid "Cannot delete application"
 msgstr "Uygulama silinemedi"
 
-#: api/classes/CTrigger.php:1548
+#: api/classes/CTrigger.php:1528
 msgid "Cannot delete dependency"
 msgstr "Bağımlılık silinemiyor."
 
@@ -1507,7 +1507,7 @@ msgstr "Şablonlanmış öğeler silinemiyor."
 msgid "Cannot delete templated items."
 msgstr "Şablonlarmış öğeler silinemiyor."
 
-#: api/classes/CTrigger.php:1134 api/classes/CTriggerPrototype.php:925
+#: api/classes/CTrigger.php:1114 api/classes/CTriggerPrototype.php:925
 #, php-format
 msgid "Cannot delete templated trigger \"%1$s:%2$s\"."
 msgstr "\"%1$s:%2$s\" şablonlanmış tetikleyicisi silinemiyor."
@@ -1660,7 +1660,7 @@ msgstr "Ağaç biçimlendirilemiyor."
 msgid "Cannot have empty visible template name"
 msgstr "Görünen şablon ismi boş olamaz"
 
-#: api/classes/CTrigger.php:1579 api/classes/CTrigger.php:1654
+#: api/classes/CTrigger.php:1559 api/classes/CTrigger.php:1634
 #: api/classes/CTriggerPrototype.php:1006
 #: api/classes/CTriggerPrototype.php:1064
 #, php-format
@@ -1766,7 +1766,7 @@ msgstr "\"%1$s\" öğesi için \"templateid\" kurulamıyor."
 msgid "Cannot set \"templateid\" for screen \"%1$s\"."
 msgstr "\"%1$s\" ekranı için \"templateid\" kurulamıyor."
 
-#: api/classes/CTrigger.php:1119
+#: api/classes/CTrigger.php:1099
 #, php-format
 msgid "Cannot set \"templateid\" for trigger \"%1$s\"."
 msgstr "\"%1$s\" tetikleyicisi için \"templateid\" kurulamıyor."
@@ -1841,7 +1841,7 @@ msgstr "\"%1$s\" öğesi için \"templateid\" güncellenemiyor."
 msgid "Cannot update \"templateid\" for screen \"%1$s\"."
 msgstr "\"%1$s\" ekranı için \"templateid\" güncellenemiyor."
 
-#: api/classes/CTrigger.php:1116
+#: api/classes/CTrigger.php:1096
 #, php-format
 msgid "Cannot update \"templateid\" for trigger \"%1$s\"."
 msgstr "\"%1$s\" tetikleyicisi için \"templateid\" güncellenemiyor."
@@ -1867,7 +1867,7 @@ msgstr "Yorum güncellenemedi"
 #: adm.triggerdisplayoptions.php:65 adm.triggerseverities.php:69
 #: adm.workingtime.php:46
 msgid "Cannot update configuration"
-msgstr ""
+msgstr "Yapılandırma güncellenemedi"
 
 #: usergrps.php:275
 msgid "Cannot update debug mode"
@@ -2117,20 +2117,20 @@ msgstr "Haritalarda Döngüsel referans : %1$s."
 #: include/classes/import/importers/CScreenImporter.php:104
 #, php-format
 msgid "Circular reference in screens: %1$s."
-msgstr ""
+msgstr "Ekranlarda döngüsel referanslar var: %1$s."
 
 #: include/classes/import/importers/CTemplateImporter.php:139
 #, php-format
 msgid "Circular reference in templates: %1$s."
-msgstr ""
+msgstr "Şablonlarda döngüsel referanslar var: %1$s."
 
 #: api/classes/CHostGeneral.php:335 api/classes/CHostGeneral.php:767
 msgid "Circular template linkage is not allowed."
-msgstr ""
+msgstr "Döngüsel şablon bağlantısına izin verilmiyor."
 
 #: include/classes/core/ZBase.php:135
 msgid "Classic"
-msgstr ""
+msgstr "Klasik"
 
 #: jsLoader.php:164
 msgid "Clear"
@@ -2138,7 +2138,7 @@ msgstr "Temizle"
 
 #: include/views/configuration.item.edit.php:460
 msgid "Clear history and trends"
-msgstr ""
+msgstr "Geçmiş ve trendleri temizle"
 
 #: include/views/configuration.httpconf.list.php:137
 #: include/views/configuration.item.list.php:251
@@ -2183,7 +2183,7 @@ msgstr "Kapat"
 
 #: include/views/configuration.triggers.edit.php:233
 msgid "Close expression constructor"
-msgstr ""
+msgstr "İfade oluşturucuyu kapat"
 
 #: include/views/administration.general.triggerDisplayOptions.edit.php:26
 #: include/views/administration.general.triggerSeverity.edit.php:28
@@ -2199,21 +2199,23 @@ msgstr "Renk(TAMAM)"
 
 #: include/profiles.inc.php:279
 msgid "Colour is not correct: expecting hexadecimal colour code (6 symbols)."
-msgstr ""
+msgstr "Renk doğru değil: onaltılık renk kodu bekleniyor (6 sembol)."
 
 #: include/views/configuration.screen.constructor.edit.php:605
 #: screenedit.php:45
 msgid "Column span"
-msgstr "Kolon kapsamı"
+msgstr "Sütun açıklığı"
 
 #: api/classes/CScreenItem.php:613
 #, php-format
 msgid "Column span of screen element located at X - %1$s and Y - %2$s is too big."
 msgstr ""
+"X - %1$s ve Y - %2$s arasında bulunan ekran öğesinin sütun açıklığı çok "
+"büyük."
 
 #: include/views/configuration.screen.edit.php:40 screenconf.php:51
 msgid "Columns"
-msgstr "Kolonlar"
+msgstr "Sütunlar"
 
 #: include/forms.inc.php:1844
 msgid "Combined result"
@@ -2261,7 +2263,7 @@ msgstr "Değerleri birden çok dönem için karşılaştır"
 
 #: include/views/administration.usergroups.edit.php:113
 msgid "Composing permissions"
-msgstr ""
+msgstr "İzinleri düzenleme"
 
 #: popup_trexpr.php:25
 msgid "Condition"
@@ -2280,11 +2282,11 @@ msgstr "Yapılandırma"
 
 #: conf.import.php:25
 msgid "Configuration import"
-msgstr ""
+msgstr "Yapılandırmayı içe aktar"
 
 #: adm.gui.php:24
 msgid "Configuration of GUI"
-msgstr ""
+msgstr "GUI Yapılandırması"
 
 #: services.php:27
 msgid "Configuration of IT services"
@@ -2300,11 +2302,11 @@ msgstr "Eylemlerin yapılandırması"
 
 #: applications.php:26
 msgid "Configuration of applications"
-msgstr ""
+msgstr "Uygulamaların Yapılandırması"
 
 #: authentication.php:24
 msgid "Configuration of authentication"
-msgstr ""
+msgstr "Kimlik Doğrulama Yapılandırması"
 
 #: discoveryconf.php:26
 msgid "Configuration of discovery"
@@ -2312,7 +2314,7 @@ msgstr "Keşif yapılandırması"
 
 #: host_discovery.php:27
 msgid "Configuration of discovery rules"
-msgstr ""
+msgstr "Keşif kurallarının yapılandırması"
 
 #: graphs.php:26
 msgid "Configuration of graphs"
@@ -2320,11 +2322,11 @@ msgstr "Grafiklerin yapılandırması"
 
 #: hostgroups.php:25
 msgid "Configuration of host groups"
-msgstr ""
+msgstr "Konak gruplarının yapılandırması"
 
 #: hosts.php:32
 msgid "Configuration of hosts"
-msgstr ""
+msgstr "Konakların yapılandırması"
 
 #: adm.housekeeper.php:24
 msgid "Configuration of housekeeper"
@@ -2332,15 +2334,15 @@ msgstr ""
 
 #: adm.iconmapping.php:24
 msgid "Configuration of icon mapping"
-msgstr ""
+msgstr "Simge eşleştirmesinin yapılandırması"
 
 #: adm.images.php:25
 msgid "Configuration of images"
-msgstr ""
+msgstr "İmajların yapılandırması"
 
 #: disc_prototypes.php:27
 msgid "Configuration of item prototypes"
-msgstr ""
+msgstr "Öğe prototiplerinin yapılandırması"
 
 #: items.php:27
 msgid "Configuration of items"
@@ -2348,15 +2350,15 @@ msgstr "Öğelerin yapılandırması"
 
 #: adm.macros.php:24
 msgid "Configuration of macros"
-msgstr ""
+msgstr "Makroların yapılandırması"
 
 #: maintenance.php:27
 msgid "Configuration of maintenance"
-msgstr ""
+msgstr "Bakım yapılandırması"
 
 #: media_types.php:26
 msgid "Configuration of media types"
-msgstr ""
+msgstr "Medya tiplerinin yapılandırması"
 
 #: sysmap.php:26 sysmaps.php:34
 msgid "Configuration of network maps"
@@ -2364,15 +2366,15 @@ msgstr "Ağ haritalarının yapılandırması"
 
 #: nodes.php:25
 msgid "Configuration of nodes"
-msgstr ""
+msgstr "Düğümlerin yapılandırması"
 
 #: proxies.php:25
 msgid "Configuration of proxies"
-msgstr ""
+msgstr "Vekillerin yapılandırması"
 
 #: adm.regexps.php:26
 msgid "Configuration of regular expressions"
-msgstr ""
+msgstr "Düzenli ifadelerin yapılandırması"
 
 #: screenconf.php:38 screenedit.php:27
 msgid "Configuration of screens"
@@ -2380,31 +2382,31 @@ msgstr "Ekranların yapılandırması"
 
 #: scripts.php:23
 msgid "Configuration of scripts"
-msgstr ""
+msgstr "Betiklerin yapılandırması"
 
 #: slideconf.php:27
 msgid "Configuration of slide shows"
-msgstr ""
+msgstr "Slayt gösterisinin yapılandırması"
 
 #: templates.php:38
 msgid "Configuration of templates"
-msgstr ""
+msgstr "Şablonların yapılandırması"
 
 #: report5.php:167
 msgid "Configuration of trigger"
-msgstr ""
+msgstr "Tetiklerin yapılandırması"
 
 #: adm.triggerdisplayoptions.php:24
 msgid "Configuration of trigger displaying options"
-msgstr ""
+msgstr "Tetik görüntüleme opsiyonlarının yapılandırması"
 
 #: trigger_prototypes.php:27
 msgid "Configuration of trigger prototypes"
-msgstr ""
+msgstr "Tetik prototiplerinin yapılandırması"
 
 #: adm.triggerseverities.php:24
 msgid "Configuration of trigger severities"
-msgstr ""
+msgstr "Tetik önem derecelerinin yapılandırması"
 
 #: triggers.php:27 tr_status.php:513
 msgid "Configuration of triggers"
@@ -2412,23 +2414,23 @@ msgstr "Tetiklerin Yapılandırması"
 
 #: usergrps.php:29
 msgid "Configuration of user groups"
-msgstr ""
+msgstr "Kullanıcın gruplarının yapılandırması"
 
 #: users.php:29
 msgid "Configuration of users"
-msgstr ""
+msgstr "Kullanıcınların yapılandırması"
 
 #: adm.valuemapping.php:24
 msgid "Configuration of value mapping"
-msgstr ""
+msgstr "Değer eşleştirmelerinin yapılandırması"
 
 #: httpconf.php:27
 msgid "Configuration of web monitoring"
-msgstr ""
+msgstr "Web monitörlemenin yapılandırması"
 
 #: adm.workingtime.php:24
 msgid "Configuration of working time"
-msgstr ""
+msgstr "Çalışma zamanlarının yapılandırması"
 
 #: adm.gui.php:66 adm.housekeeper.php:53 adm.other.php:58
 #: adm.triggerdisplayoptions.php:65 adm.triggerseverities.php:69
@@ -2439,7 +2441,7 @@ msgstr "Yapılandırma güncellendi"
 #: dashboard.php:227
 #, php-format
 msgid "Configure (Filter %s)"
-msgstr ""
+msgstr "Yapılandır (Filtre %s)"
 
 #: include/views/administration.script.edit.php:109
 msgid "Confirmation text"
@@ -2447,7 +2449,7 @@ msgstr "Onaylama metni"
 
 #: popup.php:617
 msgid "Conflict between selected templates."
-msgstr ""
+msgstr "Seçilen şablonlar arasında çakışma"
 
 #: include/views/administration.proxy.edit.php:54
 #: include/views/configuration.host.edit.php:217
@@ -2472,6 +2474,9 @@ msgid ""
 "1. Incorrect server IP/DNS in the \"zabbix.conf.php\";\n"
 "2. Incorrect DNS server configuration.\n"
 msgstr ""
+"\"%s\" Zabbix sunucusuna bağlantı başarısız. Muhtemel Sebepleri:\n"
+"1. \"zabbix.conf.php\" içinde yanlış sunucu IP/DNS tanımlaması;\n"
+"2. Yanlış DNS konfigurasyonu.\n"
 
 #: api/classes/CScript.php:464
 #, php-format
@@ -2482,6 +2487,11 @@ msgid ""
 "3. Zabbix server daemon not running;\n"
 "4. Firewall is blocking TCP connection.\n"
 msgstr ""
+"\"%s\" Zabbix sunucuna bağlantı reddedildi. Muhtemel sebepler:\n"
+"1. \"zabbix.con.php\" içinde yanlış sunucu IP/DNS tanımlaması:\n"
+"2. Güvenlik çevrebirimi (örneğin SELinux) bağlantıyı blokluyor;\n"
+"3. Zabbix sunucu daemon çalışmıyor;\n"
+"4. Güvenlik duvarı TCp bağlantısını blokluyor.\n"
 
 #: api/classes/CScript.php:470
 #, php-format
@@ -2490,6 +2500,9 @@ msgid ""
 "1. Incorrect server IP/DNS in the \"zabbix.conf.php\";\n"
 "2. Firewall is blocking TCP connection.\n"
 msgstr ""
+"%s\" Zabbix sunucuna bağlantı zaman aşımına uğradı. Muhtemel sebepler:\n"
+"1. \"zabbix.conf.php\" içinde yanlış sunucu IP/DNS tanımlaması:\n"
+"2. Güvenlik duvarı TCp bağlantısını blokluyor.\n"
 
 #: include/hosts.inc.php:214
 msgid "Contact"
@@ -2497,11 +2510,11 @@ msgstr "Kontak"
 
 #: include/hosts.inc.php:259
 msgid "Contract number"
-msgstr "Kontak numarası"
+msgstr "Kontrat numarası"
 
 #: include/views/js/configuration.sysmaps.js.php:151
 msgid "Coordinates"
-msgstr ""
+msgstr "Koordinatlar"
 
 #: include/views/configuration.copy.elements.php:102
 #: include/views/configuration.item.copy.php:82
@@ -2517,11 +2530,11 @@ msgstr "Seçilenleri kopyalanacağı ..."
 #: api/classes/CUser.php:985
 #, php-format
 msgid "Correct login \"%s\"."
-msgstr ""
+msgstr "Başarılı giriş \"%s\"."
 
 #: api/classes/CImage.php:493
 msgid "Could not save image!"
-msgstr "Resim kaydedilemedi!"
+msgstr "İmaj kaydedilemedi!"
 
 #: include/graphs.inc.php:84
 #: include/views/configuration.triggers.expression.php:95 popup_bitem.php:131
@@ -2535,7 +2548,7 @@ msgstr "Slaytların sayısı"
 
 #: include/views/configuration.action.list.php:28
 msgid "Create action"
-msgstr ""
+msgstr "Eylem oluştur"
 
 #: include/views/configuration.application.list.php:31
 msgid "Create application"
@@ -2544,64 +2557,64 @@ msgstr "Uygulama oluştur"
 #: include/views/configuration.discovery.list.php:27
 #: include/views/configuration.host.discovery.list.php:29
 msgid "Create discovery rule"
-msgstr ""
+msgstr "Keşif kuralı oluştur"
 
 #: include/views/configuration.graph.list.php:42
 msgid "Create graph"
-msgstr ""
+msgstr "Grafik oluştur"
 
 #: include/views/configuration.graph.list.php:45
 msgid "Create graph (select host first)"
-msgstr ""
+msgstr "Grafik oluştur (Önce konak seç)"
 
 #: include/views/configuration.graph.list.php:29
 msgid "Create graph prototype"
-msgstr ""
+msgstr "Grafik prototipi oluştur"
 
 #: hosts.php:633
 msgid "Create host"
-msgstr ""
+msgstr "Konak oluştur"
 
 #: include/views/configuration.hostgroups.list.php:28
 #: include/views/configuration.hostgroups.list.php:31
 msgid "Create host group"
-msgstr ""
+msgstr "Konak grubu oluştur"
 
 #: adm.iconmapping.php:123
 msgid "Create icon map"
-msgstr ""
+msgstr "Simge haritası oluştur"
 
 #: adm.images.php:145
 msgid "Create image"
-msgstr "Resim oluştur"
+msgstr "İmaj oluştur"
 
 #: include/views/configuration.item.list.php:30 items.php:662
 msgid "Create item"
-msgstr ""
+msgstr "Öğe oluştur"
 
 #: include/views/configuration.item.prototype.list.php:28
 msgid "Create item prototype"
-msgstr ""
+msgstr "Öğe prototipi oluştur"
 
 #: include/views/configuration.maintenance.list.php:27
 msgid "Create maintenance period"
-msgstr "Bakım dönemi oluştur"
+msgstr "Bakım aralığı oluştur"
 
 #: sysmaps.php:211
 msgid "Create map"
-msgstr ""
+msgstr "Harita oluştur"
 
 #: include/views/administration.mediatypes.list.php:26
 msgid "Create media type"
-msgstr ""
+msgstr "Medya tipi oluştur"
 
 #: include/views/administration.node.list.php:36
 msgid "Create node"
-msgstr ""
+msgstr "Düğüm oluştur"
 
 #: include/views/administration.proxy.list.php:32
 msgid "Create proxy"
-msgstr ""
+msgstr "Vekil oluştur"
 
 #: include/views/configuration.httpconf.list.php:30
 msgid "Create scenario"
@@ -2609,11 +2622,11 @@ msgstr "Senaryo oluştur"
 
 #: include/views/configuration.httpconf.list.php:33
 msgid "Create scenario (select host first)"
-msgstr ""
+msgstr "Senaryo oluştur (Önce konak seç)"
 
 #: include/views/configuration.screen.list.php:27
 msgid "Create screen"
-msgstr ""
+msgstr "Ekran oluştur"
 
 #: include/views/administration.script.list.php:24
 msgid "Create script"
@@ -2621,11 +2634,11 @@ msgstr "Betik oluştur"
 
 #: include/views/configuration.slideconf.list.php:27
 msgid "Create slide show"
-msgstr ""
+msgstr "Slayt gösterisi oluştur"
 
 #: templates.php:436
 msgid "Create template"
-msgstr ""
+msgstr "Şablon oluştur"
 
 #: include/views/configuration.triggers.list.php:44 jsLoader.php:103
 msgid "Create trigger"
@@ -2633,15 +2646,15 @@ msgstr "Tetik oluştur"
 
 #: include/views/configuration.triggers.list.php:39
 msgid "Create trigger prototype"
-msgstr ""
+msgstr "Tetik prototipi oluştur"
 
 #: include/views/administration.users.list.php:30
 msgid "Create user"
-msgstr ""
+msgstr "Kullanıcı oluştur"
 
 #: include/views/administration.usergroups.list.php:30
 msgid "Create user group"
-msgstr ""
+msgstr "Kullanıcı grubu oluştur"
 
 #: adm.valuemapping.php:139
 msgid "Create value map"
@@ -2650,82 +2663,82 @@ msgstr "Değer haritası oluştur"
 #: api/classes/CApplication.php:548
 #, php-format
 msgid "Created: Application \"%1$s\" on \"%2$s\"."
-msgstr ""
+msgstr "Oluşturuldu: \"%2$s\" üzerinde \"%1$s\" uygulaması."
 
 #: api/classes/CDiscoveryRule.php:827
 #, php-format
 msgid "Created: Discovery rule \"%1$s\" on \"%2$s\"."
-msgstr ""
+msgstr "Oluşturuldu: \"%2$s\" üzerinde \"%1$s\" keşif kuralı."
 
 #: api/classes/CItem.php:846
 #, php-format
 msgid "Created: Item \"%1$s\" on \"%2$s\"."
-msgstr ""
+msgstr "Oluşturuldu: \"%2$s\" üzerinde \"%1$s\" öğesi."
 
 #: api/classes/CItemPrototype.php:629
 #, php-format
 msgid "Created: Item prototype \"%1$s\" on \"%2$s\"."
-msgstr ""
+msgstr "Oluşturuldu: \"%2$s\" üzerinde \"%1$s\" öğe prototipi."
 
-#: api/classes/CTrigger.php:1589
+#: api/classes/CTrigger.php:1569
 #, php-format
 msgid "Created: Trigger \"%1$s\" on \"%2$s\"."
-msgstr ""
+msgstr "Oluşturuldu: \"%2$s\" üzerinde \"%1$s\" tetiği."
 
 #: api/classes/CTriggerPrototype.php:1013
 #, php-format
 msgid "Created: Trigger prototype \"%1$s\" on \"%2$s\"."
-msgstr ""
+msgstr "Oluşturuldu: \"%2$s\" üzerinde \"%1$s\" tetik prototipi."
 
 #: include/validate.inc.php:375
 #, php-format
 msgid "Critical error. Field \"%1$s\" contains Multibyte chars."
-msgstr ""
+msgstr "Kritik hata: \"%1$s\" alanı Multibyte karakterler içeriyor."
 
 #: include/validate.inc.php:436
 #, php-format
 msgid "Critical error. Field \"%1$s\" is mandatory."
-msgstr ""
+msgstr "Kritik hata: \"%1$s\" alanı gerekli."
 
 #: include/validate.inc.php:315
 #, php-format
 msgid "Critical error. Field \"%1$s\" is not IP range."
-msgstr ""
+msgstr "Kritik hata: \"%1$s\" alanı IP aralığı değil."
 
 #: include/validate.inc.php:301
 #, php-format
 msgid "Critical error. Field \"%1$s\" is not IP."
-msgstr ""
+msgstr "Kritik hata: \"%1$s\" alanı IP değil."
 
 #: include/validate.inc.php:387
 #, php-format
 msgid "Critical error. Field \"%1$s\" is not a colour."
-msgstr ""
+msgstr "Kritik hata: \"%1$s\" alanı bir renk değil."
 
 #: include/validate.inc.php:353
 #, php-format
 msgid "Critical error. Field \"%1$s\" is not decimal number."
-msgstr ""
+msgstr "Kritik hata: \"%1$s\" alanı ondalık sayı değil."
 
 #: include/validate.inc.php:329
 #, php-format
 msgid "Critical error. Field \"%1$s\" is not integer list or range."
-msgstr ""
+msgstr "Kritik hata: \"%1$s\" alanı tamsayı listesi veya aralığı değil."
 
 #: include/validate.inc.php:342
 #, php-format
 msgid "Critical error. Field \"%1$s\" is not integer."
-msgstr ""
+msgstr "Kritik hata: \"%1$s\" alanı tam sayı değil."
 
 #: include/validate.inc.php:364
 #, php-format
 msgid "Critical error. Field \"%1$s\" is not string."
-msgstr ""
+msgstr "Kritik hata: \"%1$s\" alanı söz dizimi değil."
 
 #: include/validate.inc.php:453
 #, php-format
 msgid "Critical error. Field \"%1$s\" must be missing."
-msgstr ""
+msgstr "Kritik hata. \"%1$s\" alanı eksik olmalı."
 
 #: include/validate.inc.php:507
 #, php-format
@@ -2736,56 +2749,58 @@ msgstr "Kritik hata. \"%2$s\" alanı için \"%1$s\" değeri geçersiz."
 #, php-format
 msgid "Critical error. Incorrect value \"%1$s\" for \"%2$s\" field: must be between %3$s and %4$s."
 msgstr ""
+"Kritik hata. \"%2$s\" alanı için \"%1$s\" değeri geçersiz: %3$s ve %4$s arasında "
+"olması lazım."
 
 #: include/validate.inc.php:488
 #, php-format
 msgid "Critical error. Incorrect value for field \"%1$s\": cannot be empty."
-msgstr ""
+msgstr "Kritik hata.\"%1$s\" alanı için geçersiz değer: boş olamaz."
 
 #: popup_trexpr.php:348
 msgid "Current date is < N"
-msgstr ""
+msgstr "Mevcut tarih < N"
 
 #: popup_trexpr.php:356
 msgid "Current date is = N"
-msgstr ""
+msgstr "Mevcut tarih = N"
 
 #: popup_trexpr.php:352
 msgid "Current date is > N"
-msgstr ""
+msgstr "Mevcut tarih > N"
 
 #: popup_trexpr.php:360
 msgid "Current date is NOT N"
-msgstr ""
+msgstr "Mevcut tarih N DEĞİL"
 
 #: include/views/js/configuration.action.edit.js.php:87
 #: include/views/js/configuration.action.edit.js.php:217
 msgid "Current host"
-msgstr "Geçerli konak"
+msgstr "Mevcut konak"
 
 #: include/page_header.php:363
 msgid "Current node"
-msgstr "Geçerli düğüm"
+msgstr "Mevcut düğüm"
 
 #: popup_trexpr.php:478
 msgid "Current time is < N"
-msgstr ""
+msgstr "Mevcut zaman < N"
 
 #: popup_trexpr.php:486
 msgid "Current time is = N"
-msgstr ""
+msgstr "Mevcut zaman = N"
 
 #: popup_trexpr.php:482
 msgid "Current time is > N"
-msgstr ""
+msgstr "Mevcut zaman > N"
 
 #: popup_trexpr.php:490
 msgid "Current time is NOT N"
-msgstr ""
+msgstr "Mevcut zaman N DEĞİL"
 
 #: include/setup.inc.php:192
 msgid "Current value"
-msgstr ""
+msgstr "Mevcut değer"
 
 #: charts.php:26
 msgid "Custom graphs"
@@ -2823,7 +2838,7 @@ msgstr "Özel önem derecesi isimleri bütün yerelleri etkiler ve elle çeviri 
 
 #: include/views/js/configuration.sysmaps.js.php:43
 msgid "Custom size"
-msgstr ""
+msgstr "Özel boyut"
 
 #: slides.php:27
 msgid "Custom slides"
@@ -2831,7 +2846,7 @@ msgstr "Özel slaytlar"
 
 #: include/locales.inc.php:49
 msgid "Czech (cs_CZ)"
-msgstr ""
+msgstr "Çek (cs_CZ)"
 
 #: include/classes/class.cchart.php:1227
 msgid "D"
@@ -2916,7 +2931,7 @@ msgstr "Veri"
 #: include/classes/class.cchart.php:2363 include/classes/class.cpie.php:702
 #, php-format
 msgid "Data from %1$s. Generated in %2$s sec."
-msgstr ""
+msgstr "%1$s'den gelen veri. %2$ saniyede oluşturuldu."
 
 #: include/screens.inc.php:29
 msgid "Data overview"
@@ -2974,7 +2989,7 @@ msgstr "Tarih"
 
 #: include/hosts.inc.php:334
 msgid "Date HW decommissioned"
-msgstr ""
+msgstr "HW'nin faaliyetine son verildiği tarih"
 
 #: include/hosts.inc.php:324
 msgid "Date HW installed"
@@ -2999,19 +3014,19 @@ msgstr "Ayın günü"
 
 #: popup_trexpr.php:380
 msgid "Day of month is < N"
-msgstr ""
+msgstr "Ayın günü < N"
 
 #: popup_trexpr.php:388
 msgid "Day of month is = N"
-msgstr ""
+msgstr "Ayın günü = N"
 
 #: popup_trexpr.php:384
 msgid "Day of month is > N"
-msgstr ""
+msgstr "Ayın günü > N"
 
 #: popup_trexpr.php:392
 msgid "Day of month is NOT N"
-msgstr ""
+msgstr "Ayın günü N DEĞİL"
 
 #: include/forms.inc.php:1534 include/forms.inc.php:1591
 #: include/forms.inc.php:1615
@@ -3020,19 +3035,19 @@ msgstr "Haftanın günü"
 
 #: popup_trexpr.php:364
 msgid "Day of week is < N"
-msgstr ""
+msgstr "Haftanın günü < N"
 
 #: popup_trexpr.php:372
 msgid "Day of week is = N"
-msgstr ""
+msgstr "Haftanın günü = N"
 
 #: popup_trexpr.php:368
 msgid "Day of week is > N"
-msgstr ""
+msgstr "Haftanın günü > N"
 
 #: popup_trexpr.php:376
 msgid "Day of week is NOT N"
-msgstr ""
+msgstr "Haftanın günü N DEĞİL"
 
 #: include/forms.inc.php:1697 tr_status.php:207 tr_status.php:209
 msgid "Days"
@@ -3082,7 +3097,7 @@ msgstr "Öntanımlı kimlik doğrulama"
 
 #: include/views/configuration.slideconf.edit.php:39 slideconf.php:39
 msgid "Default delay (in seconds)"
-msgstr ""
+msgstr "Öntanımlı geçikme ( saniye olarak)"
 
 #: include/views/configuration.action.edit.php:51
 #: include/views/configuration.action.edit.php:534
@@ -3091,7 +3106,7 @@ msgstr "Öntanımlı mesaj"
 
 #: actionconf.php:37 include/views/configuration.action.edit.php:44
 msgid "Default operation step duration"
-msgstr ""
+msgstr "Öntanımlı operasyon adımı süresi"
 
 #: include/views/configuration.action.edit.php:50
 msgid "Default subject"
@@ -3104,7 +3119,7 @@ msgstr "Öntanımlı tema"
 #: adm.gui.php:70
 #, php-format
 msgid "Default theme \"%1$s\"."
-msgstr ""
+msgstr "Öntanımlı tema \"%1$s\"."
 
 #: include/views/configuration.discovery.list.php:42
 #: include/views/configuration.slideconf.edit.php:49
@@ -3114,7 +3129,7 @@ msgstr "Geçikme"
 
 #: include/views/configuration.discovery.edit.php:48
 msgid "Delay (in sec)"
-msgstr ""
+msgstr "Geçikme ( saniye olarak)"
 
 #: queue.php:247
 msgid "Delayed by"
@@ -3141,7 +3156,7 @@ msgstr "Seçilen şablon silinsin ve temizlensin mi? (Uyarı: bütün bağlantı
 
 #: include/views/configuration.application.edit.php:73
 msgid "Delete application?"
-msgstr ""
+msgstr "Uygulama silinsin mi?"
 
 #: include/views/configuration.action.edit.php:974
 msgid "Delete current action?"
@@ -3171,11 +3186,11 @@ msgstr "Seçilen öğelerin geçmişi silinsin mi?"
 
 #: include/views/administration.general.iconmap.edit.php:142
 msgid "Delete icon map?"
-msgstr ""
+msgstr "Simge haritası silinsin mi?"
 
 #: include/views/configuration.item.edit.php:470
 msgid "Delete item?"
-msgstr ""
+msgstr "Öğe silinsin mi?"
 
 #: jsLoader.php:105 tr_logform.php:349
 msgid "Delete keyword?"
@@ -3183,7 +3198,7 @@ msgstr "Anahtar kelime silinsin mi?"
 
 #: jsLoader.php:156
 msgid "Delete links between selected elements?"
-msgstr ""
+msgstr "Seçilen elementler arasındaki bağlar silinsin mi?"
 
 #: include/views/configuration.maintenance.edit.php:222
 msgid "Delete maintenance period?"
@@ -3191,11 +3206,11 @@ msgstr "Bakım dönemi silinsin mi?"
 
 #: include/views/configuration.sysmap.edit.php:209
 msgid "Delete network map?"
-msgstr ""
+msgstr "Ağ haritası silinsin mi?"
 
 #: include/views/administration.proxy.edit.php:95
 msgid "Delete proxy?"
-msgstr ""
+msgstr "Vekil silinsin mi?"
 
 #: include/forms.inc.php:1874
 msgid "Delete regular expression?"
@@ -3280,7 +3295,7 @@ msgstr "Seçilen gruplar silinsin mi?"
 
 #: include/views/configuration.hostgroups.list.php:126
 msgid "Delete selected host groups?"
-msgstr ""
+msgstr "Seçilen konak grupları silinsin mi?"
 
 #: include/views/configuration.host.edit.php:641
 msgid "Delete selected host?"
@@ -3309,7 +3324,7 @@ msgstr "Seçilen haritalar silinsin mi?"
 
 #: include/views/administration.mediatypes.edit.php:109
 msgid "Delete selected media type?"
-msgstr ""
+msgstr "Seçilen medya tipleri silinsin mi?"
 
 #: include/views/administration.mediatypes.list.php:118
 msgid "Delete selected media types?"
@@ -3337,7 +3352,7 @@ msgstr "Seçilen betikler silinsin mi?"
 
 #: include/views/configuration.slideconf.list.php:60
 msgid "Delete selected slide shows?"
-msgstr ""
+msgstr "Seçilen slayt gösterileri silinsin mi?"
 
 #: templates.php:613
 msgid "Delete selected templates?"
@@ -3372,11 +3387,11 @@ msgstr "Seçilen bağlı elemanları sil"
 
 #: jsLoader.php:183
 msgid "Delete service"
-msgstr ""
+msgstr "Servisi sil"
 
 #: include/views/configuration.slideconf.edit.php:115
 msgid "Delete slide show?"
-msgstr ""
+msgstr "Slayt gösterisi silinsin mi?"
 
 #: include/views/configuration.template.edit.php:437
 msgid "Delete template?"
@@ -3384,7 +3399,7 @@ msgstr "Şablon silinsin mi?"
 
 #: jsLoader.php:184
 msgid "Delete the selected service?"
-msgstr ""
+msgstr "Seçilen servis silinsin mi?"
 
 #: include/views/configuration.triggers.edit.php:304
 msgid "Delete trigger?"
@@ -3397,53 +3412,53 @@ msgstr "Silindi"
 #: api/classes/CApplication.php:641
 #, php-format
 msgid "Deleted: Application \"%1$s\" on \"%2$s\"."
-msgstr ""
+msgstr "Silindi: \"%2$s\" üzerindeki \"%1$s\" uygulaması."
 
 #: api/classes/CDiscoveryRule.php:636
 #, php-format
 msgid "Deleted: Discovery rule \"%1$s\" on \"%2$s\"."
-msgstr ""
+msgstr "Silindi: \"%2$s\" üzerindeki \"%1$s\" keşif kuralı."
 
 #: api/classes/CGraph.php:745
 #, php-format
 msgid "Deleted: Graph \"%1$s\" on \"%2$s\"."
-msgstr ""
+msgstr "Silindi: \"%2$s\" üzerindeki \"%1$s\" grafik."
 
 #: api/classes/CHost.php:2145
 #, php-format
 msgid "Deleted: Host \"%1$s\"."
-msgstr ""
+msgstr "Silindi: \"%1$s\" konağı."
 
 #: api/classes/CItem.php:1036
 #, php-format
 msgid "Deleted: Item \"%1$s\" on \"%2$s\"."
-msgstr ""
+msgstr "Silindi: \"%2$s\" üzerindeki \"%1$s\" öğe."
 
 #: api/classes/CItemPrototype.php:812
 #, php-format
 msgid "Deleted: Item prototype \"%1$s\" on \"%2$s\"."
-msgstr ""
+msgstr "Silindi: \"%2$s\" üzerindeki \"%1$s\" öğe prototipi."
 
 #: api/classes/CProxy.php:530
 #, php-format
 msgid "Deleted: Proxy \"%1$s\"."
-msgstr ""
+msgstr "Silindi: \"%1$s\" vekili."
 
 #: api/classes/CTemplate.php:1241
 #, php-format
 msgid "Deleted: Template \"%1$s\"."
-msgstr ""
+msgstr "Silindi: \"%1$s\" şablonu."
 
 #: api/classes/CTriggerGeneral.php:86 api/classes/CTriggerGeneral.php:141
-#: api/classes/CTrigger.php:1353
+#: api/classes/CTrigger.php:1333
 #, php-format
 msgid "Deleted: Trigger \"%1$s\" on \"%2$s\"."
-msgstr ""
+msgstr "Silindi: \"%2$s\" üzerindeki \"%1$s\" tetiği."
 
 #: api/classes/CTriggerPrototype.php:969
 #, php-format
 msgid "Deleted: Trigger prototype \"%1$s\" on \"%2$s\"."
-msgstr ""
+msgstr "Silindi: \"%2$s\" üzerindeki \"%1$s\" tetik prototipi."
 
 #: include/forms.inc.php:1835 include/forms.inc.php:1916
 #: include/forms.inc.php:1996
@@ -3469,7 +3484,7 @@ msgstr "Reddet"
 #: include/views/configuration.triggers.edit.php:284
 #: include/views/configuration.triggers.edit.php:293
 msgid "Dependencies"
-msgstr ""
+msgstr "Bağımlılıklar"
 
 #: include/triggers.inc.php:1355 tr_status.php:558
 msgid "Dependent"
@@ -3501,7 +3516,7 @@ msgstr "Dağıtım durumu"
 msgid "Description"
 msgstr "Açıklama"
 
-#: include/actions.inc.php:868 include/blocks.inc.php:713
+#: include/actions.inc.php:868 include/blocks.inc.php:704
 #: include/config.inc.php:344
 #: include/views/administration.auditlogs.list.php:92
 #: include/views/administration.mediatypes.list.php:43
@@ -3524,19 +3539,19 @@ msgstr "Aygıt teklik kıstası"
 
 #: popup_trexpr.php:158
 msgid "Difference between MAX and MIN value of a period T is < N"
-msgstr ""
+msgstr "T aralığının MAX ve MIN değerleri arasındaki fark < N"
 
 #: popup_trexpr.php:168
 msgid "Difference between MAX and MIN value of a period T is = N"
-msgstr ""
+msgstr "T aralığının MAX ve MIN değerleri arasındaki fark = N"
 
 #: popup_trexpr.php:163
 msgid "Difference between MAX and MIN value of a period T is > N"
-msgstr ""
+msgstr "T aralığının MAX ve MIN değerleri arasındaki fark > N"
 
 #: popup_trexpr.php:173
 msgid "Difference between MAX and MIN value of a period T is NOT N"
-msgstr ""
+msgstr "T aralığının MAX ve MIN değerleri arasındaki fark N DEĞİL"
 
 #: popup_trexpr.php:214
 msgid "Difference between last and preceding values, then N = 1, 0 - otherwise"
@@ -3548,19 +3563,19 @@ msgstr ""
 
 #: popup_trexpr.php:178
 msgid "Difference between last and previous value is < N"
-msgstr ""
+msgstr "En son ve önceki değer arasındaki fark < N"
 
 #: popup_trexpr.php:186
 msgid "Difference between last and previous value is = N"
-msgstr ""
+msgstr "En son ve önceki değer arasındaki fark = N"
 
 #: popup_trexpr.php:182
 msgid "Difference between last and previous value is > N"
-msgstr ""
+msgstr "En son ve önceki değer arasındaki fark > N"
 
 #: popup_trexpr.php:190
 msgid "Difference between last and previous value is NOT N"
-msgstr ""
+msgstr "En son ve önceki değer arasındaki fark N DEĞİL"
 
 #: include/views/configuration.screen.list.php:50
 msgid "Dimension (cols x rows)"
@@ -3588,7 +3603,7 @@ msgstr "Konak etkisizleştirilsin mi?"
 
 #: include/views/configuration.hostgroups.list.php:123
 msgid "Disable hosts in the selected host groups?"
-msgstr ""
+msgstr "Seçilen konak gruplarındaki konaklar etkisizleştirilsin mi?"
 
 #: include/views/administration.proxy.list.php:100
 msgid "Disable hosts monitored by selected proxies?"
@@ -3641,7 +3656,7 @@ msgstr "Seçilen öğeler etkisizleştirilsin mi?"
 
 #: include/views/administration.mediatypes.list.php:114
 msgid "Disable selected media types?"
-msgstr ""
+msgstr "Seçilen medya tipleri etkisizleştirilsin mi?"
 
 #: include/views/configuration.triggers.list.php:229
 msgid "Disable selected triggers?"
@@ -3672,7 +3687,7 @@ msgstr "Etkisizleştirilmiş"
 
 #: include/views/monitoring.overview.php:59
 msgid "Disabled or no trigger"
-msgstr ""
+msgstr "Etkisizleştirilmiş veya tetik yok"
 
 #: adm.triggerseverities.php:64
 #: include/views/administration.general.triggerSeverity.edit.php:64
@@ -3704,18 +3719,18 @@ msgstr "Keşif kontrolü"
 
 #: popup.php:131
 msgid "Discovery checks"
-msgstr ""
+msgstr "Keşif kontrolleri"
 
 #: include/html.inc.php:378
 msgid "Discovery list"
-msgstr ""
+msgstr "Keşif listesi"
 
 #: include/actions.inc.php:74
 msgid "Discovery object"
 msgstr "Keşif objesi"
 
 #: include/actions.inc.php:70 include/audit.inc.php:44
-#: include/blocks.inc.php:1110 include/forms.inc.php:1018
+#: include/blocks.inc.php:1091 include/forms.inc.php:1018
 #: include/views/configuration.discovery.edit.php:76
 #: include/views/configuration.discovery.list.php:29
 #: include/views/monitoring.discovery.php:34
@@ -3726,6 +3741,8 @@ msgstr "Keşif kuralı"
 #, php-format
 msgid "Discovery rule \"%1$s\" already exists on \"%2$s\", inherited from another template."
 msgstr ""
+"\"%2$s\" üzerinde \"%1$s\" keşif kuralı zaten mevcut, başka bir şablondan "
+"intikal etmiş."
 
 #: api/classes/CDiscoveryRule.php:881
 #, php-format
@@ -3735,12 +3752,12 @@ msgstr ""
 #: api/classes/CDRule.php:596
 #, php-format
 msgid "Discovery rule \"%s\" already exists."
-msgstr ""
+msgstr "Keşif kuralı \"%s\" zaten var."
 
 #: api/classes/CDRule.php:664
 #, php-format
 msgid "Discovery rule [%s] already exists"
-msgstr ""
+msgstr "Keşif kuralı [%s] zaten var"
 
 #: discoveryconf.php:150 host_discovery.php:233
 msgid "Discovery rule created"
@@ -3769,7 +3786,7 @@ msgstr "Keşif kuralları etkinleştirildi"
 
 #: discoveryconf.php:192 host_discovery.php:250
 msgid "Discovery rules deleted"
-msgstr ""
+msgstr "Keşif kuralları silindi"
 
 #: host_discovery.php:246
 msgid "Discovery rules disabled"
@@ -3777,7 +3794,7 @@ msgstr "Keşif kuralları etkisizleştirilmiş"
 
 #: discoveryconf.php:182
 msgid "Discovery rules updated"
-msgstr ""
+msgstr "Keşif kuralları güncellendi"
 
 #: dashboard.php:334 include/actions.inc.php:82
 msgid "Discovery status"
@@ -3811,22 +3828,22 @@ msgstr "Hesaplama yapma"
 #: adm.housekeeper.php:33
 #: include/views/administration.general.housekeeper.edit.php:24
 msgid "Do not keep actions older than (in days)"
-msgstr "Daha eski eylemleri saklama (gün olarak) "
+msgstr "Daha eski eylemleri saklama (gün olarak)"
 
 #: adm.housekeeper.php:58
 #, php-format
 msgid "Do not keep actions older than (in days) \"%1$s\"."
-msgstr ""
+msgstr "\"%1$s\"'den (gün olarak) daha eski olan aksiyonları saklama."
 
 #: adm.housekeeper.php:35
 #: include/views/administration.general.housekeeper.edit.php:25
 msgid "Do not keep events older than (in days)"
-msgstr "Daha eski olayları saklama (gün olarak) "
+msgstr "Daha eski olayları saklama (gün olarak)"
 
 #: adm.housekeeper.php:57
 #, php-format
 msgid "Do not keep events older than (in days) \"%1$s\"."
-msgstr ""
+msgstr "\"%1$s\"'den (gün olarak) daha eski olan olayları saklama."
 
 #: jsLoader.php:101
 msgid "Do you wish to replace the conditional expression?"
@@ -3834,32 +3851,32 @@ msgstr "Koşulsal ifadeyi değiştirmek ister misiniz?"
 
 #: jsLoader.php:134
 msgid "Done"
-msgstr ""
+msgstr "Yapıldı"
 
 #: include/graphs.inc.php:71 include/views/js/configuration.sysmaps.js.php:335
 #: include/views/js/configuration.sysmaps.js.php:411 jsLoader.php:150
 msgid "Dot"
 msgstr "Nokta"
 
-#: include/blocks.inc.php:1112
+#: include/blocks.inc.php:1093
 msgctxt "discovery results in dashboard"
 msgid "Down"
-msgstr ""
+msgstr "Aşağı"
 
 #: include/discovery.inc.php:150
 msgctxt "discovery status"
 msgid "Down"
-msgstr ""
+msgstr "Aşağı"
 
 #: api/classes/CWebCheck.php:619
 #, php-format
 msgid "Download speed for scenario \"%s\"."
-msgstr ""
+msgstr "\"%s\" senaryosu için indirme hızı."
 
 #: api/classes/CWebCheck.php:718
 #, php-format
 msgid "Download speed for step \"%1$s\" of scenario \"%2$s\"."
-msgstr ""
+msgstr "\"%s\" senaryosunun \"%2$s\" adımı için indirme hızı."
 
 #: include/views/configuration.services.edit.php:127
 #: include/views/configuration.services.edit.php:287
@@ -3870,19 +3887,19 @@ msgstr "Aksama Süresi"
 
 #: include/views/configuration.host.edit.php:271
 msgid "Drag here to change the type of the interface to \"IPMI\" type."
-msgstr ""
+msgstr "Arabirimin tipini \"IPMI\" olarak değiştirmek için buraya sürükle."
 
 #: include/views/configuration.host.edit.php:256
 msgid "Drag here to change the type of the interface to \"JMX\" type."
-msgstr ""
+msgstr "Arabirimin tipini \"JMX\" olarak değiştirmek için buraya sürükle."
 
 #: include/views/configuration.host.edit.php:240
 msgid "Drag here to change the type of the interface to \"SNMP\" type."
-msgstr ""
+msgstr "Arabirimin tipini \"SNMP\" olarak değiştirmek için buraya sürükle."
 
 #: include/views/configuration.host.edit.php:223
 msgid "Drag here to change the type of the interface to \"agent\" type."
-msgstr ""
+msgstr "Arabirimin tipini \"ajan\" olarak değiştirmek için buraya sürükle."
 
 #: include/views/configuration.graph.edit.php:72
 msgid "Draw style"
@@ -3902,53 +3919,57 @@ msgstr ""
 msgid "Dropdown remember selected \"%1$s\"."
 msgstr ""
 
-#: api/classes/CTrigger.php:1996
+#: api/classes/CTrigger.php:1976
 #, php-format
 msgid "Duplicate dependencies in trigger \"%1$s\"."
-msgstr ""
+msgstr "\"%1$s\" tetiğinde çift bağımlılıklar var."
 
 #: api/classes/CHost.php:1361
 #, php-format
 msgid "Duplicate host. Host with the same host name \"%s\" already exists in data."
 msgstr ""
+"Mükerrer konak. Veri içinde konak ismi aynı \"%s\" olan konak zaten "
+"bulunmakta."
 
 #: api/classes/CHost.php:1393
 #, php-format
 msgid "Duplicate host. Host with the same visible name \"%s\" already exists in data."
 msgstr ""
+"Mükerrer konak. Veri içinde görünür ismi aynı \"%s\" olan konak zaten "
+"bulunmakta."
 
 #: api/classes/CMap.php:560
 #, php-format
 msgid "Duplicate map name for map \"%s\"."
-msgstr "\"%s\" haritası için çift kopya harita ismi"
+msgstr "\"%s\" haritası için mükerrer harita ismi"
 
 #: api/classes/CScript.php:312 api/classes/CScript.php:363
 #, php-format
 msgid "Duplicate script name \"%s\"."
-msgstr ""
+msgstr "Mükerrer betik ismi \"%s\"."
 
 #: include/profiles.inc.php:311
 #, php-format
 msgid "Duplicate severity name \"%s\"."
-msgstr "Çift kopya \"%s\" önem derecesi ismi"
+msgstr "Mükerrer önem derecesi ismi \"%s\"."
 
 #: api/classes/CUser.php:388
 #, php-format
 msgid "Duplicate user alias \"%s\"."
-msgstr "Çift kopya \"%s\"  kullanıcı rumuzu"
+msgstr "Mükerrer kullanıcı rumuzu \"%s\"."
 
 #: events.php:564 events.php:577 include/events.inc.php:135
-#: include/events.inc.php:210 include/events.inc.php:213 tr_status.php:289
+#: include/events.inc.php:208 include/events.inc.php:211 tr_status.php:289
 msgid "Duration"
 msgstr "Süre"
 
 #: include/views/configuration.action.edit.php:317
 msgid "Duration (sec)"
-msgstr ""
+msgstr "Süre (saniye)"
 
 #: include/locales.inc.php:50
 msgid "Dutch (nl_NL)"
-msgstr ""
+msgstr "Hollandaca (nl_NL)"
 
 #: include/views/configuration.screen.constructor.edit.php:610
 msgid "Dynamic item"
@@ -3994,11 +4015,11 @@ msgstr "Harita elemanını düzenle"
 
 #: jsLoader.php:182
 msgid "Edit service"
-msgstr ""
+msgstr "Servisi düzenle"
 
 #: include/views/configuration.item.list.php:181
 msgid "Edit trigger"
-msgstr ""
+msgstr "Tetiği düzenle"
 
 #: include/views/configuration.sysmap.edit.php:151
 msgid "Element"
@@ -4019,7 +4040,7 @@ msgstr "Boş"
 
 #: api/classes/CAction.php:1724
 msgid "Empty action condition."
-msgstr ""
+msgstr "Boş aksiyon koşulu."
 
 #: api/classes/CAction.php:1429 api/classes/CApplication.php:656
 #: api/classes/CDiscoveryRule.php:567 api/classes/CGraph.php:693
@@ -4030,12 +4051,12 @@ msgstr ""
 #: api/classes/CProxy.php:547 api/classes/CService.php:344
 #: api/classes/CService.php:380 api/classes/CService.php:446
 #: api/classes/CService.php:518 api/classes/CTemplate.php:1112
-#: api/classes/CTrigger.php:1325 api/classes/CTrigger.php:1421
-#: api/classes/CTrigger.php:1513 api/classes/CTriggerPrototype.php:907
+#: api/classes/CTrigger.php:1305 api/classes/CTrigger.php:1401
+#: api/classes/CTrigger.php:1493 api/classes/CTriggerPrototype.php:907
 #: api/classes/CUserGroup.php:701 api/classes/CUserMacro.php:495
 #: api/classes/CUserMacro.php:647
 msgid "Empty input parameter."
-msgstr ""
+msgstr "Boş girdi parametresi."
 
 #: api/classes/CDRule.php:418
 msgid "Empty input."
@@ -4043,11 +4064,11 @@ msgstr "Boş girdi."
 
 #: api/classes/CUserMacro.php:885
 msgid "Empty macro."
-msgstr ""
+msgstr "Boş makro."
 
 #: api/classes/CService.php:1108
 msgid "Empty name."
-msgstr ""
+msgstr "Boş isim."
 
 #: api/classes/CImage.php:510 api/rpc/class.czbxrpc.php:38
 msgid "Empty parameters"
@@ -4055,7 +4076,7 @@ msgstr "Boş parametreler"
 
 #: include/classes/validators/CTimePeriodValidator.php:39
 msgid "Empty time period."
-msgstr ""
+msgstr "Boş zaman aralığı."
 
 #: include/views/administration.auditlogs.list.php:48
 msgid "Enable"
@@ -4105,7 +4126,7 @@ msgstr "Seçileni etkinleştir"
 
 #: include/views/configuration.httpconf.list.php:130
 msgid "Enable selected WEB scenarios?"
-msgstr ""
+msgstr "Seçilen WEB senaryoları etkinleştirilsin mi?"
 
 #: include/views/configuration.action.list.php:94
 msgid "Enable selected actions?"
@@ -4113,7 +4134,7 @@ msgstr "Seçilen eylemler etkinleştirilsin mi?"
 
 #: include/views/configuration.application.list.php:82
 msgid "Enable selected applications?"
-msgstr ""
+msgstr "Seçilen uygulamalar etkinleştirilsin mi?"
 
 #: include/views/configuration.discovery.list.php:68
 #: include/views/configuration.host.discovery.list.php:102
@@ -4126,7 +4147,7 @@ msgstr "Seçilen konaklar etkinleştirilsin mi?"
 
 #: hosts.php:868 include/views/configuration.hostgroups.list.php:120
 msgid "Enable selected hosts?"
-msgstr ""
+msgstr "Seçilen konaklar etkinleştirilsin mi?"
 
 #: include/views/configuration.item.list.php:238
 #: include/views/configuration.item.prototype.list.php:105
@@ -4135,7 +4156,7 @@ msgstr "Seçilen öğeler etkinleştirilsin mi?"
 
 #: include/views/administration.mediatypes.list.php:110
 msgid "Enable selected media types?"
-msgstr ""
+msgstr "Seçilen medya tipleri etkinleştirilsin mi?"
 
 #: include/views/configuration.triggers.list.php:226
 msgid "Enable selected triggers?"
@@ -4167,11 +4188,11 @@ msgstr "Etkinleştirilmiş"
 
 #: include/locales.inc.php:44
 msgid "English (en_GB)"
-msgstr ""
+msgstr "İngilizce (en_GB)"
 
 #: include/locales.inc.php:45
 msgid "English (en_US)"
-msgstr ""
+msgstr "İngilizce (en_US)"
 
 #: include/actions.inc.php:736 include/actions.inc.php:812
 #: include/classes/screens/CScreenActions.php:131 include/items.inc.php:35
@@ -4185,27 +4206,33 @@ msgstr "Hata"
 
 #: api/classes/CScript.php:478
 msgid "Error description"
-msgstr ""
+msgstr "Hata açıklaması"
 
 #: api/classes/CScript.php:516
 msgid "Error description: can't read script response, check connection."
-msgstr ""
+msgstr "Hata açıklaması: betik yanıtı okunamadı, bağlantıyı kontrol edin."
 
 #: api/classes/CScript.php:493
 msgid "Error description: can't send command, check connection."
-msgstr ""
+msgstr "Hata açıklaması: komut gönderilemedi, bağlantıyı kontrol edin."
 
 #: api/classes/CScript.php:509
 msgid "Error description: defined in \"include/defines.inc.php\" constant ZBX_SCRIPT_BYTES_LIMIT read bytes limit is reached. You can try to increase this value."
 msgstr ""
+"Hata açıklaması: \"include/defines.inc.php\" içinde tanımlı "
+"ZBX_SCRIPT_BYTES_LIMIT sabitinin okuma bayt limitine ulaşıldı. Bu değeri "
+"arttırmayı deneyebilirsiniz."
 
 #: api/classes/CScript.php:505
 msgid "Error description: defined in \"include/defines.inc.php\" constant ZBX_SCRIPT_TIMEOUT timeout is reached. You can try to increase this value."
 msgstr ""
+"Hata açıklaması: \"include/defines.inc.php\" içinde tanımlı "
+"ZBX_SCRIPT_BYTES_TIMEOUT sabitinin zaman aşımına ulaşıldı. Bu değeri "
+"arttırmayı deneyebilirsiniz."
 
 #: api/classes/CScript.php:524
 msgid "Error description: empty response received."
-msgstr ""
+msgstr "Hata açıklaması: boş yanıt alındı."
 
 #: api/classes/CItemGeneral.php:267
 #, php-format
@@ -4220,7 +4247,7 @@ msgstr ""
 #: httpdetails.php:155 httpdetails.php:209
 #, php-format
 msgid "Error: %1$s"
-msgstr ""
+msgstr "Hata: %1$s"
 
 #: include/events.inc.php:115
 msgid "Event"
@@ -4261,7 +4288,7 @@ msgstr ""
 
 #: tr_events.php:139
 msgid "Event list [previous 20]"
-msgstr ""
+msgstr "Olay listesi [önceki 20]"
 
 #: include/views/configuration.action.list.php:37
 msgid "Event source"
@@ -4269,7 +4296,7 @@ msgstr "Olay kaynağı"
 
 #: tr_events.php:110
 msgid "Event source details"
-msgstr ""
+msgstr "Olay kaynağı detayları"
 
 #: events.php:317 include/menu.inc.php:57 include/triggers.inc.php:1267
 #: jsLoader.php:111 search.php:134 search.php:206 search.php:261
@@ -4321,7 +4348,7 @@ msgstr ""
 
 #: sysmap.php:190
 msgid "Expand macros"
-msgstr ""
+msgstr "Makroları genişlet"
 
 #: include/views/configuration.sysmap.edit.php:83
 msgid "Expand single problem"
@@ -4334,7 +4361,7 @@ msgstr "Beklenen sonuç"
 #: api/rpc/class.cjsonrpc.php:90
 #, php-format
 msgid "Expecting JSON-rpc version 2.0, \"%s\" is given."
-msgstr ""
+msgstr "JSON-rpc versiyon 2.0 bekleniyor, \"%s\" verildi."
 
 #: include/views/configuration.maintenance.list.php:55
 msgctxt "maintenance status"
@@ -4368,7 +4395,7 @@ msgstr "İfade"
 #: include/forms.inc.php:1341 include/forms.inc.php:1346
 #: include/forms.inc.php:1359
 msgid "Expression Syntax Error."
-msgstr ""
+msgstr "İfade Sözdizimi Hatası."
 
 #: tr_testexpr.php:56
 msgid "Expression Variable Elements"
@@ -4380,7 +4407,7 @@ msgstr "İfade boş olamaz"
 
 #: include/views/configuration.triggers.edit.php:126
 msgid "Expression constructor"
-msgstr ""
+msgstr "İfade oluşturucusu"
 
 #: include/forms.inc.php:1988
 msgid "Expression type"
@@ -4419,14 +4446,14 @@ msgstr "FTP"
 msgid "Fail"
 msgstr "Başarısız"
 
-#: include/actions.inc.php:961 include/blocks.inc.php:1021
+#: include/actions.inc.php:972 include/blocks.inc.php:1002
 msgid "Failed"
 msgstr "Başarısız"
 
 #: api/classes/CWebCheck.php:626
 #, php-format
 msgid "Failed step of scenario \"%s\"."
-msgstr ""
+msgstr "Senaryonun başarısız olan adımı \"%s\"."
 
 #: api/classes/CTemplate.php:1092
 msgid "Failed to update template"
@@ -4436,15 +4463,15 @@ msgstr "Şablon güncellemesi başarısız oldu"
 msgid "Failure Audit"
 msgstr "Başarısızlık denetimi"
 
-#: dashboard.php:259 include/blocks.inc.php:1132
+#: dashboard.php:259 include/blocks.inc.php:1113
 msgid "Favourite graphs"
 msgstr "Favori grafikler"
 
-#: dashboard.php:273 include/blocks.inc.php:1256
+#: dashboard.php:273 include/blocks.inc.php:1237
 msgid "Favourite maps"
 msgstr "Favori haritalar"
 
-#: dashboard.php:266 include/blocks.inc.php:1301
+#: dashboard.php:266 include/blocks.inc.php:1282
 msgid "Favourite screens"
 msgstr "Favori ekranlar"
 
@@ -4479,16 +4506,16 @@ msgstr "\"isim\" alanı gerekiyor."
 
 #: hostinventories.php:126
 msgid "Field:"
-msgstr ""
+msgstr "Alan:"
 
 #: api/classes/CImage.php:593
 msgid "File format is unsupported."
-msgstr ""
+msgstr "Dosya formatı desteklenmiyor."
 
 #: include/classes/helpers/CUploadFile.php:153
 #, php-format
 msgid "File is too big, max upload size is %1$s bytes."
-msgstr ""
+msgstr "Dosya çok büyük, maksimum yükleme boyutu %1$s bayt."
 
 #: include/classes/class.cview.php:68
 #, php-format
@@ -4531,7 +4558,7 @@ msgstr "Bitir"
 
 #: include/locales.inc.php:51
 msgid "Finnish (fi_FI)"
-msgstr ""
+msgstr "Fince (fi_FI)"
 
 #: include/forms.inc.php:1597 include/maintenances.inc.php:103
 msgid "First"
@@ -4540,11 +4567,11 @@ msgstr "İlk"
 #: include/func.inc.php:1656
 msgctxt "page navigation"
 msgid "First"
-msgstr ""
+msgstr "İlk"
 
 #: include/views/js/configuration.sysmaps.js.php:40
 msgid "Fit to map"
-msgstr ""
+msgstr "Haritaya sığdır"
 
 #: include/views/configuration.graph.edit.php:163
 #: include/views/configuration.graph.edit.php:221
@@ -4570,7 +4597,7 @@ msgstr "Dördüncü"
 
 #: include/locales.inc.php:52
 msgid "French (fr_FR)"
-msgstr ""
+msgstr "Fransızca (fr_FR)"
 
 #: include/func.inc.php:199
 msgid "Fri"
@@ -4627,7 +4654,7 @@ msgstr ""
 #: include/func.inc.php:566
 msgctxt "Giga short"
 msgid "G"
-msgstr ""
+msgstr "G"
 
 #: include/views/administration.mediatypes.edit.php:60
 #: include/views/administration.mediatypes.list.php:57
@@ -4657,7 +4684,7 @@ msgstr "%s sn'de oluşturuldu"
 
 #: include/locales.inc.php:53
 msgid "German (de_DE)"
-msgstr ""
+msgstr "Almanca (de_DE)"
 
 #: include/page_header.php:235
 msgid "Get support"
@@ -4709,17 +4736,17 @@ msgstr "Git"
 
 #: include/views/js/monitoring.maps.js.php:51 jsLoader.php:177
 msgid "Go to"
-msgstr ""
+msgstr "Git"
 
 #: include/views/configuration.httpconf.edit.php:97
 msgid "Google Chrome"
-msgstr ""
+msgstr "Google Chrome"
 
 #: include/graphs.inc.php:75
 msgid "Gradient line"
 msgstr "Gradyan çizgi"
 
-#: include/audit.inc.php:29 include/blocks.inc.php:1139
+#: include/audit.inc.php:29 include/blocks.inc.php:1120
 #: include/screens.inc.php:30 include/views/configuration.graph.edit.php:287
 #: include/views/monitoring.charts.php:27
 #: include/views/monitoring.history.php:60 latest.php:318 latest.php:495
@@ -4731,6 +4758,8 @@ msgstr "Grafik"
 #, php-format
 msgid "Graph \"%1$s\" already exists on \"%2$s\" (inherited from another template)."
 msgstr ""
+"\"%2$s\" üzerinde \"%1$s\" grafiği zaten mevcut (başka bir şablondan intikal "
+"etmiş)."
 
 #: api/classes/CGraph.php:622 api/classes/CGraph.php:629
 #: api/classes/CGraphPrototype.php:670 api/classes/CGraphPrototype.php:677
@@ -4802,11 +4831,11 @@ msgstr ""
 #: api/classes/CGraphPrototype.php:792
 #, php-format
 msgid "Graph prototype \"%s\" deleted."
-msgstr ""
+msgstr "Grafik prototipi \"%s\" silindi."
 
 #: api/classes/CGraphPrototype.php:855
 msgid "Graph prototype must have at least one prototype."
-msgstr ""
+msgstr "Grafik prototipi en az bir prototipe sahip olmak zorunda."
 
 #: include/html.inc.php:453 include/html.inc.php:457
 #: include/views/configuration.host.discovery.list.php:90
@@ -4841,9 +4870,9 @@ msgstr ""
 #: api/classes/CGraph.php:583 api/classes/CGraph.php:604
 #: api/classes/CGraphPrototype.php:630 api/classes/CGraphPrototype.php:651
 msgid "Graph with same name but other type exist."
-msgstr ""
+msgstr "Aynı isimde fakat başka tipte bir grafik var."
 
-#: dashboard.php:260 hosts.php:686 hosts.php:765 include/blocks.inc.php:1237
+#: dashboard.php:260 hosts.php:686 hosts.php:765 include/blocks.inc.php:1218
 #: include/html.inc.php:464 include/html.inc.php:468 include/items.inc.php:802
 #: include/menu.inc.php:62 include/triggers.inc.php:1311
 #: include/views/configuration.graph.list.php:56
@@ -4866,7 +4895,7 @@ msgstr "Grafikler silindi"
 
 #: include/locales.inc.php:54
 msgid "Greek (el_GR)"
-msgstr ""
+msgstr "Yunanca (el_GR)"
 
 #: include/views/js/configuration.sysmaps.js.php:60 sysmap.php:192
 msgid "Grid"
@@ -4901,12 +4930,12 @@ msgstr "Grup"
 #: include/classes/import/importers/CTemplateImporter.php:233
 #, php-format
 msgid "Group \"%1$s\" does not exist."
-msgstr ""
+msgstr "\"%1$s\" grubu mevcut değil."
 
 #: include/classes/import/importers/CHostImporter.php:131
 #, php-format
 msgid "Group \"%1$s\" for host \"%2$s\" does not exist."
-msgstr ""
+msgstr "\"%2$s\" konağı için \"%1$s\" grubu mevcut değil."
 
 #: api/classes/CHostGroup.php:746
 #, php-format
@@ -4937,7 +4966,7 @@ msgstr "Keşfedilmiş konaklar için grup"
 
 #: adm.other.php:71
 msgid "Group for discovered hosts."
-msgstr ""
+msgstr "Keşfedilmiş konaklar için grup."
 
 #: include/views/administration.usergroups.edit.php:39
 #: include/views/configuration.hostgroups.edit.php:35
@@ -4974,9 +5003,9 @@ msgstr "H.i"
 msgid "H:i"
 msgstr "H.i"
 
-#: include/blocks.inc.php:363 include/blocks.inc.php:701
-#: include/blocks.inc.php:769 include/blocks.inc.php:978
-#: include/blocks.inc.php:1068 include/blocks.inc.php:1126
+#: include/blocks.inc.php:354 include/blocks.inc.php:692
+#: include/blocks.inc.php:760 include/blocks.inc.php:958
+#: include/blocks.inc.php:1049 include/blocks.inc.php:1107
 #: include/classes/screens/CScreenSystemStatus.php:47
 #: include/views/configuration.item.list.php:102
 msgid "H:i:s"
@@ -4988,7 +5017,7 @@ msgstr ""
 
 #: hostinventories.php:84
 msgid "HOST INVENTORIES"
-msgstr ""
+msgstr "KONAK ENVANTERLERİ"
 
 #: hostinventoriesoverview.php:61
 msgid "HOST INVENTORY OVERVIEW"
@@ -5109,9 +5138,9 @@ msgstr "Yatay hizalama"
 #: hostinventories.php:157 httpconf.php:190 httpconf.php:289 httpconf.php:313
 #: httpconf.php:331 httpconf.php:351 httpmon.php:121 httpmon.php:141
 #: include/actions.inc.php:64 include/audit.inc.php:27
-#: include/blocks.inc.php:587 include/blocks.inc.php:634
-#: include/blocks.inc.php:884 include/blocks.inc.php:894
-#: include/blocks.inc.php:1411 include/classes/screens/CScreenEvents.php:46
+#: include/blocks.inc.php:578 include/blocks.inc.php:625
+#: include/blocks.inc.php:836 include/blocks.inc.php:847
+#: include/blocks.inc.php:1391 include/classes/screens/CScreenEvents.php:46
 #: include/classes/screens/CScreenHostgroupTriggers.php:121
 #: include/classes/screens/CScreenHostTriggers.php:63
 #: include/classes/screens/CScreenHostTriggers.php:123
@@ -5150,7 +5179,7 @@ msgstr "Konak"
 #: api/classes/CHost.php:1695
 #, php-format
 msgid "Host \"%1$s\" already exists."
-msgstr ""
+msgstr "\"%1$s\" konağı zaten var."
 
 #: api/classes/CProxy.php:643
 #, php-format
@@ -5166,10 +5195,12 @@ msgstr "\"%s\" konağı zaten var."
 #, php-format
 msgid "Host \"%s\" has \"useipmi\" parameter checked, but has no \"ipmi_ip\" parameter! Using host IP address as an address for IPMI interface."
 msgstr ""
+"\"%s\" konağında \"useipmi\" parametresi seçilmiş, fakat \"ipmi_ip\" parametresi "
+"girilmemiş! Konağın IP adresi IPMI arabirimi için adres olarak kullanılıyor."
 
 #: include/views/configuration.screen.constructor.edit.php:343
 msgid "Host (ascending)"
-msgstr ""
+msgstr "Konak (artan)"
 
 #: include/actions.inc.php:76
 msgid "Host IP"
@@ -5177,7 +5208,7 @@ msgstr "Konak IP"
 
 #: include/forms.inc.php:1717
 msgid "Host Inventory"
-msgstr ""
+msgstr "Konak Envanteri"
 
 #: include/views/administration.script.list.php:43
 msgid "Host access"
@@ -5189,7 +5220,7 @@ msgstr "Konak eklendi"
 
 #: api/classes/CHostInterface.php:1005
 msgid "Host cannot have more than one default interface of the same type."
-msgstr ""
+msgstr "Konak aynı tipte birden fazla öntanımlı arabirime sahip olamaz."
 
 #: hostinventoriesoverview.php:88
 #: include/views/administration.proxy.list.php:48
@@ -5201,8 +5232,8 @@ msgid "Host deleted"
 msgstr "Konak silindi"
 
 #: include/actions.inc.php:60 include/audit.inc.php:35
-#: include/blocks.inc.php:185 include/blocks.inc.php:372
-#: include/blocks.inc.php:1019 include/forms.inc.php:486
+#: include/blocks.inc.php:185 include/blocks.inc.php:363
+#: include/blocks.inc.php:1000 include/forms.inc.php:486
 #: include/maps.inc.php:25 include/reports.inc.php:111
 #: include/views/administration.script.list.php:42
 #: include/views/configuration.hostgroups.edit.php:63
@@ -5218,15 +5249,15 @@ msgstr "Konak grubu"
 #: api/classes/CHostGroup.php:650 api/classes/CHostGroup.php:703
 #, php-format
 msgid "Host group \"%1$s\" already exists."
-msgstr ""
+msgstr "\"%1$s\" konak grubu zaten var."
 
 #: include/views/js/configuration.sysmaps.js.php:31
 msgid "Host group elements"
-msgstr ""
+msgstr "Konak grup elemanları"
 
 #: include/views/configuration.sysmap.edit.php:92
 msgid "Host group label type"
-msgstr ""
+msgstr "Konak grubu etiket tipi"
 
 #: dashconf.php:180 include/forms.inc.php:197 include/menu.inc.php:160
 #: include/views/administration.script.edit.php:91
@@ -5244,11 +5275,11 @@ msgstr "Konak arabirimi"
 
 #: hostinventories.php:26 jsLoader.php:180
 msgid "Host inventories"
-msgstr ""
+msgstr "Konak envanterleri"
 
 #: include/views/configuration.host.edit.php:630
 msgid "Host inventory"
-msgstr ""
+msgstr "Konak envanteri"
 
 #: hostinventoriesoverview.php:26
 msgid "Host inventory overview"
@@ -5260,7 +5291,7 @@ msgstr "Konak etiket tipi"
 
 #: include/html.inc.php:343
 msgid "Host list"
-msgstr ""
+msgstr "Konak listesi"
 
 #: hosts.php:51 include/actions.inc.php:58
 #: include/views/configuration.host.edit.php:170
@@ -5307,7 +5338,7 @@ msgstr "Konak zamanı"
 
 #: api/classes/CHost.php:1573
 msgid "Host update failed."
-msgstr ""
+msgstr "Konak güncellemesi başarısız."
 
 #: hosts.php:321
 msgid "Host updated"
@@ -5341,7 +5372,7 @@ msgstr "Konaklar"
 
 #: include/views/configuration.maintenance.edit.php:207
 msgid "Hosts & Groups"
-msgstr ""
+msgstr "Konaklar & Gruplar"
 
 #: include/classes/class.cserverinfo.php:48
 msgid "Hosts (m/n/t)"
@@ -5349,7 +5380,7 @@ msgstr "Konaklar(gözetlenen/gözetlenmeyen/şablon)"
 
 #: include/views/configuration.template.edit.php:195
 msgid "Hosts / templates"
-msgstr ""
+msgstr "Konaklar / şablonlar"
 
 #: popup.php:41
 msgid "Hosts and templates"
@@ -5395,7 +5426,7 @@ msgstr ""
 
 #: include/locales.inc.php:55
 msgid "Hungarian (hu_HU)"
-msgstr ""
+msgstr "Macarca (hu_HU)"
 
 #: include/discovery.inc.php:70
 #: include/views/js/configuration.discovery.edit.js.php:123
@@ -5460,7 +5491,7 @@ msgstr "IPMI kimlik doğrulama algoritması"
 
 #: include/views/configuration.host.edit.php:280
 msgid "IPMI interfaces"
-msgstr ""
+msgstr "IPMI arabirimleri"
 
 #: include/views/configuration.host.massupdate.php:168
 msgid "IPMI password"
@@ -5493,7 +5524,7 @@ msgstr "BT servisi"
 
 #: include/views/configuration.services.child.list.php:25
 msgid "IT service dependencies"
-msgstr ""
+msgstr "BT servis bağımlılıkları"
 
 #: include/views/configuration.services.parent.list.php:25
 msgid "IT service parent"
@@ -5550,12 +5581,12 @@ msgstr "Simge etiket tipi"
 #: include/views/administration.general.iconmap.edit.php:134
 #: include/views/administration.general.iconmap.list.php:23
 msgid "Icon map"
-msgstr ""
+msgstr "Simge haritası"
 
 #: api/classes/CIconMap.php:421
 #, php-format
 msgid "Icon map \"%1$s\" cannot be deleted. Used in map \"%2$s\"."
-msgstr ""
+msgstr "Simge haritası \"%1$s\" silinemez. \"%2$s\" haritasında kullanılıyor."
 
 #: api/classes/CIconMap.php:528
 #, php-format
@@ -5570,12 +5601,12 @@ msgstr ""
 #: api/classes/CIconMap.php:276 api/classes/CIconMap.php:353
 #, php-format
 msgid "Icon map \"%s\" already exists."
-msgstr ""
+msgstr "Simge haritası \"%s\" zaten var."
 
 #: api/classes/CIconMap.php:538
 #, php-format
 msgid "Icon map \"%s\" cannot have mapping with empty expression."
-msgstr ""
+msgstr "Simge haritası \"%s\" boş ifade ile eşleştirmeye sahip olamaz."
 
 #: api/classes/CIconMap.php:542
 #, php-format
@@ -5585,33 +5616,33 @@ msgstr ""
 #: api/classes/CIconMap.php:546
 #, php-format
 msgid "Icon map \"%s\" has incorrect expression."
-msgstr ""
+msgstr "Simge haritası \"%s\" yanlış ifadeye sahip."
 
 #: api/classes/CIconMap.php:499 api/classes/CIconMap.php:504
 #, php-format
 msgid "Icon map \"%s\" must have at least one mapping."
-msgstr ""
+msgstr "Simge haritası \"%s\" en az bir eşleştirmeye sahip olmalı."
 
 #: adm.iconmapping.php:81
 msgid "Icon map created"
-msgstr ""
+msgstr "Simge haritası oluşturuldu"
 
 #: adm.iconmapping.php:95
 msgid "Icon map deleted"
-msgstr ""
+msgstr "Simge haritası silindi"
 
 #: api/classes/CIconMap.php:256 api/classes/CIconMap.php:316
 msgid "Icon map name cannot be empty."
-msgstr ""
+msgstr "Simge haritası ismi boş olamaz."
 
 #: adm.iconmapping.php:76
 msgid "Icon map updated"
-msgstr ""
+msgstr "Simge haritası güncellendi"
 
 #: api/classes/CIconMap.php:340
 #, php-format
 msgid "Icon map with iconmapid \"%s\" does not exist."
-msgstr ""
+msgstr "\"%s\" iconmapid'li simge haritası mevcuıt değil."
 
 #: adm.gui.php:95 adm.housekeeper.php:74 adm.iconmapping.php:112
 #: adm.iconmapping.php:168 adm.images.php:134 adm.macros.php:161
@@ -5619,7 +5650,7 @@ msgstr ""
 #: adm.triggerseverities.php:82 adm.valuemapping.php:128
 #: adm.workingtime.php:64
 msgid "Icon mapping"
-msgstr ""
+msgstr "Simge eşleştirme"
 
 #: api/classes/CIconMap.php:552
 #, php-format
@@ -5632,7 +5663,7 @@ msgstr ""
 
 #: include/views/js/configuration.sysmaps.js.php:111
 msgid "Icons"
-msgstr ""
+msgstr "Simgeler"
 
 #: include/config.inc.php:258
 msgid "If you think this message is wrong, please consult your administrators about getting the necessary permissions."
@@ -5646,19 +5677,19 @@ msgstr "Eğer bu mesajın yanlış olduğunu düşünüyorsanız gerekli izinler
 #: include/views/js/configuration.sysmaps.js.php:19 jsLoader.php:146
 #: map.php:136
 msgid "Image"
-msgstr "Resim"
+msgstr "İmaj"
 
 #: adm.images.php:61
 msgid "Image added"
-msgstr "Resim eklendi"
+msgstr "İmaj eklendi"
 
 #: adm.images.php:116
 msgid "Image deleted"
-msgstr "Resim silindi"
+msgstr "İmaj silindi"
 
 #: include/views/configuration.sysmap.edit.php:124
 msgid "Image label type"
-msgstr "Resim etiket tipi"
+msgstr "İmaj etiket tipi"
 
 #: api/classes/CImage.php:343
 #, php-format
@@ -5667,11 +5698,11 @@ msgstr ""
 
 #: api/classes/CImage.php:588 include/classes/helpers/CUploadFile.php:129
 msgid "Image size must be less than 1MB."
-msgstr ""
+msgstr "İmaj boyutu 1MB'den az olmalı."
 
 #: adm.images.php:57
 msgid "Image updated"
-msgstr "Resim güncellendi"
+msgstr "İmaj güncellendi"
 
 #: adm.gui.php:94 adm.housekeeper.php:73 adm.iconmapping.php:111
 #: adm.images.php:133 adm.macros.php:160 adm.other.php:106 adm.regexps.php:210
@@ -5680,11 +5711,11 @@ msgstr "Resim güncellendi"
 #: include/views/administration.general.image.list.php:29
 #: include/views/conf.import.php:37
 msgid "Images"
-msgstr "Resimler"
+msgstr "İmajlar"
 
 #: include/views/conf.import.php:51
 msgid "Images for all maps will be updated!"
-msgstr ""
+msgstr "Bütün haritalar için imajlar güncellenecek!"
 
 #: include/views/configuration.action.edit.php:356
 msgid "Immediately"
@@ -5715,7 +5746,7 @@ msgstr ""
 
 #: screenedit.php:237 screenedit.php:252
 msgid "Impossible to remove last row and column."
-msgstr ""
+msgstr "Son satır ve sütünu silmek imkansız."
 
 #: include/classes/class.ctweenbox.php:74
 #: include/classes/class.ctweenbox.php:101
@@ -5725,7 +5756,7 @@ msgstr "İçinde"
 
 #: include/views/administration.usergroups.edit.php:53
 msgid "In group"
-msgstr ""
+msgstr "Grupta"
 
 #: include/views/configuration.host.edit.php:186
 #: include/views/configuration.host.massupdate.php:46
@@ -5739,7 +5770,7 @@ msgid "In maintenance"
 msgstr "Bakımda"
 
 #: include/actions.inc.php:764 include/actions.inc.php:838
-#: include/actions.inc.php:889 include/actions.inc.php:955
+#: include/actions.inc.php:889 include/actions.inc.php:966
 #: include/classes/screens/CScreenActions.php:140
 #: include/views/administration.auditacts.list.php:94
 msgid "In progress"
@@ -5763,7 +5794,7 @@ msgstr "\"%2$s\" haritası için geçersiz %1$s etiket tipi değeri ."
 #: api/classes/CProxy.php:350
 #, php-format
 msgid "Incorrect IP for passive proxy \"%1$s\"."
-msgstr ""
+msgstr "\"%1$s\" pasif vekili için geçersiz IP."
 
 #: api/classes/CDRule.php:433
 #, php-format
@@ -5778,12 +5809,12 @@ msgstr "Geçersiz SNMP OID."
 #: api/classes/CDRule.php:492
 #: include/views/js/configuration.discovery.edit.js.php:307
 msgid "Incorrect SNMP community."
-msgstr ""
+msgstr "Geçersiz SNMP topluluğu."
 
 #: api/classes/CService.php:1160
 #, php-format
 msgid "Incorrect acceptable SLA for service \"%1$s\"."
-msgstr ""
+msgstr "\"%1$s\" servisi için geçersiz kabul edilebilir HSA."
 
 #: api/classes/CAction.php:1695
 msgid "Incorrect action condition discovery check."
@@ -5792,10 +5823,14 @@ msgstr "Geçersiz eylem koşul keşif kontrolü."
 #: api/classes/CAction.php:1750
 msgid "Incorrect action condition discovery check. Discovery check does not exist or you have no access to it."
 msgstr ""
+"Geçersiz eylem koşul keşif kontrolü. Keşif kontrolü mevcut değil veya erişim "
+"için hakkınız yok."
 
 #: api/classes/CAction.php:1747
 msgid "Incorrect action condition discovery rule. Discovery rule does not exist or you have no access to it."
 msgstr ""
+"Geçersiz eylem koşul keşif kuralı. Keşif kuralı mevcut değil veya erişim "
+"için hakkınız yok."
 
 #: api/classes/CAction.php:1707
 msgid "Incorrect action condition discovery status."
@@ -5804,10 +5839,14 @@ msgstr "Geçersiz eylem koşul keşif durumu."
 #: api/classes/CAction.php:1735
 msgid "Incorrect action condition host group. Host group does not exist or you have no access to it."
 msgstr ""
+"Geçersiz eylem koşul konak grubu. Konak grubu mevcut değil veya erişim için "
+"hakkınız yok."
 
 #: api/classes/CAction.php:1738
 msgid "Incorrect action condition host. Host does not exist or you have no access to it."
 msgstr ""
+"Geçersiz eylem koşul konağı. Konak mevcut değil veya erişim için hakkınız "
+"yok."
 
 #: api/classes/CAction.php:1689
 #, php-format
@@ -5822,27 +5861,33 @@ msgstr "Geçersiz eylem koşul dönemi \"%s\"."
 #: api/classes/CAction.php:1701
 #, php-format
 msgid "Incorrect action condition port \"%s\"."
-msgstr "geçersiz eylem koşul portu \"%s\"."
+msgstr "Geçersiz eylem koşul portu \"%s\"."
 
 #: api/classes/CAction.php:1753
 msgid "Incorrect action condition proxy. Proxy does not exist or you have no access to it."
 msgstr ""
+"Geçersiz eylem koşul vekili. Vekil mevcut değil veya erişim için hakkınız "
+"yok."
 
 #: api/classes/CAction.php:1741
 msgid "Incorrect action condition template. Template does not exist or you have no access to it."
 msgstr ""
+"Geçersiz eylem koşul şablonu. Şablon mevcut değil veya erişim için hakkınız "
+"yok."
 
 #: api/classes/CAction.php:1744
 msgid "Incorrect action condition trigger. Trigger does not exist or you have no access to it."
 msgstr ""
+"Geçersiz eylem koşul tetiği. Tetik mevcut değil veya erişim için hakkınız "
+"yok."
 
 #: api/classes/CAction.php:1729
 msgid "Incorrect action condition type."
-msgstr ""
+msgstr "Geçersiz eylem koşul tipi."
 
 #: api/classes/CAction.php:918
 msgid "Incorrect action conditionid."
-msgstr ""
+msgstr "Geçersiz eylem conditionid."
 
 #: api/classes/CAction.php:1543
 msgid "Incorrect action operation command type."
@@ -5854,15 +5899,17 @@ msgstr "Geçersiz işlem koşul onay tipi."
 
 #: api/classes/CAction.php:1782
 msgid "Incorrect action operation condition type."
-msgstr ""
+msgstr "Geçersiz eylem operasyon koşul tipi."
 
 #: api/classes/CAction.php:1461 api/classes/CAction.php:1465
 msgid "Incorrect action operation escalation step values."
-msgstr "Geçersiz eylem işlem eskalasyon adım değerleri."
+msgstr "Geçersiz eylem operasyon eskalasyon adım değerleri."
 
 #: api/classes/CAction.php:1614
 msgid "Incorrect action operation host group. Host group does not exist or you have no access to this host group."
 msgstr ""
+"Geçersiz eylem operasyon konak grubu. Konak grubu mevcut değil ve erişim "
+"için izniniz yok."
 
 #: api/classes/CAction.php:1617
 msgid "Incorrect action operation host. Host does not exist or you have no access to this host."
@@ -5879,7 +5926,7 @@ msgstr ""
 
 #: api/classes/CAction.php:1609
 msgid "Incorrect action operation type."
-msgstr "Geçersiz eylem işlem tipi"
+msgstr "Geçersiz eylem işlem tipi."
 
 #: api/classes/CAction.php:1623
 msgid "Incorrect action operation user group. User group does not exist or you have no access to this user group."
@@ -5891,22 +5938,22 @@ msgstr "Geçersiz eylem işlem kullanıcısı. Kullanıcı mevcut değil veta si
 
 #: api/classes/CAction.php:943
 msgid "Incorrect action operationid."
-msgstr ""
+msgstr "Geçersiz eylem operationid."
 
 #: api/classes/CService.php:1123
 #, php-format
 msgid "Incorrect algorithm for service \"%1$s\"."
-msgstr ""
+msgstr "\"%1$s\" servisi için geçersiz algoritma."
 
 #: api/classes/CApplication.php:436 include/regexp.inc.php:53
 #: include/regexp.inc.php:91 include/regexp.inc.php:162
 msgid "Incorrect arguments passed to function"
-msgstr "Fonksiyona geçersiz değişkenler geçirildi."
+msgstr "Fonksiyona geçersiz değişkenler geçirildi"
 
 #: api/classes/CHostInterface.php:500 api/classes/CHostInterface.php:690
 #: api/classes/CItemGeneral.php:174 api/classes/CWebCheck.php:537
 msgid "Incorrect arguments passed to function."
-msgstr ""
+msgstr "Fonksiyona geçersiz değişkenler geçirildi."
 
 #: api/classes/CHostInterface.php:528
 msgid "Incorrect arguments passed to method."
@@ -5915,36 +5962,36 @@ msgstr "Yönteme geçersiz değişkenler geçirildi."
 #: api/classes/CService.php:1142
 #, php-format
 msgid "Incorrect calculate SLA value for service \"%1$s\"."
-msgstr ""
+msgstr "\"%1s\" servisi için geçersiz HSA değeri hesaplandı."
 
 #: include/nodes.inc.php:267 include/nodes.inc.php:309
 msgid "Incorrect characters used for Node name."
-msgstr ""
+msgstr "Düğüm ismi için geçersiz karakterler kullanıldı."
 
 #: api/classes/CProxy.php:359
 #, php-format
 msgid "Incorrect characters used for Proxy name \"%s\"."
-msgstr "Vekil ismi \"%s\" içinde geçersiz karakterler kullanılmış."
+msgstr "Vekil ismi \"%s\" için geçersiz karakterler kullanılmış."
 
 #: api/classes/CTemplate.php:995
 #, php-format
 msgid "Incorrect characters used for Template name [ %1$s ]"
-msgstr "Şablon ismi [ %1$s ] içinde geçersiz karakterler kullanılmış"
+msgstr "Şablon ismi [ %1$s ] için geçersiz karakterler kullanılmış"
 
 #: api/classes/CHost.php:1357 api/classes/CHost.php:1678
 #, php-format
 msgid "Incorrect characters used for host name \"%s\"."
-msgstr ""
+msgstr "\"%s\" konak ismi için geçersiz karakterler kullanılmış."
 
 #: api/classes/CTemplate.php:1365
 #, php-format
 msgid "Incorrect characters used for template name \"%s\"."
-msgstr ""
+msgstr "\"%s\" şablon ismi için geçersiz karakterler kullanılmış."
 
 #: api/classes/CGraphGeneral.php:71
 #, php-format
 msgid "Incorrect colour \"%1$s\"."
-msgstr ""
+msgstr "Geçersiz renk \"%1$s\"."
 
 #: api/classes/CScreenItem.php:590
 #, php-format
@@ -5962,19 +6009,20 @@ msgstr "Geçersiz ifade"
 #: include/classes/db/DB.php:455 include/classes/db/DB.php:621
 #, php-format
 msgid "Incorrect field \"%1$s\" name or value in where statement for table \"%2$s\"."
-msgstr "\"%2$s\" tablosu için where komutunda geçersiz  alan ismi \"%1$s\" veya değeri."
+msgstr ""
+"\"%2$s\" tablosu için where komutunda geçersiz alan ismi \"%1$s\" veya değeri."
 
 #: api/classes/CMap.php:545
 msgid "Incorrect fields for sysmap"
 msgstr "sysmap için geçersiz alanlar"
 
-#: api/classes/CTrigger.php:1125
+#: api/classes/CTrigger.php:1105
 msgid "Incorrect fields for trigger."
-msgstr ""
+msgstr "Tetik için geçersiz alanlar."
 
 #: include/classes/helpers/CUploadFile.php:159
 msgid "Incorrect file upload."
-msgstr ""
+msgstr "Geçersiz dosya yüklemesi."
 
 #: api/classes/CItemGeneral.php:759
 #, php-format
@@ -5994,7 +6042,7 @@ msgstr "Geçersiz fonksiyon kullanıldı"
 #: api/classes/CScreenItem.php:516
 #, php-format
 msgid "Incorrect graph ID \"%s\" provided for screen element."
-msgstr "Ekran elemanı için geçersiz grafik ID'si \"%s\"  sağlanmış."
+msgstr "Ekran elemanı için geçersiz grafik ID'si \"%s\" sağlanmış."
 
 #: api/classes/CScreenItem.php:502
 #, php-format
@@ -6004,46 +6052,46 @@ msgstr "Ekran elemanı için geçersiz konak ID'si  \"%s\" sağlanmış."
 #: api/classes/CScreenItem.php:488
 #, php-format
 msgid "Incorrect host group ID \"%s\" provided for screen element."
-msgstr "Ekran elemanı için geçersiz konak grup ID'si  \"%s\" sağlanmış."
+msgstr "Ekran elemanı için geçersiz konak grup ID'si \"%s\" sağlanmış."
 
 #: include/profiles.inc.php:258
 msgid "Incorrect host group."
-msgstr ""
+msgstr "Geçersiz konak grubu."
 
 #: image.php:48
 msgid "Incorrect image index."
-msgstr ""
+msgstr "Geçersiz imaj endeksi."
 
 #: api/classes/CHostInterface.php:804
 #, php-format
 msgid "Incorrect interface DNS parameter \"%s\" provided."
-msgstr ""
+msgstr "Geçersiz arabirim DNS parametresi \"%s\" verilmiş."
 
 #: api/classes/CHostInterface.php:820
 #, php-format
 msgid "Incorrect interface IP parameter \"%s\" provided."
-msgstr ""
+msgstr "Geçersiz arabirim IP parametresi \"%s\" verilmiş."
 
 #: api/classes/CHostInterface.php:836
 #, php-format
 msgid "Incorrect interface port \"%s\" provided."
-msgstr ""
+msgstr "Geçersiz arabirim port parametresi \"%s\" verilmiş."
 
 #: api/classes/CHost.php:1291
 #, php-format
 msgid "Incorrect inventory field \"%s\"."
-msgstr ""
+msgstr "Geçersiz envanter alanı \"%s\" verilmiş."
 
 #: api/classes/CScreenItem.php:531
 #, php-format
 msgid "Incorrect item ID \"%s\" provided for screen element."
-msgstr "Ekran elemanı için geçersiz öğe ID'si  \"%s\" sağlanmış."
+msgstr "Ekran elemanı için geçersiz öğe ID'si \"%s\" verilmiş."
 
 #: api/classes/CGraphGeneral.php:401
 msgid "Incorrect item for axis value."
 msgstr ""
 
-#: api/classes/CTrigger.php:1226 include/triggers.inc.php:917
+#: api/classes/CTrigger.php:1206 include/triggers.inc.php:917
 #, php-format
 msgid "Incorrect item key \"%1$s\" provided for trigger expression on \"%2$s\"."
 msgstr ""
@@ -6060,7 +6108,7 @@ msgstr "Geçersiz anahtar."
 #: discoveryconf.php:109
 #, php-format
 msgid "Incorrect key: \"%1$s\"."
-msgstr ""
+msgstr "Geçersiz anahtar: \"%1$s\"."
 
 #: api/classes/CDRule.php:487
 #, php-format
@@ -6073,11 +6121,11 @@ msgstr "Geçersiz öğelerin listesi."
 
 #: maintenance.php:316
 msgid "Incorrect maintenance - date must be between 1970.01.01 and 2038.01.18"
-msgstr ""
+msgstr "Geçersiz bakım - tarih 01.01.1970 ile 18.01.2038 arasında olmalı."
 
 #: maintenance.php:344
 msgid "Incorrect maintenance date"
-msgstr "Geçersiz bakım zamanı"
+msgstr "Geçersiz bakım tarihi"
 
 #: maintenance.php:323
 msgid "Incorrect maintenance day period"
@@ -6097,7 +6145,7 @@ msgstr "Geçersiz bakım dönemi"
 
 #: maintenance.php:300
 msgid "Incorrect maintenance period (minimum 5 minutes)"
-msgstr ""
+msgstr "Geçersiz bakım aralığı (minimum 5 dakika)"
 
 #: maintenance.php:327
 msgid "Incorrect maintenance week period"
@@ -6106,7 +6154,7 @@ msgstr "Geçersiz bakım haftası dönemi"
 #: api/classes/CScreenItem.php:545
 #, php-format
 msgid "Incorrect map ID \"%s\" provided for screen element."
-msgstr "Ekran elemanı için geçersiz konak harita ID'si  \"%s\" sağlanmış."
+msgstr "Ekran elemanı için geçersiz konak harita ID'si \"%s\" sağlanmış."
 
 #: api/classes/CMap.php:569
 #, php-format
@@ -6120,21 +6168,21 @@ msgstr "\"%s\" haritası için geçersiz harita genişlik değeri."
 
 #: include/nodes.inc.php:287
 msgid "Incorrect node type."
-msgstr ""
+msgstr "Geçersiz düğüm tipi."
 
 #: api/classes/CAction.php:771 api/classes/CAction.php:806
 #, php-format
 msgid "Incorrect parameter for action \"%s\"."
-msgstr ""
+msgstr "\"%s\" eylemi için geçersiz parametre."
 
 #: api/classes/CAction.php:1013
 msgid "Incorrect parameter for operations."
-msgstr ""
+msgstr "Operasyonlar için geçersiz parametre."
 
 #: api/classes/CIconMap.php:253
 #, php-format
 msgid "Incorrect parameter is used for icon map \"%s\"."
-msgstr ""
+msgstr "\"%s\" simge haritası için geçersiz parametre kullanılmış."
 
 #: api/classes/CAction.php:862
 #, php-format
@@ -6143,7 +6191,7 @@ msgstr ""
 
 #: api/classes/CAction.php:983
 msgid "Incorrect parameters for condition."
-msgstr "Koşul için geçersiz parametreler"
+msgstr "Koşul için geçersiz parametreler."
 
 #: api/classes/CIconMap.php:311
 #, php-format
@@ -6152,11 +6200,11 @@ msgstr ""
 
 #: api/classes/CMaintenance.php:448 api/classes/CMaintenance.php:635
 msgid "Incorrect parameters for maintenance."
-msgstr ""
+msgstr "Bakım için geçersiz parametreler."
 
 #: api/classes/CUserGroup.php:341 api/classes/CUserGroup.php:391
 msgid "Incorrect parameters for user group."
-msgstr ""
+msgstr "Kullanıcı grubu için geçersiz parametreler."
 
 #: api/classes/CService.php:1208
 #, php-format
@@ -6177,7 +6225,7 @@ msgstr "Geçersiz proxyid."
 
 #: api/classes/CScreenItem.php:419
 msgid "Incorrect resource type provided for screen item."
-msgstr ""
+msgstr "Ekram öğesi için geçersiz kaynak tipi verilmiş."
 
 #: api/classes/CScreenItem.php:585
 #, php-format
@@ -6187,7 +6235,7 @@ msgstr ""
 #: api/classes/CScreenItem.php:558
 #, php-format
 msgid "Incorrect screen ID \"%s\" provided for screen element."
-msgstr "Ekran elemanı için geçersiz konak ekran ID'si  \"%s\" sağlanmış."
+msgstr "Ekran elemanı için geçersiz konak ekran ID'si \"%s\" verilmiş."
 
 #: include/screens.inc.php:169 include/screens.inc.php:225
 msgid "Incorrect screen provided for slide show."
@@ -6195,15 +6243,15 @@ msgstr ""
 
 #: include/services.inc.php:490 include/services.inc.php:499
 msgid "Incorrect service end time."
-msgstr ""
+msgstr "Geçersiz servis bitiş zamanı."
 
 #: include/services.inc.php:487 include/services.inc.php:496
 msgid "Incorrect service start time."
-msgstr ""
+msgstr "Geçersiz servis başlangıç zamanı."
 
 #: include/services.inc.php:481
 msgid "Incorrect service time type."
-msgstr ""
+msgstr "Geçersiz servis zaman tipi."
 
 #: api/classes/CService.php:1177
 #, php-format
@@ -6213,7 +6261,7 @@ msgstr ""
 #: api/classes/CService.php:1231
 #, php-format
 msgid "Incorrect status for service \"%1$s\"."
-msgstr ""
+msgstr "\"%1$s\" servisi için geçersiz durum."
 
 #: api/classes/CDRule.php:441
 msgid "Incorrect status."
@@ -6257,19 +6305,22 @@ msgstr "Geçersiz tetik ifadesi"
 #: include/classes/parsers/CTriggerExpression.php:243
 #: include/classes/parsers/CTriggerExpression.php:248
 msgid "Incorrect trigger expression."
-msgstr ""
+msgstr "Geçersiz tetik ifadesi."
 
 #: include/triggers.inc.php:1057
 #, php-format
 msgid "Incorrect trigger expression. Host \"%1$s\" does not exist or you have no access to this host."
 msgstr ""
+"Geçersiz tetik ifadesi. \"%1$s\" konağı mevcut değil veya erişim izniniz yok."
 
-#: api/classes/CTrigger.php:1206
+#: api/classes/CTrigger.php:1186
 #, php-format
 msgid "Incorrect trigger expression. Host \"%s\" does not exist or you have no access to this host."
-msgstr "Geçersiz tetik ifadesi. \"%s\" konağı mevcut değil veya sizin bu konağa erişiminiz yok."
+msgstr ""
+"Geçersiz tetik ifadesi. \"%s\" konağı mevcut değil veya sizin bu konağa erişim "
+"hakkınız yok."
 
-#: api/classes/CTrigger.php:1212
+#: api/classes/CTrigger.php:1192
 msgid "Incorrect trigger expression. Trigger expression elements should not belong to a template and a host simultaneously."
 msgstr ""
 
@@ -6286,7 +6337,7 @@ msgstr ""
 
 #: include/func.inc.php:1058
 msgid "Incorrect type of asort_by_key."
-msgstr ""
+msgstr "asort_by_key için geçersiz tip."
 
 #: api/classes/CItemKey.php:174 api/classes/CItemKey.php:210
 #: api/classes/CItemKey.php:252
@@ -6349,7 +6400,7 @@ msgstr ""
 msgid "Indonesian (id_ID)"
 msgstr ""
 
-#: include/blocks.inc.php:898 include/blocks.inc.php:1414
+#: include/blocks.inc.php:851 include/blocks.inc.php:1394
 #: include/classes/class.cformlist.php:65 tr_status.php:286
 msgid "Info"
 msgstr "Bilgi"
@@ -6509,8 +6560,8 @@ msgstr ""
 msgid "Is online?"
 msgstr "Çevrimiçi mi?"
 
-#: include/blocks.inc.php:886 include/blocks.inc.php:895
-#: include/blocks.inc.php:1412
+#: include/blocks.inc.php:838 include/blocks.inc.php:848
+#: include/blocks.inc.php:1392
 msgid "Issue"
 msgstr "Sorun"
 
@@ -6931,7 +6982,7 @@ msgstr "Son 365 gün"
 msgid "Last 7 days"
 msgstr "Son 7 gün"
 
-#: include/blocks.inc.php:888 include/blocks.inc.php:896 tr_status.php:287
+#: include/blocks.inc.php:840 include/blocks.inc.php:849 tr_status.php:287
 msgid "Last change"
 msgstr "Son değişiklik"
 
@@ -7339,11 +7390,11 @@ msgstr "Bakım tipi"
 msgid "Maintenance updated"
 msgstr "Bakım güncellendi"
 
-#: include/blocks.inc.php:926 tr_status.php:623
+#: include/blocks.inc.php:880 tr_status.php:623
 msgid "Maintenance with data collection"
 msgstr ""
 
-#: include/blocks.inc.php:925 tr_status.php:622
+#: include/blocks.inc.php:879 tr_status.php:622
 msgid "Maintenance without data collection"
 msgstr ""
 
@@ -7365,7 +7416,7 @@ msgstr ""
 msgid "Manual Logout"
 msgstr "Manuel Oturum Kapat"
 
-#: include/audit.inc.php:40 include/blocks.inc.php:1258
+#: include/audit.inc.php:40 include/blocks.inc.php:1239
 #: include/maps.inc.php:27 include/screens.inc.php:34
 #: include/views/configuration.sysmap.edit.php:201
 #: include/views/js/configuration.sysmaps.js.php:16
@@ -7425,7 +7476,7 @@ msgstr ""
 msgid "Mappings"
 msgstr ""
 
-#: dashboard.php:274 include/blocks.inc.php:1291 include/menu.inc.php:72
+#: dashboard.php:274 include/blocks.inc.php:1272 include/menu.inc.php:72
 #: include/menu.inc.php:206 include/views/conf.import.php:36 popup.php:101
 #: sysmaps.php:251
 msgid "Maps"
@@ -8009,8 +8060,8 @@ msgstr ""
 msgid "Next check"
 msgstr "Sonraki kontrol"
 
-#: events.php:760 include/config.inc.php:563 include/events.inc.php:301
-#: include/events.inc.php:319 include/forms.inc.php:1922
+#: events.php:756 include/config.inc.php:563 include/events.inc.php:303
+#: include/events.inc.php:321 include/forms.inc.php:1922
 #: include/triggers.inc.php:1608
 #: include/views/administration.users.list.php:75
 #: include/views/administration.users.list.php:78
@@ -8446,8 +8497,8 @@ msgstr "Sistem erişimi için izin yok."
 #: api/classes/CScreen.php:578 api/classes/CService.php:1252
 #: api/classes/CService.php:1267 api/classes/CTemplateScreen.php:775
 #: api/classes/CTemplateScreen.php:796 api/classes/CTemplateScreen.php:802
-#: api/classes/CTrigger.php:1110 api/classes/CTrigger.php:1440
-#: api/classes/CTrigger.php:1464 api/classes/CTriggerPrototype.php:822
+#: api/classes/CTrigger.php:1090 api/classes/CTrigger.php:1420
+#: api/classes/CTrigger.php:1444 api/classes/CTriggerPrototype.php:822
 #: api/classes/CTriggerPrototype.php:920 api/classes/CUserMacro.php:824
 #: api/classes/CUserMacro.php:933 api/classes/CWebCheck.php:444
 #: include/config.inc.php:244
@@ -8592,9 +8643,9 @@ msgstr ""
 
 #: events.php:559 events.php:572 hostinventories.php:156 httpmon.php:140
 #: include/actions.inc.php:68 include/audit.inc.php:42
-#: include/blocks.inc.php:184 include/blocks.inc.php:371
-#: include/blocks.inc.php:893 include/blocks.inc.php:1018
-#: include/blocks.inc.php:1109 include/blocks.inc.php:1410
+#: include/blocks.inc.php:184 include/blocks.inc.php:362
+#: include/blocks.inc.php:846 include/blocks.inc.php:999
+#: include/blocks.inc.php:1090 include/blocks.inc.php:1390
 #: include/classes/screens/CScreenEvents.php:45 include/page_header.php:354
 #: include/triggers.inc.php:1582 include/views/administration.node.edit.php:83
 #: include/views/configuration.httpconf.list.php:66
@@ -8656,7 +8707,7 @@ msgstr "Onaysız"
 msgid "Not Templated items"
 msgstr "Şablonlanmamış öğeler"
 
-#: api/classes/CTrigger.php:1899
+#: api/classes/CTrigger.php:1879
 #, php-format
 msgid "Not all templates are linked to \"%s\"."
 msgstr ""
@@ -8735,11 +8786,11 @@ msgstr "Kasım"
 msgid "Now"
 msgstr ""
 
-#: include/blocks.inc.php:724 include/blocks.inc.php:726
+#: include/blocks.inc.php:715 include/blocks.inc.php:717
 msgid "Number of hosts (monitored/not monitored/templates)"
 msgstr "Konakların sayısı (gözetlenen/gözetlenmeyen/şablonlar)"
 
-#: include/blocks.inc.php:733
+#: include/blocks.inc.php:724
 msgid "Number of items (monitored/disabled/not supported)"
 msgstr "Öğelerin sayısı (gözetlenen/etkisiz/desteklenmeyen)"
 
@@ -8783,11 +8834,11 @@ msgstr ""
 msgid "Number of successfully retrieved values V (which fulfill operator O) for period T is NOT N"
 msgstr ""
 
-#: include/blocks.inc.php:742
+#: include/blocks.inc.php:733
 msgid "Number of triggers (enabled/disabled)[problem/unknown/ok]"
 msgstr "Tetiklerin sayısı (Etkin/ Etkisiz)[pronlem/bilinmeyen/tamam]"
 
-#: include/blocks.inc.php:753
+#: include/blocks.inc.php:744
 msgid "Number of users (online)"
 msgstr "Kullanıcıların sayısı(çevrimiçi)"
 
@@ -8878,7 +8929,7 @@ msgstr "Ekim"
 msgid "Off"
 msgstr "Kapalı"
 
-#: include/actions.inc.php:958 include/blocks.inc.php:1020
+#: include/actions.inc.php:969 include/blocks.inc.php:1001
 #: include/classes/class.ctriggersinfo.php:134
 #: include/views/administration.users.list.php:86 report2.php:238
 #: report3.php:85
@@ -8971,7 +9022,7 @@ msgstr ""
 msgid "Only characters are allowed."
 msgstr ""
 
-#: include/blocks.inc.php:734
+#: include/blocks.inc.php:725
 msgid "Only items assigned to enabled hosts are counted"
 msgstr "Yalnızca etkinleştirilmiş konaklara atanmış olan öğeler sayıldı"
 
@@ -8992,7 +9043,7 @@ msgstr ""
 msgid "Only the last 20%% of the indicator is displayed."
 msgstr ""
 
-#: include/blocks.inc.php:743
+#: include/blocks.inc.php:734
 msgid "Only triggers assigned to enabled hosts and depending on enabled items are counted"
 msgstr "Yalnızca etkinleştirilmiş konaklara atanmış ve etkinleştirilmiş öğeler bağımlılığı olan tetikler sayıldı"
 
@@ -9320,7 +9371,7 @@ msgstr "Palet"
 msgid "Palette #%1$s"
 msgstr ""
 
-#: include/blocks.inc.php:711
+#: include/blocks.inc.php:702
 #: include/views/configuration.screen.constructor.edit.php:191
 #: include/views/configuration.screen.constructor.edit.php:219
 #: include/views/configuration.screen.constructor.edit.php:273
@@ -9888,10 +9939,10 @@ msgstr "30 gün için beni hatırla"
 msgid "Remote command"
 msgstr "Uzak komut"
 
-#: include/blocks.inc.php:1151 include/blocks.inc.php:1237
-#: include/blocks.inc.php:1246 include/blocks.inc.php:1263
-#: include/blocks.inc.php:1291 include/blocks.inc.php:1314
-#: include/blocks.inc.php:1375 include/blocks.inc.php:1384
+#: include/blocks.inc.php:1132 include/blocks.inc.php:1218
+#: include/blocks.inc.php:1227 include/blocks.inc.php:1244
+#: include/blocks.inc.php:1272 include/blocks.inc.php:1295
+#: include/blocks.inc.php:1356 include/blocks.inc.php:1365
 #: include/views/administration.general.iconmap.edit.php:69
 #: include/views/administration.general.iconmap.edit.php:106
 #: include/views/common.macros.php:38
@@ -10022,7 +10073,7 @@ msgstr "Konak izinleri gerekli"
 msgid "Required performance (vps)"
 msgstr "Gerekli performans(vps) "
 
-#: include/blocks.inc.php:754
+#: include/blocks.inc.php:745
 msgid "Required server performance, new values per second"
 msgstr "Gereki sunucu performansı, saniye başına yeni değerler"
 
@@ -10510,7 +10561,7 @@ msgstr "Senaryolar"
 msgid "Schedule"
 msgstr "Çizelge"
 
-#: include/audit.inc.php:41 include/blocks.inc.php:1303
+#: include/audit.inc.php:41 include/blocks.inc.php:1284
 #: include/screens.inc.php:36 include/views/configuration.screen.edit.php:45
 #: include/views/configuration.screen.list.php:51
 #: include/views/configuration.slideconf.edit.php:48
@@ -10580,7 +10631,7 @@ msgstr ""
 msgid "Screen with name \"%s\" does not exist."
 msgstr ""
 
-#: dashboard.php:267 include/blocks.inc.php:1375 include/html.inc.php:477
+#: dashboard.php:267 include/blocks.inc.php:1356 include/html.inc.php:477
 #: include/html.inc.php:481 include/menu.inc.php:67 include/menu.inc.php:197
 #: include/views/configuration.screen.list.php:38
 #: include/views/configuration.template.edit.php:386
@@ -11057,11 +11108,11 @@ msgstr "Basit"
 msgid "Simple check"
 msgstr "Basit kontrol"
 
-#: include/blocks.inc.php:1145 include/screens.inc.php:38 popup.php:97
+#: include/blocks.inc.php:1126 include/screens.inc.php:38 popup.php:97
 msgid "Simple graph"
 msgstr "Basit grafik"
 
-#: include/blocks.inc.php:1246 jsLoader.php:107
+#: include/blocks.inc.php:1227 jsLoader.php:107
 msgid "Simple graphs"
 msgstr "Basit grafikler"
 
@@ -11110,7 +11161,7 @@ msgstr ""
 msgid "Slide"
 msgstr ""
 
-#: include/audit.inc.php:45 include/blocks.inc.php:1309
+#: include/audit.inc.php:45 include/blocks.inc.php:1290
 #: include/views/monitoring.slides.php:69
 msgid "Slide show"
 msgstr "Slayt gösterisi"
@@ -11142,7 +11193,7 @@ msgstr ""
 msgid "Slide shows"
 msgstr "Slayt gösterileri"
 
-#: include/blocks.inc.php:1384
+#: include/blocks.inc.php:1365
 #: include/views/configuration.slideconf.edit.php:96
 msgid "Slides"
 msgstr "Slaytlar"
@@ -11205,7 +11256,7 @@ msgstr ""
 msgid "Sorting by field \"%1$s\" not allowed."
 msgstr ""
 
-#: api/classes/CTrigger.php:510
+#: api/classes/CTrigger.php:508
 #, php-format
 msgid "Sorting by field \"%s\" not allowed."
 msgstr ""
@@ -11248,7 +11299,7 @@ msgstr "Aşama"
 #: include/classes/screens/CScreenActions.php:58
 #: include/classes/screens/CScreenActions.php:63
 #: include/classes/screens/CScreenActions.php:127 include/events.inc.php:134
-#: include/events.inc.php:210 include/events.inc.php:213
+#: include/events.inc.php:208 include/events.inc.php:211
 #: include/forms.inc.php:499 include/forms.inc.php:838
 #: include/views/administration.auditacts.list.php:72
 #: include/views/administration.mediatypes.list.php:41
@@ -11756,8 +11807,8 @@ msgstr "Kadar"
 #: include/classes/screens/CScreenActions.php:43
 #: include/classes/screens/CScreenActions.php:125
 #: include/classes/screens/CScreenEvents.php:44 include/events.inc.php:116
-#: include/events.inc.php:133 include/events.inc.php:210
-#: include/events.inc.php:213
+#: include/events.inc.php:133 include/events.inc.php:208
+#: include/events.inc.php:211
 #: include/views/administration.auditacts.list.php:70
 #: include/views/administration.auditlogs.list.php:85
 #: include/views/configuration.services.edit.php:280
@@ -11842,7 +11893,7 @@ msgstr "\"%s\" vekili için çok fazla arabirim sağlanmış."
 msgid "Top"
 msgstr "Üst"
 
-#: include/blocks.inc.php:375 include/classes/class.chostsinfo.php:128
+#: include/blocks.inc.php:366 include/classes/class.chostsinfo.php:128
 #: queue.php:289
 msgid "Total"
 msgstr "Toplam"
@@ -11913,7 +11964,7 @@ msgstr ""
 msgid "Trigger \"%1$s:%2$s\" does not have item prototype."
 msgstr ""
 
-#: api/classes/CTrigger.php:2038
+#: api/classes/CTrigger.php:2018
 #, php-format
 msgid "Trigger \"%s\" belongs to templates with different linkages."
 msgstr ""
@@ -11923,7 +11974,7 @@ msgstr ""
 msgid "Trigger added"
 msgstr "Tetik eklendi"
 
-#: api/classes/CTrigger.php:1942
+#: api/classes/CTrigger.php:1922
 msgid "Trigger cannot be dependant on a trigger, that is inherited from it."
 msgstr ""
 
@@ -11947,7 +11998,7 @@ msgstr ""
 msgid "Trigger expression condition"
 msgstr ""
 
-#: api/classes/CTrigger.php:1186 api/classes/CTriggerPrototype.php:1052
+#: api/classes/CTrigger.php:1166 api/classes/CTriggerPrototype.php:1052
 msgid "Trigger expression must contain at least one host:key reference."
 msgstr ""
 
@@ -12276,7 +12327,7 @@ msgstr "Birim"
 #: include/actions.inc.php:190 include/actions.inc.php:198
 #: include/actions.inc.php:212 include/actions.inc.php:223
 #: include/actions.inc.php:251 include/actions.inc.php:570
-#: include/blocks.inc.php:1022 include/classes/class.chostsinfo.php:127
+#: include/blocks.inc.php:1003 include/classes/class.chostsinfo.php:127
 #: include/discovery.inc.php:128 include/discovery.inc.php:162
 #: include/events.inc.php:29 include/graphs.inc.php:37
 #: include/graphs.inc.php:77 include/hosts.inc.php:53 include/hosts.inc.php:80
@@ -12404,7 +12455,7 @@ msgstr ""
 msgid "Unsupported import format \"%1$s\"."
 msgstr ""
 
-#: include/blocks.inc.php:1111
+#: include/blocks.inc.php:1092
 msgctxt "discovery results in dashboard"
 msgid "Up"
 msgstr ""
@@ -12446,9 +12497,9 @@ msgstr "Güncellendi"
 msgid "Updated status of host"
 msgstr "Konağın durumunu güncelle"
 
-#: include/blocks.inc.php:363 include/blocks.inc.php:701
-#: include/blocks.inc.php:769 include/blocks.inc.php:978
-#: include/blocks.inc.php:1068 include/blocks.inc.php:1126
+#: include/blocks.inc.php:354 include/blocks.inc.php:692
+#: include/blocks.inc.php:760 include/blocks.inc.php:958
+#: include/blocks.inc.php:1049 include/blocks.inc.php:1107
 #: include/classes/screens/CScreenSystemStatus.php:47
 #, php-format
 msgid "Updated: %s"
@@ -12474,7 +12525,7 @@ msgstr ""
 msgid "Updated: Item prototype \"%1$s\" on \"%2$s\"."
 msgstr ""
 
-#: api/classes/CTrigger.php:1693
+#: api/classes/CTrigger.php:1673
 #, php-format
 msgid "Updated: Trigger \"%1$s\" on \"%2$s\"."
 msgstr ""
@@ -12678,7 +12729,7 @@ msgstr "Kullanıcı durumu güncellendi"
 msgid "Users unblocked"
 msgstr "Bloklaması kaldırılmış kullanıcılar"
 
-#: include/blocks.inc.php:712 include/classes/class.cpie.php:309
+#: include/blocks.inc.php:703 include/classes/class.cpie.php:309
 #: include/classes/screens/CScreenEvents.php:48
 #: include/classes/screens/CScreenHistory.php:168
 #: include/classes/screens/CScreenHistory.php:266 include/reports.inc.php:383
@@ -12974,7 +13025,7 @@ msgstr "Veri toplama ile"
 msgid "With last event unacknowledged"
 msgstr "Son onaylanmamış olay ile"
 
-#: include/blocks.inc.php:374
+#: include/blocks.inc.php:365
 msgid "With problems"
 msgstr "Problemli"
 
@@ -12987,7 +13038,7 @@ msgstr "Tetikli"
 msgid "With unacknowledged events"
 msgstr "Onaylanmamış olaylar ile"
 
-#: include/blocks.inc.php:373
+#: include/blocks.inc.php:364
 msgid "Without problems"
 msgstr "Problemsiz"
 
@@ -13195,9 +13246,9 @@ msgstr "Yıl"
 msgid "Yearly"
 msgstr "Yıllık"
 
-#: events.php:760 include/blocks.inc.php:721
+#: events.php:756 include/blocks.inc.php:712
 #: include/classes/class.cserverinfo.php:35 include/config.inc.php:563
-#: include/events.inc.php:304 include/events.inc.php:322
+#: include/events.inc.php:306 include/events.inc.php:324
 #: include/forms.inc.php:1922 include/triggers.inc.php:1608
 #: include/views/administration.users.list.php:74
 msgid "Yes"
@@ -13370,7 +13421,7 @@ msgid ""
 "2. Incorrect network configuration.\n"
 msgstr ""
 
-#: include/blocks.inc.php:722
+#: include/blocks.inc.php:713
 msgid "Zabbix server IP or port is not set!"
 msgstr ""
 
@@ -13386,7 +13437,7 @@ msgstr ""
 msgid "Zabbix server is not running: the information displayed may not be current."
 msgstr ""
 
-#: include/blocks.inc.php:720
+#: include/blocks.inc.php:711
 msgid "Zabbix server is running"
 msgstr "Zabbix sunucu çalışıyor"
 
@@ -13501,10 +13552,10 @@ msgid "d M Y H:i"
 msgstr "d M Y H:i"
 
 #: acknow.php:162 events.php:282 httpdetails.php:115 httpmon.php:242
-#: include/acknow.inc.php:59 include/blocks.inc.php:952
+#: include/acknow.inc.php:59 include/blocks.inc.php:930
 #: include/classes/screens/CScreenEvents.php:63
 #: include/classes/screens/CScreenPlainText.php:95 include/events.inc.php:116
-#: include/events.inc.php:187 include/events.inc.php:243
+#: include/events.inc.php:186 include/events.inc.php:245
 #: include/translateDefines.inc.php:27 include/translateDefines.inc.php:28
 #: include/translateDefines.inc.php:34 include/translateDefines.inc.php:35
 #: include/translateDefines.inc.php:36 include/translateDefines.inc.php:45
@@ -13725,7 +13776,7 @@ msgstr ""
 msgid "no"
 msgstr "hayır"
 
-#: include/blocks.inc.php:1435 include/classes/class.cchart.php:1794
+#: include/blocks.inc.php:1412 include/classes/class.cchart.php:1794
 #: include/classes/class.cpie.php:320 include/maps.inc.php:435
 #: include/maps.inc.php:468
 #, php-format
@@ -13760,7 +13811,7 @@ msgstr "gönderilmedi"
 msgid "now"
 msgstr "şimdi"
 
-#: include/blocks.inc.php:348 include/blocks.inc.php:691
+#: include/blocks.inc.php:340 include/blocks.inc.php:682
 #: include/func.inc.php:1718
 msgid "of"
 msgstr "un"
