@@ -107,10 +107,10 @@ typedef struct
 	const char	*snmpv3_securityname;
 	const char	*snmpv3_authpassphrase;
 	const char	*snmpv3_privpassphrase;
+	const char	*snmpv3_contextname;
 	unsigned char	snmpv3_securitylevel;
 	unsigned char	snmpv3_authprotocol;
 	unsigned char	snmpv3_privprotocol;
-	const char	*snmpv3_contextname;
 }
 ZBX_DC_SNMPITEM;
 

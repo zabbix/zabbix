@@ -245,10 +245,13 @@ static int	discover_service(DB_DCHECK *dcheck, char *ip, int port, char *value)
 
 					if (ITEM_TYPE_SNMPv3 == item.type)
 					{
-						item.snmpv3_securityname = zbx_strdup(NULL, dcheck->snmpv3_securityname);
+						item.snmpv3_securityname =
+								zbx_strdup(NULL, dcheck->snmpv3_securityname);
 						item.snmpv3_securitylevel = dcheck->snmpv3_securitylevel;
-						item.snmpv3_authpassphrase = zbx_strdup(NULL, dcheck->snmpv3_authpassphrase);
-						item.snmpv3_privpassphrase = zbx_strdup(NULL, dcheck->snmpv3_privpassphrase);
+						item.snmpv3_authpassphrase =
+								zbx_strdup(NULL, dcheck->snmpv3_authpassphrase);
+						item.snmpv3_privpassphrase =
+								zbx_strdup(NULL, dcheck->snmpv3_privpassphrase);
 						item.snmpv3_authprotocol = dcheck->snmpv3_authprotocol;
 						item.snmpv3_privprotocol = dcheck->snmpv3_privprotocol;
 						item.snmpv3_contextname = zbx_strdup(NULL, dcheck->snmpv3_contextname);

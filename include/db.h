@@ -256,11 +256,11 @@ typedef struct
 	char		*snmpv3_securityname;
 	char		*snmpv3_authpassphrase;
 	char		*snmpv3_privpassphrase;
+	char		*snmpv3_contextname;
 	int		type;
 	unsigned char	snmpv3_securitylevel;
 	unsigned char	snmpv3_authprotocol;
 	unsigned char	snmpv3_privprotocol;
-	char		*snmpv3_contextname;
 }
 DB_DCHECK;
 

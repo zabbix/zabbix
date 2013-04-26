@@ -262,15 +262,15 @@ static void	DBlld_items_get(zbx_uint64_t parent_itemid, zbx_vector_ptr_t *items,
 		if (0 != strcmp(row[33], privatekey))
 			item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_PRIVATEKEY;
 
-		if (0 != strcmp(row[36], snmpv3_contextname))
-			item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_SNMPV3_CONTEXTNAME;
-
 		item->description = zbx_strdup(NULL, row[34]);
 		item->description_orig = NULL;
 
 		ZBX_DBROW2UINT64(db_interfaceid, row[35]);
 		if (db_interfaceid != interfaceid)
 			item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_INTERFACEID;
+
+		if (0 != strcmp(row[36], snmpv3_contextname))
+			item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_SNMPV3_CONTEXTNAME;
 
 		zbx_vector_uint64_create(&item->new_applicationids);
 
@@ -791,7 +791,8 @@ static void	DBlld_items_save(zbx_uint64_t hostid, zbx_uint64_t parent_itemid, zb
 			*snmp_community_esc = NULL, *port_esc = NULL, *snmpv3_securityname_esc = NULL,
 			*snmpv3_authpassphrase_esc = NULL, *snmpv3_privpassphrase_esc = NULL, *username_esc = NULL,
 			*password_esc = NULL, *publickey_esc = NULL, *privatekey_esc = NULL,
-			*name_esc, *key_esc, *params_esc, *snmp_oid_esc, *description_esc, *snmpv3_contextname_esc = NULL;
+			*snmpv3_contextname_esc = NULL,
+			*name_esc, *key_esc, *params_esc, *snmp_oid_esc, *description_esc;
 	size_t		sql1_alloc = 8 * ZBX_KIBIBYTE, sql1_offset = 0,
 			sql2_alloc = 2 * ZBX_KIBIBYTE, sql2_offset = 0,
 			sql3_alloc = 2 * ZBX_KIBIBYTE, sql3_offset = 0,
@@ -1190,6 +1191,7 @@ static void	DBlld_items_save(zbx_uint64_t hostid, zbx_uint64_t parent_itemid, zb
 		}
 	}
 
+	zbx_free(snmpv3_contextname_esc);
 	zbx_free(privatekey_esc);
 	zbx_free(publickey_esc);
 	zbx_free(password_esc);
@@ -1206,7 +1208,6 @@ static void	DBlld_items_save(zbx_uint64_t hostid, zbx_uint64_t parent_itemid, zb
 	zbx_free(trapper_hosts_esc);
 	zbx_free(delay_flex_esc);
 	zbx_free(key_proto_esc);
-	zbx_free(snmpv3_contextname_esc);
 
 	if (0 != new_items)
 	{
