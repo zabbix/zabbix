@@ -156,7 +156,7 @@ static void	DBlld_items_get(zbx_uint64_t parent_itemid, zbx_vector_ptr_t *items,
 				"i.multiplier,i.delta,i.formula,i.logtimefmt,i.valuemapid,i.params,i.ipmi_sensor,"
 				"i.snmp_community,i.snmp_oid,i.port,i.snmpv3_securityname,i.snmpv3_securitylevel,"
 				"i.snmpv3_authpassphrase,i.snmpv3_privpassphrase,i.authtype,i.username,i.password,"
-				"i.publickey,i.privatekey,i.description,i.interfaceid,i.smpv3_contextname"
+				"i.publickey,i.privatekey,i.description,i.interfaceid,i.snmpv3_contextname"
 			" from item_discovery id"
 				" join items i"
 					" on id.itemid=i.itemid"
