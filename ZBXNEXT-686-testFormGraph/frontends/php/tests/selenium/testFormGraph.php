@@ -34,24 +34,31 @@ class testFormItem extends CWebTest {
 	protected $host = 'Simple form test host';
 
 	/**
-	 * The name of the host for the testing of the layout of the graphs created in the test data set.
+	 * The name of the host item for the testing of the layout of the graphs created in the test data set.
 	 *
 	 * @var string
 	 */
-	protected $item = 'testFormItem';
+	protected $itemSimple = 'testFormItem';
+
+	/**
+	 * The name of the inheritance item for the testing of the layout of the graphs created in the test data set.
+	 *
+	 * @var string
+	 */
+	protected $itemInheritance = 'testInheritanceItem1';
 
 	/**
 	 * Backup the tables that will be modified during the tests.
 	 */
 	public function testFormGraph_Setup() {
-//		DBsave_tables('graphs');
+		DBsave_tables('graphs');
 	}
 
 
 	// Returns layout data
 	public static function layout() {
 		return array(
-		/*	array(
+			array(
 				array(
 					'ymin_type' => 'Fixed',
 					'ymax_type' => 'Item',
@@ -99,7 +106,7 @@ class testFormItem extends CWebTest {
 					'host' => 'Simple form test host'
 				)
 			),
-*/			array(
+			array(
 				array(
 					'graphtype' => 'Exploded',
 					'host' => 'Simple form test host'
@@ -131,7 +138,7 @@ class testFormItem extends CWebTest {
 					'form' => 'testInheritanceGraph1'
 				)
 			),
-	/*		array(
+			array(
 				array(
 					'graphtype' => 'Normal',
 					'template' => 'Inheritance test template'
@@ -177,7 +184,7 @@ class testFormItem extends CWebTest {
 					'graphtype' => 'Exploded',
 					'template' => 'Inheritance test template'
 				)
-			)*/
+			)
 		);
 	}
 
@@ -237,6 +244,9 @@ class testFormItem extends CWebTest {
 		if (isset($data['templatedHost'])) {
 			$this->assertAttribute("//input[@id='name']/@disabled", 'disabled');
 		}
+		else {
+			$this->assertElementNotPresent("//input[@id='name']/@disabled");
+		}
 
 		$this->zbxTestTextPresent('Width');
 		$this->assertVisible('width');
@@ -246,6 +256,9 @@ class testFormItem extends CWebTest {
 		if (isset($data['templatedHost'])) {
 			$this->assertAttribute("//input[@id='width']/@disabled", 'disabled');
 		}
+		else {
+			$this->assertElementNotPresent("//input[@id='width']/@disabled");
+		}
 
 		$this->zbxTestTextPresent('Height');
 		$this->assertVisible('height');
@@ -254,6 +267,9 @@ class testFormItem extends CWebTest {
 		$this->assertAttribute("//input[@id='height']/@value", '200');
 		if (isset($data['templatedHost'])) {
 			$this->assertAttribute("//input[@id='height']/@disabled", 'disabled');
+		}
+		else {
+			$this->assertElementNotPresent("//input[@id='height']/@disabled");
 		}
 
 		$this->zbxTestTextPresent('Graph type');
@@ -271,6 +287,10 @@ class testFormItem extends CWebTest {
 		if (isset($data['templatedHost'])) {
 			$this->assertAttribute("//select[@id='graphtype']/@disabled", 'disabled');
 		}
+		else {
+			$this->assertElementNotPresent("//select[@id='graphtype']/@disabled");
+		}
+
 		if (isset($data['graphtype'])) {
 			$this->zbxTestDropdownSelectWait('graphtype', $data['graphtype']);
 		}
@@ -302,11 +322,16 @@ class testFormItem extends CWebTest {
 		if ($graphtype == 'Normal' || $graphtype == 'Stacked') {
 			$this->zbxTestTextPresent('Show working time');
 			$this->assertVisible('show_work_period');
+
 			if (!isset($data['form'])) {
 				$this->assertAttribute("//*[@id='show_work_period']/@checked", 'checked');
 			}
+
 			if (isset($data['templatedHost'])) {
 				$this->assertAttribute("//*[@id='show_work_period']/@disabled", 'disabled');
+			}
+			else {
+				$this->assertElementNotPresent("//*[@id='show_work_period']/@disabled");
 			}
 		}
 		else {
@@ -322,6 +347,9 @@ class testFormItem extends CWebTest {
 			}
 			if (isset($data['templatedHost'])) {
 				$this->assertAttribute("//*[@id='show_triggers']/@disabled", 'disabled');
+			}
+			else {
+				$this->assertElementNotPresent("//*[@id='show_triggers']/@disabled");
 			}
 		}
 		else {
@@ -355,13 +383,16 @@ class testFormItem extends CWebTest {
 			if (isset($data['templatedHost'])) {
 				$this->assertAttribute("//input[@id='show_3d']/@disabled", 'disabled');
 			}
+			else {
+				$this->assertElementNotPresent("//input[@id='show_3d']/@disabled");
+			}
 		}
 		else {
 			$this->zbxTestTextNotPresent('3D view');
 			$this->assertElementNotPresent('show_3d');
 		}
 
-	/*	if ($graphtype == 'Normal' || $graphtype == 'Stacked') {
+		if ($graphtype == 'Normal' || $graphtype == 'Stacked') {
 			$this->zbxTestTextPresent('Y axis MIN value');
 			$this->assertVisible('ymin_type');
 			$this->zbxTestDropdownHasOptions('ymin_type', array(
@@ -369,16 +400,26 @@ class testFormItem extends CWebTest {
 				'Fixed',
 				'Item'
 			));
-			switch ($ymin_type) {
-				case 'Calculated':
-					$this->assertAttribute("//*[@id='ymin_type']/option[text()='$ymin_type']/@selected", 'selected');
-					break;
-				case 'Fixed':
-					$this->assertAttribute("//*[@id='ymin_type']/option[text()='$ymin_type']/@selected", 'selected');
-					break;
-				case 'Item':
-					$this->assertAttribute("//*[@id='ymin_type']/option[text()='$ymin_type']/@selected", 'selected');
-					break;
+
+			if (isset($data['templatedHost'])) {
+				$this->assertAttribute("//select[@id='ymin_type']/@disabled", 'disabled');
+			}
+			else {
+				$this->assertElementNotPresent("//select[@id='ymin_type']/@disabled");
+			}
+
+			if (!isset($data['form'])) {
+				switch ($ymin_type) {
+					case 'Calculated':
+						$this->assertAttribute("//*[@id='ymin_type']/option[text()='$ymin_type']/@selected", 'selected');
+						break;
+					case 'Fixed':
+						$this->assertAttribute("//*[@id='ymin_type']/option[text()='$ymin_type']/@selected", 'selected');
+						break;
+					case 'Item':
+						$this->assertAttribute("//*[@id='ymin_type']/option[text()='$ymin_type']/@selected", 'selected');
+						break;
+				}
 			}
 
 			$this->zbxTestTextPresent('Y axis MAX value');
@@ -388,16 +429,26 @@ class testFormItem extends CWebTest {
 				'Fixed',
 				'Item'
 			));
-			switch ($ymax_type) {
-				case 'Calculated':
-					$this->assertAttribute("//*[@id='ymax_type']/option[text()='$ymax_type']/@selected", 'selected');
-					break;
-				case 'Fixed':
-					$this->assertAttribute("//*[@id='ymax_type']/option[text()='$ymax_type']/@selected", 'selected');
-					break;
-				case 'Item':
-					$this->assertAttribute("//*[@id='ymax_type']/option[text()='$ymax_type']/@selected", 'selected');
-					break;
+
+			if (isset($data['templatedHost'])) {
+				$this->assertAttribute("//select[@id='ymax_type']/@disabled", 'disabled');
+			}
+			else {
+				$this->assertElementNotPresent("//select[@id='ymax_type']/@disabled");
+			}
+
+			if (!isset($data['form'])) {
+				switch ($ymax_type) {
+					case 'Calculated':
+						$this->assertAttribute("//*[@id='ymax_type']/option[text()='$ymax_type']/@selected", 'selected');
+						break;
+					case 'Fixed':
+						$this->assertAttribute("//*[@id='ymax_type']/option[text()='$ymax_type']/@selected", 'selected');
+						break;
+					case 'Item':
+						$this->assertAttribute("//*[@id='ymax_type']/option[text()='$ymax_type']/@selected", 'selected');
+						break;
+				}
 			}
 		}
 		else {
@@ -408,108 +459,155 @@ class testFormItem extends CWebTest {
 			$this->assertElementNotPresent('ymax_type');
 		}
 
-		// add general item
-		$this->zbxTestLaunchPopup('add_item');
-		$this->zbxTestClick('link='.$this->item);
-		sleep(1);
-		$this->selectWindow(null);
+		if (!isset($data['form'])) {
+			// add general item
+			$this->zbxTestLaunchPopup('add_item');
 
-		switch($ymin_type) {
-			case 'Fixed':
-				$this->assertVisible('yaxismin');
-				$this->assertAttribute("//input[@id='yaxismin']/@maxlength", '255');
-				$this->assertAttribute("//input[@id='yaxismin']/@size", '7');
-				$this->assertAttribute("//input[@id='yaxismin']/@value", '0.00');
+			if (isset($data['host'])) {
+				$this->zbxTestClick('link='.$this->itemSimple);
+			}
 
-				$this->assertElementNotPresent('ymin_name');
-				$this->assertElementNotPresent('yaxis_min');
-				break;
-			case 'Calculated':
-				$this->assertElementNotPresent('ymin_name');
-				$this->assertElementNotPresent('yaxis_min');
-				$this->assertNotVisible('yaxismin');
-				break;
-			case 'Item':
-				$this->assertElementPresent('ymin_name');
-				$this->assertElementPresent('yaxis_min');
-				$this->assertAttribute("//input[@id='yaxis_min']/@value", 'Select');
+			if (isset($data['template'])) {
+				$this->zbxTestClick('link='.$this->itemInheritance);
+			}
 
-				$this->assertNotVisible('yaxismin');
-				break;
-			default:
-				$this->zbxTestTextNotPresent('Add graph items first');
-				$this->assertElementNotPresent('ymin_name');
-				$this->assertElementNotPresent('yaxis_min');
-				$this->assertElementNotPresent('yaxismin');
-				break;
-		}
+			sleep(1);
+			$this->selectWindow(null);
 
-		switch($ymax_type) {
-			case 'Fixed':
-				$this->assertVisible('yaxismax');
-				$this->assertAttribute("//input[@id='yaxismax']/@maxlength", '255');
-				$this->assertAttribute("//input[@id='yaxismax']/@size", '7');
-				$this->assertAttribute("//input[@id='yaxismax']/@value", '100.00');
+			switch($ymin_type) {
+				case 'Fixed':
+					$this->assertVisible('yaxismin');
+					$this->assertAttribute("//input[@id='yaxismin']/@maxlength", '255');
+					$this->assertAttribute("//input[@id='yaxismin']/@size", '7');
+					$this->assertAttribute("//input[@id='yaxismin']/@value", '0.00');
 
-				$this->assertElementNotPresent('ymax_name');
-				$this->assertElementNotPresent('yaxis_max');
-				break;
-			case 'Calculated':
-				$this->assertElementNotPresent('ymax_name');
-				$this->assertElementNotPresent('yaxis_max');
-				$this->assertNotVisible('yaxismax');
-				break;
-			case 'Item':
-				$this->zbxTestDropdownSelectWait('ymax_type', 'Calculated');
-				$this->zbxTestDropdownSelectWait('ymax_type', 'Item');
-				$this->assertElementPresent('ymax_name');
-				$this->assertElementPresent('yaxis_max');
-				$this->assertAttribute("//input[@id='yaxis_max']/@value", 'Select');
+					$this->assertElementNotPresent('ymin_name');
+					$this->assertElementNotPresent('yaxis_min');
+					break;
+				case 'Calculated':
+					$this->assertElementNotPresent('ymin_name');
+					$this->assertElementNotPresent('yaxis_min');
+					$this->assertNotVisible('yaxismin');
+					break;
+				case 'Item':
+					$this->assertElementPresent('ymin_name');
+					$this->assertElementPresent('yaxis_min');
+					$this->assertAttribute("//input[@id='yaxis_min']/@value", 'Select');
 
-				$this->assertNotVisible('yaxismax');
-				break;
-			default:
-				$this->zbxTestTextNotPresent('Add graph items first');
-				$this->assertElementNotPresent('ymax_name');
-				$this->assertElementNotPresent('yaxis_max');
-				$this->assertElementNotPresent('yaxismax');
-				break;
-		}
+					$this->assertNotVisible('yaxismin');
+					break;
+				default:
+					$this->zbxTestTextNotPresent('Add graph items first');
+					$this->assertElementNotPresent('ymin_name');
+					$this->assertElementNotPresent('yaxis_min');
+					$this->assertElementNotPresent('yaxismin');
+					break;
+			}
 
-		switch ($graphtype) {
-			case 'Normal':
-				$this->zbxTestTextPresent(array('Items', 'Name', 'Function', 'Draw style', 'Y axis side', 'Colour', 'Action'));
-				break;
-			case 'Stacked':
-				$this->zbxTestTextPresent(array('Items', 'Name', 'Function', 'Y axis side', 'Colour', 'Action'));
-				break;
-			case 'Pie':
-			case 'Exploded':
-				$this->zbxTestTextPresent(array('Items', 'Name', 'Type', 'Function', 'Colour', 'Action'));
-				break;
+			switch($ymax_type) {
+				case 'Fixed':
+					$this->assertVisible('yaxismax');
+					$this->assertAttribute("//input[@id='yaxismax']/@maxlength", '255');
+					$this->assertAttribute("//input[@id='yaxismax']/@size", '7');
+					$this->assertAttribute("//input[@id='yaxismax']/@value", '100.00');
+
+					$this->assertElementNotPresent('ymax_name');
+					$this->assertElementNotPresent('yaxis_max');
+					break;
+				case 'Calculated':
+					$this->assertElementNotPresent('ymax_name');
+					$this->assertElementNotPresent('yaxis_max');
+					$this->assertNotVisible('yaxismax');
+					break;
+				case 'Item':
+					$this->zbxTestDropdownSelectWait('ymax_type', 'Calculated');
+					$this->zbxTestDropdownSelectWait('ymax_type', 'Item');
+					$this->assertElementPresent('ymax_name');
+					$this->assertElementPresent('yaxis_max');
+					$this->assertAttribute("//input[@id='yaxis_max']/@value", 'Select');
+
+					$this->assertNotVisible('yaxismax');
+					break;
+				default:
+					$this->zbxTestTextNotPresent('Add graph items first');
+					$this->assertElementNotPresent('ymax_name');
+					$this->assertElementNotPresent('yaxis_max');
+					$this->assertElementNotPresent('yaxismax');
+					break;
+			}
+
+			switch ($graphtype) {
+				case 'Normal':
+					$this->zbxTestTextPresent(array('Items', 'Name', 'Function', 'Draw style', 'Y axis side', 'Colour', 'Action'));
+					break;
+				case 'Stacked':
+					$this->zbxTestTextPresent(array('Items', 'Name', 'Function', 'Y axis side', 'Colour', 'Action'));
+					break;
+				case 'Pie':
+				case 'Exploded':
+					$this->zbxTestTextPresent(array('Items', 'Name', 'Type', 'Function', 'Colour', 'Action'));
+					break;
+			}
 		}
 
 		$this->assertVisible('add_item');
 		$this->assertAttribute("//input[@id='add_item']/@value", 'Add');
+
+		if (isset($data['templatedHost'])) {
+			$this->assertAttribute("//input[@id='add_item']/@disabled", 'disabled');
+		}
+		else {
+			$this->assertElementNotPresent("//input[@id='add_item']/@disabled");
+		}
 
 		$this->zbxTestClick('link=Preview');
 
 		$this->assertVisible('save');
 		$this->assertAttribute("//input[@id='save']/@value", 'Save');
 
+		if (isset($data['templatedHost'])) {
+			$this->assertAttribute("//input[@id='save']/@aria-disabled", 'true');
+		}
+		else {
+			$this->assertAttribute("//input[@id='save']/@aria-disabled", 'false');
+		}
+
 		$this->assertVisible('cancel');
-		$this->assertAttribute("//input[@id='cancel']/@value", 'Cancel');*/
+		$this->assertAttribute("//input[@id='cancel']/@value", 'Cancel');
+
+		if (isset($data['form'])) {
+			$this->assertVisible('clone');
+			$this->assertAttribute("//input[@id='clone']/@value", 'Clone');
+		}
+		else {
+			$this->assertElementNotPresent('clone');
+		}
+
+		if (isset($data['form'])) {
+			$this->assertVisible('delete');
+			$this->assertAttribute("//input[@id='delete']/@value", 'Delete');
+
+			if (isset($data['templatedHost'])) {
+				$this->assertAttribute("//input[@id='delete']/@aria-disabled", 'true');
+			}
+			else {
+				$this->assertAttribute("//input[@id='delete']/@aria-disabled", 'false');
+			}
+		}
+		else {
+			$this->assertElementNotPresent('delete');
+		}
 	}
 
 	// Returns update data
 	public static function update() {
-	//	return DBdata("select * from graphs where name LIKE 'testFormGraph%'");
+		return DBdata("select * from graphs where name LIKE 'testFormGraph%'");
 	}
 
 	/**
 	 * @dataProvider update
 	 */
-/*	public function testFormGraph_SimpleUpdate($data) {
+	public function testFormGraph_SimpleUpdate($data) {
 		$name = $data['name'];
 
 		$sqlGraphs = "select * from graphs";
@@ -527,11 +625,11 @@ class testFormItem extends CWebTest {
 
 		$this->assertEquals($oldHashGraphs, DBhash($sqlGraphs));
 	}
-*/
+
 	// Returns create data
 	public static function create() {
 		return array(
-		/*	array(
+			array(
 				array(
 					'expected' => GRAPH_BAD,
 					'errors' => array(
@@ -751,7 +849,7 @@ class testFormItem extends CWebTest {
 					'dbCheck' => true,
 					'formCheck' => true
 				)
-			)*/
+			)
 		);
 	}
 
@@ -845,7 +943,7 @@ class testFormItem extends CWebTest {
 			$this->zbxTestLaunchPopup('yaxis_min' , 'zbx_popup_item');
 			$this->zbxTestDropdownSelectWait('groupid', 'Zabbix servers');
 			$this->zbxTestDropdownSelectWait('hostid', $this->host);
-			$this->zbxTestClick('link='.$this->item);
+			$this->zbxTestClick('link='.$this->itemSimple);
 			sleep(1);
 			$this->selectWindow(null);
 			$ymin_name = $data['ymin_name'];
@@ -857,7 +955,7 @@ class testFormItem extends CWebTest {
 			$this->zbxTestLaunchPopup('yaxis_max', 'zbx_popup_item');
 			$this->zbxTestDropdownSelectWait('groupid', 'Zabbix servers');
 			$this->zbxTestDropdownSelectWait('hostid', $this->host);
-			$this->zbxTestClick('link='.$this->item);
+			$this->zbxTestClick('link='.$this->itemSimple);
 			sleep(1);
 			$this->selectWindow(null);
 			$ymax_name = $data['ymax_name'];
@@ -905,6 +1003,6 @@ class testFormItem extends CWebTest {
 	 * Restore the original tables.
 	 */
 	public function testFormGraph_Teardown() {
-	//	DBrestore_tables('graphs');
+		DBrestore_tables('graphs');
 	}
 }
