@@ -263,6 +263,64 @@ return array(
 			),
 		),
 	),
+	'group_prototype' => array(
+		'type' => DB::TABLE_TYPE_CONFIG,
+		'key' => 'group_prototypeid',
+		'fields' => array(
+			'group_prototypeid' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+			),
+			'hostid' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'hosts',
+				'ref_field' => 'hostid',
+			),
+			'name' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 64,
+				'default' => '',
+			),
+			'groupid' => array(
+				'null' => true,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'groups',
+				'ref_field' => 'groupid',
+			),
+			'templateid' => array(
+				'null' => true,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'groups',
+				'ref_field' => 'groupid',
+			),
+		),
+	),
+	'group_discovery' => array(
+		'type' => DB::TABLE_TYPE_CONFIG,
+		'key' => 'groupid',
+		'fields' => array(
+			'groupid' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'groups',
+				'ref_field' => 'groupid',
+			),
+			'parent_hostid' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'hosts',
+				'ref_field' => 'hostid',
+			),
+		),
+	),
 	'screens' => array(
 		'type' => DB::TABLE_TYPE_CONFIG,
 		'key' => 'screenid',
@@ -5725,6 +5783,26 @@ return array(
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
 				'default' => '0',
+			),
+		),
+	),
+	'interface_discovery' => array(
+		'type' => DB::TABLE_TYPE_CONFIG,
+		'key' => 'interfaceid',
+		'fields' => array(
+			'interfaceid' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'interface',
+				'ref_field' => 'interfaceid',
+			),
+			'parent_interfaceid' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'interface',
+				'ref_field' => 'interfaceid',
 			),
 		),
 	),

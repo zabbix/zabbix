@@ -1225,6 +1225,7 @@ static int	DBpatch_02010081()
 					{"hostid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 					{"name", "", NULL, NULL, 64, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
 					{"groupid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_SYNC, 0},
+					{"templateid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0},
 					{NULL}
 				}
 			};
@@ -1248,10 +1249,17 @@ static int	DBpatch_02010083()
 
 static int	DBpatch_02010084()
 {
-	return DBcreate_index("group_prototype", "group_prototype_1", "hostid", 0);
+	const ZBX_FIELD	field = {"templateid", NULL, "groups", "groupid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("group_prototype", 3, &field);
 }
 
 static int	DBpatch_02010085()
+{
+	return DBcreate_index("group_prototype", "group_prototype_1", "hostid", 0);
+}
+
+static int	DBpatch_02010086()
 {
 	const ZBX_TABLE	table =
 			{"group_discovery", "groupid", 0,
@@ -1265,14 +1273,14 @@ static int	DBpatch_02010085()
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_02010086()
+static int	DBpatch_02010087()
 {
 	const ZBX_FIELD	field = {"groupid", NULL, "groups", "groupid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("group_discovery", 1, &field);
 }
 
-static int	DBpatch_02010087()
+static int	DBpatch_02010088()
 {
 	const ZBX_FIELD	field = {"parent_hostid", NULL, "hosts", "hostid", 0, 0, 0, 0};
 
@@ -1403,11 +1411,12 @@ int	DBcheck_version()
 		{DBpatch_02010085, 2010085, 0, 1},
 		{DBpatch_02010086, 2010086, 0, 1},
 		{DBpatch_02010087, 2010087, 0, 1},
+		{DBpatch_02010088, 2010088, 0, 1},
 		/* IMPORTANT! When adding a new mandatory DBPatch don't forget to update it for SQLite, too. */
 		{NULL}
 	};
 #else
-	required = 2010087;	/* <---- Update mandatory DBpatch for SQLite here. */
+	required = 2010088;	/* <---- Update mandatory DBpatch for SQLite here. */
 #endif
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
