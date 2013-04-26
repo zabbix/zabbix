@@ -642,6 +642,7 @@ include_once('include/page_header.php');
 	$graph->setPeriodCaption($graph_data['captions']);
 
 	$graph->setHeader($title);
+	$graph->setPeriod($scaleperiod);
 	$graph->setXLabel($xlabel);
 	$graph->setYLabel($ylabel);
 

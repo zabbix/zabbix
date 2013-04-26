@@ -1,5 +1,6 @@
 Changes for 1.8.17rc1
 
+..F....... [ZBX-1129] fixed graph time period in bar reports (Oleg)
 ..F....... [ZBX-6484] fixed bar report calculation (Oleg)
 ..F....... [ZBX-1236] added right side y axis support in bar reports (Oleg)
 ..F....... [ZBX-6474] fixed {ITEM.VALUE} macro expanding in trigger names (Oleg)
