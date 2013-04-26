@@ -22,7 +22,7 @@
 #include "db.h"
 #include "log.h"
 
-#if defined(HAVE_MYSQL)
+#ifdef HAVE_MYSQL
 #	define ZBX_DB_TABLE_OPTIONS	" engine=innodb"
 #	define ZBX_DROP_FK		" drop foreign key"
 #else
@@ -30,7 +30,7 @@
 #	define ZBX_DROP_FK		" drop constraint"
 #endif
 
-#if defined(HAVE_POSTGRESQL)
+#ifdef HAVE_POSTGRESQL
 #	define ZBX_DB_ONLY		" only"
 #else
 #	define ZBX_DB_ONLY		""
@@ -60,7 +60,7 @@
 #	define ZBX_TYPE_ID_STR		"number(20)"
 #endif
 
-#if defined(HAVE_ORACLE)
+#ifdef HAVE_ORACLE
 #	define ZBX_TYPE_INT_STR		"number(10)"
 #	define ZBX_TYPE_CHAR_STR	"nvarchar2"
 #else
@@ -150,7 +150,7 @@ static void	DBmodify_field_type_sql(char **sql, size_t *sql_alloc, size_t *sql_o
 	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "alter table" ZBX_DB_ONLY " %s" ZBX_DB_ALTER_COLUMN " ",
 			table_name);
 
-#if defined(HAVE_MYSQL)
+#ifdef HAVE_MYSQL
 	DBfield_definition_string(sql, sql_alloc, sql_offset, field);
 #else
 	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%s" ZBX_DB_SET_TYPE " ", field->name);
@@ -215,7 +215,7 @@ static void	DBrename_field_sql(char **sql, size_t *sql_alloc, size_t *sql_offset
 {
 	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "alter table" ZBX_DB_ONLY " %s ", table_name);
 
-#if defined(HAVE_MYSQL)
+#ifdef HAVE_MYSQL
 	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "change column %s ", field_name);
 	DBfield_definition_string(sql, sql_alloc, sql_offset, field);
 #else
@@ -243,7 +243,7 @@ static void	DBdrop_index_sql(char **sql, size_t *sql_alloc, size_t *sql_offset,
 		const char *table_name, const char *index_name)
 {
 	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "drop index %s", index_name);
-#if defined(HAVE_MYSQL)
+#ifdef HAVE_MYSQL
 	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, " on %s", table_name);
 #endif
 }
@@ -267,7 +267,7 @@ static void	DBdrop_foreign_key_sql(char **sql, size_t *sql_alloc, size_t *sql_of
 
 static int	DBreorg_table(const char *table_name)
 {
-#if defined(HAVE_IBM_DB2)
+#ifdef HAVE_IBM_DB2
 	if (ZBX_DB_OK <= DBexecute("call sysproc.admin_cmd ('reorg table %s')", table_name))
 		return SUCCEED;
 
@@ -533,7 +533,7 @@ static int	DBset_version(int version, unsigned char mandatory)
 
 static int	DBmodify_proxy_table_id_field(const char *table_name)
 {
-#if defined(HAVE_POSTGRESQL)
+#ifdef HAVE_POSTGRESQL
 	const ZBX_FIELD	field = {"id", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0};
 
 	return DBmodify_field_type(table_name, &field);
