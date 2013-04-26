@@ -2722,6 +2722,7 @@ static void	DBcopy_template_items(zbx_uint64_t hostid, zbx_vector_uint64_t *temp
 		char		*snmpv3_securityname_esc;
 		char		*snmpv3_authpassphrase_esc;
 		char		*snmpv3_privpassphrase_esc;
+		char		*snmpv3_contextname_esc;
 		char		*username_esc;
 		char		*password_esc;
 		char		*publickey_esc;
@@ -2790,7 +2791,7 @@ static void	DBcopy_template_items(zbx_uint64_t hostid, zbx_vector_uint64_t *temp
 				"ti.snmp_oid,ti.snmpv3_securityname,ti.snmpv3_securitylevel,ti.snmpv3_authprotocol,"
 				"ti.snmpv3_authpassphrase,ti.snmpv3_privprotocol,ti.snmpv3_privpassphrase,ti.authtype,"
 				"ti.username,ti.password,ti.publickey,ti.privatekey,ti.flags,ti.filter,ti.description,"
-				"ti.inventory_link,ti.lifetime,hi.itemid"
+				"ti.inventory_link,ti.lifetime,hi.itemid,ti.snmpv3_contextname"
 			" from items ti"
 			" left join items hi on hi.key_=ti.key_"
 				" and hi.hostid=" ZBX_FS_UI64
@@ -2848,6 +2849,7 @@ static void	DBcopy_template_items(zbx_uint64_t hostid, zbx_vector_uint64_t *temp
 		item[item_num].description_esc = DBdyn_escape_string(row[35]);
 		item[item_num].inventory_link = (unsigned char)atoi(row[36]);
 		item[item_num].lifetime_esc = DBdyn_escape_string(row[37]);
+		item[item_num].snmpv3_contextname_esc = DBdyn_escape_string(row[39]);
 
 		switch (interface_type = get_interface_type_by_item_type(item[item_num].type))
 		{
@@ -2893,7 +2895,7 @@ static void	DBcopy_template_items(zbx_uint64_t hostid, zbx_vector_uint64_t *temp
 					"snmpv3_securitylevel,snmpv3_authprotocol,snmpv3_authpassphrase,"
 					"snmpv3_privprotocol,snmpv3_privpassphrase,authtype,username,password,"
 					"publickey,privatekey,templateid,flags,filter,description,inventory_link,"
-					"interfaceid,lifetime)"
+					"interfaceid,lifetime,snmpv3_contextname)"
 				" values ";
 		zbx_uint64_t	*itemids = NULL, *protoids = NULL;
 		size_t		itemids_num = 0, protoids_num = 0;
@@ -2940,6 +2942,7 @@ static void	DBcopy_template_items(zbx_uint64_t hostid, zbx_vector_uint64_t *temp
 						"snmpv3_authpassphrase='%s',"
 						"snmpv3_privprotocol=%d,"
 						"snmpv3_privpassphrase='%s',"
+						"snmpv3_contextname='%s',"
 						"authtype=%d,"
 						"username='%s',"
 						"password='%s',"
@@ -2962,6 +2965,7 @@ static void	DBcopy_template_items(zbx_uint64_t hostid, zbx_vector_uint64_t *temp
 					item[i].snmpv3_securityname_esc, (int)item[i].snmpv3_securitylevel,
 					(int)item[i].snmpv3_authprotocol, item[i].snmpv3_authpassphrase_esc,
 					(int)item[i].snmpv3_privprotocol, item[i].snmpv3_privpassphrase_esc,
+					item[i].snmpv3_contextname_esc,
 					(int)item[i].authtype, item[i].username_esc, item[i].password_esc,
 					item[i].publickey_esc, item[i].privatekey_esc, item[i].templateid,
 					(int)item[i].flags, item[i].filter_esc, item[i].description_esc,
@@ -2993,7 +2997,7 @@ static void	DBcopy_template_items(zbx_uint64_t hostid, zbx_vector_uint64_t *temp
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 					"(" ZBX_FS_UI64 ",'%s','%s'," ZBX_FS_UI64 ",%d,%d,%d,%d,'%s',%d,%d,%d,'%s',"
 						"'%s',%d,%d,'%s','%s',%s,'%s','%s','%s','%s','%s',%d,%d,'%s',%d,'%s',"
-						"%d,'%s','%s','%s','%s'," ZBX_FS_UI64 ",%d,'%s','%s',%d,%s,'%s')"
+						"%d,'%s','%s','%s','%s'," ZBX_FS_UI64 ",%d,'%s','%s',%d,%s,'%s','%s')"
 						ZBX_ROW_DL,
 					itemid, item[i].name_esc, item[i].key_esc, hostid, (int)item[i].type,
 					(int)item[i].value_type, (int)item[i].data_type, item[i].delay,
@@ -3009,7 +3013,7 @@ static void	DBcopy_template_items(zbx_uint64_t hostid, zbx_vector_uint64_t *temp
 					item[i].publickey_esc, item[i].privatekey_esc, item[i].templateid,
 					(int)item[i].flags, item[i].filter_esc, item[i].description_esc,
 					(int)item[i].inventory_link, DBsql_id_ins(item[i].interfaceid),
-					item[i].lifetime_esc);
+					item[i].lifetime_esc, item[i].snmpv3_contextname_esc);
 
 			zbx_free(item[i].key_esc);
 
@@ -3042,6 +3046,7 @@ static void	DBcopy_template_items(zbx_uint64_t hostid, zbx_vector_uint64_t *temp
 			zbx_free(item[i].snmpv3_privpassphrase_esc);
 			zbx_free(item[i].snmpv3_authpassphrase_esc);
 			zbx_free(item[i].snmpv3_securityname_esc);
+			zbx_free(item[i].snmpv3_contextname_esc);
 			zbx_free(item[i].snmp_oid_esc);
 			zbx_free(item[i].snmp_community_esc);
 			zbx_free(item[i].ipmi_sensor_esc);
