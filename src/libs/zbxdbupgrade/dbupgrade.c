@@ -1161,14 +1161,14 @@ static int	DBpatch_02010073()
 
 static int	DBpatch_02010074()
 {
-	const ZBX_FIELD	field = {"parent_hostid", NULL, "hosts", "hostid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+	const ZBX_FIELD	field = {"parent_hostid", NULL, "hosts", "hostid", 0, 0, 0, 0};
 
 	return DBadd_foreign_key("host_discovery", 2, &field);
 }
 
 static int	DBpatch_02010075()
 {
-	const ZBX_FIELD	field = {"parent_itemid", NULL, "items", "itemid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+	const ZBX_FIELD	field = {"parent_itemid", NULL, "items", "itemid", 0, 0, 0, 0};
 
 	return DBadd_foreign_key("host_discovery", 3, &field);
 }
@@ -1214,6 +1214,69 @@ static int	DBpatch_02010080()
 			{"parent_interfaceid", NULL, "interface", "interfaceid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("interface_discovery", 2, &field);
+}
+
+static int	DBpatch_02010081()
+{
+	const ZBX_TABLE	table =
+			{"group_prototype", "group_prototypeid", 0,
+				{
+					{"group_prototypeid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"hostid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"name", "", NULL, NULL, 64, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"groupid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_SYNC, 0},
+					{NULL}
+				}
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_02010082()
+{
+	const ZBX_FIELD	field = {"hostid", NULL, "hosts", "hostid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("group_prototype", 1, &field);
+}
+
+static int	DBpatch_02010083()
+{
+	const ZBX_FIELD	field = {"groupid", NULL, "groups", "groupid", 0, 0, 0, 0};
+
+	return DBadd_foreign_key("group_prototype", 2, &field);
+}
+
+static int	DBpatch_02010084()
+{
+	return DBcreate_index("group_prototype", "group_prototype_1", "hostid", 0);
+}
+
+static int	DBpatch_02010085()
+{
+	const ZBX_TABLE	table =
+			{"group_discovery", "groupid", 0,
+				{
+					{"groupid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"parent_hostid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{NULL}
+				}
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_02010086()
+{
+	const ZBX_FIELD	field = {"groupid", NULL, "groups", "groupid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("group_discovery", 1, &field);
+}
+
+static int	DBpatch_02010087()
+{
+	const ZBX_FIELD	field = {"parent_hostid", NULL, "hosts", "hostid", 0, 0, 0, 0};
+
+	return DBadd_foreign_key("group_discovery", 2, &field);
 }
 #endif	/* not HAVE_SQLITE3 */
 
@@ -1333,11 +1396,18 @@ int	DBcheck_version()
 		{DBpatch_02010078, 2010078, 0, 1},
 		{DBpatch_02010079, 2010079, 0, 1},
 		{DBpatch_02010080, 2010080, 0, 1},
+		{DBpatch_02010081, 2010081, 0, 1},
+		{DBpatch_02010082, 2010082, 0, 1},
+		{DBpatch_02010083, 2010083, 0, 1},
+		{DBpatch_02010084, 2010084, 0, 1},
+		{DBpatch_02010085, 2010085, 0, 1},
+		{DBpatch_02010086, 2010086, 0, 1},
+		{DBpatch_02010087, 2010087, 0, 1},
 		/* IMPORTANT! When adding a new mandatory DBPatch don't forget to update it for SQLite, too. */
 		{NULL}
 	};
 #else
-	required = 2010080;	/* <---- Update mandatory DBpatch for SQLite here. */
+	required = 2010087;	/* <---- Update mandatory DBpatch for SQLite here. */
 #endif
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);

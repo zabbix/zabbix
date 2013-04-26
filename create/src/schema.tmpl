@@ -75,6 +75,17 @@ FIELD		|name		|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|internal	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 INDEX		|1		|name
 
+TABLE|group_prototype|group_prototypeid|ZBX_SYNC,ZBX_DATA
+FIELD		|group_prototypeid|t_id		|	|NOT NULL	|0
+FIELD		|hostid		|t_id		|	|NOT NULL	|ZBX_SYNC		|1|hosts
+FIELD		|name		|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC
+FIELD		|groupid	|t_id		|	|NULL		|ZBX_SYNC		|2|groups	|		|RESTRICT
+INDEX		|1		|hostid
+
+TABLE|group_discovery|groupid|ZBX_SYNC,ZBX_DATA
+FIELD		|groupid	|t_id		|	|NOT NULL	|ZBX_SYNC		|1|groups
+FIELD		|parent_hostid	|t_id		|	|NOT NULL	|ZBX_SYNC		|2|hosts	|hostid		|RESTRICT
+
 TABLE|screens|screenid|ZBX_SYNC,ZBX_DATA
 FIELD		|screenid	|t_id		|	|NOT NULL	|0
 FIELD		|name		|t_varchar(255)	|	|NOT NULL	|ZBX_SYNC
@@ -1185,9 +1196,9 @@ FIELD		|ts_delete	|t_time		|'0'	|NOT NULL	|ZBX_NODATA
 UNIQUE		|1		|itemid,parent_itemid
 
 TABLE|host_discovery|hostid|ZBX_SYNC,ZBX_DATA
-FIELD		|hostid		|t_id		|	|NOT NULL	|ZBX_SYNC		|1|hosts
-FIELD		|parent_hostid	|t_id		|	|NULL		|ZBX_SYNC		|2|hosts	|hostid
-FIELD		|parent_itemid	|t_id		|	|NULL		|ZBX_SYNC		|3|items	|itemid
+FIELD		|hostid		|t_id		|	|NOT NULL	|0			|1|hosts
+FIELD		|parent_hostid	|t_id		|	|NULL		|ZBX_SYNC		|2|hosts	|hostid		|RESTRICT
+FIELD		|parent_itemid	|t_id		|	|NULL		|ZBX_SYNC		|3|items	|itemid		|RESTRICT
 FIELD		|host		|t_varchar(64)	|''	|NOT NULL	|ZBX_NODATA
 FIELD		|lastcheck	|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
 FIELD		|ts_delete	|t_time		|'0'	|NOT NULL	|ZBX_NODATA
@@ -1241,4 +1252,4 @@ UNIQUE		|1		|userid
 TABLE|dbversion||
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|2010080	|2010080
+ROW		|2010087	|2010087
