@@ -141,6 +141,9 @@ static void	DBcreate_table_sql(char **sql, size_t *sql_alloc, size_t *sql_offset
 			zbx_strcpy_alloc(sql, sql_alloc, sql_offset, ",\n");
 		DBfield_definition_string(sql, sql_alloc, sql_offset, &table->fields[i]);
 	}
+	if (NULL != table->recid)
+		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, ",PRIMARY KEY(%s)", table->recid);
+
 	zbx_strcpy_alloc(sql, sql_alloc, sql_offset, "\n)" ZBX_DB_TABLE_OPTIONS);
 }
 
@@ -1120,6 +1123,71 @@ static int	DBpatch_02010070()
 {
 	return DBdrop_field("config", "alert_history");
 }
+
+static int	DBpatch_02010071()
+{
+	const ZBX_TABLE	*table;
+	int		ret = FAIL;
+
+	table = DBget_table("application_template");
+	if (NULL != table)
+		ret = DBcreate_table(table);
+
+	return ret;
+}
+
+static int	DBpatch_02010072()
+{
+	return DBcreate_index("application_template", "application_template_1", "applicationid,templateid", 1);
+}
+
+static int	DBpatch_02010073()
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+	zbx_uint64_t	id_counter = 1, application_id, template_id, app_template_id;
+	int		ret = FAIL;
+
+	result = DBselect("select applicationid,templateid from applications where templateid is not NULL");
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		is_uint64(row[0], &application_id);
+		is_uint64(row[1], &template_id);
+		app_template_id = get_nodeid_by_id(application_id) * ZBX_DM_MAX_HISTORY_IDS + id_counter++;
+
+		if (ZBX_DB_OK > DBexecute(
+				"insert into application_template"
+					" (application_templateid, applicationid, templateid)"
+					" values (" ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 ")",
+				app_template_id, application_id, template_id))
+		{
+			goto out;
+		}
+	}
+
+	ret = SUCCEED;
+out:
+	DBfree_result(result);
+
+	return ret;
+}
+
+static int	DBpatch_02010074()
+{
+	return DBdrop_foreign_key("applications", 2);
+}
+
+static int	DBpatch_02010075()
+{
+	return DBdrop_index("applications", "applications_1");
+}
+
+static int	DBpatch_02010076()
+{
+	return DBdrop_field("applications","templateid");
+}
+
 #endif	/* not HAVE_SQLITE3 */
 
 static void	DBget_version(int *mandatory, int *optional)
@@ -1228,11 +1296,17 @@ int	DBcheck_version()
 		{DBpatch_02010068, 2010068, 0, 1},
 		{DBpatch_02010069, 2010069, 0, 0},
 		{DBpatch_02010070, 2010070, 0, 0},
+		{DBpatch_02010071, 2010071, 0, 1},
+		{DBpatch_02010072, 2010072, 0, 1},
+		{DBpatch_02010073, 2010073, 0, 1},
+		{DBpatch_02010074, 2010074, 0, 1},
+		{DBpatch_02010075, 2010075, 0, 1},
+		{DBpatch_02010076, 2010076, 0, 1},
 		/* IMPORTANT! When adding a new mandatory DBPatch don't forget to update it for SQLite, too. */
 		{NULL}
 	};
 #else
-	required = 2010068;	/* <---- Update mandatory DBpatch for SQLite here. */
+	required = 2010076;	/* <---- Update mandatory DBpatch for SQLite here. */
 #endif
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
