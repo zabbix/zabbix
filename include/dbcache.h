@@ -126,6 +126,7 @@ typedef struct
 	unsigned char	flags;
 	unsigned char	snmpv3_authprotocol;
 	unsigned char	snmpv3_privprotocol;
+	char		snmpv3_contextname_orig[ITEM_SNMPV3_CONTEXTNAME_LEN_MAX], *snmpv3_contextname;
 }
 DC_ITEM;
 
