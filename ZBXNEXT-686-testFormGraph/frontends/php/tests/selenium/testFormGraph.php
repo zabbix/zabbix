@@ -44,14 +44,14 @@ class testFormItem extends CWebTest {
 	 * Backup the tables that will be modified during the tests.
 	 */
 	public function testFormGraph_Setup() {
-		DBsave_tables('graphs');
+//		DBsave_tables('graphs');
 	}
 
 
 	// Returns layout data
 	public static function layout() {
 		return array(
-			array(
+		/*	array(
 				array(
 					'ymin_type' => 'Fixed',
 					'ymax_type' => 'Item',
@@ -99,13 +99,18 @@ class testFormItem extends CWebTest {
 					'host' => 'Simple form test host'
 				)
 			),
-			array(
+*/			array(
 				array(
 					'graphtype' => 'Exploded',
 					'host' => 'Simple form test host'
 				)
 			),
-//
+			array(
+				array(
+					'host' => 'Simple form test host',
+					'form' => 'testFormGraph1'
+				)
+			),
 			array(
 				array(
 					'ymin_type' => 'Fixed',
@@ -114,6 +119,19 @@ class testFormItem extends CWebTest {
 				)
 			),
 			array(
+				array(
+					'template' => 'Inheritance test template',
+					'form' => 'testInheritanceGraph1'
+				)
+			),
+			array(
+				array(
+					'host' => 'Template inheritance test host',
+					'templatedHost' => 'Inheritance test template',
+					'form' => 'testInheritanceGraph1'
+				)
+			),
+	/*		array(
 				array(
 					'graphtype' => 'Normal',
 					'template' => 'Inheritance test template'
@@ -159,7 +177,7 @@ class testFormItem extends CWebTest {
 					'graphtype' => 'Exploded',
 					'template' => 'Inheritance test template'
 				)
-			)
+			)*/
 		);
 	}
 
@@ -168,33 +186,75 @@ class testFormItem extends CWebTest {
 	 */
 	public function testFormGraph_CheckLayout($data) {
 
-		$this->zbxTestLogin('hosts.php');
-		$this->zbxTestClickWait('link='.$this->host);
+		if (isset($data['template'])) {
+			$this->zbxTestLogin('templates.php');
+			$this->zbxTestClickWait('link='.$data['template']);
+			$hostid = 30000;
+		}
+
+		if (isset($data['host'])) {
+			$this->zbxTestLogin('hosts.php');
+			$this->zbxTestClickWait('link='.$data['host']);
+			if (isset($data['templatedHost'])) {
+				$hostid = 30001;
+			}
+			else {
+				$hostid = 40001;
+			}
+		}
+
 		$this->zbxTestClickWait("//div[@class='w']//a[text()='Graphs']");
 
 		$this->checkTitle('Configuration of graphs');
 		$this->zbxTestTextPresent('CONFIGURATION OF GRAPHS');
 
-		$this->zbxTestClickWait('form');
+		if (isset($data['form'])) {
+			$this->zbxTestClickWait('link='.$data['form']);
+		}
+		else {
+			$this->zbxTestClickWait('form');
+		}
+
 		$this->checkTitle('Configuration of graphs');
+		$this->zbxTestTextPresent('CONFIGURATION OF GRAPHS');
+		$this->zbxTestTextPresent('Graph');
+
+		if (isset($data['templatedHost'])) {
+			$this->zbxTestTextPresent('Parent graphs');
+			if (isset($data['hostTemplate'])) {
+				$this->assertElementPresent("//a[text()='".$data['hostTemplate']."']");
+			}
+		}
+		else {
+			$this->zbxTestTextNotPresent('Parent graphs');
+		}
 
 		$this->zbxTestTextPresent('Name');
 		$this->assertVisible('name');
 		$this->assertAttribute("//input[@id='name']/@maxlength", '255');
 		$this->assertAttribute("//input[@id='name']/@size", '50');
 		$this->assertAttribute("//input[@id='name']/@autofocus", 'autofocus');
+		if (isset($data['templatedHost'])) {
+			$this->assertAttribute("//input[@id='name']/@disabled", 'disabled');
+		}
 
 		$this->zbxTestTextPresent('Width');
 		$this->assertVisible('width');
 		$this->assertAttribute("//input[@id='width']/@maxlength", '5');
 		$this->assertAttribute("//input[@id='width']/@size", '5');
 		$this->assertAttribute("//input[@id='width']/@value", '900');
+		if (isset($data['templatedHost'])) {
+			$this->assertAttribute("//input[@id='width']/@disabled", 'disabled');
+		}
 
 		$this->zbxTestTextPresent('Height');
 		$this->assertVisible('height');
 		$this->assertAttribute("//input[@id='height']/@maxlength", '5');
 		$this->assertAttribute("//input[@id='height']/@size", '5');
 		$this->assertAttribute("//input[@id='height']/@value", '200');
+		if (isset($data['templatedHost'])) {
+			$this->assertAttribute("//input[@id='height']/@disabled", 'disabled');
+		}
 
 		$this->zbxTestTextPresent('Graph type');
 		$this->assertVisible('graphtype');
@@ -204,8 +264,13 @@ class testFormItem extends CWebTest {
 			'Pie',
 			'Exploded'
 		));
-		$this->assertAttribute("//*[@id='graphtype']/option[text()='Normal']/@selected", 'selected');
+		if (!isset($data['form'])) {
+			$this->assertAttribute("//*[@id='graphtype']/option[text()='Normal']/@selected", 'selected');
+		}
 
+		if (isset($data['templatedHost'])) {
+			$this->assertAttribute("//select[@id='graphtype']/@disabled", 'disabled');
+		}
 		if (isset($data['graphtype'])) {
 			$this->zbxTestDropdownSelectWait('graphtype', $data['graphtype']);
 		}
@@ -230,12 +295,19 @@ class testFormItem extends CWebTest {
 
 		$this->zbxTestTextPresent('Show legend');
 		$this->assertVisible('show_legend');
-		$this->assertAttribute("//*[@id='show_legend']/@checked", 'checked');
+		if (!isset($data['form'])) {
+			$this->assertAttribute("//*[@id='show_legend']/@checked", 'checked');
+		}
 
 		if ($graphtype == 'Normal' || $graphtype == 'Stacked') {
 			$this->zbxTestTextPresent('Show working time');
 			$this->assertVisible('show_work_period');
-			$this->assertAttribute("//*[@id='show_work_period']/@checked", 'checked');
+			if (!isset($data['form'])) {
+				$this->assertAttribute("//*[@id='show_work_period']/@checked", 'checked');
+			}
+			if (isset($data['templatedHost'])) {
+				$this->assertAttribute("//*[@id='show_work_period']/@disabled", 'disabled');
+			}
 		}
 		else {
 			$this->zbxTestTextNotPresent('Show working time');
@@ -245,7 +317,12 @@ class testFormItem extends CWebTest {
 		if ($graphtype == 'Normal' || $graphtype == 'Stacked') {
 			$this->zbxTestTextPresent('Show triggers');
 			$this->assertVisible('show_triggers');
-			$this->assertAttribute("//*[@id='show_triggers']/@checked", 'checked');
+			if (!isset($data['form'])) {
+				$this->assertAttribute("//*[@id='show_triggers']/@checked", 'checked');
+			}
+			if (isset($data['templatedHost'])) {
+				$this->assertAttribute("//*[@id='show_triggers']/@disabled", 'disabled');
+			}
 		}
 		else {
 			$this->zbxTestTextNotPresent('Show triggers');
@@ -255,9 +332,14 @@ class testFormItem extends CWebTest {
 		if ($graphtype == 'Normal') {
 			$this->zbxTestTextPresent('Percentile line (left)');
 			$this->assertVisible('visible_percent_left');
-
+			if (isset($data['templatedHost'])) {
+				$this->assertAttribute("//input[@id='visible_percent_left']/@disabled", 'disabled');
+			}
 			$this->zbxTestTextPresent('Percentile line (right)');
 			$this->assertVisible('visible_percent_right');
+			if (isset($data['templatedHost'])) {
+				$this->assertAttribute("//input[@id='visible_percent_right']/@disabled", 'disabled');
+			}
 		}
 		else {
 			$this->zbxTestTextNotPresent('Percentile line (left)');
@@ -270,13 +352,16 @@ class testFormItem extends CWebTest {
 		if ($graphtype == 'Pie' || $graphtype == 'Exploded') {
 			$this->zbxTestTextPresent('3D view');
 			$this->assertVisible('show_3d');
+			if (isset($data['templatedHost'])) {
+				$this->assertAttribute("//input[@id='show_3d']/@disabled", 'disabled');
+			}
 		}
 		else {
 			$this->zbxTestTextNotPresent('3D view');
 			$this->assertElementNotPresent('show_3d');
 		}
 
-		if ($graphtype == 'Normal' || $graphtype == 'Stacked') {
+	/*	if ($graphtype == 'Normal' || $graphtype == 'Stacked') {
 			$this->zbxTestTextPresent('Y axis MIN value');
 			$this->assertVisible('ymin_type');
 			$this->zbxTestDropdownHasOptions('ymin_type', array(
@@ -413,18 +498,18 @@ class testFormItem extends CWebTest {
 		$this->assertAttribute("//input[@id='save']/@value", 'Save');
 
 		$this->assertVisible('cancel');
-		$this->assertAttribute("//input[@id='cancel']/@value", 'Cancel');
+		$this->assertAttribute("//input[@id='cancel']/@value", 'Cancel');*/
 	}
 
 	// Returns update data
 	public static function update() {
-		return DBdata("select * from graphs where name LIKE 'testFormGraph%'");
+	//	return DBdata("select * from graphs where name LIKE 'testFormGraph%'");
 	}
 
 	/**
 	 * @dataProvider update
 	 */
-	public function testFormGraph_SimpleUpdate($data) {
+/*	public function testFormGraph_SimpleUpdate($data) {
 		$name = $data['name'];
 
 		$sqlGraphs = "select * from graphs";
@@ -442,11 +527,11 @@ class testFormItem extends CWebTest {
 
 		$this->assertEquals($oldHashGraphs, DBhash($sqlGraphs));
 	}
-
+*/
 	// Returns create data
 	public static function create() {
 		return array(
-			array(
+		/*	array(
 				array(
 					'expected' => GRAPH_BAD,
 					'errors' => array(
@@ -666,7 +751,7 @@ class testFormItem extends CWebTest {
 					'dbCheck' => true,
 					'formCheck' => true
 				)
-			)
+			)*/
 		);
 	}
 
@@ -820,6 +905,6 @@ class testFormItem extends CWebTest {
 	 * Restore the original tables.
 	 */
 	public function testFormGraph_Teardown() {
-		DBrestore_tables('graphs');
+	//	DBrestore_tables('graphs');
 	}
 }
