@@ -9,7 +9,9 @@
 			</thead>
 			<tbody>
 			<tr>
-				<td><label for="elementType"><?php echo _('Type'); ?></label></td>
+				<td>
+					<label for="elementType"><?php echo _('Type'); ?></label>
+				</td>
 				<td>
 					<select size="1" class="input select" name="elementtype" id="elementType">
 						<option value="<?php echo SYSMAP_ELEMENT_TYPE_HOST; ?>"><?php echo _('Host'); ?></option>
@@ -54,7 +56,9 @@
 				</td>
 			</tr>
 			<tr id="areaPlacingRow">
-				<td><label for="areaPlacing"><?php echo _('Placing algorithm'); ?></label></td>
+				<td>
+					<label for="areaPlacing"><?php echo _('Placing algorithm'); ?></label>
+				</td>
 				<td>
 					<select id="areaPlacing" class="input select">
 						<option value="<?php echo SYSMAP_ELEMENT_AREA_VIEWTYPE_GRID; ?>"><?php echo _('Grid'); ?></option>
@@ -62,29 +66,41 @@
 				</td>
 			</tr>
 			<tr>
-				<td><label for="elementLabel"><?php echo _('Label'); ?></label></td>
-				<td><textarea id="elementLabel" cols="56" rows="4" name="label" class="input textarea_standard"></textarea></td>
+				<td>
+					<label for="elementLabel"><?php echo _('Label'); ?></label>
+				</td>
+				<td>
+					<textarea id="elementLabel" cols="56" rows="4" name="label" class="input textarea_standard"></textarea>
+				</td>
 			</tr>
 			<tr>
-				<td><label for="label_location"><?php echo _('Label location'); ?></label></td>
-				<td><select id="label_location" class="input select" name="label_location">
-					<option value="-1">-</option>
-					<option value="<?php echo MAP_LABEL_LOC_BOTTOM; ?>"><?php echo _('Bottom'); ?></option>
-					<option value="<?php echo MAP_LABEL_LOC_LEFT; ?>"><?php echo _('Left'); ?></option>
-					<option value="<?php echo MAP_LABEL_LOC_RIGHT; ?>"><?php echo _('Right'); ?></option>
-					<option value="<?php echo MAP_LABEL_LOC_TOP; ?>"><?php echo _('Top'); ?></option>
-				</select></td>
+				<td>
+					<label for="label_location"><?php echo _('Label location'); ?></label>
+				</td>
+				<td>
+					<select id="label_location" class="input select" name="label_location">
+						<option value="-1">-</option>
+						<option value="<?php echo MAP_LABEL_LOC_BOTTOM; ?>"><?php echo _('Bottom'); ?></option>
+						<option value="<?php echo MAP_LABEL_LOC_LEFT; ?>"><?php echo _('Left'); ?></option>
+						<option value="<?php echo MAP_LABEL_LOC_RIGHT; ?>"><?php echo _('Right'); ?></option>
+						<option value="<?php echo MAP_LABEL_LOC_TOP; ?>"><?php echo _('Top'); ?></option>
+					</select>
+				</td>
 			</tr>
 			<tr id="hostGroupSelectRow">
 				<td><?php echo _('Host group'); ?></td>
 				<td>
-					<div id="elementNameHostGroup" class="multiselect"></div>
+					<div style="position: absolute;">
+						<div id="elementNameHostGroup" class="multiselect" style="top: -20px;"></div>
+					</div>
 				</td>
 			</tr>
 			<tr id="hostSelectRow">
 				<td><?php echo _('Host'); ?></td>
 				<td>
-					<div id="elementNameHost" class="multiselect"></div>
+					<div style="position: absolute;">
+						<div id="elementNameHost" class="multiselect" style="top: -20px;"></div>
+					</div>
 				</td>
 			</tr>
 			<tr id="triggerSelectRow">
@@ -214,14 +230,17 @@
 					<input type="checkbox" name="chkbox_label" id="chkboxLabel" class="checkbox">
 					<label for="chkboxLabel"><?php echo _('Label'); ?></label>
 				</td>
-				<td><textarea id="massLabel" cols="56" rows="4" name="label" class="input textarea_standard"></textarea></td>
+				<td>
+					<textarea id="massLabel" cols="56" rows="4" name="label" class="input textarea_standard"></textarea>
+				</td>
 			</tr>
 			<tr>
 				<td>
 					<input type="checkbox" name="chkbox_label_location" id="chkboxLabelLocation" class="checkbox">
 					<label for="chkboxLabelLocation"><?php echo _('Label location'); ?></label>
 				</td>
-				<td><select id="massLabelLocation" class="input select" name="label_location">
+				<td>
+					<select id="massLabelLocation" class="input select" name="label_location">
 						<option value="-1">-</option>
 						<option value="<?php echo MAP_LABEL_LOC_BOTTOM; ?>"><?php echo _('Bottom'); ?></option>
 						<option value="<?php echo MAP_LABEL_LOC_LEFT; ?>"><?php echo _('Left'); ?></option>
@@ -235,35 +254,44 @@
 					<input type="checkbox" name="chkbox_use_iconmap" id="chkboxMassUseIconmap" class="checkbox">
 					<label for="chkboxMassUseIconmap"><?php echo _('Automatic icon selection'); ?></label>
 				</td>
-				<td><input type="checkbox" name="use_iconmap" id="massUseIconmap" class="checkbox" value="1"></td>
+				<td>
+					<input type="checkbox" name="use_iconmap" id="massUseIconmap" class="checkbox" value="1">
+				</td>
 			</tr>
 			<tr>
 				<td>
 					<input type="checkbox" name="chkbox_iconid_off" id="chkboxMassIconidOff" class="checkbox">
 					<label for="chkboxMassIconidOff"><?php echo _('Icon (default)'); ?></label>
 				</td>
-				<td><select class="input select" name="iconid_off" id="massIconidOff"></select></td>
+				<td>
+					<select class="input select" name="iconid_off" id="massIconidOff"></select>
+				</td>
 			</tr>
 			<tr>
 				<td>
 					<input type="checkbox" name="chkbox_iconid_on" id="chkboxMassIconidOn" class="checkbox">
 					<label for="chkboxMassIconidOn"><?php echo _('Icon (problem)'); ?></label>
 				</td>
-				<td><select class="input select" name="iconid_on" id="massIconidOn"></select></td>
+				<td>
+					<select class="input select" name="iconid_on" id="massIconidOn"></select>
+				</td>
 			</tr>
 			<tr>
 				<td>
 					<input type="checkbox" name="chkbox_iconid_maintenance" id="chkboxMassIconidMaintenance" class="checkbox">
 					<label for="chkboxMassIconidMaintenance"><?php echo _('Icon (maintenance)'); ?></label>
 				</td>
-				<td><select class="input select" name="iconid_maintenance" id="massIconidMaintenance"></select></td>
+				<td>
+					<select class="input select" name="iconid_maintenance" id="massIconidMaintenance"></select>
+				</td>
 			</tr>
 			<tr>
 				<td>
 					<input type="checkbox" name="chkbox_iconid_disabled" id="chkboxMassIconidDisabled" class="checkbox">
 					<label for="chkboxMassIconidDisabled"><?php echo _('Icon (disabled)'); ?></label>
 				</td>
-				<td><select class="input select" name="iconid_disabled" id="massIconidDisabled"></select>
+				<td>
+					<select class="input select" name="iconid_disabled" id="massIconidDisabled"></select>
 				</td>
 			</tr>
 			<tr class="footer">
@@ -317,16 +345,26 @@
 		<table class="formtable">
 			<tbody>
 			<tr>
-				<td><label for="linklabel"><?php echo _('Label'); ?></label></td>
-				<td><textarea cols="48" rows="4" name="label" id="linklabel" class="input textarea_standard"></textarea></td>
+				<td>
+					<label for="linklabel"><?php echo _('Label'); ?></label>
+				</td>
+				<td>
+					<textarea cols="48" rows="4" name="label" id="linklabel" class="input textarea_standard"></textarea>
+				</td>
 			</tr>
 			<tr id="link-connect-to">
-				<td><label for="selementid2"><?php echo _('Connect to'); ?></label></td>
-				<td><select class="input select" name="selementid2" id="selementid2"></select></td>
+				<td>
+					<label for="selementid2"><?php echo _('Connect to'); ?></label>
+				</td>
+				<td>
+					<select class="input select" name="selementid2" id="selementid2"></select>
+				</td>
 			</tr>
 			<tr>
-				<td><label for="drawtype"><?php echo _('Type (OK)'); ?></label></td>
-				<td >
+				<td>
+					<label for="drawtype"><?php echo _('Type (OK)'); ?></label>
+				</td>
+				<td>
 					<select size="1" class="input select" name="drawtype" id="drawtype">
 						<option value="<?php echo GRAPH_ITEM_DRAWTYPE_LINE; ?>"><?php echo _('Line'); ?></option>
 						<option value="<?php echo GRAPH_ITEM_DRAWTYPE_BOLD_LINE; ?>"><?php echo _('Bold line'); ?></option>
@@ -336,7 +374,9 @@
 				</td>
 			</tr>
 			<tr>
-				<td><label for="color"><?php echo _('Colour (OK)'); ?></label></td>
+				<td>
+					<label for="color"><?php echo _('Colour (OK)'); ?></label>
+				</td>
 				<td>
 					<input maxlength="6" size="7" id="color" name="color" class="input colorpicker">
 					<div id="lbl_color" class="pointer colorpickerLabel">&nbsp;&nbsp;&nbsp;</div>
