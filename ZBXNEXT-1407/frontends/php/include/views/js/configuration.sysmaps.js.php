@@ -91,7 +91,7 @@
 				<td><?php echo _('Host group'); ?></td>
 				<td>
 					<div style="position: absolute;">
-						<div id="elementNameHostGroup" class="multiselect" style="top: -20px;"></div>
+						<div id="elementNameHostGroup" class="multiselect" style="top: -20px; width: 312px;"></div>
 					</div>
 				</td>
 			</tr>
@@ -99,7 +99,7 @@
 				<td><?php echo _('Host'); ?></td>
 				<td>
 					<div style="position: absolute;">
-						<div id="elementNameHost" class="multiselect" style="top: -20px;"></div>
+						<div id="elementNameHost" class="multiselect" style="top: -20px; width: 312px;"></div>
 					</div>
 				</td>
 			</tr>
