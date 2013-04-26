@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2000-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -738,4 +738,5 @@ if (!$this->data['is_discovery_rule']) {
 }
 
 require_once dirname(__FILE__).'/js/configuration.item.edit.js.php';
+
 return $itemWidget;
