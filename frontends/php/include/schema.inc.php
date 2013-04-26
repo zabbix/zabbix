@@ -547,6 +547,12 @@ return array(
 				'length' => 255,
 				'default' => '0',
 			),
+			'snmpv3_contextname' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => '',
+			),
 			'snmpv3_securityname' => array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
@@ -974,6 +980,12 @@ return array(
 				'null' => true,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 255,
+			),
+			'snmpv3_contextname' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => '',
 			),
 			'snmpv3_securityname' => array(
 				'null' => false,

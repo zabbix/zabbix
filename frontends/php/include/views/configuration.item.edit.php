@@ -120,6 +120,10 @@ $itemFormList->addRow(_('SNMP OID'),
 	new CTextBox('snmp_oid', $this->data['snmp_oid'], ZBX_TEXTBOX_STANDARD_SIZE, $this->data['limited']),
 	false, 'row_snmp_oid'
 );
+$itemFormList->addRow(_('Context name'),
+	new CTextBox('snmpv3_contextname', $this->data['snmpv3_contextname'], ZBX_TEXTBOX_STANDARD_SIZE, $this->data['limited']),
+	false, 'row_snmpv3_contextname'
+);
 $itemFormList->addRow(_('SNMP community'),
 	new CTextBox('snmp_community', $this->data['snmp_community'], ZBX_TEXTBOX_STANDARD_SIZE, 'no', 64),
 	false, 'row_snmp_community'
@@ -569,6 +573,8 @@ zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_SNMPV1, 'snmp_communi
 zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_SNMPV2C, 'snmp_community');
 zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_SNMPV1, 'row_snmp_community');
 zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_SNMPV2C, 'row_snmp_community');
+zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_SNMPV3, 'snmpv3_contextname');
+zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_SNMPV3, 'row_snmpv3_contextname');
 zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_SNMPV3, 'snmpv3_securityname');
 zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_SNMPV3, 'row_snmpv3_securityname');
 zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_SNMPV3, 'snmpv3_securitylevel');
