@@ -856,24 +856,25 @@ int	zbx_check_hostname(const char *hostname)
  *                                                                            *
  * Function: parse_host                                                       *
  *                                                                            *
- * Purpose: return hostname                                                   *
+ * Purpose: parse hostname                                                    *
  *                                                                            *
  *  e.g., Zabbix server                                                       *
  *                                                                            *
  * Parameters: exp - pointer to the first char of hostname                    *
+ *             host - optional pointer to resulted hostname                   *
  *                                                                            *
  *  e.g., {Zabbix server:agent.ping.last(0)}                                  *
  *         ^                                                                  *
  *                                                                            *
- * Return value: return SUCCEED and pointer to just after the end of hostname *
- *               or FAIL and pointer to incorrect char                        *
+ * Return value: return SUCCEED and move exp to the next char after hostname  *
+ *               or FAIL and move exp at the failed character                 *
  *                                                                            *
  * Author: Aleksandrs Saveljevs                                               *
  *                                                                            *
  ******************************************************************************/
 int	parse_host(char **exp, char **host)
 {
-	char	c, *p, *s;
+	char	*p, *s;
 
 	p = *exp;
 
@@ -882,16 +883,20 @@ int	parse_host(char **exp, char **host)
 
 	*exp = s;
 
-	if (p != s)
+	if (p == s)
+		return FAIL;
+
+	if (NULL != host)
 	{
+		char	c;
+
 		c = *s;
 		*s = '\0';
 		*host = strdup(p);
 		*s = c;
-		return SUCCEED;
 	}
-	else
-		return FAIL;
+
+	return SUCCEED;
 }
 
 /******************************************************************************
@@ -903,12 +908,13 @@ int	parse_host(char **exp, char **host)
  *  e.g., system.run[cat /etc/passwd | awk -F: '{ print $1 }']                *
  *                                                                            *
  * Parameters: exp - pointer to the first char of key                         *
+ *             key - pointer to the resulted key                              *
  *                                                                            *
  *  e.g., {host:system.run[cat /etc/passwd | awk -F: '{ print $1 }'].last(0)} *
  *              ^                                                             *
  *                                                                            *
- * Return value: return SUCCEED and pointer to just after the end of key      *
- *               or FAIL and pointer to incorrect char                        *
+ * Return value: return SUCCEED and move exp to the next character after key  *
+ *               or FAIL and move exp to incorrect character                  *
  *                                                                            *
  * Author: Aleksandrs Saveljevs                                               *
  *                                                                            *
@@ -956,7 +962,7 @@ int	parse_key(char **exp, char **key)
 		{
 			switch (state)
 			{
-				/* Init state */
+				/* init state */
 				case 0:
 					if (',' == *s)
 						;
@@ -991,7 +997,7 @@ int	parse_key(char **exp, char **key)
 					else if (' ' != *s)
 						state = 2;
 					break;
-				/* Quoted */
+				/* quoted */
 				case 1:
 					if ('"' == *s)
 					{
@@ -1022,7 +1028,7 @@ int	parse_key(char **exp, char **key)
 					else if ('\\' == *s && '"' == s[1])
 						s++;
 					break;
-				/* Unquoted */
+				/* unquoted */
 				case 2:
 					if (0 == array && ']' == *s && '[' == s[1])	/* Zapcat */
 					{
@@ -1052,10 +1058,7 @@ succeed:
 		return SUCCEED;
 	}
 	else
-	{
-		*exp = s;
-		return FAIL;
-	}
+		goto fail;
 }
 
 /******************************************************************************
@@ -1069,19 +1072,24 @@ succeed:
  *         exp - pointer to the first char of function                        *
  *                last("host:key[key params]",#1)                             *
  *                ^                                                           *
+ *         func - optional pointer to resulted function                       *
+ *         params - optional pointer to resulted function parameters          *
  *                                                                            *
- * Return value: return SUCCEED and pointer to just after the right ')'       *
- *               or FAIL and pointer to incorrect char                        *
+ * Return value: return SUCCEED and move exp to the next char after right ')' *
+ *               or FAIL and move exp to incorrect character                  *
  *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
 int	parse_function(char **exp, char **func, char **params)
 {
-	char	*p, *s;
-	int	state;	/* 0 - init
-			 * 1 - function name/params
-			 */
+	char		*p, *s;
+	int		state;		/* 0 - init
+					 * 1 - function name/params
+					 */
+	unsigned char	flags = 0x00;	/* 0x01 - function OK
+					 * 0x02 - params OK
+					 */
 
 	for (p = *exp, s = *exp, state = 0; '\0' != *p; p++)	/* check for function */
 	{
@@ -1105,14 +1113,18 @@ int	parse_function(char **exp, char **func, char **params)
 					 * 3 - end of params
 					 */
 
-			*p = '\0';
-			*func = strdup(s);
-			*p++ = '(';
+			if (NULL != func)
+			{
+				*p = '\0';
+				*func = zbx_strdup(NULL, s);
+				*p++ = '(';
+			}
+			flags |= 0x01;
 
 			for (s = p, state = 0; '\0' != *p; p++)
 			{
 				switch (state) {
-				/* Init state */
+				/* init state */
 				case 0:
 					if (',' == *p)
 						;
@@ -1123,7 +1135,7 @@ int	parse_function(char **exp, char **func, char **params)
 					else if (' ' != *p)
 						state = 2;
 					break;
-				/* Quoted */
+				/* quoted */
 				case 1:
 					if ('"' == *p)
 					{
@@ -1135,7 +1147,7 @@ int	parse_function(char **exp, char **func, char **params)
 					else if ('\\' == *p && '"' == p[1])
 						p++;
 					break;
-				/* Unquoted */
+				/* unquoted */
 				case 2:
 					if (',' == *p)
 						state = 0;
@@ -1150,9 +1162,13 @@ int	parse_function(char **exp, char **func, char **params)
 
 			if (3 == state)
 			{
-				*p = '\0';
-				*params = strdup(s);
-				*p = ')';
+				if (NULL != params)
+				{
+					*p = '\0';
+					*params = zbx_strdup(NULL, s);
+					*p = ')';
+				}
+				flags |= 0x02;
 			}
 			else
 				goto error;
@@ -1163,15 +1179,17 @@ int	parse_function(char **exp, char **func, char **params)
 		break;
 	}
 
-	if (NULL == *func || NULL == *params)
+	if (0x03 != flags)
 		goto error;
 
 	*exp = p + 1;
 
 	return SUCCEED;
 error:
-	zbx_free(*func);
-	zbx_free(*params);
+	if (NULL != func)
+		zbx_free(*func);
+	if (NULL != params)
+		zbx_free(*params);
 
 	*exp = p;
 

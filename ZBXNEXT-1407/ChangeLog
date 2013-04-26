@@ -1,6 +1,8 @@
 Changes for 2.1.0
 
 New features:
+A.F.....S. [ZBXNEXT-1] added support of {host:key.last/min/avg/max()} macros in graph titles (Sasha, Toms)
+..F.I...S. [ZBXNEXT-1649] added fine grained control of housekeeper tasks (Oleg, wiper)
 ..F....... [ZBXNEXT-1712] improved create button for applications, items, triggers and web scenarios (Eduard)
 ..F....... [ZBXNEXT-1712] removed useless host name field in applications, items and web scenarios (Eduard)
 ........S. [ZBXNEXT-384] added support of new notification macros {ACTION.*} and {EVENT.RECOVERY.*}; {EVENT.*} macros now return information of the events which triggered an action (Sasha)
@@ -62,6 +64,9 @@ Bug fixes:
 ..F.....S. [ZBX-6305] fixed display name support in email sender (wiper, Andris)
 ..F....... [ZBX-6480] fixed default time out instead of stored shown in popup_httpstep.php (Toms)
 ....I..... [ZBX-5532] updated 1.8 time format to 2.0 for "services_times" table (Sasha)
+..F....... [ZBX-1511] fixed division by zero in graphs (Oleg)
+..F....... [ZBX-1950] fixed no values in graphs (Oleg)
+..F....... [ZBX-2424] fixed duplicates and zero values in Y axis (Oleg)
 ..F....... [ZBX-3311] fixed duplicates in Y axis (Oleg)
 ..F....... [ZBX-6287] added Milli and Micro support in graphs (Oleg)
 ..F....... [ZBX-6263] fixed invisible negative points in graphs (Oleg)
@@ -71,7 +76,6 @@ Bug fixes:
 ..F....... [ZBX-2579] fixed intervals rewriting (Oleg)
 ..F....... [ZBX-2579] fixed negative Y axis (Oleg)
 ..F....... [ZBX-2579] fixed small value rounding to zero (Oleg)
-..F....... [ZBX-2579] fixed division by zero in graphs (Oleg)
 ..F....... [ZBX-2579] fixed units types in Y axis (Oleg)
 ..F....... [ZBX-6445] fixed unnecessary trimming for IPMI sensor field for item prototypes and discovery rules (Toms)
 ....I..... [ZBX-6335] removed unused alerts.nextcheck field (Sasha)
@@ -178,6 +182,27 @@ A......... [ZBX-5498] applications API refactoring (Vedmak)
 ..F....... [ZBX-5142] changed media type field label from 'Description' to 'Name' (Vedmak)
 ....I..... [ZBX-5314] increased size of autoincrement fields for PostgreSQL database (Sasha)
 ..F....... [ZBX-1845] added tabs to host massupdate form (Vedmak)
+
+--------------------------------------------------------------------------------
+Changes for 2.0.7rc1
+
+New features:
+
+A.F....... [ZBX-1357] updated Spanish and Turkish translations; thanks to Zabbix translators (Richlv)
+
+Bug fixes:
+..F....... [ZBX-1129] fixed graph time period in bar reports (Oleg)
+....I..... [ZBX-6490] fixed web test 1.8->2.0 upgrade script ignoring nodes (wiper)
+.......PS. [ZBX-6526] fixed possible data uploading issues duing server startup or network problems (wiper)
+...G...... [ZBX-6285] fixed message output from Zabbix sender (Andris)
+..F....... [ZBX-6484] fixed bar report calculation (Oleg)
+..F....... [ZBX-1236] added graph right side in bar reports (Oleg)
+..F....... [ZBX-6498] fixed date format in update query for maintenance daily period (Oleg)
+
+--------------------------------------------------------------------------------
+Changes for 2.0.6
+
+2.0.6rc1 was released as 2.0.6 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 2.0.6rc1
@@ -1471,6 +1496,8 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.17rc1
 
+..F....... [ZBX-6484] fixed bar report calculation (Oleg)
+..F....... [ZBX-1236] added graph right side in bar reports (Oleg)
 ..F....... [ZBX-6474] fixed {ITEM.VALUE} macros expand in trigger names (Oleg)
 ...G...PS. [ZBX-6342] fixed LDAP check that caused server crash when LDAP is running but no DIT has been defined (Aleksej)
 ..F....... [ZBX-6329] fixed form with "0" in trigger expression parser (Eduard)
