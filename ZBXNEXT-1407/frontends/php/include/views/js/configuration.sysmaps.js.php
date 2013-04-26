@@ -75,7 +75,7 @@
 					<option value="<?php echo MAP_LABEL_LOC_TOP; ?>"><?php echo _('Top'); ?></option>
 				</select></td>
 			</tr>
-			<tr id="hostGroupSelectRow" class="standard">
+			<tr id="hostGroupSelectRow">
 				<td><?php echo _('Host group'); ?></td>
 				<td>
 					<div id="elementNameHostGroup" class="multiselect"></div>

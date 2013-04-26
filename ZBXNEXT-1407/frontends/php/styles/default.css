@@ -158,12 +158,12 @@ form { margin: 0; }
 .input[disabled]:focus { text-decoration: none; border-color: #ACA899; }
 .input[disabled]:hover { text-decoration: none; border-color: #ACA899; }
 .select { -moz-box-sizing: content-box; -webkit-box-sizing: content-box; box-sizing: content-box; height: 14px; }
-select[multiple="multiple"] { height: auto; }
+select[multiple="multiple"], select.openView { height: auto; }
 
 input.formlist { padding-top: 2px; padding-bottom: 2px; }
 
 input[type="button"],
-input[type="submit"] { height: 16px; }
+input[type="submit"] { height: auto; }
 input[type="button"].formlist { margin-bottom: 1px; cursor: pointer; vertical-align: top; background: #ffffff; height: 20px; }
 input[type="submit"].formlist { margin-bottom: 1px; cursor: pointer; height: 20px; }
 input[type="button"].input[disabled].formlist,
@@ -362,15 +362,9 @@ div.thin_header { width: 100%; color: #FFFFFF;  background: #5c9ccc url(themes/o
 .formWideTable { min-width: 600px; }
 
 /* tween box table */
-.tweenBoxTable tr td {
-	padding: 0;
-	vertical-align: middle;
-	height: 24px;
-}
-.tweenBoxTable tr td input {
-	margin: 5px;
-	padding: 5px;
-}
+.tweenBoxTable tr td { padding: 0; vertical-align: middle; height: 24px; }
+.tweenBoxTable tr td input { margin: 5px; padding: 5px; }
+.tweenBoxTable input[type="button"] { height: auto; }
 
 /* page table */
 table.page_header {
