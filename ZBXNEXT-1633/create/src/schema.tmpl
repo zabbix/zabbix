@@ -85,7 +85,10 @@ INDEX		|1		|hostid
 
 TABLE|group_discovery|groupid|ZBX_SYNC,ZBX_DATA
 FIELD		|groupid	|t_id		|	|NOT NULL	|ZBX_SYNC		|1|groups
-FIELD		|parent_hostid	|t_id		|	|NOT NULL	|ZBX_SYNC		|2|hosts	|hostid		|RESTRICT
+FIELD		|parent_group_prototypeid|t_id	|	|NOT NULL	|ZBX_SYNC		|2|group_prototype|group_prototypeid|RESTRICT
+FIELD		|name		|t_varchar(64)	|''	|NOT NULL	|ZBX_NODATA
+FIELD		|lastcheck	|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
+FIELD		|ts_delete	|t_time		|'0'	|NOT NULL	|ZBX_NODATA
 
 TABLE|screens|screenid|ZBX_SYNC,ZBX_DATA
 FIELD		|screenid	|t_id		|	|NOT NULL	|0

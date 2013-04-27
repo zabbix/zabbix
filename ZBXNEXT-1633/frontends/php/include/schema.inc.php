@@ -312,12 +312,30 @@ return array(
 				'ref_table' => 'groups',
 				'ref_field' => 'groupid',
 			),
-			'parent_hostid' => array(
+			'parent_group_prototypeid' => array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
-				'ref_table' => 'hosts',
-				'ref_field' => 'hostid',
+				'ref_table' => 'group_prototype',
+				'ref_field' => 'group_prototypeid',
+			),
+			'name' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 64,
+				'default' => '',
+			),
+			'lastcheck' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0',
+			),
+			'ts_delete' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0',
 			),
 		),
 	),
