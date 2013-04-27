@@ -1224,7 +1224,7 @@ static int	DBpatch_02010081()
 					{"group_prototypeid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 					{"hostid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 					{"name", "", NULL, NULL, 64, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
-					{"groupid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_SYNC, 0},
+					{"groupid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0},
 					{"templateid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0},
 					{NULL}
 				}
@@ -1265,7 +1265,10 @@ static int	DBpatch_02010086()
 			{"group_discovery", "groupid", 0,
 				{
 					{"groupid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
-					{"parent_hostid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"parent_group_prototypeid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"name", "", NULL, NULL, 64, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"lastcheck", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"ts_delete", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
 					{NULL}
 				}
 			};
@@ -1282,7 +1285,7 @@ static int	DBpatch_02010087()
 
 static int	DBpatch_02010088()
 {
-	const ZBX_FIELD	field = {"parent_hostid", NULL, "hosts", "hostid", 0, 0, 0, 0};
+	const ZBX_FIELD	field = {"parent_group_prototypeid", NULL, "group_prototype", "group_prototypeid", 0, 0, 0, 0};
 
 	return DBadd_foreign_key("group_discovery", 2, &field);
 }
