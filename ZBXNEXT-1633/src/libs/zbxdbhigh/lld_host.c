@@ -595,30 +595,27 @@ static void	DBlld_host_make(zbx_vector_ptr_t *hosts, const char *host_proto, con
 
 /******************************************************************************
  *                                                                            *
- * Function: DBlld_hostgroups_get                                             *
+ * Function: DBlld_groups_get                                                 *
  *                                                                            *
  * Purpose: retrieve list of host groups which should be present on the each  *
  *          discovered host                                                   *
  *                                                                            *
- * Parameters: groupids - [OUT] sorted list of host groups                    *
+ * Parameters: parent_hostid - [IN] host prototype identificator              *
+ *             groupids      - [OUT] sorted list of host groups               *
  *                                                                            *
  ******************************************************************************/
-static void	DBlld_hostgroups_get(zbx_uint64_t lld_ruleid, zbx_vector_uint64_t *groupids)
+static void	DBlld_groups_get(zbx_uint64_t parent_hostid, zbx_vector_uint64_t *groupids)
 {
-	const char	*__function_name = "DBlld_hostgroups_get";
-
 	DB_RESULT	result;
 	DB_ROW		row;
 	zbx_uint64_t	groupid;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
-
 	result = DBselect(
-			"select hg.groupid"
-			" from hosts_groups hg,items i"
-			" where hg.hostid=i.hostid"
-				" and i.itemid=" ZBX_FS_UI64,
-			lld_ruleid);
+			"select groupid"
+			" from group_prototype"
+			" where groupid is not null"
+				" and hostid=" ZBX_FS_UI64,
+			parent_hostid);
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -632,7 +629,7 @@ static void	DBlld_hostgroups_get(zbx_uint64_t lld_ruleid, zbx_vector_uint64_t *g
 
 /******************************************************************************
  *                                                                            *
- * Function: DBlld_hostgroups_make                                            *
+ * Function: DBlld_groups_make                                                *
  *                                                                            *
  * Parameters: groupids         - [IN] sorted list of host groups which       *
  *                                     should be present on the each          *
@@ -643,10 +640,10 @@ static void	DBlld_hostgroups_get(zbx_uint64_t lld_ruleid, zbx_vector_uint64_t *g
  *                                      deleted                               *
  *                                                                            *
  ******************************************************************************/
-static void	DBlld_hostgroups_make(const zbx_vector_uint64_t *groupids, zbx_vector_ptr_t *hosts,
+static void	DBlld_groups_make(const zbx_vector_uint64_t *groupids, zbx_vector_ptr_t *hosts,
 		zbx_vector_uint64_t *del_hostgroupids)
 {
-	const char		*__function_name = "DBlld_hostgroups_make";
+	const char		*__function_name = "DBlld_groups_make";
 
 	DB_RESULT		result;
 	DB_ROW			row;
@@ -682,10 +679,13 @@ static void	DBlld_hostgroups_make(const zbx_vector_uint64_t *groupids, zbx_vecto
 		sql = zbx_malloc(sql, sql_alloc);
 
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-				"select hostid,groupid,hostgroupid"
-				" from hosts_groups"
-				" where");
-		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid", hostids.values, hostids.values_num);
+				"select hg.hostid,hg.groupid,hg.hostgroupid"
+				" from hosts_groups hg"
+					" left join group_discovery gd"
+						" on hg.groupid=gd.groupid"
+				" where gd.groupid is null"
+					" and");
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hg.hostid", hostids.values, hostids.values_num);
 
 		result = DBselect("%s", sql);
 
@@ -784,7 +784,7 @@ static void	DBlld_hostmacros_get(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *host
 static void	DBlld_hostmacros_make(const zbx_vector_ptr_t *hostmacros, zbx_vector_ptr_t *hosts,
 		zbx_vector_uint64_t *del_hostmacroids)
 {
-	const char		*__function_name = "DBlld_hostgroups_make";
+	const char		*__function_name = "DBlld_hostmacros_make";
 
 	DB_RESULT		result;
 	DB_ROW			row;
@@ -1673,7 +1673,6 @@ void	DBlld_update_hosts(zbx_uint64_t lld_ruleid, struct zbx_json_parse *jp_data,
 	zbx_vector_ptr_create(&interfaces);
 	zbx_vector_ptr_create(&hostmacros);
 
-	DBlld_hostgroups_get(lld_ruleid, &groupids);
 	DBlld_interfaces_get(lld_ruleid, &interfaces);
 	DBlld_hostmacros_get(lld_ruleid, &hostmacros);
 
@@ -1701,6 +1700,8 @@ void	DBlld_update_hosts(zbx_uint64_t lld_ruleid, struct zbx_json_parse *jp_data,
 		else
 			inventory_mode = (char)atoi(row[4]);
 
+		DBlld_groups_get(parent_hostid, &groupids);
+
 		DBlld_hosts_get(parent_hostid, &hosts, proxy_hostid, ipmi_authtype, ipmi_privilege, ipmi_username,
 				ipmi_password, inventory_mode);
 
@@ -1724,7 +1725,7 @@ void	DBlld_update_hosts(zbx_uint64_t lld_ruleid, struct zbx_json_parse *jp_data,
 
 		DBlld_hosts_validate(&hosts, error);
 
-		DBlld_hostgroups_make(&groupids, &hosts, &del_hostgroupids);
+		DBlld_groups_make(&groupids, &hosts, &del_hostgroupids);
 		DBlld_templates_make(parent_hostid, &hosts);
 		DBlld_hostmacros_make(&hostmacros, &hosts, &del_hostmacroids);
 
@@ -1738,6 +1739,8 @@ void	DBlld_update_hosts(zbx_uint64_t lld_ruleid, struct zbx_json_parse *jp_data,
 		DBlld_remove_lost_resources(&hosts, lifetime, lastcheck);
 
 		DBlld_hosts_free(&hosts);
+
+		groupids.values_num = 0;
 		del_hostgroupids.values_num = 0;
 		del_hostmacroids.values_num = 0;
 	}
