@@ -26,7 +26,7 @@ require_once dirname(__FILE__).'/include/forms.inc.php';
 
 $page['title'] = _('Configuration of host prototypes');
 $page['file'] = 'host_prototypes.php';
-$page['scripts'] = array('effects.js', 'class.cviewswitcher.js');
+$page['scripts'] = array('effects.js', 'class.cviewswitcher.js', 'multiselect.js');
 
 //???
 $page['hist_arg'] = array('parent_discoveryid');
@@ -35,23 +35,25 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = array(
-	'hostid' =>				array(T_ZBX_INT, O_NO,	P_SYS,	DB_ID,		'(isset({form})&&({form}=="update"))'),
-	'parent_discoveryid' =>	array(T_ZBX_INT, O_MAND, P_SYS,	DB_ID, null),
-	'host' =>		        array(T_ZBX_STR, O_OPT, null,		NOT_EMPTY,	'isset({save})', _('Host name')),
-	'name' =>	            array(T_ZBX_STR, O_OPT, null,		null,		'isset({save})'),
-	'status' =>		        array(T_ZBX_INT, O_OPT, null,		        IN(array(HOST_STATUS_NOT_MONITORED, HOST_STATUS_MONITORED)), 'isset({save})'),
-	'inventory_mode' =>	array(T_ZBX_INT, O_OPT, null, IN(array(HOST_INVENTORY_DISABLED, HOST_INVENTORY_MANUAL, HOST_INVENTORY_AUTOMATIC)), null),
-	'templates' =>		    array(T_ZBX_STR, O_OPT, null, NOT_EMPTY,	null),
-	'unlink' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,		null),
-	'group_hostid' =>		array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
-	'go' =>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
-	'save' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
-	'clone' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
-	'update' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
-	'delete' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
-	'cancel' =>				array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
-	'form' =>				array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
-	'form_refresh' =>		array(T_ZBX_INT, O_OPT, null,	null,		null),
+	'hostid' =>					array(T_ZBX_INT, O_NO,	P_SYS,	DB_ID,		'(isset({form})&&({form}=="update"))'),
+	'parent_discoveryid' =>		array(T_ZBX_INT, O_MAND, P_SYS,	DB_ID, null),
+	'host' =>		        	array(T_ZBX_STR, O_OPT, null,		NOT_EMPTY,	'isset({save})', _('Host name')),
+	'name' =>	            	array(T_ZBX_STR, O_OPT, null,		null,		'isset({save})'),
+	'status' =>		        	array(T_ZBX_INT, O_OPT, null,		        IN(array(HOST_STATUS_NOT_MONITORED, HOST_STATUS_MONITORED)), 'isset({save})'),
+	'inventory_mode' =>			array(T_ZBX_INT, O_OPT, null, IN(array(HOST_INVENTORY_DISABLED, HOST_INVENTORY_MANUAL, HOST_INVENTORY_AUTOMATIC)), null),
+	'templates' =>		    	array(T_ZBX_STR, O_OPT, null, NOT_EMPTY,	null),
+	'new_group_prototypes' =>	array(T_ZBX_STR, O_OPT, null, NOT_EMPTY,	null),
+	'group_prototypes' =>		array(T_ZBX_STR, O_OPT, null, NOT_EMPTY,	null),
+	'unlink' =>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,		null),
+	'group_hostid' =>			array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
+	'go' =>						array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
+	'save' =>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
+	'clone' =>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
+	'update' =>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
+	'delete' =>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
+	'cancel' =>					array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
+	'form' =>					array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
+	'form_refresh' =>			array(T_ZBX_INT, O_OPT, null,	null,		null),
 );
 check_fields($fields);
 validate_sort_and_sortorder('name', ZBX_SORT_UP);
@@ -75,6 +77,7 @@ if (get_request('parent_discoveryid')) {
 		$hostPrototype = API::HostPrototype()->get(array(
 			'hostids' => get_request('hostid'),
 			'output' => API_OUTPUT_EXTEND,
+			'selectGroupPrototypes' => API_OUTPUT_EXTEND,
 			'selectTemplates' => array('templateid', 'name'),
 			'selectParentHost' => array('hostid'),
 			'selectInventory' => API_OUTPUT_EXTEND,
@@ -118,6 +121,7 @@ elseif (isset($_REQUEST['save'])) {
 		'host' => get_request('host'),
 		'name' => get_request('name'),
 		'status' => get_request('status'),
+		'groupPrototypes' => array(),
 		'templates' => zbx_toObject(array_keys(get_request('templates', array())), 'templateid'),
 		'status' => get_request('status'),
 		'inventory' => array(
@@ -125,8 +129,30 @@ elseif (isset($_REQUEST['save'])) {
 		)
 	);
 
+	// add custom group prototypes
+	foreach (get_request('new_group_prototypes', array()) as $groupPrototype) {
+		if (!zbx_empty($groupPrototype['name'])) {
+			$newHostPrototype['groupPrototypes'][] = $groupPrototype;
+		}
+	}
+
 	if (get_request('hostid')) {
 		$newHostPrototype['hostid'] = get_request('hostid');
+
+		// add group prototypes based on existing host groups
+		$groupPrototypesByGroupId = zbx_toHash($hostPrototype['groupPrototypes'], 'groupid');
+		unset($groupPrototypesByGroupId[0]);
+		foreach (get_request('group_prototypes', array()) as $groupId) {
+			if (isset($groupPrototypesByGroupId[$groupId])) {
+				$newHostPrototype['groupPrototypes'][] = $groupPrototypesByGroupId[$groupId];
+			}
+			else {
+				$newHostPrototype['groupPrototypes'][] = array(
+					'groupid' => $groupId
+				);
+			}
+		}
+
 		$newHostPrototype = CArrayHelper::unsetEqualValues($newHostPrototype, $hostPrototype, array('hostid'));
 		$result = API::HostPrototype()->update($newHostPrototype);
 
@@ -134,6 +160,14 @@ elseif (isset($_REQUEST['save'])) {
 	}
 	else {
 		$newHostPrototype['ruleid'] = get_request('parent_discoveryid');
+
+		// add group prototypes based on existing host groups
+		foreach (get_request('group_prototypes', array()) as $group) {
+			$newHostPrototype['groupPrototypes'][] = array(
+				'groupid' => $group['groupid']
+			);
+		}
+
 		$result = API::HostPrototype()->create($newHostPrototype);
 
 		show_messages($result, _('Host prototype added'), _('Cannot add host prototype'));
@@ -191,7 +225,9 @@ if (isset($_REQUEST['form'])) {
 				'inventory_mode' => HOST_INVENTORY_DISABLED
 			))
 		),
-		'templates' => array()
+		'templates' => array(),
+		'new_group_prototypes' => get_request('new_group_prototypes', array()),
+		'group_prototypes' => get_request('group_prototypes', array())
 	);
 
 	// add parent host
@@ -215,8 +251,30 @@ if (isset($_REQUEST['form'])) {
 		$data['proxy'] = reset($proxy);
 	}
 
+	// host prototype edit form
 	if (get_request('hostid') && !get_request('form_refresh')) {
 		$data['host_prototype'] = array_merge($data['host_prototype'], $hostPrototype);
+
+		// add group prototypes
+		$data['new_group_prototypes'] = array();
+		$data['group_prototypes'] = array();
+		$groupPrototypeIds = array();
+		foreach ($hostPrototype['groupPrototypes'] as $groupPrototype) {
+			if ($groupPrototype['groupid']) {
+				$groupPrototypeIds[] = $groupPrototype['groupid'];
+			}
+			else {
+				$data['new_group_prototypes'][] = $groupPrototype;
+			}
+		}
+
+		$data['group_prototypes'] = API::HostGroup()->get(array(
+			'output' => API_OUTPUT_EXTEND,
+			'groupids' => $groupPrototypeIds,
+			'editable' => true
+		));
+
+		// add linked templates
 		$data['host_prototype']['templates'] = array();
 		foreach ($hostPrototype['templates'] as $template) {
 			$data['host_prototype']['templates'][$template['templateid']] = $template['name'];

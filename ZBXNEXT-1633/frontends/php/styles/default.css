@@ -289,6 +289,8 @@ div.footer .formrow .main:hover, div.ui-dialog-buttonpane div.ui-dialog-buttonse
 .host-edit #groups, .hostprototype-edit #groups { width: 280px; }
 .host-edit #templateTab .formlist .formrow, .hostprototype-edit #templateTab .formlist .formrow { overflow: auto; }
 
+.hostprototype-edit #grouplist .group-prototypes { width: 310px; padding-top: 8px; }
+
 /* housekeeper elements */
 .hk .element-row { margin-top: -3px; border-top-width: 0; }
 .hk .element-row-first { border-top-width: 1px; }
