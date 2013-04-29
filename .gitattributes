@@ -174,6 +174,7 @@ frontends/php/include/classes/validators/CSetValidator.php -text
 frontends/php/include/classes/validators/event/CEventSourceObjectValidator.php -text
 frontends/php/include/draw.inc.php -text
 frontends/php/include/views/js/administration.general.housekeeper.edit.js.php -text
+frontends/php/include/views/js/configuration.host.prototype.edit.js.php -text
 frontends/php/include/views/monitoring.dashconf.php -text
 frontends/php/js/flickerfreescreen.js -text svneol=unset#text/plain
 frontends/php/js/multiselect.js -text svneol=unset#text/plain

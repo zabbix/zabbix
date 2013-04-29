@@ -23,6 +23,7 @@ $hostPrototype = $data['host_prototype'];
 $parentHost = $data['parent_host'];
 
 require_once dirname(__FILE__).'/js/configuration.host.edit.js.php';
+require_once dirname(__FILE__).'/js/configuration.host.prototype.edit.js.php';
 
 $widget = new CWidget(null, 'hostprototype-edit');
 $widget->addPageHeader(_('CONFIGURATION OF HOST PROTOTYPES'));
@@ -70,15 +71,6 @@ $hostList->addRow(_('Visible name'), $visiblenameTB);
 
 // display inherited parameters only for hosts prototypes on hosts
 if ($parentHost['status'] != HOST_STATUS_TEMPLATE) {
-	// host groups
-	$groupBox = new CComboBox('groups');
-	$groupBox->setAttribute('readonly', true);
-	$groupBox->setAttribute('size', 10);
-	foreach ($parentHost['groups'] as $group) {
-		$groupBox->addItem($group['groupid'], $group['name']);
-	}
-	$hostList->addRow(_('Groups'), $groupBox);
-
 	$interfaces = array();
 	$existingInterfaceTypes = array();
 	foreach ($parentHost['interfaces'] as $interface) {
@@ -170,6 +162,60 @@ $cmbStatus->addItem(HOST_STATUS_NOT_MONITORED, _('Not monitored'));
 $hostList->addRow(_('Status'), $cmbStatus);
 
 $divTabs->addTab('hostTab', _('Host'), $hostList);
+
+// groups
+$groupList = new CFormList('grouplist');
+
+// existing groups
+$groups = array();
+foreach ($data['group_prototypes'] as $group) {
+	$groups[] = array(
+		'id' => $group['groupid'],
+		'name' => $group['name']
+	);
+}
+$groupList->addRow(_('Groups'), new CMultiSelect(array(
+	'name' => 'group_prototypes[]',
+	'objectName' => 'hostGroup',
+	'data' => $groups
+)));
+
+// new group prototypes
+$customGroupTable = new CTable(SPACE, 'formElementTable');
+$customGroupTable->setAttribute('id', 'tbl_group_prototypes');
+
+// fields
+if (!$data['new_group_prototypes']) {
+	$data['new_group_prototypes'] = array(array(
+		'name' => ''
+	));
+}
+foreach ($data['new_group_prototypes'] as $i => $groupPrototype) {
+	$text1 = new CTextBox('new_group_prototypes['.$i.'][name]', $groupPrototype['name'], 30, null, 64);
+	$text1->setAttribute('placeholder', '{#MACRO}');
+
+	$deleteButtonCell = array(new CButton('groupPrototypes_remove', _('Remove'), null, 'link_menu group-prototype-remove'));
+	if (isset($groupPrototype['group_prototypeid'])) {
+		$deleteButtonCell[] = new CVar('new_group_prototypes['.$i.'][group_prototypeid]', $groupPrototype['group_prototypeid']);
+	}
+
+	$customGroupTable->addRow(array($text1, $deleteButtonCell), 'form_row');
+}
+
+// buttons
+$addButton = new CButton('group_prototype_add', _('Add'), null, 'link_menu');
+$buttonColumn = new CCol($addButton);
+$buttonColumn->setAttribute('colspan', 5);
+
+$buttonRow = new CRow();
+$buttonRow->setAttribute('id', 'row_new_group_prototype');
+$buttonRow->addItem($buttonColumn);
+
+$customGroupTable->addRow($buttonRow);
+$groupDiv = new CDiv($customGroupTable, 'objectgroup border_dotted ui-corner-all group-prototypes');
+$groupList->addRow(_('Group prototypes'), $groupDiv);
+
+$divTabs->addTab('groupTab', _('Groups'), $groupList);
 
 // templates
 $tmplList = new CFormList('tmpllist');

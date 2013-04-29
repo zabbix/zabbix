@@ -35,6 +35,7 @@ class CHostPrototype extends CHostBase {
 			'discoveryids'  		=> null,
 			'inherited'				=> null,
 			'selectDiscoveryRule' 	=> null,
+			'selectGroupPrototypes' => null,
 			'selectParentHost'		=> null,
 			'selectTemplates' 		=> null,
 			'selectInventory' 		=> null,
@@ -117,7 +118,7 @@ class CHostPrototype extends CHostBase {
 
 			$this->checkUnsupportedFields($this->tableName(), $hostPrototype,
 				_s('Wrong fields for host prototype "%1$s".', $hostPrototype['host']),
-				array('ruleid', 'templates', 'inventory')
+				array('ruleid', 'templates', 'inventory', 'groupPrototypes')
 			);
 
 			$this->checkHost($hostPrototype);
@@ -190,14 +191,23 @@ class CHostPrototype extends CHostBase {
 
 		$hostPrototypeDiscoveryRules = array();
 		$hostPrototypeInventory = array();
+		$hostPrototypeGroups = array();
 		foreach ($hostPrototypes as $key => $hostPrototype) {
 			$hostPrototypes[$key]['hostid'] = $hostPrototype['hostid'] = $hostPrototypeIds[$key];
 
+			// group prototypes
+			foreach ($hostPrototype['groupPrototypes'] as $groupPrototype) {
+				$groupPrototype['hostid'] = $hostPrototype['hostid'];
+				$hostPrototypeGroups[] = $groupPrototype;
+			}
+
+			// discovery rules
 			$hostPrototypeDiscoveryRules[] = array(
 				'hostid' => $hostPrototype['hostid'],
 				'parent_itemid' => $hostPrototype['ruleid']
 			);
 
+			// inventory
 			if (isset($hostPrototype['inventory']) && $hostPrototype['inventory']) {
 				$hostPrototypeInventory[] = array(
 					'hostid' => $hostPrototype['hostid'],
@@ -208,6 +218,9 @@ class CHostPrototype extends CHostBase {
 
 		// link host prototypes to discovery rules
 		DB::insert('host_discovery', $hostPrototypeDiscoveryRules, false);
+
+		// save group prototypes
+		DB::insert('group_prototype', $hostPrototypeGroups);
 
 		// save inventory
 		DB::insert('host_inventory', $hostPrototypeInventory, false);
@@ -258,7 +271,7 @@ class CHostPrototype extends CHostBase {
 		foreach ($hostPrototypes as $hostPrototype) {
 			$this->checkUnsupportedFields($this->tableName(), $hostPrototype,
 				_s('Wrong fields for host prototype "%1$s".', $hostPrototype['host']),
-				array('templates', 'inventory')
+				array('templates', 'inventory', 'groupPrototypes')
 			);
 
 			if (isset($hostPrototype['host'])) {
@@ -329,6 +342,7 @@ class CHostPrototype extends CHostBase {
 
 		$exHostPrototypes = $this->get(array(
 			'output' => array('hostid'),
+			'selectGroupPrototypes' => API_OUTPUT_EXTEND,
 			'selectTemplates' => array('templateid'),
 			'selectInventory' => API_OUTPUT_EXTEND,
 			'hostids' => zbx_objectValues($hostPrototypes, 'hostid'),
@@ -338,10 +352,25 @@ class CHostPrototype extends CHostBase {
 		// update related objects
 		$inventoryCreate = array();
 		$inventoryDeleteIds = array();
+		$exGroupPrototypes = array();
+		$newGroupPrototypes = array();
 		foreach ($hostPrototypes as $hostPrototype) {
+			$exHostPrototype = $exHostPrototypes[$hostPrototype['hostid']];
+
+			// group prototypes
+			if (isset($hostPrototype['groupPrototypes'])) {
+				foreach ($exHostPrototype['groupPrototypes'] as $groupPrototype) {
+					$exGroupPrototypes[] = $groupPrototype;
+				}
+				foreach ($hostPrototype['groupPrototypes'] as $groupPrototype) {
+					$groupPrototype['hostid'] = $hostPrototype['hostid'];
+					$newGroupPrototypes[] = $groupPrototype;
+				}
+			}
+
 			// templates
 			if (isset($hostPrototype['templates'])) {
-				$existingTemplateIds = zbx_objectValues($exHostPrototypes[$hostPrototype['hostid']]['templates'], 'templateid');
+				$existingTemplateIds = zbx_objectValues($exHostPrototype['templates'], 'templateid');
 				$newTemplateIds = zbx_objectValues($hostPrototype['templates'], 'templateid');
 				$this->unlink(array_diff($existingTemplateIds, $newTemplateIds), array($hostPrototype['hostid']));
 				$this->link(array_diff($newTemplateIds, $existingTemplateIds), array($hostPrototype['hostid']));
@@ -355,7 +384,7 @@ class CHostPrototype extends CHostBase {
 				if ($hostPrototype['inventory']
 					&& (!isset($hostPrototype['inventory']['inventory_mode']) || $hostPrototype['inventory']['inventory_mode'] != HOST_INVENTORY_DISABLED)) {
 
-					if ($exHostPrototypes[$hostPrototype['hostid']]['inventory']) {
+					if ($exHostPrototype['inventory']) {
 						DB::update('host_inventory', array(
 							'values' => $inventory,
 							'where' => array('hostid' => $inventory['hostid'])
@@ -371,6 +400,9 @@ class CHostPrototype extends CHostBase {
 				}
 			}
 		}
+
+		// save group prototypes
+		DB::replace('group_prototype', $exGroupPrototypes, $newGroupPrototypes);
 
 		// save inventory
 		DB::insert('host_inventory', $inventoryCreate, false);
@@ -934,6 +966,18 @@ class CHostPrototype extends CHostBase {
 				'preservekeys' => true,
 			));
 			$result = $relationMap->mapOne($result, $discoveryRules, 'discoveryRule');
+		}
+
+		// adding group prototypes
+		if ($options['selectGroupPrototypes'] !== null && $options['selectGroupPrototypes'] != API_OUTPUT_COUNT) {
+			$relationMap = $this->createRelationMap($result, 'hostid', 'group_prototypeid', 'group_prototype');
+			$groupPrototypes = API::getApi()->select('group_prototype', array(
+				'output' => $options['selectGroupPrototypes'],
+				'nodeids' => $options['nodeids'],
+				'group_prototypeids' => $relationMap->getRelatedIds(),
+				'preservekeys' => true
+			));
+			$result = $relationMap->mapMany($result, $groupPrototypes, 'groupPrototypes');
 		}
 
 		// adding host
