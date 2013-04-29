@@ -503,7 +503,7 @@ typedef enum
 /*	TIMEPERIOD_TYPE_HOURLY,*/
 	TIMEPERIOD_TYPE_DAILY = 2,
 	TIMEPERIOD_TYPE_WEEKLY,
-	TIMEPERIOD_TYPE_MONTHLY,
+	TIMEPERIOD_TYPE_MONTHLY
 }
 zbx_timeperiod_type_t;
 
@@ -752,7 +752,7 @@ extern const char	title_message[];
 extern const char	usage_message[];
 extern const char	*help_message[];
 
-#define ARRSIZE(a)	sizeof(a) / sizeof(*a)
+#define ARRSIZE(a)	(sizeof(a) / sizeof(*a))
 
 void	help();
 void	usage();
@@ -890,9 +890,9 @@ void	__zbx_zbx_setproctitle(const char *fmt, ...);
 
 #define ZBX_MAX_RECV_DATA_SIZE	(64 * ZBX_MEBIBYTE)
 
-double	zbx_time();
+double	zbx_time(void);
 void	zbx_timespec(zbx_timespec_t *ts);
-double	zbx_current_time();
+double	zbx_current_time(void);
 
 #ifdef HAVE___VA_ARGS__
 #	define zbx_error(fmt, ...) __zbx_zbx_error(ZBX_CONST_STRING(fmt), ##__VA_ARGS__)

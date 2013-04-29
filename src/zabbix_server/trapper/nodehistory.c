@@ -460,7 +460,7 @@ static int	process_items(char **sql, size_t *sql_alloc, size_t *sql_offset, int 
 					ZBX_STR2UINT64(value_uint64, buffer);
 			}
 		}
-		else	/* ZBX_TYPE_TEXT, ZBX_TYPE_CHAR, ZBX_TYPE_SHORTEXT, ZBX_TYPE_LONGTEXT */
+		else	/* ZBX_TYPE_TEXT, ZBX_TYPE_CHAR, ZBX_TYPE_SHORTTEXT, ZBX_TYPE_LONGTEXT */
 		{
 			if (0 == strcmp(table->fields[f].name, "value"))
 			{

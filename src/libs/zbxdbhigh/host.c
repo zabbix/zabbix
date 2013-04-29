@@ -4130,7 +4130,8 @@ static void	DBsave_httptests(zbx_uint64_t hostid, zbx_vector_ptr_t *httptests)
 							"%d,'%s','%s','%s','%s')" ZBX_ROW_DL,
 						httpstepid, httptest->httptestid, httpstep->name_esc, httpstep->no,
 						httpstep->url_esc, httpstep->timeout, httpstep->posts_esc,
-						httpstep->required_esc, httpstep->status_codes_esc,httpstep->variables_esc);
+						httpstep->required_esc, httpstep->status_codes_esc,
+						httpstep->variables_esc);
 
 				for (k = 0; k < httpstep->httpstepitems.values_num; k++)
 				{

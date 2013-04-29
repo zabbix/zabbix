@@ -45,7 +45,6 @@ typedef struct
 }
 zbx_httpstat_t;
 
-
 extern int	CONFIG_HTTPPOLLER_FORKS;
 
 #ifdef HAVE_LIBCURL
@@ -87,7 +86,7 @@ static size_t	HEADERFUNCTION2(void *ptr, size_t size, size_t nmemb, void *userda
  * Author: Andris Zeila                                                       *
  *                                                                            *
  ******************************************************************************/
-static void	httptest_remove_macros(zbx_httptest_t* httptest)
+static void	httptest_remove_macros(zbx_httptest_t *httptest)
 {
 	int i;
 
@@ -516,9 +515,11 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 						httptest->httptest.name, httpstep.name, httpstep.variables);
 
 				if (NULL == err_str)
+				{
 					zbx_snprintf_alloc(&err_str, &err_size, &err_offset,
 							"Failed to extract variables from '%s' step response",
 							httpstep.name);
+				}
 			}
 		}
 		else
