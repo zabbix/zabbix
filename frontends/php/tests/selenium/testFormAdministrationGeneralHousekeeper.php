@@ -25,13 +25,6 @@ define('HOUSEKEEPER_BAD', 1);
 
 class testFormAdministrationGeneralHousekeeper extends CWebTest {
 
-	/**
-	 * Backup the tables that will be modified during the tests.
-	 */
-	public function testFormAdministrationGeneralHousekeeper_Setup() {
-		DBsave_tables('config');
-	}
-
 	// Returns layout data
 	public static function layout() {
 		return array(
@@ -828,6 +821,7 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 	}
 
 	public function testFormAdministrationGeneralHousekeeper_ResetDefaults() {
+		DBsave_tables('config');
 
 		$this->zbxTestLogin('adm.gui.php');
 		$this->assertElementPresent('configDropDown');
@@ -889,12 +883,6 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 		$this->assertElementPresent("//input[@id='hk_trends']/@disabled");
 
 		$this->assertEquals($oldHashConfig, DBhash($sqlConfig), "Values in some DB fields changed, but shouldn't.");
-	}
-
-	/**
-	 * Restore the original tables.
-	 */
-	public function testFormAdministrationGeneralHousekeeper_Teardown() {
 		DBrestore_tables('config');
 	}
 }
