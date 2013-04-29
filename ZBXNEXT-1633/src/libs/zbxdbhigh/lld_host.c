@@ -1228,7 +1228,7 @@ static void	DBlld_groups_save(zbx_vector_ptr_t *groups, zbx_vector_ptr_t *group_
 	size_t				sql1_alloc = ZBX_KIBIBYTE, sql1_offset = 0,
 					sql2_alloc = ZBX_KIBIBYTE, sql2_offset = 0,
 					sql3_alloc = ZBX_KIBIBYTE, sql3_offset = 0;
-	const char			*ins_groups_sql = "insert into groups (groupid,name) values ";
+	const char			*ins_groups_sql = "insert into groups (groupid,name,flags) values ";
 	const char			*ins_group_discovery_sql =
 					"insert into group_discovery (groupid,parent_group_prototypeid,name) values ";
 
@@ -1282,8 +1282,8 @@ static void	DBlld_groups_save(zbx_vector_ptr_t *groups, zbx_vector_ptr_t *group_
 #ifndef HAVE_MULTIROW_INSERT
 			zbx_strcpy_alloc(&sql1, &sql1_alloc, &sql1_offset, ins_groups_sql);
 #endif
-			zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset, "(" ZBX_FS_UI64 ",'%s')" ZBX_ROW_DL,
-					group->groupid, name_esc);
+			zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset, "(" ZBX_FS_UI64 ",'%s',%d)" ZBX_ROW_DL,
+					group->groupid, name_esc, ZBX_FLAG_DISCOVERY_CREATED);
 
 			if (FAIL != (j = zbx_vector_ptr_bsearch(group_prototypes, &group->group_prototypeid,
 					ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
