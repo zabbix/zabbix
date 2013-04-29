@@ -50,7 +50,7 @@ typedef struct
 	zbx_vector_uint64_t	new_groupids;		/* host groups which should be added */
 	zbx_vector_uint64_t	lnk_templateids;	/* templates which should be linked */
 	zbx_vector_uint64_t	del_templateids;	/* templates which should be unlinked */
-	zbx_vector_ptr_t	new_hostmacros;		/* host macros whic should be added */
+	zbx_vector_ptr_t	new_hostmacros;		/* host macros which should be added */
 	char			*host_proto;
 	char			*host;
 	char			*host_orig;
@@ -150,6 +150,7 @@ typedef struct
 {
 	zbx_uint64_t		groupid;
 	zbx_uint64_t		group_prototypeid;
+	zbx_vector_ptr_t	hosts;
 	char			*name_proto;
 	char			*name;
 	char			*name_orig;
@@ -164,6 +165,8 @@ zbx_lld_group_t;
 
 static void	DBlld_group_free(zbx_lld_group_t *group)
 {
+	/* DBlld_hosts_free(&group->hosts); is not missing here */
+	zbx_vector_ptr_destroy(&group->hosts);
 	zbx_free(group->name_proto);
 	zbx_free(group->name);
 	zbx_free(group->name_orig);
@@ -642,7 +645,7 @@ static zbx_lld_host_t	*DBlld_host_make(zbx_vector_ptr_t *hosts, const char *host
 
 	zbx_free(buffer);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%p", __function_name, host);
 
 	return host;
 }
@@ -683,7 +686,7 @@ static void	DBlld_simple_groups_get(zbx_uint64_t parent_hostid, zbx_vector_uint6
 
 /******************************************************************************
  *                                                                            *
- * Function: DBlld_simple_groups_make                                         *
+ * Function: DBlld_hostgroups_make                                            *
  *                                                                            *
  * Parameters: groupids         - [IN] sorted list of host groups which       *
  *                                     should be present on the each          *
@@ -694,10 +697,10 @@ static void	DBlld_simple_groups_get(zbx_uint64_t parent_hostid, zbx_vector_uint6
  *                                      deleted                               *
  *                                                                            *
  ******************************************************************************/
-static void	DBlld_simple_groups_make(const zbx_vector_uint64_t *groupids, zbx_vector_ptr_t *hosts,
-		zbx_vector_uint64_t *del_hostgroupids)
+static void	DBlld_hostgroups_make(const zbx_vector_uint64_t *groupids, zbx_vector_ptr_t *hosts,
+		zbx_vector_ptr_t *groups, zbx_vector_uint64_t *del_hostgroupids)
 {
-	const char		*__function_name = "DBlld_simple_groups_make";
+	const char		*__function_name = "DBlld_hostgroups_make";
 
 	DB_RESULT		result;
 	DB_ROW			row;
@@ -705,6 +708,7 @@ static void	DBlld_simple_groups_make(const zbx_vector_uint64_t *groupids, zbx_ve
 	zbx_vector_uint64_t	hostids;
 	zbx_uint64_t		hostgroupid, hostid, groupid;
 	zbx_lld_host_t		*host;
+	zbx_lld_group_t		*group;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -725,6 +729,21 @@ static void	DBlld_simple_groups_make(const zbx_vector_uint64_t *groupids, zbx_ve
 			zbx_vector_uint64_append(&hostids, host->hostid);
 	}
 
+	for (i = 0; i < groups->values_num; i++)
+	{
+		group = (zbx_lld_group_t *)groups->values[i];
+
+		if (0 == (group->flags & ZBX_FLAG_LLD_GROUP_DISCOVERED) || 0 == group->groupid)
+			continue;
+
+		for (j = 0; j < group->hosts.values_num; j++)
+		{
+			host = (zbx_lld_host_t *)group->hosts.values[j];
+
+			zbx_vector_uint64_append(&host->new_groupids, group->groupid);
+		}
+	}
+
 	if (0 != hostids.values_num)
 	{
 		char	*sql = NULL;
@@ -733,13 +752,10 @@ static void	DBlld_simple_groups_make(const zbx_vector_uint64_t *groupids, zbx_ve
 		sql = zbx_malloc(sql, sql_alloc);
 
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-				"select hg.hostid,hg.groupid,hg.hostgroupid"
-				" from hosts_groups hg"
-					" left join group_discovery gd"
-						" on hg.groupid=gd.groupid"
-				" where gd.groupid is null"
-					" and");
-		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hg.hostid", hostids.values, hostids.values_num);
+				"select hostid,groupid,hostgroupid"
+				" from hosts_groups"
+				" where");
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid", hostids.values, hostids.values_num);
 
 		result = DBselect("%s", sql);
 
@@ -761,7 +777,7 @@ static void	DBlld_simple_groups_make(const zbx_vector_uint64_t *groupids, zbx_ve
 			if (FAIL == (i = zbx_vector_uint64_bsearch(&host->new_groupids, groupid,
 					ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
 			{
-				/* host groups which should be deleted */
+				/* host groups which should be unlinked */
 				ZBX_STR2UINT64(hostgroupid, row[2]);
 				zbx_vector_uint64_append(del_hostgroupids, hostgroupid);
 			}
@@ -859,6 +875,7 @@ static void	DBlld_groups_get(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *group
 
 		ZBX_STR2UINT64(group->groupid, row[0]);
 		ZBX_STR2UINT64(group->group_prototypeid, row[1]);
+		zbx_vector_ptr_create(&group->hosts);
 		group->name_proto = zbx_strdup(NULL, row[2]);
 		group->lastcheck = atoi(row[3]);
 		group->ts_delete = atoi(row[4]);
@@ -880,8 +897,8 @@ static void	DBlld_groups_get(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *group
  * Function: DBlld_group_make                                                 *
  *                                                                            *
  ******************************************************************************/
-static void	DBlld_group_make(zbx_vector_ptr_t *groups, zbx_uint64_t group_prototypeid, const char *name_proto,
-		struct zbx_json_parse *jp_row)
+static zbx_lld_group_t	*DBlld_group_make(zbx_vector_ptr_t *groups, zbx_uint64_t group_prototypeid,
+		const char *name_proto, struct zbx_json_parse *jp_row)
 {
 	const char	*__function_name = "DBlld_group_make";
 
@@ -911,10 +928,33 @@ static void	DBlld_group_make(zbx_vector_ptr_t *groups, zbx_uint64_t group_protot
 
 	if (i == groups->values_num)	/* no group found */
 	{
+		/* trying to find an already existing group */
+
+		buffer = zbx_strdup(buffer, name_proto);
+		substitute_discovery_macros(&buffer, jp_row, ZBX_MACRO_ANY, NULL, 0);
+		zbx_lrtrim(buffer, ZBX_WHITESPACE);
+
+		for (i = 0; i < groups->values_num; i++)
+		{
+			group = (zbx_lld_group_t *)groups->values[i];
+
+			if (group->group_prototypeid != group_prototypeid)
+				continue;
+
+			if (0 == (group->flags & ZBX_FLAG_LLD_GROUP_DISCOVERED))
+				continue;
+
+			if (0 == strcmp(group->name, buffer))
+				return group;
+		}
+
+		/* otherwise create a new group */
+
 		group = zbx_malloc(NULL, sizeof(zbx_lld_group_t));
 
 		group->groupid = 0;
 		group->group_prototypeid = group_prototypeid;
+		zbx_vector_ptr_create(&group->hosts);
 		group->name_proto = NULL;
 		group->name = zbx_strdup(NULL, name_proto);
 		substitute_discovery_macros(&group->name, jp_row, ZBX_MACRO_ANY, NULL, 0);
@@ -929,6 +969,8 @@ static void	DBlld_group_make(zbx_vector_ptr_t *groups, zbx_uint64_t group_protot
 	}
 	else
 	{
+		/* update an already existing group */
+
 		/* group name */
 		buffer = zbx_strdup(buffer, name_proto);
 		substitute_discovery_macros(&buffer, jp_row, ZBX_MACRO_ANY, NULL, 0);
@@ -946,7 +988,9 @@ static void	DBlld_group_make(zbx_vector_ptr_t *groups, zbx_uint64_t group_protot
 
 	zbx_free(buffer);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%p", __function_name, group);
+
+	return group;
 }
 
 /******************************************************************************
@@ -966,10 +1010,13 @@ static void	DBlld_groups_make(zbx_lld_host_t *host, zbx_vector_ptr_t *groups, zb
 	for (i = 0; i < group_prototypes->values_num; i++)
 	{
 		zbx_lld_group_prototype_t	*group_prototype;
+		zbx_lld_group_t			*group;
 
 		group_prototype = (zbx_lld_group_prototype_t *)group_prototypes->values[i];
 
-		DBlld_group_make(groups, group_prototype->group_prototypeid, group_prototype->name, jp_row);
+		group = DBlld_group_make(groups, group_prototype->group_prototypeid, group_prototype->name, jp_row);
+
+		zbx_vector_ptr_append(&group->hosts, host);
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
@@ -1162,7 +1209,10 @@ void	DBlld_groups_validate(zbx_vector_ptr_t *groups, char **error)
  *                                                                            *
  * Function: DBlld_groups_save                                                *
  *                                                                            *
- * Parameters: groups - [IN] list of groups; should be sorted by groupid      *
+ * Parameters: groups           - [IN/OUT] list of groups; should be sorted   *
+ *                                         by groupid                         *
+ *             group_prototypes - [IN] list of group prototypes; should be    *
+ *                                     sorted by group_prototypeid            *
  *                                                                            *
  ******************************************************************************/
 static void	DBlld_groups_save(zbx_vector_ptr_t *groups, zbx_vector_ptr_t *group_prototypes)
@@ -1172,6 +1222,7 @@ static void	DBlld_groups_save(zbx_vector_ptr_t *groups, zbx_vector_ptr_t *group_
 	int				i, j, new_groups = 0, upd_groups = 0;
 	zbx_lld_group_t			*group;
 	zbx_lld_group_prototype_t	*group_prototype;
+	zbx_lld_host_t			*host;
 	zbx_uint64_t			groupid = 0;
 	char				*sql1 = NULL, *sql2 = NULL, *sql3 = NULL, *name_esc, *name_proto_esc;
 	size_t				sql1_alloc = ZBX_KIBIBYTE, sql1_offset = 0,
@@ -1251,6 +1302,14 @@ static void	DBlld_groups_save(zbx_vector_ptr_t *groups, zbx_vector_ptr_t *group_
 			}
 			else
 				THIS_SHOULD_NEVER_HAPPEN;
+
+			for (j = 0; j < group->hosts.values_num; j++)
+			{
+				host = (zbx_lld_host_t *)group->hosts.values[j];
+
+				/* hosts will be linked to a new host groups */
+				zbx_vector_uint64_append(&host->new_groupids, group->groupid);
+			}
 		}
 		else
 		{
@@ -2321,7 +2380,6 @@ void	DBlld_update_hosts(zbx_uint64_t lld_ruleid, struct zbx_json_parse *jp_data,
 	char			*ipmi_username = NULL, *ipmi_password;
 	char			ipmi_authtype, inventory_mode;
 	unsigned char		ipmi_privilege;
-	zbx_lld_host_t		*host;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -2373,6 +2431,7 @@ void	DBlld_update_hosts(zbx_uint64_t lld_ruleid, struct zbx_json_parse *jp_data,
 	{
 		zbx_uint64_t	parent_hostid;
 		const char	*host_proto, *name_proto;
+		zbx_lld_host_t	*host;
 		unsigned char	status;
 
 		ZBX_STR2UINT64(parent_hostid, row[0]);
@@ -2409,27 +2468,12 @@ void	DBlld_update_hosts(zbx_uint64_t lld_ruleid, struct zbx_json_parse *jp_data,
 			DBlld_groups_make(host, &groups, &group_prototypes, &jp_row);
 		}
 
-{
-	int	i;
-
-	for (i = 0; i < groups.values_num; i++)
-	{
-		zbx_lld_group_t	*group;
-
-		group = (zbx_lld_group_t *)groups.values[i];
-
-		zabbix_log(LOG_LEVEL_CRIT, ">>>>> [%d] " ZBX_FS_UI64 "|" ZBX_FS_UI64 "|%s|%s|%s|%d|%d|%2hhx", i,
-				group->groupid, group->group_prototypeid, group->name_proto, group->name,
-				group->name_orig, group->lastcheck, group->ts_delete, group->flags);
-	}
-}
-
 		zbx_vector_ptr_sort(&hosts, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 
 		DBlld_groups_validate(&groups, error);
 		DBlld_hosts_validate(&hosts, error);
 
-		DBlld_simple_groups_make(&groupids, &hosts, &del_hostgroupids);
+		DBlld_hostgroups_make(&groupids, &hosts, &groups, &del_hostgroupids);
 		DBlld_templates_make(parent_hostid, &hosts);
 		DBlld_hostmacros_make(&hostmacros, &hosts, &del_hostmacroids);
 
