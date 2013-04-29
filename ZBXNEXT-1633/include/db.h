@@ -97,6 +97,8 @@ zbx_graph_item_type;
 #	define TRIGGER_COMMENTS_LEN	65535
 #endif
 
+#define GROUP_NAME_LEN			64
+
 #define HOST_HOST_LEN			MAX_ZBX_HOSTNAME_LEN
 #define HOST_HOST_LEN_MAX		HOST_HOST_LEN+1
 #define HOST_NAME_LEN			64
@@ -598,4 +600,7 @@ int	DBfield_exists(const char *table_name, const char *field_name);
 
 void	zbx_create_services_lock();
 void	zbx_destroy_services_lock();
+
+void	DBdelete_groups(zbx_vector_uint64_t *groupids);
+
 #endif
