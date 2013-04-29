@@ -1289,6 +1289,13 @@ static int	DBpatch_02010088()
 
 	return DBadd_foreign_key("group_discovery", 2, &field);
 }
+
+static int	DBpatch_02010089()
+{
+	const ZBX_FIELD field = {"flags", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("groups", &field);
+}
 #endif	/* not HAVE_SQLITE3 */
 
 static void	DBget_version(int *mandatory, int *optional)
@@ -1415,11 +1422,12 @@ int	DBcheck_version()
 		{DBpatch_02010086, 2010086, 0, 1},
 		{DBpatch_02010087, 2010087, 0, 1},
 		{DBpatch_02010088, 2010088, 0, 1},
+		{DBpatch_02010089, 2010089, 0, 1},
 		/* IMPORTANT! When adding a new mandatory DBPatch don't forget to update it for SQLite, too. */
 		{NULL}
 	};
 #else
-	required = 2010088;	/* <---- Update mandatory DBpatch for SQLite here. */
+	required = 2010089;	/* <---- Update mandatory DBpatch for SQLite here. */
 #endif
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);

@@ -73,6 +73,7 @@ TABLE|groups|groupid|ZBX_SYNC,ZBX_DATA
 FIELD		|groupid	|t_id		|	|NOT NULL	|0
 FIELD		|name		|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|internal	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|flags		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 INDEX		|1		|name
 
 TABLE|group_prototype|group_prototypeid|ZBX_SYNC,ZBX_DATA
@@ -1256,4 +1257,4 @@ UNIQUE		|1		|userid
 TABLE|dbversion||
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|2010088	|2010088
+ROW		|2010089	|2010089
