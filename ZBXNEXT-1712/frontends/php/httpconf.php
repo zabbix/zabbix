@@ -312,13 +312,14 @@ show_messages();
 /*
  * Display
  */
-$data = array('hostid' => get_request('hostid', 0));
-
 if (isset($_REQUEST['form'])) {
-	$data['httptestid'] = get_request('httptestid', null);
-	$data['form'] = get_request('form');
-	$data['form_refresh'] = get_request('form_refresh');
-	$data['templates'] = array();
+	$data = array(
+		'hostid' => get_request('hostid', 0),
+		'httptestid' => get_request('httptestid', null),
+		'form' => get_request('form'),
+		'form_refresh' => get_request('form_refresh'),
+		'templates' => array()
+	);
 
 	if (isset($data['httptestid'])) {
 		// get templates
@@ -419,12 +420,13 @@ else {
 		'groupid' => get_request('groupid')
 	));
 
-	$_REQUEST['groupid'] = $pageFilter->groupid;
-	$_REQUEST['hostid'] = $pageFilter->hostid;
-	$data['pageFilter'] = $pageFilter;
-	$data['showDisabled'] = $showDisabled;
-	$data['httpTests'] = array();
-	$data['paging'] = null;
+	$data = array(
+		'hostid' => $pageFilter->hostid,
+		'pageFilter' => $pageFilter,
+		'showDisabled' => $showDisabled,
+		'httpTests' => array(),
+		'paging' => null
+	);
 
 	if ($data['pageFilter']->hostsSelected) {
 		$sortfield = getPageSortField('hostname');
