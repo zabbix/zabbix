@@ -1143,6 +1143,21 @@ static int	DBpatch_02010072()
 
 static int	DBpatch_02010073()
 {
+	const ZBX_FIELD	field = {"applicationid", NULL, "applications", "applicationid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("application_template", 1, &field);
+}
+
+static int	DBpatch_02010074()
+{
+	const ZBX_FIELD	field = {"templateid", NULL, "applications", "applicationid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("application_template", 2, &field);
+}
+
+
+static int	DBpatch_02010075()
+{
 	DB_RESULT	result;
 	DB_ROW		row;
 	zbx_uint64_t	id_counter = 1, application_id, template_id, app_template_id;
@@ -1173,17 +1188,17 @@ out:
 	return ret;
 }
 
-static int	DBpatch_02010074()
+static int	DBpatch_02010076()
 {
 	return DBdrop_foreign_key("applications", 2);
 }
 
-static int	DBpatch_02010075()
+static int	DBpatch_02010077()
 {
 	return DBdrop_index("applications", "applications_1");
 }
 
-static int	DBpatch_02010076()
+static int	DBpatch_02010078()
 {
 	return DBdrop_field("applications","templateid");
 }
@@ -1302,11 +1317,13 @@ int	DBcheck_version()
 		{DBpatch_02010074, 2010074, 0, 1},
 		{DBpatch_02010075, 2010075, 0, 1},
 		{DBpatch_02010076, 2010076, 0, 1},
+		{DBpatch_02010077, 2010077, 0, 1},
+		{DBpatch_02010078, 2010078, 0, 1},
 		/* IMPORTANT! When adding a new mandatory DBPatch don't forget to update it for SQLite, too. */
 		{NULL}
 	};
 #else
-	required = 2010076;	/* <---- Update mandatory DBpatch for SQLite here. */
+	required = 2010078;	/* <---- Update mandatory DBpatch for SQLite here. */
 #endif
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
