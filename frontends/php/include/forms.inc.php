@@ -1074,7 +1074,7 @@
 		}
 
 		// hostname
-		if (empty($data['hostname'])) {
+		if (empty($data['is_discovery_rule']) && empty($data['hostname'])) {
 			if (!empty($data['hostid'])) {
 				$hostInfo = API::Host()->get(array(
 					'hostids' => $data['hostid'],
