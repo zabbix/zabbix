@@ -28,7 +28,7 @@
 
 /******************************************************************************
  *                                                                            *
- * Function: httpmacro_comp_func                                              *
+ * Function: httpmacro_cmp_func                                               *
  *                                                                            *
  * Purpose: compare two macros by name                                        *
  *                                                                            *
@@ -42,7 +42,7 @@
  * Author: Andris Zeila                                                       *
  *                                                                            *
  ******************************************************************************/
-static int 	httpmacro_comp_func(const void *d1, const void *d2)
+static int 	httpmacro_cmp_func(const void *d1, const void *d2)
 {
 	const zbx_ptr_pair_t	*pair1 = (const zbx_ptr_pair_t *)d1;
 	const zbx_ptr_pair_t	*pair2 = (const zbx_ptr_pair_t *)d2;
@@ -54,15 +54,15 @@ static int 	httpmacro_comp_func(const void *d1, const void *d2)
  *                                                                            *
  * Function: httpmacro_append_pair                                            *
  *                                                                            *
- * Purpose: appends key,value pair to the http test macro cache.              *
+ * Purpose: appends key/value pair to the http test macro cache.              *
  *          If the value format is 'regex:<pattern>', then regular expression *
  *          match is performed against the supplied data value and specified  *
  *          pattern. The first captured group is assigned to the macro value. *
  *                                                                            *
  * Parameters: httptest - [IN/OUT] the http test data                         *
- *             pkey     - [IN] a reference to the  macro name (key) data      *
- *             nkey     - [IN] the key (macro name) size                      *
- *             pvalue   - [IN] a reference to the macro value data            *
+ *             pkey     - [IN] a pointer to the macro name (key) data         *
+ *             nkey     - [IN] the macro name (key) size                      *
+ *             pvalue   - [IN] a pointer to the macro value data              *
  *             nvalue   - [IN] the value size                                 *
  *             data     - [IN] the data for regexp matching (optional)        *
  *                                                                            *
@@ -81,7 +81,7 @@ static int	httpmacro_append_pair(zbx_httptest_t *httptest, const char *pkey, siz
 	const char	*__function_name = "httpmacro_append_pair";
 	char 		*value_str = NULL;
 	size_t		key_size = 0, key_offset = 0, value_size = 0, value_offset = 0;
-	zbx_ptr_pair_t	pair = {0};
+	zbx_ptr_pair_t	pair = {NULL, NULL};
 	int		index, ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
@@ -94,11 +94,11 @@ static int	httpmacro_append_pair(zbx_httptest_t *httptest, const char *pkey, siz
 
 	/* get macro value */
 	zbx_strncpy_alloc(&value_str, &value_size, &value_offset, pvalue, nvalue);
-	if (!strncmp(REGEXP_PREFIX, value_str, REGEXP_PREFIX_SIZE))
+	if (0 == strncmp(REGEXP_PREFIX, value_str, REGEXP_PREFIX_SIZE))
 	{
-		/* The value contains regexp pattern, retrieve the first captured group or the whole string. */
-		/* If regular expression pattern contains groups, then \1 returns captured group and \*      */
-		/* returns empty string. Otherwise \1 returns empty string and \* returns the input text.    */
+		/* The value contains regexp pattern, retrieve the first captured group or fail.  */
+		/* The \@ sequence is a special construct to fail if the pattern matches but does */
+		/* not contain groups to capture.                                                 */
 		if (NULL != data)
 			pair.second = (void *)zbx_mregexp_sub(data, value_str + REGEXP_PREFIX_SIZE, "\\@");
 
@@ -114,8 +114,8 @@ static int	httpmacro_append_pair(zbx_httptest_t *httptest, const char *pkey, siz
 	zbx_strncpy_alloc((char**)&pair.first, &key_size, &key_offset, pkey, nkey);
 
 	/* remove existing macro if necessary */
-	index = zbx_vector_ptr_pair_search(&httptest->macros, pair, httpmacro_comp_func);
-	if (index != FAIL)
+	index = zbx_vector_ptr_pair_search(&httptest->macros, pair, httpmacro_cmp_func);
+	if (FAIL != index)
 	{
 		zbx_ptr_pair_t	*ppair = &httptest->macros.values[index];
 
@@ -137,10 +137,11 @@ out:
  *                                                                            *
  * Function: http_substitute_variables                                        *
  *                                                                            *
- * Purpose: substitute macros in input string by value from http test config  *
+ * Purpose: substitute variables in input string with their values from http  *
+ *          test config                                                       *
  *                                                                            *
- * Parameters: macros - [IN]     the http test data                           *
- *             data   - [IN\OUT] string to substitute macros                  *
+ * Parameters: httptest - [IN]     the http test data                         *
+ *             data     - [IN/OUT] string to substitute macros in             *
  *                                                                            *
  * Author: Alexei Vladishev, Andris Zeila                                     *
  *                                                                            *
@@ -170,7 +171,7 @@ void	http_substitute_variables(zbx_httptest_t *httptest, char **data)
 		(*data)[right + 1] = '\0';
 
 		pair.first = *data + left;
-		index = zbx_vector_ptr_pair_search(&httptest->macros, pair, httpmacro_comp_func);
+		index = zbx_vector_ptr_pair_search(&httptest->macros, pair, httpmacro_cmp_func);
 
 		(*data)[right + 1] = replace_char;
 
@@ -271,5 +272,3 @@ out:
 
 	return rc;
 }
-
-
