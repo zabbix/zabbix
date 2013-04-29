@@ -121,7 +121,7 @@ $itemFormList->addRow(_('SNMP OID'),
 	false, 'row_snmp_oid'
 );
 $itemFormList->addRow(_('Context name'),
-	new CTextBox('snmpv3_contextname', $this->data['snmpv3_contextname'], ZBX_TEXTBOX_STANDARD_SIZE, $this->data['limited']),
+	new CTextBox('snmpv3_contextname', $this->data['snmpv3_contextname'], ZBX_TEXTBOX_STANDARD_SIZE, 'no', 255),
 	false, 'row_snmpv3_contextname'
 );
 $itemFormList->addRow(_('SNMP community'),
