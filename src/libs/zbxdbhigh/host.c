@@ -5202,3 +5202,50 @@ void	zbx_destroy_services_lock()
 {
 	zbx_mutex_destroy(&services_lock);
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DBdelete_groups                                                  *
+ *                                                                            *
+ * Purpose: delete host groups from database                                  *
+ *                                                                            *
+ * Parameters: groupids - [IN] array of group identificators from database    *
+ *                                                                            *
+ ******************************************************************************/
+void	DBdelete_groups(zbx_vector_uint64_t *groupids)
+{
+	const char	*__function_name = "DBdelete_groups";
+
+	char		*sql = NULL;
+	size_t		sql_alloc = 256, sql_offset = 0;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() values_num:%d", __function_name, groupids->values_num);
+
+	if (0 == groupids->values_num)
+		goto out;
+
+	sql = zbx_malloc(sql, sql_alloc);
+
+	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	/* profiles */
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
+			"delete from profiles"
+			" where idx in ('web.dashconf.groups.groupids','web.dashconf.groups.hide.groupids')"
+				" and");
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "value_id", groupids->values, groupids->values_num);
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
+
+	/* groups */
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from groups where");
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "groupid", groupids->values, groupids->values_num);
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
+
+	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	DBexecute("%s", sql);
+
+	zbx_free(sql);
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+}
