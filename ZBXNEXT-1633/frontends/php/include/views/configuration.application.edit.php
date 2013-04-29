@@ -31,7 +31,6 @@ $applicationForm->setName('applicationForm');
 $applicationForm->addVar('form', $this->data['form']);
 $applicationForm->addVar('groupid', $this->data['groupid']);
 $applicationForm->addVar('hostid', $this->data['hostid']);
-$applicationForm->addVar('apphostid', $this->data['apphostid']);
 if (!empty($this->data['applicationid'])) {
 	$applicationForm->addVar('applicationid', $this->data['applicationid']);
 }
