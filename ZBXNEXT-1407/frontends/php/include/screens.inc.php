@@ -58,7 +58,8 @@ function screen_resources($resource = null) {
 
 function get_screen_by_screenid($screenid) {
 	$dbScreen = DBfetch(DBselect('SELECT s.* FROM screens s WHERE s.screenid='.$screenid));
-	return !empty($dbScreen) ? $dbScreen : false;
+
+	return empty($dbScreen) ? false : $dbScreen;
 }
 
 function check_screen_recursion($mother_screenid, $child_screenid) {
@@ -77,6 +78,7 @@ function check_screen_recursion($mother_screenid, $child_screenid) {
 			return true;
 		}
 	}
+
 	return false;
 }
 
@@ -142,6 +144,7 @@ function slideshow_accessible($slideshowid, $perm) {
 			}
 		}
 	}
+
 	return $result;
 }
 
@@ -202,6 +205,7 @@ function add_slideshow($name, $delay, $slides) {
 			return false;
 		}
 	}
+
 	return $slideshowid;
 }
 
@@ -295,6 +299,7 @@ function delete_slideshow($slideshowid) {
 	$result = DBexecute('DELETE FROM slideshows where slideshowid='.$slideshowid);
 	$result &= DBexecute('DELETE FROM slides where slideshowid='.$slideshowid);
 	$result &= DBexecute('DELETE FROM profiles WHERE idx=\'web.favorite.screenids\' AND source=\'slideshowid\' AND value_id='.$slideshowid);
+
 	return $result;
 }
 
@@ -316,5 +321,33 @@ function check_dynamic_items($elid, $config = 0) {
 	if (DBfetch(DBselect($sql, 1))) {
 		return true;
 	}
+
 	return false;
+}
+
+function getResourceNameByType($resourceType) {
+	switch ($resourceType) {
+		case SCREEN_RESOURCE_DATA_OVERVIEW:
+			return _('Group');
+		case SCREEN_RESOURCE_GRAPH:
+			return _('Graph');
+		case SCREEN_RESOURCE_SIMPLE_GRAPH:
+			return _('Simple graph');
+		case SCREEN_RESOURCE_HOSTS_INFO:
+			return _('Host');
+		case SCREEN_RESOURCE_MAP:
+			return _('Map');
+		case SCREEN_RESOURCE_PLAIN_TEXT:
+			return _('Plain text');
+		case SCREEN_RESOURCE_SCREEN:
+			return _('Screen');
+		case SCREEN_RESOURCE_HOSTGROUP_TRIGGERS:
+			return _('Group');
+		case SCREEN_RESOURCE_HOST_TRIGGERS:
+			return _('Host');
+		case SCREEN_RESOURCE_TRIGGERS_INFO:
+			return _('Group');
+		case SCREEN_RESOURCE_TRIGGERS_OVERVIEW:
+			return _('Group');
+	}
 }

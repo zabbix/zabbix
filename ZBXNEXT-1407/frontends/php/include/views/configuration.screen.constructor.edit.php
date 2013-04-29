@@ -305,6 +305,7 @@ elseif (in_array($resourceType, array(SCREEN_RESOURCE_HOSTGROUP_TRIGGERS, SCREEN
 			'name' => 'resourceid',
 			'objectName' => 'hostGroup',
 			'data' => $data ? array(array('id' => $data['groupid'], 'name' => $data['name'], 'prefix' => $data['prefix'])) : null,
+			'defaultValue' => 0,
 			'selectedLimit' => 1
 		)));
 	}
@@ -327,6 +328,7 @@ elseif (in_array($resourceType, array(SCREEN_RESOURCE_HOSTGROUP_TRIGGERS, SCREEN
 			'name' => 'resourceid',
 			'objectName' => 'hosts',
 			'data' => $data ? array(array('id' => $data['hostid'], 'name' => $data['name'], 'prefix' => $data['prefix'])) : null,
+			'defaultValue' => 0,
 			'selectedLimit' => 1
 		)));
 	}
