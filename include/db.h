@@ -113,6 +113,8 @@ zbx_graph_item_type;
 #define ITEM_SNMPV3_AUTHPASSPHRASE_LEN_MAX	ITEM_SNMPV3_AUTHPASSPHRASE_LEN+1
 #define ITEM_SNMPV3_PRIVPASSPHRASE_LEN		64
 #define ITEM_SNMPV3_PRIVPASSPHRASE_LEN_MAX	ITEM_SNMPV3_PRIVPASSPHRASE_LEN+1
+#define ITEM_SNMPV3_CONTEXTNAME_LEN		255
+#define ITEM_SNMPV3_CONTEXTNAME_LEN_MAX		ITEM_SNMPV3_CONTEXTNAME_LEN+1
 #define ITEM_LOGTIMEFMT_LEN		64
 #define ITEM_LOGTIMEFMT_LEN_MAX		ITEM_LOGTIMEFMT_LEN+1
 #define ITEM_DELAY_FLEX_LEN		255
@@ -235,6 +237,7 @@ typedef struct
 	char		*snmpv3_securityname;
 	char		*snmpv3_authpassphrase;
 	char		*snmpv3_privpassphrase;
+	char		*snmpv3_contextname;
 	int		type;
 	unsigned char	snmpv3_securitylevel;
 	unsigned char	snmpv3_authprotocol;
