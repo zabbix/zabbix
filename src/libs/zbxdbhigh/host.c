@@ -1748,8 +1748,9 @@ static void	DBdelete_applications(zbx_uint64_t *applicationids, int applicationi
 	if (0 == applicationids_num)
 		return;
 
+	/* don't delete applications used in web scenarious */
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-			"select applicationid,name"
+			"select distinct applicationid"
 			" from httptest"
 			" where");
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "applicationid", applicationids, applicationids_num);
@@ -1760,9 +1761,23 @@ static void	DBdelete_applications(zbx_uint64_t *applicationids, int applicationi
 	{
 		ZBX_STR2UINT64(applicationid, row[0]);
 		uint64_array_remove(applicationids, &applicationids_num, &applicationid, 1);
+	}
+	DBfree_result(result);
 
-		zabbix_log(LOG_LEVEL_DEBUG, "Application [" ZBX_FS_UI64 "] used by scenario '%s'",
-				applicationid, row[1]);
+	/* don't delete applications with items assigned to them */
+	sql_offset = 0;
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
+			"select distinct applicationid"
+			" from items_applications"
+			" where");
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "applicationid", applicationids, applicationids_num);
+
+	result = DBselect("%s", sql);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		ZBX_STR2UINT64(applicationid, row[0]);
+		uint64_array_remove(applicationids, &applicationids_num, &applicationid, 1);
 	}
 	DBfree_result(result);
 
