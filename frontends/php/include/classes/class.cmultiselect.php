@@ -53,6 +53,7 @@ class CMultiSelect extends CTag {
 			'defaultValue' => isset($options['defaultValue']) ? $options['defaultValue'] : null,
 			'disabled' => isset($options['disabled']) ? $options['disabled'] : false,
 			'selectedLimit' => isset($options['selectedLimit']) ? $options['selectedLimit'] : null,
+			'addNew' => isset($options['addNew']) ? $options['addNew'] : false
 		);
 
 		zbx_add_post_js('jQuery("#'.$this->getAttribute('id').'").multiSelect('.CJs::encodeJson($params).')');

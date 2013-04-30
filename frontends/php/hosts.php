@@ -34,6 +34,10 @@ else {
 	$page['type'] = detect_page_type(PAGE_TYPE_HTML);
 	$page['hist_arg'] = array('groupid');
 
+	if (isset($_REQUEST['go']) && $_REQUEST['go'] == 'massupdate') {
+		$page['scripts'] = array('multiselect.js');
+	}
+
 	$EXPORT_DATA = false;
 }
 
@@ -43,6 +47,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 $fields = array(
 	'hosts' =>		array(T_ZBX_INT, O_OPT, P_SYS,		DB_ID,		null),
 	'groups' =>		array(T_ZBX_INT, O_OPT, P_SYS,		DB_ID,		null),
+	'new_groups' =>		array(T_ZBX_STR, O_OPT, P_SYS,		DB_ID,		null),
 	'hostids' =>		array(T_ZBX_INT, O_OPT, P_SYS,		DB_ID,		null),
 	'groupids' =>		array(T_ZBX_INT, O_OPT, P_SYS,		DB_ID,		null),
 	'applications' =>	array(T_ZBX_INT, O_OPT, P_SYS,		DB_ID,		null),

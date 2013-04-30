@@ -75,6 +75,7 @@ jQuery(function($) {
 				'type here to search': 'type here to search'
 			},
 			data: [],
+			addNew: false,
 			defaultValue: null,
 			disabled: false,
 			selectedLimit: null,
@@ -413,7 +414,7 @@ jQuery(function($) {
 
 		if (!empty(data)) {
 			$.each(data, function(i, item) {
-				addAvailable(item, obj, values, options);
+				addAvailable(item, obj, values, options, false);
 			});
 		}
 
@@ -443,19 +444,42 @@ jQuery(function($) {
 			$('.available', obj).prepend(div);
 		}
 
+		// add new
+		if (options.addNew == true) {
+			var item = {
+				id: values['search'],
+				prefix: '',
+				name: values['search']+' (new)'
+			};
+			addAvailable(item, obj, values, options, true);
+		}
+
 		showAvailable(obj, values);
 	}
 
-	function addSelected(item, obj, values, options) {
+	function addSelected(item, obj, values, options, newValue) {
 		if (typeof(values.selected[item.id]) == 'undefined') {
 			removeDefaultValue(obj, options);
 
 			values.selected[item.id] = item;
 
+			var itemName;
+			if (options.addNew) {
+				if (newValue) {
+					itemName = options.name+'[new]';
+				}
+				else {
+					itemName = options.name+'[exist]';
+				}
+			}
+			else {
+				itemName = options.name;
+			}
+
 			// add hidden input
 			obj.append($('<input>', {
 				type: 'hidden',
-				name: options.name,
+				name: itemName,
 				value: item.id,
 				'data-name': item.name,
 				'data-prefix': item.prefix
@@ -529,7 +553,7 @@ jQuery(function($) {
 		}
 	}
 
-	function addAvailable(item, obj, values, options) {
+	function addAvailable(item, obj, values, options, newValue) {
 		if (empty(options.limit) || (options.limit > 0 && $('.available li', obj).length < options.limit)) {
 			if (typeof(values.available[item.id]) == 'undefined' && typeof(values.selected[item.id]) == 'undefined') {
 				values.available[item.id] = item;
@@ -552,7 +576,7 @@ jQuery(function($) {
 					'data-id': item.id
 				})
 				.click(function() {
-					select($(this).data('id'), obj, values, options);
+					select($(this).data('id'), obj, values, options, newValue);
 				})
 				.hover(function() {
 					$('.available li.hover', obj).removeClass('hover');
@@ -568,9 +592,9 @@ jQuery(function($) {
 		}
 	}
 
-	function select(id, obj, values, options) {
+	function select(id, obj, values, options, newValue) {
 		if (values.isAjaxLoaded && !values.isWaiting) {
-			addSelected(values.available[id], obj, values, options);
+			addSelected(values.available[id], obj, values, options, newValue);
 			hideAvailable(obj);
 			cleanAvailable(obj, values);
 			cleanLastSearch(obj);
