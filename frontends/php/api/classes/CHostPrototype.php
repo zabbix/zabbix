@@ -111,6 +111,19 @@ class CHostPrototype extends CHostBase {
 			'status' => HOST_STATUS_MONITORED
 		);
 
+		$hostValidator = new CLldMacroStringValidator(array(
+			'maxLength' => 64,
+			'regex' => '/^('.ZBX_PREG_INTERNAL_NAMES.'|\{#'.ZBX_PREG_MACRO_NAME_LLD.'\})+$/',
+			'messageEmpty' => _('Empty host.'),
+			'messageMaxLength' => _n(
+				'Host name "%1$s" is too long, it must have less then %2$d character.',
+				'Host name "%1$s" is too long, it must have less then %2$d characters.',
+				64
+			),
+			'messageRegex' => _('Incorrect characters used for host "%1$s".'),
+			'messageMacro' => _('Host name for host prototype "%1$s" must contain macros.')
+		));
+
 		foreach ($hostPrototypes as $hostPrototype) {
 			if (!check_db_fields($parameters, $hostPrototype)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Wrong fields for host prototype "%1$s".', $hostPrototype['host']));
@@ -121,7 +134,7 @@ class CHostPrototype extends CHostBase {
 				array('ruleid', 'templates', 'inventory', 'groupPrototypes')
 			);
 
-			$this->checkHost($hostPrototype);
+			$this->checkValidator($hostPrototype['host'], $hostValidator);;
 			$this->checkName($hostPrototype);
 			$this->checkStatus($hostPrototype);
 			$this->checkId($hostPrototype['ruleid'],
@@ -268,6 +281,19 @@ class CHostPrototype extends CHostBase {
 
 		$hostPrototypes = $this->extendObjects($this->tableName(), $hostPrototypes, array('host'));
 
+		$hostValidator = new CLldMacroStringValidator(array(
+			'maxLength' => 64,
+			'regex' => '/^('.ZBX_PREG_INTERNAL_NAMES.'|\{#'.ZBX_PREG_MACRO_NAME_LLD.'\})+$/',
+			'messageEmpty' => _('Empty host.'),
+			'messageMaxLength' => _n(
+				'Host name "%1$s" is too long, it must have less then %2$d character.',
+				'Host name "%1$s" is too long, it must have less then %2$d characters.',
+				64
+			),
+			'messageRegex' => _('Incorrect characters used for host "%1$s".'),
+			'messageMacro' => _('Host name for host prototype "%1$s" must contain macros.')
+		));
+
 		foreach ($hostPrototypes as $hostPrototype) {
 			$this->checkUnsupportedFields($this->tableName(), $hostPrototype,
 				_s('Wrong fields for host prototype "%1$s".', $hostPrototype['host']),
@@ -275,7 +301,7 @@ class CHostPrototype extends CHostBase {
 			);
 
 			if (isset($hostPrototype['host'])) {
-				$this->checkHost($hostPrototype);
+				$this->checkValidator($hostPrototype['host'], $hostValidator);
 			}
 			if (isset($hostPrototype['name'])) {
 				$this->checkName($hostPrototype);
@@ -749,43 +775,6 @@ class CHostPrototype extends CHostBase {
 	}
 
 	/**
-	 * Validates the "host" field.
-	 *
-	 * @throws APIException if the name is missing
-	 *
-	 * @param array $host
-	 *
-	 * @return void
-	 */
-	protected function checkHost(array $host) {
-		if (zbx_empty($host['host'])) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty host.'));
-		}
-
-		// Check if host name isn't longer than 64 chars
-		if (zbx_strlen($host['host']) > 64) {
-			self::exception(
-				ZBX_API_ERROR_PARAMETERS,
-				_n(
-					'Maximum host name length is %2$d characters, "%3$s" is %1$d character.',
-					'Maximum host name length is %2$d characters, "%3$s" is %1$d characters.',
-					zbx_strlen($host['host']),
-					64,
-					$host['host']
-				)
-			);
-		}
-
-		if (!preg_match('/^('.ZBX_PREG_INTERNAL_NAMES.'|\{#'.ZBX_PREG_MACRO_NAME_LLD.'\})+$/', $host['host'])) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect characters used for host "%s".', $host['host']));
-		}
-		// a host prototype must contain macros in the host name
-		if (!preg_match('/(\{#'.ZBX_PREG_MACRO_NAME_LLD.'\})+/', $host['host'])) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Host name for host prototype "%s" must contain macros.', $host['host']));
-		}
-	}
-
-	/**
 	 * Validates the "name" field. Assumes the "host" field is valid.
 	 *
 	 * @throws APIException if the name is missing
@@ -898,6 +887,35 @@ class CHostPrototype extends CHostBase {
 			while ($row = DBfetch($query)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
 					_s('Host prototype "%1$s" already exists in discovery rule "%2$s".', $row['host'], $row['name']));
+			}
+		}
+	}
+
+	protected function checkGroupPrototypes(array $hostPrototype) {
+		if (empty($hostPrototype['groupPrototypes'])) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('No host groups for host prototype "%1$s"', $hostPrototype['host']));
+		}
+
+		$nameValidator = new CLldMacroStringValidator(array(
+			'messageEmpty' => _('Empty group prototype name.'),
+			'messageMacro' => _('Host name for host prototype "%1$s" must contain macros.')
+		));
+
+		foreach ($hostPrototype['groupPrototypes'] as $groupPrototype) {
+			if (isset($hostPrototype['name'])) {
+				$this->checkValidator($hostPrototype['name'], $nameValidator);
+			}
+
+			if (empty($hostPrototype['name']) && empty($hostPrototype['groupid'])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Host group prototype must have either "name" or "groupid" defined.', $groupPrototype['name'])
+				);
+			}
+
+			if (!empty($hostPrototype['name']) && !empty($hostPrototype['groupid'])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Host group prototype "%1$s" cannot have "name" and "groupid" defined at the same time.', $groupPrototype['name'])
+				);
 			}
 		}
 	}

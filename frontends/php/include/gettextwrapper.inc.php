@@ -117,7 +117,8 @@ function _s($string) {
 /**
  * Translates the string in the correct form with respect to the given numeric parameter.
  *
- * Supports unlimited parameters; placeholders must be defined as %1$s, %2$s etc.
+ * Supports unlimited parameters; placeholders must be defined as %1$s, %2$s etc. If the parameter count doesn't match
+ * the parameters in the string, they will not be substituted.
  *
  * Examples:
  * _n('%1$s item on host %2$s', '%1$s items on host %2$s', 1, 'Zabbix server') // 1 item on host Zabbix server
@@ -133,7 +134,11 @@ function _s($string) {
  */
 function _n($string1, $string2, $value) {
 	$arguments = array_slice(func_get_args(), 2);
-	return vsprintf(ngettext($string1, $string2, $value), $arguments);
+
+	$string = ngettext($string1, $string2, $value);
+
+	// try to substitute the parameters, if it was unsuccessful - return the original string with parameter placeholders
+	return ($paramString = @vsprintf($string, $arguments)) ? $paramString : $string;
 }
 
 /**
