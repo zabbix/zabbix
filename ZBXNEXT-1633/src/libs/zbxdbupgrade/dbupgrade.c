@@ -1129,12 +1129,36 @@ static int	DBpatch_02010070()
 
 static int	DBpatch_02010071()
 {
+	const ZBX_FIELD	field = {"snmpv3_contextname", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("items", &field);
+}
+
+static int	DBpatch_02010072()
+{
+	const ZBX_FIELD	field = {"snmpv3_contextname", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("dchecks", &field);
+}
+
+static int	DBpatch_02010073()
+{
+	const char	*sql = "delete from ids where table_name='events'";
+
+	if (ZBX_DB_OK <= DBexecute("%s", sql))
+		return SUCCEED;
+
+	return FAIL;
+}
+
+static int	DBpatch_02010074()
+{
 	const ZBX_FIELD field = {"flags", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("hosts", &field);
 }
 
-static int	DBpatch_02010072()
+static int	DBpatch_02010075()
 {
 	const ZBX_TABLE	table =
 			{"host_discovery", "hostid", 0,
@@ -1152,42 +1176,42 @@ static int	DBpatch_02010072()
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_02010073()
+static int	DBpatch_02010076()
 {
 	const ZBX_FIELD	field = {"hostid", NULL, "hosts", "hostid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("host_discovery", 1, &field);
 }
 
-static int	DBpatch_02010074()
+static int	DBpatch_02010077()
 {
 	const ZBX_FIELD	field = {"parent_hostid", NULL, "hosts", "hostid", 0, 0, 0, 0};
 
 	return DBadd_foreign_key("host_discovery", 2, &field);
 }
 
-static int	DBpatch_02010075()
+static int	DBpatch_02010078()
 {
 	const ZBX_FIELD	field = {"parent_itemid", NULL, "items", "itemid", 0, 0, 0, 0};
 
 	return DBadd_foreign_key("host_discovery", 3, &field);
 }
 
-static int	DBpatch_02010076()
+static int	DBpatch_02010079()
 {
 	const ZBX_FIELD field = {"templateid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
 
 	return DBadd_field("hosts", &field);
 }
 
-static int	DBpatch_02010077()
+static int	DBpatch_02010080()
 {
 	const ZBX_FIELD	field = {"templateid", NULL, "hosts", "hostid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("hosts", 3, &field);
 }
 
-static int	DBpatch_02010078()
+static int	DBpatch_02010081()
 {
 	const ZBX_TABLE	table =
 			{"interface_discovery", "interfaceid", 0,
@@ -1201,14 +1225,14 @@ static int	DBpatch_02010078()
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_02010079()
+static int	DBpatch_02010082()
 {
 	const ZBX_FIELD	field = {"interfaceid", NULL, "interface", "interfaceid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("interface_discovery", 1, &field);
 }
 
-static int	DBpatch_02010080()
+static int	DBpatch_02010083()
 {
 	const ZBX_FIELD	field =
 			{"parent_interfaceid", NULL, "interface", "interfaceid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
@@ -1216,7 +1240,7 @@ static int	DBpatch_02010080()
 	return DBadd_foreign_key("interface_discovery", 2, &field);
 }
 
-static int	DBpatch_02010081()
+static int	DBpatch_02010084()
 {
 	const ZBX_TABLE	table =
 			{"group_prototype", "group_prototypeid", 0,
@@ -1233,33 +1257,33 @@ static int	DBpatch_02010081()
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_02010082()
+static int	DBpatch_02010085()
 {
 	const ZBX_FIELD	field = {"hostid", NULL, "hosts", "hostid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("group_prototype", 1, &field);
 }
 
-static int	DBpatch_02010083()
+static int	DBpatch_02010086()
 {
 	const ZBX_FIELD	field = {"groupid", NULL, "groups", "groupid", 0, 0, 0, 0};
 
 	return DBadd_foreign_key("group_prototype", 2, &field);
 }
 
-static int	DBpatch_02010084()
+static int	DBpatch_02010087()
 {
 	const ZBX_FIELD	field = {"templateid", NULL, "group_prototype", "group_prototypeid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("group_prototype", 3, &field);
 }
 
-static int	DBpatch_02010085()
+static int	DBpatch_02010088()
 {
 	return DBcreate_index("group_prototype", "group_prototype_1", "hostid", 0);
 }
 
-static int	DBpatch_02010086()
+static int	DBpatch_02010089()
 {
 	const ZBX_TABLE	table =
 			{"group_discovery", "groupid", 0,
@@ -1276,21 +1300,21 @@ static int	DBpatch_02010086()
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_02010087()
+static int	DBpatch_02010090()
 {
 	const ZBX_FIELD	field = {"groupid", NULL, "groups", "groupid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("group_discovery", 1, &field);
 }
 
-static int	DBpatch_02010088()
+static int	DBpatch_02010091()
 {
 	const ZBX_FIELD	field = {"parent_group_prototypeid", NULL, "group_prototype", "group_prototypeid", 0, 0, 0, 0};
 
 	return DBadd_foreign_key("group_discovery", 2, &field);
 }
 
-static int	DBpatch_02010089()
+static int	DBpatch_02010092()
 {
 	const ZBX_FIELD field = {"flags", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
@@ -1406,7 +1430,7 @@ int	DBcheck_version()
 		{DBpatch_02010070, 2010070, 0, 0},
 		{DBpatch_02010071, 2010071, 0, 1},
 		{DBpatch_02010072, 2010072, 0, 1},
-		{DBpatch_02010073, 2010073, 0, 1},
+		{DBpatch_02010073, 2010073, 0, 0},
 		{DBpatch_02010074, 2010074, 0, 1},
 		{DBpatch_02010075, 2010075, 0, 1},
 		{DBpatch_02010076, 2010076, 0, 1},
@@ -1423,11 +1447,14 @@ int	DBcheck_version()
 		{DBpatch_02010087, 2010087, 0, 1},
 		{DBpatch_02010088, 2010088, 0, 1},
 		{DBpatch_02010089, 2010089, 0, 1},
+		{DBpatch_02010090, 2010090, 0, 1},
+		{DBpatch_02010091, 2010091, 0, 1},
+		{DBpatch_02010092, 2010092, 0, 1},
 		/* IMPORTANT! When adding a new mandatory DBPatch don't forget to update it for SQLite, too. */
 		{NULL}
 	};
 #else
-	required = 2010089;	/* <---- Update mandatory DBpatch for SQLite here. */
+	required = 2010092;	/* <---- Update mandatory DBpatch for SQLite here. */
 #endif
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
