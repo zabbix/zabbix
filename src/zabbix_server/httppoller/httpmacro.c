@@ -65,6 +65,7 @@ static int 	httpmacro_cmp_func(const void *d1, const void *d2)
  *             pvalue   - [IN] a pointer to the macro value data              *
  *             nvalue   - [IN] the value size                                 *
  *             data     - [IN] the data for regexp matching (optional)        *
+ *             err_str  - [OUT] the error message (optional)                  *
  *                                                                            *
  * Return value: SUCCEDED - the key/value pair was added successfully         *
  *                   FAIL - key/value pair adding to cache failed.            *
@@ -76,7 +77,7 @@ static int 	httpmacro_cmp_func(const void *d1, const void *d2)
  *                                                                            *
  ******************************************************************************/
 static int	httpmacro_append_pair(zbx_httptest_t *httptest, const char *pkey, size_t nkey,
-			const char *pvalue, size_t nvalue, const char *data)
+			const char *pvalue, size_t nvalue, const char *data, char **err_str)
 {
 	const char	*__function_name = "httpmacro_append_pair";
 	char 		*value_str = NULL;
@@ -87,10 +88,24 @@ static int	httpmacro_append_pair(zbx_httptest_t *httptest, const char *pkey, siz
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	if (0 == nkey || 0 == nvalue)
+	{
+		if (NULL != err_str && NULL == *err_str)
+		{
+			size_t	size = 0, offset = 0;
+			zbx_strcpy_alloc(err_str, &size, &offset, "a variable defined without a name or value");
+		}
 		goto out;
+	}
 
 	if ('{' != pkey[0] || '}' != pkey[nkey - 1])
+	{
+		if (NULL != err_str && NULL == *err_str)
+		{
+			size_t	size = 0, offset = 0;
+			zbx_strcpy_alloc(err_str, &size, &offset, "invalid variable name specified");
+		}
 		goto out;
+	}
 
 	/* get macro value */
 	zbx_strncpy_alloc(&value_str, &value_size, &value_offset, pvalue, nvalue);
@@ -104,8 +119,23 @@ static int	httpmacro_append_pair(zbx_httptest_t *httptest, const char *pkey, siz
 
 		zbx_free(value_str);
 
-		if (NULL == pair.second)
+		if (NULL == data)
+		{
+			/* Ignore regex variables when no input data is specified. Currently only */
+			/* scenario level variables don't have input data.                        */
+			ret = SUCCEED;
 			goto out;
+		}
+
+		if (NULL == pair.second)
+		{
+			if (NULL != err_str && NULL == *err_str)
+			{
+				size_t	size = 0, offset = 0;
+				zbx_strcpy_alloc(err_str, &size, &offset, "failed to extract variable from response data");
+			}
+			goto out;
+		}
 	}
 	else
 		pair.second = value_str;
@@ -213,7 +243,7 @@ void	http_substitute_variables(zbx_httptest_t *httptest, char **data)
  * Author: Andris Zeila                                                       *
  *                                                                            *
  ******************************************************************************/
-int	http_process_variables(zbx_httptest_t *httptest, const char *variables, const char *data)
+int	http_process_variables(zbx_httptest_t *httptest, const char *variables, const char *data, char **err_str)
 {
 	const char	*__function_name = "http_process_variables";
 	const char	*pkey = variables, *pvalue;
@@ -255,7 +285,7 @@ int	http_process_variables(zbx_httptest_t *httptest, const char *variables, cons
 			else
 				nvalue = 0;
 
-			if (FAIL == httpmacro_append_pair(httptest, pkey, nkey, pvalue, nvalue, data))
+			if (FAIL == httpmacro_append_pair(httptest, pkey, nkey, pvalue, nvalue, data, err_str))
 				goto out;
 		}
 

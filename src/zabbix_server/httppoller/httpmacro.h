@@ -29,7 +29,7 @@ typedef struct
 zbx_httptest_t;
 
 void	http_substitute_variables(zbx_httptest_t *httptest, char **data);
-int	http_process_variables(zbx_httptest_t *httptest, const char *variables, const char *data);
+int	http_process_variables(zbx_httptest_t *httptest, const char *variables, const char *data, char **err_str);
 
 
 #endif
