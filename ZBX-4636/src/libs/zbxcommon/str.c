@@ -2805,7 +2805,7 @@ char	*convert_to_utf8(char *in, size_t in_size, const char *encoding)
 	int		utf8_size;
 	unsigned int	codepage;
 
-	if (FAIL == get_codepage(encoding, &codepage))
+	if (*encoding == '\0' || FAIL == get_codepage(encoding, &codepage))
 	{
 		utf8_size = (int)in_size + 1;
 		utf8_string = zbx_malloc(utf8_string, utf8_size);
