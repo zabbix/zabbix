@@ -229,7 +229,7 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 		$this->zbxTestTextPresent('Enable housekeeping');
 		$this->assertVisible('hk_trends_mode');
 		$this->assertAttribute("//input[@id='hk_trends_mode']/@checked", 'checked');
-		$this->zbxTestTextPresent('Override item trends period');
+		$this->zbxTestTextPresent('Override item trend period');
 		$this->assertVisible('hk_history_global');
 		$this->assertElementNotPresent("//input[@id='hk_trends_global']/@checked");
 		if (isset($data['hk_trends_mode'])) {
