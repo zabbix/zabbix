@@ -1781,20 +1781,20 @@ static void	DBdelete_applications(zbx_uint64_t *applicationids, int applicationi
 	}
 	DBfree_result(result);
 
-	sql_offset = 0;
-	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
-
 	if (0 != applicationids_num)
 	{
+		sql_offset = 0;
+		DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from applications where");
 		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset,
 				"applicationid", applicationids, applicationids_num);
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
+
+		DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+		DBexecute("%s", sql);
 	}
-
-	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-	DBexecute("%s", sql);
 
 	zbx_free(sql);
 }
