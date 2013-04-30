@@ -62,6 +62,7 @@ typedef struct
 #define ZBX_FLAG_LLD_ITEM_UPDATE_PRIVATEKEY		__UINT64_C(0x0000000100000000)
 #define ZBX_FLAG_LLD_ITEM_UPDATE_DESCRIPTION		__UINT64_C(0x0000000200000000)
 #define ZBX_FLAG_LLD_ITEM_UPDATE_INTERFACEID		__UINT64_C(0x0000000400000000)
+#define ZBX_FLAG_LLD_ITEM_UPDATE_SNMPV3_CONTEXTNAME	__UINT64_C(0x0000000200000000)
 #define ZBX_FLAG_LLD_ITEM_UPDATE										\
 		(ZBX_FLAG_LLD_ITEM_UPDATE_NAME | ZBX_FLAG_LLD_ITEM_UPDATE_KEY | ZBX_FLAG_LLD_ITEM_UPDATE_TYPE |	\
 		ZBX_FLAG_LLD_ITEM_UPDATE_VALUE_TYPE | ZBX_FLAG_LLD_ITEM_UPDATE_DATA_TYPE |			\
@@ -79,7 +80,7 @@ typedef struct
 		ZBX_FLAG_LLD_ITEM_UPDATE_AUTHTYPE | ZBX_FLAG_LLD_ITEM_UPDATE_USERNAME |				\
 		ZBX_FLAG_LLD_ITEM_UPDATE_PASSWORD | ZBX_FLAG_LLD_ITEM_UPDATE_PUBLICKEY |			\
 		ZBX_FLAG_LLD_ITEM_UPDATE_PRIVATEKEY | ZBX_FLAG_LLD_ITEM_UPDATE_DESCRIPTION |			\
-		ZBX_FLAG_LLD_ITEM_UPDATE_INTERFACEID)
+		ZBX_FLAG_LLD_ITEM_UPDATE_INTERFACEID | ZBX_FLAG_LLD_ITEM_UPDATE_SNMPV3_CONTEXTNAME)
 	zbx_uint64_t		flags;
 	char			*key_proto;
 	char			*name;
@@ -140,7 +141,7 @@ static void	DBlld_items_get(zbx_uint64_t parent_itemid, zbx_vector_ptr_t *items,
 		const char *snmpv3_securityname, unsigned char snmpv3_securitylevel, unsigned char snmpv3_authprotocol,
 		const char *snmpv3_authpassphrase, unsigned char snmpv3_privprotocol, const char *snmpv3_privpassphrase,
 		unsigned char authtype, const char *username, const char *password, const char *publickey,
-		const char *privatekey, const char *description, zbx_uint64_t interfaceid)
+		const char *privatekey, const char *description, zbx_uint64_t interfaceid, const char *snmpv3_contextname)
 {
 	const char	*__function_name = "DBlld_items_get";
 
@@ -158,7 +159,7 @@ static void	DBlld_items_get(zbx_uint64_t parent_itemid, zbx_vector_ptr_t *items,
 				"i.snmp_community,i.snmp_oid,i.port,i.snmpv3_securityname,i.snmpv3_securitylevel,"
 				"i.snmpv3_authprotocol,i.snmpv3_authpassphrase,i.snmpv3_privprotocol,"
 				"i.snmpv3_privpassphrase,i.authtype,i.username,i.password,i.publickey,i.privatekey,"
-				"i.description,i.interfaceid"
+				"i.description,i.interfaceid,i.snmpv3_contextname"
 			" from item_discovery id"
 				" join items i"
 					" on id.itemid=i.itemid"
@@ -276,6 +277,9 @@ static void	DBlld_items_get(zbx_uint64_t parent_itemid, zbx_vector_ptr_t *items,
 		ZBX_DBROW2UINT64(db_interfaceid, row[37]);
 		if (db_interfaceid != interfaceid)
 			item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_INTERFACEID;
+
+		if (0 != strcmp(row[38], snmpv3_contextname))
+			item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_SNMPV3_CONTEXTNAME;
 
 		zbx_vector_uint64_create(&item->new_applicationids);
 
@@ -784,7 +788,7 @@ static void	DBlld_items_save(zbx_uint64_t hostid, zbx_uint64_t parent_itemid, zb
 		unsigned char snmpv3_authprotocol, const char *snmpv3_authpassphrase, unsigned char snmpv3_privprotocol,
 		const char *snmpv3_privpassphrase, unsigned char authtype, const char *username, const char *password,
 		const char *publickey, const char *privatekey, zbx_uint64_t interfaceid,
-		zbx_vector_uint64_t *del_itemappids)
+		zbx_vector_uint64_t *del_itemappids, const char *snmpv3_contextname)
 {
 	const char	*__function_name = "DBlld_items_save";
 
@@ -797,6 +801,7 @@ static void	DBlld_items_save(zbx_uint64_t hostid, zbx_uint64_t parent_itemid, zb
 			*snmp_community_esc = NULL, *port_esc = NULL, *snmpv3_securityname_esc = NULL,
 			*snmpv3_authpassphrase_esc = NULL, *snmpv3_privpassphrase_esc = NULL, *username_esc = NULL,
 			*password_esc = NULL, *publickey_esc = NULL, *privatekey_esc = NULL,
+			*snmpv3_contextname_esc = NULL,
 			*name_esc, *key_esc, *params_esc, *snmp_oid_esc, *description_esc;
 	size_t		sql1_alloc = 8 * ZBX_KIBIBYTE, sql1_offset = 0,
 			sql2_alloc = 2 * ZBX_KIBIBYTE, sql2_offset = 0,
@@ -808,7 +813,8 @@ static void	DBlld_items_save(zbx_uint64_t hostid, zbx_uint64_t parent_itemid, zb
 				"trapper_hosts,units,multiplier,delta,formula,logtimefmt,valuemapid,params,ipmi_sensor,"
 				"snmp_community,snmp_oid,port,snmpv3_securityname,snmpv3_securitylevel,"
 				"snmpv3_authprotocol,snmpv3_authpassphrase,snmpv3_privprotocol,snmpv3_privpassphrase,"
-				"authtype,username,password,publickey,privatekey,description,interfaceid,flags)"
+				"authtype,username,password,publickey,privatekey,description,interfaceid,flags,"
+				"snmpv3_contextname)"
 			" values ";
 	const char	*ins_item_discovery_sql =
 			"insert into item_discovery (itemdiscoveryid,itemid,parent_itemid,key_) values ";
@@ -907,6 +913,8 @@ static void	DBlld_items_save(zbx_uint64_t hostid, zbx_uint64_t parent_itemid, zb
 		publickey_esc = DBdyn_escape_string(publickey);
 	if (0 != (flags & ZBX_FLAG_LLD_ITEM_UPDATE_PRIVATEKEY))
 		privatekey_esc = DBdyn_escape_string(privatekey);
+	if (0 != (flags & ZBX_FLAG_LLD_ITEM_UPDATE_SNMPV3_CONTEXTNAME))
+		snmpv3_contextname_esc = DBdyn_escape_string(snmpv3_contextname);
 
 	for (i = 0; i < items->values_num; i++)
 	{
@@ -930,7 +938,7 @@ static void	DBlld_items_save(zbx_uint64_t hostid, zbx_uint64_t parent_itemid, zb
 			zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset,
 					"(" ZBX_FS_UI64 ",'%s','%s'," ZBX_FS_UI64 ",%d,%d,%d,%d,'%s',%d,%d,%d,'%s',"
 						"'%s',%d,%d,'%s','%s',%s,'%s','%s','%s','%s','%s','%s',%d,%d,'%s',%d,"
-						"'%s',%d,'%s','%s','%s','%s','%s',%s,%d)" ZBX_ROW_DL,
+						"'%s',%d,'%s','%s','%s','%s','%s',%s,%d,'%s')" ZBX_ROW_DL,
 					item->itemid, name_esc, key_esc, hostid, (int)type, (int)value_type,
 					(int)data_type, delay, delay_flex_esc, history, trends, (int)status,
 					trapper_hosts_esc, units_esc, (int)multiplier, (int)delta, formula_esc,
@@ -939,7 +947,7 @@ static void	DBlld_items_save(zbx_uint64_t hostid, zbx_uint64_t parent_itemid, zb
 					(int)snmpv3_securitylevel, (int)snmpv3_authprotocol, snmpv3_authpassphrase_esc,
 					(int)snmpv3_privprotocol, snmpv3_privpassphrase_esc, (int)authtype,
 					username_esc, password_esc, publickey_esc, privatekey_esc, description_esc,
-					DBsql_id_ins(interfaceid), ZBX_FLAG_DISCOVERY_CREATED);
+					DBsql_id_ins(interfaceid), ZBX_FLAG_DISCOVERY_CREATED, snmpv3_contextname_esc);
 
 			zbx_free(description_esc);
 			zbx_free(snmp_oid_esc);
@@ -1170,6 +1178,12 @@ static void	DBlld_items_save(zbx_uint64_t hostid, zbx_uint64_t parent_itemid, zb
 				{
 					zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset, "%sinterfaceid=%s",
 							d, DBsql_id_ins(interfaceid));
+					d = ",";
+				}
+				if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_SNMPV3_CONTEXTNAME))
+				{
+					zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset,
+							"%ssnmpv3_contextname='%s'", d, snmpv3_contextname_esc);
 				}
 
 				zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset, " where itemid=" ZBX_FS_UI64 ";\n",
@@ -1197,6 +1211,7 @@ static void	DBlld_items_save(zbx_uint64_t hostid, zbx_uint64_t parent_itemid, zb
 		}
 	}
 
+	zbx_free(snmpv3_contextname_esc);
 	zbx_free(privatekey_esc);
 	zbx_free(publickey_esc);
 	zbx_free(password_esc);
@@ -1397,7 +1412,8 @@ void	DBlld_update_items(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, struct zbx
 				"i.logtimefmt,i.valuemapid,i.params,i.ipmi_sensor,i.snmp_community,i.snmp_oid,"
 				"i.port,i.snmpv3_securityname,i.snmpv3_securitylevel,i.snmpv3_authprotocol,"
 				"i.snmpv3_authpassphrase,i.snmpv3_privprotocol,i.snmpv3_privpassphrase,i.authtype,"
-				"i.username,i.password,i.publickey,i.privatekey,i.description,i.interfaceid"
+				"i.username,i.password,i.publickey,i.privatekey,i.description,i.interfaceid,"
+				"i.snmpv3_contextname"
 			" from items i,item_discovery id"
 			" where i.itemid=id.itemid"
 				" and id.parent_itemid=" ZBX_FS_UI64,
@@ -1409,7 +1425,7 @@ void	DBlld_update_items(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, struct zbx
 		const char	*name_proto, *key_proto, *params_proto, *snmp_oid_proto, *delay_flex, *trapper_hosts,
 				*units, *formula, *logtimefmt, *ipmi_sensor, *snmp_community, *port,
 				*snmpv3_securityname, *snmpv3_authpassphrase, *snmpv3_privpassphrase, *username,
-				*password, *publickey, *privatekey, *description_proto;
+				*password, *publickey, *privatekey, *description_proto, *snmpv3_contextname;
 		unsigned char	type, value_type, data_type, status, multiplier, delta, snmpv3_securitylevel,
 				snmpv3_authprotocol, snmpv3_privprotocol, authtype;
 		int		delay, history, trends;
@@ -1450,12 +1466,13 @@ void	DBlld_update_items(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, struct zbx
 		privatekey = row[33];
 		description_proto = row[34];
 		ZBX_DBROW2UINT64(interfaceid, row[35]);
+		snmpv3_contextname = row[36];
 
 		DBlld_items_get(parent_itemid, &items, type, value_type, data_type, delay, delay_flex, history, trends,
 				trapper_hosts, units, multiplier, delta, formula, logtimefmt, valuemapid, ipmi_sensor,
 				snmp_community, port, snmpv3_securityname, snmpv3_securitylevel, snmpv3_authprotocol,
 				snmpv3_authpassphrase, snmpv3_privprotocol, snmpv3_privpassphrase, authtype, username,
-				password, publickey, privatekey, description_proto, interfaceid);
+				password, publickey, privatekey, description_proto, interfaceid, snmpv3_contextname);
 
 		p = NULL;
 		/* {"data":[{"{#IFNAME}":"eth0"},{"{#IFNAME}":"lo"},...]} */
@@ -1485,7 +1502,7 @@ void	DBlld_update_items(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, struct zbx
 				logtimefmt, valuemapid, ipmi_sensor, snmp_community, port, snmpv3_securityname,
 				snmpv3_securitylevel, snmpv3_authprotocol, snmpv3_authpassphrase, snmpv3_privprotocol,
 				snmpv3_privpassphrase, authtype, username, password, publickey, privatekey, interfaceid,
-				&del_itemappids);
+				&del_itemappids, snmpv3_contextname);
 
 		DBlld_remove_lost_resources(&items, lifetime, lastcheck);
 

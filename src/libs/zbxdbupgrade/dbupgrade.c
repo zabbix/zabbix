@@ -1120,6 +1120,21 @@ static int	DBpatch_02010070()
 {
 	return DBdrop_field("config", "alert_history");
 }
+
+static int	DBpatch_02010071()
+{
+	const ZBX_FIELD	field = {"snmpv3_contextname", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("items", &field);
+}
+
+static int	DBpatch_02010072()
+{
+	const ZBX_FIELD	field = {"snmpv3_contextname", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("dchecks", &field);
+}
+
 #endif	/* not HAVE_SQLITE3 */
 
 static void	DBget_version(int *mandatory, int *optional)
@@ -1228,11 +1243,13 @@ int	DBcheck_version()
 		{DBpatch_02010068, 2010068, 0, 1},
 		{DBpatch_02010069, 2010069, 0, 0},
 		{DBpatch_02010070, 2010070, 0, 0},
+		{DBpatch_02010071, 2010071, 0, 1},
+		{DBpatch_02010072, 2010072, 0, 1},
 		/* IMPORTANT! When adding a new mandatory DBPatch don't forget to update it for SQLite, too. */
 		{NULL}
 	};
 #else
-	required = 2010068;	/* <---- Update mandatory DBpatch for SQLite here. */
+	required = 2010072;	/* <---- Update mandatory DBpatch for SQLite here. */
 #endif
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
