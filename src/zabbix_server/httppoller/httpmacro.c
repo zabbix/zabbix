@@ -85,7 +85,8 @@ static int	httpmacro_append_pair(zbx_httptest_t *httptest, const char *pkey, siz
 	zbx_ptr_pair_t	pair = {NULL, NULL};
 	int		index, ret = FAIL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() pkey:'%s' nkey:%zu pvalue:'%s' nvalue:%zu",
+			__function_name, pkey, nkey, pvalue, nvalue);
 
 	if (0 == nkey || 0 == nvalue)
 	{
@@ -121,8 +122,9 @@ static int	httpmacro_append_pair(zbx_httptest_t *httptest, const char *pkey, siz
 
 		if (NULL == data)
 		{
-			/* Ignore regex variables when no input data is specified. Currently only */
-			/* scenario level variables don't have input data.                        */
+			/* Ignore regex variables when no input data is specified. For example,   */
+			/* scenario level regex variables don't have input data before the first  */
+			/* web scenario step is processed.                                        */
 			ret = SUCCEED;
 			goto out;
 		}
@@ -157,8 +159,8 @@ static int	httpmacro_append_pair(zbx_httptest_t *httptest, const char *pkey, siz
 
 	ret = SUCCEED;
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() ret:%d, macro:%s=%s, text:%s",
-			__function_name, ret, (char*)pair.first, (char*)pair.second, pkey);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() ret:%d, macro:%s=%s",
+			__function_name, ret, (char*)pair.first, (char*)pair.second);
 
 	return ret;
 }
