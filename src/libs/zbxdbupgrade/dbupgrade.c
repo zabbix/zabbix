@@ -1144,8 +1144,6 @@ static int	DBpatch_02010073()
 
 	return FAIL;
 }
-
-
 #endif	/* not HAVE_SQLITE3 */
 
 static void	DBget_version(int *mandatory, int *optional)
