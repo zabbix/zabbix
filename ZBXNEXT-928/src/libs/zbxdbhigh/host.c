@@ -2033,14 +2033,16 @@ static void	DBdelete_template_applications(zbx_uint64_t hostid, zbx_vector_uint6
 	size_t		sql_alloc = 0, sql_offset = 0;
 	DB_RESULT	result;
 	DB_ROW		row;
-	zbx_uint64_t	*applicationids = NULL, applicationid;
+	zbx_uint64_t	*applicationids = NULL, *apptemplateids = NULL, id;
 	int		applicationids_alloc = 0, applicationids_num = 0;
+	int		apptemplateids_alloc = 0, apptemplateids_num = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-			"delete t from application_template t,applications a,applications ta"
+			"select t.application_templateid,t.applicationid"
+			" from application_template t,applications a,applications ta"
 			" where t.applicationid = a.applicationid"
 				" and a.hostid =" ZBX_FS_UI64
 				" and t.templateid = ta.applicationid"
@@ -2049,30 +2051,32 @@ static void	DBdelete_template_applications(zbx_uint64_t hostid, zbx_vector_uint6
 
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "ta.hostid", templateids->values, templateids->values_num);
 
-	DBexecute("%s", sql);
-
-	sql_offset = 0;
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-			"select distinct a.applicationid"
-			" from applications a"
-			" where a.hostid =" ZBX_FS_UI64
-				" and not exists (select * from application_template t"
-					" where a.applicationid = t.applicationid)",
-			hostid);
-
 	result = DBselect("%s", sql);
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		ZBX_STR2UINT64(applicationid, row[0]);
-		uint64_array_add(&applicationids, &applicationids_alloc, &applicationids_num,
-				applicationid, 64);
+		ZBX_STR2UINT64(id, row[0]);
+		uint64_array_add(&apptemplateids, &apptemplateids_alloc, &apptemplateids_num, id, 64);
+
+		ZBX_STR2UINT64(id, row[1]);
+		if (SUCCEED != uint64_array_exists(applicationids, applicationids_num, id))
+			uint64_array_add(&applicationids, &applicationids_alloc, &applicationids_num, id, 64);
 	}
 	DBfree_result(result);
+
+	sql_offset = 0;
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+			"delete from application_template"
+			" where ");
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "application_templateid",
+			apptemplateids, apptemplateids_num);
+
+	DBexecute("%s", sql);
 
 	DBdelete_applications(applicationids, applicationids_num);
 
 	zbx_free(applicationids);
+	zbx_free(apptemplateids);
 	zbx_free(sql);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
