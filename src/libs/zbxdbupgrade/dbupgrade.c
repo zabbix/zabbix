@@ -1135,6 +1135,17 @@ static int	DBpatch_02010072()
 	return DBadd_field("dchecks", &field);
 }
 
+static int	DBpatch_02010073()
+{
+	const char	*sql = "delete from ids where table_name='events'";
+
+	if (ZBX_DB_OK <= DBexecute("%s", sql))
+		return SUCCEED;
+
+	return FAIL;
+}
+
+
 #endif	/* not HAVE_SQLITE3 */
 
 static void	DBget_version(int *mandatory, int *optional)
@@ -1245,6 +1256,7 @@ int	DBcheck_version()
 		{DBpatch_02010070, 2010070, 0, 0},
 		{DBpatch_02010071, 2010071, 0, 1},
 		{DBpatch_02010072, 2010072, 0, 1},
+		{DBpatch_02010073, 2010073, 0, 0},
 		/* IMPORTANT! When adding a new mandatory DBPatch don't forget to update it for SQLite, too. */
 		{NULL}
 	};
