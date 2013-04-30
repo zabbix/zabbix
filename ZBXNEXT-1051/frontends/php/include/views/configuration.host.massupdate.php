@@ -32,28 +32,56 @@ foreach ($this->data['hosts'] as $hostid) {
 // create form list
 $hostFormList = new CFormList('hostFormList');
 
-// append groups to form list
-$groupTweenBox = new CTweenBox($hostForm, 'groups', $this->data['groups'], 6);
-foreach ($this->data['all_groups'] as $group) {
-	$groupTweenBox->addItem($group['groupid'], $group['name']);
-}
+// replace host groups
+$replaceGroups = new CMultiSelect(array(
+		'name' => 'groups[]',
+		'objectName' => 'hostGroup',
+		'data' => isset($this->data['visible']['groups'])
+	));
+
 $hostFormList->addRow(
 	array(
 		_('Replace host groups'),
 		SPACE,
-		new CVisibilityBox('visible[groups]', isset($this->data['visible']['groups']), $groupTweenBox->getName(), _('Original'))
+		new CVisibilityBox('visible[groups]', isset($this->data['visible']['groups']), 'groups_', _('Original'))
 	),
-	$groupTweenBox->get(_('In groups'), _('Other groups'))
+	$replaceGroups
 );
-$hostFormList->addRow(
-	array(
-		_('New host group'),
-		SPACE,
-		new CVisibilityBox('visible[newgroup]', isset($this->data['visible']['newgroup']), 'newgroup', _('Original'))
-	),
-	new CTextBox('newgroup', $this->data['newgroup'], ZBX_TEXTBOX_STANDARD_SIZE, 'no', 64),
-	null, null, 'new'
-);
+
+// add new or existing host groups
+if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
+	$newGroups = new CMultiSelect(array(
+			'name' => 'new_groups[]',
+			'objectName' => 'hostGroup',
+			'data' => isset($this->data['visible']['new_groups']),
+			'addNew' => true
+		));
+
+	$hostFormList->addRow(
+		array(
+			_('Add new or existing host groups'),
+			SPACE,
+			new CVisibilityBox('visible[new_groups]', isset($this->data['visible']['new_groups']), 'new_groups_', _('Original'))
+		),
+		$newGroups
+	);
+}
+else {
+	$newGroups = new CMultiSelect(array(
+			'name' => 'new_groups[]',
+			'objectName' => 'hostGroup',
+			'data' => isset($this->data['visible']['new_groups'])
+		));
+
+	$hostFormList->addRow(
+		array(
+			_('New host group'),
+			SPACE,
+			new CVisibilityBox('visible[new_groups]', isset($this->data['visible']['new_groups']), 'new_groups_', _('Original'))
+		),
+		$newGroups
+	);
+}
 
 // append proxy to form list
 $proxyComboBox = new CComboBox('proxy_hostid', $this->data['proxy_hostid']);
