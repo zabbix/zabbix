@@ -1187,12 +1187,15 @@ error:
 
 	err = OCIHandleAlloc((dvoid *)oracle.envhp, (dvoid **)&result->stmthp, OCI_HTYPE_STMT, (size_t)0, (dvoid **)0);
 
-	/* Do some prefetching, otherwise Oracle fetches only 1 row at a time by default. Based on the study optimal  */
-	/* (speed-wise) memory based prefetch is 2 MB. But in case of many subsequent selects CPU usage jumps up to   */
-	/* 100 %. Using rows prefetch option with up to 200 rows does not affect CPU usage, it is the same as without */
-	/* prefetching at all. This is why we use a 200 rows prefetch option. See ZBX-5920, ZBX-6493 for details.     */
-	/*                                                                                                            */
-	/* Oracle info: info: docs.oracle.com/cd/B28359_01/appdev.111/b28395/oci04sql.htm                             */
+	/* Prefetching when working with Oracle is needed because otherwise it fetches only 1 row at a time when doing */
+	/* selects (default behavior). There are 2 ways to do prefetching: memory based and rows based. Based on the   */
+	/* study optimal (speed-wise) memory based prefetch is 2 MB. But in case of many subsequent selects CPU usage  */
+	/* jumps up to 100 %. Using rows prefetch with up to 200 rows does not affect CPU usage, it is the same as     */
+	/* without prefetching at all. See ZBX-5920, ZBX-6493 for details.                                             */
+	/*                                                                                                             */
+	/* Tested on Oracle 11gR2.                                                                                     */
+	/*                                                                                                             */
+	/* Oracle info: info: docs.oracle.com/cd/B28359_01/appdev.111/b28395/oci04sql.htm                              */
 
 	if (OCI_SUCCESS == err)
 	{
