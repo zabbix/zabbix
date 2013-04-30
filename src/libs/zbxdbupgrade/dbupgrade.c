@@ -1249,7 +1249,7 @@ static int	DBpatch_02010083()
 
 static int	DBpatch_02010084()
 {
-	const ZBX_FIELD	field = {"templateid", NULL, "groups", "groupid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+	const ZBX_FIELD	field = {"templateid", NULL, "group_prototype", "group_prototypeid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("group_prototype", 3, &field);
 }
