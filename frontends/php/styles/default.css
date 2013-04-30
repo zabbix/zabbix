@@ -286,7 +286,7 @@ div.footer .formrow .main:hover, div.ui-dialog-buttonpane div.ui-dialog-buttonse
 	visibility: hidden;
 }
 
-.host-edit #groups, .hostprototype-edit #groups { width: 280px; }
+.host-edit #groups, .hostprototype-edit #groups { width: 280px; height: auto; }
 .host-edit #templateTab .formlist .formrow, .hostprototype-edit #templateTab .formlist .formrow { overflow: auto; }
 
 .hostprototype-edit #grouplist .group-prototypes { width: 310px; padding-top: 8px; }
