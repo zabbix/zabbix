@@ -62,7 +62,7 @@ typedef struct
 #define ZBX_FLAG_LLD_ITEM_UPDATE_PRIVATEKEY		__UINT64_C(0x0000000100000000)
 #define ZBX_FLAG_LLD_ITEM_UPDATE_DESCRIPTION		__UINT64_C(0x0000000200000000)
 #define ZBX_FLAG_LLD_ITEM_UPDATE_INTERFACEID		__UINT64_C(0x0000000400000000)
-#define ZBX_FLAG_LLD_ITEM_UPDATE_SNMPV3_CONTEXTNAME	__UINT64_C(0x0000000200000000)
+#define ZBX_FLAG_LLD_ITEM_UPDATE_SNMPV3_CONTEXTNAME	__UINT64_C(0x0000000800000000)
 #define ZBX_FLAG_LLD_ITEM_UPDATE										\
 		(ZBX_FLAG_LLD_ITEM_UPDATE_NAME | ZBX_FLAG_LLD_ITEM_UPDATE_KEY | ZBX_FLAG_LLD_ITEM_UPDATE_TYPE |	\
 		ZBX_FLAG_LLD_ITEM_UPDATE_VALUE_TYPE | ZBX_FLAG_LLD_ITEM_UPDATE_DATA_TYPE |			\
@@ -141,7 +141,8 @@ static void	DBlld_items_get(zbx_uint64_t parent_itemid, zbx_vector_ptr_t *items,
 		const char *snmpv3_securityname, unsigned char snmpv3_securitylevel, unsigned char snmpv3_authprotocol,
 		const char *snmpv3_authpassphrase, unsigned char snmpv3_privprotocol, const char *snmpv3_privpassphrase,
 		unsigned char authtype, const char *username, const char *password, const char *publickey,
-		const char *privatekey, const char *description, zbx_uint64_t interfaceid, const char *snmpv3_contextname)
+		const char *privatekey, const char *description, zbx_uint64_t interfaceid,
+		const char *snmpv3_contextname)
 {
 	const char	*__function_name = "DBlld_items_get";
 
@@ -1134,7 +1135,6 @@ static void	DBlld_items_save(zbx_uint64_t hostid, zbx_uint64_t parent_itemid, zb
 							"%ssnmpv3_privpassphrase='%s'", d, snmpv3_privpassphrase_esc);
 					d = ",";
 				}
-
 				if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_AUTHTYPE))
 				{
 					zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset, "%sauthtype=%d",
