@@ -506,7 +506,8 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 			}
 
 			/* process variables defined in this step */
-			if (FAIL == http_process_variables(httptest, httpstep.variables, page.data))
+			if (FAIL == http_process_variables(httptest, httptest->httptest.variables, page.data, &err_str) ||
+				FAIL == http_process_variables(httptest, httpstep.variables, page.data, &err_str))
 			{
 				size_t	err_size = 0, err_offset = 0;
 
@@ -672,7 +673,7 @@ void	process_httptests(int httppoller_num, int now)
 		httptest.httptest.retries = atoi(row[11]);
 
 		/* add httptest varriables to the current test macro cache */
-		http_process_variables(&httptest, httptest.httptest.variables, NULL);
+		http_process_variables(&httptest, httptest.httptest.variables, NULL, NULL);
 
 		process_httptest(&host, &httptest);
 
