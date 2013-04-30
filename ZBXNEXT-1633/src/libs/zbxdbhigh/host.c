@@ -1199,7 +1199,7 @@ static void	DBdelete_sysmaps_elements(int elementtype, zbx_uint64_t *elementids,
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
-static void DBdelete_action_conditions(int conditiontype, zbx_uint64_t elementid)
+static void	DBdelete_action_conditions(int conditiontype, zbx_uint64_t elementid)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -5218,15 +5218,48 @@ void	DBdelete_groups(zbx_vector_uint64_t *groupids)
 
 	char		*sql = NULL;
 	size_t		sql_alloc = 256, sql_offset = 0;
+	int		i;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() values_num:%d", __function_name, groupids->values_num);
 
 	if (0 == groupids->values_num)
 		goto out;
 
+	for (i = 0; i < groupids->values_num; i++)
+		DBdelete_action_conditions(CONDITION_TYPE_HOST_GROUP, groupids->values[i]);
+
 	sql = zbx_malloc(sql, sql_alloc);
 
 	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	/* delete sysmaps_elements */
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+			"delete from sysmaps_elements"
+			" where elementtype=%d"
+				" and",
+			SYSMAP_ELEMENT_TYPE_HOST_GROUP);
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "elementid", groupids->values, groupids->values_num);
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
+
+	/* delete screens_items (host group is mandatory for this elements) */
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+			"delete from screens_items"
+			" where resourcetype in (%d,%d)"
+				" and",
+			SCREEN_RESOURCE_DATA_OVERVIEW, SCREEN_RESOURCE_TRIGGERS_OVERVIEW);
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "resourceid", groupids->values, groupids->values_num);
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
+
+	/* update screens_items (host group isn't mandatory for this elements) */
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+			"update screens_items"
+			" set resourceid=0"
+			" where resourcetype in (%d,%d,%d,%d)"
+				" and",
+			SCREEN_RESOURCE_HOSTS_INFO, SCREEN_RESOURCE_TRIGGERS_INFO,
+			SCREEN_RESOURCE_HOSTGROUP_TRIGGERS, SCREEN_RESOURCE_HOST_TRIGGERS);
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "resourceid", groupids->values, groupids->values_num);
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
 
 	/* profiles */
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
