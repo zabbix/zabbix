@@ -65,7 +65,7 @@ class testFormAction extends CWebTest {
 	/**
 	 * @dataProvider providerNewActions
 	 */
-/*	public function testFormAction_CreateSimple($action) {
+	public function testFormAction_CreateSimple($action) {
 
 		$this->zbxTestLogin('actionconf.php?form=1&eventsource=0');
 		$this->checkTitle('Configuration of actions');
@@ -138,7 +138,7 @@ class testFormAction extends CWebTest {
 		$this->zbxTestClickWait('save');
 		$this->zbxTestTextPresent('Action added');
 	}
-*/
+
 	public function testFormAction_Create() {
 
 		$this->zbxTestLogin('actionconf.php?form=1&eventsource=0');
