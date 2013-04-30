@@ -267,7 +267,8 @@ static void	DBlld_hosts_get(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts,
  * Parameters: hosts - [IN] list of hosts; should be sorted by hostid         *
  *                                                                            *
  ******************************************************************************/
-void	DBlld_hosts_validate(zbx_vector_ptr_t *hosts, char **error)
+void	DBlld_hosts_validate(zbx_vector_ptr_t *hosts, const zbx_vector_uint64_t *groupids,
+		const zbx_vector_ptr_t *groups, char **error)
 {
 	const char		*__function_name = "DBlld_hosts_validate";
 
@@ -1247,6 +1248,11 @@ static void	DBlld_groups_save(zbx_vector_ptr_t *groups, zbx_vector_ptr_t *group_
 			upd_groups++;
 	}
 
+	if (0 == new_groups && 0 == upd_groups)
+		goto out;
+
+	DBbegin();
+
 	if (0 != new_groups)
 	{
 		groupid = DBget_maxid_num("groups", new_groups);
@@ -1370,6 +1376,8 @@ static void	DBlld_groups_save(zbx_vector_ptr_t *groups, zbx_vector_ptr_t *group_
 		zbx_free(sql3);
 	}
 
+	DBcommit();
+out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
@@ -1748,6 +1756,18 @@ static void	DBlld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts
 		}
 	}
 
+	new_interfaces = new_hosts * interfaces->values_num;
+
+	if (0 == new_hosts && 0 == new_host_inventories && 0 == upd_hosts && 0 == upd_hostmacros &&
+			0 == new_hostgroups && 0 == new_hostmacros && 0 == new_interfaces &&
+			0 == del_hostgroupids->values_num && 0 == del_hostmacroids->values_num &&
+			0 == upd_host_inventory_hostids.values_num && 0 == del_host_inventory_hostids.values_num)
+	{
+		goto out;
+	}
+
+	DBbegin();
+
 	if (0 != new_hosts)
 	{
 		hostid = DBget_maxid_num("hosts", new_hosts);
@@ -1799,7 +1819,7 @@ static void	DBlld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts
 #endif
 	}
 
-	if (0 != (new_interfaces = new_hosts * interfaces->values_num))
+	if (0 != new_interfaces)
 	{
 		interfaceid = DBget_maxid_num("interface", new_interfaces);
 
@@ -2095,6 +2115,8 @@ static void	DBlld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts
 		zbx_free(sql8);
 	}
 
+	DBcommit();
+out:
 	zbx_vector_uint64_destroy(&del_host_inventory_hostids);
 	zbx_vector_uint64_destroy(&upd_host_inventory_hostids);
 
@@ -2208,17 +2230,29 @@ static void	DBlld_hosts_remove(zbx_vector_ptr_t *hosts, unsigned short lifetime,
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
 	}
 
-	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
-
 	if (16 < sql_offset)	/* in ORACLE always present begin..end; */
+	{
+		DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+		DBbegin();
+
 		DBexecute("%s", sql);
+
+		DBcommit();
+	}
 
 	zbx_free(sql);
 
-	zbx_vector_uint64_sort(&del_hostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-
 	if (0 != del_hostids.values_num)
+	{
+		zbx_vector_uint64_sort(&del_hostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+		DBbegin();
+
 		DBdelete_hosts(&del_hostids);
+
+		DBcommit();
+	}
 
 	zbx_vector_uint64_destroy(&ts_hostids);
 	zbx_vector_uint64_destroy(&lc_hostids);
@@ -2301,17 +2335,28 @@ static void	DBlld_groups_remove(zbx_vector_ptr_t *groups, unsigned short lifetim
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
 	}
 
-	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
-
 	if (16 < sql_offset)	/* in ORACLE always present begin..end; */
+	{
+		DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+		DBbegin();
+
 		DBexecute("%s", sql);
+
+		DBcommit();
+	}
 
 	zbx_free(sql);
 
 	if (0 != del_groupids.values_num)
 	{
 		zbx_vector_uint64_sort(&del_groupids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+		DBbegin();
+
 		DBdelete_groups(&del_groupids);
+
+		DBcommit();
 	}
 
 	zbx_vector_uint64_destroy(&ts_groupids);
@@ -2471,7 +2516,7 @@ void	DBlld_update_hosts(zbx_uint64_t lld_ruleid, struct zbx_json_parse *jp_data,
 		zbx_vector_ptr_sort(&hosts, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 
 		DBlld_groups_validate(&groups, error);
-		DBlld_hosts_validate(&hosts, error);
+		DBlld_hosts_validate(&hosts, &groupids, &groups, error);
 
 		DBlld_hostgroups_make(&groupids, &hosts, &groups, &del_hostgroupids);
 		DBlld_templates_make(parent_hostid, &hosts);
