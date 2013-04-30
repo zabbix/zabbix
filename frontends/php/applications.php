@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2000-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -40,7 +40,7 @@ $fields = array(
 	'hostid' =>				array(T_ZBX_INT, O_OPT, null,	DB_ID,	null),
 	'groupid' =>			array(T_ZBX_INT, O_OPT, null,	DB_ID,	null),
 	'applicationid' =>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,	'isset({form})&&({form}=="update")'),
-	'appname' =>			array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY, 'isset({save})'),
+	'appname' =>			array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY, 'isset({save})'),
 	'apphostid' =>			array(T_ZBX_INT, O_OPT, null,	DB_ID.'{}>0', 'isset({save})'),
 	'apptemplateid' =>		array(T_ZBX_INT, O_OPT, null,	DB_ID,	null),
 	// actions
@@ -255,13 +255,12 @@ if (isset($_REQUEST['form'])) {
 	$applicationView->show();
 }
 else {
-	$options = array(
+	$data['pageFilter'] = new CPageFilter(array(
 		'groups' => array('editable' => true, 'with_hosts_and_templates' => true),
 		'hosts' => array('editable' => true, 'templated_hosts' => true),
 		'hostid' => get_request('hostid'),
 		'groupid' => get_request('groupid')
-	);
-	$data['pageFilter'] = new CPageFilter($options);
+	));
 	$data['groupid'] = $data['pageFilter']->groupid;
 	$data['hostid'] = $data['pageFilter']->hostid;
 
@@ -285,13 +284,12 @@ else {
 		$data['applications'] = API::Application()->get($options);
 
 		// get applications
-		$options = array(
+		$data['applications'] = API::Application()->get(array(
 			'applicationids' => zbx_objectValues($data['applications'], 'applicationid'),
 			'output' => API_OUTPUT_EXTEND,
 			'selectItems' => API_OUTPUT_REFER,
 			'expandData' => true
-		);
-		$data['applications'] = API::Application()->get($options);
+		));
 		order_result($data['applications'], $sortfield, $sortorder);
 
 		// fill applications with templated hosts

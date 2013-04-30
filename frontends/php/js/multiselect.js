@@ -21,17 +21,47 @@
 jQuery(function($) {
 
 	/**
+	 * Multi select helper.
+	 *
+	 * @param objectName options['objectName']	backend data source
+	 *
+	 * @see jQuery.multiSelect()
+	 */
+	$.fn.multiSelectHelper = function(options) {
+		// url
+		options.url = new Curl('jsrpc.php');
+		options.url.setArgument('type', 11); // PAGE_TYPE_TEXT_RETURN_JSON
+		options.url.setArgument('method', 'multiselect.get');
+		options.url.setArgument('objectName', options.objectName);
+		options.url = options.url.getUrl();
+
+		// labels
+		options.labels = {
+			'No matches found': t('No matches found'),
+			'More matches found...': t('More matches found...'),
+			'type here to search': t('type here to search')
+		};
+
+		return this.each(function() {
+			$(this).empty();
+			$(this).multiSelect(options);
+		});
+	};
+
+	/**
 	 * Create multi select input element.
 	 *
-	 * @param string options['url']
-	 * @param string options['name']
-	 * @param int    options['limit']
-	 * @param bool   options['disabled']
-	 * @param object options['labels']
-	 * @param object options['data']
+	 * @param string options['url']				backend url
+	 * @param string options['name']			input element name
+	 * @param object options['labels']			translated labels
+	 * @param object options['data']			preload data {id, name, prefix}
 	 * @param string options['data'][id]
 	 * @param string options['data'][name]
 	 * @param string options['data'][prefix]
+	 * @param string options['defaultValue']	default value for input element
+	 * @param bool   options['disabled']		turn on/off readonly state
+	 * @param int    options['selectedLimit']	how many items can be selected
+	 * @param int    options['limit']			how many available items can be received from backend
 	 *
 	 * @return object
 	 */
@@ -39,13 +69,16 @@ jQuery(function($) {
 		var defaults = {
 			url: '',
 			name: '',
-			limit: null,
-			data: {},
-			disabled: false,
 			labels: {
-				emptyResult: 'No matches found',
-				moreMatchesFound: 'More matches found...'
-			}
+				'No matches found': 'No matches found',
+				'More matches found...': 'More matches found...',
+				'type here to search': 'type here to search'
+			},
+			data: [],
+			defaultValue: null,
+			disabled: false,
+			selectedLimit: null,
+			limit: 20
 		};
 		options = $.extend({}, defaults, options);
 
@@ -62,6 +95,39 @@ jQuery(function($) {
 		};
 
 		return this.each(function() {
+			/**
+			 * Clean multi select object values.
+			 */
+			$.fn.multiSelect.clean = function() {
+				for (var id in values.selected) {
+					removeSelected(id, obj, values, options);
+				}
+
+				cleanAvailable(obj, values);
+			};
+
+			/**
+			 * Get multi select selected data.
+			 *
+			 * @return array
+			 */
+			$.fn.multiSelect.getData = function() {
+				var data = [];
+
+				for (var id in values.selected) {
+					data[data.length] = {
+						id: id,
+						name: $('input[value="' + id + '"]', obj).data('name'),
+						prefix: $('input[value="' + id + '"]', obj).data('prefix')
+					};
+				}
+
+				return data;
+			};
+
+			/**
+			 * MultiSelect object.
+			 */
 			var obj = $(this),
 				jqxhr = null,
 				values = {
@@ -78,6 +144,7 @@ jQuery(function($) {
 			// search input
 			if (!options.disabled) {
 				var input = $('<input>', {
+					'class': 'input',
 					type: 'text',
 					value: '',
 					css: {width: values.width}
@@ -85,6 +152,11 @@ jQuery(function($) {
 				.on('keyup change', function(e) {
 					if (e.which == KEY.ESCAPE) {
 						cleanSearchInput(obj);
+						return false;
+					}
+
+					if ($('.selected li', obj).length > 0 && $('.selected li', obj).length == options.selectedLimit) {
+						setReadonly(obj);
 						return false;
 					}
 
@@ -245,27 +317,37 @@ jQuery(function($) {
 					}
 				})
 				.focusin(function() {
-					$('.selected ul', obj).addClass('active');
+					if (options.selectedLimit > 0) {
+						if ($('.selected li', obj).length == 0) {
+							$('.selected ul', obj).addClass('active');
+						}
+					}
+					else {
+						$('.selected ul', obj).addClass('active');
+					}
 				})
 				.focusout(function() {
 					$('.selected ul', obj).removeClass('active');
 					cleanSearchInput(obj);
 				});
-				obj.append($('<div>', {style: 'position: relative;'}).append(input));
+				obj.append(input);
 			}
 
 			// selected
-			obj.append($('<div>', {
-				'class': 'selected',
+			var selectedDiv = $('<div>', {
+				'class': 'selected'
+			});
+			var selectedUl = $('<ul>', {
 				css: {width: values.width}
-			}).append($('<ul>')));
+			});
+			obj.append(selectedDiv.append(selectedUl));
 
 			// available
 			if (!options.disabled) {
 				var available = $('<div>', {
 					'class': 'available',
 					css: {
-						width: values.width - 2,
+						width: values.width + 1,
 						display: 'none'
 					}
 				})
@@ -278,7 +360,7 @@ jQuery(function($) {
 				});
 
 				// multi select
-				obj.append($('<div>', {style: 'position: relative;'}).append(available))
+				obj.append(available)
 				.focusout(function() {
 					setTimeout(function() {
 						if (!values.isAvailableOpenned && $('.available', obj).is(':visible')) {
@@ -289,15 +371,36 @@ jQuery(function($) {
 			}
 
 			// preload data
-			if (!empty(options.data)) {
-				loadSelected(options.data, obj, values, options);
+			if (empty(options.data)) {
+				setDefaultValue(obj, options);
+				setPlaceholder(obj, options);
 			}
 			else {
-				// resize
-				resizeSelected(obj, values);
+				loadSelected(options.data, obj, values, options);
 			}
+
+			// resize
+			resizeSelected(obj, values, options);
+			resizeAvailable(obj);
 		});
 	};
+
+	function setDefaultValue(obj, options) {
+		if (!empty(options.defaultValue)) {
+			obj.append($('<input>', {
+				type: 'hidden',
+				name: options.name,
+				value: options.defaultValue,
+				'data-default': 1
+			}));
+		}
+	}
+
+	function removeDefaultValue(obj, options) {
+		if (!empty(options.defaultValue)) {
+			$('input[data-default="1"]', obj).remove();
+		}
+	}
 
 	function loadSelected(data, obj, values, options) {
 		$.each(data, function(i, item) {
@@ -318,7 +421,7 @@ jQuery(function($) {
 		if (objectLength(values.available) == 0) {
 			var div = $('<div>', {
 				'class': 'label-empty-result',
-				text: options.labels.emptyResult
+				text: options.labels['No matches found']
 			})
 			.click(function() {
 				$('input[type="text"]', obj).focus();
@@ -331,7 +434,7 @@ jQuery(function($) {
 		if (values.isMoreMatchesFound) {
 			var div = $('<div>', {
 				'class': 'label-more-matches-found',
-				text: options.labels.moreMatchesFound
+				text: options.labels['More matches found...']
 			})
 			.click(function() {
 				$('input[type="text"]', obj).focus();
@@ -345,13 +448,17 @@ jQuery(function($) {
 
 	function addSelected(item, obj, values, options) {
 		if (typeof(values.selected[item.id]) == 'undefined') {
+			removeDefaultValue(obj, options);
+
 			values.selected[item.id] = item;
 
 			// add hidden input
 			obj.append($('<input>', {
 				type: 'hidden',
 				name: options.name,
-				value: item.id
+				value: item.id,
+				'data-name': item.name,
+				'data-prefix': item.prefix
 			}));
 
 			// add list item
@@ -364,7 +471,10 @@ jQuery(function($) {
 				text: empty(item.prefix) ? item.name : item.prefix + item.name
 			});
 
-			if (!options.disabled) {
+			if (options.disabled) {
+				$('.selected ul', obj).append(li.append(text));
+			}
+			else {
 				var arrow = $('<span>', {
 					'class': 'arrow',
 					'data-id': item.id
@@ -374,12 +484,17 @@ jQuery(function($) {
 				});
 
 				$('.selected ul', obj).append(li.append(text, arrow));
-
-				// resize
-				resizeSelected(obj, values);
 			}
-			else {
-				$('.selected ul', obj).append(li.append(text));
+
+			removePlaceholder(obj);
+
+			// resize
+			resizeSelected(obj, values, options);
+			resizeAvailable(obj);
+
+			// set readonly
+			if (options.selectedLimit > 0 && $('.selected li', obj).length == options.selectedLimit) {
+				setReadonly(obj);
 			}
 		}
 	}
@@ -392,12 +507,26 @@ jQuery(function($) {
 		delete values.selected[id];
 
 		// resize
-		resizeSelected(obj, values);
+		resizeSelected(obj, values, options);
+		resizeAvailable(obj);
+
+		// remove readonly
+		if ($('.selected li', obj).length == 0) {
+			setDefaultValue(obj, options);
+			setPlaceholder(obj, options);
+
+			if (options.selectedLimit > 0) {
+				$('input[type="text"]', obj).prop('disabled', false);
+			}
+		}
 
 		// clean
 		cleanAvailable(obj, values);
 		cleanLastSearch(obj);
-		$('input[type="text"]', obj).focus();
+
+		if (!$('input[type="text"]', obj).prop('disabled')) {
+			$('input[type="text"]', obj).focus();
+		}
 	}
 
 	function addAvailable(item, obj, values, options) {
@@ -446,7 +575,9 @@ jQuery(function($) {
 			cleanAvailable(obj, values);
 			cleanLastSearch(obj);
 
-			$('input[type="text"]', obj).focus();
+			if (!$('input[type="text"]', obj).prop('disabled')) {
+				$('input[type="text"]', obj).focus();
+			}
 		}
 	}
 
@@ -487,25 +618,31 @@ jQuery(function($) {
 		$('input[type="text"]', obj).val('');
 	}
 
-	function resizeSelected(obj, values) {
+	function resizeSelected(obj, values, options) {
 		// settings
-		var searchInputMinWidth = 50,
-			searchInputLeftPaddings = 4,
-			searchInputRightPaddings = 4,
-			searchInputTopPaddings = IE8 ? 4 : 0;
+		var settingTopPaddings = IE8 ? 1 : 0,
+			settingTopPaddingsInit = 3,
+			settingRightPaddings = 4,
+			settingLeftPaddings = 13,
+			settingMinimumWidth = 50,
+			settingNewLineTopPaddings = 6;
 
 		// calculate
-		var top, left, height;
+		var top = 0,
+			left = 0,
+			height = 0;
 
 		if ($('.selected li', obj).length > 0) {
-			var position = $('.selected li:last-child .arrow', obj).position();
-			top = position.top + searchInputTopPaddings;
-			left = position.left + 20;
+			var position = options.disabled
+				? $('.selected li:last-child', obj).position()
+				: $('.selected li:last-child .arrow', obj).position();
+
+			top = position.top + settingTopPaddings - 1;
+			left = position.left + settingLeftPaddings;
 			height = $('.selected li:last-child', obj).height();
 		}
 		else {
-			top = 3 + searchInputTopPaddings;
-			left = searchInputLeftPaddings;
+			top = settingTopPaddingsInit + settingTopPaddings;
 			height = 0;
 		}
 
@@ -513,15 +650,17 @@ jQuery(function($) {
 			top = top * 2;
 		}
 
-		if (left + searchInputMinWidth > values.width) {
+		if (left + settingMinimumWidth > values.width) {
 			var topPaddings = (height > 20) ? height / 2 : height;
+
+			topPaddings += settingNewLineTopPaddings;
 
 			if (SF) {
 				topPaddings = topPaddings * 2;
 			}
 
 			top += topPaddings;
-			left = searchInputLeftPaddings;
+			left = 0;
 
 			$('.selected ul', obj).css({
 				'padding-bottom': topPaddings
@@ -536,7 +675,15 @@ jQuery(function($) {
 		$('input[type="text"]', obj).css({
 			'padding-top': top,
 			'padding-left': left,
-			width: values.width - left - searchInputRightPaddings
+			width: values.width - left - settingRightPaddings
+		});
+	}
+
+	function resizeAvailable(obj) {
+		var selectedHeight = $('.selected', obj).height();
+
+		$('.available', obj).css({
+			top: (selectedHeight > 0) ? selectedHeight : 20
 		});
 	}
 
@@ -555,6 +702,20 @@ jQuery(function($) {
 				available.animate({scrollTop: offset}, 300);
 			}
 		}
+	}
+
+	function setReadonly(obj) {
+		cleanSearchInput(obj);
+		$('input[type="text"]', obj).prop('disabled', true);
+		$('.selected ul', obj).removeClass('active');
+	}
+
+	function setPlaceholder(obj, options) {
+		$('input[type="text"]', obj).prop('placeholder', options.labels['type here to search']);
+	}
+
+	function removePlaceholder(obj) {
+		$('input[type="text"]', obj).removeAttr('placeholder');
 	}
 
 	function getLimit(values, options) {

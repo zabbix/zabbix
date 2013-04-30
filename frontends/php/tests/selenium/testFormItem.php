@@ -41,6 +41,14 @@ class testFormItem extends CWebTest {
 	protected $hostid = 40001;
 
 	/**
+	 * The name of the item created in the test data set.
+	 *
+	 * @var string
+	 */
+	protected $item = 'testFormItem1';
+
+
+	/**
 	 * Backup the tables that will be modified during the tests.
 	 */
 	public function testFormItem_Setup() {
@@ -1268,7 +1276,7 @@ class testFormItem extends CWebTest {
 		$sqlItems = "SELECT * FROM items ORDER BY itemid";
 		$oldHashItems = DBhash($sqlItems);
 
-		$this->zbxTestLogin('templates.php');
+		$this->zbxTestLogin('hosts.php');
 		$this->zbxTestClickWait('link='.$this->host);
 		$this->zbxTestClickWait("//div[@class='w']//a[text()='Items']");
 		$this->zbxTestClickWait('link='.$name);
@@ -1279,7 +1287,6 @@ class testFormItem extends CWebTest {
 		$this->zbxTestTextPresent('ITEMS');
 
 		$this->assertEquals($oldHashItems, DBhash($sqlItems));
-
 	}
 
 	// Returns create data
@@ -2433,6 +2440,7 @@ class testFormItem extends CWebTest {
 						$this->assertEquals($data['formulaValue'], $formulaValue);
 					}
 					break;
+				}
 			}
 
 		if (isset($data['dbCheck'])) {
@@ -2519,6 +2527,64 @@ class testFormItem extends CWebTest {
 				}
 			}
 		}
+
+	public function testFormItem_HousekeeperUpdate() {
+		$this->zbxTestLogin('adm.gui.php');
+		$this->assertElementPresent('configDropDown');
+		$this->zbxTestDropdownSelectWait('configDropDown', 'Housekeeper');
+
+		$this->zbxTestCheckboxUnselect('hk_history_global');
+		$this->zbxTestCheckboxUnselect('hk_trends_global');
+
+		$this->zbxTestClickWait('save');
+
+		$this->zbxTestOpen('hosts.php');
+		$this->zbxTestClickWait('link='.$this->host);
+		$this->zbxTestClickWait("//div[@class='w']//a[text()='Items']");
+		$this->zbxTestClickWait('link='.$this->item);
+
+		$this->zbxTestTextNotPresent('Overridden by global housekeeper settings');
+		$this->zbxTestTextNotPresent('Overridden by global housekeeper settings');
+
+		$this->zbxTestOpen('adm.gui.php');
+		$this->assertElementPresent('configDropDown');
+		$this->zbxTestDropdownSelectWait('configDropDown', 'Housekeeper');
+
+		$this->zbxTestCheckboxSelect('hk_history_global');
+		$this->input_type('hk_history', 99);
+
+		$this->zbxTestCheckboxSelect('hk_trends_global');
+		$this->input_type('hk_trends', 455);
+
+		$this->zbxTestClickWait('save');
+
+		$this->zbxTestOpen('hosts.php');
+		$this->zbxTestClickWait('link='.$this->host);
+		$this->zbxTestClickWait("//div[@class='w']//a[text()='Items']");
+		$this->zbxTestClickWait('link='.$this->item);
+
+		$this->zbxTestTextPresent('Overridden by global housekeeper settings (99 days)');
+		$this->zbxTestTextPresent('Overridden by global housekeeper settings (455 days)');
+
+		$this->zbxTestOpen('adm.gui.php');
+		$this->assertElementPresent('configDropDown');
+		$this->zbxTestDropdownSelectWait('configDropDown', 'Housekeeper');
+
+		$this->input_type('hk_history', 90);
+		$this->zbxTestCheckboxUnselect('hk_history_global');
+
+		$this->input_type('hk_trends', 365);
+		$this->zbxTestCheckboxUnselect('hk_trends_global');
+
+		$this->zbxTestClickWait('save');
+
+		$this->zbxTestOpen('hosts.php');
+		$this->zbxTestClickWait('link='.$this->host);
+		$this->zbxTestClickWait("//div[@class='w']//a[text()='Items']");
+		$this->zbxTestClickWait('link='.$this->item);
+
+		$this->zbxTestTextNotPresent('Overridden by global housekeeper settings (99 days)');
+		$this->zbxTestTextNotPresent('Overridden by global housekeeper settings (455 days)');
 	}
 
 	/**
