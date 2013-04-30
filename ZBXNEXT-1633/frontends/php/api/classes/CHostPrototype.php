@@ -204,15 +204,15 @@ class CHostPrototype extends CHostBase {
 
 		$hostPrototypeDiscoveryRules = array();
 		$hostPrototypeInventory = array();
-		$hostPrototypeGroups = array();
 		foreach ($hostPrototypes as $key => $hostPrototype) {
 			$hostPrototypes[$key]['hostid'] = $hostPrototype['hostid'] = $hostPrototypeIds[$key];
 
-			// group prototypes
-			foreach ($hostPrototype['groupPrototypes'] as $groupPrototype) {
+			// save group prototypes
+			foreach ($hostPrototype['groupPrototypes'] as &$groupPrototype) {
 				$groupPrototype['hostid'] = $hostPrototype['hostid'];
-				$hostPrototypeGroups[] = $groupPrototype;
 			}
+			unset($groupPrototype);
+			$hostPrototypes[$key]['groupPrototypes'] = DB::save('group_prototype', $hostPrototype['groupPrototypes']);
 
 			// discovery rules
 			$hostPrototypeDiscoveryRules[] = array(
@@ -231,9 +231,6 @@ class CHostPrototype extends CHostBase {
 
 		// link host prototypes to discovery rules
 		DB::insert('host_discovery', $hostPrototypeDiscoveryRules, false);
-
-		// save group prototypes
-		DB::insert('group_prototype', $hostPrototypeGroups);
 
 		// save inventory
 		DB::insert('host_inventory', $hostPrototypeInventory, false);
@@ -378,20 +375,28 @@ class CHostPrototype extends CHostBase {
 		// update related objects
 		$inventoryCreate = array();
 		$inventoryDeleteIds = array();
-		$exGroupPrototypes = array();
-		$newGroupPrototypes = array();
-		foreach ($hostPrototypes as $hostPrototype) {
+		foreach ($hostPrototypes as $key => $hostPrototype) {
 			$exHostPrototype = $exHostPrototypes[$hostPrototype['hostid']];
 
 			// group prototypes
 			if (isset($hostPrototype['groupPrototypes'])) {
-				foreach ($exHostPrototype['groupPrototypes'] as $groupPrototype) {
-					$exGroupPrototypes[] = $groupPrototype;
-				}
-				foreach ($hostPrototype['groupPrototypes'] as $groupPrototype) {
+				foreach ($hostPrototype['groupPrototypes'] as &$groupPrototype) {
 					$groupPrototype['hostid'] = $hostPrototype['hostid'];
-					$newGroupPrototypes[] = $groupPrototype;
 				}
+				unset($groupPrototype);
+
+				// save group prototypes
+				$exGroupPrototypes = zbx_toHash($exHostPrototype['groupPrototypes'], 'group_prototypeid');
+				$modifiedGroupPrototypes = array();
+				foreach ($hostPrototype['groupPrototypes'] as $groupPrototype) {
+					if (isset($groupPrototype['group_prototypeid'])) {
+						unset($exGroupPrototypes[$groupPrototype['group_prototypeid']]);
+					}
+
+					$modifiedGroupPrototypes[] = $groupPrototype;
+				}
+				DB::delete('group_prototype', array('group_prototypeid' => array_keys($exGroupPrototypes)));
+				$hostPrototypes[$key]['groupPrototypes'] = DB::save('group_prototype', $modifiedGroupPrototypes);
 			}
 
 			// templates
@@ -427,9 +432,6 @@ class CHostPrototype extends CHostBase {
 			}
 		}
 
-		// save group prototypes
-		DB::replace('group_prototype', $exGroupPrototypes, $newGroupPrototypes);
-
 		// save inventory
 		DB::insert('host_inventory', $inventoryCreate, false);
 		DB::delete('host_inventory', array('hostid' => $inventoryDeleteIds));
@@ -463,7 +465,7 @@ class CHostPrototype extends CHostBase {
 		}
 
 		// prepare the child host prototypes
-		$newHostPrototypes = $this->prepareInheritedItems($hostPrototypes, $hostids);
+		$newHostPrototypes = $this->prepareInheritedObjects($hostPrototypes, $hostids);
 		if (!$newHostPrototypes) {
 			return true;
 		}
@@ -504,7 +506,7 @@ class CHostPrototype extends CHostBase {
 	 *
 	 * @return array 	an array of unsaved child host prototypes
 	 */
-	protected function prepareInheritedItems(array $hostPrototypes, array $hostIds = null) {
+	protected function prepareInheritedObjects(array $hostPrototypes, array $hostIds = null) {
 		// fetch the related discovery rules with their hosts
 		$discoveryRules = API::DiscoveryRule()->get(array(
 			'output' => array('itemid', 'hostid'),
@@ -533,12 +535,29 @@ class CHostPrototype extends CHostBase {
 		// fetch the child discovery rules
 		$childDiscoveryRules = API::DiscoveryRule()->get(array(
 			'output' => array('itemid', 'templateid', 'hostid'),
-			'selectHostPrototypes' => array('hostid', 'host', 'templateid'),
 			'preservekeys' => true,
 			'filter' => array(
 				'templateid' => array_keys($discoveryRules)
 			)
 		));
+
+		// fetch child host prototypes and group them by discovery rule
+		$childHostPrototypes = API::HostPrototype()->get(array(
+			'output' => array('hostid', 'host', 'templateid'),
+			'selectGroupPrototypes' => API_OUTPUT_EXTEND,
+			'selectDiscoveryRule' => array('itemid'),
+			'discoveryids' => zbx_objectValues($childDiscoveryRules, 'itemid'),
+		));
+		foreach ($childDiscoveryRules as &$childDiscoveryRule) {
+			$childDiscoveryRule['hostPrototypes'] = array();
+		}
+		unset($childDiscoveryRule);
+		foreach ($childHostPrototypes as $childHostPrototype) {
+			$discoveryRuleId = $childHostPrototype['discoveryRule']['itemid'];
+			unset($childHostPrototype['discoveryRule']);
+
+			$childDiscoveryRules[$discoveryRuleId]['hostPrototypes'][] = $childHostPrototype;
+		}
 
 		// match each discovery that the parent host prototypes belong to to the child discovery rule for each host
 		$discoveryRuleChildren = array();
@@ -604,10 +623,53 @@ class CHostPrototype extends CHostBase {
 				$newHostPrototype['ruleid'] = $discoveryRuleChildren[$parentHostPrototype['ruleid']][$hostId];
 				$newHostPrototype['templateid'] = $parentHostPrototype['hostid'];
 
+				// update an existing inherited host prototype
 				if ($exHostPrototype) {
+					// look for existing group prototypes to update
+					$exGroupPrototypesByTemplateId = zbx_toHash($exHostPrototype['groupPrototypes'], 'templateid');
+					$exGroupPrototypesByName = zbx_toHash($exHostPrototype['groupPrototypes'], 'name');
+					$exGroupPrototypesByGroupId = zbx_toHash($exHostPrototype['groupPrototypes'], 'groupid');
+
+					// look for a group prototype that can be updated
+					foreach ($newHostPrototype['groupPrototypes'] as &$groupPrototype) {
+						// updated an inherited item prototype by templateid
+						if (isset($exGroupPrototypesByTemplateId[$groupPrototype['group_prototypeid']])) {
+							$groupPrototype['group_prototypeid'] = $exGroupPrototypesByTemplateId[$groupPrototype['group_prototypeid']]['group_prototypeid'];
+						}
+						// updated an inherited item prototype by name
+						elseif (isset($groupPrototype['name']) && !zbx_empty($groupPrototype['name'])
+								&& isset($exGroupPrototypesByName[$groupPrototype['name']])) {
+
+							$groupPrototype['templateid'] = $groupPrototype['group_prototypeid'];
+							$groupPrototype['group_prototypeid'] = $exGroupPrototypesByName[$groupPrototype['name']]['group_prototypeid'];
+						}
+						// updated an inherited item prototype by group ID
+						elseif (isset($groupPrototype['groupid']) && $groupPrototype['groupid']
+								&& isset($exGroupPrototypesByGroupId[$groupPrototype['groupid']])) {
+
+							$groupPrototype['templateid'] = $groupPrototype['group_prototypeid'];
+							$groupPrototype['group_prototypeid'] = $exGroupPrototypesByGroupId[$groupPrototype['groupid']]['group_prototypeid'];
+						}
+						// create a new child group prototype
+						else {
+							$groupPrototype['templateid'] = $groupPrototype['group_prototypeid'];
+							unset($groupPrototype['group_prototypeid']);
+						}
+
+						unset($groupPrototype['hostid']);
+					}
+					unset($groupPrototype);
+
 					$newHostPrototype['hostid'] = $exHostPrototype['hostid'];
 				}
+				// create a new inherited host prototype
 				else {
+					foreach ($newHostPrototype['groupPrototypes'] as &$groupPrototype) {
+						$groupPrototype['templateid'] = $groupPrototype['group_prototypeid'];
+						unset($groupPrototype['group_prototypeid'], $groupPrototype['hostid']);
+					}
+					unset($groupPrototype);
+
 					unset($newHostPrototype['hostid']);
 				}
 				$newHostPrototypes[] = $newHostPrototype;
@@ -636,6 +698,7 @@ class CHostPrototype extends CHostBase {
 			'discoveryids' => zbx_objectValues($discoveryRules, 'itemid'),
 			'preservekeys' => true,
 			'output' => API_OUTPUT_EXTEND,
+			'selectGroupPrototypes' => API_OUTPUT_EXTEND,
 			'selectTemplates' => array('templateid'),
 			'selectDiscoveryRule' => array('itemid')
 		));

@@ -427,6 +427,10 @@ abstract class CHostGeneral extends CHostBase {
 					'values' => array('templateid' => 0),
 					'where' => array('hostid' => array_keys($hostPrototypes))
 				));
+				DB::update('group_prototype', array(
+					'values' => array('templateid' => 0),
+					'where' => array('hostid' => array_keys($hostPrototypes))
+				));
 				foreach ($hostPrototypes as $hostPrototype) {
 					info(_s('Unlinked: Host prototype "%1$s" on "%2$s".', $hostPrototype['host'], $hostPrototype['parent_host']));
 				}

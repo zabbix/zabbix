@@ -177,7 +177,8 @@ foreach ($data['group_prototypes'] as $group) {
 $groupList->addRow(_('Groups'), new CMultiSelect(array(
 	'name' => 'group_prototypes[]',
 	'objectName' => 'hostGroup',
-	'data' => $groups
+	'data' => $groups,
+	'disabled' => (bool) $hostPrototype['templateid']
 )));
 
 // new group prototypes
@@ -191,10 +192,14 @@ if (!$data['new_group_prototypes']) {
 	));
 }
 foreach ($data['new_group_prototypes'] as $i => $groupPrototype) {
-	$text1 = new CTextBox('new_group_prototypes['.$i.'][name]', $groupPrototype['name'], 30, null, 64);
+	$text1 = new CTextBox('new_group_prototypes['.$i.'][name]', $groupPrototype['name'], 30, (bool) $hostPrototype['templateid'], 64);
 	$text1->setAttribute('placeholder', '{#MACRO}');
 
-	$deleteButtonCell = array(new CButton('groupPrototypes_remove', _('Remove'), null, 'link_menu group-prototype-remove'));
+	$deleteButton = new CButton('groupPrototypes_remove', _('Remove'), null, 'link_menu group-prototype-remove');
+	if ($hostPrototype['templateid']) {
+		$deleteButton->setAttribute('disabled', true);
+	}
+	$deleteButtonCell = array($deleteButton);
 	if (isset($groupPrototype['group_prototypeid'])) {
 		$deleteButtonCell[] = new CVar('new_group_prototypes['.$i.'][group_prototypeid]', $groupPrototype['group_prototypeid']);
 	}
@@ -204,6 +209,9 @@ foreach ($data['new_group_prototypes'] as $i => $groupPrototype) {
 
 // buttons
 $addButton = new CButton('group_prototype_add', _('Add'), null, 'link_menu');
+if ($hostPrototype['templateid']) {
+	$addButton->setAttribute('disabled', true);
+}
 $buttonColumn = new CCol($addButton);
 $buttonColumn->setAttribute('colspan', 5);
 

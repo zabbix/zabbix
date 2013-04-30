@@ -139,18 +139,26 @@ elseif (isset($_REQUEST['save'])) {
 	if (get_request('hostid')) {
 		$newHostPrototype['hostid'] = get_request('hostid');
 
-		// add group prototypes based on existing host groups
-		$groupPrototypesByGroupId = zbx_toHash($hostPrototype['groupPrototypes'], 'groupid');
-		unset($groupPrototypesByGroupId[0]);
-		foreach (get_request('group_prototypes', array()) as $groupId) {
-			if (isset($groupPrototypesByGroupId[$groupId])) {
-				$newHostPrototype['groupPrototypes'][] = $groupPrototypesByGroupId[$groupId];
+		if (!$hostPrototype['templateid']) {
+			// add group prototypes based on existing host groups
+			$groupPrototypesByGroupId = zbx_toHash($hostPrototype['groupPrototypes'], 'groupid');
+			unset($groupPrototypesByGroupId[0]);
+			foreach (get_request('group_prototypes', array()) as $groupId) {
+				if (isset($groupPrototypesByGroupId[$groupId])) {
+					$newHostPrototype['groupPrototypes'][] = array(
+						'name' => $groupPrototypesByGroupId[$groupId]['name'],
+						'group_prototypeid' => $groupPrototypesByGroupId[$groupId]['group_prototypeid']
+					);
+				}
+				else {
+					$newHostPrototype['groupPrototypes'][] = array(
+						'groupid' => $groupId
+					);
+				}
 			}
-			else {
-				$newHostPrototype['groupPrototypes'][] = array(
-					'groupid' => $groupId
-				);
-			}
+		}
+		else {
+			unset($newHostPrototype['groupPrototypes']);
 		}
 
 		$newHostPrototype = CArrayHelper::unsetEqualValues($newHostPrototype, $hostPrototype, array('hostid'));
