@@ -950,6 +950,7 @@
 			'applications' => get_request('applications', array()),
 			'delay_flex' => get_request('delay_flex', array()),
 			'new_delay_flex' => get_request('new_delay_flex', array('delay' => 50, 'period' => ZBX_DEFAULT_INTERVAL)),
+			'snmpv3_contextname' => get_request('snmpv3_contextname', ''),
 			'snmpv3_securityname' => get_request('snmpv3_securityname', ''),
 			'snmpv3_securitylevel' => get_request('snmpv3_securitylevel', 0),
 			'snmpv3_authprotocol' => get_request('snmpv3_authprotocol', ITEM_AUTHPROTOCOL_MD5),
@@ -1107,6 +1108,7 @@
 			$data['multiplier'] = $data['item']['multiplier'];
 			$data['hostid'] = $data['item']['hostid'];
 			$data['params'] = $data['item']['params'];
+			$data['snmpv3_contextname'] = $data['item']['snmpv3_contextname'];
 			$data['snmpv3_securityname'] = $data['item']['snmpv3_securityname'];
 			$data['snmpv3_securitylevel'] = $data['item']['snmpv3_securitylevel'];
 			$data['snmpv3_authprotocol'] = $data['item']['snmpv3_authprotocol'];
