@@ -1159,7 +1159,7 @@ function getSelementsInfo($sysmap, $options = array()) {
 			}
 			else {
 				if ($trigger['value'] == TRIGGER_VALUE_TRUE) {
-					if ($options['severity_min'] && $options['severity_min'] <= $trigger['priority']) {
+					if (!$options['severity_min'] || $options['severity_min'] <= $trigger['priority']) {
 						$i['problem']++;
 						$lastProblemId = $triggerId;
 
