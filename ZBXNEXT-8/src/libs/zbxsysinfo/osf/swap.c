@@ -117,6 +117,37 @@ static int	SYSTEM_SWAP_FREE(const char *cmd, const char *param, unsigned flags, 
 #endif
 }
 
+static int	SYSTEM_SWAP_USED(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+{
+#ifdef HAVE_SYSINFO_FREESWAP
+	struct sysinfo info;
+
+	if( 0 == sysinfo(&info))
+	{
+#ifdef HAVE_SYSINFO_MEM_UNIT
+		SET_UI64_RESULT(result, ((zbx_uint64_t)info.totalswap - (zbx_uint64_t)info.freeswap) * (zbx_uint64_t)info.mem_unit);
+#else
+		SET_UI64_RESULT(result, info.totalswap - info.freeswap);
+#endif
+		return SYSINFO_RET_OK;
+	}
+	else
+		return SYSINFO_RET_FAIL;
+/* Solaris */
+#else
+#ifdef HAVE_SYS_SWAP_SWAPTABLE
+	double swaptotal,swapfree;
+
+	get_swapinfo(&swaptotal,&swapfree);
+
+	SET_UI64_RESULT(result, swaptotal - swapfree);
+	return SYSINFO_RET_OK;
+#else
+	return SYSINFO_RET_FAIL;
+#endif
+#endif
+}
+
 static int	SYSTEM_SWAP_TOTAL(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 #ifdef HAVE_SYSINFO_TOTALSWAP

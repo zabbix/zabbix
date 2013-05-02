@@ -74,6 +74,11 @@ int	SYSTEM_SWAP_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_R
 			SET_UI64_RESULT(result, ms_ex.ullAvailPageFile);
 			return SYSINFO_RET_OK;
 		}
+		else if (strcmp(mode, "used") == 0)
+		{
+			SET_UI64_RESULT(result, ms_ex.ullTotalPageFile - ms_ex.ullAvailPageFile);
+			return SYSINFO_RET_OK;
+		}
 		else
 		{
 			return SYSINFO_RET_FAIL;
