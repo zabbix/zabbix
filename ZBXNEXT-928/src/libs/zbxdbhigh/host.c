@@ -45,7 +45,7 @@ static ZBX_MUTEX	services_lock;
  * Comments: !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
  ******************************************************************************/
-static int	validate_linked_templates(zbx_vector_uint64_t *templateids, char *error, size_t max_error_len)
+static int	validate_linked_templates(const zbx_vector_uint64_t *templateids, char *error, size_t max_error_len)
 {
 	const char	*__function_name = "validate_linked_templates";
 
@@ -326,7 +326,7 @@ static int	DBcmp_triggers(zbx_uint64_t triggerid1, const char *expression1,
  * Comments: !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
  ******************************************************************************/
-static int	validate_inventory_links(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids,
+static int	validate_inventory_links(zbx_uint64_t hostid, const zbx_vector_uint64_t *templateids,
 		char *error, size_t max_error_len)
 {
 	const char	*__function_name = "validate_inventory_links";
@@ -419,7 +419,7 @@ out:
  * Comments: !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
  ******************************************************************************/
-static int	validate_httptests(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids,
+static int	validate_httptests(zbx_uint64_t hostid, const zbx_vector_uint64_t *templateids,
 		char *error, size_t max_error_len)
 {
 	const char	*__function_name = "validate_httptests";
@@ -1812,7 +1812,7 @@ out:
  *             templateids - [IN] array of template IDs                       *
  *                                                                            *
  ******************************************************************************/
-static void	DBdelete_template_httptests(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids)
+static void	DBdelete_template_httptests(zbx_uint64_t hostid, const zbx_vector_uint64_t *templateids)
 {
 	const char		*__function_name = "DBdelete_template_httptests";
 
@@ -1870,7 +1870,7 @@ static void	DBdelete_template_httptests(zbx_uint64_t hostid, zbx_vector_uint64_t
  * Comments: !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
  ******************************************************************************/
-static void	DBdelete_template_graphs(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids)
+static void	DBdelete_template_graphs(zbx_uint64_t hostid, const zbx_vector_uint64_t *templateids)
 {
 	const char		*__function_name = "DBdelete_template_graphs";
 
@@ -1928,7 +1928,7 @@ static void	DBdelete_template_graphs(zbx_uint64_t hostid, zbx_vector_uint64_t *t
  * Comments: !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
  ******************************************************************************/
-static void	DBdelete_template_triggers(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids)
+static void	DBdelete_template_triggers(zbx_uint64_t hostid, const zbx_vector_uint64_t *templateids)
 {
 	const char		*__function_name = "DBdelete_template_triggers";
 
@@ -1986,7 +1986,7 @@ static void	DBdelete_template_triggers(zbx_uint64_t hostid, zbx_vector_uint64_t 
  * Comments: !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
  ******************************************************************************/
-static void	DBdelete_template_items(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids)
+static void	DBdelete_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t *templateids)
 {
 	const char		*__function_name = "DBdelete_template_items";
 
@@ -2043,7 +2043,7 @@ static void	DBdelete_template_items(zbx_uint64_t hostid, zbx_vector_uint64_t *te
  * Comments: !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
  ******************************************************************************/
-static void	DBdelete_template_applications(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids)
+static void	DBdelete_template_applications(zbx_uint64_t hostid, const zbx_vector_uint64_t *templateids)
 {
 	const char	*__function_name = "DBdelete_template_applications";
 
@@ -2533,7 +2533,7 @@ clean:
  * Comments: !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
  ******************************************************************************/
-static void	DBcopy_template_applications(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids)
+static void	DBcopy_template_applications(zbx_uint64_t hostid, const zbx_vector_uint64_t *templateids)
 {
 	typedef struct
 	{
@@ -2710,7 +2710,7 @@ static void	DBget_interfaces_by_hostid(zbx_uint64_t hostid, zbx_uint64_t *interf
  * Comments: !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
  ******************************************************************************/
-static void	DBcopy_template_items(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids)
+static void	DBcopy_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t *templateids)
 {
 	typedef struct
 	{
@@ -3231,7 +3231,7 @@ static void	DBcopy_template_items(zbx_uint64_t hostid, zbx_vector_uint64_t *temp
  * Comments: !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
  ******************************************************************************/
-static int	DBcopy_template_triggers(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids)
+static int	DBcopy_template_triggers(zbx_uint64_t hostid, const zbx_vector_uint64_t *templateids)
 {
 	const char	*__function_name = "DBcopy_template_triggers";
 	char		*sql = NULL;
@@ -3560,7 +3560,7 @@ static void	DBcopy_graph_to_host(zbx_uint64_t hostid, zbx_uint64_t graphid,
  * Comments: !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
  ******************************************************************************/
-static void	DBcopy_template_graphs(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids)
+static void	DBcopy_template_graphs(zbx_uint64_t hostid, const zbx_vector_uint64_t *templateids)
 {
 	const char	*__function_name = "DBcopy_template_graphs";
 	char		*sql = NULL;
@@ -3677,7 +3677,7 @@ httptest_t;
  * Purpose: helper function for DCmass_add_history()                          *
  *                                                                            *
  ******************************************************************************/
-static void	DBget_httptests(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids, zbx_vector_ptr_t *httptests)
+static void	DBget_httptests(zbx_uint64_t hostid, const zbx_vector_uint64_t *templateids, zbx_vector_ptr_t *httptests)
 {
 	const char		*__function_name = "DBget_httptests";
 
@@ -4294,7 +4294,7 @@ static void	clean_httptests(zbx_vector_ptr_t *httptests)
  *             templateids - [IN] array of template IDs                       *
  *                                                                            *
  ******************************************************************************/
-static void	DBcopy_template_httptests(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids)
+static void	DBcopy_template_httptests(zbx_uint64_t hostid, const zbx_vector_uint64_t *templateids)
 {
 	const char		*__function_name = "DBcopy_template_httptests";
 	zbx_vector_ptr_t	httptests;
