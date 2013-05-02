@@ -19,27 +19,51 @@
 **/
 
 
-class CLldMacroStringValidator extends CStringValidator {
+class CIdValidator extends CValidator {
 
 	/**
-	 * Error message if a string doesn't contain LLD macros.
+	 * If set to false, the ID cannot be empty.
+	 *
+	 * @var bool
+	 */
+	public $empty = false;
+
+	/**
+	 * Error message if the ID is empty.
 	 *
 	 * @var string
 	 */
-	public $messageMacro = 'String "%1$s" must contain macros.';
+	public $messageEmpty;
 
 	/**
-	 * Validates the given string and checks if it contains LLD macros.
+	 * Error message if an incorrect ID is given.
+	 *
+	 * @var string
+	 */
+	public $messageInvalid;
+
+	/**
+	 * Checks if the given string is a valid object ID.
+	 *
+	 * @param string $value
+	 *
+	 * @return bool
 	 */
 	public function validate($value)
 	{
-		if (!parent::validate($value)) {
-			return false;
+		if (!$value) {
+			if ($this->empty) {
+				return true;
+			}
+			else {
+				$this->error($this->messageEmpty);
+
+				return false;
+			}
 		}
 
-		// check if a string contains an LLD macro
-		if (!preg_match('/(\{#'.ZBX_PREG_MACRO_NAME_LLD.'\})+/', $value)) {
-			$this->error($this->messageMacro);
+		if (!is_numeric($value)) {
+			$this->error($this->messageInvalid, $value);
 
 			return false;
 		}

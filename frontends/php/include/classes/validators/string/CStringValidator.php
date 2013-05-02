@@ -81,22 +81,20 @@ class CStringValidator extends CValidator {
 				return true;
 			}
 			else {
-				$this->setError($this->messageEmpty);
+				$this->error($this->messageEmpty);
 
 				return false;
 			}
 		}
 
 		if ($this->maxLength && zbx_strlen($value) > $this->maxLength) {
-			$this->setError(
-				_s($this->messageMaxLength, $value, $this->maxLength)
-			);
+			$this->error($this->messageMaxLength, $this->maxLength);
 
 			return false;
 		}
 
 		if ($this->regex && !preg_match($this->regex, $value)) {
-			$this->setError(_s($this->messageRegex, $value));
+			$this->error($this->messageRegex);
 
 			return false;
 		}
