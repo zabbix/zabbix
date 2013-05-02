@@ -1764,6 +1764,9 @@ static void	DBdelete_applications(zbx_uint64_t *applicationids, int applicationi
 	}
 	DBfree_result(result);
 
+	if (0 == applicationids_num)
+		goto out;
+
 	/* don't delete applications with items assigned to them */
 	sql_offset = 0;
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
@@ -1781,21 +1784,22 @@ static void	DBdelete_applications(zbx_uint64_t *applicationids, int applicationi
 	}
 	DBfree_result(result);
 
-	if (0 != applicationids_num)
-	{
-		sql_offset = 0;
-		DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+	if (0 == applicationids_num)
+		goto out;
 
-		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from applications where");
-		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset,
-				"applicationid", applicationids, applicationids_num);
-		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
+	sql_offset = 0;
+	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
-		DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from applications where");
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset,
+			"applicationid", applicationids, applicationids_num);
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
 
-		DBexecute("%s", sql);
-	}
+	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
+	DBexecute("%s", sql);
+
+out:
 	zbx_free(sql);
 }
 
