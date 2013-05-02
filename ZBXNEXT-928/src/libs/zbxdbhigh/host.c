@@ -2061,9 +2061,9 @@ static void	DBdelete_template_applications(zbx_uint64_t hostid, zbx_vector_uint6
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 			"select t.application_templateid,t.applicationid"
 			" from application_template t,applications a,applications ta"
-			" where t.applicationid = a.applicationid"
-				" and t.templateid = ta.applicationid"
-				" and a.hostid =" ZBX_FS_UI64
+			" where t.applicationid=a.applicationid"
+				" and t.templateid=ta.applicationid"
+				" and a.hostid=" ZBX_FS_UI64
 				" and ",
 			hostid);
 
@@ -3075,8 +3075,8 @@ static void	DBcopy_template_items(zbx_uint64_t hostid, zbx_vector_uint64_t *temp
 						" and");
 		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hi.itemid", itemids, itemids_num);
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-					" join application_template t on t.templateid = tia.applicationid"
-					" join applications ha on ha.applicationid = t.applicationid"
+					" join application_template t on t.templateid=tia.applicationid"
+					" join applications ha on ha.applicationid=t.applicationid"
 						" and ha.hostid=hi.hostid"
 						" left join items_applications hia on hia.applicationid=ha.applicationid"
 							" and hia.itemid=hi.itemid"
