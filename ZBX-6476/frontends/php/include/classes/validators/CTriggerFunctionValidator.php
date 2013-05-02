@@ -256,14 +256,6 @@ class CTriggerFunctionValidator extends CValidator {
 		$argsIgnored = array(array('type' => 'str'));
 
 		$this->allowed = array(
-			'band' => array(
-				'args' => array(
-					array('type' => 'sec_num', 'mandat' => true),
-					array('type' => 'num', 'mandat' => true),
-					array('type' => 'sec_zero')
-				),
-				'value_types' => $valueTypesInt
-			),
 			'abschange' => array(
 				'args' => $argsIgnored,
 				'value_types' => $valueTypesAll
@@ -274,6 +266,14 @@ class CTriggerFunctionValidator extends CValidator {
 					array('type' => 'sec_zero')
 				),
 				'value_types' => $valueTypesNum
+			),
+			'band' => array(
+				'args' => array(
+					array('type' => 'sec_num_zero', 'mandat' => true),
+					array('type' => 'num', 'mandat' => true),
+					array('type' => 'sec_zero')
+				),
+				'value_types' => $valueTypesInt
 			),
 			'change' => array(
 				'args' => $argsIgnored,

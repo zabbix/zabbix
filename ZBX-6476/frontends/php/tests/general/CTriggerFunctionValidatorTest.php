@@ -247,7 +247,7 @@ class CTriggerFunctionValidatorTest extends PHPUnit_Framework_TestCase {
 			self::parameterTimeShift_TestCases('avg', $valueTypesNum, array('#1', ''), 1),
 
 			// band() - (sec or #num, mask, time_shift) [int]
-			self::parameterSecNumPeriod_TestCases('band', $valueTypesInt, array('', '0')),
+			self::parameterSecNumOffset_TestCases('band', $valueTypesInt, array('', '0')),
 //			TODO Mask
 			self::parameterTimeShift_TestCases('band', $valueTypesInt, array('#1', '0', ''), 2),
 
