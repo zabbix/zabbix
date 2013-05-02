@@ -34,7 +34,7 @@ static ZBX_MUTEX	services_lock;
  *                                                                            *
  * Function: validate_linked_templates                                        *
  *                                                                            *
- * Description: Check of collisions between linked templates                  *
+ * Description: Check collisions between linked templates                     *
  *                                                                            *
  * Parameters: templateids - [IN] array of template IDs                       *
  *                                                                            *
@@ -2033,7 +2033,7 @@ static void	DBdelete_template_items(zbx_uint64_t hostid, zbx_vector_uint64_t *te
  *                                                                            *
  * Function: DBdelete_template_applications                                   *
  *                                                                            *
- * Purpose: delete application                                                *
+ * Purpose: delete host applications that belong to an unlinked template      *
  *                                                                            *
  * Parameters: hostid      - [IN] host identificator from database            *
  *             templateids - [IN] array of template IDs                       *
@@ -2062,8 +2062,8 @@ static void	DBdelete_template_applications(zbx_uint64_t hostid, zbx_vector_uint6
 			"select t.application_templateid,t.applicationid"
 			" from application_template t,applications a,applications ta"
 			" where t.applicationid = a.applicationid"
-				" and a.hostid =" ZBX_FS_UI64
 				" and t.templateid = ta.applicationid"
+				" and a.hostid =" ZBX_FS_UI64
 				" and ",
 			hostid);
 
@@ -2082,6 +2082,9 @@ static void	DBdelete_template_applications(zbx_uint64_t hostid, zbx_vector_uint6
 	}
 	DBfree_result(result);
 
+	if (0 == apptemplateids_num)
+		goto out;
+
 	sql_offset = 0;
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 			"delete from application_template"
@@ -2096,7 +2099,7 @@ static void	DBdelete_template_applications(zbx_uint64_t hostid, zbx_vector_uint6
 	zbx_free(applicationids);
 	zbx_free(apptemplateids);
 	zbx_free(sql);
-
+out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
