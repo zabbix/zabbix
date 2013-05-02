@@ -1798,7 +1798,6 @@ static void	DBdelete_applications(zbx_uint64_t *applicationids, int applicationi
 	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	DBexecute("%s", sql);
-
 out:
 	zbx_free(sql);
 }
