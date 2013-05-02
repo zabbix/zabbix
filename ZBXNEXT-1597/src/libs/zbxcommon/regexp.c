@@ -113,7 +113,7 @@ static char	*regexp_sub_replace(const char *text, const char *output_template, r
 			case '9':
 				zbx_strncpy_alloc(&ptr, &size, &offset, pstart, pgroup - pstart - 1);
 				group_index = *pgroup - '0';
-				if (group_index < nmatch - 1 && -1 != match[group_index].rm_so)
+				if (group_index < nmatch && -1 != match[group_index].rm_so)
 				{
 					zbx_strncpy_alloc(&ptr, &size, &offset, text + match[group_index].rm_so,
 							match[group_index].rm_eo - match[group_index].rm_so);
