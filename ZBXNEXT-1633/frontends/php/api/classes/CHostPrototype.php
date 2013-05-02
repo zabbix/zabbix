@@ -125,7 +125,7 @@ class CHostPrototype extends CHostBase {
 			'messageMacro' => _('Host name for host prototype "%1$s" must contain macros.')
 		));
 		$groupPrototypeCollectionValidator = new CGroupPrototypeCollectionValidator(array(
-			'messageEmpty' => _('Host prototype "%1$s" must have at least on group prototype.'),
+			'messageEmpty' => _('Host prototype "%1$s" must have at least one group prototype.'),
 			'messageHostGroups' => _('Host prototype "%1$s" must have at least one host group.')
 		));
 
@@ -347,7 +347,7 @@ class CHostPrototype extends CHostBase {
 			'messageUnsupported' => _('Wrong fields for group prototype "%1$s".')
 		));
 		$groupPrototypeCollectionValidator = new CGroupPrototypeCollectionValidator(array(
-			'messageEmpty' => _('Host prototype "%1$s" must have at least on group prototype.'),
+			'messageEmpty' => _('Host prototype "%1$s" must have at least one group prototype.'),
 			'messageHostGroups' => _('Host prototype "%1$s" must have at least one host group.'),
 			'messageDuplicateName' => _('Duplicate group prototype name "%2$s" for host prototype "%1$s".'),
 			'messageDuplicateGroupId' => _('Duplicate group prototype group ID "%2$s" for host prototype "%1$s".')
@@ -468,7 +468,9 @@ class CHostPrototype extends CHostBase {
 
 					$modifiedGroupPrototypes[] = $groupPrototype;
 				}
-				DB::delete('group_prototype', array('group_prototypeid' => array_keys($exGroupPrototypes)));
+				if ($exGroupPrototypes) {
+					$this->deleteGroupPrototypes(array_keys($exGroupPrototypes));
+				}
 				$hostPrototypes[$key]['groupPrototypes'] = DB::save('group_prototype', $modifiedGroupPrototypes);
 			}
 
@@ -838,6 +840,7 @@ class CHostPrototype extends CHostBase {
 		$deleteHostPrototypes = $this->get(array(
 			'hostids' => $hostPrototypeIds,
 			'output' => array('host'),
+			'selectGroupPrototypes' => array('group_prototypeid'),
 			'selectParentHost' => array('host'),
 			'nopermissions' => true
 		));
@@ -847,8 +850,17 @@ class CHostPrototype extends CHostBase {
 			'SELECT hostid FROM host_discovery WHERE '.dbConditionInt('parent_hostid', $hostPrototypeIds)
 		));
 		if ($discoveredHosts) {
-			API::Host()->delete(zbx_objectValues($discoveredHosts, 'hostid'));
+			API::Host()->delete(zbx_objectValues($discoveredHosts, 'hostid'), true);
 		}
+
+		// delete group prototypes and discovered groups
+		$groupPrototypeIds = array();
+		foreach ($deleteHostPrototypes as $groupPrototype) {
+			foreach ($groupPrototype['groupPrototypes'] as $groupPrototype) {
+				$groupPrototypeIds[] = $groupPrototype['group_prototypeid'];
+			}
+		}
+		$this->deleteGroupPrototypes($groupPrototypeIds);
 
 		// delete host prototypes
 		DB::delete($this->tableName(), array('hostid' => $hostPrototypeIds));
@@ -1175,5 +1187,23 @@ class CHostPrototype extends CHostBase {
 		}
 
 		return $result;
+	}
+
+	/**
+	 * Deletes the given group prototype and all discovered groups.
+	 *
+	 * @param array $groupPrototypeIds
+	 */
+	protected function deleteGroupPrototypes(array $groupPrototypeIds) {
+		// delete discovered groups
+		$hostGroups = DBfetchArray(DBselect(
+			'SELECT groupid FROM group_discovery WHERE '.dbConditionInt('parent_group_prototypeid', $groupPrototypeIds)
+		));
+		if ($hostGroups) {
+			API::HostGroup()->delete(zbx_objectValues($hostGroups, 'groupid'), true);
+		}
+
+		// delete group prototypes
+		DB::delete('group_prototype', array('group_prototypeid' => $groupPrototypeIds));
 	}
 }
