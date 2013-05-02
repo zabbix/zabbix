@@ -19,27 +19,35 @@
 **/
 
 
-class CLldMacroStringValidator extends CStringValidator {
+class CGroupPrototypeValidator extends CValidator {
 
 	/**
-	 * Error message if a string doesn't contain LLD macros.
+	 * Error message if no name and group ID is defined.
 	 *
 	 * @var string
 	 */
-	public $messageMacro = 'String "%1$s" must contain macros.';
+	public $messageMissing;
 
 	/**
-	 * Validates the given string and checks if it contains LLD macros.
+	 * Error message both name and group ID are defined.
+	 *
+	 * @var string
+	 */
+	public $messageBoth;
+
+	/**
+	 * Checks that a group prototype contains a name or a group ID and not both.
 	 */
 	public function validate($value)
 	{
-		if (!parent::validate($value)) {
+		if (empty($value['name']) && empty($value['groupid'])) {
+			$this->setError($this->messageMissing);
+
 			return false;
 		}
 
-		// check if a string contains an LLD macro
-		if (!preg_match('/(\{#'.ZBX_PREG_MACRO_NAME_LLD.'\})+/', $value)) {
-			$this->error($this->messageMacro);
+		if (isset($value['name']) && !zbx_empty($value['name']) && !empty($value['groupid'])) {
+			$this->error($this->messageBoth);
 
 			return false;
 		}

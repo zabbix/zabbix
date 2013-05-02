@@ -19,27 +19,33 @@
 **/
 
 
-class CLldMacroStringValidator extends CStringValidator {
+class CCollectionValidator extends CValidator {
 
 	/**
-	 * Error message if a string doesn't contain LLD macros.
+	 * If set to false, the string cannot be empty.
+	 *
+	 * @var bool
+	 */
+	public $empty = false;
+
+	/**
+	 * Error message if the string is empty.
 	 *
 	 * @var string
 	 */
-	public $messageMacro = 'String "%1$s" must contain macros.';
+	public $messageEmpty;
 
 	/**
-	 * Validates the given string and checks if it contains LLD macros.
+	 * Checks if the given object collection is valid.
+	 *
+	 * @param array $value
+	 *
+	 * @return bool
 	 */
 	public function validate($value)
 	{
-		if (!parent::validate($value)) {
-			return false;
-		}
-
-		// check if a string contains an LLD macro
-		if (!preg_match('/(\{#'.ZBX_PREG_MACRO_NAME_LLD.'\})+/', $value)) {
-			$this->error($this->messageMacro);
+		if (!$value) {
+			$this->error($this->messageEmpty);
 
 			return false;
 		}

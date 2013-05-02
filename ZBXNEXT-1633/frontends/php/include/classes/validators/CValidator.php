@@ -22,6 +22,13 @@
 abstract class CValidator {
 
 	/**
+	 * Name of the object that can be used in error message. If it is set, it will replace the %1$s placeholder.
+	 *
+	 * @var string
+	 */
+	protected $objectName;
+
+	/**
 	 * Validation errors.
 	 *
 	 * @var array
@@ -63,6 +70,13 @@ abstract class CValidator {
 	}
 
 	/**
+	 * @param string $name
+	 */
+	public function setObjectName($name) {
+		$this->objectName = $name;
+	}
+
+	/**
 	 * Throws an exception when trying to set an unexisting validator option.
 	 *
 	 * @param $name
@@ -72,5 +86,25 @@ abstract class CValidator {
 	 */
 	public function __set($name, $value) {
 		throw new Exception(sprintf('Incorrect option "%1$s" for validator "%2$s".', $name, get_class($this)));
+	}
+
+	/**
+	 * Adds a validation error with custom parameter support. The value of $objectName will be passed as the
+	 * first parameter.
+	 *
+	 * @param string 	$message
+	 * @param mixed 	$param 		parameter to be replace the first placeholder
+	 * @param mixed 	$param,... 	unlimited number of optional parameters
+	 *
+	 * @return string
+	 */
+	protected function error($message) {
+		$arguments = array_slice(func_get_args(), 1);
+
+		if ($this->objectName !== null) {
+			array_unshift($arguments, $this->objectName);
+		}
+
+		$this->setError(vsprintf($message, $arguments));
 	}
 }

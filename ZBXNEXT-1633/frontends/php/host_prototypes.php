@@ -146,7 +146,7 @@ elseif (isset($_REQUEST['save'])) {
 			foreach (get_request('group_prototypes', array()) as $groupId) {
 				if (isset($groupPrototypesByGroupId[$groupId])) {
 					$newHostPrototype['groupPrototypes'][] = array(
-						'name' => $groupPrototypesByGroupId[$groupId]['name'],
+						'groupid' => $groupPrototypesByGroupId[$groupId]['groupid'],
 						'group_prototypeid' => $groupPrototypesByGroupId[$groupId]['group_prototypeid']
 					);
 				}
