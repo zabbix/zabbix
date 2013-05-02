@@ -1071,8 +1071,7 @@ DB_RESULT	zbx_db_vselect(const char *fmt, va_list args)
 	SQLRETURN	ret = SQL_SUCCESS;
 #elif defined(HAVE_ORACLE)
 	sword		err = OCI_SUCCESS;
-	ub4		prefetch_rows = 200;
-	ub4		counter, attr_unset = 0;
+	ub4		prefetch_rows = 200, counter;
 #elif defined(HAVE_POSTGRESQL)
 	char		*error = NULL;
 #elif defined(HAVE_SQLITE3)
@@ -1196,13 +1195,6 @@ error:
 	/* Tested on Oracle 11gR2.                                                                                     */
 	/*                                                                                                             */
 	/* Oracle info: info: docs.oracle.com/cd/B28359_01/appdev.111/b28395/oci04sql.htm                              */
-
-	if (OCI_SUCCESS == err)
-	{
-		/* unset memory prefetch so that rows prefetch takes effect */
-		err = OCIAttrSet(result->stmthp, OCI_HTYPE_STMT, &attr_unset, sizeof(attr_unset),
-				OCI_ATTR_PREFETCH_MEMORY, oracle.errhp);
-	}
 
 	if (OCI_SUCCESS == err)
 	{
