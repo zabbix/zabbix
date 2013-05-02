@@ -235,8 +235,17 @@ if (isset($_REQUEST['form'])) {
 		),
 		'templates' => array(),
 		'new_group_prototypes' => get_request('new_group_prototypes', array()),
-		'group_prototypes' => get_request('group_prototypes', array())
+		'group_prototypes' => array()
 	);
+
+	// add group prototypes
+	if (get_request('group_prototypes')) {
+		$data['group_prototypes'] = API::HostGroup()->get(array(
+			'output' => API_OUTPUT_EXTEND,
+			'groupids' => get_request('group_prototypes'),
+			'editable' => true
+		));
+	}
 
 	// add parent host
 	$parentHost = API::Host()->get(array(
