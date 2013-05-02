@@ -1393,25 +1393,29 @@ class CHost extends CHostGeneral {
 	 * @throws APIException if the input is invalid
 	 *
 	 * @param array $hostIds
+	 * @param bool 	$nopermissions
 	 *
 	 * @return void
 	 */
-	protected function validateDelete(array $hostIds) {
+	protected function validateDelete(array $hostIds, $nopermissions = false) {
 		if (empty($hostIds)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 		}
 
-		$this->checkPermissions($hostIds);
+		if (!$nopermissions) {
+			$this->checkPermissions($hostIds);
+		}
 	}
 
 	/**
 	 * Delete Host
 	 *
-	 * @param string|array $hostIds
+	 * @param string|array 	$hostIds
+	 * @param bool			$nopermissions
 	 *
 	 * @return array|boolean
 	 */
-	public function delete($hostIds) {
+	public function delete($hostIds, $nopermissions = false) {
 		$hostIds = zbx_toArray($hostIds);
 
 		// deprecated input support
@@ -1425,7 +1429,7 @@ class CHost extends CHostGeneral {
 			$hostIds = zbx_objectValues($hostIds, 'hostid');
 		}
 
-		$this->validateDelete($hostIds);
+		$this->validateDelete($hostIds, $nopermissions);
 
 		// delete the discovery rules first
 		$delRules = API::DiscoveryRule()->get(array(

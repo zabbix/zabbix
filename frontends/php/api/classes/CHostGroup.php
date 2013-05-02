@@ -558,22 +558,24 @@ class CHostGroup extends CZBXAPI {
 	 * Delete host groups.
 	 *
 	 * @param array $groupids
+	 * @param bool 	$nopermissions
 	 *
 	 * @return boolean
 	 */
-	public function delete($groupids) {
+	public function delete($groupids, $nopermissions = false) {
 		if (empty($groupids)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 		}
 		$groupids = zbx_toArray($groupids);
 
-		$options = array(
+
+		$delGroups = $this->get(array(
 			'groupids' => $groupids,
 			'editable' => true,
 			'output' => API_OUTPUT_EXTEND,
-			'preservekeys' => true
-		);
-		$delGroups = $this->get($options);
+			'preservekeys' => true,
+			'nopermissions' => ($nopermissions) ? true : null
+		));
 		foreach ($groupids as $groupid) {
 			if (!isset($delGroups[$groupid])) {
 				self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
