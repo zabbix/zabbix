@@ -977,7 +977,7 @@ function delete_trends_by_itemid($itemIds) {
  * @param string    $item['units']          units of item
  * @param int       $item['valuemapid']     id of mapping set of values
  * @param string    $unknownString          the text to be used if the item has no data
- * @param bool		$ellipsis		        text will be cutted and ellipsis "..." added if set to true
+ * @param bool		$ellipsis		        text will be cut and ellipsis "..." added if set to true
  *
  * @return string
  */
@@ -998,7 +998,6 @@ function formatItemLastValue(array $item, $unknownString = '-', $ellipsis = true
 			if ($ellipsis && zbx_strlen($value) > 20) {
 				$value = zbx_substr($value, 0, 20).'...';
 			}
-			$value = nbsp(htmlspecialchars($value));
 
 			if ($mapping !== false) {
 				$value = $mapping.' ('.$value.')';
