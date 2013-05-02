@@ -1746,7 +1746,7 @@ static void	DBdelete_applications(zbx_uint64_t *applicationids, int applicationi
 	zbx_uint64_t	applicationid;
 
 	if (0 == applicationids_num)
-		return;
+		goto out;
 
 	/* don't delete applications used in web scenarious */
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
