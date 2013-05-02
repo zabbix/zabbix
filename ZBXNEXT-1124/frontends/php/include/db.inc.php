@@ -962,17 +962,17 @@ function remove_nodes_from_id($id) {
  *
  * If $db_fields element value is given and corresponding $args is not then it is assigned to $args element.
  *
- * @param $db_fields
+ * @param $dbFields
  * @param $args
  *
  * @return boolean
  */
-function check_db_fields($db_fields, &$args) {
+function check_db_fields($dbFields, &$args) {
 	if (!is_array($args)) {
 		return false;
 	}
 
-	foreach ($db_fields as $field => $def) {
+	foreach ($dbFields as $field => $def) {
 		if (!isset($args[$field])) {
 			if (is_null($def)) {
 				return false;
@@ -982,6 +982,7 @@ function check_db_fields($db_fields, &$args) {
 			}
 		}
 	}
+
 	return true;
 }
 

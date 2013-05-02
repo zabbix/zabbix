@@ -29,6 +29,10 @@ class CSeverity extends CTag {
 		parent::__construct('div', 'yes');
 		$this->addClass('jqueryinputset control-severity');
 
+		if (!isset($options['value'])) {
+			$options['value'] = null;
+		}
+
 		$controls = array();
 
 		foreach (getSeverityCaption() as $severity => $caption) {
@@ -42,35 +46,34 @@ class CSeverity extends CTag {
 
 		$this->addItem($controls);
 
-		insert_js(
-			'jQuery(function($) {
-				$("#severity_0, #severity_1, #severity_2, #severity_3, #severity_4, #severity_5").change(function() {
-					// remove classes from all labels
-					$("div.control-severity label").each(function(i, obj) {
-						obj = $(obj);
-						obj.removeClass(obj.data("severityStyle"));
-					});
-
-					var label = $("#severity_label_" + $(this).val());
-					label.addClass(label.data("severityStyle"));
+		insert_js('
+			jQuery("#severity_0, #severity_1, #severity_2, #severity_3, #severity_4, #severity_5").change(function() {
+				// remove classes from all labels
+				jQuery("div.control-severity label").each(function(i, obj) {
+					obj = jQuery(obj);
+					obj.removeClass(obj.data("severityStyle"));
 				});
 
-				$("#severity_label_0, #severity_label_1, #severity_label_2, #severity_label_3, #severity_label_4, #severity_label_5").mouseenter(function() {
-					var obj = $(this);
-					obj.addClass(obj.data("severityStyle"));
-				});
+				var label = jQuery("#severity_label_" + jQuery(this).val());
+				label.addClass(label.data("severityStyle"));
+			});
 
-				$("#severity_label_0, #severity_label_1, #severity_label_2, #severity_label_3, #severity_label_4, #severity_label_5").mouseleave(function() {
-					var obj = $(this);
+			jQuery("#severity_label_0, #severity_label_1, #severity_label_2, #severity_label_3, #severity_label_4, #severity_label_5").mouseenter(function() {
+				var obj = jQuery(this);
 
-					if (!$("#" + obj.attr("for")).prop("checked")) {
-						obj.removeClass(obj.data("severityStyle"));
-					}
-				});
+				obj.addClass(obj.data("severityStyle"));
+			});
 
-				// click on selected severity on form load
-				$("input[name=\''.$options['name'].'\']:checked").change();
-			});'
+			jQuery("#severity_label_0, #severity_label_1, #severity_label_2, #severity_label_3, #severity_label_4, #severity_label_5").mouseleave(function() {
+				var obj = jQuery(this);
+
+				if (!jQuery("#" + obj.attr("for")).prop("checked")) {
+					obj.removeClass(obj.data("severityStyle"));
+				}
+			});
+
+			// click on selected severity on form load
+			jQuery("input[name=\''.$options['name'].'\']:checked").change();'
 		, true);
 	}
 }

@@ -36,7 +36,8 @@ if (!empty($this->data['maps'])) {
 
 	$headerForm = new CForm('get');
 	$headerForm->addVar('fullscreen', $this->data['fullscreen']);
-	$headerForm->addItem($mapComboBox);
+	$headerForm->addItem(array(_('Maps'), SPACE, $mapComboBox));
+	$headerForm->addItem(array(SPACE, _('Minimum severity'), SPACE, $this->data['pageFilter']->getSeveritiesMinCB()));
 
 	$mapWidget->addHeader($this->data['map']['name'], $headerForm);
 
@@ -46,7 +47,7 @@ if (!empty($this->data['maps'])) {
 		// check for permissions
 		if (isset($this->data['maps'][$parent['sysmapid']])) {
 			$parentMaps[] = SPACE.SPACE;
-			$parentMaps[] = new Clink($parent['name'], 'maps.php?sysmapid='.$parent['sysmapid'].'&fullscreen='.$this->data['fullscreen']);
+			$parentMaps[] = new Clink($parent['name'], 'maps.php?sysmapid='.$parent['sysmapid'].'&fullscreen='.$this->data['fullscreen'].'&severity_min='.$this->data['severity_min']);
 		}
 	}
 	if (!empty($parentMaps)) {
@@ -54,11 +55,11 @@ if (!empty($this->data['maps'])) {
 		$mapWidget->addHeader($parentMaps);
 	}
 
-	$actionMap = getActionMapBySysmap($this->data['map']);
+	$actionMap = getActionMapBySysmap($this->data['map'], array('severity_min' => $this->data['severity_min']));
 
 	$mapTable->addRow($actionMap);
 
-	$imgMap = new CImg('map.php?sysmapid='.$this->data['sysmapid']);
+	$imgMap = new CImg('map.php?sysmapid='.$this->data['sysmapid'].'&severity_min='.$this->data['severity_min']);
 	$imgMap->setMap($actionMap->getName());
 	$mapTable->addRow($imgMap);
 

@@ -376,9 +376,10 @@ class CMap extends CMapElement {
 		}
 
 		$mapNames = array();
+
 		foreach ($maps as &$map) {
 			if (!check_db_fields($mapDbFields, $map)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect fields for sysmap.'));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect fields for sysmap.'));
 			}
 
 			if ($update || $delete) {
@@ -401,11 +402,11 @@ class CMap extends CMapElement {
 				}
 			}
 
-			if (isset($map['width']) && (($map['width'] > 65535) || ($map['width'] < 1))) {
+			if (isset($map['width']) && ($map['width'] > 65535 || $map['width'] < 1)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect map width value for map "%s".', $dbMap['name']));
 			}
 
-			if (isset($map['height']) && (($map['height'] > 65535) || ($map['height'] < 1))) {
+			if (isset($map['height']) && ($map['height'] > 65535 || $map['height'] < 1)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect map height value for map "%s".', $dbMap['name']));
 			}
 
@@ -428,7 +429,7 @@ class CMap extends CMapElement {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect %1$s label type value for map "%2$s".', $labelData['typeName'], $dbMap['name']));
 				}
 
-				if (MAP_LABEL_TYPE_CUSTOM == $map[$labelName]) {
+				if ($map[$labelName] == MAP_LABEL_TYPE_CUSTOM) {
 					if (!isset($labelData['string'])) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect %1$s label type value for map "%2$s".', $labelData['typeName'], $dbMap['name']));
 					}
@@ -438,7 +439,7 @@ class CMap extends CMapElement {
 					}
 				}
 
-				if (($labelName == 'label_type_image') && (MAP_LABEL_TYPE_STATUS == $map[$labelName])) {
+				if ($labelName == 'label_type_image' && $map[$labelName] == MAP_LABEL_TYPE_STATUS) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect %1$s label type value for map "%2$s".', $labelData['typeName'], $dbMap['name']));
 				}
 
@@ -446,7 +447,7 @@ class CMap extends CMapElement {
 					continue;
 				}
 
-				if (MAP_LABEL_TYPE_IP == $map[$labelName]) {
+				if ($map[$labelName] == MAP_LABEL_TYPE_IP) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect %1$s label type value for map "%2$s".', $labelData['typeName'], $dbMap['name']));
 				}
 			}
@@ -454,6 +455,7 @@ class CMap extends CMapElement {
 			// GRID OPTIONS
 			// validating grid options
 			$possibleGridSizes = array(20, 40, 50, 75, 100);
+
 			if ($update || $create) {
 				// grid size
 				if (isset($map['grid_size']) && !in_array($map['grid_size'], $possibleGridSizes)) {
@@ -461,12 +463,12 @@ class CMap extends CMapElement {
 				}
 
 				// grid auto align
-				if (isset($map['grid_align']) && $map['grid_align'] != SYSMAP_GRID_ALIGN_ON &&  $map['grid_align'] != SYSMAP_GRID_ALIGN_OFF) {
+				if (isset($map['grid_align']) && $map['grid_align'] != SYSMAP_GRID_ALIGN_ON && $map['grid_align'] != SYSMAP_GRID_ALIGN_OFF) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Value "%1$s" is invalid for parameter "grid_align". Choices are: "%2$s" and "%3$s"', $map['grid_align'], SYSMAP_GRID_ALIGN_ON, SYSMAP_GRID_ALIGN_OFF));
 				}
 
 				// grid show
-				if (isset($map['grid_show']) && $map['grid_show'] != SYSMAP_GRID_SHOW_ON &&  $map['grid_show'] != SYSMAP_GRID_SHOW_OFF) {
+				if (isset($map['grid_show']) && $map['grid_show'] != SYSMAP_GRID_SHOW_ON && $map['grid_show'] != SYSMAP_GRID_SHOW_OFF) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Value "%1$s" is invalid for parameter "grid_show". Choices are: "%2$s" and "%3$s".', $map['grid_show'], SYSMAP_GRID_SHOW_ON, SYSMAP_GRID_SHOW_OFF));
 				}
 			}
@@ -513,7 +515,7 @@ class CMap extends CMapElement {
 				'nopermissions' => true
 			));
 			foreach ($existDbMaps as $dbMap) {
-				if ($create || (bccomp($mapNames[$dbMap['name']], $dbMap['sysmapid']) != 0)) {
+				if ($create || bccomp($mapNames[$dbMap['name']], $dbMap['sysmapid']) != 0) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Map with name "%s" already exists.', $dbMap['name']));
 				}
 			}
@@ -612,23 +614,23 @@ class CMap extends CMapElement {
 	/**
 	 * Update Map.
 	 *
-	 * @param array $maps multidimensional array with Hosts data
+	 * @param array  $maps multidimensional array with Hosts data
 	 * @param string $maps['sysmapid']
 	 * @param string $maps['name']
-	 * @param array $maps['width']
-	 * @param int $maps['height']
+	 * @param array  $maps['width']
+	 * @param int    $maps['height']
 	 * @param string $maps['backgroundid']
-	 * @param array $maps['label_type']
-	 * @param int $maps['label_location']
-	 * @param int $maps['grid_size'] size of a one grid cell. 100 refers to 100x100 and so on.
-	 * @param int $maps['grid_show'] does grid need to be shown. Constants: SYSMAP_GRID_SHOW_ON / SYSMAP_GRID_SHOW_OFF
-	 * @param int $maps['grid_align'] does elements need to be aligned to the grid. Constants: SYSMAP_GRID_ALIGN_ON / SYSMAP_GRID_ALIGN_OFF
+	 * @param array  $maps['label_type']
+	 * @param int    $maps['label_location']
+	 * @param int    $maps['grid_size'] size of a one grid cell. 100 refers to 100x100 and so on.
+	 * @param int    $maps['grid_show'] does grid need to be shown. Constants: SYSMAP_GRID_SHOW_ON / SYSMAP_GRID_SHOW_OFF
+	 * @param int    $maps['grid_align'] does elements need to be aligned to the grid. Constants: SYSMAP_GRID_ALIGN_ON / SYSMAP_GRID_ALIGN_OFF
 	 *
 	 * @return boolean
 	 */
 	public function update($maps) {
 		$maps = zbx_toArray($maps);
-		$sysmapids = zbx_objectValues($maps, 'sysmapid');
+		$sysmapIds = zbx_objectValues($maps, 'sysmapid');
 
 		$dbMaps = $this->checkInput($maps, __FUNCTION__);
 
@@ -803,7 +805,7 @@ class CMap extends CMapElement {
 			$this->updateLinkTriggers($linkTriggersToUpdate);
 		}
 
-		return array('sysmapids' => $sysmapids);
+		return array('sysmapids' => $sysmapIds);
 	}
 
 	/**

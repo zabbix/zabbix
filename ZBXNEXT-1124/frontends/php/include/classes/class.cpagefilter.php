@@ -19,13 +19,13 @@
 **/
 
 
-/**
- * @property string $groupid
- * @property string $hostid
- * @property array $groups
- * @property array $hosts
- */
 class CPageFilter {
+
+	const GROUP_LATEST_IDX = 'web.latest.groupid';
+	const HOST_LATEST_IDX = 'web.latest.hostid';
+	const GRAPH_LATEST_IDX = 'web.latest.graphid';
+	const TRIGGER_LATEST_IDX = 'web.latest.triggerid';
+	const DRULE_LATEST_IDX = 'web.latest.druleid';
 
 	/**
 	 * Configuration options.
@@ -53,10 +53,13 @@ class CPageFilter {
 		// Force the filter to select the given objects.
 		// works only if the host given in 'hostid' belongs to that group or 'hostid' is not set
 		'groupid' => null,
+
 		// works only if a host group is selected or the host group filter value is set to 'all'
 		'hostid' => null,
+
 		// works only if a host is selected or the host filter value is set to 'all'
 		'graphid' => null,
+
 		// works only if a specific host has been selected, will NOT work if the host filter is set to 'all'
 		'triggerid' => null,
 		'druleid' => null,
@@ -92,7 +95,8 @@ class CPageFilter {
 		'hostid' => null,
 		'triggerid' => null,
 		'graphid' => null,
-		'druleid' => null
+		'druleid' => null,
+		'severity_min' => null
 	);
 
 	/**
@@ -128,7 +132,8 @@ class CPageFilter {
 		'hostid' => null,
 		'triggerid' => null,
 		'graphid' => null,
-		'druleid' => null
+		'druleid' => null,
+		'severity_min' => null
 	);
 
 	/**
@@ -141,17 +146,24 @@ class CPageFilter {
 		'hostid' => null,
 		'triggerid' => null,
 		'graphid' => null,
-		'druleid' => null
+		'druleid' => null,
+		'severity_min' => null
 	);
 
+	/**
+	 * Request ids.
+	 *
+	 * @var array
+	 */
 	private $_requestIds = array();
 
-	const GROUP_LATEST_IDX = 'web.latest.groupid';
-	const HOST_LATEST_IDX = 'web.latest.hostid';
-	const GRAPH_LATEST_IDX = 'web.latest.graphid';
-	const TRIGGER_LATEST_IDX = 'web.latest.triggerid';
-	const DRULE_LATEST_IDX = 'web.latest.druleid';
-
+	/**
+	 * Get value from data structure.
+	 *
+	 * @param unknown $name
+	 *
+	 * @return mixed
+	 */
 	public function __get($name) {
 		if (isset($this->data[$name])) {
 			return $this->data[$name];
@@ -164,6 +176,7 @@ class CPageFilter {
 		}
 		else {
 			trigger_error(_s('Try to read inaccessible property "%s".', get_class($this).'->'.$name), E_USER_WARNING);
+
 			return false;
 		}
 	}
@@ -198,6 +211,7 @@ class CPageFilter {
 
 		// profiles
 		$this->_getProfiles($options);
+
 		if (!isset($options['groupid'], $options['hostid'])) {
 			if (isset($options['graphid'])) {
 				$this->_updateByGraph($options);
@@ -229,8 +243,14 @@ class CPageFilter {
 			$this->_initDiscoveries($options['druleid'], $options['drules']);
 		}
 
+		// applications
 		if (isset($options['applications'])) {
 			$this->_initApplications($options['application'], $options['applications']);
+		}
+
+		// severities min
+		if (isset($options['severitiesMin'])) {
+			$this->_initSeveritiesMin($options['severitiesMin']);
 		}
 	}
 
@@ -250,12 +270,14 @@ class CPageFilter {
 		global $page;
 
 		$profileSection = $this->config['individual'] ? $page['file'] : $page['menu'];
+
 		$this->_profileIdx['groups'] = 'web.'.$profileSection.'.groupid';
 		$this->_profileIdx['hosts'] = 'web.'.$profileSection.'.hostid';
 		$this->_profileIdx['graphs'] = 'web.'.$profileSection.'.graphid';
 		$this->_profileIdx['triggers'] = 'web.'.$profileSection.'.triggerid';
 		$this->_profileIdx['drules'] = 'web.'.$profileSection.'.druleid';
 		$this->_profileIdx['application'] = 'web.'.$profileSection.'.application';
+		$this->_profileIdx['severity_min'] = 'web.maps.severity_min';
 
 		if ($this->config['select_latest']) {
 			$this->_profileIds['groupid'] = CProfile::get(self::GROUP_LATEST_IDX);
@@ -264,6 +286,7 @@ class CPageFilter {
 			$this->_profileIds['triggerid'] = null;
 			$this->_profileIds['druleid'] = CProfile::get(self::DRULE_LATEST_IDX);
 			$this->_profileIds['application'] = '';
+			$this->_profileIds['severity_min'] = null;
 		}
 		elseif ($this->config['DDReset'] && !$this->config['DDRemember']) {
 			$this->_profileIds['groupid'] = 0;
@@ -272,6 +295,7 @@ class CPageFilter {
 			$this->_profileIds['triggerid'] = 0;
 			$this->_profileIds['druleid'] = 0;
 			$this->_profileIds['application'] = '';
+			$this->_profileIds['severity_min'] = null;
 		}
 		else {
 			$this->_profileIds['groupid'] = CProfile::get($this->_profileIdx['groups']);
@@ -280,6 +304,7 @@ class CPageFilter {
 			$this->_profileIds['triggerid'] = null;
 			$this->_profileIds['druleid'] = CProfile::get($this->_profileIdx['drules']);
 			$this->_profileIds['application'] = CProfile::get($this->_profileIdx['application']);
+			$this->_profileIds['severity_min'] = CProfile::get($this->_profileIdx['severity_min']);
 		}
 
 		$this->_requestIds['groupid'] = isset($options['groupid']) ? $options['groupid'] : null;
@@ -288,6 +313,7 @@ class CPageFilter {
 		$this->_requestIds['triggerid'] = isset($options['triggerid']) ? $options['triggerid'] : null;
 		$this->_requestIds['druleid'] = isset($options['druleid']) ? $options['druleid'] : null;
 		$this->_requestIds['application'] = isset($options['application']) ? $options['application'] : null;
+		$this->_requestIds['severity_min'] = isset($options['severitiesMin']) ? $options['severitiesMin'] : null;
 	}
 
 	private function _updateByGraph(&$options) {
@@ -624,7 +650,7 @@ class CPageFilter {
 				$this->data['applications'][$app['name']] = $app['name'];
 			}
 
-			// select remebered selection
+			// select remembered selection
 			if (is_null($application) && $this->_profileIds['application']) {
 				$application = $this->_profileIds['application'];
 			}
@@ -643,14 +669,53 @@ class CPageFilter {
 		$this->ids['application'] = $application;
 	}
 
+	/**
+	 * Set severities min related variables.
+	 *
+	 * @param string $severityMin
+	 */
+	private function _initSeveritiesMin($severityMin) {
+		if (is_null($severityMin)) {
+			$severityMin = $this->_profileIds['severity_min'];
+		}
+
+		if ($severityMin) {
+			CProfile::update($this->_profileIdx['severity_min'], $severityMin, PROFILE_TYPE_INT);
+		}
+
+		$this->data['severitiesMin'] = getSeverityCaption();
+		$this->ids['severity_min'] = $severityMin;
+	}
+
+	/**
+	 * Get dropdown for hosts.
+	 *
+	 * @param bool $withNode
+	 *
+	 * @return CComboBox
+	 */
 	public function getHostsCB($withNode = false) {
 		return $this->_getCB('hostid', $this->hostid, $this->hosts, $withNode);
 	}
 
+	/**
+	 * Get dropdown for groups.
+	 *
+	 * @param bool $withNode
+	 *
+	 * @return CComboBox
+	 */
 	public function getGroupsCB($withNode = false) {
 		return $this->_getCB('groupid', $this->groupid, $this->groups, $withNode);
 	}
 
+	/**
+	 * Get dropdown for graphs.
+	 *
+	 * @param bool $withNode
+	 *
+	 * @return CComboBox
+	 */
 	public function getGraphsCB($withNode = false) {
 		$items = $this->graphs;
 		if ($withNode) {
@@ -670,12 +735,19 @@ class CPageFilter {
 		return $graphComboBox;
 	}
 
+	/**
+	 * Get dropdown for discovery.
+	 *
+	 * @param bool $withNode
+	 *
+	 * @return CComboBox
+	 */
 	public function getDiscoveryCB($withNode = false) {
 		return $this->_getCB('druleid', $this->druleid, $this->drules, $withNode);
 	}
 
 	/**
-	 * Get dropdown for application selection.
+	 * Get dropdown for applications.
 	 *
 	 * @param bool $withNode
 	 *
@@ -685,8 +757,28 @@ class CPageFilter {
 		return $this->_getCB('application', $this->application, $this->applications, $withNode, '');
 	}
 
-	private function _getCB($cbname, $selectedid, $items, $withNode, $allValue = 0) {
-		$cmb = new CComboBox($cbname, $selectedid, 'javascript: submit();');
+	/**
+	 * Get dropdown for severities min.
+	 *
+	 * @return CComboBox
+	 */
+	public function getSeveritiesMinCB() {
+		return new CComboBox('severity_min', $this->severity_min, 'javascript: submit();', $this->severitiesMin);
+	}
+
+	/**
+	 * Create dropdown.
+	 *
+	 * @param string $name
+	 * @param string $selectedId
+	 * @param array  $items
+	 * @param bool   $withNode
+	 * @param bool   $allValue
+	 *
+	 * @return CComboBox
+	 */
+	private function _getCB($name, $selectedId, $items, $withNode, $allValue = 0) {
+		$comboBox = new CComboBox($name, $selectedId, 'javascript: submit();');
 
 		if ($withNode) {
 			foreach ($items as $id => $item) {
@@ -697,13 +789,15 @@ class CPageFilter {
 		natcasesort($items);
 
 		if (!$this->config['popupDD']) {
-			$items = array($allValue => ($this->config['DDFirst'] == ZBX_DROPDOWN_FIRST_NONE) ? _('not selected') : _('all')) + $items;
+			$items = array(
+				$allValue => ($this->config['DDFirst'] == ZBX_DROPDOWN_FIRST_NONE) ? _('not selected') : _('all')
+			) + $items;
 		}
 
 		foreach ($items as $id => $name) {
-			$cmb->addItem($id, $name);
+			$comboBox->addItem($id, $name);
 		}
 
-		return $cmb;
+		return $comboBox;
 	}
 }

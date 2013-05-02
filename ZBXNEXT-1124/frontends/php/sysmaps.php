@@ -146,7 +146,7 @@ if (isset($_REQUEST['save'])) {
 		'label_type' => $_REQUEST['label_type'],
 		'label_location' => $_REQUEST['label_location'],
 		'show_unack' => get_request('show_unack', 0),
-		'severity_min' => get_request('severity_min', TRIGGER_SEVERITY_DISASTER),
+		'severity_min' => get_request('severity_min', TRIGGER_SEVERITY_NOT_CLASSIFIED),
 		'urls' => get_request('urls', array())
 	);
 
@@ -240,7 +240,7 @@ if (isset($_REQUEST['form'])) {
 				'markelements' => get_request('markelements', 0),
 				'expandproblem' => get_request('expandproblem', 0),
 				'show_unack' => get_request('show_unack', 0),
-				'severity_min' => get_request('severity_min', TRIGGER_SEVERITY_DISASTER),
+				'severity_min' => get_request('severity_min', TRIGGER_SEVERITY_NOT_CLASSIFIED),
 				'urls' => get_request('urls', array())
 			)
 		);

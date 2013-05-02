@@ -129,7 +129,7 @@ if (!$this->data['config']['event_ack_enable']) {
 $sysmapList->addRow(_('Problem display'), $showUnackComboBox);
 
 // append severity min to form list
-$sysmapList->addRow(_('Minimum severity'), new CSeverity(array('name' => 'severity_min', 'value' => $this->data['sysmap']['severity_min'])));
+$sysmapList->addRow(_('Minimum trigger severity'), new CSeverity(array('name' => 'severity_min', 'value' => $this->data['sysmap']['severity_min'])));
 
 // create url table
 $urlTable = new CTable(_('No URLs defined.'), 'formElementTable');
@@ -192,10 +192,7 @@ if (isset($_REQUEST['sysmapid']) && $_REQUEST['sysmapid'] > 0) {
 }
 $others[] = new CButtonCancel();
 
-$sysmapForm->addItem(makeFormFooter(
-	new CSubmit('save', _('Save')),
-	$others
-));
+$sysmapForm->addItem(makeFormFooter(new CSubmit('save', _('Save')), $others));
 
 // append form to widget
 $sysmapWidget->addItem($sysmapForm);

@@ -3395,6 +3395,12 @@ return array(
 				'length' => 10,
 				'default' => '0',
 			),
+			'severity_min' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0',
+			),
 		),
 	),
 	'sysmaps_elements' => array(
