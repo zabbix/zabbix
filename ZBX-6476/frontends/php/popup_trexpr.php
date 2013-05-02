@@ -675,7 +675,7 @@ if (!empty($itemId)) {
 	// get item value type
 	$selectedItems = API::Item()->get(array(
 		'itemids' => array($itemId),
-		'output' => API_OUTPUT_EXTEND,
+		'output' => array('value_type'),
 		'filter' => array('flags' => null)
 	));
 	if ($selectedItem = reset($selectedItems)) {
