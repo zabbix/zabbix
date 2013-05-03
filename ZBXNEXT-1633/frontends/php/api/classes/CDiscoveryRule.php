@@ -964,6 +964,7 @@ class CDiscoveryRule extends CItemGeneral {
 			'discoveryids' => $srcDiscovery['itemid'],
 			'output' => array('host', 'name', 'status'),
 			'selectGroupPrototypes' => array('name', 'groupid'),
+			'selectInventory' => array('inventory_mode'),
 			'selectTemplates' => array('templateid'),
 			'preservekeys' => true
 		));
@@ -972,7 +973,7 @@ class CDiscoveryRule extends CItemGeneral {
 		if ($prototypes) {
 			foreach ($prototypes as &$prototype) {
 				$prototype['ruleid'] = $dstDiscovery['itemid'];
-				unset($prototype['hostid'], $prototype['templateid']);
+				unset($prototype['hostid'], $prototype['templateid'], $prototype['inventory']['hostid']);
 
 				foreach ($prototype['groupPrototypes'] as &$groupPrototype) {
 					unset($groupPrototype['group_prototypeid'], $groupPrototype['templateid']);
