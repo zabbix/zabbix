@@ -700,25 +700,26 @@ if (!empty($itemId)) {
 
 		// validate trigger expression
 		$triggerExpression = new CTriggerExpression();
-		$isValid = $triggerExpression->parse($data['expression']);
-		if (!$isValid) {
-			error($triggerExpression->error);
-			show_messages();
 
-			unset($data['insert']);
+		if ($triggerExpression->parse($data['expression'])) {
+			$expressionData = reset($triggerExpression->expressions);
+
+			// validate trigger function
+			$triggerFunctionValidator = new CTriggerFunctionValidator();
+			$isValid = $triggerFunctionValidator->validate(array(
+				'functionName' => $expressionData['functionName'],
+				'functionParamList' => $expressionData['functionParamList'],
+				'valueType' => $data['itemValueType']
+			));
+			if (!$isValid) {
+				error($triggerFunctionValidator->getError());
+				show_messages();
+
+				unset($data['insert']);
+			}
 		}
-
-		$expressionData = reset($triggerExpression->expressions);
-
-		// validate trigger function
-		$triggerFunctionValidator = new CTriggerFunctionValidator();
-		$isValid = $triggerFunctionValidator->validate(array(
-			'functionName' => $expressionData['functionName'],
-			'functionParamList' => $expressionData['functionParamList'],
-			'valueType' => $data['itemValueType']
-		));
-		if (!$isValid) {
-			error($triggerFunctionValidator->getError());
+		else {
+			error($triggerExpression->error);
 			show_messages();
 
 			unset($data['insert']);
