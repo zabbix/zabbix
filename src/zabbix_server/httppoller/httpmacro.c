@@ -80,7 +80,7 @@ static int	httpmacro_append_pair(zbx_httptest_t *httptest, const char *pkey, siz
 			const char *pvalue, size_t nvalue, const char *data, char **err_str)
 {
 	const char	*__function_name = "httpmacro_append_pair";
-	char 		*value_str = NULL;
+	char 		*value_str = NULL, *buf = NULL;
 	size_t		key_size = 0, key_offset = 0, value_size = 0, value_offset = 0;
 	zbx_ptr_pair_t	pair = {NULL, NULL};
 	int		index, ret = FAIL;
@@ -95,6 +95,22 @@ static int	httpmacro_append_pair(zbx_httptest_t *httptest, const char *pkey, siz
 			size_t	size = 0, offset = 0;
 			zbx_strcpy_alloc(err_str, &size, &offset, "a variable defined without a name or value");
 		}
+
+		if (0 == nkey && 0 != nvalue)
+		{
+			buf = zbx_strdup(buf, pvalue);
+			buf[nvalue] = '\0';
+			zabbix_log(LOG_LEVEL_ERR, "missing variable name (only value provided): \"%s\"", buf);
+			zbx_free(buf);
+		}
+		else if (0 == nvalue && 0 != nkey)
+		{
+			buf = zbx_strdup(buf, pkey);
+			buf[nkey] = '\0';
+			zabbix_log(LOG_LEVEL_ERR, "missing variable value (only name provided): \"%s\"", buf);
+			zbx_free(buf);
+		}
+
 		goto out;
 	}
 
@@ -105,6 +121,12 @@ static int	httpmacro_append_pair(zbx_httptest_t *httptest, const char *pkey, siz
 			size_t	size = 0, offset = 0;
 			zbx_strcpy_alloc(err_str, &size, &offset, "invalid variable name specified");
 		}
+
+		buf = zbx_strdup(buf, pkey);
+		buf[nkey] = '\0';
+		zabbix_log(LOG_LEVEL_ERR, "invalid variable name specified: \"%s\"", buf);
+		zbx_free(buf);
+
 		goto out;
 	}
 
@@ -136,6 +158,12 @@ static int	httpmacro_append_pair(zbx_httptest_t *httptest, const char *pkey, siz
 				size_t	size = 0, offset = 0;
 				zbx_strcpy_alloc(err_str, &size, &offset, "failed to extract variable from response data");
 			}
+
+			buf = zbx_strdup(buf, pkey);
+			buf[nkey] = '\0';
+			zabbix_log(LOG_LEVEL_ERR, "failed to extract variable \"%s\" from response data", buf);
+			zbx_free(buf);
+
 			goto out;
 		}
 	}
