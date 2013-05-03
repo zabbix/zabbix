@@ -1,6 +1,7 @@
 Changes for 2.1.0
 
 New features:
+..F.I...S. [ZBXNEXT-1438] added SNMPv3 context name support (wiper, Oleg)
 ..F....... [ZBXNEXT-1407] implement multiselect in multiple pages for host and host groups (Eduard)
 A.F.....S. [ZBXNEXT-1] added support of {host:key.last/min/avg/max()} macros in graph titles (Sasha, Toms)
 ..F.I...S. [ZBXNEXT-1649] added fine grained control of housekeeper tasks (Oleg, wiper)
@@ -60,6 +61,9 @@ A.F.I...S. [ZBXNEXT-1186] increased length to 2048 characters of expression fiel
 ........S. [ZBXNEXT-1663] added support for notification macros {TRIGGER.NAME.ORIG}, {ITEM.NAME.ORIG}, {ITEM.KEY.ORIG} (dimir)
 
 Bug fixes:
+A......... [ZBX-6465] fixed that host inventory mode were enabled even if only some inventory fields were update (Toms)
+A......... [ZBX-6530] formatted some exception messages in CImage.php which where wrongly formatted and not translated (Toms)
+...G...... [ZBX-4590] added support for multibyte path to logrt items on Windows (dimir)
 ..F....... [ZBX-6460] fixed html entity encoding in condition names in action configuration page (Eduard)
 .......PS. [ZBX-6435] fixed compiler warnings (Andris)
 ..F.....S. [ZBX-6305] fixed display name support in email sender (wiper, Andris)
@@ -188,7 +192,7 @@ A......... [ZBX-5498] applications API refactoring (Vedmak)
 Changes for 2.0.7rc1
 
 New features:
-
+........S. [ZBX-6493] improved performance when working with Oracle by changing memory based prefetch to rows based (dimir)
 A.F....... [ZBX-1357] updated Spanish and Turkish translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
