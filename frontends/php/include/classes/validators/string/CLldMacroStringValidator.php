@@ -38,7 +38,7 @@ class CLldMacroStringValidator extends CStringValidator {
 		}
 
 		// check if a string contains an LLD macro
-		if (!preg_match('/(\{#'.ZBX_PREG_MACRO_NAME_LLD.'\})+/', $value)) {
+		if (!zbx_empty($value) && !preg_match('/(\{#'.ZBX_PREG_MACRO_NAME_LLD.'\})+/', $value)) {
 			$this->error($this->messageMacro);
 
 			return false;
