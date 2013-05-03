@@ -904,13 +904,13 @@ function getImagesInfo($selement) {
  * Calculate map info.
  *
  * @param array $sysmap
- * @param int   $options['severity_min']
+ * @param int   $options['severity_min']	Minimum trigger severity, default value is maximal (Disaster)
  *
  * @return array
  */
 function getSelementsInfo($sysmap, $options = array()) {
 	if (!isset($options['severity_min'])) {
-		$options['severity_min'] = 0;
+		$options['severity_min'] = TRIGGER_SEVERITY_DISASTER;
 	}
 
 	$config = select_config();
@@ -1159,7 +1159,7 @@ function getSelementsInfo($sysmap, $options = array()) {
 			}
 			else {
 				if ($trigger['value'] == TRIGGER_VALUE_TRUE) {
-					if (!$options['severity_min'] || $options['severity_min'] <= $trigger['priority']) {
+					if ($options['severity_min'] <= $trigger['priority']) {
 						$i['problem']++;
 						$lastProblemId = $triggerId;
 

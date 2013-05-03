@@ -250,7 +250,7 @@ class CPageFilter {
 
 		// severities min
 		if (isset($options['severitiesMin'])) {
-			$this->_initSeveritiesMin($options['severitiesMin']);
+			$this->_initSeveritiesMin($options['severitiesMin']['severity_min']);
 		}
 	}
 
@@ -286,7 +286,7 @@ class CPageFilter {
 			$this->_profileIds['triggerid'] = null;
 			$this->_profileIds['druleid'] = CProfile::get(self::DRULE_LATEST_IDX);
 			$this->_profileIds['application'] = '';
-			$this->_profileIds['severity_min'] = null;
+			$this->_profileIds['severity_min'] = TRIGGER_SEVERITY_DISASTER;
 		}
 		elseif ($this->config['DDReset'] && !$this->config['DDRemember']) {
 			$this->_profileIds['groupid'] = 0;
@@ -295,7 +295,7 @@ class CPageFilter {
 			$this->_profileIds['triggerid'] = 0;
 			$this->_profileIds['druleid'] = 0;
 			$this->_profileIds['application'] = '';
-			$this->_profileIds['severity_min'] = null;
+			$this->_profileIds['severity_min'] = TRIGGER_SEVERITY_DISASTER;
 		}
 		else {
 			$this->_profileIds['groupid'] = CProfile::get($this->_profileIdx['groups']);
@@ -676,12 +676,10 @@ class CPageFilter {
 	 */
 	private function _initSeveritiesMin($severityMin) {
 		if (is_null($severityMin)) {
-			$severityMin = $this->_profileIds['severity_min'];
+			$severityMin = isset($this->_profileIds['severity_min']) ? $this->_profileIds['severity_min'] : TRIGGER_SEVERITY_DISASTER;
 		}
 
-		if ($severityMin) {
-			CProfile::update($this->_profileIdx['severity_min'], $severityMin, PROFILE_TYPE_INT);
-		}
+		CProfile::update($this->_profileIdx['severity_min'], $severityMin, PROFILE_TYPE_INT);
 
 		$this->data['severitiesMin'] = getSeverityCaption();
 		$this->ids['severity_min'] = $severityMin;

@@ -154,7 +154,7 @@ else {
 	add_triggerExpressions($map['selements']);
 
 	$areas = populateFromMapAreas($map);
-	$mapInfo = getSelementsInfo($map, array('severity_min' => get_request('severity_min')));
+	$mapInfo = getSelementsInfo($map, array('severity_min' => get_request('severity_min', TRIGGER_SEVERITY_DISASTER)));
 	processAreasCoordinates($map, $areas, $mapInfo);
 	$allLinks = false;
 }

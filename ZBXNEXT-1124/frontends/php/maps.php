@@ -136,7 +136,7 @@ $data['map'] = API::Map()->get(array(
 $data['map'] = reset($data['map']);
 
 $data['pageFilter'] = new CPageFilter(array(
-	'severitiesMin' => get_request('severity_min', 0)
+	'severitiesMin' => array('severity_min' => get_request('severity_min'))
 ));
 $data['severity_min'] = $data['pageFilter']->severity_min;
 
