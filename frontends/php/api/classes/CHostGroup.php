@@ -83,6 +83,8 @@ class CHostGroup extends CZBXAPI {
 			'output'					=> API_OUTPUT_REFER,
 			'selectHosts'				=> null,
 			'selectTemplates'			=> null,
+			'selectGroupDiscovery'		=> null,
+			'selectDiscoveryRule'		=> null,
 			'countOutput'				=> null,
 			'groupCount'				=> null,
 			'preservekeys'				=> null,
@@ -1069,6 +1071,42 @@ class CHostGroup extends CZBXAPI {
 					}
 				}
 			}
+		}
+
+		// adding discovery rule
+		if ($options['selectDiscoveryRule'] !== null && $options['selectDiscoveryRule'] != API_OUTPUT_COUNT) {
+			// discovered items
+			$discoveryRules = DBFetchArray(DBselect(
+				'SELECT gd.groupid,hd.parent_itemid'.
+					' FROM group_discovery gd,group_prototype gp,host_discovery hd'.
+					' WHERE '.dbConditionInt('gd.groupid', $groupIds).
+					' AND gd.parent_group_prototypeid=gp.group_prototypeid'.
+					' AND gp.hostid=hd.hostid'
+			));
+			$relationMap = $this->createRelationMap($discoveryRules, 'groupid', 'parent_itemid');
+
+			$discoveryRules = API::DiscoveryRule()->get(array(
+				'output' => $options['selectDiscoveryRule'],
+				'nodeids' => $options['nodeids'],
+				'itemids' => $relationMap->getRelatedIds(),
+				'preservekeys' => true
+			));
+			$result = $relationMap->mapOne($result, $discoveryRules, 'discoveryRule');
+		}
+
+		// adding group discovery
+		if ($options['selectGroupDiscovery'] !== null) {
+			$groupDiscoveries = API::getApi()->select('group_discovery', array(
+				'output' => $this->outputExtend('group_discovery', array('groupid'), $options['selectGroupDiscovery']),
+				'filter' => array('groupid' => $groupIds),
+				'preservekeys' => true
+			));
+			$relationMap = $this->createRelationMap($groupDiscoveries, 'groupid', 'groupid');
+
+			$groupDiscoveries = $this->unsetExtraFields($groupDiscoveries, array('groupid'),
+				$options['selectGroupDiscovery']
+			);
+			$result = $relationMap->mapOne($result, $groupDiscoveries, 'groupDiscovery');
 		}
 
 		return $result;

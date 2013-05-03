@@ -1738,17 +1738,16 @@ class CHost extends CHostGeneral {
 				'output' => $options['selectDiscoveryRule'],
 				'nodeids' => $options['nodeids'],
 				'itemids' => $relationMap->getRelatedIds(),
-				'nopermissions' => true,
 				'preservekeys' => true
 			));
 			$result = $relationMap->mapOne($result, $discoveryRules, 'discoveryRule');
 		}
 
-		// adding item discovery
+		// adding host discovery
 		if ($options['selectHostDiscovery'] !== null) {
 			$hostDiscoveries = API::getApi()->select('host_discovery', array(
 				'output' => $this->outputExtend('host_discovery', array('hostid'), $options['selectHostDiscovery']),
-				'filter' => array('hostid' => array_keys($result)),
+				'filter' => array('hostid' => $hostids),
 				'preservekeys' => true
 			));
 			$relationMap = $this->createRelationMap($hostDiscoveries, 'hostid', 'hostid');

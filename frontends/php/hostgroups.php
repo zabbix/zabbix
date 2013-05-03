@@ -307,15 +307,15 @@ else {
 	$data['groupCounts'] = zbx_toHash($data['groupCounts'], 'groupid');
 
 	// get host groups
-	$options = array(
+	$data['groups'] = API::HostGroup()->get(array(
 		'groupids' => zbx_objectValues($groups, 'groupid'),
 		'selectHosts' => array('hostid', 'name', 'status'),
 		'selectTemplates' => array('hostid', 'name', 'status'),
+		'selectGroupDiscovery' => array('ts_delete'),
+		'selectDiscoveryRule' => array('itemid', 'name'),
 		'output' => API_OUTPUT_EXTEND,
-		'nopermissions' => 1,
 		'limitSelects' => $config['max_in_table'] + 1
-	);
-	$data['groups'] = API::HostGroup()->get($options);
+	));
 	order_result($data['groups'], $sortfield, $sortorder);
 
 	// render view
