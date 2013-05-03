@@ -211,7 +211,8 @@ class CTriggerFunctionValidator extends CValidator {
 	}
 
 	/**
-	 * Validate trigger function parameter which can contain operation (band, eq, ge, gt, le, like, lt, ne) or macros.
+	 * Validate trigger function parameter which can contain operation (band, eq, ge, gt, le, like, lt, ne) or
+	 * an empty value.
 	 *
 	 * @param string $param
 	 *
