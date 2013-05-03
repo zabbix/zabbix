@@ -47,7 +47,8 @@ class CMultiSelect extends CTag {
 			'labels' => array(
 				'No matches found' => _('No matches found'),
 				'More matches found...' => _('More matches found...'),
-				'type here to search' => _('type here to search')
+				'type here to search' => _('type here to search'),
+				'new' => _('new')
 			),
 			'data' => empty($options['data']) ? array() : $options['data'],
 			'defaultValue' => isset($options['defaultValue']) ? $options['defaultValue'] : null,
