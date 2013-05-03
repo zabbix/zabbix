@@ -962,20 +962,24 @@ class CDiscoveryRule extends CItemGeneral {
 	protected function copyHostPrototypes(array $srcDiscovery, array $dstDiscovery) {
 		$prototypes = API::HostPrototype()->get(array(
 			'discoveryids' => $srcDiscovery['itemid'],
-			'output' => API_OUTPUT_EXTEND,
+			'output' => array('host', 'name', 'status'),
+			'selectGroupPrototypes' => array('name', 'groupid'),
 			'selectTemplates' => array('templateid'),
 			'preservekeys' => true
 		));
 
 		$rs = array();
 		if ($prototypes) {
-			foreach ($prototypes as $key => $prototype) {
+			foreach ($prototypes as &$prototype) {
 				$prototype['ruleid'] = $dstDiscovery['itemid'];
+				unset($prototype['hostid'], $prototype['templateid']);
 
-				unset($prototype['templateid']);
-
-				$prototypes[$key] = $prototype;
+				foreach ($prototype['groupPrototypes'] as &$groupPrototype) {
+					unset($groupPrototype['group_prototypeid'], $groupPrototype['templateid']);
+				}
+				unset($groupPrototype);
 			}
+			unset($prototype);
 
 			$rs = API::HostPrototype()->create($prototypes);
 			if (!$rs) {

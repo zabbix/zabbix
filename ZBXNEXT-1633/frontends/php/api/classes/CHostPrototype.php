@@ -108,7 +108,8 @@ class CHostPrototype extends CHostBase {
 		$parameters = array(
 			'host' => null,
 			'ruleid' => null,
-			'status' => HOST_STATUS_MONITORED
+			'status' => HOST_STATUS_MONITORED,
+			'groupPrototypes' => null
 		);
 
 		// host prototype validators
@@ -135,11 +136,11 @@ class CHostPrototype extends CHostBase {
 		$groupPrototypeValidator = new CSchemaValidator(array(
 			'validators' => array(
 				'name' => new CLldMacroStringValidator(array(
-					'messageEmpty' => _('No name for group prototype.'),
+					'empty' => true,
 					'messageMacro' => _('Name for group prototype "%1$s" must contain macros.')
 				)),
 				'groupid' => new CIdValidator(array(
-					'messageEmpty' => _('No host group ID for group prototype.'),
+					'empty' => true,
 					'messageInvalid' => _('Incorrect host group ID "%2$s" for group prototype.')
 				)),
 			),
@@ -340,11 +341,11 @@ class CHostPrototype extends CHostBase {
 					'messageInvalid' => _('Incorrect group prototype ID.')
 				)),
 				'name' => new CLldMacroStringValidator(array(
-					'messageEmpty' => _('Group prototype name cannot be empty.'),
+					'empty' => true,
 					'messageMacro' => _('Name for group prototype "%1$s" must contain macros.')
 				)),
 				'groupid' => new CIdValidator(array(
-					'messageEmpty' => _('Group prototype host group ID cannot be empty.'),
+					'empty' => true,
 					'messageInvalid' => _('Incorrect host group ID "%2$s" for group prototype.')
 				)),
 			),
