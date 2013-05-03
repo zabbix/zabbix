@@ -1100,7 +1100,8 @@ class CHost extends CHostGeneral {
 			unset($data['macros']);
 		}
 
-		if (isset($data['inventory'])) {
+		// second check is necessary, because import incorrectly inputs unset 'inventory' as empty string rather than null
+		if (isset($data['inventory']) && $data['inventory']) {
 			$updateInventory = $data['inventory'];
 			unset($data['inventory']);
 
