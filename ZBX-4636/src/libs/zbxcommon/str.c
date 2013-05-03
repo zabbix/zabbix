@@ -2857,7 +2857,7 @@ char	*convert_to_utf8(char *in, size_t in_size, const char *encoding)
 	out_alloc = in_size + 1;
 	p = out = zbx_malloc(out, out_alloc);
 
-	if (*encoding == '\0' || (iconv_t)-1 == (cd = iconv_open(to_code, encoding)))
+	if ('\0' == *encoding || (iconv_t)-1 == (cd = iconv_open(to_code, encoding)))
 	{
 		memcpy(out, in, in_size);
 		out[in_size] = '\0';
