@@ -39,7 +39,8 @@ jQuery(function($) {
 		options.labels = {
 			'No matches found': t('No matches found'),
 			'More matches found...': t('More matches found...'),
-			'type here to search': t('type here to search')
+			'type here to search': t('type here to search'),
+			'new': t('new')
 		};
 
 		return this.each(function() {
@@ -72,7 +73,8 @@ jQuery(function($) {
 			labels: {
 				'No matches found': 'No matches found',
 				'More matches found...': 'More matches found...',
-				'type here to search': 'type here to search'
+				'type here to search': 'type here to search',
+				'new': 'new'
 			},
 			data: [],
 			addNew: false,
@@ -444,12 +446,13 @@ jQuery(function($) {
 			$('.available', obj).prepend(div);
 		}
 
+		var value = values['search'].trim();
 		// add new
-		if (options.addNew == true) {
+		if (options.addNew == true && !empty(value)) {
 			var item = {
-				id: values['search'],
+				id: value,
 				prefix: '',
-				name: values['search']+' (new)'
+				name: value + ' (' + options.labels['new'] + ')'
 			};
 			addAvailable(item, obj, values, options, true);
 		}
