@@ -75,7 +75,12 @@ class CTriggerFunctionValidator extends CValidator {
 			return false;
 		}
 
-		$paramNumLabels = array(_('first'), _('second'), _('third'), _('fourth'));
+		$paramLabels = array(
+			_('Invalid first parameter.'),
+			_('Invalid second parameter.'),
+			_('Invalid third parameter.'),
+			_('Invalid fourth parameter.')
+		);
 
 		foreach ($this->allowed[$value['functionName']]['args'] as $aNum => $arg) {
 			// mandatory check
@@ -90,29 +95,11 @@ class CTriggerFunctionValidator extends CValidator {
 				$userMacro = preg_match('/^'.ZBX_PREG_EXPRESSION_USER_MACROS.'$/', $value['functionParamList'][$aNum]);
 
 				if (!$userMacro) {
-					$invalidParameterLabel = _s('Invalid %1$s parameter.', $paramNumLabels[$aNum]);
-
 					switch ($arg['type']) {
-						case 'str':
-							if (!is_string($value['functionParamList'][$aNum])) {
-								$this->setError(_s('Incorrect trigger function "%1$s" provided in expression.', $functionName).
-									' '.$invalidParameterLabel);
-								return false;
-							}
-							break;
-
-						case 'sec':
-							if (!$this->validateSec($value['functionParamList'][$aNum])) {
-								$this->setError(_s('Incorrect trigger function "%1$s" provided in expression.', $functionName).
-									' '.$invalidParameterLabel);
-								return false;
-							}
-							break;
-
 						case 'sec_zero':
 							if (!$this->validateSecZero($value['functionParamList'][$aNum])) {
 								$this->setError(_s('Incorrect trigger function "%1$s" provided in expression.', $functionName).
-									' '.$invalidParameterLabel);
+									' '.$paramLabels[$aNum]);
 								return false;
 							}
 							break;
@@ -120,7 +107,7 @@ class CTriggerFunctionValidator extends CValidator {
 						case 'sec_num':
 							if (!$this->validateSecNum($value['functionParamList'][$aNum])) {
 								$this->setError(_s('Incorrect trigger function "%1$s" provided in expression.', $functionName).
-									' '.$invalidParameterLabel);
+									' '.$paramLabels[$aNum]);
 								return false;
 							}
 							break;
@@ -128,7 +115,7 @@ class CTriggerFunctionValidator extends CValidator {
 						case 'sec_num_zero':
 							if (!$this->validateSecNumZero($value['functionParamList'][$aNum])) {
 								$this->setError(_s('Incorrect trigger function "%1$s" provided in expression.', $functionName).
-									' '.$invalidParameterLabel);
+									' '.$paramLabels[$aNum]);
 								return false;
 							}
 							break;
@@ -136,7 +123,7 @@ class CTriggerFunctionValidator extends CValidator {
 						case 'num':
 							if (!is_numeric($value['functionParamList'][$aNum])) {
 								$this->setError(_s('Incorrect trigger function "%1$s" provided in expression.', $functionName).
-									' '.$invalidParameterLabel);
+									' '.$paramLabels[$aNum]);
 								return false;
 							}
 							break;
@@ -144,7 +131,7 @@ class CTriggerFunctionValidator extends CValidator {
 						case 'operation':
 							if (!$this->validateOperation($value['functionParamList'][$aNum])) {
 								$this->setError(_s('Incorrect trigger function "%1$s" provided in expression.', $functionName).
-									' '.$invalidParameterLabel);
+									' '.$paramLabels[$aNum]);
 								return false;
 							}
 							break;
@@ -157,40 +144,43 @@ class CTriggerFunctionValidator extends CValidator {
 	}
 
 	/**
-	 * Validate trigger function parameter which can contain only seconds.
-	 * Examples:
-	 *   5
-	 *   1w
+	 * Validate trigger function parameter seconds value.
+	 *
+	 * @param string $param
+	 *
+	 * @return bool
+	 */
+	private function validateSecValue($param) {
+		return preg_match('/^\d+['.ZBX_TIME_SUFFIXES.']{0,1}$/', $param);
+	}
+
+	/**
+	 * Validate trigger function parameter which can contain seconds greater zero.
+	 * Examples: 1, 5w
 	 *
 	 * @param string $param
 	 *
 	 * @return bool
 	 */
 	private function validateSec($param) {
-		return ($param > 0 && preg_match('/^\d+['.ZBX_TIME_SUFFIXES.']{0,1}$/', $param));
+		return ($this->validateSecValue($param) && $param > 0);
 	}
 
 	/**
-	 * Validate trigger function parameter which can contain only seconds or 0.
-	 * Examples:
-	 *   0
-	 *   5
-	 *   1w
+	 * Validate trigger function parameter which can contain only seconds or zero.
+	 * Examples: 0, 1, 5w
 	 *
 	 * @param string $param
 	 *
 	 * @return bool
 	 */
 	private function validateSecZero($param) {
-		return $param ? $this->validateSec($param) : true;
+		return $this->validateSecValue($param);
 	}
 
 	/**
-	 * Validate trigger function parameter which can contain seconds more than 0 or count.
-	 * Examples:
-	 *   5
-	 *   1w
-	 *   #5
+	 * Validate trigger function parameter which can contain seconds greater zero or count.
+	 * Examples: 1, 5w, #1
 	 *
 	 * @param string $param
 	 *
@@ -201,29 +191,34 @@ class CTriggerFunctionValidator extends CValidator {
 			return (substr($param, 1) > 0);
 		}
 
-		return $this->validateSec($param);
+		return ($this->validateSecValue($param) && $param > 0);
 	}
 
 	/**
-	 * Validate trigger function parameter which can contain seconds, count or 0.
+	 * Validate trigger function parameter which can contain seconds or count.
+	 * Examples: 0, 1, 5w, #1
 	 *
 	 * @param string $param
 	 *
 	 * @return bool
 	 */
 	private function validateSecNumZero($param) {
-		return $param ? $this->validateSecNum($param) : true;
+		if (preg_match('/^#\d+$/', $param)) {
+			return (substr($param, 1) > 0);
+		}
+
+		return $this->validateSecValue($param);
 	}
 
 	/**
-	 * Validate trigger function parameter which can contain operation (eq, ne, gt, ge, lt, le, like, band) or macros.
+	 * Validate trigger function parameter which can contain operation (band, eq, ge, gt, le, like, lt, ne) or macros.
 	 *
 	 * @param string $param
 	 *
 	 * @return bool
 	 */
 	private function validateOperation($param) {
-		return $param ? preg_match('/^(eq|ne|gt|ge|lt|le|like|band|{\$.*})$/', $param) : true;
+		return empty($param) ? true : preg_match('/^(eq|ne|gt|ge|lt|le|like|band)$/', $param);
 	}
 
 	/**

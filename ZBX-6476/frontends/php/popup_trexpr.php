@@ -689,11 +689,6 @@ if (!empty($itemId)) {
 			$data['param'][$paramNumber] = '#'.$data['param'][$paramNumber];
 		}
 
-		foreach ($data['param'] as &$param) {
-			$param = quoteFunctionParam($param);
-		}
-		unset($param);
-
 		$data['expression'] = sprintf('{%s:%s.%s(%s)}%s%s',
 			$data['item_host'],
 			$data['item_key'],
@@ -705,9 +700,17 @@ if (!empty($itemId)) {
 
 		// validate trigger expression
 		$triggerExpression = new CTriggerExpression();
-		$triggerExpression->parse($data['expression']);
+		$isValid = $triggerExpression->parse($data['expression']);
+		if (!$isValid) {
+			error($triggerExpression->error);
+			show_messages();
+
+			unset($data['insert']);
+		}
+
 		$expressionData = reset($triggerExpression->expressions);
 
+		// validate trigger function
 		$triggerFunctionValidator = new CTriggerFunctionValidator();
 		$isValid = $triggerFunctionValidator->validate(array(
 			'functionName' => $expressionData['functionName'],
@@ -719,6 +722,13 @@ if (!empty($itemId)) {
 			show_messages();
 
 			unset($data['insert']);
+		}
+
+		// quote function param
+		if (isset($data['insert'])) {
+			foreach ($data['param'] as $pnum => $param) {
+				$data['param'][$pnum] = quoteFunctionParam($param);
+			}
 		}
 	}
 }
