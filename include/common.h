@@ -241,7 +241,9 @@ typedef enum
 	ITEM_VALUE_TYPE_STR,
 	ITEM_VALUE_TYPE_LOG,
 	ITEM_VALUE_TYPE_UINT64,
-	ITEM_VALUE_TYPE_TEXT
+	ITEM_VALUE_TYPE_TEXT,
+	/* the number of defined value types */
+	ITEM_VALUE_TYPE_COUNT
 }
 zbx_item_value_type_t;
 const char	*zbx_item_value_type_string(zbx_item_value_type_t value_type);
@@ -574,6 +576,7 @@ zbx_case_sensitive_t;
 #define TRIGGER_VALUE_OK		0
 #define TRIGGER_VALUE_PROBLEM		1
 #define TRIGGER_VALUE_UNKNOWN		2	/* only in server code, never in DB */
+const char	*zbx_trigger_value_string(unsigned char value);
 
 /* trigger states */
 #define TRIGGER_STATE_NORMAL		0
@@ -754,9 +757,9 @@ extern const char	*help_message[];
 
 #define ARRSIZE(a)	(sizeof(a) / sizeof(*a))
 
-void	help();
-void	usage();
-void	version();
+void	help(void);
+void	usage(void);
+void	version(void);
 
 /* max length of base64 data */
 #define ZBX_MAX_B64_LEN 16 * 1024
@@ -1006,6 +1009,8 @@ void	uint64_array_merge(zbx_uint64_t **values, int *alloc, int *num, zbx_uint64_
 int	uint64_array_exists(zbx_uint64_t *values, int num, zbx_uint64_t value);
 void	uint64_array_remove(zbx_uint64_t *values, int *num, zbx_uint64_t *rm_values, int rm_num);
 void	uint64_array_remove_both(zbx_uint64_t *values, int *num, zbx_uint64_t *rm_values, int *rm_num);
+
+const char	*zbx_event_value_string(unsigned char source, unsigned char object, unsigned char value);
 
 #ifdef _WINDOWS
 LPTSTR	zbx_acp_to_unicode(LPCSTR acp_string);

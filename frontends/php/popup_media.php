@@ -120,7 +120,7 @@ while ($type = DBfetch($types)) {
 	);
 }
 $frmMedia->addRow(_('Type'), $cmbType);
-$frmMedia->addRow(_('Send to'), new CTextBox('sendto', $sendto, 20));
+$frmMedia->addRow(_('Send to'), new CTextBox('sendto', $sendto, 48));
 $frmMedia->addRow(_('When active'), new CTextBox('period', $period, 48));
 
 $frm_row = array();

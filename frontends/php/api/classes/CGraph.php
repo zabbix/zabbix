@@ -305,6 +305,10 @@ class CGraph extends CGraphGeneral {
 			return $result;
 		}
 
+		if (isset($options['expandName'])) {
+			$result = CMacrosResolverHelper::resolveGraphNameByIds($result);
+		}
+
 		if ($result) {
 			$result = $this->addRelatedObjects($options, $result);
 		}

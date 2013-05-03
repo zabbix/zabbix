@@ -163,15 +163,15 @@ static void	update_triggers_status_to_unknown(zbx_uint64_t hostid, zbx_item_type
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		trigger = zbx_malloc(NULL, sizeof(trigger));
+		trigger = zbx_malloc(NULL, sizeof(DC_TRIGGER));
 		ZBX_STR2UINT64(trigger->triggerid, row[0]);
-		trigger->description = row[1];
-		trigger->expression_orig = row[2];
+		trigger->description = zbx_strdup(NULL, row[1]);
+		trigger->expression_orig = zbx_strdup(NULL, row[2]);
 		trigger->priority = (unsigned char)atoi(row[3]);
 		trigger->type = (unsigned char)atoi(row[4]);
 		trigger->value = atoi(row[5]);
 		trigger->state = atoi(row[6]);
-		trigger->error = row[7];
+		trigger->error = zbx_strdup(NULL, row[7]);
 		trigger->lastchange = atoi(row[8]);
 		trigger->new_value = TRIGGER_VALUE_UNKNOWN;
 		trigger->new_error = reason;
@@ -188,7 +188,14 @@ static void	update_triggers_status_to_unknown(zbx_uint64_t hostid, zbx_item_type
 	process_events();
 
 	for (i = 0; i < triggers.values_num; i++)
-		zbx_free(triggers.values[i]);
+	{
+		trigger = (DC_TRIGGER *)triggers.values[i];
+
+		zbx_free(trigger->error);
+		zbx_free(trigger->expression_orig);
+		zbx_free(trigger->description);
+		zbx_free(trigger);
+	}
 	zbx_vector_ptr_destroy(&triggers);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
@@ -581,8 +588,8 @@ static int	get_values(unsigned char poller_type)
 			case ITEM_TYPE_IPMI:
 			case ITEM_TYPE_JMX:
 				ZBX_STRDUP(port, items[i].interface.port_orig);
-				substitute_simple_macros(NULL, NULL, &items[i].host.hostid, NULL, NULL, NULL,
-						&port, MACRO_TYPE_COMMON, NULL, 0);
+				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL, NULL,
+						NULL, &port, MACRO_TYPE_COMMON, NULL, 0);
 				if (FAIL == is_ushort(port, &items[i].interface.port))
 				{
 					SET_MSG_RESULT(&results[i], zbx_dsprintf(NULL, "Invalid port number [%s]",
@@ -599,21 +606,24 @@ static int	get_values(unsigned char poller_type)
 				ZBX_STRDUP(items[i].snmpv3_securityname, items[i].snmpv3_securityname_orig);
 				ZBX_STRDUP(items[i].snmpv3_authpassphrase, items[i].snmpv3_authpassphrase_orig);
 				ZBX_STRDUP(items[i].snmpv3_privpassphrase, items[i].snmpv3_privpassphrase_orig);
+				ZBX_STRDUP(items[i].snmpv3_contextname, items[i].snmpv3_contextname_orig);
 
-				substitute_simple_macros(NULL, NULL, &items[i].host.hostid, NULL, NULL, NULL,
-						&items[i].snmpv3_securityname, MACRO_TYPE_COMMON, NULL, 0);
-				substitute_simple_macros(NULL, NULL, &items[i].host.hostid, NULL, NULL, NULL,
-						&items[i].snmpv3_authpassphrase, MACRO_TYPE_COMMON, NULL, 0);
-				substitute_simple_macros(NULL, NULL, &items[i].host.hostid, NULL, NULL, NULL,
-						&items[i].snmpv3_privpassphrase, MACRO_TYPE_COMMON, NULL, 0);
+				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL, NULL,
+						NULL, &items[i].snmpv3_securityname, MACRO_TYPE_COMMON, NULL, 0);
+				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL, NULL,
+						NULL, &items[i].snmpv3_authpassphrase, MACRO_TYPE_COMMON, NULL, 0);
+				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL, NULL,
+						NULL, &items[i].snmpv3_privpassphrase, MACRO_TYPE_COMMON, NULL, 0);
+				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL, NULL,
+						NULL, &items[i].snmpv3_contextname, MACRO_TYPE_COMMON, NULL, 0);
 				/* break; is not missing here */
 			case ITEM_TYPE_SNMPv1:
 			case ITEM_TYPE_SNMPv2c:
 				ZBX_STRDUP(items[i].snmp_community, items[i].snmp_community_orig);
 				ZBX_STRDUP(items[i].snmp_oid, items[i].snmp_oid_orig);
 
-				substitute_simple_macros(NULL, NULL, &items[i].host.hostid, NULL, NULL, NULL,
-						&items[i].snmp_community, MACRO_TYPE_COMMON, NULL, 0);
+				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL, NULL,
+						NULL, &items[i].snmp_community, MACRO_TYPE_COMMON, NULL, 0);
 				if (SUCCEED != substitute_key_macros(&items[i].snmp_oid, &items[i].host.hostid, NULL,
 						NULL, MACRO_TYPE_SNMP_OID, error, sizeof(error)))
 				{
@@ -626,32 +636,32 @@ static int	get_values(unsigned char poller_type)
 				ZBX_STRDUP(items[i].publickey, items[i].publickey_orig);
 				ZBX_STRDUP(items[i].privatekey, items[i].privatekey_orig);
 
-				substitute_simple_macros(NULL, NULL, &items[i].host.hostid, NULL, NULL, NULL,
-						&items[i].publickey, MACRO_TYPE_COMMON, NULL, 0);
-				substitute_simple_macros(NULL, NULL, &items[i].host.hostid, NULL, NULL, NULL,
-						&items[i].privatekey, MACRO_TYPE_COMMON, NULL, 0);
+				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL, NULL,
+						NULL, &items[i].publickey, MACRO_TYPE_COMMON, NULL, 0);
+				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL, NULL,
+						NULL, &items[i].privatekey, MACRO_TYPE_COMMON, NULL, 0);
 				/* break; is not missing here */
 			case ITEM_TYPE_TELNET:
 				ZBX_STRDUP(items[i].username, items[i].username_orig);
 				ZBX_STRDUP(items[i].password, items[i].password_orig);
 
-				substitute_simple_macros(NULL, NULL, &items[i].host.hostid, NULL, NULL, NULL,
-						&items[i].username, MACRO_TYPE_COMMON, NULL, 0);
-				substitute_simple_macros(NULL, NULL, &items[i].host.hostid, NULL, NULL, NULL,
-						&items[i].password, MACRO_TYPE_COMMON, NULL, 0);
+				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL, NULL,
+						NULL, &items[i].username, MACRO_TYPE_COMMON, NULL, 0);
+				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL, NULL,
+						NULL, &items[i].password, MACRO_TYPE_COMMON, NULL, 0);
 				/* break; is not missing here */
 			case ITEM_TYPE_DB_MONITOR:
-				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i], NULL,
-						&items[i].params, MACRO_TYPE_PARAMS_FIELD, NULL, 0);
+				substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, &items[i],
+						NULL, &items[i].params, MACRO_TYPE_PARAMS_FIELD, NULL, 0);
 				break;
 			case ITEM_TYPE_JMX:
 				ZBX_STRDUP(items[i].username, items[i].username_orig);
 				ZBX_STRDUP(items[i].password, items[i].password_orig);
 
-				substitute_simple_macros(NULL, NULL, &items[i].host.hostid, NULL, NULL, NULL,
-						&items[i].username, MACRO_TYPE_COMMON, NULL, 0);
-				substitute_simple_macros(NULL, NULL, &items[i].host.hostid, NULL, NULL, NULL,
-						&items[i].password, MACRO_TYPE_COMMON, NULL, 0);
+				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL, NULL,
+						NULL, &items[i].username, MACRO_TYPE_COMMON, NULL, 0);
+				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL, NULL,
+						NULL, &items[i].password, MACRO_TYPE_COMMON, NULL, 0);
 				break;
 		}
 	}
@@ -716,6 +726,7 @@ static int	get_values(unsigned char poller_type)
 				zbx_free(items[i].snmpv3_securityname);
 				zbx_free(items[i].snmpv3_authpassphrase);
 				zbx_free(items[i].snmpv3_privpassphrase);
+				zbx_free(items[i].snmpv3_contextname);
 				/* break; is not missing here */
 			case ITEM_TYPE_SNMPv1:
 			case ITEM_TYPE_SNMPv2c:

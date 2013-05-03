@@ -372,7 +372,7 @@ function resolveMapLabelMacros($label, $replaceHosts = null) {
 	// find functional macro pattern
 	$pattern = (null === $replaceHosts)
 		? '/{'.ZBX_PREG_HOST_FORMAT.":.+\.(last|max|min|avg)\([0-9]+[smhdwKMGT]?\)}/Uu"
-		: '/{('.ZBX_PREG_HOST_FORMAT."|{HOSTNAME[0-9]?}|{HOST.HOST[0-9]?}):.+\.(last|max|min|avg)\([0-9]+[smhdwKMGT]?\)}/Uu";
+		: '/{('.ZBX_PREG_HOST_FORMAT."|{HOSTNAME[0-9]?}|{HOST\.HOST[0-9]?}):.+\.(last|max|min|avg)\([0-9]+[smhdwKMGT]?\)}/Uu";
 	preg_match_all($pattern, $label, $matches);
 
 	// for each functional macro
@@ -383,7 +383,7 @@ function resolveMapLabelMacros($label, $replaceHosts = null) {
 			foreach ($replaceHosts as $i => $host) {
 				$macroTmp = $macro;
 				// repalce only macro in first position
-				$macro = preg_replace('/{({HOSTNAME'.$i.'}|{HOST.HOST'.$i.'}):(.*)}/U', '{'.$host['host'].':$2}', $macro);
+				$macro = preg_replace('/{({HOSTNAME'.$i.'}|{HOST\.HOST'.$i.'}):(.*)}/U', '{'.$host['host'].':$2}', $macro);
 				// only one simple macro possible inside functional macro
 				if ($macro != $macroTmp) {
 					break;
@@ -409,7 +409,7 @@ function resolveMapLabelMacros($label, $replaceHosts = null) {
 				'host' => $itemHost,
 				'key_' => $key
 			),
-			'output' => array('lastclock', 'value_type', 'lastvalue', 'units')
+			'output' => array('lastclock', 'value_type', 'lastvalue', 'units', 'valuemapid')
 		));
 
 		$item = reset($item);
@@ -422,45 +422,13 @@ function resolveMapLabelMacros($label, $replaceHosts = null) {
 
 		// do function type (last, min, max, avg) related actions
 		if (0 == strcmp($function, 'last')) {
-			if ($item['lastclock'] == 0) {
-				$label = str_replace($expr, '('._('no data').')', $label);
-			}
-			else {
-				switch ($item['value_type']) {
-					case ITEM_VALUE_TYPE_FLOAT:
-					case ITEM_VALUE_TYPE_UINT64:
-						$value = convert_units($item['lastvalue'], $item['units']);
-						break;
-					default:
-						$value = $item['lastvalue'];
-				}
-				$label = str_replace($expr, $value, $label);
-			}
+			$value = formatItemLastValue($item, UNRESOLVED_MACRO_STRING);
 		}
 		elseif (0 == strcmp($function, 'min') || 0 == strcmp($function, 'max') || 0 == strcmp($function, 'avg')) {
-			// allowed item types for min, max and avg function
-			$history_table = array(
-				ITEM_VALUE_TYPE_FLOAT => 'history',
-				ITEM_VALUE_TYPE_UINT64 => 'history_uint'
-			);
-			if (!isset($history_table[$item['value_type']])) {
-				$label = str_replace($expr, '???', $label);
-				continue;
-			}
-
-			// search for item function data in DB corresponding history tables
-			$result = DBselect(
-				'SELECT '.$function.'(value) AS value'.
-				' FROM '.$history_table[$item['value_type']].
-				' WHERE clock>'.(time() - $parameter).
-				' AND itemid='.$item['itemid']
-			);
-			if (null === ($row = DBfetch($result))) {
-				$label = str_replace($expr, '('._('no data').')', $label);
-			}
-			else {
-				$label = str_replace($expr, convert_units($row['value'], $item['units']), $label);
-			}
+			$value = getItemFunctionalValue($item, $function, $parameter);
+		}
+		if (isset($value)) {
+			$label = str_replace($expr, $value, $label);
 		}
 	}
 
