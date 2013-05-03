@@ -126,7 +126,9 @@ class CHostPrototype extends CHostBase {
 		));
 		$groupPrototypeCollectionValidator = new CGroupPrototypeCollectionValidator(array(
 			'messageEmpty' => _('Host prototype "%1$s" must have at least one group prototype.'),
-			'messageHostGroups' => _('Host prototype "%1$s" must have at least one host group.')
+			'messageHostGroups' => _('Host prototype "%1$s" must have at least one host group.'),
+			'messageDuplicateName' => _('Duplicate group prototype name "%2$s" for host prototype "%1$s".'),
+			'messageDuplicateGroupId' => _('Duplicate group prototype group ID "%2$s" for host prototype "%1$s".')
 		));
 
 		// group prototype validator
@@ -323,6 +325,12 @@ class CHostPrototype extends CHostBase {
 			'messageRegex' => _('Incorrect characters used for host "%1$s".'),
 			'messageMacro' => _('Host name for host prototype "%1$s" must contain macros.')
 		));
+		$groupPrototypeCollectionValidator = new CGroupPrototypeCollectionValidator(array(
+			'messageEmpty' => _('Host prototype "%1$s" must have at least one group prototype.'),
+			'messageHostGroups' => _('Host prototype "%1$s" must have at least one host group.'),
+			'messageDuplicateName' => _('Duplicate group prototype name "%2$s" for host prototype "%1$s".'),
+			'messageDuplicateGroupId' => _('Duplicate group prototype group ID "%2$s" for host prototype "%1$s".')
+		));
 
 		// group prototype validator
 		$groupPrototypeValidator = new CSchemaValidator(array(
@@ -345,12 +353,6 @@ class CHostPrototype extends CHostBase {
 				'messageBoth' => _('Host group prototype "%1$s" cannot have a name and a group ID set at the same time.'),
 			))),
 			'messageUnsupported' => _('Wrong fields for group prototype "%1$s".')
-		));
-		$groupPrototypeCollectionValidator = new CGroupPrototypeCollectionValidator(array(
-			'messageEmpty' => _('Host prototype "%1$s" must have at least one group prototype.'),
-			'messageHostGroups' => _('Host prototype "%1$s" must have at least one host group.'),
-			'messageDuplicateName' => _('Duplicate group prototype name "%2$s" for host prototype "%1$s".'),
-			'messageDuplicateGroupId' => _('Duplicate group prototype group ID "%2$s" for host prototype "%1$s".')
 		));
 
 		foreach ($hostPrototypes as $hostPrototype) {
