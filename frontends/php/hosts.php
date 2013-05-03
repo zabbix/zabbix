@@ -214,7 +214,6 @@ elseif (isset($_REQUEST['full_clone']) && isset($_REQUEST['hostid'])) {
 elseif (isset($_REQUEST['go']) && $_REQUEST['go'] == 'massupdate' && isset($_REQUEST['masssave'])) {
 	$hostids = get_request('hosts', array());
 	$visible = get_request('visible', array());
-	$_REQUEST['newgroup'] = get_request('newgroup', '');
 	$_REQUEST['proxy_hostid'] = get_request('proxy_hostid', 0);
 	$_REQUEST['templates'] = get_request('templates', array());
 
@@ -236,31 +235,58 @@ elseif (isset($_REQUEST['go']) && $_REQUEST['go'] == 'massupdate' && isset($_REQ
 			$new_values['inventory'] = $new_values['inventory_mode'] != HOST_INVENTORY_DISABLED ? get_request('host_inventory', array()) : array();
 		}
 
-		$newgroup = array();
-		if (isset($visible['newgroup']) && !empty($_REQUEST['newgroup'])) {
-			if (!$result = API::HostGroup()->create(array('name' => $_REQUEST['newgroup']))) {
-				throw new Exception();
-			}
-
-			$newgroup = array('groupid' => reset($result['groupids']), 'name' => $_REQUEST['newgroup']);
-		}
-
 		$templates = array();
 		if (isset($visible['template_table'])) {
 			$tplids = array_keys($_REQUEST['templates']);
 			$templates = zbx_toObject($tplids, 'templateid');
 		}
 
+		// add new or existing host groups
+		if (isset($visible['new_groups']) && !empty($_REQUEST['new_groups'])) {
+			if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
+				foreach ($_REQUEST['new_groups'] as $newGroup) {
+					if (isset($newGroup['new'])) {
+						$newgroups[] = array('name' => $newGroup['new']);
+					}
+					else {
+						$new_groups[] =$newGroup['exist'];
+					}
+				}
+				if (isset($newgroups)) {
+					if (!$createdGroups = API::HostGroup()->create($newgroups)) {
+						throw new Exception();
+					}
+					if (isset($new_groups)) {
+						$new_groups = array_merge($new_groups, $createdGroups['groupids']);
+					}
+					else {
+						$new_groups = $createdGroups['groupids'];
+					}
+				}
+			}
+			else {
+				$new_groups = $_REQUEST['new_groups'];
+			}
+		}
+
 		if (isset($visible['groups'])) {
+			if (isset($new_groups)){
+				$_REQUEST['groups'] = array_unique(array_merge($_REQUEST['groups'], $new_groups));
+			}
 			$hosts['groups'] = API::HostGroup()->get(array(
 				'groupids' => get_request('groups', array()),
 				'editable' => true,
 				'output' => array('groupid')
 			));
-			if (!empty($newgroup)) {
-				$hosts['groups'][] = $newgroup;
-			}
 		}
+		elseif (isset($new_groups)) {
+			$new_groups = API::HostGroup()->get(array(
+				'groupids' => $new_groups,
+				'editable' => true,
+				'output' => array('groupid')
+			));
+		}
+
 		if (isset($_REQUEST['mass_replace_tpls'])) {
 			if (isset($_REQUEST['mass_clear_tpls'])) {
 				$host_templates = API::Template()->get(array('hostids' => $hostids));
@@ -280,9 +306,12 @@ elseif (isset($_REQUEST['go']) && $_REQUEST['go'] == 'massupdate' && isset($_REQ
 		if (!empty($templates) && isset($visible['template_table'])) {
 			$add['templates'] = $templates;
 		}
-		if (!empty($newgroup) && !isset($visible['groups'])) {
-			$add['groups'][] = $newgroup;
+
+		// add new host groups
+		if (!empty($new_groups) && !isset($visible['groups'])) {
+			$add['groups'] = $new_groups;
 		}
+
 		if (!empty($add)) {
 			$add['hosts'] = $hosts['hosts'];
 
