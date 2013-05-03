@@ -414,8 +414,11 @@ jQuery(function($) {
 	function loadAvailable(data, obj, values, options) {
 		cleanAvailable(obj, values);
 
+		var availableValues = [];
+
 		if (!empty(data)) {
 			$.each(data, function(i, item) {
+				availableValues.push(item.name);
 				addAvailable(item, obj, values, options, false);
 			});
 		}
@@ -448,7 +451,7 @@ jQuery(function($) {
 
 		var value = values['search'].trim();
 		// add new
-		if (options.addNew == true && !empty(value)) {
+		if (options.addNew == true && !empty(value) && $.inArray(value, availableValues)) {
 			var item = {
 				id: value,
 				prefix: '',
