@@ -246,32 +246,32 @@ elseif (isset($_REQUEST['go']) && $_REQUEST['go'] == 'massupdate' && isset($_REQ
 			if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
 				foreach ($_REQUEST['new_groups'] as $newGroup) {
 					if (isset($newGroup['new'])) {
-						$newgroups[] = array('name' => $newGroup['new']);
+						$newGroups[] = array('name' => $newGroup['new']);
 					}
 					else {
-						$new_groups[] =$newGroup['exist'];
+						$existGroups[] =$newGroup['exist'];
 					}
 				}
-				if (isset($newgroups)) {
-					if (!$createdGroups = API::HostGroup()->create($newgroups)) {
+				if (isset($newGroups)) {
+					if (!$createdGroups = API::HostGroup()->create($newGroups)) {
 						throw new Exception();
 					}
-					if (isset($new_groups)) {
-						$new_groups = array_merge($new_groups, $createdGroups['groupids']);
+					if (isset($existGroups)) {
+						$existGroups = array_merge($existGroups, $createdGroups['groupids']);
 					}
 					else {
-						$new_groups = $createdGroups['groupids'];
+						$existGroups = $createdGroups['groupids'];
 					}
 				}
 			}
 			else {
-				$new_groups = $_REQUEST['new_groups'];
+				$existGroups = $_REQUEST['new_groups'];
 			}
 		}
 
 		if (isset($visible['groups'])) {
-			if (isset($new_groups)){
-				$_REQUEST['groups'] = array_unique(array_merge($_REQUEST['groups'], $new_groups));
+			if (isset($existGroups)){
+				$_REQUEST['groups'] = array_unique(array_merge($_REQUEST['groups'], $existGroups));
 			}
 			$hosts['groups'] = API::HostGroup()->get(array(
 				'groupids' => get_request('groups', array()),
@@ -279,9 +279,9 @@ elseif (isset($_REQUEST['go']) && $_REQUEST['go'] == 'massupdate' && isset($_REQ
 				'output' => array('groupid')
 			));
 		}
-		elseif (isset($new_groups)) {
-			$new_groups = API::HostGroup()->get(array(
-				'groupids' => $new_groups,
+		elseif (isset($existGroups)) {
+			$existGroups = API::HostGroup()->get(array(
+				'groupids' => $existGroups,
 				'editable' => true,
 				'output' => array('groupid')
 			));
@@ -308,8 +308,8 @@ elseif (isset($_REQUEST['go']) && $_REQUEST['go'] == 'massupdate' && isset($_REQ
 		}
 
 		// add new host groups
-		if (!empty($new_groups) && !isset($visible['groups'])) {
-			$add['groups'] = $new_groups;
+		if (!empty($existGroups) && !isset($visible['groups'])) {
+			$add['groups'] = $existGroups;
 		}
 
 		if (!empty($add)) {
