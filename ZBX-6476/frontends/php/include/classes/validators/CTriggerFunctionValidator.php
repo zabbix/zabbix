@@ -155,18 +155,6 @@ class CTriggerFunctionValidator extends CValidator {
 	}
 
 	/**
-	 * Validate trigger function parameter which can contain seconds greater zero.
-	 * Examples: 1, 5w
-	 *
-	 * @param string $param
-	 *
-	 * @return bool
-	 */
-	private function validateSec($param) {
-		return ($this->validateSecValue($param) && $param > 0);
-	}
-
-	/**
 	 * Validate trigger function parameter which can contain only seconds or zero.
 	 * Examples: 0, 1, 5w
 	 *
@@ -219,7 +207,7 @@ class CTriggerFunctionValidator extends CValidator {
 	 * @return bool
 	 */
 	private function validateOperation($param) {
-		return empty($param) ? true : preg_match('/^(eq|ne|gt|ge|lt|le|like|band)$/', $param);
+		return preg_match('/^(eq|ne|gt|ge|lt|le|like|band|)$/', $param);
 	}
 
 	/**

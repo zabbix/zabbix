@@ -176,6 +176,8 @@ class CTriggerFunctionValidatorTest extends PHPUnit_Framework_TestCase {
 			$params[$no] = 'like';		$tests[] = array($func, $params, $valueType, isset($valueTypes[$valueType]));
 			$params[$no] = 'band';		$tests[] = array($func, $params, $valueType, isset($valueTypes[$valueType]));
 			$params[$no] = '{$M}';		$tests[] = array($func, $params, $valueType, isset($valueTypes[$valueType]));
+			$params[$no] = '';			$tests[] = array($func, $params, $valueType, isset($valueTypes[$valueType]));
+			$params[$no] = '0';			$tests[] = array($func, $params, $valueType, false);
 			$params[$no] = '#12345';	$tests[] = array($func, $params, $valueType, false);
 			$params[$no] = '#01';		$tests[] = array($func, $params, $valueType, false);
 			$params[$no] = '#-15';		$tests[] = array($func, $params, $valueType, false);
