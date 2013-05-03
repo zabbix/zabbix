@@ -140,7 +140,6 @@ int	CONFIG_CONF_CACHE_SIZE		= 8 * ZBX_MEBIBYTE;
 int	CONFIG_HISTORY_CACHE_SIZE	= 8 * ZBX_MEBIBYTE;
 int	CONFIG_TRENDS_CACHE_SIZE	= 4 * ZBX_MEBIBYTE;
 int	CONFIG_TEXT_CACHE_SIZE		= 16 * ZBX_MEBIBYTE;
-int	CONFIG_DISABLE_HOUSEKEEPING	= 0;
 int	CONFIG_UNREACHABLE_PERIOD	= 45;
 int	CONFIG_UNREACHABLE_DELAY	= 15;
 int	CONFIG_UNAVAILABLE_DELAY	= 60;
@@ -239,9 +238,6 @@ static void	zbx_set_defaults()
 #ifdef HAVE_SQLITE3
 	CONFIG_MAX_HOUSEKEEPER_DELETE = 0;
 #endif
-
-	if (1 == CONFIG_DISABLE_HOUSEKEEPING)
-		CONFIG_HOUSEKEEPER_FORKS = 0;
 }
 
 /******************************************************************************
@@ -351,8 +347,6 @@ static void	zbx_load_config()
 			PARM_OPT,	1024,			32767},
 		{"SourceIP",			&CONFIG_SOURCE_IP,			TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"DisableHousekeeping",		&CONFIG_DISABLE_HOUSEKEEPING,		TYPE_INT,
-			PARM_OPT,	0,			1},
 		{"DebugLevel",			&CONFIG_LOG_LEVEL,			TYPE_INT,
 			PARM_OPT,	0,			4},
 		{"PidFile",			&CONFIG_PID_FILE,			TYPE_STRING,
@@ -628,6 +622,9 @@ int	MAIN_ZABBIX_ENTRY()
 	zbx_create_services_lock();
 
 	DCload_config();
+
+	/* make initial configuration sync before worker processes are forked */
+	DCsync_configuration();
 
 	DBclose();
 

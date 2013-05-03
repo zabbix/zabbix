@@ -50,7 +50,7 @@ class testFormAdministrationGeneralWorkperiod extends CWebTest {
 		$this->checkTitle('Configuration of working time');
 		$this->zbxTestTextPresent(array('CONFIGURATION OF WORKING TIME', 'Working time'));
 
-		$sqlHash = 'SELECT configid,alert_history,event_history,refresh_unsupported,alert_usrgrpid,'.
+		$sqlHash = 'SELECT configid,refresh_unsupported,alert_usrgrpid,'.
 				'event_ack_enable,event_expire,event_show_max,default_theme,authentication_type,'.
 				'ldap_host,ldap_port,ldap_base_dn,ldap_bind_dn,ldap_bind_password,'.
 				'ldap_search_attribute,dropdown_first_entry,dropdown_first_remember,discovery_groupid,'.

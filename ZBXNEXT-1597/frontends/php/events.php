@@ -675,6 +675,10 @@ else {
 				$hostScripts = API::Script()->getScriptsByHosts($hostids);
 			}
 
+			// actions
+			$actions = getEventActionsStatus(zbx_objectValues($events, 'eventid'));
+
+			// events
 			foreach ($events as $enum => $event) {
 				$trigger = $triggers[$event['objectid']];
 				$host = reset($trigger['hosts']);
@@ -692,9 +696,6 @@ else {
 					$i['name'] = itemName($item);
 					$items[] = $i;
 				}
-
-				// actions
-				$actions = get_event_actions_status($event['eventid']);
 
 				$ack = getEventAckState($event, true);
 
@@ -730,6 +731,9 @@ else {
 					$hostSpan->setAttribute('data-menu', hostMenuData($host, $scripts));
 				}
 
+				// action
+				$action = isset($actions[$event['eventid']]) ? $actions[$event['eventid']] : ' - ';
+
 				$table->addRow(array(
 					new CLink(zbx_date2str(EVENTS_ACTION_TIME_FORMAT, $event['clock']),
 							'tr_events.php?triggerid='.$event['objectid'].'&eventid='.$event['eventid'],
@@ -742,7 +746,7 @@ else {
 					getSeverityCell($trigger['priority'], null, !$event['value']),
 					$event['duration'],
 					($config['event_ack_enable']) ? $ack : null,
-					$actions
+					$action
 				));
 
 				if ($CSV_EXPORT) {
@@ -756,7 +760,7 @@ else {
 						$event['duration'],
 						($config['event_ack_enable']) ? ($event['acknowledges'] ? _('Yes') : _('No')) : null,
 						// ($config['event_ack_enable'])? $ack :NULL,
-						strip_tags((string) $actions)
+						strip_tags((string) $action)
 					);
 				}
 			}
