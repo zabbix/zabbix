@@ -833,7 +833,10 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 		$oldHashConfig = DBhash($sqlConfig);
 
 		$this->zbxTestClick('resetDefaults');
+		$this->assertVisible("//div[@class='ui-dialog ui-widget ui-widget-content ui-corner-all']");
+		$this->zbxTestClick("//div[@class='ui-dialog ui-widget ui-widget-content ui-corner-all']/div/div/button[1]");
 		$this->zbxTestClickWait('save');
+
 		$this->zbxTestTextPresent('Configuration updated');
 		$this->checkTitle('Configuration of housekeeper');
 		$this->zbxTestTextPresent(array('CONFIGURATION OF HOUSEKEEPER', 'Housekeeper'));
@@ -873,13 +876,11 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 		$this->assertElementPresent("//input[@id='hk_history_mode']/@checked");
 		$this->assertElementNotPresent("//input[@id='hk_history_global']/@checked");
 		$this->assertVisible('hk_history');
-		$this->assertAttribute("//input[@id='hk_history']/@value", 90);
 		$this->assertElementPresent("//input[@id='hk_history']/@disabled");
 
 		$this->assertElementPresent("//input[@id='hk_trends_mode']/@checked");
 		$this->assertElementNotPresent("//input[@id='hk_trends_global']/@checked");
 		$this->assertVisible('hk_trends');
-		$this->assertAttribute("//input[@id='hk_trends']/@value", 365);
 		$this->assertElementPresent("//input[@id='hk_trends']/@disabled");
 
 		$this->assertEquals($oldHashConfig, DBhash($sqlConfig), "Values in some DB fields changed, but shouldn't.");
