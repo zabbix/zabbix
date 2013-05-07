@@ -39,7 +39,7 @@ $fields = array(
 	'resourcetype' =>	array(T_ZBX_INT, O_OPT, null,	BETWEEN(0, 16),	'isset({save})'),
 	'caption' =>		array(T_ZBX_STR, O_OPT, null,	null,			null),
 	'resourceid' =>		array(T_ZBX_INT, O_OPT, null,	DB_ID,			'isset({save})',
-		isset($_REQUEST['resourcetype']) ? getResourceNameByType($_REQUEST['resourcetype']) : 'resourceid'),
+		isset($_REQUEST['save']) ? getResourceNameByType($_REQUEST['resourcetype']) : null),
 	'templateid' =>		array(T_ZBX_INT, O_OPT, null,	DB_ID,			null),
 	'width' =>			array(T_ZBX_INT, O_OPT, null,	BETWEEN(0, 65535), null, _('Width')),
 	'height' =>			array(T_ZBX_INT, O_OPT, null,	BETWEEN(0, 65535), null, _('Height')),
