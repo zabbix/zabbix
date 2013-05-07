@@ -105,31 +105,43 @@ class CHostPrototype extends CHostBase {
 	 * @return void
 	 */
 	protected function validateCreate(array $hostPrototypes) {
-		$parameters = array(
-			'host' => null,
-			'ruleid' => null,
-			'status' => HOST_STATUS_MONITORED,
-			'groupPrototypes' => null
-		);
-
-		// host prototype validators
-		$hostValidator = new CLldMacroStringValidator(array(
-			'maxLength' => 64,
-			'regex' => '/^('.ZBX_PREG_INTERNAL_NAMES.'|\{#'.ZBX_PREG_MACRO_NAME_LLD.'\})+$/',
-			'messageEmpty' => _('Empty host.'),
-			'messageMaxLength' => _n(
-				'Host name "%1$s" is too long, it must have less then %2$d character.',
-				'Host name "%1$s" is too long, it must have less then %2$d characters.',
-				64
+		$hostPrototypeValidator = new CSchemaValidator(array(
+			'validators' => array(
+				'host' => new CLldMacroStringValidator(array(
+					'maxLength' => 64,
+					'regex' => '/^('.ZBX_PREG_INTERNAL_NAMES.'|\{#'.ZBX_PREG_MACRO_NAME_LLD.'\})+$/',
+					'messageEmpty' => _('Empty host.'),
+					'messageMaxLength' => _n(
+						'Host name "%1$s" is too long, it must have less then %2$d character.',
+						'Host name "%1$s" is too long, it must have less then %2$d characters.',
+						64
+					),
+					'messageRegex' => _('Incorrect characters used for host "%1$s".'),
+					'messageMacro' => _('Host name for host prototype "%1$s" must contain macros.')
+				)),
+				'name' => new CStringValidator(array(
+					'messageEmpty' => _('Empty name for host prototype "%1$s".')
+				)),
+				'status' => new CSetValidator(array(
+					'values' => array(HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED),
+					'messageInvalid' => _('Incorrect status for host prototype "%1$s".')
+				)),
+				'ruleid' => new CIdValidator(array(
+					'messageEmpty' => _('No discovery rule ID given for host prototype "%1$s".'),
+					'messageInvalid' => _('Incorrect discovery rule ID for host prototype "%1$s".')
+				)),
+				'groupPrototypes' => new CGroupPrototypeCollectionValidator(array(
+					'messageEmpty' => _('Host prototype "%1$s" must have at least one group prototype.'),
+					'messageHostGroups' => _('Host prototype "%1$s" must have at least one host group.'),
+					'messageDuplicateName' => _('Duplicate group prototype name "%2$s" for host prototype "%1$s".'),
+					'messageDuplicateGroupId' => _('Duplicate group prototype group ID "%2$s" for host prototype "%1$s".')
+				)),
+				'inventory' => null,
+				'templates' => null
 			),
-			'messageRegex' => _('Incorrect characters used for host "%1$s".'),
-			'messageMacro' => _('Host name for host prototype "%1$s" must contain macros.')
-		));
-		$groupPrototypeCollectionValidator = new CGroupPrototypeCollectionValidator(array(
-			'messageEmpty' => _('Host prototype "%1$s" must have at least one group prototype.'),
-			'messageHostGroups' => _('Host prototype "%1$s" must have at least one host group.'),
-			'messageDuplicateName' => _('Duplicate group prototype name "%2$s" for host prototype "%1$s".'),
-			'messageDuplicateGroupId' => _('Duplicate group prototype group ID "%2$s" for host prototype "%1$s".')
+			'required' => array('host', 'ruleid', 'groupPrototypes'),
+			'messageRequired' => _('Wrong fields for host prototype "%1$s".'),
+			'messageUnsupported' => _('Wrong fields for host prototype "%1$s".'),
 		));
 
 		// group prototype validator
@@ -152,26 +164,11 @@ class CHostPrototype extends CHostBase {
 		));
 
 		foreach ($hostPrototypes as $hostPrototype) {
-			if (!check_db_fields($parameters, $hostPrototype)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Wrong fields for host prototype "%1$s".', $hostPrototype['host']));
-			}
-
-			$this->checkUnsupportedFields($this->tableName(), $hostPrototype,
-				_s('Wrong fields for host prototype "%1$s".', $hostPrototype['host']),
-				array('ruleid', 'templates', 'inventory', 'groupPrototypes')
-			);
-
-			$hostValidator->setObjectName($hostPrototype['host']);
-			$this->checkValidator($hostPrototype['host'], $hostValidator);;
-			$this->checkName($hostPrototype);
-			$this->checkStatus($hostPrototype);
-			$this->checkId($hostPrototype['ruleid'],
-				_s('Incorrect discovery rule ID for host prototype "%1$s".', $hostPrototype['host'])
-			);
+			// host prototype
+			$hostPrototypeValidator->setObjectName(isset($hostPrototype['host']) ? $hostPrototype['host'] : '');
+			$this->checkValidator($hostPrototype, $hostPrototypeValidator);
 
 			// group prototypes
-			$groupPrototypeCollectionValidator->setObjectName($hostPrototype['host']);
-			$this->checkValidator($hostPrototype['groupPrototypes'], $groupPrototypeCollectionValidator);
 			foreach ($hostPrototype['groupPrototypes'] as $groupPrototype) {
 				$groupPrototypeValidator->setObjectName(isset($groupPrototype['name']) ? $groupPrototype['name'] : '');
 				$this->checkValidator($groupPrototype, $groupPrototypeValidator);
@@ -327,23 +324,42 @@ class CHostPrototype extends CHostBase {
 
 		$hostPrototypes = $this->extendObjects($this->tableName(), $hostPrototypes, array('host'));
 
-		$hostValidator = new CLldMacroStringValidator(array(
-			'maxLength' => 64,
-			'regex' => '/^('.ZBX_PREG_INTERNAL_NAMES.'|\{#'.ZBX_PREG_MACRO_NAME_LLD.'\})+$/',
-			'messageEmpty' => _('Empty host.'),
-			'messageMaxLength' => _n(
-				'Host name "%1$s" is too long, it must have less then %2$d character.',
-				'Host name "%1$s" is too long, it must have less then %2$d characters.',
-				64
+		$hostPrototypeValidator = new CSchemaValidator(array(
+			'validators' => array(
+				'host' => new CLldMacroStringValidator(array(
+					'maxLength' => 64,
+					'regex' => '/^('.ZBX_PREG_INTERNAL_NAMES.'|\{#'.ZBX_PREG_MACRO_NAME_LLD.'\})+$/',
+					'messageEmpty' => _('Empty host.'),
+					'messageMaxLength' => _n(
+						'Host name "%1$s" is too long, it must have less then %2$d character.',
+						'Host name "%1$s" is too long, it must have less then %2$d characters.',
+						64
+					),
+					'messageRegex' => _('Incorrect characters used for host "%1$s".'),
+					'messageMacro' => _('Host name for host prototype "%1$s" must contain macros.')
+				)),
+				'name' => new CStringValidator(array(
+					'messageEmpty' => _('Empty name for host prototype "%1$s".')
+				)),
+				'status' => new CSetValidator(array(
+					'values' => array(HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED),
+					'messageInvalid' => _('Incorrect status for host prototype "%1$s".')
+				)),
+				'ruleid' => new CIdValidator(array(
+					'messageEmpty' => _('No discovery rule ID given for host prototype "%1$s".'),
+					'messageInvalid' => _('Incorrect discovery rule ID for host prototype "%1$s".')
+				)),
+				'groupPrototypes' => new CGroupPrototypeCollectionValidator(array(
+					'messageEmpty' => _('Host prototype "%1$s" must have at least one group prototype.'),
+					'messageHostGroups' => _('Host prototype "%1$s" must have at least one host group.'),
+					'messageDuplicateName' => _('Duplicate group prototype name "%2$s" for host prototype "%1$s".'),
+					'messageDuplicateGroupId' => _('Duplicate group prototype group ID "%2$s" for host prototype "%1$s".')
+				)),
+				'inventory' => null,
+				'templates' => null,
+				'hostid' => null
 			),
-			'messageRegex' => _('Incorrect characters used for host "%1$s".'),
-			'messageMacro' => _('Host name for host prototype "%1$s" must contain macros.')
-		));
-		$groupPrototypeCollectionValidator = new CGroupPrototypeCollectionValidator(array(
-			'messageEmpty' => _('Host prototype "%1$s" must have at least one group prototype.'),
-			'messageHostGroups' => _('Host prototype "%1$s" must have at least one host group.'),
-			'messageDuplicateName' => _('Duplicate group prototype name "%2$s" for host prototype "%1$s".'),
-			'messageDuplicateGroupId' => _('Duplicate group prototype group ID "%2$s" for host prototype "%1$s".')
+			'messageUnsupported' => _('Wrong fields for host prototype "%1$s".'),
 		));
 
 		// group prototype validator
@@ -370,26 +386,12 @@ class CHostPrototype extends CHostBase {
 		));
 
 		foreach ($hostPrototypes as $hostPrototype) {
-			$this->checkUnsupportedFields($this->tableName(), $hostPrototype,
-				_s('Wrong fields for host prototype "%1$s".', $hostPrototype['host']),
-				array('templates', 'inventory', 'groupPrototypes')
-			);
-
-			if (isset($hostPrototype['host'])) {
-				$hostValidator->setObjectName($hostPrototype['host']);
-				$this->checkValidator($hostPrototype['host'], $hostValidator);
-			}
-			if (isset($hostPrototype['name'])) {
-				$this->checkName($hostPrototype);
-			}
-			if (isset($hostPrototype['status'])) {
-				$this->checkStatus($hostPrototype);
-			}
+			// host prototype
+			$hostPrototypeValidator->setObjectName($hostPrototype['host']);
+			$this->checkValidator($hostPrototype, $hostPrototypeValidator);
 
 			// group prototypes
 			if (isset($hostPrototype['groupPrototypes'])) {
-				$groupPrototypeCollectionValidator->setObjectName($hostPrototype['host']);
-				$this->checkValidator($hostPrototype['groupPrototypes'], $groupPrototypeCollectionValidator);
 				foreach ($hostPrototype['groupPrototypes'] as $groupPrototype) {
 					$groupPrototypeValidator->setObjectName(isset($groupPrototype['name']) ? $groupPrototype['name'] : '');
 					$this->checkValidator($groupPrototype, $groupPrototypeValidator);
@@ -951,41 +953,6 @@ class CHostPrototype extends CHostBase {
 		}
 
 		parent::link($templateids, $targetids);
-	}
-
-	/**
-	 * Validates the "name" field. Assumes the "host" field is valid.
-	 *
-	 * @throws APIException if the name is missing
-	 *
-	 * @param array $host
-	 *
-	 * @return void
-	 */
-	protected function checkName(array $host) {
-		if (zbx_empty($host['name'])) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Empty name for host prototype "%1$s".', $host['host']));
-		}
-	}
-
-	/**
-	 * Validates the "host" field. Assumes the "host" field is valid.
-	 *
-	 * @throws APIException if the status is incorrect
-	 *
-	 * @param array $host
-	 *
-	 * @return void
-	 */
-	protected function checkStatus(array $host) {
-		$statuses = array(
-			HOST_STATUS_MONITORED => true,
-			HOST_STATUS_NOT_MONITORED => true
-		);
-
-		if (!isset($statuses[$host['status']])) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect status for host prototype "%1$s".', $host['host']));
-		}
 	}
 
 	/**

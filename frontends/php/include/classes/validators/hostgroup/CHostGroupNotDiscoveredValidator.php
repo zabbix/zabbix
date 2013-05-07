@@ -26,7 +26,7 @@ class CHostGroupNotDiscoveredValidator extends CValidator {
 	 *
 	 * @var string
 	 */
-	public $message = '';
+	public $message;
 
 	/**
 	 * Checks is any of the given host groups are discovered.
@@ -45,7 +45,7 @@ class CHostGroupNotDiscoveredValidator extends CValidator {
 
 		if ($hostGroups) {
 			$hostGroup = reset($hostGroups);
-			$this->setError(_s($this->message, $hostGroup['name']));
+			$this->error($this->message, $hostGroup['name']);
 
 			return false;
 		}

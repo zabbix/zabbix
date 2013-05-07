@@ -26,14 +26,14 @@ class CHostNotDiscoveredValidator extends CValidator {
 	 *
 	 * @var string
 	 */
-	public $message = '';
+	public $message;
 
 	/**
 	 * Checks is any of the given hosts are discovered.
 	 *
 	 * @param $hostIds
 	 *
-	 * @return bool|void
+	 * @return bool
 	 */
 	public function validate($hostIds) {
 		$hosts = API::Host()->get(array(
@@ -45,7 +45,7 @@ class CHostNotDiscoveredValidator extends CValidator {
 
 		if ($hosts) {
 			$host = reset($hosts);
-			$this->setError(_s($this->message, $host['host']));
+			$this->error($this->message, $host['host']);
 			return false;
 		}
 

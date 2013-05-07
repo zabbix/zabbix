@@ -22,7 +22,8 @@
 abstract class CValidator {
 
 	/**
-	 * Name of the object that can be used in error message. If it is set, it will replace the %1$s placeholder.
+	 * Name of the object that can be used in error message. If it is set, it will replace the %1$s placeholder and
+	 * all other places holders will be shifted by +1.
 	 *
 	 * @var string
 	 */

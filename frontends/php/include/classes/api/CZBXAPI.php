@@ -744,22 +744,6 @@ class CZBXAPI {
 	}
 
 	/**
-	 * Checks if the ID is valid.
-	 *
-	 * @param string    $id
-	 * @param string    $error
-	 *
-	 * @throws APIException
-	 *
-	 * @return void
-	 */
-	protected function checkId($id, $error) {
-		if (zbx_empty($id) || !is_numeric($id)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
-		}
-	}
-
-	/**
 	 * Checks if the array contains objects with duplicate values under the $uniqueField field.
 	 *
 	 * @param array    	$objects

@@ -26,7 +26,7 @@ class CLldMacroStringValidator extends CStringValidator {
 	 *
 	 * @var string
 	 */
-	public $messageMacro = 'String "%1$s" must contain macros.';
+	public $messageMacro;
 
 	/**
 	 * Validates the given string and checks if it contains LLD macros.
