@@ -133,6 +133,7 @@ static int	json_parse_string(const char *start, char **error)
 
 		ptr++;
 	}
+
 	return ptr - start + 1;
 }
 
@@ -227,12 +228,13 @@ static int	json_parse_number(const char *start, char **error)
 		if (0 == point)
 			digit++;
 	}
+
 	/* number does not contain any digits, failing */
 	if (0 == digit)
 		return json_error("invalid numeric value format", start, error);
 
 	/* number has zero leading digit following by other digits, failing */
-	if ('0' == first_digit && 1 < (digit))
+	if ('0' == first_digit && 1 < digit)
 		return json_error("invalid numeric value format", start, error);
 
 	if ('e' == *ptr || 'E' == *ptr)
@@ -254,6 +256,7 @@ static int	json_parse_number(const char *start, char **error)
 			ptr++;
 		}
 	}
+
 	return ptr - start;
 }
 
@@ -288,6 +291,7 @@ static int	json_parse_literal(const char *start, const char *text, char **error)
 		ptr++;
 		text++;
 	}
+
 	return ptr - start;
 }
 
@@ -320,27 +324,27 @@ static int	json_parse_value(const char *start, char **error)
 		case '\0':
 			return json_error("unexpected end of object value", NULL, error);
 		case '"':
-			if (0 == (len = json_parse_string(ptr, error)) )
+			if (0 == (len = json_parse_string(ptr, error)))
 				return 0;
 			break;
 		case '{':
-			if (0 == (len = json_parse_object(ptr, error)) )
+			if (0 == (len = json_parse_object(ptr, error)))
 				return 0;
 			break;
 		case '[':
-			if (0 == (len = json_parse_array(ptr, error)) )
+			if (0 == (len = json_parse_array(ptr, error)))
 				return 0;
 			break;
 		case 't':
-			if (0 == (len = json_parse_literal(ptr, "true", error)) )
+			if (0 == (len = json_parse_literal(ptr, "true", error)))
 				return 0;
 			break;
 		case 'f':
-			if (0 == (len = json_parse_literal(ptr, "false", error)) )
+			if (0 == (len = json_parse_literal(ptr, "false", error)))
 				return 0;
 			break;
 		case 'n':
-			if (0 == (len = json_parse_literal(ptr, "null", error)) )
+			if (0 == (len = json_parse_literal(ptr, "null", error)))
 				return 0;
 			break;
 		case '0':
@@ -354,12 +358,13 @@ static int	json_parse_value(const char *start, char **error)
 		case '8':
 		case '9':
 		case '-':
-			if (0 == (len = json_parse_number(ptr, error)) )
+			if (0 == (len = json_parse_number(ptr, error)))
 				return 0;
 			break;
 		default:
 			return json_error("invalid JSON object value starting character", ptr, error);
 	}
+
 	return ptr - start + len;
 }
 
@@ -400,7 +405,7 @@ static int	json_parse_object(const char *start, char **error)
 		while (1)
 		{
 			/* cannot parse object name, failing */
-			if (0 == (len = json_parse_string(ptr, error)) )
+			if (0 == (len = json_parse_string(ptr, error)))
 				return 0;
 
 			ptr += len;
@@ -412,7 +417,7 @@ static int	json_parse_object(const char *start, char **error)
 				return json_error("invalid object name/value separator", ptr, error);
 			ptr++;
 
-			if (0 == (len = json_parse_value(ptr, error)) )
+			if (0 == (len = json_parse_value(ptr, error)))
 				return 0;
 
 			ptr += len;
@@ -457,7 +462,7 @@ int	zbx_json_validate(const char *start, char **error)
 {
 	int	len;
 
-	if (0 == (len = json_parse_object(start, error)) )
+	if (0 == (len = json_parse_object(start, error)))
 		return 0;
 
 	start += len;
