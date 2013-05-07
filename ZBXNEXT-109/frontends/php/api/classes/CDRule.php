@@ -536,7 +536,6 @@ class CDRule extends CZBXAPI {
 			$dbChecks = $dRulesDb[$dRule['druleid']]['dchecks'];
 
 			$newChecks = array();
-			$deleteChecksIds = array();
 
 			foreach ($dRule['dchecks'] as $cnum => $check) {
 				if (!isset($check['druleid'])) {
@@ -549,10 +548,13 @@ class CDRule extends CZBXAPI {
 				}
 			}
 
-			$deleteChecksIds = array_diff(zbx_objectValues($dbChecks, 'dcheckid'), zbx_objectValues($dRule['dchecks'], 'dcheckid'));
+			$delDCheckIds = array_diff(
+				zbx_objectValues($dbChecks, 'dcheckid'),
+				zbx_objectValues($dRule['dchecks'], 'dcheckid')
+			);
 
-			if ($deleteChecksIds) {
-				$this->deleteCheckConditions($deleteChecksIds);
+			if ($delDCheckIds) {
+				$this->deleteActionConditions($delDCheckIds);
 			}
 
 			DB::replace('dchecks', $dbChecks, array_merge($dRule['dchecks'], $newChecks));
@@ -582,10 +584,11 @@ class CDRule extends CZBXAPI {
 		$actionIds = array();
 
 		$dbActions = DBselect(
-			'SELECT DISTINCT actionid '.
-			' FROM conditions '.
-			' WHERE conditiontype='.CONDITION_TYPE_DRULE.
-			' AND '.dbConditionString('value', $druleIds)
+			'SELECT DISTINCT c.actionid'.
+			' FROM c.conditions'.
+			' WHERE c.conditiontype='.CONDITION_TYPE_DRULE.
+				' AND '.dbConditionString('c.value', $druleIds).
+			' ORDER BY c.actionid'
 		);
 		while ($dbAction = DBfetch($dbActions)) {
 			$actionIds[] = $dbAction['actionid'];
@@ -609,19 +612,20 @@ class CDRule extends CZBXAPI {
 	}
 
 	/**
-	 * Delete related check conditions.
+	 * Delete related action conditions.
 	 *
-	 * @param array $checkIds
+	 * @param array $dCheckIds
 	 */
-	protected function deleteCheckConditions(array $checkIds) {
+	protected function deleteActionConditions(array $dCheckIds) {
 		$actionIds = array();
 
 		// conditions
 		$dbActions = DBselect(
-			'SELECT DISTINCT actionid '.
-			' FROM conditions '.
-			' WHERE conditiontype='.CONDITION_TYPE_DCHECK.
-				' AND '.dbConditionString('value', $checkIds)
+			'SELECT DISTINCT c.actionid'.
+			' FROM conditions c'.
+			' WHERE c.conditiontype='.CONDITION_TYPE_DCHECK.
+				' AND '.dbConditionString('c.value', $dCheckIds).
+			' ORDER BY c.actionid'
 		);
 		while ($dbAction = DBfetch($dbActions)) {
 			$actionIds[] = $dbAction['actionid'];
@@ -629,18 +633,15 @@ class CDRule extends CZBXAPI {
 
 		// disabling actions with deleted conditions
 		if ($actionIds) {
-			DBexecute(
-				'UPDATE actions '.
-				' SET status='.ACTION_STATUS_DISABLED.
-				' WHERE '.dbConditionInt('actionid', $actionIds)
-			);
+			DB::update('actions', array(
+				'values' => array('status' => ACTION_STATUS_DISABLED),
+				'where' => array('actionid' => $actionIds),
+			));
 
-			// delete action conditions
-			DBexecute(
-				'DELETE FROM conditions '.
-				' WHERE conditiontype='.CONDITION_TYPE_DCHECK.
-					' AND '.dbConditionString('value', $checkIds)
-			);
+			DB::delete('conditions', array(
+				'conditiontype' => CONDITION_TYPE_DCHECK,
+				'value' => $dCheckIds
+			));
 		}
 	}
 
