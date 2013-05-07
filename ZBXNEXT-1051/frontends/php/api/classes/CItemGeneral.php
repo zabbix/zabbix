@@ -272,7 +272,7 @@ abstract class CItemGeneral extends CZBXAPI {
 
 			$itemKey = new CItemKey($fullItem['key_']);
 			if (!$itemKey->isValid()) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Error in item key: "%s".', $itemKey->getError()));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect key: "%1$s".', $itemKey->getError()));
 			}
 
 			if ($fullItem['type'] == ITEM_TYPE_AGGREGATE) {
