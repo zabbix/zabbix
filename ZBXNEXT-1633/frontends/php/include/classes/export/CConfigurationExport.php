@@ -554,17 +554,38 @@ class CConfigurationExport {
 			$items[$trigger['discoveryRule']['itemid']]['triggerPrototypes'][] = $trigger;
 		}
 
-		// gather trigger prototypes
+		// gather host prototypes
 		$hostPrototypes = API::HostPrototype()->get(array(
 			'discoveryids' => zbx_objectValues($items, 'itemid'),
 			'output' => API_OUTPUT_EXTEND,
+			'selectGroupPrototypes' => API_OUTPUT_EXTEND,
 			'selectDiscoveryRule' => API_OUTPUT_EXTEND,
 			'selectTemplates' => API_OUTPUT_EXTEND,
 			'inherited' => false,
 			'preservekeys' => true
 		));
 
+		// replace group prototype group IDs with references
+		$groupIds = array();
 		foreach ($hostPrototypes as $hostPrototype) {
+			foreach ($hostPrototype['groupPrototypes'] as $groupPrototype) {
+				if ($groupPrototype['groupid']) {
+					$groupIds[] = $groupPrototype['groupid'];
+				}
+			}
+		}
+		$groups = $this->getGroupsReferences($groupIds);
+
+		// export the groups used in group prototypes
+		$this->data['groups'] += $groups;
+
+		foreach ($hostPrototypes as $hostPrototype) {
+			foreach ($hostPrototype['groupPrototypes'] as &$groupPrototype) {
+				if ($groupPrototype['groupid']) {
+					$groupPrototype['groupid'] = $groups[$groupPrototype['groupid']];
+				}
+			}
+			unset($groupPrototype);
 			$items[$hostPrototype['discoveryRule']['itemid']]['hostPrototypes'][] = $hostPrototype;
 		}
 
