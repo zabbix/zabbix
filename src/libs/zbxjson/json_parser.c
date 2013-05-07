@@ -37,7 +37,7 @@ static int	json_parse_object(const char *start, char **error);
  *             json_buffer - [IN] the failing data fragment                   *
  *             error       - [OUT] the parsing error message (can be NULL)    *
  *                                                                            *
- * Return value: FAIL - the json_error() function always returns 0 value      *
+ * Return value: 0 - the json_error() function always returns 0 value         *
  *                      so it can be used to return from failed parses        *
  *                                                                            *
  * Author: Andris Zeila                                                       *
@@ -51,7 +51,7 @@ static int	json_error(const char *message, const char* json_buffer, char** error
 	{
 		*error = zbx_malloc(*error, size);
 
-		if (json_buffer)
+		if (NULL != json_buffer)
 			zbx_snprintf_alloc(error, &size, &offset, "%s at: '%s'", message, json_buffer);
 		else
 			zbx_snprintf_alloc(error, &size, &offset, "%s", message);
@@ -451,8 +451,6 @@ static int	json_parse_object(const char *start, char **error)
  *               message.                                                     *
  *                                                                            *
  * Author: Andris Zeila                                                       *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 int	zbx_json_validate(const char *start, char **error)

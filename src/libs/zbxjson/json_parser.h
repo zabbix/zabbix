@@ -20,7 +20,7 @@
 #ifndef JSON_PARSER_H_
 #define JSON_PARSER_H_
 
-#define STRIP_WHITESPACE(src) \
+#define STRIP_WHITESPACE(src)	\
 	while ('\0' != *src && NULL != strchr(ZBX_WHITESPACE, *src)) src++;
 
 int	zbx_json_validate(const char *start, char **error);
