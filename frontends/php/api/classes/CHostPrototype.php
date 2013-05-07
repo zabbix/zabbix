@@ -177,6 +177,18 @@ class CHostPrototype extends CHostBase {
 
 		$this->checkDiscoveryRulePermissions(zbx_objectValues($hostPrototypes, 'ruleid'));
 
+		// get affected host group IDs
+		$groupPrototypeGroupIds = array();
+		foreach ($hostPrototypes as $hostPrototype) {
+			foreach ($hostPrototype['groupPrototypes'] as $groupPrototype) {
+				if (isset($groupPrototype['groupid']) && $groupPrototype['groupid']) {
+					$groupPrototypeGroupIds[] = $groupPrototype['groupid'];
+				}
+			}
+		}
+
+		$this->checkHostGroupsPermissions($groupPrototypeGroupIds);
+
 		// check if the host is discovered
 		$discoveryRules = API::getApi()->select('items', array(
 			'output' => array('hostid'),
@@ -187,14 +199,6 @@ class CHostPrototype extends CHostBase {
 		)));
 
 		// check if group prototypes use discovered host groups
-		$groupPrototypeGroupIds = array();
-		foreach ($hostPrototypes as $hostPrototype) {
-			foreach ($hostPrototype['groupPrototypes'] as $groupPrototype) {
-				if (isset($groupPrototype['groupid']) && $groupPrototype['groupid']) {
-					$groupPrototypeGroupIds[] = $groupPrototype['groupid'];
-				}
-			}
-		}
 		$this->checkValidator(array_unique($groupPrototypeGroupIds), new CHostGroupNotDiscoveredValidator(array(
 			'message' => _('Group prototype cannot be based on a discovered host group "%1$s".')
 		)));
@@ -399,13 +403,7 @@ class CHostPrototype extends CHostBase {
 			}
 		}
 
-		// check for duplicates
-		$relationMap = $this->createRelationMap($hostPrototypes, 'hostid', 'parent_itemid', 'host_discovery');
-		$hostPrototypes = $relationMap->mapIdOne($hostPrototypes, 'ruleid');
-		$this->checkDuplicates($hostPrototypes, 'host', _('Host prototype "%1$s" already exists.'));
-		$this->checkExistingHostPrototypes($hostPrototypes);
-
-		// check if group prototypes use discovered host groups
+		// get affected host group IDs
 		$groupPrototypeGroupIds = array();
 		foreach ($hostPrototypes as $hostPrototype) {
 			if (isset($hostPrototype['groupPrototypes'])) {
@@ -416,6 +414,16 @@ class CHostPrototype extends CHostBase {
 				}
 			}
 		}
+
+		$this->checkHostGroupsPermissions($groupPrototypeGroupIds);
+
+		// check for duplicates
+		$relationMap = $this->createRelationMap($hostPrototypes, 'hostid', 'parent_itemid', 'host_discovery');
+		$hostPrototypes = $relationMap->mapIdOne($hostPrototypes, 'ruleid');
+		$this->checkDuplicates($hostPrototypes, 'host', _('Host prototype "%1$s" already exists.'));
+		$this->checkExistingHostPrototypes($hostPrototypes);
+
+		// check if group prototypes use discovered host groups
 		$this->checkValidator(array_unique($groupPrototypeGroupIds), new CHostGroupNotDiscoveredValidator(array(
 			'message' => _('Group prototype cannot be based on a discovered host group "%1$s".')
 		)));
@@ -964,6 +972,19 @@ class CHostPrototype extends CHostBase {
 	 */
 	protected function checkDiscoveryRulePermissions(array $discoveryRuleIds) {
 		if (!API::DiscoveryRule()->isWritable($discoveryRuleIds)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+		}
+	}
+
+	/**
+	 * Checks if the current user has access to the given host groups.
+	 *
+	 * @throws APIException if the user doesn't have write permissions for the given host groups
+	 *
+	 * @param array $hostGroupIds
+	 */
+	protected function checkHostGroupsPermissions(array $hostGroupIds) {
+		if (!API::HostGroup()->isWritable($hostGroupIds)) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 	}
