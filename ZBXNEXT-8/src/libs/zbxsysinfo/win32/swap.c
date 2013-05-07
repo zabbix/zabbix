@@ -64,12 +64,12 @@ int	SYSTEM_SWAP_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_R
 
 		zbx_GlobalMemoryStatusEx(&ms_ex);
 
-		if (strcmp(mode, "total") == 0)
+		if (0 == strcmp(mode, "total"))
 		{
 			SET_UI64_RESULT(result, ms_ex.ullTotalPageFile);
 			return SYSINFO_RET_OK;
 		}
-		else if (strcmp(mode, "free") == 0)
+		else if (0 == strcmp(mode, "free"))
 		{
 			SET_UI64_RESULT(result, ms_ex.ullAvailPageFile);
 			return SYSINFO_RET_OK;
@@ -88,17 +88,17 @@ int	SYSTEM_SWAP_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_R
 	{
 		GlobalMemoryStatus(&ms);
 
-		if (strcmp(mode,"total") == 0)
+		if (0 == strcmp(mode,"total"))
 		{
 			SET_UI64_RESULT(result, ms.dwTotalPageFile);
 			return SYSINFO_RET_OK;
 		}
-		else if (strcmp(mode,"free") == 0)
+		else if (0 == strcmp(mode,"free"))
 		{
 			SET_UI64_RESULT(result, ms.dwAvailPageFile);
 			return SYSINFO_RET_OK;
 		}
-		else if (strcmp(mode,"used") == 0)
+		else if (0 == strcmp(mode,"used"))
 		{
 			SET_UI64_RESULT(result, ms.dwTotalPageFile - ms.dwAvailPageFile);
 			return SYSINFO_RET_OK;
