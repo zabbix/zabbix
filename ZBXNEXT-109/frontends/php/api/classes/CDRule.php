@@ -318,7 +318,7 @@ class CDRule extends CZBXAPI {
 
 					$itemKey = new CItemKey($dCheck['key_']);
 					if (!$itemKey->isValid()) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect key: "%s".', $itemKey->getError()));
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect key: "%1$s".', $itemKey->getError()));
 					}
 					break;
 				case SVC_SNMPv1:
@@ -552,7 +552,7 @@ class CDRule extends CZBXAPI {
 			$deleteChecksIds = array_diff(zbx_objectValues($dbChecks, 'dcheckid'), zbx_objectValues($dRule['dchecks'], 'dcheckid'));
 
 			if ($deleteChecksIds) {
-				$this->deleteChecks($deleteChecksIds);
+				$this->deleteCheckConditions($deleteChecksIds);
 			}
 
 			DB::replace('dchecks', $dbChecks, array_merge($dRule['dchecks'], $newChecks));
@@ -608,7 +608,12 @@ class CDRule extends CZBXAPI {
 		return array('druleids' => $druleIds);
 	}
 
-	protected function deleteChecks(array $checkIds) {
+	/**
+	 * Delete related check conditions.
+	 *
+	 * @param array $checkIds
+	 */
+	protected function deleteCheckConditions(array $checkIds) {
 		$actionIds = array();
 
 		// conditions
@@ -637,8 +642,6 @@ class CDRule extends CZBXAPI {
 					' AND '.dbConditionString('value', $checkIds)
 			);
 		}
-
-		DB::delete('dchecks', array('dcheckid' => $checkIds));
 	}
 
 	/**
