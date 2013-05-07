@@ -45,7 +45,7 @@ class CTriggerFunctionValidator extends CValidator {
 	 * Validate trigger function like last(0), time(), etc.
 	 * Examples:
 	 *	array(
-	 *		'function' => last('#15'),
+	 *		'function' => last("#15"),
 	 *		'functionName' => 'last',
 	 *		'functionParamList' => array(0 => '#15'),
 	 *		'valueType' => 3
