@@ -588,6 +588,21 @@ class CHostGroup extends CZBXAPI {
 			}
 		}
 
+		// check if a group is used in a group prototype
+		$groupPrototype = DBFetch(DBselect(
+			'SELECT groupid'.
+			' FROM group_prototype gp'.
+			' WHERE '.dbConditionInt('groupid', $groupids),
+			1
+		));
+		if ($groupPrototype) {
+			self::exception(ZBX_API_ERROR_PARAMETERS,
+				_s('Group "%1$s" cannot be deleted, because it is used by a host prototype.',
+					$delGroups[$groupPrototype['groupid']]['name']
+				)
+			);
+		}
+
 		$dltGroupids = getDeletableHostGroups($groupids);
 		if (count($groupids) != count($dltGroupids)) {
 			foreach ($groupids as $groupid) {
