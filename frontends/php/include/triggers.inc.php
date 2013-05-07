@@ -918,19 +918,21 @@ function implode_exp($expression, $triggerid, &$hostnames = array()) {
 	$functions = array();
 	$items = array();
 	$triggerFunctionValidator = new CTriggerFunctionValidator();
+
 	foreach ($expressionData->expressions as $exprPart) {
-		if (isset($newFunctions[$exprPart['expression']]))
+		if (isset($newFunctions[$exprPart['expression']])) {
 			continue;
+		}
 
 		if (!isset($items[$exprPart['host']][$exprPart['item']])) {
 			$result = DBselect(
-					'SELECT i.itemid,i.value_type,h.name'.
-					' FROM items i,hosts h'.
-					' WHERE i.key_='.zbx_dbstr($exprPart['item']).
-						' AND '.dbConditionInt('i.flags', array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED, ZBX_FLAG_DISCOVERY_CHILD)).
-						' AND h.host='.zbx_dbstr($exprPart['host']).
-						' AND h.hostid=i.hostid'.
-						andDbNode('i.itemid')
+				'SELECT i.itemid,i.value_type,h.name'.
+				' FROM items i,hosts h'.
+				' WHERE i.key_='.zbx_dbstr($exprPart['item']).
+					' AND '.dbConditionInt('i.flags', array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED, ZBX_FLAG_DISCOVERY_CHILD)).
+					' AND h.host='.zbx_dbstr($exprPart['host']).
+					' AND h.hostid=i.hostid'.
+					andDbNode('i.itemid')
 			);
 			if ($row = DBfetch($result)) {
 				$hostnames[] = $row['name'];
@@ -943,7 +945,9 @@ function implode_exp($expression, $triggerid, &$hostnames = array()) {
 			}
 		}
 
-		if (!$triggerFunctionValidator->validate(array('functionName' => $exprPart['functionName'],
+		if (!$triggerFunctionValidator->validate(array(
+				'function' => $exprPart['function'],
+				'functionName' => $exprPart['functionName'],
 				'functionParamList' => $exprPart['functionParamList'],
 				'valueType' => $items[$exprPart['host']][$exprPart['item']]['valueType']))) {
 			throw new Exception($triggerFunctionValidator->getError());
@@ -2363,14 +2367,13 @@ function convert($value) {
 }
 
 /**
- * Quoting $param if it contain special characters
+ * Quoting $param if it contain special characters.
  *
  * @param string $param
  *
  * @return string
  */
-function quoteFunctionParam($param)
-{
+function quoteFunctionParam($param) {
 	if (!isset($param[0]) || ($param[0] != '"' && false === strpos($param, ',') && false === strpos($param, ')'))) {
 		return $param;
 	}
