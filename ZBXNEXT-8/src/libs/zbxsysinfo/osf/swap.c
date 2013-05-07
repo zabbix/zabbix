@@ -121,11 +121,12 @@ static int	SYSTEM_SWAP_USED(const char *cmd, const char *param, unsigned flags, 
 {
 #ifdef HAVE_SYSINFO_FREESWAP
 	struct sysinfo info;
-
+	zbx_uint64_t used_swap;
 	if( 0 == sysinfo(&info))
 	{
 #ifdef HAVE_SYSINFO_MEM_UNIT
-		SET_UI64_RESULT(result, ((zbx_uint64_t)info.totalswap - (zbx_uint64_t)info.freeswap) * (zbx_uint64_t)info.mem_unit);
+		used_swap = (zbx_uint64_t)info.totalswap - (zbx_uint64_t)info.freeswap) * (zbx_uint64_t)info.mem_unit;
+		SET_UI64_RESULT(result, (zbx_uint64_t)info.mem_unit * used_swap);
 #else
 		SET_UI64_RESULT(result, info.totalswap - info.freeswap);
 #endif
@@ -245,6 +246,7 @@ int	SYSTEM_SWAP_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_R
 	{
 		{"total",	SYSTEM_SWAP_TOTAL},
 		{"free",	SYSTEM_SWAP_FREE},
+		{"used",	SYSTEM_SWAP_USED},
 		{"pfree",	SYSTEM_SWAP_PFREE},
 		{"pused",	SYSTEM_SWAP_PUSED},
 		{NULL,		0}

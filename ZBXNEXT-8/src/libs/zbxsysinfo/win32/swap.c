@@ -74,7 +74,7 @@ int	SYSTEM_SWAP_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_R
 			SET_UI64_RESULT(result, ms_ex.ullAvailPageFile);
 			return SYSINFO_RET_OK;
 		}
-		else if (strcmp(mode, "used") == 0)
+		else if (0 == strcmp(mode, "used"))
 		{
 			SET_UI64_RESULT(result, ms_ex.ullTotalPageFile - ms_ex.ullAvailPageFile);
 			return SYSINFO_RET_OK;
@@ -96,6 +96,11 @@ int	SYSTEM_SWAP_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_R
 		else if (strcmp(mode,"free") == 0)
 		{
 			SET_UI64_RESULT(result, ms.dwAvailPageFile);
+			return SYSINFO_RET_OK;
+		}
+		else if (strcmp(mode,"used") == 0)
+		{
+			SET_UI64_RESULT(result, ms.dwTotalPageFile - ms.dwAvailPageFile);
 			return SYSINFO_RET_OK;
 		}
 	}
