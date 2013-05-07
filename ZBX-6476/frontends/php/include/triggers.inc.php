@@ -2368,7 +2368,7 @@ function convert($value) {
 /**
  * Quoting $param if it contain special characters.
  *
- * @param array $param
+ * @param string $param
  *
  * @return string
  */
