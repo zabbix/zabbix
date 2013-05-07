@@ -249,7 +249,7 @@ elseif (isset($_REQUEST['go']) && $_REQUEST['go'] == 'massupdate' && isset($_REQ
 						$newGroups[] = array('name' => $newGroup['new']);
 					}
 					else {
-						$existGroups[] =$newGroup['exist'];
+						$existGroups[] = $newGroup;
 					}
 				}
 				if (isset($newGroups)) {
