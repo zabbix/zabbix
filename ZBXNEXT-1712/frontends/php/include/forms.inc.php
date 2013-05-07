@@ -1037,22 +1037,30 @@
 
 				if (!empty($item)) {
 					$host = reset($item['hosts']);
+
 					if (!empty($item['hosts'])) {
 						if (bccomp($data['itemid'], $itemid) == 0) {
 						}
 						// discovery rule
 						elseif ($data['is_discovery_rule']) {
-							$data['templates'][] = new CLink($host['name'], 'host_discovery.php?form=update&itemid='.$item['itemid'], 'highlight underline weight_normal');
+							$data['templates'][] = new CLink($host['name'], 'host_discovery.php?form=update'.
+									'&itemid='.$item['itemid'].
+									'&hostid='.$host['hostid'], 'highlight underline weight_normal');
 							$data['templates'][] = SPACE.RARR.SPACE;
 						}
 						// item prototype
 						elseif ($item['discoveryRule']) {
-							$data['templates'][] = new CLink($host['name'], 'disc_prototypes.php?form=update&itemid='.$item['itemid'].'&parent_discoveryid='.$item['discoveryRule']['itemid'], 'highlight underline weight_normal');
+							$data['templates'][] = new CLink($host['name'], 'disc_prototypes.php?form=update'.
+									'&itemid='.$item['itemid'].
+									'&parent_discoveryid='.$item['discoveryRule']['itemid'].
+									'&hostid='.$host['hostid'], 'highlight underline weight_normal');
 							$data['templates'][] = SPACE.RARR.SPACE;
 						}
 						// plain item
 						else {
-							$data['templates'][] = new CLink($host['name'], 'items.php?form=update&itemid='.$item['itemid'], 'highlight underline weight_normal');
+							$data['templates'][] = new CLink($host['name'], 'items.php?form=update'.
+									'&itemid='.$item['itemid'].
+									'&hostid='.$host['hostid'], 'highlight underline weight_normal');
 							$data['templates'][] = SPACE.RARR.SPACE;
 						}
 					}
