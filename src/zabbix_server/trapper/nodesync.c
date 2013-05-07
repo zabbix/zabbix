@@ -341,7 +341,7 @@ static void	process_updated_records(int nodeid, char *data)
 #endif
 						}
 						break;
-					default:	/* ZBX_TYPE_TEXT, ZBX_TYPE_CHAR */
+					default:	/* ZBX_TYPE_TEXT, ZBX_TYPE_CHAR, ZBX_TYPE_SHORTTEXT, ZBX_TYPE_LONGTEXT */
 						zbx_hex2binary(buf);
 						value_esc = DBdyn_escape_string(buf);
 
