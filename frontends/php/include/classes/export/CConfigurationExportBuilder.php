@@ -360,8 +360,35 @@ class CConfigurationExportBuilder {
 				'host' => $hostPrototype['host'],
 				'name' => $hostPrototype['name'],
 				'status' => $hostPrototype['status'],
+				'group_prototypes' => $this->formatGroupPrototypes($hostPrototype['groupPrototypes']),
 				'templates' => $this->formatTemplateLinkage($hostPrototype['templates'])
 			);
+		}
+
+		return $result;
+	}
+
+	/**
+	 * Format group prototypes.
+	 *
+	 * @param array $groupPrototypes
+	 *
+	 * @return array
+	 */
+	protected function formatGroupPrototypes(array $groupPrototypes) {
+		$result = array();
+
+		foreach ($groupPrototypes as $groupPrototype) {
+			if ($groupPrototype['groupid']) {
+				$result[] = array(
+					'group' => $groupPrototype['groupid'],
+				);
+			}
+			else {
+				$result[] = array(
+					'name' => $groupPrototype['name']
+				);
+			}
 		}
 
 		return $result;

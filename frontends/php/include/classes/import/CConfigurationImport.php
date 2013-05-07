@@ -297,6 +297,12 @@ class CConfigurationImport {
 				foreach ($discoveryRule['host_prototypes'] as $hostPrototype) {
 					$hostPrototypeRefs[$host][$discoveryRule['key_']][$hostPrototype['host']] = $hostPrototype['host'];
 
+					foreach ($hostPrototype['group_prototypes'] as $groupPrototype) {
+						if (isset($groupPrototype['group'])) {
+							$groupsRefs[$groupPrototype['group']['name']] = $groupPrototype['group']['name'];
+						}
+					}
+
 					foreach ($hostPrototype['templates'] as $template) {
 						$templatesRefs[$template['name']] = $template['name'];
 					}
@@ -642,6 +648,7 @@ class CConfigurationImport {
 				unset($item['item_prototypes']);
 				unset($item['trigger_prototypes']);
 				unset($item['graph_prototypes']);
+				unset($item['host_prototypes']);
 
 				$itemId = $this->referencer->resolveItem($hostid, $item['key_']);
 				if ($itemId) {
@@ -724,12 +731,27 @@ class CConfigurationImport {
 
 				// host prototype
 				foreach ($item['host_prototypes'] as $hostPrototype) {
-					// resolve templates
-					$templateIds = array();
-					foreach ($hostPrototype['templates'] as $template) {
-						$templateIds[] = array('templateid' => $this->referencer->resolveTemplate($template['name']));
+					// resolve group prototypes
+					$groupPrototypes = array();
+					foreach ($hostPrototype['group_prototypes'] as $groupPrototype) {
+						if (isset($groupPrototype['group'])) {
+							$groupPrototypes[] = array(
+								'groupid' => $this->referencer->resolveGroup($groupPrototype['group']['name'])
+							);
+						}
+						else {
+							$groupPrototypes[] = $groupPrototype;
+						}
 					}
-					$hostPrototype['templates'] = $templateIds;
+					$hostPrototype['groupPrototypes'] = $groupPrototypes;
+					unset($hostPrototype['group_prototypes']);
+
+					// resolve templates
+					$templates = array();
+					foreach ($hostPrototype['templates'] as $template) {
+						$templates[] = array('templateid' => $this->referencer->resolveTemplate($template['name']));
+					}
+					$hostPrototype['templates'] = $templates;
 
 					$hostPrototypeId = $this->referencer->resolveHostPrototype($hostid, $itemId, $hostPrototype['host']);
 					if ($hostPrototypeId) {
