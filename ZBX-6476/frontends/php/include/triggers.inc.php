@@ -2363,14 +2363,13 @@ function convert($value) {
 }
 
 /**
- * Quoting $param if it contain special characters
+ * Quoting $param if it contain special characters.
  *
- * @param string $param
+ * @param array $param
  *
  * @return string
  */
-function quoteFunctionParam($param)
-{
+function quoteFunctionParam($param) {
 	if (!isset($param[0]) || ($param[0] != '"' && false === strpos($param, ',') && false === strpos($param, ')'))) {
 		return $param;
 	}

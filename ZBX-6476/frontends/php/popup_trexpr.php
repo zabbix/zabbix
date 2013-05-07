@@ -689,11 +689,17 @@ if (!empty($itemId)) {
 			$data['param'][$paramNumber] = '#'.$data['param'][$paramNumber];
 		}
 
+		// quote function param
+		$params = array();
+		foreach ($data['param'] as $param) {
+			$params[] = quoteFunctionParam($param);
+		}
+
 		$data['expression'] = sprintf('{%s:%s.%s(%s)}%s%s',
 			$data['item_host'],
 			$data['item_key'],
 			$data['function'],
-			rtrim(implode(',', $data['param']), ','),
+			rtrim(implode(',', $params), ','),
 			$data['operator'],
 			$data['value']
 		);
