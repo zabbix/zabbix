@@ -920,8 +920,9 @@ function implode_exp($expression, $triggerid, &$hostnames = array()) {
 	$triggerFunctionValidator = new CTriggerFunctionValidator();
 
 	foreach ($expressionData->expressions as $exprPart) {
-		if (isset($newFunctions[$exprPart['expression']]))
+		if (isset($newFunctions[$exprPart['expression']])) {
 			continue;
+		}
 
 		if (!isset($items[$exprPart['host']][$exprPart['item']])) {
 			$result = DBselect(
@@ -945,8 +946,8 @@ function implode_exp($expression, $triggerid, &$hostnames = array()) {
 		}
 
 		if (!$triggerFunctionValidator->validate(array(
+				'function' => $exprPart['function'],
 				'functionName' => $exprPart['functionName'],
-				'functionParam' => $exprPart['functionParam'],
 				'functionParamList' => $exprPart['functionParamList'],
 				'valueType' => $items[$exprPart['host']][$exprPart['item']]['valueType']))) {
 			throw new Exception($triggerFunctionValidator->getError());

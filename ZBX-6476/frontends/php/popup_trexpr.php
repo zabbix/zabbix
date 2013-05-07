@@ -713,8 +713,8 @@ if (!empty($itemId)) {
 			// validate trigger function
 			$triggerFunctionValidator = new CTriggerFunctionValidator();
 			$isValid = $triggerFunctionValidator->validate(array(
+				'function' => $expressionData['function'],
 				'functionName' => $expressionData['functionName'],
-				'functionParam' => $expressionData['functionParam'],
 				'functionParamList' => $expressionData['functionParamList'],
 				'valueType' => $data['itemValueType']
 			));
