@@ -269,7 +269,7 @@ elseif (isset($_REQUEST['go']) && $_REQUEST['go'] == 'massupdate' && isset($_REQ
 			}
 		}
 
-		if (isset($visible['groups'])) {
+		if (isset($visible['groups']) && isset($_REQUEST['groups'])) {
 			if (isset($existGroups)){
 				$_REQUEST['groups'] = array_unique(array_merge($_REQUEST['groups'], $existGroups));
 			}
@@ -308,7 +308,7 @@ elseif (isset($_REQUEST['go']) && $_REQUEST['go'] == 'massupdate' && isset($_REQ
 		}
 
 		// add new host groups
-		if (!empty($existGroups) && !isset($visible['groups'])) {
+		if (!empty($existGroups) && (!isset($visible['groups']) || !isset($_REQUEST['groups']))) {
 			$add['groups'] = $existGroups;
 		}
 
