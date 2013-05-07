@@ -328,26 +328,9 @@ function check_dynamic_items($elid, $config = 0) {
 function getResourceNameByType($resourceType) {
 	switch ($resourceType) {
 		case SCREEN_RESOURCE_DATA_OVERVIEW:
-			return _('Group');
-		case SCREEN_RESOURCE_GRAPH:
-			return _('Graph');
-		case SCREEN_RESOURCE_SIMPLE_GRAPH:
-			return _('Simple graph');
-		case SCREEN_RESOURCE_HOSTS_INFO:
-			return _('Host');
-		case SCREEN_RESOURCE_MAP:
-			return _('Map');
-		case SCREEN_RESOURCE_PLAIN_TEXT:
-			return _('Plain text');
-		case SCREEN_RESOURCE_SCREEN:
-			return _('Screen');
-		case SCREEN_RESOURCE_HOSTGROUP_TRIGGERS:
-			return _('Group');
-		case SCREEN_RESOURCE_HOST_TRIGGERS:
-			return _('Host');
-		case SCREEN_RESOURCE_TRIGGERS_INFO:
-			return _('Group');
 		case SCREEN_RESOURCE_TRIGGERS_OVERVIEW:
 			return _('Group');
 	}
+
+	return null;
 }
