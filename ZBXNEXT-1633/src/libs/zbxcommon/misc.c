@@ -177,7 +177,7 @@ void	zbx_timespec(zbx_timespec_t *ts)
  *           January 1, 1970, coordinated universal time (UTC).               *
  *                                                                            *
  ******************************************************************************/
-double	zbx_time()
+double	zbx_time(void)
 {
 	zbx_timespec_t	ts;
 
@@ -197,7 +197,7 @@ double	zbx_time()
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  ******************************************************************************/
-double	zbx_current_time()
+double	zbx_current_time(void)
 {
 	return zbx_time() + ZBX_JAN_1970_IN_SEC;
 }

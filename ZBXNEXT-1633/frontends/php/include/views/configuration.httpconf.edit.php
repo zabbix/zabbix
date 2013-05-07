@@ -144,7 +144,7 @@ $httpProxyTextBox->setAttribute('placeholder', 'http://[username[:password]@]pro
 $httpFormList->addRow(_('HTTP proxy'), $httpProxyTextBox);
 
 // append status to form list
-$httpFormList->addRow(_('Variables'), new CTextArea('macros', $this->data['macros']));
+$httpFormList->addRow(_('Variables'), new CTextArea('variables', $this->data['variables']));
 $httpFormList->addRow(_('Enabled'), new CCheckBox('status', !$this->data['status']));
 
 /*

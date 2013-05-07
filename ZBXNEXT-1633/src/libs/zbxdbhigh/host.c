@@ -4249,6 +4249,7 @@ typedef struct
 	zbx_vector_ptr_t	httpstepitems;
 	int			no;
 	int			timeout;
+	char			*variables_esc;
 }
 httpstep_t;
 
@@ -4267,7 +4268,7 @@ typedef struct
 	zbx_uint64_t		t_applicationid;
 	zbx_uint64_t		h_applicationid;
 	char			*name_esc;
-	char			*macros_esc;
+	char			*variables_esc;
 	char			*agent_esc;
 	char			*http_user_esc;
 	char			*http_password_esc;
@@ -4315,7 +4316,7 @@ static void	DBget_httptests(zbx_uint64_t hostid, zbx_vector_uint64_t *templateid
 	sql = zbx_malloc(sql, sql_alloc);
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-			"select t.httptestid,t.name,t.applicationid,t.delay,t.status,t.macros,t.agent,"
+			"select t.httptestid,t.name,t.applicationid,t.delay,t.status,t.variables,t.agent,"
 				"t.authentication,t.http_user,t.http_password,t.http_proxy,t.retries,h.httptestid"
 			" from httptest t"
 				" left join httptest h"
@@ -4344,7 +4345,7 @@ static void	DBget_httptests(zbx_uint64_t hostid, zbx_vector_uint64_t *templateid
 			ZBX_DBROW2UINT64(httptest->t_applicationid, row[2]);
 			httptest->delay = atoi(row[3]);
 			httptest->status = (unsigned char)atoi(row[4]);
-			httptest->macros_esc = DBdyn_escape_string(row[5]);
+			httptest->variables_esc = DBdyn_escape_string(row[5]);
 			httptest->agent_esc = DBdyn_escape_string(row[6]);
 			httptest->authentication = (unsigned char)atoi(row[7]);
 			httptest->http_user_esc = DBdyn_escape_string(row[8]);
@@ -4367,7 +4368,7 @@ static void	DBget_httptests(zbx_uint64_t hostid, zbx_vector_uint64_t *templateid
 
 		sql_offset = 0;
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-				"select httpstepid,httptestid,name,no,url,timeout,posts,required,status_codes"
+				"select httpstepid,httptestid,name,no,url,timeout,posts,required,status_codes,variables"
 				" from httpstep"
 				" where");
 		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "httptestid",
@@ -4402,6 +4403,7 @@ static void	DBget_httptests(zbx_uint64_t hostid, zbx_vector_uint64_t *templateid
 			httpstep->posts_esc = DBdyn_escape_string(row[6]);
 			httpstep->required_esc = DBdyn_escape_string(row[7]);
 			httpstep->status_codes_esc = DBdyn_escape_string(row[8]);
+			httpstep->variables_esc = DBdyn_escape_string(row[9]);
 			zbx_vector_ptr_create(&httpstep->httpstepitems);
 
 			zbx_vector_ptr_append(&httptest->httpsteps, httpstep);
@@ -4638,12 +4640,12 @@ static void	DBsave_httptests(zbx_uint64_t hostid, zbx_vector_ptr_t *httptests)
 	int		i, j, k, num_httptests = 0, num_httpsteps = 0, num_httptestitems = 0, num_httpstepitems = 0;
 	const char	*ins_httptest_sql =
 			"insert into httptest"
-			" (httptestid,name,applicationid,delay,status,macros,agent,"
+			" (httptestid,name,applicationid,delay,status,variables,agent,"
 				"authentication,http_user,http_password,http_proxy,retries,hostid,templateid)"
 			" values ";
 	const char	*ins_httpstep_sql =
 			"insert into httpstep"
-			" (httpstepid,httptestid,name,no,url,timeout,posts,required,status_codes)"
+			" (httpstepid,httptestid,name,no,url,timeout,posts,required,status_codes,variables)"
 			" values ";
 	const char	*ins_httptestitem_sql =
 			"insert into httptestitem (httptestitemid,httptestid,itemid,type) values ";
@@ -4734,7 +4736,7 @@ static void	DBsave_httptests(zbx_uint64_t hostid, zbx_vector_ptr_t *httptests)
 					"(" ZBX_FS_UI64 ",'%s',%s,%d,%d,'%s','%s',%d,'%s','%s','%s',%d,"
 						ZBX_FS_UI64 "," ZBX_FS_UI64 ")" ZBX_ROW_DL,
 					httptest->httptestid, httptest->name_esc, DBsql_id_ins(httptest->h_applicationid),
-					httptest->delay, (int)httptest->status, httptest->macros_esc,
+					httptest->delay, (int)httptest->status, httptest->variables_esc,
 					httptest->agent_esc, (int)httptest->authentication, httptest->http_user_esc,
 					httptest->http_password_esc, httptest->http_proxy_esc, httptest->retries,
 					hostid, httptest->templateid);
@@ -4747,10 +4749,11 @@ static void	DBsave_httptests(zbx_uint64_t hostid, zbx_vector_ptr_t *httptests)
 #endif
 				zbx_snprintf_alloc(&sql3, &sql3_alloc, &sql3_offset,
 						"(" ZBX_FS_UI64 "," ZBX_FS_UI64 ",'%s',%d,'%s',"\
-							"%d,'%s','%s','%s')" ZBX_ROW_DL,
+							"%d,'%s','%s','%s','%s')" ZBX_ROW_DL,
 						httpstepid, httptest->httptestid, httpstep->name_esc, httpstep->no,
 						httpstep->url_esc, httpstep->timeout, httpstep->posts_esc,
-						httpstep->required_esc, httpstep->status_codes_esc);
+						httpstep->required_esc, httpstep->status_codes_esc,
+						httpstep->variables_esc);
 
 				for (k = 0; k < httpstep->httpstepitems.values_num; k++)
 				{
@@ -4863,7 +4866,7 @@ static void	clean_httptests(zbx_vector_ptr_t *httptests)
 		zbx_free(httptest->http_password_esc);
 		zbx_free(httptest->http_user_esc);
 		zbx_free(httptest->agent_esc);
-		zbx_free(httptest->macros_esc);
+		zbx_free(httptest->variables_esc);
 		zbx_free(httptest->name_esc);
 
 		for (j = 0; j < httptest->httpsteps.values_num; j++)
@@ -4875,6 +4878,7 @@ static void	clean_httptests(zbx_vector_ptr_t *httptests)
 			zbx_free(httpstep->posts_esc);
 			zbx_free(httpstep->url_esc);
 			zbx_free(httpstep->name_esc);
+			zbx_free(httpstep->variables_esc);
 
 			for (k = 0; k < httpstep->httpstepitems.values_num; k++)
 				zbx_free(httpstep->httpstepitems.values[k]);

@@ -147,7 +147,7 @@ $houseKeeperTrendModeGlobal = new CNumericBox('hk_trends', $this->data['config']
 if (!$this->data['config']['hk_trends_mode'] || !$this->data['config']['hk_trends_global']) {
 	$houseKeeperTrendModeGlobal->setAttribute('disabled', 'disabled');
 }
-$trendTab->addRow(array(new CLabel(_('Override item trends period'),
+$trendTab->addRow(array(new CLabel(_('Override item trend period'),
 	'hk_trends_global'), $houseKeeperTrendGlobal));
 $trendTab->addRow(array(new CLabel(_('Keep data for (in days)'),
 	'hk_trends'), $houseKeeperTrendModeGlobal));
