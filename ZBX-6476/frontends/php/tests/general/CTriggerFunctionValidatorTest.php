@@ -317,6 +317,7 @@ class CTriggerFunctionValidatorTest extends PHPUnit_Framework_TestCase {
 
 		$result = $triggerFunctionValidator->validate(array(
 			'functionName' => $functionName,
+			'functionParam' => $functionParamList,
 			'functionParamList' => $functionParamList,
 			'valueType' => $valueType
 		));

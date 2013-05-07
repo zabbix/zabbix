@@ -47,6 +47,7 @@ class CTriggerFunctionValidator extends CValidator {
 	 *   array('functionName' => 'last', 'functionParamList' => array(0 => '#15'), 'valueType' => 3)
 	 *
 	 * @param string $value['functionName']
+	 * @param string $value['functionParam']
 	 * @param array  $value['functionParamList']
 	 * @param int    $value['valueType']
 	 *
@@ -55,7 +56,7 @@ class CTriggerFunctionValidator extends CValidator {
 	public function validate($value) {
 		$this->setError('');
 
-		$functionName = $value['functionName'].'('.implode(',', $value['functionParamList']).')';
+		$functionName = $value['functionName'].'('.$value['functionParam'].')';
 
 		if (!isset($this->allowed[$value['functionName']])) {
 			$this->setError(_s('Incorrect trigger function "%1$s" provided in expression.', $functionName).' '.
