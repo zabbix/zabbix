@@ -49,7 +49,7 @@ static int	json_error(const char *message, const char* json_buffer, char** error
 
 	if (NULL != error)
 	{
-		*error = zbx_malloc(NULL, size);
+		*error = zbx_malloc(*error, size);
 
 		if (json_buffer)
 			zbx_snprintf_alloc(error, &size, &offset, "%s at: '%s'", message, json_buffer);
