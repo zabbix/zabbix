@@ -222,7 +222,7 @@ jQuery(function($) {
 							var availableActive = $('.available li.hover', obj);
 
 							if (availableActive.length > 0) {
-								select(availableActive.data('id'), obj, values, options);
+								select(availableActive.data('uid'), obj, values, options);
 							}
 
 							// stop form submit
@@ -240,7 +240,7 @@ jQuery(function($) {
 								if ($('.selected li', obj).length > 0) {
 									if ($('.selected li.pressed', obj).length > 0) {
 										if (e.which == KEY.BACKSPACE || e.which == KEY.DELETE) {
-											removeSelected($('.selected li.pressed', obj).data('id'), obj, values, options);
+											removeSelected($('.selected li.pressed', obj).data('uid'), obj, values, options);
 										}
 										else {
 											var prev = $('.selected li.pressed', obj).removeClass('pressed').prev();
@@ -426,7 +426,7 @@ jQuery(function($) {
 
 		if (options.addNew == true && !empty(value) && $.inArray(value, availableValues)) {
 			data[data.length] = {
-				id: value.replace('"', ''),
+				id: value,
 				prefix: '',
 				name: value + ' (' + options.labels['new'] + ')',
 				isNew: true
@@ -469,10 +469,10 @@ jQuery(function($) {
 	}
 
 	function addSelected(item, obj, values, options) {
-		if (typeof(values.selected[item.id]) == 'undefined') {
+		if (typeof(values.selected[item.realName]) == 'undefined') {
 			removeDefaultValue(obj, options);
 
-			values.selected[item.id] = item;
+			values.selected[item.realName] = item;
 
 			var itemName;
 			if (options.addNew) {
@@ -480,7 +480,7 @@ jQuery(function($) {
 					itemName = options.name + '[new]';
 				}
 				else {
-					itemName = options.name + '[exist]';
+					itemName = options.name;
 				}
 			}
 			else {
@@ -492,13 +492,14 @@ jQuery(function($) {
 				type: 'hidden',
 				name: itemName,
 				value: item.id,
+				'data-uid': item.uid,
 				'data-name': item.name,
 				'data-prefix': item.prefix
 			}));
 
 			// add list item
 			var li = $('<li>', {
-				'data-id': item.id
+				'data-uid': item.uid
 			});
 
 			var text = $('<span>', {
@@ -512,10 +513,10 @@ jQuery(function($) {
 			else {
 				var arrow = $('<span>', {
 					'class': 'arrow',
-					'data-id': item.id
+					'data-uid': item.uid
 				})
 				.click(function() {
-					removeSelected($(this).data('id'), obj, values, options);
+					removeSelected($(this).data('uid'), obj, values, options);
 				});
 
 				$('.selected ul', obj).append(li.append(text, arrow));
@@ -534,12 +535,17 @@ jQuery(function($) {
 		}
 	}
 
-	function removeSelected(id, obj, values, options) {
+	function removeSelected(uid, obj, values, options) {
 		// remove
-		$('.selected li[data-id="' + id + '"]', obj).remove();
-		$('input[value="' + id + '"]', obj).remove();
+		$('.selected li[data-uid="' + uid + '"]', obj).remove();
+		$('input[data-uid="' + uid + '"]', obj).remove();
 
-		delete values.selected[id];
+		$.each(values.selected, function(i, selected) {
+			if (selected.uid = uid) {
+				delete values.selected[selected.realName];
+				return false;
+			}
+		});
 
 		// resize
 		resizeSelected(obj, values, options);
@@ -565,9 +571,18 @@ jQuery(function($) {
 	}
 
 	function addAvailable(item, obj, values, options) {
+		if (item.isNew) {
+			item.realName = item.id;
+		}
+		else {
+			item.realName = item.name;
+		}
 		if (empty(options.limit) || (options.limit > 0 && $('.available li', obj).length < options.limit)) {
-			if (typeof(values.available[item.id]) == 'undefined' && typeof(values.selected[item.id]) == 'undefined') {
-				values.available[item.id] = item;
+			if (typeof(values.available[item.id]) == 'undefined' && typeof(values.selected[item.realName]) == 'undefined') {
+
+				item.uid = getUniqueId();
+
+				values.available[item.uid] = item;
 
 				var prefix = $('<span>', {
 					'class': 'prefix',
@@ -584,10 +599,10 @@ jQuery(function($) {
 				});
 
 				var li = $('<li>', {
-					'data-id': item.id
+					'data-uid': item.uid
 				})
 				.click(function() {
-					select($(this).data('id'), obj, values, options);
+					select($(this).data('uid'), obj, values, options);
 				})
 				.hover(function() {
 					$('.available li.hover', obj).removeClass('hover');
@@ -603,9 +618,9 @@ jQuery(function($) {
 		}
 	}
 
-	function select(id, obj, values, options) {
+	function select(uid, obj, values, options) {
 		if (values.isAjaxLoaded && !values.isWaiting) {
-			addSelected(values.available[id], obj, values, options);
+			addSelected(values.available[uid], obj, values, options);
 			hideAvailable(obj);
 			cleanAvailable(obj, values);
 			cleanLastSearch(obj);
