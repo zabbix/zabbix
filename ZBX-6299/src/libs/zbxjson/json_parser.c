@@ -25,6 +25,7 @@
 #include "log.h"
 
 static int	json_parse_value(const char *start, char **error);
+static int	json_parse_object(const char *start, char **error);
 
 /******************************************************************************
  *                                                                            *
@@ -164,7 +165,7 @@ static int	json_parse_array(const char *start, char **error)
 		while (1)
 		{
 			/* json_parse_value strips leading whitespace, so we don't have to do it here */
-			if (0 == (len = json_parse_value(ptr, error)) )
+			if (0 == (len = json_parse_value(ptr, error)))
 				return 0;
 
 			ptr += len;
@@ -379,7 +380,7 @@ static int	json_parse_value(const char *start, char **error)
  * Author: Andris Zeila                                                       *
  *                                                                            *
  ******************************************************************************/
-int	json_parse_object(const char *start, char **error)
+static int	json_parse_object(const char *start, char **error)
 {
 	const char	*ptr = start;
 	int		len;
