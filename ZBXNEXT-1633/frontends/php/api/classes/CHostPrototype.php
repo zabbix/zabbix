@@ -189,6 +189,19 @@ class CHostPrototype extends CHostBase {
 			'message' => _('Cannot create a host prototype on a discovered host "%1$s".')
 		)));
 
+		// check if group prototypes use discovered host groups
+		$groupPrototypeGroupIds = array();
+		foreach ($hostPrototypes as $hostPrototype) {
+			foreach ($hostPrototype['groupPrototypes'] as $groupPrototype) {
+				if (isset($groupPrototype['groupid']) && $groupPrototype['groupid']) {
+					$groupPrototypeGroupIds[] = $groupPrototype['groupid'];
+				}
+			}
+		}
+		$this->checkValidator(array_unique($groupPrototypeGroupIds), new CHostGroupNotDiscoveredValidator(array(
+			'message' => _('Group prototype cannot be based on a discovered host group "%1$s".')
+		)));
+
 		$this->checkDuplicates($hostPrototypes, 'host', _('Host prototype "%1$s" already exists.'), 'ruleid');
 		$this->checkExistingHostPrototypes($hostPrototypes);
 	}
@@ -389,6 +402,21 @@ class CHostPrototype extends CHostBase {
 		$hostPrototypes = $relationMap->mapIdOne($hostPrototypes, 'ruleid');
 		$this->checkDuplicates($hostPrototypes, 'host', _('Host prototype "%1$s" already exists.'));
 		$this->checkExistingHostPrototypes($hostPrototypes);
+
+		// check if group prototypes use discovered host groups
+		$groupPrototypeGroupIds = array();
+		foreach ($hostPrototypes as $hostPrototype) {
+			if (isset($hostPrototype['groupPrototypes'])) {
+				foreach ($hostPrototype['groupPrototypes'] as $groupPrototype) {
+					if (isset($groupPrototype['groupid']) && $groupPrototype['groupid']) {
+						$groupPrototypeGroupIds[] = $groupPrototype['groupid'];
+					}
+				}
+			}
+		}
+		$this->checkValidator(array_unique($groupPrototypeGroupIds), new CHostGroupNotDiscoveredValidator(array(
+			'message' => _('Group prototype cannot be based on a discovered host group "%1$s".')
+		)));
 	}
 
 	/**
