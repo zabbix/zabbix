@@ -478,7 +478,7 @@ int	zbx_json_open(const char *buffer, struct zbx_json_parse *jp)
 	char	*error = NULL;
 	int	len;
 
-	STRIP_WHITESPACE(buffer);
+	SKIP_WHITESPACE(buffer);
 
 	/* return immediate failure without logging when opening empty string */
 	if ('\0' == *buffer)
@@ -529,7 +529,7 @@ const char	*zbx_json_next(const struct zbx_json_parse *jp, const char *p)
 	if (NULL == p)
 	{
 		p = jp->start + 1;
-		STRIP_WHITESPACE(p);
+		SKIP_WHITESPACE(p);
 		return p;
 	}
 
@@ -562,7 +562,7 @@ const char	*zbx_json_next(const struct zbx_json_parse *jp, const char *p)
 				if (0 == state && 0 == level)
 				{
 					p++;
-					STRIP_WHITESPACE(p);
+					SKIP_WHITESPACE(p);
 					return p;
 				}
 				break;
@@ -805,12 +805,12 @@ const char	*zbx_json_pair_next(const struct zbx_json_parse *jp, const char *p, c
 	if (NULL == (p = zbx_json_decodestring(p, name, len)))
 		return NULL;
 
-	STRIP_WHITESPACE(p);
+	SKIP_WHITESPACE(p);
 
 	if (':' != *p++)
 		return NULL;
 
-	STRIP_WHITESPACE(p);
+	SKIP_WHITESPACE(p);
 
 	return p;
 }
@@ -923,7 +923,7 @@ int	zbx_json_brackets_open(const const char *p, struct zbx_json_parse *jp)
 		return FAIL;
 	}
 
-	STRIP_WHITESPACE(p);
+	SKIP_WHITESPACE(p);
 
 	jp->start = p;
 

@@ -158,7 +158,7 @@ static int	json_parse_array(const char *start, char **error)
 	int		len;
 
 	ptr++;
-	STRIP_WHITESPACE(ptr);
+	SKIP_WHITESPACE(ptr);
 
 	if (']' != *ptr)
 	{
@@ -169,7 +169,7 @@ static int	json_parse_array(const char *start, char **error)
 				return 0;
 
 			ptr += len;
-			STRIP_WHITESPACE(ptr);
+			SKIP_WHITESPACE(ptr);
 
 			if (',' != *ptr)
 				break;
@@ -313,7 +313,7 @@ static int	json_parse_value(const char *start, char **error)
 	const char	*ptr = start;
 	int		len = 0;
 
-	STRIP_WHITESPACE(ptr);
+	SKIP_WHITESPACE(ptr);
 
 	switch (*ptr)
 	{
@@ -386,14 +386,14 @@ static int	json_parse_object(const char *start, char **error)
 	int		len;
 
 	/* parse object name */
-	STRIP_WHITESPACE(ptr);
+	SKIP_WHITESPACE(ptr);
 
 	/* not an object, failing */
 	if ('{' != *ptr)
 		return json_error("invalid object format, expected opening character '{'", ptr, error);
 
 	ptr++;
-	STRIP_WHITESPACE(ptr);
+	SKIP_WHITESPACE(ptr);
 
 	if ('}' != *ptr)
 	{
@@ -406,7 +406,7 @@ static int	json_parse_object(const char *start, char **error)
 			ptr += len;
 
 			/* parse name:value separator */
-			STRIP_WHITESPACE(ptr);
+			SKIP_WHITESPACE(ptr);
 
 			if (':' != *ptr)
 				return json_error("invalid object name/value separator", ptr, error);
@@ -417,13 +417,13 @@ static int	json_parse_object(const char *start, char **error)
 
 			ptr += len;
 
-			STRIP_WHITESPACE(ptr);
+			SKIP_WHITESPACE(ptr);
 
 			if (',' != *ptr)
 				break;
 
 			ptr++;
-			STRIP_WHITESPACE(ptr);
+			SKIP_WHITESPACE(ptr);
 		}
 
 		/* object is not properly closed, failing */
@@ -461,7 +461,7 @@ int	zbx_json_validate(const char *start, char **error)
 		return 0;
 
 	start += len;
-	STRIP_WHITESPACE(start);
+	SKIP_WHITESPACE(start);
 
 	if ('\0' != *start)
 		return json_error("invalid character following JSON object", start, error);
