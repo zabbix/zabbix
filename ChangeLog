@@ -1,6 +1,7 @@
 Changes for 2.0.7rc1
 
 New features:
+A......... [ZBX-6407] improved data retrieval performance for CTrigger get() with post SQL filtering (Toms)
 ........S. [ZBX-6493] improved performance when working with Oracle by changing memory based prefetch to rows based (dimir)
 A.F....... [ZBX-1357] updated Spanish and Turkish translations; thanks to Zabbix translators (Richlv)
 
