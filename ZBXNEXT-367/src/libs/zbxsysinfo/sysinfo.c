@@ -40,6 +40,7 @@
 #endif
 
 static ZBX_METRIC	*commands = NULL;
+extern ALIAS		*aliasList;
 
 void	add_metric(ZBX_METRIC *new)
 {
@@ -231,11 +232,16 @@ int	parse_command(const char *command, char *cmd, size_t cmd_max_len, char *para
 
 void	test_parameter(const char *key, unsigned flags)
 {
+	ALIAS		*alias;
 	AGENT_RESULT	result;
 
 	init_result(&result);
 
-	process(key, flags, &result);
+	if (0 == strcmp(key, "__UserPerfCounter"))
+		for (alias = aliasList; NULL != alias; alias = alias->next)
+			test_parameter(alias->value, PROCESS_TEST);
+	else
+		process(key, flags, &result);
 
 	if (ISSET_UI64(&result))
 		printf(" [u|" ZBX_FS_UI64 "]", result.ui64);
