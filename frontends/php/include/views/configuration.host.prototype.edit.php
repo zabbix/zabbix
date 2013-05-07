@@ -177,6 +177,10 @@ foreach ($data['group_prototypes'] as $group) {
 $groupList->addRow(_('Groups'), new CMultiSelect(array(
 	'name' => 'group_prototypes[]',
 	'objectName' => 'hostGroup',
+	'objectOptions' => array(
+		'editable' => true,
+		'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL)
+	),
 	'data' => $groups,
 	'disabled' => (bool) $hostPrototype['templateid']
 )));

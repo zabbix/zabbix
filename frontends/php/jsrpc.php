@@ -235,9 +235,11 @@ switch ($data['method']) {
 		switch ($data['objectName']) {
 			case 'hostGroup':
 				$hostGroups = API::HostGroup()->get(array(
+					'editable' => isset($data['editable']) ? $data['editable'] : null,
 					'output' => array('groupid', 'name'),
 					'startSearch' => true,
 					'search' => isset($data['search']) ? array('name' => $data['search']) : null,
+					'filter' => isset($data['filter']) ? $data['filter'] : null,
 					'limit' => isset($data['limit']) ? $data['limit'] : null
 				));
 				foreach ($hostGroups as &$hostGroup) {

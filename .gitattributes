@@ -175,6 +175,7 @@ frontends/php/include/classes/validators/CIdValidator.php -text
 frontends/php/include/classes/validators/CSchemaValidator.php -text
 frontends/php/include/classes/validators/CSetValidator.php -text
 frontends/php/include/classes/validators/event/CEventSourceObjectValidator.php -text
+frontends/php/include/classes/validators/hostgroup/CHostGroupNotDiscoveredValidator.php -text
 frontends/php/include/classes/validators/hostprototype/CGroupPrototypeCollectionValidator.php -text
 frontends/php/include/classes/validators/hostprototype/CGroupPrototypeValidator.php -text
 frontends/php/include/classes/validators/string/CLldMacroStringValidator.php -text
