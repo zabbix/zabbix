@@ -477,13 +477,8 @@ jQuery(function($) {
 			values.selected[item.realName] = item;
 
 			var itemName;
-			if (options.addNew) {
-				if (item.isNew) {
-					itemName = options.name + '[new]';
-				}
-				else {
-					itemName = options.name;
-				}
+			if (options.addNew && item.isNew) {
+				itemName = options.name + '[new]';
 			}
 			else {
 				itemName = options.name;
