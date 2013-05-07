@@ -47,21 +47,21 @@ class CStringValidator extends CValidator {
 	 *
 	 * @var string
 	 */
-	public $messageEmpty = 'Empty string.';
+	public $messageEmpty;
 
 	/**
 	 * Error message if the string is too long.
 	 *
 	 * @var string
 	 */
-	public $messageMaxLength = 'String "%1$s" is too long, it must have less then %2$d characters.';
+	public $messageMaxLength;
 
 	/**
 	 * Error message if the string doesn't match the regex.
 	 *
 	 * @var string
 	 */
-	public $messageRegex = 'Incorrect characters used for string "%1$s".';
+	public $messageRegex;
 
 
 	/**

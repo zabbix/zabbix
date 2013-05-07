@@ -22,7 +22,9 @@
 class CSchemaValidator extends CValidator {
 
 	/**
-	 * Array of validators where keys are object field names and values CValidator objects.
+	 * Array of validators where keys are object field names and values are either CValidator objects or nulls.
+	 *
+	 * If the value is set to null, it will not be validated, but no $messageUnsupported error will be triggered.
 	 *
 	 * @var array
 	 */
@@ -47,14 +49,14 @@ class CSchemaValidator extends CValidator {
 	 *
 	 * @var string
 	 */
-	public $messageRequired = 'No "%1$s" given.';
+	public $messageRequired;
 
 	/**
 	 * Error message if an unsupported field is given.
 	 *
 	 * @var string
 	 */
-	public $messageUnsupported = 'Wrong fields.';
+	public $messageUnsupported;
 
 	/**
 	 * Checks each object field against the given validator, and then the whole object against the post validators.
@@ -70,16 +72,18 @@ class CSchemaValidator extends CValidator {
 
 		// field validators
 		foreach ($this->validators as $field => $validator) {
+			unset($unvalidatedFields[$field]);
+
+			// if the value is present
 			if (isset($value[$field])) {
-				if ($validator->validate($value[$field])) {
-					unset($unvalidatedFields[$field]);
-				}
-				else {
+				// validate it if a validator is given, skip it otherwise
+				if ($validator && !$validator->validate($value[$field])) {
 					$this->setError($validator->getError());
 
 					return false;
 				}
 			}
+			// if no value is given, check if it's required
 			elseif (isset($required[$field])) {
 				$this->error($this->messageRequired, $field);
 
@@ -115,7 +119,9 @@ class CSchemaValidator extends CValidator {
 		parent::setObjectName($name);
 
 		foreach ($this->validators as $validator) {
-			$validator->setObjectName($name);
+			if ($validator) {
+				$validator->setObjectName($name);
+			}
 		}
 
 		foreach ($this->postValidators as $validator) {

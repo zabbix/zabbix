@@ -41,7 +41,7 @@ class CGroupPrototypeValidator extends CValidator {
 	public function validate($value)
 	{
 		if (empty($value['name']) && empty($value['groupid'])) {
-			$this->setError($this->messageMissing);
+			$this->error($this->messageMissing);
 
 			return false;
 		}
