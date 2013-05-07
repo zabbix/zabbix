@@ -407,6 +407,8 @@ jQuery(function($) {
 
 	function loadSelected(data, obj, values, options) {
 		$.each(data, function(i, item) {
+			item.realName = item.name;
+			item.uid = getUniqueId();
 			addSelected(item, obj, values, options);
 		});
 	}
