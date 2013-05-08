@@ -79,6 +79,18 @@ static int	SYSTEM_SWAP_FREE(const char *cmd, const char *param, unsigned flags, 
 	return SYSINFO_RET_OK;
 }
 
+static int	SYSTEM_SWAP_USED(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+{
+	zbx_uint64_t	total, used;
+
+	if (SUCCEED != get_swapinfo(&total, &used))
+		return SYSINFO_RET_FAIL;
+
+	SET_UI64_RESULT(result, used);
+
+	return SYSINFO_RET_OK;
+}
+
 static int	SYSTEM_SWAP_PUSED(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	zbx_uint64_t	total, used;
@@ -115,6 +127,7 @@ int	SYSTEM_SWAP_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_R
 	{
 		{"total",	SYSTEM_SWAP_TOTAL},
 		{"free",	SYSTEM_SWAP_FREE},
+		{"used",	SYSTEM_SWAP_USED},
 		{"pused",       SYSTEM_SWAP_PUSED},
 		{"pfree",       SYSTEM_SWAP_PFREE},
 		{NULL,		0}

@@ -2,7 +2,7 @@ Changes for 2.0.7rc1
 
 New features:
 
-...G...... [ZBXNEXT-8] Added used swap size support for Windows and OSF (aleksej)
+...G...... [ZBXNEXT-8] Added used swap size support for Windows, Solaris and OSF (aleksej)
 A.F....... [ZBX-1357] updated Spanish and Turkish translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
