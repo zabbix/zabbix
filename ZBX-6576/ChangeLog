@@ -6,6 +6,7 @@ A......... [ZBX-6407] improved data retrieval performance for CTrigger get() wit
 A.F....... [ZBX-1357] updated Spanish and Turkish translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+...G...... [ZBX-6576] fixed heavy cpu usage when collecting cpu stats on Solaris (aleksej)
 ..F....... [ZBX-1129] fixed graph time period in bar reports (Oleg)
 ....I..... [ZBX-6490] fixed web test 1.8->2.0 upgrade script ignoring nodes (wiper)
 .......PS. [ZBX-6526] fixed possible data uploading issues duing server startup or network problems (wiper)

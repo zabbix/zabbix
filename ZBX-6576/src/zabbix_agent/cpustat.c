@@ -32,6 +32,10 @@
 static ZBX_MUTEX	cpustats_lock;
 #endif
 
+#ifdef HAVE_KSTAT_H
+	kstat_ctl_t			*kc;
+#endif
+
 int	init_cpu_collector(ZBX_CPUS_STAT_DATA *pcpus)
 {
 	const char			*__function_name = "init_cpu_collector";
@@ -42,7 +46,6 @@ int	init_cpu_collector(ZBX_CPUS_STAT_DATA *pcpus)
 	PDH_COUNTER_PATH_ELEMENTS	cpe;
 #else
 #ifdef HAVE_KSTAT_H
-	kstat_ctl_t			*kc;
 	kstat_t				*k, *kd;
 #endif
 #endif
@@ -368,7 +371,7 @@ static void	update_cpustats(ZBX_CPUS_STAT_DATA *pcpus)
 #elif defined(HAVE_KSTAT_H)
 	/* Solaris */
 
-	if (NULL == (kc = kstat_open()))
+	if (NULL == kc)
 	{
 		ZBX_SET_CPUS_NOTSUPPORTED();
 		goto exit;
