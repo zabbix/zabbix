@@ -323,7 +323,7 @@ else {
 	$_REQUEST['filter_ipmi_sensor'] = CProfile::get('web.items.filter_ipmi_sensor');
 }
 
-if (isset($_REQUEST['filter_hostname']) && !zbx_empty($_REQUEST['filter_hostname'])) {
+if (empty($_REQUEST['hostid']) && isset($_REQUEST['filter_hostname']) && !zbx_empty($_REQUEST['filter_hostname'])) {
 	$host = API::Host()->getObjects(array('name' => $_REQUEST['filter_hostname']));
 	if (empty($host)) {
 		$host = API::Template()->getObjects(array('name' => $_REQUEST['filter_hostname']));
