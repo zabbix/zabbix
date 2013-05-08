@@ -29,7 +29,7 @@ $page['file'] = 'items.php';
 $page['scripts'] = array('class.cviewswitcher.js');
 $page['hist_arg'] = array();
 
-if (isset($_REQUEST['go']) && $_REQUEST['go'] == 'massupdate') {
+if ((isset($_REQUEST['go']) && $_REQUEST['go'] == 'massupdate') || isset($_REQUEST['massupdate'])) {
 	$page['scripts'] = array('multiselect.js');
 }
 

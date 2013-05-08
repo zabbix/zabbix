@@ -464,28 +464,68 @@ $itemFormList->addRow(
 // append applications to form list
 if (!$this->data['is_multiple_hosts']) {
 	// replace applications
+	$appToReplace = null;
+	if (isset($_REQUEST['applications'])) {
+		$getApps = API::Application()->get(array(
+			'applicationids' => $_REQUEST['applications'],
+			'output' => array('applicationid', 'name')
+		));
+		foreach ($getApps as $getApp) {
+			$appToReplace[] = array(
+				'id' => $getApp['applicationid'],
+				'name' => $getApp['name']
+			);
+		}
+	}
+
 	$replaceApp = new CMultiSelect(array(
 			'name' => 'applications[]',
 			'objectName' => 'applications',
 			'objectOptions' => array('hostid' => $this->data['hostid']),
-			'data' => isset($this->data['visible']['applications'])
+			'data' => $appToReplace
 		));
 
 	$itemFormList->addRow(
 		array(
 			_('Replace applications'),
 			SPACE,
-			new CVisibilityBox('visible[applications]', isset($this->data['visible']['applications']), 'applications_', _('Original'))
+			new CVisibilityBox('visible[applications]', isset($_REQUEST['visible']['applications']), 'applications_', _('Original'))
 		),
 		$replaceApp
 	);
 
 	// add new or existing applications
+	$appToAdd = null;
+	if (isset($_REQUEST['new_applications'])) {
+		foreach ($_REQUEST['new_applications'] as $newApplication) {
+			if (isset($newApplication['new'])) {
+				$appToAdd[] = array(
+					'id' => $newApplication['new'],
+					'name' => $newApplication['new'] . ' (new)'
+				);
+			}
+			else {
+				$appToAddId[] = $newApplication;
+			}
+		}
+
+		$getApps = API::Application()->get(array(
+			'applicationids' => $appToAddId,
+			'output' => array('applicationid', 'name')
+		));
+		foreach ($getApps as $getApp) {
+			$appToAdd[] = array(
+				'id' => $getApp['applicationid'],
+				'name' => $getApp['name']
+			);
+		}
+	}
+
 	$newApp = new CMultiSelect(array(
 			'name' => 'new_applications[]',
 			'objectName' => 'applications',
 			'objectOptions' => array('hostid' => $this->data['hostid']),
-			'data' => isset($this->data['visible']['new_applications']),
+			'data' => $appToAdd,
 			'addNew' => true
 		));
 
@@ -493,7 +533,7 @@ if (!$this->data['is_multiple_hosts']) {
 		array(
 			_('Add new or existing applications'),
 			SPACE,
-			new CVisibilityBox('visible[new_applications]', isset($this->data['visible']['new_applications']), 'new_applications_', _('Original'))
+			new CVisibilityBox('visible[new_applications]', isset($_REQUEST['visible']['new_applications']), 'new_applications_', _('Original'))
 		),
 		$newApp
 	);
