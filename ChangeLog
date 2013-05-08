@@ -1,6 +1,7 @@
 Changes for 2.1.0
 
 New features:
+...G...... [ZBXNEXT-8] added used swap size support for Windows and OSF (aleksej)
 ..F.I...S. [ZBXNEXT-1597] added support for content retrieval based on regular expressions in WEB monitoring (wiper, Pavels)
 ..F.I...S. [ZBXNEXT-1438] added SNMPv3 context name support (wiper, Oleg)
 ..F....... [ZBXNEXT-1407] implement multiselect in multiple pages for host and host groups (Eduard)
