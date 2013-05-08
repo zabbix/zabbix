@@ -29,6 +29,10 @@ $page['file'] = 'items.php';
 $page['scripts'] = array('class.cviewswitcher.js');
 $page['hist_arg'] = array();
 
+if (isset($_REQUEST['go']) && $_REQUEST['go'] == 'massupdate') {
+	$page['scripts'] = array('multiselect.js');
+}
+
 require_once dirname(__FILE__).'/include/page_header.php';
 
 $paramsFieldName = getParamFieldNameByType(get_request('type', 0));
@@ -65,7 +69,6 @@ $fields = array(
 	'delta_visible' =>			array(T_ZBX_STR, O_OPT, null,	null,		null),
 	'valuemapid_visible' =>		array(T_ZBX_STR, O_OPT, null,	null,		null),
 	'trapper_hosts_visible' =>	array(T_ZBX_STR, O_OPT, null,	null,		null),
-	'applications_visible' =>	array(T_ZBX_STR, O_OPT, null,	null,		null),
 	'groupid' =>				array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
 	'hostid' =>					array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
 	'interfaceid' =>			array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null, _('Interface')),
@@ -147,7 +150,9 @@ $fields = array(
 	'copy_targetid' =>			array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
 	'copy_groupid' =>			array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		'isset({copy})&&(isset({copy_type})&&({copy_type}==0))'),
 	'new_application' =>		array(T_ZBX_STR, O_OPT, null,	null,		'isset({save})'),
+	'visible' =>		array(T_ZBX_STR, O_OPT, null,		null,		null),
 	'applications' =>			array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
+	'new_applications' =>		array(T_ZBX_STR, O_OPT, null,	null,		null),
 	'del_history' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'add_delay_flex' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	// actions
@@ -506,6 +511,7 @@ elseif (isset($_REQUEST['del_history']) && isset($_REQUEST['itemid'])) {
 	show_messages($result, _('History cleared'), _('Cannot clear history'));
 }
 elseif (isset($_REQUEST['update']) && isset($_REQUEST['massupdate']) && isset($_REQUEST['group_itemid'])) {
+	$visible = get_request('visible', array());
 	if (get_request('delay_flex_visible')) {
 		$delay_flex = get_request('delay_flex');
 		if (!is_null($delay_flex)) {
@@ -533,6 +539,42 @@ elseif (isset($_REQUEST['update']) && isset($_REQUEST['massupdate']) && isset($_
 	$applications = get_request('applications', null);
 	if (isset($applications[0]) && $applications[0] == '0') {
 		$applications = array();
+	}
+
+	DBstart();
+
+	// add new or existing applications
+	if (isset($visible['new_applications']) && !empty($_REQUEST['new_applications'])) {
+		foreach ($_REQUEST['new_applications'] as $newApplication) {
+			if (isset($newApplication['new'])) {
+				$newApplications[] = array(
+					'name' => $newApplication['new'],
+					'hostid' => get_request('hostid')
+				);
+			}
+			else {
+				$existApplication[] = $newApplication;
+			}
+		}
+
+		if (isset($newApplications)) {
+			$createdApplication = API::Application()->create($newApplications);
+			if (isset($existApplication)) {
+				$existApplication = array_merge($existApplication, $createdApplication['applicationids']);
+			}
+			else {
+				$existApplication = $createdApplication['applicationids'];
+			}
+		}
+	}
+
+	if (isset($visible['applications']) && isset($_REQUEST['applications'])) {
+		if (isset($existApplication)){
+			$applications = array_unique(array_merge($_REQUEST['applications'], $existApplication));
+		}
+		else {
+			$applications = $_REQUEST['applications'];
+		}
 	}
 
 	$item = array(
@@ -571,13 +613,28 @@ elseif (isset($_REQUEST['update']) && isset($_REQUEST['massupdate']) && isset($_
 		'applications' => $applications,
 		'data_type' => get_request('data_type')
 	);
+
+	// add applications
+	if (!empty($existApplication) && (!isset($visible['applications']) || !isset($_REQUEST['applications']))) {
+		foreach ($existApplication as $linkApp) {
+			$linkApplications[] = array('applicationid' => $linkApp);
+		}
+		foreach (get_request('group_itemid') as $linkItem) {
+			$linkItems[] = array('itemid' => $linkItem);;
+		}
+		$linkApp = array(
+			'applications' => $linkApplications,
+			'items' => $linkItems
+		);
+		API::Application()->massAdd($linkApp);
+	}
+
 	foreach ($item as $number => $field) {
 		if (is_null($field)) {
 			unset($item[$number]);
 		}
 	}
 
-	DBstart();
 	foreach ($_REQUEST['group_itemid'] as $id) {
 		$item['itemid'] = $id;
 		$result = API::Item()->update($item);
