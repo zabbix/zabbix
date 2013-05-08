@@ -255,8 +255,6 @@ static int	json_parse_number(const char *start, char **error)
 		{
 			if (0 == isdigit(*ptr))
 				break;
-
-			ptr++;
 		}
 	}
 
