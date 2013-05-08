@@ -41,8 +41,6 @@ $fields = array(
 	'groupid' =>			array(T_ZBX_INT, O_OPT, null,	DB_ID,	null),
 	'applicationid' =>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,	'isset({form})&&({form}=="update")'),
 	'appname' =>			array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY, 'isset({save})'),
-	'apphostid' =>			array(T_ZBX_INT, O_OPT, null,	DB_ID.'{}>0', 'isset({save})'),
-	'apptemplateid' =>		array(T_ZBX_INT, O_OPT, null,	DB_ID,	null),
 	// actions
 	'go' =>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'add_to_group' =>		array(T_ZBX_INT, O_OPT, P_SYS|P_ACT, DB_ID,	null),
@@ -95,12 +93,6 @@ if (get_request('hostid', 0) > 0) {
 		access_deny();
 	}
 }
-if (get_request('apphostid', 0) > 0) {
-	$hostids = available_hosts($_REQUEST['apphostid'], 1);
-	if (empty($hostids)) {
-		access_deny();
-	}
-}
 $_REQUEST['go'] = get_request('go', 'none');
 
 /*
@@ -110,7 +102,7 @@ if (isset($_REQUEST['save'])) {
 	DBstart();
 	$application = array(
 		'name' => $_REQUEST['appname'],
-		'hostid' => $_REQUEST['apphostid']
+		'hostid' => $_REQUEST['hostid']
 	);
 
 	if (isset($_REQUEST['applicationid'])) {
@@ -118,19 +110,20 @@ if (isset($_REQUEST['save'])) {
 		$dbApplications = API::Application()->update($application);
 
 		$action = AUDIT_ACTION_UPDATE;
-		$msg_ok = _('Application updated');
-		$msg_fail = _('Cannot update application');
+		$msgOk = _('Application updated');
+		$msgFail = _('Cannot update application');
 	}
-	else{
+	else {
 		$dbApplications = API::Application()->create($application);
 
 		$action = AUDIT_ACTION_ADD;
-		$msg_ok = _('Application added');
-		$msg_fail = _('Cannot add application');
+		$msgOk = _('Application added');
+		$msgFail = _('Cannot add application');
 	}
 	$result = DBend($dbApplications);
 
-	show_messages($result, $msg_ok, $msg_fail);
+	show_messages($result, $msgOk, $msgFail);
+
 	if ($result) {
 		$applicationid = reset($dbApplications['applicationids']);
 		add_audit($action, AUDIT_RESOURCE_APPLICATION, _('Application').' ['.$_REQUEST['appname'].' ] ['.$applicationid.']');
@@ -226,28 +219,25 @@ if ($_REQUEST['go'] != 'none' && !empty($go_result)) {
 /*
  * Dsiplay
  */
-$data = array();
-
 if (isset($_REQUEST['form'])) {
-	$data['applicationid'] = get_request('applicationid');
-	$data['form'] = get_request('form');
-	$data['form_refresh'] = get_request('form_refresh', 0);
-	$data['groupid'] = get_request('groupid', 0);
+	$data = array(
+		'applicationid' => get_request('applicationid'),
+		'groupid' => get_request('groupid', 0),
+		'form' => get_request('form'),
+		'form_refresh' => get_request('form_refresh', 0)
+	);
 
 	if (isset($data['applicationid']) && !isset($_REQUEST['form_refresh'])) {
 		$dbApplication = reset($dbApplication);
 
 		$data['appname'] = $dbApplication['name'];
-		$data['apphostid'] = $dbApplication['hostid'];
+		$data['hostid'] = $dbApplication['hostid'];
 
 	}
 	else {
 		$data['appname'] = get_request('appname', '');
-		$data['apphostid'] = get_request('apphostid', get_request('hostid', 0));
+		$data['hostid'] = get_request('hostid');
 	}
-
-	// select the host for the navigation panel
-	$data['hostid'] = get_request('hostid') ? get_request('hostid') : $data['apphostid'];
 
 	// render view
 	$applicationView = new CView('configuration.application.edit', $data);
@@ -255,12 +245,14 @@ if (isset($_REQUEST['form'])) {
 	$applicationView->show();
 }
 else {
-	$data['pageFilter'] = new CPageFilter(array(
-		'groups' => array('editable' => true, 'with_hosts_and_templates' => true),
-		'hosts' => array('editable' => true, 'templated_hosts' => true),
-		'hostid' => get_request('hostid'),
-		'groupid' => get_request('groupid')
-	));
+	$data = array(
+		'pageFilter' => new CPageFilter(array(
+			'groups' => array('editable' => true, 'with_hosts_and_templates' => true),
+			'hosts' => array('editable' => true, 'templated_hosts' => true),
+			'hostid' => get_request('hostid'),
+			'groupid' => get_request('groupid')
+		))
+	);
 	$data['groupid'] = $data['pageFilter']->groupid;
 	$data['hostid'] = $data['pageFilter']->hostid;
 
