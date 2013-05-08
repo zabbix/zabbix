@@ -833,6 +833,7 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 		$oldHashConfig = DBhash($sqlConfig);
 
 		$this->zbxTestClick('resetDefaults');
+		sleep(1);
 		$this->assertVisible("//div[@class='ui-dialog ui-widget ui-widget-content ui-corner-all']");
 		$this->zbxTestClick("//div[@class='ui-dialog ui-widget ui-widget-content ui-corner-all']/div/div/button[1]");
 		$this->zbxTestClickWait('save');
