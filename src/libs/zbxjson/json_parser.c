@@ -248,7 +248,10 @@ static int	json_parse_number(const char *start, char **error)
 				return json_error("unexpected end of numeric value", NULL, error);
 		}
 
-		while ('\0' != *ptr)
+		if (0 == isdigit(*ptr))
+			return json_error("invalid power value of number in E notation", ptr, error);
+
+		while ('\0' != *(++ptr))
 		{
 			if (0 == isdigit(*ptr))
 				break;
@@ -404,6 +407,9 @@ static int	json_parse_object(const char *start, char **error)
 	{
 		while (1)
 		{
+			if ('"' != *ptr)
+				return json_error("invalid object name", ptr, error);
+
 			/* cannot parse object name, failing */
 			if (0 == (len = json_parse_string(ptr, error)))
 				return 0;
