@@ -337,7 +337,8 @@ if (isset($_REQUEST['filter_hostname']) && !zbx_empty($_REQUEST['filter_hostname
 
 // validate hostid, must exist in edit form
 if (isset($_REQUEST['form']) && empty($_REQUEST['hostid'])) {
-	access_deny();
+	info(_('Critical error. Field "hostid" is mandatory.'));
+	invalid_url();
 }
 
 // subfilters
