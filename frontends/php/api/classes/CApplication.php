@@ -74,7 +74,7 @@ class CApplication extends CZBXAPI {
 			'search'					=> null,
 			'searchByAny'				=> null,
 			'startSearch'				=> null,
-			'exludeSearch'				=> null,
+			'excludeSearch'				=> null,
 			'searchWildcardsEnabled'	=> null,
 			// output
 			'output'					=> API_OUTPUT_REFER,

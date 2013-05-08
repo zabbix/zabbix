@@ -223,7 +223,7 @@ switch ($data['method']) {
 
 	/**
 	 * Create multi select data.
-	 * Supported objects: "hostGroup"
+	 * Supported objects: "hostGroup", "hosts", "templates", "applications"
 	 *
 	 * @param string $data['objectName']
 	 * @param string $data['search']
@@ -299,6 +299,28 @@ switch ($data['method']) {
 						'id' => $template['templateid'],
 						'prefix' => '',
 						'name' => $template['name']
+					);
+				}
+				break;
+
+			case 'applications':
+				$applications = API::Application()->get(array(
+					'hostids' => zbx_toArray($data['hostid']),
+					'output' => array('applicationid', 'name'),
+					'startSearch' => true,
+					'search' => isset($data['search']) ? array('name' => $data['search']) : null,
+					'limit' => isset($data['limit']) ? $data['limit'] : null
+				));
+
+				CArrayHelper::sort($applications, array(
+					array('field' => 'name', 'order' => ZBX_SORT_UP)
+				));
+
+				foreach ($applications as $application) {
+					$result[] = array(
+						'id' => $application['applicationid'],
+						'prefix' => '',
+						'name' => $application['name']
 					);
 				}
 				break;
