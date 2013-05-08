@@ -287,6 +287,8 @@
 		$output = array();
 
 		foreach ($data as $id => $element) {
+			$element['name'] = str_replace(' ', SPACE, $element['name']);
+
 			// is activated
 			if (str_in_array($id, $subfilter)) {
 				$span = new CSpan($element['name'].SPACE.'('.$element['count'].')', 'subfilter_enabled');
@@ -318,8 +320,9 @@
 				}
 			}
 
-			$output[] = SPACE.', ';
+			$output[] = ', ';
 		}
+
 		array_pop($output);
 
 		return $output;
