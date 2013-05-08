@@ -335,6 +335,11 @@ if (isset($_REQUEST['filter_hostname']) && !zbx_empty($_REQUEST['filter_hostname
 	}
 }
 
+// validate hostid, must exist in edit form
+if (isset($_REQUEST['form']) && empty($_REQUEST['hostid'])) {
+	access_deny();
+}
+
 // subfilters
 foreach (array('subfilter_apps', 'subfilter_types', 'subfilter_value_types', 'subfilter_status', 'subfilter_state',
 			'subfilter_templated_items', 'subfilter_with_triggers', 'subfilter_hosts', 'subfilter_interval',
