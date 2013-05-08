@@ -287,7 +287,7 @@
 		$output = array();
 
 		foreach ($data as $id => $element) {
-			$element['name'] = str_replace(' ', SPACE, $element['name']);
+			$element['name'] = nbsp($element['name']);
 
 			// is activated
 			if (str_in_array($id, $subfilter)) {
