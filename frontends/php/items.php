@@ -67,7 +67,7 @@ $fields = array(
 	'trapper_hosts_visible' =>	array(T_ZBX_STR, O_OPT, null,	null,		null),
 	'applications_visible' =>	array(T_ZBX_STR, O_OPT, null,	null,		null),
 	'groupid' =>				array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
-	'hostid' =>					array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
+	'hostid' =>					array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		'isset({form})&&({form}=="update")'),
 	'interfaceid' =>			array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null, _('Interface')),
 	'copy_type' =>				array(T_ZBX_INT, O_OPT, P_SYS,	IN('0,1'),	'isset({copy})'),
 	'copy_mode' =>				array(T_ZBX_INT, O_OPT, P_SYS,	IN('0'),	null),
@@ -333,12 +333,6 @@ if (isset($_REQUEST['filter_hostname']) && !zbx_empty($_REQUEST['filter_hostname
 	if ($host) {
 		$_REQUEST['hostid'] = isset($host['hostid']) ? $host['hostid'] : $host['templateid'];
 	}
-}
-
-// validate hostid, must exist in edit form
-if (isset($_REQUEST['form']) && empty($_REQUEST['hostid'])) {
-	info(_('Critical error. Field "hostid" is mandatory.'));
-	invalid_url();
 }
 
 // subfilters
@@ -931,7 +925,7 @@ else {
 		$options['filter']['ipmi_sensor'] = $_REQUEST['filter_ipmi_sensor'];
 	}
 	$afterFilter = count($options, COUNT_RECURSIVE);
-	if ($preFilter == $afterFilter) {
+	if ($preFilter == $afterFilter && !isset($_REQUEST['hostid'])) {
 		$data['items'] = array();
 	}
 	else {
