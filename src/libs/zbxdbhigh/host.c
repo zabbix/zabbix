@@ -1737,15 +1737,16 @@ out:
  * Comments: !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
  ******************************************************************************/
-static void	DBdelete_applications(zbx_uint64_t *applicationids, int applicationids_num)
+static void	DBdelete_applications(zbx_vector_uint64_t *applicationids)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
 	char		*sql = NULL;
 	size_t		sql_alloc = 0, sql_offset = 0;
 	zbx_uint64_t	applicationid;
+	int		index;
 
-	if (0 == applicationids_num)
+	if (0 == applicationids->values_num)
 		goto out;
 
 	/* don't delete applications used in web scenarious */
@@ -1753,18 +1754,22 @@ static void	DBdelete_applications(zbx_uint64_t *applicationids, int applicationi
 			"select distinct applicationid"
 			" from httptest"
 			" where");
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "applicationid", applicationids, applicationids_num);
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "applicationid", applicationids->values,
+			applicationids->values_num);
 
 	result = DBselect("%s", sql);
 
 	while (NULL != (row = DBfetch(result)))
 	{
 		ZBX_STR2UINT64(applicationid, row[0]);
-		uint64_array_remove(applicationids, &applicationids_num, &applicationid, 1);
+
+		index = zbx_vector_uint64_bsearch(applicationids, applicationid, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+		if (FAIL != index)
+			zbx_vector_uint64_remove(applicationids, index);
 	}
 	DBfree_result(result);
 
-	if (0 == applicationids_num)
+	if (0 == applicationids->values_num)
 		goto out;
 
 	/* don't delete applications with items assigned to them */
@@ -1773,18 +1778,22 @@ static void	DBdelete_applications(zbx_uint64_t *applicationids, int applicationi
 			"select distinct applicationid"
 			" from items_applications"
 			" where");
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "applicationid", applicationids, applicationids_num);
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "applicationid", applicationids->values,
+			applicationids->values_num);
 
 	result = DBselect("%s", sql);
 
 	while (NULL != (row = DBfetch(result)))
 	{
 		ZBX_STR2UINT64(applicationid, row[0]);
-		uint64_array_remove(applicationids, &applicationids_num, &applicationid, 1);
+
+		index = zbx_vector_uint64_bsearch(applicationids, applicationid, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+		if (FAIL != index)
+			zbx_vector_uint64_remove(applicationids, index);
 	}
 	DBfree_result(result);
 
-	if (0 == applicationids_num)
+	if (0 == applicationids->values_num)
 		goto out;
 
 	sql_offset = 0;
@@ -1792,7 +1801,7 @@ static void	DBdelete_applications(zbx_uint64_t *applicationids, int applicationi
 
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from applications where");
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset,
-			"applicationid", applicationids, applicationids_num);
+			"applicationid", applicationids->values, applicationids->values_num);
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
 
 	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
@@ -2047,15 +2056,17 @@ static void	DBdelete_template_applications(zbx_uint64_t hostid, const zbx_vector
 {
 	const char	*__function_name = "DBdelete_template_applications";
 
-	char		*sql = NULL;
-	size_t		sql_alloc = 0, sql_offset = 0;
-	DB_RESULT	result;
-	DB_ROW		row;
-	zbx_uint64_t	*applicationids = NULL, *apptemplateids = NULL, id;
-	int		applicationids_alloc = 0, applicationids_num = 0;
-	int		apptemplateids_alloc = 0, apptemplateids_num = 0;
+	char			*sql = NULL;
+	size_t			sql_alloc = 0, sql_offset = 0;
+	DB_RESULT		result;
+	DB_ROW			row;
+	zbx_uint64_t		id;
+	zbx_vector_uint64_t	applicationids, apptemplateids;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	zbx_vector_uint64_create(&applicationids);
+	zbx_vector_uint64_create(&apptemplateids);
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 			"select t.application_templateid,t.applicationid"
@@ -2073,32 +2084,35 @@ static void	DBdelete_template_applications(zbx_uint64_t hostid, const zbx_vector
 	while (NULL != (row = DBfetch(result)))
 	{
 		ZBX_STR2UINT64(id, row[0]);
-		uint64_array_add(&apptemplateids, &apptemplateids_alloc, &apptemplateids_num, id, 64);
+		zbx_vector_uint64_append(&apptemplateids, id);
 
 		ZBX_STR2UINT64(id, row[1]);
-		if (SUCCEED != uint64_array_exists(applicationids, applicationids_num, id))
-			uint64_array_add(&applicationids, &applicationids_alloc, &applicationids_num, id, 64);
+		zbx_vector_uint64_append(&applicationids, id);
 	}
 	DBfree_result(result);
 
-	if (0 == apptemplateids_num)
+	if (0 == apptemplateids.values_num)
 		goto out;
+
+	zbx_vector_uint64_sort(&applicationids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	zbx_vector_uint64_uniq(&applicationids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	sql_offset = 0;
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 			"delete from application_template"
 			" where ");
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "application_templateid",
-			apptemplateids, apptemplateids_num);
+			apptemplateids.values, apptemplateids.values_num);
 
 	DBexecute("%s", sql);
 
-	DBdelete_applications(applicationids, applicationids_num);
+	DBdelete_applications(&applicationids);
 
-	zbx_free(applicationids);
-	zbx_free(apptemplateids);
-	zbx_free(sql);
 out:
+	zbx_vector_uint64_destroy(&applicationids);
+	zbx_vector_uint64_destroy(&apptemplateids);
+	zbx_free(sql);
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
