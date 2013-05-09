@@ -113,7 +113,6 @@ clean:
 			}
 		}
 
-		kstat_close(kc);
 	}
 #endif	/* HAVE_KSTAT_H */
 
@@ -147,6 +146,10 @@ void	free_cpu_collector(ZBX_CPUS_STAT_DATA *pcpus)
 #endif
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+
+#ifdef HAVE_KSTAT_H
+	kstat_close(kc);
+#endif
 }
 
 #if !defined(_WINDOWS)
@@ -203,7 +206,6 @@ static void	update_cpustats(ZBX_CPUS_STAT_DATA *pcpus)
 
 #elif defined(HAVE_KSTAT_H)
 
-	kstat_ctl_t	*kc;
 	kstat_t		*k;
 	cpu_stat_t	*cpu;
 	zbx_uint64_t	total[ZBX_CPU_STATE_COUNT];
@@ -399,7 +401,6 @@ static void	update_cpustats(ZBX_CPUS_STAT_DATA *pcpus)
 
 		update_cpu_counters(&pcpus->cpu[cpu_num], counter);
 	}
-	kstat_close(kc);
 
 	update_cpu_counters(&pcpus->cpu[0], total);
 
