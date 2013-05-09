@@ -62,9 +62,11 @@ function sysmapElementLabel($label = null) {
 }
 
 /**
- * Get action map.
+ * Create map area with submenu for sysmap elements.
+ * In submenu gathered information about urls, scripts and submaps.
  *
  * @param array $sysmap
+ * @param array $options
  * @param int   $options['severity_min']
  *
  * @return CAreaMap
@@ -901,10 +903,13 @@ function getImagesInfo($selement) {
 }
 
 /**
- * Calculate map info.
+ * Prepare map elements data.
+ * Calculate problem triggers and priorities. Populate map elements with automatic icon mapping, acknowledging and
+ * recent change markers.
  *
  * @param array $sysmap
- * @param int   $options['severity_min']	Minimum trigger severity, default value is maximal (Disaster)
+ * @param int   $options
+ * @param int   $options['severity_min'] Minimum trigger severity, default value is maximal (Disaster)
  *
  * @return array
  */
@@ -1175,7 +1180,7 @@ function getSelementsInfo($sysmap, $options = array()) {
 
 				$config = select_config();
 
-				$i['latelyChanged'] |= (time() - $trigger['lastchange'] < $config['blink_period']);
+				$i['latelyChanged'] |= ((time() - $trigger['lastchange']) < $config['blink_period']);
 			}
 		}
 

@@ -675,7 +675,7 @@ class CPageFilter {
 	 * @param string $severityMin
 	 */
 	private function _initSeveritiesMin($severityMin) {
-		if (is_null($severityMin)) {
+		if ($severityMin === null) {
 			$severityMin = isset($this->_profileIds['severity_min']) ? $this->_profileIds['severity_min'] : TRIGGER_SEVERITY_DISASTER;
 		}
 
@@ -686,7 +686,7 @@ class CPageFilter {
 	}
 
 	/**
-	 * Get dropdown for hosts.
+	 * Get hosts combobox with selected item.
 	 *
 	 * @param bool $withNode
 	 *
@@ -697,7 +697,7 @@ class CPageFilter {
 	}
 
 	/**
-	 * Get dropdown for groups.
+	 * Get host groups combobox with selected item.
 	 *
 	 * @param bool $withNode
 	 *
@@ -708,7 +708,7 @@ class CPageFilter {
 	}
 
 	/**
-	 * Get dropdown for graphs.
+	 * Get graphs combobox with selected item.
 	 *
 	 * @param bool $withNode
 	 *
@@ -734,7 +734,7 @@ class CPageFilter {
 	}
 
 	/**
-	 * Get dropdown for discovery.
+	 * Get discovery rules combobox with selected item.
 	 *
 	 * @param bool $withNode
 	 *
@@ -745,7 +745,7 @@ class CPageFilter {
 	}
 
 	/**
-	 * Get dropdown for applications.
+	 * Get applications combobox with selected item.
 	 *
 	 * @param bool $withNode
 	 *
@@ -756,7 +756,7 @@ class CPageFilter {
 	}
 
 	/**
-	 * Get dropdown for severities min.
+	 * Get minimum trigger severities combobox with selected item.
 	 *
 	 * @return CComboBox
 	 */
@@ -765,13 +765,14 @@ class CPageFilter {
 	}
 
 	/**
-	 * Create dropdown.
+	 * Create combobox with available data.
+	 * Preselect active item. Display nodes. Add addition 'not selected' or 'all' item to top adjusted by configuration.
 	 *
 	 * @param string $name
 	 * @param string $selectedId
 	 * @param array  $items
 	 * @param bool   $withNode
-	 * @param bool   $allValue
+	 * @param int    $allValue
 	 *
 	 * @return CComboBox
 	 */
