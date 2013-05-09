@@ -1155,7 +1155,6 @@ static int	DBpatch_02010074()
 	return DBadd_foreign_key("application_template", 2, &field);
 }
 
-
 static int	DBpatch_02010075()
 {
 	DB_RESULT	result;
@@ -1163,7 +1162,7 @@ static int	DBpatch_02010075()
 	zbx_uint64_t	id_counter = 1, application_id, template_id, app_template_id;
 	int		ret = FAIL;
 
-	result = DBselect("select applicationid,templateid from applications where templateid is not NULL");
+	result = DBselect("select applicationid,templateid from applications where templateid is not null");
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -1173,7 +1172,7 @@ static int	DBpatch_02010075()
 
 		if (ZBX_DB_OK > DBexecute(
 				"insert into application_template"
-					" (application_templateid, applicationid, templateid)"
+					" (application_templateid,applicationid,templateid)"
 					" values (" ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 ")",
 				app_template_id, application_id, template_id))
 		{
@@ -1200,7 +1199,7 @@ static int	DBpatch_02010077()
 
 static int	DBpatch_02010078()
 {
-	return DBdrop_field("applications","templateid");
+	return DBdrop_field("applications", "templateid");
 }
 
 #endif	/* not HAVE_SQLITE3 */
