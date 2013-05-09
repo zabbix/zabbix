@@ -106,9 +106,9 @@ static int	SYSTEM_SWAP_USED(AGENT_RESULT *result)
 /* Solaris */
 #else
 #ifdef HAVE_SYS_SWAP_SWAPTABLE
-	double swaptotal,swapfree;
+	double	swaptotal, swapfree;
 
-	get_swapinfo(&swaptotal,&swapfree);
+	get_swapinfo(&swaptotal, &swapfree);
 
 	SET_UI64_RESULT(result, swaptotal - swapfree);
 	return SYSINFO_RET_OK;
