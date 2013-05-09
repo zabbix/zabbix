@@ -548,7 +548,7 @@ int	process_logrt(char *filename, long *lastlogsize, int *mtime, char **value, c
 	}
 
 	free_logfiles(&logfiles, &logfiles_alloc, &logfiles_num);
-	if (0 != fd && -1 == close(fd))
+	if (0 < fd && -1 == close(fd))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "could not close the file [%s]: %s",
 					logfile_candidate, zbx_strerror(errno));
