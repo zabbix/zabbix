@@ -564,7 +564,7 @@ int	process_logrt(char *filename, zbx_uint64_t *lastlogsize, int *mtime, char **
 		zabbix_log(LOG_LEVEL_WARNING, "there are no files matching '%s' in '%s'", format, directory);
 
 	free_logfiles(&logfiles, &logfiles_alloc, &logfiles_num);
-	if (0 != fd && -1 == close(fd))
+	if (0 < fd && -1 == close(fd))
 		zabbix_log(LOG_LEVEL_WARNING, "cannot close file '%s': %s", logfile_candidate, zbx_strerror(errno));
 
 #ifdef _WINDOWS

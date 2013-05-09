@@ -1311,6 +1311,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.17rc1
 
+...G...... [ZBX-6584] fixed possible logrt crash on windows platform when logfile was moved during processing (wiper)
 ..F....... [ZBX-1129] fixed graph time period in bar reports (Oleg)
 ..F....... [ZBX-6484] fixed bar report calculation (Oleg)
 ..F....... [ZBX-1236] added right side y axis support in bar reports (Oleg)
