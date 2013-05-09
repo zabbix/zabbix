@@ -1223,20 +1223,6 @@ function validate_templates($templateid_list) {
 		}
 	}
 
-	$res = DBselect(
-		'SELECT name,COUNT(*) AS cnt'.
-		' FROM applications'.
-		' WHERE '.dbConditionInt('hostid',$templateid_list).
-		' GROUP BY name'.
-		' ORDER BY cnt DESC'
-	);
-	while ($db_cnt = DBfetch($res)) {
-		if ($db_cnt['cnt'] > 1) {
-			$result &= false;
-			error(_s('Template with application "%1$s" already linked to host.', htmlspecialchars($db_cnt['name'])));
-		}
-	}
-
 	return $result;
 }
 
