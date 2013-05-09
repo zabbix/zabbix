@@ -222,7 +222,7 @@ jQuery(function($) {
 							var availableActive = $('.available li.hover', obj);
 
 							if (availableActive.length > 0) {
-								select(availableActive.data('uid'), obj, values, options);
+								select(availableActive.data('id'), obj, values, options);
 							}
 
 							// stop form submit
@@ -240,7 +240,7 @@ jQuery(function($) {
 								if ($('.selected li', obj).length > 0) {
 									if ($('.selected li.pressed', obj).length > 0) {
 										if (e.which == KEY.BACKSPACE || e.which == KEY.DELETE) {
-											removeSelected($('.selected li.pressed', obj).data('uid'), obj, values, options);
+											removeSelected($('.selected li.pressed', obj).data('id'), obj, values, options);
 										}
 										else {
 											var prev = $('.selected li.pressed', obj).removeClass('pressed').prev();
@@ -408,7 +408,7 @@ jQuery(function($) {
 	function loadSelected(data, obj, values, options) {
 		$.each(data, function(i, item) {
 			item.realName = item.name;
-			item.uid = getUniqueId();
+			item.uid = getId();
 			addSelected(item, obj, values, options);
 		});
 	}
@@ -437,7 +437,7 @@ jQuery(function($) {
 
 		if (!empty(data)) {
 			$.each(data, function(i, item) {
-				addAvailable(item, obj, values, options, false);
+				addAvailable(item, obj, values, options);
 			});
 		}
 
@@ -471,10 +471,10 @@ jQuery(function($) {
 	}
 
 	function addSelected(item, obj, values, options) {
-		if (typeof(values.selected[item.realName]) == 'undefined') {
+		if (typeof(values.selected[item.realName.toUpperCase()]) == 'undefined') {
 			removeDefaultValue(obj, options);
 
-			values.selected[item.realName] = item;
+			values.selected[item.realName.toUpperCase()] = item;
 
 			var itemName;
 			if (options.addNew && item.isNew) {
@@ -489,14 +489,14 @@ jQuery(function($) {
 				type: 'hidden',
 				name: itemName,
 				value: item.id,
-				'data-uid': item.uid,
+				'data-id': item.uid,
 				'data-name': item.name,
 				'data-prefix': item.prefix
 			}));
 
 			// add list item
 			var li = $('<li>', {
-				'data-uid': item.uid
+				'data-id': item.uid
 			});
 
 			var text = $('<span>', {
@@ -510,10 +510,10 @@ jQuery(function($) {
 			else {
 				var arrow = $('<span>', {
 					'class': 'arrow',
-					'data-uid': item.uid
+					'data-id': item.uid
 				})
 				.click(function() {
-					removeSelected($(this).data('uid'), obj, values, options);
+					removeSelected($(this).data('id'), obj, values, options);
 				});
 
 				$('.selected ul', obj).append(li.append(text, arrow));
@@ -534,11 +534,11 @@ jQuery(function($) {
 
 	function removeSelected(uid, obj, values, options) {
 		// remove
-		$('.selected li[data-uid="' + uid + '"]', obj).remove();
-		$('input[data-uid="' + uid + '"]', obj).remove();
+		$('.selected li[data-id="' + uid + '"]', obj).remove();
+		$('input[data-id="' + uid + '"]', obj).remove();
 
 		$.each(values.selected, function(i, selected) {
-			if (selected.uid = uid) {
+			if (selected.uid == uid) {
 				delete values.selected[selected.realName];
 				return false;
 			}
@@ -575,9 +575,9 @@ jQuery(function($) {
 			item.realName = item.name;
 		}
 		if (empty(options.limit) || (options.limit > 0 && $('.available li', obj).length < options.limit)) {
-			if (typeof(values.available[item.id]) == 'undefined' && typeof(values.selected[item.realName]) == 'undefined') {
-
-				item.uid = getUniqueId();
+			if (typeof(values.available[item.id]) == 'undefined'
+					&& typeof(values.selected[item.realName.toUpperCase()]) == 'undefined') {
+				item.uid = getId();
 
 				values.available[item.uid] = item;
 
@@ -596,10 +596,10 @@ jQuery(function($) {
 				});
 
 				var li = $('<li>', {
-					'data-uid': item.uid
+					'data-id': item.uid
 				})
 				.click(function() {
-					select($(this).data('uid'), obj, values, options);
+					select($(this).data('id'), obj, values, options);
 				})
 				.hover(function() {
 					$('.available li.hover', obj).removeClass('hover');
@@ -781,5 +781,12 @@ jQuery(function($) {
 		}
 
 		return length;
+	}
+
+	function getId() {
+		if (typeof getId.id === 'undefined') {
+			getId.id = 0;
+		}
+		return (getId.id++).toString();
 	}
 });
