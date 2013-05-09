@@ -26,7 +26,7 @@ require_once dirname(__FILE__).'/include/forms.inc.php';
 $page['title'] = _('Configuration of network maps');
 $page['file'] = 'sysmap.php';
 $page['hist_arg'] = array('sysmapid');
-$page['scripts'] = array('class.cmap.js', 'class.cviewswitcher.js');
+$page['scripts'] = array('class.cmap.js', 'class.cviewswitcher.js', 'multiselect.js');
 $page['type'] = detect_page_type();
 
 require_once dirname(__FILE__).'/include/page_header.php';
@@ -228,7 +228,7 @@ foreach ($sysmap['links'] as &$link) {
 		$dbTrigger = reset($dbTrigger);
 		$host = reset($dbTrigger['hosts']);
 
-		$link['linktriggers'][$lnum]['desc_exp'] = $host['name'].':'.$dbTrigger['description'];
+		$link['linktriggers'][$lnum]['desc_exp'] = $host['name'].NAME_DELIMITER.$dbTrigger['description'];
 	}
 	order_result($link['linktriggers'], 'desc_exp');
 }
@@ -249,10 +249,10 @@ else {
 
 $iconList = array();
 $result = DBselect(
-		'SELECT i.imageid,i.name'.
-		' FROM images i'.
-		' WHERE i.imagetype='.IMAGE_TYPE_ICON.
-			andDbNode('i.imageid')
+	'SELECT i.imageid,i.name'.
+	' FROM images i'.
+	' WHERE i.imagetype='.IMAGE_TYPE_ICON.
+		andDbNode('i.imageid')
 );
 while ($row = DBfetch($result)) {
 	$iconList[] = array('imageid' => $row['imageid'], 'name' => $row['name']);

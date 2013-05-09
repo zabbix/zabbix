@@ -554,9 +554,6 @@ function updateHostStatus($hostids, $status) {
 				' AND h.status='.$oldStatus
 	);
 	while ($host = DBfetch($db_hosts)) {
-		if ($status == HOST_STATUS_NOT_MONITORED) {
-			updateTriggerValueToUnknownByHostId($host['hostid']);
-		}
 		$hostIds[] = $host['hostid'];
 
 		$host_new = $host;
@@ -689,7 +686,7 @@ function get_viewed_groups($perm, $options = array(), $nodeid = null, $sql = arr
 		$def_sql['where'][] = 'EXISTS (SELECT 1'.
 										' FROM items i'.
 										' WHERE hg.hostid=i.hostid'.
-											' AND (i.status='.ITEM_STATUS_ACTIVE.' OR i.status='.ITEM_STATUS_NOTSUPPORTED.')'.
+											' AND i.status='.ITEM_STATUS_ACTIVE.
 											' AND i.lastvalue IS NOT NULL '.zbx_limit(1).')';
 	}
 
@@ -959,7 +956,7 @@ function get_viewed_hosts($perm, $groupid = 0, $options = array(), $nodeid = nul
 		$def_sql['where'][] = 'EXISTS (SELECT NULL FROM items i WHERE h.hostid=i.hostid AND i.status='.ITEM_STATUS_ACTIVE.')';
 	}
 	elseif ($def_options['with_historical_items']) {
-		$def_sql['where'][] = 'EXISTS (SELECT NULL FROM items i WHERE h.hostid=i.hostid AND (i.status='.ITEM_STATUS_ACTIVE.' OR i.status='.ITEM_STATUS_NOTSUPPORTED.') AND i.lastvalue IS NOT NULL)';
+		$def_sql['where'][] = 'EXISTS (SELECT NULL FROM items i WHERE h.hostid=i.hostid AND i.status='.ITEM_STATUS_ACTIVE.' AND i.lastvalue IS NOT NULL)';
 	}
 
 	// triggers

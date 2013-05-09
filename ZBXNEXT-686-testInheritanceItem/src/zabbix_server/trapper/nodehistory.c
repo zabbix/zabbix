@@ -79,7 +79,7 @@ int	send_history_last_id(zbx_sock_t *sock, const char *data)
 
 	if (FAIL == is_direct_slave_node(sender_nodeid))
 	{
-		zabbix_log(LOG_LEVEL_ERR, "NODE %d: Received data from node %d that is not a direct slave node [%s]",
+		zabbix_log(LOG_LEVEL_ERR, "NODE %d: received data from node %d that is not a direct slave node [%s]",
 				CONFIG_NODEID, sender_nodeid, data);
 		goto fail;
 	}
@@ -91,7 +91,7 @@ int	send_history_last_id(zbx_sock_t *sock, const char *data)
 
 	if (FAIL == is_slave_node(CONFIG_NODEID, nodeid))
 	{
-		zabbix_log(LOG_LEVEL_ERR, "NODE %d: Received data for unknown slave node %d [%s]",
+		zabbix_log(LOG_LEVEL_ERR, "NODE %d: received data for unknown slave node %d [%s]",
 				CONFIG_NODEID, nodeid, data);
 		goto fail;
 	}
@@ -131,7 +131,7 @@ int	send_history_last_id(zbx_sock_t *sock, const char *data)
 
 	return res;
 error:
-	zabbix_log(LOG_LEVEL_ERR, "NODE %d: Received invalid record from node %d for node %d [%s]",
+	zabbix_log(LOG_LEVEL_ERR, "NODE %d: received invalid record from node %d for node %d [%s]",
 		CONFIG_NODEID, sender_nodeid, nodeid, data);
 fail:
 	buffer_offset= 0;
@@ -160,12 +160,16 @@ fail:
  ******************************************************************************/
 static int	process_record_event(int sender_nodeid, int nodeid, const ZBX_TABLE *table, const char *record)
 {
+	const char	*__function_name = "process_record_event";
 	const char	*r;
-	int		f, source = 0, object = 0, value = 0, acknowledged = 0;
+	int		f, source = 0, object = 0, value = 0;
 	zbx_uint64_t	eventid = 0, objectid = 0;
 	zbx_timespec_t	ts;
+	DB_RESULT	result;
+	DB_ROW		row;
+	int		ret = SUCCEED;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In process_record_event()");
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	ts.sec = 0;
 	ts.ns = 0;
@@ -174,7 +178,12 @@ static int	process_record_event(int sender_nodeid, int nodeid, const ZBX_TABLE *
 	for (f = 0; NULL != table->fields[f].name; f++)
 	{
 		if (NULL == r)
-			goto error;
+		{
+			zabbix_log(LOG_LEVEL_ERR, "NODE %d: received invalid record from node %d for node %d [%s]",
+					CONFIG_NODEID, sender_nodeid, nodeid, record);
+			ret = FAIL;
+			goto out;
+		}
 
 		zbx_get_next_field(&r, &buffer, &buffer_alloc, ZBX_DM_DELIMITER);
 
@@ -192,16 +201,31 @@ static int	process_record_event(int sender_nodeid, int nodeid, const ZBX_TABLE *
 			ts.ns = atoi(buffer);
 		else if (0 == strcmp(table->fields[f].name, "value"))
 			value = atoi(buffer);
-		else if (0 == strcmp(table->fields[f].name, "acknowledged"))
-			acknowledged = atoi(buffer);
 	}
 
-	return process_event(eventid, source, object, objectid, &ts, value, acknowledged);
-error:
-	zabbix_log(LOG_LEVEL_ERR, "NODE %d: received invalid record from node %d for node %d [%s]",
-			CONFIG_NODEID, sender_nodeid, nodeid, record);
+	if (EVENT_OBJECT_TRIGGER == object)
+	{
+		result = DBselect(
+				"select description,expression,priority,type"
+				" from triggers"
+				" where triggerid=" ZBX_FS_UI64,
+				objectid);
 
-	return FAIL;
+		if (NULL != (row = DBfetch(result)))
+		{
+			add_event(eventid, source, object, objectid, &ts, value, row[0], row[1],
+					(unsigned char)atoi(row[2]), (unsigned char)atoi(row[3]));
+		}
+		else
+			ret = FAIL;
+		DBfree_result(result);
+	}
+	else
+		add_event(eventid, source, object, objectid, &ts, value, NULL, NULL, 0, 0);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+out:
+	return ret;
 }
 
 static void	begin_history_sql(char **sql, size_t *sql_alloc, size_t *sql_offset, const ZBX_TABLE *table)
@@ -309,7 +333,7 @@ static int	process_record(char **sql, size_t *sql_alloc, size_t *sql_offset, int
 #endif
 			}
 		}
-		else	/* ZBX_TYPE_TEXT, ZBX_TYPE_CHAR */
+		else	/* ZBX_TYPE_TEXT, ZBX_TYPE_CHAR, ZBX_TYPE_SHORTTEXT, ZBX_TYPE_LONGTEXT */
 		{
 			zbx_hex2binary(buffer);
 			value_esc = DBdyn_escape_string(buffer);
@@ -362,7 +386,7 @@ static int	process_record(char **sql, size_t *sql_alloc, size_t *sql_offset, int
 
 	return res;
 error:
-	zabbix_log(LOG_LEVEL_ERR, "NODE %d: Received invalid record from node %d for node %d [%s]",
+	zabbix_log(LOG_LEVEL_ERR, "NODE %d: received invalid record from node %d for node %d [%s]",
 			CONFIG_NODEID, sender_nodeid, nodeid, record);
 
 	return FAIL;
@@ -436,7 +460,7 @@ static int	process_items(char **sql, size_t *sql_alloc, size_t *sql_offset, int 
 					ZBX_STR2UINT64(value_uint64, buffer);
 			}
 		}
-		else	/* ZBX_TYPE_TEXT, ZBX_TYPE_CHAR */
+		else	/* ZBX_TYPE_TEXT, ZBX_TYPE_CHAR, ZBX_TYPE_SHORTTEXT, ZBX_TYPE_LONGTEXT */
 		{
 			if (0 == strcmp(table->fields[f].name, "value"))
 			{
@@ -468,7 +492,7 @@ static int	process_items(char **sql, size_t *sql_alloc, size_t *sql_offset, int 
 
 	return res;
 error:
-	zabbix_log(LOG_LEVEL_ERR, "NODE %d: Received invalid record from node %d for node %d [%s]",
+	zabbix_log(LOG_LEVEL_ERR, "NODE %d: received invalid record from node %d for node %d [%s]",
 		CONFIG_NODEID, sender_nodeid, nodeid, record);
 
 	return FAIL;
@@ -541,7 +565,7 @@ int	node_history(char *data, size_t datalen)
 
 			if (FAIL == is_direct_slave_node(sender_nodeid))
 			{
-				zabbix_log(LOG_LEVEL_ERR, "NODE %d: Received data from node %d"
+				zabbix_log(LOG_LEVEL_ERR, "NODE %d: received data from node %d"
 							" that is not a direct slave node",
 						CONFIG_NODEID, sender_nodeid);
 				res = FAIL;
@@ -549,7 +573,7 @@ int	node_history(char *data, size_t datalen)
 
 			if (FAIL == is_slave_node(CONFIG_NODEID, nodeid))
 			{
-				zabbix_log(LOG_LEVEL_ERR, "NODE %d: Received history for unknown slave node %d",
+				zabbix_log(LOG_LEVEL_ERR, "NODE %d: received history for unknown slave node %d",
 						CONFIG_NODEID, nodeid);
 				res = FAIL;
 			}
@@ -570,7 +594,7 @@ int	node_history(char *data, size_t datalen)
 
 			if (NULL == table)
 			{
-				zabbix_log(LOG_LEVEL_ERR, "NODE %d: Invalid received data: unknown tablename \"%s\"",
+				zabbix_log(LOG_LEVEL_ERR, "NODE %d: invalid data received: unknown tablename \"%s\"",
 						CONFIG_NODEID, buffer);
 				res = FAIL;
 			}
@@ -588,7 +612,7 @@ int	node_history(char *data, size_t datalen)
 
 			if (NULL != newline)
 			{
-				zabbix_log(LOG_LEVEL_WARNING, "NODE %d: Received %s from node %d for node %d datalen " ZBX_FS_SIZE_T,
+				zabbix_log(LOG_LEVEL_WARNING, "NODE %d: received %s from node %d for node %d datalen " ZBX_FS_SIZE_T,
 						CONFIG_NODEID, buffer, sender_nodeid, nodeid, (zbx_fs_size_t)datalen);
 			}
 			firstline = 0;
@@ -598,7 +622,7 @@ int	node_history(char *data, size_t datalen)
 		}
 		else if (NULL != table)
 		{
-			if (events)
+			if (0 != events)
 			{
 				res = process_record_event(sender_nodeid, nodeid, table, r);
 			}

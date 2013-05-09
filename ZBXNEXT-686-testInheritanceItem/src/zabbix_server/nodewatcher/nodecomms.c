@@ -33,7 +33,7 @@ int	connect_to_node(int nodeid, zbx_sock_t *sock)
 	unsigned short	port;
 	int		res = FAIL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In connect_to_node(nodeid:%d)", nodeid);
+	zabbix_log(LOG_LEVEL_DEBUG, "In connect_to_node() nodeid:%d", nodeid);
 
 	result = DBselect("select ip,port from nodes where nodeid=%d", nodeid);
 
@@ -44,7 +44,7 @@ int	connect_to_node(int nodeid, zbx_sock_t *sock)
 		if (SUCCEED == zbx_tcp_connect(sock, CONFIG_SOURCE_IP, row[0], port, 0))
 			res = SUCCEED;
 		else
-			zabbix_log(LOG_LEVEL_ERR, "NODE %d: Unable to connect to Node [%d] error: %s",
+			zabbix_log(LOG_LEVEL_ERR, "NODE %d: cannot connect to Node [%d]: %s",
 					CONFIG_NODEID, nodeid, zbx_tcp_strerror());
 	}
 	else
@@ -61,11 +61,11 @@ int	send_data_to_node(int nodeid, zbx_sock_t *sock, const char *data)
 
 	if (FAIL == (res = zbx_tcp_send(sock, data)))
 	{
-		zabbix_log(LOG_LEVEL_ERR, "NODE %d: Error while sending data to Node [%d] error: %s",
+		zabbix_log(LOG_LEVEL_ERR, "NODE %d: cannot send data to Node [%d]: %s",
 				CONFIG_NODEID, nodeid, zbx_tcp_strerror());
 	}
 	else
-		zabbix_log(LOG_LEVEL_DEBUG, "NODE %d: Sending [%s] to Node [%d]",
+		zabbix_log(LOG_LEVEL_DEBUG, "NODE %d: sending [%s] to Node [%d]",
 				CONFIG_NODEID, data, nodeid);
 
 	return res;
@@ -77,11 +77,11 @@ int	recv_data_from_node(int nodeid, zbx_sock_t *sock, char **data)
 
 	if (FAIL == (res = zbx_tcp_recv(sock, data)))
 	{
-		zabbix_log(LOG_LEVEL_ERR, "NODE %d: Error while receiving answer from Node [%d] error: %s",
+		zabbix_log(LOG_LEVEL_ERR, "NODE %d: cannot receive answer from Node [%d]: %s",
 				CONFIG_NODEID, nodeid, zbx_tcp_strerror());
 	}
 	else
-		zabbix_log(LOG_LEVEL_DEBUG, "NODE %d: Receiving [%s] from Node [%d]",
+		zabbix_log(LOG_LEVEL_DEBUG, "NODE %d: receiving [%s] from Node [%d]",
 				CONFIG_NODEID, *data, nodeid);
 
 	return res;
@@ -108,13 +108,13 @@ void	disconnect_node(zbx_sock_t *sock)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-int send_to_node(const char *name, int dest_nodeid, int nodeid, char *data)
+int	send_to_node(const char *name, int dest_nodeid, int nodeid, char *data)
 {
 	int		ret = FAIL;
 	zbx_sock_t	sock;
 	char		*answer;
 
-	zabbix_log(LOG_LEVEL_WARNING, "NODE %d: Sending %s of node %d to node %d datalen " ZBX_FS_SIZE_T,
+	zabbix_log(LOG_LEVEL_WARNING, "NODE %d: sending %s of node %d to node %d datalen " ZBX_FS_SIZE_T,
 			CONFIG_NODEID, name, nodeid, dest_nodeid, (zbx_fs_size_t)strlen(data));
 
 	if (FAIL == connect_to_node(dest_nodeid, &sock))
@@ -128,13 +128,11 @@ int send_to_node(const char *name, int dest_nodeid, int nodeid, char *data)
 
 	if (0 == strcmp(answer, "OK"))
 	{
-		zabbix_log( LOG_LEVEL_DEBUG, "OK");
+		zabbix_log(LOG_LEVEL_DEBUG, "OK");
 		ret = SUCCEED;
 	}
 	else
-	{
-		zabbix_log( LOG_LEVEL_WARNING, "NOT OK");
-	}
+		zabbix_log(LOG_LEVEL_WARNING, "NOT OK");
 disconnect:
 	disconnect_node(&sock);
 

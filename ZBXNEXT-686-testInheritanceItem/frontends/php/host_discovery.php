@@ -50,7 +50,7 @@ $fields = array(
 	'add_delay_flex' =>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'new_delay_flex' =>		array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY, 'isset({add_delay_flex})&&(isset({type})&&({type}!=2))',
 		_('New flexible interval')),
-	'status' =>				array(T_ZBX_INT, O_OPT, null,	BETWEEN(0, 65535), 'isset({save})'),
+	'status' =>					array(T_ZBX_INT, O_OPT, null,	IN(ITEM_STATUS_ACTIVE), null),
 	'type' =>				array(T_ZBX_INT, O_OPT, null,
 		IN(array(-1, ITEM_TYPE_ZABBIX, ITEM_TYPE_SNMPV1, ITEM_TYPE_TRAPPER, ITEM_TYPE_SIMPLE, ITEM_TYPE_SNMPV2C,
 			ITEM_TYPE_INTERNAL, ITEM_TYPE_SNMPV3, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_EXTERNAL, ITEM_TYPE_IPMI,
@@ -77,6 +77,8 @@ $fields = array(
 	'port' =>				array(T_ZBX_STR, O_OPT, null,	BETWEEN(0, 65535),
 		'isset({save})&&isset({type})&&'.IN(ITEM_TYPE_SNMPV1.','.ITEM_TYPE_SNMPV2C.','.ITEM_TYPE_SNMPV3,'type'),
 		_('Port')),
+	'snmpv3_contextname' => array(T_ZBX_STR, O_OPT, null,	null,
+		'isset({save})&&(isset({type})&&({type}=='.ITEM_TYPE_SNMPV3.'))'),
 	'snmpv3_securitylevel' => array(T_ZBX_INT, O_OPT, null,	IN('0,1,2'),
 		'isset({save})&&(isset({type})&&({type}=='.ITEM_TYPE_SNMPV3.'))'),
 	'snmpv3_securityname' => array(T_ZBX_STR, O_OPT, null,	null,
@@ -91,7 +93,7 @@ $fields = array(
 		'isset({save})&&(isset({type})&&({type}=='.ITEM_TYPE_SNMPV3.')&&({snmpv3_securitylevel}=='.ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV.'))'),
 	'snmpv3_privpassphrase' => array(T_ZBX_STR, O_OPT, null, null,
 		'isset({save})&&(isset({type})&&({type}=='.ITEM_TYPE_SNMPV3.')&&({snmpv3_securitylevel}=='.ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV.'))'),
-	'ipmi_sensor' =>		array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,
+	'ipmi_sensor' =>		array(T_ZBX_STR, O_OPT, NO_TRIM,	NOT_EMPTY,
 		'isset({save})&&(isset({type})&&({type}=='.ITEM_TYPE_IPMI.'))', _('IPMI sensor')),
 	'trapper_hosts' =>		array(T_ZBX_STR, O_OPT, null,	null,		'isset({save})&&isset({type})&&({type}==2)'),
 	'lifetime' => 			array(T_ZBX_STR, O_OPT, null,	null,		'isset({save})'),
@@ -162,8 +164,17 @@ if ($page['type'] == PAGE_TYPE_JS || $page['type'] == PAGE_TYPE_HTML_BLOCK) {
  * Actions
  */
 if (isset($_REQUEST['add_delay_flex']) && isset($_REQUEST['new_delay_flex'])) {
+	$timePeriodValidator = new CTimePeriodValidator(array('allow_multiple' => false));
 	$_REQUEST['delay_flex'] = get_request('delay_flex', array());
-	array_push($_REQUEST['delay_flex'], $_REQUEST['new_delay_flex']);
+
+	if ($timePeriodValidator->validate($_REQUEST['new_delay_flex']['period'])) {
+		array_push($_REQUEST['delay_flex'], $_REQUEST['new_delay_flex']);
+		unset($_REQUEST['new_delay_flex']);
+	}
+	else {
+		error($timePeriodValidator->getError());
+		show_messages(false, null, _('Invalid time period'));
+	}
 }
 elseif (isset($_REQUEST['delete']) && isset($_REQUEST['itemid'])) {
 	$result = API::DiscoveryRule()->delete($_REQUEST['itemid']);
@@ -195,12 +206,13 @@ elseif (isset($_REQUEST['save'])) {
 		'key_' => get_request('key'),
 		'hostid' => get_request('hostid'),
 		'delay' => get_request('delay'),
-		'status' => get_request('status'),
+		'status' => get_request('status', ITEM_STATUS_DISABLED),
 		'type' => get_request('type'),
 		'snmp_community' => get_request('snmp_community'),
 		'snmp_oid' => get_request('snmp_oid'),
 		'trapper_hosts' => get_request('trapper_hosts'),
 		'port' => get_request('port'),
+		'snmpv3_contextname' => get_request('snmpv3_contextname'),
 		'snmpv3_securityname' => get_request('snmpv3_securityname'),
 		'snmpv3_securitylevel' => get_request('snmpv3_securitylevel'),
 		'snmpv3_authprotocol' => get_request('snmpv3_authprotocol'),
