@@ -94,7 +94,8 @@ static int	SYSTEM_SWAP_USED(AGENT_RESULT *result)
 	if (0 == sysinfo(&info))
 	{
 #ifdef HAVE_SYSINFO_MEM_UNIT
-		SET_UI64_RESULT(result, ((zbx_uint64_t)info.totalswap - (zbx_uint64_t)info.freeswap) * (zbx_uint64_t)info.mem_unit);
+		SET_UI64_RESULT(result, ((zbx_uint64_t)info.totalswap - (zbx_uint64_t)info.freeswap) *
+				(zbx_uint64_t)info.mem_unit);
 #else
 		SET_UI64_RESULT(result, info.totalswap - info.freeswap);
 #endif
