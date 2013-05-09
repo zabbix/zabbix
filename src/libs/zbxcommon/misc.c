@@ -19,7 +19,6 @@
 
 #include "common.h"
 #include "log.h"
-#include "db.h"
 
 #ifdef _WINDOWS
 char	ZABBIX_SERVICE_NAME[ZBX_SERVICE_NAME_LEN] = APPLICATION_NAME;
@@ -65,7 +64,7 @@ const char	*get_program_name(const char *path)
  ******************************************************************************/
 int	get_nodeid_by_id(zbx_uint64_t id)
 {
-	return (int)(id / ZBX_DM_MAX_HISTORY_IDS);
+	return (int)(id / __UINT64_C(100000000000000));
 }
 
 /******************************************************************************
