@@ -2057,7 +2057,6 @@ static void	DBdelete_template_applications(zbx_uint64_t hostid, const zbx_vector
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 			"select t.application_templateid,t.applicationid"
 			" from application_template t,applications a,applications ta"
@@ -2549,7 +2548,8 @@ static void	DBcopy_template_applications(zbx_uint64_t hostid, const zbx_vector_u
 	char		*sql = NULL;
 	size_t		sql_alloc = ZBX_KIBIBYTE, sql_offset;
 	zbx_app_t	*app = NULL;
-	size_t		app_alloc = 0, app_num = 0, new_applications = 0;
+	size_t		app_alloc = 0, app_num = 0;
+	int		new_applications = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -2598,10 +2598,7 @@ static void	DBcopy_template_applications(zbx_uint64_t hostid, const zbx_vector_u
 	{
 		zbx_uint64_t	applicationid = 0, application_templateid = 0;
 		int		i;
-		const char	*ins_applications_sql =
-				"insert into applications"
-				" (applicationid,hostid,name)"
-				" values ";
+		const char	*ins_applications_sql = "insert into applications (applicationid,hostid,name) values ";
 		const char	*ins_application_template_sql =
 				"insert into application_template"
 				" (application_templateid,applicationid,templateid)"
@@ -2616,14 +2613,12 @@ static void	DBcopy_template_applications(zbx_uint64_t hostid, const zbx_vector_u
 #ifdef HAVE_MULTIROW_INSERT
 			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ins_applications_sql);
 #endif
-
 			for (i = 0; i < app_num; i++)
 			{
 				if (0 != app[i].applicationid)
 					continue;
 
 				app[i].applicationid = applicationid++;
-
 #ifndef HAVE_MULTIROW_INSERT
 				zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ins_applications_sql);
 #endif
@@ -2644,13 +2639,11 @@ static void	DBcopy_template_applications(zbx_uint64_t hostid, const zbx_vector_u
 #ifdef HAVE_MULTIROW_INSERT
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ins_application_template_sql);
 #endif
-
 		for (i = 0; i < app_num; i++)
 		{
 #ifndef HAVE_MULTIROW_INSERT
 			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ins_application_template_sql);
 #endif
-
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 					"(" ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 ")" ZBX_ROW_DL,
 					application_templateid++, app[i].applicationid, app[i].templateid);
@@ -2660,7 +2653,6 @@ static void	DBcopy_template_applications(zbx_uint64_t hostid, const zbx_vector_u
 		sql_offset--;
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
 #endif
-
 		DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 		DBexecute("%s", sql);
@@ -3075,8 +3067,8 @@ static void	DBcopy_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t
 						" and");
 		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hi.itemid", itemids, itemids_num);
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-					" join application_template t on t.templateid=tia.applicationid"
-					" join applications ha on ha.applicationid=t.applicationid"
+					" join application_template hat on hat.templateid=tia.applicationid"
+					" join applications ha on ha.applicationid=hat.applicationid"
 						" and ha.hostid=hi.hostid"
 						" left join items_applications hia on hia.applicationid=ha.applicationid"
 							" and hia.itemid=hi.itemid"
