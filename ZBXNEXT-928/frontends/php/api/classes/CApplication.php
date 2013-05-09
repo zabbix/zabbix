@@ -608,6 +608,22 @@ class CApplication extends CZBXAPI {
 	protected function addRelatedObjects(array $options, array $result) {
 		$result = parent::addRelatedObjects($options, $result);
 
+		// add application templates
+		if ($this->outputIsRequested('templateids', $options['output'])) {
+			$query = DBselect(
+				'SELECT at.application_templateid,at.applicationid,at.templateid'.
+					' FROM application_template at'.
+					' WHERE '.dbConditionInt('at.applicationid', array_keys($result))
+			);
+			$relationMap = new CRelationMap();
+			$templateApplications = array();
+			while ($templateApplication = DBfetch($query)) {
+				$relationMap->addRelation($templateApplication['applicationid'], $templateApplication['application_templateid']);
+				$templateApplications[$templateApplication['application_templateid']] = $templateApplication['templateid'];
+			}
+			$result = $relationMap->mapMany($result, $templateApplications, 'templateids');
+		}
+
 		// adding hosts
 		if ($options['selectHosts'] !== null && $options['selectHosts'] != API_OUTPUT_COUNT) {
 			$relationMap = $this->createRelationMap($result, 'applicationid', 'hostid');
