@@ -5,6 +5,7 @@ MC = mc.exe
 MT = mt.exe
 MESSAGES_H = messages.h
 RESOURCE_H = resource.h
+DESC_H = zabbix_sender_desc.h
 RESOURCE_RC = resource.rc
 RESOURCE_RES = zabbix_sender.res
 OBJS  = ..\..\..\src\libs\zbxcommon\alias.o ..\..\..\src\libs\zbxcommon\comms.o ..\..\..\src\libs\zbxcommon\gnuregex.o ..\..\..\src\libs\zbxcommon\misc.o ..\..\..\src\libs\zbxcommon\regexp.o ..\..\..\src\libs\zbxcommon\str.o ..\..\..\src\libs\zbxcommon\xml.o ..\..\..\src\libs\zbxcommon\zbxgetopt.o ..\..\..\src\libs\zbxcommon\file.o ..\..\..\src\libs\zbxcomms\comms.o ..\..\..\src\libs\zbxconf\cfg.o ..\..\..\src\libs\zbxcrypto\base64.o ..\..\..\src\libs\zbxjson\json.o ..\..\..\src\libs\zbxlog\log.o ..\..\..\src\libs\zbxsys\mutexs.o ..\..\..\src\libs\zbxsys\symbols.o ..\..\..\src\libs\zbxsys\threads.o ..\..\..\src\zabbix_sender\zabbix_sender.o
@@ -22,7 +23,7 @@ $(PROGNAME): $(MESSAGES_H) $(OBJS) $(RESOURCE_RES)
 $(MESSAGES_H): messages.mc
 	$(MC) -U -h ".\\" -r ".\\" messages.mc
 
-$(RESOURCE_RES): $(RESOURCE_RC) $(RESOURCE_H)
+$(RESOURCE_RES): $(RESOURCE_RC) $(RESOURCE_H) $(DESC_H)
 	$(RC) /d "NDEBUG" /d "_VC80_UPGRADE=0x0600" /l 0x419 /fo"$(RESOURCE_RES)" $(RESOURCE_RC)
 
 ..\..\..\src\libs\zbxcommon\alias.o: ..\..\..\src\libs\zbxcommon\alias.c
