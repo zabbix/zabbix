@@ -1162,22 +1162,22 @@ static int	DBpatch_02010075()
 {
 	DB_RESULT	result;
 	DB_ROW		row;
-	zbx_uint64_t	id_counter = 1, application_id, template_id, app_template_id;
+	zbx_uint64_t	id = 1, applicationid, templateid, application_templateid;
 	int		ret = FAIL;
 
 	result = DBselect("select applicationid,templateid from applications where templateid is not null");
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		is_uint64(row[0], &application_id);
-		is_uint64(row[1], &template_id);
-		app_template_id = get_nodeid_by_id(application_id) * ZBX_DM_MAX_HISTORY_IDS + id_counter++;
+		ZBX_STR2UINT64(applicationid, row[0]);
+		ZBX_STR2UINT64(templateid, row[1]);
+		application_templateid = get_nodeid_by_id(applicationid) * ZBX_DM_MAX_HISTORY_IDS + id++;
 
 		if (ZBX_DB_OK > DBexecute(
 				"insert into application_template"
 					" (application_templateid,applicationid,templateid)"
 					" values (" ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 ")",
-				app_template_id, application_id, template_id))
+				application_templateid, applicationid, templateid))
 		{
 			goto out;
 		}
