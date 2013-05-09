@@ -132,7 +132,7 @@ static int	httpmacro_append_pair(zbx_httptest_t *httptest, const char *pkey, siz
 
 	/* get macro value */
 	zbx_strncpy_alloc(&value_str, &value_size, &value_offset, pvalue, nvalue);
-	if (0 == strncmp(REGEXP_PREFIX, value_str, REGEXP_PREFIX_SIZE))
+	if (0 == strncasecmp(REGEXP_PREFIX, value_str, REGEXP_PREFIX_SIZE))
 	{
 		/* The value contains regexp pattern, retrieve the first captured group or fail.  */
 		/* The \@ sequence is a special construct to fail if the pattern matches but does */
