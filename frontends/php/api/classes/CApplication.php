@@ -345,8 +345,8 @@ class CApplication extends CZBXAPI {
 
 			// check on operating with templated applications
 			if ($delete || $update) {
-				if ($dbApplications[$application['applicationid']]['templateid'] != 0) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot interact templated applications');
+				if ($dbApplications[$application['applicationid']]['templateids']) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot update templated applications'));
 				}
 			}
 
@@ -436,7 +436,7 @@ class CApplication extends CZBXAPI {
 				if (!isset($delApplications[$applicationid])) {
 					self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 				}
-				if ($delApplications[$applicationid]['templateid'] != 0) {
+				if ($delApplications[$applicationid]['templateids']) {
 					self::exception(ZBX_API_ERROR_PERMISSIONS, 'Cannot delete templated application.');
 				}
 			}
@@ -445,7 +445,10 @@ class CApplication extends CZBXAPI {
 		$parentApplicationids = $applicationids;
 		$childApplicationids = array();
 		do {
-			$dbApplications = DBselect('SELECT a.applicationid FROM applications a WHERE '.dbConditionInt('a.templateid', $parentApplicationids));
+			$dbApplications = DBselect(
+				'SELECT at.applicationid'.
+				' FROM application_template at'.
+				' WHERE '.dbConditionInt('at.templateid', $parentApplicationids));
 			$parentApplicationids = array();
 			while ($dbApplication = DBfetch($dbApplications)) {
 				$parentApplicationids[] = $dbApplication['applicationid'];
