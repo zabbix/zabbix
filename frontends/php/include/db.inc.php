@@ -958,7 +958,7 @@ function remove_nodes_from_id($id) {
 }
 
 /**
- * Cheks whether all $db_fields keys exists as $args keys.
+ * Checks whether all $db_fields keys exists as $args keys.
  *
  * If $db_fields element value is given and corresponding $args is not then it is assigned to $args element.
  *

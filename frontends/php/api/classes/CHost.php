@@ -663,6 +663,11 @@ class CHost extends CHostGeneral {
 			}
 
 			if (isset($host['inventory']) && !empty($host['inventory'])) {
+
+				if (isset($host['inventory_mode']) && $host['inventory_mode'] == HOST_INVENTORY_DISABLED) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot set inventory fields for disabled inventory.'));
+				}
+
 				$fields = array_keys($host['inventory']);
 				foreach ($fields as $field) {
 					if (!in_array($field, $inventoryFields)) {
