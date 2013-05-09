@@ -89,14 +89,12 @@ point them all to the same buffer */
 static int	SYSTEM_SWAP_USED(AGENT_RESULT *result)
 {
 #ifdef HAVE_SYSINFO_FREESWAP
-	struct sysinfo info;
-	zbx_uint64_t used_swap;
+	struct sysinfo	info;
 
-	if( 0 == sysinfo(&info))
+	if (0 == sysinfo(&info))
 	{
 #ifdef HAVE_SYSINFO_MEM_UNIT
-		used_swap = (zbx_uint64_t)info.totalswap - (zbx_uint64_t)info.freeswap) * (zbx_uint64_t)info.mem_unit;
-		SET_UI64_RESULT(result, (zbx_uint64_t)info.mem_unit * used_swap);
+		SET_UI64_RESULT(result, ((zbx_uint64_t)info.totalswap - (zbx_uint64_t)info.freeswap) * (zbx_uint64_t)info.mem_unit);
 #else
 		SET_UI64_RESULT(result, info.totalswap - info.freeswap);
 #endif
