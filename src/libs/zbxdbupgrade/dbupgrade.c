@@ -1126,14 +1126,19 @@ static int	DBpatch_02010070()
 
 static int	DBpatch_02010071()
 {
-	const ZBX_TABLE	*table;
 	int		ret = FAIL;
+	const ZBX_TABLE	table =
+			{"application_template", "application_templateid", 0,
+			{
+				{"application_templateid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+				{"applicationid", NULL, "applications", "applicationid", 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+				{"templateid", NULL, "applications", "applicationid", 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+				{NULL}
+			},
+			"applicationid,templateid"
+			};
 
-	table = DBget_table("application_template");
-	if (NULL != table)
-		ret = DBcreate_table(table);
-
-	return ret;
+	return DBcreate_table(&table);
 }
 
 static int	DBpatch_02010072()
