@@ -1110,6 +1110,9 @@ class CHost extends CHostGeneral {
 			}
 			$updateInventory['inventory_mode'] = $data['inventory_mode'];
 		}
+		else {
+			$updateInventory['inventory_mode'] = null;
+		}
 
 		if (isset($data['status'])) {
 			$updateStatus = $data['status'];
