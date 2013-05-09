@@ -37,7 +37,7 @@ $fields = array(
 	'hostids' =>			array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,	null),
 	'groupids' =>			array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,	null),
 	'applications' =>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,	null),
-	'hostid' =>				array(T_ZBX_INT, O_MAND, P_SYS,	DB_ID,	null),
+	'hostid' =>				array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,	'isset({form})||isset({save})'),
 	'groupid' =>			array(T_ZBX_INT, O_OPT, null,	DB_ID,	null),
 	'applicationid' =>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,	'isset({form})&&({form}=="update")'),
 	'appname' =>			array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY, 'isset({save})'),
