@@ -1138,26 +1138,52 @@ function get_application_by_applicationid($applicationid, $no_error_message = 0)
 	return false;
 }
 
-function get_applications_by_templateid($applicationid) {
-	return DBselect('SELECT a.* FROM applications a WHERE a.templateid='.$applicationid);
-}
+/**
+ * Returns the farthest application ancestor for each given application.
+ *
+ * @param array $applicationIds
+ * @param array $templateApplicationIds		array with parent application IDs as keys and arrays of child application
+ * 											IDs as values
+ *
+ * @return array	an array with child IDs as keys and arrays of ancestor IDs as values
+ */
+function getApplicationSourceParentIds(array $applicationIds, array $templateApplicationIds = array()) {
+	$query = DBSelect(
+		'SELECT at.applicationid,at.templateid'.
+		' FROM application_template at'.
+		' WHERE '.dbConditionInt('at.applicationid', $applicationIds)
+	);
 
-function get_realhost_by_applicationid($applicationid) {
-	$application = get_application_by_applicationid($applicationid);
-	if ($application['templateid'] > 0) {
-		return get_realhost_by_applicationid($application['templateid']);
+	$applicationIds = array();
+	while ($applicationTemplate = DBfetch($query)) {
+		// check if we already have an application inherited from the current application
+		// if we do - move all of its child applications to the parent template
+		if (isset($templateApplicationIds[$applicationTemplate['applicationid']])) {
+			$templateApplicationIds[$applicationTemplate['templateid']] = $templateApplicationIds[$applicationTemplate['applicationid']];
+			unset($templateApplicationIds[$applicationTemplate['applicationid']]);
+		}
+		// if no - just add the application
+		else {
+			$templateApplicationIds[$applicationTemplate['templateid']][] = $applicationTemplate['applicationid'];
+			$applicationIds[] = $applicationTemplate['templateid'];
+		}
 	}
-	return get_host_by_applicationid($applicationid);
-}
 
-function get_host_by_applicationid($applicationid) {
-	$row = DBfetch(DBselect('SELECT h.* FROM hosts h,applications a WHERE a.hostid=h.hostid AND a.applicationid='.$applicationid));
-	if ($row) {
-		return $row;
+	// continue while we still have new applications to check
+	if ($applicationIds) {
+		return getApplicationSourceParentIds($applicationIds, $templateApplicationIds);
 	}
-	error(_s('No host with applicationid "%1$s".', $applicationid));
+	else {
+		// return an inverse hash with application IDs as keys and arrays of parent application IDs as values
+		$result = array();
+		foreach ($templateApplicationIds as $templateId => $applicationIds) {
+			foreach ($applicationIds as $applicationId) {
+				$result[$applicationId][] = $templateId;
+			}
+		}
 
-	return false;
+		return $result;
+	}
 }
 
 /**
