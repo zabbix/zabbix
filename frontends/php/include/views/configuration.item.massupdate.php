@@ -501,7 +501,8 @@ if (!$this->data['is_multiple_hosts']) {
 			if (isset($newApplication['new'])) {
 				$appToAdd[] = array(
 					'id' => $newApplication['new'],
-					'name' => $newApplication['new'] . ' (new)'
+					'name' => $newApplication['new'] . ' (new)',
+					'isNew' => true
 				);
 			}
 			else {
