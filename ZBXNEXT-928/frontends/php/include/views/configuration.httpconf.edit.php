@@ -144,7 +144,7 @@ $httpProxyTextBox->setAttribute('placeholder', 'http://[username[:password]@]pro
 $httpFormList->addRow(_('HTTP proxy'), $httpProxyTextBox);
 
 // append status to form list
-$httpFormList->addRow(_('Variables'), new CTextArea('macros', $this->data['macros']));
+$httpFormList->addRow(_('Variables'), new CTextArea('variables', $this->data['variables']));
 $httpFormList->addRow(_('Enabled'), new CCheckBox('status', !$this->data['status']));
 
 /*
@@ -249,7 +249,7 @@ if (!empty($this->data['httptestid'])) {
 		array(
 			new CSubmit('clone', _('Clone')),
 			$this->data['templated'] ? null : new CButtonDelete(_('Delete scenario?'), url_param('form').url_param('httptestid').url_param('hostid')),
-			new CButtonCancel()
+			new CButtonCancel(url_param('hostid'))
 		)
 	));
 }

@@ -25,13 +25,6 @@ define('HOUSEKEEPER_BAD', 1);
 
 class testFormAdministrationGeneralHousekeeper extends CWebTest {
 
-	/**
-	 * Backup the tables that will be modified during the tests.
-	 */
-	public function testFormAdministrationGeneralHousekeeper_Setup() {
-		DBsave_tables('config');
-	}
-
 	// Returns layout data
 	public static function layout() {
 		return array(
@@ -236,7 +229,7 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 		$this->zbxTestTextPresent('Enable housekeeping');
 		$this->assertVisible('hk_trends_mode');
 		$this->assertAttribute("//input[@id='hk_trends_mode']/@checked", 'checked');
-		$this->zbxTestTextPresent('Override item trends period');
+		$this->zbxTestTextPresent('Override item trend period');
 		$this->assertVisible('hk_history_global');
 		$this->assertElementNotPresent("//input[@id='hk_trends_global']/@checked");
 		if (isset($data['hk_trends_mode'])) {
@@ -828,6 +821,7 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 	}
 
 	public function testFormAdministrationGeneralHousekeeper_ResetDefaults() {
+		DBsave_tables('config');
 
 		$this->zbxTestLogin('adm.gui.php');
 		$this->assertElementPresent('configDropDown');
@@ -839,7 +833,11 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 		$oldHashConfig = DBhash($sqlConfig);
 
 		$this->zbxTestClick('resetDefaults');
+		sleep(1);
+		$this->assertVisible("//div[@class='ui-dialog ui-widget ui-widget-content ui-corner-all']");
+		$this->zbxTestClick("//div[@class='ui-dialog ui-widget ui-widget-content ui-corner-all']/div/div/button[1]");
 		$this->zbxTestClickWait('save');
+
 		$this->zbxTestTextPresent('Configuration updated');
 		$this->checkTitle('Configuration of housekeeper');
 		$this->zbxTestTextPresent(array('CONFIGURATION OF HOUSEKEEPER', 'Housekeeper'));
@@ -879,22 +877,14 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 		$this->assertElementPresent("//input[@id='hk_history_mode']/@checked");
 		$this->assertElementNotPresent("//input[@id='hk_history_global']/@checked");
 		$this->assertVisible('hk_history');
-		$this->assertAttribute("//input[@id='hk_history']/@value", 90);
 		$this->assertElementPresent("//input[@id='hk_history']/@disabled");
 
 		$this->assertElementPresent("//input[@id='hk_trends_mode']/@checked");
 		$this->assertElementNotPresent("//input[@id='hk_trends_global']/@checked");
 		$this->assertVisible('hk_trends');
-		$this->assertAttribute("//input[@id='hk_trends']/@value", 365);
 		$this->assertElementPresent("//input[@id='hk_trends']/@disabled");
 
 		$this->assertEquals($oldHashConfig, DBhash($sqlConfig), "Values in some DB fields changed, but shouldn't.");
-	}
-
-	/**
-	 * Restore the original tables.
-	 */
-	public function testFormAdministrationGeneralHousekeeper_Teardown() {
 		DBrestore_tables('config');
 	}
 }

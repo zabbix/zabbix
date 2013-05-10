@@ -505,7 +505,7 @@ typedef enum
 /*	TIMEPERIOD_TYPE_HOURLY,*/
 	TIMEPERIOD_TYPE_DAILY = 2,
 	TIMEPERIOD_TYPE_WEEKLY,
-	TIMEPERIOD_TYPE_MONTHLY,
+	TIMEPERIOD_TYPE_MONTHLY
 }
 zbx_timeperiod_type_t;
 
@@ -755,7 +755,7 @@ extern const char	title_message[];
 extern const char	usage_message[];
 extern const char	*help_message[];
 
-#define ARRSIZE(a)	sizeof(a) / sizeof(*a)
+#define ARRSIZE(a)	(sizeof(a) / sizeof(*a))
 
 void	help(void);
 void	usage(void);
@@ -893,9 +893,9 @@ void	__zbx_zbx_setproctitle(const char *fmt, ...);
 
 #define ZBX_MAX_RECV_DATA_SIZE	(64 * ZBX_MEBIBYTE)
 
-double	zbx_time();
+double	zbx_time(void);
 void	zbx_timespec(zbx_timespec_t *ts);
-double	zbx_current_time();
+double	zbx_current_time(void);
 
 #ifdef HAVE___VA_ARGS__
 #	define zbx_error(fmt, ...) __zbx_zbx_error(ZBX_CONST_STRING(fmt), ##__VA_ARGS__)
@@ -963,6 +963,7 @@ ZBX_REGEXP;
 char	*zbx_regexp_match(const char *string, const char *pattern, int *len);
 char	*zbx_iregexp_match(const char *string, const char *pattern, int *len);
 char	*zbx_regexp_sub(const char *string, const char *pattern, const char *output_template);
+char	*zbx_mregexp_sub(const char *string, const char *pattern, const char *output_template);
 
 void	clean_regexps_ex(ZBX_REGEXP *regexps, int *regexps_num);
 void	add_regexp_ex(ZBX_REGEXP **regexps, int *regexps_alloc, int *regexps_num,

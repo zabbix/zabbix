@@ -811,7 +811,8 @@ function make_latest_issues(array $filter = array()) {
 
 	// total trigger count
 	$options['countOutput'] = true;
-	unset($options['limit'], $options['sortfield'], $options['sortorder']);
+	// we unset withLastEventUnacknowledged and skipDependent because of performance issues
+	unset($options['limit'], $options['sortfield'], $options['sortorder'], $options['withLastEventUnacknowledged'], $options['skipDependent']);
 	$triggersTotalCount = API::Trigger()->get($options);
 
 	// get events

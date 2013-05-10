@@ -770,6 +770,8 @@ int	zbx_db_bind_parameter(int position, void *buffer, unsigned char type)
 			err = zbx_oracle_bind_parameter((ub4)position, buffer, (sb4)sizeof(int), SQLT_INT);
 			break;
 		case ZBX_TYPE_TEXT:
+		case ZBX_TYPE_SHORTTEXT:
+		case ZBX_TYPE_LONGTEXT:
 			err = zbx_oracle_bind_parameter((ub4)position, buffer, (sb4)strlen((char *)buffer), SQLT_LNG);
 			break;
 		default:
@@ -1071,8 +1073,7 @@ DB_RESULT	zbx_db_vselect(const char *fmt, va_list args)
 	SQLRETURN	ret = SQL_SUCCESS;
 #elif defined(HAVE_ORACLE)
 	sword		err = OCI_SUCCESS;
-	ub4		prefetch_mem_size = 2 * ZBX_MEBIBYTE;	/* prefetch 2 MB of data */
-	ub4		counter, attrvalue_zero = 0;
+	ub4		prefetch_rows = 200, counter;
 #elif defined(HAVE_POSTGRESQL)
 	char		*error = NULL;
 #elif defined(HAVE_SQLITE3)
@@ -1187,19 +1188,19 @@ error:
 
 	err = OCIHandleAlloc((dvoid *)oracle.envhp, (dvoid **)&result->stmthp, OCI_HTYPE_STMT, (size_t)0, (dvoid **)0);
 
-	if (OCI_SUCCESS == err)
-	{
-		/* Set prefetch memory size. */
-		/* By default prefetching is done by 1 row per iteration. */
-		/* More info: docs.oracle.com/cd/B28359_01/appdev.111/b28395/oci04sql.htm */
-		err = OCIAttrSet(result->stmthp, OCI_HTYPE_STMT, &prefetch_mem_size, sizeof(prefetch_mem_size),
-				OCI_ATTR_PREFETCH_MEMORY, oracle.errhp);
-	}
+	/* Prefetching when working with Oracle is needed because otherwise it fetches only 1 row at a time when doing */
+	/* selects (default behavior). There are 2 ways to do prefetching: memory based and rows based. Based on the   */
+	/* study optimal (speed-wise) memory based prefetch is 2 MB. But in case of many subsequent selects CPU usage  */
+	/* jumps up to 100 %. Using rows prefetch with up to 200 rows does not affect CPU usage, it is the same as     */
+	/* without prefetching at all. See ZBX-5920, ZBX-6493 for details.                                             */
+	/*                                                                                                             */
+	/* Tested on Oracle 11gR2.                                                                                     */
+	/*                                                                                                             */
+	/* Oracle info: docs.oracle.com/cd/B28359_01/appdev.111/b28395/oci04sql.htm                                    */
 
 	if (OCI_SUCCESS == err)
 	{
-		/* unset prefetch rows so that memory size takes effect */
-		err = OCIAttrSet(result->stmthp, OCI_HTYPE_STMT, &attrvalue_zero, sizeof(attrvalue_zero),
+		err = OCIAttrSet(result->stmthp, OCI_HTYPE_STMT, &prefetch_rows, sizeof(prefetch_rows),
 				OCI_ATTR_PREFETCH_ROWS, oracle.errhp);
 	}
 

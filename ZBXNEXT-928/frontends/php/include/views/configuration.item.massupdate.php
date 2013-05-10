@@ -99,6 +99,16 @@ $itemFormList->addRow(
 	new CTextBox('snmp_community', $this->data['snmp_community'], ZBX_TEXTBOX_SMALL_SIZE)
 );
 
+// append snmpv3 contextname to form list
+$itemFormList->addRow(
+	array(
+		_('Context name'),
+		SPACE,
+		new CVisibilityBox('contextname_visible', get_request('contextname_visible'), 'snmpv3_contextname', _('Original'))
+	),
+	new CTextBox('snmpv3_contextname', $this->data['snmpv3_contextname'], ZBX_TEXTBOX_STANDARD_SIZE)
+);
+
 // append snmpv3 securityname to form list
 $itemFormList->addRow(
 	array(
