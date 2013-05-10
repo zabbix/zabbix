@@ -542,106 +542,112 @@ elseif (isset($_REQUEST['update']) && isset($_REQUEST['massupdate']) && isset($_
 		$applications = array();
 	}
 
-	DBstart();
+	try {
+		DBstart();
 
-	// add new or existing applications
-	if (isset($visible['new_applications']) && !empty($_REQUEST['new_applications'])) {
-		foreach ($_REQUEST['new_applications'] as $newApplication) {
-			if (isset($newApplication['new'])) {
-				$newApplications[] = array(
-					'name' => $newApplication['new'],
-					'hostid' => get_request('hostid')
-				);
+		// add new or existing applications
+		if (isset($visible['new_applications']) && !empty($_REQUEST['new_applications'])) {
+			foreach ($_REQUEST['new_applications'] as $newApplication) {
+				if (isset($newApplication['new'])) {
+					$newApplications[] = array(
+						'name' => $newApplication['new'],
+						'hostid' => get_request('hostid')
+					);
+				}
+				else {
+					$existApplication[] = $newApplication;
+				}
+			}
+
+			if (isset($newApplications)) {
+				if (!$createdApplication = API::Application()->create($newApplications)) {
+					throw new Exception();
+				}
+				if (isset($existApplication)) {
+					$existApplication = array_merge($existApplication, $createdApplication['applicationids']);
+				}
+				else {
+					$existApplication = $createdApplication['applicationids'];
+				}
+			}
+		}
+
+		if (isset($visible['applications']) && isset($_REQUEST['applications'])) {
+			if (isset($existApplication)){
+				$applications = array_unique(array_merge($_REQUEST['applications'], $existApplication));
 			}
 			else {
-				$existApplication[] = $newApplication;
+				$applications = $_REQUEST['applications'];
 			}
 		}
 
-		if (isset($newApplications)) {
-			$createdApplication = API::Application()->create($newApplications);
-			if (isset($existApplication)) {
-				$existApplication = array_merge($existApplication, $createdApplication['applicationids']);
-			}
-			else {
-				$existApplication = $createdApplication['applicationids'];
-			}
-		}
-	}
-
-	if (isset($visible['applications']) && isset($_REQUEST['applications'])) {
-		if (isset($existApplication)){
-			$applications = array_unique(array_merge($_REQUEST['applications'], $existApplication));
-		}
-		else {
-			$applications = $_REQUEST['applications'];
-		}
-	}
-
-	$item = array(
-		'interfaceid' => get_request('interfaceid'),
-		'description' => get_request('description'),
-		'delay' => get_request('delay'),
-		'history' => get_request('history'),
-		'status' => get_request('status'),
-		'type' => get_request('type'),
-		'snmp_community' => get_request('snmp_community'),
-		'snmp_oid' => get_request('snmp_oid'),
-		'value_type' => get_request('value_type'),
-		'trapper_hosts' => get_request('trapper_hosts'),
-		'port' => get_request('port'),
-		'units' => get_request('units'),
-		'multiplier' => get_request('multiplier'),
-		'delta' => get_request('delta'),
-		'snmpv3_contextname' => get_request('snmpv3_contextname'),
-		'snmpv3_securityname' => get_request('snmpv3_securityname'),
-		'snmpv3_securitylevel' => get_request('snmpv3_securitylevel'),
-		'snmpv3_authprotocol' => get_request('snmpv3_authprotocol'),
-		'snmpv3_authpassphrase' => get_request('snmpv3_authpassphrase'),
-		'snmpv3_privprotocol' => get_request('snmpv3_privprotocol'),
-		'snmpv3_privpassphrase' => get_request('snmpv3_privpassphrase'),
-		'formula' => get_request('formula'),
-		'trends' => get_request('trends'),
-		'logtimefmt' => get_request('logtimefmt'),
-		'valuemapid' => get_request('valuemapid'),
-		'delay_flex' => $db_delay_flex,
-		'authtype' => get_request('authtype'),
-		'username' => get_request('username'),
-		'password' => get_request('password'),
-		'publickey' => get_request('publickey'),
-		'privatekey' => get_request('privatekey'),
-		'ipmi_sensor' => get_request('ipmi_sensor'),
-		'applications' => $applications,
-		'data_type' => get_request('data_type')
-	);
-
-	// add applications
-	if (!empty($existApplication) && (!isset($visible['applications']) || !isset($_REQUEST['applications']))) {
-		foreach ($existApplication as $linkApp) {
-			$linkApplications[] = array('applicationid' => $linkApp);
-		}
-		foreach (get_request('group_itemid') as $linkItem) {
-			$linkItems[] = array('itemid' => $linkItem);;
-		}
-		$linkApp = array(
-			'applications' => $linkApplications,
-			'items' => $linkItems
+		$item = array(
+			'interfaceid' => get_request('interfaceid'),
+			'description' => get_request('description'),
+			'delay' => get_request('delay'),
+			'history' => get_request('history'),
+			'status' => get_request('status'),
+			'type' => get_request('type'),
+			'snmp_community' => get_request('snmp_community'),
+			'snmp_oid' => get_request('snmp_oid'),
+			'value_type' => get_request('value_type'),
+			'trapper_hosts' => get_request('trapper_hosts'),
+			'port' => get_request('port'),
+			'units' => get_request('units'),
+			'multiplier' => get_request('multiplier'),
+			'delta' => get_request('delta'),
+			'snmpv3_contextname' => get_request('snmpv3_contextname'),
+			'snmpv3_securityname' => get_request('snmpv3_securityname'),
+			'snmpv3_securitylevel' => get_request('snmpv3_securitylevel'),
+			'snmpv3_authprotocol' => get_request('snmpv3_authprotocol'),
+			'snmpv3_authpassphrase' => get_request('snmpv3_authpassphrase'),
+			'snmpv3_privprotocol' => get_request('snmpv3_privprotocol'),
+			'snmpv3_privpassphrase' => get_request('snmpv3_privpassphrase'),
+			'formula' => get_request('formula'),
+			'trends' => get_request('trends'),
+			'logtimefmt' => get_request('logtimefmt'),
+			'valuemapid' => get_request('valuemapid'),
+			'delay_flex' => $db_delay_flex,
+			'authtype' => get_request('authtype'),
+			'username' => get_request('username'),
+			'password' => get_request('password'),
+			'publickey' => get_request('publickey'),
+			'privatekey' => get_request('privatekey'),
+			'ipmi_sensor' => get_request('ipmi_sensor'),
+			'applications' => $applications,
+			'data_type' => get_request('data_type')
 		);
-		API::Application()->massAdd($linkApp);
-	}
 
-	foreach ($item as $number => $field) {
-		if (is_null($field)) {
-			unset($item[$number]);
+		// add applications
+		if (!empty($existApplication) && (!isset($visible['applications']) || !isset($_REQUEST['applications']))) {
+			foreach ($existApplication as $linkApp) {
+				$linkApplications[] = array('applicationid' => $linkApp);
+			}
+			foreach (get_request('group_itemid') as $linkItem) {
+				$linkItems[] = array('itemid' => $linkItem);;
+			}
+			$linkApp = array(
+				'applications' => $linkApplications,
+				'items' => $linkItems
+			);
+			API::Application()->massAdd($linkApp);
+		}
+
+		foreach ($item as $number => $field) {
+			if (is_null($field)) {
+				unset($item[$number]);
+			}
+		}
+
+		foreach ($_REQUEST['group_itemid'] as $id) {
+			$item['itemid'] = $id;
+			if (!$result = API::Item()->update($item)) {
+				break;
+			}
 		}
 	}
-
-	foreach ($_REQUEST['group_itemid'] as $id) {
-		$item['itemid'] = $id;
-		$result = API::Item()->update($item);
-		if (!$result) {
-			break;
-		}
+	catch (Exception $e) {
+		$result = false;
 	}
 	$result = DBend($result);
 	show_messages($result, _('Items updated'), _('Cannot update items'));

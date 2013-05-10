@@ -69,7 +69,8 @@ if (isset($_REQUEST['new_groups'])) {
 		if (isset($newHostGroup['new'])) {
 			$hostGroupsToAdd[] = array(
 				'id' => $newHostGroup['new'],
-				'name' => $newHostGroup['new'] . ' (new)'
+				'name' => $newHostGroup['new'] . ' (new)',
+				'isNew' => true
 			);
 		}
 		else {
