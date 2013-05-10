@@ -2074,9 +2074,8 @@ static void	DBdelete_template_applications(zbx_uint64_t hostid, const zbx_vector
 			" where t.applicationid=a.applicationid"
 				" and t.templateid=ta.applicationid"
 				" and a.hostid=" ZBX_FS_UI64
-				" and ",
+				" and",
 			hostid);
-
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "ta.hostid", templateids->values, templateids->values_num);
 
 	result = DBselect("%s", sql);
@@ -2094,23 +2093,22 @@ static void	DBdelete_template_applications(zbx_uint64_t hostid, const zbx_vector
 	if (0 == apptemplateids.values_num)
 		goto out;
 
+	zbx_vector_uint64_sort(&apptemplateids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
 	zbx_vector_uint64_sort(&applicationids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 	zbx_vector_uint64_uniq(&applicationids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	sql_offset = 0;
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-			"delete from application_template"
-			" where ");
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from application_template where");
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "application_templateid",
 			apptemplateids.values, apptemplateids.values_num);
 
 	DBexecute("%s", sql);
 
 	DBdelete_applications(&applicationids);
-
 out:
-	zbx_vector_uint64_destroy(&applicationids);
 	zbx_vector_uint64_destroy(&apptemplateids);
+	zbx_vector_uint64_destroy(&applicationids);
 	zbx_free(sql);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
