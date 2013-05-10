@@ -33,26 +33,68 @@ foreach ($this->data['hosts'] as $hostid) {
 $hostFormList = new CFormList('hostFormList');
 
 // replace host groups
+$hostGroupsToReplace = null;
+if (isset($_REQUEST['groups'])) {
+	$getHostGroups = API::HostGroup()->get(array(
+		'groupids' => $_REQUEST['groups'],
+		'output' => array('groupid', 'name')
+	));
+	foreach ($getHostGroups as $getHostGroup) {
+		$hostGroupsToReplace[] = array(
+			'id' => $getHostGroup['groupid'],
+			'name' => $getHostGroup['name']
+		);
+	}
+}
+
 $replaceGroups = new CMultiSelect(array(
 		'name' => 'groups[]',
 		'objectName' => 'hostGroup',
-		'data' => isset($this->data['visible']['groups'])
+		'data' => $hostGroupsToReplace
 	));
 
 $hostFormList->addRow(
 	array(
 		_('Replace host groups'),
 		SPACE,
-		new CVisibilityBox('visible[groups]', isset($_REQUEST['visible']['groups']), 'groups_', _('Original'))
+		new CVisibilityBox('visible[groups]', isset($this->data['visible']['groups']), 'groups_', _('Original'))
 	),
 	$replaceGroups
 );
 
 // add new or existing host groups
+$hostGroupsToAdd = null;
+if (isset($_REQUEST['new_groups'])) {
+	foreach ($_REQUEST['new_groups'] as $newHostGroup) {
+		if (isset($newHostGroup['new'])) {
+			$hostGroupsToAdd[] = array(
+				'id' => $newHostGroup['new'],
+				'name' => $newHostGroup['new'] . ' (new)'
+			);
+		}
+		else {
+			$hostGroupIds[] = $newHostGroup;
+		}
+	}
+
+	if (isset($hostGroupIds)) {
+		$getHostGroups = API::HostGroup()->get(array(
+			'groupids' => $hostGroupIds,
+			'output' => array('groupid', 'name')
+		));
+		foreach ($getHostGroups as $getHostGroup) {
+			$hostGroupsToAdd[] = array(
+				'id' => $getHostGroup['groupid'],
+				'name' => $getHostGroup['name']
+			);
+		}
+	}
+}
 if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
 	$newGroups = new CMultiSelect(array(
 			'name' => 'new_groups[]',
 			'objectName' => 'hostGroup',
+			'data' => $hostGroupsToAdd,
 			'addNew' => true
 		));
 
@@ -60,7 +102,7 @@ if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
 		array(
 			_('Add new or existing host groups'),
 			SPACE,
-			new CVisibilityBox('visible[new_groups]', isset($_REQUEST['visible']['new_groups']), 'new_groups_', _('Original'))
+			new CVisibilityBox('visible[new_groups]', isset($this->data['visible']['new_groups']), 'new_groups_', _('Original'))
 		),
 		$newGroups
 	);
@@ -68,14 +110,15 @@ if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
 else {
 	$newGroups = new CMultiSelect(array(
 			'name' => 'new_groups[]',
-			'objectName' => 'hostGroup'
+			'objectName' => 'hostGroup',
+			'data' => $hostGroupsToAdd
 		));
 
 	$hostFormList->addRow(
 		array(
 			_('New host group'),
 			SPACE,
-			new CVisibilityBox('visible[new_groups]', isset($_REQUEST['visible']['new_groups']), 'new_groups_', _('Original'))
+			new CVisibilityBox('visible[new_groups]', isset($this->data['visible']['new_groups']), 'new_groups_', _('Original'))
 		),
 		$newGroups
 	);
