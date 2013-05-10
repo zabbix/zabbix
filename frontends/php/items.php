@@ -67,7 +67,7 @@ $fields = array(
 	'trapper_hosts_visible' =>	array(T_ZBX_STR, O_OPT, null,	null,		null),
 	'applications_visible' =>	array(T_ZBX_STR, O_OPT, null,	null,		null),
 	'groupid' =>				array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
-	'hostid' =>					array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		'isset({form})&&{form}=="update"'),
+	'hostid' =>					array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		'isset({form})||isset({save})'),
 	'interfaceid' =>			array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null, _('Interface')),
 	'copy_type' =>				array(T_ZBX_INT, O_OPT, P_SYS,	IN('0,1'),	'isset({copy})'),
 	'copy_mode' =>				array(T_ZBX_INT, O_OPT, P_SYS,	IN('0'),	null),
@@ -334,6 +334,9 @@ if (!(isset($_REQUEST['form']) && isset($_REQUEST['hostid']))
 	if ($host) {
 		$_REQUEST['hostid'] = isset($host['hostid']) ? $host['hostid'] : $host['templateid'];
 	}
+}
+elseif (!isset($_REQUEST['form']) && isset($_REQUEST['hostid'])) {
+	unset($_REQUEST['hostid']);
 }
 
 // subfilters
