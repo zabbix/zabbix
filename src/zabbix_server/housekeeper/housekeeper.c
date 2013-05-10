@@ -408,7 +408,6 @@ static void	hk_history_delete_queue_prepare_all(zbx_hk_history_rule_t *rules, in
 {
 	const char		*__function_name = "hk_history_delete_queue_prepare_all";
 
-	int			update_cache = 0;
 	zbx_hk_history_rule_t	*rule;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
