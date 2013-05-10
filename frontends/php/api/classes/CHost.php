@@ -663,6 +663,11 @@ class CHost extends CHostGeneral {
 			}
 
 			if (isset($host['inventory']) && !empty($host['inventory'])) {
+
+				if (isset($host['inventory_mode']) && $host['inventory_mode'] == HOST_INVENTORY_DISABLED) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot set inventory fields for disabled inventory.'));
+				}
+
 				$fields = array_keys($host['inventory']);
 				foreach ($fields as $field) {
 					if (!in_array($field, $inventoryFields)) {
@@ -1077,32 +1082,27 @@ class CHost extends CHostGeneral {
 
 		if (isset($data['groups'])) {
 			$updateGroups = $data['groups'];
-			unset($data['groups']);
 		}
 
 		if (isset($data['interfaces'])) {
 			$updateInterfaces = $data['interfaces'];
-			unset($data['interfaces']);
 		}
 
 		if (isset($data['templates_clear'])) {
 			$updateTemplatesClear = zbx_toArray($data['templates_clear']);
-			unset($data['templates_clear']);
 		}
 
 		if (isset($data['templates'])) {
 			$updateTemplates = $data['templates'];
-			unset($data['templates']);
 		}
 
 		if (isset($data['macros'])) {
 			$updateMacros = $data['macros'];
-			unset($data['macros']);
 		}
 
-		if (isset($data['inventory'])) {
+		// second check is necessary, because import incorrectly inputs unset 'inventory' as empty string rather than null
+		if (isset($data['inventory']) && $data['inventory']) {
 			$updateInventory = $data['inventory'];
-			unset($data['inventory']);
 
 			if (isset($data['inventory_mode']) && $data['inventory_mode'] == HOST_INVENTORY_DISABLED) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot set inventory fields for disabled inventory.'));
@@ -1114,15 +1114,17 @@ class CHost extends CHostGeneral {
 				$updateInventory = array();
 			}
 			$updateInventory['inventory_mode'] = $data['inventory_mode'];
-			unset($data['inventory_mode']);
+		}
+		else {
+			$updateInventory['inventory_mode'] = null;
 		}
 
 		if (isset($data['status'])) {
 			$updateStatus = $data['status'];
-			unset($data['status']);
 		}
 
-		unset($data['hosts']);
+		unset($data['hosts'], $data['groups'], $data['interfaces'], $data['templates_clear'], $data['templates'],
+			$data['macros'], $data['inventory'], $data['inventory_mode'], $data['status']);
 		if (!zbx_empty($data)) {
 			$update = array(
 				'values' => $data,

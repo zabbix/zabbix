@@ -384,7 +384,7 @@ elseif (isset($_REQUEST['save'])) {
 			'templates' => $templates,
 			'interfaces' => $interfaces,
 			'macros' => $macros,
-			'inventory' => (get_request('inventory_mode') != HOST_INVENTORY_DISABLED) ? get_request('host_inventory', array()) : array(),
+			'inventory' => (get_request('inventory_mode') != HOST_INVENTORY_DISABLED) ? get_request('host_inventory', array()) : null,
 			'inventory_mode' => get_request('inventory_mode')
 		);
 
