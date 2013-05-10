@@ -193,7 +193,9 @@ class testFormAction extends CWebTest {
 
 // add target host Zabbix server
 		$this->zbxTestClick('add');
+		sleep(1);
 		$this->select("opCmdTarget", "label=Host");
+		sleep(1);
 		$this->input_type("//input[@placeholder='type here to search']", 'Simple form test host');
 		sleep(1);
 		$this->zbxTestClick("//span[@class='matched']");
@@ -202,7 +204,9 @@ class testFormAction extends CWebTest {
 		sleep(1);
 // add target group Zabbix servers
 		$this->zbxTestClick('add');
+		sleep(1);
 		$this->select("opCmdTarget", "label=Host group");
+		sleep(1);
 		$this->input_type("//input[@placeholder='type here to search']", 'Zabbix servers');
 		sleep(1);
 		$this->zbxTestClick("//span[@class='matched']");

@@ -304,7 +304,9 @@ elseif (in_array($resourceType, array(SCREEN_RESOURCE_HOSTGROUP_TRIGGERS, SCREEN
 		$screenFormList->addRow(_('Group'), new CMultiSelect(array(
 			'name' => 'resourceid',
 			'objectName' => 'hostGroup',
+			'objectOptions' => array('editable' => true),
 			'data' => $data ? array(array('id' => $data['groupid'], 'name' => $data['name'], 'prefix' => $data['prefix'])) : null,
+			'defaultValue' => 0,
 			'selectedLimit' => 1
 		)));
 	}
@@ -326,7 +328,9 @@ elseif (in_array($resourceType, array(SCREEN_RESOURCE_HOSTGROUP_TRIGGERS, SCREEN
 		$screenFormList->addRow(_('Host'), new CMultiSelect(array(
 			'name' => 'resourceid',
 			'objectName' => 'hosts',
+			'objectOptions' => array('editable' => true),
 			'data' => $data ? array(array('id' => $data['hostid'], 'name' => $data['name'], 'prefix' => $data['prefix'])) : null,
+			'defaultValue' => 0,
 			'selectedLimit' => 1
 		)));
 	}
@@ -396,6 +400,7 @@ elseif (in_array($resourceType, array(SCREEN_RESOURCE_TRIGGERS_OVERVIEW, SCREEN_
 	$screenFormList->addRow(_('Group'), new CMultiSelect(array(
 		'name' => 'resourceid',
 		'objectName' => 'hostGroup',
+		'objectOptions' => array('editable' => true),
 		'data' => $data ? array(array('id' => $data['groupid'], 'name' => $data['name'], 'prefix' => $data['prefix'])) : null,
 		'selectedLimit' => 1
 	)));
@@ -456,7 +461,8 @@ elseif ($resourceType == SCREEN_RESOURCE_HOSTS_INFO || $resourceType == SCREEN_R
 		$data = API::HostGroup()->get(array(
 			'groupids' => $resourceId,
 			'nodeids' => get_current_nodeid(true),
-			'output' => array('groupid', 'name')
+			'output' => array('groupid', 'name'),
+			'editable' => true
 		));
 
 		if ($data) {
@@ -469,6 +475,7 @@ elseif ($resourceType == SCREEN_RESOURCE_HOSTS_INFO || $resourceType == SCREEN_R
 	$screenFormList->addRow(_('Group'), new CMultiSelect(array(
 		'name' => 'resourceid',
 		'objectName' => 'hostGroup',
+		'objectOptions' => array('editable' => true),
 		'data' => $data ? array(array('id' => $data['groupid'], 'name' => $data['name'], 'prefix' => $data['prefix'])) : null,
 		'defaultValue' => 0,
 		'selectedLimit' => 1

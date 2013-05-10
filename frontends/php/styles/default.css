@@ -164,7 +164,8 @@ select[multiple="multiple"], select.openView { height: auto; }
 input.formlist { padding-top: 2px; padding-bottom: 2px; }
 
 input[type="button"],
-input[type="submit"] { height: auto; }
+input[type="submit"],
+input[type="file"] { height: auto; }
 input[type="button"].formlist { margin-bottom: 1px; cursor: pointer; vertical-align: top; background: #ffffff; height: 20px; }
 input[type="submit"].formlist { margin-bottom: 1px; cursor: pointer; height: 20px; }
 input[type="button"].input[disabled].formlist,
