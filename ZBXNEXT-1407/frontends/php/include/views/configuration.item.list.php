@@ -31,6 +31,7 @@ if (empty($this->data['hostid'])) {
 	$createForm->addItem($createButton);
 }
 else {
+	$createForm->addVar('hostid', $this->data['hostid']);
 	$createForm->addItem(new CSubmit('form', _('Create item')));
 }
 $itemsWidget->addPageHeader(_('CONFIGURATION OF ITEMS'), $createForm);
