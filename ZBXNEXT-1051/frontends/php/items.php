@@ -30,7 +30,7 @@ $page['scripts'] = array('class.cviewswitcher.js');
 $page['hist_arg'] = array();
 
 if ((isset($_REQUEST['go']) && $_REQUEST['go'] == 'massupdate') || isset($_REQUEST['massupdate'])) {
-	$page['scripts'] = array('multiselect.js');
+	$page['scripts'][] = 'multiselect.js';
 }
 
 require_once dirname(__FILE__).'/include/page_header.php';

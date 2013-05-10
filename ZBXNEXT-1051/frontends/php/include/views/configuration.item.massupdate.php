@@ -509,15 +509,17 @@ if (!$this->data['is_multiple_hosts']) {
 			}
 		}
 
-		$getApps = API::Application()->get(array(
-			'applicationids' => $appToAddId,
-			'output' => array('applicationid', 'name')
-		));
-		foreach ($getApps as $getApp) {
-			$appToAdd[] = array(
-				'id' => $getApp['applicationid'],
-				'name' => $getApp['name']
-			);
+		if (isset($appToAddId)) {
+			$getApps = API::Application()->get(array(
+				'applicationids' => $appToAddId,
+				'output' => array('applicationid', 'name')
+			));
+			foreach ($getApps as $getApp) {
+				$appToAdd[] = array(
+					'id' => $getApp['applicationid'],
+					'name' => $getApp['name']
+				);
+			}
 		}
 	}
 
