@@ -58,7 +58,7 @@ $httpForm->addVar('hostid', $this->data['hostid']);
 $httpTable = new CTableInfo(_('No web scenarios defined.'));
 $httpTable->setHeader(array(
 	new CCheckBox('all_httptests', null, "checkAll('".$httpForm->getName()."', 'all_httptests', 'group_httptestid');"),
-	($_REQUEST['hostid'] == 0) ? make_sorting_header(_('Host'), 'hostname') : null,
+	($this->data['hostid'] == 0) ? make_sorting_header(_('Host'), 'hostname') : null,
 	make_sorting_header(_('Name'), 'name'),
 	_('Number of steps'),
 	_('Update interval'),
@@ -76,7 +76,7 @@ foreach ($this->data['httpTests'] as $httpTestId => $httpTest) {
 
 	$httpTable->addRow(array(
 		new CCheckBox('group_httptestid['.$httpTest['httptestid'].']', null, null, $httpTest['httptestid']),
-		($_REQUEST['hostid'] > 0) ? null : $httpTest['hostname'],
+		($this->data['hostid'] > 0) ? null : $httpTest['hostname'],
 		$name,
 		$httpTest['stepscnt'],
 		$httpTest['delay'],

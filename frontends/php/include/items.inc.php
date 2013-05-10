@@ -295,10 +295,11 @@ function copyItemsToHosts($srcItemIds, $dstHostIds) {
 		'itemids' => $srcItemIds,
 		'output' => array(
 			'type', 'snmp_community', 'snmp_oid', 'name', 'key_', 'delay', 'history', 'trends', 'status', 'value_type',
-			'trapper_hosts', 'units', 'multiplier', 'delta', 'snmpv3_securityname', 'snmpv3_securitylevel', 'snmpv3_authprotocol',
-			'snmpv3_authpassphrase', 'snmpv3_privprotocol', 'snmpv3_privpassphrase', 'formula', 'logtimefmt', 'valuemapid',
-			'delay_flex', 'params', 'ipmi_sensor', 'data_type', 'authtype', 'username', 'password', 'publickey',
-			'privatekey', 'flags', 'filter', 'port', 'description', 'inventory_link'
+			'trapper_hosts', 'units', 'multiplier', 'delta', 'snmpv3_contextname', 'snmpv3_securityname',
+			'snmpv3_securitylevel', 'snmpv3_authprotocol', 'snmpv3_authpassphrase', 'snmpv3_privprotocol',
+			'snmpv3_privpassphrase', 'formula', 'logtimefmt', 'valuemapid', 'delay_flex', 'params', 'ipmi_sensor',
+			'data_type', 'authtype', 'username', 'password', 'publickey', 'privatekey', 'flags', 'filter', 'port',
+			'description', 'inventory_link'
 		),
 		'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL),
 		'selectApplications' => API_OUTPUT_REFER
@@ -356,10 +357,11 @@ function copyItems($srcHostId, $dstHostId) {
 		'hostids' => $srcHostId,
 		'output' => array(
 			'type', 'snmp_community', 'snmp_oid', 'name', 'key_', 'delay', 'history', 'trends', 'status', 'value_type',
-			'trapper_hosts', 'units', 'multiplier', 'delta', 'snmpv3_securityname', 'snmpv3_securitylevel', 'snmpv3_authprotocol',
-			'snmpv3_authpassphrase', 'snmpv3_privprotocol', 'snmpv3_privpassphrase', 'formula', 'logtimefmt', 'valuemapid',
-			'delay_flex', 'params', 'ipmi_sensor', 'data_type', 'authtype', 'username', 'password', 'publickey', 'privatekey',
-			'flags', 'filter', 'port', 'description', 'inventory_link'
+			'trapper_hosts', 'units', 'multiplier', 'delta', 'snmpv3_contextname', 'snmpv3_securityname',
+			'snmpv3_securitylevel', 'snmpv3_authprotocol', 'snmpv3_authpassphrase', 'snmpv3_privprotocol',
+			'snmpv3_privpassphrase', 'formula', 'logtimefmt', 'valuemapid', 'delay_flex', 'params', 'ipmi_sensor',
+			'data_type', 'authtype', 'username', 'password', 'publickey', 'privatekey', 'flags', 'filter', 'port',
+			'description', 'inventory_link'
 		),
 		'inherited' => false,
 		'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL),
@@ -478,10 +480,11 @@ function get_item_by_itemid($itemid) {
 function get_item_by_itemid_limited($itemid) {
 	$row = DBfetch(DBselect(
 		'SELECT i.itemid,i.interfaceid,i.name,i.key_,i.hostid,i.delay,i.history,i.status,i.type,i.lifetime,'.
-			'i.snmp_community,i.snmp_oid,i.value_type,i.data_type,i.trapper_hosts,i.port,i.units,i.multiplier,i.delta,'.
-			'i.snmpv3_securityname,i.snmpv3_securitylevel,i.snmpv3_authprotocol,i.snmpv3_authpassphrase,i.snmpv3_privprotocol,'.
-			'i.snmpv3_privpassphrase,i.formula,i.trends,i.logtimefmt,i.valuemapid,i.delay_flex,i.params,i.ipmi_sensor,i.templateid,'.
-			'i.authtype,i.username,i.password,i.publickey,i.privatekey,i.flags,i.filter,i.description,i.inventory_link'.
+			'i.snmp_community,i.snmp_oid,i.value_type,i.data_type,i.trapper_hosts,i.port,i.units,i.multiplier,'.
+			'i.delta,i.snmpv3_contextname,i.snmpv3_securityname,i.snmpv3_securitylevel,i.snmpv3_authprotocol,'.
+			'i.snmpv3_authpassphrase,i.snmpv3_privprotocol,i.snmpv3_privpassphrase,i.formula,i.trends,i.logtimefmt,'.
+			'i.valuemapid,i.delay_flex,i.params,i.ipmi_sensor,i.templateid,i.authtype,i.username,i.password,'.
+			'i.publickey,i.privatekey,i.flags,i.filter,i.description,i.inventory_link'.
 		' FROM items i'.
 		' WHERE i.itemid='.$itemid));
 	if ($row) {
@@ -974,7 +977,7 @@ function delete_trends_by_itemid($itemIds) {
  * @param string    $item['units']          units of item
  * @param int       $item['valuemapid']     id of mapping set of values
  * @param string    $unknownString          the text to be used if the item has no data
- * @param bool		$ellipsis		        text will be cutted and ellipsis "..." added if set to true
+ * @param bool		$ellipsis		        text will be cut and ellipsis "..." added if set to true
  *
  * @return string
  */
@@ -995,7 +998,6 @@ function formatItemLastValue(array $item, $unknownString = '-', $ellipsis = true
 			if ($ellipsis && zbx_strlen($value) > 20) {
 				$value = zbx_substr($value, 0, 20).'...';
 			}
-			$value = nbsp(htmlspecialchars($value));
 
 			if ($mapping !== false) {
 				$value = $mapping.' ('.$value.')';

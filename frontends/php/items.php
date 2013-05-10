@@ -39,6 +39,7 @@ $fields = array(
 	'type_visible' =>			array(T_ZBX_STR, O_OPT, null,	null,		null),
 	'interface_visible' =>		array(T_ZBX_STR, O_OPT, null,	null,		null),
 	'community_visible' =>		array(T_ZBX_STR, O_OPT, null,	null,		null),
+	'contextname_visible' =>	array(T_ZBX_STR, O_OPT, null,	null,		null),
 	'securityname_visible' =>	array(T_ZBX_STR, O_OPT, null,	null,		null),
 	'securitylevel_visible' =>	array(T_ZBX_STR, O_OPT, null,	null,		null),
 	'authprotocol_visible' =>	array(T_ZBX_STR, O_OPT, null,	null,		null),
@@ -81,7 +82,7 @@ $fields = array(
 		_('New flexible interval')),
 	'delay_flex' =>				array(T_ZBX_STR, O_OPT, null,	'',			null),
 	'history' =>				array(T_ZBX_INT, O_OPT, null,	BETWEEN(0, 65535), 'isset({save})', _('Keep history (in days)')),
-	'status' =>					array(T_ZBX_INT, O_OPT, null,	IN(ITEM_STATUS_ACTIVE), null),
+	'status' =>					array(T_ZBX_INT, O_OPT, null,	IN(array(ITEM_STATUS_DISABLED, ITEM_STATUS_ACTIVE)), null),
 	'type' =>					array(T_ZBX_INT, O_OPT, null,
 		IN(array(-1, ITEM_TYPE_ZABBIX, ITEM_TYPE_SNMPV1, ITEM_TYPE_TRAPPER, ITEM_TYPE_SIMPLE, ITEM_TYPE_SNMPV2C,
 			ITEM_TYPE_INTERNAL, ITEM_TYPE_SNMPV3, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_AGGREGATE, ITEM_TYPE_EXTERNAL,
@@ -115,6 +116,8 @@ $fields = array(
 	'port' =>					array(T_ZBX_STR, O_OPT, null,	BETWEEN(0, 65535), 'isset({save})&&isset({type})&&'.IN(
 		ITEM_TYPE_SNMPV1.','.ITEM_TYPE_SNMPV2C.','.ITEM_TYPE_SNMPV3,'type'), _('Port')),
 	'snmpv3_securitylevel' =>	array(T_ZBX_INT, O_OPT, null,	IN('0,1,2'),
+		'isset({save})&&(isset({type})&&({type}=='.ITEM_TYPE_SNMPV3.'))'),
+	'snmpv3_contextname' =>	array(T_ZBX_STR, O_OPT, null,	null,
 		'isset({save})&&(isset({type})&&({type}=='.ITEM_TYPE_SNMPV3.'))'),
 	'snmpv3_securityname' =>	array(T_ZBX_STR, O_OPT, null,	null,
 		'isset({save})&&(isset({type})&&({type}=='.ITEM_TYPE_SNMPV3.'))'),
@@ -419,6 +422,7 @@ elseif (isset($_REQUEST['save'])) {
 			'units' => get_request('units'),
 			'multiplier' => get_request('multiplier', 0),
 			'delta' => get_request('delta'),
+			'snmpv3_contextname' => get_request('snmpv3_contextname'),
 			'snmpv3_securityname' => get_request('snmpv3_securityname'),
 			'snmpv3_securitylevel' => get_request('snmpv3_securitylevel'),
 			'snmpv3_authprotocol' => get_request('snmpv3_authprotocol'),
@@ -501,6 +505,7 @@ elseif (isset($_REQUEST['del_history']) && isset($_REQUEST['itemid'])) {
 	$result = DBend($result);
 	show_messages($result, _('History cleared'), _('Cannot clear history'));
 }
+// mass update
 elseif (isset($_REQUEST['update']) && isset($_REQUEST['massupdate']) && isset($_REQUEST['group_itemid'])) {
 	if (get_request('delay_flex_visible')) {
 		$delay_flex = get_request('delay_flex');
@@ -536,7 +541,7 @@ elseif (isset($_REQUEST['update']) && isset($_REQUEST['massupdate']) && isset($_
 		'description' => get_request('description'),
 		'delay' => get_request('delay'),
 		'history' => get_request('history'),
-		'status' => get_request('status', ITEM_STATUS_DISABLED),
+		'status' => get_request('status'),
 		'type' => get_request('type'),
 		'snmp_community' => get_request('snmp_community'),
 		'snmp_oid' => get_request('snmp_oid'),
@@ -546,6 +551,7 @@ elseif (isset($_REQUEST['update']) && isset($_REQUEST['massupdate']) && isset($_
 		'units' => get_request('units'),
 		'multiplier' => get_request('multiplier'),
 		'delta' => get_request('delta'),
+		'snmpv3_contextname' => get_request('snmpv3_contextname'),
 		'snmpv3_securityname' => get_request('snmpv3_securityname'),
 		'snmpv3_securitylevel' => get_request('snmpv3_securitylevel'),
 		'snmpv3_authprotocol' => get_request('snmpv3_authprotocol'),
@@ -722,6 +728,7 @@ elseif ($_REQUEST['go'] == 'massupdate' || isset($_REQUEST['massupdate']) && iss
 		'delta' => get_request('delta', 0),
 		'trends' => get_request('trends', DAY_IN_YEAR),
 		'applications' => get_request('applications', array()),
+		'snmpv3_contextname' => get_request('snmpv3_contextname', ''),
 		'snmpv3_securityname' => get_request('snmpv3_securityname', ''),
 		'snmpv3_securitylevel' => get_request('snmpv3_securitylevel', 0),
 		'snmpv3_authprotocol' => get_request('snmpv3_authprotocol', ITEM_AUTHPROTOCOL_MD5),

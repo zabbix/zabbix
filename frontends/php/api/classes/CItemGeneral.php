@@ -66,6 +66,7 @@ abstract class CItemGeneral extends CZBXAPI {
 			'multiplier'			=> array('template' => 1),
 			'delta'					=> array(),
 			'prevorgvalue'			=> array('system' => 1),
+			'snmpv3_contextname'	=> array(),
 			'snmpv3_securityname'	=> array(),
 			'snmpv3_securitylevel'	=> array(),
 			'snmpv3_authprotocol'	=> array(),
@@ -271,7 +272,7 @@ abstract class CItemGeneral extends CZBXAPI {
 
 			$itemKey = new CItemKey($fullItem['key_']);
 			if (!$itemKey->isValid()) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Error in item key: "%s".', $itemKey->getError()));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect key: "%1$s".', $itemKey->getError()));
 			}
 
 			if ($fullItem['type'] == ITEM_TYPE_AGGREGATE) {
