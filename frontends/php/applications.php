@@ -53,8 +53,8 @@ validate_sort_and_sortorder('name', ZBX_SORT_UP);
  */
 if (isset($_REQUEST['applicationid'])) {
 	$dbApplication = API::Application()->get(array(
-		'output' => API_OUTPUT_EXTEND,
-		'applicationids' => get_request('applicationid')
+		'applicationids' => array($_REQUEST['applicationid']),
+		'output' => array('name', 'hostid')
 	));
 	if (empty($dbApplication)) {
 		access_deny();
