@@ -82,7 +82,7 @@ $fields = array(
 		_('New flexible interval')),
 	'delay_flex' =>				array(T_ZBX_STR, O_OPT, null,	'',			null),
 	'history' =>				array(T_ZBX_INT, O_OPT, null,	BETWEEN(0, 65535), 'isset({save})', _('Keep history (in days)')),
-	'status' =>					array(T_ZBX_INT, O_OPT, null,	IN(ITEM_STATUS_ACTIVE), null),
+	'status' =>					array(T_ZBX_INT, O_OPT, null,	IN(array(ITEM_STATUS_DISABLED, ITEM_STATUS_ACTIVE)), null),
 	'type' =>					array(T_ZBX_INT, O_OPT, null,
 		IN(array(-1, ITEM_TYPE_ZABBIX, ITEM_TYPE_SNMPV1, ITEM_TYPE_TRAPPER, ITEM_TYPE_SIMPLE, ITEM_TYPE_SNMPV2C,
 			ITEM_TYPE_INTERNAL, ITEM_TYPE_SNMPV3, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_AGGREGATE, ITEM_TYPE_EXTERNAL,
@@ -505,6 +505,7 @@ elseif (isset($_REQUEST['del_history']) && isset($_REQUEST['itemid'])) {
 	$result = DBend($result);
 	show_messages($result, _('History cleared'), _('Cannot clear history'));
 }
+// mass update
 elseif (isset($_REQUEST['update']) && isset($_REQUEST['massupdate']) && isset($_REQUEST['group_itemid'])) {
 	if (get_request('delay_flex_visible')) {
 		$delay_flex = get_request('delay_flex');
@@ -540,7 +541,7 @@ elseif (isset($_REQUEST['update']) && isset($_REQUEST['massupdate']) && isset($_
 		'description' => get_request('description'),
 		'delay' => get_request('delay'),
 		'history' => get_request('history'),
-		'status' => get_request('status', ITEM_STATUS_DISABLED),
+		'status' => get_request('status'),
 		'type' => get_request('type'),
 		'snmp_community' => get_request('snmp_community'),
 		'snmp_oid' => get_request('snmp_oid'),
