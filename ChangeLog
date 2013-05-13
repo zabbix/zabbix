@@ -64,6 +64,7 @@ A.F.I...S. [ZBXNEXT-1186] increased length to 2048 characters of expression fiel
 ........S. [ZBXNEXT-1663] added support for notification macros {TRIGGER.NAME.ORIG}, {ITEM.NAME.ORIG}, {ITEM.KEY.ORIG} (dimir)
 
 Bug fixes:
+...G...... [ZBX-4636] fixed broken UFT-8 characters in log item on Windows agent when encoding parameter is not set (aleksej)
 A......... [ZBX-6465] fixed undefined index, when inventory mode is not set in API call (Toms)
 ..F....... [ZBX-6580] fixed space between name and count in items subfilter (Eduard)
 ..F.....S. [ZBX-6476] fixed trigger function validation (Eduard, Sasha, wiper)
@@ -204,6 +205,7 @@ A......... [ZBX-6407] improved data retrieval performance for CTrigger get() wit
 A.F....... [ZBX-1357] updated Chinese (China), Spanish and Turkish translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+...G...... [ZBX-4636] fixed broken UFT-8 characters in log item on Windows agent when encoding parameter is not set (aleksej)
 ...G...... [ZBX-6584] fixed possible logrt crash on windows platform when logfile was moved during processing (wiper)
 ..F....... [ZBX-1129] fixed graph time period in bar reports (Oleg)
 ....I..... [ZBX-6490] fixed web test 1.8->2.0 upgrade script ignoring nodes (wiper)
