@@ -164,17 +164,87 @@ class CApplicationManager {
 	 * @return bool
 	 */
 	public function inherit(array $applications, array $hostIds = array()) {
-		$hostsTemplatesMap = $this->getChildHostsFromApplications($applications, $hostIds);
-		if (empty($hostsTemplatesMap)) {
+		$hostTemplateMap = $this->getChildHostsFromApplications($applications, $hostIds);
+		if (empty($hostTemplateMap)) {
 			return true;
 		}
 
-		$preparedApps = $this->prepareInheritedApps($applications, $hostsTemplatesMap);
+		$hostApps = $this->getApplicationMapsByHostIds(array_keys($hostTemplateMap));
+		$preparedApps = $this->prepareInheritedApps($applications, $hostTemplateMap, $hostApps);
 		$inheritedApps = $this->save($preparedApps);
+
+		$applications = zbx_toHash($applications, 'applicationid');
+
+		// update application linkage
+		$oldApplicationTemplateIds = array();
+		$movedAppTemplateIds = array();
+		$childAppIdsPairs = array();
+		foreach ($inheritedApps as $newChildApp) {
+			$oldChildAppsByTemplateId = $hostApps[$newChildApp['hostid']]['byTemplateId'];
+
+			foreach ($newChildApp['applicationTemplates'] as $applicationTemplate) {
+				// check if the parent of this application had a different child on the same host
+				if (isset($oldChildAppsByTemplateId[$applicationTemplate['templateid']])
+						&& $oldChildAppsByTemplateId[$applicationTemplate['templateid']]['applicationid'] != $newChildApp['applicationid']) {
+
+					// if a different child existed, find the template-application link and remove it later
+					$oldChildApp = $oldChildAppsByTemplateId[$applicationTemplate['templateid']];
+					$oldApplicationTemplates = zbx_toHash($oldChildApp['applicationTemplates'], 'templateid');
+					$oldApplicationTemplateIds[] = $oldApplicationTemplates[$applicationTemplate['templateid']]['application_templateid'];
+
+					// save the the IDs of the affected templates and old
+					if (isset($applications[$applicationTemplate['templateid']])) {
+						$movedAppTemplateIds[] = $applications[$applicationTemplate['templateid']]['hostid'];
+						$childAppIdsPairs[$oldChildApp['applicationid']] =  $newChildApp['applicationid'];
+					}
+				}
+			}
+		}
+
+		// move all items and web scenarios from the old app to the new
+		if ($childAppIdsPairs) {
+			$this->moveInheritedHttpTests($movedAppTemplateIds, $childAppIdsPairs);
+		}
+
+		// delete old application links
+		if ($oldApplicationTemplateIds) {
+			DB::delete('application_template', array(
+				'application_templateid' => $oldApplicationTemplateIds
+			));
+		}
 
 		$this->inherit($inheritedApps);
 
 		return true;
+	}
+
+	/**
+	 * Replaces the applications for all http tests inherited from templates $templateIds according to the map given in
+	 * $appIdPairs.
+	 *
+	 * @param array $templateIds
+	 * @param array $appIdPairs		an array of source application ID - target application ID pairs
+	 */
+	protected function moveInheritedHttpTests(array $templateIds, array $appIdPairs) {
+		// find all http tests inherited from the given templates and linked to the given applications
+		$query = DBselect(
+			'SELECT ht2.applicationid,ht2.httptestid'.
+			' FROM httptest ht,httptest ht2'.
+			' WHERE ht.httptestid=ht2.templateid'.
+				' AND '.dbConditionInt('ht.hostid', $templateIds).
+				' AND '.dbConditionInt('ht2.applicationid', array_keys($appIdPairs))
+		);
+		$targetAppHttpTestIds = array();
+		while ($row = DBfetch($query)) {
+			$targetAppHttpTestIds[$appIdPairs[$row['applicationid']]][] = $row['httptestid'];
+		}
+
+		// link the http test to the new apps
+		foreach ($targetAppHttpTestIds as $targetAppId => $httpTestIds) {
+			DB::updateByPk('httptest', $httpTestIds, array(
+				'applicationid' => $targetAppId
+			));
+		}
 	}
 
 	/**
@@ -212,15 +282,14 @@ class CApplicationManager {
 	 * Generate apps data for inheritance.
 	 * Using passed parameters decide if new application must be created on host or existing one must be updated.
 	 *
-	 * @param array $applications which we need to inherit
+	 * @param array $applications 		applications which we need to inherit
 	 * @param array $hostsTemplatesMap
+	 * @param array $hostApps			array of existing applications on the child host returned by
+	 * 									self::getApplicationMapsByHostIds()
 	 *
-	 * @throws Exception
 	 * @return array with applications, existing apps have 'applicationid' key.
 	 */
-	protected function prepareInheritedApps(array $applications, array $hostsTemplatesMap) {
-		$hostApps = $this->getApplicationMapsByHostIds(array_keys($hostsTemplatesMap));
-
+	protected function prepareInheritedApps(array $applications, array $hostsTemplatesMap, array $hostApps) {
 		$result = array();
 		foreach ($applications as $application) {
 			$appId = $application['applicationid'];
@@ -231,22 +300,15 @@ class CApplicationManager {
 				}
 
 				$exApplication = null;
-				// update by templateid
-				if (isset($hostApp['byTemplateId'][$appId])) {
-					$exApplication = $hostApp['byTemplateId'][$appId];
 
-					// check if there's an application on the target host with the same name but from a different template
-					// or no template
-					$templateIds = zbx_objectValues($hostApp['byName'][$application['name']]['applicationTemplates'], 'templateid');
-					if (isset($hostApp['byName'][$application['name']]) && !in_array($appId, $templateIds)) {
-						$host = DBfetch(DBselect('SELECT h.name FROM hosts h WHERE h.hostid='.zbx_dbstr($hostId)));
-						throw new Exception(_s('Application "%1$s" already exists on "%2$s".', $application['name'], $host['name']));
-					}
-				}
-
-				// update by name
+				// look for an application with the same name, it one exists - link the parent app to it
 				if (isset($hostApp['byName'][$application['name']])) {
 					$exApplication = $hostApp['byName'][$application['name']];
+				}
+				// if no application with the same name exists, look for a child app via templateid
+				// use it only if it has only one parent, otherwise a new app must be created
+				elseif (isset($hostApp['byTemplateId'][$appId]) && count($hostApp['byTemplateId'][$appId]['applicationTemplates']) == 1) {
+					$exApplication = $hostApp['byTemplateId'][$appId];
 				}
 
 				$newApplication = $application;
@@ -264,6 +326,7 @@ class CApplicationManager {
 						);
 					}
 				}
+				// if no matching child app exists - create a new one
 				else {
 					$newApplication['applicationTemplates'][] = array(
 						'templateid' => $appId
