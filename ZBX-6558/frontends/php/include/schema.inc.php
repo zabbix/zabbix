@@ -5559,8 +5559,8 @@ return array(
 			),
 			'value_int' => array(
 				'null' => false,
-				'type' => DB::FIELD_TYPE_UINT,
-				'length' => 20,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
 				'default' => '0',
 			),
 			'value_str' => array(
