@@ -259,7 +259,6 @@ static void	set_defaults()
 	if (NULL == CONFIG_PID_FILE)
 		CONFIG_PID_FILE = "/tmp/zabbix_agentd.pid";
 #endif
-
 }
 
 /******************************************************************************
@@ -386,6 +385,10 @@ static void	zbx_load_config(int requirement)
 		{"Hostname",			&CONFIG_HOSTNAME,			TYPE_STRING,
 			PARM_OPT,	0,			0},
 		{"HostnameItem",		&CONFIG_HOSTNAME_ITEM,			TYPE_STRING,
+			PARM_OPT,	0,			0},
+		{"HostMetadata",		&CONFIG_HOST_METADATA,			TYPE_STRING,
+			PARM_OPT,	0,			0},
+		{"HostMetadataItem",		&CONFIG_HOST_METADATA_ITEM,		TYPE_STRING,
 			PARM_OPT,	0,			0},
 		{"BufferSize",			&CONFIG_BUFFER_SIZE,			TYPE_INT,
 			PARM_OPT,	2,			65535},
