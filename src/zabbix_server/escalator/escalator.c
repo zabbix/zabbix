@@ -1315,8 +1315,6 @@ next:
 	/* delete completed escalations */
 	if (0 != escalationids.values_num)
 	{
-		zbx_vector_uint64_sort(&escalationids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-
 		sql_offset = 0;
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "delete from escalations where");
 		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "escalationid",
