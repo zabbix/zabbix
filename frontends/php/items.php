@@ -39,36 +39,6 @@ $paramsFieldName = getParamFieldNameByType(get_request('type', 0));
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = array(
-	'description_visible' =>	array(T_ZBX_STR, O_OPT, null,	null,		null),
-	'type_visible' =>			array(T_ZBX_STR, O_OPT, null,	null,		null),
-	'interface_visible' =>		array(T_ZBX_STR, O_OPT, null,	null,		null),
-	'community_visible' =>		array(T_ZBX_STR, O_OPT, null,	null,		null),
-	'contextname_visible' =>	array(T_ZBX_STR, O_OPT, null,	null,		null),
-	'securityname_visible' =>	array(T_ZBX_STR, O_OPT, null,	null,		null),
-	'securitylevel_visible' =>	array(T_ZBX_STR, O_OPT, null,	null,		null),
-	'authprotocol_visible' =>	array(T_ZBX_STR, O_OPT, null,	null,		null),
-	'authpassphrase_visible' =>	array(T_ZBX_STR, O_OPT, null,	null,		null),
-	'privprotocol_visible' =>	array(T_ZBX_STR, O_OPT, null,	null,		null),
-	'privpassphras_visible' =>	array(T_ZBX_STR, O_OPT, null,	null,		null),
-	'port_visible' =>			array(T_ZBX_STR, O_OPT, null,	null,		null),
-	'authtype_visible' =>		array(T_ZBX_STR, O_OPT, null,	null,		null),
-	'username_visible' =>		array(T_ZBX_STR, O_OPT, null,	null,		null),
-	'publickey_visible' =>		array(T_ZBX_STR, O_OPT, null,	null,		null),
-	'privatekey_visible' =>		array(T_ZBX_STR, O_OPT, null,	null,		null),
-	'password_visible' =>		array(T_ZBX_STR, O_OPT, null,	null,		null),
-	'value_type_visible' =>		array(T_ZBX_STR, O_OPT, null,	null,		null),
-	'data_type_visible' =>		array(T_ZBX_STR, O_OPT, null,	null,		null),
-	'units_visible' =>			array(T_ZBX_STR, O_OPT, null,	null,		null),
-	'formula_visible' =>		array(T_ZBX_STR, O_OPT, null,	null,		null),
-	'delay_visible' =>			array(T_ZBX_STR, O_OPT, null,	null,		null),
-	'delay_flex_visible' =>		array(T_ZBX_STR, O_OPT, null,	null,		null),
-	'history_visible' =>		array(T_ZBX_STR, O_OPT, null,	null,		null),
-	'trends_visible' =>			array(T_ZBX_STR, O_OPT, null,	null,		null),
-	'status_visible' =>			array(T_ZBX_STR, O_OPT, null,	null,		null),
-	'logtimefmt_visible' =>		array(T_ZBX_STR, O_OPT, null,	null,		null),
-	'delta_visible' =>			array(T_ZBX_STR, O_OPT, null,	null,		null),
-	'valuemapid_visible' =>		array(T_ZBX_STR, O_OPT, null,	null,		null),
-	'trapper_hosts_visible' =>	array(T_ZBX_STR, O_OPT, null,	null,		null),
 	'groupid' =>				array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
 	'hostid' =>					array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
 	'interfaceid' =>			array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null, _('Interface')),
@@ -513,7 +483,7 @@ elseif (isset($_REQUEST['del_history']) && isset($_REQUEST['itemid'])) {
 // mass update
 elseif (isset($_REQUEST['update']) && isset($_REQUEST['massupdate']) && isset($_REQUEST['group_itemid'])) {
 	$visible = get_request('visible', array());
-	if (get_request('delay_flex_visible')) {
+	if (isset($visible['delay_flex_visible'])) {
 		$delay_flex = get_request('delay_flex');
 		if (!is_null($delay_flex)) {
 			$db_delay_flex = '';
@@ -801,7 +771,8 @@ elseif ($_REQUEST['go'] == 'massupdate' || isset($_REQUEST['massupdate']) && iss
 		'formula' => get_request('formula', '1'),
 		'logtimefmt' => get_request('logtimefmt', ''),
 		'initial_item_type' => null,
-		'multiple_interface_types' => false
+		'multiple_interface_types' => false,
+		'visible' => get_request('visible', array())
 	);
 
 	// hosts
