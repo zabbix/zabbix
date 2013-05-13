@@ -183,12 +183,12 @@ class CBar extends CGraphDraw {
 				$tmp = 1;
 			}
 
-			$this->columnWidth = floor($seriesSizeX / $tmp);
+			$this->columnWidth = $seriesSizeX / $tmp;
 
 			if ($serieLength == 0) {
 				$serieLength = 1;
 			}
-			$this->seriesWidth = floor($seriesSizeX / $serieLength);
+			$this->seriesWidth = $seriesSizeX / $serieLength;
 		}
 		else {
 			$seriesSizeY = $this->sizeY - ($this->seriesDistance * $serieLength);
@@ -199,12 +199,12 @@ class CBar extends CGraphDraw {
 				$tmp = 1;
 			}
 
-			$this->columnWidth = floor($seriesSizeY / $tmp);
+			$this->columnWidth = $seriesSizeY / $tmp;
 
 			if ($serieLength == 0) {
 				$serieLength = 1;
 			}
-			$this->seriesWidth = floor($seriesSizeY / $serieLength);
+			$this->seriesWidth = $seriesSizeY / $serieLength;
 		}
 	}
 
@@ -492,12 +492,14 @@ class CBar extends CGraphDraw {
 			$i = 0;
 			foreach ($this->series as $key => $serie) {
 				$caption = $this->periodCaption[$key];
+				$dims = imageTextSize(7, 90, $caption);
 
-				$dims = imageTextSize(9, 0, $caption);
-				imageText($this->im, 9, 0,
-					$i * ($this->seriesWidth + $this->seriesDistance) + $this->shiftXleft + $this->shiftXCaptionLeft
-						+ round($this->seriesWidth / 2) - $dims['width'] / 2,
-					$this->sizeY + $this->shiftY + 20,
+				imageText(
+					$this->im,
+					7,
+					90,
+					$i*($this->seriesWidth+$this->seriesDistance)+$this->shiftXleft+$this->shiftXCaptionLeft+round($this->seriesWidth/2)+$dims['width']*2,
+					$this->sizeY+$this->shiftY + $dims['height'] +6,
 					$this->getColor($this->graphtheme['textcolor'], 0),
 					$caption
 				);
