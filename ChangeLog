@@ -6,6 +6,9 @@ A......... [ZBX-6407] improved data retrieval performance for CTrigger get() wit
 A.F....... [ZBX-1357] updated Chinese (China), Spanish and Turkish translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+...G...... [ZBX-4636] fixed broken UFT-8 characters in log item on Windows agent when encoding parameter is not set (aleksej)
+...G...... [ZBX-6470] fixed incorrect swap calculation on Solaris (dimir)
+..F....... [ZBX-5760] fixed graph item legend being rendered incorrectly if the names of the items contain certain local symbols (Pavels)
 ...G...... [ZBX-6584] fixed possible logrt crash on windows platform when logfile was moved during processing (wiper)
 ..F....... [ZBX-1129] fixed graph time period in bar reports (Oleg)
 ....I..... [ZBX-6490] fixed web test 1.8->2.0 upgrade script ignoring nodes (wiper)
