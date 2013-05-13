@@ -1170,6 +1170,20 @@ static int	DBpatch_02010075(void)
 	return DBadd_field("httpstep", &field);
 }
 
+static int	DBpatch_02010076(void)
+{
+	const ZBX_FIELD	field = {"host_metadata", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("autoreg_host", &field);
+}
+
+static int	DBpatch_02010077(void)
+{
+	const ZBX_FIELD	field = {"host_metadata", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("proxy_autoreg_host", &field);
+}
+
 #endif	/* not HAVE_SQLITE3 */
 
 static void	DBget_version(int *mandatory, int *optional)
@@ -1283,11 +1297,13 @@ int	DBcheck_version(void)
 		{DBpatch_02010073, 2010073, 0, 0},
 		{DBpatch_02010074, 2010074, 0, 1},
 		{DBpatch_02010075, 2010075, 0, 1},
+		{DBpatch_02010076, 2010076, 0, 1},
+		{DBpatch_02010077, 2010077, 0, 1},
 		/* IMPORTANT! When adding a new mandatory DBPatch don't forget to update it for SQLite, too. */
 		{NULL}
 	};
 #else
-	required = 2010075;	/* <---- Update mandatory DBpatch for SQLite here. */
+	required = 2010077;	/* <---- Update mandatory DBpatch for SQLite here. */
 #endif
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
