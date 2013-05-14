@@ -422,11 +422,11 @@ jQuery(function($) {
 		// add new
 		if (!empty(data)) {
 			$.each(data, function(i, item) {
-				availableValues.push(item.name);
+				availableValues.push(item.name.toUpperCase());
 			});
 		}
 
-		if (options.addNew == true && !empty(value) && $.inArray(value, availableValues)) {
+		if (options.addNew == true && !empty(value) && $.inArray(value.toUpperCase(), availableValues)) {
 			data[data.length] = {
 				id: value,
 				prefix: '',
