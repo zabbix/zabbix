@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -9,7 +9,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -177,7 +177,7 @@ void	zbx_timespec(zbx_timespec_t *ts)
  *           January 1, 1970, coordinated universal time (UTC).               *
  *                                                                            *
  ******************************************************************************/
-double	zbx_time()
+double	zbx_time(void)
 {
 	zbx_timespec_t	ts;
 
@@ -197,7 +197,7 @@ double	zbx_time()
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  ******************************************************************************/
-double	zbx_current_time()
+double	zbx_current_time(void)
 {
 	return zbx_time() + ZBX_JAN_1970_IN_SEC;
 }

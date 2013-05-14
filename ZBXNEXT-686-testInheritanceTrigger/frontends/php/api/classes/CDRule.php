@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -10,15 +10,15 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
+
 /**
  * File containing drule class for API.
  * @package API
@@ -32,12 +32,13 @@ class CDRule extends CZBXAPI {
 	protected $tableAlias = 'dr';
 	protected $sortColumns = array('druleid', 'name');
 
-/**
-* Get drule data
-*
-* @param array $options
-* @return array
-*/
+	/**
+	 * Get drule data.
+	 *
+	 * @param array $options
+	 *
+	 * @return array
+	 */
 	public function get(array $options = array()) {
 		$result = array();
 		$nodeCheck = false;
@@ -316,16 +317,19 @@ class CDRule extends CZBXAPI {
 					}
 
 					$itemKey = new CItemKey($dCheck['key_']);
-					if (!$itemKey->isValid())
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect key: %s', $itemKey->getError()));
+					if (!$itemKey->isValid()) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect key: "%1$s".', $itemKey->getError()));
+					}
 					break;
 				case SVC_SNMPv1:
 				case SVC_SNMPv2c:
-					if (!isset($dCheck['snmp_community']) || zbx_empty($dCheck['snmp_community']))
+					if (!isset($dCheck['snmp_community']) || zbx_empty($dCheck['snmp_community'])) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect SNMP community.'));
+					}
 				case SVC_SNMPv3:
-					if (!isset($dCheck['key_']) || zbx_empty($dCheck['key_']))
+					if (!isset($dCheck['key_']) || zbx_empty($dCheck['key_'])) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect SNMP OID.'));
+					}
 					break;
 			}
 
@@ -417,7 +421,7 @@ class CDRule extends CZBXAPI {
 	}
 
 	/**
-	 * Create new discovery rules
+	 * Create new discovery rules.
 	 *
 	 * @param array(
 	 *  name => string,
@@ -439,6 +443,7 @@ class CDRule extends CZBXAPI {
 	 *  	), ...
 	 *  )
 	 * ) $drules
+	 *
 	 * @return array
 	 */
 	public function create(array $dRules) {
@@ -468,56 +473,57 @@ class CDRule extends CZBXAPI {
 		return array('druleids' => $druleids);
 	}
 
-/**
- * Update existing drules
- *
- * @param array(
- * 	druleid => int,
- *  name => string,
- *  proxy_hostid => int,
- *  iprange => string,
- *  delay => string,
- *  status => int,
- *  dchecks => array(
- *  	array(
- * 			dcheckid => int,
- *  		type => int,
- *  		ports => string,
- *  		key_ => string,
- *  		snmp_community => string,
- *  		snmpv3_securityname => string,
- *  		snmpv3_securitylevel => int,
- *  		snmpv3_authpassphrase => string,
- *  		snmpv3_privpassphrase => string,
- *  		uniq => int,
- *  	), ...
- *  )
- * ) $drules
- * @return array
- */
+	/**
+	 * Update existing drules.
+	 *
+	 * @param array(
+	 * 	druleid => int,
+	 *  name => string,
+	 *  proxy_hostid => int,
+	 *  iprange => string,
+	 *  delay => string,
+	 *  status => int,
+	 *  dchecks => array(
+	 *  	array(
+	 * 			dcheckid => int,
+	 *  		type => int,
+	 *  		ports => string,
+	 *  		key_ => string,
+	 *  		snmp_community => string,
+	 *  		snmpv3_securityname => string,
+	 *  		snmpv3_securitylevel => int,
+	 *  		snmpv3_authpassphrase => string,
+	 *  		snmpv3_privpassphrase => string,
+	 *  		uniq => int,
+	 *  	), ...
+	 *  )
+	 * ) $dRules
+	 *
+	 * @return array
+	 */
 	public function update(array $dRules) {
 		$this->checkInput($dRules);
 		$this->validateRequiredFields($dRules, __FUNCTION__);
 
-		$dRuleids = zbx_objectValues($dRules, 'druleid');
+		$dRuleIds = zbx_objectValues($dRules, 'druleid');
 
 		$dRulesDb = API::DRule()->get(array(
-			'druleids' => $dRuleids,
+			'druleids' => $dRuleIds,
 			'output' => API_OUTPUT_EXTEND,
 			'selectDChecks' => API_OUTPUT_EXTEND,
 			'editable' => true,
-			'preservekeys' => true,
+			'preservekeys' => true
 		));
 
 		$defaultValues = DB::getDefaults('dchecks');
 
-		$dRulesUpdate = $dCheckidsDelete = $dChecksCreate = array();
-		foreach ($dRules as $dRule) {
+		$dRulesUpdate = $dCheckIdsDelete = $dChecksCreate = array();
 
-			// checking to the duplicate names
+		foreach ($dRules as $dRule) {
+			// validate drule duplicate names
 			if (strcmp($dRulesDb[$dRule['druleid']]['name'], $dRule['name']) != 0) {
 				if ($this->exists($dRule)) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Discovery rule [%s] already exists', $dRule['name']));
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Discovery rule "%s" already exists.', $dRule['name']));
 				}
 			}
 
@@ -526,49 +532,48 @@ class CDRule extends CZBXAPI {
 				'where' => array('druleid' => $dRule['druleid'])
 			);
 
+			// update dchecks
 			$dbChecks = $dRulesDb[$dRule['druleid']]['dchecks'];
-			$newChecks = $dRule['dchecks'];
-			foreach ($newChecks as &$dCheck) {
-				$dCheck += $defaultValues;
-			}
-			unset($dCheck);
 
-			foreach ($newChecks as $newnum => $newdCheck) {
-				foreach ($dbChecks as $exnum => $exdCheck) {
-					if (!DB::recordModified('dchecks', $exdCheck, $newdCheck)) {
-						unset($dRule['dchecks'][$newnum]);
-						unset($dbChecks[$exnum]);
-					}
+			$newChecks = array();
+
+			foreach ($dRule['dchecks'] as $cnum => $check) {
+				if (!isset($check['druleid'])) {
+					$check['druleid'] = $dRule['druleid'];
+					unset($check['dcheckid']);
+
+					$newChecks[] = array_merge($defaultValues, $check);
+
+					unset($dRule['dchecks'][$cnum]);
 				}
 			}
 
-			foreach ($dRule['dchecks'] as $dCheck) {
-				$dCheck['druleid'] = $dRule['druleid'];
-				$dChecksCreate[] = $dCheck;
+			$delDCheckIds = array_diff(
+				zbx_objectValues($dbChecks, 'dcheckid'),
+				zbx_objectValues($dRule['dchecks'], 'dcheckid')
+			);
+
+			if ($delDCheckIds) {
+				$this->deleteActionConditions($delDCheckIds);
 			}
 
-			$dCheckidsDelete = array_merge($dCheckidsDelete, zbx_objectValues($dbChecks, 'dcheckid'));
+			DB::replace('dchecks', $dbChecks, array_merge($dRule['dchecks'], $newChecks));
 		}
 
 		DB::update('drules', $dRulesUpdate);
 
-		if (!empty($dCheckidsDelete)) {
-			$this->deleteChecks($dCheckidsDelete);
-		}
-
-		DB::insert('dchecks', $dChecksCreate);
-
-		return array('druleids' => $dRuleids);
+		return array('druleids' => $dRuleIds);
 	}
 
-/**
- * Delete drules
- *
- * @param array $druleids
- * @return boolean
- */
-	public function delete(array $druleids) {
-		$druleids = zbx_toArray($druleids);
+	/**
+	 * Delete drules.
+	 *
+	 * @param array $druleIds
+	 *
+	 * @return boolean
+	 */
+	public function delete(array $druleIds) {
+		$druleIds = zbx_toArray($druleIds);
 
 		if (self::$userData['type'] >= USER_TYPE_ZABBIX_ADMIN) {
 			if (!count(get_accessible_nodes_by_user(self::$userData, PERM_READ_WRITE, PERM_RES_IDS_ARRAY))) {
@@ -576,63 +581,75 @@ class CDRule extends CZBXAPI {
 			}
 		}
 
-		$actionids = array();
-		$sql = 'SELECT DISTINCT actionid '.
-				' FROM conditions '.
-				' WHERE conditiontype='.CONDITION_TYPE_DRULE.
-				' AND '.dbConditionString('value', $druleids);
-		$dbActions = DBselect($sql);
+		$actionIds = array();
+
+		$dbActions = DBselect(
+			'SELECT DISTINCT c.actionid'.
+			' FROM c.conditions'.
+			' WHERE c.conditiontype='.CONDITION_TYPE_DRULE.
+				' AND '.dbConditionString('c.value', $druleIds).
+			' ORDER BY c.actionid'
+		);
 		while ($dbAction = DBfetch($dbActions)) {
-			$actionids[] = $dbAction['actionid'];
+			$actionIds[] = $dbAction['actionid'];
 		}
 
-		if (!empty($actionids)) {
+		if ($actionIds) {
 			DB::update('actions', array(
 				'values' => array('status' => ACTION_STATUS_DISABLED),
-				'where' => array('actionid' => $actionids),
+				'where' => array('actionid' => $actionIds),
 			));
 
 			DB::delete('conditions', array(
 				'conditiontype' => CONDITION_TYPE_DRULE,
-				'value' => $druleids
+				'value' => $druleIds
 			));
 		}
 
-		DB::delete('drules', array('druleid' => $druleids));
+		DB::delete('drules', array('druleid' => $druleIds));
 
-		return array('druleids' => $druleids);
+		return array('druleids' => $druleIds);
 	}
 
-	protected function deleteChecks(array $checkids) {
-		$actionids = array();
+	/**
+	 * Delete related action conditions.
+	 *
+	 * @param array $dCheckIds
+	 */
+	protected function deleteActionConditions(array $dCheckIds) {
+		$actionIds = array();
+
 		// conditions
-		$sql = 'SELECT DISTINCT actionid '.
-				' FROM conditions '.
-				' WHERE conditiontype='.CONDITION_TYPE_DCHECK.
-				' AND '.dbConditionString('value', $checkids);
-		$dbActions = DBselect($sql);
-		while ($dbAction = DBfetch($dbActions))
-			$actionids[] = $dbAction['actionid'];
-
-		// disabling actions with deleted conditions
-		if (!empty($actionids)) {
-			DBexecute('UPDATE actions '.
-					' SET status='.ACTION_STATUS_DISABLED.
-					' WHERE '.dbConditionInt('actionid', $actionids));
-
-			// delete action conditions
-			DBexecute('DELETE FROM conditions '.
-					' WHERE conditiontype='.CONDITION_TYPE_DCHECK.
-					' AND '.dbConditionString('value', $checkids));
+		$dbActions = DBselect(
+			'SELECT DISTINCT c.actionid'.
+			' FROM conditions c'.
+			' WHERE c.conditiontype='.CONDITION_TYPE_DCHECK.
+				' AND '.dbConditionString('c.value', $dCheckIds).
+			' ORDER BY c.actionid'
+		);
+		while ($dbAction = DBfetch($dbActions)) {
+			$actionIds[] = $dbAction['actionid'];
 		}
 
-		DB::delete('dchecks', array('dcheckid' => $checkids));
+		// disabling actions with deleted conditions
+		if ($actionIds) {
+			DB::update('actions', array(
+				'values' => array('status' => ACTION_STATUS_DISABLED),
+				'where' => array('actionid' => $actionIds),
+			));
+
+			DB::delete('conditions', array(
+				'conditiontype' => CONDITION_TYPE_DCHECK,
+				'value' => $dCheckIds
+			));
+		}
 	}
 
 	/**
 	 * Check if user has read permissions for discovery rule.
 	 *
 	 * @param array $ids
+	 *
 	 * @return bool
 	 */
 	public function isReadable(array $ids) {
@@ -655,6 +672,7 @@ class CDRule extends CZBXAPI {
 	 * Check if user has write permissions for discovery rule.
 	 *
 	 * @param array $ids
+	 *
 	 * @return bool
 	 */
 	public function isWritable(array $ids) {
@@ -747,6 +765,4 @@ class CDRule extends CZBXAPI {
 
 		return $result;
 	}
-
 }
-?>

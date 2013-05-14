@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2012 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -45,7 +45,7 @@ $actionFormList->addRow(_('Name'), $nameTextBox);
 $actionFormList->addRow(_('Default subject'), new CTextBox('def_shortdata', $this->data['action']['def_shortdata'], ZBX_TEXTBOX_STANDARD_SIZE));
 $actionFormList->addRow(_('Default message'), new CTextArea('def_longdata', $this->data['action']['def_longdata']));
 
-if ($this->data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
+if ($this->data['eventsource'] == EVENT_SOURCE_TRIGGERS || $this->data['eventsource'] == EVENT_SOURCE_INTERNAL) {
 	$actionFormList->addRow(_('Recovery message'), new CCheckBox('recovery_msg', $this->data['action']['recovery_msg'], 'javascript: submit();', 1));
 	if ($this->data['action']['recovery_msg']) {
 		$actionFormList->addRow(_('Recovery subject'), new CTextBox('r_shortdata', $this->data['action']['r_shortdata'], ZBX_TEXTBOX_STANDARD_SIZE));
@@ -92,7 +92,7 @@ foreach ($this->data['action']['conditions'] as $condition) {
 	$conditionTable->addRow(
 		array(
 			$labelSpan,
-			get_condition_desc($condition['conditiontype'], $condition['operator'], $condition['value']).SPACE,
+			get_condition_desc($condition['conditiontype'], $condition['operator'], $condition['value']),
 			array(
 				new CButton('remove', _('Remove'), 'javascript: removeCondition('.$i.');', 'link_menu'),
 				new CVar('conditions['.$i.']', $condition)
@@ -139,32 +139,31 @@ switch ($this->data['new_condition']['conditiontype']) {
 			)
 		);
 		break;
+
 	case CONDITION_TYPE_HOST_TEMPLATE:
-		$conditionFormList->addItem(new CVar('new_condition[value]', '0'));
-		$rowCondition[] = array(
-			new CTextBox('hostname', '', ZBX_TEXTBOX_STANDARD_SIZE, 'yes'),
-			SPACE,
-			new CButton('btn1', _('Select'),
-				'return PopUp("popup.php?srctbl=host_templates&srcfld1=templateid&srcfld2=name'.
-					'&dstfrm='.$actionForm->getName().'&dstfld1=new_condition_value&dstfld2=hostname'.
-					'&templated_hosts=1&writeonly=1", 450, 450);',
-				'link_menu'
-			)
-		);
+		$rowCondition[] = new CDiv(new CMultiSelect(array(
+			'name' => 'new_condition[value]',
+			'selectedLimit' => 1,
+			'objectName' => 'templates',
+			'objectOptions' => array(
+				'editable' => true
+			),
+			'defaultValue' => 0
+		)), 'floatright');
 		break;
+
 	case CONDITION_TYPE_HOST:
-		$conditionFormList->addItem(new CVar('new_condition[value]', '0'));
-		$rowCondition[] = array(
-			new CTextBox('hostname', '', ZBX_TEXTBOX_STANDARD_SIZE, 'yes'),
-			SPACE,
-			new CButton('btn1', _('Select'),
-				'return PopUp("popup.php?srctbl=hosts&srcfld1=hostid&srcfld2=name'.
-					'&dstfrm='.$actionForm->getName().'&dstfld1=new_condition_value&dstfld2=hostname'.
-					'&real_hosts=1&writeonly=1&noempty=1", 450, 450);',
-				'link_menu'
-			)
-		);
+		$rowCondition[] = new CDiv(new CMultiSelect(array(
+			'name' => 'new_condition[value]',
+			'selectedLimit' => 1,
+			'objectName' => 'hosts',
+			'objectOptions' => array(
+				'editable' => true
+			),
+			'defaultValue' => 0
+		)), 'floatright');
 		break;
+
 	case CONDITION_TYPE_TRIGGER:
 		$conditionFormList->addItem(new CVar('new_condition[value]', '0'));
 		$rowCondition[] = array(
@@ -178,9 +177,11 @@ switch ($this->data['new_condition']['conditiontype']) {
 			)
 		);
 		break;
+
 	case CONDITION_TYPE_TRIGGER_NAME:
 		$rowCondition[] = new CTextBox('new_condition[value]', '', ZBX_TEXTBOX_STANDARD_SIZE);
 		break;
+
 	case CONDITION_TYPE_TRIGGER_VALUE:
 		$conditionValueComboBox = new CComboBox('new_condition[value]');
 		foreach (array(TRIGGER_VALUE_FALSE, TRIGGER_VALUE_TRUE) as $trigerValue) {
@@ -188,17 +189,21 @@ switch ($this->data['new_condition']['conditiontype']) {
 		}
 		$rowCondition[] = $conditionValueComboBox;
 		break;
+
 	case CONDITION_TYPE_TIME_PERIOD:
 		$rowCondition[] = new CTextBox('new_condition[value]', ZBX_DEFAULT_INTERVAL, ZBX_TEXTBOX_STANDARD_SIZE);
 		break;
+
 	case CONDITION_TYPE_TRIGGER_SEVERITY:
 		$conditionValueComboBox = new CComboBox('new_condition[value]');
 		$conditionValueComboBox->addItems(getSeverityCaption());
 		$rowCondition[] = $conditionValueComboBox;
 		break;
+
 	case CONDITION_TYPE_MAINTENANCE:
 		$rowCondition[] = new CCol(_('maintenance'));
 		break;
+
 	case CONDITION_TYPE_NODE:
 		$conditionFormList->addItem(new CVar('new_condition[value]', '0'));
 		$rowCondition[] = array(
@@ -212,6 +217,7 @@ switch ($this->data['new_condition']['conditiontype']) {
 			)
 		);
 		break;
+
 	case CONDITION_TYPE_DRULE:
 		$conditionFormList->addItem(new CVar('new_condition[value]', '0'));
 		$rowCondition[] = array(
@@ -224,6 +230,7 @@ switch ($this->data['new_condition']['conditiontype']) {
 			)
 		);
 		break;
+
 	case CONDITION_TYPE_DCHECK:
 		$conditionFormList->addItem(new CVar('new_condition[value]', '0'));
 		$rowCondition[] = array(
@@ -236,6 +243,7 @@ switch ($this->data['new_condition']['conditiontype']) {
 			)
 		);
 		break;
+
 	case CONDITION_TYPE_PROXY:
 		$conditionFormList->addItem(new CVar('new_condition[value]', '0'));
 		$rowCondition[] = array(
@@ -249,9 +257,11 @@ switch ($this->data['new_condition']['conditiontype']) {
 			)
 		);
 		break;
+
 	case CONDITION_TYPE_DHOST_IP:
 		$rowCondition[] = new CTextBox('new_condition[value]', '192.168.0.1-127,192.168.2.1', ZBX_TEXTBOX_STANDARD_SIZE);
 		break;
+
 	case CONDITION_TYPE_DSERVICE_TYPE:
 		$conditionValueComboBox = new CComboBox('new_condition[value]');
 		foreach (array(SVC_SSH, SVC_LDAP, SVC_SMTP, SVC_FTP, SVC_HTTP, SVC_HTTPS, SVC_POP, SVC_NNTP, SVC_IMAP, SVC_TCP, SVC_AGENT,
@@ -260,9 +270,11 @@ switch ($this->data['new_condition']['conditiontype']) {
 		}
 		$rowCondition[] = $conditionValueComboBox;
 		break;
+
 	case CONDITION_TYPE_DSERVICE_PORT:
 		$rowCondition[] = new CTextBox('new_condition[value]', '0-1023,1024-49151', ZBX_TEXTBOX_STANDARD_SIZE);
 		break;
+
 	case CONDITION_TYPE_DSTATUS:
 		$conditionValueComboBox = new CComboBox('new_condition[value]');
 		foreach (array(DOBJECT_STATUS_UP, DOBJECT_STATUS_DOWN, DOBJECT_STATUS_DISCOVER, DOBJECT_STATUS_LOST) as $stat) {
@@ -270,6 +282,7 @@ switch ($this->data['new_condition']['conditiontype']) {
 		}
 		$rowCondition[] = $conditionValueComboBox;
 		break;
+
 	case CONDITION_TYPE_DOBJECT:
 		$conditionValueComboBox = new CComboBox('new_condition[value]');
 		foreach (array(EVENT_OBJECT_DHOST, EVENT_OBJECT_DSERVICE) as $object) {
@@ -277,17 +290,24 @@ switch ($this->data['new_condition']['conditiontype']) {
 		}
 		$rowCondition[] = $conditionValueComboBox;
 		break;
+
 	case CONDITION_TYPE_DUPTIME:
 		$rowCondition[] = new CNumericBox('new_condition[value]', 600, 15);
 		break;
+
 	case CONDITION_TYPE_DVALUE:
 		$rowCondition[] = new CTextBox('new_condition[value]', '', ZBX_TEXTBOX_STANDARD_SIZE);
 		break;
+
 	case CONDITION_TYPE_APPLICATION:
 		$rowCondition[] = new CTextBox('new_condition[value]', '', ZBX_TEXTBOX_STANDARD_SIZE);
 		break;
+
 	case CONDITION_TYPE_HOST_NAME:
 		$rowCondition[] = new CTextBox('new_condition[value]', '', ZBX_TEXTBOX_STANDARD_SIZE);
+		break;
+	case CONDITION_TYPE_EVENT_TYPE:
+		$rowCondition[] = new CComboBox('new_condition[value]', null, null, eventType());
 		break;
 }
 
@@ -305,7 +325,7 @@ $conditionFormList->addRow(_('New condition'), $newConditionDiv);
  */
 $operationFormList = new CFormList('operationlist');
 
-if ($this->data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
+if ($this->data['eventsource'] == EVENT_SOURCE_TRIGGERS || $this->data['eventsource'] == EVENT_SOURCE_INTERNAL) {
 	$operationFormList->addRow(_('Default operation step duration'), array(
 		new CNumericBox('esc_period', $this->data['action']['esc_period'], 6, 'no'),
 		' ('._('minimum 60 seconds').')')
@@ -315,7 +335,7 @@ if ($this->data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
 // create operation table
 $operationsTable = new CTable(_('No operations defined.'), 'formElementTable');
 $operationsTable->attr('style', 'min-width: 600px;');
-if ($this->data['action']['eventsource'] == EVENT_SOURCE_TRIGGERS) {
+if ($this->data['action']['eventsource'] == EVENT_SOURCE_TRIGGERS || $this->data['eventsource'] == EVENT_SOURCE_INTERNAL) {
 	$operationsTable->setHeader(array(_('Steps'), _('Details'), _('Start in'), _('Duration (sec)'), _('Action')));
 	$delay = count_operations_delay($this->data['action']['operations'], $this->data['action']['esc_period']);
 }
@@ -337,7 +357,7 @@ foreach ($this->data['action']['operations'] as $operationid => $operation) {
 	$details = new CSpan(get_operation_descr(SHORT_DESCRIPTION, $operation));
 	$details->setHint(get_operation_descr(LONG_DESCRIPTION, $operation));
 
-	if ($this->data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
+	if ($this->data['eventsource'] == EVENT_SOURCE_TRIGGERS || $this->data['eventsource'] == EVENT_SOURCE_INTERNAL) {
 		$esc_steps_txt = null;
 		$esc_period_txt = null;
 		$esc_delay_txt = null;
@@ -411,7 +431,7 @@ if (!empty($this->data['new_operation'])) {
 		$newOperationsTable->addItem(new CVar('new_operation[operationid]', $this->data['new_operation']['operationid']));
 	}
 
-	if ($this->data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
+	if ($this->data['eventsource'] == EVENT_SOURCE_TRIGGERS || $this->data['eventsource'] == EVENT_SOURCE_INTERNAL) {
 		$stepNumericBox = new CNumericBox('new_operation[esc_step_from]', $this->data['new_operation']['esc_step_from'], 5);
 		$stepNumericBox->addAction('onchange', 'javascript:'.$stepNumericBox->getAttribute('onchange').' if(this.value == 0) this.value=1;');
 
@@ -440,12 +460,26 @@ if (!empty($this->data['new_operation'])) {
 		$newOperationsTable->addRow(array(_('Step'), $stepTable));
 	}
 
-	$operationTypeComboBox = new CComboBox('new_operation[operationtype]', $this->data['new_operation']['operationtype'], 'submit()');
-	foreach ($this->data['allowedOperations'] as $operation) {
-		$operationTypeComboBox->addItem($operation, operation_type2str($operation));
+	// if multiple operation types are available, display a select
+	if (count($this->data['allowedOperations']) > 1) {
+		$operationTypeComboBox = new CComboBox(
+			'new_operation[operationtype]',
+			$this->data['new_operation']['operationtype'], 'submit()'
+		);
+		foreach ($this->data['allowedOperations'] as $operation) {
+			$operationTypeComboBox->addItem($operation, operation_type2str($operation));
+		}
+		$newOperationsTable->addRow(array(_('Operation type'), $operationTypeComboBox), 'indent_both');
+	}
+	// if only one operation is available - show only the label
+	else {
+		$operation = $this->data['allowedOperations'][0];
+		$newOperationsTable->addRow(array(
+			_('Operation type'),
+			array(operation_type2str($operation), new CVar('new_operation[operationtype]', $operation)),
+		), 'indent_both');
 	}
 
-	$newOperationsTable->addRow(array(_('Operation type'), $operationTypeComboBox), 'indent_both');
 	switch ($this->data['new_operation']['operationtype']) {
 		case OPERATION_TYPE_MESSAGE:
 			if (!isset($this->data['new_operation']['opmessage'])) {
@@ -463,6 +497,10 @@ if (!empty($this->data['new_operation'])) {
 				elseif ($this->data['eventsource'] == EVENT_SOURCE_AUTO_REGISTRATION) {
 					$this->data['new_operation']['opmessage']['subject'] = ACTION_DEFAULT_SUBJ_AUTOREG;
 					$this->data['new_operation']['opmessage']['message'] = ACTION_DEFAULT_MSG_AUTOREG;
+				}
+				else {
+					$this->data['new_operation']['opmessage']['subject'] = '';
+					$this->data['new_operation']['opmessage']['message'] = '';
 				}
 			}
 
@@ -553,6 +591,7 @@ if (!empty($this->data['new_operation'])) {
 				$newOperationsTable->addItem(new CVar('new_operation[opmessage][message]', $this->data['new_operation']['opmessage']['message']));
 			}
 			break;
+
 		case OPERATION_TYPE_COMMAND:
 			if (!isset($this->data['new_operation']['opcommand'])) {
 				$this->data['new_operation']['opcommand'] = array();
@@ -727,6 +766,7 @@ if (!empty($this->data['new_operation'])) {
 			$commandIpmiTextBox->attr('id', 'opcommand_command_ipmi');
 			$newOperationsTable->addRow(array(_('Commands'), $commandIpmiTextBox), 'class_opcommand_command_ipmi hidden indent_both');
 			break;
+
 		case OPERATION_TYPE_HOST_ADD:
 		case OPERATION_TYPE_HOST_REMOVE:
 		case OPERATION_TYPE_HOST_ENABLE:
@@ -736,6 +776,7 @@ if (!empty($this->data['new_operation'])) {
 			$newOperationsTable->addItem(new CVar('new_operation[shortdata]', ''));
 			$newOperationsTable->addItem(new CVar('new_operation[longdata]', ''));
 			break;
+
 		case OPERATION_TYPE_GROUP_ADD:
 		case OPERATION_TYPE_GROUP_REMOVE:
 			if (!isset($this->data['new_operation']['opgroup'])) {
@@ -769,6 +810,7 @@ if (!empty($this->data['new_operation'])) {
 
 			$newOperationsTable->addRow(array($caption, new CDiv($groupList, 'objectgroup inlineblock border_dotted ui-corner-all')));
 			break;
+
 		case OPERATION_TYPE_TEMPLATE_ADD:
 		case OPERATION_TYPE_TEMPLATE_REMOVE:
 			if (!isset($this->data['new_operation']['optemplate'])) {
@@ -777,27 +819,34 @@ if (!empty($this->data['new_operation'])) {
 
 			$templateList = new CTable();
 			$templateList->setAttribute('id', 'opTemplateList');
+			$templateList->addRow(new CRow(
+				new CCol(array(
+					new CMultiSelect(array(
+						'name' => 'discoveryTemplates',
+						'objectName' => 'templates'
+					)),
+					new CButton('add', _('Add'), 'return addDiscoveryTemplates();', 'link_menu')
+				), null, 2),
+				null,
+				'opTemplateListFooter'
+			));
 
-			$addUsrgrpBtn = new CButton('add', _('Add'),
-				'return PopUp("popup.php?srctbl=host_templates&srcfld1=templateid&srcfld2=name'.
-					'&dstfrm=action.edit&reference=dsc_templateid&templated_hosts=1&multiselect=1",450,450)',
-				'link_menu');
-			$templateList->addRow(new CRow(new CCol($addUsrgrpBtn, null, 2), null, 'opTemplateListFooter'));
-
-			// add participations
-			$templateids = isset($this->data['new_operation']['optemplate'])
+			// load templates
+			$templateIds = isset($this->data['new_operation']['optemplate'])
 				? zbx_objectValues($this->data['new_operation']['optemplate'], 'templateid')
 				: array();
 
-			$templates = API::Template()->get(array(
-				'templateids' => $templateids,
-				'output' => array('templateid', 'name')
-			));
-			order_result($templates, 'name');
+			if ($templateIds) {
+				$templates = API::Template()->get(array(
+					'templateids' => $templateIds,
+					'output' => array('templateid', 'name')
+				));
+				order_result($templates, 'name');
 
-			$jsInsert = '';
-			$jsInsert .= 'addPopupValues('.zbx_jsvalue(array('object' => 'dsc_templateid', 'values' => $templates)).');';
-			zbx_add_post_js($jsInsert);
+				$jsInsert = '';
+				$jsInsert .= 'addPopupValues('.zbx_jsvalue(array('object' => 'dsc_templateid', 'values' => $templates)).');';
+				zbx_add_post_js($jsInsert);
+			}
 
 			$caption = (OPERATION_TYPE_TEMPLATE_ADD == $this->data['new_operation']['operationtype'])
 				? _('Link with templates')

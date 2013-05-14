@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -9,7 +9,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -20,6 +20,15 @@
 #ifndef ZABBIX_HTTPMACRO_H
 #define ZABBIX_HTTPMACRO_H
 
-void	http_substitute_macros(const char *macros, char **data);
+typedef struct
+{
+	DB_HTTPTEST		httptest;
+	/* httptest macro cache consisting of (key, value) pair array */
+	zbx_vector_ptr_pair_t   macros;
+}
+zbx_httptest_t;
+
+void	http_substitute_variables(zbx_httptest_t *httptest, char **data);
+int	http_process_variables(zbx_httptest_t *httptest, const char *variables, const char *data, char **err_str);
 
 #endif
