@@ -196,8 +196,8 @@ class testFormAction extends CWebTest {
 		sleep(1);
 		$this->select("opCmdTarget", "label=Host");
 		$this->zbxTestTextPresent(array('Target list', 'Target', 'Action'));
-		$this->assertElementPresent("//input[@placeholder='type here to search']");
-		$this->input_type("//input[@placeholder='type here to search']", 'Simple form test host');
+		$this->assertElementPresent("//input[@placeholder]");
+		$this->input_type("//input[@placeholder]", 'Simple form test host');
 		sleep(1);
 		$this->zbxTestClick("//span[@class='matched']");
 		$this->zbxTestClick("//input[@name='save']");
@@ -208,8 +208,8 @@ class testFormAction extends CWebTest {
 		sleep(1);
 		$this->select("opCmdTarget", "label=Host group");
 		$this->zbxTestTextPresent(array('Target list', 'Target', 'Action'));
-		$this->assertElementPresent("//input[@placeholder='type here to search']");
-		$this->input_type("//input[@placeholder='type here to search']", 'Zabbix servers');
+		$this->assertElementPresent("//input[@placeholder]");
+		$this->input_type("//input[@placeholder]", 'Zabbix servers');
 		sleep(1);
 		$this->zbxTestClick("//span[@class='matched']");
 		$this->zbxTestClick("//input[@name='save']");
@@ -245,8 +245,8 @@ class testFormAction extends CWebTest {
 
 		$this->type("esc_period", "123");
 		sleep(1);
-		$this->type('new_condition_value', '');
-		sleep(1);
+	//	$this->type('new_condition_value', '');
+	//	sleep(1);
 
 		$this->zbxTestClickWait('save');
 		$this->zbxTestTextPresent('Action added');
