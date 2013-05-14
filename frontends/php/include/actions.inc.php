@@ -92,6 +92,8 @@ function condition_type2str($conditionType) {
 			return _('Proxy');
 		case CONDITION_TYPE_EVENT_TYPE:
 			return _('Event type');
+		case CONDITION_TYPE_HOST_METADATA:
+			return _('Host metadata');
 		default:
 			return _('Unknown');
 	}
@@ -169,6 +171,7 @@ function condition_value2str($conditiontype, $value) {
 			}
 			break;
 		case CONDITION_TYPE_TRIGGER_NAME:
+		case CONDITION_TYPE_HOST_METADATA:
 		case CONDITION_TYPE_HOST_NAME:
 			$str_val = $value;
 			break;
@@ -547,7 +550,8 @@ function get_conditions_by_eventsource($eventsource) {
 	);
 	$conditions[EVENT_SOURCE_AUTO_REGISTRATION] = array(
 		CONDITION_TYPE_HOST_NAME,
-		CONDITION_TYPE_PROXY
+		CONDITION_TYPE_PROXY,
+		CONDITION_TYPE_HOST_METADATA
 	);
 	$conditions[EVENT_SOURCE_INTERNAL] = array(
 		CONDITION_TYPE_APPLICATION,
@@ -766,6 +770,10 @@ function get_operators_by_conditiontype($conditiontype) {
 	);
 	$operators[CONDITION_TYPE_EVENT_TYPE] = array(
 		CONDITION_OPERATOR_EQUAL
+	);
+	$operators[CONDITION_TYPE_HOST_METADATA] = array(
+		CONDITION_OPERATOR_LIKE,
+		CONDITION_OPERATOR_NOT_LIKE
 	);
 
 	if (isset($operators[$conditiontype])) {
