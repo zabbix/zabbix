@@ -22,6 +22,7 @@
 $applicationWidget = new CWidget();
 
 $createForm = new CForm('get');
+$createForm->cleanItems();
 $createForm->addVar('hostid', $this->data['hostid']);
 
 // append host summary to widget header
