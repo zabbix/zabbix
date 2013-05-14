@@ -191,7 +191,8 @@ class CConfigurationExportBuilder {
 				'iconmap' => $map['iconmap'],
 				'urls' => $this->formatMapUrls($map['urls']),
 				'selements' => $this->formatMapElements($map['selements']),
-				'links' => $this->formatMapLinks($map['links'])
+				'links' => $this->formatMapLinks($map['links']),
+				'severity_min' => $map['severity_min'],
 			);
 		}
 	}
