@@ -544,7 +544,7 @@ elseif (isset($_REQUEST['update']) && isset($_REQUEST['massupdate']) && isset($_
 
 		if (isset($visible['applications'])) {
 			if (isset($_REQUEST['applications'])) {
-				if (isset($existApplication)){
+				if (isset($existApplication)) {
 					$applications = array_unique(array_merge($_REQUEST['applications'], $existApplication));
 				}
 				else {
@@ -604,7 +604,7 @@ elseif (isset($_REQUEST['update']) && isset($_REQUEST['massupdate']) && isset($_
 				$linkApplications[] = array('applicationid' => $linkApp);
 			}
 			foreach (get_request('group_itemid') as $linkItem) {
-				$linkItems[] = array('itemid' => $linkItem);;
+				$linkItems[] = array('itemid' => $linkItem);
 			}
 			$linkApp = array(
 				'applications' => $linkApplications,
