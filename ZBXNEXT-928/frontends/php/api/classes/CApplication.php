@@ -476,16 +476,14 @@ class CApplication extends CZBXAPI {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Application "%1$s" used by scenario "%2$s" and can\'t be deleted.', $delApplications[$info['applicationid']]['name'], $info['name']));
 		}
 
-		DB::delete('applications', array('applicationid' => $applicationids));
+		$appManager = new CApplicationManager();
+		$appManager->delete($applicationids);
 
 		// TODO: remove info from API
 		foreach ($delApplications as $delApplication) {
 			$host = reset($delApplication['hosts']);
 			info(_s('Deleted: Application "%1$s" on "%2$s".', $delApplication['name'], $host['name']));
 		}
-
-		// remove Monitoring > Latest data toggle profile values related to given aplications
-		CProfile::delete('web.latest.toggle', $delApplicationIds);
 
 		return array('applicationids' => $delApplicationIds);
 	}
