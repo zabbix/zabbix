@@ -40,10 +40,11 @@ extern unsigned char	daemon_type;
  *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
- * Comments:                                                                  *
+ * Comments: NB! adds host to the database if it does not exist               *
  *                                                                            *
  ******************************************************************************/
-static int	get_hostid_by_host(const char *host, const char *ip, unsigned short port, zbx_uint64_t *hostid, char *error)
+static int	get_hostid_by_host(const char *host, const char *ip, unsigned short port, const char *host_metadata,
+		zbx_uint64_t *hostid, char *error)
 {
 	const char	*__function_name = "get_hostid_by_host";
 
@@ -96,13 +97,9 @@ static int	get_hostid_by_host(const char *host, const char *ip, unsigned short p
 		DBbegin();
 
 		if (0 != (daemon_type & ZBX_DAEMON_TYPE_SERVER))
-		{
-			DBregister_host(0, host, ip, dns, port, (int)time(NULL));
-		}
+			DBregister_host(0, host, ip, dns, port, host_metadata, (int)time(NULL));
 		else if (0 != (daemon_type & ZBX_DAEMON_TYPE_PROXY))
-		{
-			DBproxy_register_host(host, ip, dns, port);
-		}
+			DBproxy_register_host(host, ip, dns, port, host_metadata);
 
 		DBcommit();
 	}
@@ -158,7 +155,7 @@ static void	get_list_of_active_checks(zbx_uint64_t hostid, zbx_uint64_t **itemid
  *                                                                            *
  * Function: send_list_of_active_checks                                       *
  *                                                                            *
- * Purpose: send list of active checks to the host                            *
+ * Purpose: send list of active checks to the host (older version agent)      *
  *                                                                            *
  * Parameters: sock - open socket of server-agent connection                  *
  *             request - request buffer                                       *
@@ -196,7 +193,8 @@ int	send_list_of_active_checks(zbx_sock_t *sock, char *request)
 
 	strscpy(ip, get_ip_by_socket(sock));
 
-	if (FAIL == get_hostid_by_host(host, ip, ZBX_DEFAULT_AGENT_PORT, &hostid, error))
+	/* no host metadata in older versions of agent */
+	if (FAIL == get_hostid_by_host(host, ip, ZBX_DEFAULT_AGENT_PORT, "", &hostid, error))
 		goto out;
 
 	get_list_of_active_checks(hostid, &itemids, &items, &items_num);
@@ -311,7 +309,7 @@ int	send_list_of_active_checks_json(zbx_sock_t *sock, struct zbx_json_parse *jp)
 #define ZBX_KEY_EVENTLOG	2
 
 	char		host[HOST_HOST_LEN_MAX], params[MAX_STRING_LEN], tmp[MAX_STRING_LEN],
-			ip[INTERFACE_IP_LEN_MAX], error[MAX_STRING_LEN];
+			ip[INTERFACE_IP_LEN_MAX], error[MAX_STRING_LEN], host_metadata[HOST_METADATA_LEN_MAX];
 	struct zbx_json	json;
 	int		ret = FAIL;
 	zbx_uint64_t	hostid, *itemids = NULL;
@@ -331,6 +329,9 @@ int	send_list_of_active_checks_json(zbx_sock_t *sock, struct zbx_json_parse *jp)
 		goto error;
 	}
 
+	if (FAIL == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_HOST_METADATA, host_metadata, sizeof(host_metadata)))
+		*host_metadata = '\0';
+
 	if (FAIL == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_IP, ip, sizeof(ip)))
 		strscpy(ip, get_ip_by_socket(sock));
 
@@ -340,7 +341,7 @@ int	send_list_of_active_checks_json(zbx_sock_t *sock, struct zbx_json_parse *jp)
 	if (FAIL == is_ushort(tmp, &port))
 		port = ZBX_DEFAULT_AGENT_PORT;
 
-	if (FAIL == get_hostid_by_host(host, ip, port, &hostid, error))
+	if (FAIL == get_hostid_by_host(host, ip, port, host_metadata, &hostid, error))
 		goto error;
 
 	get_list_of_active_checks(hostid, &itemids, &items, &items_num);

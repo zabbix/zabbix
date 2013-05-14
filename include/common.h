@@ -149,6 +149,9 @@ const char	*zbx_result_string(int result);
 #define ZBX_MAX_UINT64_LEN	21
 #define ZBX_DM_DELIMITER	'\255'
 
+#define HOST_METADATA_LEN	255
+#define HOST_METADATA_LEN_MAX	HOST_METADATA_LEN+1
+
 typedef struct
 {
 	int	sec;	/* seconds */
