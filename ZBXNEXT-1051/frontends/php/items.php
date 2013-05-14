@@ -518,7 +518,7 @@ elseif (isset($_REQUEST['update']) && isset($_REQUEST['massupdate']) && isset($_
 		// add new or existing applications
 		if (isset($visible['new_applications']) && !empty($_REQUEST['new_applications'])) {
 			foreach ($_REQUEST['new_applications'] as $newApplication) {
-				if (isset($newApplication['new'])) {
+				if (is_array($newApplication) && isset($newApplication['new'])) {
 					$newApplications[] = array(
 						'name' => $newApplication['new'],
 						'hostid' => get_request('hostid')

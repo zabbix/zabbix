@@ -245,7 +245,7 @@ elseif (isset($_REQUEST['go']) && $_REQUEST['go'] == 'massupdate' && isset($_REQ
 		if (isset($visible['new_groups']) && !empty($_REQUEST['new_groups'])) {
 			if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
 				foreach ($_REQUEST['new_groups'] as $newGroup) {
-					if (isset($newGroup['new'])) {
+					if (is_array($newGroup) && isset($newGroup['new'])) {
 						$newGroups[] = array('name' => $newGroup['new']);
 					}
 					else {
