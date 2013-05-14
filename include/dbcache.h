@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -9,7 +9,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -106,7 +106,7 @@ typedef struct
 	int		delay;
 	int		nextcheck;
 	int		lastclock;
-	unsigned char	status;
+	unsigned char	state;
 	char		trapper_hosts[ITEM_TRAPPER_HOSTS_LEN_MAX];
 	char		logtimefmt[ITEM_LOGTIMEFMT_LEN_MAX];
 	char		snmp_community_orig[ITEM_SNMP_COMMUNITY_LEN_MAX], *snmp_community;
@@ -126,6 +126,7 @@ typedef struct
 	unsigned char	flags;
 	unsigned char	snmpv3_authprotocol;
 	unsigned char	snmpv3_privprotocol;
+	char		snmpv3_contextname_orig[ITEM_SNMPV3_CONTEXTNAME_LEN_MAX], *snmpv3_contextname;
 }
 DC_ITEM;
 
@@ -142,16 +143,18 @@ DC_FUNCTION;
 typedef struct
 {
 	zbx_uint64_t	triggerid;
+	char		*description;
+	char		*expression_orig;
 	char		*expression;
-	char		error[TRIGGER_ERROR_LEN_MAX];
+	char		*error;
 	char		*new_error;
 	zbx_timespec_t	timespec;
 	int		lastchange;
+	unsigned char	priority;
 	unsigned char	type;
 	unsigned char	value;
-	unsigned char	value_flags;
+	unsigned char	state;
 	unsigned char	new_value;
-	unsigned char	add_event;
 }
 DC_TRIGGER;
 
@@ -175,16 +178,39 @@ typedef struct
 }
 zbx_host_key_t;
 
+/* housekeeping related configuration data*/
+typedef struct
+{
+	int		events_trigger;
+	int		events_internal;
+	int		events_discovery;
+	int		events_autoreg;
+	int		services;
+	int		audit;
+	int		sessions;
+	int		trends;
+	int		history;
+
+	unsigned char	services_mode;
+	unsigned char	audit_mode;
+	unsigned char	sessions_mode;
+	unsigned char	events_mode;
+	unsigned char	trends_mode;
+	unsigned char	trends_global;
+	unsigned char	history_mode;
+	unsigned char	history_global;
+}
+zbx_config_hk_t;
+
 void	dc_add_history(zbx_uint64_t itemid, unsigned char value_type, unsigned char flags, AGENT_RESULT *value,
-		zbx_timespec_t *ts, unsigned char status, const char *error, int timestamp, const char *source,
+		zbx_timespec_t *ts, unsigned char state, const char *error, int timestamp, const char *source,
 		int severity, int logeventid, zbx_uint64_t lastlogsize, int mtime);
 void	dc_flush_history();
 int	DCsync_history(int sync_type);
 void	init_database_cache();
 void	free_database_cache();
 
-void	DCinit_nextchecks();
-void	DCadd_nextcheck(zbx_uint64_t itemid, time_t now, const char *error_msg);
+void	DCadd_nextcheck(zbx_uint64_t itemid, const zbx_timespec_t *ts, const char *error_msg);
 void	DCflush_nextchecks();
 
 #define ZBX_STATS_HISTORY_COUNTER	0
@@ -227,30 +253,33 @@ void	DCconfig_get_functions_by_functionids(DC_FUNCTION *functions,
 void	DCconfig_clean_functions(DC_FUNCTION *functions, int *errcodes, size_t num);
 void	DCconfig_get_triggers_by_itemids(zbx_hashset_t *trigger_info, zbx_vector_ptr_t *trigger_order,
 		const zbx_uint64_t *itemids, const zbx_timespec_t *timespecs, char **errors, int item_num);
-int	DCconfig_get_trigger_for_event(DB_TRIGGER *trigger, zbx_uint64_t triggerid);
 void	DCconfig_get_time_based_triggers(DC_TRIGGER **trigger_info, zbx_vector_ptr_t *trigger_order, int process_num);
+void	DCfree_triggers(zbx_vector_ptr_t *triggers);
 int	DCconfig_get_interface_by_type(DC_INTERFACE *interface, zbx_uint64_t hostid, unsigned char type);
 int	DCconfig_get_poller_nextcheck(unsigned char poller_type);
 int	DCconfig_get_poller_items(unsigned char poller_type, DC_ITEM *items, int max_items);
 int	DCconfig_get_snmp_interfaceids_by_addr(const char *addr, zbx_uint64_t **interfaceids);
 size_t	DCconfig_get_snmp_items_by_interfaceid(zbx_uint64_t interfaceid, DC_ITEM **items);
 
-#define	CONFIG_ALERT_HISTORY		1
-#define	CONFIG_EVENT_HISTORY		2
-#define	CONFIG_REFRESH_UNSUPPORTED	3
-#define	CONFIG_DISCOVERY_GROUPID	4
-#define	CONFIG_SNMPTRAP_LOGGING		5
+#define	CONFIG_REFRESH_UNSUPPORTED	1
+#define	CONFIG_DISCOVERY_GROUPID	2
+#define	CONFIG_SNMPTRAP_LOGGING		3
+
+#define ZBX_HK_OPTION_DISABLED		0
+#define ZBX_HK_OPTION_ENABLED		1
+
 void	*DCconfig_get_config_data(void *data, int type);
+void	DCconfig_get_config_hk(zbx_config_hk_t *data);
 int	DCget_trigger_severity_name(unsigned char priority, char **replace_to);
 
-void	DCrequeue_items(zbx_uint64_t *itemids, unsigned char *statuses, int *lastclocks, int *errcodes, size_t num);
+void	DCrequeue_items(zbx_uint64_t *itemids, unsigned char *states, int *lastclocks, int *errcodes, size_t num);
 int	DCconfig_activate_host(DC_ITEM *item);
 int	DCconfig_deactivate_host(DC_ITEM *item, int now);
 
 int	DCconfig_check_trigger_dependencies(zbx_uint64_t triggerid);
 
 void	DCconfig_set_trigger_value(zbx_uint64_t triggerid, unsigned char value,
-		unsigned char value_flags, const char *error, int *lastchange);
+		unsigned char state, const char *error, int *lastchange);
 void	DCconfig_set_maintenance(zbx_uint64_t hostid, int maintenance_status,
 		int maintenance_type, int maintenance_from);
 

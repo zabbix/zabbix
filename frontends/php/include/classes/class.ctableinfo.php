@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2012 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -75,12 +75,13 @@ class CTableInfo extends CTable {
 								"-o-transform-origin": transform
 							};
 
-							if (IE9) {
-								css["-ms-transform-origin"] = transform;
-							}
-
 							if (IE) {
 								css["font-family"] = "monospace";
+								css["-ms-transform-origin"] = "50% 50%";
+							}
+
+							if (IE9) {
+								css["-ms-transform-origin"] = transform;
 							}
 
 							var divInner = $("<div>", {

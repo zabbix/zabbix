@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -10,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -25,19 +25,13 @@ define('TRIGGER_BAD', 1);
 
 class testFormTrigger extends CWebTest {
 
-	/**
-	 * Backup the tables that will be modified during the tests.
-	 */
-	public function testFormTrigger_setup() {
-		DBsave_tables('triggers');
-	}
 
-	/**
-	 * @dataProvider itemTypes
-	 */
 	public function testFormTrigger_CheckLayout() {
 
-		$this->zbxTestLogin('triggers.php');
+		$this->zbxTestLogin('hosts.php');
+		$this->zbxTestClickWait('link=Simple form test host');
+		$this->zbxTestClickWait("//div[@class='w']//a[text()='Triggers']");
+
 		$this->checkTitle('Configuration of triggers');
 		$this->zbxTestTextPresent('CONFIGURATION OF TRIGGERS');
 
@@ -72,8 +66,7 @@ class testFormTrigger extends CWebTest {
 		$this->assertElementPresent("//*/span[text()='Expression constructor']");
 
 		// expression constructor
-		$this->zbxTestClick("//*/span[text()='Expression constructor']");
-		sleep(1);
+		$this->zbxTestClickWait("//*/span[text()='Expression constructor']");
 
 		$this->zbxTestTextPresent('Target');
 		$this->zbxTestTextPresent('Expression');
@@ -87,8 +80,8 @@ class testFormTrigger extends CWebTest {
 		$this->assertAttribute("//textarea[@id='expr_temp']/@readonly", 'readonly');
 		$this->assertElementPresent("//*/span[text()='Close expression constructor']");
 
-		$this->zbxTestClick("//*/span[text()='Close expression constructor']");
-		sleep(1);
+		$this->zbxTestClickWait("//*/span[text()='Close expression constructor']");
+
 		$this->zbxTestTextNotPresent('Insert macro');
 		$this->zbxTestTextNotPresent('Close expression constructor');
 
@@ -129,12 +122,5 @@ class testFormTrigger extends CWebTest {
 		$this->zbxTestClick('link=Dependencies');
 		$this->assertElementPresent('bnt1');
 		$this->zbxTestClick('link=Trigger');
-	}
-
-	/**
-	 * Restore the original tables.
-	 */
-	public function testFormTrigger_teardown() {
-		DBrestore_tables('triggers');
 	}
 }

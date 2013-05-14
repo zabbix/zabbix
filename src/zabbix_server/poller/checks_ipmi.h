@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -9,7 +9,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -27,8 +27,8 @@
 #include "dbcache.h"
 #include "sysinfo.h"
 
-int	init_ipmi_handler();
-int	free_ipmi_handler();
+int	init_ipmi_handler(void);
+int	free_ipmi_handler(void);
 int	get_value_ipmi(DC_ITEM *item, AGENT_RESULT *value);
 int	parse_ipmi_command(const char *command, char *c_name, int *val, char *error, size_t max_error_len);
 int	set_ipmi_control_value(DC_ITEM *item, int value, char *error, size_t max_error_len);
