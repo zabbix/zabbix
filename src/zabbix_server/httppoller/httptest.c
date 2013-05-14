@@ -322,7 +322,7 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 	if (NULL == (easyhandle = curl_easy_init()))
 	{
 		err_str = zbx_strdup(err_str, "could not init cURL library");
-		zabbix_log(LOG_LEVEL_ERR, "web scenario \"%s\" error: %s", httptest->httptest.name, err_str);
+		zabbix_log(LOG_LEVEL_ERR, "web scenario \"%s\" on host [%s] error: %s", httptest->httptest.name, host->name, err_str);
 		goto clean;
 	}
 
@@ -336,8 +336,8 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_SSL_VERIFYHOST, 0L)))
 	{
 		err_str = zbx_strdup(err_str, curl_easy_strerror(err));
-		zabbix_log(LOG_LEVEL_ERR, "web scenario \"%s\" error: could not set cURL option [%d]: %s",
-				httptest->httptest.name, opt, err_str);
+		zabbix_log(LOG_LEVEL_ERR, "web scenario \"%s\" on host [%s] error: could not set cURL option [%d]: %s",
+				httptest->httptest.name, host->name, opt, err_str);
 		goto clean;
 	}
 
@@ -381,9 +381,9 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 		if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_POSTFIELDS, httpstep.posts)))
 		{
 			err_str = zbx_strdup(err_str, curl_easy_strerror(err));
-			zabbix_log(LOG_LEVEL_ERR, "web scenario \"%s:%s\" error:"
+			zabbix_log(LOG_LEVEL_ERR, "web scenario \"%s:%s\" on host [%s] error:"
 					" could not set cURL option [%d]: %s",
-					httptest->httptest.name, httpstep.name, opt, err_str);
+					httptest->httptest.name, httpstep.name, host->name, opt, err_str);
 			goto httpstep_error;
 		}
 
@@ -394,9 +394,9 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 				'\0' != *httpstep.posts ? 1L : 0L)))
 		{
 			err_str = zbx_strdup(err_str, curl_easy_strerror(err));
-			zabbix_log(LOG_LEVEL_ERR, "web scenario \"%s:%s\" error:"
+			zabbix_log(LOG_LEVEL_ERR, "web scenario \"%s:%s\" on host [%s] error:"
 					" could not set cURL option [%d]: %s",
-					httptest->httptest.name, httpstep.name, opt, err_str);
+					httptest->httptest.name, httpstep.name, host->name, opt, err_str);
 			goto httpstep_error;
 		}
 
@@ -427,9 +427,9 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 					CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_USERPWD, auth)))
 			{
 				err_str = zbx_strdup(err_str, curl_easy_strerror(err));
-				zabbix_log(LOG_LEVEL_ERR, "web scenario step \"%s:%s\" error:"
+				zabbix_log(LOG_LEVEL_ERR, "web scenario step \"%s:%s\" on host [%s] error:"
 						" could not set cURL option [%d]: %s",
-						httptest->httptest.name, httpstep.name, opt, err_str);
+						httptest->httptest.name, httpstep.name, host->name, opt, err_str);
 				goto httpstep_error;
 			}
 		}
@@ -440,9 +440,9 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 				CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_TIMEOUT, (long)httpstep.timeout)))
 		{
 			err_str = zbx_strdup(err_str, curl_easy_strerror(err));
-			zabbix_log(LOG_LEVEL_ERR, "web scenario step \"%s:%s\" error:"
+			zabbix_log(LOG_LEVEL_ERR, "web scenario step \"%s:%s\" on host [%s] error:"
 					" could not set cURL option [%d]: %s",
-					httptest->httptest.name, httpstep.name, opt, err_str);
+					httptest->httptest.name, httpstep.name, host->name, opt, err_str);
 			goto httpstep_error;
 		}
 
@@ -467,9 +467,9 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 
 			if (CURLE_OK != (err = curl_easy_getinfo(easyhandle, CURLINFO_RESPONSE_CODE, &stat.rspcode)))
 			{
-				zabbix_log(LOG_LEVEL_ERR, "web scenario step \"%s:%s\" error:"
+				zabbix_log(LOG_LEVEL_ERR, "web scenario step \"%s:%s\" on host [%s] error:"
 						" error getting CURLINFO_RESPONSE_CODE: %s",
-						httptest->httptest.name, httpstep.name, curl_easy_strerror(err));
+						httptest->httptest.name, httpstep.name, host->name, curl_easy_strerror(err));
 				if (NULL == err_str)
 					err_str = zbx_strdup(err_str, curl_easy_strerror(err));
 			}
@@ -484,18 +484,18 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 
 			if (CURLE_OK != (err = curl_easy_getinfo(easyhandle, CURLINFO_TOTAL_TIME, &stat.total_time)))
 			{
-				zabbix_log(LOG_LEVEL_ERR, "web scenario step \"%s:%s\" error:"
+				zabbix_log(LOG_LEVEL_ERR, "web scenario step \"%s:%s\" on host [%s] error:"
 						" error getting CURLINFO_TOTAL_TIME: %s",
-						httptest->httptest.name, httpstep.name, curl_easy_strerror(err));
+						httptest->httptest.name, httpstep.name, host->name, curl_easy_strerror(err));
 				if (NULL == err_str)
 					err_str = zbx_strdup(err_str, curl_easy_strerror(err));
 			}
 
 			if (CURLE_OK != (err = curl_easy_getinfo(easyhandle, CURLINFO_SPEED_DOWNLOAD, &stat.speed_download)))
 			{
-				zabbix_log(LOG_LEVEL_ERR, "web scenario step \"%s:%s\" error:"
+				zabbix_log(LOG_LEVEL_ERR, "web scenario step \"%s:%s\" on host [%s] error:"
 						" error getting CURLINFO_SPEED_DOWNLOAD: %s",
-						httptest->httptest.name, httpstep.name, curl_easy_strerror(err));
+						httptest->httptest.name, httpstep.name, host->name, curl_easy_strerror(err));
 				if (NULL == err_str)
 					err_str = zbx_strdup(err_str, curl_easy_strerror(err));
 			}
@@ -511,9 +511,9 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 			{
 				size_t	err_size = 0, err_offset = 0;
 
-				zabbix_log(LOG_LEVEL_ERR, "web scenario step \"%s:%s\" error:"
+				zabbix_log(LOG_LEVEL_ERR, "web scenario step \"%s:%s\" on host [%s] error:"
 						" error extracting variables: %s",
-						httptest->httptest.name, httpstep.name, httpstep.variables);
+						httptest->httptest.name, httpstep.name, host->name, httpstep.variables);
 
 				if (NULL == err_str)
 				{
@@ -526,9 +526,9 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 		else
 		{
 			err_str = zbx_strdup(err_str, curl_easy_strerror(err));
-			zabbix_log(LOG_LEVEL_ERR, "web scenario step \"%s:%s\" error:"
+			zabbix_log(LOG_LEVEL_ERR, "web scenario step \"%s:%s\" on host [%s] error:"
 					" error doing curl_easy_perform: %s",
-					httptest->httptest.name, httpstep.name, err_str);
+					httptest->httptest.name, httpstep.name, host->name, err_str);
 		}
 
 		zbx_free(page.data);
