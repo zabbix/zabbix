@@ -127,17 +127,15 @@ $rowCondition[] = $conditionOperatorsComboBox;
 
 switch ($this->data['new_condition']['conditiontype']) {
 	case CONDITION_TYPE_HOST_GROUP:
-		$conditionFormList->addItem(new CVar('new_condition[value]', '0'));
-		$rowCondition[] = array(
-			new CTextBox('group', '', ZBX_TEXTBOX_STANDARD_SIZE, 'yes'),
-			SPACE,
-			new CButton('btn1', _('Select'),
-				"return PopUp('popup.php?writeonly=1&dstfrm=".$actionForm->getName().
-				'&dstfld1=new_condition_value&dstfld2=group&srctbl=host_group'.
-				"&srcfld1=groupid&srcfld2=name', 450, 450);",
-				'link_menu'
-			)
-		);
+		$rowCondition[] = new CDiv(new CMultiSelect(array(
+			'name' => 'new_condition[value]',
+			'selectedLimit' => 1,
+			'objectName' => 'hostGroup',
+			'objectOptions' => array(
+				'editable' => true
+			),
+			'defaultValue' => 0
+		)), 'floatright');
 		break;
 
 	case CONDITION_TYPE_HOST_TEMPLATE:
