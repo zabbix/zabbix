@@ -1745,6 +1745,45 @@ static void	DBdelete_applications(zbx_uint64_t *applicationids, int applicationi
 
 /******************************************************************************
  *                                                                            *
+ * Function: DBgroup_prototypes_delete                                        *
+ *                                                                            *
+ * Parameters: del_group_prototypeids - [IN] list of group_prototypeids which *
+ *                                      will be deleted                       *
+ *                                                                            *
+ ******************************************************************************/
+static void	DBgroup_prototypes_delete(zbx_vector_uint64_t *del_group_prototypeids)
+{
+	char			*sql = NULL;
+	size_t			sql_alloc = 0, sql_offset;
+	zbx_vector_uint64_t	groupids;
+
+	if (0 == del_group_prototypeids->values_num)
+		return;
+
+	zbx_vector_uint64_create(&groupids);
+
+	sql_offset = 0;
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select groupid from group_discovery where");
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "parent_group_prototypeid",
+			del_group_prototypeids->values, del_group_prototypeids->values_num);
+
+	DBselect_uint64(sql, &groupids);
+
+	DBdelete_groups(&groupids);
+
+	sql_offset = 0;
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from group_prototype where");
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "group_prototypeid",
+			del_group_prototypeids->values, del_group_prototypeids->values_num);
+
+	DBexecute("%s", sql);
+
+	zbx_vector_uint64_destroy(&groupids);
+	zbx_free(sql);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: DBdelete_host_prototypes                                         *
  *                                                                            *
  * Purpose: deletes host prototypes from database                             *
@@ -1755,8 +1794,8 @@ static void	DBdelete_applications(zbx_uint64_t *applicationids, int applicationi
 static void	DBdelete_host_prototypes(zbx_vector_uint64_t *host_prototypeids)
 {
 	char			*sql = NULL;
-	size_t			sql_alloc = 0, sql_offset = 0;
-	zbx_vector_uint64_t	hostids;
+	size_t			sql_alloc = 0, sql_offset;
+	zbx_vector_uint64_t	hostids, group_prototypeids;
 
 	if (0 == host_prototypeids->values_num)
 		return;
@@ -1764,7 +1803,9 @@ static void	DBdelete_host_prototypes(zbx_vector_uint64_t *host_prototypeids)
 	/* delete discovered hosts */
 
 	zbx_vector_uint64_create(&hostids);
+	zbx_vector_uint64_create(&group_prototypeids);
 
+	sql_offset = 0;
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select hostid from host_discovery where");
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "parent_hostid",
 			host_prototypeids->values, host_prototypeids->values_num);
@@ -1773,6 +1814,17 @@ static void	DBdelete_host_prototypes(zbx_vector_uint64_t *host_prototypeids)
 
 	if (0 != hostids.values_num)
 		DBdelete_hosts(&hostids);
+
+	/* delete group prototypes */
+
+	sql_offset = 0;
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select group_prototypeid from group_prototype where");
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid",
+			host_prototypeids->values, host_prototypeids->values_num);
+
+	DBselect_uint64(sql, &group_prototypeids);
+
+	DBgroup_prototypes_delete(&group_prototypeids);
 
 	/* delete host prototypes */
 
@@ -1783,6 +1835,7 @@ static void	DBdelete_host_prototypes(zbx_vector_uint64_t *host_prototypeids)
 
 	DBexecute("%s", sql);
 
+	zbx_vector_uint64_destroy(&group_prototypeids);
 	zbx_vector_uint64_destroy(&hostids);
 	zbx_free(sql);
 }
@@ -3314,45 +3367,6 @@ static void	DBhost_prototypes_save(zbx_vector_ptr_t *host_prototypes, zbx_vector
 		DBexecute("%s", sql6);
 		zbx_free(sql6);
 	}
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: DBgroup_prototypes_delete                                        *
- *                                                                            *
- * Parameters: del_group_prototypeids - [OUT] list of group_prototypeids      *
- *                                      which will be deleted                 *
- *                                                                            *
- ******************************************************************************/
-static void	DBgroup_prototypes_delete(zbx_vector_uint64_t *del_group_prototypeids)
-{
-	char			*sql = NULL;
-	size_t			sql_alloc = 0, sql_offset;
-	zbx_vector_uint64_t	groupids;
-
-	if (0 == del_group_prototypeids->values_num)
-		return;
-
-	zbx_vector_uint64_create(&groupids);
-
-	sql_offset = 0;
-	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select groupid from group_discovery where");
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "parent_group_prototypeid",
-			del_group_prototypeids->values, del_group_prototypeids->values_num);
-
-	DBselect_uint64(sql, &groupids);
-
-	DBdelete_groups(&groupids);
-
-	sql_offset = 0;
-	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from group_prototype where");
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "group_prototypeid",
-			del_group_prototypeids->values, del_group_prototypeids->values_num);
-
-	DBexecute("%s", sql);
-
-	zbx_vector_uint64_destroy(&groupids);
-	zbx_free(sql);
 }
 
 /******************************************************************************
