@@ -355,18 +355,55 @@ json_error:
  ******************************************************************************/
 static int	refresh_active_checks(const char *host, unsigned short port)
 {
+	const char	*__function_name = "refresh_active_checks";
 	zbx_sock_t	s;
 	char		*buf;
 	int		ret;
 	struct zbx_json	json;
 	static int	last_ret = SUCCEED;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In refresh_active_checks('%s',%u)", host, port);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() host:'%s' port:%u", __function_name, host, port);
 
 	zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
 
 	zbx_json_addstring(&json, ZBX_PROTO_TAG_REQUEST, ZBX_PROTO_VALUE_GET_ACTIVE_CHECKS, ZBX_JSON_TYPE_STRING);
 	zbx_json_addstring(&json, ZBX_PROTO_TAG_HOST, CONFIG_HOSTNAME, ZBX_JSON_TYPE_STRING);
+
+	if (NULL != CONFIG_HOST_METADATA)
+	{
+		if (HOST_METADATA_LEN < strlen(CONFIG_HOST_METADATA))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "the value of configuration parameter \"HostMetadata\" is too"
+					" long, truncating at position %d", HOST_METADATA_LEN_MAX);
+			CONFIG_HOST_METADATA[HOST_METADATA_LEN] = '\0';
+		}
+		zbx_json_addstring(&json, ZBX_PROTO_TAG_HOST_METADATA, CONFIG_HOST_METADATA, ZBX_JSON_TYPE_STRING);
+	}
+	else if (NULL != CONFIG_HOST_METADATA_ITEM)
+	{
+		char		**value;
+		AGENT_RESULT	result;
+
+		init_result(&result);
+
+		if (SUCCEED == process(CONFIG_HOST_METADATA_ITEM, PROCESS_LOCAL_COMMAND, &result) &&
+				NULL != (value = GET_STR_RESULT(&result)))
+		{
+			if (HOST_METADATA_LEN < strlen(*value))
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "returned value of item %s specified by configuration"
+						" parameter \"HostMetadataItem\" is too long, truncating at position %d",
+						CONFIG_HOST_METADATA_ITEM, HOST_METADATA_LEN_MAX);
+				(*value)[HOST_METADATA_LEN] = '\0';
+			}
+			zbx_json_addstring(&json, ZBX_PROTO_TAG_HOST_METADATA, *value, ZBX_JSON_TYPE_STRING);
+		}
+		else
+			zabbix_log(LOG_LEVEL_WARNING, "cannot get host metadata using item \"%s\" specified by"
+					" configuration parameter \"HostMetadataItem\"", CONFIG_HOST_METADATA_ITEM);
+
+		free_result(&result);
+	}
 
 	if (NULL != CONFIG_LISTEN_IP)
 	{
@@ -420,6 +457,8 @@ static int	refresh_active_checks(const char *host, unsigned short port)
 	last_ret = ret;
 
 	zbx_json_free(&json);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
 }

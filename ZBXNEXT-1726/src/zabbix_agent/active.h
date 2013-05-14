@@ -24,6 +24,8 @@
 
 extern char	*CONFIG_SOURCE_IP;
 extern char	*CONFIG_HOSTNAME;
+extern char	*CONFIG_HOST_METADATA;
+extern char	*CONFIG_HOST_METADATA_ITEM;
 extern int	CONFIG_REFRESH_ACTIVE_CHECKS;
 extern int	CONFIG_BUFFER_SEND;
 extern int	CONFIG_BUFFER_SIZE;
