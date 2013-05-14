@@ -36,9 +36,9 @@ class CSeverity extends CTag {
 		$controls = array();
 
 		foreach (getSeverityCaption() as $severity => $caption) {
-			$controls[] = new CRadioButton($options['name'], $severity, null, 'severity_'.$severity, ($options['value'] == $severity));
+			$controls[] = new CRadioButton($options['name'], $severity, null, $options['name'].'_'.$severity, ($options['value'] == $severity));
 
-			$label = new CLabel($caption, 'severity_'.$severity, 'severity_label_'.$severity);
+			$label = new CLabel($caption, $options['name'].'_'.$severity, $options['name'].'_label_'.$severity);
 			$label->attr('data-severity', $severity);
 			$label->attr('data-severity-style', getSeverityStyle($severity));
 			$controls[] = $label;
@@ -47,24 +47,26 @@ class CSeverity extends CTag {
 		$this->addItem($controls);
 
 		insert_js('
-			jQuery("#severity_0, #severity_1, #severity_2, #severity_3, #severity_4, #severity_5").change(function() {
-				// remove classes from all labels
+			jQuery("#'.$options['name'].'_0, #'.$options['name'].'_1, #'.$options['name'].'_2, #'.$options['name'].'_3," +
+					"#'.$options['name'].'_4, #'.$options['name'].'_5").change(function() {
 				jQuery("div.control-severity label").each(function(i, obj) {
 					obj = jQuery(obj);
 					obj.removeClass(obj.data("severityStyle"));
 				});
 
-				var label = jQuery("#severity_label_" + jQuery(this).val());
+				var label = jQuery("#'.$options['name'].'_label_" + jQuery(this).val());
 				label.addClass(label.data("severityStyle"));
 			});
 
-			jQuery("#severity_label_0, #severity_label_1, #severity_label_2, #severity_label_3, #severity_label_4, #severity_label_5").mouseenter(function() {
+			jQuery("#'.$options['name'].'_label_0, #'.$options['name'].'_label_1, #'.$options['name'].'_label_2," +
+					"#'.$options['name'].'_label_3, #'.$options['name'].'_label_4, #'.$options['name'].'_label_5").mouseenter(function() {
 				var obj = jQuery(this);
 
 				obj.addClass(obj.data("severityStyle"));
 			});
 
-			jQuery("#severity_label_0, #severity_label_1, #severity_label_2, #severity_label_3, #severity_label_4, #severity_label_5").mouseleave(function() {
+			jQuery("#'.$options['name'].'_label_0, #'.$options['name'].'_label_1, #'.$options['name'].'_label_2," +
+					"#'.$options['name'].'_label_3, #'.$options['name'].'_label_4, #'.$options['name'].'_label_5").mouseleave(function() {
 				var obj = jQuery(this);
 
 				if (!jQuery("#" + obj.attr("for")).prop("checked")) {

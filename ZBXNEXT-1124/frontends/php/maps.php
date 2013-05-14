@@ -136,9 +136,13 @@ $data['map'] = API::Map()->get(array(
 $data['map'] = reset($data['map']);
 
 $data['pageFilter'] = new CPageFilter(array(
-	'severitiesMin' => array('severity_min' => get_request('severity_min'))
+	'severitiesMin' => array(
+		'default' => $data['map']['severity_min'],
+		'mapId' => $data['sysmapid']
+	),
+	'severityMin' => get_request('severity_min')
 ));
-$data['severity_min'] = $data['pageFilter']->severity_min;
+$data['severity_min'] = $data['pageFilter']->severityMin;
 
 // render view
 $mapsView = new CView('monitoring.maps', $data);

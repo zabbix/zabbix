@@ -96,7 +96,7 @@ class CPageFilter {
 		'triggerid' => null,
 		'graphid' => null,
 		'druleid' => null,
-		'severity_min' => null
+		'severityMin' => null
 	);
 
 	/**
@@ -133,7 +133,7 @@ class CPageFilter {
 		'triggerid' => null,
 		'graphid' => null,
 		'druleid' => null,
-		'severity_min' => null
+		'severityMin' => null
 	);
 
 	/**
@@ -147,7 +147,7 @@ class CPageFilter {
 		'triggerid' => null,
 		'graphid' => null,
 		'druleid' => null,
-		'severity_min' => null
+		'severityMin' => null
 	);
 
 	/**
@@ -158,11 +158,12 @@ class CPageFilter {
 	private $_requestIds = array();
 
 	/**
-	 * Get value from data structure.
+	 * Get value from $data, $ids or $isSelected arrays.
+	 * Search occurs in mentioned above order.
 	 *
-	 * @param unknown $name
+	 * @param string $name
 	 *
-	 * @return mixed
+	 * @return string
 	 */
 	public function __get($name) {
 		if (isset($this->data[$name])) {
@@ -181,6 +182,34 @@ class CPageFilter {
 		}
 	}
 
+	/**
+	 * Initialize filter features.
+	 * Supported: Host groups, Hosts, Triggers, Graphs, Applications, Discovery rules, Minimum trigger severities.
+	 *
+	 * @param array  $options
+	 * @param array  $options['config']
+	 * @param bool   $options['config']['select_latest']
+	 * @param bool   $options['config']['popupDD']
+	 * @param bool   $options['config']['individual']
+	 * @param bool   $options['config']['allow_all']
+	 * @param bool   $options['config']['deny_all']
+	 * @param array  $options['hosts']
+	 * @param string $options['hostid']
+	 * @param array  $options['groups']
+	 * @param string $options['groupid']
+	 * @param array  $options['graphs']
+	 * @param string $options['graphid']
+	 * @param array  $options['triggers']
+	 * @param string $options['triggerid']
+	 * @param array  $options['drules']
+	 * @param string $options['druleid']
+	 * @param array  $options['applications']
+	 * @param string $options['application']
+	 * @param array  $options['severitiesMin']
+	 * @param int    $options['severitiesMin']['default']
+	 * @param string $options['severitiesMin']['mapId']
+	 * @param string $options['severityMin']
+	 */
 	public function __construct($options = array()) {
 		global $ZBX_WITH_ALL_NODES;
 
@@ -250,7 +279,7 @@ class CPageFilter {
 
 		// severities min
 		if (isset($options['severitiesMin'])) {
-			$this->_initSeveritiesMin($options['severitiesMin']['severity_min']);
+			$this->_initSeveritiesMin($options['severityMin'], $options['severitiesMin']);
 		}
 	}
 
@@ -277,7 +306,7 @@ class CPageFilter {
 		$this->_profileIdx['triggers'] = 'web.'.$profileSection.'.triggerid';
 		$this->_profileIdx['drules'] = 'web.'.$profileSection.'.druleid';
 		$this->_profileIdx['application'] = 'web.'.$profileSection.'.application';
-		$this->_profileIdx['severity_min'] = 'web.maps.severity_min';
+		$this->_profileIdx['severityMin'] = 'web.maps.severity_min';
 
 		if ($this->config['select_latest']) {
 			$this->_profileIds['groupid'] = CProfile::get(self::GROUP_LATEST_IDX);
@@ -286,7 +315,7 @@ class CPageFilter {
 			$this->_profileIds['triggerid'] = null;
 			$this->_profileIds['druleid'] = CProfile::get(self::DRULE_LATEST_IDX);
 			$this->_profileIds['application'] = '';
-			$this->_profileIds['severity_min'] = TRIGGER_SEVERITY_DISASTER;
+			$this->_profileIds['severityMin'] = null;
 		}
 		elseif ($this->config['DDReset'] && !$this->config['DDRemember']) {
 			$this->_profileIds['groupid'] = 0;
@@ -295,7 +324,7 @@ class CPageFilter {
 			$this->_profileIds['triggerid'] = 0;
 			$this->_profileIds['druleid'] = 0;
 			$this->_profileIds['application'] = '';
-			$this->_profileIds['severity_min'] = TRIGGER_SEVERITY_DISASTER;
+			$this->_profileIds['severityMin'] = null;
 		}
 		else {
 			$this->_profileIds['groupid'] = CProfile::get($this->_profileIdx['groups']);
@@ -304,7 +333,10 @@ class CPageFilter {
 			$this->_profileIds['triggerid'] = null;
 			$this->_profileIds['druleid'] = CProfile::get($this->_profileIdx['drules']);
 			$this->_profileIds['application'] = CProfile::get($this->_profileIdx['application']);
-			$this->_profileIds['severity_min'] = CProfile::get($this->_profileIdx['severity_min']);
+
+			// minimum severity
+			$mapId = isset($options['severitiesMin']['mapId']) ? $options['severitiesMin']['mapId'] : null;
+			$this->_profileIds['severityMin'] = CProfile::get($this->_profileIdx['severityMin'], null, $mapId);
 		}
 
 		$this->_requestIds['groupid'] = isset($options['groupid']) ? $options['groupid'] : null;
@@ -313,7 +345,7 @@ class CPageFilter {
 		$this->_requestIds['triggerid'] = isset($options['triggerid']) ? $options['triggerid'] : null;
 		$this->_requestIds['druleid'] = isset($options['druleid']) ? $options['druleid'] : null;
 		$this->_requestIds['application'] = isset($options['application']) ? $options['application'] : null;
-		$this->_requestIds['severity_min'] = isset($options['severitiesMin']) ? $options['severitiesMin'] : null;
+		$this->_requestIds['severityMin'] = isset($options['severityMin']) ? $options['severityMin'] : null;
 	}
 
 	private function _updateByGraph(&$options) {
@@ -670,19 +702,34 @@ class CPageFilter {
 	}
 
 	/**
-	 * Set severities min related variables.
+	 * Initialize minimum trigger severities.
 	 *
 	 * @param string $severityMin
+	 * @param array  $options
+	 * @param int    $options['default']
+	 * @param string $options['mapId']
 	 */
-	private function _initSeveritiesMin($severityMin) {
-		if ($severityMin === null) {
-			$severityMin = isset($this->_profileIds['severity_min']) ? $this->_profileIds['severity_min'] : TRIGGER_SEVERITY_DISASTER;
+	private function _initSeveritiesMin($severityMin, $options = array()) {
+		$default = isset($options['default']) ? $options['default'] : TRIGGER_SEVERITY_DISASTER;
+		$mapId = isset($options['mapId']) ? $options['mapId'] : null;
+		$severityMinProfile = isset($this->_profileIds['severityMin']) ? $this->_profileIds['severityMin'] : null;
+
+		if ($severityMin === null && $severityMinProfile !== null) {
+			$severityMin = $severityMinProfile;
 		}
 
-		CProfile::update($this->_profileIdx['severity_min'], $severityMin, PROFILE_TYPE_INT);
+		if ($severityMin !== null) {
+			if ($severityMin == $default) {
+				CProfile::delete($this->_profileIdx['severityMin'], $mapId);
+			}
+			else {
+				CProfile::update($this->_profileIdx['severityMin'], $severityMin, PROFILE_TYPE_INT, $mapId);
+			}
+		}
 
 		$this->data['severitiesMin'] = getSeverityCaption();
-		$this->ids['severity_min'] = $severityMin;
+		$this->data['severitiesMin'][$default] = $this->data['severitiesMin'][$default].SPACE.'('._('default').')';
+		$this->ids['severityMin'] = ($severityMin === null) ? $default : $severityMin;
 	}
 
 	/**
@@ -761,7 +808,7 @@ class CPageFilter {
 	 * @return CComboBox
 	 */
 	public function getSeveritiesMinCB() {
-		return new CComboBox('severity_min', $this->severity_min, 'javascript: submit();', $this->severitiesMin);
+		return new CComboBox('severity_min', $this->severityMin, 'javascript: submit();', $this->severitiesMin);
 	}
 
 	/**
