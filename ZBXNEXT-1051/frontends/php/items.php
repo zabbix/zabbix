@@ -542,12 +542,22 @@ elseif (isset($_REQUEST['update']) && isset($_REQUEST['massupdate']) && isset($_
 			}
 		}
 
-		if (isset($visible['applications']) && isset($_REQUEST['applications'])) {
-			if (isset($existApplication)){
-				$applications = array_unique(array_merge($_REQUEST['applications'], $existApplication));
+		if (isset($visible['applications'])) {
+			if (isset($_REQUEST['applications'])) {
+				if (isset($existApplication)){
+					$applications = array_unique(array_merge($_REQUEST['applications'], $existApplication));
+				}
+				else {
+					$applications = $_REQUEST['applications'];
+				}
 			}
 			else {
-				$applications = $_REQUEST['applications'];
+				if (isset($existApplication)){
+					$applications = $existApplication;
+				}
+				else {
+					$applications = array();
+				}
 			}
 		}
 
