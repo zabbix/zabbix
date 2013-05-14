@@ -280,14 +280,16 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 	if (NULL == param || '\0' == *param)
 		retrans = 1;
 	else
-		retrans = atoi(param);
+		if (1 > (retrans = atoi(param)))
+			return SYSINFO_RET_FAIL;
 
 	param = get_rparam(request, 4);
 
 	if (NULL == param || '\0' == *param)
 		retry = 2;
 	else
-		retry = atoi(param);
+		if (1 > (retry = atoi(param)))
+			return SYSINFO_RET_FAIL;
 
 #ifdef _WINDOWS
 	wzone = zbx_utf8_to_unicode(zone);
