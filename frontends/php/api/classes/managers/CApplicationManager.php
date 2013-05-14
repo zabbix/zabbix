@@ -179,6 +179,7 @@ class CApplicationManager {
 		$oldApplicationTemplateIds = array();
 		$movedAppTemplateIds = array();
 		$childAppIdsPairs = array();
+		$oldChildApps = array();
 		foreach ($inheritedApps as $newChildApp) {
 			$oldChildAppsByTemplateId = $hostApps[$newChildApp['hostid']]['byTemplateId'];
 
@@ -197,12 +198,15 @@ class CApplicationManager {
 						$movedAppTemplateIds[] = $applications[$applicationTemplate['templateid']]['hostid'];
 						$childAppIdsPairs[$oldChildApp['applicationid']] =  $newChildApp['applicationid'];
 					}
+
+					$oldChildApps[] = $oldChildApp;
 				}
 			}
 		}
 
 		// move all items and web scenarios from the old app to the new
 		if ($childAppIdsPairs) {
+			$this->moveInheritedItems($movedAppTemplateIds, $childAppIdsPairs);
 			$this->moveInheritedHttpTests($movedAppTemplateIds, $childAppIdsPairs);
 		}
 
@@ -213,9 +217,109 @@ class CApplicationManager {
 			));
 		}
 
+		// delete old children that have only one parent
+		$delAppIds = array();
+		foreach ($oldChildApps as $app) {
+			if (count($app['applicationTemplates']) == 1) {
+				$delAppIds[] = $app['applicationid'];
+			}
+		}
+		if ($delAppIds) {
+			$this->deleteEmpty($delAppIds);
+		}
+
 		$this->inherit($inheritedApps);
 
 		return true;
+	}
+
+	/**
+	 * Replaces the applications for all items inherited from templates $templateIds according to the map given in
+	 * $appIdPairs.
+	 *
+	 * @param array $templateIds
+	 * @param array $appIdPairs		an array of source application ID - target application ID pairs
+	 *
+	 * @return void
+	 */
+	protected function moveInheritedItems(array $templateIds, array $appIdPairs) {
+		// fetch existing item application links for all items inherited from template $templateIds
+		$itemApps = DBfetchArray(DBselect(
+			'SELECT ia2.itemappid,ia2.applicationid,ia2.itemid'.
+			' FROM items i,items i2,items_applications ia2'.
+			' WHERE i.itemid=i2.templateid'.
+				' AND i2.itemid=ia2.itemid'.
+				' AND '.dbConditionInt('i.hostid', $templateIds).
+				' AND '.dbConditionInt('ia2.applicationid', array_keys($appIdPairs))
+		));
+
+		// find item application links to target applications that may already exist
+		$query = DBselect(
+			'SELECT ia.itemid,ia.applicationid'.
+			' FROM items_applications ia'.
+			' WHERE '.dbConditionInt('ia.applicationid', $appIdPairs).
+				' AND '.dbConditionInt('ia.itemid', zbx_objectValues($itemApps, 'itemid'))
+		);
+		$exItemAppIds = array();
+		while ($row = DBfetch($query)) {
+			$exItemAppIds[$row['itemid']][$row['applicationid']] = $row['applicationid'];
+		}
+
+		$newAppItems = array();
+		$delAppItemIds = array();
+		foreach ($itemApps as $itemApp) {
+			// if no link to the target app exists, add a new one
+			if (!isset($exItemAppIds[$itemApp['itemid']][$appIdPairs[$itemApp['applicationid']]])) {
+				$newAppItems[$appIdPairs[$itemApp['applicationid']]][] = $itemApp['itemappid'];
+			}
+			// if the link to the target app already exists, delete the link to the old app
+			else {
+				$delAppItemIds[] = $itemApp['itemappid'];
+			}
+		}
+
+		// link the items to the new apps
+		foreach ($newAppItems as $targetAppId => $itemAppIds) {
+			DB::updateByPk('items_applications', $itemAppIds, array(
+				'applicationid' => $targetAppId
+			));
+		}
+
+		// delete old item application links
+		if ($delAppItemIds) {
+			DB::delete('items_applications', array('itemappid' => $delAppItemIds));
+		}
+	}
+
+	/**
+	 * Delete applications that don't have items and are not used by http tests.
+	 *
+	 * @param array $applicationIds
+	 */
+	protected function deleteEmpty(array $applicationIds) {
+		$emptyApplications = DBfetchArray(DBselect(
+			'SELECT a.applicationid '.
+			' FROM applications a'.
+				' LEFT JOIN items_applications ia ON a.applicationid=ia.applicationid'.
+				' LEFT JOIN httptest ht ON a.applicationid=ht.applicationid'.
+			' WHERE ia.applicationid IS NULL'.
+				' AND ht.applicationid IS NULL'.
+				' AND '.dbConditionInt('a.applicationid', $applicationIds)
+		));
+
+		$this->delete(zbx_objectValues($emptyApplications, 'applicationid'));
+	}
+
+	/**
+	 * Delete applications.
+	 *
+	 * @param array $applicationIds
+	 */
+	public function delete(array $applicationIds) {
+		// remove Monitoring > Latest data toggle profile values related to given aplications
+		CProfile::delete('web.latest.toggle', $applicationIds);
+
+		DB::delete('applications', array('applicationid' => $applicationIds));
 	}
 
 	/**
@@ -224,6 +328,8 @@ class CApplicationManager {
 	 *
 	 * @param array $templateIds
 	 * @param array $appIdPairs		an array of source application ID - target application ID pairs
+	 *
+	 * @return void
 	 */
 	protected function moveInheritedHttpTests(array $templateIds, array $appIdPairs) {
 		// find all http tests inherited from the given templates and linked to the given applications
@@ -328,9 +434,9 @@ class CApplicationManager {
 				}
 				// if no matching child app exists - create a new one
 				else {
-					$newApplication['applicationTemplates'][] = array(
+					$newApplication['applicationTemplates'] = array(array(
 						'templateid' => $appId
-					);
+					));
 					unset($newApplication['applicationid']);
 				}
 				$result[] = $newApplication;
