@@ -187,7 +187,6 @@ static int	validate_linked_templates(zbx_vector_uint64_t *templateids, char *err
 	if (SUCCEED == ret && 1 < templateids->values_num)
 	{
 		zbx_vector_uint64_t	graphids;
-		zbx_uint64_t		graphid;
 
 		zbx_vector_uint64_create(&graphids);
 
@@ -201,20 +200,11 @@ static int	validate_linked_templates(zbx_vector_uint64_t *templateids, char *err
 		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "i.hostid",
 				templateids->values, templateids->values_num);
 
-		result = DBselect("%s", sql);
-
-		while (NULL != (row = DBfetch(result)))
-		{
-			ZBX_STR2UINT64(graphid, row[0]);
-			zbx_vector_uint64_append(&graphids, graphid);
-		}
-		DBfree_result(result);
+		DBselect_uint64(sql, &graphids);
 
 		/* check for names */
 		if (0 != graphids.values_num)
 		{
-			zbx_vector_uint64_sort(&graphids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-
 			sql_offset = 0;
 			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
 					"select name,count(*)"
@@ -1232,9 +1222,6 @@ void	DBdelete_triggers(zbx_vector_uint64_t *triggerids)
 	char		*sql = NULL;
 	size_t		sql_alloc = 256, sql_offset;
 	int		num, i;
-	DB_RESULT	result;
-	DB_ROW		row;
-	zbx_uint64_t	triggerid;
 
 	if (0 == triggerids->values_num)
 		return;
@@ -1253,16 +1240,8 @@ void	DBdelete_triggers(zbx_vector_uint64_t *triggerids)
 		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "parent_triggerid",
 				triggerids->values, triggerids->values_num);
 
-		result = DBselect("%s", sql);
+		DBselect_uint64(sql, triggerids);
 
-		while (NULL != (row = DBfetch(result)))
-		{
-			ZBX_STR2UINT64(triggerid, row[0]);
-			zbx_vector_uint64_append(triggerids, triggerid);
-		}
-		DBfree_result(result);
-
-		zbx_vector_uint64_sort(triggerids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 		zbx_vector_uint64_uniq(triggerids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 	}
 	while (num != triggerids->values_num);
@@ -1324,10 +1303,7 @@ static void	DBdelete_triggers_by_itemids(zbx_vector_uint64_t *itemids)
 	const char		*__function_name = "DBdelete_triggers_by_itemids";
 
 	char			*sql = NULL;
-	size_t			sql_alloc = 512, sql_offset = 0;
-	DB_RESULT		result;
-	DB_ROW			row;
-	zbx_uint64_t		triggerid;
+	size_t			sql_alloc = 0, sql_offset = 0;
 	zbx_vector_uint64_t	triggerids;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() values_num:%d", __function_name, itemids->values_num);
@@ -1335,25 +1311,13 @@ static void	DBdelete_triggers_by_itemids(zbx_vector_uint64_t *itemids)
 	if (0 == itemids->values_num)
 		goto out;
 
-	sql = zbx_malloc(sql, sql_alloc);
 	zbx_vector_uint64_create(&triggerids);
 
-	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-			"select distinct triggerid"
-			" from functions"
-			" where");
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select distinct triggerid from functions where");
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", itemids->values, itemids->values_num);
 
-	result = DBselect("%s", sql);
+	DBselect_uint64(sql, &triggerids);
 
-	while (NULL != (row = DBfetch(result)))
-	{
-		ZBX_STR2UINT64(triggerid, row[0]);
-		zbx_vector_uint64_append(&triggerids, triggerid);
-	}
-	DBfree_result(result);
-
-	zbx_vector_uint64_sort(&triggerids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 	DBdelete_triggers(&triggerids);
 
 	zbx_vector_uint64_destroy(&triggerids);
@@ -1441,9 +1405,6 @@ void	DBdelete_graphs(zbx_vector_uint64_t *graphids)
 	char		*sql = NULL;
 	size_t		sql_alloc = 256, sql_offset;
 	int		num;
-	DB_RESULT	result;
-	DB_ROW		row;
-	zbx_uint64_t	graphid;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() values_num:%d", __function_name, graphids->values_num);
 
@@ -1463,16 +1424,8 @@ void	DBdelete_graphs(zbx_vector_uint64_t *graphids)
 		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "parent_graphid",
 				graphids->values, graphids->values_num);
 
-		result = DBselect("%s", sql);
+		DBselect_uint64(sql, graphids);
 
-		while (NULL != (row = DBfetch(result)))
-		{
-			ZBX_STR2UINT64(graphid, row[0]);
-			zbx_vector_uint64_append(graphids, graphid);
-		}
-		DBfree_result(result);
-
-		zbx_vector_uint64_sort(graphids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 		zbx_vector_uint64_uniq(graphids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 	}
 	while (num != graphids->values_num);
@@ -1544,19 +1497,11 @@ static void	DBdelete_graphs_by_itemids(zbx_vector_uint64_t *itemids)
 	sql_offset = 0;
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "select distinct graphid from graphs_items where");
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", itemids->values, itemids->values_num);
-	result = DBselect("%s", sql);
 
-	while (NULL != (row = DBfetch(result)))
-	{
-		ZBX_STR2UINT64(graphid, row[0]);
-		zbx_vector_uint64_append(&graphids, graphid);
-	}
-	DBfree_result(result);
+	DBselect_uint64(sql, &graphids);
 
 	if (0 == graphids.values_num)
 		goto clean;
-
-	zbx_vector_uint64_sort(&graphids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	/* select graphs with other items */
 	sql_offset = 0;
@@ -1601,9 +1546,6 @@ void	DBdelete_items(zbx_vector_uint64_t *itemids)
 	char		*sql = NULL;
 	size_t		sql_alloc = 256, sql_offset;
 	int		num;
-	DB_RESULT	result;
-	DB_ROW		row;
-	zbx_uint64_t	itemid;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() values_num:%d", __function_name, itemids->values_num);
 
@@ -1616,23 +1558,12 @@ void	DBdelete_items(zbx_vector_uint64_t *itemids)
 	{
 		num = itemids->values_num;
 		sql_offset = 0;
-		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-				"select itemid"
-				" from item_discovery"
-				" where");
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select itemid from item_discovery where");
 		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "parent_itemid",
 				itemids->values, itemids->values_num);
 
-		result = DBselect("%s", sql);
+		DBselect_uint64(sql, itemids);
 
-		while (NULL != (row = DBfetch(result)))
-		{
-			ZBX_STR2UINT64(itemid, row[0]);
-			zbx_vector_uint64_append(itemids, itemid);
-		}
-		DBfree_result(result);
-
-		zbx_vector_uint64_sort(itemids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 		zbx_vector_uint64_uniq(itemids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 	}
 	while (num != itemids->values_num);
@@ -1693,12 +1624,10 @@ out:
 static void	DBdelete_httptests(zbx_vector_uint64_t *httptestids)
 {
 	const char		*__function_name = "DBdelete_httptests";
-	DB_RESULT		result;
-	DB_ROW			row;
+
 	char			*sql = NULL;
 	size_t			sql_alloc = 256, sql_offset = 0;
 	zbx_vector_uint64_t	itemids;
-	zbx_uint64_t		itemid;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() values_num:%d", __function_name, httptestids->values_num);
 
@@ -1725,16 +1654,8 @@ static void	DBdelete_httptests(zbx_vector_uint64_t *httptestids)
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "httptestid",
 			httptestids->values, httptestids->values_num);
 
-	result = DBselect("%s", sql);
+	DBselect_uint64(sql, &itemids);
 
-	while (NULL != (row = DBfetch(result)))
-	{
-		ZBX_STR2UINT64(itemid, row[0]);
-		zbx_vector_uint64_append(&itemids, itemid);
-	}
-	DBfree_result(result);
-
-	zbx_vector_uint64_sort(&itemids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 	DBdelete_items(&itemids);
 
 	sql_offset = 0;
@@ -1833,17 +1754,12 @@ static void	DBdelete_applications(zbx_uint64_t *applicationids, int applicationi
  ******************************************************************************/
 static void	DBdelete_host_prototypes(zbx_vector_uint64_t *host_prototypeids)
 {
-	DB_RESULT		result;
-	DB_ROW			row;
 	char			*sql = NULL;
-	size_t			sql_alloc = 256, sql_offset = 0;
-	zbx_uint64_t		hostid;
+	size_t			sql_alloc = 0, sql_offset = 0;
 	zbx_vector_uint64_t	hostids;
 
 	if (0 == host_prototypeids->values_num)
 		return;
-
-	sql = zbx_malloc(sql, sql_alloc);
 
 	/* delete discovered hosts */
 
@@ -1853,20 +1769,10 @@ static void	DBdelete_host_prototypes(zbx_vector_uint64_t *host_prototypeids)
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "parent_hostid",
 			host_prototypeids->values, host_prototypeids->values_num);
 
-	result = DBselect("%s", sql);
-
-	while (NULL != (row = DBfetch(result)))
-	{
-		ZBX_STR2UINT64(hostid, row[0]);
-		zbx_vector_uint64_append(&hostids, hostid);
-	}
-	DBfree_result(result);
+	DBselect_uint64(sql, &hostids);
 
 	if (0 != hostids.values_num)
-	{
-		zbx_vector_uint64_sort(&hostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 		DBdelete_hosts(&hostids);
-	}
 
 	/* delete host prototypes */
 
@@ -1878,7 +1784,6 @@ static void	DBdelete_host_prototypes(zbx_vector_uint64_t *host_prototypeids)
 	DBexecute("%s", sql);
 
 	zbx_vector_uint64_destroy(&hostids);
-
 	zbx_free(sql);
 }
 
@@ -1897,15 +1802,11 @@ static void	DBdelete_template_httptests(zbx_uint64_t hostid, zbx_vector_uint64_t
 	const char		*__function_name = "DBdelete_template_httptests";
 
 	char			*sql = NULL;
-	size_t			sql_alloc = 256, sql_offset = 0;
-	DB_RESULT		result;
-	DB_ROW			row;
+	size_t			sql_alloc = 0, sql_offset = 0;
 	zbx_vector_uint64_t	httptestids;
-	zbx_uint64_t		httptestid;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	sql = zbx_malloc(sql, sql_alloc);
 	zbx_vector_uint64_create(&httptestids);
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
@@ -1918,16 +1819,8 @@ static void	DBdelete_template_httptests(zbx_uint64_t hostid, zbx_vector_uint64_t
 						" and t.httptestid=h.templateid"
 			" where h.hostid=" ZBX_FS_UI64, hostid);
 
-	result = DBselect("%s", sql);
+	DBselect_uint64(sql, &httptestids);
 
-	while (NULL != (row = DBfetch(result)))
-	{
-		ZBX_STR2UINT64(httptestid, row[0]);
-		zbx_vector_uint64_append(&httptestids, httptestid);
-	}
-	DBfree_result(result);
-
-	zbx_vector_uint64_sort(&httptestids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 	DBdelete_httptests(&httptestids);
 
 	zbx_vector_uint64_destroy(&httptestids);
@@ -1955,15 +1848,11 @@ static void	DBdelete_template_graphs(zbx_uint64_t hostid, zbx_vector_uint64_t *t
 	const char		*__function_name = "DBdelete_template_graphs";
 
 	char			*sql = NULL;
-	size_t			sql_alloc = 256, sql_offset = 0;
-	DB_RESULT		result;
-	DB_ROW			row;
+	size_t			sql_alloc = 0, sql_offset = 0;
 	zbx_vector_uint64_t	graphids;
-	zbx_uint64_t		graphid;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	sql = zbx_malloc(sql, sql_alloc);
 	zbx_vector_uint64_create(&graphids);
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
@@ -1976,16 +1865,8 @@ static void	DBdelete_template_graphs(zbx_uint64_t hostid, zbx_vector_uint64_t *t
 			hostid);
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "ti.hostid", templateids->values, templateids->values_num);
 
-	result = DBselect("%s", sql);
+	DBselect_uint64(sql, &graphids);
 
-	while (NULL != (row = DBfetch(result)))
-	{
-		ZBX_STR2UINT64(graphid, row[0]);
-		zbx_vector_uint64_append(&graphids, graphid);
-	}
-	DBfree_result(result);
-
-	zbx_vector_uint64_sort(&graphids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 	DBdelete_graphs(&graphids);
 
 	zbx_vector_uint64_destroy(&graphids);
@@ -2013,15 +1894,11 @@ static void	DBdelete_template_triggers(zbx_uint64_t hostid, zbx_vector_uint64_t 
 	const char		*__function_name = "DBdelete_template_triggers";
 
 	char			*sql = NULL;
-	size_t			sql_alloc = 256, sql_offset = 0;
-	DB_RESULT		result;
-	DB_ROW			row;
-	zbx_uint64_t		triggerid;
+	size_t			sql_alloc = 0, sql_offset = 0;
 	zbx_vector_uint64_t	triggerids;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	sql = zbx_malloc(sql, sql_alloc);
 	zbx_vector_uint64_create(&triggerids);
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
@@ -2034,16 +1911,8 @@ static void	DBdelete_template_triggers(zbx_uint64_t hostid, zbx_vector_uint64_t 
 			hostid);
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "ti.hostid", templateids->values, templateids->values_num);
 
-	result = DBselect("%s", sql);
+	DBselect_uint64(sql, &triggerids);
 
-	while (NULL != (row = DBfetch(result)))
-	{
-		ZBX_STR2UINT64(triggerid, row[0]);
-		zbx_vector_uint64_append(&triggerids, triggerid);
-	}
-	DBfree_result(result);
-
-	zbx_vector_uint64_sort(&triggerids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 	DBdelete_triggers(&triggerids);
 
 	zbx_vector_uint64_destroy(&triggerids);
@@ -2067,17 +1936,12 @@ static void	DBdelete_template_host_prototypes(zbx_uint64_t hostid, zbx_vector_ui
 	const char		*__function_name = "DBdelete_template_host_prototypes";
 
 	char			*sql = NULL;
-	size_t			sql_alloc = 256, sql_offset = 0;
-	DB_RESULT		result;
-	DB_ROW			row;
-	zbx_uint64_t		host_prototypeid;
+	size_t			sql_alloc = 0, sql_offset = 0;
 	zbx_vector_uint64_t	host_prototypeids;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	zbx_vector_uint64_create(&host_prototypeids);
-
-	sql = zbx_malloc(sql, sql_alloc);
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 			"select hp.hostid"
@@ -2091,16 +1955,8 @@ static void	DBdelete_template_host_prototypes(zbx_uint64_t hostid, zbx_vector_ui
 			hostid);
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "ti.hostid", templateids->values, templateids->values_num);
 
-	result = DBselect("%s", sql);
+	DBselect_uint64(sql, &host_prototypeids);
 
-	while (NULL != (row = DBfetch(result)))
-	{
-		ZBX_STR2UINT64(host_prototypeid, row[0]);
-		zbx_vector_uint64_append(&host_prototypeids, host_prototypeid);
-	}
-	DBfree_result(result);
-
-	zbx_vector_uint64_sort(&host_prototypeids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 	DBdelete_host_prototypes(&host_prototypeids);
 
 	zbx_free(sql);
@@ -2129,15 +1985,11 @@ static void	DBdelete_template_items(zbx_uint64_t hostid, zbx_vector_uint64_t *te
 	const char		*__function_name = "DBdelete_template_items";
 
 	char			*sql = NULL;
-	size_t			sql_alloc = 256, sql_offset = 0;
-	DB_RESULT		result;
-	DB_ROW			row;
-	zbx_uint64_t		itemid;
+	size_t			sql_alloc = 0, sql_offset = 0;
 	zbx_vector_uint64_t	itemids;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	sql = zbx_malloc(sql, sql_alloc);
 	zbx_vector_uint64_create(&itemids);
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
@@ -2149,16 +2001,8 @@ static void	DBdelete_template_items(zbx_uint64_t hostid, zbx_vector_uint64_t *te
 			hostid);
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "ti.hostid", templateids->values, templateids->values_num);
 
-	result = DBselect("%s", sql);
+	DBselect_uint64(sql, &itemids);
 
-	while (NULL != (row = DBfetch(result)))
-	{
-		ZBX_STR2UINT64(itemid, row[0]);
-		zbx_vector_uint64_append(&itemids, itemid);
-	}
-	DBfree_result(result);
-
-	zbx_vector_uint64_sort(&itemids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 	DBdelete_items(&itemids);
 
 	zbx_vector_uint64_destroy(&itemids);
@@ -2784,10 +2628,33 @@ static void	DBcopy_template_applications(zbx_uint64_t hostid, zbx_vector_uint64_
 
 typedef struct
 {
+	zbx_uint64_t	group_prototypeid;
+	zbx_uint64_t	groupid;
+	zbx_uint64_t	templateid;	/* reference to parent group_prototypeid */
+	char		*name;
+}
+zbx_group_prototype_t;
+
+static void	DBgroup_prototype_clean(zbx_group_prototype_t *group_prototype)
+{
+	zbx_free(group_prototype->name);
+}
+
+static void	DBgroup_prototypes_clean(zbx_vector_ptr_t *group_prototypes)
+{
+	int	i;
+
+	for (i = 0; i < group_prototypes->values_num; i++)
+		DBgroup_prototype_clean((zbx_group_prototype_t *)group_prototypes->values[i]);
+}
+
+typedef struct
+{
 	zbx_uint64_t		templateid;		/* link to parent template */
 	zbx_uint64_t		hostid;
 	zbx_uint64_t		itemid;			/* discovery rule id */
 	zbx_vector_uint64_t	lnk_templateids;	/* list of templates which should be linked */
+	zbx_vector_ptr_t	group_prototypes;	/* list of group prototypes */
 	char			*host;
 	char			*name;
 	unsigned char		status;
@@ -2797,20 +2664,22 @@ typedef struct
 }
 zbx_host_prototype_t;
 
+static void	DBhost_prototype_clean(zbx_host_prototype_t *host_prototype)
+{
+	zbx_free(host_prototype->name);
+	zbx_free(host_prototype->host);
+	DBgroup_prototypes_clean(&host_prototype->group_prototypes);
+	zbx_vector_ptr_destroy(&host_prototype->group_prototypes);
+	zbx_vector_uint64_destroy(&host_prototype->lnk_templateids);
+	zbx_free(host_prototype);
+}
+
 static void	DBhost_prototypes_clean(zbx_vector_ptr_t *host_prototypes)
 {
-	int			i;
-	zbx_host_prototype_t	*host_prototype;
+	int	i;
 
 	for (i = 0; i < host_prototypes->values_num; i++)
-	{
-		host_prototype = (zbx_host_prototype_t *)host_prototypes->values[i];
-
-		zbx_free(host_prototype->name);
-		zbx_free(host_prototype->host);
-		zbx_vector_uint64_destroy(&host_prototype->lnk_templateids);
-		zbx_free(host_prototype);
-	}
+		DBhost_prototype_clean((zbx_host_prototype_t *)host_prototypes->values[i]);
 }
 
 /******************************************************************************
@@ -2851,13 +2720,11 @@ static void	DBhost_prototypes_make(zbx_uint64_t hostid, zbx_vector_uint64_t *tem
 	DB_RESULT		result;
 	DB_ROW			row;
 	char			*sql = NULL;
-	size_t			sql_alloc = ZBX_KIBIBYTE, sql_offset = 0;
+	size_t			sql_alloc = 0, sql_offset = 0;
 	zbx_vector_uint64_t	itemids;
 	zbx_host_prototype_t	*host_prototype;
 
 	zbx_vector_uint64_create(&itemids);
-
-	sql = zbx_malloc(sql, sql_alloc);
 
 	/* selects host prototypes from templates */
 
@@ -2882,6 +2749,7 @@ static void	DBhost_prototypes_make(zbx_uint64_t hostid, zbx_vector_uint64_t *tem
 		ZBX_STR2UINT64(host_prototype->itemid, row[0]);
 		ZBX_STR2UINT64(host_prototype->templateid, row[1]);
 		zbx_vector_uint64_create(&host_prototype->lnk_templateids);
+		zbx_vector_ptr_create(&host_prototype->group_prototypes);
 		host_prototype->host = zbx_strdup(NULL, row[2]);
 		host_prototype->name = zbx_strdup(NULL, row[3]);
 		host_prototype->status = (unsigned char)atoi(row[4]);
@@ -2912,8 +2780,7 @@ static void	DBhost_prototypes_make(zbx_uint64_t hostid, zbx_vector_uint64_t *tem
 					" and i.hostid=" ZBX_FS_UI64
 					" and",
 				hostid);
-		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "i.itemid",
-				itemids.values, itemids.values_num);
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "i.itemid", itemids.values, itemids.values_num);
 
 		result = DBselect("%s", sql);
 
@@ -2965,13 +2832,11 @@ static void	DBhost_prototypes_templates_make(zbx_vector_ptr_t *host_prototypes,
 	DB_RESULT		result;
 	DB_ROW			row;
 	char			*sql = NULL;
-	size_t			sql_alloc = ZBX_KIBIBYTE, sql_offset = 0;
+	size_t			sql_alloc = 0, sql_offset = 0;
 	zbx_vector_uint64_t	hostids;
 	zbx_uint64_t		hostid, templateid, hosttemplateid;
 	zbx_host_prototype_t	*host_prototype;
 	int			i;
-
-	sql = zbx_malloc(sql, sql_alloc);
 
 	zbx_vector_uint64_create(&hostids);
 
@@ -3026,6 +2891,8 @@ static void	DBhost_prototypes_templates_make(zbx_vector_ptr_t *host_prototypes,
 
 	if (0 != hostids.values_num)
 	{
+		zbx_vector_uint64_sort(&hostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
 		sql_offset = 0;
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
 				"select hostid,templateid,hosttemplateid"
@@ -3074,6 +2941,146 @@ static void	DBhost_prototypes_templates_make(zbx_vector_ptr_t *host_prototypes,
 
 /******************************************************************************
  *                                                                            *
+ * Function: DBhost_prototypes_groups_make                                    *
+ *                                                                            *
+ * Parameters: host_prototypes        - [IN/OUT] list of host prototypes      *
+ *                                      should be sorted by templateid        *
+ *             del_group_prototypeids - [OUT] list of group_prototypeid which *
+ *                                      should be deleted                     *
+ *                                                                            *
+ * Comments: auxiliary function for DBcopy_template_host_prototypes()         *
+ *                                                                            *
+ ******************************************************************************/
+static void	DBhost_prototypes_groups_make(zbx_vector_ptr_t *host_prototypes,
+		zbx_vector_uint64_t *del_group_prototypeids)
+{
+	DB_RESULT		result;
+	DB_ROW			row;
+	char			*sql = NULL;
+	size_t			sql_alloc = 0, sql_offset = 0;
+	zbx_vector_uint64_t	hostids;
+	zbx_uint64_t		hostid, groupid, group_prototypeid;
+	zbx_host_prototype_t	*host_prototype;
+	zbx_group_prototype_t	*group_prototype;
+	int			i;
+
+	zbx_vector_uint64_create(&hostids);
+
+	/* select list of groups which should be linked to host prototypes */
+
+	for (i = 0; i < host_prototypes->values_num; i++)
+	{
+		host_prototype = (zbx_host_prototype_t *)host_prototypes->values[i];
+
+		zbx_vector_uint64_append(&hostids, host_prototype->templateid);
+	}
+
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
+			"select hostid,name,groupid,group_prototypeid"
+			" from group_prototype"
+			" where");
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid", hostids.values, hostids.values_num);
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " order by hostid");
+
+	result = DBselect("%s", sql);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		ZBX_STR2UINT64(hostid, row[0]);
+
+		if (FAIL == (i = zbx_vector_ptr_bsearch(host_prototypes, &hostid, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
+		{
+			THIS_SHOULD_NEVER_HAPPEN;
+			continue;
+		}
+
+		host_prototype = (zbx_host_prototype_t *)host_prototypes->values[i];
+
+		group_prototype = (zbx_group_prototype_t *)zbx_malloc(NULL, sizeof(zbx_group_prototype_t));
+		group_prototype->group_prototypeid = 0;
+		group_prototype->name = zbx_strdup(NULL, row[1]);
+		ZBX_DBROW2UINT64(group_prototype->groupid, row[2]);
+		ZBX_STR2UINT64(group_prototype->templateid, row[3]);
+
+		zbx_vector_ptr_append(&host_prototype->group_prototypes, group_prototype);
+	}
+	DBfree_result(result);
+
+	/* select list of group prototypes which already linked to host prototypes */
+
+	hostids.values_num = 0;
+
+	for (i = 0; i < host_prototypes->values_num; i++)
+	{
+		host_prototype = (zbx_host_prototype_t *)host_prototypes->values[i];
+
+		if (0 == host_prototype->hostid)
+			continue;
+
+		zbx_vector_uint64_append(&hostids, host_prototype->hostid);
+	}
+
+	if (0 != hostids.values_num)
+	{
+		zbx_vector_uint64_sort(&hostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+		sql_offset = 0;
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
+				"select hostid,group_prototypeid,groupid,name from group_prototype where");
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid", hostids.values, hostids.values_num);
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " order by group_prototypeid");
+
+		result = DBselect("%s", sql);
+
+		while (NULL != (row = DBfetch(result)))
+		{
+			ZBX_STR2UINT64(hostid, row[0]);
+
+			for (i = 0; i < host_prototypes->values_num; i++)
+			{
+				host_prototype = (zbx_host_prototype_t *)host_prototypes->values[i];
+
+				if (host_prototype->hostid == hostid)
+					break;
+			}
+
+			if (i == host_prototypes->values_num)
+			{
+				THIS_SHOULD_NEVER_HAPPEN;
+				continue;
+			}
+
+			ZBX_STR2UINT64(group_prototypeid, row[1]);
+			ZBX_DBROW2UINT64(groupid, row[2]);
+
+			for (i = 0; i < host_prototype->group_prototypes.values_num; i++)
+			{
+				group_prototype = (zbx_group_prototype_t *)host_prototype->group_prototypes.values[i];
+
+				if (0 != group_prototype->group_prototypeid)
+					continue;
+
+				if (group_prototype->groupid == groupid && 0 == strcmp(group_prototype->name, row[3]))
+				{
+					group_prototype->group_prototypeid = group_prototypeid;
+					break;
+				}
+			}
+
+			if (i == host_prototype->group_prototypes.values_num)
+				zbx_vector_uint64_append(del_group_prototypeids, group_prototypeid);
+		}
+		DBfree_result(result);
+	}
+
+	zbx_vector_uint64_sort(del_group_prototypeids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+	zbx_vector_uint64_destroy(&hostids);
+	zbx_free(sql);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: DBhost_prototypes_save                                           *
  *                                                                            *
  * Comments: auxiliary function for DBcopy_template_host_prototypes()         *
@@ -3081,21 +3088,28 @@ static void	DBhost_prototypes_templates_make(zbx_vector_ptr_t *host_prototypes,
  ******************************************************************************/
 static void	DBhost_prototypes_save(zbx_vector_ptr_t *host_prototypes, zbx_vector_uint64_t *del_hosttemplateids)
 {
-	char			*sql1 = NULL, *sql2 = NULL, *sql3 = NULL, *sql4 = NULL, *sql5 = NULL,
+	char			*sql1 = NULL, *sql2 = NULL, *sql3 = NULL, *sql4 = NULL, *sql5 = NULL, *sql6 = NULL,
 				*host_esc, *name_esc;
 	size_t			sql1_alloc = ZBX_KIBIBYTE, sql1_offset = 0,
 				sql2_alloc = ZBX_KIBIBYTE, sql2_offset = 0,
 				sql3_alloc = ZBX_KIBIBYTE, sql3_offset = 0,
 				sql4_alloc = ZBX_KIBIBYTE, sql4_offset = 0,
-				sql5_alloc = ZBX_KIBIBYTE, sql5_offset = 0;
+				sql5_alloc = ZBX_KIBIBYTE, sql5_offset = 0,
+				sql6_alloc = ZBX_KIBIBYTE, sql6_offset = 0;
 	zbx_host_prototype_t	*host_prototype;
-	zbx_uint64_t		hostid = 0, hosttemplateid = 0;
-	int			i, j, new_hosts = 0, new_hosts_templates = 0;
+	zbx_group_prototype_t	*group_prototype;
+	zbx_uint64_t		hostid = 0, hosttemplateid = 0, group_prototypeid = 0;
+	int			i, j, new_hosts = 0, new_hosts_templates = 0, new_group_prototypes = 0,
+				upd_group_prototypes = 0;
 	const char		*ins_host_discovery_sql =
 				"insert into host_discovery (hostid,parent_itemid) values ";
 	const char		*ins_hosts_sql = "insert into hosts (hostid,host,name,status,flags,templateid) values ";
 	const char		*ins_hosts_templates_sql =
 				"insert into hosts_templates (hosttemplateid,hostid,templateid) values ";
+	const char		*ins_group_prototype_sql =
+				"insert into group_prototype"
+				" (group_prototypeid,hostid,name,groupid,templateid)"
+				" values ";
 
 	for (i = 0; i < host_prototypes->values_num; i++)
 	{
@@ -3105,6 +3119,16 @@ static void	DBhost_prototypes_save(zbx_vector_ptr_t *host_prototypes, zbx_vector
 			new_hosts++;
 
 		new_hosts_templates += host_prototype->lnk_templateids.values_num;
+
+		for (j = 0; j < host_prototype->group_prototypes.values_num; j++)
+		{
+			group_prototype = (zbx_group_prototype_t *)host_prototype->group_prototypes.values[j];
+
+			if (0 == group_prototype->group_prototypeid)
+				new_group_prototypes++;
+			else
+				upd_group_prototypes++;
+		}
 	}
 
 	if (0 != new_hosts)
@@ -3121,7 +3145,7 @@ static void	DBhost_prototypes_save(zbx_vector_ptr_t *host_prototypes, zbx_vector
 #endif
 	}
 
-	if (new_hosts != host_prototypes->values_num)
+	if (new_hosts != host_prototypes->values_num || 0 != upd_group_prototypes)
 	{
 		sql3 = zbx_malloc(sql3, sql3_alloc);
 		DBbegin_multiple_update(&sql3, &sql3_alloc, &sql3_offset);
@@ -3144,6 +3168,17 @@ static void	DBhost_prototypes_save(zbx_vector_ptr_t *host_prototypes, zbx_vector
 		zbx_strcpy_alloc(&sql5, &sql5_alloc, &sql5_offset, "delete from hosts_templates where");
 		DBadd_condition_alloc(&sql5, &sql5_alloc, &sql5_offset, "hosttemplateid",
 				del_hosttemplateids->values, del_hosttemplateids->values_num);
+	}
+
+	if (0 != new_group_prototypes)
+	{
+		group_prototypeid = DBget_maxid_num("group_prototype", new_group_prototypes);
+
+		sql6 = zbx_malloc(sql6, sql6_alloc);
+		DBbegin_multiple_update(&sql6, &sql6_alloc, &sql6_offset);
+#ifdef HAVE_MULTIROW_INSERT
+		zbx_strcpy_alloc(&sql6, &sql6_alloc, &sql6_offset, ins_group_prototype_sql);
+#endif
 	}
 
 	for (i = 0; i < host_prototypes->values_num; i++)
@@ -3200,6 +3235,33 @@ static void	DBhost_prototypes_save(zbx_vector_ptr_t *host_prototypes, zbx_vector
 					hosttemplateid++, host_prototype->hostid,
 					host_prototype->lnk_templateids.values[j]);
 		}
+
+		for (j = 0; j < host_prototype->group_prototypes.values_num; j++)
+		{
+			group_prototype = (zbx_group_prototype_t *)host_prototype->group_prototypes.values[j];
+
+			if (0 == group_prototype->group_prototypeid)
+			{
+				name_esc = DBdyn_escape_string(group_prototype->name);
+#ifndef HAVE_MULTIROW_INSERT
+				zbx_strcpy_alloc(&sql6, &sql6_alloc, &sql6_offset, ins_group_prototype_sql);
+#endif
+				zbx_snprintf_alloc(&sql6, &sql6_alloc, &sql6_offset,
+						"(" ZBX_FS_UI64 "," ZBX_FS_UI64 ",'%s',%s," ZBX_FS_UI64 ")" ZBX_ROW_DL,
+						group_prototypeid++, host_prototype->hostid, name_esc,
+						DBsql_id_ins(group_prototype->groupid), group_prototype->templateid);
+
+				zbx_free(name_esc);
+			}
+			else
+			{
+				zbx_snprintf_alloc(&sql3, &sql3_alloc, &sql3_offset,
+						"update group_prototype"
+						" set templateid=" ZBX_FS_UI64
+						" where group_prototypeid=" ZBX_FS_UI64 ";\n",
+						group_prototype->templateid, group_prototype->group_prototypeid);
+			}
+		}
 	}
 
 	if (0 != new_hosts)
@@ -3218,7 +3280,7 @@ static void	DBhost_prototypes_save(zbx_vector_ptr_t *host_prototypes, zbx_vector
 		zbx_free(sql2);
 	}
 
-	if (new_hosts != host_prototypes->values_num)
+	if (new_hosts != host_prototypes->values_num || 0 != upd_group_prototypes)
 	{
 		DBend_multiple_update(&sql3, &sql3_alloc, &sql3_offset);
 		DBexecute("%s", sql3);
@@ -3241,6 +3303,56 @@ static void	DBhost_prototypes_save(zbx_vector_ptr_t *host_prototypes, zbx_vector
 		DBexecute("%s", sql5);
 		zbx_free(sql5);
 	}
+
+	if (0 != new_group_prototypes)
+	{
+#ifdef HAVE_MULTIROW_INSERT
+		sql6_offset--;
+		zbx_strcpy_alloc(&sql6, &sql6_alloc, &sql6_offset, ";\n");
+#endif
+		DBend_multiple_update(&sql6, &sql6_alloc, &sql6_offset);
+		DBexecute("%s", sql6);
+		zbx_free(sql6);
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DBgroup_prototypes_delete                                        *
+ *                                                                            *
+ * Parameters: del_group_prototypeids - [OUT] list of group_prototypeids      *
+ *                                      which will be deleted                 *
+ *                                                                            *
+ ******************************************************************************/
+static void	DBgroup_prototypes_delete(zbx_vector_uint64_t *del_group_prototypeids)
+{
+	char			*sql = NULL;
+	size_t			sql_alloc = 0, sql_offset;
+	zbx_vector_uint64_t	groupids;
+
+	if (0 == del_group_prototypeids->values_num)
+		return;
+
+	zbx_vector_uint64_create(&groupids);
+
+	sql_offset = 0;
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select groupid from group_discovery where");
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "parent_group_prototypeid",
+			del_group_prototypeids->values, del_group_prototypeids->values_num);
+
+	DBselect_uint64(sql, &groupids);
+
+	DBdelete_groups(&groupids);
+
+	sql_offset = 0;
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from group_prototype where");
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "group_prototypeid",
+			del_group_prototypeids->values, del_group_prototypeids->values_num);
+
+	DBexecute("%s", sql);
+
+	zbx_vector_uint64_destroy(&groupids);
+	zbx_free(sql);
 }
 
 /******************************************************************************
@@ -3267,13 +3379,17 @@ static void	DBcopy_template_host_prototypes(zbx_uint64_t hostid, zbx_vector_uint
 
 	if (0 != host_prototypes.values_num)
 	{
-		zbx_vector_uint64_t	del_hosttemplateids;
+		zbx_vector_uint64_t	del_hosttemplateids, del_group_prototypeids;
 
 		zbx_vector_uint64_create(&del_hosttemplateids);
+		zbx_vector_uint64_create(&del_group_prototypeids);
 
 		DBhost_prototypes_templates_make(&host_prototypes, &del_hosttemplateids);
+		DBhost_prototypes_groups_make(&host_prototypes, &del_group_prototypeids);
 		DBhost_prototypes_save(&host_prototypes, &del_hosttemplateids);
+		DBgroup_prototypes_delete(&del_group_prototypeids);
 
+		zbx_vector_uint64_destroy(&del_group_prototypeids);
 		zbx_vector_uint64_destroy(&del_hosttemplateids);
 	}
 
@@ -5021,17 +5137,12 @@ void	DBdelete_hosts(zbx_vector_uint64_t *hostids)
 {
 	const char		*__function_name = "DBdelete_hosts";
 
-	DB_RESULT		result;
-	DB_ROW			row;
-	zbx_uint64_t		elementid;
 	zbx_vector_uint64_t	itemids, httptestids;
 	char			*sql = NULL;
-	size_t			sql_alloc = 256, sql_offset;
+	size_t			sql_alloc = 0, sql_offset;
 	int			i;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
-
-	sql = zbx_malloc(sql, sql_alloc);
 
 	zbx_vector_uint64_create(&httptestids);
 
@@ -5044,16 +5155,8 @@ void	DBdelete_hosts(zbx_vector_uint64_t *hostids)
 			" where");
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid", hostids->values, hostids->values_num);
 
-	result = DBselect("%s", sql);
+	DBselect_uint64(sql, &httptestids);
 
-	while (NULL != (row = DBfetch(result)))
-	{
-		ZBX_STR2UINT64(elementid, row[0]);
-		zbx_vector_uint64_append(&httptestids, elementid);
-	}
-	DBfree_result(result);
-
-	zbx_vector_uint64_sort(&httptestids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 	DBdelete_httptests(&httptestids);
 
 	zbx_vector_uint64_destroy(&httptestids);
@@ -5069,16 +5172,8 @@ void	DBdelete_hosts(zbx_vector_uint64_t *hostids)
 			" where");
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid", hostids->values, hostids->values_num);
 
-	result = DBselect("%s", sql);
+	DBselect_uint64(sql, &itemids);
 
-	while (NULL != (row = DBfetch(result)))
-	{
-		ZBX_STR2UINT64(elementid, row[0]);
-		zbx_vector_uint64_append(&itemids, elementid);
-	}
-	DBfree_result(result);
-
-	zbx_vector_uint64_sort(&itemids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 	DBdelete_items(&itemids);
 
 	zbx_vector_uint64_destroy(&itemids);

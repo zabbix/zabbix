@@ -2473,3 +2473,30 @@ int	DBfield_exists(const char *table_name, const char *field_name)
 
 	return ret;
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DBselect_uint64                                                  *
+ *                                                                            *
+ * Parameters: sql - [IN] sql statement                                       *
+ *             ids - [OUT] sorted list of selected uint64 values              *
+ *                                                                            *
+ ******************************************************************************/
+void	DBselect_uint64(const char *sql, zbx_vector_uint64_t *ids)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+	zbx_uint64_t	id;
+
+	result = DBselect("%s", sql);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		ZBX_STR2UINT64(id, row[0]);
+
+		zbx_vector_uint64_append(ids, id);
+	}
+	DBfree_result(result);
+
+	zbx_vector_uint64_sort(ids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+}
