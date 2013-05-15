@@ -38,6 +38,9 @@ extern int	CONFIG_LISTEN_PORT;
 #define	MIN_VALUE_LINES	1
 #define	MAX_VALUE_LINES	1000
 
+#define HOST_METADATA_LEN	255
+#define HOST_METADATA_LEN_MAX	HOST_METADATA_LEN+1
+
 /* Windows event types for `eventlog' check */
 #ifdef _WINDOWS
 #	ifndef INFORMATION_TYPE
