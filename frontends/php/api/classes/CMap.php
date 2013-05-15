@@ -325,6 +325,8 @@ class CMap extends CMapElement {
 						}
 					}
 				}
+
+				$sysmapids = array_keys($result);
 			}
 		}
 
@@ -334,7 +336,6 @@ class CMap extends CMapElement {
 
 		// adding elements
 		if (!is_null($options['selectSelements']) && str_in_array($options['selectSelements'], $subselectsAllowedOutputs)) {
-			$sysmapids = zbx_objectValues($result, 'sysmapid');
 			$selements = array();
 
 			$dbSelements = DBselect(
