@@ -385,7 +385,7 @@ static int	refresh_active_checks(const char *host, unsigned short port)
 		{
 			if (HOST_METADATA_LEN < strlen(*value))
 			{
-				zabbix_log(LOG_LEVEL_WARNING, "returned value of \"%s\" item specified by"
+				zabbix_log(LOG_LEVEL_WARNING, "the returned value of \"%s\" item specified by"
 						" \"HostMetadataItem\" configuration parameter is too long, truncating"
 						" at position %d", CONFIG_HOST_METADATA_ITEM, HOST_METADATA_LEN_MAX);
 				(*value)[HOST_METADATA_LEN] = '\0';
