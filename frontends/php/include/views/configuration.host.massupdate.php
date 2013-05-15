@@ -66,7 +66,7 @@ $hostFormList->addRow(
 $hostGroupsToAdd = null;
 if (isset($_REQUEST['new_groups'])) {
 	foreach ($_REQUEST['new_groups'] as $newHostGroup) {
-		if (isset($newHostGroup['new'])) {
+		if (is_array($newHostGroup) && isset($newHostGroup['new'])) {
 			$hostGroupsToAdd[] = array(
 				'id' => $newHostGroup['new'],
 				'name' => $newHostGroup['new'] . ' (new)',
