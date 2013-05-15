@@ -385,9 +385,9 @@ static int	refresh_active_checks(const char *host, unsigned short port)
 		{
 			if (HOST_METADATA_LEN < strlen(*value))
 			{
-				zabbix_log(LOG_LEVEL_WARNING, "returned value of item %s specified by configuration"
-						" parameter \"HostMetadataItem\" is too long, truncating at position %d",
-						CONFIG_HOST_METADATA_ITEM, HOST_METADATA_LEN_MAX);
+				zabbix_log(LOG_LEVEL_WARNING, "returned value of item %s specified by"
+						" \"HostMetadataItem\" configuration parameter is too long, truncating"
+						" at position %d", CONFIG_HOST_METADATA_ITEM, HOST_METADATA_LEN_MAX);
 				(*value)[HOST_METADATA_LEN] = '\0';
 			}
 			zbx_json_addstring(&json, ZBX_PROTO_TAG_HOST_METADATA, *value, ZBX_JSON_TYPE_STRING);
