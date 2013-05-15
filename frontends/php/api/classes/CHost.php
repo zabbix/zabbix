@@ -1103,6 +1103,7 @@ class CHost extends CHostGeneral {
 		// second check is necessary, because import incorrectly inputs unset 'inventory' as empty string rather than null
 		if (isset($data['inventory']) && $data['inventory']) {
 			$updateInventory = $data['inventory'];
+			$updateInventory['inventory_mode'] = null;
 
 			if (isset($data['inventory_mode']) && $data['inventory_mode'] == HOST_INVENTORY_DISABLED) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot set inventory fields for disabled inventory.'));
@@ -1114,9 +1115,6 @@ class CHost extends CHostGeneral {
 				$updateInventory = array();
 			}
 			$updateInventory['inventory_mode'] = $data['inventory_mode'];
-		}
-		else {
-			$updateInventory['inventory_mode'] = null;
 		}
 
 		if (isset($data['status'])) {
