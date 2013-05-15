@@ -498,7 +498,7 @@ if (!$this->data['is_multiple_hosts']) {
 	$appToAdd = null;
 	if (isset($_REQUEST['new_applications'])) {
 		foreach ($_REQUEST['new_applications'] as $newApplication) {
-			if (isset($newApplication['new'])) {
+			if (is_array($newApplication) && isset($newApplication['new'])) {
 				$appToAdd[] = array(
 					'id' => $newApplication['new'],
 					'name' => $newApplication['new'] . ' (new)',

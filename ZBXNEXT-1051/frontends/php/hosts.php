@@ -272,15 +272,15 @@ elseif (isset($_REQUEST['go']) && $_REQUEST['go'] == 'massupdate' && isset($_REQ
 		if (isset($visible['groups'])) {
 			if (isset($_REQUEST['groups'])) {
 				if (isset($existGroups)){
-					$_REQUEST['groups'] = array_unique(array_merge($_REQUEST['groups'], $existGroups));
+					$replaceHostGroups = array_unique(array_merge($_REQUEST['groups'], $existGroups));
 				}
 			}
 			elseif (isset($existGroups)) {
-				$_REQUEST['groups'] = $existGroups;
+				$replaceHostGroups = $existGroups;
 			}
 
 			$hosts['groups'] = API::HostGroup()->get(array(
-				'groupids' => get_request('groups', array()),
+				'groupids' => $replaceHostGroups,
 				'editable' => true,
 				'output' => array('groupid')
 			));
@@ -314,7 +314,7 @@ elseif (isset($_REQUEST['go']) && $_REQUEST['go'] == 'massupdate' && isset($_REQ
 		}
 
 		// add new host groups
-		if (!empty($existGroups) && (!isset($visible['groups']) || !isset($_REQUEST['groups']))) {
+		if (!empty($existGroups) && (!isset($visible['groups']) || !isset($replaceHostGroups))) {
 			$add['groups'] = $existGroups;
 		}
 
