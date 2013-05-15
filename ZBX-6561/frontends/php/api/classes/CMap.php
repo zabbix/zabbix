@@ -325,7 +325,8 @@ class CMap extends CMapElement {
 						}
 					}
 				}
-				$sysmapids = zbx_objectValues($result, 'sysmapid');
+
+				$sysmapids = array_keys($result);
 			}
 		}
 
