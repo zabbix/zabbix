@@ -1155,18 +1155,24 @@ function getApplicationSourceParentIds(array $applicationIds, array $templateApp
 	);
 
 	$applicationIds = array();
+	$unsetApplicationIds = array();
 	while ($applicationTemplate = DBfetch($query)) {
 		// check if we already have an application inherited from the current application
-		// if we do - move all of its child applications to the parent template
+		// if we do - copy all of its child applications to the parent template
 		if (isset($templateApplicationIds[$applicationTemplate['applicationid']])) {
 			$templateApplicationIds[$applicationTemplate['templateid']] = $templateApplicationIds[$applicationTemplate['applicationid']];
-			unset($templateApplicationIds[$applicationTemplate['applicationid']]);
+			$unsetApplicationIds[] = $applicationTemplate['applicationid'];
 		}
 		// if no - just add the application
 		else {
 			$templateApplicationIds[$applicationTemplate['templateid']][] = $applicationTemplate['applicationid'];
-			$applicationIds[] = $applicationTemplate['templateid'];
 		}
+		$applicationIds[] = $applicationTemplate['templateid'];
+	}
+
+	// unset children of all applications that we found a new parent for
+	foreach ($unsetApplicationIds as $applicationId) {
+		unset($templateApplicationIds[$applicationId]);
 	}
 
 	// continue while we still have new applications to check
