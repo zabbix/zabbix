@@ -161,14 +161,14 @@ static void	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 				break;
 			case 'h':
 				help();
-				exit(FAIL);
+				exit(EXIT_FAILURE);
 				break;
 			case 'V':
 				version();
 #ifdef _AIX
 				tl_version();
 #endif
-				exit(FAIL);
+				exit(EXIT_FAILURE);
 				break;
 			case 'p':
 				if (ZBX_TASK_START == t->task)
@@ -275,20 +275,27 @@ static void	zbx_validate_config()
 	if (NULL == CONFIG_HOSTNAME)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "hostname is not defined");
-		exit(FAIL);
+		exit(EXIT_FAILURE);
+	}
+
+	if (NULL != CONFIG_HOST_METADATA && HOST_METADATA_LEN < strlen(CONFIG_HOST_METADATA))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "the value of configuration parameter \"HostMetadata\" can not be longer"
+				" than %d characters", HOST_METADATA_LEN_MAX);
+		exit(EXIT_FAILURE);
 	}
 
 	if (FAIL == zbx_check_hostname(CONFIG_HOSTNAME))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "invalid host name: [%s]", CONFIG_HOSTNAME);
-		exit(FAIL);
+		exit(EXIT_FAILURE);
 	}
 
 	/* make sure active or passive check is enabled */
 	if (0 == CONFIG_ACTIVE_FORKS && 0 == CONFIG_PASSIVE_FORKS)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "either active or passive checks must be enabled");
-		exit(FAIL);
+		exit(EXIT_FAILURE);
 	}
 }
 
@@ -744,7 +751,7 @@ int	main(int argc, char **argv)
 	{
 		case ZBX_TASK_SHOW_USAGE:
 			usage();
-			exit(FAIL);
+			exit(EXIT_FAILURE);
 			break;
 #ifdef _WINDOWS
 		case ZBX_TASK_INSTALL_SERVICE:

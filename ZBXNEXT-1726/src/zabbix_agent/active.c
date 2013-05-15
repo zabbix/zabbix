@@ -371,12 +371,6 @@ static int	refresh_active_checks(const char *host, unsigned short port)
 
 	if (NULL != CONFIG_HOST_METADATA)
 	{
-		if (HOST_METADATA_LEN < strlen(CONFIG_HOST_METADATA))
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "the value of configuration parameter \"HostMetadata\" is too"
-					" long, truncating at position %d", HOST_METADATA_LEN_MAX);
-			CONFIG_HOST_METADATA[HOST_METADATA_LEN] = '\0';
-		}
 		zbx_json_addstring(&json, ZBX_PROTO_TAG_HOST_METADATA, CONFIG_HOST_METADATA, ZBX_JSON_TYPE_STRING);
 	}
 	else if (NULL != CONFIG_HOST_METADATA_ITEM)
