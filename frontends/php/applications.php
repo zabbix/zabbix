@@ -279,7 +279,6 @@ else {
 
 		// fetch template application source parents
 		$applicationSourceParentIds = getApplicationSourceParentIds(zbx_objectValues($data['applications'], 'applicationid'));
-		var_dump($applicationSourceParentIds);
 		$parentAppIds = array();
 		foreach ($applicationSourceParentIds as $applicationParentIds) {
 			foreach ($applicationParentIds as $parentId) {
