@@ -1123,7 +1123,7 @@ static int	DBpatch_2010070()
 
 static int	DBpatch_2010071()
 {
-	const ZBX_FIELD field = {"severity_min", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD field = {"severity_min", "5", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("sysmaps", &field);
 }
