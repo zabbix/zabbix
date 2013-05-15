@@ -34,43 +34,16 @@ if (isset($_REQUEST['filter_set'])) {
 
 $page['hist_arg'] = array();
 
+if ((isset($_REQUEST['go']) && $_REQUEST['go'] == 'massupdate') || isset($_REQUEST['massupdate'])) {
+	$page['scripts'][] = 'multiselect.js';
+}
+
 require_once dirname(__FILE__).'/include/page_header.php';
 
 $paramsFieldName = getParamFieldNameByType(get_request('type', 0));
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = array(
-	'description_visible' =>	array(T_ZBX_STR, O_OPT, null,	null,		null),
-	'type_visible' =>			array(T_ZBX_STR, O_OPT, null,	null,		null),
-	'interface_visible' =>		array(T_ZBX_STR, O_OPT, null,	null,		null),
-	'community_visible' =>		array(T_ZBX_STR, O_OPT, null,	null,		null),
-	'contextname_visible' =>	array(T_ZBX_STR, O_OPT, null,	null,		null),
-	'securityname_visible' =>	array(T_ZBX_STR, O_OPT, null,	null,		null),
-	'securitylevel_visible' =>	array(T_ZBX_STR, O_OPT, null,	null,		null),
-	'authprotocol_visible' =>	array(T_ZBX_STR, O_OPT, null,	null,		null),
-	'authpassphrase_visible' =>	array(T_ZBX_STR, O_OPT, null,	null,		null),
-	'privprotocol_visible' =>	array(T_ZBX_STR, O_OPT, null,	null,		null),
-	'privpassphras_visible' =>	array(T_ZBX_STR, O_OPT, null,	null,		null),
-	'port_visible' =>			array(T_ZBX_STR, O_OPT, null,	null,		null),
-	'authtype_visible' =>		array(T_ZBX_STR, O_OPT, null,	null,		null),
-	'username_visible' =>		array(T_ZBX_STR, O_OPT, null,	null,		null),
-	'publickey_visible' =>		array(T_ZBX_STR, O_OPT, null,	null,		null),
-	'privatekey_visible' =>		array(T_ZBX_STR, O_OPT, null,	null,		null),
-	'password_visible' =>		array(T_ZBX_STR, O_OPT, null,	null,		null),
-	'value_type_visible' =>		array(T_ZBX_STR, O_OPT, null,	null,		null),
-	'data_type_visible' =>		array(T_ZBX_STR, O_OPT, null,	null,		null),
-	'units_visible' =>			array(T_ZBX_STR, O_OPT, null,	null,		null),
-	'formula_visible' =>		array(T_ZBX_STR, O_OPT, null,	null,		null),
-	'delay_visible' =>			array(T_ZBX_STR, O_OPT, null,	null,		null),
-	'delay_flex_visible' =>		array(T_ZBX_STR, O_OPT, null,	null,		null),
-	'history_visible' =>		array(T_ZBX_STR, O_OPT, null,	null,		null),
-	'trends_visible' =>			array(T_ZBX_STR, O_OPT, null,	null,		null),
-	'status_visible' =>			array(T_ZBX_STR, O_OPT, null,	null,		null),
-	'logtimefmt_visible' =>		array(T_ZBX_STR, O_OPT, null,	null,		null),
-	'delta_visible' =>			array(T_ZBX_STR, O_OPT, null,	null,		null),
-	'valuemapid_visible' =>		array(T_ZBX_STR, O_OPT, null,	null,		null),
-	'trapper_hosts_visible' =>	array(T_ZBX_STR, O_OPT, null,	null,		null),
-	'applications_visible' =>	array(T_ZBX_STR, O_OPT, null,	null,		null),
 	'groupid' =>				array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
 	'hostid' =>					array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID.NOT_ZERO, 'isset({form})&&!isset({itemid})'),
 	'interfaceid' =>			array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null, _('Interface')),
@@ -152,7 +125,9 @@ $fields = array(
 	'copy_targetid' =>			array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
 	'copy_groupid' =>			array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		'isset({copy})&&isset({copy_type})&&{copy_type}==0'),
 	'new_application' =>		array(T_ZBX_STR, O_OPT, null,	null,		'isset({save})'),
+	'visible' =>		array(T_ZBX_STR, O_OPT, null,		null,		null),
 	'applications' =>			array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
+	'new_applications' =>		array(T_ZBX_STR, O_OPT, null,	null,		null),
 	'del_history' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'add_delay_flex' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	// actions
@@ -512,7 +487,8 @@ elseif (isset($_REQUEST['del_history']) && isset($_REQUEST['itemid'])) {
 }
 // mass update
 elseif (isset($_REQUEST['update']) && isset($_REQUEST['massupdate']) && isset($_REQUEST['group_itemid'])) {
-	if (get_request('delay_flex_visible')) {
+	$visible = get_request('visible', array());
+	if (isset($visible['delay_flex_visible'])) {
 		$delay_flex = get_request('delay_flex');
 		if (!is_null($delay_flex)) {
 			$db_delay_flex = '';
@@ -541,55 +517,122 @@ elseif (isset($_REQUEST['update']) && isset($_REQUEST['massupdate']) && isset($_
 		$applications = array();
 	}
 
-	$item = array(
-		'interfaceid' => get_request('interfaceid'),
-		'description' => get_request('description'),
-		'delay' => get_request('delay'),
-		'history' => get_request('history'),
-		'status' => get_request('status'),
-		'type' => get_request('type'),
-		'snmp_community' => get_request('snmp_community'),
-		'snmp_oid' => get_request('snmp_oid'),
-		'value_type' => get_request('value_type'),
-		'trapper_hosts' => get_request('trapper_hosts'),
-		'port' => get_request('port'),
-		'units' => get_request('units'),
-		'multiplier' => get_request('multiplier'),
-		'delta' => get_request('delta'),
-		'snmpv3_contextname' => get_request('snmpv3_contextname'),
-		'snmpv3_securityname' => get_request('snmpv3_securityname'),
-		'snmpv3_securitylevel' => get_request('snmpv3_securitylevel'),
-		'snmpv3_authprotocol' => get_request('snmpv3_authprotocol'),
-		'snmpv3_authpassphrase' => get_request('snmpv3_authpassphrase'),
-		'snmpv3_privprotocol' => get_request('snmpv3_privprotocol'),
-		'snmpv3_privpassphrase' => get_request('snmpv3_privpassphrase'),
-		'formula' => get_request('formula'),
-		'trends' => get_request('trends'),
-		'logtimefmt' => get_request('logtimefmt'),
-		'valuemapid' => get_request('valuemapid'),
-		'delay_flex' => $db_delay_flex,
-		'authtype' => get_request('authtype'),
-		'username' => get_request('username'),
-		'password' => get_request('password'),
-		'publickey' => get_request('publickey'),
-		'privatekey' => get_request('privatekey'),
-		'ipmi_sensor' => get_request('ipmi_sensor'),
-		'applications' => $applications,
-		'data_type' => get_request('data_type')
-	);
-	foreach ($item as $number => $field) {
-		if (is_null($field)) {
-			unset($item[$number]);
+	try {
+		DBstart();
+
+		// add new or existing applications
+		if (isset($visible['new_applications']) && !empty($_REQUEST['new_applications'])) {
+			foreach ($_REQUEST['new_applications'] as $newApplication) {
+				if (is_array($newApplication) && isset($newApplication['new'])) {
+					$newApplications[] = array(
+						'name' => $newApplication['new'],
+						'hostid' => get_request('hostid')
+					);
+				}
+				else {
+					$existApplication[] = $newApplication;
+				}
+			}
+
+			if (isset($newApplications)) {
+				if (!$createdApplication = API::Application()->create($newApplications)) {
+					throw new Exception();
+				}
+				if (isset($existApplication)) {
+					$existApplication = array_merge($existApplication, $createdApplication['applicationids']);
+				}
+				else {
+					$existApplication = $createdApplication['applicationids'];
+				}
+			}
+		}
+
+		if (isset($visible['applications'])) {
+			if (isset($_REQUEST['applications'])) {
+				if (isset($existApplication)) {
+					$applications = array_unique(array_merge($_REQUEST['applications'], $existApplication));
+				}
+				else {
+					$applications = $_REQUEST['applications'];
+				}
+			}
+			else {
+				if (isset($existApplication)){
+					$applications = $existApplication;
+				}
+				else {
+					$applications = array();
+				}
+			}
+		}
+
+		$item = array(
+			'interfaceid' => get_request('interfaceid'),
+			'description' => get_request('description'),
+			'delay' => get_request('delay'),
+			'history' => get_request('history'),
+			'status' => get_request('status'),
+			'type' => get_request('type'),
+			'snmp_community' => get_request('snmp_community'),
+			'snmp_oid' => get_request('snmp_oid'),
+			'value_type' => get_request('value_type'),
+			'trapper_hosts' => get_request('trapper_hosts'),
+			'port' => get_request('port'),
+			'units' => get_request('units'),
+			'multiplier' => get_request('multiplier'),
+			'delta' => get_request('delta'),
+			'snmpv3_contextname' => get_request('snmpv3_contextname'),
+			'snmpv3_securityname' => get_request('snmpv3_securityname'),
+			'snmpv3_securitylevel' => get_request('snmpv3_securitylevel'),
+			'snmpv3_authprotocol' => get_request('snmpv3_authprotocol'),
+			'snmpv3_authpassphrase' => get_request('snmpv3_authpassphrase'),
+			'snmpv3_privprotocol' => get_request('snmpv3_privprotocol'),
+			'snmpv3_privpassphrase' => get_request('snmpv3_privpassphrase'),
+			'formula' => get_request('formula'),
+			'trends' => get_request('trends'),
+			'logtimefmt' => get_request('logtimefmt'),
+			'valuemapid' => get_request('valuemapid'),
+			'delay_flex' => $db_delay_flex,
+			'authtype' => get_request('authtype'),
+			'username' => get_request('username'),
+			'password' => get_request('password'),
+			'publickey' => get_request('publickey'),
+			'privatekey' => get_request('privatekey'),
+			'ipmi_sensor' => get_request('ipmi_sensor'),
+			'applications' => $applications,
+			'data_type' => get_request('data_type')
+		);
+
+		// add applications
+		if (!empty($existApplication) && (!isset($visible['applications']) || !isset($_REQUEST['applications']))) {
+			foreach ($existApplication as $linkApp) {
+				$linkApplications[] = array('applicationid' => $linkApp);
+			}
+			foreach (get_request('group_itemid') as $linkItem) {
+				$linkItems[] = array('itemid' => $linkItem);
+			}
+			$linkApp = array(
+				'applications' => $linkApplications,
+				'items' => $linkItems
+			);
+			API::Application()->massAdd($linkApp);
+		}
+
+		foreach ($item as $number => $field) {
+			if (is_null($field)) {
+				unset($item[$number]);
+			}
+		}
+
+		foreach ($_REQUEST['group_itemid'] as $id) {
+			$item['itemid'] = $id;
+			if (!$result = API::Item()->update($item)) {
+				break;
+			}
 		}
 	}
-
-	DBstart();
-	foreach ($_REQUEST['group_itemid'] as $id) {
-		$item['itemid'] = $id;
-		$result = API::Item()->update($item);
-		if (!$result) {
-			break;
-		}
+	catch (Exception $e) {
+		$result = false;
 	}
 	$result = DBend($result);
 	show_messages($result, _('Items updated'), _('Cannot update items'));
@@ -743,7 +786,8 @@ elseif ($_REQUEST['go'] == 'massupdate' || isset($_REQUEST['massupdate']) && iss
 		'formula' => get_request('formula', '1'),
 		'logtimefmt' => get_request('logtimefmt', ''),
 		'initial_item_type' => null,
-		'multiple_interface_types' => false
+		'multiple_interface_types' => false,
+		'visible' => get_request('visible', array())
 	);
 
 	// hosts

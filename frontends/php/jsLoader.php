@@ -189,7 +189,8 @@ $tranStrings = array(
 	'multiselect.js' => array(
 		'No matches found' => _('No matches found'),
 		'More matches found...' => _('More matches found...'),
-		'type here to search' => _('type here to search')
+		'type here to search' => _('type here to search'),
+		'new' => _('new')
 	)
 );
 
