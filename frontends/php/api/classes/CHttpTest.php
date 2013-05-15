@@ -63,7 +63,7 @@ class CHttpTest extends CZBXAPI {
 			'search'         => null,
 			'searchByAny'    => null,
 			'startSearch'    => null,
-			'exludeSearch'   => null,
+			'excludeSearch'  => null,
 			// output
 			'output'         => API_OUTPUT_REFER,
 			'expandName'     => null,
