@@ -547,7 +547,7 @@ class CApplication extends CZBXAPI {
 				' AND '.dbConditionInt('ia.applicationid', $applicationids)
 		);
 		while ($pair = DBfetch($linkedDb)) {
-			$linked[$pair['applicationid']][$pair['itemid']] = array($pair['itemid'] => $pair['itemid']);
+			$linked[$pair['applicationid']][$pair['itemid']] = true;
 		}
 		$appsInsert = array();
 		foreach ($applicationids as $applicationid) {
