@@ -27,6 +27,11 @@ require_once dirname(__FILE__).'/include/forms.inc.php';
 $page['title'] = _('Configuration of items');
 $page['file'] = 'items.php';
 $page['scripts'] = array('class.cviewswitcher.js');
+
+if (isset($_REQUEST['filter_set'])) {
+	$page['scripts'][] = 'multiselect.js';
+}
+
 $page['hist_arg'] = array();
 
 require_once dirname(__FILE__).'/include/page_header.php';

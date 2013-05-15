@@ -503,12 +503,15 @@
 		$table->addRow(array(
 			new CCol(bold(_('Host group').NAME_DELIMITER), 'label col1'),
 			new CCol(array(
-				new CTextBox('filter_group', $filter_group, ZBX_TEXTBOX_FILTER_SIZE),
-				new CButton('btn_group', _('Select'),
-					'return PopUp("popup.php?srctbl=host_group&srcfld1=name'.
-						'&dstfrm='.$form->getName().'&dstfld1=filter_group", 450, 450);',
-					'G'
-				)
+				new CMultiSelect(array(
+						'name' => 'filter_group',
+						'selectedLimit' => 1,
+						'objectName' => 'hostGroup',
+						'objectOptions' => array(
+							'editable' => true
+						),
+						'defaultValue' => 0
+				))
 			), 'col1'),
 			new CCol(bold(_('Type').NAME_DELIMITER), 'label col2'),
 			new CCol($cmbType, 'col2'),
@@ -521,12 +524,15 @@
 		$table->addRow(array(
 			new CCol(bold(_('Host').NAME_DELIMITER), 'label'),
 			new CCol(array(
-				new CTextBox('filter_hostname', $filter_hostname, ZBX_TEXTBOX_FILTER_SIZE),
-				new CButton('btn_host', _('Select'),
-					'return PopUp("popup.php?srctbl=hosts_and_templates&srcfld1=hostid&srcfld2=name'.
-					'&dstfrm='.$form->getName().'&dstfld1=filter_hostid&dstfld2=filter_hostname'.
-					'&group=" + jQuery("#filter_group").val(), 450, 450);', 'H'
-				)
+				new CMultiSelect(array(
+						'name' => 'filter_hostname',
+						'selectedLimit' => 1,
+						'objectName' => 'hosts',
+						'objectOptions' => array(
+							'editable' => true
+						),
+						'defaultValue' => 0
+				))
 			)),
 			new CCol($updateIntervalLabel, 'label'),
 			new CCol($updateIntervalInput),
