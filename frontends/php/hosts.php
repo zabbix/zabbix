@@ -274,16 +274,24 @@ elseif (isset($_REQUEST['go']) && $_REQUEST['go'] == 'massupdate' && isset($_REQ
 				if (isset($existGroups)){
 					$replaceHostGroups = array_unique(array_merge($_REQUEST['groups'], $existGroups));
 				}
+				else {
+					$replaceHostGroups = $_REQUEST['groups'];
+				}
 			}
 			elseif (isset($existGroups)) {
 				$replaceHostGroups = $existGroups;
 			}
 
-			$hosts['groups'] = API::HostGroup()->get(array(
-				'groupids' => $replaceHostGroups,
-				'editable' => true,
-				'output' => array('groupid')
-			));
+			if (isset($replaceHostGroups)) {
+				$hosts['groups'] = API::HostGroup()->get(array(
+					'groupids' => $replaceHostGroups,
+					'editable' => true,
+					'output' => array('groupid')
+				));
+			}
+			else {
+				$hosts['groups'] = array();
+			}
 		}
 		elseif (isset($existGroups)) {
 			$existGroups = API::HostGroup()->get(array(
