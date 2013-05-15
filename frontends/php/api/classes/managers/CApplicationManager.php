@@ -34,11 +34,12 @@ class CApplicationManager {
 	 * @return array
 	 */
 	public function create(array $applications, $batch = false) {
-		$insertApplications = array();
-		foreach ($applications as $app) {
+		$insertApplications = $applications;
+		foreach ($insertApplications as &$app) {
 			unset($app['applicationTemplates']);
-			$insertApplications[] = $app;
 		}
+		unset($app);
+
 		if ($batch) {
 			$applicationids = DB::insertBatch('applications', $insertApplications);
 		}
@@ -507,19 +508,19 @@ class CApplicationManager {
 		$appsCreate = array();
 		$appsUpdate = array();
 
-		foreach ($applications as $app) {
+		foreach ($applications as $key => $app) {
 			if (isset($app['applicationid'])) {
 				$appsUpdate[] = $app;
 			}
 			else {
-				$appsCreate[] = $app;
+				$appsCreate[$key] = $app;
 			}
 		}
 
 		if (!empty($appsCreate)) {
 			$newApps = $this->create($appsCreate, true);
-			foreach ($newApps as $num => $newApp) {
-				$applications[$num]['applicationid'] = $newApp['applicationid'];
+			foreach ($newApps as $key => $newApp) {
+				$applications[$key]['applicationid'] = $newApp['applicationid'];
 			}
 		}
 		if (!empty($appsUpdate)) {
