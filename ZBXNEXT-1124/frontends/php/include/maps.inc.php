@@ -915,7 +915,7 @@ function getImagesInfo($selement) {
  */
 function getSelementsInfo($sysmap, $options = array()) {
 	if (!isset($options['severity_min'])) {
-		$options['severity_min'] = TRIGGER_SEVERITY_DISASTER;
+		$options['severity_min'] = TRIGGER_SEVERITY_NOT_CLASSIFIED;
 	}
 
 	$config = select_config();
