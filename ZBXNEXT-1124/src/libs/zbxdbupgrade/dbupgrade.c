@@ -78,6 +78,14 @@
 #	define ZBX_TYPE_UINT_STR	"numeric(20)"
 #endif
 
+#if defined(HAVE_IBM_DB2)
+#	define ZBX_TYPE_SHORTTEXT_STR	"varchar(2048)"
+#elif defined(HAVE_ORACLE)
+#	define ZBX_TYPE_SHORTTEXT_STR	"nvarchar2(2048)"
+#else
+#	define ZBX_TYPE_SHORTTEXT_STR	"text"
+#endif
+
 #define ZBX_FIRST_DB_VERSION		2010000
 
 typedef struct
@@ -107,6 +115,9 @@ static void	DBfield_type_string(char **sql, size_t *sql_alloc, size_t *sql_offse
 			break;
 		case ZBX_TYPE_UINT:
 			zbx_strcpy_alloc(sql, sql_alloc, sql_offset, ZBX_TYPE_UINT_STR);
+			break;
+		case ZBX_TYPE_SHORTTEXT:
+			zbx_strcpy_alloc(sql, sql_alloc, sql_offset, ZBX_TYPE_SHORTTEXT_STR);
 			break;
 		default:
 			assert(0);
@@ -493,7 +504,7 @@ static int	DBdrop_foreign_key(const char *table_name, int id)
 	return ret;
 }
 
-static int	DBcreate_dbversion_table()
+static int	DBcreate_dbversion_table(void)
 {
 	const ZBX_TABLE	*table;
 	int		ret;
@@ -542,37 +553,37 @@ static int	DBmodify_proxy_table_id_field(const char *table_name)
 #endif
 }
 
-static int	DBpatch_2010001()
+static int	DBpatch_2010001(void)
 {
 	return DBmodify_proxy_table_id_field("proxy_autoreg_host");
 }
 
-static int	DBpatch_2010002()
+static int	DBpatch_2010002(void)
 {
 	return DBmodify_proxy_table_id_field("proxy_dhistory");
 }
 
-static int	DBpatch_2010003()
+static int	DBpatch_2010003(void)
 {
 	return DBmodify_proxy_table_id_field("proxy_history");
 }
 
-static int	DBpatch_2010004()
+static int	DBpatch_2010004(void)
 {
 	return DBmodify_proxy_table_id_field("history_str_sync");
 }
 
-static int	DBpatch_2010005()
+static int	DBpatch_2010005(void)
 {
 	return DBmodify_proxy_table_id_field("history_sync");
 }
 
-static int	DBpatch_2010006()
+static int	DBpatch_2010006(void)
 {
 	return DBmodify_proxy_table_id_field("history_uint_sync");
 }
 
-static int	DBpatch_2010007()
+static int	DBpatch_2010007(void)
 {
 	const char	*strings[] = {"period", "stime", "timelinefixed", NULL};
 	int		i;
@@ -589,28 +600,28 @@ static int	DBpatch_2010007()
 	return SUCCEED;
 }
 
-static int	DBpatch_2010008()
+static int	DBpatch_2010008(void)
 {
 	const ZBX_FIELD	field = {"expression", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBmodify_field_type("triggers", &field);
 }
 
-static int	DBpatch_2010009()
+static int	DBpatch_2010009(void)
 {
 	const ZBX_FIELD	field = {"applicationid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
 
 	return DBdrop_not_null("httptest", &field);
 }
 
-static int	DBpatch_2010010()
+static int	DBpatch_2010010(void)
 {
 	const ZBX_FIELD	field = {"hostid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
 
 	return DBadd_field("httptest", &field);
 }
 
-static int	DBpatch_2010011()
+static int	DBpatch_2010011(void)
 {
 	const char	*sql =
 			"update httptest set hostid=("
@@ -625,111 +636,111 @@ static int	DBpatch_2010011()
 	return FAIL;
 }
 
-static int	DBpatch_2010012()
+static int	DBpatch_2010012(void)
 {
 	const ZBX_FIELD	field = {"hostid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0};
 
 	return DBset_not_null("httptest", &field);
 }
 
-static int	DBpatch_2010013()
+static int	DBpatch_2010013(void)
 {
 	const ZBX_FIELD	field = {"templateid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
 
 	return DBadd_field("httptest", &field);
 }
 
-static int	DBpatch_2010014()
+static int	DBpatch_2010014(void)
 {
 	return DBdrop_index("httptest", "httptest_2");
 }
 
-static int	DBpatch_2010015()
+static int	DBpatch_2010015(void)
 {
 	return DBcreate_index("httptest", "httptest_2", "hostid,name", 1);
 }
 
-static int	DBpatch_2010016()
+static int	DBpatch_2010016(void)
 {
 	return DBcreate_index("httptest", "httptest_4", "templateid", 0);
 }
 
-static int	DBpatch_2010017()
+static int	DBpatch_2010017(void)
 {
 	return DBdrop_foreign_key("httptest", 1);
 }
 
-static int	DBpatch_2010018()
+static int	DBpatch_2010018(void)
 {
 	const ZBX_FIELD	field = {"applicationid", NULL, "applications", "applicationid", 0, 0, 0, 0};
 
 	return DBadd_foreign_key("httptest", 1, &field);
 }
 
-static int	DBpatch_2010019()
+static int	DBpatch_2010019(void)
 {
 	const ZBX_FIELD	field = {"hostid", NULL, "hosts", "hostid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("httptest", 2, &field);
 }
 
-static int	DBpatch_2010020()
+static int	DBpatch_2010020(void)
 {
 	const ZBX_FIELD	field = {"templateid", NULL, "httptest", "httptestid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("httptest", 3, &field);
 }
 
-static int	DBpatch_2010021()
+static int	DBpatch_2010021(void)
 {
 	const ZBX_FIELD	field = {"http_proxy", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBadd_field("httptest", &field);
 }
 
-static int	DBpatch_2010022()
+static int	DBpatch_2010022(void)
 {
 	const ZBX_FIELD field = {"snmpv3_authprotocol", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("items", &field);
 }
 
-static int	DBpatch_2010023()
+static int	DBpatch_2010023(void)
 {
 	const ZBX_FIELD field = {"snmpv3_privprotocol", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("items", &field);
 }
 
-static int	DBpatch_2010024()
+static int	DBpatch_2010024(void)
 {
 	const ZBX_FIELD field = {"snmpv3_authprotocol", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("dchecks", &field);
 }
 
-static int	DBpatch_2010025()
+static int	DBpatch_2010025(void)
 {
 	const ZBX_FIELD field = {"snmpv3_privprotocol", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("dchecks", &field);
 }
 
-static int	DBpatch_2010026()
+static int	DBpatch_2010026(void)
 {
 	const ZBX_FIELD field = {"retries", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("httptest", &field);
 }
 
-static int	DBpatch_2010027()
+static int	DBpatch_2010027(void)
 {
 	const ZBX_FIELD field = {"application", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBadd_field("screens_items", &field);
 }
 
-static int	DBpatch_2010028()
+static int	DBpatch_2010028(void)
 {
 	const char	*sql =
 			"update profiles"
@@ -744,7 +755,7 @@ static int	DBpatch_2010028()
 	return FAIL;
 }
 
-static int	DBpatch_2010029()
+static int	DBpatch_2010029(void)
 {
 	const char	*sql =
 			"delete from profiles where idx in ('web.httpconf.applications','web.httpmon.applications')";
@@ -755,7 +766,7 @@ static int	DBpatch_2010029()
 	return FAIL;
 }
 
-static int	DBpatch_2010030()
+static int	DBpatch_2010030(void)
 {
 	const char	*sql = "delete from profiles where idx='web.items.filter_groupid'";
 
@@ -765,7 +776,7 @@ static int	DBpatch_2010030()
 	return FAIL;
 }
 
-static int	DBpatch_2010031()
+static int	DBpatch_2010031(void)
 {
 	const char	*sql =
 			"update profiles"
@@ -780,14 +791,14 @@ static int	DBpatch_2010031()
 	return FAIL;
 }
 
-static int	DBpatch_2010032()
+static int	DBpatch_2010032(void)
 {
 	const ZBX_FIELD	field = {"type", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBset_default("users", &field);
 }
 
-static int	DBpatch_2010033()
+static int	DBpatch_2010033(void)
 {
 	if (ZBX_DB_OK <= DBexecute(
 			"delete from events"
@@ -805,12 +816,12 @@ static int	DBpatch_2010033()
 	return FAIL;
 }
 
-static int	DBpatch_2010034()
+static int	DBpatch_2010034(void)
 {
 	return DBdrop_field("events", "value_changed");
 }
 
-static int	DBpatch_2010035()
+static int	DBpatch_2010035(void)
 {
 	const char	*sql = "delete from profiles where idx='web.events.filter.showUnknown'";
 
@@ -820,7 +831,7 @@ static int	DBpatch_2010035()
 	return FAIL;
 }
 
-static int	DBpatch_2010036()
+static int	DBpatch_2010036(void)
 {
 	const char	*sql =
 			"update profiles"
@@ -835,7 +846,7 @@ static int	DBpatch_2010036()
 	return FAIL;
 }
 
-static int	DBpatch_2010037()
+static int	DBpatch_2010037(void)
 {
 	if (ZBX_DB_OK <= DBexecute("update config set server_check_interval=10"))
 		return SUCCEED;
@@ -843,43 +854,43 @@ static int	DBpatch_2010037()
 	return FAIL;
 }
 
-static int	DBpatch_2010038()
+static int	DBpatch_2010038(void)
 {
 	const ZBX_FIELD	field = {"server_check_interval", "10", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBset_default("config", &field);
 }
 
-static int	DBpatch_2010039()
+static int	DBpatch_2010039(void)
 {
 	return DBdrop_field("alerts", "nextcheck");
 }
 
-static int	DBpatch_2010040()
+static int	DBpatch_2010040(void)
 {
 	const ZBX_FIELD	field = {"state", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBrename_field("triggers", "value_flags", &field);
 }
 
-static int	DBpatch_2010041()
+static int	DBpatch_2010041(void)
 {
 	return DBdrop_index("events", "events_1");
 }
 
-static int	DBpatch_2010042()
+static int	DBpatch_2010042(void)
 {
 	return DBcreate_index("events", "events_1", "source,object,objectid,eventid", 1);
 }
 
-static int	DBpatch_2010043()
+static int	DBpatch_2010043(void)
 {
 	const ZBX_FIELD field = {"state", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("items", &field);
 }
 
-static int	DBpatch_2010044()
+static int	DBpatch_2010044(void)
 {
 	if (ZBX_DB_OK <= DBexecute(
 			"update items"
@@ -892,14 +903,14 @@ static int	DBpatch_2010044()
 	return FAIL;
 }
 
-static int	DBpatch_2010045()
+static int	DBpatch_2010045(void)
 {
 	const ZBX_FIELD	field = {"state", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBrename_field("proxy_history", "status", &field);
 }
 
-static int	DBpatch_2010046()
+static int	DBpatch_2010046(void)
 {
 	if (ZBX_DB_OK <= DBexecute(
 			"update proxy_history"
@@ -911,19 +922,19 @@ static int	DBpatch_2010046()
 	return FAIL;
 }
 
-static int	DBpatch_2010047()
+static int	DBpatch_2010047(void)
 {
 	const ZBX_FIELD	field = {"itemid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
 
 	return DBadd_field("escalations", &field);
 }
 
-static int	DBpatch_2010048()
+static int	DBpatch_2010048(void)
 {
 	return DBdrop_index("escalations", "escalations_1");
 }
 
-static int	DBpatch_2010049()
+static int	DBpatch_2010049(void)
 {
 	return DBcreate_index("escalations", "escalations_1", "actionid,triggerid,itemid,escalationid", 1);
 }
@@ -963,126 +974,126 @@ static int	DBpatch_2010050()
 	return SUCCEED;
 }
 
-static int	DBpatch_2010051()
+static int	DBpatch_2010051(void)
 {
 	const ZBX_FIELD field = {"hk_events_mode", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("config", &field);
 }
 
-static int	DBpatch_2010052()
+static int	DBpatch_2010052(void)
 {
 	const ZBX_FIELD field = {"hk_events_trigger", "365", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("config", &field);
 }
 
-static int	DBpatch_2010053()
+static int	DBpatch_2010053(void)
 {
 	const ZBX_FIELD field = {"hk_events_internal", "365", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("config", &field);
 }
 
-static int	DBpatch_2010054()
+static int	DBpatch_2010054(void)
 {
 	const ZBX_FIELD field = {"hk_events_discovery", "365", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("config", &field);
 }
 
-static int	DBpatch_2010055()
+static int	DBpatch_2010055(void)
 {
 	const ZBX_FIELD field = {"hk_events_autoreg", "365", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("config", &field);
 }
 
-static int	DBpatch_2010056()
+static int	DBpatch_2010056(void)
 {
 	const ZBX_FIELD field = {"hk_services_mode", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("config", &field);
 }
 
-static int	DBpatch_2010057()
+static int	DBpatch_2010057(void)
 {
 	const ZBX_FIELD field = {"hk_services", "365", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("config", &field);
 }
 
-static int	DBpatch_2010058()
+static int	DBpatch_2010058(void)
 {
 	const ZBX_FIELD field = {"hk_audit_mode", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("config", &field);
 }
 
-static int	DBpatch_2010059()
+static int	DBpatch_2010059(void)
 {
 	const ZBX_FIELD field = {"hk_audit", "365", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("config", &field);
 }
 
-static int	DBpatch_2010060()
+static int	DBpatch_2010060(void)
 {
 	const ZBX_FIELD field = {"hk_sessions_mode", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("config", &field);
 }
 
-static int	DBpatch_2010061()
+static int	DBpatch_2010061(void)
 {
 	const ZBX_FIELD field = {"hk_sessions", "365", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("config", &field);
 }
 
-static int	DBpatch_2010062()
+static int	DBpatch_2010062(void)
 {
 	const ZBX_FIELD field = {"hk_history_mode", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("config", &field);
 }
 
-static int	DBpatch_2010063()
+static int	DBpatch_2010063(void)
 {
 	const ZBX_FIELD field = {"hk_history_global", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("config", &field);
 }
 
-static int	DBpatch_2010064()
+static int	DBpatch_2010064(void)
 {
 	const ZBX_FIELD field = {"hk_history", "90", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("config", &field);
 }
 
-static int	DBpatch_2010065()
+static int	DBpatch_2010065(void)
 {
 	const ZBX_FIELD field = {"hk_trends_mode", "1 ", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("config", &field);
 }
 
-static int	DBpatch_2010066()
+static int	DBpatch_2010066(void)
 {
 	const ZBX_FIELD field = {"hk_trends_global", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("config", &field);
 }
 
-static int	DBpatch_2010067()
+static int	DBpatch_2010067(void)
 {
 	const ZBX_FIELD field = {"hk_trends", "365", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("config", &field);
 }
 
-static int	DBpatch_2010068()
+static int	DBpatch_2010068(void)
 {
 	if (ZBX_DB_OK <= DBexecute(
 			"update config"
@@ -1111,22 +1122,61 @@ static int	DBpatch_2010068()
 	return FAIL;
 }
 
-static int	DBpatch_2010069()
+static int	DBpatch_2010069(void)
 {
 	return DBdrop_field("config", "event_history");
 }
 
-static int	DBpatch_2010070()
+static int	DBpatch_2010070(void)
 {
 	return DBdrop_field("config", "alert_history");
 }
 
-static int	DBpatch_2010071()
+static int	DBpatch_2010071(void)
+{
+	const ZBX_FIELD	field = {"snmpv3_contextname", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("items", &field);
+}
+
+static int	DBpatch_2010072(void)
+{
+	const ZBX_FIELD	field = {"snmpv3_contextname", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("dchecks", &field);
+}
+
+static int	DBpatch_2010073(void)
+{
+	const char	*sql = "delete from ids where table_name='events'";
+
+	if (ZBX_DB_OK <= DBexecute("%s", sql))
+		return SUCCEED;
+
+	return FAIL;
+}
+
+static int	DBpatch_2010074(void)
+{
+	const ZBX_FIELD	field = {"variables", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
+
+	return DBrename_field("httptest", "macros", &field);
+}
+
+static int	DBpatch_2010075(void)
+{
+	const ZBX_FIELD	field = {"variables", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("httpstep", &field);
+}
+
+static int	DBpatch_2010076(void)
 {
 	const ZBX_FIELD field = {"severity_min", "5", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("sysmaps", &field);
 }
+
 
 #define DBPATCH_START()					zbx_dbpatch_t	patches[] = {
 #define DBPATCH_ADD(version, duplicates, mandatory)	{DBpatch_##version, version, duplicates, mandatory},
@@ -1164,7 +1214,7 @@ static void	DBget_version(int *mandatory, int *optional)
 	}
 }
 
-int	DBcheck_version()
+int	DBcheck_version(void)
 {
 	const char	*__function_name = "DBcheck_version";
 	const char	*dbversion_table_name = "dbversion";
@@ -1248,6 +1298,11 @@ int	DBcheck_version()
 	DBPATCH_ADD(2010069, 0, 0)
 	DBPATCH_ADD(2010070, 0, 0)
 	DBPATCH_ADD(2010071, 0, 1)
+	DBPATCH_ADD(2010072, 0, 1)
+	DBPATCH_ADD(2010073, 0, 0)
+	DBPATCH_ADD(2010074, 0, 1)
+	DBPATCH_ADD(2010075, 0, 1)
+	DBPATCH_ADD(2010076, 0, 1)
 
 	DBPATCH_END()
 
