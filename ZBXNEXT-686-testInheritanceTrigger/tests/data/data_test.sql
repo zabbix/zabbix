@@ -740,7 +740,7 @@ INSERT INTO interface (type, ip, dns, useip, port, main, hostid, interfaceid) VA
 INSERT INTO interface (type, ip, dns, useip, port, main, hostid, interfaceid) VALUES (3, '127.0.7.3', '', '1', '10073', '1', 30001, 50013);
 INSERT INTO interface (type, ip, dns, useip, port, main, hostid, interfaceid) VALUES (4, '127.0.7.4', '', '1', '10074', '1', 30001, 50014);
 
--- add triggers for simpleCreate testing for testFormTrigger
+-- testInheritanceTrigger.SimpleUpdate
 INSERT INTO triggers (triggerid, expression, description, comments) VALUES (15000, '{15000}=0', 'testInheritanceTrigger1', '');
 INSERT INTO functions (functionid, itemid, triggerid, function, parameter) VALUES (15000, 24329 ,15000,'last',0);
 INSERT INTO triggers (triggerid, expression, description, comments, templateid) VALUES (15001, '{15001}=0', 'testInheritanceTrigger1', '', 15000);
