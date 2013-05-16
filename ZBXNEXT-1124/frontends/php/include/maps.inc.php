@@ -1159,12 +1159,12 @@ function getSelementsInfo($sysmap, $options = array()) {
 		foreach ($selement['triggers'] as $triggerId) {
 			$trigger = $all_triggers[$triggerId];
 
-			if ($trigger['status'] == TRIGGER_STATUS_DISABLED) {
-				$i['trigger_disabled']++;
-			}
-			else {
-				if ($trigger['value'] == TRIGGER_VALUE_TRUE) {
-					if ($options['severity_min'] <= $trigger['priority']) {
+			if ($options['severity_min'] <= $trigger['priority']) {
+				if ($trigger['status'] == TRIGGER_STATUS_DISABLED) {
+					$i['trigger_disabled']++;
+				}
+				else {
+					if ($trigger['value'] == TRIGGER_VALUE_TRUE) {
 						$i['problem']++;
 						$lastProblemId = $triggerId;
 
@@ -1172,15 +1172,15 @@ function getSelementsInfo($sysmap, $options = array()) {
 							$i['priority'] = $trigger['priority'];
 						}
 					}
+
+					if (isset($unackTriggerIds[$triggerId])) {
+						$i['problem_unack']++;
+					}
+
+					$config = select_config();
+
+					$i['latelyChanged'] |= ((time() - $trigger['lastchange']) < $config['blink_period']);
 				}
-
-				if (isset($unackTriggerIds[$triggerId])) {
-					$i['problem_unack']++;
-				}
-
-				$config = select_config();
-
-				$i['latelyChanged'] |= ((time() - $trigger['lastchange']) < $config['blink_period']);
 			}
 		}
 
@@ -1524,11 +1524,12 @@ function drawMapHighligts(&$im, $map, $mapInfo) {
 	}
 }
 
-function drawMapSelementsMarks(&$im, &$map, &$mapInfo) {
+function drawMapSelementsMarks(&$im, $map, $mapInfo) {
 	global $colors;
 
 	$selements = $map['selements'];
-
+sdff($selements);
+sdff($mapInfo);
 	foreach ($selements as $selementId => $selement) {
 		if (empty($selement)) {
 			continue;
@@ -1555,11 +1556,8 @@ function drawMapSelementsMarks(&$im, &$map, &$mapInfo) {
 			if ($elementInfo['icon_type'] == SYSMAP_ELEMENT_ICON_ON) {
 				$hl_color = true;
 			}
-
-			if ($elementInfo['icon_type'] == SYSMAP_ELEMENT_ICON_MAINTENANCE) {
-				$st_color = true;
-			}
-			if ($elementInfo['icon_type'] == SYSMAP_ELEMENT_ICON_DISABLED) {
+			if ($elementInfo['icon_type'] == SYSMAP_ELEMENT_ICON_MAINTENANCE
+					|| $elementInfo['icon_type'] == SYSMAP_ELEMENT_ICON_DISABLED) {
 				$st_color = true;
 			}
 		}
@@ -1589,7 +1587,6 @@ function drawMapSelementsMarks(&$im, &$map, &$mapInfo) {
 			$markSize += 3;
 		}
 
-		$marks = 'tlbr';
 		if ($map['label_type'] != MAP_LABEL_TYPE_NOTHING) {
 			$labelLocation = $selement['label_location'];
 			if (is_null($labelLocation) || ($labelLocation < 0)) {
@@ -1598,18 +1595,21 @@ function drawMapSelementsMarks(&$im, &$map, &$mapInfo) {
 
 			switch ($labelLocation) {
 				case MAP_LABEL_LOC_TOP:
-					$marks = 'lbr';
+					$marks = 'rbl';
 					break;
 				case MAP_LABEL_LOC_LEFT:
-					$marks = 'tbr';
+					$marks = 'trb';
 					break;
 				case MAP_LABEL_LOC_RIGHT:
-					$marks = 'tlb';
+					$marks = 'tbl';
 					break;
 				case MAP_LABEL_LOC_BOTTOM:
 				default:
-					$marks = 'tlr';
+					$marks = 'trl';
 			}
+		}
+		else {
+			$marks = 'trbl';
 		}
 
 		imageVerticalMarks($im, $selement['x'] + ($iconX / 2), $selement['y'] + ($iconY / 2), $markSize, $colors['Red'], $marks);
