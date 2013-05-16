@@ -47,54 +47,53 @@ class CGroupPrototypeCollectionValidator extends CCollectionValidator {
 	 */
 	public function validate($value)
 	{
-		if (parent::validate($value)) {
-			// check that at least one group prototype with a host group exists
-			$hasHostGroup = false;
-			foreach ($value as $groupPrototype) {
-				if (isset($groupPrototype['groupid'])) {
-					$hasHostGroup = true;
-				}
-			}
-			if (!$hasHostGroup) {
-				$this->error($this->messageHostGroups);
-				return false;
-			}
-
-			// check for name duplicates
-			// keep in mind that some group prototypes may not have a name set
-			$names = array();
-			foreach ($value as $groupPrototype) {
-				if (isset($groupPrototype['name'])) {
-					if (isset($names[$groupPrototype['name']])) {
-						$this->error($this->messageDuplicateName, $groupPrototype['name']);
-
-						return false;
-					}
-
-					$names[$groupPrototype['name']] = true;
-				}
-			}
-
-			// check for group ID duplicates
-			// keep in mind that some group prototypes may not have a group ID set
-			$groupIds = array();
-			foreach ($value as $groupPrototype) {
-				if (isset($groupPrototype['groupid'])) {
-					if (isset($groupIds[$groupPrototype['groupid']])) {
-						$this->error($this->messageDuplicateGroupId, $groupPrototype['groupid']);
-
-						return false;
-					}
-
-					$groupIds[$groupPrototype['groupid']] = true;
-				}
-			}
-
-			return true;
-		}
-		else {
+		if (!parent::validate($value)) {
 			return false;
 		}
+
+		// check that at least one group prototype with a host group exists
+		$hasHostGroup = false;
+		foreach ($value as $groupPrototype) {
+			if (isset($groupPrototype['groupid'])) {
+				$hasHostGroup = true;
+			}
+		}
+		if (!$hasHostGroup) {
+			$this->error($this->messageHostGroups);
+			return false;
+		}
+
+		// check for name duplicates
+		// keep in mind that some group prototypes may not have a name set
+		$names = array();
+		foreach ($value as $groupPrototype) {
+			if (isset($groupPrototype['name'])) {
+				if (isset($names[$groupPrototype['name']])) {
+					$this->error($this->messageDuplicateName, $groupPrototype['name']);
+
+					return false;
+				}
+
+				$names[$groupPrototype['name']] = true;
+			}
+		}
+
+		// check for group ID duplicates
+		// keep in mind that some group prototypes may not have a group ID set
+		$groupIds = array();
+		foreach ($value as $groupPrototype) {
+			if (isset($groupPrototype['groupid'])) {
+				if (isset($groupIds[$groupPrototype['groupid']])) {
+					$this->error($this->messageDuplicateGroupId, $groupPrototype['groupid']);
+
+					return false;
+				}
+
+				$groupIds[$groupPrototype['groupid']] = true;
+			}
+		}
+
+		return true;
 	}
 
 }

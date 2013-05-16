@@ -65,8 +65,7 @@ class CSchemaValidator extends CValidator {
 	 *
 	 * @return bool
 	 */
-	public function validate($value)
-	{
+	public function validate($value) {
 		$required = array_flip($this->required);
 		$unvalidatedFields = array_flip(array_keys($value));
 
