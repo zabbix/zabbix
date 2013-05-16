@@ -46,11 +46,53 @@ static void	DBlld_hostmacros_free(zbx_vector_ptr_t *hostmacros)
 
 typedef struct
 {
+	zbx_uint64_t	interfaceid;
+	zbx_uint64_t	parent_interfaceid;
+	char		*ip;
+	char		*dns;
+	char		*port;
+	unsigned char	main;
+	unsigned char	main_orig;
+	unsigned char	type;
+	unsigned char	type_orig;
+	unsigned char	useip;
+#define ZBX_FLAG_LLD_INTERFACE_UPDATE_TYPE	0x01	/* interface.type field should be updated  */
+#define ZBX_FLAG_LLD_INTERFACE_UPDATE_MAIN	0x02	/* interface.main field should be updated */
+#define ZBX_FLAG_LLD_INTERFACE_UPDATE_USEIP	0x04	/* interface.useip field should be updated */
+#define ZBX_FLAG_LLD_INTERFACE_UPDATE_IP	0x08	/* interface.ip field should be updated */
+#define ZBX_FLAG_LLD_INTERFACE_UPDATE_DNS	0x10	/* interface.dns field should be updated */
+#define ZBX_FLAG_LLD_INTERFACE_UPDATE_PORT	0x20	/* interface.port field should be updated */
+#define ZBX_FLAG_LLD_INTERFACE_UPDATE								\
+		(ZBX_FLAG_LLD_INTERFACE_UPDATE_TYPE | ZBX_FLAG_LLD_INTERFACE_UPDATE_MAIN |	\
+		ZBX_FLAG_LLD_INTERFACE_UPDATE_USEIP | ZBX_FLAG_LLD_INTERFACE_UPDATE_IP |	\
+		ZBX_FLAG_LLD_INTERFACE_UPDATE_DNS | ZBX_FLAG_LLD_INTERFACE_UPDATE_PORT)
+#define ZBX_FLAG_LLD_INTERFACE_REMOVE		0x40	/* interfaces which should be deleted */
+	unsigned char	flags;
+}
+zbx_lld_interface_t;
+
+static void	DBlld_interface_free(zbx_lld_interface_t *interface)
+{
+	zbx_free(interface->port);
+	zbx_free(interface->dns);
+	zbx_free(interface->ip);
+	zbx_free(interface);
+}
+
+static void	DBlld_interfaces_free(zbx_vector_ptr_t *interfaces)
+{
+	while (0 != interfaces->values_num)
+		DBlld_interface_free((zbx_lld_interface_t *)interfaces->values[--interfaces->values_num]);
+}
+
+typedef struct
+{
 	zbx_uint64_t		hostid;
 	zbx_vector_uint64_t	new_groupids;		/* host groups which should be added */
 	zbx_vector_uint64_t	lnk_templateids;	/* templates which should be linked */
 	zbx_vector_uint64_t	del_templateids;	/* templates which should be unlinked */
 	zbx_vector_ptr_t	new_hostmacros;		/* host macros which should be added */
+	zbx_vector_ptr_t	interfaces;
 	char			*host_proto;
 	char			*host;
 	char			*host_orig;
@@ -89,38 +131,14 @@ static void	DBlld_hosts_free(zbx_vector_ptr_t *hosts)
 		zbx_vector_uint64_destroy(&host->del_templateids);
 		DBlld_hostmacros_free(&host->new_hostmacros);
 		zbx_vector_ptr_destroy(&host->new_hostmacros);
+		DBlld_interfaces_free(&host->interfaces);
+		zbx_vector_ptr_destroy(&host->interfaces);
 		zbx_free(host->host_proto);
 		zbx_free(host->host);
 		zbx_free(host->host_orig);
 		zbx_free(host->name);
 		zbx_free(host->name_orig);
 		zbx_free(host);
-	}
-}
-
-typedef struct
-{
-	char		*ip_esc;
-	char		*dns_esc;
-	char		*port_esc;
-	unsigned char	main;
-	unsigned char	type;
-	unsigned char	useip;
-}
-zbx_lld_interface_t;
-
-static void	DBlld_interfaces_free(zbx_vector_ptr_t *interfaces)
-{
-	zbx_lld_interface_t	*interface;
-
-	while (0 != interfaces->values_num)
-	{
-		interface = (zbx_lld_interface_t *)interfaces->values[--interfaces->values_num];
-
-		zbx_free(interface->port_esc);
-		zbx_free(interface->dns_esc);
-		zbx_free(interface->ip_esc);
-		zbx_free(interface);
 	}
 }
 
@@ -252,6 +270,7 @@ static void	DBlld_hosts_get(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts,
 		zbx_vector_uint64_create(&host->lnk_templateids);
 		zbx_vector_uint64_create(&host->del_templateids);
 		zbx_vector_ptr_create(&host->new_hostmacros);
+		zbx_vector_ptr_create(&host->interfaces);
 
 		zbx_vector_ptr_append(hosts, host);
 	}
@@ -474,9 +493,7 @@ void	DBlld_hosts_validate(zbx_vector_ptr_t *hosts, const zbx_vector_uint64_t *gr
 	if (0 != tnames_offset || 0 != vnames_offset)
 	{
 		char	*sql = NULL;
-		size_t	sql_alloc = 256, sql_offset = 0;
-
-		sql = zbx_malloc(sql, sql_alloc);
+		size_t	sql_alloc = 0, sql_offset = 0;
 
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 				"select host,name"
@@ -613,6 +630,7 @@ static zbx_lld_host_t	*DBlld_host_make(zbx_vector_ptr_t *hosts, const char *host
 		zbx_vector_uint64_create(&host->lnk_templateids);
 		zbx_vector_uint64_create(&host->del_templateids);
 		zbx_vector_ptr_create(&host->new_hostmacros);
+		zbx_vector_ptr_create(&host->interfaces);
 		host->flags = ZBX_FLAG_LLD_HOST_DISCOVERED;
 
 		zbx_vector_ptr_append(hosts, host);
@@ -748,9 +766,7 @@ static void	DBlld_hostgroups_make(const zbx_vector_uint64_t *groupids, zbx_vecto
 	if (0 != hostids.values_num)
 	{
 		char	*sql = NULL;
-		size_t	sql_alloc = 256, sql_offset = 0;
-
-		sql = zbx_malloc(sql, sql_alloc);
+		size_t	sql_alloc = 0, sql_offset = 0;
 
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
 				"select hostid,groupid,hostgroupid"
@@ -1151,9 +1167,7 @@ void	DBlld_groups_validate(zbx_vector_ptr_t *groups, char **error)
 	if (0 != names_offset)
 	{
 		char	*sql = NULL;
-		size_t	sql_alloc = 256, sql_offset = 0;
-
-		sql = zbx_malloc(sql, sql_alloc);
+		size_t	sql_alloc = 0, sql_offset = 0;
 
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "select name from groups where name in (%s)", names);
 		if (0 != groupids.values_num)
@@ -1226,9 +1240,9 @@ static void	DBlld_groups_save(zbx_vector_ptr_t *groups, zbx_vector_ptr_t *group_
 	zbx_lld_host_t			*host;
 	zbx_uint64_t			groupid = 0;
 	char				*sql1 = NULL, *sql2 = NULL, *sql3 = NULL, *name_esc, *name_proto_esc;
-	size_t				sql1_alloc = ZBX_KIBIBYTE, sql1_offset = 0,
-					sql2_alloc = ZBX_KIBIBYTE, sql2_offset = 0,
-					sql3_alloc = ZBX_KIBIBYTE, sql3_offset = 0;
+	size_t				sql1_alloc = 0, sql1_offset = 0,
+					sql2_alloc = 0, sql2_offset = 0,
+					sql3_alloc = 0, sql3_offset = 0;
 	const char			*ins_groups_sql = "insert into groups (groupid,name,flags) values ";
 	const char			*ins_group_discovery_sql =
 					"insert into group_discovery (groupid,parent_group_prototypeid,name) values ";
@@ -1257,8 +1271,6 @@ static void	DBlld_groups_save(zbx_vector_ptr_t *groups, zbx_vector_ptr_t *group_
 	{
 		groupid = DBget_maxid_num("groups", new_groups);
 
-		sql1 = zbx_malloc(sql1, sql1_alloc);
-		sql2 = zbx_malloc(sql2, sql2_alloc);
 		DBbegin_multiple_update(&sql1, &sql1_alloc, &sql1_offset);
 		DBbegin_multiple_update(&sql2, &sql2_alloc, &sql2_offset);
 #ifdef HAVE_MULTIROW_INSERT
@@ -1269,7 +1281,6 @@ static void	DBlld_groups_save(zbx_vector_ptr_t *groups, zbx_vector_ptr_t *group_
 
 	if (0 != upd_groups)
 	{
-		sql3 = zbx_malloc(sql3, sql3_alloc);
 		DBbegin_multiple_update(&sql3, &sql3_alloc, &sql3_offset);
 	}
 
@@ -1358,8 +1369,8 @@ static void	DBlld_groups_save(zbx_vector_ptr_t *groups, zbx_vector_ptr_t *group_
 #ifdef HAVE_MULTIROW_INSERT
 		sql1_offset--;
 		sql2_offset--;
-		zbx_strcpy_alloc(&sql1, &sql1_alloc, &sql1_offset, ";\n");
-		zbx_strcpy_alloc(&sql2, &sql2_alloc, &sql2_offset, ";\n");
+		zbx_chrcpy_alloc(&sql1, &sql1_alloc, &sql1_offset, ';');
+		zbx_chrcpy_alloc(&sql2, &sql2_alloc, &sql2_offset, ';');
 #endif
 		DBend_multiple_update(&sql1, &sql1_alloc, &sql1_offset);
 		DBend_multiple_update(&sql2, &sql2_alloc, &sql2_offset);
@@ -1478,9 +1489,7 @@ static void	DBlld_hostmacros_make(const zbx_vector_ptr_t *hostmacros, zbx_vector
 	if (0 != hostids.values_num)
 	{
 		char	*sql = NULL;
-		size_t	sql_alloc = 256, sql_offset = 0;
-
-		sql = zbx_malloc(sql, sql_alloc);
+		size_t	sql_alloc = 0, sql_offset = 0;
 
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
 				"select hostmacroid,hostid,macro,value"
@@ -1600,9 +1609,7 @@ static void	DBlld_templates_make(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *h
 	if (0 != hostids.values_num)
 	{
 		char	*sql = NULL;
-		size_t	sql_alloc = 256, sql_offset = 0;
-
-		sql = zbx_malloc(sql, sql_alloc);
+		size_t	sql_alloc = 0, sql_offset = 0;
 
 		/* select already linked temlates */
 
@@ -1674,29 +1681,30 @@ static void	DBlld_templates_make(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *h
 static void	DBlld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, const char *host_proto,
 		zbx_uint64_t proxy_hostid, char ipmi_authtype, unsigned char ipmi_privilege, const char *ipmi_username,
 		const char *ipmi_password, unsigned char status, char inventory_mode,
-		zbx_vector_uint64_t *del_hostgroupids, zbx_vector_uint64_t *del_hostmacroids,
-		zbx_vector_ptr_t *interfaces)
+		zbx_vector_uint64_t *del_hostgroupids, zbx_vector_uint64_t *del_hostmacroids)
 {
 	const char		*__function_name = "DBlld_hosts_save";
 
 	int			i, j, new_hosts = 0, new_host_inventories = 0, upd_hosts = 0, new_hostgroups = 0,
-				new_hostmacros = 0, upd_hostmacros = 0, new_interfaces;
+				new_hostmacros = 0, upd_hostmacros = 0, new_interfaces = 0, upd_interfaces = 0;
 	zbx_lld_host_t		*host;
 	zbx_lld_hostmacro_t	*hostmacro;
 	zbx_lld_interface_t	*interface;
-	zbx_vector_uint64_t	upd_host_inventory_hostids, del_host_inventory_hostids;
+	zbx_vector_uint64_t	upd_host_inventory_hostids, del_host_inventory_hostids, del_interfaceids;
 	zbx_uint64_t		hostid = 0, hostgroupid = 0, hostmacroid = 0, interfaceid = 0;
 	char			*sql1 = NULL, *sql2 = NULL, *sql3 = NULL, *sql4 = NULL, *sql5 = NULL, *sql6 = NULL,
-				*sql7 = NULL, *sql8 = NULL, *host_esc, *name_esc, *host_proto_esc,
-				*ipmi_username_esc, *ipmi_password_esc, *macro_esc, *value_esc;
-	size_t			sql1_alloc = 8 * ZBX_KIBIBYTE, sql1_offset = 0,
-				sql2_alloc = 2 * ZBX_KIBIBYTE, sql2_offset = 0,
-				sql3_alloc = 2 * ZBX_KIBIBYTE, sql3_offset = 0,
-				sql4_alloc = 8 * ZBX_KIBIBYTE, sql4_offset = 0,
-				sql5_alloc = 2 * ZBX_KIBIBYTE, sql5_offset = 0,
-				sql6_alloc = 2 * ZBX_KIBIBYTE, sql6_offset = 0,
-				sql7_alloc = 256, sql7_offset = 0,
-				sql8_alloc = 2 * ZBX_KIBIBYTE, sql8_offset = 0;
+				*sql7 = NULL, *sql8 = NULL, *sql9 = NULL, *host_esc, *name_esc, *host_proto_esc,
+				*ipmi_username_esc, *ipmi_password_esc, *macro_esc, *value_esc, *ip_esc, *dns_esc,
+				*port_esc;
+	size_t			sql1_alloc = 0, sql1_offset = 0,
+				sql2_alloc = 0, sql2_offset = 0,
+				sql3_alloc = 0, sql3_offset = 0,
+				sql4_alloc = 0, sql4_offset = 0,
+				sql5_alloc = 0, sql5_offset = 0,
+				sql6_alloc = 0, sql6_offset = 0,
+				sql7_alloc = 0, sql7_offset = 0,
+				sql8_alloc = 0, sql8_offset = 0,
+				sql9_alloc = 0, sql9_offset = 0;
 	const char		*ins_hosts_sql =
 				"insert into hosts (hostid,host,name,proxy_hostid,ipmi_authtype,ipmi_privilege,"
 					"ipmi_username,ipmi_password,status,flags)"
@@ -1708,11 +1716,14 @@ static void	DBlld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts
 	const char		*ins_hostmacro_sql = "insert into hostmacro (hostmacroid,hostid,macro,value) values ";
 	const char		*ins_interface_sql =
 				"insert into interface (interfaceid,hostid,type,main,useip,ip,dns,port) values ";
+	const char		*ins_interface_discovery_sql =
+				"insert into interface_discovery (interfaceid,parent_interfaceid) values ";
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	zbx_vector_uint64_create(&upd_host_inventory_hostids);
 	zbx_vector_uint64_create(&del_host_inventory_hostids);
+	zbx_vector_uint64_create(&del_interfaceids);
 
 	for (i = 0; i < hosts->values_num; i++)
 	{
@@ -1745,6 +1756,18 @@ static void	DBlld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts
 
 		new_hostgroups += host->new_groupids.values_num;
 
+		for (j = 0; j < host->interfaces.values_num; j++)
+		{
+			interface = (zbx_lld_interface_t *)host->interfaces.values[j];
+
+			if (0 == interface->interfaceid)
+				new_interfaces++;
+			else if (0 != (interface->flags & ZBX_FLAG_LLD_INTERFACE_UPDATE))
+				upd_interfaces++;
+			else if (0 != (interface->flags & ZBX_FLAG_LLD_INTERFACE_REMOVE))
+				zbx_vector_uint64_append(&del_interfaceids, interface->interfaceid);
+		}
+
 		for (j = 0; j < host->new_hostmacros.values_num; j++)
 		{
 			hostmacro = (zbx_lld_hostmacro_t *)host->new_hostmacros.values[j];
@@ -1756,12 +1779,11 @@ static void	DBlld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts
 		}
 	}
 
-	new_interfaces = new_hosts * interfaces->values_num;
-
-	if (0 == new_hosts && 0 == new_host_inventories && 0 == upd_hosts && 0 == upd_hostmacros &&
-			0 == new_hostgroups && 0 == new_hostmacros && 0 == new_interfaces &&
+	if (0 == new_hosts && 0 == new_host_inventories && 0 == upd_hosts && 0 == upd_interfaces &&
+			0 == upd_hostmacros && 0 == new_hostgroups && 0 == new_hostmacros && 0 == new_interfaces &&
 			0 == del_hostgroupids->values_num && 0 == del_hostmacroids->values_num &&
-			0 == upd_host_inventory_hostids.values_num && 0 == del_host_inventory_hostids.values_num)
+			0 == upd_host_inventory_hostids.values_num && 0 == del_host_inventory_hostids.values_num &&
+			0 == del_interfaceids.values_num)
 	{
 		goto out;
 	}
@@ -1772,8 +1794,6 @@ static void	DBlld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts
 	{
 		hostid = DBget_maxid_num("hosts", new_hosts);
 
-		sql1 = zbx_malloc(sql1, sql1_alloc);
-		sql2 = zbx_malloc(sql2, sql2_alloc);
 		DBbegin_multiple_update(&sql1, &sql1_alloc, &sql1_offset);
 		DBbegin_multiple_update(&sql2, &sql2_alloc, &sql2_offset);
 #ifdef HAVE_MULTIROW_INSERT
@@ -1784,16 +1804,14 @@ static void	DBlld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts
 
 	if (0 != new_host_inventories)
 	{
-		sql3 = zbx_malloc(sql3, sql3_alloc);
 		DBbegin_multiple_update(&sql3, &sql3_alloc, &sql3_offset);
 #ifdef HAVE_MULTIROW_INSERT
 		zbx_strcpy_alloc(&sql3, &sql3_alloc, &sql3_offset, ins_host_inventory_sql);
 #endif
 	}
 
-	if (0 != upd_hosts || 0 != upd_hostmacros)
+	if (0 != upd_hosts || 0 != upd_interfaces || 0 != upd_hostmacros)
 	{
-		sql4 = zbx_malloc(sql4, sql4_alloc);
 		DBbegin_multiple_update(&sql4, &sql4_alloc, &sql4_offset);
 	}
 
@@ -1801,7 +1819,6 @@ static void	DBlld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts
 	{
 		hostgroupid = DBget_maxid_num("hosts_groups", new_hostgroups);
 
-		sql5 = zbx_malloc(sql5, sql5_alloc);
 		DBbegin_multiple_update(&sql5, &sql5_alloc, &sql5_offset);
 #ifdef HAVE_MULTIROW_INSERT
 		zbx_strcpy_alloc(&sql5, &sql5_alloc, &sql5_offset, ins_hosts_groups_sql);
@@ -1812,7 +1829,6 @@ static void	DBlld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts
 	{
 		hostmacroid = DBget_maxid_num("hostmacro", new_hostmacros);
 
-		sql6 = zbx_malloc(sql6, sql6_alloc);
 		DBbegin_multiple_update(&sql6, &sql6_alloc, &sql6_offset);
 #ifdef HAVE_MULTIROW_INSERT
 		zbx_strcpy_alloc(&sql6, &sql6_alloc, &sql6_offset, ins_hostmacro_sql);
@@ -1823,10 +1839,11 @@ static void	DBlld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts
 	{
 		interfaceid = DBget_maxid_num("interface", new_interfaces);
 
-		sql8 = zbx_malloc(sql8, sql8_alloc);
 		DBbegin_multiple_update(&sql8, &sql8_alloc, &sql8_offset);
+		DBbegin_multiple_update(&sql9, &sql9_alloc, &sql9_offset);
 #ifdef HAVE_MULTIROW_INSERT
 		zbx_strcpy_alloc(&sql8, &sql8_alloc, &sql8_offset, ins_interface_sql);
+		zbx_strcpy_alloc(&sql9, &sql9_alloc, &sql9_offset, ins_interface_discovery_sql);
 #endif
 	}
 
@@ -1870,19 +1887,6 @@ static void	DBlld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts
 #endif
 				zbx_snprintf_alloc(&sql3, &sql3_alloc, &sql3_offset, "(" ZBX_FS_UI64 ",%d)" ZBX_ROW_DL,
 						host->hostid, (int)inventory_mode);
-			}
-
-			for (j = 0; j < interfaces->values_num; j++)
-			{
-				interface = (zbx_lld_interface_t *)interfaces->values[j];
-#ifndef HAVE_MULTIROW_INSERT
-				zbx_strcpy_alloc(&sql8, &sql8_alloc, &sql8_offset, ins_interface_sql);
-#endif
-				zbx_snprintf_alloc(&sql8, &sql8_alloc, &sql8_offset,
-						"(" ZBX_FS_UI64 "," ZBX_FS_UI64 ",%d,%d,%d,'%s','%s','%s')" ZBX_ROW_DL,
-						interfaceid++, host->hostid, (int)interface->type, (int)interface->main,
-						(int)interface->useip, interface->ip_esc, interface->dns_esc,
-						interface->port_esc);
 			}
 		}
 		else
@@ -1955,6 +1959,83 @@ static void	DBlld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts
 			}
 		}
 
+		for (j = 0; j < host->interfaces.values_num; j++)
+		{
+			interface = (zbx_lld_interface_t *)host->interfaces.values[j];
+
+			if (0 == interface->interfaceid)
+			{
+				interface->interfaceid = interfaceid++;
+#ifndef HAVE_MULTIROW_INSERT
+				zbx_strcpy_alloc(&sql8, &sql8_alloc, &sql8_offset, ins_interface_sql);
+				zbx_strcpy_alloc(&sql9, &sql9_alloc, &sql9_offset, ins_interface_discovery_sql);
+#endif
+				ip_esc = DBdyn_escape_string(interface->ip);
+				dns_esc = DBdyn_escape_string(interface->dns);
+				port_esc = DBdyn_escape_string(interface->port);
+
+				zbx_snprintf_alloc(&sql8, &sql8_alloc, &sql8_offset,
+						"(" ZBX_FS_UI64 "," ZBX_FS_UI64 ",%d,%d,%d,'%s','%s','%s')" ZBX_ROW_DL,
+						interface->interfaceid, host->hostid, (int)interface->type,
+						(int)interface->main, (int)interface->useip, ip_esc, dns_esc, port_esc);
+
+				zbx_free(port_esc);
+				zbx_free(dns_esc);
+				zbx_free(ip_esc);
+
+				zbx_snprintf_alloc(&sql9, &sql9_alloc, &sql9_offset,
+						"(" ZBX_FS_UI64 "," ZBX_FS_UI64 ")" ZBX_ROW_DL,
+						interface->interfaceid, interface->parent_interfaceid);
+			}
+			else if (0 != (interface->flags & ZBX_FLAG_LLD_INTERFACE_UPDATE))
+			{
+				const char	*d = "";
+
+				zbx_strcpy_alloc(&sql4, &sql4_alloc, &sql4_offset, "update interface set ");
+				if (0 != (interface->flags & ZBX_FLAG_LLD_INTERFACE_UPDATE_TYPE))
+				{
+					zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset, "type=%d",
+							(int)interface->type);
+					d = ",";
+				}
+				if (0 != (interface->flags & ZBX_FLAG_LLD_INTERFACE_UPDATE_MAIN))
+				{
+					zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset, "%smain=%d",
+							d, (int)interface->main);
+					d = ",";
+				}
+				if (0 != (interface->flags & ZBX_FLAG_LLD_INTERFACE_UPDATE_USEIP))
+				{
+					zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset, "%suseip=%d",
+							d, (int)interface->useip);
+					d = ",";
+				}
+				if (0 != (interface->flags & ZBX_FLAG_LLD_INTERFACE_UPDATE_IP))
+				{
+					ip_esc = DBdyn_escape_string(interface->ip);
+					zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset, "%sip='%s'", d, ip_esc);
+					zbx_free(ip_esc);
+					d = ",";
+				}
+				if (0 != (interface->flags & ZBX_FLAG_LLD_INTERFACE_UPDATE_DNS))
+				{
+					dns_esc = DBdyn_escape_string(interface->dns);
+					zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset, "%sdns='%s'", d, dns_esc);
+					zbx_free(dns_esc);
+					d = ",";
+				}
+				if (0 != (interface->flags & ZBX_FLAG_LLD_INTERFACE_UPDATE_PORT))
+				{
+					port_esc = DBdyn_escape_string(interface->port);
+					zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset, "%sport='%s'",
+							d, port_esc);
+					zbx_free(port_esc);
+				}
+				zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset,
+						" where interfaceid=" ZBX_FS_UI64 ";\n", interface->interfaceid);
+			}
+		}
+
 		for (j = 0; j < host->new_groupids.values_num; j++)
 		{
 #ifndef HAVE_MULTIROW_INSERT
@@ -2009,8 +2090,8 @@ static void	DBlld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts
 #ifdef HAVE_MULTIROW_INSERT
 		sql1_offset--;
 		sql2_offset--;
-		zbx_strcpy_alloc(&sql1, &sql1_alloc, &sql1_offset, ";\n");
-		zbx_strcpy_alloc(&sql2, &sql2_alloc, &sql2_offset, ";\n");
+		zbx_chrcpy_alloc(&sql1, &sql1_alloc, &sql1_offset, ';');
+		zbx_chrcpy_alloc(&sql2, &sql2_alloc, &sql2_offset, ';');
 #endif
 		DBend_multiple_update(&sql1, &sql1_alloc, &sql1_offset);
 		DBend_multiple_update(&sql2, &sql2_alloc, &sql2_offset);
@@ -2024,14 +2105,14 @@ static void	DBlld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts
 	{
 #ifdef HAVE_MULTIROW_INSERT
 		sql3_offset--;
-		zbx_strcpy_alloc(&sql3, &sql3_alloc, &sql3_offset, ";\n");
+		zbx_chrcpy_alloc(&sql3, &sql3_alloc, &sql3_offset, ';');
 #endif
 		DBend_multiple_update(&sql3, &sql3_alloc, &sql3_offset);
 		DBexecute("%s", sql3);
 		zbx_free(sql3);
 	}
 
-	if (0 != upd_hosts || 0 != upd_hostmacros)
+	if (0 != upd_hosts || 0 != upd_interfaces || 0 != upd_hostmacros)
 	{
 		DBend_multiple_update(&sql4, &sql4_alloc, &sql4_offset);
 		DBexecute("%s", sql4);
@@ -2042,7 +2123,7 @@ static void	DBlld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts
 	{
 #ifdef HAVE_MULTIROW_INSERT
 		sql5_offset--;
-		zbx_strcpy_alloc(&sql5, &sql5_alloc, &sql5_offset, ";\n");
+		zbx_chrcpy_alloc(&sql5, &sql5_alloc, &sql5_offset, ';');
 #endif
 		DBend_multiple_update(&sql5, &sql5_alloc, &sql5_offset);
 		DBexecute("%s", sql5);
@@ -2053,7 +2134,7 @@ static void	DBlld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts
 	{
 #ifdef HAVE_MULTIROW_INSERT
 		sql6_offset--;
-		zbx_strcpy_alloc(&sql6, &sql6_alloc, &sql6_offset, ";\n");
+		zbx_chrcpy_alloc(&sql6, &sql6_alloc, &sql6_offset, ';');
 #endif
 		DBend_multiple_update(&sql6, &sql6_alloc, &sql6_offset);
 		DBexecute("%s", sql6);
@@ -2061,9 +2142,9 @@ static void	DBlld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts
 	}
 
 	if (0 != del_hostgroupids->values_num || 0 != del_hostmacroids->values_num ||
-			0 != upd_host_inventory_hostids.values_num || 0 != del_host_inventory_hostids.values_num)
+			0 != upd_host_inventory_hostids.values_num || 0 != del_host_inventory_hostids.values_num ||
+			0 != del_interfaceids.values_num)
 	{
-		sql7 = zbx_malloc(sql7, sql7_alloc);
 		DBbegin_multiple_update(&sql7, &sql7_alloc, &sql7_offset);
 
 		if (0 != del_hostgroupids->values_num)
@@ -2099,6 +2180,14 @@ static void	DBlld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts
 			zbx_strcpy_alloc(&sql7, &sql7_alloc, &sql7_offset, ";\n");
 		}
 
+		if (0 != del_interfaceids.values_num)
+		{
+			zbx_strcpy_alloc(&sql7, &sql7_alloc, &sql7_offset, "delete from interface where");
+			DBadd_condition_alloc(&sql7, &sql7_alloc, &sql7_offset, "interfaceid",
+					del_interfaceids.values, del_interfaceids.values_num);
+			zbx_strcpy_alloc(&sql7, &sql7_alloc, &sql7_offset, ";\n");
+		}
+
 		DBend_multiple_update(&sql7, &sql7_alloc, &sql7_offset);
 		DBexecute("%s", sql7);
 		zbx_free(sql7);
@@ -2108,15 +2197,21 @@ static void	DBlld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts
 	{
 #ifdef HAVE_MULTIROW_INSERT
 		sql8_offset--;
-		zbx_strcpy_alloc(&sql8, &sql8_alloc, &sql8_offset, ";\n");
+		sql9_offset--;
+		zbx_chrcpy_alloc(&sql8, &sql8_alloc, &sql8_offset, ';');
+		zbx_chrcpy_alloc(&sql9, &sql9_alloc, &sql9_offset, ';');
 #endif
 		DBend_multiple_update(&sql8, &sql8_alloc, &sql8_offset);
+		DBend_multiple_update(&sql9, &sql9_alloc, &sql9_offset);
 		DBexecute("%s", sql8);
+		DBexecute("%s", sql9);
 		zbx_free(sql8);
+		zbx_free(sql9);
 	}
 
 	DBcommit();
 out:
+	zbx_vector_uint64_destroy(&del_interfaceids);
 	zbx_vector_uint64_destroy(&del_host_inventory_hostids);
 	zbx_vector_uint64_destroy(&upd_host_inventory_hostids);
 
@@ -2165,7 +2260,7 @@ static void	DBlld_templates_link(const zbx_vector_ptr_t *hosts)
 static void	DBlld_hosts_remove(zbx_vector_ptr_t *hosts, unsigned short lifetime, int lastcheck)
 {
 	char			*sql = NULL;
-	size_t			sql_alloc = 256, sql_offset = 0;
+	size_t			sql_alloc = 0, sql_offset = 0;
 	zbx_lld_host_t		*host;
 	zbx_vector_uint64_t	del_hostids, lc_hostids, ts_hostids;
 	int			i, lifetime_sec;
@@ -2178,8 +2273,6 @@ static void	DBlld_hosts_remove(zbx_vector_ptr_t *hosts, unsigned short lifetime,
 	zbx_vector_uint64_create(&del_hostids);
 	zbx_vector_uint64_create(&lc_hostids);
 	zbx_vector_uint64_create(&ts_hostids);
-
-	sql = zbx_malloc(sql, sql_alloc);
 
 	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
@@ -2270,7 +2363,7 @@ static void	DBlld_hosts_remove(zbx_vector_ptr_t *hosts, unsigned short lifetime,
 static void	DBlld_groups_remove(zbx_vector_ptr_t *groups, unsigned short lifetime, int lastcheck)
 {
 	char			*sql = NULL;
-	size_t			sql_alloc = 256, sql_offset = 0;
+	size_t			sql_alloc = 0, sql_offset = 0;
 	zbx_lld_group_t		*group;
 	zbx_vector_uint64_t	del_groupids, lc_groupids, ts_groupids;
 	int			i, lifetime_sec;
@@ -2283,8 +2376,6 @@ static void	DBlld_groups_remove(zbx_vector_ptr_t *groups, unsigned short lifetim
 	zbx_vector_uint64_create(&del_groupids);
 	zbx_vector_uint64_create(&lc_groupids);
 	zbx_vector_uint64_create(&ts_groupids);
-
-	sql = zbx_malloc(sql, sql_alloc);
 
 	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
@@ -2378,7 +2469,7 @@ static void	DBlld_interfaces_get(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *inte
 	zbx_lld_interface_t	*interface;
 
 	result = DBselect(
-			"select hi.type,hi.main,hi.useip,hi.ip,hi.dns,hi.port"
+			"select hi.interfaceid,hi.type,hi.main,hi.useip,hi.ip,hi.dns,hi.port"
 			" from interface hi,items i"
 			" where hi.hostid=i.hostid"
 				" and i.itemid=" ZBX_FS_UI64,
@@ -2388,16 +2479,395 @@ static void	DBlld_interfaces_get(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *inte
 	{
 		interface = zbx_malloc(NULL, sizeof(zbx_lld_interface_t));
 
-		interface->type = (unsigned char)atoi(row[0]);
-		interface->main = (unsigned char)atoi(row[1]);
-		interface->useip = (unsigned char)atoi(row[2]);
-		interface->ip_esc = DBdyn_escape_string(row[3]);
-		interface->dns_esc = DBdyn_escape_string(row[4]);
-		interface->port_esc = DBdyn_escape_string(row[5]);
+		ZBX_STR2UINT64(interface->interfaceid, row[0]);
+		interface->type = (unsigned char)atoi(row[1]);
+		interface->main = (unsigned char)atoi(row[2]);
+		interface->useip = (unsigned char)atoi(row[3]);
+		interface->ip = zbx_strdup(NULL, row[4]);
+		interface->dns = zbx_strdup(NULL, row[5]);
+		interface->port = zbx_strdup(NULL, row[6]);
 
 		zbx_vector_ptr_append(interfaces, interface);
 	}
 	DBfree_result(result);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DBlld_interface_make                                             *
+ *                                                                            *
+ ******************************************************************************/
+static void	DBlld_interface_make(zbx_vector_ptr_t *interfaces, zbx_uint64_t parent_interfaceid,
+		zbx_uint64_t interfaceid, unsigned char type, unsigned char main, unsigned char useip, const char *ip,
+		const char *dns, const char *port)
+{
+	zbx_lld_interface_t	*interface;
+	int			i;
+
+	for (i = 0; i < interfaces->values_num; i++)
+	{
+		interface = (zbx_lld_interface_t *)interfaces->values[i];
+
+		if (0 != interface->interfaceid)
+			continue;
+
+		if (interface->parent_interfaceid == parent_interfaceid)
+			break;
+	}
+
+	if (i == interfaces->values_num)
+	{
+		/* interface which should be deleted */
+		interface = zbx_malloc(NULL, sizeof(zbx_lld_interface_t));
+
+		interface->interfaceid = interfaceid;
+		interface->parent_interfaceid = 0;
+		interface->type = type;
+		interface->main = main;
+		interface->useip = 0;
+		interface->ip = NULL;
+		interface->dns = NULL;
+		interface->port = NULL;
+		interface->flags = ZBX_FLAG_LLD_INTERFACE_REMOVE;
+
+		zbx_vector_ptr_append(interfaces, interface);
+	}
+	else
+	{
+		/* interface which are already added */
+		if (interface->type != type)
+		{
+			interface->type_orig = type;
+			interface->flags |= ZBX_FLAG_LLD_INTERFACE_UPDATE_TYPE;
+		}
+		if (interface->main != main)
+		{
+			interface->main_orig = main;
+			interface->flags |= ZBX_FLAG_LLD_INTERFACE_UPDATE_MAIN;
+		}
+		if (interface->useip != useip)
+			interface->flags |= ZBX_FLAG_LLD_INTERFACE_UPDATE_USEIP;
+		if (0 != strcmp(interface->ip, ip))
+			interface->flags |= ZBX_FLAG_LLD_INTERFACE_UPDATE_IP;
+		if (0 != strcmp(interface->dns, dns))
+			interface->flags |= ZBX_FLAG_LLD_INTERFACE_UPDATE_DNS;
+		if (0 != strcmp(interface->port, port))
+			interface->flags |= ZBX_FLAG_LLD_INTERFACE_UPDATE_PORT;
+	}
+
+	interface->interfaceid = interfaceid;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DBlld_interfaces_make                                            *
+ *                                                                            *
+ * Parameters: interfaces - [IN] sorted list of interfaces which              *
+ *                               should be present on the each                *
+ *                               discovered host                              *
+ *             hosts      - [IN/OUT] sorted list of hosts                     *
+ *                                                                            *
+ ******************************************************************************/
+static void	DBlld_interfaces_make(const zbx_vector_ptr_t *interfaces, zbx_vector_ptr_t *hosts)
+{
+	const char		*__function_name = "DBlld_interfaces_make";
+
+	DB_RESULT		result;
+	DB_ROW			row;
+	int			i, j;
+	zbx_vector_uint64_t	hostids;
+	zbx_uint64_t		parent_interfaceid, hostid, interfaceid;
+	zbx_lld_host_t		*host;
+	zbx_lld_interface_t	*new_interface, *interface;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	zbx_vector_uint64_create(&hostids);
+
+	for (i = 0; i < hosts->values_num; i++)
+	{
+		host = (zbx_lld_host_t *)hosts->values[i];
+
+		if (0 == (host->flags & ZBX_FLAG_LLD_HOST_DISCOVERED))
+			continue;
+
+		zbx_vector_ptr_reserve(&host->interfaces, interfaces->values_num);
+		for (j = 0; j < interfaces->values_num; j++)
+		{
+			interface = (zbx_lld_interface_t *)interfaces->values[j];
+
+			new_interface = zbx_malloc(NULL, sizeof(zbx_lld_interface_t));
+
+			new_interface->interfaceid = 0;
+			new_interface->parent_interfaceid = interface->interfaceid;
+			new_interface->type = interface->type;
+			new_interface->main = interface->main;
+			new_interface->useip = interface->useip;
+			new_interface->ip = zbx_strdup(NULL, interface->ip);
+			new_interface->dns = zbx_strdup(NULL, interface->dns);
+			new_interface->port = zbx_strdup(NULL, interface->port);
+			new_interface->flags = 0x00;
+
+			zbx_vector_ptr_append(&host->interfaces, new_interface);
+		}
+
+		if (0 != host->hostid)
+			zbx_vector_uint64_append(&hostids, host->hostid);
+	}
+
+	if (0 != hostids.values_num)
+	{
+		char	*sql = NULL;
+		size_t	sql_alloc = 0, sql_offset = 0;
+
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
+				"select hi.hostid,id.parent_interfaceid,hi.interfaceid,hi.type,hi.main,hi.useip,hi.ip,"
+					"hi.dns,hi.port"
+				" from interface hi"
+					" left join interface_discovery id"
+						" on hi.interfaceid=id.interfaceid"
+				" where");
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hi.hostid", hostids.values, hostids.values_num);
+
+		result = DBselect("%s", sql);
+
+		zbx_free(sql);
+
+		while (NULL != (row = DBfetch(result)))
+		{
+			ZBX_STR2UINT64(hostid, row[0]);
+			ZBX_DBROW2UINT64(parent_interfaceid, row[1]);
+			ZBX_DBROW2UINT64(interfaceid, row[2]);
+
+			if (FAIL == (i = zbx_vector_ptr_bsearch(hosts, &hostid, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
+			{
+				THIS_SHOULD_NEVER_HAPPEN;
+				continue;
+			}
+
+			host = (zbx_lld_host_t *)hosts->values[i];
+
+			DBlld_interface_make(&host->interfaces, parent_interfaceid, interfaceid,
+					(unsigned char)atoi(row[3]), (unsigned char)atoi(row[4]),
+					(unsigned char)atoi(row[5]), row[6], row[7], row[8]);
+		}
+		DBfree_result(result);
+	}
+
+	zbx_vector_uint64_destroy(&hostids);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: another_main_interface_exists                                    *
+ *                                                                            *
+ * Return value: SUCCEED if interface with same type exists in the list of    *
+ *               interfaces; FAIL - otherwise                                 *
+ *                                                                            *
+ * Comments: interfaces with ZBX_FLAG_LLD_INTERFACE_REMOVE flag are ignored   *
+ *           auxiliary function for DBlld_interfaces_validate()               *
+ *                                                                            *
+ ******************************************************************************/
+static int	another_main_interface_exists(const zbx_vector_ptr_t *interfaces, const zbx_lld_interface_t *interface)
+{
+	zbx_lld_interface_t	*interface_b;
+	int			i;
+
+	for (i = 0; i < interfaces->values_num; i++)
+	{
+		interface_b = (zbx_lld_interface_t *)interfaces->values[i];
+
+		if (interface_b == interface)
+			continue;
+
+		if (0 != (interface_b->flags & ZBX_FLAG_LLD_INTERFACE_REMOVE))
+			continue;
+
+		if (interface_b->type != interface->type)
+			continue;
+
+		if (1 == interface_b->main)
+			return SUCCEED;
+	}
+
+	return FAIL;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DBlld_interfaces_validate                                        *
+ *                                                                            *
+ * Parameters: hosts - [IN/OUT] list of hosts                                 *
+ *                                                                            *
+ ******************************************************************************/
+static void	DBlld_interfaces_validate(zbx_vector_ptr_t *hosts, char **error)
+{
+	const char		*__function_name = "DBlld_interfaces_validate";
+
+	DB_RESULT		result;
+	DB_ROW			row;
+	int			i, j;
+	zbx_vector_uint64_t	interfaceids;
+	zbx_uint64_t		interfaceid;
+	zbx_lld_host_t		*host;
+	zbx_lld_interface_t	*interface;
+	unsigned char		type;
+	char			*sql = NULL;
+	size_t			sql_alloc = 0, sql_offset = 0;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	/* validate changed types */
+
+	zbx_vector_uint64_create(&interfaceids);
+
+	for (i = 0; i < hosts->values_num; i++)
+	{
+		host = (zbx_lld_host_t *)hosts->values[i];
+
+		for (j = 0; j < host->interfaces.values_num; j++)
+		{
+			interface = (zbx_lld_interface_t *)host->interfaces.values[j];
+
+			if (0 == (interface->flags & ZBX_FLAG_LLD_INTERFACE_UPDATE_TYPE))
+				continue;
+
+			zbx_vector_uint64_append(&interfaceids, interface->interfaceid);
+		}
+	}
+
+	if (0 != interfaceids.values_num)
+	{
+		zbx_vector_uint64_sort(&interfaceids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select interfaceid,type from items where");
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "interfaceid",
+				interfaceids.values, interfaceids.values_num);
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " group by interfaceid,type");
+
+		result = DBselect("%s", sql);
+
+		while (NULL != (row = DBfetch(result)))
+		{
+			type = get_interface_type_by_item_type((unsigned char)atoi(row[1]));
+
+			if (type != INTERFACE_TYPE_ANY && type != INTERFACE_TYPE_UNKNOWN)
+			{
+				ZBX_STR2UINT64(interfaceid, row[0]);
+
+				for (i = 0; i < hosts->values_num; i++)
+				{
+					host = (zbx_lld_host_t *)hosts->values[i];
+
+					for (j = 0; j < host->interfaces.values_num; j++)
+					{
+						interface = (zbx_lld_interface_t *)host->interfaces.values[j];
+
+						if (0 == (interface->flags & ZBX_FLAG_LLD_INTERFACE_UPDATE_TYPE))
+							continue;
+
+						if (interface->interfaceid != interfaceid)
+							continue;
+
+						*error = zbx_strdcatf(*error,
+								"Cannot update \"%s\" interface on host \"%s\":"
+								" the interface is used by items.\n",
+								zbx_interface_type_string(interface->type_orig),
+								host->host);
+
+						/* return an original interface type and drop the correspond flag */
+						interface->type = interface->type_orig;
+						interface->flags &= ~ZBX_FLAG_LLD_INTERFACE_UPDATE_TYPE;
+					}
+				}
+			}
+		}
+	}
+
+	/* validate interfaces which should be deleted */
+
+	interfaceids.values_num = 0;
+
+	for (i = 0; i < hosts->values_num; i++)
+	{
+		host = (zbx_lld_host_t *)hosts->values[i];
+
+		for (j = 0; j < host->interfaces.values_num; j++)
+		{
+			interface = (zbx_lld_interface_t *)host->interfaces.values[j];
+
+			if (0 == (interface->flags & ZBX_FLAG_LLD_INTERFACE_REMOVE))
+				continue;
+
+			zbx_vector_uint64_append(&interfaceids, interface->interfaceid);
+		}
+	}
+
+	if (0 != interfaceids.values_num)
+	{
+		zbx_vector_uint64_sort(&interfaceids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select interfaceid from items where");
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "interfaceid",
+				interfaceids.values, interfaceids.values_num);
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " group by interfaceid");
+
+		result = DBselect("%s", sql);
+
+		while (NULL != (row = DBfetch(result)))
+		{
+			ZBX_STR2UINT64(interfaceid, row[0]);
+
+			for (i = 0; i < hosts->values_num; i++)
+			{
+				host = (zbx_lld_host_t *)hosts->values[i];
+
+				for (j = 0; j < host->interfaces.values_num; j++)
+				{
+					interface = (zbx_lld_interface_t *)host->interfaces.values[j];
+
+					if (0 == (interface->flags & ZBX_FLAG_LLD_INTERFACE_REMOVE))
+						continue;
+
+					if (interface->interfaceid != interfaceid)
+						continue;
+
+					*error = zbx_strdcatf(*error, "Cannot delete \"%s\" interface on host \"%s\":"
+							" the interface is used by items.\n",
+							zbx_interface_type_string(interface->type), host->host);
+
+					/* drop the correspond flag */
+					interface->flags &= ~ZBX_FLAG_LLD_INTERFACE_REMOVE;
+
+					if (SUCCEED == another_main_interface_exists(&host->interfaces, interface))
+					{
+						if (1 == interface->main)
+						{
+							/* drop main flag */
+							interface->main_orig = interface->main;
+							interface->main = 0;
+							interface->flags |= ZBX_FLAG_LLD_INTERFACE_UPDATE_MAIN;
+						}
+					}
+					else if (1 != interface->main)
+					{
+						/* set main flag */
+						interface->main_orig = interface->main;
+						interface->main = 1;
+						interface->flags |= ZBX_FLAG_LLD_INTERFACE_UPDATE_MAIN;
+					}
+				}
+			}
+		}
+	}
+
+	zbx_vector_uint64_destroy(&interfaceids);
+
+	zbx_free(sql);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 /******************************************************************************
@@ -2518,6 +2988,9 @@ void	DBlld_update_hosts(zbx_uint64_t lld_ruleid, struct zbx_json_parse *jp_data,
 		DBlld_groups_validate(&groups, error);
 		DBlld_hosts_validate(&hosts, &groupids, &groups, error);
 
+		DBlld_interfaces_make(&interfaces, &hosts);
+		DBlld_interfaces_validate(&hosts, error);
+
 		DBlld_hostgroups_make(&groupids, &hosts, &groups, &del_hostgroupids);
 		DBlld_templates_make(parent_hostid, &hosts);
 		DBlld_hostmacros_make(&hostmacros, &hosts, &del_hostmacroids);
@@ -2525,7 +2998,7 @@ void	DBlld_update_hosts(zbx_uint64_t lld_ruleid, struct zbx_json_parse *jp_data,
 		DBlld_groups_save(&groups, &group_prototypes);
 		DBlld_hosts_save(parent_hostid, &hosts, host_proto, proxy_hostid, ipmi_authtype, ipmi_privilege,
 				ipmi_username, ipmi_password, status, inventory_mode, &del_hostgroupids,
-				&del_hostmacroids, &interfaces);
+				&del_hostmacroids);
 
 		/* linking of the templates */
 		DBlld_templates_link(&hosts);
