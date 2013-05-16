@@ -278,7 +278,7 @@ static void	zbx_validate_config()
 		exit(EXIT_FAILURE);
 	}
 
-	if (NULL != CONFIG_HOST_METADATA && HOST_METADATA_LEN < strlen(CONFIG_HOST_METADATA))
+	if (NULL != CONFIG_HOST_METADATA && HOST_METADATA_LEN < zbx_strlen_utf8(CONFIG_HOST_METADATA))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "the value of \"HostMetadata\" configuration parameter cannot be longer than"
 				" %d characters", HOST_METADATA_LEN);

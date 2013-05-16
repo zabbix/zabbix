@@ -383,12 +383,16 @@ static int	refresh_active_checks(const char *host, unsigned short port)
 		if (SUCCEED == process(CONFIG_HOST_METADATA_ITEM, PROCESS_LOCAL_COMMAND, &result) &&
 				NULL != (value = GET_STR_RESULT(&result)))
 		{
-			if (HOST_METADATA_LEN < strlen(*value))
+			if (HOST_METADATA_LEN < zbx_strlen_utf8(*value))
 			{
+				size_t	bytes;
+
 				zabbix_log(LOG_LEVEL_WARNING, "the returned value of \"%s\" item specified by"
 						" \"HostMetadataItem\" configuration parameter is too long, truncating"
 						" at position %d", CONFIG_HOST_METADATA_ITEM, HOST_METADATA_LEN_MAX);
-				(*value)[HOST_METADATA_LEN] = '\0';
+
+				bytes = zbx_strlen_utf8_n(*value, HOST_METADATA_LEN);
+				(*value)[bytes] = '\0';
 			}
 			zbx_json_addstring(&json, ZBX_PROTO_TAG_HOST_METADATA, *value, ZBX_JSON_TYPE_STRING);
 		}
