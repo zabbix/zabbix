@@ -1791,7 +1791,7 @@ void	DBregister_host(zbx_uint64_t proxy_hostid, const char *host, const char *ip
 	{
 		ip_esc = DBdyn_escape_string_len(ip, INTERFACE_IP_LEN);
 		dns_esc = DBdyn_escape_string_len(dns, INTERFACE_DNS_LEN);
-		host_metadata_esc = DBdyn_escape_string_len(host_metadata, HOST_METADATA_LEN);
+		host_metadata_esc = DBdyn_escape_string(host_metadata);
 
 		result = DBselect(
 				"select autoreg_hostid"
@@ -1855,7 +1855,7 @@ void	DBproxy_register_host(const char *host, const char *ip, const char *dns, un
 	host_esc = DBdyn_escape_string_len(host, HOST_HOST_LEN);
 	ip_esc = DBdyn_escape_string_len(ip, INTERFACE_IP_LEN);
 	dns_esc = DBdyn_escape_string_len(dns, INTERFACE_DNS_LEN);
-	host_metadata_esc = DBdyn_escape_string_len(host_metadata, HOST_METADATA_LEN);
+	host_metadata_esc = DBdyn_escape_string(host_metadata);
 
 	DBexecute("insert into proxy_autoreg_host"
 			" (clock,host,listen_ip,listen_dns,listen_port,host_metadata)"

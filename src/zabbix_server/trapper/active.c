@@ -309,12 +309,12 @@ int	send_list_of_active_checks_json(zbx_sock_t *sock, struct zbx_json_parse *jp)
 #define ZBX_KEY_EVENTLOG	2
 
 	char		host[HOST_HOST_LEN_MAX], params[MAX_STRING_LEN], tmp[MAX_STRING_LEN],
-			ip[INTERFACE_IP_LEN_MAX], error[MAX_STRING_LEN], host_metadata[HOST_METADATA_LEN_MAX];
+			ip[INTERFACE_IP_LEN_MAX], error[MAX_STRING_LEN], *host_metadata = NULL;
 	struct zbx_json	json;
 	int		ret = FAIL;
 	zbx_uint64_t	hostid, *itemids = NULL;
 	zbx_active_t	*items = NULL;
-	size_t		items_num = 0;
+	size_t		items_num = 0, host_metadata_alloc = 1;	/* for at least NUL-termination char */
 	unsigned short	port;
 
 	unsigned char	item_key;
@@ -329,8 +329,13 @@ int	send_list_of_active_checks_json(zbx_sock_t *sock, struct zbx_json_parse *jp)
 		goto error;
 	}
 
-	if (FAIL == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_HOST_METADATA, host_metadata, sizeof(host_metadata)))
+	host_metadata = zbx_malloc(host_metadata, host_metadata_alloc);
+
+	if (FAIL == zbx_json_value_by_name_dyn(jp, ZBX_PROTO_TAG_HOST_METADATA,
+			&host_metadata, &host_metadata_alloc))
+	{
 		*host_metadata = '\0';
+	}
 
 	if (FAIL == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_IP, ip, sizeof(ip)))
 		strscpy(ip, get_ip_by_socket(sock));
@@ -508,6 +513,8 @@ error:
 
 	zbx_json_free(&json);
 out:
+	zbx_free(host_metadata);
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
