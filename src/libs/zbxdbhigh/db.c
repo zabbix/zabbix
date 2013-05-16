@@ -1729,6 +1729,8 @@ zbx_uint64_t	multiply_item_value_uint64(DB_ITEM *item, zbx_uint64_t value)
  *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
+ * Comments: NB! Do not use this function more than once in same SQL query    *
+ *                                                                            *
  ******************************************************************************/
 static const char	*DBsql_id_cmp(zbx_uint64_t id)
 {
