@@ -1992,8 +1992,9 @@ void	process_areg_data(struct zbx_json_parse *jp, zbx_uint64_t proxy_hostid)
 	const char		*p = NULL;
 	time_t			now, hosttime, itemtime;
 	char			host[HOST_HOST_LEN_MAX], ip[INTERFACE_IP_LEN_MAX], dns[INTERFACE_DNS_LEN_MAX],
-				host_metadata[HOST_METADATA_LEN_MAX], tmp[MAX_STRING_LEN];
+				tmp[MAX_STRING_LEN], *host_metadata = NULL;
 	unsigned short		port;
+	size_t			host_metadata_alloc = 1;	/* for at least NUL-termination char */
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -2007,6 +2008,8 @@ void	process_areg_data(struct zbx_json_parse *jp, zbx_uint64_t proxy_hostid)
 
 	hosttime = atoi(tmp);
 
+	host_metadata = zbx_malloc(host_metadata, host_metadata_alloc);
+
 	while (NULL != (p = zbx_json_next(&jp_data, p)))
 	{
 		if (FAIL == (ret = zbx_json_brackets_open(p, &jp_row)))
@@ -2019,8 +2022,8 @@ void	process_areg_data(struct zbx_json_parse *jp, zbx_uint64_t proxy_hostid)
 		if (FAIL == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_HOST, host, sizeof(host)))
 			goto json_parse_error;
 
-		if (FAIL == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_HOST_METADATA, host_metadata,
-				sizeof(host_metadata)))
+		if (FAIL == zbx_json_value_by_name_dyn(&jp_row, ZBX_PROTO_TAG_HOST_METADATA,
+				&host_metadata, &host_metadata_alloc))
 		{
 			*host_metadata = '\0';
 		}
@@ -2048,6 +2051,8 @@ json_parse_error:
 exit:
 	if (SUCCEED != ret)
 		zabbix_log(LOG_LEVEL_WARNING, "invalid auto registration data: %s", zbx_json_strerror());
+
+	zbx_free(host_metadata);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 }
