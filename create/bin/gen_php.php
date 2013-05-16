@@ -58,11 +58,8 @@ function parse_schema($path) {
 						break;
 					case 't_blob':
 					case 't_text':
-					case 't_history_log':
-					case 't_history_text':
-					case 't_item_param':
 					case 't_longtext':
-					case 't_cksum_text':
+					case 't_shorttext':
 						$type = 'DB::FIELD_TYPE_TEXT';
 						$length = false;
 						break;

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2012 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -10,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -264,6 +264,7 @@ class CConfigurationExportBuilder {
 				'delay' => $discoveryRule['delay'],
 				'status' => $discoveryRule['status'],
 				'allowed_hosts' => $discoveryRule['trapper_hosts'],
+				'snmpv3_contextname' => $discoveryRule['snmpv3_contextname'],
 				'snmpv3_securityname' => $discoveryRule['snmpv3_securityname'],
 				'snmpv3_securitylevel' => $discoveryRule['snmpv3_securitylevel'],
 				'snmpv3_authprotocol' => $discoveryRule['snmpv3_authprotocol'],
@@ -462,6 +463,7 @@ class CConfigurationExportBuilder {
 				'allowed_hosts' => $item['trapper_hosts'],
 				'units' => $item['units'],
 				'delta' => $item['delta'],
+				'snmpv3_contextname' => $item['snmpv3_contextname'],
 				'snmpv3_securityname' => $item['snmpv3_securityname'],
 				'snmpv3_securitylevel' => $item['snmpv3_securitylevel'],
 				'snmpv3_authprotocol' => $item['snmpv3_authprotocol'],

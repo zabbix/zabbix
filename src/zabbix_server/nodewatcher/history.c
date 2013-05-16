@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -9,7 +9,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -70,7 +70,7 @@ static int	get_history_lastid(int master_nodeid, int nodeid, const ZBX_TABLE *ta
 		if (0 == strncmp(answer, "FAIL", 4))
 		{
 			zabbix_log(LOG_LEVEL_ERR, "NODE %d: %s() FAIL from node %d for node %d",
-				CONFIG_NODEID, __function_name, master_nodeid, nodeid);
+					CONFIG_NODEID, __function_name, master_nodeid, nodeid);
 			goto disconnect;
 		}
 
@@ -190,7 +190,7 @@ static void	process_history_table_data(const ZBX_TABLE *table, int master_nodeid
 							row[fld], ZBX_DM_DELIMITER);
 				}
 			}
-			else	/* ZBX_TYPE_CHAR ZBX_TYPE_BLOB ZBX_TYPE_TEXT */
+			else	/* ZBX_TYPE_CHAR ZBX_TYPE_BLOB ZBX_TYPE_TEXT ZBX_TYPE_SHORTTEXT ZBX_TYPE_LONGTEXT */
 			{
 				zbx_binary2hex((u_char *)row[fld], strlen(row[fld]), &tmp, &tmp_alloc);
 				zbx_snprintf_alloc(&data, &data_alloc, &data_offset, "%s%c", tmp, ZBX_DM_DELIMITER);
@@ -281,7 +281,7 @@ static void	process_history_tables(int master_nodeid, int nodeid)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-void	main_historysender()
+void	main_historysender(void)
 {
 	const char	*__function_name = "main_historysender";
 	DB_RESULT	result;

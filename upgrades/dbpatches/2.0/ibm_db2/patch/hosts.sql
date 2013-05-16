@@ -269,125 +269,84 @@ ROLLBACK
 
 -- adding web.test.error[<web check>] items
 
-CREATE SEQUENCE items_seq AS bigint
-/
-CREATE SEQUENCE httptestitem_seq AS bigint
-/
-CREATE SEQUENCE items_applications_seq AS bigint
-/
-
 CREATE PROCEDURE zbx_add_web_test_error()
 LANGUAGE SQL
 BEGIN
-	DECLARE max_itemid bigint;
-	DECLARE max_httptestitemid bigint;
-	DECLARE max_itemappid bigint;
+	DECLARE httptest_nodeid INTEGER;
+	DECLARE init_nodeid BIGINT;
+	DECLARE min_nodeid BIGINT;
+	DECLARE max_nodeid BIGINT;
 
-	BEGIN
-		DECLARE m_done integer DEFAULT 0;
-		DECLARE m_not_found CONDITION FOR SQLSTATE '02000';
-		DECLARE m_cur CURSOR FOR (SELECT MAX(itemid) FROM items);
-		DECLARE CONTINUE HANDLER FOR m_not_found SET m_done = 1;
+	DECLARE max_itemid BIGINT;
+	DECLARE max_httptestitemid BIGINT;
+	DECLARE max_itemappid BIGINT;
 
-		OPEN m_cur;
+	DECLARE node_done integer DEFAULT 0;
+	DECLARE node_not_found CONDITION FOR SQLSTATE '02000';
+	DECLARE node_cursor CURSOR FOR (SELECT DISTINCT TRUNC(httptestid / 100000000000000) FROM httptest);
+	DECLARE CONTINUE HANDLER FOR node_not_found SET node_done = 1;
 
-		m_loop: LOOP
-			FETCH m_cur INTO max_itemid;
+	OPEN node_cursor;
 
-			IF m_done = 1 THEN
-				LEAVE m_loop;
-			END IF;
-		END LOOP m_loop;
+	node_loop: LOOP
+		FETCH node_cursor INTO httptest_nodeid;
 
-		CLOSE m_cur;
-	END;
+		IF node_done = 1 THEN
+			LEAVE node_loop;
+		END IF;
 
-	BEGIN
-		DECLARE m_done integer DEFAULT 0;
-		DECLARE m_not_found CONDITION FOR SQLSTATE '02000';
-		DECLARE m_cur CURSOR FOR (SELECT MAX(httptestitemid) FROM httptestitem);
-		DECLARE CONTINUE HANDLER FOR m_not_found SET m_done = 1;
+		SET min_nodeid = httptest_nodeid * 100000000000000;
+		SET max_nodeid = min_nodeid + 99999999999999;
+		SET init_nodeid = (httptest_nodeid * 1000 + httptest_nodeid) * 100000000000;
 
-		OPEN m_cur;
+		SELECT MAX(itemid) INTO max_itemid FROM items WHERE itemid BETWEEN min_nodeid AND max_nodeid;
+		IF max_itemid IS NULL THEN
+			SET max_itemid = init_nodeid;
+		END IF;
+		EXECUTE IMMEDIATE 'CREATE SEQUENCE items_seq AS BIGINT MINVALUE ' || (max_itemid + 1);
 
-		m_loop: LOOP
-			FETCH m_cur INTO max_httptestitemid;
+		SELECT MAX(httptestitemid) INTO max_httptestitemid FROM httptestitem WHERE httptestitemid BETWEEN min_nodeid AND max_nodeid;
+		IF max_httptestitemid IS NULL THEN
+			SET max_httptestitemid = init_nodeid;
+		END IF;
+		EXECUTE IMMEDIATE 'CREATE SEQUENCE httptestitem_seq AS BIGINT MINVALUE ' || (max_httptestitemid + 1);
 
-			IF m_done = 1 THEN
-				LEAVE m_loop;
-			END IF;
-		END LOOP m_loop;
+		SELECT MAX(itemappid) INTO max_itemappid FROM items_applications WHERE itemappid BETWEEN min_nodeid AND max_nodeid;
+		IF max_itemappid IS NULL THEN
+			SET max_itemappid = init_nodeid;
+		END IF;
+		EXECUTE IMMEDIATE 'CREATE SEQUENCE items_applications_seq AS BIGINT MINVALUE ' || (max_itemappid + 1);
 
-		CLOSE m_cur;
-	END;
+		EXECUTE IMMEDIATE 'INSERT INTO items (itemid, hostid, type, name, key_, value_type, units, delay, history, trends, status)
+			SELECT (NEXT VALUE FOR items_seq), hostid, type, ''Last error message of scenario ''''$1'''''', ''web.test.error'' || SUBSTR(key_, POSSTR(key_, ''['')), 1, '''', delay, history, 0, status
+			FROM items
+			WHERE type = 9
+				AND key_ LIKE ''web.test.fail%''
+				AND itemid BETWEEN ' || min_nodeid ||' AND ' || max_nodeid;
 
-	BEGIN
-		DECLARE m_done integer DEFAULT 0;
-		DECLARE m_not_found CONDITION FOR SQLSTATE '02000';
-		DECLARE m_cur CURSOR FOR (SELECT MAX(itemappid) FROM items_applications);
-		DECLARE CONTINUE HANDLER FOR m_not_found SET m_done = 1;
+		EXECUTE IMMEDIATE 'INSERT INTO httptestitem (httptestitemid, httptestid, itemid, type)
+			SELECT (NEXT VALUE FOR httptestitem_seq), ht.httptestid, i.itemid, 4
+			FROM httptest ht,applications a,items i
+			WHERE ht.applicationid=a.applicationid
+				AND a.hostid=i.hostid
+				AND ''web.test.error['' || ht.name || '']'' = i.key_
+				AND itemid BETWEEN ' || min_nodeid ||' AND ' || max_nodeid;
 
-		OPEN m_cur;
+		EXECUTE IMMEDIATE 'INSERT INTO items_applications (itemappid, applicationid, itemid)
+			SELECT (NEXT VALUE FOR items_applications_seq), ht.applicationid, hti.itemid
+			FROM httptest ht, httptestitem hti
+			WHERE ht.httptestid = hti.httptestid
+				AND hti.type = 4
+				AND itemid BETWEEN ' || min_nodeid ||' AND ' || max_nodeid;
 
-		m_loop: LOOP
-			FETCH m_cur INTO max_itemappid;
+		EXECUTE IMMEDIATE 'DROP SEQUENCE items_seq';
+		EXECUTE IMMEDIATE 'DROP SEQUENCE httptestitem_seq';
+		EXECUTE IMMEDIATE 'DROP SEQUENCE items_applications_seq';
 
-			IF m_done = 1 THEN
-				LEAVE m_loop;
-			END IF;
-		END LOOP m_loop;
+	END LOOP node_loop;
 
-		CLOSE m_cur;
-	END;
+	CLOSE node_cursor;
 
-	IF max_itemid IS NULL OR max_httptestitemid IS NULL OR max_itemappid IS NULL THEN
-		RETURN;
-	END IF;
-
-	BEGIN
-		DECLARE v_httptestid bigint;
-		DECLARE v_name varchar(64);
-		DECLARE v_delay integer;
-		DECLARE v_status integer;
-		DECLARE v_applicationid bigint;
-		DECLARE v_hostid bigint;
-		DECLARE v_itemid bigint;
-		DECLARE v_httptestitemid bigint;
-		DECLARE v_itemappid bigint;
-		DECLARE m_done integer DEFAULT 0;
-		DECLARE m_not_found CONDITION FOR SQLSTATE '02000';
-		DECLARE m_cur CURSOR FOR (
-			SELECT ht.httptestid, ht.name, ht.delay, ht.status, a.applicationid, a.hostid
-				FROM httptest ht,applications a
-				WHERE ht.applicationid = a.applicationid
-		);
-		DECLARE CONTINUE HANDLER FOR m_not_found SET m_done = 1;
-
-		OPEN m_cur;
-
-		m_loop: LOOP
-			FETCH m_cur INTO v_httptestid, v_name, v_delay, v_status, v_applicationid, v_hostid;
-
-			IF m_done = 1 THEN
-				LEAVE m_loop;
-			END IF;
-
-			SET v_itemid = max_itemid + (NEXTVAL FOR items_seq);
-			SET v_httptestitemid = max_httptestitemid + (NEXTVAL FOR httptestitem_seq);
-			SET v_itemappid = max_itemappid + (NEXTVAL FOR items_applications_seq);
-
-			INSERT INTO items (itemid, hostid, type, name, key_, value_type, units, delay, history, trends, status)
-				VALUES (v_itemid, v_hostid, 9, 'Last error message of scenario ''$1''', 'web.test.error[' || v_name || ']', 1, '', v_delay, 30, 0, v_status);
-
-			INSERT INTO httptestitem (httptestitemid, httptestid, itemid, type)
-				VALUES (v_httptestitemid, v_httptestid, v_itemid, 4);
-
-			INSERT INTO items_applications (itemappid, applicationid, itemid)
-				VALUES (v_itemappid, v_applicationid, v_itemid);
-		END LOOP m_loop;
-
-		CLOSE m_cur;
-	END;
 END
 /
 
@@ -395,13 +354,6 @@ CALL zbx_add_web_test_error
 /
 
 DROP PROCEDURE zbx_add_web_test_error
-/
-
-DROP SEQUENCE items_applications_seq
-/
-DROP SEQUENCE httptestitem_seq
-/
-DROP SEQUENCE items_seq
 /
 
 DELETE FROM ids WHERE table_name IN ('items', 'httptestitem', 'items_applications')

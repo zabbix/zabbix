@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2012 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -10,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -501,7 +501,20 @@ function convertUnitsS($value) {
 	return rtrim($value);
 }
 
-function convert_units($value, $units, $convert = ITEM_CONVERT_WITH_UNITS) {
+/**
+ * Converts value to actual value.
+ * Example:
+ * 	6442450944 B convert to 6 GB
+ *
+ * @param string $value
+ * @param string $units
+ * @param string $convert
+ * @param string $byteStep
+ * @param string $pow
+ *
+ * @return string
+ */
+function convert_units($value, $units, $convert = ITEM_CONVERT_WITH_UNITS, $byteStep = false, $pow = false) {
 	// special processing for unix timestamps
 	if ($units == 'unixtime') {
 		return zbx_date2str(_('Y.m.d H:i:s'), $value);
@@ -521,7 +534,7 @@ function convert_units($value, $units, $convert = ITEM_CONVERT_WITH_UNITS) {
 	// black list wich do not require units metrics..
 	$blackList = array('%', 'ms', 'rpm', 'RPM');
 
-	if (in_array($units, $blackList) || (zbx_empty($units) && ($convert == ITEM_CONVERT_WITH_UNITS || $value < 1))) {
+	if (in_array($units, $blackList) || (zbx_empty($units) && ($convert == ITEM_CONVERT_WITH_UNITS))) {
 		if (abs($value) >= ZBX_UNITS_ROUNDOFF_THRESHOLD) {
 			$value = round($value, ZBX_UNITS_ROUNDOFF_UPPER_LIMIT);
 		}
@@ -537,17 +550,23 @@ function convert_units($value, $units, $convert = ITEM_CONVERT_WITH_UNITS) {
 		}
 	}
 
-	switch ($units) {
-		case 'Bps':
-		case 'B':
-			$step = 1024;
-			$convert = $convert ? $convert : ITEM_CONVERT_NO_UNITS;
-			break;
-		case 'b':
-		case 'bps':
-			$convert = $convert ? $convert : ITEM_CONVERT_NO_UNITS;
-		default:
-			$step = 1000;
+	// if one or more items is B or Bps, then Y-scale use base 8 and calculated in bytes
+	if ($byteStep) {
+		$step = 1024;
+	}
+	else {
+		switch ($units) {
+			case 'Bps':
+			case 'B':
+				$step = 1024;
+				$convert = $convert ? $convert : ITEM_CONVERT_NO_UNITS;
+				break;
+			case 'b':
+			case 'bps':
+				$convert = $convert ? $convert : ITEM_CONVERT_NO_UNITS;
+			default:
+				$step = 1000;
+		}
 	}
 
 	// init intervals
@@ -585,7 +604,8 @@ function convert_units($value, $units, $convert = ITEM_CONVERT_WITH_UNITS) {
 	}
 
 	$valUnit = array('pow' => 0, 'short' => '', 'long' => '', 'value' => $value);
-	if ($abs > 999 || $abs < 0.001) {
+
+	if ($pow === false || $value == 0) {
 		foreach ($digitUnits[$step] as $dnum => $data) {
 			if (bccomp($abs, $data['value']) > -1) {
 				$valUnit = $data;
@@ -594,12 +614,27 @@ function convert_units($value, $units, $convert = ITEM_CONVERT_WITH_UNITS) {
 				break;
 			}
 		}
-		if (round($valUnit['value'], 6) > 0) {
-			$valUnit['value'] = bcdiv(sprintf('%.6f',$value), sprintf('%.6f', $valUnit['value']), 6);
+	}
+	else {
+		foreach ($digitUnits[$step] as $data) {
+			if ($pow == $data['pow']) {
+				$valUnit = $data;
+				break;
+			}
+		}
+	}
+
+	if (round($valUnit['value'], ZBX_UNITS_ROUNDOFF_LOWER_LIMIT) > 0) {
+		if ($valUnit['pow'] >= 0) {
+			$valUnit['value'] = bcdiv(sprintf('%.6f',$value), sprintf('%.6f', $valUnit['value']),
+				ZBX_UNITS_ROUNDOFF_LOWER_LIMIT);
 		}
 		else {
-			$valUnit['value'] = 0;
+			$valUnit['value'] = bcdiv(sprintf('%.10f',$value), sprintf('%.10f', $valUnit['value']), ZBX_PRECISION_10);
 		}
+	}
+	else {
+		$valUnit['value'] = 0;
 	}
 
 	switch ($convert) {
@@ -610,6 +645,11 @@ function convert_units($value, $units, $convert = ITEM_CONVERT_WITH_UNITS) {
 
 	$value = preg_replace('/^([\-0-9]+)(\.)([0-9]*)[0]+$/U','$1$2$3', round($valUnit['value'], ZBX_UNITS_ROUNDOFF_UPPER_LIMIT));
 	$value = rtrim($value, '.');
+
+	// fix negative zero
+	if (bccomp($value, 0) == 0) {
+		$value = 0;
+	}
 
 	return rtrim(sprintf('%s %s%s', $value, $desc, $units));
 }
@@ -644,7 +684,7 @@ function convertFunctionValue($value) {
 				$value = bcmul($value, '604800');
 				break;
 			case 'K':
-				$value = bcmul($value, '1000');
+				$value = bcmul($value, '1024');
 				break;
 			case 'M':
 				$value = bcmul($value, '1048576');
@@ -2286,23 +2326,22 @@ function get_status() {
 
 	// items
 	$dbItems = DBselect(
-		'SELECT COUNT(*) AS cnt,i.status'.
+		'SELECT COUNT(i.itemid) AS cnt,i.status,i.state'.
 				' FROM items i'.
 				' INNER JOIN hosts h ON i.hostid=h.hostid'.
 				' WHERE h.status='.HOST_STATUS_MONITORED.
-				' AND '.dbConditionInt('i.status', array(ITEM_STATUS_ACTIVE, ITEM_STATUS_DISABLED, ITEM_STATUS_NOTSUPPORTED)).
-				' GROUP BY i.status');
+				' GROUP BY i.status,i.state');
 	while ($dbItem = DBfetch($dbItems)) {
-		switch ($dbItem['status']) {
-			case ITEM_STATUS_ACTIVE:
+		if ($dbItem['status'] == ITEM_STATUS_ACTIVE) {
+			if ($dbItem['state'] == ITEM_STATE_NORMAL) {
 				$status['items_count_monitored'] = $dbItem['cnt'];
-				break;
-			case ITEM_STATUS_DISABLED:
-				$status['items_count_disabled'] = $dbItem['cnt'];
-				break;
-			case ITEM_STATUS_NOTSUPPORTED:
+			}
+			else {
 				$status['items_count_not_supported'] = $dbItem['cnt'];
-				break;
+			}
+		}
+		elseif ($dbItem['status'] == ITEM_STATUS_DISABLED) {
+			$status['items_count_disabled'] += $dbItem['cnt'];
 		}
 	}
 	$status['items_count'] = $status['items_count_monitored'] + $status['items_count_disabled']

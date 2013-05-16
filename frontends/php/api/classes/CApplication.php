@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -10,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -74,7 +74,7 @@ class CApplication extends CZBXAPI {
 			'search'					=> null,
 			'searchByAny'				=> null,
 			'startSearch'				=> null,
-			'exludeSearch'				=> null,
+			'excludeSearch'				=> null,
 			'searchWildcardsEnabled'	=> null,
 			// output
 			'output'					=> API_OUTPUT_REFER,
@@ -547,7 +547,7 @@ class CApplication extends CZBXAPI {
 				' AND '.dbConditionInt('ia.applicationid', $applicationids)
 		);
 		while ($pair = DBfetch($linkedDb)) {
-			$linked[$pair['applicationid']] = array($pair['itemid'] => $pair['itemid']);
+			$linked[$pair['applicationid']][$pair['itemid']] = true;
 		}
 		$appsInsert = array();
 		foreach ($applicationids as $applicationid) {

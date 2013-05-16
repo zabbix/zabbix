@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -10,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -481,7 +481,7 @@ function check_field(&$fields, &$field, $checks) {
 		return $err;
 	}
 
-	if ((is_null($exception) || $except) && $validation && !calc_exp($fields, $field, $validation)){
+	if ((is_null($exception) || $except) && $validation && !calc_exp($fields, $field, $validation)) {
 		if ($validation == NOT_EMPTY) {
 			if ($flags&P_SYS) {
 				info(_s('Critical error. Incorrect value for field "%1$s": cannot be empty.', $caption));
@@ -512,6 +512,7 @@ function check_field(&$fields, &$field, $checks) {
 
 		return ($flags&P_SYS) ? ZBX_VALID_ERROR : ZBX_VALID_WARNING;
 	}
+
 	return ZBX_VALID_OK;
 }
 
@@ -528,13 +529,13 @@ function invalid_url($msg = null) {
 function check_fields(&$fields, $show_messages = true) {
 	// VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 	$system_fields = array(
-		'sid' =>		array(T_ZBX_STR, O_OPT, P_SYS, HEX(),		null),
+		'sid' =>			array(T_ZBX_STR, O_OPT, P_SYS, HEX(),		null),
 		'switch_node' =>	array(T_ZBX_INT, O_OPT, P_SYS, DB_ID,		null),
 		'triggers_hash' =>	array(T_ZBX_STR, O_OPT, P_SYS, NOT_EMPTY,	null),
-		'print' =>		array(T_ZBX_INT, O_OPT, P_SYS, IN('1'),		null),
-		'sort' =>		array(T_ZBX_STR, O_OPT, P_SYS, null,		null),
+		'print' =>			array(T_ZBX_INT, O_OPT, P_SYS, IN('1'),		null),
+		'sort' =>			array(T_ZBX_STR, O_OPT, P_SYS, null,		null),
 		'sortorder' =>		array(T_ZBX_STR, O_OPT, P_SYS, null,		null),
-		'page' =>		array(T_ZBX_INT, O_OPT, P_SYS, null,		null), // paging
+		'page' =>			array(T_ZBX_INT, O_OPT, P_SYS, null,		null), // paging
 		'ddreset' =>		array(T_ZBX_INT, O_OPT, P_SYS, null,		null)
 	);
 	$fields = zbx_array_merge($system_fields, $fields);
@@ -560,7 +561,7 @@ function check_fields(&$fields, $show_messages = true) {
 		show_messages($err == ZBX_VALID_OK, null, _('Page received incorrect data'));
 	}
 
-	return $err == ZBX_VALID_OK;
+	return ($err == ZBX_VALID_OK);
 }
 
 function validatePortNumberOrMacro($port) {

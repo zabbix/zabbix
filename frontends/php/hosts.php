@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2012 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -10,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -34,6 +34,10 @@ else {
 	$page['type'] = detect_page_type(PAGE_TYPE_HTML);
 	$page['hist_arg'] = array('groupid');
 
+	if (isset($_REQUEST['go']) && $_REQUEST['go'] == 'massupdate') {
+		$page['scripts'] = array('multiselect.js');
+	}
+
 	$EXPORT_DATA = false;
 }
 
@@ -43,6 +47,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 $fields = array(
 	'hosts' =>		array(T_ZBX_INT, O_OPT, P_SYS,		DB_ID,		null),
 	'groups' =>		array(T_ZBX_INT, O_OPT, P_SYS,		DB_ID,		null),
+	'new_groups' =>		array(T_ZBX_STR, O_OPT, P_SYS,		null,		null),
 	'hostids' =>		array(T_ZBX_INT, O_OPT, P_SYS,		DB_ID,		null),
 	'groupids' =>		array(T_ZBX_INT, O_OPT, P_SYS,		DB_ID,		null),
 	'applications' =>	array(T_ZBX_INT, O_OPT, P_SYS,		DB_ID,		null),
@@ -209,7 +214,6 @@ elseif (isset($_REQUEST['full_clone']) && isset($_REQUEST['hostid'])) {
 elseif (isset($_REQUEST['go']) && $_REQUEST['go'] == 'massupdate' && isset($_REQUEST['masssave'])) {
 	$hostids = get_request('hosts', array());
 	$visible = get_request('visible', array());
-	$_REQUEST['newgroup'] = get_request('newgroup', '');
 	$_REQUEST['proxy_hostid'] = get_request('proxy_hostid', 0);
 	$_REQUEST['templates'] = get_request('templates', array());
 
@@ -231,31 +235,72 @@ elseif (isset($_REQUEST['go']) && $_REQUEST['go'] == 'massupdate' && isset($_REQ
 			$new_values['inventory'] = $new_values['inventory_mode'] != HOST_INVENTORY_DISABLED ? get_request('host_inventory', array()) : array();
 		}
 
-		$newgroup = array();
-		if (isset($visible['newgroup']) && !empty($_REQUEST['newgroup'])) {
-			if (!$result = API::HostGroup()->create(array('name' => $_REQUEST['newgroup']))) {
-				throw new Exception();
-			}
-
-			$newgroup = array('groupid' => reset($result['groupids']), 'name' => $_REQUEST['newgroup']);
-		}
-
 		$templates = array();
 		if (isset($visible['template_table'])) {
 			$tplids = array_keys($_REQUEST['templates']);
 			$templates = zbx_toObject($tplids, 'templateid');
 		}
 
+		// add new or existing host groups
+		if (isset($visible['new_groups']) && !empty($_REQUEST['new_groups'])) {
+			if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
+				foreach ($_REQUEST['new_groups'] as $newGroup) {
+					if (is_array($newGroup) && isset($newGroup['new'])) {
+						$newGroups[] = array('name' => $newGroup['new']);
+					}
+					else {
+						$existGroups[] = $newGroup;
+					}
+				}
+				if (isset($newGroups)) {
+					if (!$createdGroups = API::HostGroup()->create($newGroups)) {
+						throw new Exception();
+					}
+					if (isset($existGroups)) {
+						$existGroups = array_merge($existGroups, $createdGroups['groupids']);
+					}
+					else {
+						$existGroups = $createdGroups['groupids'];
+					}
+				}
+			}
+			else {
+				$existGroups = $_REQUEST['new_groups'];
+			}
+		}
+
 		if (isset($visible['groups'])) {
-			$hosts['groups'] = API::HostGroup()->get(array(
-				'groupids' => get_request('groups', array()),
+			if (isset($_REQUEST['groups'])) {
+				if (isset($existGroups)){
+					$replaceHostGroups = array_unique(array_merge($_REQUEST['groups'], $existGroups));
+				}
+				else {
+					$replaceHostGroups = $_REQUEST['groups'];
+				}
+			}
+			elseif (isset($existGroups)) {
+				$replaceHostGroups = $existGroups;
+			}
+
+			if (isset($replaceHostGroups)) {
+				$hosts['groups'] = API::HostGroup()->get(array(
+					'groupids' => $replaceHostGroups,
+					'editable' => true,
+					'output' => array('groupid')
+				));
+			}
+			else {
+				$hosts['groups'] = array();
+			}
+		}
+		elseif (isset($existGroups)) {
+			$existGroups = API::HostGroup()->get(array(
+				'groupids' => $existGroups,
 				'editable' => true,
 				'output' => array('groupid')
 			));
-			if (!empty($newgroup)) {
-				$hosts['groups'][] = $newgroup;
-			}
 		}
+
 		if (isset($_REQUEST['mass_replace_tpls'])) {
 			if (isset($_REQUEST['mass_clear_tpls'])) {
 				$host_templates = API::Template()->get(array('hostids' => $hostids));
@@ -275,9 +320,12 @@ elseif (isset($_REQUEST['go']) && $_REQUEST['go'] == 'massupdate' && isset($_REQ
 		if (!empty($templates) && isset($visible['template_table'])) {
 			$add['templates'] = $templates;
 		}
-		if (!empty($newgroup) && !isset($visible['groups'])) {
-			$add['groups'][] = $newgroup;
+
+		// add new host groups
+		if (!empty($existGroups) && (!isset($visible['groups']) || !isset($replaceHostGroups))) {
+			$add['groups'] = $existGroups;
 		}
+
 		if (!empty($add)) {
 			$add['hosts'] = $hosts['hosts'];
 
@@ -384,7 +432,7 @@ elseif (isset($_REQUEST['save'])) {
 			'templates' => $templates,
 			'interfaces' => $interfaces,
 			'macros' => $macros,
-			'inventory' => (get_request('inventory_mode') != HOST_INVENTORY_DISABLED) ? get_request('host_inventory', array()) : array(),
+			'inventory' => (get_request('inventory_mode') != HOST_INVENTORY_DISABLED) ? get_request('host_inventory', array()) : null,
 			'inventory_mode' => get_request('inventory_mode')
 		);
 

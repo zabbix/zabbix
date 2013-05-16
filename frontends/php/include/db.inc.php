@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2012 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -10,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -958,7 +958,7 @@ function remove_nodes_from_id($id) {
 }
 
 /**
- * Cheks whether all $db_fields keys exists as $args keys.
+ * Checks whether all $db_fields keys exists as $args keys.
  *
  * If $db_fields element value is given and corresponding $args is not then it is assigned to $args element.
  *
@@ -987,7 +987,7 @@ function check_db_fields($db_fields, &$args) {
 
 /**
  * Takes an initial part of SQL query and appends a generated WHERE condition.
- * The WHERE condidion is generated from the given list of values as a mix of
+ * The WHERE condition is generated from the given list of values as a mix of
  * <fieldname> BETWEEN <id1> AND <idN>" and "<fieldname> IN (<id1>,<id2>,...,<idN>)" elements.
  *
  * @param string $fieldName  field name to be used in SQL WHERE condition
@@ -1011,8 +1011,12 @@ function dbConditionInt($fieldName, array $values, $notIn = false) {
 
 	$pos = 1;
 	$len = 1;
-	$valueL = reset($values);
-	while (false !== ($valueR = next($values))) {
+	foreach ($values as $valueR) {
+		if (!isset($valueL)) {
+			$valueL = $valueR;
+			continue;
+		}
+
 		$valueL = bcadd($valueL, 1, 0);
 
 		if (bccomp($valueR, $valueL) != 0) {
