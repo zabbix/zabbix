@@ -49,7 +49,7 @@
 
 const char	*progname = NULL;
 
-/* Default config file location */
+/* default config file location */
 #ifdef _WINDOWS
 	static char	DEFAULT_CONFIG_FILE[]	= "C:\\zabbix_agentd.conf";
 #else
