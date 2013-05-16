@@ -154,8 +154,7 @@ switch ($this->data['new_condition']['conditiontype']) {
 
 	case CONDITION_TYPE_HOST:
 		$rowCondition[] = new CDiv(new CMultiSelect(array(
-			'name' => 'new_condition[value]',
-			'selectedLimit' => 1,
+			'name' => 'new_condition[value][]',
 			'objectName' => 'hosts',
 			'objectOptions' => array(
 				'editable' => true
