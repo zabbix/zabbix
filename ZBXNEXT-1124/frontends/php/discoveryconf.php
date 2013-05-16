@@ -143,19 +143,19 @@ if (isset($_REQUEST['save'])) {
 
 	if (isset($_REQUEST['druleid'])) {
 		$discoveryRule['druleid'] = get_request('druleid');
-		$result = API::drule()->update($discoveryRule);
+		$result = API::DRule()->update($discoveryRule);
 
-		$msg_ok = _('Discovery rule updated');
-		$msg_fail = _('Cannot update discovery rule');
+		$msgOk = _('Discovery rule updated');
+		$msgFail = _('Cannot update discovery rule');
 	}
 	else {
-		$result = API::drule()->create($discoveryRule);
+		$result = API::DRule()->create($discoveryRule);
 
-		$msg_ok = _('Discovery rule created');
-		$msg_fail = _('Cannot create discovery rule');
+		$msgOk = _('Discovery rule created');
+		$msgFail = _('Cannot create discovery rule');
 	}
 
-	show_messages($result, $msg_ok, $msg_fail);
+	show_messages($result, $msgOk, $msgFail);
 
 	if ($result) {
 		$druleid = reset($result['druleids']);

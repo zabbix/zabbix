@@ -530,12 +530,14 @@ $ipmiList = new CFormList('ipmilist');
 $cmbIPMIAuthtype = new CComboBox('ipmi_authtype', $ipmi_authtype);
 $cmbIPMIAuthtype->addItems(ipmiAuthTypes());
 $cmbIPMIAuthtype->setAttribute('size', 7);
+$cmbIPMIAuthtype->addClass('openView');
 $cmbIPMIAuthtype->addStyle('width: 170px;');
 $ipmiList->addRow(_('Authentication algorithm'), $cmbIPMIAuthtype);
 
 $cmbIPMIPrivilege = new CComboBox('ipmi_privilege', $ipmi_privilege);
 $cmbIPMIPrivilege->addItems(ipmiPrivileges());
 $cmbIPMIPrivilege->setAttribute('size', 5);
+$cmbIPMIPrivilege->addClass('openView');
 $cmbIPMIPrivilege->addStyle('width: 170px;');
 $ipmiList->addRow(_('Privilege level'), $cmbIPMIPrivilege);
 $ipmiList->addRow(_('Username'), new CTextBox('ipmi_username', $ipmi_username, ZBX_TEXTBOX_SMALL_SIZE));
