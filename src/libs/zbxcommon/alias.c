@@ -21,7 +21,7 @@
 #include "alias.h"
 #include "log.h"
 
-static ALIAS	*aliasList = NULL;
+ALIAS	*aliasList = NULL;
 
 void	add_alias(const char *name, const char *value)
 {
