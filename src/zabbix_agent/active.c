@@ -381,20 +381,30 @@ static int	refresh_active_checks(const char *host, unsigned short port)
 		init_result(&result);
 
 		if (SUCCEED == process(CONFIG_HOST_METADATA_ITEM, PROCESS_LOCAL_COMMAND, &result) &&
-				NULL != (value = GET_STR_RESULT(&result)))
+				NULL != (value = GET_STR_RESULT(&result)) && NULL != *value)
 		{
-			if (HOST_METADATA_LEN < zbx_strlen_utf8(*value))
+			if (SUCCEED != zbx_is_utf8(*value))
 			{
-				size_t	bytes;
-
-				zabbix_log(LOG_LEVEL_WARNING, "the returned value of \"%s\" item specified by"
-						" \"HostMetadataItem\" configuration parameter is too long, truncating"
-						" at position %d", CONFIG_HOST_METADATA_ITEM, HOST_METADATA_LEN_MAX);
-
-				bytes = zbx_strlen_utf8_n(*value, HOST_METADATA_LEN);
-				(*value)[bytes] = '\0';
+				zabbix_log(LOG_LEVEL_WARNING, "cannot get host metadata using \"%s\" item specified by"
+						" \"HostMetadataItem\" configuration parameter: returned value is not"
+						" an UTF-8 string", CONFIG_HOST_METADATA_ITEM);
 			}
-			zbx_json_addstring(&json, ZBX_PROTO_TAG_HOST_METADATA, *value, ZBX_JSON_TYPE_STRING);
+			else
+			{
+				if (HOST_METADATA_LEN < zbx_strlen_utf8(*value))
+				{
+					size_t	bytes;
+
+					zabbix_log(LOG_LEVEL_WARNING, "the returned value of \"%s\" item specified by"
+							" \"HostMetadataItem\" configuration parameter is too long,"
+							" truncating at position %d", CONFIG_HOST_METADATA_ITEM,
+							HOST_METADATA_LEN_MAX);
+
+					bytes = zbx_strlen_utf8_n(*value, HOST_METADATA_LEN);
+					(*value)[bytes] = '\0';
+				}
+				zbx_json_addstring(&json, ZBX_PROTO_TAG_HOST_METADATA, *value, ZBX_JSON_TYPE_STRING);
+			}
 		}
 		else
 			zabbix_log(LOG_LEVEL_WARNING, "cannot get host metadata using \"%s\" item specified by"
