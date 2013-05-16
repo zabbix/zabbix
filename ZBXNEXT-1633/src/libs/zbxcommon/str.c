@@ -2883,7 +2883,7 @@ char	*convert_to_utf8(char *in, size_t in_size, const char *encoding)
 	int		utf8_size;
 	unsigned int	codepage;
 
-	if (FAIL == get_codepage(encoding, &codepage))
+	if ('\0' == *encoding || FAIL == get_codepage(encoding, &codepage))
 	{
 		utf8_size = (int)in_size + 1;
 		utf8_string = zbx_malloc(utf8_string, utf8_size);
@@ -2935,7 +2935,7 @@ char	*convert_to_utf8(char *in, size_t in_size, const char *encoding)
 	out_alloc = in_size + 1;
 	p = out = zbx_malloc(out, out_alloc);
 
-	if (*encoding == '\0' || (iconv_t)-1 == (cd = iconv_open(to_code, encoding)))
+	if ('\0' == *encoding || (iconv_t)-1 == (cd = iconv_open(to_code, encoding)))
 	{
 		memcpy(out, in, in_size);
 		out[in_size] = '\0';
