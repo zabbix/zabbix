@@ -1528,8 +1528,7 @@ function drawMapSelementsMarks(&$im, $map, $mapInfo) {
 	global $colors;
 
 	$selements = $map['selements'];
-sdff($selements);
-sdff($mapInfo);
+
 	foreach ($selements as $selementId => $selement) {
 		if (empty($selement)) {
 			continue;
