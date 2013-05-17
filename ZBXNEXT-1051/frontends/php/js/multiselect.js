@@ -417,7 +417,7 @@ jQuery(function($) {
 		cleanAvailable(obj, values);
 
 		var availableValues = [];
-		var value = values['search'].trim();
+		var value = values['search'].replace(/^\s+|\s+$/g, '');
 
 		// add new
 		if (!empty(data)) {
