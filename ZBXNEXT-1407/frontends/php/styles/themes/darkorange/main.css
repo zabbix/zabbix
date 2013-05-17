@@ -506,7 +506,8 @@ div.preloader {
 }
 
 /* multiselect */
-.multiselect input { color: #F50; }
+.multiselect input[type="text"] { color: #F50; }
+.multiselect input[type="text"]:hover { background: none; border: none; outline: none; }
 .multiselect .selected ul { border: 1px solid #DFDFDF; background: #313131; }
 .multiselect .selected ul.active { border: 1px solid #BE4F00; }
 .multiselect .selected ul li {
@@ -520,5 +521,5 @@ div.preloader {
 .multiselect .selected ul li.pressed { background: #525151; }
 .multiselect .available { background: #313131; border: 1px solid #908E8E; }
 .multiselect .available .prefix { color: #838383; }
-.multiselect .available ul li.hover { background: #DF5916; }
+.multiselect .available ul li.hover { background: #908E8E; }
 .multiselect .available ul li.hover .prefix { color: #F1F1F1; }
