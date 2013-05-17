@@ -131,7 +131,7 @@ class CHostPrototype extends CHostBase {
 					'messageInvalid' => _('Incorrect discovery rule ID for host prototype "%1$s".')
 				)),
 				'groupPrototypes' => new CGroupPrototypeCollectionValidator(array(
-					'messageEmpty' => _('Host prototype "%1$s" must have at least one group prototype.'),
+					'messageEmpty' => _('Host prototype "%1$s" must have at least one host group.'),
 					'messageHostGroups' => _('Host prototype "%1$s" must have at least one host group.'),
 					'messageDuplicateName' => _('Duplicate group prototype name "%2$s" for host prototype "%1$s".'),
 					'messageDuplicateGroupId' => _('Duplicate group prototype group ID "%2$s" for host prototype "%1$s".')
@@ -354,7 +354,7 @@ class CHostPrototype extends CHostBase {
 					'messageInvalid' => _('Incorrect discovery rule ID for host prototype "%1$s".')
 				)),
 				'groupPrototypes' => new CGroupPrototypeCollectionValidator(array(
-					'messageEmpty' => _('Host prototype "%1$s" must have at least one group prototype.'),
+					'messageEmpty' => _('Host prototype "%1$s" must have at least one host group.'),
 					'messageHostGroups' => _('Host prototype "%1$s" must have at least one host group.'),
 					'messageDuplicateName' => _('Duplicate group prototype name "%2$s" for host prototype "%1$s".'),
 					'messageDuplicateGroupId' => _('Duplicate group prototype group ID "%2$s" for host prototype "%1$s".')
