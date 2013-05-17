@@ -117,7 +117,9 @@ jQuery(function($) {
 			$.fn.multiSelect.getData = function() {
 				var data = [];
 
-				for (var id in values.selected) {
+				for (var name in values.selected) {
+					id = values.selected[name].id;
+
 					data[data.length] = {
 						id: id,
 						name: $('input[value="' + id + '"]', obj).data('name'),
@@ -539,7 +541,7 @@ jQuery(function($) {
 
 		$.each(values.selected, function(i, selected) {
 			if (selected.uid == uid) {
-				delete values.selected[selected.realName];
+				delete values.selected[selected.realName.toUpperCase()];
 				return false;
 			}
 		});
