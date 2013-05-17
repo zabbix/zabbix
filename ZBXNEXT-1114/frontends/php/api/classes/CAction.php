@@ -121,7 +121,7 @@ class CAction extends CZBXAPI {
 								' AND '.dbConditionInt('r.groupid', $userGroups).
 					' WHERE a.actionid=cc.actionid'.
 						' AND '.zbx_dbcast_2bigint('cc.value').'=hgg.hostid'.
-						' AND cc.conditiontype IN ('.CONDITION_TYPE_HOST.','.CONDITION_TYPE_HOST_TEMPLATE.')'.
+						' AND cc.conditiontype IN ('.CONDITION_TYPE_HOST.','.CONDITION_TYPE_TEMPLATE.')'.
 					' GROUP BY cc.value'.
 					' HAVING MIN(r.permission) IS NULL'.
 						' OR MIN(r.permission)='.PERM_DENY.
@@ -1426,7 +1426,7 @@ class CAction extends CZBXAPI {
 						$hostGroupIdsAll[$value] = $value;
 						break;
 
-					case CONDITION_TYPE_HOST_TEMPLATE:
+					case CONDITION_TYPE_TEMPLATE:
 						$templateIdsAll[$value] = $value;
 						break;
 

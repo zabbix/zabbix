@@ -186,7 +186,9 @@ elseif (isset($_REQUEST['add_condition']) && isset($_REQUEST['new_condition'])) 
 
 			foreach ($conditions as $condition) {
 				if ($newCondition['conditiontype'] == $condition['conditiontype']) {
-					foreach ($newCondition['value'] as $num => $newValue) {
+					$newConditionValues = zbx_toArray($newCondition['value']);
+
+					foreach ($newConditionValues as $num => $newValue) {
 						if ($condition['value'] == $newValue) {
 							unset($newCondition['value'][$num]);
 						}
@@ -195,7 +197,9 @@ elseif (isset($_REQUEST['add_condition']) && isset($_REQUEST['new_condition'])) 
 			}
 
 			if ($newCondition['value']) {
-				foreach ($newCondition['value'] as $newValue) {
+				$newConditionValues = zbx_toArray($newCondition['value']);
+
+				foreach ($newConditionValues as $newValue) {
 					$condition = $newCondition;
 					$condition['value'] = $newValue;
 

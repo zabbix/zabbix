@@ -223,7 +223,7 @@ switch ($data['method']) {
 
 	/**
 	 * Create multi select data.
-	 * Supported objects: "hostGroup", "hosts", "templates", "applications"
+	 * Supported objects: "applications", "hosts", "hostGroup", "templates", "triggers"
 	 *
 	 * @param string $data['objectName']
 	 * @param string $data['search']
@@ -322,6 +322,28 @@ switch ($data['method']) {
 						'id' => $application['applicationid'],
 						'prefix' => '',
 						'name' => $application['name']
+					);
+				}
+				break;
+
+			case 'triggers':
+				$triggers = API::Trigger()->get(array(
+					'editable' => isset($data['editable']) ? $data['editable'] : null,
+					'output' => array('triggerid', 'description'),
+					'startSearch' => true,
+					'search' => isset($data['search']) ? array('description' => $data['search']) : null,
+					'limit' => isset($data['limit']) ? $data['limit'] : null
+				));
+
+				CArrayHelper::sort($triggers, array(
+					array('field' => 'description', 'order' => ZBX_SORT_UP)
+				));
+
+				foreach ($triggers as $trigger) {
+					$result[] = array(
+						'id' => $trigger['triggerid'],
+						'prefix' => '',
+						'name' => $trigger['description']
 					);
 				}
 				break;
