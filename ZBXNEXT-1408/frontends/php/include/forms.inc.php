@@ -329,8 +329,8 @@
 	}
 
 	function getItemFilterForm(&$items) {
-		$filter_group				= $_REQUEST['filter_group'];
-		$filter_hostname			= $_REQUEST['filter_hostname'];
+		$filter_groupId				= $_REQUEST['filter_groupid'];
+		$filter_hostId				= $_REQUEST['filter_hostid'];
 		$filter_application			= $_REQUEST['filter_application'];
 		$filter_name				= $_REQUEST['filter_name'];
 		$filter_type				= $_REQUEST['filter_type'];
@@ -363,7 +363,6 @@
 		$form = new CForm('get');
 		$form->setAttribute('name', 'zbx_filter');
 		$form->setAttribute('id', 'zbx_filter');
-		$form->addVar('filter_hostid', get_request('filter_hostid', get_request('hostid', 0)));
 		$form->addVar('subfilter_hosts', $subfilter_hosts);
 		$form->addVar('subfilter_apps', $subfilter_apps);
 		$form->addVar('subfilter_types', $subfilter_types);
@@ -500,17 +499,32 @@
 		$portField->setEnabled('no');
 
 		// row 1
+		$groupFilter = null;
+		if (!empty($filter_groupId)) {
+			$getHostInfo = API::HostGroup()->get(array(
+				'groupids' => $filter_groupId,
+				'output' => array('name')
+			));
+			$getHostInfo = reset($getHostInfo);
+			if (!empty($getHostInfo)) {
+				$groupFilter[] = array(
+					'id' => $getHostInfo['groupid'],
+					'name' => $getHostInfo['name']
+				);
+			}
+		}
+
 		$table->addRow(array(
 			new CCol(bold(_('Host group').NAME_DELIMITER), 'label col1'),
 			new CCol(array(
 				new CMultiSelect(array(
-						'name' => 'filter_group',
+						'name' => 'filter_groupid',
 						'selectedLimit' => 1,
 						'objectName' => 'hostGroup',
 						'objectOptions' => array(
 							'editable' => true
 						),
-						'defaultValue' => 0
+						'data' => $groupFilter
 				))
 			), 'col1'),
 			new CCol(bold(_('Type').NAME_DELIMITER), 'label col2'),
@@ -521,17 +535,32 @@
 			new CCol($cmbStatus, 'col4')
 		));
 		// row 2
+		$hostFilterData = null;
+		if (!empty($filter_hostId)) {
+			$getHostInfo = API::Host()->get(array(
+				'hostids' => $filter_hostId,
+				'output' => array('name')
+			));
+			$getHostInfo = reset($getHostInfo);
+			if (!empty($getHostInfo)) {
+				$hostFilterData[] = array(
+					'id' => $getHostInfo['hostid'],
+					'name' => $getHostInfo['name']
+				);
+			}
+		}
+
 		$table->addRow(array(
 			new CCol(bold(_('Host').NAME_DELIMITER), 'label'),
 			new CCol(array(
 				new CMultiSelect(array(
-						'name' => 'filter_hostname',
+						'name' => 'filter_hostid',
 						'selectedLimit' => 1,
 						'objectName' => 'hosts',
 						'objectOptions' => array(
 							'editable' => true
 						),
-						'defaultValue' => 0
+						'data' => $hostFilterData
 				))
 			)),
 			new CCol($updateIntervalLabel, 'label'),
@@ -627,7 +656,7 @@
 		// generate array with values for subfilters of selected items
 		foreach ($items as $item) {
 			// hosts
-			if (zbx_empty($filter_hostname)) {
+			if (zbx_empty($filter_hostId)) {
 				$host = reset($item['hosts']);
 
 				if (!isset($item_params['hosts'][$host['hostid']])) {
@@ -858,7 +887,7 @@
 		}
 
 		// output
-		if (zbx_empty($filter_hostname) && count($item_params['hosts']) > 1) {
+		if (zbx_empty($filter_hostId) && count($item_params['hosts']) > 1) {
 			$hosts_output = prepareSubfilterOutput($item_params['hosts'], $subfilter_hosts, 'subfilter_hosts');
 			$table_subfilter->addRow(array(_('Hosts'), $hosts_output));
 		}
