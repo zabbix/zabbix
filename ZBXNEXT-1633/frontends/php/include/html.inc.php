@@ -585,7 +585,7 @@ function makeFormFooter($main, $others = null) {
 			),
 			'formrow'
 		),
-		'objectgroup footer min-width ui-widget-content ui-corner-all'
+		'objectgroup footer ui-widget-content ui-corner-all'
 	);
 }
 
