@@ -393,8 +393,6 @@
 					break;
 			}
 		});
-		jQuery('#name').focus();
-
 
 		/**
 		 * Mass update
