@@ -80,7 +80,7 @@ static	int	refresh_kstat(ZBX_CPUS_STAT_DATA *pcpus)
 				else if (-1 == pcpus->cpu[i].cpu_num)	/* Free slot found. Most likely first-time */
 									/* initialization. */
 				{
-					pcpus->cpu[i].cpu_num == k->ks_instance + 1;
+					pcpus->cpu[i].cpu_num = k->ks_instance + 1;
 					(*ksp)[i - 1] = k;
 					inserted = 1;
 					break;
@@ -115,12 +115,7 @@ int	init_cpu_collector(ZBX_CPUS_STAT_DATA *pcpus)
 	TCHAR				cpu[8];
 	char				counterPath[PDH_MAX_COUNTER_PATH];
 	PDH_COUNTER_PATH_ELEMENTS	cpe;
-#else
-#ifdef HAVE_KSTAT_H
-	kstat_t				*k, *kd;
 #endif
-#endif
-
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 #ifdef _WINDOWS
@@ -288,7 +283,6 @@ static void	update_cpustats(ZBX_CPUS_STAT_DATA *pcpus)
 
 #elif defined(HAVE_KSTAT_H)
 
-	kstat_t		*k;
 	cpu_stat_t	*cpu;
 	zbx_uint64_t	total[ZBX_CPU_STATE_COUNT];
 
