@@ -576,7 +576,7 @@ class CHostGroup extends CZBXAPI {
 			'editable' => true,
 			'output' => API_OUTPUT_EXTEND,
 			'preservekeys' => true,
-			'nopermissions' => ($nopermissions) ? true : null
+			'nopermissions' => $nopermissions
 		));
 		foreach ($groupids as $groupid) {
 			if (!isset($delGroups[$groupid])) {
