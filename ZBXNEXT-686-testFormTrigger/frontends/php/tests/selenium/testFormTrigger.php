@@ -156,7 +156,7 @@ class testFormTrigger extends CWebTest {
 	/**
 	 * @dataProvider layout
 	 */
-/*	public function testFormTrigger_CheckLayout($data) {
+	public function testFormTrigger_CheckLayout($data) {
 
 		if (isset($data['template'])) {
 			$this->zbxTestLogin('templates.php');
@@ -345,16 +345,16 @@ class testFormTrigger extends CWebTest {
 		$this->assertElementPresent('bnt1');
 		$this->assertAttribute("//input[@id='bnt1']/@value", 'Add');
 	}
-*/
+
 	// Returns update data
 	public static function update() {
-//		return DBdata("select description from triggers where description LIKE 'testFormTrigger%'");
+		return DBdata("select description from triggers where description LIKE 'testFormTrigger%'");
 	}
 
 	/**
 	 * @dataProvider update
 	 */
-/*	public function testFormTrigger_SimpleUpdate($data) {
+	public function testFormTrigger_SimpleUpdate($data) {
 		$sqlTriggers = 'select * from triggers order by triggerid';
 		$sqlFunctions = 'select * from functions order by functionid';
 
@@ -374,11 +374,11 @@ class testFormTrigger extends CWebTest {
 		$this->assertEquals($oldHashTriggers, DBhash($sqlTriggers));
 		$this->assertEquals($oldHashFunctions, DBhash($sqlFunctions));
 	}
-*/
+
 	// Returns create data
 	public static function create() {
 		return array(
-		/*	array(
+			array(
 				array(
 					'expected' => TRIGGER_BAD,
 					'errors' => array(
@@ -438,7 +438,7 @@ class testFormTrigger extends CWebTest {
 					'formCheck' => true
 				)
 			),
-	*/		array(
+			array(
 				array(
 					'expected' => TRIGGER_GOOD,
 					'description' => 'HTML_symbols&#8704;&forall;&#8734;&ne;&sup;&Eta;&#937;&#958;&pi;&#8194;&mdash;&#8364;&loz;',
@@ -454,7 +454,7 @@ class testFormTrigger extends CWebTest {
 					'formCheck' => true
 				)
 			),
-		/*	array(
+			array(
 				array(
 					'expected' => TRIGGER_GOOD,
 					'description' => 'MyTrigger_allFields',
@@ -475,7 +475,7 @@ class testFormTrigger extends CWebTest {
 					'formCheck' => true
 				)
 			),
-		*/	array(
+			array(
 				array(
 					'expected' => TRIGGER_GOOD,
 					'description' => '0',
@@ -483,7 +483,7 @@ class testFormTrigger extends CWebTest {
 					'formCheck' => true
 				)
 			),
-		/*	array(
+			array(
 				array(
 					'expected' => TRIGGER_GOOD,
 					'description' => 'a?aa+',
@@ -705,7 +705,7 @@ class testFormTrigger extends CWebTest {
 						)
 					)
 				)
-			)*/
+			)
 		);
 	}
 
