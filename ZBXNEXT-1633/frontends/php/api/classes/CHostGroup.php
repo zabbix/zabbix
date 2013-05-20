@@ -569,7 +569,7 @@ class CHostGroup extends CZBXAPI {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 		}
 		$groupids = zbx_toArray($groupids);
-
+		sort($groupids);
 
 		$delGroups = $this->get(array(
 			'groupids' => $groupids,
@@ -1019,6 +1019,7 @@ class CHostGroup extends CZBXAPI {
 		$result = parent::addRelatedObjects($options, $result);
 
 		$groupIds = array_keys($result);
+		sort($groupIds);
 
 		// adding hosts
 		if ($options['selectHosts'] !== null) {
