@@ -105,59 +105,9 @@ class CHostPrototype extends CHostBase {
 	 * @return void
 	 */
 	protected function validateCreate(array $hostPrototypes) {
-		$hostPrototypeValidator = new CSchemaValidator(array(
-			'validators' => array(
-				'host' => new CLldMacroStringValidator(array(
-					'maxLength' => 64,
-					'regex' => '/^('.ZBX_PREG_INTERNAL_NAMES.'|\{#'.ZBX_PREG_MACRO_NAME_LLD.'\})+$/',
-					'messageEmpty' => _('Empty host.'),
-					'messageMaxLength' => _('Host name "%1$s" is too long, it must not be longer than %2$d characters.'),
-					'messageRegex' => _('Incorrect characters used for host "%1$s".'),
-					'messageMacro' => _('Host name for host prototype "%1$s" must contain macros.')
-				)),
-				'name' => new CStringValidator(array(
-					'messageEmpty' => _('Empty name for host prototype "%1$s".')
-				)),
-				'status' => new CSetValidator(array(
-					'values' => array(HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED),
-					'messageInvalid' => _('Incorrect status for host prototype "%1$s".')
-				)),
-				'ruleid' => new CIdValidator(array(
-					'messageEmpty' => _('No discovery rule ID given for host prototype "%1$s".'),
-					'messageInvalid' => _('Incorrect discovery rule ID for host prototype "%1$s".')
-				)),
-				'groupPrototypes' => new CGroupPrototypeCollectionValidator(array(
-					'messageEmpty' => _('Host prototype "%1$s" must have at least one host group.'),
-					'messageHostGroups' => _('Host prototype "%1$s" must have at least one host group.'),
-					'messageDuplicateName' => _('Duplicate group prototype name "%2$s" for host prototype "%1$s".'),
-					'messageDuplicateGroupId' => _('Duplicate group prototype group ID "%2$s" for host prototype "%1$s".')
-				)),
-				'inventory' => null,
-				'templates' => null
-			),
-			'required' => array('host', 'ruleid', 'groupPrototypes'),
-			'messageRequired' => _('Wrong fields for host prototype "%1$s".'),
-			'messageUnsupported' => _('Wrong fields for host prototype "%1$s".'),
-		));
-
-		// group prototype validator
-		$groupPrototypeValidator = new CSchemaValidator(array(
-			'validators' => array(
-				'name' => new CLldMacroStringValidator(array(
-					'empty' => true,
-					'messageMacro' => _('Name for group prototype "%1$s" must contain macros.')
-				)),
-				'groupid' => new CIdValidator(array(
-					'empty' => true,
-					'messageInvalid' => _('Incorrect host group ID "%2$s" for group prototype.')
-				)),
-			),
-			'postValidators' => array(new CGroupPrototypeValidator(array(
-				'messageMissing' => _('Host group prototype must have either a name or a group ID set.'),
-				'messageBoth' => _('Host group prototype "%1$s" cannot have a name and a group ID set at the same time.'),
-			))),
-			'messageUnsupported' => _('Wrong fields for group prototype "%1$s".')
-		));
+		// validators
+		$hostPrototypeValidator = $this->getHostPrototypValidator();
+		$groupPrototypeValidator = $this->getGroupPrototypeValidator();
 
 		foreach ($hostPrototypes as $hostPrototype) {
 			// host prototype
@@ -201,6 +151,73 @@ class CHostPrototype extends CHostBase {
 
 		$this->checkDuplicates($hostPrototypes, 'host', _('Host prototype "%1$s" already exists.'), 'ruleid');
 		$this->checkExistingHostPrototypes($hostPrototypes);
+	}
+
+	/**
+	 * Returns the complete validator for creating a new host prototype.
+	 *
+	 * @return CSchemaValidator
+	 */
+	protected function getHostPrototypValidator() {
+		return new CSchemaValidator(array(
+			'validators' => array(
+				'host' => new CLldMacroStringValidator(array(
+					'maxLength' => 64,
+					'regex' => '/^('.ZBX_PREG_INTERNAL_NAMES.'|\{#'.ZBX_PREG_MACRO_NAME_LLD.'\})+$/',
+					'messageEmpty' => _('Empty host.'),
+					'messageMaxLength' => _('Host name "%1$s" is too long, it must not be longer than %2$d characters.'),
+					'messageRegex' => _('Incorrect characters used for host "%1$s".'),
+					'messageMacro' => _('Host name for host prototype "%1$s" must contain macros.')
+				)),
+				'name' => new CStringValidator(array(
+					'messageEmpty' => _('Empty name for host prototype "%1$s".')
+				)),
+				'status' => new CSetValidator(array(
+					'values' => array(HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED),
+					'messageInvalid' => _('Incorrect status for host prototype "%1$s".')
+				)),
+				'ruleid' => new CIdValidator(array(
+					'messageEmpty' => _('No discovery rule ID given for host prototype "%1$s".'),
+					'messageInvalid' => _('Incorrect discovery rule ID for host prototype "%1$s".')
+				)),
+				'groupPrototypes' => new CGroupPrototypeCollectionValidator(array(
+					'messageEmpty' => _('Host prototype "%1$s" must have at least one host group.'),
+					'messageHostGroups' => _('Host prototype "%1$s" must have at least one host group.'),
+					'messageDuplicateName' => _('Duplicate group prototype name "%2$s" for host prototype "%1$s".'),
+					'messageDuplicateGroupId' => _('Duplicate group prototype group ID "%2$s" for host prototype "%1$s".')
+				)),
+				'inventory' => null,
+				'templates' => null
+			),
+			'required' => array('host', 'ruleid', 'groupPrototypes'),
+			'messageRequired' => _('Wrong fields for host prototype "%1$s".'),
+			'messageUnsupported' => _('Wrong fields for host prototype "%1$s".'),
+		));
+	}
+
+	/**
+	 * Returns the complete validator for creating a new group prototype.
+	 *
+	 * @return CSchemaValidator
+	 */
+	protected function getGroupPrototypeValidator() {
+		return new CSchemaValidator(array(
+			'validators' => array(
+				'name' => new CLldMacroStringValidator(array(
+					'empty' => true,
+					'messageMacro' => _('Name for group prototype "%1$s" must contain macros.')
+				)),
+				'groupid' => new CIdValidator(array(
+					'empty' => true,
+					'messageInvalid' => _('Incorrect host group ID "%2$s" for group prototype.')
+				)),
+			),
+			'postValidators' => array(new CGroupPrototypeValidator(array(
+				'messageMissing' => _('Host group prototype must have either a name or a group ID set.'),
+				'messageBoth' => _('Host group prototype "%1$s" cannot have a name and a group ID set at the same time.'),
+			))),
+			'messageUnsupported' => _('Wrong fields for group prototype "%1$s".')
+		));
 	}
 
 	/**
@@ -324,61 +341,17 @@ class CHostPrototype extends CHostBase {
 
 		$hostPrototypes = $this->extendObjects($this->tableName(), $hostPrototypes, array('host'));
 
-		$hostPrototypeValidator = new CSchemaValidator(array(
-			'validators' => array(
-				'host' => new CLldMacroStringValidator(array(
-					'maxLength' => 64,
-					'regex' => '/^('.ZBX_PREG_INTERNAL_NAMES.'|\{#'.ZBX_PREG_MACRO_NAME_LLD.'\})+$/',
-					'messageEmpty' => _('Empty host.'),
-					'messageMaxLength' => _('Host name "%1$s" is too long, it must not be longer than %2$d characters.'),
-					'messageRegex' => _('Incorrect characters used for host "%1$s".'),
-					'messageMacro' => _('Host name for host prototype "%1$s" must contain macros.')
-				)),
-				'name' => new CStringValidator(array(
-					'messageEmpty' => _('Empty name for host prototype "%1$s".')
-				)),
-				'status' => new CSetValidator(array(
-					'values' => array(HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED),
-					'messageInvalid' => _('Incorrect status for host prototype "%1$s".')
-				)),
-				'ruleid' => new CIdValidator(array(
-					'messageEmpty' => _('No discovery rule ID given for host prototype "%1$s".'),
-					'messageInvalid' => _('Incorrect discovery rule ID for host prototype "%1$s".')
-				)),
-				'groupPrototypes' => new CGroupPrototypeCollectionValidator(array(
-					'messageEmpty' => _('Host prototype "%1$s" must have at least one host group.'),
-					'messageHostGroups' => _('Host prototype "%1$s" must have at least one host group.'),
-					'messageDuplicateName' => _('Duplicate group prototype name "%2$s" for host prototype "%1$s".'),
-					'messageDuplicateGroupId' => _('Duplicate group prototype group ID "%2$s" for host prototype "%1$s".')
-				)),
-				'inventory' => null,
-				'templates' => null,
-				'hostid' => null
-			),
-			'messageUnsupported' => _('Wrong fields for host prototype "%1$s".'),
-		));
+		// host prototype validator
+		$hostPrototypeValidator = $this->getHostPrototypValidator();
+		$hostPrototypeValidator->required = array();
+		$hostPrototypeValidator->validators['hostid'] = null;
 
 		// group prototype validator
-		$groupPrototypeValidator = new CSchemaValidator(array(
-			'validators' => array(
-				'group_prototypeid' => new CIdValidator(array(
-					'messageEmpty' => _('Group prototype ID cannot be empty.'),
-					'messageInvalid' => _('Incorrect group prototype ID.')
-				)),
-				'name' => new CLldMacroStringValidator(array(
-					'empty' => true,
-					'messageMacro' => _('Name for group prototype "%1$s" must contain macros.')
-				)),
-				'groupid' => new CIdValidator(array(
-					'empty' => true,
-					'messageInvalid' => _('Incorrect host group ID "%2$s" for group prototype.')
-				)),
-			),
-			'postValidators' => array(new CGroupPrototypeValidator(array(
-				'messageMissing' => _('Host group prototype must have either a name or a group ID set.'),
-				'messageBoth' => _('Host group prototype "%1$s" cannot have a name and a group ID set at the same time.'),
-			))),
-			'messageUnsupported' => _('Wrong fields for group prototype "%1$s".')
+		$groupPrototypeValidator = $this->getGroupPrototypeValidator();
+		$groupPrototypeValidator->required = array();
+		$groupPrototypeValidator->validators['group_prototypeid'] = new CIdValidator(array(
+			'messageEmpty' => _('Group prototype ID cannot be empty.'),
+			'messageInvalid' => _('Incorrect group prototype ID.')
 		));
 
 		foreach ($hostPrototypes as $hostPrototype) {
