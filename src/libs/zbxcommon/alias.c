@@ -19,9 +19,18 @@
 
 #include "common.h"
 #include "alias.h"
+#include "sysinfo.h"
 #include "log.h"
 
-ALIAS	*aliasList = NULL;
+static	ALIAS	*aliasList = NULL;
+
+void	test_aliases(unsigned flags)
+{
+	ALIAS		*alias;
+
+	for (alias = aliasList; NULL != alias; alias = alias->next)
+		test_parameter(alias->value, flags);
+}
 
 void	add_alias(const char *name, const char *value)
 {
