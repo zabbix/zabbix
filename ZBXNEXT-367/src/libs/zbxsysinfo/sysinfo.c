@@ -41,7 +41,6 @@
 #endif
 
 static ZBX_METRIC	*commands = NULL;
-extern ALIAS		*aliasList;
 
 /******************************************************************************
  *                                                                            *
@@ -359,15 +358,6 @@ void	test_parameter(const char *key, unsigned flags)
 	fflush(stdout);
 }
 
-void	test_aliases()
-{
-	ALIAS		*alias;
-
-	for (alias = aliasList; NULL != alias; alias = alias->next)
-		test_parameter(alias->value, PROCESS_TEST);
-	}
-}
-
 void	test_parameters()
 {
 	int	i;
@@ -376,7 +366,7 @@ void	test_parameters()
 		if (0 != strcmp(commands[i].key, "__UserPerfCounter"))
 			test_parameter(commands[i].key, PROCESS_TEST | PROCESS_USE_TEST_PARAM);
 		else
-			test_aliases();
+			test_aliases(PROCESS_TEST);
 }
 
 static int	replace_param(const char *cmd, const char *param, char *out, int outlen, char *error, int max_error_len)
