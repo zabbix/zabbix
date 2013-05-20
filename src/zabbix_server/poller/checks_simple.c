@@ -28,6 +28,19 @@ typedef int	(*vmfunc_t)(AGENT_REQUEST *, AGENT_RESULT *);
 
 static char	*vmkeys[] =
 {
+	"vcenter.vm.list",
+	"vcenter.vm.memory.size",
+	"vcenter.vm.memory.size.compressed",
+	"vcenter.vm.memory.size.ballooned",
+	"vcenter.vm.memory.size.swapped",
+	"vcenter.vm.storage.unshared",
+	"vcenter.vm.storage.committed",
+	"vcenter.vm.storage.uncommitted",
+	"vcenter.vm.cpu.num",
+	"vcenter.vm.cpu.usage",
+	"vcenter.vm.uptime",
+	"vcenter.vm.powerstate",
+
 	"host.cpu.usage",
 	"host.fullname",
 	"host.hw.cpucores",
@@ -49,8 +62,8 @@ static char	*vmkeys[] =
 	"vm.memory.size.compressed",
 	"vm.memory.size.ballooned",
 	"vm.memory.size.swapped",
-	"vm.power.state",
-	"vm.storage.additional",
+	"vm.powerstate",
+	"vm.storage.unshared",
 	"vm.storage.committed",
 	"vm.storage.uncommitted",
 	"vm.uptime",
@@ -60,32 +73,45 @@ static char	*vmkeys[] =
 #if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
 static vmfunc_t	vmfuncs[] =
 {
-	check_vmware_hostcpuusage,
-	check_vmware_hostfullname,
-	check_vmware_hosthwcpucores,
-	check_vmware_hosthwcpufreq,
-	check_vmware_hosthwcpumodel,
-	check_vmware_hosthwcputhreads,
-	check_vmware_hosthwmemory,
-	check_vmware_hosthwmodel,
-	check_vmware_hosthwuuid,
-	check_vmware_hosthwvendor,
-	check_vmware_hostmemoryused,
-	check_vmware_hoststatus,
-	check_vmware_hostuptime,
-	check_vmware_hostversion,
-	check_vmware_vmcpunum,
-	check_vmware_vmcpuusage,
-	check_vmware_vmlist,
-	check_vmware_vmmemsize,
-	check_vmware_vmmemsizecompressed,
-	check_vmware_vmmemsizeballooned,
-	check_vmware_vmmemsizeswapped,
-	check_vmware_vmpowerstate,
-	check_vmware_vmstorageunshared,
-	check_vmware_vmstoragecommitted,
-	check_vmware_vmstorageuncommitted,
-	check_vmware_vmuptime
+	check_vcenter_vmlist,
+	check_vcenter_vmmemsize,
+	check_vcenter_vmmemsizecompressed,
+	check_vcenter_vmmemsizeballooned,
+	check_vcenter_vmmemsizeswapped,
+	check_vcenter_vmstorageunshared,
+	check_vcenter_vmstoragecommitted,
+	check_vcenter_vmstorageuncommitted,
+	check_vcenter_vmcpunum,
+	check_vcenter_vmcpuusage,
+	check_vcenter_vmuptime,
+	check_vcenter_vmpowerstate,
+
+	check_vsphere_hostcpuusage,
+	check_vsphere_hostfullname,
+	check_vsphere_hosthwcpucores,
+	check_vsphere_hosthwcpufreq,
+	check_vsphere_hosthwcpumodel,
+	check_vsphere_hosthwcputhreads,
+	check_vsphere_hosthwmemory,
+	check_vsphere_hosthwmodel,
+	check_vsphere_hosthwuuid,
+	check_vsphere_hosthwvendor,
+	check_vsphere_hostmemoryused,
+	check_vsphere_hoststatus,
+	check_vsphere_hostuptime,
+	check_vsphere_hostversion,
+	check_vsphere_vmcpunum,
+	check_vsphere_vmcpuusage,
+	check_vsphere_vmlist,
+	check_vsphere_vmmemsize,
+	check_vsphere_vmmemsizecompressed,
+	check_vsphere_vmmemsizeballooned,
+	check_vsphere_vmmemsizeswapped,
+	check_vsphere_vmpowerstate,
+	check_vsphere_vmstorageunshared,
+	check_vsphere_vmstoragecommitted,
+	check_vsphere_vmstorageuncommitted,
+	check_vsphere_vmuptime
 };
 #endif
 
@@ -157,7 +183,10 @@ int	get_value_simple(DC_ITEM *item, AGENT_RESULT *result)
 	else if (SUCCEED == get_vmware_function(request.key, &vmfunc))
 	{
 		if (NULL != vmfunc)
-			ret = vmfunc(&request, result);
+		{
+			if (SYSINFO_RET_OK == vmfunc(&request, result))
+				ret = SUCCEED;
+		}
 		else
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Support for VMware checks was not compiled in"));
 	}
