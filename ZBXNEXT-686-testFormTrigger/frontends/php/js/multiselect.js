@@ -21,17 +21,48 @@
 jQuery(function($) {
 
 	/**
+	 * Multi select helper.
+	 *
+	 * @param objectName options['objectName']	backend data source
+	 *
+	 * @see jQuery.multiSelect()
+	 */
+	$.fn.multiSelectHelper = function(options) {
+		// url
+		options.url = new Curl('jsrpc.php');
+		options.url.setArgument('type', 11); // PAGE_TYPE_TEXT_RETURN_JSON
+		options.url.setArgument('method', 'multiselect.get');
+		options.url.setArgument('objectName', options.objectName);
+		options.url = options.url.getUrl();
+
+		// labels
+		options.labels = {
+			'No matches found': t('No matches found'),
+			'More matches found...': t('More matches found...'),
+			'type here to search': t('type here to search'),
+			'new': t('new')
+		};
+
+		return this.each(function() {
+			$(this).empty();
+			$(this).multiSelect(options);
+		});
+	};
+
+	/**
 	 * Create multi select input element.
 	 *
-	 * @param string options['url']
-	 * @param string options['name']
-	 * @param int    options['limit']
-	 * @param bool   options['disabled']
-	 * @param object options['labels']
-	 * @param object options['data']
+	 * @param string options['url']				backend url
+	 * @param string options['name']			input element name
+	 * @param object options['labels']			translated labels
+	 * @param object options['data']			preload data {id, name, prefix}
 	 * @param string options['data'][id]
 	 * @param string options['data'][name]
 	 * @param string options['data'][prefix]
+	 * @param string options['defaultValue']	default value for input element
+	 * @param bool   options['disabled']		turn on/off readonly state
+	 * @param int    options['selectedLimit']	how many items can be selected
+	 * @param int    options['limit']			how many available items can be received from backend
 	 *
 	 * @return object
 	 */
@@ -39,13 +70,18 @@ jQuery(function($) {
 		var defaults = {
 			url: '',
 			name: '',
-			limit: null,
-			data: {},
-			disabled: false,
 			labels: {
-				emptyResult: 'No matches found',
-				moreMatchesFound: 'More matches found...'
-			}
+				'No matches found': 'No matches found',
+				'More matches found...': 'More matches found...',
+				'type here to search': 'type here to search',
+				'new': 'new'
+			},
+			data: [],
+			addNew: false,
+			defaultValue: null,
+			disabled: false,
+			selectedLimit: null,
+			limit: 20
 		};
 		options = $.extend({}, defaults, options);
 
@@ -62,6 +98,41 @@ jQuery(function($) {
 		};
 
 		return this.each(function() {
+			/**
+			 * Clean multi select object values.
+			 */
+			$.fn.multiSelect.clean = function() {
+				for (var id in values.selected) {
+					removeSelected(id, obj, values, options);
+				}
+
+				cleanAvailable(obj, values);
+			};
+
+			/**
+			 * Get multi select selected data.
+			 *
+			 * @return array
+			 */
+			$.fn.multiSelect.getData = function() {
+				var data = [];
+
+				for (var name in values.selected) {
+					id = values.selected[name].id;
+
+					data[data.length] = {
+						id: id,
+						name: $('input[value="' + id + '"]', obj).data('name'),
+						prefix: $('input[value="' + id + '"]', obj).data('prefix')
+					};
+				}
+
+				return data;
+			};
+
+			/**
+			 * MultiSelect object.
+			 */
 			var obj = $(this),
 				jqxhr = null,
 				values = {
@@ -78,6 +149,7 @@ jQuery(function($) {
 			// search input
 			if (!options.disabled) {
 				var input = $('<input>', {
+					'class': 'input',
 					type: 'text',
 					value: '',
 					css: {width: values.width}
@@ -85,6 +157,11 @@ jQuery(function($) {
 				.on('keyup change', function(e) {
 					if (e.which == KEY.ESCAPE) {
 						cleanSearchInput(obj);
+						return false;
+					}
+
+					if ($('.selected li', obj).length > 0 && $('.selected li', obj).length == options.selectedLimit) {
+						setReadonly(obj);
 						return false;
 					}
 
@@ -245,27 +322,37 @@ jQuery(function($) {
 					}
 				})
 				.focusin(function() {
-					$('.selected ul', obj).addClass('active');
+					if (options.selectedLimit > 0) {
+						if ($('.selected li', obj).length == 0) {
+							$('.selected ul', obj).addClass('active');
+						}
+					}
+					else {
+						$('.selected ul', obj).addClass('active');
+					}
 				})
 				.focusout(function() {
 					$('.selected ul', obj).removeClass('active');
 					cleanSearchInput(obj);
 				});
-				obj.append($('<div>', {style: 'position: relative;'}).append(input));
+				obj.append(input);
 			}
 
 			// selected
-			obj.append($('<div>', {
-				'class': 'selected',
+			var selectedDiv = $('<div>', {
+				'class': 'selected'
+			});
+			var selectedUl = $('<ul>', {
 				css: {width: values.width}
-			}).append($('<ul>')));
+			});
+			obj.append(selectedDiv.append(selectedUl));
 
 			// available
 			if (!options.disabled) {
 				var available = $('<div>', {
 					'class': 'available',
 					css: {
-						width: values.width - 2,
+						width: values.width + 1,
 						display: 'none'
 					}
 				})
@@ -278,7 +365,7 @@ jQuery(function($) {
 				});
 
 				// multi select
-				obj.append($('<div>', {style: 'position: relative;'}).append(available))
+				obj.append(available)
 				.focusout(function() {
 					setTimeout(function() {
 						if (!values.isAvailableOpenned && $('.available', obj).is(':visible')) {
@@ -289,24 +376,66 @@ jQuery(function($) {
 			}
 
 			// preload data
-			if (!empty(options.data)) {
-				loadSelected(options.data, obj, values, options);
+			if (empty(options.data)) {
+				setDefaultValue(obj, options);
+				setPlaceholder(obj, options);
 			}
 			else {
-				// resize
-				resizeSelected(obj, values);
+				loadSelected(options.data, obj, values, options);
 			}
+
+			// resize
+			resizeSelected(obj, values, options);
+			resizeAvailable(obj);
 		});
 	};
 
+	function setDefaultValue(obj, options) {
+		if (!empty(options.defaultValue)) {
+			obj.append($('<input>', {
+				type: 'hidden',
+				name: options.name,
+				value: options.defaultValue,
+				'data-default': 1
+			}));
+		}
+	}
+
+	function removeDefaultValue(obj, options) {
+		if (!empty(options.defaultValue)) {
+			$('input[data-default="1"]', obj).remove();
+		}
+	}
+
 	function loadSelected(data, obj, values, options) {
 		$.each(data, function(i, item) {
+			item.realName = item.name;
+			item.uid = getId();
 			addSelected(item, obj, values, options);
 		});
 	}
 
 	function loadAvailable(data, obj, values, options) {
 		cleanAvailable(obj, values);
+
+		var availableValues = [];
+		var value = values['search'].replace(/^\s+|\s+$/g, '');
+
+		// add new
+		if (!empty(data)) {
+			$.each(data, function(i, item) {
+				availableValues.push(item.name.toUpperCase());
+			});
+		}
+
+		if (options.addNew == true && !empty(value) && $.inArray(value.toUpperCase(), availableValues)) {
+			data[data.length] = {
+				id: value,
+				prefix: '',
+				name: value + ' (' + options.labels['new'] + ')',
+				isNew: true
+			};
+		}
 
 		if (!empty(data)) {
 			$.each(data, function(i, item) {
@@ -318,7 +447,7 @@ jQuery(function($) {
 		if (objectLength(values.available) == 0) {
 			var div = $('<div>', {
 				'class': 'label-empty-result',
-				text: options.labels.emptyResult
+				text: options.labels['No matches found']
 			})
 			.click(function() {
 				$('input[type="text"]', obj).focus();
@@ -331,7 +460,7 @@ jQuery(function($) {
 		if (values.isMoreMatchesFound) {
 			var div = $('<div>', {
 				'class': 'label-more-matches-found',
-				text: options.labels.moreMatchesFound
+				text: options.labels['More matches found...']
 			})
 			.click(function() {
 				$('input[type="text"]', obj).focus();
@@ -344,19 +473,32 @@ jQuery(function($) {
 	}
 
 	function addSelected(item, obj, values, options) {
-		if (typeof(values.selected[item.id]) == 'undefined') {
-			values.selected[item.id] = item;
+		if (typeof(values.selected[item.realName.toUpperCase()]) == 'undefined') {
+			removeDefaultValue(obj, options);
+
+			values.selected[item.realName.toUpperCase()] = item;
+
+			var itemName;
+			if (options.addNew && item.isNew) {
+				itemName = options.name + '[new]';
+			}
+			else {
+				itemName = options.name;
+			}
 
 			// add hidden input
 			obj.append($('<input>', {
 				type: 'hidden',
-				name: options.name,
-				value: item.id
+				name: itemName,
+				value: item.id,
+				'data-id': item.uid,
+				'data-name': item.name,
+				'data-prefix': item.prefix
 			}));
 
 			// add list item
 			var li = $('<li>', {
-				'data-id': item.id
+				'data-id': item.uid
 			});
 
 			var text = $('<span>', {
@@ -364,46 +506,82 @@ jQuery(function($) {
 				text: empty(item.prefix) ? item.name : item.prefix + item.name
 			});
 
-			if (!options.disabled) {
+			if (options.disabled) {
+				$('.selected ul', obj).append(li.append(text));
+			}
+			else {
 				var arrow = $('<span>', {
 					'class': 'arrow',
-					'data-id': item.id
+					'data-id': item.uid
 				})
 				.click(function() {
 					removeSelected($(this).data('id'), obj, values, options);
 				});
 
 				$('.selected ul', obj).append(li.append(text, arrow));
-
-				// resize
-				resizeSelected(obj, values);
 			}
-			else {
-				$('.selected ul', obj).append(li.append(text));
+
+			removePlaceholder(obj);
+
+			// resize
+			resizeSelected(obj, values, options);
+			resizeAvailable(obj);
+
+			// set readonly
+			if (options.selectedLimit > 0 && $('.selected li', obj).length == options.selectedLimit) {
+				setReadonly(obj);
 			}
 		}
 	}
 
-	function removeSelected(id, obj, values, options) {
+	function removeSelected(uid, obj, values, options) {
 		// remove
-		$('.selected li[data-id="' + id + '"]', obj).remove();
-		$('input[value="' + id + '"]', obj).remove();
+		$('.selected li[data-id="' + uid + '"]', obj).remove();
+		$('input[data-id="' + uid + '"]', obj).remove();
 
-		delete values.selected[id];
+		$.each(values.selected, function(i, selected) {
+			if (selected.uid == uid) {
+				delete values.selected[selected.realName.toUpperCase()];
+				return false;
+			}
+		});
 
 		// resize
-		resizeSelected(obj, values);
+		resizeSelected(obj, values, options);
+		resizeAvailable(obj);
+
+		// remove readonly
+		if ($('.selected li', obj).length == 0) {
+			setDefaultValue(obj, options);
+			setPlaceholder(obj, options);
+
+			if (options.selectedLimit > 0) {
+				$('input[type="text"]', obj).prop('disabled', false);
+			}
+		}
 
 		// clean
 		cleanAvailable(obj, values);
 		cleanLastSearch(obj);
-		$('input[type="text"]', obj).focus();
+
+		if (!$('input[type="text"]', obj).prop('disabled')) {
+			$('input[type="text"]', obj).focus();
+		}
 	}
 
 	function addAvailable(item, obj, values, options) {
+		if (item.isNew) {
+			item.realName = item.id;
+		}
+		else {
+			item.realName = item.name;
+		}
 		if (empty(options.limit) || (options.limit > 0 && $('.available li', obj).length < options.limit)) {
-			if (typeof(values.available[item.id]) == 'undefined' && typeof(values.selected[item.id]) == 'undefined') {
-				values.available[item.id] = item;
+			if (typeof(values.available[item.id]) == 'undefined'
+					&& typeof(values.selected[item.realName.toUpperCase()]) == 'undefined') {
+				item.uid = getId();
+
+				values.available[item.uid] = item;
 
 				var prefix = $('<span>', {
 					'class': 'prefix',
@@ -420,7 +598,7 @@ jQuery(function($) {
 				});
 
 				var li = $('<li>', {
-					'data-id': item.id
+					'data-id': item.uid
 				})
 				.click(function() {
 					select($(this).data('id'), obj, values, options);
@@ -439,14 +617,16 @@ jQuery(function($) {
 		}
 	}
 
-	function select(id, obj, values, options) {
+	function select(uid, obj, values, options) {
 		if (values.isAjaxLoaded && !values.isWaiting) {
-			addSelected(values.available[id], obj, values, options);
+			addSelected(values.available[uid], obj, values, options);
 			hideAvailable(obj);
 			cleanAvailable(obj, values);
 			cleanLastSearch(obj);
 
-			$('input[type="text"]', obj).focus();
+			if (!$('input[type="text"]', obj).prop('disabled')) {
+				$('input[type="text"]', obj).focus();
+			}
 		}
 	}
 
@@ -487,25 +667,31 @@ jQuery(function($) {
 		$('input[type="text"]', obj).val('');
 	}
 
-	function resizeSelected(obj, values) {
+	function resizeSelected(obj, values, options) {
 		// settings
-		var searchInputMinWidth = 50,
-			searchInputLeftPaddings = 4,
-			searchInputRightPaddings = 4,
-			searchInputTopPaddings = IE8 ? 4 : 0;
+		var settingTopPaddings = IE8 ? 1 : 0,
+			settingTopPaddingsInit = 3,
+			settingRightPaddings = 4,
+			settingLeftPaddings = 13,
+			settingMinimumWidth = 50,
+			settingNewLineTopPaddings = 6;
 
 		// calculate
-		var top, left, height;
+		var top = 0,
+			left = 0,
+			height = 0;
 
 		if ($('.selected li', obj).length > 0) {
-			var position = $('.selected li:last-child .arrow', obj).position();
-			top = position.top + searchInputTopPaddings;
-			left = position.left + 20;
+			var position = options.disabled
+				? $('.selected li:last-child', obj).position()
+				: $('.selected li:last-child .arrow', obj).position();
+
+			top = position.top + settingTopPaddings - 1;
+			left = position.left + settingLeftPaddings;
 			height = $('.selected li:last-child', obj).height();
 		}
 		else {
-			top = 3 + searchInputTopPaddings;
-			left = searchInputLeftPaddings;
+			top = settingTopPaddingsInit + settingTopPaddings;
 			height = 0;
 		}
 
@@ -513,15 +699,17 @@ jQuery(function($) {
 			top = top * 2;
 		}
 
-		if (left + searchInputMinWidth > values.width) {
+		if (left + settingMinimumWidth > values.width) {
 			var topPaddings = (height > 20) ? height / 2 : height;
+
+			topPaddings += settingNewLineTopPaddings;
 
 			if (SF) {
 				topPaddings = topPaddings * 2;
 			}
 
 			top += topPaddings;
-			left = searchInputLeftPaddings;
+			left = 0;
 
 			$('.selected ul', obj).css({
 				'padding-bottom': topPaddings
@@ -536,7 +724,15 @@ jQuery(function($) {
 		$('input[type="text"]', obj).css({
 			'padding-top': top,
 			'padding-left': left,
-			width: values.width - left - searchInputRightPaddings
+			width: values.width - left - settingRightPaddings
+		});
+	}
+
+	function resizeAvailable(obj) {
+		var selectedHeight = $('.selected', obj).height();
+
+		$('.available', obj).css({
+			top: (selectedHeight > 0) ? selectedHeight : 20
 		});
 	}
 
@@ -557,6 +753,20 @@ jQuery(function($) {
 		}
 	}
 
+	function setReadonly(obj) {
+		cleanSearchInput(obj);
+		$('input[type="text"]', obj).prop('disabled', true);
+		$('.selected ul', obj).removeClass('active');
+	}
+
+	function setPlaceholder(obj, options) {
+		$('input[type="text"]', obj).prop('placeholder', options.labels['type here to search']);
+	}
+
+	function removePlaceholder(obj) {
+		$('input[type="text"]', obj).removeAttr('placeholder');
+	}
+
 	function getLimit(values, options) {
 		return (options.limit > 0)
 			? options.limit + objectLength(values.selected) + 1
@@ -573,5 +783,12 @@ jQuery(function($) {
 		}
 
 		return length;
+	}
+
+	function getId() {
+		if (typeof getId.id === 'undefined') {
+			getId.id = 0;
+		}
+		return (getId.id++).toString();
 	}
 });

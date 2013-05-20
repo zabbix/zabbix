@@ -74,7 +74,7 @@ class CApplication extends CZBXAPI {
 			'search'					=> null,
 			'searchByAny'				=> null,
 			'startSearch'				=> null,
-			'exludeSearch'				=> null,
+			'excludeSearch'				=> null,
 			'searchWildcardsEnabled'	=> null,
 			// output
 			'output'					=> API_OUTPUT_REFER,
@@ -547,7 +547,7 @@ class CApplication extends CZBXAPI {
 				' AND '.dbConditionInt('ia.applicationid', $applicationids)
 		);
 		while ($pair = DBfetch($linkedDb)) {
-			$linked[$pair['applicationid']] = array($pair['itemid'] => $pair['itemid']);
+			$linked[$pair['applicationid']][$pair['itemid']] = true;
 		}
 		$appsInsert = array();
 		foreach ($applicationids as $applicationid) {

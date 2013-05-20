@@ -190,7 +190,7 @@ static void	process_history_table_data(const ZBX_TABLE *table, int master_nodeid
 							row[fld], ZBX_DM_DELIMITER);
 				}
 			}
-			else	/* ZBX_TYPE_CHAR ZBX_TYPE_BLOB ZBX_TYPE_TEXT */
+			else	/* ZBX_TYPE_CHAR ZBX_TYPE_BLOB ZBX_TYPE_TEXT ZBX_TYPE_SHORTTEXT ZBX_TYPE_LONGTEXT */
 			{
 				zbx_binary2hex((u_char *)row[fld], strlen(row[fld]), &tmp, &tmp_alloc);
 				zbx_snprintf_alloc(&data, &data_alloc, &data_offset, "%s%c", tmp, ZBX_DM_DELIMITER);
@@ -281,7 +281,7 @@ static void	process_history_tables(int master_nodeid, int nodeid)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-void	main_historysender()
+void	main_historysender(void)
 {
 	const char	*__function_name = "main_historysender";
 	DB_RESULT	result;

@@ -48,7 +48,7 @@ static int	get_function_parameter_uint31(zbx_uint64_t hostid, const char *parame
 		if ('#' == *parameter)
 		{
 			*flag = ZBX_FLAG_VALUES;
-			if (SUCCEED == is_uint31(parameter + 1, (uint32_t*)value))
+			if (SUCCEED == is_uint31(parameter + 1, (uint32_t*)value) && 0 < *value)
 				res = SUCCEED;
 		}
 		else if (SUCCEED == is_uint_suffix(parameter, (unsigned int *)value) && 0 <= *value)
@@ -537,7 +537,7 @@ static int	evaluate_COUNT(char *value, DB_ITEM *item, const char *function, cons
 	if (4 < (nparams = num_param(parameters)))
 		goto exit;
 
-	if (FAIL == get_function_parameter_uint31(item->hostid, parameters, 1, &arg1, &flag))
+	if (FAIL == get_function_parameter_uint31(item->hostid, parameters, 1, &arg1, &flag) || 0 >= arg1)
 		goto exit;
 
 	if (2 <= nparams && FAIL == get_function_parameter_str(item->hostid, parameters, 2, &arg2))
@@ -807,7 +807,7 @@ static int	evaluate_AVG(char *value, DB_ITEM *item, const char *function, const 
 	if (2 < (nparams = num_param(parameters)))
 		goto clean;
 
-	if (FAIL == get_function_parameter_uint31(item->hostid, parameters, 1, &arg1, &flag))
+	if (FAIL == get_function_parameter_uint31(item->hostid, parameters, 1, &arg1, &flag) || 0 >= arg1)
 		goto clean;
 
 	if (2 == nparams)
@@ -885,7 +885,10 @@ static int	evaluate_LAST(char *value, DB_ITEM *item, const char *function, const
 
 	if (0 == strcmp(function, "last"))
 	{
-		if (FAIL == get_function_parameter_uint31(item->hostid, parameters, 1, &arg1, &flag) || ZBX_FLAG_VALUES != flag)
+		if (FAIL == get_function_parameter_uint31(item->hostid, parameters, 1, &arg1, &flag))
+			goto clean;
+
+		if (ZBX_FLAG_VALUES != flag)
 		{
 			arg1 = 1;
 			flag = ZBX_FLAG_VALUES;
@@ -1007,7 +1010,7 @@ static int	evaluate_MIN(char *value, DB_ITEM *item, const char *function, const 
 	if (2 < (nparams = num_param(parameters)))
 		goto clean;
 
-	if (FAIL == get_function_parameter_uint31(item->hostid, parameters, 1, &arg1, &flag))
+	if (FAIL == get_function_parameter_uint31(item->hostid, parameters, 1, &arg1, &flag) || 0 >= arg1)
 		goto clean;
 
 	if (2 == nparams)
@@ -1109,7 +1112,7 @@ static int	evaluate_MAX(char *value, DB_ITEM *item, const char *function, const 
 	if (2 < (nparams = num_param(parameters)))
 		goto clean;
 
-	if (FAIL == get_function_parameter_uint31(item->hostid, parameters, 1, &arg1, &flag))
+	if (FAIL == get_function_parameter_uint31(item->hostid, parameters, 1, &arg1, &flag) || 0 >= arg1)
 		goto clean;
 
 	if (2 == nparams)
@@ -1211,7 +1214,7 @@ static int	evaluate_DELTA(char *value, DB_ITEM *item, const char *function, cons
 	if (2 < (nparams = num_param(parameters)))
 		goto clean;
 
-	if (FAIL == get_function_parameter_uint31(item->hostid, parameters, 1, &arg1, &flag))
+	if (FAIL == get_function_parameter_uint31(item->hostid, parameters, 1, &arg1, &flag) || 0 >= arg1)
 		goto clean;
 
 	if (2 == nparams)

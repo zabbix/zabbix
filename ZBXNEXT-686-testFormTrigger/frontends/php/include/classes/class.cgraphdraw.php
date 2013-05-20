@@ -233,7 +233,11 @@ class CGraphDraw {
 			$str = $this->items[0]['hostname'].NAME_DELIMITER.$this->items[0]['name'];
 		}
 		else {
-			$str = $this->header;
+			foreach ($this->items as &$item) {
+				$item['host'] = $item['hostname'];
+			}
+			unset($item);
+			$str = CMacrosResolverHelper::resolveGraphName($this->header, $this->items);
 		}
 
 		$str .= $this->period2str($this->period);

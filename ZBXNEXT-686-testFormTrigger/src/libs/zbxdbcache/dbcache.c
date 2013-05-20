@@ -1149,8 +1149,11 @@ static void	DCmass_update_items(ZBX_DC_HISTORY *history, int history_num)
 	zbx_vector_uint64_t	ids;
 	int			i;
 	unsigned char		inventory_link;
+	zbx_config_hk_t		config_hk;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	DCconfig_get_config_hk(&config_hk);
 
 	zbx_vector_uint64_create(&ids);
 	zbx_vector_uint64_reserve(&ids, history_num);
@@ -1226,11 +1229,14 @@ static void	DCmass_update_items(ZBX_DC_HISTORY *history, int history_num)
 		}
 		else
 			item.prevorgvalue_null = 1;
+
 		item.delta = atoi(row[4]);
 		item.multiplier = atoi(row[5]);
 		item.formula = row[6];
-		item.history = atoi(row[7]);
-		item.trends = atoi(row[8]);
+
+		item.history = (ZBX_HK_OPTION_ENABLED == config_hk.history_global ? config_hk.history : atoi(row[7]));
+		item.trends = (ZBX_HK_OPTION_ENABLED == config_hk.trends_global ? config_hk.trends : atoi(row[8]));
+
 		ZBX_STR2UINT64(item.hostid, row[10]);
 
 		if (SUCCEED != DBis_null(row[12]) && HOST_INVENTORY_AUTOMATIC == (unsigned char)atoi(row[12]))
@@ -1887,7 +1893,7 @@ static void	dc_add_proxy_history_text_sql(ZBX_DC_HISTORY *history, int history_n
 		DBbind_parameter(1, &history[i].itemid, ZBX_TYPE_ID);
 		DBbind_parameter(2, &history[i].ts.sec, ZBX_TYPE_INT);
 		DBbind_parameter(3, &history[i].ts.ns, ZBX_TYPE_INT);
-		DBbind_parameter(4, history[i].value_orig.str, ZBX_TYPE_TEXT);
+		DBbind_parameter(4, history[i].value_orig.str, ZBX_TYPE_LONGTEXT);
 
 		DBstatement_execute();
 	}
@@ -1960,7 +1966,7 @@ static void	dc_add_proxy_history_log_sql(ZBX_DC_HISTORY *history, int history_nu
 		DBbind_parameter(4, &history[i].timestamp, ZBX_TYPE_INT);
 		DBbind_parameter(5, NULL == history[i].value.str ? "" : history[i].value.str, ZBX_TYPE_TEXT);
 		DBbind_parameter(6, &history[i].severity, ZBX_TYPE_INT);
-		DBbind_parameter(7, history[i].value_orig.str, ZBX_TYPE_TEXT);
+		DBbind_parameter(7, history[i].value_orig.str, ZBX_TYPE_LONGTEXT);
 		DBbind_parameter(8, &history[i].logeventid, ZBX_TYPE_INT);
 
 		DBstatement_execute();

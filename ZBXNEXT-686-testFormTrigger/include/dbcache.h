@@ -126,6 +126,7 @@ typedef struct
 	unsigned char	flags;
 	unsigned char	snmpv3_authprotocol;
 	unsigned char	snmpv3_privprotocol;
+	char		snmpv3_contextname_orig[ITEM_SNMPV3_CONTEXTNAME_LEN_MAX], *snmpv3_contextname;
 }
 DC_ITEM;
 
@@ -176,6 +177,30 @@ typedef struct
 	char	*key;
 }
 zbx_host_key_t;
+
+/* housekeeping related configuration data*/
+typedef struct
+{
+	int		events_trigger;
+	int		events_internal;
+	int		events_discovery;
+	int		events_autoreg;
+	int		services;
+	int		audit;
+	int		sessions;
+	int		trends;
+	int		history;
+
+	unsigned char	services_mode;
+	unsigned char	audit_mode;
+	unsigned char	sessions_mode;
+	unsigned char	events_mode;
+	unsigned char	trends_mode;
+	unsigned char	trends_global;
+	unsigned char	history_mode;
+	unsigned char	history_global;
+}
+zbx_config_hk_t;
 
 void	dc_add_history(zbx_uint64_t itemid, unsigned char value_type, unsigned char flags, AGENT_RESULT *value,
 		zbx_timespec_t *ts, unsigned char state, const char *error, int timestamp, const char *source,
@@ -236,12 +261,15 @@ int	DCconfig_get_poller_items(unsigned char poller_type, DC_ITEM *items, int max
 int	DCconfig_get_snmp_interfaceids_by_addr(const char *addr, zbx_uint64_t **interfaceids);
 size_t	DCconfig_get_snmp_items_by_interfaceid(zbx_uint64_t interfaceid, DC_ITEM **items);
 
-#define	CONFIG_ALERT_HISTORY		1
-#define	CONFIG_EVENT_HISTORY		2
-#define	CONFIG_REFRESH_UNSUPPORTED	3
-#define	CONFIG_DISCOVERY_GROUPID	4
-#define	CONFIG_SNMPTRAP_LOGGING		5
+#define	CONFIG_REFRESH_UNSUPPORTED	1
+#define	CONFIG_DISCOVERY_GROUPID	2
+#define	CONFIG_SNMPTRAP_LOGGING		3
+
+#define ZBX_HK_OPTION_DISABLED		0
+#define ZBX_HK_OPTION_ENABLED		1
+
 void	*DCconfig_get_config_data(void *data, int type);
+void	DCconfig_get_config_hk(zbx_config_hk_t *data);
 int	DCget_trigger_severity_name(unsigned char priority, char **replace_to);
 
 void	DCrequeue_items(zbx_uint64_t *itemids, unsigned char *states, int *lastclocks, int *errcodes, size_t num);

@@ -32,13 +32,13 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = array(
-	'groupid'          => array(T_ZBX_INT, O_OPT, P_SYS, DB_ID,             null),
-	'new_httpstep'     => array(T_ZBX_STR, O_OPT, null,  null,              null),
-	'sel_step'         => array(T_ZBX_INT, O_OPT, null,  BETWEEN(0, 65534), null),
-	'group_httptestid' => array(T_ZBX_INT, O_OPT, null,  DB_ID,             null),
-	'showdisabled'     => array(T_ZBX_INT, O_OPT, P_SYS, IN('0,1'),         null),
+	'groupid'			=> array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,				null),
+	'new_httpstep'		=> array(T_ZBX_STR, O_OPT, null,	null,				null),
+	'sel_step'			=> array(T_ZBX_INT, O_OPT, null,	BETWEEN(0, 65534),	null),
+	'group_httptestid'	=> array(T_ZBX_INT, O_OPT, null,	DB_ID,				null),
+	'showdisabled'		=> array(T_ZBX_INT, O_OPT, P_SYS,	IN('0,1'),			null),
 	// form
-	'hostid'          => array(T_ZBX_INT, O_OPT, P_SYS, DB_ID,                  'isset({form})||isset({save})'),
+	'hostid'          => array(T_ZBX_INT, O_OPT, P_SYS, DB_ID.NOT_ZERO,          'isset({form})||isset({save})'),
 	'applicationid'   => array(T_ZBX_INT, O_OPT, null,  DB_ID,                   null, _('Application')),
 	'httptestid'      => array(T_ZBX_INT, O_NO,  P_SYS, DB_ID,                   '(isset({form})&&({form}=="update"))'),
 	'name'            => array(T_ZBX_STR, O_OPT, null,  NOT_EMPTY,               'isset({save})', _('Name')),
@@ -46,26 +46,25 @@ $fields = array(
 	'retries'         => array(T_ZBX_INT, O_OPT, null,  BETWEEN(1, 10),          'isset({save})', _('Retries')),
 	'status'          => array(T_ZBX_STR, O_OPT, null,  null,                    null),
 	'agent'           => array(T_ZBX_STR, O_OPT, null,  null,                    'isset({save})'),
-	'macros'          => array(T_ZBX_STR, O_OPT, null,  null,                    'isset({save})'),
+	'variables'       => array(T_ZBX_STR, O_OPT, null,  null,                    'isset({save})'),
 	'steps'           => array(T_ZBX_STR, O_OPT, null,  null,                    'isset({save})', _('Steps')),
 	'authentication'  => array(T_ZBX_INT, O_OPT, null,  IN('0,1,2'),             'isset({save})'),
 	'http_user'       => array(T_ZBX_STR, O_OPT, null,  NOT_EMPTY,               'isset({save})&&isset({authentication})&&({authentication}=='.HTTPTEST_AUTH_BASIC.
 		'||{authentication}=='.HTTPTEST_AUTH_NTLM.')', _('User')),
-	'http_password'   => array(T_ZBX_STR, O_OPT, null,  NOT_EMPTY,               'isset({save})&&isset({authentication})&&({authentication}=='.HTTPTEST_AUTH_BASIC.
+	'http_password'		=> array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,			'isset({save})&&isset({authentication})&&({authentication}=='.HTTPTEST_AUTH_BASIC.
 		'||{authentication}=='.HTTPTEST_AUTH_NTLM.')', _('Password')),
-	'http_proxy'      => array(T_ZBX_STR, O_OPT, null,  null,                    'isset({save})'),
-	'new_application' => array(T_ZBX_STR, O_OPT, null, null, null),
-	'hostname'        => array(T_ZBX_STR, O_OPT, null, NOT_EMPTY, 'isset({save})', _('Host')),
-	'templated'       => array(T_ZBX_STR, O_OPT, null, null, null),
-
+	'http_proxy'		=> array(T_ZBX_STR, O_OPT, null,	null,				'isset({save})'),
+	'new_application'	=> array(T_ZBX_STR, O_OPT, null,	null,				null),
+	'hostname'			=> array(T_ZBX_STR, O_OPT, null,	null,				null),
+	'templated'			=> array(T_ZBX_STR, O_OPT, null,	null,				null),
 	// actions
-	'go'           => array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null, null),
-	'clone'        => array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null, null),
-	'save'         => array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null, null),
-	'delete'       => array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null, null),
-	'cancel'       => array(T_ZBX_STR, O_OPT, P_SYS,       null, null),
-	'form'         => array(T_ZBX_STR, O_OPT, P_SYS,       null, null),
-	'form_refresh' => array(T_ZBX_INT, O_OPT, null,        null, null)
+	'go'				=> array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,			null),
+	'clone'				=> array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,			null),
+	'save'				=> array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,			null),
+	'delete'			=> array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,			null),
+	'cancel'			=> array(T_ZBX_STR, O_OPT, P_SYS,	null,				null),
+	'form'				=> array(T_ZBX_STR, O_OPT, P_SYS,	null,				null),
+	'form_refresh'		=> array(T_ZBX_INT, O_OPT, null,	null,				null)
 );
 $_REQUEST['showdisabled'] = get_request('showdisabled', CProfile::get('web.httpconf.showdisabled', 1));
 
@@ -168,7 +167,7 @@ elseif (isset($_REQUEST['save'])) {
 			'retries' => $_REQUEST['retries'],
 			'status' => isset($_REQUEST['status']) ? 0 : 1,
 			'agent' => $_REQUEST['agent'],
-			'macros' => $_REQUEST['macros'],
+			'variables' => $_REQUEST['variables'],
 			'http_proxy' => $_REQUEST['http_proxy'],
 			'steps' => $steps
 		);
@@ -257,9 +256,9 @@ elseif (isset($_REQUEST['save'])) {
 elseif (($_REQUEST['go'] == 'activate' || $_REQUEST['go'] == 'disable')&& isset($_REQUEST['group_httptestid'])) {
 	$go_result = false;
 	$group_httptestid = $_REQUEST['group_httptestid'];
-	$status = $_REQUEST['go'] == 'activate' ? HTTPTEST_STATUS_ACTIVE : HTTPTEST_STATUS_DISABLED;
-	$msg_ok = $_REQUEST['go'] == 'activate' ? _('Web scenario activated') : _('Web scenario disabled');
-	$msg_problem = $_REQUEST['go'] == 'activate' ? _('Cannot activate web scenario') : _('Cannot disable web scenario');
+	$status = ($_REQUEST['go'] == 'activate') ? HTTPTEST_STATUS_ACTIVE : HTTPTEST_STATUS_DISABLED;
+	$msg_ok = ($_REQUEST['go'] == 'activate') ? _('Web scenario activated') : _('Web scenario disabled');
+	$msg_problem = ($_REQUEST['go'] == 'activate') ? _('Cannot activate web scenario') : _('Cannot disable web scenario');
 
 	foreach ($group_httptestid as $id) {
 		if (!($httptest_data = get_httptest_by_httptestid($id))) {
@@ -313,14 +312,14 @@ show_messages();
 /*
  * Display
  */
-$data = array('hostid' => get_request('hostid', 0));
-
 if (isset($_REQUEST['form'])) {
-	$data['httptestid'] = get_request('httptestid', null);
-	$data['form'] = get_request('form');
-	$data['form_refresh'] = get_request('form_refresh');
-	$data['hostname'] = get_request('hostname', '');
-	$data['templates'] = array();
+	$data = array(
+		'hostid' => get_request('hostid', 0),
+		'httptestid' => get_request('httptestid', null),
+		'form' => get_request('form'),
+		'form_refresh' => get_request('form_refresh'),
+		'templates' => array()
+	);
 
 	if (isset($data['httptestid'])) {
 		// get templates
@@ -350,11 +349,6 @@ if (isset($_REQUEST['form'])) {
 		array_shift($data['templates']);
 	}
 
-	if (empty($data['hostname']) && !empty($data['hostid'])) {
-		$hostInfo = get_host_by_hostid($data['hostid'], true);
-		$data['hostname'] = $hostInfo['name'];
-	}
-
 	if ((isset($_REQUEST['httptestid']) && !isset($_REQUEST['form_refresh']))) {
 		$dbHttpTest = DBfetch(DBselect(
 			'SELECT ht.*'.
@@ -369,7 +363,7 @@ if (isset($_REQUEST['form'])) {
 		$data['retries'] = $dbHttpTest['retries'];
 		$data['status'] = $dbHttpTest['status'];
 		$data['agent'] = $dbHttpTest['agent'];
-		$data['macros'] = $dbHttpTest['macros'];
+		$data['variables'] = $dbHttpTest['variables'];
 		$data['authentication'] = $dbHttpTest['authentication'];
 		$data['http_user'] = $dbHttpTest['http_user'];
 		$data['http_password'] = $dbHttpTest['http_password'];
@@ -391,7 +385,7 @@ if (isset($_REQUEST['form'])) {
 		$data['delay'] = get_request('delay', 60);
 		$data['retries'] = get_request('retries', 1);
 		$data['agent'] = get_request('agent', '');
-		$data['macros'] = get_request('macros', array());
+		$data['variables'] = get_request('variables', array());
 		$data['authentication'] = get_request('authentication', HTTPTEST_AUTH_NONE);
 		$data['http_user'] = get_request('http_user', '');
 		$data['http_password'] = get_request('http_password', '');
@@ -414,7 +408,7 @@ if (isset($_REQUEST['form'])) {
 	$httpView->show();
 }
 else {
-	$options = array(
+	$pageFilter = new CPageFilter(array(
 		'groups' => array(
 			'editable' => true
 		),
@@ -422,20 +416,21 @@ else {
 			'editable' => true,
 			'templated_hosts' => true
 		),
-		'hostid' => get_request('hostid', null),
-		'groupid' => get_request('groupid', null)
-	);
-	$pageFilter = new CPageFilter($options);
+		'hostid' => get_request('hostid'),
+		'groupid' => get_request('groupid')
+	));
 
-	$_REQUEST['groupid'] = $pageFilter->groupid;
-	$_REQUEST['hostid'] = $pageFilter->hostid;
-	$data['pageFilter'] = $pageFilter;
-	$data['showDisabled'] = $showDisabled;
-	$data['httpTests'] = array();
-	$data['paging'] = null;
+	$data = array(
+		'hostid' => $pageFilter->hostid,
+		'pageFilter' => $pageFilter,
+		'showDisabled' => $showDisabled,
+		'httpTests' => array(),
+		'paging' => null
+	);
 
 	if ($data['pageFilter']->hostsSelected) {
 		$sortfield = getPageSortField('hostname');
+
 		$options = array(
 			'editable' => true,
 			'output' => array('httptestid'),
@@ -469,9 +464,9 @@ else {
 
 		$dbHttpSteps = DBselect(
 			'SELECT hs.httptestid,COUNT(*) AS stepscnt'.
-					' FROM httpstep hs'.
-					' WHERE '.dbConditionInt('hs.httptestid', zbx_objectValues($httpTests, 'httptestid')).
-					' GROUP BY hs.httptestid'
+				' FROM httpstep hs'.
+				' WHERE '.dbConditionInt('hs.httptestid', zbx_objectValues($httpTests, 'httptestid')).
+				' GROUP BY hs.httptestid'
 		);
 		while ($dbHttpStep = DBfetch($dbHttpSteps)) {
 			$httpTests[$dbHttpStep['httptestid']]['stepscnt'] = $dbHttpStep['stepscnt'];

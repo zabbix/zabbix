@@ -185,10 +185,10 @@ while ($httpstep_data = DBfetch($db_httpsteps)) {
 		$itemIds[] = $item_data['itemid'];
 	}
 
-	$speed = formatItemValue($httpstep_data['item_data'][HTTPSTEP_ITEM_TYPE_IN]);
-	$resp = formatItemValue($httpstep_data['item_data'][HTTPSTEP_ITEM_TYPE_RSPCODE]);
+	$speed = formatItemLastValue($httpstep_data['item_data'][HTTPSTEP_ITEM_TYPE_IN]);
+	$resp = formatItemLastValue($httpstep_data['item_data'][HTTPSTEP_ITEM_TYPE_RSPCODE]);
 	$respTime = $httpstep_data['item_data'][HTTPSTEP_ITEM_TYPE_TIME]['lastvalue'];
-	$respItemTime = formatItemValue($httpstep_data['item_data'][HTTPSTEP_ITEM_TYPE_TIME]);
+	$respItemTime = formatItemLastValue($httpstep_data['item_data'][HTTPSTEP_ITEM_TYPE_TIME]);
 
 	$httpdetailsTable->addRow(array(
 		CMacrosResolverHelper::resolveHttpTestName($httpTest['hostid'], $httpstep_data['name']),
@@ -215,7 +215,7 @@ else {
 $httpdetailsTable->addRow(array(
 	bold(_('TOTAL')),
 	SPACE,
-	bold(formatItemValue($totalTime)),
+	bold(formatItemLastValue($totalTime)),
 	SPACE,
 	new CSpan($status['msg'], $status['style'].' bold')
 ));

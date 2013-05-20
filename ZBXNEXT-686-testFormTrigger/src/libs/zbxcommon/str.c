@@ -32,7 +32,7 @@
  *                            in each zabbix application                      *
  *                                                                            *
  ******************************************************************************/
-static void	app_title()
+static void	app_title(void)
 {
 	printf("%s v%s (revision %s) (%s)\n", title_message, ZABBIX_VERSION, ZABBIX_REVISION, ZABBIX_REVDATE);
 }
@@ -47,7 +47,7 @@ static void	app_title()
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  ******************************************************************************/
-void	version()
+void	version(void)
 {
 	app_title();
 	printf("Compilation time: %s %s\n", __DATE__, __TIME__);
@@ -65,7 +65,7 @@ void	version()
  *                            in each zabbix application                      *
  *                                                                            *
  ******************************************************************************/
-void	usage()
+void	usage(void)
 {
 	printf("usage: %s %s\n", progname, usage_message);
 }
@@ -83,7 +83,7 @@ void	usage()
  *                            in each zabbix application                      *
  *                                                                            *
  ******************************************************************************/
-void	help()
+void	help(void)
 {
 	const char	**p = help_message;
 
@@ -175,33 +175,31 @@ void	__zbx_zbx_snprintf_alloc(char **str, size_t *alloc_len, size_t *offset, con
 	va_list	args;
 	size_t	avail_len, written_len;
 retry:
-	va_start(args, fmt);
-
 	if (NULL == *str)
 	{
 		/* zbx_vsnprintf() returns bytes actually written instead of bytes to write, */
 		/* so we have to use the standard function                                   */
+		va_start(args, fmt);
 		*alloc_len = vsnprintf(NULL, 0, fmt, args) + 1;
+		va_end(args);
 		*offset = 0;
 		*str = zbx_malloc(*str, *alloc_len);
 	}
 
 	avail_len = *alloc_len - *offset;
+	va_start(args, fmt);
 	written_len = zbx_vsnprintf(*str + *offset, avail_len, fmt, args);
+	va_end(args);
 
 	if (written_len == avail_len - 1)
 	{
 		*alloc_len *= 2;
 		*str = zbx_realloc(*str, *alloc_len);
 
-		va_end(args);
-
 		goto retry;
 	}
 
 	*offset += written_len;
-
-	va_end(args);
 }
 
 /******************************************************************************
@@ -268,7 +266,6 @@ void	zbx_strncpy_alloc(char **str, size_t *alloc_len, size_t *offset, const char
 	}
 	else if (*offset + n >= *alloc_len)
 	{
-
 		while (*offset + n >= *alloc_len)
 			*alloc_len *= 2;
 		*str = zbx_realloc(*str, *alloc_len);
@@ -858,24 +855,25 @@ int	zbx_check_hostname(const char *hostname)
  *                                                                            *
  * Function: parse_host                                                       *
  *                                                                            *
- * Purpose: return hostname                                                   *
+ * Purpose: parse hostname                                                    *
  *                                                                            *
  *  e.g., Zabbix server                                                       *
  *                                                                            *
  * Parameters: exp - pointer to the first char of hostname                    *
+ *             host - optional pointer to resulted hostname                   *
  *                                                                            *
  *  e.g., {Zabbix server:agent.ping.last(0)}                                  *
  *         ^                                                                  *
  *                                                                            *
- * Return value: return SUCCEED and pointer to just after the end of hostname *
- *               or FAIL and pointer to incorrect char                        *
+ * Return value: return SUCCEED and move exp to the next char after hostname  *
+ *               or FAIL and move exp at the failed character                 *
  *                                                                            *
  * Author: Aleksandrs Saveljevs                                               *
  *                                                                            *
  ******************************************************************************/
 int	parse_host(char **exp, char **host)
 {
-	char	c, *p, *s;
+	char	*p, *s;
 
 	p = *exp;
 
@@ -884,16 +882,20 @@ int	parse_host(char **exp, char **host)
 
 	*exp = s;
 
-	if (p != s)
+	if (p == s)
+		return FAIL;
+
+	if (NULL != host)
 	{
+		char	c;
+
 		c = *s;
 		*s = '\0';
 		*host = strdup(p);
 		*s = c;
-		return SUCCEED;
 	}
-	else
-		return FAIL;
+
+	return SUCCEED;
 }
 
 /******************************************************************************
@@ -905,12 +907,13 @@ int	parse_host(char **exp, char **host)
  *  e.g., system.run[cat /etc/passwd | awk -F: '{ print $1 }']                *
  *                                                                            *
  * Parameters: exp - pointer to the first char of key                         *
+ *             key - pointer to the resulted key                              *
  *                                                                            *
  *  e.g., {host:system.run[cat /etc/passwd | awk -F: '{ print $1 }'].last(0)} *
  *              ^                                                             *
  *                                                                            *
- * Return value: return SUCCEED and pointer to just after the end of key      *
- *               or FAIL and pointer to incorrect char                        *
+ * Return value: return SUCCEED and move exp to the next character after key  *
+ *               or FAIL and move exp to incorrect character                  *
  *                                                                            *
  * Author: Aleksandrs Saveljevs                                               *
  *                                                                            *
@@ -958,7 +961,7 @@ int	parse_key(char **exp, char **key)
 		{
 			switch (state)
 			{
-				/* Init state */
+				/* init state */
 				case 0:
 					if (',' == *s)
 						;
@@ -993,7 +996,7 @@ int	parse_key(char **exp, char **key)
 					else if (' ' != *s)
 						state = 2;
 					break;
-				/* Quoted */
+				/* quoted */
 				case 1:
 					if ('"' == *s)
 					{
@@ -1024,7 +1027,7 @@ int	parse_key(char **exp, char **key)
 					else if ('\\' == *s && '"' == s[1])
 						s++;
 					break;
-				/* Unquoted */
+				/* unquoted */
 				case 2:
 					if (0 == array && ']' == *s && '[' == s[1])	/* Zapcat */
 					{
@@ -1054,10 +1057,7 @@ succeed:
 		return SUCCEED;
 	}
 	else
-	{
-		*exp = s;
-		return FAIL;
-	}
+		goto fail;
 }
 
 /******************************************************************************
@@ -1071,19 +1071,24 @@ succeed:
  *         exp - pointer to the first char of function                        *
  *                last("host:key[key params]",#1)                             *
  *                ^                                                           *
+ *         func - optional pointer to resulted function                       *
+ *         params - optional pointer to resulted function parameters          *
  *                                                                            *
- * Return value: return SUCCEED and pointer to just after the right ')'       *
- *               or FAIL and pointer to incorrect char                        *
+ * Return value: return SUCCEED and move exp to the next char after right ')' *
+ *               or FAIL and move exp to incorrect character                  *
  *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
 int	parse_function(char **exp, char **func, char **params)
 {
-	char	*p, *s;
-	int	state;	/* 0 - init
-			 * 1 - function name/params
-			 */
+	char		*p, *s;
+	int		state;		/* 0 - init
+					 * 1 - function name/params
+					 */
+	unsigned char	flags = 0x00;	/* 0x01 - function OK
+					 * 0x02 - params OK
+					 */
 
 	for (p = *exp, s = *exp, state = 0; '\0' != *p; p++)	/* check for function */
 	{
@@ -1107,14 +1112,18 @@ int	parse_function(char **exp, char **func, char **params)
 					 * 3 - end of params
 					 */
 
-			*p = '\0';
-			*func = strdup(s);
-			*p++ = '(';
+			if (NULL != func)
+			{
+				*p = '\0';
+				*func = zbx_strdup(NULL, s);
+				*p++ = '(';
+			}
+			flags |= 0x01;
 
 			for (s = p, state = 0; '\0' != *p; p++)
 			{
 				switch (state) {
-				/* Init state */
+				/* init state */
 				case 0:
 					if (',' == *p)
 						;
@@ -1125,7 +1134,7 @@ int	parse_function(char **exp, char **func, char **params)
 					else if (' ' != *p)
 						state = 2;
 					break;
-				/* Quoted */
+				/* quoted */
 				case 1:
 					if ('"' == *p)
 					{
@@ -1137,7 +1146,7 @@ int	parse_function(char **exp, char **func, char **params)
 					else if ('\\' == *p && '"' == p[1])
 						p++;
 					break;
-				/* Unquoted */
+				/* unquoted */
 				case 2:
 					if (',' == *p)
 						state = 0;
@@ -1152,9 +1161,13 @@ int	parse_function(char **exp, char **func, char **params)
 
 			if (3 == state)
 			{
-				*p = '\0';
-				*params = strdup(s);
-				*p = ')';
+				if (NULL != params)
+				{
+					*p = '\0';
+					*params = zbx_strdup(NULL, s);
+					*p = ')';
+				}
+				flags |= 0x02;
 			}
 			else
 				goto error;
@@ -1165,15 +1178,17 @@ int	parse_function(char **exp, char **func, char **params)
 		break;
 	}
 
-	if (NULL == *func || NULL == *params)
+	if (0x03 != flags)
 		goto error;
 
 	*exp = p + 1;
 
 	return SUCCEED;
 error:
-	zbx_free(*func);
-	zbx_free(*params);
+	if (NULL != func)
+		zbx_free(*func);
+	if (NULL != params)
+		zbx_free(*params);
 
 	*exp = p;
 
@@ -2868,7 +2883,7 @@ char	*convert_to_utf8(char *in, size_t in_size, const char *encoding)
 	int		utf8_size;
 	unsigned int	codepage;
 
-	if (FAIL == get_codepage(encoding, &codepage))
+	if ('\0' == *encoding || FAIL == get_codepage(encoding, &codepage))
 	{
 		utf8_size = (int)in_size + 1;
 		utf8_string = zbx_malloc(utf8_string, utf8_size);
@@ -2920,7 +2935,7 @@ char	*convert_to_utf8(char *in, size_t in_size, const char *encoding)
 	out_alloc = in_size + 1;
 	p = out = zbx_malloc(out, out_alloc);
 
-	if (*encoding == '\0' || (iconv_t)-1 == (cd = iconv_open(to_code, encoding)))
+	if ('\0' == *encoding || (iconv_t)-1 == (cd = iconv_open(to_code, encoding)))
 	{
 		memcpy(out, in, in_size);
 		out[in_size] = '\0';

@@ -183,12 +183,12 @@ class CBar extends CGraphDraw {
 				$tmp = 1;
 			}
 
-			$this->columnWidth = floor($seriesSizeX / $tmp);
+			$this->columnWidth = $seriesSizeX / $tmp;
 
 			if ($serieLength == 0) {
 				$serieLength = 1;
 			}
-			$this->seriesWidth = floor($seriesSizeX / $serieLength);
+			$this->seriesWidth = $seriesSizeX / $serieLength;
 		}
 		else {
 			$seriesSizeY = $this->sizeY - ($this->seriesDistance * $serieLength);
@@ -199,12 +199,12 @@ class CBar extends CGraphDraw {
 				$tmp = 1;
 			}
 
-			$this->columnWidth = floor($seriesSizeY / $tmp);
+			$this->columnWidth = $seriesSizeY / $tmp;
 
 			if ($serieLength == 0) {
 				$serieLength = 1;
 			}
-			$this->seriesWidth = floor($seriesSizeY / $serieLength);
+			$this->seriesWidth = $seriesSizeY / $serieLength;
 		}
 	}
 
@@ -400,26 +400,51 @@ class CBar extends CGraphDraw {
 			$gbColor
 		);
 
-		imagefilledpolygon($this->im,
-			array(
-				$this->shiftXleft + $this->shiftXCaptionLeft - 4, $this->shiftY - 5,
-				$this->shiftXleft + $this->shiftXCaptionLeft + 2, $this->shiftY - 5,
-				$this->shiftXleft + $this->shiftXCaptionLeft - 1, $this->shiftY - 10,
-			),
-			3,
-			$this->getColor('White')
-		);
+		$sides = array();
+		if ($this->axisSideLeft) {
+			$sides[] = GRAPH_YAXIS_SIDE_LEFT;
+		}
+		if ($this->axisSideRight) {
+			$sides[] = GRAPH_YAXIS_SIDE_RIGHT;
+		}
 
-		// draw Y axis triangle
-		zbx_imageline($this->im, $this->shiftXleft + $this->shiftXCaptionLeft - 4, $this->shiftY - 5,
-			$this->shiftXleft + $this->shiftXCaptionLeft + 2, $this->shiftY - 5,
-			$gbColor);
-		zbx_imagealine($this->im, $this->shiftXleft + $this->shiftXCaptionLeft + 2, $this->shiftY - 5,
-			$this->shiftXleft + $this->shiftXCaptionLeft - 1, $this->shiftY - 10,
-			$gbColor);
-		zbx_imagealine($this->im, $this->shiftXleft + $this->shiftXCaptionLeft - 1, $this->shiftY - 10,
-			$this->shiftXleft + $this->shiftXCaptionLeft - 4, $this->shiftY - 5,
-			$gbColor);
+		foreach($sides as $axis){
+			if ($axis == GRAPH_YAXIS_SIDE_LEFT) {
+				$sideCorrection = -1;
+				$triangle = 0;
+			}
+			else {
+				$sideCorrection = $this->sizeX;
+				$triangle = $this->sizeX + 1;
+			}
+			zbx_imageline($this->im,
+				$this->shiftXCaptionLeft + $this->shiftXleft + $sideCorrection,
+				$this->shiftY - 5,
+				$this->shiftXCaptionLeft + $this->shiftXleft + $sideCorrection,
+				$this->sizeY + $this->shiftY + 4,
+				$this->getColor($this->graphtheme['gridbordercolor'], 0)
+				);
+
+			imagefilledpolygon($this->im,
+					array(
+						$this->shiftXleft + $this->shiftXCaptionLeft + $triangle - 4, $this->shiftY - 5,
+						$this->shiftXleft + $this->shiftXCaptionLeft + $triangle + 2, $this->shiftY - 5,
+						$this->shiftXleft + $this->shiftXCaptionLeft + $triangle - 1, $this->shiftY - 10,
+					),
+					3,
+					$this->getColor('White')
+				);
+
+			imagepolygon($this->im,
+				array(
+					$this->shiftXleft + $this->shiftXCaptionLeft + $triangle - 4, $this->shiftY - 5,
+					$this->shiftXleft + $this->shiftXCaptionLeft + $triangle + 2, $this->shiftY - 5,
+					$this->shiftXleft + $this->shiftXCaptionLeft + $triangle - 1, $this->shiftY - 10,
+				),
+				3,
+				$this->getColor($this->graphtheme['gridbordercolor'], 0)
+			);
+		}
 
 		zbx_imageline($this->im,
 			$this->shiftXleft + $this->shiftXCaptionLeft - 4,
@@ -470,12 +495,14 @@ class CBar extends CGraphDraw {
 			$i = 0;
 			foreach ($this->series as $key => $serie) {
 				$caption = $this->periodCaption[$key];
+				$dims = imageTextSize(7, 90, $caption);
 
-				$dims = imageTextSize(9, 0, $caption);
-				imageText($this->im, 9, 0,
-					$i * ($this->seriesWidth + $this->seriesDistance) + $this->shiftXleft + $this->shiftXCaptionLeft
-						+ round($this->seriesWidth / 2) - $dims['width'] / 2,
-					$this->sizeY + $this->shiftY + 20,
+				imageText(
+					$this->im,
+					7,
+					90,
+					$i*($this->seriesWidth+$this->seriesDistance)+$this->shiftXleft+$this->shiftXCaptionLeft+round($this->seriesWidth/2)+$dims['width']*2,
+					$this->sizeY+$this->shiftY + $dims['height'] +6,
 					$this->getColor($this->graphtheme['textcolor'], 0),
 					$caption
 				);
@@ -534,11 +561,14 @@ class CBar extends CGraphDraw {
 					$sideShift = 0;
 					if (GRAPH_YAXIS_SIDE_LEFT == $axis) {
 						$dims = imageTextSize(8, 0, $str);
-						$sideShift = $dims['width'];
+						$sideShift = -1 * ($dims['width'] + 10);
+					}
+					else {
+						$sideShift = $this->sizeX + 10;
 					}
 
 					imagetext($this->im, 8, 0,
-						$this->shiftXleft + $this->shiftXCaptionLeft - $sideShift - 10,
+						$this->shiftXleft + $this->shiftXCaptionLeft + $sideShift,
 						$this->sizeY - $this->sizeY * $i / $hstr_count + $this->shiftY + $this->shiftYCaptionTop + 6,
 						$this->getColor($this->graphtheme['textcolor'], 0),
 						$str
