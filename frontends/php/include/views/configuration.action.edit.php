@@ -128,8 +128,7 @@ $rowCondition[] = $conditionOperatorsComboBox;
 switch ($this->data['new_condition']['conditiontype']) {
 	case CONDITION_TYPE_HOST_GROUP:
 		$rowCondition[] = new CDiv(new CMultiSelect(array(
-			'name' => 'new_condition[value]',
-			'selectedLimit' => 1,
+			'name' => 'new_condition[value][]',
 			'objectName' => 'hostGroup',
 			'objectOptions' => array(
 				'editable' => true
