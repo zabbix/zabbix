@@ -111,11 +111,7 @@ class CHostPrototype extends CHostBase {
 					'maxLength' => 64,
 					'regex' => '/^('.ZBX_PREG_INTERNAL_NAMES.'|\{#'.ZBX_PREG_MACRO_NAME_LLD.'\})+$/',
 					'messageEmpty' => _('Empty host.'),
-					'messageMaxLength' => _n(
-						'Host name "%1$s" is too long, it must have less then %2$d character.',
-						'Host name "%1$s" is too long, it must have less then %2$d characters.',
-						64
-					),
+					'messageMaxLength' => _('Host name "%1$s" is too long, it must not be longer than %2$d characters.'),
 					'messageRegex' => _('Incorrect characters used for host "%1$s".'),
 					'messageMacro' => _('Host name for host prototype "%1$s" must contain macros.')
 				)),
@@ -334,11 +330,7 @@ class CHostPrototype extends CHostBase {
 					'maxLength' => 64,
 					'regex' => '/^('.ZBX_PREG_INTERNAL_NAMES.'|\{#'.ZBX_PREG_MACRO_NAME_LLD.'\})+$/',
 					'messageEmpty' => _('Empty host.'),
-					'messageMaxLength' => _n(
-						'Host name "%1$s" is too long, it must have less then %2$d character.',
-						'Host name "%1$s" is too long, it must have less then %2$d characters.',
-						64
-					),
+					'messageMaxLength' => _('Host name "%1$s" is too long, it must not be longer than %2$d characters.'),
 					'messageRegex' => _('Incorrect characters used for host "%1$s".'),
 					'messageMacro' => _('Host name for host prototype "%1$s" must contain macros.')
 				)),
