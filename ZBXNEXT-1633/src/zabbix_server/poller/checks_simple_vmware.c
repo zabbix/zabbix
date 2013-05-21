@@ -1038,9 +1038,9 @@ int	check_vcenter_vm_list(AGENT_REQUEST *request, AGENT_RESULT *result)
 			}
 
 			zbx_json_addobject(&j, NULL);
-			zbx_json_addstring(&j, "{#UUID}", vcenter_vm->uuid, ZBX_JSON_TYPE_STRING);
-			zbx_json_addstring(&j, "{#NAME}", name, ZBX_JSON_TYPE_STRING);
-			zbx_json_addstring(&j, "{#HOST}", host, ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(&j, "{#VM.UUID}", vcenter_vm->uuid, ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(&j, "{#VM.NAME}", name, ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(&j, "{#HYPERVISOR.NAME}", host, ZBX_JSON_TYPE_STRING);
 			zbx_json_close(&j);
 
 			zbx_free(host);
@@ -1393,8 +1393,8 @@ int	check_vsphere_vm_list(AGENT_REQUEST *request, AGENT_RESULT *result)
 		}
 
 		zbx_json_addobject(&j, NULL);
-		zbx_json_addstring(&j, "{#UUID}", uuid, ZBX_JSON_TYPE_STRING);
-		zbx_json_addstring(&j, "{#NAME}", name, ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(&j, "{#VM.UUID}", uuid, ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(&j, "{#VM.NAME}", name, ZBX_JSON_TYPE_STRING);
 		zbx_json_close(&j);
 
 		zbx_free(name);
