@@ -35,11 +35,12 @@
 typedef struct
 {
 	char	*data;
-	size_t	allocated;
+	size_t	alloc;
 	size_t	offset;
 }
 ZBX_HTTPPAGE;
 
+static int		page_initialized = 0;
 static ZBX_HTTPPAGE	page;
 
 static int		vcenters_initialized = 0;
@@ -67,14 +68,15 @@ static size_t	WRITEFUNCTION2(void *ptr, size_t size, size_t nmemb, void *userdat
 	size_t	r_size = size * nmemb;
 
 	/* first piece of data */
-	if (NULL == page.data)
+	if (0 == page_initialized)
 	{
-		page.allocated = MAX(8096, r_size);
-		page.offset = 0;
-		page.data = malloc(page.allocated);
+		page.alloc = 0;
+		page.data = NULL;
+
+		page_initialized = 1;
 	}
 
-	zbx_strncpy_alloc(&page.data, &page.allocated, &page.offset, ptr, r_size);
+	zbx_strncpy_alloc(&page.data, &page.alloc, &page.offset, ptr, r_size);
 
 	return r_size;
 }
@@ -131,7 +133,7 @@ static int	vcenter_authenticate(CURL *easyhandle, const char *url, const char *u
 		goto out;
 	}
 
-	memset(&page, 0, sizeof(page));
+	page.offset = 0;
 
 	if (CURLE_OK != (err = curl_easy_perform(easyhandle)))
 	{
@@ -431,7 +433,7 @@ static int	vcenter_guestvmids_get(CURL *easyhandle, zbx_vector_str_t *guestvmids
 		goto out;
 	}
 
-	memset(&page, 0, sizeof(page));
+	page.offset = 0;
 
 	if (CURLE_OK != (err = curl_easy_perform(easyhandle)))
 	{
@@ -500,7 +502,7 @@ static int	vcenter_vmdata_get(CURL *easyhandle, const char *guestvmid)
 		goto out;
 	}
 
-	memset(&page, 0, sizeof(page));
+	page.offset = 0;
 
 	if (CURLE_OK != (err = curl_easy_perform(easyhandle)))
 	{
@@ -644,8 +646,8 @@ clean:
 		zbx_free(guestvmids.values[i]);
 	zbx_vector_str_destroy(&guestvmids);
 
-	curl_easy_cleanup(easyhandle);
 	curl_slist_free_all(headers);
+	curl_easy_cleanup(easyhandle);
 out:
 	if (SUCCEED != ret)
 		zabbix_log(LOG_LEVEL_DEBUG, "VMWare URL \"%s\" error: %s", url, *error);
@@ -699,7 +701,7 @@ static int	vsphere_authenticate(CURL *easyhandle, const char *url, const char *u
 		goto out;
 	}
 
-	memset(&page, 0, sizeof(page));
+	page.offset = 0;
 
 	if (CURLE_OK != (err = curl_easy_perform(easyhandle)))
 	{
@@ -753,7 +755,7 @@ static int	vsphere_guestvmids_get(CURL *easyhandle, zbx_vector_str_t *guestvmids
 		goto clean;
 	}
 
-	memset(&page, 0, sizeof(page));
+	page.offset = 0;
 
 	if (CURLE_OK != (err = curl_easy_perform(easyhandle)))
 	{
@@ -817,7 +819,7 @@ static int	get_hostdata(CURL *easyhandle)
 		goto out;
 	}
 
-	memset(&page, 0, sizeof(page));
+	page.offset = 0;
 
 	if (CURLE_OK != (err = curl_easy_perform(easyhandle)))
 	{
@@ -875,7 +877,7 @@ static int	vsphere_vmdata_get(CURL *easyhandle, const char *vmid)
 		goto out;
 	}
 
-	memset(&page, 0, sizeof(page));
+	page.offset = 0;
 
 	if (CURLE_OK != (err = curl_easy_perform(easyhandle)))
 	{
@@ -1110,8 +1112,8 @@ static int	get_vsphere_hoststat(AGENT_REQUEST *request, char *xpath, AGENT_RESUL
 
 	ret = SYSINFO_RET_OK;
 clean:
-	curl_easy_cleanup(easyhandle);
 	curl_slist_free_all(headers);
+	curl_easy_cleanup(easyhandle);
 
 	return ret;
 }
@@ -1191,8 +1193,8 @@ clean:
 		zbx_free(guestvmids.values[i]);
 	zbx_vector_str_destroy(&guestvmids);
 
-	curl_easy_cleanup(easyhandle);
 	curl_slist_free_all(headers);
+	curl_easy_cleanup(easyhandle);
 
 	return ret;
 }
@@ -1364,8 +1366,8 @@ clean:
 		zbx_free(guestvmids.values[i]);
 	zbx_vector_str_destroy(&guestvmids);
 
-	curl_easy_cleanup(easyhandle);
 	curl_slist_free_all(headers);
+	curl_easy_cleanup(easyhandle);
 
 	return ret;
 }
@@ -1456,7 +1458,7 @@ int	check_vsphere_vm_uptime(AGENT_REQUEST *request, AGENT_RESULT *result)
 		goto out;
 	}
 
-	memset(&page, 0, sizeof(page));
+	page.offset = 0;
 
 	if (CURLE_OK != (err = curl_easy_perform(easyhandle)))
 	{
@@ -1511,7 +1513,7 @@ static int	vcenter_get_groupfolder(CURL *easyhandle)
 		goto out;
 	}
 
-	memset(&page, 0, sizeof(page));
+	page.offset = 0;
 
 	if (CURLE_OK != (err = curl_easy_perform(easyhandle)))
 	{
@@ -1566,7 +1568,7 @@ static int	vcenter_get_hostdomain(CURL *easyhandle)
 		goto out;
 	}
 
-	memset(&page, 0, sizeof(page));
+	page.offset = 0;
 
 	if (CURLE_OK != (err = curl_easy_perform(easyhandle)))
 	{
@@ -1621,7 +1623,7 @@ static int	vcenter_get_hostsystem(CURL *easyhandle)
 		goto out;
 	}
 
-	memset(&page, 0, sizeof(page));
+	page.offset = 0;
 
 	if (CURLE_OK != (err = curl_easy_perform(easyhandle)))
 	{
