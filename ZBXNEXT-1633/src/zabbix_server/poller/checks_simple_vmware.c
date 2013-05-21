@@ -537,7 +537,7 @@ static zbx_vcenter_t	*vcenter_get(const char *url, const char *username, const c
 	return NULL;
 }
 
-static zbx_vm_t	*vcenter_vm_get(zbx_vector_ptr_t *vms, const char *uuid)
+static zbx_vm_t	*vm_get(zbx_vector_ptr_t *vms, const char *uuid)
 {
 	zbx_vm_t	*vm;
 	int		i;
@@ -622,7 +622,7 @@ static int	vcenter_update(const char *url, const char *username, const char *pas
 		if (NULL == (uuid = read_xml_value(page.data, ZBX_XPATH_LN("uuid"))))
 			continue;
 
-		if (NULL == (vm = vcenter_vm_get(&vcenter->vms, uuid)))
+		if (NULL == (vm = vm_get(&vcenter->vms, uuid)))
 		{
 			vm = zbx_malloc(NULL, sizeof(zbx_vm_t));
 			vm->uuid = uuid;
@@ -653,56 +653,6 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
-}
-
-static int	get_ids(char *data, zbx_vector_str_t *guestvmids)
-{
-	xmlDoc		*doc;
-	xmlNode		*root_element = NULL, *cur_node = NULL;
-	xmlXPathContext	*xpathCtx;
-	xmlXPathObject	*xpathObj;
-	xmlChar		*val;
-
-	if (NULL == data)
-		return FAIL;
-
-	if (NULL == (doc = xmlReadMemory(data, strlen(data), "noname.xml", NULL, 0)))
-		return FAIL;
-
-	xpathCtx = xmlXPathNewContext(doc);
-	if (NULL == (xpathObj = xmlXPathEvalExpression((xmlChar *)ZBX_XPATH_LN("ManagedObjectReference") "[@type]",
-			xpathCtx)))
-	{
-		xmlCleanupParser();
-		return FAIL;
-	}
-
-	if (xmlXPathNodeSetIsEmpty(xpathObj->nodesetval))
-	{
-		xmlXPathFreeObject(xpathObj);
-		xmlCleanupParser();
-		return FAIL;
-	}
-
-	root_element = xpathObj->nodesetval->nodeTab[0];
-
-	for (cur_node = root_element; cur_node; cur_node = cur_node->next)
-	{
-		if (cur_node->type == XML_ELEMENT_NODE)
-		{
-			if (NULL != (val = xmlNodeGetContent(cur_node)))
-			{
-				val = xmlNodeGetContent(cur_node);
-				zbx_vector_str_append(guestvmids, zbx_strdup(NULL, (char *)val));
-				xmlFree(val);
-			}
-		}
-	}
-
-	xmlXPathFreeObject(xpathObj);
-	xmlCleanupParser();
-
-	return SUCCEED;
 }
 
 static int	vsphere_authenticate(CURL *easyhandle, const char *url, const char *username, const char *password,
@@ -766,7 +716,7 @@ out:
 	return ret;
 }
 
-static int	get_guestids(CURL *easyhandle, zbx_vector_str_t *guestvmids)
+static int	vsphere_guestvmids_get(CURL *easyhandle, zbx_vector_str_t *guestvmids)
 {
 #	define ZBX_POST_VMLIST											\
 		"<?xml version=\"1.0\" encoding=\"UTF-8\"?>"							\
@@ -812,9 +762,9 @@ static int	get_guestids(CURL *easyhandle, zbx_vector_str_t *guestvmids)
 		goto clean;
 	}
 
-	if (SUCCEED != get_ids(page.data, guestvmids))
+	if (SUCCEED != read_xml_values(page.data, "//*[@type='VirtualMachine']", guestvmids))
 	{
-		error = zbx_strdup(error, "unable to get list of guest ids");
+		error = zbx_strdup(error, "Cannot get list of guest VMs");
 		zabbix_log(LOG_LEVEL_DEBUG, "VMWare error: %s", error);
 		goto clean;
 	}
@@ -975,7 +925,7 @@ static int	get_vcenter_vmstat(AGENT_REQUEST *request, char *xpath, AGENT_RESULT 
 	if (NULL == (vcenter = vcenter_get(url, username, password)))
 		return SYSINFO_RET_FAIL;
 
-	if (NULL == (vm = vcenter_vm_get(&vcenter->vms, uuid)))
+	if (NULL == (vm = vm_get(&vcenter->vms, uuid)))
 		return SYSINFO_RET_FAIL;
 
 	if (NULL == (value = read_xml_value(vm->details, xpath)))
@@ -1210,7 +1160,7 @@ static int	get_vsphere_vmstat(AGENT_REQUEST *request, char *xpath, AGENT_RESULT 
 		goto clean;
 	}
 
-	if (SUCCEED != get_guestids(easyhandle, &guestvmids))
+	if (SUCCEED != vsphere_guestvmids_get(easyhandle, &guestvmids))
 		goto clean;
 
 	for (i = 0; i < guestvmids.values_num; i++)
@@ -1370,7 +1320,7 @@ int	check_vsphere_vm_list(AGENT_REQUEST *request, AGENT_RESULT *result)
 		goto clean;
 	}
 
-	if (SUCCEED != get_guestids(easyhandle, &guestvmids))
+	if (SUCCEED != vsphere_guestvmids_get(easyhandle, &guestvmids))
 		goto clean;
 
 	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
