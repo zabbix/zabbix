@@ -11,18 +11,21 @@
 </script>
 
 <script type="text/javascript">
+	function addGroupPrototypeRow(groupPrototype) {
+		var addButton = jQuery('#group_prototype_add');
+
+		var rowTemplate = new Template(jQuery('#groupPrototypeRow').html());
+		groupPrototype.i = addButton.data('group-prototype-count');
+		jQuery('#row_new_group_prototype').before(rowTemplate.evaluate(groupPrototype));
+
+		addButton.data('group-prototype-count', addButton.data('group-prototype-count') + 1);
+	}
+
 	jQuery(function() {
 		jQuery('#group_prototype_add')
 			.data('group-prototype-count', jQuery('#tbl_group_prototypes').find('.group-prototype-remove').length)
 			.click(function() {
-				var e = jQuery(this);
-
-				var rowTemplate = new Template(jQuery('#groupPrototypeRow').html());
-				jQuery('#row_new_group_prototype').before(rowTemplate.evaluate({
-					i: e.data('group-prototype-count')
-				}));
-
-				e.data('group-prototype-count', e.data('group-prototype-count') + 1);
+				addGroupPrototypeRow({})
 			});
 
 		jQuery('#tbl_group_prototypes').on('click', 'input.group-prototype-remove', function() {
