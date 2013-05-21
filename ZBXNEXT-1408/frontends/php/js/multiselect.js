@@ -81,6 +81,7 @@ jQuery(function($) {
 			defaultValue: null,
 			disabled: false,
 			selectedLimit: null,
+			ignored: null,
 			limit: 20
 		};
 		options = $.extend({}, defaults, options);
@@ -141,7 +142,8 @@ jQuery(function($) {
 					isMoreMatchesFound: false,
 					isAvailableOpenned: false,
 					selected: {},
-					available: {}
+					available: {},
+					ignored: {}
 				};
 
 			// search input
@@ -382,6 +384,10 @@ jQuery(function($) {
 				loadSelected(options.data, obj, values, options);
 			}
 
+			if (!empty(options.ignored)) {
+				loadIgnored(options.ignored, values);
+			}
+
 			// resize
 			resizeSelected(obj, values, options);
 			resizeAvailable(obj);
@@ -410,6 +416,12 @@ jQuery(function($) {
 			item.realName = item.name;
 			item.uid = getId();
 			addSelected(item, obj, values, options);
+		});
+	}
+
+	function loadIgnored(ignored, values) {
+		$.each(ignored, function(i, item) {
+			values.ignored[item.toUpperCase()] = item;
 		});
 	}
 
@@ -576,7 +588,8 @@ jQuery(function($) {
 		}
 		if (empty(options.limit) || (options.limit > 0 && $('.available li', obj).length < options.limit)) {
 			if (typeof(values.available[item.id]) == 'undefined'
-					&& typeof(values.selected[item.realName.toUpperCase()]) == 'undefined') {
+					&& typeof(values.selected[item.realName.toUpperCase()]) == 'undefined'
+					&& typeof(values.ignored[item.realName.toUpperCase()]) == 'undefined') {
 				item.uid = getId();
 
 				values.available[item.uid] = item;
@@ -767,8 +780,20 @@ jQuery(function($) {
 
 	function getLimit(values, options) {
 		return (options.limit > 0)
-			? options.limit + objectLength(values.selected) + 1
+			? options.limit + countMatches(values.selected, search) + countMatches(values.ignored, search) + 1
 			: null;
+	}
+
+	function countMatches(data, $search) {
+		var count = 0;
+
+		for (var key in data) {
+			if (data[key].name === $search) {
+				count++;
+			}
+		}
+
+		return count;
 	}
 
 	function objectLength(obj) {
