@@ -374,7 +374,9 @@ class CHostPrototype extends CHostBase {
 					$this->checkValidator($groupPrototype, $groupPrototypeValidator);
 
 					// save affected host group IDs
-					$groupPrototypeGroupIds[$groupPrototype['groupid']] = $groupPrototype['groupid'];
+					if (isset($groupPrototype['groupid'])) {
+						$groupPrototypeGroupIds[$groupPrototype['groupid']] = $groupPrototype['groupid'];
+					}
 				}
 			}
 		}
