@@ -24,45 +24,46 @@
 #if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
 #include "sysinfo.h"
 
-int	check_vcenter_vmlist(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	check_vcenter_vmmemsize(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	check_vcenter_vmmemsizecompressed(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	check_vcenter_vmmemsizeballooned(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	check_vcenter_vmmemsizeswapped(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	check_vcenter_vmstorageunshared(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	check_vcenter_vmstoragecommitted(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	check_vcenter_vmstorageuncommitted(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	check_vcenter_vmcpunum(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	check_vcenter_vmcpuusage(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	check_vcenter_vmuptime(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	check_vcenter_vmpowerstate(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	check_vcenter_vm_cpu_num(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	check_vcenter_vm_cpu_usage(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	check_vcenter_vm_list(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	check_vcenter_vm_memory_size(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	check_vcenter_vm_memory_size_ballooned(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	check_vcenter_vm_memory_size_compressed(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	check_vcenter_vm_memory_size_swapped(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	check_vcenter_vm_powerstate(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	check_vcenter_vm_storage_committed(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	check_vcenter_vm_storage_unshared(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	check_vcenter_vm_storage_uncommitted(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	check_vcenter_vm_uptime(AGENT_REQUEST *request, AGENT_RESULT *result);
 
-int	check_vsphere_vmlist(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	check_vsphere_vmcpunum(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	check_vsphere_vmmemsize(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	check_vsphere_vmuptime(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	check_vsphere_vmmemsizeballooned(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	check_vsphere_vmmemsizecompressed(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	check_vsphere_vmmemsizeswapped(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	check_vsphere_vmstoragecommitted(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	check_vsphere_vmstorageuncommitted(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	check_vsphere_vmstorageunshared(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	check_vsphere_vmpowerstate(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	check_vsphere_vmcpuusage(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	check_vsphere_hostuptime(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	check_vsphere_hostmemoryused(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	check_vsphere_hostcpuusage(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	check_vsphere_hostfullname(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	check_vsphere_hostversion(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	check_vsphere_hosthwvendor(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	check_vsphere_hosthwmodel(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	check_vsphere_hosthwuuid(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	check_vsphere_hosthwmemory(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	check_vsphere_hosthwcpumodel(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	check_vsphere_hosthwcpufreq(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	check_vsphere_hosthwcpucores(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	check_vsphere_hosthwcputhreads(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	check_vsphere_hoststatus(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	check_vsphere_cpu_usage(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	check_vsphere_fullname(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	check_vsphere_hw_cpu_cores(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	check_vsphere_hw_cpu_freq(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	check_vsphere_hw_cpu_model(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	check_vsphere_hw_cpu_threads(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	check_vsphere_hw_memory(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	check_vsphere_hw_model(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	check_vsphere_hw_uuid(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	check_vsphere_hw_vendor(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	check_vsphere_memory_used(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	check_vsphere_status(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	check_vsphere_uptime(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	check_vsphere_version(AGENT_REQUEST *request, AGENT_RESULT *result);
+
+int	check_vsphere_vm_cpu_num(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	check_vsphere_vm_cpu_usage(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	check_vsphere_vm_list(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	check_vsphere_vm_memory_size(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	check_vsphere_vm_memory_size_ballooned(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	check_vsphere_vm_memory_size_compressed(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	check_vsphere_vm_memory_size_swapped(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	check_vsphere_vm_powerstate(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	check_vsphere_vm_storage_committed(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	check_vsphere_vm_storage_uncommitted(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	check_vsphere_vm_storage_unshared(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	check_vsphere_vm_uptime(AGENT_REQUEST *request, AGENT_RESULT *result);
 
 #endif
 #endif
