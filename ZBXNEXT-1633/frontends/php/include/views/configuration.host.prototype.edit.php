@@ -189,26 +189,19 @@ $groupList->addRow(_('Groups'), new CMultiSelect(array(
 $customGroupTable = new CTable(SPACE, 'formElementTable');
 $customGroupTable->setAttribute('id', 'tbl_group_prototypes');
 
-// fields
+// add existing group prototypes
 if (!$data['new_group_prototypes']) {
 	$data['new_group_prototypes'] = array(array(
 		'name' => ''
 	));
 }
 foreach ($data['new_group_prototypes'] as $i => $groupPrototype) {
-	$text1 = new CTextBox('new_group_prototypes['.$i.'][name]', $groupPrototype['name'], 30, (bool) $hostPrototype['templateid'], 64);
-	$text1->setAttribute('placeholder', '{#MACRO}');
-
-	$deleteButton = new CButton('groupPrototypes_remove', _('Remove'), null, 'link_menu group-prototype-remove');
-	if ($hostPrototype['templateid']) {
-		$deleteButton->setAttribute('disabled', true);
-	}
-	$deleteButtonCell = array($deleteButton);
 	if (isset($groupPrototype['group_prototypeid'])) {
-		$deleteButtonCell[] = new CVar('new_group_prototypes['.$i.'][group_prototypeid]', $groupPrototype['group_prototypeid']);
+		$customGroupTable->addItem(new CVar('new_group_prototypes['.$i.'][group_prototypeid]', $groupPrototype['group_prototypeid']));
 	}
-
-	$customGroupTable->addRow(array($text1, $deleteButtonCell), 'form_row');
+	zbx_add_post_js('addGroupPrototypeRow('.CJs::encodeJson(array(
+		'name' => $groupPrototype['name']
+	)).')');
 }
 
 // buttons
