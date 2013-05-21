@@ -987,6 +987,11 @@ Copt::memoryPick();
 
 					if(isset($triggers_to_expand_items[$func['triggerid']][$func['functionid']])){
 						$fnum = $triggers_to_expand_items[$func['triggerid']][$func['functionid']];
+
+						if(zbx_strlen($func['lastvalue']) > 20) {
+							$func['lastvalue'] = zbx_substr($func['lastvalue'],0,20)." ...";
+						}
+
 						$value = $func['newvalue'] ? $func['newvalue'].' '.'('.$func['lastvalue'].')' : $func['lastvalue'];
 
 						// expand the macro with no position number
