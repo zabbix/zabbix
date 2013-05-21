@@ -109,6 +109,7 @@ class CHostPrototype extends CHostBase {
 		$hostPrototypeValidator = $this->getHostPrototypValidator();
 		$groupPrototypeValidator = $this->getGroupPrototypeValidator();
 
+		$groupPrototypeGroupIds = array();
 		foreach ($hostPrototypes as $hostPrototype) {
 			// host prototype
 			$hostPrototypeValidator->setObjectName(isset($hostPrototype['host']) ? $hostPrototype['host'] : '');
@@ -118,21 +119,13 @@ class CHostPrototype extends CHostBase {
 			foreach ($hostPrototype['groupPrototypes'] as $groupPrototype) {
 				$groupPrototypeValidator->setObjectName(isset($groupPrototype['name']) ? $groupPrototype['name'] : '');
 				$this->checkValidator($groupPrototype, $groupPrototypeValidator);
+
+				// save affected host group IDs
+				$groupPrototypeGroupIds[$groupPrototype['groupid']] = $groupPrototype['groupid'];
 			}
 		}
 
 		$this->checkDiscoveryRulePermissions(zbx_objectValues($hostPrototypes, 'ruleid'));
-
-		// get affected host group IDs
-		$groupPrototypeGroupIds = array();
-		foreach ($hostPrototypes as $hostPrototype) {
-			foreach ($hostPrototype['groupPrototypes'] as $groupPrototype) {
-				if (isset($groupPrototype['groupid']) && $groupPrototype['groupid']) {
-					$groupPrototypeGroupIds[] = $groupPrototype['groupid'];
-				}
-			}
-		}
-
 		$this->checkHostGroupsPermissions($groupPrototypeGroupIds);
 
 		// check if the host is discovered
@@ -354,6 +347,7 @@ class CHostPrototype extends CHostBase {
 			'messageInvalid' => _('Incorrect group prototype ID.')
 		));
 
+		$groupPrototypeGroupIds = array();
 		foreach ($hostPrototypes as $hostPrototype) {
 			// host prototype
 			$hostPrototypeValidator->setObjectName($hostPrototype['host']);
@@ -364,18 +358,9 @@ class CHostPrototype extends CHostBase {
 				foreach ($hostPrototype['groupPrototypes'] as $groupPrototype) {
 					$groupPrototypeValidator->setObjectName(isset($groupPrototype['name']) ? $groupPrototype['name'] : '');
 					$this->checkValidator($groupPrototype, $groupPrototypeValidator);
-				}
-			}
-		}
 
-		// get affected host group IDs
-		$groupPrototypeGroupIds = array();
-		foreach ($hostPrototypes as $hostPrototype) {
-			if (isset($hostPrototype['groupPrototypes'])) {
-				foreach ($hostPrototype['groupPrototypes'] as $groupPrototype) {
-					if (isset($groupPrototype['groupid']) && $groupPrototype['groupid']) {
-						$groupPrototypeGroupIds[] = $groupPrototype['groupid'];
-					}
+					// save affected host group IDs
+					$groupPrototypeGroupIds[$groupPrototype['groupid']] = $groupPrototype['groupid'];
 				}
 			}
 		}
