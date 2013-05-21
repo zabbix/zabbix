@@ -745,7 +745,7 @@ INSERT INTO functions (functionid, itemid, triggerid, function, parameter) VALUE
 
 -- testFormTrigger.SimpleUpdate and testInheritanceTrigger.SimpleUpdate
 INSERT INTO items (itemid, name, key_, hostid, delay, value_type, templateid) VALUES (23332, 'itemInheritance', 'key-item-inheritance', 30000, 30, 3, NULL);
-INSERT INTO items (itemid, name, key_, hostid, delay, value_type, templateid) VALUES (23333, 'itemInheritance', 'key-item-inheritance', 30001, 30, 3, 30000);
+INSERT INTO items (itemid, name, key_, hostid, delay, value_type, templateid, interfaceid) VALUES (23333, 'itemInheritance', 'key-item-inheritance', 30001, 30, 3, 30000, 40011);
 
 -- testFormTrigger.SimpleUpdate and testInheritanceTrigger.SimpleUpdate
 INSERT INTO triggers (triggerid, expression, description, templateid) VALUES (15000, '{15000}=0', 'testInheritanceTrigger1', NULL);
