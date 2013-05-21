@@ -336,6 +336,17 @@ void	test_parameter(const char *key, unsigned flags)
 
 	process(key, flags, &result);
 
+	if (0 != (flags & PROCESS_TEST))
+	{
+#define	COL_WIDTH	45
+		int	n1;
+
+		n1 = printf("%s", key);
+
+		if (0 < n1 && COL_WIDTH > n1)
+			printf("%-*s", COL_WIDTH - n1, " ");
+	}
+
 	if (ISSET_UI64(&result))
 		printf(" [u|" ZBX_FS_UI64 "]", result.ui64);
 
@@ -363,10 +374,12 @@ void	test_parameters()
 	int	i;
 
 	for (i = 0; NULL != commands[i].key; i++)
+	{
 		if (0 != strcmp(commands[i].key, "__UserPerfCounter"))
 			test_parameter(commands[i].key, PROCESS_TEST | PROCESS_USE_TEST_PARAM);
-		else
-			test_aliases(PROCESS_TEST);
+	}
+
+	test_aliases(PROCESS_TEST);
 }
 
 static int	replace_param(const char *cmd, const char *param, char *out, int outlen, char *error, int max_error_len)
@@ -537,17 +550,6 @@ int	process(const char *in_command, unsigned flags, AGENT_RESULT *result)
 
 notsupported:
 	free_request(&request);
-
-	if (0 != (flags & PROCESS_TEST))
-	{
-#define	COL_WIDTH	45
-		int	n1;
-
-		n1 = printf("%s", tmp);
-
-		if (0 < n1 && COL_WIDTH > n1)
-			printf("%-*s", COL_WIDTH - n1, " ");
-	}
 
 	if (NOTSUPPORTED == ret)
 		SET_MSG_RESULT(result, zbx_strdup(NULL, ZBX_NOTSUPPORTED));
