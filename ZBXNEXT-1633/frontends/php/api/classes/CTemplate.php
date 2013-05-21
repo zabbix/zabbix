@@ -774,7 +774,7 @@ class CTemplate extends CHostGeneral {
 			$hostIds = zbx_objectValues($data['hosts'], 'hostid');
 
 			// check if any of the hosts are discovered
-			$this->checkValidator($hostIds, new CHostNotDiscoveredValidator(array(
+			$this->checkValidator($hostIds, new CHostNormalValidator(array(
 				'message' => _('Cannot update templates on discovered host "%1$s".')
 			)));
 
@@ -1045,7 +1045,7 @@ class CTemplate extends CHostGeneral {
 
 		if (isset($data['hostids'])) {
 			// check if any of the hosts are discovered
-			$this->checkValidator($data['hostids'], new CHostNotDiscoveredValidator(array(
+			$this->checkValidator($data['hostids'], new CHostNormalValidator(array(
 				'message' => _('Cannot update templates on discovered host "%1$s".')
 			)));
 

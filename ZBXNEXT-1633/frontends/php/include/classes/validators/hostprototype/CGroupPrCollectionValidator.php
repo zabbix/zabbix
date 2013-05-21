@@ -19,7 +19,7 @@
 **/
 
 
-class CGroupPrototypeCollectionValidator extends CCollectionValidator {
+class CGroupPrCollectionValidator extends CCollectionValidator {
 
 	/**
 	 * Error message if the collection has no group prototypes based on host groups.

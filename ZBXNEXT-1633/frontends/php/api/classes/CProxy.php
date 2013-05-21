@@ -256,7 +256,7 @@ class CProxy extends CZBXAPI {
 				$hostIds = array_merge($hostIds, zbx_objectValues($proxy['hosts'], 'hostid'));
 			}
 		}
-		$this->checkValidator($hostIds, new CHostNotDiscoveredValidator(array(
+		$this->checkValidator($hostIds, new CHostNormalValidator(array(
 			'message' => _('Cannot update proxy for discovered host "%1$s".')
 		)));
 	}

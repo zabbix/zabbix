@@ -395,7 +395,7 @@ class CHostInterface extends CZBXAPI {
 		if ($update) {
 			$interfaces = $this->extendObjects('interface', $interfaces, array('hostid'));
 		}
-		$this->checkValidator(zbx_objectValues($interfaces, 'hostid'), new CHostNotDiscoveredValidator(array(
+		$this->checkValidator(zbx_objectValues($interfaces, 'hostid'), new CHostNormalValidator(array(
 			'message' => _('Cannot update interface for discovered host "%1$s".')
 		)));
 	}

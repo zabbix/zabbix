@@ -135,12 +135,12 @@ class CHostPrototype extends CHostBase {
 			'output' => array('hostid'),
 			'itemids' => zbx_objectValues($hostPrototypes, 'ruleid')
 		));
-		$this->checkValidator(zbx_objectValues($discoveryRules, 'hostid'), new CHostNotDiscoveredValidator(array(
+		$this->checkValidator(zbx_objectValues($discoveryRules, 'hostid'), new CHostNormalValidator(array(
 			'message' => _('Cannot create a host prototype on a discovered host "%1$s".')
 		)));
 
 		// check if group prototypes use discovered host groups
-		$this->checkValidator(array_unique($groupPrototypeGroupIds), new CHostGroupNotDiscoveredValidator(array(
+		$this->checkValidator(array_unique($groupPrototypeGroupIds), new CHostGroupNormalValidator(array(
 			'message' => _('Group prototype cannot be based on a discovered host group "%1$s".')
 		)));
 
@@ -175,7 +175,7 @@ class CHostPrototype extends CHostBase {
 					'messageEmpty' => _('No discovery rule ID given for host prototype "%1$s".'),
 					'messageInvalid' => _('Incorrect discovery rule ID for host prototype "%1$s".')
 				)),
-				'groupPrototypes' => new CGroupPrototypeCollectionValidator(array(
+				'groupPrototypes' => new CGroupPrCollectionValidator(array(
 					'messageEmpty' => _('Host prototype "%1$s" must have at least one host group.'),
 					'messageHostGroups' => _('Host prototype "%1$s" must have at least one host group.'),
 					'messageDuplicateName' => _('Duplicate group prototype name "%2$s" for host prototype "%1$s".'),
@@ -390,7 +390,7 @@ class CHostPrototype extends CHostBase {
 		$this->checkExistingHostPrototypes($hostPrototypes);
 
 		// check if group prototypes use discovered host groups
-		$this->checkValidator(array_unique($groupPrototypeGroupIds), new CHostGroupNotDiscoveredValidator(array(
+		$this->checkValidator(array_unique($groupPrototypeGroupIds), new CHostGroupNormalValidator(array(
 			'message' => _('Group prototype cannot be based on a discovered host group "%1$s".')
 		)));
 	}

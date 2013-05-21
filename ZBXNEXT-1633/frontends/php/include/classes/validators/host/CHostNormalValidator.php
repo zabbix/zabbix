@@ -19,7 +19,7 @@
 **/
 
 
-class CHostNotDiscoveredValidator extends CValidator {
+class CHostNormalValidator extends CValidator {
 
 	/**
 	 * Error message
