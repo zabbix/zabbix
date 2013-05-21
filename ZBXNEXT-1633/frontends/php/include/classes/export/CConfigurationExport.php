@@ -570,7 +570,7 @@ class CConfigurationExport {
 		foreach ($hostPrototypes as $hostPrototype) {
 			foreach ($hostPrototype['groupPrototypes'] as $groupPrototype) {
 				if ($groupPrototype['groupid']) {
-					$groupIds[] = $groupPrototype['groupid'];
+					$groupIds[$groupPrototype['groupid']] = $groupPrototype['groupid'];
 				}
 			}
 		}
