@@ -962,7 +962,7 @@ static int	get_vcenter_vmstat(AGENT_REQUEST *request, char *xpath, AGENT_RESULT 
 	userpwd = get_rparam(request, 2);
 	uuid = get_rparam(request, 3);
 
-	if ('\0' == *url || '\0' == *username)
+	if ('\0' == *url || '\0' == *username || '\0' == *uuid)
 		return SYSINFO_RET_FAIL;
 
 	if (SUCCEED != vcenter_update(url, username, userpwd, &error))
