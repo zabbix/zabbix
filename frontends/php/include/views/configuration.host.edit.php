@@ -538,8 +538,6 @@ $newTemplateTable = new CTable(null, 'formElementTable');
 $newTemplateTable->attr('id', 'newTemplateTable');
 $newTemplateTable->attr('style', 'min-width: 400px;');
 
-// add exist linked templates
-
 $newTemplateTable->addRow(
 	array(
 		new CMultiSelect(
@@ -558,7 +556,7 @@ $newTemplateTable->addRow(
 	)
 );
 
-$tmplList->addRow(_('Link new template'), new CDiv($newTemplateTable, 'objectgroup inlineblock border_dotted ui-corner-all'));
+$tmplList->addRow(_('Link new templates'), new CDiv($newTemplateTable, 'objectgroup inlineblock border_dotted ui-corner-all'));
 
 $divTabs->addTab('templateTab', _('Templates'), $tmplList);
 

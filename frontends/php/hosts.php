@@ -59,6 +59,7 @@ $fields = array(
 	'interfaces' =>		array(T_ZBX_STR, O_OPT, null,		NOT_EMPTY,	'isset({save})', _('Agent or SNMP or JMX or IPMI interface')),
 	'mainInterfaces' =>	array(T_ZBX_INT, O_OPT, null,		DB_ID,		null),
 	'templates' =>		array(T_ZBX_INT, O_OPT, null,		DB_ID,	null),
+	'add_template' =>	array(T_ZBX_STR, O_OPT, null,		null,	null),
 	'exist_templates' =>		array(T_ZBX_INT, O_OPT, null,		DB_ID,	null),
 	'templates_rem' =>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,		null),
 	'clear_templates' =>	array(T_ZBX_INT, O_OPT, null,		DB_ID,		null),
@@ -183,7 +184,7 @@ else {
  */
 
 if (isset($_REQUEST['exist_templates'])) {
-	if (isset($_REQUEST['templates'])) {
+	if (isset($_REQUEST['templates']) && isset($_REQUEST['add_template'])) {
 		$_REQUEST['templates'] = array_merge($_REQUEST['exist_templates'], $_REQUEST['templates']);
 	}
 	else {
