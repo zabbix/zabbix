@@ -12,8 +12,6 @@
 
 <script type="text/javascript">
 	jQuery(function() {
-		'use strict';
-
 		jQuery('#group_prototype_add')
 			.data('group-prototype-count', jQuery('#tbl_group_prototypes').find('.group-prototype-remove').length)
 			.click(function() {
