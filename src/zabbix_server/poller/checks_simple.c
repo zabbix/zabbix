@@ -24,7 +24,7 @@
 
 typedef int	(*vmfunc_t)(AGENT_REQUEST *, AGENT_RESULT *);
 
-#define ZBX_VIRT_VMWARE_PREFIX	"vmware."
+#define ZBX_VMWARE_PREFIX	"vmware."
 
 static char	*vmkeys[] =
 {
@@ -134,12 +134,12 @@ static int	get_vmware_function(const char *key, vmfunc_t *vmfunc)
 {
 	int	i;
 
-	if (0 != strncmp(key, ZBX_VIRT_VMWARE_PREFIX, sizeof(ZBX_VIRT_VMWARE_PREFIX) - 1))
+	if (0 != strncmp(key, ZBX_VMWARE_PREFIX, sizeof(ZBX_VMWARE_PREFIX) - 1))
 		return FAIL;
 
 	for (i = 0; NULL != vmkeys[i]; i++)
 	{
-		if (0 == strcmp(key + sizeof(ZBX_VIRT_VMWARE_PREFIX) - 1, vmkeys[i]))
+		if (0 == strcmp(key + sizeof(ZBX_VMWARE_PREFIX) - 1, vmkeys[i]))
 		{
 #if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
 			*vmfunc = vmfuncs[i];
