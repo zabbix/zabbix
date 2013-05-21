@@ -92,7 +92,9 @@ class CSchemaValidator extends CValidator {
 
 		// check if any unsupported fields remain
 		if ($unvalidatedFields) {
-			$this->error($this->messageUnsupported);
+			reset($unvalidatedFields);
+			$field = key($unvalidatedFields);
+			$this->error($this->messageUnsupported, $field);
 
 			return false;
 		}

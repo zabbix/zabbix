@@ -190,8 +190,8 @@ class CHostPrototype extends CHostBase {
 				'templates' => null
 			),
 			'required' => array('host', 'ruleid', 'groupPrototypes'),
-			'messageRequired' => _('Wrong fields for host prototype "%1$s".'),
-			'messageUnsupported' => _('Wrong fields for host prototype "%1$s".'),
+			'messageRequired' => _('No "%2$s" given for host prototype "%1$s".'),
+			'messageUnsupported' => _('Unsupported parameter "%2$s" for host prototype "%1$s".')
 		));
 	}
 
@@ -216,7 +216,7 @@ class CHostPrototype extends CHostBase {
 				'messageMissing' => _('Host group prototype must have either a name or a group ID set.'),
 				'messageBoth' => _('Host group prototype "%1$s" cannot have a name and a group ID set at the same time.'),
 			))),
-			'messageUnsupported' => _('Wrong fields for group prototype "%1$s".')
+			'messageUnsupported' => _('Unsupported parameter "%2$s" for group prototype "%1$s".')
 		));
 	}
 
