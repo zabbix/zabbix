@@ -531,15 +531,8 @@ div.preloader {
 }
 
 /* multiselect */
-.multiselect input { color: white; }
-.multiselect .selected ul {
-	border: 1px solid #B3C9D6; background: #001C31;
-	background-image: -webkit-gradient(linear, 0 0, 0 100%, color-stop(1%, #03111C), color-stop(15%, #001C31));
-	background-image: -webkit-linear-gradient(top, #03111C 1%, #001C31 15%);
-	background-image: -moz-linear-gradient(top, #03111C 1%, #001C31 15%);
-	background-image: -o-linear-gradient(top, #03111C 1%, #001C31 15%);
-	background-image: linear-gradient(#03111C 1%, #001C31 15%);
-}
+.multiselect input { color: #FFFFFF; }
+.multiselect .selected ul { border: 1px solid #B3C9D6; background: #001C31; }
 .multiselect .selected ul.active { border: 1px solid #41789D; }
 .multiselect .selected ul li {
 	border: 1px solid #B3C9D6; background: #32698E; color: #FFFFFF;

@@ -223,7 +223,7 @@ switch ($data['method']) {
 
 	/**
 	 * Create multi select data.
-	 * Supported objects: "hostGroup"
+	 * Supported objects: "hostGroup", "hosts", "templates", "applications"
 	 *
 	 * @param string $data['objectName']
 	 * @param string $data['search']
@@ -232,30 +232,99 @@ switch ($data['method']) {
 	 * @return array(int => array('value' => int, 'text' => string))
 	 */
 	case 'multiselect.get':
-		if ($data['objectName'] == 'hostGroup') {
-			$hostGroups = API::HostGroup()->get(array(
-				'output' => array('groupid', 'name'),
-				'startSearch' => true,
-				'search' => isset($data['search']) ? array('name' => $data['search']) : null,
-				'limit' => isset($data['limit']) ? $data['limit'] : null
-			));
-			foreach ($hostGroups as &$hostGroup) {
-				$hostGroup['nodename'] = get_node_name_by_elid($hostGroup['groupid'], true, ': ');
-			}
-			unset($hostGroup);
+		switch ($data['objectName']) {
+			case 'hostGroup':
+				$hostGroups = API::HostGroup()->get(array(
+					'editable' => isset($data['editable']) ? $data['editable'] : null,
+					'output' => array('groupid', 'name'),
+					'startSearch' => true,
+					'search' => isset($data['search']) ? array('name' => $data['search']) : null,
+					'limit' => isset($data['limit']) ? $data['limit'] : null
+				));
+				foreach ($hostGroups as &$hostGroup) {
+					$hostGroup['nodename'] = get_node_name_by_elid($hostGroup['groupid'], true, ': ');
+				}
+				unset($hostGroup);
 
-			CArrayHelper::sort($hostGroups, array(
-				array('field' => 'nodename', 'order' => ZBX_SORT_UP),
-				array('field' => 'name', 'order' => ZBX_SORT_UP)
-			));
+				CArrayHelper::sort($hostGroups, array(
+					array('field' => 'nodename', 'order' => ZBX_SORT_UP),
+					array('field' => 'name', 'order' => ZBX_SORT_UP)
+				));
 
-			foreach ($hostGroups as $hostGroup) {
-				$result[] = array(
-					'id' => $hostGroup['groupid'],
-					'prefix' => (string) $hostGroup['nodename'],
-					'name' => $hostGroup['name']
-				);
-			}
+				foreach ($hostGroups as $hostGroup) {
+					$result[] = array(
+						'id' => $hostGroup['groupid'],
+						'prefix' => (string) $hostGroup['nodename'],
+						'name' => $hostGroup['name']
+					);
+				}
+				break;
+
+			case 'hosts':
+				$hosts = API::Host()->get(array(
+					'editable' => isset($data['editable']) ? $data['editable'] : null,
+					'output' => array('hostid', 'name'),
+					'startSearch' => true,
+					'search' => isset($data['search']) ? array('name' => $data['search']) : null,
+					'limit' => isset($data['limit']) ? $data['limit'] : null
+				));
+
+				CArrayHelper::sort($hosts, array(
+					array('field' => 'name', 'order' => ZBX_SORT_UP)
+				));
+
+				foreach ($hosts as $host) {
+					$result[] = array(
+						'id' => $host['hostid'],
+						'prefix' => '',
+						'name' => $host['name']
+					);
+				}
+				break;
+
+			case 'templates':
+				$templates = API::Template()->get(array(
+					'editable' => isset($data['editable']) ? $data['editable'] : null,
+					'output' => array('templateid', 'name'),
+					'startSearch' => true,
+					'search' => isset($data['search']) ? array('name' => $data['search']) : null,
+					'limit' => isset($data['limit']) ? $data['limit'] : null
+				));
+
+				CArrayHelper::sort($templates, array(
+					array('field' => 'name', 'order' => ZBX_SORT_UP)
+				));
+
+				foreach ($templates as $template) {
+					$result[] = array(
+						'id' => $template['templateid'],
+						'prefix' => '',
+						'name' => $template['name']
+					);
+				}
+				break;
+
+			case 'applications':
+				$applications = API::Application()->get(array(
+					'hostids' => zbx_toArray($data['hostid']),
+					'output' => array('applicationid', 'name'),
+					'startSearch' => true,
+					'search' => isset($data['search']) ? array('name' => $data['search']) : null,
+					'limit' => isset($data['limit']) ? $data['limit'] : null
+				));
+
+				CArrayHelper::sort($applications, array(
+					array('field' => 'name', 'order' => ZBX_SORT_UP)
+				));
+
+				foreach ($applications as $application) {
+					$result[] = array(
+						'id' => $application['applicationid'],
+						'prefix' => '',
+						'name' => $application['name']
+					);
+				}
+				break;
 		}
 		break;
 
