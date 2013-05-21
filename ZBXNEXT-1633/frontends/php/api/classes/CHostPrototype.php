@@ -121,7 +121,9 @@ class CHostPrototype extends CHostBase {
 				$this->checkValidator($groupPrototype, $groupPrototypeValidator);
 
 				// save affected host group IDs
-				$groupPrototypeGroupIds[$groupPrototype['groupid']] = $groupPrototype['groupid'];
+				if (isset($groupPrototype['groupid'])) {
+					$groupPrototypeGroupIds[$groupPrototype['groupid']] = $groupPrototype['groupid'];
+				}
 			}
 		}
 
@@ -258,17 +260,17 @@ class CHostPrototype extends CHostBase {
 		// save the host prototypes
 		$hostPrototypeIds = DB::insert($this->tableName(), $hostPrototypes);
 
+		$groupPrototypes = array();
 		$hostPrototypeDiscoveryRules = array();
 		$hostPrototypeInventory = array();
 		foreach ($hostPrototypes as $key => $hostPrototype) {
 			$hostPrototypes[$key]['hostid'] = $hostPrototype['hostid'] = $hostPrototypeIds[$key];
 
 			// save group prototypes
-			foreach ($hostPrototype['groupPrototypes'] as &$groupPrototype) {
+			foreach ($hostPrototype['groupPrototypes'] as $groupPrototype) {
 				$groupPrototype['hostid'] = $hostPrototype['hostid'];
+				$groupPrototypes[] = $groupPrototype;
 			}
-			unset($groupPrototype);
-			$hostPrototypes[$key]['groupPrototypes'] = DB::save('group_prototype', $hostPrototype['groupPrototypes']);
 
 			// discovery rules
 			$hostPrototypeDiscoveryRules[] = array(
@@ -284,6 +286,18 @@ class CHostPrototype extends CHostBase {
 				);
 			}
 		}
+
+		// save group prototypes
+		$groupPrototypes = DB::save('group_prototype', $groupPrototypes);
+		$i = 0;
+		foreach ($hostPrototypes as &$hostPrototype) {
+			foreach ($hostPrototype['groupPrototypes'] as &$groupPrototype) {
+				$groupPrototype['group_prototypeid'] = $groupPrototypes[$i]['group_prototypeid'];
+				$i++;
+			}
+			unset($groupPrototype);
+		}
+		unset($hostPrototype);
 
 		// link host prototypes to discovery rules
 		DB::insert('host_discovery', $hostPrototypeDiscoveryRules, false);
