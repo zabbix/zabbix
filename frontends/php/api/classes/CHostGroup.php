@@ -763,7 +763,7 @@ class CHostGroup extends CZBXAPI {
 		$objectids = array_merge($hostids, $templateids);
 
 		// check if any of the hosts are discovered
-		$this->checkValidator($hostids, new CHostNotDiscoveredValidator(array(
+		$this->checkValidator($hostids, new CHostNormalValidator(array(
 			'message' => _('Cannot update groups for discovered host "%1$s".')
 		)));
 
@@ -819,7 +819,7 @@ class CHostGroup extends CZBXAPI {
 		$templateids = isset($data['templateids']) ? zbx_toArray($data['templateids']) : array();
 
 		// check if any of the hosts are discovered
-		$this->checkValidator($hostids, new CHostNotDiscoveredValidator(array(
+		$this->checkValidator($hostids, new CHostNormalValidator(array(
 			'message' => _('Cannot update groups for discovered host "%1$s".')
 		)));
 
@@ -874,7 +874,7 @@ class CHostGroup extends CZBXAPI {
 			}
 
 			// check if any of the hosts are discovered
-			$this->checkValidator($hostIds, new CHostNotDiscoveredValidator(array(
+			$this->checkValidator($hostIds, new CHostNormalValidator(array(
 				'message' => _('Cannot update groups for discovered host "%1$s".')
 			)));
 

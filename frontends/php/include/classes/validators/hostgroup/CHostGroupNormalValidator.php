@@ -19,7 +19,7 @@
 **/
 
 
-class CHostGroupNotDiscoveredValidator extends CValidator {
+class CHostGroupNormalValidator extends CValidator {
 
 	/**
 	 * Error message
