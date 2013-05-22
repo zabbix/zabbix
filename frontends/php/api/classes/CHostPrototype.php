@@ -181,7 +181,12 @@ class CHostPrototype extends CHostBase {
 					'messageDuplicateName' => _('Duplicate group prototype name "%2$s" for host prototype "%1$s".'),
 					'messageDuplicateGroupId' => _('Duplicate group prototype group ID "%2$s" for host prototype "%1$s".')
 				)),
-				'inventory' => null,
+				'inventory' => new CSchemaValidator(array(
+					'validators' => array(
+						'inventory_mode' => null,
+					),
+					'messageUnsupported' => _('Unsupported parameter "%2$s" for host prototype %1$s host inventory.'),
+				)),
 				'templates' => null
 			),
 			'required' => array('host', 'ruleid', 'groupPrototypes'),
