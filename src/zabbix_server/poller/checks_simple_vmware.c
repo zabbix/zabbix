@@ -197,6 +197,7 @@ static char	*read_xml_value(const char *data, char *xpath)
 
 	if (NULL == (xpathObj = xmlXPathEvalExpression((xmlChar *)xpath, xpathCtx)))
 	{
+		xmlXPathFreeContext(xpathCtx);
 		xmlFreeDoc(doc);
 		xmlCleanupParser();
 		return NULL;
@@ -205,6 +206,7 @@ static char	*read_xml_value(const char *data, char *xpath)
 	if (xmlXPathNodeSetIsEmpty(xpathObj->nodesetval))
 	{
 		xmlXPathFreeObject(xpathObj);
+		xmlXPathFreeContext(xpathCtx);
 		xmlFreeDoc(doc);
 		xmlCleanupParser();
 		return NULL;
@@ -217,6 +219,7 @@ static char	*read_xml_value(const char *data, char *xpath)
 	xmlFree(val);
 
 	xmlXPathFreeObject(xpathObj);
+	xmlXPathFreeContext(xpathCtx);
 	xmlFreeDoc(doc);
 	xmlCleanupParser();
 
@@ -260,6 +263,8 @@ static int	read_xml_values(const char *data, char *xpath, zbx_vector_str_t *valu
 
 	if (NULL == (xpathObj = xmlXPathEvalExpression((xmlChar *)xpath, xpathCtx)))
 	{
+		xmlXPathFreeContext(xpathCtx);
+		xmlFreeDoc(doc);
 		xmlCleanupParser();
 		return FAIL;
 	}
@@ -267,6 +272,8 @@ static int	read_xml_values(const char *data, char *xpath, zbx_vector_str_t *valu
 	if (xmlXPathNodeSetIsEmpty(xpathObj->nodesetval))
 	{
 		xmlXPathFreeObject(xpathObj);
+		xmlXPathFreeContext(xpathCtx);
+		xmlFreeDoc(doc);
 		xmlCleanupParser();
 		return FAIL;
 	}
@@ -281,6 +288,8 @@ static int	read_xml_values(const char *data, char *xpath, zbx_vector_str_t *valu
 	}
 
 	xmlXPathFreeObject(xpathObj);
+	xmlXPathFreeContext(xpathCtx);
+	xmlFreeDoc(doc);
 	xmlCleanupParser();
 
 	return SUCCEED;
