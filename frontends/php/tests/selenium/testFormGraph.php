@@ -24,7 +24,7 @@ require_once dirname(__FILE__).'/../../include/items.inc.php';
 define('GRAPH_GOOD', 0);
 define('GRAPH_BAD', 1);
 
-class testFormItem extends CWebTest {
+class testFormGraph extends CWebTest {
 
 	/**
 	 * The name of the host for the testing of the create function created in the test data set.
