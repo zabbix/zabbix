@@ -71,7 +71,7 @@ function sysmapElementLabel($label = null) {
  *
  * @return CAreaMap
  */
-function getActionMapBySysmap($sysmap, $options = array()) {
+function getActionMapBySysmap($sysmap, array $options = array()) {
 	$actionMap = new CAreaMap('links'.$sysmap['sysmapid']);
 
 	$areas = populateFromMapAreas($sysmap);
@@ -913,7 +913,7 @@ function getImagesInfo($selement) {
  *
  * @return array
  */
-function getSelementsInfo($sysmap, $options = array()) {
+function getSelementsInfo($sysmap, array $options = array()) {
 	if (!isset($options['severity_min'])) {
 		$options['severity_min'] = TRIGGER_SEVERITY_NOT_CLASSIFIED;
 	}

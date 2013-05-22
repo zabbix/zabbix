@@ -114,6 +114,8 @@ if (isset($_REQUEST['sysmapid']) && !isset($maps[$_REQUEST['sysmapid']])) {
 	access_deny();
 }
 
+$previousSysmapId = CProfile::get('web.maps.sysmapid');
+
 CProfile::update('web.maps.sysmapid', $_REQUEST['sysmapid'], PROFILE_TYPE_ID);
 
 /*
@@ -140,7 +142,7 @@ $data['pageFilter'] = new CPageFilter(array(
 		'default' => $data['map']['severity_min'],
 		'mapId' => $data['sysmapid']
 	),
-	'severityMin' => get_request('severity_min')
+	'severityMin' => ($_REQUEST['sysmapid'] == $previousSysmapId) ? get_request('severity_min') : null
 ));
 $data['severity_min'] = $data['pageFilter']->severityMin;
 

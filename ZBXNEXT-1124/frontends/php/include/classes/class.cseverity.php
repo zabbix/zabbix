@@ -27,6 +27,7 @@ class CSeverity extends CTag {
 	 */
 	public function __construct(array $options = array()) {
 		parent::__construct('div', 'yes');
+		$this->attr('id', zbx_formatDomId($options['name']));
 		$this->addClass('jqueryinputset control-severity');
 
 		if (!isset($options['value'])) {
@@ -49,7 +50,7 @@ class CSeverity extends CTag {
 		insert_js('
 			jQuery("#'.$options['name'].'_0, #'.$options['name'].'_1, #'.$options['name'].'_2, #'.$options['name'].'_3," +
 					"#'.$options['name'].'_4, #'.$options['name'].'_5").change(function() {
-				jQuery("div.control-severity label").each(function(i, obj) {
+				jQuery("#'.$this->getAttribute('id').' label").each(function(i, obj) {
 					obj = jQuery(obj);
 					obj.removeClass(obj.data("severityStyle"));
 				});

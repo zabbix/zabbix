@@ -163,7 +163,7 @@ class CPageFilter {
 	 *
 	 * @param string $name
 	 *
-	 * @return string
+	 * @return mixed
 	 */
 	public function __get($name) {
 		if (isset($this->data[$name])) {
@@ -210,7 +210,7 @@ class CPageFilter {
 	 * @param string $options['severitiesMin']['mapId']
 	 * @param string $options['severityMin']
 	 */
-	public function __construct($options = array()) {
+	public function __construct(array $options = array()) {
 		global $ZBX_WITH_ALL_NODES;
 
 		$this->config['all_nodes'] = $ZBX_WITH_ALL_NODES;
@@ -295,7 +295,7 @@ class CPageFilter {
 	 *
 	 * @param $options
 	 */
-	private function _getProfiles($options) {
+	private function _getProfiles(array $options) {
 		global $page;
 
 		$profileSection = $this->config['individual'] ? $page['file'] : $page['menu'];
@@ -348,7 +348,7 @@ class CPageFilter {
 		$this->_requestIds['severityMin'] = isset($options['severityMin']) ? $options['severityMin'] : null;
 	}
 
-	private function _updateByGraph(&$options) {
+	private function _updateByGraph(array &$options) {
 		$graphs = API::Graph()->get(array(
 			'graphids' => $options['graphid'],
 			'output' => API_OUTPUT_EXTEND,
@@ -400,7 +400,7 @@ class CPageFilter {
 	 * @param $options
 	 * @param $hostid
 	 */
-	private function _initGroups($groupid, $options, $hostid) {
+	private function _initGroups($groupid, array $options, $hostid) {
 		$def_options = array(
 			'nodeids' => $this->config['all_nodes'] ? get_current_nodeid() : null,
 			'output' => array('groupid', 'name')
@@ -459,7 +459,7 @@ class CPageFilter {
 	 * @param $hostid
 	 * @param $options
 	 */
-	private function _initHosts($hostid, $options) {
+	private function _initHosts($hostid, array $options) {
 		$this->data['hosts'] = array();
 
 		if (!$this->groupsSelected) {
@@ -515,7 +515,7 @@ class CPageFilter {
 	 * @param $graphid
 	 * @param $options
 	 */
-	private function _initGraphs($graphid, $options) {
+	private function _initGraphs($graphid, array $options) {
 		$this->data['graphs'] = array();
 
 		if (!$this->hostsSelected) {
@@ -580,7 +580,7 @@ class CPageFilter {
 	 * @param $triggerid
 	 * @param $options
 	 */
-	private function _initTriggers($triggerid, $options) {
+	private function _initTriggers($triggerid, array $options) {
 		$this->data['triggers'] = array();
 
 		if (!$this->hostsSelected || $this->hostsAll) {
@@ -617,7 +617,7 @@ class CPageFilter {
 	 * @param $druleid
 	 * @param $options
 	 */
-	private function _initDiscoveries($druleid, $options) {
+	private function _initDiscoveries($druleid, array $options) {
 		$def_options = array(
 			'nodeids' => $this->config['all_nodes'] ? get_current_nodeid() : null,
 			'output' => API_OUTPUT_EXTEND
@@ -663,7 +663,7 @@ class CPageFilter {
 	 * @param $application
 	 * @param $options
 	 */
-	private function _initApplications($application, $options) {
+	private function _initApplications($application, array $options) {
 		$this->data['applications'] = array();
 
 		if (!$this->groupsSelected) {
@@ -709,7 +709,7 @@ class CPageFilter {
 	 * @param int    $options['default']
 	 * @param string $options['mapId']
 	 */
-	private function _initSeveritiesMin($severityMin, $options = array()) {
+	private function _initSeveritiesMin($severityMin, array $options = array()) {
 		$default = isset($options['default']) ? $options['default'] : TRIGGER_SEVERITY_NOT_CLASSIFIED;
 		$mapId = isset($options['mapId']) ? $options['mapId'] : null;
 		$severityMinProfile = isset($this->_profileIds['severityMin']) ? $this->_profileIds['severityMin'] : null;
