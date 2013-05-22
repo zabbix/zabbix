@@ -2471,3 +2471,52 @@ int	DBfield_exists(const char *table_name, const char *field_name)
 
 	return ret;
 }
+
+int	DBexecute_multiple_query(const char *query, const char *field, zbx_vector_uint64_t *IDs)
+{
+#define MAX_IDS                 950
+	char                    *sql = NULL;
+	size_t                  sql_alloc = ZBX_KIBIBYTE, sql_offset, ret = FAIL;
+	int 			query_count, i, ids_left;
+
+	if (0 != IDs->values_num)
+	{
+		sql_offset = 0;
+
+		DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+		if (0 < (query_count = IDs->values_num/MAX_IDS))
+		{
+			for (i = 0; i < query_count; i++)
+			{
+				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%s", query);
+				DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, field,
+							IDs->values + i * MAX_IDS, MAX_IDS);
+				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
+				DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+			}
+		}
+
+		if (0 < (ids_left = IDs->values_num % MAX_IDS))
+		{
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%s", query);
+			DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, field,
+						IDs->values + query_count * MAX_IDS, ids_left);
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
+			DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+		}
+		if (sql_offset > 16)	/* in ORACLE always present begin..end; */
+		{
+			DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+			if (ZBX_DB_OK > DBexecute("%s", sql))
+				goto clean;
+		}
+
+		ret = SUCCEED;
+clean:
+		zbx_free(sql);
+
+	}
+	return ret;
+}

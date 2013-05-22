@@ -1341,17 +1341,7 @@ next:
 	DBfree_result(result);
 
 	/* delete completed escalations */
-	if (0 != escalationids.values_num)
-	{
-		sql_offset = 0;
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "delete from escalations where");
-		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "escalationid",
-				escalationids.values, escalationids.values_num);
-
-		DBbegin();
-		DBexecute("%s", sql);
-		DBcommit();
-	}
+	DBexecute_multiple_query("delete from escalations where", "escalationid", &escalationids);
 
 	zbx_free(sql);
 	zbx_vector_uint64_destroy(&escalationids);
