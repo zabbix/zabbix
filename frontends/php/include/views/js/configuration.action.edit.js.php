@@ -529,6 +529,26 @@
 		jQuery('#dsc_templateid').multiSelect.clean();
 	}
 
+	function addDiscoveryHostGroup() {
+		var values = jQuery('#discoveryHostGroup').multiSelect.getData();
+
+		for (var key in values) {
+			var data = values[key];
+
+			if (!empty(data.id)) {
+				addPopupValues({
+					object: 'dsc_groupid',
+					values: [{
+						groupid: data.id,
+						name: data.name
+					}]
+				});
+			}
+		}
+
+		jQuery('#dsc_groupid').multiSelect.clean();
+	}
+
 	jQuery(document).ready(function() {
 		// clone button
 		jQuery('#clone').click(function() {

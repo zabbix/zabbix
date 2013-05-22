@@ -782,24 +782,34 @@ if (!empty($this->data['new_operation'])) {
 
 			$groupList = new CTable();
 			$groupList->setAttribute('id', 'opGroupList');
+			$groupList->addRow(new CRow(
+				new CCol(array(
+					new CMultiSelect(array(
+						'name' => 'discoveryHostGroup',
+						'objectName' => 'hostGroup'
+					)),
+					new CButton('add', _('Add'), 'return addDiscoveryHostGroup();', 'link_menu')
+				), null, 2),
+				null,
+				'opGroupListFooter'
+			));
 
-			$addUsrgrpBtn = new CButton('add', _('Add'), 'return PopUp("popup.php?dstfrm=action.edit&srctbl=host_group&srcfld1=groupid&srcfld2=name&multiselect=1&reference=dsc_groupid",450,450)', 'link_menu');
-			$groupList->addRow(new CRow(new CCol($addUsrgrpBtn, null, 2), null, 'opGroupListFooter'));
-
-			// add participations
-			$groupids = isset($this->data['new_operation']['opgroup'])
+			// load host groups
+			$groupIds = isset($this->data['new_operation']['optemplate'])
 				? zbx_objectValues($this->data['new_operation']['opgroup'], 'groupid')
 				: array();
 
-			$groups = API::HostGroup()->get(array(
-				'groupids' => $groupids,
-				'output' => array('name')
-			));
-			order_result($groups, 'name');
+			if ($groupIds) {
+				$hostGroups = API::HostGroup()->get(array(
+					'groupids' => $groupIds,
+					'output' => array('groupid', 'name')
+				));
+				order_result($hostGroups, 'name');
 
-			$jsInsert = '';
-			$jsInsert .= 'addPopupValues('.zbx_jsvalue(array('object' => 'dsc_groupid', 'values' => $groups)).');';
-			zbx_add_post_js($jsInsert);
+				$jsInsert = '';
+				$jsInsert .= 'addPopupValues('.zbx_jsvalue(array('object' => 'dsc_groupid', 'values' => $hostGroups)).');';
+				zbx_add_post_js($jsInsert);
+			}
 
 			$caption = (OPERATION_TYPE_GROUP_ADD == $this->data['new_operation']['operationtype'])
 				? _('Add to host groups')
