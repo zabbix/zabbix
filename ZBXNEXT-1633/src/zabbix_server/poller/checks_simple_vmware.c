@@ -30,7 +30,7 @@
 #define	ZBX_XML_HEADER1		"Soapaction:urn:vim25/4.1"
 #define ZBX_XML_HEADER2		"Content-Type:text/xml; charset=utf-8"
 
-#define ZBX_VCENTER_TTL		SEC_PER_MIN
+#define ZBX_VMWARE_CACHE_TTL	SEC_PER_MIN
 
 typedef struct
 {
@@ -46,6 +46,9 @@ static ZBX_HTTPPAGE	page;
 static int		vcenters_initialized = 0;
 static zbx_vector_ptr_t	vcenters;
 
+static int		vspheres_initialized = 0;
+static zbx_vector_ptr_t	vspheres;
+
 typedef struct
 {
 	char			*url;
@@ -55,6 +58,17 @@ typedef struct
 	int			lastcheck;
 }
 zbx_vcenter_t;
+
+typedef struct
+{
+	char			*url;
+	char			*username;
+	char			*password;
+	char			*details;
+	zbx_vector_ptr_t	vms;
+	int			lastcheck;
+}
+zbx_vsphere_t;
 
 typedef struct
 {
@@ -587,7 +601,7 @@ static int	vcenter_update(const char *url, const char *username, const char *pas
 
 		zbx_vector_ptr_append(&vcenters, vcenter);
 	}
-	else if (vcenter->lastcheck + ZBX_VCENTER_TTL > time(NULL))
+	else if (vcenter->lastcheck + ZBX_VMWARE_CACHE_TTL > time(NULL))
 	{
 		ret = SUCCEED;
 		goto out;
@@ -718,7 +732,7 @@ out:
 	return ret;
 }
 
-static int	vsphere_guestvmids_get(CURL *easyhandle, zbx_vector_str_t *guestvmids)
+static int	vsphere_guestvmids_get(CURL *easyhandle, zbx_vector_str_t *guestvmids, char **error)
 {
 #	define ZBX_POST_VMLIST											\
 		"<?xml version=\"1.0\" encoding=\"UTF-8\"?>"							\
@@ -745,40 +759,40 @@ static int	vsphere_guestvmids_get(CURL *easyhandle, zbx_vector_str_t *guestvmids
 			"</ns1:Body>"										\
 		"</SOAP-ENV:Envelope>"
 
-	int	err, opt, ret = FAIL;
-	char	*error = NULL;
+	const char	*__function_name = "vsphere_guestvmids_get";
+
+	int		err, opt, ret = FAIL;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_POSTFIELDS, ZBX_POST_VMLIST)))
 	{
-		error = zbx_dsprintf(error, "Cannot set cURL option [%d]: %s", opt, curl_easy_strerror(err));
-		zabbix_log(LOG_LEVEL_DEBUG, "VMWare error: %s", error);
-		goto clean;
+		*error = zbx_dsprintf(*error, "Cannot set cURL option [%d]: %s", opt, curl_easy_strerror(err));
+		goto out;
 	}
 
 	page.offset = 0;
 
 	if (CURLE_OK != (err = curl_easy_perform(easyhandle)))
 	{
-		error = zbx_strdup(error, curl_easy_strerror(err));
-		zabbix_log(LOG_LEVEL_DEBUG, "VMWare error: %s", error);
-		goto clean;
+		*error = zbx_strdup(*error, curl_easy_strerror(err));
+		goto out;
 	}
 
 	if (SUCCEED != read_xml_values(page.data, "//*[@type='VirtualMachine']", guestvmids))
 	{
-		error = zbx_strdup(error, "Cannot get list of guest VMs");
-		zabbix_log(LOG_LEVEL_DEBUG, "VMWare error: %s", error);
-		goto clean;
+		*error = zbx_strdup(*error, "Cannot get list of guest VMs");
+		goto out;
 	}
 
 	ret = SUCCEED;
-clean:
-	zbx_free(error);
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
 }
 
-static int	get_hostdata(CURL *easyhandle)
+static int	vsphere_hostdata_get(CURL *easyhandle, char **details, char **error)
 {
 #	define ZBX_POST_HOSTDETAILS										\
 		"<?xml version=\"1.0\" encoding=\"UTF-8\"?>"							\
@@ -805,17 +819,15 @@ static int	get_hostdata(CURL *easyhandle)
 			"</ns1:Body>"										\
 		"</SOAP-ENV:Envelope>"
 
-	const char	*__function_name = "get_hostdata";
+	const char	*__function_name = "vsphere_hostdata_get";
+
 	int		err, opt, ret = FAIL;
-	char		*error = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_POSTFIELDS, ZBX_POST_HOSTDETAILS)))
 	{
-		error = zbx_strdup(error, curl_easy_strerror(err));
-		zabbix_log(LOG_LEVEL_DEBUG, "VMWare error: cannot set cURL option [%d]: %s",
-				opt, error);
+		*error = zbx_dsprintf(*error, "Cannot set cURL option [%d]: %s", opt, curl_easy_strerror(err));
 		goto out;
 	}
 
@@ -823,10 +835,11 @@ static int	get_hostdata(CURL *easyhandle)
 
 	if (CURLE_OK != (err = curl_easy_perform(easyhandle)))
 	{
-		error = zbx_strdup(error, curl_easy_strerror(err));
-		zabbix_log(LOG_LEVEL_DEBUG, "VMWare error: %s", error);
+		*error = zbx_strdup(*error, curl_easy_strerror(err));
 		goto out;
 	}
+
+	*details = zbx_strdup(*details, page.data);
 
 	ret = SUCCEED;
 out:
@@ -835,7 +848,7 @@ out:
 
 static int	vsphere_vmdata_get(CURL *easyhandle, const char *vmid)
 {
-#	define ZBX_POST_VSPHERE_VMDETAILS 									\
+#	define ZBX_POST_VSPHERE_VMDETAILS 								\
 		"<?xml version=\"1.0\" encoding=\"UTF-8\"?>"						\
 		"<SOAP-ENV:Envelope "									\
 			" xmlns:ns0=\"urn:vim25\" "							\
@@ -888,6 +901,134 @@ static int	vsphere_vmdata_get(CURL *easyhandle, const char *vmid)
 
 	ret = SUCCEED;
 out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+
+	return ret;
+}
+
+static zbx_vsphere_t	*vsphere_get(const char *url, const char *username, const char *password)
+{
+	zbx_vsphere_t	*vsphere;
+	int		i;
+
+	for (i = 0; i < vspheres.values_num; i++)
+	{
+		vsphere = (zbx_vsphere_t *)vspheres.values[i];
+
+		if (0 != strcmp(vsphere->url, url))
+			continue;
+		if (0 != strcmp(vsphere->username, username))
+			continue;
+		if (0 != strcmp(vsphere->password, password))
+			continue;
+
+		return vsphere;
+	}
+
+	return NULL;
+}
+
+static int	vsphere_update(const char *url, const char *username, const char *password, char **error)
+{
+	const char		*__function_name = "vsphere_update";
+
+	CURL			*easyhandle = NULL;
+	int			opt, i, err, ret = FAIL;
+	zbx_vector_str_t	guestvmids;
+	struct curl_slist	*headers = NULL;
+	zbx_vsphere_t		*vsphere;
+	zbx_vm_t		*vm;
+	char			*uuid;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() url:'%s' username:'%s' password:'%s'",
+			__function_name, url, username, password);
+
+	if (0 == vspheres_initialized)
+	{
+		zbx_vector_ptr_create(&vspheres);
+		vspheres_initialized = 1;
+	}
+
+	if (NULL == (vsphere = vsphere_get(url, username, password)))
+	{
+		vsphere = zbx_malloc(NULL, sizeof(zbx_vsphere_t));
+		vsphere->url = zbx_strdup(NULL, url);
+		vsphere->username = zbx_strdup(NULL, username);
+		vsphere->password = zbx_strdup(NULL, password);
+		vsphere->details = NULL;
+		vsphere->lastcheck = 0;
+		zbx_vector_ptr_create(&vsphere->vms);
+
+		zbx_vector_ptr_append(&vspheres, vsphere);
+	}
+	else if (vsphere->lastcheck + ZBX_VMWARE_CACHE_TTL > time(NULL))
+	{
+		ret = SUCCEED;
+		goto out;
+	}
+
+	if (NULL == (easyhandle = curl_easy_init()))
+	{
+		*error = zbx_strdup(*error, "Cannot init cURL library");
+		goto out;
+	}
+
+	headers = curl_slist_append(headers, ZBX_XML_HEADER1);
+	headers = curl_slist_append(headers, ZBX_XML_HEADER2);
+
+	zbx_vector_str_create(&guestvmids);
+
+	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_HTTPHEADER, headers)))
+	{
+		*error = zbx_dsprintf(*error, "Cannot set cURL option [%d]: %s", opt, curl_easy_strerror(err));
+		goto clean;
+	}
+
+	if (SUCCEED != vsphere_authenticate(easyhandle, url, username, password, error))
+		goto clean;
+
+	if (SUCCEED != vsphere_guestvmids_get(easyhandle, &guestvmids, error))
+		goto clean;
+
+	if (SUCCEED != vsphere_hostdata_get(easyhandle, &vsphere->details, error))
+		goto clean;
+
+	for (i = 0; i < guestvmids.values_num; i++)
+	{
+		if (SUCCEED != vsphere_vmdata_get(easyhandle, guestvmids.values[i]))
+			continue;
+
+		if (NULL == (uuid = read_xml_value(page.data, ZBX_XPATH_LN("uuid"))))
+			continue;
+
+		if (NULL == (vm = vm_get(&vsphere->vms, uuid)))
+		{
+			vm = zbx_malloc(NULL, sizeof(zbx_vm_t));
+			vm->uuid = uuid;
+			vm->details = NULL;
+
+			zbx_vector_ptr_append(&vsphere->vms, vm);
+		}
+		else
+			zbx_free(uuid);
+
+		vm->details = zbx_strdup(vm->details, page.data);
+	}
+
+	vsphere->lastcheck = time(NULL);
+
+	ret = SUCCEED;
+clean:
+	for (i = 0; i < guestvmids.values_num; i++)
+		zbx_free(guestvmids.values[i]);
+	zbx_vector_str_destroy(&guestvmids);
+
+	curl_slist_free_all(headers);
+	curl_easy_cleanup(easyhandle);
+out:
+	if (SUCCEED != ret)
+		zabbix_log(LOG_LEVEL_DEBUG, "VMWare URL \"%s\" error: %s", url, *error);
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
@@ -1065,10 +1206,8 @@ int	check_vcenter_vm_uptime(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 static int	get_vsphere_hoststat(AGENT_REQUEST *request, char *xpath, AGENT_RESULT *result)
 {
-	char			*url, *username, *password, *value, *error = NULL;
-	CURL			*easyhandle = NULL;
-	struct curl_slist	*headers = NULL;
-	int			err, opt, ret = SYSINFO_RET_FAIL;
+	zbx_vsphere_t	*vsphere;
+	char		*url, *username, *password, *value, *error = NULL;
 
 	if (3 != request->nparam)
 		return SYSINFO_RET_FAIL;
@@ -1080,52 +1219,28 @@ static int	get_vsphere_hoststat(AGENT_REQUEST *request, char *xpath, AGENT_RESUL
 	if ('\0' == *url || '\0' == *username)
 		return SYSINFO_RET_FAIL;
 
-	if (NULL == (easyhandle = curl_easy_init()))
+	if (SUCCEED != vsphere_update(url, username, password, &error))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot init cURL library"));
+		SET_MSG_RESULT(result, error);
 		return SYSINFO_RET_FAIL;
 	}
 
-	headers = curl_slist_append(headers, ZBX_XML_HEADER1);
-	headers = curl_slist_append(headers, ZBX_XML_HEADER2);
+	if (NULL == (vsphere = vsphere_get(url, username, password)))
+		return SYSINFO_RET_FAIL;
 
-	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_HTTPHEADER, headers)))
-	{
-		SET_MSG_RESULT(result,
-				zbx_dsprintf(NULL, "Cannot set cURL option [%d]: %s", opt, curl_easy_strerror(err)));
-		goto clean;
-	}
-
-	if (SUCCEED != vsphere_authenticate(easyhandle, url, username, password, &error))
-	{
-		SET_MSG_RESULT(result, error);
-		goto clean;
-	}
-
-	if (SUCCEED != get_hostdata(easyhandle))
-		goto clean;
-
-	if (NULL == (value = read_xml_value(page.data, xpath)))
-		goto clean;
+	if (NULL == (value = read_xml_value(vsphere->details, xpath)))
+		return SYSINFO_RET_FAIL;
 
 	SET_STR_RESULT(result, value);
 
-	ret = SYSINFO_RET_OK;
-clean:
-	curl_slist_free_all(headers);
-	curl_easy_cleanup(easyhandle);
-
-	return ret;
+	return SYSINFO_RET_OK;
 }
 
 static int	get_vsphere_vmstat(AGENT_REQUEST *request, char *xpath, AGENT_RESULT *result)
 {
-	CURL			*easyhandle = NULL;
-	int			i;
-	char			*url, *username, *password, *uuid, *uuidtmp, *value, *error = NULL;
-	zbx_vector_str_t	guestvmids;
-	struct curl_slist	*headers = NULL;
-	int			err, opt, ret = SYSINFO_RET_FAIL;
+	zbx_vsphere_t	*vsphere;
+	zbx_vm_t	*vm;
+	char		*url, *username, *password, *uuid, *value, *error = NULL;
 
 	if (4 != request->nparam)
 		return SYSINFO_RET_FAIL;
@@ -1138,65 +1253,24 @@ static int	get_vsphere_vmstat(AGENT_REQUEST *request, char *xpath, AGENT_RESULT 
 	if ('\0' == *url || '\0' == *username || '\0' == *uuid)
 		return SYSINFO_RET_FAIL;
 
-	if (NULL == (easyhandle = curl_easy_init()))
+	if (SUCCEED != vsphere_update(url, username, password, &error))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot init cURL library"));
+		SET_MSG_RESULT(result, error);
 		return SYSINFO_RET_FAIL;
 	}
 
-	headers = curl_slist_append(headers, ZBX_XML_HEADER1);
-	headers = curl_slist_append(headers, ZBX_XML_HEADER2);
+	if (NULL == (vsphere = vsphere_get(url, username, password)))
+		return SYSINFO_RET_FAIL;
 
-	zbx_vector_str_create(&guestvmids);
+	if (NULL == (vm = vm_get(&vsphere->vms, uuid)))
+		return SYSINFO_RET_FAIL;
 
-	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_HTTPHEADER, headers)))
-	{
-		SET_MSG_RESULT(result,
-				zbx_dsprintf(NULL, "Cannot set cURL option [%d]: %s", opt, curl_easy_strerror(err)));
-		goto clean;
-	}
+	if (NULL == (value = read_xml_value(vm->details, xpath)))
+		return SYSINFO_RET_FAIL;
 
-	if (SUCCEED != vsphere_authenticate(easyhandle, url, username, password, &error))
-	{
-		SET_MSG_RESULT(result, error);
-		goto clean;
-	}
+	SET_STR_RESULT(result, value);
 
-	if (SUCCEED != vsphere_guestvmids_get(easyhandle, &guestvmids))
-		goto clean;
-
-	for (i = 0; i < guestvmids.values_num; i++)
-	{
-		if (SUCCEED != vsphere_vmdata_get(easyhandle, guestvmids.values[i]))
-			goto clean;
-
-		if (NULL == (uuidtmp = read_xml_value(page.data, ZBX_XPATH_LN("uuid"))))
-			continue;
-
-		if (0 != strcmp(uuid, uuidtmp))
-		{
-			zbx_free(uuidtmp);
-			continue;
-		}
-
-		zbx_free(uuidtmp);
-
-		if (NULL != (value = read_xml_value(page.data, xpath)))
-		{
-			SET_STR_RESULT(result, value);
-			ret = SYSINFO_RET_OK;
-		}
-		break;
-	}
-clean:
-	for (i = 0; i < guestvmids.values_num; i++)
-		zbx_free(guestvmids.values[i]);
-	zbx_vector_str_destroy(&guestvmids);
-
-	curl_slist_free_all(headers);
-	curl_easy_cleanup(easyhandle);
-
-	return ret;
+	return SYSINFO_RET_OK;
 }
 
 int	check_vsphere_cpu_usage(AGENT_REQUEST *request, AGENT_RESULT *result)
@@ -1281,12 +1355,11 @@ int	check_vsphere_vm_cpu_usage(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 int	check_vsphere_vm_list(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	struct zbx_json		j;
-	CURL			*easyhandle = NULL;
-	char			*url, *username, *password, *uuid, *name, *error = NULL;
-	zbx_vector_str_t	guestvmids;
-	struct curl_slist	*headers = NULL;
-	int			err, opt, i, ret = SYSINFO_RET_FAIL;
+	struct zbx_json	j;
+	int		i;
+	char		*url, *username, *password, *name, *error = NULL;
+	zbx_vsphere_t	*vsphere = NULL;
+	zbx_vm_t	*vm = NULL;
 
 	if (3 != request->nparam)
 		return SYSINFO_RET_FAIL;
@@ -1298,78 +1371,40 @@ int	check_vsphere_vm_list(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if ('\0' == *url || '\0' == *username)
 		return SYSINFO_RET_FAIL;
 
-	if (NULL == (easyhandle = curl_easy_init()))
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot init cURL library"));
-		return SYSINFO_RET_FAIL;
-	}
-
-	headers = curl_slist_append(headers, ZBX_XML_HEADER1);
-	headers = curl_slist_append(headers, ZBX_XML_HEADER2);
-
-	zbx_vector_str_create(&guestvmids);
-
-	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_HTTPHEADER, headers)))
-	{
-		SET_MSG_RESULT(result,
-				zbx_dsprintf(NULL, "Cannot set cURL option [%d]: %s", opt, curl_easy_strerror(err)));
-		goto clean;
-	}
-
-	if (SUCCEED != vsphere_authenticate(easyhandle, url, username, password, &error))
+	if (SUCCEED != vsphere_update(url, username, password, &error))
 	{
 		SET_MSG_RESULT(result, error);
-		goto clean;
+		return SYSINFO_RET_FAIL;
 	}
-
-	if (SUCCEED != vsphere_guestvmids_get(easyhandle, &guestvmids))
-		goto clean;
 
 	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
 	zbx_json_addarray(&j, ZBX_PROTO_TAG_DATA);
 
-	for (i = 0; i < guestvmids.values_num; i++)
+	if (NULL != (vsphere = vsphere_get(url, username, password)))
 	{
-		if (SUCCEED != vsphere_vmdata_get(easyhandle, guestvmids.values[i]))
+		for (i = 0; i < vsphere->vms.values_num; i++)
 		{
-			zbx_json_free(&j);
-			goto clean;
+			vm = (zbx_vm_t *)vsphere->vms.values[i];
+
+			if (NULL == (name = read_xml_value(vm->details, ZBX_XPATH_LN2("config", "name"))))
+				continue;
+
+			zbx_json_addobject(&j, NULL);
+			zbx_json_addstring(&j, "{#VM.UUID}", vm->uuid, ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(&j, "{#VM.NAME}", name, ZBX_JSON_TYPE_STRING);
+			zbx_json_close(&j);
+
+			zbx_free(name);
 		}
-
-		if (NULL == (uuid = read_xml_value(page.data, ZBX_XPATH_LN("uuid"))))
-			continue;
-
-		if (NULL == (name = read_xml_value(page.data, ZBX_XPATH_LN2("config", "name"))))
-		{
-			zbx_free(uuid);
-			continue;
-		}
-
-		zbx_json_addobject(&j, NULL);
-		zbx_json_addstring(&j, "{#VM.UUID}", uuid, ZBX_JSON_TYPE_STRING);
-		zbx_json_addstring(&j, "{#VM.NAME}", name, ZBX_JSON_TYPE_STRING);
-		zbx_json_close(&j);
-
-		zbx_free(name);
-		zbx_free(uuid);
 	}
 
 	zbx_json_close(&j);
 
-	SET_STR_RESULT(result, strdup(j.buffer));
-
-	ret = SYSINFO_RET_OK;
+	SET_STR_RESULT(result, zbx_strdup(NULL, j.buffer));
 
 	zbx_json_free(&j);
-clean:
-	for (i = 0; i < guestvmids.values_num; i++)
-		zbx_free(guestvmids.values[i]);
-	zbx_vector_str_destroy(&guestvmids);
 
-	curl_slist_free_all(headers);
-	curl_easy_cleanup(easyhandle);
-
-	return ret;
+	return SYSINFO_RET_OK;
 }
 
 int	check_vsphere_vm_memory_size(AGENT_REQUEST *request, AGENT_RESULT *result)
