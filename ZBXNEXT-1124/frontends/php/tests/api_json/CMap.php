@@ -41,7 +41,7 @@ class API_JSON_Map extends CZabbixTest {
 					'expandproblem' => 0,
 					'markelements' => 0,
 					'show_unack' => 0,
-					'severity_min' => 5,
+					'severity_min' => 0,
 					'selements' => array()
 				)),
 			),
