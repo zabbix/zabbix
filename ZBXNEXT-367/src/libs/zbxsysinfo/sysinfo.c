@@ -330,36 +330,29 @@ int	parse_command(const char *key, char *cmd, size_t cmd_max_len, char *param, s
 
 void	test_parameter(const char *key, unsigned flags)
 {
+#define	ZBX_COL_WIDTH	45
+
 	AGENT_RESULT	result;
+	int		n;
 
 	init_result(&result);
 
 	process(key, flags, &result);
 
-	if (0 != (flags & PROCESS_TEST))
-	{
-#define	COL_WIDTH	45
-		int	n1;
+	n = printf("%s", key);
 
-		n1 = printf("%s", key);
-
-		if (0 < n1 && COL_WIDTH > n1)
-			printf("%-*s", COL_WIDTH - n1, " ");
-	}
+	if (0 < n && ZBX_COL_WIDTH > n)
+		printf("%-*s", ZBX_COL_WIDTH - n, " ");
 
 	if (ISSET_UI64(&result))
 		printf(" [u|" ZBX_FS_UI64 "]", result.ui64);
-
-	if (ISSET_DBL(&result))
+	else if (ISSET_DBL(&result))
 		printf(" [d|" ZBX_FS_DBL "]", result.dbl);
-
-	if (ISSET_STR(&result))
+	else if (ISSET_STR(&result))
 		printf(" [s|%s]", result.str);
-
-	if (ISSET_TEXT(&result))
+	else if (ISSET_TEXT(&result))
 		printf(" [t|%s]", result.text);
-
-	if (ISSET_MSG(&result))
+	else if (ISSET_MSG(&result))
 		printf(" [m|%s]", result.msg);
 
 	free_result(&result);
@@ -376,10 +369,10 @@ void	test_parameters()
 	for (i = 0; NULL != commands[i].key; i++)
 	{
 		if (0 != strcmp(commands[i].key, "__UserPerfCounter"))
-			test_parameter(commands[i].key, PROCESS_TEST | PROCESS_USE_TEST_PARAM);
+			test_parameter(commands[i].key, PROCESS_USE_TEST_PARAM);
 	}
 
-	test_aliases(PROCESS_TEST);
+	test_aliases();
 }
 
 static int	replace_param(const char *cmd, const char *param, char *out, int outlen, char *error, int max_error_len)

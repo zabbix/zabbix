@@ -24,12 +24,12 @@
 
 static	ALIAS	*aliasList = NULL;
 
-void	test_aliases(unsigned flags)
+void	test_aliases()
 {
-	ALIAS		*alias;
+	ALIAS	*alias;
 
 	for (alias = aliasList; NULL != alias; alias = alias->next)
-		test_parameter(alias->name, flags);
+		test_parameter(alias->name, 0);
 }
 
 void	add_alias(const char *name, const char *value)
