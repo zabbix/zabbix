@@ -3118,7 +3118,7 @@ static void	init_trend_cache()
 
 	sz = zbx_mem_required_size(1, "trend cache", "TrendCacheSize");
 	zbx_mem_create(&trend_mem, trend_shm_key, ZBX_NO_MUTEX, CONFIG_TRENDS_CACHE_SIZE,
-			"trend cache", "TrendCacheSize");
+			"trend cache", "TrendCacheSize", 0);
 	CONFIG_TRENDS_CACHE_SIZE -= sz;
 
 	cache->trends_num = 0;
@@ -3194,7 +3194,7 @@ void	init_database_cache()
 
 	sz += sz_history;
 
-	zbx_mem_create(&history_mem, history_shm_key, ZBX_NO_MUTEX, sz, "history cache", "HistoryCacheSize");
+	zbx_mem_create(&history_mem, history_shm_key, ZBX_NO_MUTEX, sz, "history cache", "HistoryCacheSize", 0);
 
 	cache = (ZBX_DC_CACHE *)__history_mem_malloc_func(NULL, sizeof(ZBX_DC_CACHE));
 
@@ -3214,7 +3214,7 @@ void	init_database_cache()
 	sz = zbx_mem_required_size(1, "history text cache", "HistoryTextCacheSize");
 
 	zbx_mem_create(&history_text_mem, history_text_shm_key, ZBX_NO_MUTEX, CONFIG_TEXT_CACHE_SIZE,
-			"history text cache", "HistoryTextCacheSize");
+			"history text cache", "HistoryTextCacheSize", 0);
 	CONFIG_TEXT_CACHE_SIZE -= sz;
 
 	cache->text = (char *)__history_text_mem_malloc_func(NULL, CONFIG_TEXT_CACHE_SIZE);
