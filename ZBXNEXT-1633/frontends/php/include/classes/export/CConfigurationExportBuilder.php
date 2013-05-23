@@ -360,8 +360,28 @@ class CConfigurationExportBuilder {
 				'host' => $hostPrototype['host'],
 				'name' => $hostPrototype['name'],
 				'status' => $hostPrototype['status'],
+				'group_links' => $this->formatGroupLinks($hostPrototype['groupLinks']),
 				'group_prototypes' => $this->formatGroupPrototypes($hostPrototype['groupPrototypes']),
 				'templates' => $this->formatTemplateLinkage($hostPrototype['templates'])
+			);
+		}
+
+		return $result;
+	}
+
+	/**
+	 * Format group links.
+	 *
+	 * @param array $groupLinks
+	 *
+	 * @return array
+	 */
+	protected function formatGroupLinks(array $groupLinks) {
+		$result = array();
+
+		foreach ($groupLinks as $groupLink) {
+			$result[] = array(
+				'group' => $groupLink['groupid'],
 			);
 		}
 
@@ -379,16 +399,9 @@ class CConfigurationExportBuilder {
 		$result = array();
 
 		foreach ($groupPrototypes as $groupPrototype) {
-			if ($groupPrototype['groupid']) {
-				$result[] = array(
-					'group' => $groupPrototype['groupid'],
-				);
-			}
-			else {
-				$result[] = array(
-					'name' => $groupPrototype['name']
-				);
-			}
+			$result[] = array(
+				'name' => $groupPrototype['name']
+			);
 		}
 
 		return $result;

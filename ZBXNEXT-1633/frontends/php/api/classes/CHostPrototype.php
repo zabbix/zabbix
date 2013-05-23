@@ -117,13 +117,15 @@ class CHostPrototype extends CHostBase {
 			$this->checkValidator($hostPrototype, $hostPrototypeValidator);
 
 			// group prototypes
-			foreach ($hostPrototype['groupPrototypes'] as $groupPrototype) {
-				$groupPrototypeValidator->setObjectName(isset($groupPrototype['name']) ? $groupPrototype['name'] : '');
-				$this->checkValidator($groupPrototype, $groupPrototypeValidator);
+			if (isset($hostPrototype['groupPrototypes'])) {
+				foreach ($hostPrototype['groupPrototypes'] as $groupPrototype) {
+					$groupPrototypeValidator->setObjectName(isset($groupPrototype['name']) ? $groupPrototype['name'] : '');
+					$this->checkValidator($groupPrototype, $groupPrototypeValidator);
 
-				// save affected host group IDs
-				if (isset($groupPrototype['groupid'])) {
-					$groupPrototypeGroupIds[$groupPrototype['groupid']] = $groupPrototype['groupid'];
+					// save affected host group IDs
+					if (isset($groupPrototype['groupid'])) {
+						$groupPrototypeGroupIds[$groupPrototype['groupid']] = $groupPrototype['groupid'];
+					}
 				}
 			}
 		}
@@ -194,7 +196,7 @@ class CHostPrototype extends CHostBase {
 				)),
 				'templates' => null
 			),
-			'required' => array('host', 'ruleid', 'groupPrototypes'),
+			'required' => array('host', 'ruleid', 'groupLinks'),
 			'messageRequired' => _('No "%2$s" given for host prototype "%1$s".'),
 			'messageUnsupported' => _('Unsupported parameter "%2$s" for host prototype "%1$s".')
 		));
@@ -407,8 +409,10 @@ class CHostPrototype extends CHostBase {
 			$this->checkValidator($hostPrototype, $hostPrototypeValidator);
 
 			// groups
-			foreach ($hostPrototype['groupLinks'] as $group) {
-				$this->checkValidator($group, $groupLinkValidator);
+			if (isset($hostPrototype['groupLinks'])) {
+				foreach ($hostPrototype['groupLinks'] as $group) {
+					$this->checkValidator($group, $groupLinkValidator);
+				}
 			}
 
 			// group prototypes

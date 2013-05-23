@@ -732,19 +732,15 @@ class CConfigurationImport {
 				// host prototype
 				foreach ($item['host_prototypes'] as $hostPrototype) {
 					// resolve group prototypes
-					$groupPrototypes = array();
-					foreach ($hostPrototype['group_prototypes'] as $groupPrototype) {
-						if (isset($groupPrototype['group'])) {
-							$groupPrototypes[] = array(
-								'groupid' => $this->referencer->resolveGroup($groupPrototype['group']['name'])
-							);
-						}
-						else {
-							$groupPrototypes[] = $groupPrototype;
-						}
+					$groupLinks = array();
+					foreach ($hostPrototype['group_links'] as $groupLink) {
+						$groupLinks[] = array(
+							'groupid' => $this->referencer->resolveGroup($groupLink['group']['name'])
+						);
 					}
-					$hostPrototype['groupPrototypes'] = $groupPrototypes;
-					unset($hostPrototype['group_prototypes']);
+					$hostPrototype['groupLinks'] = $groupLinks;
+					$hostPrototype['groupPrototypes'] = $hostPrototype['group_prototypes'];
+					unset($hostPrototype['group_links'], $hostPrototype['group_prototypes']);
 
 					// resolve templates
 					$templates = array();
