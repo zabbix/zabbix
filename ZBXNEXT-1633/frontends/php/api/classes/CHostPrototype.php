@@ -35,6 +35,7 @@ class CHostPrototype extends CHostBase {
 			'discoveryids'  		=> null,
 			'inherited'				=> null,
 			'selectDiscoveryRule' 	=> null,
+			'selectGroupLinks'		=> null,
 			'selectGroupPrototypes' => null,
 			'selectParentHost'		=> null,
 			'selectTemplates' 		=> null,
@@ -175,11 +176,15 @@ class CHostPrototype extends CHostBase {
 					'messageEmpty' => _('No discovery rule ID given for host prototype "%1$s".'),
 					'messageInvalid' => _('Incorrect discovery rule ID for host prototype "%1$s".')
 				)),
-				'groupPrototypes' => new CGroupPrCollectionValidator(array(
+				'groupLinks' => new CCollectionValidator(array(
+					'uniqueField' => 'groupid',
 					'messageEmpty' => _('Host prototype "%1$s" must have at least one host group.'),
-					'messageHostGroups' => _('Host prototype "%1$s" must have at least one host group.'),
-					'messageDuplicateName' => _('Duplicate group prototype name "%2$s" for host prototype "%1$s".'),
-					'messageDuplicateGroupId' => _('Duplicate group prototype group ID "%2$s" for host prototype "%1$s".')
+					'messageDuplicate' => _('Duplicate host group ID "%2$s" for host prototype "%1$s".')
+				)),
+				'groupPrototypes' => new CCollectionValidator(array(
+					'empty' => true,
+					'uniqueField' => 'name',
+					'messageDuplicate' => _('Duplicate group prototype name "%2$s" for host prototype "%1$s".')
 				)),
 				'inventory' => new CSchemaValidator(array(
 					'validators' => array(
@@ -204,19 +209,30 @@ class CHostPrototype extends CHostBase {
 		return new CSchemaValidator(array(
 			'validators' => array(
 				'name' => new CLldMacroStringValidator(array(
-					'empty' => true,
+					'messageEmpty' => _('Empty name for group prototype.'),
 					'messageMacro' => _('Name for group prototype "%1$s" must contain macros.')
-				)),
+				))
+			),
+			'required' => array('name'),
+			'messageUnsupported' => _('Unsupported parameter "%2$s" for group prototype "%1$s".')
+		));
+	}
+
+	/**
+	 * Returns the complete validator for creating a host prototype group.
+	 *
+	 * @return CSchemaValidator
+	 */
+	protected function getGroupLinkValidator() {
+		return new CSchemaValidator(array(
+			'validators' => array(
 				'groupid' => new CIdValidator(array(
 					'empty' => true,
-					'messageInvalid' => _('Incorrect host group ID "%2$s" for group prototype.')
-				)),
+					'messageInvalid' => _('Incorrect host group ID for group prototype.')
+				))
 			),
-			'postValidators' => array(new CGroupPrototypeValidator(array(
-				'messageMissing' => _('Host group prototype must have either a name or a group ID set.'),
-				'messageBoth' => _('Host group prototype "%1$s" cannot have a name and a group ID set at the same time.'),
-			))),
-			'messageUnsupported' => _('Unsupported parameter "%2$s" for group prototype "%1$s".')
+			'required' => array('groupid'),
+			'messageUnsupported' => _('Unsupported parameter "%1$s" for group prototype.')
 		));
 	}
 
@@ -243,6 +259,16 @@ class CHostPrototype extends CHostBase {
 		unset($hostPrototype);
 
 		$this->validateCreate($hostPrototypes);
+
+		// merge groups into group prototypes
+		foreach ($hostPrototypes as &$hostPrototype) {
+			foreach ($hostPrototype['groupLinks'] as $group) {
+				$hostPrototype['groupPrototypes'][] = $group;
+			}
+			unset($hostPrototype['groupLinks']);
+		}
+		unset($hostPrototype);
+
 		$hostPrototypes = $this->createReal($hostPrototypes);
 		$this->inherit($hostPrototypes);
 
@@ -358,6 +384,14 @@ class CHostPrototype extends CHostBase {
 		$hostPrototypeValidator->required = array();
 		$hostPrototypeValidator->validators['hostid'] = null;
 
+		// group validator
+		$groupLinkValidator = $this->getGroupLinkValidator();
+		$groupLinkValidator->required = array();
+		$groupLinkValidator->validators['group_prototypeid'] = new CIdValidator(array(
+			'messageEmpty' => _('Group prototype ID cannot be empty.'),
+			'messageInvalid' => _('Incorrect group prototype ID.')
+		));
+
 		// group prototype validator
 		$groupPrototypeValidator = $this->getGroupPrototypeValidator();
 		$groupPrototypeValidator->required = array();
@@ -371,6 +405,11 @@ class CHostPrototype extends CHostBase {
 			// host prototype
 			$hostPrototypeValidator->setObjectName($hostPrototype['host']);
 			$this->checkValidator($hostPrototype, $hostPrototypeValidator);
+
+			// groups
+			foreach ($hostPrototype['groupLinks'] as $group) {
+				$this->checkValidator($group, $groupLinkValidator);
+			}
 
 			// group prototypes
 			if (isset($hostPrototype['groupPrototypes'])) {
@@ -424,6 +463,16 @@ class CHostPrototype extends CHostBase {
 		unset($hostPrototype);
 
 		$this->validateUpdate($hostPrototypes);
+
+		// merge group links into group prototypes
+		foreach ($hostPrototypes as &$hostPrototype) {
+			foreach ($hostPrototype['groupLinks'] as $group) {
+				$hostPrototype['groupPrototypes'][] = $group;
+			}
+			unset($hostPrototype['groupLinks']);
+		}
+		unset($hostPrototype);
+
 		$hostPrototypes = $this->updateReal($hostPrototypes);
 
 		// load additional data required for inheritance
@@ -450,6 +499,7 @@ class CHostPrototype extends CHostBase {
 
 		$exHostPrototypes = $this->get(array(
 			'output' => array('hostid'),
+			'selectGroupLinks' => API_OUTPUT_EXTEND,
 			'selectGroupPrototypes' => API_OUTPUT_EXTEND,
 			'selectTemplates' => array('templateid'),
 			'selectInventory' => API_OUTPUT_EXTEND,
@@ -471,7 +521,10 @@ class CHostPrototype extends CHostBase {
 				unset($groupPrototype);
 
 				// save group prototypes
-				$exGroupPrototypes = zbx_toHash($exHostPrototype['groupPrototypes'], 'group_prototypeid');
+				$exGroupPrototypes = zbx_toHash(
+					array_merge($exHostPrototype['groupLinks'], $exHostPrototype['groupPrototypes']),
+					'group_prototypeid'
+				);
 				$modifiedGroupPrototypes = array();
 				foreach ($hostPrototype['groupPrototypes'] as $groupPrototype) {
 					if (isset($groupPrototype['group_prototypeid'])) {
@@ -631,6 +684,7 @@ class CHostPrototype extends CHostBase {
 		// fetch child host prototypes and group them by discovery rule
 		$childHostPrototypes = API::HostPrototype()->get(array(
 			'output' => array('hostid', 'host', 'templateid'),
+			'selectGroupLinks' => API_OUTPUT_EXTEND,
 			'selectGroupPrototypes' => API_OUTPUT_EXTEND,
 			'selectDiscoveryRule' => array('itemid'),
 			'discoveryids' => zbx_objectValues($childDiscoveryRules, 'itemid'),
@@ -715,7 +769,7 @@ class CHostPrototype extends CHostBase {
 					// look for existing group prototypes to update
 					$exGroupPrototypesByTemplateId = zbx_toHash($exHostPrototype['groupPrototypes'], 'templateid');
 					$exGroupPrototypesByName = zbx_toHash($exHostPrototype['groupPrototypes'], 'name');
-					$exGroupPrototypesByGroupId = zbx_toHash($exHostPrototype['groupPrototypes'], 'groupid');
+					$exGroupPrototypesByGroupId = zbx_toHash($exHostPrototype['groupLinks'], 'groupid');
 
 					// look for a group prototype that can be updated
 					foreach ($newHostPrototype['groupPrototypes'] as &$groupPrototype) {
@@ -785,13 +839,20 @@ class CHostPrototype extends CHostBase {
 			'discoveryids' => zbx_objectValues($discoveryRules, 'itemid'),
 			'preservekeys' => true,
 			'output' => API_OUTPUT_EXTEND,
+			'selectGroupLinks' => API_OUTPUT_EXTEND,
 			'selectGroupPrototypes' => API_OUTPUT_EXTEND,
 			'selectTemplates' => array('templateid'),
 			'selectDiscoveryRule' => array('itemid')
 		));
 
-		// the ID of the discovery rule must be passed in the "ruleid" parameter
 		foreach ($hostPrototypes as &$hostPrototype) {
+			// merge group links into group prototypes
+			foreach ($hostPrototype['groupLinks'] as $group) {
+				$hostPrototype['groupPrototypes'][] = $group;
+			}
+			unset($hostPrototype['groupLinks']);
+
+			// the ID of the discovery rule must be passed in the "ruleid" parameter
 			$hostPrototype['ruleid'] = $hostPrototype['discoveryRule']['itemid'];
 			unset($hostPrototype['discoveryRule']);
 		}
@@ -1095,15 +1156,47 @@ class CHostPrototype extends CHostBase {
 			$result = $relationMap->mapOne($result, $discoveryRules, 'discoveryRule');
 		}
 
+		// adding group links
+		if ($options['selectGroupLinks'] !== null && $options['selectGroupLinks'] != API_OUTPUT_COUNT) {
+			$groupPrototypes = DBFetchArray(DBselect(
+				'SELECT hg.group_prototypeid,hg.hostid'.
+					' FROM group_prototype hg'.
+					' WHERE '.dbConditionInt('hg.hostid', $hostPrototypeIds).
+					' AND hg.groupid!=0'
+			));
+			$relationMap = $this->createRelationMap($groupPrototypes, 'hostid', 'group_prototypeid');
+			$groupPrototypes = API::getApi()->select('group_prototype', array(
+				'output' => $options['selectGroupLinks'],
+				'nodeids' => $options['nodeids'],
+				'group_prototypeids' => $relationMap->getRelatedIds(),
+				'preservekeys' => true
+			));
+			foreach ($groupPrototypes as &$groupPrototype) {
+				unset($groupPrototype['name']);
+			}
+			unset($groupPrototype);
+			$result = $relationMap->mapMany($result, $groupPrototypes, 'groupLinks');
+		}
+
 		// adding group prototypes
 		if ($options['selectGroupPrototypes'] !== null && $options['selectGroupPrototypes'] != API_OUTPUT_COUNT) {
-			$relationMap = $this->createRelationMap($result, 'hostid', 'group_prototypeid', 'group_prototype');
+			$groupPrototypes = DBFetchArray(DBselect(
+				'SELECT hg.group_prototypeid,hg.hostid'.
+				' FROM group_prototype hg'.
+				' WHERE '.dbConditionInt('hg.hostid', $hostPrototypeIds).
+					' AND hg.name NOT LIKE ""'
+			));
+			$relationMap = $this->createRelationMap($groupPrototypes, 'hostid', 'group_prototypeid');
 			$groupPrototypes = API::getApi()->select('group_prototype', array(
 				'output' => $options['selectGroupPrototypes'],
 				'nodeids' => $options['nodeids'],
 				'group_prototypeids' => $relationMap->getRelatedIds(),
 				'preservekeys' => true
 			));
+			foreach ($groupPrototypes as &$groupPrototype) {
+				unset($groupPrototype['groupid']);
+			}
+			unset($groupPrototype);
 			$result = $relationMap->mapMany($result, $groupPrototypes, 'groupPrototypes');
 		}
 

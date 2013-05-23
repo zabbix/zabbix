@@ -42,7 +42,7 @@ $fields = array(
 	'status' =>		        	array(T_ZBX_INT, O_OPT, null,		        IN(array(HOST_STATUS_NOT_MONITORED, HOST_STATUS_MONITORED)), 'isset({save})'),
 	'inventory_mode' =>			array(T_ZBX_INT, O_OPT, null, IN(array(HOST_INVENTORY_DISABLED, HOST_INVENTORY_MANUAL, HOST_INVENTORY_AUTOMATIC)), null),
 	'templates' =>		    	array(T_ZBX_STR, O_OPT, null, NOT_EMPTY,	null),
-	'new_group_prototypes' =>	array(T_ZBX_STR, O_OPT, null, NOT_EMPTY,	null),
+	'group_links' =>				array(T_ZBX_STR, O_OPT, null, NOT_EMPTY,	null),
 	'group_prototypes' =>		array(T_ZBX_STR, O_OPT, null, NOT_EMPTY,	null),
 	'unlink' =>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,		null),
 	'group_hostid' =>			array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
@@ -77,6 +77,7 @@ if (get_request('parent_discoveryid')) {
 		$hostPrototype = API::HostPrototype()->get(array(
 			'hostids' => get_request('hostid'),
 			'output' => API_OUTPUT_EXTEND,
+			'selectGroupLinks' => API_OUTPUT_EXTEND,
 			'selectGroupPrototypes' => API_OUTPUT_EXTEND,
 			'selectTemplates' => array('templateid', 'name'),
 			'selectParentHost' => array('hostid'),
@@ -125,6 +126,7 @@ elseif (isset($_REQUEST['save'])) {
 		'host' => get_request('host'),
 		'name' => get_request('name'),
 		'status' => get_request('status'),
+		'groupLinks' => array(),
 		'groupPrototypes' => array(),
 		'templates' => zbx_toObject(array_keys(get_request('templates', array())), 'templateid'),
 		'status' => get_request('status'),
@@ -134,7 +136,11 @@ elseif (isset($_REQUEST['save'])) {
 	);
 
 	// add custom group prototypes
-	foreach (get_request('new_group_prototypes', array()) as $groupPrototype) {
+	foreach (get_request('group_prototypes', array()) as $groupPrototype) {
+		if (!$groupPrototype['group_prototypeid']) {
+			unset($groupPrototype['group_prototypeid']);
+		}
+
 		if (!zbx_empty($groupPrototype['name'])) {
 			$newHostPrototype['groupPrototypes'][] = $groupPrototype;
 		}
@@ -145,24 +151,24 @@ elseif (isset($_REQUEST['save'])) {
 
 		if (!$hostPrototype['templateid']) {
 			// add group prototypes based on existing host groups
-			$groupPrototypesByGroupId = zbx_toHash($hostPrototype['groupPrototypes'], 'groupid');
+			$groupPrototypesByGroupId = zbx_toHash($hostPrototype['groupLinks'], 'groupid');
 			unset($groupPrototypesByGroupId[0]);
-			foreach (get_request('group_prototypes', array()) as $groupId) {
+			foreach (get_request('group_links', array()) as $groupId) {
 				if (isset($groupPrototypesByGroupId[$groupId])) {
-					$newHostPrototype['groupPrototypes'][] = array(
+					$newHostPrototype['groupLinks'][] = array(
 						'groupid' => $groupPrototypesByGroupId[$groupId]['groupid'],
 						'group_prototypeid' => $groupPrototypesByGroupId[$groupId]['group_prototypeid']
 					);
 				}
 				else {
-					$newHostPrototype['groupPrototypes'][] = array(
+					$newHostPrototype['groupLinks'][] = array(
 						'groupid' => $groupId
 					);
 				}
 			}
 		}
 		else {
-			unset($newHostPrototype['groupPrototypes']);
+			unset($newHostPrototype['groupPrototypes'], $newHostPrototype['groupLinks']);
 		}
 
 		$newHostPrototype = CArrayHelper::unsetEqualValues($newHostPrototype, $hostPrototype, array('hostid'));
@@ -174,8 +180,8 @@ elseif (isset($_REQUEST['save'])) {
 		$newHostPrototype['ruleid'] = get_request('parent_discoveryid');
 
 		// add group prototypes based on existing host groups
-		foreach (get_request('group_prototypes', array()) as $group) {
-			$newHostPrototype['groupPrototypes'][] = array(
+		foreach (get_request('group_links', array()) as $group) {
+			$newHostPrototype['groupLinks'][] = array(
 				'groupid' => $group['groupid']
 			);
 		}
@@ -235,21 +241,12 @@ if (isset($_REQUEST['form'])) {
 			'templates' => get_request('templates', array()),
 			'inventory' => get_request('inventory', array(
 				'inventory_mode' => HOST_INVENTORY_DISABLED
-			))
+			)),
+			'groupLinks' => get_request('groupLinks', array()),
+			'groupPrototypes' => array()
 		),
-		'templates' => array(),
-		'new_group_prototypes' => get_request('new_group_prototypes', array()),
-		'group_prototypes' => array()
+		'groups' => array()
 	);
-
-	// add group prototypes
-	if (get_request('group_prototypes')) {
-		$data['group_prototypes'] = API::HostGroup()->get(array(
-			'output' => API_OUTPUT_EXTEND,
-			'groupids' => get_request('group_prototypes'),
-			'editable' => true
-		));
-	}
 
 	// add parent host
 	$parentHost = API::Host()->get(array(
@@ -276,23 +273,11 @@ if (isset($_REQUEST['form'])) {
 	if (get_request('hostid') && !get_request('form_refresh')) {
 		$data['host_prototype'] = array_merge($data['host_prototype'], $hostPrototype);
 
-		// add group prototypes
-		$data['new_group_prototypes'] = array();
-		$data['group_prototypes'] = array();
-		$groupPrototypeIds = array();
-		foreach ($hostPrototype['groupPrototypes'] as $groupPrototype) {
-			if ($groupPrototype['groupid']) {
-				$groupPrototypeIds[] = $groupPrototype['groupid'];
-			}
-			else {
-				$data['new_group_prototypes'][] = $groupPrototype;
-			}
-		}
-
-		$data['group_prototypes'] = API::HostGroup()->get(array(
+		$data['groups'] = API::HostGroup()->get(array(
 			'output' => API_OUTPUT_EXTEND,
-			'groupids' => $groupPrototypeIds,
-			'editable' => true
+			'groupids' => zbx_objectValues($data['host_prototype']['groupLinks'], 'groupid'),
+			'editable' => true,
+			'preservekeys' => true
 		));
 
 		// add linked templates

@@ -1,11 +1,12 @@
 <script type="text/x-jquery-tmpl" id="groupPrototypeRow">
 	<tr class="form_row">
 		<td>
-			<input class="input text" name="new_group_prototypes[#{i}][name]" type="text" size="30" value="#{name}"
+			<input class="input text" name="group_prototypes[#{i}][name]" type="text" size="30" value="#{name}"
 				placeholder="{#MACRO}">
 		</td>
 		<td>
 			<input type="button" class="link_menu group-prototype-remove" name="remove" value="<?php echo CHtml::encode(_('Remove')); ?>" />
+			<input type="hidden" name="group_prototypes[#{i}][group_prototypeid]" value="#{group_prototypeid}" />
 		</td>
 	</tr>
 </script>
