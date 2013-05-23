@@ -151,7 +151,7 @@ static void	process_history_table_data(const ZBX_TABLE *table, int master_nodeid
 			table->table, table->recid, lastid, DBnode(table->recid, nodeid), table->recid);
 	}
 
-	result = DBselectN(10000, "%s", tmp);
+	result = DBselectN(tmp, 10000);
 
 	while (NULL != (row = DBfetch(result)))
 	{

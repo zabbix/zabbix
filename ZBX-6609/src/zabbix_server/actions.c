@@ -1249,13 +1249,21 @@ void	process_actions(DB_EVENT *event)
 		{
 			/* stop escalation only if it was started before */
 			DB_RESULT	result2;
+			char		*sql = NULL;
+			size_t		sql_alloc = 128, sql_offset = 0;
 
-			result2 = DBselectN(1, "select null"
+			sql = zbx_malloc(sql, sql_alloc);
+
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+					"select null"
 					" from escalations"
 					" where actionid=" ZBX_FS_UI64
-					" and triggerid=" ZBX_FS_UI64
+						" and triggerid=" ZBX_FS_UI64
 						" and eventid is not null",
 					actionid, event->objectid);
+
+			result2 = DBselectN(sql, 1);
+			zbx_free(sql);
 
 			if (NULL != DBfetch(result2))
 				DBstop_escalation(actionid, event->objectid, event->eventid);

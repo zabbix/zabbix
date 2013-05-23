@@ -113,7 +113,7 @@ static void	discovery_separate_host(DB_DRULE *drule, DB_DHOST *dhost, const char
 				" and ip" ZBX_SQL_STRCMP,
 			dhost->dhostid, ZBX_SQL_STRVAL_NE(ip_esc));
 
-	result = DBselectN(1, "%s", sql);
+	result = DBselectN(sql, 1);
 
 	if (NULL != (row = DBfetch(result)))
 	{

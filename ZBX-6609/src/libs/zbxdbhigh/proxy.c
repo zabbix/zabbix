@@ -1315,7 +1315,7 @@ static int	proxy_get_history_data(struct zbx_json *j, const ZBX_HISTORY_TABLE *h
 			ht->where,
 			id);
 
-	result = DBselectN(ZBX_MAX_HRECORDS, "%s", sql);
+	result = DBselectN(sql, ZBX_MAX_HRECORDS);
 
 	while (NULL != (row = DBfetch(result)))
 	{

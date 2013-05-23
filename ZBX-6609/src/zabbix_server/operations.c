@@ -79,7 +79,7 @@ static zbx_uint64_t	select_discovered_host(DB_EVENT *event)
 			goto exit;
 	}
 
-	result = DBselectN(1, "%s", sql);
+	result = DBselectN(sql, 1);
 
 	if (NULL != (row = DBfetch(result)))
 		ZBX_STR2UINT64(hostid, row[0]);
@@ -350,7 +350,7 @@ static zbx_uint64_t	add_discovered_host(DB_EVENT *event)
 					host_esc,
 					DBnode_local("hostid"));
 
-			result2 = DBselectN(1, "%s", sql);
+			result2 = DBselectN(sql, 1);
 
 			if (NULL == (row2 = DBfetch(result2)))
 			{
@@ -600,7 +600,7 @@ void	op_groups_del(DB_EVENT *event, zbx_vector_uint64_t *groupids)
 			hostid);
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "groupid", groupids->values, groupids->values_num);
 
-	result = DBselectN(1, "%s", sql);
+	result = DBselectN(sql, 1);
 
 	if (NULL == DBfetch(result))
 	{

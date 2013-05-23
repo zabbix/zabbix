@@ -406,31 +406,23 @@ DB_RESULT	__zbx_DBselect(const char *fmt, ...)
  * Comments: retry until DB is up                                             *
  *                                                                            *
  ******************************************************************************/
-DB_RESULT	__zbx_DBselectN(int n, const char *fmt, ...)
+DB_RESULT	DBselectN(const char *query, int n)
 {
-	va_list		args;
 	DB_RESULT	rc;
-	char		*sql = NULL;
 
-	va_start(args, fmt);
-	sql = zbx_dvsprintf(sql, fmt, args);
-	va_end(args);
-
-	rc = zbx_db_select_n(sql, n);
+	rc = zbx_db_select_n(query, n);
 
 	while ((DB_RESULT)ZBX_DB_DOWN == rc)
 	{
 		DBclose();
 		DBconnect(ZBX_DB_CONNECT_NORMAL);
 
-		if ((DB_RESULT)ZBX_DB_DOWN == (rc = zbx_db_select_n(sql, n)))
+		if ((DB_RESULT)ZBX_DB_DOWN == (rc = zbx_db_select_n(query, n)))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "Database is down. Retrying in %d seconds.", ZBX_DB_WAIT_DOWN);
 			sleep(ZBX_DB_WAIT_DOWN);
 		}
 	}
-
-	zbx_free(sql);
 
 	return rc;
 }
@@ -2322,7 +2314,7 @@ retry:
 					" order by ns desc");
 		}
 
-		result = DBselectN(last_n - h_num, "%s", sql);
+		result = DBselectN(sql, last_n - h_num);
 	}
 	else
 		result = DBselect("%s", sql);

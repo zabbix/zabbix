@@ -1281,7 +1281,7 @@ static int	DBget_dhost_value_by_event(DB_EVENT *event, char **replace_to, const 
 			return ret;
 	}
 
-	result = DBselectN(1, "%s", sql);
+	result = DBselectN(sql, 1);
 
 	if (NULL != (row = DBfetch(result)) && SUCCEED != DBis_null(row[0]))
 	{
