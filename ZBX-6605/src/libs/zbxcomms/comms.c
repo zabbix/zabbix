@@ -377,7 +377,7 @@ int	zbx_tcp_connect(zbx_sock_t *s, const char *source_ip, const char *ip, unsign
 		source_addr.sin_addr.s_addr	= inet_addr(source_ip);
 		source_addr.sin_port		= 0;
 #ifdef _AIX
-		memset(&(source_addr.sin_zero), '\0', sizeof(source_addr.sin_zero));
+		memset(&(source_addr.sin_zero), 0, sizeof(source_addr.sin_zero));
 #endif
 		if (ZBX_TCP_ERROR == bind(s->socket, (struct sockaddr *)&source_addr, sizeof(source_addr)))
 		{
