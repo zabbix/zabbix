@@ -34,12 +34,15 @@ if (!empty($this->data['maps'])) {
 		$mapComboBox->addItem($sysmapId, get_node_name_by_elid($sysmapId, null, NAME_DELIMITER).$map['name']);
 	}
 
-	$headerForm = new CForm('get');
-	$headerForm->addVar('fullscreen', $this->data['fullscreen']);
-	$headerForm->addItem(array(_('Maps'), SPACE, $mapComboBox));
-	$headerForm->addItem(array(SPACE, _('Minimum severity'), SPACE, $this->data['pageFilter']->getSeveritiesMinCB()));
+	$headerMapForm = new CForm('get');
+	$headerMapForm->addVar('fullscreen', $this->data['fullscreen']);
+	$headerMapForm->addItem(array(_('Maps'), SPACE, $mapComboBox));
 
-	$mapWidget->addHeader($this->data['map']['name'], $headerForm);
+	$headerSeverityMinForm = new CForm('get');
+	$headerSeverityMinForm->addVar('fullscreen', $this->data['fullscreen']);
+	$headerSeverityMinForm->addItem(array(SPACE, _('Minimum severity'), SPACE, $this->data['pageFilter']->getSeveritiesMinCB()));
+
+	$mapWidget->addHeader($this->data['map']['name'], array($headerMapForm, $headerSeverityMinForm));
 
 	// get map parent maps
 	$parentMaps = array();
