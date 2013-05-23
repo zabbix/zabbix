@@ -963,7 +963,8 @@ class CDiscoveryRule extends CItemGeneral {
 		$prototypes = API::HostPrototype()->get(array(
 			'discoveryids' => $srcDiscovery['itemid'],
 			'output' => array('host', 'name', 'status'),
-			'selectGroupPrototypes' => array('name', 'groupid'),
+			'selectGroupLinks' => array('groupid'),
+			'selectGroupPrototypes' => array('name'),
 			'selectInventory' => array('inventory_mode'),
 			'selectTemplates' => array('templateid'),
 			'preservekeys' => true
@@ -974,6 +975,11 @@ class CDiscoveryRule extends CItemGeneral {
 			foreach ($prototypes as &$prototype) {
 				$prototype['ruleid'] = $dstDiscovery['itemid'];
 				unset($prototype['hostid'], $prototype['templateid'], $prototype['inventory']['hostid']);
+
+				foreach ($prototype['groupLinks'] as &$groupLinks) {
+					unset($groupLinks['group_prototypeid'], $groupLinks['templateid']);
+				}
+				unset($groupLinks);
 
 				foreach ($prototype['groupPrototypes'] as &$groupPrototype) {
 					unset($groupPrototype['group_prototypeid'], $groupPrototype['templateid']);

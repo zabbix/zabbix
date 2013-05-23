@@ -199,7 +199,7 @@ if (!$hostPrototype['groupPrototypes']) {
 foreach ($hostPrototype['groupPrototypes'] as $i => $groupPrototype) {
 	zbx_add_post_js('addGroupPrototypeRow('.CJs::encodeJson(array(
 		'name' => $groupPrototype['name'],
-		'group_prototypeid' => $groupPrototype['group_prototypeid']
+		'group_prototypeid' => isset($groupPrototype['group_prototypeid']) ? $groupPrototype['group_prototypeid'] : null
 	)).')');
 }
 
