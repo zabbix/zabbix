@@ -38,7 +38,7 @@ class testFormGraph extends CWebTest {
 	 *
 	 * @var string
 	 */
-	protected $itemSimple = 'testFormItem';
+	protected $itemSimple = 'testFormItem1';
 
 	/**
 	 * The name of the inheritance item for the testing of the layout of the graphs created in the test data set.
@@ -464,12 +464,10 @@ class testFormGraph extends CWebTest {
 			$this->zbxTestLaunchPopup('add_item');
 
 			if (isset($data['host'])) {
-				sleep(1);
 				$this->zbxTestClick('link='.$this->itemSimple);
 			}
 
 			if (isset($data['template'])) {
-				sleep(1);
 				$this->zbxTestClick('link='.$this->itemInheritance);
 			}
 
@@ -881,7 +879,6 @@ class testFormGraph extends CWebTest {
 			foreach($data['addItems'] as $item) {
 				$this->zbxTestLaunchPopup('add_item');
 				$link = $item['itemName'];
-				sleep(1);
 				$this->zbxTestClick("link=$link");
 				sleep(1);
 				$this->selectWindow(null);
