@@ -113,7 +113,7 @@ elseif (isset($_REQUEST['delete']) && isset($_REQUEST['hostid'])) {
 }
 elseif (isset($_REQUEST['clone']) && isset($_REQUEST['hostid'])) {
 	unset($_REQUEST['hostid']);
-	foreach ($_REQUEST['new_group_prototypes'] as &$groupPrototype) {
+	foreach ($_REQUEST['group_prototypes'] as &$groupPrototype) {
 		unset($groupPrototype['group_prototypeid']);
 	}
 	unset($groupPrototype);
@@ -242,8 +242,8 @@ if (isset($_REQUEST['form'])) {
 			'inventory' => get_request('inventory', array(
 				'inventory_mode' => HOST_INVENTORY_DISABLED
 			)),
-			'groupLinks' => get_request('groupLinks', array()),
-			'groupPrototypes' => array()
+			'groupLinks' => get_request('group_links', array()),
+			'groupPrototypes' => get_request('group_prototypes', array())
 		),
 		'groups' => array()
 	);
@@ -259,6 +259,15 @@ if (isset($_REQUEST['form'])) {
 	));
 	$parentHost = reset($parentHost);
 	$data['parent_host'] = $parentHost;
+
+	if (get_request('group_links')) {
+		$data['groups'] = API::HostGroup()->get(array(
+			'output' => API_OUTPUT_EXTEND,
+			'groupids' => get_request('group_links'),
+			'editable' => true,
+			'preservekeys' => true
+		));
+	}
 
 	if ($parentHost['proxy_hostid']) {
 		$proxy = API::Proxy()->get(array(
