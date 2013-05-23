@@ -22,11 +22,18 @@
 class CCollectionValidator extends CValidator {
 
 	/**
-	 * If set to false, the string cannot be empty.
+	 * If set to false, the array cannot be empty.
 	 *
 	 * @var bool
 	 */
 	public $empty = false;
+
+	/**
+	 * Name of a field that must have unique values in the whole collection.
+	 *
+	 * @var string
+	 */
+	public $uniqueField;
 
 	/**
 	 * Error message if the string is empty.
@@ -36,7 +43,14 @@ class CCollectionValidator extends CValidator {
 	public $messageEmpty;
 
 	/**
-	 * Checks if the given object collection is valid.
+	 * Error message if duplicate objects exist.
+	 *
+	 * @var string
+	 */
+	public $messageDuplicate;
+
+	/**
+	 * Checks if the given array of objects is valid.
 	 *
 	 * @param array $value
 	 *
@@ -44,10 +58,20 @@ class CCollectionValidator extends CValidator {
 	 */
 	public function validate($value)
 	{
-		if (!$value) {
+		// check if it's empty
+		if (!$this->empty && !$value) {
 			$this->error($this->messageEmpty);
 
 			return false;
+		}
+
+		// check for objects with duplicate values
+		if ($this->uniqueField) {
+			if ($duplicate = CArrayHelper::findDuplicate($value, $this->uniqueField)) {
+				$this->error($this->messageDuplicate, $duplicate[$this->uniqueField]);
+
+				return false;
+			}
 		}
 
 		return true;

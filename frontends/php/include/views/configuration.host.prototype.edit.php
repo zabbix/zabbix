@@ -168,14 +168,14 @@ $groupList = new CFormList('grouplist');
 
 // existing groups
 $groups = array();
-foreach ($data['group_prototypes'] as $group) {
+foreach ($hostPrototype['groupLinks'] as $group) {
 	$groups[] = array(
 		'id' => $group['groupid'],
-		'name' => $group['name']
+		'name' => $data['groups'][$group['groupid']]['name']
 	);
 }
 $groupList->addRow(_('Groups'), new CMultiSelect(array(
-	'name' => 'group_prototypes[]',
+	'name' => 'group_links[]',
 	'objectName' => 'hostGroup',
 	'objectOptions' => array(
 		'editable' => true,
@@ -190,17 +190,16 @@ $customGroupTable = new CTable(SPACE, 'formElementTable');
 $customGroupTable->setAttribute('id', 'tbl_group_prototypes');
 
 // add existing group prototypes
-if (!$data['new_group_prototypes']) {
-	$data['new_group_prototypes'] = array(array(
-		'name' => ''
+if (!$hostPrototype['groupPrototypes']) {
+	$hostPrototype['groupPrototypes'] = array(array(
+		'name' => '',
+		'group_prototypeid' => ''
 	));
 }
-foreach ($data['new_group_prototypes'] as $i => $groupPrototype) {
-	if (isset($groupPrototype['group_prototypeid'])) {
-		$customGroupTable->addItem(new CVar('new_group_prototypes['.$i.'][group_prototypeid]', $groupPrototype['group_prototypeid']));
-	}
+foreach ($hostPrototype['groupPrototypes'] as $i => $groupPrototype) {
 	zbx_add_post_js('addGroupPrototypeRow('.CJs::encodeJson(array(
-		'name' => $groupPrototype['name']
+		'name' => $groupPrototype['name'],
+		'group_prototypeid' => $groupPrototype['group_prototypeid']
 	)).')');
 }
 
