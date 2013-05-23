@@ -339,7 +339,7 @@ static void	get_trigger_values(zbx_uint64_t triggerid, int maintenance_from, int
 			maintenance_to,
 			TRIGGER_VALUE_FALSE, TRIGGER_VALUE_TRUE);
 
-	result = DBselectN(sql, 1);
+	result = DBselectN(1, "%s", sql);
 
 	if (NULL != (row = DBfetch(result)))
 	{
@@ -377,7 +377,7 @@ static void	get_trigger_values(zbx_uint64_t triggerid, int maintenance_from, int
 			maintenance_from,
 			TRIGGER_VALUE_FALSE, TRIGGER_VALUE_TRUE);
 
-	result = DBselectN(sql, 1);
+	result = DBselectN(1, "%s", sql);
 
 	if (NULL != (row = DBfetch(result)))
 		*value_before = atoi(row[0]);

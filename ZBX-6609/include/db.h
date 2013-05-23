@@ -458,14 +458,16 @@ int	__zbx_DBexecute(const char *fmt, ...);
 #ifdef HAVE___VA_ARGS__
 #	define DBselect_once(fmt, ...)	__zbx_DBselect_once(ZBX_CONST_STRING(fmt), ##__VA_ARGS__)
 #	define DBselect(fmt, ...)	__zbx_DBselect(ZBX_CONST_STRING(fmt), ##__VA_ARGS__)
+#	define DBselectN(n, fmt, ...)	__zbx_DBselectN(n, ZBX_CONST_STRING(fmt), ##__VA_ARGS__)
 #else
 #	define DBselect_once	__zbx_DBselect_once
 #	define DBselect		__zbx_DBselect
+#	define DBselectN	__zbx_DBselectN
 #endif
 DB_RESULT	__zbx_DBselect_once(const char *fmt, ...);
 DB_RESULT	__zbx_DBselect(const char *fmt, ...);
+DB_RESULT	__zbx_DBselectN(int n, const char *fmt, ...);
 
-DB_RESULT	DBselectN(const char *query, int n);
 DB_ROW		DBfetch(DB_RESULT result);
 int		DBis_null(const char *field);
 void		DBbegin();

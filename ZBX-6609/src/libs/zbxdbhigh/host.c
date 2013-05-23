@@ -76,7 +76,7 @@ static int	validate_linked_templates(zbx_vector_uint64_t *templateids, char *err
 				" group by name"
 				" having count(*)>1");
 
-		result = DBselectN(sql, 1);
+		result = DBselectN(1, "%s", sql);
 
 		if (NULL != (row = DBfetch(result)))
 		{
@@ -101,7 +101,7 @@ static int	validate_linked_templates(zbx_vector_uint64_t *templateids, char *err
 				" group by key_"
 				" having count(*)>1");
 
-		result = DBselectN(sql, 1);
+		result = DBselectN(1, "%s", sql);
 
 		if (NULL != (row = DBfetch(result)))
 		{
@@ -133,7 +133,7 @@ static int	validate_linked_templates(zbx_vector_uint64_t *templateids, char *err
 		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "i2.hostid",
 				templateids->values, templateids->values_num);
 
-		result = DBselectN(sql, 1);
+		result = DBselectN(1, "%s", sql);
 
 		if (NULL != (row = DBfetch(result)))
 		{
@@ -170,7 +170,7 @@ static int	validate_linked_templates(zbx_vector_uint64_t *templateids, char *err
 				templateids->values, templateids->values_num);
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " and h2.status=%d", HOST_STATUS_TEMPLATE);
 
-		result = DBselectN(sql, 1);
+		result = DBselectN(1, "%s", sql);
 
 		if (NULL != (row = DBfetch(result)))
 		{
@@ -352,7 +352,7 @@ static int	validate_inventory_links(zbx_uint64_t hostid, zbx_vector_uint64_t *te
 			" group by inventory_link"
 			" having count(*)>1");
 
-	result = DBselectN(sql, 1);
+	result = DBselectN(1, "%s", sql);
 
 	if (NULL != (row = DBfetch(result)))
 	{
@@ -387,7 +387,7 @@ static int	validate_inventory_links(zbx_uint64_t hostid, zbx_vector_uint64_t *te
 						" and items.key_=i.key_"
 					")");
 
-	result = DBselectN(sql, 1);
+	result = DBselectN(1, "%s", sql);
 
 	if (NULL != (row = DBfetch(result)))
 	{
@@ -622,7 +622,7 @@ static int	validate_host(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids,
 		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "t.hostid",
 				templateids->values, templateids->values_num);
 
-		tresult = DBselectN(sql, 1);
+		tresult = DBselectN(1, "%s", sql);
 
 		if (NULL != (trow = DBfetch(tresult)))
 		{
@@ -778,7 +778,7 @@ static int	DBget_service_status(zbx_uint64_t serviceid, int algorithm, zbx_uint6
 						serviceid,
 						sort_order);
 
-		result = DBselectN(sql, 1);
+		result = DBselectN(1, "%s", sql);
 		row = DBfetch(result);
 		if (NULL != row && SUCCEED != DBis_null(row[0]))
 		{
@@ -811,7 +811,7 @@ static int	latest_service_alarm(zbx_uint64_t serviceid, int status)
 					" where serviceid=" ZBX_FS_UI64
 					" order by servicealarmid desc", serviceid);
 
-	result = DBselectN(sql, 1);
+	result = DBselectN(1, "%s", sql);
 	row = DBfetch(result);
 
 	if (NULL != row && FAIL == DBis_null(row[1]) && status == atoi(row[1]))

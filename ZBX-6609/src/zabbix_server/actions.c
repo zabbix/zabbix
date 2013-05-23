@@ -1246,7 +1246,21 @@ void	process_actions(DB_EVENT *event)
 				execute_operations(event, actionid);
 		}
 		else if (EVENT_SOURCE_TRIGGERS == event->source)
-			DBstop_escalation(actionid, event->objectid, event->eventid);
+		{
+			/* stop escalation only if it was started before */
+			DB_RESULT	result2;
+
+			result2 = DBselectN(1, "select null"
+					" from escalations"
+					" where actionid=" ZBX_FS_UI64
+						" and eventid is not null",
+					actionid);
+
+			if (NULL != DBfetch(result2))
+				DBstop_escalation(actionid, event->objectid, event->eventid);
+
+			DBfree_result(result2);
+		}
 	}
 	DBfree_result(result);
 
