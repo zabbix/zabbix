@@ -530,7 +530,7 @@ static void	DBlld_item_make(zbx_vector_ptr_t *items, const char *name_proto, con
 
 	char		*buffer = NULL;
 	int		i;
-	zbx_lld_item_t	*item;
+	zbx_lld_item_t	*item = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
