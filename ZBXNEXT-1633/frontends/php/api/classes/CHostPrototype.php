@@ -469,13 +469,15 @@ class CHostPrototype extends CHostBase {
 		$this->validateUpdate($hostPrototypes);
 
 		// merge group links into group prototypes
-		foreach ($hostPrototypes as &$hostPrototype) {
-			foreach ($hostPrototype['groupLinks'] as $group) {
-				$hostPrototype['groupPrototypes'][] = $group;
+		if (isset($hostPrototype['groupLinks'])) {
+			foreach ($hostPrototypes as &$hostPrototype) {
+				foreach ($hostPrototype['groupLinks'] as $group) {
+					$hostPrototype['groupPrototypes'][] = $group;
+				}
+				unset($hostPrototype['groupLinks']);
 			}
-			unset($hostPrototype['groupLinks']);
+			unset($hostPrototype);
 		}
-		unset($hostPrototype);
 
 		$hostPrototypes = $this->updateReal($hostPrototypes);
 

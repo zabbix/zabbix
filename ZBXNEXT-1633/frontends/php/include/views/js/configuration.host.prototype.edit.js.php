@@ -32,5 +32,20 @@
 		jQuery('#tbl_group_prototypes').on('click', 'input.group-prototype-remove', function() {
 			jQuery(this).closest('.form_row').remove();
 		});
+
+
+		<?php if (!$hostPrototype['groupPrototypes']): ?>
+			addGroupPrototypeRow({'name': '', 'group_prototypeid': ''});
+		<?php endif ?>
+		<?php foreach ($hostPrototype['groupPrototypes'] as $i => $groupPrototype): ?>
+			addGroupPrototypeRow(<?php echo CJs::encodeJson(array(
+				'name' => $groupPrototype['name'],
+				'group_prototypeid' => isset($groupPrototype['group_prototypeid']) ? $groupPrototype['group_prototypeid'] : null
+			)) ?>);
+		<?php endforeach ?>
+
+		<?php if ($hostPrototype['templateid']): ?>
+			jQuery("#tbl_group_prototypes").find('input').prop("disabled", "disabled");
+		<?php endif ?>
 	});
 </script>

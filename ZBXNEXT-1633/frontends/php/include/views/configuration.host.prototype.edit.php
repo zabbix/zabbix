@@ -189,25 +189,8 @@ $groupList->addRow(_('Groups'), new CMultiSelect(array(
 $customGroupTable = new CTable(SPACE, 'formElementTable');
 $customGroupTable->setAttribute('id', 'tbl_group_prototypes');
 
-// add existing group prototypes
-if (!$hostPrototype['groupPrototypes']) {
-	$hostPrototype['groupPrototypes'] = array(array(
-		'name' => '',
-		'group_prototypeid' => ''
-	));
-}
-foreach ($hostPrototype['groupPrototypes'] as $i => $groupPrototype) {
-	zbx_add_post_js('addGroupPrototypeRow('.CJs::encodeJson(array(
-		'name' => $groupPrototype['name'],
-		'group_prototypeid' => isset($groupPrototype['group_prototypeid']) ? $groupPrototype['group_prototypeid'] : null
-	)).')');
-}
-
 // buttons
 $addButton = new CButton('group_prototype_add', _('Add'), null, 'link_menu');
-if ($hostPrototype['templateid']) {
-	$addButton->setAttribute('disabled', true);
-}
 $buttonColumn = new CCol($addButton);
 $buttonColumn->setAttribute('colspan', 5);
 
