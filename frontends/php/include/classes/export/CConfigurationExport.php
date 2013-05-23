@@ -558,6 +558,7 @@ class CConfigurationExport {
 		$hostPrototypes = API::HostPrototype()->get(array(
 			'discoveryids' => zbx_objectValues($items, 'itemid'),
 			'output' => API_OUTPUT_EXTEND,
+			'selectGroupLinks' => API_OUTPUT_EXTEND,
 			'selectGroupPrototypes' => API_OUTPUT_EXTEND,
 			'selectDiscoveryRule' => API_OUTPUT_EXTEND,
 			'selectTemplates' => API_OUTPUT_EXTEND,
@@ -568,10 +569,8 @@ class CConfigurationExport {
 		// replace group prototype group IDs with references
 		$groupIds = array();
 		foreach ($hostPrototypes as $hostPrototype) {
-			foreach ($hostPrototype['groupPrototypes'] as $groupPrototype) {
-				if ($groupPrototype['groupid']) {
-					$groupIds[$groupPrototype['groupid']] = $groupPrototype['groupid'];
-				}
+			foreach ($hostPrototype['groupLinks'] as $groupLink) {
+				$groupIds[$groupLink['groupid']] = $groupLink['groupid'];
 			}
 		}
 		$groups = $this->getGroupsReferences($groupIds);
@@ -580,12 +579,10 @@ class CConfigurationExport {
 		$this->data['groups'] += $groups;
 
 		foreach ($hostPrototypes as $hostPrototype) {
-			foreach ($hostPrototype['groupPrototypes'] as &$groupPrototype) {
-				if ($groupPrototype['groupid']) {
-					$groupPrototype['groupid'] = $groups[$groupPrototype['groupid']];
-				}
+			foreach ($hostPrototype['groupLinks'] as &$groupLink) {
+				$groupLink['groupid'] = $groups[$groupLink['groupid']];
 			}
-			unset($groupPrototype);
+			unset($groupLink);
 			$items[$hostPrototype['discoveryRule']['itemid']]['hostPrototypes'][] = $hostPrototype;
 		}
 
