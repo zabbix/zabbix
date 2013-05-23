@@ -84,7 +84,7 @@ if ($config['dropdown_first_remember']) {
 		$_REQUEST['filter_timesince'] = get_request('filter_timesince', CProfile::get('web.avail_report.'.$availabilityReportMode.'.timesince', 0));
 		$_REQUEST['filter_timetill'] = get_request('filter_timetill', CProfile::get('web.avail_report.'.$availabilityReportMode.'.timetill', 0));
 	}
-	CProfile::update('web.avail_report.'.$availabilityReportMode.'.groupid', $_REQUEST['filter_groupid'], PROFILE_TYPE_INT);
+	CProfile::update('web.avail_report.'.$availabilityReportMode.'.groupid', $_REQUEST['filter_groupid'], PROFILE_TYPE_ID);
 	CProfile::update('web.avail_report.'.$availabilityReportMode.'.timesince', $_REQUEST['filter_timesince'], PROFILE_TYPE_STR);
 	CProfile::update('web.avail_report.'.$availabilityReportMode.'.timetill', $_REQUEST['filter_timetill'], PROFILE_TYPE_STR);
 }
@@ -95,7 +95,7 @@ elseif (!isset($_REQUEST['filter_rst'])) {
 	$_REQUEST['filter_timetill'] = get_request('filter_timetill', 0);
 }
 
-CProfile::update('web.avail_report.'.$availabilityReportMode.'.hostid', $_REQUEST['filter_hostid'], PROFILE_TYPE_INT);
+CProfile::update('web.avail_report.'.$availabilityReportMode.'.hostid', $_REQUEST['filter_hostid'], PROFILE_TYPE_ID);
 
 if (($_REQUEST['filter_timetill'] > 0) && ($_REQUEST['filter_timesince'] > $_REQUEST['filter_timetill'])) {
 	$tmp = $_REQUEST['filter_timesince'];

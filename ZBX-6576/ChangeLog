@@ -3,10 +3,13 @@ Changes for 2.0.7rc1
 New features:
 A......... [ZBX-6407] improved data retrieval performance for CTrigger get() with post SQL filtering (Toms)
 ........S. [ZBX-6493] improved performance when working with Oracle by changing memory based prefetch to rows based (dimir)
-A.F....... [ZBX-1357] updated Spanish and Turkish translations; thanks to Zabbix translators (Richlv)
+A.F....... [ZBX-1357] updated Chinese (China), Spanish and Turkish translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
-...G...... [ZBX-6576] fixed heavy cpu usage when collecting cpu stats on Solaris (aleksej)
+..F....... [ZBX-6558] fixed profile types in availability reports (Oleg)
+A......... [ZBX-6561] fixed undefined indexes and errors in configuration of network maps (Oleg)
+...G...... [ZBX-4636] fixed broken UFT-8 characters in log item on Windows agent when encoding parameter is not set (aleksej)
+...G...... [ZBX-6584] fixed possible logrt crash on windows platform when logfile was moved during processing (wiper)
 ..F....... [ZBX-1129] fixed graph time period in bar reports (Oleg)
 ....I..... [ZBX-6490] fixed web test 1.8->2.0 upgrade script ignoring nodes (wiper)
 .......PS. [ZBX-6526] fixed possible data uploading issues duing server startup or network problems (wiper)
@@ -1312,6 +1315,8 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.17rc1
 
+A......... [ZBX-6582] fixed that {$ITEM.VALUE} and {$ITEM.LASTVALUE} macro was not truncated in Monitoring > Triggers (Toms)
+...G...... [ZBX-6584] fixed possible logrt crash on windows platform when logfile was moved during processing (wiper)
 ..F....... [ZBX-1129] fixed graph time period in bar reports (Oleg)
 ..F....... [ZBX-6484] fixed bar report calculation (Oleg)
 ..F....... [ZBX-1236] added right side y axis support in bar reports (Oleg)
