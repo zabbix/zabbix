@@ -108,6 +108,7 @@ class CHostPrototype extends CHostBase {
 	protected function validateCreate(array $hostPrototypes) {
 		// validators
 		$hostPrototypeValidator = $this->getHostPrototypValidator();
+		$groupLinkValidator = $this->getGroupLinkValidator();
 		$groupPrototypeValidator = $this->getGroupPrototypeValidator();
 
 		$groupPrototypeGroupIds = array();
@@ -116,16 +117,18 @@ class CHostPrototype extends CHostBase {
 			$hostPrototypeValidator->setObjectName(isset($hostPrototype['host']) ? $hostPrototype['host'] : '');
 			$this->checkValidator($hostPrototype, $hostPrototypeValidator);
 
+			// groups
+			foreach ($hostPrototype['groupLinks'] as $groupPrototype) {
+				$this->checkValidator($groupPrototype, $groupLinkValidator);
+
+				$groupPrototypeGroupIds[$groupPrototype['groupid']] = $groupPrototype['groupid'];
+			}
+
 			// group prototypes
 			if (isset($hostPrototype['groupPrototypes'])) {
 				foreach ($hostPrototype['groupPrototypes'] as $groupPrototype) {
 					$groupPrototypeValidator->setObjectName(isset($groupPrototype['name']) ? $groupPrototype['name'] : '');
 					$this->checkValidator($groupPrototype, $groupPrototypeValidator);
-
-					// save affected host group IDs
-					if (isset($groupPrototype['groupid'])) {
-						$groupPrototypeGroupIds[$groupPrototype['groupid']] = $groupPrototype['groupid'];
-					}
 				}
 			}
 		}
@@ -410,8 +413,10 @@ class CHostPrototype extends CHostBase {
 
 			// groups
 			if (isset($hostPrototype['groupLinks'])) {
-				foreach ($hostPrototype['groupLinks'] as $group) {
-					$this->checkValidator($group, $groupLinkValidator);
+				foreach ($hostPrototype['groupLinks'] as $groupPrototype) {
+					$this->checkValidator($groupPrototype, $groupLinkValidator);
+
+					$groupPrototypeGroupIds[$groupPrototype['groupid']] = $groupPrototype['groupid'];
 				}
 			}
 
@@ -420,11 +425,6 @@ class CHostPrototype extends CHostBase {
 				foreach ($hostPrototype['groupPrototypes'] as $groupPrototype) {
 					$groupPrototypeValidator->setObjectName(isset($groupPrototype['name']) ? $groupPrototype['name'] : '');
 					$this->checkValidator($groupPrototype, $groupPrototypeValidator);
-
-					// save affected host group IDs
-					if (isset($groupPrototype['groupid'])) {
-						$groupPrototypeGroupIds[$groupPrototype['groupid']] = $groupPrototype['groupid'];
-					}
 				}
 			}
 		}
