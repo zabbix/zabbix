@@ -1253,8 +1253,9 @@ void	process_actions(DB_EVENT *event)
 			result2 = DBselectN(1, "select null"
 					" from escalations"
 					" where actionid=" ZBX_FS_UI64
+					" and triggerid=" ZBX_FS_UI64
 						" and eventid is not null",
-					actionid);
+					actionid, event->objectid);
 
 			if (NULL != DBfetch(result2))
 				DBstop_escalation(actionid, event->objectid, event->eventid);
