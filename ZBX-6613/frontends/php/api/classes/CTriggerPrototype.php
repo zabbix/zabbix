@@ -498,7 +498,8 @@ class CTriggerPrototype extends CTriggerGeneral {
 
 			// check for "templateid", because it is not allowed
 			if (isset($trigger['templateid'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot set "templateid" for trigger prototype "%1$s".', $trigger['description']));
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Cannot set "templateid" for trigger prototype "%1$s".', $trigger['description']));
 			}
 
 			$expressionData = new CTriggerExpression();
@@ -521,7 +522,8 @@ class CTriggerPrototype extends CTriggerGeneral {
 
 			if (!$hasPrototype) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Trigger prototype expression "%1$s" must contain at least one item prototype.', $trigger['expression']));
+					_s('Trigger prototype expression "%1$s" must contain at least one item prototype.',
+						$trigger['expression']));
 			}
 		}
 
@@ -548,14 +550,14 @@ class CTriggerPrototype extends CTriggerGeneral {
 	 *
 	 * @param array $triggers
 	 *
-	 * @return boolean
+	 * @return array
 	 */
 	public function update(array $triggers) {
 		$triggers = zbx_toArray($triggers);
-		$triggerids = zbx_objectValues($triggers, 'triggerid');
+		$triggerIds = zbx_objectValues($triggers, 'triggerid');
 
 		$dbTriggers = $this->get(array(
-			'triggerids' => $triggerids,
+			'triggerids' => $triggerIds,
 			'editable' => true,
 			'output' => API_OUTPUT_EXTEND,
 			'preservekeys' => true
@@ -563,18 +565,19 @@ class CTriggerPrototype extends CTriggerGeneral {
 
 		$triggers = $this->extendObjects($this->tableName(), $triggers, array('description'));
 
-		foreach ($triggers as $tnum => $trigger) {
+		foreach ($triggers as $key => $trigger) {
 			if (!isset($dbTriggers[$trigger['triggerid']])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
 			}
 
 			if (!isset($trigger['triggerid'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Wrong fields for trigger.'));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Wrong fields for trigger.'));
 			}
 
 			// check for "templateid", because it is not allowed
 			if (array_key_exists('templateid', $trigger)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot update "templateid" for trigger prototype "%1$s".', $trigger['description']));
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Cannot update "templateid" for trigger prototype "%1$s".', $trigger['description']));
 			}
 
 			$dbTrigger = $dbTriggers[$trigger['triggerid']];
@@ -582,60 +585,57 @@ class CTriggerPrototype extends CTriggerGeneral {
 			if (isset($trigger['expression'])) {
 				$expressionFull = explode_exp($dbTrigger['expression']);
 				if (strcmp($trigger['expression'], $expressionFull) == 0) {
-					unset($triggers[$tnum]['expression']);
+					unset($triggers[$key]['expression']);
 				}
 			}
 
 			if (isset($trigger['description']) && strcmp($trigger['description'], $dbTrigger['comments']) == 0) {
-				unset($triggers[$tnum]['description']);
+				unset($triggers[$key]['description']);
 			}
 			if (isset($trigger['priority']) && $trigger['priority'] == $dbTrigger['priority']) {
-				unset($triggers[$tnum]['priority']);
+				unset($triggers[$key]['priority']);
 			}
 			if (isset($trigger['type']) && $trigger['type'] == $dbTrigger['type']) {
-				unset($triggers[$tnum]['type']);
+				unset($triggers[$key]['type']);
 			}
 			if (isset($trigger['comments']) && strcmp($trigger['comments'], $dbTrigger['comments']) == 0) {
-				unset($triggers[$tnum]['comments']);
+				unset($triggers[$key]['comments']);
 			}
 			if (isset($trigger['url']) && strcmp($trigger['url'], $dbTrigger['url']) == 0) {
-				unset($triggers[$tnum]['url']);
+				unset($triggers[$key]['url']);
 			}
 			if (isset($trigger['status']) && $trigger['status'] == $dbTrigger['status']) {
-				unset($triggers[$tnum]['status']);
+				unset($triggers[$key]['status']);
 			}
 
 			$this->checkIfExistsOnHost($trigger);
-		}
 
-		$this->updateReal($triggers);
+			// check item prototypes
+			$items = getExpressionItems($trigger['expression']);
 
-		$updatedTriggers = $this->get(array(
-			'triggerids' => zbx_objectValues($triggers, 'triggerid'),
-			'output' => API_OUTPUT_REFER,
-			'selectItems' => API_OUTPUT_EXTEND
-		));
-		foreach ($updatedTriggers as $updatedTrigger) {
 			$hasPrototype = false;
-
-			foreach ($updatedTrigger['items'] as $titem) {
-				if ($titem['flags'] == ZBX_FLAG_DISCOVERY_CHILD) {
+			foreach ($items as $item) {
+				if ($item['flags'] == ZBX_FLAG_DISCOVERY_CHILD) {
 					$hasPrototype = true;
 					break;
 				}
 			}
+
 			if (!$hasPrototype) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Trigger "%1$s" does not have item prototype.', $trigger['description']));
+					_s('Trigger prototype expression "%1$s" must contain at least one item prototype.',
+						$trigger['expression']));
 			}
 		}
+
+		$this->updateReal($triggers);
 
 		foreach ($triggers as $trigger) {
 			$trigger['flags'] = ZBX_FLAG_DISCOVERY_CHILD;
 			$this->inherit($trigger);
 		}
 
-		return array('triggerids' => $triggerids);
+		return array('triggerids' => $triggerIds);
 	}
 
 	/**
@@ -647,11 +647,12 @@ class CTriggerPrototype extends CTriggerGeneral {
 	 * @return array
 	 */
 	public function delete($triggerIds, $nopermissions = false) {
-		$triggerIds = zbx_toArray($triggerIds);
-		$triggerPrototypeIds = $triggerIds;
 		if (empty($triggerIds)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 		}
+
+		$triggerIds = zbx_toArray($triggerIds);
+		$triggerPrototypeIds = $triggerIds;
 
 		$delTriggers = $this->get(array(
 			'triggerids' => $triggerIds,
@@ -659,6 +660,7 @@ class CTriggerPrototype extends CTriggerGeneral {
 			'editable' => true,
 			'preservekeys' => true
 		));
+
 		// TODO: remove $nopermissions hack
 		if (!$nopermissions) {
 			foreach ($triggerIds as $triggerId) {
@@ -796,7 +798,7 @@ class CTriggerPrototype extends CTriggerGeneral {
 
 				if (!isset($expressionData->expressions[0])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
-							_('Trigger expression must contain at least one host:key reference.'));
+						_('Trigger expression must contain at least one host:key reference.'));
 				}
 			}
 
@@ -808,7 +810,7 @@ class CTriggerPrototype extends CTriggerGeneral {
 				}
 				catch (Exception $e) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
-							_s('Cannot implode expression "%s".', $expressionFull).' '.$e->getMessage());
+						_s('Cannot implode expression "%s".', $expressionFull).' '.$e->getMessage());
 				}
 			}
 

@@ -17,8 +17,8 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
+
 /**
  * Class containing common methods for operations with triggers.
  */
@@ -156,7 +156,7 @@ abstract class CTriggerGeneral extends CZBXAPI {
 		$childTriggers = $this->get(array(
 			'filter' => array('templateid' => $newTrigger['templateid']),
 			'output' => API_OUTPUT_EXTEND,
-			'preservekeys' => 1,
+			'preservekeys' => true,
 			'hostids' => $chdHost['hostid']
 		));
 
@@ -173,8 +173,8 @@ abstract class CTriggerGeneral extends CZBXAPI {
 					'flags' => null
 				),
 				'output' => API_OUTPUT_EXTEND,
-				'preservekeys' => 1,
-				'nopermissions' => 1,
+				'preservekeys' => true,
+				'nopermissions' => true,
 				'hostids' => $chdHost['hostid']
 			));
 
@@ -281,7 +281,8 @@ abstract class CTriggerGeneral extends CZBXAPI {
 				$host = API::Host()->get($options);
 				$host = reset($host);
 
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Trigger "%1$s" already exists on "%2$s".', $trigger['description'], $host['name']));
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Trigger "%1$s" already exists on "%2$s".', $trigger['description'], $host['name']));
 			}
 		}
 	}
@@ -356,6 +357,4 @@ abstract class CTriggerGeneral extends CZBXAPI {
 
 		return $result;
 	}
-
-
 }

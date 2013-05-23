@@ -1002,7 +1002,6 @@ function getExpressionItems($expression) {
 	$items = array();
 	$processedFunctions = array();
 	$processedItems = array();
-	$triggerFunctionValidator = new CTriggerFunctionValidator();
 
 	foreach ($expressionData->expressions as $expression) {
 		if (isset($processedFunctions[$expression['expression']])) {
@@ -1014,7 +1013,9 @@ function getExpressionItems($expression) {
 				'SELECT i.itemid,i.flags'.
 				' FROM items i,hosts h'.
 				' WHERE i.key_='.zbx_dbstr($expression['item']).
-					' AND '.dbConditionInt('i.flags', array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED, ZBX_FLAG_DISCOVERY_CHILD)).
+					' AND '.dbConditionInt('i.flags', array(
+						ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED, ZBX_FLAG_DISCOVERY_CHILD
+					)).
 					' AND h.host='.zbx_dbstr($expression['host']).
 					' AND h.hostid=i.hostid'.
 					andDbNode('i.itemid')
@@ -1025,7 +1026,7 @@ function getExpressionItems($expression) {
 			}
 			else {
 				throw new Exception(_s('Incorrect item key "%1$s" provided for trigger expression on "%2$s".',
-						$expression['item'], $expression['host']));
+					$expression['item'], $expression['host']));
 			}
 		}
 
