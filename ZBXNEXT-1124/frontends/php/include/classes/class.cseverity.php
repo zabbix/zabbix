@@ -31,10 +31,13 @@ class CSeverity extends CTag {
 		$this->addClass('jqueryinputset control-severity');
 
 		if (!isset($options['value'])) {
-			$options['value'] = null;
+			$options['value'] = TRIGGER_SEVERITY_NOT_CLASSIFIED;
 		}
 
 		$controls = array();
+
+		$jsIds = '';
+		$jsLabels = '';
 
 		foreach (getSeverityCaption() as $severity => $caption) {
 			$controls[] = new CRadioButton($options['name'], $severity, null, $options['name'].'_'.$severity, ($options['value'] == $severity));
@@ -43,13 +46,20 @@ class CSeverity extends CTag {
 			$label->attr('data-severity', $severity);
 			$label->attr('data-severity-style', getSeverityStyle($severity));
 			$controls[] = $label;
+
+			$jsIds .= ', #'.$options['name'].'_'.$severity;
+			$jsLabels .= ', #'.$options['name'].'_label_'.$severity;
+		}
+
+		if ($jsIds) {
+			$jsIds = substr($jsIds, 2);
+			$jsLabels = substr($jsLabels, 2);
 		}
 
 		$this->addItem($controls);
 
 		insert_js('
-			jQuery("#'.$options['name'].'_0, #'.$options['name'].'_1, #'.$options['name'].'_2, #'.$options['name'].'_3," +
-					"#'.$options['name'].'_4, #'.$options['name'].'_5").change(function() {
+			jQuery("'.$jsIds.'").change(function() {
 				jQuery("#'.$this->getAttribute('id').' label").each(function(i, obj) {
 					obj = jQuery(obj);
 					obj.removeClass(obj.data("severityStyle"));
@@ -59,15 +69,12 @@ class CSeverity extends CTag {
 				label.addClass(label.data("severityStyle"));
 			});
 
-			jQuery("#'.$options['name'].'_label_0, #'.$options['name'].'_label_1, #'.$options['name'].'_label_2," +
-					"#'.$options['name'].'_label_3, #'.$options['name'].'_label_4, #'.$options['name'].'_label_5").mouseenter(function() {
+			jQuery("'.$jsLabels.'").mouseenter(function() {
 				var obj = jQuery(this);
 
 				obj.addClass(obj.data("severityStyle"));
-			});
-
-			jQuery("#'.$options['name'].'_label_0, #'.$options['name'].'_label_1, #'.$options['name'].'_label_2," +
-					"#'.$options['name'].'_label_3, #'.$options['name'].'_label_4, #'.$options['name'].'_label_5").mouseleave(function() {
+			})
+			.mouseleave(function() {
 				var obj = jQuery(this);
 
 				if (!jQuery("#" + obj.attr("for")).prop("checked")) {
