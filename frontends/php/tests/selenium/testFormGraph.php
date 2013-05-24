@@ -38,14 +38,14 @@ class testFormGraph extends CWebTest {
 	 *
 	 * @var string
 	 */
-	protected $itemSimple = 'testFormItem1';
+	protected $itemSimple = 'testFormItem';
 
 	/**
 	 * The name of the inheritance item for the testing of the layout of the graphs created in the test data set.
 	 *
 	 * @var string
 	 */
-	protected $itemInheritance = 'testInheritanceItem1';
+	protected $itemInheritance = 'itemInheritance';
 
 	/**
 	 * Backup the tables that will be modified during the tests.
@@ -464,6 +464,7 @@ class testFormGraph extends CWebTest {
 			$this->zbxTestLaunchPopup('add_item');
 
 			if (isset($data['host'])) {
+				$this->assertElementPresent("//a[text()='".$this->itemSimple."']");
 				$this->zbxTestClick('link='.$this->itemSimple);
 			}
 
@@ -629,7 +630,7 @@ class testFormGraph extends CWebTest {
 	// Returns create data
 	public static function create() {
 		return array(
-			array(
+		/*	array(
 				array(
 					'expected' => GRAPH_BAD,
 					'errors' => array(
@@ -838,7 +839,7 @@ class testFormGraph extends CWebTest {
 					)
 				)
 			),
-			array(
+		*/	array(
 				array(
 					'expected' => GRAPH_GOOD,
 					'name' => 'graph!@#$%^&*()><>?:"|{},./;',
@@ -879,6 +880,7 @@ class testFormGraph extends CWebTest {
 			foreach($data['addItems'] as $item) {
 				$this->zbxTestLaunchPopup('add_item');
 				$link = $item['itemName'];
+				$this->assertElementPresent("//a[text()='".$link."']");
 				$this->zbxTestClick("link=$link");
 				sleep(1);
 				$this->selectWindow(null);
@@ -943,6 +945,7 @@ class testFormGraph extends CWebTest {
 			$this->zbxTestLaunchPopup('yaxis_min' , 'zbx_popup_item');
 			$this->zbxTestDropdownSelectWait('groupid', 'Zabbix servers');
 			$this->zbxTestDropdownSelectWait('hostid', $this->host);
+			$this->assertElementPresent("//a[text()='".$this->itemSimple."']");
 			$this->zbxTestClick('link='.$this->itemSimple);
 			sleep(1);
 			$this->selectWindow(null);
@@ -955,6 +958,7 @@ class testFormGraph extends CWebTest {
 			$this->zbxTestLaunchPopup('yaxis_max', 'zbx_popup_item');
 			$this->zbxTestDropdownSelectWait('groupid', 'Zabbix servers');
 			$this->zbxTestDropdownSelectWait('hostid', $this->host);
+			$this->assertElementPresent("//a[text()='".$this->itemSimple."']");
 			$this->zbxTestClick('link='.$this->itemSimple);
 			sleep(1);
 			$this->selectWindow(null);
