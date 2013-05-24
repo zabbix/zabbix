@@ -93,21 +93,23 @@ static int	httpmacro_append_pair(zbx_httptest_t *httptest, const char *pkey, siz
 		if (NULL != err_str && NULL == *err_str)
 		{
 			size_t	size = 0, offset = 0;
-			zbx_strcpy_alloc(err_str, &size, &offset, "a variable defined without a name or value");
+			zbx_strcpy_alloc(err_str, &size, &offset, "variables must be defined as \"{NAME}=VALUE\"");
 		}
 
 		if (0 == nkey && 0 != nvalue)
 		{
 			buf = zbx_strdup(buf, pvalue);
 			buf[nvalue] = '\0';
-			zabbix_log(LOG_LEVEL_ERR, "missing variable name (only value provided): \"%s\"", buf);
+			zabbix_log(LOG_LEVEL_DEBUG, "%s() missing variable name (only value provided): \"%s\"",
+					__function_name, buf);
 			zbx_free(buf);
 		}
 		else if (0 == nvalue && 0 != nkey)
 		{
 			buf = zbx_strdup(buf, pkey);
 			buf[nkey] = '\0';
-			zabbix_log(LOG_LEVEL_ERR, "missing variable value (only name provided): \"%s\"", buf);
+			zabbix_log(LOG_LEVEL_DEBUG, "%s() missing variable value (only name provided): \"%s\"",
+					__function_name, buf);
 			zbx_free(buf);
 		}
 
@@ -116,15 +118,14 @@ static int	httpmacro_append_pair(zbx_httptest_t *httptest, const char *pkey, siz
 
 	if ('{' != pkey[0] || '}' != pkey[nkey - 1])
 	{
+		buf = zbx_strdup(buf, pkey);
+		buf[nkey] = '\0';
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() \"%s\" not enclosed in {}", __function_name, buf);
 		if (NULL != err_str && NULL == *err_str)
 		{
 			size_t	size = 0, offset = 0;
-			zbx_strcpy_alloc(err_str, &size, &offset, "invalid variable name specified");
+			zbx_snprintf_alloc(err_str, &size, &offset, "\"%s\" not enclosed in {}", buf);
 		}
-
-		buf = zbx_strdup(buf, pkey);
-		buf[nkey] = '\0';
-		zabbix_log(LOG_LEVEL_ERR, "invalid variable name specified: \"%s\"", buf);
 		zbx_free(buf);
 
 		goto out;
@@ -153,15 +154,16 @@ static int	httpmacro_append_pair(zbx_httptest_t *httptest, const char *pkey, siz
 
 		if (NULL == pair.second)
 		{
+			buf = zbx_strdup(buf, pkey);
+			buf[nkey] = '\0';
+			zabbix_log(LOG_LEVEL_DEBUG, "%s() cannot extract the value of \"%s\" from response",
+					__function_name, buf);
 			if (NULL != err_str && NULL == *err_str)
 			{
 				size_t	size = 0, offset = 0;
-				zbx_strcpy_alloc(err_str, &size, &offset, "failed to extract variable from response data");
+				zbx_snprintf_alloc(err_str, &size, &offset, "cannot extract the value of \"%s\""
+						" from response", buf);
 			}
-
-			buf = zbx_strdup(buf, pkey);
-			buf[nkey] = '\0';
-			zabbix_log(LOG_LEVEL_ERR, "failed to extract variable \"%s\" from response data", buf);
 			zbx_free(buf);
 
 			goto out;

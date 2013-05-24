@@ -321,23 +321,23 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 #ifdef HAVE_LIBCURL
 	if (NULL == (easyhandle = curl_easy_init()))
 	{
-		err_str = zbx_strdup(err_str, "could not init cURL library");
-		zabbix_log(LOG_LEVEL_ERR, "web scenario \"%s\" on host [%s] error: %s", httptest->httptest.name, host->name, err_str);
+		err_str = zbx_strdup(err_str, "cannot initialize cURL library");
 		goto clean;
 	}
 
 	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_COOKIEFILE, "")) ||
-			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_PROXY, httptest->httptest.http_proxy)) ||
-			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_USERAGENT, httptest->httptest.agent)) ||
+			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_PROXY,
+			httptest->httptest.http_proxy)) ||
+			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_USERAGENT,
+			httptest->httptest.agent)) ||
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_FOLLOWLOCATION, 1L)) ||
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_WRITEFUNCTION, WRITEFUNCTION2)) ||
-			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_HEADERFUNCTION, HEADERFUNCTION2)) ||
+			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_HEADERFUNCTION,
+			HEADERFUNCTION2)) ||
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_SSL_VERIFYPEER, 0L)) ||
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_SSL_VERIFYHOST, 0L)))
 	{
 		err_str = zbx_strdup(err_str, curl_easy_strerror(err));
-		zabbix_log(LOG_LEVEL_ERR, "web scenario \"%s\" on host [%s] error: could not set cURL option [%d]: %s",
-				httptest->httptest.name, host->name, opt, err_str);
 		goto clean;
 	}
 
@@ -381,9 +381,6 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 		if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_POSTFIELDS, httpstep.posts)))
 		{
 			err_str = zbx_strdup(err_str, curl_easy_strerror(err));
-			zabbix_log(LOG_LEVEL_ERR, "web scenario \"%s:%s\" on host [%s] error:"
-					" could not set cURL option [%d]: %s",
-					httptest->httptest.name, httpstep.name, host->name, opt, err_str);
 			goto httpstep_error;
 		}
 
@@ -394,9 +391,6 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 				'\0' != *httpstep.posts ? 1L : 0L)))
 		{
 			err_str = zbx_strdup(err_str, curl_easy_strerror(err));
-			zabbix_log(LOG_LEVEL_ERR, "web scenario \"%s:%s\" on host [%s] error:"
-					" could not set cURL option [%d]: %s",
-					httptest->httptest.name, httpstep.name, host->name, opt, err_str);
 			goto httpstep_error;
 		}
 
@@ -421,15 +415,13 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 					break;
 			}
 
-			zbx_snprintf(auth, sizeof(auth), "%s:%s", httptest->httptest.http_user, httptest->httptest.http_password);
+			zbx_snprintf(auth, sizeof(auth), "%s:%s", httptest->httptest.http_user,
+					httptest->httptest.http_password);
 
 			if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_HTTPAUTH, curlauth)) ||
 					CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_USERPWD, auth)))
 			{
 				err_str = zbx_strdup(err_str, curl_easy_strerror(err));
-				zabbix_log(LOG_LEVEL_ERR, "web scenario step \"%s:%s\" on host [%s] error:"
-						" could not set cURL option [%d]: %s",
-						httptest->httptest.name, httpstep.name, host->name, opt, err_str);
 				goto httpstep_error;
 			}
 		}
@@ -437,12 +429,10 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() go to URL \"%s\"", __function_name, httpstep.url);
 
 		if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_URL, httpstep.url)) ||
-				CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_TIMEOUT, (long)httpstep.timeout)))
+				CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_TIMEOUT,
+				(long)httpstep.timeout)))
 		{
 			err_str = zbx_strdup(err_str, curl_easy_strerror(err));
-			zabbix_log(LOG_LEVEL_ERR, "web scenario step \"%s:%s\" on host [%s] error:"
-					" could not set cURL option [%d]: %s",
-					httptest->httptest.name, httpstep.name, host->name, opt, err_str);
 			goto httpstep_error;
 		}
 
@@ -458,46 +448,29 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 
 		if (CURLE_OK == err)
 		{
-			if ('\0' != *httpstep.required && NULL == zbx_regexp_match(page.data, httpstep.required, NULL))
-			{
-				zabbix_log(LOG_LEVEL_DEBUG, "%s() required pattern \"%s\" not found on %s",
-						__function_name, httpstep.required, httpstep.url);
-				err_str = zbx_strdup(err_str, "Required pattern not found");
-			}
+			char	*var_err_str = NULL;
 
+			/* first get the data that is needed even if step fails */
 			if (CURLE_OK != (err = curl_easy_getinfo(easyhandle, CURLINFO_RESPONSE_CODE, &stat.rspcode)))
 			{
-				zabbix_log(LOG_LEVEL_ERR, "web scenario step \"%s:%s\" on host [%s] error:"
-						" error getting CURLINFO_RESPONSE_CODE: %s",
-						httptest->httptest.name, httpstep.name, host->name, curl_easy_strerror(err));
-				if (NULL == err_str)
-					err_str = zbx_strdup(err_str, curl_easy_strerror(err));
+				err_str = zbx_strdup(err_str, curl_easy_strerror(err));
 			}
 			else if ('\0' != *httpstep.status_codes &&
 					FAIL == int_in_list(httpstep.status_codes, stat.rspcode))
 			{
-				zabbix_log(LOG_LEVEL_DEBUG, "%s() status code did not match [%s]",
-						__function_name, httpstep.status_codes);
-				if (NULL == err_str)
-					err_str = zbx_strdup(err_str, "Status code did not match");
+				err_str = zbx_strdup(err_str, "status code did not match");
 			}
 
-			if (CURLE_OK != (err = curl_easy_getinfo(easyhandle, CURLINFO_TOTAL_TIME, &stat.total_time)))
+			if (CURLE_OK != (err = curl_easy_getinfo(easyhandle, CURLINFO_TOTAL_TIME, &stat.total_time)) &&
+					NULL == err_str)
 			{
-				zabbix_log(LOG_LEVEL_ERR, "web scenario step \"%s:%s\" on host [%s] error:"
-						" error getting CURLINFO_TOTAL_TIME: %s",
-						httptest->httptest.name, httpstep.name, host->name, curl_easy_strerror(err));
-				if (NULL == err_str)
-					err_str = zbx_strdup(err_str, curl_easy_strerror(err));
+				err_str = zbx_strdup(err_str, curl_easy_strerror(err));
 			}
 
-			if (CURLE_OK != (err = curl_easy_getinfo(easyhandle, CURLINFO_SPEED_DOWNLOAD, &stat.speed_download)))
+			if (CURLE_OK != (err = curl_easy_getinfo(easyhandle, CURLINFO_SPEED_DOWNLOAD,
+					&stat.speed_download)) && NULL == err_str)
 			{
-				zabbix_log(LOG_LEVEL_ERR, "web scenario step \"%s:%s\" on host [%s] error:"
-						" error getting CURLINFO_SPEED_DOWNLOAD: %s",
-						httptest->httptest.name, httpstep.name, host->name, curl_easy_strerror(err));
-				if (NULL == err_str)
-					err_str = zbx_strdup(err_str, curl_easy_strerror(err));
+				err_str = zbx_strdup(err_str, curl_easy_strerror(err));
 			}
 			else
 			{
@@ -505,31 +478,43 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 				speed_download_num++;
 			}
 
-			/* process variables defined in this step */
-			if (FAIL == http_process_variables(httptest, httptest->httptest.variables, page.data, &err_str) ||
-				FAIL == http_process_variables(httptest, httpstep.variables, page.data, &err_str))
+			/* required pattern */
+			if (NULL == err_str && '\0' != *httpstep.required && NULL == zbx_regexp_match(page.data,
+					httpstep.required, NULL))
 			{
-				size_t	err_size = 0, err_offset = 0;
-
-				zabbix_log(LOG_LEVEL_ERR, "web scenario step \"%s:%s\" on host [%s] error:"
-						" error extracting variables: %s",
-						httptest->httptest.name, httpstep.name, host->name, httpstep.variables);
-
-				if (NULL == err_str)
-				{
-					zbx_snprintf_alloc(&err_str, &err_size, &err_offset,
-							"Failed to extract variables from '%s' step response",
-							httpstep.name);
-				}
+				err_str = zbx_strdup(err_str, "required pattern not found");
 			}
+
+			/* TODO: variables defined in scenario */
+			if (NULL == err_str && FAIL == http_process_variables(httptest, httptest->httptest.variables,
+					page.data, &var_err_str))
+			{
+				size_t  err_size = 0, err_offset = 0;
+				char	*variables;
+
+				variables = string_replace(httptest->httptest.variables, "\r\n", " ");
+				zbx_snprintf_alloc(&err_str, &err_size, &err_offset,
+						"error in scenario variables \"%s\": %s", variables, var_err_str);
+				zbx_free(variables);
+			}
+
+			/* variables defined in a step */
+			if (NULL == err_str && FAIL == http_process_variables(httptest, httpstep.variables, page.data,
+					&var_err_str))
+			{
+				size_t  err_size = 0, err_offset = 0;
+				char	*variables;
+
+				variables = string_replace(httptest->httptest.variables, "\r\n", " ");
+				zbx_snprintf_alloc(&err_str, &err_size, &err_offset,
+						"error in step variables \"%s\": %s", variables, var_err_str);
+				zbx_free(variables);
+			}
+
+			zbx_free(var_err_str);
 		}
 		else
-		{
 			err_str = zbx_strdup(err_str, curl_easy_strerror(err));
-			zabbix_log(LOG_LEVEL_ERR, "web scenario step \"%s:%s\" on host [%s] error:"
-					" error doing curl_easy_perform: %s",
-					httptest->httptest.name, httpstep.name, host->name, err_str);
-		}
 
 		zbx_free(page.data);
 httpstep_error:
@@ -555,23 +540,30 @@ clean:
 
 	zbx_timespec(&ts);
 
-	if (0 == lastfailedstep && NULL != err_str)
+	if (NULL != err_str)
 	{
-		/* we are here either because cURL initialization failed */
-		/* or we have been compiled without cURL library */
-
-		lastfailedstep = 1;
-
-		if (NULL != (row = DBfetch(result)))
+		if (0 == lastfailedstep)
 		{
-			ZBX_STR2UINT64(httpstep.httpstepid, row[0]);
+			/* we are here either because cURL initialization failed */
+			/* or we have been compiled without cURL library */
 
-			memset(&stat, 0, sizeof(stat));
+			lastfailedstep = 1;
 
-			process_step_data(httpstep.httpstepid, &stat, &ts);
+			if (NULL != (row = DBfetch(result)))
+			{
+				ZBX_STR2UINT64(httpstep.httpstepid, row[0]);
+				httpstep.name = row[2];
+
+				memset(&stat, 0, sizeof(stat));
+
+				process_step_data(httpstep.httpstepid, &stat, &ts);
+			}
+			else
+				THIS_SHOULD_NEVER_HAPPEN;
 		}
-		else
-			THIS_SHOULD_NEVER_HAPPEN;
+
+		zabbix_log(LOG_LEVEL_ERR, "cannot process step \"%s\" of web scenario \"%s\""
+				" on host \"%s\": %s", httpstep.name, httptest->httptest.name, host->name, err_str);
 	}
 	DBfree_result(result);
 
