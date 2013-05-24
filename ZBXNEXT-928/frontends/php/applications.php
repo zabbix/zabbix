@@ -282,7 +282,7 @@ else {
 		$parentAppIds = array();
 		foreach ($applicationSourceParentIds as $applicationParentIds) {
 			foreach ($applicationParentIds as $parentId) {
-				$parentAppIds[] = $parentId;
+				$parentAppIds[$parentId] = $parentId;
 			}
 		}
 		if ($parentAppIds) {
@@ -290,7 +290,7 @@ else {
 				'SELECT a.applicationid,h.hostid,h.name'.
 				' FROM applications a,hosts h'.
 				' WHERE a.hostid=h.hostid'.
-					' AND '.dbConditionInt('a.applicationid', array_unique($parentAppIds))
+					' AND '.dbConditionInt('a.applicationid', $parentAppIds)
 			), 'applicationid');
 
 			foreach ($data['applications'] as &$app) {
