@@ -467,15 +467,6 @@ class CApplication extends CZBXAPI {
 		$delApplications = zbx_array_merge($delApplications, $delApplicationChilds);
 		$applicationids = array_merge($applicationids, $childApplicationids);
 
-		// check if app is used by web scenario
-		$sql = 'SELECT ht.name,ht.applicationid'.
-				' FROM httptest ht'.
-				' WHERE '.dbConditionInt('ht.applicationid', $applicationids);
-		$res = DBselect($sql);
-		if ($info = DBfetch($res)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Application "%1$s" used by scenario "%2$s" and can\'t be deleted.', $delApplications[$info['applicationid']]['name'], $info['name']));
-		}
-
 		$appManager = new CApplicationManager();
 		$appManager->delete($applicationids);
 
