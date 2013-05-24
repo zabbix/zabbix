@@ -346,13 +346,17 @@ void	test_parameter(const char *key, unsigned flags)
 
 	if (ISSET_UI64(&result))
 		printf(" [u|" ZBX_FS_UI64 "]", result.ui64);
-	else if (ISSET_DBL(&result))
+
+	if (ISSET_DBL(&result))
 		printf(" [d|" ZBX_FS_DBL "]", result.dbl);
-	else if (ISSET_STR(&result))
+
+	if (ISSET_STR(&result))
 		printf(" [s|%s]", result.str);
-	else if (ISSET_TEXT(&result))
+
+	if (ISSET_TEXT(&result))
 		printf(" [t|%s]", result.text);
-	else if (ISSET_MSG(&result))
+
+	if (ISSET_MSG(&result))
 		printf(" [m|%s]", result.msg);
 
 	free_result(&result);
