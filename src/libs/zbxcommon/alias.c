@@ -22,7 +22,7 @@
 #include "sysinfo.h"
 #include "log.h"
 
-static	ALIAS	*aliasList = NULL;
+static ALIAS	*aliasList = NULL;
 
 void	test_aliases()
 {
