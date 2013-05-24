@@ -630,7 +630,7 @@ class testFormGraph extends CWebTest {
 	// Returns create data
 	public static function create() {
 		return array(
-		/*	array(
+			array(
 				array(
 					'expected' => GRAPH_BAD,
 					'errors' => array(
@@ -839,7 +839,7 @@ class testFormGraph extends CWebTest {
 					)
 				)
 			),
-		*/	array(
+			array(
 				array(
 					'expected' => GRAPH_GOOD,
 					'name' => 'graph!@#$%^&*()><>?:"|{},./;',
