@@ -317,6 +317,13 @@ class CApplicationManager {
 	 * @param array $applicationIds
 	 */
 	public function delete(array $applicationIds) {
+		// unset applications from http tests
+		DBexecute(
+			'UPDATE httptest ht'.
+			' SET ht.applicationid=NULL'.
+			' WHERE '.dbConditionInt('ht.applicationid', $applicationIds)
+		);
+
 		// remove Monitoring > Latest data toggle profile values related to given aplications
 		CProfile::delete('web.latest.toggle', $applicationIds);
 
