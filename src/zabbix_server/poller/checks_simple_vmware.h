@@ -24,9 +24,19 @@
 #if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
 #include "sysinfo.h"
 
+int	check_vcenter_hv_discovery(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	check_vcenter_hv_hw_cpu_cores(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	check_vcenter_hv_hw_cpu_freq(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	check_vcenter_hv_hw_cpu_model(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	check_vcenter_hv_hw_cpu_threads(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	check_vcenter_hv_hw_memory(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	check_vcenter_hv_hw_model(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	check_vcenter_hv_hw_uuid(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	check_vcenter_hv_hw_vendor(AGENT_REQUEST *request, AGENT_RESULT *result);
+
 int	check_vcenter_vm_cpu_num(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	check_vcenter_vm_cpu_usage(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	check_vcenter_vm_list(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	check_vcenter_vm_discovery(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	check_vcenter_vm_memory_size(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	check_vcenter_vm_memory_size_ballooned(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	check_vcenter_vm_memory_size_compressed(AGENT_REQUEST *request, AGENT_RESULT *result);
@@ -54,7 +64,7 @@ int	check_vsphere_version(AGENT_REQUEST *request, AGENT_RESULT *result);
 
 int	check_vsphere_vm_cpu_num(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	check_vsphere_vm_cpu_usage(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	check_vsphere_vm_list(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	check_vsphere_vm_discovery(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	check_vsphere_vm_memory_size(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	check_vsphere_vm_memory_size_ballooned(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	check_vsphere_vm_memory_size_compressed(AGENT_REQUEST *request, AGENT_RESULT *result);
