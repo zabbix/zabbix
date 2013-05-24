@@ -1726,11 +1726,11 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: DBdelete_application                                             *
+ * Function: DBdelete_applications                                            *
  *                                                                            *
- * Purpose: delete application                                                *
+ * Purpose: delete applications                                               *
  *                                                                            *
- * Parameters: applicationid - [IN] application identificator from database   *
+ * Parameters: applicationids - [IN] a vector of application identifiers      *
  *                                                                            *
  * Author: Eugene Grigorjev, Alexander Vladishev                              *
  *                                                                            *
@@ -1745,29 +1745,6 @@ static void	DBdelete_applications(zbx_vector_uint64_t *applicationids)
 	size_t		sql_alloc = 0, sql_offset = 0;
 	zbx_uint64_t	applicationid;
 	int		index;
-
-	if (0 == applicationids->values_num)
-		goto out;
-
-	/* don't delete applications used in web scenarious */
-	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-			"select distinct applicationid"
-			" from httptest"
-			" where");
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "applicationid", applicationids->values,
-			applicationids->values_num);
-
-	result = DBselect("%s", sql);
-
-	while (NULL != (row = DBfetch(result)))
-	{
-		ZBX_STR2UINT64(applicationid, row[0]);
-
-		index = zbx_vector_uint64_bsearch(applicationids, applicationid, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-		if (FAIL != index)
-			zbx_vector_uint64_remove(applicationids, index);
-	}
-	DBfree_result(result);
 
 	if (0 == applicationids->values_num)
 		goto out;
