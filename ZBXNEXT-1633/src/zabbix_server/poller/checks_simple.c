@@ -28,9 +28,19 @@ typedef int	(*vmfunc_t)(AGENT_REQUEST *, AGENT_RESULT *);
 
 static char	*vmkeys[] =
 {
+	"vcenter.hv.discovery",
+	"vcenter.hv.hw.cpu.cores",
+	"vcenter.hv.hw.cpu.freq",
+	"vcenter.hv.hw.cpu.model",
+	"vcenter.hv.hw.cpu.threads",
+	"vcenter.hv.hw.memory",
+	"vcenter.hv.hw.model",
+	"vcenter.hv.hw.uuid",
+	"vcenter.hv.hw.vendor",
+
 	"vcenter.vm.cpu.num",
 	"vcenter.vm.cpu.usage",
-	"vcenter.vm.list",
+	"vcenter.vm.discovery",
 	"vcenter.vm.memory.size",
 	"vcenter.vm.memory.size.ballooned",
 	"vcenter.vm.memory.size.compressed",
@@ -58,7 +68,7 @@ static char	*vmkeys[] =
 
 	"vsphere.vm.cpu.num",
 	"vsphere.vm.cpu.usage",
-	"vsphere.vm.list",
+	"vsphere.vm.discovery",
 	"vsphere.vm.memory.size",
 	"vsphere.vm.memory.size.ballooned",
 	"vsphere.vm.memory.size.compressed",
@@ -74,9 +84,19 @@ static char	*vmkeys[] =
 #if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
 static vmfunc_t	vmfuncs[] =
 {
+	check_vcenter_hv_discovery,
+	check_vcenter_hv_hw_cpu_cores,
+	check_vcenter_hv_hw_cpu_freq,
+	check_vcenter_hv_hw_cpu_model,
+	check_vcenter_hv_hw_cpu_threads,
+	check_vcenter_hv_hw_memory,
+	check_vcenter_hv_hw_model,
+	check_vcenter_hv_hw_uuid,
+	check_vcenter_hv_hw_vendor,
+
 	check_vcenter_vm_cpu_num,
 	check_vcenter_vm_cpu_usage,
-	check_vcenter_vm_list,
+	check_vcenter_vm_discovery,
 	check_vcenter_vm_memory_size,
 	check_vcenter_vm_memory_size_ballooned,
 	check_vcenter_vm_memory_size_compressed,
@@ -104,7 +124,7 @@ static vmfunc_t	vmfuncs[] =
 
 	check_vsphere_vm_cpu_num,
 	check_vsphere_vm_cpu_usage,
-	check_vsphere_vm_list,
+	check_vsphere_vm_discovery,
 	check_vsphere_vm_memory_size,
 	check_vsphere_vm_memory_size_ballooned,
 	check_vsphere_vm_memory_size_compressed,
