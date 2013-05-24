@@ -42,6 +42,8 @@ $screenWidget->addHeaderRowNumber();
 $screenForm = new CForm();
 $screenForm->setName('screenForm');
 
+$screenForm->addVar('templateid', $this->data['templateid']);
+
 // create table
 $screenTable = new CTableInfo(_('No screens defined.'));
 $screenTable->setHeader(array(
