@@ -717,7 +717,7 @@ INSERT INTO items (itemid, type, hostid, name, description, key_, delay, interfa
 INSERT INTO items (itemid, type, hostid, name, description, key_, delay, interfaceid) VALUES (30002, 0, 40001, 'testFormItem3', 'testFormItems', 'test-item-form3', 30, 40011);
 INSERT INTO items (itemid, type, hostid, name, description, key_, delay, interfaceid) VALUES (30003, 0, 40001, 'testFormItem4', 'testFormItems', 'test-item-form4', 30, 40011);
 
--- testFormItem.LayoutCheck
+-- testFormItem.LayoutCheck testInheritanceItem.SimpleUpdate
 INSERT INTO items (itemid, type, snmp_community, snmp_oid, hostid, name, description, key_, delay, history, trends, lastvalue, lastclock, prevvalue, status, value_type, trapper_hosts, units, multiplier, delta, prevorgvalue, snmpv3_securityname, snmpv3_securitylevel, snmpv3_authpassphrase, snmpv3_privpassphrase, formula, error, lastlogsize, logtimefmt, templateid, valuemapid, delay_flex, params, ipmi_sensor, data_type, authtype, username, password, publickey, privatekey, mtime, lastns, flags) VALUES (40000, 0, '', '', 30000, 'testInheritanceItem1', 'testInheritanceItems','test-inheritance-item1', 30, 90, 365, NULL, NULL, NULL, 0, 3, '', '', 0, 0, NULL, '', 0, '', '', '1', '', 0, '', NULL, NULL, '', '', '', 0, 0, '', '', '', '', 0, NULL, 0);
 INSERT INTO items (itemid, type, snmp_community, snmp_oid, hostid, name, description, key_, delay, history, trends, lastvalue, lastclock, prevvalue, status, value_type, trapper_hosts, units, multiplier, delta, prevorgvalue, snmpv3_securityname, snmpv3_securitylevel, snmpv3_authpassphrase, snmpv3_privpassphrase, formula, error, lastlogsize, logtimefmt, templateid, valuemapid, delay_flex, params, ipmi_sensor, data_type, authtype, username, password, publickey, privatekey, mtime, lastns, flags, interfaceid) VALUES (40001, 0, '', '', 30001, 'testInheritanceItem1', 'testInheritanceItems','test-inheritance-item1', 30, 90, 365, NULL, NULL, NULL, 0, 0, '', '', 0, 0, NULL, '', 0, '', '', '1', '', 0, '', 40000, NULL, '', '', '', 0, 0, '', '', '', '', 0, NULL, 0, 40011);
 INSERT INTO items (itemid, type, snmp_community, snmp_oid, hostid, name, description, key_, delay, history, trends, lastvalue, lastclock, prevvalue, status, value_type, trapper_hosts, units, multiplier, delta, prevorgvalue, snmpv3_securityname, snmpv3_securitylevel, snmpv3_authpassphrase, snmpv3_privpassphrase, formula, error, lastlogsize, logtimefmt, templateid, valuemapid, delay_flex, params, ipmi_sensor, data_type, authtype, username, password, publickey, privatekey, mtime, lastns, flags) VALUES (40002, 0, '', '', 30000, 'testInheritanceItem2', 'testInheritanceItems','test-inheritance-item2', 30, 90, 365, NULL, NULL, NULL, 0, 3, '', '', 0, 0, NULL, '', 0, '', '', '1', '', 0, '', NULL, NULL, '', '', '', 0, 0, '', '', '', '', 0, NULL, 0);
@@ -743,9 +743,16 @@ INSERT INTO functions (functionid, itemid, triggerid, function, parameter) VALUE
 INSERT INTO triggers (triggerid, expression, description, comments) VALUES (14003, '{14003}=0', 'testFormTrigger4', '');
 INSERT INTO functions (functionid, itemid, triggerid, function, parameter) VALUES (14003, 30004, 14003, 'last', '0');
 
--- testFormGraph.LayoutCheck testInheritanceGraph.SimpleUpdate testFormTrigger.SimpleUpdate testInheritanceTrigger.SimpleUpdate
+-- testFormGraph.LayoutCheck testInheritanceGraph.SimpleUpdate testFormTrigger.SimpleUpdate testInheritanceTrigger.SimpleUpdate testInheritanceItem.SimpleUpdate
 INSERT INTO items (name, key_, hostid, delay, value_type, lastvalue, itemid, params, description) VALUES ('itemInheritance', 'key-item-inheritance', 30000, 30, 3, 5, 24329, '', '');
-INSERT INTO items (name, key_, hostid, delay, value_type, lastvalue, itemid, templateid, params, description, interfaceid) VALUES ('itemInheritance', 'key-item-inheritance', 30001, 30, 3, 5, 24333, 30000, '', '', 40011);
+INSERT INTO items (name, key_, hostid, delay, value_type, lastvalue, itemid, templateid, params, description) VALUES ('itemInheritance', 'key-item-inheritance', 30001, 30, 3, 5, 24333, 30000, '', '');
+-- testFormDiscoveryRule.SimpleCreate testInheritanceDiscoveryRule.SimpleCreate
+INSERT INTO items (name, key_, hostid, delay, value_type, lastvalue, itemid, params, description, interfaceid) VALUES ('itemInheritanceTest', 'key-test-inheritance', 30001, 30, 3, 5, 35000, '', '', 30000);
+-- testFormDiscoveryRule.CheckLayout testInheritanceDiscoveryRule.CheckLayout testFormDiscoveryRule.SimpleCreate testInheritanceDiscoveryRule.SimpleCreate
+INSERT INTO interface (type, ip, dns, useip, port, main, hostid, interfaceid) VALUES (1, '127.0.7.1', '', '1', '10071', '1', 30001, 50011);
+INSERT INTO interface (type, ip, dns, useip, port, main, hostid, interfaceid) VALUES (2, '127.0.7.2', '', '1', '10072', '1', 30001, 50012);
+INSERT INTO interface (type, ip, dns, useip, port, main, hostid, interfaceid) VALUES (3, '127.0.7.3', '', '1', '10073', '1', 30001, 50013);
+INSERT INTO interface (type, ip, dns, useip, port, main, hostid, interfaceid) VALUES (4, '127.0.7.4', '', '1', '10074', '1', 30001, 50014);
 
 -- testFormTrigger.SimpleUpdate and testInheritanceTrigger.SimpleUpdate
 INSERT INTO triggers (triggerid, expression, description, templateid) VALUES (15000, '{15000}=0', 'testInheritanceTrigger1', NULL);
