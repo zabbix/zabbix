@@ -195,8 +195,10 @@ class testFormAction extends CWebTest {
 		$this->zbxTestClick('add');
 		sleep(1);
 		$this->select("opCmdTarget", "label=Host");
+		$this->zbxTestTextPresent(array('Target list', 'Target', 'Action'));
 		sleep(1);
-		$this->input_type("//input[@placeholder='type here to search']", 'Simple form test host');
+		$this->assertElementPresent("//div[@id='opCmdTargetObject']/input");
+		$this->input_type("//div[@id='opCmdTargetObject']/input", 'Simple form test host');
 		sleep(1);
 		$this->zbxTestClick("//span[@class='matched']");
 		$this->zbxTestClick("//input[@name='save']");
@@ -206,8 +208,10 @@ class testFormAction extends CWebTest {
 		$this->zbxTestClick('add');
 		sleep(1);
 		$this->select("opCmdTarget", "label=Host group");
+		$this->zbxTestTextPresent(array('Target list', 'Target', 'Action'));
 		sleep(1);
-		$this->input_type("//input[@placeholder='type here to search']", 'Zabbix servers');
+		$this->assertElementPresent("//div[@id='opCmdTargetObject']/input");
+		$this->input_type("//div[@id='opCmdTargetObject']/input", 'Zabbix servers');
 		sleep(1);
 		$this->zbxTestClick("//span[@class='matched']");
 		$this->zbxTestClick("//input[@name='save']");
