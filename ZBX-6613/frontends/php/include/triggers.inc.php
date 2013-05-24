@@ -1025,8 +1025,7 @@ function getExpressionItems($expression) {
 				$processedItems[$expression['host'].$expression['item']] = true;
 			}
 			else {
-				throw new Exception(_s('Incorrect item key "%1$s" provided for trigger expression on "%2$s".',
-					$expression['item'], $expression['host']));
+				throw new Exception(_s('Incorrect trigger expression part "%1$s".', $expression['expression']));
 			}
 		}
 
