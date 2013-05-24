@@ -136,8 +136,26 @@ static void	DBfield_definition_string(char **sql, size_t *sql_alloc, size_t *sql
 		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, " default '%s'", default_value_esc);
 		zbx_free(default_value_esc);
 	}
+
 	if (0 != (field->flags & ZBX_NOTNULL))
+	{
+#if defined(HAVE_ORACLE)
+		switch (field->type)
+		{
+			case ZBX_TYPE_INT:
+			case ZBX_TYPE_FLOAT:
+			case ZBX_TYPE_BLOB:
+			case ZBX_TYPE_UINT:
+			case ZBX_TYPE_ID:
+				zbx_strcpy_alloc(sql, sql_alloc, sql_offset, " not null");
+				break;
+			default:	/* ZBX_TYPE_CHAR, ZBX_TYPE_TEXT, ZBX_TYPE_SHORTTEXT or ZBX_TYPE_LONGTEXT */
+				/* nothing to do */;
+		}
+#else
 		zbx_strcpy_alloc(sql, sql_alloc, sql_offset, " not null");
+#endif
+	}
 }
 
 static void	DBcreate_table_sql(char **sql, size_t *sql_alloc, size_t *sql_offset, const ZBX_TABLE *table)
@@ -294,10 +312,8 @@ static int	DBreorg_table(const char *table_name)
 static int	DBcreate_table(const ZBX_TABLE *table)
 {
 	char	*sql = NULL;
-	size_t	sql_alloc = 64, sql_offset = 0;
+	size_t	sql_alloc = 0, sql_offset = 0;
 	int	ret = FAIL;
-
-	sql = zbx_malloc(sql, sql_alloc);
 
 	DBcreate_table_sql(&sql, &sql_alloc, &sql_offset, table);
 
@@ -312,10 +328,8 @@ static int	DBcreate_table(const ZBX_TABLE *table)
 static int	DBadd_field(const char *table_name, const ZBX_FIELD *field)
 {
 	char	*sql = NULL;
-	size_t	sql_alloc = 64, sql_offset = 0;
+	size_t	sql_alloc = 0, sql_offset = 0;
 	int	ret = FAIL;
-
-	sql = zbx_malloc(sql, sql_alloc);
 
 	DBadd_field_sql(&sql, &sql_alloc, &sql_offset, table_name, field);
 
@@ -330,10 +344,8 @@ static int	DBadd_field(const char *table_name, const ZBX_FIELD *field)
 static int	DBrename_field(const char *table_name, const char *field_name, const ZBX_FIELD *field)
 {
 	char	*sql = NULL;
-	size_t	sql_alloc = 64, sql_offset = 0;
+	size_t	sql_alloc = 0, sql_offset = 0;
 	int	ret = FAIL;
-
-	sql = zbx_malloc(sql, sql_alloc);
 
 	DBrename_field_sql(&sql, &sql_alloc, &sql_offset, table_name, field_name, field);
 
@@ -348,10 +360,8 @@ static int	DBrename_field(const char *table_name, const char *field_name, const 
 static int	DBmodify_field_type(const char *table_name, const ZBX_FIELD *field)
 {
 	char	*sql = NULL;
-	size_t	sql_alloc = 64, sql_offset = 0;
+	size_t	sql_alloc = 0, sql_offset = 0;
 	int	ret = FAIL;
-
-	sql = zbx_malloc(sql, sql_alloc);
 
 	DBmodify_field_type_sql(&sql, &sql_alloc, &sql_offset, table_name, field);
 
@@ -366,10 +376,8 @@ static int	DBmodify_field_type(const char *table_name, const ZBX_FIELD *field)
 static int	DBset_not_null(const char *table_name, const ZBX_FIELD *field)
 {
 	char	*sql = NULL;
-	size_t	sql_alloc = 64, sql_offset = 0;
+	size_t	sql_alloc = 0, sql_offset = 0;
 	int	ret = FAIL;
-
-	sql = zbx_malloc(sql, sql_alloc);
 
 	DBset_not_null_sql(&sql, &sql_alloc, &sql_offset, table_name, field);
 
@@ -384,10 +392,8 @@ static int	DBset_not_null(const char *table_name, const ZBX_FIELD *field)
 static int	DBset_default(const char *table_name, const ZBX_FIELD *field)
 {
 	char	*sql = NULL;
-	size_t	sql_alloc = 64, sql_offset = 0;
+	size_t	sql_alloc = 0, sql_offset = 0;
 	int	ret = FAIL;
-
-	sql = zbx_malloc(sql, sql_alloc);
 
 	DBset_default_sql(&sql, &sql_alloc, &sql_offset, table_name, field);
 
@@ -402,10 +408,8 @@ static int	DBset_default(const char *table_name, const ZBX_FIELD *field)
 static int	DBdrop_not_null(const char *table_name, const ZBX_FIELD *field)
 {
 	char	*sql = NULL;
-	size_t	sql_alloc = 64, sql_offset = 0;
+	size_t	sql_alloc = 0, sql_offset = 0;
 	int	ret = FAIL;
-
-	sql = zbx_malloc(sql, sql_alloc);
 
 	DBdrop_not_null_sql(&sql, &sql_alloc, &sql_offset, table_name, field);
 
@@ -420,10 +424,8 @@ static int	DBdrop_not_null(const char *table_name, const ZBX_FIELD *field)
 static int	DBdrop_field(const char *table_name, const char *field_name)
 {
 	char	*sql = NULL;
-	size_t	sql_alloc = 64, sql_offset = 0;
+	size_t	sql_alloc = 0, sql_offset = 0;
 	int	ret = FAIL;
-
-	sql = zbx_malloc(sql, sql_alloc);
 
 	DBdrop_field_sql(&sql, &sql_alloc, &sql_offset, table_name, field_name);
 
@@ -438,10 +440,8 @@ static int	DBdrop_field(const char *table_name, const char *field_name)
 static int	DBcreate_index(const char *table_name, const char *index_name, const char *fields, int unique)
 {
 	char	*sql = NULL;
-	size_t	sql_alloc = 64, sql_offset = 0;
+	size_t	sql_alloc = 0, sql_offset = 0;
 	int	ret = FAIL;
-
-	sql = zbx_malloc(sql, sql_alloc);
 
 	DBcreate_index_sql(&sql, &sql_alloc, &sql_offset, table_name, index_name, fields, unique);
 
@@ -456,10 +456,8 @@ static int	DBcreate_index(const char *table_name, const char *index_name, const 
 static int	DBdrop_index(const char *table_name, const char *index_name)
 {
 	char	*sql = NULL;
-	size_t	sql_alloc = 64, sql_offset = 0;
+	size_t	sql_alloc = 0, sql_offset = 0;
 	int	ret = FAIL;
-
-	sql = zbx_malloc(sql, sql_alloc);
 
 	DBdrop_index_sql(&sql, &sql_alloc, &sql_offset, table_name, index_name);
 
@@ -474,10 +472,8 @@ static int	DBdrop_index(const char *table_name, const char *index_name)
 static int	DBadd_foreign_key(const char *table_name, int id, const ZBX_FIELD *field)
 {
 	char	*sql = NULL;
-	size_t	sql_alloc = 64, sql_offset = 0;
+	size_t	sql_alloc = 0, sql_offset = 0;
 	int	ret = FAIL;
-
-	sql = zbx_malloc(sql, sql_alloc);
 
 	DBadd_foreign_key_sql(&sql, &sql_alloc, &sql_offset, table_name, id, field);
 
@@ -492,10 +488,8 @@ static int	DBadd_foreign_key(const char *table_name, int id, const ZBX_FIELD *fi
 static int	DBdrop_foreign_key(const char *table_name, int id)
 {
 	char	*sql = NULL;
-	size_t	sql_alloc = 64, sql_offset = 0;
+	size_t	sql_alloc = 0, sql_offset = 0;
 	int	ret = FAIL;
-
-	sql = zbx_malloc(sql, sql_alloc);
 
 	DBdrop_foreign_key_sql(&sql, &sql_alloc, &sql_offset, table_name, id);
 
