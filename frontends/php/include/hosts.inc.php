@@ -1161,13 +1161,13 @@ function getApplicationSourceParentIds(array $applicationIds, array $templateApp
 		// if we do - copy all of its child applications to the parent template
 		if (isset($templateApplicationIds[$applicationTemplate['applicationid']])) {
 			$templateApplicationIds[$applicationTemplate['templateid']] = $templateApplicationIds[$applicationTemplate['applicationid']];
-			$unsetApplicationIds[] = $applicationTemplate['applicationid'];
+			$unsetApplicationIds[$applicationTemplate['applicationid']] = $applicationTemplate['applicationid'];
 		}
 		// if no - just add the application
 		else {
 			$templateApplicationIds[$applicationTemplate['templateid']][] = $applicationTemplate['applicationid'];
 		}
-		$applicationIds[] = $applicationTemplate['templateid'];
+		$applicationIds[$applicationTemplate['applicationid']] = $applicationTemplate['templateid'];
 	}
 
 	// unset children of all applications that we found a new parent for

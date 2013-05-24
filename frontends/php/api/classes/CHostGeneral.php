@@ -740,7 +740,7 @@ abstract class CHostGeneral extends CZBXAPI {
 				));
 				$result = API::Application()->delete(zbx_objectValues($applications, 'applicationid'), true);
 				if (!$result) {
-					self::exception(ZBX_API_ERROR_INTERNAL, _('Cannot unlink and clear applications'));
+					self::exception(ZBX_API_ERROR_INTERNAL, _('Cannot unlink and clear applications.'));
 				}
 			}
 			else{

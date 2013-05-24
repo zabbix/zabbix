@@ -181,7 +181,7 @@ class CApplication extends CZBXAPI {
 
 		// inherited
 		if (!is_null($options['inherited'])) {
-			$sqlParts['where'][] = (($options['inherited']) ? '' : 'NOT').' EXISTS ('.
+			$sqlParts['where'][] = ($options['inherited'] ? '' : 'NOT').' EXISTS ('.
 				'SELECT NULL'.
 				' FROM application_template at'.
 				' WHERE a.applicationid=at.applicationid'.
@@ -315,7 +315,7 @@ class CApplication extends CZBXAPI {
 
 		foreach ($applications as &$application) {
 			if (!check_db_fields($itemDbFields, $application)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function'));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
 			}
 
 			// check permissions by hostid
@@ -346,7 +346,7 @@ class CApplication extends CZBXAPI {
 			// check on operating with templated applications
 			if ($delete || $update) {
 				if ($dbApplications[$application['applicationid']]['templateids']) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot update templated applications'));
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot update templated applications.'));
 				}
 			}
 
@@ -437,7 +437,7 @@ class CApplication extends CZBXAPI {
 					self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 				}
 				if ($delApplications[$applicationid]['templateids']) {
-					self::exception(ZBX_API_ERROR_PERMISSIONS, 'Cannot delete templated application.');
+					self::exception(ZBX_API_ERROR_PERMISSIONS, _('Cannot delete templated application.'));
 				}
 			}
 		}
@@ -579,7 +579,7 @@ class CApplication extends CZBXAPI {
 				}
 				$result = $this->massAdd(array('items' => $child, 'applications' => $childApplications));
 				if (!$result) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot add items.');
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot add items.'));
 				}
 			}
 		}
