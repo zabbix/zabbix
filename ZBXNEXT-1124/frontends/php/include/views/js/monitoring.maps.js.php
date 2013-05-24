@@ -31,7 +31,7 @@
 			// map menu
 			else if (+menuData.elementType === <?php echo SYSMAP_ELEMENT_TYPE_MAP; ?>) {
 				linkMenu.push(createMenuItem(<?php echo CJs::encodeJson(_('Submap')); ?>,
-					'maps.php?sysmapid=' + menuData.elementId));
+					'maps.php?sysmapid=' + menuData.elementId + '&severity_min=<?php echo $this->data['severity_min']; ?>'));
 			}
 			// trigger menu
 			else if (+menuData.elementType === <?php echo SYSMAP_ELEMENT_TYPE_TRIGGER; ?>) {
