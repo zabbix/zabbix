@@ -476,18 +476,10 @@ jQuery(function($) {
 
 			values.selected[item.realName.toUpperCase()] = item;
 
-			var itemName;
-			if (options.addNew && item.isNew) {
-				itemName = options.name + '[new]';
-			}
-			else {
-				itemName = options.name;
-			}
-
 			// add hidden input
 			obj.append($('<input>', {
 				type: 'hidden',
-				name: itemName,
+				name: (options.addNew && item.isNew) ? options.name + '[new]' : options.name,
 				value: item.id,
 				'data-id': item.uid,
 				'data-name': item.name,
@@ -672,6 +664,7 @@ jQuery(function($) {
 			settingRightPaddings = 4,
 			settingLeftPaddings = 13,
 			settingMinimumWidth = 50,
+			settingMinimumHeight = 12,
 			settingNewLineTopPaddings = 6;
 
 		// calculate
@@ -697,8 +690,8 @@ jQuery(function($) {
 			top = top * 2;
 		}
 
-		if (left + settingMinimumWidth > values.width) {
-			var topPaddings = (height > 20) ? height / 2 : height;
+		if (left + settingMinimumWidth > values.width || height > settingMinimumHeight) {
+			var topPaddings = (height > settingMinimumHeight) ? height / 2 : height;
 
 			topPaddings += settingNewLineTopPaddings;
 
@@ -787,6 +780,7 @@ jQuery(function($) {
 		if (typeof getId.id === 'undefined') {
 			getId.id = 0;
 		}
+
 		return (getId.id++).toString();
 	}
 });
