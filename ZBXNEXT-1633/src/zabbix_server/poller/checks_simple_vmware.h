@@ -24,8 +24,10 @@
 #if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
 #include "sysinfo.h"
 
+int	check_vcenter_hv_cpu_usage(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	check_vcenter_hv_discovery(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	check_vcenter_hv_hw_cpu_cores(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	check_vcenter_hv_fullname(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	check_vcenter_hv_hw_cpu_num(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	check_vcenter_hv_hw_cpu_freq(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	check_vcenter_hv_hw_cpu_model(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	check_vcenter_hv_hw_cpu_threads(AGENT_REQUEST *request, AGENT_RESULT *result);
@@ -33,6 +35,11 @@ int	check_vcenter_hv_hw_memory(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	check_vcenter_hv_hw_model(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	check_vcenter_hv_hw_uuid(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	check_vcenter_hv_hw_vendor(AGENT_REQUEST *request, AGENT_RESULT *result);
+// ... ballooned
+int	check_vcenter_hv_memory_used(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	check_vcenter_hv_status(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	check_vcenter_hv_uptime(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	check_vcenter_hv_version(AGENT_REQUEST *request, AGENT_RESULT *result);
 
 int	check_vcenter_vm_cpu_num(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	check_vcenter_vm_cpu_usage(AGENT_REQUEST *request, AGENT_RESULT *result);
@@ -49,7 +56,7 @@ int	check_vcenter_vm_uptime(AGENT_REQUEST *request, AGENT_RESULT *result);
 
 int	check_vsphere_cpu_usage(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	check_vsphere_fullname(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	check_vsphere_hw_cpu_cores(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	check_vsphere_hw_cpu_num(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	check_vsphere_hw_cpu_freq(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	check_vsphere_hw_cpu_model(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	check_vsphere_hw_cpu_threads(AGENT_REQUEST *request, AGENT_RESULT *result);
@@ -57,10 +64,12 @@ int	check_vsphere_hw_memory(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	check_vsphere_hw_model(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	check_vsphere_hw_uuid(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	check_vsphere_hw_vendor(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	check_vsphere_memory_size_ballooned(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	check_vsphere_memory_used(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	check_vsphere_status(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	check_vsphere_uptime(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	check_vsphere_version(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	check_vsphere_vm_num(AGENT_REQUEST *request, AGENT_RESULT *result);
 
 int	check_vsphere_vm_cpu_num(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	check_vsphere_vm_cpu_usage(AGENT_REQUEST *request, AGENT_RESULT *result);

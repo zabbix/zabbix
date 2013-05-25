@@ -28,8 +28,10 @@ typedef int	(*vmfunc_t)(AGENT_REQUEST *, AGENT_RESULT *);
 
 static char	*vmkeys[] =
 {
+	"vcenter.hv.cpu.usage",
 	"vcenter.hv.discovery",
-	"vcenter.hv.hw.cpu.cores",
+	"vcenter.hv.fullname",
+	"vcenter.hv.hw.cpu.num",
 	"vcenter.hv.hw.cpu.freq",
 	"vcenter.hv.hw.cpu.model",
 	"vcenter.hv.hw.cpu.threads",
@@ -37,6 +39,10 @@ static char	*vmkeys[] =
 	"vcenter.hv.hw.model",
 	"vcenter.hv.hw.uuid",
 	"vcenter.hv.hw.vendor",
+	"vcenter.hv.memory.used",
+	"vcenter.hv.status",
+	"vcenter.hv.uptime",
+	"vcenter.hv.version",
 
 	"vcenter.vm.cpu.num",
 	"vcenter.vm.cpu.usage",
@@ -53,7 +59,7 @@ static char	*vmkeys[] =
 
 	"vsphere.cpu.usage",
 	"vsphere.fullname",
-	"vsphere.hw.cpu.cores",
+	"vsphere.hw.cpu.num",
 	"vsphere.hw.cpu.freq",
 	"vsphere.hw.cpu.model",
 	"vsphere.hw.cpu.threads",
@@ -61,10 +67,12 @@ static char	*vmkeys[] =
 	"vsphere.hw.model",
 	"vsphere.hw.uuid",
 	"vsphere.hw.vendor",
+	"vsphere.memory.size.ballooned",
 	"vsphere.memory.used",
 	"vsphere.status",
 	"vsphere.uptime",
 	"vsphere.version",
+	"vsphere.vm.num",
 
 	"vsphere.vm.cpu.num",
 	"vsphere.vm.cpu.usage",
@@ -84,8 +92,10 @@ static char	*vmkeys[] =
 #if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
 static vmfunc_t	vmfuncs[] =
 {
+	check_vcenter_hv_cpu_usage,
 	check_vcenter_hv_discovery,
-	check_vcenter_hv_hw_cpu_cores,
+	check_vcenter_hv_fullname,
+	check_vcenter_hv_hw_cpu_num,
 	check_vcenter_hv_hw_cpu_freq,
 	check_vcenter_hv_hw_cpu_model,
 	check_vcenter_hv_hw_cpu_threads,
@@ -93,6 +103,10 @@ static vmfunc_t	vmfuncs[] =
 	check_vcenter_hv_hw_model,
 	check_vcenter_hv_hw_uuid,
 	check_vcenter_hv_hw_vendor,
+	check_vcenter_hv_memory_used,
+	check_vcenter_hv_status,
+	check_vcenter_hv_uptime,
+	check_vcenter_hv_version,
 
 	check_vcenter_vm_cpu_num,
 	check_vcenter_vm_cpu_usage,
@@ -109,7 +123,7 @@ static vmfunc_t	vmfuncs[] =
 
 	check_vsphere_cpu_usage,
 	check_vsphere_fullname,
-	check_vsphere_hw_cpu_cores,
+	check_vsphere_hw_cpu_num,
 	check_vsphere_hw_cpu_freq,
 	check_vsphere_hw_cpu_model,
 	check_vsphere_hw_cpu_threads,
@@ -117,10 +131,12 @@ static vmfunc_t	vmfuncs[] =
 	check_vsphere_hw_model,
 	check_vsphere_hw_uuid,
 	check_vsphere_hw_vendor,
+	check_vsphere_memory_size_ballooned,
 	check_vsphere_memory_used,
 	check_vsphere_status,
 	check_vsphere_uptime,
 	check_vsphere_version,
+	check_vsphere_vm_num,
 
 	check_vsphere_vm_cpu_num,
 	check_vsphere_vm_cpu_usage,
