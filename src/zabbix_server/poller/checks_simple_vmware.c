@@ -203,7 +203,7 @@ out:
  *         Otherwise, FAIL is returned.                                       *
  *                                                                            *
  ******************************************************************************/
-static char	*read_xml_value(const char *data, char *xpath)
+static char	*read_xml_value(const char *data, const char *xpath)
 {
 	xmlDoc		*doc;
 	xmlXPathContext	*xpathCtx;
@@ -220,7 +220,7 @@ static char	*read_xml_value(const char *data, char *xpath)
 
 	xpathCtx = xmlXPathNewContext(doc);
 
-	if (NULL == (xpathObj = xmlXPathEvalExpression((xmlChar *)xpath, xpathCtx)))
+	if (NULL == (xpathObj = xmlXPathEvalExpression((const xmlChar *)xpath, xpathCtx)))
 	{
 		xmlXPathFreeContext(xpathCtx);
 		xmlFreeDoc(doc);
@@ -265,7 +265,7 @@ static char	*read_xml_value(const char *data, char *xpath)
  *         Otherwise, FAIL is returned.                                       *
  *                                                                            *
  ******************************************************************************/
-static int	read_xml_values(const char *data, char *xpath, zbx_vector_str_t *values)
+static int	read_xml_values(const char *data, const char *xpath, zbx_vector_str_t *values)
 {
 	xmlDoc		*doc;
 	xmlXPathContext	*xpathCtx;
@@ -1278,7 +1278,7 @@ out:
  *                                                                            *
  ******************************************************************************/
 
-static int	get_vcenter_vmstat(AGENT_REQUEST *request, char *xpath, AGENT_RESULT *result)
+static int	get_vcenter_vmstat(AGENT_REQUEST *request, const char *xpath, AGENT_RESULT *result)
 {
 	zbx_vcenter_t	*vcenter;
 	zbx_vm_t	*vm;
@@ -1315,7 +1315,7 @@ static int	get_vcenter_vmstat(AGENT_REQUEST *request, char *xpath, AGENT_RESULT 
 	return SYSINFO_RET_OK;
 }
 
-static int	get_vcenter_hv_hoststat(AGENT_REQUEST *request, char *xpath, AGENT_RESULT *result)
+static int	get_vcenter_hv_hoststat(AGENT_REQUEST *request, const char *xpath, AGENT_RESULT *result)
 {
 	zbx_vcenter_t	*vcenter;
 	zbx_hv_t	*hv;
@@ -1350,6 +1350,85 @@ static int	get_vcenter_hv_hoststat(AGENT_REQUEST *request, char *xpath, AGENT_RE
 	SET_STR_RESULT(result, value);
 
 	return SYSINFO_RET_OK;
+}
+
+#define ZBX_OPT_XPATH		0
+#define ZBX_OPT_VM_NUM		1
+#define ZBX_OPT_MEM_BALLOONED	2
+static int	get_vcenter_hv_stat(AGENT_REQUEST *request, int opt, const char *xpath, AGENT_RESULT *result)
+{
+	zbx_vcenter_t	*vcenter;
+	char		*url, *username, *password, *value, *uuid, *error = NULL;
+	int		i;
+	zbx_hv_t	*hv;
+	zbx_uint64_t	value_uint64, value_uint64_sum;
+
+	if (4 != request->nparam)
+		return SYSINFO_RET_FAIL;
+
+	url = get_rparam(request, 0);
+	username = get_rparam(request, 1);
+	password = get_rparam(request, 2);
+	uuid = get_rparam(request, 3);
+
+	if ('\0' == *url || '\0' == *username)
+		return SYSINFO_RET_FAIL;
+
+	if (SUCCEED != vcenter_update(url, username, password, &error))
+	{
+		SET_MSG_RESULT(result, error);
+		return SYSINFO_RET_FAIL;
+	}
+
+	if (NULL == (vcenter = vcenter_get(url, username, password)))
+		return SYSINFO_RET_FAIL;
+
+	if (NULL == (hv = hv_get(&vcenter->hvs, uuid)))
+		return SYSINFO_RET_FAIL;
+
+	switch (opt)
+	{
+		case ZBX_OPT_XPATH:
+			if (NULL == (value = read_xml_value(hv->details, xpath)))
+				return SYSINFO_RET_FAIL;
+
+			SET_STR_RESULT(result, value);
+			break;
+/*		case ZBX_OPT_VM_NUM:
+			SET_UI64_RESULT(result, vsphere->vms.values_num);
+			break;
+		case ZBX_OPT_MEM_BALLOONED:
+			xpath = ZBX_XPATH_LN2("quickStats", "balloonedMemory");
+			value_uint64_sum = 0;
+
+			for (i = 0; i < vsphere->vms.values_num; i++)
+			{
+				vm = (zbx_vm_t *)vsphere->vms.values[i];
+
+				if (NULL == (value = read_xml_value(vm->details, xpath)))
+					return SYSINFO_RET_FAIL;
+
+				if (SUCCEED != is_uint64(value, &value_uint64))
+				{
+					zbx_free(value);
+					return SYSINFO_RET_FAIL;
+				}
+
+				zbx_free(value);
+
+				value_uint64_sum += value_uint64;
+			}
+
+			SET_UI64_RESULT(result, value_uint64_sum * ZBX_MEBIBYTE);*/
+			break;
+	}
+
+	return SYSINFO_RET_OK;
+}
+
+int	check_vcenter_hv_cpu_usage(AGENT_REQUEST *request, AGENT_RESULT *result)
+{
+	return get_vcenter_hv_stat(request, ZBX_OPT_XPATH, ZBX_XPATH_LN2("quickStats", "overallCpuUsage"), result);
 }
 
 int	check_vcenter_hv_discovery(AGENT_REQUEST *request, AGENT_RESULT *result)
@@ -1406,11 +1485,12 @@ int	check_vcenter_hv_discovery(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
+int	check_vcenter_hv_fullname(AGENT_REQUEST *request, AGENT_RESULT *result)
+{
+	return get_vcenter_hv_stat(request, ZBX_OPT_XPATH, ZBX_XPATH_LN2("product", "fullName"), result);
+}
 
-
-
-
-int	check_vcenter_hv_hw_cpu_cores(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	check_vcenter_hv_hw_cpu_num(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	return get_vcenter_hv_hoststat(request, ZBX_XPATH_LN2("hardware", "numCpuCores"), result);
 }
@@ -1452,6 +1532,31 @@ int	check_vcenter_hv_hw_vendor(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 
 
+/*
+int	check_vcenter_hv_memory_size_ballooned(AGENT_REQUEST *request, AGENT_RESULT *result)
+{
+	return get_vcenter_hv_stat(request, ZBX_OPT_MEM_BALLOONED, NULL, result);
+}
+*/
+int	check_vcenter_hv_memory_used(AGENT_REQUEST *request, AGENT_RESULT *result)
+{
+	return get_vcenter_hv_stat(request, ZBX_OPT_XPATH, ZBX_XPATH_LN2("quickStats", "overallMemoryUsage"), result);
+}
+
+int	check_vcenter_hv_status(AGENT_REQUEST *request, AGENT_RESULT *result)
+{
+	return get_vcenter_hv_stat(request, ZBX_OPT_XPATH, ZBX_XPATH_LN2("val", "overallStatus"), result);
+}
+
+int	check_vcenter_hv_uptime(AGENT_REQUEST *request, AGENT_RESULT *result)
+{
+	return get_vcenter_hv_stat(request, ZBX_OPT_XPATH, ZBX_XPATH_LN2("quickStats", "uptime"), result);
+}
+
+int	check_vcenter_hv_version(AGENT_REQUEST *request, AGENT_RESULT *result)
+{
+	return get_vcenter_hv_stat(request, ZBX_OPT_XPATH, ZBX_XPATH_LN2("product", "version"), result);
+}
 
 
 
@@ -1583,10 +1688,13 @@ int	check_vcenter_vm_uptime(AGENT_REQUEST *request, AGENT_RESULT *result)
  *                                                                            *
  ******************************************************************************/
 
-static int	get_vsphere_hoststat(AGENT_REQUEST *request, char *xpath, AGENT_RESULT *result)
+static int	get_vsphere_stat(AGENT_REQUEST *request, int opt, const char *xpath, AGENT_RESULT *result)
 {
 	zbx_vsphere_t	*vsphere;
 	char		*url, *username, *password, *value, *error = NULL;
+	int		i;
+	zbx_vm_t	*vm;
+	zbx_uint64_t	value_uint64, value_uint64_sum;
 
 	if (3 != request->nparam)
 		return SYSINFO_RET_FAIL;
@@ -1607,15 +1715,47 @@ static int	get_vsphere_hoststat(AGENT_REQUEST *request, char *xpath, AGENT_RESUL
 	if (NULL == (vsphere = vsphere_get(url, username, password)))
 		return SYSINFO_RET_FAIL;
 
-	if (NULL == (value = read_xml_value(vsphere->details, xpath)))
-		return SYSINFO_RET_FAIL;
+	switch (opt)
+	{
+		case ZBX_OPT_XPATH:
+			if (NULL == (value = read_xml_value(vsphere->details, xpath)))
+				return SYSINFO_RET_FAIL;
 
-	SET_STR_RESULT(result, value);
+			SET_STR_RESULT(result, value);
+			break;
+		case ZBX_OPT_VM_NUM:
+			SET_UI64_RESULT(result, vsphere->vms.values_num);
+			break;
+		case ZBX_OPT_MEM_BALLOONED:
+			xpath = ZBX_XPATH_LN2("quickStats", "balloonedMemory");
+			value_uint64_sum = 0;
+
+			for (i = 0; i < vsphere->vms.values_num; i++)
+			{
+				vm = (zbx_vm_t *)vsphere->vms.values[i];
+
+				if (NULL == (value = read_xml_value(vm->details, xpath)))
+					return SYSINFO_RET_FAIL;
+
+				if (SUCCEED != is_uint64(value, &value_uint64))
+				{
+					zbx_free(value);
+					return SYSINFO_RET_FAIL;
+				}
+
+				zbx_free(value);
+
+				value_uint64_sum += value_uint64;
+			}
+
+			SET_UI64_RESULT(result, value_uint64_sum * ZBX_MEBIBYTE);
+			break;
+	}
 
 	return SYSINFO_RET_OK;
 }
 
-static int	get_vsphere_vmstat(AGENT_REQUEST *request, char *xpath, AGENT_RESULT *result)
+static int	get_vsphere_vmstat(AGENT_REQUEST *request, const char *xpath, AGENT_RESULT *result)
 {
 	zbx_vsphere_t	*vsphere;
 	zbx_vm_t	*vm;
@@ -1654,72 +1794,82 @@ static int	get_vsphere_vmstat(AGENT_REQUEST *request, char *xpath, AGENT_RESULT 
 
 int	check_vsphere_cpu_usage(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	return get_vsphere_hoststat(request, ZBX_XPATH_LN2("quickStats", "overallCpuUsage"), result);
+	return get_vsphere_stat(request, ZBX_OPT_XPATH, ZBX_XPATH_LN2("quickStats", "overallCpuUsage"), result);
 }
 
 int	check_vsphere_fullname(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	return get_vsphere_hoststat(request, ZBX_XPATH_LN2("product", "fullName"), result);
+	return get_vsphere_stat(request, ZBX_OPT_XPATH, ZBX_XPATH_LN2("product", "fullName"), result);
 }
 
-int	check_vsphere_hw_cpu_cores(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	check_vsphere_hw_cpu_num(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	return get_vsphere_hoststat(request, ZBX_XPATH_LN2("hardware", "numCpuCores"), result);
+	return get_vsphere_stat(request, ZBX_OPT_XPATH, ZBX_XPATH_LN2("hardware", "numCpuCores"), result);
 }
 
 int	check_vsphere_hw_cpu_freq(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	return get_vsphere_hoststat(request, ZBX_XPATH_LN2("hardware", "cpuMhz"), result);
+	return get_vsphere_stat(request, ZBX_OPT_XPATH, ZBX_XPATH_LN2("hardware", "cpuMhz"), result);
 }
 
 int	check_vsphere_hw_cpu_model(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	return get_vsphere_hoststat(request, ZBX_XPATH_LN2("hardware", "cpuModel"), result);
+	return get_vsphere_stat(request, ZBX_OPT_XPATH, ZBX_XPATH_LN2("hardware", "cpuModel"), result);
 }
 
 int	check_vsphere_hw_cpu_threads(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	return get_vsphere_hoststat(request, ZBX_XPATH_LN2("hardware", "numCpuThreads"), result);
+	return get_vsphere_stat(request, ZBX_OPT_XPATH, ZBX_XPATH_LN2("hardware", "numCpuThreads"), result);
 }
 
 int	check_vsphere_hw_memory(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	return get_vsphere_hoststat(request, ZBX_XPATH_LN2("hardware", "memorySize"), result);
+	return get_vsphere_stat(request, ZBX_OPT_XPATH, ZBX_XPATH_LN2("hardware", "memorySize"), result);
 }
 
 int	check_vsphere_hw_model(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	return get_vsphere_hoststat(request, ZBX_XPATH_LN2("hardware", "model"), result);
+	return get_vsphere_stat(request, ZBX_OPT_XPATH, ZBX_XPATH_LN2("hardware", "model"), result);
 }
 
 int	check_vsphere_hw_uuid(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	return get_vsphere_hoststat(request, ZBX_XPATH_LN2("hardware", "uuid"), result);
+	return get_vsphere_stat(request, ZBX_OPT_XPATH, ZBX_XPATH_LN2("hardware", "uuid"), result);
 }
 
 int	check_vsphere_hw_vendor(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	return get_vsphere_hoststat(request, ZBX_XPATH_LN2("hardware", "vendor"), result);
+	return get_vsphere_stat(request, ZBX_OPT_XPATH, ZBX_XPATH_LN2("hardware", "vendor"), result);
+}
+
+int	check_vsphere_memory_size_ballooned(AGENT_REQUEST *request, AGENT_RESULT *result)
+{
+	return get_vsphere_stat(request, ZBX_OPT_MEM_BALLOONED, NULL, result);
 }
 
 int	check_vsphere_memory_used(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	return get_vsphere_hoststat(request, ZBX_XPATH_LN2("quickStats", "overallMemoryUsage"), result);
+	return get_vsphere_stat(request, ZBX_OPT_XPATH, ZBX_XPATH_LN2("quickStats", "overallMemoryUsage"), result);
 }
 
 int	check_vsphere_status(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	return get_vsphere_hoststat(request, ZBX_XPATH_LN2("val", "overallStatus"), result);
+	return get_vsphere_stat(request, ZBX_OPT_XPATH, ZBX_XPATH_LN2("val", "overallStatus"), result);
 }
 
 int	check_vsphere_uptime(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	return get_vsphere_hoststat(request, ZBX_XPATH_LN2("quickStats", "uptime"), result);
+	return get_vsphere_stat(request, ZBX_OPT_XPATH, ZBX_XPATH_LN2("quickStats", "uptime"), result);
 }
 
 int	check_vsphere_version(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	return get_vsphere_hoststat(request, ZBX_XPATH_LN2("product", "version"), result);
+	return get_vsphere_stat(request, ZBX_OPT_XPATH, ZBX_XPATH_LN2("product", "version"), result);
+}
+
+int	check_vsphere_vm_num(AGENT_REQUEST *request, AGENT_RESULT *result)
+{
+	return get_vsphere_stat(request, ZBX_OPT_VM_NUM, NULL, result);
 }
 
 int	check_vsphere_vm_cpu_num(AGENT_REQUEST *request, AGENT_RESULT *result)
