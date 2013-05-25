@@ -1528,7 +1528,7 @@ static int	get_vcenter_hv_stat(AGENT_REQUEST *request, int opt, const char *xpat
 				value_uint64_sum += value_uint64;
 			}
 
-			SET_UI64_RESULT(result, value_uint64_sum * ZBX_MEBIBYTE);
+			SET_UI64_RESULT(result, value_uint64_sum);
 			break;
 	}
 
@@ -1537,7 +1537,14 @@ static int	get_vcenter_hv_stat(AGENT_REQUEST *request, int opt, const char *xpat
 
 int	check_vcenter_hv_cpu_usage(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	return get_vcenter_hv_stat(request, ZBX_OPT_XPATH, ZBX_XPATH_LN2("quickStats", "overallCpuUsage"), result);
+	int	ret;
+
+	ret = get_vcenter_hv_stat(request, ZBX_OPT_XPATH, ZBX_XPATH_LN2("quickStats", "overallCpuUsage"), result);
+
+	if (SYSINFO_RET_OK == ret && GET_UI64_RESULT(result))
+		result->ui64 = result->ui64 * 1000000;
+
+	return ret;
 }
 
 int	check_vcenter_hv_discovery(AGENT_REQUEST *request, AGENT_RESULT *result)
@@ -1606,7 +1613,14 @@ int	check_vcenter_hv_hw_cpu_num(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 int	check_vcenter_hv_hw_cpu_freq(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	return get_vcenter_hv_hoststat(request, ZBX_XPATH_LN2("hardware", "cpuMhz"), result);
+	int	ret;
+
+	ret = get_vcenter_hv_hoststat(request, ZBX_XPATH_LN2("hardware", "cpuMhz"), result);
+
+	if (SYSINFO_RET_OK == ret && GET_UI64_RESULT(result))
+		result->ui64 = result->ui64 * 1000000;
+
+	return ret;
 }
 
 int	check_vcenter_hv_hw_cpu_model(AGENT_REQUEST *request, AGENT_RESULT *result)
@@ -1641,12 +1655,26 @@ int	check_vcenter_hv_hw_vendor(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 int	check_vcenter_hv_memory_size_ballooned(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	return get_vcenter_hv_stat(request, ZBX_OPT_MEM_BALLOONED, NULL, result);
+	int	ret;
+
+	ret = get_vcenter_hv_stat(request, ZBX_OPT_MEM_BALLOONED, NULL, result);
+
+	if (SYSINFO_RET_OK == ret && GET_UI64_RESULT(result))
+		result->ui64 = result->ui64 * ZBX_MEBIBYTE;
+
+	return ret;
 }
 
 int	check_vcenter_hv_memory_used(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	return get_vcenter_hv_stat(request, ZBX_OPT_XPATH, ZBX_XPATH_LN2("quickStats", "overallMemoryUsage"), result);
+	int	ret;
+
+	ret = get_vcenter_hv_stat(request, ZBX_OPT_XPATH, ZBX_XPATH_LN2("quickStats", "overallMemoryUsage"), result);
+
+	if (SYSINFO_RET_OK == ret && GET_UI64_RESULT(result))
+		result->ui64 = result->ui64 * ZBX_MEBIBYTE;
+
+	return ret;
 }
 
 int	check_vcenter_hv_status(AGENT_REQUEST *request, AGENT_RESULT *result)
@@ -1676,7 +1704,14 @@ int	check_vcenter_vm_cpu_num(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 int	check_vcenter_vm_cpu_usage(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	return get_vcenter_vmstat(request, ZBX_XPATH_LN2("runtime", "maxCpuUsage"), result);
+	int	ret;
+
+	ret = get_vcenter_vmstat(request, ZBX_XPATH_LN2("runtime", "maxCpuUsage"), result);
+
+	if (SYSINFO_RET_OK == ret && GET_UI64_RESULT(result))
+		result->ui64 = result->ui64 * 1000000;
+
+	return ret;
 }
 
 int	check_vcenter_vm_discovery(AGENT_REQUEST *request, AGENT_RESULT *result)
@@ -1749,22 +1784,50 @@ int	check_vcenter_vm_discovery(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 int	check_vcenter_vm_memory_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	return get_vcenter_vmstat(request, ZBX_XPATH_LN2("config", "memorySizeMB"), result);
+	int	ret;
+
+	ret = get_vcenter_vmstat(request, ZBX_XPATH_LN2("config", "memorySizeMB"), result);
+
+	if (SYSINFO_RET_OK == ret && GET_UI64_RESULT(result))
+		result->ui64 = result->ui64 * ZBX_MEBIBYTE;
+
+	return ret;
 }
 
 int	check_vcenter_vm_memory_size_ballooned(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	return get_vcenter_vmstat(request, ZBX_XPATH_LN2("quickStats", "balloonedMemory"), result);
+	int	ret;
+
+	ret = get_vcenter_vmstat(request, ZBX_XPATH_LN2("quickStats", "balloonedMemory"), result);
+
+	if (SYSINFO_RET_OK == ret && GET_UI64_RESULT(result))
+		result->ui64 = result->ui64 * ZBX_MEBIBYTE;
+
+	return ret;
 }
 
 int	check_vcenter_vm_memory_size_compressed(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	return get_vcenter_vmstat(request, ZBX_XPATH_LN2("quickStats", "compressedMemory"), result);
+	int	ret;
+
+	ret = get_vcenter_vmstat(request, ZBX_XPATH_LN2("quickStats", "compressedMemory"), result);
+
+	if (SYSINFO_RET_OK == ret && GET_UI64_RESULT(result))
+		result->ui64 = result->ui64 * ZBX_MEBIBYTE;
+
+	return ret;
 }
 
 int	check_vcenter_vm_memory_size_swapped(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	return get_vcenter_vmstat(request, ZBX_XPATH_LN2("quickStats", "swappedMemory"), result);
+	int	ret;
+
+	ret = get_vcenter_vmstat(request, ZBX_XPATH_LN2("quickStats", "swappedMemory"), result);
+
+	if (SYSINFO_RET_OK == ret && GET_UI64_RESULT(result))
+		result->ui64 = result->ui64 * ZBX_MEBIBYTE;
+
+	return ret;
 }
 
 int	check_vcenter_vm_powerstate(AGENT_REQUEST *request, AGENT_RESULT *result)
@@ -1860,7 +1923,7 @@ static int	get_vsphere_stat(AGENT_REQUEST *request, int opt, const char *xpath, 
 				value_uint64_sum += value_uint64;
 			}
 
-			SET_UI64_RESULT(result, value_uint64_sum * ZBX_MEBIBYTE);
+			SET_UI64_RESULT(result, value_uint64_sum);
 			break;
 	}
 
@@ -1906,7 +1969,14 @@ static int	get_vsphere_vmstat(AGENT_REQUEST *request, const char *xpath, AGENT_R
 
 int	check_vsphere_cpu_usage(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	return get_vsphere_stat(request, ZBX_OPT_XPATH, ZBX_XPATH_LN2("quickStats", "overallCpuUsage"), result);
+	int	ret;
+
+	ret = get_vsphere_stat(request, ZBX_OPT_XPATH, ZBX_XPATH_LN2("quickStats", "overallCpuUsage"), result);
+
+	if (SYSINFO_RET_OK == ret && GET_UI64_RESULT(result))
+		result->ui64 = result->ui64 * 1000000;
+
+	return ret;
 }
 
 int	check_vsphere_fullname(AGENT_REQUEST *request, AGENT_RESULT *result)
@@ -1921,7 +1991,14 @@ int	check_vsphere_hw_cpu_num(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 int	check_vsphere_hw_cpu_freq(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	return get_vsphere_stat(request, ZBX_OPT_XPATH, ZBX_XPATH_LN2("hardware", "cpuMhz"), result);
+	int	ret;
+
+	ret = get_vsphere_stat(request, ZBX_OPT_XPATH, ZBX_XPATH_LN2("hardware", "cpuMhz"), result);
+
+	if (SYSINFO_RET_OK == ret && GET_UI64_RESULT(result))
+		result->ui64 = result->ui64 * 1000000;
+
+	return ret;
 }
 
 int	check_vsphere_hw_cpu_model(AGENT_REQUEST *request, AGENT_RESULT *result)
@@ -1956,12 +2033,26 @@ int	check_vsphere_hw_vendor(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 int	check_vsphere_memory_size_ballooned(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	return get_vsphere_stat(request, ZBX_OPT_MEM_BALLOONED, NULL, result);
+	int	ret;
+
+	ret = get_vsphere_stat(request, ZBX_OPT_MEM_BALLOONED, NULL, result);
+
+	if (SYSINFO_RET_OK == ret && GET_UI64_RESULT(result))
+		result->ui64 = result->ui64 * ZBX_MEBIBYTE;
+
+	return ret;
 }
 
 int	check_vsphere_memory_used(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	return get_vsphere_stat(request, ZBX_OPT_XPATH, ZBX_XPATH_LN2("quickStats", "overallMemoryUsage"), result);
+	int	ret;
+
+	ret = get_vsphere_stat(request, ZBX_OPT_XPATH, ZBX_XPATH_LN2("quickStats", "overallMemoryUsage"), result);
+
+	if (SYSINFO_RET_OK == ret && GET_UI64_RESULT(result))
+		result->ui64 = result->ui64 * ZBX_MEBIBYTE;
+
+	return ret;
 }
 
 int	check_vsphere_status(AGENT_REQUEST *request, AGENT_RESULT *result)
@@ -1991,7 +2082,14 @@ int	check_vsphere_vm_cpu_num(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 int	check_vsphere_vm_cpu_usage(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	return get_vsphere_vmstat(request, ZBX_XPATH_LN2("runtime", "maxCpuUsage"), result);
+	int	ret;
+
+	ret = get_vsphere_vmstat(request, ZBX_XPATH_LN2("runtime", "maxCpuUsage"), result);
+
+	if (SYSINFO_RET_OK == ret && GET_UI64_RESULT(result))
+		result->ui64 = result->ui64 * 1000000;
+
+	return ret;
 }
 
 int	check_vsphere_vm_discovery(AGENT_REQUEST *request, AGENT_RESULT *result)
@@ -2050,22 +2148,50 @@ int	check_vsphere_vm_discovery(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 int	check_vsphere_vm_memory_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	return get_vsphere_vmstat(request, ZBX_XPATH_LN2("config", "memorySizeMB"), result);
+	int	ret;
+
+	ret = get_vsphere_vmstat(request, ZBX_XPATH_LN2("config", "memorySizeMB"), result);
+
+	if (SYSINFO_RET_OK == ret && GET_UI64_RESULT(result))
+		result->ui64 = result->ui64 * ZBX_MEBIBYTE;
+
+	return ret;
 }
 
 int	check_vsphere_vm_memory_size_ballooned(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	return get_vsphere_vmstat(request, ZBX_XPATH_LN2("quickStats", "balloonedMemory"), result);
+	int	ret;
+
+	ret = get_vsphere_vmstat(request, ZBX_XPATH_LN2("quickStats", "balloonedMemory"), result);
+
+	if (SYSINFO_RET_OK == ret && GET_UI64_RESULT(result))
+		result->ui64 = result->ui64 * ZBX_MEBIBYTE;
+
+	return ret;
 }
 
 int	check_vsphere_vm_memory_size_compressed(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	return get_vsphere_vmstat(request, ZBX_XPATH_LN2("quickStats", "compressedMemory"), result);
+	int	ret;
+
+	ret = get_vsphere_vmstat(request, ZBX_XPATH_LN2("quickStats", "compressedMemory"), result);
+
+	if (SYSINFO_RET_OK == ret && GET_UI64_RESULT(result))
+		result->ui64 = result->ui64 * ZBX_MEBIBYTE;
+
+	return ret;
 }
 
 int	check_vsphere_vm_memory_size_swapped(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	return get_vsphere_vmstat(request, ZBX_XPATH_LN2("quickStats", "swappedMemory"), result);
+	int	ret;
+
+	ret = get_vsphere_vmstat(request, ZBX_XPATH_LN2("quickStats", "swappedMemory"), result);
+
+	if (SYSINFO_RET_OK == ret && GET_UI64_RESULT(result))
+		result->ui64 = result->ui64 * ZBX_MEBIBYTE;
+
+	return ret;
 }
 
 int	check_vsphere_vm_powerstate(AGENT_REQUEST *request, AGENT_RESULT *result)
