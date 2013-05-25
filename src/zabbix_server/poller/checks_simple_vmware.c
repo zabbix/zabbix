@@ -86,7 +86,6 @@ typedef struct
 	char			*username;
 	char			*password;
 	zbx_vector_ptr_t	hvs;
-	zbx_vector_ptr_t	vms;
 	int			lastcheck;
 }
 zbx_vcenter_t;
@@ -106,6 +105,7 @@ typedef struct
 {
 	char			*uuid;
 	char			*details;
+	zbx_vector_ptr_t	vms;
 }
 zbx_hv_t;
 
@@ -497,7 +497,7 @@ out:
  *         Otherwise, FAIL is returned.                                       *
  *                                                                            *
  ******************************************************************************/
-static int	vcenter_guestvmids_get(CURL *easyhandle, zbx_vector_str_t *guestvmids, char **error)
+/*static int	vcenter_guestvmids_get(CURL *easyhandle, zbx_vector_str_t *guestvmids, char **error)
 {
 #	define ZBX_POST_VCENTER_VMLIST								\
 		ZBX_POST_VCENTER_HEADER								\
@@ -626,6 +626,76 @@ static int	vcenter_guestvmids_get(CURL *easyhandle, zbx_vector_str_t *guestvmids
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_POSTFIELDS, ZBX_POST_VCENTER_VMLIST)))
+	{
+		*error = zbx_dsprintf(*error, "Cannot set cURL option [%d]: %s", opt, curl_easy_strerror(err));
+		goto out;
+	}
+
+	page.offset = 0;
+
+	if (CURLE_OK != (err = curl_easy_perform(easyhandle)))
+	{
+		*error = zbx_strdup(*error, curl_easy_strerror(err));
+		goto out;
+	}
+
+	if (SUCCEED != read_xml_values(page.data, "//*[@type='VirtualMachine']", guestvmids))
+	{
+		*error = zbx_strdup(*error, "Cannot get list of guest VMs");
+		goto out;
+	}
+
+	ret = SUCCEED;
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+
+	return ret;
+}
+*/
+/******************************************************************************
+ *                                                                            *
+ * Function: vcenter_hv_guestvmids_get                                        *
+ *                                                                            *
+ * Purpose: populate array of guest VMs                                       *
+ *                                                                            *
+ * Parameters: easyhandle - [IN] CURL easy handle                             *
+ *             guesthvid  - [IN] hypervisor ID                                *
+ *             guestvmids - [OUT] list of guest VMs IDs                       *
+ *                                                                            *
+ * Return: Upon successful completion the function return SUCCEED.            *
+ *         Otherwise, FAIL is returned.                                       *
+ *                                                                            *
+ ******************************************************************************/
+static int	vcenter_hv_guestvmids_get(CURL *easyhandle, const char *guesthvid, zbx_vector_str_t *guestvmids,
+		char **error)
+{
+#	define ZBX_POST_VCENTER_HV_VMLIST							\
+		ZBX_POST_VSPHERE_HEADER								\
+		"<ns0:RetrieveProperties>"							\
+			"<ns0:_this type=\"PropertyCollector\">propertyCollector</ns0:_this>"	\
+			"<ns0:specSet>"								\
+				"<ns0:propSet>"							\
+					"<ns0:type>HostSystem</ns0:type>"			\
+					"<ns0:all>false</ns0:all>"				\
+					"<ns0:pathSet>vm</ns0:pathSet>"				\
+				"</ns0:propSet>"						\
+				"<ns0:objectSet>"						\
+					"<ns0:obj type=\"HostSystem\">%s</ns0:obj>"		\
+				"</ns0:objectSet>"						\
+			"</ns0:specSet>"							\
+		"</ns0:RetrieveProperties>"							\
+		ZBX_POST_VSPHERE_FOOTER
+
+	const char	*__function_name = "vcenter_hv_guestvmids_get";
+
+	int		err, opt, ret = FAIL;
+	char		postdata[MAX_STRING_LEN];
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	zbx_snprintf(postdata, sizeof(postdata), ZBX_POST_VCENTER_HV_VMLIST, guesthvid);
+
+	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_POSTFIELDS, postdata)))
 	{
 		*error = zbx_dsprintf(*error, "Cannot set cURL option [%d]: %s", opt, curl_easy_strerror(err));
 		goto out;
@@ -812,7 +882,7 @@ static int	vcenter_update(const char *url, const char *username, const char *pas
 	const char		*__function_name = "vcenter_update";
 
 	CURL			*easyhandle = NULL;
-	int			opt, i, err, ret = FAIL;
+	int			opt, i, j, err, ret = FAIL;
 	zbx_vector_str_t	guesthvids, guestvmids;
 	struct curl_slist	*headers = NULL;
 	zbx_vcenter_t		*vcenter;
@@ -837,7 +907,6 @@ static int	vcenter_update(const char *url, const char *username, const char *pas
 		vcenter->password = zbx_strdup(NULL, password);
 		vcenter->lastcheck = 0;
 		zbx_vector_ptr_create(&vcenter->hvs);
-		zbx_vector_ptr_create(&vcenter->vms);
 
 		zbx_vector_ptr_append(&vcenters, vcenter);
 	}
@@ -884,6 +953,7 @@ static int	vcenter_update(const char *url, const char *username, const char *pas
 			hv = zbx_malloc(NULL, sizeof(zbx_hv_t));
 			hv->uuid = uuid;
 			hv->details = NULL;
+			zbx_vector_ptr_create(&hv->vms);
 
 			zbx_vector_ptr_append(&vcenter->hvs, hv);
 		}
@@ -891,9 +961,37 @@ static int	vcenter_update(const char *url, const char *username, const char *pas
 			zbx_free(uuid);
 
 		hv->details = zbx_strdup(hv->details, page.data);
+
+		if (SUCCEED != vcenter_hv_guestvmids_get(easyhandle, guesthvids.values[i], &guestvmids, error))
+			goto clean;
+
+		for (j = 0; j < guestvmids.values_num; j++)
+		{
+			if (SUCCEED != vcenter_vm_data_get(easyhandle, guestvmids.values[j]))
+				continue;
+
+			if (NULL == (uuid = read_xml_value(page.data, ZBX_XPATH_LN("uuid"))))
+				continue;
+
+			if (NULL == (vm = vm_get(&hv->vms, uuid)))
+			{
+				vm = zbx_malloc(NULL, sizeof(zbx_vm_t));
+				vm->uuid = uuid;
+				vm->details = NULL;
+
+				zbx_vector_ptr_append(&hv->vms, vm);
+			}
+			else
+				zbx_free(uuid);
+
+			vm->details = zbx_strdup(vm->details, page.data);
+
+			zbx_free(guestvmids.values[j]);
+		}
+		guestvmids.values_num = 0;
 	}
 
-	if (SUCCEED != vcenter_guestvmids_get(easyhandle, &guestvmids, error))
+/*	if (SUCCEED != vcenter_guestvmids_get(easyhandle, &guestvmids, error))
 		goto clean;
 
 	for (i = 0; i < guestvmids.values_num; i++)
@@ -917,7 +1015,7 @@ static int	vcenter_update(const char *url, const char *username, const char *pas
 
 		vm->details = zbx_strdup(vm->details, page.data);
 	}
-
+*/
 	vcenter->lastcheck = time(NULL);
 
 	ret = SUCCEED;
@@ -926,8 +1024,8 @@ clean:
 		zbx_free(guesthvids.values[i]);
 	zbx_vector_str_destroy(&guesthvids);
 
-	for (i = 0; i < guestvmids.values_num; i++)
-		zbx_free(guestvmids.values[i]);
+/*	for (i = 0; i < guestvmids.values_num; i++)
+		zbx_free(guestvmids.values[i]);*/
 	zbx_vector_str_destroy(&guestvmids);
 
 	curl_slist_free_all(headers);
@@ -1281,8 +1379,10 @@ out:
 static int	get_vcenter_vmstat(AGENT_REQUEST *request, const char *xpath, AGENT_RESULT *result)
 {
 	zbx_vcenter_t	*vcenter;
-	zbx_vm_t	*vm;
+	zbx_vm_t	*vm = NULL;
+	zbx_hv_t	*hv;
 	char		*url, *username, *password, *uuid, *value, *error = NULL;
+	int		i;
 
 	if (4 != request->nparam)
 		return SYSINFO_RET_FAIL;
@@ -1304,7 +1404,15 @@ static int	get_vcenter_vmstat(AGENT_REQUEST *request, const char *xpath, AGENT_R
 	if (NULL == (vcenter = vcenter_get(url, username, password)))
 		return SYSINFO_RET_FAIL;
 
-	if (NULL == (vm = vm_get(&vcenter->vms, uuid)))
+	for (i = 0; i < vcenter->hvs.values_num; i++)
+	{
+		hv = (zbx_hv_t *)vcenter->hvs.values[i];
+
+		if (NULL != (vm = vm_get(&hv->vms, uuid)))
+			break;
+	}
+
+	if (NULL == vm)
 		return SYSINFO_RET_FAIL;
 
 	if (NULL == (value = read_xml_value(vm->details, xpath)))
@@ -1361,6 +1469,7 @@ static int	get_vcenter_hv_stat(AGENT_REQUEST *request, int opt, const char *xpat
 	char		*url, *username, *password, *value, *uuid, *error = NULL;
 	int		i;
 	zbx_hv_t	*hv;
+	zbx_vm_t	*vm;
 	zbx_uint64_t	value_uint64, value_uint64_sum;
 
 	if (4 != request->nparam)
@@ -1394,16 +1503,16 @@ static int	get_vcenter_hv_stat(AGENT_REQUEST *request, int opt, const char *xpat
 
 			SET_STR_RESULT(result, value);
 			break;
-/*		case ZBX_OPT_VM_NUM:
-			SET_UI64_RESULT(result, vsphere->vms.values_num);
+		case ZBX_OPT_VM_NUM:
+			SET_UI64_RESULT(result, hv->vms.values_num);
 			break;
 		case ZBX_OPT_MEM_BALLOONED:
 			xpath = ZBX_XPATH_LN2("quickStats", "balloonedMemory");
 			value_uint64_sum = 0;
 
-			for (i = 0; i < vsphere->vms.values_num; i++)
+			for (i = 0; i < hv->vms.values_num; i++)
 			{
-				vm = (zbx_vm_t *)vsphere->vms.values[i];
+				vm = (zbx_vm_t *)hv->vms.values[i];
 
 				if (NULL == (value = read_xml_value(vm->details, xpath)))
 					return SYSINFO_RET_FAIL;
@@ -1419,7 +1528,7 @@ static int	get_vcenter_hv_stat(AGENT_REQUEST *request, int opt, const char *xpat
 				value_uint64_sum += value_uint64;
 			}
 
-			SET_UI64_RESULT(result, value_uint64_sum * ZBX_MEBIBYTE);*/
+			SET_UI64_RESULT(result, value_uint64_sum * ZBX_MEBIBYTE);
 			break;
 	}
 
@@ -1530,14 +1639,11 @@ int	check_vcenter_hv_hw_vendor(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return get_vcenter_hv_hoststat(request, ZBX_XPATH_LN2("hardware", "vendor"), result);
 }
 
-
-
-/*
 int	check_vcenter_hv_memory_size_ballooned(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	return get_vcenter_hv_stat(request, ZBX_OPT_MEM_BALLOONED, NULL, result);
 }
-*/
+
 int	check_vcenter_hv_memory_used(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	return get_vcenter_hv_stat(request, ZBX_OPT_XPATH, ZBX_XPATH_LN2("quickStats", "overallMemoryUsage"), result);
@@ -1558,10 +1664,10 @@ int	check_vcenter_hv_version(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return get_vcenter_hv_stat(request, ZBX_OPT_XPATH, ZBX_XPATH_LN2("product", "version"), result);
 }
 
-
-
-
-
+int	check_vcenter_hv_vm_num(AGENT_REQUEST *request, AGENT_RESULT *result)
+{
+	return get_vcenter_hv_stat(request, ZBX_OPT_VM_NUM, NULL, result);
+}
 
 int	check_vcenter_vm_cpu_num(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
@@ -1576,10 +1682,11 @@ int	check_vcenter_vm_cpu_usage(AGENT_REQUEST *request, AGENT_RESULT *result)
 int	check_vcenter_vm_discovery(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	struct zbx_json	j;
-	int		i;
+	int		i, k;
 	char		*url, *username, *password, *name, *host, *error = NULL;
 	zbx_vcenter_t	*vcenter = NULL;
-	zbx_vm_t	*vm = NULL;
+	zbx_hv_t	*hv;
+	zbx_vm_t	*vm;
 
 	if (3 != request->nparam)
 		return SYSINFO_RET_FAIL;
@@ -1602,27 +1709,32 @@ int	check_vcenter_vm_discovery(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (NULL != (vcenter = vcenter_get(url, username, password)))
 	{
-		for (i = 0; i < vcenter->vms.values_num; i++)
+		for (i = 0; i < vcenter->hvs.values_num; i++)
 		{
-			vm = (zbx_vm_t *)vcenter->vms.values[i];
+			hv = (zbx_hv_t *)vcenter->hvs.values[i];
 
-			if (NULL == (name = read_xml_value(vm->details, ZBX_XPATH_LN2("config", "name"))))
-				continue;
-
-			if (NULL == (host = read_xml_value(vm->details, ZBX_XPATH_LN("host"))))
+			for (k = 0; k < hv->vms.values_num; k++)
 			{
+				vm = (zbx_vm_t *)hv->vms.values[k];
+
+				if (NULL == (name = read_xml_value(vm->details, ZBX_XPATH_LN2("config", "name"))))
+					continue;
+
+				if (NULL == (host = read_xml_value(vm->details, ZBX_XPATH_LN("host"))))
+				{
+					zbx_free(name);
+					continue;
+				}
+
+				zbx_json_addobject(&j, NULL);
+				zbx_json_addstring(&j, "{#VM.UUID}", vm->uuid, ZBX_JSON_TYPE_STRING);
+				zbx_json_addstring(&j, "{#VM.NAME}", name, ZBX_JSON_TYPE_STRING);
+				zbx_json_addstring(&j, "{#HV.NAME}", host, ZBX_JSON_TYPE_STRING);
+				zbx_json_close(&j);
+
+				zbx_free(host);
 				zbx_free(name);
-				continue;
 			}
-
-			zbx_json_addobject(&j, NULL);
-			zbx_json_addstring(&j, "{#VM.UUID}", vm->uuid, ZBX_JSON_TYPE_STRING);
-			zbx_json_addstring(&j, "{#VM.NAME}", name, ZBX_JSON_TYPE_STRING);
-			zbx_json_addstring(&j, "{#HV.NAME}", host, ZBX_JSON_TYPE_STRING);
-			zbx_json_close(&j);
-
-			zbx_free(host);
-			zbx_free(name);
 		}
 	}
 
