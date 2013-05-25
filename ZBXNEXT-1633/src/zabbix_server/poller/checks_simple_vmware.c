@@ -112,7 +112,7 @@ zbx_hv_t;
 typedef struct
 {
 	char			*uuid;
-	char			*details;
+	char			*status_ex;
 }
 zbx_vm_t;
 
@@ -993,14 +993,14 @@ static int	vcenter_update(const char *url, const char *username, const char *pas
 			{
 				vm = zbx_malloc(NULL, sizeof(zbx_vm_t));
 				vm->uuid = uuid;
-				vm->details = NULL;
+				vm->status_ex = NULL;
 
 				zbx_vector_ptr_append(&hv->vms, vm);
 			}
 			else
 				zbx_free(uuid);
 
-			vm->details = zbx_strdup(vm->details, page.data);
+			vm->status_ex = zbx_strdup(vm->status_ex, page.data);
 
 			zbx_free(guestvmids.values[j]);
 		}
@@ -1022,14 +1022,14 @@ static int	vcenter_update(const char *url, const char *username, const char *pas
 		{
 			vm = zbx_malloc(NULL, sizeof(zbx_vm_t));
 			vm->uuid = uuid;
-			vm->details = NULL;
+			vm->status_ex = NULL;
 
 			zbx_vector_ptr_append(&vcenter->vms, vm);
 		}
 		else
 			zbx_free(uuid);
 
-		vm->details = zbx_strdup(vm->details, page.data);
+		vm->status_ex = zbx_strdup(vm->status_ex, page.data);
 	}
 */
 	vcenter->lastcheck = time(NULL);
@@ -1205,10 +1205,9 @@ out:
 	return ret;
 }
 
-static int	vsphere_vm_data_get(CURL *easyhandle, const char *vmid)
+static int	vsphere_vm_status_ex_get(CURL *easyhandle, const char *vmid)
 {
-#	define ZBX_POST_VSPHERE_VMDETAILS 								\
-		ZBX_POST_VSPHERE_HEADER									\
+/*
 		"<ns0:RetrieveProperties>"								\
 			"<ns0:_this type=\"PropertyCollector\">ha-property-collector</ns0:_this>"	\
 			"<ns0:specSet>"									\
@@ -1222,9 +1221,24 @@ static int	vsphere_vm_data_get(CURL *easyhandle, const char *vmid)
 				"</ns0:objectSet>"							\
 			"</ns0:specSet>"								\
 		"</ns0:RetrieveProperties>"								\
+*/
+#	define ZBX_POST_VSPHERE_VMDETAILS 								\
+		ZBX_POST_VSPHERE_HEADER									\
+		"<ns0:RetrieveProperties>"								\
+			"<ns0:_this type=\"PropertyCollector\">ha-property-collector</ns0:_this>"	\
+			"<ns0:specSet>"									\
+				"<ns0:propSet>"								\
+					"<ns0:type>VirtualMachine</ns0:type>"				\
+					"<ns0:all>true</ns0:all>"					\
+				"</ns0:propSet>"							\
+				"<ns0:objectSet>"							\
+					"<ns0:obj type=\"VirtualMachine\">%s</ns0:obj>"			\
+				"</ns0:objectSet>"							\
+			"</ns0:specSet>"								\
+		"</ns0:RetrieveProperties>"								\
 		ZBX_POST_VSPHERE_FOOTER
 
-	const char	*__function_name = "vsphere_vm_data_get";
+	const char	*__function_name = "vsphere_vm_status_ex_get";
 
 	int		err, opt, ret = FAIL;
 	char		*error = NULL, tmp[MAX_STRING_LEN];
@@ -1345,7 +1359,7 @@ static int	vsphere_update(const char *url, const char *username, const char *pas
 
 	for (i = 0; i < guestvmids.values_num; i++)
 	{
-		if (SUCCEED != vsphere_vm_data_get(easyhandle, guestvmids.values[i]))
+		if (SUCCEED != vsphere_vm_status_ex_get(easyhandle, guestvmids.values[i]))
 			continue;
 
 		if (NULL == (uuid = read_xml_value(page.data, ZBX_XPATH_LN("uuid"))))
@@ -1355,14 +1369,14 @@ static int	vsphere_update(const char *url, const char *username, const char *pas
 		{
 			vm = zbx_malloc(NULL, sizeof(zbx_vm_t));
 			vm->uuid = uuid;
-			vm->details = NULL;
+			vm->status_ex = NULL;
 
 			zbx_vector_ptr_append(&vsphere->vms, vm);
 		}
 		else
 			zbx_free(uuid);
 
-		vm->details = zbx_strdup(vm->details, page.data);
+		vm->status_ex = zbx_strdup(vm->status_ex, page.data);
 	}
 
 	vsphere->lastcheck = time(NULL);
@@ -1431,7 +1445,7 @@ static int	get_vcenter_vmstat(AGENT_REQUEST *request, const char *xpath, AGENT_R
 	if (NULL == vm)
 		return SYSINFO_RET_FAIL;
 
-	if (NULL == (value = read_xml_value(vm->details, xpath)))
+	if (NULL == (value = read_xml_value(vm->status_ex, xpath)))
 		return SYSINFO_RET_FAIL;
 
 	SET_STR_RESULT(result, value);
@@ -1530,7 +1544,7 @@ static int	get_vcenter_hv_stat(AGENT_REQUEST *request, int opt, const char *xpat
 			{
 				vm = (zbx_vm_t *)hv->vms.values[i];
 
-				if (NULL == (value = read_xml_value(vm->details, xpath)))
+				if (NULL == (value = read_xml_value(vm->status_ex, xpath)))
 					return SYSINFO_RET_FAIL;
 
 				if (SUCCEED != is_uint64(value, &value_uint64))
@@ -1768,10 +1782,10 @@ int	check_vcenter_vm_discovery(AGENT_REQUEST *request, AGENT_RESULT *result)
 			{
 				vm = (zbx_vm_t *)hv->vms.values[k];
 
-				if (NULL == (name = read_xml_value(vm->details, ZBX_XPATH_LN2("config", "name"))))
+				if (NULL == (name = read_xml_value(vm->status_ex, ZBX_XPATH_LN2("config", "name"))))
 					continue;
 
-				if (NULL == (host = read_xml_value(vm->details, ZBX_XPATH_LN("host"))))
+				if (NULL == (host = read_xml_value(vm->status_ex, ZBX_XPATH_LN("host"))))
 				{
 					zbx_free(name);
 					continue;
@@ -1875,8 +1889,8 @@ int	check_vcenter_vm_vfs_fs_discovery(AGENT_REQUEST *request, AGENT_RESULT *resu
 {
 	struct zbx_json		j;
 	zbx_vcenter_t		*vcenter;
-	zbx_vm_t		*vm = NULL;
 	zbx_hv_t		*hv;
+	zbx_vm_t		*vm = NULL;
 	char			*url, *username, *password, *uuid, *error = NULL;
 	zbx_vector_str_t	disks;
 	int			i;
@@ -1914,7 +1928,7 @@ int	check_vcenter_vm_vfs_fs_discovery(AGENT_REQUEST *request, AGENT_RESULT *resu
 
 	zbx_vector_str_create(&disks);
 
-	if (SUCCEED != read_xml_values(vm->details, ZBX_XPATH_LN2("disk", "diskPath"), &disks))
+	if (SUCCEED != read_xml_values(vm->status_ex, ZBX_XPATH_LN2("disk", "diskPath"), &disks))
 	{
 		zbx_vector_str_destroy(&disks);
 		return SYSINFO_RET_FAIL;
@@ -1939,6 +1953,92 @@ int	check_vcenter_vm_vfs_fs_discovery(AGENT_REQUEST *request, AGENT_RESULT *resu
 	SET_STR_RESULT(result, zbx_strdup(NULL, j.buffer));
 
 	zbx_json_free(&j);
+
+	return SYSINFO_RET_OK;
+}
+
+int	check_vcenter_vm_vfs_fs_size(AGENT_REQUEST *request, AGENT_RESULT *result)
+{
+	zbx_vcenter_t	*vcenter;
+	zbx_hv_t	*hv;
+	zbx_vm_t	*vm = NULL;
+	char		*url, *username, *password, *uuid, *fsname, *mode, *value, *error = NULL, xpath[MAX_STRING_LEN];
+	zbx_uint64_t	value_total, value_free;
+	int		i;
+
+	if (6 != request->nparam)
+		return SYSINFO_RET_FAIL;
+
+	url = get_rparam(request, 0);
+	username = get_rparam(request, 1);
+	password = get_rparam(request, 2);
+	uuid = get_rparam(request, 3);
+	fsname = get_rparam(request, 4);
+	mode = get_rparam(request, 5);
+
+	if ('\0' == *url || '\0' == *username || '\0' == *uuid)
+		return SYSINFO_RET_FAIL;
+
+	if (SUCCEED != vcenter_update(url, username, password, &error))
+	{
+		SET_MSG_RESULT(result, error);
+		return SYSINFO_RET_FAIL;
+	}
+
+	if (NULL == (vcenter = vcenter_get(url, username, password)))
+		return SYSINFO_RET_FAIL;
+
+	for (i = 0; i < vcenter->hvs.values_num; i++)
+	{
+		hv = (zbx_hv_t *)vcenter->hvs.values[i];
+
+		if (NULL != (vm = vm_get(&hv->vms, uuid)))
+			break;
+	}
+
+	if (NULL == vm)
+		return SYSINFO_RET_FAIL;
+
+	zbx_snprintf(xpath, sizeof(xpath),
+			ZBX_XPATH_LN2("disk", "diskPath") "[.='%s']/../*[local-name()='capacity']", fsname);
+
+	if (NULL == (value = read_xml_value(vm->status_ex, xpath)))
+		return SYSINFO_RET_FAIL;
+
+	if (SUCCEED != is_uint64(value, &value_total))
+	{
+		zbx_free(value);
+		return SYSINFO_RET_FAIL;
+	}
+
+	zbx_free(value);
+
+	zbx_snprintf(xpath, sizeof(xpath),
+			ZBX_XPATH_LN2("disk", "diskPath") "[.='%s']/../*[local-name()='freeSpace']", fsname);
+
+	if (NULL == (value = read_xml_value(vm->status_ex, xpath)))
+		return SYSINFO_RET_FAIL;
+
+	if (SUCCEED != is_uint64(value, &value_free))
+	{
+		zbx_free(value);
+		return SYSINFO_RET_FAIL;
+	}
+
+	zbx_free(value);
+
+	if ('\0' == *mode || 0 == strcmp(mode, "total"))
+		SET_UI64_RESULT(result, value_total);
+	else if (0 == strcmp(mode, "free"))
+		SET_UI64_RESULT(result, value_free);
+	else if (0 == strcmp(mode, "used"))
+		SET_UI64_RESULT(result, value_total - value_free);
+	else if (0 == strcmp(mode, "pfree"))
+		SET_DBL_RESULT(result, (0 != value_total ? (double)(100.0 * value_free) / value_total : 0));
+	else if (0 == strcmp(mode, "pused"))
+		SET_DBL_RESULT(result, 100.0 - (0 != value_total ? (double)(100.0 * value_free) / value_total : 0));
+	else
+		return SYSINFO_RET_FAIL;
 
 	return SYSINFO_RET_OK;
 }
@@ -1997,7 +2097,7 @@ static int	get_vsphere_stat(AGENT_REQUEST *request, int opt, const char *xpath, 
 			{
 				vm = (zbx_vm_t *)vsphere->vms.values[i];
 
-				if (NULL == (value = read_xml_value(vm->details, xpath)))
+				if (NULL == (value = read_xml_value(vm->status_ex, xpath)))
 					return SYSINFO_RET_FAIL;
 
 				if (SUCCEED != is_uint64(value, &value_uint64))
@@ -2047,7 +2147,7 @@ static int	get_vsphere_vmstat(AGENT_REQUEST *request, const char *xpath, AGENT_R
 	if (NULL == (vm = vm_get(&vsphere->vms, uuid)))
 		return SYSINFO_RET_FAIL;
 
-	if (NULL == (value = read_xml_value(vm->details, xpath)))
+	if (NULL == (value = read_xml_value(vm->status_ex, xpath)))
 		return SYSINFO_RET_FAIL;
 
 	SET_STR_RESULT(result, value);
@@ -2213,7 +2313,7 @@ int	check_vsphere_vm_discovery(AGENT_REQUEST *request, AGENT_RESULT *result)
 		{
 			vm = (zbx_vm_t *)vsphere->vms.values[i];
 
-			if (NULL == (name = read_xml_value(vm->details, ZBX_XPATH_LN2("config", "name"))))
+			if (NULL == (name = read_xml_value(vm->status_ex, ZBX_XPATH_LN2("config", "name"))))
 				continue;
 
 			zbx_json_addobject(&j, NULL);
@@ -2305,6 +2405,146 @@ int	check_vsphere_vm_storage_uncommitted(AGENT_REQUEST *request, AGENT_RESULT *r
 int	check_vsphere_vm_uptime(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	return get_vsphere_vmstat(request, ZBX_XPATH_LN2("quickStats", "uptimeSeconds"), result);
+}
+
+int	check_vsphere_vm_vfs_fs_discovery(AGENT_REQUEST *request, AGENT_RESULT *result)
+{
+	struct zbx_json		j;
+	zbx_vsphere_t		*vsphere;
+	zbx_vm_t		*vm;
+	char			*url, *username, *password, *uuid, *error = NULL;
+	zbx_vector_str_t	disks;
+	int			i;
+
+	if (4 != request->nparam)
+		return SYSINFO_RET_FAIL;
+
+	url = get_rparam(request, 0);
+	username = get_rparam(request, 1);
+	password = get_rparam(request, 2);
+	uuid = get_rparam(request, 3);
+
+	if ('\0' == *url || '\0' == *username || '\0' == *uuid)
+		return SYSINFO_RET_FAIL;
+
+	if (SUCCEED != vsphere_update(url, username, password, &error))
+	{
+		SET_MSG_RESULT(result, error);
+		return SYSINFO_RET_FAIL;
+	}
+
+	if (NULL == (vsphere = vsphere_get(url, username, password)))
+		return SYSINFO_RET_FAIL;
+
+
+	if (NULL == (vm = vm_get(&vsphere->vms, uuid)))
+		return SYSINFO_RET_FAIL;
+
+	zbx_vector_str_create(&disks);
+
+	if (SUCCEED != read_xml_values(vm->status_ex, ZBX_XPATH_LN2("disk", "diskPath"), &disks))
+	{
+		zbx_vector_str_destroy(&disks);
+		return SYSINFO_RET_FAIL;
+	}
+
+	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
+	zbx_json_addarray(&j, ZBX_PROTO_TAG_DATA);
+
+	for (i = 0; i < disks.values_num; i++)
+	{
+		zbx_json_addobject(&j, NULL);
+		zbx_json_addstring(&j, "{#FSNAME}", disks.values[i], ZBX_JSON_TYPE_STRING);
+		zbx_json_close(&j);
+
+		zbx_free(disks.values[i]);
+	}
+
+	zbx_vector_str_destroy(&disks);
+
+	zbx_json_close(&j);
+
+	SET_STR_RESULT(result, zbx_strdup(NULL, j.buffer));
+
+	zbx_json_free(&j);
+
+	return SYSINFO_RET_OK;
+}
+
+int	check_vsphere_vm_vfs_fs_size(AGENT_REQUEST *request, AGENT_RESULT *result)
+{
+	zbx_vsphere_t	*vsphere;
+	zbx_vm_t	*vm;
+	char		*url, *username, *password, *uuid, *fsname, *mode, *value, *error = NULL, xpath[MAX_STRING_LEN];
+	zbx_uint64_t	value_total, value_free;
+
+	if (6 != request->nparam)
+		return SYSINFO_RET_FAIL;
+
+	url = get_rparam(request, 0);
+	username = get_rparam(request, 1);
+	password = get_rparam(request, 2);
+	uuid = get_rparam(request, 3);
+	fsname = get_rparam(request, 4);
+	mode = get_rparam(request, 5);
+
+	if ('\0' == *url || '\0' == *username || '\0' == *uuid)
+		return SYSINFO_RET_FAIL;
+
+	if (SUCCEED != vsphere_update(url, username, password, &error))
+	{
+		SET_MSG_RESULT(result, error);
+		return SYSINFO_RET_FAIL;
+	}
+
+	if (NULL == (vsphere = vsphere_get(url, username, password)))
+		return SYSINFO_RET_FAIL;
+
+	if (NULL == (vm = vm_get(&vsphere->vms, uuid)))
+		return SYSINFO_RET_FAIL;
+
+	zbx_snprintf(xpath, sizeof(xpath),
+			ZBX_XPATH_LN2("disk", "diskPath") "[.='%s']/../*[local-name()='capacity']", fsname);
+
+	if (NULL == (value = read_xml_value(vm->status_ex, xpath)))
+		return SYSINFO_RET_FAIL;
+
+	if (SUCCEED != is_uint64(value, &value_total))
+	{
+		zbx_free(value);
+		return SYSINFO_RET_FAIL;
+	}
+
+	zbx_free(value);
+
+	zbx_snprintf(xpath, sizeof(xpath),
+			ZBX_XPATH_LN2("disk", "diskPath") "[.='%s']/../*[local-name()='freeSpace']", fsname);
+
+	if (NULL == (value = read_xml_value(vm->status_ex, xpath)))
+		return SYSINFO_RET_FAIL;
+
+	if (SUCCEED != is_uint64(value, &value_free))
+	{
+		zbx_free(value);
+		return SYSINFO_RET_FAIL;
+	}
+
+	zbx_free(value);
+
+	if ('\0' == *mode || 0 == strcmp(mode, "total"))
+		SET_UI64_RESULT(result, value_total);
+	else if (0 == strcmp(mode, "free"))
+		SET_UI64_RESULT(result, value_free);
+	else if (0 == strcmp(mode, "used"))
+		SET_UI64_RESULT(result, value_total - value_free);
+	else if (0 == strcmp(mode, "pfree"))
+		SET_DBL_RESULT(result, (0 != value_total ? (double)(100.0 * value_free) / value_total : 0));
+	else if (0 == strcmp(mode, "pused"))
+		SET_DBL_RESULT(result, 100.0 - (0 != value_total ? (double)(100.0 * value_free) / value_total : 0));
+	else
+		return SYSINFO_RET_FAIL;
+
+	return SYSINFO_RET_OK;
 }
 
 /*static int	vcenter_get_datacenter(CURL *easyhandle)

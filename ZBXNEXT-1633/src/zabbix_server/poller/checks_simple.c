@@ -59,6 +59,7 @@ static char	*vmkeys[] =
 	"vcenter.vm.storage.uncommitted",
 	"vcenter.vm.uptime",
 	"vcenter.vm.vfs.fs.discovery",
+	"vcenter.vm.vfs.fs.size",
 
 	"vsphere.cpu.usage",
 	"vsphere.fullname",
@@ -89,6 +90,8 @@ static char	*vmkeys[] =
 	"vsphere.vm.storage.unshared",
 	"vsphere.vm.storage.uncommitted",
 	"vsphere.vm.uptime",
+	"vsphere.vm.vfs.fs.discovery",
+	"vsphere.vm.vfs.fs.size",
 	NULL
 };
 
@@ -126,6 +129,7 @@ static vmfunc_t	vmfuncs[] =
 	check_vcenter_vm_storage_uncommitted,
 	check_vcenter_vm_uptime,
 	check_vcenter_vm_vfs_fs_discovery,
+	check_vcenter_vm_vfs_fs_size,
 
 	check_vsphere_cpu_usage,
 	check_vsphere_fullname,
@@ -155,7 +159,9 @@ static vmfunc_t	vmfuncs[] =
 	check_vsphere_vm_storage_committed,
 	check_vsphere_vm_storage_unshared,
 	check_vsphere_vm_storage_uncommitted,
-	check_vsphere_vm_uptime
+	check_vsphere_vm_uptime,
+	check_vsphere_vm_vfs_fs_discovery,
+	check_vsphere_vm_vfs_fs_size
 };
 #endif
 
