@@ -58,6 +58,7 @@ static char	*vmkeys[] =
 	"vcenter.vm.storage.unshared",
 	"vcenter.vm.storage.uncommitted",
 	"vcenter.vm.uptime",
+	"vcenter.vm.vfs.fs.discovery",
 
 	"vsphere.cpu.usage",
 	"vsphere.fullname",
@@ -124,6 +125,7 @@ static vmfunc_t	vmfuncs[] =
 	check_vcenter_vm_storage_unshared,
 	check_vcenter_vm_storage_uncommitted,
 	check_vcenter_vm_uptime,
+	check_vcenter_vm_vfs_fs_discovery,
 
 	check_vsphere_cpu_usage,
 	check_vsphere_fullname,
