@@ -772,10 +772,9 @@ out:
 	return ret;
 }
 
-static int	vcenter_vm_data_get(CURL *easyhandle, const char *guestvmid)
+static int	vcenter_vm_status_ex_get(CURL *easyhandle, const char *guestvmid)
 {
-#	define ZBX_POST_VCENTER_VMDETAILS 							\
-		ZBX_POST_VCENTER_HEADER								\
+/*
 		"<ns1:RetrieveProperties>"							\
 			"<ns1:_this type=\"PropertyCollector\">propertyCollector</ns1:_this>"	\
 			"<ns1:specSet>"								\
@@ -790,9 +789,26 @@ static int	vcenter_vm_data_get(CURL *easyhandle, const char *guestvmid)
 				"</ns1:objectSet>"						\
 			"</ns1:specSet>"							\
 		"</ns1:RetrieveProperties>"							\
+*/
+#	define ZBX_POST_VCENTER_VMDETAILS 							\
+		ZBX_POST_VCENTER_HEADER								\
+		"<ns1:RetrievePropertiesEx xsi:type=\"ns1:RetrievePropertiesExRequestType\">"	\
+			"<ns1:_this type=\"PropertyCollector\">propertyCollector</ns1:_this>"	\
+			"<ns1:specSet>"								\
+				"<ns1:propSet>"							\
+					"<ns1:type>VirtualMachine</ns1:type>"			\
+					"<ns1:all>true</ns1:all>"				\
+				"</ns1:propSet>"						\
+				"<ns1:objectSet>"						\
+					"<ns1:obj type=\"VirtualMachine\">%s</ns1:obj>"		\
+					"<ns1:skip>false</ns1:skip>"				\
+				"</ns1:objectSet>"						\
+			"</ns1:specSet>"							\
+			"<ns1:options></ns1:options>"						\
+		"</ns1:RetrievePropertiesEx>"							\
 		ZBX_POST_VCENTER_FOOTER
 
-	const char	*__function_name = "vcenter_vm_data_get";
+	const char	*__function_name = "vcenter_vm_status_ex_get";
 
 	int		err, opt, ret = FAIL;
 	char		tmp[MAX_STRING_LEN];
@@ -967,7 +983,7 @@ static int	vcenter_update(const char *url, const char *username, const char *pas
 
 		for (j = 0; j < guestvmids.values_num; j++)
 		{
-			if (SUCCEED != vcenter_vm_data_get(easyhandle, guestvmids.values[j]))
+			if (SUCCEED != vcenter_vm_status_ex_get(easyhandle, guestvmids.values[j]))
 				continue;
 
 			if (NULL == (uuid = read_xml_value(page.data, ZBX_XPATH_LN("uuid"))))
@@ -996,7 +1012,7 @@ static int	vcenter_update(const char *url, const char *username, const char *pas
 
 	for (i = 0; i < guestvmids.values_num; i++)
 	{
-		if (SUCCEED != vcenter_vm_data_get(easyhandle, guestvmids.values[i]))
+		if (SUCCEED != vcenter_vm_status_ex_get(easyhandle, guestvmids.values[i]))
 			continue;
 
 		if (NULL == (uuid = read_xml_value(page.data, ZBX_XPATH_LN("uuid"))))
@@ -1853,6 +1869,78 @@ int	check_vcenter_vm_storage_uncommitted(AGENT_REQUEST *request, AGENT_RESULT *r
 int	check_vcenter_vm_uptime(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	return get_vcenter_vmstat(request, ZBX_XPATH_LN2("quickStats", "uptimeSeconds"), result);
+}
+
+int	check_vcenter_vm_vfs_fs_discovery(AGENT_REQUEST *request, AGENT_RESULT *result)
+{
+	struct zbx_json		j;
+	zbx_vcenter_t		*vcenter;
+	zbx_vm_t		*vm = NULL;
+	zbx_hv_t		*hv;
+	char			*url, *username, *password, *uuid, *error = NULL;
+	zbx_vector_str_t	disks;
+	int			i;
+
+	if (4 != request->nparam)
+		return SYSINFO_RET_FAIL;
+
+	url = get_rparam(request, 0);
+	username = get_rparam(request, 1);
+	password = get_rparam(request, 2);
+	uuid = get_rparam(request, 3);
+
+	if ('\0' == *url || '\0' == *username || '\0' == *uuid)
+		return SYSINFO_RET_FAIL;
+
+	if (SUCCEED != vcenter_update(url, username, password, &error))
+	{
+		SET_MSG_RESULT(result, error);
+		return SYSINFO_RET_FAIL;
+	}
+
+	if (NULL == (vcenter = vcenter_get(url, username, password)))
+		return SYSINFO_RET_FAIL;
+
+	for (i = 0; i < vcenter->hvs.values_num; i++)
+	{
+		hv = (zbx_hv_t *)vcenter->hvs.values[i];
+
+		if (NULL != (vm = vm_get(&hv->vms, uuid)))
+			break;
+	}
+
+	if (NULL == vm)
+		return SYSINFO_RET_FAIL;
+
+	zbx_vector_str_create(&disks);
+
+	if (SUCCEED != read_xml_values(vm->details, ZBX_XPATH_LN2("disk", "diskPath"), &disks))
+	{
+		zbx_vector_str_destroy(&disks);
+		return SYSINFO_RET_FAIL;
+	}
+
+	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
+	zbx_json_addarray(&j, ZBX_PROTO_TAG_DATA);
+
+	for (i = 0; i < disks.values_num; i++)
+	{
+		zbx_json_addobject(&j, NULL);
+		zbx_json_addstring(&j, "{#FSNAME}", disks.values[i], ZBX_JSON_TYPE_STRING);
+		zbx_json_close(&j);
+
+		zbx_free(disks.values[i]);
+	}
+
+	zbx_vector_str_destroy(&disks);
+
+	zbx_json_close(&j);
+
+	SET_STR_RESULT(result, zbx_strdup(NULL, j.buffer));
+
+	zbx_json_free(&j);
+
+	return SYSINFO_RET_OK;
 }
 
 /******************************************************************************
