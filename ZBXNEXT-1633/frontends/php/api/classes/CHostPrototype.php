@@ -171,6 +171,8 @@ class CHostPrototype extends CHostBase {
 					'messageMacro' => _('Host name for host prototype "%1$s" must contain macros.')
 				)),
 				'name' => new CStringValidator(array(
+					// if an empty name is given, it should be replaced with the host name, but we'll validate it
+					// just in case
 					'messageEmpty' => _('Empty name for host prototype "%1$s".')
 				)),
 				'status' => new CSetValidator(array(
