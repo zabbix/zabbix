@@ -2391,3 +2391,34 @@ int	DBtxn_ongoing()
 {
 	return 0 == zbx_db_txn_level() ? FAIL : SUCCEED;
 }
+
+void	DBexecute_multiple_query(const char *query, const char *field_name, zbx_vector_uint64_t *ids)
+{
+#define MAX_IDS	950
+	char	*sql = NULL;
+	size_t	sql_alloc = ZBX_KIBIBYTE, sql_offset = 0;
+	int	i;
+
+	sql = zbx_malloc(sql, sql_alloc);
+
+	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	for (i = 0; i < ids->values_num; i += MAX_IDS)
+	{
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, query);
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, field_name,
+				&ids->values[i], MIN(MAX_IDS, ids->values_num - i));
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
+
+		DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+	}
+
+	if (sql_offset > 16)	/* in ORACLE always present begin..end; */
+	{
+		DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+		DBexecute("%s", sql);
+	}
+
+	zbx_free(sql);
+}
