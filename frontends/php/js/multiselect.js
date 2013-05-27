@@ -62,6 +62,7 @@ jQuery(function($) {
 	 * @param string options['defaultValue']	default value for input element
 	 * @param bool   options['disabled']		turn on/off readonly state
 	 * @param int    options['selectedLimit']	how many items can be selected
+	 * @param object options['ignored']			preload ignored data
 	 * @param int    options['limit']			how many available items can be received from backend
 	 *
 	 * @return object
@@ -103,8 +104,8 @@ jQuery(function($) {
 			 * Clean multi select object values.
 			 */
 			$.fn.multiSelect.clean = function() {
-				for (var id in values.selected) {
-					removeSelected(id, obj, values, options);
+				for (var name in values.selected) {
+					removeSelected(values.selected[name.toUpperCase()].uid, obj, values, options);
 				}
 
 				cleanAvailable(obj, values);
@@ -781,16 +782,17 @@ jQuery(function($) {
 	}
 
 	function getLimit(values, options) {
+
 		return (options.limit > 0)
-			? options.limit + countMatches(values.selected, search) + countMatches(values.ignored, search) + 1
+			? options.limit + countMatches(values.selected, values.search) + countMatches(values.ignored, values.search) + 1
 			: null;
 	}
 
-	function countMatches(data, $search) {
+	function countMatches(data, search) {
 		var count = 0;
 
 		for (var key in data) {
-			if (data[key].name === $search) {
+			if (data[key].name.substr(0, search.length).toUpperCase() == search.toUpperCase()) {
 				count++;
 			}
 		}
