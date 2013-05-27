@@ -19,6 +19,27 @@
 **/
 
 
+/**
+ * @property string $groupid
+ * @property string $hostid
+ * @property string $triggerid
+ * @property string $graphid
+ * @property string $druleid
+ * @property string $severityMin
+ * @property array  $groups
+ * @property array  $hosts
+ * @property array  $graphs
+ * @property array  $triggers
+ * @property array  $drules
+ * @property bool   $groupsSelected
+ * @property bool   $groupsAll
+ * @property bool   $hostsSelected
+ * @property bool   $hostsAll
+ * @property bool   $graphsSelected
+ * @property bool   $triggersSelected
+ * @property bool   $drulesSelected
+ * @property bool   $drulesAll
+ */
 class CPageFilter {
 
 	const GROUP_LATEST_IDX = 'web.latest.groupid';
