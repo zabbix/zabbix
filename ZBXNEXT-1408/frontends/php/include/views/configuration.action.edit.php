@@ -795,7 +795,7 @@ if (!empty($this->data['new_operation'])) {
 			));
 
 			// load host groups
-			$groupIds = isset($this->data['new_operation']['optemplate'])
+			$groupIds = isset($this->data['new_operation']['opgroup'])
 				? zbx_objectValues($this->data['new_operation']['opgroup'], 'groupid')
 				: array();
 
