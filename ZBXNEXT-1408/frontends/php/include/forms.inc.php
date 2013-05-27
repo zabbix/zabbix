@@ -578,7 +578,7 @@
 				new CButton('btn_app', _('Select'),
 					'return PopUp("popup.php?srctbl=applications&srcfld1=name'.
 						'&dstfrm='.$form->getName().'&dstfld1=filter_application'.
-						'&with_applications=1&host=" + jQuery("#filter_hostname").val()'
+						'&with_applications=1&hostid=" + jQuery("input[name=\'filter_hostid\']").val()'
 						.', 550, 450, "application");',
 					'A'
 				)
