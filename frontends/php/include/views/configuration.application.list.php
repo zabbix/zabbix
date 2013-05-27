@@ -62,13 +62,20 @@ $applicationTable->setHeader(array(
 	_('Show')
 ));
 foreach ($this->data['applications'] as $application) {
-	if (!empty($application['template_host'])) {
-		$name = array(
-			new CLink($application['template_host']['name'], 'applications.php?hostid='.$application['template_host']['hostid'], 'unknown'),
-			NAME_DELIMITER,
-			$application['name']
-		);
+	// inherited app, display the template list
+	if ($application['templateids']) {
+		CArrayHelper::sort($application['sourceTemplates'], array('name'));
+
+		$name = array();
+		foreach ($application['sourceTemplates'] as $template) {
+			$name[] = new CLink($template['name'], 'applications.php?hostid='.$template['hostid'], 'unknown');
+			$name[] = ', ';
+		}
+		array_pop($name);
+		$name[] = NAME_DELIMITER;
+		$name[] = $application['name'];
 	}
+	// normal app
 	else {
 		$name = new CLink($application['name'], 'applications.php?form=update&applicationid='.$application['applicationid'].'&hostid='.$application['hostid'].'&groupid='.$this->data['groupid']);
 	}
