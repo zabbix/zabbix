@@ -239,9 +239,9 @@ if (isset($_REQUEST['form'])) {
 			'name' => get_request('name'),
 			'status' => get_request('status', HOST_STATUS_MONITORED),
 			'templates' => get_request('templates', array()),
-			'inventory' => get_request('inventory', array(
-				'inventory_mode' => HOST_INVENTORY_DISABLED
-			)),
+			'inventory' => array(
+				'inventory_mode' => get_request('inventory_mode', HOST_INVENTORY_DISABLED)
+			),
 			'groupLinks' => get_request('group_links', array()),
 			'groupPrototypes' => get_request('group_prototypes', array())
 		),
