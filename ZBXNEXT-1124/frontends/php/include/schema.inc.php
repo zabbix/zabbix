@@ -619,13 +619,6 @@ return array(
 				'length' => 255,
 				'default' => '',
 			),
-			'templateid' => array(
-				'null' => true,
-				'type' => DB::FIELD_TYPE_ID,
-				'length' => 20,
-				'ref_table' => 'applications',
-				'ref_field' => 'applicationid',
-			),
 		),
 	),
 	'httptest' => array(
@@ -5890,6 +5883,31 @@ return array(
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 255,
 				'default' => '',
+			),
+		),
+	),
+	'application_template' => array(
+		'type' => DB::TABLE_TYPE_CONFIG,
+		'key' => 'application_templateid',
+		'fields' => array(
+			'application_templateid' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+			),
+			'applicationid' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'applications',
+				'ref_field' => 'applicationid',
+			),
+			'templateid' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'applications',
+				'ref_field' => 'applicationid',
 			),
 		),
 	),
