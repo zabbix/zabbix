@@ -438,12 +438,7 @@ function convertUnitsUptime($value) {
 }
 
 function convertUnitsS($value) {
-	if (floor(abs($value) * 1000) == 0) {
-		$value = ($value == 0) ? '0'._x('s', 'second short') : '< 1'._x('ms', 'millisecond short');
-		return $value;
-	}
-
-	if (($secs = round($value * 1000) / 1000) < 0) {
+	if (($secs = round($value * 1000, ZBX_UNITS_ROUNDOFF_UPPER_LIMIT) / 1000) < 0) {
 		$value = '-';
 		$secs = -$secs;
 	}
@@ -494,8 +489,12 @@ function convertUnitsS($value) {
 		$secs -= $n;
 	}
 
-	if ($n_unit < 1 && ($n = round($secs * 1000)) != 0) {
+	if ($n_unit < 1 && ($n = round($secs * 1000, ZBX_UNITS_ROUNDOFF_UPPER_LIMIT)) != 0) {
 		$value .= $n._x('ms', 'millisecond short');
+	}
+
+	if (empty($value)) {
+		$value = 0;
 	}
 
 	return rtrim($value);
