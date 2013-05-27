@@ -970,15 +970,15 @@ class CDiscoveryRule extends CItemGeneral {
 		if ($prototypes) {
 			foreach ($prototypes as &$prototype) {
 				$prototype['ruleid'] = $dstDiscovery['itemid'];
-				unset($prototype['hostid'], $prototype['templateid'], $prototype['inventory']['hostid']);
+				unset($prototype['hostid'], $prototype['inventory']['hostid']);
 
 				foreach ($prototype['groupLinks'] as &$groupLinks) {
-					unset($groupLinks['group_prototypeid'], $groupLinks['templateid']);
+					unset($groupLinks['group_prototypeid']);
 				}
 				unset($groupLinks);
 
 				foreach ($prototype['groupPrototypes'] as &$groupPrototype) {
-					unset($groupPrototype['group_prototypeid'], $groupPrototype['templateid']);
+					unset($groupPrototype['group_prototypeid']);
 				}
 				unset($groupPrototype);
 			}
