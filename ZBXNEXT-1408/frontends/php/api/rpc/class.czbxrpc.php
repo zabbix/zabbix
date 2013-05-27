@@ -145,7 +145,8 @@ class czbxrpc {
 					'data' => $e->getMessage(),
 				);
 
-				if (isset(CZBXAPI::$userData['debug_mode']) && CZBXAPI::$userData['debug_mode']) {
+				if (isset(CZBXAPI::$userData['debug_mode']) && CZBXAPI::$userData['debug_mode']
+						&& $method !== 'user.login') {
 					$result['debug'] = $e->getTrace();
 				}
 
