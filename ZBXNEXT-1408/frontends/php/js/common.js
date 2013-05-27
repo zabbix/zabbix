@@ -273,6 +273,11 @@ function clearAllForm(form) {
 		areas[i].innerHTML = '';
 	}
 
+	var multiselect = form.getElementsByClassName('multiselect');
+	for (var i = 0; i < multiselect.length; i++) {
+		jQuery(multiselect[i]).multiSelect.clean();
+	}
+
 	return true;
 }
 
