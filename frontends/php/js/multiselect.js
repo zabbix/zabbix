@@ -721,11 +721,19 @@ jQuery(function($) {
 			});
 		}
 
-		$('input[type="text"]', obj).css({
-			'padding-top': top,
-			'padding-left': left,
-			width: values.width - left - settingRightPaddings
-		});
+		if (IE) {
+			$('input[type="text"]', obj).css({
+				'padding-top': top,
+				'padding-left': left
+			});
+		}
+		else {
+			$('input[type="text"]', obj).css({
+				'padding-top': top,
+				'padding-left': left,
+				width: values.width - left - settingRightPaddings
+			});
+		}
 	}
 
 	function resizeAvailable(obj) {
