@@ -57,7 +57,7 @@ foreach ($this->data['g_triggerid'] as $triggerid) {
 $triggersFormList = new CFormList('triggersFormList');
 
 // append severity to form list
-$severityDiv = getSeverityControl();
+$severityDiv = new CSeverity(array('name' => 'priority'));
 $severityDiv->setAttribute('id', 'priority_div');
 
 $triggersFormList->addRow(
