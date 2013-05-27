@@ -195,12 +195,7 @@ if (isset($_REQUEST['form'])) {
 		$data['confirmation'] = get_request('confirmation', '');
 		$data['enableConfirmation'] = get_request('enableConfirmation', false);
 		$data['hgstype'] = get_request('hgstype', 0);
-		if (empty($data['hgstype'])) {
-			$data['groupid'] = 0;
-		}
-		else {
-			$data['groupid'] = get_request('groupid', 0);
-		}
+		$data['hgstype'] = empty($data['groupid']) ? 0 : 1;
 	}
 	elseif ($data['scriptid']) {
 		$script = API::Script()->get(array(
@@ -219,13 +214,7 @@ if (isset($_REQUEST['form'])) {
 		$data['access'] = $script['host_access'];
 		$data['confirmation'] = $script['confirmation'];
 		$data['enableConfirmation'] = !empty($script['confirmation']);
-
-		if (empty($data['groupid'])) {
-			$data['hgstype'] = 0;
-		}
-		else {
-			$data['hgstype'] = 1;
-		}
+		$data['hgstype'] = empty($data['groupid']) ? 0 : 1;
 	}
 
 	$scriptView = new CView('administration.script.edit');
