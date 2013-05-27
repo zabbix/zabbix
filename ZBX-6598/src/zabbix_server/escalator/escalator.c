@@ -1340,6 +1340,8 @@ next:
 
 	DBfree_result(result);
 
+	zbx_free(sql);
+
 	/* delete completed escalations */
 	if (0 != escalationids.values_num)
 	{
@@ -1348,7 +1350,6 @@ next:
 		DBcommit();
 	}
 
-	zbx_free(sql);
 	zbx_vector_uint64_destroy(&escalationids);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
