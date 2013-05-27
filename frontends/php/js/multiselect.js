@@ -726,8 +726,6 @@ jQuery(function($) {
 				'padding-top': top,
 				'padding-left': left
 			});
-
-			$('input[type="text"]', obj).attr("width", values.width - left - settingRightPaddings);
 		}
 		else {
 			$('input[type="text"]', obj).css({
