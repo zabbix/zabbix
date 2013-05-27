@@ -989,26 +989,21 @@ function implode_exp($expression, $triggerId, &$hostnames = array()) {
 /**
  * Get items from expression.
  *
- * @param string $expression
+ * @param array $expressions	Data received from CTriggerExpression parser
  *
  * @return array
  */
-function getExpressionItems($expression) {
-	$expressionData = new CTriggerExpression();
-	if (!$expressionData->parse($expression)) {
-		throw new Exception($expressionData->error);
-	}
-
+function getExpressionItems($expressions) {
 	$items = array();
 	$processedFunctions = array();
 	$processedItems = array();
 
-	foreach ($expressionData->expressions as $expression) {
+	foreach ($expressions as $expression) {
 		if (isset($processedFunctions[$expression['expression']])) {
 			continue;
 		}
 
-		if (!isset($processedItems[$expression['host'].$expression['item']])) {
+		if (!isset($processedItems[$expression['host']][$expression['item']])) {
 			$dbItems = DBselect(
 				'SELECT i.itemid,i.flags'.
 				' FROM items i,hosts h'.
@@ -1022,10 +1017,7 @@ function getExpressionItems($expression) {
 			);
 			if ($dbItem = DBfetch($dbItems)) {
 				$items[] = $dbItem;
-				$processedItems[$expression['host'].$expression['item']] = true;
-			}
-			else {
-				throw new Exception(_s('Incorrect trigger expression part "%1$s".', $expression['expression']));
+				$processedItems[$expression['host']][$expression['item']] = true;
 			}
 		}
 
