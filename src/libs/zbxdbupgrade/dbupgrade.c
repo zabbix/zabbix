@@ -170,6 +170,9 @@ static void	DBcreate_table_sql(char **sql, size_t *sql_alloc, size_t *sql_offset
 			zbx_strcpy_alloc(sql, sql_alloc, sql_offset, ",\n");
 		DBfield_definition_string(sql, sql_alloc, sql_offset, &table->fields[i]);
 	}
+	if ('\0' != *table->recid)
+		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, ",\nprimary key (%s)", table->recid);
+
 	zbx_strcpy_alloc(sql, sql_alloc, sql_offset, "\n)" ZBX_DB_TABLE_OPTIONS);
 }
 
@@ -1164,6 +1167,88 @@ static int	DBpatch_02010075(void)
 	return DBadd_field("httpstep", &field);
 }
 
+
+static int	DBpatch_02010076()
+{
+	const ZBX_TABLE	table =
+			{"application_template", "application_templateid", 0,
+				{
+					{"application_templateid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"applicationid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"templateid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{NULL}
+				}
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_02010077()
+{
+	return DBcreate_index("application_template", "application_template_1", "applicationid,templateid", 1);
+}
+
+static int	DBpatch_02010078()
+{
+	const ZBX_FIELD	field = {"applicationid", NULL, "applications", "applicationid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("application_template", 1, &field);
+}
+
+static int	DBpatch_02010079()
+{
+	const ZBX_FIELD	field = {"templateid", NULL, "applications", "applicationid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("application_template", 2, &field);
+}
+
+static int	DBpatch_02010080()
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+	zbx_uint64_t	id = 1, applicationid, templateid, application_templateid;
+	int		ret = FAIL;
+
+	result = DBselect("select applicationid,templateid from applications where templateid is not null");
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		ZBX_STR2UINT64(applicationid, row[0]);
+		ZBX_STR2UINT64(templateid, row[1]);
+		application_templateid = get_nodeid_by_id(applicationid) * ZBX_DM_MAX_HISTORY_IDS + id++;
+
+		if (ZBX_DB_OK > DBexecute(
+				"insert into application_template"
+					" (application_templateid,applicationid,templateid)"
+					" values (" ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 ")",
+				application_templateid, applicationid, templateid))
+		{
+			goto out;
+		}
+	}
+
+	ret = SUCCEED;
+out:
+	DBfree_result(result);
+
+	return ret;
+}
+
+static int	DBpatch_02010081()
+{
+	return DBdrop_foreign_key("applications", 2);
+}
+
+static int	DBpatch_02010082()
+{
+	return DBdrop_index("applications", "applications_1");
+}
+
+static int	DBpatch_02010083()
+{
+	return DBdrop_field("applications", "templateid");
+}
+
 #endif	/* not HAVE_SQLITE3 */
 
 static void	DBget_version(int *mandatory, int *optional)
@@ -1277,11 +1362,19 @@ int	DBcheck_version(void)
 		{DBpatch_02010073, 2010073, 0, 0},
 		{DBpatch_02010074, 2010074, 0, 1},
 		{DBpatch_02010075, 2010075, 0, 1},
+		{DBpatch_02010076, 2010076, 0, 1},
+		{DBpatch_02010077, 2010077, 0, 1},
+		{DBpatch_02010078, 2010078, 0, 1},
+		{DBpatch_02010079, 2010079, 0, 1},
+		{DBpatch_02010080, 2010080, 0, 1},
+		{DBpatch_02010081, 2010081, 0, 1},
+		{DBpatch_02010082, 2010082, 0, 1},
+		{DBpatch_02010083, 2010083, 0, 1},
 		/* IMPORTANT! When adding a new mandatory DBPatch don't forget to update it for SQLite, too. */
 		{NULL}
 	};
 #else
-	required = 2010075;	/* <---- Update mandatory DBpatch for SQLite here. */
+	required = 2010083;	/* <---- Update mandatory DBpatch for SQLite here. */
 #endif
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
