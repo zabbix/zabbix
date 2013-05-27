@@ -170,6 +170,9 @@ static void	DBcreate_table_sql(char **sql, size_t *sql_alloc, size_t *sql_offset
 			zbx_strcpy_alloc(sql, sql_alloc, sql_offset, ",\n");
 		DBfield_definition_string(sql, sql_alloc, sql_offset, &table->fields[i]);
 	}
+	if ('\0' != *table->recid)
+		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, ",\nprimary key (%s)", table->recid);
+
 	zbx_strcpy_alloc(sql, sql_alloc, sql_offset, "\n)" ZBX_DB_TABLE_OPTIONS);
 }
 
@@ -1166,11 +1169,91 @@ static int	DBpatch_2010075(void)
 
 static int	DBpatch_2010076(void)
 {
+	const ZBX_TABLE	table =
+			{"application_template", "application_templateid", 0,
+				{
+					{"application_templateid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"applicationid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"templateid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{NULL}
+				}
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_2010077(void)
+{
+	return DBcreate_index("application_template", "application_template_1", "applicationid,templateid", 1);
+}
+
+static int	DBpatch_2010078(void)
+{
+	const ZBX_FIELD	field = {"applicationid", NULL, "applications", "applicationid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("application_template", 1, &field);
+}
+
+static int	DBpatch_2010079(void)
+{
+	const ZBX_FIELD	field = {"templateid", NULL, "applications", "applicationid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("application_template", 2, &field);
+}
+
+static int	DBpatch_2010080(void)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+	zbx_uint64_t	id = 1, applicationid, templateid, application_templateid;
+	int		ret = FAIL;
+
+	result = DBselect("select applicationid,templateid from applications where templateid is not null");
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		ZBX_STR2UINT64(applicationid, row[0]);
+		ZBX_STR2UINT64(templateid, row[1]);
+		application_templateid = get_nodeid_by_id(applicationid) * ZBX_DM_MAX_HISTORY_IDS + id++;
+
+		if (ZBX_DB_OK > DBexecute(
+				"insert into application_template"
+					" (application_templateid,applicationid,templateid)"
+					" values (" ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 ")",
+				application_templateid, applicationid, templateid))
+		{
+			goto out;
+		}
+	}
+
+	ret = SUCCEED;
+out:
+	DBfree_result(result);
+
+	return ret;
+}
+
+static int	DBpatch_2010081(void)
+{
+	return DBdrop_foreign_key("applications", 2);
+}
+
+static int	DBpatch_2010082(void)
+{
+	return DBdrop_index("applications", "applications_1");
+}
+
+static int	DBpatch_2010083(void)
+{
+	return DBdrop_field("applications", "templateid");
+}
+
+static int	DBpatch_2010084(void)
+{
 	const ZBX_FIELD field = {"severity_min", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("sysmaps", &field);
 }
-
 
 #define DBPATCH_START()					zbx_dbpatch_t	patches[] = {
 #define DBPATCH_ADD(version, duplicates, mandatory)	{DBpatch_##version, version, duplicates, mandatory},
@@ -1297,6 +1380,14 @@ int	DBcheck_version(void)
 	DBPATCH_ADD(2010074, 0, 1)
 	DBPATCH_ADD(2010075, 0, 1)
 	DBPATCH_ADD(2010076, 0, 1)
+	DBPATCH_ADD(2010077, 0, 1)
+	DBPATCH_ADD(2010078, 0, 1)
+	DBPATCH_ADD(2010079, 0, 1)
+	DBPATCH_ADD(2010080, 0, 1)
+	DBPATCH_ADD(2010081, 0, 1)
+	DBPATCH_ADD(2010082, 0, 1)
+	DBPATCH_ADD(2010083, 0, 1)
+	DBPATCH_ADD(2010084, 0, 1)
 
 	DBPATCH_END()
 
