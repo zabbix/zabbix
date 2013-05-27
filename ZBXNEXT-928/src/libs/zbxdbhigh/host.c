@@ -1726,11 +1726,11 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: DBdelete_applications                                            *
+ * Function: DBdelete_application                                             *
  *                                                                            *
- * Purpose: delete applications                                               *
+ * Purpose: delete application                                                *
  *                                                                            *
- * Parameters: applicationids - [IN] a vector of application identifiers      *
+ * Parameters: applicationid - [IN] application identificator from database   *
  *                                                                            *
  * Author: Eugene Grigorjev, Alexander Vladishev                              *
  *                                                                            *
@@ -1749,8 +1749,30 @@ static void	DBdelete_applications(zbx_vector_uint64_t *applicationids)
 	if (0 == applicationids->values_num)
 		goto out;
 
+	/* don't delete applications used in web scenarious */
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
+			"select distinct applicationid"
+			" from httptest"
+			" where");
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "applicationid", applicationids->values,
+			applicationids->values_num);
+
+	result = DBselect("%s", sql);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		ZBX_STR2UINT64(applicationid, row[0]);
+
+		index = zbx_vector_uint64_bsearch(applicationids, applicationid, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+		if (FAIL != index)
+			zbx_vector_uint64_remove(applicationids, index);
+	}
+	DBfree_result(result);
+
+	if (0 == applicationids->values_num)
+		goto out;
+
 	/* don't delete applications with items assigned to them */
-	sql_offset = 0;
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
 			"select distinct applicationid"
 			" from items_applications"
@@ -1773,6 +1795,17 @@ static void	DBdelete_applications(zbx_vector_uint64_t *applicationids)
 	if (0 == applicationids->values_num)
 		goto out;
 
+	/* unlink scenarios from deleted applications */
+	sql_offset = 0;
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
+			"update httptest set applicationid=null"
+			" where");
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "applicationid", applicationids->values,
+			applicationids->values_num);
+
+	DBexecute("%s", sql);
+
+	/* delete applications */
 	sql_offset = 0;
 	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
