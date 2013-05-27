@@ -1773,6 +1773,7 @@ static void	DBdelete_applications(zbx_vector_uint64_t *applicationids)
 		goto out;
 
 	/* don't delete applications with items assigned to them */
+	sql_offset = 0;
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
 			"select distinct applicationid"
 			" from items_applications"
@@ -1795,17 +1796,6 @@ static void	DBdelete_applications(zbx_vector_uint64_t *applicationids)
 	if (0 == applicationids->values_num)
 		goto out;
 
-	/* unlink scenarios from deleted applications */
-	sql_offset = 0;
-	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-			"update httptest set applicationid=null"
-			" where");
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "applicationid", applicationids->values,
-			applicationids->values_num);
-
-	DBexecute("%s", sql);
-
-	/* delete applications */
 	sql_offset = 0;
 	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
