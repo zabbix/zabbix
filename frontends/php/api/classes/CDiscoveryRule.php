@@ -395,15 +395,11 @@ class CDiscoveryRule extends CItemGeneral {
 		}
 
 		// delete host prototypes
-		$hostPrototypeIds = array();
-		$dbItems = DBselect(
+		$hostPrototypeIds = DBfetchColumn(DBselect(
 			'SELECT hd.hostid'.
 			' FROM host_discovery hd'.
 			' WHERE '.dbConditionInt('hd.parent_itemid', $ruleids)
-		);
-		while ($item = DBfetch($dbItems)) {
-			$hostPrototypeIds[] = $item['hostid'];
-		}
+		), 'hostid');
 		if ($hostPrototypeIds) {
 			if (!API::HostPrototype()->delete($hostPrototypeIds, true)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete host prototype.'));
