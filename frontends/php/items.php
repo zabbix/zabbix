@@ -907,6 +907,7 @@ else {
 		'sortfield' => $data['sortfield'],
 		'limit' => $config['search_limit'] + 1
 	);
+	$preFilter = count($options, COUNT_RECURSIVE);
 
 	if (isset($_REQUEST['filter_groupid']) && !zbx_empty($_REQUEST['filter_groupid'])) {
 		$options['groupids'] = $_REQUEST['filter_groupid'];
@@ -973,7 +974,13 @@ else {
 		$options['filter']['ipmi_sensor'] = $_REQUEST['filter_ipmi_sensor'];
 	}
 
-	$data['items'] = API::Item()->get($options);
+	$afterFilter = count($options, COUNT_RECURSIVE);
+	if (empty($options['hostids']) && $preFilter == $afterFilter) {
+		$data['items'] = array();
+	}
+	else {
+		$data['items'] = API::Item()->get($options);
+	}
 
 	// set values for subfilters, if any of subfilters = false then item shouldnt be shown
 	if (!empty($data['items'])) {
