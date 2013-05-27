@@ -989,16 +989,16 @@ function implode_exp($expression, $triggerId, &$hostnames = array()) {
 /**
  * Get items from expression.
  *
- * @param array $expressions	Data received from CTriggerExpression parser
+ * @param object $triggerExpression		CTriggerExpression parser
  *
  * @return array
  */
-function getExpressionItems($expressions) {
+function getExpressionItems($triggerExpression) {
 	$items = array();
 	$processedFunctions = array();
 	$processedItems = array();
 
-	foreach ($expressions as $expression) {
+	foreach ($triggerExpression->expressions as $expression) {
 		if (isset($processedFunctions[$expression['expression']])) {
 			continue;
 		}

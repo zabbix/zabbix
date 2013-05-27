@@ -502,15 +502,15 @@ class CTriggerPrototype extends CTriggerGeneral {
 					_s('Cannot set "templateid" for trigger prototype "%1$s".', $trigger['description']));
 			}
 
-			$expressionData = new CTriggerExpression();
-			if (!$expressionData->parse($trigger['expression'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, $expressionData->error);
+			$triggerExpression = new CTriggerExpression();
+			if (!$triggerExpression->parse($trigger['expression'])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, $triggerExpression->error);
 			}
 
 			$this->checkIfExistsOnHost($trigger);
 
 			// check item prototypes
-			$items = getExpressionItems($expressionData->expressions);
+			$items = getExpressionItems($triggerExpression);
 
 			$hasPrototype = false;
 			foreach ($items as $item) {
@@ -580,12 +580,12 @@ class CTriggerPrototype extends CTriggerGeneral {
 				}
 
 				// check item prototypes
-				$expressionData = new CTriggerExpression();
-				if (!$expressionData->parse($trigger['expression'])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, $expressionData->error);
+				$triggerExpression = new CTriggerExpression();
+				if (!$triggerExpression->parse($trigger['expression'])) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, $triggerExpression->error);
 				}
 
-				$items = getExpressionItems($expressionData->expressions);
+				$items = getExpressionItems($triggerExpression);
 
 				$hasPrototype = false;
 				foreach ($items as $item) {
