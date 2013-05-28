@@ -1001,4 +1001,4 @@ fieldset legend { margin: 0.2em 0.5em; }
 .multiselect .available ul li.hover { background: #7A9FC1; color: #FFFFFF; }
 .multiselect .available ul li.hover .prefix { color: #F1F1F1; }
 
-.item-list .filter .multiselect { width: 165px; }
+.item-list .filter .multiselect { width: 165px; line-height: 14px; }
