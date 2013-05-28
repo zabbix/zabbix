@@ -67,18 +67,6 @@ class CTag extends CObject {
 		$this->addClass($class);
 	}
 
-	public function showStart() {
-		echo $this->startToString();
-	}
-
-	public function showBody() {
-		echo $this->bodyToString();
-	}
-
-	public function showEnd() {
-		echo $this->endToString();
-	}
-
 	// do not put new line symbol (\n) before or after html tags, it adds spaces in unwanted places
 	public function startToString() {
 		$res = $this->tag_start.'<'.$this->tagname;
