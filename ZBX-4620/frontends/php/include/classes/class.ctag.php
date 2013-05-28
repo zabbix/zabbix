@@ -71,8 +71,9 @@ class CTag extends CObject {
 	public function startToString() {
 		$res = $this->tag_start.'<'.$this->tagname;
 		foreach ($this->attributes as $key => $value) {
-			// a special encoding strategy should be used for the "value" attribute
-			$value = $this->encode($value, ($key == 'value') ? $this->valueEncStrategy : self::ENC_NOAMP);
+			// a special encoding strategy should be used for the "value", "name" and "id" attributes
+			$strategy = in_array($key, array('value', 'name', 'id'), true) ? $this->valueEncStrategy : self::ENC_NOAMP;
+			$value = $this->encode($value, $strategy);
 			$res .= ' '.$key.'="'.$value.'"';
 		}
 		$res .= ($this->paired === 'yes') ? '>' : ' />';
