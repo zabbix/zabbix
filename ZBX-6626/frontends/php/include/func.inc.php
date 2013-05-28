@@ -270,18 +270,19 @@ function zbx_date2str($format, $value = null) {
 		}
 	}
 
-	$output .= zbx_strlen($part) > 0 ? date($part, $value) : '';
+	$output .= (zbx_strlen($part) > 0) ? date($part, $value) : '';
+
 	return $output;
 }
 
 // calculate and convert timestamp to string representation
-function zbx_date2age($start_date, $end_date = 0, $utime = false) {
+function zbx_date2age($startDate, $endDate = 0, $utime = false) {
 	if (!$utime) {
-		$start_date = date('U', $start_date);
-		$end_date = !empty($end_date) ? date('U', $end_date) : time();
+		$startDate = date('U', $startDate);
+		$endDate = $endDate ? date('U', $endDate) : time();
 	}
 
-	return convertUnitsS(abs($end_date - $start_date));
+	return convertUnitsS(abs($endDate - $startDate));
 }
 
 function zbxDateToTime($strdate) {
