@@ -497,20 +497,20 @@ class CTriggerPrototype extends CTriggerGeneral {
 			}
 
 			// check for "templateid", because it is not allowed
-			if (isset($trigger['templateid'])) {
+			if (array_key_exists('templateid', $trigger)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
 					_s('Cannot set "templateid" for trigger prototype "%1$s".', $trigger['description']));
 			}
 
-			$expressionData = new CTriggerExpression();
-			if (!$expressionData->parse($trigger['expression'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, $expressionData->error);
+			$triggerExpression = new CTriggerExpression();
+			if (!$triggerExpression->parse($trigger['expression'])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, $triggerExpression->error);
 			}
 
 			$this->checkIfExistsOnHost($trigger);
 
 			// check item prototypes
-			$items = getExpressionItems($trigger['expression']);
+			$items = getExpressionItems($triggerExpression);
 
 			$hasPrototype = false;
 			foreach ($items as $item) {
@@ -529,20 +529,11 @@ class CTriggerPrototype extends CTriggerGeneral {
 
 		$this->createReal($triggers);
 
-		$triggerIds = zbx_objectValues($triggers, 'triggerid');
-
-		$createdTriggers = $this->get(array(
-			'triggerids' => $triggerIds,
-			'output' => array('description', 'expression', 'flags'),
-			'selectItems' => API_OUTPUT_EXTEND,
-			'selectHosts' => array('name')
-		));
-
 		foreach ($triggers as $trigger) {
 			$this->inherit($trigger);
 		}
 
-		return array('triggerids' => $triggerIds);
+		return array('triggerids' => zbx_objectValues($triggers, 'triggerid'));
 	}
 
 	/**
@@ -587,6 +578,28 @@ class CTriggerPrototype extends CTriggerGeneral {
 				if (strcmp($trigger['expression'], $expressionFull) == 0) {
 					unset($triggers[$key]['expression']);
 				}
+
+				// check item prototypes
+				$triggerExpression = new CTriggerExpression();
+				if (!$triggerExpression->parse($trigger['expression'])) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, $triggerExpression->error);
+				}
+
+				$items = getExpressionItems($triggerExpression);
+
+				$hasPrototype = false;
+				foreach ($items as $item) {
+					if ($item['flags'] == ZBX_FLAG_DISCOVERY_CHILD) {
+						$hasPrototype = true;
+						break;
+					}
+				}
+
+				if (!$hasPrototype) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Trigger prototype expression "%1$s" must contain at least one item prototype.',
+							$trigger['expression']));
+				}
 			}
 
 			if (isset($trigger['description']) && strcmp($trigger['description'], $dbTrigger['comments']) == 0) {
@@ -609,23 +622,6 @@ class CTriggerPrototype extends CTriggerGeneral {
 			}
 
 			$this->checkIfExistsOnHost($trigger);
-
-			// check item prototypes
-			$items = getExpressionItems($trigger['expression']);
-
-			$hasPrototype = false;
-			foreach ($items as $item) {
-				if ($item['flags'] == ZBX_FLAG_DISCOVERY_CHILD) {
-					$hasPrototype = true;
-					break;
-				}
-			}
-
-			if (!$hasPrototype) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Trigger prototype expression "%1$s" must contain at least one item prototype.',
-						$trigger['expression']));
-			}
 		}
 
 		$this->updateReal($triggers);
