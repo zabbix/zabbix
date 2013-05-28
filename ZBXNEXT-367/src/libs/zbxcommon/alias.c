@@ -29,7 +29,7 @@ void	test_aliases()
 	ALIAS	*alias;
 
 	for (alias = aliasList; NULL != alias; alias = alias->next)
-		test_parameter(alias->name, 0);
+		test_parameter(alias->name);
 }
 
 void	add_alias(const char *name, const char *value)
