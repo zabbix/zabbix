@@ -277,10 +277,28 @@ else {
 		));
 		order_result($data['applications'], $sortfield, $sortorder);
 
-		// fill applications with templated hosts
-		foreach ($data['applications'] as $id => $application) {
-			if (!empty($application['templateid'])) {
-				$data['applications'][$id]['template_host'] = get_realhost_by_applicationid($application['templateid']);
+		// fetch template application source parents
+		$applicationSourceParentIds = getApplicationSourceParentIds(zbx_objectValues($data['applications'], 'applicationid'));
+		$parentAppIds = array();
+		foreach ($applicationSourceParentIds as $applicationParentIds) {
+			foreach ($applicationParentIds as $parentId) {
+				$parentAppIds[$parentId] = $parentId;
+			}
+		}
+		if ($parentAppIds) {
+			$parentTemplates = DBfetchArrayAssoc(DBselect(
+				'SELECT a.applicationid,h.hostid,h.name'.
+				' FROM applications a,hosts h'.
+				' WHERE a.hostid=h.hostid'.
+					' AND '.dbConditionInt('a.applicationid', $parentAppIds)
+			), 'applicationid');
+
+			foreach ($data['applications'] as &$app) {
+				if ($app['templateids']) {
+					foreach ($applicationSourceParentIds[$app['applicationid']] as $parentAppId) {
+						$app['sourceTemplates'][] = $parentTemplates[$parentAppId];
+					}
+				}
 			}
 		}
 	}
