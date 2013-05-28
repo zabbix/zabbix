@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-05-09 23:17+0300\n"
-"PO-Revision-Date: 2013-05-09 19:22+0200\n"
+"POT-Creation-Date: 2013-05-28 18:26+0300\n"
+"PO-Revision-Date: 2013-05-09 23:01+0200\n"
 "Last-Translator: emmanux <emmanuel.arias@ues21.edu.ar>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: es\n"
@@ -2818,7 +2818,7 @@ msgstr "Gráficos personalizados"
 msgid "Custom label"
 msgstr "Etiqueta personalizada"
 
-#: api/classes/CMap.php:592
+#: api/classes/CMap.php:593
 #, php-format
 msgid "Custom label for map \"%2$s\" elements of type \"%1$s\" may not be empty."
 msgstr "La etiqueta personalizada para los elementos de tipo \"%1$s\" del mapa \"%2$s\" no puede estar vacía."
@@ -3957,7 +3957,7 @@ msgstr "Nombre de equipo duplicado. Ya existe un equipo con el nombre \"%s\"."
 msgid "Duplicate host. Host with the same visible name \"%s\" already exists in data."
 msgstr "Nombre de equipo duplicado. Ya existe un equipo con el nombre visible \"%s\"."
 
-#: api/classes/CMap.php:560
+#: api/classes/CMap.php:561
 #, php-format
 msgid "Duplicate map name for map \"%s\"."
 msgstr "Nombre de mapa \"%s\" duplicado."
@@ -4571,7 +4571,7 @@ msgstr "Finalizar"
 
 #: include/locales.inc.php:51
 msgid "Finnish (fi_FI)"
-msgstr ""
+msgstr "Finlandés (fi_FI)"
 
 #: include/forms.inc.php:1597 include/maintenances.inc.php:103
 msgid "First"
@@ -4594,7 +4594,7 @@ msgstr "Fijo"
 #: include/views/configuration.item.edit.php:296
 #: include/views/configuration.item.massupdate.php:298
 msgid "Flexible intervals"
-msgstr ""
+msgstr "Intervalos flexibles"
 
 #: profile.php:113 users.php:154
 msgid "For guest, password must be empty"
@@ -4643,7 +4643,7 @@ msgstr "Acceso al frontal actualizado"
 
 #: include/views/administration.users.edit.php:175
 msgid "Frontend messaging"
-msgstr ""
+msgstr "Mensajería primaria"
 
 #: include/views/configuration.host.edit.php:640
 #: include/views/configuration.template.edit.php:436
@@ -4662,12 +4662,12 @@ msgstr "Función"
 #: include/classes/validators/CTriggerFunctionValidator.php:71
 #, php-format
 msgid "Function supports \"%1$s\" parameters."
-msgstr ""
+msgstr "La función soporta \"%1$s\" parámetros."
 
 #: include/func.inc.php:566
 msgctxt "Giga short"
 msgid "G"
-msgstr ""
+msgstr "G"
 
 #: include/views/administration.mediatypes.edit.php:60
 #: include/views/administration.mediatypes.list.php:57
@@ -4709,19 +4709,19 @@ msgstr "Giga"
 
 #: include/triggers.inc.php:1738 tr_testexpr.php:36
 msgid "Given expression is not a macro"
-msgstr ""
+msgstr "La expresión dada no es una macro"
 
 #: include/classes/class.globalregexp.php:71
 msgid "Global expression does not exist."
-msgstr ""
+msgstr "La expresión global no existe"
 
 #: include/views/configuration.action.edit.php:649
 msgid "Global script"
-msgstr ""
+msgstr "Script global"
 
 #: popup.php:135
 msgid "Global scripts"
-msgstr ""
+msgstr "Scripts globales"
 
 #: hosts.php:879
 #: include/views/administration.general.regularexpressions.list.php:62
@@ -4745,19 +4745,19 @@ msgstr ""
 #: include/views/configuration.triggers.list.php:240 sysmaps.php:296
 #: templates.php:621 tr_status.php:783
 msgid "Go"
-msgstr ""
+msgstr "Ir"
 
 #: include/views/js/monitoring.maps.js.php:51 jsLoader.php:177
 msgid "Go to"
-msgstr ""
+msgstr "Ir a"
 
 #: include/views/configuration.httpconf.edit.php:97
 msgid "Google Chrome"
-msgstr ""
+msgstr "Google Chrome"
 
 #: include/graphs.inc.php:75
 msgid "Gradient line"
-msgstr ""
+msgstr "Línea gradual"
 
 #: include/audit.inc.php:29 include/blocks.inc.php:1140
 #: include/screens.inc.php:30 include/views/configuration.graph.edit.php:287
@@ -4765,54 +4765,54 @@ msgstr ""
 #: include/views/monitoring.history.php:60 latest.php:318 latest.php:495
 #: report2.php:240
 msgid "Graph"
-msgstr "Gráficos"
+msgstr "Gráfico"
 
 #: api/classes/CGraph.php:601 api/classes/CGraphPrototype.php:648
 #, php-format
 msgid "Graph \"%1$s\" already exists on \"%2$s\" (inherited from another template)."
-msgstr ""
+msgstr "El gráfico \"%1$s\" ya existe en \"%2$s\" (heredado de otra plantilla)."
 
 #: api/classes/CGraph.php:622 api/classes/CGraph.php:629
 #: api/classes/CGraphPrototype.php:670 api/classes/CGraphPrototype.php:677
 #, php-format
 msgid "Graph \"%1$s\" already exists on \"%2$s\" (items are not identical)."
-msgstr ""
+msgstr "El gráfico \"%1$s\" ya existe en \"%2$s\" (items no idénticos)."
 
 #: api/classes/CGraph.php:580 api/classes/CGraphPrototype.php:627
 #, php-format
 msgid "Graph \"%1$s\" already exists on \"%2$s\"."
-msgstr ""
+msgstr "El gráfico \"%1$s\" ya existe en \"%2$s\"."
 
 #: api/classes/CGraph.php:554 api/classes/CGraphPrototype.php:601
 #, php-format
 msgid "Graph \"%1$s\" cannot inherit. No required items on \"%2$s\" (Ymax value item)."
-msgstr ""
+msgstr "El gráfico \"%1$s\" no puede heredar. Sin items requeridos en \"%2$s\" (ítem de valor Ymax)."
 
 #: api/classes/CGraph.php:562 api/classes/CGraphPrototype.php:609
 #, php-format
 msgid "Graph \"%1$s\" cannot inherit. No required items on \"%2$s\" (Ymin value item)."
-msgstr ""
+msgstr "El gráfico \"%1$s\" no puede heredar. Sin items requeridos en \"%2$s\" (ítem de valor Ymin)."
 
 #: api/classes/CGraph.php:548 api/classes/CGraphPrototype.php:595
 #, php-format
 msgid "Graph \"%1$s\" cannot inherit. No required items on \"%2$s\"."
-msgstr ""
+msgstr "El gráfico \"%1$s\" no puede heredar. Sin items requeridos en \"%2$s\"."
 
 #: api/classes/CTemplateScreen.php:658
 #, php-format
 msgid "Graph \"%1$s\" does not exist on template \"%2$s\"."
-msgstr ""
+msgstr "El gráfico \"%1$s\" no existe en la plantilla \"%2$s\"."
 
 #: include/classes/import/CXmlImport18.php:1558
 #: include/classes/import/CXmlImport18.php:1562
 #, php-format
 msgid "Graph \"%1$s\" skipped - user rule."
-msgstr ""
+msgstr "Gráfico \"%1$s\" omitido: regla de usuario."
 
 #: api/classes/CGraph.php:38
 #, php-format
 msgid "Graph \"%1$s\" with templated items cannot contain items from other hosts."
-msgstr ""
+msgstr "El gráfico \"%1$s\" con items de plantilla, no puede contener items de otros hosts."
 
 #: graphs.php:246
 msgid "Graph added"
@@ -4828,7 +4828,7 @@ msgstr "Elemento del gráfico"
 
 #: popup_bitem.php:28
 msgid "Graph item"
-msgstr "Gráfico del elemento"
+msgstr "Ítem del gráfico"
 
 #: include/views/configuration.screen.constructor.edit.php:140
 msgid "Graph name"
@@ -4837,32 +4837,32 @@ msgstr "Nombre del gráfico"
 #: api/classes/CGraphPrototype.php:34
 #, php-format
 msgid "Graph prototype \"%1$s\" with templated items cannot contain items from other hosts."
-msgstr ""
+msgstr "Prototipo de gráfico \"%1$s\" con items de plantilla no puede contener items de otros hosts."
 
 #: api/classes/CGraphPrototype.php:792
 #, php-format
 msgid "Graph prototype \"%s\" deleted."
-msgstr ""
+msgstr "Protitpo de gráfico \"%s\" eliminado."
 
 #: api/classes/CGraphPrototype.php:855
 msgid "Graph prototype must have at least one prototype."
-msgstr ""
+msgstr "El prototipo de gráfico debe tener al menos un prototipo."
 
 #: include/html.inc.php:453 include/html.inc.php:457
 #: include/views/configuration.host.discovery.list.php:90
 #: include/views/configuration.host.edit.php:494
 #: include/views/configuration.template.edit.php:365
 msgid "Graph prototypes"
-msgstr ""
+msgstr "Prototipos de gráfico"
 
 #: include/views/configuration.graph.list.php:32
 msgid "Graph prototypes of"
-msgstr ""
+msgstr "Prototipos de gráfico de"
 
 #: include/graphs.inc.php:44
 #: include/views/js/configuration.graph.edit.js.php:28
 msgid "Graph sum"
-msgstr ""
+msgstr "Suma de gráfico"
 
 #: include/views/configuration.graph.edit.php:59
 #: include/views/configuration.graph.list.php:80 popup.php:1346 popup.php:1352
@@ -4876,12 +4876,12 @@ msgstr "Gráfico actualizado"
 #: api/classes/CGraphGeneral.php:120
 #, php-format
 msgid "Graph with name \"%1$s\" already exists in graphs or graph prototypes."
-msgstr ""
+msgstr "Gráfico de nombre \"%1$s\" ya existe en gráficos o prototipos de gráficos."
 
 #: api/classes/CGraph.php:583 api/classes/CGraph.php:604
 #: api/classes/CGraphPrototype.php:630 api/classes/CGraphPrototype.php:651
 msgid "Graph with same name but other type exist."
-msgstr ""
+msgstr "Existe un gráfico con el mismo nombre pero de otro tipo."
 
 #: dashboard.php:260 hosts.php:686 hosts.php:765 include/blocks.inc.php:1238
 #: include/html.inc.php:464 include/html.inc.php:468 include/items.inc.php:802
@@ -4910,7 +4910,7 @@ msgstr "Griego (el_GR)"
 
 #: include/views/js/configuration.sysmaps.js.php:60 sysmap.php:192
 msgid "Grid"
-msgstr "Rejilla"
+msgstr "Grilla"
 
 #: events.php:298 hostinventoriesoverview.php:79 hostinventories.php:93
 #: hostinventories.php:158 hosts.php:642 httpmon.php:120
@@ -4946,17 +4946,17 @@ msgstr "El grupo \"%1$s\" no existe."
 #: include/classes/import/importers/CHostImporter.php:131
 #, php-format
 msgid "Group \"%1$s\" for host \"%2$s\" does not exist."
-msgstr ""
+msgstr "El grupo \"%1$s\" para el host \"%2$s\" no existe."
 
 #: api/classes/CHostGroup.php:746
 #, php-format
 msgid "Group \"%1$s\" is internal and can not be deleted."
-msgstr ""
+msgstr "El grupo \"%1$s\" es interno y no puede ser eliminado."
 
 #: api/classes/CHostGroup.php:769
 #, php-format
 msgid "Group \"%s\" cannot be deleted, because it is used in a global script."
-msgstr ""
+msgstr "El grupo \"%s\" no puede ser eliminado, porque está siendo usando en un script global."
 
 #: api/classes/CHostGroup.php:754
 #, php-format
@@ -5794,8 +5794,8 @@ msgstr ""
 msgid "Incorrect \"soft\" field value for dependency for service \"%1$s\"."
 msgstr ""
 
-#: api/classes/CMap.php:585 api/classes/CMap.php:589 api/classes/CMap.php:596
-#: api/classes/CMap.php:601
+#: api/classes/CMap.php:586 api/classes/CMap.php:590 api/classes/CMap.php:597
+#: api/classes/CMap.php:602
 #, php-format
 msgid "Incorrect %1$s label type value for map \"%2$s\"."
 msgstr ""
@@ -6004,7 +6004,7 @@ msgstr ""
 msgid "Incorrect field \"%1$s\" name or value in where statement for table \"%2$s\"."
 msgstr ""
 
-#: api/classes/CMap.php:545
+#: api/classes/CMap.php:546
 msgid "Incorrect fields for sysmap"
 msgstr ""
 
@@ -6148,12 +6148,12 @@ msgstr ""
 msgid "Incorrect map ID \"%s\" provided for screen element."
 msgstr ""
 
-#: api/classes/CMap.php:569
+#: api/classes/CMap.php:570
 #, php-format
 msgid "Incorrect map height value for map \"%s\"."
 msgstr ""
 
-#: api/classes/CMap.php:566
+#: api/classes/CMap.php:567
 #, php-format
 msgid "Incorrect map width value for map \"%s\"."
 msgstr ""
@@ -7073,22 +7073,22 @@ msgstr "Vínculo"
 msgid "Link indicators"
 msgstr ""
 
-#: api/classes/CMap.php:631
+#: api/classes/CMap.php:632
 #, php-format
 msgid "Link name should be unique for map \"%s\"."
 msgstr ""
 
-#: api/classes/CMap.php:642
+#: api/classes/CMap.php:643
 #, php-format
 msgid "Link selementid1 field is pointing to a nonexistent map selement ID \"%1$s\" for map \"%2$s\"."
 msgstr ""
 
-#: api/classes/CMap.php:645
+#: api/classes/CMap.php:646
 #, php-format
 msgid "Link selementid2 field is pointing to a nonexistent map selement ID \"%1$s\" for map \"%2$s\"."
 msgstr ""
 
-#: api/classes/CMap.php:628
+#: api/classes/CMap.php:629
 #, php-format
 msgid "Link should have both \"name\" and \"url\" fields for map \"%s\"."
 msgstr ""
@@ -7446,7 +7446,7 @@ msgstr ""
 msgid "Map save operation failed."
 msgstr ""
 
-#: api/classes/CMap.php:661
+#: api/classes/CMap.php:662
 #, php-format
 msgid "Map with name \"%s\" already exists"
 msgstr ""
@@ -8480,7 +8480,7 @@ msgstr ""
 #: api/classes/CMaintenance.php:429 api/classes/CMaintenance.php:537
 #: api/classes/CMaintenance.php:554 api/classes/CMaintenance.php:621
 #: api/classes/CMapElement.php:519 api/classes/CMapElement.php:575
-#: api/classes/CMap.php:550 api/classes/CProxy.php:318
+#: api/classes/CMap.php:551 api/classes/CProxy.php:318
 #: api/classes/CProxy.php:332 api/classes/CScreenItem.php:330
 #: api/classes/CScreenItem.php:414 api/classes/CScreen.php:499
 #: api/classes/CScreen.php:578 api/classes/CService.php:1252
@@ -12727,17 +12727,17 @@ msgstr "Usuarios desbloqueados"
 msgid "Value"
 msgstr "Estado"
 
-#: api/classes/CMap.php:615
+#: api/classes/CMap.php:616
 #, php-format
 msgid "Value \"%1$s\" is invalid for parameter \"grid_align\". Choices are: \"%2$s\" and \"%3$s\""
 msgstr ""
 
-#: api/classes/CMap.php:611
+#: api/classes/CMap.php:612
 #, php-format
 msgid "Value \"%1$s\" is invalid for parameter \"grid_show\". Choices are: \"%2$s\""
 msgstr ""
 
-#: api/classes/CMap.php:619
+#: api/classes/CMap.php:620
 #, php-format
 msgid "Value \"%1$s\" is invalid for parameter \"grid_show\". Choices are: \"%2$s\" and \"%3$s\""
 msgstr ""
@@ -13644,19 +13644,19 @@ msgstr ""
 msgid "hh"
 msgstr "hh"
 
-#: api/classes/CMap.php:575
+#: api/classes/CMap.php:576
 msgid "host"
 msgstr "equipo"
 
-#: api/classes/CMap.php:574
+#: api/classes/CMap.php:575
 msgid "host group"
 msgstr "Grupo de equipos"
 
-#: api/classes/CMap.php:572
+#: api/classes/CMap.php:573
 msgid "icon"
 msgstr "icono"
 
-#: api/classes/CMap.php:578
+#: api/classes/CMap.php:579
 msgid "image"
 msgstr "imagen"
 
@@ -13704,7 +13704,7 @@ msgstr "macro(s)"
 msgid "maintenance"
 msgstr "mantenimiento"
 
-#: api/classes/CMap.php:577
+#: api/classes/CMap.php:578
 msgid "map"
 msgstr "mapa"
 
@@ -13888,7 +13888,7 @@ msgstr ""
 msgid "to"
 msgstr "a"
 
-#: api/classes/CMap.php:576
+#: api/classes/CMap.php:577
 msgid "trigger"
 msgstr "iniciador"
 
