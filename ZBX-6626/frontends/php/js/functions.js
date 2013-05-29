@@ -919,6 +919,7 @@ function formatTimestamp(timestamp, isTsDouble, isExtend) {
 	var days = parseInt((timestamp - years * 31536000 - months * 2592000) / 86400),
 		hours = parseInt((timestamp - years * 31536000 - months * 2592000 - days * 86400) / 3600);
 
+	// due to imprecise calculations it is possible that the remainder contains 12 whole months but no whole years
 	if (months == 12) {
 		years++;
 		months = 0;
