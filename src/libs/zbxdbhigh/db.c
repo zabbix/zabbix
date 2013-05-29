@@ -2500,3 +2500,19 @@ void	DBselect_uint64(const char *sql, zbx_vector_uint64_t *ids)
 
 	zbx_vector_uint64_sort(ids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Function: get_nodeid_by_id                                                 *
+ *                                                                            *
+ * Purpose: Get Node ID by resource ID                                        *
+ *                                                                            *
+ * Return value: Node ID                                                      *
+ *                                                                            *
+ * Author: Alexei Vladishev                                                   *
+ *                                                                            *
+ ******************************************************************************/
+int	get_nodeid_by_id(zbx_uint64_t id)
+{
+	return (int)(id / ZBX_DM_MAX_HISTORY_IDS);
+}

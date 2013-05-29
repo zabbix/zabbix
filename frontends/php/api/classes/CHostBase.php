@@ -78,18 +78,6 @@ abstract class CHostBase extends CZBXAPI {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
 					_s('Template with item key "%1$s" already linked to host.', htmlspecialchars($dbCnt['key_'])));
 			}
-
-			$res = DBselect(
-				'SELECT name,COUNT(applicationid) AS cnt'.
-					' FROM applications'.
-					' WHERE '.dbConditionInt('hostid', $allids).
-					' GROUP BY name'.
-					' HAVING COUNT(applicationid)>1'
-			);
-			if ($dbCnt = DBfetch($res)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Template with application "%1$s" already linked to host.', htmlspecialchars($dbCnt['name'])));
-			}
 		}
 
 		// get DB templates which exists in all targets
