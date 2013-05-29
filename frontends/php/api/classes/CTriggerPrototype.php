@@ -622,9 +622,7 @@ class CTriggerPrototype extends CTriggerGeneral {
 			}
 
 			$this->checkIfExistsOnHost($trigger);
-
-			// check item prototypes
-			$items = getExpressionItems($trigger['expression']);
+		}
 
 		$this->updateReal($triggers);
 
