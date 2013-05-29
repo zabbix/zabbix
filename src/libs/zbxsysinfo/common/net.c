@@ -280,7 +280,7 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 	if (NULL == param || '\0' == *param)
 		retrans = 1;
 	else
-		if (1 > (retrans = atoi(param)))
+		if (SUCCEED != is_uint31(param, &retrans) || 0 == retrans)
 			return SYSINFO_RET_FAIL;
 
 	param = get_rparam(request, 4);
@@ -288,7 +288,7 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 	if (NULL == param || '\0' == *param)
 		retry = 2;
 	else
-		if (1 > (retry = atoi(param)))
+		if (SUCCEED != is_uint31(param, &retry) || 0 == retry)
 			return SYSINFO_RET_FAIL;
 
 #ifdef _WINDOWS
