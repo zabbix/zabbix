@@ -137,11 +137,20 @@ foreach ($this->data['triggers'] as $tnum => $trigger) {
 
 	if (empty($this->data['parent_discoveryid'])) {
 		if (!empty($trigger['discoveryRule'])) {
-			$description[] = new CLink($trigger['discoveryRule']['name'], 'trigger_prototypes.php?hostid='.$this->data['hostid'].'&parent_discoveryid='.$trigger['discoveryRule']['itemid'], 'gold');
+			$description[] = new CLink(
+				CHTML::encode($trigger['discoveryRule']['name']),
+				'trigger_prototypes.php'.
+					'?hostid='.$this->data['hostid'].
+					'&parent_discoveryid='.$trigger['discoveryRule']['itemid'],
+				'gold'
+			);
 			$description[] = NAME_DELIMITER.$trigger['description'];
 		}
 		else {
-			$description[] = new CLink($trigger['description'], 'triggers.php?form=update&hostid='.$this->data['hostid'].'&triggerid='.$triggerid);
+			$description[] = new CLink(
+				CHTML::encode($trigger['description']),
+				'triggers.php?form=update&hostid='.$this->data['hostid'].'&triggerid='.$triggerid
+			);
 		}
 
 		$dependencies = $trigger['dependencies'];
@@ -162,7 +171,14 @@ foreach ($this->data['triggers'] as $tnum => $trigger) {
 		}
 	}
 	else {
-		$description[] = new CLink($trigger['description'], 'trigger_prototypes.php?form=update&hostid='.$this->data['hostid'].'&parent_discoveryid='.$this->data['parent_discoveryid'].'&triggerid='.$triggerid);
+		$description[] = new CLink(
+			CHTML::encode($trigger['description']),
+			'trigger_prototypes.php'.
+				'?form=update'.
+				'&hostid='.$this->data['hostid'].
+				'&parent_discoveryid='.$this->data['parent_discoveryid'].
+				'&triggerid='.$triggerid
+		);
 	}
 
 	$templated = false;
