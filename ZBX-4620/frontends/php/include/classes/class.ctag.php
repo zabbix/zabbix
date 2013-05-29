@@ -39,11 +39,11 @@ class CTag extends CObject {
 	protected $encStrategy = self::ENC_NOAMP;
 
 	/**
-	 * The HTML encoding strategy for the "value" attribute.
+	 * The HTML encoding strategy for the "value", "name" and "id" attributes.
 	 *
 	 * @var int
 	 */
-	protected $valueEncStrategy = self::ENC_ALL;
+	protected $attrEncStrategy = self::ENC_ALL;
 
 	public function __construct($tagname = null, $paired = 'no', $body = null, $class = null) {
 		parent::__construct();
@@ -72,7 +72,7 @@ class CTag extends CObject {
 		$res = $this->tag_start.'<'.$this->tagname;
 		foreach ($this->attributes as $key => $value) {
 			// a special encoding strategy should be used for the "value", "name" and "id" attributes
-			$strategy = in_array($key, array('value', 'name', 'id'), true) ? $this->valueEncStrategy : self::ENC_NOAMP;
+			$strategy = in_array($key, array('value', 'name', 'id'), true) ? $this->attrEncStrategy : $this->encStrategy;
 			$value = $this->encode($value, $strategy);
 			$res .= ' '.$key.'="'.$value.'"';
 		}

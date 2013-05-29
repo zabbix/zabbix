@@ -26,7 +26,7 @@ class CButton extends CInput {
 	 *
 	 * @var int
 	 */
-	protected $valueEncStrategy = self::ENC_NOAMP;
+	protected $attrEncStrategy = self::ENC_NOAMP;
 
 	public function __construct($name = 'button', $caption = '', $action = null, $class = null) {
 		parent::__construct('button', $name, $caption, $class);
