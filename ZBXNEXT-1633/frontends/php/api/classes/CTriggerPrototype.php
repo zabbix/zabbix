@@ -589,7 +589,7 @@ class CTriggerPrototype extends CTriggerGeneral {
 
 				$hasPrototype = false;
 				foreach ($items as $item) {
-					if ($item['flags'] == ZBX_FLAG_DISCOVERY_CHILD) {
+					if ($item['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
 						$hasPrototype = true;
 						break;
 					}
