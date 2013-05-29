@@ -270,18 +270,19 @@ function zbx_date2str($format, $value = null) {
 		}
 	}
 
-	$output .= zbx_strlen($part) > 0 ? date($part, $value) : '';
+	$output .= (zbx_strlen($part) > 0) ? date($part, $value) : '';
+
 	return $output;
 }
 
 // calculate and convert timestamp to string representation
-function zbx_date2age($start_date, $end_date = 0, $utime = false) {
+function zbx_date2age($startDate, $endDate = 0, $utime = false) {
 	if (!$utime) {
-		$start_date = date('U', $start_date);
-		$end_date = !empty($end_date) ? date('U', $end_date) : time();
+		$startDate = date('U', $startDate);
+		$endDate = $endDate ? date('U', $endDate) : time();
 	}
 
-	return convertUnitsS(abs($end_date - $start_date));
+	return convertUnitsS(abs($endDate - $startDate));
 }
 
 function zbxDateToTime($strdate) {
@@ -437,67 +438,97 @@ function convertUnitsUptime($value) {
 	return $value;
 }
 
+/**
+ * Converts a time period to a human-readable format.
+ *
+ * The following units are used: years, months, days, hours, minutes, seconds and milliseconds.
+ *
+ * Only the three highest units are displayed: #y #m #d, #m #d #h, #d #h #mm and so on.
+ *
+ * If some value is equal to zero, it is omitted. For example, if the period is 1y 0m 4d, it will be displayed as
+ * 1y 4d, not 1y 0m 4d or 1y 4d #h.
+ *
+ * @param int $value	time period in seconds
+ *
+ * @return string
+ */
 function convertUnitsS($value) {
 	if (($secs = round($value * 1000, ZBX_UNITS_ROUNDOFF_UPPER_LIMIT) / 1000) < 0) {
-		$value = '-';
 		$secs = -$secs;
+		$str = '-';
 	}
 	else {
-		$value = '';
+		$str = '';
 	}
+
+	$values = array('y' => null, 'm' => null, 'd' => null, 'h' => null, 'mm' => null, 's' => null, 'ms' => null);
 	$n_unit = 0;
 
 	if (($n = floor($secs / SEC_PER_YEAR)) != 0) {
-		$value .= $n._x('y', 'year short').' ';
 		$secs -= $n * SEC_PER_YEAR;
-		if (0 == $n_unit) {
+		if ($n_unit == 0) {
 			$n_unit = 4;
 		}
+		$values['y'] = $n;
 	}
 
 	if (($n = floor($secs / SEC_PER_MONTH)) != 0) {
-		$value .= $n._x('m', 'month short').' ';
 		$secs -= $n * SEC_PER_MONTH;
-		if (0 == $n_unit) {
-			$n_unit = 3;
+		// due to imprecise calculations it is possible that the remainder contains 12 whole months but no whole years
+		if ($n == 12) {
+			$values['y']++;
+			$values['m'] = null;
+			if ($n_unit == 0) {
+				$n_unit = 4;
+			}
+		}
+		else {
+			$values['m'] = $n;
+			if ($n_unit == 0) {
+				$n_unit = 3;
+			}
 		}
 	}
 
 	if (($n = floor($secs / SEC_PER_DAY)) != 0) {
-		$value .= $n._x('d', 'day short').' ';
 		$secs -= $n * SEC_PER_DAY;
-		if (0 == $n_unit) {
+		$values['d'] = $n;
+		if ($n_unit == 0) {
 			$n_unit = 2;
 		}
 	}
 
 	if ($n_unit < 4 && ($n = floor($secs / SEC_PER_HOUR)) != 0) {
-		$value .= $n._x('h', 'hour short').' ';
 		$secs -= $n * SEC_PER_HOUR;
-		if (0 == $n_unit) {
+		$values['h'] = $n;
+		if ($n_unit == 0) {
 			$n_unit = 1;
 		}
 	}
 
 	if ($n_unit < 3 && ($n = floor($secs / SEC_PER_MIN)) != 0) {
-		$value .= $n._x('m', 'minute short').' ';
 		$secs -= $n * SEC_PER_MIN;
+		$values['mm'] = $n;
 	}
 
 	if ($n_unit < 2 && ($n = floor($secs)) != 0) {
-		$value .= $n._x('s', 'second short').' ';
 		$secs -= $n;
+		$values['s'] = $n;
 	}
 
 	if ($n_unit < 1 && ($n = round($secs * 1000, ZBX_UNITS_ROUNDOFF_UPPER_LIMIT)) != 0) {
-		$value .= $n._x('ms', 'millisecond short');
+		$values['ms'] = $n;
 	}
 
-	if (empty($value)) {
-		$value = 0;
-	}
+	$str .= isset($values['y']) ? $values['y']._x('y', 'year short').' ' : '';
+	$str .= isset($values['m']) ? $values['m']._x('m', 'month short').' ' : '';
+	$str .= isset($values['d']) ? $values['d']._x('d', 'day short').' ' : '';
+	$str .= isset($values['h']) ? $values['h']._x('h', 'hour short').' ' : '';
+	$str .= isset($values['mm']) ? $values['mm']._x('m', 'minute short').' ' : '';
+	$str .= isset($values['s']) ? $values['s']._x('s', 'second short').' ' : '';
+	$str .= isset($values['ms']) ? $values['ms']._x('ms', 'millisecond short') : '';
 
-	return rtrim($value);
+	return $str ? rtrim($str) : 0;
 }
 
 /**
