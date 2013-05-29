@@ -194,8 +194,7 @@ if (isset($_REQUEST['form'])) {
 		$data['access'] = get_request('host_access', 0);
 		$data['confirmation'] = get_request('confirmation', '');
 		$data['enableConfirmation'] = get_request('enableConfirmation', false);
-		$data['hgstype'] = get_request('hgstype', 0);
-		$data['hgstype'] = empty($data['groupid']) ? 0 : 1;
+		$data['hgstype'] = empty($_REQUEST['groupid']) ? 0 : 1;
 	}
 	elseif ($data['scriptid']) {
 		$script = API::Script()->get(array(

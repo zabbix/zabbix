@@ -62,7 +62,7 @@ jQuery(function($) {
 	 * @param string options['defaultValue']	default value for input element
 	 * @param bool   options['disabled']		turn on/off readonly state
 	 * @param int    options['selectedLimit']	how many items can be selected
-	 * @param object options['ignored']			preload ignored data
+	 * @param array  options['ignored']			preload ignored names
 	 * @param int    options['limit']			how many available items can be received from backend
 	 *
 	 * @return object
@@ -800,7 +800,9 @@ jQuery(function($) {
 		var count = 0;
 
 		for (var key in data) {
-			if (data[key].name.substr(0, search.length).toUpperCase() == search.toUpperCase()) {
+			var name = (typeof(data[key]) == 'object') ? data[key].name : data[key];
+
+			if (name.substr(0, search.length).toUpperCase() == search.toUpperCase()) {
 				count++;
 			}
 		}

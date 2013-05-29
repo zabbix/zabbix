@@ -44,7 +44,7 @@ $inventory_mode = get_request('inventory_mode', HOST_INVENTORY_DISABLED);
 $host_inventory = get_request('host_inventory', array());
 $macros = get_request('macros', array());
 $interfaces = get_request('interfaces', array());
-$templates = get_request('templates', array());
+$templateIds = get_request('templates', array());
 $clear_templates = get_request('clear_templates', array());
 
 $_REQUEST['hostid'] = get_request('hostid', 0);
@@ -123,9 +123,9 @@ if ($_REQUEST['hostid'] > 0 && !isset($_REQUEST['form_refresh'])) {
 	$host_inventory = $dbHost['inventory'];
 	$inventory_mode = empty($host_inventory) ? HOST_INVENTORY_DISABLED : $dbHost['inventory']['inventory_mode'];
 
-	$templates = array();
+	$templateIds = array();
 	foreach ($original_templates as $tpl) {
-		$templates[] = $tpl['templateid'];
+		$templateIds[$tpl['templateid']] = $tpl['templateid'];
 	}
 
 	$interfaces = $dbHost['interfaces'];
@@ -147,8 +147,8 @@ if ($_REQUEST['hostid'] > 0 && !isset($_REQUEST['form_refresh'])) {
 }
 
 $clear_templates = array_intersect($clear_templates, array_keys($original_templates));
-$clear_templates = array_diff($clear_templates, array_keys($templates));
-natcasesort($templates);
+$clear_templates = array_diff($clear_templates, array_keys($templateIds));
+natcasesort($templateIds);
 
 $frmHost = new CForm();
 $frmHost->setName('web.hosts.host.php.');
@@ -507,7 +507,7 @@ $linkedTemplateTable->setHeader(array(_('Name'), _('Action')));
 
 
 $linkedTemplates = API::Template()->get(array(
-	'templateids' => $templates,
+	'templateids' => $templateIds,
 	'output' => array('templateid', 'name')
 ));
 
