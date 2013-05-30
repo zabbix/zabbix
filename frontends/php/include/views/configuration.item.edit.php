@@ -446,7 +446,7 @@ else {
 	$applicationComboBox = new CListBox('applications[]', $this->data['applications'], 6);
 	$applicationComboBox->addItem(0, '-'._('None').'-');
 	foreach ($this->data['db_applications'] as $application) {
-		$applicationComboBox->addItem($application['applicationid'], $application['name']);
+		$applicationComboBox->addItem($application['applicationid'], CHtml::encode($application['name']));
 	}
 	$itemFormList->addRow(_('Applications'), $applicationComboBox);
 

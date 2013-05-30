@@ -132,7 +132,7 @@ foreach ($this->data['items'] as $item) {
 			}
 			else {
 				$realHost = reset($this->data['triggerRealHosts'][$trigger['triggerid']]);
-				$triggerDescription[] = new CLink($realHost['name'], 'triggers.php?&hostid='.$realHost['hostid'], 'unknown');
+				$triggerDescription[] = new CLink(CHtml::encode($realHost['name']), 'triggers.php?&hostid='.$realHost['hostid'], 'unknown');
 				$triggerDescription[] = ':';
 			}
 		}
@@ -140,10 +140,10 @@ foreach ($this->data['items'] as $item) {
 		$trigger['hosts'] = zbx_toHash($trigger['hosts'], 'hostid');
 
 		if ($trigger['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
-			$triggerDescription[] = new CSpan($trigger['description']);
+			$triggerDescription[] = new CSpan(CHtml::encode($trigger['description']));
 		}
 		else {
-			$triggerDescription[] = new CLink($trigger['description'], 'triggers.php?form=update&hostid='.
+			$triggerDescription[] = new CLink(CHtml::encode($trigger['description']), 'triggers.php?form=update&hostid='.
 				key($trigger['hosts']).'&triggerid='.$trigger['triggerid']);
 		}
 
@@ -210,7 +210,12 @@ foreach ($this->data['items'] as $item) {
 		$menuIcon = new CIcon(
 			_('Menu'),
 			'iconmenu_b',
-			'call_triggerlog_menu(event, '.zbx_jsvalue($item['itemid']).', '.zbx_jsvalue($item['name_expanded']).', '.$triggers.');'
+			'call_triggerlog_menu('.
+				'event, '.
+				CJs::encodeJson($item['itemid']).', '.
+				CJs::encodeJson(CHtml::encode($item['name_expanded'])).', '.
+				$triggers.
+			');'
 		);
 	}
 	else {
@@ -231,7 +236,7 @@ foreach ($this->data['items'] as $item) {
 		$item['history'],
 		in_array($item['value_type'], array(ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT)) ? '' : $item['trends'],
 		item_type2str($item['type']),
-		new CCol($item['applications_list'], 'wraptext'),
+		new CCol(CHtml::encode($item['applications_list']), 'wraptext'),
 		$status,
 		$statusIcons
 	));
