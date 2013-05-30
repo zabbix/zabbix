@@ -1,6 +1,7 @@
 Changes for 2.1.0
 
 New features:
+A.F....... [ZBXNEXT-1408] added multiselect in Action -> Conditions and Operations, in Scripts and in Item filter. Redesigned Host -> Templates form and added multiselect. Improved multiselect, added possibility to ignore elements (Oleg)
 ..F.I..... [ZBXNEXT-1124] implemented minimum trigger severity filter in maps (Eduard, wiper)
 A.F.I...S. [ZBXNEXT-928] changed application inheritance logic to allow linking multiple templates with the same applications (Pavels, wiper)
 A......... [ZBXNEXT-928] allowed to delete applications used in HTTP tests (Pavels, wiper)
