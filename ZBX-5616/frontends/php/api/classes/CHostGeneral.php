@@ -168,18 +168,27 @@ abstract class CHostGeneral extends CZBXAPI {
 				'output' => array('templateid'),
 				'hostids' => $targetid
 			));
-			$allids = array_merge($templateids, zbx_objectValues($linkedTpls, 'templateid'));
-
-			$res = DBselect(
-				'SELECT key_,COUNT(itemid) AS cnt'.
-				' FROM items'.
-				' WHERE '.dbConditionInt('hostid', $allids).
-				' GROUP BY key_'.
-				' HAVING COUNT(itemid)>1'
+			$dbItems = DBselect(
+				'SELECT i.key_,i.hostid'.
+				' FROM items i'.
+				' WHERE '.dbConditionInt('i.hostid', array_merge(
+					$templateids,
+					zbx_objectValues($linkedTpls, 'templateid'))).
+				' GROUP BY i.key_'.
+				' HAVING COUNT(i.itemid)>1'
 			);
-			if ($dbCnt = DBfetch($res)) {
+
+			if ($dbItem = DBfetch($dbItems)) {
+				$template = API::Template()->get(array(
+					'output' => array('name'),
+					'templateids' => $dbItem['hostid']
+				));
+
+				$template = reset($template);
+
 				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Template with item key "%1$s" already linked to host.', htmlspecialchars($dbCnt['key_'])));
+					_s('Template "%1$s" with item key "%2$s" already linked to host.',
+						$template['name'], $dbItem['key_']));
 			}
 		}
 

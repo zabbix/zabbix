@@ -176,24 +176,36 @@ elseif (isset($_REQUEST['delete']) && isset($_REQUEST['actionid'])) {
 	}
 }
 elseif (isset($_REQUEST['add_condition']) && isset($_REQUEST['new_condition'])) {
-	$new_condition = $_REQUEST['new_condition'];
-
 	try {
-		CAction::validateConditions($new_condition);
-		$_REQUEST['conditions'] = get_request('conditions', array());
+		$newCondition = get_request('new_condition');
 
-		$exists = false;
-		foreach ($_REQUEST['conditions'] as $condition) {
-			if (($new_condition['conditiontype'] === $condition['conditiontype'])
-					&& ($new_condition['operator'] === $condition['operator'])
-					&& (!isset($new_condition['value']) || $new_condition['value'] === $condition['value'])) {
-				$exists = true;
-				break;
+		if ($newCondition) {
+			CAction::validateConditions($newCondition);
+
+			$conditions = get_request('conditions', array());
+
+			foreach ($conditions as $condition) {
+				if ($newCondition['conditiontype'] == $condition['conditiontype']) {
+					$newConditionValues = zbx_toArray($newCondition['value']);
+
+					foreach ($newConditionValues as $num => $newValue) {
+						if ($condition['value'] == $newValue) {
+							unset($newCondition['value'][$num]);
+						}
+					}
+				}
 			}
-		}
 
-		if (!$exists) {
-			array_push($_REQUEST['conditions'], $new_condition);
+			if ($newCondition['value']) {
+				$newConditionValues = zbx_toArray($newCondition['value']);
+
+				foreach ($newConditionValues as $newValue) {
+					$condition = $newCondition;
+					$condition['value'] = $newValue;
+
+					$_REQUEST['conditions'][] = $condition;
+				}
+			}
 		}
 	}
 	catch (APIException $e) {
