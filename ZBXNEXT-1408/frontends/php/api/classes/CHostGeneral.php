@@ -197,13 +197,14 @@ abstract class CHostGeneral extends CZBXAPI {
 				foreach ($templateids as $templateid) {
 					if (isset($problemTemplateData[$templateid])) {
 						$problemTemplateName = $problemTemplateData[$templateid];
-						$problemTemplateKey = $problemHosts[$templateid];
+						$problemItemKey = $problemHosts[$templateid];
 						break;
 					}
 				}
 
 				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Template "%1$s" with item key "%2$s" already linked to host.', $problemTemplateName, $problemTemplateKey));
+					_s('Template "%1$s" with item key "%2$s" already linked to host.',
+						$problemTemplateName, $problemItemKey));
 			}
 		}
 
