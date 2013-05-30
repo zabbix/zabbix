@@ -1628,6 +1628,7 @@ elseif ($srctbl == 'plain_text') {
 		'output' => API_OUTPUT_EXTEND,
 		'selectHosts' => API_OUTPUT_EXTEND,
 		'templated' => 0,
+		'webitems' => true,
 		'filter' => array('status' => ITEM_STATUS_ACTIVE),
 		'sortfield' => 'name'
 	);
