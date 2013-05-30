@@ -57,7 +57,7 @@
 			" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\""	\
 			" xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\">"\
 			"<SOAP-ENV:Header/>"						\
-			"<ns1:Body>"							\
+			"<ns1:Body>"
 
 #define ZBX_POST_VSPHERE_FOOTER								\
 			"</ns1:Body>"							\
@@ -1812,6 +1812,11 @@ int	check_vcenter_vm_discovery(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
+int	check_vcenter_vm_hv_name(AGENT_REQUEST *request, AGENT_RESULT *result)
+{
+	return get_vcenter_vmstat(request, ZBX_XPATH_LN2("runtime", "host"), result);
+}
+
 int	check_vcenter_vm_memory_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	int	ret;
@@ -2332,6 +2337,11 @@ int	check_vsphere_vm_discovery(AGENT_REQUEST *request, AGENT_RESULT *result)
 	zbx_json_free(&j);
 
 	return SYSINFO_RET_OK;
+}
+
+int	check_vsphere_vm_hv_name(AGENT_REQUEST *request, AGENT_RESULT *result)
+{
+	return get_vsphere_vmstat(request, ZBX_XPATH_LN2("runtime", "host"), result);
 }
 
 int	check_vsphere_vm_memory_size(AGENT_REQUEST *request, AGENT_RESULT *result)
