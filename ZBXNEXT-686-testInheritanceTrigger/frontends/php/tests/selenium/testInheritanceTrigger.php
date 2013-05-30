@@ -86,7 +86,7 @@ class testInheritanceTrigger extends CWebTest {
 
 	public static function create() {
 		return array(
-			array(
+		/*	array(
 				array('expected' => TRIGGER_GOOD,
 					'description' => 'triggerSimple',
 					'expression' => 'default',
@@ -263,19 +263,79 @@ class testInheritanceTrigger extends CWebTest {
 					'hostCheck' => true,
 				)
 			),
-			array(
+		*/	array(
 				array(
 					'expected' => TRIGGER_GOOD,
-					'description' => 'MyTrigger_generalCheck',
+					'description' => 'MyTrigger_priority0',
 					'expression' => '{Inheritance test template:key-item-inheritance.last(0)}<5',
 					'type' => true,
 					'comments' => 'Trigger status (expression) is recalculated every time Zabbix server receives new value, if this value is part of this expression. If time based functions are used in the expression, it is recalculated every 30 seconds by a zabbix timer process. ',
 					'url' => 'www.zabbix.com',
-					'severity' => 'High',
+					'priority' => 'Not classified',
 					'status' => false,
 				)
 			),
 			array(
+				array(
+					'expected' => TRIGGER_GOOD,
+					'description' => 'MyTrigger_priority1',
+					'expression' => '{Inheritance test template:key-item-inheritance.last(0)}<5',
+					'type' => true,
+					'comments' => 'Trigger status (expression) is recalculated every time Zabbix server receives new value, if this value is part of this expression. If time based functions are used in the expression, it is recalculated every 30 seconds by a zabbix timer process. ',
+					'url' => 'www.zabbix.com',
+					'priority' => 'Information',
+					'status' => false,
+				)
+			),
+			array(
+				array(
+					'expected' => TRIGGER_GOOD,
+					'description' => 'MyTrigger_priority2',
+					'expression' => '{Inheritance test template:key-item-inheritance.last(0)}<5',
+					'type' => true,
+					'comments' => 'Trigger status (expression) is recalculated every time Zabbix server receives new value, if this value is part of this expression. If time based functions are used in the expression, it is recalculated every 30 seconds by a zabbix timer process. ',
+					'url' => 'www.zabbix.com',
+					'priority' => 'Warning',
+					'status' => false,
+				)
+			),
+array(
+				array(
+					'expected' => TRIGGER_GOOD,
+					'description' => 'MyTrigger_priority3',
+					'expression' => '{Inheritance test template:key-item-inheritance.last(0)}<5',
+					'type' => true,
+					'comments' => 'Trigger status (expression) is recalculated every time Zabbix server receives new value, if this value is part of this expression. If time based functions are used in the expression, it is recalculated every 30 seconds by a zabbix timer process. ',
+					'url' => 'www.zabbix.com',
+					'priority' => 'Average',
+					'status' => false,
+				)
+			),
+			array(
+				array(
+					'expected' => TRIGGER_GOOD,
+					'description' => 'MyTrigger_priority4',
+					'expression' => '{Inheritance test template:key-item-inheritance.last(0)}<5',
+					'type' => true,
+					'comments' => 'Trigger status (expression) is recalculated every time Zabbix server receives new value, if this value is part of this expression. If time based functions are used in the expression, it is recalculated every 30 seconds by a zabbix timer process. ',
+					'url' => 'www.zabbix.com',
+					'priority' => 'High',
+					'status' => false,
+				)
+			),
+			array(
+				array(
+					'expected' => TRIGGER_GOOD,
+					'description' => 'MyTrigger_priority5',
+					'expression' => '{Inheritance test template:key-item-inheritance.last(0)}<5',
+					'type' => true,
+					'comments' => 'Trigger status (expression) is recalculated every time Zabbix server receives new value, if this value is part of this expression. If time based functions are used in the expression, it is recalculated every 30 seconds by a zabbix timer process. ',
+					'url' => 'www.zabbix.com',
+					'priority' => 'Disaster',
+					'status' => false,
+				)
+			),
+	/*		array(
 				array(
 					'expected' => TRIGGER_BAD,
 					'description' => 'MyTrigger',
@@ -410,7 +470,7 @@ class testInheritanceTrigger extends CWebTest {
 						)
 					)
 				)
-			)
+			)*/
 		);
 	}
 
@@ -455,25 +515,25 @@ class testInheritanceTrigger extends CWebTest {
 			$this->input_type('url', $data['url']);;
 		}
 
-		if (isset($data['severity'])) {
-			switch ($data['severity']) {
+		if (isset($data['priority'])) {
+			switch ($data['priority']) {
 				case 'Not classified':
-					$this->zbxTestClick('severity_0');
+					$this->zbxTestClick('priority_0');
 					break;
 				case 'Information':
-					$this->zbxTestClick('severity_1');
+					$this->zbxTestClick('priority_1');
 					break;
 				case 'Warning':
-					$this->zbxTestClick('severity_2');
+					$this->zbxTestClick('priority_2');
 					break;
 				case 'Average':
-					$this->zbxTestClick('severity_3');
+					$this->zbxTestClick('priority_3');
 					break;
 				case 'High':
-					$this->zbxTestClick('severity_4');
+					$this->zbxTestClick('priority_4');
 					break;
 				case 'Disaster':
-					$this->zbxTestClick('severity_5');
+					$this->zbxTestClick('priority_5');
 					break;
 			}
 		}
