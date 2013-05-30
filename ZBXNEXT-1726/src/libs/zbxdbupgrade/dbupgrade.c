@@ -939,7 +939,7 @@ static int	DBpatch_02010049(void)
 	return DBcreate_index("escalations", "escalations_1", "actionid,triggerid,itemid,escalationid", 1);
 }
 
-static int	DBpatch_02010050()
+static int	DBpatch_02010050(void)
 {
 	char		*fields[] = {"ts_from", "ts_to", NULL};
 	DB_RESULT	result;
@@ -974,126 +974,126 @@ static int	DBpatch_02010050()
 	return SUCCEED;
 }
 
-static int	DBpatch_02010051()
+static int	DBpatch_02010051(void)
 {
 	const ZBX_FIELD field = {"hk_events_mode", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("config", &field);
 }
 
-static int	DBpatch_02010052()
+static int	DBpatch_02010052(void)
 {
 	const ZBX_FIELD field = {"hk_events_trigger", "365", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("config", &field);
 }
 
-static int	DBpatch_02010053()
+static int	DBpatch_02010053(void)
 {
 	const ZBX_FIELD field = {"hk_events_internal", "365", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("config", &field);
 }
 
-static int	DBpatch_02010054()
+static int	DBpatch_02010054(void)
 {
 	const ZBX_FIELD field = {"hk_events_discovery", "365", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("config", &field);
 }
 
-static int	DBpatch_02010055()
+static int	DBpatch_02010055(void)
 {
 	const ZBX_FIELD field = {"hk_events_autoreg", "365", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("config", &field);
 }
 
-static int	DBpatch_02010056()
+static int	DBpatch_02010056(void)
 {
 	const ZBX_FIELD field = {"hk_services_mode", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("config", &field);
 }
 
-static int	DBpatch_02010057()
+static int	DBpatch_02010057(void)
 {
 	const ZBX_FIELD field = {"hk_services", "365", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("config", &field);
 }
 
-static int	DBpatch_02010058()
+static int	DBpatch_02010058(void)
 {
 	const ZBX_FIELD field = {"hk_audit_mode", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("config", &field);
 }
 
-static int	DBpatch_02010059()
+static int	DBpatch_02010059(void)
 {
 	const ZBX_FIELD field = {"hk_audit", "365", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("config", &field);
 }
 
-static int	DBpatch_02010060()
+static int	DBpatch_02010060(void)
 {
 	const ZBX_FIELD field = {"hk_sessions_mode", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("config", &field);
 }
 
-static int	DBpatch_02010061()
+static int	DBpatch_02010061(void)
 {
 	const ZBX_FIELD field = {"hk_sessions", "365", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("config", &field);
 }
 
-static int	DBpatch_02010062()
+static int	DBpatch_02010062(void)
 {
 	const ZBX_FIELD field = {"hk_history_mode", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("config", &field);
 }
 
-static int	DBpatch_02010063()
+static int	DBpatch_02010063(void)
 {
 	const ZBX_FIELD field = {"hk_history_global", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("config", &field);
 }
 
-static int	DBpatch_02010064()
+static int	DBpatch_02010064(void)
 {
 	const ZBX_FIELD field = {"hk_history", "90", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("config", &field);
 }
 
-static int	DBpatch_02010065()
+static int	DBpatch_02010065(void)
 {
 	const ZBX_FIELD field = {"hk_trends_mode", "1 ", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("config", &field);
 }
 
-static int	DBpatch_02010066()
+static int	DBpatch_02010066(void)
 {
 	const ZBX_FIELD field = {"hk_trends_global", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("config", &field);
 }
 
-static int	DBpatch_02010067()
+static int	DBpatch_02010067(void)
 {
 	const ZBX_FIELD field = {"hk_trends", "365", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("config", &field);
 }
 
-static int	DBpatch_02010068()
+static int	DBpatch_02010068(void)
 {
 	if (ZBX_DB_OK <= DBexecute(
 			"update config"
@@ -1122,31 +1122,31 @@ static int	DBpatch_02010068()
 	return FAIL;
 }
 
-static int	DBpatch_02010069()
+static int	DBpatch_02010069(void)
 {
 	return DBdrop_field("config", "event_history");
 }
 
-static int	DBpatch_02010070()
+static int	DBpatch_02010070(void)
 {
 	return DBdrop_field("config", "alert_history");
 }
 
-static int	DBpatch_02010071()
+static int	DBpatch_02010071(void)
 {
 	const ZBX_FIELD	field = {"snmpv3_contextname", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBadd_field("items", &field);
 }
 
-static int	DBpatch_02010072()
+static int	DBpatch_02010072(void)
 {
 	const ZBX_FIELD	field = {"snmpv3_contextname", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBadd_field("dchecks", &field);
 }
 
-static int	DBpatch_02010073()
+static int	DBpatch_02010073(void)
 {
 	const char	*sql = "delete from ids where table_name='events'";
 
