@@ -80,37 +80,37 @@ static int	httpmacro_append_pair(zbx_httptest_t *httptest, const char *pkey, siz
 			const char *pvalue, size_t nvalue, const char *data, char **err_str)
 {
 	const char	*__function_name = "httpmacro_append_pair";
-	char 		*value_str = NULL, *buf = NULL;
+	char 		*value_str = NULL;
 	size_t		key_size = 0, key_offset = 0, value_size = 0, value_offset = 0;
 	zbx_ptr_pair_t	pair = {NULL, NULL};
 	int		index, ret = FAIL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() pkey:'%s' nkey:%zu pvalue:'%s' nvalue:%zu",
-			__function_name, pkey, nkey, pvalue, nvalue);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() pkey:'%.*s' pvalue:'%.*s'",
+			__function_name, (int)nkey, pkey, (int)nvalue, pvalue);
 
 	if (0 == nkey || 0 == nvalue)
 	{
-		if (NULL != err_str && NULL == *err_str)
-		{
-			size_t	size = 0, offset = 0;
-			zbx_strcpy_alloc(err_str, &size, &offset, "variables must be defined as \"{NAME}=VALUE\"");
-		}
-
 		if (0 == nkey && 0 != nvalue)
 		{
-			buf = zbx_strdup(buf, pvalue);
-			buf[nvalue] = '\0';
-			zabbix_log(LOG_LEVEL_DEBUG, "%s() missing variable name (only value provided): \"%s\"",
-					__function_name, buf);
-			zbx_free(buf);
+			zabbix_log(LOG_LEVEL_DEBUG, "%s() missing variable name (only value provided): \"%.*s\"",
+					__function_name, (int)nvalue, pvalue);
+
+			if (NULL != err_str && NULL == *err_str)
+			{
+				*err_str = zbx_dsprintf(*err_str, "missing variable name (only value provided):"
+						" \"%.*s\"", (int)nvalue, pvalue);
+			}
 		}
 		else if (0 == nvalue && 0 != nkey)
 		{
-			buf = zbx_strdup(buf, pkey);
-			buf[nkey] = '\0';
-			zabbix_log(LOG_LEVEL_DEBUG, "%s() missing variable value (only name provided): \"%s\"",
-					__function_name, buf);
-			zbx_free(buf);
+			zabbix_log(LOG_LEVEL_DEBUG, "%s() missing variable value (only name provided): \"%.*s\"",
+					__function_name, (int)nkey, pkey);
+
+			if (NULL != err_str && NULL == *err_str)
+			{
+				*err_str = zbx_dsprintf(*err_str, "missing variable name (only name provided):"
+						" \"%.*s\"", (int)nvalue, pvalue);
+			}
 		}
 
 		goto out;
@@ -118,15 +118,10 @@ static int	httpmacro_append_pair(zbx_httptest_t *httptest, const char *pkey, siz
 
 	if ('{' != pkey[0] || '}' != pkey[nkey - 1])
 	{
-		buf = zbx_strdup(buf, pkey);
-		buf[nkey] = '\0';
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() \"%s\" not enclosed in {}", __function_name, buf);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() \"%.*s\" not enclosed in {}", __function_name, (int)nkey, pkey);
+
 		if (NULL != err_str && NULL == *err_str)
-		{
-			size_t	size = 0, offset = 0;
-			zbx_snprintf_alloc(err_str, &size, &offset, "\"%s\" not enclosed in {}", buf);
-		}
-		zbx_free(buf);
+			*err_str = zbx_dsprintf(*err_str, "\"%.*s\" not enclosed in {}", (int)nkey, pkey);
 
 		goto out;
 	}
@@ -154,17 +149,14 @@ static int	httpmacro_append_pair(zbx_httptest_t *httptest, const char *pkey, siz
 
 		if (NULL == pair.second)
 		{
-			buf = zbx_strdup(buf, pkey);
-			buf[nkey] = '\0';
-			zabbix_log(LOG_LEVEL_DEBUG, "%s() cannot extract the value of \"%s\" from response",
-					__function_name, buf);
+			zabbix_log(LOG_LEVEL_DEBUG, "%s() cannot extract the value of \"%.*s\" from response",
+					__function_name, (int)nkey, pkey);
+
 			if (NULL != err_str && NULL == *err_str)
 			{
-				size_t	size = 0, offset = 0;
-				zbx_snprintf_alloc(err_str, &size, &offset, "cannot extract the value of \"%s\""
-						" from response", buf);
+				*err_str = zbx_dsprintf(*err_str, "cannot extract the value of \"%.*s\""
+						" from response", (int)nkey, pkey);
 			}
-			zbx_free(buf);
 
 			goto out;
 		}
@@ -189,8 +181,8 @@ static int	httpmacro_append_pair(zbx_httptest_t *httptest, const char *pkey, siz
 
 	ret = SUCCEED;
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() ret:%d, macro:%s=%s",
-			__function_name, ret, (char*)pair.first, (char*)pair.second);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s, macro:%s=%s",
+			__function_name, zbx_result_string(ret), (char*)pair.first, (char*)pair.second);
 
 	return ret;
 }

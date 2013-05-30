@@ -301,7 +301,7 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 	double		speed_download = 0;
 	int		speed_download_num = 0;
 #ifdef HAVE_LIBCURL
-	int		err, opt;
+	int		err;
 	char		auth[HTTPTEST_HTTP_USER_LEN_MAX + HTTPTEST_HTTP_PASSWORD_LEN_MAX];
 	CURL            *easyhandle = NULL;
 #endif
@@ -325,17 +325,14 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 		goto clean;
 	}
 
-	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_COOKIEFILE, "")) ||
-			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_PROXY,
-			httptest->httptest.http_proxy)) ||
-			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_USERAGENT,
-			httptest->httptest.agent)) ||
-			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_FOLLOWLOCATION, 1L)) ||
-			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_WRITEFUNCTION, WRITEFUNCTION2)) ||
-			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_HEADERFUNCTION,
-			HEADERFUNCTION2)) ||
-			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_SSL_VERIFYPEER, 0L)) ||
-			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_SSL_VERIFYHOST, 0L)))
+	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_PROXY, httptest->httptest.http_proxy)) ||
+			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_COOKIEFILE, "")) ||
+			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_USERAGENT, httptest->httptest.agent)) ||
+			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_FOLLOWLOCATION, 1L)) ||
+			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_WRITEFUNCTION, WRITEFUNCTION2)) ||
+			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_HEADERFUNCTION, HEADERFUNCTION2)) ||
+			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_SSL_VERIFYPEER, 0L)) ||
+			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_SSL_VERIFYHOST, 0L)))
 	{
 		err_str = zbx_strdup(err_str, curl_easy_strerror(err));
 		goto clean;
@@ -378,7 +375,7 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() use step \"%s\"", __function_name, httpstep.name);
 
-		if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_POSTFIELDS, httpstep.posts)))
+		if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_POSTFIELDS, httpstep.posts)))
 		{
 			err_str = zbx_strdup(err_str, curl_easy_strerror(err));
 			goto httpstep_error;
@@ -387,8 +384,7 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 		if ('\0' != *httpstep.posts)
 			zabbix_log(LOG_LEVEL_DEBUG, "%s() use post \"%s\"", __function_name, httpstep.posts);
 
-		if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_POST,
-				'\0' != *httpstep.posts ? 1L : 0L)))
+		if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_POST, '\0' != *httpstep.posts ? 1L : 0L)))
 		{
 			err_str = zbx_strdup(err_str, curl_easy_strerror(err));
 			goto httpstep_error;
@@ -418,8 +414,8 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 			zbx_snprintf(auth, sizeof(auth), "%s:%s", httptest->httptest.http_user,
 					httptest->httptest.http_password);
 
-			if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_HTTPAUTH, curlauth)) ||
-					CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_USERPWD, auth)))
+			if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_HTTPAUTH, curlauth)) ||
+					CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_USERPWD, auth)))
 			{
 				err_str = zbx_strdup(err_str, curl_easy_strerror(err));
 				goto httpstep_error;
@@ -428,9 +424,8 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() go to URL \"%s\"", __function_name, httpstep.url);
 
-		if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_URL, httpstep.url)) ||
-				CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_TIMEOUT,
-				(long)httpstep.timeout)))
+		if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_TIMEOUT, (long)httpstep.timeout)) ||
+				CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_URL, httpstep.url)))
 		{
 			err_str = zbx_strdup(err_str, curl_easy_strerror(err));
 			goto httpstep_error;
@@ -489,12 +484,11 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 			if (NULL == err_str && FAIL == http_process_variables(httptest, httptest->httptest.variables,
 					page.data, &var_err_str))
 			{
-				size_t  err_size = 0, err_offset = 0;
 				char	*variables;
 
 				variables = string_replace(httptest->httptest.variables, "\r\n", " ");
-				zbx_snprintf_alloc(&err_str, &err_size, &err_offset,
-						"error in scenario variables \"%s\": %s", variables, var_err_str);
+				err_str = zbx_dsprintf(err_str, "error in scenario variables \"%s\": %s",
+						variables, var_err_str);
 				zbx_free(variables);
 			}
 
@@ -502,12 +496,11 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 			if (NULL == err_str && FAIL == http_process_variables(httptest, httpstep.variables, page.data,
 					&var_err_str))
 			{
-				size_t  err_size = 0, err_offset = 0;
 				char	*variables;
 
-				variables = string_replace(httptest->httptest.variables, "\r\n", " ");
-				zbx_snprintf_alloc(&err_str, &err_size, &err_offset,
-						"error in step variables \"%s\": %s", variables, var_err_str);
+				variables = string_replace(httpstep.variables, "\r\n", " ");
+				err_str = zbx_dsprintf(err_str, "error in step variables \"%s\": %s",
+						variables, var_err_str);
 				zbx_free(variables);
 			}
 
@@ -562,8 +555,8 @@ clean:
 				THIS_SHOULD_NEVER_HAPPEN;
 		}
 
-		zabbix_log(LOG_LEVEL_ERR, "cannot process step \"%s\" of web scenario \"%s\""
-				" on host \"%s\": %s", httpstep.name, httptest->httptest.name, host->name, err_str);
+		zabbix_log(LOG_LEVEL_WARNING, "cannot process step \"%s\" of web scenario \"%s\" on host \"%s\": %s",
+				httpstep.name, httptest->httptest.name, host->name, err_str);
 	}
 	DBfree_result(result);
 
