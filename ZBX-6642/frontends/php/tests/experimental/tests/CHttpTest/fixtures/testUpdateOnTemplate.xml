@@ -1,0 +1,1101 @@
+<?xml version="1.0"?>
+<mysqldump xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+	--
+	-- Not dumping tablespaces as no INFORMATION_SCHEMA.FILES table on this server
+	--
+	<database name="alexey_test">
+		<table_data name="items">
+			<row>
+				<field name="itemid">1</field>
+				<field name="type">9</field>
+				<field name="snmp_community"></field>
+				<field name="snmp_oid"></field>
+				<field name="hostid">1</field>
+				<field name="name">Download speed for scenario &quot;$1&quot;.</field>
+				<field name="key_">web.test.in[HttpTestUpdate,,bps]</field>
+				<field name="delay">70</field>
+				<field name="history">30</field>
+				<field name="trends">90</field>
+				<field name="lastvalue" xsi:nil="true" />
+				<field name="lastclock" xsi:nil="true" />
+				<field name="prevvalue" xsi:nil="true" />
+				<field name="status">0</field>
+				<field name="value_type">0</field>
+				<field name="trapper_hosts"></field>
+				<field name="units">Bps</field>
+				<field name="multiplier">0</field>
+				<field name="delta">0</field>
+				<field name="prevorgvalue" xsi:nil="true" />
+				<field name="snmpv3_securityname"></field>
+				<field name="snmpv3_securitylevel">0</field>
+				<field name="snmpv3_authpassphrase"></field>
+				<field name="snmpv3_privpassphrase"></field>
+				<field name="formula">1</field>
+				<field name="error"></field>
+				<field name="lastlogsize">0</field>
+				<field name="logtimefmt"></field>
+				<field name="templateid" xsi:nil="true" />
+				<field name="valuemapid" xsi:nil="true" />
+				<field name="delay_flex"></field>
+				<field name="params"></field>
+				<field name="ipmi_sensor"></field>
+				<field name="data_type">0</field>
+				<field name="authtype">0</field>
+				<field name="username"></field>
+				<field name="password"></field>
+				<field name="publickey"></field>
+				<field name="privatekey"></field>
+				<field name="mtime">0</field>
+				<field name="lastns" xsi:nil="true" />
+				<field name="flags">0</field>
+				<field name="filter"></field>
+				<field name="interfaceid" xsi:nil="true" />
+				<field name="port"></field>
+				<field name="description"></field>
+				<field name="inventory_link">0</field>
+				<field name="lifetime">30</field>
+			</row>
+			<row>
+				<field name="itemid">2</field>
+				<field name="type">9</field>
+				<field name="snmp_community"></field>
+				<field name="snmp_oid"></field>
+				<field name="hostid">1</field>
+				<field name="name">Failed step of scenario &quot;$1&quot;.</field>
+				<field name="key_">web.test.fail[HttpTestUpdate]</field>
+				<field name="delay">70</field>
+				<field name="history">30</field>
+				<field name="trends">90</field>
+				<field name="lastvalue" xsi:nil="true" />
+				<field name="lastclock" xsi:nil="true" />
+				<field name="prevvalue" xsi:nil="true" />
+				<field name="status">0</field>
+				<field name="value_type">3</field>
+				<field name="trapper_hosts"></field>
+				<field name="units"></field>
+				<field name="multiplier">0</field>
+				<field name="delta">0</field>
+				<field name="prevorgvalue" xsi:nil="true" />
+				<field name="snmpv3_securityname"></field>
+				<field name="snmpv3_securitylevel">0</field>
+				<field name="snmpv3_authpassphrase"></field>
+				<field name="snmpv3_privpassphrase"></field>
+				<field name="formula">1</field>
+				<field name="error"></field>
+				<field name="lastlogsize">0</field>
+				<field name="logtimefmt"></field>
+				<field name="templateid" xsi:nil="true" />
+				<field name="valuemapid" xsi:nil="true" />
+				<field name="delay_flex"></field>
+				<field name="params"></field>
+				<field name="ipmi_sensor"></field>
+				<field name="data_type">0</field>
+				<field name="authtype">0</field>
+				<field name="username"></field>
+				<field name="password"></field>
+				<field name="publickey"></field>
+				<field name="privatekey"></field>
+				<field name="mtime">0</field>
+				<field name="lastns" xsi:nil="true" />
+				<field name="flags">0</field>
+				<field name="filter"></field>
+				<field name="interfaceid" xsi:nil="true" />
+				<field name="port"></field>
+				<field name="description"></field>
+				<field name="inventory_link">0</field>
+				<field name="lifetime">30</field>
+			</row>
+			<row>
+				<field name="itemid">3</field>
+				<field name="type">9</field>
+				<field name="snmp_community"></field>
+				<field name="snmp_oid"></field>
+				<field name="hostid">1</field>
+				<field name="name">Last error message of scenario &quot;$1&quot;.</field>
+				<field name="key_">web.test.error[HttpTestUpdate]</field>
+				<field name="delay">70</field>
+				<field name="history">30</field>
+				<field name="trends">90</field>
+				<field name="lastvalue" xsi:nil="true" />
+				<field name="lastclock" xsi:nil="true" />
+				<field name="prevvalue" xsi:nil="true" />
+				<field name="status">0</field>
+				<field name="value_type">1</field>
+				<field name="trapper_hosts"></field>
+				<field name="units"></field>
+				<field name="multiplier">0</field>
+				<field name="delta">0</field>
+				<field name="prevorgvalue" xsi:nil="true" />
+				<field name="snmpv3_securityname"></field>
+				<field name="snmpv3_securitylevel">0</field>
+				<field name="snmpv3_authpassphrase"></field>
+				<field name="snmpv3_privpassphrase"></field>
+				<field name="formula">1</field>
+				<field name="error"></field>
+				<field name="lastlogsize">0</field>
+				<field name="logtimefmt"></field>
+				<field name="templateid" xsi:nil="true" />
+				<field name="valuemapid" xsi:nil="true" />
+				<field name="delay_flex"></field>
+				<field name="params"></field>
+				<field name="ipmi_sensor"></field>
+				<field name="data_type">0</field>
+				<field name="authtype">0</field>
+				<field name="username"></field>
+				<field name="password"></field>
+				<field name="publickey"></field>
+				<field name="privatekey"></field>
+				<field name="mtime">0</field>
+				<field name="lastns" xsi:nil="true" />
+				<field name="flags">0</field>
+				<field name="filter"></field>
+				<field name="interfaceid" xsi:nil="true" />
+				<field name="port"></field>
+				<field name="description"></field>
+				<field name="inventory_link">0</field>
+				<field name="lifetime">30</field>
+			</row>
+			<row>
+				<field name="itemid">4</field>
+				<field name="type">9</field>
+				<field name="snmp_community"></field>
+				<field name="snmp_oid"></field>
+				<field name="hostid">1</field>
+				<field name="name">Download speed for step &quot;$2&quot; of scenario &quot;$1&quot;.</field>
+				<field name="key_">web.test.in[HttpTestUpdate,step1,bps]</field>
+				<field name="delay">70</field>
+				<field name="history">30</field>
+				<field name="trends">90</field>
+				<field name="lastvalue" xsi:nil="true" />
+				<field name="lastclock" xsi:nil="true" />
+				<field name="prevvalue" xsi:nil="true" />
+				<field name="status">0</field>
+				<field name="value_type">0</field>
+				<field name="trapper_hosts"></field>
+				<field name="units">Bps</field>
+				<field name="multiplier">0</field>
+				<field name="delta">0</field>
+				<field name="prevorgvalue" xsi:nil="true" />
+				<field name="snmpv3_securityname"></field>
+				<field name="snmpv3_securitylevel">0</field>
+				<field name="snmpv3_authpassphrase"></field>
+				<field name="snmpv3_privpassphrase"></field>
+				<field name="formula">1</field>
+				<field name="error"></field>
+				<field name="lastlogsize">0</field>
+				<field name="logtimefmt"></field>
+				<field name="templateid" xsi:nil="true" />
+				<field name="valuemapid" xsi:nil="true" />
+				<field name="delay_flex"></field>
+				<field name="params"></field>
+				<field name="ipmi_sensor"></field>
+				<field name="data_type">0</field>
+				<field name="authtype">0</field>
+				<field name="username"></field>
+				<field name="password"></field>
+				<field name="publickey"></field>
+				<field name="privatekey"></field>
+				<field name="mtime">0</field>
+				<field name="lastns" xsi:nil="true" />
+				<field name="flags">0</field>
+				<field name="filter"></field>
+				<field name="interfaceid" xsi:nil="true" />
+				<field name="port"></field>
+				<field name="description"></field>
+				<field name="inventory_link">0</field>
+				<field name="lifetime">30</field>
+			</row>
+			<row>
+				<field name="itemid">5</field>
+				<field name="type">9</field>
+				<field name="snmp_community"></field>
+				<field name="snmp_oid"></field>
+				<field name="hostid">1</field>
+				<field name="name">Response time for step &quot;$2&quot; of scenario &quot;$1&quot;.</field>
+				<field name="key_">web.test.time[HttpTestUpdate,step1,resp]</field>
+				<field name="delay">70</field>
+				<field name="history">30</field>
+				<field name="trends">90</field>
+				<field name="lastvalue" xsi:nil="true" />
+				<field name="lastclock" xsi:nil="true" />
+				<field name="prevvalue" xsi:nil="true" />
+				<field name="status">0</field>
+				<field name="value_type">0</field>
+				<field name="trapper_hosts"></field>
+				<field name="units">s</field>
+				<field name="multiplier">0</field>
+				<field name="delta">0</field>
+				<field name="prevorgvalue" xsi:nil="true" />
+				<field name="snmpv3_securityname"></field>
+				<field name="snmpv3_securitylevel">0</field>
+				<field name="snmpv3_authpassphrase"></field>
+				<field name="snmpv3_privpassphrase"></field>
+				<field name="formula">1</field>
+				<field name="error"></field>
+				<field name="lastlogsize">0</field>
+				<field name="logtimefmt"></field>
+				<field name="templateid" xsi:nil="true" />
+				<field name="valuemapid" xsi:nil="true" />
+				<field name="delay_flex"></field>
+				<field name="params"></field>
+				<field name="ipmi_sensor"></field>
+				<field name="data_type">0</field>
+				<field name="authtype">0</field>
+				<field name="username"></field>
+				<field name="password"></field>
+				<field name="publickey"></field>
+				<field name="privatekey"></field>
+				<field name="mtime">0</field>
+				<field name="lastns" xsi:nil="true" />
+				<field name="flags">0</field>
+				<field name="filter"></field>
+				<field name="interfaceid" xsi:nil="true" />
+				<field name="port"></field>
+				<field name="description"></field>
+				<field name="inventory_link">0</field>
+				<field name="lifetime">30</field>
+			</row>
+			<row>
+				<field name="itemid">6</field>
+				<field name="type">9</field>
+				<field name="snmp_community"></field>
+				<field name="snmp_oid"></field>
+				<field name="hostid">1</field>
+				<field name="name">Response code for step &quot;$2&quot; of scenario &quot;$1&quot;.</field>
+				<field name="key_">web.test.rspcode[HttpTestUpdate,step1]</field>
+				<field name="delay">70</field>
+				<field name="history">30</field>
+				<field name="trends">90</field>
+				<field name="lastvalue" xsi:nil="true" />
+				<field name="lastclock" xsi:nil="true" />
+				<field name="prevvalue" xsi:nil="true" />
+				<field name="status">0</field>
+				<field name="value_type">3</field>
+				<field name="trapper_hosts"></field>
+				<field name="units"></field>
+				<field name="multiplier">0</field>
+				<field name="delta">0</field>
+				<field name="prevorgvalue" xsi:nil="true" />
+				<field name="snmpv3_securityname"></field>
+				<field name="snmpv3_securitylevel">0</field>
+				<field name="snmpv3_authpassphrase"></field>
+				<field name="snmpv3_privpassphrase"></field>
+				<field name="formula">1</field>
+				<field name="error"></field>
+				<field name="lastlogsize">0</field>
+				<field name="logtimefmt"></field>
+				<field name="templateid" xsi:nil="true" />
+				<field name="valuemapid" xsi:nil="true" />
+				<field name="delay_flex"></field>
+				<field name="params"></field>
+				<field name="ipmi_sensor"></field>
+				<field name="data_type">0</field>
+				<field name="authtype">0</field>
+				<field name="username"></field>
+				<field name="password"></field>
+				<field name="publickey"></field>
+				<field name="privatekey"></field>
+				<field name="mtime">0</field>
+				<field name="lastns" xsi:nil="true" />
+				<field name="flags">0</field>
+				<field name="filter"></field>
+				<field name="interfaceid" xsi:nil="true" />
+				<field name="port"></field>
+				<field name="description"></field>
+				<field name="inventory_link">0</field>
+				<field name="lifetime">30</field>
+			</row>
+			<row>
+				<field name="itemid">7</field>
+				<field name="type">9</field>
+				<field name="snmp_community"></field>
+				<field name="snmp_oid"></field>
+				<field name="hostid">1</field>
+				<field name="name">Download speed for step &quot;$2&quot; of scenario &quot;$1&quot;.</field>
+				<field name="key_">web.test.in[HttpTestUpdate,step2,bps]</field>
+				<field name="delay">70</field>
+				<field name="history">30</field>
+				<field name="trends">90</field>
+				<field name="lastvalue" xsi:nil="true" />
+				<field name="lastclock" xsi:nil="true" />
+				<field name="prevvalue" xsi:nil="true" />
+				<field name="status">0</field>
+				<field name="value_type">0</field>
+				<field name="trapper_hosts"></field>
+				<field name="units">Bps</field>
+				<field name="multiplier">0</field>
+				<field name="delta">0</field>
+				<field name="prevorgvalue" xsi:nil="true" />
+				<field name="snmpv3_securityname"></field>
+				<field name="snmpv3_securitylevel">0</field>
+				<field name="snmpv3_authpassphrase"></field>
+				<field name="snmpv3_privpassphrase"></field>
+				<field name="formula">1</field>
+				<field name="error"></field>
+				<field name="lastlogsize">0</field>
+				<field name="logtimefmt"></field>
+				<field name="templateid" xsi:nil="true" />
+				<field name="valuemapid" xsi:nil="true" />
+				<field name="delay_flex"></field>
+				<field name="params"></field>
+				<field name="ipmi_sensor"></field>
+				<field name="data_type">0</field>
+				<field name="authtype">0</field>
+				<field name="username"></field>
+				<field name="password"></field>
+				<field name="publickey"></field>
+				<field name="privatekey"></field>
+				<field name="mtime">0</field>
+				<field name="lastns" xsi:nil="true" />
+				<field name="flags">0</field>
+				<field name="filter"></field>
+				<field name="interfaceid" xsi:nil="true" />
+				<field name="port"></field>
+				<field name="description"></field>
+				<field name="inventory_link">0</field>
+				<field name="lifetime">30</field>
+			</row>
+			<row>
+				<field name="itemid">8</field>
+				<field name="type">9</field>
+				<field name="snmp_community"></field>
+				<field name="snmp_oid"></field>
+				<field name="hostid">1</field>
+				<field name="name">Response time for step &quot;$2&quot; of scenario &quot;$1&quot;.</field>
+				<field name="key_">web.test.time[HttpTestUpdate,step2,resp]</field>
+				<field name="delay">70</field>
+				<field name="history">30</field>
+				<field name="trends">90</field>
+				<field name="lastvalue" xsi:nil="true" />
+				<field name="lastclock" xsi:nil="true" />
+				<field name="prevvalue" xsi:nil="true" />
+				<field name="status">0</field>
+				<field name="value_type">0</field>
+				<field name="trapper_hosts"></field>
+				<field name="units">s</field>
+				<field name="multiplier">0</field>
+				<field name="delta">0</field>
+				<field name="prevorgvalue" xsi:nil="true" />
+				<field name="snmpv3_securityname"></field>
+				<field name="snmpv3_securitylevel">0</field>
+				<field name="snmpv3_authpassphrase"></field>
+				<field name="snmpv3_privpassphrase"></field>
+				<field name="formula">1</field>
+				<field name="error"></field>
+				<field name="lastlogsize">0</field>
+				<field name="logtimefmt"></field>
+				<field name="templateid" xsi:nil="true" />
+				<field name="valuemapid" xsi:nil="true" />
+				<field name="delay_flex"></field>
+				<field name="params"></field>
+				<field name="ipmi_sensor"></field>
+				<field name="data_type">0</field>
+				<field name="authtype">0</field>
+				<field name="username"></field>
+				<field name="password"></field>
+				<field name="publickey"></field>
+				<field name="privatekey"></field>
+				<field name="mtime">0</field>
+				<field name="lastns" xsi:nil="true" />
+				<field name="flags">0</field>
+				<field name="filter"></field>
+				<field name="interfaceid" xsi:nil="true" />
+				<field name="port"></field>
+				<field name="description"></field>
+				<field name="inventory_link">0</field>
+				<field name="lifetime">30</field>
+			</row>
+			<row>
+				<field name="itemid">9</field>
+				<field name="type">9</field>
+				<field name="snmp_community"></field>
+				<field name="snmp_oid"></field>
+				<field name="hostid">1</field>
+				<field name="name">Response code for step &quot;$2&quot; of scenario &quot;$1&quot;.</field>
+				<field name="key_">web.test.rspcode[HttpTestUpdate,step2]</field>
+				<field name="delay">70</field>
+				<field name="history">30</field>
+				<field name="trends">90</field>
+				<field name="lastvalue" xsi:nil="true" />
+				<field name="lastclock" xsi:nil="true" />
+				<field name="prevvalue" xsi:nil="true" />
+				<field name="status">0</field>
+				<field name="value_type">3</field>
+				<field name="trapper_hosts"></field>
+				<field name="units"></field>
+				<field name="multiplier">0</field>
+				<field name="delta">0</field>
+				<field name="prevorgvalue" xsi:nil="true" />
+				<field name="snmpv3_securityname"></field>
+				<field name="snmpv3_securitylevel">0</field>
+				<field name="snmpv3_authpassphrase"></field>
+				<field name="snmpv3_privpassphrase"></field>
+				<field name="formula">1</field>
+				<field name="error"></field>
+				<field name="lastlogsize">0</field>
+				<field name="logtimefmt"></field>
+				<field name="templateid" xsi:nil="true" />
+				<field name="valuemapid" xsi:nil="true" />
+				<field name="delay_flex"></field>
+				<field name="params"></field>
+				<field name="ipmi_sensor"></field>
+				<field name="data_type">0</field>
+				<field name="authtype">0</field>
+				<field name="username"></field>
+				<field name="password"></field>
+				<field name="publickey"></field>
+				<field name="privatekey"></field>
+				<field name="mtime">0</field>
+				<field name="lastns" xsi:nil="true" />
+				<field name="flags">0</field>
+				<field name="filter"></field>
+				<field name="interfaceid" xsi:nil="true" />
+				<field name="port"></field>
+				<field name="description"></field>
+				<field name="inventory_link">0</field>
+				<field name="lifetime">30</field>
+			</row>
+			<row>
+				<field name="itemid">10</field>
+				<field name="type">9</field>
+				<field name="snmp_community"></field>
+				<field name="snmp_oid"></field>
+				<field name="hostid">2</field>
+				<field name="name">Download speed for scenario &quot;$1&quot;.</field>
+				<field name="key_">web.test.in[HttpTestUpdate,,bps]</field>
+				<field name="delay">70</field>
+				<field name="history">30</field>
+				<field name="trends">90</field>
+				<field name="lastvalue" xsi:nil="true" />
+				<field name="lastclock" xsi:nil="true" />
+				<field name="prevvalue" xsi:nil="true" />
+				<field name="status">0</field>
+				<field name="value_type">0</field>
+				<field name="trapper_hosts"></field>
+				<field name="units">Bps</field>
+				<field name="multiplier">0</field>
+				<field name="delta">0</field>
+				<field name="prevorgvalue" xsi:nil="true" />
+				<field name="snmpv3_securityname"></field>
+				<field name="snmpv3_securitylevel">0</field>
+				<field name="snmpv3_authpassphrase"></field>
+				<field name="snmpv3_privpassphrase"></field>
+				<field name="formula">1</field>
+				<field name="error"></field>
+				<field name="lastlogsize">0</field>
+				<field name="logtimefmt"></field>
+				<field name="templateid" xsi:nil="true" />
+				<field name="valuemapid" xsi:nil="true" />
+				<field name="delay_flex"></field>
+				<field name="params"></field>
+				<field name="ipmi_sensor"></field>
+				<field name="data_type">0</field>
+				<field name="authtype">0</field>
+				<field name="username"></field>
+				<field name="password"></field>
+				<field name="publickey"></field>
+				<field name="privatekey"></field>
+				<field name="mtime">0</field>
+				<field name="lastns" xsi:nil="true" />
+				<field name="flags">0</field>
+				<field name="filter"></field>
+				<field name="interfaceid" xsi:nil="true" />
+				<field name="port"></field>
+				<field name="description"></field>
+				<field name="inventory_link">0</field>
+				<field name="lifetime">30</field>
+			</row>
+			<row>
+				<field name="itemid">11</field>
+				<field name="type">9</field>
+				<field name="snmp_community"></field>
+				<field name="snmp_oid"></field>
+				<field name="hostid">2</field>
+				<field name="name">Failed step of scenario &quot;$1&quot;.</field>
+				<field name="key_">web.test.fail[HttpTestUpdate]</field>
+				<field name="delay">70</field>
+				<field name="history">30</field>
+				<field name="trends">90</field>
+				<field name="lastvalue" xsi:nil="true" />
+				<field name="lastclock" xsi:nil="true" />
+				<field name="prevvalue" xsi:nil="true" />
+				<field name="status">0</field>
+				<field name="value_type">3</field>
+				<field name="trapper_hosts"></field>
+				<field name="units"></field>
+				<field name="multiplier">0</field>
+				<field name="delta">0</field>
+				<field name="prevorgvalue" xsi:nil="true" />
+				<field name="snmpv3_securityname"></field>
+				<field name="snmpv3_securitylevel">0</field>
+				<field name="snmpv3_authpassphrase"></field>
+				<field name="snmpv3_privpassphrase"></field>
+				<field name="formula">1</field>
+				<field name="error"></field>
+				<field name="lastlogsize">0</field>
+				<field name="logtimefmt"></field>
+				<field name="templateid" xsi:nil="true" />
+				<field name="valuemapid" xsi:nil="true" />
+				<field name="delay_flex"></field>
+				<field name="params"></field>
+				<field name="ipmi_sensor"></field>
+				<field name="data_type">0</field>
+				<field name="authtype">0</field>
+				<field name="username"></field>
+				<field name="password"></field>
+				<field name="publickey"></field>
+				<field name="privatekey"></field>
+				<field name="mtime">0</field>
+				<field name="lastns" xsi:nil="true" />
+				<field name="flags">0</field>
+				<field name="filter"></field>
+				<field name="interfaceid" xsi:nil="true" />
+				<field name="port"></field>
+				<field name="description"></field>
+				<field name="inventory_link">0</field>
+				<field name="lifetime">30</field>
+			</row>
+			<row>
+				<field name="itemid">12</field>
+				<field name="type">9</field>
+				<field name="snmp_community"></field>
+				<field name="snmp_oid"></field>
+				<field name="hostid">2</field>
+				<field name="name">Last error message of scenario &quot;$1&quot;.</field>
+				<field name="key_">web.test.error[HttpTestUpdate]</field>
+				<field name="delay">70</field>
+				<field name="history">30</field>
+				<field name="trends">90</field>
+				<field name="lastvalue" xsi:nil="true" />
+				<field name="lastclock" xsi:nil="true" />
+				<field name="prevvalue" xsi:nil="true" />
+				<field name="status">0</field>
+				<field name="value_type">1</field>
+				<field name="trapper_hosts"></field>
+				<field name="units"></field>
+				<field name="multiplier">0</field>
+				<field name="delta">0</field>
+				<field name="prevorgvalue" xsi:nil="true" />
+				<field name="snmpv3_securityname"></field>
+				<field name="snmpv3_securitylevel">0</field>
+				<field name="snmpv3_authpassphrase"></field>
+				<field name="snmpv3_privpassphrase"></field>
+				<field name="formula">1</field>
+				<field name="error"></field>
+				<field name="lastlogsize">0</field>
+				<field name="logtimefmt"></field>
+				<field name="templateid" xsi:nil="true" />
+				<field name="valuemapid" xsi:nil="true" />
+				<field name="delay_flex"></field>
+				<field name="params"></field>
+				<field name="ipmi_sensor"></field>
+				<field name="data_type">0</field>
+				<field name="authtype">0</field>
+				<field name="username"></field>
+				<field name="password"></field>
+				<field name="publickey"></field>
+				<field name="privatekey"></field>
+				<field name="mtime">0</field>
+				<field name="lastns" xsi:nil="true" />
+				<field name="flags">0</field>
+				<field name="filter"></field>
+				<field name="interfaceid" xsi:nil="true" />
+				<field name="port"></field>
+				<field name="description"></field>
+				<field name="inventory_link">0</field>
+				<field name="lifetime">30</field>
+			</row>
+			<row>
+				<field name="itemid">13</field>
+				<field name="type">9</field>
+				<field name="snmp_community"></field>
+				<field name="snmp_oid"></field>
+				<field name="hostid">2</field>
+				<field name="name">Download speed for step &quot;$2&quot; of scenario &quot;$1&quot;.</field>
+				<field name="key_">web.test.in[HttpTestUpdate,step1,bps]</field>
+				<field name="delay">70</field>
+				<field name="history">30</field>
+				<field name="trends">90</field>
+				<field name="lastvalue" xsi:nil="true" />
+				<field name="lastclock" xsi:nil="true" />
+				<field name="prevvalue" xsi:nil="true" />
+				<field name="status">0</field>
+				<field name="value_type">0</field>
+				<field name="trapper_hosts"></field>
+				<field name="units">Bps</field>
+				<field name="multiplier">0</field>
+				<field name="delta">0</field>
+				<field name="prevorgvalue" xsi:nil="true" />
+				<field name="snmpv3_securityname"></field>
+				<field name="snmpv3_securitylevel">0</field>
+				<field name="snmpv3_authpassphrase"></field>
+				<field name="snmpv3_privpassphrase"></field>
+				<field name="formula">1</field>
+				<field name="error"></field>
+				<field name="lastlogsize">0</field>
+				<field name="logtimefmt"></field>
+				<field name="templateid" xsi:nil="true" />
+				<field name="valuemapid" xsi:nil="true" />
+				<field name="delay_flex"></field>
+				<field name="params"></field>
+				<field name="ipmi_sensor"></field>
+				<field name="data_type">0</field>
+				<field name="authtype">0</field>
+				<field name="username"></field>
+				<field name="password"></field>
+				<field name="publickey"></field>
+				<field name="privatekey"></field>
+				<field name="mtime">0</field>
+				<field name="lastns" xsi:nil="true" />
+				<field name="flags">0</field>
+				<field name="filter"></field>
+				<field name="interfaceid" xsi:nil="true" />
+				<field name="port"></field>
+				<field name="description"></field>
+				<field name="inventory_link">0</field>
+				<field name="lifetime">30</field>
+			</row>
+			<row>
+				<field name="itemid">14</field>
+				<field name="type">9</field>
+				<field name="snmp_community"></field>
+				<field name="snmp_oid"></field>
+				<field name="hostid">2</field>
+				<field name="name">Response time for step &quot;$2&quot; of scenario &quot;$1&quot;.</field>
+				<field name="key_">web.test.time[HttpTestUpdate,step1,resp]</field>
+				<field name="delay">70</field>
+				<field name="history">30</field>
+				<field name="trends">90</field>
+				<field name="lastvalue" xsi:nil="true" />
+				<field name="lastclock" xsi:nil="true" />
+				<field name="prevvalue" xsi:nil="true" />
+				<field name="status">0</field>
+				<field name="value_type">0</field>
+				<field name="trapper_hosts"></field>
+				<field name="units">s</field>
+				<field name="multiplier">0</field>
+				<field name="delta">0</field>
+				<field name="prevorgvalue" xsi:nil="true" />
+				<field name="snmpv3_securityname"></field>
+				<field name="snmpv3_securitylevel">0</field>
+				<field name="snmpv3_authpassphrase"></field>
+				<field name="snmpv3_privpassphrase"></field>
+				<field name="formula">1</field>
+				<field name="error"></field>
+				<field name="lastlogsize">0</field>
+				<field name="logtimefmt"></field>
+				<field name="templateid" xsi:nil="true" />
+				<field name="valuemapid" xsi:nil="true" />
+				<field name="delay_flex"></field>
+				<field name="params"></field>
+				<field name="ipmi_sensor"></field>
+				<field name="data_type">0</field>
+				<field name="authtype">0</field>
+				<field name="username"></field>
+				<field name="password"></field>
+				<field name="publickey"></field>
+				<field name="privatekey"></field>
+				<field name="mtime">0</field>
+				<field name="lastns" xsi:nil="true" />
+				<field name="flags">0</field>
+				<field name="filter"></field>
+				<field name="interfaceid" xsi:nil="true" />
+				<field name="port"></field>
+				<field name="description"></field>
+				<field name="inventory_link">0</field>
+				<field name="lifetime">30</field>
+			</row>
+			<row>
+				<field name="itemid">15</field>
+				<field name="type">9</field>
+				<field name="snmp_community"></field>
+				<field name="snmp_oid"></field>
+				<field name="hostid">2</field>
+				<field name="name">Response code for step &quot;$2&quot; of scenario &quot;$1&quot;.</field>
+				<field name="key_">web.test.rspcode[HttpTestUpdate,step1]</field>
+				<field name="delay">70</field>
+				<field name="history">30</field>
+				<field name="trends">90</field>
+				<field name="lastvalue" xsi:nil="true" />
+				<field name="lastclock" xsi:nil="true" />
+				<field name="prevvalue" xsi:nil="true" />
+				<field name="status">0</field>
+				<field name="value_type">3</field>
+				<field name="trapper_hosts"></field>
+				<field name="units"></field>
+				<field name="multiplier">0</field>
+				<field name="delta">0</field>
+				<field name="prevorgvalue" xsi:nil="true" />
+				<field name="snmpv3_securityname"></field>
+				<field name="snmpv3_securitylevel">0</field>
+				<field name="snmpv3_authpassphrase"></field>
+				<field name="snmpv3_privpassphrase"></field>
+				<field name="formula">1</field>
+				<field name="error"></field>
+				<field name="lastlogsize">0</field>
+				<field name="logtimefmt"></field>
+				<field name="templateid" xsi:nil="true" />
+				<field name="valuemapid" xsi:nil="true" />
+				<field name="delay_flex"></field>
+				<field name="params"></field>
+				<field name="ipmi_sensor"></field>
+				<field name="data_type">0</field>
+				<field name="authtype">0</field>
+				<field name="username"></field>
+				<field name="password"></field>
+				<field name="publickey"></field>
+				<field name="privatekey"></field>
+				<field name="mtime">0</field>
+				<field name="lastns" xsi:nil="true" />
+				<field name="flags">0</field>
+				<field name="filter"></field>
+				<field name="interfaceid" xsi:nil="true" />
+				<field name="port"></field>
+				<field name="description"></field>
+				<field name="inventory_link">0</field>
+				<field name="lifetime">30</field>
+			</row>
+			<row>
+				<field name="itemid">16</field>
+				<field name="type">9</field>
+				<field name="snmp_community"></field>
+				<field name="snmp_oid"></field>
+				<field name="hostid">2</field>
+				<field name="name">Download speed for step &quot;$2&quot; of scenario &quot;$1&quot;.</field>
+				<field name="key_">web.test.in[HttpTestUpdate,step2,bps]</field>
+				<field name="delay">70</field>
+				<field name="history">30</field>
+				<field name="trends">90</field>
+				<field name="lastvalue" xsi:nil="true" />
+				<field name="lastclock" xsi:nil="true" />
+				<field name="prevvalue" xsi:nil="true" />
+				<field name="status">0</field>
+				<field name="value_type">0</field>
+				<field name="trapper_hosts"></field>
+				<field name="units">Bps</field>
+				<field name="multiplier">0</field>
+				<field name="delta">0</field>
+				<field name="prevorgvalue" xsi:nil="true" />
+				<field name="snmpv3_securityname"></field>
+				<field name="snmpv3_securitylevel">0</field>
+				<field name="snmpv3_authpassphrase"></field>
+				<field name="snmpv3_privpassphrase"></field>
+				<field name="formula">1</field>
+				<field name="error"></field>
+				<field name="lastlogsize">0</field>
+				<field name="logtimefmt"></field>
+				<field name="templateid" xsi:nil="true" />
+				<field name="valuemapid" xsi:nil="true" />
+				<field name="delay_flex"></field>
+				<field name="params"></field>
+				<field name="ipmi_sensor"></field>
+				<field name="data_type">0</field>
+				<field name="authtype">0</field>
+				<field name="username"></field>
+				<field name="password"></field>
+				<field name="publickey"></field>
+				<field name="privatekey"></field>
+				<field name="mtime">0</field>
+				<field name="lastns" xsi:nil="true" />
+				<field name="flags">0</field>
+				<field name="filter"></field>
+				<field name="interfaceid" xsi:nil="true" />
+				<field name="port"></field>
+				<field name="description"></field>
+				<field name="inventory_link">0</field>
+				<field name="lifetime">30</field>
+			</row>
+			<row>
+				<field name="itemid">17</field>
+				<field name="type">9</field>
+				<field name="snmp_community"></field>
+				<field name="snmp_oid"></field>
+				<field name="hostid">2</field>
+				<field name="name">Response time for step &quot;$2&quot; of scenario &quot;$1&quot;.</field>
+				<field name="key_">web.test.time[HttpTestUpdate,step2,resp]</field>
+				<field name="delay">70</field>
+				<field name="history">30</field>
+				<field name="trends">90</field>
+				<field name="lastvalue" xsi:nil="true" />
+				<field name="lastclock" xsi:nil="true" />
+				<field name="prevvalue" xsi:nil="true" />
+				<field name="status">0</field>
+				<field name="value_type">0</field>
+				<field name="trapper_hosts"></field>
+				<field name="units">s</field>
+				<field name="multiplier">0</field>
+				<field name="delta">0</field>
+				<field name="prevorgvalue" xsi:nil="true" />
+				<field name="snmpv3_securityname"></field>
+				<field name="snmpv3_securitylevel">0</field>
+				<field name="snmpv3_authpassphrase"></field>
+				<field name="snmpv3_privpassphrase"></field>
+				<field name="formula">1</field>
+				<field name="error"></field>
+				<field name="lastlogsize">0</field>
+				<field name="logtimefmt"></field>
+				<field name="templateid" xsi:nil="true" />
+				<field name="valuemapid" xsi:nil="true" />
+				<field name="delay_flex"></field>
+				<field name="params"></field>
+				<field name="ipmi_sensor"></field>
+				<field name="data_type">0</field>
+				<field name="authtype">0</field>
+				<field name="username"></field>
+				<field name="password"></field>
+				<field name="publickey"></field>
+				<field name="privatekey"></field>
+				<field name="mtime">0</field>
+				<field name="lastns" xsi:nil="true" />
+				<field name="flags">0</field>
+				<field name="filter"></field>
+				<field name="interfaceid" xsi:nil="true" />
+				<field name="port"></field>
+				<field name="description"></field>
+				<field name="inventory_link">0</field>
+				<field name="lifetime">30</field>
+			</row>
+			<row>
+				<field name="itemid">18</field>
+				<field name="type">9</field>
+				<field name="snmp_community"></field>
+				<field name="snmp_oid"></field>
+				<field name="hostid">2</field>
+				<field name="name">Response code for step &quot;$2&quot; of scenario &quot;$1&quot;.</field>
+				<field name="key_">web.test.rspcode[HttpTestUpdate,step2]</field>
+				<field name="delay">70</field>
+				<field name="history">30</field>
+				<field name="trends">90</field>
+				<field name="lastvalue" xsi:nil="true" />
+				<field name="lastclock" xsi:nil="true" />
+				<field name="prevvalue" xsi:nil="true" />
+				<field name="status">0</field>
+				<field name="value_type">3</field>
+				<field name="trapper_hosts"></field>
+				<field name="units"></field>
+				<field name="multiplier">0</field>
+				<field name="delta">0</field>
+				<field name="prevorgvalue" xsi:nil="true" />
+				<field name="snmpv3_securityname"></field>
+				<field name="snmpv3_securitylevel">0</field>
+				<field name="snmpv3_authpassphrase"></field>
+				<field name="snmpv3_privpassphrase"></field>
+				<field name="formula">1</field>
+				<field name="error"></field>
+				<field name="lastlogsize">0</field>
+				<field name="logtimefmt"></field>
+				<field name="templateid" xsi:nil="true" />
+				<field name="valuemapid" xsi:nil="true" />
+				<field name="delay_flex"></field>
+				<field name="params"></field>
+				<field name="ipmi_sensor"></field>
+				<field name="data_type">0</field>
+				<field name="authtype">0</field>
+				<field name="username"></field>
+				<field name="password"></field>
+				<field name="publickey"></field>
+				<field name="privatekey"></field>
+				<field name="mtime">0</field>
+				<field name="lastns" xsi:nil="true" />
+				<field name="flags">0</field>
+				<field name="filter"></field>
+				<field name="interfaceid" xsi:nil="true" />
+				<field name="port"></field>
+				<field name="description"></field>
+				<field name="inventory_link">0</field>
+				<field name="lifetime">30</field>
+			</row>
+		</table_data>
+		<table_data name="httptest">
+			<row>
+				<field name="httptestid">1</field>
+				<field name="name">HttpTestUpdate</field>
+				<field name="applicationid" xsi:nil="true" />
+				<field name="nextcheck">0</field>
+				<field name="delay">70</field>
+				<field name="status">0</field>
+				<field name="macros"></field>
+				<field name="agent">Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; Trident/6.0)</field>
+				<field name="authentication">0</field>
+				<field name="http_user"></field>
+				<field name="http_password"></field>
+				<field name="hostid">1</field>
+				<field name="templateid" xsi:nil="true" />
+			</row>
+			<row>
+				<field name="httptestid">2</field>
+				<field name="name">HttpTestUpdate</field>
+				<field name="applicationid" xsi:nil="true" />
+				<field name="nextcheck">0</field>
+				<field name="delay">70</field>
+				<field name="status">0</field>
+				<field name="macros"></field>
+				<field name="agent">Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; Trident/6.0)</field>
+				<field name="authentication">0</field>
+				<field name="http_user"></field>
+				<field name="http_password"></field>
+				<field name="hostid">2</field>
+				<field name="templateid">1</field>
+			</row>
+		</table_data>
+		<table_data name="httpstep">
+			<row>
+				<field name="httpstepid">1</field>
+				<field name="httptestid">3</field>
+				<field name="name">step1</field>
+				<field name="no">1</field>
+				<field name="url">url1</field>
+				<field name="timeout">15</field>
+				<field name="posts"></field>
+				<field name="required"></field>
+				<field name="status_codes"></field>
+			</row>
+			<row>
+				<field name="httpstepid">2</field>
+				<field name="httptestid">3</field>
+				<field name="name">step2</field>
+				<field name="no">2</field>
+				<field name="url">url2</field>
+				<field name="timeout">15</field>
+				<field name="posts"></field>
+				<field name="required"></field>
+				<field name="status_codes"></field>
+			</row>
+			<row>
+				<field name="httpstepid">3</field>
+				<field name="httptestid">4</field>
+				<field name="name">step1</field>
+				<field name="no">1</field>
+				<field name="url">url1</field>
+				<field name="timeout">15</field>
+				<field name="posts"></field>
+				<field name="required"></field>
+				<field name="status_codes"></field>
+			</row>
+			<row>
+				<field name="httpstepid">4</field>
+				<field name="httptestid">4</field>
+				<field name="name">step2</field>
+				<field name="no">2</field>
+				<field name="url">url2</field>
+				<field name="timeout">15</field>
+				<field name="posts"></field>
+				<field name="required"></field>
+				<field name="status_codes"></field>
+			</row>
+		</table_data>
+		<table_data name="httptestitem">
+			<row>
+				<field name="httptestitemid">1</field>
+				<field name="httptestid">3</field>
+				<field name="itemid">1</field>
+				<field name="type">2</field>
+			</row>
+			<row>
+				<field name="httptestitemid">2</field>
+				<field name="httptestid">3</field>
+				<field name="itemid">2</field>
+				<field name="type">3</field>
+			</row>
+			<row>
+				<field name="httptestitemid">3</field>
+				<field name="httptestid">3</field>
+				<field name="itemid">3</field>
+				<field name="type">4</field>
+			</row>
+			<row>
+				<field name="httptestitemid">4</field>
+				<field name="httptestid">4</field>
+				<field name="itemid">10</field>
+				<field name="type">2</field>
+			</row>
+			<row>
+				<field name="httptestitemid">5</field>
+				<field name="httptestid">4</field>
+				<field name="itemid">11</field>
+				<field name="type">3</field>
+			</row>
+			<row>
+				<field name="httptestitemid">6</field>
+				<field name="httptestid">4</field>
+				<field name="itemid">12</field>
+				<field name="type">4</field>
+			</row>
+		</table_data>
+		<table_data name="httpstepitem">
+			<row>
+				<field name="httpstepitemid">1</field>
+				<field name="httpstepid">1</field>
+				<field name="itemid">4</field>
+				<field name="type">2</field>
+			</row>
+			<row>
+				<field name="httpstepitemid">2</field>
+				<field name="httpstepid">1</field>
+				<field name="itemid">5</field>
+				<field name="type">1</field>
+			</row>
+			<row>
+				<field name="httpstepitemid">3</field>
+				<field name="httpstepid">1</field>
+				<field name="itemid">6</field>
+				<field name="type">0</field>
+			</row>
+			<row>
+				<field name="httpstepitemid">4</field>
+				<field name="httpstepid">2</field>
+				<field name="itemid">7</field>
+				<field name="type">2</field>
+			</row>
+			<row>
+				<field name="httpstepitemid">5</field>
+				<field name="httpstepid">2</field>
+				<field name="itemid">8</field>
+				<field name="type">1</field>
+			</row>
+			<row>
+				<field name="httpstepitemid">6</field>
+				<field name="httpstepid">2</field>
+				<field name="itemid">9</field>
+				<field name="type">0</field>
+			</row>
+			<row>
+				<field name="httpstepitemid">7</field>
+				<field name="httpstepid">3</field>
+				<field name="itemid">13</field>
+				<field name="type">2</field>
+			</row>
+			<row>
+				<field name="httpstepitemid">8</field>
+				<field name="httpstepid">3</field>
+				<field name="itemid">14</field>
+				<field name="type">1</field>
+			</row>
+			<row>
+				<field name="httpstepitemid">9</field>
+				<field name="httpstepid">3</field>
+				<field name="itemid">15</field>
+				<field name="type">0</field>
+			</row>
+			<row>
+				<field name="httpstepitemid">10</field>
+				<field name="httpstepid">4</field>
+				<field name="itemid">16</field>
+				<field name="type">2</field>
+			</row>
+			<row>
+				<field name="httpstepitemid">11</field>
+				<field name="httpstepid">4</field>
+				<field name="itemid">17</field>
+				<field name="type">1</field>
+			</row>
+			<row>
+				<field name="httpstepitemid">12</field>
+				<field name="httpstepid">4</field>
+				<field name="itemid">18</field>
+				<field name="type">0</field>
+			</row>
+		</table_data>
+	</database>
+</mysqldump>
