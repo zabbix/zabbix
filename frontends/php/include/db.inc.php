@@ -1193,7 +1193,7 @@ function dbConditionString($fieldName, array $values, $notIn = false) {
 		$condition .= implode(',', zbx_dbstr($values));
 	}
 
-	return $fieldName.$in.'('.$condition.')';
+	return '('.$fieldName.$in.'('.$condition.'))';
 }
 
 function zero2null($val) {
