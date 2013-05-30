@@ -168,43 +168,27 @@ abstract class CHostGeneral extends CZBXAPI {
 				'output' => array('templateid'),
 				'hostids' => $targetid
 			));
-			$allids = array_merge($templateids, zbx_objectValues($linkedTpls, 'templateid'));
-
-			$res = DBselect(
-				'SELECT key_,hostid'.
-				' FROM items'.
-				' WHERE '.dbConditionInt('hostid', $allids).
-				' GROUP BY key_'.
-				' HAVING COUNT(itemid)>1'
+			$dbItems = DBselect(
+				'SELECT i.key_,i.hostid'.
+				' FROM items i'.
+				' WHERE '.dbConditionInt('i.hostid', array_merge(
+					$templateids,
+					zbx_objectValues($linkedTpls, 'templateid'))).
+				' GROUP BY i.key_'.
+				' HAVING COUNT(i.itemid)>1'
 			);
 
-			while ($row = DBfetch($res)) {
-				$problemHosts[$row['hostid']] = $row['key_'];
-				$hostIds[] = $row['hostid'];
-			}
-
-			if (isset($problemHosts)) {
-				$problemTemplates = API::Template()->get(array(
-					'output' => array('templateid', 'name'),
-					'templateids' => $hostIds
+			if ($dbItem = DBfetch($dbItems)) {
+				$template = API::Template()->get(array(
+					'output' => array('name'),
+					'templateids' => $dbItem['hostid']
 				));
 
-				foreach ($problemTemplates as $problemTemplate) {
-					$problemTemplateData[$problemTemplate['templateid']] = $problemTemplate['name'];
-				}
-
-				// searching first problem template
-				foreach ($templateids as $templateid) {
-					if (isset($problemTemplateData[$templateid])) {
-						$problemTemplateName = $problemTemplateData[$templateid];
-						$problemItemKey = $problemHosts[$templateid];
-						break;
-					}
-				}
+				$template = reset($template);
 
 				self::exception(ZBX_API_ERROR_PARAMETERS,
 					_s('Template "%1$s" with item key "%2$s" already linked to host.',
-						$problemTemplateName, $problemItemKey));
+						$template['name'], $dbItem['key_']));
 			}
 		}
 
