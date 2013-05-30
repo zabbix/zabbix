@@ -131,7 +131,7 @@ void	*zbx_hashset_insert_ext(zbx_hashset_t *hs, const void *data, size_t size, s
 
 		if (NULL == (entry->data = hs->mem_malloc_func(NULL, size)))
 		{
-			zbx_free(entry);
+			hs->mem_free_func(entry);
 			return NULL;
 		}
 

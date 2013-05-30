@@ -834,7 +834,7 @@ size_t	zbx_mem_required_size(int chunks_num, const char *descr, const char *para
 	size += (MEM_SIZE_FIELD - 1) + 8;		/* ensure we allocate enough to align the first chunk */
 	size += (MEM_SIZE_FIELD - 1) + 8;		/* ensure we allocate enough to align right size field */
 
-	size += (chunks_num - 1) * 8;			/* each additional chunk requires 8 bytes of overhead */
+	size += (chunks_num - 1) * MEM_SIZE_FIELD * 2;	/* each additional chunk requires 16 bytes of overhead */
 	size += chunks_num * (MEM_MIN_ALLOC - 1);	/* each chunk has size of at least MEM_MIN_ALLOC bytes */
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() size:" ZBX_FS_SIZE_T, __function_name, (zbx_fs_size_t)size);
