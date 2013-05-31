@@ -217,7 +217,7 @@ static void	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
  * Author: Vladimir Levijev, Rudolfs Kreicbergs                               *
  *                                                                            *
  ******************************************************************************/
-static void	set_defaults()
+static void	set_defaults(void)
 {
 	AGENT_RESULT	result;
 	char		**value = NULL;
@@ -270,7 +270,7 @@ static void	set_defaults()
  * Author: Vladimir Levijev                                                   *
  *                                                                            *
  ******************************************************************************/
-static void	zbx_validate_config()
+static void	zbx_validate_config(void)
 {
 	if (NULL == CONFIG_HOSTNAME)
 	{
@@ -491,7 +491,7 @@ static void	zbx_load_config(int requirement)
  * Author: Vladimir Levijev                                                   *
  *                                                                            *
  ******************************************************************************/
-static void	zbx_free_config()
+static void	zbx_free_config(void)
 {
 	zbx_strarr_free(CONFIG_ALIASES);
 	zbx_strarr_free(CONFIG_USER_PARAMETERS);
@@ -657,7 +657,7 @@ int	MAIN_ZABBIX_ENTRY()
  * Purpose: free service resources allocated by main thread                   *
  *                                                                            *
  ******************************************************************************/
-void	zbx_free_service_resources()
+void	zbx_free_service_resources(void)
 {
 	if (NULL != threads)
 	{
@@ -706,7 +706,7 @@ void	zbx_free_service_resources()
 #endif
 }
 
-void	zbx_on_exit()
+void	zbx_on_exit(void)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "zbx_on_exit() called");
 
