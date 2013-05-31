@@ -2394,7 +2394,7 @@ int	DBtxn_ongoing()
 
 void	DBexecute_multiple_query(const char *query, const char *field_name, zbx_vector_uint64_t *ids)
 {
-#define MAX_IDS	950
+#define ZBX_MAX_IDS	950
 	char	*sql = NULL;
 	size_t	sql_alloc = ZBX_KIBIBYTE, sql_offset = 0;
 	int	i;
@@ -2403,11 +2403,11 @@ void	DBexecute_multiple_query(const char *query, const char *field_name, zbx_vec
 
 	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
-	for (i = 0; i < ids->values_num; i += MAX_IDS)
+	for (i = 0; i < ids->values_num; i += ZBX_MAX_IDS)
 	{
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, query);
 		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, field_name,
-				&ids->values[i], MIN(MAX_IDS, ids->values_num - i));
+				&ids->values[i], MIN(ZBX_MAX_IDS, ids->values_num - i));
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
 
 		DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
