@@ -17,13 +17,20 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_SYSINFO_COMMON_SYSTEM_H
-#define ZABBIX_SYSINFO_COMMON_SYSTEM_H
-
+#include "common.h"
 #include "sysinfo.h"
+#include "system.h"
+#include <sys/utsname.h>
 
-int	SYSTEM_LOCALTIME(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	SYSTEM_USERS_NUM(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	SYSTEM_UNAME(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	SYSTEM_HOSTNAME(AGENT_REQUEST *request, AGENT_RESULT *result)
+{
+	struct utsname  name;
 
-#endif /* ZABBIX_SYSINFO_COMMON_SYSTEM_H */
+	if (-1 == uname(&name))
+		return SYSINFO_RET_FAIL;
+
+	SET_STR_RESULT(result, zbx_strdup(NULL, name.nodename));
+
+	return SYSINFO_RET_OK;
+}
+
