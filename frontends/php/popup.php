@@ -101,10 +101,6 @@ switch ($srctbl) {
 		$page['title'] = _('Maps');
 		$min_user_type = USER_TYPE_ZABBIX_USER;
 		break;
-	case 'plain_text':
-		$page['title'] = _('Plain text');
-		$min_user_type = USER_TYPE_ZABBIX_ADMIN;
-		break;
 	case 'screens2':
 		$page['title'] = _('Screens');
 		$min_user_type = USER_TYPE_ZABBIX_ADMIN;
@@ -170,7 +166,6 @@ $allowedSrcFields = array(
 	'hosts_and_templates'	=> '"name", "hostid", "group"',
 	'help_items'			=> '"key_"',
 	'simple_graph'			=> '"itemid", "name"',
-	'plain_text'			=> '"itemid", "name"',
 	'hosts'					=> '"name", "hostid"',
 	'overview'				=> '"groupid", "name"',
 	'screens'				=> '"screenid"',
@@ -478,7 +473,7 @@ if (isset($only_hostid)) {
 }
 else {
 	if (str_in_array($srctbl, array('hosts', 'host_group', 'triggers', 'items', 'simple_graph', 'applications',
-			'screens', 'slides', 'graphs', 'sysmaps', 'plain_text', 'screens2', 'overview', 'host_group_scr'))) {
+			'screens', 'slides', 'graphs', 'sysmaps', 'screens2', 'overview', 'host_group_scr'))) {
 		if (ZBX_DISTRIBUTED) {
 			$cmbNode = new CComboBox('nodeid', $nodeid, 'submit()');
 
@@ -498,7 +493,7 @@ else {
 	}
 	unset($ok);
 
-	if (str_in_array($srctbl, array('hosts_and_templates', 'hosts', 'templates', 'triggers', 'items', 'applications', 'host_templates', 'graphs', 'simple_graph', 'plain_text'))) {
+	if (str_in_array($srctbl, array('hosts_and_templates', 'hosts', 'templates', 'triggers', 'items', 'applications', 'host_templates', 'graphs', 'simple_graph'))) {
 		$frmTitle->addItem(array(_('Group'), SPACE, $pageFilter->getGroupsCB(true)));
 	}
 	if (str_in_array($srctbl, array('help_items'))) {
@@ -510,7 +505,7 @@ else {
 		}
 		$frmTitle->addItem(array(_('Type'), SPACE, $cmbTypes));
 	}
-	if (str_in_array($srctbl, array('triggers', 'items', 'applications', 'graphs', 'simple_graph', 'plain_text'))) {
+	if (str_in_array($srctbl, array('triggers', 'items', 'applications', 'graphs', 'simple_graph'))) {
 		$frmTitle->addItem(array(SPACE, _('Host'), SPACE, $pageFilter->getHostsCB(true)));
 	}
 }
@@ -1607,59 +1602,6 @@ elseif ($srctbl == 'sysmaps') {
 
 	$form->addItem($table);
 	$form->show();
-}
-/*
- * Plain text
- */
-elseif ($srctbl == 'plain_text') {
-	$table = new CTableInfo(_('No items defined.'));
-	$table->setHeader(array(
-		$hostid > 0 ? null : _('Host'),
-		_('Name'),
-		_('Key'),
-		_('Type'),
-		_('Type of information'),
-		_('Status')
-	));
-
-	$options = array(
-		'nodeids' => $nodeid,
-		'hostids' => $hostid,
-		'output' => API_OUTPUT_EXTEND,
-		'selectHosts' => API_OUTPUT_EXTEND,
-		'templated' => 0,
-		'webitems' => true,
-		'filter' => array('status' => ITEM_STATUS_ACTIVE),
-		'sortfield' => 'name'
-	);
-	if (!is_null($writeonly)) {
-		$options['editable'] = true;
-	}
-	if (!is_null($templated)) {
-		$options['templated'] = $templated;
-	}
-	$items = API::Item()->get($options);
-
-	foreach ($items as $item) {
-		$host = reset($item['hosts']);
-		$item['host'] = $host['name'];
-		$item['name'] = itemName($item);
-		$description = new CSpan($item['name'], 'link');
-		$item['name'] = $item['host'].NAME_DELIMITER.$item['name'];
-
-		$action = get_window_opener($dstfrm, $dstfld1, $item[$srcfld1]).get_window_opener($dstfrm, $dstfld2, $item[$srcfld2]);
-		$description->setAttribute('onclick', $action.' close_window(); return false;');
-
-		$table->addRow(array(
-			$hostid > 0 ? null : $item['host'],
-			$description,
-			$item['key_'],
-			item_type2str($item['type']),
-			itemValueTypeString($item['value_type']),
-			new CSpan(itemIndicator($item['status'], $item['state']), itemIndicatorStyle($item['status'], $item['state']))
-		));
-	}
-	$table->show();
 }
 /*
  * Slides
