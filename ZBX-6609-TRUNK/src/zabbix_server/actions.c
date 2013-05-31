@@ -1614,26 +1614,23 @@ void	process_actions(const DB_EVENT *events, size_t events_num)
 			}
 			else if (EVENT_SOURCE_TRIGGERS == event->source || EVENT_SOURCE_INTERNAL == event->source)
 			{
-				/* possible recovery event, check later */
-				if (FAIL == zbx_vector_uint64_bsearch(&rec_actionids, actionid,
-						ZBX_DEFAULT_UINT64_COMPARE_FUNC))
-				{
-					zbx_vector_uint64_append(&rec_actionids, actionid);
-				}
+				/* actionid of possible recovery event, check later */
+				zbx_vector_uint64_append(&rec_actionids, actionid);
 			}
 		}
 		DBfree_result(result);
 	}
 
-	if (0 < rec_actionids.values_num)
+	if (0 != rec_actionids.values_num)
 	{
 		char		*sql2 = NULL;
 		size_t		sql2_alloc = 0, sql2_offset = 0;
 		zbx_uint64_t	triggerid, itemid;
 
 		zbx_vector_uint64_sort(&rec_actionids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+		zbx_vector_uint64_uniq(&rec_actionids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
-		/* it's a recovery event if was started before */
+		/* list of ongoing escalations macthing actionids collected before */
 		zbx_strcpy_alloc(&sql2, &sql2_alloc, &sql2_offset,
 				"select actionid,triggerid,itemid"
 				" from escalations"
@@ -1646,28 +1643,41 @@ void	process_actions(const DB_EVENT *events, size_t events_num)
 
 		while (NULL != (row = DBfetch(result)))
 		{
-			triggerid = itemid = 0;
-
 			ZBX_STR2UINT64(actionid, row[0]);
-			if (FAIL == DBis_null(row[1]))
-				ZBX_STR2UINT64(triggerid, row[1]);
-			else if (FAIL == DBis_null(row[2]))
-				ZBX_STR2UINT64(itemid, row[2]);
+			ZBX_DBROW2UINT64(triggerid, row[1]);
+			ZBX_DBROW2UINT64(itemid, row[2]);
 
 			for (i = 0; i < events_num; i++)
 			{
 				event = &events[i];
 
-				if (EVENT_SOURCE_TRIGGERS != event->source && EVENT_SOURCE_INTERNAL != event->source)
-					continue;
-
-				if ((0 != triggerid && EVENT_SOURCE_TRIGGERS == event->source &&
-						triggerid == event->objectid) ||
-						(0 != itemid && EVENT_SOURCE_INTERNAL == event->source &&
-						itemid == event->objectid))
+				/* only add recovery if it matches event */
+				switch (event->source)
 				{
-					get_escalation_sql(&sql, &sql_alloc, &sql_offset, actionid, event, 1);
+					case EVENT_SOURCE_TRIGGERS:
+						if (triggerid != event->objectid)
+							continue;
+						break;
+					case EVENT_SOURCE_INTERNAL:
+						switch (event->object)
+						{
+							case EVENT_OBJECT_TRIGGER:
+								if (triggerid != event->objectid)
+									continue;
+								break;
+							case EVENT_OBJECT_ITEM:
+							case EVENT_OBJECT_LLDRULE:
+								if (itemid != event->objectid)
+									continue;
+								break;
+						}
+
+						break;
+					default:
+						continue;
 				}
+
+				get_escalation_sql(&sql, &sql_alloc, &sql_offset, actionid, event, 1);
 			}
 		}
 		DBfree_result(result);
@@ -1675,7 +1685,7 @@ void	process_actions(const DB_EVENT *events, size_t events_num)
 
 	zbx_vector_uint64_destroy(&rec_actionids);
 
-	if (0 != sql_offset)
+	if (NULL != sql)
 	{
 #ifdef HAVE_MULTIROW_INSERT
 		sql_offset--;
