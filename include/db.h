@@ -587,6 +587,8 @@ void	DBfree_history(char **value);
 int	DBtxn_status();
 int	DBtxn_ongoing();
 
+void	DBexecute_multiple_query(const char *query, const char *field_name, zbx_vector_uint64_t *ids);
+
 void	zbx_create_services_lock();
 void	zbx_destroy_services_lock();
 
