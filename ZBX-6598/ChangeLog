@@ -7,6 +7,8 @@ A.F....... [ZBX-1357] updated Chinese (China), Spanish and Turkish translations;
 
 Bug fixes:
 ........S. [ZBX-6598] fixed deleting of big amount of escalations by escalation process (Sasha)
+...G...PS. [ZBX-6605] fixed bind() error when SourceIP is used (Andris)
+A......... [ZBX-6472] fixed dbConditionString() function for large inputs, when splitting into several IN parts wasn't surrounded by parenthesis (Toms)
 ........S. [ZBX-6609] fixed trigger event processing to not add unneeded recovery event escalations to the database (dimir)
 ...G...... [ZBX-6576] fixed heavy cpu usage when collecting cpu stats on Solaris (aleksej, Andris)
 ..F....... [ZBX-6558] fixed profile types in availability reports (Oleg)
