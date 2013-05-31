@@ -671,13 +671,15 @@ $data = array(
 );
 
 // if user has already selected an item
-if (!empty($itemId)) {
+if ($itemId) {
 	// get item value type
 	$selectedItems = API::Item()->get(array(
 		'itemids' => array($itemId),
 		'output' => array('value_type'),
-		'filter' => array('flags' => null)
+		'filter' => array('flags' => null),
+		'webitems' => true
 	));
+
 	if ($selectedItem = reset($selectedItems)) {
 		$data['itemValueType'] = $selectedItem['value_type'];
 	}
