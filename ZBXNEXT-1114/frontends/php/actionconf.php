@@ -173,17 +173,15 @@ elseif (isset($_REQUEST['add_condition']) && isset($_REQUEST['new_condition'])) 
 		$newCondition = get_request('new_condition');
 
 		if ($newCondition) {
-			CAction::validateConditions($newCondition);
-
 			$conditions = get_request('conditions', array());
 
 			foreach ($conditions as $condition) {
 				if ($newCondition['conditiontype'] == $condition['conditiontype']) {
 					$newConditionValues = zbx_toArray($newCondition['value']);
 
-					foreach ($newConditionValues as $num => $newValue) {
+					foreach ($newConditionValues as $key => $newValue) {
 						if ($condition['value'] == $newValue) {
-							unset($newCondition['value'][$num]);
+							unset($newCondition['value'][$key]);
 						}
 					}
 				}
@@ -199,6 +197,8 @@ elseif (isset($_REQUEST['add_condition']) && isset($_REQUEST['new_condition'])) 
 					$_REQUEST['conditions'][] = $condition;
 				}
 			}
+
+			CAction::validateConditions($_REQUEST['conditions']);
 		}
 	}
 	catch (APIException $e) {
