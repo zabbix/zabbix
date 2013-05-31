@@ -48,6 +48,9 @@ class CTrigger extends CTriggerGeneral {
 	 * @return array|int item data as array or false if error
 	 */
 	public function get(array $options = array()) {
+
+		echo "start: <br>".timer()."<br><br>";
+
 		$result = array();
 		$userType = self::$userData['type'];
 		$userid = self::$userData['userid'];
@@ -179,6 +182,8 @@ class CTrigger extends CTriggerGeneral {
 		// groupids
 		if (!is_null($options['groupids'])) {
 			zbx_value2array($options['groupids']);
+
+			sort($options['groupids']);
 
 			if ($options['output'] != API_OUTPUT_SHORTEN) {
 				$sqlParts['select']['groupid'] = 'hg.groupid';
@@ -580,9 +585,9 @@ class CTrigger extends CTriggerGeneral {
 			}
 			return $result;
 		}
-
+		echo "bef fetch: <br>".timer()."<br><br>";
 		$triggers = zbx_toHash($this->customFetch($this->createSelectQueryFromParts($sqlParts), $options), 'triggerid');
-
+		echo "after fetch: <br>".timer()."<br><br>";
 		// return count for post SQL filtered result sets
 		if (!is_null($options['countOutput'])) {
 			return count($triggers);
@@ -616,38 +621,6 @@ class CTrigger extends CTriggerGeneral {
 					$result[$trigger['triggerid']]['discoveryRule'] = array();
 				}
 
-				// groups
-				if (isset($trigger['groupid']) && is_null($options['selectGroups'])) {
-					if (!isset($result[$trigger['triggerid']]['groups'])) {
-						$result[$trigger['triggerid']]['groups'] = array();
-					}
-
-					$result[$trigger['triggerid']]['groups'][] = array('groupid' => $trigger['groupid']);
-					unset($trigger['groupid']);
-				}
-
-				// hostids
-				if (isset($trigger['hostid']) && is_null($options['selectHosts'])) {
-					if (!isset($result[$trigger['triggerid']]['hosts'])) {
-						$result[$trigger['triggerid']]['hosts'] = array();
-					}
-
-					$result[$trigger['triggerid']]['hosts'][] = array('hostid' => $trigger['hostid']);
-
-					if (is_null($options['expandData'])) {
-						unset($trigger['hostid']);
-					}
-				}
-				// itemids
-				if (isset($trigger['itemid']) && is_null($options['selectItems'])) {
-					if (!isset($result[$trigger['triggerid']]['items'])) {
-						$result[$trigger['triggerid']]['items'] = array();
-					}
-
-					$result[$trigger['triggerid']]['items'][] = array('itemid' => $trigger['itemid']);
-					unset($trigger['itemid']);
-				}
-
 				$result[$trigger['triggerid']] += $trigger;
 
 			}
@@ -657,23 +630,24 @@ class CTrigger extends CTriggerGeneral {
 		 * Adding objects
 		 */
 		// adding last event
+		echo "after format: <br>".timer()."<br><br>";
 		if (!is_null($options['selectLastEvent']) && str_in_array($options['selectLastEvent'], $subselectsAllowedOutputs)) {
-			foreach ($result as $triggerId => $trigger) {
-				$lastEvent = API::Event()->get(array(
-					'object' => EVENT_SOURCE_TRIGGERS,
-					'triggerids' => $triggerId,
-					'output' => $options['selectLastEvent'],
-					'nopermissions' => true,
-					'filter' => array('value_changed' => TRIGGER_VALUE_CHANGED_YES),
-					'sortfield' => array('eventid'),
-					'sortorder' => ZBX_SORT_DOWN,
-					'limit' => 1
-				));
+			$lastEvents = DBfetchArrayAssoc(DBselect(
+				'SELECT e.* FROM events e JOIN ('.
+					'SELECT  max(eventid) as lasteventid FROM events e'.
+					' WHERE '.dbConditionInt('e.objectid', $triggerids).
+					' AND '.DBin_node('e.objectid').
+					' AND e.object='.EVENT_SOURCE_TRIGGERS.
+					' AND e.value_changed='.TRIGGER_VALUE_CHANGED_YES.
+					' GROUP BY e.objectid'.
+				') ee ON e.eventid=ee.lasteventid'
+			), 'objectid');
 
-				$result[$triggerId]['lastEvent'] = $lastEvent ? reset($lastEvent) : array();
+			foreach ($result as $triggerId => $trigger) {
+				$result[$triggerId]['lastEvent'] = isset($lastEvents[$triggerId]) ? $lastEvents[$triggerId] : array();
 			}
 		}
-
+		echo "after last events: <br>".timer()."<br><br>";
 		// adding trigger dependencies
 		if (!is_null($options['selectDependencies']) && str_in_array($options['selectDependencies'], $subselectsAllowedOutputs)) {
 			$deps = array();
@@ -707,8 +681,11 @@ class CTrigger extends CTriggerGeneral {
 				}
 			}
 		}
-
+		echo "after dep: <br>".timer()."<br><br>";
 		// adding groups
+		if ($options['groupids'] !== null && $options['selectGroups'] === null) {
+			$options['selectGroups'] = API_OUTPUT_REFER;
+		}
 		if (!is_null($options['selectGroups']) && str_in_array($options['selectGroups'], $subselectsAllowedOutputs)) {
 			$objParams = array(
 				'nodeids' => $options['nodeids'],
@@ -726,8 +703,11 @@ class CTrigger extends CTriggerGeneral {
 				}
 			}
 		}
-
+		echo "after groups: <br>".timer()."<br><br>";
 		// adding hosts
+		if ($options['hostids'] !== null && $options['selectHosts'] === null) {
+			$options['selectHosts'] = API_OUTPUT_REFER;
+		}
 		if (!is_null($options['selectHosts'])) {
 			$objParams = array(
 				'nodeids' => $options['nodeids'],
@@ -781,7 +761,7 @@ class CTrigger extends CTriggerGeneral {
 				}
 			}
 		}
-
+		echo "after hosts: <br>".timer()."<br><br>";
 		// adding functions
 		if (!is_null($options['selectFunctions']) && str_in_array($options['selectFunctions'], $subselectsAllowedOutputs)) {
 			if ($options['selectFunctions'] == API_OUTPUT_EXTEND) {
@@ -803,8 +783,11 @@ class CTrigger extends CTriggerGeneral {
 				$result[$triggerid]['functions'][] = $function;
 			}
 		}
-
+		echo "after fun: <br>".timer()."<br><br>";
 		// adding items
+		if ($options['itemids'] !== null && $options['selectItems'] === null) {
+			$options['selectItems'] = API_OUTPUT_REFER;
+		}
 		if (!is_null($options['selectItems']) && (is_array($options['selectItems']) || str_in_array($options['selectItems'], $subselectsAllowedOutputs))) {
 			$objParams = array(
 				'nodeids' => $options['nodeids'],
@@ -824,7 +807,7 @@ class CTrigger extends CTriggerGeneral {
 				}
 			}
 		}
-
+		echo "after item: <br>".timer()."<br><br>";
 		// adding discoveryrule
 		if (!is_null($options['selectDiscoveryRule'])) {
 			$ruleids = $ruleMap = array();
@@ -859,12 +842,12 @@ class CTrigger extends CTriggerGeneral {
 				}
 			}
 		}
-
+		echo "after drule: <br>".timer()."<br><br>";
 		// expandDescription
 		if (!is_null($options['expandDescription']) && $result && array_key_exists('description', reset($result))) {
 			$result = CTriggerHelper::batchExpandDescription($result);
 		}
-
+		echo "after expand: <br>".timer()."<br><br>";
 		// expand expression
 		if ($options['expandExpression'] !== null) {
 			foreach ($result as &$trigger) {
@@ -887,7 +870,7 @@ class CTrigger extends CTriggerGeneral {
 		if (is_null($options['preservekeys'])) {
 			$result = zbx_cleanHashes($result);
 		}
-
+		echo "end: <br>".timer()."<br><br>";
 		return $result;
 	}
 
