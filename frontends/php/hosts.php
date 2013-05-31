@@ -34,9 +34,7 @@ else {
 	$page['type'] = detect_page_type(PAGE_TYPE_HTML);
 	$page['hist_arg'] = array('groupid');
 
-	if (isset($_REQUEST['go']) && $_REQUEST['go'] == 'massupdate') {
-		$page['scripts'] = array('multiselect.js');
-	}
+	$page['scripts'] = array('multiselect.js');
 
 	$EXPORT_DATA = false;
 }
@@ -60,7 +58,9 @@ $fields = array(
 	'newgroup' =>		array(T_ZBX_STR, O_OPT, null,		null,		null),
 	'interfaces' =>		array(T_ZBX_STR, O_OPT, null,		NOT_EMPTY,	'isset({save})', _('Agent or SNMP or JMX or IPMI interface')),
 	'mainInterfaces' =>	array(T_ZBX_INT, O_OPT, null,		DB_ID,		null),
-	'templates' =>		array(T_ZBX_STR, O_OPT, null,		NOT_EMPTY,	null),
+	'templates' =>		array(T_ZBX_INT, O_OPT, null,		DB_ID,	null),
+	'add_template' =>	array(T_ZBX_STR, O_OPT, null,		null,	null),
+	'exist_templates' =>		array(T_ZBX_INT, O_OPT, null,		DB_ID,	null),
 	'templates_rem' =>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,		null),
 	'clear_templates' =>	array(T_ZBX_INT, O_OPT, null,		DB_ID,		null),
 	'ipmi_authtype' =>	array(T_ZBX_INT, O_OPT, null,		BETWEEN(-1, 6), null),
@@ -182,6 +182,16 @@ else {
 /*
  * Actions
  */
+
+if (isset($_REQUEST['exist_templates'])) {
+	if (isset($_REQUEST['templates']) && isset($_REQUEST['add_template'])) {
+		$_REQUEST['templates'] = array_merge($_REQUEST['exist_templates'], $_REQUEST['templates']);
+	}
+	else {
+		$_REQUEST['templates'] = $_REQUEST['exist_templates'];
+	}
+}
+
 if (isset($_REQUEST['unlink']) || isset($_REQUEST['unlink_and_clear'])) {
 	$_REQUEST['clear_templates'] = get_request('clear_templates', array());
 
@@ -201,7 +211,7 @@ if (isset($_REQUEST['unlink']) || isset($_REQUEST['unlink_and_clear'])) {
 	}
 
 	foreach ($unlink_templates as $id) {
-		unset($_REQUEST['templates'][$id]);
+		unset($_REQUEST['templates'][array_search($id, $_REQUEST['templates'])]);
 	}
 }
 elseif (isset($_REQUEST['clone']) && isset($_REQUEST['hostid'])) {
@@ -237,8 +247,7 @@ elseif (isset($_REQUEST['go']) && $_REQUEST['go'] == 'massupdate' && isset($_REQ
 
 		$templates = array();
 		if (isset($visible['template_table'])) {
-			$tplids = array_keys($_REQUEST['templates']);
-			$templates = zbx_toObject($tplids, 'templateid');
+			$templates = $_REQUEST['templates'];
 		}
 
 		// add new or existing host groups
@@ -352,10 +361,6 @@ elseif (isset($_REQUEST['go']) && $_REQUEST['go'] == 'massupdate' && isset($_REQ
 	unset($_REQUEST['save']);
 }
 elseif (isset($_REQUEST['save'])) {
-	if (!count(get_accessible_nodes_by_user(CWebUser::$data, PERM_READ_WRITE, PERM_RES_IDS_ARRAY))) {
-		access_deny();
-	}
-
 	try {
 		DBstart();
 
@@ -375,8 +380,11 @@ elseif (isset($_REQUEST['save'])) {
 			$msg_fail = _('Cannot add host');
 		}
 
-		$templates = array_keys($templates);
-		$templates = zbx_toObject($templates, 'templateid');
+		$linkedTemplates = $templates;
+		$templates = array();
+		foreach ($linkedTemplates as $templateId) {
+			$templates[] = array('templateid' => $templateId);
+		}
 
 		foreach ($interfaces as $inum => $interface) {
 			if (zbx_empty($interface['ip']) && zbx_empty($interface['dns'])) {

@@ -115,7 +115,7 @@ if ($EXPORT_DATA) {
 /**********************************/
 /* <<<--- TEMPLATE ACTIONS --->>> */
 /**********************************/
-/**
+/*
  * Unlink, unlink_and_clear
  */
 if (isset($_REQUEST['unlink']) || isset($_REQUEST['unlink_and_clear'])) {
@@ -132,7 +132,7 @@ if (isset($_REQUEST['unlink']) || isset($_REQUEST['unlink_and_clear'])) {
 		unset($_REQUEST['templates'][$id]);
 	}
 }
-/**
+/*
  * Clone
  */
 elseif (isset($_REQUEST['clone']) && isset($_REQUEST['templateid'])) {
@@ -140,21 +140,17 @@ elseif (isset($_REQUEST['clone']) && isset($_REQUEST['templateid'])) {
 	unset($_REQUEST['hosts']);
 	$_REQUEST['form'] = 'clone';
 }
-/**
+/*
  * Full_clone
  */
 elseif (isset($_REQUEST['full_clone']) && isset($_REQUEST['templateid'])) {
 	$_REQUEST['form'] = 'full_clone';
 	$_REQUEST['hosts'] = array();
 }
-/**
+/*
  * Save
  */
 elseif (isset($_REQUEST['save'])) {
-	if (!count(get_accessible_nodes_by_user(CWebUser::$data, PERM_READ_WRITE, PERM_RES_IDS_ARRAY))) {
-		access_deny();
-	}
-
 	try {
 		DBstart();
 
@@ -333,7 +329,7 @@ elseif (isset($_REQUEST['save'])) {
 	}
 	unset($_REQUEST['save']);
 }
-/**
+/*
  * Delete
  */
 elseif (isset($_REQUEST['delete']) && isset($_REQUEST['templateid'])) {
@@ -357,7 +353,7 @@ elseif (isset($_REQUEST['delete']) && isset($_REQUEST['templateid'])) {
 	}
 	unset($_REQUEST['delete']);
 }
-/**
+/*
  * Delete_and_clear
  */
 elseif (isset($_REQUEST['delete_and_clear']) && isset($_REQUEST['templateid'])) {
@@ -636,6 +632,5 @@ else {
 }
 
 $template_wdgt->show();
-
 
 require_once dirname(__FILE__).'/include/page_footer.php';
