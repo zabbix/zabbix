@@ -8,8 +8,8 @@
 	}
 
 	function displayNewDeleyFlexInterval() {
-		// delay_flex_visible is in massupdate, no delay_flex_visible in items
-		if (jQuery('#delay_flex_visible').length == 0 || jQuery('#delay_flex_visible').is(':checked')) {
+		// visible_delay_flex is in massupdate, no visible_delay_flex in items
+		if (jQuery('#visible_delay_flex').length == 0 || jQuery('#visible_delay_flex').is(':checked')) {
 			jQuery('#row_new_delay_flex').show();
 		}
 		else {
@@ -47,7 +47,7 @@
 			selectedInterfaceOption = jQuery('#interfaceid option[value="' + selectedInterfaceId + '"]');
 		}
 
-		if (jQuery('#interface_visible').data('multipleInterfaceTypes') && !jQuery('#type_visible').is(':checked')) {
+		if (jQuery('#visible_interface').data('multipleInterfaceTypes') && !jQuery('#visible_type').is(':checked')) {
 			jQuery('#interface_not_defined').html(<?php echo CJs::encodeJson(_('To set a host interface select a single item type for all items')); ?>).show();
 			jQuery('#interfaceid').hide();
 		}
@@ -176,9 +176,9 @@
 				setAuthTypeLabel();
 			})
 			.trigger('change');
-		jQuery('#type_visible, #interface_visible').click(function() {
+		jQuery('#visible_type, #visible_interface').click(function() {
 			// if no item type is selected, reset the interfaces to default
-			if (!jQuery('#type_visible').is(':checked')) {
+			if (!jQuery('#visible_type').is(':checked')) {
 				organizeInterfaces(itemTypeInterface(<?php echo CJs::encodeJson($data['initial_item_type']) ?>));
 			}
 			else {
@@ -192,21 +192,21 @@
 		});
 
 		// mass update page
-		if (jQuery('#delay_flex_visible').length != 0) {
+		if (jQuery('#visible_delay_flex').length != 0) {
 			displayNewDeleyFlexInterval();
 
-			jQuery('#delay_flex_visible').click(function() {
+			jQuery('#visible_delay_flex').click(function() {
 				displayNewDeleyFlexInterval();
 			});
 		}
 
 		// mass update page, create jquery buttonset object when authprotocol visible box is switched on
-		jQuery('#authprotocol_visible').one('click', function() {
+		jQuery('#visible_authprotocol').one('click', function() {
 			jQuery('#authprotocol_div').buttonset();
 		});
 
 		// mass update page, create jquery buttonset object when privprotocol visible box is switched on
-		jQuery('#privprotocol_visible').one('click', function() {
+		jQuery('#visible_privprotocol').one('click', function() {
 			jQuery('#privprotocol_div').buttonset();
 		});
 
