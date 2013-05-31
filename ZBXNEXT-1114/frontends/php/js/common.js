@@ -274,7 +274,7 @@ function clearAllForm(form) {
 	}
 
 	jQuery('.multiselect').each(function() {
-		jQuery("#" + jQuery(this).attr("id")).multiSelect.clean();
+		jQuery(this).multiSelect.clean(jQuery(this).attr('id'));
 	});
 
 	return true;

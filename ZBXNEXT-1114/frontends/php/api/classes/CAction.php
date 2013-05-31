@@ -1430,10 +1430,6 @@ class CAction extends CZBXAPI {
 						$templateIdsAll[$value] = $value;
 						break;
 
-					case CONDITION_TYPE_HOST_TEMPLATE:
-						$templateIdsAll[$value] = $value;
-						break;
-
 					case CONDITION_TYPE_TRIGGER:
 						$triggerIdsAll[$value] = $value;
 						break;
