@@ -320,7 +320,7 @@ class CIconMap extends CZBXAPI {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
-		$sql = 'SELECT m.name as mapname, im.name as iconmapname'.
+		$sql = 'SELECT m.name AS mapname, im.name as iconmapname'.
 			' FROM sysmaps m, icon_map im'.
 			' WHERE m.iconmapid=im.iconmapid'.
 			' AND '.dbConditionInt('m.iconmapid', $iconmapids);

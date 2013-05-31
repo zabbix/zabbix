@@ -679,8 +679,8 @@ function DBid2nodeid($id_name) {
 	return $result;
 }
 
-function id2nodeid($id_var) {
-	return (int)bcdiv("$id_var", '100000000000000');
+function id2nodeid($id) {
+	return (int) bcdiv("$id", '100000000000000');
 }
 
 /**
