@@ -108,8 +108,8 @@ static int	httpmacro_append_pair(zbx_httptest_t *httptest, const char *pkey, siz
 
 			if (NULL != err_str && NULL == *err_str)
 			{
-				*err_str = zbx_dsprintf(*err_str, "missing variable name (only name provided):"
-						" \"%.*s\"", (int)nvalue, pvalue);
+				*err_str = zbx_dsprintf(*err_str, "missing variable value (only name provided):"
+						" \"%.*s\"", (int)nkey, pkey);
 			}
 		}
 
