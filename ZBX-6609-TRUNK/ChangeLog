@@ -1,6 +1,12 @@
 Changes for 2.1.0
 
 New features:
+...G...... [ZBXNEXT-367] added printing Aliases and PerfCounters when agent is run with -p option (aleksej, dimir)
+.......PS. [ZBX-6581] added printing host name to a web scenario error log message (dimir)
+A.F....... [ZBXNEXT-1408] added multiselect in Action -> Conditions and Operations, in Scripts and in Item filter. Redesigned Host -> Templates form and added multiselect. Improved multiselect, added possibility to ignore elements (Oleg)
+..F.I..... [ZBXNEXT-1124] implemented minimum trigger severity filter in maps (Eduard, wiper)
+A.F.I...S. [ZBXNEXT-928] changed application inheritance logic to allow linking multiple templates with the same applications (Pavels, wiper)
+A......... [ZBXNEXT-928] allowed to delete applications used in HTTP tests (Pavels, wiper)
 A.F....... [ZBXNEXT-1051] added possibility to add new elements in multiselect, added multiselect in hosts mass update and in items mass update form, and fixed regressions in application.massadd and in application filter (Oleg)
 ...G...... [ZBXNEXT-8] added used swap size support for Windows and OSF (aleksej)
 ..F.I...S. [ZBXNEXT-1597] added support for content retrieval based on regular expressions in WEB monitoring (wiper, Pavels)
@@ -65,6 +71,13 @@ A.F.I...S. [ZBXNEXT-1186] increased length to 2048 characters of expression fiel
 ........S. [ZBXNEXT-1663] added support for notification macros {TRIGGER.NAME.ORIG}, {ITEM.NAME.ORIG}, {ITEM.KEY.ORIG} (dimir)
 
 Bug fixes:
+..F....... [ZBX-6631] made the "Debug" link available for guest users (Pavels)
+...G...... [ZBX-5589] added validation of timeout and retry count parameters of net.dns item (aleksej, dimir)
+..F....... [ZBX-6575] fixed frontend permission validation for actions, hosts, maintenance, maps, proxies, screens and templates (Eduard)
+..F....... [ZBX-6626] fixed time displaing for graphs (Eduard)
+..F....... [ZBX-6597] removed debug trace for unsuccessful login if debug mode is enabled for guest group (Toms)
+..F....... [ZBX-6562] fixed incorrect rounding in graphs for "s" units, fixed < 1 ms and 0s interval (Oleg)
+....I..PS. [ZBX-5953] added output of web monitoring status (yes/no) when configuring Proxy or Server (aleksej)
 A......... [ZBX-6613] fixed trigger prototype create/update error message (Eduard)
 ..F....... [ZBX-6619] fixed template context not remembered when deleting screen from template with mass delete (Toms)
 A......... [ZBX-6614] fixed array_keys() expects array when calling CTemplateScreen get() with countOutput parameter (Toms)
@@ -210,6 +223,9 @@ A......... [ZBX-6407] improved data retrieval performance for CTrigger get() wit
 A.F....... [ZBX-1357] updated Chinese (China), Spanish and Turkish translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+........S. [ZBX-6609] fixed trigger event processing to not add unneeded recovery event escalations to the database (dimir)
+...G...PS. [ZBX-6605] fixed bind() error when SourceIP is used (Andris)
+A......... [ZBX-6472] fixed dbConditionString() function for large inputs, when splitting into several IN parts wasn't surrounded by parenthesis (Toms)
 ........S. [ZBX-6609] fixed trigger event processing to not add unneeded recovery event escalations to the database (dimir)
 ...G...... [ZBX-6576] fixed heavy cpu usage when collecting cpu stats on Solaris (aleksej, Andris)
 ..F....... [ZBX-6558] fixed profile types in availability reports (Oleg)

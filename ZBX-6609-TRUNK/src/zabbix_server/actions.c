@@ -1647,6 +1647,8 @@ void	process_actions(const DB_EVENT *events, size_t events_num)
 			ZBX_DBROW2UINT64(triggerid, row[1]);
 			ZBX_DBROW2UINT64(itemid, row[2]);
 
+			zabbix_log(LOG_LEVEL_ERR, "VL: a:" ZBX_FS_UI64 " t:" ZBX_FS_UI64 " i:" ZBX_FS_UI64, actionid, triggerid, itemid);
+
 			for (i = 0; i < events_num; i++)
 			{
 				event = &events[i];
@@ -1670,6 +1672,8 @@ void	process_actions(const DB_EVENT *events, size_t events_num)
 								if (itemid != event->objectid)
 									continue;
 								break;
+							default:
+								THIS_SHOULD_NEVER_HAPPEN;
 						}
 
 						break;
