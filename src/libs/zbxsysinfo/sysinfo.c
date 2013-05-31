@@ -375,7 +375,7 @@ void	test_parameters()
 	{
 		if (0 != strcmp(commands[i].key, "__UserPerfCounter"))
 		{
-			if (NULL != commands[i].test_param)
+			if (0 == (commands[i].flags & CF_USERPARAMETER) && NULL != commands[i].test_param)
 			{
 				zbx_snprintf(tmp, sizeof(tmp), "%s[%s]", commands[i].key, commands[i].test_param);
 				test_parameter(tmp);
