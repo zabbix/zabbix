@@ -59,6 +59,7 @@ class testTemplateInheritance extends CWebTest {
 
 		$this->waitForPopUp("zbx_popup", "30000");
 		$this->selectWindow("name=zbx_popup");
+		sleep(1);
 		$this->zbxTestCheckboxSelect('//*[@value="Template App Zabbix Agent"]');
 		$this->zbxTestClick('select');
 
@@ -257,6 +258,7 @@ class testTemplateInheritance extends CWebTest {
 
 		$this->waitForPopUp("zbx_popup", "30000");
 		$this->selectWindow("name=zbx_popup");
+		sleep(1);
 		$this->zbxTestClick('link=Test LLD item1');
 		$this->selectWindow(null);
 		$this->zbxTestClick('save');
@@ -461,6 +463,7 @@ class testTemplateInheritance extends CWebTest {
 		$this->zbxTestClick('add_protoitem');
 		$this->waitForPopUp("zbx_popup", "30000");
 		$this->selectWindow("name=zbx_popup");
+		sleep(1);
 		$this->zbxTestClick("//span[text()='Test LLD item']");
 		$this->selectWindow(null);
 		sleep(1);

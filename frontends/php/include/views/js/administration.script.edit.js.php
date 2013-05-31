@@ -67,5 +67,17 @@
 			jQuery(d).find('button:first').prop('disabled', true).addClass('ui-state-disabled');
 			jQuery(d).find('button:last').focus();
 		});
+
+		// host group selection
+		jQuery('#hgstype')
+			.change(function() {
+				if (jQuery('#hgstype').val() == 1) {
+					jQuery('#hostGroupSelection').show();
+				}
+				else {
+					jQuery('#hostGroupSelection').hide();
+				}
+			})
+			.trigger('change');
 	});
 </script>

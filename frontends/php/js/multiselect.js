@@ -39,7 +39,8 @@ jQuery(function($) {
 		options.labels = {
 			'No matches found': t('No matches found'),
 			'More matches found...': t('More matches found...'),
-			'type here to search': t('type here to search')
+			'type here to search': t('type here to search'),
+			'new': t('new')
 		};
 
 		return this.each(function() {
@@ -61,6 +62,7 @@ jQuery(function($) {
 	 * @param string options['defaultValue']	default value for input element
 	 * @param bool   options['disabled']		turn on/off readonly state
 	 * @param int    options['selectedLimit']	how many items can be selected
+	 * @param array  options['ignored']			preload ignored names
 	 * @param int    options['limit']			how many available items can be received from backend
 	 *
 	 * @return object
@@ -72,12 +74,15 @@ jQuery(function($) {
 			labels: {
 				'No matches found': 'No matches found',
 				'More matches found...': 'More matches found...',
-				'type here to search': 'type here to search'
+				'type here to search': 'type here to search',
+				'new': 'new'
 			},
 			data: [],
+			addNew: false,
 			defaultValue: null,
 			disabled: false,
 			selectedLimit: null,
+			ignored: null,
 			limit: 20
 		};
 		options = $.extend({}, defaults, options);
@@ -99,8 +104,8 @@ jQuery(function($) {
 			 * Clean multi select object values.
 			 */
 			$.fn.multiSelect.clean = function() {
-				for (var id in values.selected) {
-					removeSelected(id, obj, values, options);
+				for (var name in values.selected) {
+					removeSelected(values.selected[name.toUpperCase()].uid, obj, values, options);
 				}
 
 				cleanAvailable(obj, values);
@@ -114,7 +119,9 @@ jQuery(function($) {
 			$.fn.multiSelect.getData = function() {
 				var data = [];
 
-				for (var id in values.selected) {
+				for (var name in values.selected) {
+					id = values.selected[name].id;
+
 					data[data.length] = {
 						id: id,
 						name: $('input[value="' + id + '"]', obj).data('name'),
@@ -138,7 +145,8 @@ jQuery(function($) {
 					isMoreMatchesFound: false,
 					isAvailableOpenned: false,
 					selected: {},
-					available: {}
+					available: {},
+					ignored: {}
 				};
 
 			// search input
@@ -379,6 +387,10 @@ jQuery(function($) {
 				loadSelected(options.data, obj, values, options);
 			}
 
+			if (!empty(options.ignored)) {
+				loadIgnored(options.ignored, values);
+			}
+
 			// resize
 			resizeSelected(obj, values, options);
 			resizeAvailable(obj);
@@ -404,12 +416,39 @@ jQuery(function($) {
 
 	function loadSelected(data, obj, values, options) {
 		$.each(data, function(i, item) {
+			item.realName = item.name;
+			item.uid = getId();
 			addSelected(item, obj, values, options);
+		});
+	}
+
+	function loadIgnored(ignored, values) {
+		$.each(ignored, function(i, item) {
+			values.ignored[item.toUpperCase()] = item;
 		});
 	}
 
 	function loadAvailable(data, obj, values, options) {
 		cleanAvailable(obj, values);
+
+		var availableValues = [];
+		var value = values['search'].replace(/^\s+|\s+$/g, '');
+
+		// add new
+		if (!empty(data)) {
+			$.each(data, function(i, item) {
+				availableValues.push(item.name.toUpperCase());
+			});
+		}
+
+		if (options.addNew == true && !empty(value) && $.inArray(value.toUpperCase(), availableValues)) {
+			data[data.length] = {
+				id: value,
+				prefix: '',
+				name: value + ' (' + options.labels['new'] + ')',
+				isNew: true
+			};
+		}
 
 		if (!empty(data)) {
 			$.each(data, function(i, item) {
@@ -447,23 +486,32 @@ jQuery(function($) {
 	}
 
 	function addSelected(item, obj, values, options) {
-		if (typeof(values.selected[item.id]) == 'undefined') {
+		if (typeof(values.selected[item.realName.toUpperCase()]) == 'undefined') {
 			removeDefaultValue(obj, options);
 
-			values.selected[item.id] = item;
+			values.selected[item.realName.toUpperCase()] = item;
+
+			var itemName;
+			if (options.addNew && item.isNew) {
+				itemName = options.name + '[new]';
+			}
+			else {
+				itemName = options.name;
+			}
 
 			// add hidden input
 			obj.append($('<input>', {
 				type: 'hidden',
-				name: options.name,
+				name: itemName,
 				value: item.id,
+				'data-id': item.uid,
 				'data-name': item.name,
 				'data-prefix': item.prefix
 			}));
 
 			// add list item
 			var li = $('<li>', {
-				'data-id': item.id
+				'data-id': item.uid
 			});
 
 			var text = $('<span>', {
@@ -477,7 +525,7 @@ jQuery(function($) {
 			else {
 				var arrow = $('<span>', {
 					'class': 'arrow',
-					'data-id': item.id
+					'data-id': item.uid
 				})
 				.click(function() {
 					removeSelected($(this).data('id'), obj, values, options);
@@ -499,12 +547,17 @@ jQuery(function($) {
 		}
 	}
 
-	function removeSelected(id, obj, values, options) {
+	function removeSelected(uid, obj, values, options) {
 		// remove
-		$('.selected li[data-id="' + id + '"]', obj).remove();
-		$('input[value="' + id + '"]', obj).remove();
+		$('.selected li[data-id="' + uid + '"]', obj).remove();
+		$('input[data-id="' + uid + '"]', obj).remove();
 
-		delete values.selected[id];
+		$.each(values.selected, function(i, selected) {
+			if (selected.uid == uid) {
+				delete values.selected[selected.realName.toUpperCase()];
+				return false;
+			}
+		});
 
 		// resize
 		resizeSelected(obj, values, options);
@@ -530,9 +583,19 @@ jQuery(function($) {
 	}
 
 	function addAvailable(item, obj, values, options) {
+		if (item.isNew) {
+			item.realName = item.id;
+		}
+		else {
+			item.realName = item.name;
+		}
 		if (empty(options.limit) || (options.limit > 0 && $('.available li', obj).length < options.limit)) {
-			if (typeof(values.available[item.id]) == 'undefined' && typeof(values.selected[item.id]) == 'undefined') {
-				values.available[item.id] = item;
+			if (typeof(values.available[item.id]) == 'undefined'
+					&& typeof(values.selected[item.realName.toUpperCase()]) == 'undefined'
+					&& typeof(values.ignored[item.realName.toUpperCase()]) == 'undefined') {
+				item.uid = getId();
+
+				values.available[item.uid] = item;
 
 				var prefix = $('<span>', {
 					'class': 'prefix',
@@ -549,7 +612,7 @@ jQuery(function($) {
 				});
 
 				var li = $('<li>', {
-					'data-id': item.id
+					'data-id': item.uid
 				})
 				.click(function() {
 					select($(this).data('id'), obj, values, options);
@@ -568,9 +631,9 @@ jQuery(function($) {
 		}
 	}
 
-	function select(id, obj, values, options) {
+	function select(uid, obj, values, options) {
 		if (values.isAjaxLoaded && !values.isWaiting) {
-			addSelected(values.available[id], obj, values, options);
+			addSelected(values.available[uid], obj, values, options);
 			hideAvailable(obj);
 			cleanAvailable(obj, values);
 			cleanLastSearch(obj);
@@ -672,11 +735,19 @@ jQuery(function($) {
 			});
 		}
 
-		$('input[type="text"]', obj).css({
-			'padding-top': top,
-			'padding-left': left,
-			width: values.width - left - settingRightPaddings
-		});
+		if (IE) {
+			$('input[type="text"]', obj).css({
+				'padding-top': top,
+				'padding-left': left
+			});
+		}
+		else {
+			$('input[type="text"]', obj).css({
+				'padding-top': top,
+				'padding-left': left,
+				width: values.width - left - settingRightPaddings
+			});
+		}
 	}
 
 	function resizeAvailable(obj) {
@@ -719,9 +790,24 @@ jQuery(function($) {
 	}
 
 	function getLimit(values, options) {
+
 		return (options.limit > 0)
-			? options.limit + objectLength(values.selected) + 1
+			? options.limit + countMatches(values.selected, values.search) + countMatches(values.ignored, values.search) + 1
 			: null;
+	}
+
+	function countMatches(data, search) {
+		var count = 0;
+
+		for (var key in data) {
+			var name = (typeof(data[key]) == 'object') ? data[key].name : data[key];
+
+			if (name.substr(0, search.length).toUpperCase() == search.toUpperCase()) {
+				count++;
+			}
+		}
+
+		return count;
 	}
 
 	function objectLength(obj) {
@@ -734,5 +820,12 @@ jQuery(function($) {
 		}
 
 		return length;
+	}
+
+	function getId() {
+		if (typeof getId.id === 'undefined') {
+			getId.id = 0;
+		}
+		return (getId.id++).toString();
 	}
 });
