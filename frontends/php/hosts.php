@@ -314,7 +314,7 @@ elseif (isset($_REQUEST['go']) && $_REQUEST['go'] == 'massupdate' && isset($_REQ
 			if (isset($_REQUEST['mass_clear_tpls'])) {
 				$host_templates = API::Template()->get(array('hostids' => $hostids));
 				$host_templateids = zbx_objectValues($host_templates, 'templateid');
-				$templates_to_del = array_diff($host_templateids, $tplids);
+				$templates_to_del = array_diff($host_templateids, $templates);
 				$hosts['templates_clear'] = zbx_toObject($templates_to_del, 'templateid');
 			}
 			$hosts['templates'] = $templates;
