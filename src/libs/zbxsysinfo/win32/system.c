@@ -17,7 +17,6 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
 #include "sysinfo.h"
 #include "log.h"
 
@@ -63,7 +62,7 @@ int	SYSTEM_HOSTNAME(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (ISSET_STR(result))
 		return SYSINFO_RET_OK;
-	else
-		return SYSINFO_RET_FAIL;
+
+	return SYSINFO_RET_FAIL;
 }
 
