@@ -17,13 +17,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
 #include "sysinfo.h"
 #include <sys/utsname.h>
 
 int	SYSTEM_HOSTNAME(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	struct utsname  name;
+	struct utsname	name;
 
 	if (-1 == uname(&name))
 		return SYSINFO_RET_FAIL;
