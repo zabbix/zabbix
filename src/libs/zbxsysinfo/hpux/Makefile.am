@@ -11,4 +11,4 @@ libspecsysinfo_a_SOURCES = \
 	inodes.c \
 	memory.c \
 	net.c \
-	system.c system.h
+	system.c
