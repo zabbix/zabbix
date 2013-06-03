@@ -250,7 +250,11 @@ static void	set_defaults(void)
 	else if (NULL != CONFIG_HOSTNAME_ITEM)
 		zabbix_log(LOG_LEVEL_WARNING, "both Hostname and HostnameItem defined, using [%s]", CONFIG_HOSTNAME);
 
-	zabbix_log(LOG_LEVEL_ERR, "VL: CONFIG_HOSTNAME=%s", CONFIG_HOSTNAME);
+	if (NULL != CONFIG_HOST_METADATA && NULL != CONFIG_HOST_METADATA_ITEM)
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "both HostMetadata and HostMetadataItem defined, using [%s]",
+				CONFIG_HOST_METADATA);
+	}
 
 #ifndef _WINDOWS
 	if (NULL == CONFIG_LOAD_MODULE_PATH)
@@ -298,12 +302,6 @@ static void	zbx_validate_config(void)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "either active or passive checks must be enabled");
 		exit(EXIT_FAILURE);
-	}
-
-	if (NULL != CONFIG_HOST_METADATA && NULL != CONFIG_HOST_METADATA_ITEM)
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "both HostMetadata and HostMetadataItem defined, using [%s]",
-				CONFIG_HOST_METADATA);
 	}
 }
 
