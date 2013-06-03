@@ -864,8 +864,6 @@ static int	check_auto_registration_condition(DB_EVENT *event, DB_CONDITION *cond
 
 			if (NULL != (row = DBfetch(result)))
 			{
-				zabbix_log(LOG_LEVEL_DEBUG, "VL %s() value='%s' condition_value='%s'", __function_name, row[0], condition->value);
-
 				switch (condition->operator)
 				{
 					case CONDITION_OPERATOR_LIKE:
