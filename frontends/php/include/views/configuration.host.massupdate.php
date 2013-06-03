@@ -155,7 +155,7 @@ $hostFormList->addRow(
 
 $templatesFormList = new CFormList('templatesFormList');
 // append templates table to from list
-$templatesTable = new CTable(_('No templates defined.'), 'formElementTable');
+$templatesTable = new CTable(null, 'formElementTable');
 $templatesTable->setAttribute('style', 'min-width: 500px;');
 $templatesTable->setAttribute('id', 'template_table');
 
@@ -175,18 +175,16 @@ if (!empty($this->data['templates'])) {
 	}
 }
 
-$templatesTable->addRow(
-	new CMultiSelect(
-		array(
-			'name' => 'templates[]',
-			'objectName' => 'templates',
-			'data' => $linkedTemplates
-		)
-	)
-);
 $templatesDiv = new CDiv(
 	array(
 		$templatesTable,
+		new CMultiSelect(
+			array(
+				'name' => 'templates[]',
+				'objectName' => 'templates',
+				'data' => $linkedTemplates
+			)
+		),
 		new CCheckBox('mass_replace_tpls', $this->data['mass_replace_tpls']),
 		SPACE,
 		_('Replace'),
