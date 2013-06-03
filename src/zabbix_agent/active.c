@@ -397,8 +397,8 @@ static int	refresh_active_checks(const char *host, unsigned short port)
 
 					zabbix_log(LOG_LEVEL_WARNING, "the returned value of \"%s\" item specified by"
 							" \"HostMetadataItem\" configuration parameter is too long,"
-							" truncating at position %d", CONFIG_HOST_METADATA_ITEM,
-							HOST_METADATA_LEN_MAX);
+							" using first %d characters", CONFIG_HOST_METADATA_ITEM,
+							HOST_METADATA_LEN);
 
 					bytes = zbx_strlen_utf8_n(*value, HOST_METADATA_LEN);
 					(*value)[bytes] = '\0';
