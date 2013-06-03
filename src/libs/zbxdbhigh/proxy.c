@@ -1449,9 +1449,8 @@ int	proxy_get_areg_data(struct zbx_json *j, zbx_uint64_t *lastid)
 	return proxy_get_history_data_simple(j, &areg, lastid);
 }
 
-void	calc_timestamp(char *line, int *timestamp, char *format)
+void	calc_timestamp(const char *line, int *timestamp, const char *format)
 {
-
 	const char	*__function_name = "calc_timestamp";
 	int		hh, mm, ss, yyyy, dd, MM;
 	int		hhc = 0, mmc = 0, ssc = 0, yyyyc = 0, ddc = 0, MMc = 0;
@@ -1517,7 +1516,7 @@ void	calc_timestamp(char *line, int *timestamp, char *format)
 			*timestamp = t;
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() timestamp:%d",	__function_name, *timestamp);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() timestamp:%d", __function_name, *timestamp);
 }
 
 /******************************************************************************
@@ -1610,7 +1609,7 @@ void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid,
 		{
 			items[i].state = ITEM_STATE_NOTSUPPORTED;
 			dc_add_history(items[i].itemid, items[i].value_type, items[i].flags, NULL, &values[i].ts,
-					items[i].state, values[i].value, 0, NULL, 0, 0, 0, 0);
+					items[i].state, values[i].value);
 
 			if (NULL != processed)
 				(*processed)++;
@@ -1623,16 +1622,28 @@ void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid,
 					proxy_hostid ? ITEM_DATA_TYPE_DECIMAL : items[i].data_type, values[i].value))
 			{
 				if (ITEM_VALUE_TYPE_LOG == items[i].value_type)
-					calc_timestamp(values[i].value, &values[i].timestamp, items[i].logtimefmt);
+				{
+					zbx_log_t	*log;
 
-				if (NULL != values[i].source)
-					zbx_replace_invalid_utf8(values[i].source);
+					log = agent.logs[0];
+
+					log->timestamp = values[i].timestamp;
+					if (NULL != values[i].source)
+					{
+						zbx_replace_invalid_utf8(values[i].source);
+						log->source = zbx_strdup(log->source, values[i].source);
+					}
+					log->severity = values[i].severity;
+					log->logeventid = values[i].logeventid;
+					log->lastlogsize = values[i].lastlogsize;
+					log->mtime = values[i].mtime;
+
+					calc_timestamp(log->value, &log->timestamp, items[i].logtimefmt);
+				}
 
 				items[i].state = ITEM_STATE_NORMAL;
 				dc_add_history(items[i].itemid, items[i].value_type, items[i].flags, &agent,
-						&values[i].ts, items[i].state, NULL, values[i].timestamp,
-						values[i].source, values[i].severity, values[i].logeventid,
-						values[i].lastlogsize, values[i].mtime);
+						&values[i].ts, items[i].state, NULL);
 
 				if (NULL != processed)
 					(*processed)++;
@@ -1644,7 +1655,7 @@ void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid,
 
 				items[i].state = ITEM_STATE_NOTSUPPORTED;
 				dc_add_history(items[i].itemid, items[i].value_type, items[i].flags, NULL,
-						&values[i].ts, items[i].state, agent.msg, 0, NULL, 0, 0, 0, 0);
+						&values[i].ts, items[i].state, agent.msg);
 			}
 			else
 				THIS_SHOULD_NEVER_HAPPEN; /* set_result_type() always sets MSG result if not SUCCEED */

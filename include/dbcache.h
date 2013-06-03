@@ -203,8 +203,7 @@ typedef struct
 zbx_config_hk_t;
 
 void	dc_add_history(zbx_uint64_t itemid, unsigned char value_type, unsigned char flags, AGENT_RESULT *value,
-		zbx_timespec_t *ts, unsigned char state, const char *error, int timestamp, const char *source,
-		int severity, int logeventid, zbx_uint64_t lastlogsize, int mtime);
+		zbx_timespec_t *ts, unsigned char state, const char *error);
 void	dc_flush_history();
 int	DCsync_history(int sync_type);
 void	init_database_cache();

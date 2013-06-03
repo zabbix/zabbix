@@ -2977,9 +2977,8 @@ static void	dc_local_add_history_lld(zbx_uint64_t itemid, zbx_timespec_t *ts, co
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
-void	dc_add_history(zbx_uint64_t itemid, unsigned char value_type, unsigned char flags,
-		AGENT_RESULT *value, zbx_timespec_t *ts, unsigned char state, const char *error,
-		int timestamp, const char *source, int severity, int logeventid, zbx_uint64_t lastlogsize, int mtime)
+void	dc_add_history(zbx_uint64_t itemid, unsigned char value_type, unsigned char flags, AGENT_RESULT *value,
+		zbx_timespec_t *ts, unsigned char state, const char *error)
 {
 	if (ITEM_STATE_NOTSUPPORTED == state)
 	{
@@ -3020,10 +3019,18 @@ void	dc_add_history(zbx_uint64_t itemid, unsigned char value_type, unsigned char
 				dc_local_add_history_text(itemid, ts, value->text);
 			break;
 		case ITEM_VALUE_TYPE_LOG:
-			if (GET_STR_RESULT(value))
+			if (GET_LOG_RESULT(value))
 			{
-				dc_local_add_history_log(itemid, ts, value->str, timestamp, source, severity,
-						logeventid, lastlogsize, mtime);
+				size_t		i;
+				zbx_log_t	*log;
+
+				for (i = 0; NULL != value->logs[i]; i++)
+				{
+					log = value->logs[i];
+
+					dc_local_add_history_log(itemid, ts, log->value, log->timestamp, log->source,
+							log->severity, log->logeventid, log->lastlogsize, log->mtime);
+				}
 			}
 			break;
 		default:

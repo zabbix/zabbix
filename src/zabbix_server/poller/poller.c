@@ -679,7 +679,6 @@ static int	get_values(unsigned char poller_type)
 		alarm(CONFIG_TIMEOUT);
 		get_values_java(ZBX_JAVA_GATEWAY_REQUEST_JMX, items, results, errcodes, num);
 		alarm(0);
-
 	}
 
 	zbx_timespec(&timespec);
@@ -707,13 +706,13 @@ static int	get_values(unsigned char poller_type)
 		{
 			items[i].state = ITEM_STATE_NORMAL;
 			dc_add_history(items[i].itemid, items[i].value_type, items[i].flags, &results[i], &timespec,
-					items[i].state, NULL, 0, NULL, 0, 0, 0, 0);
+					items[i].state, NULL);
 		}
 		else if (NOTSUPPORTED == errcodes[i] || AGENT_ERROR == errcodes[i])
 		{
 			items[i].state = ITEM_STATE_NOTSUPPORTED;
 			dc_add_history(items[i].itemid, items[i].value_type, items[i].flags, NULL, &timespec,
-					items[i].state, results[i].msg, 0, NULL, 0, 0, 0, 0);
+					items[i].state, results[i].msg);
 		}
 
 		DCrequeue_items(&items[i].itemid, &items[i].state, &timespec.sec, &errcodes[i], 1);
