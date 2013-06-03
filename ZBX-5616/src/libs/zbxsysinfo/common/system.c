@@ -19,7 +19,6 @@
 
 #include "common.h"
 #include "sysinfo.h"
-#include "system.h"
 #include "log.h"
 
 #ifdef _WINDOWS
