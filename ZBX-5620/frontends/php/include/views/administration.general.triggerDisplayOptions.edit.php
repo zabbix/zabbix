@@ -17,8 +17,8 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
+
 include('include/views/js/administration.general.triggerDisplayOptions.js.php');
 
 $triggerDOFormList = new CFormList('scriptsTab');
@@ -29,69 +29,37 @@ $triggerDOFormList->addRow(SPACE, array($headerDiv, _('Blinking')));
 
 // Unacknowledged problem events
 $triggerDOFormList->addRow(
-	_('Unacknowledged PROBLEM events'),
+	new CSpan(_('Unacknowledged PROBLEM events')),
 	array(
-		new CDiv(
-			new CColor('problem_unack_color', $this->data['problem_unack_color']),
-			'inlineblock trigger_displaying_form_col'
-		),
-		new CCheckBox(
-			'problem_unack_style',
-			$this->data['problem_unack_style'] == 1,
-			null,
-			1
-		)
+		new CDiv(new CColor('problem_unack_color', $this->data['problem_unack_color']), 'inlineblock trigger_displaying_form_col'),
+		new CCheckBox('problem_unack_style', ($this->data['problem_unack_style'] == 1), null, 1)
 	)
 );
 
 // Acknowledged problem events
 $triggerDOFormList->addRow(
-	_('Acknowledged PROBLEM events'),
+	new CSpan(_('Acknowledged PROBLEM events')),
 	array(
-		new CDiv(
-			new CColor('problem_ack_color', $this->data['problem_ack_color']),
-			'inlineblock trigger_displaying_form_col'
-		),
-		new CCheckBox(
-			'problem_ack_style',
-			$this->data['problem_ack_style'] == 1,
-			null,
-			1
-		)
+		new CDiv(new CColor('problem_ack_color', $this->data['problem_ack_color']), 'inlineblock trigger_displaying_form_col'),
+		new CCheckBox('problem_ack_style', ($this->data['problem_ack_style'] == 1), null, 1)
 	)
 );
 
 // Unacknowledged recovery events
 $triggerDOFormList->addRow(
-	_('Unacknowledged OK events'),
+	new CSpan(_('Unacknowledged OK events')),
 	array(
-		new CDiv(
-			new CColor('ok_unack_color', $this->data['ok_unack_color']),
-			'inlineblock trigger_displaying_form_col'
-		),
-		new CCheckBox(
-			'ok_unack_style',
-			$this->data['ok_unack_style'] == 1,
-			null,
-			1
-		)
+		new CDiv(new CColor('ok_unack_color', $this->data['ok_unack_color']), 'inlineblock trigger_displaying_form_col'),
+		new CCheckBox('ok_unack_style', ($this->data['ok_unack_style'] == 1), null, 1)
 	)
 );
 
 // Acknowledged recovery events
 $triggerDOFormList->addRow(
-	_('Acknowledged OK events'),
+	new CSpan(_('Acknowledged OK events')),
 	array(
-		new CDiv(
-			new CColor('ok_ack_color', $this->data['ok_ack_color']),
-			'inlineblock trigger_displaying_form_col'
-		),
-		new CCheckBox(
-			'ok_ack_style',
-			$this->data['ok_ack_style'] == 1,
-			null,
-			1
-		)
+		new CDiv(new CColor('ok_ack_color', $this->data['ok_ack_color']), 'inlineblock trigger_displaying_form_col'),
+		new CCheckBox('ok_ack_style', ($this->data['ok_ack_style'] == 1), null, 1)
 	)
 );
 
@@ -120,4 +88,3 @@ $severityForm->addItem($severityView);
 $severityForm->addItem(makeFormFooter(array(new CSubmit('save', _('Save'))), new CButton('resetDefaults', _('Reset defaults'))));
 
 return $severityForm;
-?>

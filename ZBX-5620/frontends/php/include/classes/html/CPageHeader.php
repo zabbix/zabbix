@@ -78,7 +78,6 @@ class CPageHeader {
 		$this->cssFiles[] = 'styles/color.css';
 		$this->cssFiles[] = 'styles/icon.css';
 		$this->cssFiles[] = 'styles/blocks.css';
-		$this->cssFiles[] = 'styles/screen.css';
 	}
 
 	/**

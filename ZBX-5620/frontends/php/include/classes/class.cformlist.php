@@ -30,39 +30,37 @@ class CFormList extends CDiv {
 		$this->formList = new CList(null, 'formlist');
 
 		parent::__construct();
+
 		$this->attr('id', zbx_formatDomId($id));
 		$this->attr('class', $class);
 	}
 
 	public function addRow($term, $description = null, $hidden = false, $id = null, $class = null) {
-		$label = $term;
-		if (is_object($description)) {
-			$inputClass = zbx_strtolower(get_class($description));
-			if (in_array($inputClass, $this->formInputs)) {
-				$label = new CLabel($term, $description->getAttribute('id'));
-			}
-		}
+		$label = (is_object($description) && in_array(zbx_strtolower(get_class($description)), $this->formInputs))
+			? new CLabel($term, $description->getAttribute('id'))
+			: $term;
 
 		$defaultClass = $hidden ? 'formrow hidden' : 'formrow';
-		if ($class !== null) {
-			$class .= ' '.$defaultClass;
-		}
-		else {
+
+		if ($class === null) {
 			$class = $defaultClass;
 		}
+		else {
+			$class .= ' '.$defaultClass;
+		}
 
-		if (!is_null($description)) {
-			$this->formList->addItem(array(new CDiv($label, 'dt floatleft right'), new CDiv($description, 'dd')), $class, $id);
+		if ($description === null) {
+			$this->formList->addItem(array(new CDiv(SPACE, 'dt floatleft right'), new CDiv($label, 'dd')), $class, $id);
 		}
 		else {
-			$this->formList->addItem(array(new CDiv(SPACE, 'dt floatleft right'), new CDiv($label, 'dd')), $class, $id);
+			$this->formList->addItem(array(new CDiv($label, 'dt floatleft right'), new CDiv($description, 'dd')), $class, $id);
 		}
 	}
 
 	public function addInfo($text, $label = null) {
 		$this->formList->addItem(
 			array(
-				new CDiv(!empty($label) ? $label : _('Info'), 'dt right listInfoLabel'),
+				new CDiv($label ? $label : _('Info'), 'dt right listInfoLabel'),
 				new CDiv($text, 'objectgroup inlineblock border_dotted ui-corner-all listInfoText')
 			),
 			'formrow listInfo'
@@ -71,11 +69,115 @@ class CFormList extends CDiv {
 
 	public function toString($destroy = true) {
 		$this->addItem($this->formList);
+
+		insert_js('
+			jQuery(window).resize(function() {
+				var parent = jQuery("#'.$this->getAttribute('id').'").parent();
+
+				if (!parent.is(":visible")) {
+					return;
+				}
+
+				function getLeftColumnMaxHeight() {
+					var maxHeight = 0;
+
+					jQuery("#'.$this->getAttribute('id').' .formrow .dt", parent).find("*").each(function() {
+						var height = jQuery(this).height();
+
+						if (height > maxHeight) {
+							maxHeight = height;
+						}
+					});
+
+					return maxHeight;
+				}
+
+				function getLeftColumnMaxWidth() {
+					var maxWidth = 0;
+
+					jQuery("#'.$this->getAttribute('id').' .formrow .dt", parent).find("*").each(function() {
+						var width = jQuery(this).width();
+
+						if (width > maxWidth) {
+							maxWidth = width;
+						}
+					});
+
+					return maxWidth;
+				}
+
+				function getRightColumnMaxWidth() {
+					var maxWidth = 0;
+
+					jQuery("#'.$this->getAttribute('id').' .formrow .dd", parent).find("*").each(function() {
+						var width = jQuery(this).width();
+
+						if (width > maxWidth) {
+							maxWidth = width;
+						}
+					});
+
+					return maxWidth;
+				}
+
+				function getLeftColumnWidth() {
+					var leftColumn = jQuery(jQuery(".formrow .dt", parent)[0]);
+
+					return Math.round(100 * leftColumn.width() / leftColumn.offsetParent().width());
+				}
+
+				function resizeFormList(newWidth) {
+					if (typeof(newWidth) == "undefined") {
+						newWidth = getLeftColumnWidth() + 5;
+					}
+
+					jQuery(".formrow .dt", parent).css({width: newWidth + "%"});
+					jQuery(".formrow .dd", parent).css({width: 100 - newWidth + "%", "margin-left": newWidth + 1 + "%"});
+					jQuery("#'.$this->getAttribute('id').'").data("resize", jQuery(window).width());
+
+					if (newWidth > 0 && getLeftColumnMaxHeight() > 20) {
+						resizeFormList();
+					}
+				}
+
+				var pageWidth = jQuery(window).width();
+
+				// increase left column
+				if (getLeftColumnMaxHeight() > 20) {
+					resizeFormList();
+				}
+
+				// increase right column
+				else if (getLeftColumnMaxWidth() == 0 && getRightColumnMaxWidth() + 200 > pageWidth) {
+					resizeFormList(0);
+				}
+
+				// return initial left/right column proportion
+				else {
+					var resize = jQuery("#'.$this->getAttribute('id').'").data("resize");
+
+					if (!empty(resize)) {
+						if (pageWidth > resize) {
+							var newWidth = getLeftColumnWidth() - Math.round((pageWidth - resize) * 100 / pageWidth);
+
+							if (newWidth < 20) {
+								newWidth = 20;
+							}
+
+							resizeFormList(newWidth);
+						}
+					}
+				}
+			});
+
+			jQuery(window).trigger("resize");'
+		, true);
+
 		return parent::toString($destroy);
 	}
 
 	public function addVar($name, $value, $id = null) {
-		if (!is_null($value)) {
+		if ($value !== null) {
 			return $this->addItem(new CVar($name, $value, $id));
 		}
 	}

@@ -27,21 +27,21 @@ $page['file'] = 'adm.triggerdisplayoptions.php';
 require_once dirname(__FILE__).'/include/page_header.php';
 
 $fields = array(
-	// VAR					        TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
+	// VAR						TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	'problem_unack_color' =>	array(T_ZBX_STR, O_OPT,	null,	null,		'isset({save})'),
 	'problem_ack_color' =>		array(T_ZBX_STR, O_OPT,	null,	null,		'isset({save})'),
 	'ok_unack_color' =>			array(T_ZBX_STR, O_OPT,	null,	null,		'isset({save})'),
 	'ok_ack_color' =>			array(T_ZBX_STR, O_OPT,	null,	null,		'isset({save})'),
-	'problem_unack_style' =>	array(T_ZBX_INT, O_OPT,	null,	IN('1'),	 null),
-	'problem_ack_style' =>		array(T_ZBX_INT, O_OPT,	null,	IN('1'),	 null),
-	'ok_unack_style' =>			array(T_ZBX_INT, O_OPT,	null,	IN('1'),	 null),
-	'ok_ack_style' =>			array(T_ZBX_INT, O_OPT,	null,	IN('1'),	 null),
+	'problem_unack_style' =>	array(T_ZBX_INT, O_OPT,	null,	IN('1'),	null),
+	'problem_ack_style' =>		array(T_ZBX_INT, O_OPT,	null,	IN('1'),	null),
+	'ok_unack_style' =>			array(T_ZBX_INT, O_OPT,	null,	IN('1'),	null),
+	'ok_ack_style' =>			array(T_ZBX_INT, O_OPT,	null,	IN('1'),	null),
 	'ok_period' =>				array(T_ZBX_INT, O_OPT,	null,	null,		'isset({save})'),
 	'blink_period' =>			array(T_ZBX_INT, O_OPT,	null,	null,		'isset({save})'),
 
-	'save'=>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
-	'form' =>					array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
-	'form_refresh' =>			array(T_ZBX_INT, O_OPT,	null,	null,	null)
+	'save'=>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
+	'form' =>					array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
+	'form_refresh' =>			array(T_ZBX_INT, O_OPT,	null,	null,		null)
 );
 check_fields($fields);
 
@@ -83,7 +83,6 @@ $cmbConf->addItems(array(
 	'adm.other.php' => _('Other')
 ));
 $form->addItem($cmbConf);
-
 
 $cnf_wdgt = new CWidget();
 $cnf_wdgt->addPageHeader(_('CONFIGURATION OF ZABBIX'), $form);
