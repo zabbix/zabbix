@@ -238,6 +238,8 @@ void	init_request(AGENT_REQUEST *request)
 	request->key = NULL;
 	request->nparam = 0;
 	request->params = NULL;
+	request->lastlogsize = 0;
+	request->mtime = 0;
 }
 
 /******************************************************************************
@@ -581,13 +583,54 @@ notsupported:
 	return ret;
 }
 
+void	set_log_result_empty(AGENT_RESULT *result)
+{
+	result->logs = zbx_malloc(result->logs, sizeof(zbx_log_t *));
+
+	result->logs[0] = NULL;
+	result->type |= AR_LOG;
+}
+
+zbx_log_t	*add_log_result(AGENT_RESULT *result, const char *value)
+{
+	zbx_log_t	*log;
+	size_t		i;
+
+	log = zbx_malloc(NULL, sizeof(zbx_log_t));
+
+	zbx_log_init(log);
+	log->value = zbx_strdup(log->value, value);
+
+	for (i = 0; NULL != result->logs && NULL != result->logs[i]; i++)
+		;
+
+	result->logs = zbx_realloc(result->logs, sizeof(zbx_log_t *) * (i + 2));
+
+	result->logs[i++] = log;
+	result->logs[i] = NULL;
+	result->type |= AR_LOG;
+
+	return log;
+}
+
+zbx_uint64_t	get_log_result_lastlogsize(AGENT_RESULT *result)
+{
+	size_t	i;
+
+	if (!ISSET_LOG(result) || NULL == result->logs[0])
+		return 0;
+
+	for (i = 1; NULL != result->logs[i]; i++)
+		;
+
+	return result->logs[i - 1]->lastlogsize;
+}
+
 int	set_result_type(AGENT_RESULT *result, int value_type, int data_type, char *c)
 {
 	int		ret = FAIL;
 	zbx_uint64_t	value_uint64;
 	double		value_double;
-	zbx_log_t	*log;
-	size_t		i;
 
 	assert(result);
 
@@ -664,21 +707,8 @@ int	set_result_type(AGENT_RESULT *result, int value_type, int data_type, char *c
 			ret = SUCCEED;
 			break;
 		case ITEM_VALUE_TYPE_LOG:
-			log = zbx_malloc(NULL, sizeof(zbx_log_t));
-
-			zbx_log_init(log);
 			zbx_replace_invalid_utf8(c);
-			log->value = zbx_strdup(log->value, c);
-
-			for (i = 0; NULL != result->logs && NULL != result->logs[i]; i++)
-				;
-
-			result->logs = zbx_realloc(result->logs, sizeof(zbx_log_t *) * (i + 2));
-
-			result->logs[i++] = log;
-			result->logs[i] = NULL;
-			result->type |= AR_LOG;
-
+			add_log_result(result, c);
 			ret = SUCCEED;
 			break;
 	}

@@ -46,9 +46,11 @@ ZBX_METRIC;
 /* agent request structure */
 typedef struct
 {
-	char	*key;
-	int	nparam;
-	char	**params;
+	char		*key;
+	int		nparam;
+	char		**params;
+	zbx_uint64_t	lastlogsize;
+	int		mtime;
 }
 AGENT_REQUEST;
 
