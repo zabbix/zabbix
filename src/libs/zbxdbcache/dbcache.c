@@ -970,7 +970,7 @@ static void	DCadd_update_item_sql(size_t *sql_offset, DB_ITEM *item, ZBX_DC_HIST
 						" [" ZBX_FS_DBL "] is not suitable for value type [%s]",
 						h->value.dbl, zbx_item_value_type_string(h->value_type));
 
-				DCrequeue_items(&h->itemid, &h->state, &h->ts.sec, &errcode, 1);
+				DCrequeue_items(&h->itemid, &h->state, &h->ts.sec, NULL, NULL, &errcode, 1);
 			}
 			break;
 		case ITEM_VALUE_TYPE_UINT64:
