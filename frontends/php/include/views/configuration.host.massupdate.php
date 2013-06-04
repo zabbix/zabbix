@@ -155,32 +155,20 @@ $hostFormList->addRow(
 
 $templatesFormList = new CFormList('templatesFormList');
 // append templates table to from list
-$templatesTable = new CTable(_('No templates defined.'), 'formElementTable');
+$templatesTable = new CTable(null, 'formElementTable');
 $templatesTable->setAttribute('style', 'min-width: 500px;');
 $templatesTable->setAttribute('id', 'template_table');
-$templatesTable->setHeader(array(_('Name'), _('Action')));
 
-foreach ($this->data['templates'] as $templateid => $templateName) {
-	$hostForm->addVar('templates['.$templateid.']', $templateName);
-
-	$row = new CRow(array(
-		$templateName,
-		new CButton('remove', _('Remove'), 'javascript: removeTemplate("'.$templateid.'");', 'link_menu')
-	));
-	$row->setAttribute('id', 'template_row_'.$templateid);
-	$templatesTable->addRow($row);
-}
 $templatesDiv = new CDiv(
 	array(
 		$templatesTable,
-		new CButton('btn1', _('Add'),
-			'return PopUp("popup.php?srctbl=templates&srcfld1=hostid&srcfld2=host'.
-				'&dstfrm='.$hostForm->getName().'&dstfld1=new_template&templated_hosts=1'.
-				url_param($this->data['templates'], false, 'existed_templates').'", 450, 450)',
-			'link_menu'
+		new CMultiSelect(
+			array(
+				'name' => 'templates[]',
+				'objectName' => 'templates',
+				'data' => $this->data['linkedTemplates']
+			)
 		),
-		BR(),
-		BR(),
 		new CCheckBox('mass_replace_tpls', $this->data['mass_replace_tpls']),
 		SPACE,
 		_('Replace'),
