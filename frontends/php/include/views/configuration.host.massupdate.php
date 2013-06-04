@@ -159,22 +159,6 @@ $templatesTable = new CTable(null, 'formElementTable');
 $templatesTable->setAttribute('style', 'min-width: 500px;');
 $templatesTable->setAttribute('id', 'template_table');
 
-// multiselect data
-$linkedTemplates = null;
-if (!empty($this->data['templates'])) {
-	$getLinkedTemplates = API::Template()->get(array(
-		'templateids' => $this->data['templates'],
-		'output' => array('templateid', 'name')
-	));
-
-	foreach ($getLinkedTemplates as $getLinkedTemplate) {
-		$linkedTemplates[] = array(
-			'id' => $getLinkedTemplate['templateid'],
-			'name' => $getLinkedTemplate['name']
-		);
-	}
-}
-
 $templatesDiv = new CDiv(
 	array(
 		$templatesTable,
@@ -182,7 +166,7 @@ $templatesDiv = new CDiv(
 			array(
 				'name' => 'templates[]',
 				'objectName' => 'templates',
-				'data' => $linkedTemplates
+				'data' => $this->data['linkedTemplates']
 			)
 		),
 		new CCheckBox('mass_replace_tpls', $this->data['mass_replace_tpls']),
