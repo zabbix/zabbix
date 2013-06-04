@@ -139,7 +139,7 @@ abstract class CHostGeneral extends CZBXAPI {
 	 * Links the templates to the given hosts.
 	 *
 	 * @param array $templateids
-	 * @param array $targetids    an array of host IDs to link the templates to
+	 * @param array $targetids		an array of host IDs to link the templates to
 	 *
 	 * @return bool
 	 */
@@ -168,20 +168,27 @@ abstract class CHostGeneral extends CZBXAPI {
 				'output' => array('templateid'),
 				'hostids' => $targetid
 			));
+
+			$templateIdsAll = array_merge($templateids, zbx_objectValues($linkedTpls, 'templateid'));
+
 			$dbItems = DBselect(
-				'SELECT i.key_,i.hostid'.
+				'SELECT i.key_'.
 				' FROM items i'.
-				' WHERE '.dbConditionInt('i.hostid', array_merge(
-					$templateids,
-					zbx_objectValues($linkedTpls, 'templateid'))).
+				' WHERE '.dbConditionInt('i.hostid', $templateIdsAll).
 				' GROUP BY i.key_'.
 				' HAVING COUNT(i.itemid)>1'
 			);
-
 			if ($dbItem = DBfetch($dbItems)) {
+				$dbItemHost = API::Item()->get(array(
+					'output' => array('hostid'),
+					'filter' => array('key_' => $dbItem['key_']),
+					'templateids' => $templateIdsAll
+				));
+				$dbItemHost = reset($dbItemHost);
+
 				$template = API::Template()->get(array(
 					'output' => array('name'),
-					'templateids' => $dbItem['hostid']
+					'templateids' => $dbItemHost['hostid']
 				));
 
 				$template = reset($template);
@@ -241,10 +248,10 @@ abstract class CHostGeneral extends CZBXAPI {
 		}
 
 		$res = DBselect(
-			'SELECT hostid,templateid'.
-			' FROM hosts_templates'.
-			' WHERE '.dbConditionInt('hostid', $targetids).
-				' AND '.dbConditionInt('templateid', $templateids)
+			'SELECT ht.hostid,ht.templateid'.
+			' FROM hosts_templates ht'.
+			' WHERE '.dbConditionInt('ht.hostid', $targetids).
+				' AND '.dbConditionInt('ht.templateid', $templateids)
 		);
 		$linked = array();
 		while ($row = DBfetch($res)) {
@@ -287,7 +294,7 @@ abstract class CHostGeneral extends CZBXAPI {
 		// check template linkage circularity
 		$res = DBselect(
 			'SELECT ht.hostid,ht.templateid'.
-			' FROM hosts_templates ht,hosts h '.
+			' FROM hosts_templates ht,hosts h'.
 			' WHERE ht.hostid=h.hostid '.
 				' AND h.status IN('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.','.HOST_STATUS_TEMPLATE.')'
 		);
