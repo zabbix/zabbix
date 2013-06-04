@@ -1,4 +1,4 @@
-Changes for 2.1.0
+﻿Changes for 2.1.0
 
 New features:
 ...G...... [ZBXNEXT-367] added printing Aliases and PerfCounters when agent is run with -p option (aleksej, dimir)
@@ -71,6 +71,7 @@ A.F.I...S. [ZBXNEXT-1186] increased length to 2048 characters of expression fiel
 ........S. [ZBXNEXT-1663] added support for notification macros {TRIGGER.NAME.ORIG}, {ITEM.NAME.ORIG}, {ITEM.KEY.ORIG} (dimir)
 
 Bug fixes:
+A......... [ZBX-6644] fixed sorting by history and trends fields in itemprototype.get API (Ivo)
 ..F....... [ZBX-6631] made the "Debug" link available for guest users (Pavels)
 ...G...... [ZBX-5589] added validation of timeout and retry count parameters of net.dns item (aleksej, dimir)
 ..F....... [ZBX-6575] fixed frontend permission validation for actions, hosts, maintenance, maps, proxies, screens and templates (Eduard)
@@ -223,6 +224,7 @@ A......... [ZBX-6407] improved data retrieval performance for CTrigger get() wit
 A.F....... [ZBX-1357] updated Chinese (China), Spanish and Turkish translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+A......... [ZBX-6644] fixed sorting by history and trends fields in itemprototype.get API (Ivo)
 ........S. [ZBX-6598] fixed deleting of big amount of escalations by escalation process (Sasha)
 ...G...PS. [ZBX-6605] fixed bind() error when SourceIP is used (Andris)
 A......... [ZBX-6472] fixed dbConditionString() function for large inputs, when splitting into several IN parts wasn't surrounded by parenthesis (Toms)
