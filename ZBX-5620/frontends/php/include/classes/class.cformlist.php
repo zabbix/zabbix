@@ -140,16 +140,23 @@ class CFormList extends CDiv {
 					}
 				}
 
-				var pageWidth = jQuery(window).width();
+				var pageWidth = jQuery(window).width(),
+					leftColumnMaxWidth = getLeftColumnMaxWidth(),
+					rightColumnMaxWidth = getRightColumnMaxWidth();
 
 				// increase left column
 				if (getLeftColumnMaxHeight() > 20) {
 					resizeFormList();
 				}
 
-				// increase right column
-				else if (getLeftColumnMaxWidth() == 0 && getRightColumnMaxWidth() + 200 > pageWidth) {
+				// increase right column if left column is empty
+				else if (leftColumnMaxWidth == 0 && rightColumnMaxWidth + 200 > pageWidth) {
 					resizeFormList(0);
+				}
+
+				// increase right column if it"s too big but left column too small
+				else if (leftColumnMaxWidth < 100 && rightColumnMaxWidth + 200 > pageWidth) {
+					resizeFormList(10);
 				}
 
 				// return initial left/right column proportion

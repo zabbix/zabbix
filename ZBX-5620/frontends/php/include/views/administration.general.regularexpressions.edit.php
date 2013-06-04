@@ -21,11 +21,12 @@
 
 require_once dirname(__FILE__).'/js/adm.regexprs.edit.js.php';
 
+zbx_add_post_js('zabbixRegExp.addExpressions('.CJs::encodeJson(array_values($this->get('expressions'))).')');
+
 $form = new CForm();
 $form->attr('id', 'zabbixRegExpForm');
 $form->addVar('form', 1);
 $form->addVar('regexpid', $this->data['regexpid']);
-
 
 // Expressions tab
 $exprTab = new CFormList('exprTab');
@@ -35,19 +36,9 @@ $exprTab->addRow(_('Name'), $nameTextBox);
 
 $exprTable = new CTable(null, 'formElementTable formWideTable');
 $exprTable->attr('id', 'exprTable');
-
-$exprTable->setHeader(array(
-	_('Expression'),
-	_('Expression type'),
-	_('Case sensitive'),
-	SPACE
-));
+$exprTable->setHeader(array(_('Expression'), _('Expression type'), _('Case sensitive'), SPACE));
 $exprTable->setFooter(new CButton('add', _('Add'), null, 'link_menu exprAdd'));
-
-zbx_add_post_js('zabbixRegExp.addExpressions('.CJs::encodeJson(array_values($this->get('expressions'))).')');
-
-$exprTab->addRow(_('Expressions'), new CDiv($exprTable, 'inlineblock border_dotted objectgroup'));
-
+$exprTab->addRow(new CSpan(_('Expressions')), new CDiv($exprTable, 'inlineblock border_dotted objectgroup'));
 
 $exprForm = new CTable(null, 'formElementTable');
 $exprForm->addRow(array(_('Expression'), new CTextBox('expressionNew', null, ZBX_TEXTBOX_STANDARD_SIZE)));
@@ -63,11 +54,11 @@ $exprTabDiv = new CDiv(array($exprForm, $exprFormFooter), 'objectgroup inlineblo
 $exprTabDiv->addStyle('display: none;');
 $exprTab->addRow(SPACE, $exprTabDiv);
 
-// Test tab
+// test tab
 $testTab = new CFormList('testTab');
 $testTab->addRow(_('Test string'), new CTextArea('test_string', $this->get('test_string')));
 $preloaderDiv = new CDiv(null, 'preloader', 'testPreloader');
-$preloaderDiv->addStyle('display:none');
+$preloaderDiv->addStyle('display: none');
 $testTab->addRow(SPACE, array(new CButton('testExpression', _('Test expressions')), $preloaderDiv));
 
 $tabExp = new CTableInfo(null);
@@ -75,12 +66,10 @@ $tabExp->attr('id', 'testResultTable');
 $tabExp->setHeader(array(_('Expression'), _('Expression type'), _('Result')));
 $testTab->addRow(_('Result'), $tabExp);
 
-
 $regExpView = new CTabView();
 $regExpView->addTab('expr', _('Expressions'), $exprTab);
 $regExpView->addTab('test', _('Test'), $testTab);
 $form->addItem($regExpView);
-
 
 // footer
 $secondaryActions = array(new CButtonCancel());
@@ -90,6 +79,6 @@ if (isset($this->data['regexpid'])) {
 		new CButtonDelete(_('Delete regular expression?'), url_param('form').url_param('regexpid').url_param('delete', false, 'go'))
 	);
 }
-$form->addItem(makeFormFooter(array(new CSubmit('save', _('Save'))), $secondaryActions));
+$form->addItem(makeFormFooter(new CSubmit('save', _('Save')), $secondaryActions));
 
 return $form;

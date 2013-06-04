@@ -47,7 +47,7 @@ $eventAlertTab->addRow(array(new CLabel(_('Keep network discovery data for (in d
 $eventAlertTab->addRow(array(new CLabel(_('Keep auto-registration data for (in days)'),
 	'hk_events_autoreg'), $houseKeeperEventsAutoreg));
 $eventAlertTab->addClass('border_dotted objectgroup element-row element-row-first');
-$houseKeeperTab->addRow(new CSpan(_('Events and alerts')), new CDiv($eventAlertTab));
+$houseKeeperTab->addRow(new CSpan(_('Events and alerts')), $eventAlertTab);
 
 // IT services
 $itServicesTab = new CTable(null, 'formElementTable');
@@ -62,7 +62,7 @@ if (!$this->data['config']['hk_services_mode']) {
 }
 $itServicesTab->addRow(array(new CLabel(_('Keep data for (in days)'), 'hk_services'), $houseKeeperServicesMode));
 $itServicesTab->addClass('border_dotted objectgroup element-row');
-$houseKeeperTab->addRow(new CSpan(_('IT services')), new CDiv($itServicesTab));
+$houseKeeperTab->addRow(new CSpan(_('IT services')), $itServicesTab);
 
 // audit
 $auditTab = new CTable(null, 'formElementTable');
@@ -77,7 +77,7 @@ if (!$this->data['config']['hk_audit_mode']) {
 }
 $auditTab->addRow(array(new CLabel(_('Keep data for (in days)'), 'hk_audit'), $houseKeeperAuditMode));
 $auditTab->addClass('border_dotted objectgroup element-row');
-$houseKeeperTab->addRow(new CSpan(_('Audit')), new CDiv($auditTab));
+$houseKeeperTab->addRow(new CSpan(_('Audit')), $auditTab);
 
 // user session
 $userSessionTab = new CTable(null, 'formElementTable');
@@ -92,11 +92,11 @@ if (!$this->data['config']['hk_sessions_mode']) {
 }
 $userSessionTab->addRow(array(new CLabel(_('Keep data for (in days)'), 'hk_sessions'), $houseKeeperSessionsMode));
 $userSessionTab->addClass('border_dotted objectgroup element-row');
-$houseKeeperTab->addRow(new CSpan(_('User sessions')), new CDiv($userSessionTab));
+$houseKeeperTab->addRow(new CSpan(_('User sessions')), $userSessionTab);
 
 // history
-$histortTab = new CTable(null, 'formElementTable');
-$histortTab->addRow(array(new CLabel(_('Enable housekeeping'), 'hk_history_mode'),
+$historyTab = new CTable(null, 'formElementTable');
+$historyTab->addRow(array(new CLabel(_('Enable housekeeping'), 'hk_history_mode'),
 	new CCheckBox('hk_history_mode', $this->data['config']['hk_history_mode'], null, 1)));
 
 $houseKeeperHistoryGlobal = new CCheckBox('hk_history_global', $this->data['config']['hk_history_global'], null, 1);
@@ -107,10 +107,10 @@ $houseKeeperHistoryModeGlobal = new CNumericBox('hk_history', $this->data['confi
 if (!$this->data['config']['hk_history_mode'] || !$this->data['config']['hk_history_global']) {
 	$houseKeeperHistoryModeGlobal->setAttribute('disabled', 'disabled');
 }
-$histortTab->addRow(array(new CLabel(_('Override item history period'), 'hk_history_global'), $houseKeeperHistoryGlobal));
-$histortTab->addRow(array(new CLabel(_('Keep data for (in days)'), 'hk_history'), $houseKeeperHistoryModeGlobal));
-$histortTab->addClass('border_dotted objectgroup element-row');
-$houseKeeperTab->addRow(new CSpan(_('History')), new CDiv($histortTab));
+$historyTab->addRow(array(new CLabel(_('Override item history period'), 'hk_history_global'), $houseKeeperHistoryGlobal));
+$historyTab->addRow(array(new CLabel(_('Keep data for (in days)'), 'hk_history'), $houseKeeperHistoryModeGlobal));
+$historyTab->addClass('border_dotted objectgroup element-row');
+$houseKeeperTab->addRow(new CSpan(_('History')), $historyTab);
 
 // trend
 $trendTab = new CTable(null, 'formElementTable');
@@ -129,7 +129,7 @@ if (!$this->data['config']['hk_trends_mode'] || !$this->data['config']['hk_trend
 $trendTab->addRow(array(new CLabel(_('Override item trend period'), 'hk_trends_global'), $houseKeeperTrendGlobal));
 $trendTab->addRow(array(new CLabel(_('Keep data for (in days)'), 'hk_trends'), $houseKeeperTrendModeGlobal));
 $trendTab->addClass('border_dotted objectgroup element-row');
-$houseKeeperTab->addRow(new CSpan(_('Trends')), new CDiv($trendTab));
+$houseKeeperTab->addRow(new CSpan(_('Trends')), $trendTab);
 
 $houseKeeperView = new CTabView();
 $houseKeeperView->addTab('houseKeeper', _('Housekeeper'), $houseKeeperTab);
