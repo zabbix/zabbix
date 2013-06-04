@@ -73,8 +73,7 @@ static int	dpkg_parser(const char *line, char *package, size_t max_package_len)
 	char	fmt[32], tmp[32];
 
 	zbx_snprintf(fmt, sizeof(fmt), "%%" ZBX_FS_SIZE_T "s %%" ZBX_FS_SIZE_T "s",
-			(zbx_fs_size_t)(max_package_len - 1),
-			(zbx_fs_size_t)(sizeof(tmp) - 1));	/* reserve 1 byte for '\0' appended by sscanf() */
+			(zbx_fs_size_t)max_package_len, (zbx_fs_size_t)sizeof(tmp));
 
 	if (2 != sscanf(line, fmt, package, tmp) || 0 != strcmp(tmp, "install"))
 		return FAIL;
