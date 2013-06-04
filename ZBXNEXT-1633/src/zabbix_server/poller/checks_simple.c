@@ -28,6 +28,7 @@ typedef int	(*vmfunc_t)(AGENT_REQUEST *, AGENT_RESULT *);
 
 static char	*vmkeys[] =
 {
+	"vcenter.eventlog",
 	"vcenter.hv.cpu.usage",
 	"vcenter.hv.discovery",
 	"vcenter.hv.fullname",
@@ -63,6 +64,7 @@ static char	*vmkeys[] =
 	"vcenter.vm.vfs.fs.size",
 
 	"vsphere.cpu.usage",
+	"vsphere.eventlog",
 	"vsphere.fullname",
 	"vsphere.hw.cpu.num",
 	"vsphere.hw.cpu.freq",
@@ -100,6 +102,7 @@ static char	*vmkeys[] =
 #if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
 static vmfunc_t	vmfuncs[] =
 {
+	check_vcenter_eventlog,
 	check_vcenter_hv_cpu_usage,
 	check_vcenter_hv_discovery,
 	check_vcenter_hv_fullname,
@@ -135,6 +138,7 @@ static vmfunc_t	vmfuncs[] =
 	check_vcenter_vm_vfs_fs_size,
 
 	check_vsphere_cpu_usage,
+	check_vsphere_eventlog,
 	check_vsphere_fullname,
 	check_vsphere_hw_cpu_num,
 	check_vsphere_hw_cpu_freq,
@@ -223,6 +227,8 @@ int	get_value_simple(DC_ITEM *item, AGENT_RESULT *result)
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Key is badly formatted"));
 		goto notsupported;
 	}
+
+	request.lastlogsize = item->lastlogsize;
 
 	if (0 == strcmp(request.key, "net.tcp.service"))
 	{

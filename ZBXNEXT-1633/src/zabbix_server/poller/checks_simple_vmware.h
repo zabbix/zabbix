@@ -24,6 +24,7 @@
 #if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
 #include "sysinfo.h"
 
+int	check_vcenter_eventlog(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	check_vcenter_hv_cpu_usage(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	check_vcenter_hv_discovery(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	check_vcenter_hv_fullname(AGENT_REQUEST *request, AGENT_RESULT *result);
@@ -59,6 +60,7 @@ int	check_vcenter_vm_vfs_fs_discovery(AGENT_REQUEST *request, AGENT_RESULT *resu
 int	check_vcenter_vm_vfs_fs_size(AGENT_REQUEST *request, AGENT_RESULT *result);
 
 int	check_vsphere_cpu_usage(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	check_vsphere_eventlog(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	check_vsphere_fullname(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	check_vsphere_hw_cpu_num(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	check_vsphere_hw_cpu_freq(AGENT_REQUEST *request, AGENT_RESULT *result);
@@ -91,5 +93,5 @@ int	check_vsphere_vm_uptime(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	check_vsphere_vm_vfs_fs_discovery(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	check_vsphere_vm_vfs_fs_size(AGENT_REQUEST *request, AGENT_RESULT *result);
 
-#endif
+#endif	/* defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL) */
 #endif
