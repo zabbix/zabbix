@@ -188,7 +188,7 @@ int	zbx_vector_ ## __id ## _search(zbx_vector_ ## __id ## _t *vector, __type val
 														\
 void	zbx_vector_ ## __id ## _reserve(zbx_vector_ ## __id ## _t *vector, size_t size)				\
 {														\
-	if (size > vector->values_alloc)									\
+	if ((int)size > vector->values_alloc)									\
 	{													\
 		vector->values_alloc = (int)size;								\
 		vector->values = vector->mem_realloc_func(vector->values, vector->values_alloc * sizeof(__type)); \
