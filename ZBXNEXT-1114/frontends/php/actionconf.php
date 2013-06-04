@@ -296,8 +296,7 @@ elseif (str_in_array($_REQUEST['go'], array('activate', 'disable')) && isset($_R
 	$goResult = DBselect(
 		'SELECT a.actionid'.
 		' FROM actions a'.
-		' WHERE '.dbConditionInt('a.actionid', $_REQUEST['g_actionid']).
-			andDbNode('a.actionid', id2nodeid($_REQUEST['g_actionid']))
+		' WHERE '.dbConditionInt('a.actionid', $_REQUEST['g_actionid'])
 	);
 	while ($row = DBfetch($goResult)) {
 		$res = DBexecute('UPDATE actions SET status='.$status.' WHERE actionid='.$row['actionid']);
