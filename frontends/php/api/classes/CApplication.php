@@ -442,36 +442,35 @@ class CApplication extends CZBXAPI {
 			}
 		}
 
-		$parentApplicationids = $applicationids;
-		$childApplicationids = array();
-		do {
-			$dbApplications = DBselect(
-				'SELECT at.applicationid'.
-				' FROM application_template at'.
-				' WHERE '.dbConditionInt('at.templateid', $parentApplicationids));
-			$parentApplicationids = array();
-			while ($dbApplication = DBfetch($dbApplications)) {
-				$parentApplicationids[] = $dbApplication['applicationid'];
-				$childApplicationids[$dbApplication['applicationid']] = $dbApplication['applicationid'];
-			}
-		} while (!empty($parentApplicationids));
+		$appManager = new CApplicationManager();
 
-		$options = array(
-			'applicationids' => $childApplicationids,
+		// fetch application children
+		$childApplicationIds = array();
+		$parentApplicationIds = $applicationids;
+		while ($parentApplicationIds) {
+			$parentApplicationIds = $appManager->fetchExclusiveChildIds($parentApplicationIds);
+			foreach ($parentApplicationIds as $appId) {
+				$childApplicationIds[$appId] = $appId;
+			}
+		}
+
+		// filter children that can be deleted
+		if ($childApplicationIds) {
+			$childApplicationIds = $appManager->fetchEmptyIds($childApplicationIds);
+		}
+
+		$childApplications = $this->get(array(
+			'applicationids' => $childApplicationIds,
 			'output' => API_OUTPUT_EXTEND,
 			'nopermissions' => true,
 			'preservekeys' => true,
 			'selectHosts' => array('name', 'hostid')
-		);
-		$delApplicationChilds = $this->get($options);
-		$delApplications = zbx_array_merge($delApplications, $delApplicationChilds);
-		$applicationids = array_merge($applicationids, $childApplicationids);
+		));
 
-		$appManager = new CApplicationManager();
-		$appManager->delete($applicationids);
+		$appManager->delete(array_merge($applicationids, $childApplicationIds));
 
 		// TODO: remove info from API
-		foreach ($delApplications as $delApplication) {
+		foreach (zbx_array_merge($delApplications, $childApplications) as $delApplication) {
 			$host = reset($delApplication['hosts']);
 			info(_s('Deleted: Application "%1$s" on "%2$s".', $delApplication['name'], $host['name']));
 		}
