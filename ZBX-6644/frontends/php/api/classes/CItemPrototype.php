@@ -36,7 +36,7 @@ class CItemPrototype extends CItemGeneral {
 		$userid = self::$userData['userid'];
 
 		// allowed columns for sorting
-		$sortColumns = array('itemid', 'name', 'key_', 'delay', 'type', 'status');
+		$sortColumns = array('itemid', 'name', 'key_', 'delay', 'history', 'trends', 'type', 'status');
 
 		// allowed output options for [ select_* ] params
 		$subselectsAllowedOutputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND, API_OUTPUT_CUSTOM);
