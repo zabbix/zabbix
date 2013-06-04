@@ -272,38 +272,51 @@ static int	read_xml_values(const char *data, const char *xpath, zbx_vector_str_t
 	return SUCCEED;
 }
 
-static int	vcenter_authenticate(CURL *easyhandle, const char *url, const char *username, const char *password,
-		char **error)
+/******************************************************************************
+ *                                                                            *
+ * Function: vmware_authenticate                                              *
+ *                                                                            *
+ * Purpose: opens new vSphere or vCenter session                              *
+ *                                                                            *
+ * Parameters: easyhandle - [IN] CURL easy handle                             *
+ *                                                                            *
+ * Return: Upon successful completion the function return SUCCEED.            *
+ *         Otherwise, FAIL is returned.                                       *
+ *                                                                            *
+ ******************************************************************************/
+static int	vmware_authenticate(CURL *easyhandle, const char *url, const char *username, const char *password,
+		char **error, unsigned flags)
 {
-#	define ZBX_POST_VCENTER_AUTH							\
-		ZBX_POST_VCENTER_HEADER							\
-		"<ns1:Login xsi:type=\"ns1:LoginRequestType\">"				\
-			"<ns1:_this type=\"SessionManager\">SessionManager</ns1:_this>"	\
-			"<ns1:userName>%s</ns1:userName>"				\
-			"<ns1:password>%s</ns1:password>"				\
-		"</ns1:Login>"								\
-		ZBX_POST_VCENTER_FOOTER
+#	define ZBX_POST_VMWARE_AUTH						\
+		ZBX_POST_VSPHERE_HEADER						\
+		"<ns0:Login xsi:type=\"ns0:LoginRequestType\">"			\
+			"<ns0:_this type=\"SessionManager\">%s</ns0:_this>"	\
+			"<ns0:userName>%s</ns0:userName>"			\
+			"<ns0:password>%s</ns0:password>"			\
+		"</ns0:Login>"							\
+		ZBX_POST_VSPHERE_FOOTER
 
-	const char	*__function_name = "vcenter_authenticate";
-	int		err, opt, timeout = 10, ret = FAIL;
-	char		postdata[MAX_STRING_LEN];
+	const char	*__function_name = "vmware_authenticate";
+	int		err, o, timeout = 10, ret = FAIL;
+	char		xml[MAX_STRING_LEN];
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() url:'%s' username:'%s'", __function_name, url, username);
 
-	zbx_snprintf(postdata, sizeof(postdata), ZBX_POST_VCENTER_AUTH, username, password);
+	zbx_snprintf(xml, sizeof(xml), ZBX_POST_VMWARE_AUTH,
+			ZBX_VMWARE_FLAG_VCENTER == flags ? "SessionManager" : "ha-sessionmgr", username, password);
 
-	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_COOKIEFILE, "")) ||
-			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_FOLLOWLOCATION, 1L)) ||
-			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_WRITEFUNCTION, WRITEFUNCTION2)) ||
-			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_HEADERFUNCTION, HEADERFUNCTION2)) ||
-			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_SSL_VERIFYPEER, 0L)) ||
-			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_POST, 1L)) ||
-			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_URL, url)) ||
-			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_TIMEOUT, (long)timeout)) ||
-			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_POSTFIELDS, postdata)) ||
-			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_SSL_VERIFYHOST, 0L)))
+	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, o = CURLOPT_COOKIEFILE, "")) ||
+			CURLE_OK != (err = curl_easy_setopt(easyhandle, o = CURLOPT_FOLLOWLOCATION, 1L)) ||
+			CURLE_OK != (err = curl_easy_setopt(easyhandle, o = CURLOPT_WRITEFUNCTION, WRITEFUNCTION2)) ||
+			CURLE_OK != (err = curl_easy_setopt(easyhandle, o = CURLOPT_HEADERFUNCTION, HEADERFUNCTION2)) ||
+			CURLE_OK != (err = curl_easy_setopt(easyhandle, o = CURLOPT_SSL_VERIFYPEER, 0L)) ||
+			CURLE_OK != (err = curl_easy_setopt(easyhandle, o = CURLOPT_POST, 1L)) ||
+			CURLE_OK != (err = curl_easy_setopt(easyhandle, o = CURLOPT_URL, url)) ||
+			CURLE_OK != (err = curl_easy_setopt(easyhandle, o = CURLOPT_TIMEOUT, (long)timeout)) ||
+			CURLE_OK != (err = curl_easy_setopt(easyhandle, o = CURLOPT_POSTFIELDS, xml)) ||
+			CURLE_OK != (err = curl_easy_setopt(easyhandle, o = CURLOPT_SSL_VERIFYHOST, 0L)))
 	{
-		*error = zbx_dsprintf(*error, "Cannot set cURL option [%d]: %s", opt, curl_easy_strerror(err));
+		*error = zbx_dsprintf(*error, "Cannot set cURL option [%d]: %s", o, curl_easy_strerror(err));
 		goto out;
 	}
 
@@ -462,13 +475,13 @@ static int	vcenter_guesthvids_get(CURL *easyhandle, zbx_vector_str_t *guesthvids
 
 	const char	*__function_name = "vcenter_guesthvids_get";
 
-	int		err, opt, ret = FAIL;
+	int		err, o, ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_POSTFIELDS, ZBX_POST_VCENTER_HV_LIST)))
+	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, o = CURLOPT_POSTFIELDS, ZBX_POST_VCENTER_HV_LIST)))
 	{
-		*error = zbx_dsprintf(*error, "Cannot set cURL option [%d]: %s", opt, curl_easy_strerror(err));
+		*error = zbx_dsprintf(*error, "Cannot set cURL option [%d]: %s", o, curl_easy_strerror(err));
 		goto out;
 	}
 
@@ -529,7 +542,7 @@ static int	vmware_hv_guestvmids_get(CURL *easyhandle, const char *guesthvid, zbx
 
 	const char	*__function_name = "vmware_hv_guestvmids_get";
 
-	int		err, opt, ret = FAIL;
+	int		err, o, ret = FAIL;
 	char		tmp[MAX_STRING_LEN];
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
@@ -537,9 +550,9 @@ static int	vmware_hv_guestvmids_get(CURL *easyhandle, const char *guesthvid, zbx
 	zbx_snprintf(tmp, sizeof(tmp), ZBX_POST_VMWARE_HV_GUESTVMIDS,
 			ZBX_VMWARE_FLAG_VCENTER == flags ? "propertyCollector" : "ha-property-collector", guesthvid);
 
-	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_POSTFIELDS, tmp)))
+	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, o = CURLOPT_POSTFIELDS, tmp)))
 	{
-		*error = zbx_dsprintf(*error, "Cannot set cURL option [%d]: %s", opt, curl_easy_strerror(err));
+		*error = zbx_dsprintf(*error, "Cannot set cURL option [%d]: %s", o, curl_easy_strerror(err));
 		goto out;
 	}
 
@@ -585,17 +598,17 @@ static int	vcenter_hv_data_get(CURL *easyhandle, const char *guesthvid)
 
 	const char	*__function_name = "vcenter_hv_data_get";
 
-	int		err, opt, ret = FAIL;
+	int		err, o, ret = FAIL;
 	char		tmp[MAX_STRING_LEN];
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() guesthvid:'%s'", __function_name, guesthvid);
 
 	zbx_snprintf(tmp, sizeof(tmp), ZBX_POST_VCENTER_HV_DETAILS, guesthvid);
 
-	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_POSTFIELDS, tmp)))
+	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, o = CURLOPT_POSTFIELDS, tmp)))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "VMWare error: cannot set cURL option [%d]: %s",
-				opt, curl_easy_strerror(err));
+				o, curl_easy_strerror(err));
 		goto out;
 	}
 
@@ -614,39 +627,39 @@ out:
 	return ret;
 }
 
-static int	vcenter_vm_status_ex_get(CURL *easyhandle, const char *guestvmid)
+static int	vmware_vm_status_ex_get(CURL *easyhandle, const char *vmid, unsigned flags)
 {
-#	define ZBX_POST_VCENTER_VMDETAILS 							\
-		ZBX_POST_VCENTER_HEADER								\
-		"<ns1:RetrievePropertiesEx xsi:type=\"ns1:RetrievePropertiesExRequestType\">"	\
-			"<ns1:_this type=\"PropertyCollector\">propertyCollector</ns1:_this>"	\
-			"<ns1:specSet>"								\
-				"<ns1:propSet>"							\
-					"<ns1:type>VirtualMachine</ns1:type>"			\
-					"<ns1:all>true</ns1:all>"				\
-				"</ns1:propSet>"						\
-				"<ns1:objectSet>"						\
-					"<ns1:obj type=\"VirtualMachine\">%s</ns1:obj>"		\
-					"<ns1:skip>false</ns1:skip>"				\
-				"</ns1:objectSet>"						\
-			"</ns1:specSet>"							\
-			"<ns1:options></ns1:options>"						\
-		"</ns1:RetrievePropertiesEx>"							\
-		ZBX_POST_VCENTER_FOOTER
+#	define ZBX_POST_VMWARE_VM_STATUS_EX 						\
+		ZBX_POST_VSPHERE_HEADER							\
+		"<ns0:RetrievePropertiesEx>"						\
+			"<ns0:_this type=\"PropertyCollector\">%s</ns0:_this>"		\
+			"<ns0:specSet>"							\
+				"<ns0:propSet>"						\
+					"<ns0:type>VirtualMachine</ns0:type>"		\
+					"<ns0:all>true</ns0:all>"			\
+				"</ns0:propSet>"					\
+				"<ns0:objectSet>"					\
+					"<ns0:obj type=\"VirtualMachine\">%s</ns0:obj>"	\
+				"</ns0:objectSet>"					\
+			"</ns0:specSet>"						\
+			"<ns0:options></ns0:options>"					\
+		"</ns0:RetrievePropertiesEx>"						\
+		ZBX_POST_VSPHERE_FOOTER
 
-	const char	*__function_name = "vcenter_vm_status_ex_get";
+	const char	*__function_name = "vmware_vm_status_ex_get";
 
-	int		err, opt, ret = FAIL;
+	int		err, o, ret = FAIL;
 	char		tmp[MAX_STRING_LEN];
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() guestvmid:'%s'", __function_name, guestvmid);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() vmid:'%s'", __function_name, vmid);
 
-	zbx_snprintf(tmp, sizeof(tmp), ZBX_POST_VCENTER_VMDETAILS, guestvmid);
+	zbx_snprintf(tmp, sizeof(tmp), ZBX_POST_VMWARE_VM_STATUS_EX,
+			ZBX_VMWARE_FLAG_VCENTER == flags ? "propertyCollector" : "ha-property-collector", vmid);
 
-	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_POSTFIELDS, tmp)))
+	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, o = CURLOPT_POSTFIELDS, tmp)))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "VMWare error: cannot set cURL option [%d]: %s",
-				opt, curl_easy_strerror(err));
+				o, curl_easy_strerror(err));
 		goto out;
 	}
 
@@ -685,7 +698,7 @@ static int	vmware_event_session_get(CURL *easyhandle, char **event_session, char
 
 	const char	*__function_name = "vmware_event_session_get";
 
-	int		err, opt, ret = FAIL;
+	int		err, o, ret = FAIL;
 	char		tmp[MAX_STRING_LEN];
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
@@ -693,9 +706,9 @@ static int	vmware_event_session_get(CURL *easyhandle, char **event_session, char
 	zbx_snprintf(tmp, sizeof(tmp), ZBX_POST_VMWARE_EVENT_FILTER,
 			ZBX_VMWARE_FLAG_VCENTER == flags ? "EventManager" : "ha-eventmgr");
 
-	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_POSTFIELDS, tmp)))
+	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, o = CURLOPT_POSTFIELDS, tmp)))
 	{
-		*error = zbx_dsprintf(*error, "Cannot set cURL option [%d]: %s", opt, curl_easy_strerror(err));
+		*error = zbx_dsprintf(*error, "Cannot set cURL option [%d]: %s", o, curl_easy_strerror(err));
 		goto out;
 	}
 
@@ -743,7 +756,7 @@ static int	vmware_events_get(CURL *easyhandle, const char *event_session, char *
 
 	const char	*__function_name = "vmware_events_get";
 
-	int		err, opt, ret = FAIL;
+	int		err, o, ret = FAIL;
 	char		tmp[MAX_STRING_LEN];
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() event_session:'%s'", __function_name, event_session);
@@ -752,9 +765,9 @@ static int	vmware_events_get(CURL *easyhandle, const char *event_session, char *
 			ZBX_VMWARE_FLAG_VCENTER == flags ? "propertyCollector" : "ha-property-collector",
 			event_session);
 
-	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_POSTFIELDS, tmp)))
+	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, o = CURLOPT_POSTFIELDS, tmp)))
 	{
-		*error = zbx_dsprintf(*error, "Cannot set cURL option [%d]: %s", opt, curl_easy_strerror(err));
+		*error = zbx_dsprintf(*error, "Cannot set cURL option [%d]: %s", o, curl_easy_strerror(err));
 		goto out;
 	}
 
@@ -834,7 +847,7 @@ static int	vcenter_update(const char *url, const char *username, const char *pas
 	const char		*__function_name = "vcenter_update";
 
 	CURL			*easyhandle = NULL;
-	int			opt, i, j, err, ret = FAIL;
+	int			o, i, j, err, ret = FAIL;
 	zbx_vector_str_t	guesthvids, guestvmids;
 	struct curl_slist	*headers = NULL;
 	zbx_vcenter_t		*vcenter;
@@ -881,13 +894,13 @@ static int	vcenter_update(const char *url, const char *username, const char *pas
 	zbx_vector_str_create(&guesthvids);
 	zbx_vector_str_create(&guestvmids);
 
-	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_HTTPHEADER, headers)))
+	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, o = CURLOPT_HTTPHEADER, headers)))
 	{
-		*error = zbx_dsprintf(*error, "Cannot set cURL option [%d]: %s", opt, curl_easy_strerror(err));
+		*error = zbx_dsprintf(*error, "Cannot set cURL option [%d]: %s", o, curl_easy_strerror(err));
 		goto clean;
 	}
 
-	if (SUCCEED != vcenter_authenticate(easyhandle, url, username, password, error))
+	if (SUCCEED != vmware_authenticate(easyhandle, url, username, password, error, ZBX_VMWARE_FLAG_VCENTER))
 		goto clean;
 
 	if (SUCCEED != vcenter_guesthvids_get(easyhandle, &guesthvids, error))
@@ -923,8 +936,11 @@ static int	vcenter_update(const char *url, const char *username, const char *pas
 
 		for (j = 0; j < guestvmids.values_num; j++)
 		{
-			if (SUCCEED != vcenter_vm_status_ex_get(easyhandle, guestvmids.values[j]))
+			if (SUCCEED != vmware_vm_status_ex_get(easyhandle, guestvmids.values[j],
+					ZBX_VMWARE_FLAG_VCENTER))
+			{
 				continue;
+			}
 
 			if (NULL == (uuid = read_xml_value(page.data, ZBX_XPATH_LN1("uuid"))))
 				continue;
@@ -976,59 +992,6 @@ out:
 	return ret;
 }
 
-static int	vsphere_authenticate(CURL *easyhandle, const char *url, const char *username, const char *password,
-		char **error)
-{
-#	define ZBX_POST_VSPHERE_AUTH							\
-		ZBX_POST_VSPHERE_HEADER							\
-		"<ns0:Login>"								\
-			"<ns0:_this type=\"SessionManager\">ha-sessionmgr</ns0:_this>"	\
-			"<ns0:userName>%s</ns0:userName>"				\
-			"<ns0:password>%s</ns0:password>"				\
-		"</ns0:Login>"								\
-		ZBX_POST_VSPHERE_FOOTER
-
-	const char	*__function_name = "vsphere_authenticate";
-	int		err, opt, timeout = 5, ret = FAIL;
-	char		postdata[MAX_STRING_LEN];
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() url:'%s' username:'%s'", __function_name, url, username);
-
-	zbx_snprintf(postdata, sizeof(postdata), ZBX_POST_VSPHERE_AUTH, username, password);
-
-	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_COOKIEFILE, "")) ||
-			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_FOLLOWLOCATION, 1L)) ||
-			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_WRITEFUNCTION, WRITEFUNCTION2)) ||
-			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_HEADERFUNCTION, HEADERFUNCTION2)) ||
-			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_SSL_VERIFYPEER, 0L)) ||
-			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_POST, 1L)) ||
-			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_URL, url)) ||
-			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_TIMEOUT, (long)timeout)) ||
-			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_POSTFIELDS, postdata)) ||
-			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_SSL_VERIFYHOST, 0L)))
-	{
-		*error = zbx_dsprintf(*error, "Cannot set cURL option [%d]: %s", opt, curl_easy_strerror(err));
-		goto out;
-	}
-
-	page.offset = 0;
-
-	if (CURLE_OK != (err = curl_easy_perform(easyhandle)))
-	{
-		*error = zbx_strdup(*error, curl_easy_strerror(err));
-		goto out;
-	}
-
-	if (NULL != (*error = read_xml_value(page.data, ZBX_XPATH_LN1("faultstring"))))
-		goto out;
-
-	ret = SUCCEED;
-out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
-
-	return ret;
-}
-
 static int	vsphere_hostdata_get(CURL *easyhandle, char **details, char **error)
 {
 #	define ZBX_POST_VSPHERE_HOSTDETAILS								\
@@ -1050,13 +1013,13 @@ static int	vsphere_hostdata_get(CURL *easyhandle, char **details, char **error)
 
 	const char	*__function_name = "vsphere_hostdata_get";
 
-	int		err, opt, ret = FAIL;
+	int		err, o, ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_POSTFIELDS, ZBX_POST_VSPHERE_HOSTDETAILS)))
+	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, o = CURLOPT_POSTFIELDS, ZBX_POST_VSPHERE_HOSTDETAILS)))
 	{
-		*error = zbx_dsprintf(*error, "Cannot set cURL option [%d]: %s", opt, curl_easy_strerror(err));
+		*error = zbx_dsprintf(*error, "Cannot set cURL option [%d]: %s", o, curl_easy_strerror(err));
 		goto out;
 	}
 
@@ -1069,56 +1032,6 @@ static int	vsphere_hostdata_get(CURL *easyhandle, char **details, char **error)
 	}
 
 	*details = zbx_strdup(*details, page.data);
-
-	ret = SUCCEED;
-out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
-
-	return ret;
-}
-
-static int	vsphere_vm_status_ex_get(CURL *easyhandle, const char *vmid)
-{
-#	define ZBX_POST_VSPHERE_VMDETAILS 								\
-		ZBX_POST_VSPHERE_HEADER									\
-		"<ns0:RetrieveProperties>"								\
-			"<ns0:_this type=\"PropertyCollector\">ha-property-collector</ns0:_this>"	\
-			"<ns0:specSet>"									\
-				"<ns0:propSet>"								\
-					"<ns0:type>VirtualMachine</ns0:type>"				\
-					"<ns0:all>true</ns0:all>"					\
-				"</ns0:propSet>"							\
-				"<ns0:objectSet>"							\
-					"<ns0:obj type=\"VirtualMachine\">%s</ns0:obj>"			\
-				"</ns0:objectSet>"							\
-			"</ns0:specSet>"								\
-		"</ns0:RetrieveProperties>"								\
-		ZBX_POST_VSPHERE_FOOTER
-
-	const char	*__function_name = "vsphere_vm_status_ex_get";
-
-	int		err, opt, ret = FAIL;
-	char		*error = NULL, tmp[MAX_STRING_LEN];
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() vmid:'%s'", __function_name, vmid);
-
-	zbx_snprintf(tmp, sizeof(tmp), ZBX_POST_VSPHERE_VMDETAILS, vmid);
-
-	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_POSTFIELDS, tmp)))
-	{
-		error = zbx_strdup(error, curl_easy_strerror(err));
-		zabbix_log(LOG_LEVEL_DEBUG, "VMWare error: cannot set cURL option [%d]: %s", opt, error);
-		goto out;
-	}
-
-	page.offset = 0;
-
-	if (CURLE_OK != (err = curl_easy_perform(easyhandle)))
-	{
-		error = zbx_strdup(error, curl_easy_strerror(err));
-		zabbix_log(LOG_LEVEL_DEBUG, "VMWare error: %s", error);
-		goto out;
-	}
 
 	ret = SUCCEED;
 out:
@@ -1154,7 +1067,7 @@ static int	vsphere_update(const char *url, const char *username, const char *pas
 	const char		*__function_name = "vsphere_update";
 
 	CURL			*easyhandle = NULL;
-	int			opt, i, err, ret = FAIL;
+	int			o, i, err, ret = FAIL;
 	zbx_vector_str_t	guestvmids;
 	struct curl_slist	*headers = NULL;
 	zbx_vsphere_t		*vsphere;
@@ -1200,13 +1113,13 @@ static int	vsphere_update(const char *url, const char *username, const char *pas
 
 	zbx_vector_str_create(&guestvmids);
 
-	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_HTTPHEADER, headers)))
+	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, o = CURLOPT_HTTPHEADER, headers)))
 	{
-		*error = zbx_dsprintf(*error, "Cannot set cURL option [%d]: %s", opt, curl_easy_strerror(err));
+		*error = zbx_dsprintf(*error, "Cannot set cURL option [%d]: %s", o, curl_easy_strerror(err));
 		goto clean;
 	}
 
-	if (SUCCEED != vsphere_authenticate(easyhandle, url, username, password, error))
+	if (SUCCEED != vmware_authenticate(easyhandle, url, username, password, error, ZBX_VMWARE_FLAG_VSPHERE))
 		goto clean;
 
 	if (SUCCEED != vmware_hv_guestvmids_get(easyhandle, "ha-host", &guestvmids, error, ZBX_VMWARE_FLAG_VSPHERE))
@@ -1217,7 +1130,7 @@ static int	vsphere_update(const char *url, const char *username, const char *pas
 
 	for (i = 0; i < guestvmids.values_num; i++)
 	{
-		if (SUCCEED != vsphere_vm_status_ex_get(easyhandle, guestvmids.values[i]))
+		if (SUCCEED != vmware_vm_status_ex_get(easyhandle, guestvmids.values[i], ZBX_VMWARE_FLAG_VSPHERE))
 			continue;
 
 		if (NULL == (uuid = read_xml_value(page.data, ZBX_XPATH_LN1("uuid"))))
