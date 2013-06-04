@@ -712,7 +712,7 @@ static int	vmware_event_session_get(CURL *easyhandle, char **event_session, char
 		*error = zbx_strdup(*error, "Cannot get EventHistoryCollector session");
 		goto out;
 	}
-zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, page.data);
+
 	ret = SUCCEED;
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
@@ -767,7 +767,6 @@ static int	vmware_events_get(CURL *easyhandle, const char *event_session, char *
 	}
 
 	*events = zbx_strdup(*events, page.data);
-zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, page.data);
 
 	ret = SUCCEED;
 out:
@@ -964,8 +963,6 @@ clean:
 		zbx_free(guesthvids.values[i]);
 	zbx_vector_str_destroy(&guesthvids);
 
-/*	for (i = 0; i < guestvmids.values_num; i++)
-		zbx_free(guestvmids.values[i]);*/
 	zbx_vector_str_destroy(&guestvmids);
 
 	curl_slist_free_all(headers);
@@ -2557,225 +2554,4 @@ int	check_vsphere_vm_vfs_fs_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	return SYSINFO_RET_OK;
 }
-
-/*static int	vcenter_get_datacenter(CURL *easyhandle)
-{
-#	define ZBX_POST_VCENTER_GET_DATACENTER									\
-		"<?xml version=\"1.0\" encoding=\"UTF-8\"?>"							\
-		"<SOAP-ENV:Envelope"										\
-			" xmlns:ns0=\"urn:vim25\""								\
-			" xmlns:ns1=\"http://schemas.xmlsoap.org/soap/envelope/\""				\
-			" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\""				\
-			" xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\">"			\
-			"<SOAP-ENV:Header/>"									\
-			"<ns1:Body>"										\
-				"<ns0:RetrieveProperties>"							\
-					"<ns0:_this type=\"PropertyCollector\">propertyCollector</ns0:_this>"	\
-					"<ns0:specSet>"								\
-						"<ns0:propSet>"							\
-							"<ns0:type>Folder</ns0:type>"				\
-							"<ns0:all>false</ns0:all>"				\
-							"<ns0:pathSet>childEntity</ns0:pathSet>"		\
-						"</ns0:propSet>"						\
-						"<ns0:objectSet>"						\
-							"<ns0:obj type=\"Folder\">group-d1</ns0:obj>"		\
-						"</ns0:objectSet>"						\
-					"</ns0:specSet>"							\
-				"</ns0:RetrieveProperties>"							\
-			"</ns1:Body>"										\
-		"</SOAP-ENV:Envelope>"
-
-	const char	*__function_name = "vcenter_get_datacenter";
-	int		err, opt, ret = FAIL;
-	char		*err_str = NULL;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
-
-	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_POSTFIELDS, ZBX_POST_VCENTER_GET_DATACENTER)))
-	{
-		err_str = zbx_strdup(err_str, curl_easy_strerror(err));
-		zabbix_log(LOG_LEVEL_DEBUG, "VMWare error: cannot set cURL option [%d]: %s",
-				opt, err_str);
-		goto out;
-	}
-
-	page.offset = 0;
-
-	if (CURLE_OK != (err = curl_easy_perform(easyhandle)))
-	{
-		err_str = zbx_strdup(err_str, curl_easy_strerror(err));
-		zabbix_log(LOG_LEVEL_DEBUG, "VMWare error: %s", err_str);
-		goto out;
-	}
-
-	ret = SUCCEED;
-out:
-	return ret;
-}
-
-static int	vcenter_get_groupfolder(CURL *easyhandle)
-{
-#	define ZBX_POST_VCENTER_GET_GROUPFOLDER									\
-		"<?xml version=\"1.0\" encoding=\"UTF-8\"?>"							\
-		"<SOAP-ENV:Envelope"										\
-			" xmlns:ns0=\"urn:vim25\""								\
-			" xmlns:ns1=\"http://schemas.xmlsoap.org/soap/envelope/\""				\
-			" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\""				\
-			" xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\">"			\
-			"<SOAP-ENV:Header/>"									\
-			"<ns1:Body>"										\
-				"<ns0:RetrieveProperties>"							\
-					"<ns0:_this type=\"PropertyCollector\">propertyCollector</ns0:_this>"	\
-					"<ns0:specSet>"								\
-						"<ns0:propSet>"							\
-							"<ns0:type>Datacenter</ns0:type>"			\
-							"<ns0:all>false</ns0:all>"				\
-							"<ns0:pathSet>hostFolder</ns0:pathSet>"			\
-						"</ns0:propSet>"						\
-						"<ns0:objectSet>"						\
-							"<ns0:obj type=\"Datacenter\">datacenter-21</ns0:obj>"	\
-						"</ns0:objectSet>"						\
-					"</ns0:specSet>"							\
-				"</ns0:RetrieveProperties>"							\
-			"</ns1:Body>"										\
-		"</SOAP-ENV:Envelope>"
-
-	const char	*__function_name = "vcenter_get_groupfolder";
-	int		err, opt, ret = FAIL;
-	char		*err_str = NULL;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
-
-	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_POSTFIELDS, ZBX_POST_VCENTER_GET_GROUPFOLDER)))
-	{
-		err_str = zbx_strdup(err_str, curl_easy_strerror(err));
-		zabbix_log(LOG_LEVEL_DEBUG, "VMWare error: cannot set cURL option [%d]: %s",
-				opt, err_str);
-		goto out;
-	}
-
-	page.offset = 0;
-
-	if (CURLE_OK != (err = curl_easy_perform(easyhandle)))
-	{
-		err_str = zbx_strdup(err_str, curl_easy_strerror(err));
-		zabbix_log(LOG_LEVEL_DEBUG, "VMWare error: %s", err_str);
-		goto out;
-	}
-
-	ret = SUCCEED;
-out:
-	return ret;
-}
-
-static int	vcenter_get_hostdomain(CURL *easyhandle)
-{
-#	define ZBX_POST_VCENTER_GET_HOSTDOMAIN									\
-		"<?xml version=\"1.0\" encoding=\"UTF-8\"?>"							\
-		"<SOAP-ENV:Envelope"										\
-			" xmlns:ns0=\"urn:vim25\""								\
-			" xmlns:ns1=\"http://schemas.xmlsoap.org/soap/envelope/\""				\
-			" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\""				\
-			" xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\">"			\
-			"<SOAP-ENV:Header/>"									\
-			"<ns1:Body>"										\
-				"<ns0:RetrieveProperties>"							\
-					"<ns0:_this type=\"PropertyCollector\">propertyCollector</ns0:_this>"	\
-					"<ns0:specSet>"								\
-						"<ns0:propSet>"							\
-							"<ns0:type>Folder</ns0:type>"				\
-							"<ns0:all>false</ns0:all>"				\
-							"<ns0:pathSet>childEntity</ns0:pathSet>"		\
-						"</ns0:propSet>"						\
-						"<ns0:objectSet>"						\
-							"<ns0:obj type=\"Folder\">group-h23</ns0:obj>"		\
-						"</ns0:objectSet>"						\
-					"</ns0:specSet>"							\
-				"</ns0:RetrieveProperties>"							\
-			"</ns1:Body>"										\
-		"</SOAP-ENV:Envelope>"
-
-	const char	*__function_name = "vcenter_get_hostdomain";
-	int		err, opt, ret = FAIL;
-	char		*err_str = NULL;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
-
-	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_POSTFIELDS, ZBX_POST_VCENTER_GET_HOSTDOMAIN)))
-	{
-		err_str = zbx_strdup(err_str, curl_easy_strerror(err));
-		zabbix_log(LOG_LEVEL_DEBUG, "VMWare error: cannot set cURL option [%d]: %s",
-				opt, err_str);
-		goto out;
-	}
-
-	page.offset = 0;
-
-	if (CURLE_OK != (err = curl_easy_perform(easyhandle)))
-	{
-		err_str = zbx_strdup(err_str, curl_easy_strerror(err));
-		zabbix_log(LOG_LEVEL_DEBUG, "VMWare error: %s", err_str);
-		goto out;
-	}
-
-	ret = SUCCEED;
-out:
-	return ret;
-}
-
-static int	vcenter_get_hostsystem(CURL *easyhandle)
-{
-#	define ZBX_POST_VCENTER_GET_HOSTSYSTEM									\
-		"<?xml version=\"1.0\" encoding=\"UTF-8\"?>"							\
-		"<SOAP-ENV:Envelope"										\
-			" xmlns:ns0=\"urn:vim25\""								\
-			" xmlns:ns1=\"http://schemas.xmlsoap.org/soap/envelope/\""				\
-			" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\""				\
-			" xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\">"			\
-			"<SOAP-ENV:Header/>"									\
-			"<ns1:Body>"										\
-				"<ns0:RetrieveProperties>"							\
-					"<ns0:_this type=\"PropertyCollector\">propertyCollector</ns0:_this>"	\
-					"<ns0:specSet>"								\
-						"<ns0:propSet>"							\
-							"<ns0:type>ComputeResource</ns0:type>"			\
-							"<ns0:all>false</ns0:all>"				\
-							"<ns0:pathSet>host</ns0:pathSet>"			\
-						"</ns0:propSet>"						\
-						"<ns0:objectSet>"						\
-							"<ns0:obj type=\"ComputeResource\">domain-s26</ns0:obj>"\
-						"</ns0:objectSet>"						\
-					"</ns0:specSet>"							\
-				"</ns0:RetrieveProperties>"							\
-			"</ns1:Body>"										\
-		"</SOAP-ENV:Envelope>"
-
-	const char	*__function_name = "vcenter_get_hostsystem";
-	int		err, opt, ret = FAIL;
-	char		*err_str = NULL;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
-
-	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_POSTFIELDS, ZBX_POST_VCENTER_GET_HOSTSYSTEM)))
-	{
-		err_str = zbx_strdup(err_str, curl_easy_strerror(err));
-		zabbix_log(LOG_LEVEL_DEBUG, "VMWare error: cannot set cURL option [%d]: %s",
-				opt, err_str);
-		goto out;
-	}
-
-	page.offset = 0;
-
-	if (CURLE_OK != (err = curl_easy_perform(easyhandle)))
-	{
-		err_str = zbx_strdup(err_str, curl_easy_strerror(err));
-		zabbix_log(LOG_LEVEL_DEBUG, "VMWare error: %s", err_str);
-		goto out;
-	}
-
-	ret = SUCCEED;
-out:
-	return ret;
-}
-*/
 #endif
