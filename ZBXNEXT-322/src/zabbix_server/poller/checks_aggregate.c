@@ -19,8 +19,10 @@
 
 #include "common.h"
 #include "log.h"
+#include "valuecache.h"
 
 #include "checks_aggregate.h"
+
 
 #define ZBX_GRP_FUNC_MIN	0
 #define ZBX_GRP_FUNC_AVG	1
@@ -28,21 +30,19 @@
 #define ZBX_GRP_FUNC_SUM	3
 
 static void	evaluate_one(DC_ITEM *item, history_value_t *result, int *num, int grp_func,
-		const char *value_str, unsigned char value_type)
+		const history_value_t *pvalue, unsigned char value_type)
 {
-	history_value_t	value;
+	history_value_t		value = *pvalue;
 
 	switch (value_type)
 	{
 		case ITEM_VALUE_TYPE_FLOAT:
-			value.dbl = atof(value_str);
 			if (ITEM_VALUE_TYPE_UINT64 == item->value_type)
-				value.ui64 = (zbx_uint64_t)value.dbl;
+				value.ui64 = (zbx_uint64_t)pvalue->dbl;
 			break;
 		case ITEM_VALUE_TYPE_UINT64:
-			ZBX_STR2UINT64(value.ui64, value_str);
 			if (ITEM_VALUE_TYPE_FLOAT == item->value_type)
-				value.dbl = (double)value.ui64;
+				value.dbl = (double)pvalue->ui64;
 			break;
 		default:
 			assert(0);
@@ -237,17 +237,30 @@ static int	evaluate_aggregate(DC_ITEM *item, AGENT_RESULT *res, int grp_func, co
 
 		while (NULL != (row = DBfetch(result)))
 		{
+			history_value_t		value;
+
 			value_type = (unsigned char)atoi(row[0]);
 
-			evaluate_one(item, &value, &num, grp_func, row[1], value_type);
+			switch (value_type)
+			{
+				case ITEM_VALUE_TYPE_FLOAT:
+					value.dbl = atof(row[1]);
+					break;
+				case ITEM_VALUE_TYPE_UINT64:
+					ZBX_STR2UINT64(value.ui64, row[1]);
+					break;
+				default:
+					assert(0);
+			}
+
+			evaluate_one(item, &value, &num, grp_func, &value, value_type);
 		}
 		DBfree_result(result);
 	}
 	else
 	{
-		int		clock_from;
+		int		clock_from, now = time(NULL);
 		unsigned int	period;
-		char		**h_value;
 
 		if (FAIL == is_uint_suffix(param, &period))
 		{
@@ -255,7 +268,7 @@ static int	evaluate_aggregate(DC_ITEM *item, AGENT_RESULT *res, int grp_func, co
 			goto clean;
 		}
 
-		clock_from = time(NULL) - period;
+		clock_from = now - period;
 
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 				"select itemid,value_type"
@@ -269,14 +282,22 @@ static int	evaluate_aggregate(DC_ITEM *item, AGENT_RESULT *res, int grp_func, co
 
 		while (NULL != (row = DBfetch(result)))
 		{
+			zbx_vector_vc_value_t	values;
+
 			ZBX_STR2UINT64(itemid, row[0]);
 			value_type = (unsigned char)atoi(row[1]);
 
-			h_value = DBget_history(itemid, value_type, item_func, clock_from, 0, NULL, NULL, 0);
+			zbx_vc_value_vector_create(&values);
 
-			if (NULL != h_value[0])
-				evaluate_one(item, &value, &num, grp_func, h_value[0], value_type);
-			DBfree_history(h_value);
+			if (SUCCEED == zbx_vc_get_values_by_time(itemid, value_type, &values, now - clock_from, now))
+			{
+				int	i;
+
+				for (i = 0; i < values.values_num; i++)
+					evaluate_one(item, &value, &num, grp_func, &values.values[i].value, value_type);
+			}
+
+			zbx_vc_value_vector_destroy(&values, value_type);
 		}
 		DBfree_result(result);
 	}

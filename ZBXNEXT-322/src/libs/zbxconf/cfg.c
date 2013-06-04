@@ -195,6 +195,15 @@ static int	__parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int leve
 					case TYPE_MULTISTRING:
 						zbx_strarr_add(cfg[i].variable, value);
 						break;
+					case TYPE_UINT64:
+						if (FAIL == str2uint64(value, "KMGT", &var))
+							goto incorrect_config;
+
+						if (cfg[i].min > var || (0 != cfg[i].max && var > cfg[i].max))
+							goto incorrect_config;
+
+						*((zbx_uint64_t *)cfg[i].variable) = var;
+						break;
 					default:
 						assert(0);
 				}
