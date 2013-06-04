@@ -55,7 +55,7 @@ $itemTable->setHeader(array(
 	make_sorting_header(_('Trends'), 'trends', $sortLink),
 	make_sorting_header(_('Type'), 'type', $sortLink),
 	_('Applications'),
-	make_sorting_header(_('Status'), 'status', $sortLink),
+	make_sorting_header(_('Status'), 'status', $sortLink)
 ));
 
 foreach ($this->data['items'] as $item) {
