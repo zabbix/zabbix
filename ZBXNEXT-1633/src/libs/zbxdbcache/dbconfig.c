@@ -75,12 +75,14 @@ typedef struct
 	zbx_uint64_t		itemid;
 	zbx_uint64_t		hostid;
 	zbx_uint64_t		interfaceid;
+	zbx_uint64_t		lastlogsize;
 	const char		*key;
 	const char		*port;
 	const ZBX_DC_TRIGGER	**triggers;
 	int			delay;
 	int			nextcheck;
 	int			lastclock;
+	int			mtime;
 	unsigned char		type;
 	unsigned char		data_type;
 	unsigned char		value_type;
@@ -857,6 +859,8 @@ static void	DCsync_items(DB_RESULT result)
 				item->lastclock = atoi(row[28]);
 			else
 				item->lastclock = 0;
+			ZBX_STR2UINT64(item->lastlogsize, row[32]);
+			item->mtime = atoi(row[33]);
 		}
 		else if (NULL != item->triggers && NULL == item->triggers[0])
 		{
@@ -2362,7 +2366,7 @@ void	DCsync_configuration()
 				"i.ipmi_sensor,i.delay,i.delay_flex,i.trapper_hosts,i.logtimefmt,i.params,"
 				"i.state,i.authtype,i.username,i.password,i.publickey,i.privatekey,"
 				"i.flags,i.interfaceid,i.lastclock,i.snmpv3_authprotocol,i.snmpv3_privprotocol,"
-				"i.snmpv3_contextname"
+				"i.snmpv3_contextname,i.lastlogsize,i.mtime"
 			" from items i,hosts h"
 			" where i.hostid=h.hostid"
 				" and h.status=%d"
@@ -3170,6 +3174,8 @@ static void	DCget_item(DC_ITEM *dst_item, const ZBX_DC_ITEM *src_item)
 	dst_item->state = src_item->state;
 	dst_item->lastclock = src_item->lastclock;
 	dst_item->flags = src_item->flags;
+	dst_item->lastlogsize = src_item->lastlogsize;
+	dst_item->mtime = src_item->mtime;
 
 	if (NULL != (flexitem = zbx_hashset_search(&config->flexitems, &src_item->itemid)))
 		strscpy(dst_item->delay_flex, flexitem->delay_flex);
@@ -4104,7 +4110,8 @@ static void	DCrequeue_unreachable_item(ZBX_DC_ITEM *dc_item)
 	DCupdate_item_queue(dc_item, old_poller_type, old_nextcheck);
 }
 
-void	DCrequeue_items(zbx_uint64_t *itemids, unsigned char *states, int *lastclocks, int *errcodes, size_t num)
+void	DCrequeue_items(zbx_uint64_t *itemids, unsigned char *states, int *lastclocks, zbx_uint64_t *lastlogsizes,
+		int *mtimes, int *errcodes, size_t num)
 {
 	size_t		i;
 	ZBX_DC_ITEM	*dc_item;
@@ -4121,6 +4128,10 @@ void	DCrequeue_items(zbx_uint64_t *itemids, unsigned char *states, int *lastcloc
 
 		dc_item->state = states[i];
 		dc_item->lastclock = lastclocks[i];
+		if (NULL != lastlogsizes)
+			dc_item->lastlogsize = lastlogsizes[i];
+		if (NULL != mtimes)
+			dc_item->mtime = mtimes[i];
 
 		if (ZBX_NO_POLLER == dc_item->poller_type)
 			continue;

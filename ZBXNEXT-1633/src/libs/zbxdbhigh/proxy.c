@@ -1543,9 +1543,9 @@ void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid,
 	DC_ITEM		*items = NULL;
 	zbx_host_key_t	*keys = NULL;
 	size_t		i;
-	zbx_uint64_t	*itemids = NULL;
+	zbx_uint64_t	*itemids = NULL, *lastlogsizes = NULL;
 	unsigned char	*states = NULL;
-	int		*lastclocks = NULL, *errcodes = NULL, *errcodes2 = NULL;
+	int		*lastclocks = NULL, *errcodes = NULL, *mtimes = NULL, *errcodes2 = NULL;
 	size_t		num = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
@@ -1556,6 +1556,8 @@ void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid,
 	itemids = zbx_malloc(itemids, sizeof(zbx_uint64_t) * values_num);
 	states = zbx_malloc(states, sizeof(unsigned char) * values_num);
 	lastclocks = zbx_malloc(lastclocks, sizeof(int) * values_num);
+	lastlogsizes = zbx_malloc(lastlogsizes, sizeof(zbx_uint64_t) * values_num);
+	mtimes = zbx_malloc(mtimes, sizeof(int) * values_num);
 	errcodes2 = zbx_malloc(errcodes2, sizeof(int) * values_num);
 
 	for (i = 0; i < values_num; i++)
@@ -1666,15 +1668,19 @@ void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid,
 		itemids[num] = items[i].itemid;
 		states[num] = items[i].state;
 		lastclocks[num] = values[i].ts.sec;
+		lastlogsizes[num] = values[i].lastlogsize;
+		mtimes[num] = values[i].mtime;
 		errcodes2[num] = SUCCEED;
 		num++;
 	}
 
 	DCconfig_clean_items(items, errcodes, values_num);
 
-	DCrequeue_items(itemids, states, lastclocks, errcodes2, num);
+	DCrequeue_items(itemids, states, lastclocks, lastlogsizes, mtimes, errcodes2, num);
 
 	zbx_free(errcodes2);
+	zbx_free(mtimes);
+	zbx_free(lastlogsizes);
 	zbx_free(lastclocks);
 	zbx_free(states);
 	zbx_free(itemids);
