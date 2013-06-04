@@ -1229,13 +1229,13 @@ class CChart extends CGraphDraw {
 			$hline_count = $tmp_hlines;
 		}
 
+		$y = $this->sizeY + $this->shiftY;
 		for ($i = 1; $i < $hline_count; $i++) {
-			$yOffset = $stepX * $i - $this->getYStepMarkerPosOffset($yAxis, $i);
-			if ($yOffset >= $this->sizeY || $yOffset <= 0) {
-				continue;
-			}
+			$y -= $stepX;
 
-			$y = $this->sizeY - $yOffset + $this->shiftY;
+			if ($y < $this->shiftY) {
+				break;
+			}
 
 			dashedLine(
 				$this->im,
