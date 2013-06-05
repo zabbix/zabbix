@@ -188,12 +188,12 @@ $hostList->addRow(_('Groups'), $grp_tb->get(_('In groups'), _('Other groups')));
 
 $newgroupTB = new CTextBox('newgroup', $newgroup, ZBX_TEXTBOX_SMALL_SIZE);
 $newgroupTB->setAttribute('maxlength', 64);
-$tmp_label = _('New host group');
+$tmp_label = _('New group');
 if (CWebUser::$data['type'] != USER_TYPE_SUPER_ADMIN) {
 	$tmp_label .= SPACE._('(Only super admins can create groups)');
 	$newgroupTB->setReadonly(true);
 }
-$hostList->addRow($tmp_label, $newgroupTB, null, null, 'new');
+$hostList->addRow(SPACE, array($tmp_label, BR(), $newgroupTB), null, null, 'new');
 
 if (empty($interfaces)) {
 	$script = 'hostInterfacesManager.addNew("agent");';
@@ -247,7 +247,7 @@ $buttonRow->setAttribute('id', 'SNMPIterfacesFooter');
 
 $ifTab->addRow($buttonRow);
 
-$hostList->addRow(_('SNMP interfaces'), new CDiv($ifTab, 'border_dotted inlineblock objectgroup'), false, null, 'interface-row');
+$hostList->addRow(_('SNMP interfaces'), new CDiv($ifTab, 'border_dotted inlineblock objectgroup interface-group'), false, null, 'interface-row');
 
 // table for JMX interfaces with footer
 $ifTab = new CTable(null, 'formElementTable');
@@ -277,7 +277,7 @@ $buttonRow = new CRow(array($buttonCol, $col));
 $buttonRow->setAttribute('id', 'IPMIIterfacesFooter');
 
 $ifTab->addRow($buttonRow);
-$hostList->addRow(_('IPMI interfaces'), new CDiv($ifTab, 'border_dotted objectgroup inlineblock interface-group'), false, null, 'interface-row interface-row-last');
+$hostList->addRow(_('IPMI interfaces'), new CDiv($ifTab, 'border_dotted objectgroup inlineblock interface-group'), false, null, 'interface-row');
 
 // Proxy
 $cmbProxy = new CComboBox('proxy_hostid', $proxy_hostid);
@@ -604,7 +604,7 @@ $inventoryTypeRadioButton = array(
 	),
 	new CLabel(_('Automatic'), 'host_inventory_radio_'.HOST_INVENTORY_AUTOMATIC),
 );
-$inventoryFormList->addRow(new CDiv($inventoryTypeRadioButton, 'jqueryinputset'));
+$inventoryFormList->addRow(SPACE, new CDiv($inventoryTypeRadioButton, 'jqueryinputset'));
 
 $hostInventoryTable = DB::getSchema('host_inventory');
 $hostInventoryFields = getHostInventories();

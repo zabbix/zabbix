@@ -26,7 +26,6 @@ if (!isset($_REQUEST['form_refresh'])) {
 	$divTabs->setSelected(0);
 }
 
-
 $templateid = get_request('templateid', 0);
 $host = get_request('template_name', '');
 $visiblename = get_request('visiblename', '');
@@ -143,11 +142,7 @@ if (CWebUser::$data['type'] != USER_TYPE_SUPER_ADMIN) {
 	$tmp_label .= SPACE._('(Only super admins can create groups)');
 	$newgroupTB->setReadonly(true);
 }
-$templateList->addRow(array(
-	new CLabel($tmp_label, 'newgroup'),
-	BR(),
-	$newgroupTB
-), null, null, null, 'new');
+$templateList->addRow(SPACE, array($tmp_label, BR(), $newgroupTB), null, null, 'new');
 
 // FORM ITEM : linked Hosts tween box [  ] [  ]
 $twb_groupid = get_request('twb_groupid', 0);
