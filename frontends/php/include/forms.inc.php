@@ -531,8 +531,8 @@
 			new CCol($cmbType, 'col2'),
 			new CCol(bold(_('Type of information').NAME_DELIMITER), 'label col3'),
 			new CCol($cmbValType, 'col3'),
-			new CCol(bold(_('Status').NAME_DELIMITER), 'label col4'),
-			new CCol($cmbStatus, 'col4')
+			new CCol(bold(_('State').NAME_DELIMITER), 'label'),
+			new CCol($cmbState, 'col4')
 		));
 		// row 2
 		$hostFilterData = null;
@@ -567,8 +567,8 @@
 			new CCol($updateIntervalInput),
 			new CCol($dataTypeLabel, 'label'),
 			new CCol($dataTypeInput),
-			new CCol(bold(_('State').NAME_DELIMITER), 'label'),
-			new CCol($cmbState, 'col4')
+			new CCol(bold(_('Status').NAME_DELIMITER), 'label col4'),
+			new CCol($cmbStatus, 'col4')
 		));
 		// row 3
 		$table->addRow(array(
