@@ -18,7 +18,10 @@
 **/
 
 #include "sysinfo.h"
-#include <sys/utsname.h>
+
+#ifdef HAVE_SYS_PSTAT_H
+#	include <sys/utsname.h>
+#endif
 
 int	SYSTEM_HOSTNAME(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
