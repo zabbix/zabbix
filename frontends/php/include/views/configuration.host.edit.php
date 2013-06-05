@@ -505,7 +505,6 @@ $linkedTemplateTable->attr('id', 'linkedTemplateTable');
 $linkedTemplateTable->attr('style', 'min-width: 400px;');
 $linkedTemplateTable->setHeader(array(_('Name'), _('Action')));
 
-
 $linkedTemplates = API::Template()->get(array(
 	'templateids' => $templateIds,
 	'output' => array('templateid', 'name')
@@ -513,6 +512,8 @@ $linkedTemplates = API::Template()->get(array(
 
 $ignoredTemplates = array();
 foreach ($linkedTemplates as $template) {
+	$tmplList->addVar('exist_templates[]', $template['templateid']);
+
 	$linkedTemplateTable->addRow(
 		array(
 			$template['name'],
@@ -523,12 +524,12 @@ foreach ($linkedTemplates as $template) {
 				isset($original_templates[$template['templateid']])
 					? new CSubmit('unlink_and_clear['.$template['templateid'].']', _('Unlink and clear'), null, 'link_menu')
 					: SPACE
-					)
+			)
 		),
 		null, 'conditions_'.$template['templateid']
 	);
-	$ignoredTemplates[] = $template['name'];
-	$tmplList->addVar('exist_templates[]', $template['templateid']);
+
+	$ignoredTemplates[$template['templateid']] = $template['name'];
 }
 
 $tmplList->addRow(_('Linked templates'), new CDiv($linkedTemplateTable, 'objectgroup inlineblock border_dotted ui-corner-all'));
@@ -538,23 +539,13 @@ $newTemplateTable = new CTable(null, 'formElementTable');
 $newTemplateTable->attr('id', 'newTemplateTable');
 $newTemplateTable->attr('style', 'min-width: 400px;');
 
-$newTemplateTable->addRow(
-	array(
-		new CMultiSelect(
-			array(
-				'name' => 'templates[]',
-				'objectName' => 'templates',
-				'ignored' => $ignoredTemplates
-			)
-		)
-	)
-);
+$newTemplateTable->addRow(array(new CMultiSelect(array(
+	'name' => 'templates[]',
+	'objectName' => 'templates',
+	'ignored' => $ignoredTemplates
+))));
 
-$newTemplateTable->addRow(
-	array(
-		new CSubmit('add_template', _('Add'), null, 'link_menu')
-	)
-);
+$newTemplateTable->addRow(array(new CSubmit('add_template', _('Add'), null, 'link_menu')));
 
 $tmplList->addRow(_('Link new templates'), new CDiv($newTemplateTable, 'objectgroup inlineblock border_dotted ui-corner-all'));
 
