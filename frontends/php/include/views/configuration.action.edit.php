@@ -137,10 +137,9 @@ switch ($this->data['new_condition']['conditiontype']) {
 		)), 'floatright');
 		break;
 
-	case CONDITION_TYPE_HOST_TEMPLATE:
+	case CONDITION_TYPE_TEMPLATE:
 		$rowCondition[] = new CDiv(new CMultiSelect(array(
-			'name' => 'new_condition[value]',
-			'selectedLimit' => 1,
+			'name' => 'new_condition[value][]',
 			'objectName' => 'templates',
 			'objectOptions' => array(
 				'editable' => true
@@ -151,8 +150,7 @@ switch ($this->data['new_condition']['conditiontype']) {
 
 	case CONDITION_TYPE_HOST:
 		$rowCondition[] = new CDiv(new CMultiSelect(array(
-			'name' => 'new_condition[value]',
-			'selectedLimit' => 1,
+			'name' => 'new_condition[value][]',
 			'objectName' => 'hosts',
 			'objectOptions' => array(
 				'editable' => true
@@ -162,17 +160,14 @@ switch ($this->data['new_condition']['conditiontype']) {
 		break;
 
 	case CONDITION_TYPE_TRIGGER:
-		$conditionFormList->addItem(new CVar('new_condition[value]', '0'));
-		$rowCondition[] = array(
-			new CTextBox('trigger', '', ZBX_TEXTBOX_STANDARD_SIZE, 'yes'),
-			SPACE,
-			new CButton('btn1', _('Select'),
-				"return PopUp('popup.php?writeonly=1&dstfrm=".$actionForm->getName().
-				'&dstfld1=new_condition_value&dstfld2=trigger&srctbl=triggers'.
-				"&srcfld1=triggerid&srcfld2=description');",
-				'link_menu'
-			)
-		);
+		$rowCondition[] = new CDiv(new CMultiSelect(array(
+			'name' => 'new_condition[value][]',
+			'objectName' => 'triggers',
+			'objectOptions' => array(
+				'editable' => true
+			),
+			'defaultValue' => 0
+		)), 'floatright');
 		break;
 
 	case CONDITION_TYPE_TRIGGER_NAME:
