@@ -193,7 +193,7 @@ if (CWebUser::$data['type'] != USER_TYPE_SUPER_ADMIN) {
 	$tmp_label .= SPACE._('(Only super admins can create groups)');
 	$newgroupTB->setReadonly(true);
 }
-$hostList->addRow(array(new CLabel($tmp_label, 'newgroup'), BR(), $newgroupTB), null, null, null, 'new');
+$hostList->addRow($tmp_label, $newgroupTB, null, null, 'new');
 
 if (empty($interfaces)) {
 	$script = 'hostInterfacesManager.addNew("agent");';
@@ -230,7 +230,7 @@ $buttonRow->setAttribute('id', 'agentIterfacesFooter');
 
 $ifTab->addRow($buttonRow);
 
-$hostList->addRow(_('Agent interfaces'), new CDiv($ifTab, 'border_dotted objectgroup interface-group'), false, null, 'interface-row interface-row-first');
+$hostList->addRow(_('Agent interfaces'), new CDiv($ifTab, 'border_dotted objectgroup inlineblock interface-group'), false, null, 'interface-row interface-row-first');
 
 // table for SNMP interfaces with footer
 $ifTab = new CTable(null, 'formElementTable');
@@ -247,7 +247,7 @@ $buttonRow->setAttribute('id', 'SNMPIterfacesFooter');
 
 $ifTab->addRow($buttonRow);
 
-$hostList->addRow(_('SNMP interfaces'), new CDiv($ifTab, 'border_dotted objectgroup'), false, null, 'interface-row');
+$hostList->addRow(_('SNMP interfaces'), new CDiv($ifTab, 'border_dotted inlineblock objectgroup'), false, null, 'interface-row');
 
 // table for JMX interfaces with footer
 $ifTab = new CTable(null, 'formElementTable');
@@ -262,7 +262,7 @@ $buttonRow = new CRow(array($buttonCol, $col));
 $buttonRow->setAttribute('id', 'JMXIterfacesFooter');
 $ifTab->addRow($buttonRow);
 
-$hostList->addRow(_('JMX interfaces'), new CDiv($ifTab, 'border_dotted objectgroup interface-group'), false, null, 'interface-row');
+$hostList->addRow(_('JMX interfaces'), new CDiv($ifTab, 'border_dotted objectgroup inlineblock interface-group'), false, null, 'interface-row');
 
 // table for IPMI interfaces with footer
 $ifTab = new CTable(null, 'formElementTable');
@@ -277,7 +277,7 @@ $buttonRow = new CRow(array($buttonCol, $col));
 $buttonRow->setAttribute('id', 'IPMIIterfacesFooter');
 
 $ifTab->addRow($buttonRow);
-$hostList->addRow(_('IPMI interfaces'), new CDiv($ifTab, 'border_dotted objectgroup interface-group'), false, null, 'interface-row interface-row-last');
+$hostList->addRow(_('IPMI interfaces'), new CDiv($ifTab, 'border_dotted objectgroup inlineblock interface-group'), false, null, 'interface-row interface-row-last');
 
 // Proxy
 $cmbProxy = new CComboBox('proxy_hostid', $proxy_hostid);

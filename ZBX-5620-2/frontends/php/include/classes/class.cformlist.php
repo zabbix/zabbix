@@ -52,7 +52,7 @@ class CFormList extends CDiv {
 		}
 
 		if (!is_null($description)) {
-			$this->formList->addItem(array(new CDiv($label, 'dt floatleft right'), new CDiv($description, 'dd')), $class, $id);
+			$this->formList->addItem(array(new CDiv($label, 'dt right'), new CDiv($description, 'dd')), $class, $id);
 		}
 		else {
 			$this->formList->addItem(array(new CDiv(SPACE, 'dt floatleft right'), new CDiv($label, 'dd')), $class, $id);

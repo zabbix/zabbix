@@ -115,10 +115,16 @@ a.weight_normal { font-weight: normal; }
 
 /* list */
 ul li.linear { float: left; list-style-type: none; margin-right: 2px; }
-ul.formlist { list-style-type: none; margin: 0; padding: 0; }
-ul.formlist li { padding: 2px; height: 100%; vertical-align: middle; clear: both; }
-ul.formlist li .floatleft { padding-top: 2px; }
+ul.formlist { list-style-type: none; margin: 0; padding: 0; display: table; width: 100%; }
+ul.formlist li { padding: 2px; height: 100%; vertical-align: middle; clear: both; display: table-row; }
+ul.formlist li .dt { padding-top: 2px; display: table-cell; white-space: nowrap; vertical-align: top; width: 20%; }
+ul.formlist li .dt, ul.formlist li .dd { padding: 2px 0; }
 ul.formlist .formrow .dd .checkbox  { vertical-align: middle; }
+.formrow .dt { width: 20%; }
+.formrow .dd { margin-left: 10px; }
+
+.formlist .text, .formlist textarea, .formlist .password { padding: 3px; }
+.formlist select { padding: 2px; }
 
 /* any object list inline */
 ul.objectlist { padding: 0; list-style: none; margin: 0;}
