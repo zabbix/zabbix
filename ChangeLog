@@ -72,6 +72,8 @@ A.F.I...S. [ZBXNEXT-1186] increased length to 2048 characters of expression fiel
 ........S. [ZBXNEXT-1663] added support for notification macros {TRIGGER.NAME.ORIG}, {ITEM.NAME.ORIG}, {ITEM.KEY.ORIG} (dimir)
 
 Bug fixes:
+..F....... [ZBX-6642] fixed not being able to use web items in plain text screen elements (Pavels)
+..F....... [ZBX-6642] fixed disabled items not being displayed in screen element item selection pop ups (Pavels)
 ..F....... [ZBX-6654] fixed inconsistent column order in the item prototype list (Ivo)
 A......... [ZBX-6644] fixed sorting by history and trends fields in itemprototype.get API (Ivo)
 ..F....... [ZBX-6631] made the "Debug" link available for guest users (Pavels)
