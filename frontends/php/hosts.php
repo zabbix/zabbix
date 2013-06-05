@@ -245,9 +245,9 @@ elseif (isset($_REQUEST['go']) && $_REQUEST['go'] == 'massupdate' && isset($_REQ
 			$new_values['inventory'] = $new_values['inventory_mode'] != HOST_INVENTORY_DISABLED ? get_request('host_inventory', array()) : array();
 		}
 
-		$templates = array();
+		$templateIds = array();
 		if (isset($visible['template_table'])) {
-			$templates = $_REQUEST['templates'];
+			$templateIds = $_REQUEST['templates'];
 		}
 
 		// add new or existing host groups
@@ -314,10 +314,10 @@ elseif (isset($_REQUEST['go']) && $_REQUEST['go'] == 'massupdate' && isset($_REQ
 			if (isset($_REQUEST['mass_clear_tpls'])) {
 				$host_templates = API::Template()->get(array('hostids' => $hostids));
 				$host_templateids = zbx_objectValues($host_templates, 'templateid');
-				$templates_to_del = array_diff($host_templateids, $tplids);
+				$templates_to_del = array_diff($host_templateids, $templateIds);
 				$hosts['templates_clear'] = zbx_toObject($templates_to_del, 'templateid');
 			}
-			$hosts['templates'] = $templates;
+			$hosts['templates'] = $templateIds;
 		}
 
 		$result = API::Host()->massUpdate(array_merge($hosts, $new_values));
@@ -326,8 +326,8 @@ elseif (isset($_REQUEST['go']) && $_REQUEST['go'] == 'massupdate' && isset($_REQ
 		}
 
 		$add = array();
-		if (!empty($templates) && isset($visible['template_table'])) {
-			$add['templates'] = $templates;
+		if (!empty($templateIds) && isset($visible['template_table'])) {
+			$add['templates'] = $templateIds;
 		}
 
 		// add new host groups
@@ -361,10 +361,6 @@ elseif (isset($_REQUEST['go']) && $_REQUEST['go'] == 'massupdate' && isset($_REQ
 	unset($_REQUEST['save']);
 }
 elseif (isset($_REQUEST['save'])) {
-	if (!count(get_accessible_nodes_by_user(CWebUser::$data, PERM_READ_WRITE, PERM_RES_IDS_ARRAY))) {
-		access_deny();
-	}
-
 	try {
 		DBstart();
 
@@ -670,6 +666,22 @@ if ($_REQUEST['go'] == 'massupdate' && isset($_REQUEST['hosts'])) {
 	if ($data['inventory_mode'] != HOST_INVENTORY_DISABLED) {
 		$data['inventories'] = getHostInventories();
 		$data['inventories'] = zbx_toHash($data['inventories'], 'db_field');
+	}
+
+	// get templates data
+	$data['linkedTemplates'] = null;
+	if (!empty($data['templates'])) {
+		$getLinkedTemplates = API::Template()->get(array(
+			'templateids' => $data['templates'],
+			'output' => array('templateid', 'name')
+		));
+
+		foreach ($getLinkedTemplates as $getLinkedTemplate) {
+			$data['linkedTemplates'][] = array(
+				'id' => $getLinkedTemplate['templateid'],
+				'name' => $getLinkedTemplate['name']
+			);
+		}
 	}
 
 	$hostForm = new CView('configuration.host.massupdate', $data);
