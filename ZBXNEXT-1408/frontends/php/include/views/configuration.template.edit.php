@@ -31,7 +31,7 @@ $templateid = get_request('templateid', 0);
 $host = get_request('template_name', '');
 $visiblename = get_request('visiblename', '');
 $newgroup = get_request('newgroup', '');
-$templates = get_request('templates', array());
+$templateIds = get_request('templates', array());
 $clear_templates = get_request('clear_templates', array());
 $macros = get_request('macros', array());
 
@@ -51,7 +51,7 @@ if ($templateid > 0) {
 
 	$original_templates = array();
 	foreach ($dbTemplate['parentTemplates'] as $tnum => $tpl) {
-		$original_templates[$tpl['templateid']] = $tpl['name'];
+		$original_templates[] = $tpl['templateid'];
 	}
 }
 else {
@@ -92,7 +92,7 @@ if (($templateid > 0) && !isset($_REQUEST['form_refresh'])) {
 
 	$hosts_linked_to = zbx_objectValues($hosts_linked_to, 'hostid');
 	$hosts_linked_to = zbx_toHash($hosts_linked_to, 'hostid');
-	$templates = $original_templates;
+	$templateIds = $original_templates;
 }
 else {
 	$groups = get_request('groups', array());
@@ -103,8 +103,8 @@ else {
 }
 
 $clear_templates = array_intersect($clear_templates, array_keys($original_templates));
-$clear_templates = array_diff($clear_templates, array_keys($templates));
-natcasesort($templates);
+$clear_templates = array_diff($clear_templates, array_keys($templateIds));
+natcasesort($templateIds);
 $frmHost->addVar('clear_templates', $clear_templates);
 
 // TEMPLATE WIDGET {
@@ -394,25 +394,61 @@ $divTabs->addTab('templateTab', _('Template'), $templateList);
 
 // TEMPLATES{
 $tmplList = new CFormList('tmpllist');
-foreach ($templates as $tid => $temp_name) {
-	$frmHost->addVar('templates['.$tid.']', $temp_name);
-	$tmplList->addRow($temp_name, array(
-		new CSubmit('unlink['.$tid.']', _('Unlink'), null, 'link_menu'),
-		SPACE,
-		SPACE,
-		isset($original_templates[$tid]) ? new CSubmit('unlink_and_clear['.$tid.']', _('Unlink and clear'), null, 'link_menu') : SPACE
-	));
+
+// create linked template table
+$linkedTemplateTable = new CTable(_('No templates defined.'), 'formElementTable');
+$linkedTemplateTable->attr('id', 'linkedTemplateTable');
+$linkedTemplateTable->attr('style', 'min-width: 400px;');
+$linkedTemplateTable->setHeader(array(_('Name'), _('Action')));
+
+
+$linkedTemplates = API::Template()->get(array(
+	'templateids' => $templateIds,
+	'output' => array('templateid', 'name')
+));
+
+$ignoredTemplates = array();
+foreach ($linkedTemplates as $template) {
+	$tmplList->addVar('exist_templates[]', $template['templateid']);
+
+	$linkedTemplateTable->addRow(
+		array(
+			$template['name'],
+			array(
+				new CSubmit('unlink['.$template['templateid'].']', _('Unlink'), null, 'link_menu'),
+				SPACE,
+				SPACE,
+				isset($original_templates[$template['templateid']])
+					? new CSubmit('unlink_and_clear['.$template['templateid'].']', _('Unlink and clear'), null, 'link_menu')
+					: SPACE
+			)
+		),
+		null, 'conditions_'.$template['templateid']
+	);
+
+	$ignoredTemplates[$template['templateid']] = $template['name'];
 }
 
-$tmplAdd = new CButton('add', _('Add'),
-		'return PopUp("popup.php?srctbl=templates&srcfld1=hostid&srcfld2=host'.
-				'&dstfrm='.$frmHost->getName().'&dstfld1=new_template&templated_hosts=1'.
-				'&excludeids['.$templateid.']='.$templateid.
-				url_param($templates, false, 'existed_templates').'",450,450)',
-	'link_menu'
+$tmplList->addRow(_('Linked templates'), new CDiv($linkedTemplateTable, 'objectgroup inlineblock border_dotted ui-corner-all'));
+
+// create new linked template table
+$newTemplateTable = new CTable(null, 'formElementTable');
+$newTemplateTable->attr('id', 'newTemplateTable');
+$newTemplateTable->attr('style', 'min-width: 400px;');
+
+$newTemplateTable->addRow(array(new CMultiSelect(array(
+	'name' => 'templates[]',
+	'objectName' => 'templates',
+	'ignored' => $ignoredTemplates
+))));
+
+$newTemplateTable->addRow(
+	array(
+		new CSubmit('add_template', _('Add'), null, 'link_menu')
+	)
 );
 
-$tmplList->addRow($tmplAdd, SPACE);
+$tmplList->addRow(_('Link new templates'), new CDiv($newTemplateTable, 'objectgroup inlineblock border_dotted ui-corner-all'));
 
 $divTabs->addTab('tmplTab', _('Linked templates'), $tmplList);
 // } TEMPLATES

@@ -38,6 +38,8 @@ else{
 	$page['title'] = _('Configuration of templates');
 	$page['file'] = 'templates.php';
 	$page['hist_arg'] = array('groupid');
+
+	$page['scripts'] = array('multiselect.js');
 }
 
 require_once dirname(__FILE__).'/include/page_header.php';
@@ -48,7 +50,9 @@ $fields = array(
 	'hosts'				=> array(T_ZBX_INT,	O_OPT,	P_SYS,		DB_ID, 		null),
 	'groups'			=> array(T_ZBX_INT, O_OPT,	P_SYS,		DB_ID, 		null),
 	'clear_templates'	=> array(T_ZBX_INT, O_OPT,	P_SYS,		DB_ID, 		null),
-	'templates'			=> array(T_ZBX_STR, O_OPT,	null,		null,		null),
+	'templates'			=> array(T_ZBX_INT, O_OPT,	null,		DB_ID,		null),
+	'add_template' =>	array(T_ZBX_STR, O_OPT, null,		null,	null),
+	'exist_templates' =>		array(T_ZBX_INT, O_OPT, null,		DB_ID,	null),
 	'templateid'		=> array(T_ZBX_INT,	O_OPT,	P_SYS,		DB_ID,		'isset({form})&&({form}=="update")'),
 	'template_name'		=> array(T_ZBX_STR,	O_OPT,	NOT_EMPTY,	null,		'isset({save})'),
 	'visiblename'		=> array(T_ZBX_STR,	O_OPT,	null,		null,		'isset({save})'),
@@ -115,6 +119,16 @@ if ($EXPORT_DATA) {
 /**********************************/
 /* <<<--- TEMPLATE ACTIONS --->>> */
 /**********************************/
+
+if (isset($_REQUEST['exist_templates'])) {
+	if (isset($_REQUEST['templates']) && isset($_REQUEST['add_template'])) {
+		$_REQUEST['templates'] = array_merge($_REQUEST['exist_templates'], $_REQUEST['templates']);
+	}
+	else {
+		$_REQUEST['templates'] = $_REQUEST['exist_templates'];
+	}
+}
+
 /*
  * Unlink, unlink_and_clear
  */
@@ -129,7 +143,7 @@ if (isset($_REQUEST['unlink']) || isset($_REQUEST['unlink_and_clear'])) {
 		$_REQUEST['clear_templates'] = zbx_array_merge($_REQUEST['clear_templates'], $unlink_templates);
 	}
 	foreach ($unlink_templates as $id) {
-		unset($_REQUEST['templates'][$id]);
+		unset($_REQUEST['templates'][array_search($id, $_REQUEST['templates'])]);
 	}
 }
 /*
@@ -209,8 +223,11 @@ elseif (isset($_REQUEST['save'])) {
 			}
 		}
 
-		$templates = array_keys($templates);
-		$templates = zbx_toObject($templates, 'templateid');
+		$linkedTemplates = $templates;
+		$templates = array();
+		foreach ($linkedTemplates as $templateId) {
+			$templates[] = array('templateid' => $templateId);
+		}
 		$templates_clear = zbx_toObject($templates_clear, 'templateid');
 
 		$hosts = zbx_toObject($hosts, 'hostid');
