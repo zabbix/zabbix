@@ -1,4 +1,4 @@
-﻿Changes for 2.0.7rc1
+Changes for 2.0.7rc1
 
 New features:
 A......... [ZBX-6407] improved data retrieval performance for CTrigger get() with post SQL filtering (Toms)
