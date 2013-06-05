@@ -1,4 +1,4 @@
-﻿Changes for 2.1.0
+Changes for 2.1.0
 
 New features:
 ...G...... [ZBXNEXT-367] added printing Aliases and PerfCounters when agent is run with -p option (aleksej, dimir)
