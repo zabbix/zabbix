@@ -84,14 +84,20 @@ validate_sort_and_sortorder('name', ZBX_SORT_UP);
 $_REQUEST['go'] = get_request('go', 'none');
 
 // PERMISSIONS
-if(get_request('groupid', 0) > 0){
+if (get_request('groupid', 0) > 0) {
 	$groupids = available_groups($_REQUEST['groupid'], 1);
-	if(empty($groupids)) access_deny();
+	if (empty($groupids)) {
+		access_deny();
+	}
 }
 
-if(get_request('templateid', 0) > 0){
-	$hostids = available_hosts($_REQUEST['templateid'], 1);
-	if(empty($hostids)) access_deny();
+if (get_request('templateid', 0) > 0) {
+	$options = array('templateids' => $_REQUEST['templateid'], 'editable' => 1);
+	$templates = API::Template()->get($options);
+	$templateids = zbx_objectValues($templates, 'templateid');
+	if (empty($templateids)) {
+		access_deny();
+	}
 }
 
 

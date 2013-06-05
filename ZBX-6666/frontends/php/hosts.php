@@ -119,7 +119,9 @@ if (get_request('groupid', 0) > 0) {
 	}
 }
 if (get_request('hostid', 0) > 0) {
-	$hostids = available_hosts($_REQUEST['hostid'], 1);
+	$options = array('hostids' => $_REQUEST['hostid'], 'editable' => 1);
+	$hosts = API::Host()->get($options);
+	$hostids = zbx_objectValues($hosts, 'hostid');
 	if (empty($hostids)) {
 		access_deny();
 	}
