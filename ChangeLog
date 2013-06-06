@@ -72,6 +72,7 @@ A.F.I...S. [ZBXNEXT-1186] increased length to 2048 characters of expression fiel
 ........S. [ZBXNEXT-1663] added support for notification macros {TRIGGER.NAME.ORIG}, {ITEM.NAME.ORIG}, {ITEM.KEY.ORIG} (dimir)
 
 Bug fixes:
+..F....... [ZBX-6666] fixed passing incorrect Host and Template ID directly from URL (Ivo)
 ..F....... [ZBX-6650] fixed minor layout issues for reset button and buttons in edit forms (Ivo)
 ..F....... [ZBX-6642] fixed not being able to use web items in plain text screen elements (Pavels)
 ..F....... [ZBX-6642] fixed disabled items not being displayed in screen element item selection pop ups (Pavels)
