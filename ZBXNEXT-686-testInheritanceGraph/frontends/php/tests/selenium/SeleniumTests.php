@@ -15,7 +15,7 @@
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
 require_once dirname(__FILE__).'/testGeneric.php';
@@ -75,6 +75,7 @@ require_once dirname(__FILE__).'/testFormHost.php';
 require_once dirname(__FILE__).'/testFormHostGroup.php';
 require_once dirname(__FILE__).'/testFormItem.php';
 require_once dirname(__FILE__).'/testFormTrigger.php';
+require_once dirname(__FILE__).'/testFormGraph.php';
 require_once dirname(__FILE__).'/testFormLogin.php';
 require_once dirname(__FILE__).'/testFormMap.php';
 require_once dirname(__FILE__).'/testFormUserProfile.php';
@@ -83,6 +84,7 @@ require_once dirname(__FILE__).'/testFormSysmap.php';
 require_once dirname(__FILE__).'/testFormTemplate.php';
 require_once dirname(__FILE__).'/testPageApplications.php';
 require_once dirname(__FILE__).'/testPageBrowserWarning.php';
+require_once dirname(__FILE__).'/testInheritanceItem.php';
 require_once dirname(__FILE__).'/testInheritanceGraph.php';
 require_once dirname(__FILE__).'/testTemplateInheritance.php';
 
@@ -147,6 +149,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormHostGroup');
 		$suite->addTestSuite('testFormItem');
 		$suite->addTestSuite('testFormTrigger');
+		$suite->addTestSuite('testFormGraph');
 		$suite->addTestSuite('testFormLogin');
 		$suite->addTestSuite('testFormUserProfile');
 		$suite->addTestSuite('testFormScreen');
@@ -154,6 +157,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormTemplate');
 		$suite->addTestSuite('testPageApplications');
 		$suite->addTestSuite('testPageBrowserWarning');
+		$suite->addTestSuite('testInheritanceItem');
 		$suite->addTestSuite('testInheritanceGraph');
 		$suite->addTestSuite('testTemplateInheritance');
 
