@@ -158,16 +158,17 @@ form { margin: 0; }
 .input[disabled] { color: #ACA899; cursor: default; }
 .input[disabled]:focus { text-decoration: none; border-color: #ACA899; }
 .input[disabled]:hover { text-decoration: none; border-color: #ACA899; }
-.select { -moz-box-sizing: content-box; -webkit-box-sizing: content-box; box-sizing: content-box; height: 14px; }
+.select { -moz-box-sizing: content-box; -webkit-box-sizing: content-box; box-sizing: content-box; height: 14px; line-height: 14px; }
 select[multiple="multiple"], select.openView { height: auto; }
 
 input.formlist { padding-top: 2px; padding-bottom: 2px; }
 
 input[type="button"],
 input[type="submit"],
+input[type="reset"],
 input[type="file"] { height: auto; }
-input[type="button"].formlist { margin-bottom: 1px; cursor: pointer; vertical-align: top; background: #ffffff; height: 20px; }
-input[type="submit"].formlist { margin-bottom: 1px; cursor: pointer; height: 20px; }
+input[type="button"].formlist { vertical-align: top; margin-bottom: 1px; cursor: pointer; background: #ffffff; height: 20px; }
+input[type="submit"].formlist { vertical-align: top; margin-bottom: 1px; cursor: pointer; height: 20px; }
 input[type="button"].input[disabled].formlist,
 input[type="submit"].input[disabled].formlist { cursor: default; }
 input.jqueryinput,
@@ -555,6 +556,8 @@ table.right_table tr td.deny select { color: #CC0000; width: 250px; }
 
 /* graph */
 table.graph { width: 100%; text-align: center; }
+#graphTab input[type="button"].formlist { margin-top: 1px; }
+doesnotexist:-o-prefocus, #graphTab .formlist select { padding-top: 1px; padding-bottom: 3px; } /* opera */
 
 /* menu */
 table.menu { height: 2.8em; }
