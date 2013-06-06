@@ -86,16 +86,17 @@ $_REQUEST['go'] = get_request('go', 'none');
 // PERMISSIONS
 if (get_request('groupid', 0) > 0) {
 	$groupids = available_groups($_REQUEST['groupid'], 1);
-	if (empty($groupids)) {
+	if (!$groupids) {
 		access_deny();
 	}
 }
 
 if (get_request('templateid', 0) > 0) {
-	$options = array('templateids' => $_REQUEST['templateid'], 'editable' => 1);
-	$templates = API::Template()->get($options);
-	$templateids = zbx_objectValues($templates, 'templateid');
-	if (empty($templateids)) {
+	$templates = API::Template()->get(array(
+		'templateids' => $_REQUEST['templateid'],
+		'editable' => 1
+	));
+	if (!$templates) {
 		access_deny();
 	}
 }
