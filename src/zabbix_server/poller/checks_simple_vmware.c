@@ -74,6 +74,7 @@ typedef struct
 	char			*password;
 	char			*events;
 	zbx_vector_ptr_t	hvs;
+	zbx_vector_ptr_t	clusters;
 	int			lastcheck;
 }
 zbx_vcenter_t;
@@ -104,6 +105,14 @@ typedef struct
 	char			*status_ex;
 }
 zbx_vm_t;
+
+typedef struct
+{
+	char			*uuid;
+	char			*status;
+	char			*vmlist;
+}
+zbx_cluster_t;
 
 static size_t	WRITEFUNCTION2(void *ptr, size_t size, size_t nmemb, void *userdata)
 {
@@ -491,6 +500,228 @@ out:
 
 /******************************************************************************
  *                                                                            *
+ * Function: vcenter_clusterids_get                                           *
+ *                                                                            *
+ * Purpose: populate array of guest VMs                                       *
+ *                                                                            *
+ * Parameters: easyhandle - [IN] CURL easy handle                             *
+ *             clusterids - [OUT] list of cluster names                       *
+ *                                                                            *
+ * Return: Upon successful completion the function return SUCCEED.            *
+ *         Otherwise, FAIL is returned.                                       *
+ *                                                                            *
+ ******************************************************************************/
+static int	vcenter_clusterids_get(CURL *easyhandle, zbx_vector_str_t *clusterids, char **error)
+{
+#	define ZBX_POST_VCENTER_CLUSTER								\
+		ZBX_POST_VSPHERE_HEADER								\
+		"<ns0:RetrievePropertiesEx xsi:type=\"ns0:RetrievePropertiesExRequestType\">"	\
+			"<ns0:_this type=\"PropertyCollector\">propertyCollector</ns0:_this>"	\
+			"<ns0:specSet>"								\
+				"<ns0:propSet>"							\
+					"<ns0:type>ClusterComputeResource</ns0:type>"		\
+					"<ns0:pathSet>name</ns0:pathSet>"			\
+				"</ns0:propSet>"						\
+				"<ns0:objectSet>"						\
+					"<ns0:obj type=\"Folder\">group-d1</ns0:obj>"		\
+					"<ns0:skip>false</ns0:skip>"				\
+					"<ns0:selectSet xsi:type=\"ns0:TraversalSpec\">"	\
+						"<ns0:name>visitFolders</ns0:name>"		\
+						"<ns0:type>Folder</ns0:type>"			\
+						"<ns0:path>childEntity</ns0:path>"		\
+						"<ns0:skip>false</ns0:skip>"			\
+						"<ns0:selectSet>"				\
+							"<ns0:name>visitFolders</ns0:name>"	\
+						"</ns0:selectSet>"				\
+						"<ns0:selectSet>"				\
+							"<ns0:name>dcToHf</ns0:name>"		\
+						"</ns0:selectSet>"				\
+						"<ns0:selectSet>"				\
+							"<ns0:name>dcToVmf</ns0:name>"		\
+						"</ns0:selectSet>"				\
+						"<ns0:selectSet>"				\
+							"<ns0:name>crToH</ns0:name>"		\
+						"</ns0:selectSet>"				\
+						"<ns0:selectSet>"				\
+							"<ns0:name>crToRp</ns0:name>"		\
+						"</ns0:selectSet>"				\
+						"<ns0:selectSet>"				\
+							"<ns0:name>dcToDs</ns0:name>"		\
+						"</ns0:selectSet>"				\
+						"<ns0:selectSet>"				\
+							"<ns0:name>hToVm</ns0:name>"		\
+						"</ns0:selectSet>"				\
+						"<ns0:selectSet>"				\
+							"<ns0:name>rpToVm</ns0:name>"		\
+						"</ns0:selectSet>"				\
+					"</ns0:selectSet>"					\
+					"<ns0:selectSet xsi:type=\"ns0:TraversalSpec\">"	\
+						"<ns0:name>dcToVmf</ns0:name>"			\
+						"<ns0:type>Datacenter</ns0:type>"		\
+						"<ns0:path>vmFolder</ns0:path>"			\
+						"<ns0:skip>false</ns0:skip>"			\
+						"<ns0:selectSet>"				\
+							"<ns0:name>visitFolders</ns0:name>"	\
+						"</ns0:selectSet>"				\
+					"</ns0:selectSet>"					\
+					"<ns0:selectSet xsi:type=\"ns0:TraversalSpec\">"	\
+						"<ns0:name>dcToDs</ns0:name>"			\
+						"<ns0:type>Datacenter</ns0:type>"		\
+						"<ns0:path>datastore</ns0:path>"		\
+						"<ns0:skip>false</ns0:skip>"			\
+						"<ns0:selectSet>"				\
+							"<ns0:name>visitFolders</ns0:name>"	\
+						"</ns0:selectSet>"				\
+					"</ns0:selectSet>"					\
+					"<ns0:selectSet xsi:type=\"ns0:TraversalSpec\">"	\
+						"<ns0:name>dcToHf</ns0:name>"			\
+						"<ns0:type>Datacenter</ns0:type>"		\
+						"<ns0:path>hostFolder</ns0:path>"		\
+						"<ns0:skip>false</ns0:skip>"			\
+						"<ns0:selectSet>"				\
+							"<ns0:name>visitFolders</ns0:name>"	\
+						"</ns0:selectSet>"				\
+					"</ns0:selectSet>"					\
+					"<ns0:selectSet xsi:type=\"ns0:TraversalSpec\">"	\
+						"<ns0:name>crToH</ns0:name>"			\
+						"<ns0:type>ComputeResource</ns0:type>"		\
+						"<ns0:path>host</ns0:path>"			\
+						"<ns0:skip>false</ns0:skip>"			\
+					"</ns0:selectSet>"					\
+					"<ns0:selectSet xsi:type=\"ns0:TraversalSpec\">"	\
+						"<ns0:name>crToRp</ns0:name>"			\
+						"<ns0:type>ComputeResource</ns0:type>"		\
+						"<ns0:path>resourcePool</ns0:path>"		\
+						"<ns0:skip>false</ns0:skip>"			\
+						"<ns0:selectSet>"				\
+							"<ns0:name>rpToRp</ns0:name>"		\
+						"</ns0:selectSet>"				\
+						"<ns0:selectSet>"				\
+							"<ns0:name>rpToVm</ns0:name>"		\
+						"</ns0:selectSet>"				\
+					"</ns0:selectSet>"					\
+					"<ns0:selectSet xsi:type=\"ns0:TraversalSpec\">"	\
+						"<ns0:name>rpToRp</ns0:name>"			\
+						"<ns0:type>ResourcePool</ns0:type>"		\
+						"<ns0:path>resourcePool</ns0:path>"		\
+						"<ns0:skip>false</ns0:skip>"			\
+						"<ns0:selectSet>"				\
+							"<ns0:name>rpToRp</ns0:name>"		\
+						"</ns0:selectSet>"				\
+						"<ns0:selectSet>"				\
+							"<ns0:name>rpToVm</ns0:name>"		\
+						"</ns0:selectSet>"				\
+					"</ns0:selectSet>"					\
+					"<ns0:selectSet xsi:type=\"ns0:TraversalSpec\">"	\
+						"<ns0:name>hToVm</ns0:name>"			\
+						"<ns0:type>HostSystem</ns0:type>"		\
+						"<ns0:path>vm</ns0:path>"			\
+						"<ns0:skip>false</ns0:skip>"			\
+						"<ns0:selectSet>"				\
+							"<ns0:name>visitFolders</ns0:name>"	\
+						"</ns0:selectSet>"				\
+					"</ns0:selectSet>"					\
+					"<ns0:selectSet xsi:type=\"ns0:TraversalSpec\">"	\
+						"<ns0:name>rpToVm</ns0:name>"			\
+						"<ns0:type>ResourcePool</ns0:type>"		\
+						"<ns0:path>vm</ns0:path>"			\
+						"<ns0:skip>false</ns0:skip>"			\
+					"</ns0:selectSet>"					\
+				"</ns0:objectSet>"						\
+			"</ns0:specSet>"							\
+			"<ns0:options/>"							\
+		"</ns0:RetrievePropertiesEx>"							\
+		ZBX_POST_VSPHERE_FOOTER
+
+	const char	*__function_name = "vcenter_clusterids_get";
+
+	int		err, o, ret = FAIL;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, o = CURLOPT_POSTFIELDS, ZBX_POST_VCENTER_CLUSTER)))
+	{
+		*error = zbx_dsprintf(*error, "Cannot set cURL option [%d]: %s", o, curl_easy_strerror(err));
+		goto out;
+	}
+
+	page.offset = 0;
+
+	if (CURLE_OK != (err = curl_easy_perform(easyhandle)))
+	{
+		*error = zbx_strdup(*error, curl_easy_strerror(err));
+		goto out;
+	}
+
+	if (NULL != (*error = read_xml_value(page.data, ZBX_XPATH_LN1("faultstring"))))
+		goto out;
+
+	read_xml_values(page.data, "//*[@type='ClusterComputeResource']", clusterids);
+
+	ret = SUCCEED;
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+
+	return ret;
+}
+
+static int	vcenter_cluster_status_get(CURL *easyhandle, const char *clusterid, char **status, char **error)
+{
+#	define ZBX_POST_VMWARE_CLUSTER_STATUS 								\
+		ZBX_POST_VSPHERE_HEADER									\
+		"<ns0:RetrievePropertiesEx>"								\
+			"<ns0:_this type=\"PropertyCollector\">propertyCollector</ns0:_this>"		\
+			"<ns0:specSet>"									\
+				"<ns0:propSet>"								\
+					"<ns0:type>ClusterComputeResource</ns0:type>"			\
+					"<ns0:all>false</ns0:all>"					\
+					"<ns0:pathSet>summary</ns0:pathSet>"				\
+				"</ns0:propSet>"							\
+				"<ns0:objectSet>"							\
+					"<ns0:obj type=\"ClusterComputeResource\">%s</ns0:obj>"		\
+				"</ns0:objectSet>"							\
+			"</ns0:specSet>"								\
+			"<ns0:options></ns0:options>"							\
+		"</ns0:RetrievePropertiesEx>"								\
+		enter_cluster_status_getBX_POST_VSPHERE_FOOTER
+
+	const char	*__function_name = "vcenter_cluster_status_get";
+
+	int		err, o, ret = FAIL;
+	char		tmp[MAX_STRING_LEN];
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() clusterid:'%s'", __function_name, clusterid);
+
+	zbx_snprintf(tmp, sizeof(tmp), ZBX_POST_VMWARE_CLUSTER_STATUS, clusterid);
+
+	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, o = CURLOPT_POSTFIELDS, tmp)))
+	{
+		*error = zbx_dsprintf(*error, "Cannot set cURL option [%d]: %s", o, curl_easy_strerror(err));
+		goto out;
+	}
+
+	page.offset = 0;
+
+	if (CURLE_OK != (err = curl_easy_perform(easyhandle)))
+	{
+		*error = zbx_strdup(*error, curl_easy_strerror(err));
+		goto out;
+	}
+
+	if (NULL != (*error = read_xml_value(page.data, ZBX_XPATH_LN1("faultstring"))))
+		goto out;
+
+	*status = zbx_strdup(*status, page.data);
+
+	ret = SUCCEED;
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: vmware_hv_guestvmids_get                                         *
  *                                                                            *
  * Purpose: populate array of guest VMs                                       *
@@ -825,18 +1056,35 @@ static zbx_vm_t	*vm_get(zbx_vector_ptr_t *vms, const char *uuid)
 	return NULL;
 }
 
+static zbx_cluster_t	*cluster_get(zbx_vector_ptr_t *clusters, const char *uuid)
+{
+	zbx_cluster_t	*cluster;
+	int		i;
+
+	for (i = 0; i < clusters->values_num; i++)
+	{
+		cluster = (zbx_cluster_t *)clusters->values[i];
+
+		if (0 == strcmp(cluster->uuid, uuid))
+			return cluster;
+	}
+
+	return NULL;
+}
+
 static int	vcenter_update(const char *url, const char *username, const char *password, char **error)
 {
 	const char		*__function_name = "vcenter_update";
 
 	CURL			*easyhandle = NULL;
 	int			o, i, j, err, ret = FAIL;
-	zbx_vector_str_t	guesthvids, guestvmids;
+	zbx_vector_str_t	guesthvids, guestvmids, clusterids;
 	struct curl_slist	*headers = NULL;
 	zbx_vcenter_t		*vcenter;
 	zbx_hv_t		*hv;
 	zbx_vm_t		*vm;
-	char			*uuid, *event_session = 0;
+	zbx_cluster_t		*cluster;
+	char			*uuid, *event_session = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() url:'%s' username:'%s' password:'%s'",
 			__function_name, url, username, password);
@@ -856,6 +1104,7 @@ static int	vcenter_update(const char *url, const char *username, const char *pas
 		vcenter->events = NULL;
 		vcenter->lastcheck = 0;
 		zbx_vector_ptr_create(&vcenter->hvs);
+		zbx_vector_ptr_create(&vcenter->clusters);
 
 		zbx_vector_ptr_append(&vcenters, vcenter);
 	}
@@ -876,6 +1125,7 @@ static int	vcenter_update(const char *url, const char *username, const char *pas
 
 	zbx_vector_str_create(&guesthvids);
 	zbx_vector_str_create(&guestvmids);
+	zbx_vector_str_create(&clusterids);
 
 	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, o = CURLOPT_HTTPHEADER, headers)))
 	{
@@ -952,11 +1202,34 @@ static int	vcenter_update(const char *url, const char *username, const char *pas
 	if (SUCCEED != vmware_events_get(easyhandle, event_session, &vcenter->events, error, ZBX_VMWARE_FLAG_VCENTER))
 		goto clean;
 
+	if (SUCCEED != vcenter_clusterids_get(easyhandle, &clusterids, error))
+		goto clean;
+
+	for (i = 0; i < clusterids.values_num; i++)
+	{
+		if (NULL == (cluster = cluster_get(&vcenter->clusters, clusterids.values[i])))
+		{
+			cluster = zbx_malloc(NULL, sizeof(zbx_cluster_t));
+			cluster->uuid = zbx_strdup(NULL, clusterids.values[i]);
+			cluster->status = NULL;
+			cluster->vmlist = NULL;
+
+			zbx_vector_ptr_append(&vcenter->clusters, cluster);
+		}
+
+		if (SUCCEED != vcenter_cluster_status_get(easyhandle, clusterids.values[i], &cluster->status, error))
+			goto clean;
+	}
+
 	vcenter->lastcheck = time(NULL);
 
 	ret = SUCCEED;
 clean:
 	zbx_free(event_session);
+
+	for (i = 0; i < clusterids.values_num; i++)
+		zbx_free(clusterids.values[i]);
+	zbx_vector_str_destroy(&clusterids);
 
 	for (i = 0; i < guesthvids.values_num; i++)
 		zbx_free(guesthvids.values[i]);
@@ -1397,6 +1670,100 @@ static int	get_vcenter_hv_stat(AGENT_REQUEST *request, int opt, const char *xpat
 			SET_UI64_RESULT(result, value_uint64_sum);
 			break;
 	}
+
+	return SYSINFO_RET_OK;
+}
+
+int	check_vcenter_cluster_discovery(AGENT_REQUEST *request, AGENT_RESULT *result)
+{
+	struct zbx_json	j;
+	int		i;
+	char		*url, *username, *password, *error = NULL;
+	zbx_vcenter_t	*vcenter = NULL;
+	zbx_cluster_t	*cluster = NULL;
+
+	if (3 != request->nparam)
+		return SYSINFO_RET_FAIL;
+
+	url = get_rparam(request, 0);
+	username = get_rparam(request, 1);
+	password = get_rparam(request, 2);
+
+	if ('\0' == *url || '\0' == *username)
+		return SYSINFO_RET_FAIL;
+
+	if (SUCCEED != vcenter_update(url, username, password, &error))
+	{
+		SET_MSG_RESULT(result, error);
+		return SYSINFO_RET_FAIL;
+	}
+
+	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
+	zbx_json_addarray(&j, ZBX_PROTO_TAG_DATA);
+
+	if (NULL != (vcenter = vcenter_get(url, username, password)))
+	{
+		for (i = 0; i < vcenter->clusters.values_num; i++)
+		{
+			cluster = (zbx_cluster_t *)vcenter->clusters.values[i];
+
+			zbx_json_addobject(&j, NULL);
+			zbx_json_addstring(&j, "{#CLUSTER.NAME}", cluster->uuid, ZBX_JSON_TYPE_STRING);
+			zbx_json_close(&j);
+		}
+	}
+
+	zbx_json_close(&j);
+
+	SET_STR_RESULT(result, zbx_strdup(NULL, j.buffer));
+
+	zbx_json_free(&j);
+
+	return SYSINFO_RET_OK;
+}
+
+int	check_vcenter_cluster_status(AGENT_REQUEST *request, AGENT_RESULT *result)
+{
+	char		*url, *username, *password, *clusterid, *status, *error = NULL;
+	zbx_vcenter_t	*vcenter = NULL;
+	zbx_cluster_t	*cluster = NULL;
+
+	if (4 != request->nparam)
+		return SYSINFO_RET_FAIL;
+
+	url = get_rparam(request, 0);
+	username = get_rparam(request, 1);
+	password = get_rparam(request, 2);
+	clusterid = get_rparam(request, 3);
+
+	if ('\0' == *url || '\0' == *username || '\0' == *clusterid)
+		return SYSINFO_RET_FAIL;
+
+	if (SUCCEED != vcenter_update(url, username, password, &error))
+	{
+		SET_MSG_RESULT(result, error);
+		return SYSINFO_RET_FAIL;
+	}
+
+	if (NULL == (vcenter = vcenter_get(url, username, password)))
+		return SYSINFO_RET_FAIL;
+
+	if (NULL == (cluster = cluster_get(&vcenter->clusters, clusterid)))
+		return SYSINFO_RET_FAIL;
+
+	if (NULL == (status = read_xml_value(cluster->status, ZBX_XPATH_LN2("val", "overallStatus"))))
+		return SYSINFO_RET_FAIL;
+
+	if (0 == strcmp(status, "gray"))
+		SET_UI64_RESULT(result, 0);
+	else if (0 == strcmp(status, "green"))
+		SET_UI64_RESULT(result, 1);
+	else if (0 == strcmp(status, "yellow"))
+		SET_UI64_RESULT(result, 2);
+	else if (0 == strcmp(status, "red"))
+		SET_UI64_RESULT(result, 3);
+	else
+		return SYSINFO_RET_FAIL;
 
 	return SYSINFO_RET_OK;
 }

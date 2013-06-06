@@ -24,6 +24,9 @@
 #if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
 #include "sysinfo.h"
 
+int	check_vcenter_cluster_discovery(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	check_vcenter_cluster_status(AGENT_REQUEST *request, AGENT_RESULT *result);
+
 int	check_vcenter_eventlog(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	check_vcenter_hv_cpu_usage(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	check_vcenter_hv_discovery(AGENT_REQUEST *request, AGENT_RESULT *result);
