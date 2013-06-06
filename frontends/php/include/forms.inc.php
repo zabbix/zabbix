@@ -562,7 +562,7 @@
 						),
 						'data' => $hostFilterData
 				))
-			)),
+			), 'col1'),
 			new CCol($updateIntervalLabel, 'label'),
 			new CCol($updateIntervalInput),
 			new CCol($dataTypeLabel, 'label'),
@@ -582,7 +582,7 @@
 						.', 550, 450, "application");',
 					'A'
 				)
-			)),
+			), 'col1'),
 			new CCol(array($snmpCommunityLabel, $snmpSecurityLabel), 'label'),
 			new CCol(array($snmpCommunityField, $snmpSecurityField)),
 			new CCol(array(bold(_('Keep history')), SPACE._('(in days)').NAME_DELIMITER), 'label'),
@@ -597,7 +597,7 @@
 		// row 4
 		$table->addRow(array(
 			new CCol(array(bold(_('Name')), SPACE._('like').NAME_DELIMITER), 'label'),
-			new CCol(new CTextBox('filter_name', $filter_name, ZBX_TEXTBOX_FILTER_SIZE)),
+			new CCol(new CTextBox('filter_name', $filter_name, ZBX_TEXTBOX_FILTER_SIZE), 'col1'),
 			new CCol($snmpOidLabel, 'label'),
 			new CCol($snmpOidField),
 			new CCol(array(bold(_('Keep trends')), SPACE._('(in days)').NAME_DELIMITER), 'label'),
@@ -612,7 +612,7 @@
 		// row 5
 		$table->addRow(array(
 			new CCol(array(bold(_('Key')), SPACE._('like').NAME_DELIMITER), 'label'),
-			new CCol(new CTextBox('filter_key', $filter_key, ZBX_TEXTBOX_FILTER_SIZE)),
+			new CCol(new CTextBox('filter_key', $filter_key, ZBX_TEXTBOX_FILTER_SIZE), 'col1'),
 			new CCol($portLabel, 'label'),
 			new CCol($portField),
 			new CCol(null, 'label'),
