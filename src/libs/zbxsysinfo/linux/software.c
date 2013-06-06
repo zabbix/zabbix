@@ -17,8 +17,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#ifdef HAVE_SYS_UTSNAME_H
+#	include <sys/utsname.h>
+#endif
+
 #include "sysinfo.h"
-#include <sys/utsname.h>
 #include "zbxalgo.h"
 #include "zbxexec.h"
 #include "cfg.h"
