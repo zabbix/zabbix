@@ -167,12 +167,8 @@ input[type="button"],
 input[type="submit"],
 input[type="reset"],
 input[type="file"] { height: auto; }
-input[type="button"].formlist { margin-bottom: 1px; cursor: pointer; background: #ffffff; height: 20px; }
-input[type="submit"].formlist { margin-bottom: 1px; cursor: pointer; height: 20px; }
-@-moz-document url-prefix() { /* FF specific submit and button styles */
-	input[type="button"].formlist,
-	input[type="submit"].formlist { vertical-align: top; }
-}
+input[type="button"].formlist { vertical-align: top; margin-bottom: 1px; cursor: pointer; background: #ffffff; height: 20px; }
+input[type="submit"].formlist { vertical-align: top; margin-bottom: 1px; cursor: pointer; height: 20px; }
 input[type="button"].input[disabled].formlist,
 input[type="submit"].input[disabled].formlist { cursor: default; }
 input.jqueryinput,
