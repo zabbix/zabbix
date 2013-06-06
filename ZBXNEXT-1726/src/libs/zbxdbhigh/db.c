@@ -2476,3 +2476,50 @@ int	DBfield_exists(const char *table_name, const char *field_name)
 
 	return ret;
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Function: get_nodeid_by_id                                                 *
+ *                                                                            *
+ * Purpose: Get Node ID by resource ID                                        *
+ *                                                                            *
+ * Return value: Node ID                                                      *
+ *                                                                            *
+ * Author: Alexei Vladishev                                                   *
+ *                                                                            *
+ ******************************************************************************/
+int	get_nodeid_by_id(zbx_uint64_t id)
+{
+	return (int)(id / ZBX_DM_MAX_HISTORY_IDS);
+}
+
+void	DBexecute_multiple_query(const char *query, const char *field_name, zbx_vector_uint64_t *ids)
+{
+#define ZBX_MAX_IDS	950
+	char	*sql = NULL;
+	size_t	sql_alloc = ZBX_KIBIBYTE, sql_offset = 0;
+	int	i;
+
+	sql = zbx_malloc(sql, sql_alloc);
+
+	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	for (i = 0; i < ids->values_num; i += ZBX_MAX_IDS)
+	{
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, query);
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, field_name,
+				&ids->values[i], MIN(ZBX_MAX_IDS, ids->values_num - i));
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
+
+		DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+	}
+
+	if (sql_offset > 16)	/* in ORACLE always present begin..end; */
+	{
+		DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+		DBexecute("%s", sql);
+	}
+
+	zbx_free(sql);
+}

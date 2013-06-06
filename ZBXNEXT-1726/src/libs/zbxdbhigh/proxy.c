@@ -1379,7 +1379,9 @@ static int	proxy_get_history_data(struct zbx_json *j, zbx_uint64_t *lastid)
 
 		if (string_buffer_alloc < string_buffer_offset + len1 + len2)
 		{
-			string_buffer_alloc += ZBX_KIBIBYTE;
+			while (string_buffer_alloc < string_buffer_offset + len1 + len2)
+				string_buffer_alloc += ZBX_KIBIBYTE;
+
 			string_buffer = zbx_realloc(string_buffer, string_buffer_alloc);
 		}
 

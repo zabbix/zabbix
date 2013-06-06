@@ -273,6 +273,10 @@ function clearAllForm(form) {
 		areas[i].innerHTML = '';
 	}
 
+	jQuery('.multiselect').each(function() {
+		jQuery(this).multiSelect.clean(jQuery(this).attr('id'));
+	});
+
 	return true;
 }
 

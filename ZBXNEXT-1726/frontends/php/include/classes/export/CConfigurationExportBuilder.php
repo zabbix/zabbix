@@ -70,7 +70,7 @@ class CConfigurationExportBuilder {
 				'discovery_rules' => $this->formatDiscoveryRules($template['discoveryRules']),
 				'macros' => $this->formatMacros($template['macros']),
 				'templates' => $this->formatTemplateLinkage($template['parentTemplates']),
-				'screens' => $this->formatScreens($template['screens']),
+				'screens' => $this->formatScreens($template['screens'])
 			);
 		}
 	}
@@ -147,7 +147,7 @@ class CConfigurationExportBuilder {
 			$this->data['images'][] = array(
 				'name' => $image['name'],
 				'imagetype' => $image['imagetype'],
-				'encodedImage' => $image['encodedImage'],
+				'encodedImage' => $image['encodedImage']
 			);
 		}
 	}
@@ -172,6 +172,7 @@ class CConfigurationExportBuilder {
 				'expandproblem' => $map['expandproblem'],
 				'markelements' => $map['markelements'],
 				'show_unack' => $map['show_unack'],
+				'severity_min' => $map['severity_min'],
 				'grid_size' => $map['grid_size'],
 				'grid_show' => $map['grid_show'],
 				'grid_align' => $map['grid_align'],
@@ -285,13 +286,14 @@ class CConfigurationExportBuilder {
 				'description' => $discoveryRule['description'],
 				'item_prototypes' => $this->formatItems($discoveryRule['itemPrototypes']),
 				'trigger_prototypes' => $this->formatTriggers($discoveryRule['triggerPrototypes']),
-				'graph_prototypes' => $this->formatGraphs($discoveryRule['graphPrototypes']),
+				'graph_prototypes' => $this->formatGraphs($discoveryRule['graphPrototypes'])
 			);
 			if (isset($discoveryRule['interface_ref'])) {
 				$data['interface_ref'] = $discoveryRule['interface_ref'];
 			}
 			$result[] = $data;
 		}
+
 		return $result;
 	}
 
@@ -356,9 +358,10 @@ class CConfigurationExportBuilder {
 
 		foreach ($templates as $template) {
 			$result[] = array(
-				'name' => $template['host'],
+				'name' => $template['host']
 			);
 		}
+
 		return $result;
 	}
 
@@ -381,7 +384,7 @@ class CConfigurationExportBuilder {
 				'status' => $trigger['status'],
 				'priority' => $trigger['priority'],
 				'description' => $trigger['comments'],
-				'type' => $trigger['type'],
+				'type' => $trigger['type']
 			);
 			if (isset($trigger['dependencies'])) {
 				$tr['dependencies'] = $this->formatDependencies($trigger['dependencies']);
@@ -389,6 +392,7 @@ class CConfigurationExportBuilder {
 
 			$result[] = $tr;
 		}
+
 		return $result;
 	}
 
@@ -414,6 +418,7 @@ class CConfigurationExportBuilder {
 				'interface_ref' => $interface['interface_ref']
 			);
 		}
+
 		return $result;
 	}
 
@@ -433,6 +438,7 @@ class CConfigurationExportBuilder {
 				'name' => $group['name']
 			);
 		}
+
 		return $result;
 	}
 
@@ -484,13 +490,14 @@ class CConfigurationExportBuilder {
 				'description' => $item['description'],
 				'inventory_link' => $item['inventory_link'],
 				'applications' => $this->formatApplications($item['applications']),
-				'valuemap' => $item['valuemap'],
+				'valuemap' => $item['valuemap']
 			);
 			if (isset($item['interface_ref'])) {
 				$data['interface_ref'] = $item['interface_ref'];
 			}
 			$result[] = $data;
 		}
+
 		return $result;
 	}
 
@@ -510,6 +517,7 @@ class CConfigurationExportBuilder {
 				'name' => $application['name']
 			);
 		}
+
 		return $result;
 	}
 
@@ -530,6 +538,7 @@ class CConfigurationExportBuilder {
 				'value' => $macro['value']
 			);
 		}
+
 		return $result;
 	}
 
@@ -552,6 +561,7 @@ class CConfigurationExportBuilder {
 				'screen_items' => $this->formatScreenItems($screen['screenitems'])
 			);
 		}
+
 		return $result;
 	}
 
@@ -571,6 +581,7 @@ class CConfigurationExportBuilder {
 				'expression' => $dependency['expression']
 			);
 		}
+
 		return $result;
 	}
 
@@ -604,6 +615,7 @@ class CConfigurationExportBuilder {
 				'application' => $screenItem['application']
 			);
 		}
+
 		return $result;
 	}
 
@@ -628,6 +640,7 @@ class CConfigurationExportBuilder {
 				'item'=> $graphItem['itemid']
 			);
 		}
+
 		return $result;
 	}
 
@@ -647,6 +660,7 @@ class CConfigurationExportBuilder {
 				'elementtype' => $url['elementtype']
 			);
 		}
+
 		return $result;
 	}
 
@@ -663,9 +677,10 @@ class CConfigurationExportBuilder {
 		foreach ($urls as $url) {
 			$result[] = array(
 				'name' => $url['name'],
-				'url' => $url['url'],
+				'url' => $url['url']
 			);
 		}
+
 		return $result;
 	}
 
@@ -689,6 +704,7 @@ class CConfigurationExportBuilder {
 				'linktriggers' => $this->formatMapLinkTriggers($link['linktriggers'])
 			);
 		}
+
 		return $result;
 	}
 
@@ -709,6 +725,7 @@ class CConfigurationExportBuilder {
 				'trigger' => $linktrigger['triggerid']
 			);
 		}
+
 		return $result;
 	}
 
@@ -743,6 +760,7 @@ class CConfigurationExportBuilder {
 				'urls' => $this->formatMapElementUrls($element['urls'])
 			);
 		}
+
 		return $result;
 	}
 }

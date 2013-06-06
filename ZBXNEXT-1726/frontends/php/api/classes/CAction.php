@@ -121,7 +121,7 @@ class CAction extends CZBXAPI {
 								' AND '.dbConditionInt('r.groupid', $userGroups).
 					' WHERE a.actionid=cc.actionid'.
 						' AND '.zbx_dbcast_2bigint('cc.value').'=hgg.hostid'.
-						' AND cc.conditiontype IN ('.CONDITION_TYPE_HOST.','.CONDITION_TYPE_HOST_TEMPLATE.')'.
+						' AND cc.conditiontype IN ('.CONDITION_TYPE_HOST.','.CONDITION_TYPE_TEMPLATE.')'.
 					' GROUP BY cc.value'.
 					' HAVING MIN(r.permission) IS NULL'.
 						' OR MIN(r.permission)='.PERM_DENY.
@@ -1237,7 +1237,7 @@ class CAction extends CZBXAPI {
 				}
 			}
 
-			$hostidsAll = $hostGroupidsAll = $useridsAll = $userGroupidsAll = array();
+			$hostIdsAll = $hostGroupIdsAll = $useridsAll = $userGroupidsAll = array();
 			switch ($operation['operationtype']) {
 				case OPERATION_TYPE_MESSAGE:
 					$userids = isset($operation['opmessage_usr']) ? zbx_objectValues($operation['opmessage_usr'], 'userid') : array();
@@ -1346,8 +1346,8 @@ class CAction extends CZBXAPI {
 						}
 					}
 
-					$hostidsAll = array_merge($hostidsAll, $hostids);
-					$hostGroupidsAll = array_merge($hostGroupidsAll, $groupids);
+					$hostIdsAll = array_merge($hostIdsAll, $hostids);
+					$hostGroupIdsAll = array_merge($hostGroupIdsAll, $groupids);
 					break;
 				case OPERATION_TYPE_GROUP_ADD:
 				case OPERATION_TYPE_GROUP_REMOVE:
@@ -1355,7 +1355,7 @@ class CAction extends CZBXAPI {
 					if (empty($groupids)) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _('Operation has no group to operate.'));
 					}
-					$hostGroupidsAll = array_merge($hostGroupidsAll, $groupids);
+					$hostGroupIdsAll = array_merge($hostGroupIdsAll, $groupids);
 					break;
 				case OPERATION_TYPE_TEMPLATE_ADD:
 				case OPERATION_TYPE_TEMPLATE_REMOVE:
@@ -1363,7 +1363,7 @@ class CAction extends CZBXAPI {
 					if (empty($templateids)) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _('Operation has no template to operate.'));
 					}
-					$hostidsAll = array_merge($hostidsAll, $templateids);
+					$hostIdsAll = array_merge($hostIdsAll, $templateids);
 					break;
 				case OPERATION_TYPE_HOST_ADD:
 				case OPERATION_TYPE_HOST_REMOVE:
@@ -1375,10 +1375,10 @@ class CAction extends CZBXAPI {
 			}
 		}
 
-		if (!API::HostGroup()->isWritable($hostGroupidsAll)) {
+		if (!API::HostGroup()->isWritable($hostGroupIdsAll)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect action operation host group. Host group does not exist or you have no access to this host group.'));
 		}
-		if (!API::Host()->isWritable($hostidsAll)) {
+		if (!API::Host()->isWritable($hostIdsAll)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect action operation host. Host does not exist or you have no access to this host.'));
 		}
 		if (!API::User()->isReadable($useridsAll)) {
@@ -1395,18 +1395,22 @@ class CAction extends CZBXAPI {
 	 * Validate conditions.
 	 *
 	 * @static
-	 * @param $conditions
+	 *
+	 * @param array $conditions
+	 * @param int   $conditions['conditiontype']
+	 * @param array $conditions['value']
+	 *
 	 * @return bool
 	 */
 	public static function validateConditions($conditions) {
 		$conditions = zbx_toArray($conditions);
 
-		$hostGroupidsAll = array();
-		$templateidsAll = array();
-		$triggeridsAll = array();
-		$hostidsAll = array();
-		$discoveryRuleidsAll = array();
-		$discoveryCheckidsAll = array();
+		$hostGroupIdsAll = array();
+		$templateIdsAll = array();
+		$triggerIdsAll = array();
+		$hostIdsAll = array();
+		$discoveryRuleIdsAll = array();
+		$proxyIdsAll = array();
 		$proxyidsAll = array();
 
 		$discoveryCheckTypes = discovery_check_type2str();
@@ -1416,27 +1420,27 @@ class CAction extends CZBXAPI {
 		foreach ($conditions as $condition) {
 			switch ($condition['conditiontype']) {
 				case CONDITION_TYPE_HOST_GROUP:
-					$hostGroupidsAll[$condition['value']] = $condition['value'];
+					$hostGroupIdsAll[$condition['value']] = $condition['value'];
 					break;
 
-				case CONDITION_TYPE_HOST_TEMPLATE:
-					$templateidsAll[$condition['value']] = $condition['value'];
+				case CONDITION_TYPE_TEMPLATE:
+					$templateIdsAll[$condition['value']] = $condition['value'];
 					break;
 
 				case CONDITION_TYPE_TRIGGER:
-					$triggeridsAll[$condition['value']] = $condition['value'];
+					$triggerIdsAll[$condition['value']] = $condition['value'];
 					break;
 
 				case CONDITION_TYPE_HOST:
-					$hostidsAll[$condition['value']] = $condition['value'];
+					$hostIdsAll[$condition['value']] = $condition['value'];
 					break;
 
 				case CONDITION_TYPE_DRULE:
-					$discoveryRuleidsAll[$condition['value']] = $condition['value'];
+					$discoveryRuleIdsAll[$condition['value']] = $condition['value'];
 					break;
 
 				case CONDITION_TYPE_DCHECK:
-					$discoveryCheckidsAll[$condition['value']] = $condition['value'];
+					$proxyIdsAll[$condition['value']] = $condition['value'];
 					break;
 
 				case CONDITION_TYPE_PROXY:
@@ -1476,6 +1480,7 @@ class CAction extends CZBXAPI {
 				case CONDITION_TYPE_MAINTENANCE:
 					// maintenance condition has no value...
 					break;
+
 				case CONDITION_TYPE_TRIGGER_NAME:
 				case CONDITION_TYPE_TRIGGER_VALUE:
 				case CONDITION_TYPE_TRIGGER_SEVERITY:
@@ -1498,22 +1503,22 @@ class CAction extends CZBXAPI {
 			}
 		}
 
-		if (!API::HostGroup()->isWritable($hostGroupidsAll)) {
+		if (!API::HostGroup()->isWritable($hostGroupIdsAll)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect action condition host group. Host group does not exist or you have no access to it.'));
 		}
-		if (!API::Host()->isWritable($hostidsAll)) {
+		if (!API::Host()->isWritable($hostIdsAll)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect action condition host. Host does not exist or you have no access to it.'));
 		}
-		if (!API::Template()->isWritable($templateidsAll)) {
+		if (!API::Template()->isWritable($templateIdsAll)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect action condition template. Template does not exist or you have no access to it.'));
 		}
-		if (!API::Trigger()->isWritable($triggeridsAll)) {
+		if (!API::Trigger()->isWritable($triggerIdsAll)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect action condition trigger. Trigger does not exist or you have no access to it.'));
 		}
-		if (!API::DRule()->isWritable($discoveryRuleidsAll)) {
+		if (!API::DRule()->isWritable($discoveryRuleIdsAll)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect action condition discovery rule. Discovery rule does not exist or you have no access to it.'));
 		}
-		if (!API::DCheck()->isWritable($discoveryCheckidsAll)) {
+		if (!API::DCheck()->isWritable($proxyIdsAll)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect action condition discovery check. Discovery check does not exist or you have no access to it.'));
 		}
 		if (!API::Proxy()->isWritable($proxyidsAll)) {
