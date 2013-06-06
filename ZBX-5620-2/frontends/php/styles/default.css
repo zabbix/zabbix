@@ -144,6 +144,7 @@ ul.formlist li .dd { padding: 2px 0; vertical-align: top; }
 ul.formlist .formrow .dd .checkbox { vertical-align: middle; }
 ul.formlist .text, ul.formlist textarea, ul.formlist .password { padding: 3px; }
 ul.formlist select { padding: 2px; }
+ul.formlist .hidden { display: none; }
 .formrow .dd { margin-left: 10px; }
 .objectgroup .formrow .dt { margin-left: 10px; width: 20%; }
 
