@@ -121,7 +121,7 @@ if (get_request('groupid', 0) > 0) {
 if (get_request('hostid', 0) > 0) {
 	$hosts = API::Host()->get(array(
 		'hostids' => $_REQUEST['hostid'],
-		'editable' => 1
+		'editable' => true
 	));
 	if (!$hosts) {
 		access_deny();
