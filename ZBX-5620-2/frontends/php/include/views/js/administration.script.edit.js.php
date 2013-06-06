@@ -61,7 +61,7 @@
 
 		// test confirmation button
 		jQuery('#testConfirmation').click(function() {
-			var confirmation = jQuery('#confirmation').val();
+			var confirmation = jQuery('#confirmation').val(),
 				buttons = [
 					{text: <?php echo CJs::encodeJson(_('Execute')); ?>, click: function() {}},
 					{text: <?php echo CJs::encodeJson(_('Cancel')); ?>, click: function() {
