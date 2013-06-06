@@ -28,6 +28,9 @@ typedef int	(*vmfunc_t)(AGENT_REQUEST *, AGENT_RESULT *);
 
 static char	*vmkeys[] =
 {
+	"vcenter.cluster.discovery",
+	"vcenter.cluster.status",
+
 	"vcenter.eventlog",
 	"vcenter.hv.cpu.usage",
 	"vcenter.hv.discovery",
@@ -102,6 +105,9 @@ static char	*vmkeys[] =
 #if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
 static vmfunc_t	vmfuncs[] =
 {
+	check_vcenter_cluster_discovery,
+	check_vcenter_cluster_status,
+
 	check_vcenter_eventlog,
 	check_vcenter_hv_cpu_usage,
 	check_vcenter_hv_discovery,
