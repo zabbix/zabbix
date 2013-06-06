@@ -36,23 +36,6 @@
 #define ZBX_VMWARE_FLAG_VCENTER	0x01
 #define ZBX_VMWARE_FLAG_VSPHERE	0x02
 
-#define ZBX_POST_VCENTER_HEADER								\
-		"<?xml version=\"1.0\" encoding=\"UTF-8\"?>"				\
-		"<SOAP-ENV:Envelope"							\
-			" xmlns:SOAP-ENC=\"http://schemas.xmlsoap.org/soap/encoding/\""	\
-			" xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\""	\
-			" xmlns:ZSI=\"http://www.zolera.com/schemas/ZSI/\""		\
-			" xmlns:soapenc=\"http://schemas.xmlsoap.org/soap/encoding/\""	\
-			" xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\""	\
-			" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\""		\
-			" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">"	\
-			"<SOAP-ENV:Header/>"						\
-			"<SOAP-ENV:Body xmlns:ns1=\"urn:vim25\">"
-
-#define ZBX_POST_VCENTER_FOOTER								\
-			"</SOAP-ENV:Body>"						\
-		"</SOAP-ENV:Envelope>"
-
 #define ZBX_POST_VSPHERE_HEADER								\
 		"<?xml version=\"1.0\" encoding=\"UTF-8\"?>"				\
 		"<SOAP-ENV:Envelope"							\
@@ -354,124 +337,124 @@ out:
 static int	vcenter_guesthvids_get(CURL *easyhandle, zbx_vector_str_t *guesthvids, char **error)
 {
 #	define ZBX_POST_VCENTER_HV_LIST								\
-		ZBX_POST_VCENTER_HEADER								\
-		"<ns1:RetrievePropertiesEx xsi:type=\"ns1:RetrievePropertiesExRequestType\">"	\
-			"<ns1:_this type=\"PropertyCollector\">propertyCollector</ns1:_this>"	\
-			"<ns1:specSet>"								\
-				"<ns1:propSet>"							\
-					"<ns1:type>HostSystem</ns1:type>"			\
-					"<ns1:pathSet>name</ns1:pathSet>"			\
-				"</ns1:propSet>"						\
-				"<ns1:objectSet>"						\
-					"<ns1:obj type=\"Folder\">group-d1</ns1:obj>"		\
-					"<ns1:skip>false</ns1:skip>"				\
-					"<ns1:selectSet xsi:type=\"ns1:TraversalSpec\">"	\
-						"<ns1:name>visitFolders</ns1:name>"		\
-						"<ns1:type>Folder</ns1:type>"			\
-						"<ns1:path>childEntity</ns1:path>"		\
-						"<ns1:skip>false</ns1:skip>"			\
-						"<ns1:selectSet>"				\
-							"<ns1:name>visitFolders</ns1:name>"	\
-						"</ns1:selectSet>"				\
-						"<ns1:selectSet>"				\
-							"<ns1:name>dcToHf</ns1:name>"		\
-						"</ns1:selectSet>"				\
-						"<ns1:selectSet>"				\
-							"<ns1:name>dcToVmf</ns1:name>"		\
-						"</ns1:selectSet>"				\
-						"<ns1:selectSet>"				\
-							"<ns1:name>crToH</ns1:name>"		\
-						"</ns1:selectSet>"				\
-						"<ns1:selectSet>"				\
-							"<ns1:name>crToRp</ns1:name>"		\
-						"</ns1:selectSet>"				\
-						"<ns1:selectSet>"				\
-							"<ns1:name>dcToDs</ns1:name>"		\
-						"</ns1:selectSet>"				\
-						"<ns1:selectSet>"				\
-							"<ns1:name>hToVm</ns1:name>"		\
-						"</ns1:selectSet>"				\
-						"<ns1:selectSet>"				\
-							"<ns1:name>rpToVm</ns1:name>"		\
-						"</ns1:selectSet>"				\
-					"</ns1:selectSet>"					\
-					"<ns1:selectSet xsi:type=\"ns1:TraversalSpec\">"	\
-						"<ns1:name>dcToVmf</ns1:name>"			\
-						"<ns1:type>Datacenter</ns1:type>"		\
-						"<ns1:path>vmFolder</ns1:path>"			\
-						"<ns1:skip>false</ns1:skip>"			\
-						"<ns1:selectSet>"				\
-							"<ns1:name>visitFolders</ns1:name>"	\
-						"</ns1:selectSet>"				\
-					"</ns1:selectSet>"					\
-					"<ns1:selectSet xsi:type=\"ns1:TraversalSpec\">"	\
-						"<ns1:name>dcToDs</ns1:name>"			\
-						"<ns1:type>Datacenter</ns1:type>"		\
-						"<ns1:path>datastore</ns1:path>"		\
-						"<ns1:skip>false</ns1:skip>"			\
-						"<ns1:selectSet>"				\
-							"<ns1:name>visitFolders</ns1:name>"	\
-						"</ns1:selectSet>"				\
-					"</ns1:selectSet>"					\
-					"<ns1:selectSet xsi:type=\"ns1:TraversalSpec\">"	\
-						"<ns1:name>dcToHf</ns1:name>"			\
-						"<ns1:type>Datacenter</ns1:type>"		\
-						"<ns1:path>hostFolder</ns1:path>"		\
-						"<ns1:skip>false</ns1:skip>"			\
-						"<ns1:selectSet>"				\
-							"<ns1:name>visitFolders</ns1:name>"	\
-						"</ns1:selectSet>"				\
-					"</ns1:selectSet>"					\
-					"<ns1:selectSet xsi:type=\"ns1:TraversalSpec\">"	\
-						"<ns1:name>crToH</ns1:name>"			\
-						"<ns1:type>ComputeResource</ns1:type>"		\
-						"<ns1:path>host</ns1:path>"			\
-						"<ns1:skip>false</ns1:skip>"			\
-					"</ns1:selectSet>"					\
-					"<ns1:selectSet xsi:type=\"ns1:TraversalSpec\">"	\
-						"<ns1:name>crToRp</ns1:name>"			\
-						"<ns1:type>ComputeResource</ns1:type>"		\
-						"<ns1:path>resourcePool</ns1:path>"		\
-						"<ns1:skip>false</ns1:skip>"			\
-						"<ns1:selectSet>"				\
-							"<ns1:name>rpToRp</ns1:name>"		\
-						"</ns1:selectSet>"				\
-						"<ns1:selectSet>"				\
-							"<ns1:name>rpToVm</ns1:name>"		\
-						"</ns1:selectSet>"				\
-					"</ns1:selectSet>"					\
-					"<ns1:selectSet xsi:type=\"ns1:TraversalSpec\">"	\
-						"<ns1:name>rpToRp</ns1:name>"			\
-						"<ns1:type>ResourcePool</ns1:type>"		\
-						"<ns1:path>resourcePool</ns1:path>"		\
-						"<ns1:skip>false</ns1:skip>"			\
-						"<ns1:selectSet>"				\
-							"<ns1:name>rpToRp</ns1:name>"		\
-						"</ns1:selectSet>"				\
-						"<ns1:selectSet>"				\
-							"<ns1:name>rpToVm</ns1:name>"		\
-						"</ns1:selectSet>"				\
-					"</ns1:selectSet>"					\
-					"<ns1:selectSet xsi:type=\"ns1:TraversalSpec\">"	\
-						"<ns1:name>hToVm</ns1:name>"			\
-						"<ns1:type>HostSystem</ns1:type>"		\
-						"<ns1:path>vm</ns1:path>"			\
-						"<ns1:skip>false</ns1:skip>"			\
-						"<ns1:selectSet>"				\
-							"<ns1:name>visitFolders</ns1:name>"	\
-						"</ns1:selectSet>"				\
-					"</ns1:selectSet>"					\
-					"<ns1:selectSet xsi:type=\"ns1:TraversalSpec\">"	\
-						"<ns1:name>rpToVm</ns1:name>"			\
-						"<ns1:type>ResourcePool</ns1:type>"		\
-						"<ns1:path>vm</ns1:path>"			\
-						"<ns1:skip>false</ns1:skip>"			\
-					"</ns1:selectSet>"					\
-				"</ns1:objectSet>"						\
-			"</ns1:specSet>"							\
-			"<ns1:options/>"							\
-		"</ns1:RetrievePropertiesEx>"							\
-		ZBX_POST_VCENTER_FOOTER
+		ZBX_POST_VSPHERE_HEADER								\
+		"<ns0:RetrievePropertiesEx xsi:type=\"ns0:RetrievePropertiesExRequestType\">"	\
+			"<ns0:_this type=\"PropertyCollector\">propertyCollector</ns0:_this>"	\
+			"<ns0:specSet>"								\
+				"<ns0:propSet>"							\
+					"<ns0:type>HostSystem</ns0:type>"			\
+					"<ns0:pathSet>name</ns0:pathSet>"			\
+				"</ns0:propSet>"						\
+				"<ns0:objectSet>"						\
+					"<ns0:obj type=\"Folder\">group-d1</ns0:obj>"		\
+					"<ns0:skip>false</ns0:skip>"				\
+					"<ns0:selectSet xsi:type=\"ns0:TraversalSpec\">"	\
+						"<ns0:name>visitFolders</ns0:name>"		\
+						"<ns0:type>Folder</ns0:type>"			\
+						"<ns0:path>childEntity</ns0:path>"		\
+						"<ns0:skip>false</ns0:skip>"			\
+						"<ns0:selectSet>"				\
+							"<ns0:name>visitFolders</ns0:name>"	\
+						"</ns0:selectSet>"				\
+						"<ns0:selectSet>"				\
+							"<ns0:name>dcToHf</ns0:name>"		\
+						"</ns0:selectSet>"				\
+						"<ns0:selectSet>"				\
+							"<ns0:name>dcToVmf</ns0:name>"		\
+						"</ns0:selectSet>"				\
+						"<ns0:selectSet>"				\
+							"<ns0:name>crToH</ns0:name>"		\
+						"</ns0:selectSet>"				\
+						"<ns0:selectSet>"				\
+							"<ns0:name>crToRp</ns0:name>"		\
+						"</ns0:selectSet>"				\
+						"<ns0:selectSet>"				\
+							"<ns0:name>dcToDs</ns0:name>"		\
+						"</ns0:selectSet>"				\
+						"<ns0:selectSet>"				\
+							"<ns0:name>hToVm</ns0:name>"		\
+						"</ns0:selectSet>"				\
+						"<ns0:selectSet>"				\
+							"<ns0:name>rpToVm</ns0:name>"		\
+						"</ns0:selectSet>"				\
+					"</ns0:selectSet>"					\
+					"<ns0:selectSet xsi:type=\"ns0:TraversalSpec\">"	\
+						"<ns0:name>dcToVmf</ns0:name>"			\
+						"<ns0:type>Datacenter</ns0:type>"		\
+						"<ns0:path>vmFolder</ns0:path>"			\
+						"<ns0:skip>false</ns0:skip>"			\
+						"<ns0:selectSet>"				\
+							"<ns0:name>visitFolders</ns0:name>"	\
+						"</ns0:selectSet>"				\
+					"</ns0:selectSet>"					\
+					"<ns0:selectSet xsi:type=\"ns0:TraversalSpec\">"	\
+						"<ns0:name>dcToDs</ns0:name>"			\
+						"<ns0:type>Datacenter</ns0:type>"		\
+						"<ns0:path>datastore</ns0:path>"		\
+						"<ns0:skip>false</ns0:skip>"			\
+						"<ns0:selectSet>"				\
+							"<ns0:name>visitFolders</ns0:name>"	\
+						"</ns0:selectSet>"				\
+					"</ns0:selectSet>"					\
+					"<ns0:selectSet xsi:type=\"ns0:TraversalSpec\">"	\
+						"<ns0:name>dcToHf</ns0:name>"			\
+						"<ns0:type>Datacenter</ns0:type>"		\
+						"<ns0:path>hostFolder</ns0:path>"		\
+						"<ns0:skip>false</ns0:skip>"			\
+						"<ns0:selectSet>"				\
+							"<ns0:name>visitFolders</ns0:name>"	\
+						"</ns0:selectSet>"				\
+					"</ns0:selectSet>"					\
+					"<ns0:selectSet xsi:type=\"ns0:TraversalSpec\">"	\
+						"<ns0:name>crToH</ns0:name>"			\
+						"<ns0:type>ComputeResource</ns0:type>"		\
+						"<ns0:path>host</ns0:path>"			\
+						"<ns0:skip>false</ns0:skip>"			\
+					"</ns0:selectSet>"					\
+					"<ns0:selectSet xsi:type=\"ns0:TraversalSpec\">"	\
+						"<ns0:name>crToRp</ns0:name>"			\
+						"<ns0:type>ComputeResource</ns0:type>"		\
+						"<ns0:path>resourcePool</ns0:path>"		\
+						"<ns0:skip>false</ns0:skip>"			\
+						"<ns0:selectSet>"				\
+							"<ns0:name>rpToRp</ns0:name>"		\
+						"</ns0:selectSet>"				\
+						"<ns0:selectSet>"				\
+							"<ns0:name>rpToVm</ns0:name>"		\
+						"</ns0:selectSet>"				\
+					"</ns0:selectSet>"					\
+					"<ns0:selectSet xsi:type=\"ns0:TraversalSpec\">"	\
+						"<ns0:name>rpToRp</ns0:name>"			\
+						"<ns0:type>ResourcePool</ns0:type>"		\
+						"<ns0:path>resourcePool</ns0:path>"		\
+						"<ns0:skip>false</ns0:skip>"			\
+						"<ns0:selectSet>"				\
+							"<ns0:name>rpToRp</ns0:name>"		\
+						"</ns0:selectSet>"				\
+						"<ns0:selectSet>"				\
+							"<ns0:name>rpToVm</ns0:name>"		\
+						"</ns0:selectSet>"				\
+					"</ns0:selectSet>"					\
+					"<ns0:selectSet xsi:type=\"ns0:TraversalSpec\">"	\
+						"<ns0:name>hToVm</ns0:name>"			\
+						"<ns0:type>HostSystem</ns0:type>"		\
+						"<ns0:path>vm</ns0:path>"			\
+						"<ns0:skip>false</ns0:skip>"			\
+						"<ns0:selectSet>"				\
+							"<ns0:name>visitFolders</ns0:name>"	\
+						"</ns0:selectSet>"				\
+					"</ns0:selectSet>"					\
+					"<ns0:selectSet xsi:type=\"ns0:TraversalSpec\">"	\
+						"<ns0:name>rpToVm</ns0:name>"			\
+						"<ns0:type>ResourcePool</ns0:type>"		\
+						"<ns0:path>vm</ns0:path>"			\
+						"<ns0:skip>false</ns0:skip>"			\
+					"</ns0:selectSet>"					\
+				"</ns0:objectSet>"						\
+			"</ns0:specSet>"							\
+			"<ns0:options/>"							\
+		"</ns0:RetrievePropertiesEx>"							\
+		ZBX_POST_VSPHERE_FOOTER
 
 	const char	*__function_name = "vcenter_guesthvids_get";
 
