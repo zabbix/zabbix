@@ -94,7 +94,7 @@ if (get_request('groupid', 0) > 0) {
 if (get_request('templateid', 0) > 0) {
 	$templates = API::Template()->get(array(
 		'templateids' => $_REQUEST['templateid'],
-		'editable' => 1
+		'editable' => true
 	));
 	if (!$templates) {
 		access_deny();
