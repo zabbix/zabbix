@@ -25,8 +25,6 @@ $divTabs = new CTabView(array('remember' => 1));
 if (!isset($_REQUEST['form_refresh'])) {
 	$divTabs->setSelected(0);
 }
-
-
 $templateid = get_request('templateid', 0);
 $host = get_request('template_name', '');
 $visiblename = get_request('visiblename', '');
@@ -38,26 +36,8 @@ $macros = get_request('macros', array());
 $frm_title = _('Template');
 
 if ($templateid > 0) {
-	$dbTemplates = API::Template()->get(array(
-		'templateids' => $templateid,
-		'selectGroups' => API_OUTPUT_EXTEND,
-		'selectParentTemplates' => API_OUTPUT_EXTEND,
-		'selectMacros' => API_OUTPUT_EXTEND,
-		'output' => API_OUTPUT_EXTEND
-	));
-	$dbTemplate = reset($dbTemplates);
-
-	$frm_title .= SPACE.' ['.$dbTemplate['name'].']';
-
-	$original_templates = array();
-	foreach ($dbTemplate['parentTemplates'] as $tnum => $tpl) {
-		$original_templates[] = $tpl['templateid'];
-	}
+	$frm_title .= SPACE.' ['.$this->data['dbTemplate']['name'].']';
 }
-else {
-	$original_templates = array();
-}
-
 $frmHost = new CForm();
 $frmHost->setName('tpl_for');
 
@@ -70,18 +50,18 @@ if ($templateid) {
 }
 
 if (($templateid > 0) && !isset($_REQUEST['form_refresh'])) {
-	$host = $dbTemplate['host'];
-	$visiblename = $dbTemplate['name'];
+	$host = $this->data['dbTemplate']['host'];
+	$visiblename = $this->data['dbTemplate']['name'];
 // display empry visible nam if equal to host name
 	if ($visiblename == $host) {
 		$visiblename = '';
 	}
 
 // get template groups from db
-	$groups = $dbTemplate['groups'];
+	$groups = $this->data['dbTemplate']['groups'];
 	$groups = zbx_objectValues($groups, 'groupid');
 
-	$macros = order_macros($dbTemplate['macros'], 'macro');
+	$macros = order_macros($this->data['dbTemplate']['macros'], 'macro');
 
 // get template hosts from db
 	$hosts_linked_to = API::Host()->get(array(
@@ -92,7 +72,7 @@ if (($templateid > 0) && !isset($_REQUEST['form_refresh'])) {
 
 	$hosts_linked_to = zbx_objectValues($hosts_linked_to, 'hostid');
 	$hosts_linked_to = zbx_toHash($hosts_linked_to, 'hostid');
-	$templateIds = $original_templates;
+	$templateIds = $this->data['original_templates'];
 }
 else {
 	$groups = get_request('groups', array());
@@ -102,7 +82,7 @@ else {
 	$hosts_linked_to = get_request('hosts', array());
 }
 
-$clear_templates = array_intersect($clear_templates, array_keys($original_templates));
+$clear_templates = array_intersect($clear_templates, array_keys($this->data['original_templates']));
 $clear_templates = array_diff($clear_templates, array_keys($templateIds));
 natcasesort($templateIds);
 $frmHost->addVar('clear_templates', $clear_templates);
@@ -401,14 +381,8 @@ $linkedTemplateTable->attr('id', 'linkedTemplateTable');
 $linkedTemplateTable->attr('style', 'min-width: 400px;');
 $linkedTemplateTable->setHeader(array(_('Name'), _('Action')));
 
-
-$linkedTemplates = API::Template()->get(array(
-	'templateids' => $templateIds,
-	'output' => array('templateid', 'name')
-));
-
 $ignoredTemplates = array();
-foreach ($linkedTemplates as $template) {
+foreach ($this->data['linkedTemplates'] as $template) {
 	$tmplList->addVar('exist_templates[]', $template['templateid']);
 
 	$linkedTemplateTable->addRow(
@@ -418,7 +392,7 @@ foreach ($linkedTemplates as $template) {
 				new CSubmit('unlink['.$template['templateid'].']', _('Unlink'), null, 'link_menu'),
 				SPACE,
 				SPACE,
-				isset($original_templates[$template['templateid']])
+				isset($this->data['original_templates'][$template['templateid']])
 					? new CSubmit('unlink_and_clear['.$template['templateid'].']', _('Unlink and clear'), null, 'link_menu')
 					: SPACE
 			)
