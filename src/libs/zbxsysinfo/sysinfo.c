@@ -328,13 +328,21 @@ int	parse_command(const char *key, char *cmd, size_t cmd_max_len, char *param, s
 	return ZBX_COMMAND_WITH_PARAMS;
 }
 
-void	test_parameter(const char *key, unsigned flags)
+void	test_parameter(const char *key)
 {
+#define	ZBX_COL_WIDTH	45
+
 	AGENT_RESULT	result;
+	int		n;
 
 	init_result(&result);
 
-	process(key, flags, &result);
+	process(key, 0, &result);
+
+	n = printf("%s", key);
+
+	if (0 < n && ZBX_COL_WIDTH > n)
+		printf("%-*s", ZBX_COL_WIDTH - n, " ");
 
 	if (ISSET_UI64(&result))
 		printf(" [u|" ZBX_FS_UI64 "]", result.ui64);
@@ -361,9 +369,23 @@ void	test_parameter(const char *key, unsigned flags)
 void	test_parameters()
 {
 	int	i;
+	char	tmp[MAX_STRING_LEN];
 
 	for (i = 0; NULL != commands[i].key; i++)
-		test_parameter(commands[i].key, PROCESS_TEST | PROCESS_USE_TEST_PARAM);
+	{
+		if (0 != strcmp(commands[i].key, "__UserPerfCounter"))
+		{
+			if (0 == (commands[i].flags & CF_USERPARAMETER) && NULL != commands[i].test_param)
+			{
+				zbx_snprintf(tmp, sizeof(tmp), "%s[%s]", commands[i].key, commands[i].test_param);
+				test_parameter(tmp);
+			}
+			else
+				test_parameter(commands[i].key);
+		}
+	}
+
+	test_aliases();
 }
 
 static int	replace_param(const char *cmd, const char *param, char *out, int outlen, char *error, int max_error_len)
@@ -515,10 +537,6 @@ int	process(const char *in_command, unsigned flags, AGENT_RESULT *result)
 	}
 	else
 	{
-		/* in test mode replace actual item key parameters with test ones */
-		if (0 != (flags & PROCESS_USE_TEST_PARAM) && NULL != command->test_param)
-			zbx_snprintf(tmp, sizeof(tmp), "%s[%s]", key, command->test_param);
-
 		if (SUCCEED != parse_item_key(tmp, &request))
 			goto notsupported;
 	}
@@ -534,17 +552,6 @@ int	process(const char *in_command, unsigned flags, AGENT_RESULT *result)
 
 notsupported:
 	free_request(&request);
-
-	if (0 != (flags & PROCESS_TEST))
-	{
-#define	COL_WIDTH	45
-		int	n1;
-
-		n1 = printf("%s", tmp);
-
-		if (0 < n1 && COL_WIDTH > n1)
-			printf("%-*s", COL_WIDTH - n1, " ");
-	}
 
 	if (NOTSUPPORTED == ret)
 		SET_MSG_RESULT(result, zbx_strdup(NULL, ZBX_NOTSUPPORTED));

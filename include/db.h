@@ -601,6 +601,10 @@ int	DBtxn_ongoing();
 int	DBtable_exists(const char *table_name);
 int	DBfield_exists(const char *table_name, const char *field_name);
 
+void	DBexecute_multiple_query(const char *query, const char *field_name, zbx_vector_uint64_t *ids);
+
 void	zbx_create_services_lock();
 void	zbx_destroy_services_lock();
+
+int	get_nodeid_by_id(zbx_uint64_t id);
 #endif

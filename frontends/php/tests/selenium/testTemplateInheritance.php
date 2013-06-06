@@ -55,15 +55,14 @@ class testTemplateInheritance extends CWebTest {
 		$this->zbxTestClickWait('link='.$this->hostName);
 
 		$this->zbxTestClick('tab_templateTab');
-		$this->zbxTestClick('//*[@id="add"][@value="Add"]');
 
-		$this->waitForPopUp("zbx_popup", "30000");
-		$this->selectWindow("name=zbx_popup");
-		$this->zbxTestCheckboxSelect('//*[@value="Template App Zabbix Agent"]');
-		$this->zbxTestClick('select');
+		$this->assertElementPresent("//div[@id='templates_']/input");
+		$this->input_type("//div[@id='templates_']/input", 'Template App Zabbix Agent');
+		sleep(1);
+		$this->zbxTestClick("//span[@class='matched']");
+		$this->zbxTestClickWait('add_template');
 
-		$this->selectWindow(null);
-		$this->wait();
+		$this->zbxTestTextPresent('Template App Zabbix Agent');
 		$this->zbxTestClickWait('save');
 
 		$this->zbxTestTextPresent('Host updated');
@@ -177,12 +176,18 @@ class testTemplateInheritance extends CWebTest {
 	}
 
 	public function testFormItem_unlinkHost(){
+
+		$sql = "select hostid from hosts where host='Template App Zabbix Agent';";
+		$this->assertEquals(1, DBcount($sql));
+		$row = DBfetch(DBselect($sql));
+		$hostid = $row['hostid'];
+
 		$this->zbxTestLogin('hosts.php');
 		$this->zbxTestClickWait('link='.$this->hostName);
 
 		$this->zbxTestClick('tab_templateTab');
 		sleep(1);
-		$this->zbxTestClickWait('unlink_and_clear_10050');
+		$this->zbxTestClickWait('unlink_and_clear_'.$hostid);
 		$this->zbxTestClickWait('save');
 
 		$this->zbxTestTextPresent('Host updated');
@@ -205,7 +210,7 @@ class testTemplateInheritance extends CWebTest {
 		$this->zbxTestCheckboxSelect('type');
 		$this->input_type('comments', 'comments');
 		$this->input_type('url', 'url');
-		$this->zbxTestClick('severity_label_2');
+		$this->zbxTestClick('priority_label_2');
 		$this->zbxTestCheckboxUnselect('status');
 
 		$this->zbxTestClickWait('save');
@@ -223,7 +228,7 @@ class testTemplateInheritance extends CWebTest {
 		$this->assertTrue($this->isChecked('type'));
 		$this->assertElementText('comments', 'comments');
 		$this->assertElementValue('url', 'url');
-		$this->assertTrue($this->isChecked('severity_2'));
+		$this->assertTrue($this->isChecked('priority_2'));
 		$this->assertFalse($this->isChecked('status'));
 	}
 
@@ -257,6 +262,7 @@ class testTemplateInheritance extends CWebTest {
 
 		$this->waitForPopUp("zbx_popup", "30000");
 		$this->selectWindow("name=zbx_popup");
+		sleep(1);
 		$this->zbxTestClick('link=Test LLD item1');
 		$this->selectWindow(null);
 		$this->zbxTestClick('save');
@@ -407,7 +413,7 @@ class testTemplateInheritance extends CWebTest {
 		$this->zbxTestCheckboxSelect('type');
 		$this->input_type('comments', 'comments');
 		$this->input_type('url', 'url');
-		$this->zbxTestClick('severity_label_2');
+		$this->zbxTestClick('priority_label_2');
 		$this->zbxTestCheckboxUnselect('status');
 
 		$this->zbxTestClickWait('save');
@@ -426,7 +432,7 @@ class testTemplateInheritance extends CWebTest {
 		$this->assertTrue($this->isChecked('type'));
 		$this->assertElementText('comments', 'comments');
 		$this->assertElementValue('url', 'url');
-		$this->assertTrue($this->isChecked('severity_2'));
+		$this->assertTrue($this->isChecked('priority_2'));
 		$this->assertFalse($this->isChecked('status'));
 	}
 
@@ -461,6 +467,7 @@ class testTemplateInheritance extends CWebTest {
 		$this->zbxTestClick('add_protoitem');
 		$this->waitForPopUp("zbx_popup", "30000");
 		$this->selectWindow("name=zbx_popup");
+		sleep(1);
 		$this->zbxTestClick("//span[text()='Test LLD item']");
 		$this->selectWindow(null);
 		sleep(1);
