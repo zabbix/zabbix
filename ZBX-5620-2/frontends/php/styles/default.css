@@ -44,7 +44,10 @@ ul { margin-left: 0; padding-left: 1em; }
 .border_dotted { border: 1px dotted #6C80B9; }
 .footer { padding-left: 1.6em; }
 .inlineblock { display: inline-block; }
-.thin_header { width: 100%; color: #FFFFFF; background: #5c9ccc url(themes/originalblue/images/bg_h-hard_55.png) 50% 50% repeat-x; border: 0 #000000 solid; text-align: center; }
+.thin_header {
+	width: 100%; color: #FFFFFF; border: 0 #000000 solid; text-align: center;
+	background: #5c9ccc url(themes/originalblue/images/bg_h-hard_55.png) 50% 50% repeat-x;
+}
 .divider { color: #558; font-weight: normal; }
 .vert { width: 1px; }
 .rarr { font-size: 16px; }
@@ -52,7 +55,6 @@ ul { margin-left: 0; padding-left: 1em; }
 .delimiter { font-weight: bold; color: #000; }
 .pointer:hover { cursor: pointer; }
 .move { cursor: move; }
-
 
 .transparent { border: 0; background-color: transparent; }
 .transparent:focus { outline-width: 0; }
@@ -137,14 +139,13 @@ a.weight_normal { font-weight: normal; }
 ul li.linear { float: left; list-style-type: none; margin-right: 2px; }
 ul.formlist { list-style-type: none; margin: 0; padding: 0; display: table; width: 100%; }
 ul.formlist li { padding: 2px; height: 100%; vertical-align: middle; clear: both; display: table-row; }
-ul.formlist li .dt { padding-top: 2px; display: table-cell; white-space: nowrap; vertical-align: top; }
-ul.formlist li .dd { vertical-align: top; }
-ul.formlist li .dt, ul.formlist li .dd { padding: 2px 0; }
-ul.formlist .formrow .dd .checkbox  { vertical-align: middle; }
+ul.formlist li .dt { padding: 4px 0 2px; display: table-cell; white-space: nowrap; vertical-align: top; width: 20%; }
+ul.formlist li .dd { padding: 2px 0; vertical-align: top; }
+ul.formlist .formrow .dd .checkbox { vertical-align: middle; }
 ul.formlist .text, ul.formlist textarea, ul.formlist .password { padding: 3px; }
 ul.formlist select { padding: 2px; }
-.formrow .dt { width: 20%; }
 .formrow .dd { margin-left: 10px; }
+.objectgroup .formrow .dt { margin-left: 10px; width: 20%; }
 
 /* formlist buttons */
 div.footer .formrow .dd { margin-left: 21%; }
@@ -164,7 +165,7 @@ ul.favorites li.empty { list-style: none; line-height: 18px; vertical-align: top
 ul.favorites li a { line-height: 18px; vertical-align: top; }
 
 /* frondend messages */
-ul.messages { overflow:auto; vertical-align: top; background-color: #FFFFFF; margin: 1px; text-align: left; }
+ul.messages { overflow: auto; vertical-align: top; background-color: #FFFFFF; margin: 1px; text-align: left; }
 ul.messages li { font-size: 1.1em; line-height: 18px; }
 ul.messages li.info { color: #000000; list-style: url("../images/general/warning2.png") inside; }
 ul.messages li.error { color: #D40000; list-style: url("../images/general/error3.png") inside; white-space: pre-wrap; }
@@ -319,14 +320,23 @@ td.form_row_r_simple { border-color: #AAAAAA; text-align: left; }
 table.chart { width: 100%; background-color: #DDDDDD; text-align: center; }
 
 /* table info */
-table.tableinfo { empty-cells:show; width: 100%; border-spacing: 2px; }
-table.tableinfo > tbody > tr > td { padding: 1px 3px; white-space: nowrap; font-weight: normal; text-align: left; border: 0; height: 22px; -moz-border-radius: 2px; -webkit-border-radius: 2px; border-radius: 2px; }
+table.tableinfo { empty-cells: show; width: 100%; border-spacing: 2px; }
+table.tableinfo > tbody > tr > td {
+	padding: 1px 3px; white-space: nowrap; font-weight: normal; text-align: left;
+	border: 0; height: 22px; -moz-border-radius: 2px; -webkit-border-radius: 2px; border-radius: 2px;
+}
 table.tableinfo tr.header td { white-space: nowrap; font-weight: bold; border: 0; }
-table.tableinfo tr.header td.hover_grey { white-space: nowrap; word-spacing: 0; font-weight: bold; border-width: 0; cursor: pointer; }
-table.tableinfo tr.vertical_header td { padding: 5px 0 5px 5px; margin: 0; white-space: nowrap; word-spacing: 0; font-weight: bold; width: 20px; text-align: center; }
+table.tableinfo tr.header td.hover_grey {
+	white-space: nowrap; word-spacing: 0; font-weight: bold; border-width: 0; cursor: pointer;
+}
+table.tableinfo tr.vertical_header td {
+	padding: 5px 0 5px 5px; margin: 0; white-space: nowrap; word-spacing: 0; font-weight: bold; width: 20px; text-align: center;
+}
 table.tableinfo tr.vertical_header td.left { text-align: left; }
 table.tableinfo tr.vertical_header td.hover_grey:hover { cursor: pointer; }
-table.tableinfo tr.vertical_header td.vertical_rotation { white-space: nowrap; align: center; font-family:arial; font-size:11px; }
+table.tableinfo tr.vertical_header td.vertical_rotation {
+	white-space: nowrap; align: center; font-family: arial; font-size: 11px;
+}
 table.tableinfo tr.vertical_header td.vertical_rotation .vertical_rotation_inner {
 	transform: rotate(270deg); white-space: nowrap;
 	-moz-transform: rotate(270deg); -webkit-transform: rotate(270deg); -o-transform: rotate(270deg); -ms-transform: rotate(180deg);
@@ -351,7 +361,10 @@ table.flicker a { color: #0BF; }
 
 /* acknowledgements */
 table.ack_msgs { width: 70%; background-color: #EEEEEE; padding: 0; border: 0 solid; }
-table.ack_msgs tr.title { height: 14px; vertical-align: middle; color: #FFFFFF; background: #5c9ccc url(themes/originalblue/images/bg_h-hard_55.png) 50% 50% repeat-x; }
+table.ack_msgs tr.title {
+	height: 14px; vertical-align: middle; color: #FFFFFF;
+	background: #5c9ccc url(themes/originalblue/images/bg_h-hard_55.png) 50% 50% repeat-x;
+}
 table.ack_msgs tr td.user { padding-left: 10px; padding-right: 10px; text-align: left; }
 table.ack_msgs tr td.time { padding-left: 10px; padding-right: 10px; text-align: center; width: 150px; }
 table.ack_msgs tr.msg { height: 25px; background-color: #F8F8F8; }
@@ -404,7 +417,7 @@ table.msgok tr td.clr {width: 60px; background-color: #44CC44; font-weight: bold
 table.msgok tr td.msg_main {height: 26px; font-size: 1.1em; }
 table.msgok tr td.msg {background-color: #BBFFBB; }
 table.msgerr { width: 100%; border: 1px #CC4444 solid; table-layout: fixed; }
-table.msgerr tr td {color: #333; text-align: center; }
+table.msgerr tr td { color: #333; text-align: center; }
 table.msgerr tr td.clr { width: 60px; background-color: #CC4444; font-weight: bold; }
 table.msgerr tr td.msg_main { height: 26px; font-size: 1.1em; }
 table.msgerr tr td.msg { background-color: #FFBBBB; }
@@ -438,11 +451,11 @@ table.paging { width: 100%; padding: 2px; }
 table.paging tr td { border: 0 black solid; width: 100%; font-size: 1.1em; line-height: 18px; text-align: center; vertical-align: middle; }
 
 /* header wide */
-table.header_wide { width: 100%; color: #222222; border: 1px #3377AA solid; text-align: center; vertical-align: middle; background-color:#FFFFFF; margin-top: 2px; }
+table.header_wide { width: 100%; color: #222222; border: 1px #3377AA solid; text-align: center; vertical-align: middle; background-color: #FFFFFF; margin-top: 2px; }
 table.header_wide tr.first td.header_l { font-size: 1.3em; font-weight: bold; text-align: left; height: 24px; padding-left: 5px; color: #224488; }
-table.header_wide tr.first td.header_r { background:none; text-align: right; height: 24px; padding-right: 5px; border-width: 0; }
-table.header_wide tr.next td.header_l { background:none; text-align: left; height: 20px; padding-left: 5px; border-width: 0; }
-table.header_wide tr.next td.header_r { background:none; text-align: right; height: 20px; padding-right: 5px; border-width: 0; }
+table.header_wide tr.first td.header_r { background: none; text-align: right; height: 24px; padding-right: 5px; border-width: 0; }
+table.header_wide tr.next td.header_l { background: none; text-align: left; height: 20px; padding-left: 5px; border-width: 0; }
+table.header_wide tr.next td.header_r { background: none; text-align: right; height: 20px; padding-right: 5px; border-width: 0; }
 
 /* suggest */
 table.suggest { width: 100%; margin: 0; border-spacing: 0; background-color: #FEFEFE; }

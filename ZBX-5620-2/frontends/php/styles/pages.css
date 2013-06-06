@@ -104,7 +104,9 @@
 #map-window #linkForm #linklabel { margin-top: 4px; }
 
 /* maintenance icon */
-.icon-maintenance-inline, .icon-maintenance-abs { width: 12px; background-image: url("../images/general/wrench12transp.png"); background-repeat: no-repeat; }
+.icon-maintenance-inline, .icon-maintenance-abs {
+	width: 12px; background-image: url("../images/general/wrench12transp.png"); background-repeat: no-repeat;
+}
 .icon-maintenance-inline { margin-left: 5px; height: 14px; vertical-align: middle; display: inline-block; }
 .icon-maintenance-abs { right: 0; top: 4px; height: 12px; position: absolute; }
 .maintenance-abs-cont { position: relative; }
@@ -119,12 +121,18 @@ div.trigger_displaying_form_col { width: 12em; zoom: 1; *display: inline; }
 
 /* login */
 .loginBG { background: #AABBCC url(../images/gradients/texture_diagonal.gif); }
-.loginForm { margin: auto; padding: 15px; height: 260px; width: 582px; background: url(../images/general/login/background.png) no-repeat; *position: relative; *top: -50%; }
+.loginForm {
+	margin: auto; padding: 15px; height: 260px; width: 582px; *position: relative; *top: -50%;
+	background: url(../images/general/login/background.png) no-repeat;
+}
 .loginLogo { height: 53px; width: 163px; background: url(../images/general/login/logo.png) no-repeat; }
 
 /* browserwarning */
 .browserwarningBG { background: #AABBCC url(../images/gradients/texture_diagonal.gif); }
-.browserwarningForm { margin: auto; font-size: 12px; height: 465px; width: 610px; background: url(../images/general/browserwarning/background.png) no-repeat; *position: relative; *top: -50%; }
+.browserwarningForm {
+	margin: auto; font-size: 12px; height: 465px; width: 610px; *position: relative; *top: -50%;
+	background: url(../images/general/browserwarning/background.png) no-repeat;
+}
 .browserwarningLogoChrome { height: 70px; width: 70px; background: url(../images/general/browserwarning/chrome.png) no-repeat; }
 .browserwarningLogoFirefox { height: 70px; width: 70px; background: url(../images/general/browserwarning/firefox.png) no-repeat; }
 .browserwarningLogoIE { height: 70px; width: 70px; background: url(../images/general/browserwarning/ie.png) no-repeat; }
