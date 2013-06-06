@@ -127,17 +127,14 @@ $rowCondition[] = $conditionOperatorsComboBox;
 
 switch ($this->data['new_condition']['conditiontype']) {
 	case CONDITION_TYPE_HOST_GROUP:
-		$conditionFormList->addItem(new CVar('new_condition[value]', '0'));
-		$rowCondition[] = array(
-			new CTextBox('group', '', ZBX_TEXTBOX_STANDARD_SIZE, 'yes'),
-			SPACE,
-			new CButton('btn1', _('Select'),
-				"return PopUp('popup.php?writeonly=1&dstfrm=".$actionForm->getName().
-				'&dstfld1=new_condition_value&dstfld2=group&srctbl=host_group'.
-				"&srcfld1=groupid&srcfld2=name', 450, 450);",
-				'link_menu'
-			)
-		);
+		$rowCondition[] = new CDiv(new CMultiSelect(array(
+			'name' => 'new_condition[value][]',
+			'objectName' => 'hostGroup',
+			'objectOptions' => array(
+				'editable' => true
+			),
+			'defaultValue' => 0
+		)), 'floatright');
 		break;
 
 	case CONDITION_TYPE_HOST_TEMPLATE:
@@ -785,24 +782,34 @@ if (!empty($this->data['new_operation'])) {
 
 			$groupList = new CTable();
 			$groupList->setAttribute('id', 'opGroupList');
+			$groupList->addRow(new CRow(
+				new CCol(array(
+					new CMultiSelect(array(
+						'name' => 'discoveryHostGroup',
+						'objectName' => 'hostGroup'
+					)),
+					new CButton('add', _('Add'), 'return addDiscoveryHostGroup();', 'link_menu')
+				), null, 2),
+				null,
+				'opGroupListFooter'
+			));
 
-			$addUsrgrpBtn = new CButton('add', _('Add'), 'return PopUp("popup.php?dstfrm=action.edit&srctbl=host_group&srcfld1=groupid&srcfld2=name&multiselect=1&reference=dsc_groupid",450,450)', 'link_menu');
-			$groupList->addRow(new CRow(new CCol($addUsrgrpBtn, null, 2), null, 'opGroupListFooter'));
-
-			// add participations
-			$groupids = isset($this->data['new_operation']['opgroup'])
+			// load host groups
+			$groupIds = isset($this->data['new_operation']['opgroup'])
 				? zbx_objectValues($this->data['new_operation']['opgroup'], 'groupid')
 				: array();
 
-			$groups = API::HostGroup()->get(array(
-				'groupids' => $groupids,
-				'output' => array('name')
-			));
-			order_result($groups, 'name');
+			if ($groupIds) {
+				$hostGroups = API::HostGroup()->get(array(
+					'groupids' => $groupIds,
+					'output' => array('groupid', 'name')
+				));
+				order_result($hostGroups, 'name');
 
-			$jsInsert = '';
-			$jsInsert .= 'addPopupValues('.zbx_jsvalue(array('object' => 'dsc_groupid', 'values' => $groups)).');';
-			zbx_add_post_js($jsInsert);
+				$jsInsert = '';
+				$jsInsert .= 'addPopupValues('.zbx_jsvalue(array('object' => 'dsc_groupid', 'values' => $hostGroups)).');';
+				zbx_add_post_js($jsInsert);
+			}
 
 			$caption = (OPERATION_TYPE_GROUP_ADD == $this->data['new_operation']['operationtype'])
 				? _('Add to host groups')

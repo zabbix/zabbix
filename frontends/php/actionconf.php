@@ -116,10 +116,6 @@ elseif (isset($_REQUEST['cancel_new_opcondition'])) {
 	unset($_REQUEST['new_opcondition']);
 }
 elseif (isset($_REQUEST['save'])) {
-	if (!count(get_accessible_nodes_by_user(CWebUser::$data, PERM_READ_WRITE, PERM_RES_IDS_ARRAY))) {
-		access_deny();
-	}
-
 	$action = array(
 		'name'			=> get_request('name'),
 		'eventsource'	=> get_request('eventsource', 0),
@@ -164,36 +160,45 @@ elseif (isset($_REQUEST['save'])) {
 	}
 }
 elseif (isset($_REQUEST['delete']) && isset($_REQUEST['actionid'])) {
-	if (!count(get_accessible_nodes_by_user(CWebUser::$data, PERM_READ_WRITE, PERM_RES_IDS_ARRAY))) {
-		access_deny();
-	}
-
 	$result = API::Action()->delete($_REQUEST['actionid']);
 
 	show_messages($result, _('Action deleted'), _('Cannot delete action'));
+
 	if ($result) {
 		unset($_REQUEST['form'], $_REQUEST['actionid']);
 	}
 }
 elseif (isset($_REQUEST['add_condition']) && isset($_REQUEST['new_condition'])) {
-	$new_condition = $_REQUEST['new_condition'];
-
 	try {
-		CAction::validateConditions($new_condition);
-		$_REQUEST['conditions'] = get_request('conditions', array());
+		$newCondition = get_request('new_condition');
 
-		$exists = false;
-		foreach ($_REQUEST['conditions'] as $condition) {
-			if (($new_condition['conditiontype'] === $condition['conditiontype'])
-					&& ($new_condition['operator'] === $condition['operator'])
-					&& (!isset($new_condition['value']) || $new_condition['value'] === $condition['value'])) {
-				$exists = true;
-				break;
+		if ($newCondition) {
+			CAction::validateConditions($newCondition);
+
+			$conditions = get_request('conditions', array());
+
+			foreach ($conditions as $condition) {
+				if ($newCondition['conditiontype'] == $condition['conditiontype']) {
+					$newConditionValues = zbx_toArray($newCondition['value']);
+
+					foreach ($newConditionValues as $num => $newValue) {
+						if ($condition['value'] == $newValue) {
+							unset($newCondition['value'][$num]);
+						}
+					}
+				}
 			}
-		}
 
-		if (!$exists) {
-			array_push($_REQUEST['conditions'], $new_condition);
+			if ($newCondition['value']) {
+				$newConditionValues = zbx_toArray($newCondition['value']);
+
+				foreach ($newConditionValues as $newValue) {
+					$condition = $newCondition;
+					$condition['value'] = $newValue;
+
+					$_REQUEST['conditions'][] = $condition;
+				}
+			}
 		}
 	}
 	catch (APIException $e) {
@@ -273,10 +278,6 @@ elseif (isset($_REQUEST['edit_operationid'])) {
 	}
 }
 elseif (str_in_array($_REQUEST['go'], array('activate', 'disable')) && isset($_REQUEST['g_actionid'])) {
-	if (!count($nodes = get_accessible_nodes_by_user(CWebUser::$data, PERM_READ_WRITE, PERM_RES_IDS_ARRAY))) {
-		access_deny();
-	}
-
 	$status = ($_REQUEST['go'] == 'activate') ? 0 : 1;
 	$status_name = $status ? 'disabled' : 'enabled';
 
@@ -303,10 +304,6 @@ elseif (str_in_array($_REQUEST['go'], array('activate', 'disable')) && isset($_R
 	}
 }
 elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['g_actionid'])) {
-	if (!count($nodes = get_accessible_nodes_by_user(CWebUser::$data, PERM_READ_WRITE, PERM_RES_IDS_ARRAY))) {
-		access_deny();
-	}
-
 	$go_result = API::Action()->delete($_REQUEST['g_actionid']);
 	show_messages($go_result, _('Selected actions deleted'), _('Cannot delete selected actions'));
 }

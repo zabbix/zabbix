@@ -472,7 +472,7 @@ class DB {
 
 		$tableSchema = self::getSchema($table);
 		$values = self::addMissingFields($tableSchema, $values);
-		$fields = array_keys($values[0]);
+		$fields = array_keys(reset($values));
 
 		if ($getids) {
 			$id = self::reserveIds($table, count($values));

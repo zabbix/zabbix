@@ -62,6 +62,7 @@ jQuery(function($) {
 	 * @param string options['defaultValue']	default value for input element
 	 * @param bool   options['disabled']		turn on/off readonly state
 	 * @param int    options['selectedLimit']	how many items can be selected
+	 * @param array  options['ignored']			preload ignored names
 	 * @param int    options['limit']			how many available items can be received from backend
 	 *
 	 * @return object
@@ -81,6 +82,7 @@ jQuery(function($) {
 			defaultValue: null,
 			disabled: false,
 			selectedLimit: null,
+			ignored: null,
 			limit: 20
 		};
 		options = $.extend({}, defaults, options);
@@ -102,8 +104,8 @@ jQuery(function($) {
 			 * Clean multi select object values.
 			 */
 			$.fn.multiSelect.clean = function() {
-				for (var id in values.selected) {
-					removeSelected(id, obj, values, options);
+				for (var name in values.selected) {
+					removeSelected(values.selected[name.toUpperCase()].uid, obj, values, options);
 				}
 
 				cleanAvailable(obj, values);
@@ -117,7 +119,9 @@ jQuery(function($) {
 			$.fn.multiSelect.getData = function() {
 				var data = [];
 
-				for (var id in values.selected) {
+				for (var name in values.selected) {
+					id = values.selected[name].id;
+
 					data[data.length] = {
 						id: id,
 						name: $('input[value="' + id + '"]', obj).data('name'),
@@ -141,7 +145,8 @@ jQuery(function($) {
 					isMoreMatchesFound: false,
 					isAvailableOpenned: false,
 					selected: {},
-					available: {}
+					available: {},
+					ignored: {}
 				};
 
 			// search input
@@ -382,6 +387,10 @@ jQuery(function($) {
 				loadSelected(options.data, obj, values, options);
 			}
 
+			if (!empty(options.ignored)) {
+				loadIgnored(options.ignored, values);
+			}
+
 			// resize
 			resizeSelected(obj, values, options);
 			resizeAvailable(obj);
@@ -413,11 +422,17 @@ jQuery(function($) {
 		});
 	}
 
+	function loadIgnored(ignored, values) {
+		$.each(ignored, function(i, item) {
+			values.ignored[item.toUpperCase()] = item;
+		});
+	}
+
 	function loadAvailable(data, obj, values, options) {
 		cleanAvailable(obj, values);
 
 		var availableValues = [];
-		var value = values['search'].trim();
+		var value = values['search'].replace(/^\s+|\s+$/g, '');
 
 		// add new
 		if (!empty(data)) {
@@ -539,7 +554,7 @@ jQuery(function($) {
 
 		$.each(values.selected, function(i, selected) {
 			if (selected.uid == uid) {
-				delete values.selected[selected.realName];
+				delete values.selected[selected.realName.toUpperCase()];
 				return false;
 			}
 		});
@@ -576,7 +591,8 @@ jQuery(function($) {
 		}
 		if (empty(options.limit) || (options.limit > 0 && $('.available li', obj).length < options.limit)) {
 			if (typeof(values.available[item.id]) == 'undefined'
-					&& typeof(values.selected[item.realName.toUpperCase()]) == 'undefined') {
+					&& typeof(values.selected[item.realName.toUpperCase()]) == 'undefined'
+					&& typeof(values.ignored[item.realName.toUpperCase()]) == 'undefined') {
 				item.uid = getId();
 
 				values.available[item.uid] = item;
@@ -719,11 +735,19 @@ jQuery(function($) {
 			});
 		}
 
-		$('input[type="text"]', obj).css({
-			'padding-top': top,
-			'padding-left': left,
-			width: values.width - left - settingRightPaddings
-		});
+		if (IE) {
+			$('input[type="text"]', obj).css({
+				'padding-top': top,
+				'padding-left': left
+			});
+		}
+		else {
+			$('input[type="text"]', obj).css({
+				'padding-top': top,
+				'padding-left': left,
+				width: values.width - left - settingRightPaddings
+			});
+		}
 	}
 
 	function resizeAvailable(obj) {
@@ -766,9 +790,24 @@ jQuery(function($) {
 	}
 
 	function getLimit(values, options) {
+
 		return (options.limit > 0)
-			? options.limit + objectLength(values.selected) + 1
+			? options.limit + countMatches(values.selected, values.search) + countMatches(values.ignored, values.search) + 1
 			: null;
+	}
+
+	function countMatches(data, search) {
+		var count = 0;
+
+		for (var key in data) {
+			var name = (typeof(data[key]) == 'object') ? data[key].name : data[key];
+
+			if (name.substr(0, search.length).toUpperCase() == search.toUpperCase()) {
+				count++;
+			}
+		}
+
+		return count;
 	}
 
 	function objectLength(obj) {

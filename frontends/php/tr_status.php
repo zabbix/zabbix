@@ -296,7 +296,7 @@ $severityComboBox->addItems(array(
 	TRIGGER_SEVERITY_HIGH => getSeverityCaption(TRIGGER_SEVERITY_HIGH),
 	TRIGGER_SEVERITY_DISASTER => getSeverityCaption(TRIGGER_SEVERITY_DISASTER)
 ));
-$filterForm->addRow(_('Min severity'), $severityComboBox);
+$filterForm->addRow(_('Minimum trigger severity'), $severityComboBox);
 
 $statusChangeDays = new CNumericBox('status_change_days', $_REQUEST['status_change_days'], 4);
 if (!$_REQUEST['status_change']) {
