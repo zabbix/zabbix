@@ -19,7 +19,7 @@
 
 #include "sysinfo.h"
 
-#ifdef HAVE_SYS_PSTAT_H
+#ifdef HAVE_SYS_UTSNAME_H
 #	include <sys/utsname.h>
 #endif
 
