@@ -114,15 +114,16 @@ $_REQUEST['go'] = get_request('go', 'none');
  */
 if (get_request('groupid', 0) > 0) {
 	$groupids = available_groups($_REQUEST['groupid'], 1);
-	if (empty($groupids)) {
+	if (!$groupids) {
 		access_deny();
 	}
 }
 if (get_request('hostid', 0) > 0) {
-	$options = array('hostids' => $_REQUEST['hostid'], 'editable' => 1);
-	$hosts = API::Host()->get($options);
-	$hostids = zbx_objectValues($hosts, 'hostid');
-	if (empty($hostids)) {
+	$hosts = API::Host()->get(array(
+		'hostids' => $_REQUEST['hostid'],
+		'editable' => 1
+	));
+	if (!$hosts) {
 		access_deny();
 	}
 }
