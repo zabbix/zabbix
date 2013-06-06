@@ -533,7 +533,7 @@
 			new CCol($cmbValType, 'col3'),
 			new CCol(bold(_('Status').NAME_DELIMITER), 'label col4'),
 			new CCol($cmbStatus, 'col4')
-		));
+		), 'item-list-row');
 		// row 2
 		$hostFilterData = null;
 		if (!empty($filter_hostId)) {
@@ -569,7 +569,7 @@
 			new CCol($dataTypeInput),
 			new CCol(bold(_('State').NAME_DELIMITER), 'label'),
 			new CCol($cmbState, 'col4')
-		));
+		), 'item-list-row');
 		// row 3
 		$table->addRow(array(
 			new CCol(bold(_('Application').NAME_DELIMITER), 'label'),
@@ -593,7 +593,7 @@
 				1 => _('With triggers'),
 				0 => _('Without triggers')
 			)))
-		));
+		), 'item-list-row');
 		// row 4
 		$table->addRow(array(
 			new CCol(array(bold(_('Name')), SPACE._('like').NAME_DELIMITER), 'label'),
@@ -608,7 +608,7 @@
 				1 => _('Templated items'),
 				0 => _('Not Templated items'),
 			)))
-		));
+		), 'item-list-row');
 		// row 5
 		$table->addRow(array(
 			new CCol(array(bold(_('Key')), SPACE._('like').NAME_DELIMITER), 'label'),
@@ -619,7 +619,7 @@
 			new CCol(),
 			new CCol(null, 'label'),
 			new CCol()
-		));
+		), 'item-list-row');
 
 		$reset = new CButton('reset', _('Reset'), "javascript: clearAllForm('zbx_filter');");
 		$reset->useJQueryStyle();
