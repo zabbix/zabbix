@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once dirname(__FILE__).'/js/configuration.item.list.js.php';
 
 $itemsWidget = new CWidget(null, 'item-list');
