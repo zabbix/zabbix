@@ -103,21 +103,20 @@ zbx_hv_t;
 
 typedef struct
 {
+	char			*uuid;
+	char			*id;
+	char			*status_ex;
+}
+zbx_vm_t;
+
+typedef struct
+{
 	char			*id;
 	char			*name;
 	char			*status;
 	char			*vmlist;
 }
 zbx_cluster_t;
-
-typedef struct
-{
-	char			*uuid;
-	char			*id;
-	char			*status_ex;
-	zbx_cluster_t		*cluster;
-}
-zbx_vm_t;
 
 static size_t	WRITEFUNCTION2(void *ptr, size_t size, size_t nmemb, void *userdata)
 {
@@ -511,7 +510,7 @@ out:
  *         Otherwise, FAIL is returned.                                       *
  *                                                                            *
  ******************************************************************************/
-static int	vcenter_clusters_get(CURL *easyhandle, char **clusters, char **error)
+static int	vcenter_clusters_get(CURL *easyhandle, char **error)
 {
 #	define ZBX_POST_VCENTER_CLUSTER								\
 		ZBX_POST_VSPHERE_HEADER								\
@@ -655,179 +654,6 @@ static int	vcenter_clusters_get(CURL *easyhandle, char **clusters, char **error)
 
 	if (NULL != (*error = read_xml_value(page.data, ZBX_XPATH_LN1("faultstring"))))
 		goto out;
-
-	*clusters = zbx_strdup(*clusters, page.data);
-
-	ret = SUCCEED;
-out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
-
-	return ret;
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: vcenter_cluster_vms_get                                          *
- *                                                                            *
- * Purpose: populate array of guest VMs                                       *
- *                                                                            *
- * Parameters: easyhandle - [IN] CURL easy handle                             *
- *             clusterid  - [IN] cluster ID                                   *
- *             vms        - [OUT] VMs xml                                     *
- *                                                                            *
- * Return: Upon successful completion the function return SUCCEED.            *
- *         Otherwise, FAIL is returned.                                       *
- *                                                                            *
- ******************************************************************************/
-static int	vcenter_cluster_vms_get(CURL *easyhandle, const char *clusterid, zbx_vector_str_t *guestvmids,
-		char **error)
-{
-#	define ZBX_POST_VCENTER_CLUSTER_VMS							\
-		ZBX_POST_VSPHERE_HEADER								\
-		"<ns0:RetrievePropertiesEx xsi:type=\"ns0:RetrievePropertiesExRequestType\">"	\
-			"<ns0:_this type=\"PropertyCollector\">propertyCollector</ns0:_this>"	\
-			"<ns0:specSet>"								\
-				"<ns0:propSet>"							\
-					"<ns0:type>VirtualMachine</ns0:type>"			\
-				"</ns0:propSet>"						\
-				"<ns0:objectSet>"						\
-					"<ns0:obj type=\"ClusterComputeResource\">%s</ns0:obj>"	\
-					"<ns0:skip>false</ns0:skip>"				\
-					"<ns0:selectSet xsi:type=\"ns0:TraversalSpec\">"	\
-						"<ns0:name>visitFolders</ns0:name>"		\
-						"<ns0:type>Folder</ns0:type>"			\
-						"<ns0:path>childEntity</ns0:path>"		\
-						"<ns0:skip>false</ns0:skip>"			\
-						"<ns0:selectSet>"				\
-							"<ns0:name>visitFolders</ns0:name>"	\
-						"</ns0:selectSet>"				\
-						"<ns0:selectSet>"				\
-							"<ns0:name>dcToHf</ns0:name>"		\
-						"</ns0:selectSet>"				\
-						"<ns0:selectSet>"				\
-							"<ns0:name>dcToVmf</ns0:name>"		\
-						"</ns0:selectSet>"				\
-						"<ns0:selectSet>"				\
-							"<ns0:name>crToH</ns0:name>"		\
-						"</ns0:selectSet>"				\
-						"<ns0:selectSet>"				\
-							"<ns0:name>crToRp</ns0:name>"		\
-						"</ns0:selectSet>"				\
-						"<ns0:selectSet>"				\
-							"<ns0:name>dcToDs</ns0:name>"		\
-						"</ns0:selectSet>"				\
-						"<ns0:selectSet>"				\
-							"<ns0:name>hToVm</ns0:name>"		\
-						"</ns0:selectSet>"				\
-						"<ns0:selectSet>"				\
-							"<ns0:name>rpToVm</ns0:name>"		\
-						"</ns0:selectSet>"				\
-					"</ns0:selectSet>"					\
-					"<ns0:selectSet xsi:type=\"ns0:TraversalSpec\">"	\
-						"<ns0:name>dcToVmf</ns0:name>"			\
-						"<ns0:type>Datacenter</ns0:type>"		\
-						"<ns0:path>vmFolder</ns0:path>"			\
-						"<ns0:skip>false</ns0:skip>"			\
-						"<ns0:selectSet>"				\
-							"<ns0:name>visitFolders</ns0:name>"	\
-						"</ns0:selectSet>"				\
-					"</ns0:selectSet>"					\
-					"<ns0:selectSet xsi:type=\"ns0:TraversalSpec\">"	\
-						"<ns0:name>dcToDs</ns0:name>"			\
-						"<ns0:type>Datacenter</ns0:type>"		\
-						"<ns0:path>datastore</ns0:path>"		\
-						"<ns0:skip>false</ns0:skip>"			\
-						"<ns0:selectSet>"				\
-							"<ns0:name>visitFolders</ns0:name>"	\
-						"</ns0:selectSet>"				\
-					"</ns0:selectSet>"					\
-					"<ns0:selectSet xsi:type=\"ns0:TraversalSpec\">"	\
-						"<ns0:name>dcToHf</ns0:name>"			\
-						"<ns0:type>Datacenter</ns0:type>"		\
-						"<ns0:path>hostFolder</ns0:path>"		\
-						"<ns0:skip>false</ns0:skip>"			\
-						"<ns0:selectSet>"				\
-							"<ns0:name>visitFolders</ns0:name>"	\
-						"</ns0:selectSet>"				\
-					"</ns0:selectSet>"					\
-					"<ns0:selectSet xsi:type=\"ns0:TraversalSpec\">"	\
-						"<ns0:name>crToH</ns0:name>"			\
-						"<ns0:type>ComputeResource</ns0:type>"		\
-						"<ns0:path>host</ns0:path>"			\
-						"<ns0:skip>false</ns0:skip>"			\
-					"</ns0:selectSet>"					\
-					"<ns0:selectSet xsi:type=\"ns0:TraversalSpec\">"	\
-						"<ns0:name>crToRp</ns0:name>"			\
-						"<ns0:type>ComputeResource</ns0:type>"		\
-						"<ns0:path>resourcePool</ns0:path>"		\
-						"<ns0:skip>false</ns0:skip>"			\
-						"<ns0:selectSet>"				\
-							"<ns0:name>rpToRp</ns0:name>"		\
-						"</ns0:selectSet>"				\
-						"<ns0:selectSet>"				\
-							"<ns0:name>rpToVm</ns0:name>"		\
-						"</ns0:selectSet>"				\
-					"</ns0:selectSet>"					\
-					"<ns0:selectSet xsi:type=\"ns0:TraversalSpec\">"	\
-						"<ns0:name>rpToRp</ns0:name>"			\
-						"<ns0:type>ResourcePool</ns0:type>"		\
-						"<ns0:path>resourcePool</ns0:path>"		\
-						"<ns0:skip>false</ns0:skip>"			\
-						"<ns0:selectSet>"				\
-							"<ns0:name>rpToRp</ns0:name>"		\
-						"</ns0:selectSet>"				\
-						"<ns0:selectSet>"				\
-							"<ns0:name>rpToVm</ns0:name>"		\
-						"</ns0:selectSet>"				\
-					"</ns0:selectSet>"					\
-					"<ns0:selectSet xsi:type=\"ns0:TraversalSpec\">"	\
-						"<ns0:name>hToVm</ns0:name>"			\
-						"<ns0:type>HostSystem</ns0:type>"		\
-						"<ns0:path>vm</ns0:path>"			\
-						"<ns0:skip>false</ns0:skip>"			\
-						"<ns0:selectSet>"				\
-							"<ns0:name>visitFolders</ns0:name>"	\
-						"</ns0:selectSet>"				\
-					"</ns0:selectSet>"					\
-					"<ns0:selectSet xsi:type=\"ns0:TraversalSpec\">"	\
-						"<ns0:name>rpToVm</ns0:name>"			\
-						"<ns0:type>ResourcePool</ns0:type>"		\
-						"<ns0:path>vm</ns0:path>"			\
-						"<ns0:skip>false</ns0:skip>"			\
-					"</ns0:selectSet>"					\
-				"</ns0:objectSet>"						\
-			"</ns0:specSet>"							\
-			"<ns0:options/>"							\
-		"</ns0:RetrievePropertiesEx>"							\
-		ZBX_POST_VSPHERE_FOOTER
-
-	const char	*__function_name = "vcenter_cluster_vms_get";
-
-	int		err, o, ret = FAIL;
-	char		tmp[MAX_STRING_LEN << 1];
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
-
-	zbx_snprintf(tmp, sizeof(tmp), ZBX_POST_VCENTER_CLUSTER_VMS, clusterid);
-
-	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, o = CURLOPT_POSTFIELDS, tmp)))
-	{
-		*error = zbx_dsprintf(*error, "Cannot set cURL option [%d]: %s", o, curl_easy_strerror(err));
-		goto out;
-	}
-
-	page.offset = 0;
-
-	if (CURLE_OK != (err = curl_easy_perform(easyhandle)))
-	{
-		*error = zbx_strdup(*error, curl_easy_strerror(err));
-		goto out;
-	}
-
-	if (NULL != (*error = read_xml_value(page.data, ZBX_XPATH_LN1("faultstring"))))
-		goto out;
-
-	read_xml_values(page.data, "//*[@type='VirtualMachine']", guestvmids);
 
 	ret = SUCCEED;
 out:
@@ -1057,6 +883,7 @@ static int	vmware_vm_status_ex_get(CURL *easyhandle, const char *vmid, unsigned 
 		goto out;
 	}
 
+	zabbix_log(LOG_LEVEL_DEBUG, ">>>>>> %s() %s", __function_name, page.data);
 	ret = SUCCEED;
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
@@ -1257,14 +1084,14 @@ static int	vcenter_update(const char *url, const char *username, const char *pas
 	const char		*__function_name = "vcenter_update";
 
 	CURL			*easyhandle = NULL;
-	int			o, i, j, k, l,err, ret = FAIL;
+	int			o, i, j, err, ret = FAIL;
 	zbx_vector_str_t	guesthvids, guestvmids, clusterids;
 	struct curl_slist	*headers = NULL;
 	zbx_vcenter_t		*vcenter;
 	zbx_hv_t		*hv;
 	zbx_vm_t		*vm;
 	zbx_cluster_t		*cluster;
-	char			*uuid, *name, *clusters = NULL, *event_session = NULL,
+	char			*uuid, *name, *event_session = NULL,
 				xpath[MAX_STRING_LEN];
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() url:'%s' username:'%s' password:'%s'",
@@ -1371,7 +1198,6 @@ static int	vcenter_update(const char *url, const char *username, const char *pas
 				vm->uuid = uuid;
 				vm->id = NULL;
 				vm->status_ex = NULL;
-				vm->cluster = NULL;
 
 				zbx_vector_ptr_append(&hv->vms, vm);
 			}
@@ -1397,23 +1223,10 @@ static int	vcenter_update(const char *url, const char *username, const char *pas
 
 	/* clusters */
 
-	/* clear cluster data*/
-	for (i = 0; i < vcenter->hvs.values_num; i++)
-	{
-		hv = (zbx_hv_t *)vcenter->hvs.values[i];
-
-		for (j = 0; j < hv->vms.values_num; j++)
-		{
-			vm = (zbx_vm_t *)hv->vms.values[j];
-
-			vm->cluster = NULL;
-		}
-	}
-
-	if (SUCCEED != vcenter_clusters_get(easyhandle, &clusters, error))
+	if (SUCCEED != vcenter_clusters_get(easyhandle, error))
 		goto clean;
 
-	read_xml_values(clusters, "//*[@type='ClusterComputeResource']", &clusterids);
+	read_xml_values(page.data, "//*[@type='ClusterComputeResource']", &clusterids);
 
 	for (i = 0; i < clusterids.values_num; i++)
 	{
@@ -1440,37 +1253,12 @@ static int	vcenter_update(const char *url, const char *username, const char *pas
 
 		if (SUCCEED != vcenter_cluster_status_get(easyhandle, clusterids.values[i], &cluster->status, error))
 			goto clean;
-
-		/* list of guest VMs */
-
-		if (SUCCEED != vcenter_cluster_vms_get(easyhandle, clusterids.values[i], &guestvmids, error))
-			goto clean;
-
-		for (j = 0; j < vcenter->hvs.values_num; j++)
-		{
-			hv = (zbx_hv_t *)vcenter->hvs.values[j];
-
-			for (k = 0; k < hv->vms.values_num; k++)
-			{
-				vm = (zbx_vm_t *)hv->vms.values[k];
-
-				for (l = 0; l < guestvmids.values_num; l++)
-				{
-					if (0 != strcmp(guestvmids.values[l], vm->id))
-						continue;
-
-					vm->cluster = cluster;
-					break;
-				}
-			}
-		}
 	}
 
 	vcenter->lastcheck = time(NULL);
 
 	ret = SUCCEED;
 clean:
-	zbx_free(clusters);
 	zbx_free(event_session);
 
 	for (i = 0; i < clusterids.values_num; i++)
@@ -1657,7 +1445,7 @@ static int	vsphere_update(const char *url, const char *username, const char *pas
 	if (SUCCEED != vmware_event_session_get(easyhandle, &event_session, error, ZBX_VMWARE_FLAG_VSPHERE))
 		goto clean;
 
-	if ( SUCCEED != vmware_events_get(easyhandle, event_session, &vsphere->events, error, ZBX_VMWARE_FLAG_VSPHERE))
+	if (SUCCEED != vmware_events_get(easyhandle, event_session, &vsphere->events, error, ZBX_VMWARE_FLAG_VSPHERE))
 		goto clean;
 
 	vsphere->lastcheck = time(NULL);
@@ -1974,8 +1762,8 @@ int	check_vcenter_cluster_discovery(AGENT_REQUEST *request, AGENT_RESULT *result
 int	check_vcenter_cluster_status(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char		*url, *username, *password, *name, *status, *error = NULL;
-	zbx_vcenter_t	*vcenter = NULL;
-	zbx_cluster_t	*cluster = NULL;
+	zbx_vcenter_t	*vcenter;
+	zbx_cluster_t	*cluster;
 
 	if (4 != request->nparam)
 		return SYSINFO_RET_FAIL;
@@ -2101,7 +1889,6 @@ int	check_vcenter_hv_discovery(AGENT_REQUEST *request, AGENT_RESULT *result)
 	char		*url, *username, *password, *name, *error = NULL;
 	zbx_vcenter_t	*vcenter;
 	zbx_hv_t	*hv;
-	zbx_cluster_t	*cluster = NULL;
 
 	if (3 != request->nparam)
 		return SYSINFO_RET_FAIL;
@@ -2126,6 +1913,8 @@ int	check_vcenter_hv_discovery(AGENT_REQUEST *request, AGENT_RESULT *result)
 	{
 		for (i = 0; i < vcenter->hvs.values_num; i++)
 		{
+			zbx_cluster_t	*cluster = NULL;
+
 			hv = (zbx_hv_t *)vcenter->hvs.values[i];
 
 			if (NULL == (name = read_xml_value(hv->details, ZBX_XPATH_LN2("config", "name"))))
@@ -2260,9 +2049,9 @@ int	check_vcenter_vm_cluster_name(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	int		i;
 	char		*url, *username, *password, *uuid, *error = NULL;
-	zbx_vcenter_t	*vcenter = NULL;
+	zbx_vcenter_t	*vcenter;
 	zbx_hv_t	*hv;
-	zbx_vm_t	*vm;
+	zbx_cluster_t	*cluster = NULL;
 
 	if (4 != request->nparam)
 		return SYSINFO_RET_FAIL;
@@ -2288,14 +2077,17 @@ int	check_vcenter_vm_cluster_name(AGENT_REQUEST *request, AGENT_RESULT *result)
 	{
 		hv = (zbx_hv_t *)vcenter->hvs.values[i];
 
-		if (NULL != (vm = vm_get(&hv->vms, uuid)))
+		if (NULL != vm_get(&hv->vms, uuid))
 			break;
 	}
 
-	if (NULL == vm)
+	if (i == vcenter->hvs.values_num)
 		return SYSINFO_RET_FAIL;
 
-	SET_STR_RESULT(result, zbx_strdup(NULL, NULL != vm->cluster ? vm->cluster->name : ""));
+	if (NULL != hv->clusterid)
+		cluster = cluster_get(&vcenter->clusters, hv->clusterid);
+
+	SET_STR_RESULT(result, zbx_strdup(NULL, NULL != cluster ? cluster->name : ""));
 
 	return SYSINFO_RET_OK;
 }
@@ -2317,7 +2109,7 @@ int	check_vcenter_vm_discovery(AGENT_REQUEST *request, AGENT_RESULT *result)
 	struct zbx_json	j;
 	int		i, k;
 	char		*url, *username, *password, *name, *host, *error = NULL;
-	zbx_vcenter_t	*vcenter = NULL;
+	zbx_vcenter_t	*vcenter;
 	zbx_hv_t	*hv;
 	zbx_vm_t	*vm;
 
@@ -2344,7 +2136,12 @@ int	check_vcenter_vm_discovery(AGENT_REQUEST *request, AGENT_RESULT *result)
 	{
 		for (i = 0; i < vcenter->hvs.values_num; i++)
 		{
+			zbx_cluster_t	*cluster = NULL;
+
 			hv = (zbx_hv_t *)vcenter->hvs.values[i];
+
+			if (NULL != hv->clusterid)
+				cluster = cluster_get(&vcenter->clusters, hv->clusterid);
 
 			for (k = 0; k < hv->vms.values_num; k++)
 			{
@@ -2365,7 +2162,7 @@ int	check_vcenter_vm_discovery(AGENT_REQUEST *request, AGENT_RESULT *result)
 				zbx_json_addstring(&j, "{#VM.NAME}", name, ZBX_JSON_TYPE_STRING);
 				zbx_json_addstring(&j, "{#HV.NAME}", host, ZBX_JSON_TYPE_STRING);
 				zbx_json_addstring(&j, "{#CLUSTER.NAME}",
-						(NULL != vm->cluster ? vm->cluster->name : ""), ZBX_JSON_TYPE_STRING);
+						(NULL != cluster ? cluster->name : ""), ZBX_JSON_TYPE_STRING);
 				zbx_json_close(&j);
 
 				zbx_free(host);
