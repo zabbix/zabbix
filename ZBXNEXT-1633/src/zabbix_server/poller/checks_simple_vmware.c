@@ -108,7 +108,8 @@ zbx_vm_t;
 
 typedef struct
 {
-	char			*uuid;
+	char			*id;
+	char			*name;
 	char			*status;
 	char			*vmlist;
 }
@@ -500,18 +501,18 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: vcenter_clusterids_get                                           *
+ * Function: vcenter_clusters_get                                             *
  *                                                                            *
  * Purpose: populate array of guest VMs                                       *
  *                                                                            *
  * Parameters: easyhandle - [IN] CURL easy handle                             *
- *             clusterids - [OUT] list of cluster names                       *
+ *             clusters   - [OUT] clusters xml                                *
  *                                                                            *
  * Return: Upon successful completion the function return SUCCEED.            *
  *         Otherwise, FAIL is returned.                                       *
  *                                                                            *
  ******************************************************************************/
-static int	vcenter_clusterids_get(CURL *easyhandle, zbx_vector_str_t *clusterids, char **error)
+static int	vcenter_clusters_get(CURL *easyhandle, char **clusters, char **error)
 {
 #	define ZBX_POST_VCENTER_CLUSTER								\
 		ZBX_POST_VSPHERE_HEADER								\
@@ -633,7 +634,7 @@ static int	vcenter_clusterids_get(CURL *easyhandle, zbx_vector_str_t *clusterids
 		"</ns0:RetrievePropertiesEx>"							\
 		ZBX_POST_VSPHERE_FOOTER
 
-	const char	*__function_name = "vcenter_clusterids_get";
+	const char	*__function_name = "vcenter_clusters_get";
 
 	int		err, o, ret = FAIL;
 
@@ -656,7 +657,7 @@ static int	vcenter_clusterids_get(CURL *easyhandle, zbx_vector_str_t *clusterids
 	if (NULL != (*error = read_xml_value(page.data, ZBX_XPATH_LN1("faultstring"))))
 		goto out;
 
-	read_xml_values(page.data, "//*[@type='ClusterComputeResource']", clusterids);
+	*clusters = zbx_strdup(*clusters, page.data);
 
 	ret = SUCCEED;
 out:
@@ -683,7 +684,7 @@ static int	vcenter_cluster_status_get(CURL *easyhandle, const char *clusterid, c
 			"</ns0:specSet>"								\
 			"<ns0:options></ns0:options>"							\
 		"</ns0:RetrievePropertiesEx>"								\
-		enter_cluster_status_getBX_POST_VSPHERE_FOOTER
+		ZBX_POST_VSPHERE_FOOTER
 
 	const char	*__function_name = "vcenter_cluster_status_get";
 
@@ -901,14 +902,6 @@ static int	vmware_event_session_get(CURL *easyhandle, char **event_session, char
 			"<ns0:filter/>"						\
 		"</ns0:CreateCollectorForEvents>"				\
 		ZBX_POST_VSPHERE_FOOTER
-/*
-			"<ns1:filter>"									\
-				"<time>"								\
-					"<beginTime>2000-01-01T00:00:00Z</beginTime>"			\
-					"<endTime>2013-06-02T00:00:00Z</endTime>"			\
-				"</time>"								\
-			"</ns1:filter>"									\
-*/
 
 	const char	*__function_name = "vmware_event_session_get";
 
@@ -1056,7 +1049,7 @@ static zbx_vm_t	*vm_get(zbx_vector_ptr_t *vms, const char *uuid)
 	return NULL;
 }
 
-static zbx_cluster_t	*cluster_get(zbx_vector_ptr_t *clusters, const char *uuid)
+static zbx_cluster_t	*cluster_get(zbx_vector_ptr_t *clusters, const char *clusterid)
 {
 	zbx_cluster_t	*cluster;
 	int		i;
@@ -1065,7 +1058,23 @@ static zbx_cluster_t	*cluster_get(zbx_vector_ptr_t *clusters, const char *uuid)
 	{
 		cluster = (zbx_cluster_t *)clusters->values[i];
 
-		if (0 == strcmp(cluster->uuid, uuid))
+		if (0 == strcmp(cluster->id, clusterid))
+			return cluster;
+	}
+
+	return NULL;
+}
+
+static zbx_cluster_t	*cluster_get_by_name(zbx_vector_ptr_t *clusters, const char *name)
+{
+	zbx_cluster_t	*cluster;
+	int		i;
+
+	for (i = 0; i < clusters->values_num; i++)
+	{
+		cluster = (zbx_cluster_t *)clusters->values[i];
+
+		if (0 == strcmp(cluster->name, name))
 			return cluster;
 	}
 
@@ -1084,7 +1093,7 @@ static int	vcenter_update(const char *url, const char *username, const char *pas
 	zbx_hv_t		*hv;
 	zbx_vm_t		*vm;
 	zbx_cluster_t		*cluster;
-	char			*uuid, *event_session = NULL;
+	char			*uuid, *clusters = NULL, *event_session = NULL, *name, xpath[MAX_STRING_LEN];
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() url:'%s' username:'%s' password:'%s'",
 			__function_name, url, username, password);
@@ -1202,20 +1211,33 @@ static int	vcenter_update(const char *url, const char *username, const char *pas
 	if (SUCCEED != vmware_events_get(easyhandle, event_session, &vcenter->events, error, ZBX_VMWARE_FLAG_VCENTER))
 		goto clean;
 
-	if (SUCCEED != vcenter_clusterids_get(easyhandle, &clusterids, error))
+	if (SUCCEED != vcenter_clusters_get(easyhandle, &clusters, error))
 		goto clean;
+
+	read_xml_values(clusters, "//*[@type='ClusterComputeResource']", &clusterids);
 
 	for (i = 0; i < clusterids.values_num; i++)
 	{
+		zbx_snprintf(xpath, sizeof(xpath), "//*[@type='ClusterComputeResource'][.='%s']"
+				"/.." ZBX_XPATH_LN2("propSet", "val"), clusterids.values[i]);
+
+		if (NULL == (name = read_xml_value(page.data, xpath)))
+			continue;
+
 		if (NULL == (cluster = cluster_get(&vcenter->clusters, clusterids.values[i])))
 		{
 			cluster = zbx_malloc(NULL, sizeof(zbx_cluster_t));
-			cluster->uuid = zbx_strdup(NULL, clusterids.values[i]);
+			cluster->id = zbx_strdup(NULL, clusterids.values[i]);
+			cluster->name = NULL;
 			cluster->status = NULL;
 			cluster->vmlist = NULL;
 
 			zbx_vector_ptr_append(&vcenter->clusters, cluster);
 		}
+		else
+			zbx_free(cluster->name);
+
+		cluster->name = name;
 
 		if (SUCCEED != vcenter_cluster_status_get(easyhandle, clusterids.values[i], &cluster->status, error))
 			goto clean;
@@ -1708,7 +1730,8 @@ int	check_vcenter_cluster_discovery(AGENT_REQUEST *request, AGENT_RESULT *result
 			cluster = (zbx_cluster_t *)vcenter->clusters.values[i];
 
 			zbx_json_addobject(&j, NULL);
-			zbx_json_addstring(&j, "{#CLUSTER.NAME}", cluster->uuid, ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(&j, "{#CLUSTER.ID}", cluster->id, ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(&j, "{#CLUSTER.NAME}", cluster->name, ZBX_JSON_TYPE_STRING);
 			zbx_json_close(&j);
 		}
 	}
@@ -1724,7 +1747,7 @@ int	check_vcenter_cluster_discovery(AGENT_REQUEST *request, AGENT_RESULT *result
 
 int	check_vcenter_cluster_status(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	char		*url, *username, *password, *clusterid, *status, *error = NULL;
+	char		*url, *username, *password, *name, *status, *error = NULL;
 	zbx_vcenter_t	*vcenter = NULL;
 	zbx_cluster_t	*cluster = NULL;
 
@@ -1734,9 +1757,9 @@ int	check_vcenter_cluster_status(AGENT_REQUEST *request, AGENT_RESULT *result)
 	url = get_rparam(request, 0);
 	username = get_rparam(request, 1);
 	password = get_rparam(request, 2);
-	clusterid = get_rparam(request, 3);
+	name = get_rparam(request, 3);
 
-	if ('\0' == *url || '\0' == *username || '\0' == *clusterid)
+	if ('\0' == *url || '\0' == *username || '\0' == *name)
 		return SYSINFO_RET_FAIL;
 
 	if (SUCCEED != vcenter_update(url, username, password, &error))
@@ -1748,7 +1771,7 @@ int	check_vcenter_cluster_status(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if (NULL == (vcenter = vcenter_get(url, username, password)))
 		return SYSINFO_RET_FAIL;
 
-	if (NULL == (cluster = cluster_get(&vcenter->clusters, clusterid)))
+	if (NULL == (cluster = cluster_get_by_name(&vcenter->clusters, name)))
 		return SYSINFO_RET_FAIL;
 
 	if (NULL == (status = read_xml_value(cluster->status, ZBX_XPATH_LN2("val", "overallStatus"))))
