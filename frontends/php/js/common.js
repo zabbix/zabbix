@@ -254,24 +254,28 @@ function clearAllForm(form) {
 			case 'submit':
 				break;
 			case 'checkbox':
-				inputs[i].checked = false;
+				jQuery(inputs[i]).prop('checked', false).trigger('change');
 				break;
 			case 'text':
 			case 'password':
 			default:
-				inputs[i].value = '';
+				jQuery(inputs[i]).val('').trigger('change');
 		}
 	}
 
 	var selects = form.getElementsByTagName('select');
 	for (var i = 0; i < selects.length; i++) {
-		selects[i].selectedIndex = 0;
+		jQuery(selects[i]).val(null).trigger('change');
 	}
 
 	var areas = form.getElementsByTagName('textarea');
 	for (var i = 0; i < areas.length; i++) {
-		areas[i].innerHTML = '';
+		jQuery(areas[i]).val('').trigger('change');
 	}
+
+	jQuery('.multiselect').each(function() {
+		jQuery(this).multiSelect.clean(jQuery(this).attr('id'));
+	});
 
 	return true;
 }
