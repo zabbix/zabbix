@@ -18,7 +18,7 @@
 **/
 
 /* host interfaces */
-.host-edit .interface-group { width: 800px; }
+.host-edit .interface-group { width: 750px; }
 .host-edit .interface-row, .host-edit .interface-row .dd { padding: 0; line-height: 1.0em; }
 .host-edit .interface-row .dd .interface-group { line-height: 1.8em; }
 .host-edit .interface-row .objectgroup { border-top-width: 0; padding-top: 4px; }
