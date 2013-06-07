@@ -89,7 +89,7 @@ $scriptFormList->addRow(null, new CMultiSelect(array(
 	'data' => $this->get('hostGroup')
 )), null, 'hostGroupSelection');
 
-// permissions
+// access
 $accessComboBox = new CCombobox('access', $this->get('access'));
 $accessComboBox->addItem(PERM_READ, _('Read'));
 $accessComboBox->addItem(PERM_READ_WRITE, _('Write'));

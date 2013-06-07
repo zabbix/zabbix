@@ -105,14 +105,14 @@ $maintenancePeriodTable->setHeader(array(
 
 foreach ($this->data['timeperiods'] as $id => $timeperiod) {
 	$maintenancePeriodTable->addRow(array(
-		timeperiod_type2str($timeperiod['timeperiod_type']),
+		new CCol(timeperiod_type2str($timeperiod['timeperiod_type']), 'nowrap'),
 		new CCol(shedule2str($timeperiod), 'wraptext'),
-		zbx_date2age(0, $timeperiod['period']),
-		array(
+		new CCol(zbx_date2age(0, $timeperiod['period']), 'nowrap'),
+		new CCol(array(
 			new CSubmit('edit_timeperiodid['.$id.']', _('Edit'), null, 'link_menu'),
 			SPACE.SPACE,
 			new CSubmit('del_timeperiodid['.$id.']', _('Remove'), null, 'link_menu')
-		)
+		), 'nowrap')
 	));
 	if (isset($timeperiod['timeperiodid'])) {
 		$maintenanceForm->addVar('timeperiods['.$id.'][timeperiodid]', $timeperiod['timeperiodid']);
