@@ -23,6 +23,39 @@
 #include "zbxtypes.h"
 #include "zbxalgo.h"
 
+/*
+ * The Value Cache provides read caching of item historical data residing in history
+ * tables. No components must read history tables manually. Instead all history data
+ * must be read from the Value Cache.
+ *
+ * Usage notes:
+ *
+ * Initialization
+ *
+ *   The value cache must be initialized at the start of the program with zbx_vc_init()
+ *   function. To ensure proper removal of shared memory the value cache must be destroyed
+ *   upon a program exit with zbx_vc_destroy() function.
+ *
+ * Adding data
+ *
+ *   Whenever a new item value is added to system (history tables) the item value must be
+ *   also added added to Value Cache with zbx_add_value() function to keep it up to date.
+ *
+ * Retrieving data
+ *
+ *   The history data is accessed with zbx_vc_get_value_range() and zbx_vc_get_value()
+ *   functions. Afterwards the retrieved history data must be freed by the caller by using
+ *   either zbx_vc_value_vector_destroy() function (free the zbx_vc_get_value_range()
+ *   call output) or zbx_vc_value_clear() function (free the zbx_vc_get_value() call output).
+ *
+ * Locking
+ *
+ *   The cache ensures synchronization between processes by using automatic locks whenever
+ *   a cache function (zbx_vc_*) is called and by providing manual cache locking functionality
+ *   with zbx_vc_lock()/zbx_vc_unlock() functions.
+ *
+ */
+
 /* the item history value */
 typedef struct
 {
@@ -53,23 +86,16 @@ void	zbx_vc_lock(void);
 
 void	zbx_vc_unlock(void);
 
-int	zbx_vc_get_values_by_time(zbx_uint64_t itemid, int value_type, zbx_vector_vc_value_t *values,
-		int seconds, int timestamp);
-
-int	zbx_vc_get_values_by_count(zbx_uint64_t itemid, int value_type, zbx_vector_vc_value_t *values,
+int	zbx_vc_get_value_range(zbx_uint64_t itemid, int value_type, zbx_vector_vc_value_t *values, int seconds,
 		int count, int timestamp);
 
 int	zbx_vc_get_value(zbx_uint64_t itemid, int value_type, const zbx_timespec_t *ts, zbx_vc_value_t *value);
-
-int	zbx_vc_add_values(zbx_uint64_t itemid, int value_type, zbx_vector_vc_value_t *values);
 
 int	zbx_vc_add_value(zbx_uint64_t itemid, int value_type, const zbx_timespec_t *timestamp, history_value_t *value);
 
 int	zbx_vc_get_statistics(zbx_vc_stats_t *stats);
 
 void	zbx_vc_value_vector_destroy(zbx_vector_vc_value_t *vector, int value_type);
-
-void	zbx_vc_value_vector_append(zbx_vector_vc_value_t *vector, int value_type, zbx_vc_value_t *value);
 
 void	zbx_vc_value_clear(zbx_vc_value_t *value, int value_type);
 

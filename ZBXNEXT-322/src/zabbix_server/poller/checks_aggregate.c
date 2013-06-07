@@ -289,7 +289,7 @@ static int	evaluate_aggregate(DC_ITEM *item, AGENT_RESULT *res, int grp_func, co
 
 			zbx_vc_value_vector_create(&values);
 
-			if (SUCCEED == zbx_vc_get_values_by_time(itemid, value_type, &values, now - clock_from, now))
+			if (SUCCEED == zbx_vc_get_value_range(itemid, value_type, &values, now - clock_from, 0, now))
 			{
 				int	i;
 
