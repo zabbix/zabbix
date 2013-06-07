@@ -82,13 +82,17 @@ foreach($usergroups as $ugnum => $usr_group){
 $scriptTab->addRow(_('User groups'), $usr_groups);
 
 // host groups
-$host_groups = new CCombobox('groupid', $this->get('groupid'));
+$host_groups = new CCombobox('hgstype', $this->get('hgstype'));
 $host_groups->addItem(0, _('All'));
-$groups = $this->getArray('groups');
-foreach($groups as $gnum => $group){
-	$host_groups->addItem($group['groupid'], $group['name']);
-}
+$host_groups->addItem(1, _('Selected'));
 $scriptTab->addRow(_('Host groups'), $host_groups);
+
+$scriptTab->addRow(null, new CMultiSelect(array(
+	'name' => 'groupid',
+	'selectedLimit' => 1,
+	'objectName' => 'hostGroup',
+	'data' => $this->get('hostGroup')
+)), null, 'hostGroupSelection');
 
 // permissions
 $select_acc = new CCombobox('access', $this->get('access'));

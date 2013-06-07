@@ -843,69 +843,77 @@ static int	check_auto_registration_condition(DB_EVENT *event, DB_CONDITION *cond
 	DB_ROW		row;
 	zbx_uint64_t	condition_value, id;
 	int		ret = FAIL;
+	const char	*condition_field;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	if (CONDITION_TYPE_HOST_NAME == condition->conditiontype)
+	switch (condition->conditiontype)
 	{
-		result = DBselect(
-				"select host"
-				" from autoreg_host"
-				" where autoreg_hostid=" ZBX_FS_UI64,
-				event->objectid);
+		case CONDITION_TYPE_HOST_NAME:
+		case CONDITION_TYPE_HOST_METADATA:
+			if (CONDITION_TYPE_HOST_NAME == condition->conditiontype)
+				condition_field = "host";
+			else
+				condition_field = "host_metadata";
 
-		if (NULL != (row = DBfetch(result)))
-		{
-			switch (condition->operator)
+			result = DBselect(
+					"select %s"
+					" from autoreg_host"
+					" where autoreg_hostid=" ZBX_FS_UI64,
+					condition_field, event->objectid);
+
+			if (NULL != (row = DBfetch(result)))
 			{
-				case CONDITION_OPERATOR_LIKE:
-					if (NULL != strstr(row[0], condition->value))
-						ret = SUCCEED;
-					break;
-				case CONDITION_OPERATOR_NOT_LIKE:
-					if (NULL == strstr(row[0], condition->value))
-						ret = SUCCEED;
-					break;
-				default:
-					ret = NOTSUPPORTED;
+				switch (condition->operator)
+				{
+					case CONDITION_OPERATOR_LIKE:
+						if (NULL != strstr(row[0], condition->value))
+							ret = SUCCEED;
+						break;
+					case CONDITION_OPERATOR_NOT_LIKE:
+						if (NULL == strstr(row[0], condition->value))
+							ret = SUCCEED;
+						break;
+					default:
+						ret = NOTSUPPORTED;
+				}
 			}
-		}
-		DBfree_result(result);
-	}
-	else if (CONDITION_TYPE_PROXY == condition->conditiontype)
-	{
-		ZBX_STR2UINT64(condition_value, condition->value);
+			DBfree_result(result);
 
-		result = DBselect(
-				"select proxy_hostid"
-				" from autoreg_host"
-				" where autoreg_hostid=" ZBX_FS_UI64,
-				event->objectid);
+			break;
+		case CONDITION_TYPE_PROXY:
+			ZBX_STR2UINT64(condition_value, condition->value);
 
-		if (NULL != (row = DBfetch(result)))
-		{
-			ZBX_DBROW2UINT64(id, row[0]);
+			result = DBselect(
+					"select proxy_hostid"
+					" from autoreg_host"
+					" where autoreg_hostid=" ZBX_FS_UI64,
+					event->objectid);
 
-			switch (condition->operator)
+			if (NULL != (row = DBfetch(result)))
 			{
-				case CONDITION_OPERATOR_EQUAL:
-					if (id == condition_value)
-						ret = SUCCEED;
-					break;
-				case CONDITION_OPERATOR_NOT_EQUAL:
-					if (id != condition_value)
-						ret = SUCCEED;
-					break;
-				default:
-					ret = NOTSUPPORTED;
+				ZBX_DBROW2UINT64(id, row[0]);
+
+				switch (condition->operator)
+				{
+					case CONDITION_OPERATOR_EQUAL:
+						if (id == condition_value)
+							ret = SUCCEED;
+						break;
+					case CONDITION_OPERATOR_NOT_EQUAL:
+						if (id != condition_value)
+							ret = SUCCEED;
+						break;
+					default:
+						ret = NOTSUPPORTED;
+				}
 			}
-		}
-		DBfree_result(result);
-	}
-	else
-	{
-		zabbix_log(LOG_LEVEL_ERR, "unsupported condition type [%d] for condition id [" ZBX_FS_UI64 "]",
-				(int)condition->conditiontype, condition->conditionid);
+			DBfree_result(result);
+
+			break;
+		default:
+			zabbix_log(LOG_LEVEL_ERR, "unsupported condition type [%d] for condition id [" ZBX_FS_UI64 "]",
+					(int)condition->conditiontype, condition->conditionid);
 	}
 
 	if (NOTSUPPORTED == ret)
