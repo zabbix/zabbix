@@ -85,6 +85,7 @@ require_once dirname(__FILE__).'/testFormTemplate.php';
 require_once dirname(__FILE__).'/testPageApplications.php';
 require_once dirname(__FILE__).'/testPageBrowserWarning.php';
 require_once dirname(__FILE__).'/testInheritanceItem.php';
+require_once dirname(__FILE__).'/testInheritanceTrigger.php';
 require_once dirname(__FILE__).'/testTemplateInheritance.php';
 
 class SeleniumTests {
@@ -157,6 +158,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testPageApplications');
 		$suite->addTestSuite('testPageBrowserWarning');
 		$suite->addTestSuite('testInheritanceItem');
+		$suite->addTestSuite('testInheritanceTrigger');
 		$suite->addTestSuite('testTemplateInheritance');
 
 		return $suite;
