@@ -624,6 +624,29 @@ class CGraphPrototype extends CGraphGeneral {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Graph prototype must have at least one prototype.'));
 			}
 		}
+
+		// check if item value is numeric
+		$allowedItems = API::Item()->get(array(
+			'value_types' => array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64),
+			'preservekeys' => true
+		));
+
+		$allowedItemPrototypes = API::ItemPrototype()->get(array(
+			'value_types' => array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64),
+			'preservekeys' => true
+		));
+
+		$allowedItems = zbx_array_merge($allowedItems, $allowedItemPrototypes);
+
+		foreach ($itemids as $itemid) {
+			if (!isset($allowedItems[$itemid])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect item value type for graph!'));
+			}
+		}
+
+		if (!isset($allowedItems[$graph['ymax_itemid']])) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect item value type for graph!'));
+		}
 	}
 
 	protected function createReal($graph) {
