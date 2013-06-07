@@ -783,13 +783,13 @@ table.filter tr td {
 table.filter tr td.label { border-right: 0 !important; }
 table.filter tr td.controls { text-align: center; }
 table.filter .text { height: 16px; }
-table.filter .A,
-table.filter .T { height: 20px; vertical-align: bottom; }
+table.filter .filter-select-button { height: 20px; vertical-align: bottom; }
 table.filter .select { -moz-box-sizing: content-box; -webkit-box-sizing: content-box; box-sizing: content-box; height: 18px; vertical-align: top; margin-bottom: 1px; }
 table.filter .host-inventories .text { margin-bottom: 1px; }
-table.filter tr.item-list-row { height: 41px; }
+table.filter tr.item-list-row { height: 26px; }
 .item-list .filter .col1 .text,
 .item-list .filter .multiselect { width: 165px; line-height: 12px; }
+.item-list .filter .multiselect { height: 10px; top: -8px; }
 
 .host-list table.filter tr td { width: 25%; }
 

@@ -580,7 +580,7 @@
 						'&dstfrm='.$form->getName().'&dstfld1=filter_application'.
 						'&with_applications=1&hostid=" + jQuery("input[name=\'filter_hostid\']").val()'
 						.', 550, 450, "application");',
-					'A'
+					'filter-select-button'
 				)
 			), 'col1'),
 			new CCol(array($snmpCommunityLabel, $snmpSecurityLabel), 'label'),
