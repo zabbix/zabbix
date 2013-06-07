@@ -20,6 +20,7 @@
 
 
 include('include/views/js/configuration.services.edit.js.php');
+
 global $ZBX_MESSAGES;
 
 $service = $this->data['service'];
@@ -112,7 +113,7 @@ $servicesDependenciesFormList->addRow(
  */
 $servicesTimeFormList = new CFormList('servicesTimeFormList');
 $servicesTimeTable = new CTable(_('No times defined. Work 24x7.'), 'formElementTable');
-$servicesTimeTable->setAttribute('style', 'min-width:500px;');
+$servicesTimeTable->setAttribute('style', 'min-width: 500px;');
 $servicesTimeTable->setHeader(array(_('Type'), _('Interval'), _('Note'), _('Action')));
 
 $i = 0;
