@@ -57,7 +57,7 @@ $filterTable->addRow(array(
 		SPACE,
 		new CTextBox('alias', $this->data['alias'], 20),
 		new CButton('btn1', _('Select'), 'return PopUp(\'popup.php?dstfrm='.$filterForm->getName().
-			'&dstfld1=alias&srctbl=users&srcfld1=alias&real_hosts=1\');', 'T')
+			'&dstfld1=alias&srctbl=users&srcfld1=alias&real_hosts=1\');', 'filter-select-button')
 	),
 	array(bold(_('Action')), SPACE, $actionComboBox),
 	array(bold(_('Resource')), SPACE, $resourceComboBox)
