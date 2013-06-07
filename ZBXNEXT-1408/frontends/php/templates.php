@@ -453,9 +453,9 @@ if (isset($_REQUEST['form'])) {
 	}
 
 	$templateIds = get_request('templates', array());
-		$templateIds = empty($templateIds) ? $data['original_templates'] : $templateIds;
+	$templateIds = empty($templateIds) ? $data['original_templates'] : $templateIds;
 
-	natcasesort($templateIds);
+	sort($templateIds);
 
 	$data['linkedTemplates'] = API::Template()->get(array(
 		'templateids' => $templateIds,
