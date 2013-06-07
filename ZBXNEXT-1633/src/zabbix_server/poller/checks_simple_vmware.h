@@ -46,6 +46,7 @@ int	check_vcenter_hv_uptime(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	check_vcenter_hv_version(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	check_vcenter_hv_vm_num(AGENT_REQUEST *request, AGENT_RESULT *result);
 
+int	check_vcenter_vm_cluster_name(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	check_vcenter_vm_cpu_num(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	check_vcenter_vm_cpu_usage(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	check_vcenter_vm_discovery(AGENT_REQUEST *request, AGENT_RESULT *result);

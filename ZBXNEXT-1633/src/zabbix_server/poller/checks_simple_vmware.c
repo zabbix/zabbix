@@ -2214,6 +2214,50 @@ int	check_vcenter_vm_cpu_num(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return get_vcenter_vmstat(request, ZBX_XPATH_LN2("config", "numCpu"), result);
 }
 
+int	check_vcenter_vm_cluster_name(AGENT_REQUEST *request, AGENT_RESULT *result)
+{
+	int		i;
+	char		*url, *username, *password, *uuid, *error = NULL;
+	zbx_vcenter_t	*vcenter = NULL;
+	zbx_hv_t	*hv;
+	zbx_vm_t	*vm;
+
+	if (4 != request->nparam)
+		return SYSINFO_RET_FAIL;
+
+	url = get_rparam(request, 0);
+	username = get_rparam(request, 1);
+	password = get_rparam(request, 2);
+	uuid = get_rparam(request, 3);
+
+	if ('\0' == *url || '\0' == *username || '\0' == *uuid)
+		return SYSINFO_RET_FAIL;
+
+	if (SUCCEED != vcenter_update(url, username, password, &error))
+	{
+		SET_MSG_RESULT(result, error);
+		return SYSINFO_RET_FAIL;
+	}
+
+	if (NULL == (vcenter = vcenter_get(url, username, password)))
+		return SYSINFO_RET_FAIL;
+
+	for (i = 0; i < vcenter->hvs.values_num; i++)
+	{
+		hv = (zbx_hv_t *)vcenter->hvs.values[i];
+
+		if (NULL != (vm = vm_get(&hv->vms, uuid)))
+			break;
+	}
+
+	if (NULL == vm)
+		return SYSINFO_RET_FAIL;
+
+	SET_STR_RESULT(result, zbx_strdup(NULL, NULL != vm->cluster ? vm->cluster->name : ""));
+
+	return SYSINFO_RET_OK;
+}
+
 int	check_vcenter_vm_cpu_usage(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	int	ret;

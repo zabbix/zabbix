@@ -50,6 +50,7 @@ static char	*vmkeys[] =
 	"vcenter.hv.version",
 	"vcenter.hv.vm.num",
 
+	"vcenter.vm.cluster.name",
 	"vcenter.vm.cpu.num",
 	"vcenter.vm.cpu.usage",
 	"vcenter.vm.discovery",
@@ -127,6 +128,7 @@ static vmfunc_t	vmfuncs[] =
 	check_vcenter_hv_version,
 	check_vcenter_hv_vm_num,
 
+	check_vcenter_vm_cluster_name,
 	check_vcenter_vm_cpu_num,
 	check_vcenter_vm_cpu_usage,
 	check_vcenter_vm_discovery,
