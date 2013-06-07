@@ -139,7 +139,7 @@ abstract class CHostGeneral extends CZBXAPI {
 	 * Links the templates to the given hosts.
 	 *
 	 * @param array $templateids
-	 * @param array $targetids    an array of host IDs to link the templates to
+	 * @param array $targetids		an array of host IDs to link the templates to
 	 *
 	 * @return bool
 	 */
@@ -168,30 +168,34 @@ abstract class CHostGeneral extends CZBXAPI {
 				'output' => array('templateid'),
 				'hostids' => $targetid
 			));
-			$allids = array_merge($templateids, zbx_objectValues($linkedTpls, 'templateid'));
 
-			$res = DBselect(
-				'SELECT key_,COUNT(itemid) AS cnt'.
-				' FROM items'.
-				' WHERE '.dbConditionInt('hostid', $allids).
-				' GROUP BY key_'.
-				' HAVING COUNT(itemid)>1'
-			);
-			if ($dbCnt = DBfetch($res)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Template with item key "%1$s" already linked to host.', htmlspecialchars($dbCnt['key_'])));
-			}
+			$templateIdsAll = array_merge($templateids, zbx_objectValues($linkedTpls, 'templateid'));
 
-			$res = DBselect(
-				'SELECT name,COUNT(applicationid) AS cnt'.
-				' FROM applications'.
-				' WHERE '.dbConditionInt('hostid', $allids).
-				' GROUP BY name'.
-				' HAVING COUNT(applicationid)>1'
+			$dbItems = DBselect(
+				'SELECT i.key_'.
+				' FROM items i'.
+				' WHERE '.dbConditionInt('i.hostid', $templateIdsAll).
+				' GROUP BY i.key_'.
+				' HAVING COUNT(i.itemid)>1'
 			);
-			if ($dbCnt = DBfetch($res)) {
+			if ($dbItem = DBfetch($dbItems)) {
+				$dbItemHost = API::Item()->get(array(
+					'output' => array('hostid'),
+					'filter' => array('key_' => $dbItem['key_']),
+					'templateids' => $templateIdsAll
+				));
+				$dbItemHost = reset($dbItemHost);
+
+				$template = API::Template()->get(array(
+					'output' => array('name'),
+					'templateids' => $dbItemHost['hostid']
+				));
+
+				$template = reset($template);
+
 				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Template with application "%1$s" already linked to host.', htmlspecialchars($dbCnt['name'])));
+					_s('Template "%1$s" with item key "%2$s" already linked to host.',
+						$template['name'], $dbItem['key_']));
 			}
 		}
 
@@ -244,10 +248,10 @@ abstract class CHostGeneral extends CZBXAPI {
 		}
 
 		$res = DBselect(
-			'SELECT hostid,templateid'.
-			' FROM hosts_templates'.
-			' WHERE '.dbConditionInt('hostid', $targetids).
-				' AND '.dbConditionInt('templateid', $templateids)
+			'SELECT ht.hostid,ht.templateid'.
+			' FROM hosts_templates ht'.
+			' WHERE '.dbConditionInt('ht.hostid', $targetids).
+				' AND '.dbConditionInt('ht.templateid', $templateids)
 		);
 		$linked = array();
 		while ($row = DBfetch($res)) {
@@ -290,7 +294,7 @@ abstract class CHostGeneral extends CZBXAPI {
 		// check template linkage circularity
 		$res = DBselect(
 			'SELECT ht.hostid,ht.templateid'.
-			' FROM hosts_templates ht,hosts h '.
+			' FROM hosts_templates ht,hosts h'.
 			' WHERE ht.hostid=h.hostid '.
 				' AND h.status IN('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.','.HOST_STATUS_TEMPLATE.')'
 		);
@@ -714,38 +718,49 @@ abstract class CHostGeneral extends CZBXAPI {
 		}
 
 		/* APPLICATIONS {{{ */
-		$sqlFrom = ' applications a1,applications a2,hosts h';
-		$sqlWhere = ' a2.applicationid=a1.templateid'.
-			' AND '.dbConditionInt('a2.hostid', $templateids).
-			' AND h.hostid=a1.hostid';
-		if (!is_null($targetids)) {
-			$sqlWhere .= ' AND '.dbConditionInt('a1.hostid', $targetids);
+		$sql = 'SELECT at.application_templateid,at.applicationid,h.name,h.host,h.hostid'.
+			' FROM applications a1,application_template at,applications a2,hosts h'.
+			' WHERE a1.applicationid=at.applicationid'.
+				' AND at.templateid=a2.applicationid'.
+				' AND '.dbConditionInt('a2.hostid', $templateids).
+				' AND a1.hostid=h.hostid';
+		if ($targetids) {
+			$sql .= ' AND '.dbConditionInt('a1.hostid', $targetids);
 		}
-		$sql = 'SELECT DISTINCT a1.applicationid,a1.name,a1.hostid,h.name as host'.
-			' FROM '.$sqlFrom.
-			' WHERE '.$sqlWhere;
-		$dbApplications = DBSelect($sql);
-		$applications = array();
-		while ($application = DBfetch($dbApplications)) {
-			$applications[$application['applicationid']] = array(
-				'name' => $application['name'],
-				'hostid' => $application['hostid'],
-				'host' => $application['host']
+		$query = DBselect($sql);
+		$applicationTemplates = array();
+		while ($applicationTemplate = DBfetch($query)) {
+			$applicationTemplates[] = array(
+				'applicationid' => $applicationTemplate['applicationid'],
+				'application_templateid' => $applicationTemplate['application_templateid'],
+				'name' => $applicationTemplate['name'],
+				'hostid' => $applicationTemplate['hostid'],
+				'host' => $applicationTemplate['host']
 			);
 		}
 
-		if (!empty($applications)) {
+		if ($applicationTemplates) {
+			// unlink applications from templates
+			DB::delete('application_template', array(
+				'application_templateid' => zbx_objectValues($applicationTemplates, 'application_templateid')
+			));
+
 			if ($clear) {
-				$result = API::Application()->delete(array_keys($applications), true);
-				if (!$result) self::exception(ZBX_API_ERROR_INTERNAL, _('Cannot unlink and clear applications'));
+				// delete inherited applications that are no longer linked to any templates
+				$applications = DBfetchArray(DBselect(
+					'SELECT a.applicationid'.
+					' FROM applications a'.
+						' LEFT JOIN application_template at ON a.applicationid=at.applicationid '.
+					' WHERE '.dbConditionInt('a.applicationid', zbx_objectValues($applicationTemplates, 'applicationid')).
+						' AND at.applicationid IS NULL'
+				));
+				$result = API::Application()->delete(zbx_objectValues($applications, 'applicationid'), true);
+				if (!$result) {
+					self::exception(ZBX_API_ERROR_INTERNAL, _('Cannot unlink and clear applications.'));
+				}
 			}
 			else{
-				DB::update('applications', array(
-					'values' => array('templateid' => 0),
-					'where' => array('applicationid' => array_keys($applications))
-				));
-
-				foreach ($applications as $application) {
+				foreach ($applicationTemplates as $application) {
 					info(_s('Unlinked: Application "%1$s" on "%2$s".', $application['name'], $application['host']));
 				}
 			}

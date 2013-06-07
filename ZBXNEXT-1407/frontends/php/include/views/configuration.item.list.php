@@ -19,6 +19,8 @@
 **/
 
 
+require_once dirname(__FILE__).'/js/configuration.item.list.js.php';
+
 $itemsWidget = new CWidget(null, 'item-list');
 
 // create new item button
@@ -57,7 +59,7 @@ $itemTable = new CTableInfo(_('No items defined.'));
 $itemTable->setHeader(array(
 	new CCheckBox('all_items', null, "checkAll('".$itemForm->getName()."', 'all_items', 'group_itemid');"),
 	_('Wizard'),
-	empty($this->data['filter_hostname']) ? _('Host') : null,
+	empty($this->data['filter_hostid']) ? _('Host') : null,
 	make_sorting_header(_('Name'), 'name'),
 	_('Triggers'),
 	make_sorting_header(_('Key'), 'key_'),
@@ -223,7 +225,7 @@ foreach ($this->data['items'] as $item) {
 	$itemTable->addRow(array(
 		$checkBox,
 		$menuIcon,
-		empty($this->data['filter_hostname']) ? $item['host'] : null,
+		empty($this->data['filter_hostid']) ? $item['host'] : null,
 		$description,
 		$triggerInfo,
 		$item['key_'],

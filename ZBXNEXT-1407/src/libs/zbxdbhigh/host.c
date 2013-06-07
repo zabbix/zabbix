@@ -34,7 +34,7 @@ static ZBX_MUTEX	services_lock;
  *                                                                            *
  * Function: validate_linked_templates                                        *
  *                                                                            *
- * Description: Check of collisions between linked templates                  *
+ * Description: Check collisions between linked templates                     *
  *                                                                            *
  * Parameters: templateids - [IN] array of template IDs                       *
  *                                                                            *
@@ -45,7 +45,7 @@ static ZBX_MUTEX	services_lock;
  * Comments: !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
  ******************************************************************************/
-static int	validate_linked_templates(zbx_vector_uint64_t *templateids, char *error, size_t max_error_len)
+static int	validate_linked_templates(const zbx_vector_uint64_t *templateids, char *error, size_t max_error_len)
 {
 	const char	*__function_name = "validate_linked_templates";
 
@@ -61,31 +61,6 @@ static int	validate_linked_templates(zbx_vector_uint64_t *templateids, char *err
 		goto out;
 
 	sql = zbx_malloc(sql, sql_alloc);
-
-	/* applications */
-	if (1 < templateids->values_num)
-	{
-		sql_offset = 0;
-		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-				"select name,count(*)"
-				" from applications"
-				" where");
-		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid",
-				templateids->values, templateids->values_num);
-		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-				" group by name"
-				" having count(*)>1");
-
-		result = DBselectN(sql, 1);
-
-		if (NULL != (row = DBfetch(result)))
-		{
-			ret = FAIL;
-			zbx_snprintf(error, max_error_len,
-					"template with application \"%s\" already linked to the host", row[0]);
-		}
-		DBfree_result(result);
-	}
 
 	/* items */
 	if (SUCCEED == ret && 1 < templateids->values_num)
@@ -351,7 +326,7 @@ static int	DBcmp_triggers(zbx_uint64_t triggerid1, const char *expression1,
  * Comments: !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
  ******************************************************************************/
-static int	validate_inventory_links(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids,
+static int	validate_inventory_links(zbx_uint64_t hostid, const zbx_vector_uint64_t *templateids,
 		char *error, size_t max_error_len)
 {
 	const char	*__function_name = "validate_inventory_links";
@@ -444,7 +419,7 @@ out:
  * Comments: !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
  ******************************************************************************/
-static int	validate_httptests(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids,
+static int	validate_httptests(zbx_uint64_t hostid, const zbx_vector_uint64_t *templateids,
 		char *error, size_t max_error_len)
 {
 	const char	*__function_name = "validate_httptests";
@@ -1762,63 +1737,77 @@ out:
  * Comments: !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
  ******************************************************************************/
-static void	DBdelete_applications(zbx_uint64_t *applicationids, int applicationids_num)
+static void	DBdelete_applications(zbx_vector_uint64_t *applicationids)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
 	char		*sql = NULL;
-	size_t		sql_alloc = 256, sql_offset = 0;
-	zbx_uint64_t	*ids = NULL, applicationid;
-	int		ids_alloc = 0, ids_num = 0;
+	size_t		sql_alloc = 0, sql_offset = 0;
+	zbx_uint64_t	applicationid;
+	int		index;
 
-	if (0 == applicationids_num)
-		return;
+	if (0 == applicationids->values_num)
+		goto out;
 
-	sql = zbx_malloc(sql, sql_alloc);
-
+	/* don't delete applications used in web scenarious */
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-			"select applicationid,name"
+			"select distinct applicationid"
 			" from httptest"
 			" where");
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "applicationid", applicationids, applicationids_num);
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "applicationid", applicationids->values,
+			applicationids->values_num);
 
 	result = DBselect("%s", sql);
 
 	while (NULL != (row = DBfetch(result)))
 	{
 		ZBX_STR2UINT64(applicationid, row[0]);
-		uint64_array_add(&ids, &ids_alloc, &ids_num, applicationid, 4);
 
-		zabbix_log(LOG_LEVEL_DEBUG, "Application [" ZBX_FS_UI64 "] used by scenario '%s'",
-				applicationid, row[1]);
+		index = zbx_vector_uint64_bsearch(applicationids, applicationid, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+		if (FAIL != index)
+			zbx_vector_uint64_remove(applicationids, index);
 	}
 	DBfree_result(result);
 
-	uint64_array_remove(applicationids, &applicationids_num, ids, ids_num);
+	if (0 == applicationids->values_num)
+		goto out;
+
+	/* don't delete applications with items assigned to them */
+	sql_offset = 0;
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
+			"select distinct applicationid"
+			" from items_applications"
+			" where");
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "applicationid", applicationids->values,
+			applicationids->values_num);
+
+	result = DBselect("%s", sql);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		ZBX_STR2UINT64(applicationid, row[0]);
+
+		index = zbx_vector_uint64_bsearch(applicationids, applicationid, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+		if (FAIL != index)
+			zbx_vector_uint64_remove(applicationids, index);
+	}
+	DBfree_result(result);
+
+	if (0 == applicationids->values_num)
+		goto out;
 
 	sql_offset = 0;
 	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
-	if (0 != applicationids_num)
-	{
-		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from applications where");
-		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset,
-				"applicationid", applicationids, applicationids_num);
-		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
-	}
-
-	if (0 != ids_num)
-	{
-		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "update applications set templateid=null where");
-		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "applicationid", ids, ids_num);
-		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
-	}
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from applications where");
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset,
+			"applicationid", applicationids->values, applicationids->values_num);
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
 
 	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	DBexecute("%s", sql);
-
-	zbx_free(ids);
+out:
 	zbx_free(sql);
 }
 
@@ -1832,7 +1821,7 @@ static void	DBdelete_applications(zbx_uint64_t *applicationids, int applicationi
  *             templateids - [IN] array of template IDs                       *
  *                                                                            *
  ******************************************************************************/
-static void	DBdelete_template_httptests(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids)
+static void	DBdelete_template_httptests(zbx_uint64_t hostid, const zbx_vector_uint64_t *templateids)
 {
 	const char		*__function_name = "DBdelete_template_httptests";
 
@@ -1890,7 +1879,7 @@ static void	DBdelete_template_httptests(zbx_uint64_t hostid, zbx_vector_uint64_t
  * Comments: !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
  ******************************************************************************/
-static void	DBdelete_template_graphs(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids)
+static void	DBdelete_template_graphs(zbx_uint64_t hostid, const zbx_vector_uint64_t *templateids)
 {
 	const char		*__function_name = "DBdelete_template_graphs";
 
@@ -1948,7 +1937,7 @@ static void	DBdelete_template_graphs(zbx_uint64_t hostid, zbx_vector_uint64_t *t
  * Comments: !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
  ******************************************************************************/
-static void	DBdelete_template_triggers(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids)
+static void	DBdelete_template_triggers(zbx_uint64_t hostid, const zbx_vector_uint64_t *templateids)
 {
 	const char		*__function_name = "DBdelete_template_triggers";
 
@@ -2006,7 +1995,7 @@ static void	DBdelete_template_triggers(zbx_uint64_t hostid, zbx_vector_uint64_t 
  * Comments: !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
  ******************************************************************************/
-static void	DBdelete_template_items(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids)
+static void	DBdelete_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t *templateids)
 {
 	const char		*__function_name = "DBdelete_template_items";
 
@@ -2053,7 +2042,7 @@ static void	DBdelete_template_items(zbx_uint64_t hostid, zbx_vector_uint64_t *te
  *                                                                            *
  * Function: DBdelete_template_applications                                   *
  *                                                                            *
- * Purpose: delete application                                                *
+ * Purpose: delete host applications that belong to an unlinked template      *
  *                                                                            *
  * Parameters: hostid      - [IN] host identificator from database            *
  *             templateids - [IN] array of template IDs                       *
@@ -2063,25 +2052,27 @@ static void	DBdelete_template_items(zbx_uint64_t hostid, zbx_vector_uint64_t *te
  * Comments: !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
  ******************************************************************************/
-static void	DBdelete_template_applications(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids)
+static void	DBdelete_template_applications(zbx_uint64_t hostid, const zbx_vector_uint64_t *templateids)
 {
 	const char	*__function_name = "DBdelete_template_applications";
 
-	char		*sql = NULL;
-	size_t		sql_alloc = 256, sql_offset = 0;
-	DB_RESULT	result;
-	DB_ROW		row;
-	zbx_uint64_t	*applicationids = NULL, applicationid;
-	int		applicationids_alloc = 0, applicationids_num = 0;
+	char			*sql = NULL;
+	size_t			sql_alloc = 0, sql_offset = 0;
+	DB_RESULT		result;
+	DB_ROW			row;
+	zbx_uint64_t		id;
+	zbx_vector_uint64_t	applicationids, apptemplateids;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	sql = zbx_malloc(sql, sql_alloc);
+	zbx_vector_uint64_create(&applicationids);
+	zbx_vector_uint64_create(&apptemplateids);
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-			"select distinct a.applicationid"
-			" from applications a,applications ta"
-			" where a.templateid=ta.applicationid"
+			"select t.application_templateid,t.applicationid"
+			" from application_template t,applications a,applications ta"
+			" where t.applicationid=a.applicationid"
+				" and t.templateid=ta.applicationid"
 				" and a.hostid=" ZBX_FS_UI64
 				" and",
 			hostid);
@@ -2091,15 +2082,33 @@ static void	DBdelete_template_applications(zbx_uint64_t hostid, zbx_vector_uint6
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		ZBX_STR2UINT64(applicationid, row[0]);
-		uint64_array_add(&applicationids, &applicationids_alloc, &applicationids_num,
-				applicationid, 64);
+		ZBX_STR2UINT64(id, row[0]);
+		zbx_vector_uint64_append(&apptemplateids, id);
+
+		ZBX_STR2UINT64(id, row[1]);
+		zbx_vector_uint64_append(&applicationids, id);
 	}
 	DBfree_result(result);
 
-	DBdelete_applications(applicationids, applicationids_num);
+	if (0 == apptemplateids.values_num)
+		goto out;
 
-	zbx_free(applicationids);
+	zbx_vector_uint64_sort(&apptemplateids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+	zbx_vector_uint64_sort(&applicationids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	zbx_vector_uint64_uniq(&applicationids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+	sql_offset = 0;
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from application_template where");
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "application_templateid",
+			apptemplateids.values, apptemplateids.values_num);
+
+	DBexecute("%s", sql);
+
+	DBdelete_applications(&applicationids);
+out:
+	zbx_vector_uint64_destroy(&apptemplateids);
+	zbx_vector_uint64_destroy(&applicationids);
 	zbx_free(sql);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
@@ -2535,7 +2544,7 @@ clean:
  * Comments: !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
  ******************************************************************************/
-static void	DBcopy_template_applications(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids)
+static void	DBcopy_template_applications(zbx_uint64_t hostid, const zbx_vector_uint64_t *templateids)
 {
 	typedef struct
 	{
@@ -2552,6 +2561,7 @@ static void	DBcopy_template_applications(zbx_uint64_t hostid, zbx_vector_uint64_
 	size_t		sql_alloc = ZBX_KIBIBYTE, sql_offset;
 	zbx_app_t	*app = NULL;
 	size_t		app_alloc = 0, app_num = 0;
+	int		new_applications = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -2590,6 +2600,7 @@ static void	DBcopy_template_applications(zbx_uint64_t hostid, zbx_vector_uint64_
 		{
 			app[app_num].applicationid = 0;
 			app[app_num].name_esc = DBdyn_escape_string(row[1]);
+			new_applications++;
 		}
 		app_num++;
 	}
@@ -2597,29 +2608,16 @@ static void	DBcopy_template_applications(zbx_uint64_t hostid, zbx_vector_uint64_
 
 	if (0 != app_num)
 	{
-		zbx_uint64_t	applicationid = 0;
-		int		i, new_applications = app_num;
-		const char	*ins_applications_sql =
-				"insert into applications"
-				" (applicationid,hostid,name,templateid)"
+		zbx_uint64_t	applicationid = 0, application_templateid = 0;
+		int		i;
+		const char	*ins_applications_sql = "insert into applications (applicationid,hostid,name) values ";
+		const char	*ins_application_template_sql =
+				"insert into application_template"
+				" (application_templateid,applicationid,templateid)"
 				" values ";
 
 		sql_offset = 0;
 		DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-		for (i = 0; i < app_num; i++)
-		{
-			if (0 == app[i].applicationid)
-				continue;
-
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-					"update applications"
-					" set templateid=" ZBX_FS_UI64
-					" where applicationid=" ZBX_FS_UI64 ";\n",
-					app[i].templateid, app[i].applicationid);
-
-			new_applications--;
-		}
 
 		if (0 != new_applications)
 		{
@@ -2627,29 +2625,45 @@ static void	DBcopy_template_applications(zbx_uint64_t hostid, zbx_vector_uint64_
 #ifdef HAVE_MULTIROW_INSERT
 			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ins_applications_sql);
 #endif
+			for (i = 0; i < app_num; i++)
+			{
+				if (0 != app[i].applicationid)
+					continue;
+
+				app[i].applicationid = applicationid++;
+#ifndef HAVE_MULTIROW_INSERT
+				zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ins_applications_sql);
+#endif
+				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+						"(" ZBX_FS_UI64 "," ZBX_FS_UI64 ",'%s')" ZBX_ROW_DL,
+						app[i].applicationid, hostid, app[i].name_esc);
+
+				zbx_free(app[i].name_esc);
+			}
+
+#ifdef HAVE_MULTIROW_INSERT
+			sql_offset--;
+			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
+#endif
 		}
 
+		application_templateid = DBget_maxid_num("application_template", app_num);
+#ifdef HAVE_MULTIROW_INSERT
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ins_application_template_sql);
+#endif
 		for (i = 0; i < app_num; i++)
 		{
-			if (0 != app[i].applicationid)
-				continue;
-
 #ifndef HAVE_MULTIROW_INSERT
-			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ins_applications_sql);
+			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ins_application_template_sql);
 #endif
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-					"(" ZBX_FS_UI64 "," ZBX_FS_UI64 ",'%s'," ZBX_FS_UI64 ")" ZBX_ROW_DL,
-					applicationid++, hostid, app[i].name_esc, app[i].templateid);
-
-			zbx_free(app[i].name_esc);
+					"(" ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 ")" ZBX_ROW_DL,
+					application_templateid++, app[i].applicationid, app[i].templateid);
 		}
 
 #ifdef HAVE_MULTIROW_INSERT
-		if (0 != new_applications)
-		{
-			sql_offset--;
-			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
-		}
+		sql_offset--;
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
 #endif
 		DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
@@ -2700,7 +2714,7 @@ static void	DBget_interfaces_by_hostid(zbx_uint64_t hostid, zbx_uint64_t *interf
  * Comments: !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
  ******************************************************************************/
-static void	DBcopy_template_items(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids)
+static void	DBcopy_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t *templateids)
 {
 	typedef struct
 	{
@@ -3069,7 +3083,8 @@ static void	DBcopy_template_items(zbx_uint64_t hostid, zbx_vector_uint64_t *temp
 						" and");
 		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hi.itemid", itemids, itemids_num);
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-					" join applications ha on ha.templateid=tia.applicationid"
+					" join application_template hat on hat.templateid=tia.applicationid"
+					" join applications ha on ha.applicationid=hat.applicationid"
 						" and ha.hostid=hi.hostid"
 						" left join items_applications hia on hia.applicationid=ha.applicationid"
 							" and hia.itemid=hi.itemid"
@@ -3224,7 +3239,7 @@ static void	DBcopy_template_items(zbx_uint64_t hostid, zbx_vector_uint64_t *temp
  * Comments: !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
  ******************************************************************************/
-static int	DBcopy_template_triggers(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids)
+static int	DBcopy_template_triggers(zbx_uint64_t hostid, const zbx_vector_uint64_t *templateids)
 {
 	const char	*__function_name = "DBcopy_template_triggers";
 	char		*sql = NULL;
@@ -3553,7 +3568,7 @@ static void	DBcopy_graph_to_host(zbx_uint64_t hostid, zbx_uint64_t graphid,
  * Comments: !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
  ******************************************************************************/
-static void	DBcopy_template_graphs(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids)
+static void	DBcopy_template_graphs(zbx_uint64_t hostid, const zbx_vector_uint64_t *templateids)
 {
 	const char	*__function_name = "DBcopy_template_graphs";
 	char		*sql = NULL;
@@ -3671,7 +3686,7 @@ httptest_t;
  * Purpose: helper function for DCmass_add_history()                          *
  *                                                                            *
  ******************************************************************************/
-static void	DBget_httptests(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids, zbx_vector_ptr_t *httptests)
+static void	DBget_httptests(zbx_uint64_t hostid, const zbx_vector_uint64_t *templateids, zbx_vector_ptr_t *httptests)
 {
 	const char		*__function_name = "DBget_httptests";
 
@@ -4291,7 +4306,7 @@ static void	clean_httptests(zbx_vector_ptr_t *httptests)
  *             templateids - [IN] array of template IDs                       *
  *                                                                            *
  ******************************************************************************/
-static void	DBcopy_template_httptests(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids)
+static void	DBcopy_template_httptests(zbx_uint64_t hostid, const zbx_vector_uint64_t *templateids)
 {
 	const char		*__function_name = "DBcopy_template_httptests";
 	zbx_vector_ptr_t	httptests;
