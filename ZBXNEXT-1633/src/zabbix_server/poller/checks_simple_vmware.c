@@ -96,6 +96,7 @@ typedef struct
 	char			*uuid;
 	char			*id;
 	char			*details;
+	char			*clusterid;
 	zbx_vector_ptr_t	vms;
 }
 zbx_hv_t;
@@ -341,13 +342,12 @@ out:
  * Purpose: populate array of guest VMs                                       *
  *                                                                            *
  * Parameters: easyhandle - [IN] CURL easy handle                             *
- *             guesthvids - [OUT] list of guest HV IDs                        *
  *                                                                            *
  * Return: Upon successful completion the function return SUCCEED.            *
  *         Otherwise, FAIL is returned.                                       *
  *                                                                            *
  ******************************************************************************/
-static int	vcenter_guesthvids_get(CURL *easyhandle, zbx_vector_str_t *guesthvids, char **error)
+static int	vcenter_guesthvids_get(CURL *easyhandle, char **error)
 {
 #	define ZBX_POST_VCENTER_HV_LIST								\
 		ZBX_POST_VSPHERE_HEADER								\
@@ -356,7 +356,6 @@ static int	vcenter_guesthvids_get(CURL *easyhandle, zbx_vector_str_t *guesthvids
 			"<ns0:specSet>"								\
 				"<ns0:propSet>"							\
 					"<ns0:type>HostSystem</ns0:type>"			\
-					"<ns0:pathSet>name</ns0:pathSet>"			\
 				"</ns0:propSet>"						\
 				"<ns0:objectSet>"						\
 					"<ns0:obj type=\"Folder\">group-d1</ns0:obj>"		\
@@ -489,11 +488,8 @@ static int	vcenter_guesthvids_get(CURL *easyhandle, zbx_vector_str_t *guesthvids
 		goto out;
 	}
 
-	if (SUCCEED != read_xml_values(page.data, "//*[@type='HostSystem']", guesthvids))
-	{
-		*error = zbx_strdup(*error, "Cannot get list of guest hypervisors");
+	if (NULL != (*error = read_xml_value(page.data, ZBX_XPATH_LN1("faultstring"))))
 		goto out;
-	}
 
 	ret = SUCCEED;
 out:
@@ -919,7 +915,6 @@ static int	vmware_hv_guestvmids_get(CURL *easyhandle, const char *guesthvid, zbx
 			"<ns0:specSet>"							\
 				"<ns0:propSet>"						\
 					"<ns0:type>HostSystem</ns0:type>"		\
-					"<ns0:all>false</ns0:all>"			\
 					"<ns0:pathSet>vm</ns0:pathSet>"			\
 				"</ns0:propSet>"					\
 				"<ns0:objectSet>"					\
@@ -975,8 +970,10 @@ static int	vcenter_hv_data_get(CURL *easyhandle, const char *guesthvid)
 			"<ns0:specSet>"								\
 				"<ns0:propSet>"							\
 					"<ns0:type>HostSystem</ns0:type>"			\
-					"<ns0:all>false</ns0:all>"				\
+					"<ns0:pathSet>name</ns0:pathSet>"			\
+					"<ns0:pathSet>vm</ns0:pathSet>"				\
 					"<ns0:pathSet>summary</ns0:pathSet>"			\
+					"<ns0:pathSet>parent</ns0:pathSet>"			\
 				"</ns0:propSet>"						\
 				"<ns0:objectSet>"						\
 					"<ns0:obj type=\"HostSystem\">%s</ns0:obj>"		\
@@ -1320,15 +1317,17 @@ static int	vcenter_update(const char *url, const char *username, const char *pas
 	if (SUCCEED != vmware_authenticate(easyhandle, url, username, password, error, ZBX_VMWARE_FLAG_VCENTER))
 		goto clean;
 
-	if (SUCCEED != vcenter_guesthvids_get(easyhandle, &guesthvids, error))
+	if (SUCCEED != vcenter_guesthvids_get(easyhandle, error))
 		goto clean;
+
+	read_xml_values(page.data, "//*[@type='HostSystem']", &guesthvids);
 
 	for (i = 0; i < guesthvids.values_num; i++)
 	{
 		if (SUCCEED != vcenter_hv_data_get(easyhandle, guesthvids.values[i]))
 			continue;
 
-		if (NULL == (uuid = read_xml_value(page.data, ZBX_XPATH_LN1("uuid"))))
+		if (NULL == (uuid = read_xml_value(page.data, ZBX_XPATH_LN2("hardware", "uuid"))))
 			continue;
 
 		if (NULL == (hv = hv_get(&vcenter->hvs, uuid)))
@@ -1337,6 +1336,7 @@ static int	vcenter_update(const char *url, const char *username, const char *pas
 			hv->uuid = uuid;
 			hv->id = NULL;
 			hv->details = NULL;
+			hv->clusterid = NULL;
 			zbx_vector_ptr_create(&hv->vms);
 
 			zbx_vector_ptr_append(&vcenter->hvs, hv);
@@ -1345,16 +1345,14 @@ static int	vcenter_update(const char *url, const char *username, const char *pas
 		{
 			zbx_free(uuid);
 			zbx_free(hv->id);
+			zbx_free(hv->clusterid);
 		}
 
 		hv->id = zbx_strdup(hv->id, guesthvids.values[i]);
 		hv->details = zbx_strdup(hv->details, page.data);
+		hv->clusterid = read_xml_value(page.data, "//*[@type='ClusterComputeResource']");
 
-		if (SUCCEED != vmware_hv_guestvmids_get(easyhandle, guesthvids.values[i], &guestvmids, error,
-				ZBX_VMWARE_FLAG_VCENTER))
-		{
-			goto clean;
-		}
+		read_xml_values(page.data, "//*[@type='VirtualMachine']", &guestvmids);
 
 		for (j = 0; j < guestvmids.values_num; j++)
 		{
@@ -2046,6 +2044,44 @@ int	check_vcenter_eventlog(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return vmware_get_events(vcenter->events, request->lastlogsize, result);
 }
 
+int	check_vcenter_hv_cluster_name(AGENT_REQUEST *request, AGENT_RESULT *result)
+{
+	char		*url, *username, *password, *uuid, *error = NULL;
+	zbx_vcenter_t	*vcenter;
+	zbx_hv_t	*hv;
+	zbx_cluster_t	*cluster = NULL;
+
+	if (4 != request->nparam)
+		return SYSINFO_RET_FAIL;
+
+	url = get_rparam(request, 0);
+	username = get_rparam(request, 1);
+	password = get_rparam(request, 2);
+	uuid = get_rparam(request, 3);
+
+	if ('\0' == *url || '\0' == *username || '\0' == *uuid)
+		return SYSINFO_RET_FAIL;
+
+	if (SUCCEED != vcenter_update(url, username, password, &error))
+	{
+		SET_MSG_RESULT(result, error);
+		return SYSINFO_RET_FAIL;
+	}
+
+	if (NULL == (vcenter = vcenter_get(url, username, password)))
+		return SYSINFO_RET_FAIL;
+
+	if (NULL == (hv = hv_get(&vcenter->hvs, uuid)))
+		return SYSINFO_RET_FAIL;
+
+	if (NULL != hv->clusterid)
+		cluster = cluster_get(&vcenter->clusters, hv->clusterid);
+
+	SET_STR_RESULT(result, zbx_strdup(NULL, NULL != cluster ? cluster->name : ""));
+
+	return SYSINFO_RET_OK;
+}
+
 int	check_vcenter_hv_cpu_usage(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	int	ret;
@@ -2063,8 +2099,9 @@ int	check_vcenter_hv_discovery(AGENT_REQUEST *request, AGENT_RESULT *result)
 	struct zbx_json	j;
 	int		i;
 	char		*url, *username, *password, *name, *error = NULL;
-	zbx_vcenter_t	*vcenter = NULL;
-	zbx_hv_t	*hv = NULL;
+	zbx_vcenter_t	*vcenter;
+	zbx_hv_t	*hv;
+	zbx_cluster_t	*cluster = NULL;
 
 	if (3 != request->nparam)
 		return SYSINFO_RET_FAIL;
@@ -2094,10 +2131,15 @@ int	check_vcenter_hv_discovery(AGENT_REQUEST *request, AGENT_RESULT *result)
 			if (NULL == (name = read_xml_value(hv->details, ZBX_XPATH_LN2("config", "name"))))
 				continue;
 
+			if (NULL != hv->clusterid)
+				cluster = cluster_get(&vcenter->clusters, hv->clusterid);
+
 			zbx_json_addobject(&j, NULL);
 			zbx_json_addstring(&j, "{#HV.UUID}", hv->uuid, ZBX_JSON_TYPE_STRING);
 			zbx_json_addstring(&j, "{#HV.ID}", hv->id, ZBX_JSON_TYPE_STRING);
 			zbx_json_addstring(&j, "{#HV.NAME}", name, ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(&j, "{#CLUSTER.NAME}",
+					(NULL != cluster ? cluster->name : ""), ZBX_JSON_TYPE_STRING);
 			zbx_json_close(&j);
 
 			zbx_free(name);
