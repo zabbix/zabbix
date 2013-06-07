@@ -21,11 +21,12 @@
 
 require_once dirname(__FILE__).'/js/adm.regexprs.edit.js.php';
 
+zbx_add_post_js('zabbixRegExp.addExpressions('.CJs::encodeJson(array_values($this->get('expressions'))).')');
+
 $form = new CForm();
 $form->attr('id', 'zabbixRegExpForm');
 $form->addVar('form', 1);
 $form->addVar('regexpid', $this->data['regexpid']);
-
 
 // Expressions tab
 $exprTab = new CFormList('exprTab');
@@ -35,19 +36,14 @@ $exprTab->addRow(_('Name'), $nameTextBox);
 
 $exprTable = new CTable(null, 'formElementTable formWideTable');
 $exprTable->attr('id', 'exprTable');
-
 $exprTable->setHeader(array(
 	_('Expression'),
-	_('Expression type'),
-	_('Case sensitive'),
+	new CCol(_('Expression type'), 'nowrap'),
+	new CCol(_('Case sensitive'), 'nowrap'),
 	SPACE
 ));
 $exprTable->setFooter(new CButton('add', _('Add'), null, 'link_menu exprAdd'));
-
-zbx_add_post_js('zabbixRegExp.addExpressions('.CJs::encodeJson(array_values($this->get('expressions'))).')');
-
 $exprTab->addRow(_('Expressions'), new CDiv($exprTable, 'inlineblock border_dotted objectgroup'));
-
 
 $exprForm = new CTable(null, 'formElementTable');
 $exprForm->addRow(array(_('Expression'), new CTextBox('expressionNew', null, ZBX_TEXTBOX_STANDARD_SIZE)));
@@ -67,7 +63,7 @@ $exprTab->addRow(SPACE, $exprTabDiv);
 $testTab = new CFormList('testTab');
 $testTab->addRow(_('Test string'), new CTextArea('test_string', $this->get('test_string')));
 $preloaderDiv = new CDiv(null, 'preloader', 'testPreloader');
-$preloaderDiv->addStyle('display:none');
+$preloaderDiv->addStyle('display: none');
 $testTab->addRow(SPACE, array(new CButton('testExpression', _('Test expressions')), $preloaderDiv));
 
 $tabExp = new CTableInfo(null);
@@ -75,12 +71,10 @@ $tabExp->attr('id', 'testResultTable');
 $tabExp->setHeader(array(_('Expression'), _('Expression type'), _('Result')));
 $testTab->addRow(_('Result'), $tabExp);
 
-
 $regExpView = new CTabView();
 $regExpView->addTab('expr', _('Expressions'), $exprTab);
 $regExpView->addTab('test', _('Test'), $testTab);
 $form->addItem($regExpView);
-
 
 // footer
 $secondaryActions = array(new CButtonCancel());
