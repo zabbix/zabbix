@@ -604,6 +604,22 @@ class CGraph extends CGraphGeneral {
 			}
 		}
 
+		// check if item value is numeric
+		$allowedItems = API::Item()->get(array(
+			'value_types' => array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64),
+			'preservekeys' => true
+		));
+
+		foreach ($itemids as $itemid) {
+			if (!isset($allowedItems[$itemid])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect item value type for graph!'));
+			}
+		}
+
+		if (!isset($allowedItems[$graph['ymax_itemid']])) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect item value type for graph!'));
+		}
+
 		parent::checkInput($graphs, $update);
 	}
 

@@ -27,6 +27,7 @@ class CItemPrototype extends CItemGeneral {
 	protected $tableName = 'items';
 	protected $tableAlias = 'i';
 	protected $sortColumns = array('itemid', 'name', 'key_', 'delay', 'history', 'trends', 'type', 'status');
+	protected $allowedValueTypes = array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_TEXT);
 
 	public function __construct() {
 		parent::__construct();
@@ -68,6 +69,7 @@ class CItemPrototype extends CItemGeneral {
 			'monitored'					=> null,
 			'editable'					=> null,
 			'nopermissions'				=> null,
+			'value_types'				=> null,
 			// filter
 			'filter'					=> null,
 			'search'					=> null,
@@ -213,6 +215,27 @@ class CItemPrototype extends CItemGeneral {
 			}
 		}
 
+		// value type(s)
+		if ($options['value_types'] !== null) {
+			if (is_array($options['value_types'])) { // check for multiple values
+				$found_value_type = false;
+				$where = 'i.value_type IN (';
+				foreach ($options['value_types'] as $value_type) {
+					if (is_numeric($value_type) && in_array($value_type, $this->allowedValueTypes)) {
+						$where .= $value_type.',';
+						$found_value_type = true;
+					}
+				}
+
+				if ($found_value_type) {
+					$where = substr($where, 0, strlen($where) - 1).')';
+					$sqlParts['where'][] = $where;
+				} // else no correct values were passed to query
+			}
+			elseif (is_numeric($options['value_types']) && in_array($value_type, $this->allowedValueTypes)) { // check single
+				$sqlParts['where'][] = 'i.value_type='.$options['value_types'];
+			}
+		}
 
 // search
 		if (is_array($options['search'])) {
