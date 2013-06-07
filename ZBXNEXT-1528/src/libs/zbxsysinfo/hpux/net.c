@@ -17,9 +17,17 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include <sys/unistd.h>
+#include <sys/stropts.h>
+#include <sys/dlpi.h>
+#include <sys/dlpi_ext.h>
+#include <sys/mib.h>
+
 #include "common.h"
 #include "sysinfo.h"
 #include "zbxjson.h"
+
+char	buf_ctl[1024];
 
 /* Low Level Discovery needs a way to get the list of network interfaces available */
 /* on the monitored system. HP-UX versions starting from 11.31 have if_nameindex() */
@@ -27,6 +35,11 @@
 /* depend on. So for older versions we use different code to get that list.        */
 /* More information:                                                               */
 /* h20000.www2.hp.com/bc/docs/support/SupportManual/c02258083/c02258083.pdf        */
+struct strbuf	ctlbuf = {
+	1024,
+	0,
+	buf_ctl
+};
 
 #if HPUX_VERSION < 1131
 
@@ -192,6 +205,224 @@ int	NET_IF_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 	SET_STR_RESULT(result, strdup(j.buffer));
 
 	zbx_json_free(&j);
+
+	return SYSINFO_RET_OK;
+}
+
+/* Attaches to a PPA via an already open stream to DLPI provider. */
+static int	dlpi_attach(int fd, int ppa)
+{
+	dl_attach_req_t		attach_req;
+	int			ret, flags = RS_HIPRI;
+
+	attach_req.dl_primitive = DL_ATTACH_REQ;
+	attach_req.dl_ppa = ppa;
+
+	ctlbuf.len = sizeof(attach_req);
+	ctlbuf.buf = (char *)&attach_req;
+
+	if (0 > putmsg(fd, &ctlbuf, NULL, flags)) {
+		perror("dlpi_attach: putmsg");
+		return 0;
+	}
+
+	ctlbuf.buf = buf_ctl;
+	ctlbuf.maxlen = 1024;
+
+	if (0 > getmsg(fd, &ctlbuf, NULL, &flags)) {
+		perror("dlpi_attach: getmsg");
+		return 0;
+	}
+
+	ret = *(int *)buf_ctl;
+
+	if (ret != DL_OK_ACK)
+		return 0;
+
+	/* Succesfully attached to a PPA. */
+	return 1;
+}
+
+/* Detaches from a PPA via an already open stream to DLPI provider. */
+static int	dlpi_detach(int fd)
+{
+	dl_detach_req_t		detach_req;
+	int			ret, flags = RS_HIPRI;
+
+	detach_req.dl_primitive = DL_DETACH_REQ;
+
+	ctlbuf.len = sizeof(detach_req);
+	ctlbuf.buf = (char *)&detach_req;
+
+	if (0 > putmsg(fd, &ctlbuf, NULL, flags)) {
+		perror("dlpi_detach: putmsg");
+		return 0;
+	}
+
+	ctlbuf.buf = buf_ctl;
+	ctlbuf.maxlen = 1024;
+
+	if (0 > getmsg(fd, &ctlbuf, NULL, &flags)) {
+		perror("dlpi_detach: getmsg");
+		return 0;
+	}
+
+	ret = *(int *)buf_ctl;
+
+	if (ret != DL_OK_ACK)
+		return 0;
+
+	/* Succesfully detached. */
+	return 1;
+}
+
+static int	dlpi_get_stats(int fd, Ext_mib_t *mib)
+{
+	dl_get_statistics_req_t		stat_req;
+	dl_get_statistics_ack_t		stat_msg;
+	int				ret, flags = RS_HIPRI;
+
+	stat_req.dl_primitive = DL_GET_STATISTICS_REQ;
+
+	ctlbuf.len = sizeof(stat_req);
+	ctlbuf.buf = (char *)&stat_req;
+
+	if (0 > putmsg(fd, &ctlbuf, NULL, flags)) {
+		perror("dlpi_get_stats: putmsg");
+		return 0;
+	}
+
+	ctlbuf.buf = buf_ctl;
+	ctlbuf.maxlen = 1024;
+
+	if (0 > getmsg(fd, &ctlbuf, NULL, &flags)) {
+		perror("dlpi_get_stats: getmsg");
+		return 0;
+	}
+
+	ret = *(int *)buf_ctl;
+
+	if (ret != DL_GET_STATISTICS_ACK)
+		return 0;
+
+	stat_msg = *(dl_get_statistics_ack_t *)buf_ctl;
+
+	memcpy (mib, (Ext_mib_t *)(buf_ctl + stat_msg.dl_stat_offset), sizeof(Ext_mib_t));
+	return 1;
+}
+
+static int	get_net_stat(int ppa, Ext_mib_t *mib)
+{
+	int	fd;
+
+	if (-1 == (fd = open("/dev/dlpi", O_RDWR)))
+		return 0;
+
+	if (0 == dlpi_attach(fd, ppa))
+		return 0;
+
+	if (0 == dlpi_get_stats(fd, mib))
+		return 0;
+
+	dlpi_detach(fd);
+
+	close(fd);
+
+	return 1;
+}
+
+int	NET_IF_IN(AGENT_REQUEST *request, AGENT_RESULT *result)
+{
+	char		*if_name, *mode;
+	Ext_mib_t	mib;
+	int		ppa;
+
+	if (2 < request->nparam)
+		return SYSINFO_RET_FAIL;
+
+	if_name = get_rparam(request, 0);
+	mode = get_rparam(request, 1);
+
+	if (1 != sscanf(if_name, "lan%d", &ppa) || 0> ppa)
+		return SYSINFO_RET_FAIL;
+
+	if (0 == get_net_stat(ppa, &mib))
+		return SYSINFO_RET_FAIL;
+
+	if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "bytes"))
+		SET_UI64_RESULT(result, mib.mib_if.ifInOctets);
+	else if (0 == strcmp(mode, "packets"))
+		SET_UI64_RESULT(result, mib.mib_if.ifInUcastPkts + mib.mib_if.ifInNUcastPkts);
+	else if (0 == strcmp(mode, "errors"))
+		SET_UI64_RESULT(result, mib.mib_if.ifInErrors);
+	else if (0 == strcmp(mode, "dropped"))
+		SET_UI64_RESULT(result, mib.mib_if.ifInDiscards);
+	else
+		return SYSINFO_RET_FAIL;
+
+	return SYSINFO_RET_OK;
+}
+
+int	NET_IF_OUT(AGENT_REQUEST *request, AGENT_RESULT *result)
+{
+	char		*if_name, *mode;
+	Ext_mib_t	mib;
+	int		ppa;
+
+	if (2 < request->nparam)
+		return SYSINFO_RET_FAIL;
+
+	if_name = get_rparam(request, 0);
+	mode = get_rparam(request, 1);
+
+	if (1 != sscanf(if_name, "lan%d", &ppa) || 0 > ppa)
+		return SYSINFO_RET_FAIL;
+
+	if (0 == get_net_stat(ppa, &mib))
+		return SYSINFO_RET_FAIL;
+
+	if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "bytes"))
+		SET_UI64_RESULT(result, mib.mib_if.ifOutOctets);
+	else if (0 == strcmp(mode, "packets"))
+		SET_UI64_RESULT(result, mib.mib_if.ifOutUcastPkts + mib.mib_if.ifOutNUcastPkts);
+	else if (0 == strcmp(mode, "errors"))
+		SET_UI64_RESULT(result, mib.mib_if.ifOutErrors);
+	else if (0 == strcmp(mode, "dropped"))
+		SET_UI64_RESULT(result, mib.mib_if.ifOutDiscards);
+	else
+		return SYSINFO_RET_FAIL;
+
+	return SYSINFO_RET_OK;
+}
+
+int	NET_IF_TOTAL(AGENT_REQUEST *request, AGENT_RESULT *result)
+{
+	char		*if_name, *mode;
+	Ext_mib_t	mib;
+	int		ppa;
+
+	if (2 < request->nparam)
+		return SYSINFO_RET_FAIL;
+
+	if_name = get_rparam(request, 0);
+	mode = get_rparam(request, 1);
+
+	if (1 != sscanf(if_name, "lan%d", &ppa) || 0 > ppa)
+		return SYSINFO_RET_FAIL;
+
+	if (0 == get_net_stat(ppa, &mib))
+		return SYSINFO_RET_FAIL;
+
+	if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "bytes"))
+		SET_UI64_RESULT(result, mib.mib_if.ifInOctets + mib.mib_if.ifOutOctets);
+	else if (0 == strcmp(mode, "packets"))
+		SET_UI64_RESULT(result, mib.mib_if.ifInUcastPkts + mib.mib_if.ifInNUcastPkts + mib.mib_if.ifOutUcastPkts + mib.mib_if.ifOutNUcastPkts);
+	else if (0 == strcmp(mode, "errors"))
+		SET_UI64_RESULT(result, mib.mib_if.ifInErrors + mib.mib_if.ifOutErrors);
+	else if (0 == strcmp(mode, "dropped"))
+		SET_UI64_RESULT(result, mib.mib_if.ifInDiscards + mib.mib_if.ifOutDiscards);
+	else
+		return SYSINFO_RET_FAIL;
 
 	return SYSINFO_RET_OK;
 }
