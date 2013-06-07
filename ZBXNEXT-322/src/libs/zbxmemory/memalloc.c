@@ -444,12 +444,19 @@ static void	*__mem_realloc(zbx_mem_info_t *info, void *old, zbx_uint64_t size)
 
 		new_chunk = __mem_malloc(info, size);
 
-		if (NULL != new_chunk)
-			memcpy(new_chunk + MEM_SIZE_FIELD, tmp, chunk_size);
+		if (NULL == new_chunk)
+		{
+			new_chunk = __mem_malloc(info, chunk_size);
+			chunk = NULL;
+		}
+		else
+			chunk = new_chunk;
+
+		memcpy(new_chunk + MEM_SIZE_FIELD, tmp, chunk_size);
 
 		zbx_free(tmp);
 
-		return new_chunk;
+		return chunk;
 	}
 }
 
