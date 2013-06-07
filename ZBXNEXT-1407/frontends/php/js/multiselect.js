@@ -408,9 +408,6 @@ jQuery(function($) {
 			// resize
 			resizeSelected(obj, values, options);
 			resizeAvailable(obj);
-
-			// placeholders for IE
-			createPlaceholders();
 		});
 	};
 
@@ -700,7 +697,11 @@ jQuery(function($) {
 	}
 
 	function cleanSearchInput(obj) {
-		$('input[type="text"]', obj).val('');
+		var input = $('input[type="text"]', obj);
+
+		if (!(IE && input.val() == input.prop('placeholder'))) {
+			input.val('');
+		}
 	}
 
 	function resizeSelected(obj, values, options) {
@@ -806,6 +807,8 @@ jQuery(function($) {
 
 	function setPlaceholder(obj, options) {
 		$('input[type="text"]', obj).prop('placeholder', options.labels['type here to search']);
+
+		createPlaceholders();
 	}
 
 	function removePlaceholder(obj) {
