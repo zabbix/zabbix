@@ -1490,6 +1490,7 @@ class CAction extends CZBXAPI {
 				case CONDITION_TYPE_DVALUE:
 				case CONDITION_TYPE_APPLICATION:
 				case CONDITION_TYPE_HOST_NAME:
+				case CONDITION_TYPE_HOST_METADATA:
 				case CONDITION_TYPE_EVENT_TYPE:
 					if (zbx_empty($condition['value'])) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty action condition.'));
