@@ -68,6 +68,7 @@ ROW   |2                |10090 |                  |6      |NULL      |
 ROW   |3                |10086 |                  |6      |NULL      |
 ROW   |4                |10092 |                  |7      |NULL      |
 ROW   |5                |10090 |{#DATACENTER.NAME}|NULL   |NULL      |
+ROW   |6                |10090 |{#CLUSTER.NAME}   |NULL   |NULL      |
 
 TABLE |screens
 FIELDS|screenid|name                |hsize|vsize|templateid|
@@ -118,25 +119,39 @@ ROW   |2       |2      |9   |system.uname|              |10050|                 
 
 TABLE |applications
 FIELDS|applicationid|hostid|name              |
-ROW   |1            |10001 |OS                |
 ROW   |13           |10001 |CPU               |
+ROW   |5            |10001 |Filesystems       |
+ROW   |21           |10001 |General           |
 ROW   |15           |10001 |Memory            |
+ROW   |7            |10001 |Network interfaces|
+ROW   |1            |10001 |OS                |
 ROW   |17           |10001 |Performance       |
+ROW   |9            |10001 |Processes         |
+ROW   |23           |10001 |Security          |
+ROW   |207          |10001 |Zabbix agent      |
 ROW   |179          |10047 |Zabbix server     |
 ROW   |206          |10050 |Zabbix agent      |
-ROW   |21           |10001 |General           |
 ROW   |214          |10056 |Services          |
 ROW   |227          |10060 |Interfaces        |
 ROW   |228          |10065 |General           |
-ROW   |23           |10001 |Security          |
+ROW   |229          |10066 |General           |
+ROW   |230          |10066 |Interfaces        |
+ROW   |235          |10067 |Disk partitions   |
+ROW   |231          |10067 |General           |
+ROW   |232          |10067 |Interfaces        |
+ROW   |242          |10067 |Processors        |
 ROW   |234          |10068 |Disk partitions   |
+ROW   |236          |10069 |Disk partitions   |
+ROW   |237          |10069 |General           |
+ROW   |238          |10069 |Interfaces        |
+ROW   |241          |10069 |Processors        |
 ROW   |240          |10070 |Processors        |
-ROW   |245          |10071 |Voltage           |
-ROW   |246          |10071 |Temperature       |
 ROW   |247          |10071 |Fans              |
-ROW   |248          |10072 |Voltage           |
-ROW   |249          |10072 |Temperature       |
+ROW   |246          |10071 |Temperature       |
+ROW   |245          |10071 |Voltage           |
 ROW   |250          |10072 |Fans              |
+ROW   |249          |10072 |Temperature       |
+ROW   |248          |10072 |Voltage           |
 ROW   |251          |10073 |MySQL             |
 ROW   |253          |10074 |CPU               |
 ROW   |254          |10074 |Filesystems       |
@@ -147,6 +162,7 @@ ROW   |258          |10074 |OS                |
 ROW   |259          |10074 |Performance       |
 ROW   |260          |10074 |Processes         |
 ROW   |261          |10074 |Security          |
+ROW   |252          |10074 |Zabbix agent      |
 ROW   |263          |10075 |CPU               |
 ROW   |264          |10075 |Filesystems       |
 ROW   |265          |10075 |General           |
@@ -156,15 +172,18 @@ ROW   |268          |10075 |OS                |
 ROW   |269          |10075 |Performance       |
 ROW   |270          |10075 |Processes         |
 ROW   |271          |10075 |Security          |
+ROW   |262          |10075 |Zabbix agent      |
 ROW   |273          |10076 |CPU               |
 ROW   |274          |10076 |Filesystems       |
 ROW   |275          |10076 |General           |
+ROW   |331          |10076 |Logical partitions|
 ROW   |276          |10076 |Memory            |
 ROW   |277          |10076 |Network interfaces|
 ROW   |278          |10076 |OS                |
 ROW   |279          |10076 |Performance       |
 ROW   |280          |10076 |Processes         |
 ROW   |281          |10076 |Security          |
+ROW   |272          |10076 |Zabbix agent      |
 ROW   |283          |10077 |CPU               |
 ROW   |284          |10077 |Filesystems       |
 ROW   |285          |10077 |General           |
@@ -174,6 +193,7 @@ ROW   |288          |10077 |OS                |
 ROW   |289          |10077 |Performance       |
 ROW   |290          |10077 |Processes         |
 ROW   |291          |10077 |Security          |
+ROW   |282          |10077 |Zabbix agent      |
 ROW   |293          |10078 |CPU               |
 ROW   |294          |10078 |Filesystems       |
 ROW   |295          |10078 |General           |
@@ -183,6 +203,7 @@ ROW   |298          |10078 |OS                |
 ROW   |299          |10078 |Performance       |
 ROW   |300          |10078 |Processes         |
 ROW   |301          |10078 |Security          |
+ROW   |292          |10078 |Zabbix agent      |
 ROW   |303          |10079 |CPU               |
 ROW   |304          |10079 |Filesystems       |
 ROW   |305          |10079 |General           |
@@ -192,15 +213,16 @@ ROW   |308          |10079 |OS                |
 ROW   |309          |10079 |Performance       |
 ROW   |310          |10079 |Processes         |
 ROW   |311          |10079 |Security          |
-ROW   |319          |10081 |General           |
-ROW   |320          |10081 |Performance       |
-ROW   |322          |10081 |Filesystems       |
-ROW   |323          |10081 |OS                |
-ROW   |324          |10081 |Processes         |
+ROW   |302          |10079 |Zabbix agent      |
 ROW   |325          |10081 |CPU               |
+ROW   |322          |10081 |Filesystems       |
+ROW   |319          |10081 |General           |
 ROW   |328          |10081 |Memory            |
 ROW   |330          |10081 |Network interfaces|
-ROW   |331          |10076 |Logical partitions|
+ROW   |323          |10081 |OS                |
+ROW   |320          |10081 |Performance       |
+ROW   |324          |10081 |Processes         |
+ROW   |329          |10081 |Zabbix agent      |
 ROW   |332          |10082 |Classes           |
 ROW   |333          |10082 |Compilation       |
 ROW   |334          |10082 |Garbage Collector |
@@ -214,48 +236,6 @@ ROW   |341          |10083 |http-8443         |
 ROW   |342          |10083 |jk-8009           |
 ROW   |343          |10083 |Sessions          |
 ROW   |344          |10083 |Tomcat            |
-ROW   |356          |10087 |CPU               |
-ROW   |363          |10087 |Memory            |
-ROW   |370          |10087 |General           |
-ROW   |377          |10087 |Storage           |
-ROW   |384          |10085 |General           |
-ROW   |386          |10085 |Memory            |
-ROW   |405          |10085 |CPU               |
-ROW   |407          |10085 |Hardware          |
-ROW   |408          |10089 |CPU               |
-ROW   |410          |10089 |Memory            |
-ROW   |412          |10089 |General           |
-ROW   |414          |10089 |Storage           |
-ROW   |416          |10091 |CPU               |
-ROW   |418          |10091 |General           |
-ROW   |420          |10091 |Hardware          |
-ROW   |422          |10091 |Memory            |
-ROW   |424          |10089 |Filesystems       |
-ROW   |426          |10087 |Filesystems       |
-ROW   |428          |10089 |Network           |
-ROW   |430          |10087 |Network           |
-ROW   |5            |10001 |Filesystems       |
-ROW   |7            |10001 |Network interfaces|
-ROW   |9            |10001 |Processes         |
-ROW   |207          |10001 |Zabbix agent      |
-ROW   |229          |10066 |General           |
-ROW   |230          |10066 |Interfaces        |
-ROW   |231          |10067 |General           |
-ROW   |232          |10067 |Interfaces        |
-ROW   |235          |10067 |Disk partitions   |
-ROW   |236          |10069 |Disk partitions   |
-ROW   |237          |10069 |General           |
-ROW   |238          |10069 |Interfaces        |
-ROW   |241          |10069 |Processors        |
-ROW   |242          |10067 |Processors        |
-ROW   |252          |10074 |Zabbix agent      |
-ROW   |262          |10075 |Zabbix agent      |
-ROW   |272          |10076 |Zabbix agent      |
-ROW   |282          |10077 |Zabbix agent      |
-ROW   |292          |10078 |Zabbix agent      |
-ROW   |302          |10079 |Zabbix agent      |
-ROW   |329          |10081 |Zabbix agent      |
-ROW   |345          |10084 |Zabbix server     |
 ROW   |346          |10084 |CPU               |
 ROW   |347          |10084 |Filesystems       |
 ROW   |348          |10084 |General           |
@@ -266,24 +246,46 @@ ROW   |352          |10084 |Performance       |
 ROW   |353          |10084 |Processes         |
 ROW   |354          |10084 |Security          |
 ROW   |355          |10084 |Zabbix agent      |
+ROW   |345          |10084 |Zabbix server     |
+ROW   |405          |10085 |CPU               |
+ROW   |384          |10085 |General           |
+ROW   |407          |10085 |Hardware          |
+ROW   |432          |10085 |Log               |
+ROW   |386          |10085 |Memory            |
 ROW   |357          |10086 |CPU               |
-ROW   |364          |10086 |Memory            |
+ROW   |427          |10086 |Filesystems       |
 ROW   |371          |10086 |General           |
+ROW   |364          |10086 |Memory            |
+ROW   |431          |10086 |Network           |
 ROW   |378          |10086 |Storage           |
+ROW   |356          |10087 |CPU               |
+ROW   |426          |10087 |Filesystems       |
+ROW   |370          |10087 |General           |
+ROW   |363          |10087 |Memory            |
+ROW   |430          |10087 |Network           |
+ROW   |377          |10087 |Storage           |
+ROW   |434          |10088 |Clusters          |
+ROW   |433          |10088 |Log               |
+ROW   |408          |10089 |CPU               |
+ROW   |424          |10089 |Filesystems       |
+ROW   |412          |10089 |General           |
+ROW   |410          |10089 |Memory            |
+ROW   |428          |10089 |Network           |
+ROW   |414          |10089 |Storage           |
 ROW   |409          |10090 |CPU               |
-ROW   |411          |10090 |Memory            |
+ROW   |425          |10090 |Filesystems       |
 ROW   |413          |10090 |General           |
+ROW   |411          |10090 |Memory            |
+ROW   |429          |10090 |Network           |
 ROW   |415          |10090 |Storage           |
+ROW   |416          |10091 |CPU               |
+ROW   |418          |10091 |General           |
+ROW   |420          |10091 |Hardware          |
+ROW   |422          |10091 |Memory            |
 ROW   |417          |10092 |CPU               |
 ROW   |419          |10092 |General           |
 ROW   |421          |10092 |Hardware          |
 ROW   |423          |10092 |Memory            |
-ROW   |425          |10090 |Filesystems       |
-ROW   |427          |10086 |Filesystems       |
-ROW   |429          |10090 |Network           |
-ROW   |431          |10086 |Network           |
-ROW   |432          |10085 |Log               |
-ROW   |433          |10088 |Log               |
 
 TABLE |interface
 FIELDS|interfaceid|hostid|main|type|useip|ip       |dns|port |
@@ -293,6 +295,7 @@ TABLE |valuemaps
 FIELDS|valuemapid|name                                 |
 ROW   |4         |APC Battery Replacement Status       |
 ROW   |5         |APC Battery Status                   |
+ROW   |13        |Cluster status                       |
 ROW   |7         |Dell Open Manage System Status       |
 ROW   |2         |Host status                          |
 ROW   |6         |HP Insight System Status             |
@@ -817,6 +820,10 @@ ROW   |23589 |3   |                 |                                           
 ROW   |23590 |3   |                 |                                                         |10087 |Outgoing network traffic                                         |vmware.vsphere.vm.net.if.out[{$URL},{$USERNAME},{$PASSWORD},{HOST.HOST}]                 |60   |90     |365   |0     |3         |             |bps     |1         |0    |                   |0                   |                     |                     |8      |          |NULL      |NULL      |          |                                                                                    |                |0        |0       |        |        |         |          |0    |                                                |NULL       |    |Average amount of data transmitted per second.                                                                                                                                                                                                                                                                                                                                                                                            |0             |30      |0                  |0                  |                  |
 ROW   |23591 |3   |                 |                                                         |10087 |Number of bytes read from the disk                               |vmware.vsphere.vm.disk.in[{$URL},{$USERNAME},{$PASSWORD},{HOST.HOST}]                    |60   |90     |365   |0     |3         |             |Bps     |0         |0    |                   |0                   |                     |                     |1      |          |NULL      |NULL      |          |                                                                                    |                |0        |0       |        |        |         |          |0    |                                                |NULL       |    |Average number of bytes read from the disk.                                                                                                                                                                                                                                                                                                                                                                                               |0             |30      |0                  |0                  |                  |
 ROW   |23592 |3   |                 |                                                         |10087 |Number of bytes written from the disk                            |vmware.vsphere.vm.disk.out[{$URL},{$USERNAME},{$PASSWORD},{HOST.HOST}]                   |60   |90     |365   |0     |3         |             |Bps     |0         |0    |                   |0                   |                     |                     |1      |          |NULL      |NULL      |          |                                                                                    |                |0        |0       |        |        |         |          |0    |                                                |NULL       |    |Average number of bytes written from the disk.                                                                                                                                                                                                                                                                                                                                                                                            |0             |30      |0                  |0                  |                  |
+ROW   |23593 |3   |                 |                                                         |10088 |Event log                                                        |vmware.vcenter.eventlog[{$URL},{$USERNAME},{$PASSWORD}]                                  |60   |90     |365   |0     |2         |             |        |0         |0    |                   |0                   |                     |                     |1      |          |NULL      |NULL      |          |                                                                                    |                |0        |0       |        |        |         |          |0    |                                                |NULL       |    |                                                                                                                                                                                                                                                                                                                                                                                                                                          |0             |30      |0                  |0                  |                  |
+ROW   |23594 |3   |                 |                                                         |10085 |Event log                                                        |vmware.vsphere.eventlog[{$URL},{$USERNAME},{$PASSWORD}]                                  |60   |90     |365   |0     |2         |             |        |0         |0    |                   |0                   |                     |                     |1      |          |NULL      |NULL      |          |                                                                                    |                |0        |0       |        |        |         |          |0    |                                                |NULL       |    |                                                                                                                                                                                                                                                                                                                                                                                                                                          |0             |30      |0                  |0                  |                  |
+ROW   |23595 |3   |                 |                                                         |10088 |Discover vCenter clusters                                        |vmware.vcenter.cluster.discovery[{$URL},{$USERNAME},{$PASSWORD}]                         |3600 |90     |365   |0     |4         |             |        |0         |0    |                   |0                   |                     |                     |1      |          |NULL      |NULL      |          |                                                                                    |                |0        |0       |        |        |         |          |1    |:                                               |NULL       |    |Discovery of clusters                                                                                                                                                                                                                                                                                                                                                                                                                     |0             |30      |0                  |0                  |                  |
+ROW   |23596 |3   |                 |                                                         |10088 |Status of $4 cluster                                             |vmware.vcenter.cluster.status[{$URL},{$USERNAME},{$PASSWORD},{#CLUSTER.NAME}]            |60   |90     |365   |0     |3         |             |        |0         |0    |                   |0                   |                     |                     |1      |          |NULL      |13        |          |                                                                                    |                |0        |0       |        |        |         |          |2    |                                                |NULL       |    |                                                                                                                                                                                                                                                                                                                                                                                                                                          |0             |30      |0                  |0                  |                  |
 ROW   |10020 |0   |                 |                                                         |10001 |Agent ping                                                       |agent.ping                                                                               |60   |7      |365   |0     |3         |             |        |0         |0    |                   |0                   |                     |                     |1      |          |22232     |10        |          |                                                                                    |                |0        |0       |        |        |         |          |0    |                                                |NULL       |    |The agent always returns 1 for this item. It could be used in combination with nodata() for availability check.                                                                                                                                                                                                                                                                                                                           |0             |0       |0                  |0                  |                  |
 ROW   |10059 |0   |                 |                                                         |10001 |Version of zabbix_agent(d) running                               |agent.version                                                                            |3600 |7      |365   |0     |1         |             |        |0         |0    |                   |0                   |                     |                     |1      |          |22231     |NULL      |          |                                                                                    |                |0        |0       |        |        |         |          |0    |                                                |NULL       |    |                                                                                                                                                                                                                                                                                                                                                                                                                                          |0             |0       |0                  |0                  |                  |
 ROW   |22715 |4   |{$SNMP_COMMUNITY}|SNMPv2-MIB::sysContact.0                                 |10066 |Device contact details                                           |sysContact                                                                               |3600 |7      |365   |0     |1         |             |        |0         |0    |                   |0                   |                     |                     |1      |          |22713     |NULL      |          |                                                                                    |                |0        |0       |        |        |         |          |0    |                                                |NULL       |    |The textual identification of the contact person for this managed node, together with information on how to contact this person.  If no contact information is known, the value is the zero-length string.                                                                                                                                                                                                                                |23            |0       |0                  |0                  |                  |
@@ -971,8 +978,6 @@ ROW   |23324 |0   |                 |                                           
 ROW   |23325 |0   |                 |                                                         |10079 |Host name of zabbix_agentd running                               |agent.hostname                                                                           |3600 |7      |365   |0     |1         |             |        |0         |0    |                   |0                   |                     |                     |1      |          |23318     |NULL      |          |                                                                                    |                |0        |0       |        |        |         |          |0    |                                                |NULL       |    |                                                                                                                                                                                                                                                                                                                                                                                                                                          |0             |30      |0                  |0                  |                  |
 ROW   |23326 |0   |                 |                                                         |10081 |Host name of zabbix_agentd running                               |agent.hostname                                                                           |3600 |7      |365   |0     |1         |             |        |0         |0    |                   |0                   |                     |                     |1      |          |23318     |NULL      |          |                                                                                    |                |0        |0       |        |        |         |          |0    |                                                |NULL       |    |                                                                                                                                                                                                                                                                                                                                                                                                                                          |0             |30      |0                  |0                  |                  |
 ROW   |23327 |0   |                 |                                                         |10084 |Host name of zabbix_agentd running                               |agent.hostname                                                                           |3600 |7      |365   |0     |1         |             |        |0         |0    |                   |0                   |                     |                     |1      |          |23319     |NULL      |          |                                                                                    |                |0        |0       |        |        |         |          |0    |                                                |1          |    |                                                                                                                                                                                                                                                                                                                                                                                                                                          |0             |30      |0                  |0                  |                  |
-ROW   |23593 |3   |                 |                                                         |10088 |Event log                                                        |vmware.vcenter.eventlog[{$URL},{$USERNAME},{$PASSWORD}]                                  |60   |90     |365   |0     |2         |             |        |0         |0    |                   |0                   |                     |                     |1      |          |NULL      |NULL      |          |                                                                                    |                |0        |0       |        |        |         |          |0    |                                                |NULL       |    |                                                                                                                                                                                                                                                                                                                                                                                                                                          |0             |30      |0                  |0                  |                  |
-ROW   |23594 |3   |                 |                                                         |10085 |Event log                                                        |vmware.vsphere.eventlog[{$URL},{$USERNAME},{$PASSWORD}]                                  |60   |90     |365   |0     |2         |             |        |0         |0    |                   |0                   |                     |                     |1      |          |NULL      |NULL      |          |                                                                                    |                |0        |0       |        |        |         |          |0    |                                                |NULL       |    |                                                                                                                                                                                                                                                                                                                                                                                                                                          |0             |30      |0                  |0                  |                  |
 
 TABLE |media_type
 FIELDS|mediatypeid|type|description|smtp_server     |smtp_helo  |smtp_email        |exec_path|gsm_modem |username          |passwd|status|
@@ -3005,6 +3010,7 @@ ROW   |5788     |430          |23589 |
 ROW   |5789     |430          |23590 |
 ROW   |5792     |432          |23594 |
 ROW   |5793     |433          |23593 |
+ROW   |5794     |434          |23596 |
 
 TABLE |mappings
 FIELDS|mappingid|valuemapid|value|newvalue          |
@@ -3059,10 +3065,14 @@ ROW   |71       |11        |3    |testing           |
 ROW   |72       |12        |0    |poweredOff        |
 ROW   |73       |12        |1    |poweredOn         |
 ROW   |74       |12        |2    |suspended         |
+ROW   |75       |13        |0    |gray              |
+ROW   |76       |13        |1    |green             |
+ROW   |77       |13        |2    |yellow            |
+ROW   |78       |13        |3    |red               |
 
 TABLE |sysmaps
-FIELDS|sysmapid|name         |width|height|backgroundid|label_type|label_location|highlight|expandproblem|markelements|show_unack|grid_size|grid_show|grid_align|label_format|label_type_host|label_type_hostgroup|label_type_trigger|label_type_map|label_type_image|label_string_host|label_string_hostgroup|label_string_trigger|label_string_map|label_string_image|iconmapid|expand_macros|
-ROW   |1       |Local network|680  |200   |NULL        |0         |0             |1        |1            |1           |0         |50       |1        |1         |0           |2              |2                   |2                 |2             |2               |                 |                      |                    |                |                  |NULL     |1            |
+FIELDS|sysmapid|name         |width|height|backgroundid|label_type|label_location|highlight|expandproblem|markelements|show_unack|grid_size|grid_show|grid_align|label_format|label_type_host|label_type_hostgroup|label_type_trigger|label_type_map|label_type_image|label_string_host|label_string_hostgroup|label_string_trigger|label_string_map|label_string_image|iconmapid|expand_macros|severity_min|
+ROW   |1       |Local network|680  |200   |NULL        |0         |0             |1        |1            |1           |0         |50       |1        |1         |0           |2              |2                   |2                 |2             |2               |                 |                      |                    |                |                  |NULL     |1            |0           |
 
 TABLE |sysmaps_elements
 FIELDS|selementid|sysmapid|elementid|elementtype|iconid_off|iconid_on|label                      |label_location|x  |y |iconid_disabled|iconid_maintenance|elementsubtype|areatype|width|height|viewtype|use_iconmap|
@@ -3204,6 +3214,7 @@ ROW   |197            |23581 |23580        |
 ROW   |198            |23582 |23580        |
 ROW   |199            |23583 |23580        |
 ROW   |200            |23584 |23580        |
+ROW   |201            |23596 |23595        |
 
 TABLE |host_discovery
 FIELDS|hostid|parent_hostid|parent_itemid|
@@ -3258,3 +3269,4 @@ ROW   |42                    |425          |424       |
 ROW   |43                    |427          |426       |
 ROW   |44                    |429          |428       |
 ROW   |45                    |431          |430       |
+
