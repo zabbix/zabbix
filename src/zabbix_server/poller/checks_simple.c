@@ -30,8 +30,9 @@ static char	*vmkeys[] =
 {
 	"vcenter.cluster.discovery",
 	"vcenter.cluster.status",
-
 	"vcenter.eventlog",
+
+	"vcenter.hv.cluster.name",
 	"vcenter.hv.cpu.usage",
 	"vcenter.hv.discovery",
 	"vcenter.hv.fullname",
@@ -108,8 +109,9 @@ static vmfunc_t	vmfuncs[] =
 {
 	check_vcenter_cluster_discovery,
 	check_vcenter_cluster_status,
-
 	check_vcenter_eventlog,
+
+	check_vcenter_hv_cluster_name,
 	check_vcenter_hv_cpu_usage,
 	check_vcenter_hv_discovery,
 	check_vcenter_hv_fullname,

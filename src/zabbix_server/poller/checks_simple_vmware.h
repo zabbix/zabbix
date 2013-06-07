@@ -26,8 +26,9 @@
 
 int	check_vcenter_cluster_discovery(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	check_vcenter_cluster_status(AGENT_REQUEST *request, AGENT_RESULT *result);
-
 int	check_vcenter_eventlog(AGENT_REQUEST *request, AGENT_RESULT *result);
+
+int	check_vcenter_hv_cluster_name(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	check_vcenter_hv_cpu_usage(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	check_vcenter_hv_discovery(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	check_vcenter_hv_fullname(AGENT_REQUEST *request, AGENT_RESULT *result);
