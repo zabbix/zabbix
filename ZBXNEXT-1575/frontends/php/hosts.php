@@ -114,13 +114,16 @@ $_REQUEST['go'] = get_request('go', 'none');
  */
 if (get_request('groupid', 0) > 0) {
 	$groupids = available_groups($_REQUEST['groupid'], 1);
-	if (empty($groupids)) {
+	if (!$groupids) {
 		access_deny();
 	}
 }
 if (get_request('hostid', 0) > 0) {
-	$hostids = available_hosts($_REQUEST['hostid'], 1);
-	if (empty($hostids)) {
+	$hosts = API::Host()->get(array(
+		'hostids' => $_REQUEST['hostid'],
+		'editable' => true
+	));
+	if (!$hosts) {
 		access_deny();
 	}
 }

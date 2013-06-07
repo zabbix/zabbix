@@ -1,6 +1,7 @@
 Changes for 2.1.0
 
 New features:
+A.FGI..PS. [ZBXNEXT-1726] added support for optional Host Metadata to active agent for auto-registration (dimir, Oleg)
 ..F....... [ZBXNEXT-1114] improved multiselect support in action conditions configuration page (Eduard)
 ...G...... [ZBXNEXT-367] added printing Aliases and PerfCounters when agent is run with -p option (aleksej, dimir)
 .......PS. [ZBX-6581] added printing host name to a web scenario error log message (dimir)
@@ -72,6 +73,10 @@ A.F.I...S. [ZBXNEXT-1186] increased length to 2048 characters of expression fiel
 ........S. [ZBXNEXT-1663] added support for notification macros {TRIGGER.NAME.ORIG}, {ITEM.NAME.ORIG}, {ITEM.KEY.ORIG} (dimir)
 
 Bug fixes:
+..F....... [ZBX-6666] fixed passing incorrect Host and Template ID directly from URL (Ivo)
+..F....... [ZBX-6650] fixed minor layout issues for reset button and buttons in edit forms (Ivo)
+..F....... [ZBX-6642] fixed not being able to use web items in plain text screen elements (Pavels)
+..F....... [ZBX-6642] fixed disabled items not being displayed in screen element item selection pop ups (Pavels)
 ..F....... [ZBX-6654] fixed inconsistent column order in the item prototype list (Ivo)
 A......... [ZBX-6644] fixed sorting by history and trends fields in itemprototype.get API (Ivo)
 ..F....... [ZBX-6631] made the "Debug" link available for guest users (Pavels)
