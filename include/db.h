@@ -332,10 +332,6 @@ typedef struct
 	zbx_uint64_t		valuemapid;
 	char			*error;
 
-	char			*h_lastvalue[2];
-	char			*h_lasteventid;
-	char			*h_lastsource;
-	char			*h_lastseverity;
 	unsigned char		state;
 	unsigned char		flags;
 }

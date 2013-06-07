@@ -3799,7 +3799,6 @@ static void	zbx_evaluate_item_functions(zbx_vector_ptr_t *ifuncs)
 			else
 				func->value = zbx_strdup(func->value, value);
 		}
-		DBfree_item_from_db(&item);	/* free cached historical fields item.h_* */
 	}
 	DBfree_result(result);
 
