@@ -440,7 +440,7 @@ static void	vc_warn_low_memory()
 		last_warning_time = now;
 
 		zabbix_log(LOG_LEVEL_WARNING, "Value cache is working in low memory mode. Increase ValueCacheSize"
-				" configuration parameter to increase value cache efficiency.");
+				" configuration parameter to have better value cache efficiency.");
 	}
 }
 
