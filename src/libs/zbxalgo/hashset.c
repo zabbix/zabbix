@@ -126,29 +126,19 @@ void	*zbx_hashset_insert_ext(zbx_hashset_t *hs, const void *data, size_t size, s
 
 	if (NULL == entry)
 	{
-		if (NULL == (entry = hs->mem_malloc_func(NULL, sizeof(ZBX_HASHSET_ENTRY_T))))
-			return NULL;
-
-		if (NULL == (entry->data = hs->mem_malloc_func(NULL, size)))
-		{
-			hs->mem_free_func(entry);
-			return NULL;
-		}
-
-		memcpy((char *)entry->data + offset, (const char *)data + offset, size - offset);
-		entry->hash = hash;
-		entry->next = hs->slots[slot];
-		hs->slots[slot] = entry;
-		hs->num_data++;
-
-		if (hs->num_data >= hs->num_slots * CRIT_LOAD_FACTOR)
+		if (hs->num_data + 1 >= hs->num_slots * CRIT_LOAD_FACTOR)
 		{
 			int			inc_slots, new_slot;
+			void			*slots;
 			ZBX_HASHSET_ENTRY_T	**prev_next, *curr_entry, *tmp;
 
 			inc_slots = next_prime(MAX(hs->num_slots + 1, hs->num_slots * SLOT_GROWTH_FACTOR));
 
-			hs->slots = hs->mem_realloc_func(hs->slots, inc_slots * sizeof(ZBX_HASHSET_ENTRY_T *));
+			if (NULL == (slots = hs->mem_realloc_func(hs->slots, inc_slots * sizeof(ZBX_HASHSET_ENTRY_T *))))
+				return NULL;
+
+			hs->slots = slots;
+
 			memset(hs->slots + hs->num_slots, 0, (inc_slots - hs->num_slots) * sizeof(ZBX_HASHSET_ENTRY_T *));
 
 			for (slot = 0; slot < hs->num_slots; slot++)
@@ -176,7 +166,27 @@ void	*zbx_hashset_insert_ext(zbx_hashset_t *hs, const void *data, size_t size, s
 			}
 
 			hs->num_slots = inc_slots;
+
+			/* recalculate slot/entry for the new item */
+			slot = hash % hs->num_slots;
+			entry = hs->slots[slot];
+
 		}
+
+		if (NULL == (entry = hs->mem_malloc_func(NULL, sizeof(ZBX_HASHSET_ENTRY_T))))
+			return NULL;
+
+		if (NULL == (entry->data = hs->mem_malloc_func(NULL, size)))
+		{
+			hs->mem_free_func(entry);
+			return NULL;
+		}
+
+		memcpy((char *)entry->data + offset, (const char *)data + offset, size - offset);
+		entry->hash = hash;
+		entry->next = hs->slots[slot];
+		hs->slots[slot] = entry;
+		hs->num_data++;
 	}
 
 	return entry->data;
