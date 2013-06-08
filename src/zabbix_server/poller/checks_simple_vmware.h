@@ -57,10 +57,16 @@ int	check_vcenter_vm_memory_size_ballooned(AGENT_REQUEST *request, AGENT_RESULT 
 int	check_vcenter_vm_memory_size_compressed(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	check_vcenter_vm_memory_size_swapped(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	check_vcenter_vm_powerstate(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	check_vcenter_vm_net_if_discovery(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	check_vcenter_vm_net_if_in(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	check_vcenter_vm_net_if_out(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	check_vcenter_vm_storage_committed(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	check_vcenter_vm_storage_unshared(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	check_vcenter_vm_storage_uncommitted(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	check_vcenter_vm_uptime(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	check_vcenter_vm_vfs_dev_discovery(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	check_vcenter_vm_vfs_dev_read(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	check_vcenter_vm_vfs_dev_write(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	check_vcenter_vm_vfs_fs_discovery(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	check_vcenter_vm_vfs_fs_size(AGENT_REQUEST *request, AGENT_RESULT *result);
 
@@ -91,10 +97,16 @@ int	check_vsphere_vm_memory_size_ballooned(AGENT_REQUEST *request, AGENT_RESULT 
 int	check_vsphere_vm_memory_size_compressed(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	check_vsphere_vm_memory_size_swapped(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	check_vsphere_vm_powerstate(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	check_vsphere_vm_net_if_discovery(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	check_vsphere_vm_net_if_in(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	check_vsphere_vm_net_if_out(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	check_vsphere_vm_storage_committed(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	check_vsphere_vm_storage_uncommitted(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	check_vsphere_vm_storage_unshared(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	check_vsphere_vm_uptime(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	check_vsphere_vm_vfs_dev_discovery(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	check_vsphere_vm_vfs_dev_read(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	check_vsphere_vm_vfs_dev_write(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	check_vsphere_vm_vfs_fs_discovery(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	check_vsphere_vm_vfs_fs_size(AGENT_REQUEST *request, AGENT_RESULT *result);
 
