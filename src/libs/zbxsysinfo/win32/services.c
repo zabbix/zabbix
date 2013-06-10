@@ -236,9 +236,10 @@ int	SERVICES(AGENT_REQUEST *request, AGENT_RESULT *result)
 				continue;
 
 			if (SUCCEED == check_service_starttype(h_srv, start_type))
+			{
 				if (SUCCEED == check_service_state(h_srv, service_state))
 				{
-					if (NULL == exclude || '\0' == *exclude)
+					if (NULL != exclude && '\0' != *exclude)
 					{
 						utf8 = zbx_unicode_to_utf8(ssp[i].lpServiceName);
 						if (FAIL == str_in_list(exclude, utf8, ','))
@@ -246,6 +247,7 @@ int	SERVICES(AGENT_REQUEST *request, AGENT_RESULT *result)
 						zbx_free(utf8);
 					}
 				}
+			}
 
 			CloseServiceHandle(h_srv);
 		}

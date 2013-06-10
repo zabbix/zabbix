@@ -123,10 +123,6 @@ elseif (isset($_REQUEST['cancel_new_timeperiod'])) {
 	unset($_REQUEST['new_timeperiod']);
 }
 elseif (isset($_REQUEST['save'])) {
-	if (!count(get_accessible_nodes_by_user(CWebUser::$data, PERM_READ_WRITE, PERM_RES_IDS_ARRAY))) {
-		access_deny();
-	}
-
 	if (isset($_REQUEST['maintenanceid'])) {
 		$msg1 = _('Maintenance updated');
 		$msg2 = _('Cannot update maintenance');
@@ -210,10 +206,6 @@ elseif (isset($_REQUEST['save'])) {
 	show_messages($result, $msg1, $msg2);
 }
 elseif (isset($_REQUEST['delete']) || $_REQUEST['go'] == 'delete') {
-	if (!count(get_accessible_nodes_by_user(CWebUser::$data, PERM_READ_WRITE, PERM_RES_IDS_ARRAY))) {
-		access_deny();
-	}
-
 	$maintenanceids = get_request('maintenanceid', array());
 	if (isset($_REQUEST['maintenanceids'])) {
 		$maintenanceids = $_REQUEST['maintenanceids'];
@@ -377,7 +369,7 @@ elseif (isset($_REQUEST['edit_timeperiodid'])) {
 	if (isset($_REQUEST['timeperiods'][$edit_timeperiodid])) {
 		$_REQUEST['new_timeperiod'] = $_REQUEST['timeperiods'][$edit_timeperiodid];
 		$_REQUEST['new_timeperiod']['id'] = $edit_timeperiodid;
-		$_REQUEST['new_timeperiod']['start_date'] = date('YmdHi', $_REQUEST['timeperiods'][$edit_timeperiodid]['start_date']);
+		$_REQUEST['new_timeperiod']['start_date'] = $_REQUEST['timeperiods'][$edit_timeperiodid]['start_date'];
 	}
 }
 

@@ -63,7 +63,7 @@ class CHttpTest extends CZBXAPI {
 			'search'         => null,
 			'searchByAny'    => null,
 			'startSearch'    => null,
-			'exludeSearch'   => null,
+			'excludeSearch'  => null,
 			// output
 			'output'         => API_OUTPUT_REFER,
 			'expandName'     => null,
@@ -79,6 +79,7 @@ class CHttpTest extends CZBXAPI {
 		);
 		$options = zbx_array_merge($defOptions, $options);
 
+		$this->checkDeprecatedParam($options, 'output', 'macros');
 		$this->checkDeprecatedParam($options, 'selectSteps', 'webstepid');
 
 		// editable + PERMISSION CHECK
@@ -252,6 +253,10 @@ class CHttpTest extends CZBXAPI {
 		if (is_null($options['preservekeys'])) {
 			$result = zbx_cleanHashes($result);
 		}
+
+		// deprecated fields
+		$result = $this->handleDeprecatedOutput($result, 'macros', 'variables', $options['output']);
+
 		return $result;
 	}
 
@@ -268,6 +273,9 @@ class CHttpTest extends CZBXAPI {
 		// find hostid by applicationid
 		foreach ($httpTests as $hnum => $httpTest) {
 			unset($httpTests[$hnum]['templateid']);
+
+			// convert deprecated params
+			$httpTests[$hnum] = $this->convertDeprecatedParam($httpTest, 'macros', 'variables');
 
 			if (empty($httpTest['hostid']) && !empty($httpTest['applicationid'])) {
 				$dbHostId = DBfetch(DBselect('SELECT a.hostid'.
@@ -300,6 +308,7 @@ class CHttpTest extends CZBXAPI {
 			unset($httpTests[$hnum]['templateid']);
 
 			// convert deprecated parameters
+			$httpTests[$hnum] = $this->convertDeprecatedParam($httpTest, 'macros', 'variables');
 			if (isset($httpTest['steps'])) {
 				foreach ($httpTest['steps'] as $i => $step) {
 					$httpTests[$hnum]['steps'][$i] = $this->convertDeprecatedParam($step, 'webstepid', 'httpstepid');
@@ -702,6 +711,11 @@ class CHttpTest extends CZBXAPI {
 			// make sure we request the hostid to be able to expand macros
 			if ($options['expandName'] !== null || $options['expandStepName'] !== null || $options['selectHosts'] !== null) {
 				$sqlParts = $this->addQuerySelect($this->fieldId('hostid'), $sqlParts);
+			}
+
+			// select the state field to be able to return the deprecated value_flag property
+			if ($this->outputIsRequested('macros', $options['output'])) {
+				$sqlParts = $this->addQuerySelect($this->fieldId('variables'), $sqlParts);
 			}
 		}
 

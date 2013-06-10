@@ -167,9 +167,15 @@ frontends/php/images/sysmaps/old/Router.png -text svneol=unset#unset
 frontends/php/images/sysmaps/old/Server.png -text svneol=unset#unset
 frontends/php/images/sysmaps/old/Workstation.png -text svneol=unset#unset
 frontends/php/include/classes/class.cmultiselect.php -text
+frontends/php/include/classes/class.cseverity.php -text
+frontends/php/include/classes/macros/CEventDescription.php -text
+frontends/php/include/classes/macros/CTriggerDescription.php -text
 frontends/php/include/classes/validators/CSetValidator.php -text
 frontends/php/include/classes/validators/event/CEventSourceObjectValidator.php -text
 frontends/php/include/draw.inc.php -text
+frontends/php/include/views/configuration.sysmap.constructor.php -text
+frontends/php/include/views/configuration.sysmap.list.php -text
+frontends/php/include/views/js/administration.general.housekeeper.edit.js.php -text
 frontends/php/include/views/monitoring.dashconf.php -text
 frontends/php/js/flickerfreescreen.js -text svneol=unset#text/plain
 frontends/php/js/multiselect.js -text svneol=unset#text/plain
@@ -261,7 +267,12 @@ frontends/php/styles/themes/originalblue/images/icons_d40000.png -text
 frontends/php/styles/themes/originalblue/images/icons_ffffff.png -text
 frontends/php/styles/themes/originalblue/images/preloader.gif -text
 frontends/php/tests/bootstrap.php.template -text
+frontends/php/tests/general/CTriggerFunctionValidatorTest.php -text
 frontends/php/tests/selenium/testFormDiscoveryRule.php -text
+frontends/php/tests/selenium/testFormGraph.php -text
+frontends/php/tests/selenium/testInheritanceGraph.php -text
+frontends/php/tests/selenium/testInheritanceItem.php -text
+frontends/php/tests/selenium/testInheritanceTrigger.php -text
 include/module.h -text
 include/zbxmodules.h -text
 man/zabbix_agentd.man -text
