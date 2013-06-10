@@ -823,11 +823,10 @@ static int	vmware_hv_guestvmids_get(CURL *easyhandle, const char *guesthvid, zbx
 		goto out;
 	}
 
-	if (SUCCEED != read_xml_values(page.data, "//*[@type='VirtualMachine']", guestvmids))
-	{
-		*error = zbx_strdup(*error, "Cannot get list of guest VMs");
+	if (NULL != (*error = read_xml_value(page.data, ZBX_XPATH_LN1("faultstring"))))
 		goto out;
-	}
+
+	read_xml_values(page.data, "//*[@type='VirtualMachine']", guestvmids);
 
 	ret = SUCCEED;
 out:
@@ -860,7 +859,7 @@ static int	vcenter_hv_data_get(CURL *easyhandle, const char *guesthvid)
 	const char	*__function_name = "vcenter_hv_data_get";
 
 	int		err, o, ret = FAIL;
-	char		tmp[MAX_STRING_LEN];
+	char		*error, tmp[MAX_STRING_LEN];
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() guesthvid:'%s'", __function_name, guesthvid);
 
@@ -881,6 +880,13 @@ static int	vcenter_hv_data_get(CURL *easyhandle, const char *guesthvid)
 		goto out;
 	}
 
+	if (NULL != (error = read_xml_value(page.data, ZBX_XPATH_LN1("faultstring"))))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "VMWare error: %s", error);
+		zbx_free(error);
+		goto out;
+	}
+
 	ret = SUCCEED;
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
@@ -889,7 +895,7 @@ out:
 }
 
 static int	vmware_perf_counters_refresh_rate_get(CURL *easyhandle, const char *guestvmid, int *refresh_rate,
-		unsigned flags)
+		char **error, unsigned flags)
 {
 #	define ZBX_POST_VCENTER_PERF_COUNTERS_REFRESH_RATE			\
 		ZBX_POST_VSPHERE_HEADER						\
@@ -902,7 +908,7 @@ static int	vmware_perf_counters_refresh_rate_get(CURL *easyhandle, const char *g
 	const char	*__function_name = "vmware_perf_counters_refresh_rate_get";
 
 	int		err, o, ret = FAIL;
-	char		tmp[MAX_STRING_LEN], *value, *error;
+	char		tmp[MAX_STRING_LEN], *value = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -911,8 +917,7 @@ static int	vmware_perf_counters_refresh_rate_get(CURL *easyhandle, const char *g
 
 	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, o = CURLOPT_POSTFIELDS, tmp)))
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "VMWare error: cannot set cURL option [%d]: %s",
-				o, curl_easy_strerror(err));
+		*error = zbx_dsprintf(*error, "Cannot set cURL option [%d]: %s", o, curl_easy_strerror(err));
 		goto out;
 	}
 
@@ -920,22 +925,23 @@ static int	vmware_perf_counters_refresh_rate_get(CURL *easyhandle, const char *g
 
 	if (CURLE_OK != (err = curl_easy_perform(easyhandle)))
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "VMWare error: %s", curl_easy_strerror(err));
+		*error = zbx_strdup(*error, curl_easy_strerror(err));
 		goto out;
 	}
 
-	if (NULL != (error = read_xml_value(page.data, ZBX_XPATH_LN1("faultstring"))))
-	{
-		zbx_free(error);
+	if (NULL != (*error = read_xml_value(page.data, ZBX_XPATH_LN1("faultstring"))))
 		goto out;
-	}
 
 	if (NULL == (value = read_xml_value(page.data, ZBX_XPATH_LN2("returnval", "refreshRate"))))
+	{
+		*error = zbx_strdup(*error, "Cannot get refreshRate");
 		goto out;
+	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() refresh_rate:%s", __function_name, value);
 
-	ret = is_uint31(value, refresh_rate);
+	if (SUCCEED != (ret = is_uint31(value, refresh_rate)))
+		*error = zbx_strdup(*error, "Cannot get refreshRate");
 
 	zbx_free(value);
 out:
@@ -958,14 +964,14 @@ static int	vmware_perf_counters_get(CURL *easyhandle, const char *guestvmid, zbx
 	const char		*__function_name = "vmware_perf_counters_get";
 
 	int			i, j, err, o, ret = FAIL;
-	char			*error, tmp[MAX_STRING_LEN], xpath[MAX_STRING_LEN];
+	char			*error = NULL, tmp[MAX_STRING_LEN], xpath[MAX_STRING_LEN];
 	zbx_vector_str_t	instances, counters;
 	zbx_uint64_t		counterid;
 	zbx_dev_t		*dev;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	if (SUCCEED != vmware_perf_counters_refresh_rate_get(easyhandle, guestvmid, &vm->refresh_rate, flags))
+	if (SUCCEED != vmware_perf_counters_refresh_rate_get(easyhandle, guestvmid, &vm->refresh_rate, &error, flags))
 		goto out;
 
 	zbx_snprintf(tmp, sizeof(tmp), ZBX_POST_VCENTER_PERF_COUNTERS,
@@ -973,8 +979,7 @@ static int	vmware_perf_counters_get(CURL *easyhandle, const char *guestvmid, zbx
 
 	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, o = CURLOPT_POSTFIELDS, tmp)))
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "VMWare error: cannot set cURL option [%d]: %s",
-				o, curl_easy_strerror(err));
+		error = zbx_dsprintf(error, "Cannot set cURL option [%d]: %s", o, curl_easy_strerror(err));
 		goto out;
 	}
 
@@ -982,15 +987,12 @@ static int	vmware_perf_counters_get(CURL *easyhandle, const char *guestvmid, zbx
 
 	if (CURLE_OK != (err = curl_easy_perform(easyhandle)))
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "VMWare error: %s", curl_easy_strerror(err));
+		error = zbx_strdup(error, curl_easy_strerror(err));
 		goto out;
 	}
 
 	if (NULL != (error = read_xml_value(page.data, ZBX_XPATH_LN1("faultstring"))))
-	{
-		zbx_free(error);
 		goto out;
-	}
 
 	zbx_devs_free(&vm->devs);
 
@@ -1061,6 +1063,12 @@ static int	vmware_perf_counters_get(CURL *easyhandle, const char *guestvmid, zbx
 
 	ret = SUCCEED;
 out:
+	if (SUCCEED != ret)
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "VMWare error: %s", error);
+		zbx_free(error);
+	}
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
@@ -1080,12 +1088,12 @@ static void	vmware_get_counterid_by_key(const char *key, zbx_uint64_t *counterid
 }
 
 static int	vmware_perf_counter_details_get(CURL *easyhandle, const zbx_vector_ptr_t *vms, zbx_counters_t *counters,
-		unsigned flags)
+		char **error, unsigned flags)
 {
 	const char		*__function_name = "vmware_perf_counter_details_get";
 
 	int			i, j, k, err, o, ret = FAIL;
-	char			*tmp = NULL, *error;
+	char			*tmp = NULL;
 	size_t			tmp_alloc = 0, tmp_offset = 0;
 	zbx_vector_uint64_t	counterids;
 	zbx_vm_t		*vm;
@@ -1134,8 +1142,7 @@ static int	vmware_perf_counter_details_get(CURL *easyhandle, const zbx_vector_pt
 
 	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, o = CURLOPT_POSTFIELDS, tmp)))
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "VMWare error: cannot set cURL option [%d]: %s",
-				o, curl_easy_strerror(err));
+		*error = zbx_dsprintf(*error, "Cannot set cURL option [%d]: %s", o, curl_easy_strerror(err));
 		goto out;
 	}
 
@@ -1143,15 +1150,12 @@ static int	vmware_perf_counter_details_get(CURL *easyhandle, const zbx_vector_pt
 
 	if (CURLE_OK != (err = curl_easy_perform(easyhandle)))
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "VMWare error: %s", curl_easy_strerror(err));
+		*error = zbx_strdup(*error, curl_easy_strerror(err));
 		goto out;
 	}
 
-	if (NULL != (error = read_xml_value(page.data, ZBX_XPATH_LN1("faultstring"))))
-	{
-		zbx_free(error);
+	if (NULL != (*error = read_xml_value(page.data, ZBX_XPATH_LN1("faultstring"))))
 		goto out;
-	}
 
 	vmware_get_counterid_by_key("packetsRx", &counters->nic_packets_rx);
 	vmware_get_counterid_by_key("packetsTx", &counters->nic_packets_tx);
@@ -1186,12 +1190,13 @@ static void	add_perf_counter_stat_metric(char **tmp, size_t *tmp_alloc, size_t *
 	zbx_strcpy_alloc(tmp, tmp_alloc, tmp_offset, "</ns0:metricId>");
 }
 
-static int	vmware_perf_counter_stats_get(CURL *easyhandle, zbx_vm_t *vm, zbx_counters_t *counters, unsigned flags)
+static int	vmware_perf_counter_stats_get(CURL *easyhandle, zbx_vm_t *vm, zbx_counters_t *counters, char **error,
+		unsigned flags)
 {
 	const char		*__function_name = "vmware_perf_counter_stats_get";
 
 	int			i, err, o, ret = FAIL;
-	char			*tmp = NULL, *error;
+	char			*tmp = NULL;
 	size_t			tmp_alloc = 0, tmp_offset = 0;
 	zbx_dev_t		*dev;
 
@@ -1240,8 +1245,7 @@ static int	vmware_perf_counter_stats_get(CURL *easyhandle, zbx_vm_t *vm, zbx_cou
 
 	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, o = CURLOPT_POSTFIELDS, tmp)))
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "VMWare error: cannot set cURL option [%d]: %s",
-				o, curl_easy_strerror(err));
+		*error = zbx_dsprintf(*error, "Cannot set cURL option [%d]: %s", o, curl_easy_strerror(err));
 		goto out;
 	}
 
@@ -1249,15 +1253,12 @@ static int	vmware_perf_counter_stats_get(CURL *easyhandle, zbx_vm_t *vm, zbx_cou
 
 	if (CURLE_OK != (err = curl_easy_perform(easyhandle)))
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "VMWare error: %s", curl_easy_strerror(err));
+		*error = zbx_strdup(*error, curl_easy_strerror(err));
 		goto out;
 	}
 
-	if (NULL != (error = read_xml_value(page.data, ZBX_XPATH_LN1("faultstring"))))
-	{
-		zbx_free(error);
+	if (NULL != (*error = read_xml_value(page.data, ZBX_XPATH_LN1("faultstring"))))
 		goto out;
-	}
 
 	vm->stats = zbx_strdup(vm->stats, page.data);
 
@@ -1292,7 +1293,7 @@ static int	vmware_vm_status_ex_get(CURL *easyhandle, const char *vmid, unsigned 
 	const char	*__function_name = "vmware_vm_status_ex_get";
 
 	int		err, o, ret = FAIL;
-	char		tmp[MAX_STRING_LEN];
+	char		*error, tmp[MAX_STRING_LEN];
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() vmid:'%s'", __function_name, vmid);
 
@@ -1311,6 +1312,13 @@ static int	vmware_vm_status_ex_get(CURL *easyhandle, const char *vmid, unsigned 
 	if (CURLE_OK != (err = curl_easy_perform(easyhandle)))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "VMWare error: %s", curl_easy_strerror(err));
+		goto out;
+	}
+
+	if (NULL != (error = read_xml_value(page.data, ZBX_XPATH_LN1("faultstring"))))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "VMWare error: %s", error);
+		zbx_free(error);
 		goto out;
 	}
 
@@ -1354,6 +1362,9 @@ static int	vmware_event_session_get(CURL *easyhandle, char **event_session, char
 		*error = zbx_strdup(*error, curl_easy_strerror(err));
 		goto out;
 	}
+
+	if (NULL != (*error = read_xml_value(page.data, ZBX_XPATH_LN1("faultstring"))))
+		goto out;
 
 	if (NULL == (*event_session = read_xml_value(page.data, "//*[@type='EventHistoryCollector']")))
 	{
@@ -1413,6 +1424,9 @@ static int	vmware_events_get(CURL *easyhandle, const char *event_session, char *
 		*error = zbx_strdup(*error, curl_easy_strerror(err));
 		goto out;
 	}
+
+	if (NULL != (*error = read_xml_value(page.data, ZBX_XPATH_LN1("faultstring"))))
+		goto out;
 
 	*events = zbx_strdup(*events, page.data);
 
@@ -1652,7 +1666,7 @@ static int	vcenter_update(const char *url, const char *username, const char *pas
 		guestvmids.values_num = 0;
 	}
 
-	if (SUCCEED != vmware_perf_counter_details_get(easyhandle, &hv->vms, &vcenter->counters,
+	if (SUCCEED != vmware_perf_counter_details_get(easyhandle, &hv->vms, &vcenter->counters, error,
 			ZBX_VMWARE_FLAG_VCENTER))
 	{
 		goto clean;
@@ -1666,7 +1680,7 @@ static int	vcenter_update(const char *url, const char *username, const char *pas
 		{
 			vm = (zbx_vm_t *)hv->vms.values[j];
 
-			if (SUCCEED != vmware_perf_counter_stats_get(easyhandle, vm, &vcenter->counters,
+			if (SUCCEED != vmware_perf_counter_stats_get(easyhandle, vm, &vcenter->counters, error,
 					ZBX_VMWARE_FLAG_VCENTER))
 			{
 				goto clean;
@@ -1781,6 +1795,9 @@ static int	vsphere_hostdata_get(CURL *easyhandle, char **details, char **error)
 		*error = zbx_strdup(*error, curl_easy_strerror(err));
 		goto out;
 	}
+
+	if (NULL != (*error = read_xml_value(page.data, ZBX_XPATH_LN1("faultstring"))))
+		goto out;
 
 	*details = zbx_strdup(*details, page.data);
 
@@ -1912,7 +1929,7 @@ static int	vsphere_update(const char *url, const char *username, const char *pas
 		vmware_perf_counters_get(easyhandle, guestvmids.values[i], vm, ZBX_VMWARE_FLAG_VSPHERE);
 	}
 
-	if (SUCCEED != vmware_perf_counter_details_get(easyhandle, &vsphere->vms, &vsphere->counters,
+	if (SUCCEED != vmware_perf_counter_details_get(easyhandle, &vsphere->vms, &vsphere->counters, error,
 			ZBX_VMWARE_FLAG_VSPHERE))
 	{
 		goto clean;
@@ -1922,7 +1939,7 @@ static int	vsphere_update(const char *url, const char *username, const char *pas
 	{
 		vm = (zbx_vm_t *)vsphere->vms.values[i];
 
-		if (SUCCEED != vmware_perf_counter_stats_get(easyhandle, vm, &vsphere->counters,
+		if (SUCCEED != vmware_perf_counter_stats_get(easyhandle, vm, &vsphere->counters, error,
 				ZBX_VMWARE_FLAG_VSPHERE))
 		{
 			goto clean;
@@ -2509,7 +2526,27 @@ int	check_vcenter_hv_memory_used(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 int	check_vcenter_hv_status(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	return get_vcenter_hv_stat(request, ZBX_OPT_XPATH, ZBX_XPATH_LN2("val", "overallStatus"), result);
+	int	ret;
+
+	ret = get_vcenter_hv_stat(request, ZBX_OPT_XPATH, ZBX_XPATH_LN2("val", "overallStatus"), result);
+
+	if (SYSINFO_RET_OK == ret && GET_STR_RESULT(result))
+	{
+		if (0 == strcmp(result->str, "gray"))
+			SET_UI64_RESULT(result, 0);
+		else if (0 == strcmp(result->str, "green"))
+			SET_UI64_RESULT(result, 1);
+		else if (0 == strcmp(result->str, "yellow"))
+			SET_UI64_RESULT(result, 2);
+		else if (0 == strcmp(result->str, "red"))
+			SET_UI64_RESULT(result, 3);
+		else
+			return SYSINFO_RET_FAIL;
+
+		UNSET_STR_RESULT(result);
+	}
+
+	return ret;
 }
 
 int	check_vcenter_hv_uptime(AGENT_REQUEST *request, AGENT_RESULT *result)
@@ -3262,11 +3299,7 @@ int	check_vcenter_vm_vfs_fs_discovery(AGENT_REQUEST *request, AGENT_RESULT *resu
 
 	zbx_vector_str_create(&disks);
 
-	if (SUCCEED != read_xml_values(vm->status_ex, ZBX_XPATH_LN2("disk", "diskPath"), &disks))
-	{
-		zbx_vector_str_destroy(&disks);
-		return SYSINFO_RET_FAIL;
-	}
+	read_xml_values(vm->status_ex, ZBX_XPATH_LN2("disk", "diskPath"), &disks);
 
 	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
 	zbx_json_addarray(&j, ZBX_PROTO_TAG_DATA);
@@ -3608,7 +3641,27 @@ int	check_vsphere_memory_used(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 int	check_vsphere_status(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	return get_vsphere_stat(request, ZBX_OPT_XPATH, ZBX_XPATH_LN2("val", "overallStatus"), result);
+	int	ret;
+
+	ret = get_vsphere_stat(request, ZBX_OPT_XPATH, ZBX_XPATH_LN2("val", "overallStatus"), result);
+
+	if (SYSINFO_RET_OK == ret && GET_STR_RESULT(result))
+	{
+		if (0 == strcmp(result->str, "gray"))
+			SET_UI64_RESULT(result, 0);
+		else if (0 == strcmp(result->str, "green"))
+			SET_UI64_RESULT(result, 1);
+		else if (0 == strcmp(result->str, "yellow"))
+			SET_UI64_RESULT(result, 2);
+		else if (0 == strcmp(result->str, "red"))
+			SET_UI64_RESULT(result, 3);
+		else
+			return SYSINFO_RET_FAIL;
+
+		UNSET_STR_RESULT(result);
+	}
+
+	return ret;
 }
 
 int	check_vsphere_uptime(AGENT_REQUEST *request, AGENT_RESULT *result)
@@ -4225,17 +4278,12 @@ int	check_vsphere_vm_vfs_fs_discovery(AGENT_REQUEST *request, AGENT_RESULT *resu
 	if (NULL == (vsphere = vsphere_get(url, username, password)))
 		return SYSINFO_RET_FAIL;
 
-
 	if (NULL == (vm = vm_get(&vsphere->vms, uuid)))
 		return SYSINFO_RET_FAIL;
 
 	zbx_vector_str_create(&disks);
 
-	if (SUCCEED != read_xml_values(vm->status_ex, ZBX_XPATH_LN2("disk", "diskPath"), &disks))
-	{
-		zbx_vector_str_destroy(&disks);
-		return SYSINFO_RET_FAIL;
-	}
+	read_xml_values(vm->status_ex, ZBX_XPATH_LN2("disk", "diskPath"), &disks);
 
 	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
 	zbx_json_addarray(&j, ZBX_PROTO_TAG_DATA);
