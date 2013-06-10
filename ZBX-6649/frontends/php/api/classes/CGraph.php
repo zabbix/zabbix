@@ -604,23 +604,26 @@ class CGraph extends CGraphGeneral {
 			}
 		}
 
-		// check if item value is numeric
-		$allowedItems = API::Item()->get(array(
-			'value_types' => array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64),
-			'preservekeys' => true
+		parent::checkInput($graphs, $update);
+
+		$allowedValueTypes = array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64);
+
+		// get value type and name for these items
+		$items = API::Item()->get(array(
+			'preservekeys' => true,
+			'itemids' => $itemids,
+			'output' => array('itemid', 'value_type', 'name'),
+			'webitems' => true
 		));
 
-		foreach ($itemids as $itemid) {
-			if (!isset($allowedItems[$itemid])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect item value type for graph!'));
+		foreach ($items as $item) {
+			if (!in_array($item['value_type'], $allowedValueTypes)) {
+				self::exception(
+					ZBX_API_ERROR_PARAMETERS,
+					_s('Cannot add a non-numeric item "%1$s" to graph "%2$s".', $item['name'], $graph['name'])
+				);
 			}
 		}
-
-		if (!isset($allowedItems[$graph['ymax_itemid']])) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect item value type for graph!'));
-		}
-
-		parent::checkInput($graphs, $update);
 	}
 
 	protected function applyQueryNodeOptions($tableName, $tableAlias, array $options, array $sqlParts) {
