@@ -1,6 +1,7 @@
 Changes for 2.1.0
 
 New features:
+A.FGI..PS. [ZBXNEXT-1726] added support for optional Host Metadata to active agent for auto-registration (dimir, Oleg)
 ..F....... [ZBXNEXT-1114] improved multiselect support in action conditions configuration page (Eduard)
 ...G...... [ZBXNEXT-367] added printing Aliases and PerfCounters when agent is run with -p option (aleksej, dimir)
 .......PS. [ZBX-6581] added printing host name to a web scenario error log message (dimir)
@@ -73,6 +74,7 @@ A.F.I...S. [ZBXNEXT-1186] increased length to 2048 characters of expression fiel
 
 Bug fixes:
 A.F....... [ZBX-6649] added numeric validation when selecting item for graphs and graph prototypes (Ivo)
+A......... [ZBX-6668] fixed possibility to update action conditions alone (Oleg)
 ..F....... [ZBX-6666] fixed passing incorrect Host and Template ID directly from URL (Ivo)
 ..F....... [ZBX-6650] fixed minor layout issues for reset button and buttons in edit forms (Ivo)
 ..F....... [ZBX-6642] fixed not being able to use web items in plain text screen elements (Pavels)
@@ -231,6 +233,7 @@ A......... [ZBX-6407] improved data retrieval performance for CTrigger get() wit
 A.F....... [ZBX-1357] updated Chinese (China), Spanish and Turkish translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+....I..... [ZBX-6674] fixed items description in the default data set (Oleg)
 A......... [ZBX-6644] fixed sorting by history and trends fields in itemprototype.get API (Ivo)
 ........S. [ZBX-6598] fixed deleting of big amount of escalations by escalation process (Sasha)
 ...G...PS. [ZBX-6605] fixed bind() error when SourceIP is used (Andris)

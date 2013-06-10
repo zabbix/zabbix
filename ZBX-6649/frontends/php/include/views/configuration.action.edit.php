@@ -301,6 +301,9 @@ switch ($this->data['new_condition']['conditiontype']) {
 	case CONDITION_TYPE_EVENT_TYPE:
 		$rowCondition[] = new CComboBox('new_condition[value]', null, null, eventType());
 		break;
+	case CONDITION_TYPE_HOST_METADATA:
+		$rowCondition[] = new CTextBox('new_condition[value]', '', ZBX_TEXTBOX_STANDARD_SIZE);
+		break;
 }
 
 $newConditionDiv = new CDiv(
