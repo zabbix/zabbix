@@ -711,7 +711,7 @@ class CAction extends CZBXAPI {
 			}
 
 			$actionid = $action['actionid'];
-			unset($action['actionid']);
+			unset($action['actionid'], $action['conditions']);
 			if (!empty($action)) {
 				$update[] = array(
 					'values' => $action,
