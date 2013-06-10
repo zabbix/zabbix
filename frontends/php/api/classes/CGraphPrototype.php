@@ -625,16 +625,6 @@ class CGraphPrototype extends CGraphGeneral {
 			}
 		}
 
-		/*
-		// if user adds item type values for y axis, add them for validation in same way
-		if ($graph['ymin_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE) {
-			$itemids[$graph['ymin_itemid']] = $graph['ymin_itemid'];
-		}
-		if ($graph['ymax_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE) {
-			$itemids[$graph['ymax_itemid']] = $graph['ymax_itemid'];
-		}
-		*/
-
 		$allowedValueTypes = array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64);
 
 		// get value_type for these items and item prototypes
