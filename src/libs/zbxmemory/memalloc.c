@@ -436,6 +436,10 @@ static void	*__mem_realloc(zbx_mem_info_t *info, void *old, zbx_uint64_t size)
 	{
 		void	*tmp = NULL;
 
+		/* in allow_oom mode realloc failure must keep the original memory untouched */
+		if (1 == info->allow_oom)
+			return NULL;
+
 		tmp = zbx_malloc(tmp, chunk_size);
 
 		memcpy(tmp, chunk + MEM_SIZE_FIELD, chunk_size);
@@ -444,19 +448,12 @@ static void	*__mem_realloc(zbx_mem_info_t *info, void *old, zbx_uint64_t size)
 
 		new_chunk = __mem_malloc(info, size);
 
-		if (NULL == new_chunk)
-		{
-			new_chunk = __mem_malloc(info, chunk_size);
-			chunk = NULL;
-		}
-		else
-			chunk = new_chunk;
-
-		memcpy(new_chunk + MEM_SIZE_FIELD, tmp, chunk_size);
+		if (NULL != new_chunk)
+			memcpy(new_chunk + MEM_SIZE_FIELD, tmp, chunk_size);
 
 		zbx_free(tmp);
 
-		return chunk;
+		return new_chunk;
 	}
 }
 
