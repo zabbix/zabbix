@@ -788,7 +788,8 @@ table.filter tr td.controls { text-align: center; }
 table.filter .text { height: 16px; }
 table.filter .filter-select-button { height: 20px; vertical-align: bottom; }
 table.filter .select { -moz-box-sizing: content-box; -webkit-box-sizing: content-box; box-sizing: content-box; height: 18px; vertical-align: top; margin-bottom: 1px; }
-table.filter .host-inventories .text { margin-bottom: 1px; }
+table.filter .host-inventories .select,
+table.filter .host-inventories .text { vertical-align: middle; }
 table.filter tr.item-list-row { height: 26px; }
 .item-list .filter .col1 .text,
 .item-list .filter .multiselect { width: 165px; line-height: 12px; }
