@@ -6,6 +6,7 @@ A......... [ZBX-6407] improved data retrieval performance for CTrigger get() wit
 A.F....... [ZBX-1357] updated Chinese (China), Spanish and Turkish translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+....I..... [ZBX-6674] fixed item description (Oleg)
 A......... [ZBX-6644] fixed sorting by history and trends fields in itemprototype.get API (Ivo)
 ........S. [ZBX-6598] fixed deleting of big amount of escalations by escalation process (Sasha)
 ...G...PS. [ZBX-6605] fixed bind() error when SourceIP is used (Andris)
