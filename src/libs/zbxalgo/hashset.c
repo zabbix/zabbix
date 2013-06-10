@@ -31,7 +31,6 @@ static void	__hashset_free_entry(zbx_hashset_t *hs, ZBX_HASHSET_ENTRY_T *entry);
 
 static void	__hashset_free_entry(zbx_hashset_t *hs, ZBX_HASHSET_ENTRY_T *entry)
 {
-	hs->mem_free_func(entry->data);
 	hs->mem_free_func(entry);
 }
 
@@ -164,23 +163,13 @@ void	*zbx_hashset_insert_ext(zbx_hashset_t *hs, const void *data, size_t size, s
 					}
 				}
 			}
-
 			hs->num_slots = inc_slots;
 
-			/* recalculate slot/entry for the new item */
+			/* recalculate new slot */
 			slot = hash % hs->num_slots;
-			entry = hs->slots[slot];
-
 		}
-
-		if (NULL == (entry = hs->mem_malloc_func(NULL, sizeof(ZBX_HASHSET_ENTRY_T))))
+		if (NULL == (entry = hs->mem_malloc_func(NULL, sizeof(ZBX_HASHSET_ENTRY_T) + size - 1)))
 			return NULL;
-
-		if (NULL == (entry->data = hs->mem_malloc_func(NULL, size)))
-		{
-			hs->mem_free_func(entry);
-			return NULL;
-		}
 
 		memcpy((char *)entry->data + offset, (const char *)data + offset, size - offset);
 		entry->hash = hash;
