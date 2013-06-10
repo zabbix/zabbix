@@ -625,27 +625,41 @@ class CGraphPrototype extends CGraphGeneral {
 			}
 		}
 
-		// check if item value is numeric
-		$allowedItems = API::Item()->get(array(
-			'value_types' => array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64),
-			'preservekeys' => true
-		));
-
-		$allowedItemPrototypes = API::ItemPrototype()->get(array(
-			'value_types' => array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64),
-			'preservekeys' => true
-		));
-
-		$allowedItems = zbx_array_merge($allowedItems, $allowedItemPrototypes);
-
-		foreach ($itemids as $itemid) {
-			if (!isset($allowedItems[$itemid])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect item value type for graph!'));
-			}
+		/*
+		// if user adds item type values for y axis, add them for validation in same way
+		if ($graph['ymin_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE) {
+			$itemids[$graph['ymin_itemid']] = $graph['ymin_itemid'];
 		}
+		if ($graph['ymax_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE) {
+			$itemids[$graph['ymax_itemid']] = $graph['ymax_itemid'];
+		}
+		*/
 
-		if (!isset($allowedItems[$graph['ymax_itemid']])) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect item value type for graph!'));
+		$allowedValueTypes = array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64);
+
+		// get value_type for these items and item prototypes
+		$items = API::Item()->get(array(
+			'preservekeys' => true,
+			'itemids' => $itemids,
+			'output' => array('itemid', 'value_type', 'name'),
+			'webitems' => true
+		));
+		$itemPrototypes = API::ItemPrototype()->get(array(
+			'preservekeys' => true,
+			'itemids' => $itemids,
+			'output' => array('itemid', 'value_type', 'name'),
+			'webitems' => true
+		));
+
+		$items = zbx_array_merge($items, $itemPrototypes);
+
+		foreach ($items as $item) {
+			if (!in_array($item['value_type'], $allowedValueTypes)) {
+				self::exception(
+					ZBX_API_ERROR_PARAMETERS,
+					_s('Cannot add a non-numeric item "%1$s" to graph "%2$s".', $item['name'], $graph['name'])
+				);
+			}
 		}
 	}
 

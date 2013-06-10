@@ -1113,10 +1113,6 @@ elseif ($srctbl == 'items') {
 		$options['filter']['value_type'] = $value_types;
 	}
 
-	if ($dstfrm == 'graphForm' || $dstfrm = 'graph_item') { // filter numeric value types speficly to graphs
-		$options['value_types'] = array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64);
-	}
-
 	$items = API::Item()->get($options);
 	order_result($items, 'name', ZBX_SORT_UP);
 
@@ -1222,10 +1218,8 @@ elseif ($srctbl == 'prototypes') {
 		'output' => API_OUTPUT_EXTEND,
 		'preservekeys' => true
 	);
-
-	// filter numeric value types speficly to graphs
-	if ($dstfrm == 'graphForm' || $dstfrm = 'graph_item') {
-		$options['value_types'] = array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64);
+	if (!is_null($value_types)) {
+		$options['filter']['value_type'] = $value_types;
 	}
 
 	$items = API::ItemPrototype()->get($options);
