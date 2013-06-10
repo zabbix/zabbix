@@ -269,6 +269,7 @@ frontends/php/styles/themes/originalblue/images/preloader.gif -text
 frontends/php/tests/bootstrap.php.template -text
 frontends/php/tests/general/CTriggerFunctionValidatorTest.php -text
 frontends/php/tests/selenium/testFormGraph.php -text
+frontends/php/tests/selenium/testInheritanceGraph.php -text
 frontends/php/tests/selenium/testInheritanceItem.php -text
 frontends/php/tests/selenium/testInheritanceTrigger.php -text
 include/module.h -text
