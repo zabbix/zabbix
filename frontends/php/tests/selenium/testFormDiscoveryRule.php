@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2013 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -10,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -24,11 +24,7 @@ require_once dirname(__FILE__).'/../../include/items.inc.php';
 define('DISCOVERY_GOOD', 0);
 define('DISCOVERY_BAD', 1);
 
-/**
- * Test the creation of inheritance of new objects on a previously linked template.
- */
 class testFormDiscoveryRule extends CWebTest {
-
 
 	/**
 	 * The name of the test host created in the test data set.
@@ -1375,8 +1371,11 @@ class testFormDiscoveryRule extends CWebTest {
 
 		$itemFlexFlag = true;
 		if (isset($data['flexPeriod'])) {
+
+			$itemCount = 0;
 			foreach ($data['flexPeriod'] as $period) {
 				$this->input_type('new_delay_flex_period', $period['flexTime']);
+				$itemCount ++;
 
 				if (isset($period['flexDelay'])) {
 					$this->input_type('new_delay_flex_delay', $period['flexDelay']);
@@ -1390,7 +1389,7 @@ class testFormDiscoveryRule extends CWebTest {
 					$itemFlexFlag = false;
 				}
 
-				if (isset($period['maximumItems'])) {
+				if (isset($period['maximumItems']) || $itemCount == 7) {
 					$this->assertNotVisible('new_delay_flex_delay');
 					$this->assertNotVisible('new_delay_flex_period');
 				}
@@ -1400,6 +1399,7 @@ class testFormDiscoveryRule extends CWebTest {
 				}
 
 				if (isset($period['remove'])) {
+					$itemCount --;
 					$this->zbxTestClick('remove');
 					sleep(1);
 				}
