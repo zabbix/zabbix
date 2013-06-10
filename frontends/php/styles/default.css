@@ -785,12 +785,20 @@ table.filter tr td {
 }
 table.filter tr td.label { border-right: 0 !important; }
 table.filter tr td.controls { text-align: center; }
+table.filter .text { height: 16px; }
+table.filter .filter-select-button { height: 20px; vertical-align: bottom; }
+table.filter .select { -moz-box-sizing: content-box; -webkit-box-sizing: content-box; box-sizing: content-box; height: 18px; vertical-align: top; margin-bottom: 1px; }
+table.filter .host-inventories .text { margin-bottom: 1px; }
+table.filter tr.item-list-row { height: 26px; }
+.item-list .filter .col1 .text,
+.item-list .filter .multiselect { width: 165px; line-height: 12px; }
+.item-list .filter .multiselect { height: 10px; top: -8px; }
 
 .host-list table.filter tr td { width: 25%; }
 
 .item-list table.filter { text-align: left; min-width: 1024px; }
 .item-list table.filter tr td.label { text-align: right; }
-.item-list table.filter tr td.col1 { width: 18%; }
+.item-list table.filter tr td.col1 { width: 230px; }
 .item-list table.filter tr td.label.col1 { width: 6%; }
 .item-list table.filter tr td.label.col4 { width: 8%; }
 
@@ -1003,5 +1011,3 @@ fieldset legend { margin: 0.2em 0.5em; }
 .multiselect .available ul li { padding: 3px 2px 3px 4px; list-style: none outside none; cursor: pointer; }
 .multiselect .available ul li.hover { background: #7A9FC1; color: #FFFFFF; }
 .multiselect .available ul li.hover .prefix { color: #F1F1F1; }
-
-.item-list .filter .multiselect { width: 165px; line-height: 14px; }
