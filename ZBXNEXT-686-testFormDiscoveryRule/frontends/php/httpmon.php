@@ -112,6 +112,7 @@ if ($pageFilter->hostsSelected) {
 		$host = reset($httpTest['hosts']);
 		$httpTest['hostname'] = $host['name'];
 	}
+	unset($httpTest);
 
 	$httpTests = resolveHttpTestMacros($httpTests, true, false);
 

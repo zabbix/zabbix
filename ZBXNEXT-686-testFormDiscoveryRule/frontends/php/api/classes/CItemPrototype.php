@@ -26,7 +26,7 @@ class CItemPrototype extends CItemGeneral {
 
 	protected $tableName = 'items';
 	protected $tableAlias = 'i';
-	protected $sortColumns = array('itemid', 'name', 'key_', 'delay', 'type', 'status');
+	protected $sortColumns = array('itemid', 'name', 'key_', 'delay', 'history', 'trends', 'type', 'status');
 
 	public function __construct() {
 		parent::__construct();
