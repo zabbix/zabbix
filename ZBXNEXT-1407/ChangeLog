@@ -73,6 +73,7 @@ A.F.I...S. [ZBXNEXT-1186] increased length to 2048 characters of expression fiel
 ........S. [ZBXNEXT-1663] added support for notification macros {TRIGGER.NAME.ORIG}, {ITEM.NAME.ORIG}, {ITEM.KEY.ORIG} (dimir)
 
 Bug fixes:
+A......... [ZBX-6668] fixed possibility to update action conditions alone (Oleg)
 ..F....... [ZBX-6666] fixed passing incorrect Host and Template ID directly from URL (Ivo)
 ..F....... [ZBX-6650] fixed minor layout issues for reset button and buttons in edit forms (Ivo)
 ..F....... [ZBX-6642] fixed not being able to use web items in plain text screen elements (Pavels)
@@ -231,6 +232,7 @@ A......... [ZBX-6407] improved data retrieval performance for CTrigger get() wit
 A.F....... [ZBX-1357] updated Chinese (China), Spanish and Turkish translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+....I..... [ZBX-6674] fixed items description in the default data set (Oleg)
 A......... [ZBX-6644] fixed sorting by history and trends fields in itemprototype.get API (Ivo)
 ........S. [ZBX-6598] fixed deleting of big amount of escalations by escalation process (Sasha)
 ...G...PS. [ZBX-6605] fixed bind() error when SourceIP is used (Andris)
