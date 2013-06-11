@@ -19,11 +19,10 @@
 
 /* host interfaces */
 .host-edit .interface-group { width: 750px; }
-.host-edit .interface-row, .host-edit .interface-row .dd { padding: 0; line-height: 1.0em; }
+.host-edit .interface-row .dt { padding-top: 5px; }
+.host-edit .interface-row .dd { padding: 0; line-height: 1.0em; }
 .host-edit .interface-row .dd .interface-group { line-height: 1.8em; }
 .host-edit .interface-row .objectgroup { border-top-width: 0; padding-top: 4px; }
-.host-edit .interface-row-first .dt, .host-edit .interface-row-first .dd { padding-top: 2px; }
-.host-edit .interface-row-first .objectgroup { border-top-width: 1px; padding-top: 0; }
 .host-edit .interface-row .interface-drag-control,
 .host-edit .interface-row .interface-add-control { width: 2em; }
 .host-edit .interface-row .interface-ip { width: 16.5em; }
@@ -31,6 +30,8 @@
 .host-edit .interface-row .interface-connect-to { width: 8em; white-space: nowrap; }
 .host-edit .interface-row .interface-port { width: 11em; }
 .host-edit .interface-row .interface-default { width: 4em; }
+.host-edit .interface-row-first .dd { padding-top: 2px; }
+.host-edit .interface-row-first .objectgroup { border-top-width: 1px; padding-top: 0; }
 .host-edit .dropArea .interface-add-control { visibility: hidden; }
 
 /* housekeeper elements */

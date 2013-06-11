@@ -277,7 +277,7 @@ if ($service['serviceid'] && !$service['dependencies']) {
 $buttons[] = new CButtonCancel();
 
 $servicesForm->addItem(makeFormFooter(
-	array(new CSubmit('save_service', _('Save'), 'javascript: document.forms[0].action += \'?saction=1\';')),
+	new CSubmit('save_service', _('Save'), 'javascript: document.forms[0].action += \'?saction=1\';'),
 	$buttons
 ));
 

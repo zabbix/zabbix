@@ -424,7 +424,6 @@ $divTabs->addTab('macroTab', _('Macros'), $macrosView->render());
 $frmHost->addItem($divTabs);
 
 // Footer
-$main = array(new CSubmit('save', _('Save')));
 $others = array();
 if (($templateid > 0) && ($_REQUEST['form'] != 'full_clone')) {
 	$others[] = new CSubmit('clone', _('Clone'));
@@ -434,6 +433,6 @@ if (($templateid > 0) && ($_REQUEST['form'] != 'full_clone')) {
 }
 $others[] = new CButtonCancel(url_param('groupid'));
 
-$frmHost->addItem(makeFormFooter($main, $others));
+$frmHost->addItem(makeFormFooter(new CSubmit('save', _('Save')), $others));
 
 return $frmHost;

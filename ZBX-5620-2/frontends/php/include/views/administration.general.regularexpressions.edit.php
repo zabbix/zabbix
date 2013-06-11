@@ -84,6 +84,6 @@ if (isset($this->data['regexpid'])) {
 		new CButtonDelete(_('Delete regular expression?'), url_param('form').url_param('regexpid').url_param('delete', false, 'go'))
 	);
 }
-$form->addItem(makeFormFooter(array(new CSubmit('save', _('Save'))), $secondaryActions));
+$form->addItem(makeFormFooter(new CSubmit('save', _('Save')), $secondaryActions));
 
 return $form;

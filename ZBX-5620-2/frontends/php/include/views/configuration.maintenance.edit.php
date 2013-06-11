@@ -190,17 +190,18 @@ $maintenanceForm->addItem($maintenanceTab);
 // append buttons to form
 if (empty($this->data['maintenanceid'])) {
 	$maintenanceForm->addItem(makeFormFooter(
-		array(new CSubmit('save', _('Save'))),
-		array(new CButtonCancel())
+		new CSubmit('save', _('Save')),
+		new CButtonCancel()
 	));
 }
 else {
 	$maintenanceForm->addItem(makeFormFooter(
-		array(new CSubmit('save', _('Save'))),
+		new CSubmit('save', _('Save')),
 		array(
 			new CSubmit('clone', _('Clone')),
 			new CButtonDelete(_('Delete maintenance period?'), url_param('form').url_param('maintenanceid')),
-			new CButtonCancel())
+			new CButtonCancel()
+		)
 	));
 }
 

@@ -33,6 +33,7 @@ body {
 }
 iframe { border: 0; }
 ul { margin-left: 0; padding-left: 1em; }
+ul li.linear { float: left; list-style-type: none; margin-right: 2px; }
 
 .hidden { display: none; }
 .pre { white-space: pre; }
@@ -55,9 +56,6 @@ ul { margin-left: 0; padding-left: 1em; }
 .delimiter { font-weight: bold; color: #000; }
 .pointer:hover { cursor: pointer; }
 .move { cursor: move; }
-
-.transparent { border: 0; background-color: transparent; }
-.transparent:focus { outline-width: 0; }
 
 /* font */
 .bold { font-weight: bold; }
@@ -135,42 +133,6 @@ a.weight_normal { font-weight: normal; }
 .underline:visited { text-decoration: underline; }
 .underline:hover { text-decoration: underline; }
 
-/* formlist */
-ul li.linear { float: left; list-style-type: none; margin-right: 2px; }
-ul.formlist { list-style-type: none; margin: 0; padding: 0; display: table; width: 100%; }
-ul.formlist li { padding: 2px; height: 100%; vertical-align: middle; clear: both; display: table-row; }
-ul.formlist li .dt { padding: 4px 0 2px; display: table-cell; white-space: nowrap; vertical-align: top; width: 20%; }
-ul.formlist li .dd { padding: 2px 0; vertical-align: top; }
-ul.formlist .formrow .dd .checkbox { vertical-align: middle; }
-ul.formlist .text, ul.formlist textarea, ul.formlist .password { padding: 3px; }
-ul.formlist select { padding: 2px; }
-ul.formlist .hidden { display: none; }
-.formrow .dd { margin-left: 10px; }
-.objectgroup .formrow .dt { margin-left: 10px; width: 20%; }
-
-/* formlist buttons */
-div.footer .formrow .dd { margin-left: 21%; }
-div.footer .formrow .main, div.ui-dialog-buttonpane div.ui-dialog-buttonset button.main, input[type="button"].main { border-color: #FFAA33; }
-div.footer .formrow .main:hover, div.ui-dialog-buttonpane div.ui-dialog-buttonset button.main, input[type="button"].main { border-color: #DD7711; }
-
-/* object list */
-ul.objectlist { padding: 0; list-style: none; margin: 0;}
-ul.objectlist li { display: inline-block; margin: 2px 10px 2px 5px; white-space: nowrap; font-size: 1.1em; }
-ul.objectlist li.selected { font-weight: bold; font-size: 1.2em; }
-ul.objectlist li a { color: #000000; font-weight: normal; }
-
-/* favorites */
-ul.favorites { vertical-align: top; margin: 8px 4px 8px 0; text-align: left; }
-ul.favorites li { line-height: 16px; vertical-align: top; list-style: url("../images/general/chart.png"); margin: 4px 0 4px 20px; }
-ul.favorites li.empty { list-style: none; line-height: 18px; vertical-align: top; margin-left: 10px; color: #999; }
-ul.favorites li a { line-height: 18px; vertical-align: top; }
-
-/* frondend messages */
-ul.messages { overflow: auto; vertical-align: top; background-color: #FFFFFF; margin: 1px; text-align: left; }
-ul.messages li { font-size: 1.1em; line-height: 18px; }
-ul.messages li.info { color: #000000; list-style: url("../images/general/warning2.png") inside; }
-ul.messages li.error { color: #D40000; list-style: url("../images/general/error3.png") inside; white-space: pre-wrap; }
-
 /* form */
 fieldset { margin: 0 0 2px 0; padding: 2px; border: 1px solid gray; }
 fieldset legend { margin: 0.2em 0.5em; }
@@ -178,7 +140,7 @@ label { cursor: pointer; }
 form { margin: 0; }
 .input {
 	font-size: 10px; font-family: Verdana, arial, helvetica, sans-serif;
-	border: 1px solid #ACA899; background-color: white; margin: 0 1px; height: 12px;
+	border: 1px solid #ACA899; background-color: white; margin: 0 2px 0 0; height: 12px;
 }
 .input:focus { border-color: #6e8ab4; }
 .input:hover { border-color: #6e8ab4; }
@@ -203,9 +165,9 @@ input.jqueryinput,
 textarea.textarea_standard,
 textarea.textarea_big { height: auto; }
 
-.select { cursor: pointer; margin: 1px 2px 1px 1px; }
+.select { cursor: pointer; margin: 1px 2px 1px 0; }
 .selectShorten { width: 200px; }
-.radio { margin: 2px 2px; vertical-align: top; }
+.radio { margin: 2px 2px 2px 0; vertical-align: top; }
 .checkbox { padding: 0; border: 0; }
 .formrow .listInfoLabel { vertical-align: middle; display: table-cell; height: 100%; }
 .formrow .listInfoText { margin-left: 1%; }
@@ -224,14 +186,9 @@ textarea.textarea_big { height: auto; }
 .link_menu[disabled] { color: #DDD; cursor: default; border: 0; }
 .link_menu[disabled]:hover { border: 0; }
 
-/* drag & drop */
-.draggable { cursor: move; }
-.dragHelpText { display: none; }
-
-/* object group */
-.objectgroup { padding: 4px; }
-.objectgroup.top { margin: 2px 0; }
-.objectgroup.footer { margin-top: 2px; }
+/* transparent - must be after input! */
+.transparent { border: 0; background-color: transparent; }
+.transparent:focus { outline-width: 0; }
 
 /* widget */
 .widget { min-width: 230px }
@@ -239,9 +196,56 @@ textarea.textarea_big { height: auto; }
 .widget .header .menu_icon { float: right; margin-right: 2px; }
 .widget .footer { color: white; line-height: 12px; height: 12px; padding: 4px 4px; margin-top: 2px; }
 
+/* object group */
+.objectgroup { padding: 4px; }
+.objectgroup.top { margin: 2px 0; }
+.objectgroup.footer { margin-top: 2px; }
+
+/* formlist */
+ul.formlist { list-style-type: none; margin: 0; padding: 0; display: table; width: 100%; }
+ul.formlist li { padding: 2px; height: 100%; vertical-align: middle; display: table-row; }
+ul.formlist li .dt { padding: 4px 0 2px; display: table-cell; white-space: nowrap; vertical-align: top; width: 20%; }
+ul.formlist li .dd { padding: 2px 0; vertical-align: top; }
+ul.formlist .formrow .dd .checkbox { vertical-align: middle; }
+ul.formlist .formrow .dd { margin-left: 10px; }
+ul.formlist .hidden { display: none; }
+ul.formlist .text, ul.formlist textarea, ul.formlist .password { padding: 3px; }
+ul.formlist select { padding: 2px; }
+
+/* formlist buttons */
+div.footer { padding: 4px 1.8em; }
+div.footer .formtable { display: table; width: 100%; }
+div.footer .formrow { display: table-row; }
+div.footer .formrow .dt { width: 20%; display: table-cell; }
+div.footer .formrow .dd { margin-left: 10px; }
+div.footer .formrow .main, div.ui-dialog-buttonpane div.ui-dialog-buttonset button.main, input[type="button"].main { border-color: #FFAA33; }
+div.footer .formrow .main:hover, div.ui-dialog-buttonpane div.ui-dialog-buttonset button.main, input[type="button"].main { border-color: #DD7711; }
+
+/* object list */
+ul.objectlist { padding: 0; list-style: none; margin: 0;}
+ul.objectlist li { display: inline-block; margin: 2px 10px 2px 5px; white-space: nowrap; font-size: 1.1em; }
+ul.objectlist li.selected { font-weight: bold; font-size: 1.2em; }
+ul.objectlist li a { color: #000000; font-weight: normal; }
+
+/* favorites */
+ul.favorites { vertical-align: top; margin: 8px 4px 8px 0; text-align: left; }
+ul.favorites li { line-height: 16px; vertical-align: top; list-style: url("../images/general/chart.png"); margin: 4px 0 4px 20px; }
+ul.favorites li.empty { list-style: none; line-height: 18px; vertical-align: top; margin-left: 10px; color: #999; }
+ul.favorites li a { line-height: 18px; vertical-align: top; }
+
+/* frondend messages */
+ul.messages { overflow: auto; vertical-align: top; background-color: #FFFFFF; margin: 1px; text-align: left; }
+ul.messages li { font-size: 1.1em; line-height: 18px; }
+ul.messages li.info { color: #000000; list-style: url("../images/general/warning2.png") inside; }
+ul.messages li.error { color: #D40000; list-style: url("../images/general/error3.png") inside; white-space: pre-wrap; }
+
 /* column */
 .column { margin: 5px 0 5px 5px; min-width: 240px; padding-bottom: 100px; }
 .column .widget, #search_wdgt .widget { padding: 2px; margin-bottom: 5px; overflow: hidden; }
+
+/* drag & drop */
+.draggable { cursor: move; }
+.dragHelpText { display: none; }
 
 /* subfilter buttons */
 span.subfilter_enabled { color: #00AA00; cursor: pointer; text-decoration: none; border-bottom: 1px dashed; }
