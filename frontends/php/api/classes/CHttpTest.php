@@ -94,9 +94,7 @@ class CHttpTest extends CZBXAPI {
 						' JOIN rights r'.
 							' ON r.id=hgg.groupid'.
 								' AND '.dbConditionInt('r.groupid', $userGroups).
-					' WHERE a.applicationid=ht.applicationid'.
-						' AND a.hostid=hgg.hostid'.
-					' GROUP BY a.applicationid'.
+					' WHERE a.hostid=hgg.hostid'.
 					' HAVING MIN(r.permission)>'.PERM_DENY.
 						' AND MAX(r.permission)>='.$permission.
 					')';
