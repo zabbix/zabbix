@@ -721,7 +721,7 @@ class CGraph extends CGraphGeneral {
 			$parentGraphids = array();
 			while ($dbGraph = DBfetch($dbGraphs)) {
 				$parentGraphids[] = $dbGraph['graphid'];
-				$itemids[$dbGraph['graphid']] = $dbGraph['graphid'];
+				$graphids[] = $dbGraph['graphid'];
 			}
 		} while (!empty($parentGraphids));
 
