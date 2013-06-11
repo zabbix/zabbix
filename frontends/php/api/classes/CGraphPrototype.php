@@ -591,7 +591,7 @@ class CGraphPrototype extends CGraphGeneral {
 			}
 		}
 
-		$allowedItems = API::Item()->get(array(
+		$items = API::Item()->get(array(
 			'nodeids' => get_current_nodeid(true),
 			'itemids' => $itemids,
 			'webitems' => true,
@@ -602,7 +602,7 @@ class CGraphPrototype extends CGraphGeneral {
 		));
 
 		foreach ($itemids as $itemid) {
-			if (!isset($allowedItems[$itemid])) {
+			if (!isset($items[$itemid])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
 			}
 		}
@@ -614,8 +614,8 @@ class CGraphPrototype extends CGraphGeneral {
 			// check if the graph has at least one prototype
 			$hasPrototype = false;
 			foreach ($graph['gitems'] as $gitem) {
-				// $allowedItems used because it is possible to make API call without full item data
-				if ($allowedItems[$gitem['itemid']]['flags'] == ZBX_FLAG_DISCOVERY_CHILD) {
+				// $items used because it is possible to make API call without full item data
+				if ($items[$gitem['itemid']]['flags'] == ZBX_FLAG_DISCOVERY_CHILD) {
 					$hasPrototype = true;
 					break;
 				}
@@ -634,7 +634,7 @@ class CGraphPrototype extends CGraphGeneral {
 			'webitems' => true
 		));
 
-		$items = zbx_array_merge($allowedItems, $itemPrototypes);
+		$items = zbx_array_merge($items, $itemPrototypes);
 
 		foreach ($items as $item) {
 			if (!in_array($item['value_type'], $allowedValueTypes)) {
