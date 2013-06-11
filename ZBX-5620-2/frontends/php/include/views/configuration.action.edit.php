@@ -310,6 +310,7 @@ $newConditionDiv = new CDiv(
 	),
 	'objectgroup inlineblock border_dotted ui-corner-all'
 );
+$newConditionDiv->attr('style', 'min-width: 540px;');
 $conditionFormList->addRow(_('New condition'), $newConditionDiv);
 
 /*
