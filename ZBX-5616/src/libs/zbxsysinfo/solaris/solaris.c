@@ -53,6 +53,7 @@ ZBX_METRIC	parameters_specific[] =
 	{"system.cpu.num",	CF_HAVEPARAMS,	SYSTEM_CPU_NUM,		"online"},
 
 	{"system.hostname",     0,              SYSTEM_HOSTNAME,        NULL},
+	{"system.uname",	0,		SYSTEM_UNAME,		NULL},
 
 	{"system.swap.size",	CF_HAVEPARAMS,	SYSTEM_SWAP_SIZE,	"all,free"},
 	{"system.swap.in",	CF_HAVEPARAMS,	SYSTEM_SWAP_IN,		"all"},

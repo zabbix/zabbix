@@ -35,3 +35,26 @@ int	SYSTEM_HOSTNAME(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
+int	SYSTEM_UNAME(AGENT_REQUEST *request, AGENT_RESULT *result)
+{
+	struct utsname	name;
+	size_t 		length;
+
+	if (-1 == uname(&name))
+		return SYSINFO_RET_FAIL;
+
+	length = strlen(name.sysname) + strlen(name.nodename) + strlen(name.release) + strlen(name.version) + strlen(name.machine) + strlen(name.idnumber);
+
+	char	*buf=malloc(length+6);
+
+	if (NULL == buf)
+		return SYSINFO_RET_FAIL;
+
+	zbx_snprintf(buf, length+6, "%s %s %s %s %s %s", name.sysname, name.nodename, name.release, name.version, name.machine, name.idnumber);
+
+	SET_STR_RESULT(result, zbx_strdup(NULL, buf));
+
+	free(buf);
+
+	return SYSINFO_RET_OK;
+}
