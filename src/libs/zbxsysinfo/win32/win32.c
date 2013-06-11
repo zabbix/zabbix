@@ -50,6 +50,8 @@ ZBX_METRIC	parameters_specific[] =
 
 	{"system.uptime",	0,		SYSTEM_UPTIME,		NULL},
 
+	{"system.uname",	0,		SYSTEM_UNAME,		NULL},
+
 	{"service_state",	CF_HAVEPARAMS,	SERVICE_STATE,		ZABBIX_SERVICE_NAME},
 	{"services",		CF_HAVEPARAMS,	SERVICES,		NULL},
 	{"perf_counter",	CF_HAVEPARAMS,	PERF_COUNTER,		"\\System\\Processes"},

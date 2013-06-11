@@ -17,15 +17,15 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifdef HAVE_SYS_UTSNAME_H
-#	include <sys/utsname.h>
-#endif
-
 #include "sysinfo.h"
 #include "zbxalgo.h"
 #include "zbxexec.h"
 #include "cfg.h"
 #include "software.h"
+
+#ifdef HAVE_SYS_UTSNAME_H
+#       include <sys/utsname.h>
+#endif
 
 int	SYSTEM_SW_ARCH(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
