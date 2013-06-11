@@ -126,10 +126,18 @@ foreach ($this->data['triggers'] as $tnum => $trigger) {
 
 			if (!empty($this->data['parent_discoveryid'])) {
 				$tpl_disc_ruleid = get_realrule_by_itemid_and_hostid($this->data['parent_discoveryid'], $real_host['hostid']);
-				$description[] = new CLink($real_host['name'], 'trigger_prototypes.php?hostid='.$real_host['hostid'].'&parent_discoveryid='.$tpl_disc_ruleid, 'unknown');
+				$description[] = new CLink(
+					CHtml::encode($real_host['name']),
+					'trigger_prototypes.php?hostid='.$real_host['hostid'].'&parent_discoveryid='.$tpl_disc_ruleid,
+					'unknown'
+				);
 			}
 			else {
-				$description[] = new CLink($real_host['name'], 'triggers.php?hostid='.$real_host['hostid'], 'unknown');
+				$description[] = new CLink(
+					CHtml::encode($real_host['name']),
+					'triggers.php?hostid='.$real_host['hostid'],
+					'unknown'
+				);
 			}
 			$description[] = NAME_DELIMITER;
 		}
@@ -138,7 +146,7 @@ foreach ($this->data['triggers'] as $tnum => $trigger) {
 	if (empty($this->data['parent_discoveryid'])) {
 		if (!empty($trigger['discoveryRule'])) {
 			$description[] = new CLink(
-				CHTML::encode($trigger['discoveryRule']['name']),
+				CHtml::encode($trigger['discoveryRule']['name']),
 				'trigger_prototypes.php'.
 					'?hostid='.$this->data['hostid'].
 					'&parent_discoveryid='.$trigger['discoveryRule']['itemid'],
@@ -148,7 +156,7 @@ foreach ($this->data['triggers'] as $tnum => $trigger) {
 		}
 		else {
 			$description[] = new CLink(
-				CHTML::encode($trigger['description']),
+				CHtml::encode($trigger['description']),
 				'triggers.php?form=update&hostid='.$this->data['hostid'].'&triggerid='.$triggerid
 			);
 		}
@@ -161,18 +169,18 @@ foreach ($this->data['triggers'] as $tnum => $trigger) {
 
 				$db_hosts = get_hosts_by_triggerid($dep_trigger['triggerid']);
 				while ($host = DBfetch($db_hosts)) {
-					$description[] = $host['name'];
+					$description[] = CHtml::encode($host['name']);
 					$description[] = ', ';
 				}
 				array_pop($description);
 				$description[] = NAME_DELIMITER;
-				$description[] = $dep_trigger['description'];
+				$description[] = CHtml::encode($dep_trigger['description']);
 			}
 		}
 	}
 	else {
 		$description[] = new CLink(
-			CHTML::encode($trigger['description']),
+			CHtml::encode($trigger['description']),
 			'trigger_prototypes.php'.
 				'?form=update'.
 				'&hostid='.$this->data['hostid'].

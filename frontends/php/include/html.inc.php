@@ -374,11 +374,9 @@ function get_header_host_table($currentElement, $hostid, $discoveryid = null) {
 	$description = '';
 	if ($dbHost['proxy_hostid']) {
 		$proxy = get_host_by_hostid($dbHost['proxy_hostid']);
-		$description .= $proxy['host'].NAME_DELIMITER;
+		$description .= CHtml::encode($proxy['host']).NAME_DELIMITER;
 	}
-	$description .= $dbHost['name'];
-
-	$description = CHtml::encode($description);
+	$description .= CHtml::encode($dbHost['name']);
 
 	if ($dbHost['status'] == HOST_STATUS_TEMPLATE) {
 		$list->addItem(array(bold(_('Template').NAME_DELIMITER), new CLink($description, 'templates.php?form=update&templateid='.$dbHost['hostid'])));

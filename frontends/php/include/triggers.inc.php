@@ -100,7 +100,7 @@ function getSeverityCell($severity, $text = null, $force_normal = false) {
 		$text = getSeverityCaption($severity);
 	}
 
-	return new CCol($text, getSeverityStyle($severity, !$force_normal));
+	return new CCol(CHtml::encode($text), getSeverityStyle($severity, !$force_normal));
 }
 
 // retrieve trigger's priority for services
@@ -843,15 +843,15 @@ function triggerExpression($trigger, $html = false) {
 					}
 
 					if ($function_data['flags'] == ZBX_FLAG_DISCOVERY_CREATED || $function_data['type'] == ITEM_TYPE_HTTPTEST) {
-						$link = new CSpan($function_data['host'].':'.$function_data['key_'], $style);
+						$link = new CSpan($function_data['host'].':'.CHtml::encode($function_data['key_']), $style);
 					}
 					elseif ($function_data['flags'] == ZBX_FLAG_DISCOVERY_CHILD) {
-						$link = new CLink($function_data['host'].':'.$function_data['key_'],
+						$link = new CLink($function_data['host'].':'.CHtml::encode($function_data['key_']),
 							'disc_prototypes.php?form=update&itemid='.$function_data['itemid'].'&parent_discoveryid='.
 							$trigger['discoveryRuleid'], $style);
 					}
 					else {
-						$link = new CLink($function_data['host'].':'.$function_data['key_'],
+						$link = new CLink($function_data['host'].':'.CHtml::encode($function_data['key_']),
 							'items.php?form=update&itemid='.$function_data['itemid'], $style);
 					}
 					array_push(
@@ -861,7 +861,7 @@ function triggerExpression($trigger, $html = false) {
 							$link,
 							'.',
 							bold($function_data['function'].'('),
-							CHTML::encode($function_data['parameter']),
+							CHtml::encode($function_data['parameter']),
 							bold(')'),
 							'}'
 						)
