@@ -90,8 +90,8 @@ zbx_ptr_pair_t;
 ZBX_HASHSET_ENTRY_T
 {
 	ZBX_HASHSET_ENTRY_T	*next;
-	void			*data;
 	zbx_hash_t		hash;
+	char			data[1];
 };
 
 typedef struct
