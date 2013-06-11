@@ -93,7 +93,7 @@ class CFavorite {
 		// add to cache only if cache is created
 		if (isset(self::$cache[$idx])) {
 			self::$cache[$idx][] = array(
-				'value' => $values['idx'],
+				'value' => $values['value_id'],
 				'source' => (isset($values['source']) ? $values['source'] : null)
 			);
 		}
