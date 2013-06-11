@@ -40,13 +40,30 @@ function media_type2str($type = null) {
 	}
 }
 
+/**
+ * Return span array with trigger severities labels and in Profile (Media tab)
+ *
+ * @param int $severity
+ *
+ * @return array
+ */
 function media_severity2str($severity) {
 	$result = array();
-	foreach (getSeverityCaption() as $i => $caption) {
-		$style = ($severity & (1 << $i)) ? 'enabled' : null;
+	$mapping = array();
+	$severityStyle = null;
 
-		$result[$i] = new CSpan(zbx_substr($caption, 0, 1), $style);
-		$result[$i]->setHint($caption.' ('.(isset($map['style']) ? 'on' : 'off').')');
+	for ($i = 0; $i <= 5; $i++) {
+		$severityStyle = empty($severityStyle) ? 1 : $severityStyle * 2;
+
+		$mapping[] = array(
+			'letter' => zbx_substr(getSeverityCaption($i), 0, 1),
+			'style' => (($severity & $severityStyle)  ? 'enabled' : NULL)
+		);
+	}
+
+	foreach ($mapping as $key => $map) {
+		$result[$key] = new CSpan($map['letter'], $map['style']);
+		$result[$key]->setHint(getSeverityCaption($key).' ('.(isset($map['style']) ? 'on' : 'off').')');
 	}
 
 	return $result;
