@@ -1112,6 +1112,7 @@ elseif ($srctbl == 'items') {
 	if (!is_null($value_types)) {
 		$options['filter']['value_type'] = $value_types;
 	}
+
 	$items = API::Item()->get($options);
 	order_result($items, 'name', ZBX_SORT_UP);
 
@@ -1210,13 +1211,18 @@ elseif ($srctbl == 'prototypes') {
 	}
 	$table->setHeader($header);
 
-	$items = API::ItemPrototype()->get(array(
+	$options = array(
 		'nodeids' => $nodeid,
 		'selectHosts' => array('name'),
 		'discoveryids' => get_request('parent_discoveryid'),
 		'output' => API_OUTPUT_EXTEND,
 		'preservekeys' => true
-	));
+	);
+	if (!is_null($value_types)) {
+		$options['filter']['value_type'] = $value_types;
+	}
+
+	$items = API::ItemPrototype()->get($options);
 	order_result($items, 'name');
 
 	foreach ($items as &$item) {
