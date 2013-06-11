@@ -627,13 +627,6 @@ class CGraphPrototype extends CGraphGeneral {
 
 		$allowedValueTypes = array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64);
 
-		// get value_type for these items and item prototypes
-		$items = API::Item()->get(array(
-			'preservekeys' => true,
-			'itemids' => $itemids,
-			'output' => array('itemid', 'value_type', 'name'),
-			'webitems' => true
-		));
 		$itemPrototypes = API::ItemPrototype()->get(array(
 			'preservekeys' => true,
 			'itemids' => $itemids,
@@ -641,7 +634,7 @@ class CGraphPrototype extends CGraphGeneral {
 			'webitems' => true
 		));
 
-		$items = zbx_array_merge($items, $itemPrototypes);
+		$items = zbx_array_merge($allowedItems, $itemPrototypes);
 
 		foreach ($items as $item) {
 			if (!in_array($item['value_type'], $allowedValueTypes)) {
