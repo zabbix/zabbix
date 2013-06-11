@@ -40,6 +40,20 @@ class testFormDiscoveryRule extends CWebTest {
 	 */
 	protected $hostid = 40001;
 
+	/**
+	 * The key of the host item used in discovery rule.
+	 *
+	 * @var string
+	 */
+	protected $keyForm = 'discovery-rule-form1';
+
+	/**
+	 * The key of the inheritance item used in discovery rule.
+	 *
+	 * @var string
+	 */
+	protected $keyInheritance = 'discovery-rule-inheritance1';
+
 
 	/**
 	 * Backup the tables that will be modified during the tests.
@@ -52,67 +66,169 @@ class testFormDiscoveryRule extends CWebTest {
 	public static function layout() {
 		return array(
 			array(
-				array('type' => 'Zabbix agent')
+				array('type' => 'Zabbix agent', 'host' => 'Simple form test host')
 			),
 			array(
-				array('type' => 'Zabbix agent (active)'),
+				array('host' => 'Simple form test host', 'form' => 'testFormDiscoveryRule1')
 			),
 			array(
-				array('type' => 'Simple check')
+				array('type' => 'Zabbix agent (active)', 'host' => 'Simple form test host'),
 			),
 			array(
-				array('type' => 'SNMPv1 agent')
+				array('type' => 'Simple check', 'host' => 'Simple form test host')
 			),
 			array(
-				array('type' => 'SNMPv2 agent')
+				array('type' => 'SNMPv1 agent', 'host' => 'Simple form test host')
 			),
 			array(
-				array('type' => 'SNMPv3 agent')
+				array('type' => 'SNMPv2 agent', 'host' => 'Simple form test host')
+			),
+			array(
+				array('type' => 'SNMPv3 agent', 'host' => 'Simple form test host')
 			),
 			array(
 				array(
 					'type' => 'SNMPv3 agent',
-					'snmpv3_securitylevel' => 'noAuthNoPriv'
+					'snmpv3_securitylevel' => 'noAuthNoPriv',
+					'host' => 'Simple form test host'
 				)
 			),
 			array(
 				array(
 					'type' => 'SNMPv3 agent',
-					'snmpv3_securitylevel' => 'authNoPriv'
+					'snmpv3_securitylevel' => 'authNoPriv',
+					'host' => 'Simple form test host'
 				)
 			),
 			array(
 				array(
 					'type' => 'SNMPv3 agent',
-					'snmpv3_securitylevel' => 'authPriv'
+					'snmpv3_securitylevel' => 'authPriv',
+					'host' => 'Simple form test host'
 				)
 			),
 			array(
-				array('type' => 'Zabbix internal')
+				array('type' => 'Zabbix internal', 'host' => 'Simple form test host')
 			),
 			array(
-				array('type' => 'Zabbix trapper')
+				array('type' => 'Zabbix trapper', 'host' => 'Simple form test host')
 			),
 			array(
-				array('type' => 'External check')
+				array('type' => 'External check', 'host' => 'Simple form test host')
 			),
 			array(
-				array('type' => 'IPMI agent')
+				array('type' => 'IPMI agent', 'host' => 'Simple form test host')
 			),
 			array(
-				array('type' => 'SSH agent')
+				array('type' => 'SSH agent', 'host' => 'Simple form test host')
 			),
 			array(
-				array('type' => 'SSH agent', 'authtype' => 'Public key')
+				array('type' => 'SSH agent',
+				'authtype' => 'Public key',
+				'host' => 'Simple form test host'
+				)
 			),
 			array(
-				array('type' => 'SSH agent', 'authtype' => 'Password')
+				array(
+					'type' => 'SSH agent',
+					'authtype' => 'Password',
+					'host' => 'Simple form test host'
+				)
 			),
 			array(
-				array('type' => 'TELNET agent')
+				array('type' => 'TELNET agent', 'host' => 'Simple form test host')
 			),
 			array(
-				array('type' => 'JMX agent')
+				array('type' => 'JMX agent', 'host' => 'Simple form test host')
+			),
+			array(
+				array('type' => 'Zabbix agent', 'template' => 'Inheritance test template')
+			),
+			array(
+				array(
+					'type' => 'Zabbix agent',
+					'template' => 'Inheritance test template',
+					'form' => 'testInheritanceDiscoveryRule1'
+				)
+			),
+			array(
+				array(
+					'type' => 'Zabbix agent',
+					'host' => 'Template inheritance test host',
+					'templatedHost' => 'Inheritance test template',
+					'form' => 'testInheritanceDiscoveryRule1'
+				)
+			),
+			array(
+				array('type' => 'Zabbix agent (active)', 'template' => 'Inheritance test template')
+			),
+			array(
+				array('type' => 'Simple check', 'template' => 'Inheritance test template')
+			),
+			array(
+				array('type' => 'SNMPv1 agent', 'template' => 'Inheritance test template')
+			),
+			array(
+				array('type' => 'SNMPv2 agent', 'template' => 'Inheritance test template')
+			),
+			array(
+				array('type' => 'SNMPv3 agent', 'template' => 'Inheritance test template')
+			),
+			array(
+				array(
+					'type' => 'SNMPv3 agent',
+					'snmpv3_securitylevel' => 'noAuthNoPriv',
+					'template' => 'Inheritance test template'
+				)
+			),
+			array(
+				array(
+					'type' => 'SNMPv3 agent',
+					'snmpv3_securitylevel' => 'authNoPriv',
+					'template' => 'Inheritance test template'
+				)
+			),
+			array(
+				array(
+					'type' => 'SNMPv3 agent',
+					'snmpv3_securitylevel' => 'authPriv',
+					'template' => 'Inheritance test template'
+				)
+			),
+			array(
+				array('type' => 'Zabbix internal', 'template' => 'Inheritance test template')
+			),
+			array(
+				array('type' => 'Zabbix trapper', 'template' => 'Inheritance test template')
+			),
+			array(
+				array('type' => 'External check', 'template' => 'Inheritance test template')
+			),
+			array(
+				array('type' => 'IPMI agent', 'template' => 'Inheritance test template')
+			),
+			array(
+				array('type' => 'SSH agent', 'template' => 'Inheritance test template')
+			),
+			array(
+				array(
+					'type' => 'SSH agent',
+					'authtype' => 'Public key',
+					'template' => 'Inheritance test template'
+				)
+			),
+			array(
+				array(
+					'type' => 'SSH agent',
+					'authtype' => 'Password',
+					'template' => 'Inheritance test template'
+				)
+			),
+			array(
+				array('type' => 'TELNET agent', 'template' => 'Inheritance test template')
+			),
+			array(
+				array('type' => 'JMX agent', 'template' => 'Inheritance test template')
 			)
 		);
 	}
@@ -121,96 +237,160 @@ class testFormDiscoveryRule extends CWebTest {
 	 * @dataProvider layout
 	 */
 	public function testFormDiscoveryRule_CheckLayout($data) {
-		$this->zbxTestLogin('hosts.php');
-		$this->checkTitle('Configuration of hosts');
-		$this->zbxTestTextPresent('CONFIGURATION OF HOSTS');
 
-		$this->zbxTestClickWait('link='.$this->host);
+		if (isset($data['template'])) {
+			$this->zbxTestLogin('templates.php');
+			$this->zbxTestClickWait('link='.$data['template']);
+			$hostid = 30000;
+		}
+
+		if (isset($data['host'])) {
+			$this->zbxTestLogin('hosts.php');
+			$this->zbxTestClickWait('link='.$data['host']);
+			if (isset($data['templatedHost'])) {
+				$hostid = 30001;
+			}
+			else {
+				$hostid = 40001;
+			}
+		}
+
 		$this->zbxTestClickWait('link=Discovery rules');
-		$this->checkTitle('Configuration of discovery rules');
-		$this->zbxTestTextPresent('CONFIGURATION OF DISCOVERY RULES');
 
-		$this->zbxTestClickWait('form');
+		if (isset($data['form'])) {
+			$this->zbxTestClickWait('link='.$data['form']);
+		}
+		else {
+			$this->zbxTestClickWait('form');
+		}
+
 		$this->checkTitle('Configuration of discovery rules');
 		$this->zbxTestTextPresent('CONFIGURATION OF DISCOVERY RULES');
 		$this->zbxTestTextPresent('Discovery rule');
+
+		if (isset($data['templatedHost'])) {
+			$this->zbxTestTextPresent('Parent discovery rules');
+			if (isset($data['hostTemplate'])) {
+				$this->assertElementPresent("//a[text()='".$data['hostTemplate']."']");
+			}
+		}
+		else {
+			$this->zbxTestTextNotPresent('Parent discovery rules');
+		}
 
 		$this->zbxTestTextPresent('Name');
 		$this->assertVisible('name');
 		$this->assertAttribute("//input[@id='name']/@maxlength", 255);
 		$this->assertAttribute("//input[@id='name']/@size", 50);
 		$this->assertAttribute("//input[@id='name']/@autofocus", 'autofocus');
+			if(isset($data['templatedHost'])) {
+				$this->assertAttribute("//input[@id='name']/@readonly", 'readonly');
+			}
 
 		$this->zbxTestTextPresent('Type');
-		$this->assertVisible('type');
-		$this->zbxTestDropdownHasOptions('type', array(
-			'Zabbix agent',
-			'Zabbix agent (active)',
-			'Simple check',
-			'SNMPv1 agent',
-			'SNMPv2 agent',
-			'SNMPv3 agent',
-			'Zabbix internal',
-			'Zabbix trapper',
-			'External check',
-			'IPMI agent',
-			'SSH agent',
-			'TELNET agent',
-			'JMX agent'
-		));
-		$this->zbxTestDropdownSelect('type', $data['type']);
+		if (!isset($data['templatedHost'])) {
+			$this->assertVisible('type');
+			$this->zbxTestDropdownHasOptions('type', array(
+				'Zabbix agent',
+				'Zabbix agent (active)',
+				'Simple check',
+				'SNMPv1 agent',
+				'SNMPv2 agent',
+				'SNMPv3 agent',
+				'Zabbix internal',
+				'Zabbix trapper',
+				'External check',
+				'IPMI agent',
+				'SSH agent',
+				'TELNET agent',
+				'JMX agent'
+			));
+			if (isset($data['type'])) {
+				$this->zbxTestDropdownSelect('type', $data['type']);
+			}
+			$type = $this->getSelectedLabel('type');
+		}
+		else {
+			$this->assertVisible('typename');
+			$this->assertAttribute("//input[@id='typename']/@maxlength", 255);
+			$this->assertAttribute("//input[@id='typename']/@size", 50);
+			$this->assertAttribute("//input[@id='typename']/@readonly", 'readonly');
+
+			$type = $this->getValue('typename');
+		}
 
 		$this->zbxTestTextPresent('Key');
 		$this->assertVisible('key');
 		$this->assertAttribute("//input[@id='key']/@maxlength", 255);
 		$this->assertAttribute("//input[@id='key']/@size", 50);
-
-		$keyValue = $this->getValue('key');
-		switch($data['type']) {
-			case 'SSH agent':
-				$this->assertEquals($keyValue, "ssh.run[<unique short description>,<ip>,<port>,<encoding>]");
-				break;
-			case 'TELNET agent':
-				$this->assertEquals($keyValue, "telnet.run[<unique short description>,<ip>,<port>,<encoding>]");
-				break;
-			case 'JMX agent':
-				$this->assertEquals($keyValue, "jmx[<object name>,<attribute name>]");
-				break;
-			}
-
-		$interfaceType = itemTypeInterface($this->getValue('type'));
-		switch ($interfaceType) {
-			case INTERFACE_TYPE_SNMP :
-			case INTERFACE_TYPE_IPMI :
-			case INTERFACE_TYPE_AGENT :
-			case INTERFACE_TYPE_ANY :
-			case INTERFACE_TYPE_JMX :
-				$this->zbxTestTextPresent('Host interface');
-				$dbInterfaces = DBdata(
-					'SELECT type,ip,port'.
-					' FROM interface'.
-					' WHERE hostid='.$this->hostid.
-						($interfaceType == INTERFACE_TYPE_ANY ? '' : ' AND type='.$interfaceType)
-				);
-				$dbInterfaces = reset($dbInterfaces);
-				if ($dbInterfaces != null) {
-					foreach ($dbInterfaces as $host_interface) {
-						$this->assertElementPresent('//select[@id="interfaceid"]/optgroup/option[text()="'.
-						$host_interface['ip'].' : '.$host_interface['port'].'"]');
-					}
-				}
-				else {
-					$this->zbxTestTextPresent('No interface found');
-					$this->assertNotVisible('interfaceid');
-				}
-				break;
-			default:
-				$this->zbxTestTextNotPresent(array('Host interface', 'No interface found'));
-				$this->assertNotVisible('interfaceid');
-				break;
+		if (isset($data['templatedHost'])) {
+			$this->assertAttribute("//input[@id='key']/@readonly", 'readonly');
 		}
 
-		if ($data['type'] == 'SNMPv3 agent') {
+		if (isset($data['host']) && isset($data['form']) && !isset($data['templatedHost'])) {
+			$keyTest = $this->getValue('key');
+			$this->assertEquals($this->keyForm, $keyTest);
+		}
+
+		if (isset($data['template']) && isset($data['form'])) {
+			$keyTest = $this->getValue('key');
+			$this->assertEquals($this->keyInheritance, $keyTest);
+		}
+
+		if (isset($data['host']) && isset($data['templatedHost'])) {
+			$keyTest = $this->getValue('key');
+			$this->assertEquals($this->keyInheritance, $keyTest);
+		}
+
+		if (!isset($data['form'])) {
+			$keyValue = $this->getValue('key');
+			switch($type) {
+				case 'SSH agent':
+					$this->assertEquals($keyValue, "ssh.run[<unique short description>,<ip>,<port>,<encoding>]");
+					break;
+				case 'TELNET agent':
+					$this->assertEquals($keyValue, "telnet.run[<unique short description>,<ip>,<port>,<encoding>]");
+					break;
+				case 'JMX agent':
+					$this->assertEquals($keyValue, "jmx[<object name>,<attribute name>]");
+					break;
+				}
+		}
+
+		if (!isset($data['template'])){
+			$interfaceType = itemTypeInterface($this->getValue('type'));
+			switch ($interfaceType) {
+				case INTERFACE_TYPE_SNMP :
+				case INTERFACE_TYPE_IPMI :
+				case INTERFACE_TYPE_AGENT :
+				case INTERFACE_TYPE_ANY :
+				case INTERFACE_TYPE_JMX :
+					$this->zbxTestTextPresent('Host interface');
+					$dbInterfaces = DBdata(
+						'SELECT type,ip,port'.
+						' FROM interface'.
+						' WHERE hostid='.$hostid.
+							($interfaceType == INTERFACE_TYPE_ANY ? '' : ' AND type='.$interfaceType)
+					);
+					$dbInterfaces = reset($dbInterfaces);
+					if ($dbInterfaces != null) {
+						foreach ($dbInterfaces as $host_interface) {
+							$this->assertElementPresent('//select[@id="interfaceid"]/optgroup/option[text()="'.
+							$host_interface['ip'].' : '.$host_interface['port'].'"]');
+						}
+					}
+					else {
+						$this->zbxTestTextPresent('No interface found');
+						$this->assertNotVisible('interfaceid');
+					}
+					break;
+				default:
+					$this->zbxTestTextNotPresent(array('Host interface', 'No interface found'));
+					$this->assertNotVisible('interfaceid');
+					break;
+			}
+		}
+		if ($type == 'SNMPv3 agent') {
 			if (isset($data['snmpv3_securitylevel'])) {
 				$this->zbxTestDropdownSelect('snmpv3_securitylevel', $data['snmpv3_securitylevel']);
 			}
@@ -220,7 +400,7 @@ class testFormDiscoveryRule extends CWebTest {
 		$this->zbxTestTextNotPresent('Additional parameters');
 		$this->assertNotVisible('params_ap');
 
-		if ($data['type'] == 'SSH agent' || $data['type'] == 'TELNET agent' ) {
+		if ($type == 'SSH agent' || $type == 'TELNET agent' ) {
 			$this->zbxTestTextPresent('Executed script');
 			$this->assertVisible('params_es');
 			$this->assertAttribute("//textarea[@id='params_es']/@rows", 7);
@@ -233,7 +413,7 @@ class testFormDiscoveryRule extends CWebTest {
 		$this->zbxTestTextNotPresent('Formula');
 		$this->assertNotVisible('params_f');
 
-		if ($data['type'] == 'IPMI agent') {
+		if ($type == 'IPMI agent') {
 			$this->zbxTestTextPresent('IPMI sensor');
 			$this->assertVisible('ipmi_sensor');
 			$this->assertAttribute("//input[@id='ipmi_sensor']/@maxlength", 128);
@@ -244,7 +424,7 @@ class testFormDiscoveryRule extends CWebTest {
 			$this->assertNotVisible('ipmi_sensor');
 		}
 
-		if ($data['type'] == 'SSH agent') {
+		if ($type == 'SSH agent') {
 			$this->zbxTestTextPresent('Authentication method');
 			$this->assertVisible('authtype');
 			$this->zbxTestDropdownHasOptions('authtype', array('Password', 'Public key'));
@@ -254,7 +434,7 @@ class testFormDiscoveryRule extends CWebTest {
 			$this->assertNotVisible('authtype');
 		}
 
-		if ($data['type'] == 'SSH agent' || $data['type'] == 'TELNET agent' || $data['type'] == 'JMX agent') {
+		if ($type == 'SSH agent' || $type == 'TELNET agent' || $type == 'JMX agent') {
 			$this->zbxTestTextPresent('User name');
 			$this->assertVisible('username');
 			$this->assertAttribute("//input[@id='username']/@maxlength", 64);
@@ -295,7 +475,7 @@ class testFormDiscoveryRule extends CWebTest {
 			$this->assertNotVisible('publickey');
 		}
 
-		if	($data['type'] == 'SNMPv1 agent' || $data['type'] == 'SNMPv2 agent' || $data['type'] == 'SNMPv3 agent') {
+		if	($type == 'SNMPv1 agent' || $type == 'SNMPv2 agent' || $type == 'SNMPv3 agent') {
 			$this->zbxTestTextPresent('SNMP OID');
 			$this->assertVisible('snmp_oid');
 			$this->assertAttribute("//input[@id='snmp_oid']/@maxlength", 255);
@@ -315,7 +495,7 @@ class testFormDiscoveryRule extends CWebTest {
 			$this->assertNotVisible('port');
 		}
 
-		if	($data['type'] == 'SNMPv1 agent' || $data['type'] == 'SNMPv2 agent') {
+		if	($type == 'SNMPv1 agent' || $type == 'SNMPv2 agent') {
 			$this->zbxTestTextPresent('SNMP community');
 			$this->assertVisible('snmp_community');
 			$this->assertAttribute("//input[@id='snmp_community']/@maxlength", 64);
@@ -327,7 +507,7 @@ class testFormDiscoveryRule extends CWebTest {
 			$this->assertNotVisible('snmp_community');
 		}
 
-		if	($data['type'] == 'SNMPv3 agent') {
+		if	($type == 'SNMPv3 agent') {
 			$this->zbxTestTextPresent('Security name');
 			$this->assertVisible('snmpv3_securityname');
 			$this->assertAttribute("//input[@id='snmpv3_securityname']/@maxlength", 64);
@@ -387,7 +567,7 @@ class testFormDiscoveryRule extends CWebTest {
 			$this->assertNotVisible('snmpv3_privpassphrase');
 		}
 
-		switch ($data['type']) {
+		switch ($type) {
 			case 'Zabbix agent':
 			case 'Zabbix agent (active)':
 			case 'Simple check':
@@ -404,7 +584,9 @@ class testFormDiscoveryRule extends CWebTest {
 				$this->assertVisible('delay');
 				$this->assertAttribute("//input[@id='delay']/@maxlength", 5);
 				$this->assertAttribute("//input[@id='delay']/@size", 5);
-				$this->assertAttribute("//input[@id='delay']/@value", 30);
+				if (!isset($data['form'])) {
+					$this->assertAttribute("//input[@id='delay']/@value", 30);
+				}
 				break;
 			default:
 				$this->zbxTestTextNotPresent('Update interval (in sec)');
@@ -417,7 +599,7 @@ class testFormDiscoveryRule extends CWebTest {
 		$this->assertAttribute("//input[@id='lifetime']/@size", 25);
 		$this->assertAttribute("//input[@id='lifetime']/@value", 30);
 
-		switch ($data['type']) {
+		switch ($type) {
 			case 'Zabbix agent':
 			case 'Simple check':
 			case 'SNMPv1 agent':
@@ -454,7 +636,7 @@ class testFormDiscoveryRule extends CWebTest {
 				$this->assertNotVisible('add_delay_flex');
 		}
 
-		if ($data['type'] == 'Zabbix trapper') {
+		if ($type == 'Zabbix trapper') {
 			$this->zbxTestTextPresent('Allowed hosts');
 			$this->assertVisible('trapper_hosts');
 			$this->assertAttribute("//input[@id='trapper_hosts']/@maxlength", 255);
@@ -493,7 +675,7 @@ class testFormDiscoveryRule extends CWebTest {
 	/**
 	 * @dataProvider update
 	 */
-	public function testFormDiscoveryRule_SimpleUpdate($data) {
+/*	public function testFormDiscoveryRule_SimpleUpdate($data) {
 		$name = $data['name'];
 
 		$sqlDiscovery = 'select itemid, hostid, name, key_, delay, history, trends, value_type, formula, templateid, flags, lifetime from items';
@@ -511,11 +693,11 @@ class testFormDiscoveryRule extends CWebTest {
 		$this->assertEquals($oldHashDiscovery, DBhash($sqlDiscovery));
 
 	}
-
+*/
 	// Returns create data
 	public static function create() {
 		return array(
-			array(
+		/*	array(
 				array(
 					'expected' => DISCOVERY_BAD,
 					'errors' => array(
@@ -1288,7 +1470,7 @@ class testFormDiscoveryRule extends CWebTest {
 							'Check the key, please. Default example was passed.'
 					)
 				)
-			)
+			)*/
 		);
 	}
 
@@ -1464,7 +1646,7 @@ class testFormDiscoveryRule extends CWebTest {
 				case 'SSH agent':
 				case 'TELNET agent':
 				case 'JMX agent':
-			$this->assertElementPresent("//select[@id='interfaceid']/optgroup/option[text()='".$interfaceid."']");
+					$this->assertElementPresent("//select[@id='interfaceid']/optgroup/option[text()='".$interfaceid."']");
 					break;
 				default:
 					$this->assertNotVisible('interfaceid');
