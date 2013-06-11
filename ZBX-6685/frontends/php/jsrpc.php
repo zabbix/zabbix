@@ -238,8 +238,7 @@ switch ($data['method']) {
 					'editable' => isset($data['editable']) ? $data['editable'] : null,
 					'output' => array('groupid', 'name'),
 					'startSearch' => true,
-					'search' => isset($data['search']) ? array('name' => $data['search']) : null,
-					'limit' => isset($data['limit']) ? $data['limit'] : null
+					'search' => isset($data['search']) ? array('name' => $data['search']) : null
 				));
 
 				if ($hostGroups) {
@@ -252,6 +251,10 @@ switch ($data['method']) {
 						array('field' => 'nodename', 'order' => ZBX_SORT_UP),
 						array('field' => 'name', 'order' => ZBX_SORT_UP)
 					));
+
+					if (isset($data['limit'])) {
+						$hostGroups = array_slice($hostGroups, 0, $data['limit']);
+					}
 
 					foreach ($hostGroups as $hostGroup) {
 						$result[] = array(
@@ -268,14 +271,17 @@ switch ($data['method']) {
 					'editable' => isset($data['editable']) ? $data['editable'] : null,
 					'output' => array('hostid', 'name'),
 					'startSearch' => true,
-					'search' => isset($data['search']) ? array('name' => $data['search']) : null,
-					'limit' => isset($data['limit']) ? $data['limit'] : null
+					'search' => isset($data['search']) ? array('name' => $data['search']) : null
 				));
 
 				if ($hosts) {
 					CArrayHelper::sort($hosts, array(
 						array('field' => 'name', 'order' => ZBX_SORT_UP)
 					));
+
+					if (isset($data['limit'])) {
+						$hosts = array_slice($hosts, 0, $data['limit']);
+					}
 
 					foreach ($hosts as $host) {
 						$result[] = array(
@@ -292,14 +298,17 @@ switch ($data['method']) {
 					'editable' => isset($data['editable']) ? $data['editable'] : null,
 					'output' => array('templateid', 'name'),
 					'startSearch' => true,
-					'search' => isset($data['search']) ? array('name' => $data['search']) : null,
-					'limit' => isset($data['limit']) ? $data['limit'] : null
+					'search' => isset($data['search']) ? array('name' => $data['search']) : null
 				));
 
 				if ($templates) {
 					CArrayHelper::sort($templates, array(
 						array('field' => 'name', 'order' => ZBX_SORT_UP)
 					));
+
+					if (isset($data['limit'])) {
+						$templates = array_slice($templates, 0, $data['limit']);
+					}
 
 					foreach ($templates as $template) {
 						$result[] = array(
@@ -316,14 +325,17 @@ switch ($data['method']) {
 					'hostids' => zbx_toArray($data['hostid']),
 					'output' => array('applicationid', 'name'),
 					'startSearch' => true,
-					'search' => isset($data['search']) ? array('name' => $data['search']) : null,
-					'limit' => isset($data['limit']) ? $data['limit'] : null
+					'search' => isset($data['search']) ? array('name' => $data['search']) : null
 				));
 
 				if ($applications) {
 					CArrayHelper::sort($applications, array(
 						array('field' => 'name', 'order' => ZBX_SORT_UP)
 					));
+
+					if (isset($data['limit'])) {
+						$applications = array_slice($applications, 0, $data['limit']);
+					}
 
 					foreach ($applications as $application) {
 						$result[] = array(
@@ -341,14 +353,17 @@ switch ($data['method']) {
 					'output' => array('triggerid', 'description'),
 					'selectHosts' => array('name'),
 					'startSearch' => true,
-					'search' => isset($data['search']) ? array('description' => $data['search']) : null,
-					'limit' => isset($data['limit']) ? $data['limit'] : null
+					'search' => isset($data['search']) ? array('description' => $data['search']) : null
 				));
 
 				if ($triggers) {
 					CArrayHelper::sort($triggers, array(
 						array('field' => 'description', 'order' => ZBX_SORT_UP)
 					));
+
+					if (isset($data['limit'])) {
+						$triggers = array_slice($triggers, 0, $data['limit']);
+					}
 
 					foreach ($triggers as $trigger) {
 						$hostName = '';
