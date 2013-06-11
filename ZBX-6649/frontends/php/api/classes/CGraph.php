@@ -587,7 +587,7 @@ class CGraph extends CGraphGeneral {
 			}
 		}
 
-		$allowedItems = API::Item()->get(array(
+		$items = API::Item()->get(array(
 			'nodeids' => get_current_nodeid(true),
 			'itemids' => $itemids,
 			'webitems' => true,
@@ -599,7 +599,7 @@ class CGraph extends CGraphGeneral {
 		// check permissions only for non super admins
 		if (CUser::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
 			foreach ($itemids as $itemid) {
-				if (!isset($allowedItems[$itemid])) {
+				if (!isset($items[$itemid])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
 				}
 			}
@@ -610,7 +610,7 @@ class CGraph extends CGraphGeneral {
 		$allowedValueTypes = array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64);
 
 		// get value type and name for these items
-		foreach ($allowedItems as $item) {
+		foreach ($items as $item) {
 			if (!in_array($item['value_type'], $allowedValueTypes)) {
 				self::exception(
 					ZBX_API_ERROR_PARAMETERS,
