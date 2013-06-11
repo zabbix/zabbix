@@ -79,19 +79,19 @@ int	USER_PERF_COUNTER(AGENT_REQUEST *request, AGENT_RESULT *result)
 int	PERF_COUNTER(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	const char		*__function_name = "PERF_COUNTER";
-	char			*counterpath, *tmp;
+	char			counterpath[PDH_MAX_COUNTER_PATH], *tmp;
 	int			interval, ret = SYSINFO_RET_FAIL;
 	double			value;
 	PERF_COUNTER_DATA	*perfs = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	if (2 < request->nparam)
+	if (! (1 == request->nparam || 2 == request->nparam))
 		goto clean;
 
-	counterpath = get_rparam(request, 0);
+	zbx_strlcpy(counterpath, request->params[0], sizeof(counterpath));
 
-	if (NULL == counterpath || '\0' == *counterpath)
+	if ('\0' == *counterpath)
 		goto clean;
 
 	tmp = get_rparam(request, 1);
