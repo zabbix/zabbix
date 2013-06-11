@@ -213,7 +213,6 @@ class CItemPrototype extends CItemGeneral {
 			}
 		}
 
-
 // search
 		if (is_array($options['search'])) {
 			zbx_db_search('items i', $options, $sqlParts);
