@@ -80,6 +80,9 @@
 /* service list */
 .service-list .tableinfo .service-caption-soft a { color: #888; }
 
+/* service edit */
+.services-edit .time-type-combobox { padding-bottom: 8px; }
+
 /* service monitoring */
 .service-mon .tableinfo .sla-value { display: inline-block; width: 5em; text-align: right; padding-right: 0.2em; }
 .service-mon .tableinfo ul.service-problems { margin: 0; list-style-type: none; padding-left: 0; }

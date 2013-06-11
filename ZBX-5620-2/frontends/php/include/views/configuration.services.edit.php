@@ -26,6 +26,7 @@ global $ZBX_MESSAGES;
 $service = $this->data['service'];
 
 $servicesWidget = new CWidget();
+$servicesWidget->setRootClass('services-edit');
 $servicesWidget->addPageHeader(_('CONFIGURATION OF IT SERVICES'));
 
 // create form
@@ -249,8 +250,7 @@ $timeTypeComboBox->addItem(SERVICE_TIME_TYPE_ONETIME_DOWNTIME, _('One-time downt
 $servicesTimeFormList->addRow(
 	_('New service time'),
 	new CDiv(array(
-		$timeTypeComboBox,
-		BR(),
+		new CDiv($timeTypeComboBox, 'time-type-combobox'),
 		$serviceTimeTable,
 		new CButton('add_service_time', _('Add'), null, 'link_menu')
 	),
