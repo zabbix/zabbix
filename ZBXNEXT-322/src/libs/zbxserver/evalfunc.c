@@ -567,7 +567,7 @@ static int	evaluate_COUNT(char *value, DB_ITEM *item, const char *function, cons
 	else
 		nvalues = arg1;
 
-	if (FAIL == (ret = zbx_vc_get_value_range(item->itemid, item->value_type, &values, seconds, nvalues, now)))
+	if (FAIL == zbx_vc_get_value_range(item->itemid, item->value_type, &values, seconds, nvalues, now))
 		goto clean;
 
 	for (i = 0; i < values.values_num; i++)
@@ -654,7 +654,7 @@ static int	evaluate_SUM(char *value, DB_ITEM *item, const char *function, const 
 	else
 		nvalues = arg1;
 
-	if (FAIL == (ret = zbx_vc_get_value_range(item->itemid, item->value_type, &values, seconds, nvalues, now)))
+	if (FAIL == zbx_vc_get_value_range(item->itemid, item->value_type, &values, seconds, nvalues, now))
 		goto out;
 
 	if (0 < values.values_num)
@@ -673,6 +673,8 @@ static int	evaluate_SUM(char *value, DB_ITEM *item, const char *function, const 
 		}
 
 		zbx_vc_history_value2str(value, MAX_BUFFER_LEN, &result, item->value_type);
+
+		ret = SUCCEED;
 	}
 	else
 		zabbix_log(LOG_LEVEL_DEBUG, "result for SUM is empty");
@@ -737,7 +739,7 @@ static int	evaluate_AVG(char *value, DB_ITEM *item, const char *function, const 
 	else
 		nvalues = arg1;
 
-	if (FAIL == (ret = zbx_vc_get_value_range(item->itemid, item->value_type, &values, seconds, nvalues, now)))
+	if (FAIL == zbx_vc_get_value_range(item->itemid, item->value_type, &values, seconds, nvalues, now))
 		goto out;
 
 	if (values.values_num > 0)
@@ -753,11 +755,11 @@ static int	evaluate_AVG(char *value, DB_ITEM *item, const char *function, const 
 				sum += values.values[i].value.ui64;
 		}
 		zbx_snprintf(value, MAX_BUFFER_LEN, ZBX_FS_DBL, sum / values.values_num);
+
 		ret = SUCCEED;
 	}
 	else
 		zabbix_log(LOG_LEVEL_DEBUG, "result for AVG is empty");
-
 out:
 	zbx_vc_value_vector_destroy(&values, item->value_type);
 
@@ -824,14 +826,13 @@ static int	evaluate_LAST(char *value, DB_ITEM *item, const char *function, const
 
 		if (NULL != item->lastvalue[index])
 		{
-			ret = SUCCEED;
-
 			switch (item->value_type)
 			{
 				case ITEM_VALUE_TYPE_FLOAT:
 				case ITEM_VALUE_TYPE_UINT64:
 				case ITEM_VALUE_TYPE_STR:
 					zbx_strlcpy(value, item->lastvalue[index], MAX_BUFFER_LEN);
+					ret = SUCCEED;
 					break;
 				default:
 					use_history = 1;
@@ -915,7 +916,7 @@ static int	evaluate_MIN(char *value, DB_ITEM *item, const char *function, const 
 	else
 		nvalues = arg1;
 
-	if (FAIL == (ret = zbx_vc_get_value_range(item->itemid, item->value_type, &values, seconds, nvalues, now)))
+	if (FAIL == zbx_vc_get_value_range(item->itemid, item->value_type, &values, seconds, nvalues, now))
 		goto out;
 
 	if (0 < values.values_num)
@@ -941,8 +942,6 @@ static int	evaluate_MIN(char *value, DB_ITEM *item, const char *function, const 
 		zbx_vc_history_value2str(value, MAX_BUFFER_LEN, &values.values[index].value, item->value_type);
 
 		ret = SUCCEED;
-
-		zabbix_log(LOG_LEVEL_DEBUG, "WDN: min=%s\n", value);
 	}
 	else
 		zabbix_log(LOG_LEVEL_DEBUG, "result for MIN is empty");
@@ -1006,7 +1005,7 @@ static int	evaluate_MAX(char *value, DB_ITEM *item, const char *function, const 
 	else
 		nvalues = arg1;
 
-	if (FAIL == (ret = zbx_vc_get_value_range(item->itemid, item->value_type, &values, seconds, nvalues, now)))
+	if (FAIL == zbx_vc_get_value_range(item->itemid, item->value_type, &values, seconds, nvalues, now))
 		goto out;
 
 	if (0 < values.values_num)
@@ -1095,7 +1094,7 @@ static int	evaluate_DELTA(char *value, DB_ITEM *item, const char *function, cons
 	else
 		nvalues = arg1;
 
-	if (FAIL == (ret = zbx_vc_get_value_range(item->itemid, item->value_type, &values, seconds, nvalues, now)))
+	if (FAIL == zbx_vc_get_value_range(item->itemid, item->value_type, &values, seconds, nvalues, now))
 		goto out;
 
 	if (0 < values.values_num)
@@ -1521,7 +1520,7 @@ static int	evaluate_STR(char *value, DB_ITEM *item, const char *function, const 
 	else
 		nvalues = arg2;
 
-	if (FAIL == (ret = zbx_vc_get_value_range(item->itemid, item->value_type, &values, seconds, nvalues, now)))
+	if (FAIL == zbx_vc_get_value_range(item->itemid, item->value_type, &values, seconds, nvalues, now))
 		goto clean;
 
 	if (0 == values.values_num)

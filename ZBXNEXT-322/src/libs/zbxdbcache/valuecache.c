@@ -1454,7 +1454,7 @@ out:
  ******************************************************************************************************************/
 
 /*
- * The history storage mode caches all values from the oldest request range to
+ * The history storage mode caches all values from the largest request range to
  * the current time
  *
  * The history storage mode supports requests of any range, but it's not
