@@ -806,3 +806,19 @@ INSERT INTO graphs_items (gitemid, graphid, itemid, drawtype, sortorder, color, 
 INSERT INTO graphs_items (gitemid, graphid, itemid, drawtype, sortorder, color, yaxisside, calc_fnc, type) VALUES (500005, 500005, 24333, 1, 1, 'FF5555', 0, 2, 0);
 INSERT INTO graphs_items (gitemid, graphid, itemid, drawtype, sortorder, color, yaxisside, calc_fnc, type) VALUES (500006, 500006, 24329, 1, 1, 'FF5555', 0, 2, 0);
 INSERT INTO graphs_items (gitemid, graphid, itemid, drawtype, sortorder, color, yaxisside, calc_fnc, type) VALUES (500007, 500007, 24333, 1, 1, 'FF5555', 0, 2, 0);
+
+-- testFormDiscoveryRule.SimpleUpdate
+INSERT INTO items (name, key_, hostid, value_type, itemid, flags, delay, params, description, interfaceid) VALUES ('testFormDiscoveryRule1', 'discovery-rule-form1', 40001, 4, 33700, 1,  50, '', '', 40011);
+INSERT INTO items (name, key_, hostid, value_type, itemid, flags, delay, params, description, interfaceid) VALUES ('testFormDiscoveryRule2', 'discovery-rule-form2', 40001, 4, 33701, 1,  50, '', '', 40011);
+INSERT INTO items (name, key_, hostid, value_type, itemid, flags, delay, params, description, interfaceid) VALUES ('testFormDiscoveryRule3', 'discovery-rule-form3', 40001, 4, 33702, 1,  50, '', '', 40011);
+INSERT INTO items (name, key_, hostid, value_type, itemid, flags, delay, params, description, interfaceid) VALUES ('testFormDiscoveryRule4', 'discovery-rule-form4', 40001, 4, 33703, 1,  50, '', '', 40011);
+
+-- testInheritanceDiscoveryRule.LayoutCheck and testInheritanceDiscoveryRule.SimpleUpdate
+INSERT INTO items (name, key_, hostid, value_type, itemid, flags, delay, params, description) VALUES ('testInheritanceDiscoveryRule1', 'discovery-rule-inheritance1', 30000, 4, 33500, 1, 50, '', '');
+INSERT INTO items (name, key_, hostid, value_type, itemid, flags, templateid, delay, params, description) VALUES ('testInheritanceDiscoveryRule1', 'discovery-rule-inheritance1', 30001, 4, 33501, 1, 33500, 50, '', '');
+INSERT INTO items (name, key_, hostid, value_type, itemid, flags, delay, params, description) VALUES ('testInheritanceDiscoveryRule2', 'discovery-rule-inheritance2', 30000, 4, 33502, 1, 50, '', '');
+INSERT INTO items (name, key_, hostid, value_type, itemid, flags, templateid, delay, params, description) VALUES ('testInheritanceDiscoveryRule2', 'discovery-rule-inheritance2', 30001, 4, 33503, 1, 33502, 50, '', '');
+INSERT INTO items (name, key_, hostid, value_type, itemid, flags, delay, params, description) VALUES ('testInheritanceDiscoveryRule3', 'discovery-rule-inheritance3', 30000, 4, 33504, 1, 50, '', '');
+INSERT INTO items (name, key_, hostid, value_type, itemid, flags, templateid, delay, params, description) VALUES ('testInheritanceDiscoveryRule3', 'discovery-rule-inheritance3', 30001, 4, 33505, 1, 33504, 50, '', '');
+INSERT INTO items (name, key_, hostid, value_type, itemid, flags, delay, params, description) VALUES ('testInheritanceDiscoveryRule4', 'discovery-rule-inheritance4', 30000, 4, 33506, 1, 50, '', '');
+INSERT INTO items (name, key_, hostid, value_type, itemid, flags, templateid, delay, params, description) VALUES ('testInheritanceDiscoveryRule4', 'discovery-rule-inheritance4', 30001, 4, 33507, 1, 33506, 50, '', '');
