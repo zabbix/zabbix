@@ -86,13 +86,15 @@ int	PERF_COUNTER(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	if (! (1 == request->nparam || 2 == request->nparam))
+	if (2 < request->nparam)
 		goto clean;
 
-	zbx_strlcpy(counterpath, request->params[0], sizeof(counterpath));
+	tmp = get_rparam(request, 0);
 
-	if ('\0' == *counterpath)
+	if (NULL == tmp || '\0' == *tmp)
 		goto clean;
+
+	strscpy(counterpath, tmp);
 
 	tmp = get_rparam(request, 1);
 
