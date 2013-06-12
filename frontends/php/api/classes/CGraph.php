@@ -305,6 +305,10 @@ class CGraph extends CGraphGeneral {
 			return $result;
 		}
 
+		if (isset($options['expandName'])) {
+			$result = CMacrosResolverHelper::resolveGraphNameByIds($result);
+		}
+
 		if ($result) {
 			$result = $this->addRelatedObjects($options, $result);
 		}
@@ -529,9 +533,11 @@ class CGraph extends CGraphGeneral {
 			$parentGraphids = array();
 			while ($dbGraph = DBfetch($dbGraphs)) {
 				$parentGraphids[] = $dbGraph['graphid'];
-				$itemids[$dbGraph['graphid']] = $dbGraph['graphid'];
+				$graphids[] = $dbGraph['graphid'];
 			}
 		} while (!empty($parentGraphids));
+
+		$graphids = array_unique($graphids);
 
 		DB::delete('screens_items', array(
 			'resourceid' => $graphids,
@@ -582,17 +588,18 @@ class CGraph extends CGraphGeneral {
 				$itemids[$gitem['itemid']] = $gitem['itemid'];
 			}
 		}
+
+		$allowedItems = API::Item()->get(array(
+			'nodeids' => get_current_nodeid(true),
+			'itemids' => $itemids,
+			'webitems' => true,
+			'editable' => true,
+			'output' => API_OUTPUT_EXTEND,
+			'preservekeys' => true
+		));
+
 		// check permissions only for non super admins
 		if (CUser::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
-			$allowedItems = API::Item()->get(array(
-				'nodeids' => get_current_nodeid(true),
-				'itemids' => $itemids,
-				'webitems' => true,
-				'editable' => true,
-				'output' => API_OUTPUT_EXTEND,
-				'preservekeys' => true
-			));
-
 			foreach ($itemids as $itemid) {
 				if (!isset($allowedItems[$itemid])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
@@ -601,6 +608,18 @@ class CGraph extends CGraphGeneral {
 		}
 
 		parent::checkInput($graphs, $update);
+
+		$allowedValueTypes = array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64);
+
+		// get value type and name for these items
+		foreach ($allowedItems as $item) {
+			if (!in_array($item['value_type'], $allowedValueTypes)) {
+				self::exception(
+					ZBX_API_ERROR_PARAMETERS,
+					_s('Cannot add a non-numeric item "%1$s" to graph "%2$s".', $item['name'], $graph['name'])
+				);
+			}
+		}
 	}
 
 	protected function applyQueryNodeOptions($tableName, $tableAlias, array $options, array $sqlParts) {

@@ -35,13 +35,22 @@ if (!empty($this->data['hostid'])) {
 $createForm = new CForm('get');
 $createForm->cleanItems();
 $createForm->addVar('hostid', $this->data['hostid']);
+
 if (!empty($this->data['parent_discoveryid'])) {
 	$createForm->addItem(new CSubmit('form', _('Create trigger prototype')));
 	$createForm->addVar('parent_discoveryid', $this->data['parent_discoveryid']);
 	$triggersWidget->addPageHeader(_('CONFIGURATION OF TRIGGER PROTOTYPES'), $createForm);
 }
 else {
-	$createForm->addItem(new CSubmit('form', _('Create trigger')));
+	if (empty($this->data['hostid'])) {
+		$createButton = new CSubmit('form', _('Create trigger (select host first)'));
+		$createButton->setEnabled(false);
+		$createForm->addItem($createButton);
+	}
+	else {
+		$createForm->addItem(new CSubmit('form', _('Create trigger')));
+	}
+
 	$triggersWidget->addPageHeader(_('CONFIGURATION OF TRIGGERS'), $createForm);
 }
 

@@ -778,8 +778,9 @@ function explode_exp($expression, $html = false, $resolve_macro = false, $src_ho
 /**
  * Translate {10}>10 to something like {localhost:system.cpu.load.last(0)}>10.
  *
- * @param $trigger
- * @param bool $html
+ * @param array $trigger
+ * @param bool  $html
+ *
  * @return array|string
  */
 function triggerExpression($trigger, $html = false) {
@@ -896,7 +897,7 @@ function triggerExpression($trigger, $html = false) {
 }
 
 /**
- * Implodes expression, replaces names and keys with IDs
+ * Implodes expression, replaces names and keys with IDs.
  *
  * Fro example: localhost:procload.last(0)>10 will translated to {12}>10 and created database representation.
  *
@@ -908,7 +909,7 @@ function triggerExpression($trigger, $html = false) {
  *
  * @return string Imploded expression (names and keys replaced by IDs)
  */
-function implode_exp($expression, $triggerid, &$hostnames = array()) {
+function implode_exp($expression, $triggerId, &$hostnames = array()) {
 	$expressionData = new CTriggerExpression();
 	if (!$expressionData->parse($expression)) {
 		throw new Exception($expressionData->error);
@@ -918,24 +919,28 @@ function implode_exp($expression, $triggerid, &$hostnames = array()) {
 	$functions = array();
 	$items = array();
 	$triggerFunctionValidator = new CTriggerFunctionValidator();
+
 	foreach ($expressionData->expressions as $exprPart) {
-		if (isset($newFunctions[$exprPart['expression']]))
+		if (isset($newFunctions[$exprPart['expression']])) {
 			continue;
+		}
 
 		if (!isset($items[$exprPart['host']][$exprPart['item']])) {
 			$result = DBselect(
-					'SELECT i.itemid,i.value_type,h.name'.
-					' FROM items i,hosts h'.
-					' WHERE i.key_='.zbx_dbstr($exprPart['item']).
-						' AND '.dbConditionInt('i.flags', array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED, ZBX_FLAG_DISCOVERY_CHILD)).
-						' AND h.host='.zbx_dbstr($exprPart['host']).
-						' AND h.hostid=i.hostid'.
-						andDbNode('i.itemid')
+				'SELECT i.itemid,i.value_type,h.name'.
+				' FROM items i,hosts h'.
+				' WHERE i.key_='.zbx_dbstr($exprPart['item']).
+					' AND '.dbConditionInt('i.flags', array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED, ZBX_FLAG_DISCOVERY_CHILD)).
+					' AND h.host='.zbx_dbstr($exprPart['host']).
+					' AND h.hostid=i.hostid'.
+					andDbNode('i.itemid')
 			);
 			if ($row = DBfetch($result)) {
 				$hostnames[] = $row['name'];
-				$items[$exprPart['host']][$exprPart['item']] =
-						array('itemid' => $row['itemid'], 'valueType' => $row['value_type']);
+				$items[$exprPart['host']][$exprPart['item']] = array(
+					'itemid' => $row['itemid'],
+					'valueType' => $row['value_type']
+				);
 			}
 			else {
 				throw new Exception(_s('Incorrect item key "%1$s" provided for trigger expression on "%2$s".',
@@ -943,7 +948,9 @@ function implode_exp($expression, $triggerid, &$hostnames = array()) {
 			}
 		}
 
-		if (!$triggerFunctionValidator->validate(array('functionName' => $exprPart['functionName'],
+		if (!$triggerFunctionValidator->validate(array(
+				'function' => $exprPart['function'],
+				'functionName' => $exprPart['functionName'],
 				'functionParamList' => $exprPart['functionParamList'],
 				'valueType' => $items[$exprPart['host']][$exprPart['item']]['valueType']))) {
 			throw new Exception($triggerFunctionValidator->getError());
@@ -953,17 +960,17 @@ function implode_exp($expression, $triggerid, &$hostnames = array()) {
 
 		$functions[] = array(
 			'itemid' => $items[$exprPart['host']][$exprPart['item']]['itemid'],
-			'triggerid' => $triggerid,
+			'triggerid' => $triggerId,
 			'function' => $exprPart['functionName'],
 			'parameter' => $exprPart['functionParam']
 		);
 	}
 
-	$functionids = DB::insert('functions', $functions);
+	$functionIds = DB::insert('functions', $functions);
 
 	$num = 0;
 	foreach ($newFunctions as &$newFunction) {
-		$newFunction = $functionids[$num++];
+		$newFunction = $functionIds[$num++];
 	}
 	unset($newFunction);
 
@@ -977,6 +984,47 @@ function implode_exp($expression, $triggerid, &$hostnames = array()) {
 	$hostnames = array_unique($hostnames);
 
 	return $expression;
+}
+
+/**
+ * Get items from expression.
+ *
+ * @param CTriggerExpression $triggerExpression
+ *
+ * @return array
+ */
+function getExpressionItems(CTriggerExpression $triggerExpression) {
+	$items = array();
+	$processedFunctions = array();
+	$processedItems = array();
+
+	foreach ($triggerExpression->expressions as $expression) {
+		if (isset($processedFunctions[$expression['expression']])) {
+			continue;
+		}
+
+		if (!isset($processedItems[$expression['host']][$expression['item']])) {
+			$dbItems = DBselect(
+				'SELECT i.itemid,i.flags'.
+				' FROM items i,hosts h'.
+				' WHERE i.key_='.zbx_dbstr($expression['item']).
+					' AND '.dbConditionInt('i.flags', array(
+						ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED, ZBX_FLAG_DISCOVERY_CHILD
+					)).
+					' AND h.host='.zbx_dbstr($expression['host']).
+					' AND h.hostid=i.hostid'.
+					andDbNode('i.itemid')
+			);
+			if ($dbItem = DBfetch($dbItems)) {
+				$items[] = $dbItem;
+				$processedItems[$expression['host']][$expression['item']] = true;
+			}
+		}
+
+		$processedFunctions[$expression['expression']] = true;
+	}
+
+	return $items;
 }
 
 function check_right_on_trigger_by_expression($permission, $expression) {
@@ -1743,8 +1791,7 @@ function expressionLevelDraw(array $next, $level) {
  *
  * @return integer
  */
-function getExpressionElementsNum(CTriggerExpression $expressionData, $start, $end)
-{
+function getExpressionElementsNum(CTriggerExpression $expressionData, $start, $end) {
 	for ($i = $start, $level = 0, $expressionElementsNum = 1; $i <= $end; $i++) {
 		switch ($expressionData->expression[$i]) {
 			case '(':
@@ -1769,6 +1816,7 @@ function getExpressionElementsNum(CTriggerExpression $expressionData, $start, $e
 				break;
 		}
 	}
+
 	return $expressionElementsNum;
 }
 
@@ -1992,8 +2040,7 @@ function remakeExpression($expression, $expressionId, $action, $newExpression) {
  *
  * @return bool                 returns true if element is found, false - otherwise
  */
-function rebuildExpressionTree(array &$expressionTree, $expressionId, $action, $newExpression, $operand = null)
-{
+function rebuildExpressionTree(array &$expressionTree, $expressionId, $action, $newExpression, $operand = null) {
 	foreach ($expressionTree as $key => $expression) {
 		if ($expressionId == $expressionTree[$key]['id']) {
 			switch ($action) {
@@ -2070,6 +2117,7 @@ function rebuildExpressionTree(array &$expressionTree, $expressionId, $action, $
 			}
 		}
 	}
+
 	return false;
 }
 
@@ -2097,14 +2145,13 @@ function rebuildExpressionTree(array &$expressionTree, $expressionId, $action, $
  * Result:
  *   "{host1:system.cpu.util[,iowait].last(0)} > 50 & {host2:system.cpu.util[,iowait].last(0)} > 50"
  *
- * @param array $expressionTree
- * @param int $level        parameter only for recursive call
- * @param string $operand       parameter only for recursive call
+ * @param array  $expressionTree
+ * @param int    $level				parameter only for recursive call
+ * @param string $operand			parameter only for recursive call
  *
  * @return string
  */
-function makeExpression(array $expressionTree, $level = 0, $operand = null)
-{
+function makeExpression(array $expressionTree, $level = 0, $operand = null) {
 	$expression = '';
 
 	end($expressionTree);
@@ -2125,6 +2172,7 @@ function makeExpression(array $expressionTree, $level = 0, $operand = null)
 			$expression .= ' '.$operand.' ';
 		}
 	}
+
 	return $expression;
 }
 
@@ -2315,8 +2363,8 @@ function evalExpressionData($expression, $rplcts, $oct = false) {
 /**
  * Resolve {TRIGGER.ID} macro in trigger url.
  *
- * @param array $trigger trigger data with url and triggerid
- * @param int $trigger['triggerid']
+ * @param array  $trigger				trigger data with url and triggerid
+ * @param int    $trigger['triggerid']
  * @param string $trigger['url']
  *
  * @return string
@@ -2363,14 +2411,13 @@ function convert($value) {
 }
 
 /**
- * Quoting $param if it contain special characters
+ * Quoting $param if it contain special characters.
  *
  * @param string $param
  *
  * @return string
  */
-function quoteFunctionParam($param)
-{
+function quoteFunctionParam($param) {
 	if (!isset($param[0]) || ($param[0] != '"' && false === strpos($param, ',') && false === strpos($param, ')'))) {
 		return $param;
 	}

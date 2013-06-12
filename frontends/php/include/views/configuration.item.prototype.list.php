@@ -17,8 +17,8 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
+
 $itemsWidget = new CWidget();
 
 // create new item button
@@ -54,8 +54,8 @@ $itemTable->setHeader(array(
 	make_sorting_header(_('History'), 'history', $sortLink),
 	make_sorting_header(_('Trends'), 'trends', $sortLink),
 	make_sorting_header(_('Type'), 'type', $sortLink),
-	make_sorting_header(_('Status'), 'status', $sortLink),
-	_('Applications')
+	_('Applications'),
+	make_sorting_header(_('Status'), 'status', $sortLink)
 ));
 
 foreach ($this->data['items'] as $item) {
@@ -94,8 +94,8 @@ foreach ($this->data['items'] as $item) {
 		$item['history'],
 		in_array($item['value_type'], array(ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT)) ? '' : $item['trends'],
 		item_type2str($item['type']),
-		$status,
 		new CCol($applications, 'wraptext'),
+		$status
 	));
 }
 
@@ -122,5 +122,5 @@ $itemForm->addItem(array($this->data['paging'], $itemTable, $this->data['paging'
 
 // append form to widget
 $itemsWidget->addItem($itemForm);
+
 return $itemsWidget;
-?>
