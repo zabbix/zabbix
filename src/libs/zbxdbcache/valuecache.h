@@ -73,6 +73,9 @@ typedef struct
 	zbx_uint64_t	hits;
 	zbx_uint64_t	misses;
 
+	zbx_uint64_t	used;
+	zbx_uint64_t	total;
+
 	/* 0 - cache is working normally, 1 - cache is working in low memory mode */
 	int		low_memory;
 }
