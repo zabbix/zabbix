@@ -210,12 +210,10 @@ if ($source == EVENT_SOURCE_TRIGGERS) {
 	$pageFilter = new CPageFilter(array(
 		'groups' => array(
 			'monitored_hosts' => true,
-			'with_items' => true,
 			'with_monitored_triggers' => true
 		),
 		'hosts' => array(
 			'monitored_hosts' => true,
-			'with_items' => true,
 			'with_monitored_triggers' => true
 		),
 		'triggers' => array(),
