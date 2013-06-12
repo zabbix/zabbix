@@ -152,7 +152,7 @@ if (uint_in_array($USER_DETAILS['type'], array(USER_TYPE_ZABBIX_ADMIN, USER_TYPE
 			new CSpan($media['description'], 'nowrap'),
 			new CSpan($media['sendto'], 'nowrap'),
 			new CSpan($media['period'], 'nowrap'),
-			media_severity2str($media['severity']),
+			mediaSeverityToArray($media['severity']),
 			$status,
 			new CButton('edit_media', _('Edit'), 'return PopUp("popup_media.php'.$mediaUrl.'", 550, 400);', 'link_menu'))
 		);
