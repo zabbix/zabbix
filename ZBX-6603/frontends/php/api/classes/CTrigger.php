@@ -632,8 +632,9 @@ class CTrigger extends CTriggerGeneral {
 		// adding last event
 		echo "after format: <br>".timer()."<br><br>";
 		if (!is_null($options['selectLastEvent']) && str_in_array($options['selectLastEvent'], $subselectsAllowedOutputs)) {
+			$select = $options['selectLastEvent'] == API_OUTPUT_REFER ? 'e.eventid, e.objectid' : 'e.*';
 			$lastEvents = DBfetchArrayAssoc(DBselect(
-				'SELECT e.* FROM events e JOIN ('.
+				'SELECT '.$select.' FROM events e JOIN ('.
 					'SELECT  max(eventid) as lasteventid FROM events e'.
 					' WHERE '.dbConditionInt('e.objectid', $triggerids).
 					' AND '.DBin_node('e.objectid').
