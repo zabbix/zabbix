@@ -1213,38 +1213,29 @@ class CChart extends CGraphDraw {
 	/**
 	 * Draws Y scale grid.
 	 */
-	private function drawVerticalGrid() {
+	private function drawHorizontalGrid() {
 		$hline_count = round($this->sizeY / $this->gridPixels);
 
 		$yAxis = ($this->yaxisleft) ? GRAPH_YAXIS_SIDE_LEFT : GRAPH_YAXIS_SIDE_RIGHT;
 
 		$tmp_hlines = $this->gridLinesCount[$yAxis];
-		$stepX = $this->gridStepX[$yAxis];
+		$stepY = $this->gridStepX[$yAxis];
 
 		if ($tmp_hlines < $hline_count) {
 			$hline_count = $tmp_hlines * 2;
-			$stepX = $stepX / 2;
+			$stepY = $stepY / 2;
 		}
 		else {
 			$hline_count = $tmp_hlines;
 		}
 
+		$lineColor = $this->getColor($this->graphtheme['maingridcolor'], 0);
+
 		$y = $this->sizeY + $this->shiftY;
 		for ($i = 1; $i < $hline_count; $i++) {
-			$y -= $stepX;
+			$y -= $stepY;
 
-			if ($y < $this->shiftY) {
-				break;
-			}
-
-			dashedLine(
-				$this->im,
-				$this->shiftXleft,
-				$y,
-				$this->sizeX + $this->shiftXleft,
-				$y,
-				$this->getColor($this->graphtheme['maingridcolor'], 0)
-			);
+			dashedLine($this->im, $this->shiftXleft, $y, $this->sizeX + $this->shiftXleft, $y, $lineColor);
 		}
 	}
 
@@ -2401,7 +2392,7 @@ class CChart extends CGraphDraw {
 		$this->drawHeader();
 		$this->drawWorkPeriod();
 		$this->drawTimeGrid();
-		$this->drawVerticalGrid();
+		$this->drawHorizontalGrid();
 		$this->drawXYAxisScale($this->graphtheme['gridbordercolor']);
 
 		$maxX = $this->sizeX;
