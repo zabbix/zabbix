@@ -62,6 +62,7 @@
 
 /* regexp test result table, based on .tableinfo */
 #testResultTable tr td:first-child { width: auto; }
+#testResultTable tr td { padding: 1px 3px; }
 
 /* menu */
 .menu-host { cursor: pointer; }

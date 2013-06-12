@@ -28,7 +28,9 @@ $form->attr('id', 'zabbixRegExpForm');
 $form->addVar('form', 1);
 $form->addVar('regexpid', $this->data['regexpid']);
 
-// Expressions tab
+/*
+ * Expressions tab
+ */
 $exprTab = new CFormList('exprTab');
 $nameTextBox = new CTextBox('name', $this->get('name'), ZBX_TEXTBOX_STANDARD_SIZE, null, 128);
 $nameTextBox->attr('autofocus', 'autofocus');
@@ -59,7 +61,9 @@ $exprTabDiv = new CDiv(array($exprForm, $exprFormFooter), 'objectgroup inlineblo
 $exprTabDiv->addStyle('display: none;');
 $exprTab->addRow(SPACE, $exprTabDiv);
 
-// Test tab
+/*
+ * Test tab
+ */
 $testTab = new CFormList('testTab');
 $testTab->addRow(_('Test string'), new CTextArea('test_string', $this->get('test_string')));
 $preloaderDiv = new CDiv(null, 'preloader', 'testPreloader');
