@@ -148,10 +148,10 @@ if (uint_in_array($USER_DETAILS['type'], array(USER_TYPE_ZABBIX_ADMIN, USER_TYPE
 						'&active='.$media['active'];
 
 		foreach (getSeverityCaption() as $key => $caption) {
-			$style = ($media['severity'] & (1 << $key)) ? 'enabled' : null;
+			$mediaActive = ($media['severity'] & (1 << $key));
 
-			$mediaSeverity[$key] = new CSpan(zbx_substr($caption, 0, 1), $style);
-			$mediaSeverity[$key]->setHint($caption.' ('.($media['severity'] & (1 << $key) ? 'on' : 'off').')');
+			$mediaSeverity[$key] = new CSpan(zbx_substr($caption, 0, 1), $mediaActive ? 'enabled' : NULL);
+			$mediaSeverity[$key]->setHint($caption.($mediaActive ? ' (on)' : ' (off)'));
 		}
 
 		$mediaTableInfo->addRow(array(
