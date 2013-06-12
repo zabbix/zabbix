@@ -515,7 +515,7 @@ if (!empty($this->data['itemid'])) {
 	}
 }
 array_push($buttons, new CButtonCancel(url_param('groupid').url_param('parent_discoveryid').url_param('hostid')));
-$itemForm->addItem(makeFormFooter(array(new CSubmit('save', _('Save'))), $buttons));
+$itemForm->addItem(makeFormFooter(new CSubmit('save', _('Save')), $buttons));
 $itemWidget->addItem($itemForm);
 
 /*

@@ -494,7 +494,7 @@
 		var count = jQuery('#conditionTable tr').length - 1;
 
 		if (count > 1) {
-			jQuery('#conditionRow').css('display', 'block');
+			jQuery('#conditionRow').css('display', '');
 
 			var groupOperator = '',
 				globalOperator = '',

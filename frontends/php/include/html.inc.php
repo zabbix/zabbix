@@ -536,31 +536,26 @@ function get_header_host_table($currentElement, $hostid, $discoveryid = null) {
 	return new CDiv($list, 'objectgroup top ui-widget-content ui-corner-all');
 }
 
-function makeFormFooter($main, $others = null) {
-	if (!is_array($main)) {
-		$main = array($main);
-	}
-	if (!empty($others) && !is_array($others)) {
-		$others = array($others);
+function makeFormFooter($main = null, $others = null) {
+	if ($main) {
+		$main->useJQueryStyle('main');
 	}
 
-	$mainButtons = new CDiv();
-	foreach ($main as $button) {
-		$button->useJQueryStyle('main');
-		$mainButtons->addItem($button);
-	}
 	$othersButtons = new CDiv($others);
 	$othersButtons->useJQueryStyle();
 
 	return new CDiv(
 		new CDiv(
-			array(
-				empty($others) ? new CDiv($mainButtons, 'dt right') : new CDiv($mainButtons, 'dt floatleft right'),
-				new CDiv(array($othersButtons), 'dd left')
+			new CDiv(
+				array(
+					new CDiv($main, 'dt right'),
+					new CDiv($othersButtons, 'dd left')
+				),
+				'formrow'
 			),
-			'formrow'
+			'formtable'
 		),
-		'objectgroup footer min-width ui-widget-content ui-corner-all'
+		'objectgroup footer ui-widget-content ui-corner-all'
 	);
 }
 
