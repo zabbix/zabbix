@@ -48,7 +48,6 @@ class CTrigger extends CTriggerGeneral {
 	 * @return array|int item data as array or false if error
 	 */
 	public function get(array $options = array()) {
-
 		$result = array();
 		$userType = self::$userData['type'];
 		$userid = self::$userData['userid'];
@@ -628,7 +627,6 @@ class CTrigger extends CTriggerGeneral {
 		 * Adding objects
 		 */
 		// adding last event
-
 		if (!is_null($options['selectLastEvent']) && str_in_array($options['selectLastEvent'], $subselectsAllowedOutputs)) {
 			$select = $options['selectLastEvent'] == API_OUTPUT_REFER ? 'e.eventid, e.objectid' : 'e.*';
 			$lastEvents = DBfetchArrayAssoc(DBselect(
