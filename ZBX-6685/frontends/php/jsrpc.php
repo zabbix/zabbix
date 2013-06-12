@@ -232,13 +232,16 @@ switch ($data['method']) {
 	 * @return array(int => array('value' => int, 'text' => string))
 	 */
 	case 'multiselect.get':
+		$config = select_config();
+
 		switch ($data['objectName']) {
 			case 'hostGroup':
 				$hostGroups = API::HostGroup()->get(array(
 					'editable' => isset($data['editable']) ? $data['editable'] : null,
 					'output' => array('groupid', 'name'),
 					'startSearch' => true,
-					'search' => isset($data['search']) ? array('name' => $data['search']) : null
+					'search' => isset($data['search']) ? array('name' => $data['search']) : null,
+					'limit' => $config['search_limit']
 				));
 
 				if ($hostGroups) {
@@ -271,7 +274,8 @@ switch ($data['method']) {
 					'editable' => isset($data['editable']) ? $data['editable'] : null,
 					'output' => array('hostid', 'name'),
 					'startSearch' => true,
-					'search' => isset($data['search']) ? array('name' => $data['search']) : null
+					'search' => isset($data['search']) ? array('name' => $data['search']) : null,
+					'limit' => $config['search_limit']
 				));
 
 				if ($hosts) {
@@ -298,7 +302,8 @@ switch ($data['method']) {
 					'editable' => isset($data['editable']) ? $data['editable'] : null,
 					'output' => array('templateid', 'name'),
 					'startSearch' => true,
-					'search' => isset($data['search']) ? array('name' => $data['search']) : null
+					'search' => isset($data['search']) ? array('name' => $data['search']) : null,
+					'limit' => $config['search_limit']
 				));
 
 				if ($templates) {
@@ -325,7 +330,8 @@ switch ($data['method']) {
 					'hostids' => zbx_toArray($data['hostid']),
 					'output' => array('applicationid', 'name'),
 					'startSearch' => true,
-					'search' => isset($data['search']) ? array('name' => $data['search']) : null
+					'search' => isset($data['search']) ? array('name' => $data['search']) : null,
+					'limit' => $config['search_limit']
 				));
 
 				if ($applications) {
@@ -353,7 +359,8 @@ switch ($data['method']) {
 					'output' => array('triggerid', 'description'),
 					'selectHosts' => array('name'),
 					'startSearch' => true,
-					'search' => isset($data['search']) ? array('description' => $data['search']) : null
+					'search' => isset($data['search']) ? array('description' => $data['search']) : null,
+					'limit' => $config['search_limit']
 				));
 
 				if ($triggers) {
