@@ -174,7 +174,6 @@ function make_favorite_maps() {
 }
 
 function make_system_status($filter) {
-	echo "r start: <br>".timer()."<br><br>";
 	$ackParams = array();
 	if (!empty($filter['screenid'])) {
 		$ackParams['screenid'] = $filter['screenid'];
@@ -362,7 +361,7 @@ function make_system_status($filter) {
 	}
 
 	$script = new CJSScript(get_js("jQuery('#hat_syssum_footer').html('"._s('Updated: %s', zbx_date2str(_('H:i:s')))."')"));
-	echo "r end: <br>".timer()."<br><br>";
+
 	return new CDiv(array($table, $script));
 }
 

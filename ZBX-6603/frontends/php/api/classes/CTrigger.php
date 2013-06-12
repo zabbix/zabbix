@@ -49,8 +49,6 @@ class CTrigger extends CTriggerGeneral {
 	 */
 	public function get(array $options = array()) {
 
-		echo "start: <br>".timer()."<br><br>";
-
 		$result = array();
 		$userType = self::$userData['type'];
 		$userid = self::$userData['userid'];
@@ -585,9 +583,9 @@ class CTrigger extends CTriggerGeneral {
 			}
 			return $result;
 		}
-		echo "bef fetch: <br>".timer()."<br><br>";
+
 		$triggers = zbx_toHash($this->customFetch($this->createSelectQueryFromParts($sqlParts), $options), 'triggerid');
-		echo "after fetch: <br>".timer()."<br><br>";
+
 		// return count for post SQL filtered result sets
 		if (!is_null($options['countOutput'])) {
 			return count($triggers);
@@ -630,7 +628,7 @@ class CTrigger extends CTriggerGeneral {
 		 * Adding objects
 		 */
 		// adding last event
-		echo "after format: <br>".timer()."<br><br>";
+
 		if (!is_null($options['selectLastEvent']) && str_in_array($options['selectLastEvent'], $subselectsAllowedOutputs)) {
 			$select = $options['selectLastEvent'] == API_OUTPUT_REFER ? 'e.eventid, e.objectid' : 'e.*';
 			$lastEvents = DBfetchArrayAssoc(DBselect(
@@ -648,7 +646,7 @@ class CTrigger extends CTriggerGeneral {
 				$result[$triggerId]['lastEvent'] = isset($lastEvents[$triggerId]) ? $lastEvents[$triggerId] : array();
 			}
 		}
-		echo "after last events: <br>".timer()."<br><br>";
+
 		// adding trigger dependencies
 		if (!is_null($options['selectDependencies']) && str_in_array($options['selectDependencies'], $subselectsAllowedOutputs)) {
 			$deps = array();
@@ -682,7 +680,7 @@ class CTrigger extends CTriggerGeneral {
 				}
 			}
 		}
-		echo "after dep: <br>".timer()."<br><br>";
+
 		// adding groups
 		if ($options['groupids'] !== null && $options['selectGroups'] === null) {
 			$options['selectGroups'] = API_OUTPUT_REFER;
@@ -704,7 +702,7 @@ class CTrigger extends CTriggerGeneral {
 				}
 			}
 		}
-		echo "after groups: <br>".timer()."<br><br>";
+
 		// adding hosts
 		if ($options['hostids'] !== null && $options['selectHosts'] === null) {
 			$options['selectHosts'] = API_OUTPUT_REFER;
@@ -762,7 +760,7 @@ class CTrigger extends CTriggerGeneral {
 				}
 			}
 		}
-		echo "after hosts: <br>".timer()."<br><br>";
+
 		// adding functions
 		if (!is_null($options['selectFunctions']) && str_in_array($options['selectFunctions'], $subselectsAllowedOutputs)) {
 			if ($options['selectFunctions'] == API_OUTPUT_EXTEND) {
@@ -784,7 +782,7 @@ class CTrigger extends CTriggerGeneral {
 				$result[$triggerid]['functions'][] = $function;
 			}
 		}
-		echo "after fun: <br>".timer()."<br><br>";
+
 		// adding items
 		if ($options['itemids'] !== null && $options['selectItems'] === null) {
 			$options['selectItems'] = API_OUTPUT_REFER;
@@ -808,7 +806,7 @@ class CTrigger extends CTriggerGeneral {
 				}
 			}
 		}
-		echo "after item: <br>".timer()."<br><br>";
+
 		// adding discoveryrule
 		if (!is_null($options['selectDiscoveryRule'])) {
 			$ruleids = $ruleMap = array();
@@ -843,12 +841,12 @@ class CTrigger extends CTriggerGeneral {
 				}
 			}
 		}
-		echo "after drule: <br>".timer()."<br><br>";
+
 		// expandDescription
 		if (!is_null($options['expandDescription']) && $result && array_key_exists('description', reset($result))) {
 			$result = CTriggerHelper::batchExpandDescription($result);
 		}
-		echo "after expand: <br>".timer()."<br><br>";
+
 		// expand expression
 		if ($options['expandExpression'] !== null) {
 			foreach ($result as &$trigger) {
@@ -871,7 +869,7 @@ class CTrigger extends CTriggerGeneral {
 		if (is_null($options['preservekeys'])) {
 			$result = zbx_cleanHashes($result);
 		}
-		echo "end: <br>".timer()."<br><br>";
+
 		return $result;
 	}
 
