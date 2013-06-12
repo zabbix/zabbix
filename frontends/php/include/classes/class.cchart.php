@@ -1214,28 +1214,20 @@ class CChart extends CGraphDraw {
 	 * Draws Y scale grid.
 	 */
 	private function drawHorizontalGrid() {
-		$hline_count = round($this->sizeY / $this->gridPixels);
+		$yAxis = $this->yaxisleft ? GRAPH_YAXIS_SIDE_LEFT : GRAPH_YAXIS_SIDE_RIGHT;
 
-		$yAxis = ($this->yaxisleft) ? GRAPH_YAXIS_SIDE_LEFT : GRAPH_YAXIS_SIDE_RIGHT;
-
-		$tmp_hlines = $this->gridLinesCount[$yAxis];
 		$stepY = $this->gridStepX[$yAxis];
 
-		if ($tmp_hlines < $hline_count) {
-			$hline_count = $tmp_hlines * 2;
+		if ($this->gridLinesCount[$yAxis] < round($this->sizeY / $this->gridPixels)) {
 			$stepY = $stepY / 2;
 		}
-		else {
-			$hline_count = $tmp_hlines;
-		}
 
+		$xLeft = $this->shiftXleft;
+		$xRight = $this->shiftXleft + $this->sizeX;
 		$lineColor = $this->getColor($this->graphtheme['maingridcolor'], 0);
 
-		$y = $this->sizeY + $this->shiftY;
-		for ($i = 1; $i < $hline_count; $i++) {
-			$y -= $stepY;
-
-			dashedLine($this->im, $this->shiftXleft, $y, $this->sizeX + $this->shiftXleft, $y, $lineColor);
+		for ($y = $this->shiftY + $this->sizeY - $stepY; $y > $this->shiftY; $y -= $stepY) {
+			dashedLine($this->im, $xLeft, $y, $xRight, $y, $lineColor);
 		}
 	}
 
