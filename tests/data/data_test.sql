@@ -697,8 +697,8 @@ INSERT INTO interface (type, ip, dns, useip, port, main, hostid, interfaceid) VA
 INSERT INTO hosts_templates (hosttemplateid, hostid, templateid) VALUES (30000, 30001, 30000);
 
 -- add discoveryRuleTest for prototype testing
-INSERT INTO items (name, key_, hostid, value_type, itemid, flags, delay, params, description) VALUES ('discoveryRuleTest', 'discovery-rule-test', 30000, 4, 23500, 1, 50, '', '');
-INSERT INTO items (name, key_, hostid, value_type, itemid, flags, templateid, delay, params, description) VALUES ('discoveryRuleTest', 'discovery-rule-test', 30001, 4, 23501, 1, 23500, 50, '', '');
+INSERT INTO items (name, key_, hostid, value_type, itemid, flags, delay, params, description) VALUES ('discoveryRuleTest', 'discovery-rule-test', 30000, 4, 23700, 1, 50, '', '');
+INSERT INTO items (name, key_, hostid, value_type, itemid, flags, templateid, delay, params, description) VALUES ('discoveryRuleTest', 'discovery-rule-test', 30001, 4, 23701, 1, 23700, 50, '', '');
 
 -- add list of discovery rules for simpleCreate tests
 INSERT INTO items (name, key_, hostid, value_type, itemid, flags, delay, params, description) VALUES ('testInheritanceDiscoveryRule1', 'discovery-rule-inheritance1', 30000, 4, 33500, 1, 50, '', '');
