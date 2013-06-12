@@ -73,6 +73,7 @@ A.F.I...S. [ZBXNEXT-1186] increased length to 2048 characters of expression fiel
 ........S. [ZBXNEXT-1663] added support for notification macros {TRIGGER.NAME.ORIG}, {ITEM.NAME.ORIG}, {ITEM.KEY.ORIG} (dimir)
 
 Bug fixes:
+...G...... [ZBXNEXT-1550] fixed agent crash on Microsoft Windows (Andris)
 ..F....... [ZBX-6679] fixed monitoring event filter, must ignore groups and hosts without active triggers (Eduard)
 ..F....... [ZBX-6685] fixed multiselect available data sorting in jsrpc (Eduard)
 A......... [ZBX-6356] fixed displaying web scenarios for administrator users (Ivo)
