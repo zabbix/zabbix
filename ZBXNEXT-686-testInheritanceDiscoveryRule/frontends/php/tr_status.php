@@ -296,7 +296,7 @@ $severityComboBox->addItems(array(
 	TRIGGER_SEVERITY_HIGH => getSeverityCaption(TRIGGER_SEVERITY_HIGH),
 	TRIGGER_SEVERITY_DISASTER => getSeverityCaption(TRIGGER_SEVERITY_DISASTER)
 ));
-$filterForm->addRow(_('Min severity'), $severityComboBox);
+$filterForm->addRow(_('Minimum trigger severity'), $severityComboBox);
 
 $statusChangeDays = new CNumericBox('status_change_days', $_REQUEST['status_change_days'], 4);
 if (!$_REQUEST['status_change']) {
@@ -447,9 +447,8 @@ if ($config['event_ack_enable']) {
 	$eventCounts = API::Event()->get(array(
 		'countOutput' => true,
 		'groupCount' => true,
-		'triggerids' => $triggerIds,
+		'objectids' => $triggerIds,
 		'filter' => array(
-			'object' => EVENT_OBJECT_TRIGGER,
 			'acknowledged' => 0,
 			'value' => TRIGGER_VALUE_TRUE
 		),
@@ -475,10 +474,7 @@ if ($config['event_ack_enable']) {
 		$allEventCounts = API::Event()->get(array(
 			'countOutput' => true,
 			'groupCount' => true,
-			'triggerids' => $triggerIdsWithoutUnackEvents,
-			'filter' => array(
-				'object' => EVENT_OBJECT_TRIGGER
-			),
+			'objectids' => $triggerIdsWithoutUnackEvents,
 			'nopermissions' => true
 		));
 		$allEventCounts = zbx_toHash($allEventCounts, 'objectid');
@@ -494,7 +490,7 @@ if ($config['event_ack_enable']) {
 if ($showEvents != EVENTS_OPTION_NOEVENT) {
 	$options = array(
 		'nodeids' => get_current_nodeid(),
-		'triggerids' => zbx_objectValues($triggers, 'triggerid'),
+		'objectids' => zbx_objectValues($triggers, 'triggerid'),
 		'output' => API_OUTPUT_EXTEND,
 		'select_acknowledges' => API_OUTPUT_COUNT,
 		'time_from' => time() - $config['event_expire'] * SEC_PER_DAY,
@@ -766,7 +762,7 @@ foreach ($triggers as $trigger) {
 
 	// unknown triggers
 	$unknown = SPACE;
-	if ($trigger['value_flags'] == TRIGGER_VALUE_FLAG_UNKNOWN) {
+	if ($trigger['state'] == TRIGGER_STATE_UNKNOWN) {
 		$unknown = new CDiv(SPACE, 'status_icon iconunknown');
 		$unknown->setHint($trigger['error'], '', 'on');
 	}

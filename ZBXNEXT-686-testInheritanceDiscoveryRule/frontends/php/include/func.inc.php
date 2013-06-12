@@ -270,18 +270,19 @@ function zbx_date2str($format, $value = null) {
 		}
 	}
 
-	$output .= zbx_strlen($part) > 0 ? date($part, $value) : '';
+	$output .= (zbx_strlen($part) > 0) ? date($part, $value) : '';
+
 	return $output;
 }
 
 // calculate and convert timestamp to string representation
-function zbx_date2age($start_date, $end_date = 0, $utime = false) {
+function zbx_date2age($startDate, $endDate = 0, $utime = false) {
 	if (!$utime) {
-		$start_date = date('U', $start_date);
-		$end_date = !empty($end_date) ? date('U', $end_date) : time();
+		$startDate = date('U', $startDate);
+		$endDate = $endDate ? date('U', $endDate) : time();
 	}
 
-	return convertUnitsS(abs($end_date - $start_date));
+	return convertUnitsS(abs($endDate - $startDate));
 }
 
 function zbxDateToTime($strdate) {
@@ -437,71 +438,113 @@ function convertUnitsUptime($value) {
 	return $value;
 }
 
+/**
+ * Converts a time period to a human-readable format.
+ *
+ * The following units are used: years, months, days, hours, minutes, seconds and milliseconds.
+ *
+ * Only the three highest units are displayed: #y #m #d, #m #d #h, #d #h #mm and so on.
+ *
+ * If some value is equal to zero, it is omitted. For example, if the period is 1y 0m 4d, it will be displayed as
+ * 1y 4d, not 1y 0m 4d or 1y 4d #h.
+ *
+ * @param int $value	time period in seconds
+ *
+ * @return string
+ */
 function convertUnitsS($value) {
-	if (floor(abs($value) * 1000) == 0) {
-		$value = ($value == 0) ? '0'._x('s', 'second short') : '< 1'._x('ms', 'millisecond short');
-		return $value;
-	}
-
-	if (($secs = round($value * 1000) / 1000) < 0) {
-		$value = '-';
+	if (($secs = round($value * 1000, ZBX_UNITS_ROUNDOFF_UPPER_LIMIT) / 1000) < 0) {
 		$secs = -$secs;
+		$str = '-';
 	}
 	else {
-		$value = '';
+		$str = '';
 	}
+
+	$values = array('y' => null, 'm' => null, 'd' => null, 'h' => null, 'mm' => null, 's' => null, 'ms' => null);
 	$n_unit = 0;
 
 	if (($n = floor($secs / SEC_PER_YEAR)) != 0) {
-		$value .= $n._x('y', 'year short').' ';
 		$secs -= $n * SEC_PER_YEAR;
-		if (0 == $n_unit) {
+		if ($n_unit == 0) {
 			$n_unit = 4;
 		}
+		$values['y'] = $n;
 	}
 
 	if (($n = floor($secs / SEC_PER_MONTH)) != 0) {
-		$value .= $n._x('m', 'month short').' ';
 		$secs -= $n * SEC_PER_MONTH;
-		if (0 == $n_unit) {
-			$n_unit = 3;
+		// due to imprecise calculations it is possible that the remainder contains 12 whole months but no whole years
+		if ($n == 12) {
+			$values['y']++;
+			$values['m'] = null;
+			if ($n_unit == 0) {
+				$n_unit = 4;
+			}
+		}
+		else {
+			$values['m'] = $n;
+			if ($n_unit == 0) {
+				$n_unit = 3;
+			}
 		}
 	}
 
 	if (($n = floor($secs / SEC_PER_DAY)) != 0) {
-		$value .= $n._x('d', 'day short').' ';
 		$secs -= $n * SEC_PER_DAY;
-		if (0 == $n_unit) {
+		$values['d'] = $n;
+		if ($n_unit == 0) {
 			$n_unit = 2;
 		}
 	}
 
 	if ($n_unit < 4 && ($n = floor($secs / SEC_PER_HOUR)) != 0) {
-		$value .= $n._x('h', 'hour short').' ';
 		$secs -= $n * SEC_PER_HOUR;
-		if (0 == $n_unit) {
+		$values['h'] = $n;
+		if ($n_unit == 0) {
 			$n_unit = 1;
 		}
 	}
 
 	if ($n_unit < 3 && ($n = floor($secs / SEC_PER_MIN)) != 0) {
-		$value .= $n._x('m', 'minute short').' ';
 		$secs -= $n * SEC_PER_MIN;
+		$values['mm'] = $n;
 	}
 
 	if ($n_unit < 2 && ($n = floor($secs)) != 0) {
-		$value .= $n._x('s', 'second short').' ';
 		$secs -= $n;
+		$values['s'] = $n;
 	}
 
-	if ($n_unit < 1 && ($n = round($secs * 1000)) != 0) {
-		$value .= $n._x('ms', 'millisecond short');
+	if ($n_unit < 1 && ($n = round($secs * 1000, ZBX_UNITS_ROUNDOFF_UPPER_LIMIT)) != 0) {
+		$values['ms'] = $n;
 	}
 
-	return rtrim($value);
+	$str .= isset($values['y']) ? $values['y']._x('y', 'year short').' ' : '';
+	$str .= isset($values['m']) ? $values['m']._x('m', 'month short').' ' : '';
+	$str .= isset($values['d']) ? $values['d']._x('d', 'day short').' ' : '';
+	$str .= isset($values['h']) ? $values['h']._x('h', 'hour short').' ' : '';
+	$str .= isset($values['mm']) ? $values['mm']._x('m', 'minute short').' ' : '';
+	$str .= isset($values['s']) ? $values['s']._x('s', 'second short').' ' : '';
+	$str .= isset($values['ms']) ? $values['ms']._x('ms', 'millisecond short') : '';
+
+	return $str ? rtrim($str) : 0;
 }
 
-function convert_units($value, $units, $convert = ITEM_CONVERT_WITH_UNITS) {
+/**
+ * Converts value to actual value.
+ * Example:
+ * 	6442450944 B convert to 6 GB
+ *
+ * @param string $value
+ * @param string $units
+ * @param string $convert
+ * @param string $byteStep
+ * @param string $pow
+ *
+ * @return string
+ */
+function convert_units($value, $units, $convert = ITEM_CONVERT_WITH_UNITS, $byteStep = false, $pow = false) {
 	// special processing for unix timestamps
 	if ($units == 'unixtime') {
 		return zbx_date2str(_('Y.m.d H:i:s'), $value);
@@ -521,7 +564,7 @@ function convert_units($value, $units, $convert = ITEM_CONVERT_WITH_UNITS) {
 	// black list wich do not require units metrics..
 	$blackList = array('%', 'ms', 'rpm', 'RPM');
 
-	if (in_array($units, $blackList) || (zbx_empty($units) && ($convert == ITEM_CONVERT_WITH_UNITS || $value < 1))) {
+	if (in_array($units, $blackList) || (zbx_empty($units) && ($convert == ITEM_CONVERT_WITH_UNITS))) {
 		if (abs($value) >= ZBX_UNITS_ROUNDOFF_THRESHOLD) {
 			$value = round($value, ZBX_UNITS_ROUNDOFF_UPPER_LIMIT);
 		}
@@ -537,17 +580,23 @@ function convert_units($value, $units, $convert = ITEM_CONVERT_WITH_UNITS) {
 		}
 	}
 
-	switch ($units) {
-		case 'Bps':
-		case 'B':
-			$step = 1024;
-			$convert = $convert ? $convert : ITEM_CONVERT_NO_UNITS;
-			break;
-		case 'b':
-		case 'bps':
-			$convert = $convert ? $convert : ITEM_CONVERT_NO_UNITS;
-		default:
-			$step = 1000;
+	// if one or more items is B or Bps, then Y-scale use base 8 and calculated in bytes
+	if ($byteStep) {
+		$step = 1024;
+	}
+	else {
+		switch ($units) {
+			case 'Bps':
+			case 'B':
+				$step = 1024;
+				$convert = $convert ? $convert : ITEM_CONVERT_NO_UNITS;
+				break;
+			case 'b':
+			case 'bps':
+				$convert = $convert ? $convert : ITEM_CONVERT_NO_UNITS;
+			default:
+				$step = 1000;
+		}
 	}
 
 	// init intervals
@@ -585,7 +634,8 @@ function convert_units($value, $units, $convert = ITEM_CONVERT_WITH_UNITS) {
 	}
 
 	$valUnit = array('pow' => 0, 'short' => '', 'long' => '', 'value' => $value);
-	if ($abs > 999 || $abs < 0.001) {
+
+	if ($pow === false || $value == 0) {
 		foreach ($digitUnits[$step] as $dnum => $data) {
 			if (bccomp($abs, $data['value']) > -1) {
 				$valUnit = $data;
@@ -594,12 +644,27 @@ function convert_units($value, $units, $convert = ITEM_CONVERT_WITH_UNITS) {
 				break;
 			}
 		}
-		if (round($valUnit['value'], 6) > 0) {
-			$valUnit['value'] = bcdiv(sprintf('%.6f',$value), sprintf('%.6f', $valUnit['value']), 6);
+	}
+	else {
+		foreach ($digitUnits[$step] as $data) {
+			if ($pow == $data['pow']) {
+				$valUnit = $data;
+				break;
+			}
+		}
+	}
+
+	if (round($valUnit['value'], ZBX_UNITS_ROUNDOFF_LOWER_LIMIT) > 0) {
+		if ($valUnit['pow'] >= 0) {
+			$valUnit['value'] = bcdiv(sprintf('%.6f',$value), sprintf('%.6f', $valUnit['value']),
+				ZBX_UNITS_ROUNDOFF_LOWER_LIMIT);
 		}
 		else {
-			$valUnit['value'] = 0;
+			$valUnit['value'] = bcdiv(sprintf('%.10f',$value), sprintf('%.10f', $valUnit['value']), ZBX_PRECISION_10);
 		}
+	}
+	else {
+		$valUnit['value'] = 0;
 	}
 
 	switch ($convert) {
@@ -610,6 +675,11 @@ function convert_units($value, $units, $convert = ITEM_CONVERT_WITH_UNITS) {
 
 	$value = preg_replace('/^([\-0-9]+)(\.)([0-9]*)[0]+$/U','$1$2$3', round($valUnit['value'], ZBX_UNITS_ROUNDOFF_UPPER_LIMIT));
 	$value = rtrim($value, '.');
+
+	// fix negative zero
+	if (bccomp($value, 0) == 0) {
+		$value = 0;
+	}
 
 	return rtrim(sprintf('%s %s%s', $value, $desc, $units));
 }
@@ -644,7 +714,7 @@ function convertFunctionValue($value) {
 				$value = bcmul($value, '604800');
 				break;
 			case 'K':
-				$value = bcmul($value, '1000');
+				$value = bcmul($value, '1024');
 				break;
 			case 'M':
 				$value = bcmul($value, '1048576');
@@ -1123,17 +1193,15 @@ function order_result(&$data, $sortfield = null, $sortorder = ZBX_SORT_UP) {
 }
 
 function order_by($def, $allways = '') {
-	global $page;
-
 	$orderString = '';
 
-	$sortField = get_request('sort', CProfile::get('web.'.$page['file'].'.sort', null));
+	$sortField = getPageSortField();
 	$sortable = explode(',', $def);
 	if (!str_in_array($sortField, $sortable)) {
 		$sortField = null;
 	}
 	if ($sortField !== null) {
-		$sortOrder = get_request('sortorder', CProfile::get('web.'.$page['file'].'.sortorder', ZBX_SORT_UP));
+		$sortOrder = getPageSortOrder();
 		$orderString .= $sortField.' '.$sortOrder;
 	}
 	if (!empty($allways)) {
@@ -1509,12 +1577,20 @@ function array_equal(array $a, array $b, $strict=false) {
 }
 
 /*************** PAGE SORTING ******************/
-// checking, setting AND saving sort params
+
+/**
+ * Get the sort and sort order parameters for the current page and save it into profiles.
+ *
+ * @param string $sort
+ * @param string $sortorder
+ *
+ * @retur void
+ */
 function validate_sort_and_sortorder($sort = null, $sortorder = ZBX_SORT_UP) {
 	global $page;
 
-	$_REQUEST['sort'] = get_request('sort', CProfile::get('web.'.$page['file'].'.sort', $sort));
-	$_REQUEST['sortorder'] = get_request('sortorder', CProfile::get('web.'.$page['file'].'.sortorder', $sortorder));
+	$_REQUEST['sort'] = getPageSortField($sort);
+	$_REQUEST['sortorder'] = getPageSortOrder($sortorder);
 
 	if (!is_null($_REQUEST['sort'])) {
 		$_REQUEST['sort'] = preg_replace('/[^a-z\.\_]/i', '', $_REQUEST['sort']);
@@ -1578,16 +1654,34 @@ function make_sorting_header($obj, $tabfield, $url = '') {
 	return $col;
 }
 
-function getPageSortField($default) {
+/**
+ * Returns the sort field for the current page.
+ *
+ * @param string $default
+ *
+ * @return string
+ */
+function getPageSortField($default = null) {
 	global $page;
 
-	return get_request('sort', CProfile::get('web.'.$page['file'].'.sort', $default));
+	$sort = get_request('sort', CProfile::get('web.'.$page['file'].'.sort'));
+
+	return ($sort) ? $sort : $default;
 }
 
+/**
+ * Returns the sort order for the current page.
+ *
+ * @param string $default
+ *
+ * @return string
+ */
 function getPageSortOrder($default = ZBX_SORT_UP) {
 	global $page;
 
-	return get_request('sortorder', CProfile::get('web.'.$page['file'].'.sortorder', $default));
+	$sortorder = get_request('sortorder', CProfile::get('web.'.$page['file'].'.sortorder', $default));
+
+	return ($sortorder) ? $sortorder : $default;
 }
 
 /**
@@ -2286,23 +2380,22 @@ function get_status() {
 
 	// items
 	$dbItems = DBselect(
-		'SELECT COUNT(*) AS cnt,i.status'.
+		'SELECT COUNT(i.itemid) AS cnt,i.status,i.state'.
 				' FROM items i'.
 				' INNER JOIN hosts h ON i.hostid=h.hostid'.
 				' WHERE h.status='.HOST_STATUS_MONITORED.
-				' AND '.dbConditionInt('i.status', array(ITEM_STATUS_ACTIVE, ITEM_STATUS_DISABLED, ITEM_STATUS_NOTSUPPORTED)).
-				' GROUP BY i.status');
+				' GROUP BY i.status,i.state');
 	while ($dbItem = DBfetch($dbItems)) {
-		switch ($dbItem['status']) {
-			case ITEM_STATUS_ACTIVE:
+		if ($dbItem['status'] == ITEM_STATUS_ACTIVE) {
+			if ($dbItem['state'] == ITEM_STATE_NORMAL) {
 				$status['items_count_monitored'] = $dbItem['cnt'];
-				break;
-			case ITEM_STATUS_DISABLED:
-				$status['items_count_disabled'] = $dbItem['cnt'];
-				break;
-			case ITEM_STATUS_NOTSUPPORTED:
+			}
+			else {
 				$status['items_count_not_supported'] = $dbItem['cnt'];
-				break;
+			}
+		}
+		elseif ($dbItem['status'] == ITEM_STATUS_DISABLED) {
+			$status['items_count_disabled'] += $dbItem['cnt'];
 		}
 	}
 	$status['items_count'] = $status['items_count_monitored'] + $status['items_count_disabled']

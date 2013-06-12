@@ -477,46 +477,45 @@ DB_RESULT	DBselectN(const char *query, int n)
 
 /******************************************************************************
  *                                                                            *
- * Function: DBget_trigger_update_sql                                         *
+ * Function: process_trigger                                                  *
  *                                                                            *
- * Purpose: generates sql statement for updating trigger value                *
+ * Purpose: 1) generate sql statement for updating trigger                    *
+ *          2) add events                                                     *
+ *          3) update cached trigger                                          *
  *                                                                            *
- * Parameters: add_event      - [OUT] 0 - do not add event                    *
- *                                    1 - generate new event                  *
+ * Return value: SUCCEED - trigger processed successfully                     *
+ *               FAIL    - no changes                                         *
  *                                                                            *
- * Return value: SUCCEED - sql statement generated successfully               *
- *               FAIL    - trigger update isn't required                      *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments: do not update value if there are dependencies with value PROBLEM *
+ * Comments: do not process if there are dependencies with value PROBLEM      *
  *                                                                            *
  ******************************************************************************/
-int	DBget_trigger_update_sql(char **sql, size_t *sql_alloc, size_t *sql_offset, zbx_uint64_t triggerid,
-		unsigned char type, int value, int value_flags, const char *error, int lastchange,
-		int new_value, const char *new_error, int new_lastchange, unsigned char *add_event)
+static int	process_trigger(char **sql, size_t *sql_alloc, size_t *sql_offset, const DC_TRIGGER *trigger)
 {
-	const char	*__function_name = "DBget_trigger_update_sql";
+	const char	*__function_name = "process_trigger";
+
 	const char	*new_error_local;
 	char		*new_error_esc;
-	int		new_value_flags, value_changed, value_flags_changed, multiple_problem, error_changed,
-			ret = FAIL;
+	int		new_state, new_value, new_lastchange, value_changed, state_changed, multiple_problem,
+			error_changed, ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() triggerid:" ZBX_FS_UI64 " value:%d(%d) new_value:%d",
-			__function_name, triggerid, value, value_flags, new_value);
+			__function_name, trigger->triggerid, trigger->value, trigger->state, trigger->new_value);
 
-	if (TRIGGER_VALUE_UNKNOWN == new_value)
+	if (TRIGGER_VALUE_UNKNOWN == trigger->new_value)
 	{
-		new_value_flags = TRIGGER_VALUE_FLAG_UNKNOWN;
-		new_value = value;
+		new_state = TRIGGER_STATE_UNKNOWN;
+		new_value = trigger->value;
 	}
 	else
-		new_value_flags = TRIGGER_VALUE_FLAG_NORMAL;
+	{
+		new_state = TRIGGER_STATE_NORMAL;
+		new_value = trigger->new_value;
+	}
 
 	/**************************************************************************************************/
 	/*                                                                                                */
 	/* The following table shows in which cases trigger should be updated and/or events should be     */
-	/* generated. Trigger state changes from state "from" to state "to":                              */
+	/* generated. Trigger value(state) changes from state "from" to state "to":                       */
 	/*                                                                                                */
 	/*   _          |                                                                                 */
 	/*    \__ to    |                                                                                 */
@@ -545,18 +544,19 @@ int	DBget_trigger_update_sql(char **sql, size_t *sql_alloc, size_t *sql_offset, 
 	/*                                                                                                */
 	/**************************************************************************************************/
 
-	*add_event = 0;
-	new_error_local = (NULL == new_error ? "" : new_error);
+	new_error_local = (NULL == trigger->new_error ? "" : trigger->new_error);
+	new_lastchange = trigger->timespec.sec;
 
-	value_changed = (value != new_value || (0 == lastchange && TRIGGER_VALUE_FLAG_UNKNOWN != new_value_flags));
-	value_flags_changed = (value_flags != new_value_flags);
-	multiple_problem = (TRIGGER_TYPE_MULTIPLE_TRUE == type && TRIGGER_VALUE_PROBLEM == new_value &&
-			TRIGGER_VALUE_FLAG_NORMAL == new_value_flags);
-	error_changed = (0 != strcmp(error, new_error_local));
+	value_changed = (trigger->value != new_value ||
+			(0 == trigger->lastchange && TRIGGER_STATE_UNKNOWN != new_state));
+	state_changed = (trigger->state != new_state);
+	multiple_problem = (TRIGGER_TYPE_MULTIPLE_TRUE == trigger->type && TRIGGER_VALUE_PROBLEM == new_value &&
+			TRIGGER_STATE_NORMAL == new_state);
+	error_changed = (0 != strcmp(trigger->error, new_error_local));
 
-	if (0 != value_changed || 0 != value_flags_changed || 0 != multiple_problem || 0 != error_changed)
+	if (0 != value_changed || 0 != state_changed || 0 != multiple_problem || 0 != error_changed)
 	{
-		if (SUCCEED == DCconfig_check_trigger_dependencies(triggerid))
+		if (SUCCEED == DCconfig_check_trigger_dependencies(trigger->triggerid))
 		{
 			if (NULL == *sql)
 			{
@@ -568,23 +568,32 @@ int	DBget_trigger_update_sql(char **sql, size_t *sql_alloc, size_t *sql_offset, 
 
 			if (0 != value_changed || 0 != multiple_problem)
 			{
-				DCconfig_set_trigger_value(triggerid, new_value, new_value_flags, new_error_local,
+				DCconfig_set_trigger_value(trigger->triggerid, new_value, new_state, new_error_local,
 						&new_lastchange);
 
-				*add_event = 1;
+				add_event(0, EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, trigger->triggerid,
+						&trigger->timespec, new_value, trigger->description,
+						trigger->expression_orig, trigger->priority, trigger->type);
+
 				zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "lastchange=%d,", new_lastchange);
 			}
 			else
 			{
-				DCconfig_set_trigger_value(triggerid, new_value, new_value_flags, new_error_local,
+				DCconfig_set_trigger_value(trigger->triggerid, new_value, new_state, new_error_local,
 						NULL);
 			}
 
 			if (0 != value_changed)
 				zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "value=%d,", new_value);
 
-			if (0 != value_flags_changed)
-				zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "value_flags=%d,", new_value_flags);
+			if (0 != state_changed)
+			{
+				add_event(0, EVENT_SOURCE_INTERNAL, EVENT_OBJECT_TRIGGER, trigger->triggerid,
+						&trigger->timespec, new_state, trigger->description,
+						trigger->expression_orig, trigger->priority, trigger->type);
+
+				zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "state=%d,", new_state);
+			}
 
 			if (0 != error_changed)
 			{
@@ -595,7 +604,8 @@ int	DBget_trigger_update_sql(char **sql, size_t *sql_alloc, size_t *sql_offset, 
 
 			(*sql_offset)--;
 
-			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, " where triggerid=" ZBX_FS_UI64, triggerid);
+			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, " where triggerid=" ZBX_FS_UI64,
+					trigger->triggerid);
 
 			ret = SUCCEED;
 		}
@@ -604,6 +614,45 @@ int	DBget_trigger_update_sql(char **sql, size_t *sql_alloc, size_t *sql_offset, 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
+}
+
+void	process_triggers(zbx_vector_ptr_t *triggers)
+{
+	const char	*__function_name = "process_triggers";
+
+	char		*sql = NULL;
+	size_t		sql_alloc = 16 * ZBX_KIBIBYTE, sql_offset = 0;
+	int		i;
+	DC_TRIGGER	*trigger;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() values_num:%d", __function_name, triggers->values_num);
+
+	if (0 == triggers->values_num)
+		goto out;
+
+	sql = zbx_malloc(sql, sql_alloc);
+
+	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	for (i = 0; i < triggers->values_num; i++)
+	{
+		trigger = (DC_TRIGGER *)triggers->values[i];
+
+		if (SUCCEED == process_trigger(&sql, &sql_alloc, &sql_offset, trigger))
+		{
+			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
+			DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+		}
+	}
+
+	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	if (sql_offset > 16)	/* in ORACLE always present begin..end; */
+		DBexecute("%s", sql);
+
+	zbx_free(sql);
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 void	DBadd_trend(zbx_uint64_t itemid, double value, int clock)
@@ -731,7 +780,12 @@ int	DBget_items_unsupported_count()
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	result = DBselect("select count(*) from items where status=%d", ITEM_STATUS_NOTSUPPORTED);
+	result = DBselect(
+			"select count(*)"
+			" from items"
+			" where status=%d"
+				" and state=%d",
+			ITEM_STATUS_ACTIVE, ITEM_STATE_NOTSUPPORTED);
 
 	if (NULL != (row = DBfetch(result)))
 		count = atoi(row[0]);
@@ -763,22 +817,24 @@ int	DBget_queue_count(int from, int to)
 			" where i.hostid=h.hostid"
 				" and h.status=%d"
 				" and i.status=%d"
-				" and i.value_type not in (%d)"
+				" and i.state=%d"
+				" and i.value_type<>%d"
 				" and ("
 					"i.lastclock is not null"
 					" and i.lastclock<%d"
 					")"
 				" and ("
 					"i.type in (%d,%d,%d,%d,%d,%d,%d,%d,%d)"
-					" or (h.available<>%d and i.type in (%d))"
+					" or (h.available<>%d and i.type=%d)"
 					" or (h.snmp_available<>%d and i.type in (%d,%d,%d))"
-					" or (h.ipmi_available<>%d and i.type in (%d))"
-					" or (h.jmx_available<>%d and i.type in (%d))"
+					" or (h.ipmi_available<>%d and i.type=%d)"
+					" or (h.jmx_available<>%d and i.type=%d)"
 					")"
-				" and i.flags not in (%d)"
+				" and i.flags<>%d"
 				ZBX_SQL_NODE,
 			HOST_STATUS_MONITORED,
 			ITEM_STATUS_ACTIVE,
+			ITEM_STATE_NORMAL,
 			ITEM_VALUE_TYPE_LOG,
 			now - from,
 				ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_SSH, ITEM_TYPE_TELNET,
@@ -833,10 +889,14 @@ double	DBget_requiredperformance()
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	/* !!! Don't forget to sync the code with PHP !!! */
-	result = DBselect("select sum(1.0/i.delay) from hosts h,items i"
-			" where h.hostid=i.hostid and h.status=%d and i.status=%d and i.delay<>0",
-			HOST_STATUS_MONITORED,
-			ITEM_STATUS_ACTIVE);
+	result = DBselect(
+			"select sum(1.0/i.delay)"
+			" from hosts h,items i"
+			" where h.hostid=i.hostid"
+				" and h.status=%d"
+				" and i.status=%d"
+				" and i.delay<>0",
+			HOST_STATUS_MONITORED, ITEM_STATUS_ACTIVE);
 	if (NULL != (row = DBfetch(result)) && SUCCEED != DBis_null(row[0]))
 		qps_total = atof(row[0]);
 	DBfree_result(result);
@@ -873,38 +933,6 @@ int	DBget_proxy_lastaccess(const char *hostname, int *lastaccess, char **error)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
-}
-
-void	DBstart_escalation(zbx_uint64_t actionid, zbx_uint64_t triggerid, zbx_uint64_t eventid)
-{
-	const char	*__function_name = "DBstart_escalation";
-	zbx_uint64_t	escalationid;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
-
-	escalationid = DBget_maxid("escalations");
-
-	DBexecute("insert into escalations (escalationid,actionid,triggerid,eventid,status)"
-			" values (" ZBX_FS_UI64 "," ZBX_FS_UI64 ",%s," ZBX_FS_UI64 ",%d)",
-			escalationid, actionid, DBsql_id_ins(triggerid), eventid, ESCALATION_STATUS_ACTIVE);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
-}
-
-void	DBstop_escalation(zbx_uint64_t actionid, zbx_uint64_t triggerid, zbx_uint64_t eventid)
-{
-	const char	*__function_name = "DBstop_escalation";
-	zbx_uint64_t	escalationid;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
-
-	escalationid = DBget_maxid("escalations");
-
-	DBexecute("insert into escalations (escalationid,actionid,triggerid,r_eventid,status)"
-			" values (" ZBX_FS_UI64 "," ZBX_FS_UI64 ",%s," ZBX_FS_UI64 ",%d)",
-			escalationid, actionid, DBsql_id_ins(triggerid), eventid, ESCALATION_STATUS_ACTIVE);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 /******************************************************************************
@@ -1227,7 +1255,7 @@ void	DBget_item_from_db(DB_ITEM *item, DB_ROW row)
 	item->units = row[12];
 	item->multiplier = atoi(row[13]);
 	item->formula = row[14];
-	item->status = atoi(row[15]);
+	item->state = (unsigned char)atoi(row[15]);
 	ZBX_DBROW2UINT64(item->valuemapid, row[16]);
 
 	item->data_type = atoi(row[18]);
@@ -1657,7 +1685,7 @@ const char	*zbx_user_string(zbx_uint64_t userid)
 	return buf_string;
 }
 
-double	DBmultiply_value_float(DB_ITEM *item, double value)
+double	multiply_item_value_float(DB_ITEM *item, double value)
 {
 	double	value_double;
 
@@ -1666,13 +1694,13 @@ double	DBmultiply_value_float(DB_ITEM *item, double value)
 
 	value_double = value * atof(item->formula);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "DBmultiply_value_float() " ZBX_FS_DBL ",%s " ZBX_FS_DBL,
+	zabbix_log(LOG_LEVEL_DEBUG, "multiply_item_value_float() " ZBX_FS_DBL ",%s " ZBX_FS_DBL,
 			value, item->formula, value_double);
 
 	return value_double;
 }
 
-zbx_uint64_t	DBmultiply_value_uint64(DB_ITEM *item, zbx_uint64_t value)
+zbx_uint64_t	multiply_item_value_uint64(DB_ITEM *item, zbx_uint64_t value)
 {
 	zbx_uint64_t	formula_uint64, value_uint64;
 
@@ -1684,10 +1712,37 @@ zbx_uint64_t	DBmultiply_value_uint64(DB_ITEM *item, zbx_uint64_t value)
 	else
 		value_uint64 = (zbx_uint64_t)((double)value * atof(item->formula));
 
-	zabbix_log(LOG_LEVEL_DEBUG, "DBmultiply_value_uint64() " ZBX_FS_UI64 ",%s " ZBX_FS_UI64,
+	zabbix_log(LOG_LEVEL_DEBUG, "multiply_item_value_uint64() " ZBX_FS_UI64 ",%s " ZBX_FS_UI64,
 			value, item->formula, value_uint64);
 
 	return value_uint64;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DBsql_id_cmp                                                     *
+ *                                                                            *
+ * Purpose: construct where condition                                         *
+ *                                                                            *
+ * Return value: "=<id>" if id not equal zero,                                *
+ *               otherwise " is null"                                         *
+ *                                                                            *
+ * Author: Alexander Vladishev                                                *
+ *                                                                            *
+ * Comments: NB! Do not use this function more than once in same SQL query    *
+ *                                                                            *
+ ******************************************************************************/
+static const char	*DBsql_id_cmp(zbx_uint64_t id)
+{
+	static char		buf[22];	/* 1 - '=', 20 - value size, 1 - '\0' */
+	static const char	is_null[9] = " is null";
+
+	if (0 == id)
+		return is_null;
+
+	zbx_snprintf(buf, sizeof(buf), "=" ZBX_FS_UI64, id);
+
+	return buf;
 }
 
 /******************************************************************************
@@ -1701,10 +1756,10 @@ zbx_uint64_t	DBmultiply_value_uint64(DB_ITEM *item, zbx_uint64_t value)
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
-void	DBregister_host(zbx_uint64_t proxy_hostid, const char *host, const char *ip,
-		const char *dns, unsigned short port, int now)
+void	DBregister_host(zbx_uint64_t proxy_hostid, const char *host, const char *ip, const char *dns,
+		unsigned short port, const char *host_metadata, int now)
 {
-	char		*host_esc, *ip_esc, *dns_esc;
+	char		*host_esc, *ip_esc, *dns_esc, *host_metadata_esc;
 	DB_RESULT	result;
 	DB_ROW		row;
 	zbx_uint64_t	autoreg_hostid;
@@ -1721,10 +1776,10 @@ void	DBregister_host(zbx_uint64_t proxy_hostid, const char *host, const char *ip
 		result = DBselect(
 				"select hostid"
 				" from hosts"
-				" where proxy_hostid%s"
+				" where proxy_hostid=" ZBX_FS_UI64
 					" and host='%s'"
 					ZBX_SQL_NODE,
-				DBsql_id_cmp(proxy_hostid), host_esc,
+				proxy_hostid, host_esc,
 				DBand_node_local("hostid"));
 
 		if (NULL != DBfetch(result))
@@ -1736,6 +1791,7 @@ void	DBregister_host(zbx_uint64_t proxy_hostid, const char *host, const char *ip
 	{
 		ip_esc = DBdyn_escape_string_len(ip, INTERFACE_IP_LEN);
 		dns_esc = DBdyn_escape_string_len(dns, INTERFACE_DNS_LEN);
+		host_metadata_esc = DBdyn_escape_string(host_metadata);
 
 		result = DBselect(
 				"select autoreg_hostid"
@@ -1751,27 +1807,30 @@ void	DBregister_host(zbx_uint64_t proxy_hostid, const char *host, const char *ip
 			ZBX_STR2UINT64(autoreg_hostid, row[0]);
 
 			DBexecute("update autoreg_host"
-					" set listen_ip='%s',listen_dns='%s',listen_port=%d"
+					" set listen_ip='%s',listen_dns='%s',listen_port=%d,host_metadata='%s'"
 					" where autoreg_hostid=" ZBX_FS_UI64,
-					ip_esc, dns_esc, (int)port, autoreg_hostid);
+					ip_esc, dns_esc, (int)port, host_metadata_esc, autoreg_hostid);
 		}
 		else
 		{
 			autoreg_hostid = DBget_maxid("autoreg_host");
 			DBexecute("insert into autoreg_host"
-					" (autoreg_hostid,proxy_hostid,host,listen_ip,listen_dns,listen_port)"
+					" (autoreg_hostid,proxy_hostid,host,listen_ip,listen_dns,listen_port,"
+						"host_metadata)"
 					" values"
-					" (" ZBX_FS_UI64 ",%s,'%s','%s','%s',%d)",
+					" (" ZBX_FS_UI64 ",%s,'%s','%s','%s',%d,'%s')",
 					autoreg_hostid, DBsql_id_ins(proxy_hostid),
-					host_esc, ip_esc, dns_esc, (int)port);
+					host_esc, ip_esc, dns_esc, (int)port, host_metadata_esc);
 		}
 		DBfree_result(result);
 
-		process_event(0, EVENT_SOURCE_AUTO_REGISTRATION, EVENT_OBJECT_ZABBIX_ACTIVE,
-				autoreg_hostid, &ts, TRIGGER_VALUE_PROBLEM, 0);
-
+		zbx_free(host_metadata_esc);
 		zbx_free(dns_esc);
 		zbx_free(ip_esc);
+
+		add_event(0, EVENT_SOURCE_AUTO_REGISTRATION, EVENT_OBJECT_ZABBIX_ACTIVE, autoreg_hostid, &ts,
+				TRIGGER_VALUE_PROBLEM, NULL, NULL, 0, 0);
+		process_events();
 	}
 
 	zbx_free(host_esc);
@@ -1788,20 +1847,23 @@ void	DBregister_host(zbx_uint64_t proxy_hostid, const char *host, const char *ip
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
-void	DBproxy_register_host(const char *host, const char *ip, const char *dns, unsigned short port)
+void	DBproxy_register_host(const char *host, const char *ip, const char *dns, unsigned short port,
+		const char *host_metadata)
 {
-	char	*host_esc, *ip_esc, *dns_esc;
+	char	*host_esc, *ip_esc, *dns_esc, *host_metadata_esc;
 
 	host_esc = DBdyn_escape_string_len(host, HOST_HOST_LEN);
 	ip_esc = DBdyn_escape_string_len(ip, INTERFACE_IP_LEN);
 	dns_esc = DBdyn_escape_string_len(dns, INTERFACE_DNS_LEN);
+	host_metadata_esc = DBdyn_escape_string(host_metadata);
 
 	DBexecute("insert into proxy_autoreg_host"
-			" (clock,host,listen_ip,listen_dns,listen_port)"
+			" (clock,host,listen_ip,listen_dns,listen_port,host_metadata)"
 			" values"
-			" (%d,'%s','%s','%s',%d)",
-			(int)time(NULL), host_esc, ip_esc, dns_esc, (int)port);
+			" (%d,'%s','%s','%s',%d,'%s')",
+			(int)time(NULL), host_esc, ip_esc, dns_esc, (int)port, host_metadata_esc);
 
+	zbx_free(host_metadata_esc);
 	zbx_free(dns_esc);
 	zbx_free(ip_esc);
 	zbx_free(host_esc);
@@ -1938,34 +2000,6 @@ clean:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():'%s'", __function_name, host_name_temp);
 
 	return host_name_temp;
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: DBsql_id_cmp                                                     *
- *                                                                            *
- * Purpose: construct where condition                                         *
- *                                                                            *
- * Return value: "=<id>" if id not equal zero,                                *
- *               otherwise " is null"                                         *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
- ******************************************************************************/
-const char	*DBsql_id_cmp(zbx_uint64_t id)
-{
-	static unsigned char	n = 0;
-	static char		buf[4][22];	/* 1 - '=', 20 - value size, 1 - '\0' */
-	static const char	is_null[9] = " is null";
-
-	if (0 == id)
-		return is_null;
-
-	n = (n + 1) & 3;
-
-	zbx_snprintf(buf[n], sizeof(buf[n]), "=" ZBX_FS_UI64, id);
-
-	return buf[n];
 }
 
 /******************************************************************************
@@ -2441,4 +2475,51 @@ int	DBfield_exists(const char *table_name, const char *field_name)
 #endif
 
 	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: get_nodeid_by_id                                                 *
+ *                                                                            *
+ * Purpose: Get Node ID by resource ID                                        *
+ *                                                                            *
+ * Return value: Node ID                                                      *
+ *                                                                            *
+ * Author: Alexei Vladishev                                                   *
+ *                                                                            *
+ ******************************************************************************/
+int	get_nodeid_by_id(zbx_uint64_t id)
+{
+	return (int)(id / ZBX_DM_MAX_HISTORY_IDS);
+}
+
+void	DBexecute_multiple_query(const char *query, const char *field_name, zbx_vector_uint64_t *ids)
+{
+#define ZBX_MAX_IDS	950
+	char	*sql = NULL;
+	size_t	sql_alloc = ZBX_KIBIBYTE, sql_offset = 0;
+	int	i;
+
+	sql = zbx_malloc(sql, sql_alloc);
+
+	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	for (i = 0; i < ids->values_num; i += ZBX_MAX_IDS)
+	{
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, query);
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, field_name,
+				&ids->values[i], MIN(ZBX_MAX_IDS, ids->values_num - i));
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
+
+		DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+	}
+
+	if (sql_offset > 16)	/* in ORACLE always present begin..end; */
+	{
+		DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+		DBexecute("%s", sql);
+	}
+
+	zbx_free(sql);
 }
