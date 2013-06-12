@@ -112,93 +112,88 @@ $conditionFormList->addRow(_('Type of calculation'), array($calculationTypeCombo
 $conditionFormList->addRow(_('Conditions'), new CDiv($conditionTable, 'objectgroup inlineblock border_dotted ui-corner-all'));
 
 // append new condition to form list
-$rowCondition = array();
 $conditionTypeComboBox = new CComboBox('new_condition[conditiontype]', $this->data['new_condition']['conditiontype'], 'submit()');
 foreach ($this->data['allowedConditions'] as $condition) {
 	$conditionTypeComboBox->addItem($condition, condition_type2str($condition));
 }
-$rowCondition[] = $conditionTypeComboBox;
 
 $conditionOperatorsComboBox = new CComboBox('new_condition[operator]', $this->data['new_condition']['operator']);
 foreach (get_operators_by_conditiontype($this->data['new_condition']['conditiontype']) as $operator) {
 	$conditionOperatorsComboBox->addItem($operator, condition_operator2str($operator));
 }
-$rowCondition[] = $conditionOperatorsComboBox;
 
 switch ($this->data['new_condition']['conditiontype']) {
 	case CONDITION_TYPE_HOST_GROUP:
-		$rowCondition[] = new CDiv(new CMultiSelect(array(
+		$condition = new CMultiSelect(array(
 			'name' => 'new_condition[value][]',
 			'objectName' => 'hostGroup',
 			'objectOptions' => array(
 				'editable' => true
 			),
 			'defaultValue' => 0
-		)), 'floatright');
+		));
 		break;
 
 	case CONDITION_TYPE_TEMPLATE:
-		$rowCondition[] = new CDiv(new CMultiSelect(array(
+		$condition = new CMultiSelect(array(
 			'name' => 'new_condition[value][]',
 			'objectName' => 'templates',
 			'objectOptions' => array(
 				'editable' => true
 			),
 			'defaultValue' => 0
-		)), 'floatright');
+		));
 		break;
 
 	case CONDITION_TYPE_HOST:
-		$rowCondition[] = new CDiv(new CMultiSelect(array(
+		$condition = new CMultiSelect(array(
 			'name' => 'new_condition[value][]',
 			'objectName' => 'hosts',
 			'objectOptions' => array(
 				'editable' => true
 			),
 			'defaultValue' => 0
-		)), 'floatright');
+		));
 		break;
 
 	case CONDITION_TYPE_TRIGGER:
-		$rowCondition[] = new CDiv(new CMultiSelect(array(
+		$condition = new CMultiSelect(array(
 			'name' => 'new_condition[value][]',
 			'objectName' => 'triggers',
 			'objectOptions' => array(
 				'editable' => true
 			),
 			'defaultValue' => 0
-		)), 'floatright');
+		));
 		break;
 
 	case CONDITION_TYPE_TRIGGER_NAME:
-		$rowCondition[] = new CTextBox('new_condition[value]', '', ZBX_TEXTBOX_STANDARD_SIZE);
+		$condition = new CTextBox('new_condition[value]', '', ZBX_TEXTBOX_STANDARD_SIZE);
 		break;
 
 	case CONDITION_TYPE_TRIGGER_VALUE:
-		$conditionValueComboBox = new CComboBox('new_condition[value]');
+		$condition = new CComboBox('new_condition[value]');
 		foreach (array(TRIGGER_VALUE_FALSE, TRIGGER_VALUE_TRUE) as $trigerValue) {
-			$conditionValueComboBox->addItem($trigerValue, trigger_value2str($trigerValue));
+			$condition->addItem($trigerValue, trigger_value2str($trigerValue));
 		}
-		$rowCondition[] = $conditionValueComboBox;
 		break;
 
 	case CONDITION_TYPE_TIME_PERIOD:
-		$rowCondition[] = new CTextBox('new_condition[value]', ZBX_DEFAULT_INTERVAL, ZBX_TEXTBOX_STANDARD_SIZE);
+		$condition = new CTextBox('new_condition[value]', ZBX_DEFAULT_INTERVAL, ZBX_TEXTBOX_STANDARD_SIZE);
 		break;
 
 	case CONDITION_TYPE_TRIGGER_SEVERITY:
-		$conditionValueComboBox = new CComboBox('new_condition[value]');
-		$conditionValueComboBox->addItems(getSeverityCaption());
-		$rowCondition[] = $conditionValueComboBox;
+		$condition = new CComboBox('new_condition[value]');
+		$condition->addItems(getSeverityCaption());
 		break;
 
 	case CONDITION_TYPE_MAINTENANCE:
-		$rowCondition[] = new CCol(_('maintenance'));
+		$condition = new CCol(_('maintenance'));
 		break;
 
 	case CONDITION_TYPE_NODE:
 		$conditionFormList->addItem(new CVar('new_condition[value]', '0'));
-		$rowCondition[] = array(
+		$condition = array(
 			new CTextBox('node', '', ZBX_TEXTBOX_STANDARD_SIZE, 'yes'),
 			SPACE,
 			new CButton('btn1', _('Select'),
@@ -212,7 +207,7 @@ switch ($this->data['new_condition']['conditiontype']) {
 
 	case CONDITION_TYPE_DRULE:
 		$conditionFormList->addItem(new CVar('new_condition[value]', '0'));
-		$rowCondition[] = array(
+		$condition = array(
 			new CTextBox('drule', '', ZBX_TEXTBOX_STANDARD_SIZE, 'yes'),
 			SPACE,
 			new CButton('btn1', _('Select'),
@@ -225,7 +220,7 @@ switch ($this->data['new_condition']['conditiontype']) {
 
 	case CONDITION_TYPE_DCHECK:
 		$conditionFormList->addItem(new CVar('new_condition[value]', '0'));
-		$rowCondition[] = array(
+		$condition = array(
 			new CTextBox('dcheck', '', ZBX_TEXTBOX_STANDARD_SIZE, 'yes'),
 			SPACE,
 			new CButton('btn1', _('Select'),
@@ -238,7 +233,7 @@ switch ($this->data['new_condition']['conditiontype']) {
 
 	case CONDITION_TYPE_PROXY:
 		$conditionFormList->addItem(new CVar('new_condition[value]', '0'));
-		$rowCondition[] = array(
+		$condition = array(
 			new CTextBox('proxy', '', ZBX_TEXTBOX_STANDARD_SIZE, 'yes'),
 			SPACE,
 			new CButton('btn1', _('Select'),
@@ -251,67 +246,64 @@ switch ($this->data['new_condition']['conditiontype']) {
 		break;
 
 	case CONDITION_TYPE_DHOST_IP:
-		$rowCondition[] = new CTextBox('new_condition[value]', '192.168.0.1-127,192.168.2.1', ZBX_TEXTBOX_STANDARD_SIZE);
+		$condition = new CTextBox('new_condition[value]', '192.168.0.1-127,192.168.2.1', ZBX_TEXTBOX_STANDARD_SIZE);
 		break;
 
 	case CONDITION_TYPE_DSERVICE_TYPE:
-		$conditionValueComboBox = new CComboBox('new_condition[value]');
-		foreach (array(SVC_SSH, SVC_LDAP, SVC_SMTP, SVC_FTP, SVC_HTTP, SVC_HTTPS, SVC_POP, SVC_NNTP, SVC_IMAP, SVC_TCP, SVC_AGENT,
-				SVC_SNMPv1, SVC_SNMPv2c, SVC_SNMPv3, SVC_ICMPPING, SVC_TELNET) as $svc) {
-			$conditionValueComboBox->addItem($svc,discovery_check_type2str($svc));
+		$condition = new CComboBox('new_condition[value]');
+		foreach (array(SVC_SSH, SVC_LDAP, SVC_SMTP, SVC_FTP, SVC_HTTP, SVC_HTTPS, SVC_POP, SVC_NNTP, SVC_IMAP, SVC_TCP,
+				SVC_AGENT, SVC_SNMPv1, SVC_SNMPv2c, SVC_SNMPv3, SVC_ICMPPING, SVC_TELNET) as $svc) {
+			$condition->addItem($svc,discovery_check_type2str($svc));
 		}
-		$rowCondition[] = $conditionValueComboBox;
 		break;
 
 	case CONDITION_TYPE_DSERVICE_PORT:
-		$rowCondition[] = new CTextBox('new_condition[value]', '0-1023,1024-49151', ZBX_TEXTBOX_STANDARD_SIZE);
+		$condition = new CTextBox('new_condition[value]', '0-1023,1024-49151', ZBX_TEXTBOX_STANDARD_SIZE);
 		break;
 
 	case CONDITION_TYPE_DSTATUS:
-		$conditionValueComboBox = new CComboBox('new_condition[value]');
+		$condition = new CComboBox('new_condition[value]');
 		foreach (array(DOBJECT_STATUS_UP, DOBJECT_STATUS_DOWN, DOBJECT_STATUS_DISCOVER, DOBJECT_STATUS_LOST) as $stat) {
-			$conditionValueComboBox->addItem($stat, discovery_object_status2str($stat));
+			$condition->addItem($stat, discovery_object_status2str($stat));
 		}
-		$rowCondition[] = $conditionValueComboBox;
 		break;
 
 	case CONDITION_TYPE_DOBJECT:
-		$conditionValueComboBox = new CComboBox('new_condition[value]');
+		$condition = new CComboBox('new_condition[value]');
 		foreach (array(EVENT_OBJECT_DHOST, EVENT_OBJECT_DSERVICE) as $object) {
-			$conditionValueComboBox->addItem($object, discovery_object2str($object));
+			$condition->addItem($object, discovery_object2str($object));
 		}
-		$rowCondition[] = $conditionValueComboBox;
 		break;
 
 	case CONDITION_TYPE_DUPTIME:
-		$rowCondition[] = new CNumericBox('new_condition[value]', 600, 15);
+		$condition = new CNumericBox('new_condition[value]', 600, 15);
 		break;
 
 	case CONDITION_TYPE_DVALUE:
-		$rowCondition[] = new CTextBox('new_condition[value]', '', ZBX_TEXTBOX_STANDARD_SIZE);
+		$condition = new CTextBox('new_condition[value]', '', ZBX_TEXTBOX_STANDARD_SIZE);
 		break;
 
 	case CONDITION_TYPE_APPLICATION:
-		$rowCondition[] = new CTextBox('new_condition[value]', '', ZBX_TEXTBOX_STANDARD_SIZE);
+		$condition = new CTextBox('new_condition[value]', '', ZBX_TEXTBOX_STANDARD_SIZE);
 		break;
 
 	case CONDITION_TYPE_HOST_NAME:
-		$rowCondition[] = new CTextBox('new_condition[value]', '', ZBX_TEXTBOX_STANDARD_SIZE);
+		$condition = new CTextBox('new_condition[value]', '', ZBX_TEXTBOX_STANDARD_SIZE);
 		break;
+
 	case CONDITION_TYPE_EVENT_TYPE:
-		$rowCondition[] = new CComboBox('new_condition[value]', null, null, eventType());
+		$condition = new CComboBox('new_condition[value]', null, null, eventType());
 		break;
+
+	default:
+		$condition = null;
 }
 
-$newConditionDiv = new CDiv(
-	array(
-		new CDiv($rowCondition),
-		new CSubmit('add_condition', _('Add'), null, 'link_menu')
-	),
-	'objectgroup inlineblock border_dotted ui-corner-all'
-);
-$newConditionDiv->attr('style', 'min-width: 540px;');
-$conditionFormList->addRow(_('New condition'), $newConditionDiv);
+$conditionTable = new CTable(null);
+$conditionTable->addRow(array($conditionTypeComboBox, $conditionOperatorsComboBox, $condition));
+$conditionTable->addRow(array(new CSubmit('add_condition', _('Add'), null, 'link_menu'), SPACE, SPACE));
+
+$conditionFormList->addRow(_('New condition'), new CDiv($conditionTable, 'objectgroup inlineblock border_dotted ui-corner-all'));
 
 /*
  * Operation tab
