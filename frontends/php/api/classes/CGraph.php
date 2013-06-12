@@ -533,9 +533,11 @@ class CGraph extends CGraphGeneral {
 			$parentGraphids = array();
 			while ($dbGraph = DBfetch($dbGraphs)) {
 				$parentGraphids[] = $dbGraph['graphid'];
-				$itemids[$dbGraph['graphid']] = $dbGraph['graphid'];
+				$graphids[] = $dbGraph['graphid'];
 			}
 		} while (!empty($parentGraphids));
+
+		$graphids = array_unique($graphids);
 
 		DB::delete('screens_items', array(
 			'resourceid' => $graphids,

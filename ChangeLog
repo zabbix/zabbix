@@ -238,6 +238,7 @@ A......... [ZBX-6407] improved data retrieval performance for CTrigger get() wit
 A.F....... [ZBX-1357] updated Chinese (China), Spanish and Turkish translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+A......... [ZBX-6673] fixed errors after parent graph deleting (Oleg)
 .......PS. [ZBX-6610] fixed invalid next check values of IPMI items (dimir)
 ....I..... [ZBX-6674] fixed items description in the default data set (Oleg)
 A......... [ZBX-6644] fixed sorting by history and trends fields in itemprototype.get API (Ivo)
