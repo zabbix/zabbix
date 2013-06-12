@@ -49,411 +49,6 @@ class testInheritanceDiscoveryRule extends CWebTest {
 		DBsave_tables('items');
 	}
 
-	// Returns layout data
-	public static function layout() {
-		return array(
-			array(
-				array('type' => 'Zabbix agent')
-			),
-			array(
-				array('type' => 'Zabbix agent (active)'),
-			),
-			array(
-				array('type' => 'Simple check')
-			),
-			array(
-				array('type' => 'SNMPv1 agent')
-			),
-			array(
-				array('type' => 'SNMPv2 agent')
-			),
-			array(
-				array('type' => 'SNMPv3 agent')
-			),
-			array(
-				array(
-					'type' => 'SNMPv3 agent',
-					'snmpv3_securitylevel' => 'noAuthNoPriv'
-				)
-			),
-			array(
-				array(
-					'type' => 'SNMPv3 agent',
-					'snmpv3_securitylevel' => 'authNoPriv'
-				)
-			),
-			array(
-				array(
-					'type' => 'SNMPv3 agent',
-					'snmpv3_securitylevel' => 'authPriv'
-				)
-			),
-			array(
-				array('type' => 'Zabbix internal')
-			),
-			array(
-				array('type' => 'Zabbix trapper')
-			),
-			array(
-				array('type' => 'External check')
-			),
-			array(
-				array('type' => 'IPMI agent')
-			),
-			array(
-				array('type' => 'SSH agent')
-			),
-			array(
-				array('type' => 'SSH agent', 'authtype' => 'Public key')
-			),
-			array(
-				array('type' => 'SSH agent', 'authtype' => 'Password')
-			),
-			array(
-				array('type' => 'TELNET agent')
-			),
-			array(
-				array('type' => 'JMX agent')
-			)
-		);
-	}
-
-	/**
-	 * @dataProvider layout
-	 */
-	public function testInheritanceDiscoveryRule_CheckLayout($data) {
-		$this->zbxTestLogin('templates.php');
-
-		$this->checkTitle('Configuration of templates');
-		$this->zbxTestTextPresent('CONFIGURATION OF TEMPLATES');
-
-		$this->zbxTestClickWait('link='.$this->template);
-		$this->zbxTestClickWait('link=Discovery rules');
-		$this->zbxTestClickWait('form');
-
-		$this->checkTitle('Configuration of discovery rules');
-		$this->zbxTestTextPresent('CONFIGURATION OF DISCOVERY RULES');
-		$this->zbxTestTextPresent('Discovery rule');
-
-		$this->zbxTestTextPresent('Name');
-		$this->assertVisible('name');
-		$this->assertAttribute("//input[@id='name']/@maxlength", 255);
-		$this->assertAttribute("//input[@id='name']/@size", 50);
-		$this->assertAttribute("//input[@id='name']/@autofocus", 'autofocus');
-
-		$this->zbxTestTextPresent('Type');
-		$this->assertVisible('type');
-		$this->zbxTestDropdownHasOptions('type', array(
-			'Zabbix agent',
-			'Zabbix agent (active)',
-			'Simple check',
-			'SNMPv1 agent',
-			'SNMPv2 agent',
-			'SNMPv3 agent',
-			'Zabbix internal',
-			'Zabbix trapper',
-			'External check',
-			'IPMI agent',
-			'SSH agent',
-			'TELNET agent',
-			'JMX agent'
-		));
-		$this->zbxTestDropdownSelect('type', $data['type']);
-
-		$this->zbxTestTextPresent('Key');
-		$this->assertVisible('key');
-		$this->assertAttribute("//input[@id='key']/@maxlength", 255);
-		$this->assertAttribute("//input[@id='key']/@size", 50);
-
-		$keyValue = $this->getValue('key');
-		switch($data['type']) {
-			case 'SSH agent':
-				$this->assertEquals($keyValue, "ssh.run[<unique short description>,<ip>,<port>,<encoding>]");
-				break;
-			case 'TELNET agent':
-				$this->assertEquals($keyValue, "telnet.run[<unique short description>,<ip>,<port>,<encoding>]");
-				break;
-			case 'JMX agent':
-				$this->assertEquals($keyValue, "jmx[<object name>,<attribute name>]");
-				break;
-			}
-
-		if ($data['type'] == 'SNMPv3 agent') {
-			if (isset($data['snmpv3_securitylevel'])) {
-				$this->zbxTestDropdownSelect('snmpv3_securitylevel', $data['snmpv3_securitylevel']);
-			}
-			$snmpv3_securitylevel = $this->getSelectedLabel('snmpv3_securitylevel');
-		}
-
-		$this->zbxTestTextNotPresent('Additional parameters');
-		$this->assertNotVisible('params_ap');
-
-		if ($data['type'] == 'SSH agent' || $data['type'] == 'TELNET agent' ) {
-			$this->zbxTestTextPresent('Executed script');
-			$this->assertVisible('params_es');
-			$this->assertAttribute("//textarea[@id='params_es']/@rows", 7);
-		}
-		else {
-			$this->zbxTestTextNotPresent('Executed script');
-			$this->assertNotVisible('params_es');
-		}
-
-		$this->zbxTestTextNotPresent('Formula');
-		$this->assertNotVisible('params_f');
-
-		if ($data['type'] == 'IPMI agent') {
-			$this->zbxTestTextPresent('IPMI sensor');
-			$this->assertVisible('ipmi_sensor');
-			$this->assertAttribute("//input[@id='ipmi_sensor']/@maxlength", 128);
-			$this->assertAttribute("//input[@id='ipmi_sensor']/@size", 50);
-		}
-		else {
-			$this->zbxTestTextNotPresent('IPMI sensor');
-			$this->assertNotVisible('ipmi_sensor');
-		}
-
-		if ($data['type'] == 'SSH agent') {
-			$this->zbxTestTextPresent('Authentication method');
-			$this->assertVisible('authtype');
-			$this->zbxTestDropdownHasOptions('authtype', array('Password', 'Public key'));
-		}
-		else {
-			$this->zbxTestTextNotPresent('Authentication method');
-			$this->assertNotVisible('authtype');
-		}
-
-		if ($data['type'] == 'SSH agent' || $data['type'] == 'TELNET agent' || $data['type'] == 'JMX agent') {
-			$this->zbxTestTextPresent('User name');
-			$this->assertVisible('username');
-			$this->assertAttribute("//input[@id='username']/@maxlength", 64);
-			$this->assertAttribute("//input[@id='username']/@size", 25);
-
-			if (isset($authtype) && $authtype == 'Public key') {
-				$this->zbxTestTextPresent('Key passphrase');
-			}
-			else {
-				$this->zbxTestTextPresent('Password');
-			}
-			$this->assertVisible('password');
-			$this->assertAttribute("//input[@id='password']/@maxlength", 64);
-			$this->assertAttribute("//input[@id='password']/@size", 25);
-		}
-		else {
-			$this->zbxTestTextNotPresent(array('User name', 'Password', 'Key passphrase'));
-			$this->assertNotVisible('username');
-			$this->assertNotVisible('password');
-		}
-
-		if	(isset($authtype) && $authtype == 'Public key') {
-			$this->zbxTestTextPresent('Public key file');
-			$this->assertVisible('publickey');
-			$this->assertAttribute("//input[@id='publickey']/@maxlength", 64);
-			$this->assertAttribute("//input[@id='publickey']/@size", 25);
-
-			$this->zbxTestTextPresent('Private key file');
-			$this->assertVisible('privatekey');
-			$this->assertAttribute("//input[@id='privatekey']/@maxlength", 64);
-			$this->assertAttribute("//input[@id='privatekey']/@size", 25);
-		}
-		else {
-			$this->zbxTestTextNotPresent('Public key file');
-			$this->assertNotVisible('publickey');
-
-			$this->zbxTestTextNotPresent('Private key file');
-			$this->assertNotVisible('publickey');
-		}
-
-		if	($data['type'] == 'SNMPv1 agent' || $data['type'] == 'SNMPv2 agent' || $data['type'] == 'SNMPv3 agent') {
-			$this->zbxTestTextPresent('SNMP OID');
-			$this->assertVisible('snmp_oid');
-			$this->assertAttribute("//input[@id='snmp_oid']/@maxlength", 255);
-			$this->assertAttribute("//input[@id='snmp_oid']/@size", 50);
-			$this->assertAttribute("//input[@id='snmp_oid']/@value", 'interfaces.ifTable.ifEntry.ifInOctets.1');
-
-			$this->zbxTestTextPresent('Port');
-			$this->assertVisible('port');
-			$this->assertAttribute("//input[@id='port']/@maxlength", 64);
-			$this->assertAttribute("//input[@id='port']/@size", 25);
-		}
-		else {
-			$this->zbxTestTextNotPresent('SNMP OID');
-			$this->assertNotVisible('snmp_oid');
-
-			$this->zbxTestTextNotPresent('Port');
-			$this->assertNotVisible('port');
-		}
-
-		if	($data['type'] == 'SNMPv1 agent' || $data['type'] == 'SNMPv2 agent') {
-			$this->zbxTestTextPresent('SNMP community');
-			$this->assertVisible('snmp_community');
-			$this->assertAttribute("//input[@id='snmp_community']/@maxlength", 64);
-			$this->assertAttribute("//input[@id='snmp_community']/@size", 50);
-			$this->assertAttribute("//input[@id='snmp_community']/@value", 'public');
-		}
-		else {
-			$this->zbxTestTextNotPresent('SNMP community');
-			$this->assertNotVisible('snmp_community');
-		}
-
-		if	($data['type'] == 'SNMPv3 agent') {
-			$this->zbxTestTextPresent('Security name');
-			$this->assertVisible('snmpv3_securityname');
-			$this->assertAttribute("//input[@id='snmpv3_securityname']/@maxlength", 64);
-			$this->assertAttribute("//input[@id='snmpv3_securityname']/@size", 50);
-
-			$this->zbxTestTextPresent('Security level');
-			$this->assertVisible('snmpv3_securitylevel');
-			$this->zbxTestDropdownHasOptions('snmpv3_securitylevel', array('noAuthNoPriv', 'authNoPriv', 'authPriv'));
-		}
-		else {
-			$this->zbxTestTextNotPresent('Security name');
-			$this->assertNotVisible('snmpv3_securityname');
-
-			$this->zbxTestTextNotPresent('Security level');
-			$this->assertNotVisible('snmpv3_securitylevel');
-		}
-
-		if (isset($snmpv3_securitylevel) && $snmpv3_securitylevel != 'noAuthNoPriv') {
-			$this->zbxTestTextPresent('Authentication protocol');
-			$this->assertVisible('row_snmpv3_authprotocol');
-			$this->assertVisible("//span[text()='MD5']");
-			$this->assertVisible("//span[text()='SHA']");
-
-			$this->zbxTestTextPresent('Authentication passphrase');
-			$this->assertVisible('snmpv3_authpassphrase');
-			$this->assertAttribute("//input[@id='snmpv3_authpassphrase']/@maxlength", 64);
-			$this->assertAttribute("//input[@id='snmpv3_authpassphrase']/@size", 50);
-		}
-		else {
-			$this->zbxTestTextNotPresent('Authentication protocol');
-			$this->assertNotVisible('row_snmpv3_authprotocol');
-			$this->assertNotVisible("//span[text()='MD5']");
-			$this->assertNotVisible("//span[text()='SHA']");
-
-			$this->zbxTestTextNotPresent('Authentication passphrase');
-			$this->assertNotVisible('snmpv3_authpassphrase');
-		}
-
-		if (isset($snmpv3_securitylevel) && $snmpv3_securitylevel == 'authPriv') {
-			$this->zbxTestTextPresent('Privacy protocol');
-			$this->assertVisible('row_snmpv3_privprotocol');
-			$this->assertVisible("//span[text()='DES']");
-			$this->assertVisible("//span[text()='AES']");
-
-			$this->zbxTestTextPresent('Privacy passphrase');
-			$this->assertVisible('snmpv3_privpassphrase');
-			$this->assertAttribute("//input[@id='snmpv3_privpassphrase']/@maxlength", 64);
-			$this->assertAttribute("//input[@id='snmpv3_privpassphrase']/@size", 50);
-		}
-		else {
-			$this->zbxTestTextNotPresent('Privacy protocol');
-			$this->assertNotVisible('row_snmpv3_privprotocol');
-			$this->assertNotVisible("//span[text()='DES']");
-			$this->assertNotVisible("//span[text()='AES']");
-
-			$this->zbxTestTextNotPresent('Privacy passphrase');
-			$this->assertNotVisible('snmpv3_privpassphrase');
-		}
-
-		switch ($data['type']) {
-			case 'Zabbix agent':
-			case 'Zabbix agent (active)':
-			case 'Simple check':
-			case 'SNMPv1 agent':
-			case 'SNMPv2 agent':
-			case 'SNMPv3 agent':
-			case 'Zabbix internal':
-			case 'External check':
-			case 'IPMI agent':
-			case 'SSH agent':
-			case 'TELNET agent':
-			case 'JMX agent':
-				$this->zbxTestTextPresent('Update interval (in sec)');
-				$this->assertVisible('delay');
-				$this->assertAttribute("//input[@id='delay']/@maxlength", 5);
-				$this->assertAttribute("//input[@id='delay']/@size", 5);
-				$this->assertAttribute("//input[@id='delay']/@value", 30);
-				break;
-			default:
-				$this->zbxTestTextNotPresent('Update interval (in sec)');
-				$this->assertNotVisible('delay');
-		}
-
-		$this->zbxTestTextPresent('Keep lost resources period (in days)');
-		$this->assertVisible('lifetime');
-		$this->assertAttribute("//input[@id='lifetime']/@maxlength", 64);
-		$this->assertAttribute("//input[@id='lifetime']/@size", 25);
-		$this->assertAttribute("//input[@id='lifetime']/@value", 30);
-
-		switch ($data['type']) {
-			case 'Zabbix agent':
-			case 'Simple check':
-			case 'SNMPv1 agent':
-			case 'SNMPv2 agent':
-			case 'SNMPv3 agent':
-			case 'Zabbix internal':
-			case 'External check':
-			case 'IPMI agent':
-			case 'SSH agent':
-			case 'TELNET agent':
-			case 'JMX agent':
-				$this->zbxTestTextPresent(array('Flexible intervals', 'Interval', 'Period', 'No flexible intervals defined.'));
-				$this->assertVisible('delayFlexTable');
-
-				$this->zbxTestTextPresent('New flexible interval', 'Interval (in sec)', 'Period');
-				$this->assertVisible('new_delay_flex_delay');
-				$this->assertAttribute("//input[@id='new_delay_flex_delay']/@maxlength", 5);
-				$this->assertAttribute("//input[@id='new_delay_flex_delay']/@size", 5);
-				$this->assertAttribute("//input[@id='new_delay_flex_delay']/@value", 50);
-
-				$this->assertVisible('new_delay_flex_period');
-				$this->assertAttribute("//input[@id='new_delay_flex_period']/@maxlength", 255);
-				$this->assertAttribute("//input[@id='new_delay_flex_period']/@size", 20);
-				$this->assertAttribute("//input[@id='new_delay_flex_period']/@value", '1-7,00:00-24:00');
-				$this->assertVisible('add_delay_flex');
-				break;
-			default:
-				$this->zbxTestTextNotPresent(array('Flexible intervals', 'Interval', 'Period', 'No flexible intervals defined.'));
-				$this->assertNotVisible('delayFlexTable');
-
-				$this->zbxTestTextNotPresent('New flexible interval', 'Interval (in sec)', 'Period');
-				$this->assertNotVisible('new_delay_flex_period');
-				$this->assertNotVisible('new_delay_flex_delay');
-				$this->assertNotVisible('add_delay_flex');
-		}
-
-		if ($data['type'] == 'Zabbix trapper') {
-			$this->zbxTestTextPresent('Allowed hosts');
-			$this->assertVisible('trapper_hosts');
-			$this->assertAttribute("//input[@id='trapper_hosts']/@maxlength", 255);
-			$this->assertAttribute("//input[@id='trapper_hosts']/@size", 50);
-		}
-		else {
-			$this->zbxTestTextNotPresent('Allowed hosts');
-			$this->assertNotVisible('trapper_hosts');
-		}
-
-		$this->zbxTestTextPresent('Filter');
-		$this->zbxTestTextPresent('Macro');
-		$this->assertVisible('filter_macro');
-		$this->assertAttribute("//input[@id='filter_macro']/@maxlength", 255);
-		$this->assertAttribute("//input[@id='filter_macro']/@size", 13);
-
-		$this->zbxTestTextPresent('Regexp');
-		$this->assertVisible('filter_value');
-		$this->assertAttribute("//input[@id='filter_value']/@maxlength", 255);
-		$this->assertAttribute("//input[@id='filter_value']/@size", 20);
-
-		$this->zbxTestTextPresent('Description');
-		$this->assertVisible('description');
-		$this->assertAttribute("//textarea[@id='description']/@rows", 7);
-
-		$this->zbxTestTextPresent('Status');
-		$this->assertVisible('status');
-		$this->zbxTestDropdownHasOptions('status', array('Enabled', 'Disabled', 'Not supported'));
-		$this->assertAttribute("//*[@id='status']/option[text()='Enabled']/@selected", 'selected');
-	}
-
 	// Returns update data
 	public static function update() {
 		return DBdata("select * from items where hostid = 30000 and key_ LIKE 'discovery-rule-inheritance%'");
@@ -701,7 +296,7 @@ class testInheritanceDiscoveryRule extends CWebTest {
 					),
 					'errors' => array(
 						'ERROR: Cannot add discovery rule',
-						'Discovery rule will not be refreshed. Please enter a correct update interval.'
+						'Item will not be refreshed. Please enter a correct update interval.'
 					)
 				)
 			),
@@ -740,7 +335,7 @@ class testInheritanceDiscoveryRule extends CWebTest {
 					),
 					'errors' => array(
 						'ERROR: Cannot add discovery rule',
-						'Discovery rule will not be refreshed. Please enter a correct update interval.'
+						'Item will not be refreshed. Please enter a correct update interval.'
 					)
 				)
 			),
@@ -771,7 +366,7 @@ class testInheritanceDiscoveryRule extends CWebTest {
 					),
 					'errors' => array(
 						'ERROR: Cannot add discovery rule',
-						'Discovery rule will not be refreshed. Please enter a correct update interval.'
+						'Item will not be refreshed. Please enter a correct update interval.'
 					)
 				)
 			),
@@ -810,7 +405,7 @@ class testInheritanceDiscoveryRule extends CWebTest {
 					),
 					'errors' => array(
 						'ERROR: Cannot add discovery rule',
-						'Discovery rule will not be refreshed. Please enter a correct update interval.'
+						'Item will not be refreshed. Please enter a correct update interval.'
 					)
 				)
 			),
@@ -839,7 +434,7 @@ class testInheritanceDiscoveryRule extends CWebTest {
 					),
 					'errors' => array(
 						'ERROR: Cannot add discovery rule',
-						'Discovery rule will not be refreshed. Please enter a correct update interval.'
+						'Item will not be refreshed. Please enter a correct update interval.'
 					)
 				)
 			),
@@ -857,7 +452,7 @@ class testInheritanceDiscoveryRule extends CWebTest {
 					),
 					'errors' => array(
 						'ERROR: Cannot add discovery rule',
-						'Discovery rule will not be refreshed. Please enter a correct update interval.'
+						'Item will not be refreshed. Please enter a correct update interval.'
 					)
 				)
 			),
@@ -873,7 +468,7 @@ class testInheritanceDiscoveryRule extends CWebTest {
 					),
 					'errors' => array(
 						'ERROR: Cannot add discovery rule',
-						'Discovery rule will not be refreshed. Please enter a correct update interval.'
+						'Item will not be refreshed. Please enter a correct update interval.'
 					)
 				)
 			),
@@ -889,7 +484,7 @@ class testInheritanceDiscoveryRule extends CWebTest {
 					),
 					'errors' => array(
 						'ERROR: Cannot add discovery rule',
-						'Discovery rule will not be refreshed. Please enter a correct update interval.'
+						'Item will not be refreshed. Please enter a correct update interval.'
 					)
 				)
 			),
@@ -1247,6 +842,10 @@ class testInheritanceDiscoveryRule extends CWebTest {
 			$this->input_type('ipmi_sensor', $data['ipmi_sensor']);
 		}
 
+		if (isset($data['params_f'])) {
+			$this->input_type('params_f', $data['params_f']);
+		}
+
 		if (isset($data['params_es'])) {
 			$this->input_type('params_es', $data['params_es']);
 		}
@@ -1262,8 +861,11 @@ class testInheritanceDiscoveryRule extends CWebTest {
 
 		$itemFlexFlag = true;
 		if (isset($data['flexPeriod'])) {
+
+			$itemCount = 0;
 			foreach ($data['flexPeriod'] as $period) {
 				$this->input_type('new_delay_flex_period', $period['flexTime']);
+				$itemCount ++;
 
 				if (isset($period['flexDelay'])) {
 					$this->input_type('new_delay_flex_delay', $period['flexDelay']);
@@ -1276,7 +878,18 @@ class testInheritanceDiscoveryRule extends CWebTest {
 					}
 					$itemFlexFlag = false;
 				}
+
+				if (isset($period['maximumItems']) || $itemCount == 7) {
+					$this->assertNotVisible('new_delay_flex_delay');
+					$this->assertNotVisible('new_delay_flex_period');
+				}
+				else {
+					$this->assertVisible('new_delay_flex_delay');
+					$this->assertVisible('new_delay_flex_period');
+				}
+
 				if (isset($period['remove'])) {
+					$itemCount --;
 					$this->zbxTestClick('remove');
 					sleep(1);
 				}
