@@ -325,7 +325,7 @@ $userForm->addItem($userTab);
 
 // append buttons to form
 if (empty($this->data['userid'])) {
-	$userForm->addItem(makeFormFooter(array(new CSubmit('save', _('Save'))), array(new CButtonCancel(url_param('config')))));
+	$userForm->addItem(makeFormFooter(new CSubmit('save', _('Save')), new CButtonCancel(url_param('config'))));
 }
 else {
 	if (!$this->data['is_profile']) {
@@ -333,10 +333,10 @@ else {
 		if (bccomp(CWebUser::$data['userid'], $this->data['userid']) == 0) {
 			$deleteButton->setAttribute('disabled', 'disabled');
 		}
-		$userForm->addItem(makeFormFooter(array(new CSubmit('save', _('Save'))), array($deleteButton, new CButtonCancel(url_param('config')))));
+		$userForm->addItem(makeFormFooter(new CSubmit('save', _('Save')), array($deleteButton, new CButtonCancel(url_param('config')))));
 	}
 	else {
-		$userForm->addItem(makeFormFooter(array(new CSubmit('save', _('Save'))), array(new CButtonCancel(url_param('config')))));
+		$userForm->addItem(makeFormFooter(new CSubmit('save', _('Save')), new CButtonCancel(url_param('config'))));
 	}
 }
 
