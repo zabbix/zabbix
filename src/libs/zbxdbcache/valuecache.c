@@ -3301,7 +3301,7 @@ int	zbx_vc_get_value_range(zbx_uint64_t itemid, int value_type, zbx_vector_vc_va
 		int count, int timestamp)
 {
 	const char	*__function_name = "zbx_vc_get_value_range";
-	zbx_vc_item_t	*item;
+	zbx_vc_item_t	*item = NULL;
 	int 		ret = FAIL, cache_used = 1;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() itemid:" ZBX_FS_UI64 " value_type:%d seconds:%d count:%d timestamp:%d",
@@ -3373,7 +3373,7 @@ out:
 int	zbx_vc_get_value(zbx_uint64_t itemid, int value_type, const zbx_timespec_t *ts, zbx_vc_value_t *value)
 {
 	const char	*__function_name = "zbx_vc_get_value";
-	zbx_vc_item_t	*item;
+	zbx_vc_item_t	*item = NULL;
 	int 		ret = FAIL, cache_used = 1;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() itemid:" ZBX_FS_UI64 " value_type:%d timestamp:%d.%d",
