@@ -49,7 +49,7 @@
 
 const char	*progname = NULL;
 
-/* Default config file location */
+/* default config file location */
 #ifdef _WINDOWS
 	static char	DEFAULT_CONFIG_FILE[]	= "C:\\zabbix_agentd.conf";
 #else
@@ -161,14 +161,14 @@ static void	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 				break;
 			case 'h':
 				help();
-				exit(FAIL);
+				exit(EXIT_FAILURE);
 				break;
 			case 'V':
 				version();
 #ifdef _AIX
 				tl_version();
 #endif
-				exit(FAIL);
+				exit(EXIT_FAILURE);
 				break;
 			case 'p':
 				if (ZBX_TASK_START == t->task)
@@ -217,7 +217,7 @@ static void	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
  * Author: Vladimir Levijev, Rudolfs Kreicbergs                               *
  *                                                                            *
  ******************************************************************************/
-static void	set_defaults()
+static void	set_defaults(void)
 {
 	AGENT_RESULT	result;
 	char		**value = NULL;
@@ -250,6 +250,12 @@ static void	set_defaults()
 	else if (NULL != CONFIG_HOSTNAME_ITEM)
 		zabbix_log(LOG_LEVEL_WARNING, "both Hostname and HostnameItem defined, using [%s]", CONFIG_HOSTNAME);
 
+	if (NULL != CONFIG_HOST_METADATA && NULL != CONFIG_HOST_METADATA_ITEM)
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "both HostMetadata and HostMetadataItem defined, using [%s]",
+				CONFIG_HOST_METADATA);
+	}
+
 #ifndef _WINDOWS
 	if (NULL == CONFIG_LOAD_MODULE_PATH)
 		CONFIG_LOAD_MODULE_PATH = zbx_strdup(CONFIG_LOAD_MODULE_PATH, LIBDIR "/modules");
@@ -259,7 +265,6 @@ static void	set_defaults()
 	if (NULL == CONFIG_PID_FILE)
 		CONFIG_PID_FILE = "/tmp/zabbix_agentd.pid";
 #endif
-
 }
 
 /******************************************************************************
@@ -271,25 +276,32 @@ static void	set_defaults()
  * Author: Vladimir Levijev                                                   *
  *                                                                            *
  ******************************************************************************/
-static void	zbx_validate_config()
+static void	zbx_validate_config(void)
 {
 	if (NULL == CONFIG_HOSTNAME)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "hostname is not defined");
-		exit(FAIL);
+		exit(EXIT_FAILURE);
+	}
+
+	if (NULL != CONFIG_HOST_METADATA && HOST_METADATA_LEN < zbx_strlen_utf8(CONFIG_HOST_METADATA))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "the value of \"HostMetadata\" configuration parameter cannot be longer than"
+				" %d characters", HOST_METADATA_LEN);
+		exit(EXIT_FAILURE);
 	}
 
 	if (FAIL == zbx_check_hostname(CONFIG_HOSTNAME))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "invalid host name: [%s]", CONFIG_HOSTNAME);
-		exit(FAIL);
+		exit(EXIT_FAILURE);
 	}
 
 	/* make sure active or passive check is enabled */
 	if (0 == CONFIG_ACTIVE_FORKS && 0 == CONFIG_PASSIVE_FORKS)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "either active or passive checks must be enabled");
-		exit(FAIL);
+		exit(EXIT_FAILURE);
 	}
 }
 
@@ -387,6 +399,10 @@ static void	zbx_load_config(int requirement)
 			PARM_OPT,	0,			0},
 		{"HostnameItem",		&CONFIG_HOSTNAME_ITEM,			TYPE_STRING,
 			PARM_OPT,	0,			0},
+		{"HostMetadata",		&CONFIG_HOST_METADATA,			TYPE_STRING,
+			PARM_OPT,	0,			0},
+		{"HostMetadataItem",		&CONFIG_HOST_METADATA_ITEM,		TYPE_STRING,
+			PARM_OPT,	0,			0},
 		{"BufferSize",			&CONFIG_BUFFER_SIZE,			TYPE_INT,
 			PARM_OPT,	2,			65535},
 		{"BufferSend",			&CONFIG_BUFFER_SEND,			TYPE_INT,
@@ -481,7 +497,7 @@ static void	zbx_load_config(int requirement)
  * Author: Vladimir Levijev                                                   *
  *                                                                            *
  ******************************************************************************/
-static void	zbx_free_config()
+static void	zbx_free_config(void)
 {
 	zbx_strarr_free(CONFIG_ALIASES);
 	zbx_strarr_free(CONFIG_USER_PARAMETERS);
@@ -537,6 +553,8 @@ int	MAIN_ZABBIX_ENTRY()
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "Starting Zabbix Agent [%s]. Zabbix %s (revision %s).",
 			CONFIG_HOSTNAME, ZABBIX_VERSION, ZABBIX_REVISION);
+
+	zabbix_log(LOG_LEVEL_INFORMATION, "using configuration file: %s", CONFIG_FILE);
 
 #ifndef _WINDOWS
 	if (FAIL == load_modules(CONFIG_LOAD_MODULE_PATH, CONFIG_LOAD_MODULE, CONFIG_TIMEOUT, 1))
@@ -645,7 +663,7 @@ int	MAIN_ZABBIX_ENTRY()
  * Purpose: free service resources allocated by main thread                   *
  *                                                                            *
  ******************************************************************************/
-void	zbx_free_service_resources()
+void	zbx_free_service_resources(void)
 {
 	if (NULL != threads)
 	{
@@ -694,7 +712,7 @@ void	zbx_free_service_resources()
 #endif
 }
 
-void	zbx_on_exit()
+void	zbx_on_exit(void)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "zbx_on_exit() called");
 
@@ -739,7 +757,7 @@ int	main(int argc, char **argv)
 	{
 		case ZBX_TASK_SHOW_USAGE:
 			usage();
-			exit(FAIL);
+			exit(EXIT_FAILURE);
 			break;
 #ifdef _WINDOWS
 		case ZBX_TASK_INSTALL_SERVICE:
@@ -782,7 +800,7 @@ int	main(int argc, char **argv)
 			load_aliases(CONFIG_ALIASES);
 			zbx_free_config();
 			if (ZBX_TASK_TEST_METRIC == t.task)
-				test_parameter(TEST_METRIC, PROCESS_TEST);
+				test_parameter(TEST_METRIC);
 			else
 				test_parameters();
 #ifdef _WINDOWS

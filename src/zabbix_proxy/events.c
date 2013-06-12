@@ -17,25 +17,14 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "db.h"
+#include "common.h"
 
-/******************************************************************************
- *                                                                            *
- * Function: process_event                                                    *
- *                                                                            *
- * Purpose: process new event                                                 *
- *                                                                            *
- * Parameters: event data                                                     *
- *                                                                            *
- * Return value: SUCCESS - event added                                        *
- *                                                                            *
- * Author: Alexei Vladishev                                                   *
- *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
- ******************************************************************************/
-int	process_event(zbx_uint64_t eventid, int source, int object, zbx_uint64_t objectid,
-		const zbx_timespec_t *timespec, int value, int acknowledged)
+void	add_event(zbx_uint64_t eventid, unsigned char source, unsigned char object, zbx_uint64_t objectid,
+		const zbx_timespec_t *timespec, int value, const char *trigger_description,
+		const char *trigger_expression, unsigned char trigger_priority, unsigned char trigger_type)
 {
-	return SUCCEED;
+}
+
+void	process_events()
+{
 }

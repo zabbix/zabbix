@@ -243,8 +243,8 @@ while($db_app = DBfetch($db_app_res)){
 	$db_appids[$db_app['applicationid']] = $db_app['applicationid'];
 }
 
-$sortField = get_request('sort', CProfile::get('web.'.$page['file'].'.sort', null));
-$sortOrder = get_request('sortorder', CProfile::get('web.'.$page['file'].'.sortorder', ZBX_SORT_UP));
+$sortField = getPageSortField();
+$sortOrder = getPageSortOrder();
 
 // if sortfield is host name
 if ($sortField == 'h.name') {
@@ -265,29 +265,34 @@ $sql = 'SELECT DISTINCT i.*, ia.applicationid '.
 		' WHERE '.dbConditionInt('ia.applicationid',$db_appids).
 			' AND i.itemid=ia.itemid'.
 			($_REQUEST['show_without_data'] ? '' : ' AND i.lastvalue IS NOT NULL').
-			' AND (i.status='.ITEM_STATUS_ACTIVE.' OR i.status='.ITEM_STATUS_NOTSUPPORTED.')'.
+			' AND i.status='.ITEM_STATUS_ACTIVE.
 			' AND '.dbConditionInt('i.flags', array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED));
 
 $dbItems = DBfetchArray(DBselect($sql));
 
+foreach ($dbItems as &$dbItem) {
+	$dbItem['resolvedName'] = itemName($dbItem);
+}
+unset($dbItem);
+
 // if sortfield is item name
 if ($sortField == 'i.name') {
-	$sortFields = array(array('field' => 'name', 'order' => $sortOrder));
+	$sortFields = array(array('field' => 'resolvedName', 'order' => $sortOrder), 'itemid');
 }
 // if sortfield is item lastclock
 elseif ($sortField == 'i.lastclock') {
-	$sortFields = array(array('field' => 'lastclock', 'order' => $sortOrder), 'name');
+	$sortFields = array(array('field' => 'lastclock', 'order' => $sortOrder), 'resolvedName', 'itemid');
 }
 // by default
 else {
-	$sortFields = array('name');
+	$sortFields = array('resolvedName', 'itemid');
 }
 CArrayHelper::sort($dbItems, $sortFields);
 
 foreach ($dbItems as $db_item){
-	$description = itemName($db_item);
-
-	if(!empty($_REQUEST['select']) && !zbx_stristr($description, $_REQUEST['select']) ) continue;
+	if (!empty($_REQUEST['select']) && !zbx_stristr($db_item['resolvedName'], $_REQUEST['select'])) {
+		continue;
+	}
 
 	if(strpos($db_item['units'], ',') !== false)
 		list($db_item['units'], $db_item['unitsLong']) = explode(',', $db_item['units']);
@@ -308,7 +313,7 @@ foreach ($dbItems as $db_item){
 		$lastclock = ' - ';
 	}
 
-	$lastvalue = formatItemValue($db_item, '-', false);
+	$lastvalue = formatItemLastValue($db_item, '-', false);
 
 	$digits = ($db_item['value_type'] == ITEM_VALUE_TYPE_FLOAT) ? 2 : 0;
 	if (isset($db_item['lastvalue']) && isset($db_item['prevvalue'])
@@ -339,13 +344,13 @@ foreach ($dbItems as $db_item){
 		$actions = new CLink(_('History'),'history.php?action=showvalues&itemid='.$db_item['itemid']);
 	}
 
-	$item_status = $db_item['status'] == ITEM_STATUS_NOTSUPPORTED ? 'unknown' : null;
+	$item_status = $db_item['state'] == ITEM_STATE_NOTSUPPORTED ? 'unknown' : null;
 
 	array_push($app_rows, new CRow(array(
 		SPACE,
 		is_show_all_nodes()?SPACE:null,
 		($_REQUEST['hostid']>0)?NULL:SPACE,
-		new CCol(new CDiv(SPACE.SPACE.$description, $item_status)),
+		new CCol(new CDiv(SPACE.SPACE.$db_item['resolvedName'], $item_status)),
 		new CCol(new CDiv($lastclock, $item_status)),
 		new CCol(new CDiv($lastvalue, $item_status)),
 		new CCol(new CDiv($change, $item_status)),
@@ -403,7 +408,7 @@ foreach ($db_apps as $appid => $dbApp) {
 }
 
 /**
- * Display OTHER ITEMS (which doesn't linked to application)
+ * Display OTHER ITEMS (which are not linked to application)
  */
 $db_hosts = array();
 $db_hostids = array();
@@ -445,33 +450,35 @@ $sql = 'SELECT DISTINCT h.host as hostname,h.hostid,i.* '.
 			$sql_where.
 			' AND h.hostid=i.hostid '.
 			($_REQUEST['show_without_data'] ? '' : ' AND i.lastvalue IS NOT NULL').
-			' AND (i.status='.ITEM_STATUS_ACTIVE.' OR i.status='.ITEM_STATUS_NOTSUPPORTED.')'.
+			' AND i.status='.ITEM_STATUS_ACTIVE.
 			' AND '.dbConditionInt('i.flags', array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)).
 			' AND '.dbConditionInt('h.hostid', $db_hostids);
 
 $dbItems = DBfetchArray(DBselect($sql));
 
+foreach ($dbItems as &$dbItem) {
+	$dbItem['resolvedName'] = itemName($dbItem);
+}
+unset($dbItem);
+
 // if sortfield is item name
 if ($sortField == 'i.name') {
-	$sortFields = array(array('field' => 'name', 'order' => $sortOrder));
+	$sortFields = array(array('field' => 'resolvedName', 'order' => $sortOrder), 'itemid');
 }
 // if sortfield is item lastclock
 elseif ($sortField == 'i.lastclock') {
-	$sortFields = array(
-		array('field' => 'lastclock', 'order' => $sortOrder),
-		'name'
-	);
+	$sortFields = array(array('field' => 'lastclock', 'order' => $sortOrder), 'resolvedName', 'itemid');
 }
 // by default
 else {
-	$sortFields = array('name');
+	$sortFields = array('resolvedName', 'itemid');
 }
 CArrayHelper::sort($dbItems, $sortFields);
 
 foreach ($dbItems as $db_item){
-	$description = itemName($db_item);
-
-	if (!empty($_REQUEST['select']) && !zbx_stristr($description, $_REQUEST['select'])) continue;
+	if (!empty($_REQUEST['select']) && !zbx_stristr($db_item['resolvedName'], $_REQUEST['select'])) {
+		continue;
+	}
 
 	if (strpos($db_item['units'], ',') !== false)
 		list($db_item['units'], $db_item['unitsLong']) = explode(',', $db_item['units']);
@@ -494,7 +501,7 @@ foreach ($dbItems as $db_item){
 	}
 
 	// column "lastvalue"
-	$lastvalue = formatItemValue($db_item);
+	$lastvalue = formatItemLastValue($db_item);
 
 	// column "change"
 	$digits = ($db_item['value_type'] == ITEM_VALUE_TYPE_FLOAT) ? 2 : 0;
@@ -527,12 +534,12 @@ foreach ($dbItems as $db_item){
 		$actions = new CLink(_('History'), 'history.php?action=showvalues&itemid='.$db_item['itemid']);
 	}
 
-	$item_status = $db_item['status'] == ITEM_STATUS_NOTSUPPORTED ? 'unknown' : null;
+	$item_status = $db_item['state'] == ITEM_STATE_NOTSUPPORTED ? 'unknown' : null;
 	array_push($app_rows, new CRow(array(
 		SPACE,
 		is_show_all_nodes() ? ($db_host['item_cnt'] ? SPACE : get_node_name_by_elid($db_item['itemid'])) : null,
 		$_REQUEST['hostid'] ? null : SPACE,
-		new CCol(new CDiv(SPACE.SPACE.$description, $item_status)),
+		new CCol(new CDiv(SPACE.SPACE.$db_item['resolvedName'], $item_status)),
 		new CCol(new CDiv($lastclock, $item_status)),
 		new CCol(new CDiv($lastvalue, $item_status)),
 		new CCol(new CDiv($change, $item_status)),

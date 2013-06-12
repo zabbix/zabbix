@@ -134,6 +134,11 @@ class C20ImportFormatter extends CImportFormatter {
 			foreach ($this->data['hosts'] as $host) {
 				if (!empty($host['items'])) {
 					foreach ($host['items'] as $item) {
+						// if a host item has the "Not supported" status, convert it to "Active"
+						if ($item['status'] == ITEM_STATUS_NOTSUPPORTED) {
+							$item['status'] = ITEM_STATUS_ACTIVE;
+						}
+
 						$item = $this->formatItem($item);
 						$itemsData[$host['host']][$item['key_']] = $item;
 					}
@@ -161,6 +166,11 @@ class C20ImportFormatter extends CImportFormatter {
 			foreach ($this->data['hosts'] as $host) {
 				if (!empty($host['discovery_rules'])) {
 					foreach ($host['discovery_rules'] as $item) {
+						// if a discovery rule has the "Not supported" status, convert it to "Active"
+						if ($item['status'] == ITEM_STATUS_NOTSUPPORTED) {
+							$item['status'] = ITEM_STATUS_ACTIVE;
+						}
+
 						$item = $this->formatDiscoveryRule($item);
 
 						$discoveryRulesData[$host['host']][$item['key_']] = $item;

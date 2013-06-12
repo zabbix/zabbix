@@ -61,10 +61,13 @@ class CAlert extends CZBXAPI {
 
 		$defOptions = array(
 			'nodeids'					=> null,
+			'eventsource'				=> EVENT_SOURCE_TRIGGERS,
+			'eventobject'				=> EVENT_OBJECT_TRIGGER,
 			'groupids'					=> null,
 			'hostids'					=> null,
 			'alertids'					=> null,
 			'triggerids'				=> null,
+			'objectids'					=> null,
 			'eventids'					=> null,
 			'actionids'					=> null,
 			'mediatypeids'				=> null,
@@ -93,56 +96,103 @@ class CAlert extends CZBXAPI {
 		);
 		$options = zbx_array_merge($defOptions, $options);
 
+		$options = $this->convertDeprecatedParam($options, 'triggerids', 'objectids');
+		$this->validateGet($options);
+
 		// editable + PERMISSION CHECK
 		if ($userType != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
-			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ;
-
-			$userGroups = getUserGroupsByUserId($userid);
-
-			$sqlParts['where'][] = 'EXISTS ('.
+			// triggers
+			if ($options['eventobject'] == EVENT_OBJECT_TRIGGER) {
+				$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ;
+				$sqlParts['where'][] = 'EXISTS ('.
 					'SELECT NULL'.
 					' FROM events e,functions f,items i,hosts_groups hgg'.
-						' JOIN rights r'.
-							' ON r.id=hgg.groupid'.
-								' AND '.dbConditionInt('r.groupid', $userGroups).
+					' JOIN rights r'.
+						' ON r.id=hgg.groupid'.
+						' AND '.dbConditionInt('r.groupid', getUserGroupsByUserId($userid)).
 					' WHERE a.eventid=e.eventid'.
 						' AND e.objectid=f.triggerid'.
 						' AND f.itemid=i.itemid'.
 						' AND i.hostid=hgg.hostid'.
-						' AND e.object='.EVENT_OBJECT_TRIGGER.
-					' GROUP BY e.eventid'.
+					' GROUP BY f.triggerid'.
 					' HAVING MIN(r.permission)>'.PERM_DENY.
-						' AND MAX(r.permission)>='.$permission.
-					')';
+					' AND MAX(r.permission)>='.$permission.
+				')';
+			}
+			// items and LLD rules
+			elseif ($options['eventobject'] == EVENT_OBJECT_ITEM || $options['eventobject'] == EVENT_OBJECT_LLDRULE) {
+				$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ;
+				$sqlParts['where'][] = 'EXISTS ('.
+					'SELECT NULL'.
+					' FROM events e,items i,hosts_groups hgg'.
+					' JOIN rights r'.
+						' ON r.id=hgg.groupid'.
+						' AND '.dbConditionInt('r.groupid', getUserGroupsByUserId($userid)).
+					' WHERE a.eventid=e.eventid'.
+						' AND e.objectid=i.itemid'.
+						' AND i.hostid=hgg.hostid'.
+					' GROUP BY hgg.hostid'.
+					' HAVING MIN(r.permission)>'.PERM_DENY.
+					' AND MAX(r.permission)>='.$permission.
+				')';
+			}
 		}
+
+		$sqlParts['from']['e'] = 'events e';
+		$sqlParts['where']['ae'] = 'a.eventid=e.eventid';
+		$sqlParts['where'][] = 'e.source='.$options['eventsource'];
+		$sqlParts['where'][] = 'e.object='.$options['eventobject'];
 
 		// groupids
 		if (!is_null($options['groupids'])) {
 			zbx_value2array($options['groupids']);
 
-			$sqlParts['select']['groupid'] = 'hg.groupid';
+			$sqlParts = $this->addQuerySelect('hg.groupid', $sqlParts);
 			$sqlParts['from']['events'] = 'events e';
-			$sqlParts['from']['functions'] = 'functions f';
-			$sqlParts['from']['items'] = 'items i';
-			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
-			$sqlParts['where']['hgi'] = 'hg.hostid=i.hostid';
-			$sqlParts['where']['e'] = 'e.object='.EVENT_OBJECT_TRIGGER;
-			$sqlParts['where']['ef'] = 'e.objectid=f.triggerid';
-			$sqlParts['where']['fi'] = 'f.itemid=i.itemid';
-			$sqlParts['where']['hg'] = dbConditionInt('hg.groupid', $options['groupids']);
+			$sqlParts['where']['ae'] = 'a.eventid=e.eventid';
+
+			// triggers
+			if ($options['eventobject'] == EVENT_OBJECT_TRIGGER) {
+				$sqlParts['from']['functions'] = 'functions f';
+				$sqlParts['from']['items'] = 'items i';
+				$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
+				$sqlParts['where']['hg'] = dbConditionInt('hg.groupid', $options['groupids']);
+				$sqlParts['where']['hgi'] = 'hg.hostid=i.hostid';
+				$sqlParts['where']['fe'] = 'f.triggerid=e.objectid';
+				$sqlParts['where']['fi'] = 'f.itemid=i.itemid';
+			}
+			// lld rules and items
+			elseif ($options['eventobject'] == EVENT_OBJECT_LLDRULE || $options['eventobject'] == EVENT_OBJECT_ITEM) {
+				$sqlParts['from']['items'] = 'items i';
+				$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
+				$sqlParts['where']['hg'] = dbConditionInt('hg.groupid', $options['groupids']);
+				$sqlParts['where']['hgi'] = 'hg.hostid=i.hostid';
+				$sqlParts['where']['fi'] = 'e.objectid=i.itemid';
+			}
 		}
 
 		// hostids
 		if (!is_null($options['hostids'])) {
 			zbx_value2array($options['hostids']);
 
-			$sqlParts['select']['hostid'] = 'i.hostid';
-			$sqlParts['from']['functions'] = 'functions f';
-			$sqlParts['from']['items'] = 'items i';
-			$sqlParts['where']['i'] = dbConditionInt('i.hostid', $options['hostids']);
-			$sqlParts['where']['e'] = 'e.object='.EVENT_OBJECT_TRIGGER;
-			$sqlParts['where']['ef'] = 'e.objectid=f.triggerid';
-			$sqlParts['where']['fi'] = 'f.itemid=i.itemid';
+			$sqlParts = $this->addQuerySelect('i.hostid', $sqlParts);
+			$sqlParts['from']['events'] = 'events e';
+			$sqlParts['where']['ae'] = 'a.eventid=e.eventid';
+
+			// triggers
+			if ($options['eventobject'] == EVENT_OBJECT_TRIGGER) {
+				$sqlParts['from']['functions'] = 'functions f';
+				$sqlParts['from']['items'] = 'items i';
+				$sqlParts['where']['i'] = dbConditionInt('i.hostid', $options['hostids']);
+				$sqlParts['where']['ft'] = 'f.triggerid=e.objectid';
+				$sqlParts['where']['fi'] = 'f.itemid=i.itemid';
+			}
+			// lld rules and items
+			elseif ($options['eventobject'] == EVENT_OBJECT_LLDRULE || $options['eventobject'] == EVENT_OBJECT_ITEM) {
+				$sqlParts['from']['items'] = 'items i';
+				$sqlParts['where']['i'] = dbConditionInt('i.hostid', $options['hostids']);
+				$sqlParts['where']['fi'] = 'e.objectid=i.itemid';
+			}
 		}
 
 		// alertids
@@ -152,14 +202,16 @@ class CAlert extends CZBXAPI {
 			$sqlParts['where'][] = dbConditionInt('a.alertid', $options['alertids']);
 		}
 
-		// triggerids
-		if (!is_null($options['triggerids'])) {
-			zbx_value2array($options['triggerids']);
+		// objectids
+		if ($options['objectids'] !== null
+				&& in_array($options['object'], array(EVENT_OBJECT_TRIGGER, EVENT_OBJECT_ITEM, EVENT_OBJECT_LLDRULE))) {
+
+			zbx_value2array($options['objectids']);
 
 			$sqlParts['select']['actionid'] = 'a.actionid';
+			$sqlParts['from']['events'] = 'events e';
 			$sqlParts['where']['ae'] = 'a.eventid=e.eventid';
-			$sqlParts['where']['e'] = 'e.object='.EVENT_OBJECT_TRIGGER;
-			$sqlParts['where'][] = dbConditionInt('e.objectid', $options['triggerids']);
+			$sqlParts['where'][] = dbConditionInt('e.objectid', $options['objectids']);
 		}
 
 		// eventids
@@ -279,6 +331,36 @@ class CAlert extends CZBXAPI {
 		return $result;
 	}
 
+	/**
+	 * Validates the input parameters for the get() method.
+	 *
+	 * @throws APIException     if the input is invalid
+	 *
+	 * @param array     $options
+	 *
+	 * @return void
+	 */
+	protected function validateGet(array $options) {
+		$sourceValidator = new CSetValidator(array(
+			'values' => array_keys(eventSource())
+		));
+		if (!$sourceValidator->validate($options['eventsource'])) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect eventsource value.'));
+		}
+
+		$objectValidator = new CSetValidator(array(
+			'values' => array_keys(eventObject())
+		));
+		if (!$objectValidator->validate($options['eventobject'])) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect eventobject value.'));
+		}
+
+		$sourceObjectValidator = new CEventSourceObjectValidator();
+		if (!$sourceObjectValidator->validate(array('source' => $options['eventsource'], 'object' => $options['eventobject']))) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $sourceObjectValidator->getError());
+		}
+	}
+
 	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
 		$sqlParts = parent::applyQueryOutputOptions($tableName, $tableAlias, $options, $sqlParts);
 
@@ -302,17 +384,32 @@ class CAlert extends CZBXAPI {
 
 		// adding hosts
 		if ($options['selectHosts'] !== null && $options['selectHosts'] !== API_OUTPUT_COUNT) {
+			// trigger events
+			if ($options['eventobject'] == EVENT_OBJECT_TRIGGER) {
+				$query = DBselect(
+					'SELECT a.alertid,i.hostid'.
+						' FROM alerts a,events e,functions f,items i'.
+						' WHERE '.dbConditionInt('a.alertid', $alertIds).
+						' AND a.eventid=e.eventid'.
+						' AND e.objectid=f.triggerid'.
+						' AND f.itemid=i.itemid'.
+						' AND e.object='.EVENT_OBJECT_TRIGGER
+				);
+			}
+			// item and LLD rule events
+			elseif ($options['eventobject'] == EVENT_OBJECT_ITEM || $options['eventobject'] == EVENT_OBJECT_LLDRULE) {
+				$query = DBselect(
+					'SELECT a.alertid,i.hostid'.
+						' FROM alerts a,events e,items i'.
+						' WHERE '.dbConditionInt('a.alertid', $alertIds).
+						' AND a.eventid=e.eventid'.
+						' AND e.objectid=i.itemid'.
+						' AND e.object='.$options['eventobject']
+				);
+			}
+
 			$relationMap = new CRelationMap();
-			$res = DBselect(
-				'SELECT a.alertid,i.hostid'.
-					' FROM alerts a,events e,functions f,items i'.
-					' WHERE '.dbConditionInt('a.actionid', $alertIds).
-					' AND a.eventid=e.eventid'.
-					' AND e.objectid=f.triggerid'.
-					' AND f.itemid=i.itemid'.
-					' AND e.object='.EVENT_OBJECT_TRIGGER
-			);
-			while ($relation = DBfetch($res)) {
+			while ($relation = DBfetch($query)) {
 				$relationMap->addRelation($relation['alertid'], $relation['hostid']);
 			}
 			$hosts = API::Host()->get(array(

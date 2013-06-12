@@ -73,8 +73,8 @@ class CTemplate extends CHostGeneral {
 			'with_items'				=> null,
 			'with_triggers'				=> null,
 			'with_graphs'				=> null,
-			'with_httptests'            => null,
-			'editable' 					=> null,
+			'with_httptests'			=> null,
+			'editable'					=> null,
 			'nopermissions'				=> null,
 			// filter
 			'filter'					=> null,
@@ -96,7 +96,7 @@ class CTemplate extends CHostGeneral {
 			'selectApplications'		=> null,
 			'selectMacros'				=> null,
 			'selectScreens'				=> null,
-			'selectHttpTests'           => null,
+			'selectHttpTests'			=> null,
 			'countOutput'				=> null,
 			'groupCount'				=> null,
 			'preservekeys'				=> null,
@@ -658,7 +658,7 @@ class CTemplate extends CHostGeneral {
 		$actionids = array();
 		$sql = 'SELECT DISTINCT actionid'.
 			' FROM conditions'.
-			' WHERE conditiontype='.CONDITION_TYPE_HOST.
+			' WHERE conditiontype='.CONDITION_TYPE_TEMPLATE.
 			' AND '.dbConditionString('value', $templateids);
 		$dbActions = DBselect($sql);
 		while ($dbAction = DBfetch($dbActions)) {
@@ -684,8 +684,8 @@ class CTemplate extends CHostGeneral {
 
 		// delete action conditions
 		DB::delete('conditions', array(
-			'conditiontype'=>CONDITION_TYPE_HOST,
-			'value'=>$templateids
+			'conditiontype' => CONDITION_TYPE_TEMPLATE,
+			'value' => $templateids
 		));
 
 		// delete action operation commands

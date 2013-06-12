@@ -95,4 +95,6 @@
 		removeObjectById('times_' + id + '_to');
 		removeObjectById('times_' + id + '_note');
 	}
+
+	createPlaceholders();
 </script>

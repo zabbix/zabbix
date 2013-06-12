@@ -624,6 +624,17 @@ class CGraphPrototype extends CGraphGeneral {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Graph prototype must have at least one prototype.'));
 			}
 		}
+
+		$allowedValueTypes = array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64);
+
+		foreach ($allowedItems as $item) {
+			if (!in_array($item['value_type'], $allowedValueTypes)) {
+				self::exception(
+					ZBX_API_ERROR_PARAMETERS,
+					_s('Cannot add a non-numeric item "%1$s" to graph "%2$s".', $item['name'], $graph['name'])
+				);
+			}
+		}
 	}
 
 	protected function createReal($graph) {

@@ -379,7 +379,7 @@ calendar.prototype = {
 	},
 
 	setNow: function(timestamp) {
-		var now = (typeof(timestamp) == 'undefined') ? new Date() : new Date(timestamp * 1000);
+		var now = (isNaN(timestamp)) ? new Date() : new Date(timestamp * 1000);
 		this.day = now.getDate();
 		this.month = now.getMonth();
 		this.year = now.getFullYear();
