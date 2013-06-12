@@ -26,12 +26,8 @@ require_once dirname(__FILE__).'/include/forms.inc.php';
 
 $page['title'] = _('Configuration of items');
 $page['file'] = 'items.php';
-$page['scripts'] = array('class.cviewswitcher.js');
+$page['scripts'] = array('class.cviewswitcher.js', 'multiselect.js');
 $page['hist_arg'] = array();
-
-if ((isset($_REQUEST['go']) && $_REQUEST['go'] == 'massupdate') || isset($_REQUEST['massupdate'])) {
-	$page['scripts'][] = 'multiselect.js';
-}
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
@@ -138,8 +134,7 @@ $fields = array(
 	'form_refresh' =>			array(T_ZBX_INT, O_OPT, null,	null,		null),
 	// filter
 	'filter_set' =>				array(T_ZBX_STR, O_OPT, P_ACT,	null,		null),
-	'filter_group' =>			array(T_ZBX_STR, O_OPT, null,	null,		null),
-	'filter_hostname' =>		array(T_ZBX_STR, O_OPT, null,	null,		null),
+	'filter_groupid' =>			array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
 	'filter_hostid' =>			array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
 	'filter_application' =>		array(T_ZBX_STR, O_OPT, null,	null,		null),
 	'filter_name' =>			array(T_ZBX_STR, O_OPT, null,	null,		null),
@@ -227,14 +222,14 @@ if ($page['type'] == PAGE_TYPE_JS || $page['type'] == PAGE_TYPE_HTML_BLOCK) {
 }
 
 if (!empty($hosts)) {
-	$_REQUEST['filter_hostname'] = reset($hosts);
-	$_REQUEST['filter_hostname'] = $_REQUEST['filter_hostname']['name'];
+	$host = reset($hosts);
+	$_REQUEST['filter_hostid'] = $host['hostid'];
 }
 
 // filter
 if (isset($_REQUEST['filter_set'])) {
-	$_REQUEST['filter_group'] = get_request('filter_group');
-	$_REQUEST['filter_hostname'] = get_request('filter_hostname');
+	$_REQUEST['filter_groupid'] = get_request('filter_groupid', 0);
+	$_REQUEST['filter_hostid'] = get_request('filter_hostid', 0);
 	$_REQUEST['filter_application'] = get_request('filter_application');
 	$_REQUEST['filter_name'] = get_request('filter_name');
 	$_REQUEST['filter_type'] = get_request('filter_type', -1);
@@ -254,8 +249,8 @@ if (isset($_REQUEST['filter_set'])) {
 	$_REQUEST['filter_with_triggers'] = get_request('filter_with_triggers', -1);
 	$_REQUEST['filter_ipmi_sensor'] = get_request('filter_ipmi_sensor');
 
-	CProfile::update('web.items.filter_group', $_REQUEST['filter_group'], PROFILE_TYPE_STR);
-	CProfile::update('web.items.filter_hostname', $_REQUEST['filter_hostname'], PROFILE_TYPE_STR);
+	CProfile::update('web.items.filter_groupid', $_REQUEST['filter_groupid'], PROFILE_TYPE_ID);
+	CProfile::update('web.items.filter_hostid', $_REQUEST['filter_hostid'], PROFILE_TYPE_ID);
 	CProfile::update('web.items.filter_application', $_REQUEST['filter_application'], PROFILE_TYPE_STR);
 	CProfile::update('web.items.filter_name', $_REQUEST['filter_name'], PROFILE_TYPE_STR);
 	CProfile::update('web.items.filter_type', $_REQUEST['filter_type'], PROFILE_TYPE_INT);
@@ -276,8 +271,8 @@ if (isset($_REQUEST['filter_set'])) {
 	CProfile::update('web.items.filter_ipmi_sensor', $_REQUEST['filter_ipmi_sensor'], PROFILE_TYPE_STR);
 }
 else {
-	$_REQUEST['filter_group'] = CProfile::get('web.items.filter_group');
-	$_REQUEST['filter_hostname'] = CProfile::get('web.items.filter_hostname');
+	$_REQUEST['filter_groupid'] = CProfile::get('web.items.filter_groupid');
+	$_REQUEST['filter_hostid'] = CProfile::get('web.items.filter_hostid');
 	$_REQUEST['filter_application'] = CProfile::get('web.items.filter_application');
 	$_REQUEST['filter_name'] = CProfile::get('web.items.filter_name');
 	$_REQUEST['filter_type'] = CProfile::get('web.items.filter_type', -1);
@@ -298,13 +293,14 @@ else {
 	$_REQUEST['filter_ipmi_sensor'] = CProfile::get('web.items.filter_ipmi_sensor');
 }
 
-if (!isset($_REQUEST['form']) && isset($_REQUEST['filter_hostname']) && !zbx_empty($_REQUEST['filter_hostname'])) {
-	$host = API::Host()->getObjects(array('name' => $_REQUEST['filter_hostname']));
-	if (empty($host)) {
-		$host = API::Template()->getObjects(array('name' => $_REQUEST['filter_hostname']));
+if (!isset($_REQUEST['form']) && isset($_REQUEST['filter_hostid']) && !empty($_REQUEST['filter_hostid'])) {
+	if (!isset($host)) {
+		$host = API::Host()->getObjects(array('hostid' => $_REQUEST['filter_hostid']));
+		if (empty($host)) {
+			$host = API::Template()->getObjects(array('hostid' => $_REQUEST['filter_hostid']));
+		}
+		$host = reset($host);
 	}
-	$host = reset($host);
-
 	if ($host) {
 		$_REQUEST['hostid'] = isset($host['hostid']) ? $host['hostid'] : $host['templateid'];
 	}
@@ -904,12 +900,11 @@ else {
 	);
 	$preFilter = count($options, COUNT_RECURSIVE);
 
-	if (isset($_REQUEST['filter_group']) && !zbx_empty($_REQUEST['filter_group'])) {
-		$options['group'] = $_REQUEST['filter_group'];
+	if (isset($_REQUEST['filter_groupid']) && !empty($_REQUEST['filter_groupid'])) {
+		$options['groupids'] = $_REQUEST['filter_groupid'];
 	}
-	if (isset($_REQUEST['filter_hostname']) && !zbx_empty($_REQUEST['filter_hostname'])) {
-		$options['name'] = $_REQUEST['filter_hostname'];
-		$data['filter_hostname'] = $_REQUEST['filter_hostname'];
+	if (isset($_REQUEST['filter_hostid']) && !empty($_REQUEST['filter_hostid'])) {
+		$data['filter_hostid'] = $_REQUEST['filter_hostid'];
 	}
 	if (isset($_REQUEST['filter_application']) && !zbx_empty($_REQUEST['filter_application'])) {
 		$options['application'] = $_REQUEST['filter_application'];
@@ -956,6 +951,7 @@ else {
 		$options['filter']['status'] = $_REQUEST['filter_status'];
 	}
 	if (isset($_REQUEST['filter_state']) && !zbx_empty($_REQUEST['filter_state']) && $_REQUEST['filter_state'] != -1) {
+		$options['filter']['status'] = ITEM_STATUS_ACTIVE;
 		$options['filter']['state'] = $_REQUEST['filter_state'];
 	}
 	if (isset($_REQUEST['filter_templated_items']) && !zbx_empty($_REQUEST['filter_templated_items'])
@@ -969,8 +965,9 @@ else {
 	if (isset($_REQUEST['filter_ipmi_sensor']) && !zbx_empty($_REQUEST['filter_ipmi_sensor'])) {
 		$options['filter']['ipmi_sensor'] = $_REQUEST['filter_ipmi_sensor'];
 	}
+
 	$afterFilter = count($options, COUNT_RECURSIVE);
-	if ($preFilter == $afterFilter) {
+	if (empty($options['hostids']) && $preFilter == $afterFilter) {
 		$data['items'] = array();
 	}
 	else {
@@ -999,7 +996,7 @@ else {
 			$item['hostids'] = zbx_objectValues($item['hosts'], 'hostid');
 			$item['name_expanded'] = itemName($item);
 
-			if (empty($data['filter_hostname'])) {
+			if (empty($data['filter_hostid'])) {
 				$host = reset($item['hosts']);
 				$item['host'] = $host['name'];
 			}
