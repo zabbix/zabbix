@@ -538,10 +538,11 @@ class CGraphPrototype extends CGraphGeneral {
 			$parentGraphids = array();
 			while ($dbGraph = DBfetch($dbGraphs)) {
 				$parentGraphids[] = $dbGraph['graphid'];
-				$graphids[$dbGraph['graphid']] = $dbGraph['graphid'];
+				$graphids[] = $dbGraph['graphid'];
 			}
 		} while (!empty($parentGraphids));
 
+		$graphids = array_unique($graphids);
 		$createdGraphs = array();
 
 		$dbGraphs = DBselect('SELECT gd.graphid FROM graph_discovery gd WHERE '.dbConditionInt('gd.parent_graphid', $graphids));
