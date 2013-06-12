@@ -295,6 +295,10 @@ switch ($this->data['new_condition']['conditiontype']) {
 		$condition = new CComboBox('new_condition[value]', null, null, eventType());
 		break;
 
+	case CONDITION_TYPE_HOST_METADATA:
+		$rowCondition[] = new CTextBox('new_condition[value]', '', ZBX_TEXTBOX_STANDARD_SIZE);
+		break;
+
 	default:
 		$condition = null;
 }

@@ -531,7 +531,8 @@ div.preloader {
 }
 
 /* multiselect */
-.multiselect input { color: #FFFFFF; }
+.multiselect input[type="text"] { color: #FFFFFF; }
+.multiselect input[type="text"]:hover { background: none; border: none; outline: none; }
 .multiselect .selected ul { border: 1px solid #B3C9D6; background: #001C31; }
 .multiselect .selected ul.active { border: 1px solid #41789D; }
 .multiselect .selected ul li {

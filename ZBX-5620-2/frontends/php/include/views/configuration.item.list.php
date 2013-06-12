@@ -19,6 +19,8 @@
 **/
 
 
+require_once dirname(__FILE__).'/js/configuration.item.list.js.php';
+
 $itemsWidget = new CWidget(null, 'item-list');
 
 // create new item button
