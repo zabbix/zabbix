@@ -97,10 +97,10 @@ function getSeverityColor($severity, $value = TRIGGER_VALUE_TRUE) {
 
 function getSeverityCell($severity, $text = null, $force_normal = false) {
 	if ($text === null) {
-		$text = getSeverityCaption($severity);
+		$text = CHtml::encode(getSeverityCaption($severity));
 	}
 
-	return new CCol(CHtml::encode($text), getSeverityStyle($severity, !$force_normal));
+	return new CCol($text, getSeverityStyle($severity, !$force_normal));
 }
 
 // retrieve trigger's priority for services
