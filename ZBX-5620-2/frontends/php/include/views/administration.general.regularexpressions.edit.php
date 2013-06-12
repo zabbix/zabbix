@@ -57,9 +57,7 @@ $exprFormFooter = array(
 	SPACE,
 	new Cbutton('cancelExpression', _('Cancel'), null, 'link_menu')
 );
-$exprTabDiv = new CDiv(array($exprForm, $exprFormFooter), 'objectgroup inlineblock border_dotted', 'exprForm');
-$exprTabDiv->addStyle('display: none;');
-$exprTab->addRow(SPACE, $exprTabDiv);
+$exprTab->addRow(null, new CDiv(array($exprForm, $exprFormFooter), 'objectgroup inlineblock border_dotted'), true, 'exprForm');
 
 /*
  * Test tab

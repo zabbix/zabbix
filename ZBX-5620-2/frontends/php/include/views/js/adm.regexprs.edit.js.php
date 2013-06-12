@@ -263,14 +263,14 @@
 				// when type is updated fire change event to show/hide delimiter row
 				$('#typeNew').change();
 
-				$('#exprForm').show();
+				$('#exprForm').removeClass('hidden');
 			},
 
 			/**
 			 * Hide expression form.
 			 */
 			hideForm: function() {
-				$('#exprForm').hide();
+				$('#exprForm').addClass('hidden');
 			},
 
 			/**
