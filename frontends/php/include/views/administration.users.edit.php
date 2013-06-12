@@ -147,12 +147,19 @@ if (uint_in_array($USER_DETAILS['type'], array(USER_TYPE_ZABBIX_ADMIN, USER_TYPE
 						'&severity='.$media['severity'].
 						'&active='.$media['active'];
 
+		foreach (getSeverityCaption() as $key => $caption) {
+			$mediaActive = ($media['severity'] & (1 << $key));
+
+			$mediaSeverity[$key] = new CSpan(zbx_substr($caption, 0, 1), $mediaActive ? 'enabled' : NULL);
+			$mediaSeverity[$key]->setHint($caption.($mediaActive ? ' (on)' : ' (off)'));
+		}
+
 		$mediaTableInfo->addRow(array(
 			new CCheckBox('user_medias_to_del['.$id.']', null, null, $id),
 			new CSpan($media['description'], 'nowrap'),
 			new CSpan($media['sendto'], 'nowrap'),
 			new CSpan($media['period'], 'nowrap'),
-			media_severity2str($media['severity']),
+			$mediaSeverity,
 			$status,
 			new CButton('edit_media', _('Edit'), 'return PopUp("popup_media.php'.$mediaUrl.'", 550, 400);', 'link_menu'))
 		);
