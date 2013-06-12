@@ -39,23 +39,4 @@ function media_type2str($type = null) {
 		return _('Unknown');
 	}
 }
-
-/**
- * Return media severity in span array with trigger severities labels
- *
- * @param int $severity
- *
- * @return array
- */
-function mediaSeverityToArray($severity) {
-	$result = array();
-	foreach (getSeverityCaption() as $i => $caption) {
-		$style = ($severity & (1 << $i)) ? 'enabled' : null;
-
-		$result[$i] = new CSpan(zbx_substr($caption, 0, 1), $style);
-		$result[$i]->setHint($caption.' ('.($severity & (1 << $i) ? 'on' : 'off').')');
-	}
-
-	return $result;
-}
 ?>
