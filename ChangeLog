@@ -73,6 +73,7 @@ A.F.I...S. [ZBXNEXT-1186] increased length to 2048 characters of expression fiel
 ........S. [ZBXNEXT-1663] added support for notification macros {TRIGGER.NAME.ORIG}, {ITEM.NAME.ORIG}, {ITEM.KEY.ORIG} (dimir)
 
 Bug fixes:
+..F....... [ZBX-6597] removed debug trace in frontend for unsuccessful login if debug mode is enabled for guest group (Toms)
 ...G...... [ZBXNEXT-1550] fixed agent crash on Microsoft Windows (Andris)
 ..F....... [ZBX-6679] fixed monitoring event filter, must ignore groups and hosts without active triggers (Eduard)
 ..F....... [ZBX-6685] fixed multiselect available data sorting in jsrpc (Eduard)
@@ -90,7 +91,6 @@ A......... [ZBX-6644] fixed sorting by history and trends fields in itemprototyp
 ...G...... [ZBX-5589] added validation of timeout and retry count parameters of net.dns item (aleksej, dimir)
 ..F....... [ZBX-6575] fixed frontend permission validation for actions, hosts, maintenance, maps, proxies, screens and templates (Eduard)
 ..F....... [ZBX-6626] fixed time displaing for graphs (Eduard)
-..F....... [ZBX-6597] removed debug trace for unsuccessful login if debug mode is enabled for guest group (Toms)
 ..F....... [ZBX-6562] fixed incorrect rounding in graphs for "s" units, fixed < 1 ms and 0s interval (Oleg)
 ....I..PS. [ZBX-5953] added output of web monitoring status (yes/no) when configuring Proxy or Server (aleksej)
 A......... [ZBX-6613] fixed trigger prototype create/update error message (Eduard)
