@@ -165,7 +165,7 @@ int	put_data_to_server(zbx_sock_t *sock, struct zbx_json *j)
 	if (FAIL == send_data_to_server(sock, j->buffer))
 		goto exit;
 
-	if (FAIL == zbx_recv_response(sock, NULL, 0, 0))
+	if (SUCCEED != zbx_recv_response(sock, NULL, 0, 0))
 		goto exit;
 
 	ret = SUCCEED;
