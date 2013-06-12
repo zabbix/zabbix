@@ -27,6 +27,8 @@
 #include "sysinfo.h"
 #include "zbxjson.h"
 
+#define PPA(n) (*(dl_hp_ppa_info_t *)(buf_ctl + ack.dl_offset + n*sizeof(dl_hp_ppa_info_t)))
+
 char	buf_ctl[1024];
 
 /* Low Level Discovery needs a way to get the list of network interfaces available */
@@ -311,12 +313,18 @@ static int	dlpi_get_stats(int fd, Ext_mib_t *mib)
 	return 1;
 }
 
-static int	get_net_stat(int ppa, Ext_mib_t *mib)
+static int	get_net_stat(Ext_mib_t *mib, char *if_name)
 {
 	int	fd;
+	int	ppa;
 
 	if (-1 == (fd = open("/dev/dlpi", O_RDWR)))
 		return 0;
+
+	if (0 == get_ppa(fd, if_name, &ppa)){
+		close(fd);
+		return 0;
+	}
 
 	if (0 == dlpi_attach(fd, ppa))
 		return 0;
@@ -331,11 +339,56 @@ static int	get_net_stat(int ppa, Ext_mib_t *mib)
 	return 1;
 }
 
+int get_ppa(int fd, char *if_name, int *ppa)
+{
+	dl_hp_ppa_req_t		ppa_req;
+	dl_hp_ppa_ack_t		ack;
+	int			i, offset, ret, flags = RS_HIPRI;
+	char			*buf;
+
+	ppa_req.dl_primitive = DL_HP_PPA_REQ;
+
+	ctlbuf.len = sizeof(ppa_req);
+	ctlbuf.buf = (char *)&ppa_req;
+
+	if (putmsg(fd, &ctlbuf, NULL, flags) < 0) {
+		printf("error: putmsg\n");
+		return 0;
+	}
+
+	ctlbuf.buf = buf_ctl;
+	ctlbuf.maxlen = 1024;
+
+	if (getmsg(fd, &ctlbuf, NULL, &flags) < 0) {
+		printf("error: getmsg\n");
+		return 0;
+	}
+
+	ret = *(int *)buf_ctl;
+
+	if (ret != DL_HP_PPA_ACK)
+		return 0;
+
+	ack = *(dl_hp_ppa_ack_t *)buf_ctl;
+
+	buf=malloc(strlen(if_name)+1);
+	for (i = 0; i < ack.dl_count; i++) {
+		zbx_snprintf(buf, strlen(if_name)+1, "%s%d", PPA(i).dl_module_id_1, PPA(i).dl_ppa);
+		if(0 == strcmp(if_name, buf)){
+			*ppa = PPA(i).dl_ppa;
+			free(buf);
+			return 1;
+		}
+	}
+
+	free(buf);
+	return 0;
+}
+
 int	NET_IF_IN(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char		*if_name, *mode;
 	Ext_mib_t	mib;
-	int		ppa;
 
 	if (2 < request->nparam)
 		return SYSINFO_RET_FAIL;
@@ -343,10 +396,7 @@ int	NET_IF_IN(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if_name = get_rparam(request, 0);
 	mode = get_rparam(request, 1);
 
-	if (1 != sscanf(if_name, "lan%d", &ppa) || 0> ppa)
-		return SYSINFO_RET_FAIL;
-
-	if (0 == get_net_stat(ppa, &mib))
+	if (0 == get_net_stat(&mib, if_name))
 		return SYSINFO_RET_FAIL;
 
 	if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "bytes"))
@@ -367,7 +417,6 @@ int	NET_IF_OUT(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char		*if_name, *mode;
 	Ext_mib_t	mib;
-	int		ppa;
 
 	if (2 < request->nparam)
 		return SYSINFO_RET_FAIL;
@@ -375,10 +424,7 @@ int	NET_IF_OUT(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if_name = get_rparam(request, 0);
 	mode = get_rparam(request, 1);
 
-	if (1 != sscanf(if_name, "lan%d", &ppa) || 0 > ppa)
-		return SYSINFO_RET_FAIL;
-
-	if (0 == get_net_stat(ppa, &mib))
+	if (0 == get_net_stat(&mib, if_name))
 		return SYSINFO_RET_FAIL;
 
 	if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "bytes"))
@@ -399,7 +445,6 @@ int	NET_IF_TOTAL(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char		*if_name, *mode;
 	Ext_mib_t	mib;
-	int		ppa;
 
 	if (2 < request->nparam)
 		return SYSINFO_RET_FAIL;
@@ -407,10 +452,7 @@ int	NET_IF_TOTAL(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if_name = get_rparam(request, 0);
 	mode = get_rparam(request, 1);
 
-	if (1 != sscanf(if_name, "lan%d", &ppa) || 0 > ppa)
-		return SYSINFO_RET_FAIL;
-
-	if (0 == get_net_stat(ppa, &mib))
+	if (0 == get_net_stat(&mib, if_name))
 		return SYSINFO_RET_FAIL;
 
 	if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "bytes"))
