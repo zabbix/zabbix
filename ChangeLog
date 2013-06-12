@@ -73,6 +73,7 @@ A.F.I...S. [ZBXNEXT-1186] increased length to 2048 characters of expression fiel
 ........S. [ZBXNEXT-1663] added support for notification macros {TRIGGER.NAME.ORIG}, {ITEM.NAME.ORIG}, {ITEM.KEY.ORIG} (dimir)
 
 Bug fixes:
+..F....... [ZBX-6692] fixed displaying age and last change in monitoring triggers page (Ivo)
 A......... [ZBX-6356] fixed displaying web scenarios for administrator users (Ivo)
 ..F....... [ZBX-6667] fixed unused hostid parameter in maintenance configuration page (Eduard)
 A.F....... [ZBX-6649] added numeric validation when selecting item for graphs and graph prototypes (Ivo)
