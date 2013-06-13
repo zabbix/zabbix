@@ -409,7 +409,7 @@ class CItem extends CItemGeneral {
 		// add other related objects
 		if ($result) {
 			$result = $this->addRelatedObjects($options, $result);
-			$result = $this->unsetExtraFields($result, array('hostid', 'interfaceid'), $options['output']);
+			$result = $this->unsetExtraFields($result, array('hostid', 'interfaceid', 'value_type'), $options['output']);
 		}
 
 		// removing keys (hash -> array)
@@ -1155,6 +1155,36 @@ class CItem extends CItemGeneral {
 			$result = $relationMap->mapOne($result, $itemDiscoveries, 'itemDiscovery');
 		}
 
+		// adding history data
+		$requestedOutput = array(
+			'lastclock' => $this->outputIsRequested('lastclock', $options['output']),
+			'lastns' => $this->outputIsRequested('lastns', $options['output']),
+			'lastvalue' => $this->outputIsRequested('lastvalue', $options['output']),
+			'prevvalue' => $this->outputIsRequested('prevvalue', $options['output'])
+		);
+		if ($requestedOutput) {
+			$historyManager = new CHistoryManager();
+			$history = $historyManager->fetchLast($result, 2);
+			foreach ($result as &$item) {
+				$lastHistory = isset($history[$item['itemid']][0]) ? $history[$item['itemid']][0] : null;
+				$prevHistory = isset($history[$item['itemid']][1]) ? $history[$item['itemid']][1] : null;
+
+				if ($requestedOutput['lastclock']) {
+					$item['lastclock'] = $lastHistory ? $lastHistory['clock'] : '0';
+				}
+				if ($requestedOutput['lastns']) {
+					$item['lastns'] = $lastHistory ? $lastHistory['ns'] : '0';
+				}
+				if ($requestedOutput['lastvalue']) {
+					$item['lastvalue'] = $lastHistory ? $lastHistory['value'] : '0';
+				}
+				if ($requestedOutput['prevvalue']) {
+					$item['prevvalue'] = $prevHistory ? $prevHistory['value'] : '0';
+				}
+			}
+			unset($item);
+		}
+
 		return $result;
 	}
 
@@ -1168,6 +1198,14 @@ class CItem extends CItemGeneral {
 
 			if ($options['selectInterfaces'] !== null) {
 				$sqlParts = $this->addQuerySelect('i.interfaceid', $sqlParts);
+			}
+
+			if ($this->outputIsRequested('lastclock', $options['output'])
+					|| $this->outputIsRequested('lastns', $options['output'])
+					|| $this->outputIsRequested('lastvalue', $options['output'])
+					|| $this->outputIsRequested('prevvalue', $options['output'])) {
+
+				$sqlParts = $this->addQuerySelect('i.value_type', $sqlParts);
 			}
 		}
 
