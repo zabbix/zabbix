@@ -180,6 +180,11 @@ $_REQUEST['go'] = get_request('go', 'none');
 $_REQUEST['params'] = get_request($paramsFieldName, '');
 unset($_REQUEST[$paramsFieldName]);
 
+var_dump(API::Item()->get(array(
+	'output' => API_OUTPUT_EXTEND,
+	'limit' => 10
+)));
+
 /*
  * Permissions
  */

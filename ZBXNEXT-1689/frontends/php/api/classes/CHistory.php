@@ -92,28 +92,10 @@ class CHistory extends CZBXAPI {
 		);
 		$options = zbx_array_merge($defOptions, $options);
 
-		switch ($options['history']) {
-			case ITEM_VALUE_TYPE_LOG:
-				$sqlParts['from']['history'] = 'history_log h';
-				$tableName = 'history_log';
-				break;
-			case ITEM_VALUE_TYPE_TEXT:
-				$sqlParts['from']['history'] = 'history_text h';
-				$tableName = 'history_text';
-				break;
-			case ITEM_VALUE_TYPE_STR:
-				$sqlParts['from']['history'] = 'history_str h';
-				$tableName = 'history_str';
-				break;
-			case ITEM_VALUE_TYPE_UINT64:
-				$sqlParts['from']['history'] = 'history_uint h';
-				$tableName = 'history_uint';
-				break;
-			case ITEM_VALUE_TYPE_FLOAT:
-			default:
-				$sqlParts['from']['history'] = 'history h';
-				$tableName = 'history';
-		}
+		$tableName = CHistoryManager::getTableName($options['history'])
+			? CHistoryManager::getTableName($options['history'])
+			: 'history';
+		$sqlParts['from']['history'] = $tableName.' h';
 
 		// editable + PERMISSION CHECK
 		if (USER_TYPE_SUPER_ADMIN == self::$userData['type'] || $options['nopermissions']) {
