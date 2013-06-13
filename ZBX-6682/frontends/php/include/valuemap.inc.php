@@ -282,26 +282,7 @@ function getMappedValue($value, $valueMapId) {
  * @return string
  */
 function applyValueMap($value, $valueMapId) {
-	if ($valueMapId < 1) {
-		return $value;
-	}
+	$mapping = getMappedValue($value, $valueMapId);
 
-	static $valueMaps = array();
-
-	if (isset($valueMaps[$valueMapId][$value])) {
-		return $valueMaps[$valueMapId][$value];
-	}
-
-	$dbMappings = DBselect(
-		'SELECT m.newvalue'.
-		' FROM mappings m'.
-		' WHERE m.valuemapid='.$valueMapId.
-			' AND m.value='.zbx_dbstr($value)
-	);
-	if ($mapping = DBfetch($dbMappings)) {
-		$valueMaps[$valueMapId][$value] = $mapping['newvalue'].' '.'('.$value.')';
-		return $valueMaps[$valueMapId][$value];
-	}
-
-	return $value;
+	return $mapping === false ? $value : $mapping.' ('.$value.')';
 }
