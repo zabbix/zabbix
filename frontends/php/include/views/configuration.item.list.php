@@ -76,15 +76,15 @@ foreach ($this->data['items'] as $item) {
 	// description
 	$description = array();
 	if (!empty($item['template_host'])) {
-		$description[] = new CLink($item['template_host']['name'], '?hostid='.$item['template_host']['hostid'].'&filter_set=1', 'unknown');
+		$description[] = new CLink(CHtml::encode($item['template_host']['name']), '?hostid='.$item['template_host']['hostid'].'&filter_set=1', 'unknown');
 		$description[] = NAME_DELIMITER;
 	}
 	if (!empty($item['discoveryRule'])) {
-		$description[] = new CLink($item['discoveryRule']['name'], 'disc_prototypes.php?parent_discoveryid='.$item['discoveryRule']['itemid'], 'gold');
+		$description[] = new CLink(CHtml::encode($item['discoveryRule']['name']), 'disc_prototypes.php?parent_discoveryid='.$item['discoveryRule']['itemid'], 'gold');
 		$description[] = NAME_DELIMITER.$item['name_expanded'];
 	}
 	else {
-		$description[] = new CLink($item['name_expanded'], '?form=update&hostid='.$item['hostid'].'&itemid='.$item['itemid']);
+		$description[] = new CLink(CHtml::encode($item['name_expanded']), '?form=update&hostid='.$item['hostid'].'&itemid='.$item['itemid']);
 	}
 
 	// status
@@ -134,7 +134,7 @@ foreach ($this->data['items'] as $item) {
 			}
 			else {
 				$realHost = reset($this->data['triggerRealHosts'][$trigger['triggerid']]);
-				$triggerDescription[] = new CLink($realHost['name'], 'triggers.php?&hostid='.$realHost['hostid'], 'unknown');
+				$triggerDescription[] = new CLink(CHtml::encode($realHost['name']), 'triggers.php?&hostid='.$realHost['hostid'], 'unknown');
 				$triggerDescription[] = ':';
 			}
 		}
@@ -142,10 +142,10 @@ foreach ($this->data['items'] as $item) {
 		$trigger['hosts'] = zbx_toHash($trigger['hosts'], 'hostid');
 
 		if ($trigger['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
-			$triggerDescription[] = new CSpan($trigger['description']);
+			$triggerDescription[] = new CSpan(CHtml::encode($trigger['description']));
 		}
 		else {
-			$triggerDescription[] = new CLink($trigger['description'], 'triggers.php?form=update&hostid='.
+			$triggerDescription[] = new CLink(CHtml::encode($trigger['description']), 'triggers.php?form=update&hostid='.
 				key($trigger['hosts']).'&triggerid='.$trigger['triggerid']);
 		}
 
@@ -212,7 +212,12 @@ foreach ($this->data['items'] as $item) {
 		$menuIcon = new CIcon(
 			_('Menu'),
 			'iconmenu_b',
-			'call_triggerlog_menu(event, '.zbx_jsvalue($item['itemid']).', '.zbx_jsvalue($item['name_expanded']).', '.$triggers.');'
+			'call_triggerlog_menu('.
+				'event, '.
+				CJs::encodeJson($item['itemid']).', '.
+				CJs::encodeJson(CHtml::encode($item['name_expanded'])).', '.
+				$triggers.
+			');'
 		);
 	}
 	else {
@@ -228,12 +233,12 @@ foreach ($this->data['items'] as $item) {
 		empty($this->data['filter_hostid']) ? $item['host'] : null,
 		$description,
 		$triggerInfo,
-		$item['key_'],
+		CHtml::encode($item['key_']),
 		$item['type'] == ITEM_TYPE_TRAPPER || $item['type'] == ITEM_TYPE_SNMPTRAP ? '' : $item['delay'],
 		$item['history'],
 		in_array($item['value_type'], array(ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT)) ? '' : $item['trends'],
 		item_type2str($item['type']),
-		new CCol($item['applications_list'], 'wraptext'),
+		new CCol(CHtml::encode($item['applications_list']), 'wraptext'),
 		$status,
 		$statusIcons
 	));
