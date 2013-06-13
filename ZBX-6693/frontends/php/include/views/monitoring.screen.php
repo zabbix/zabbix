@@ -86,41 +86,23 @@ else {
 	$headerForm->addItem(array(_('Screens').SPACE, $elementsComboBox));
 
 	if (check_dynamic_items($screen['screenid'], 0)) {
-		global $ZBX_WITH_ALL_NODES;
+		$pageFilter = new CPageFilter(array(
+			'groups' => array(
+				'monitored_hosts' => true
+			),
+			'hosts' => array(
+				'monitored_hosts' => true
+			),
+			'hostid' => get_request('hostid', null),
+			'groupid' => get_request('groupid', null)
+		));
+		$_REQUEST['groupid'] = $pageFilter->groupid;
+		$_REQUEST['hostid'] = $pageFilter->hostid;
 
-		if (!isset($_REQUEST['hostid'])) {
-			$_REQUEST['groupid'] = $_REQUEST['hostid'] = 0;
-		}
-
-		$options = array('allow_all_hosts', 'monitored_hosts', 'with_items');
-		if (!$ZBX_WITH_ALL_NODES) {
-			array_push($options, 'only_current_node');
-		}
-		$params = array();
-		foreach ($options as $option) {
-			$params[$option] = 1;
-		}
-
-		$PAGE_GROUPS = get_viewed_groups(PERM_READ, $params);
-		$PAGE_HOSTS = get_viewed_hosts(PERM_READ, $PAGE_GROUPS['selected'], $params);
-
-		validate_group_with_host($PAGE_GROUPS, $PAGE_HOSTS);
-
-		// groups
-		$groupsComboBox = new CComboBox('groupid', $PAGE_GROUPS['selected'], 'javascript: window.flickerfreeScreen.submitForm("'.$headerForm->getName().'");');
-		foreach ($PAGE_GROUPS['groups'] as $groupid => $name) {
-			$groupsComboBox->addItem($groupid, get_node_name_by_elid($groupid, null, NAME_DELIMITER).$name);
-		}
-		$headerForm->addItem(array(SPACE._('Group').SPACE, $groupsComboBox));
-
-		// hosts
-		$PAGE_HOSTS['hosts']['0'] = _('Default');
-		$hostsComboBox = new CComboBox('hostid', $PAGE_HOSTS['selected'], 'javascript: window.flickerfreeScreen.submitForm("'.$headerForm->getName().'");');
-		foreach ($PAGE_HOSTS['hosts'] as $hostid => $name) {
-			$hostsComboBox->addItem($hostid, get_node_name_by_elid($hostid, null, NAME_DELIMITER).$name);
-		}
-		$headerForm->addItem(array(SPACE._('Host').SPACE, $hostsComboBox));
+		$headerForm->addItem(array(SPACE, _('Group'), SPACE, $pageFilter->getGroupsCB(true)));
+		$headerForm->addItem(array(SPACE, _('Host'), SPACE, $pageFilter->getHostsCB(true)));
 	}
+
 	$screenWidget->addHeader($screen['name'], $headerForm);
 
 	// append screens to widget

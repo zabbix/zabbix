@@ -122,10 +122,8 @@ class CPageFilter {
 
 	/**
 	 * Contains information about the selected values.
-	 *
 	 * The '*Selected' value is set to true if a specific object is chosen or the corresponding filter is set to 'All'
 	 * and contains objects.
-	 *
 	 * The '*All' value is set to true if the corresponding filter is set to 'All' and contains objects.
 	 *
 	 * @var array
@@ -306,15 +304,12 @@ class CPageFilter {
 
 	/**
 	 * Retrieve objects stored in the user profile.
-	 *
 	 * If the 'select_latest' option is used, the IDs will be loaded from the web.latest.objectid profile values,
 	 * otherwise - from the web.*.objectid field, depending on the use of the 'individial' option.
-	 *
 	 * If the 'DDReset' option is used, IDs will be reset to zeroes.
-	 *
 	 * The method also sets the scope for remembering the selected values, see the 'individual' option for more info.
 	 *
-	 * @param $options
+	 * @param array $options
 	 */
 	private function _getProfiles(array $options) {
 		global $page;
@@ -413,13 +408,12 @@ class CPageFilter {
 
 	/**
 	 * Load available host groups, choose the selected host group and remember the selection.
-	 *
 	 * If the host given in the 'hostid' option does not belong to the selected host group, the selected host group
 	 * will be reset to 0.
 	 *
-	 * @param $groupid
-	 * @param $options
-	 * @param $hostid
+	 * @param int   $groupid
+	 * @param array $options
+	 * @param int   $hostid
 	 */
 	private function _initGroups($groupid, array $options, $hostid) {
 		$def_options = array(
@@ -474,11 +468,11 @@ class CPageFilter {
 
 	/**
 	 * Load available hosts, choose the selected host and remember the selection.
-	 *
 	 * If no host group is selected, reset the selected host to 0.
 	 *
-	 * @param $hostid
-	 * @param $options
+	 * @param int   $hostid
+	 * @param array $options
+	 * @param bool  $options['only_templates']
 	 */
 	private function _initHosts($hostid, array $options) {
 		$this->data['hosts'] = array();
@@ -487,17 +481,21 @@ class CPageFilter {
 			$hostid = 0;
 		}
 		else {
-			$def_options = array(
+			$optionsDefault = array(
 				'nodeids' => $this->config['all_nodes'] ? get_current_nodeid() : null,
 				'output' => array('hostid', 'name'),
 				'groupids' => ($this->groupid > 0) ? $this->groupid : null
 			);
-			$options = zbx_array_merge($def_options, $options);
-			$hosts = API::Host()->get($options);
+			$options = zbx_array_merge($optionsDefault, $options);
+
+			$hosts = isset($options['only_templates'])
+				? API::Template()->get($options)
+				: API::Host()->get($options);
 			order_result($hosts, 'name');
 
+			$objectName = isset($options['only_templates']) ? 'templateid' : 'hostid';
 			foreach ($hosts as $host) {
-				$this->data['hosts'][$host['hostid']] = $host['name'];
+				$this->data['hosts'][$host[$objectName]] = $host['name'];
 			}
 
 			// select remebered selection
@@ -523,18 +521,18 @@ class CPageFilter {
 			CProfile::update($this->_profileIdx['hosts'], $hostid, PROFILE_TYPE_ID);
 			CProfile::update(self::HOST_LATEST_IDX, $hostid, PROFILE_TYPE_ID);
 		}
-		$this->isSelected['hostsSelected'] = ($this->config['DDFirst'] == ZBX_DROPDOWN_FIRST_ALL && !empty($this->data['hosts'])) || $hostid > 0;
-		$this->isSelected['hostsAll'] = $this->config['DDFirst'] == ZBX_DROPDOWN_FIRST_ALL && !empty($this->data['hosts']) && $hostid == 0;
+
+		$this->isSelected['hostsSelected'] = (($this->config['DDFirst'] == ZBX_DROPDOWN_FIRST_ALL && !empty($this->data['hosts'])) || $hostid > 0);
+		$this->isSelected['hostsAll'] = ($this->config['DDFirst'] == ZBX_DROPDOWN_FIRST_ALL && !empty($this->data['hosts']) && $hostid == 0);
 		$this->ids['hostid'] = $hostid;
 	}
 
 	/**
 	 * Load available graphs, choose the selected graph and remember the selection.
-	 *
 	 * If no host is selected, reset the selected graph to 0.
 	 *
-	 * @param $graphid
-	 * @param $options
+	 * @param int   $graphid
+	 * @param array $options
 	 */
 	private function _initGraphs($graphid, array $options) {
 		$this->data['graphs'] = array();
@@ -595,11 +593,10 @@ class CPageFilter {
 
 	/**
 	 * Load available triggers, choose the selected trigger and remember the selection.
-	 *
 	 * If no host is elected, or the host selection is set to 'All', reset the selected trigger to 0.
 	 *
-	 * @param $triggerid
-	 * @param $options
+	 * @param int   $triggerid
+	 * @param array $options
 	 */
 	private function _initTriggers($triggerid, array $options) {
 		$this->data['triggers'] = array();
@@ -635,8 +632,8 @@ class CPageFilter {
 	/**
 	 * Load the available network discovery rules, choose the selected rule and remember the selection.
 	 *
-	 * @param $druleid
-	 * @param $options
+	 * @param int   $druleid
+	 * @param array $options
 	 */
 	private function _initDiscoveries($druleid, array $options) {
 		$def_options = array(
@@ -681,8 +678,8 @@ class CPageFilter {
 	 *  - applicationsSelected: if an application selected, i.e. not 'not selected'
 	 * Applications are dependent on groups.
 	 *
-	 * @param $application
-	 * @param $options
+	 * @param int   $application
+	 * @param array $options
 	 */
 	private function _initApplications($application, array $options) {
 		$this->data['applications'] = array();

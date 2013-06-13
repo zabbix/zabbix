@@ -54,7 +54,7 @@ $fields = array(
 	'pmasterid' =>		array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
 	// actions
 	'favaction' =>		array(T_ZBX_STR, O_OPT, P_ACT,	IN("'add','remove','refresh','flop'"), null),
-	'favstate' =>		array(T_ZBX_INT, O_OPT, P_ACT,	NOT_EMPTY, 'isset({favaction})&&("flop"=={favaction})'),
+	'favstate' =>		array(T_ZBX_INT, O_OPT, P_ACT,	NOT_EMPTY, 'isset({favaction})&&"flop"=={favaction}'),
 	'upd_counter' =>	array(T_ZBX_INT, O_OPT, P_ACT,	null,	null)
 );
 check_fields($fields);
@@ -181,9 +181,9 @@ $data = array(
 
 // get slideshows
 $db_slideshows = DBselect(
-		'SELECT s.slideshowid,s.name'.
-		' FROM slideshows s'.
-		whereDbNode('s.slideshowid')
+	'SELECT s.slideshowid,s.name'.
+	' FROM slideshows s'.
+	whereDbNode('s.slideshowid')
 );
 while ($slideshow = DBfetch($db_slideshows)) {
 	if (slideshow_accessible($slideshow['slideshowid'], PERM_READ)) {
@@ -204,25 +204,22 @@ if (!isset($data['slideshows'][$data['elementid']])) {
 }
 
 // get screen
-$data['screen'] = !empty($data['elementid']) ? get_slideshow($data['elementid'], 0) : array();
+$data['screen'] = empty($data['elementid']) ? array() : get_slideshow($data['elementid'], 0);
 if (!empty($data['screen'])) {
 	// get groups and hosts
 	if (check_dynamic_items($data['elementid'], 1)) {
-		$data['hostid'] = get_request('hostid', 0);
+		$data['isDynamicItems'] = true;
 
-		$options = array('allow_all_hosts', 'monitored_hosts', 'with_items');
-		if (!$ZBX_WITH_ALL_NODES) {
-			array_push($options, 'only_current_node');
-		}
-		$params = array();
-		foreach ($options as $option) {
-			$params[$option] = 1;
-		}
-
-		$data['page_groups'] = get_viewed_groups(PERM_READ, $params);
-		$data['page_hosts'] = get_viewed_hosts(PERM_READ, $data['page_groups']['selected'], $params);
-
-		validate_group_with_host($data['page_groups'], $data['page_hosts']);
+		$data['pageFilter'] = new CPageFilter(array(
+			'groups' => array(
+				'monitored_hosts' => true
+			),
+			'hosts' => array(
+				'monitored_hosts' => true
+			),
+			'hostid' => get_request('hostid', null),
+			'groupid' => get_request('groupid', null)
+		));
 	}
 
 	// get element
