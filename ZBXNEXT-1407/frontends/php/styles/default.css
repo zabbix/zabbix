@@ -67,6 +67,7 @@ table { border-spacing: 0; }
 td, tr { color: inherit; text-decoration: none; padding: 0; }
 .cell { padding: 1px 3px; white-space: nowrap; text-align: left; border: 0; height: 20px; }
 table.cell tr td { padding: 1px; white-space: nowrap; text-align: left; }
+.commonTable tr td { vertical-align: top; }
 
 /* align */
 .floatleft { float: left; }
