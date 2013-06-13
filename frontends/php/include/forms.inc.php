@@ -287,7 +287,7 @@
 		$output = array();
 
 		foreach ($data as $id => $element) {
-			$element['name'] = nbsp($element['name']);
+			$element['name'] = nbsp(CHtml::encode($element['name']));
 
 			// is activated
 			if (str_in_array($id, $subfilter)) {
@@ -1079,6 +1079,7 @@
 				if (!empty($item)) {
 					$host = reset($item['hosts']);
 					if (!empty($item['hosts'])) {
+						$host['name'] = CHtml::encode($host['name']);
 						if (bccomp($data['itemid'], $itemid) == 0) {
 						}
 						// discovery rule
@@ -1383,7 +1384,11 @@
 						$link = 'triggers.php?form=update&triggerid='.$db_triggers['triggerid'].'&hostid='.$db_triggers['hostid'];
 					}
 
-					$data['templates'][] = new CLink($db_triggers['name'], $link, 'highlight underline weight_normal');
+					$data['templates'][] = new CLink(
+						CHtml::encode($db_triggers['name']),
+						$link,
+						'highlight underline weight_normal'
+					);
 					$data['templates'][] = SPACE.RARR.SPACE;
 				}
 				$tmp_triggerid = $db_triggers['templateid'];
