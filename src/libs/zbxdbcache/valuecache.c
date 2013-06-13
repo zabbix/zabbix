@@ -2664,6 +2664,7 @@ static int	vch_init(zbx_vc_item_t *item, zbx_vector_vc_value_t *values, int seco
 		const zbx_timespec_t *ts)
 {
 	zbx_vc_data_history_t	*data = &item->data.history;
+	int			ret;
 
 	memset(data, 0, sizeof(zbx_vc_data_history_t));
 
@@ -2697,7 +2698,10 @@ static int	vch_init(zbx_vc_item_t *item, zbx_vector_vc_value_t *values, int seco
 		}
 
 	}
-	return vch_item_add_values_at_end(item, values->values, values->values_num);
+	if (SUCCEED == (ret = vch_item_add_values_at_end(item, values->values, values->values_num)))
+		vc_update_statistics(item, 0, values->values_num);
+
+	return ret;
 }
 
 /******************************************************************************
@@ -3063,6 +3067,10 @@ static int	vcl_init(zbx_vc_item_t *item, zbx_vector_vc_value_t *values, int seco
 
 	if (SUCCEED == ret)
 		ret = vcl_item_add_values(item, values->values, values->values_num);
+
+	if (SUCCEED == ret)
+		vc_update_statistics(item, 0, MAX(values->values_num));
+
 
 	return ret;
 }
