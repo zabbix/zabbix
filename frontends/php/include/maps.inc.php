@@ -418,7 +418,7 @@ function resolveMapLabelMacros($label, $replaceHosts = null) {
 				'host' => $itemHost,
 				'key_' => $key
 			),
-			'output' => array('lastclock', 'value_type', 'lastvalue', 'units')
+			'output' => array('lastclock', 'value_type', 'lastvalue', 'units', 'valuemapid')
 		));
 
 		$item = reset($item);
@@ -435,14 +435,25 @@ function resolveMapLabelMacros($label, $replaceHosts = null) {
 				$label = str_replace($expr, '('._('no data').')', $label);
 			}
 			else {
+				$mapping = false;
+				$value = formatItemValueType($item);
+
 				switch ($item['value_type']) {
-					case ITEM_VALUE_TYPE_FLOAT:
-					case ITEM_VALUE_TYPE_UINT64:
-						$value = convert_units($item['lastvalue'], $item['units']);
+					case ITEM_VALUE_TYPE_STR:
+						$mapping = getMappedValue($value, $item['valuemapid']);
+						// break; is not missing here
+					case ITEM_VALUE_TYPE_TEXT:
+					case ITEM_VALUE_TYPE_LOG:
+						if ($mapping !== false) {
+							$value = $mapping.' ('.$value.')';
+						}
 						break;
 					default:
-						$value = $item['lastvalue'];
+						$value = applyValueMap($value, $item['valuemapid']);
 				}
+			}
+
+			if (isset($value)) {
 				$label = str_replace($expr, $value, $label);
 			}
 		}
