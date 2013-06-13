@@ -777,7 +777,7 @@ class testFormItemPrototype extends CWebTest {
 	public function testFormItemPrototype_SimpleUpdate($data) {
 		$name = $data['name'];
 
-		$sqlItems = "select * from items";
+		$sqlItems = "select itemid, hostid, name, key_, delay from items order by itemid";
 		$oldHashItems = DBhash($sqlItems);
 
 		$this->zbxTestLogin('hosts.php');
@@ -1712,6 +1712,18 @@ class testFormItemPrototype extends CWebTest {
 			array(
 				array(
 					'expected' => ITEM_GOOD,
+					'type' => 'IPMI agent',
+					'name' => 'IPMI agent with spaces',
+					'key' => 'item-ipmi-agent-spaces',
+					'ipmi_sensor' => 'ipmi_sensor',
+					'ipmiSpaces' => true,
+					'dbCheck' => true,
+					'formCheck' => true
+				)
+			),
+			array(
+				array(
+					'expected' => ITEM_GOOD,
 					'type' => 'SSH agent',
 					'name' => 'SSH agent',
 					'key' => 'item-ssh-agent',
@@ -1901,6 +1913,17 @@ class testFormItemPrototype extends CWebTest {
 			$this->input_type('username', $data['username']);
 		}
 
+		if (isset($data['ipmi_sensor'])) {
+			if (isset($data['ipmiSpaces'])) {
+				$this->getEval("this.browserbot.findElement('ipmi_sensor').value = '    ipmi_sensor    ';");
+				$ipmi_sensor = $this->getEval("this.browserbot.findElement('ipmi_sensor').value;");
+			}
+			else {
+				$this->input_type('ipmi_sensor', $data['ipmi_sensor']);
+				$ipmi_sensor = $this->getValue('ipmi_sensor');
+			}
+		}
+
 		if (isset($data['params_es'])) {
 			$this->input_type('params_es', $data['params_es']);
 		}
@@ -1920,8 +1943,11 @@ class testFormItemPrototype extends CWebTest {
 
 		$itemFlexFlag = true;
 		if (isset($data['flexPeriod'])) {
+
+			$itemCount = 0;
 			foreach ($data['flexPeriod'] as $period) {
 				$this->input_type('new_delay_flex_period', $period['flexTime']);
+				$itemCount ++;
 
 				if (isset($period['flexDelay'])) {
 					$this->input_type('new_delay_flex_delay', $period['flexDelay']);
@@ -1935,7 +1961,7 @@ class testFormItemPrototype extends CWebTest {
 					$itemFlexFlag = false;
 				}
 
-				if (isset($period['maximumItems'])) {
+				if (isset($period['maximumItems']) || $itemCount == 7) {
 					$this->assertNotVisible('new_delay_flex_delay');
 					$this->assertNotVisible('new_delay_flex_period');
 				}
@@ -1945,6 +1971,7 @@ class testFormItemPrototype extends CWebTest {
 				}
 
 				if (isset($period['remove'])) {
+					$itemCount --;
 					$this->zbxTestClick('remove');
 					sleep(1);
 				}
@@ -2044,8 +2071,17 @@ class testFormItemPrototype extends CWebTest {
 			}
 			$this->assertElementPresent("//select[@id='value_type']/option[text()='$value_type']");
 			$this->assertElementPresent("//select[@id='data_type']/option[text()='$data_type']");
-		}
 
+			if (isset($data['ipmi_sensor'])) {
+				if (isset($data['ipmiSpaces'])) {
+					$ipmiValue = $this->getEval("this.browserbot.findElement('ipmi_sensor').value;");
+				}
+				else {
+					$ipmiValue = $this->getValue('ipmi_sensor');
+				}
+				$this->assertEquals($ipmi_sensor, $ipmiValue);
+			}
+		}
 
 		if (isset($data['dbCheck'])) {
 			$result = DBselect("SELECT name, key_ FROM items where name = '".$itemName."'  AND hostid = ".$this->hostid);
