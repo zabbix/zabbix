@@ -188,12 +188,12 @@ $hostList->addRow(_('Groups'), $grp_tb->get(_('In groups'), _('Other groups')));
 
 $newgroupTB = new CTextBox('newgroup', $newgroup, ZBX_TEXTBOX_SMALL_SIZE);
 $newgroupTB->setAttribute('maxlength', 64);
-$tmp_label = _('New host group');
+$tmp_label = _('New group');
 if (CWebUser::$data['type'] != USER_TYPE_SUPER_ADMIN) {
 	$tmp_label .= SPACE._('(Only super admins can create groups)');
 	$newgroupTB->setReadonly(true);
 }
-$hostList->addRow(array(new CLabel($tmp_label, 'newgroup'), BR(), $newgroupTB), null, null, null, 'new');
+$hostList->addRow(SPACE, array($tmp_label, BR(), $newgroupTB), null, null, 'new');
 
 if (empty($interfaces)) {
 	$script = 'hostInterfacesManager.addNew("agent");';
@@ -230,7 +230,7 @@ $buttonRow->setAttribute('id', 'agentIterfacesFooter');
 
 $ifTab->addRow($buttonRow);
 
-$hostList->addRow(_('Agent interfaces'), new CDiv($ifTab, 'border_dotted objectgroup interface-group'), false, null, 'interface-row interface-row-first');
+$hostList->addRow(_('Agent interfaces'), new CDiv($ifTab, 'border_dotted objectgroup inlineblock interface-group'), false, null, 'interface-row interface-row-first');
 
 // table for SNMP interfaces with footer
 $ifTab = new CTable(null, 'formElementTable');
@@ -247,7 +247,7 @@ $buttonRow->setAttribute('id', 'SNMPIterfacesFooter');
 
 $ifTab->addRow($buttonRow);
 
-$hostList->addRow(_('SNMP interfaces'), new CDiv($ifTab, 'border_dotted objectgroup'), false, null, 'interface-row');
+$hostList->addRow(_('SNMP interfaces'), new CDiv($ifTab, 'border_dotted inlineblock objectgroup interface-group'), false, null, 'interface-row');
 
 // table for JMX interfaces with footer
 $ifTab = new CTable(null, 'formElementTable');
@@ -262,7 +262,7 @@ $buttonRow = new CRow(array($buttonCol, $col));
 $buttonRow->setAttribute('id', 'JMXIterfacesFooter');
 $ifTab->addRow($buttonRow);
 
-$hostList->addRow(_('JMX interfaces'), new CDiv($ifTab, 'border_dotted objectgroup interface-group'), false, null, 'interface-row');
+$hostList->addRow(_('JMX interfaces'), new CDiv($ifTab, 'border_dotted objectgroup inlineblock interface-group'), false, null, 'interface-row');
 
 // table for IPMI interfaces with footer
 $ifTab = new CTable(null, 'formElementTable');
@@ -277,7 +277,7 @@ $buttonRow = new CRow(array($buttonCol, $col));
 $buttonRow->setAttribute('id', 'IPMIIterfacesFooter');
 
 $ifTab->addRow($buttonRow);
-$hostList->addRow(_('IPMI interfaces'), new CDiv($ifTab, 'border_dotted objectgroup interface-group'), false, null, 'interface-row interface-row-last');
+$hostList->addRow(_('IPMI interfaces'), new CDiv($ifTab, 'border_dotted objectgroup inlineblock interface-group'), false, null, 'interface-row');
 
 // Proxy
 $cmbProxy = new CComboBox('proxy_hostid', $proxy_hostid);
@@ -505,7 +505,6 @@ $linkedTemplateTable->attr('id', 'linkedTemplateTable');
 $linkedTemplateTable->attr('style', 'min-width: 400px;');
 $linkedTemplateTable->setHeader(array(_('Name'), _('Action')));
 
-
 $linkedTemplates = API::Template()->get(array(
 	'templateids' => $templateIds,
 	'output' => array('templateid', 'name')
@@ -513,6 +512,8 @@ $linkedTemplates = API::Template()->get(array(
 
 $ignoredTemplates = array();
 foreach ($linkedTemplates as $template) {
+	$tmplList->addVar('exist_templates[]', $template['templateid']);
+
 	$linkedTemplateTable->addRow(
 		array(
 			$template['name'],
@@ -523,12 +524,12 @@ foreach ($linkedTemplates as $template) {
 				isset($original_templates[$template['templateid']])
 					? new CSubmit('unlink_and_clear['.$template['templateid'].']', _('Unlink and clear'), null, 'link_menu')
 					: SPACE
-					)
+			)
 		),
 		null, 'conditions_'.$template['templateid']
 	);
-	$ignoredTemplates[] = $template['name'];
-	$tmplList->addVar('exist_templates[]', $template['templateid']);
+
+	$ignoredTemplates[$template['templateid']] = $template['name'];
 }
 
 $tmplList->addRow(_('Linked templates'), new CDiv($linkedTemplateTable, 'objectgroup inlineblock border_dotted ui-corner-all'));
@@ -538,23 +539,13 @@ $newTemplateTable = new CTable(null, 'formElementTable');
 $newTemplateTable->attr('id', 'newTemplateTable');
 $newTemplateTable->attr('style', 'min-width: 400px;');
 
-$newTemplateTable->addRow(
-	array(
-		new CMultiSelect(
-			array(
-				'name' => 'templates[]',
-				'objectName' => 'templates',
-				'ignored' => $ignoredTemplates
-			)
-		)
-	)
-);
+$newTemplateTable->addRow(array(new CMultiSelect(array(
+	'name' => 'templates[]',
+	'objectName' => 'templates',
+	'ignored' => $ignoredTemplates
+))));
 
-$newTemplateTable->addRow(
-	array(
-		new CSubmit('add_template', _('Add'), null, 'link_menu')
-	)
-);
+$newTemplateTable->addRow(array(new CSubmit('add_template', _('Add'), null, 'link_menu')));
 
 $tmplList->addRow(_('Link new templates'), new CDiv($newTemplateTable, 'objectgroup inlineblock border_dotted ui-corner-all'));
 
@@ -613,7 +604,7 @@ $inventoryTypeRadioButton = array(
 	),
 	new CLabel(_('Automatic'), 'host_inventory_radio_'.HOST_INVENTORY_AUTOMATIC),
 );
-$inventoryFormList->addRow(new CDiv($inventoryTypeRadioButton, 'jqueryinputset'));
+$inventoryFormList->addRow(SPACE, new CDiv($inventoryTypeRadioButton, 'jqueryinputset'));
 
 $hostInventoryTable = DB::getSchema('host_inventory');
 $hostInventoryFields = getHostInventories();
@@ -673,7 +664,6 @@ $frmHost->addItem($divTabs);
 /*
  * footer
  */
-$main = array(new CSubmit('save', _('Save')));
 $others = array();
 if ($_REQUEST['hostid'] > 0 && $_REQUEST['form'] != 'full_clone') {
 	$others[] = new CSubmit('clone', _('Clone'));
@@ -682,6 +672,6 @@ if ($_REQUEST['hostid'] > 0 && $_REQUEST['form'] != 'full_clone') {
 }
 $others[] = new CButtonCancel(url_param('groupid'));
 
-$frmHost->addItem(makeFormFooter($main, $others));
+$frmHost->addItem(makeFormFooter(new CSubmit('save', _('Save')), $others));
 
 return $frmHost;

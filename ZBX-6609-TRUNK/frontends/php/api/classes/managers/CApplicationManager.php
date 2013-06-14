@@ -225,8 +225,8 @@ class CApplicationManager {
 				$delAppIds[] = $app['applicationid'];
 			}
 		}
-		if ($delAppIds) {
-			$this->deleteEmpty($delAppIds);
+		if ($delAppIds && $emptyIds = $this->fetchEmptyIds($delAppIds)) {
+			$this->delete($emptyIds);
 		}
 
 		$this->inherit($inheritedApps);
@@ -293,22 +293,39 @@ class CApplicationManager {
 	}
 
 	/**
-	 * Delete applications that don't have items and are not used by http tests.
+	 * Return IDs of applications that are not used by items or HTTP tests.
 	 *
 	 * @param array $applicationIds
+	 *
+	 * @return array
 	 */
-	protected function deleteEmpty(array $applicationIds) {
-		$emptyApplications = DBfetchArray(DBselect(
+	public function fetchEmptyIds(array $applicationIds) {
+		return DBfetchColumn(DBselect(
 			'SELECT a.applicationid '.
 			' FROM applications a'.
-				' LEFT JOIN items_applications ia ON a.applicationid=ia.applicationid'.
-				' LEFT JOIN httptest ht ON a.applicationid=ht.applicationid'.
-			' WHERE ia.applicationid IS NULL'.
-				' AND ht.applicationid IS NULL'.
-				' AND '.dbConditionInt('a.applicationid', $applicationIds)
-		));
+			' WHERE '.dbConditionInt('a.applicationid', $applicationIds).
+				' AND NOT EXISTS (SELECT NULL FROM items_applications ia WHERE a.applicationid=ia.applicationid)'.
+				' AND NOT EXISTS (SELECT NULL FROM httptest ht WHERE a.applicationid=ht.applicationid)'
+		), 'applicationid');
+	}
 
-		$this->delete(zbx_objectValues($emptyApplications, 'applicationid'));
+	/**
+	 * Return IDs of applications that are children only (!) of the given parents.
+	 *
+	 * @param array $parentApplicationIds
+	 *
+	 * @return array
+	 */
+	public function fetchExclusiveChildIds(array $parentApplicationIds) {
+		return DBfetchColumn(DBselect(
+			'SELECT at.applicationid '.
+			' FROM application_template at'.
+			' WHERE '.dbConditionInt('at.templateid', $parentApplicationIds).
+				' AND NOT EXISTS (SELECT NULL FROM application_template at2 WHERE '.
+					' at.applicationid=at2.applicationid'.
+					' AND '.dbConditionInt('at2.templateid', $parentApplicationIds, true).
+				')'
+		), 'applicationid');
 	}
 
 	/**

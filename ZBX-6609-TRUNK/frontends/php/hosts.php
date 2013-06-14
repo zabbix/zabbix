@@ -114,13 +114,16 @@ $_REQUEST['go'] = get_request('go', 'none');
  */
 if (get_request('groupid', 0) > 0) {
 	$groupids = available_groups($_REQUEST['groupid'], 1);
-	if (empty($groupids)) {
+	if (!$groupids) {
 		access_deny();
 	}
 }
 if (get_request('hostid', 0) > 0) {
-	$hostids = available_hosts($_REQUEST['hostid'], 1);
-	if (empty($hostids)) {
+	$hosts = API::Host()->get(array(
+		'hostids' => $_REQUEST['hostid'],
+		'editable' => true
+	));
+	if (!$hosts) {
 		access_deny();
 	}
 }
@@ -245,9 +248,9 @@ elseif (isset($_REQUEST['go']) && $_REQUEST['go'] == 'massupdate' && isset($_REQ
 			$new_values['inventory'] = $new_values['inventory_mode'] != HOST_INVENTORY_DISABLED ? get_request('host_inventory', array()) : array();
 		}
 
-		$templates = array();
+		$templateIds = array();
 		if (isset($visible['template_table'])) {
-			$templates = $_REQUEST['templates'];
+			$templateIds = $_REQUEST['templates'];
 		}
 
 		// add new or existing host groups
@@ -314,10 +317,10 @@ elseif (isset($_REQUEST['go']) && $_REQUEST['go'] == 'massupdate' && isset($_REQ
 			if (isset($_REQUEST['mass_clear_tpls'])) {
 				$host_templates = API::Template()->get(array('hostids' => $hostids));
 				$host_templateids = zbx_objectValues($host_templates, 'templateid');
-				$templates_to_del = array_diff($host_templateids, $tplids);
+				$templates_to_del = array_diff($host_templateids, $templateIds);
 				$hosts['templates_clear'] = zbx_toObject($templates_to_del, 'templateid');
 			}
-			$hosts['templates'] = $templates;
+			$hosts['templates'] = $templateIds;
 		}
 
 		$result = API::Host()->massUpdate(array_merge($hosts, $new_values));
@@ -326,8 +329,8 @@ elseif (isset($_REQUEST['go']) && $_REQUEST['go'] == 'massupdate' && isset($_REQ
 		}
 
 		$add = array();
-		if (!empty($templates) && isset($visible['template_table'])) {
-			$add['templates'] = $templates;
+		if (!empty($templateIds) && isset($visible['template_table'])) {
+			$add['templates'] = $templateIds;
 		}
 
 		// add new host groups
@@ -668,6 +671,22 @@ if ($_REQUEST['go'] == 'massupdate' && isset($_REQUEST['hosts'])) {
 		$data['inventories'] = zbx_toHash($data['inventories'], 'db_field');
 	}
 
+	// get templates data
+	$data['linkedTemplates'] = null;
+	if (!empty($data['templates'])) {
+		$getLinkedTemplates = API::Template()->get(array(
+			'templateids' => $data['templates'],
+			'output' => array('templateid', 'name')
+		));
+
+		foreach ($getLinkedTemplates as $getLinkedTemplate) {
+			$data['linkedTemplates'][] = array(
+				'id' => $getLinkedTemplate['templateid'],
+				'name' => $getLinkedTemplate['name']
+			);
+		}
+	}
+
 	$hostForm = new CView('configuration.host.massupdate', $data);
 	$hosts_wdgt->addItem($hostForm->render());
 }
@@ -837,7 +856,7 @@ else {
 			$description[] = $proxy['host'].NAME_DELIMITER;
 		}
 
-		$description[] = new CLink($host['name'], 'hosts.php?form=update&hostid='.$host['hostid'].url_param('groupid'));
+		$description[] = new CLink(CHtml::encode($host['name']), 'hosts.php?form=update&hostid='.$host['hostid'].url_param('groupid'));
 
 		$hostIF = ($interface['useip'] == INTERFACE_USE_IP) ? $interface['ip'] : $interface['dns'];
 		$hostIF .= empty($interface['port']) ? '' : NAME_DELIMITER.$interface['port'];
@@ -881,14 +900,14 @@ else {
 
 			foreach ($host['parentTemplates'] as $template) {
 				$caption = array();
-				$caption[] = new CLink($template['name'], 'templates.php?form=update&templateid='.$template['templateid'], 'unknown');
+				$caption[] = new CLink(CHtml::encode($template['name']), 'templates.php?form=update&templateid='.$template['templateid'], 'unknown');
 
 				if (!empty($templates[$template['templateid']]['parentTemplates'])) {
 					order_result($templates[$template['templateid']]['parentTemplates'], 'name');
 
 					$caption[] = ' (';
 					foreach ($templates[$template['templateid']]['parentTemplates'] as $tpl) {
-						$caption[] = new CLink($tpl['name'],'templates.php?form=update&templateid='.$tpl['templateid'], 'unknown');
+						$caption[] = new CLink(CHtml::encode($tpl['name']),'templates.php?form=update&templateid='.$tpl['templateid'], 'unknown');
 						$caption[] = ', ';
 					}
 					array_pop($caption);

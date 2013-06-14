@@ -41,7 +41,7 @@ $fields = array(
 	'commandipmi' =>		array(T_ZBX_STR, O_OPT, null,			null,		'isset({save})'),
 	'description' =>		array(T_ZBX_STR, O_OPT, null,			null,		'isset({save})'),
 	'access' =>				array(T_ZBX_INT, O_OPT, null,			IN('0,1,2,3'), 'isset({save})'),
-	'groupid' =>			array(T_ZBX_INT, O_OPT, NULL,			DB_ID,		'isset({save})'),
+	'groupid' =>			array(T_ZBX_INT, O_OPT, NULL,			DB_ID,		'isset({save})&&{hgstype}!=0'),
 	'usrgrpid' =>			array(T_ZBX_INT, O_OPT, P_SYS,			DB_ID,		'isset({save})'),
 	'hgstype' =>			array(T_ZBX_INT, O_OPT, null,			null,		null),
 	'confirmation' =>		array(T_ZBX_STR, O_OPT, null,			null,		null),
@@ -191,10 +191,11 @@ if (isset($_REQUEST['form'])) {
 		$data['commandipmi'] = get_request('commandipmi', '');
 		$data['description'] = get_request('description', '');
 		$data['usrgrpid'] = get_request('usrgrpid', 0);
+		$data['groupid'] = get_request('groupid', 0);
 		$data['access'] = get_request('host_access', 0);
 		$data['confirmation'] = get_request('confirmation', '');
 		$data['enableConfirmation'] = get_request('enableConfirmation', false);
-		$data['hgstype'] = empty($_REQUEST['groupid']) ? 0 : 1;
+		$data['hgstype'] = get_request('hgstype', 0);
 	}
 	elseif ($data['scriptid']) {
 		$script = API::Script()->get(array(

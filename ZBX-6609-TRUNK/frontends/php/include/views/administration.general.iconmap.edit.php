@@ -149,6 +149,6 @@ if (isset($this->data['iconmapid'])) {
 		new CButtonDelete(_('Delete icon map?'), url_param('form').url_param('iconmapid'))
 	);
 }
-$iconMapForm->addItem(makeFormFooter(array(new CSubmit('save', _('Save'))), $secondaryActions));
+$iconMapForm->addItem(makeFormFooter(new CSubmit('save', _('Save')), $secondaryActions));
 
 return $iconMapForm;
