@@ -45,16 +45,14 @@ int	SYSTEM_UNAME(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	length = strlen(name.sysname) + strlen(name.nodename) + strlen(name.release) + strlen(name.version) + strlen(name.machine);
 
-	char	*buf=malloc(length+5);
+	char	*buf=zbx_malloc(buf, length+5);
 
 	if (NULL == buf)
 		return SYSINFO_RET_FAIL;
 
 	zbx_snprintf(buf, length+5, "%s %s %s %s %s", name.sysname, name.nodename, name.release, name.version, name.machine);
 
-	SET_STR_RESULT(result, zbx_strdup(NULL, buf));
-
-	free(buf);
+	SET_STR_RESULT(result, buf);
 
 	return SYSINFO_RET_OK;
 }
