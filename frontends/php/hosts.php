@@ -856,7 +856,7 @@ else {
 			$description[] = $proxy['host'].NAME_DELIMITER;
 		}
 
-		$description[] = new CLink($host['name'], 'hosts.php?form=update&hostid='.$host['hostid'].url_param('groupid'));
+		$description[] = new CLink(CHtml::encode($host['name']), 'hosts.php?form=update&hostid='.$host['hostid'].url_param('groupid'));
 
 		$hostIF = ($interface['useip'] == INTERFACE_USE_IP) ? $interface['ip'] : $interface['dns'];
 		$hostIF .= empty($interface['port']) ? '' : NAME_DELIMITER.$interface['port'];
@@ -900,14 +900,14 @@ else {
 
 			foreach ($host['parentTemplates'] as $template) {
 				$caption = array();
-				$caption[] = new CLink($template['name'], 'templates.php?form=update&templateid='.$template['templateid'], 'unknown');
+				$caption[] = new CLink(CHtml::encode($template['name']), 'templates.php?form=update&templateid='.$template['templateid'], 'unknown');
 
 				if (!empty($templates[$template['templateid']]['parentTemplates'])) {
 					order_result($templates[$template['templateid']]['parentTemplates'], 'name');
 
 					$caption[] = ' (';
 					foreach ($templates[$template['templateid']]['parentTemplates'] as $tpl) {
-						$caption[] = new CLink($tpl['name'],'templates.php?form=update&templateid='.$tpl['templateid'], 'unknown');
+						$caption[] = new CLink(CHtml::encode($tpl['name']),'templates.php?form=update&templateid='.$tpl['templateid'], 'unknown');
 						$caption[] = ', ';
 					}
 					array_pop($caption);
