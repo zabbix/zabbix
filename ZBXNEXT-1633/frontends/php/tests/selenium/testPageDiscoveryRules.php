@@ -27,7 +27,7 @@ class testPageDiscoveryRules extends CWebTest {
 		$sql = 'SELECT h.hostid, i.itemid'.
 				' FROM hosts h, items i'.
 				' WHERE i.hostid=h.hostid'.
-					' AND i.flags='.ZBX_FLAG_DISCOVERY_RULE;
+					' AND i.flags='.ZBX_FLAG_DISCOVERY;
 
 		return DBdata($sql);
 	}
@@ -53,13 +53,13 @@ class testPageDiscoveryRules extends CWebTest {
 		$this->zbxTestTextPresent('Discovery rule deleted');
 		$this->zbxTestTextPresent('CONFIGURATION OF DISCOVERY RULES');
 
-		$sql = "select * from items where itemid=$itemid AND flags=".ZBX_FLAG_DISCOVERY_RULE;
+		$sql = "SELECT * FROM items WHERE itemid=$itemid AND flags=".ZBX_FLAG_DISCOVERY;
 		$this->assertEquals(0, DBcount($sql));
-		$sql = "select * from item_discovery where parent_itemid=$itemid";
+		$sql = "SELECT * FROM item_discovery WHERE parent_itemid=$itemid";
 		$this->assertEquals(0, DBcount($sql));
-		$sql = "SELECT gi.gitemid from graphs_items gi, item_discovery id WHERE gi.itemid=id.itemid AND id.parent_itemid=$itemid";
+		$sql = "SELECT gi.gitemid FROM graphs_items gi, item_discovery id WHERE gi.itemid=id.itemid AND id.parent_itemid=$itemid";
 		$this->assertEquals(0, DBcount($sql));
-		$sql = "SELECT f.functionid from functions f, item_discovery id WHERE f.itemid=id.itemid AND id.parent_itemid=$itemid";
+		$sql = "SELECT f.functionid FROM functions f, item_discovery id WHERE f.itemid=id.itemid AND id.parent_itemid=$itemid";
 		$this->assertEquals(0, DBcount($sql));
 
 		DBrestore_tables('triggers');

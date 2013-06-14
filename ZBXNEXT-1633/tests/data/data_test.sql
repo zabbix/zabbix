@@ -693,28 +693,29 @@ INSERT INTO hosts (hostid, proxy_hostid, host, status, disable_until, error, ava
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (30000, 30000, 1);
 INSERT INTO hosts (host, name, status, hostid) VALUES ('Template inheritance test host','Template inheritance test host', 0, 30001);
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (30001, 30001, 4);
-INSERT INTO interface (type, ip, dns, useip, port, main, hostid, interfaceid) VALUES (1, '127.0.0.1', '', 1, '10050', 1, 30001, 30000);
+INSERT INTO interface (type, ip, dns, useip, port, hostid, interfaceid) VALUES (1, '127.0.0.1', '', 1, '10050', 30001, 30000);
 INSERT INTO hosts_templates (hosttemplateid, hostid, templateid) VALUES (30000, 30001, 30000);
 
 -- create Form test template
 INSERT INTO hosts (hostid, proxy_hostid, host, status, disable_until, error, available, errors_from, lastaccess, ipmi_authtype, ipmi_privilege, ipmi_username, ipmi_password, ipmi_disable_until, ipmi_available, snmp_disable_until, snmp_available, maintenanceid, maintenance_status, maintenance_type, maintenance_from, ipmi_errors_from, snmp_errors_from, ipmi_error, snmp_error,name) VALUES (40000,NULL,'Form test template',3,0,'',0,0,0,0,2,'','',0,0,0,0,NULL,0,0,0,0,0,'','','Form test template');
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (40000, 40000, 1);
+
 -- create Simple form test
-INSERT INTO hosts (host, name, status, hostid) VALUES ('Simple form test host','Simple form test host', 0, 40001);
+INSERT INTO hosts (hostid, host, name, status) VALUES (40001, 'Simple form test host','Simple form test host', 0);
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (40001, 40001, 4);
 INSERT INTO hosts_templates (hosttemplateid, hostid, templateid) VALUES (40000, 40001, 40000);
 
 -- testFormItem interfaces
-INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, dns, port) VALUES (40011, 40001, 1, 1, 1, '127.0.5.1', '', '10051');
-INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, dns, port) VALUES (40012, 40001, 1, 2, 1, '127.0.5.2', '', '10052');
-INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, dns, port) VALUES (40013, 40001, 1, 3, 1, '127.0.5.3', '', '10053');
-INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, dns, port) VALUES (40014, 40001, 1, 4, 1, '127.0.5.4', '', '10054');
+INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, port) VALUES (40011, 40001, 1, 1, 1, '127.0.5.1', '10051');
+INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, port) VALUES (40012, 40001, 1, 2, 1, '127.0.5.2', '10052');
+INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, port) VALUES (40013, 40001, 1, 3, 1, '127.0.5.3', '10053');
+INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, port) VALUES (40014, 40001, 1, 4, 1, '127.0.5.4', '10054');
 
 -- testFormItem.LayoutCheck testFormItem.SimpleUpdate
-INSERT INTO items (itemid, type, snmp_community, snmp_oid, hostid, name, description, key_, delay, history, trends, lastvalue, lastclock, prevvalue, status, value_type, trapper_hosts, units, multiplier, delta, prevorgvalue, snmpv3_securityname, snmpv3_securitylevel, snmpv3_authpassphrase, snmpv3_privpassphrase, formula, error, lastlogsize, logtimefmt, templateid, valuemapid, delay_flex, params, ipmi_sensor, data_type, authtype, username, password, publickey, privatekey, mtime, lastns, flags, interfaceid) VALUES (30000, 0, '', '', 40001, 'testFormItem1', 'testFormItems','test-item-form1', 30, 90, 365, NULL, NULL, NULL, 0, 0, '', '', 0, 0, NULL, '', 0, '', '', 1, '', 0, '', NULL, NULL, '', '', '', 0, 0, '', '', '', '', 0, NULL, 0, 40011);
-INSERT INTO items (itemid, type, snmp_community, snmp_oid, hostid, name, description, key_, delay, history, trends, lastvalue, lastclock, prevvalue, status, value_type, trapper_hosts, units, multiplier, delta, prevorgvalue, snmpv3_securityname, snmpv3_securitylevel, snmpv3_authpassphrase, snmpv3_privpassphrase, formula, error, lastlogsize, logtimefmt, templateid, valuemapid, delay_flex, params, ipmi_sensor, data_type, authtype, username, password, publickey, privatekey, mtime, lastns, flags, interfaceid) VALUES (30001, 0, '', '', 40001, 'testFormItem2', 'testFormItems','test-item-form2', 30, 90, 365, NULL, NULL, NULL, 0, 0, '', '', 0, 0, NULL, '', 0, '', '', 1, '', 0, '', NULL, NULL, '', '', '', 0, 0, '', '', '', '', 0, NULL, 0, 40011);
-INSERT INTO items (itemid, type, snmp_community, snmp_oid, hostid, name, description, key_, delay, history, trends, lastvalue, lastclock, prevvalue, status, value_type, trapper_hosts, units, multiplier, delta, prevorgvalue, snmpv3_securityname, snmpv3_securitylevel, snmpv3_authpassphrase, snmpv3_privpassphrase, formula, error, lastlogsize, logtimefmt, templateid, valuemapid, delay_flex, params, ipmi_sensor, data_type, authtype, username, password, publickey, privatekey, mtime, lastns, flags, interfaceid) VALUES (30002, 0, '', '', 40001, 'testFormItem3', 'testFormItems','test-item-form3', 30, 90, 365, NULL, NULL, NULL, 0, 0, '', '', 0, 0, NULL, '', 0, '', '', 1, '', 0, '', NULL, NULL, '', '', '', 0, 0, '', '', '', '', 0, NULL, 0, 40011);
-INSERT INTO items (itemid, type, snmp_community, snmp_oid, hostid, name, description, key_, delay, history, trends, lastvalue, lastclock, prevvalue, status, value_type, trapper_hosts, units, multiplier, delta, prevorgvalue, snmpv3_securityname, snmpv3_securitylevel, snmpv3_authpassphrase, snmpv3_privpassphrase, formula, error, lastlogsize, logtimefmt, templateid, valuemapid, delay_flex, params, ipmi_sensor, data_type, authtype, username, password, publickey, privatekey, mtime, lastns, flags, interfaceid) VALUES (30003, 0, '', '', 40001, 'testFormItem4', 'testFormItems','test-item-form4', 30, 90, 365, NULL, NULL, NULL, 0, 0, '', '', 0, 0, NULL, '', 0, '', '', 1, '', 0, '', NULL, NULL, '', '', '', 0, 0, '', '', '', '', 0, NULL, 0, 40011);
+INSERT INTO items (itemid, type, hostid, name, description, key_, delay, interfaceid) VALUES (30000, 0, 40001, 'testFormItem1', 'testFormItems', 'test-item-form1', 30, 40011);
+INSERT INTO items (itemid, type, hostid, name, description, key_, delay, interfaceid) VALUES (30001, 0, 40001, 'testFormItem2', 'testFormItems', 'test-item-form2', 30, 40011);
+INSERT INTO items (itemid, type, hostid, name, description, key_, delay, interfaceid) VALUES (30002, 0, 40001, 'testFormItem3', 'testFormItems', 'test-item-form3', 30, 40011);
+INSERT INTO items (itemid, type, hostid, name, description, key_, delay, interfaceid) VALUES (30003, 0, 40001, 'testFormItem4', 'testFormItems', 'test-item-form4', 30, 40011);
 
 -- testFormItem.LayoutCheck testInheritanceItem.SimpleUpdate
 INSERT INTO items (itemid, type, snmp_community, snmp_oid, hostid, name, description, key_, delay, history, trends, lastvalue, lastclock, prevvalue, status, value_type, trapper_hosts, units, multiplier, delta, prevorgvalue, snmpv3_securityname, snmpv3_securitylevel, snmpv3_authpassphrase, snmpv3_privpassphrase, formula, error, lastlogsize, logtimefmt, templateid, valuemapid, delay_flex, params, ipmi_sensor, data_type, authtype, username, password, publickey, privatekey, mtime, lastns, flags) VALUES (40000, 0, '', '', 30000, 'testInheritanceItem1', 'testInheritanceItems','test-inheritance-item1', 30, 90, 365, NULL, NULL, NULL, 0, 3, '', '', 0, 0, NULL, '', 0, '', '', '1', '', 0, '', NULL, NULL, '', '', '', 0, 0, '', '', '', '', 0, NULL, 0);
@@ -805,3 +806,19 @@ INSERT INTO graphs_items (gitemid, graphid, itemid, drawtype, sortorder, color, 
 INSERT INTO graphs_items (gitemid, graphid, itemid, drawtype, sortorder, color, yaxisside, calc_fnc, type) VALUES (500005, 500005, 24333, 1, 1, 'FF5555', 0, 2, 0);
 INSERT INTO graphs_items (gitemid, graphid, itemid, drawtype, sortorder, color, yaxisside, calc_fnc, type) VALUES (500006, 500006, 24329, 1, 1, 'FF5555', 0, 2, 0);
 INSERT INTO graphs_items (gitemid, graphid, itemid, drawtype, sortorder, color, yaxisside, calc_fnc, type) VALUES (500007, 500007, 24333, 1, 1, 'FF5555', 0, 2, 0);
+
+-- testFormDiscoveryRule.SimpleUpdate
+INSERT INTO items (name, key_, hostid, value_type, itemid, flags, delay, params, description, interfaceid) VALUES ('testFormDiscoveryRule1', 'discovery-rule-form1', 40001, 4, 33700, 1,  50, '', '', 40011);
+INSERT INTO items (name, key_, hostid, value_type, itemid, flags, delay, params, description, interfaceid) VALUES ('testFormDiscoveryRule2', 'discovery-rule-form2', 40001, 4, 33701, 1,  50, '', '', 40011);
+INSERT INTO items (name, key_, hostid, value_type, itemid, flags, delay, params, description, interfaceid) VALUES ('testFormDiscoveryRule3', 'discovery-rule-form3', 40001, 4, 33702, 1,  50, '', '', 40011);
+INSERT INTO items (name, key_, hostid, value_type, itemid, flags, delay, params, description, interfaceid) VALUES ('testFormDiscoveryRule4', 'discovery-rule-form4', 40001, 4, 33703, 1,  50, '', '', 40011);
+
+-- testInheritanceDiscoveryRule.LayoutCheck and testInheritanceDiscoveryRule.SimpleUpdate
+INSERT INTO items (name, key_, hostid, value_type, itemid, flags, delay, params, description) VALUES ('testInheritanceDiscoveryRule1', 'discovery-rule-inheritance1', 30000, 4, 33500, 1, 50, '', '');
+INSERT INTO items (name, key_, hostid, value_type, itemid, flags, templateid, delay, params, description) VALUES ('testInheritanceDiscoveryRule1', 'discovery-rule-inheritance1', 30001, 4, 33501, 1, 33500, 50, '', '');
+INSERT INTO items (name, key_, hostid, value_type, itemid, flags, delay, params, description) VALUES ('testInheritanceDiscoveryRule2', 'discovery-rule-inheritance2', 30000, 4, 33502, 1, 50, '', '');
+INSERT INTO items (name, key_, hostid, value_type, itemid, flags, templateid, delay, params, description) VALUES ('testInheritanceDiscoveryRule2', 'discovery-rule-inheritance2', 30001, 4, 33503, 1, 33502, 50, '', '');
+INSERT INTO items (name, key_, hostid, value_type, itemid, flags, delay, params, description) VALUES ('testInheritanceDiscoveryRule3', 'discovery-rule-inheritance3', 30000, 4, 33504, 1, 50, '', '');
+INSERT INTO items (name, key_, hostid, value_type, itemid, flags, templateid, delay, params, description) VALUES ('testInheritanceDiscoveryRule3', 'discovery-rule-inheritance3', 30001, 4, 33505, 1, 33504, 50, '', '');
+INSERT INTO items (name, key_, hostid, value_type, itemid, flags, delay, params, description) VALUES ('testInheritanceDiscoveryRule4', 'discovery-rule-inheritance4', 30000, 4, 33506, 1, 50, '', '');
+INSERT INTO items (name, key_, hostid, value_type, itemid, flags, templateid, delay, params, description) VALUES ('testInheritanceDiscoveryRule4', 'discovery-rule-inheritance4', 30001, 4, 33507, 1, 33506, 50, '', '');

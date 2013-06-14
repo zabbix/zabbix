@@ -106,7 +106,7 @@ if (!empty($this->data['proxyid'])) {
 else {
 	$proxyForm->addItem(makeFormFooter(
 		new CSubmit('save', _('Save')),
-		array(new CButtonCancel())
+		new CButtonCancel()
 	));
 }
 

@@ -58,8 +58,8 @@ function condition_type2str($conditionType) {
 			return _('Host name');
 		case CONDITION_TYPE_HOST_GROUP:
 			return _('Host group');
-		case CONDITION_TYPE_HOST_TEMPLATE:
-			return _('Host template');
+		case CONDITION_TYPE_TEMPLATE:
+			return _('Template');
 		case CONDITION_TYPE_HOST:
 			return _('Host');
 		case CONDITION_TYPE_TIME_PERIOD:
@@ -92,6 +92,8 @@ function condition_type2str($conditionType) {
 			return _('Proxy');
 		case CONDITION_TYPE_EVENT_TYPE:
 			return _('Event type');
+		case CONDITION_TYPE_HOST_METADATA:
+			return _('Host metadata');
 		default:
 			return _('Unknown');
 	}
@@ -156,7 +158,7 @@ function condition_value2str($conditiontype, $value) {
 			}
 			break;
 		case CONDITION_TYPE_HOST:
-		case CONDITION_TYPE_HOST_TEMPLATE:
+		case CONDITION_TYPE_TEMPLATE:
 			if ($host = get_host_by_hostid($value)) {
 				$str_val = '';
 				if (id2nodeid($value) != get_current_nodeid()) {
@@ -169,6 +171,7 @@ function condition_value2str($conditiontype, $value) {
 			}
 			break;
 		case CONDITION_TYPE_TRIGGER_NAME:
+		case CONDITION_TYPE_HOST_METADATA:
 		case CONDITION_TYPE_HOST_NAME:
 			$str_val = $value;
 			break;
@@ -524,7 +527,7 @@ function get_conditions_by_eventsource($eventsource) {
 	$conditions[EVENT_SOURCE_TRIGGERS] = array(
 		CONDITION_TYPE_APPLICATION,
 		CONDITION_TYPE_HOST_GROUP,
-		CONDITION_TYPE_HOST_TEMPLATE,
+		CONDITION_TYPE_TEMPLATE,
 		CONDITION_TYPE_HOST,
 		CONDITION_TYPE_TRIGGER,
 		CONDITION_TYPE_TRIGGER_NAME,
@@ -547,13 +550,14 @@ function get_conditions_by_eventsource($eventsource) {
 	);
 	$conditions[EVENT_SOURCE_AUTO_REGISTRATION] = array(
 		CONDITION_TYPE_HOST_NAME,
-		CONDITION_TYPE_PROXY
+		CONDITION_TYPE_PROXY,
+		CONDITION_TYPE_HOST_METADATA
 	);
 	$conditions[EVENT_SOURCE_INTERNAL] = array(
 		CONDITION_TYPE_APPLICATION,
 		CONDITION_TYPE_EVENT_TYPE,
 		CONDITION_TYPE_HOST_GROUP,
-		CONDITION_TYPE_HOST_TEMPLATE,
+		CONDITION_TYPE_TEMPLATE,
 		CONDITION_TYPE_HOST
 	);
 
@@ -673,7 +677,7 @@ function get_operators_by_conditiontype($conditiontype) {
 		CONDITION_OPERATOR_EQUAL,
 		CONDITION_OPERATOR_NOT_EQUAL
 	);
-	$operators[CONDITION_TYPE_HOST_TEMPLATE] = array(
+	$operators[CONDITION_TYPE_TEMPLATE] = array(
 		CONDITION_OPERATOR_EQUAL,
 		CONDITION_OPERATOR_NOT_EQUAL
 	);
@@ -766,6 +770,10 @@ function get_operators_by_conditiontype($conditiontype) {
 	);
 	$operators[CONDITION_TYPE_EVENT_TYPE] = array(
 		CONDITION_OPERATOR_EQUAL
+	);
+	$operators[CONDITION_TYPE_HOST_METADATA] = array(
+		CONDITION_OPERATOR_LIKE,
+		CONDITION_OPERATOR_NOT_LIKE
 	);
 
 	if (isset($operators[$conditiontype])) {

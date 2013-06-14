@@ -46,16 +46,16 @@ zbx_history_table_t;
 static zbx_history_table_t dht = {
 	"proxy_dhistory", "dhistory_lastid",
 		{
-		{"clock",	ZBX_PROTO_TAG_CLOCK,		ZBX_JSON_TYPE_INT,	NULL},
-		{"druleid",	ZBX_PROTO_TAG_DRULE,		ZBX_JSON_TYPE_INT,	NULL},
-		{"dcheckid",	ZBX_PROTO_TAG_DCHECK,		ZBX_JSON_TYPE_INT,	NULL},
-		{"type",	ZBX_PROTO_TAG_TYPE,		ZBX_JSON_TYPE_INT,	NULL},
-		{"ip",		ZBX_PROTO_TAG_IP,		ZBX_JSON_TYPE_STRING,	NULL},
-		{"dns",		ZBX_PROTO_TAG_DNS,		ZBX_JSON_TYPE_STRING,	NULL},
-		{"port",	ZBX_PROTO_TAG_PORT,		ZBX_JSON_TYPE_INT,	"0"},
-		{"key_",	ZBX_PROTO_TAG_KEY,		ZBX_JSON_TYPE_STRING,	""},
-		{"value",	ZBX_PROTO_TAG_VALUE,		ZBX_JSON_TYPE_STRING,	""},
-		{"status",	ZBX_PROTO_TAG_STATUS,		ZBX_JSON_TYPE_INT,	"0"},
+		{"clock",		ZBX_PROTO_TAG_CLOCK,		ZBX_JSON_TYPE_INT,	NULL},
+		{"druleid",		ZBX_PROTO_TAG_DRULE,		ZBX_JSON_TYPE_INT,	NULL},
+		{"dcheckid",		ZBX_PROTO_TAG_DCHECK,		ZBX_JSON_TYPE_INT,	NULL},
+		{"type",		ZBX_PROTO_TAG_TYPE,		ZBX_JSON_TYPE_INT,	NULL},
+		{"ip",			ZBX_PROTO_TAG_IP,		ZBX_JSON_TYPE_STRING,	NULL},
+		{"dns",			ZBX_PROTO_TAG_DNS,		ZBX_JSON_TYPE_STRING,	NULL},
+		{"port",		ZBX_PROTO_TAG_PORT,		ZBX_JSON_TYPE_INT,	"0"},
+		{"key_",		ZBX_PROTO_TAG_KEY,		ZBX_JSON_TYPE_STRING,	""},
+		{"value",		ZBX_PROTO_TAG_VALUE,		ZBX_JSON_TYPE_STRING,	""},
+		{"status",		ZBX_PROTO_TAG_STATUS,		ZBX_JSON_TYPE_INT,	"0"},
 		{NULL}
 		}
 };
@@ -63,11 +63,12 @@ static zbx_history_table_t dht = {
 static zbx_history_table_t areg = {
 	"proxy_autoreg_host", "autoreg_host_lastid",
 		{
-		{"clock",	ZBX_PROTO_TAG_CLOCK,		ZBX_JSON_TYPE_INT,	NULL},
-		{"host",	ZBX_PROTO_TAG_HOST,		ZBX_JSON_TYPE_STRING,	NULL},
-		{"listen_ip",	ZBX_PROTO_TAG_IP,		ZBX_JSON_TYPE_STRING,	""},
-		{"listen_dns",	ZBX_PROTO_TAG_DNS,		ZBX_JSON_TYPE_STRING,	""},
-		{"listen_port",	ZBX_PROTO_TAG_PORT,		ZBX_JSON_TYPE_STRING,	"0"},
+		{"clock",		ZBX_PROTO_TAG_CLOCK,		ZBX_JSON_TYPE_INT,	NULL},
+		{"host",		ZBX_PROTO_TAG_HOST,		ZBX_JSON_TYPE_STRING,	NULL},
+		{"listen_ip",		ZBX_PROTO_TAG_IP,		ZBX_JSON_TYPE_STRING,	""},
+		{"listen_dns",		ZBX_PROTO_TAG_DNS,		ZBX_JSON_TYPE_STRING,	""},
+		{"listen_port",		ZBX_PROTO_TAG_PORT,		ZBX_JSON_TYPE_STRING,	"0"},
+		{"host_metadata",	ZBX_PROTO_TAG_HOST_METADATA,	ZBX_JSON_TYPE_STRING,	""},
 		{NULL}
 		}
 };
@@ -1378,7 +1379,9 @@ static int	proxy_get_history_data(struct zbx_json *j, zbx_uint64_t *lastid)
 
 		if (string_buffer_alloc < string_buffer_offset + len1 + len2)
 		{
-			string_buffer_alloc += ZBX_KIBIBYTE;
+			while (string_buffer_alloc < string_buffer_offset + len1 + len2)
+				string_buffer_alloc += ZBX_KIBIBYTE;
+
 			string_buffer = zbx_realloc(string_buffer, string_buffer_alloc);
 		}
 
@@ -2007,9 +2010,10 @@ void	process_areg_data(struct zbx_json_parse *jp, zbx_uint64_t proxy_hostid)
 	int			ret;
 	const char		*p = NULL;
 	time_t			now, hosttime, itemtime;
-	char			host[HOST_HOST_LEN_MAX], ip[INTERFACE_IP_LEN_MAX],
-				dns[INTERFACE_DNS_LEN_MAX], tmp[MAX_STRING_LEN];
+	char			host[HOST_HOST_LEN_MAX], ip[INTERFACE_IP_LEN_MAX], dns[INTERFACE_DNS_LEN_MAX],
+				tmp[MAX_STRING_LEN], *host_metadata = NULL;
 	unsigned short		port;
+	size_t			host_metadata_alloc = 1;	/* for at least NUL-termination char */
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -2023,6 +2027,8 @@ void	process_areg_data(struct zbx_json_parse *jp, zbx_uint64_t proxy_hostid)
 
 	hosttime = atoi(tmp);
 
+	host_metadata = zbx_malloc(host_metadata, host_metadata_alloc);
+
 	while (NULL != (p = zbx_json_next(&jp_data, p)))
 	{
 		if (FAIL == (ret = zbx_json_brackets_open(p, &jp_row)))
@@ -2034,6 +2040,12 @@ void	process_areg_data(struct zbx_json_parse *jp, zbx_uint64_t proxy_hostid)
 
 		if (FAIL == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_HOST, host, sizeof(host)))
 			goto json_parse_error;
+
+		if (FAIL == zbx_json_value_by_name_dyn(&jp_row, ZBX_PROTO_TAG_HOST_METADATA,
+				&host_metadata, &host_metadata_alloc))
+		{
+			*host_metadata = '\0';
+		}
 
 		if (FAIL == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_IP, ip, sizeof(ip)))
 			*ip = '\0';
@@ -2048,7 +2060,7 @@ void	process_areg_data(struct zbx_json_parse *jp, zbx_uint64_t proxy_hostid)
 			port = ZBX_DEFAULT_AGENT_PORT;
 
 		DBbegin();
-		DBregister_host(proxy_hostid, host, ip, dns, port, itemtime);
+		DBregister_host(proxy_hostid, host, ip, dns, port, host_metadata, itemtime);
 		DBcommit();
 
 		continue;
@@ -2058,6 +2070,8 @@ json_parse_error:
 exit:
 	if (SUCCEED != ret)
 		zabbix_log(LOG_LEVEL_WARNING, "invalid auto registration data: %s", zbx_json_strerror());
+
+	zbx_free(host_metadata);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 }
