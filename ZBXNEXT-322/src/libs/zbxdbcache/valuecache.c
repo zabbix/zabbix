@@ -27,6 +27,34 @@
 
 #include "valuecache.h"
 
+/*
+ * The cache (zbx_vc_cache_t) is organized as a hashset of item records (zbx_vc_item_t).
+ *
+ * Each record holds item data (itemid, value_type), statistics (hits, last access time,...)
+ * and the historical data (timestamp,value pairs in ascending order).
+ *
+ * The historical data storage mode is adapted for every item depending on request the
+ * type and size. Currently the following storage modes are supported:
+ *  1) lastvalue storage mode
+ *     Stores only the last and previous item values. Does not support data fetching
+ *     from database.
+ *
+ *  2) history storage mode.
+ *     Stores item's history data from the largest request (+timeshift) range to the
+ *     current time. Automatically reads from history data from DB whenever request
+ *     exceeds cached value range.
+ *
+ * When cache runs out of memory to store new items it enters in low memory mode.
+ * In low memory mode cache continues to function as before with few restrictions:
+ *   1) items that weren't accessed during the last day are removed from cache.
+ *   2) items with history storage mode and worst hits/values ratio might be removed
+ *      from cache to free space.
+ *   3) only items with few values are added to cache.
+ *
+ * The low memory mode can't be turned off - it will persist until server is rebooted.
+ *
+ */
+
 /* the period of low memory warning messages */
 #define ZBX_VC_LOW_MEMORY_WARNING_PERIOD	(60 * 5)
 
@@ -3069,7 +3097,7 @@ static int	vcl_init(zbx_vc_item_t *item, zbx_vector_vc_value_t *values, int seco
 		ret = vcl_item_add_values(item, values->values, values->values_num);
 
 	if (SUCCEED == ret)
-		vc_update_statistics(item, 0, MAX(values->values_num));
+		vc_update_statistics(item, 0, values->values_num);
 
 
 	return ret;
