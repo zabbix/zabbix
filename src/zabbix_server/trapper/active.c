@@ -302,7 +302,7 @@ int	send_list_of_active_checks_json(zbx_sock_t *sock, struct zbx_json_parse *jp)
 	struct zbx_json		json;
 	int			ret = FAIL;
 	zbx_uint64_t		hostid;
-	size_t		host_metadata_alloc = 1;	/* for at least NUL-termination char */
+	size_t			host_metadata_alloc = 1;	/* for at least NUL-termination char */
 	unsigned short		port;
 	zbx_vector_uint64_t	itemids;
 
