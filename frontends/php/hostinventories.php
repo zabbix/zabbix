@@ -123,13 +123,13 @@ else{
 	$exactComboBox->addItem('1', _('exactly'));
 	$filter_table->addRow(array(
 		array(
-			array(bold(_('Field:')), $inventoryFieldsComboBox),
+			array(bold(_('Field')), SPACE, $inventoryFieldsComboBox),
 			array(
 				$exactComboBox,
 				new CTextBox('filter_field_value', $_REQUEST['filter_field_value'], 20)
 			),
 		),
-	));
+	), 'host-inventories');
 
 	$filter = new CButton('filter', _('Filter'), "javascript: create_var('zbx_filter', 'filter_set', '1', true);");
 	$filter->useJQueryStyle('main');

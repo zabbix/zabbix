@@ -213,6 +213,7 @@ frontends/php/locale/tr/LC_MESSAGES/frontend.po -text
 frontends/php/locale/uk/LC_MESSAGES/frontend.po -text
 frontends/php/locale/zh_CN/LC_MESSAGES/frontend.po -text
 frontends/php/locale/zh_TW/LC_MESSAGES/frontend.po -text
+frontends/php/styles/pages.css -text svneol=unset#text/plain
 frontends/php/styles/themes/classic/images/bg_flat_0_999999.png -text
 frontends/php/styles/themes/classic/images/bg_flat_0_c9c9c9.png -text
 frontends/php/styles/themes/classic/images/bg_flat_100_fef1ec.png -text
@@ -273,6 +274,10 @@ frontends/php/styles/themes/originalblue/images/icons_ffffff.png -text
 frontends/php/styles/themes/originalblue/images/preloader.gif -text
 frontends/php/tests/bootstrap.php.template -text
 frontends/php/tests/general/CTriggerFunctionValidatorTest.php -text
+frontends/php/tests/selenium/testFormDiscoveryRule.php -text
+frontends/php/tests/selenium/testInheritanceDiscoveryRule.php -text
+frontends/php/tests/selenium/testInheritanceGraph.php -text
+frontends/php/tests/selenium/testInheritanceTrigger.php -text
 include/module.h -text
 include/zbxmodules.h -text
 m4/libxml2.m4 -text

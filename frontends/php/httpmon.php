@@ -83,7 +83,6 @@ $paging = null;
 
 if ($pageFilter->hostsSelected) {
 	$options = array(
-		'editable' => true,
 		'output' => array('httptestid'),
 		'templated' => false,
 		'monitored' => true,

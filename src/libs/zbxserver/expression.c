@@ -1938,6 +1938,7 @@ static int	get_autoreg_value_by_event(DB_EVENT *event, char **replace_to, const 
 #define MVAR_HOST_HOST			"{HOST.HOST}"
 #define MVAR_HOST_IP			"{HOST.IP}"
 #define MVAR_IPADDRESS			"{IPADDRESS}"			/* deprecated */
+#define MVAR_HOST_METADATA		"{HOST.METADATA}"
 #define MVAR_HOST_NAME			"{HOST.NAME}"
 #define MVAR_HOSTNAME			"{HOSTNAME}"			/* deprecated */
 #define MVAR_HOST_PORT			"{HOST.PORT}"
@@ -3103,6 +3104,10 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, DB_EVENT *event, DB_EVENT *
 				else if (0 == strncmp(m, MVAR_EVENT, sizeof(MVAR_EVENT) - 1))
 				{
 					get_event_value(m, event, &replace_to);
+				}
+				else if (0 == strcmp(m, MVAR_HOST_METADATA))
+				{
+					ret = get_autoreg_value_by_event(c_event, &replace_to, "host_metadata");
 				}
 				else if (0 == strcmp(m, MVAR_HOST_HOST))
 				{

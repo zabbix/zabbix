@@ -163,7 +163,7 @@ $stepsTable->setHeader(array(
 	new CCol(_('Timeout'), null, null, '50'),
 	new CCol(_('URL'), null, null, '200'),
 	new CCol(_('Required'), null, null, '50'),
-	new CCol(_('Status codes'), null, null, '90'),
+	new CCol(_('Status codes'), 'nowrap', null, '90'),
 	new CCol('', null, null, '50')
 ));
 

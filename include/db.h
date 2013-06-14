@@ -91,7 +91,7 @@ zbx_graph_item_type;
 #define INTERFACE_DNS_LEN_MAX		INTERFACE_DNS_LEN+1
 #define INTERFACE_IP_LEN		39
 #define INTERFACE_IP_LEN_MAX		INTERFACE_IP_LEN+1
-#define INTERFACE_ADDR_LEN		64 /* MAX(INTERFACE_DNS_LEN,INTERFACE_IP_LEN) */
+#define INTERFACE_ADDR_LEN		64	/* MAX(INTERFACE_DNS_LEN,INTERFACE_IP_LEN) */
 #define INTERFACE_ADDR_LEN_MAX		INTERFACE_ADDR_LEN+1
 #define INTERFACE_PORT_LEN		64
 #define INTERFACE_PORT_LEN_MAX		INTERFACE_PORT_LEN+1
@@ -539,7 +539,8 @@ void	DBupdate_services(zbx_uint64_t triggerid, int status, int clock);
 void	DBadd_trend(zbx_uint64_t itemid, double value, int clock);
 void	DBadd_trend_uint(zbx_uint64_t itemid, zbx_uint64_t value, int clock);
 
-void	DBadd_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_offset, const char *fieldname, const zbx_uint64_t *values, const int num);
+void	DBadd_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_offset, const char *fieldname,
+		const zbx_uint64_t *values, const int num);
 
 const char	*zbx_host_string(zbx_uint64_t hostid);
 const char	*zbx_host_key_string(zbx_uint64_t itemid);
@@ -549,12 +550,13 @@ const char	*zbx_user_string(zbx_uint64_t userid);
 double	multiply_item_value_float(DB_ITEM *item, double value);
 zbx_uint64_t	multiply_item_value_uint64(DB_ITEM *item, zbx_uint64_t value);
 
-void	DBregister_host(zbx_uint64_t proxy_hostid, const char *host, const char *ip, const char *dns, unsigned short port, int now);
-void	DBproxy_register_host(const char *host, const char *ip, const char *dns, unsigned short port);
+void	DBregister_host(zbx_uint64_t proxy_hostid, const char *host, const char *ip, const char *dns,
+		unsigned short port, const char *host_metadata, int now);
+void	DBproxy_register_host(const char *host, const char *ip, const char *dns, unsigned short port,
+		const char *host_metadata);
 int	DBexecute_overflowed_sql(char **sql, size_t *sql_alloc, size_t *sql_offset);
 char	*DBget_unique_hostname_by_sample(const char *host_name_sample);
 
-const char	*DBsql_id_cmp(zbx_uint64_t id);
 const char	*DBsql_id_ins(zbx_uint64_t id);
 
 zbx_uint64_t	DBadd_interface(zbx_uint64_t hostid, unsigned char type,
@@ -579,6 +581,8 @@ int	DBtxn_ongoing();
 
 int	DBtable_exists(const char *table_name);
 int	DBfield_exists(const char *table_name, const char *field_name);
+
+void	DBexecute_multiple_query(const char *query, const char *field_name, zbx_vector_uint64_t *ids);
 
 void	zbx_create_services_lock();
 void	zbx_destroy_services_lock();

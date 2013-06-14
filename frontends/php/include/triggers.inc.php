@@ -97,7 +97,7 @@ function getSeverityColor($severity, $value = TRIGGER_VALUE_TRUE) {
 
 function getSeverityCell($severity, $text = null, $force_normal = false) {
 	if ($text === null) {
-		$text = getSeverityCaption($severity);
+		$text = CHtml::encode(getSeverityCaption($severity));
 	}
 
 	return new CCol($text, getSeverityStyle($severity, !$force_normal));
@@ -843,18 +843,29 @@ function triggerExpression($trigger, $html = false) {
 					}
 
 					if ($function_data['flags'] == ZBX_FLAG_DISCOVERY_CREATED || $function_data['type'] == ITEM_TYPE_HTTPTEST) {
-						$link = new CSpan($function_data['host'].':'.$function_data['key_'], $style);
+						$link = new CSpan($function_data['host'].':'.CHtml::encode($function_data['key_']), $style);
 					}
 					elseif ($function_data['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
-						$link = new CLink($function_data['host'].':'.$function_data['key_'],
+						$link = new CLink($function_data['host'].':'.CHtml::encode($function_data['key_']),
 							'disc_prototypes.php?form=update&itemid='.$function_data['itemid'].'&parent_discoveryid='.
 							$trigger['discoveryRuleid'], $style);
 					}
 					else {
-						$link = new CLink($function_data['host'].':'.$function_data['key_'],
+						$link = new CLink($function_data['host'].':'.CHtml::encode($function_data['key_']),
 							'items.php?form=update&itemid='.$function_data['itemid'], $style);
 					}
-					array_push($exp, array('{', $link, '.', bold($function_data['function'].'('), $function_data['parameter'], bold(')'), '}'));
+					array_push(
+						$exp,
+						array(
+							'{',
+							$link,
+							'.',
+							bold($function_data['function'].'('),
+							CHtml::encode($function_data['parameter']),
+							bold(')'),
+							'}'
+						)
+					);
 				}
 				else {
 					$exp .= '{'.$function_data['host'].':'.$function_data['key_'].'.'.$function_data['function'].'('.$function_data['parameter'].')}';

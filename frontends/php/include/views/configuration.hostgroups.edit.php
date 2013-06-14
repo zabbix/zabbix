@@ -71,8 +71,8 @@ $hostgroupForm->addItem($hostgroupTab);
 // append buttons to form
 if (empty($this->data['groupid'])) {
 	$hostgroupForm->addItem(makeFormFooter(
-		array(new CSubmit('save', _('Save'))),
-		array(new CButtonCancel())
+		new CSubmit('save', _('Save')),
+		new CButtonCancel()
 	));
 }
 else {
@@ -81,7 +81,7 @@ else {
 		$deleteButton->attr('disabled', 'disabled');
 	}
 	$hostgroupForm->addItem(makeFormFooter(
-		array(new CSubmit('save', _('Save'))),
+		new CSubmit('save', _('Save')),
 		array(
 			new CSubmit('clone', _('Clone')),
 			$deleteButton,

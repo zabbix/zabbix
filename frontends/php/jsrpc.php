@@ -223,7 +223,7 @@ switch ($data['method']) {
 
 	/**
 	 * Create multi select data.
-	 * Supported objects: "hostGroup", "hosts", "templates", "applications"
+	 * Supported objects: "applications", "hosts", "hostGroup", "templates", "triggers"
 	 *
 	 * @param string $data['objectName']
 	 * @param string $data['search']
@@ -232,6 +232,8 @@ switch ($data['method']) {
 	 * @return array(int => array('value' => int, 'text' => string))
 	 */
 	case 'multiselect.get':
+		$config = select_config();
+
 		switch ($data['objectName']) {
 			case 'hostGroup':
 				$hostGroups = API::HostGroup()->get(array(
@@ -242,22 +244,29 @@ switch ($data['method']) {
 					'filter' => isset($data['filter']) ? $data['filter'] : null,
 					'limit' => isset($data['limit']) ? $data['limit'] : null
 				));
-				foreach ($hostGroups as &$hostGroup) {
-					$hostGroup['nodename'] = get_node_name_by_elid($hostGroup['groupid'], true, ': ');
-				}
-				unset($hostGroup);
 
-				CArrayHelper::sort($hostGroups, array(
-					array('field' => 'nodename', 'order' => ZBX_SORT_UP),
-					array('field' => 'name', 'order' => ZBX_SORT_UP)
-				));
+				if ($hostGroups) {
+					foreach ($hostGroups as &$hostGroup) {
+						$hostGroup['nodename'] = get_node_name_by_elid($hostGroup['groupid'], true, ': ');
+					}
+					unset($hostGroup);
 
-				foreach ($hostGroups as $hostGroup) {
-					$result[] = array(
-						'id' => $hostGroup['groupid'],
-						'prefix' => (string) $hostGroup['nodename'],
-						'name' => $hostGroup['name']
-					);
+					CArrayHelper::sort($hostGroups, array(
+						array('field' => 'nodename', 'order' => ZBX_SORT_UP),
+						array('field' => 'name', 'order' => ZBX_SORT_UP)
+					));
+
+					if (isset($data['limit'])) {
+						$hostGroups = array_slice($hostGroups, 0, $data['limit']);
+					}
+
+					foreach ($hostGroups as $hostGroup) {
+						$result[] = array(
+							'id' => $hostGroup['groupid'],
+							'prefix' => (string) $hostGroup['nodename'],
+							'name' => $hostGroup['name']
+						);
+					}
 				}
 				break;
 
@@ -267,19 +276,25 @@ switch ($data['method']) {
 					'output' => array('hostid', 'name'),
 					'startSearch' => true,
 					'search' => isset($data['search']) ? array('name' => $data['search']) : null,
-					'limit' => isset($data['limit']) ? $data['limit'] : null
+					'limit' => $config['search_limit']
 				));
 
-				CArrayHelper::sort($hosts, array(
-					array('field' => 'name', 'order' => ZBX_SORT_UP)
-				));
+				if ($hosts) {
+					CArrayHelper::sort($hosts, array(
+						array('field' => 'name', 'order' => ZBX_SORT_UP)
+					));
 
-				foreach ($hosts as $host) {
-					$result[] = array(
-						'id' => $host['hostid'],
-						'prefix' => '',
-						'name' => $host['name']
-					);
+					if (isset($data['limit'])) {
+						$hosts = array_slice($hosts, 0, $data['limit']);
+					}
+
+					foreach ($hosts as $host) {
+						$result[] = array(
+							'id' => $host['hostid'],
+							'prefix' => '',
+							'name' => $host['name']
+						);
+					}
 				}
 				break;
 
@@ -289,19 +304,25 @@ switch ($data['method']) {
 					'output' => array('templateid', 'name'),
 					'startSearch' => true,
 					'search' => isset($data['search']) ? array('name' => $data['search']) : null,
-					'limit' => isset($data['limit']) ? $data['limit'] : null
+					'limit' => $config['search_limit']
 				));
 
-				CArrayHelper::sort($templates, array(
-					array('field' => 'name', 'order' => ZBX_SORT_UP)
-				));
+				if ($templates) {
+					CArrayHelper::sort($templates, array(
+						array('field' => 'name', 'order' => ZBX_SORT_UP)
+					));
 
-				foreach ($templates as $template) {
-					$result[] = array(
-						'id' => $template['templateid'],
-						'prefix' => '',
-						'name' => $template['name']
-					);
+					if (isset($data['limit'])) {
+						$templates = array_slice($templates, 0, $data['limit']);
+					}
+
+					foreach ($templates as $template) {
+						$result[] = array(
+							'id' => $template['templateid'],
+							'prefix' => '',
+							'name' => $template['name']
+						);
+					}
 				}
 				break;
 
@@ -311,19 +332,62 @@ switch ($data['method']) {
 					'output' => array('applicationid', 'name'),
 					'startSearch' => true,
 					'search' => isset($data['search']) ? array('name' => $data['search']) : null,
-					'limit' => isset($data['limit']) ? $data['limit'] : null
+					'limit' => $config['search_limit']
 				));
 
-				CArrayHelper::sort($applications, array(
-					array('field' => 'name', 'order' => ZBX_SORT_UP)
+				if ($applications) {
+					CArrayHelper::sort($applications, array(
+						array('field' => 'name', 'order' => ZBX_SORT_UP)
+					));
+
+					if (isset($data['limit'])) {
+						$applications = array_slice($applications, 0, $data['limit']);
+					}
+
+					foreach ($applications as $application) {
+						$result[] = array(
+							'id' => $application['applicationid'],
+							'prefix' => '',
+							'name' => $application['name']
+						);
+					}
+				}
+				break;
+
+			case 'triggers':
+				$triggers = API::Trigger()->get(array(
+					'editable' => isset($data['editable']) ? $data['editable'] : null,
+					'output' => array('triggerid', 'description'),
+					'selectHosts' => array('name'),
+					'startSearch' => true,
+					'search' => isset($data['search']) ? array('description' => $data['search']) : null,
+					'limit' => $config['search_limit']
 				));
 
-				foreach ($applications as $application) {
-					$result[] = array(
-						'id' => $application['applicationid'],
-						'prefix' => '',
-						'name' => $application['name']
-					);
+				if ($triggers) {
+					CArrayHelper::sort($triggers, array(
+						array('field' => 'description', 'order' => ZBX_SORT_UP)
+					));
+
+					if (isset($data['limit'])) {
+						$triggers = array_slice($triggers, 0, $data['limit']);
+					}
+
+					foreach ($triggers as $trigger) {
+						$hostName = '';
+
+						if ($trigger['hosts']) {
+							$trigger['hosts'] = reset($trigger['hosts']);
+
+							$hostName = $trigger['hosts']['name'].NAME_DELIMITER;
+						}
+
+						$result[] = array(
+							'id' => $trigger['triggerid'],
+							'prefix' => $hostName,
+							'name' => $trigger['description']
+						);
+					}
 				}
 				break;
 		}
