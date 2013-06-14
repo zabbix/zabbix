@@ -2464,12 +2464,10 @@ static int	vch_item_get_values_by_count(zbx_vc_item_t *item,  zbx_vector_vc_valu
 	}
 
 	/* if cache contains the required value range, read it from cache */
-	if (SUCCEED == ret && NULL != values)
+	if (SUCCEED == ret)
 	{
 		zbx_vc_chunk_t	*chunk;
 		int		index, hits, misses;
-
-		values->values_num = 0;
 
 		if (FAIL == vch_item_get_last_value(item, timestamp, &chunk, &index))
 		{
@@ -2478,8 +2476,13 @@ static int	vch_item_get_values_by_count(zbx_vc_item_t *item,  zbx_vector_vc_valu
 			data->cached_all = 1;
 
 			/* return empty vector with success */
-			return SUCCEED;
+			goto out;
 		}
+
+		if (NULL == values)
+			goto out;
+
+		values->values_num = 0;
 
 		/* fill the values vector with item history values until the <count> values are read */
 		while (values->values_num < count)
@@ -2526,7 +2529,7 @@ static int	vch_item_get_values_by_count(zbx_vc_item_t *item,  zbx_vector_vc_valu
 
 		vc_update_statistics(item, hits, misses);
 	}
-
+out:
 	return ret;
 }
 
