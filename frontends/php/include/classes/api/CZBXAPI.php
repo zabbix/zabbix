@@ -609,6 +609,7 @@ class CZBXAPI {
 
 	/**
 	 * Adds the given field to the SELECT part of the $sqlParts array if it's not already present.
+	 * If $sqlParts['select'] not present it is created and field appended.
 	 *
 	 * @param string $fieldId
 	 * @param array  $sqlParts
@@ -616,6 +617,10 @@ class CZBXAPI {
 	 * @return array
 	 */
 	protected function addQuerySelect($fieldId, array $sqlParts) {
+		if (!isset($sqlParts['select'])) {
+			return array('select' => array($fieldId));
+		}
+
 		list($tableAlias, $field) = explode('.', $fieldId);
 
 		if (!in_array($fieldId, $sqlParts['select']) && !in_array($this->fieldId('*', $tableAlias), $sqlParts['select'])) {
