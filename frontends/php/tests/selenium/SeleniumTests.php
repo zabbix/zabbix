@@ -82,9 +82,13 @@ require_once dirname(__FILE__).'/testFormUserProfile.php';
 require_once dirname(__FILE__).'/testFormScreen.php';
 require_once dirname(__FILE__).'/testFormSysmap.php';
 require_once dirname(__FILE__).'/testFormTemplate.php';
+require_once dirname(__FILE__).'/testFormDiscoveryRule.php';
 require_once dirname(__FILE__).'/testPageApplications.php';
 require_once dirname(__FILE__).'/testPageBrowserWarning.php';
 require_once dirname(__FILE__).'/testInheritanceItem.php';
+require_once dirname(__FILE__).'/testInheritanceTrigger.php';
+require_once dirname(__FILE__).'/testInheritanceGraph.php';
+require_once dirname(__FILE__).'/testInheritanceDiscoveryRule.php';
 require_once dirname(__FILE__).'/testTemplateInheritance.php';
 
 class SeleniumTests {
@@ -154,9 +158,13 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormScreen');
 		$suite->addTestSuite('testFormMap');
 		$suite->addTestSuite('testFormTemplate');
+		$suite->addTestSuite('testFormDiscoveryRule');
 		$suite->addTestSuite('testPageApplications');
 		$suite->addTestSuite('testPageBrowserWarning');
 		$suite->addTestSuite('testInheritanceItem');
+		$suite->addTestSuite('testInheritanceTrigger');
+		$suite->addTestSuite('testInheritanceGraph');
+		$suite->addTestSuite('testInheritanceDiscoveryRule');
 		$suite->addTestSuite('testTemplateInheritance');
 
 		return $suite;

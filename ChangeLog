@@ -1,6 +1,8 @@
 Changes for 2.1.0
 
 New features:
+A.FGI..PS. [ZBXNEXT-1726] added support for optional Host Metadata to active agent for auto-registration (dimir, Oleg)
+..F....... [ZBXNEXT-1114] improved multiselect support in action conditions configuration page (Eduard)
 ...G...... [ZBXNEXT-367] added printing Aliases and PerfCounters when agent is run with -p option (aleksej, dimir)
 .......PS. [ZBX-6581] added printing host name to a web scenario error log message (dimir)
 A.F....... [ZBXNEXT-1408] added multiselect in Action -> Conditions and Operations, in Scripts and in Item filter. Redesigned Host -> Templates form and added multiselect. Improved multiselect, added possibility to ignore elements (Oleg)
@@ -71,11 +73,29 @@ A.F.I...S. [ZBXNEXT-1186] increased length to 2048 characters of expression fiel
 ........S. [ZBXNEXT-1663] added support for notification macros {TRIGGER.NAME.ORIG}, {ITEM.NAME.ORIG}, {ITEM.KEY.ORIG} (dimir)
 
 Bug fixes:
+..F....... [ZBX-6692] fixed displaying age and last change in monitoring triggers page (Ivo)
+..F....... [ZBX-5711] fixed that favorites were not added in dashboard (Toms)
+..F....... [ZBX-4620] added escaping of HTML entities for search results as well for item and trigger pages (Toms)
+..F....... [ZBX-4620] fixed that item sub-filters were impossible to unset in items.php (Toms)
+..F....... [ZBX-5620] fixed edit forms layout (Eduard)
+..F....... [ZBX-6597] removed debug trace in frontend for unsuccessful login if debug mode is enabled for guest group (Toms)
+...G...... [ZBXNEXT-1550] fixed agent crash on Microsoft Windows (Andris)
+..F....... [ZBX-6679] fixed monitoring event filter, must ignore groups and hosts without active triggers (Eduard)
+..F....... [ZBX-6685] fixed multiselect available data sorting in jsrpc (Eduard)
+A......... [ZBX-6356] fixed displaying web scenarios for administrator users (Ivo)
+..F....... [ZBX-6667] fixed unused hostid parameter in maintenance configuration page (Eduard)
+A.F....... [ZBX-6649] added numeric validation when selecting item for graphs and graph prototypes (Ivo)
+A......... [ZBX-6668] fixed possibility to update action conditions and operations alone (Oleg)
+..F....... [ZBX-6666] fixed passing incorrect Host and Template ID directly from URL (Ivo)
+..F....... [ZBX-6650] fixed minor layout issues for reset button and buttons in edit forms (Ivo)
+..F....... [ZBX-6642] fixed not being able to use web items in plain text screen elements (Pavels)
+..F....... [ZBX-6642] fixed disabled items not being displayed in screen element item selection pop ups (Pavels)
+..F....... [ZBX-6654] fixed inconsistent column order in the item prototype list (Ivo)
+A......... [ZBX-6644] fixed sorting by history and trends fields in itemprototype.get API (Ivo)
 ..F....... [ZBX-6631] made the "Debug" link available for guest users (Pavels)
 ...G...... [ZBX-5589] added validation of timeout and retry count parameters of net.dns item (aleksej, dimir)
 ..F....... [ZBX-6575] fixed frontend permission validation for actions, hosts, maintenance, maps, proxies, screens and templates (Eduard)
 ..F....... [ZBX-6626] fixed time displaing for graphs (Eduard)
-..F....... [ZBX-6597] removed debug trace for unsuccessful login if debug mode is enabled for guest group (Toms)
 ..F....... [ZBX-6562] fixed incorrect rounding in graphs for "s" units, fixed < 1 ms and 0s interval (Oleg)
 ....I..PS. [ZBX-5953] added output of web monitoring status (yes/no) when configuring Proxy or Server (aleksej)
 A......... [ZBX-6613] fixed trigger prototype create/update error message (Eduard)
@@ -218,12 +238,20 @@ A......... [ZBX-5498] applications API refactoring (Vedmak)
 Changes for 2.0.7rc1
 
 New features:
+A......... [ZBX-6603] improved CTrigger lastEvents parameter performance (Toms)
+A......... [ZBX-6603] improved performance for dbConditionInt() function (Toms)
 A......... [ZBX-6407] improved data retrieval performance for CTrigger get() with post SQL filtering (Toms)
 ........S. [ZBX-6493] improved performance when working with Oracle by changing memory based prefetch to rows based (dimir)
 A.F....... [ZBX-1357] updated Chinese (China), Spanish and Turkish translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
 ........S. [ZBX-6609] fixed trigger event processing to not add unneeded recovery event escalations to the database (dimir)
+..F....... [ZBX-6682] added value mapping in map labels (Oleg)
+A......... [ZBX-6673] fixed errors after parent graph deleting (Oleg)
+.......PS. [ZBX-6610] fixed invalid next check values of IPMI items (dimir)
+....I..... [ZBX-6674] fixed items description in the default data set (Oleg)
+A......... [ZBX-6644] fixed sorting by history and trends fields in itemprototype.get API (Ivo)
+........S. [ZBX-6598] fixed deleting of big amount of escalations by escalation process (Sasha)
 ...G...PS. [ZBX-6605] fixed bind() error when SourceIP is used (Andris)
 A......... [ZBX-6472] fixed dbConditionString() function for large inputs, when splitting into several IN parts wasn't surrounded by parenthesis (Toms)
 ........S. [ZBX-6609] fixed trigger event processing to not add unneeded recovery event escalations to the database (dimir)

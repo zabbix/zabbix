@@ -1720,6 +1720,33 @@ zbx_uint64_t	multiply_item_value_uint64(DB_ITEM *item, zbx_uint64_t value)
 
 /******************************************************************************
  *                                                                            *
+ * Function: DBsql_id_cmp                                                     *
+ *                                                                            *
+ * Purpose: construct where condition                                         *
+ *                                                                            *
+ * Return value: "=<id>" if id not equal zero,                                *
+ *               otherwise " is null"                                         *
+ *                                                                            *
+ * Author: Alexander Vladishev                                                *
+ *                                                                            *
+ * Comments: NB! Do not use this function more than once in same SQL query    *
+ *                                                                            *
+ ******************************************************************************/
+static const char	*DBsql_id_cmp(zbx_uint64_t id)
+{
+	static char		buf[22];	/* 1 - '=', 20 - value size, 1 - '\0' */
+	static const char	is_null[9] = " is null";
+
+	if (0 == id)
+		return is_null;
+
+	zbx_snprintf(buf, sizeof(buf), "=" ZBX_FS_UI64, id);
+
+	return buf;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: DBregister_host                                                  *
  *                                                                            *
  * Purpose: register unknown host and generate event                          *
@@ -1729,10 +1756,10 @@ zbx_uint64_t	multiply_item_value_uint64(DB_ITEM *item, zbx_uint64_t value)
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
-void	DBregister_host(zbx_uint64_t proxy_hostid, const char *host, const char *ip,
-		const char *dns, unsigned short port, int now)
+void	DBregister_host(zbx_uint64_t proxy_hostid, const char *host, const char *ip, const char *dns,
+		unsigned short port, const char *host_metadata, int now)
 {
-	char		*host_esc, *ip_esc, *dns_esc;
+	char		*host_esc, *ip_esc, *dns_esc, *host_metadata_esc;
 	DB_RESULT	result;
 	DB_ROW		row;
 	zbx_uint64_t	autoreg_hostid;
@@ -1749,10 +1776,10 @@ void	DBregister_host(zbx_uint64_t proxy_hostid, const char *host, const char *ip
 		result = DBselect(
 				"select hostid"
 				" from hosts"
-				" where proxy_hostid%s"
+				" where proxy_hostid=" ZBX_FS_UI64
 					" and host='%s'"
 					ZBX_SQL_NODE,
-				DBsql_id_cmp(proxy_hostid), host_esc,
+				proxy_hostid, host_esc,
 				DBand_node_local("hostid"));
 
 		if (NULL != DBfetch(result))
@@ -1764,6 +1791,7 @@ void	DBregister_host(zbx_uint64_t proxy_hostid, const char *host, const char *ip
 	{
 		ip_esc = DBdyn_escape_string_len(ip, INTERFACE_IP_LEN);
 		dns_esc = DBdyn_escape_string_len(dns, INTERFACE_DNS_LEN);
+		host_metadata_esc = DBdyn_escape_string(host_metadata);
 
 		result = DBselect(
 				"select autoreg_hostid"
@@ -1779,22 +1807,24 @@ void	DBregister_host(zbx_uint64_t proxy_hostid, const char *host, const char *ip
 			ZBX_STR2UINT64(autoreg_hostid, row[0]);
 
 			DBexecute("update autoreg_host"
-					" set listen_ip='%s',listen_dns='%s',listen_port=%d"
+					" set listen_ip='%s',listen_dns='%s',listen_port=%d,host_metadata='%s'"
 					" where autoreg_hostid=" ZBX_FS_UI64,
-					ip_esc, dns_esc, (int)port, autoreg_hostid);
+					ip_esc, dns_esc, (int)port, host_metadata_esc, autoreg_hostid);
 		}
 		else
 		{
 			autoreg_hostid = DBget_maxid("autoreg_host");
 			DBexecute("insert into autoreg_host"
-					" (autoreg_hostid,proxy_hostid,host,listen_ip,listen_dns,listen_port)"
+					" (autoreg_hostid,proxy_hostid,host,listen_ip,listen_dns,listen_port,"
+						"host_metadata)"
 					" values"
-					" (" ZBX_FS_UI64 ",%s,'%s','%s','%s',%d)",
+					" (" ZBX_FS_UI64 ",%s,'%s','%s','%s',%d,'%s')",
 					autoreg_hostid, DBsql_id_ins(proxy_hostid),
-					host_esc, ip_esc, dns_esc, (int)port);
+					host_esc, ip_esc, dns_esc, (int)port, host_metadata_esc);
 		}
 		DBfree_result(result);
 
+		zbx_free(host_metadata_esc);
 		zbx_free(dns_esc);
 		zbx_free(ip_esc);
 
@@ -1817,20 +1847,23 @@ void	DBregister_host(zbx_uint64_t proxy_hostid, const char *host, const char *ip
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
-void	DBproxy_register_host(const char *host, const char *ip, const char *dns, unsigned short port)
+void	DBproxy_register_host(const char *host, const char *ip, const char *dns, unsigned short port,
+		const char *host_metadata)
 {
-	char	*host_esc, *ip_esc, *dns_esc;
+	char	*host_esc, *ip_esc, *dns_esc, *host_metadata_esc;
 
 	host_esc = DBdyn_escape_string_len(host, HOST_HOST_LEN);
 	ip_esc = DBdyn_escape_string_len(ip, INTERFACE_IP_LEN);
 	dns_esc = DBdyn_escape_string_len(dns, INTERFACE_DNS_LEN);
+	host_metadata_esc = DBdyn_escape_string(host_metadata);
 
 	DBexecute("insert into proxy_autoreg_host"
-			" (clock,host,listen_ip,listen_dns,listen_port)"
+			" (clock,host,listen_ip,listen_dns,listen_port,host_metadata)"
 			" values"
-			" (%d,'%s','%s','%s',%d)",
-			(int)time(NULL), host_esc, ip_esc, dns_esc, (int)port);
+			" (%d,'%s','%s','%s',%d,'%s')",
+			(int)time(NULL), host_esc, ip_esc, dns_esc, (int)port, host_metadata_esc);
 
+	zbx_free(host_metadata_esc);
 	zbx_free(dns_esc);
 	zbx_free(ip_esc);
 	zbx_free(host_esc);
@@ -1967,34 +2000,6 @@ clean:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():'%s'", __function_name, host_name_temp);
 
 	return host_name_temp;
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: DBsql_id_cmp                                                     *
- *                                                                            *
- * Purpose: construct where condition                                         *
- *                                                                            *
- * Return value: "=<id>" if id not equal zero,                                *
- *               otherwise " is null"                                         *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
- ******************************************************************************/
-const char	*DBsql_id_cmp(zbx_uint64_t id)
-{
-	static unsigned char	n = 0;
-	static char		buf[4][22];	/* 1 - '=', 20 - value size, 1 - '\0' */
-	static const char	is_null[9] = " is null";
-
-	if (0 == id)
-		return is_null;
-
-	n = (n + 1) & 3;
-
-	zbx_snprintf(buf[n], sizeof(buf[n]), "=" ZBX_FS_UI64, id);
-
-	return buf[n];
 }
 
 /******************************************************************************
@@ -2486,4 +2491,35 @@ int	DBfield_exists(const char *table_name, const char *field_name)
 int	get_nodeid_by_id(zbx_uint64_t id)
 {
 	return (int)(id / ZBX_DM_MAX_HISTORY_IDS);
+}
+
+void	DBexecute_multiple_query(const char *query, const char *field_name, zbx_vector_uint64_t *ids)
+{
+#define ZBX_MAX_IDS	950
+	char	*sql = NULL;
+	size_t	sql_alloc = ZBX_KIBIBYTE, sql_offset = 0;
+	int	i;
+
+	sql = zbx_malloc(sql, sql_alloc);
+
+	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	for (i = 0; i < ids->values_num; i += ZBX_MAX_IDS)
+	{
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, query);
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, field_name,
+				&ids->values[i], MIN(ZBX_MAX_IDS, ids->values_num - i));
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
+
+		DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+	}
+
+	if (sql_offset > 16)	/* in ORACLE always present begin..end; */
+	{
+		DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+		DBexecute("%s", sql);
+	}
+
+	zbx_free(sql);
 }

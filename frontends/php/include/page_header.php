@@ -182,13 +182,6 @@ CSS;
 		$pageHeader->addJsFile($path);
 	}
 
-	$js = <<<JS
-if (jQuery(window).width() < 1024) {
-	document.write('<link rel="stylesheet" type="text/css" href="styles/handheld.css" />');
-}
-JS;
-
-	$pageHeader->addJs($js);
 	$pageHeader->display();
 ?>
 <body class="<?php echo $css; ?>">

@@ -42,6 +42,7 @@ class CMultiSelect extends CTag {
 		}
 
 		$params = array(
+			'id' => $this->getAttribute('id'),
 			'url' => $url->getUrl(),
 			'name' => $options['name'],
 			'labels' => array(
@@ -50,12 +51,12 @@ class CMultiSelect extends CTag {
 				'type here to search' => _('type here to search'),
 				'new' => _('new')
 			),
-			'data' => empty($options['data']) ? array() : $options['data'],
+			'data' => empty($options['data']) ? array() : zbx_cleanHashes($options['data']),
+			'ignored' => isset($options['ignored']) ? $options['ignored'] : null,
 			'defaultValue' => isset($options['defaultValue']) ? $options['defaultValue'] : null,
 			'disabled' => isset($options['disabled']) ? $options['disabled'] : false,
 			'selectedLimit' => isset($options['selectedLimit']) ? $options['selectedLimit'] : null,
-			'addNew' => isset($options['addNew']) ? $options['addNew'] : false,
-			'ignored' => isset($options['ignored']) ? $options['ignored'] : null
+			'addNew' => isset($options['addNew']) ? $options['addNew'] : false
 		);
 
 		zbx_add_post_js('jQuery("#'.$this->getAttribute('id').'").multiSelect('.CJs::encodeJson($params).')');
