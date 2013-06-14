@@ -481,19 +481,28 @@ class CPageFilter {
 			$hostid = 0;
 		}
 		else {
-			$optionsDefault = array(
+			$defaultOptions = array(
 				'nodeids' => $this->config['all_nodes'] ? get_current_nodeid() : null,
 				'output' => array('hostid', 'name'),
 				'groupids' => ($this->groupid > 0) ? $this->groupid : null
 			);
-			$options = zbx_array_merge($optionsDefault, $options);
+			$options = zbx_array_merge($defaultOptions, $options);
 
-			$hosts = isset($options['only_templates'])
-				? API::Template()->get($options)
-				: API::Host()->get($options);
+			if (isset($options['only_templates'])) {
+				unset($options['only_templates']);
+
+				$hosts = API::Template()->get($options);
+
+				$objectName = 'templateid';
+			}
+			else {
+				$hosts = API::Template()->Host($options);
+
+				$objectName = 'hostid';
+			}
+
 			order_result($hosts, 'name');
 
-			$objectName = isset($options['only_templates']) ? 'templateid' : 'hostid';
 			foreach ($hosts as $host) {
 				$this->data['hosts'][$host[$objectName]] = $host['name'];
 			}

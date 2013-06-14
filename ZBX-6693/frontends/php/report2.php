@@ -100,8 +100,9 @@ elseif (!isset($_REQUEST['filter_rst'])) {
 CProfile::update('web.avail_report.'.$availabilityReportMode.'.hostid', $_REQUEST['hostid'], PROFILE_TYPE_ID);
 
 if ($_REQUEST['filter_timetill'] > 0 && $_REQUEST['filter_timesince'] > $_REQUEST['filter_timetill']) {
+	$filterTimeSinceOriginal = $_REQUEST['filter_timesince'];
 	$_REQUEST['filter_timesince'] = $_REQUEST['filter_timetill'];
-	$_REQUEST['filter_timetill'] = $_REQUEST['filter_timesince'];
+	$_REQUEST['filter_timetill'] = $filterTimeSinceOriginal;
 }
 
 $_REQUEST['filter_timesince'] = zbxDateToTime($_REQUEST['filter_timesince']);
@@ -177,9 +178,8 @@ elseif (isset($_REQUEST['hostid'])) {
 	}
 	elseif ($availabilityReportMode == AVAILABILITY_REPORT_BY_TEMPLATE) {
 		if ($_REQUEST['hostid'] > 0 || !$config['dropdown_first_entry']) {
-			$hosts = API::Host()->get(array(
-				'templateids' => $_REQUEST['hostid']
-			));
+			$hosts = API::Host()->get(array('templateids' => $_REQUEST['hostid']));
+
 			$triggerOptions['hostids'] = zbx_objectValues($hosts, 'hostid');
 		}
 		if (isset($_REQUEST['tpl_triggerid']) && $_REQUEST['tpl_triggerid'] > 0) {
