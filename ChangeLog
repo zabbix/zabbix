@@ -8,6 +8,13 @@ A......... [ZBX-6407] improved data retrieval performance for CTrigger get() wit
 A.F....... [ZBX-1357] updated Chinese (China), Spanish and Turkish translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+..F....... [ZBX-6682] added value mapping in map labels (Oleg)
+A......... [ZBX-6673] fixed errors after parent graph deleting (Oleg)
+.......PS. [ZBX-6610] fixed invalid next check values of IPMI items (dimir)
+....I..... [ZBX-6674] fixed items description in the default data set (Oleg)
+A......... [ZBX-6644] fixed sorting by history and trends fields in itemprototype.get API (Ivo)
+........S. [ZBX-6598] fixed deleting of big amount of escalations by escalation process (Sasha)
+...G...PS. [ZBX-6605] fixed bind() error when SourceIP is used (Andris)
 A......... [ZBX-6472] fixed dbConditionString() function for large inputs, when splitting into several IN parts wasn't surrounded by parenthesis (Toms)
 ........S. [ZBX-6609] fixed trigger event processing to not add unneeded recovery event escalations to the database (dimir)
 ...G...... [ZBX-6576] fixed heavy cpu usage when collecting cpu stats on Solaris (aleksej, Andris)
