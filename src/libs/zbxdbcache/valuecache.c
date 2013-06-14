@@ -2339,7 +2339,7 @@ static int	vch_item_get_values_by_time(zbx_vc_item_t *item, zbx_vector_vc_value_
 	}
 
 	/* if cache contains the required value range, read it from cache */
-	if (SUCCEED == ret && NULL != values)
+	if (SUCCEED == ret)
 	{
 		zbx_vc_chunk_t	*chunk;
 		int		index, hits, misses;
@@ -2347,11 +2347,14 @@ static int	vch_item_get_values_by_time(zbx_vc_item_t *item, zbx_vector_vc_value_
 		if (data->range < seconds + now - timestamp)
 			data->range = seconds + now - timestamp;
 
+		if (NULL == values)
+			goto out;
+
 		if (FAIL == vch_item_get_last_value(item, timestamp, &chunk, &index))
 		{
 			/* Cache does not contain records for the specified timeshift & seconds range. */
 			/* Return empty vector with success.                                           */
-			return SUCCEED;
+			goto out;
 		}
 
 		/* fill the values vector with item history values until the start timestamp is reached */
@@ -2385,7 +2388,7 @@ static int	vch_item_get_values_by_time(zbx_vc_item_t *item, zbx_vector_vc_value_
 
 		vc_update_statistics(item, hits, misses);
 	}
-
+out:
 	return ret;
 }
 
