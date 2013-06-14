@@ -36,6 +36,8 @@ EXTRA_DIST = \
 
 noinst_LIBRARIES = \
 	libzbxagentsysinfo.a \
+	libzbxhostname.a \
+	libzbxproxysysinfo.a \
 	libzbxserversysinfo.a
 
 # AGENT version of sysinfo library
@@ -43,7 +45,8 @@ libzbxagentsysinfo_a_CFLAGS = \
 	-DWITH_AGENT_METRICS \
 	-DWITH_COMMON_METRICS \
 	-DWITH_SIMPLE_METRICS \
-	-DWITH_SPECIFIC_METRICS
+	-DWITH_SPECIFIC_METRICS \
+	-DWITH_HOSTNAME_METRIC
 
 libzbxagentsysinfo_a_SOURCES = \
 	sysinfo.c \
@@ -56,3 +59,16 @@ libzbxserversysinfo_a_CFLAGS = \
 
 libzbxserversysinfo_a_SOURCES = \
 	sysinfo.c
+
+# PROXY version of sysinfo library
+libzbxproxysysinfo_a_CFLAGS = \
+	-DWITH_COMMON_METRICS \
+	-DWITH_SIMPLE_METRICS \
+	-DWITH_HOSTNAME_METRIC
+
+libzbxproxysysinfo_a_SOURCES = \
+	sysinfo.c
+
+# Hostname library
+libzbxhostname_a_SOURCES = \
+	@ARCH@/hostname.c

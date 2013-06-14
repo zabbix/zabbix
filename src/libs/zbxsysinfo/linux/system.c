@@ -23,18 +23,6 @@
 #	include <sys/utsname.h>
 #endif
 
-int	SYSTEM_HOSTNAME(AGENT_REQUEST *request, AGENT_RESULT *result)
-{
-	struct utsname	name;
-
-	if (-1 == uname(&name))
-		return SYSINFO_RET_FAIL;
-
-	SET_STR_RESULT(result, zbx_strdup(NULL, name.nodename));
-
-	return SYSINFO_RET_OK;
-}
-
 int	SYSTEM_UNAME(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	struct utsname	name;
