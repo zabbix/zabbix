@@ -419,7 +419,8 @@ function make_hoststat_summary($filter) {
 			'priority' => $filter['severity'],
 			'value' => TRIGGER_VALUE_TRUE
 		),
-		'output' => array('triggerid', 'priority')
+		'output' => array('triggerid', 'priority'),
+		'selectHosts' => array('hostid')
 	);
 	$triggers = API::Trigger()->get($options);
 
