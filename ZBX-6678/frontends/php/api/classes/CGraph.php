@@ -107,8 +107,13 @@ class CGraph extends CGraphGeneral {
 					' LEFT JOIN rights r'.
 						' ON r.id=hgg.groupid'.
 							' AND '.dbConditionInt('r.groupid', $userGroups).
-				' WHERE g.graphid=gi.graphid'.
-					' AND gi.itemid=i.itemid'.
+				' WHERE (g.graphid=gi.graphid'.
+						' AND gi.itemid=i.itemid'.
+						' OR g.ymin_type='.GRAPH_YAXIS_TYPE_ITEM_VALUE.
+						' AND g.ymin_itemid=i.itemid'.
+						' OR g.ymax_type='.GRAPH_YAXIS_TYPE_ITEM_VALUE.
+						' AND g.ymax_itemid=i.itemid'.
+					')'.
 					' AND i.hostid=hgg.hostid'.
 				' GROUP BY i.hostid'.
 				' HAVING MAX(permission)<'.$permission.
@@ -586,6 +591,14 @@ class CGraph extends CGraphGeneral {
 
 				// assigning with key preserves unique itemids
 				$itemids[$gitem['itemid']] = $gitem['itemid'];
+			}
+
+			// add Y axis item IDs for persmission validation
+			if (isset($graph['ymin_type']) && $graph['ymin_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE) {
+				$itemids[$graph['ymin_itemid']] = $graph['ymin_itemid'];
+			}
+			if (isset($graph['ymax_type']) && $graph['ymax_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE) {
+				$itemids[$graph['ymax_itemid']] = $graph['ymax_itemid'];
 			}
 		}
 
