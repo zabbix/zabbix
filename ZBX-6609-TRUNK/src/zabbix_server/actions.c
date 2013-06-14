@@ -1614,7 +1614,8 @@ void	process_actions(const DB_EVENT *events, size_t events_num)
 			}
 			else if (EVENT_SOURCE_TRIGGERS == event->source || EVENT_SOURCE_INTERNAL == event->source)
 			{
-				/* actionid of possible recovery event, check later */
+				/* Action conditions evaluated to false but it could be a recovery event */
+				/* for an action already in "escalations" table. Check later. */
 				zbx_vector_uint64_append(&rec_actionids, actionid);
 			}
 		}
@@ -1646,8 +1647,6 @@ void	process_actions(const DB_EVENT *events, size_t events_num)
 			ZBX_STR2UINT64(actionid, row[0]);
 			ZBX_DBROW2UINT64(triggerid, row[1]);
 			ZBX_DBROW2UINT64(itemid, row[2]);
-
-			zabbix_log(LOG_LEVEL_ERR, "VL: a:" ZBX_FS_UI64 " t:" ZBX_FS_UI64 " i:" ZBX_FS_UI64, actionid, triggerid, itemid);
 
 			for (i = 0; i < events_num; i++)
 			{
