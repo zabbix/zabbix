@@ -1154,20 +1154,25 @@ static int	vmware_perf_counter_details_get(CURL *easyhandle, const zbx_vector_pt
 		goto out;
 	}
 
-	if (NULL != (*error = read_xml_value(page.data, ZBX_XPATH_LN1("faultstring"))))
-		goto out;
+	if (NULL == (*error = read_xml_value(page.data, ZBX_XPATH_LN1("faultstring"))))
+	{
+		vmware_get_counterid_by_key("packetsRx", &counters->nic_packets_rx);
+		vmware_get_counterid_by_key("packetsTx", &counters->nic_packets_tx);
+		vmware_get_counterid_by_key("received", &counters->nic_received);
+		vmware_get_counterid_by_key("transmitted", &counters->nic_transmitted);
 
-	vmware_get_counterid_by_key("packetsRx", &counters->nic_packets_rx);
-	vmware_get_counterid_by_key("packetsTx", &counters->nic_packets_tx);
-	vmware_get_counterid_by_key("received", &counters->nic_received);
-	vmware_get_counterid_by_key("transmitted", &counters->nic_transmitted);
+		vmware_get_counterid_by_key("read", &counters->disk_read);
+		vmware_get_counterid_by_key("write", &counters->disk_write);
+		vmware_get_counterid_by_key("numberReadAveraged", &counters->disk_number_read_averaged);
+		vmware_get_counterid_by_key("numberWriteAveraged", &counters->disk_number_write_averaged);
 
-	vmware_get_counterid_by_key("read", &counters->disk_read);
-	vmware_get_counterid_by_key("write", &counters->disk_write);
-	vmware_get_counterid_by_key("numberReadAveraged", &counters->disk_number_read_averaged);
-	vmware_get_counterid_by_key("numberWriteAveraged", &counters->disk_number_write_averaged);
-
-	counters->initialized = 1;
+		counters->initialized = 1;
+	}
+	else
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() page.data:'%s'", __function_name, page.data);
+		zbx_free(*error);
+	}
 
 	ret = SUCCEED;
 out:
