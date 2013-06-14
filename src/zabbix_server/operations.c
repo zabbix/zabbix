@@ -38,7 +38,7 @@
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
  ******************************************************************************/
-static zbx_uint64_t	select_discovered_host(DB_EVENT *event)
+static zbx_uint64_t	select_discovered_host(const DB_EVENT *event)
 {
 	const char	*__function_name = "select_discovered_host";
 	DB_RESULT	result;
@@ -187,7 +187,7 @@ static void	add_discovered_host_groups(zbx_uint64_t hostid, zbx_vector_uint64_t 
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
  ******************************************************************************/
-static zbx_uint64_t	add_discovered_host(DB_EVENT *event)
+static zbx_uint64_t	add_discovered_host(const DB_EVENT *event)
 {
 	const char		*__function_name = "add_discovered_host";
 
@@ -407,7 +407,7 @@ clean:
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
  ******************************************************************************/
-void	op_host_add(DB_EVENT *event)
+void	op_host_add(const DB_EVENT *event)
 {
 	const char	*__function_name = "op_host_add";
 
@@ -433,7 +433,7 @@ void	op_host_add(DB_EVENT *event)
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  ******************************************************************************/
-void	op_host_del(DB_EVENT *event)
+void	op_host_del(const DB_EVENT *event)
 {
 	const char	*__function_name = "op_host_del";
 	zbx_uint64_t	hostid;
@@ -463,7 +463,7 @@ void	op_host_del(DB_EVENT *event)
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
-void	op_host_enable(DB_EVENT *event)
+void	op_host_enable(const DB_EVENT *event)
 {
 	const char	*__function_name = "op_host_enable";
 	zbx_uint64_t	hostid;
@@ -498,7 +498,7 @@ void	op_host_enable(DB_EVENT *event)
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
-void	op_host_disable(DB_EVENT *event)
+void	op_host_disable(const DB_EVENT *event)
 {
 	const char	*__function_name = "op_host_disable";
 	zbx_uint64_t	hostid;
@@ -536,7 +536,7 @@ void	op_host_disable(DB_EVENT *event)
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
  ******************************************************************************/
-void	op_groups_add(DB_EVENT *event, zbx_vector_uint64_t *groupids)
+void	op_groups_add(const DB_EVENT *event, zbx_vector_uint64_t *groupids)
 {
 	const char	*__function_name = "op_groups_add";
 	zbx_uint64_t	hostid;
@@ -569,7 +569,7 @@ void	op_groups_add(DB_EVENT *event, zbx_vector_uint64_t *groupids)
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
  ******************************************************************************/
-void	op_groups_del(DB_EVENT *event, zbx_vector_uint64_t *groupids)
+void	op_groups_del(const DB_EVENT *event, zbx_vector_uint64_t *groupids)
 {
 	const char	*__function_name = "op_groups_del";
 
@@ -638,7 +638,7 @@ void	op_groups_del(DB_EVENT *event, zbx_vector_uint64_t *groupids)
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  ******************************************************************************/
-void	op_template_add(DB_EVENT *event, zbx_vector_uint64_t *lnk_templateids)
+void	op_template_add(const DB_EVENT *event, zbx_vector_uint64_t *lnk_templateids)
 {
 	const char	*__function_name = "op_template_add";
 	zbx_uint64_t	hostid;
@@ -671,7 +671,7 @@ void	op_template_add(DB_EVENT *event, zbx_vector_uint64_t *lnk_templateids)
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  ******************************************************************************/
-void	op_template_del(DB_EVENT *event, zbx_vector_uint64_t *del_templateids)
+void	op_template_del(const DB_EVENT *event, zbx_vector_uint64_t *del_templateids)
 {
 	const char	*__function_name = "op_template_del";
 	zbx_uint64_t	hostid;
