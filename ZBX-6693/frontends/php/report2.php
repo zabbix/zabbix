@@ -135,7 +135,7 @@ if (isset($_REQUEST['triggerid'])) {
 
 if (isset($_REQUEST['triggerid'])) {
 	$reportWidget->addHeader(array(
-		new CLink($triggerData['hostname'], '?filter_groupid='.$_REQUEST['groupid'].'&filter_hostid='.$triggerData['hostid']),
+		new CLink($triggerData['hostname'], '?groupid='.$_REQUEST['groupid'].'&hostid='.$triggerData['hostid']),
 		' : ',
 		$triggerData['description']
 	), SPACE);
@@ -317,7 +317,7 @@ elseif (isset($_REQUEST['hostid'])) {
 			new CLink($trigger['description'], 'events.php?triggerid='.$trigger['triggerid']),
 			new CSpan(sprintf('%.4f%%', $availability['true']), 'on'),
 			new CSpan(sprintf('%.4f%%', $availability['false']), 'off'),
-			new CLink(_('Show'), 'report2.php?filter_groupid='.$_REQUEST['groupid'].'&filter_hostid='.$_REQUEST['hostid'].'&triggerid='.$trigger['triggerid'])
+			new CLink(_('Show'), 'report2.php?groupid='.$_REQUEST['groupid'].'&hostid='.$_REQUEST['hostid'].'&triggerid='.$trigger['triggerid'])
 		));
 	}
 
