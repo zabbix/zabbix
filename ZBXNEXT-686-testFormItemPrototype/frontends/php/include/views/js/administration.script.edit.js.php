@@ -1,32 +1,39 @@
 <script type="text/javascript">
 	jQuery(document).ready(function() {
-		jQuery('#name').focus();
-
 		// type change
-		jQuery('#type').change(function(){
-			var ipmi = (jQuery(this).val() == '1');
-
-			jQuery('#execute_on').closest('li').toggle(!ipmi);
+		jQuery('#type').change(function() {
+			var ipmi = (jQuery(this).val() == 1);
 
 			if (ipmi) {
+				jQuery('#execute_on')
+					.closest('li')
+					.css('display', 'none');
+
 				jQuery('#commandipmi')
 					.val(jQuery('#command').val())
 					.closest('li')
-					.toggle(true);
+					.css('display', '')
+					.removeClass('hidden');
 
 				jQuery('#command')
 					.closest('li')
-					.toggle(false);
+					.css('display', 'none');
 			}
 			else {
+				jQuery('#execute_on')
+					.closest('li')
+					.css('display', '')
+					.removeClass('hidden');
+
 				jQuery('#command')
 					.val(jQuery('#commandipmi').val())
 					.closest('li')
-					.toggle(true);
+					.css('display', '')
+					.removeClass('hidden');
 
 				jQuery('#commandipmi')
 					.closest('li')
-					.toggle(false);
+					.css('display', 'none');
 			}
 		});
 
@@ -54,18 +61,18 @@
 
 		// test confirmation button
 		jQuery('#testConfirmation').click(function() {
-			var confirmation = jQuery('#confirmation').val();
-			var buttons = [
-				{text: <?php echo CJs::encodeJson(_('Execute')); ?>, click: function() {}},
-				{text: <?php echo CJs::encodeJson(_('Cancel')); ?>, click: function() {
-					jQuery(this).dialog('destroy');
-					jQuery('#testConfirmation').focus();
-				}}
-			];
+			var confirmation = jQuery('#confirmation').val(),
+				buttons = [
+					{text: <?php echo CJs::encodeJson(_('Execute')); ?>, click: function() {}},
+					{text: <?php echo CJs::encodeJson(_('Cancel')); ?>, click: function() {
+						jQuery(this).dialog('destroy');
+						jQuery('#testConfirmation').focus();
+					}}
+				],
+				dialogObj = showScriptDialog(confirmation, buttons);
 
-			var d = showScriptDialog(confirmation, buttons);
-			jQuery(d).find('button:first').prop('disabled', true).addClass('ui-state-disabled');
-			jQuery(d).find('button:last').focus();
+			jQuery(dialogObj).find('button:first').prop('disabled', true).addClass('ui-state-disabled');
+			jQuery(dialogObj).find('button:last').focus();
 		});
 
 		// host group selection

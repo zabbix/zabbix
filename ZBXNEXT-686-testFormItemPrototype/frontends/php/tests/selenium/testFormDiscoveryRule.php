@@ -678,7 +678,7 @@ class testFormDiscoveryRule extends CWebTest {
 	public function testFormDiscoveryRule_SimpleUpdate($data) {
 		$name = $data['name'];
 
-		$sqlDiscovery = 'select itemid, hostid, name, key_, delay, history, trends, value_type, formula, templateid, flags, lifetime from items';
+		$sqlDiscovery = 'select itemid, hostid, name, key_, delay from items order by itemid';
 		$oldHashDiscovery = DBhash($sqlDiscovery);
 
 		$this->zbxTestLogin('hosts.php');

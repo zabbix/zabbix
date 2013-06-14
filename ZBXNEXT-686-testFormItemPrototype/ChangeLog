@@ -73,6 +73,12 @@ A.F.I...S. [ZBXNEXT-1186] increased length to 2048 characters of expression fiel
 ........S. [ZBXNEXT-1663] added support for notification macros {TRIGGER.NAME.ORIG}, {ITEM.NAME.ORIG}, {ITEM.KEY.ORIG} (dimir)
 
 Bug fixes:
+..F....... [ZBX-6692] fixed displaying age and last change in monitoring triggers page (Ivo)
+..F....... [ZBX-5711] fixed that favorites were not added in dashboard (Toms)
+..F....... [ZBX-4620] added escaping of HTML entities for search results as well for item and trigger pages (Toms)
+..F....... [ZBX-4620] fixed that item sub-filters were impossible to unset in items.php (Toms)
+..F....... [ZBX-5620] fixed edit forms layout (Eduard)
+..F....... [ZBX-6597] removed debug trace in frontend for unsuccessful login if debug mode is enabled for guest group (Toms)
 ...G...... [ZBXNEXT-1550] fixed agent crash on Microsoft Windows (Andris)
 ..F....... [ZBX-6679] fixed monitoring event filter, must ignore groups and hosts without active triggers (Eduard)
 ..F....... [ZBX-6685] fixed multiselect available data sorting in jsrpc (Eduard)
@@ -90,7 +96,6 @@ A......... [ZBX-6644] fixed sorting by history and trends fields in itemprototyp
 ...G...... [ZBX-5589] added validation of timeout and retry count parameters of net.dns item (aleksej, dimir)
 ..F....... [ZBX-6575] fixed frontend permission validation for actions, hosts, maintenance, maps, proxies, screens and templates (Eduard)
 ..F....... [ZBX-6626] fixed time displaing for graphs (Eduard)
-..F....... [ZBX-6597] removed debug trace for unsuccessful login if debug mode is enabled for guest group (Toms)
 ..F....... [ZBX-6562] fixed incorrect rounding in graphs for "s" units, fixed < 1 ms and 0s interval (Oleg)
 ....I..PS. [ZBX-5953] added output of web monitoring status (yes/no) when configuring Proxy or Server (aleksej)
 A......... [ZBX-6613] fixed trigger prototype create/update error message (Eduard)
@@ -233,11 +238,14 @@ A......... [ZBX-5498] applications API refactoring (Vedmak)
 Changes for 2.0.7rc1
 
 New features:
+A......... [ZBX-6603] improved CTrigger lastEvents parameter performance (Toms)
+A......... [ZBX-6603] improved performance for dbConditionInt() function (Toms)
 A......... [ZBX-6407] improved data retrieval performance for CTrigger get() with post SQL filtering (Toms)
 ........S. [ZBX-6493] improved performance when working with Oracle by changing memory based prefetch to rows based (dimir)
 A.F....... [ZBX-1357] updated Chinese (China), Spanish and Turkish translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+..F....... [ZBX-6682] added value mapping in map labels (Oleg)
 A......... [ZBX-6673] fixed errors after parent graph deleting (Oleg)
 .......PS. [ZBX-6610] fixed invalid next check values of IPMI items (dimir)
 ....I..... [ZBX-6674] fixed items description in the default data set (Oleg)
