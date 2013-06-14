@@ -270,6 +270,7 @@ frontends/php/tests/bootstrap.php.template -text
 frontends/php/tests/general/CTriggerFunctionValidatorTest.php -text
 frontends/php/tests/selenium/testFormDiscoveryRule.php -text
 frontends/php/tests/selenium/testFormGraph.php -text
+frontends/php/tests/selenium/testFormItemPrototype.php -text
 frontends/php/tests/selenium/testInheritanceDiscoveryRule.php -text
 frontends/php/tests/selenium/testInheritanceGraph.php -text
 frontends/php/tests/selenium/testInheritanceItem.php -text
