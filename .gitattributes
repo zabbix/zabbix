@@ -553,6 +553,7 @@ src/libs/zbxcommon/int128.c -text
 src/libs/zbxsysinfo/aix/software.c -text
 src/libs/zbxsysinfo/freebsd/software.c -text
 src/libs/zbxsysinfo/hpux/software.c -text
+src/libs/zbxsysinfo/linux/hostname.c -text
 src/libs/zbxsysinfo/netbsd/software.c -text
 src/libs/zbxsysinfo/openbsd/software.c -text
 src/libs/zbxsysinfo/osf/software.c -text
