@@ -838,7 +838,7 @@ INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid) values (504,
 
 -- testFormItemPrototype, testInheritanceItemPrototype etc. for all prototype testing
 INSERT INTO items (name, key_, hostid, value_type, itemid, flags, delay, params, description) VALUES ('testInheritanceDiscoveryRule', 'inheritance-discovery-rule', 30000, 4, 23500, 1, 50, '', '');
-INSERT INTO items (name, key_, hostid, value_type, itemid, flags, templateid, delay, params, description) VALUES ('discoveryRuleTest', 'discovery-rule-test', 30001, 4, 23501, 1, 23500, 50, '', '');
+INSERT INTO items (name, key_, hostid, value_type, itemid, flags, templateid, delay, params, description) VALUES ('testInheritanceDiscoveryRule', 'inheritance-discovery-rule', 30001, 4, 23501, 1, 23500, 50, '', '');
 
 -- testInheritanceItemPrototype.SimpleUpdate and testInheritanceItemPrototype.SimpleCreate
 INSERT INTO items (name, key_, hostid, value_type, itemid, flags) VALUES ('itemDiscovery', 'item-discovery-prototype', 30000, 3, 23600, 2);
