@@ -45,11 +45,18 @@ class testFormItemPrototype extends CWebTest {
 	protected $hostid = 40001;
 
 	/**
-	 * The name of the test discovery rule created in the test data set.
+	 * The name of the test discovery rule created in the test data set on host.
 	 *
 	 * @var string
 	 */
 	protected $discoveryRule = 'testFormDiscoveryRule';
+
+	/**
+	 * The name of the test discovery rule created in the test data set on template.
+	 *
+	 * @var string
+	 */
+	protected $discoveryRuleTemplate = 'testInheritanceDiscoveryRule';
 
 
 	/**
@@ -62,53 +69,72 @@ class testFormItemPrototype extends CWebTest {
 	public static function layout() {
 		return array(
 			array(
-				array('type' => 'Zabbix agent')
+				array('type' => 'Zabbix agent', 'host' => 'Simple form test host')
 			),
 			array(
-				array('type' => 'Zabbix agent', 'value_type' => 'Numeric (unsigned)', 'data_type' => 'Boolean')
+				array('host' => 'Simple form test host', 'form' => 'testFormItemPrototype1')
 			),
 			array(
-				array('type' => 'Zabbix agent', 'value_type' => 'Numeric (unsigned)', 'data_type' => 'Hexadecimal')
+				array(
+					'type' => 'Zabbix agent',
+					'value_type' => 'Numeric (unsigned)',
+					'data_type' => 'Boolean',
+					'host' => 'Simple form test host'
+				)
 			),
 			array(
-				array('type' => 'Zabbix agent', 'value_type' => 'Numeric (unsigned)', 'data_type' => 'Octal')
+				array(
+					'type' => 'Zabbix agent',
+					'value_type' => 'Numeric (unsigned)',
+					'data_type' => 'Hexadecimal',
+					'host' => 'Simple form test host'
+				)
 			),
 			array(
-				array('type' => 'Zabbix agent', 'value_type' => 'Numeric (float)')
+				array(
+					'type' => 'Zabbix agent',
+					'value_type' => 'Numeric (unsigned)',
+					'data_type' => 'Octal',
+					'host' => 'Simple form test host'
+				)
 			),
 			array(
-				array('type' => 'Zabbix agent', 'value_type' => 'Character')
+				array('type' => 'Zabbix agent', 'value_type' => 'Numeric (float)', 'host' => 'Simple form test host')
 			),
 			array(
-				array('type' => 'Zabbix agent', 'value_type' => 'Log')
+				array('type' => 'Zabbix agent', 'value_type' => 'Character', 'host' => 'Simple form test host')
 			),
 			array(
-				array('type' => 'Zabbix agent', 'value_type' => 'Text')
+				array('type' => 'Zabbix agent', 'value_type' => 'Log', 'host' => 'Simple form test host')
 			),
 			array(
-				array('type' => 'Zabbix agent (active)'),
+				array('type' => 'Zabbix agent', 'value_type' => 'Text', 'host' => 'Simple form test host')
 			),
 			array(
-				array('type' => 'Simple check')
+				array('type' => 'Zabbix agent (active)', 'host' => 'Simple form test host')
 			),
 			array(
-				array('type' => 'SNMPv1 agent')
+				array('type' => 'Simple check', 'host' => 'Simple form test host')
 			),
 			array(
-				array('type' => 'SNMPv1 agent', 'value_type' => 'Numeric (float)')
+				array('type' => 'SNMPv1 agent', 'host' => 'Simple form test host')
 			),
 			array(
-				array('type' => 'SNMPv2 agent')
+				array('type' => 'SNMPv1 agent', 'value_type' => 'Numeric (float)', 'host' => 'Simple form test host')
 			),
 			array(
-				array('type' => 'SNMPv3 agent')
+				array('type' => 'SNMPv2 agent', 'host' => 'Simple form test host')
+			),
+			array(
+				array('type' => 'SNMPv3 agent', 'host' => 'Simple form test host')
 			),
 			array(
 				array(
 					'type' => 'SNMPv3 agent',
 					'snmpv3_securitylevel' => 'noAuthNoPriv',
 					'value_type' => 'Numeric (unsigned)',
-					'data_type' => 'Boolean'
+					'data_type' => 'Boolean',
+					'host' => 'Simple form test host'
 				)
 			),
 			array(
@@ -116,7 +142,8 @@ class testFormItemPrototype extends CWebTest {
 					'type' => 'SNMPv3 agent',
 					'snmpv3_securitylevel' => 'noAuthNoPriv',
 					'value_type' => 'Numeric (unsigned)',
-					'data_type' => 'Hexadecimal'
+					'data_type' => 'Hexadecimal',
+					'host' => 'Simple form test host'
 				)
 			),
 			array(
@@ -124,95 +151,336 @@ class testFormItemPrototype extends CWebTest {
 					'type' => 'SNMPv3 agent',
 					'snmpv3_securitylevel' => 'noAuthNoPriv',
 					'value_type' => 'Numeric (unsigned)',
-					'data_type' => 'Octal'
+					'data_type' => 'Octal',
+					'host' => 'Simple form test host'
 				)
 			),
 			array(
 				array(
 					'type' => 'SNMPv3 agent',
 					'snmpv3_securitylevel' => 'noAuthNoPriv',
-					'value_type' => 'Numeric (float)'
+					'value_type' => 'Numeric (float)',
+					'host' => 'Simple form test host'
 				)
 			),
 			array(
 				array(
 					'type' => 'SNMPv3 agent',
 					'snmpv3_securitylevel' => 'noAuthNoPriv',
-					'value_type' => 'Character'
+					'value_type' => 'Character',
+					'host' => 'Simple form test host'
 				)
 			),
 			array(
 				array(
 					'type' => 'SNMPv3 agent',
 					'snmpv3_securitylevel' => 'noAuthNoPriv',
-					'value_type' => 'Log')
+					'value_type' => 'Log',
+					'host' => 'Simple form test host'
+				)
 			),
 			array(
 				array(
 					'type' => 'SNMPv3 agent',
 					'snmpv3_securitylevel' => 'noAuthNoPriv',
-					'value_type' => 'Text'
+					'value_type' => 'Text',
+					'host' => 'Simple form test host'
 				)
 			),
 			array(
 				array(
 					'type' => 'SNMPv3 agent',
-					'snmpv3_securitylevel' => 'authNoPriv'
+					'snmpv3_securitylevel' => 'authNoPriv',
+					'host' => 'Simple form test host'
 				)
 			),
 			array(
 				array(
 					'type' => 'SNMPv3 agent',
-					'snmpv3_securitylevel' => 'authPriv'
+					'snmpv3_securitylevel' => 'authPriv',
+					'host' => 'Simple form test host'
 				)
 			),
 			array(
-				array('type' => 'SNMP trap')
+				array('type' => 'SNMP trap', 'host' => 'Simple form test host')
 			),
 			array(
-				array('type' => 'Zabbix internal')
+				array('type' => 'Zabbix internal', 'host' => 'Simple form test host')
 			),
 			array(
-				array('type' => 'Zabbix internal', 'value_type' => 'Numeric (unsigned)', 'data_type' => 'Boolean')
+				array(
+					'type' => 'Zabbix internal',
+					'value_type' => 'Numeric (unsigned)',
+					'data_type' => 'Boolean',
+					'host' => 'Simple form test host'
+				)
 			),
 			array(
-				array('type' => 'Zabbix trapper')
+				array('type' => 'Zabbix trapper', 'host' => 'Simple form test host')
 			),
 			array(
-				array('type' => 'Zabbix aggregate')
+				array('type' => 'Zabbix aggregate', 'host' => 'Simple form test host')
 			),
 			array(
-				array('type' => 'External check')
+				array('type' => 'External check', 'host' => 'Simple form test host')
 			),
 			array(
-				array('type' => 'Database monitor')
+				array('type' => 'Database monitor', 'host' => 'Simple form test host')
 			),
 			array(
-				array('type' => 'IPMI agent')
+				array('type' => 'IPMI agent', 'host' => 'Simple form test host')
 			),
 			array(
-				array('type' => 'SSH agent')
+				array('type' => 'SSH agent', 'host' => 'Simple form test host')
 			),
 			array(
-				array('type' => 'SSH agent', 'authtype' => 'Public key')
+				array('type' => 'SSH agent', 'authtype' => 'Public key', 'host' => 'Simple form test host')
 			),
 			array(
-				array('type' => 'SSH agent', 'authtype' => 'Password')
+				array('type' => 'SSH agent', 'authtype' => 'Password', 'host' => 'Simple form test host')
 			),
 			array(
-				array('type' => 'SSH agent', 'value_type' => 'Numeric (unsigned)', 'data_type' => 'Boolean')
+				array(
+					'type' => 'SSH agent',
+					'value_type' => 'Numeric (unsigned)',
+					'data_type' => 'Boolean',
+					'host' => 'Simple form test host'
+				)
 			),
 			array(
-				array('type' => 'SSH agent', 'authtype' => 'Password', 'value_type' => 'Character')
+				array(
+					'type' => 'SSH agent',
+					'authtype' => 'Password',
+					'value_type' => 'Character',
+					'host' => 'Simple form test host'
+				)
 			),
 			array(
-				array('type' => 'TELNET agent')
+				array('type' => 'TELNET agent', 'host' => 'Simple form test host')
 			),
 			array(
-				array('type' => 'JMX agent')
+				array('type' => 'JMX agent', 'host' => 'Simple form test host')
 			),
 			array(
-				array('type' => 'Calculated')
+				array('type' => 'Calculated', 'host' => 'Simple form test host')
+			),
+			array(
+				array('type' => 'Zabbix agent', 'template' => 'Inheritance test template')
+			),
+			array(
+				array(
+					'template' => 'Inheritance test template',
+					'form' => 'testInheritanceItemPrototype1'
+				)
+			),
+			array(
+				array(
+					'host' => 'Template inheritance test host',
+					'templatedHost' => 'Inheritance test template',
+					'form' => 'testInheritanceItemPrototype1'
+				)
+			),
+			array(
+				array(
+					'type' => 'Zabbix agent',
+					'value_type' => 'Numeric (unsigned)',
+					'data_type' => 'Boolean',
+					'template' => 'Inheritance test template'
+				)
+			),
+			array(
+				array(
+					'type' => 'Zabbix agent',
+					'value_type' => 'Numeric (unsigned)',
+					'data_type' => 'Hexadecimal',
+					'template' => 'Inheritance test template'
+				)
+			),
+			array(
+				array(
+					'type' => 'Zabbix agent',
+					'value_type' => 'Numeric (unsigned)',
+					'data_type' => 'Octal',
+					'template' => 'Inheritance test template'
+				)
+			),
+			array(
+				array(
+					'type' => 'Zabbix agent',
+					'value_type' => 'Numeric (float)',
+					'template' => 'Inheritance test template'
+				)
+			),
+			array(
+				array(
+					'type' => 'Zabbix agent',
+					'value_type' => 'Character',
+					'template' => 'Inheritance test template'
+				)
+			),
+			array(
+				array('type' => 'Zabbix agent', 'value_type' => 'Log', 'template' => 'Inheritance test template')
+			),
+			array(
+				array('type' => 'Zabbix agent', 'value_type' => 'Text', 'template' => 'Inheritance test template')
+			),
+			array(
+				array('type' => 'Zabbix agent (active)', 'template' => 'Inheritance test template')
+			),
+			array(
+				array('type' => 'Simple check', 'template' => 'Inheritance test template')
+			),
+			array(
+				array('type' => 'SNMPv1 agent', 'template' => 'Inheritance test template')
+			),
+			array(
+				array(
+					'type' => 'SNMPv1 agent',
+					'value_type' => 'Numeric (float)',
+					'template' => 'Inheritance test template'
+				)
+			),
+			array(
+				array('type' => 'SNMPv2 agent', 'template' => 'Inheritance test template')
+			),
+			array(
+				array('type' => 'SNMPv3 agent', 'template' => 'Inheritance test template')
+			),
+			array(
+				array(
+					'type' => 'SNMPv3 agent',
+					'snmpv3_securitylevel' => 'noAuthNoPriv',
+					'value_type' => 'Numeric (unsigned)',
+					'data_type' => 'Boolean',
+					'template' => 'Inheritance test template'
+				)
+			),
+			array(
+				array(
+					'type' => 'SNMPv3 agent',
+					'snmpv3_securitylevel' => 'noAuthNoPriv',
+					'value_type' => 'Numeric (unsigned)',
+					'data_type' => 'Hexadecimal',
+					'template' => 'Inheritance test template'
+				)
+			),
+			array(
+				array(
+					'type' => 'SNMPv3 agent',
+					'snmpv3_securitylevel' => 'noAuthNoPriv',
+					'value_type' => 'Numeric (unsigned)',
+					'data_type' => 'Octal',
+					'template' => 'Inheritance test template'
+				)
+			),
+			array(
+				array(
+					'type' => 'SNMPv3 agent',
+					'snmpv3_securitylevel' => 'noAuthNoPriv',
+					'value_type' => 'Numeric (float)',
+					'template' => 'Inheritance test template'
+				)
+			),
+			array(
+				array(
+					'type' => 'SNMPv3 agent',
+					'snmpv3_securitylevel' => 'noAuthNoPriv',
+					'value_type' => 'Character',
+					'template' => 'Inheritance test template'
+				)
+			),
+			array(
+				array(
+					'type' => 'SNMPv3 agent',
+					'snmpv3_securitylevel' => 'noAuthNoPriv',
+					'value_type' => 'Log',
+					'template' => 'Inheritance test template'
+				)
+			),
+			array(
+				array(
+					'type' => 'SNMPv3 agent',
+					'snmpv3_securitylevel' => 'noAuthNoPriv',
+					'value_type' => 'Text',
+					'template' => 'Inheritance test template'
+				)
+			),
+			array(
+				array(
+					'type' => 'SNMPv3 agent',
+					'snmpv3_securitylevel' => 'authNoPriv',
+					'template' => 'Inheritance test template'
+				)
+			),
+			array(
+				array(
+					'type' => 'SNMPv3 agent',
+					'snmpv3_securitylevel' => 'authPriv',
+					'template' => 'Inheritance test template'
+				)
+			),
+			array(
+				array('type' => 'SNMP trap', 'template' => 'Inheritance test template')
+			),
+			array(
+				array('type' => 'Zabbix internal', 'template' => 'Inheritance test template')
+			),
+			array(
+				array(
+					'type' => 'Zabbix internal',
+					'value_type' => 'Numeric (unsigned)',
+					'data_type' => 'Boolean',
+					'template' => 'Inheritance test template'
+				)
+			),
+			array(
+				array('type' => 'Zabbix trapper', 'template' => 'Inheritance test template')
+			),
+			array(
+				array('type' => 'Zabbix aggregate', 'template' => 'Inheritance test template')
+			),
+			array(
+				array('type' => 'External check', 'template' => 'Inheritance test template')
+			),
+			array(
+				array('type' => 'Database monitor', 'template' => 'Inheritance test template')
+			),
+			array(
+				array('type' => 'IPMI agent', 'template' => 'Inheritance test template')
+			),
+			array(
+				array('type' => 'SSH agent', 'template' => 'Inheritance test template')
+			),
+			array(
+				array('type' => 'SSH agent', 'authtype' => 'Public key', 'template' => 'Inheritance test template')
+			),
+			array(
+				array('type' => 'SSH agent', 'authtype' => 'Password', 'template' => 'Inheritance test template')
+			),
+			array(
+				array(
+					'type' => 'SSH agent',
+					'value_type' => 'Numeric (unsigned)',
+					'data_type' => 'Boolean',
+					'template' => 'Inheritance test template'
+				)
+			),
+			array(
+				array(
+					'type' => 'SSH agent',
+					'authtype' => 'Password',
+					'value_type' => 'Character',
+					'template' => 'Inheritance test template'
+				)
+			),
+			array(
+				array('type' => 'TELNET agent', 'template' => 'Inheritance test template')
+			),
+			array(
+				array('type' => 'JMX agent', 'template' => 'Inheritance test template')
+			),
+			array(
+				array('type' => 'Calculated', 'template' => 'Inheritance test template')
 			)
 		);
 	}
@@ -221,19 +489,52 @@ class testFormItemPrototype extends CWebTest {
 	 * @dataProvider layout
 	 */
 	public function testFormItemPrototype_CheckLayout($data) {
-		$this->zbxTestLogin('hosts.php');
 
-		$this->zbxTestClickWait('link='.$this->host);
-		$this->zbxTestClickWait("link=Discovery rules");
-		$this->zbxTestClickWait('link='.$this->discoveryRule);
+		if (isset($data['template'])) {
+			$this->zbxTestLogin('templates.php');
+			$this->zbxTestClickWait('link='.$data['template']);
+			$hostid = 30000;
+			$discoveryRule = $this->discoveryRuleTemplate;
+		}
+
+		if (isset($data['host'])) {
+			$this->zbxTestLogin('hosts.php');
+			$this->zbxTestClickWait('link='.$data['host']);
+			if (isset($data['templatedHost'])) {
+				$hostid = 30001;
+				$discoveryRule = $this->discoveryRuleTemplate;
+			}
+			else {
+				$hostid = 40001;
+				$discoveryRule = $this->discoveryRule;
+			}
+		}
+
+		$this->zbxTestClickWait('link=Discovery rules');
+		$this->zbxTestClickWait('link='.$discoveryRule);
 		$this->zbxTestClickWait("link=Item prototypes");
-
 		$this->checkTitle('Configuration of item prototypes');
-		$this->zbxTestTextPresent(array('CONFIGURATION OF ITEM PROTOTYPES', "Item prototypes of ".$this->discoveryRule));
+		$this->zbxTestTextPresent(array('CONFIGURATION OF ITEM PROTOTYPES', "Item prototypes of ".$discoveryRule));
 
-		$this->zbxTestClickWait('form');
+		if (isset($data['form'])) {
+			$this->zbxTestClickWait('link='.$data['form']);
+		}
+		else {
+			$this->zbxTestClickWait('form');
+		}
+
 		$this->checkTitle('Configuration of item prototypes');
 		$this->zbxTestTextPresent(array('CONFIGURATION OF ITEM PROTOTYPES', 'Item prototype'));
+
+		if (isset($data['templatedHost'])) {
+			$this->zbxTestTextPresent('Parent items');
+			if (isset($data['hostTemplate'])) {
+				$this->assertElementPresent("//a[text()='".$data['hostTemplate']."']");
+			}
+		}
+		else {
+			$this->zbxTestTextNotPresent('Parent items');
+		}
 
 		$this->zbxTestTextPresent('Name');
 		$this->assertVisible('name');
@@ -242,55 +543,73 @@ class testFormItemPrototype extends CWebTest {
 		$this->assertAttribute("//input[@id='name']/@autofocus", 'autofocus');
 
 		$this->zbxTestTextPresent('Type');
-		$this->assertVisible('type');
-		$this->zbxTestDropdownHasOptions('type', array(
-			'Zabbix agent',
-			'Zabbix agent (active)',
-			'Simple check',
-			'SNMPv1 agent',
-			'SNMPv2 agent',
-			'SNMPv3 agent',
-			'SNMP trap',
-			'Zabbix internal',
-			'Zabbix trapper',
-			'Zabbix aggregate',
-			'External check',
-			'Database monitor',
-			'IPMI agent',
-			'SSH agent',
-			'TELNET agent',
-			'JMX agent',
-			'Calculated'
-		));
-		$this->zbxTestDropdownSelect('type', $data['type']);
+		if (!isset($data['templatedHost'])) {
+			$this->assertVisible('type');
+			$this->zbxTestDropdownHasOptions('type', array(
+				'Zabbix agent',
+				'Zabbix agent (active)',
+				'Simple check',
+				'SNMPv1 agent',
+				'SNMPv2 agent',
+				'SNMPv3 agent',
+				'SNMP trap',
+				'Zabbix internal',
+				'Zabbix trapper',
+				'Zabbix aggregate',
+				'External check',
+				'Database monitor',
+				'IPMI agent',
+				'SSH agent',
+				'TELNET agent',
+				'JMX agent',
+				'Calculated'
+			));
+			if (isset($data['type'])) {
+				$this->zbxTestDropdownSelect('type', $data['type']);
+			}
+			$type = $this->getSelectedLabel('type');
+		}
+		else {
+			$this->assertVisible('typename');
+			$this->assertAttribute("//input[@id='typename']/@maxlength", 255);
+			$this->assertAttribute("//input[@id='typename']/@size", 50);
+			$this->assertAttribute("//input[@id='typename']/@readonly", 'readonly');
+
+			$type = $this->getValue('typename');
+		}
 
 		$this->zbxTestTextPresent('Key');
 		$this->assertVisible('key');
 		$this->assertAttribute("//input[@id='key']/@maxlength", 255);
 		$this->assertAttribute("//input[@id='key']/@size", 50);
-		$this->assertElementPresent('keyButton');
+		if (!isset($data['templatedHost'])) {
+			$this->assertElementPresent('keyButton');
+		}
+		else {
+			$this->assertAttribute("//input[@id='key']/@readonly", 'readonly');
+		}
 
-		if ($data['type'] == 'Database monitor') {
+		if ($type == 'Database monitor' && !isset($data['form'])) {
 			$keyValue = $this->getValue('key');
 			$this->assertEquals($keyValue, "db.odbc.select[<unique short description>]");
 		}
 
-		if ($data['type'] == 'SSH agent') {
+		if ($type == 'SSH agent' && !isset($data['form'])) {
 			$keyValue = $this->getValue('key');
 			$this->assertEquals($keyValue, "ssh.run[<unique short description>,<ip>,<port>,<encoding>]");
 		}
 
-		if ($data['type'] == 'TELNET agent') {
+		if ($type == 'TELNET agent' && !isset($data['form'])) {
 			$keyValue = $this->getValue('key');
 			$this->assertEquals($keyValue, "telnet.run[<unique short description>,<ip>,<port>,<encoding>]");
 		}
 
-		if ($data['type'] == 'JMX agent') {
+		if ($type == 'JMX agent' && !isset($data['form'])) {
 			$keyValue = $this->getValue('key');
 			$this->assertEquals($keyValue, "jmx[<object name>,<attribute name>]");
 		}
 
-		if ($data['type'] == 'SNMPv3 agent') {
+		if ($type == 'SNMPv3 agent') {
 			if (isset($data['snmpv3_securitylevel'])) {
 				$this->zbxTestDropdownSelect('snmpv3_securitylevel', $data['snmpv3_securitylevel']);
 			}
@@ -300,51 +619,64 @@ class testFormItemPrototype extends CWebTest {
 			$snmpv3_securitylevel = null;
 		}
 
-		$interfaceType = itemTypeInterface($this->getValue('type'));
-		switch ($interfaceType) {
-			case INTERFACE_TYPE_SNMP :
-			case INTERFACE_TYPE_IPMI :
-			case INTERFACE_TYPE_AGENT :
-			case INTERFACE_TYPE_ANY :
-			case INTERFACE_TYPE_JMX :
-				$this->zbxTestTextPresent('Host interface');
-				$dbInterfaces = DBdata(
-					'SELECT type,ip,port'.
-					' FROM interface'.
-					' WHERE hostid='.$this->hostid.
-						($interfaceType == INTERFACE_TYPE_ANY ? '' : ' AND type='.$interfaceType)
-				);
-				$dbInterfaces = reset($dbInterfaces);
-				if ($dbInterfaces != null) {
-					foreach ($dbInterfaces as $host_interface) {
-						$this->assertElementPresent('//select[@id="interfaceid"]/optgroup/option[text()="'.
-						$host_interface['ip'].' : '.$host_interface['port'].'"]');
+		if (!isset($data['template'])){
+			$interfaceType = itemTypeInterface($this->getValue('type'));
+			switch ($interfaceType) {
+				case INTERFACE_TYPE_SNMP :
+				case INTERFACE_TYPE_IPMI :
+				case INTERFACE_TYPE_AGENT :
+				case INTERFACE_TYPE_ANY :
+				case INTERFACE_TYPE_JMX :
+					$this->zbxTestTextPresent('Host interface');
+					$dbInterfaces = DBdata(
+						'SELECT type,ip,port'.
+						' FROM interface'.
+						' WHERE hostid='.$hostid.
+							($interfaceType == INTERFACE_TYPE_ANY ? '' : ' AND type='.$interfaceType)
+					);
+					$dbInterfaces = reset($dbInterfaces);
+					if ($dbInterfaces != null) {
+						foreach ($dbInterfaces as $host_interface) {
+							$this->assertElementPresent('//select[@id="interfaceid"]/optgroup/option[text()="'.
+							$host_interface['ip'].' : '.$host_interface['port'].'"]');
+						}
 					}
-				}
-				else {
-					$this->zbxTestTextPresent('No interface found');
+					else {
+						$this->zbxTestTextPresent('No interface found');
+						$this->assertNotVisible('interfaceid');
+					}
+					break;
+				default:
+					$this->zbxTestTextNotPresent(array('Host interface', 'No interface found'));
 					$this->assertNotVisible('interfaceid');
-				}
-				break;
-			default:
-				$this->zbxTestTextNotPresent(array('Host interface', 'No interface found'));
-				$this->assertNotVisible('interfaceid');
-				break;
+					break;
+			}
 		}
 
-		if (isset($data['value_type'])) {
-			$this->zbxTestDropdownSelect('value_type', $data['value_type']);
+		if (isset($data['templatedHost'])) {
+			$value_type = $this->getValue('value_type_name');
 		}
-		$value_type = $this->getSelectedLabel('value_type');
+		elseif (isset($data['value_type'])) {
+			$this->zbxTestDropdownSelect('value_type', $data['value_type']);
+			$value_type = $this->getSelectedLabel('value_type');
+		}
+		else {
+			$value_type = $this->getSelectedLabel('value_type');
+		}
 
 		if ($value_type == 'Numeric (unsigned)') {
 			if (isset($data['data_type'])) {
 				$this->zbxTestDropdownSelect('data_type', $data['data_type']);
 			}
-			$data_type = $this->getSelectedLabel('data_type');
+			if (!isset($data['templatedHost'])) {
+				$data_type = $this->getSelectedLabel('data_type');
+			}
+			else {
+				$data_type = $this->getValue('data_type_name');
+			}
 		}
 
-		if ($data['type'] == 'SSH agent') {
+		if ($type == 'SSH agent') {
 			if (isset($data['authtype'])) {
 				$this->zbxTestDropdownSelect('authtype', $data['authtype']);
 			}
@@ -354,7 +686,7 @@ class testFormItemPrototype extends CWebTest {
 			$authtype = null;
 		}
 
-		if ($data['type'] == 'Database monitor') {
+		if ($type == 'Database monitor') {
 			$this->zbxTestTextPresent('Additional parameters');
 			$this->assertVisible('params_ap');
 			$this->assertAttribute("//textarea[@id='params_ap']/@rows", 7);
@@ -366,7 +698,7 @@ class testFormItemPrototype extends CWebTest {
 			$this->assertNotVisible('params_ap');
 		}
 
-		if ($data['type'] == 'SSH agent' || $data['type'] == 'TELNET agent' ) {
+		if ($type == 'SSH agent' || $type == 'TELNET agent' ) {
 			$this->zbxTestTextPresent('Executed script');
 			$this->assertVisible('params_es');
 			$this->assertAttribute("//textarea[@id='params_es']/@rows", 7);
@@ -376,7 +708,7 @@ class testFormItemPrototype extends CWebTest {
 			$this->assertNotVisible('params_es');
 		}
 
-		if ($data['type'] == 'Calculated') {
+		if ($type == 'Calculated') {
 			$this->zbxTestTextPresent('Formula');
 			$this->assertVisible('params_f');
 			$this->assertAttribute("//textarea[@id='params_f']/@rows", 7);
@@ -386,7 +718,7 @@ class testFormItemPrototype extends CWebTest {
 			$this->assertNotVisible('params_f');
 		}
 
-		if ($data['type'] == 'IPMI agent') {
+		if ($type == 'IPMI agent') {
 			$this->zbxTestTextPresent('IPMI sensor');
 			$this->assertVisible('ipmi_sensor');
 			$this->assertAttribute("//input[@id='ipmi_sensor']/@maxlength", 128);
@@ -397,7 +729,7 @@ class testFormItemPrototype extends CWebTest {
 			$this->assertNotVisible('ipmi_sensor');
 		}
 
-		if ($data['type'] == 'SSH agent') {
+		if ($type == 'SSH agent') {
 			$this->zbxTestTextPresent('Authentication method');
 			$this->assertVisible('authtype');
 			$this->zbxTestDropdownHasOptions('authtype', array('Password', 'Public key'));
@@ -407,7 +739,7 @@ class testFormItemPrototype extends CWebTest {
 			$this->assertNotVisible('authtype');
 		}
 
-		if ($data['type'] == 'SSH agent' || $data['type'] == 'TELNET agent' || $data['type'] == 'JMX agent') {
+		if ($type == 'SSH agent' || $type == 'TELNET agent' || $type == 'JMX agent') {
 			$this->zbxTestTextPresent('User name');
 			$this->assertVisible('username');
 			$this->assertAttribute("//input[@id='username']/@maxlength", 64);
@@ -429,7 +761,7 @@ class testFormItemPrototype extends CWebTest {
 			$this->assertNotVisible('password');
 		}
 
-		if	($data['type'] == 'SSH agent' && $authtype == 'Public key') {
+		if	($type == 'SSH agent' && $authtype == 'Public key') {
 			$this->zbxTestTextPresent('Public key file');
 			$this->assertVisible('publickey');
 			$this->assertAttribute("//input[@id='publickey']/@maxlength", 64);
@@ -448,12 +780,14 @@ class testFormItemPrototype extends CWebTest {
 			$this->assertNotVisible('publickey');
 		}
 
-		if	($data['type'] == 'SNMPv1 agent' || $data['type'] == 'SNMPv2 agent' || $data['type'] == 'SNMPv3 agent') {
+		if	($type == 'SNMPv1 agent' || $type == 'SNMPv2 agent' || $type == 'SNMPv3 agent') {
 			$this->zbxTestTextPresent('SNMP OID');
 			$this->assertVisible('snmp_oid');
 			$this->assertAttribute("//input[@id='snmp_oid']/@maxlength", 255);
 			$this->assertAttribute("//input[@id='snmp_oid']/@size", 50);
-			$this->assertAttribute("//input[@id='snmp_oid']/@value", 'interfaces.ifTable.ifEntry.ifInOctets.1');
+			if (!isset($data['form'])) {
+				$this->assertAttribute("//input[@id='snmp_oid']/@value", 'interfaces.ifTable.ifEntry.ifInOctets.1');
+			}
 
 			$this->zbxTestTextPresent('Port');
 			$this->assertVisible('port');
@@ -468,19 +802,21 @@ class testFormItemPrototype extends CWebTest {
 			$this->assertNotVisible('port');
 		}
 
-		if	($data['type'] == 'SNMPv1 agent' || $data['type'] == 'SNMPv2 agent') {
+		if	($type == 'SNMPv1 agent' || $type == 'SNMPv2 agent') {
 			$this->zbxTestTextPresent('SNMP community');
 			$this->assertVisible('snmp_community');
 			$this->assertAttribute("//input[@id='snmp_community']/@maxlength", 64);
 			$this->assertAttribute("//input[@id='snmp_community']/@size", 50);
-			$this->assertAttribute("//input[@id='snmp_community']/@value", 'public');
+			if (!isset($data['form'])) {
+				$this->assertAttribute("//input[@id='snmp_community']/@value", 'public');
+			}
 		}
 		else {
 			$this->zbxTestTextNotPresent('SNMP community');
 			$this->assertNotVisible('snmp_community');
 		}
 
-		if	($data['type'] == 'SNMPv3 agent') {
+		if	($type == 'SNMPv3 agent') {
 			$this->zbxTestTextPresent('Security name');
 			$this->assertVisible('snmpv3_securityname');
 			$this->assertAttribute("//input[@id='snmpv3_securityname']/@maxlength", 64);
@@ -540,7 +876,7 @@ class testFormItemPrototype extends CWebTest {
 			$this->assertNotVisible('snmpv3_privpassphrase');
 		}
 
-		switch ($data['type']) {
+		switch ($type) {
 			case 'Zabbix agent':
 			case 'Zabbix agent (active)':
 			case 'Simple check':
@@ -560,45 +896,52 @@ class testFormItemPrototype extends CWebTest {
 				$this->assertVisible('delay');
 				$this->assertAttribute("//input[@id='delay']/@maxlength", 5);
 				$this->assertAttribute("//input[@id='delay']/@size", 5);
-				$this->assertAttribute("//input[@id='delay']/@value", 30);
+				if (!isset($data['form'])) {
+					$this->assertAttribute("//input[@id='delay']/@value", 30);
+				}
 				break;
 			default:
 				$this->zbxTestTextNotPresent('Update interval (in sec)');
 				$this->assertNotVisible('delay');
 		}
 
-		$this->zbxTestTextPresent('Type of information');
-		$this->assertVisible('value_type');
-		$this->zbxTestDropdownHasOptions('value_type', array(
-			'Numeric (unsigned)',
-			'Numeric (float)',
-			'Character',
-			'Log',
-			'Text'
-		));
-		$this->assertAttribute("//*[@id='value_type']/option[text()='Numeric (unsigned)']/@selected", 'selected');
-		$this->isEditable("//*[@id='value_type']/option[text()='Numeric (unsigned)']");
-		$this->isEditable("//*[@id='value_type']/option[text()='Numeric (float)']");
+		if (!isset($data['templatedHost'])) {
+			$this->zbxTestTextPresent('Type of information');
+			$this->assertVisible('value_type');
+			$this->zbxTestDropdownHasOptions('value_type', array(
+				'Numeric (unsigned)',
+				'Numeric (float)',
+				'Character',
+				'Log',
+				'Text'
+			));
+		}
 
-		if ($data['type'] == 'Zabbix aggregate' || $data['type'] == 'Calculated') {
+		if (!isset($data['templatedHost'])) {
+			$this->assertAttribute("//*[@id='value_type']/option[text()='Numeric (unsigned)']/@selected", 'selected');
+			$this->isEditable("//*[@id='value_type']/option[text()='Numeric (unsigned)']");
+			$this->isEditable("//*[@id='value_type']/option[text()='Numeric (float)']");
+		}
+
+		if (($type == 'Zabbix aggregate' || $type == 'Calculated') && !isset($data['templatedHost'])) {
 			$this->assertAttribute("//*[@id='value_type']/option[text()='Character']/@disabled", 'disabled');
 			$this->assertAttribute("//*[@id='value_type']/option[text()='Log']/@disabled", 'disabled');
 			$this->assertAttribute("//*[@id='value_type']/option[text()='Text']/@disabled", 'disabled');
 		}
-		else {
+		elseif (!isset($data['templatedHost'])) {
 			$this->isEditable("//*[@id='value_type']/option[text()='Character']");
 			$this->isEditable("//*[@id='value_type']/option[text()='Log']");
 			$this->isEditable("//*[@id='value_type']/option[text()='Text']");
 		}
 
-		if ($value_type == 'Numeric (unsigned)') {
+		if ($value_type == 'Numeric (unsigned)' && !isset($data['templatedHost'])) {
 			$this->zbxTestTextPresent('Data type');
 			$this->assertVisible('data_type');
 			$this->zbxTestDropdownHasOptions('data_type', array('Boolean', 'Octal', 'Decimal', 'Hexadecimal'));
 			$this->assertAttribute("//*[@id='data_type']/option[text()='Decimal']/@selected", 'selected');
 			$this->isEditable("//*[@id='data_type']/option[text()='Decimal']");
 
-			if ($data['type'] == 'Zabbix aggregate' || $data['type'] == 'Calculated') {
+			if ($type == 'Zabbix aggregate' || $type == 'Calculated') {
 				$this->assertAttribute("//*[@id='data_type']/option[text()='Boolean']/@disabled", 'disabled');
 				$this->assertAttribute("//*[@id='data_type']/option[text()='Octal']/@disabled", 'disabled');
 				$this->assertAttribute("//*[@id='data_type']/option[text()='Hexadecimal']/@disabled", 'disabled');
@@ -608,6 +951,11 @@ class testFormItemPrototype extends CWebTest {
 				$this->isEditable("//*[@id='data_type']/option[text()='Octal']");
 				$this->isEditable("//*[@id='data_type']/option[text()='Hexadecimal']");
 			}
+		}
+		elseif (isset($data['templatedHost'])) {
+			$this->zbxTestTextPresent('Data type');
+			$this->assertVisible('data_type_name');
+			$this->assertAttribute("//input[@id='data_type_name']/@readonly", 'readonly');
 		}
 		else {
 			$this->zbxTestTextNotPresent('Data type');
@@ -619,16 +967,32 @@ class testFormItemPrototype extends CWebTest {
 			$this->assertVisible('units');
 			$this->assertAttribute("//input[@id='units']/@maxlength", 255);
 			$this->assertAttribute("//input[@id='units']/@size", 50);
+			if(isset($data['templatedHost'])) {
+				$this->assertAttribute("//input[@id='units']/@readonly", 'readonly');
+			}
 
 			$this->zbxTestTextPresent('Use custom multiplier');
-			$this->assertVisible('multiplier');
-			$this->assertAttribute("//input[@id='multiplier']/@type", 'checkbox');
+			if (!isset($data['templatedHost'])) {
+				$this->assertVisible('multiplier');
+				$this->assertAttribute("//input[@id='multiplier']/@type", 'checkbox');
+			}
+			else {
+				$this->assertElementPresent("//input[@type='checkbox' and @id='multiplier' and @disabled = 'disabled']");
+			}
 
 			$this->assertVisible('formula');
 			$this->assertAttribute("//input[@id='formula']/@maxlength", 255);
 			$this->assertAttribute("//input[@id='formula']/@size", 25);
 			$this->assertAttribute("//input[@id='formula']/@value", 1);
-			$this->assertElementPresent("//input[@id='formula']/@disabled");
+			if (!isset($data['form'])) {
+				$this->assertAttribute("//input[@id='formula']/@value", 1);
+			}
+			if (!isset($data['templatedHost'])) {
+				$this->assertElementPresent("//input[@id='formula']/@disabled");
+			}
+			else {
+				$this->assertAttribute("//input[@id='formula']/@readonly", 'readonly');
+			}
 		}
 		else {
 			$this->zbxTestTextNotPresent('Units');
@@ -639,7 +1003,7 @@ class testFormItemPrototype extends CWebTest {
 			$this->assertNotVisible('formula');
 		}
 
-		switch ($data['type']) {
+		switch ($type) {
 			case 'Zabbix agent':
 			case 'Simple check':
 			case 'SNMPv1 agent':
@@ -684,12 +1048,17 @@ class testFormItemPrototype extends CWebTest {
 		$this->assertAttribute("//input[@id='history']/@maxlength", 8);
 		$this->assertAttribute("//input[@id='history']/@value", 90);
 		$this->assertAttribute("//input[@id='history']/@size", 8);
+		if (!isset($data['form'])) {
+			$this->assertAttribute("//input[@id='history']/@value", 90);
+		}
 
 		if ($value_type == 'Numeric (unsigned)' || $value_type == 'Numeric (float)') {
 			$this->zbxTestTextPresent('Keep trends (in days)');
 			$this->assertVisible('trends');
 			$this->assertAttribute("//input[@id='trends']/@maxlength", 8);
-			$this->assertAttribute("//input[@id='trends']/@value", 365);
+			if (!isset($data['form'])) {
+				$this->assertAttribute("//input[@id='trends']/@value", 365);
+			}
 			$this->assertAttribute("//input[@id='trends']/@size", 8);
 		}
 		else {
@@ -699,9 +1068,16 @@ class testFormItemPrototype extends CWebTest {
 
 		if ($value_type == 'Numeric (float)' || ($value_type == 'Numeric (unsigned)' && $data_type != 'Boolean')) {
 			$this->zbxTestTextPresent('Store value');
-			$this->assertVisible('delta');
-			$this->zbxTestDropdownHasOptions('delta', array('As is', 'Delta (speed per second)', 'Delta (simple change)'));
-			$this->assertAttribute("//*[@id='delta']/option[text()='As is']/@selected", 'selected');
+			if (!isset($data['templatedHost'])) {
+				$this->assertVisible('delta');
+				$this->zbxTestDropdownHasOptions('delta', array('As is', 'Delta (speed per second)', 'Delta (simple change)'));
+				$this->assertAttribute("//*[@id='delta']/option[text()='As is']/@selected", 'selected');
+			}
+			else {
+				$this->assertVisible('delta_name');
+				$this->assertAttribute("//input[@id='delta_name']/@maxlength", 255);
+				$this->assertAttribute("//input[@id='delta_name']/@readonly", 'readonly');
+			}
 		}
 		else {
 			$this->zbxTestTextNotPresent('Store value');
@@ -710,22 +1086,30 @@ class testFormItemPrototype extends CWebTest {
 
 		if ($value_type == 'Numeric (float)' || $value_type == 'Numeric (unsigned)' || $value_type == 'Character') {
 			$this->zbxTestTextPresent(array('Show value', 'show value mappings'));
-			$this->assertVisible('valuemapid');
-			$this->assertAttribute("//*[@id='valuemapid']/option[text()='As is']/@selected", 'selected');
+			if (!isset($data['templatedHost'])) {
+				$this->assertVisible('valuemapid');
+				$this->assertAttribute("//*[@id='valuemapid']/option[text()='As is']/@selected", 'selected');
 
-			$options = array('As is');
-			$result = DBselect('SELECT name FROM valuemaps');
-			while ($row = DBfetch($result)) {
-				$options[] = $row['name'];
+				$options = array('As is');
+				$result = DBselect('SELECT name FROM valuemaps');
+				while ($row = DBfetch($result)) {
+					$options[] = $row['name'];
+				}
+				$this->zbxTestDropdownHasOptions('valuemapid', $options);
 			}
-			$this->zbxTestDropdownHasOptions('valuemapid', $options);
+			else {
+				$this->assertVisible('valuemap_name');
+				$this->assertAttribute("//input[@id='valuemap_name']/@maxlength", 255);
+				$this->assertAttribute("//input[@id='valuemap_name']/@size", 25);
+				$this->assertAttribute("//input[@id='valuemap_name']/@readonly", 'readonly');
+			}
 		}
 		else {
 			$this->zbxTestTextNotPresent(array('Show value', 'show value mappings'));
 			$this->assertNotVisible('valuemapid');
 		}
 
-		if ($data['type'] == 'Zabbix trapper') {
+		if ($type == 'Zabbix trapper') {
 			$this->zbxTestTextPresent('Allowed hosts');
 			$this->assertVisible('trapper_hosts');
 			$this->assertAttribute("//input[@id='trapper_hosts']/@maxlength", 255);
@@ -763,6 +1147,28 @@ class testFormItemPrototype extends CWebTest {
 		$this->zbxTestTextPresent('Enabled');
 		$this->assertVisible('status');
 		$this->assertAttribute("//input[@id='status']/@checked", 'checked');
+
+		$this->assertVisible('save');
+		$this->assertAttribute("//input[@id='save']/@value", 'Save');
+
+		$this->assertVisible('cancel');
+		$this->assertAttribute("//input[@id='cancel']/@value", 'Cancel');
+
+		if (isset($data['form'])) {
+			$this->assertVisible('clone');
+			$this->assertAttribute("//input[@id='clone']/@value", 'Clone');
+		}
+		else {
+			$this->assertElementNotPresent('clone');
+		}
+
+		if ((isset($data['form']) && !isset($data['templatedHost']))) {
+			$this->assertVisible('delete');
+			$this->assertAttribute("//input[@id='delete']/@value", 'Delete');
+		}
+		else {
+			$this->assertElementNotPresent('delete');
+		}
 	}
 
 
@@ -792,11 +1198,11 @@ class testFormItemPrototype extends CWebTest {
 
 		$this->assertEquals($oldHashItems, DBhash($sqlItems));
 	}
-
+*/
 	// Returns create data
 	public static function create() {
 		return array(
-			array(
+		/*	array(
 				array(
 					'expected' => ITEM_GOOD,
 					'name' => 'Checksum of $1',
