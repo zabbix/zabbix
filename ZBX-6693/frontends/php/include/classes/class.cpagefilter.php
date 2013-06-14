@@ -212,6 +212,7 @@ class CPageFilter {
 	 * @param bool   $options['config']['individual']
 	 * @param bool   $options['config']['allow_all']
 	 * @param bool   $options['config']['deny_all']
+	 * @param array  $options['config']['DDFirstLabels']
 	 * @param array  $options['hosts']
 	 * @param string $options['hostid']
 	 * @param array  $options['groups']
@@ -470,15 +471,22 @@ class CPageFilter {
 	 * Load available hosts, choose the selected host and remember the selection.
 	 * If no host group is selected, reset the selected host to 0.
 	 *
-	 * @param int   $hostid
-	 * @param array $options
-	 * @param bool  $options['only_templates']
+	 * @param int    $hostId
+	 * @param array  $options
+	 * @param bool   $options['only_templates']
+	 * @param string $options['DDFirstLabel']
 	 */
-	private function _initHosts($hostid, array $options) {
+	private function _initHosts($hostId, array $options) {
 		$this->data['hosts'] = array();
 
+		if (isset($options['DDFirstLabel'])) {
+			$this->config['DDFirstLabels']['hosts'] = $options['DDFirstLabel'];
+
+			unset($options['DDFirstLabel']);
+		}
+
 		if (!$this->groupsSelected) {
-			$hostid = 0;
+			$hostId = 0;
 		}
 		else {
 			$defaultOptions = array(
@@ -496,44 +504,46 @@ class CPageFilter {
 				$objectName = 'templateid';
 			}
 			else {
-				$hosts = API::Template()->Host($options);
+				$hosts = API::Host()->get($options);
 
 				$objectName = 'hostid';
 			}
 
-			order_result($hosts, 'name');
+			if ($hosts) {
+				order_result($hosts, 'name');
 
-			foreach ($hosts as $host) {
-				$this->data['hosts'][$host[$objectName]] = $host['name'];
+				foreach ($hosts as $host) {
+					$this->data['hosts'][$host[$objectName]] = $host['name'];
+				}
 			}
 
 			// select remebered selection
-			if (is_null($hostid) && $this->_profileIds['hostid']) {
-				$hostid = $this->_profileIds['hostid'];
+			if (is_null($hostId) && $this->_profileIds['hostid']) {
+				$hostId = $this->_profileIds['hostid'];
 			}
 
 			// nonexisting or unset $hostid
-			if ((!isset($this->data['hosts'][$hostid]) && $hostid > 0) || is_null($hostid)) {
+			if ((!isset($this->data['hosts'][$hostId]) && $hostId > 0) || is_null($hostId)) {
 				// for popup select first host in the list
 				if ($this->config['popupDD'] && !empty($this->data['hosts'])) {
 					reset($this->data['hosts']);
-					$hostid = key($this->data['hosts']);
+					$hostId = key($this->data['hosts']);
 				}
 				// otherwise hostid = 0 for 'Dropdown first entry' option ALL or NONE
 				else {
-					$hostid = 0;
+					$hostId = 0;
 				}
 			}
 		}
 
 		if (!is_null($this->_requestIds['hostid'])) {
-			CProfile::update($this->_profileIdx['hosts'], $hostid, PROFILE_TYPE_ID);
-			CProfile::update(self::HOST_LATEST_IDX, $hostid, PROFILE_TYPE_ID);
+			CProfile::update($this->_profileIdx['hosts'], $hostId, PROFILE_TYPE_ID);
+			CProfile::update(self::HOST_LATEST_IDX, $hostId, PROFILE_TYPE_ID);
 		}
 
-		$this->isSelected['hostsSelected'] = (($this->config['DDFirst'] == ZBX_DROPDOWN_FIRST_ALL && !empty($this->data['hosts'])) || $hostid > 0);
-		$this->isSelected['hostsAll'] = ($this->config['DDFirst'] == ZBX_DROPDOWN_FIRST_ALL && !empty($this->data['hosts']) && $hostid == 0);
-		$this->ids['hostid'] = $hostid;
+		$this->isSelected['hostsSelected'] = (($this->config['DDFirst'] == ZBX_DROPDOWN_FIRST_ALL && !empty($this->data['hosts'])) || $hostId > 0);
+		$this->isSelected['hostsAll'] = ($this->config['DDFirst'] == ZBX_DROPDOWN_FIRST_ALL && !empty($this->data['hosts']) && $hostId == 0);
+		$this->ids['hostid'] = $hostId;
 	}
 
 	/**
@@ -767,7 +777,7 @@ class CPageFilter {
 	 * @return CComboBox
 	 */
 	public function getHostsCB($withNode = false) {
-		return $this->_getCB('hostid', $this->hostid, $this->hosts, $withNode);
+		return $this->_getCB('hostid', $this->hostid, $this->hosts, $withNode, array('objectName' => 'hosts'));
 	}
 
 	/**
@@ -778,7 +788,7 @@ class CPageFilter {
 	 * @return CComboBox
 	 */
 	public function getGroupsCB($withNode = false) {
-		return $this->_getCB('groupid', $this->groupid, $this->groups, $withNode);
+		return $this->_getCB('groupid', $this->groupid, $this->groups, $withNode, array('objectName' => 'groups'));
 	}
 
 	/**
@@ -815,7 +825,7 @@ class CPageFilter {
 	 * @return CComboBox
 	 */
 	public function getDiscoveryCB($withNode = false) {
-		return $this->_getCB('druleid', $this->druleid, $this->drules, $withNode);
+		return $this->_getCB('druleid', $this->druleid, $this->drules, $withNode, array('objectName' => 'discovery'));
 	}
 
 	/**
@@ -826,7 +836,10 @@ class CPageFilter {
 	 * @return CComboBox
 	 */
 	public function getApplicationsCB($withNode = false) {
-		return $this->_getCB('application', $this->application, $this->applications, $withNode, '');
+		return $this->_getCB('application', $this->application, $this->applications, $withNode, array(
+			'objectName' => 'applications',
+			'DDFirstValue' => ''
+		));
 	}
 
 	/**
@@ -847,10 +860,13 @@ class CPageFilter {
 	 * @param array  $items
 	 * @param bool   $withNode
 	 * @param int    $allValue
+	 * @param array  $options
+	 * @param string $options['objectName']
+	 * @param int    $options['DDFirstValue']
 	 *
 	 * @return CComboBox
 	 */
-	private function _getCB($name, $selectedId, $items, $withNode, $allValue = 0) {
+	private function _getCB($name, $selectedId, $items, $withNode, array $options = array()) {
 		$comboBox = new CComboBox($name, $selectedId, 'javascript: submit();');
 
 		if ($withNode) {
@@ -861,10 +877,20 @@ class CPageFilter {
 
 		natcasesort($items);
 
+		// add drop down first item
 		if (!$this->config['popupDD']) {
-			$items = array(
-				$allValue => ($this->config['DDFirst'] == ZBX_DROPDOWN_FIRST_NONE) ? _('not selected') : _('all')
-			) + $items;
+			if (!isset($options['DDFirstValue'])) {
+				$options['DDFirstValue'] = 0;
+			}
+
+			if (isset($this->config['DDFirstLabels'][$options['objectName']])) {
+				$firstLabel = $this->config['DDFirstLabels'][$options['objectName']];
+			}
+			else {
+				$firstLabel = ($this->config['DDFirst'] == ZBX_DROPDOWN_FIRST_NONE) ? _('not selected') : _('all');
+			}
+
+			$items = array($options['DDFirstValue'] => $firstLabel) + $items;
 		}
 
 		foreach ($items as $id => $name) {

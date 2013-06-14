@@ -88,10 +88,13 @@ else {
 	if (check_dynamic_items($screen['screenid'], 0)) {
 		$pageFilter = new CPageFilter(array(
 			'groups' => array(
-				'monitored_hosts' => true
+				'monitored_hosts' => true,
+				'with_items' => true
 			),
 			'hosts' => array(
-				'monitored_hosts' => true
+				'monitored_hosts' => true,
+				'with_items' => true,
+				'DDFirstLabel' => _('Default')
 			),
 			'hostid' => get_request('hostid', null),
 			'groupid' => get_request('groupid', null)
