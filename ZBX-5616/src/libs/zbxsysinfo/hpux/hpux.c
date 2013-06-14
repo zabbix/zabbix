@@ -35,7 +35,6 @@ ZBX_METRIC	parameters_specific[] =
 	{"system.cpu.load",	CF_HAVEPARAMS,	SYSTEM_CPU_LOAD,	"all,avg1"},
 	{"system.cpu.num",	CF_HAVEPARAMS,	SYSTEM_CPU_NUM,		"online"},
 
-	{"system.hostname",     0,              SYSTEM_HOSTNAME,        NULL},
 	{"system.uname",	0,		SYSTEM_UNAME,		NULL},
 	{"system.sw.arch",	0,		SYSTEM_SW_ARCH,		NULL},
 

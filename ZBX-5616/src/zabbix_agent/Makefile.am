@@ -5,6 +5,7 @@ EXTRA_DIST = \
 
 agents_ldadd = \
 	$(top_srcdir)/src/libs/zbxsysinfo/libzbxagentsysinfo.a \
+	$(top_srcdir)/src/libs/zbxsysinfo/libzbxhostname.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/$(ARCH)/libspecsysinfo.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/agent/libagentsysinfo.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/common/libcommonsysinfo.a \
