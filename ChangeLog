@@ -73,6 +73,7 @@ A.F.I...S. [ZBXNEXT-1186] increased length to 2048 characters of expression fiel
 ........S. [ZBXNEXT-1663] added support for notification macros {TRIGGER.NAME.ORIG}, {ITEM.NAME.ORIG}, {ITEM.KEY.ORIG} (dimir)
 
 Bug fixes:
+A.F....... [ZBX-6678] added write permissions check in graphs and graphprototypes for Y MIN/MAX items (Ivo)
 ..F....... [ZBX-6597] removed debug trace in frontend for unsuccessful login if debug mode is enabled for guest group (Toms)
 ...G...... [ZBXNEXT-1550] fixed agent crash on Microsoft Windows (Andris)
 ..F....... [ZBX-6679] fixed monitoring event filter, must ignore groups and hosts without active triggers (Eduard)
