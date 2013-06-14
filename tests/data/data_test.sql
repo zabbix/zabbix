@@ -822,3 +822,44 @@ INSERT INTO items (name, key_, hostid, value_type, itemid, flags, delay, params,
 INSERT INTO items (name, key_, hostid, value_type, itemid, flags, templateid, delay, params, description) VALUES ('testInheritanceDiscoveryRule3', 'discovery-rule-inheritance3', 30001, 4, 33505, 1, 33504, 50, '', '');
 INSERT INTO items (name, key_, hostid, value_type, itemid, flags, delay, params, description) VALUES ('testInheritanceDiscoveryRule4', 'discovery-rule-inheritance4', 30000, 4, 33506, 1, 50, '', '');
 INSERT INTO items (name, key_, hostid, value_type, itemid, flags, templateid, delay, params, description) VALUES ('testInheritanceDiscoveryRule4', 'discovery-rule-inheritance4', 30001, 4, 33507, 1, 33506, 50, '', '');
+
+-- testFormItemPrototype.SimpleUpdate
+INSERT INTO items (name, key_, hostid, value_type, itemid, flags, delay, params, description) VALUES ('testFormDiscoveryRule', 'discovery-rule-form', 40001, 4, 33800, 1,  50, '', '');
+
+-- testFormItemPrototype.SimpleUpdate
+INSERT INTO items (name, key_, hostid, value_type, itemid, flags, delay, params, description) VALUES ('testFormItemPrototype1', 'item-prototype-form1', 40001, 3, 23800, 2, 5, '', '');
+INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid) values (501, 23800, 33800);
+INSERT INTO items (name, key_, hostid, value_type, itemid, flags, delay, params, description) VALUES ('testFormItemPrototype2', 'item-prototype-form2', 40001, 3, 23801, 2, 5, '', '');
+INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid) values (502, 23801, 33800);
+INSERT INTO items (name, key_, hostid, value_type, itemid, flags, delay, params, description) VALUES ('testFormItemPrototype3', 'item-prototype-form3', 40001, 3, 23802, 2, 5, '', '');
+INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid) values (503, 23802, 33800);
+INSERT INTO items (name, key_, hostid, value_type, itemid, flags, delay, params, description) VALUES ('testFormItemPrototype4', 'item-prototype-form4', 40001, 3, 23803, 2, 5, '', '');
+INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid) values (504, 23803, 33800);
+
+-- testFormItemPrototype, testInheritanceItemPrototype etc. for all prototype testing
+INSERT INTO items (name, key_, hostid, value_type, itemid, flags, delay, params, description) VALUES ('testInheritanceDiscoveryRule', 'inheritance-discovery-rule', 30000, 4, 23500, 1, 50, '', '');
+INSERT INTO items (name, key_, hostid, value_type, itemid, flags, templateid, delay, params, description) VALUES ('testInheritanceDiscoveryRule', 'inheritance-discovery-rule', 30001, 4, 23501, 1, 23500, 50, '', '');
+
+-- testInheritanceItemPrototype.SimpleUpdate and testInheritanceItemPrototype.SimpleCreate
+INSERT INTO items (name, key_, hostid, value_type, itemid, flags) VALUES ('itemDiscovery', 'item-discovery-prototype', 30000, 3, 23600, 2);
+INSERT INTO items (name, key_, hostid, value_type, itemid, flags, templateid) VALUES ('itemDiscovery', 'item-discovery-prototype', 30001, 3, 23601, 2, 23600);
+INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid) values (301, 23600, 23500);
+INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid) values (302, 23601, 23501);
+
+-- testInheritanceItemPrototype.SimpleUpdate
+INSERT INTO items (name, key_, hostid, value_type, itemid, flags, delay, params, description) VALUES ('testInheritanceItemPrototype1', 'item-prototype-test1', 30000, 3, 23700, 2, 5, '', '');
+INSERT INTO items (name, key_, hostid, value_type, itemid, flags, templateid, delay, params, description) VALUES ('testInheritanceItemPrototype1', 'item-prototype-test1', 30001, 3, 23701, 2, 23700, 5, '', '');
+INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid) values (401, 23700, 23500);
+INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid) values (402, 23701, 23501);
+INSERT INTO items (name, key_, hostid, value_type, itemid, flags, delay, params, description) VALUES ('testInheritanceItemPrototype2', 'item-prototype-test2', 30000, 3, 23702, 2, 5, '', '');
+INSERT INTO items (name, key_, hostid, value_type, itemid, flags, templateid, delay, params, description) VALUES ('testInheritanceItemPrototype2', 'item-prototype-test2', 30001, 3, 23703, 2, 23702, 5, '', '');
+INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid) values (403, 23702, 23500);
+INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid) values (404, 23703, 23501);
+INSERT INTO items (name, key_, hostid, value_type, itemid, flags, delay, params, description) VALUES ('testInheritanceItemPrototype3', 'item-prototype-test3', 30000, 3, 23704, 2, 5, '', '');
+INSERT INTO items (name, key_, hostid, value_type, itemid, flags, templateid, delay, params, description) VALUES ('testInheritanceItemPrototype3', 'item-prototype-test3', 30001, 3, 23705, 2, 23704, 5, '', '');
+INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid) values (405, 23704, 23500);
+INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid) values (406, 23705, 23501);
+INSERT INTO items (name, key_, hostid, value_type, itemid, flags, delay, params, description) VALUES ('testInheritanceItemPrototype4', 'item-prototype-test4', 30000, 3, 23706, 2, 5, '', '');
+INSERT INTO items (name, key_, hostid, value_type, itemid, flags, templateid, delay, params, description) VALUES ('testInheritanceItemPrototype4', 'item-prototype-test4', 30001, 3, 23707, 2, 23706, 5, '', '');
+INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid) values (407, 23706, 23500);
+INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid) values (408, 23707, 23501);
