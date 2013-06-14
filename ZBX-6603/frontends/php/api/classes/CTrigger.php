@@ -633,9 +633,9 @@ class CTrigger extends CTriggerGeneral {
 				'SELECT '.$select.' FROM events e JOIN ('.
 					'SELECT  max(eventid) as lasteventid FROM events e'.
 					' WHERE '.dbConditionInt('e.objectid', $triggerids).
-					' AND '.DBin_node('e.objectid').
-					' AND e.object='.EVENT_SOURCE_TRIGGERS.
-					' AND e.value_changed='.TRIGGER_VALUE_CHANGED_YES.
+						' AND '.DBin_node('e.objectid').
+						' AND e.object='.EVENT_SOURCE_TRIGGERS.
+						' AND e.value_changed='.TRIGGER_VALUE_CHANGED_YES.
 					' GROUP BY e.objectid'.
 				') ee ON e.eventid=ee.lasteventid'
 			), 'objectid');
