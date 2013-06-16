@@ -245,7 +245,6 @@ A......... [ZBX-6407] improved data retrieval performance for CTrigger get() wit
 A.F....... [ZBX-1357] updated Chinese (China), Spanish and Turkish translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
-........S. [ZBX-6609] fixed trigger event processing to not add unneeded recovery event escalations to the database (dimir)
 ..F....... [ZBX-6682] added value mapping in map labels (Oleg)
 A......... [ZBX-6673] fixed errors after parent graph deleting (Oleg)
 .......PS. [ZBX-6610] fixed invalid next check values of IPMI items (dimir)
