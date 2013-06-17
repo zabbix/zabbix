@@ -18,10 +18,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-
 define('ZABBIX_VERSION',     '2.1.0');
 define('ZABBIX_API_VERSION', '2.1.0');
-define('ZABBIX_DB_VERSION',	 2010050);
+define('ZABBIX_DB_VERSION',	 2010086);
 
 define('ZABBIX_COPYRIGHT_FROM', '2001');
 define('ZABBIX_COPYRIGHT_TO',   '2013');
@@ -202,7 +201,7 @@ define('CONDITION_TYPE_DSERVICE_PORT',		9);
 define('CONDITION_TYPE_DSTATUS',			10);
 define('CONDITION_TYPE_DUPTIME',			11);
 define('CONDITION_TYPE_DVALUE',				12);
-define('CONDITION_TYPE_HOST_TEMPLATE',		13);
+define('CONDITION_TYPE_TEMPLATE',			13);
 define('CONDITION_TYPE_EVENT_ACKNOWLEDGED',	14);
 define('CONDITION_TYPE_APPLICATION',		15);
 define('CONDITION_TYPE_MAINTENANCE',		16);
@@ -213,6 +212,7 @@ define('CONDITION_TYPE_PROXY',				20);
 define('CONDITION_TYPE_DOBJECT',			21);
 define('CONDITION_TYPE_HOST_NAME',			22);
 define('CONDITION_TYPE_EVENT_TYPE',			23);
+define('CONDITION_TYPE_HOST_METADATA',		24);
 
 define('CONDITION_OPERATOR_EQUAL',		0);
 define('CONDITION_OPERATOR_NOT_EQUAL',	1);
@@ -344,7 +344,7 @@ define('ITEM_TYPE_CALCULATED',		15);
 define('ITEM_TYPE_JMX',				16);
 
 define('ITEM_VALUE_TYPE_FLOAT',		0);
-define('ITEM_VALUE_TYPE_STR',		1);
+define('ITEM_VALUE_TYPE_STR',		1); // aka Character
 define('ITEM_VALUE_TYPE_LOG',		2);
 define('ITEM_VALUE_TYPE_UINT64',	3);
 define('ITEM_VALUE_TYPE_TEXT',		4);
@@ -529,6 +529,7 @@ define('SCREEN_RESOURCE_EVENTS',			13);
 define('SCREEN_RESOURCE_HOSTGROUP_TRIGGERS',14);
 define('SCREEN_RESOURCE_SYSTEM_STATUS',		15);
 define('SCREEN_RESOURCE_HOST_TRIGGERS',		16);
+// used in Monitoring > Latest data > Graph (history.php)
 define('SCREEN_RESOURCE_HISTORY',			17);
 define('SCREEN_RESOURCE_CHART',				18);
 
@@ -818,6 +819,37 @@ define('ZBX_PREG_FUNCTION_FORMAT', '([a-z]+(\('.ZBX_PREG_PARAMS.'\)))');
 define('ZBX_PREG_MACRO_NAME_FORMAT', '(\{[A-Z\.]+\})');
 define('ZBX_PREG_EXPRESSION_SIMPLE_MACROS', '(\{TRIGGER\.VALUE\})');
 define('ZBX_PREG_EXPRESSION_USER_MACROS', '(\{\$'.ZBX_PREG_MACRO_NAME.'\})');
+
+// !!! should be used with "x" modifier
+define('ZBX_PREG_ITEM_KEY_PARAMETER_FORMAT', '(
+	(?P>param) # match recursive parameter group
+	|
+	(\" # match quoted string
+		(
+			((\\\\)+?[^\\\\]) # match any amount of backslash with non-backslash ending
+			|
+			[^\"\\\\] # match any character except \ or "
+		)*? # match \" or any character except "
+	\")
+	|
+	[^\"\[\],][^,\]]*? #match unquoted string - any character except " [ ] and , at begining and any character except , and ] afterwards
+	|
+	() # match empty and only empty part
+)');
+define('ZBX_PREG_ITEM_KEY_FORMAT', '([0-9a-zA-Z_\. \-]+? # match key
+(?<param>( # name parameter group used in recursion
+	\[ # match opening bracket
+		(
+			\s*?'.ZBX_PREG_ITEM_KEY_PARAMETER_FORMAT .' # match spaces and parameter
+			(
+				\s*?,\s*? # match spaces, comma and spaces
+				'.ZBX_PREG_ITEM_KEY_PARAMETER_FORMAT .' # match parameter
+			)*? # match spaces, comma, spaces, parameter zero or more times
+			\s*? #matches spaces
+		)
+	\] # match closing bracket
+))*? # matches non comma seperated brackets with parameters zero or more times
+)');
 
 // regexp ids
 define('ZBX_KEY_ID',		1);

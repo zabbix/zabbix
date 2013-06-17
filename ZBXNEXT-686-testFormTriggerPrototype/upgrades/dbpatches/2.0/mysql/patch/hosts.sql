@@ -175,29 +175,78 @@ DROP FUNCTION zbx_convert_simple_checks;
 
 -- adding web.test.error[<web check>] items
 
-SET @itemid = (SELECT MAX(itemid) FROM items);
-SET @httptestitemid = (SELECT MAX(httptestitemid) FROM httptestitem);
-SET @itemappid = (SELECT MAX(itemappid) FROM items_applications);
+DROP PROCEDURE IF EXISTS zbx_add_web_error_items;
 
-INSERT INTO items (itemid, hostid, type, name, key_, value_type, units, delay, history, trends, status)
-	SELECT @itemid := @itemid + 1, hostid, type, 'Last error message of scenario \'$1\'', CONCAT('web.test.error', SUBSTR(key_, LOCATE('[', key_))), 1, '', delay, history, 0, status
-	FROM items
-	WHERE type = 9
-		AND key_ LIKE 'web.test.fail%';
+DELIMITER $
+CREATE PROCEDURE zbx_add_web_error_items()
+LANGUAGE SQL
+BEGIN
+	DECLARE v_nodeid integer;
+	DECLARE init_nodeid bigint unsigned;
+	DECLARE minid, maxid bigint unsigned;
+	DECLARE n_done integer DEFAULT 0;
+	DECLARE n_cur CURSOR FOR (SELECT DISTINCT httptestid div 100000000000000 FROM httptest);
+	DECLARE CONTINUE HANDLER FOR NOT FOUND SET n_done = 1;
 
-INSERT INTO httptestitem (httptestitemid, httptestid, itemid, type)
-	SELECT @httptestitemid := @httptestitemid + 1, ht.httptestid, i.itemid, 4
-	FROM httptest ht,applications a,items i
-	WHERE ht.applicationid=a.applicationid
-		AND a.hostid=i.hostid
-		AND CONCAT('web.test.error[', ht.name, ']') = i.key_;
+	OPEN n_cur;
 
-INSERT INTO items_applications (itemappid, applicationid, itemid)
-	SELECT @itemappid := @itemappid + 1, ht.applicationid, hti.itemid
-	FROM httptest ht, httptestitem hti
-	WHERE ht.httptestid = hti.httptestid
-		AND hti.type = 4;
+	n_loop: LOOP
+		FETCH n_cur INTO v_nodeid;
 
+		IF n_done THEN
+			LEAVE n_loop;
+		END IF;
+
+		SET minid = v_nodeid * 100000000000000;
+		SET maxid = minid + 99999999999999;
+		SET init_nodeid = (v_nodeid * 1000 + v_nodeid) * 100000000000;
+
+		SET @itemid = (SELECT MAX(itemid) FROM items where itemid BETWEEN minid AND maxid);
+		IF @itemid IS NULL THEN
+			SET @itemid = init_nodeid;
+		END IF;
+
+		SET @httptestitemid = (SELECT MAX(httptestitemid) FROM httptestitem where httptestitemid BETWEEN minid AND maxid);
+		IF @httptestitemid IS NULL THEN
+			SET @httptestitemid = init_nodeid;
+		END IF;
+
+		SET @itemappid = (SELECT MAX(itemappid) FROM items_applications where itemappid BETWEEN minid AND maxid);
+		IF @itemappid IS NULL THEN
+			SET @itemappid = init_nodeid;
+		END IF;
+
+		INSERT INTO items (itemid, hostid, type, name, key_, value_type, units, delay, history, trends, status)
+			SELECT @itemid := @itemid + 1, hostid, type, 'Last error message of scenario \'$1\'', CONCAT('web.test.error',
+				SUBSTR(key_, LOCATE('[', key_))), 1, '', delay, history, 0, status
+				FROM items
+				WHERE type = 9
+					AND key_ LIKE 'web.test.fail%'
+					AND itemid BETWEEN minid AND maxid;
+
+		INSERT INTO httptestitem (httptestitemid, httptestid, itemid, type)
+			SELECT @httptestitemid := @httptestitemid + 1, ht.httptestid, i.itemid, 4
+				FROM httptest ht,applications a,items i
+				WHERE ht.applicationid=a.applicationid
+					AND a.hostid=i.hostid
+					AND CONCAT('web.test.error[', ht.name, ']') = i.key_
+					AND i.itemid BETWEEN minid AND maxid;
+
+		INSERT INTO items_applications (itemappid, applicationid, itemid)
+			SELECT @itemappid := @itemappid + 1, ht.applicationid, hti.itemid
+				FROM httptest ht, httptestitem hti
+				WHERE ht.httptestid = hti.httptestid
+					AND hti.type = 4
+					AND hti.itemid BETWEEN minid AND maxid;
+
+	END LOOP n_loop;
+
+	CLOSE n_cur;
+END$
+DELIMITER ;
+
+CALL zbx_add_web_error_items();
+DROP PROCEDURE zbx_add_web_error_items;
 DELETE FROM ids WHERE table_name IN ('items', 'httptestitem', 'items_applications');
 
 -- Patching table `hosts`

@@ -54,7 +54,7 @@ $guiForm = new CForm();
 $guiForm->setName('guiForm');
 $guiForm->addVar('form_refresh', $this->data['form_refresh'] + 1);
 $guiForm->addItem($guiView);
-$guiForm->addItem(makeFormFooter(array(new CSubmit('save', _('Save')))));
+$guiForm->addItem(makeFormFooter(new CSubmit('save', _('Save'))));
 
 return $guiForm;
 
