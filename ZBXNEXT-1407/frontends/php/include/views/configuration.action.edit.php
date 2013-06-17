@@ -21,7 +21,7 @@
 
 require_once dirname(__FILE__).'/js/configuration.action.edit.js.php';
 
-$actionWidget = new CWidget();
+$actionWidget = new CWidget(null, 'action-edit');
 $actionWidget->addPageHeader(_('CONFIGURATION OF ACTIONS'));
 
 // create form
@@ -303,7 +303,7 @@ switch ($this->data['new_condition']['conditiontype']) {
 		$condition = null;
 }
 
-$conditionTable = new CTable(null, 'commonTable');
+$conditionTable = new CTable(null, 'newActionConditionTable');
 $conditionTable->addRow(array($conditionTypeComboBox, $conditionOperatorsComboBox, $condition));
 $conditionTable->addRow(array(new CSubmit('add_condition', _('Add'), null, 'link_menu'), SPACE, SPACE));
 
