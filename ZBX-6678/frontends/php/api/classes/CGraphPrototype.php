@@ -598,10 +598,20 @@ class CGraphPrototype extends CGraphGeneral {
 
 			// add Y axis item IDs for persmission validation
 			if (isset($graph['ymin_type']) && $graph['ymin_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE) {
-				$itemids[$graph['ymin_itemid']] = $graph['ymin_itemid'];
+				if (empty($graph['ymin_itemid'])) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Missing "itemid" field for Y MIN axis item.'));
+				}
+				else {
+					$itemids[$graph['ymin_itemid']] = $graph['ymin_itemid'];
+				}
 			}
 			if (isset($graph['ymax_type']) && $graph['ymax_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE) {
-				$itemids[$graph['ymax_itemid']] = $graph['ymax_itemid'];
+				if (empty($graph['ymax_itemid'])) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Missing "itemid" field for Y MAX axis item.'));
+				}
+				else {
+					$itemids[$graph['ymax_itemid']] = $graph['ymax_itemid'];
+				}
 			}
 		}
 
