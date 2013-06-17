@@ -10,82 +10,50 @@ ALTER TABLE ONLY events ALTER eventid DROP DEFAULT,
 
 -- Begin event redesign patch
 
-CREATE TEMPORARY TABLE tmp_events_eventid (eventid bigint PRIMARY KEY,prev_value integer,value integer);
-CREATE INDEX tmp_events_index on events (source, object, objectid, clock, eventid, value);
+CREATE LANGUAGE plpgsql;
 
--- Which OK events should have value_changed flag set?
--- Those that have a PROBLEM event (or no event) before them.
+CREATE OR REPLACE FUNCTION zbx_convert_events() RETURNS BOOLEAN AS $$
+		DECLARE prev_triggerid bigint;
+		DECLARE prev_value integer;
+		r RECORD;
+BEGIN
 
-INSERT INTO tmp_events_eventid (eventid,prev_value,value)
-(
-	SELECT e1.eventid,(SELECT e2.value
-				FROM events e2
-				WHERE e2.source=e1.source
-					AND e2.object=e1.object
-					AND e2.objectid=e1.objectid
-					AND (e2.clock<e1.clock OR (e2.clock=e1.clock AND e2.eventid<e1.eventid))
-					AND e2.value<2					-- TRIGGER_VALUE_UNKNOWN
-				ORDER BY e2.source DESC,
-						e2.object DESC,
-						e2.objectid DESC,
-						e2.clock DESC,
-						e2.eventid DESC,
-						e2.value DESC
-				LIMIT 1),e1.value
-		FROM events e1
-		WHERE e1.source=0							-- EVENT_SOURCE_TRIGGERS
-			AND e1.object=0 						-- EVENT_OBJECT_TRIGGER
-			AND e1.value=0							-- TRIGGER_VALUE_FALSE (OK)
-);
+	FOR r IN
+		SELECT e.eventid, e.objectid, e.value, t.type as type
+		FROM events e
+		JOIN triggers t ON t.triggerid = e.objectid
+		WHERE e.source = 0
+			AND e.object = 0
+			AND e.value IN (0,1)
+		ORDER BY e.objectid, e.clock, e.eventid
+	LOOP
 
--- Which PROBLEM events should have value_changed flag set?
--- (1) Those that have an OK event (or no event) before them.
--- (2) Those that came from a "MULTIPLE PROBLEM" trigger.
+	IF prev_triggerid IS NULL OR prev_triggerid <> r.objectid THEN
+		prev_value := NULL;
+	END IF;
 
-INSERT INTO tmp_events_eventid (eventid,prev_value,value)
-(
-	SELECT e1.eventid,(SELECT e2.value
-				FROM events e2
-				WHERE e2.source=e1.source
-					AND e2.object=e1.object
-					AND e2.objectid=e1.objectid
-					AND (e2.clock<e1.clock OR (e2.clock=e1.clock AND e2.eventid<e1.eventid))
-					AND e2.value<2					-- TRIGGER_VALUE_UNKNOWN
-				ORDER BY e2.source DESC,
-						e2.object DESC,
-						e2.objectid DESC,
-						e2.clock DESC,
-						e2.eventid DESC,
-						e2.value DESC
-				LIMIT 1),e1.value
-		FROM events e1,triggers t
-		WHERE e1.source=0							-- EVENT_SOURCE_TRIGGERS
-			AND e1.object=0 						-- EVENT_OBJECT_TRIGGER
-			AND e1.objectid=t.triggerid
-			AND e1.value=1							-- TRIGGER_VALUE_TRUE
-			AND t.type=0							-- TRIGGER_TYPE_NORMAL
-);
+	IF r.value = 0 THEN
+		IF prev_value IS NULL OR prev_value = 1 THEN
+			UPDATE events set value_changed = 1 WHERE eventid = r.eventid;
+		END IF;
+	ELSE
+		IF r.type = 1 OR prev_value IS NULL OR prev_value = 0 THEN
+			UPDATE events set value_changed = 1 WHERE eventid = r.eventid;
+		END IF;
+	END IF;
 
-INSERT INTO tmp_events_eventid (eventid,value)
-(
-	SELECT e1.eventid,e1.value
-		FROM events e1,triggers t
-		WHERE e1.source=0							-- EVENT_SOURCE_TRIGGERS
-			AND e1.object=0 						-- EVENT_OBJECT_TRIGGER
-			AND e1.objectid=t.triggerid
-			AND e1.value=1							-- TRIGGER_VALUE_TRUE (PROBLEM)
-			AND t.type=1							-- TRIGGER_TYPE_MULTIPLE_TRUE
-);
+	prev_value := r.value;
+	prev_triggerid := r.objectid;
 
-DELETE FROM tmp_events_eventid WHERE prev_value = value;
+	END LOOP;
 
--- Update the value_changed flag.
+	RETURN 1;
+END;
+$$ LANGUAGE plpgsql;
 
-DROP INDEX tmp_events_index;
+SELECT zbx_convert_events();
 
-UPDATE events SET value_changed=1 WHERE EXISTS (SELECT 1 FROM tmp_events_eventid WHERE tmp_events_eventid.eventid=events.eventid);
-
-DROP TABLE tmp_events_eventid;
+DROP FUNCTION zbx_convert_events();
 
 -- End event redesign patch
 
