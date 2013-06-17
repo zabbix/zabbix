@@ -18,6 +18,7 @@
 **/
 
 var ZABBIX = ZABBIX || {};
+
 ZABBIX.namespace = function(namespace) {
 	var parts = namespace.split('.'),
 		parent = this,
@@ -27,18 +28,22 @@ ZABBIX.namespace = function(namespace) {
 		if (typeof parent[parts[i]] === 'undefined') {
 			parent[parts[i]] = {};
 		}
+
 		parent = parent[parts[i]];
 	}
+
 	return parent;
 };
 
 ZABBIX.namespace('classes.Observer');
+
 ZABBIX.classes.Observer = (function() {
 	'use strict';
 
 	var Observer = function() {
-		this.listeners = {}
+		this.listeners = {};
 	};
+
 	Observer.prototype = {
 		constructor: ZABBIX.classes.Observer,
 
@@ -52,29 +57,35 @@ ZABBIX.classes.Observer = (function() {
 					if (this.listeners[event[i]] === void(0)) {
 						this.listeners[event[i]] = [];
 					}
+
 					this.listeners[event[i]].push(callback);
 				}
 			}
+
 			return this;
 		},
 
 		trigger: function(event, target) {
 			event = event.toLowerCase();
+
 			var handlers = this.listeners[event] || [],
 				i;
 
 			if (handlers.length) {
 				event = jQuery.Event(event);
+
 				for (i = 0; i < handlers.length; i++) {
 					try {
 						if (handlers[i](event, target) === false || event.isDefaultPrevented()) {
 							break;
 						}
-					} catch(ex) {
+					}
+					catch(ex) {
 						window.console && window.console.log && window.console.log(ex);
 					}
 				}
 			}
+
 			return this;
 		}
 	};
@@ -87,20 +98,23 @@ ZABBIX.classes.Observer = (function() {
 				object[i] = Observer.prototype[i];
 			}
 		}
+
 		object.listeners = {};
 	};
+
 	return Observer;
 }());
 
 ZABBIX.namespace('apps.map');
+
 ZABBIX.apps.map = (function($) {
 	'use strict';
 
 	// dependencies
 	var Observer = ZABBIX.classes.Observer;
 
-	function createMap(containerid, mapdata) {
-		var CMap = function(containerid, mapdata) {
+	function createMap(containerId, mapData) {
+		var CMap = function(containerId, mapData) {
 			var selementid,
 				linkid,
 				setContainer;
@@ -115,12 +129,12 @@ ZABBIX.apps.map = (function($) {
 			};
 			this.currentLinkId = '0'; // linkid of currently edited link
 			this.allLinkTriggerIds = {};
-			this.sysmapid = mapdata.sysmap.sysmapid;
-			this.data = mapdata.sysmap;
-			this.iconList = mapdata.iconList;
-			this.defaultAutoIconId = mapdata.defaultAutoIconId
+			this.sysmapid = mapData.sysmap.sysmapid;
+			this.data = mapData.sysmap;
+			this.iconList = mapData.iconList;
+			this.defaultAutoIconId = mapData.defaultAutoIconId;
+			this.container = $('#' + containerId);
 
-			this.container = $('#' + containerid);
 			if (this.container.length === 0) {
 				this.container = $(document.body);
 			}
@@ -145,21 +159,23 @@ ZABBIX.apps.map = (function($) {
 
 				// resize div on window resize
 				setContainer = function() {
-					var sysmap_pn = this.mapimg.position(),
+					var sysmapPosition = this.mapimg.position(),
 						sysmapHeight = this.mapimg.height(),
 						sysmapWidth = this.mapimg.width(),
-						container_pn = this.container.position();
+						containerPosition = this.container.position();
 
-					if (container_pn.top !== sysmap_pn.top || container_pn.left !== sysmap_pn.left || this.container.height() !== sysmapHeight || this.container.width() !== sysmapWidth) {
+					if (containerPosition.top !== sysmapPosition.top || containerPosition.left !== sysmapPosition.left || this.container.height() !== sysmapHeight || this.container.width() !== sysmapWidth) {
 						this.container.css({
-							top: sysmap_pn.top + 'px',
-							left: sysmap_pn.left + 'px',
+							top: sysmapPosition.top + 'px',
+							left: sysmapPosition.left + 'px',
 							height: sysmapHeight + 'px',
 							width: sysmapWidth + 'px'
 						});
 					}
 				};
+
 				$(window).resize($.proxy(setContainer, this));
+
 				this.mapimg.load($.proxy(setContainer, this));
 			}
 			else {
@@ -173,6 +189,7 @@ ZABBIX.apps.map = (function($) {
 					this.selements[selementid] = new Selement(this, this.data.selements[selementid]);
 				}
 			}
+
 			for (linkid in this.data.links) {
 				if (this.data.selements.hasOwnProperty(selementid)) {
 					this.links[linkid] = new Link(this, this.data.links[linkid]);
@@ -192,10 +209,10 @@ ZABBIX.apps.map = (function($) {
 			this.linkForm = new LinkForm(this.formContainer, this);
 			this.bindActions();
 
-			// initialize SELECTABLE
+			// initialize selectable
 			this.container.selectable({
 				start: $.proxy(function(event) {
-					if(!event.ctrlKey && !event.metaKey) {
+					if (!event.ctrlKey && !event.metaKey) {
 						this.clearSelection();
 					}
 				}, this),
@@ -211,6 +228,7 @@ ZABBIX.apps.map = (function($) {
 						// remove ui-selected class, to not confuse next selection
 						selected.removeClass('ui-selected');
 					}
+
 					this.selectElements(ids, event.ctrlKey || event.metaKey);
 				}, this)
 			});
@@ -219,6 +237,7 @@ ZABBIX.apps.map = (function($) {
 		CMap.prototype = {
 			save: function() {
 				var url = new Curl(location.href);
+
 				$.ajax({
 					url: url.getPath() + '?output=ajax&sid=' + url.getArgument('sid'),
 					type: 'post',
@@ -242,6 +261,7 @@ ZABBIX.apps.map = (function($) {
 				// is image is updating, set reupdate flag and exit
 				if (this.imageUpdating === true) {
 					this.reupdateImage = true;
+
 					return;
 				}
 
@@ -251,6 +271,7 @@ ZABBIX.apps.map = (function($) {
 				}
 
 				this.imageUpdating = true;
+
 				ajaxRequest = $.ajax({
 					url: urlText,
 					type: 'post',
@@ -276,6 +297,7 @@ ZABBIX.apps.map = (function($) {
 						else {
 							this.mapimg.attr('src', 'imgstore.php?imageid=' + data.result);
 						}
+
 						this.imageUpdating = false;
 					}, this),
 					error: function(jqXHR, textStatus, errorThrown) {
@@ -292,7 +314,7 @@ ZABBIX.apps.map = (function($) {
 				}, this));
 			},
 
-			// ---------- ELEMENTS -------------
+			// elements
 			deleteSelectedElements: function() {
 				var selementid;
 
@@ -301,6 +323,7 @@ ZABBIX.apps.map = (function($) {
 						this.selements[selementid].remove();
 						this.removeLinksBySelementId(selementid);
 					}
+
 					this.toggleForm();
 					this.updateImage();
 				}
@@ -314,6 +337,7 @@ ZABBIX.apps.map = (function($) {
 
 				selementIds[selementid] = selementid;
 				linkids = this.getLinksBySelementIds(selementIds);
+
 				for (i = 0, ln = linkids.length; i < ln; i++) {
 					this.links[linkids[i]].remove();
 				}
@@ -324,7 +348,7 @@ ZABBIX.apps.map = (function($) {
 			 *
 			 * @param selementIds
 			 *
-			 * @return {Array}  an array of link ids
+			 * @return {Array} an array of link ids
 			 */
 			getLinksBySelementIds: function(selementIds) {
 				var linkIds = [],
@@ -346,7 +370,9 @@ ZABBIX.apps.map = (function($) {
 			bindActions: function() {
 				var that = this;
 
-				// MAP PANEL EVENTS
+				/*
+				 * Map panel events
+				 */
 				// toggle expand macros
 				$('#expand_macros').click(function() {
 					that.data.expand_macros = (that.data.expand_macros === '1') ? '0' : '1';
@@ -357,6 +383,7 @@ ZABBIX.apps.map = (function($) {
 				// change grid size
 				$('#gridsize').change(function() {
 					var value = $(this).val();
+
 					if (that.data.grid_size !== value) {
 						that.data.grid_size = value;
 						that.updateImage();
@@ -379,9 +406,11 @@ ZABBIX.apps.map = (function($) {
 				// perform align all
 				$('#gridalignall').click(function() {
 					var selementid;
+
 					for (selementid in that.selements) {
 						that.selements[selementid].align(true);
 					}
+
 					that.updateImage();
 				});
 
@@ -392,11 +421,14 @@ ZABBIX.apps.map = (function($) {
 
 				// add element
 				$('#selementAdd').click(function() {
-					if (typeof that.iconList[0] === 'undefined') {
+					if (typeof(that.iconList[0]) === 'undefined') {
 						alert(locale['S_NO_IMAGES']);
+
 						return;
 					}
+
 					var selement = new Selement(that);
+
 					that.selements[selement.id] = selement;
 					that.updateImage();
 				});
@@ -410,8 +442,10 @@ ZABBIX.apps.map = (function($) {
 
 					if (that.selection.count !== 2) {
 						alert(locale['S_TWO_ELEMENTS_SHOULD_BE_SELECTED']);
+
 						return false;
 					}
+
 					link = new Link(that);
 					that.links[link.id] = link;
 					that.updateImage();
@@ -424,45 +458,78 @@ ZABBIX.apps.map = (function($) {
 
 					if (that.selection.count !== 2) {
 						alert(locale['S_PLEASE_SELECT_TWO_ELEMENTS']);
+
 						return false;
 					}
 
 					linkids = that.getLinksBySelementIds(that.selection.selements);
+
 					if (linkids.length && confirm(locale['S_DELETE_LINKS_BETWEEN_SELECTED_ELEMENTS_Q'])) {
 						for (var i = 0, ln = linkids.length; i < ln; i++) {
 							that.links[linkids[i]].remove();
 						}
+
 						that.linkForm.hide();
 						that.linkForm.updateList({});
 						that.updateImage();
 					}
 				});
 
-
-				// SELEMENTS EVENTS
+				/*
+				 * Selements events
+				 */
 				// delegate selements icons clicks
 				$(this.container).delegate('.sysmap_element', 'click', function(event) {
 					that.selectElements([$(this).data('id')], event.ctrlKey || event.metaKey);
 				});
 
-
-				// FORM EVENTS
-				// when change elementType, we clear elementnames and elementid
+				/*
+				 * Form events
+				 */
 				$('#elementType').change(function() {
-					$('input[name=elementName]').val('');
-					$('#elementid').val('0');
+					var obj = $(this);
+
+					// clean element id and name
+					switch (obj.val()) {
+						// host
+						case '0':
+							$('#elementNameHost').multiSelectHelper({
+								objectName: 'hosts',
+								name: 'elementValue',
+								selectedLimit: 1
+							});
+							break;
+
+						// host group
+						case '3':
+							$('#elementNameHostGroup').multiSelectHelper({
+								objectName: 'hostGroup',
+								name: 'elementValue',
+								selectedLimit: 1
+							});
+							break;
+
+						// others types
+						default:
+							$('input[name=elementName]').val('');
+							$('#elementid').val('0');
+					}
 				});
 
 				$('#elementClose').click(function() {
 					that.clearSelection();
 					that.toggleForm();
 				});
+
 				$('#elementRemove').click($.proxy(this.deleteSelectedElements, this));
+
 				$('#elementApply').click($.proxy(function() {
 					if (this.selection.count !== 1) {
 						throw 'Try to single update element, when more than one selected.';
 					}
+
 					var values = this.form.getValues();
+
 					if (values) {
 						for (var selementid in this.selection.selements) {
 							this.selements[selementid].update(values, true);
@@ -476,10 +543,13 @@ ZABBIX.apps.map = (function($) {
 
 				$('#x, #y', this.form.domNode).change(function() {
 					var value = parseInt(this.value, 10);
+
 					this.value = isNaN(value) || (value < 0) ? 0 : value;
 				});
+
 				$('#areaSizeWidth, #areaSizeHeight', this.form.domNode).change(function() {
 					var value = parseInt(this.value, 10);
+
 					this.value = isNaN(value) || (value < 10) ? 10 : value;
 				});
 
@@ -488,9 +558,12 @@ ZABBIX.apps.map = (function($) {
 					that.clearSelection();
 					that.toggleForm();
 				});
+
 				$('#massRemove').click($.proxy(this.deleteSelectedElements, this));
+
 				$('#massApply').click($.proxy(function() {
 					var values = this.massForm.getValues();
+
 					if (values) {
 						for (var selementid in this.selection.selements) {
 							this.selements[selementid].update(values);
@@ -503,7 +576,9 @@ ZABBIX.apps.map = (function($) {
 					that.currentLinkId = $(this).data('linkid');
 					$('table.element-links tr').removeClass('selected');
 					$(this).parent().parent().addClass('selected');
+
 					var linkData = that.links[that.currentLinkId].getData();
+
 					that.linkForm.setValues(linkData);
 					that.linkForm.show();
 				});
@@ -515,6 +590,7 @@ ZABBIX.apps.map = (function($) {
 					that.linkForm.hide();
 					that.updateImage();
 				});
+
 				$('#formLinkApply').click(function() {
 					try {
 						var linkData = that.linkForm.getValues();
@@ -525,6 +601,7 @@ ZABBIX.apps.map = (function($) {
 						alert(err);
 					}
 				});
+
 				$('#formLinkClose').click(function() {
 					that.linkForm.hide();
 				});
@@ -534,6 +611,7 @@ ZABBIX.apps.map = (function($) {
 						tid = $(this).data('linktriggerid').toString();
 
 					$('#linktrigger_' + tid).remove();
+
 					for (triggerid in that.linkForm.triggerids) {
 						if (that.linkForm.triggerids[triggerid] === tid) {
 							delete that.linkForm.triggerids[triggerid];
@@ -544,17 +622,21 @@ ZABBIX.apps.map = (function($) {
 				// changes for color inputs
 				this.linkForm.domNode.delegate('.colorpicker', 'change', function() {
 					var id = $(this).attr('id');
+
 					set_color_by_name(id, this.value);
 				});
+
 				this.linkForm.domNode.delegate('.colorpickerLabel', 'click', function() {
-					var id = $(this).attr('id');
-					var input = id.match(/^lbl_(.+)$/);
+					var id = $(this).attr('id'),
+						input = id.match(/^lbl_(.+)$/);
+
 					show_color_picker(input[1]);
 				});
 			},
 
 			clearSelection: function() {
 				var id;
+
 				for (id in this.selection.selements) {
 					this.selection.count--;
 					this.selements[id].toggleSelect(false);
@@ -570,8 +652,9 @@ ZABBIX.apps.map = (function($) {
 				}
 
 				for (i = 0, ln = ids.length; i < ln; i++) {
-					var selementid = ids[i];
-					var selected = this.selements[selementid].toggleSelect();
+					var selementid = ids[i],
+						selected = this.selements[selementid].toggleSelect();
+
 					if (selected) {
 						this.selection.count++;
 						this.selection.selements[selementid] = selementid;
@@ -581,26 +664,32 @@ ZABBIX.apps.map = (function($) {
 						delete this.selection.selements[selementid];
 					}
 				}
+
 				this.toggleForm();
 			},
 
 			toggleForm: function() {
 				var selementid;
+
 				this.linkForm.hide();
+
 				if (this.selection.count == 0) {
 					$('#map-window').hide();
 				}
 				else {
 					this.linkForm.updateList(this.selection.selements);
+
 					// only one element selected
 					if (this.selection.count == 1) {
 						for (selementid in this.selection.selements) {
 							this.form.setValues(this.selements[selementid].getData());
 						}
+
 						this.massForm.hide();
 						$('#link-connect-to').show();
 						this.form.show();
 					}
+
 					// multiple elements selected
 					else {
 						this.form.hide();
@@ -625,16 +714,17 @@ ZABBIX.apps.map = (function($) {
 		 */
 		function Link(sysmap, linkData) {
 			var selementid;
+
 			this.sysmap = sysmap;
 
 			if (!linkData) {
 				linkData = {
-					label:			'',
-					selementid1:	null,
-					selementid2:	null,
-					linktriggers:	{},
-					drawtype:		0,
-					color:			'00CC00'
+					label: '',
+					selementid1: null,
+					selementid2: null,
+					linktriggers: {},
+					drawtype: 0,
+					color: '00CC00'
 				};
 
 				for (selementid in this.sysmap.selection.selements) {
@@ -692,6 +782,7 @@ ZABBIX.apps.map = (function($) {
 				if (sysmap.form.active) {
 					sysmap.linkForm.updateList(sysmap.selection.selements);
 				}
+
 				sysmap.linkForm.hide();
 			},
 
@@ -704,10 +795,11 @@ ZABBIX.apps.map = (function($) {
 				return this.data;
 			}
 		};
+
 		Observer.makeObserver(Link.prototype);
 
 		/**
-		 * @class Creates a new Selement
+		 * @class Creates a new Selement.
 		 *
 		 * @property {Object} sysmap reference to Map object
 		 * @property {Object} data selement db values
@@ -805,6 +897,7 @@ ZABBIX.apps.map = (function($) {
 				// update elements fields, if not massupdate, remove fields that are not in new values
 				for (i = 0, ln = dataFelds.length; i < ln; i++) {
 					fieldName = dataFelds[i];
+
 					if (typeof data[fieldName] !== 'undefined') {
 						this.data[fieldName] = data[fieldName];
 					}
@@ -827,10 +920,8 @@ ZABBIX.apps.map = (function($) {
 					this.data.iconid_on = '0';
 					this.data.iconid_maintenance = '0';
 					this.data.iconid_disabled = '0';
-				}
 
-				// if image element, set elementName to image name
-				if (this.data.elementtype === '4') {
+					// if image element, set elementName to image name
 					for (i in this.sysmap.iconList) {
 						if (this.sysmap.iconList[i].imageid === this.data.iconid_off) {
 							this.data.elementName = this.sysmap.iconList[i].name;
@@ -866,6 +957,7 @@ ZABBIX.apps.map = (function($) {
 				if (typeof this.sysmap.selection.selements[this.id] !== 'undefined') {
 					this.sysmap.selection.count--;
 				}
+
 				delete this.sysmap.selection.selements[this.id];
 			},
 
@@ -877,12 +969,14 @@ ZABBIX.apps.map = (function($) {
 			toggleSelect: function(state) {
 				state = state || !this.selected;
 				this.selected = state;
+
 				if (this.selected) {
 					this.domNode.addClass('selected');
 				}
 				else {
 					this.domNode.removeClass('selected');
 				}
+
 				return this.selected;
 			},
 
@@ -904,14 +998,14 @@ ZABBIX.apps.map = (function($) {
 					newY = y,
 					newWidth = dims.width,
 					newHeight = dims.height,
-					gridSize = parseInt(this.sysmap.data.grid_size, 10),
-					realign = false;
+					gridSize = parseInt(this.sysmap.data.grid_size, 10);
 
 				// if 'fit to map' area coords are 0 always
 				if (this.data.elementsubtype === '1' && this.data.areatype === '0') {
 					newX = 0;
 					newY = 0;
 				}
+
 				// if autoalign is off
 				else if (doAutoAlign === false || (typeof doAutoAlign === 'undefined' && this.sysmap.data.grid_align == '0')) {
 					if ((x + dims.width) > this.sysmap.data.width) {
@@ -951,11 +1045,11 @@ ZABBIX.apps.map = (function($) {
 					while (newY < 0) {
 						newY += gridSize;
 					}
-
 				}
 
 				this.data.y = newY;
 				this.data.x = newX;
+
 				if (this.data.elementsubtype === '1') {
 					this.data.width = newWidth;
 					this.data.height = newHeight;
@@ -974,6 +1068,7 @@ ZABBIX.apps.map = (function($) {
 			 */
 			updateIcon: function() {
 				var oldIconClass = this.domNode.get(0).className.match(/sysmap_iconid_\d+/);
+
 				if (oldIconClass !== null) {
 					this.domNode.removeClass(oldIconClass[0]);
 				}
@@ -1014,6 +1109,7 @@ ZABBIX.apps.map = (function($) {
 				}
 			}
 		};
+
 		Observer.makeObserver(Selement.prototype);
 
 		/**
@@ -1226,6 +1322,29 @@ ZABBIX.apps.map = (function($) {
 				if (this.sysmap.data.iconmapid === '0') {
 					$('#use_iconmap').prop('disabled', true);
 				}
+
+				// set element id and name
+				switch (selement.elementtype) {
+					// host
+					case '0':
+						$('#elementNameHost').multiSelectHelper({
+							objectName: 'hosts',
+							name: 'elementValue',
+							data: [{id: selement.elementid, name: selement.elementName}],
+							selectedLimit: 1
+						});
+						break;
+
+					// host group
+					case '3':
+						$('#elementNameHostGroup').multiSelectHelper({
+							objectName: 'hostGroup',
+							name: 'elementValue',
+							data: [{id: selement.elementid, name: selement.elementName}],
+							selectedLimit: 1
+						});
+						break;
+				}
 			},
 
 			/**
@@ -1245,10 +1364,12 @@ ZABBIX.apps.map = (function($) {
 
 				for (i = 0; i < values.length; i++) {
 					url = urlPattern.exec(values[i].name);
+
 					if (url !== null) {
 						if (typeof data.urls[url[1]] === 'undefined') {
 							data.urls[url[1]] = {};
 						}
+
 						data.urls[url[1]][url[2]] = values[i].value.toString();
 					}
 					else {
@@ -1256,6 +1377,38 @@ ZABBIX.apps.map = (function($) {
 					}
 				}
 
+				// set element id and name
+				switch (data.elementtype) {
+					// host
+					case '0':
+						var elementData = $('#elementNameHost').multiSelect.getData();
+
+						if (empty(elementData)) {
+							data.elementid = '0';
+							data.elementName = '';
+						}
+						else {
+							data.elementid = elementData[0].id;
+							data.elementName = elementData[0].name;
+						}
+						break;
+
+					// host group
+					case '3':
+						var elementData = $('#elementNameHostGroup').multiSelect.getData();
+
+						if (empty(elementData)) {
+							data.elementid = '0';
+							data.elementName = '';
+						}
+						else {
+							data.elementid = elementData[0].id;
+							data.elementName = elementData[0].name;
+						}
+						break;
+				}
+
+				// validate urls
 				for (i in data.urls) {
 					if (data.urls[i].name === '' && data.urls[i].url === '') {
 						delete data.urls[i];
@@ -1264,16 +1417,20 @@ ZABBIX.apps.map = (function($) {
 
 					if (data.urls[i].name === '' || data.urls[i].url === '') {
 						alert(locale['S_INCORRECT_ELEMENT_MAP_LINK']);
+
 						return false;
 					}
 
 					if (typeof urlNames[data.urls[i].name] !== 'undefined') {
 						alert(locale['S_EACH_URL_SHOULD_HAVE_UNIQUE'] + " '" + data.urls[i].name + "'.");
+
 						return false;
 					}
+
 					urlNames[data.urls[i].name] = 1;
 				}
 
+				// validate element id
 				if (data.elementid === '0' && data.elementtype !== '4') {
 					switch (data.elementtype) {
 						case '0': alert('Host is not selected.');
@@ -1420,8 +1577,10 @@ ZABBIX.apps.map = (function($) {
 					if (values[i].name.match(/^chkbox_/) !== null) {
 						continue;
 					}
+
 					data[values[i].name] = values[i].value.toString();
 				}
+
 				return data;
 			},
 
@@ -1438,8 +1597,10 @@ ZABBIX.apps.map = (function($) {
 					ln;
 
 				$('#massList').empty();
+
 				for (id in this.sysmap.selection.selements) {
 					element = this.sysmap.selements[id];
+
 					switch (element.data.elementtype) {
 						case '0': elementTypeText = locale['S_HOST']; break;
 						case '1': elementTypeText = locale['S_MAP']; break;
@@ -1447,6 +1608,7 @@ ZABBIX.apps.map = (function($) {
 						case '3': elementTypeText = locale['S_HOST_GROUP']; break;
 						case '4': elementTypeText = locale['S_IMAGE']; break;
 					}
+
 					list.push({
 						elementType: elementTypeText,
 						elementName: element.data.elementName
@@ -1479,9 +1641,11 @@ ZABBIX.apps.map = (function($) {
 
 					return 0;
 				});
+
 				for (i = 0, ln = list.length; i < ln; i++) {
 					$(tpl.evaluate(list[i])).appendTo('#massList');
 				}
+
 				$('#massList tr:nth-child(odd)').addClass('odd_row');
 				$('#massList tr:nth-child(even)').addClass('even_row');
 			}
@@ -1497,7 +1661,6 @@ ZABBIX.apps.map = (function($) {
 			this.sysmap = sysmap;
 			this.formContainer = formContainer;
 			this.triggerids = {};
-
 			this.domNode = $(new Template($('#linkFormTpl').html()).evaluate()).appendTo(formContainer);
 
 			// apply jQuery UI elements
@@ -1538,8 +1701,8 @@ ZABBIX.apps.map = (function($) {
 
 				for (i = 0, ln = values.length; i < ln; i++) {
 					linkTrigger = linkTriggerPattern.exec(values[i].name);
-					if (linkTrigger !== null) {
 
+					if (linkTrigger !== null) {
 						if (linkTrigger[2] == 'color' && !colorPattern.match(values[i].value.toString())) {
 							throw sprintf(t('Colour "%1$s" is not correct: expecting hexadecimal colour code (6 symbols).'), values[i].value);
 						}
@@ -1547,12 +1710,14 @@ ZABBIX.apps.map = (function($) {
 						if (typeof data.linktriggers[linkTrigger[1]] === 'undefined') {
 							data.linktriggers[linkTrigger[1]] = {};
 						}
+
 						data.linktriggers[linkTrigger[1]][linkTrigger[2]] = values[i].value.toString();
 					}
 					else {
 						if (values[i].name == 'color' && !colorPattern.match(values[i].value.toString())) {
 							throw sprintf(t('Colour "%1$s" is not correct: expecting hexadecimal colour code (6 symbols).'), values[i].value);
 						}
+
 						data[values[i].name] = values[i].value.toString();
 					}
 				}
@@ -1561,7 +1726,7 @@ ZABBIX.apps.map = (function($) {
 			},
 
 			/**
-			 * update form controls with values from link.
+			 * Update form controls with values from link.
 			 *
 			 * @param {Object} link
 			 */
@@ -1599,6 +1764,7 @@ ZABBIX.apps.map = (function($) {
 				// sort by type
 				for (selementid in this.sysmap.selements) {
 					selement = this.sysmap.selements[selementid];
+
 					if (selement.id == link.selementid1) {
 						continue;
 					}
@@ -1606,6 +1772,7 @@ ZABBIX.apps.map = (function($) {
 					if (optgroups[selement.data.elementtype] === void(0)) {
 						optgroups[selement.data.elementtype] = [];
 					}
+
 					optgroups[selement.data.elementtype].push(selement);
 				}
 
@@ -1619,9 +1786,11 @@ ZABBIX.apps.map = (function($) {
 					}
 
 					optgroupDom = $('<optgroup label="' + optgroupLabel + '"></optgroup>');
+
 					for (i = 0, ln = optgroups[optgroupType].length; i < ln; i++) {
 						optgroupDom.append('<option value="' + optgroups[optgroupType][i].id + '">' + optgroups[optgroupType][i].data.elementName + '</option>')
 					}
+
 					$('#selementid2').append(optgroupDom);
 				}
 
@@ -1650,6 +1819,7 @@ ZABBIX.apps.map = (function($) {
 					$(tpl.evaluate(triggers[linkTrigger])).appendTo('#linkTriggerscontainer');
 					$('#linktrigger_' + triggers[linkTrigger].linktriggerid + '_drawtype').val(triggers[linkTrigger].drawtype);
 				}
+
 				$('.colorpicker', this.domNode).change();
 			},
 
@@ -1684,6 +1854,7 @@ ZABBIX.apps.map = (function($) {
 					linkTrigger.triggerid = triggers[i].triggerid;
 					$(tpl.evaluate(linkTrigger)).appendTo('#linkTriggerscontainer');
 				}
+
 				$('.colorpicker', this.domNode).change();
 			},
 
@@ -1706,6 +1877,7 @@ ZABBIX.apps.map = (function($) {
 
 				$('.element-links').hide();
 				$('.element-links tbody').empty();
+
 				if (links.length) {
 					$('#mapLinksContainer').show();
 
@@ -1717,6 +1889,7 @@ ZABBIX.apps.map = (function($) {
 						rowTpl = '#elementLinkTableRowTpl';
 						linkTable = $('#element-links');
 					}
+
 					rowTpl = new Template($(rowTpl).html());
 
 					list = [];
@@ -1754,12 +1927,12 @@ ZABBIX.apps.map = (function($) {
 
 					// sort by "from" element and then by "to" element
 					list.sort(function(a, b) {
-						var fromElementA = a.fromElementName.toLowerCase();
-						var fromElementB = b.fromElementName.toLowerCase();
-						var toElementA = a.toElementName.toLowerCase();
-						var toElementB = b.toElementName.toLowerCase();
-						var linkIdA = a.linkid;
-						var linkIdB = b.linkid;
+						var fromElementA = a.fromElementName.toLowerCase(),
+							fromElementB = b.fromElementName.toLowerCase(),
+							toElementA = a.toElementName.toLowerCase(),
+							toElementB = b.toElementName.toLowerCase(),
+							linkIdA = a.linkid,
+							linkIdB = b.linkid;
 
 						if (fromElementA < fromElementB) {
 							return -1;
@@ -1788,6 +1961,7 @@ ZABBIX.apps.map = (function($) {
 					for (i = 0, ln = list.length; i < ln; i++) {
 						$(rowTpl.evaluate(list[i])).appendTo(linkTable.find('tbody'));
 					}
+
 					linkTable.find('tbody tr:nth-child(odd)').addClass('odd_row');
 					linkTable.find('tbody tr:nth-child(even)').addClass('even_row');
 					linkTable.show();
@@ -1798,7 +1972,7 @@ ZABBIX.apps.map = (function($) {
 			}
 		};
 
-		var sysmap = new CMap(containerid, mapdata);
+		var sysmap = new CMap(containerId, mapData);
 
 		Selement.prototype.bind('afterMove', function(event, element) {
 			if (sysmap.selection.count === 1 && sysmap.selection.selements[element.id] !== void(0)) {
@@ -1812,6 +1986,7 @@ ZABBIX.apps.map = (function($) {
 					$('#areaSizeHeight').val(element.data.height);
 				}
 			}
+
 			sysmap.updateImage();
 		});
 
@@ -1820,13 +1995,14 @@ ZABBIX.apps.map = (function($) {
 
 	return {
 		object: null,
-		run: function(containerid, mapdata) {
+		run: function(containerId, mapData) {
 			if (this.object !== null) {
 				throw new Error('Map has already been run.');
 			}
-			this.object = createMap(containerid, mapdata);
+
+			this.object = createMap(containerId, mapData);
 		}
-	}
+	};
 }(jQuery));
 
 /**

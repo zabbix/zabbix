@@ -147,8 +147,7 @@ function item_data_type2str($type = null) {
 function item_status2str($type = null) {
 	$types = array(
 		ITEM_STATUS_ACTIVE => _('Enabled'),
-		ITEM_STATUS_DISABLED => _('Disabled'),
-		ITEM_STATUS_NOTSUPPORTED => _('Not supported')
+		ITEM_STATUS_DISABLED => _('Disabled')
 	);
 	if (is_null($type)) {
 		return $types;
@@ -161,20 +160,75 @@ function item_status2str($type = null) {
 	}
 }
 
-function item_status2style($status) {
-	switch ($status) {
-		case ITEM_STATUS_ACTIVE:
-			return 'off';
-		case ITEM_STATUS_DISABLED:
-			return 'on';
-		case ITEM_STATUS_NOTSUPPORTED:
-		default:
-			return 'unknown';
+/**
+ * Returns the names of supported item states.
+ *
+ * If the $state parameter is passed, returns the name of the specific state, otherwise - returns an array of all
+ * supported states.
+ *
+ * @param string $state
+ *
+ * @return array|string
+ */
+function itemState($state = null) {
+	$states = array(
+		ITEM_STATE_NORMAL => _('Normal'),
+		ITEM_STATE_NOTSUPPORTED => _('Not supported')
+	);
+
+	if ($state === null) {
+		return $states;
+	}
+	elseif (isset($states[$state])) {
+		return $states[$state];
+	}
+	else {
+		return _('Unknown');
 	}
 }
 
 /**
- * Returns the name of the given interface type.
+ * Returns the text indicating the items status and state. If the $state parameter is not given, only the status of
+ * the item will be taken into account.
+ *
+ * @param int $status
+ * @param int $state
+ *
+ * @return string
+ */
+function itemIndicator($status, $state = null) {
+	if ($status == ITEM_STATUS_ACTIVE) {
+		return ($state == ITEM_STATE_NOTSUPPORTED) ? _('Not supported') : _('Enabled');
+	}
+	elseif ($status == ITEM_STATUS_DISABLED) {
+		return _('Disabled');
+	}
+
+	return _('Unknown');
+}
+
+/**
+ * Returns the CSS class for the items status and state indicator. If the $state parameter is not given, only the status of
+ * the item will be taken into account.
+ *
+ * @param int $status
+ * @param int $state
+ *
+ * @return string
+ */
+function itemIndicatorStyle($status, $state = null) {
+	if ($status == ITEM_STATUS_ACTIVE) {
+		return ($state == ITEM_STATE_NOTSUPPORTED) ? 'unknown' : 'enabled';
+	}
+	elseif ($status == ITEM_STATUS_DISABLED) {
+		return 'disabled';
+	}
+
+	return 'unknown';
+}
+
+/**
+ * Returns the name of the given interface type. Items "status" and "state" properties must be defined.
  *
  * @param int $type
  *
@@ -225,7 +279,6 @@ function update_item_status($itemids, $status) {
 		$old_status = $item['status'];
 		if ($status != $old_status) {
 			$result &= DBexecute('UPDATE items SET status='.$status.
-				($status != ITEM_STATUS_NOTSUPPORTED ? ",error=''" : '').
 				' WHERE itemid='.$item['itemid']);
 			if ($result) {
 				$host = get_host_by_hostid($item['hostid']);
@@ -242,19 +295,15 @@ function copyItemsToHosts($srcItemIds, $dstHostIds) {
 		'itemids' => $srcItemIds,
 		'output' => array(
 			'type', 'snmp_community', 'snmp_oid', 'name', 'key_', 'delay', 'history', 'trends', 'status', 'value_type',
-			'trapper_hosts', 'units', 'multiplier', 'delta', 'snmpv3_securityname', 'snmpv3_securitylevel', 'snmpv3_authprotocol',
-			'snmpv3_authpassphrase', 'snmpv3_privprotocol', 'snmpv3_privpassphrase', 'formula', 'logtimefmt', 'valuemapid',
-			'delay_flex', 'params', 'ipmi_sensor', 'data_type', 'authtype', 'username', 'password', 'publickey',
-			'privatekey', 'flags', 'filter', 'port', 'description', 'inventory_link'
+			'trapper_hosts', 'units', 'multiplier', 'delta', 'snmpv3_contextname', 'snmpv3_securityname',
+			'snmpv3_securitylevel', 'snmpv3_authprotocol', 'snmpv3_authpassphrase', 'snmpv3_privprotocol',
+			'snmpv3_privpassphrase', 'formula', 'logtimefmt', 'valuemapid', 'delay_flex', 'params', 'ipmi_sensor',
+			'data_type', 'authtype', 'username', 'password', 'publickey', 'privatekey', 'flags', 'filter', 'port',
+			'description', 'inventory_link'
 		),
 		'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL),
 		'selectApplications' => API_OUTPUT_REFER
 	));
-	foreach ($srcItems as &$srcItem) {
-		if ($srcItem['status'] == ITEM_STATUS_NOTSUPPORTED) {
-			$srcItem['status'] = ITEM_STATUS_ACTIVE;
-		}
-	}
 
 	$dstHosts = API::Host()->get(array(
 		'output' => array('hostid', 'host', 'status'),
@@ -308,22 +357,16 @@ function copyItems($srcHostId, $dstHostId) {
 		'hostids' => $srcHostId,
 		'output' => array(
 			'type', 'snmp_community', 'snmp_oid', 'name', 'key_', 'delay', 'history', 'trends', 'status', 'value_type',
-			'trapper_hosts', 'units', 'multiplier', 'delta', 'snmpv3_securityname', 'snmpv3_securitylevel', 'snmpv3_authprotocol',
-			'snmpv3_authpassphrase', 'snmpv3_privprotocol', 'snmpv3_privpassphrase', 'formula', 'logtimefmt', 'valuemapid',
-			'delay_flex', 'params', 'ipmi_sensor', 'data_type', 'authtype', 'username', 'password', 'publickey', 'privatekey',
-			'flags', 'filter', 'port', 'description', 'inventory_link'
+			'trapper_hosts', 'units', 'multiplier', 'delta', 'snmpv3_contextname', 'snmpv3_securityname',
+			'snmpv3_securitylevel', 'snmpv3_authprotocol', 'snmpv3_authpassphrase', 'snmpv3_privprotocol',
+			'snmpv3_privpassphrase', 'formula', 'logtimefmt', 'valuemapid', 'delay_flex', 'params', 'ipmi_sensor',
+			'data_type', 'authtype', 'username', 'password', 'publickey', 'privatekey', 'flags', 'filter', 'port',
+			'description', 'inventory_link'
 		),
 		'inherited' => false,
 		'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL),
 		'selectApplications' => API_OUTPUT_REFER
 	));
-
-	foreach ($srcItems as &$srcItem) {
-		if ($srcItem['status'] == ITEM_STATUS_NOTSUPPORTED) {
-			$srcItem['status'] = ITEM_STATUS_ACTIVE;
-		}
-	}
-
 	$dstHosts = API::Host()->get(array(
 		'output' => array('hostid', 'host', 'status'),
 		'selectInterfaces' => array('interfaceid', 'type', 'main'),
@@ -437,10 +480,11 @@ function get_item_by_itemid($itemid) {
 function get_item_by_itemid_limited($itemid) {
 	$row = DBfetch(DBselect(
 		'SELECT i.itemid,i.interfaceid,i.name,i.key_,i.hostid,i.delay,i.history,i.status,i.type,i.lifetime,'.
-			'i.snmp_community,i.snmp_oid,i.value_type,i.data_type,i.trapper_hosts,i.port,i.units,i.multiplier,i.delta,'.
-			'i.snmpv3_securityname,i.snmpv3_securitylevel,i.snmpv3_authprotocol,i.snmpv3_authpassphrase,i.snmpv3_privprotocol,'.
-			'i.snmpv3_privpassphrase,i.formula,i.trends,i.logtimefmt,i.valuemapid,i.delay_flex,i.params,i.ipmi_sensor,i.templateid,'.
-			'i.authtype,i.username,i.password,i.publickey,i.privatekey,i.flags,i.filter,i.description,i.inventory_link'.
+			'i.snmp_community,i.snmp_oid,i.value_type,i.data_type,i.trapper_hosts,i.port,i.units,i.multiplier,'.
+			'i.delta,i.snmpv3_contextname,i.snmpv3_securityname,i.snmpv3_securitylevel,i.snmpv3_authprotocol,'.
+			'i.snmpv3_authpassphrase,i.snmpv3_privprotocol,i.snmpv3_privpassphrase,i.formula,i.trends,i.logtimefmt,'.
+			'i.valuemapid,i.delay_flex,i.params,i.ipmi_sensor,i.templateid,i.authtype,i.username,i.password,'.
+			'i.publickey,i.privatekey,i.flags,i.filter,i.description,i.inventory_link'.
 		' FROM items i'.
 		' WHERE i.itemid='.$itemid));
 	if ($row) {
@@ -801,7 +845,7 @@ function get_item_data_overview_cells(&$table_row, &$ithosts, $hostname) {
 				? array(SPACE, new CImg('images/general/tick.png', 'ack'))
 				: null;
 		}
-		$value = formatItemValue($ithosts[$hostname]);
+		$value = formatItemLastValue($ithosts[$hostname]);
 
 		$it_ov_menu = array(
 			array(_('Values'), null, null, array('outer' => array('pum_oheader'), 'inner' => array('pum_iheader'))),
@@ -926,45 +970,96 @@ function delete_trends_by_itemid($itemIds) {
  * First format the value according to the configuration of the item. Then apply the value mapping to the formatted (!)
  * value.
  *
- * @param array		$item
- * @param string	$unknownString	the text to be used if the item has no data
- * @param bool		$ellipsis		text will be cutted and ellipsis "..." added if set to true
+ * @param type      $item
+ * @param int       $item['value_type']     type of the value: ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64, ...
+ * @param mixed     $item['lastvalue']      value of item
+ * @param mixed     $item['lastclock']      time when last value had stored
+ * @param string    $item['units']          units of item
+ * @param int       $item['valuemapid']     id of mapping set of values
+ * @param string    $unknownString          the text to be used if the item has no data
+ * @param bool		$ellipsis		        text will be cut and ellipsis "..." added if set to true
  *
  * @return string
  */
-function formatItemValue(array $item, $unknownString = '-', $ellipsis = true) {
+function formatItemLastValue(array $item, $unknownString = '-', $ellipsis = true) {
 	if (!isset($item['lastvalue']) || $item['lastclock'] == 0) {
 		return $unknownString;
 	}
 
+	$mapping = false;
 	$value = formatItemValueType($item);
 
-	if ($item['value_type'] == ITEM_VALUE_TYPE_STR
-			|| $item['value_type'] == ITEM_VALUE_TYPE_TEXT
-			|| $item['value_type'] == ITEM_VALUE_TYPE_LOG) {
+	switch ($item['value_type']) {
+		case ITEM_VALUE_TYPE_STR:
+			$mapping = getMappedValue($value, $item['valuemapid']);
+			// break; is not missing here
+		case ITEM_VALUE_TYPE_TEXT:
+		case ITEM_VALUE_TYPE_LOG:
+			if ($ellipsis && zbx_strlen($value) > 20) {
+				$value = zbx_substr($value, 0, 20).'...';
+			}
 
-		$mapping = getMappedValue($value, $item['valuemapid']);
+			if ($mapping !== false) {
+				$value = $mapping.' ('.$value.')';
+			}
+			break;
+		default:
+			$value = applyValueMap($value, $item['valuemapid']);
+	}
+	return $value;
+}
 
-		if ($ellipsis && zbx_strlen($value) > 20) {
-			$value = zbx_substr($value, 0, 20).'...';
-		}
-		$value = nbsp(htmlspecialchars($value));
+/**
+ * Retrieves from DB historical data for items and applies functional calculations.
+ * If fore some reasons fails, returns UNRESOLVED_MACRO_STRING.
+ *
+ * @param type $item
+ * @param type $item['value_type'] type of item, allowed: ITEM_VALUE_TYPE_FLOAT and ITEM_VALUE_TYPE_UINT64
+ * @param type $item['itemid'] id of item
+ * @param type $item['units'] units of item
+ * @param type $function function to apply to time period from param, allowed: min, max and avg
+ * @param type $param formatted parameter for function, example: "2w" meaning 2 weeks
+ *
+ * @return string item functional value from history
+ */
+function getItemFunctionalValue($item, $function, $param) {
+	// check whether function is allowed
+	if (!in_array($function, array('min', 'max', 'avg'))) {
+		return UNRESOLVED_MACRO_STRING;
+	}
 
-		if ($mapping !== false) {
-			$value = $mapping.' ('.$value.')';
-		}
+	// allowed item types for min, max and avg function
+	$historyTables = array(ITEM_VALUE_TYPE_FLOAT => 'history', ITEM_VALUE_TYPE_UINT64 => 'history_uint');
+
+	if (!isset($historyTables[$item['value_type']])) {
+		return UNRESOLVED_MACRO_STRING;
 	}
 	else {
-		$value = applyValueMap($value, $item['valuemapid']);
+		// search for item function data in DB corresponding history table
+		$result = DBselect(
+			'SELECT '.$function.'(value) AS value'.
+			' FROM '.$historyTables[$item['value_type']].
+			' WHERE clock>'.(time() - convertFunctionValue($param)).
+			' AND itemid='.$item['itemid'].
+			' HAVING COUNT(*)>0' // necessary because DBselect() return 0 if empty data set, for graph templates
+		);
+		if ($row = DBfetch($result)) {
+			return convert_units($row['value'], $item['units']);
+		}
+		// no data in history
+		else {
+			return UNRESOLVED_MACRO_STRING;
+		}
 	}
-
-	return $value;
 }
 
 /**
  * Format item lastvalue depending on it's value type.
  *
  * @param array $item
+ * @param int $item['value_type'] type of the value: ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64, ...
+ * @param mixed $item['lastvalue'] value of item
+ * @param string $item['units'] units of item
  *
  * @return string
  */

@@ -326,7 +326,7 @@ class CHost extends CHostGeneral {
 					'SELECT NULL'.
 					' FROM items i'.
 					' WHERE h.hostid=i.hostid'.
-						' AND i.status IN ('.ITEM_STATUS_ACTIVE.','.ITEM_STATUS_NOTSUPPORTED.')'.
+						' AND i.status='.ITEM_STATUS_ACTIVE.
 						' AND i.lastvalue IS NOT NULL'.
 					')';
 		}
@@ -663,6 +663,11 @@ class CHost extends CHostGeneral {
 			}
 
 			if (isset($host['inventory']) && !empty($host['inventory'])) {
+
+				if (isset($host['inventory_mode']) && $host['inventory_mode'] == HOST_INVENTORY_DISABLED) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot set inventory fields for disabled inventory.'));
+				}
+
 				$fields = array_keys($host['inventory']);
 				foreach ($fields as $field) {
 					if (!in_array($field, $inventoryFields)) {
@@ -995,28 +1000,31 @@ class CHost extends CHostGeneral {
 	}
 
 	/**
-	 * Mass update hosts
+	 * Mass update hosts.
 	 *
-	 * @param array $hosts multidimensional array with Hosts data
-	 * @param array  $hosts ['hosts'] Array of Host objects to update
-	 * @param string $hosts ['fields']['host'] Host name.
-	 * @param array  $hosts ['fields']['groupids'] HostGroup IDs add Host to.
-	 * @param int    $hosts ['fields']['port'] Port. OPTIONAL
-	 * @param int    $hosts ['fields']['status'] Host Status. OPTIONAL
-	 * @param int    $hosts ['fields']['useip'] Use IP. OPTIONAL
-	 * @param string $hosts ['fields']['dns'] DNS. OPTIONAL
-	 * @param string $hosts ['fields']['ip'] IP. OPTIONAL
-	 * @param int    $hosts ['fields']['proxy_hostid'] Proxy Host ID. OPTIONAL
-	 * @param int    $hosts ['fields']['ipmi_authtype'] IPMI authentication type. OPTIONAL
-	 * @param int    $hosts ['fields']['ipmi_privilege'] IPMI privilege. OPTIONAL
-	 * @param string $hosts ['fields']['ipmi_username'] IPMI username. OPTIONAL
-	 * @param string $hosts ['fields']['ipmi_password'] IPMI password. OPTIONAL
+	 * @param array  $hosts								multidimensional array with Hosts data
+	 * @param array  $hosts['hosts']					Array of Host objects to update
+	 * @param string $hosts['fields']['host']			Host name.
+	 * @param array  $hosts['fields']['groupids']		HostGroup IDs add Host to.
+	 * @param int    $hosts['fields']['port']			Port. OPTIONAL
+	 * @param int    $hosts['fields']['status']			Host Status. OPTIONAL
+	 * @param int    $hosts['fields']['useip']			Use IP. OPTIONAL
+	 * @param string $hosts['fields']['dns']			DNS. OPTIONAL
+	 * @param string $hosts['fields']['ip']				IP. OPTIONAL
+	 * @param int    $hosts['fields']['proxy_hostid']	Proxy Host ID. OPTIONAL
+	 * @param int    $hosts['fields']['ipmi_authtype']	IPMI authentication type. OPTIONAL
+	 * @param int    $hosts['fields']['ipmi_privilege']	IPMI privilege. OPTIONAL
+	 * @param string $hosts['fields']['ipmi_username']	IPMI username. OPTIONAL
+	 * @param string $hosts['fields']['ipmi_password']	IPMI password. OPTIONAL
 	 *
 	 * @return boolean
 	 */
 	public function massUpdate($data) {
 		$hosts = zbx_toArray($data['hosts']);
-		$hostids = zbx_objectValues($hosts, 'hostid');
+		$inputHostIds = zbx_objectValues($hosts, 'hostid');
+		$hostids = array_unique($inputHostIds);
+
+		sort($hostids);
 
 		$updHosts = $this->get(array(
 			'hostids' => $hostids,
@@ -1074,32 +1082,32 @@ class CHost extends CHostGeneral {
 
 		if (isset($data['groups'])) {
 			$updateGroups = $data['groups'];
-			unset($data['groups']);
 		}
 
 		if (isset($data['interfaces'])) {
 			$updateInterfaces = $data['interfaces'];
-			unset($data['interfaces']);
 		}
 
 		if (isset($data['templates_clear'])) {
 			$updateTemplatesClear = zbx_toArray($data['templates_clear']);
-			unset($data['templates_clear']);
 		}
 
 		if (isset($data['templates'])) {
 			$updateTemplates = $data['templates'];
-			unset($data['templates']);
 		}
 
 		if (isset($data['macros'])) {
 			$updateMacros = $data['macros'];
-			unset($data['macros']);
 		}
 
-		if (isset($data['inventory'])) {
+		// second check is necessary, because import incorrectly inputs unset 'inventory' as empty string rather than null
+		if (isset($data['inventory']) && $data['inventory']) {
 			$updateInventory = $data['inventory'];
-			unset($data['inventory']);
+			$updateInventory['inventory_mode'] = null;
+
+			if (isset($data['inventory_mode']) && $data['inventory_mode'] == HOST_INVENTORY_DISABLED) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot set inventory fields for disabled inventory.'));
+			}
 		}
 
 		if (isset($data['inventory_mode'])) {
@@ -1107,21 +1115,20 @@ class CHost extends CHostGeneral {
 				$updateInventory = array();
 			}
 			$updateInventory['inventory_mode'] = $data['inventory_mode'];
-			unset($data['inventory_mode']);
 		}
 
 		if (isset($data['status'])) {
 			$updateStatus = $data['status'];
-			unset($data['status']);
 		}
 
-		unset($data['hosts']);
+		unset($data['hosts'], $data['groups'], $data['interfaces'], $data['templates_clear'], $data['templates'],
+			$data['macros'], $data['inventory'], $data['inventory_mode'], $data['status']);
+
 		if (!zbx_empty($data)) {
-			$update = array(
+			DB::update('hosts', array(
 				'values' => $data,
 				'where' => array('hostid' => $hostids)
-			);
-			DB::update('hosts', $update);
+			));
 		}
 
 		if (isset($updateStatus)) {
@@ -1148,7 +1155,7 @@ class CHost extends CHostGeneral {
 
 			$groupidsToDel = array_diff($hostGroupids, $newGroupids);
 
-			if (!empty($groupidsToDel)) {
+			if ($groupidsToDel) {
 				$result = $this->massRemove(array(
 					'hostids' => $hostids,
 					'groupids' => $groupidsToDel
@@ -1182,13 +1189,9 @@ class CHost extends CHostGeneral {
 
 		if (isset($updateTemplatesClear)) {
 			$templateidsClear = zbx_objectValues($updateTemplatesClear, 'templateid');
-			if (!empty($updateTemplatesClear)) {
-				$this->massRemove(
-					array(
-						'hostids' => $hostids,
-						'templateids_clear' => $templateidsClear
-					)
-				);
+
+			if ($updateTemplatesClear) {
+				$this->massRemove(array('hostids' => $hostids, 'templateids_clear' => $templateidsClear));
 			}
 		}
 		else {
@@ -1211,7 +1214,7 @@ class CHost extends CHostGeneral {
 			$templatesToDel = array_diff($hostTemplateids, $newTemplateids);
 			$templatesToDel = array_diff($templatesToDel, $templateidsClear);
 
-			if (!empty($templatesToDel)) {
+			if ($templatesToDel) {
 				$result = $this->massRemove(array(
 					'hostids' => $hostids,
 					'templateids' => $templatesToDel
@@ -1252,8 +1255,23 @@ class CHost extends CHostGeneral {
 			}
 			else {
 				$hostsWithInventories = array();
-				$existingInventoriesDb = DBselect('SELECT hostid FROM host_inventory WHERE '.dbConditionInt('hostid', $hostids));
-				while ($existingInventory = DBfetch($existingInventoriesDb)) {
+				$existingInventoriesDb = DBfetchArrayAssoc(DBselect(
+					'SELECT hostid'.
+					' FROM host_inventory'.
+					' WHERE '.dbConditionInt('hostid', $hostids)
+				), 'hostid');
+
+				// check for hosts with disabled inventory mode
+				if ($updateInventory['inventory_mode'] === null && count($existingInventoriesDb) !== count($hostids)) {
+					foreach ($hostids as $hostId) {
+						if (!isset($existingInventoriesDb[$hostId])) {
+							$host = get_host_by_hostid($hostId);
+							self::exception(ZBX_API_ERROR_PARAMETERS,
+								_s('Inventory disabled for host "%s".', $host['host']));
+						}
+					}
+				}
+				foreach ($existingInventoriesDb as $existingInventory) {
 					$hostsWithInventories[] = $existingInventory['hostid'];
 				}
 
@@ -1320,7 +1338,7 @@ class CHost extends CHostGeneral {
 			}
 		}
 
-		return array('hostids' => $hostids);
+		return array('hostids' => $inputHostIds);
 	}
 
 	/**

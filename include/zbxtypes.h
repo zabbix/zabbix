@@ -129,4 +129,9 @@
 
 #define ZBX_CONST_STRING(str) ""str
 
+typedef struct {
+	zbx_uint64_t	lo;
+	zbx_uint64_t	hi;
+} zbx_uint128_t;
+
 #endif
