@@ -1198,11 +1198,11 @@ class testFormItemPrototype extends CWebTest {
 
 		$this->assertEquals($oldHashItems, DBhash($sqlItems));
 	}
-*/
+
 	// Returns create data
 	public static function create() {
 		return array(
-		/*	array(
+			array(
 				array(
 					'expected' => ITEM_GOOD,
 					'name' => 'Checksum of $1',
