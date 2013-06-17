@@ -1500,7 +1500,6 @@ class CChart extends CGraphDraw {
 			// marker Y coordinate
 			$posY = $this->sizeY + $this->shiftY - $this->gridStepX[GRAPH_YAXIS_SIDE_LEFT] * $i + 4;
 
-			// only draw the marker if it doesn't overlay the previous one
 			imageText(
 				$this->im,
 				8,
@@ -1639,10 +1638,8 @@ class CChart extends CGraphDraw {
 			$str = convert_units($val, $units, ITEM_CONVERT_NO_UNITS, $byteStep, $newPow);
 
 			// marker Y coordinate
-			$dims = imageTextSize(8, 0, $str);
 			$posY = $this->sizeY + $this->shiftY - $this->gridStepX[GRAPH_YAXIS_SIDE_RIGHT] * $i + 4;
 
-			// only draw the marker if it doesn't overlay the previous one
 			imageText(
 				$this->im,
 				8,
