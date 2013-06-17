@@ -1242,13 +1242,6 @@
 			$data['alreadyPopulated'] = zbx_toHash($data['alreadyPopulated'], 'inventory_link');
 		}
 
-		// host groups
-		$data['hostGroups'] = API::HostGroup()->get(array(
-			'editable' => true,
-			'output' => API_OUTPUT_EXTEND
-		));
-		order_result($data['hostGroups'], 'name');
-
 		// template
 		$data['is_template'] = isTemplate($data['hostid']);
 
