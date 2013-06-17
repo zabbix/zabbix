@@ -93,10 +93,8 @@ $tranStrings = array(
 		'S_NOW_SMALL' => _('now'),
 		'S_YEAR_SHORT' => _x('y', 'year short'),
 		'S_MONTH_SHORT' => _x('m', 'month short'),
-		'S_WEEK_SHORT' => _x('w', 'week short'),
 		'S_DAY_SHORT' => _x('d', 'day short'),
 		'S_HOUR_SHORT' => _x('h', 'hour short'),
-		'S_MINUTE_SHORT' => _x('m', 'minute short'),
 		'S_DATE_FORMAT' => FILTER_TIMEBAR_DATE_FORMAT
 	),
 	'functions.js' => array(
@@ -185,6 +183,12 @@ $tranStrings = array(
 		'Edit service' => _('Edit service'),
 		'Delete service' => _('Delete service'),
 		'Delete the selected service?' => _('Delete the selected service?')
+	),
+	'multiselect.js' => array(
+		'No matches found' => _('No matches found'),
+		'More matches found...' => _('More matches found...'),
+		'type here to search' => _('type here to search'),
+		'new' => _('new')
 	)
 );
 

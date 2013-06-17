@@ -97,37 +97,42 @@ $data = array(
 $from = zbxDateToTime($data['stime']);
 $till = $from + $effectivePeriod;
 
-// get alerts
-$options = array(
-	'time_from' => $from,
-	'time_till' => $till,
-	'output' => API_OUTPUT_EXTEND,
-	'selectMediatypes' => API_OUTPUT_EXTEND,
-	'sortfield' => 'alertid',
-	'sortorder' => ZBX_SORT_DOWN,
-	'limit' => $config['search_limit'] + 1
-);
-if (!empty($data['alias'])) {
+// filter by user
+if ($data['alias']) {
 	$users = API::User()->get(array(
+		'output' => array('userid'),
 		'filter' => array('alias' => $data['alias'])
 	));
-	$options['userids'] = zbx_objectValues($users, 'userid');
+	$user = reset($users);
 }
-$data['alerts'] = API::Alert()->get($options);
+
+// fetch alerts for different objects and sources and combine them in a single stream
+foreach (eventSourceObjects() as $eventSource) {
+	$data['alerts'] = array_merge($data['alerts'], API::Alert()->get(array(
+		'output' => API_OUTPUT_EXTEND,
+		'selectMediatypes' => API_OUTPUT_EXTEND,
+		'userids' => ($data['alias']) ? $user['userid'] : null,
+		'time_from' => $from,
+		'time_till' => $till,
+		'eventsource' => $eventSource['source'],
+		'eventobject' => $eventSource['object'],
+		'limit' => $config['search_limit'] + 1
+	)));
+}
+CArrayHelper::sort($data['alerts'], array(
+	array('field' => 'alertid', 'order' => ZBX_SORT_DOWN)
+));
+$data['alerts'] = array_slice($data['alerts'], 0, $config['search_limit'] + 1);
 
 // get paging
 $data['paging'] = getPagingLine($data['alerts']);
 
-// get timeline
-unset($options['userids'], $options['time_from'], $options['time_till'], $options['selectMediatypes']);
-$options['limit'] = 1;
-$options['sortorder'] = ZBX_SORT_UP;
-$firstAlert = API::Alert()->get($options);
-$firstAlert = reset($firstAlert);
+// fetch the year of the first alert
+$firstAlert = DBfetch(DBselect('SELECT MIN(a.clock) AS clock FROM alerts a'));
 
 $data['timeline'] = array(
 	'period' => $effectivePeriod,
-	'starttime' => date(TIMESTAMP_FORMAT, !empty($firstAlert) ? $firstAlert['clock'] : time() - SEC_PER_HOUR),
+	'starttime' => date(TIMESTAMP_FORMAT, ($firstAlert) ? $firstAlert['clock'] : time() - SEC_PER_HOUR),
 	'usertime' => isset($data['stime']) ? date(TIMESTAMP_FORMAT, zbxDateToTime($data['stime']) + $effectivePeriod) : null
 );
 

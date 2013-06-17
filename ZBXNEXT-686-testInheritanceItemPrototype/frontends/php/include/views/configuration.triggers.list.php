@@ -35,13 +35,22 @@ if (!empty($this->data['hostid'])) {
 $createForm = new CForm('get');
 $createForm->cleanItems();
 $createForm->addVar('hostid', $this->data['hostid']);
+
 if (!empty($this->data['parent_discoveryid'])) {
 	$createForm->addItem(new CSubmit('form', _('Create trigger prototype')));
 	$createForm->addVar('parent_discoveryid', $this->data['parent_discoveryid']);
 	$triggersWidget->addPageHeader(_('CONFIGURATION OF TRIGGER PROTOTYPES'), $createForm);
 }
 else {
-	$createForm->addItem(new CSubmit('form', _('Create trigger')));
+	if (empty($this->data['hostid'])) {
+		$createButton = new CSubmit('form', _('Create trigger (select host first)'));
+		$createButton->setEnabled(false);
+		$createForm->addItem($createButton);
+	}
+	else {
+		$createForm->addItem(new CSubmit('form', _('Create trigger')));
+	}
+
 	$triggersWidget->addPageHeader(_('CONFIGURATION OF TRIGGERS'), $createForm);
 }
 
@@ -117,10 +126,18 @@ foreach ($this->data['triggers'] as $tnum => $trigger) {
 
 			if (!empty($this->data['parent_discoveryid'])) {
 				$tpl_disc_ruleid = get_realrule_by_itemid_and_hostid($this->data['parent_discoveryid'], $real_host['hostid']);
-				$description[] = new CLink($real_host['name'], 'trigger_prototypes.php?hostid='.$real_host['hostid'].'&parent_discoveryid='.$tpl_disc_ruleid, 'unknown');
+				$description[] = new CLink(
+					CHtml::encode($real_host['name']),
+					'trigger_prototypes.php?hostid='.$real_host['hostid'].'&parent_discoveryid='.$tpl_disc_ruleid,
+					'unknown'
+				);
 			}
 			else {
-				$description[] = new CLink($real_host['name'], 'triggers.php?hostid='.$real_host['hostid'], 'unknown');
+				$description[] = new CLink(
+					CHtml::encode($real_host['name']),
+					'triggers.php?hostid='.$real_host['hostid'],
+					'unknown'
+				);
 			}
 			$description[] = NAME_DELIMITER;
 		}
@@ -128,11 +145,20 @@ foreach ($this->data['triggers'] as $tnum => $trigger) {
 
 	if (empty($this->data['parent_discoveryid'])) {
 		if (!empty($trigger['discoveryRule'])) {
-			$description[] = new CLink($trigger['discoveryRule']['name'], 'trigger_prototypes.php?hostid='.$this->data['hostid'].'&parent_discoveryid='.$trigger['discoveryRule']['itemid'], 'gold');
+			$description[] = new CLink(
+				CHtml::encode($trigger['discoveryRule']['name']),
+				'trigger_prototypes.php'.
+					'?hostid='.$this->data['hostid'].
+					'&parent_discoveryid='.$trigger['discoveryRule']['itemid'],
+				'gold'
+			);
 			$description[] = NAME_DELIMITER.$trigger['description'];
 		}
 		else {
-			$description[] = new CLink($trigger['description'], 'triggers.php?form=update&hostid='.$this->data['hostid'].'&triggerid='.$triggerid);
+			$description[] = new CLink(
+				CHtml::encode($trigger['description']),
+				'triggers.php?form=update&hostid='.$this->data['hostid'].'&triggerid='.$triggerid
+			);
 		}
 
 		$dependencies = $trigger['dependencies'];
@@ -143,21 +169,24 @@ foreach ($this->data['triggers'] as $tnum => $trigger) {
 
 				$db_hosts = get_hosts_by_triggerid($dep_trigger['triggerid']);
 				while ($host = DBfetch($db_hosts)) {
-					$description[] = $host['name'];
+					$description[] = CHtml::encode($host['name']);
 					$description[] = ', ';
 				}
 				array_pop($description);
 				$description[] = NAME_DELIMITER;
-				$description[] = $dep_trigger['description'];
+				$description[] = CHtml::encode($dep_trigger['description']);
 			}
 		}
 	}
 	else {
-		$description[] = new CLink($trigger['description'], 'trigger_prototypes.php?form=update&hostid='.$this->data['hostid'].'&parent_discoveryid='.$this->data['parent_discoveryid'].'&triggerid='.$triggerid);
-	}
-
-	if ($trigger['value_flags'] == TRIGGER_VALUE_FLAG_NORMAL) {
-		$trigger['error'] = '';
+		$description[] = new CLink(
+			CHtml::encode($trigger['description']),
+			'trigger_prototypes.php'.
+				'?form=update'.
+				'&hostid='.$this->data['hostid'].
+				'&parent_discoveryid='.$this->data['parent_discoveryid'].
+				'&triggerid='.$triggerid
+		);
 	}
 
 	$templated = false;
@@ -166,12 +195,15 @@ foreach ($this->data['triggers'] as $tnum => $trigger) {
 	}
 
 	if (empty($this->data['parent_discoveryid'])) {
-		if (!zbx_empty($trigger['error']) && !$templated) {
-			$error = new CDiv(SPACE, 'status_icon iconerror');
-			$error->setHint($trigger['error'], '', 'on');
-		}
-		else {
-			$error = new CDiv(SPACE, 'status_icon iconok');
+		$error = '';
+		if ($trigger['status'] == TRIGGER_STATUS_ENABLED) {
+			if (!zbx_empty($trigger['error']) && !$templated) {
+				$error = new CDiv(SPACE, 'status_icon iconerror');
+				$error->setHint($trigger['error'], '', 'on');
+			}
+			else {
+				$error = new CDiv(SPACE, 'status_icon iconok');
+			}
 		}
 	}
 	else {
@@ -180,16 +212,20 @@ foreach ($this->data['triggers'] as $tnum => $trigger) {
 
 	$status = '';
 	if (!empty($this->data['parent_discoveryid'])) {
-		$status_link = 'trigger_prototypes.php?go='.($trigger['status'] == TRIGGER_STATUS_DISABLED ? 'activate' : 'disable').'&hostid='.$this->data['hostid'].'&g_triggerid='.$triggerid.'&parent_discoveryid='.$this->data['parent_discoveryid'];
+		$status = new CLink(
+			triggerIndicator($trigger['status']),
+			'trigger_prototypes.php?go='.($trigger['status'] == TRIGGER_STATUS_DISABLED ? 'activate' : 'disable').
+				'&hostid='.$this->data['hostid'].'&g_triggerid='.$triggerid.'&parent_discoveryid='.$this->data['parent_discoveryid'],
+			triggerIndicatorStyle($trigger['status'])
+		);
 	}
 	else {
-		$status_link = 'triggers.php?go='.($trigger['status'] == TRIGGER_STATUS_DISABLED ? 'activate' : 'disable').'&hostid='.$this->data['hostid'].'&g_triggerid='.$triggerid;
-	}
-	if ($trigger['status'] == TRIGGER_STATUS_DISABLED) {
-		$status = new CLink(_('Disabled'), $status_link, 'disabled');
-	}
-	elseif ($trigger['status'] == TRIGGER_STATUS_ENABLED) {
-		$status = new CLink(_('Enabled'), $status_link, 'enabled');
+		$status = new CLink(
+			triggerIndicator($trigger['status'], $trigger['state']),
+			'triggers.php?go='.($trigger['status'] == TRIGGER_STATUS_DISABLED ? 'activate' : 'disable').
+				'&hostid='.$this->data['hostid'].'&g_triggerid='.$triggerid,
+			triggerIndicatorStyle($trigger['status'], $trigger['state'])
+		);
 	}
 
 	$hosts = null;

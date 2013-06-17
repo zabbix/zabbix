@@ -18,10 +18,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-
 define('ZABBIX_VERSION',     '2.1.0');
 define('ZABBIX_API_VERSION', '2.1.0');
-define('ZABBIX_DB_VERSION',	 2010034);
+define('ZABBIX_DB_VERSION',	 2010086);
 
 define('ZABBIX_COPYRIGHT_FROM', '2001');
 define('ZABBIX_COPYRIGHT_TO',   '2013');
@@ -49,6 +48,8 @@ define('ZBX_MAX_IMAGE_SIZE', 1048576); // 1024 * 1024
 define('ZBX_UNITS_ROUNDOFF_THRESHOLD',		0.01);
 define('ZBX_UNITS_ROUNDOFF_UPPER_LIMIT',	2);
 define('ZBX_UNITS_ROUNDOFF_LOWER_LIMIT',	6);
+
+define('ZBX_PRECISION_10',	10);
 
 define('ZBX_DEFAULT_INTERVAL', '1-7,00:00-24:00');
 
@@ -200,7 +201,7 @@ define('CONDITION_TYPE_DSERVICE_PORT',		9);
 define('CONDITION_TYPE_DSTATUS',			10);
 define('CONDITION_TYPE_DUPTIME',			11);
 define('CONDITION_TYPE_DVALUE',				12);
-define('CONDITION_TYPE_HOST_TEMPLATE',		13);
+define('CONDITION_TYPE_TEMPLATE',			13);
 define('CONDITION_TYPE_EVENT_ACKNOWLEDGED',	14);
 define('CONDITION_TYPE_APPLICATION',		15);
 define('CONDITION_TYPE_MAINTENANCE',		16);
@@ -210,6 +211,8 @@ define('CONDITION_TYPE_DCHECK',				19);
 define('CONDITION_TYPE_PROXY',				20);
 define('CONDITION_TYPE_DOBJECT',			21);
 define('CONDITION_TYPE_HOST_NAME',			22);
+define('CONDITION_TYPE_EVENT_TYPE',			23);
+define('CONDITION_TYPE_HOST_METADATA',		24);
 
 define('CONDITION_OPERATOR_EQUAL',		0);
 define('CONDITION_OPERATOR_NOT_EQUAL',	1);
@@ -219,6 +222,14 @@ define('CONDITION_OPERATOR_IN',			4);
 define('CONDITION_OPERATOR_MORE_EQUAL',	5);
 define('CONDITION_OPERATOR_LESS_EQUAL',	6);
 define('CONDITION_OPERATOR_NOT_IN',		7);
+
+// event type action condition values
+define('EVENT_TYPE_ITEM_NOTSUPPORTED',		0);
+define('EVENT_TYPE_ITEM_NORMAL',			1);
+define('EVENT_TYPE_LLDRULE_NOTSUPPORTED',	2);
+define('EVENT_TYPE_LLDRULE_NORMAL',			3);
+define('EVENT_TYPE_TRIGGER_UNKNOWN',		4);
+define('EVENT_TYPE_TRIGGER_NORMAL',			5);
 
 define('HOST_STATUS_MONITORED',		0);
 define('HOST_STATUS_NOT_MONITORED',	1);
@@ -333,7 +344,7 @@ define('ITEM_TYPE_CALCULATED',		15);
 define('ITEM_TYPE_JMX',				16);
 
 define('ITEM_VALUE_TYPE_FLOAT',		0);
-define('ITEM_VALUE_TYPE_STR',		1);
+define('ITEM_VALUE_TYPE_STR',		1); // aka Character
 define('ITEM_VALUE_TYPE_LOG',		2);
 define('ITEM_VALUE_TYPE_UINT64',	3);
 define('ITEM_VALUE_TYPE_TEXT',		4);
@@ -357,6 +368,9 @@ define('ZBX_ICON_PREVIEW_WIDTH',	24);
 define('ITEM_STATUS_ACTIVE',		0);
 define('ITEM_STATUS_DISABLED',		1);
 define('ITEM_STATUS_NOTSUPPORTED',	3);
+
+define('ITEM_STATE_NORMAL',			0);
+define('ITEM_STATE_NOTSUPPORTED',	1);
 
 define('ITEM_TYPE_SNMPTRAP', 17);
 
@@ -413,8 +427,8 @@ define('TRIGGER_VALUE_FALSE',	0);
 define('TRIGGER_VALUE_TRUE',	1);
 define('TRIGGER_VALUE_UNKNOWN', 2); // only in "events" table
 
-define('TRIGGER_VALUE_FLAG_NORMAL',		0);
-define('TRIGGER_VALUE_FLAG_UNKNOWN',	1);
+define('TRIGGER_STATE_NORMAL',	0);
+define('TRIGGER_STATE_UNKNOWN',	1);
 
 define('TRIGGER_VALUE_CHANGED_NO',	0);
 define('TRIGGER_VALUE_CHANGED_YES', 1);
@@ -456,7 +470,8 @@ define('ACTION_DEFAULT_MSG_TRIGGER', "Trigger: {TRIGGER.NAME}\nTrigger status: {
 		"Trigger severity: {TRIGGER.SEVERITY}\nTrigger URL: {TRIGGER.URL}\n\nItem values:\n\n".
 		"1. {ITEM.NAME1} ({HOST.NAME1}:{ITEM.KEY1}): {ITEM.VALUE1}\n".
 		"2. {ITEM.NAME2} ({HOST.NAME2}:{ITEM.KEY2}): {ITEM.VALUE2}\n".
-		"3. {ITEM.NAME3} ({HOST.NAME3}:{ITEM.KEY3}): {ITEM.VALUE3}"
+		"3. {ITEM.NAME3} ({HOST.NAME3}:{ITEM.KEY3}): {ITEM.VALUE3}\n\n".
+		"Original event ID: {EVENT.ID}"
 );
 define('ACTION_DEFAULT_MSG_AUTOREG', "Host name: {HOST.HOST}\nHost IP: {HOST.IP}\nAgent port: {HOST.PORT}");
 define('ACTION_DEFAULT_MSG_DISCOVERY', "Discovery rule: {DISCOVERY.RULE.NAME}\n\nDevice IP:{DISCOVERY.DEVICE.IPADDRESS}\n".
@@ -514,6 +529,7 @@ define('SCREEN_RESOURCE_EVENTS',			13);
 define('SCREEN_RESOURCE_HOSTGROUP_TRIGGERS',14);
 define('SCREEN_RESOURCE_SYSTEM_STATUS',		15);
 define('SCREEN_RESOURCE_HOST_TRIGGERS',		16);
+// used in Monitoring > Latest data > Graph (history.php)
 define('SCREEN_RESOURCE_HISTORY',			17);
 define('SCREEN_RESOURCE_CHART',				18);
 
@@ -638,7 +654,7 @@ define('PERM_RES_DATA_ARRAY',	2);
 define('RESOURCE_TYPE_NODE',	0);
 define('RESOURCE_TYPE_GROUP',	1);
 
-define('PARAM_TYPE_TIME',	0);
+define('PARAM_TYPE_TIME',		0);
 define('PARAM_TYPE_COUNTS',		1);
 
 define('ZBX_NODE_CHILD',	0);
@@ -671,13 +687,17 @@ define('EVENTS_NOFALSEFORB_STATUS_ALL',		0); // used with TRIGGERS_OPTION_NOFALS
 define('EVENTS_NOFALSEFORB_STATUS_FALSE',	1); // used with TRIGGERS_OPTION_NOFALSEFORB
 define('EVENTS_NOFALSEFORB_STATUS_TRUE',	2); // used with TRIGGERS_OPTION_NOFALSEFORB
 
-define('EVENT_SOURCE_TRIGGERS',			0);
-define('EVENT_SOURCE_DISCOVERY',		1);
-define('EVENT_SOURCE_AUTO_REGISTRATION',2);
+define('EVENT_SOURCE_TRIGGERS',				0);
+define('EVENT_SOURCE_DISCOVERY',			1);
+define('EVENT_SOURCE_AUTO_REGISTRATION',	2);
+define('EVENT_SOURCE_INTERNAL', 			3);
 
-define('EVENT_OBJECT_TRIGGER',		0);
-define('EVENT_OBJECT_DHOST',		1);
-define('EVENT_OBJECT_DSERVICE',		2);
+define('EVENT_OBJECT_TRIGGER',			0);
+define('EVENT_OBJECT_DHOST',			1);
+define('EVENT_OBJECT_DSERVICE',			2);
+define('EVENT_OBJECT_AUTOREGHOST',		3);
+define('EVENT_OBJECT_ITEM',				4);
+define('EVENT_OBJECT_LLDRULE',			5);
 
 define('GRAPH_YAXIS_TYPE_CALCULATED',	0);
 define('GRAPH_YAXIS_TYPE_FIXED',		1);
@@ -799,6 +819,37 @@ define('ZBX_PREG_FUNCTION_FORMAT', '([a-z]+(\('.ZBX_PREG_PARAMS.'\)))');
 define('ZBX_PREG_MACRO_NAME_FORMAT', '(\{[A-Z\.]+\})');
 define('ZBX_PREG_EXPRESSION_SIMPLE_MACROS', '(\{TRIGGER\.VALUE\})');
 define('ZBX_PREG_EXPRESSION_USER_MACROS', '(\{\$'.ZBX_PREG_MACRO_NAME.'\})');
+
+// !!! should be used with "x" modifier
+define('ZBX_PREG_ITEM_KEY_PARAMETER_FORMAT', '(
+	(?P>param) # match recursive parameter group
+	|
+	(\" # match quoted string
+		(
+			((\\\\)+?[^\\\\]) # match any amount of backslash with non-backslash ending
+			|
+			[^\"\\\\] # match any character except \ or "
+		)*? # match \" or any character except "
+	\")
+	|
+	[^\"\[\],][^,\]]*? #match unquoted string - any character except " [ ] and , at begining and any character except , and ] afterwards
+	|
+	() # match empty and only empty part
+)');
+define('ZBX_PREG_ITEM_KEY_FORMAT', '([0-9a-zA-Z_\. \-]+? # match key
+(?<param>( # name parameter group used in recursion
+	\[ # match opening bracket
+		(
+			\s*?'.ZBX_PREG_ITEM_KEY_PARAMETER_FORMAT .' # match spaces and parameter
+			(
+				\s*?,\s*? # match spaces, comma and spaces
+				'.ZBX_PREG_ITEM_KEY_PARAMETER_FORMAT .' # match parameter
+			)*? # match spaces, comma, spaces, parameter zero or more times
+			\s*? #matches spaces
+		)
+	\] # match closing bracket
+))*? # matches non comma seperated brackets with parameters zero or more times
+)');
 
 // regexp ids
 define('ZBX_KEY_ID',		1);

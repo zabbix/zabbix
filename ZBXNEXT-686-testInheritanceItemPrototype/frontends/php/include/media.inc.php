@@ -39,16 +39,4 @@ function media_type2str($type = null) {
 		return _('Unknown');
 	}
 }
-
-function media_severity2str($severity) {
-	$result = array();
-	foreach (getSeverityCaption() as $i => $caption) {
-		$style = ($severity & (1 << $i)) ? 'enabled' : null;
-
-		$result[$i] = new CSpan(zbx_substr($caption, 0, 1), $style);
-		$result[$i]->setHint($caption.' ('.(isset($map['style']) ? 'on' : 'off').')');
-	}
-
-	return $result;
-}
 ?>

@@ -19,6 +19,7 @@
 
 #include "common.h"
 #include "sysinfo.h"
+#include "zbxjson.h"
 
 #include <sys/sockio.h>
 
@@ -276,4 +277,38 @@ int	NET_IF_COLLISIONS(AGENT_REQUEST *request, AGENT_RESULT *result)
 	SET_UI64_RESULT(result, icollisions);
 
 	return SYSINFO_RET_OK;
+}
+
+int	NET_IF_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
+{
+	int			ret = SYSINFO_RET_FAIL, i;
+	struct zbx_json		j;
+	struct if_nameindex	*interfaces;
+
+	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
+
+	zbx_json_addarray(&j, ZBX_PROTO_TAG_DATA);
+
+	if (NULL != (interfaces = if_nameindex()))
+	{
+		i = 0;
+
+		while (0 != interfaces[i].if_index)
+		{
+			zbx_json_addobject(&j, NULL);
+			zbx_json_addstring(&j, "{#IFNAME}", interfaces[i].if_name, ZBX_JSON_TYPE_STRING);
+			zbx_json_close(&j);
+			i++;
+		}
+
+		ret = SYSINFO_RET_OK;
+	}
+
+	zbx_json_close(&j);
+
+	SET_STR_RESULT(result, strdup(j.buffer));
+
+	zbx_json_free(&j);
+
+	return ret;
 }

@@ -23,7 +23,7 @@
 #include "common.h"
 #include "db.h"
 
-int	check_action_condition(DB_EVENT *event, DB_CONDITION *condition);
-void    process_actions(DB_EVENT *event);
+int	check_action_condition(const DB_EVENT *event, DB_CONDITION *condition);
+void	process_actions(const DB_EVENT *events, size_t events_num);
 
 #endif
