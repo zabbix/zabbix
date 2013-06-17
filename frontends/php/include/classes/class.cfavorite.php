@@ -78,6 +78,14 @@ class CFavorite {
 			return true;
 		}
 
+		// add to cache only if cache is created
+		if (isset(self::$cache[$idx])) {
+			self::$cache[$idx][] = array(
+				'value' => $favid,
+				'source' => $favobj
+			);
+		}
+
 		DBstart();
 		$values = array(
 			'profileid' => get_dbid('profiles', 'profileid'),
@@ -88,14 +96,6 @@ class CFavorite {
 		);
 		if (!is_null($favobj)) {
 			$values['source'] = zbx_dbstr($favobj);
-		}
-
-		// add to cache only if cache is created
-		if (isset(self::$cache[$idx])) {
-			self::$cache[$idx][] = array(
-				'value' => $values['idx'],
-				'source' => (isset($values['source']) ? $values['source'] : null)
-			);
 		}
 
 		return DBend(DBexecute('INSERT INTO profiles ('.implode(', ', array_keys($values)).') VALUES ('.implode(', ', $values).')'));
@@ -112,11 +112,11 @@ class CFavorite {
 	 */
 	public static function remove($idx, $favid = 0, $favobj = null) {
 
-		// empty cahce, we know that all $idx values will be removed in DELETE
+		// empty cache, we know that all $idx values will be removed in DELETE
 		if ($favid == 0 && $favobj === null) {
 			self::$cache[$idx] = array();
 		}
-		// remove from cahche, cache will be rebuilded upon get()
+		// remove from cache, cache will be rebuilt upon get()
 		else {
 			self::$cache[$idx] = null;
 		}
@@ -131,7 +131,7 @@ class CFavorite {
 	}
 
 	/**
-	 * Cheks whether favorite value exists.
+	 * Checks whether favorite value exists.
 	 *
 	 * @param string $idx    identifier of favorite value group
 	 * @param int    $favid  value id

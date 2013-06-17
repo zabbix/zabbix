@@ -74,7 +74,7 @@ class CApplication extends CZBXAPI {
 			'search'					=> null,
 			'searchByAny'				=> null,
 			'startSearch'				=> null,
-			'exludeSearch'				=> null,
+			'excludeSearch'				=> null,
 			'searchWildcardsEnabled'	=> null,
 			// output
 			'output'					=> API_OUTPUT_REFER,
@@ -181,12 +181,11 @@ class CApplication extends CZBXAPI {
 
 		// inherited
 		if (!is_null($options['inherited'])) {
-			if ($options['inherited']) {
-				$sqlParts['where'][] = 'a.templateid IS NOT NULL';
-			}
-			else {
-				$sqlParts['where'][] = 'a.templateid IS NULL';
-			}
+			$sqlParts['where'][] = ($options['inherited'] ? '' : 'NOT').' EXISTS ('.
+				'SELECT NULL'.
+				' FROM application_template at'.
+				' WHERE a.applicationid=at.applicationid'.
+			')';
 		}
 
 		// search
@@ -316,7 +315,7 @@ class CApplication extends CZBXAPI {
 
 		foreach ($applications as &$application) {
 			if (!check_db_fields($itemDbFields, $application)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function'));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
 			}
 
 			// check permissions by hostid
@@ -346,8 +345,8 @@ class CApplication extends CZBXAPI {
 
 			// check on operating with templated applications
 			if ($delete || $update) {
-				if ($dbApplications[$application['applicationid']]['templateid'] != 0) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot interact templated applications');
+				if ($dbApplications[$application['applicationid']]['templateids']) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot update templated applications.'));
 				}
 			}
 
@@ -437,53 +436,44 @@ class CApplication extends CZBXAPI {
 				if (!isset($delApplications[$applicationid])) {
 					self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 				}
-				if ($delApplications[$applicationid]['templateid'] != 0) {
-					self::exception(ZBX_API_ERROR_PERMISSIONS, 'Cannot delete templated application.');
+				if ($delApplications[$applicationid]['templateids']) {
+					self::exception(ZBX_API_ERROR_PERMISSIONS, _('Cannot delete templated application.'));
 				}
 			}
 		}
 
-		$parentApplicationids = $applicationids;
-		$childApplicationids = array();
-		do {
-			$dbApplications = DBselect('SELECT a.applicationid FROM applications a WHERE '.dbConditionInt('a.templateid', $parentApplicationids));
-			$parentApplicationids = array();
-			while ($dbApplication = DBfetch($dbApplications)) {
-				$parentApplicationids[] = $dbApplication['applicationid'];
-				$childApplicationids[$dbApplication['applicationid']] = $dbApplication['applicationid'];
-			}
-		} while (!empty($parentApplicationids));
+		$appManager = new CApplicationManager();
 
-		$options = array(
-			'applicationids' => $childApplicationids,
+		// fetch application children
+		$childApplicationIds = array();
+		$parentApplicationIds = $applicationids;
+		while ($parentApplicationIds) {
+			$parentApplicationIds = $appManager->fetchExclusiveChildIds($parentApplicationIds);
+			foreach ($parentApplicationIds as $appId) {
+				$childApplicationIds[$appId] = $appId;
+			}
+		}
+
+		// filter children that can be deleted
+		if ($childApplicationIds) {
+			$childApplicationIds = $appManager->fetchEmptyIds($childApplicationIds);
+		}
+
+		$childApplications = $this->get(array(
+			'applicationids' => $childApplicationIds,
 			'output' => API_OUTPUT_EXTEND,
 			'nopermissions' => true,
 			'preservekeys' => true,
 			'selectHosts' => array('name', 'hostid')
-		);
-		$delApplicationChilds = $this->get($options);
-		$delApplications = zbx_array_merge($delApplications, $delApplicationChilds);
-		$applicationids = array_merge($applicationids, $childApplicationids);
+		));
 
-		// check if app is used by web scenario
-		$sql = 'SELECT ht.name,ht.applicationid'.
-				' FROM httptest ht'.
-				' WHERE '.dbConditionInt('ht.applicationid', $applicationids);
-		$res = DBselect($sql);
-		if ($info = DBfetch($res)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Application "%1$s" used by scenario "%2$s" and can\'t be deleted.', $delApplications[$info['applicationid']]['name'], $info['name']));
-		}
-
-		DB::delete('applications', array('applicationid' => $applicationids));
+		$appManager->delete(array_merge($applicationids, $childApplicationIds));
 
 		// TODO: remove info from API
-		foreach ($delApplications as $delApplication) {
+		foreach (zbx_array_merge($delApplications, $childApplications) as $delApplication) {
 			$host = reset($delApplication['hosts']);
 			info(_s('Deleted: Application "%1$s" on "%2$s".', $delApplication['name'], $host['name']));
 		}
-
-		// remove Monitoring > Latest data toggle profile values related to given aplications
-		CProfile::delete('web.latest.toggle', $delApplicationIds);
 
 		return array('applicationids' => $delApplicationIds);
 	}
@@ -547,7 +537,7 @@ class CApplication extends CZBXAPI {
 				' AND '.dbConditionInt('ia.applicationid', $applicationids)
 		);
 		while ($pair = DBfetch($linkedDb)) {
-			$linked[$pair['applicationid']] = array($pair['itemid'] => $pair['itemid']);
+			$linked[$pair['applicationid']][$pair['itemid']] = true;
 		}
 		$appsInsert = array();
 		foreach ($applicationids as $applicationid) {
@@ -579,7 +569,7 @@ class CApplication extends CZBXAPI {
 				}
 				$result = $this->massAdd(array('items' => $child, 'applications' => $childApplications));
 				if (!$result) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot add items.');
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot add items.'));
 				}
 			}
 		}
@@ -607,6 +597,22 @@ class CApplication extends CZBXAPI {
 
 	protected function addRelatedObjects(array $options, array $result) {
 		$result = parent::addRelatedObjects($options, $result);
+
+		// add application templates
+		if ($this->outputIsRequested('templateids', $options['output'])) {
+			$query = DBselect(
+				'SELECT at.application_templateid,at.applicationid,at.templateid'.
+					' FROM application_template at'.
+					' WHERE '.dbConditionInt('at.applicationid', array_keys($result))
+			);
+			$relationMap = new CRelationMap();
+			$templateApplications = array();
+			while ($templateApplication = DBfetch($query)) {
+				$relationMap->addRelation($templateApplication['applicationid'], $templateApplication['application_templateid']);
+				$templateApplications[$templateApplication['application_templateid']] = $templateApplication['templateid'];
+			}
+			$result = $relationMap->mapMany($result, $templateApplications, 'templateids');
+		}
 
 		// adding hosts
 		if ($options['selectHosts'] !== null && $options['selectHosts'] != API_OUTPUT_COUNT) {

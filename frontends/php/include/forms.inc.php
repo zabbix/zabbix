@@ -281,35 +281,37 @@
 		return $rightsFormList;
 	}
 
-	function prepare_subfilter_output($data, $subfilter, $subfilter_name) {
-		$output = array();
+	function prepareSubfilterOutput($data, $subfilter, $subfilterName) {
 		order_result($data, 'name');
+
+		$output = array();
+
 		foreach ($data as $id => $element) {
-			// subfilter is activated
+			$element['name'] = nbsp(CHtml::encode($element['name']));
+
+			// is activated
 			if (str_in_array($id, $subfilter)) {
-				$span = new CSpan($element['name'].' ('.$element['count'].')', 'subfilter_enabled');
-				$script = CHtml::encode('javascript: create_var("zbx_filter", '.CJs::encodeJson($subfilter_name.'['.$id.']').', null, true);');
-				$span->onClick($script);
+				$span = new CSpan($element['name'].SPACE.'('.$element['count'].')', 'subfilter_enabled');
+				$span->onClick(CHtml::encode('javascript: create_var("zbx_filter", '.CJs::encodeJson($subfilterName.'['.$id.']').', null, true);'));
 				$output[] = $span;
 			}
-			// subfilter isn't activated
+
+			// isn't activated
 			else {
-				$script = CHtml::encode('javascript: create_var("zbx_filter", '.CJs::encodeJson($subfilter_name.'['.$id.']').', '.CJs::encodeJson($id).', true);');
+				$script = CHtml::encode('javascript: create_var("zbx_filter", '.CJs::encodeJson($subfilterName.'['.$id.']').', '.CJs::encodeJson($id).', true);');
 
 				// subfilter has 0 items
 				if ($element['count'] == 0) {
-					$span = new CSpan($element['name'].' ('.$element['count'].')', 'subfilter_inactive');
+					$span = new CSpan($element['name'].SPACE.'('.$element['count'].')', 'subfilter_inactive');
 					$span->onClick($script);
 					$output[] = $span;
 				}
 				else {
 					// this level has no active subfilters
-					if (empty($subfilter)) {
-						$nspan = new CSpan(' ('.$element['count'].')', 'subfilter_active');
-					}
-					else {
-						$nspan = new CSpan(' (+'.$element['count'].')', 'subfilter_active');
-					}
+					$nspan = empty($subfilter)
+						? new CSpan(SPACE.'('.$element['count'].')', 'subfilter_active')
+						: new CSpan(SPACE.'(+'.$element['count'].')', 'subfilter_active');
+
 					$span = new CSpan($element['name'], 'subfilter_disabled');
 					$span->onClick($script);
 
@@ -317,15 +319,18 @@
 					$output[] = $nspan;
 				}
 			}
-			$output[] = ' , ';
+
+			$output[] = ', ';
 		}
+
 		array_pop($output);
+
 		return $output;
 	}
 
 	function getItemFilterForm(&$items) {
-		$filter_group				= $_REQUEST['filter_group'];
-		$filter_hostname			= $_REQUEST['filter_hostname'];
+		$filter_groupId				= $_REQUEST['filter_groupid'];
+		$filter_hostId				= $_REQUEST['filter_hostid'];
 		$filter_application			= $_REQUEST['filter_application'];
 		$filter_name				= $_REQUEST['filter_name'];
 		$filter_type				= $_REQUEST['filter_type'];
@@ -358,7 +363,6 @@
 		$form = new CForm('get');
 		$form->setAttribute('name', 'zbx_filter');
 		$form->setAttribute('id', 'zbx_filter');
-		$form->addVar('filter_hostid', get_request('filter_hostid', get_request('hostid', 0)));
 		$form->addVar('subfilter_hosts', $subfilter_hosts);
 		$form->addVar('subfilter_apps', $subfilter_apps);
 		$form->addVar('subfilter_types', $subfilter_types);
@@ -495,41 +499,77 @@
 		$portField->setEnabled('no');
 
 		// row 1
+		$groupFilter = null;
+		if (!empty($filter_groupId)) {
+			$getHostInfo = API::HostGroup()->get(array(
+				'groupids' => $filter_groupId,
+				'output' => array('name')
+			));
+			$getHostInfo = reset($getHostInfo);
+			if (!empty($getHostInfo)) {
+				$groupFilter[] = array(
+					'id' => $getHostInfo['groupid'],
+					'name' => $getHostInfo['name']
+				);
+			}
+		}
+
 		$table->addRow(array(
 			new CCol(bold(_('Host group').NAME_DELIMITER), 'label col1'),
 			new CCol(array(
-				new CTextBox('filter_group', $filter_group, ZBX_TEXTBOX_FILTER_SIZE),
-				new CButton('btn_group', _('Select'),
-					'return PopUp("popup.php?srctbl=host_group&srcfld1=name'.
-						'&dstfrm='.$form->getName().'&dstfld1=filter_group", 450, 450);',
-					'G'
-				)
+				new CMultiSelect(array(
+						'name' => 'filter_groupid',
+						'selectedLimit' => 1,
+						'objectName' => 'hostGroup',
+						'objectOptions' => array(
+							'editable' => true
+						),
+						'data' => $groupFilter
+				))
 			), 'col1'),
 			new CCol(bold(_('Type').NAME_DELIMITER), 'label col2'),
 			new CCol($cmbType, 'col2'),
 			new CCol(bold(_('Type of information').NAME_DELIMITER), 'label col3'),
 			new CCol($cmbValType, 'col3'),
-			new CCol(bold(_('Status').NAME_DELIMITER), 'label col4'),
-			new CCol($cmbStatus, 'col4')
-		));
+			new CCol(bold(_('State').NAME_DELIMITER), 'label'),
+			new CCol($cmbState, 'col4')
+		), 'item-list-row');
 		// row 2
+		$hostFilterData = null;
+		if (!empty($filter_hostId)) {
+			$getHostInfo = API::Host()->get(array(
+				'hostids' => $filter_hostId,
+				'output' => array('name')
+			));
+			$getHostInfo = reset($getHostInfo);
+			if (!empty($getHostInfo)) {
+				$hostFilterData[] = array(
+					'id' => $getHostInfo['hostid'],
+					'name' => $getHostInfo['name']
+				);
+			}
+		}
+
 		$table->addRow(array(
 			new CCol(bold(_('Host').NAME_DELIMITER), 'label'),
 			new CCol(array(
-				new CTextBox('filter_hostname', $filter_hostname, ZBX_TEXTBOX_FILTER_SIZE),
-				new CButton('btn_host', _('Select'),
-					'return PopUp("popup.php?srctbl=hosts_and_templates&srcfld1=hostid&srcfld2=name'.
-					'&dstfrm='.$form->getName().'&dstfld1=filter_hostid&dstfld2=filter_hostname'.
-					'&group=" + jQuery("#filter_group").val(), 450, 450);', 'H'
-				)
-			)),
+				new CMultiSelect(array(
+						'name' => 'filter_hostid',
+						'selectedLimit' => 1,
+						'objectName' => 'hosts',
+						'objectOptions' => array(
+							'editable' => true
+						),
+						'data' => $hostFilterData
+				))
+			), 'col1'),
 			new CCol($updateIntervalLabel, 'label'),
 			new CCol($updateIntervalInput),
 			new CCol($dataTypeLabel, 'label'),
 			new CCol($dataTypeInput),
-			new CCol(bold(_('State').NAME_DELIMITER), 'label'),
-			new CCol($cmbState, 'col4')
-		));
+			new CCol(bold(_('Status').NAME_DELIMITER), 'label col4'),
+			new CCol($cmbStatus, 'col4')
+		), 'item-list-row');
 		// row 3
 		$table->addRow(array(
 			new CCol(bold(_('Application').NAME_DELIMITER), 'label'),
@@ -538,11 +578,11 @@
 				new CButton('btn_app', _('Select'),
 					'return PopUp("popup.php?srctbl=applications&srcfld1=name'.
 						'&dstfrm='.$form->getName().'&dstfld1=filter_application'.
-						'&with_applications=1&host=" + jQuery("#filter_hostname").val()'
+						'&with_applications=1&hostid=" + jQuery("input[name=\'filter_hostid\']").val()'
 						.', 550, 450, "application");',
-					'A'
+					'filter-select-button'
 				)
-			)),
+			), 'col1'),
 			new CCol(array($snmpCommunityLabel, $snmpSecurityLabel), 'label'),
 			new CCol(array($snmpCommunityField, $snmpSecurityField)),
 			new CCol(array(bold(_('Keep history')), SPACE._('(in days)').NAME_DELIMITER), 'label'),
@@ -553,11 +593,11 @@
 				1 => _('With triggers'),
 				0 => _('Without triggers')
 			)))
-		));
+		), 'item-list-row');
 		// row 4
 		$table->addRow(array(
 			new CCol(array(bold(_('Name')), SPACE._('like').NAME_DELIMITER), 'label'),
-			new CCol(new CTextBox('filter_name', $filter_name, ZBX_TEXTBOX_FILTER_SIZE)),
+			new CCol(new CTextBox('filter_name', $filter_name, ZBX_TEXTBOX_FILTER_SIZE), 'col1'),
 			new CCol($snmpOidLabel, 'label'),
 			new CCol($snmpOidField),
 			new CCol(array(bold(_('Keep trends')), SPACE._('(in days)').NAME_DELIMITER), 'label'),
@@ -568,18 +608,18 @@
 				1 => _('Templated items'),
 				0 => _('Not Templated items'),
 			)))
-		));
+		), 'item-list-row');
 		// row 5
 		$table->addRow(array(
 			new CCol(array(bold(_('Key')), SPACE._('like').NAME_DELIMITER), 'label'),
-			new CCol(new CTextBox('filter_key', $filter_key, ZBX_TEXTBOX_FILTER_SIZE)),
+			new CCol(new CTextBox('filter_key', $filter_key, ZBX_TEXTBOX_FILTER_SIZE), 'col1'),
 			new CCol($portLabel, 'label'),
 			new CCol($portField),
 			new CCol(null, 'label'),
 			new CCol(),
 			new CCol(null, 'label'),
 			new CCol()
-		));
+		), 'item-list-row');
 
 		$reset = new CButton('reset', _('Reset'), "javascript: clearAllForm('zbx_filter');");
 		$reset->useJQueryStyle();
@@ -616,7 +656,7 @@
 		// generate array with values for subfilters of selected items
 		foreach ($items as $item) {
 			// hosts
-			if (zbx_empty($filter_hostname)) {
+			if (zbx_empty($filter_hostId)) {
 				$host = reset($item['hosts']);
 
 				if (!isset($item_params['hosts'][$host['hostid']])) {
@@ -847,63 +887,64 @@
 		}
 
 		// output
-		if (zbx_empty($filter_hostname) && count($item_params['hosts']) > 1) {
-			$hosts_output = prepare_subfilter_output($item_params['hosts'], $subfilter_hosts, 'subfilter_hosts');
+		if (zbx_empty($filter_hostId) && count($item_params['hosts']) > 1) {
+			$hosts_output = prepareSubfilterOutput($item_params['hosts'], $subfilter_hosts, 'subfilter_hosts');
 			$table_subfilter->addRow(array(_('Hosts'), $hosts_output));
 		}
 
 		if (!empty($item_params['applications']) && count($item_params['applications']) > 1) {
-			$application_output = prepare_subfilter_output($item_params['applications'], $subfilter_apps, 'subfilter_apps');
+			$application_output = prepareSubfilterOutput($item_params['applications'], $subfilter_apps, 'subfilter_apps');
 			$table_subfilter->addRow(array(_('Applications'), $application_output));
 		}
 
 		if ($filter_type == -1 && count($item_params['types']) > 1) {
-			$type_output = prepare_subfilter_output($item_params['types'], $subfilter_types, 'subfilter_types');
+			$type_output = prepareSubfilterOutput($item_params['types'], $subfilter_types, 'subfilter_types');
 			$table_subfilter->addRow(array(_('Types'), $type_output));
 		}
 
 		if ($filter_value_type == -1 && count($item_params['value_types']) > 1) {
-			$value_types_output = prepare_subfilter_output($item_params['value_types'], $subfilter_value_types, 'subfilter_value_types');
+			$value_types_output = prepareSubfilterOutput($item_params['value_types'], $subfilter_value_types, 'subfilter_value_types');
 			$table_subfilter->addRow(array(_('Type of information'), $value_types_output));
 		}
 
 		if ($filter_status == -1 && count($item_params['status']) > 1) {
-			$status_output = prepare_subfilter_output($item_params['status'], $subfilter_status, 'subfilter_status');
+			$status_output = prepareSubfilterOutput($item_params['status'], $subfilter_status, 'subfilter_status');
 			$table_subfilter->addRow(array(_('Status'), $status_output));
 		}
 
 		if ($filter_state == -1 && count($item_params['state']) > 1) {
-			$state_output = prepare_subfilter_output($item_params['state'], $subfilter_state, 'subfilter_state');
+			$state_output = prepareSubfilterOutput($item_params['state'], $subfilter_state, 'subfilter_state');
 			$table_subfilter->addRow(array(_('State'), $state_output));
 		}
 
 		if ($filter_templated_items == -1 && count($item_params['templated_items']) > 1) {
-			$templated_items_output = prepare_subfilter_output($item_params['templated_items'], $subfilter_templated_items, 'subfilter_templated_items');
+			$templated_items_output = prepareSubfilterOutput($item_params['templated_items'], $subfilter_templated_items, 'subfilter_templated_items');
 			$table_subfilter->addRow(array(_('Template'), $templated_items_output));
 		}
 
 		if ($filter_with_triggers == -1 && count($item_params['with_triggers']) > 1) {
-			$with_triggers_output = prepare_subfilter_output($item_params['with_triggers'], $subfilter_with_triggers, 'subfilter_with_triggers');
+			$with_triggers_output = prepareSubfilterOutput($item_params['with_triggers'], $subfilter_with_triggers, 'subfilter_with_triggers');
 			$table_subfilter->addRow(array(_('With triggers'), $with_triggers_output));
 		}
 
 		if (zbx_empty($filter_history) && count($item_params['history']) > 1) {
-			$history_output = prepare_subfilter_output($item_params['history'], $subfilter_history, 'subfilter_history');
+			$history_output = prepareSubfilterOutput($item_params['history'], $subfilter_history, 'subfilter_history');
 			$table_subfilter->addRow(array(_('History'), $history_output));
 		}
 
 		if (zbx_empty($filter_trends) && (count($item_params['trends']) > 1)) {
-			$trends_output = prepare_subfilter_output($item_params['trends'], $subfilter_trends, 'subfilter_trends');
+			$trends_output = prepareSubfilterOutput($item_params['trends'], $subfilter_trends, 'subfilter_trends');
 			$table_subfilter->addRow(array(_('Trends'), $trends_output));
 		}
 
 		if (zbx_empty($filter_delay) && $filter_type != ITEM_TYPE_TRAPPER && count($item_params['interval']) > 1) {
-			$interval_output = prepare_subfilter_output($item_params['interval'], $subfilter_interval, 'subfilter_interval');
+			$interval_output = prepareSubfilterOutput($item_params['interval'], $subfilter_interval, 'subfilter_interval');
 			$table_subfilter->addRow(array(_('Interval'), $interval_output));
 		}
 
 		$form->addItem(new CDiv(_('Subfilter [affects only filtered data!]'), 'thin_header'));
 		$form->addItem($table_subfilter);
+
 		return $form;
 	}
 
@@ -950,6 +991,7 @@
 			'applications' => get_request('applications', array()),
 			'delay_flex' => get_request('delay_flex', array()),
 			'new_delay_flex' => get_request('new_delay_flex', array('delay' => 50, 'period' => ZBX_DEFAULT_INTERVAL)),
+			'snmpv3_contextname' => get_request('snmpv3_contextname', ''),
 			'snmpv3_securityname' => get_request('snmpv3_securityname', ''),
 			'snmpv3_securitylevel' => get_request('snmpv3_securitylevel', 0),
 			'snmpv3_authprotocol' => get_request('snmpv3_authprotocol', ITEM_AUTHPROTOCOL_MD5),
@@ -986,7 +1028,7 @@
 			$data['hostid'] = $discoveryRule['hostid'];
 		}
 		else {
-			$data['hostid'] = get_request('form_hostid', get_request('hostid', 0));
+			$data['hostid'] = get_request('hostid', 0);
 		}
 
 		// types, http items only for internal processes
@@ -1037,6 +1079,7 @@
 				if (!empty($item)) {
 					$host = reset($item['hosts']);
 					if (!empty($item['hosts'])) {
+						$host['name'] = CHtml::encode($host['name']);
 						if (bccomp($data['itemid'], $itemid) == 0) {
 						}
 						// discovery rule
@@ -1074,7 +1117,7 @@
 		}
 
 		// hostname
-		if (empty($data['hostname'])) {
+		if (empty($data['is_discovery_rule']) && empty($data['hostname'])) {
 			if (!empty($data['hostid'])) {
 				$hostInfo = API::Host()->get(array(
 					'hostids' => $data['hostid'],
@@ -1107,6 +1150,7 @@
 			$data['multiplier'] = $data['item']['multiplier'];
 			$data['hostid'] = $data['item']['hostid'];
 			$data['params'] = $data['item']['params'];
+			$data['snmpv3_contextname'] = $data['item']['snmpv3_contextname'];
 			$data['snmpv3_securityname'] = $data['item']['snmpv3_securityname'];
 			$data['snmpv3_securitylevel'] = $data['item']['snmpv3_securitylevel'];
 			$data['snmpv3_authprotocol'] = $data['item']['snmpv3_authprotocol'];
@@ -1340,7 +1384,11 @@
 						$link = 'triggers.php?form=update&triggerid='.$db_triggers['triggerid'].'&hostid='.$db_triggers['hostid'];
 					}
 
-					$data['templates'][] = new CLink($db_triggers['name'], $link, 'highlight underline weight_normal');
+					$data['templates'][] = new CLink(
+						CHtml::encode($db_triggers['name']),
+						$link,
+						'highlight underline weight_normal'
+					);
 					$data['templates'][] = SPACE.RARR.SPACE;
 				}
 				$tmp_triggerid = $db_triggers['templateid'];
