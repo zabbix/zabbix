@@ -274,6 +274,7 @@ frontends/php/tests/selenium/testFormItemPrototype.php -text
 frontends/php/tests/selenium/testInheritanceDiscoveryRule.php -text
 frontends/php/tests/selenium/testInheritanceGraph.php -text
 frontends/php/tests/selenium/testInheritanceItem.php -text
+frontends/php/tests/selenium/testInheritanceItemPrototype.php -text
 frontends/php/tests/selenium/testInheritanceTrigger.php -text
 include/module.h -text
 include/zbxmodules.h -text
