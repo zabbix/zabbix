@@ -306,37 +306,69 @@
 
 		// host group
 		if (object.target == 'hostGroup') {
-			object.object = 'groupid';
-			object.opcommand_grpid = jQuery(objectForm).find('input[name="opCmdId"]').val();
-			object.groupid = jQuery(objectForm).find('input[name="opCmdTargetObjectName"]').val();
-			object.name = jQuery(objectForm).find('input[name="opCmdTargetObjectName"]').data('name');
+			var values = jQuery('#opCmdTargetObject').multiSelect.getData();
 
-			if (empty(object.name)) {
+			object.opcommand_grpid = jQuery(objectForm).find('input[name="opCmdId"]').val();
+
+			if (empty(values)) {
 				alert(<?php echo CJs::encodeJson(_('You did not specify host group for operation.')); ?>);
 
 				return true;
 			}
+			else {
+				if (object.opcommand_grpid == 'new') {
+					object['opcommand_grpid'] = null;
+				}
+				for (var key in values) {
+					var data = values[key];
 
-			if (object.opcommand_grpid == 'new') {
-				delete(object['opcommand_grpid']);
+					if (!empty(data.id)) {
+						addPopupValues({
+							object: 'groupid',
+							values: [{
+								action: object.action,
+								target: object.target,
+								opcommand_grpid: object.opcommand_grpid,
+								groupid: data.id,
+								name: data.name
+							}]
+						});
+					}
+				}
 			}
 		}
 
 		// host
 		else if (object.target == 'host') {
-			object.object = 'hostid';
-			object.opcommand_hstid = jQuery(objectForm).find('input[name="opCmdId"]').val();
-			object.hostid = jQuery(objectForm).find('input[name="opCmdTargetObjectName"]').val();
-			object.name = jQuery(objectForm).find('input[name="opCmdTargetObjectName"]').data('name');
+			var values = jQuery('#opCmdTargetObject').multiSelect.getData();
 
-			if (object.target != 'current' && empty(object.name)) {
+			object.opcommand_hstid = jQuery(objectForm).find('input[name="opCmdId"]').val();
+
+			if (object.target != 'current' && empty(values)) {
 				alert(<?php echo CJs::encodeJson(_('You did not specify host for operation.')); ?>);
 
 				return true;
 			}
+			else {
+				if (object.opcommand_hstid == 'new') {
+					object['opcommand_grpid'] = null;
+				}
+				for (var key in values) {
+					var data = values[key];
 
-			if (object.opcommand_hstid == 'new') {
-				delete(object['opcommand_hstid']);
+					if (!empty(data.id)) {
+						addPopupValues({
+							object: 'hostid',
+							values: [{
+								action: object.action,
+								target: object.target,
+								opcommand_hstid: object.opcommand_hstid,
+								hostid: data.id,
+								name: data.name
+							}]
+						});
+					}
+				}
 			}
 		}
 
@@ -350,9 +382,10 @@
 			if (object.opcommand_hstid == 'new') {
 				delete(object['opcommand_hstid']);
 			}
+
+			addPopupValues({object: object.object, values: [object]});
 		}
 
-		addPopupValues({object: object.object, values: [object]});
 		jQuery(objectForm).remove();
 	}
 
@@ -374,8 +407,7 @@
 
 			jQuery(opCmdTargetObject).multiSelectHelper({
 				objectName: (opCmdTarget == 'host') ? 'hosts' : 'hostGroup',
-				name: 'opCmdTargetObjectName',
-				selectedLimit: 1
+				name: 'opCmdTargetObjectName[]'
 			});
 		}
 	}
@@ -462,7 +494,7 @@
 		var count = jQuery('#conditionTable tr').length - 1;
 
 		if (count > 1) {
-			jQuery('#conditionRow').css('display', 'block');
+			jQuery('#conditionRow').css('display', '');
 
 			var groupOperator = '',
 				globalOperator = '',
@@ -527,6 +559,26 @@
 		}
 
 		jQuery('#dsc_templateid').multiSelect.clean();
+	}
+
+	function addDiscoveryHostGroup() {
+		var values = jQuery('#discoveryHostGroup').multiSelect.getData();
+
+		for (var key in values) {
+			var data = values[key];
+
+			if (!empty(data.id)) {
+				addPopupValues({
+					object: 'dsc_groupid',
+					values: [{
+						groupid: data.id,
+						name: data.name
+					}]
+				});
+			}
+		}
+
+		jQuery('#dsc_groupid').multiSelect.clean();
 	}
 
 	jQuery(document).ready(function() {

@@ -24,6 +24,8 @@ define('ZBX_PAGE_NO_FOOTER', 1);
 
 $request = CHtml::encode(get_request('request', ''));
 $message = CHtml::encode(get_request('message', '')) ;
+// remove debug code for login form message, trimming not in regex to relay only on [ ] in debug message.
+$message = trim(preg_replace('/\[.*\]/', '', $message));
 
 require_once dirname(__FILE__).'/../page_header.php';
 ?>

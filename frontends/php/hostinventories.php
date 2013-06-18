@@ -17,8 +17,8 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
+
 require_once dirname(__FILE__).'/include/config.inc.php';
 require_once dirname(__FILE__).'/include/hosts.inc.php';
 require_once dirname(__FILE__).'/include/forms.inc.php';
@@ -28,8 +28,7 @@ $page['file'] = 'hostinventories.php';
 $page['hist_arg'] = array('groupid', 'hostid');
 
 require_once dirname(__FILE__).'/include/page_header.php';
-?>
-<?php
+
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 $fields=array(
 	'groupid' =>	array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,	NULL),
@@ -58,8 +57,6 @@ if((PAGE_TYPE_JS == $page['type']) || (PAGE_TYPE_HTML_BLOCK == $page['type'])){
 	require_once dirname(__FILE__).'/include/page_footer.php';
 	exit();
 }
-?>
-<?php
 
 $options = array(
 	'groups' => array(
@@ -123,13 +120,13 @@ else{
 	$exactComboBox->addItem('1', _('exactly'));
 	$filter_table->addRow(array(
 		array(
-			array(bold(_('Field:')), $inventoryFieldsComboBox),
+			array(bold(_('Field')), SPACE, $inventoryFieldsComboBox),
 			array(
 				$exactComboBox,
 				new CTextBox('filter_field_value', $_REQUEST['filter_field_value'], 20)
 			),
 		),
-	));
+	), 'host-inventories');
 
 	$filter = new CButton('filter', _('Filter'), "javascript: create_var('zbx_filter', 'filter_set', '1', true);");
 	$filter->useJQueryStyle('main');
@@ -263,4 +260,3 @@ else{
 $hostinvent_wdgt->show();
 
 require_once dirname(__FILE__).'/include/page_footer.php';
-?>
