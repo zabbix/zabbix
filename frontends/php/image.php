@@ -17,8 +17,8 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
+
 require_once dirname(__FILE__).'/include/config.inc.php';
 require_once dirname(__FILE__).'/include/images.inc.php';
 
@@ -27,8 +27,7 @@ $page['title'] = _('Image');
 $page['type'] = PAGE_TYPE_IMAGE;
 
 require_once dirname(__FILE__).'/include/page_header.php';
-?>
-<?php
+
 //	VAR		TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = array(
 	'imageid' =>	array(T_ZBX_INT, O_MAND, P_SYS, DB_ID,				null),
@@ -36,8 +35,7 @@ $fields = array(
 	'height' =>		array(T_ZBX_INT, O_OPT, P_SYS,	BETWEEN(1, 2000),	null),
 );
 check_fields($fields);
-?>
-<?php
+
 $resize = false;
 if (isset($_REQUEST['width']) || isset($_REQUEST['height'])) {
 	$resize = true;
@@ -56,5 +54,4 @@ if ($resize) {
 }
 imageout($source);
 
-require_once 'include/page_footer.php';
-?>
+require_once dirname(__FILE__).'/include/page_footer.php';
