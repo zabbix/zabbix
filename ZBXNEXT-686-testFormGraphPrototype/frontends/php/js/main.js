@@ -1095,17 +1095,19 @@ function switch_mute(icon) {
 function createPlaceholders() {
 	if (IE) {
 		jQuery(document).ready(function() {
-			'use strict';
-
 			jQuery('[placeholder]').focus(function() {
-				if (jQuery(this).val() == jQuery(this).attr('placeholder')) {
-					jQuery(this).val('');
-					jQuery(this).removeClass('placeholder');
+				var obj = jQuery(this);
+
+				if (obj.val() == obj.prop('placeholder')) {
+					obj.val('');
+					obj.removeClass('placeholder');
 				}
 			}).blur(function() {
-				if (jQuery(this).val() == '' || jQuery(this).val() == jQuery(this).attr('placeholder')) {
-					jQuery(this).addClass('placeholder');
-					jQuery(this).val(jQuery(this).attr('placeholder'));
+				var obj = jQuery(this);
+
+				if (obj.val() == '' || obj.val() == obj.prop('placeholder')) {
+					obj.val(obj.prop('placeholder'));
+					obj.addClass('placeholder');
 				}
 			}).blur();
 		});

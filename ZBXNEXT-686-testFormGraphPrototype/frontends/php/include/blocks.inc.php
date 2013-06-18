@@ -48,7 +48,8 @@ function make_favorite_graphs() {
 		$options = array(
 			'graphids' => $graphids,
 			'selectHosts' => array('hostid', 'name'),
-			'output' => array('graphid', 'name')
+			'output' => array('graphid', 'name'),
+			'expandName' => true
 		);
 		$graphs = API::Graph()->get($options);
 		$graphs = zbx_toHash($graphs, 'graphid');
@@ -734,12 +735,12 @@ function make_status_of_zbx() {
 			new CSpan($status['items_count_not_supported'], 'unknown')
 		)
 	));
-	$title = new CSpan(_('Number of triggers (enabled/disabled)[problem/ok]'));
+	$title = new CSpan(_('Number of triggers (enabled/disabled) [problem/ok]'));
 	$title->setAttribute('title', _('Only triggers assigned to enabled hosts and depending on enabled items are counted'));
 	$table->addRow(array($title, $status['triggers_count'],
 		array(
 			$status['triggers_count_enabled'], ' / ',
-			$status['triggers_count_disabled'].SPACE.SPACE.'[',
+			$status['triggers_count_disabled'], ' [',
 			new CSpan($status['triggers_count_on'], 'on'), ' / ',
 			new CSpan($status['triggers_count_off'], 'off'), ']'
 		)
@@ -810,7 +811,8 @@ function make_latest_issues(array $filter = array()) {
 
 	// total trigger count
 	$options['countOutput'] = true;
-	unset($options['limit'], $options['sortfield'], $options['sortorder']);
+	// we unset withLastEventUnacknowledged and skipDependent because of performance issues
+	unset($options['limit'], $options['sortfield'], $options['sortorder'], $options['withLastEventUnacknowledged'], $options['skipDependent']);
 	$triggersTotalCount = API::Trigger()->get($options);
 
 	// get events
@@ -1154,7 +1156,8 @@ function make_graph_menu(&$menu, &$submenu) {
 	);
 	$menu['menu_graphs'][] = array(
 		_('Add').' '._('Simple graph'),
-		'javascript: PopUp(\'popup.php?srctbl=simple_graph&srcfld1=itemid&monitored_hosts=1&reference=itemid&multiselect=1\',800,450); void(0);',
+		'javascript: PopUp(\'popup.php?srctbl=items&srcfld1=itemid&monitored_hosts=1&reference=itemid'.
+			'&multiselect=1&numeric=1&templated=0&with_simple_graph_items=1\',800,450); void(0);',
 		null,
 		array('outer' => 'pum_o_submenu', 'inner' => array('pum_i_submenu'))
 	);
@@ -1190,7 +1193,8 @@ function make_graph_submenu() {
 		$options = array(
 			'graphids' => $graphids,
 			'selectHosts' => array('hostid', 'host'),
-			'output' => array('graphid', 'name')
+			'output' => array('graphid', 'name'),
+			'expandName' => true
 		);
 		$graphs = API::Graph()->get($options);
 		$graphs = zbx_toHash($graphs, 'graphid');

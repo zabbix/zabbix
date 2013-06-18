@@ -171,7 +171,7 @@ static int	split_filename(const char *filename, char **directory, char **format)
 	if (separator < filename)
 		goto out;
 
-#else/* _WINDOWS */
+#else	/* not _WINDOWS */
 	if (NULL == (separator = strrchr(filename, (int)PATH_SEPARATOR)))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "filename '%s' does not contain any path separator '%c'", filename, PATH_SEPARATOR);
@@ -198,7 +198,7 @@ static int	split_filename(const char *filename, char **directory, char **format)
 		zbx_free(*format);
 		goto out;
 	}
-#endif/* _WINDOWS */
+#endif	/* _WINDOWS */
 
 	ret = SUCCEED;
 out:
@@ -374,9 +374,10 @@ int	process_logrt(char *filename, zbx_uint64_t *lastlogsize, int *mtime, char **
 	struct stat		file_buf;
 	struct st_logfile	*logfiles = NULL;
 #ifdef _WINDOWS
-	char			*find_path = NULL;
+	char			*find_path = NULL, *file_name_utf8;
+	wchar_t			*find_wpath;
 	intptr_t		find_handle;
-	struct _finddata_t	find_data;
+	struct _wfinddata_t	find_data;
 #else
 	DIR			*dir = NULL;
 	struct dirent		*d_ent = NULL;
@@ -395,40 +396,44 @@ int	process_logrt(char *filename, zbx_uint64_t *lastlogsize, int *mtime, char **
 #ifdef _WINDOWS
 	/* try to "open" Windows directory */
 	find_path = zbx_dsprintf(find_path, "%s*", directory);
-	find_handle = _findfirst((const char *)find_path, &find_data);
-	if (-1 == find_handle)
+	find_wpath = zbx_utf8_to_unicode(find_path);
+	zbx_free(find_path);
+
+	if (-1 == (find_handle = _wfindfirst(find_wpath, &find_data)))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "cannot get entries from '%s' directory: %s", directory, zbx_strerror(errno));
 		zbx_free(directory);
 		zbx_free(format);
-		zbx_free(find_path);
+		zbx_free(find_wpath);
 		goto out;
 	}
-	zbx_free(find_path);
+	zbx_free(find_wpath);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "we are in the Windows directory reading cycle");
 	do
 	{
-		logfile_candidate = zbx_dsprintf(logfile_candidate, "%s%s", directory, find_data.name);
+		file_name_utf8 = zbx_unicode_to_utf8(find_data.name);
+		logfile_candidate = zbx_dsprintf(logfile_candidate, "%s%s", directory, file_name_utf8);
 
 		if (-1 == zbx_stat(logfile_candidate, &file_buf) || !S_ISREG(file_buf.st_mode))
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "cannot process read entry '%s'", logfile_candidate);
 		}
-		else if (NULL != zbx_regexp_match(find_data.name, format, &length))
+		else if (NULL != zbx_regexp_match(file_name_utf8, format, &length))
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "adding file '%s' to logfiles", logfile_candidate);
-			add_logfile(&logfiles, &logfiles_alloc, &logfiles_num, find_data.name, (int)file_buf.st_mtime);
+			add_logfile(&logfiles, &logfiles_alloc, &logfiles_num, file_name_utf8, (int)file_buf.st_mtime);
 		}
 		else
 			zabbix_log(LOG_LEVEL_DEBUG, "'%s' does not match '%s'", logfile_candidate, format);
 
 		zbx_free(logfile_candidate);
+		zbx_free(file_name_utf8);
 
 	}
-	while (0 == _findnext(find_handle, &find_data));
+	while (0 == _wfindnext(find_handle, &find_data));
 
-#else	/* _WINDOWS */
+#else	/* not _WINDOWS */
 	if (NULL == (dir = opendir(directory)))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot open directory '%s' for reading: %s", directory, zbx_strerror(errno));
@@ -564,7 +569,7 @@ int	process_logrt(char *filename, zbx_uint64_t *lastlogsize, int *mtime, char **
 		zabbix_log(LOG_LEVEL_WARNING, "there are no files matching '%s' in '%s'", format, directory);
 
 	free_logfiles(&logfiles, &logfiles_alloc, &logfiles_num);
-	if (0 != fd && -1 == close(fd))
+	if (0 < fd && -1 == close(fd))
 		zabbix_log(LOG_LEVEL_WARNING, "cannot close file '%s': %s", logfile_candidate, zbx_strerror(errno));
 
 #ifdef _WINDOWS

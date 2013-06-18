@@ -296,7 +296,7 @@ $severityComboBox->addItems(array(
 	TRIGGER_SEVERITY_HIGH => getSeverityCaption(TRIGGER_SEVERITY_HIGH),
 	TRIGGER_SEVERITY_DISASTER => getSeverityCaption(TRIGGER_SEVERITY_DISASTER)
 ));
-$filterForm->addRow(_('Min severity'), $severityComboBox);
+$filterForm->addRow(_('Minimum trigger severity'), $severityComboBox);
 
 $statusChangeDays = new CNumericBox('status_change_days', $_REQUEST['status_change_days'], 4);
 if (!$_REQUEST['status_change']) {
@@ -721,7 +721,10 @@ foreach ($triggers as $trigger) {
 		$config['event_ack_enable'] ? ($trigger['event_count'] == 0) : false
 	);
 
-	$lastChange = new CLink(zbx_date2str(_('d M Y H:i:s'), $trigger['lastchange']), 'events.php?triggerid='.$trigger['triggerid']);
+	$lastChangeDate = zbx_date2str(_('d M Y H:i:s'), $trigger['lastchange']);
+	$lastChange = empty($trigger['lastchange'])
+		? $lastChangeDate
+		: new CLink($lastChangeDate, 'events.php?triggerid='.$trigger['triggerid']);
 
 	// acknowledge
 	if ($config['event_ack_enable']) {
@@ -785,7 +788,7 @@ foreach ($triggers as $trigger) {
 		$statusSpan,
 		$unknown,
 		$lastChange,
-		zbx_date2age($trigger['lastchange']),
+		empty($trigger['lastchange']) ? '-' : zbx_date2age($trigger['lastchange']),
 		$showEventColumn ? SPACE : null,
 		$ackColumn,
 		get_node_name_by_elid($trigger['triggerid']),

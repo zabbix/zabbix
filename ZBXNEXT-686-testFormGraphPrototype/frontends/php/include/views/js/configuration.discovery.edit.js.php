@@ -46,6 +46,12 @@
 						<input type="text" id="key_" name="key_" value="" class="input text" size="20" maxlength="255">
 					</td>
 				</tr>
+				<tr id="newCheckContextRow" class="hidden">
+					<td><label for="snmpv3_contextname"><?php echo _('Context name'); ?></label></td>
+					<td>
+						<input type="text" id="snmpv3_contextname" name="snmpv3_contextname" value="" class="input text" size="20" maxlength="255">
+					</td>
+				</tr>
 				<tr id="newCheckSecNameRow" class="hidden">
 					<td><label for="snmpv3_securityname"><?php echo _('Security name'); ?></label></td>
 					<td><input type="text" id="snmpv3_securityname" name="snmpv3_securityname" value=""
@@ -426,6 +432,7 @@
 		toggleInputs('newCheckCommunityRow', isset(dcheckType, comRowTypes));
 		toggleInputs('newCheckSecNameRow', isset(dcheckType, secNameRowTypes));
 		toggleInputs('newCheckSecLevRow', isset(dcheckType, secNameRowTypes));
+		toggleInputs('newCheckContextRow', isset(dcheckType, secNameRowTypes));
 
 		// get old type
 		var oldType = jQuery('#type').data('oldType');
@@ -521,7 +528,9 @@
 						&& (typeof(dCheck['snmpv3_securitylevel']) == 'undefined'
 							|| ZBX_CHECKLIST[zbxDcheckId]['snmpv3_securitylevel'] === dCheck['snmpv3_securitylevel'])
 						&& (typeof(dCheck['snmpv3_securityname']) == 'undefined'
-							|| ZBX_CHECKLIST[zbxDcheckId]['snmpv3_securityname'] === dCheck['snmpv3_securityname'])) {
+							|| ZBX_CHECKLIST[zbxDcheckId]['snmpv3_securityname'] === dCheck['snmpv3_securityname'])
+						&& (typeof(dCheck['snmpv3_contextname']) == 'undefined'
+							|| ZBX_CHECKLIST[zbxDcheckId]['snmpv3_contextname'] === dCheck['snmpv3_contextname'])) {
 					alert(<?php echo CJs::encodeJson(_('Check already exists.')); ?>);
 
 					return null;
