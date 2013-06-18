@@ -338,7 +338,7 @@ class testFormTriggerPrototype extends CWebTest {
 					'errors' => array(
 						'ERROR: Page received incorrect data',
 						'Warning. Incorrect value for field "Name": cannot be empty.',
-						'Warning. Incorrect value for field "expression": cannot be empty.'
+						'Warning. Incorrect value for field "Expression": cannot be empty.'
 					)
 				)
 			),
@@ -348,7 +348,7 @@ class testFormTriggerPrototype extends CWebTest {
 					'description' => 'MyTrigger',
 					'errors' => array(
 						'ERROR: Page received incorrect data',
-						'Warning. Incorrect value for field "expression": cannot be empty.'
+						'Warning. Incorrect value for field "Expression": cannot be empty.'
 					)
 				)
 			),
@@ -462,7 +462,7 @@ class testFormTriggerPrototype extends CWebTest {
 					'expression' => '{Simple form test host:someItem.uptime.last(0)}<0',
 					'errors' => array(
 						'ERROR: Cannot add trigger',
-						'Incorrect item key "someItem.uptime" provided for trigger expression on "Simple form test host".'
+						'Trigger prototype expression "{Simple form test host:someItem.uptime.last(0)}<0" must contain at least one item prototype.'
 					)
 				)
 			),
@@ -473,7 +473,7 @@ class testFormTriggerPrototype extends CWebTest {
 					'expression' => '{Simple form test host:item-prototype-reuse.somefunc(0)}<0',
 					'errors' => array(
 						'ERROR: Cannot add trigger',
-						'Cannot implode expression "{Simple form test host:item-prototype-reuse.somefunc(0)}<0". Incorrect trigger function "somefunc" provided in expression. Unknown function.'
+						'Cannot implode expression "{Simple form test host:item-prototype-reuse.somefunc(0)}<0". Incorrect trigger function "somefunc(0)" provided in expression. Unknown function.'
 					)
 				)
 			),
