@@ -496,15 +496,21 @@ class CMap extends CMapElement {
 
 			// map selement links
 			if (!empty($map['links'])) {
-				$mapSelements = zbx_toHash($map['selements'], 'selementid');
+				$selementIds = zbx_objectValues($dbMap['selements'], 'selementid');
 
 				foreach ($map['links'] as $link) {
-					if (!isset($mapSelements[$link['selementid1']])) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Link selementid1 field is pointing to a nonexistent map selement ID "%1$s" for map "%2$s".', $link['selementid1'], $dbMap['name']));
+					if (!in_array($link['selementid1'], $selementIds)) {
+						self::exception(ZBX_API_ERROR_PARAMETERS,
+							_s('Link selementid1 field is pointing to a nonexistent map selement ID "%1$s" for map "%2$s".',
+								$link['selementid1'], $dbMap['name']
+						));
 					}
 
-					if (!isset($mapSelements[$link['selementid2']])) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Link selementid2 field is pointing to a nonexistent map selement ID "%1$s" for map "%2$s".', $link['selementid2'], $dbMap['name']));
+					if (!in_array($link['selementid2'], $selementIds)) {
+						self::exception(ZBX_API_ERROR_PARAMETERS,
+							_s('Link selementid2 field is pointing to a nonexistent map selement ID "%1$s" for map "%2$s".',
+								$link['selementid2'], $dbMap['name']
+						));
 					}
 				}
 			}
