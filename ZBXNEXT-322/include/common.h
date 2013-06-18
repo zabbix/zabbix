@@ -358,6 +358,7 @@ const char	*zbx_dservice_type_string(zbx_dservice_type_t service);
 #define CONDITION_TYPE_DOBJECT			21
 #define CONDITION_TYPE_HOST_NAME		22
 #define CONDITION_TYPE_EVENT_TYPE		23
+#define CONDITION_TYPE_HOST_METADATA		24
 
 /* condition operators */
 #define CONDITION_OPERATOR_EQUAL		0
@@ -991,8 +992,6 @@ int	is_ip6(const char *ip);
 int	is_ip4(const char *ip);
 
 void	zbx_on_exit(); /* calls exit() at the end! */
-
-int	get_nodeid_by_id(zbx_uint64_t id);
 
 int	int_in_list(char *list, int value);
 int	uint64_in_list(char *list, zbx_uint64_t value);

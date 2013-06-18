@@ -75,14 +75,24 @@ require_once dirname(__FILE__).'/testFormHost.php';
 require_once dirname(__FILE__).'/testFormHostGroup.php';
 require_once dirname(__FILE__).'/testFormItem.php';
 require_once dirname(__FILE__).'/testFormTrigger.php';
+require_once dirname(__FILE__).'/testFormGraph.php';
 require_once dirname(__FILE__).'/testFormLogin.php';
 require_once dirname(__FILE__).'/testFormMap.php';
 require_once dirname(__FILE__).'/testFormUserProfile.php';
 require_once dirname(__FILE__).'/testFormScreen.php';
 require_once dirname(__FILE__).'/testFormSysmap.php';
 require_once dirname(__FILE__).'/testFormTemplate.php';
+require_once dirname(__FILE__).'/testFormDiscoveryRule.php';
+require_once dirname(__FILE__).'/testFormItemPrototype.php';
+require_once dirname(__FILE__).'/testFormTriggerPrototype.php';
 require_once dirname(__FILE__).'/testPageApplications.php';
 require_once dirname(__FILE__).'/testPageBrowserWarning.php';
+require_once dirname(__FILE__).'/testInheritanceItem.php';
+require_once dirname(__FILE__).'/testInheritanceTrigger.php';
+require_once dirname(__FILE__).'/testInheritanceGraph.php';
+require_once dirname(__FILE__).'/testInheritanceDiscoveryRule.php';
+require_once dirname(__FILE__).'/testInheritanceItemPrototype.php';
+require_once dirname(__FILE__).'/testInheritanceTriggerPrototype.php';
 require_once dirname(__FILE__).'/testTemplateInheritance.php';
 
 class SeleniumTests {
@@ -146,13 +156,23 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormHostGroup');
 		$suite->addTestSuite('testFormItem');
 		$suite->addTestSuite('testFormTrigger');
+		$suite->addTestSuite('testFormGraph');
 		$suite->addTestSuite('testFormLogin');
 		$suite->addTestSuite('testFormUserProfile');
 		$suite->addTestSuite('testFormScreen');
 		$suite->addTestSuite('testFormMap');
 		$suite->addTestSuite('testFormTemplate');
+		$suite->addTestSuite('testFormDiscoveryRule');
+		$suite->addTestSuite('testFormItemPrototype');
+		$suite->addTestSuite('testFormTriggerPrototype');
 		$suite->addTestSuite('testPageApplications');
 		$suite->addTestSuite('testPageBrowserWarning');
+		$suite->addTestSuite('testInheritanceItem');
+		$suite->addTestSuite('testInheritanceTrigger');
+		$suite->addTestSuite('testInheritanceGraph');
+		$suite->addTestSuite('testInheritanceDiscoveryRule');
+		$suite->addTestSuite('testInheritanceItemPrototype');
+		$suite->addTestSuite('testInheritanceTriggerPrototype');
 		$suite->addTestSuite('testTemplateInheritance');
 
 		return $suite;

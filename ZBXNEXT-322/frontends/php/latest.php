@@ -243,8 +243,8 @@ while($db_app = DBfetch($db_app_res)){
 	$db_appids[$db_app['applicationid']] = $db_app['applicationid'];
 }
 
-$sortField = get_request('sort', CProfile::get('web.'.$page['file'].'.sort', null));
-$sortOrder = get_request('sortorder', CProfile::get('web.'.$page['file'].'.sortorder', ZBX_SORT_UP));
+$sortField = getPageSortField();
+$sortOrder = getPageSortOrder();
 
 // if sortfield is host name
 if ($sortField == 'h.name') {
@@ -600,4 +600,4 @@ foreach ($db_hosts as $hostId => $dbHost) {
 $latest_wdgt->addItem($table);
 $latest_wdgt->show();
 
-require_once 'include/page_footer.php';
+require_once dirname(__FILE__).'/include/page_footer.php';

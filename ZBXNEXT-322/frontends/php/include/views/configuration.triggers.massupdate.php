@@ -57,7 +57,7 @@ foreach ($this->data['g_triggerid'] as $triggerid) {
 $triggersFormList = new CFormList('triggersFormList');
 
 // append severity to form list
-$severityDiv = getSeverityControl();
+$severityDiv = new CSeverity(array('name' => 'priority'));
 $severityDiv->setAttribute('id', 'priority_div');
 
 $triggersFormList->addRow(
@@ -121,8 +121,8 @@ $triggersForm->addItem($triggersTab);
 
 // append buttons to form
 $triggersForm->addItem(makeFormFooter(
-	array(new CSubmit('mass_save', _('Save'))),
-	array(new CButtonCancel(url_param('groupid').url_param('parent_discoveryid')))
+	new CSubmit('mass_save', _('Save')),
+	new CButtonCancel(url_param('groupid').url_param('parent_discoveryid'))
 ));
 
 $triggersWidget->addItem($triggersForm);

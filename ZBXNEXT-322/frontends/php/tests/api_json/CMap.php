@@ -22,6 +22,7 @@
 require_once dirname(__FILE__).'/../include/class.czabbixtest.php';
 
 class API_JSON_Map extends CZabbixTest {
+
 	public static function map_data() {
 		return array(
 			array(
@@ -36,10 +37,11 @@ class API_JSON_Map extends CZabbixTest {
 					'grid_size' => 100,
 					'grid_show' => 1,
 					'grid_align' => 0,
-					"highlight" => 0,
-					"expandproblem" => 0,
-					"markelements" => 0,
-					"show_unack" => 0,
+					'highlight' => 0,
+					'expandproblem' => 0,
+					'markelements' => 0,
+					'show_unack' => 0,
+					'severity_min' => 0,
 					'selements' => array()
 				)),
 			),
@@ -47,8 +49,8 @@ class API_JSON_Map extends CZabbixTest {
 	}
 
 	/**
-	* @dataProvider map_data
-	*/
+	 * @dataProvider map_data
+	 */
 	public function testCMap_Create($maps) {
 		$debug = null;
 
@@ -81,10 +83,8 @@ class API_JSON_Map extends CZabbixTest {
 			);
 			$map_api = reset($result['result']);
 			$this->assertTrue(array_key_exists('sysmapid', $map_api), "Chuck Norris: Map was just inserted but I failed to fetch it's ID using JSON API. Result is: ".print_r($result, true)."\nDebug: ".print_r($debug, true));
-
 		}
 
 		DBrestore_tables('sysmaps');
-
 	}
 }

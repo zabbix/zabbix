@@ -53,22 +53,6 @@ const char	*get_program_name(const char *path)
 
 /******************************************************************************
  *                                                                            *
- * Function: get_nodeid_by_id                                                 *
- *                                                                            *
- * Purpose: Get Node ID by resource ID                                        *
- *                                                                            *
- * Return value: Node ID                                                      *
- *                                                                            *
- * Author: Alexei Vladishev                                                   *
- *                                                                            *
- ******************************************************************************/
-int	get_nodeid_by_id(zbx_uint64_t id)
-{
-	return (int)(id / __UINT64_C(100000000000000)) % 1000;
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: zbx_timespec                                                     *
  *                                                                            *
  * Purpose: Gets the current time.                                            *
