@@ -91,24 +91,19 @@ $hostLocationForm->additem(array(_('Hosts location'), SPACE, $styleComboBox));
 
 $overviewWidget->addHeader($hostLocationForm);
 
-if ($this->data['pageFilter']->applicationsSelected) {
-	if ($this->data['type'] == SHOW_DATA) {
-		$dataTable = get_items_data_overview(
-			array_keys($this->data['pageFilter']->hosts),
-			$this->data['pageFilter']->application,
-			$this->data['view_style']
-		);
-	}
-	elseif ($this->data['type'] == SHOW_TRIGGERS) {
-		$dataTable = get_triggers_overview(
-			array_keys($this->data['pageFilter']->hosts),
-			$this->data['pageFilter']->application,
-			$this->data['view_style']
-		);
-	}
+if ($this->data['type'] == SHOW_DATA) {
+	$dataTable = get_items_data_overview(
+		array_keys($this->data['pageFilter']->hosts),
+		$this->data['pageFilter']->application,
+		$this->data['view_style']
+	);
 }
-else {
-	$dataTable = new CTableInfo(_('No items defined.'));
+elseif ($this->data['type'] == SHOW_TRIGGERS) {
+	$dataTable = get_triggers_overview(
+		array_keys($this->data['pageFilter']->hosts),
+		$this->data['pageFilter']->application,
+		$this->data['view_style']
+	);
 }
 
 $overviewWidget->addItem($dataTable);
