@@ -44,11 +44,18 @@ class testFormTriggerPrototype extends CWebTest {
 	protected $host = 'Simple form test host';
 
 	/**
-	 * The name of the test discovery rule created in the test data set.
+	 * The name of the form test discovery rule created in the test data set.
 	 *
 	 * @var string
 	 */
 	protected $discoveryRule = 'testFormDiscoveryRule';
+
+	/**
+	 * The name of the form test discovery rule created in the test data set.
+	 *
+	 * @var string
+	 */
+	protected $discoveryRuleTemplate = 'testInheritanceDiscoveryRule';
 
 	/**
 	 * The name of the test discovery rule key created in the test data set.
@@ -122,14 +129,85 @@ class testFormTriggerPrototype extends CWebTest {
 			array(
 				array(
 					'host' => 'Simple form test host',
-					'form' => 'testFormTriggerPrototype2',
+					'form' => 'testFormTriggerPrototype1',
 					'constructor' => 'open_close'
 				)
 			),
 			array(
 				array(
 					'host' => 'Simple form test host',
-					'form' => 'testFormTriggerPrototype3'
+					'form' => 'testFormTriggerPrototype1'
+				)
+			),
+			array(
+				array('constructor' => 'open', 'template' => 'Inheritance test template')
+			),
+			array(
+				array('constructor' => 'open_close', 'template' => 'Inheritance test template')
+			),
+			array(
+				array('constructor' => 'open', 'severity' => 'Warning', 'template' => 'Inheritance test template')
+			),
+			array(
+				array(
+					'constructor' => 'open_close',
+					'severity' => 'Disaster',
+					'template' => 'Inheritance test template'
+				)
+			),
+			array(
+				array('severity' => 'Not classified', 'template' => 'Inheritance test template')
+			),
+			array(
+				array('severity' => 'Information', 'template' => 'Inheritance test template')
+			),
+			array(
+				array('severity' => 'Warning', 'template' => 'Inheritance test template')
+			),
+			array(
+				array('severity' => 'Average', 'template' => 'Inheritance test template')
+			),
+			array(
+				array('severity' => 'High', 'template' => 'Inheritance test template')
+			),
+			array(
+				array('severity' => 'Disaster', 'template' => 'Inheritance test template')
+			),
+			array(
+				array('host' => 'Simple form test host', 'form' => 'testFormTriggerPrototype1')
+			),
+			array(
+				array('template' => 'Inheritance test template', 'form' => 'testInheritanceTriggerPrototype1')
+			),
+			array(
+				array(
+					'host' => 'Template inheritance test host',
+					'form' => 'testInheritanceTriggerPrototype1',
+					'templatedHost' => true,
+					'hostTemplate' => 'Inheritance test template'
+				)
+			),
+			array(
+				array(
+					'host' => 'Template inheritance test host',
+					'form' => 'testInheritanceTriggerPrototype1',
+					'templatedHost' => true,
+					'hostTemplate' => 'Inheritance test template'
+				)
+			),
+			array(
+				array(
+					'template' => 'Inheritance test template',
+					'form' => 'testInheritanceTriggerPrototype1',
+					'constructor' => 'open'
+				)
+			),
+			array(
+				array(
+					'host' => 'Template inheritance test host',
+					'form' => 'testInheritanceTriggerPrototype1',
+					'templatedHost' => true,
+					'constructor' => 'open'
 				)
 			)
 		);
@@ -143,19 +221,26 @@ class testFormTriggerPrototype extends CWebTest {
 		if (isset($data['template'])) {
 			$this->zbxTestLogin('templates.php');
 			$this->zbxTestClickWait('link='.$data['template']);
+			$discoveryRule = $this->discoveryRuleTemplate;
 		}
 
 		if (isset($data['host'])) {
 			$this->zbxTestLogin('hosts.php');
 			$this->zbxTestClickWait('link='.$data['host']);
+			if (!isset($data['templatedHost'])) {
+				$discoveryRule = $this->discoveryRule;
+			}
+			else {
+				$discoveryRule = $this->discoveryRuleTemplate;
+			}
 		}
 
 		$this->zbxTestClickWait('link=Discovery rules');
-		$this->zbxTestClickWait('link='.$this->discoveryRule);
+		$this->zbxTestClickWait('link='.$discoveryRule);
 		$this->zbxTestClickWait('link=Trigger prototypes');
 
 		$this->checkTitle('Configuration of trigger prototypes');
-		$this->zbxTestTextPresent(array('CONFIGURATION OF TRIGGER PROTOTYPES', "Trigger prototypes of ".$this->discoveryRule));
+		$this->zbxTestTextPresent(array('CONFIGURATION OF TRIGGER PROTOTYPES', "Trigger prototypes of ".$discoveryRule));
 
 		if (isset($data['form'])) {
 			$this->zbxTestClickWait('link='.$data['form']);
@@ -181,6 +266,17 @@ class testFormTriggerPrototype extends CWebTest {
 		}
 
 		$this->zbxTestTextPresent('Trigger prototype');
+
+		if (isset($data['templatedHost'])) {
+			$this->zbxTestTextPresent('Parent triggers');
+			if (isset($data['hostTemplate'])) {
+				$this->assertElementPresent("//a[text()='".$data['hostTemplate']."']");
+			}
+		}
+		else {
+			$this->zbxTestTextNotPresent('Parent triggers');
+		}
+
 		$this->zbxTestTextPresent('Name');
 		$this->assertVisible('description');
 		$this->assertAttribute("//input[@id='description']/@maxlength", '255');
@@ -188,10 +284,17 @@ class testFormTriggerPrototype extends CWebTest {
 
 		if (!(isset($data['constructor'])) || $data['constructor'] == 'open_close') {
 			$this->zbxTestTextPresent(array('Expression', 'Expression constructor'));
-			$this->assertVisible('expression');
+			$this->assertVisible("//textarea[@id='expression']");
 			$this->assertAttribute("//textarea[@id='expression']/@rows", '7');
+			if (isset($data['templatedHost'])) {
+				$this->assertAttribute("//textarea[@id='expression']/@readonly", 'readonly');
+			}
+
 			$this->assertVisible('insert');
 			$this->assertAttribute("//input[@id='insert']/@value", 'Add');
+			if (isset($data['templatedHost'])) {
+				$this->assertElementPresent("//input[@id='insert']/@disabled");
+			}
 
 			$this->assertElementNotPresent('add_expression');
 			$this->assertElementNotPresent('insert_macro');
@@ -215,11 +318,22 @@ class testFormTriggerPrototype extends CWebTest {
 
 			$this->assertVisible('insert');
 			$this->assertAttribute("//input[@id='insert']/@value", 'Edit');
+			if (isset($data['templatedHost'])) {
+				$this->assertElementPresent("//input[@id='insert']/@disabled");
+			}
 
 			$this->assertVisible('insert_macro');
 			$this->assertAttribute("//input[@id='insert_macro']/@value", 'Insert macro');
+			if (isset($data['templatedHost'])) {
+				$this->assertElementPresent("//input[@id='insert_macro']/@disabled");
+			}
 
-			$this->zbxTestTextPresent(array('Target', 'Expression', 'Action', 'Close expression constructor'));
+			if (!isset($data['templatedHost'])) {
+				$this->zbxTestTextPresent(array('Target', 'Expression', 'Action', 'Close expression constructor'));
+			}
+			else {
+				$this->zbxTestTextPresent(array('Expression', 'Close expression constructor'));
+			}
 			$this->assertVisible('exp_list');
 			$this->zbxTestTextPresent('Close expression constructor');
 		}
@@ -283,20 +397,24 @@ class testFormTriggerPrototype extends CWebTest {
 		$this->assertVisible('save');
 		$this->assertAttribute("//input[@id='save']/@value", 'Save');
 
+		$this->assertVisible('cancel');
+		$this->assertAttribute("//input[@id='cancel']/@value", 'Cancel');
+
 		if (isset($data['form'])) {
 			$this->assertVisible('clone');
 			$this->assertAttribute("//input[@id='clone']/@value", 'Clone');
 
 			$this->assertVisible('delete');
 			$this->assertAttribute("//input[@id='delete']/@value", 'Delete');
+			if (isset($data['templatedHost'])) {
+				$this->assertElementPresent("//input[@id='delete']/@disabled");
+			}
 		}
 		else {
 			$this->assertElementNotPresent('clone');
 			$this->assertElementNotPresent('delete');
 		}
 
-		$this->assertVisible('cancel');
-		$this->assertAttribute("//input[@id='cancel']/@value", 'Cancel');
 	}
 
 	// Returns update data
