@@ -863,3 +863,35 @@ INSERT INTO items (name, key_, hostid, value_type, itemid, flags, delay, params,
 INSERT INTO items (name, key_, hostid, value_type, itemid, flags, templateid, delay, params, description) VALUES ('testInheritanceItemPrototype4', 'item-prototype-test4', 30001, 3, 23707, 2, 23706, 5, '', '');
 INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid) values (407, 23706, 23500);
 INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid) values (408, 23707, 23501);
+
+-- testFormTriggerPrototype.SimpleCreate
+INSERT INTO items (name, key_, hostid, value_type, itemid, flags, delay, params, description) VALUES ('testFormItemReuse', 'item-prototype-reuse', 40001, 3, 23804, 2, 5, '', '');
+INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid) values (505, 23804, 33800);
+
+-- testFormTriggerPrototype.SimpleUpdate
+INSERT INTO triggers (triggerid,expression,description,url,status,value,priority,lastchange,comments,error,templateid,type,state,flags) VALUES (13518,'{12947}=0','testFormTriggerPrototype1','',0,0,0,0,'','',NULL,0,0,2);
+INSERT INTO triggers (triggerid,expression,description,url,status,value,priority,lastchange,comments,error,templateid,type,state,flags) VALUES (13519,'{12948}=0','testFormTriggerPrototype2','',0,0,0,0,'','',NULL,0,0,2);
+INSERT INTO triggers (triggerid,expression,description,url,status,value,priority,lastchange,comments,error,templateid,type,state,flags) VALUES (13520,'{12949}=0','testFormTriggerPrototype3','',0,0,0,0,'','',NULL,0,0,2);
+INSERT INTO triggers (triggerid,expression,description,url,status,value,priority,lastchange,comments,error,templateid,type,state,flags) VALUES (13521,'{12950}=0','testFormTriggerPrototype4','',0,0,0,0,'','',NULL,0,0,2);
+INSERT INTO functions (functionid,itemid,triggerid,function,parameter) VALUES (12947,23804,13518,'last','0');
+INSERT INTO functions (functionid,itemid,triggerid,function,parameter) VALUES (12948,23804,13519,'last','0');
+INSERT INTO functions (functionid,itemid,triggerid,function,parameter) VALUES (12949,23804,13520,'last','0');
+INSERT INTO functions (functionid,itemid,triggerid,function,parameter) VALUES (12950,23804,13521,'last','0');
+
+-- testFormTriggerPrototype.LayoutCheck, testInheritanceTriggerPrototype.SimpleUpdate
+INSERT INTO triggers (triggerid, expression, description, comments, flags) VALUES (16000, '{16000}=0', 'testInheritanceTriggerPrototype1', '', 2);
+INSERT INTO functions (functionid, itemid, triggerid, function, parameter) VALUES (16000, 23600 ,16000,'last',0);
+INSERT INTO triggers (triggerid, expression, description, comments, templateid, flags) VALUES (16001, '{16001}=0', 'testInheritanceTriggerPrototype1', '', 16000, 2);
+INSERT INTO functions (functionid, itemid, triggerid, function, parameter) VALUES (16001, 23601 ,16001,'last',0);
+INSERT INTO triggers (triggerid, expression, description, comments, flags) VALUES (16002, '{16002}=0', 'testInheritanceTriggerPrototype2', '', 2);
+INSERT INTO functions (functionid, itemid, triggerid, function, parameter) VALUES (16002, 23600 ,16002,'last',0);
+INSERT INTO triggers (triggerid, expression, description, comments, templateid, flags) VALUES (16003, '{16003}=0', 'testInheritanceTriggerPrototype2', '', 16002, 2);
+INSERT INTO functions (functionid, itemid, triggerid, function, parameter) VALUES (16003, 23601 ,16003,'last',0);
+INSERT INTO triggers (triggerid, expression, description, comments, flags) VALUES (16004, '{16004}=0', 'testInheritanceTriggerPrototype3', '', 2);
+INSERT INTO functions (functionid, itemid, triggerid, function, parameter) VALUES (16004, 23600 ,16004,'last',0);
+INSERT INTO triggers (triggerid, expression, description, comments, templateid, flags) VALUES (16005, '{16005}=0', 'testInheritanceTriggerPrototype3', '', 16004, 2);
+INSERT INTO functions (functionid, itemid, triggerid, function, parameter) VALUES (16005, 23601 ,16005,'last',0);
+INSERT INTO triggers (triggerid, expression, description, comments, flags) VALUES (16006, '{16006}=0', 'testInheritanceTriggerPrototype4', '', 2);
+INSERT INTO functions (functionid, itemid, triggerid, function, parameter) VALUES (16006, 23600 ,16006,'last',0);
+INSERT INTO triggers (triggerid, expression, description, comments, templateid, flags) VALUES (16007, '{16007}=0', 'testInheritanceTriggerPrototype4', '', 16006, 2);
+INSERT INTO functions (functionid, itemid, triggerid, function, parameter) VALUES (16007, 23601 ,16007,'last',0);
