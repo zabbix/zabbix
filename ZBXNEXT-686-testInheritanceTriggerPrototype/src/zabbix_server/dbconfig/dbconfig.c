@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -9,7 +9,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -50,6 +50,9 @@ void	main_dbconfig_loop()
 	double	sec;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In main_dbconfig_loop()");
+
+	/* the initial configuration sync is done by server before worker processes are forked */
+	zbx_sleep_loop(CONFIG_CONFSYNCER_FREQUENCY);
 
 	zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
 

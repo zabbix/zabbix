@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2012 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -10,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -388,7 +388,8 @@ abstract class CGraphGeneral extends CZBXAPI {
 				'itemids' => $axisItems,
 				'output' => array('itemid'),
 				'countOutput' => true,
-				'filter' => array('flags' => null)
+				'webitems' => true,
+				'filter' => array('flags' => null, 'value_type' => array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64))
 			);
 			if ($tpl) {
 				$options['hostids'] = $tpl;

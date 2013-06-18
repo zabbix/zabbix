@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2012 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -244,7 +244,7 @@ if ($this->data['input_method'] == IM_TREE) {
 $triggersFormList->addRow(_('Multiple PROBLEM events generation'), new CCheckBox('type', (($this->data['type'] == TRIGGER_MULT_EVENT_ENABLED) ? 'yes' : 'no'), null, 1));
 $triggersFormList->addRow(_('Description'), new CTextArea('comments', $this->data['comments']));
 $triggersFormList->addRow(_('URL'), new CTextBox('url', $this->data['url'], ZBX_TEXTBOX_STANDARD_SIZE));
-$triggersFormList->addRow(_('Severity'), getSeverityControl($this->data['priority']));
+$triggersFormList->addRow(_('Severity'), new CSeverity(array('name' => 'priority', 'value' => $this->data['priority'])));
 
 // append status to form list
 if (empty($this->data['triggerid']) && empty($this->data['form_refresh'])) {
@@ -314,7 +314,7 @@ if (!empty($this->data['triggerid'])) {
 }
 $buttons[] = new CButtonCancel(url_param('groupid').url_param('hostid').url_param('parent_discoveryid'));
 $triggersForm->addItem(makeFormFooter(
-	array(new CSubmit('save', _('Save'))),
+	new CSubmit('save', _('Save')),
 	array($buttons)
 ));
 

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2000-2012 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -9,7 +9,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -254,24 +254,28 @@ function clearAllForm(form) {
 			case 'submit':
 				break;
 			case 'checkbox':
-				inputs[i].checked = false;
+				jQuery(inputs[i]).prop('checked', false).trigger('change');
 				break;
 			case 'text':
 			case 'password':
 			default:
-				inputs[i].value = '';
+				jQuery(inputs[i]).val('').trigger('change');
 		}
 	}
 
 	var selects = form.getElementsByTagName('select');
 	for (var i = 0; i < selects.length; i++) {
-		selects[i].selectedIndex = 0;
+		jQuery(selects[i]).val(null).trigger('change');
 	}
 
 	var areas = form.getElementsByTagName('textarea');
 	for (var i = 0; i < areas.length; i++) {
-		areas[i].innerHTML = '';
+		jQuery(areas[i]).val('').trigger('change');
 	}
+
+	jQuery('.multiselect').each(function() {
+		jQuery(this).multiSelect.clean(jQuery(this).attr('id'));
+	});
 
 	return true;
 }

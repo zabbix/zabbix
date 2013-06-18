@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -10,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -59,9 +59,9 @@ function make_decoration($haystack, $needle, $class = null) {
 	$result = $haystack;
 	$pos = zbx_stripos($haystack, $needle);
 	if ($pos !== false) {
-		$start = zbx_substring($haystack, 0, $pos);
-		$end = zbx_substring($haystack, $pos + zbx_strlen($needle));
-		$found = zbx_substring($haystack, $pos, $pos + zbx_strlen($needle));
+		$start = CHtml::encode(zbx_substring($haystack, 0, $pos));
+		$end = CHtml::encode(zbx_substring($haystack, $pos + zbx_strlen($needle)));
+		$found = CHtml::encode(zbx_substring($haystack, $pos, $pos + zbx_strlen($needle)));
 		if (is_null($class)) {
 			$result = array($start, bold($found), $end);
 		}
@@ -374,9 +374,9 @@ function get_header_host_table($currentElement, $hostid, $discoveryid = null) {
 	$description = '';
 	if ($dbHost['proxy_hostid']) {
 		$proxy = get_host_by_hostid($dbHost['proxy_hostid']);
-		$description .= $proxy['host'].NAME_DELIMITER;
+		$description .= CHtml::encode($proxy['host']).NAME_DELIMITER;
 	}
-	$description .= $dbHost['name'];
+	$description .= CHtml::encode($dbHost['name']);
 
 	if ($dbHost['status'] == HOST_STATUS_TEMPLATE) {
 		$list->addItem(array(bold(_('Template').NAME_DELIMITER), new CLink($description, 'templates.php?form=update&templateid='.$dbHost['hostid'])));
@@ -403,7 +403,7 @@ function get_header_host_table($currentElement, $hostid, $discoveryid = null) {
 		$list->addItem(array('&laquo; ', new CLink(_('Discovery list'), 'host_discovery.php?hostid='.$dbHost['hostid'].url_param('groupid'))));
 		$list->addItem(array(
 			bold(_('Discovery').NAME_DELIMITER),
-			new CLink($dbDiscovery['name'], 'host_discovery.php?form=update&itemid='.$dbDiscovery['itemid'])
+			new CLink(CHtml::encode($dbDiscovery['name']), 'host_discovery.php?form=update&itemid='.$dbDiscovery['itemid'])
 		));
 	}
 
@@ -536,56 +536,27 @@ function get_header_host_table($currentElement, $hostid, $discoveryid = null) {
 	return new CDiv($list, 'objectgroup top ui-widget-content ui-corner-all');
 }
 
-function makeFormFooter($main, $others = null) {
-	if (!is_array($main)) {
-		$main = array($main);
-	}
-	if (!empty($others) && !is_array($others)) {
-		$others = array($others);
+function makeFormFooter($main = null, $others = null) {
+	if ($main) {
+		$main->useJQueryStyle('main');
 	}
 
-	$mainButtons = new CDiv();
-	foreach ($main as $button) {
-		$button->useJQueryStyle('main');
-		$mainButtons->addItem($button);
-	}
 	$othersButtons = new CDiv($others);
 	$othersButtons->useJQueryStyle();
 
 	return new CDiv(
 		new CDiv(
-			array(
-				empty($others) ? new CDiv($mainButtons, 'dt right') : new CDiv($mainButtons, 'dt floatleft right'),
-				new CDiv(array($othersButtons), 'dd left')
+			new CDiv(
+				array(
+					new CDiv($main, 'dt right'),
+					new CDiv($othersButtons, 'dd left')
+				),
+				'formrow'
 			),
-			'formrow'
+			'formtable'
 		),
-		'objectgroup footer min-width ui-widget-content ui-corner-all'
+		'objectgroup footer ui-widget-content ui-corner-all'
 	);
-}
-
-/**
- * Create control for trigger severities.
- * It's mostly the same as usual button set, but background color is changed based on selected severiity.
- * Js file "/include/views/js/configuration.triggers.edit.js.php" is needed to make it work correcty.
- *
- * @param $selectedSeverity
- *
- * @return CDiv
- */
-function getSeverityControl($selectedSeverity = TRIGGER_SEVERITY_NOT_CLASSIFIED) {
-	$controls = array();
-	foreach (getSeverityCaption() as $severity => $caption) {
-		$controls[] = new CRadioButton('priority', $severity, null, 'severity_'.$severity, $selectedSeverity == $severity);
-
-		$label = new CLabel($caption, 'severity_'.$severity, 'severity_label_'.$severity);
-		$label->attr('data-severity', $severity);
-		$label->attr('data-severity-style', getSeverityStyle($severity));
-		$controls[] = $label;
-
-	}
-
-	return new CDiv($controls, 'jqueryinputset control-severity');
 }
 
 /**

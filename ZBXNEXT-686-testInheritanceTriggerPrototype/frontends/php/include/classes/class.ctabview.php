@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -10,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -39,7 +39,7 @@ class CTabView extends CDiv {
 		}
 		parent::__construct();
 		$this->attr('id', zbx_formatDomId($this->id));
-		$this->attr('class', 'min-width hidden');
+		$this->attr('class', 'hidden');
 	}
 
 	public function setRemember($remember) {
@@ -58,7 +58,7 @@ class CTabView extends CDiv {
 
 	public function toString($destroy = true) {
 		if (count($this->tabs) == 1) {
-			$this->setAttribute('class', 'min-width ui-tabs ui-widget ui-widget-content ui-corner-all widget');
+			$this->setAttribute('class', 'ui-tabs ui-widget ui-widget-content ui-corner-all widget');
 
 			$header = reset($this->headers);
 			$header = new CDiv($header);

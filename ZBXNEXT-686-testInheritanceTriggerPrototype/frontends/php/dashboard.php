@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2013 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -207,7 +207,7 @@ if (isset($_REQUEST['favobj'])) {
 			$result = CFavorite::remove('web.favorite.sysmapids', $_REQUEST['favid'], $_REQUEST['favobj']);
 		}
 
-		if ($page['type'] == PAGE_TYPE_JS&& $result) {
+		if ($page['type'] == PAGE_TYPE_JS && $result) {
 			$innerHTML = make_favorite_maps();
 			$innerHTML = $innerHTML->toString();
 			echo '$("hat_favmap").update('.zbx_jsvalue($innerHTML).');';

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -10,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -320,7 +320,7 @@ class CIconMap extends CZBXAPI {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
-		$sql = 'SELECT m.name as mapname, im.name as iconmapname'.
+		$sql = 'SELECT m.name AS mapname, im.name as iconmapname'.
 			' FROM sysmaps m, icon_map im'.
 			' WHERE m.iconmapid=im.iconmapid'.
 			' AND '.dbConditionInt('m.iconmapid', $iconmapids);

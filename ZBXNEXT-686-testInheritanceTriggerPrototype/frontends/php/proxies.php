@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2013 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -83,10 +83,6 @@ $_REQUEST['go'] = get_request('go', 'none');
  * Actions
  */
 if (isset($_REQUEST['save'])) {
-	if (!count(get_accessible_nodes_by_user(CWebUser::$data, PERM_READ_WRITE, PERM_RES_IDS_ARRAY))) {
-		access_deny();
-	}
-
 	$proxy = array(
 		'host' => get_request('host'),
 		'status' => get_request('status'),

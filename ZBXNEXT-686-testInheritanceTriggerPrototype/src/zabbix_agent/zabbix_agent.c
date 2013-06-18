@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -9,7 +9,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -219,7 +219,7 @@ int	main(int argc, char **argv)
 		case ZBX_TASK_TEST_METRIC:
 		case ZBX_TASK_PRINT_SUPPORTED:
 			if (ZBX_TASK_TEST_METRIC == task)
-				test_parameter(TEST_METRIC, PROCESS_TEST);
+				test_parameter(TEST_METRIC);
 			else
 				test_parameters();
 			zbx_on_exit();

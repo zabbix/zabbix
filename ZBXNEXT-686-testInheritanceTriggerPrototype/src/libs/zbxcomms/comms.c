@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2000-2012 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -9,7 +9,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -300,6 +300,7 @@ int	zbx_tcp_connect(zbx_sock_t *s, const char *source_ip, const char *ip, unsign
 	if (NULL != source_ip)
 	{
 		memset(&hints, 0x00, sizeof(struct addrinfo));
+
 		hints.ai_family = PF_UNSPEC;
 		hints.ai_socktype = SOCK_STREAM;
 		hints.ai_flags = AI_NUMERICHOST;
@@ -340,7 +341,7 @@ out:
 #else
 int	zbx_tcp_connect(zbx_sock_t *s, const char *source_ip, const char *ip, unsigned short port, int timeout)
 {
-	ZBX_SOCKADDR	servaddr_in, source_addr;
+	ZBX_SOCKADDR	servaddr_in;
 	struct hostent	*hp;
 
 	ZBX_TCP_START();
@@ -359,9 +360,9 @@ int	zbx_tcp_connect(zbx_sock_t *s, const char *source_ip, const char *ip, unsign
 		return FAIL;
 	}
 
-	servaddr_in.sin_family		= AF_INET;
-	servaddr_in.sin_addr.s_addr	= ((struct in_addr *)(hp->h_addr))->s_addr;
-	servaddr_in.sin_port		= htons(port);
+	servaddr_in.sin_family = AF_INET;
+	servaddr_in.sin_addr.s_addr = ((struct in_addr *)(hp->h_addr))->s_addr;
+	servaddr_in.sin_port = htons(port);
 
 	if (ZBX_SOCK_ERROR == (s->socket = socket(AF_INET, SOCK_STREAM | SOCK_CLOEXEC, 0)))
 	{
@@ -375,9 +376,13 @@ int	zbx_tcp_connect(zbx_sock_t *s, const char *source_ip, const char *ip, unsign
 
 	if (NULL != source_ip)
 	{
-		source_addr.sin_family		= AF_INET;
-		source_addr.sin_addr.s_addr	= inet_addr(source_ip);
-		source_addr.sin_port		= 0;
+		ZBX_SOCKADDR	source_addr;
+
+		memset(&source_addr, 0, sizeof(source_addr));
+
+		source_addr.sin_family = AF_INET;
+		source_addr.sin_addr.s_addr = inet_addr(source_ip);
+		source_addr.sin_port = 0;
 
 		if (ZBX_TCP_ERROR == bind(s->socket, (struct sockaddr *)&source_addr, sizeof(source_addr)))
 		{

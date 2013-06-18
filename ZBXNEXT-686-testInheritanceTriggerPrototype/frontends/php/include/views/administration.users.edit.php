@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -10,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -148,12 +148,19 @@ if (uint_in_array(CWebUser::$data['type'], array(USER_TYPE_ZABBIX_ADMIN, USER_TY
 						'&severity='.$media['severity'].
 						'&active='.$media['active'];
 
+		foreach (getSeverityCaption() as $key => $caption) {
+			$mediaActive = ($media['severity'] & (1 << $key));
+
+			$mediaSeverity[$key] = new CSpan(zbx_substr($caption, 0, 1), $mediaActive ? 'enabled' : NULL);
+			$mediaSeverity[$key]->setHint($caption.($mediaActive ? ' (on)' : ' (off)'));
+		}
+
 		$mediaTableInfo->addRow(array(
 			new CCheckBox('user_medias_to_del['.$id.']', null, null, $id),
 			new CSpan($media['description'], 'nowrap'),
 			new CSpan($media['sendto'], 'nowrap'),
 			new CSpan($media['period'], 'nowrap'),
-			media_severity2str($media['severity']),
+			$mediaSeverity,
 			$status,
 			new CButton('edit_media', _('Edit'), 'return PopUp("popup_media.php'.$mediaUrl.'", 550, 400);', 'link_menu'))
 		);
@@ -318,7 +325,7 @@ $userForm->addItem($userTab);
 
 // append buttons to form
 if (empty($this->data['userid'])) {
-	$userForm->addItem(makeFormFooter(array(new CSubmit('save', _('Save'))), array(new CButtonCancel(url_param('config')))));
+	$userForm->addItem(makeFormFooter(new CSubmit('save', _('Save')), new CButtonCancel(url_param('config'))));
 }
 else {
 	if (!$this->data['is_profile']) {
@@ -326,10 +333,10 @@ else {
 		if (bccomp(CWebUser::$data['userid'], $this->data['userid']) == 0) {
 			$deleteButton->setAttribute('disabled', 'disabled');
 		}
-		$userForm->addItem(makeFormFooter(array(new CSubmit('save', _('Save'))), array($deleteButton, new CButtonCancel(url_param('config')))));
+		$userForm->addItem(makeFormFooter(new CSubmit('save', _('Save')), array($deleteButton, new CButtonCancel(url_param('config')))));
 	}
 	else {
-		$userForm->addItem(makeFormFooter(array(new CSubmit('save', _('Save'))), array(new CButtonCancel(url_param('config')))));
+		$userForm->addItem(makeFormFooter(new CSubmit('save', _('Save')), new CButtonCancel(url_param('config'))));
 	}
 }
 

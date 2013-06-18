@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2011 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -10,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -57,7 +57,7 @@ $filterTable->addRow(array(
 		SPACE,
 		new CTextBox('alias', $this->data['alias'], 20),
 		new CButton('btn1', _('Select'), 'return PopUp(\'popup.php?dstfrm='.$filterForm->getName().
-			'&dstfld1=alias&srctbl=users&srcfld1=alias&real_hosts=1\');', 'T')
+			'&dstfld1=alias&srctbl=users&srcfld1=alias&real_hosts=1\');', 'filter-select-button')
 	),
 	array(bold(_('Action')), SPACE, $actionComboBox),
 	array(bold(_('Resource')), SPACE, $resourceComboBox)

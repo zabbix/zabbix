@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2012 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -182,13 +182,6 @@ CSS;
 		$pageHeader->addJsFile($path);
 	}
 
-	$js = <<<JS
-if (jQuery(window).width() < 1024) {
-	document.write('<link rel="stylesheet" type="text/css" href="styles/handheld.css" />');
-}
-JS;
-
-	$pageHeader->addJs($js);
 	$pageHeader->display();
 ?>
 <body class="<?php echo $css; ?>">
@@ -228,22 +221,26 @@ if (!defined('ZBX_PAGE_NO_MENU')) {
 	$req->setArgument('print', 1);
 	$printview = new CLink(_('Print'), $req->getUrl(), 'small_font', null, 'nosid');
 
-	$page_header_r_col = array($help, '|', $support, '|', $printview);
+	$page_header_r_col = array($help, '|', $support, '|', $printview, '|');
 
-	if (CWebUser::$data['alias'] != ZBX_GUEST_USER) {
-		$page_header_r_col[] = array('|');
+	if (!CWebUser::isGuest()) {
 		array_push($page_header_r_col, new CLink(_('Profile'), 'profile.php', 'small_font', null, 'nosid'), '|');
+	}
 
-		if (CWebUser::$data['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
-			$debug = new CLink(_('Debug'), '#debug', 'small_font', null, 'nosid');
-			$d_script = " if (!isset('state', this)) { this.state = 'none'; }".
-						" if (this.state == 'none') { this.state = 'block'; }".
-						" else { this.state = 'none'; }".
-						" showHideByName('zbx_gebug_info', this.state);";
-			$debug->setAttribute('onclick', 'javascript: '.$d_script);
-			array_push($page_header_r_col, $debug, '|');
-		}
+	if (CWebUser::$data['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
+		$debug = new CLink(_('Debug'), '#debug', 'small_font', null, 'nosid');
+		$d_script = " if (!isset('state', this)) { this.state = 'none'; }".
+			" if (this.state == 'none') { this.state = 'block'; }".
+			" else { this.state = 'none'; }".
+			" showHideByName('zbx_gebug_info', this.state);";
+		$debug->setAttribute('onclick', 'javascript: '.$d_script);
+		array_push($page_header_r_col, $debug, '|');
+	}
 
+	if (CWebUser::isGuest()) {
+		$page_header_r_col[] = array(new CLink(_('Login'), 'index.php?reconnect=1', 'small_font', null, 'nosid'));
+	}
+	else {
 		// it is not possible to logout from HTTP authentication
 		$chck = $page['file'] == 'authentication.php' && isset($_REQUEST['save'], $_REQUEST['config']);
 		if ($chck && $_REQUEST['config'] == ZBX_AUTH_HTTP || !$chck && $config['authentication_type'] == ZBX_AUTH_HTTP) {
@@ -254,9 +251,6 @@ if (!defined('ZBX_PAGE_NO_MENU')) {
 			$logout =  new CLink(_('Logout'), 'index.php?reconnect=1', 'small_font', null, 'nosid');
 		}
 		array_push($page_header_r_col, $logout);
-	}
-	else {
-		$page_header_r_col[] = array('|', new CLink(_('Login'), 'index.php?reconnect=1', 'small_font', null, 'nosid'));
 	}
 
 	$logo = new CLink(new CDiv(SPACE, 'zabbix_logo'), 'http://www.zabbix.com/', 'image', null, 'nosid');

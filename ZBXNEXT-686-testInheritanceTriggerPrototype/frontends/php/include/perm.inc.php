@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -10,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -168,33 +168,32 @@ function available_triggers($triggerids, $editable = null) {
  * - PERM_RES_IDS_ARRAY - return only host group ids;
  * - PERM_RES_DATA_ARRAY - return an array of host groups.
  *
- * @param array $user_data      an array defined as array('userid' => userid, 'type' => type)
- * @param int $perm             requested permission level
- * @param int|null $perm_res    result format
- * @param null $nodeid
+ * @param array    $userData		an array defined as array('userid' => userid, 'type' => type)
+ * @param int      $perm			requested permission level
+ * @param int|null $permRes			result format
+ * @param int      $nodeId
  *
  * @return array
  */
-function get_accessible_groups_by_user($user_data, $perm, $perm_res = PERM_RES_IDS_ARRAY, $nodeid = null) {
-	if (is_null($nodeid)) {
-		$nodeid = get_current_nodeid();
-	}
-
-	$result = array();
-
-	$userid =& $user_data['userid'];
-	if (!isset($userid)) {
+function get_accessible_groups_by_user($userData, $perm, $permRes = PERM_RES_IDS_ARRAY, $nodeId = null) {
+	$userId =& $userData['userid'];
+	if (!isset($userId)) {
 		fatal_error(_('Incorrect user data in "get_accessible_groups_by_user".'));
 	}
-	$user_type =& $user_data['type'];
 
+	if (is_null($nodeId)) {
+		$nodeId = get_current_nodeid();
+	}
+
+	$userType =& $userData['type'];
+	$result = array();
 	$processed = array();
 
-	if ($user_type == USER_TYPE_SUPER_ADMIN) {
+	if ($userType == USER_TYPE_SUPER_ADMIN) {
 		$sql = 'SELECT n.nodeid AS nodeid,n.name AS node_name,hg.groupid,hg.name'.
 				' FROM groups hg'.
 					' LEFT JOIN nodes n ON '.DBid2nodeid('hg.groupid').'=n.nodeid'.
-				whereDbNode('hg.groupid', $nodeid).
+				whereDbNode('hg.groupid', $nodeId).
 				' GROUP BY n.nodeid,n.name,hg.groupid,hg.name'.
 				' ORDER BY node_name,hg.name';
 	}
@@ -204,112 +203,114 @@ function get_accessible_groups_by_user($user_data, $perm, $perm_res = PERM_RES_I
 					' LEFT JOIN rights r ON r.id=hg.groupid'.
 					' LEFT JOIN users_groups g ON r.groupid=g.usrgrpid'.
 					' LEFT JOIN nodes n ON '.DBid2nodeid('hg.groupid').'=n.nodeid'.
-				' WHERE g.userid='.$userid.
-					andDbNode('hg.groupid', $nodeid).
+				' WHERE g.userid='.$userId.
+					andDbNode('hg.groupid', $nodeId).
 				' GROUP BY n.nodeid,n.name,hg.groupid,hg.name,g.userid'.
 				' ORDER BY node_name,hg.name,permission';
 	}
 
-	$db_groups = DBselect($sql);
-	while ($group_data = DBfetch($db_groups)) {
-		if (zbx_empty($group_data['nodeid'])) {
-			$group_data['nodeid'] = id2nodeid($group_data['groupid']);
+	$dbGroups = DBselect($sql);
+	while ($groupData = DBfetch($dbGroups)) {
+		if (zbx_empty($groupData['nodeid'])) {
+			$groupData['nodeid'] = id2nodeid($groupData['groupid']);
 		}
 
 		// calculate permissions
-		if ($user_type == USER_TYPE_SUPER_ADMIN) {
-			$group_data['permission'] = PERM_READ_WRITE;
+		if ($userType == USER_TYPE_SUPER_ADMIN) {
+			$groupData['permission'] = PERM_READ_WRITE;
 		}
-		elseif (isset($processed[$group_data['groupid']])) {
-			if ($group_data['permission_deny'] == PERM_DENY) {
-				unset($result[$group_data['groupid']]);
+		elseif (isset($processed[$groupData['groupid']])) {
+			if ($groupData['permission_deny'] == PERM_DENY) {
+				unset($result[$groupData['groupid']]);
 			}
-			elseif ($processed[$group_data['groupid']] > $group_data['permission']) {
-				unset($processed[$group_data['groupid']]);
+			elseif ($processed[$groupData['groupid']] > $groupData['permission']) {
+				unset($processed[$groupData['groupid']]);
 			}
 			else {
 				continue;
 			}
 		}
 
-		$processed[$group_data['groupid']] = $group_data['permission'];
-		if ($group_data['permission'] < $perm) {
+		$processed[$groupData['groupid']] = $groupData['permission'];
+		if ($groupData['permission'] < $perm) {
 			continue;
 		}
 
-		switch ($perm_res) {
+		switch ($permRes) {
 			case PERM_RES_DATA_ARRAY:
-				$result[$group_data['groupid']] = $group_data;
+				$result[$groupData['groupid']] = $groupData;
 				break;
 			default:
-				$result[$group_data['groupid']] = $group_data['groupid'];
+				$result[$groupData['groupid']] = $groupData['groupid'];
 				break;
 		}
 	}
 
-	unset($processed, $group_data, $db_groups);
+	unset($processed, $groupData, $dbGroups);
 
 	return $result;
 }
 
-function get_accessible_nodes_by_user(&$user_data, $perm, $perm_res = null, $nodeid = null, $cache = 1) {
-	global $ZBX_LOCALNODEID, $ZBX_NODES_IDS;
-	static $available_nodes;
-
-	if (is_null($perm_res)) {
-		$perm_res = PERM_RES_IDS_ARRAY;
-	}
-	if (is_null($nodeid)) {
-		$nodeid = $ZBX_NODES_IDS;
-	}
-	if (!is_array($nodeid)) {
-		$nodeid = array($nodeid);
-	}
-
-	$userid =& $user_data['userid'];
-	$user_type =& $user_data['type'];
-	if (!isset($userid)) {
+function get_accessible_nodes_by_user(&$userData, $perm, $permRes = null, $nodeId = null, $cache = true) {
+	$userId =& $userData['userid'];
+	if (!isset($userId)) {
 		fatal_error(_('Incorrect user data in "get_accessible_nodes_by_user".'));
 	}
 
-	$nodeid_str = is_array($nodeid) ? md5(implode('', $nodeid)) : strval($nodeid);
+	global $ZBX_LOCALNODEID, $ZBX_NODES_IDS;
+	static $available_nodes;
 
-	if ($cache && isset($available_nodes[$userid][$perm][$perm_res][$nodeid_str])) {
-		return $available_nodes[$userid][$perm][$perm_res][$nodeid_str];
+	if (is_null($permRes)) {
+		$permRes = PERM_RES_IDS_ARRAY;
+	}
+	if (is_null($nodeId)) {
+		$nodeId = $ZBX_NODES_IDS;
+	}
+	if (!is_array($nodeId)) {
+		$nodeId = array($nodeId);
 	}
 
-	$node_data = array();
+	$userType =& $userData['type'];
+	$nodeIdStr = is_array($nodeId) ? md5(implode('', $nodeId)) : strval($nodeId);
+
+	if ($cache && isset($available_nodes[$userId][$perm][$permRes][$nodeIdStr])) {
+		return $available_nodes[$userId][$perm][$permRes][$nodeIdStr];
+	}
+
+	$nodeData = array();
 	$result = array();
 
-	if (USER_TYPE_SUPER_ADMIN == $user_type) {
-		$db_nodes = DBselect('SELECT n.nodeid FROM nodes n');
-		while ($node = DBfetch($db_nodes)) {
-			$node_data[$node['nodeid']] = $node;
-			$node_data[$node['nodeid']]['permission'] = PERM_READ_WRITE;
+	if ($userType == USER_TYPE_SUPER_ADMIN) {
+		$dbNodes = DBselect('SELECT n.nodeid FROM nodes n');
+		while ($node = DBfetch($dbNodes)) {
+			$nodeData[$node['nodeid']] = $node;
+			$nodeData[$node['nodeid']]['permission'] = PERM_READ_WRITE;
 		}
-		if (empty($node_data)) {
-			$node_data[0]['nodeid'] = 0;
+		if (empty($nodeData)) {
+			$nodeData[0]['nodeid'] = 0;
 		}
 	}
 	else {
-		$available_groups = get_accessible_groups_by_user($user_data, $perm, PERM_RES_DATA_ARRAY, $nodeid, $cache);
-		foreach ($available_groups as $group) {
-			$nodeid = id2nodeid($group['groupid']);
-			$permission = isset($node_data[$nodeid]) && $permission < $node_data[$nodeid]['permission'] ? $node_data[$nodeid]['permission'] : $group['permission'];
+		$availableGroups = get_accessible_groups_by_user($userData, $perm, PERM_RES_DATA_ARRAY, $nodeId);
+		foreach ($availableGroups as $availableGroup) {
+			$nodeId = id2nodeid($availableGroup['groupid']);
+			$permission = (isset($nodeData[$nodeId]) && $permission < $nodeData[$nodeId]['permission'])
+				? $nodeData[$nodeId]['permission']
+				: $availableGroup['permission'];
 
-			$node_data[$nodeid]['nodeid'] = $nodeid;
-			$node_data[$nodeid]['permission'] = $permission;
+			$nodeData[$nodeId]['nodeid'] = $nodeId;
+			$nodeData[$nodeId]['permission'] = $permission;
 		}
 	}
 
-	foreach ($node_data as $nodeid => $node) {
-		switch ($perm_res) {
+	foreach ($nodeData as $nodeId => $node) {
+		switch ($permRes) {
 			case PERM_RES_DATA_ARRAY:
-				$db_node = DBfetch(DBselect('SELECT n.* FROM nodes n WHERE n.nodeid='.$nodeid.' ORDER BY n.name'));
+				$dbNode = DBfetch(DBselect('SELECT n.* FROM nodes n WHERE n.nodeid='.$nodeId.' ORDER BY n.name'));
 
 				if (!ZBX_DISTRIBUTED) {
 					if (!$node) {
-						$db_node = array(
+						$dbNode = array(
 							'nodeid' => $ZBX_LOCALNODEID,
 							'name' => 'local',
 							'permission' => PERM_READ_WRITE,
@@ -320,15 +321,16 @@ function get_accessible_nodes_by_user(&$user_data, $perm, $perm_res = null, $nod
 						continue;
 					}
 				}
-				$result[$nodeid] = zbx_array_merge($db_node, $node);
+				$result[$nodeId] = zbx_array_merge($dbNode, $node);
 				break;
 			default:
-				$result[$nodeid] = $nodeid;
+				$result[$nodeId] = $nodeId;
 				break;
 		}
 	}
 
-	$available_nodes[$userid][$perm][$perm_res][$nodeid_str] = $result;
+	$available_nodes[$userId][$perm][$permRes][$nodeIdStr] = $result;
+
 	return $result;
 }
 
@@ -554,7 +556,6 @@ function getUserGroupsByUserId($userId) {
 			$userGroups[$userId][] = $row['usrgrpid'];
 		}
 	}
+
 	return $userGroups[$userId];
 }
-
-?>

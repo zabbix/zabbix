@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -10,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -57,7 +57,7 @@ foreach ($this->data['g_triggerid'] as $triggerid) {
 $triggersFormList = new CFormList('triggersFormList');
 
 // append severity to form list
-$severityDiv = getSeverityControl();
+$severityDiv = new CSeverity(array('name' => 'priority'));
 $severityDiv->setAttribute('id', 'priority_div');
 
 $triggersFormList->addRow(
@@ -121,8 +121,8 @@ $triggersForm->addItem($triggersTab);
 
 // append buttons to form
 $triggersForm->addItem(makeFormFooter(
-	array(new CSubmit('mass_save', _('Save'))),
-	array(new CButtonCancel(url_param('groupid').url_param('parent_discoveryid')))
+	new CSubmit('mass_save', _('Save')),
+	new CButtonCancel(url_param('groupid').url_param('parent_discoveryid'))
 ));
 
 $triggersWidget->addItem($triggersForm);

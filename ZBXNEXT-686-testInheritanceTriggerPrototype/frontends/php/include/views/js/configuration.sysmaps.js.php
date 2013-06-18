@@ -9,9 +9,11 @@
 			</thead>
 			<tbody>
 			<tr>
-				<td><label for="elementType"><?php echo _('Type'); ?></label></td>
 				<td>
-					<select size="1" class="input" name="elementtype" id="elementType">
+					<label for="elementType"><?php echo _('Type'); ?></label>
+				</td>
+				<td>
+					<select size="1" class="input select" name="elementtype" id="elementType">
 						<option value="<?php echo SYSMAP_ELEMENT_TYPE_HOST; ?>"><?php echo _('Host'); ?></option>
 						<option value="<?php echo SYSMAP_ELEMENT_TYPE_MAP; ?>"><?php echo _('Map'); ?></option>
 						<option value="<?php echo SYSMAP_ELEMENT_TYPE_TRIGGER; ?>"><?php echo _('Trigger'); ?></option>
@@ -54,39 +56,51 @@
 				</td>
 			</tr>
 			<tr id="areaPlacingRow">
-				<td><label for="areaPlacing"><?php echo _('Placing algorithm'); ?></label></td>
 				<td>
-					<select id="areaPlacing" class="input">
+					<label for="areaPlacing"><?php echo _('Placing algorithm'); ?></label>
+				</td>
+				<td>
+					<select id="areaPlacing" class="input select">
 						<option value="<?php echo SYSMAP_ELEMENT_AREA_VIEWTYPE_GRID; ?>"><?php echo _('Grid'); ?></option>
 					</select>
 				</td>
 			</tr>
 			<tr>
-				<td><label for="elementLabel"><?php echo _('Label'); ?></label></td>
-				<td><textarea id="elementLabel" cols="56" rows="4" name="label" class="input"></textarea></td>
+				<td>
+					<label for="elementLabel"><?php echo _('Label'); ?></label>
+				</td>
+				<td>
+					<textarea id="elementLabel" cols="56" rows="4" name="label" class="input textarea_standard"></textarea>
+				</td>
 			</tr>
 			<tr>
-				<td><label for="label_location"><?php echo _('Label location'); ?></label></td>
-				<td><select id="label_location" class="input" name="label_location">
-					<option value="-1">-</option>
-					<option value="<?php echo MAP_LABEL_LOC_BOTTOM; ?>"><?php echo _('Bottom'); ?></option>
-					<option value="<?php echo MAP_LABEL_LOC_LEFT; ?>"><?php echo _('Left'); ?></option>
-					<option value="<?php echo MAP_LABEL_LOC_RIGHT; ?>"><?php echo _('Right'); ?></option>
-					<option value="<?php echo MAP_LABEL_LOC_TOP; ?>"><?php echo _('Top'); ?></option>
-				</select></td>
+				<td>
+					<label for="label_location"><?php echo _('Label location'); ?></label>
+				</td>
+				<td>
+					<select id="label_location" class="input select" name="label_location">
+						<option value="-1">-</option>
+						<option value="<?php echo MAP_LABEL_LOC_BOTTOM; ?>"><?php echo _('Bottom'); ?></option>
+						<option value="<?php echo MAP_LABEL_LOC_LEFT; ?>"><?php echo _('Left'); ?></option>
+						<option value="<?php echo MAP_LABEL_LOC_RIGHT; ?>"><?php echo _('Right'); ?></option>
+						<option value="<?php echo MAP_LABEL_LOC_TOP; ?>"><?php echo _('Top'); ?></option>
+					</select>
+				</td>
 			</tr>
 			<tr id="hostGroupSelectRow">
 				<td><?php echo _('Host group'); ?></td>
 				<td>
-					<input readonly="readonly" size="50" id="elementNameHostGroup" name="elementName" class="input">
-					<span class="link" onclick="PopUp('popup.php?srctbl=host_group&srcfld1=groupid&srcfld2=name&dstfrm=selementForm&dstfld1=elementid&dstfld2=elementNameHostGroup&writeonly=1&noempty=1', 450, 450)"><?php echo _('Select'); ?></span>
+					<div style="position: absolute;">
+						<div id="elementNameHostGroup" class="multiselect" style="top: -20px; width: 312px;"></div>
+					</div>
 				</td>
 			</tr>
 			<tr id="hostSelectRow">
 				<td><?php echo _('Host'); ?></td>
 				<td>
-					<input readonly="readonly" size="50" id="elementNameHost" name="elementName" class="input">
-					<span class="link" onclick="PopUp('popup.php?srctbl=hosts&srcfld1=hostid&srcfld2=name&dstfrm=selementForm&dstfld1=elementid&dstfld2=elementNameHost&real_hosts=1&writeonly=1&noempty=1', 450, 450)"><?php echo _('Select'); ?></span>
+					<div style="position: absolute;">
+						<div id="elementNameHost" class="multiselect" style="top: -20px; width: 312px;"></div>
+					</div>
 				</td>
 			</tr>
 			<tr id="triggerSelectRow">
@@ -121,24 +135,24 @@
 								<td>
 									<label for="iconid_off"><?php echo _('Default'); ?></label>
 									<br />
-									<select class="input" name="iconid_off" id="iconid_off"></select>
+									<select class="input select" name="iconid_off" id="iconid_off"></select>
 								</td>
 								<td id="iconProblemRow">
 									<label for="iconid_on"><?php echo _('Problem'); ?></label>
 									<br />
-									<select class="input" name="iconid_on" id="iconid_on"></select>
+									<select class="input select" name="iconid_on" id="iconid_on"></select>
 								</td>
 							</tr>
 							<tr>
 								<td id="iconMainetnanceRow">
 									<label for="iconid_maintenance"><?php echo _('Maintenance'); ?></label>
 									<br />
-									<select class="input" name="iconid_maintenance" id="iconid_maintenance"></select>
+									<select class="input select" name="iconid_maintenance" id="iconid_maintenance"></select>
 								</td>
 								<td id="iconDisabledRow">
 									<label for="iconid_disabled"><?php echo _('Disabled'); ?></label>
 									<br />
-									<select class="input" name="iconid_disabled" id="iconid_disabled"></select>
+									<select class="input select" name="iconid_disabled" id="iconid_disabled"></select>
 								</td>
 							</tr>
 							</tbody>
@@ -181,9 +195,9 @@
 			</tr>
 			<tr class="footer">
 				<td colspan="2" class="form_row_last">
-					<input id="elementApply" class="element-edit-control" type="button" name="apply" value="<?php echo CHtml::encode(_('Apply')); ?>">
-					<input id="elementRemove" class="element-edit-control" type="button" name="remove" value="<?php echo CHtml::encode(_('Remove')); ?>">
-					<input id="elementClose" type="button" name="close" value=<?php echo CHtml::encode(_('Close')); ?>>
+					<input id="elementApply" class="element-edit-control jqueryinput" type="button" name="apply" value="<?php echo CHtml::encode(_('Apply')); ?>">
+					<input id="elementRemove" class="element-edit-control jqueryinput" type="button" name="remove" value="<?php echo CHtml::encode(_('Remove')); ?>">
+					<input id="elementClose" class="jqueryinput" type="button" name="close" value=<?php echo CHtml::encode(_('Close')); ?>>
 				</td>
 			</tr>
 			</tbody>
@@ -216,14 +230,17 @@
 					<input type="checkbox" name="chkbox_label" id="chkboxLabel" class="checkbox">
 					<label for="chkboxLabel"><?php echo _('Label'); ?></label>
 				</td>
-				<td><textarea id="massLabel" cols="56" rows="4" name="label" class="input"></textarea></td>
+				<td>
+					<textarea id="massLabel" cols="56" rows="4" name="label" class="input textarea_standard"></textarea>
+				</td>
 			</tr>
 			<tr>
 				<td>
 					<input type="checkbox" name="chkbox_label_location" id="chkboxLabelLocation" class="checkbox">
 					<label for="chkboxLabelLocation"><?php echo _('Label location'); ?></label>
 				</td>
-				<td><select id="massLabelLocation" class="input" name="label_location">
+				<td>
+					<select id="massLabelLocation" class="input select" name="label_location">
 						<option value="-1">-</option>
 						<option value="<?php echo MAP_LABEL_LOC_BOTTOM; ?>"><?php echo _('Bottom'); ?></option>
 						<option value="<?php echo MAP_LABEL_LOC_LEFT; ?>"><?php echo _('Left'); ?></option>
@@ -237,42 +254,51 @@
 					<input type="checkbox" name="chkbox_use_iconmap" id="chkboxMassUseIconmap" class="checkbox">
 					<label for="chkboxMassUseIconmap"><?php echo _('Automatic icon selection'); ?></label>
 				</td>
-				<td><input type="checkbox" name="use_iconmap" id="massUseIconmap" class="checkbox" value="1"></select></td>
+				<td>
+					<input type="checkbox" name="use_iconmap" id="massUseIconmap" class="checkbox" value="1">
+				</td>
 			</tr>
 			<tr>
 				<td>
 					<input type="checkbox" name="chkbox_iconid_off" id="chkboxMassIconidOff" class="checkbox">
 					<label for="chkboxMassIconidOff"><?php echo _('Icon (default)'); ?></label>
 				</td>
-				<td><select class="input" name="iconid_off" id="massIconidOff"></select></td>
+				<td>
+					<select class="input select" name="iconid_off" id="massIconidOff"></select>
+				</td>
 			</tr>
 			<tr>
 				<td>
 					<input type="checkbox" name="chkbox_iconid_on" id="chkboxMassIconidOn" class="checkbox">
 					<label for="chkboxMassIconidOn"><?php echo _('Icon (problem)'); ?></label>
 				</td>
-				<td><select class="input" name="iconid_on" id="massIconidOn"></select></td>
+				<td>
+					<select class="input select" name="iconid_on" id="massIconidOn"></select>
+				</td>
 			</tr>
 			<tr>
 				<td>
 					<input type="checkbox" name="chkbox_iconid_maintenance" id="chkboxMassIconidMaintenance" class="checkbox">
 					<label for="chkboxMassIconidMaintenance"><?php echo _('Icon (maintenance)'); ?></label>
 				</td>
-				<td><select class="input" name="iconid_maintenance" id="massIconidMaintenance"></select></td>
+				<td>
+					<select class="input select" name="iconid_maintenance" id="massIconidMaintenance"></select>
+				</td>
 			</tr>
 			<tr>
 				<td>
 					<input type="checkbox" name="chkbox_iconid_disabled" id="chkboxMassIconidDisabled" class="checkbox">
 					<label for="chkboxMassIconidDisabled"><?php echo _('Icon (disabled)'); ?></label>
 				</td>
-				<td><select class="input" name="iconid_disabled" id="massIconidDisabled"></select>
+				<td>
+					<select class="input select" name="iconid_disabled" id="massIconidDisabled"></select>
 				</td>
 			</tr>
 			<tr class="footer">
 				<td colspan="2" class="form_row_last">
-					<input id="massApply" class="element-edit-control" type="button" name="apply" value="<?php echo CHtml::encode(_('Apply')); ?>">
-					<input id="massRemove" class="element-edit-control" type="button" name="remove" value="<?php echo CHtml::encode(_('Remove')); ?>">
-					<input id="massClose" type="button" name="close" value=<?php echo CHtml::encode(_('Close')); ?>>
+					<input id="massApply" class="element-edit-control jqueryinput" type="button" name="apply" value="<?php echo CHtml::encode(_('Apply')); ?>">
+					<input id="massRemove" class="element-edit-control jqueryinput" type="button" name="remove" value="<?php echo CHtml::encode(_('Remove')); ?>">
+					<input id="massClose" class="jqueryinput" type="button" name="close" value=<?php echo CHtml::encode(_('Close')); ?>>
 				</td>
 			</tr>
 			</tbody>
@@ -319,17 +345,27 @@
 		<table class="formtable">
 			<tbody>
 			<tr>
-				<td><label for="linklabel"><?php echo _('Label'); ?></label></td>
-				<td><textarea cols="48" rows="4" name="label" id="linklabel" class="input"></textarea></td>
+				<td>
+					<label for="linklabel"><?php echo _('Label'); ?></label>
+				</td>
+				<td>
+					<textarea cols="48" rows="4" name="label" id="linklabel" class="input textarea_standard"></textarea>
+				</td>
 			</tr>
 			<tr id="link-connect-to">
-				<td><label for="selementid2"><?php echo _('Connect to'); ?></label></td>
-				<td><select class="input" name="selementid2" id="selementid2"></select></td>
+				<td>
+					<label for="selementid2"><?php echo _('Connect to'); ?></label>
+				</td>
+				<td>
+					<select class="input select" name="selementid2" id="selementid2"></select>
+				</td>
 			</tr>
 			<tr>
-				<td><label for="drawtype"><?php echo _('Type (OK)'); ?></label></td>
-				<td >
-					<select size="1" class="input" name="drawtype" id="drawtype">
+				<td>
+					<label for="drawtype"><?php echo _('Type (OK)'); ?></label>
+				</td>
+				<td>
+					<select size="1" class="input select" name="drawtype" id="drawtype">
 						<option value="<?php echo GRAPH_ITEM_DRAWTYPE_LINE; ?>"><?php echo _('Line'); ?></option>
 						<option value="<?php echo GRAPH_ITEM_DRAWTYPE_BOLD_LINE; ?>"><?php echo _('Bold line'); ?></option>
 						<option value="<?php echo GRAPH_ITEM_DRAWTYPE_DOT; ?>"><?php echo _('Dot'); ?></option>
@@ -338,7 +374,9 @@
 				</td>
 			</tr>
 			<tr>
-				<td><label for="color"><?php echo _('Colour (OK)'); ?></label></td>
+				<td>
+					<label for="color"><?php echo _('Colour (OK)'); ?></label>
+				</td>
 				<td>
 					<input maxlength="6" size="7" id="color" name="color" class="input colorpicker">
 					<div id="lbl_color" class="pointer colorpickerLabel">&nbsp;&nbsp;&nbsp;</div>
@@ -405,7 +443,7 @@
 			<input type="hidden" name="linktrigger_#{linktriggerid}_desc_exp" value="#{desc_exp}" />
 			<input type="hidden" name="linktrigger_#{linktriggerid}_triggerid" value="#{triggerid}" />
 			<input type="hidden" name="linktrigger_#{linktriggerid}_linktriggerid" value="#{linktriggerid}" />
-			<select id="linktrigger_#{linktriggerid}_drawtype" name="linktrigger_#{linktriggerid}_drawtype" class="input">
+			<select id="linktrigger_#{linktriggerid}_drawtype" name="linktrigger_#{linktriggerid}_drawtype" class="input select">
 				<option value="<?php echo GRAPH_ITEM_DRAWTYPE_LINE; ?>"><?php echo _('Line'); ?></option>
 				<option value="<?php echo GRAPH_ITEM_DRAWTYPE_BOLD_LINE; ?>"><?php echo _('Bold line'); ?></option>
 				<option value="<?php echo GRAPH_ITEM_DRAWTYPE_DOT; ?>"><?php echo _('Dot'); ?></option>

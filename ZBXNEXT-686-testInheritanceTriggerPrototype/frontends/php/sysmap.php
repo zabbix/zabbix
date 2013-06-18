@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2012 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@ require_once dirname(__FILE__).'/include/forms.inc.php';
 $page['title'] = _('Configuration of network maps');
 $page['file'] = 'sysmap.php';
 $page['hist_arg'] = array('sysmapid');
-$page['scripts'] = array('class.cmap.js', 'class.cviewswitcher.js');
+$page['scripts'] = array('class.cmap.js', 'class.cviewswitcher.js', 'multiselect.js');
 $page['type'] = detect_page_type();
 
 require_once dirname(__FILE__).'/include/page_header.php';
@@ -57,6 +57,7 @@ check_fields($fields);
  */
 if (isset($_REQUEST['favobj'])) {
 	$json = new CJSON();
+
 	if ($_REQUEST['favobj'] == 'sysmap' && $_REQUEST['action'] == 'save') {
 		$sysmapid = get_request('sysmapid', 0);
 
@@ -71,6 +72,7 @@ if (isset($_REQUEST['favobj'])) {
 				'output' => array('sysmapid')
 			));
 			$sysmap = reset($sysmap);
+
 			if ($sysmap === false) {
 				throw new Exception(_('Access denied!')."\n\r");
 			}
@@ -92,6 +94,7 @@ if (isset($_REQUEST['favobj'])) {
 		catch (Exception $e) {
 			DBend(false);
 			$msg = array($e->getMessage());
+
 			foreach (clear_messages() as $errMsg) {
 				$msg[] = $errMsg['type'].': '.$errMsg['message'];
 			}
@@ -113,15 +116,10 @@ if (PAGE_TYPE_HTML != $page['type']) {
 }
 
 /*
- * Display
+ * Permissions
  */
-// include JS + templates
-include('include/views/js/configuration.sysmaps.js.php');
-
-show_table_header(_('CONFIGURATION OF NETWORK MAPS'));
-
 if (isset($_REQUEST['sysmapid'])) {
-	$maps = API::Map()->get(array(
+	$sysmap = API::Map()->get(array(
 		'sysmapids' => $_REQUEST['sysmapid'],
 		'editable' => true,
 		'output' => API_OUTPUT_EXTEND,
@@ -129,97 +127,27 @@ if (isset($_REQUEST['sysmapid'])) {
 		'selectLinks' => API_OUTPUT_EXTEND,
 		'preservekeys' => true
 	));
-
-	if (empty($maps)) {
+	if (empty($sysmap)) {
 		access_deny();
 	}
 	else {
-		$sysmap = reset($maps);
+		$sysmap = reset($sysmap);
 	}
 }
 
-echo SBR;
+/*
+ * Display
+ */
+$data = array('sysmap' => $sysmap);
 
-// elements
-$el_add = new CIcon(_('Add element'), 'iconplus');
-$el_add->setAttribute('id', 'selementAdd');
-$el_rmv = new CIcon(_('Remove element'), 'iconminus');
-$el_rmv->setAttribute('id', 'selementRemove');
+// get selements
+add_elementNames($data['sysmap']['selements']);
 
-// connectors
-$cn_add = new CIcon(_('Add link'), 'iconplus');
-$cn_add->setAttribute('id', 'linkAdd');
-$cn_rmv = new CIcon(_('Remove link'), 'iconminus');
-$cn_rmv->setAttribute('id', 'linkRemove');
-
-$expandMacros = new CSpan(($sysmap['expand_macros'] == SYSMAP_EXPAND_MACROS_ON) ? _('On') : _('Off'), 'whitelink');
-$expandMacros->setAttribute('id', 'expand_macros');
-
-$gridShow = new CSpan(($sysmap['grid_show'] == SYSMAP_GRID_SHOW_ON) ? _('Shown') : _('Hidden'), 'whitelink');
-$gridShow->setAttribute('id', 'gridshow');
-
-$gridAutoAlign = new CSpan(($sysmap['grid_align'] == SYSMAP_GRID_ALIGN_ON) ? _('On') : _('Off'), 'whitelink');
-$gridAutoAlign->setAttribute('id', 'gridautoalign');
-
-$possibleGridSizes = array(
-	20 => '20x20',
-	40 => '40x40',
-	50 => '50x50',
-	75 => '75x75',
-	100 => '100x100'
-);
-$gridSize = new CComboBox('gridsize', $sysmap['grid_size']);
-$gridSize->addItems($possibleGridSizes);
-
-$gridAlignAll = new CSubmit('gridalignall', _('Align icons'));
-$gridAlignAll->setAttribute('id', 'gridalignall');
-
-$gridForm = new CDiv(array($gridSize, $gridAlignAll));
-$gridForm->setAttribute('id', 'gridalignblock');
-
-$saveButton = new CSubmit('save', _('Save'));
-$saveButton->setAttribute('id', 'sysmap_save');
-
-$menuRow = array(
-	_s('Map "%s"', $sysmap['name']),
-	SPACE.SPACE,
-	_('Icon'), SPACE, $el_add, SPACE, $el_rmv,
-	SPACE.SPACE,
-	_('Link'), SPACE, $cn_add, SPACE, $cn_rmv,
-	SPACE.SPACE,
-	_('Expand macros').' [ ', $expandMacros, ' ]',
-	SPACE.SPACE,
-	_('Grid').SPACE.'[', $gridShow, '|', $gridAutoAlign, ']',
-	SPACE,
-	$gridForm,
-	SPACE.'|'.SPACE,
-	$saveButton
-);
-
-$elcn_tab = new CTable(null, 'textwhite');
-$elcn_tab->addRow($menuRow);
-
-show_table_header($elcn_tab);
-
-$sysmap_img = new CImg('images/general/tree/zero.gif', 'Sysmap');
-$sysmap_img->setAttribute('id', 'sysmap_img', $sysmap['width'], $sysmap['height']);
-
-$table = new CTable();
-$table->addRow($sysmap_img);
-$table->Show();
-
-$container = new CDiv();
-$container->setAttribute('id', 'sysmap_cnt');
-$container->Show();
-
-insert_show_color_picker_javascript();
-
-add_elementNames($sysmap['selements']);
-
-foreach ($sysmap['links'] as &$link) {
-	foreach ($link['linktriggers'] as $lnum => $linktrigger) {
+// get links
+foreach ($data['sysmap']['links'] as &$link) {
+	foreach ($link['linktriggers'] as $lnum => $linkTrigger) {
 		$dbTrigger = API::Trigger()->get(array(
-			'triggerids' => $linktrigger['triggerid'],
+			'triggerids' => $linkTrigger['triggerid'],
 			'output' => array('description', 'expression'),
 			'selectHosts' => API_OUTPUT_EXTEND,
 			'preservekeys' => true,
@@ -228,44 +156,45 @@ foreach ($sysmap['links'] as &$link) {
 		$dbTrigger = reset($dbTrigger);
 		$host = reset($dbTrigger['hosts']);
 
-		$link['linktriggers'][$lnum]['desc_exp'] = $host['name'].':'.$dbTrigger['description'];
+		$link['linktriggers'][$lnum]['desc_exp'] = $host['name'].NAME_DELIMITER.$dbTrigger['description'];
 	}
 	order_result($link['linktriggers'], 'desc_exp');
 }
 unset($link);
 
-if ($sysmap['iconmapid']) {
-	$iconMaps = API::IconMap()->get(array(
-		'iconmapids' => $sysmap['iconmapid'],
+// get iconmapping
+if ($data['sysmap']['iconmapid']) {
+	$iconMap = API::IconMap()->get(array(
+		'iconmapids' => $data['sysmap']['iconmapid'],
 		'output' => array('default_iconid'),
 		'preservekeys' => true
 	));
-	$iconMap = reset($iconMaps);
-	$defaultAutoIconId = $iconMap['default_iconid'];
+	$iconMap = reset($iconMap);
+	$data['defaultAutoIconId'] = $iconMap['default_iconid'];
 }
 else {
-	$defaultAutoIconId = null;
+	$data['defaultAutoIconId'] = null;
 }
 
-$iconList = array();
-$result = DBselect(
-		'SELECT i.imageid,i.name'.
-		' FROM images i'.
-		' WHERE i.imagetype='.IMAGE_TYPE_ICON.
-			andDbNode('i.imageid')
+// get icon list
+$data['iconList'] = array();
+$icons = DBselect(
+	'SELECT i.imageid,i.name'.
+	' FROM images i'.
+	' WHERE i.imagetype='.IMAGE_TYPE_ICON.
+		andDbNode('i.imageid')
 );
-while ($row = DBfetch($result)) {
-	$iconList[] = array('imageid' => $row['imageid'], 'name' => $row['name']);
+while ($icon = DBfetch($icons)) {
+	$data['iconList'][] = array('imageid' => $icon['imageid'], 'name' => $icon['name']);
 }
-order_result($iconList, 'name');
+order_result($data['iconList'], 'name');
 
-// we need selements to be a hash for further processing
-$sysmap['selements'] = zbx_toHash($sysmap['selements'], 'selementid');
-$sysmap['links'] = zbx_toHash($sysmap['links'], 'linkid');
-zbx_add_post_js('ZABBIX.apps.map.run("sysmap_cnt", '.CJs::encodeJson(array(
-	'sysmap' => $sysmap,
-	'iconList' => $iconList,
-	'defaultAutoIconId' => $defaultAutoIconId
-), true).');');
+$data['sysmap']['selements'] = zbx_toHash($data['sysmap']['selements'], 'selementid');
+$data['sysmap']['links'] = zbx_toHash($data['sysmap']['links'], 'linkid');
+
+// render view
+$sysmapView = new CView('configuration.sysmap.constructor', $data);
+$sysmapView->render();
+$sysmapView->show();
 
 require_once dirname(__FILE__).'/include/page_footer.php';
