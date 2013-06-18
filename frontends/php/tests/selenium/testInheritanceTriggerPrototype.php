@@ -47,7 +47,7 @@ class testInheritanceTriggerPrototype extends CWebTest {
 	 *
 	 * @var string
 	 */
-	protected $discoveryRule = 'discoveryRuleTest';
+	protected $discoveryRule = 'testInheritanceDiscoveryRule';
 
 	/**
 	 * The name of the test discovery rule key created in the test data set.
@@ -78,177 +78,6 @@ class testInheritanceTriggerPrototype extends CWebTest {
 		DBsave_tables('triggers');
 	}
 
-	// Returns layout data
-	public static function layout() {
-		return array(
-			array(
-				array('constructor' => 'open')
-			),
-			array(
-				array('constructor' => 'open_close')
-			),
-			array(
-				array('constructor' => 'open', 'severity' => 'Warning')
-			),
-			array(
-				array('constructor' => 'open_close', 'severity' => 'Disaster')
-			),
-			array(
-				array('severity' => 'Not classified')
-			),
-			array(
-				array('severity' => 'Information')
-			),
-			array(
-				array('severity' => 'Warning')
-			),
-			array(
-				array('severity' => 'Average')
-			),
-			array(
-				array('severity' => 'High')
-			),
-			array(
-				array('severity' => 'Disaster')
-			)
-		);
-	}
-
-	/**
-	 * @dataProvider layout
-	 */
-	public function testInheritanceTriggerPrototype_CheckLayout($data) {
-
-		$this->zbxTestLogin('templates.php');
-		$this->zbxTestClickWait('link='.$this->template);
-		$this->zbxTestClickWait('link=Discovery rules');
-		$this->zbxTestClickWait('link='.$this->discoveryRule);
-		$this->zbxTestClickWait('link=Trigger prototypes');
-
-		$this->checkTitle('Configuration of trigger prototypes');
-		$this->zbxTestTextPresent(array('CONFIGURATION OF TRIGGER PROTOTYPES', "Trigger prototypes of ".$this->discoveryRule));
-
-		$this->zbxTestClickWait('form');
-		$this->checkTitle('Configuration of trigger prototypes');
-		$this->zbxTestTextPresent('CONFIGURATION OF TRIGGER PROTOTYPES');
-		$this->assertElementPresent("//div[@id='tab_triggersTab' and text()='Trigger prototype']");
-
-		if (isset($data['constructor'])) {
-			switch ($data['constructor']) {
-				case 'open':
-					$this->zbxTestClick("//span[text()='Expression constructor']");
-					sleep(1);
-					break;
-				case 'open_close':
-					$this->zbxTestClick("//span[text()='Expression constructor']");
-					sleep(1);
-					$this->zbxTestClick("//span[text()='Close expression constructor']");
-					sleep(1);
-					break;
-			}
-		}
-
-		$this->zbxTestTextPresent('Trigger');
-		$this->zbxTestTextPresent('Name');
-		$this->assertVisible('description');
-		$this->assertAttribute("//input[@id='description']/@maxlength", '255');
-		$this->assertAttribute("//input[@id='description']/@size", '50');
-
-		if (!(isset($data['constructor'])) || $data['constructor'] == 'open_close') {
-			$this->zbxTestTextPresent(array('Expression', 'Expression constructor'));
-			$this->assertVisible('expression');
-			$this->assertAttribute("//textarea[@id='expression']/@rows", '7');
-			$this->assertVisible('insert');
-			$this->assertAttribute("//input[@id='insert']/@value", 'Add');
-
-			$this->assertElementNotPresent('add_expression');
-			$this->assertElementNotPresent('insert_macro');
-			$this->assertElementNotPresent('exp_list');
-		} else {
-			$this->zbxTestTextPresent('Expression');
-			$this->assertVisible('expr_temp');
-			$this->assertAttribute("//textarea[@id='expr_temp']/@rows", '7');
-			$this->assertAttribute("//textarea[@id='expr_temp']/@readonly", 'readonly');
-			$this->zbxTestTextNotPresent('Expression constructor');
-			$this->assertNotVisible('expression');
-
-			$this->assertVisible('add_expression');
-			$this->assertAttribute("//input[@id='add_expression']/@value", 'Add');
-
-			$this->assertVisible('insert');
-			$this->assertAttribute("//input[@id='insert']/@value", 'Edit');
-
-			$this->assertVisible('insert_macro');
-			$this->assertAttribute("//input[@id='insert_macro']/@value", 'Insert macro');
-
-			$this->zbxTestTextPresent(array('Target', 'Expression', 'Action', 'Close expression constructor'));
-			$this->assertVisible('exp_list');
-			$this->zbxTestTextPresent('Close expression constructor');
-		}
-
-		$this->zbxTestTextPresent('Multiple PROBLEM events generation');
-		$this->assertVisible('type');
-		$this->assertAttribute("//input[@id='type']/@type", 'checkbox');
-
-		$this->zbxTestTextPresent('Description');
-		$this->assertVisible('comments');
-		$this->assertAttribute("//textarea[@id='comments']/@rows", '7');
-
-		$this->zbxTestTextPresent('URL');
-		$this->assertVisible('url');
-		$this->assertAttribute("//input[@id='url']/@maxlength", '255');
-		$this->assertAttribute("//input[@id='url']/@size", '50');
-
-		$this->assertVisible('severity_0');
-		$this->assertAttribute("//*[@id='severity_0']/@checked", 'checked');
-		$this->assertElementPresent("//*[@id='severity_label_0']/span[text()='Not classified']");
-		$this->assertVisible('severity_1');
-		$this->assertElementPresent("//*[@id='severity_label_1']/span[text()='Information']");
-		$this->assertVisible('severity_2');
-		$this->assertElementPresent("//*[@id='severity_label_2']/span[text()='Warning']");
-		$this->assertVisible('severity_3');
-		$this->assertElementPresent("//*[@id='severity_label_3']/span[text()='Average']");
-		$this->assertVisible('severity_4');
-		$this->assertElementPresent("//*[@id='severity_label_4']/span[text()='High']");
-		$this->assertVisible('severity_5');
-		$this->assertElementPresent("//*[@id='severity_label_5']/span[text()='Disaster']");
-
-		if (isset($data['severity'])) {
-			switch ($data['severity']) {
-				case 'Not classified':
-					$this->zbxTestClick('severity_0');
-					break;
-				case 'Information':
-					$this->zbxTestClick('severity_1');
-					break;
-				case 'Warning':
-					$this->zbxTestClick('severity_2');
-					break;
-				case 'Average':
-					$this->zbxTestClick('severity_3');
-					break;
-				case 'High':
-					$this->zbxTestClick('severity_4');
-					break;
-				case 'Disaster':
-					$this->zbxTestClick('severity_5');
-					break;
-				default:
-					break;
-			}
-		}
-
-		$this->zbxTestTextPresent('Enabled');
-		$this->assertVisible('status');
-		$this->assertAttribute("//input[@id='status']/@type", 'checkbox');
-
-		$this->assertVisible('save');
-		$this->assertAttribute("//input[@id='save']/@value", 'Save');
-
-		$this->assertVisible('cancel');
-		$this->assertAttribute("//input[@id='cancel']/@value", 'Cancel');
-	}
-
 	// Returns update data
 	public static function update() {
 		return DBdata("select * from triggers t left join functions f on f.triggerid=t.triggerid where f.itemid='23600' and t.description LIKE 'testInheritanceTriggerPrototype%'");
@@ -260,7 +89,7 @@ class testInheritanceTriggerPrototype extends CWebTest {
 	public function testInheritanceTriggerPrototype_SimpleUpdate($data) {
 		$description = $data['description'];
 
-		$sqlTriggers = "select * from triggers";
+		$sqlTriggers = "select * from triggers ORDER BY triggerid";
 		$oldHashTriggers = DBhash($sqlTriggers);
 
 		$this->zbxTestLogin('templates.php');
@@ -280,7 +109,7 @@ class testInheritanceTriggerPrototype extends CWebTest {
 	}
 
 
-	public static function zcreate() {
+	public static function create() {
 		return array(
 			array(
 				array(
@@ -329,7 +158,7 @@ class testInheritanceTriggerPrototype extends CWebTest {
 					'description' => 'MyTrigger_sysUptime',
 					'expression' => '{Inheritance test template:item-discovery-prototype.last(0)}<0',
 					'expressionHost' => '{Template inheritance test host:item-discovery-prototype.last(0)}<0',
-					'hostCheck' => true,
+					'hostCheck' => true
 				)
 			),
 			array(
@@ -338,7 +167,7 @@ class testInheritanceTriggerPrototype extends CWebTest {
 					'description' => '1234567890',
 					'expression' => '{Inheritance test template:item-discovery-prototype.last(0)}<0',
 					'expressionHost' => '{Template inheritance test host:item-discovery-prototype.last(0)}<0',
-					'hostCheck' => true,
+					'hostCheck' => true
 				)
 			),
 			array(
@@ -347,7 +176,7 @@ class testInheritanceTriggerPrototype extends CWebTest {
 					'description' => 'a?aa+',
 					'expression' => '{Inheritance test template:item-discovery-prototype.last(0)}<0',
 					'expressionHost' => '{Template inheritance test host:item-discovery-prototype.last(0)}<0',
-					'hostCheck' => true,
+					'hostCheck' => true
 				)
 			),
 			array(
@@ -356,7 +185,7 @@ class testInheritanceTriggerPrototype extends CWebTest {
 					'description' => '}aa]a{',
 					'expression' => '{Inheritance test template:item-discovery-prototype.last(0)}<0',
 					'expressionHost' => '{Template inheritance test host:item-discovery-prototype.last(0)}<0',
-					'hostCheck' => true,
+					'hostCheck' => true
 				)
 			),
 			array(
@@ -365,7 +194,7 @@ class testInheritanceTriggerPrototype extends CWebTest {
 					'description' => '-aaa=%',
 					'expression' => '{Inheritance test template:item-discovery-prototype.last(0)}<0',
 					'expressionHost' => '{Template inheritance test host:item-discovery-prototype.last(0)}<0',
-					'hostCheck' => true,
+					'hostCheck' => true
 				)
 			),
 			array(
@@ -374,7 +203,7 @@ class testInheritanceTriggerPrototype extends CWebTest {
 					'description' => 'aaa,;:',
 					'expression' => '{Inheritance test template:item-discovery-prototype.last(0)}<0',
 					'expressionHost' => '{Template inheritance test host:item-discovery-prototype.last(0)}<0',
-					'hostCheck' => true,
+					'hostCheck' => true
 				)
 			),
 			array(
@@ -382,7 +211,7 @@ class testInheritanceTriggerPrototype extends CWebTest {
 					'expected' => TRIGGER_GOOD,
 					'description' => 'aaa><.',
 					'expression' => '{Inheritance test template:item-discovery-prototype.last(0)}<0',
-					'hostCheck' => true,
+					'hostCheck' => true
 				)
 			),
 			array(
@@ -390,7 +219,7 @@ class testInheritanceTriggerPrototype extends CWebTest {
 					'expected' => TRIGGER_GOOD,
 					'description' => 'aaa*&_',
 					'expression' => '{Inheritance test template:item-discovery-prototype.last(0)}<0',
-					'hostCheck' => true,
+					'hostCheck' => true
 				)
 			),
 			array(
@@ -398,7 +227,7 @@ class testInheritanceTriggerPrototype extends CWebTest {
 					'expected' => TRIGGER_GOOD,
 					'description' => 'aaa#@!',
 					'expression' => '{Inheritance test template:item-discovery-prototype.last(0)}<0',
-					'hostCheck' => true,
+					'hostCheck' => true
 				)
 			),
 			array(
@@ -406,7 +235,7 @@ class testInheritanceTriggerPrototype extends CWebTest {
 					'expected' => TRIGGER_GOOD,
 					'description' => '([)$^',
 					'expression' => '{Inheritance test template:item-discovery-prototype.last(0)}<0',
-					'hostCheck' => true,
+					'hostCheck' => true
 				)
 			),
 			array(
@@ -418,7 +247,7 @@ class testInheritanceTriggerPrototype extends CWebTest {
 					'comments' => 'Trigger status (expression) is recalculated every time Zabbix server receives new value, if this value is part of this expression. If time based functions are used in the expression, it is recalculated every 30 seconds by a zabbix timer process. ',
 					'url' => 'www.zabbix.com',
 					'severity' => 'High',
-					'status' => false,
+					'status' => false
 				)
 			),
 			array(
@@ -428,7 +257,7 @@ class testInheritanceTriggerPrototype extends CWebTest {
 					'expression' => '{Inheritance test template:someItem.uptime.last(0)}<0',
 					'errors' => array(
 						'ERROR: Cannot add trigger',
-						'Incorrect item key "someItem.uptime" provided for trigger expression on "Inheritance test template".'
+						'Trigger prototype expression "{Inheritance test template:someItem.uptime.last(0)}<0" must contain at least one item prototype.'
 					)
 				)
 			),
@@ -439,7 +268,7 @@ class testInheritanceTriggerPrototype extends CWebTest {
 					'expression' => '{Inheritance test template:item-discovery-prototype.somefunc(0)}<0',
 					'errors' => array(
 						'ERROR: Cannot add trigger',
-						'Cannot implode expression "{Inheritance test template:item-discovery-prototype.somefunc(0)}<0". Incorrect trigger function "somefunc" provided in expression. Unknown function.'
+						'Cannot implode expression "{Inheritance test template:item-discovery-prototype.somefunc(0)}<0". Incorrect trigger function "somefunc(0)" provided in expression. Unknown function.'
 					)
 				)
 			),
@@ -499,7 +328,8 @@ class testInheritanceTriggerPrototype extends CWebTest {
 					'constructor' => array(array(
 						'errors' => array(
 							'ERROR: Expression Syntax Error.',
-							'Incorrect trigger expression. Check expression part starting from "{Inheritance test template@:item-discovery-prototype.last(0)}".'),
+							'Incorrect trigger expression. Check expression part starting from "{Inheritance test template@:item-discovery-prototype.last(0)}".'
+							),
 						)
 					)
 				)
@@ -512,7 +342,8 @@ class testInheritanceTriggerPrototype extends CWebTest {
 					'constructor' => array(array(
 						'errors' => array(
 							'ERROR: Expression Syntax Error.',
-							'Incorrect trigger expression. Check expression part starting from "{Inheritance test template:system .uptime.last(0)}".'),
+							'Incorrect trigger expression. Check expression part starting from "{Inheritance test template:system .uptime.last(0)}".'
+							),
 						)
 					)
 				)
@@ -525,7 +356,8 @@ class testInheritanceTriggerPrototype extends CWebTest {
 					'constructor' => array(array(
 						'errors' => array(
 							'ERROR: Expression Syntax Error.',
-							'Incorrect trigger expression. Check expression part starting from "{Inheritance test template:system .uptime.last(0)}".'),
+							'Incorrect trigger expression. Check expression part starting from "{Inheritance test template:system .uptime.last(0)}".'
+							),
 						)
 					)
 				)
@@ -538,7 +370,8 @@ class testInheritanceTriggerPrototype extends CWebTest {
 					'constructor' => array(array(
 						'errors' => array(
 							'ERROR: Expression Syntax Error.',
-							'Incorrect trigger expression. Check expression part starting from "{Inheritance test template:item-discovery-prototype.lastA(0)}".'),
+							'Incorrect trigger expression. Check expression part starting from "{Inheritance test template:item-discovery-prototype.lastA(0)}".'
+							),
 						)
 					)
 				)
@@ -548,13 +381,15 @@ class testInheritanceTriggerPrototype extends CWebTest {
 					'description' => 'triggerSimple',
 					'expression' => 'default',
 					'hostCheck' => true,
-					'dbCheck' => true)
+					'dbCheck' => true
+				)
 			),
 			array(
 				array('expected' => TRIGGER_GOOD,
 					'description' => 'triggerName',
 					'expression' => 'default',
-					'hostCheck' => true)
+					'hostCheck' => true
+				)
 			),
 			array(
 				array('expected' => TRIGGER_GOOD,
@@ -571,7 +406,8 @@ class testInheritanceTriggerPrototype extends CWebTest {
 					'hostCheck' => true,
 					'dbCheck' => true,
 					'hostRemove' => true,
-					'remove' => true)
+					'remove' => true
+				)
 			),
 			array(
 				array('expected' => TRIGGER_BAD,
@@ -579,14 +415,15 @@ class testInheritanceTriggerPrototype extends CWebTest {
 					'expression' => 'default',
 					'errors' => array(
 						'ERROR: Cannot add trigger',
-						'Trigger "triggerSimple" already exists on "Inheritance test template".')
+						'Trigger "triggerSimple" already exists on "Inheritance test template".'
+					)
 				)
 			)
 		);
 	}
 
 	/**
-	 * @dataProvider simple
+	 * @dataProvider create
 	 */
 	public function testInheritanceTriggerPrototype_SimpleCreate($data) {
 
@@ -631,22 +468,22 @@ class testInheritanceTriggerPrototype extends CWebTest {
 		if (isset($data['severity'])) {
 			switch ($data['severity']) {
 				case 'Not classified':
-					$this->zbxTestClick('severity_0');
+					$this->zbxTestClick('priority_0');
 					break;
 				case 'Information':
-					$this->zbxTestClick('severity_1');
+					$this->zbxTestClick('priority_1');
 					break;
 				case 'Warning':
-					$this->zbxTestClick('severity_2');
+					$this->zbxTestClick('priority_2');
 					break;
 				case 'Average':
-					$this->zbxTestClick('severity_3');
+					$this->zbxTestClick('priority_3');
 					break;
 				case 'High':
-					$this->zbxTestClick('severity_4');
+					$this->zbxTestClick('priority_4');
 					break;
 				case 'Disaster':
-					$this->zbxTestClick('severity_5');
+					$this->zbxTestClick('priority_5');
 					break;
 			}
 		}
