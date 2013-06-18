@@ -17,8 +17,8 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
+
 $auditWidget = new CWidget();
 
 // header
@@ -99,12 +99,9 @@ foreach ($this->data['alerts'] as $alert) {
 		$retries = new CSpan(0, 'red');
 	}
 
-	if ($alert['alerttype'] == ALERT_TYPE_MESSAGE) {
-		$message = array(bold(_('Subject').NAME_DELIMITER), br(), $alert['subject'], br(), br(), bold(_('Message').NAME_DELIMITER), br(), zbx_nl2br($alert['message']));
-	}
-	else {
-		$message = array(bold(_('Command').NAME_DELIMITER), br(), zbx_nl2br($alert['message']));
-	}
+	$message = ($alert['alerttype'] == ALERT_TYPE_MESSAGE)
+		? array(bold(_('Subject').NAME_DELIMITER), br(), $alert['subject'], br(), br(), bold(_('Message').NAME_DELIMITER), br(), zbx_nl2br($alert['message']))
+		: array(bold(_('Command').NAME_DELIMITER), br(), zbx_nl2br($alert['message']));
 
 	$error = empty($alert['error']) ? new CSpan(SPACE, 'off') : new CSpan($alert['error'], 'on');
 
@@ -140,5 +137,5 @@ zbx_add_post_js('timeControl.processObjects();');
 
 // append form to widget
 $auditWidget->addItem($auditForm);
+
 return $auditWidget;
-?>

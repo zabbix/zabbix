@@ -17,8 +17,8 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
+
 require_once dirname(__FILE__).'/include/config.inc.php';
 require_once dirname(__FILE__).'/include/audit.inc.php';
 require_once dirname(__FILE__).'/include/actions.inc.php';
@@ -27,7 +27,7 @@ require_once dirname(__FILE__).'/include/users.inc.php';
 $page['title'] = _('Audit actions');
 $page['file'] = 'auditacts.php';
 $page['hist_arg'] = array();
-$page['scripts'] = array('class.calendar.js','gtlc.js');
+$page['scripts'] = array('class.calendar.js', 'gtlc.js');
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
 require_once dirname(__FILE__).'/include/page_header.php';
@@ -46,8 +46,8 @@ $fields = array(
 	'stime' =>		array(T_ZBX_STR, O_OPT, null,	null,		null),
 	// ajax
 	'favobj' =>		array(T_ZBX_STR, O_OPT, P_ACT,	null,		null),
-	'favref' =>		array(T_ZBX_STR, O_OPT, P_ACT,	NOT_EMPTY,	'isset({favobj})&&("filter"=={favobj})'),
-	'favstate' =>	array(T_ZBX_INT, O_OPT, P_ACT,	NOT_EMPTY,	'isset({favobj})&&("filter"=={favobj})'),
+	'favref' =>		array(T_ZBX_STR, O_OPT, P_ACT,	NOT_EMPTY,	'isset({favobj})&&"filter"=={favobj}'),
+	'favstate' =>	array(T_ZBX_INT, O_OPT, P_ACT,	NOT_EMPTY,	'isset({favobj})&&"filter"=={favobj}'),
 	'favid' =>		array(T_ZBX_INT, O_OPT, P_ACT,	null,		null)
 );
 check_fields($fields);
@@ -67,7 +67,7 @@ if (isset($_REQUEST['favobj'])) {
 	}
 }
 
-if (PAGE_TYPE_JS == $page['type'] || PAGE_TYPE_HTML_BLOCK == $page['type']) {
+if ($page['type'] == PAGE_TYPE_JS || $page['type'] == PAGE_TYPE_HTML_BLOCK) {
 	require_once dirname(__FILE__).'/include/page_footer.php';
 	exit();
 }
@@ -75,10 +75,9 @@ if (PAGE_TYPE_JS == $page['type'] || PAGE_TYPE_HTML_BLOCK == $page['type']) {
 /*
  * Filter
  */
-if (isset($_REQUEST['filter_rst'])) {
-	$_REQUEST['alias'] = '';
-}
-$_REQUEST['alias'] = get_request('alias', CProfile::get('web.auditacts.filter.alias', ''));
+$_REQUEST['alias'] = isset($_REQUEST['filter_rst'])
+	? ''
+	: get_request('alias', CProfile::get('web.auditacts.filter.alias', ''));
 
 if (isset($_REQUEST['filter_set']) || isset($_REQUEST['filter_rst'])) {
 	CProfile::update('web.auditacts.filter.alias', $_REQUEST['alias'], PROFILE_TYPE_STR);
@@ -111,7 +110,7 @@ foreach (eventSourceObjects() as $eventSource) {
 	$data['alerts'] = array_merge($data['alerts'], API::Alert()->get(array(
 		'output' => API_OUTPUT_EXTEND,
 		'selectMediatypes' => API_OUTPUT_EXTEND,
-		'userids' => ($data['alias']) ? $user['userid'] : null,
+		'userids' => $data['alias'] ? $user['userid'] : null,
 		'time_from' => $from,
 		'time_till' => $till,
 		'eventsource' => $eventSource['source'],
@@ -128,11 +127,15 @@ $data['alerts'] = array_slice($data['alerts'], 0, $config['search_limit'] + 1);
 $data['paging'] = getPagingLine($data['alerts']);
 
 // fetch the year of the first alert
-$firstAlert = DBfetch(DBselect('SELECT MIN(a.clock) AS clock FROM alerts a'));
+$firstAlert = DBfetch(DBselect(
+	'SELECT MIN(a.clock) AS clock'.
+	' FROM alerts a'.
+		(isset($user['userid']) ? ' WHERE a.userid='.$user['userid'] : '')
+));
 
 $data['timeline'] = array(
 	'period' => $effectivePeriod,
-	'starttime' => date(TIMESTAMP_FORMAT, ($firstAlert) ? $firstAlert['clock'] : time() - SEC_PER_HOUR),
+	'starttime' => date(TIMESTAMP_FORMAT, ($firstAlert ? $firstAlert['clock'] : time() - SEC_PER_HOUR)),
 	'usertime' => isset($data['stime']) ? date(TIMESTAMP_FORMAT, zbxDateToTime($data['stime']) + $effectivePeriod) : null
 );
 
@@ -142,4 +145,3 @@ $auditView->render();
 $auditView->show();
 
 require_once dirname(__FILE__).'/include/page_footer.php';
-?>

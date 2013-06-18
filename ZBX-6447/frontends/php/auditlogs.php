@@ -17,8 +17,8 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
+
 require_once dirname(__FILE__).'/include/config.inc.php';
 require_once dirname(__FILE__).'/include/audit.inc.php';
 require_once dirname(__FILE__).'/include/actions.inc.php';
@@ -49,8 +49,8 @@ $fields = array(
 	'stime' =>			array(T_ZBX_STR, O_OPT, null,	null,		null),
 	// ajax
 	'favobj' =>			array(T_ZBX_STR, O_OPT, P_ACT,	null,		null),
-	'favref' =>			array(T_ZBX_STR, O_OPT, P_ACT,	NOT_EMPTY,	'isset({favobj})&&("filter"=={favobj})'),
-	'favstate' =>		array(T_ZBX_INT, O_OPT, P_ACT,	NOT_EMPTY,	'isset({favobj})&&("filter"=={favobj})'),
+	'favref' =>			array(T_ZBX_STR, O_OPT, P_ACT,	NOT_EMPTY,	'isset({favobj})&&"filter"=={favobj}'),
+	'favstate' =>		array(T_ZBX_INT, O_OPT, P_ACT,	NOT_EMPTY,	'isset({favobj})&&"filter"=={favobj}'),
 	'favid' =>			array(T_ZBX_INT, O_OPT, P_ACT,	null,		null)
 );
 check_fields($fields);
@@ -82,9 +82,11 @@ if (isset($_REQUEST['filter_rst'])) {
 	$_REQUEST['action'] = -1;
 	$_REQUEST['resourcetype'] = -1;
 }
-$_REQUEST['alias'] = get_request('alias', CProfile::get('web.auditlogs.filter.alias', ''));
-$_REQUEST['action'] = get_request('action', CProfile::get('web.auditlogs.filter.action', -1));
-$_REQUEST['resourcetype'] = get_request('resourcetype', CProfile::get('web.auditlogs.filter.resourcetype', -1));
+else {
+	$_REQUEST['alias'] = get_request('alias', CProfile::get('web.auditlogs.filter.alias', ''));
+	$_REQUEST['action'] = get_request('action', CProfile::get('web.auditlogs.filter.action', -1));
+	$_REQUEST['resourcetype'] = get_request('resourcetype', CProfile::get('web.auditlogs.filter.resourcetype', -1));
+}
 
 if (isset($_REQUEST['filter_set']) || isset($_REQUEST['filter_rst'])) {
 	CProfile::update('web.auditlogs.filter.alias', $_REQUEST['alias'], PROFILE_TYPE_STR);
@@ -176,17 +178,16 @@ $data['paging'] = getPagingLine($data['actions']);
 // get timeline
 unset($sqlWhere['from'], $sqlWhere['till']);
 
-$sql = 'SELECT a.auditid,a.clock'.
+$sql = 'SELECT MIN(a.clock) AS clock'.
 		' FROM auditlog a,users u'.
 		' WHERE a.userid=u.userid'.
-		implode('', $sqlWhere).
-		andDbNode('u.userid', get_current_nodeid(null, PERM_READ)).
-		' ORDER BY a.clock';
+			implode('', $sqlWhere).
+			andDbNode('u.userid', get_current_nodeid(null, PERM_READ));
 $firstAudit = DBfetch(DBselect($sql, $config['search_limit'] + 1));
 
 $data['timeline'] = array(
 	'period' => $effectivePeriod,
-	'starttime' => date(TIMESTAMP_FORMAT, !empty($firstAudit) ? $firstAudit['clock'] : null),
+	'starttime' => date(TIMESTAMP_FORMAT, $firstAudit ? $firstAudit['clock'] : null),
 	'usertime' => isset($_REQUEST['stime']) ? date(TIMESTAMP_FORMAT, zbxDateToTime($data['stime']) + $effectivePeriod) : null
 );
 
@@ -196,4 +197,3 @@ $auditView->render();
 $auditView->show();
 
 require_once dirname(__FILE__).'/include/page_footer.php';
-?>
