@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -10,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -107,7 +107,7 @@ if (!empty($this->data['items'])) {
 $addButton = new CButton('add_item', _('Add'),
 	'return PopUp("popup.php?writeonly=1&multiselect=1&dstfrm='.$graphForm->getName().
 		(!empty($this->data['normal_only']) ? '&normal_only=1' : '').
-		'&srctbl=items&srcfld1=itemid&srcfld2=name" + getOnlyHostParam(), 800, 600);',
+		'&srctbl=items&srcfld1=itemid&srcfld2=name&numeric=1" + getOnlyHostParam(), 800, 600);',
 	'link_menu'
 );
 
@@ -118,7 +118,7 @@ if (!empty($this->data['parent_discoveryid'])) {
 			url_param($this->data['graphtype'], false, 'graphtype').
 			url_param('parent_discoveryid').
 			(!empty($this->data['normal_only']) ? '&normal_only=1' : '').
-			'&srctbl=prototypes&srcfld1=itemid&srcfld2=name", 800, 600);',
+			'&srctbl=prototypes&srcfld1=itemid&srcfld2=name&numeric=1", 800, 600);',
 		'link_menu'
 	);
 }
@@ -187,7 +187,9 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 				'&dstfld2=ymin_name'.
 				'&srctbl=items'.
 				'&srcfld1=itemid'.
-				'&srcfld2=name" + getOnlyHostParam(), 0, 0, "zbx_popup_item");',
+				'&srcfld2=name'.
+				'&numeric=1'.
+				'&writeonly=1" + getOnlyHostParam(), 0, 0, "zbx_popup_item");',
 			'formlist'
 		);
 
@@ -200,7 +202,8 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 					'&dstfld2=ymin_name'.
 					'&srctbl=prototypes'.
 					'&srcfld1=itemid'.
-					'&srcfld2=name", 0, 0, "zbx_popup_item");',
+					'&srcfld2=name'.
+					'&numeric=1", 0, 0, "zbx_popup_item");',
 				'formlist'
 			);
 		}
@@ -239,7 +242,9 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 				'&dstfld2=ymax_name'.
 				'&srctbl=items'.
 				'&srcfld1=itemid'.
-				'&srcfld2=name" + getOnlyHostParam(), 0, 0, "zbx_popup_item");',
+				'&srcfld2=name'.
+				'&numeric=1'.
+				'&writeonly=1" + getOnlyHostParam(), 0, 0, "zbx_popup_item");',
 			'formlist'
 		);
 
@@ -252,7 +257,8 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 					'&dstfld2=ymax_name'.
 					'&srctbl=prototypes'.
 					'&srcfld1=itemid'.
-					'&srcfld2=name", 0, 0, "zbx_popup_item");',
+					'&srcfld2=name'.
+					'&numeric=1", 0, 0, "zbx_popup_item");',
 				'formlist'
 			);
 		}

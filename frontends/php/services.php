@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2011 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -10,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -33,7 +33,7 @@ if (isset($_REQUEST['pservices']) || isset($_REQUEST['cservices'])) {
 	define('ZBX_PAGE_NO_MENU', 1);
 }
 
-include_once('include/page_header.php');
+require_once dirname(__FILE__).'/include/page_header.php';
 
 //	VAR		TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 $fields = array(
@@ -294,7 +294,6 @@ if (isset($_REQUEST['pservices'])) {
 	$servicesView = new CView('configuration.services.parent.list', $data);
 	$servicesView->render();
 	$servicesView->show();
-	include_once('include/page_footer.php');
 }
 
 /*
@@ -337,7 +336,6 @@ if (isset($_REQUEST['cservices'])) {
 	$servicesView = new CView('configuration.services.child.list', $data);
 	$servicesView->render();
 	$servicesView->show();
-	include_once('include/page_footer.php');
 }
 
 /*
@@ -477,4 +475,4 @@ else {
 	$servicesView->show();
 }
 
-include_once('include/page_footer.php');
+require_once dirname(__FILE__).'/include/page_footer.php';

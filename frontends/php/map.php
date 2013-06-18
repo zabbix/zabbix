@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2012 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -10,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -30,16 +30,17 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION		EXCEPTION
 $fields = array(
-	'sysmapid' =>		array(T_ZBX_INT, O_MAND, P_SYS,	DB_ID,			null),
-	'selements' =>		array(T_ZBX_STR, O_OPT, P_SYS,	DB_ID,			null),
-	'links' =>			array(T_ZBX_STR, O_OPT, P_SYS,	DB_ID,			null),
-	'noselements' =>	array(T_ZBX_INT, O_OPT, null,	IN('0,1'),		null),
-	'nolinks' =>		array(T_ZBX_INT, O_OPT, null,	IN('0,1'),		null),
-	'nocalculations' =>	array(T_ZBX_INT, O_OPT, null,	IN('0,1'),		null),
-	'expand_macros' =>	array(T_ZBX_INT, O_OPT, null,	IN('0,1'),		null),
-	'show_triggers' =>	array(T_ZBX_INT, O_OPT, P_SYS,	IN('0,1,2,3'),	null),
-	'grid' =>			array(T_ZBX_INT, O_OPT, null,	BETWEEN(0, 500), null),
-	'base64image' =>	array(T_ZBX_INT, O_OPT, null,	IN('0,1'),		null)
+	'sysmapid' =>		array(T_ZBX_INT, O_MAND, P_SYS,	DB_ID,				null),
+	'selements' =>		array(T_ZBX_STR, O_OPT, P_SYS,	DB_ID,				null),
+	'links' =>			array(T_ZBX_STR, O_OPT, P_SYS,	DB_ID,				null),
+	'noselements' =>	array(T_ZBX_INT, O_OPT, null,	IN('0,1'),			null),
+	'nolinks' =>		array(T_ZBX_INT, O_OPT, null,	IN('0,1'),			null),
+	'nocalculations' =>	array(T_ZBX_INT, O_OPT, null,	IN('0,1'),			null),
+	'expand_macros' =>	array(T_ZBX_INT, O_OPT, null,	IN('0,1'),			null),
+	'show_triggers' =>	array(T_ZBX_INT, O_OPT, P_SYS,	IN('0,1,2,3'),		null),
+	'severity_min' =>	array(T_ZBX_INT, O_OPT, null,	IN('0,1,2,3,4,5'),	null),
+	'grid' =>			array(T_ZBX_INT, O_OPT, null,	BETWEEN(0, 500),	null),
+	'base64image' =>	array(T_ZBX_INT, O_OPT, null,	IN('0,1'),			null)
 );
 check_fields($fields);
 
@@ -101,8 +102,7 @@ if (isset($_REQUEST['links']) || isset($_REQUEST['nolinks'])) {
 	$map['links'] = $json->decode($map['links'], true);
 }
 
-$nocalculations = get_request('nocalculations', false);
-if ($nocalculations) {
+if (get_request('nocalculations', false)) {
 	foreach ($map['selements'] as $selement) {
 		if ($selement['elementtype'] != SYSMAP_ELEMENT_TYPE_IMAGE) {
 			add_elementNames($map['selements']);
@@ -118,10 +118,11 @@ if ($nocalculations) {
 			'preservekeys' => true
 		));
 		$iconMap = reset($iconMaps);
+
 		$defaultAutoIconId = $iconMap['default_iconid'];
 	}
 
-	$map_info = array();
+	$mapInfo = array();
 	foreach ($map['selements'] as $selement) {
 		// if element use icon map and icon map is set for map, and is host like element, we use default icon map icon
 		if ($map['iconmapid'] && $selement['use_iconmap']
@@ -134,12 +135,12 @@ if ($nocalculations) {
 			$iconid = $selement['iconid_off'];
 		}
 
-		$map_info[$selement['selementid']] = array(
+		$mapInfo[$selement['selementid']] = array(
 			'iconid' => $iconid,
 			'icon_type' => SYSMAP_ELEMENT_ICON_OFF
 		);
 
-		$map_info[$selement['selementid']]['name'] = ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_IMAGE)
+		$mapInfo[$selement['selementid']]['name'] = ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_IMAGE)
 			? _('Image')
 			: $selement['elementName'];
 	}
@@ -153,27 +154,27 @@ else {
 	add_triggerExpressions($map['selements']);
 
 	$areas = populateFromMapAreas($map);
-	$map_info = getSelementsInfo($map);
-	processAreasCoordinates($map, $areas, $map_info);
+	$mapInfo = getSelementsInfo($map, array('severity_min' => get_request('severity_min')));
+	processAreasCoordinates($map, $areas, $mapInfo);
 	$allLinks = false;
 }
 
 /*
  * Draw map
  */
-drawMapConnectors($im, $map, $map_info, $allLinks);
+drawMapConnectors($im, $map, $mapInfo, $allLinks);
 
 if (!isset($_REQUEST['noselements'])) {
-	drawMapHighligts($im, $map, $map_info);
-	drawMapSelements($im, $map, $map_info);
+	drawMapHighligts($im, $map, $mapInfo);
+	drawMapSelements($im, $map, $mapInfo);
 }
 
-$expand_macros = get_request('expand_macros', true);
-drawMapLabels($im, $map, $map_info, $expand_macros);
-drawMapLinkLabels($im, $map, $map_info, $expand_macros);
+$expandMacros = get_request('expand_macros', true);
+drawMapLabels($im, $map, $mapInfo, $expandMacros);
+drawMapLinkLabels($im, $map, $mapInfo, $expandMacros);
 
 if (!isset($_REQUEST['noselements']) && $map['markelements'] == 1) {
-	drawMapSelementsMarks($im, $map, $map_info);
+	drawMapSelementsMarks($im, $map, $mapInfo);
 }
 
 show_messages();

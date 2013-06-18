@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -9,7 +9,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -79,7 +79,7 @@ int	USER_PERF_COUNTER(AGENT_REQUEST *request, AGENT_RESULT *result)
 int	PERF_COUNTER(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	const char		*__function_name = "PERF_COUNTER";
-	char			*counterpath, *tmp;
+	char			counterpath[PDH_MAX_COUNTER_PATH], *tmp;
 	int			interval, ret = SYSINFO_RET_FAIL;
 	double			value;
 	PERF_COUNTER_DATA	*perfs = NULL;
@@ -89,10 +89,12 @@ int	PERF_COUNTER(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if (2 < request->nparam)
 		goto clean;
 
-	counterpath = get_rparam(request, 0);
+	tmp = get_rparam(request, 0);
 
-	if (NULL == counterpath || '\0' == *counterpath)
+	if (NULL == tmp || '\0' == *tmp)
 		goto clean;
+
+	strscpy(counterpath, tmp);
 
 	tmp = get_rparam(request, 1);
 

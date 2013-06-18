@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -9,7 +9,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -899,34 +899,35 @@ function sprintf(string) {
  * 2592000 = 30 * 86400
  * 604800 = 7 * 86400
  *
- * @param int timestamp
- * @param boolean isTsDouble
- * @param boolean isExtend
+ * @param int  timestamp
+ * @param bool isTsDouble
+ * @param bool isExtend
  *
  * @return string
  */
 function formatTimestamp(timestamp, isTsDouble, isExtend) {
 	timestamp = timestamp || 0;
+
 	var years = 0,
-		months = 0,
-		weeks = 0;
+		months = 0;
 
 	if (isExtend) {
 		years = parseInt(timestamp / 31536000);
 		months = parseInt((timestamp - years * 31536000) / 2592000);
-		//weeks = parseInt((timestamp - years * 31536000 - months * 2592000) / 604800);
 	}
 
-	var days = parseInt((timestamp - years * 31536000 - months * 2592000 - weeks * 604800) / 86400);
-	var hours = parseInt((timestamp - years * 31536000 - months * 2592000 - weeks * 604800 - days * 86400) / 3600);
-	//var minutes = parseInt((timestamp - years * 31536000 - months * 2592000 - weeks * 604800 - days * 86400 - hours * 3600) / 60);
+	var days = parseInt((timestamp - years * 31536000 - months * 2592000) / 86400),
+		hours = parseInt((timestamp - years * 31536000 - months * 2592000 - days * 86400) / 3600);
+
+	// due to imprecise calculations it is possible that the remainder contains 12 whole months but no whole years
+	if (months == 12) {
+		years++;
+		months = 0;
+	}
 
 	if (isTsDouble) {
 		if (months.toString().length == 1) {
 			months = '0' + months;
-		}
-		if (weeks.toString().length == 1) {
-			weeks = '0' + weeks;
 		}
 		if (days.toString().length == 1) {
 			days = '0' + days;
@@ -934,21 +935,14 @@ function formatTimestamp(timestamp, isTsDouble, isExtend) {
 		if (hours.toString().length == 1) {
 			hours = '0' + hours;
 		}
-		/*if (minutes.toString().length == 1) {
-			minutes = '0' + minutes;
-		}*/
 	}
 
 	var str = (years == 0) ? '' : years + locale['S_YEAR_SHORT'] + ' ';
 	str += (months == 0) ? '' : months + locale['S_MONTH_SHORT'] + ' ';
-	str += (weeks == 0) ? '' : weeks + locale['S_WEEK_SHORT'] + ' ';
 	str += (isExtend && isTsDouble)
 		? days + locale['S_DAY_SHORT'] + ' '
-		: (days == 0)
-			? ''
-			: days + locale['S_DAY_SHORT'] + ' ';
+		: ((days == 0) ? '' : days + locale['S_DAY_SHORT'] + ' ');
 	str += (hours == 0) ? '' : hours + locale['S_HOUR_SHORT'] + ' ';
-	//str += (minutes == 0) ? '' : minutes + locale['S_MINUTE_SHORT'] + ' ';
 
 	return str;
 }

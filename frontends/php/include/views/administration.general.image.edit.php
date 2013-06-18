@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2012 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -51,10 +51,10 @@ $imageTab->addTab('imageTab', _('Image'), $imageFormList);
 // append buttons
 $imageForm->addItem($imageTab);
 if (!empty($this->data['imageid'])) {
-	$imageForm->addItem(makeFormFooter(array(new CSubmit('save', _('Save'))), array(new CButtonDelete(_('Delete selected image?'), url_param('form').url_param('imageid')), new CButtonCancel())));
+	$imageForm->addItem(makeFormFooter(new CSubmit('save', _('Save')), array(new CButtonDelete(_('Delete selected image?'), url_param('form').url_param('imageid')), new CButtonCancel())));
 }
 else {
-	$imageForm->addItem(makeFormFooter(array(new CSubmit('save', _('Save'))), new CButtonCancel()));
+	$imageForm->addItem(makeFormFooter(new CSubmit('save', _('Save')), new CButtonCancel()));
 }
 
 return $imageForm;

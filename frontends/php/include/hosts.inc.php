@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -10,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -554,9 +554,6 @@ function updateHostStatus($hostids, $status) {
 				' AND h.status='.$oldStatus
 	);
 	while ($host = DBfetch($db_hosts)) {
-		if ($status == HOST_STATUS_NOT_MONITORED) {
-			updateTriggerValueToUnknownByHostId($host['hostid']);
-		}
 		$hostIds[] = $host['hostid'];
 
 		$host_new = $host;
@@ -689,7 +686,7 @@ function get_viewed_groups($perm, $options = array(), $nodeid = null, $sql = arr
 		$def_sql['where'][] = 'EXISTS (SELECT 1'.
 										' FROM items i'.
 										' WHERE hg.hostid=i.hostid'.
-											' AND (i.status='.ITEM_STATUS_ACTIVE.' OR i.status='.ITEM_STATUS_NOTSUPPORTED.')'.
+											' AND i.status='.ITEM_STATUS_ACTIVE.
 											' AND i.lastvalue IS NOT NULL '.zbx_limit(1).')';
 	}
 
@@ -959,7 +956,7 @@ function get_viewed_hosts($perm, $groupid = 0, $options = array(), $nodeid = nul
 		$def_sql['where'][] = 'EXISTS (SELECT NULL FROM items i WHERE h.hostid=i.hostid AND i.status='.ITEM_STATUS_ACTIVE.')';
 	}
 	elseif ($def_options['with_historical_items']) {
-		$def_sql['where'][] = 'EXISTS (SELECT NULL FROM items i WHERE h.hostid=i.hostid AND (i.status='.ITEM_STATUS_ACTIVE.' OR i.status='.ITEM_STATUS_NOTSUPPORTED.') AND i.lastvalue IS NOT NULL)';
+		$def_sql['where'][] = 'EXISTS (SELECT NULL FROM items i WHERE h.hostid=i.hostid AND i.status='.ITEM_STATUS_ACTIVE.' AND i.lastvalue IS NOT NULL)';
 	}
 
 	// triggers
@@ -1141,26 +1138,58 @@ function get_application_by_applicationid($applicationid, $no_error_message = 0)
 	return false;
 }
 
-function get_applications_by_templateid($applicationid) {
-	return DBselect('SELECT a.* FROM applications a WHERE a.templateid='.$applicationid);
-}
+/**
+ * Returns the farthest application ancestor for each given application.
+ *
+ * @param array $applicationIds
+ * @param array $templateApplicationIds		array with parent application IDs as keys and arrays of child application
+ * 											IDs as values
+ *
+ * @return array	an array with child IDs as keys and arrays of ancestor IDs as values
+ */
+function getApplicationSourceParentIds(array $applicationIds, array $templateApplicationIds = array()) {
+	$query = DBSelect(
+		'SELECT at.applicationid,at.templateid'.
+		' FROM application_template at'.
+		' WHERE '.dbConditionInt('at.applicationid', $applicationIds)
+	);
 
-function get_realhost_by_applicationid($applicationid) {
-	$application = get_application_by_applicationid($applicationid);
-	if ($application['templateid'] > 0) {
-		return get_realhost_by_applicationid($application['templateid']);
+	$applicationIds = array();
+	$unsetApplicationIds = array();
+	while ($applicationTemplate = DBfetch($query)) {
+		// check if we already have an application inherited from the current application
+		// if we do - copy all of its child applications to the parent template
+		if (isset($templateApplicationIds[$applicationTemplate['applicationid']])) {
+			$templateApplicationIds[$applicationTemplate['templateid']] = $templateApplicationIds[$applicationTemplate['applicationid']];
+			$unsetApplicationIds[$applicationTemplate['applicationid']] = $applicationTemplate['applicationid'];
+		}
+		// if no - just add the application
+		else {
+			$templateApplicationIds[$applicationTemplate['templateid']][] = $applicationTemplate['applicationid'];
+		}
+		$applicationIds[$applicationTemplate['applicationid']] = $applicationTemplate['templateid'];
 	}
-	return get_host_by_applicationid($applicationid);
-}
 
-function get_host_by_applicationid($applicationid) {
-	$row = DBfetch(DBselect('SELECT h.* FROM hosts h,applications a WHERE a.hostid=h.hostid AND a.applicationid='.$applicationid));
-	if ($row) {
-		return $row;
+	// unset children of all applications that we found a new parent for
+	foreach ($unsetApplicationIds as $applicationId) {
+		unset($templateApplicationIds[$applicationId]);
 	}
-	error(_s('No host with applicationid "%1$s".', $applicationid));
 
-	return false;
+	// continue while we still have new applications to check
+	if ($applicationIds) {
+		return getApplicationSourceParentIds($applicationIds, $templateApplicationIds);
+	}
+	else {
+		// return an inverse hash with application IDs as keys and arrays of parent application IDs as values
+		$result = array();
+		foreach ($templateApplicationIds as $templateId => $applicationIds) {
+			foreach ($applicationIds as $applicationId) {
+				$result[$applicationId][] = $templateId;
+			}
+		}
+
+		return $result;
+	}
 }
 
 /**
@@ -1197,20 +1226,6 @@ function validate_templates($templateid_list) {
 		if ($db_cnt['cnt'] > 1) {
 			$result &= false;
 			error(_s('Template with item key "%1$s" already linked to host.', htmlspecialchars($db_cnt['key_'])));
-		}
-	}
-
-	$res = DBselect(
-		'SELECT name,COUNT(*) AS cnt'.
-		' FROM applications'.
-		' WHERE '.dbConditionInt('hostid',$templateid_list).
-		' GROUP BY name'.
-		' ORDER BY cnt DESC'
-	);
-	while ($db_cnt = DBfetch($res)) {
-		if ($db_cnt['cnt'] > 1) {
-			$result &= false;
-			error(_s('Template with application "%1$s" already linked to host.', htmlspecialchars($db_cnt['name'])));
 		}
 	}
 

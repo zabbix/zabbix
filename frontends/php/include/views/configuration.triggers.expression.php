@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2013 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -143,9 +143,9 @@ $expressionTab->addTab('expressionTab', _('Trigger expression condition'), $expr
 $expressionForm->addItem($expressionTab);
 
 // append buttons to form
-$expressionForm->addItem(makeFormFooter(array(
-	new CSubmit('insert', _('Insert'))),
-	array(new CButtonCancel(url_params(array('parent_discoveryid', 'dstfrm', 'dstfld1')))
+$expressionForm->addItem(makeFormFooter(
+	new CSubmit('insert', _('Insert')),
+	new CButtonCancel(url_params(array('parent_discoveryid', 'dstfrm', 'dstfld1'))
 )));
 
 $expressionWidget->addItem($expressionForm);

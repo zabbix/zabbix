@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -10,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -23,6 +23,10 @@ require_once dirname(__FILE__).'/include/config.inc.php';
 $page['title'] = _('Configuration of scripts');
 $page['file'] = 'scripts.php';
 $page['hist_arg'] = array('scriptid');
+
+if (isset($_REQUEST['form'])) {
+	$page['scripts'] = array('multiselect.js');
+}
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
@@ -37,8 +41,9 @@ $fields = array(
 	'commandipmi' =>		array(T_ZBX_STR, O_OPT, null,			null,		'isset({save})'),
 	'description' =>		array(T_ZBX_STR, O_OPT, null,			null,		'isset({save})'),
 	'access' =>				array(T_ZBX_INT, O_OPT, null,			IN('0,1,2,3'), 'isset({save})'),
-	'groupid' =>			array(T_ZBX_INT, O_OPT, P_SYS,			DB_ID,		'isset({save})'),
+	'groupid' =>			array(T_ZBX_INT, O_OPT, NULL,			DB_ID,		'isset({save})&&{hgstype}!=0'),
 	'usrgrpid' =>			array(T_ZBX_INT, O_OPT, P_SYS,			DB_ID,		'isset({save})'),
+	'hgstype' =>			array(T_ZBX_INT, O_OPT, null,			null,		null),
 	'confirmation' =>		array(T_ZBX_STR, O_OPT, null,			null,		null),
 	'enableConfirmation' =>	array(T_ZBX_STR, O_OPT, null,			null,		null),
 	// actions
@@ -80,6 +85,9 @@ if (isset($_REQUEST['clone']) && isset($_REQUEST['scriptid'])) {
 elseif (isset($_REQUEST['save'])) {
 	$confirmation = get_request('confirmation', '');
 	$enableConfirmation = get_request('enableConfirmation', false);
+	if (empty($_REQUEST['hgstype'])) {
+		$_REQUEST['groupid'] = 0;
+	}
 
 	$command = ($_REQUEST['type'] == ZBX_SCRIPT_TYPE_IPMI) ? $_REQUEST['commandipmi'] : $_REQUEST['command'];
 	if ($enableConfirmation && zbx_empty($confirmation)) {
@@ -187,6 +195,7 @@ if (isset($_REQUEST['form'])) {
 		$data['access'] = get_request('host_access', 0);
 		$data['confirmation'] = get_request('confirmation', '');
 		$data['enableConfirmation'] = get_request('enableConfirmation', false);
+		$data['hgstype'] = get_request('hgstype', 0);
 	}
 	elseif ($data['scriptid']) {
 		$script = API::Script()->get(array(
@@ -205,6 +214,7 @@ if (isset($_REQUEST['form'])) {
 		$data['access'] = $script['host_access'];
 		$data['confirmation'] = $script['confirmation'];
 		$data['enableConfirmation'] = !empty($script['confirmation']);
+		$data['hgstype'] = empty($data['groupid']) ? 0 : 1;
 	}
 
 	$scriptView = new CView('administration.script.edit');
@@ -223,13 +233,22 @@ if (isset($_REQUEST['form'])) {
 	$scriptView->set('access', $data['access']);
 	$scriptView->set('confirmation', $data['confirmation']);
 	$scriptView->set('enableConfirmation', $data['enableConfirmation']);
+	$scriptView->set('hgstype', $data['hgstype']);
 
-	// get list of all groups
-	$groups = API::HostGroup()->get(array(
-		'output' => array('groupid', 'name')
-	));
-	order_result($groups, 'name');
-	$scriptView->set('groups', $groups);
+	// get host gruop
+	$hostGroup = null;
+	if (!empty($data['groupid'])) {
+		$groups = API::HostGroup()->get(array(
+			'groupids' => array($data['groupid']),
+			'output' => array('groupid', 'name')
+		));
+		$groups = reset($groups);
+		$hostGroup[] = array(
+			'id' => $groups['groupid'],
+			'name' => $groups['name']
+		);
+	}
+	$scriptView->set('hostGroup', $hostGroup);
 
 	// get list of user groups
 	$usergroups = API::UserGroup()->get(array(

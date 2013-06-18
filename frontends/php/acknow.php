@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -10,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -75,6 +75,28 @@ if (!isset($_REQUEST['events']) && !isset($_REQUEST['eventid']) && !isset($_REQU
 	show_message(_('No events to acknowledge'));
 	require_once dirname(__FILE__).'/include/page_footer.php';
 }
+// check event permissions
+elseif (get_request('eventid')) {
+	$event = API::Event()->get(array(
+		'output' => array('eventid'),
+		'eventids' => get_request('eventid'),
+		'limit' => 1
+	));
+	if (!$event) {
+		access_deny();
+	}
+}
+// check trigger permissions
+elseif (get_request('triggers')) {
+	$trigger = API::Trigger()->get(array(
+		'output' => array('triggerid'),
+		'triggerids' => get_request('triggers'),
+		'limit' => 1
+	));
+	if (!$trigger) {
+		access_deny();
+	}
+}
 
 $bulk = !isset($_REQUEST['eventid']);
 $_REQUEST['backurl'] = get_request('backurl', 'tr_status.php');
@@ -82,12 +104,12 @@ $_REQUEST['backurl'] = get_request('backurl', 'tr_status.php');
 if (!$bulk) {
 	$options = array(
 		'output' => API_OUTPUT_EXTEND,
-		'selectTriggers' => API_OUTPUT_EXTEND,
+		'selectRelatedObject' => API_OUTPUT_EXTEND,
 		'eventids' => $_REQUEST['eventid']
 	);
 	$events = API::Event()->get($options);
 	$event = reset($events);
-	$event_trigger = reset($event['triggers']);
+	$event_trigger = $event['relatedObject'];
 	$event_acknowledged = $event['acknowledged'];
 	$_REQUEST['events'] = $_REQUEST['eventid'];
 }
@@ -104,7 +126,7 @@ if (isset($_REQUEST['save']) || isset($_REQUEST['saveandreturn'])) {
 		$options = array(
 			'output' => array('eventid'),
 			'acknowledged' => 0,
-			'triggerids' => $_REQUEST['triggers']
+			'objectids' => $_REQUEST['triggers']
 		);
 		$_REQUEST['events'] = API::Event()->get($options);
 	}

@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 #
 # Zabbix
-# Copyright (C) 2000-2011 Zabbix SIA
+# Copyright (C) 2001-2013 Zabbix SIA
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License version 2 as
@@ -9,7 +9,7 @@
 #
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
@@ -31,24 +31,22 @@ my %c = (
 	"after"		=>	"\t{0}\n};\n",
 	"t_bigint"	=>	"ZBX_TYPE_UINT",
 	"t_char"	=>	"ZBX_TYPE_CHAR",
-	"t_cksum_text"	=>	"ZBX_TYPE_TEXT",
+	"t_text"	=>	"ZBX_TYPE_TEXT",
 	"t_double"	=>	"ZBX_TYPE_FLOAT",
-	"t_history_log"	=>	"ZBX_TYPE_TEXT",
-	"t_history_text"=>	"ZBX_TYPE_TEXT",
 	"t_id"		=>	"ZBX_TYPE_ID",
 	"t_image"	=>	"ZBX_TYPE_BLOB",
 	"t_integer"	=>	"ZBX_TYPE_INT",
-	"t_longtext"	=>	"ZBX_TYPE_TEXT",
+	"t_longtext"	=>	"ZBX_TYPE_LONGTEXT",
 	"t_nanosec"	=>	"ZBX_TYPE_INT",
 	"t_serial"	=>	"ZBX_TYPE_UINT",
-	"t_text"	=>	"ZBX_TYPE_TEXT",
+	"t_shorttext"	=>	"ZBX_TYPE_SHORTTEXT",
 	"t_time"	=>	"ZBX_TYPE_INT",
 	"t_varchar"	=>	"ZBX_TYPE_CHAR"
 );
 
 $c{"before"} = "/*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -57,7 +55,7 @@ $c{"before"} = "/*
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -79,17 +77,15 @@ my %ibm_db2 = (
 	"table_options"	=>	"",
 	"t_bigint"	=>	"bigint",
 	"t_char"	=>	"varchar",
-	"t_cksum_text"	=>	"varchar(2048)",
+	"t_text"	=>	"varchar(2048)",
 	"t_double"	=>	"decfloat(16)",
-	"t_history_log"	=>	"varchar(2048)",
-	"t_history_text"=>	"varchar(2048)",
 	"t_id"		=>	"bigint",
 	"t_image"	=>	"blob",
 	"t_integer"	=>	"integer",
 	"t_longtext"	=>	"varchar(2048)",
 	"t_nanosec"	=>	"integer",
 	"t_serial"	=>	"bigint",
-	"t_text"	=>	"varchar(2048)",
+	"t_shorttext"	=>	"varchar(2048)",
 	"t_time"	=>	"integer",
 	"t_varchar"	=>	"varchar"
 );
@@ -102,17 +98,15 @@ my %mysql = (
 	"table_options"	=>	" ENGINE=InnoDB",
 	"t_bigint"	=>	"bigint unsigned",
 	"t_char"	=>	"char",
-	"t_cksum_text"	=>	"text",
+	"t_text"	=>	"text",
 	"t_double"	=>	"double(16,4)",
-	"t_history_log"	=>	"text",
-	"t_history_text"=>	"text",
 	"t_id"		=>	"bigint unsigned",
 	"t_image"	=>	"longblob",
 	"t_integer"	=>	"integer",
 	"t_longtext"	=>	"longtext",
 	"t_nanosec"	=>	"integer",
 	"t_serial"	=>	"bigint unsigned",
-	"t_text"	=>	"text",
+	"t_shorttext"	=>	"text",
 	"t_time"	=>	"integer",
 	"t_varchar"	=>	"varchar"
 );
@@ -125,17 +119,15 @@ my %oracle = (
 	"table_options"	=>	"",
 	"t_bigint"	=>	"number(20)",
 	"t_char"	=>	"nvarchar2",
-	"t_cksum_text"	=>	"nclob",
+	"t_text"	=>	"nclob",
 	"t_double"	=>	"number(20,4)",
-	"t_history_log"	=>	"nclob",
-	"t_history_text"=>	"nclob",
 	"t_id"		=>	"number(20)",
 	"t_image"	=>	"blob",
 	"t_integer"	=>	"number(10)",
 	"t_longtext"	=>	"nclob",
 	"t_nanosec"	=>	"number(10)",
 	"t_serial"	=>	"number(20)",
-	"t_text"	=>	"nvarchar2(2048)",
+	"t_shorttext"	=>	"nvarchar2(2048)",
 	"t_time"	=>	"number(10)",
 	"t_varchar"	=>	"nvarchar2"
 );
@@ -148,17 +140,15 @@ my %postgresql = (
 	"table_options"	=>	"",
 	"t_bigint"	=>	"numeric(20)",
 	"t_char"	=>	"char",
-	"t_cksum_text"	=>	"text",
+	"t_text"	=>	"text",
 	"t_double"	=>	"numeric(16,4)",
-	"t_history_log"	=>	"text",
-	"t_history_text"=>	"text",
 	"t_id"		=>	"bigint",
 	"t_image"	=>	"bytea",
 	"t_integer"	=>	"integer",
 	"t_longtext"	=>	"text",
 	"t_nanosec"	=>	"integer",
 	"t_serial"	=>	"bigserial",
-	"t_text"	=>	"text",
+	"t_shorttext"	=>	"text",
 	"t_time"	=>	"integer",
 	"t_varchar"	=>	"varchar"
 );
@@ -171,17 +161,15 @@ my %sqlite3 = (
 	"table_options"	=>	"",
 	"t_bigint"	=>	"bigint",
 	"t_char"	=>	"char",
-	"t_cksum_text"	=>	"text",
+	"t_text"	=>	"text",
 	"t_double"	=>	"double(16,4)",
-	"t_history_log"	=>	"text",
-	"t_history_text"=>	"text",
 	"t_id"		=>	"bigint",
 	"t_image"	=>	"longblob",
 	"t_integer"	=>	"integer",
 	"t_longtext"	=>	"text",
 	"t_nanosec"	=>	"integer",
 	"t_serial"	=>	"integer",
-	"t_text"	=>	"text",
+	"t_shorttext"	=>	"text",
 	"t_time"	=>	"integer",
 	"t_varchar"	=>	"varchar"
 );

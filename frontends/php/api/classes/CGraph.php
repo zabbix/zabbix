@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -10,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -107,8 +107,13 @@ class CGraph extends CGraphGeneral {
 					' LEFT JOIN rights r'.
 						' ON r.id=hgg.groupid'.
 							' AND '.dbConditionInt('r.groupid', $userGroups).
-				' WHERE g.graphid=gi.graphid'.
-					' AND gi.itemid=i.itemid'.
+				' WHERE (g.graphid=gi.graphid'.
+						' AND gi.itemid=i.itemid'.
+						' OR g.ymin_type='.GRAPH_YAXIS_TYPE_ITEM_VALUE.
+						' AND g.ymin_itemid=i.itemid'.
+						' OR g.ymax_type='.GRAPH_YAXIS_TYPE_ITEM_VALUE.
+						' AND g.ymax_itemid=i.itemid'.
+					')'.
 					' AND i.hostid=hgg.hostid'.
 				' GROUP BY i.hostid'.
 				' HAVING MAX(permission)<'.$permission.
@@ -303,6 +308,10 @@ class CGraph extends CGraphGeneral {
 
 		if (!is_null($options['countOutput'])) {
 			return $result;
+		}
+
+		if (isset($options['expandName'])) {
+			$result = CMacrosResolverHelper::resolveGraphNameByIds($result);
 		}
 
 		if ($result) {
@@ -529,9 +538,11 @@ class CGraph extends CGraphGeneral {
 			$parentGraphids = array();
 			while ($dbGraph = DBfetch($dbGraphs)) {
 				$parentGraphids[] = $dbGraph['graphid'];
-				$itemids[$dbGraph['graphid']] = $dbGraph['graphid'];
+				$graphids[] = $dbGraph['graphid'];
 			}
 		} while (!empty($parentGraphids));
+
+		$graphids = array_unique($graphids);
 
 		DB::delete('screens_items', array(
 			'resourceid' => $graphids,
@@ -581,18 +592,37 @@ class CGraph extends CGraphGeneral {
 				// assigning with key preserves unique itemids
 				$itemids[$gitem['itemid']] = $gitem['itemid'];
 			}
+
+			// add Y axis item IDs for persmission validation
+			if (isset($graph['ymin_type']) && $graph['ymin_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE) {
+				if (!isset($graph['ymin_itemid']) || zbx_empty($graph['ymin_itemid'])) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('No "%1$s" given for graph.', 'ymin_itemid'));
+				}
+				else {
+					$itemids[$graph['ymin_itemid']] = $graph['ymin_itemid'];
+				}
+			}
+			if (isset($graph['ymax_type']) && $graph['ymax_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE) {
+				if (!isset($graph['ymax_itemid']) || zbx_empty($graph['ymax_itemid'])) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('No "%1$s" given for graph.', 'ymax_itemid'));
+				}
+				else {
+					$itemids[$graph['ymax_itemid']] = $graph['ymax_itemid'];
+				}
+			}
 		}
+
+		$allowedItems = API::Item()->get(array(
+			'nodeids' => get_current_nodeid(true),
+			'itemids' => $itemids,
+			'webitems' => true,
+			'editable' => true,
+			'output' => API_OUTPUT_EXTEND,
+			'preservekeys' => true
+		));
+
 		// check permissions only for non super admins
 		if (CUser::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
-			$allowedItems = API::Item()->get(array(
-				'nodeids' => get_current_nodeid(true),
-				'itemids' => $itemids,
-				'webitems' => true,
-				'editable' => true,
-				'output' => API_OUTPUT_EXTEND,
-				'preservekeys' => true
-			));
-
 			foreach ($itemids as $itemid) {
 				if (!isset($allowedItems[$itemid])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
@@ -601,6 +631,18 @@ class CGraph extends CGraphGeneral {
 		}
 
 		parent::checkInput($graphs, $update);
+
+		$allowedValueTypes = array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64);
+
+		// get value type and name for these items
+		foreach ($allowedItems as $item) {
+			if (!in_array($item['value_type'], $allowedValueTypes)) {
+				self::exception(
+					ZBX_API_ERROR_PARAMETERS,
+					_s('Cannot add a non-numeric item "%1$s" to graph "%2$s".', $item['name'], $graph['name'])
+				);
+			}
+		}
 	}
 
 	protected function applyQueryNodeOptions($tableName, $tableAlias, array $options, array $sqlParts) {

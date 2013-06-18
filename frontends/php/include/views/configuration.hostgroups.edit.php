@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -10,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -68,8 +68,8 @@ $hostgroupForm->addItem($hostgroupTab);
 // append buttons to form
 if (empty($this->data['groupid'])) {
 	$hostgroupForm->addItem(makeFormFooter(
-		array(new CSubmit('save', _('Save'))),
-		array(new CButtonCancel())
+		new CSubmit('save', _('Save')),
+		new CButtonCancel()
 	));
 }
 else {
@@ -78,7 +78,7 @@ else {
 		$deleteButton->attr('disabled', 'disabled');
 	}
 	$hostgroupForm->addItem(makeFormFooter(
-		array(new CSubmit('save', _('Save'))),
+		new CSubmit('save', _('Save')),
 		array(
 			new CSubmit('clone', _('Clone')),
 			$deleteButton,

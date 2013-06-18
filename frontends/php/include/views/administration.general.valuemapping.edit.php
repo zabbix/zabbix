@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2012 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -59,15 +59,14 @@ $valueMappingTab->addTab('valuemapping', _('Value mapping'), $valueMappingFormLi
 $valueMappingForm->addItem($valueMappingTab);
 
 // append buttons
-$saveButton = new CSubmit('save', _('Save'));
 if (!empty($this->data['valuemapid'])) {
-	$valueMappingForm->addItem(makeFormFooter(array($saveButton), array(
+	$valueMappingForm->addItem(makeFormFooter(new CSubmit('save', _('Save')), array(
 		new CButtonDelete($this->data['confirmMessage'], url_param('valuemapid')),
 		new CButtonCancel())
 	));
 }
 else {
-	$valueMappingForm->addItem(makeFormFooter(array($saveButton), new CButtonCancel()));
+	$valueMappingForm->addItem(makeFormFooter(new CSubmit('save', _('Save')), new CButtonCancel()));
 }
 
 return $valueMappingForm;

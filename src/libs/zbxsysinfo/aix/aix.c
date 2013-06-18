@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -9,7 +9,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -47,6 +47,6 @@ ZBX_METRIC	parameters_specific[] =
 	{"system.uptime",	0,		SYSTEM_UPTIME,		NULL},
 
 	{"system.stat",		CF_HAVEPARAMS,	SYSTEM_STAT,		"page,fi"},
-	{"system.swap.size",	CF_USEUPARAM,	SYSTEM_SWAP_SIZE,	"all,free"},
+	{"system.swap.size",	CF_HAVEPARAMS,	SYSTEM_SWAP_SIZE,	"all,free"},
 	{NULL}
 };

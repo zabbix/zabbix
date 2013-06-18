@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2012 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -78,7 +78,7 @@ class CPageHeader {
 		$this->cssFiles[] = 'styles/color.css';
 		$this->cssFiles[] = 'styles/icon.css';
 		$this->cssFiles[] = 'styles/blocks.css';
-		$this->cssFiles[] = 'styles/screen.css';
+		$this->cssFiles[] = 'styles/pages.css';
 	}
 
 	/**

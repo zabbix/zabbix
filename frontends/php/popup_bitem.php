@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -10,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -19,9 +19,9 @@
 **/
 
 
-require_once 'include/config.inc.php';
-require_once 'include/triggers.inc.php';
-require_once 'include/js.inc.php';
+require_once dirname(__FILE__).'/include/config.inc.php';
+require_once dirname(__FILE__).'/include/triggers.inc.php';
+require_once dirname(__FILE__).'/include/js.inc.php';
 
 $dstfrm		= get_request('dstfrm',		0);	// destination form
 
@@ -30,7 +30,7 @@ $page['file'] = 'popup_bitem.php';
 
 define('ZBX_PAGE_NO_MENU', 1);
 
-require_once 'include/page_header.php';
+require_once dirname(__FILE__).'/include/page_header.php';
 
 
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
@@ -152,4 +152,4 @@ else{
 	$frmGItem->Show();
 }
 
-require_once 'include/page_footer.php';
+require_once dirname(__FILE__).'/include/page_footer.php';
