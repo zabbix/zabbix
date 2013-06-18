@@ -878,7 +878,7 @@ INSERT INTO functions (functionid,itemid,triggerid,function,parameter) VALUES (1
 INSERT INTO functions (functionid,itemid,triggerid,function,parameter) VALUES (12949,23804,13520,'last','0');
 INSERT INTO functions (functionid,itemid,triggerid,function,parameter) VALUES (12950,23804,13521,'last','0');
 
--- testFormTriggerPrototype.SimpleCreate
+-- testFormTriggerPrototype.LayoutCheck, testInheritanceTriggerPrototype.SimpleUpdate
 INSERT INTO triggers (triggerid, expression, description, comments, flags) VALUES (16000, '{16000}=0', 'testInheritanceTriggerPrototype1', '', 2);
 INSERT INTO functions (functionid, itemid, triggerid, function, parameter) VALUES (16000, 23600 ,16000,'last',0);
 INSERT INTO triggers (triggerid, expression, description, comments, templateid, flags) VALUES (16001, '{16001}=0', 'testInheritanceTriggerPrototype1', '', 16000, 2);
