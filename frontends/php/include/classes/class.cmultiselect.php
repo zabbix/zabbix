@@ -22,26 +22,12 @@
 class CMultiSelect extends CTag {
 
 	/**
-	 * @param string $options['name']
-	 * @param string $options['objectName']
-	 * @param array  $options['data']
-	 * @param bool   $options['disabled']
-	 * @param int    $options['width']
-	 * @param int    $options['limit']
+	 * @see jQuery.multiSelect()
 	 */
 	public function __construct(array $options = array()) {
 		parent::__construct('div', 'yes');
 		$this->attr('id', zbx_formatDomId($options['name']));
 		$this->addClass('multiselect');
-		$this->addStyle('width: '.(isset($options['width']) ? $options['width'] : ZBX_TEXTAREA_STANDARD_WIDTH).'px;');
-
-		// data
-		$data = '[]';
-		if (!empty($options['data'])) {
-			$json = new CJSON();
-
-			$data = $json->encode($options['data']);
-		}
 
 		// url
 		$url = new Curl('jsrpc.php');
@@ -49,16 +35,30 @@ class CMultiSelect extends CTag {
 		$url->setArgument('method', 'multiselect.get');
 		$url->setArgument('objectName', $options['objectName']);
 
-		zbx_add_post_js('jQuery("#'.$this->getAttribute('id').'").multiSelect({
-			url: "'.$url->getUrl().'",
-			name: "'.$options['name'].'",
-			data: '.$data.',
-			limit: '.(isset($options['limit']) ? $options['limit'] : '20').',
-			labels: {
-				emptyResult: "'._('No matches found').'",
-				moreMatchesFound: "'._('More matches found...').'"
-			},
-			disabled: '.($options['disabled'] ? 'true' : 'false').'
-		});');
+		if (!empty($options['objectOptions'])) {
+			foreach ($options['objectOptions'] as $optionName => $optionvalue) {
+				$url->setArgument($optionName, $optionvalue);
+			}
+		}
+
+		$params = array(
+			'id' => $this->getAttribute('id'),
+			'url' => $url->getUrl(),
+			'name' => $options['name'],
+			'labels' => array(
+				'No matches found' => _('No matches found'),
+				'More matches found...' => _('More matches found...'),
+				'type here to search' => _('type here to search'),
+				'new' => _('new')
+			),
+			'data' => empty($options['data']) ? array() : zbx_cleanHashes($options['data']),
+			'ignored' => isset($options['ignored']) ? $options['ignored'] : null,
+			'defaultValue' => isset($options['defaultValue']) ? $options['defaultValue'] : null,
+			'disabled' => isset($options['disabled']) ? $options['disabled'] : false,
+			'selectedLimit' => isset($options['selectedLimit']) ? $options['selectedLimit'] : null,
+			'addNew' => isset($options['addNew']) ? $options['addNew'] : false
+		);
+
+		zbx_add_post_js('jQuery("#'.$this->getAttribute('id').'").multiSelect('.CJs::encodeJson($params).')');
 	}
 }

@@ -20,7 +20,7 @@
 
 				if (menuData.isMonitored) {
 					linkMenu.push(createMenuItem(<?php echo CJs::encodeJson(_('Status of triggers')); ?>,
-						'tr_status.php?hostid=' + menuData.elementId));
+						'tr_status.php?hostid=' + menuData.elementId + '&show_severity=<?php echo $this->data['severity_min']; ?>&filter_set=1'));
 
 					if (menuData.hasScreens) {
 						linkMenu.push(createMenuItem(<?php echo CJs::encodeJson(_('Host screens')); ?>,
@@ -31,7 +31,7 @@
 			// map menu
 			else if (+menuData.elementType === <?php echo SYSMAP_ELEMENT_TYPE_MAP; ?>) {
 				linkMenu.push(createMenuItem(<?php echo CJs::encodeJson(_('Submap')); ?>,
-					'maps.php?sysmapid=' + menuData.elementId));
+					'maps.php?sysmapid=' + menuData.elementId + '&severity_min=<?php echo $this->data['severity_min']; ?>'));
 			}
 			// trigger menu
 			else if (+menuData.elementType === <?php echo SYSMAP_ELEMENT_TYPE_TRIGGER; ?>) {
@@ -41,7 +41,7 @@
 			// host group menu
 			else if (+menuData.elementType === <?php echo SYSMAP_ELEMENT_TYPE_HOST_GROUP; ?>) {
 				linkMenu.push(createMenuItem(<?php echo CJs::encodeJson(_('Status of triggers')); ?>,
-					'tr_status.php?hostid=0&groupid=' + menuData.elementId));
+					'tr_status.php?hostid=0&groupid=' + menuData.elementId + '&show_severity=<?php echo $this->data['severity_min']; ?>&filter_set=1'));
 			}
 
 			// link section

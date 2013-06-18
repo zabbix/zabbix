@@ -104,8 +104,13 @@ class CGraphPrototype extends CGraphGeneral {
 						' LEFT JOIN rights r'.
 							' ON r.id=hgg.groupid'.
 								' AND '.dbConditionInt('r.groupid', $userGroups).
-					' WHERE g.graphid=gi.graphid'.
-						' AND gi.itemid=i.itemid'.
+					' WHERE (g.graphid=gi.graphid'.
+							' AND gi.itemid=i.itemid'.
+							' OR g.ymin_type='.GRAPH_YAXIS_TYPE_ITEM_VALUE.
+							' AND g.ymin_itemid=i.itemid'.
+							' OR g.ymax_type='.GRAPH_YAXIS_TYPE_ITEM_VALUE.
+							' AND g.ymax_itemid=i.itemid'.
+						')'.
 						' AND i.hostid=hgg.hostid'.
 					' GROUP BY i.hostid'.
 					' HAVING MAX(permission)<'.$permission.
@@ -538,10 +543,11 @@ class CGraphPrototype extends CGraphGeneral {
 			$parentGraphids = array();
 			while ($dbGraph = DBfetch($dbGraphs)) {
 				$parentGraphids[] = $dbGraph['graphid'];
-				$graphids[$dbGraph['graphid']] = $dbGraph['graphid'];
+				$graphids[] = $dbGraph['graphid'];
 			}
 		} while (!empty($parentGraphids));
 
+		$graphids = array_unique($graphids);
 		$createdGraphs = array();
 
 		$dbGraphs = DBselect('SELECT gd.graphid FROM graph_discovery gd WHERE '.dbConditionInt('gd.parent_graphid', $graphids));
@@ -589,6 +595,26 @@ class CGraphPrototype extends CGraphGeneral {
 				// assigning with key preserves unique itemids
 				$itemids[$gitem['itemid']] = $gitem['itemid'];
 			}
+
+			// add Y axis item IDs for persmission validation
+			if (isset($graph['ymin_type']) && $graph['ymin_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE) {
+				if (!isset($graph['ymin_itemid']) || zbx_empty($graph['ymin_itemid'])) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('No "%1$s" given for graph prototype.', 'ymin_itemid'));
+				}
+				else {
+					$itemids[$graph['ymin_itemid']] = $graph['ymin_itemid'];
+				}
+			}
+			if (isset($graph['ymax_type']) && $graph['ymax_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE) {
+				if (!isset($graph['ymax_itemid']) || zbx_empty($graph['ymax_itemid'])) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('No "%1$s" given for graph prototype.', 'ymax_itemid'));
+				}
+				else {
+					$itemids[$graph['ymax_itemid']] = $graph['ymax_itemid'];
+				}
+			}
 		}
 
 		$allowedItems = API::Item()->get(array(
@@ -622,6 +648,17 @@ class CGraphPrototype extends CGraphGeneral {
 			}
 			if (!$hasPrototype) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Graph prototype must have at least one prototype.'));
+			}
+		}
+
+		$allowedValueTypes = array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64);
+
+		foreach ($allowedItems as $item) {
+			if (!in_array($item['value_type'], $allowedValueTypes)) {
+				self::exception(
+					ZBX_API_ERROR_PARAMETERS,
+					_s('Cannot add a non-numeric item "%1$s" to graph "%2$s".', $item['name'], $graph['name'])
+				);
 			}
 		}
 	}

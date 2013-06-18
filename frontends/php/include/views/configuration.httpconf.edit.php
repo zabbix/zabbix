@@ -33,25 +33,12 @@ if (!empty($this->data['hostid'])) {
 $httpForm = new CForm();
 $httpForm->setName('httpForm');
 $httpForm->addVar('form', $this->data['form']);
+$httpForm->addVar('hostid', $this->data['hostid']);
 $httpForm->addVar('steps', $this->data['steps']);
 $httpForm->addVar('templated', $this->data['templated']);
 
-
 if (!empty($this->data['httptestid'])) {
 	$httpForm->addVar('httptestid', $this->data['httptestid']);
-	$hostButton = null;
-}
-else {
-	$hostButton = new CButtonPopup(array(
-		'srctbl' => 'hosts_and_templates',
-		'srcfld1' => 'name',
-		'srcfld2' => 'hostid',
-		'dstfrm' => $httpForm->getName(),
-		'dstfld1' => 'hostname',
-		'dstfld2' => 'hostid',
-		'noempty' => 1,
-		'submitParent' => 1
-	));
 }
 
 /*
@@ -63,13 +50,6 @@ $httpFormList = new CFormList('httpFormList');
 if (!empty($this->data['templates'])) {
 	$httpFormList->addRow(_('Parent web scenarios'), $this->data['templates']);
 }
-
-// Host
-$httpForm->addVar('hostid', $this->data['hostid']);
-$httpFormList->addRow(_('Host'), array(
-	new CTextBox('hostname', $this->data['hostname'], ZBX_TEXTBOX_STANDARD_SIZE, true),
-	$hostButton
-));
 
 // Name
 $nameTextBox = new CTextBox('name', $this->data['name'], ZBX_TEXTBOX_STANDARD_SIZE, $this->data['templated'], 64);
@@ -164,7 +144,7 @@ $httpProxyTextBox->setAttribute('placeholder', 'http://[username[:password]@]pro
 $httpFormList->addRow(_('HTTP proxy'), $httpProxyTextBox);
 
 // append status to form list
-$httpFormList->addRow(_('Variables'), new CTextArea('macros', $this->data['macros']));
+$httpFormList->addRow(_('Variables'), new CTextArea('variables', $this->data['variables']));
 $httpFormList->addRow(_('Enabled'), new CCheckBox('status', !$this->data['status']));
 
 /*
@@ -183,7 +163,7 @@ $stepsTable->setHeader(array(
 	new CCol(_('Timeout'), null, null, '50'),
 	new CCol(_('URL'), null, null, '200'),
 	new CCol(_('Required'), null, null, '50'),
-	new CCol(_('Status codes'), null, null, '90'),
+	new CCol(_('Status codes'), 'nowrap', null, '90'),
 	new CCol('', null, null, '50')
 ));
 
@@ -269,7 +249,7 @@ if (!empty($this->data['httptestid'])) {
 		array(
 			new CSubmit('clone', _('Clone')),
 			$this->data['templated'] ? null : new CButtonDelete(_('Delete scenario?'), url_param('form').url_param('httptestid').url_param('hostid')),
-			new CButtonCancel()
+			new CButtonCancel(url_param('hostid'))
 		)
 	));
 }

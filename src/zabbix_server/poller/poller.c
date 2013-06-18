@@ -606,6 +606,7 @@ static int	get_values(unsigned char poller_type)
 				ZBX_STRDUP(items[i].snmpv3_securityname, items[i].snmpv3_securityname_orig);
 				ZBX_STRDUP(items[i].snmpv3_authpassphrase, items[i].snmpv3_authpassphrase_orig);
 				ZBX_STRDUP(items[i].snmpv3_privpassphrase, items[i].snmpv3_privpassphrase_orig);
+				ZBX_STRDUP(items[i].snmpv3_contextname, items[i].snmpv3_contextname_orig);
 
 				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL, NULL,
 						NULL, &items[i].snmpv3_securityname, MACRO_TYPE_COMMON, NULL, 0);
@@ -613,6 +614,8 @@ static int	get_values(unsigned char poller_type)
 						NULL, &items[i].snmpv3_authpassphrase, MACRO_TYPE_COMMON, NULL, 0);
 				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL, NULL,
 						NULL, &items[i].snmpv3_privpassphrase, MACRO_TYPE_COMMON, NULL, 0);
+				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL, NULL,
+						NULL, &items[i].snmpv3_contextname, MACRO_TYPE_COMMON, NULL, 0);
 				/* break; is not missing here */
 			case ITEM_TYPE_SNMPv1:
 			case ITEM_TYPE_SNMPv2c:
@@ -723,6 +726,7 @@ static int	get_values(unsigned char poller_type)
 				zbx_free(items[i].snmpv3_securityname);
 				zbx_free(items[i].snmpv3_authpassphrase);
 				zbx_free(items[i].snmpv3_privpassphrase);
+				zbx_free(items[i].snmpv3_contextname);
 				/* break; is not missing here */
 			case ITEM_TYPE_SNMPv1:
 			case ITEM_TYPE_SNMPv2c:
