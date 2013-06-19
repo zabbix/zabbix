@@ -535,7 +535,7 @@ class CMap extends CMapElement {
 	}
 
 	/**
-	 * Add Map.
+	 * Add map.
 	 *
 	 * @param array  $maps
 	 * @param string $maps['name']
@@ -549,36 +549,36 @@ class CMap extends CMapElement {
 	 * @param int    $maps['grid_show']			does grid need to be shown. Constants: SYSMAP_GRID_SHOW_ON / SYSMAP_GRID_SHOW_OFF
 	 * @param int    $maps['grid_align']		does elements need to be aligned to the grid. Constants: SYSMAP_GRID_ALIGN_ON / SYSMAP_GRID_ALIGN_OFF
 	 *
-	 * @return boolean | array
+	 * @return array
 	 */
 	public function create($maps) {
 		$maps = zbx_toArray($maps);
 
 		$this->checkInput($maps, __FUNCTION__);
 
-		$sysmapids = DB::insert('sysmaps', $maps);
+		$sysmapIds = DB::insert('sysmaps', $maps);
 
 		$newUrls = array();
 		$newSelements = array();
 		$newLinks = array();
 
-		foreach ($sysmapids as $mnum => $sysmapid) {
-			foreach ($maps[$mnum]['urls'] as $url) {
-				$url['sysmapid'] = $sysmapid;
+		foreach ($sysmapIds as $key => $sysmapId) {
+			foreach ($maps[$key]['urls'] as $url) {
+				$url['sysmapid'] = $sysmapId;
 				$newUrls[] = $url;
 			}
 
-			foreach ($maps[$mnum]['selements'] as $snum => $selement) {
-				$maps[$mnum]['selements'][$snum]['sysmapid'] = $sysmapid;
+			foreach ($maps[$key]['selements'] as $snum => $selement) {
+				$maps[$key]['selements'][$snum]['sysmapid'] = $sysmapId;
 			}
 
-			$newSelements = array_merge($newSelements, $maps[$mnum]['selements']);
+			$newSelements = array_merge($newSelements, $maps[$key]['selements']);
 
-			foreach ($maps[$mnum]['links'] as $lnum => $link) {
-				$maps[$mnum]['links'][$lnum]['sysmapid'] = $sysmapid;
+			foreach ($maps[$key]['links'] as $lnum => $link) {
+				$maps[$key]['links'][$lnum]['sysmapid'] = $sysmapId;
 			}
 
-			$newLinks = array_merge($newLinks, $maps[$mnum]['links']);
+			$newLinks = array_merge($newLinks, $maps[$key]['links']);
 		}
 
 		DB::insert('sysmap_url', $newUrls);
@@ -589,27 +589,27 @@ class CMap extends CMapElement {
 			if ($newLinks) {
 				// links
 				$mapVirtSelements = array();
-				foreach ($selementids['selementids'] as $snum => $selementid) {
-					$mapVirtSelements[$newSelements[$snum]['selementid']] = $selementid;
+				foreach ($selementids['selementids'] as $key => $selementid) {
+					$mapVirtSelements[$newSelements[$key]['selementid']] = $selementid;
 				}
 
-				foreach ($newLinks as $lnum => $link) {
-					$newLinks[$lnum]['selementid1'] = $mapVirtSelements[$link['selementid1']];
-					$newLinks[$lnum]['selementid2'] = $mapVirtSelements[$link['selementid2']];
+				foreach ($newLinks as $key => $link) {
+					$newLinks[$key]['selementid1'] = $mapVirtSelements[$link['selementid1']];
+					$newLinks[$key]['selementid2'] = $mapVirtSelements[$link['selementid2']];
 				}
 				unset($mapVirtSelements);
 
-				$linkids = $this->createLinks($newLinks);
+				$linkIds = $this->createLinks($newLinks);
 
 				// linkTriggers
 				$newLinkTriggers = array();
-				foreach ($linkids['linkids'] as $lnum => $linkid) {
-					if (!isset($newLinks[$lnum]['linktriggers'])) {
+				foreach ($linkIds['linkids'] as $key => $linkId) {
+					if (!isset($newLinks[$key]['linktriggers'])) {
 						continue;
 					}
 
-					foreach ($newLinks[$lnum]['linktriggers'] as $linktrigger) {
-						$linktrigger['linkid'] = $linkid;
+					foreach ($newLinks[$key]['linktriggers'] as $linktrigger) {
+						$linktrigger['linkid'] = $linkId;
 						$newLinkTriggers[] = $linktrigger;
 					}
 				}
@@ -620,11 +620,11 @@ class CMap extends CMapElement {
 			}
 		}
 
-		return array('sysmapids' => $sysmapids);
+		return array('sysmapids' => $sysmapIds);
 	}
 
 	/**
-	 * Update Map.
+	 * Update map.
 	 *
 	 * @param array  $maps						multidimensional array with Hosts data
 	 * @param string $maps['sysmapid']
@@ -638,7 +638,7 @@ class CMap extends CMapElement {
 	 * @param int    $maps['grid_show']			does grid need to be shown. Constants: SYSMAP_GRID_SHOW_ON / SYSMAP_GRID_SHOW_OFF
 	 * @param int    $maps['grid_align']		does elements need to be aligned to the grid. Constants: SYSMAP_GRID_ALIGN_ON / SYSMAP_GRID_ALIGN_OFF
 	 *
-	 * @return boolean
+	 * @return array
 	 */
 	public function update(array $maps) {
 		$maps = zbx_toArray($maps);
@@ -663,10 +663,10 @@ class CMap extends CMapElement {
 			if (isset($map['urls'])) {
 				$urlDiff = zbx_array_diff($map['urls'], $dbMap['urls'], 'name');
 
-				foreach ($urlDiff['both'] as $updUrl) {
+				foreach ($urlDiff['both'] as $updateUrl) {
 					$urlsToUpdate[] = array(
-						'values' => $updUrl,
-						'where' => array('name' => $updUrl['name'], 'sysmapid' => $map['sysmapid'])
+						'values' => $updateUrl,
+						'where' => array('name' => $updateUrl['name'], 'sysmapid' => $map['sysmapid'])
 					);
 				}
 
@@ -696,7 +696,7 @@ class CMap extends CMapElement {
 			if (isset($map['links'])) {
 				$linkDiff = zbx_array_diff($map['links'], $dbMap['links'], 'linkid');
 
-				// we need sysmapid for add operations
+				// we need sysmapId for add operations
 				foreach ($linkDiff['first'] as $newLink) {
 					$newLink['sysmapid'] = $map['sysmapid'];
 
@@ -733,6 +733,37 @@ class CMap extends CMapElement {
 		}
 
 		// links
+		if ($linksToAdd || $linksToUpdate) {
+			$selementsNames = array();
+			foreach ($newSelementIds['selementids'] as $key => $selementId) {
+				$selementsNames[$selementsToAdd[$key]['selementid']] = $selementId;
+			}
+
+			foreach ($selementsToUpdate as $selement) {
+				$selementsNames[$selement['selementid']] = $selement['selementid'];
+			}
+
+			foreach ($linksToAdd as $key => $link) {
+				if (isset($selementsNames[$link['selementid1']])) {
+					$linksToAdd[$key]['selementid1'] = $selementsNames[$link['selementid1']];
+				}
+				if (isset($selementsNames[$link['selementid2']])) {
+					$linksToAdd[$key]['selementid2'] = $selementsNames[$link['selementid2']];
+				}
+			}
+
+			foreach ($linksToUpdate as $key => $link) {
+				if (isset($selementsNames[$link['selementid1']])) {
+					$linksToUpdate[$key]['selementid1'] = $selementsNames[$link['selementid1']];
+				}
+				if (isset($selementsNames[$link['selementid2']])) {
+					$linksToUpdate[$key]['selementid2'] = $selementsNames[$link['selementid2']];
+				}
+			}
+
+			unset($selementsNames);
+		}
+
 		$newLinkIds = $updateLinkIds = array('linkids' => array());
 
 		if ($linksToAdd) {
