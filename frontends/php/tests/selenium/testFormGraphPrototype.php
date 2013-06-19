@@ -61,28 +61,28 @@ class testFormGraphPrototype extends CWebTest {
 	 *
 	 * @var string
 	 */
-	protected $itemSimple = 'itemInheritance';
+	protected $itemSimple = 'testFormItem';
 
 	/**
 	 * The name of the test item key created in the test data set.
 	 *
 	 * @var string
 	 */
-	protected $itemKeySimple = 'key-item-inheritance';
+	protected $itemKeySimple = 'test-item-reuse';
 
 	/**
 	 * The name of the test item prototype within test discovery rule created in the test data set.
 	 *
 	 * @var string
 	 */
-	protected $item = 'itemDiscovery';
+	protected $item = 'testFormItemReuse';
 
 	/**
 	 * The name of the test item prototype key within test discovery rule created in the test data set.
 	 *
 	 * @var string
 	 */
-	protected $itemKey = 'item-discovery-prototype';
+	protected $testFormItemReuse = 'item-prototype-reuse';
 
 	/**
 	 * The value of the yaxismin field to be created in the test data set.
@@ -115,7 +115,7 @@ class testFormGraphPrototype extends CWebTest {
 					'ymax_type' => 'Item',
 				)
 			),
-		/*	array(
+			array(
 				array(
 					'graphtype' => 'Normal',
 				)
@@ -178,7 +178,7 @@ class testFormGraphPrototype extends CWebTest {
 				array(
 					'graphtype' => 'Exploded',
 				)
-			)*/
+			)
 		);
 	}
 
@@ -188,7 +188,7 @@ class testFormGraphPrototype extends CWebTest {
 	public function testFormGraphPrototype_CheckLayout($data) {
 
 		$this->zbxTestLogin('hosts.php');
-		$this->zbxTestClickWait('link='.$this->template);
+		$this->zbxTestClickWait('link='.$this->host);
 		$this->zbxTestClickWait('link=Discovery rules');
 		$this->zbxTestClickWait('link='.$this->discoveryRule);
 		$this->zbxTestClickWait('link=Graph prototypes');
@@ -391,7 +391,7 @@ class testFormGraphPrototype extends CWebTest {
 		$this->assertAttribute("//input[@id='add_protoitem']/@value", 'Add prototype');
 
 		$this->zbxTestLaunchPopup('add_protoitem');
-		$this->zbxTestClick("//span[text()='"."$this->item"."']");
+		$this->zbxTestClick("//span[text()='".$this->item."']");
 		sleep(1);
 		$this->selectWindow(null);
 
@@ -475,20 +475,20 @@ class testFormGraphPrototype extends CWebTest {
 
 	// Returns update data
 	public static function update() {
-	//	return DBdata("select * from graphs g left join graphs_items gi on gi.graphid=g.graphid where gi.itemid='23600'");
+		return DBdata("select * from graphs where name LIKE 'testFormGraphPrototype%'");
 	}
 
 	/**
 	 * @dataProvider update
 	 */
-/*	public function testFormGraphPrototype_SimpleUpdate($data) {
+	public function testFormGraphPrototype_SimpleUpdate($data) {
 		$name = $data['name'];
 
-		$sqlGraphs = "select * from graphs";
+		$sqlGraphs = "select * from graphs ORDER BY graphid";
 		$oldHashGraphs = DBhash($sqlGraphs);
 
-		$this->zbxTestLogin('templates.php');
-		$this->zbxTestClickWait('link='.$this->template);
+		$this->zbxTestLogin('hosts.php');
+		$this->zbxTestClickWait('link='.$this->host);
 		$this->zbxTestClickWait('link=Discovery rules');
 		$this->zbxTestClickWait('link='.$this->discoveryRule);
 		$this->zbxTestClickWait('link=Graph prototypes');
@@ -501,169 +501,191 @@ class testFormGraphPrototype extends CWebTest {
 
 		$this->assertEquals($oldHashGraphs, DBhash($sqlGraphs));
 	}
-*/
+
 	// Returns create data
 	public static function create() {
 		return array(
-		/*	array(
-				array('expected' => GRAPH_GOOD,
+			array(
+				array(
+					'expected' => GRAPH_GOOD,
 					'graphName' => 'graphSimple',
 					'hostCheck' => true,
-					'dbCheck' => true)
+					'dbCheck' => true
+				)
 			),
 			array(
-				array('expected' => GRAPH_GOOD,
+				array(
+					'expected' => GRAPH_GOOD,
 					'graphName' => 'graphName',
-					'hostCheck' => true)
+					'hostCheck' => true
+				)
 			),
 			array(
-				array('expected' => GRAPH_GOOD,
+				array(
+					'expected' => GRAPH_GOOD,
 					'graphName' => 'graphRemove',
-					'hostCheck' => true,
+					'formCheck' => true,
 					'dbCheck' => true,
-					'remove' => true)
+					'remove' => true
+				)
 			),
 			array(
-				array('expected' => GRAPH_GOOD,
+				array(
+					'expected' => GRAPH_GOOD,
 					'graphName' => 'graphNotRemove',
-					'hostCheck' => true,
+					'formCheck' => true,
 					'dbCheck' => true,
-					'hostRemove' => true,
-					'remove' => true)
+					'remove' => true
+				)
 			),
 			array(
-				array('expected' => GRAPH_GOOD,
+				array(
+					'expected' => GRAPH_GOOD,
 					'graphName' => 'graphNormal1',
 					'graphtype' => 'Normal',
-					'hostCheck' => true,
+					'formCheck' => true,
 					'dbCheck' => true,
-					'hostRemove' => true,
-					'remove' => true)
+					'remove' => true
+				)
 			),
 			array(
-				array('expected' => GRAPH_GOOD,
+				array(
+					'expected' => GRAPH_GOOD,
 					'graphName' => 'graphNormal2',
 					'graphtype' => 'Normal',
 					'ymin_type' => 'Fixed',
 					'ymax_type' => 'Calculated',
-					'hostCheck' => true,
+					'formCheck' => true,
 					'dbCheck' => true,
-					'hostRemove' => true,
-					'remove' => true)
+					'remove' => true
+				)
 			),
 			array(
-				array('expected' => GRAPH_GOOD,
+				array(
+					'expected' => GRAPH_GOOD,
 					'graphName' => 'graphNormal3',
 					'ymin_type' => 'Item',
 					'ymax_type' => 'Fixed',
-					'hostCheck' => true,
+					'formCheck' => true,
 					'dbCheck' => true,
-					'hostRemove' => true,
-					'remove' => true)
+					'remove' => true
+				)
 			),
 			array(
-				array('expected' => GRAPH_GOOD,
+				array(
+					'expected' => GRAPH_GOOD,
 					'graphName' => 'graphNormal4',
 					'ymin_type' => 'Fixed',
 					'ymax_type' => 'Item',
-					'hostCheck' => true,
+					'formCheck' => true,
 					'dbCheck' => true,
-					'hostRemove' => true,
-					'remove' => true)
+					'remove' => true
+				)
 			),
 			array(
-				array('expected' => GRAPH_GOOD,
+				array(
+					'expected' => GRAPH_GOOD,
 					'graphName' => 'graphNormal5',
 					'ymin_type' => 'Item',
 					'ymax_type' => 'Item',
-					'hostCheck' => true,
+					'formCheck' => true,
 					'dbCheck' => true,
-					'hostRemove' => true,
-					'remove' => true)
+					'remove' => true
+				)
 			),
 			array(
-				array('expected' => GRAPH_GOOD,
+				array(
+					'expected' => GRAPH_GOOD,
 					'graphName' => 'graphStacked1',
 					'graphtype' => 'Stacked',
 					'ymin_type' => 'Item',
 					'ymax_type' => 'Fixed',
-					'hostCheck' => true,
+					'formCheck' => true,
 					'dbCheck' => true,
-					'hostRemove' => true,
-					'remove' => true)
+					'remove' => true
+				)
 			),
 			array(
-				array('expected' => GRAPH_GOOD,
+				array(
+					'expected' => GRAPH_GOOD,
 					'graphName' => 'graphStacked2',
 					'graphtype' => 'Stacked',
 					'ymin_type' => 'Fixed',
 					'ymax_type' => 'Fixed',
-					'hostCheck' => true,
+					'formCheck' => true,
 					'dbCheck' => true,
-					'hostRemove' => true,
-					'remove' => true)
+					'remove' => true
+				)
 			),
 			array(
-				array('expected' => GRAPH_GOOD,
+				array(
+					'expected' => GRAPH_GOOD,
 					'graphName' => 'graphStacked3',
 					'graphtype' => 'Stacked',
 					'ymax_type' => 'Fixed',
-					'hostCheck' => true,
+					'formCheck' => true,
 					'dbCheck' => true,
-					'hostRemove' => true,
-					'remove' => true)
+					'remove' => true
+				)
 			),
 			array(
-				array('expected' => GRAPH_GOOD,
+				array(
+					'expected' => GRAPH_GOOD,
 					'graphName' => 'graphStacked4',
 					'graphtype' => 'Stacked',
 					'ymax_type' => 'Item',
-					'hostCheck' => true,
+					'formCheck' => true,
 					'dbCheck' => true,
-					'hostRemove' => true,
-					'remove' => true)
+					'remove' => true
+				)
 			),
 			array(
-				array('expected' => GRAPH_GOOD,
+				array(
+					'expected' => GRAPH_GOOD,
 					'graphName' => 'graphStacked5',
 					'graphtype' => 'Stacked',
-					'hostCheck' => true,
+					'formCheck' => true,
 					'dbCheck' => true,
-					'hostRemove' => true,
-					'remove' => true)
+					'remove' => true
+				)
 			),
 			array(
-				array('expected' => GRAPH_GOOD,
+				array(
+					'expected' => GRAPH_GOOD,
 					'graphName' => 'graphPie',
 					'graphtype' => 'Pie',
-					'hostCheck' => true,
+					'formCheck' => true,
 					'dbCheck' => true,
-					'hostRemove' => true,
-					'remove' => true)
+					'remove' => true
+				)
 			),
 			array(
-				array('expected' => GRAPH_GOOD,
+				array(
+					'expected' => GRAPH_GOOD,
 					'graphName' => 'graphExploded',
 					'graphtype' => 'Exploded',
-					'hostCheck' => true,
+					'formCheck' => true,
 					'dbCheck' => true,
-					'hostRemove' => true,
-					'remove' => true)
+					'remove' => true
+				)
 			),
 			array(
-				array('expected' => GRAPH_GOOD,
+				array(
+					'expected' => GRAPH_GOOD,
 					'graphName' => 'graphSomeRemove',
-					'hostCheck' => true,
+					'formCheck' => true,
 					'dbCheck' => true,
-					'hostRemove' => true,
-					'remove' => true)
+					'remove' => true
+				)
 			),
 			array(
-				array('expected' => GRAPH_BAD,
+				array(
+					'expected' => GRAPH_BAD,
 					'graphName' => 'graphSimple',
 					'errors' => array(
 						'ERROR: Cannot add graph',
-						'Graph with name "graphSimple" already exists in graphs or graph prototypes')
+						'Graph with name "graphSimple" already exists in graphs or graph prototypes'
+					)
 				)
 			),
 			array(
@@ -707,14 +729,28 @@ class testFormGraphPrototype extends CWebTest {
 			array(
 				array(
 					'expected' => GRAPH_BAD,
-					'graphName' => 'graphStackedSome',
+					'graphName' => 'graphStackedNoMinAxisItem',
 					'graphtype' => 'Stacked',
 					'noAxisItem' => true,
 					'ymin_type' => 'Item',
 					'ymax_type' => 'Fixed',
 					'errors' => array(
 						'ERROR: Cannot add graph',
-						'Incorrect item for axis value.'
+						'No permissions to referred object or it does not exist!'
+					)
+				)
+			),
+			array(
+				array(
+					'expected' => GRAPH_BAD,
+					'graphName' => 'graphStackedNoMaxAxisItem',
+					'graphtype' => 'Stacked',
+					'noAxisItem' => true,
+					'ymin_type' => 'Fixed',
+					'ymax_type' => 'Item',
+					'errors' => array(
+						'ERROR: Cannot add graph',
+						'No permissions to referred object or it does not exist!'
 					)
 				)
 			),
@@ -751,7 +787,7 @@ class testFormGraphPrototype extends CWebTest {
 						'Warning. Incorrect value for field "Height (min:20, max:65535)": must be between 20 and 65535.'
 					)
 				)
-			)*/
+			)
 		);
 	}
 
@@ -760,8 +796,8 @@ class testFormGraphPrototype extends CWebTest {
 	 */
 	public function testFormGraphPrototype_SimpleCreate($data) {
 
-		$this->zbxTestLogin('templates.php');
-		$this->zbxTestClickWait('link='.$this->template);
+		$this->zbxTestLogin('hosts.php');
+		$this->zbxTestClickWait('link='.$this->host);
 		$this->zbxTestClickWait('link=Discovery rules');
 		$this->zbxTestClickWait('link='.$this->discoveryRule);
 		$this->zbxTestClickWait('link=Graph prototypes');
@@ -891,65 +927,35 @@ class testFormGraphPrototype extends CWebTest {
 				break;
 		}
 
-		if (isset($data['hostCheck'])) {
+		if (isset($data['formCheck'])) {
 			$this->zbxTestOpenWait('hosts.php');
 			$this->zbxTestClickWait('link='.$this->host);
 			$this->zbxTestClickWait("link=Discovery rules");
 			$this->zbxTestClickWait('link='.$this->discoveryRule);
 			$this->zbxTestClickWait("link=Graph prototypes");
 
-			$this->zbxTestTextPresent($this->template.": $graphName");
 			$this->zbxTestClickWait("link=$graphName");
 
-			$this->zbxTestTextPresent('Parent graphs');
 			$this->assertElementValue('name', $graphName);
 			$this->assertElementPresent("//span[text()='".$this->host.": ".$this->itemSimple."']");
 			$this->assertElementPresent("//span[text()='".$this->host.": ".$this->item."']");
 		}
 
 		if (isset($data['dbCheck'])) {
-			// template
 			$result = DBselect("SELECT name, graphid FROM graphs where name = '".$graphName."' limit 1");
 			while ($row = DBfetch($result)) {
 				$this->assertEquals($row['name'], $graphName);
-				$templateid = $row['graphid'];
 			}
-
-			// host
-			$result = DBselect("SELECT name FROM graphs where name = '".$graphName."' AND templateid = ".$templateid."");
-			while ($row = DBfetch($result)) {
-				$this->assertEquals($row['name'], $graphName);
-			}
-		}
-
-		if (isset($data['hostRemove'])) {
-			$result = DBselect("SELECT graphid FROM graphs where name = '".$graphName."' limit 1");
-			while ($row = DBfetch($result)) {
-				$templateid = $row['graphid'];
-			}
-
-			$result = DBselect("SELECT graphid FROM graphs where name = '".$graphName."' AND templateid = ".$templateid."");
-			while ($row = DBfetch($result)) {
-				$graphId = $row['graphid'];
-			}
-			$this->zbxTestOpenWait('hosts.php');
-			$this->zbxTestClickWait('link='.$this->host);
-			$this->zbxTestClickWait("link=Discovery rules");
-			$this->zbxTestClickWait('link='.$this->discoveryRule);
-			$this->zbxTestClickWait("link=Graph prototypes");
-
-			$this->assertElementPresent("group_graphid_$graphId");
-			$this->assertAttribute("//input[@id='group_graphid_$graphId']/@disabled", 'disabled');
 		}
 
 		if (isset($data['remove'])) {
-			$result = DBselect("SELECT graphid FROM graphs where name = '".$graphName."' limit 1");
+			$result = DBselect("SELECT graphid FROM graphs where name = '".$graphName."'");
 			while ($row = DBfetch($result)) {
 				$graphid = $row['graphid'];
 			}
 
-			$this->zbxTestOpenWait('templates.php');
-			$this->zbxTestClickWait('link='.$this->template);
+			$this->zbxTestOpenWait('hosts.php');
+			$this->zbxTestClickWait('link='.$this->host);
 			$this->zbxTestClickWait("link=Discovery rules");
 			$this->zbxTestClickWait('link='.$this->discoveryRule);
 			$this->zbxTestClickWait("link=Graph prototypes");
