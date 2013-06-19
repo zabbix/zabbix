@@ -98,11 +98,12 @@ $till = $from + $effectivePeriod;
 
 // filter by user
 if ($data['alias']) {
-	$users = API::User()->get(array(
+	$user = API::User()->get(array(
 		'output' => array('userid'),
 		'filter' => array('alias' => $data['alias'])
 	));
-	$user = reset($users);
+
+	$user = $user ? reset($user) : array('userid' => -1);
 }
 
 // fetch alerts for different objects and sources and combine them in a single stream

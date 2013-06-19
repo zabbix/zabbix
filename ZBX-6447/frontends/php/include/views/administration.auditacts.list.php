@@ -42,8 +42,8 @@ $filterTable->addRow(array(
 		bold(_('Recipient')),
 		SPACE,
 		new CTextBox('alias', $this->data['alias'], 20),
-		new CButton('btn1', _('Select'), 'return PopUp(\'popup.php?dstfrm='.$filterForm->getName().
-			'&dstfld1=alias&srctbl=users&srcfld1=alias&real_hosts=1\');', 'T')
+		new CButton('btn1', _('Select'), 'return PopUp("popup.php?dstfrm='.$filterForm->getName().
+			'&dstfld1=alias&srctbl=users&srcfld1=alias&real_hosts=1");', 'filter-select-button')
 	)
 ));
 $filterButton = new CButton('filter', _('Filter'), "javascript: create_var('zbx_filter', 'filter_set', '1', true);");
@@ -100,8 +100,21 @@ foreach ($this->data['alerts'] as $alert) {
 	}
 
 	$message = ($alert['alerttype'] == ALERT_TYPE_MESSAGE)
-		? array(bold(_('Subject').NAME_DELIMITER), br(), $alert['subject'], br(), br(), bold(_('Message').NAME_DELIMITER), br(), zbx_nl2br($alert['message']))
-		: array(bold(_('Command').NAME_DELIMITER), br(), zbx_nl2br($alert['message']));
+		? array(
+			bold(_('Subject').NAME_DELIMITER),
+			BR(),
+			$alert['subject'],
+			BR(),
+			BR(),
+			bold(_('Message').NAME_DELIMITER),
+			BR(),
+			zbx_nl2br($alert['message'])
+		)
+		: array(
+			bold(_('Command').NAME_DELIMITER),
+			BR(),
+			zbx_nl2br($alert['message'])
+		);
 
 	$error = empty($alert['error']) ? new CSpan(SPACE, 'off') : new CSpan($alert['error'], 'on');
 
