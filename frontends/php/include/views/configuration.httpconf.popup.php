@@ -44,6 +44,7 @@ if (isset($_REQUEST['save']) && $result) {
 					zbx_jsvalue($_REQUEST['timeout']).','.
 					zbx_jsvalue($_REQUEST['url']).','.
 					zbx_jsvalue($_REQUEST['posts']).','.
+					zbx_jsvalue($_REQUEST['variables']).','.
 					zbx_jsvalue($_REQUEST['required']).','.
 					zbx_jsvalue($_REQUEST['status_codes']).");\n"
 		);
@@ -57,6 +58,7 @@ if (isset($_REQUEST['save']) && $result) {
 					zbx_jsvalue($_REQUEST['timeout']).','.
 					zbx_jsvalue($_REQUEST['url']).','.
 					zbx_jsvalue($_REQUEST['posts']).','.
+					zbx_jsvalue($_REQUEST['variables']).','.
 					zbx_jsvalue($_REQUEST['required']).','.
 					zbx_jsvalue($_REQUEST['status_codes']).");\n"
 		);
@@ -75,6 +77,7 @@ else {
 	$httpPopupFormList->addRow(_('Name'), new CTextBox('name', get_request('name', ''), ZBX_TEXTBOX_STANDARD_SIZE, get_request('templated', null), 64));
 	$httpPopupFormList->addRow(_('URL'), new CTextBox('url', get_request('url', ''), ZBX_TEXTBOX_STANDARD_SIZE));
 	$httpPopupFormList->addRow(_('Post'), new CTextArea('posts', get_request('posts', '')));
+	$httpPopupFormList->addRow(_('Variables'), new CTextArea('variables', get_request('variables', '')));
 	$httpPopupFormList->addRow(_('Timeout'), new CNumericBox('timeout', get_request('timeout', 15), 5));
 	$httpPopupFormList->addRow(_('Required string'), new CTextBox('required', get_request('required', ''), ZBX_TEXTBOX_STANDARD_SIZE));
 	$httpPopupFormList->addRow(_('Required status codes'), new CTextBox('status_codes', get_request('status_codes', ''), ZBX_TEXTBOX_STANDARD_SIZE));
@@ -87,12 +90,11 @@ else {
 	// append buttons to form
 	$stepid = get_request('stepid', null);
 	$httpPopupForm->addItem(makeFormFooter(
-		array(new CSubmit('save', isset($stepid) ? _('Update') : _('Add'))),
-		array(new CButtonCancel(null, 'close_window();'))
+		new CSubmit('save', isset($stepid) ? _('Update') : _('Add')),
+		new CButtonCancel(null, 'close_window();')
 	));
 
 	$httpPopupWidget->addItem($httpPopupForm);
 }
 
 return $httpPopupWidget;
-

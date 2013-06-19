@@ -51,7 +51,7 @@ static int			regexps_alloc = 0;
 static int			regexps_num = 0;
 #endif
 
-static void	init_active_metrics()
+static void	init_active_metrics(void)
 {
 	size_t	sz;
 
@@ -73,7 +73,7 @@ static void	init_active_metrics()
 	}
 }
 
-static void	disable_all_metrics()
+static void	disable_all_metrics(void)
 {
 	int	i;
 
@@ -84,7 +84,7 @@ static void	disable_all_metrics()
 }
 
 #ifdef _WINDOWS
-static void	free_active_metrics()
+static void	free_active_metrics(void)
 {
 	int	i;
 
@@ -101,7 +101,7 @@ static void	free_active_metrics()
 }
 #endif
 
-static int	get_min_nextcheck()
+static int	get_min_nextcheck(void)
 {
 	int	i, min = -1;
 
@@ -355,18 +355,63 @@ json_error:
  ******************************************************************************/
 static int	refresh_active_checks(const char *host, unsigned short port)
 {
+	const char	*__function_name = "refresh_active_checks";
 	zbx_sock_t	s;
 	char		*buf;
 	int		ret;
 	struct zbx_json	json;
 	static int	last_ret = SUCCEED;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In refresh_active_checks('%s',%u)", host, port);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() host:'%s' port:%hu", __function_name, host, port);
 
 	zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
 
 	zbx_json_addstring(&json, ZBX_PROTO_TAG_REQUEST, ZBX_PROTO_VALUE_GET_ACTIVE_CHECKS, ZBX_JSON_TYPE_STRING);
 	zbx_json_addstring(&json, ZBX_PROTO_TAG_HOST, CONFIG_HOSTNAME, ZBX_JSON_TYPE_STRING);
+
+	if (NULL != CONFIG_HOST_METADATA)
+	{
+		zbx_json_addstring(&json, ZBX_PROTO_TAG_HOST_METADATA, CONFIG_HOST_METADATA, ZBX_JSON_TYPE_STRING);
+	}
+	else if (NULL != CONFIG_HOST_METADATA_ITEM)
+	{
+		char		**value;
+		AGENT_RESULT	result;
+
+		init_result(&result);
+
+		if (SUCCEED == process(CONFIG_HOST_METADATA_ITEM, PROCESS_LOCAL_COMMAND, &result) &&
+				NULL != (value = GET_STR_RESULT(&result)) && NULL != *value)
+		{
+			if (SUCCEED != zbx_is_utf8(*value))
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "cannot get host metadata using \"%s\" item specified by"
+						" \"HostMetadataItem\" configuration parameter: returned value is not"
+						" an UTF-8 string", CONFIG_HOST_METADATA_ITEM);
+			}
+			else
+			{
+				if (HOST_METADATA_LEN < zbx_strlen_utf8(*value))
+				{
+					size_t	bytes;
+
+					zabbix_log(LOG_LEVEL_WARNING, "the returned value of \"%s\" item specified by"
+							" \"HostMetadataItem\" configuration parameter is too long,"
+							" using first %d characters", CONFIG_HOST_METADATA_ITEM,
+							HOST_METADATA_LEN);
+
+					bytes = zbx_strlen_utf8_n(*value, HOST_METADATA_LEN);
+					(*value)[bytes] = '\0';
+				}
+				zbx_json_addstring(&json, ZBX_PROTO_TAG_HOST_METADATA, *value, ZBX_JSON_TYPE_STRING);
+			}
+		}
+		else
+			zabbix_log(LOG_LEVEL_WARNING, "cannot get host metadata using \"%s\" item specified by"
+					" \"HostMetadataItem\" configuration parameter", CONFIG_HOST_METADATA_ITEM);
+
+		free_result(&result);
+	}
 
 	if (NULL != CONFIG_LISTEN_IP)
 	{
@@ -420,6 +465,8 @@ static int	refresh_active_checks(const char *host, unsigned short port)
 	last_ret = ret;
 
 	zbx_json_free(&json);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
 }
