@@ -484,7 +484,7 @@ class testInheritanceGraphPrototype extends CWebTest {
 	public function testInheritanceGraphPrototype_SimpleUpdate($data) {
 		$name = $data['name'];
 
-		$sqlGraphs = "select * from graphs";
+		$sqlGraphs = "select * from graphs ORDER BY graphid";
 		$oldHashGraphs = DBhash($sqlGraphs);
 
 		$this->zbxTestLogin('templates.php');

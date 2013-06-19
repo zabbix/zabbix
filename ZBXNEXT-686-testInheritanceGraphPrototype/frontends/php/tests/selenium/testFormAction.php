@@ -22,6 +22,10 @@ require_once dirname(__FILE__) . '/../include/class.cwebtest.php';
 
 class testFormAction extends CWebTest {
 
+	public function testFormAction_Setup() {
+		DBsave_tables('actions');
+	}
+
 	public static function providerNewActions() {
 		$data = array(
 			array(array(
@@ -61,8 +65,7 @@ class testFormAction extends CWebTest {
 	/**
 	 * @dataProvider providerNewActions
 	 */
-	public function testActionCreateSimple($action) {
-		DBsave_tables('actions');
+	public function testFormAction_CreateSimple($action) {
 
 		$this->zbxTestLogin('actionconf.php?form=1&eventsource=0');
 		$this->checkTitle('Configuration of actions');
@@ -134,12 +137,9 @@ class testFormAction extends CWebTest {
 
 		$this->zbxTestClickWait('save');
 		$this->zbxTestTextPresent('Action added');
-
-		DBrestore_tables('actions');
 	}
 
-	public function testActionCreate() {
-		DBsave_tables('actions');
+	public function testFormAction_Create() {
 
 		$this->zbxTestLogin('actionconf.php?form=1&eventsource=0');
 		$this->checkTitle('Configuration of actions');
@@ -182,8 +182,8 @@ class testFormAction extends CWebTest {
 		$this->selectWindow('null');
 		$this->select("new_operation_opmessage_mediatypeid", "label=Jabber");
 		$this->zbxTestClickWait('add_operation');
-		$this->zbxTestTextPresent("Send message to users: Admin");
-		$this->zbxTestTextPresent("Send message to user groups: Enabled debug mode, Zabbix administrators");
+		$this->zbxTestTextPresent("Send message to users: Admin via Jabber");
+		$this->zbxTestTextPresent("Send message to user groups: Enabled debug mode, Zabbix administrators via Jabber");
 		$this->zbxTestClickWait('new_operation');
 		$this->select("new_operation_operationtype", "label=Remote command");
 		$this->wait();
@@ -193,34 +193,39 @@ class testFormAction extends CWebTest {
 
 // add target host Zabbix server
 		$this->zbxTestClick('add');
+		sleep(1);
 		$this->select("opCmdTarget", "label=Host");
-		$this->zbxTestClick('select');
-		$this->waitForPopUp("zbx_popup", "30000");
-		$this->selectWindow("name=zbx_popup");
-		$this->zbxTestDropdownSelectWait('groupid', 'Zabbix servers');
-		$this->zbxTestClick('spanid10053');
-		$this->selectWindow('null');
+		$this->zbxTestTextPresent(array('Target list', 'Target', 'Action'));
+		sleep(1);
+		$this->assertElementPresent("//div[@id='opCmdTargetObject']/input");
+		$this->input_type("//div[@id='opCmdTargetObject']/input", 'Simple form test host');
+		sleep(1);
+		$this->zbxTestClick("//span[@class='matched']");
 		$this->zbxTestClick("//input[@name='save']");
 
 		sleep(1);
-
 // add target group Zabbix servers
 		$this->zbxTestClick('add');
+		sleep(1);
 		$this->select("opCmdTarget", "label=Host group");
-		$this->zbxTestClick('select');
-		$this->waitForPopUp("zbx_popup", "30000");
-		$this->selectWindow("name=zbx_popup");
-		$this->zbxTestClick('spanid4');
-		$this->selectWindow('null');
+		$this->zbxTestTextPresent(array('Target list', 'Target', 'Action'));
+		sleep(1);
+		$this->assertElementPresent("//div[@id='opCmdTargetObject']/input");
+		$this->input_type("//div[@id='opCmdTargetObject']/input", 'Zabbix servers');
+		sleep(1);
+		$this->zbxTestClick("//span[@class='matched']");
+		$this->zbxTestClick("//input[@name='save']");
 
 		sleep(1);
 
-		$this->zbxTestClick("//input[@name='save']");
 		$this->type("new_operation_opcommand_command", "command");
 		$this->zbxTestClickWait('add_operation');
+		$this->zbxTestTextPresent('Send message to users: Admin via Jabber');
+		$this->zbxTestTextPresent("Send message to user groups: Enabled debug mode, Zabbix administrators via Jabber");
 		$this->zbxTestTextPresent("Run remote commands on current host");
-		// $this->zbxTestTextPresent("Run remote commands on hosts: ЗАББИКС Сервер");
-		$this->zbxTestTextPresent("Run remote commands on host groups: Zabbix servers");
+		$this->zbxTestTextPresent('Run remote commands on hosts: Simple form test host');
+		$this->zbxTestTextPresent('Run remote commands on host groups: Zabbix servers');
+
 		$this->zbxTestClickWait('new_operation');
 		$this->type("new_operation_esc_step_to", "2");
 		$this->select("new_operation_operationtype", "label=Remote command");
@@ -233,16 +238,23 @@ class testFormAction extends CWebTest {
 		$this->type("new_operation_opcommand_port", "123");
 		$this->type("new_operation_opcommand_command", "command ssh");
 		$this->zbxTestClickWait('add_operation');
-		$this->type("esc_period", "123");
-		$this->zbxTestTextPresent("Run remote commands on current host");
 
+		$this->zbxTestTextPresent('Send message to users: Admin via Jabber');
+		$this->zbxTestTextPresent("Send message to user groups: Enabled debug mode, Zabbix administrators via Jabber");
+		$this->zbxTestTextPresent("Run remote commands on current host");
+		$this->zbxTestTextPresent('Run remote commands on hosts: Simple form test host');
+		$this->zbxTestTextPresent('Run remote commands on host groups: Zabbix servers');
+
+		$this->type("esc_period", "123");
 		sleep(1);
 		$this->type('new_condition_value', '');
 		sleep(1);
 
 		$this->zbxTestClickWait('save');
 		$this->zbxTestTextPresent('Action added');
+	}
 
+	public function testFormAction_Teardown() {
 		DBrestore_tables('actions');
 	}
 }

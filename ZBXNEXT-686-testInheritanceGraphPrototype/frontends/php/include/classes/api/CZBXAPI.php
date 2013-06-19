@@ -456,7 +456,7 @@ class CZBXAPI {
 		$pkFieldId = $this->fieldId($this->pk($tableName), $tableAlias);
 
 		// count
-		if (isset($options['countOutput'])) {
+		if (isset($options['countOutput']) && !$this->requiresPostSqlFiltering($options)) {
 			$sqlParts['select'] = array('COUNT(DISTINCT '.$pkFieldId.') AS rowscount');
 
 			// select columns used by group count
@@ -784,7 +784,7 @@ class CZBXAPI {
 	}
 
 	/**
-	 * Apply filter conditions to sql builded query.
+	 * Apply filter conditions to sql built query.
 	 *
 	 * @param string $table
 	 * @param array  $options
@@ -902,4 +902,88 @@ class CZBXAPI {
 
 		return $objects;
 	}
+
+	/**
+	 * Fetch data from DB.
+	 * If post SQL filtering is necessary, several queries will be executed. SQL limit is calculated so that minimum
+	 * amount of queries would be executed and minimum amount of unnecessary data retrieved.
+	 *
+	 * @param   string    $query      SQL query
+	 * @param   array     $options    API call parameters
+	 *
+	 * @return  array
+	 */
+	protected function customFetch($query, array $options) {
+		if ($this->requiresPostSqlFiltering($options)) {
+			$offset = 0;
+			// we think that taking twice as necessary elements in first query is fair guess, this cast to int as well
+			$limit = $options['limit'] ? 2 * $options['limit'] : null;
+			// we use $minLimit for setting minimum limit twice as big for each consecutive query to not run in lots
+			// of queries for some cases
+			$minLimit = $limit;
+			$allElements = array();
+			do {
+				// fetch group of elements
+				$elements = DBfetchArray(DBselect($query, $limit, $offset));
+
+				// we have potentially more elements
+				$hasMore = ($limit && count($elements) === $limit);
+
+				$elements = $this->applyPostSqlFiltering($elements, $options);
+
+				// truncate element set after post SQL filtering, if enough elements or more retrieved via SQL query
+				if ($options['limit'] && count($allElements) + count($elements) >= $options['limit']) {
+					$allElements += array_slice($elements, 0, $options['limit'] - count($allElements), true);
+					break;
+				}
+
+				$allElements += $elements;
+
+				// calculate $limit and $offset for next query
+				if ($limit) {
+					$offset += $limit;
+					$minLimit *= 2;
+					// take care of division by zero
+					$elemCount = count($elements) ? count($elements) : 1;
+					// we take $limit as $minLimit or reasonable estimate to get all necessary data in two queries
+					// with high probability
+					$limit = max($minLimit, round($limit / $elemCount * ($options['limit'] - count($allElements)) * 2));
+				}
+
+			} while ($hasMore);
+
+			return $allElements;
+		}
+		else {
+			return DBfetchArray(DBselect($query, $options['limit']));
+		}
+	}
+
+	/**
+	 * Checks if post SQL filtering necessary.
+	 *
+	 * @param   array   $options    API call parameters
+	 *
+	 * @return  bool                true if filtering necessary false otherwise
+	 */
+	protected function requiresPostSqlFiltering(array $options) {
+		// must be implemented in each API separately
+
+		return false;
+	}
+
+	/**
+	 * Removes elements which could not be removed within SQL query.
+	 *
+	 * @param   array   $elements   list of elements on whom perform filtering
+	 * @param   array   $options    API call parameters
+	 *
+	 * @return  array               input array $elements with some elements removed
+	 */
+	protected function applyPostSqlFiltering(array $elements, array $options) {
+		// must be implemented in each API separately
+
+		return $elements;
+	}
+
 }
