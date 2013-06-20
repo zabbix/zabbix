@@ -262,30 +262,25 @@ class CProxy extends CZBXAPI {
 		$proxyIds = DB::insert('hosts', $proxies);
 
 		$hostUpdate = array();
-		foreach ($proxies as $pnum => $proxy) {
-			if (!isset($proxy['hosts'])) {
-				continue;
-			}
-
-			$hostUpdate[] = array(
-				'values' => array('proxy_hostid' => $proxyIds[$pnum]),
-				'where' => array('hostid' => zbx_objectValues($proxy['hosts'], 'hostid'))
-			);
-
-			if ($proxy['status'] == HOST_STATUS_PROXY_ACTIVE) {
-				continue;
+		foreach ($proxies as $key => $proxy) {
+			if (!empty($proxy['hosts'])) {
+				$hostUpdate[] = array(
+					'values' => array('proxy_hostid' => $proxyIds[$key]),
+					'where' => array('hostid' => zbx_objectValues($proxy['hosts'], 'hostid'))
+				);
 			}
 
 			// create the interface
-			$proxy['interfaces'][0]['hostid'] = $proxyIds[$pnum];
+			if ($proxy['status'] == HOST_STATUS_PROXY_PASSIVE) {
+				$proxy['interfaces'][0]['hostid'] = $proxyIds[$key];
 
-			$result = API::HostInterface()->create($proxy['interfaces']);
-
-			if (!$result) {
-				self::exception(ZBX_API_ERROR_INTERNAL, _('Proxy interface creation failed.'));
+				if (!API::HostInterface()->create($proxy['interfaces'])) {
+					self::exception(ZBX_API_ERROR_INTERNAL, _('Proxy interface creation failed.'));
+				}
 			}
 		}
 
+		// link hosts with proxies
 		DB::update('hosts', $hostUpdate);
 
 		return array('proxyids' => $proxyIds);
