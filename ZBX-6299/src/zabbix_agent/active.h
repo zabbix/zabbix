@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -9,7 +9,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -24,6 +24,8 @@
 
 extern char	*CONFIG_SOURCE_IP;
 extern char	*CONFIG_HOSTNAME;
+extern char	*CONFIG_HOST_METADATA;
+extern char	*CONFIG_HOST_METADATA_ITEM;
 extern int	CONFIG_REFRESH_ACTIVE_CHECKS;
 extern int	CONFIG_BUFFER_SEND;
 extern int	CONFIG_BUFFER_SIZE;
@@ -35,6 +37,8 @@ extern int	CONFIG_LISTEN_PORT;
 /* per second for checks `log' and `eventlog', used to parse key parameters */
 #define	MIN_VALUE_LINES	1
 #define	MAX_VALUE_LINES	1000
+
+#define HOST_METADATA_LEN	255	/* UTF-8 characters, not bytes */
 
 /* Windows event types for `eventlog' check */
 #ifdef _WINDOWS
@@ -61,10 +65,10 @@ typedef struct
 	zbx_uint64_t	lastlogsize;
 	int		refresh;
 	int		nextcheck;
-	int		status;
 /* must be long for fseek() */
 	int		mtime;
 	unsigned char	skip_old_data;	/* for processing [event]log metrics */
+	unsigned char	state;
 }
 ZBX_ACTIVE_METRIC;
 
@@ -95,6 +99,7 @@ typedef struct
 {
 	ZBX_ACTIVE_BUFFER_ELEMENT	*data;
 	int	count, pcount, lastsent;
+	int	first_error;
 }
 ZBX_ACTIVE_BUFFER;
 

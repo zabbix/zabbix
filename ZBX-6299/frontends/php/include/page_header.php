@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2012 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -10,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -74,13 +74,9 @@ switch ($page['type']) {
 			define('ZBX_PAGE_NO_MENU', 1);
 		}
 		break;
-	case PAGE_TYPE_HTML_BLOCK:
-		header('Content-Type: text/plain; charset=UTF-8');
-		if (!defined('ZBX_PAGE_NO_MENU')) {
-			define('ZBX_PAGE_NO_MENU', 1);
-		}
-		break;
 	case PAGE_TYPE_TEXT:
+	case PAGE_TYPE_TEXT_RETURN_JSON:
+	case PAGE_TYPE_HTML_BLOCK:
 		header('Content-Type: text/plain; charset=UTF-8');
 		if (!defined('ZBX_PAGE_NO_MENU')) {
 			define('ZBX_PAGE_NO_MENU', 1);
@@ -105,23 +101,23 @@ switch ($page['type']) {
 		header('Content-Type: text/html; charset=UTF-8');
 
 		// page title
-		$page_title = '';
+		$pageTitle = '';
 		if (isset($ZBX_SERVER_NAME) && !zbx_empty($ZBX_SERVER_NAME)) {
-			$page_title = $ZBX_SERVER_NAME.NAME_DELIMITER;
+			$pageTitle = $ZBX_SERVER_NAME.NAME_DELIMITER;
 		}
-		$page_title .= isset($page['title']) ? $page['title'] : _('Zabbix');
+		$pageTitle .= isset($page['title']) ? $page['title'] : _('Zabbix');
 
 		if (ZBX_DISTRIBUTED) {
 			if (isset($ZBX_VIEWED_NODES) && $ZBX_VIEWED_NODES['selected'] == 0) { // all selected
-				$page_title .= ' ('._('All nodes').') ';
+				$pageTitle .= ' ('._('All nodes').') ';
 			}
 			elseif (!empty($ZBX_NODES)) {
-				$page_title .= ' ('.$ZBX_NODES[$ZBX_CURRENT_NODEID]['name'].')';
+				$pageTitle .= ' ('.$ZBX_NODES[$ZBX_CURRENT_NODEID]['name'].')';
 			}
 		}
 
 		if ((defined('ZBX_PAGE_DO_REFRESH') || defined('ZBX_PAGE_DO_JS_REFRESH')) && CWebUser::$data['refresh']) {
-			$page_title .= ' ['._('refreshed every').' '.CWebUser::$data['refresh'].' '._('sec').']';
+			$pageTitle .= ' ['._('refreshed every').' '.CWebUser::$data['refresh'].' '._('sec').']';
 		}
 		break;
 }
@@ -139,8 +135,8 @@ if ($denied_page_requested) {
 }
 
 if ($page['type'] == PAGE_TYPE_HTML) {
-	$pageHeader = new CPageHeader($page_title);
-	$pageHeader->addCssFile('css.css');
+	$pageHeader = new CPageHeader($pageTitle);
+	$pageHeader->addCssInit();
 
 	$css = ZBX_DEFAULT_THEME;
 	if (!ZBX_PAGE_NO_THEME) {
@@ -165,6 +161,7 @@ CSS;
 			}
 		}
 	}
+
 	$pageHeader->addCssFile('styles/themes/'.$css.'/main.css');
 
 	if ($page['file'] == 'sysmap.php') {
@@ -185,13 +182,6 @@ CSS;
 		$pageHeader->addJsFile($path);
 	}
 
-	$js = <<<JS
-if (jQuery(window).width() < 1024) {
-	document.write('<link rel="stylesheet" type="text/css" href="styles/handheld.css" />');
-}
-JS;
-
-	$pageHeader->addJs($js);
 	$pageHeader->display();
 ?>
 <body class="<?php echo $css; ?>">
@@ -231,22 +221,26 @@ if (!defined('ZBX_PAGE_NO_MENU')) {
 	$req->setArgument('print', 1);
 	$printview = new CLink(_('Print'), $req->getUrl(), 'small_font', null, 'nosid');
 
-	$page_header_r_col = array($help, '|', $support, '|', $printview);
+	$page_header_r_col = array($help, '|', $support, '|', $printview, '|');
 
-	if (CWebUser::$data['alias'] != ZBX_GUEST_USER) {
-		$page_header_r_col[] = array('|');
+	if (!CWebUser::isGuest()) {
 		array_push($page_header_r_col, new CLink(_('Profile'), 'profile.php', 'small_font', null, 'nosid'), '|');
+	}
 
-		if (CWebUser::$data['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
-			$debug = new CLink(_('Debug'), '#debug', 'small_font', null, 'nosid');
-			$d_script = " if (!isset('state', this)) { this.state = 'none'; }".
-						" if (this.state == 'none') { this.state = 'block'; }".
-						" else { this.state = 'none'; }".
-						" showHideByName('zbx_gebug_info', this.state);";
-			$debug->setAttribute('onclick', 'javascript: '.$d_script);
-			array_push($page_header_r_col, $debug, '|');
-		}
+	if (CWebUser::$data['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
+		$debug = new CLink(_('Debug'), '#debug', 'small_font', null, 'nosid');
+		$d_script = " if (!isset('state', this)) { this.state = 'none'; }".
+			" if (this.state == 'none') { this.state = 'block'; }".
+			" else { this.state = 'none'; }".
+			" showHideByName('zbx_gebug_info', this.state);";
+		$debug->setAttribute('onclick', 'javascript: '.$d_script);
+		array_push($page_header_r_col, $debug, '|');
+	}
 
+	if (CWebUser::isGuest()) {
+		$page_header_r_col[] = array(new CLink(_('Login'), 'index.php?reconnect=1', 'small_font', null, 'nosid'));
+	}
+	else {
 		// it is not possible to logout from HTTP authentication
 		$chck = $page['file'] == 'authentication.php' && isset($_REQUEST['save'], $_REQUEST['config']);
 		if ($chck && $_REQUEST['config'] == ZBX_AUTH_HTTP || !$chck && $config['authentication_type'] == ZBX_AUTH_HTTP) {
@@ -257,9 +251,6 @@ if (!defined('ZBX_PAGE_NO_MENU')) {
 			$logout =  new CLink(_('Logout'), 'index.php?reconnect=1', 'small_font', null, 'nosid');
 		}
 		array_push($page_header_r_col, $logout);
-	}
-	else {
-		$page_header_r_col[] = array('|', new CLink(_('Login'), 'index.php?reconnect=1', 'small_font', null, 'nosid'));
 	}
 
 	$logo = new CLink(new CDiv(SPACE, 'zabbix_logo'), 'http://www.zabbix.com/', 'image', null, 'nosid');

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2012 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -10,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -234,12 +234,158 @@ class CTemplateScreen extends CScreen {
 			}
 		}
 
+		if ($options['countOutput'] !== null && $options['groupCount'] === null) {
+			return $result;
+		}
+
+		$screenIds = array_keys($result);
+
+		// adding screenitems
+		if ($options['selectScreenItems'] !== null && $options['selectScreenItems'] != API_OUTPUT_COUNT) {
+			$screenItems = API::getApi()->select('screens_items', array(
+				'output' => $this->outputExtend('screens_items',
+					array('screenid', 'screenitemid', 'resourcetype', 'resourceid'), $options['selectScreenItems']
+				),
+				'filter' => array('screenid' => $screenIds),
+				'preservekeys' => true
+			));
+			$relationMap = $this->createRelationMap($screenItems, 'screenid', 'screenitemid');
+
+			foreach ($screenItems as $screenItem) {
+				switch ($screenItem['resourcetype']) {
+					case SCREEN_RESOURCE_GRAPH:
+						$graphids[$screenItem['resourceid']] = $screenItem['resourceid'];
+						break;
+					case SCREEN_RESOURCE_SIMPLE_GRAPH:
+					case SCREEN_RESOURCE_PLAIN_TEXT:
+						$itemids[$screenItem['resourceid']] = $screenItem['resourceid'];
+						break;
+				}
+			}
+
+			$screenItems = $this->unsetExtraFields($screenItems,
+				array('screenid', 'screenitemid', 'resourceid', 'resourcetype'),
+				$options['selectScreenItems']
+			);
+			$result = $relationMap->mapMany($result, $screenItems, 'screenitems');
+		}
+
+		// creating linkage of template -> real objects
+		if (!is_null($options['selectScreenItems']) && !is_null($options['hostids'])) {
+			// prepare graphs
+			if (!empty($graphids)) {
+				$tplGraphs = API::Graph()->get(array(
+					'output' => array('graphid', 'name'),
+					'graphids' => $graphids,
+					'nopermissions' => true,
+					'preservekeys' => true
+				));
+
+				$dbGraphs = API::Graph()->get(array(
+					'output' => array('graphid', 'name'),
+					'selectHosts' => array('hostid'),
+					'hostids' => $options['hostids'],
+					'filter' => array('name' => zbx_objectValues($tplGraphs, 'name')),
+					'nopermissions' => true,
+					'preservekeys' => true
+				));
+				$realGraphs = array();
+				foreach ($dbGraphs as $graph) {
+					$host = reset($graph['hosts']);
+					unset($graph['hosts']);
+
+					if (!isset($realGraphs[$host['hostid']])) {
+						$realGraphs[$host['hostid']] = array();
+					}
+					$realGraphs[$host['hostid']][$graph['name']] = $graph;
+				}
+			}
+
+			// prepare items
+			if (!empty($itemids)) {
+				$tplItems = API::Item()->get(array(
+					'output' => array('itemid', 'key_', 'hostid'),
+					'itemids' => $itemids,
+					'nopermissions' => true,
+					'preservekeys' => true
+				));
+
+				$dbItems = API::Item()->get(array(
+					'output' => array('itemid', 'key_', 'hostid'),
+					'hostids' => $options['hostids'],
+					'filter' => array('key_' => zbx_objectValues($tplItems, 'key_')),
+					'nopermissions' => true,
+					'preservekeys' => true
+				));
+
+				$realItems = array();
+				foreach ($dbItems as $item) {
+					unset($item['hosts']);
+
+					if (!isset($realItems[$item['hostid']])) {
+						$realItems[$item['hostid']] = array();
+					}
+					$realItems[$item['hostid']][$item['key_']] = $item;
+				}
+			}
+		}
+
+		// hashing
+		$options['hostids'] = zbx_toHash($options['hostids']);
+		if (is_null($options['countOutput'])
+				|| (!is_null($options['countOutput']) && !is_null($options['groupCount']))) {
+			// creating copies of templated screens (inheritance)
+			// screenNum is needed due to we can't refer to screenid/hostid/templateid as they will repeat
+			$screenNum = 0;
+			$vrtResult = array();
+
+			foreach ($result as $screen) {
+				if (is_null($options['hostids']) || isset($options['hostids'][$screen['templateid']])) {
+					$screenNum++;
+					$vrtResult[$screenNum] = $screen;
+					$vrtResult[$screenNum]['hostid'] = $screen['templateid'];
+				}
+				if (!isset($templatesChain[$screen['templateid']])) {
+					continue;
+				}
+
+				foreach ($templatesChain[$screen['templateid']] as $hostid) {
+					if (!isset($options['hostids'][$hostid])) {
+						continue;
+					}
+
+					$screenNum++;
+					$vrtResult[$screenNum] = $screen;
+					$vrtResult[$screenNum]['hostid'] = $hostid;
+
+					if (!isset($vrtResult[$screenNum]['screenitems'])) {
+						continue;
+					}
+
+					foreach ($vrtResult[$screenNum]['screenitems'] as &$screenitem) {
+						switch ($screenitem['resourcetype']) {
+							case SCREEN_RESOURCE_GRAPH:
+								$graphName = $tplGraphs[$screenitem['resourceid']]['name'];
+								$screenitem['real_resourceid'] = $realGraphs[$hostid][$graphName]['graphid'];
+								break;
+							case SCREEN_RESOURCE_SIMPLE_GRAPH:
+							case SCREEN_RESOURCE_PLAIN_TEXT:
+								$itemKey = $tplItems[$screenitem['resourceid']]['key_'];
+								$screenitem['real_resourceid'] = $realItems[$hostid][$itemKey]['itemid'];
+								break;
+						}
+					}
+					unset($screenitem);
+				}
+			}
+			$result = array_values($vrtResult);
+		}
+
 		if (!is_null($options['countOutput'])) {
 			return $result;
 		}
 
 		if ($result) {
-			$result = $this->addRelatedObjects($options, $result, $templatesChain);
 			$result = $this->unsetExtraFields($result, array('templateid'), $options['output']);
 		}
 
@@ -395,7 +541,7 @@ class CTemplateScreen extends CScreen {
 			// get same items on destination template
 			$resourceItemsMap = array();
 			$dbItems = DBselect(
-				'SELECT src.itemid as srcid,dest.itemid as destid'.
+				'SELECT src.itemid AS srcid,dest.itemid as destid'.
 						' FROM items dest,items src'.
 						' WHERE dest.key_=src.key_'.
 						' AND dest.hostid='.$templateId.
@@ -408,7 +554,7 @@ class CTemplateScreen extends CScreen {
 			// get same graphs on destination template
 			$resourceGraphsMap = array();
 			$dbItems = DBselect(
-				'SELECT src.graphid as srcid,dest.graphid as destid'.
+				'SELECT src.graphid AS srcid,dest.graphid as destid'.
 						' FROM graphs dest,graphs src,graphs_items destgi,items desti'.
 						' WHERE dest.name=src.name'.
 						' AND destgi.graphid=dest.graphid'.
@@ -654,153 +800,5 @@ class CTemplateScreen extends CScreen {
 		}
 
 		return $sqlParts;
-	}
-
-	protected function addRelatedObjects(array $options, array $result, array $templatesChain = array()) {
-		$result = parent::addRelatedObjects($options, $result);
-
-		$screenIds = array_keys($result);
-
-		// hashing
-		$options['hostids'] = zbx_toHash($options['hostids']);
-
-		// adding screenitems
-		if ($options['selectScreenItems'] !== null && $options['selectScreenItems'] != API_OUTPUT_COUNT) {
-			$screenItems = API::getApi()->select('screens_items', array(
-				'output' => $this->outputExtend('screens_items',
-					array('screenid', 'screenitemid', 'resourcetype', 'resourceid'), $options['selectScreenItems']
-				),
-				'filter' => array('screenid' => $screenIds),
-				'preservekeys' => true
-			));
-			$relationMap = $this->createRelationMap($screenItems, 'screenid', 'screenitemid');
-
-			foreach ($screenItems as $screenItem) {
-				switch ($screenItem['resourcetype']) {
-					case SCREEN_RESOURCE_GRAPH:
-						$graphids[$screenItem['resourceid']] = $screenItem['resourceid'];
-						break;
-					case SCREEN_RESOURCE_SIMPLE_GRAPH:
-					case SCREEN_RESOURCE_PLAIN_TEXT:
-						$itemids[$screenItem['resourceid']] = $screenItem['resourceid'];
-						break;
-				}
-			}
-
-			$screenItems = $this->unsetExtraFields($screenItems, array('screenid', 'screenitemid', 'resourceid', 'resourcetype'),
-				$options['selectScreenItems']
-			);
-			$result = $relationMap->mapMany($result, $screenItems, 'screenitems');
-		}
-
-		// creating linkage of template -> real objects
-		if (!is_null($options['selectScreenItems']) && !is_null($options['hostids'])) {
-			// prepare graphs
-			if (!empty($graphids)) {
-				$tplGraphs = API::Graph()->get(array(
-					'output' => array('graphid', 'name'),
-					'graphids' => $graphids,
-					'nopermissions' => true,
-					'preservekeys' => true
-				));
-
-				$dbGraphs = API::Graph()->get(array(
-					'output' => array('graphid', 'name'),
-					'selectHosts' => array('hostid'),
-					'hostids' => $options['hostids'],
-					'filter' => array('name' => zbx_objectValues($tplGraphs, 'name')),
-					'nopermissions' => true,
-					'preservekeys' => true
-				));
-				$realGraphs = array();
-				foreach ($dbGraphs as $graph) {
-					$host = reset($graph['hosts']);
-					unset($graph['hosts']);
-
-					if (!isset($realGraphs[$host['hostid']])) {
-						$realGraphs[$host['hostid']] = array();
-					}
-					$realGraphs[$host['hostid']][$graph['name']] = $graph;
-				}
-			}
-
-			// prepare items
-			if (!empty($itemids)) {
-				$tplItems = API::Item()->get(array(
-					'output' => array('itemid', 'key_', 'hostid'),
-					'itemids' => $itemids,
-					'nopermissions' => true,
-					'preservekeys' => true
-				));
-
-				$dbItems = API::Item()->get(array(
-					'output' => array('itemid', 'key_', 'hostid'),
-					'hostids' => $options['hostids'],
-					'filter' => array('key_' => zbx_objectValues($tplItems, 'key_')),
-					'nopermissions' => true,
-					'preservekeys' => true
-				));
-
-				$realItems = array();
-				foreach ($dbItems as $item) {
-					unset($item['hosts']);
-
-					if (!isset($realItems[$item['hostid']])) {
-						$realItems[$item['hostid']] = array();
-					}
-					$realItems[$item['hostid']][$item['key_']] = $item;
-				}
-			}
-		}
-
-		if (is_null($options['countOutput']) || (!is_null($options['countOutput']) && !is_null($options['groupCount']))) {
-			// creating copies of templated screens (inheritance)
-			// screenNum is needed due to we can't refer to screenid/hostid/templateid as they will repeat
-			$screenNum = 0;
-			$vrtResult = array();
-
-			foreach ($result as $screen) {
-				if (is_null($options['hostids']) || isset($options['hostids'][$screen['templateid']])) {
-					$screenNum++;
-					$vrtResult[$screenNum] = $screen;
-					$vrtResult[$screenNum]['hostid'] = $screen['templateid'];
-				}
-				if (!isset($templatesChain[$screen['templateid']])) {
-					continue;
-				}
-
-				foreach ($templatesChain[$screen['templateid']] as $hostid) {
-					if (!isset($options['hostids'][$hostid])) {
-						continue;
-					}
-
-					$screenNum++;
-					$vrtResult[$screenNum] = $screen;
-					$vrtResult[$screenNum]['hostid'] = $hostid;
-
-					if (!isset($vrtResult[$screenNum]['screenitems'])) {
-						continue;
-					}
-
-					foreach ($vrtResult[$screenNum]['screenitems'] as &$screenitem) {
-						switch ($screenitem['resourcetype']) {
-							case SCREEN_RESOURCE_GRAPH:
-								$graphName = $tplGraphs[$screenitem['resourceid']]['name'];
-								$screenitem['real_resourceid'] = $realGraphs[$hostid][$graphName]['graphid'];
-								break;
-							case SCREEN_RESOURCE_SIMPLE_GRAPH:
-							case SCREEN_RESOURCE_PLAIN_TEXT:
-								$itemKey = $tplItems[$screenitem['resourceid']]['key_'];
-								$screenitem['real_resourceid'] = $realItems[$hostid][$itemKey]['itemid'];
-								break;
-						}
-					}
-					unset($screenitem);
-				}
-			}
-			$result = array_values($vrtResult);
-		}
-
-		return $result;
 	}
 }

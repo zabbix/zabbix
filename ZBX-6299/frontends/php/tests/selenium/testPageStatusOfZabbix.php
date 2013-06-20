@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -10,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -33,7 +33,7 @@ class testPageStatusOfZabbix extends CWebTest {
 		$this->zbxTestTextPresent('Zabbix server is running');
 		$this->zbxTestTextPresent('Number of hosts (monitored/not monitored/templates)');
 		$this->zbxTestTextPresent('Number of items (monitored/disabled/not supported)');
-		$this->zbxTestTextPresent('Number of triggers (enabled/disabled)[problem/ok]');
+		$this->zbxTestTextPresent('Number of triggers (enabled/disabled) [problem/ok]');
 		$this->zbxTestTextPresent('Number of users (online)');
 		$this->zbxTestTextPresent('Required server performance, new values per second');
 	}

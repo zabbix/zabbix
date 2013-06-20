@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -9,7 +9,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -125,17 +125,17 @@ int	VM_MEMORY_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "total"))
 		ret = VM_MEMORY_TOTAL(result);
-	esle if (0 == strcmp(mode, "free"))
+	else if (0 == strcmp(mode, "free"))
 		ret = VM_MEMORY_FREE(result);
-	esle if (0 == strcmp(mode, "active"))
+	else if (0 == strcmp(mode, "active"))
 		ret = VM_MEMORY_ACTIVE(result);
-	esle if (0 == strcmp(mode, "used"))
+	else if (0 == strcmp(mode, "used"))
 		ret = VM_MEMORY_USED(result);
-	esle if (0 == strcmp(mode, "pused"))
+	else if (0 == strcmp(mode, "pused"))
 		ret = VM_MEMORY_PUSED(result);
-	esle if (0 == strcmp(mode, "available"))
+	else if (0 == strcmp(mode, "available"))
 		ret = VM_MEMORY_AVAILABLE(result);
-	esle if (0 == strcmp(mode, "pavailable"))
+	else if (0 == strcmp(mode, "pavailable"))
 		ret = VM_MEMORY_PAVAILABLE(result);
 	else
 		ret = SYSINFO_RET_FAIL;

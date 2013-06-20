@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -9,7 +9,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -17,17 +17,16 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-/********* DIV IMG *********/
-.zabbix_logo{
+.zabbix_logo {
 	height: 31px;
 	width: 118px;
 	background: #FFFFFF url('../images/general/zabbix.png') no-repeat;
 	cursor: pointer;
 }
 
-.menu_icon{
+.menu_icon {
 	display: inline-block;
-	background-repeat:no-repeat;
+	background-repeat: no-repeat;
 	height: 16px;
 	width: 16px;
 	cursor: pointer;
@@ -37,8 +36,7 @@
 	-o-border-radius: 2px;
 	border-radius: 2px;
 }
-
-.menu_icon:hover{ -webkit-box-shadow: 0 0 6px white; -moz-box-shadow: 0 0 6px white; box-shadow: 0 0 6px white; }
+.menu_icon:hover { -webkit-box-shadow: 0 0 6px white; -moz-box-shadow: 0 0 6px white; box-shadow: 0 0 6px white; }
 
 .iconminus		{ background-image: url('../images/general/bttn/minus.png'); }
 .iconplus		{ background-image: url('../images/general/bttn/plus.png'); }
@@ -73,13 +71,13 @@
 	vertical-align: middle;
 	height: 14px;
 	width: 14px;
-	background-repeat:no-repeat;
-	cursor:pointer;
+	background-repeat: no-repeat;
+	cursor: pointer;
 	margin: 0 1px 0 1px;
 }
 
 .status_icon_extra {
-	margin-top:-2px;
+	margin-top: -2px;
 }
 
 .iconerror			{ background-image: url('../images/general/error2.png');}
@@ -98,41 +96,37 @@
 .iconipmiunknown	{ background-image: url('../images/general/ipmi_unknown.png');}
 .iconipmiavailable	{ background-image: url('../images/general/ipmi_available.png');}
 .iconipmiunavailable{ background-image: url('../images/general/ipmi_unavailable.png');}
-/* </status icons> */
 
-
-.dbl_arrow_down{
+.dbl_arrow_down {
 	height: 10px;
 	width: 9px;
 	background: url('../images/general/dbl_arrow_down2.png') no-repeat;
-	display:block;
-	cursor:pointer;
+	display: block;
+	cursor: pointer;
 }
-.dbl_arrow_up{
+.dbl_arrow_up {
 	height: 10px;
 	width: 9px;
 	background: url('../images/general/dbl_arrow_up2.png') no-repeat;
-	cursor:pointer;
+	cursor: pointer;
 }
 
-.icon_sortup{
+.icon_sortup {
 	height: 16px;
 	width: 19px;
 	background: url('../images/general/sort_up.png') no-repeat;
 	cursor: pointer;
-	display:inline-block;
+	display: inline-block;
 }
-.icon_sortdown{
+.icon_sortdown {
 	height: 16px;
 	width: 19px;
 	background: url('../images/general/sort_down.png') no-repeat;
 	cursor: pointer;
-	display:inline-block;
+	display: inline-block;
 }
-.default_cursor{
+.default_cursor {
 	cursor: default !important;
 }
-/********* DIV IMG END *********/
 
-span.ui-icon.state-disabled { opacity: .5; filter:Alpha(Opacity=50); background-image: none; }
-
+span.ui-icon.state-disabled { opacity: .5; filter: Alpha(Opacity=50); background-image: none; }

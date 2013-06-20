@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2012 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -34,11 +34,15 @@ if (!empty($this->data['maps'])) {
 		$mapComboBox->addItem($sysmapId, get_node_name_by_elid($sysmapId, null, NAME_DELIMITER).$map['name']);
 	}
 
-	$headerForm = new CForm('get');
-	$headerForm->addVar('fullscreen', $this->data['fullscreen']);
-	$headerForm->addItem($mapComboBox);
+	$headerMapForm = new CForm('get');
+	$headerMapForm->addVar('fullscreen', $this->data['fullscreen']);
+	$headerMapForm->addItem(array(_('Maps'), SPACE, $mapComboBox));
 
-	$mapWidget->addHeader($this->data['map']['name'], $headerForm);
+	$headerSeverityMinForm = new CForm('get');
+	$headerSeverityMinForm->addVar('fullscreen', $this->data['fullscreen']);
+	$headerSeverityMinForm->addItem(array(SPACE, _('Minimum severity'), SPACE, $this->data['pageFilter']->getSeveritiesMinCB()));
+
+	$mapWidget->addHeader($this->data['map']['name'], array($headerMapForm, $headerSeverityMinForm));
 
 	// get map parent maps
 	$parentMaps = array();
@@ -46,7 +50,7 @@ if (!empty($this->data['maps'])) {
 		// check for permissions
 		if (isset($this->data['maps'][$parent['sysmapid']])) {
 			$parentMaps[] = SPACE.SPACE;
-			$parentMaps[] = new Clink($parent['name'], 'maps.php?sysmapid='.$parent['sysmapid'].'&fullscreen='.$this->data['fullscreen']);
+			$parentMaps[] = new Clink($parent['name'], 'maps.php?sysmapid='.$parent['sysmapid'].'&fullscreen='.$this->data['fullscreen'].'&severity_min='.$this->data['severity_min']);
 		}
 	}
 	if (!empty($parentMaps)) {
@@ -54,11 +58,11 @@ if (!empty($this->data['maps'])) {
 		$mapWidget->addHeader($parentMaps);
 	}
 
-	$actionMap = getActionMapBySysmap($this->data['map']);
+	$actionMap = getActionMapBySysmap($this->data['map'], array('severity_min' => $this->data['severity_min']));
 
 	$mapTable->addRow($actionMap);
 
-	$imgMap = new CImg('map.php?sysmapid='.$this->data['sysmapid']);
+	$imgMap = new CImg('map.php?sysmapid='.$this->data['sysmapid'].'&severity_min='.$this->data['severity_min']);
 	$imgMap->setMap($actionMap->getName());
 	$mapTable->addRow($imgMap);
 

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -9,7 +9,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -40,10 +40,11 @@ extern unsigned char	daemon_type;
  *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
- * Comments:                                                                  *
+ * Comments: NB! adds host to the database if it does not exist               *
  *                                                                            *
  ******************************************************************************/
-static int	get_hostid_by_host(const char *host, const char *ip, unsigned short port, zbx_uint64_t *hostid, char *error)
+static int	get_hostid_by_host(const char *host, const char *ip, unsigned short port, const char *host_metadata,
+		zbx_uint64_t *hostid, char *error)
 {
 	const char	*__function_name = "get_hostid_by_host";
 
@@ -69,10 +70,7 @@ static int	get_hostid_by_host(const char *host, const char *ip, unsigned short p
 				" and status in (%d,%d)"
 		       		" and proxy_hostid is null"
 				ZBX_SQL_NODE,
-			host_esc,
-			HOST_STATUS_MONITORED,
-			HOST_STATUS_NOT_MONITORED,
-			DBand_node_local("hostid"));
+			host_esc, HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED, DBand_node_local("hostid"));
 
 	if (NULL != (row = DBfetch(result)))
 	{
@@ -99,13 +97,9 @@ static int	get_hostid_by_host(const char *host, const char *ip, unsigned short p
 		DBbegin();
 
 		if (0 != (daemon_type & ZBX_DAEMON_TYPE_SERVER))
-		{
-			DBregister_host(0, host, ip, dns, port, (int)time(NULL));
-		}
+			DBregister_host(0, host, ip, dns, port, host_metadata, (int)time(NULL));
 		else if (0 != (daemon_type & ZBX_DAEMON_TYPE_PROXY))
-		{
-			DBproxy_register_host(host, ip, dns, port);
-		}
+			DBproxy_register_host(host, ip, dns, port, host_metadata);
 
 		DBcommit();
 	}
@@ -132,20 +126,13 @@ static void	get_list_of_active_checks(zbx_uint64_t hostid, zbx_uint64_t **itemid
 	DB_ROW		row;
 	size_t		items_alloc = 0;
 
-	assert(NULL == *itemids);
-	assert(NULL == *items);
-	assert(0 == *items_num);
-
 	result = DBselect(
-			"select i.itemid,i.lastlogsize,i.mtime"
-			" from items i,hosts h"
-			" where i.hostid=h.hostid"
-				" and h.status=%d"
-				" and i.type=%d"
-				" and i.flags<>%d"
-				" and h.hostid=" ZBX_FS_UI64
-				" and h.proxy_hostid is null",
-			HOST_STATUS_MONITORED, ITEM_TYPE_ZABBIX_ACTIVE, ZBX_FLAG_DISCOVERY_CHILD, hostid);
+			"select itemid,lastlogsize,mtime"
+			" from items"
+			" where type=%d"
+				" and flags<>%d"
+				" and hostid=" ZBX_FS_UI64,
+			ITEM_TYPE_ZABBIX_ACTIVE, ZBX_FLAG_DISCOVERY_CHILD, hostid);
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -168,7 +155,7 @@ static void	get_list_of_active_checks(zbx_uint64_t hostid, zbx_uint64_t **itemid
  *                                                                            *
  * Function: send_list_of_active_checks                                       *
  *                                                                            *
- * Purpose: send list of active checks to the host                            *
+ * Purpose: send list of active checks to the host (older version agent)      *
  *                                                                            *
  * Parameters: sock - open socket of server-agent connection                  *
  *             request - request buffer                                       *
@@ -206,7 +193,8 @@ int	send_list_of_active_checks(zbx_sock_t *sock, char *request)
 
 	strscpy(ip, get_ip_by_socket(sock));
 
-	if (FAIL == get_hostid_by_host(host, ip, ZBX_DEFAULT_AGENT_PORT, &hostid, error))
+	/* no host metadata in older versions of agent */
+	if (FAIL == get_hostid_by_host(host, ip, ZBX_DEFAULT_AGENT_PORT, "", &hostid, error))
 		goto out;
 
 	get_list_of_active_checks(hostid, &itemids, &items, &items_num);
@@ -235,7 +223,7 @@ int	send_list_of_active_checks(zbx_sock_t *sock, char *request)
 				continue;
 			}
 
-			if (ITEM_STATUS_NOTSUPPORTED == dc_items[i].status)
+			if (ITEM_STATE_NOTSUPPORTED == dc_items[i].state)
 			{
 				if (0 == refresh_unsupported || dc_items[i].lastclock + refresh_unsupported > now)
 					continue;
@@ -321,12 +309,12 @@ int	send_list_of_active_checks_json(zbx_sock_t *sock, struct zbx_json_parse *jp)
 #define ZBX_KEY_EVENTLOG	2
 
 	char		host[HOST_HOST_LEN_MAX], params[MAX_STRING_LEN], tmp[MAX_STRING_LEN],
-			ip[INTERFACE_IP_LEN_MAX], error[MAX_STRING_LEN];
+			ip[INTERFACE_IP_LEN_MAX], error[MAX_STRING_LEN], *host_metadata = NULL;
 	struct zbx_json	json;
 	int		ret = FAIL;
 	zbx_uint64_t	hostid, *itemids = NULL;
 	zbx_active_t	*items = NULL;
-	size_t		items_num = 0;
+	size_t		items_num = 0, host_metadata_alloc = 1;	/* for at least NUL-termination char */
 	unsigned short	port;
 
 	unsigned char	item_key;
@@ -341,6 +329,14 @@ int	send_list_of_active_checks_json(zbx_sock_t *sock, struct zbx_json_parse *jp)
 		goto error;
 	}
 
+	host_metadata = zbx_malloc(host_metadata, host_metadata_alloc);
+
+	if (FAIL == zbx_json_value_by_name_dyn(jp, ZBX_PROTO_TAG_HOST_METADATA,
+			&host_metadata, &host_metadata_alloc))
+	{
+		*host_metadata = '\0';
+	}
+
 	if (FAIL == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_IP, ip, sizeof(ip)))
 		strscpy(ip, get_ip_by_socket(sock));
 
@@ -350,7 +346,7 @@ int	send_list_of_active_checks_json(zbx_sock_t *sock, struct zbx_json_parse *jp)
 	if (FAIL == is_ushort(tmp, &port))
 		port = ZBX_DEFAULT_AGENT_PORT;
 
-	if (FAIL == get_hostid_by_host(host, ip, port, &hostid, error))
+	if (FAIL == get_hostid_by_host(host, ip, port, host_metadata, &hostid, error))
 		goto error;
 
 	get_list_of_active_checks(hostid, &itemids, &items, &items_num);
@@ -381,7 +377,7 @@ int	send_list_of_active_checks_json(zbx_sock_t *sock, struct zbx_json_parse *jp)
 				continue;
 			}
 
-			if (ITEM_STATUS_NOTSUPPORTED == dc_items[i].status)
+			if (ITEM_STATE_NOTSUPPORTED == dc_items[i].state)
 			{
 				if (0 == refresh_unsupported || dc_items[i].lastclock + refresh_unsupported > now)
 					continue;
@@ -471,6 +467,8 @@ int	send_list_of_active_checks_json(zbx_sock_t *sock, struct zbx_json_parse *jp)
 		}
 		zbx_chrcpy_alloc(&sql, &sql_alloc, &sql_offset, ')');
 
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ZBX_SQL_NODE, DBand_node_local("r.regexpid"));
+
 		result = DBselect("%s", sql);
 		while (NULL != (row = DBfetch(result)))
 		{
@@ -515,6 +513,8 @@ error:
 
 	zbx_json_free(&json);
 out:
+	zbx_free(host_metadata);
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;

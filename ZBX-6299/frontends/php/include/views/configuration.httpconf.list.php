@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -10,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -21,16 +21,21 @@
 
 $httpWidget = new CWidget();
 
-// append host summary to widget header
-if (!empty($this->data['hostid'])) {
-	$httpWidget->addItem(get_header_host_table('web', $this->data['hostid']));
-}
-
-// create new scenario button
 $createForm = new CForm('get');
 $createForm->cleanItems();
 $createForm->addVar('hostid', $this->data['hostid']);
-$createForm->addItem(new CSubmit('form', _('Create scenario')));
+
+if (empty($this->data['hostid'])) {
+	$createButton = new CSubmit('form', _('Create scenario (select host first)'));
+	$createButton->setEnabled(false);
+	$createForm->addItem($createButton);
+}
+else {
+	$createForm->addItem(new CSubmit('form', _('Create scenario')));
+
+	$httpWidget->addItem(get_header_host_table('web', $this->data['hostid']));
+}
+
 $httpWidget->addPageHeader(_('CONFIGURATION OF WEB MONITORING'), $createForm);
 
 // header
@@ -53,7 +58,7 @@ $httpForm->addVar('hostid', $this->data['hostid']);
 $httpTable = new CTableInfo(_('No web scenarios defined.'));
 $httpTable->setHeader(array(
 	new CCheckBox('all_httptests', null, "checkAll('".$httpForm->getName()."', 'all_httptests', 'group_httptestid');"),
-	$_REQUEST['hostid'] == 0 ? make_sorting_header(_('Host'), 'hostname') : null,
+	($this->data['hostid'] == 0) ? make_sorting_header(_('Host'), 'hostname') : null,
 	make_sorting_header(_('Name'), 'name'),
 	_('Number of steps'),
 	_('Update interval'),
@@ -71,7 +76,7 @@ foreach ($this->data['httpTests'] as $httpTestId => $httpTest) {
 
 	$httpTable->addRow(array(
 		new CCheckBox('group_httptestid['.$httpTest['httptestid'].']', null, null, $httpTest['httptestid']),
-		$_REQUEST['hostid'] > 0 ? null : $httpTest['hostname'],
+		($this->data['hostid'] > 0) ? null : $httpTest['hostname'],
 		$name,
 		$httpTest['stepscnt'],
 		$httpTest['delay'],
@@ -110,4 +115,5 @@ $httpForm->addItem(array($this->data['paging'], $httpTable, $this->data['paging'
 
 // append form to widget
 $httpWidget->addItem($httpForm);
+
 return $httpWidget;

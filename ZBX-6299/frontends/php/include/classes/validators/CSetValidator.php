@@ -1,3 +1,4 @@
+<?php
 /*
 ** Zabbix
 ** Copyright (C) 2000-2012 Zabbix SIA
@@ -17,9 +18,28 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-/* Normal screen CSS Document */
-.formrow .dt { width: 20%; }
-.formrow .dd { width: 77%; margin-left: 21%; }
 
-.formlist .text, .formlist textarea, .formlist .password { padding: 3px; }
-.formlist select { padding: 2px; }
+class CSetValidator extends CValidator {
+
+	/**
+	 * Checks if the given value belongs to some set.
+	 *
+	 * @param $value
+	 *
+	 * @return bool
+	 */
+	public function validate($value)
+	{
+		return in_array($value, $this->options['values']);
+	}
+
+	/**
+	 * Set default options.
+	 * Possible options:
+	 * - values		- supported values
+	 */
+	protected function initOptions() {
+		$this->options['values'] = array();
+	}
+
+}

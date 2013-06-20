@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -9,7 +9,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -268,8 +268,10 @@ static struct snmp_session	*snmp_open_session(DC_ITEM *item, char *err)
 			break;
 	}
 
-	session.timeout = CONFIG_TIMEOUT * 1000 * 1000;	/* milliseconds */
-	session.retries = 0;
+	session.retries = 0;				/* number of retries after failed attempt */
+							/* (net-snmp default = 5) */
+	session.timeout = CONFIG_TIMEOUT * 1000 * 1000;	/* timeout of one attempt in microseconds */
+							/* (net-snmp default = 1 second) */
 
 #ifdef HAVE_IPV6
 	if (SUCCEED != get_address_family(item->interface.addr, &family, err, MAX_STRING_LEN))
@@ -301,6 +303,13 @@ static struct snmp_session	*snmp_open_session(DC_ITEM *item, char *err)
 		/* set the SNMPv3 user name */
 		session.securityName = item->snmpv3_securityname;
 		session.securityNameLen = strlen(session.securityName);
+
+		/* set the SNMPv3 context if specified */
+		if ('\0' != *item->snmpv3_contextname)
+		{
+			session.contextName = item->snmpv3_contextname;
+			session.contextNameLen = strlen(session.contextName);
+		}
 
 		/* set the security level to authenticated, but not encrypted */
 		switch (item->snmpv3_securitylevel)

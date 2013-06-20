@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -10,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -105,14 +105,14 @@ $maintenancePeriodTable->setHeader(array(
 
 foreach ($this->data['timeperiods'] as $id => $timeperiod) {
 	$maintenancePeriodTable->addRow(array(
-		timeperiod_type2str($timeperiod['timeperiod_type']),
+		new CCol(timeperiod_type2str($timeperiod['timeperiod_type']), 'nowrap'),
 		new CCol(shedule2str($timeperiod), 'wraptext'),
-		zbx_date2age(0, $timeperiod['period']),
-		array(
+		new CCol(zbx_date2age(0, $timeperiod['period']), 'nowrap'),
+		new CCol(array(
 			new CSubmit('edit_timeperiodid['.$id.']', _('Edit'), null, 'link_menu'),
 			SPACE.SPACE,
 			new CSubmit('del_timeperiodid['.$id.']', _('Remove'), null, 'link_menu')
-		)
+		), 'nowrap')
 	));
 	if (isset($timeperiod['timeperiodid'])) {
 		$maintenanceForm->addVar('timeperiods['.$id.'][timeperiodid]', $timeperiod['timeperiodid']);
@@ -190,17 +190,18 @@ $maintenanceForm->addItem($maintenanceTab);
 // append buttons to form
 if (empty($this->data['maintenanceid'])) {
 	$maintenanceForm->addItem(makeFormFooter(
-		array(new CSubmit('save', _('Save'))),
-		array(new CButtonCancel())
+		new CSubmit('save', _('Save')),
+		new CButtonCancel()
 	));
 }
 else {
 	$maintenanceForm->addItem(makeFormFooter(
-		array(new CSubmit('save', _('Save'))),
+		new CSubmit('save', _('Save')),
 		array(
 			new CSubmit('clone', _('Clone')),
 			new CButtonDelete(_('Delete maintenance period?'), url_param('form').url_param('maintenanceid')),
-			new CButtonCancel())
+			new CButtonCancel()
+		)
 	));
 }
 

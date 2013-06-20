@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -10,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -31,20 +31,20 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 //	VAR		TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 $fields = array(
-	'groupid' =>	array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,			null),
-	'view_style' =>	array(T_ZBX_INT, O_OPT,	P_SYS,	IN('0,1'),		null),
-	'type' =>		array(T_ZBX_INT, O_OPT,	P_SYS,	IN('0,1'),		null),
-	'output' =>		array(T_ZBX_STR, O_OPT, P_SYS,	null,			null),
-	'jsscriptid' =>	array(T_ZBX_STR, O_OPT, P_SYS,	null,			null),
-	'fullscreen' =>	array(T_ZBX_INT, O_OPT,	P_SYS,	IN('0,1'),		null),
+	'groupid' =>	array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
+	'view_style' =>	array(T_ZBX_INT, O_OPT, P_SYS,	IN('0,1'),	null),
+	'type' =>		array(T_ZBX_INT, O_OPT, P_SYS,	IN('0,1'),	null),
+	'output' =>		array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
+	'jsscriptid' =>	array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
+	'fullscreen' =>	array(T_ZBX_INT, O_OPT, P_SYS,	IN('0,1'),	null),
 	// ajax
-	'favobj' =>		array(T_ZBX_STR, O_OPT, P_ACT,	null,			null),
-	'favref' =>		array(T_ZBX_STR, O_OPT, P_ACT,	null,			null),
-	'favid' =>		array(T_ZBX_INT, O_OPT, P_ACT,  null,			null),
-	'favcnt' =>		array(T_ZBX_INT, O_OPT,	null,	null,			null),
-	'pmasterid' =>	array(T_ZBX_STR, O_OPT,	P_SYS,	null,			null),
-	'favaction' =>	array(T_ZBX_STR, O_OPT, P_ACT, 	IN("'add','remove','refresh','flop'"), null),
-	'favstate' =>	array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favaction})&&("flop"=={favaction})'),
+	'favobj' =>		array(T_ZBX_STR, O_OPT, P_ACT,	null,		null),
+	'favref' =>		array(T_ZBX_STR, O_OPT, P_ACT,	null,		null),
+	'favid' =>		array(T_ZBX_INT, O_OPT, P_ACT,	null,		null),
+	'favcnt' =>		array(T_ZBX_INT, O_OPT, null,	null,		null),
+	'pmasterid' =>	array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
+	'favaction' =>	array(T_ZBX_STR, O_OPT, P_ACT,	IN("'add','remove','refresh','flop'"), null),
+	'favstate' =>	array(T_ZBX_INT, O_OPT, P_ACT,	NOT_EMPTY,	'isset({favaction})&&("flop"=={favaction})')
 );
 check_fields($fields);
 
@@ -61,11 +61,44 @@ if ($dashconf['filterEnable'] == 1) {
 	// groups
 	$dashconf['grpswitch'] = CProfile::get('web.dashconf.groups.grpswitch', 0);
 	if ($dashconf['grpswitch'] == 0) {
-		$dashconf['groupids'] = null;
+		$dashconf['groupids'] = null; // null mean all groups
 	}
 	else {
-		$groupids = CFavorite::get('web.dashconf.groups.groupids');
-		$dashconf['groupids'] = zbx_objectValues($groupids, 'value');
+		$dashconf['groupids'] = zbx_objectValues(CFavorite::get('web.dashconf.groups.groupids'), 'value');
+		$hideGroupIds = zbx_objectValues(CFavorite::get('web.dashconf.groups.hide.groupids'), 'value');
+
+		if ($hideGroupIds) {
+			// get all groups if no selected groups defined
+			if (empty($dashconf['groupids'])) {
+				$groups = API::HostGroup()->get(array(
+					'nodeids' => get_current_nodeid(),
+					'output' => array('groupid')
+				));
+				$dashconf['groupids'] = zbx_objectValues($groups, 'groupid');
+			}
+
+			$dashconf['groupids'] = array_diff($dashconf['groupids'], $hideGroupIds);
+
+			// get available hosts
+			$availableHosts = API::Host()->get(array(
+				'groupids' => $dashconf['groupids'],
+				'output' => array('hostid')
+			));
+			$availableHostIds = zbx_objectValues($availableHosts, 'hostid');
+
+			$disabledHosts = API::Host()->get(array(
+				'groupids' => $hideGroupIds,
+				'output' => array('hostid')
+			));
+			$disabledHostIds = zbx_objectValues($disabledHosts, 'hostid');
+
+			$dashconf['hostids'] = array_diff($availableHostIds, $disabledHostIds);
+		}
+		else {
+			if (empty($dashconf['groupids'])) {
+				$dashconf['groupids'] = null; // null mean all groups
+			}
+		}
 	}
 
 	// hosts
@@ -174,7 +207,7 @@ if (isset($_REQUEST['favobj'])) {
 			$result = CFavorite::remove('web.favorite.sysmapids', $_REQUEST['favid'], $_REQUEST['favobj']);
 		}
 
-		if ($page['type'] == PAGE_TYPE_JS&& $result) {
+		if ($page['type'] == PAGE_TYPE_JS && $result) {
 			$innerHTML = make_favorite_maps();
 			$innerHTML = $innerHTML->toString();
 			echo '$("hat_favmap").update('.zbx_jsvalue($innerHTML).');';
@@ -363,17 +396,20 @@ zbx_add_post_js('jqBlink.blink();');
 			throw('Prototype.js lib is required!');
 			return false;
 		}
-		var favorites = {'graphid': 1, 'itemid': 1, 'screenid': 1, 'slideshowid': 1, 'sysmapid': 1};
+
+		var favorites = {graphid: 1, itemid: 1, screenid: 1, slideshowid: 1, sysmapid: 1};
+
 		if (isset(list.object, favorites)) {
 			var favid = [];
 			for (var i = 0; i < list.values.length; i++) {
 				favid.push(list.values[i][list.object]);
 			}
+
 			var params = {
 				'favobj': list.object,
 				'favid[]': favid,
 				'favaction': 'add'
-			}
+			};
 			send_params(params);
 		}
 	}
@@ -381,4 +417,3 @@ zbx_add_post_js('jqBlink.blink();');
 </script>
 <?php
 require_once dirname(__FILE__).'/include/page_footer.php';
-?>

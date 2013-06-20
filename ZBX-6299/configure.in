@@ -1,6 +1,6 @@
 dnl
 dnl Zabbix
-dnl Copyright (C) 2000-2011 Zabbix SIA
+dnl Copyright (C) 2001-2013 Zabbix SIA
 dnl
 dnl This program is free software; you can redistribute it and/or modify
 dnl it under the terms of the GNU General Public License as published by
@@ -9,7 +9,7 @@ dnl (at your option) any later version.
 dnl
 dnl This program is distributed in the hope that it will be useful,
 dnl but WITHOUT ANY WARRANTY; without even the implied warranty of
-dnl MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+dnl MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 dnl GNU General Public License for more details.
 dnl
 dnl You should have received a copy of the GNU General Public License
@@ -1178,7 +1178,7 @@ if test "x$server" = "xyes" || test "x$proxy" = "xyes"; then
 		fi
 	fi
 	if test "x$found_curl" = "xyes"; then
-		have_web_monitoring="cURL"
+		have_web_monitoring="yes"
 	fi
 	CFLAGS="$CFLAGS $LIBCURL_CPPFLAGS"
 	SERVER_LDFLAGS="$SERVER_LDFLAGS $LIBCURL_LDFLAGS"
@@ -1474,7 +1474,7 @@ if test "x$server" != "xno"; then
 
 echo "  Server details:
     With database:         ${have_db}
-    WEB Monitoring via:    ${have_web_monitoring}
+    WEB Monitoring:        ${have_web_monitoring}
     Native Jabber:         ${have_jabber}
     SNMP:                  ${have_snmp}
     IPMI:                  ${have_ipmi}
@@ -1492,6 +1492,7 @@ if test "x$proxy" != "xno"; then
 
 echo "  Proxy details:
     With database:         ${have_db}
+    WEB Monitoring:        ${have_web_monitoring}
     SNMP:                  ${have_snmp}
     IPMI:                  ${have_ipmi}
     SSH:                   ${have_ssh2}

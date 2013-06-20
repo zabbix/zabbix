@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -9,7 +9,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -22,7 +22,7 @@ body { background: #E5E5E5; }
 
 .ui-widget-header.sub_menu, .ui-widget-header.page_footer { background: url("images/bg_h-hard_55.gif") repeat-x scroll left top #365081; border: 0; }
 table.menu tr td.active { background: url("images/bg_h-hard_55.gif") repeat-x scroll left top #5C9CCC; border-color: #365081; }
-div.thin_header { background: url("images/menu_not_active2.gif") repeat-x scroll left top #4E6EA7; }
+.thin_header { background: url("images/menu_not_active2.gif") repeat-x scroll left top #4E6EA7; }
 
 table.flicker,
 table.formtable tr td.form_row_first, table.formtable tr td.form_row_last,
@@ -128,3 +128,7 @@ table.ack_msgs tr.msg { background-color: #F8F8F8; }
 div.preloader {
 	background: url("images/preloader.gif") no-repeat;
 }
+
+/* multiselect */
+.multiselect .selected ul.active { border: 1px solid #6681B2; }
+.multiselect .available ul li.hover { background: #4F70A8; }

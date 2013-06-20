@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -10,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -33,7 +33,7 @@ $page['hist_arg'] = array('triggerid', 'eventid');
 $page['scripts'] = array();
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
-require_once 'include/page_header.php';
+require_once dirname(__FILE__).'/include/page_header.php';
 
 define('PAGE_SIZE', 100);
 
@@ -85,7 +85,7 @@ $trigger = reset($triggers);
 // get events
 $options = array(
 	'eventids' => $_REQUEST['eventid'],
-	'triggerids' => $_REQUEST['triggerid'],
+	'objectids' => $_REQUEST['triggerid'],
 	'select_alerts' => API_OUTPUT_EXTEND,
 	'select_acknowledges' => API_OUTPUT_EXTEND,
 	'output' => API_OUTPUT_EXTEND,

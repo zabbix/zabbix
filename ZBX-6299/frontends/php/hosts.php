@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2012 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -10,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -34,6 +34,8 @@ else {
 	$page['type'] = detect_page_type(PAGE_TYPE_HTML);
 	$page['hist_arg'] = array('groupid');
 
+	$page['scripts'] = array('multiselect.js');
+
 	$EXPORT_DATA = false;
 }
 
@@ -43,6 +45,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 $fields = array(
 	'hosts' =>		array(T_ZBX_INT, O_OPT, P_SYS,		DB_ID,		null),
 	'groups' =>		array(T_ZBX_INT, O_OPT, P_SYS,		DB_ID,		null),
+	'new_groups' =>		array(T_ZBX_STR, O_OPT, P_SYS,		null,		null),
 	'hostids' =>		array(T_ZBX_INT, O_OPT, P_SYS,		DB_ID,		null),
 	'groupids' =>		array(T_ZBX_INT, O_OPT, P_SYS,		DB_ID,		null),
 	'applications' =>	array(T_ZBX_INT, O_OPT, P_SYS,		DB_ID,		null),
@@ -55,7 +58,9 @@ $fields = array(
 	'newgroup' =>		array(T_ZBX_STR, O_OPT, null,		null,		null),
 	'interfaces' =>		array(T_ZBX_STR, O_OPT, null,		NOT_EMPTY,	'isset({save})', _('Agent or SNMP or JMX or IPMI interface')),
 	'mainInterfaces' =>	array(T_ZBX_INT, O_OPT, null,		DB_ID,		null),
-	'templates' =>		array(T_ZBX_STR, O_OPT, null,		NOT_EMPTY,	null),
+	'templates' =>		array(T_ZBX_INT, O_OPT, null,		DB_ID,	null),
+	'add_template' =>	array(T_ZBX_STR, O_OPT, null,		null,	null),
+	'exist_templates' =>		array(T_ZBX_INT, O_OPT, null,		DB_ID,	null),
 	'templates_rem' =>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,		null),
 	'clear_templates' =>	array(T_ZBX_INT, O_OPT, null,		DB_ID,		null),
 	'ipmi_authtype' =>	array(T_ZBX_INT, O_OPT, null,		BETWEEN(-1, 6), null),
@@ -109,13 +114,16 @@ $_REQUEST['go'] = get_request('go', 'none');
  */
 if (get_request('groupid', 0) > 0) {
 	$groupids = available_groups($_REQUEST['groupid'], 1);
-	if (empty($groupids)) {
+	if (!$groupids) {
 		access_deny();
 	}
 }
 if (get_request('hostid', 0) > 0) {
-	$hostids = available_hosts($_REQUEST['hostid'], 1);
-	if (empty($hostids)) {
+	$hosts = API::Host()->get(array(
+		'hostids' => $_REQUEST['hostid'],
+		'editable' => true
+	));
+	if (!$hosts) {
 		access_deny();
 	}
 }
@@ -177,6 +185,16 @@ else {
 /*
  * Actions
  */
+
+if (isset($_REQUEST['exist_templates'])) {
+	if (isset($_REQUEST['templates']) && isset($_REQUEST['add_template'])) {
+		$_REQUEST['templates'] = array_merge($_REQUEST['exist_templates'], $_REQUEST['templates']);
+	}
+	else {
+		$_REQUEST['templates'] = $_REQUEST['exist_templates'];
+	}
+}
+
 if (isset($_REQUEST['unlink']) || isset($_REQUEST['unlink_and_clear'])) {
 	$_REQUEST['clear_templates'] = get_request('clear_templates', array());
 
@@ -196,7 +214,7 @@ if (isset($_REQUEST['unlink']) || isset($_REQUEST['unlink_and_clear'])) {
 	}
 
 	foreach ($unlink_templates as $id) {
-		unset($_REQUEST['templates'][$id]);
+		unset($_REQUEST['templates'][array_search($id, $_REQUEST['templates'])]);
 	}
 }
 elseif (isset($_REQUEST['clone']) && isset($_REQUEST['hostid'])) {
@@ -209,7 +227,6 @@ elseif (isset($_REQUEST['full_clone']) && isset($_REQUEST['hostid'])) {
 elseif (isset($_REQUEST['go']) && $_REQUEST['go'] == 'massupdate' && isset($_REQUEST['masssave'])) {
 	$hostids = get_request('hosts', array());
 	$visible = get_request('visible', array());
-	$_REQUEST['newgroup'] = get_request('newgroup', '');
 	$_REQUEST['proxy_hostid'] = get_request('proxy_hostid', 0);
 	$_REQUEST['templates'] = get_request('templates', array());
 
@@ -231,39 +248,79 @@ elseif (isset($_REQUEST['go']) && $_REQUEST['go'] == 'massupdate' && isset($_REQ
 			$new_values['inventory'] = $new_values['inventory_mode'] != HOST_INVENTORY_DISABLED ? get_request('host_inventory', array()) : array();
 		}
 
-		$newgroup = array();
-		if (isset($visible['newgroup']) && !empty($_REQUEST['newgroup'])) {
-			if (!$result = API::HostGroup()->create(array('name' => $_REQUEST['newgroup']))) {
-				throw new Exception();
-			}
-
-			$newgroup = array('groupid' => reset($result['groupids']), 'name' => $_REQUEST['newgroup']);
+		$templateIds = array();
+		if (isset($visible['template_table'])) {
+			$templateIds = $_REQUEST['templates'];
 		}
 
-		$templates = array();
-		if (isset($visible['template_table'])) {
-			$tplids = array_keys($_REQUEST['templates']);
-			$templates = zbx_toObject($tplids, 'templateid');
+		// add new or existing host groups
+		if (isset($visible['new_groups']) && !empty($_REQUEST['new_groups'])) {
+			if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
+				foreach ($_REQUEST['new_groups'] as $newGroup) {
+					if (is_array($newGroup) && isset($newGroup['new'])) {
+						$newGroups[] = array('name' => $newGroup['new']);
+					}
+					else {
+						$existGroups[] = $newGroup;
+					}
+				}
+				if (isset($newGroups)) {
+					if (!$createdGroups = API::HostGroup()->create($newGroups)) {
+						throw new Exception();
+					}
+					if (isset($existGroups)) {
+						$existGroups = array_merge($existGroups, $createdGroups['groupids']);
+					}
+					else {
+						$existGroups = $createdGroups['groupids'];
+					}
+				}
+			}
+			else {
+				$existGroups = $_REQUEST['new_groups'];
+			}
 		}
 
 		if (isset($visible['groups'])) {
-			$hosts['groups'] = API::HostGroup()->get(array(
-				'groupids' => get_request('groups', array()),
+			if (isset($_REQUEST['groups'])) {
+				if (isset($existGroups)){
+					$replaceHostGroups = array_unique(array_merge($_REQUEST['groups'], $existGroups));
+				}
+				else {
+					$replaceHostGroups = $_REQUEST['groups'];
+				}
+			}
+			elseif (isset($existGroups)) {
+				$replaceHostGroups = $existGroups;
+			}
+
+			if (isset($replaceHostGroups)) {
+				$hosts['groups'] = API::HostGroup()->get(array(
+					'groupids' => $replaceHostGroups,
+					'editable' => true,
+					'output' => array('groupid')
+				));
+			}
+			else {
+				$hosts['groups'] = array();
+			}
+		}
+		elseif (isset($existGroups)) {
+			$existGroups = API::HostGroup()->get(array(
+				'groupids' => $existGroups,
 				'editable' => true,
 				'output' => array('groupid')
 			));
-			if (!empty($newgroup)) {
-				$hosts['groups'][] = $newgroup;
-			}
 		}
+
 		if (isset($_REQUEST['mass_replace_tpls'])) {
 			if (isset($_REQUEST['mass_clear_tpls'])) {
 				$host_templates = API::Template()->get(array('hostids' => $hostids));
 				$host_templateids = zbx_objectValues($host_templates, 'templateid');
-				$templates_to_del = array_diff($host_templateids, $tplids);
+				$templates_to_del = array_diff($host_templateids, $templateIds);
 				$hosts['templates_clear'] = zbx_toObject($templates_to_del, 'templateid');
 			}
-			$hosts['templates'] = $templates;
+			$hosts['templates'] = $templateIds;
 		}
 
 		$result = API::Host()->massUpdate(array_merge($hosts, $new_values));
@@ -272,12 +329,15 @@ elseif (isset($_REQUEST['go']) && $_REQUEST['go'] == 'massupdate' && isset($_REQ
 		}
 
 		$add = array();
-		if (!empty($templates) && isset($visible['template_table'])) {
-			$add['templates'] = $templates;
+		if (!empty($templateIds) && isset($visible['template_table'])) {
+			$add['templates'] = $templateIds;
 		}
-		if (!empty($newgroup) && !isset($visible['groups'])) {
-			$add['groups'][] = $newgroup;
+
+		// add new host groups
+		if (!empty($existGroups) && (!isset($visible['groups']) || !isset($replaceHostGroups))) {
+			$add['groups'] = $existGroups;
 		}
+
 		if (!empty($add)) {
 			$add['hosts'] = $hosts['hosts'];
 
@@ -304,10 +364,6 @@ elseif (isset($_REQUEST['go']) && $_REQUEST['go'] == 'massupdate' && isset($_REQ
 	unset($_REQUEST['save']);
 }
 elseif (isset($_REQUEST['save'])) {
-	if (!count(get_accessible_nodes_by_user(CWebUser::$data, PERM_READ_WRITE, PERM_RES_IDS_ARRAY))) {
-		access_deny();
-	}
-
 	try {
 		DBstart();
 
@@ -327,8 +383,11 @@ elseif (isset($_REQUEST['save'])) {
 			$msg_fail = _('Cannot add host');
 		}
 
-		$templates = array_keys($templates);
-		$templates = zbx_toObject($templates, 'templateid');
+		$linkedTemplates = $templates;
+		$templates = array();
+		foreach ($linkedTemplates as $templateId) {
+			$templates[] = array('templateid' => $templateId);
+		}
 
 		foreach ($interfaces as $inum => $interface) {
 			if (zbx_empty($interface['ip']) && zbx_empty($interface['dns'])) {
@@ -384,7 +443,7 @@ elseif (isset($_REQUEST['save'])) {
 			'templates' => $templates,
 			'interfaces' => $interfaces,
 			'macros' => $macros,
-			'inventory' => (get_request('inventory_mode') != HOST_INVENTORY_DISABLED) ? get_request('host_inventory', array()) : array(),
+			'inventory' => (get_request('inventory_mode') != HOST_INVENTORY_DISABLED) ? get_request('host_inventory', array()) : null,
 			'inventory_mode' => get_request('inventory_mode')
 		);
 
@@ -612,6 +671,22 @@ if ($_REQUEST['go'] == 'massupdate' && isset($_REQUEST['hosts'])) {
 		$data['inventories'] = zbx_toHash($data['inventories'], 'db_field');
 	}
 
+	// get templates data
+	$data['linkedTemplates'] = null;
+	if (!empty($data['templates'])) {
+		$getLinkedTemplates = API::Template()->get(array(
+			'templateids' => $data['templates'],
+			'output' => array('templateid', 'name')
+		));
+
+		foreach ($getLinkedTemplates as $getLinkedTemplate) {
+			$data['linkedTemplates'][] = array(
+				'id' => $getLinkedTemplate['templateid'],
+				'name' => $getLinkedTemplate['name']
+			);
+		}
+	}
+
 	$hostForm = new CView('configuration.host.massupdate', $data);
 	$hosts_wdgt->addItem($hostForm->render());
 }
@@ -781,7 +856,7 @@ else {
 			$description[] = $proxy['host'].NAME_DELIMITER;
 		}
 
-		$description[] = new CLink($host['name'], 'hosts.php?form=update&hostid='.$host['hostid'].url_param('groupid'));
+		$description[] = new CLink(CHtml::encode($host['name']), 'hosts.php?form=update&hostid='.$host['hostid'].url_param('groupid'));
 
 		$hostIF = ($interface['useip'] == INTERFACE_USE_IP) ? $interface['ip'] : $interface['dns'];
 		$hostIF .= empty($interface['port']) ? '' : NAME_DELIMITER.$interface['port'];
@@ -825,14 +900,14 @@ else {
 
 			foreach ($host['parentTemplates'] as $template) {
 				$caption = array();
-				$caption[] = new CLink($template['name'], 'templates.php?form=update&templateid='.$template['templateid'], 'unknown');
+				$caption[] = new CLink(CHtml::encode($template['name']), 'templates.php?form=update&templateid='.$template['templateid'], 'unknown');
 
 				if (!empty($templates[$template['templateid']]['parentTemplates'])) {
 					order_result($templates[$template['templateid']]['parentTemplates'], 'name');
 
 					$caption[] = ' (';
 					foreach ($templates[$template['templateid']]['parentTemplates'] as $tpl) {
-						$caption[] = new CLink($tpl['name'],'templates.php?form=update&templateid='.$tpl['templateid'], 'unknown');
+						$caption[] = new CLink(CHtml::encode($tpl['name']),'templates.php?form=update&templateid='.$tpl['templateid'], 'unknown');
 						$caption[] = ', ';
 					}
 					array_pop($caption);

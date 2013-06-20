@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2012 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -37,9 +37,9 @@ $fields = array(
 	'name' =>			array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({save})'),
 	'proxy_hostid' =>	array(T_ZBX_INT, O_OPT, null,	DB_ID,		'isset({save})'),
 	'iprange' =>		array(T_ZBX_STR, O_OPT, null,	null,		'isset({save})'),
-	'delay' =>			array(T_ZBX_INT, O_OPT, null,	null, 		'isset({save})'),
+	'delay' =>			array(T_ZBX_INT, O_OPT, null,	BETWEEN(1, SEC_PER_WEEK), 'isset({save})'),
 	'status' =>			array(T_ZBX_INT, O_OPT, null,	IN('0,1'),	null),
-	'uniqueness_criteria' => array(T_ZBX_INT, O_OPT, null, null,	'isset({save})', _('Device uniqueness criteria')),
+	'uniqueness_criteria' => array(T_ZBX_STR, O_OPT, null, null,	'isset({save})', _('Device uniqueness criteria')),
 	'g_druleid' =>		array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
 	'dchecks' =>		array(null, O_OPT, null,		null,		null),
 	// actions
@@ -95,8 +95,9 @@ if (isset($_REQUEST['output']) && $_REQUEST['output'] == 'ajax') {
 	$ajaxResponse = new AjaxResponse;
 
 	if (isset($_REQUEST['ajaxaction']) && $_REQUEST['ajaxaction'] == 'validate') {
-		$ajaxdata = get_request('ajaxdata', array());
-		foreach ($ajaxdata as $check) {
+		$ajaxData = get_request('ajaxdata', array());
+
+		foreach ($ajaxData as $check) {
 			switch ($check['field']) {
 				case 'port':
 					if (!validate_port_list($check['value'])) {
@@ -105,6 +106,7 @@ if (isset($_REQUEST['output']) && $_REQUEST['output'] == 'ajax') {
 					break;
 				case 'itemKey':
 					$itemKey = new CItemKey($check['value']);
+
 					if (!$itemKey->isValid()) {
 						$ajaxResponse->error(_s('Incorrect key: "%1$s".', $itemKey->getError()));
 					}
@@ -112,6 +114,7 @@ if (isset($_REQUEST['output']) && $_REQUEST['output'] == 'ajax') {
 			}
 		}
 	}
+
 	$ajaxResponse->send();
 
 	require_once dirname(__FILE__).'/include/page_footer.php';
@@ -124,8 +127,9 @@ if (isset($_REQUEST['output']) && $_REQUEST['output'] == 'ajax') {
 if (isset($_REQUEST['save'])) {
 	$dChecks = get_request('dchecks', array());
 	$uniq = get_request('uniqueness_criteria', 0);
-	foreach($dChecks as $dcnum => $check){
-		$dChecks[$dcnum]['uniq'] = $uniq == $dcnum ? 1 : 0;
+
+	foreach ($dChecks as $dcnum => $check) {
+		$dChecks[$dcnum]['uniq'] = ($uniq == $dcnum) ? 1 : 0;
 	}
 
 	$discoveryRule = array(
@@ -139,18 +143,19 @@ if (isset($_REQUEST['save'])) {
 
 	if (isset($_REQUEST['druleid'])) {
 		$discoveryRule['druleid'] = get_request('druleid');
-		$result = API::drule()->update($discoveryRule);
+		$result = API::DRule()->update($discoveryRule);
 
-		$msg_ok = _('Discovery rule updated');
-		$msg_fail = _('Cannot update discovery rule');
+		$msgOk = _('Discovery rule updated');
+		$msgFail = _('Cannot update discovery rule');
 	}
 	else {
-		$result = API::drule()->create($discoveryRule);
+		$result = API::DRule()->create($discoveryRule);
 
-		$msg_ok = _('Discovery rule created');
-		$msg_fail = _('Cannot create discovery rule');
+		$msgOk = _('Discovery rule created');
+		$msgFail = _('Cannot create discovery rule');
 	}
-	show_messages($result, $msg_ok, $msg_fail);
+
+	show_messages($result, $msgOk, $msgFail);
 
 	if ($result) {
 		$druleid = reset($result['druleids']);
@@ -179,6 +184,7 @@ elseif (str_in_array($_REQUEST['go'], array('activate', 'disable')) && isset($_R
 			$go_result = true;
 		}
 	}
+
 	show_messages($go_result, _('Discovery rules updated'));
 }
 elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['g_druleid'])) {
@@ -189,6 +195,7 @@ elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['g_druleid'])) {
 			$go_result = true;
 		}
 	}
+
 	show_messages($go_result, _('Discovery rules deleted'));
 }
 
@@ -241,6 +248,7 @@ if (isset($_REQUEST['form'])) {
 				isset($dcheck['ports']) ? $dcheck['ports'] : ''
 			);
 		}
+
 		order_result($data['drule']['dchecks'], 'name');
 	}
 

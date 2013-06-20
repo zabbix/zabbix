@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -9,7 +9,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -248,7 +248,7 @@ static int	process_trap(zbx_sock_t	*sock, char *s)
 				res = calculate_checksums(nodeid, NULL, 0);
 				if (SUCCEED == res && NULL != (data = DMget_config_data(nodeid, ZBX_NODE_SLAVE)))
 				{
-					zabbix_log( LOG_LEVEL_WARNING, "NODE %d: Sending configuration changes"
+					zabbix_log(LOG_LEVEL_WARNING, "NODE %d: sending configuration changes"
 							" to slave node %d for node %d datalen " ZBX_FS_SIZE_T,
 							CONFIG_NODEID,
 							sender_nodeid,
@@ -277,7 +277,7 @@ static int	process_trap(zbx_sock_t	*sock, char *s)
 
 			alarm(CONFIG_TIMEOUT);
 			if (SUCCEED != zbx_tcp_send_raw(sock, reply))
-				zabbix_log(LOG_LEVEL_WARNING, "Error sending %s to node", reply);
+				zabbix_log(LOG_LEVEL_WARNING, "cannot send %s to node", reply);
 			alarm(0);
 
 			return ret;
@@ -386,7 +386,7 @@ static int	process_trap(zbx_sock_t	*sock, char *s)
 		zbx_timespec(&av.ts);
 
 		if (0 == strcmp(av.value, ZBX_NOTSUPPORTED))
-			av.status = ITEM_STATUS_NOTSUPPORTED;
+			av.state = ITEM_STATE_NOTSUPPORTED;
 
 		process_mass_data(sock, 0, &av, 1, NULL);
 

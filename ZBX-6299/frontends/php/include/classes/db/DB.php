@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2012 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -10,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -50,7 +50,7 @@ class DB {
 	private static $dbBackend;
 
 	/**
-	 * Get necessary DB class
+	 * Get necessary DB class.
 	 *
 	 * @return DbBackend
 	 */
@@ -105,6 +105,7 @@ class DB {
 	 * using maximum id from table or minimum allowed value.
 	 *
 	 * @throw APIException
+	 *
 	 * @static
 	 *
 	 * @param string $table table name
@@ -152,6 +153,7 @@ class DB {
 		else {
 			$nextid = self::refreshIds($table, $count);
 		}
+
 		return $nextid;
 	}
 
@@ -201,6 +203,7 @@ class DB {
 		}
 
 		$nextid = bcadd($nextid, 1, 0);
+
 		return $nextid;
 	}
 
@@ -220,7 +223,6 @@ class DB {
 	 */
 	public static function getSchema($table = null) {
 		if (is_null(self::$schema)) {
-
 			self::$schema = include(dirname(__FILE__).'/../../'.self::SCHEMA_FILE);
 		}
 
@@ -409,7 +411,7 @@ class DB {
 	}
 
 	/**
-	 * Insert data into DB
+	 * Insert data into DB.
 	 *
 	 * @param string $table
 	 * @param array  $values pair of fieldname => fieldvalue
@@ -421,6 +423,7 @@ class DB {
 		if (empty($values)) {
 			return true;
 		}
+
 		$resultIds = array();
 
 		if ($getids) {
@@ -447,11 +450,12 @@ class DB {
 				self::exception(self::DBEXECUTE_ERROR, _s('SQL statement execution has failed "%1$s".', $sql));
 			}
 		}
+
 		return $resultIds;
 	}
 
 	/**
-	 * Insert batch data into DB
+	 * Insert batch data into DB.
 	 *
 	 * @param string $table
 	 * @param array  $values pair of fieldname => fieldvalue
@@ -463,11 +467,12 @@ class DB {
 		if (empty($values)) {
 			return true;
 		}
+
 		$resultIds = array();
 
 		$tableSchema = self::getSchema($table);
 		$values = self::addMissingFields($tableSchema, $values);
-		$fields = array_keys($values[0]);
+		$fields = array_keys(reset($values));
 
 		if ($getids) {
 			$id = self::reserveIds($table, count($values));
@@ -496,18 +501,20 @@ class DB {
 	}
 
 	/**
-	 * Update data in DB
+	 * Update data in DB.
 	 *
 	 * @param string $table
 	 * @param array $data
 	 * @param array $data[...]['values'] pair of fieldname => fieldvalue for SET clause
 	 * @param array $data[...]['where'] pair of fieldname => fieldvalue for WHERE clause
+	 *
 	 * @return array of ids
 	 */
 	public static function update($table, $data) {
 		if (empty($data)) {
 			return true;
 		}
+
 		$tableSchema = self::getSchema($table);
 
 		$data = zbx_toArray($data);
@@ -547,6 +554,7 @@ class DB {
 				self::exception(self::DBEXECUTE_ERROR, _s('SQL statement execution has failed "%1$s".', $sql));
 			}
 		}
+
 		return true;
 	}
 
@@ -675,7 +683,7 @@ class DB {
 	}
 
 	/**
-	 * Delete data from DB
+	 * Delete data from DB.
 	 *
 	 * Example:
 	 * DB::delete('applications', array('applicationid'=>array(1, 8, 6)));
@@ -711,6 +719,7 @@ class DB {
 		if (!DBexecute($sql)) {
 			self::exception(self::DBEXECUTE_ERROR, _s('SQL statement execution has failed "%1$s"', $sql));
 		}
+
 		return true;
 	}
 
@@ -728,6 +737,7 @@ class DB {
 			case self::FIELD_TYPE_UINT:
 				return true;
 		}
+
 		return false;
 	}
 }

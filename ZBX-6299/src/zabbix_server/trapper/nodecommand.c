@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -9,7 +9,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -225,59 +225,60 @@ static int	get_next_point_to_node(int current_nodeid, int slave_nodeid, int *nod
  ******************************************************************************/
 int	node_process_command(zbx_sock_t *sock, const char *data, struct zbx_json_parse *jp)
 {
-	char		*result = NULL, *send, tmp[64];
-	const char	*response;
-	int		nodeid, next_nodeid, ret = FAIL;
+	char		*result = NULL, *send = NULL, tmp[64];
+	int		nodeid = -1, next_nodeid, ret = FAIL;
 	zbx_uint64_t	scriptid, hostid;
 	struct zbx_json	j;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In node_process_command()");
-
-	if (SUCCEED != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_NODEID, tmp, sizeof(tmp)))
-		return FAIL;
-	nodeid = atoi(tmp);
-
-	if (SUCCEED != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_SCRIPTID, tmp, sizeof(tmp)))
-		return FAIL;
-	ZBX_STR2UINT64(scriptid, tmp);
-
-	if (SUCCEED != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_HOSTID, tmp, sizeof(tmp)))
-		return FAIL;
-	ZBX_STR2UINT64(hostid, tmp);
-
 	zbx_json_init(&j, 256);
+
+	if (SUCCEED != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_NODEID, tmp, sizeof(tmp)) ||
+			FAIL == is_uint31(tmp, &nodeid))
+	{
+		result = zbx_dsprintf(result, "Failed to parse command request tag: %s", ZBX_PROTO_TAG_NODEID);
+		goto finish;
+	}
+
+	if (SUCCEED != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_SCRIPTID, tmp, sizeof(tmp)) ||
+			FAIL == is_uint64(tmp, &scriptid))
+	{
+		result = zbx_dsprintf(result, "Failed to parse command request tag: %s", ZBX_PROTO_TAG_SCRIPTID);
+		goto finish;
+	}
+
+	if (SUCCEED != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_HOSTID, tmp, sizeof(tmp)) ||
+			FAIL == is_uint64(tmp, &hostid))
+	{
+		result = zbx_dsprintf(result, "Failed to parse command request tag: %s", ZBX_PROTO_TAG_HOSTID);
+		goto finish;
+	}
 
 	if (nodeid == CONFIG_NODEID)
 	{
-		ret = execute_script(scriptid, hostid, &result);
-
-		response = (FAIL == ret) ? ZBX_PROTO_VALUE_FAILED : ZBX_PROTO_VALUE_SUCCESS;
-
-		zbx_json_addstring(&j, ZBX_PROTO_TAG_RESPONSE, response, ZBX_JSON_TYPE_STRING);
-		zbx_json_addstring(&j, ZBX_PROTO_TAG_VALUE, result, ZBX_JSON_TYPE_STRING);
-		send = j.buffer;
+		if (SUCCEED == (ret = execute_script(scriptid, hostid, &result)))
+		{
+			zbx_json_addstring(&j, ZBX_PROTO_TAG_RESPONSE, ZBX_PROTO_VALUE_SUCCESS, ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(&j, ZBX_PROTO_TAG_VALUE, result, ZBX_JSON_TYPE_STRING);
+			send = j.buffer;
+		}
 	}
 	else if (SUCCEED == get_next_point_to_node(CONFIG_NODEID, nodeid, &next_nodeid))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "NODE %d: Sending command for Node %d to Node %d",
 				CONFIG_NODEID, nodeid, next_nodeid);
 
-		if (FAIL == (ret = send_script(next_nodeid, data, &result)))
-		{
-			zbx_json_addstring(&j, ZBX_PROTO_TAG_RESPONSE, ZBX_PROTO_VALUE_FAILED, ZBX_JSON_TYPE_STRING);
-			zbx_json_addstring(&j, ZBX_PROTO_TAG_VALUE, result, ZBX_JSON_TYPE_STRING);
-			send = j.buffer;
-		}
-		else
+		if (SUCCEED == (ret = send_script(next_nodeid, data, &result)))
 			send = result;
 	}
 	else
+		result = zbx_dsprintf(result, "NODE %d: Unknown Node ID [%d]", CONFIG_NODEID, nodeid);
+finish:
+	if (FAIL == ret)
 	{
-		result = zbx_dsprintf(result, "NODE %d: Unknown Node ID [%d]",
-				CONFIG_NODEID, nodeid);
-
 		zbx_json_addstring(&j, ZBX_PROTO_TAG_RESPONSE, ZBX_PROTO_VALUE_FAILED, ZBX_JSON_TYPE_STRING);
-		zbx_json_addstring(&j, ZBX_PROTO_TAG_VALUE, result, ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(&j, ZBX_PROTO_TAG_VALUE, (NULL != result) ? result : "Unknown error",
+				ZBX_JSON_TYPE_STRING);
 		send = j.buffer;
 	}
 
@@ -297,5 +298,5 @@ int	node_process_command(zbx_sock_t *sock, const char *data, struct zbx_json_par
 	zbx_json_free(&j);
 	zbx_free(result);
 
-	return SUCCEED;
+	return ret;
 }

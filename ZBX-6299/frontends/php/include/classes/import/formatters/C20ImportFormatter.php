@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2012 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -10,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -134,6 +134,11 @@ class C20ImportFormatter extends CImportFormatter {
 			foreach ($this->data['hosts'] as $host) {
 				if (!empty($host['items'])) {
 					foreach ($host['items'] as $item) {
+						// if a host item has the "Not supported" status, convert it to "Active"
+						if ($item['status'] == ITEM_STATUS_NOTSUPPORTED) {
+							$item['status'] = ITEM_STATUS_ACTIVE;
+						}
+
 						$item = $this->formatItem($item);
 						$itemsData[$host['host']][$item['key_']] = $item;
 					}
@@ -161,6 +166,11 @@ class C20ImportFormatter extends CImportFormatter {
 			foreach ($this->data['hosts'] as $host) {
 				if (!empty($host['discovery_rules'])) {
 					foreach ($host['discovery_rules'] as $item) {
+						// if a discovery rule has the "Not supported" status, convert it to "Active"
+						if ($item['status'] == ITEM_STATUS_NOTSUPPORTED) {
+							$item['status'] = ITEM_STATUS_ACTIVE;
+						}
+
 						$item = $this->formatDiscoveryRule($item);
 
 						$discoveryRulesData[$host['host']][$item['key_']] = $item;

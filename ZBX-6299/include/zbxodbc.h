@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -9,7 +9,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -35,7 +35,7 @@ typedef struct zbx_odbc_dbh_s
 	SQLHSTMT	hstmt;
 	SQLSMALLINT     col_num;
 	ZBX_ODBC_ROW	row_data;
-	SQLINTEGER	*data_len;
+	SQLLEN		*data_len;
 } ZBX_ODBC_DBH;
 
 typedef ZBX_ODBC_DBH*		ZBX_ODBC_RESULT;
@@ -46,6 +46,6 @@ void		odbc_DBclose(ZBX_ODBC_DBH *pdbh);
 ZBX_ODBC_RESULT odbc_DBselect(ZBX_ODBC_DBH *pdbh, const char *query);
 ZBX_ODBC_ROW    odbc_DBfetch(ZBX_ODBC_RESULT pdbh);
 
-const char	*get_last_odbc_strerror();
+const char	*get_last_odbc_strerror(void);
 
 #endif /* ZABBIX_ZODBC_H */

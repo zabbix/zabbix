@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -9,7 +9,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -28,7 +28,7 @@
 
 #define ZBX_MAX_WEBPAGE_SIZE	(1 * 1024 * 1024)
 
-static int	get_http_page(const char *host, const char *path, unsigned short port, char *buffer, int max_buffer_len)
+static int	get_http_page(const char *host, const char *path, unsigned short port, char *buffer, size_t max_buffer_len)
 {
 	int		ret;
 	char		*recv_buffer;
@@ -68,7 +68,7 @@ static int	get_http_page(const char *host, const char *path, unsigned short port
 int	WEB_PAGE_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char		*hostname, *path_str, *port_str, buffer[MAX_BUFFER_LEN], path[MAX_STRING_LEN];
-	unsigned short	port;
+	unsigned short	port_number;
 
 	if (3 < request->nparam)
 		return SYSINFO_RET_FAIL;
@@ -86,17 +86,17 @@ int	WEB_PAGE_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 		strscpy(path, path_str);
 
 	if (NULL == port_str || '\0' == *port_str)
-		port = ZBX_DEFAULT_HTTP_PORT;
-	else if (SUCCEED != is_ushort(port_str, &port))
+		port_number = ZBX_DEFAULT_HTTP_PORT;
+	else if (FAIL == is_ushort(port_str, &port_number))
 		return SYSINFO_RET_FAIL;
 
-	if (SYSINFO_RET_OK == get_http_page(hostname, path, port, buffer, sizeof(buffer)))
+	if (SYSINFO_RET_OK == get_http_page(hostname, path, port_number, buffer, sizeof(buffer)))
 	{
 		zbx_rtrim(buffer, "\r\n");
-		SET_TEXT_RESULT(result, strdup(buffer));
+		SET_TEXT_RESULT(result, zbx_strdup(NULL, buffer));
 	}
 	else
-		SET_TEXT_RESULT(result, strdup("EOF"));
+		SET_TEXT_RESULT(result, zbx_strdup(NULL, ""));
 
 	return SYSINFO_RET_OK;
 }
@@ -105,7 +105,7 @@ int	WEB_PAGE_PERF(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char		*hostname, path[MAX_STRING_LEN], *port_str, *path_str;
 	double		start_time;
-	unsigned short	port;
+	unsigned short	port_number;
 
 	if (3 < request->nparam)
 		return SYSINFO_RET_FAIL;
@@ -123,13 +123,13 @@ int	WEB_PAGE_PERF(AGENT_REQUEST *request, AGENT_RESULT *result)
 		strscpy(path, path_str);
 
 	if (NULL == port_str || '\0' == *port_str)
-		port = ZBX_DEFAULT_HTTP_PORT;
-	else if (SUCCEED != is_ushort(port_str, &port))
+		port_number = ZBX_DEFAULT_HTTP_PORT;
+	else if (FAIL == is_ushort(port_str, &port_number))
 		return SYSINFO_RET_FAIL;
 
 	start_time = zbx_time();
 
-	if (SYSINFO_RET_OK == get_http_page(hostname, path, port, NULL, 0))
+	if (SYSINFO_RET_OK == get_http_page(hostname, path, port_number, NULL, 0))
 		SET_DBL_RESULT(result, zbx_time() - start_time);
 	else
 		SET_DBL_RESULT(result, 0.0);
@@ -140,11 +140,12 @@ int	WEB_PAGE_PERF(AGENT_REQUEST *request, AGENT_RESULT *result)
 int	WEB_PAGE_REGEXP(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char		*hostname, *path_str, *port_str, *regexp, *length_str, path[MAX_STRING_LEN],
-			back[MAX_BUFFER_LEN], *buffer = NULL, *found;
-	int		length, len, found_len;
-	unsigned short	port;
+			*buffer = NULL, *ptr = NULL;
+	int		length;
+	const char	*output;
+	unsigned short	port_number;
 
-	if (5 < request->nparam)
+	if (6 < request->nparam)
 		return SYSINFO_RET_FAIL;
 
 	hostname = get_rparam(request, 0);
@@ -152,6 +153,7 @@ int	WEB_PAGE_REGEXP(AGENT_REQUEST *request, AGENT_RESULT *result)
 	port_str = get_rparam(request, 2);
 	regexp = get_rparam(request, 3);
 	length_str = get_rparam(request, 4);
+	output = get_rparam(request, 5);
 
 	if (NULL == hostname || '\0' == *hostname)
                 return SYSINFO_RET_FAIL;
@@ -162,38 +164,31 @@ int	WEB_PAGE_REGEXP(AGENT_REQUEST *request, AGENT_RESULT *result)
 		strscpy(path, path_str);
 
 	if (NULL == port_str || '\0' == *port_str)
-		port = ZBX_DEFAULT_HTTP_PORT;
-	else if (SUCCEED != is_ushort(port_str, &port))
+		port_number = ZBX_DEFAULT_HTTP_PORT;
+	else if (FAIL == is_ushort(port_str, &port_number))
 		return SYSINFO_RET_FAIL;
 
 	if (NULL == regexp)
                 return SYSINFO_RET_FAIL;
 
+	/* by default return the matched part of web page */
+	if (NULL == output || '\0' == *output)
+		output = "\\0";
+
 	if (NULL == length_str || '\0' == *length_str)
 		length = MAX_BUFFER_LEN - 1;
-	else if (FAIL != is_uint(length_str))
-		length = atoi(length_str);
-	else
+	else if (FAIL == is_uint31_1(length_str, &length))
 		return SYSINFO_RET_FAIL;
 
 	buffer = zbx_malloc(buffer, ZBX_MAX_WEBPAGE_SIZE);
 
-	if (SYSINFO_RET_OK == get_http_page(hostname, path, port, buffer, ZBX_MAX_WEBPAGE_SIZE))
-	{
-		if (NULL != (found = zbx_regexp_match(buffer, regexp, &found_len)))
-		{
-			len = length + 1;
-			len = MIN(len, found_len + 1);
-			len = MIN(len, sizeof(back));
+	if (SYSINFO_RET_OK == get_http_page(hostname, path, port_number, buffer, ZBX_MAX_WEBPAGE_SIZE))
+		ptr = zbx_regexp_sub(buffer, regexp, output);
 
-			zbx_strlcpy(back, found, len);
-			SET_STR_RESULT(result, strdup(back));
-		}
-		else
-			SET_STR_RESULT(result, strdup("EOF"));
-	}
+	if (NULL != ptr)
+		SET_STR_RESULT(result, ptr);
 	else
-		SET_STR_RESULT(result, strdup("EOF"));
+		SET_STR_RESULT(result, zbx_strdup(NULL, ""));
 
 	zbx_free(buffer);
 

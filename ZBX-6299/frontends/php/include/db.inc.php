@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2012 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -10,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -679,8 +679,8 @@ function DBid2nodeid($id_name) {
 	return $result;
 }
 
-function id2nodeid($id_var) {
-	return (int)bcdiv("$id_var", '100000000000000');
+function id2nodeid($id) {
+	return (int) bcdiv("$id", '100000000000000');
 }
 
 /**
@@ -744,50 +744,47 @@ function dbNode($fieldName, $nodes = null, $operator = '') {
 
 /**
  * Wrapper function to generate condition like " WHERE h.hostid BETWEEN 500000000000000 AND 599999999999999"
- * For a standalone setup the function will return an empty string
+ * For a standalone setup the function will return an empty string.
  *
  * @param string $fieldName
- * @param mixed nodes
+ * @param mixed  nodes
  *
  * @return string
  */
-function whereDbNode($fieldName, $nodes = null)
-{
+function whereDbNode($fieldName, $nodes = null) {
 	return dbNode($fieldName, $nodes, 'WHERE');
 }
 
 /**
  * Wrapper function to generate condition like " AND h.hostid BETWEEN 500000000000000 AND 599999999999999"
- * For a standalone setup the function will return an empty string
+ * For a standalone setup the function will return an empty string.
  *
  * @param string $fieldName
  * @param mixed nodes
  *
  * @return string
  */
-function andDbNode($fieldName, $nodes = null)
-{
+function andDbNode($fieldName, $nodes = null) {
 	return dbNode($fieldName, $nodes, 'AND');
 }
 
 /**
- * Wrapper function to add condition like "h.hostid BETWEEN 500000000000000 AND 599999999999999"
- *   to an array $sqlPartWhere
- * For a standalone setup the function will make nothing and will return $sqlPartWhere array without any changes
+ * Wrapper function to add condition like "h.hostid BETWEEN 500000000000000 AND 599999999999999" to an array $sqlPartWhere.
+ * For a standalone setup the function will make nothing and will return $sqlPartWhere array without any changes.
  *
- * @param array $sqlPartWhere
+ * @param array  $sqlPartWhere
  * @param string $fieldName
- * @param mixed nodes
+ * @param mixed  nodes
  *
  * @return array
  */
-function sqlPartDbNode($sqlPartWhere, $fieldName, $nodes = null)
-{
+function sqlPartDbNode($sqlPartWhere, $fieldName, $nodes = null) {
 	$sql = dbNode($fieldName, $nodes);
 
 	if ($sql != '') {
 		$sqlPartWhere[] = $sql;
 	}
+
 	return $sqlPartWhere;
 }
 
@@ -958,21 +955,21 @@ function remove_nodes_from_id($id) {
 }
 
 /**
- * Cheks whether all $db_fields keys exists as $args keys.
+ * Checks whether all $db_fields keys exists as $args keys.
  *
  * If $db_fields element value is given and corresponding $args is not then it is assigned to $args element.
  *
- * @param $db_fields
+ * @param $dbFields
  * @param $args
  *
  * @return boolean
  */
-function check_db_fields($db_fields, &$args) {
+function check_db_fields($dbFields, &$args) {
 	if (!is_array($args)) {
 		return false;
 	}
 
-	foreach ($db_fields as $field => $def) {
+	foreach ($dbFields as $field => $def) {
 		if (!isset($args[$field])) {
 			if (is_null($def)) {
 				return false;
@@ -982,12 +979,13 @@ function check_db_fields($db_fields, &$args) {
 			}
 		}
 	}
+
 	return true;
 }
 
 /**
  * Takes an initial part of SQL query and appends a generated WHERE condition.
- * The WHERE condidion is generated from the given list of values as a mix of
+ * The WHERE condition is generated from the given list of values as a mix of
  * <fieldname> BETWEEN <id1> AND <idN>" and "<fieldname> IN (<id1>,<id2>,...,<idN>)" elements.
  *
  * @param string $fieldName  field name to be used in SQL WHERE condition
@@ -1011,11 +1009,15 @@ function dbConditionInt($fieldName, array $values, $notIn = false) {
 
 	$pos = 1;
 	$len = 1;
-	$valueL = reset($values);
-	while (false !== ($valueR = next($values))) {
+	foreach ($values as $valueR) {
+		if (!isset($valueL)) {
+			$valueL = $valueR;
+			continue;
+		}
+
 		$valueL = bcadd($valueL, 1, 0);
 
-		if ($valueR != $valueL) {
+		if (bccomp($valueR, $valueL) != 0) {
 			if ($len >= $MIN_NUM_BETWEEN) {
 				$betweens[] = array(bcsub($valueL, $len, 0), bcsub($valueL, 1, 0));
 			}
@@ -1121,7 +1123,7 @@ function dbConditionString($fieldName, array $values, $notIn = false) {
 		$condition .= implode(',', zbx_dbstr($values));
 	}
 
-	return $fieldName.$in.'('.$condition.')';
+	return '('.$fieldName.$in.'('.$condition.'))';
 }
 
 function zero2null($val) {

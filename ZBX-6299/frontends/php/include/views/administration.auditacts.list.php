@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2011 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -10,15 +10,15 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
+
 $auditWidget = new CWidget();
 
 // header
@@ -42,8 +42,8 @@ $filterTable->addRow(array(
 		bold(_('Recipient')),
 		SPACE,
 		new CTextBox('alias', $this->data['alias'], 20),
-		new CButton('btn1', _('Select'), 'return PopUp(\'popup.php?dstfrm='.$filterForm->getName().
-			'&dstfld1=alias&srctbl=users&srcfld1=alias&real_hosts=1\');', 'T')
+		new CButton('btn1', _('Select'), 'return PopUp("popup.php?dstfrm='.$filterForm->getName().
+			'&dstfld1=alias&srctbl=users&srcfld1=alias&real_hosts=1");', 'filter-select-button')
 	)
 ));
 $filterButton = new CButton('filter', _('Filter'), "javascript: create_var('zbx_filter', 'filter_set', '1', true);");
@@ -99,12 +99,22 @@ foreach ($this->data['alerts'] as $alert) {
 		$retries = new CSpan(0, 'red');
 	}
 
-	if ($alert['alerttype'] == ALERT_TYPE_MESSAGE) {
-		$message = array(bold(_('Subject').NAME_DELIMITER), br(), $alert['subject'], br(), br(), bold(_('Message').NAME_DELIMITER), br(), zbx_nl2br($alert['message']));
-	}
-	else {
-		$message = array(bold(_('Command').NAME_DELIMITER), br(), zbx_nl2br($alert['message']));
-	}
+	$message = ($alert['alerttype'] == ALERT_TYPE_MESSAGE)
+		? array(
+			bold(_('Subject').NAME_DELIMITER),
+			BR(),
+			$alert['subject'],
+			BR(),
+			BR(),
+			bold(_('Message').NAME_DELIMITER),
+			BR(),
+			zbx_nl2br($alert['message'])
+		)
+		: array(
+			bold(_('Command').NAME_DELIMITER),
+			BR(),
+			zbx_nl2br($alert['message'])
+		);
 
 	$error = empty($alert['error']) ? new CSpan(SPACE, 'off') : new CSpan($alert['error'], 'on');
 
@@ -140,5 +150,5 @@ zbx_add_post_js('timeControl.processObjects();');
 
 // append form to widget
 $auditWidget->addItem($auditForm);
+
 return $auditWidget;
-?>
