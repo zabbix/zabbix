@@ -75,6 +75,14 @@ function is_array(obj) {
 	return (obj != null) && (typeof obj == 'object') && ('splice' in obj) && ('join' in obj);
 }
 
+function in_array(needle, haystack) {
+	for (key in haystack) {
+		if (haystack[key] == needle) {
+			return true;
+		}
+	}
+}
+
 function SDI(msg) {
 	if (GK || WK) {
 		console.log(msg);

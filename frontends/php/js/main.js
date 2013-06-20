@@ -175,6 +175,8 @@ var chkbxRange = {
 			}
 		}
 
+		this.allSelected();
+
 		this.goButton = $('goButton');
 		if (!is_null(this.goButton)) {
 			addListener(this.goButton, 'click', this.submitGo.bindAsEventListener(this), false);
@@ -198,6 +200,31 @@ var chkbxRange = {
 
 			if (isset(obj_id, this.selected_ids)) {
 				obj.checked = true;
+			}
+		}
+	},
+
+	// check if all checkboxes are checked
+	allSelected: function() {
+		var chkbx_list = this.chkboxes[this.pageGoName];
+		var checkboxes_checked = 0;
+		var checkboxes_total = chkbx_list.length;
+
+		for (var i = 0; i < checkboxes_total; i++) {
+			if (chkbx_list[i].checked) {
+				// see if checked value is in selected_ids array
+				if (in_array(chkbx_list[i].value, this.selected_ids)) {
+					checkboxes_checked++;
+				}
+			}
+		}
+
+		// if all checkboxes on page are checked, mark top checkbox also as checked
+		if (checkboxes_checked == checkboxes_total) {
+			for (key in this.chkboxes) {
+				if (key.indexOf('all_') > -1) {
+					this.chkboxes[key][0].checked = true;
+				}
 			}
 		}
 	},
@@ -266,6 +293,8 @@ var chkbxRange = {
 		}
 		this.startbox = obj;
 		this.startbox_name = obj_name;
+
+		this.allSelected();
 	},
 
 	checkAll: function(name, value) {
