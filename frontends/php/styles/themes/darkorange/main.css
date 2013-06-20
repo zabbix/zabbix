@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -9,7 +9,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -504,3 +504,22 @@ div.control-severity label span:hover {
 div.preloader {
 	background: url("images/preloader.gif") no-repeat;
 }
+
+/* multiselect */
+.multiselect input[type="text"] { color: #F50; }
+.multiselect input[type="text"]:hover { background: none; border: none; outline: none; }
+.multiselect .selected ul { border: 1px solid #DFDFDF; background: #313131; }
+.multiselect .selected ul.active { border: 1px solid #BE4F00; }
+.multiselect .selected ul li {
+	border: 1px solid #DFDFDF; background: #908E8E; color: #FFFFFF;
+	background-image: -webkit-gradient(linear, 0 0, 0 100%, color-stop(1%, #4E4D4E), color-stop(15%, #908E8E));
+	background-image: -webkit-linear-gradient(top, #4E4D4E 1%, #908E8E 15%);
+	background-image: -moz-linear-gradient(top, #4E4D4E 1%, #908E8E 15%);
+	background-image: -o-linear-gradient(top, #4E4D4E 1%, #908E8E 15%);
+	background-image: linear-gradient(#4E4D4E 1%, #908E8E 15%);
+}
+.multiselect .selected ul li.pressed { background: #525151; }
+.multiselect .available { background: #313131; border: 1px solid #908E8E; }
+.multiselect .available .prefix { color: #838383; }
+.multiselect .available ul li.hover { background: #908E8E; }
+.multiselect .available ul li.hover .prefix { color: #F1F1F1; }

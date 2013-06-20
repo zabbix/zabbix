@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -10,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -39,12 +39,11 @@ class CTag extends CObject {
 	protected $encStrategy = self::ENC_NOAMP;
 
 	/**
-	 * The HTML encoding strategy for the "value" attribute.
+	 * The HTML encoding strategy for the "value", "name" and "id" attributes.
 	 *
 	 * @var int
 	 */
-	protected $valueEncStrategy = self::ENC_ALL;
-
+	protected $attrEncStrategy = self::ENC_ALL;
 
 	public function __construct($tagname = null, $paired = 'no', $body = null, $class = null) {
 		parent::__construct();
@@ -68,24 +67,13 @@ class CTag extends CObject {
 		$this->addClass($class);
 	}
 
-	public function showStart() {
-		echo $this->startToString();
-	}
-
-	public function showBody() {
-		echo $this->bodyToString();
-	}
-
-	public function showEnd() {
-		echo $this->endToString();
-	}
-
 	// do not put new line symbol (\n) before or after html tags, it adds spaces in unwanted places
 	public function startToString() {
 		$res = $this->tag_start.'<'.$this->tagname;
 		foreach ($this->attributes as $key => $value) {
-			// a special encoding strategy should be used for the "value" attribute
-			$value = $this->encode($value, ($key == 'value') ? $this->valueEncStrategy : self::ENC_NOAMP);
+			// a special encoding strategy should be used for the "value", "name" and "id" attributes
+			$strategy = in_array($key, array('value', 'name', 'id'), true) ? $this->attrEncStrategy : $this->encStrategy;
+			$value = $this->encode($value, $strategy);
 			$res .= ' '.$key.'="'.$value.'"';
 		}
 		$res .= ($this->paired === 'yes') ? '>' : ' />';

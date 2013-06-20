@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -10,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -129,11 +129,14 @@ $userGroupForm->addItem($userGroupTab);
 
 // append buttons to form
 if (empty($this->data['usrgrpid'])) {
-	$userGroupForm->addItem(makeFormFooter(array(new CSubmit('save', _('Save'))), array(new CButtonCancel(url_param('config')))));
+	$userGroupForm->addItem(makeFormFooter(
+		new CSubmit('save', _('Save')),
+		new CButtonCancel(url_param('config'))
+	));
 }
 else {
 	$userGroupForm->addItem(makeFormFooter(
-		array(new CSubmit('save', _('Save'))),
+		new CSubmit('save', _('Save')),
 		array(
 			new CButtonDelete(_('Delete selected group?'), url_param('form').url_param('usrgrpid').url_param('config')),
 			new CButtonCancel(url_param('config'))

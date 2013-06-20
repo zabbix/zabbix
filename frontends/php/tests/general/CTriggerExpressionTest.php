@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -10,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -23,6 +23,7 @@ require_once dirname(__FILE__).'/../../include/defines.inc.php';
 require_once dirname(__FILE__).'/../../include/classes/parsers/CTriggerExpression.php';
 
 class CTriggerExpressionTest extends PHPUnit_Framework_TestCase {
+
 	public static function provider() {
 		return array(
 			array('', null, false),
@@ -155,6 +156,7 @@ class CTriggerExpressionTest extends PHPUnit_Framework_TestCase {
 			array('(-5)={host:key.diff()}', null, true),
 			array('(15 - 5.25 - 1)={host:key.diff()}', null, true),
 			array('{host:key.diff()} = -5', null, true),
+			array('{0:0.last(0)}=0', null, true),
 
 			array('(({host:key.diff()})=0)', null, true),
 			array('( ( {host:key.diff()} ) = 0 )', null, true),
@@ -2078,10 +2080,11 @@ class CTriggerExpressionTest extends PHPUnit_Framework_TestCase {
 	}
 
 	/**
-	* @dataProvider provider
-	*/
+	 * @dataProvider provider
+	 */
 	public function test_parse($expression, $result, $rc) {
 		$expressionData = new CTriggerExpression();
+
 		if ($expressionData->parse($expression)) {
 			$this->assertEquals($rc, true);
 			$this->assertEquals($rc, $expressionData->isValid);
@@ -2094,7 +2097,7 @@ class CTriggerExpressionTest extends PHPUnit_Framework_TestCase {
 			}
 		}
 		else {
-			$this->assertEquals($rc,false, "\nError with expression $expression: ".$expressionData->error);
+			$this->assertEquals($rc, false, "\nError with expression $expression: ".$expressionData->error);
 		}
 	}
 }

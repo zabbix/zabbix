@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2012 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -10,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -47,7 +47,7 @@ $result = array();
 switch ($data['method']) {
 	case 'host.get':
 		$result = API::Host()->get(array(
-			'startSearch' => 1,
+			'startSearch' => true,
 			'search' => $data['params']['search'],
 			'output' => array('hostid', 'host', 'name'),
 			'sortfield' => 'name',
@@ -221,19 +221,197 @@ switch ($data['method']) {
 		}
 		break;
 
+	/**
+	 * Create multi select data.
+	 * Supported objects: "applications", "hosts", "hostGroup", "templates", "triggers"
+	 *
+	 * @param string $data['objectName']
+	 * @param string $data['search']
+	 * @param int    $data['limit']
+	 *
+	 * @return array(int => array('value' => int, 'text' => string))
+	 */
+	case 'multiselect.get':
+		$config = select_config();
+
+		switch ($data['objectName']) {
+			case 'hostGroup':
+				$hostGroups = API::HostGroup()->get(array(
+					'editable' => isset($data['editable']) ? $data['editable'] : null,
+					'output' => array('groupid', 'name'),
+					'startSearch' => true,
+					'search' => isset($data['search']) ? array('name' => $data['search']) : null,
+					'limit' => $config['search_limit']
+				));
+
+				if ($hostGroups) {
+					foreach ($hostGroups as &$hostGroup) {
+						$hostGroup['nodename'] = get_node_name_by_elid($hostGroup['groupid'], true, ': ');
+					}
+					unset($hostGroup);
+
+					CArrayHelper::sort($hostGroups, array(
+						array('field' => 'nodename', 'order' => ZBX_SORT_UP),
+						array('field' => 'name', 'order' => ZBX_SORT_UP)
+					));
+
+					if (isset($data['limit'])) {
+						$hostGroups = array_slice($hostGroups, 0, $data['limit']);
+					}
+
+					foreach ($hostGroups as $hostGroup) {
+						$result[] = array(
+							'id' => $hostGroup['groupid'],
+							'prefix' => (string) $hostGroup['nodename'],
+							'name' => $hostGroup['name']
+						);
+					}
+				}
+				break;
+
+			case 'hosts':
+				$hosts = API::Host()->get(array(
+					'editable' => isset($data['editable']) ? $data['editable'] : null,
+					'output' => array('hostid', 'name'),
+					'startSearch' => true,
+					'search' => isset($data['search']) ? array('name' => $data['search']) : null,
+					'limit' => $config['search_limit']
+				));
+
+				if ($hosts) {
+					CArrayHelper::sort($hosts, array(
+						array('field' => 'name', 'order' => ZBX_SORT_UP)
+					));
+
+					if (isset($data['limit'])) {
+						$hosts = array_slice($hosts, 0, $data['limit']);
+					}
+
+					foreach ($hosts as $host) {
+						$result[] = array(
+							'id' => $host['hostid'],
+							'prefix' => '',
+							'name' => $host['name']
+						);
+					}
+				}
+				break;
+
+			case 'templates':
+				$templates = API::Template()->get(array(
+					'editable' => isset($data['editable']) ? $data['editable'] : null,
+					'output' => array('templateid', 'name'),
+					'startSearch' => true,
+					'search' => isset($data['search']) ? array('name' => $data['search']) : null,
+					'limit' => $config['search_limit']
+				));
+
+				if ($templates) {
+					CArrayHelper::sort($templates, array(
+						array('field' => 'name', 'order' => ZBX_SORT_UP)
+					));
+
+					if (isset($data['limit'])) {
+						$templates = array_slice($templates, 0, $data['limit']);
+					}
+
+					foreach ($templates as $template) {
+						$result[] = array(
+							'id' => $template['templateid'],
+							'prefix' => '',
+							'name' => $template['name']
+						);
+					}
+				}
+				break;
+
+			case 'applications':
+				$applications = API::Application()->get(array(
+					'hostids' => zbx_toArray($data['hostid']),
+					'output' => array('applicationid', 'name'),
+					'startSearch' => true,
+					'search' => isset($data['search']) ? array('name' => $data['search']) : null,
+					'limit' => $config['search_limit']
+				));
+
+				if ($applications) {
+					CArrayHelper::sort($applications, array(
+						array('field' => 'name', 'order' => ZBX_SORT_UP)
+					));
+
+					if (isset($data['limit'])) {
+						$applications = array_slice($applications, 0, $data['limit']);
+					}
+
+					foreach ($applications as $application) {
+						$result[] = array(
+							'id' => $application['applicationid'],
+							'prefix' => '',
+							'name' => $application['name']
+						);
+					}
+				}
+				break;
+
+			case 'triggers':
+				$triggers = API::Trigger()->get(array(
+					'editable' => isset($data['editable']) ? $data['editable'] : null,
+					'output' => array('triggerid', 'description'),
+					'selectHosts' => array('name'),
+					'startSearch' => true,
+					'search' => isset($data['search']) ? array('description' => $data['search']) : null,
+					'limit' => $config['search_limit']
+				));
+
+				if ($triggers) {
+					CArrayHelper::sort($triggers, array(
+						array('field' => 'description', 'order' => ZBX_SORT_UP)
+					));
+
+					if (isset($data['limit'])) {
+						$triggers = array_slice($triggers, 0, $data['limit']);
+					}
+
+					foreach ($triggers as $trigger) {
+						$hostName = '';
+
+						if ($trigger['hosts']) {
+							$trigger['hosts'] = reset($trigger['hosts']);
+
+							$hostName = $trigger['hosts']['name'].NAME_DELIMITER;
+						}
+
+						$result[] = array(
+							'id' => $trigger['triggerid'],
+							'prefix' => $hostName,
+							'name' => $trigger['description']
+						);
+					}
+				}
+				break;
+		}
+		break;
+
 	default:
 		fatal_error('Wrong RPC call to JS RPC!');
 }
 
 if ($requestType == PAGE_TYPE_JSON) {
 	if (isset($data['id'])) {
-		$rpcResp = array(
+		echo $json->encode(array(
 			'jsonrpc' => '2.0',
 			'result' => $result,
 			'id' => $data['id']
-		);
-		echo $json->encode($rpcResp);
+		));
 	}
+}
+elseif ($requestType == PAGE_TYPE_TEXT_RETURN_JSON) {
+	$json = new CJSON();
+
+	echo $json->encode(array(
+		'jsonrpc' => '2.0',
+		'result' => $result
+	));
 }
 elseif ($requestType == PAGE_TYPE_TEXT || $requestType == PAGE_TYPE_JS) {
 	echo $result;

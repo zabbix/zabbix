@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2012 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -10,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -261,7 +261,7 @@ class CHttpTestManager {
 
 		$httpTests = array();
 		$dbCursor = DBselect(
-			'SELECT ht.httptestid,ht.name,ht.applicationid,ht.delay,ht.status,ht.macros,ht.agent,'.
+			'SELECT ht.httptestid,ht.name,ht.applicationid,ht.delay,ht.status,ht.variables,ht.agent,'.
 				'ht.authentication,ht.http_user,ht.http_password,ht.hostid,ht.templateid'.
 			' FROM httptest ht'.
 			' WHERE ht.hostid='.zbx_dbstr($templateId)
@@ -271,7 +271,7 @@ class CHttpTestManager {
 		}
 
 		$dbCursor = DBselect(
-			'SELECT hs.httpstepid,hs.httptestid,hs.name,hs.no,hs.url,hs.timeout,hs.posts,hs.required,hs.status_codes'.
+			'SELECT hs.httpstepid,hs.httptestid,hs.name,hs.no,hs.url,hs.timeout,hs.posts,hs.variables,hs.required,hs.status_codes'.
 			' FROM httpstep hs'.
 			' WHERE '.dbConditionInt('hs.httptestid', array_keys($httpTests))
 		);

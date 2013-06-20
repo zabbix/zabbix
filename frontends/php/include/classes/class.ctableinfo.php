@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2012 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -42,14 +42,22 @@ class CTableInfo extends CTable {
 			insert_js(
 				'jQuery(function($) {
 					$.fn.makeVerticalRotation = function () {
-						var cellsToRotate = $(".vertical_rotation", this);
-						var betterCells = [];
+						var cellsToRotate = $(".vertical_rotation", this),
+							betterCells = [];
 
 						// insert spans
 						cellsToRotate.each(function () {
-							var cell = $(this),
-								text = cell.text();
-							cell.text("").append($("<span>", {text: text}));
+							var cell = $(this);
+
+							var text = $("<span>", {
+								text: cell.text()
+							});
+
+							if (IE) {
+								text.css({"font-family": "monospace"});
+							}
+
+							cell.text("").append(text);
 						});
 
 						// rotate cells
@@ -67,15 +75,30 @@ class CTableInfo extends CTable {
 								"-o-transform-origin": transform
 							};
 
+							if (IE) {
+								css["font-family"] = "monospace";
+								css["-ms-transform-origin"] = "50% 50%";
+							}
+
 							if (IE9) {
 								css["-ms-transform-origin"] = transform;
 							}
 
-							var divInner = $("<div>", {"class": "vertical_rotation_inner"}).css(css).append(span.text());
+							var divInner = $("<div>", {
+								"class": "vertical_rotation_inner"
+							})
+							.css(css)
+							.append(span.text());
 
-							var div = $("<div>", {height: width, width: height}).append(divInner);
+							var div = $("<div>", {
+								height: width,
+								width: height
+							})
+							.append(divInner);
+
 							betterCells.push(div);
 						});
+
 						cellsToRotate.each(function (i) {
 							$(this).html(betterCells[i]);
 						});
@@ -86,7 +109,10 @@ class CTableInfo extends CTable {
 								width = cell.width();
 
 							if (width > 30) {
-								cell.children().css({position: "relative", left: (width / 2 - 12)});
+								cell.children().css({
+									position: "relative",
+									left: width / 2 - 12
+								});
 							}
 						});
 					};

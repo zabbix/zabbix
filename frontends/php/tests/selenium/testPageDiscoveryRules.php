@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -10,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -53,13 +53,13 @@ class testPageDiscoveryRules extends CWebTest {
 		$this->zbxTestTextPresent('Discovery rule deleted');
 		$this->zbxTestTextPresent('CONFIGURATION OF DISCOVERY RULES');
 
-		$sql = "select * from items where itemid=$itemid AND flags=".ZBX_FLAG_DISCOVERY;
+		$sql = "SELECT * FROM items WHERE itemid=$itemid AND flags=".ZBX_FLAG_DISCOVERY;
 		$this->assertEquals(0, DBcount($sql));
-		$sql = "select * from item_discovery where parent_itemid=$itemid";
+		$sql = "SELECT * FROM item_discovery WHERE parent_itemid=$itemid";
 		$this->assertEquals(0, DBcount($sql));
-		$sql = "SELECT gi.gitemid from graphs_items gi, item_discovery id WHERE gi.itemid=id.itemid AND id.parent_itemid=$itemid";
+		$sql = "SELECT gi.gitemid FROM graphs_items gi, item_discovery id WHERE gi.itemid=id.itemid AND id.parent_itemid=$itemid";
 		$this->assertEquals(0, DBcount($sql));
-		$sql = "SELECT f.functionid from functions f, item_discovery id WHERE f.itemid=id.itemid AND id.parent_itemid=$itemid";
+		$sql = "SELECT f.functionid FROM functions f, item_discovery id WHERE f.itemid=id.itemid AND id.parent_itemid=$itemid";
 		$this->assertEquals(0, DBcount($sql));
 
 		DBrestore_tables('triggers');

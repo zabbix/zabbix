@@ -76,6 +76,7 @@ frontends/php/images/general/login/background.png -text
 frontends/php/images/general/login/logo.png -text
 frontends/php/images/general/login/username_pass_field.png -text
 frontends/php/images/general/minus.png -text
+frontends/php/images/general/multiselect.png -text
 frontends/php/images/general/no_icon.png -text
 frontends/php/images/general/ok.png -text
 frontends/php/images/general/ok_bb.png -text
@@ -165,7 +166,19 @@ frontends/php/images/sysmaps/old/Printer.png -text svneol=unset#unset
 frontends/php/images/sysmaps/old/Router.png -text svneol=unset#unset
 frontends/php/images/sysmaps/old/Server.png -text svneol=unset#unset
 frontends/php/images/sysmaps/old/Workstation.png -text svneol=unset#unset
+frontends/php/include/classes/class.cmultiselect.php -text
+frontends/php/include/classes/class.cseverity.php -text
+frontends/php/include/classes/macros/CEventDescription.php -text
+frontends/php/include/classes/macros/CTriggerDescription.php -text
+frontends/php/include/classes/validators/CSetValidator.php -text
+frontends/php/include/classes/validators/event/CEventSourceObjectValidator.php -text
+frontends/php/include/draw.inc.php -text
+frontends/php/include/views/configuration.sysmap.constructor.php -text
+frontends/php/include/views/configuration.sysmap.list.php -text
+frontends/php/include/views/js/administration.general.housekeeper.edit.js.php -text
+frontends/php/include/views/monitoring.dashconf.php -text
 frontends/php/js/flickerfreescreen.js -text svneol=unset#text/plain
+frontends/php/js/multiselect.js -text svneol=unset#text/plain
 frontends/php/js/servercheck.js -text
 frontends/php/js/vendors/activity-indicator.js -text svneol=unset#text/plain
 frontends/php/locale/bg/LC_MESSAGES/frontend.po -text
@@ -254,6 +267,17 @@ frontends/php/styles/themes/originalblue/images/icons_d40000.png -text
 frontends/php/styles/themes/originalblue/images/icons_ffffff.png -text
 frontends/php/styles/themes/originalblue/images/preloader.gif -text
 frontends/php/tests/bootstrap.php.template -text
+frontends/php/tests/general/CTriggerFunctionValidatorTest.php -text
+frontends/php/tests/selenium/testFormDiscoveryRule.php -text
+frontends/php/tests/selenium/testFormGraph.php -text
+frontends/php/tests/selenium/testFormItemPrototype.php -text
+frontends/php/tests/selenium/testFormTriggerPrototype.php -text
+frontends/php/tests/selenium/testInheritanceDiscoveryRule.php -text
+frontends/php/tests/selenium/testInheritanceGraph.php -text
+frontends/php/tests/selenium/testInheritanceItem.php -text
+frontends/php/tests/selenium/testInheritanceItemPrototype.php -text
+frontends/php/tests/selenium/testInheritanceTrigger.php -text
+frontends/php/tests/selenium/testInheritanceTriggerPrototype.php -text
 include/module.h -text
 include/zbxmodules.h -text
 man/zabbix_agentd.man -text
@@ -533,6 +557,7 @@ misc/init.d/fedora/core5/zabbix_agentd -text
 misc/init.d/freebsd/zabbix_agentd -text
 misc/init.d/freebsd/zabbix_server -text
 misc/init.d/tru64/zabbix_server -text
+src/libs/zbxcommon/int128.c -text
 src/libs/zbxjson/json_parser.c -text
 src/libs/zbxjson/json_parser.h -text
 src/zabbix_java/lib/logback-classic-0.9.27.jar -text

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -9,7 +9,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -30,6 +30,7 @@
 #define ZBX_PROTO_TAG_DRULE		"drule"
 #define ZBX_PROTO_TAG_DCHECK		"dcheck"
 #define ZBX_PROTO_TAG_HOST		"host"
+#define ZBX_PROTO_TAG_HOST_METADATA	"host_metadata"
 #define ZBX_PROTO_TAG_INFO		"info"
 #define ZBX_PROTO_TAG_IP		"ip"
 #define ZBX_PROTO_TAG_DNS		"dns"
@@ -48,6 +49,7 @@
 #define ZBX_PROTO_TAG_REQUEST		"request"
 #define ZBX_PROTO_TAG_RESPONSE		"response"
 #define ZBX_PROTO_TAG_STATUS		"status"
+#define ZBX_PROTO_TAG_STATE		"state"
 #define ZBX_PROTO_TAG_TYPE		"type"
 #define ZBX_PROTO_TAG_VALUE		"value"
 #define ZBX_PROTO_TAG_SCRIPTID		"scriptid"

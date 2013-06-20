@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2012 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -10,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -20,11 +20,13 @@
 
 
 include('include/views/js/configuration.services.edit.js.php');
+
 global $ZBX_MESSAGES;
 
 $service = $this->data['service'];
 
 $servicesWidget = new CWidget();
+$servicesWidget->setRootClass('services-edit');
 $servicesWidget->addPageHeader(_('CONFIGURATION OF IT SERVICES'));
 
 // create form
@@ -112,7 +114,7 @@ $servicesDependenciesFormList->addRow(
  */
 $servicesTimeFormList = new CFormList('servicesTimeFormList');
 $servicesTimeTable = new CTable(_('No times defined. Work 24x7.'), 'formElementTable');
-$servicesTimeTable->setAttribute('style', 'min-width:500px;');
+$servicesTimeTable->setAttribute('style', 'min-width: 500px;');
 $servicesTimeTable->setHeader(array(_('Type'), _('Interval'), _('Note'), _('Action')));
 
 $i = 0;
@@ -248,8 +250,7 @@ $timeTypeComboBox->addItem(SERVICE_TIME_TYPE_ONETIME_DOWNTIME, _('One-time downt
 $servicesTimeFormList->addRow(
 	_('New service time'),
 	new CDiv(array(
-		$timeTypeComboBox,
-		BR(),
+		new CDiv($timeTypeComboBox, 'time-type-combobox'),
 		$serviceTimeTable,
 		new CButton('add_service_time', _('Add'), null, 'link_menu')
 	),
@@ -276,7 +277,7 @@ if ($service['serviceid'] && !$service['dependencies']) {
 $buttons[] = new CButtonCancel();
 
 $servicesForm->addItem(makeFormFooter(
-	array(new CSubmit('save_service', _('Save'), 'javascript: document.forms[0].action += \'?saction=1\';')),
+	new CSubmit('save_service', _('Save'), 'javascript: document.forms[0].action += \'?saction=1\';'),
 	$buttons
 ));
 

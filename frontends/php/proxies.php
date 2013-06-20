@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -10,15 +10,15 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
+
 require_once dirname(__FILE__).'/include/config.inc.php';
 require_once dirname(__FILE__).'/include/hosts.inc.php';
 
@@ -83,10 +83,6 @@ $_REQUEST['go'] = get_request('go', 'none');
  * Actions
  */
 if (isset($_REQUEST['save'])) {
-	if (!count(get_accessible_nodes_by_user(CWebUser::$data, PERM_READ_WRITE, PERM_RES_IDS_ARRAY))) {
-		access_deny();
-	}
-
 	$proxy = array(
 		'host' => get_request('host'),
 		'status' => get_request('status'),
@@ -200,6 +196,7 @@ if (isset($_REQUEST['form'])) {
 	// proxy
 	if (!empty($data['proxyid'])) {
 		$dbProxy = reset($dbProxy);
+
 		if (!isset($_REQUEST['form_refresh'])) {
 			$data['name'] = $dbProxy['host'];
 			$data['status'] = $dbProxy['status'];
@@ -250,7 +247,8 @@ else {
 		'limit' => $config['search_limit'] + 1
 	));
 	$data['proxies'] = zbx_toHash($data['proxies'], 'proxyid');
-	$proxyids = array_keys($data['proxies']);
+
+	$proxyIds = array_keys($data['proxies']);
 
 	order_result($data['proxies'], $sortfield, getPageSortOrder());
 
@@ -265,26 +263,31 @@ else {
 			' AND i.hostid=h.hostid '.
 			' AND h.status='.HOST_STATUS_MONITORED.
 			' AND i.delay<>0'.
-			' AND '.dbConditionInt('h.proxy_hostid', $proxyids).
+			' AND '.dbConditionInt('h.proxy_hostid', $proxyIds).
 		' GROUP BY h.proxy_hostid'
 	);
 	while ($performance = DBfetch($dbPerformance)) {
-		$data['proxies'][$performance['proxy_hostid']]['perf'] = round($performance['qps'], 2);
+		if (isset($data['proxies'][$performance['proxy_hostid']])) {
+			$data['proxies'][$performance['proxy_hostid']]['perf'] = round($performance['qps'], 2);
+		}
 	}
 
 	// get items
 	$items = API::Item()->get(array(
-		'groupCount' => 1,
-		'countOutput' => 1,
-		'proxyids' => $proxyids,
-		'webitems' => 1,
-		'monitored' => 1
+		'proxyids' => $proxyIds,
+		'groupCount' => true,
+		'countOutput' => true,
+		'webitems' => true,
+		'monitored' => true
 	));
 	foreach ($items as $item) {
-		if (!isset($data['proxies'][$item['proxy_hostid']]['item_count'])) {
-			$data['proxies'][$item['proxy_hostid']]['item_count'] = 0;
+		if (isset($data['proxies'][$item['proxy_hostid']])) {
+			if (!isset($data['proxies'][$item['proxy_hostid']]['item_count'])) {
+				$data['proxies'][$item['proxy_hostid']]['item_count'] = 0;
+			}
+
+			$data['proxies'][$item['proxy_hostid']]['item_count'] += $item['rowscount'];
 		}
-		$data['proxies'][$item['proxy_hostid']]['item_count'] += $item['rowscount'];
 	}
 
 	// render view
@@ -294,4 +297,3 @@ else {
 }
 
 require_once dirname(__FILE__).'/include/page_footer.php';
-?>

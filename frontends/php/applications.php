@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2012 Zabbix SIA
+** Copyright (C) 2000-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -10,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -32,27 +32,18 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = array(
-	'hosts' =>				array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,	null),
-	'groups' =>				array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,	null),
-	'hostids' =>			array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,	null),
-	'groupids' =>			array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,	null),
 	'applications' =>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,	null),
-	'hostid' =>				array(T_ZBX_INT, O_OPT, null,	DB_ID,	null),
+	'hostid' =>				array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID.NOT_ZERO, 'isset({form})&&!isset({applicationid})'),
 	'groupid' =>			array(T_ZBX_INT, O_OPT, null,	DB_ID,	null),
-	'applicationid' =>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,	'isset({form})&&({form}=="update")'),
-	'appname' =>			array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY, 'isset({save})'),
-	'apphostid' =>			array(T_ZBX_INT, O_OPT, null,	DB_ID.'{}>0', 'isset({save})'),
-	'apptemplateid' =>		array(T_ZBX_INT, O_OPT, null,	DB_ID,	null),
+	'applicationid' =>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,	'isset({form})&&{form}=="update"'),
+	'appname' =>			array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY, 'isset({save})', _('Name')),
 	// actions
 	'go' =>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
-	'add_to_group' =>		array(T_ZBX_INT, O_OPT, P_SYS|P_ACT, DB_ID,	null),
-	'delete_from_group' =>	array(T_ZBX_INT, O_OPT, P_SYS|P_ACT, DB_ID,	null),
 	'save' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'clone' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'delete' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
-	'cancel' =>				array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
 	'form' =>				array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
-	'form_refresh' =>		array(T_ZBX_STR, O_OPT, null,	null,	null)
+	'form_refresh' =>		array(T_ZBX_INT, O_OPT, null,	null,	null)
 );
 check_fields($fields);
 validate_sort_and_sortorder('name', ZBX_SORT_UP);
@@ -62,8 +53,8 @@ validate_sort_and_sortorder('name', ZBX_SORT_UP);
  */
 if (isset($_REQUEST['applicationid'])) {
 	$dbApplication = API::Application()->get(array(
-		'output' => API_OUTPUT_EXTEND,
-		'applicationids' => get_request('applicationid')
+		'applicationids' => array($_REQUEST['applicationid']),
+		'output' => array('name', 'hostid')
 	));
 	if (empty($dbApplication)) {
 		access_deny();
@@ -95,12 +86,6 @@ if (get_request('hostid', 0) > 0) {
 		access_deny();
 	}
 }
-if (get_request('apphostid', 0) > 0) {
-	$hostids = available_hosts($_REQUEST['apphostid'], 1);
-	if (empty($hostids)) {
-		access_deny();
-	}
-}
 $_REQUEST['go'] = get_request('go', 'none');
 
 /*
@@ -110,7 +95,7 @@ if (isset($_REQUEST['save'])) {
 	DBstart();
 	$application = array(
 		'name' => $_REQUEST['appname'],
-		'hostid' => $_REQUEST['apphostid']
+		'hostid' => $_REQUEST['hostid']
 	);
 
 	if (isset($_REQUEST['applicationid'])) {
@@ -118,19 +103,20 @@ if (isset($_REQUEST['save'])) {
 		$dbApplications = API::Application()->update($application);
 
 		$action = AUDIT_ACTION_UPDATE;
-		$msg_ok = _('Application updated');
-		$msg_fail = _('Cannot update application');
+		$msgOk = _('Application updated');
+		$msgFail = _('Cannot update application');
 	}
-	else{
+	else {
 		$dbApplications = API::Application()->create($application);
 
 		$action = AUDIT_ACTION_ADD;
-		$msg_ok = _('Application added');
-		$msg_fail = _('Cannot add application');
+		$msgOk = _('Application added');
+		$msgFail = _('Cannot add application');
 	}
 	$result = DBend($dbApplications);
 
-	show_messages($result, $msg_ok, $msg_fail);
+	show_messages($result, $msgOk, $msgFail);
+
 	if ($result) {
 		$applicationid = reset($dbApplications['applicationids']);
 		add_audit($action, AUDIT_RESOURCE_APPLICATION, _('Application').' ['.$_REQUEST['appname'].' ] ['.$applicationid.']');
@@ -166,10 +152,10 @@ elseif ($_REQUEST['go'] == 'delete') {
 
 	DBstart();
 	$dbApplications = DBselect(
-			'SELECT a.applicationid,a.name,a.hostid'.
-			' FROM applications a'.
-			' WHERE '.dbConditionInt('a.applicationid', $applications).
-				andDbNode('a.applicationid')
+		'SELECT a.applicationid,a.name,a.hostid'.
+		' FROM applications a'.
+		' WHERE '.dbConditionInt('a.applicationid', $applications).
+			andDbNode('a.applicationid')
 	);
 	while ($db_app = DBfetch($dbApplications)) {
 		if (!isset($applications[$db_app['applicationid']])) {
@@ -192,13 +178,13 @@ elseif (str_in_array($_REQUEST['go'], array('activate', 'disable'))) {
 	DBstart();
 	foreach ($applications as $id => $appid) {
 		$db_items = DBselect(
-				'SELECT ia.itemid,i.hostid,i.key_'.
-				' FROM items_applications ia'.
-					' LEFT JOIN items i ON ia.itemid=i.itemid'.
-				' WHERE ia.applicationid='.$appid.
-					' AND i.hostid='.$_REQUEST['hostid'].
-					' AND i.type<>'.ITEM_TYPE_HTTPTEST.
-					andDbNode('ia.applicationid')
+			'SELECT ia.itemid,i.hostid,i.key_'.
+			' FROM items_applications ia'.
+				' LEFT JOIN items i ON ia.itemid=i.itemid'.
+			' WHERE ia.applicationid='.$appid.
+				' AND i.hostid='.$_REQUEST['hostid'].
+				' AND i.type<>'.ITEM_TYPE_HTTPTEST.
+				andDbNode('ia.applicationid')
 		);
 		while ($item = DBfetch($db_items)) {
 			if ($_REQUEST['go'] == 'activate') {
@@ -226,34 +212,24 @@ if ($_REQUEST['go'] != 'none' && !empty($go_result)) {
 /*
  * Dsiplay
  */
-$data = array();
 if (isset($_REQUEST['form'])) {
-	$data['applicationid'] = get_request('applicationid');
-	$data['form'] = get_request('form');
-	$data['form_refresh'] = get_request('form_refresh', 0);
-	$data['groupid'] = get_request('groupid', 0);
+	$data = array(
+		'applicationid' => get_request('applicationid'),
+		'groupid' => get_request('groupid', 0),
+		'form' => get_request('form'),
+		'form_refresh' => get_request('form_refresh', 0)
+	);
 
 	if (isset($data['applicationid']) && !isset($_REQUEST['form_refresh'])) {
 		$dbApplication = reset($dbApplication);
+
 		$data['appname'] = $dbApplication['name'];
-		$data['apphostid'] = $dbApplication['hostid'];
+		$data['hostid'] = $dbApplication['hostid'];
 
 	}
 	else {
 		$data['appname'] = get_request('appname', '');
-		$data['apphostid'] = get_request('apphostid', get_request('hostid', 0));
-	}
-
-	// select the host for the navigation panel
-	$data['hostid'] = get_request('hostid') ? get_request('hostid') : $data['apphostid'];
-
-	// get application hostid
-	$db_host = get_host_by_hostid($data['apphostid'], 1);
-	if ($db_host) {
-		$data['hostname'] = $db_host['name'];
-	}
-	else {
-		$data['hostname'] = '';
+		$data['hostid'] = get_request('hostid');
 	}
 
 	// render view
@@ -262,23 +238,25 @@ if (isset($_REQUEST['form'])) {
 	$applicationView->show();
 }
 else {
-	$options = array(
-		'groups' => array('editable' => 1, 'with_hosts_and_templates' => true),
-		'hosts' => array('editable' => 1, 'templated_hosts' => 1),
-		'hostid' => get_request('hostid', null),
-		'groupid' => get_request('groupid', null)
+	$data = array(
+		'pageFilter' => new CPageFilter(array(
+			'groups' => array('editable' => true, 'with_hosts_and_templates' => true),
+			'hosts' => array('editable' => true, 'templated_hosts' => true),
+			'hostid' => get_request('hostid'),
+			'groupid' => get_request('groupid')
+		))
 	);
-	$data['pageFilter'] = new CPageFilter($options);
 	$data['groupid'] = $data['pageFilter']->groupid;
 	$data['hostid'] = $data['pageFilter']->hostid;
 
 	if ($data['pageFilter']->hostsSelected) {
-		// get application
+		// get application ids
 		$sortfield = getPageSortField('name');
 		$sortorder = getPageSortOrder();
+
 		$options = array(
 			'output' => array('applicationid'),
-			'editable' => 1,
+			'editable' => true,
 			'sortfield' => $sortfield,
 			'limit' => $config['search_limit'] + 1
 		);
@@ -291,19 +269,36 @@ else {
 		$data['applications'] = API::Application()->get($options);
 
 		// get applications
-		$options = array(
+		$data['applications'] = API::Application()->get(array(
 			'applicationids' => zbx_objectValues($data['applications'], 'applicationid'),
 			'output' => API_OUTPUT_EXTEND,
 			'selectItems' => API_OUTPUT_REFER,
-			'expandData' => 1
-		);
-		$data['applications'] = API::Application()->get($options);
+			'expandData' => true
+		));
 		order_result($data['applications'], $sortfield, $sortorder);
 
-		// fill applications with templated hosts
-		foreach ($data['applications'] as $id => $application) {
-			if (!empty($application['templateid'])) {
-				$data['applications'][$id]['template_host'] = get_realhost_by_applicationid($application['templateid']);
+		// fetch template application source parents
+		$applicationSourceParentIds = getApplicationSourceParentIds(zbx_objectValues($data['applications'], 'applicationid'));
+		$parentAppIds = array();
+		foreach ($applicationSourceParentIds as $applicationParentIds) {
+			foreach ($applicationParentIds as $parentId) {
+				$parentAppIds[$parentId] = $parentId;
+			}
+		}
+		if ($parentAppIds) {
+			$parentTemplates = DBfetchArrayAssoc(DBselect(
+				'SELECT a.applicationid,h.hostid,h.name'.
+				' FROM applications a,hosts h'.
+				' WHERE a.hostid=h.hostid'.
+					' AND '.dbConditionInt('a.applicationid', $parentAppIds)
+			), 'applicationid');
+
+			foreach ($data['applications'] as &$app) {
+				if ($app['templateids']) {
+					foreach ($applicationSourceParentIds[$app['applicationid']] as $parentAppId) {
+						$app['sourceTemplates'][] = $parentTemplates[$parentAppId];
+					}
+				}
 			}
 		}
 	}
@@ -321,4 +316,3 @@ else {
 }
 
 require_once dirname(__FILE__).'/include/page_footer.php';
-?>

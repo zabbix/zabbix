@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -10,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -48,7 +48,7 @@ $graphForm->addVar('ymax_itemid', $this->data['ymax_itemid']);
 // create form list
 $graphFormList = new CFormList('graphFormList');
 if (!empty($this->data['templates'])) {
-	$graphFormList->addRow(_('Parent graph'), $this->data['templates']);
+	$graphFormList->addRow(_('Parent graphs'), $this->data['templates']);
 }
 $nameTextBox = new CTextBox('name', $this->data['name'], ZBX_TEXTBOX_STANDARD_SIZE);
 $nameTextBox->attr('autofocus', 'autofocus');
@@ -107,7 +107,7 @@ if (!empty($this->data['items'])) {
 $addButton = new CButton('add_item', _('Add'),
 	'return PopUp("popup.php?writeonly=1&multiselect=1&dstfrm='.$graphForm->getName().
 		(!empty($this->data['normal_only']) ? '&normal_only=1' : '').
-		'&srctbl=items&srcfld1=itemid&srcfld2=name" + getOnlyHostParam(), 800, 600);',
+		'&srctbl=items&srcfld1=itemid&srcfld2=name&numeric=1" + getOnlyHostParam(), 800, 600);',
 	'link_menu'
 );
 
@@ -118,19 +118,19 @@ if (!empty($this->data['parent_discoveryid'])) {
 			url_param($this->data['graphtype'], false, 'graphtype').
 			url_param('parent_discoveryid').
 			(!empty($this->data['normal_only']) ? '&normal_only=1' : '').
-			'&srctbl=prototypes&srcfld1=itemid&srcfld2=name", 800, 600);',
+			'&srctbl=prototypes&srcfld1=itemid&srcfld2=name&numeric=1", 800, 600);',
 		'link_menu'
 	);
 }
 $itemsTable->addRow(new CRow(new CCol(array($addButton, SPACE, SPACE, SPACE, $addPrototypeButton), null, 8), null, 'itemButtonsRow'));
 
 // append legend to form list
-$graphFormList->addRow(_('Show legend'), new CCheckBox('legend', $this->data['legend'], null, 1));
+$graphFormList->addRow(_('Show legend'), new CCheckBox('show_legend', $this->data['show_legend'], null, 1));
 
 // append graph types to form list
 if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] == GRAPH_TYPE_STACKED) {
-	$graphFormList->addRow(_('Show working time'), new CCheckBox('showworkperiod', $this->data['showworkperiod'], null, 1));
-	$graphFormList->addRow(_('Show triggers'), new CCheckBox('showtriggers', $this->data['showtriggers'], null, 1));
+	$graphFormList->addRow(_('Show working time'), new CCheckBox('show_work_period', $this->data['show_work_period'], null, 1));
+	$graphFormList->addRow(_('Show triggers'), new CCheckBox('show_triggers', $this->data['show_triggers'], null, 1));
 
 	if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL) {
 		if (is_numeric($this->data['percent_left'])) {
@@ -187,20 +187,23 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 				'&dstfld2=ymin_name'.
 				'&srctbl=items'.
 				'&srcfld1=itemid'.
-				'&srcfld2=name" + getOnlyHostParam(), 0, 0, "zbx_popup_item");',
+				'&srcfld2=name'.
+				'&numeric=1'.
+				'&writeonly=1" + getOnlyHostParam(), 0, 0, "zbx_popup_item");',
 			'formlist'
 		);
 
 		// select prototype button
 		if (!empty($this->data['parent_discoveryid'])) {
-			$yaxisMinData[] = new CButton('yaxis_min', _('Select prototype'), 'javascript: '.
+			$yaxisMinData[] = new CButton('yaxis_min_prototype', _('Select prototype'), 'javascript: '.
 				'return PopUp("popup.php?dstfrm='.$graphForm->getName().
 					'&parent_discoveryid='.$this->data['parent_discoveryid'].
 					'&dstfld1=ymin_itemid'.
 					'&dstfld2=ymin_name'.
 					'&srctbl=prototypes'.
 					'&srcfld1=itemid'.
-					'&srcfld2=name", 0, 0, "zbx_popup_item");',
+					'&srcfld2=name'.
+					'&numeric=1", 0, 0, "zbx_popup_item");',
 				'formlist'
 			);
 		}
@@ -239,20 +242,23 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 				'&dstfld2=ymax_name'.
 				'&srctbl=items'.
 				'&srcfld1=itemid'.
-				'&srcfld2=name" + getOnlyHostParam(), 0, 0, "zbx_popup_item");',
+				'&srcfld2=name'.
+				'&numeric=1'.
+				'&writeonly=1" + getOnlyHostParam(), 0, 0, "zbx_popup_item");',
 			'formlist'
 		);
 
 		// select prototype button
 		if (!empty($this->data['parent_discoveryid'])) {
-			$yaxisMaxData[] = new CButton('yaxis_min', _('Select prototype'), 'javascript: '.
+			$yaxisMaxData[] = new CButton('yaxis_max_prototype', _('Select prototype'), 'javascript: '.
 				'return PopUp("popup.php?dstfrm='.$graphForm->getName().
 					'&parent_discoveryid='.$this->data['parent_discoveryid'].
 					'&dstfld1=ymax_itemid'.
 					'&dstfld2=ymax_name'.
 					'&srctbl=prototypes'.
 					'&srcfld1=itemid'.
-					'&srcfld2=name", 0, 0, "zbx_popup_item");',
+					'&srcfld2=name'.
+					'&numeric=1", 0, 0, "zbx_popup_item");',
 				'formlist'
 			);
 		}
@@ -264,7 +270,7 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 	$graphFormList->addRow(_('Y axis MAX value'), $yaxisMaxData);
 }
 else {
-	$graphFormList->addRow(_('3D view'), new CCheckBox('graph3d', $this->data['graph3d'], null, 1));
+	$graphFormList->addRow(_('3D view'), new CCheckBox('show_3d', $this->data['show_3d'], null, 1));
 }
 
 $graphFormList->addRow(_('Items'), new CDiv($itemsTable, 'objectgroup inlineblock border_dotted ui-corner-all'));
@@ -274,7 +280,10 @@ $graphTab = new CTabView(array('remember' => true));
 if (!$this->data['form_refresh']) {
 	$graphTab->setSelected(0);
 }
-$graphTab->addTab('graphTab', _('Graph'), $graphFormList);
+$graphTab->addTab(
+	'graphTab',
+	empty($this->data['parent_discoveryid']) ? _('Graph') : _('Graph prototype'), $graphFormList
+);
 
 /*
  * Preview tab
@@ -297,7 +306,6 @@ if (!empty($this->data['graphid'])) {
 	if (!empty($this->data['templateid'])) {
 		$saveButton->setEnabled(false);
 		$deleteButton->setEnabled(false);
-		$cloneButton->setEnabled(false);
 	}
 
 	$graphForm->addItem(makeFormFooter($saveButton, array($cloneButton, $deleteButton, $cancelButton)));

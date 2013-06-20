@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -10,15 +10,15 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
+
 require_once dirname(__FILE__).'/js/configuration.triggers.expression.js.php';
 
 $expressionWidget = new CWidget();
@@ -29,6 +29,7 @@ $expressionForm->setName('expression');
 $expressionForm->addVar('dstfrm', $this->data['dstfrm']);
 $expressionForm->addVar('dstfld1', $this->data['dstfld1']);
 $expressionForm->addVar('itemid', $this->data['itemid']);
+
 if (!empty($this->data['parent_discoveryid'])) {
 	$expressionForm->addVar('parent_discoveryid', $this->data['parent_discoveryid']);
 }
@@ -52,72 +53,88 @@ if (!empty($this->data['parent_discoveryid'])) {
 		'formlist'
 	);
 }
+
 $expressionFormList->addRow(_('Item'), $item);
 
 // append function to form list
 $functionComboBox = new CComboBox('expr_type', $this->data['expr_type'], 'submit()');
 $functionComboBox->addStyle('width: 605px;');
+
 foreach ($this->data['functions'] as $id => $f) {
 	// if user has selected an item, we are filtering out the triggers that can't work with it
 	if (empty($this->data['itemValueType']) || !empty($f['allowed_types'][$this->data['itemValueType']])) {
 		$functionComboBox->addItem($id, $f['description']);
 	}
 }
-$expressionFormList->addRow(_('Function'), $functionComboBox);
-if (isset($this->data['functions'][$this->data['function'].'['.$this->data['operator'].']']['params'])) {
-	foreach ($this->data['functions'][$this->data['function'].'['.$this->data['operator'].']']['params'] as $pid => $pf) {
-		$paramIsReadonly = 'no';
-		$paramTypeElement = null;
-		$paramValue = isset($this->data['param'][$pid]) ? $this->data['param'][$pid] : null;
 
-		if ($pf['T'] == T_ZBX_INT) {
-			if ($pid == 0
-				|| ($pid == 1
+$expressionFormList->addRow(_('Function'), $functionComboBox);
+
+if (isset($this->data['functions'][$this->data['function'].'['.$this->data['operator'].']']['params'])) {
+	foreach ($this->data['functions'][$this->data['function'].'['.$this->data['operator'].']']['params'] as $paramId => $paramFunction) {
+		$paramValue = isset($this->data['param'][$paramId]) ? $this->data['param'][$paramId] : null;
+
+		if ($paramFunction['T'] == T_ZBX_INT) {
+			$paramIsReadonly = 'no';
+			$paramTypeElement = null;
+
+			if ($paramId == 0
+				|| ($paramId == 1
 					&& (substr($this->data['expr_type'], 0, 6) == 'regexp'
 						|| substr($this->data['expr_type'], 0, 7) == 'iregexp'
 						|| (substr($this->data['expr_type'], 0, 3) == 'str' && substr($this->data['expr_type'], 0, 6) != 'strlen')))) {
-				if (isset($pf['M'])) {
-					if (is_array($pf['M'])) {
-						$paramTypeElement = new CComboBox('paramtype', $this->data['paramtype']);
-						foreach ($pf['M'] as $mid => $caption) {
+				if (isset($paramFunction['M'])) {
+					if (is_array($paramFunction['M'])) {
+						$paramTypeElement = new CComboBox('paramtype', $this->data['paramtype'], 'submit()');
+
+						foreach ($paramFunction['M'] as $mid => $caption) {
 							$paramTypeElement->addItem($mid, $caption);
 						}
+
 						if (substr($this->data['expr_type'], 0, 4) == 'last' || substr($this->data['expr_type'], 0, 6) == 'strlen') {
 							$paramIsReadonly = 'yes';
 						}
 					}
-					elseif ($pf['M'] == PARAM_TYPE_SECONDS) {
-						$expressionForm->addVar('paramtype', PARAM_TYPE_SECONDS);
-						$paramTypeElement = SPACE._('Seconds');
+					elseif ($paramFunction['M'] == PARAM_TYPE_TIME) {
+						$expressionForm->addVar('paramtype', PARAM_TYPE_TIME);
+						$paramTypeElement = SPACE._('Time');
 					}
-					elseif ($pf['M'] == PARAM_TYPE_COUNTS) {
+					elseif ($paramFunction['M'] == PARAM_TYPE_COUNTS) {
 						$expressionForm->addVar('paramtype', PARAM_TYPE_COUNTS);
 						$paramTypeElement = SPACE._('Count');
 					}
 				}
 				else {
-					$expressionForm->addVar('paramtype', PARAM_TYPE_SECONDS);
-					$paramTypeElement = SPACE._('Seconds');
+					$expressionForm->addVar('paramtype', PARAM_TYPE_TIME);
+					$paramTypeElement = SPACE._('Time');
 				}
 			}
-			if ($pid == 1
+
+			if ($paramId == 1
 					&& (substr($this->data['expr_type'], 0, 3) != 'str' || substr($this->data['expr_type'], 0, 6) == 'strlen')
 					&& substr($this->data['expr_type'], 0, 6) != 'regexp'
 					&& substr($this->data['expr_type'], 0, 7) != 'iregexp') {
-				$paramTypeElement = SPACE._('Seconds');
+				$paramTypeElement = SPACE._('Time');
+				$paramField = new CTextBox('param['.$paramId.']', $paramValue, 10, $paramIsReadonly);
 			}
-			$expressionFormList->addRow($pf['C'].' ', array(new CNumericBox('param['.$pid.']', $paramValue, 10, $paramIsReadonly), $paramTypeElement));
+			else {
+				$paramField = ($this->data['paramtype'] == PARAM_TYPE_COUNTS)
+					? new CNumericBox('param['.$paramId.']', (int) $paramValue, 10, $paramIsReadonly)
+					: new CTextBox('param['.$paramId.']', $paramValue, 10, $paramIsReadonly);
+			}
+
+			$expressionFormList->addRow($paramFunction['C'].' ', array($paramField, $paramTypeElement));
 		}
 		else {
-			$expressionFormList->addRow($pf['C'], new CTextBox('param['.$pid.']', $paramValue, 30));
-			$expressionForm->addVar('paramtype', PARAM_TYPE_SECONDS);
+			$expressionFormList->addRow($paramFunction['C'], new CTextBox('param['.$paramId.']', $paramValue, 30));
+			$expressionForm->addVar('paramtype', PARAM_TYPE_TIME);
 		}
 	}
 }
 else {
-	$expressionForm->addVar('paramtype', PARAM_TYPE_SECONDS);
+	$expressionForm->addVar('paramtype', PARAM_TYPE_TIME);
 	$expressionForm->addVar('param', 0);
 }
+
 $expressionFormList->addRow('N', new CTextBox('value', $this->data['value'], 10));
 
 // append tabs to form
@@ -126,8 +143,11 @@ $expressionTab->addTab('expressionTab', _('Trigger expression condition'), $expr
 $expressionForm->addItem($expressionTab);
 
 // append buttons to form
-$expressionForm->addItem(makeFormFooter(array(new CSubmit('insert', _('Insert'))), array(new CButtonCancel(url_param('parent_discoveryid').url_param('dstfrm').url_param('dstfld1')))));
+$expressionForm->addItem(makeFormFooter(
+	new CSubmit('insert', _('Insert')),
+	new CButtonCancel(url_params(array('parent_discoveryid', 'dstfrm', 'dstfld1'))
+)));
 
 $expressionWidget->addItem($expressionForm);
+
 return $expressionWidget;
-?>

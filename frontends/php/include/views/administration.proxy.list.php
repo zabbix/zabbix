@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2011 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -10,15 +10,15 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
+
 $proxyWidget = new CWidget();
 
 // create new proxy button
@@ -54,28 +54,36 @@ $proxyTable->setHeader(array(
 foreach ($this->data['proxies'] as $proxy) {
 	$hosts = array();
 
-	foreach ($proxy['hosts'] as $host) {
-		if ($host['status'] == HOST_STATUS_MONITORED) {
-			$style = 'off';
-		}
-		elseif ($host['status'] == HOST_STATUS_TEMPLATE) {
-			$style = 'unknown';
-		}
-		else {
-			$style = 'on';
+	if (!empty($proxy['hosts'])) {
+		foreach ($proxy['hosts'] as $host) {
+			if ($host['status'] == HOST_STATUS_MONITORED) {
+				$style = 'off';
+			}
+			elseif ($host['status'] == HOST_STATUS_TEMPLATE) {
+				$style = 'unknown';
+			}
+			else {
+				$style = 'on';
+			}
+
+			$hosts[] = new CLink($host['name'], 'hosts.php?form=update&hostid='.$host['hostid'], $style);
+			$hosts[] = ', ';
 		}
 
-		$hosts[] = new CLink($host['name'], 'hosts.php?form=update&hostid='.$host['hostid'], $style);
-		$hosts[] = ', ';
+		array_pop($hosts);
 	}
-	array_pop($hosts);
+
+	$lastAccess = '-';
+	if (isset($proxy['lastaccess'])) {
+		$lastAccess = ($proxy['lastaccess'] == 0) ? '-' : zbx_date2age($proxy['lastaccess']);
+	}
 
 	$proxyTable->addRow(array(
 		new CCheckBox('hosts['.$proxy['proxyid'].']', null, null, $proxy['proxyid']),
-		new CLink($proxy['host'], 'proxies.php?form=update&proxyid='.$proxy['proxyid']),
-		$proxy['status'] == HOST_STATUS_PROXY_ACTIVE ? _('Active') : _('Passive'),
-		$proxy['lastaccess'] == 0 ? '-' : zbx_date2age($proxy['lastaccess']),
-		count($proxy['hosts']),
+		isset($proxy['host']) ? new CLink($proxy['host'], 'proxies.php?form=update&proxyid='.$proxy['proxyid']) : '',
+		(isset($proxy['status']) && $proxy['status'] == HOST_STATUS_PROXY_ACTIVE) ? _('Active') : _('Passive'),
+		$lastAccess,
+		isset($proxy['host']) ? count($proxy['hosts']) : '',
 		isset($proxy['item_count']) ? $proxy['item_count'] : 0,
 		isset($proxy['perf']) ? $proxy['perf'] : '-',
 		new CCol((empty($hosts) ? '-' : $hosts), 'wraptext')
@@ -105,5 +113,5 @@ $proxyForm->addItem(array($this->data['paging'], $proxyTable, $this->data['pagin
 
 // append form to widget
 $proxyWidget->addItem($proxyForm);
+
 return $proxyWidget;
-?>

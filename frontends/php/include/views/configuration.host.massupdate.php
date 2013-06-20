@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2012 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -10,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -32,28 +32,98 @@ foreach ($this->data['hosts'] as $hostid) {
 // create form list
 $hostFormList = new CFormList('hostFormList');
 
-// append groups to form list
-$groupTweenBox = new CTweenBox($hostForm, 'groups', $this->data['groups'], 6);
-foreach ($this->data['all_groups'] as $group) {
-	$groupTweenBox->addItem($group['groupid'], $group['name']);
+// replace host groups
+$hostGroupsToReplace = null;
+if (isset($_REQUEST['groups'])) {
+	$getHostGroups = API::HostGroup()->get(array(
+		'groupids' => $_REQUEST['groups'],
+		'output' => array('groupid', 'name')
+	));
+	foreach ($getHostGroups as $getHostGroup) {
+		$hostGroupsToReplace[] = array(
+			'id' => $getHostGroup['groupid'],
+			'name' => $getHostGroup['name']
+		);
+	}
 }
+
+$replaceGroups = new CMultiSelect(array(
+		'name' => 'groups[]',
+		'objectName' => 'hostGroup',
+		'data' => $hostGroupsToReplace
+	));
+
 $hostFormList->addRow(
 	array(
 		_('Replace host groups'),
 		SPACE,
-		new CVisibilityBox('visible[groups]', isset($this->data['visible']['groups']), $groupTweenBox->getName(), _('Original'))
+		new CVisibilityBox('visible[groups]', isset($this->data['visible']['groups']), 'groups_', _('Original'))
 	),
-	$groupTweenBox->get(_('In groups'), _('Other groups'))
+	$replaceGroups
 );
-$hostFormList->addRow(
-	array(
-		_('New host group'),
-		SPACE,
-		new CVisibilityBox('visible[newgroup]', isset($this->data['visible']['newgroup']), 'newgroup', _('Original'))
-	),
-	new CTextBox('newgroup', $this->data['newgroup'], ZBX_TEXTBOX_STANDARD_SIZE, 'no', 64),
-	null, null, 'new'
-);
+
+// add new or existing host groups
+$hostGroupsToAdd = null;
+if (isset($_REQUEST['new_groups'])) {
+	foreach ($_REQUEST['new_groups'] as $newHostGroup) {
+		if (is_array($newHostGroup) && isset($newHostGroup['new'])) {
+			$hostGroupsToAdd[] = array(
+				'id' => $newHostGroup['new'],
+				'name' => $newHostGroup['new'] . ' (new)',
+				'isNew' => true
+			);
+		}
+		else {
+			$hostGroupIds[] = $newHostGroup;
+		}
+	}
+
+	if (isset($hostGroupIds)) {
+		$getHostGroups = API::HostGroup()->get(array(
+			'groupids' => $hostGroupIds,
+			'output' => array('groupid', 'name')
+		));
+		foreach ($getHostGroups as $getHostGroup) {
+			$hostGroupsToAdd[] = array(
+				'id' => $getHostGroup['groupid'],
+				'name' => $getHostGroup['name']
+			);
+		}
+	}
+}
+if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
+	$newGroups = new CMultiSelect(array(
+			'name' => 'new_groups[]',
+			'objectName' => 'hostGroup',
+			'data' => $hostGroupsToAdd,
+			'addNew' => true
+		));
+
+	$hostFormList->addRow(
+		array(
+			_('Add new or existing host groups'),
+			SPACE,
+			new CVisibilityBox('visible[new_groups]', isset($this->data['visible']['new_groups']), 'new_groups_', _('Original'))
+		),
+		$newGroups
+	);
+}
+else {
+	$newGroups = new CMultiSelect(array(
+			'name' => 'new_groups[]',
+			'objectName' => 'hostGroup',
+			'data' => $hostGroupsToAdd
+		));
+
+	$hostFormList->addRow(
+		array(
+			_('New host group'),
+			SPACE,
+			new CVisibilityBox('visible[new_groups]', isset($this->data['visible']['new_groups']), 'new_groups_', _('Original'))
+		),
+		$newGroups
+	);
+}
 
 // append proxy to form list
 $proxyComboBox = new CComboBox('proxy_hostid', $this->data['proxy_hostid']);
@@ -85,32 +155,20 @@ $hostFormList->addRow(
 
 $templatesFormList = new CFormList('templatesFormList');
 // append templates table to from list
-$templatesTable = new CTable(_('No templates defined.'), 'formElementTable');
+$templatesTable = new CTable(null, 'formElementTable');
 $templatesTable->setAttribute('style', 'min-width: 500px;');
 $templatesTable->setAttribute('id', 'template_table');
-$templatesTable->setHeader(array(_('Name'), _('Action')));
 
-foreach ($this->data['templates'] as $templateid => $templateName) {
-	$hostForm->addVar('templates['.$templateid.']', $templateName);
-
-	$row = new CRow(array(
-		$templateName,
-		new CButton('remove', _('Remove'), 'javascript: removeTemplate("'.$templateid.'");', 'link_menu')
-	));
-	$row->setAttribute('id', 'template_row_'.$templateid);
-	$templatesTable->addRow($row);
-}
 $templatesDiv = new CDiv(
 	array(
 		$templatesTable,
-		new CButton('btn1', _('Add'),
-			'return PopUp("popup.php?srctbl=templates&srcfld1=hostid&srcfld2=host'.
-				'&dstfrm='.$hostForm->getName().'&dstfld1=new_template&templated_hosts=1'.
-				url_param($this->data['templates'], false, 'existed_templates').'", 450, 450)',
-			'link_menu'
+		new CMultiSelect(
+			array(
+				'name' => 'templates[]',
+				'objectName' => 'templates',
+				'data' => $this->data['linkedTemplates']
+			)
 		),
-		BR(),
-		BR(),
 		new CCheckBox('mass_replace_tpls', $this->data['mass_replace_tpls']),
 		SPACE,
 		_('Replace'),

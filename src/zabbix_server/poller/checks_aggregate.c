@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -9,7 +9,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -132,8 +132,9 @@ static void	aggregate_get_items(zbx_vector_uint64_t *itemids, const char *groups
 				" and hg.groupid=g.groupid"
 				" and i.key_='%s'"
 				" and i.status=%d"
+				" and i.state=%d"
 				" and h.status=%d",
-			esc, ITEM_STATUS_ACTIVE, HOST_STATUS_MONITORED);
+			esc, ITEM_STATUS_ACTIVE, ITEM_STATE_NORMAL, HOST_STATUS_MONITORED);
 
 	zbx_free(esc);
 

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -10,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -42,21 +42,22 @@ if (isset($this->data['iconmapid'])) {
 $iconMapTable->addRow(array(SPACE, SPACE, _('Inventory field'), _('Expression'), _('Icon'), SPACE, SPACE));
 
 order_result($this->data['iconmap']['mappings'], 'sortorder');
-$i = 1;
+$i = 0;
 foreach ($this->data['iconmap']['mappings'] as $mapping) {
-	$iconmappingid = $mapping['iconmappingid'];
-	$numSpan = new CSpan($i++.':');
+	$numSpan = new CSpan(($i + 1).':');
 	$numSpan->addClass('rowNum');
 
-	$profileLinksComboBox = new CComboBox('iconmap[mappings]['.$iconmappingid.'][inventory_link]', $mapping['inventory_link']);
+	$profileLinksComboBox = new CComboBox('iconmap[mappings]['.$i.'][inventory_link]', $mapping['inventory_link']);
 	$profileLinksComboBox->addItems($this->data['inventoryList']);
 
-	$expressionTextBox = new CTextBox('iconmap[mappings]['.$iconmappingid.'][expression]', $mapping['expression']);
+	$expressionTextBox = new CTextBox('iconmap[mappings]['.$i.'][expression]', $mapping['expression']);
 	$expressionTextBox->setAttribute('maxlength', 64);
+	$expressionTextBox = array($expressionTextBox);
+	if (isset($mapping['iconmappingid'])) {
+		$expressionTextBox[] = new CVar('iconmap[mappings]['.$i.'][iconmappingid]', $mapping['iconmappingid']);
+	}
 
-	$iconMappingIdVar = new CVar('iconmap[mappings]['.$iconmappingid.'][iconmappingid]', $mapping['iconmappingid']);
-
-	$iconsComboBox = new CComboBox('iconmap[mappings]['.$iconmappingid.'][iconid]', $mapping['iconid']);
+	$iconsComboBox = new CComboBox('iconmap[mappings]['.$i.'][iconid]', $mapping['iconid']);
 	$iconsComboBox->addClass('mappingIcon');
 	$iconsComboBox->addItems($this->data['iconList']);
 
@@ -67,13 +68,15 @@ foreach ($this->data['iconmap']['mappings'] as $mapping) {
 		new CSpan(null, 'ui-icon ui-icon-arrowthick-2-n-s move'),
 		$numSpan,
 		$profileLinksComboBox,
-		array($expressionTextBox, $iconMappingIdVar),
+		$expressionTextBox,
 		$iconsComboBox,
 		$iconPreviewImage,
 		new CButton('remove', _('Remove'), '', 'link_menu removeMapping'),
 	), 'sortable');
-	$row->setAttribute('id', 'iconmapidRow_'.$iconmappingid);
+	$row->setAttribute('id', 'iconmapidRow_'.$i);
 	$iconMapTable->addRow($row);
+
+	$i++;
 }
 
 
@@ -146,6 +149,6 @@ if (isset($this->data['iconmapid'])) {
 		new CButtonDelete(_('Delete icon map?'), url_param('form').url_param('iconmapid'))
 	);
 }
-$iconMapForm->addItem(makeFormFooter(array(new CSubmit('save', _('Save'))), $secondaryActions));
+$iconMapForm->addItem(makeFormFooter(new CSubmit('save', _('Save')), $secondaryActions));
 
 return $iconMapForm;

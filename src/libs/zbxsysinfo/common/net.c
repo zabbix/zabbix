@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -9,7 +9,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -279,15 +279,15 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 
 	if (NULL == param || '\0' == *param)
 		retrans = 1;
-	else
-		retrans = atoi(param);
+	else if (SUCCEED != is_uint31(param, &retrans) || 0 == retrans)
+		return SYSINFO_RET_FAIL;
 
 	param = get_rparam(request, 4);
 
 	if (NULL == param || '\0' == *param)
 		retry = 2;
-	else
-		retry = atoi(param);
+	else if (SUCCEED != is_uint31(param, &retry) || 0 == retry)
+		return SYSINFO_RET_FAIL;
 
 #ifdef _WINDOWS
 	wzone = zbx_utf8_to_unicode(zone);

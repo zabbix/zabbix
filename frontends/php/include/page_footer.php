@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2012 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -63,7 +63,6 @@ if (in_array($page['type'], array(PAGE_TYPE_HTML_BLOCK, PAGE_TYPE_HTML))) {
 
 if ($page['type'] == PAGE_TYPE_HTML) {
 	$post_script .= 'var page_refresh = null;'."\n";
-
 	$post_script .= "jQuery(function() {\n";
 
 	if (isset($ZBX_PAGE_POST_JS)) {
@@ -100,8 +99,9 @@ if ($page['type'] == PAGE_TYPE_HTML) {
 
 		$table->addRow(array(
 			new CCol(new CLink(
-				_s('Zabbix %s Copyright %s-%s by Zabbix SIA', ZABBIX_VERSION, ZABBIX_COPYRIGHT_FROM, ZABBIX_COPYRIGHT_TO),
-				'http://www.zabbix.com', 'highlight', null, true), 'center'),
+				_s('Zabbix %1$s Copyright %2$s-%3$s by Zabbix SIA',
+					ZABBIX_VERSION, ZABBIX_COPYRIGHT_FROM, ZABBIX_COPYRIGHT_TO),
+				ZABBIX_HOMEPAGE, 'highlight', null, true), 'center'),
 			new CCol(array(
 				new CSpan(SPACE.SPACE.'|'.SPACE.SPACE, 'divider'),
 				new CSpan($conString, 'footer_sign')

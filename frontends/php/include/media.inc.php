@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -10,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -38,17 +38,5 @@ function media_type2str($type = null) {
 	else {
 		return _('Unknown');
 	}
-}
-
-function media_severity2str($severity) {
-	$result = array();
-	foreach (getSeverityCaption() as $i => $caption) {
-		$style = ($severity & (1 << $i)) ? 'enabled' : null;
-
-		$result[$i] = new CSpan(zbx_substr($caption, 0, 1), $style);
-		$result[$i]->setHint($caption.' ('.(isset($map['style']) ? 'on' : 'off').')');
-	}
-
-	return $result;
 }
 ?>

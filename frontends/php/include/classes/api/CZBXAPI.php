@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -10,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -456,7 +456,7 @@ class CZBXAPI {
 		$pkFieldId = $this->fieldId($this->pk($tableName), $tableAlias);
 
 		// count
-		if (isset($options['countOutput'])) {
+		if (isset($options['countOutput']) && !$this->requiresPostSqlFiltering($options)) {
 			$sqlParts['select'] = array('COUNT(DISTINCT '.$pkFieldId.') AS rowscount');
 
 			// select columns used by group count
@@ -744,6 +744,23 @@ class CZBXAPI {
 	}
 
 	/**
+	 * Checks if an objects contains any of the given parameters.
+	 *
+	 * @throws APIException     if any of the parameters are present in the object
+	 *
+	 * @param array $object
+	 * @param array $params
+	 * @param $error
+	 */
+	protected function checkNoParameters(array $object, array $params, $error) {
+		foreach ($params as $param) {
+			if (array_key_exists($param, $object)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s($error, $param));
+			}
+		}
+	}
+
+	/**
 	 * Throws an API exception.
 	 *
 	 * @static
@@ -767,7 +784,7 @@ class CZBXAPI {
 	}
 
 	/**
-	 * Apply filter conditions to sql builded query.
+	 * Apply filter conditions to sql built query.
 	 *
 	 * @param string $table
 	 * @param array  $options
@@ -841,7 +858,11 @@ class CZBXAPI {
 	}
 
 	/**
-	 * Check if a parameter contains a deprecated value. Currently supports only array parameters.
+	 * Check if a set of parameters contains a deprecated parameter or a a parameter with a deprecated value.
+	 *
+	 * If $value is not set, the method will trigger a deprecated notice if $params contains the $paramName key.
+	 * If $value is set, the method will trigger a notice if the value of the parameter is equal to the deprecated value
+	 * or the parameter is an array and contains a deprecated value.
 	 *
 	 * @param array     $params
 	 * @param string    $paramName
@@ -849,9 +870,14 @@ class CZBXAPI {
 	 *
 	 * @return void
 	 */
-	protected function checkDeprecatedParam(array $params, $paramName, $value) {
-		if (isset($params[$paramName]) && is_array($params[$paramName]) && in_array($value, $params[$paramName])) {
-			self::deprecated('Value "'.$value.'" for parameter "'.$paramName.'" is deprecated.');
+	protected function checkDeprecatedParam(array $params, $paramName, $value = null) {
+		if (isset($params[$paramName])) {
+			if ($value === null) {
+				self::deprecated('Parameter "'.$paramName.'" is deprecated.');
+			}
+			elseif (is_array($params[$paramName]) && in_array($value, $params[$paramName]) || $params[$paramName] == $value) {
+				self::deprecated('Value "'.$value.'" for parameter "'.$paramName.'" is deprecated.');
+			}
 		}
 	}
 
@@ -866,7 +892,7 @@ class CZBXAPI {
 	 *
 	 * @return array
 	 */
-	protected function addDeprecatedOutput(array $objects, $deprecatedProperty, $newProperty, $output) {
+	protected function handleDeprecatedOutput(array $objects, $deprecatedProperty, $newProperty, $output) {
 		if ($this->outputIsRequested($deprecatedProperty, $output)) {
 			foreach ($objects as &$object) {
 				$object[$deprecatedProperty] = $object[$newProperty];
@@ -876,4 +902,88 @@ class CZBXAPI {
 
 		return $objects;
 	}
+
+	/**
+	 * Fetch data from DB.
+	 * If post SQL filtering is necessary, several queries will be executed. SQL limit is calculated so that minimum
+	 * amount of queries would be executed and minimum amount of unnecessary data retrieved.
+	 *
+	 * @param   string    $query      SQL query
+	 * @param   array     $options    API call parameters
+	 *
+	 * @return  array
+	 */
+	protected function customFetch($query, array $options) {
+		if ($this->requiresPostSqlFiltering($options)) {
+			$offset = 0;
+			// we think that taking twice as necessary elements in first query is fair guess, this cast to int as well
+			$limit = $options['limit'] ? 2 * $options['limit'] : null;
+			// we use $minLimit for setting minimum limit twice as big for each consecutive query to not run in lots
+			// of queries for some cases
+			$minLimit = $limit;
+			$allElements = array();
+			do {
+				// fetch group of elements
+				$elements = DBfetchArray(DBselect($query, $limit, $offset));
+
+				// we have potentially more elements
+				$hasMore = ($limit && count($elements) === $limit);
+
+				$elements = $this->applyPostSqlFiltering($elements, $options);
+
+				// truncate element set after post SQL filtering, if enough elements or more retrieved via SQL query
+				if ($options['limit'] && count($allElements) + count($elements) >= $options['limit']) {
+					$allElements += array_slice($elements, 0, $options['limit'] - count($allElements), true);
+					break;
+				}
+
+				$allElements += $elements;
+
+				// calculate $limit and $offset for next query
+				if ($limit) {
+					$offset += $limit;
+					$minLimit *= 2;
+					// take care of division by zero
+					$elemCount = count($elements) ? count($elements) : 1;
+					// we take $limit as $minLimit or reasonable estimate to get all necessary data in two queries
+					// with high probability
+					$limit = max($minLimit, round($limit / $elemCount * ($options['limit'] - count($allElements)) * 2));
+				}
+
+			} while ($hasMore);
+
+			return $allElements;
+		}
+		else {
+			return DBfetchArray(DBselect($query, $options['limit']));
+		}
+	}
+
+	/**
+	 * Checks if post SQL filtering necessary.
+	 *
+	 * @param   array   $options    API call parameters
+	 *
+	 * @return  bool                true if filtering necessary false otherwise
+	 */
+	protected function requiresPostSqlFiltering(array $options) {
+		// must be implemented in each API separately
+
+		return false;
+	}
+
+	/**
+	 * Removes elements which could not be removed within SQL query.
+	 *
+	 * @param   array   $elements   list of elements on whom perform filtering
+	 * @param   array   $options    API call parameters
+	 *
+	 * @return  array               input array $elements with some elements removed
+	 */
+	protected function applyPostSqlFiltering(array $elements, array $options) {
+		// must be implemented in each API separately
+
+		return $elements;
+	}
+
 }
