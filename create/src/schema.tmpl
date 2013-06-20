@@ -1028,6 +1028,7 @@ FIELD		|host		|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|listen_ip	|t_varchar(39)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|listen_port	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|listen_dns	|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC
+FIELD		|host_metadata	|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
 INDEX		|1		|proxy_hostid,host
 
 TABLE|proxy_autoreg_host|id|0
@@ -1037,6 +1038,7 @@ FIELD		|host		|t_varchar(64)	|''	|NOT NULL	|0
 FIELD		|listen_ip	|t_varchar(39)	|''	|NOT NULL	|0
 FIELD		|listen_port	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|listen_dns	|t_varchar(64)	|''	|NOT NULL	|0
+FIELD		|host_metadata	|t_varchar(255)	|''	|NOT NULL	|0
 INDEX		|1		|clock
 
 TABLE|dhosts|dhostid|ZBX_SYNC
@@ -1235,4 +1237,4 @@ UNIQUE		|1			|applicationid,templateid
 TABLE|dbversion||
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|2010084	|2010084
+ROW		|2010086	|2010086

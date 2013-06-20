@@ -39,7 +39,7 @@ class CTabView extends CDiv {
 		}
 		parent::__construct();
 		$this->attr('id', zbx_formatDomId($this->id));
-		$this->attr('class', 'min-width hidden');
+		$this->attr('class', 'hidden');
 	}
 
 	public function setRemember($remember) {
@@ -58,7 +58,7 @@ class CTabView extends CDiv {
 
 	public function toString($destroy = true) {
 		if (count($this->tabs) == 1) {
-			$this->setAttribute('class', 'min-width ui-tabs ui-widget ui-widget-content ui-corner-all widget');
+			$this->setAttribute('class', 'ui-tabs ui-widget ui-widget-content ui-corner-all widget');
 
 			$header = reset($this->headers);
 			$header = new CDiv($header);

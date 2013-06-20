@@ -425,33 +425,33 @@ div.calendar input.calendar_textbox{
 }
 
 /* SCROLLBAR */
-div.scrollbar{ background-color: #001C31; border: 1px solid #3C759B; }
+div.scrollbar { background-color: #001C31; border: 1px solid #3C759B; }
 
-div.scrollbar .info .zoom .text{ color: #FFFFFF; }
+div.scrollbar .info .zoom .text { color: #FFFFFF; }
 
-div.scrollbar .subline .info_period{ color: #FFFFFF; }
+div.scrollbar .subline .info_period { color: #FFFFFF; }
 
-div.scrollbar .subline .nav_links .text{ color: #FFFFFF; }
+div.scrollbar .subline .nav_links .text { color: #FFFFFF; }
 
 /* MESSAGES */
-div.messagecontainer .message .messagebox{
+div.messagecontainer .message .messagebox {
 	margin-right: 15px;
 	margin-left: 0;
 	margin-bottom: 0;
 }
 
-div.thin_header{ background: #3C759B url(images/bg_i-soft_25.png) 50% 50% repeat-x; }
-div.zabbix_logo{ background-image:url('../../../images/general/zabbix_bb.png'); }
-.iconzbxavailable{ background-image: url('../../../images/general/zabbix_available_bb.png'); }
-.iconsnmpavailable{ background-image: url('../../../images/general/snmp_available_bb.png'); }
-.iconjmxavailable{ background-image: url('../../../images/general/jmx_available_bb.png'); }
-.iconipmiavailable{ background-image: url('../../../images/general/ipmi_available_bb.png'); }
-.sla_green{ background-image: url('../../../images/gradients/sla_blue15.png'); }
-.icon_sortup{ background-image: url('../../../images/general/sort_up_blue.png'); }
-.icon_sortdown{ background-image: url('../../../images/general/sort_down_blue.png'); }
+.thin_header { background: #3C759B url(images/bg_i-soft_25.png) 50% 50% repeat-x; }
+div.zabbix_logo { background-image:url('../../../images/general/zabbix_bb.png'); }
+.iconzbxavailable { background-image: url('../../../images/general/zabbix_available_bb.png'); }
+.iconsnmpavailable { background-image: url('../../../images/general/snmp_available_bb.png'); }
+.iconjmxavailable { background-image: url('../../../images/general/jmx_available_bb.png'); }
+.iconipmiavailable { background-image: url('../../../images/general/ipmi_available_bb.png'); }
+.sla_green { background-image: url('../../../images/gradients/sla_blue15.png'); }
+.icon_sortup { background-image: url('../../../images/general/sort_up_blue.png'); }
+.icon_sortdown { background-image: url('../../../images/general/sort_down_blue.png'); }
 
-.menu_icon:hover{ background-color: #77B7DA; }
-div.iconmenu_b{ background-color: transparent; }
+.menu_icon:hover { background-color: #77B7DA; }
+div.iconmenu_b { background-color: transparent; }
 
 div.messagecontainer{ background-color: #245078;}
 div#scrolltableft{ color: #00CCFF; }
@@ -531,7 +531,8 @@ div.preloader {
 }
 
 /* multiselect */
-.multiselect input { color: #FFFFFF; }
+.multiselect input[type="text"] { color: #FFFFFF; }
+.multiselect input[type="text"]:hover { background: none; border: none; outline: none; }
 .multiselect .selected ul { border: 1px solid #B3C9D6; background: #001C31; }
 .multiselect .selected ul.active { border: 1px solid #41789D; }
 .multiselect .selected ul li {
