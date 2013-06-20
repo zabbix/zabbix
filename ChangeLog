@@ -1,6 +1,7 @@
 Changes for 2.1.0
 
 New features:
+...G...PS. [ZBX-6299] added json validator (wiper)
 A.FGI..PS. [ZBXNEXT-1726] added support for optional Host Metadata to active agent for auto-registration (dimir, Oleg)
 ..F....... [ZBXNEXT-1114] improved multiselect support in action conditions configuration page (Eduard)
 ...G...... [ZBXNEXT-367] added printing Aliases and PerfCounters when agent is run with -p option (aleksej, dimir)
