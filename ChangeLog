@@ -75,6 +75,7 @@ A.F.I...S. [ZBXNEXT-1186] increased length to 2048 characters of expression fiel
 ........S. [ZBXNEXT-1663] added support for notification macros {TRIGGER.NAME.ORIG}, {ITEM.NAME.ORIG}, {ITEM.KEY.ORIG} (dimir)
 
 Bug fixes:
+..F....... [ZBX-6718] fixed "placeholder" attribute for IE9 (Ivo)
 A......... [ZBX-6399] fixed map element linking (Eduard)
 ..F....... [ZBX-6447] fixed time control start time calculation using filter in audit administration (Eduard)
 A.F....... [ZBX-6678] added write permissions check in graphs and graphprototypes for Y axis MIN/MAX items (Ivo)
