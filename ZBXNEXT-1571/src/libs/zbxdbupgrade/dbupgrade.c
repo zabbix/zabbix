@@ -936,7 +936,7 @@ static int	DBpatch_2010049(void)
 	return DBcreate_index("escalations", "escalations_1", "actionid,triggerid,itemid,escalationid", 1);
 }
 
-static int	DBpatch_2010050()
+static int	DBpatch_2010050(void)
 {
 	char		*fields[] = {"ts_from", "ts_to", NULL};
 	DB_RESULT	result;
@@ -1255,6 +1255,20 @@ static int	DBpatch_2010084(void)
 	return DBadd_field("sysmaps", &field);
 }
 
+static int	DBpatch_2010085(void)
+{
+	const ZBX_FIELD	field = {"host_metadata", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("autoreg_host", &field);
+}
+
+static int	DBpatch_2010086(void)
+{
+	const ZBX_FIELD	field = {"host_metadata", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("proxy_autoreg_host", &field);
+}
+
 #define DBPATCH_START()					zbx_dbpatch_t	patches[] = {
 #define DBPATCH_ADD(version, duplicates, mandatory)	{DBpatch_##version, version, duplicates, mandatory},
 #define DBPATCH_END()					{NULL}};
@@ -1388,6 +1402,8 @@ int	DBcheck_version(void)
 	DBPATCH_ADD(2010082, 0, 1)
 	DBPATCH_ADD(2010083, 0, 1)
 	DBPATCH_ADD(2010084, 0, 1)
+	DBPATCH_ADD(2010085, 0, 1)
+	DBPATCH_ADD(2010086, 0, 1)
 
 	DBPATCH_END()
 
@@ -1398,7 +1414,7 @@ int	DBcheck_version(void)
 	if (SUCCEED != DBtable_exists(dbversion_table_name))
 	{
 #ifndef HAVE_SQLITE3
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() \"%s\" doesn't exist",
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() \"%s\" does not exist",
 				__function_name, dbversion_table_name);
 
 		if (SUCCEED != DBfield_exists("config", "server_check_interval"))

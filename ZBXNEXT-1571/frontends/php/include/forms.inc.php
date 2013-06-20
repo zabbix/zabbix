@@ -287,7 +287,7 @@
 		$output = array();
 
 		foreach ($data as $id => $element) {
-			$element['name'] = nbsp($element['name']);
+			$element['name'] = nbsp(CHtml::encode($element['name']));
 
 			// is activated
 			if (str_in_array($id, $subfilter)) {
@@ -531,9 +531,9 @@
 			new CCol($cmbType, 'col2'),
 			new CCol(bold(_('Type of information').NAME_DELIMITER), 'label col3'),
 			new CCol($cmbValType, 'col3'),
-			new CCol(bold(_('Status').NAME_DELIMITER), 'label col4'),
-			new CCol($cmbStatus, 'col4')
-		));
+			new CCol(bold(_('State').NAME_DELIMITER), 'label'),
+			new CCol($cmbState, 'col4')
+		), 'item-list-row');
 		// row 2
 		$hostFilterData = null;
 		if (!empty($filter_hostId)) {
@@ -562,14 +562,14 @@
 						),
 						'data' => $hostFilterData
 				))
-			)),
+			), 'col1'),
 			new CCol($updateIntervalLabel, 'label'),
 			new CCol($updateIntervalInput),
 			new CCol($dataTypeLabel, 'label'),
 			new CCol($dataTypeInput),
-			new CCol(bold(_('State').NAME_DELIMITER), 'label'),
-			new CCol($cmbState, 'col4')
-		));
+			new CCol(bold(_('Status').NAME_DELIMITER), 'label col4'),
+			new CCol($cmbStatus, 'col4')
+		), 'item-list-row');
 		// row 3
 		$table->addRow(array(
 			new CCol(bold(_('Application').NAME_DELIMITER), 'label'),
@@ -580,9 +580,9 @@
 						'&dstfrm='.$form->getName().'&dstfld1=filter_application'.
 						'&with_applications=1&hostid=" + jQuery("input[name=\'filter_hostid\']").val()'
 						.', 550, 450, "application");',
-					'A'
+					'filter-select-button'
 				)
-			)),
+			), 'col1'),
 			new CCol(array($snmpCommunityLabel, $snmpSecurityLabel), 'label'),
 			new CCol(array($snmpCommunityField, $snmpSecurityField)),
 			new CCol(array(bold(_('Keep history')), SPACE._('(in days)').NAME_DELIMITER), 'label'),
@@ -593,11 +593,11 @@
 				1 => _('With triggers'),
 				0 => _('Without triggers')
 			)))
-		));
+		), 'item-list-row');
 		// row 4
 		$table->addRow(array(
 			new CCol(array(bold(_('Name')), SPACE._('like').NAME_DELIMITER), 'label'),
-			new CCol(new CTextBox('filter_name', $filter_name, ZBX_TEXTBOX_FILTER_SIZE)),
+			new CCol(new CTextBox('filter_name', $filter_name, ZBX_TEXTBOX_FILTER_SIZE), 'col1'),
 			new CCol($snmpOidLabel, 'label'),
 			new CCol($snmpOidField),
 			new CCol(array(bold(_('Keep trends')), SPACE._('(in days)').NAME_DELIMITER), 'label'),
@@ -608,18 +608,18 @@
 				1 => _('Templated items'),
 				0 => _('Not Templated items'),
 			)))
-		));
+		), 'item-list-row');
 		// row 5
 		$table->addRow(array(
 			new CCol(array(bold(_('Key')), SPACE._('like').NAME_DELIMITER), 'label'),
-			new CCol(new CTextBox('filter_key', $filter_key, ZBX_TEXTBOX_FILTER_SIZE)),
+			new CCol(new CTextBox('filter_key', $filter_key, ZBX_TEXTBOX_FILTER_SIZE), 'col1'),
 			new CCol($portLabel, 'label'),
 			new CCol($portField),
 			new CCol(null, 'label'),
 			new CCol(),
 			new CCol(null, 'label'),
 			new CCol()
-		));
+		), 'item-list-row');
 
 		$reset = new CButton('reset', _('Reset'), "javascript: clearAllForm('zbx_filter');");
 		$reset->useJQueryStyle();
@@ -1079,6 +1079,7 @@
 				if (!empty($item)) {
 					$host = reset($item['hosts']);
 					if (!empty($item['hosts'])) {
+						$host['name'] = CHtml::encode($host['name']);
 						if (bccomp($data['itemid'], $itemid) == 0) {
 						}
 						// discovery rule
@@ -1241,13 +1242,6 @@
 			$data['alreadyPopulated'] = zbx_toHash($data['alreadyPopulated'], 'inventory_link');
 		}
 
-		// host groups
-		$data['hostGroups'] = API::HostGroup()->get(array(
-			'editable' => true,
-			'output' => API_OUTPUT_EXTEND
-		));
-		order_result($data['hostGroups'], 'name');
-
 		// template
 		$data['is_template'] = isTemplate($data['hostid']);
 
@@ -1383,7 +1377,11 @@
 						$link = 'triggers.php?form=update&triggerid='.$db_triggers['triggerid'].'&hostid='.$db_triggers['hostid'];
 					}
 
-					$data['templates'][] = new CLink($db_triggers['name'], $link, 'highlight underline weight_normal');
+					$data['templates'][] = new CLink(
+						CHtml::encode($db_triggers['name']),
+						$link,
+						'highlight underline weight_normal'
+					);
 					$data['templates'][] = SPACE.RARR.SPACE;
 				}
 				$tmp_triggerid = $db_triggers['templateid'];

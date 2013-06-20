@@ -14,9 +14,7 @@
 			<input class="input link_menu macroRemove" type="button" id="macros_#{macroNum}_remove" name="macros_#{macroNum}_remove" value="<?php echo CHtml::encode(_('Remove')); ?>">
 		</td>
 	</tr>
-
 </script>
-
 <script type="text/javascript">
 	jQuery(function() {
 		'use strict';
@@ -30,6 +28,8 @@
 
 			jQuery('#row_new_macro').before(rowTemplate.evaluate({macroNum: addMacroRow.macro_count}));
 			addMacroRow.macro_count++;
+
+			createPlaceholders();
 		}
 
 		jQuery('#macro_add').click(addMacroRow);
