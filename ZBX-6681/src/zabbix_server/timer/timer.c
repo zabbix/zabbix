@@ -802,13 +802,17 @@ static void	process_maintenance()
 			continue;
 		}
 
-		if (db_start_date < db_active_since)
+		/* allow one time periods to start before active time */
+		if (db_start_date < db_active_since && TIMEPERIOD_TYPE_ONETIME != db_timeperiod_type)
 			continue;
 
 		if (db_start_date > now || now >= db_start_date + db_period)
 			continue;
 
 		maintenance_from = db_start_date;
+
+		if (maintenance_from < db_active_since)
+			maintenance_from = db_active_since;
 
 		process_maintenance_hosts(&hm, &hm_alloc, &hm_count, maintenance_from, db_maintenanceid, db_maintenance_type);
 	}
