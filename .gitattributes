@@ -560,6 +560,7 @@ misc/init.d/tru64/zabbix_server -text
 src/libs/zbxcommon/int128.c -text
 src/libs/zbxjson/json_parser.c -text
 src/libs/zbxjson/json_parser.h -text
+src/libs/zbxsysinfo/hpux/proc.c -text
 src/zabbix_java/lib/logback-classic-0.9.27.jar -text
 src/zabbix_java/lib/logback-core-0.9.27.jar -text
 src/zabbix_java/lib/org-json-2010-12-28.jar -text
