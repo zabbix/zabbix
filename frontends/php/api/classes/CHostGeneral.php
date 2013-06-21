@@ -215,7 +215,7 @@ abstract class CHostGeneral extends CZBXAPI {
 			}
 		}
 
-		// get DB templates which exists in all targets
+		// retrieve templates which exist in all targets
 		$res = DBselect('SELECT * FROM hosts_templates WHERE '.dbConditionInt('hostid', $targetIds));
 		$mas = array();
 		while ($row = DBfetch($res)) {
@@ -232,7 +232,7 @@ abstract class CHostGeneral extends CZBXAPI {
 			}
 		}
 
-		// check if there are any template with triggers which depends on triggers in templates which will be not linked
+		// check if there are any templates with triggers which depend on triggers in templates which will not be not linked
 		$commonTemplateIds = array_unique(array_merge($commonDBTemplateIds, $templateIds));
 		foreach ($templateIds as $templateId) {
 			$triggerIds = array();
@@ -290,8 +290,9 @@ abstract class CHostGeneral extends CZBXAPI {
 		DB::insert('hosts_templates', $hostsLinkageInserts);
 
 		// check if all trigger templates are linked to host.
-		// we try to find template that is not linked to hosts ($targetIds)
-		// and exists trigger which reference that template and template from ($templateIds)
+		// we try to find template that is not linked to hosts
+		// ($targetIds) and there is a trigger which references that
+		// template and template from ($templateIds)
 		$sql = 'SELECT DISTINCT h.host'.
 				' FROM functions f,items i,triggers t,hosts h'.
 				' WHERE f.itemid=i.itemid'.
@@ -349,7 +350,7 @@ abstract class CHostGeneral extends CZBXAPI {
 			$this->checkCircularAndDoubleLinkage($graph, $root, $path, $visited);
 		}
 
-		// there is still possible cycles without root
+		// there are still possible cycles without root
 		if (count($visited) < count($all)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Circular template linkage is not allowed.'));
 		}
