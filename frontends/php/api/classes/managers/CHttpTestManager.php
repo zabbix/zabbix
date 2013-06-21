@@ -306,7 +306,7 @@ class CHttpTestManager {
 	}
 
 	/**
-	 * Get array with hosts that are linked with templates which passed http tests belongs to as key and templateid that host
+	 * Get array with hosts that are linked with templates which passed http tests belong to as key and templateid that host
 	 * is linked to as value.
 	 * If second parameter $hostIds is not empty, result should contain only passed host ids.
 	 *
@@ -334,7 +334,7 @@ class CHttpTestManager {
 
 	/**
 	 * Generate http tests data for inheritance.
-	 * Using passed parameters decide if new http tests must be created on host or existing one must be updated.
+	 * Using passed parameters decide if new http tests must be created on host or existing ones must be updated.
 	 *
 	 * @param array $httpTests which we need to inherit
 	 * @param array $hostsTemaplatesMap
@@ -956,7 +956,7 @@ class CHttpTestManager {
 	}
 
 	/**
-	 * Update web items application linkage.
+	 * Update web item application linkage.
 	 *
 	 * @param array  $itemIds
 	 * @param string $appId
