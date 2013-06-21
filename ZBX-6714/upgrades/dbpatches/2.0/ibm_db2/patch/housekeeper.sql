@@ -1,0 +1,8 @@
+ALTER TABLE housekeeper ALTER COLUMN housekeeperid SET WITH DEFAULT NULL
+/
+REORG TABLE housekeeper
+/
+ALTER TABLE housekeeper ALTER COLUMN value SET WITH DEFAULT NULL
+/
+REORG TABLE housekeeper
+/
