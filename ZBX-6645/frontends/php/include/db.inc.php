@@ -23,9 +23,10 @@
  * Creates global database connection
  *
  * @param string $error returns a message in case of an error
+ * @param bool $debug turns On or Off trace calls when making connections. Suggested debug mode Off during Zabbix setup
  * @return bool
  */
-function DBconnect(&$error) {
+function DBconnect(&$error, $debug = true) {
 	global $DB;
 
 	if (isset($DB['DB'])) {
@@ -52,18 +53,28 @@ function DBconnect(&$error) {
 			case ZBX_DB_MYSQL:
 				$mysql_server = $DB['SERVER'].(!empty($DB['PORT']) ? ':'.$DB['PORT'] : '');
 
+				// avoids using @ before functions
+				if (!$debug) {
+					error_reporting(0);
+				}
+
 				if (!$DB['DB'] = mysql_connect($mysql_server, $DB['USER'], $DB['PASSWORD'])) {
-					$error = 'Error connecting to database ['.mysql_error().']';
+					$error = 'Error connecting to database ['.trim(mysql_error()).']';
 					$result = false;
 				}
 				else {
 					if (!mysql_select_db($DB['DATABASE'])) {
-						$error = 'Error database in selection ['.mysql_error().']';
+						$error = 'Error database in selection ['.trim(mysql_error()).']';
 						$result = false;
 					}
 					else {
 						DBexecute('SET NAMES utf8');
 					}
+				}
+
+				// turn other error reporting back on to display futher errors
+				if (!$debug) {
+					error_reporting(1);
 				}
 
 				if ($result) {
@@ -78,6 +89,10 @@ function DBconnect(&$error) {
 					(!empty($DB['PASSWORD']) ? 'password=\''.pg_connect_escape($DB['PASSWORD']).'\' ' : '').
 					(!empty($DB['PORT']) ? 'port='.pg_connect_escape($DB['PORT']) : '');
 
+				if (!$debug) {
+					error_reporting(0);
+				}
+
 				$DB['DB']= pg_connect($pg_connection_string);
 				if (!$DB['DB']) {
 					$error = 'Error connecting to database';
@@ -89,6 +104,11 @@ function DBconnect(&$error) {
 						DBexecute('set bytea_output = escape');
 					}
 				}
+
+				if (!$debug) {
+					error_reporting(1);
+				}
+
 				if ($result) {
 					$dbBackend = new PostgresqlDbBackend();
 				}

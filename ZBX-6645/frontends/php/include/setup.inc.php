@@ -479,6 +479,10 @@ class CsetupWizard extends CForm {
 	function CheckConnection() {
 		global $DB;
 
+		if (!$this->getConfig('check_fields_result')) {
+			return false;
+		}
+
 		$DB['TYPE'] = $this->getConfig('DB_TYPE');
 		if (is_null($DB['TYPE'])) {
 			return false;
@@ -492,7 +496,9 @@ class CsetupWizard extends CForm {
 		$DB['SCHEMA'] = $this->getConfig('DB_SCHEMA', '');
 
 		$error = '';
-		if (!$result = DBconnect($error)) {
+
+		// during setup set debug to false to avoid displaying unwanted PHP errors in messages
+		if (!$result = DBconnect($error, false)) {
 			error($error);
 		}
 		else {
