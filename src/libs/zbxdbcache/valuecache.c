@@ -95,7 +95,7 @@ typedef struct _zbx_vc_chunk_t
 	int			slots_num;
 
 	/* the item value data */
-	zbx_vc_value_t		slots[1];
+	zbx_vc_value_t		slots[0];
 }
 zbx_vc_chunk_t;
 
@@ -103,11 +103,10 @@ zbx_vc_chunk_t;
 
 /* The minimum number is calculated so that 3 chunks of 1/2 value count size takes less space */
 /* than 2 chunks of 1 value count size.                                                       */
-#define ZBX_VC_MIN_CHUNK_RECORDS	(1 + (sizeof(zbx_vc_chunk_t) - sizeof(zbx_vc_value_t)) / \
-						sizeof(zbx_vc_value_t))
+#define ZBX_VC_MIN_CHUNK_RECORDS	(1 + (sizeof(zbx_vc_chunk_t) / sizeof(zbx_vc_value_t)))
 
 /* The maximum number is calculated so that the chunk size does not exceed 4KB */
-#define ZBX_VC_MAX_CHUNK_RECORDS	((4096 - sizeof(zbx_vc_chunk_t)) /  sizeof(zbx_vc_value_t) + 1)
+#define ZBX_VC_MAX_CHUNK_RECORDS	((4096 - sizeof(zbx_vc_chunk_t)) /  sizeof(zbx_vc_value_t))
 
 /* data storage modes */
 #define ZBX_VC_MODE_LASTVALUE	0
@@ -1583,7 +1582,7 @@ static int	vch_item_add_chunk(zbx_vc_item_t *item, int nslots, zbx_vc_chunk_t *i
 	zbx_vc_chunk_t		*chunk;
 	int			chunk_size, ret = FAIL;
 
-	chunk_size = sizeof(zbx_vc_chunk_t) + sizeof(zbx_vc_value_t) * (nslots - 1);
+	chunk_size = sizeof(zbx_vc_chunk_t) + sizeof(zbx_vc_value_t) * nslots;
 
 	chunk =  vc_item_malloc(item, chunk_size);
 
@@ -2001,7 +2000,7 @@ static size_t	vch_item_free_chunk(zbx_vc_item_t *item, zbx_vc_chunk_t *chunk)
 
 	vc_mem_free_func(chunk);
 
-	return freed + sizeof(zbx_vc_chunk_t) + (chunk->last_value - chunk->first_value) * sizeof(zbx_vc_value_t);
+	return freed + sizeof(zbx_vc_chunk_t) + (chunk->last_value - chunk->first_value + 1) * sizeof(zbx_vc_value_t);
 }
 
 /******************************************************************************
