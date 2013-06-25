@@ -216,7 +216,7 @@ abstract class CHostGeneral extends CZBXAPI {
 				}
 				elseif ($dbItem['flags'] == ZBX_FLAG_DISCOVERY) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Template "%1$s" with low level discovery rule "%2$s" already linked to host.',
+						_s('Template "%1$s" with low level discovery rule key "%2$s" already linked to host.',
 							$template['name'], $dbItem['key_']));
 				}
 				else {
