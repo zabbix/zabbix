@@ -49,12 +49,16 @@ function DBconnect(&$error, $debug = true) {
 	else {
 		$DB['TYPE'] = zbx_strtoupper($DB['TYPE']);
 
+		if (!$debug) {
+			$errorReportingLevel = error_reporting();
+		}
+
 		switch ($DB['TYPE']) {
 			case ZBX_DB_MYSQL:
 				$mysql_server = $DB['SERVER'].(!empty($DB['PORT']) ? ':'.$DB['PORT'] : '');
 
 				// avoids using @ before functions
-				if (!$debug) {
+				if (!$debug && $errorReportingLevel > 0) {
 					error_reporting(0);
 				}
 
@@ -73,8 +77,8 @@ function DBconnect(&$error, $debug = true) {
 				}
 
 				// turn other error reporting back on to display futher errors
-				if (!$debug) {
-					error_reporting(1);
+				if (!$debug && $errorReportingLevel > 0) {
+					error_reporting($errorReportingLevel);
 				}
 
 				if ($result) {
@@ -89,7 +93,7 @@ function DBconnect(&$error, $debug = true) {
 					(!empty($DB['PASSWORD']) ? 'password=\''.pg_connect_escape($DB['PASSWORD']).'\' ' : '').
 					(!empty($DB['PORT']) ? 'port='.pg_connect_escape($DB['PORT']) : '');
 
-				if (!$debug) {
+				if (!$debug && $errorReportingLevel > 0) {
 					error_reporting(0);
 				}
 
@@ -105,8 +109,8 @@ function DBconnect(&$error, $debug = true) {
 					}
 				}
 
-				if (!$debug) {
-					error_reporting(1);
+				if (!$debug && $errorReportingLevel > 0) {
+					error_reporting($errorReportingLevel);
 				}
 
 				if ($result) {
@@ -126,6 +130,10 @@ function DBconnect(&$error, $debug = true) {
 					}
 				}
 
+				if (!$debug && $errorReportingLevel > 0) {
+					error_reporting(0);
+				}
+
 				$DB['DB'] = oci_connect($DB['USER'], $DB['PASSWORD'], $connect);
 				if ($DB['DB']) {
 					DBexecute('ALTER SESSION SET NLS_NUMERIC_CHARACTERS='.zbx_dbstr('. '));
@@ -134,6 +142,11 @@ function DBconnect(&$error, $debug = true) {
 					$error = 'Error connecting to database';
 					$result = false;
 				}
+
+				if (!$debug && $errorReportingLevel > 0) {
+					error_reporting($errorReportingLevel);
+				}
+
 				if ($result) {
 					$dbBackend = new OracleDbBackend();
 				}
@@ -146,6 +159,10 @@ function DBconnect(&$error, $debug = true) {
 				$connect .= 'PROTOCOL=TCPIP;';
 				$connect .= 'UID='.$DB['USER'].';';
 				$connect .= 'PWD='.$DB['PASSWORD'].';';
+
+				if (!$debug && $errorReportingLevel > 0) {
+					error_reporting(0);
+				}
 
 				$DB['DB'] = db2_connect($connect, $DB['USER'], $DB['PASSWORD']);
 				if (!$DB['DB']) {
@@ -161,11 +178,20 @@ function DBconnect(&$error, $debug = true) {
 						DBexecute("SET CURRENT SCHEMA='".$DB['SCHEMA']."'");
 					}
 				}
+
+				if (!$debug && $errorReportingLevel > 0) {
+					error_reporting($errorReportingLevel);
+				}
+
 				if ($result) {
 					$dbBackend = new Db2DbBackend();
 				}
 				break;
 			case ZBX_DB_SQLITE3:
+				if (!$debug && $errorReportingLevel > 0) {
+					error_reporting(0);
+				}
+
 				if (file_exists($DB['DATABASE'])) {
 					init_sqlite3_access();
 					lock_sqlite3_access();
@@ -182,6 +208,11 @@ function DBconnect(&$error, $debug = true) {
 					$error = 'Missing database';
 					$result = false;
 				}
+
+				if (!$debug && $errorReportingLevel > 0) {
+					error_reporting($errorReportingLevel);
+				}
+
 				if ($result) {
 					$dbBackend = new SqliteDbBackend();
 				}
