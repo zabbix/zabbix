@@ -948,7 +948,6 @@ function formatItemValueType(array $item) {
 		if (zbx_strlen($value) > 20) {
 			$value = zbx_substr($value, 0, 20).' ...';
 		}
-		$value = nbsp(htmlspecialchars($value));
 	}
 	else {
 		$value = _('Unknown value type');
