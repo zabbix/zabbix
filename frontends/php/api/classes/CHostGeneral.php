@@ -209,9 +209,21 @@ abstract class CHostGeneral extends CZBXAPI {
 
 				$template = reset($template);
 
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Template "%1$s" with item key "%2$s" already linked to host.',
-						$template['name'], $dbItem['key_']));
+				if ($dbItem['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Template "%1$s" with item key "%2$s" already linked to host.',
+							$template['name'], $dbItem['key_']));
+				}
+				elseif ($dbItem['flags'] == ZBX_FLAG_DISCOVERY) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Template "%1$s" with low level discovery rule key "%2$s" already linked to host.',
+							$template['name'], $dbItem['key_']));
+				}
+				else {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Template "%1$s" with item prototype key "%2$s" already linked to host.',
+							$template['name'], $dbItem['key_']));
+				}
 			}
 		}
 
