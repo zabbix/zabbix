@@ -597,7 +597,7 @@ class CHostInterface extends CZBXAPI {
 				DB::update('interface', $data);
 			}
 
-			if (interfacesToAdd) {
+			if ($interfacesToAdd) {
 				$this->checkInput($interfacesToAdd, 'create');
 				DB::insert('interface', $interfacesToAdd);
 			}
