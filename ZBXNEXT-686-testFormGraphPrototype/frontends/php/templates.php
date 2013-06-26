@@ -459,8 +459,8 @@ if (isset($_REQUEST['form'])) {
 		$data['original_templates'] = array();
 	}
 
-	$templateIds = get_request('templates', array());
-	$templateIds = empty($templateIds) ? $data['original_templates'] : $templateIds;
+	$templateIds = isset($_REQUEST['unlink']) || isset($_REQUEST['add_template'])
+		|| isset($_REQUEST['exist_templates']) ? get_request('templates', array()) : $data['original_templates'];
 
 	sort($templateIds);
 
@@ -468,6 +468,8 @@ if (isset($_REQUEST['form'])) {
 		'templateids' => $templateIds,
 		'output' => array('templateid', 'name')
 	));
+
+	CArrayHelper::sort($data['linkedTemplates'], array('name'));
 
 	$templateForm = new CView('configuration.template.edit', $data);
 	$template_wdgt->addItem($templateForm->render());
