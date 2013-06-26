@@ -699,7 +699,7 @@ jQuery(function($) {
 	function cleanSearchInput(obj) {
 		var input = $('input[type="text"]', obj);
 
-		if (!(IE && input.val() == input.prop('placeholder'))) {
+		if (!(IE && input.val() == input.attr('placeholder'))) {
 			input.val('');
 		}
 	}
@@ -806,7 +806,7 @@ jQuery(function($) {
 	}
 
 	function setPlaceholder(obj, options) {
-		$('input[type="text"]', obj).prop('placeholder', options.labels['type here to search']);
+		$('input[type="text"]', obj).attr('placeholder', options.labels['type here to search']);
 
 		createPlaceholders();
 	}
