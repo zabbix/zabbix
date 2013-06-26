@@ -470,10 +470,10 @@ class CTrigger extends CTriggerGeneral {
 				'SELECT '.implode(',', $parts['select']).' FROM events e JOIN ('.
 					'SELECT  max(eventid) as lasteventid FROM events e'.
 					' WHERE '.dbConditionInt('e.objectid', $triggerids).
-					andDbNode('e.objectid').
-					' AND e.object='.EVENT_SOURCE_TRIGGERS.
+						andDbNode('e.objectid').
+						' AND e.object='.EVENT_SOURCE_TRIGGERS.
 					' GROUP BY e.objectid'.
-					') ee ON e.eventid=ee.lasteventid'
+				') ee ON e.eventid=ee.lasteventid'
 			), 'objectid');
 
 			foreach ($result as $triggerId => $trigger) {
