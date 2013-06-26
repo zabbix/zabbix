@@ -13,22 +13,21 @@ ALTER TABLE ONLY events ALTER eventid DROP DEFAULT,
 CREATE LANGUAGE plpgsql;
 
 CREATE OR REPLACE FUNCTION zbx_convert_events() RETURNS BOOLEAN AS $$
-		DECLARE prev_triggerid bigint;
-		DECLARE prev_value integer;
-		r RECORD;
+	DECLARE prev_triggerid bigint;
+	DECLARE prev_value integer;
+	r RECORD;
 BEGIN
-
 	FOR r IN
-		SELECT e.eventid, e.objectid, e.value, t.type as type
+		SELECT e.eventid, t.triggerid, e.value, t.type
 		FROM events e
-		JOIN triggers t ON t.triggerid = e.objectid
+			JOIN triggers t ON t.triggerid = e.objectid
 		WHERE e.source = 0
 			AND e.object = 0
-			AND e.value IN (0,1)
+			AND e.value IN (0, 1)
 		ORDER BY e.objectid, e.clock, e.eventid
 	LOOP
 
-	IF prev_triggerid IS NULL OR prev_triggerid <> r.objectid THEN
+	IF prev_triggerid IS NULL OR prev_triggerid <> r.triggerid THEN
 		prev_value := NULL;
 	END IF;
 
@@ -43,7 +42,7 @@ BEGIN
 	END IF;
 
 	prev_value := r.value;
-	prev_triggerid := r.objectid;
+	prev_triggerid := r.triggerid;
 
 	END LOOP;
 
