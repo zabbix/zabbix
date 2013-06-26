@@ -1022,7 +1022,9 @@ function dbConditionInt($fieldName, array $values, $notIn = false) {
 				$betweens[] = array(bcsub($valueL, $len, 0), bcsub($valueL, 1, 0));
 			}
 			else {
-				$ins = array_merge($ins, array_slice($values, $pos - $len, $len));
+				foreach (array_slice($values, $pos - $len, $len) as $val) {
+					array_push($ins, $val);
+				}
 			}
 
 			$len = 1;
@@ -1038,7 +1040,9 @@ function dbConditionInt($fieldName, array $values, $notIn = false) {
 		$betweens[] = array(bcadd(bcsub($valueL, $len, 0), 1, 0), $valueL);
 	}
 	else {
-		$ins = array_merge($ins, array_slice($values, $pos - $len, $len));
+		foreach (array_slice($values, $pos - $len, $len) as $val) {
+			array_push($ins, $val);
+		}
 	}
 
 	$operand = $notIn ? 'AND' : 'OR';

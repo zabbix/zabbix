@@ -147,6 +147,8 @@ class CTrigger extends CTriggerGeneral {
 		if (!is_null($options['groupids'])) {
 			zbx_value2array($options['groupids']);
 
+			sort($options['groupids']);
+
 			$sqlParts['select']['groupid'] = 'hg.groupid';
 			$sqlParts['from']['functions'] = 'functions f';
 			$sqlParts['from']['items'] = 'items i';
@@ -459,56 +461,34 @@ class CTrigger extends CTriggerGeneral {
 				$result[$trigger['triggerid']] = array();
 			}
 
-			// groups
-			if (isset($trigger['groupid']) && is_null($options['selectGroups'])) {
-				if (!isset($result[$trigger['triggerid']]['groups'])) {
-					$result[$trigger['triggerid']]['groups'] = array();
-				}
-
-				$result[$trigger['triggerid']]['groups'][] = array('groupid' => $trigger['groupid']);
-				unset($trigger['groupid']);
-			}
-
-			// hostids
-			if (isset($trigger['hostid']) && is_null($options['selectHosts'])) {
-				if (!isset($result[$trigger['triggerid']]['hosts'])) {
-					$result[$trigger['triggerid']]['hosts'] = array();
-				}
-
-				$result[$trigger['triggerid']]['hosts'][] = array('hostid' => $trigger['hostid']);
-
-				if (is_null($options['expandData'])) {
-					unset($trigger['hostid']);
-				}
-			}
-			// itemids
-			if (isset($trigger['itemid']) && is_null($options['selectItems'])) {
-				if (!isset($result[$trigger['triggerid']]['items'])) {
-					$result[$trigger['triggerid']]['items'] = array();
-				}
-
-				$result[$trigger['triggerid']]['items'][] = array('itemid' => $trigger['itemid']);
-				unset($trigger['itemid']);
-			}
-
 			$result[$trigger['triggerid']] += $trigger;
 		}
 
 		if (!is_null($options['selectLastEvent'])) {
-			foreach ($result as $triggerId => $trigger) {
-				$lastEvent = API::Event()->get(array(
-					'object' => EVENT_SOURCE_TRIGGERS,
-					'objectids' => $triggerId,
-					'output' => $options['selectLastEvent'],
-					'nopermissions' => true,
-					'filter' => array('value_changed' => TRIGGER_VALUE_CHANGED_YES),
-					'sortfield' => array('eventid'),
-					'sortorder' => ZBX_SORT_DOWN,
-					'limit' => 1
-				));
+			$parts = API::getApi()->applyQueryOutputOptions('events', 'e', array('output' => $options['selectLastEvent']), array());
+			$lastEvents = DBfetchArrayAssoc(DBselect(
+				'SELECT '.implode(',', $parts['select']).' FROM events e JOIN ('.
+					'SELECT  max(eventid) as lasteventid FROM events e'.
+					' WHERE '.dbConditionInt('e.objectid', $triggerids).
+						andDbNode('e.objectid').
+						' AND e.object='.EVENT_SOURCE_TRIGGERS.
+					' GROUP BY e.objectid'.
+				') ee ON e.eventid=ee.lasteventid'
+			), 'objectid');
 
-				$result[$triggerId]['lastEvent'] = $lastEvent ? reset($lastEvent) : array();
+			foreach ($result as $triggerId => $trigger) {
+				$result[$triggerId]['lastEvent'] = isset($lastEvents[$triggerId]) ? $lastEvents[$triggerId] : array();
 			}
+		}
+
+		if ($options['groupids'] !== null && $options['selectGroups'] === null) {
+			$options['selectGroups'] = API_OUTPUT_REFER;
+		}
+		if ($options['hostids'] !== null && $options['selectHosts'] === null) {
+			$options['selectHosts'] = API_OUTPUT_REFER;
+		}
+		if ($options['itemids'] !== null && $options['selectItems'] === null) {
+			$options['selectItems'] = API_OUTPUT_REFER;
 		}
 
 		if ($result) {
