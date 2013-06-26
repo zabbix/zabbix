@@ -157,7 +157,7 @@ class CApplicationManager {
 	 *   inherit is called with some $hostIds passed
 	 *   new applications are created/updated
 	 *   inherit is called again with created/updated applications but empty $hostIds
-	 *   if any of new applications belongs to template, inherit it to all hosts linked to tah template
+	 *   if any of new applications belongs to template, inherit it to all hosts linked to that template
 	 *
 	 * @param array $applications
 	 * @param array $hostIds
@@ -194,7 +194,7 @@ class CApplicationManager {
 					$oldApplicationTemplates = zbx_toHash($oldChildApp['applicationTemplates'], 'templateid');
 					$oldApplicationTemplateIds[] = $oldApplicationTemplates[$applicationTemplate['templateid']]['application_templateid'];
 
-					// save the the IDs of the affected templates and old
+					// save the IDs of the affected templates and old
 					if (isset($applications[$applicationTemplate['templateid']])) {
 						$movedAppTemplateIds[] = $applications[$applicationTemplate['templateid']]['hostid'];
 						$childAppIdsPairs[$oldChildApp['applicationid']] =  $newChildApp['applicationid'];
@@ -235,7 +235,7 @@ class CApplicationManager {
 	}
 
 	/**
-	 * Replaces the applications for all items inherited from templates $templateIds according to the map given in
+	 * Replaces applications for all items inherited from templates $templateIds according to the map given in
 	 * $appIdPairs.
 	 *
 	 * @param array $templateIds
