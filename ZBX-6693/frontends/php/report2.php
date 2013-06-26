@@ -100,9 +100,7 @@ elseif (!isset($_REQUEST['filter_rst'])) {
 CProfile::update('web.avail_report.'.$availabilityReportMode.'.hostid', $_REQUEST['filter_hostid'], PROFILE_TYPE_ID);
 
 if ($_REQUEST['filter_timetill'] > 0 && $_REQUEST['filter_timesince'] > $_REQUEST['filter_timetill']) {
-	$filterTimeSinceOriginal = $_REQUEST['filter_timesince'];
-	$_REQUEST['filter_timesince'] = $_REQUEST['filter_timetill'];
-	$_REQUEST['filter_timetill'] = $filterTimeSinceOriginal;
+	zbx_swap($_REQUEST['filter_timesince'], $_REQUEST['filter_timetill']);
 }
 
 $_REQUEST['filter_timesince'] = zbxDateToTime($_REQUEST['filter_timesince']);
@@ -293,14 +291,6 @@ elseif (isset($_REQUEST['filter_hostid'])) {
 
 	// report by host
 	elseif ($availabilityReportMode == AVAILABILITY_REPORT_BY_HOST) {
-		// trigger options
-		if (!empty($_REQUEST['filter_groupid']) || !$config['dropdown_first_entry']) {
-			$triggerOptions['groupids'] = $_REQUEST['filter_groupid'];
-		}
-		if (!empty($_REQUEST['filter_hostid']) || !$config['dropdown_first_entry']) {
-			$triggerOptions['hostids'] = $_REQUEST['filter_hostid'];
-		}
-
 		// filter host group
 		$groupsComboBox = new CComboBox('filter_groupid', $_REQUEST['filter_groupid'], 'javascript: submit();');
 		$groupsComboBox->addItem(0, _('all'));
@@ -331,6 +321,7 @@ elseif (isset($_REQUEST['filter_hostid'])) {
 			'with_triggers' => true
 		));
 		order_result($hosts, 'name');
+		$hosts = zbx_toHash($hosts, 'hostid');
 
 		foreach ($hosts as $host) {
 			$hostsComboBox->addItem(
@@ -339,6 +330,14 @@ elseif (isset($_REQUEST['filter_hostid'])) {
 			);
 		}
 		$filterForm->addRow(_('Host'), $hostsComboBox);
+
+		// trigger options
+		if (!empty($_REQUEST['filter_groupid']) || !$config['dropdown_first_entry']) {
+			$triggerOptions['groupids'] = $_REQUEST['filter_groupid'];
+		}
+		if (!empty($_REQUEST['filter_hostid']) && isset($hosts[$_REQUEST['filter_hostid']]) || !$config['dropdown_first_entry']) {
+			$triggerOptions['hostids'] = $_REQUEST['filter_hostid'];
+		}
 	}
 
 	// filter period
