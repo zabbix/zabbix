@@ -109,7 +109,7 @@ class testFormGraphPrototype extends CWebTest {
 	// Returns layout data
 	public static function layout() {
 		return array(
-			array(
+		/*	array(
 				array(
 					'ymin_type' => 'Fixed',
 					'ymax_type' => 'Item',
@@ -178,7 +178,7 @@ class testFormGraphPrototype extends CWebTest {
 				array(
 					'graphtype' => 'Exploded',
 				)
-			)
+			)*/
 		);
 	}
 
@@ -481,7 +481,7 @@ class testFormGraphPrototype extends CWebTest {
 	/**
 	 * @dataProvider update
 	 */
-	public function testFormGraphPrototype_SimpleUpdate($data) {
+/*	public function testFormGraphPrototype_SimpleUpdate($data) {
 		$name = $data['name'];
 
 		$sqlGraphs = "select * from graphs ORDER BY graphid";
@@ -501,11 +501,11 @@ class testFormGraphPrototype extends CWebTest {
 
 		$this->assertEquals($oldHashGraphs, DBhash($sqlGraphs));
 	}
-
+*/
 	// Returns create data
 	public static function create() {
 		return array(
-			array(
+		/*	array(
 				array(
 					'expected' => GRAPH_GOOD,
 					'graphName' => 'graphSimple',
@@ -787,7 +787,7 @@ class testFormGraphPrototype extends CWebTest {
 						'Warning. Incorrect value for field "Height (min:20, max:65535)": must be between 20 and 65535.'
 					)
 				)
-			)
+			)*/
 		);
 	}
 

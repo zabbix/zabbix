@@ -367,6 +367,8 @@ if (isset($_REQUEST['form'])) {
 		$data['action']['conditions'] = get_request('conditions', array());
 		$data['action']['operations'] = get_request('operations', array());
 
+		sortOperations($data['action']['eventsource'], $data['action']['operations']);
+
 		if (!empty($data['actionid']) && isset($_REQUEST['form_refresh'])) {
 			$data['action']['def_shortdata'] = get_request('def_shortdata');
 			$data['action']['def_longdata'] = get_request('def_longdata');

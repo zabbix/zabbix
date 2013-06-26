@@ -1517,7 +1517,7 @@ class CTrigger extends CTriggerGeneral {
 
 	/**
 	 * Check that none of the triggers have dependencies on their children. Checks only one level of inheritance, but
-	 * since is is called on each inheritance step, also works for multiple inheritance levels.
+	 * since it is called on each inheritance step, also works for multiple inheritance levels.
 	 *
 	 * @throws APIException     if at least one trigger is dependent on its child
 	 *
@@ -1854,7 +1854,7 @@ class CTrigger extends CTriggerGeneral {
 	}
 
 	/**
-	 * Checks that none of the given triggers are inherited from a template.
+	 * Checks that none of the given triggers is inherited from a template.
 	 *
 	 * @throws APIException     if one of the triggers is inherited
 	 *

@@ -348,7 +348,7 @@ class testFormTrigger extends CWebTest {
 
 	// Returns update data
 	public static function update() {
-		return DBdata("select description from triggers where description LIKE 'testFormTrigger%'");
+		return DBdata("select description from triggers t left join functions f on f.triggerid=t.triggerid where f.itemid='30004' and t.description LIKE 'testFormTrigger%'");
 	}
 
 	/**
