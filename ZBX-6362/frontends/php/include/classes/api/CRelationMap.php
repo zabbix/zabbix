@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 /**
  * A helper class for storing relations between objects, and mapping related objects.
  */
@@ -61,10 +62,10 @@ class CRelationMap {
 	 * Maps multiple related objects to the base objects and adds them under the $name property. Each base object will
 	 * have an array of related objects.
 	 *
-	 * @param array $baseObjects        a hash of base objects with IDs as keys
-	 * @param array $relatedObjects     a hash of related objects with IDs as keys
-	 * @param string $name              the name of the property under which the related objects will be added
-	 * @param int $limit                maximum number of related objects for each base objects
+	 * @param array  $baseObjects		a hash of base objects with IDs as keys
+	 * @param array  $relatedObjects	a hash of related objects with IDs as keys
+	 * @param string $name				the name of the property under which the related objects will be added
+	 * @param int    $limit				maximum number of related objects for each base objects
 	 *
 	 * @return array
 	 */
@@ -94,12 +95,12 @@ class CRelationMap {
 	}
 
 	/**
-	 * Maps multiple related objects to the base objects and adds them under the $name property. Each base object will
-	 * have only one related object.
+	 * Maps multiple related objects to the base objects and adds them under the $name property.
+	 * Each base object will have only one related object.
 	 *
-	 * @param array $baseObjects        a hash of base objects with IDs as keys
-	 * @param array $relatedObjects     a hash of related objects with IDs as keys
-	 * @param string $name              the name of the property under which the related object will be added
+	 * @param array  $baseObjects		a hash of base objects with IDs as keys
+	 * @param array  $relatedObjects	a hash of related objects with IDs as keys
+	 * @param string $name				the name of the property under which the related object will be added
 	 *
 	 * @return array
 	 */
@@ -110,6 +111,7 @@ class CRelationMap {
 			// add the related objects if there are any
 			if (isset($this->map[$baseObjectId])) {
 				$matchingRelatedId = reset($this->map[$baseObjectId]);
+
 				if (isset($relatedObjects[$matchingRelatedId])) {
 					$matchingRelatedObject = $relatedObjects[$matchingRelatedId];
 				}

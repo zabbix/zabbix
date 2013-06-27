@@ -34,7 +34,7 @@ class CScript extends CZBXAPI {
 	 *
 	 * @param array  $options
 	 * @param array  $options['itemids']
-	 * @param array  $options['hostids']	depricated (very slow)
+	 * @param array  $options['hostids']	deprecated (very slow)
 	 * @param array  $options['groupids']
 	 * @param array  $options['triggerids']
 	 * @param array  $options['scriptids']

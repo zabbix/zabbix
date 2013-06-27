@@ -630,8 +630,8 @@ class CHostInterface extends CZBXAPI {
 	 */
 	protected function checkIp(array $interface) {
 		if (!empty($interface['ip']) && (!validate_ip($interface['ip'], $arr)
-			&& !preg_match('/^'.ZBX_PREG_MACRO_NAME_FORMAT.'$/i', $interface['ip'])
-			&& !preg_match('/^'.ZBX_PREG_EXPRESSION_USER_MACROS.'$/i', $interface['ip']))) {
+				&& !preg_match('/^'.ZBX_PREG_MACRO_NAME_FORMAT.'$/i', $interface['ip'])
+				&& !preg_match('/^'.ZBX_PREG_EXPRESSION_USER_MACROS.'$/i', $interface['ip']))) {
 
 			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect interface IP parameter "%s" provided.', $interface['ip']));
 		}

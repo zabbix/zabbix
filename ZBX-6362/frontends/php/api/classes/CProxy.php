@@ -73,7 +73,7 @@ class CProxy extends CZBXAPI {
 			'countOutput'				=> null,
 			'preservekeys'				=> null,
 			'selectHosts'				=> null,
-			'selectInterfaces'			=> null,
+			'selectInterface'			=> null,
 			'sortfield'					=> '',
 			'sortorder'					=> '',
 			'limit'						=> null
@@ -204,8 +204,8 @@ class CProxy extends CZBXAPI {
 					if ($dbProxies[$proxy['proxyid']]['status'] == $proxy['status']) {
 						unset($proxy['status']);
 					}
-					elseif (!isset($proxy['interfaces'])) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s('No interfaces provided for proxy "%s".', $proxy['host']));
+					elseif (!isset($proxy['interface'])) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('No interface provided for proxy "%s".', $proxy['host']));
 					}
 				}
 			}
@@ -214,26 +214,22 @@ class CProxy extends CZBXAPI {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
 				}
 
-				if ($proxy['status'] == HOST_STATUS_PROXY_PASSIVE && !isset($proxy['interfaces'])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('No interfaces provided for proxy "%s".', $proxy['host']));
+				if ($proxy['status'] == HOST_STATUS_PROXY_PASSIVE && !isset($proxy['interface'])) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('No interface provided for proxy "%s".', $proxy['host']));
 				}
 			}
 
-			if (isset($proxy['interfaces'])) {
-				if (!is_array($proxy['interfaces']) || empty($proxy['interfaces'])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('No interfaces for proxy "%s".', $proxy['host']));
-				}
-				elseif (count($proxy['interfaces']) > 1) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Too many interfaces provided for proxy "%s".', $proxy['host']));
+			if (isset($proxy['interface'])) {
+				if (!is_array($proxy['interface']) || empty($proxy['interface'])) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('No interface for proxy "%s".', $proxy['host']));
 				}
 
-				$interface = reset($proxy['interfaces']);
-				if (preg_match('/^(0{1,3}\.){3,3}0{1,3}$/', $interface['ip'])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect IP for passive proxy "%1$s".', $interface['ip']));
+				if (!validate_ip($proxy['interface']['ip'], $arr)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect IP for passive proxy "%1$s".', $proxy['interface']['ip']));
 				}
 
 				// mark the interface as main to pass host interface validation
-				$proxy['interfaces'][0]['main'] = INTERFACE_PRIMARY;
+				$proxy['interface']['main'] = INTERFACE_PRIMARY;
 			}
 
 			if (isset($proxy['host'])) {
@@ -270,11 +266,11 @@ class CProxy extends CZBXAPI {
 				);
 			}
 
-			// create the interface
+			// create interface
 			if ($proxy['status'] == HOST_STATUS_PROXY_PASSIVE) {
-				$proxy['interfaces'][0]['hostid'] = $proxyIds[$key];
+				$proxy['interface']['hostid'] = $proxyIds[$key];
 
-				if (!API::HostInterface()->create($proxy['interfaces'])) {
+				if (!API::HostInterface()->create($proxy['interface'])) {
 					self::exception(ZBX_API_ERROR_INTERNAL, _('Proxy interface creation failed.'));
 				}
 			}
@@ -323,18 +319,19 @@ class CProxy extends CZBXAPI {
 					'output' => API_OUTPUT_REFER,
 					'hostids' => $proxy['hostid']
 				));
-				$interfaceids = zbx_objectValues($interfaces, 'interfaceid');
-				if ($interfaceids) {
-					API::HostInterface()->delete($interfaceids);
+				$interfaceIds = zbx_objectValues($interfaces, 'interfaceid');
+
+				if ($interfaceIds) {
+					API::HostInterface()->delete($interfaceIds);
 				}
 			}
 			// update the interface of a passive proxy
-			elseif (isset($proxy['interfaces']) && is_array($proxy['interfaces'])) {
-				$proxy['interfaces'][0]['hostid'] = $proxy['hostid'];
+			elseif (isset($proxy['interface']) && is_array($proxy['interface'])) {
+				$proxy['interface']['hostid'] = $proxy['hostid'];
 
-				$result = isset($proxy['interfaces'][0]['interfaceid'])
-					? API::HostInterface()->update($proxy['interfaces'])
-					: API::HostInterface()->create($proxy['interfaces']);
+				$result = isset($proxy['interface']['interfaceid'])
+					? API::HostInterface()->update($proxy['interface'])
+					: API::HostInterface()->create($proxy['interface']);
 
 				if (!$result) {
 					self::exception(ZBX_API_ERROR_INTERNAL, _('Proxy interface update failed.'));
@@ -362,11 +359,12 @@ class CProxy extends CZBXAPI {
 		if ($proxyIds && is_array($proxyIds[0])) {
 			$this->deprecated('Passing objects is deprecated, use an array of IDs instead.');
 
-			foreach ($proxyIds as $proxy) {
-				if (!check_db_fields(array('proxyid' => null), $proxy)) {
+			foreach ($proxyIds as $proxyId) {
+				if (!check_db_fields(array('proxyid' => null), $proxyId)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('No proxy ID given.'));
 				}
 			}
+
 			$proxyIds = zbx_objectValues($proxyIds, 'proxyid');
 		}
 
@@ -404,7 +402,7 @@ class CProxy extends CZBXAPI {
 			'value' => $proxyIds
 		));
 
-		// interfaces
+		// delete interface
 		DB::delete('interface', array('hostid' => $proxyIds));
 
 		// delete host
@@ -527,6 +525,7 @@ class CProxy extends CZBXAPI {
 			' WHERE '.dbConditionInt('h.proxy_hostid', $proxyIds), 1));
 		if ($host) {
 			$proxy = DBfetch(DBselect('SELECT h.host FROM hosts h WHERE h.hostid='.$host['proxy_hostid']));
+
 			self::exception(ZBX_API_ERROR_PARAMETERS,
 				_s('Host "%1$s" is monitored with proxy "%2$s".', $host['name'], $proxy['host']));
 		}
@@ -536,7 +535,7 @@ class CProxy extends CZBXAPI {
 		$sqlParts = parent::applyQueryOutputOptions($tableName, $tableAlias, $options, $sqlParts);
 
 		if ($options['countOutput'] === null) {
-			if ($options['selectInterfaces'] !== null) {
+			if ($options['selectInterface'] !== null) {
 				$sqlParts = $this->addQuerySelect('h.hostid', $sqlParts);
 			}
 		}
@@ -559,15 +558,14 @@ class CProxy extends CZBXAPI {
 			));
 
 			$relationMap = $this->createRelationMap($hosts, 'proxy_hostid', 'hostid');
-
 			$hosts = $this->unsetExtraFields($hosts, array('proxy_hostid', 'hostid'), $options['selectHosts']);
 			$result = $relationMap->mapMany($result, $hosts, 'hosts');
 		}
 
-		// adding hostinterfaces
-		if ($options['selectInterfaces'] !== null && $options['selectInterfaces'] != API_OUTPUT_COUNT) {
+		// adding host interface
+		if ($options['selectInterface'] !== null && $options['selectInterface'] != API_OUTPUT_COUNT) {
 			$interfaces = API::HostInterface()->get(array(
-				'output' => $this->outputExtend('interface', array('interfaceid', 'hostid'), $options['selectInterfaces']),
+				'output' => $this->outputExtend('interface', array('interfaceid', 'hostid'), $options['selectInterface']),
 				'nodeids' => $options['nodeids'],
 				'hostids' => $proxyIds,
 				'nopermissions' => true,
@@ -575,9 +573,14 @@ class CProxy extends CZBXAPI {
 			));
 
 			$relationMap = $this->createRelationMap($interfaces, 'hostid', 'interfaceid');
+			$interfaces = $this->unsetExtraFields($interfaces, array('hostid', 'interfaceid'), $options['selectInterface']);
+			$result = $relationMap->mapMany($result, $interfaces, 'interface');
 
-			$interfaces = $this->unsetExtraFields($interfaces, array('hostid', 'interfaceid'), $options['selectInterfaces']);
-			$result = $relationMap->mapMany($result, $interfaces, 'interfaces');
+			foreach ($result as $key => $proxy) {
+				if (!empty($proxy['interface'])) {
+					$result[$key]['interface'] = reset($proxy['interface']);
+				}
+			}
 		}
 
 		return $result;
