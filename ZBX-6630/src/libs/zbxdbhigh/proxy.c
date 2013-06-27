@@ -580,7 +580,7 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 	char			*sql = NULL, *field_names = NULL, *recs = NULL;
 	size_t			sql_alloc = 4 * ZBX_KIBIBYTE, sql_offset,
 				field_names_alloc = 1 * ZBX_KIBIBYTE, field_names_offset = 0,
-				recs_alloc = 10 * ZBX_KIBIBYTE, recs_offset = 0, r_offset;
+				recs_alloc = 20 * ZBX_KIBIBYTE, recs_offset = 0, r_offset;
 	DB_RESULT		result;
 	DB_ROW			row;
 	zbx_hashset_t           h_id_offsets;
@@ -705,7 +705,9 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 
 	sql = zbx_malloc(sql, sql_alloc);
 	zbx_vector_uint64_create(&ins);
-	zbx_vector_uint64_create(&moves);
+
+	if (1 == move_out)
+		zbx_vector_uint64_create(&moves);
 
 	p = NULL;
 	/* iterate the entries (lines 9, 14 and 19 in T1) */
@@ -776,7 +778,12 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 				zbx_vector_uint64_append(del, moves.values[i]);
 				zbx_vector_uint64_append(&ins, moves.values[i]);
 			}
-			zbx_vector_uint64_clear(&moves);
+			if (0 < moves.values_num)
+			{
+				zbx_vector_uint64_clear(&moves);
+				zbx_vector_uint64_sort(del, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+				zbx_vector_uint64_sort(&ins, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+			}
 		}
 
 		if (0 != del->values_num)
@@ -817,6 +824,8 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 						"set key_='#'||itemid where");
 #endif
 			}
+
+			zbx_vector_uint64_sort(&moves, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 			DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, table->recid, moves.values,
 					moves.values_num);
 
@@ -969,7 +978,8 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 clean:
 	zbx_hashset_destroy(&h_id_offsets);
 	zbx_vector_uint64_destroy(&ins);
-	zbx_vector_uint64_destroy(&moves);
+	if (1 == move_out)
+		zbx_vector_uint64_destroy(&moves);
 	zbx_free(sql);
 	zbx_free(recs);
 out:
