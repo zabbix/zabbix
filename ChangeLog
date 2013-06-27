@@ -260,6 +260,7 @@ A......... [ZBX-6407] improved data retrieval performance for CTrigger get() wit
 A.F....... [ZBX-1357] updated Chinese (China), Spanish and Turkish translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+A......... [ZBX-6725] fixed undefined indexes in item list view when trigger has items from different hosts (Toms)
 ....I..... [ZBX-6700] improved PostgreSQL upgrade patch (dotneft, Oleg)
 ..F....... [ZBX-6682] added value mapping in map labels (Oleg)
 A......... [ZBX-6673] fixed errors after parent graph deleting (Oleg)
