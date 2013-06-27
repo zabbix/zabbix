@@ -57,7 +57,7 @@ $_REQUEST['backurl'] = get_request('backurl', 'tr_status.php');
 
 if (isset($_REQUEST['cancel'])) {
 	ob_end_clean();
-	if ($_REQUEST['backurl'] == 'tr_events.php') {
+	if (in_array($_REQUEST['backurl'], array('tr_events.php', 'events.php'), true)) {
 		redirect($_REQUEST['backurl'].'?eventid='.$_REQUEST['eventid'].'&triggerid='.$_REQUEST['triggerid']);
 	}
 	elseif ($_REQUEST['backurl'] == 'screenedit.php') {
