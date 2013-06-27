@@ -385,7 +385,14 @@ else {
 	}
 }
 
-$_REQUEST['period'] = get_request('period', SEC_PER_WEEK);
+if (isset($_REQUEST['period'])) {
+	$_REQUEST['period'] = get_request('period', ZBX_PERIOD_DEFAULT);
+	CProfile::update('web.events.period', $_REQUEST['period'], PROFILE_TYPE_INT);
+}
+else {
+	$_REQUEST['period'] = get_request('period', CProfile::get('web.events.period', ZBX_PERIOD_DEFAULT));
+}
+
 $effectiveperiod = navigation_bar_calc();
 $from = zbxDateToTime($_REQUEST['stime']);
 $till = $from + $effectiveperiod;
