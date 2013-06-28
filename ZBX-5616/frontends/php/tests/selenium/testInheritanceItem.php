@@ -75,7 +75,7 @@ class testInheritanceItem extends CWebTest {
 	public function testInheritanceItem_SimpleUpdate($data) {
 		$name = $data['name'];
 
-		$sqlItems = "select * from items";
+		$sqlItems = "select itemid,hostid, name, key_, delay from items order by itemid";
 		$oldHashItems = DBhash($sqlItems);
 
 		$this->zbxTestLogin('templates.php');

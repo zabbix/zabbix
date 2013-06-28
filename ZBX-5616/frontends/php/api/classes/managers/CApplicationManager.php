@@ -157,7 +157,7 @@ class CApplicationManager {
 	 *   inherit is called with some $hostIds passed
 	 *   new applications are created/updated
 	 *   inherit is called again with created/updated applications but empty $hostIds
-	 *   if any of new applications belongs to template, inherit it to all hosts linked to tah template
+	 *   if any of new applications belongs to template, inherit it to all hosts linked to that template
 	 *
 	 * @param array $applications
 	 * @param array $hostIds
@@ -194,7 +194,7 @@ class CApplicationManager {
 					$oldApplicationTemplates = zbx_toHash($oldChildApp['applicationTemplates'], 'templateid');
 					$oldApplicationTemplateIds[] = $oldApplicationTemplates[$applicationTemplate['templateid']]['application_templateid'];
 
-					// save the the IDs of the affected templates and old
+					// save the IDs of the affected templates and old
 					if (isset($applications[$applicationTemplate['templateid']])) {
 						$movedAppTemplateIds[] = $applications[$applicationTemplate['templateid']]['hostid'];
 						$childAppIdsPairs[$oldChildApp['applicationid']] =  $newChildApp['applicationid'];
@@ -225,8 +225,8 @@ class CApplicationManager {
 				$delAppIds[] = $app['applicationid'];
 			}
 		}
-		if ($delAppIds) {
-			$this->deleteEmpty($delAppIds);
+		if ($delAppIds && $emptyIds = $this->fetchEmptyIds($delAppIds)) {
+			$this->delete($emptyIds);
 		}
 
 		$this->inherit($inheritedApps);
@@ -235,7 +235,7 @@ class CApplicationManager {
 	}
 
 	/**
-	 * Replaces the applications for all items inherited from templates $templateIds according to the map given in
+	 * Replaces applications for all items inherited from templates $templateIds according to the map given in
 	 * $appIdPairs.
 	 *
 	 * @param array $templateIds
@@ -293,22 +293,39 @@ class CApplicationManager {
 	}
 
 	/**
-	 * Delete applications that don't have items and are not used by http tests.
+	 * Return IDs of applications that are not used by items or HTTP tests.
 	 *
 	 * @param array $applicationIds
+	 *
+	 * @return array
 	 */
-	protected function deleteEmpty(array $applicationIds) {
-		$emptyApplications = DBfetchArray(DBselect(
+	public function fetchEmptyIds(array $applicationIds) {
+		return DBfetchColumn(DBselect(
 			'SELECT a.applicationid '.
 			' FROM applications a'.
-				' LEFT JOIN items_applications ia ON a.applicationid=ia.applicationid'.
-				' LEFT JOIN httptest ht ON a.applicationid=ht.applicationid'.
-			' WHERE ia.applicationid IS NULL'.
-				' AND ht.applicationid IS NULL'.
-				' AND '.dbConditionInt('a.applicationid', $applicationIds)
-		));
+			' WHERE '.dbConditionInt('a.applicationid', $applicationIds).
+				' AND NOT EXISTS (SELECT NULL FROM items_applications ia WHERE a.applicationid=ia.applicationid)'.
+				' AND NOT EXISTS (SELECT NULL FROM httptest ht WHERE a.applicationid=ht.applicationid)'
+		), 'applicationid');
+	}
 
-		$this->delete(zbx_objectValues($emptyApplications, 'applicationid'));
+	/**
+	 * Return IDs of applications that are children only (!) of the given parents.
+	 *
+	 * @param array $parentApplicationIds
+	 *
+	 * @return array
+	 */
+	public function fetchExclusiveChildIds(array $parentApplicationIds) {
+		return DBfetchColumn(DBselect(
+			'SELECT at.applicationid '.
+			' FROM application_template at'.
+			' WHERE '.dbConditionInt('at.templateid', $parentApplicationIds).
+				' AND NOT EXISTS (SELECT NULL FROM application_template at2 WHERE '.
+					' at.applicationid=at2.applicationid'.
+					' AND '.dbConditionInt('at2.templateid', $parentApplicationIds, true).
+				')'
+		), 'applicationid');
 	}
 
 	/**
@@ -318,11 +335,10 @@ class CApplicationManager {
 	 */
 	public function delete(array $applicationIds) {
 		// unset applications from http tests
-		DBexecute(
-			'UPDATE httptest ht'.
-			' SET ht.applicationid=NULL'.
-			' WHERE '.dbConditionInt('ht.applicationid', $applicationIds)
-		);
+		DB::update('httptest', array(
+			'values' => array('applicationid' => null),
+			'where' => array('applicationid' => $applicationIds)
+		));
 
 		// remove Monitoring > Latest data toggle profile values related to given aplications
 		CProfile::delete('web.latest.toggle', $applicationIds);

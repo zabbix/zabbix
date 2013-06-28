@@ -35,8 +35,10 @@ require_once dirname(__FILE__).'/include/page_header.php';
 $fields = array(
 	'actionid' =>			array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
 	'name' =>				array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({save})', _('Name')),
-	'eventsource' =>		array(T_ZBX_INT, O_MAND, null,	IN(array(EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_DISCOVERY, EVENT_SOURCE_AUTO_REGISTRATION, EVENT_SOURCE_INTERNAL)), null),
-	'evaltype' =>			array(T_ZBX_INT, O_OPT, null,	IN(array(ACTION_EVAL_TYPE_AND_OR, ACTION_EVAL_TYPE_AND, ACTION_EVAL_TYPE_OR)), 'isset({save})'),
+	'eventsource' =>		array(T_ZBX_INT, O_MAND, null,
+		IN(array(EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_DISCOVERY, EVENT_SOURCE_AUTO_REGISTRATION, EVENT_SOURCE_INTERNAL)), null),
+	'evaltype' =>			array(T_ZBX_INT, O_OPT, null,
+		IN(array(ACTION_EVAL_TYPE_AND_OR, ACTION_EVAL_TYPE_AND, ACTION_EVAL_TYPE_OR)), 'isset({save})'),
 	'esc_period' =>			array(T_ZBX_INT, O_OPT, null,	BETWEEN(60, 999999), null, _('Default operation step duration')),
 	'status' =>				array(T_ZBX_INT, O_OPT, null,	IN(array(ACTION_STATUS_ENABLED, ACTION_STATUS_DISABLED)), null),
 	'def_shortdata' =>		array(T_ZBX_STR, O_OPT, null,	null,		'isset({save})'),
@@ -69,7 +71,7 @@ $fields = array(
 	// ajax
 	'favobj' =>				array(T_ZBX_STR, O_OPT, P_ACT,	null,		null),
 	'favref' =>				array(T_ZBX_STR, O_OPT, P_ACT,	NOT_EMPTY,	'isset({favobj})'),
-	'favstate' =>			array(T_ZBX_INT, O_OPT, P_ACT,	NOT_EMPTY,	'isset({favobj})&&("filter"=={favobj})')
+	'favstate' =>			array(T_ZBX_INT, O_OPT, P_ACT,	NOT_EMPTY,	'isset({favobj})&&"filter"=={favobj}')
 );
 $_REQUEST['eventsource'] = get_request('eventsource', CProfile::get('web.actionconf.eventsource', EVENT_SOURCE_TRIGGERS));
 
@@ -116,10 +118,6 @@ elseif (isset($_REQUEST['cancel_new_opcondition'])) {
 	unset($_REQUEST['new_opcondition']);
 }
 elseif (isset($_REQUEST['save'])) {
-	if (!count(get_accessible_nodes_by_user(CWebUser::$data, PERM_READ_WRITE, PERM_RES_IDS_ARRAY))) {
-		access_deny();
-	}
-
 	$action = array(
 		'name'			=> get_request('name'),
 		'eventsource'	=> get_request('eventsource', 0),
@@ -164,13 +162,10 @@ elseif (isset($_REQUEST['save'])) {
 	}
 }
 elseif (isset($_REQUEST['delete']) && isset($_REQUEST['actionid'])) {
-	if (!count(get_accessible_nodes_by_user(CWebUser::$data, PERM_READ_WRITE, PERM_RES_IDS_ARRAY))) {
-		access_deny();
-	}
-
 	$result = API::Action()->delete($_REQUEST['actionid']);
 
 	show_messages($result, _('Action deleted'), _('Cannot delete action'));
+
 	if ($result) {
 		unset($_REQUEST['form'], $_REQUEST['actionid']);
 	}
@@ -180,23 +175,26 @@ elseif (isset($_REQUEST['add_condition']) && isset($_REQUEST['new_condition'])) 
 		$newCondition = get_request('new_condition');
 
 		if ($newCondition) {
-			CAction::validateConditions($newCondition);
-
 			$conditions = get_request('conditions', array());
 
 			foreach ($conditions as $condition) {
 				if ($newCondition['conditiontype'] == $condition['conditiontype']) {
-					$newConditionValues = zbx_toArray($newCondition['value']);
-
-					foreach ($newConditionValues as $num => $newValue) {
-						if ($condition['value'] == $newValue) {
-							unset($newCondition['value'][$num]);
+					if (is_array($newCondition['value'])) {
+						foreach ($newCondition['value'] as $key => $newValue) {
+							if ($condition['value'] == $newValue) {
+								unset($newCondition['value'][$key]);
+							}
+						}
+					}
+					else {
+						if ($condition['value'] == $newCondition['value']) {
+							$newCondition['value'] = null;
 						}
 					}
 				}
 			}
 
-			if ($newCondition['value']) {
+			if (!zbx_empty($newCondition['value'])) {
 				$newConditionValues = zbx_toArray($newCondition['value']);
 
 				foreach ($newConditionValues as $newValue) {
@@ -205,6 +203,10 @@ elseif (isset($_REQUEST['add_condition']) && isset($_REQUEST['new_condition'])) 
 
 					$_REQUEST['conditions'][] = $condition;
 				}
+			}
+
+			if ($_REQUEST['conditions']) {
+				CAction::validateConditions($_REQUEST['conditions']);
 			}
 		}
 	}
@@ -285,45 +287,36 @@ elseif (isset($_REQUEST['edit_operationid'])) {
 	}
 }
 elseif (str_in_array($_REQUEST['go'], array('activate', 'disable')) && isset($_REQUEST['g_actionid'])) {
-	if (!count($nodes = get_accessible_nodes_by_user(CWebUser::$data, PERM_READ_WRITE, PERM_RES_IDS_ARRAY))) {
-		access_deny();
-	}
-
 	$status = ($_REQUEST['go'] == 'activate') ? 0 : 1;
-	$status_name = $status ? 'disabled' : 'enabled';
+	$statusName = $status ? 'disabled' : 'enabled';
 
 	DBstart();
-	$actionids = array();
+	$actionIds = array();
 
-	$go_result = DBselect(
-			'SELECT a.actionid'.
-			' FROM actions a'.
-			' WHERE '.dbConditionInt('a.actionid', $_REQUEST['g_actionid']).
-				andDbNode('a.actionid', $nodes)
+	$goResult = DBselect(
+		'SELECT a.actionid'.
+		' FROM actions a'.
+		' WHERE '.dbConditionInt('a.actionid', $_REQUEST['g_actionid'])
 	);
-	while ($row = DBfetch($go_result)) {
+	while ($row = DBfetch($goResult)) {
 		$res = DBexecute('UPDATE actions SET status='.$status.' WHERE actionid='.$row['actionid']);
 		if ($res) {
-			$actionids[] = $row['actionid'];
+			$actionIds[] = $row['actionid'];
 		}
 	}
-	$go_result = DBend($res);
+	$goResult = DBend($res);
 
-	if ($go_result && isset($res)) {
-		show_messages($go_result, _('Status updated'), _('Cannot update status'));
-		add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ACTION, ' Actions ['.implode(',', $actionids).'] '.$status_name);
+	if ($goResult && isset($res)) {
+		show_messages($goResult, _('Status updated'), _('Cannot update status'));
+		add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ACTION, ' Actions ['.implode(',', $actionIds).'] '.$statusName);
 	}
 }
 elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['g_actionid'])) {
-	if (!count($nodes = get_accessible_nodes_by_user(CWebUser::$data, PERM_READ_WRITE, PERM_RES_IDS_ARRAY))) {
-		access_deny();
-	}
-
-	$go_result = API::Action()->delete($_REQUEST['g_actionid']);
-	show_messages($go_result, _('Selected actions deleted'), _('Cannot delete selected actions'));
+	$goResult = API::Action()->delete($_REQUEST['g_actionid']);
+	show_messages($goResult, _('Selected actions deleted'), _('Cannot delete selected actions'));
 }
 
-if ($_REQUEST['go'] != 'none' && isset($go_result) && $go_result) {
+if ($_REQUEST['go'] != 'none' && isset($goResult) && $goResult) {
 	$url = new CUrl();
 	$path = $url->getPath();
 	insert_js('cookie.eraseArray("'.$path.'")');
@@ -373,6 +366,8 @@ if (isset($_REQUEST['form'])) {
 		$data['action']['recovery_msg'] = get_request('recovery_msg', 0);
 		$data['action']['conditions'] = get_request('conditions', array());
 		$data['action']['operations'] = get_request('operations', array());
+
+		sortOperations($data['action']['eventsource'], $data['action']['operations']);
 
 		if (!empty($data['actionid']) && isset($_REQUEST['form_refresh'])) {
 			$data['action']['def_shortdata'] = get_request('def_shortdata');

@@ -278,39 +278,39 @@ class testFormTrigger extends CWebTest {
 		$this->assertAttribute("//input[@id='url']/@maxlength", '255');
 		$this->assertAttribute("//input[@id='url']/@size", '50');
 
-		$this->assertVisible('severity_0');
-		$this->assertAttribute("//*[@id='severity_0']/@checked", 'checked');
-		$this->assertElementPresent("//*[@id='severity_label_0']/span[text()='Not classified']");
-		$this->assertVisible('severity_1');
-		$this->assertElementPresent("//*[@id='severity_label_1']/span[text()='Information']");
-		$this->assertVisible('severity_2');
-		$this->assertElementPresent("//*[@id='severity_label_2']/span[text()='Warning']");
-		$this->assertVisible('severity_3');
-		$this->assertElementPresent("//*[@id='severity_label_3']/span[text()='Average']");
-		$this->assertVisible('severity_4');
-		$this->assertElementPresent("//*[@id='severity_label_4']/span[text()='High']");
-		$this->assertVisible('severity_5');
-		$this->assertElementPresent("//*[@id='severity_label_5']/span[text()='Disaster']");
+		$this->assertVisible('priority_0');
+		$this->assertAttribute("//*[@id='priority_0']/@checked", 'checked');
+		$this->assertElementPresent("//*[@id='priority_label_0']/span[text()='Not classified']");
+		$this->assertVisible('priority_1');
+		$this->assertElementPresent("//*[@id='priority_label_1']/span[text()='Information']");
+		$this->assertVisible('priority_2');
+		$this->assertElementPresent("//*[@id='priority_label_2']/span[text()='Warning']");
+		$this->assertVisible('priority_3');
+		$this->assertElementPresent("//*[@id='priority_label_3']/span[text()='Average']");
+		$this->assertVisible('priority_4');
+		$this->assertElementPresent("//*[@id='priority_label_4']/span[text()='High']");
+		$this->assertVisible('priority_5');
+		$this->assertElementPresent("//*[@id='priority_label_5']/span[text()='Disaster']");
 
 		if (isset($data['severity'])) {
 			switch ($data['severity']) {
 				case 'Not classified':
-					$this->zbxTestClick('severity_0');
+					$this->zbxTestClick('priority_0');
 					break;
 				case 'Information':
-					$this->zbxTestClick('severity_1');
+					$this->zbxTestClick('priority_1');
 					break;
 				case 'Warning':
-					$this->zbxTestClick('severity_2');
+					$this->zbxTestClick('priority_2');
 					break;
 				case 'Average':
-					$this->zbxTestClick('severity_3');
+					$this->zbxTestClick('priority_3');
 					break;
 				case 'High':
-					$this->zbxTestClick('severity_4');
+					$this->zbxTestClick('priority_4');
 					break;
 				case 'Disaster':
-					$this->zbxTestClick('severity_5');
+					$this->zbxTestClick('priority_5');
 					break;
 			}
 		}
@@ -348,7 +348,7 @@ class testFormTrigger extends CWebTest {
 
 	// Returns update data
 	public static function update() {
-		return DBdata("select description from triggers where description LIKE 'testFormTrigger%'");
+		return DBdata("select description from triggers t left join functions f on f.triggerid=t.triggerid where f.itemid='30004' and t.description LIKE 'testFormTrigger%'");
 	}
 
 	/**
@@ -757,22 +757,22 @@ class testFormTrigger extends CWebTest {
 		if (isset($data['severity'])) {
 			switch ($data['severity']) {
 				case 'Not classified':
-					$this->zbxTestClick('severity_0');
+					$this->zbxTestClick('priority_0');
 					break;
 				case 'Information':
-					$this->zbxTestClick('severity_1');
+					$this->zbxTestClick('priority_1');
 					break;
 				case 'Warning':
-					$this->zbxTestClick('severity_2');
+					$this->zbxTestClick('priority_2');
 					break;
 				case 'Average':
-					$this->zbxTestClick('severity_3');
+					$this->zbxTestClick('priority_3');
 					break;
 				case 'High':
-					$this->zbxTestClick('severity_4');
+					$this->zbxTestClick('priority_4');
 					break;
 				case 'Disaster':
-					$this->zbxTestClick('severity_5');
+					$this->zbxTestClick('priority_5');
 					break;
 			}
 			$severity = $data['severity'];
@@ -870,22 +870,22 @@ class testFormTrigger extends CWebTest {
 
 				switch ($severity) {
 					case 'Not classified':
-						$this->assertElementPresent("//label[@id='severity_label_0']/@aria-pressed");
+						$this->assertElementPresent("//label[@id='priority_label_0']/@aria-pressed");
 						break;
 					case 'Information':
-						$this->assertElementPresent("//label[@id='severity_label_1']/@aria-pressed");
+						$this->assertElementPresent("//label[@id='priority_label_1']/@aria-pressed");
 						break;
 					case 'Warning':
-						$this->assertElementPresent("//label[@id='severity_label_2']/@aria-pressed");
+						$this->assertElementPresent("//label[@id='priority_label_2']/@aria-pressed");
 						break;
 					case 'Average':
-						$this->assertElementPresent("//label[@id='severity_label_3']/@aria-pressed");
+						$this->assertElementPresent("//label[@id='priority_label_3']/@aria-pressed");
 						break;
 					case 'High':
-						$this->assertElementPresent("//label[@id='severity_label_4']/@aria-pressed");
+						$this->assertElementPresent("//label[@id='priority_label_4']/@aria-pressed");
 						break;
 					case 'Disaster':
-						$this->assertElementPresent("//label[@id='severity_label_5']/@aria-pressed");
+						$this->assertElementPresent("//label[@id='priority_label_5']/@aria-pressed");
 						break;
 				}
 
