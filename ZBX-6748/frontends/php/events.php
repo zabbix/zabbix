@@ -348,6 +348,8 @@ $table = new CTableInfo(_('No events defined.'));
 
 // trigger events
 if ($source == EVENT_OBJECT_TRIGGER) {
+	$sourceName = 'trigger';
+
 	$firstEvent = API::Event()->get(array(
 		'output' => API_OUTPUT_EXTEND,
 		'objectids' => !empty($_REQUEST['triggerid']) ? $_REQUEST['triggerid'] : null,
@@ -360,6 +362,7 @@ if ($source == EVENT_OBJECT_TRIGGER) {
 
 // discovery events
 else {
+	$sourceName = 'discovery';
 	$firstEvent = API::Event()->get(array(
 		'output' => API_OUTPUT_EXTEND,
 		'source' => EVENT_SOURCE_DISCOVERY,
@@ -387,10 +390,10 @@ else {
 
 if (isset($_REQUEST['period'])) {
 	$_REQUEST['period'] = get_request('period', ZBX_PERIOD_DEFAULT);
-	CProfile::update('web.events.period', $_REQUEST['period'], PROFILE_TYPE_INT);
+	CProfile::update('web.events.'.$sourceName.'.period', $_REQUEST['period'], PROFILE_TYPE_INT);
 }
 else {
-	$_REQUEST['period'] = get_request('period', CProfile::get('web.events.period', ZBX_PERIOD_DEFAULT));
+	$_REQUEST['period'] = CProfile::get('web.events.period');
 }
 
 $effectiveperiod = navigation_bar_calc();
