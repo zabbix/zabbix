@@ -200,6 +200,8 @@ else {
 			whereDbNode('v.valuemapid')
 	);
 	while ($dbValueMap = DBfetch($dbValueMaps)) {
+		$dbValueMap['nodename'] = get_node_name_by_elid($dbValueMap['valuemapid'], true, NAME_DELIMITER);
+
 		$data['valuemaps'][$dbValueMap['valuemapid']] = $dbValueMap;
 		$data['valuemaps'][$dbValueMap['valuemapid']]['maps'] = array();
 	}

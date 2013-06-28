@@ -32,7 +32,10 @@ function addValueMap(array $valueMap, array $mappings) {
 	checkValueMapMappings($mappings);
 
 	// check duplicate name
-	$sql = 'SELECT v.valuemapid FROM valuemaps v WHERE v.name='.zbx_dbstr($valueMap['name']).' '.andDbNode('v.valuemapid');
+	$sql = 'SELECT v.valuemapid'.
+			' FROM valuemaps v'.
+			' WHERE v.name='.zbx_dbstr($valueMap['name']).
+			' '.andDbNode('v.valuemapid');
 	if (DBfetch(DBselect($sql))) {
 		throw new Exception(_s('Value map "%1$s" already exists.', $valueMap['name']));
 	}
