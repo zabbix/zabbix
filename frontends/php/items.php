@@ -26,17 +26,8 @@ require_once dirname(__FILE__).'/include/forms.inc.php';
 
 $page['title'] = _('Configuration of items');
 $page['file'] = 'items.php';
-$page['scripts'] = array('class.cviewswitcher.js');
-
-if (isset($_REQUEST['filter_set'])) {
-	$page['scripts'][] = 'multiselect.js';
-}
-
+$page['scripts'] = array('class.cviewswitcher.js', 'multiselect.js');
 $page['hist_arg'] = array();
-
-if ((isset($_REQUEST['go']) && $_REQUEST['go'] == 'massupdate') || isset($_REQUEST['massupdate'])) {
-	$page['scripts'][] = 'multiselect.js';
-}
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
@@ -237,8 +228,8 @@ if (!empty($hosts)) {
 
 // filter
 if (isset($_REQUEST['filter_set'])) {
-	$_REQUEST['filter_groupid'] = get_request('filter_groupid');
-	$_REQUEST['filter_hostid'] = get_request('filter_hostid');
+	$_REQUEST['filter_groupid'] = get_request('filter_groupid', 0);
+	$_REQUEST['filter_hostid'] = get_request('filter_hostid', 0);
 	$_REQUEST['filter_application'] = get_request('filter_application');
 	$_REQUEST['filter_name'] = get_request('filter_name');
 	$_REQUEST['filter_type'] = get_request('filter_type', -1);
@@ -302,7 +293,7 @@ else {
 	$_REQUEST['filter_ipmi_sensor'] = CProfile::get('web.items.filter_ipmi_sensor');
 }
 
-if (!isset($_REQUEST['form']) && isset($_REQUEST['filter_hostid']) && !zbx_empty($_REQUEST['filter_hostid'])) {
+if (!isset($_REQUEST['form']) && isset($_REQUEST['filter_hostid']) && !empty($_REQUEST['filter_hostid'])) {
 	if (!isset($host)) {
 		$host = API::Host()->getObjects(array('hostid' => $_REQUEST['filter_hostid']));
 		if (empty($host)) {
@@ -909,10 +900,10 @@ else {
 	);
 	$preFilter = count($options, COUNT_RECURSIVE);
 
-	if (isset($_REQUEST['filter_groupid']) && !zbx_empty($_REQUEST['filter_groupid'])) {
+	if (isset($_REQUEST['filter_groupid']) && !empty($_REQUEST['filter_groupid'])) {
 		$options['groupids'] = $_REQUEST['filter_groupid'];
 	}
-	if (isset($_REQUEST['filter_hostid']) && !zbx_empty($_REQUEST['filter_hostid'])) {
+	if (isset($_REQUEST['filter_hostid']) && !empty($_REQUEST['filter_hostid'])) {
 		$data['filter_hostid'] = $_REQUEST['filter_hostid'];
 	}
 	if (isset($_REQUEST['filter_application']) && !zbx_empty($_REQUEST['filter_application'])) {
@@ -960,6 +951,7 @@ else {
 		$options['filter']['status'] = $_REQUEST['filter_status'];
 	}
 	if (isset($_REQUEST['filter_state']) && !zbx_empty($_REQUEST['filter_state']) && $_REQUEST['filter_state'] != -1) {
+		$options['filter']['status'] = ITEM_STATUS_ACTIVE;
 		$options['filter']['state'] = $_REQUEST['filter_state'];
 	}
 	if (isset($_REQUEST['filter_templated_items']) && !zbx_empty($_REQUEST['filter_templated_items'])

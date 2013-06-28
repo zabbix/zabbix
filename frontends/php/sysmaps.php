@@ -165,10 +165,6 @@ if (isset($_REQUEST['save'])) {
 		show_messages($result, _('Network map updated'), _('Cannot update network map'));
 	}
 	else {
-		if (!count(get_accessible_nodes_by_user(CWebUser::$data, PERM_READ_WRITE, PERM_RES_IDS_ARRAY))) {
-			access_deny();
-		}
-
 		$result = API::Map()->create($map);
 
 		$auditAction = AUDIT_ACTION_ADD;

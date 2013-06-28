@@ -24,6 +24,8 @@
 
 extern char	*CONFIG_SOURCE_IP;
 extern char	*CONFIG_HOSTNAME;
+extern char	*CONFIG_HOST_METADATA;
+extern char	*CONFIG_HOST_METADATA_ITEM;
 extern int	CONFIG_REFRESH_ACTIVE_CHECKS;
 extern int	CONFIG_BUFFER_SEND;
 extern int	CONFIG_BUFFER_SIZE;
@@ -35,6 +37,8 @@ extern int	CONFIG_LISTEN_PORT;
 /* per second for checks `log' and `eventlog', used to parse key parameters */
 #define	MIN_VALUE_LINES	1
 #define	MAX_VALUE_LINES	1000
+
+#define HOST_METADATA_LEN	255	/* UTF-8 characters, not bytes */
 
 /* Windows event types for `eventlog' check */
 #ifdef _WINDOWS

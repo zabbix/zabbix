@@ -429,7 +429,10 @@ else {
 		$valuemapComboBox = new CComboBox('valuemapid', $this->data['valuemapid']);
 		$valuemapComboBox->addItem(0, _('As is'));
 		foreach ($this->data['valuemaps'] as $valuemap) {
-			$valuemapComboBox->addItem($valuemap['valuemapid'], get_node_name_by_elid($valuemap['valuemapid'], null, NAME_DELIMITER).$valuemap['name']);
+			$valuemapComboBox->addItem(
+				$valuemap['valuemapid'],
+				get_node_name_by_elid($valuemap['valuemapid'], null, NAME_DELIMITER).CHtml::encode($valuemap['name'])
+			);
 		}
 	}
 	$link = new CLink(_('show value mappings'), 'adm.valuemapping.php');
@@ -446,7 +449,7 @@ else {
 	$applicationComboBox = new CListBox('applications[]', $this->data['applications'], 6);
 	$applicationComboBox->addItem(0, '-'._('None').'-');
 	foreach ($this->data['db_applications'] as $application) {
-		$applicationComboBox->addItem($application['applicationid'], $application['name']);
+		$applicationComboBox->addItem($application['applicationid'], CHtml::encode($application['name']));
 	}
 	$itemFormList->addRow(_('Applications'), $applicationComboBox);
 
@@ -504,18 +507,18 @@ if (!empty($this->data['itemid'])) {
 	if (!$this->data['limited']) {
 		if ($this->data['is_discovery_rule']) {
 			array_push($buttons, new CButtonDelete(_('Delete discovery rule?'),
-				url_params(array('form', 'groupid', 'itemid', 'parent_discoveryid')))
+				url_params(array('form', 'groupid', 'itemid', 'parent_discoveryid', 'hostid')))
 			);
 		}
 		else {
 			array_push($buttons, new CButtonDelete(_('Delete item?'),
-				url_params(array('form', 'groupid', 'itemid', 'parent_discoveryid')))
+				url_params(array('form', 'groupid', 'itemid', 'parent_discoveryid', 'hostid')))
 			);
 		}
 	}
 }
 array_push($buttons, new CButtonCancel(url_param('groupid').url_param('parent_discoveryid').url_param('hostid')));
-$itemForm->addItem(makeFormFooter(array(new CSubmit('save', _('Save'))), $buttons));
+$itemForm->addItem(makeFormFooter(new CSubmit('save', _('Save')), $buttons));
 $itemWidget->addItem($itemForm);
 
 /*

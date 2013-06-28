@@ -99,8 +99,8 @@ $triggersForm->addItem($triggersTab);
 
 // append buttons to form
 $triggersForm->addItem(makeFormFooter(
-	array(new CSubmit('copy', _('Copy'))),
-	array(new CButtonCancel(url_param('groupid').url_param('hostid').url_param('config')))
+	new CSubmit('copy', _('Copy')),
+	new CButtonCancel(url_param('groupid').url_param('hostid').url_param('config'))
 ));
 
 $triggersWidget->addItem($triggersForm);

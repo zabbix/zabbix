@@ -464,6 +464,10 @@ class testFormGraph extends CWebTest {
 			$this->zbxTestLaunchPopup('add_item');
 
 			if (isset($data['host'])) {
+				sleep(1);
+				$this->zbxTestDropdownSelectWait('groupid', 'Zabbix servers');
+				$this->zbxTestDropdownSelectWait('hostid', $this->host);
+
 				$this->assertElementPresent("//a[text()='".$this->itemSimple."']");
 				$this->zbxTestClick('link='.$this->itemSimple);
 			}
@@ -880,6 +884,10 @@ class testFormGraph extends CWebTest {
 			foreach($data['addItems'] as $item) {
 				$this->zbxTestLaunchPopup('add_item');
 				$link = $item['itemName'];
+
+				$this->zbxTestDropdownSelectWait('groupid', 'Zabbix servers');
+				$this->zbxTestDropdownSelectWait('hostid', $this->host);
+
 				$this->assertElementPresent("//a[text()='".$link."']");
 				$this->zbxTestClick("link=$link");
 				sleep(1);
@@ -943,8 +951,10 @@ class testFormGraph extends CWebTest {
 
 		if (isset($data['ymin_name'])) {
 			$this->zbxTestLaunchPopup('yaxis_min' , 'zbx_popup_item');
+
 			$this->zbxTestDropdownSelectWait('groupid', 'Zabbix servers');
 			$this->zbxTestDropdownSelectWait('hostid', $this->host);
+
 			$this->assertElementPresent("//a[text()='".$this->itemSimple."']");
 			$this->zbxTestClick('link='.$this->itemSimple);
 			sleep(1);
@@ -956,8 +966,10 @@ class testFormGraph extends CWebTest {
 
 		if (isset($data['ymax_name'])) {
 			$this->zbxTestLaunchPopup('yaxis_max', 'zbx_popup_item');
+
 			$this->zbxTestDropdownSelectWait('groupid', 'Zabbix servers');
 			$this->zbxTestDropdownSelectWait('hostid', $this->host);
+
 			$this->assertElementPresent("//a[text()='".$this->itemSimple."']");
 			$this->zbxTestClick('link='.$this->itemSimple);
 			sleep(1);

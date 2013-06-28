@@ -679,8 +679,8 @@ function DBid2nodeid($id_name) {
 	return $result;
 }
 
-function id2nodeid($id_var) {
-	return (int)bcdiv("$id_var", '100000000000000');
+function id2nodeid($id) {
+	return (int) bcdiv("$id", '100000000000000');
 }
 
 /**
@@ -744,50 +744,47 @@ function dbNode($fieldName, $nodes = null, $operator = '') {
 
 /**
  * Wrapper function to generate condition like " WHERE h.hostid BETWEEN 500000000000000 AND 599999999999999"
- * For a standalone setup the function will return an empty string
+ * For a standalone setup the function will return an empty string.
  *
  * @param string $fieldName
- * @param mixed nodes
+ * @param mixed  nodes
  *
  * @return string
  */
-function whereDbNode($fieldName, $nodes = null)
-{
+function whereDbNode($fieldName, $nodes = null) {
 	return dbNode($fieldName, $nodes, 'WHERE');
 }
 
 /**
  * Wrapper function to generate condition like " AND h.hostid BETWEEN 500000000000000 AND 599999999999999"
- * For a standalone setup the function will return an empty string
+ * For a standalone setup the function will return an empty string.
  *
  * @param string $fieldName
  * @param mixed nodes
  *
  * @return string
  */
-function andDbNode($fieldName, $nodes = null)
-{
+function andDbNode($fieldName, $nodes = null) {
 	return dbNode($fieldName, $nodes, 'AND');
 }
 
 /**
- * Wrapper function to add condition like "h.hostid BETWEEN 500000000000000 AND 599999999999999"
- *   to an array $sqlPartWhere
- * For a standalone setup the function will make nothing and will return $sqlPartWhere array without any changes
+ * Wrapper function to add condition like "h.hostid BETWEEN 500000000000000 AND 599999999999999" to an array $sqlPartWhere.
+ * For a standalone setup the function will make nothing and will return $sqlPartWhere array without any changes.
  *
- * @param array $sqlPartWhere
+ * @param array  $sqlPartWhere
  * @param string $fieldName
- * @param mixed nodes
+ * @param mixed  nodes
  *
  * @return array
  */
-function sqlPartDbNode($sqlPartWhere, $fieldName, $nodes = null)
-{
+function sqlPartDbNode($sqlPartWhere, $fieldName, $nodes = null) {
 	$sql = dbNode($fieldName, $nodes);
 
 	if ($sql != '') {
 		$sqlPartWhere[] = $sql;
 	}
+
 	return $sqlPartWhere;
 }
 
@@ -1025,7 +1022,9 @@ function dbConditionInt($fieldName, array $values, $notIn = false) {
 				$betweens[] = array(bcsub($valueL, $len, 0), bcsub($valueL, 1, 0));
 			}
 			else {
-				$ins = array_merge($ins, array_slice($values, $pos - $len, $len));
+				foreach (array_slice($values, $pos - $len, $len) as $val) {
+					array_push($ins, $val);
+				}
 			}
 
 			$len = 1;
@@ -1041,7 +1040,9 @@ function dbConditionInt($fieldName, array $values, $notIn = false) {
 		$betweens[] = array(bcadd(bcsub($valueL, $len, 0), 1, 0), $valueL);
 	}
 	else {
-		$ins = array_merge($ins, array_slice($values, $pos - $len, $len));
+		foreach (array_slice($values, $pos - $len, $len) as $val) {
+			array_push($ins, $val);
+		}
 	}
 
 	$operand = $notIn ? 'AND' : 'OR';
