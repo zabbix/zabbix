@@ -171,9 +171,9 @@ abstract class CHostGeneral extends CZBXAPI {
 
 			$dbItems = DBselect(
 				'SELECT i.key_,i.flags'.
-				' FROM items i,i.flags'.
+				' FROM items i'.
 				' WHERE '.dbConditionInt('i.hostid', $templateIdsAll).
-				' GROUP BY i.key_'.
+				' GROUP BY i.key_,i.flags'.
 				' HAVING COUNT(i.itemid)>1'
 			);
 
