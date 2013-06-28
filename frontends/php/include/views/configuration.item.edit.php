@@ -308,7 +308,7 @@ $itemFormList->addRow(_('Flexible intervals'),
 $newFlexInt = new CSpan(array(
 	_('Interval (in sec)'),
 	SPACE,
-	new CNumericBox('new_delay_flex[delay]', $this->data['new_delay_flex']['delay'], 5),
+	new CNumericBox('new_delay_flex[delay]', $this->data['new_delay_flex']['delay'], 5, 'no', false, false),
 	SPACE,
 	_('Period'),
 	SPACE,
