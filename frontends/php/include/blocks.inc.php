@@ -289,6 +289,9 @@ function make_system_status($filter) {
 
 		// groups
 		foreach ($trigger['groups'] as $group) {
+			if (!isset($groups[$group['groupid']])) {
+				continue;
+			}
 			if (in_array($filter['extAck'], array(EXTACK_OPTION_ALL, EXTACK_OPTION_BOTH))) {
 				$groups[$group['groupid']]['tab_priority'][$trigger['priority']]['count']++;
 
