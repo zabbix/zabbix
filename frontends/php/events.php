@@ -363,6 +363,7 @@ if ($source == EVENT_OBJECT_TRIGGER) {
 // discovery events
 else {
 	$sourceName = 'discovery';
+
 	$firstEvent = API::Event()->get(array(
 		'output' => API_OUTPUT_EXTEND,
 		'source' => EVENT_SOURCE_DISCOVERY,
@@ -393,7 +394,7 @@ if (isset($_REQUEST['period'])) {
 	CProfile::update('web.events.'.$sourceName.'.period', $_REQUEST['period'], PROFILE_TYPE_INT);
 }
 else {
-	$_REQUEST['period'] = CProfile::get('web.events.period');
+	$_REQUEST['period'] = CProfile::get('web.events.'.$sourceName.'.period');
 }
 
 $effectiveperiod = navigation_bar_calc();
