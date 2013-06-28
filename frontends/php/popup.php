@@ -207,6 +207,7 @@ $fields = array(
 	'with_items' =>			array(T_ZBX_INT, O_OPT, null,	IN('0,1'),	null),
 	'with_simple_graph_items' => array(T_ZBX_INT, O_OPT, null, IN('0,1'), null),
 	'with_triggers' =>		array(T_ZBX_INT, O_OPT, null,	IN('0,1'),	null),
+	'with_monitored_triggers' => array(T_ZBX_INT, O_OPT, null, IN('0,1'), null),
 	'itemtype' =>			array(T_ZBX_INT, O_OPT, null,	null,		null),
 	'value_types' =>		array(T_ZBX_INT, O_OPT, null,	BETWEEN(0, 15), null),
 	'numeric' =>			array(T_ZBX_INT, O_OPT, null,	IN('0,1'),	null),
@@ -258,6 +259,7 @@ $monitored_hosts = get_request('monitored_hosts', 0);
 $templated_hosts = get_request('templated_hosts', 0);
 $with_simple_graph_items = get_request('with_simple_graph_items', 0);
 $with_triggers = get_request('with_triggers', 0);
+$with_monitored_triggers = get_request('with_monitored_triggers', 0);
 $submitParent = get_request('submitParent', 0);
 $normal_only = get_request('normal_only');
 $nodeid = get_request('nodeid', get_current_nodeid(false));
@@ -364,6 +366,10 @@ elseif ($with_triggers) {
 	$options['groups']['with_triggers'] = true;
 	$options['hosts']['with_triggers'] = true;
 }
+elseif ($with_monitored_triggers) {
+	$options['groups']['with_monitored_triggers'] = true;
+	$options['hosts']['with_monitored_triggers'] = true;
+}
 $pageFilter = new CPageFilter($options);
 
 // get groupid
@@ -418,6 +424,9 @@ if ($with_simple_graph_items) {
 }
 if ($with_triggers) {
 	$frmTitle->addVar('with_triggers', 1);
+}
+if ($with_monitored_triggers) {
+	$frmTitle->addVar('with_monitored_triggers', 1);
 }
 if ($value_types) {
 	$frmTitle->addVar('value_types', $value_types);
@@ -994,6 +1003,9 @@ elseif ($srctbl == 'triggers') {
 	}
 	if (!is_null($templated)) {
 		$options['templated'] = $templated;
+	}
+	if ($with_monitored_triggers) {
+		$options['monitored'] = true;
 	}
 	$triggers = API::Trigger()->get($options);
 	order_result($triggers, 'description');
