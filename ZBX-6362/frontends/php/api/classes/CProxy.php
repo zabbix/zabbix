@@ -20,6 +20,8 @@
 
 
 /**
+ * Class containing methods for operations with proxies.
+ *
  * @package API
  */
 class CProxy extends CZBXAPI {
@@ -316,8 +318,8 @@ class CProxy extends CZBXAPI {
 			// if this is an active proxy - delete it's interface;
 			if (isset($proxy['status']) && $proxy['status'] == HOST_STATUS_PROXY_ACTIVE) {
 				$interfaces = API::HostInterface()->get(array(
-					'output' => API_OUTPUT_REFER,
-					'hostids' => $proxy['hostid']
+					'hostids' => $proxy['hostid'],
+					'output' => array('interfaceid')
 				));
 				$interfaceIds = zbx_objectValues($interfaces, 'interfaceid');
 
@@ -325,6 +327,7 @@ class CProxy extends CZBXAPI {
 					API::HostInterface()->delete($interfaceIds);
 				}
 			}
+
 			// update the interface of a passive proxy
 			elseif (isset($proxy['interface']) && is_array($proxy['interface'])) {
 				$proxy['interface']['hostid'] = $proxy['hostid'];
@@ -373,7 +376,8 @@ class CProxy extends CZBXAPI {
 		$dbProxies = DBselect(
 			'SELECT h.hostid,h.host'.
 			' FROM hosts h'.
-			' WHERE '.dbConditionInt('h.hostid', $proxyIds));
+			' WHERE '.dbConditionInt('h.hostid', $proxyIds)
+		);
 		$dbProxies = DBfetchArrayAssoc($dbProxies, 'hostid');
 
 		$actionIds = array();
@@ -504,7 +508,9 @@ class CProxy extends CZBXAPI {
 		$dRule = DBfetch(DBselect(
 			'SELECT dr.druleid,dr.name,dr.proxy_hostid'.
 			' FROM drules dr'.
-			' WHERE '.dbConditionInt('dr.proxy_hostid', $proxyIds), 1));
+			' WHERE '.dbConditionInt('dr.proxy_hostid', $proxyIds),
+			1
+		));
 		if ($dRule) {
 			$proxy = DBfetch(DBselect('SELECT h.host FROM hosts h WHERE h.hostid='.$dRule['proxy_hostid']));
 
@@ -522,7 +528,9 @@ class CProxy extends CZBXAPI {
 		$host = DBfetch(DBselect(
 			'SELECT h.name,h.proxy_hostid'.
 			' FROM hosts h'.
-			' WHERE '.dbConditionInt('h.proxy_hostid', $proxyIds), 1));
+			' WHERE '.dbConditionInt('h.proxy_hostid', $proxyIds),
+			1
+		));
 		if ($host) {
 			$proxy = DBfetch(DBselect('SELECT h.host FROM hosts h WHERE h.hostid='.$host['proxy_hostid']));
 
@@ -574,11 +582,11 @@ class CProxy extends CZBXAPI {
 
 			$relationMap = $this->createRelationMap($interfaces, 'hostid', 'interfaceid');
 			$interfaces = $this->unsetExtraFields($interfaces, array('hostid', 'interfaceid'), $options['selectInterface']);
-			$result = $relationMap->mapMany($result, $interfaces, 'interface');
+			$result = $relationMap->mapOne($result, $interfaces, 'interface');
 
 			foreach ($result as $key => $proxy) {
 				if (!empty($proxy['interface'])) {
-					$result[$key]['interface'] = reset($proxy['interface']);
+					$result[$key]['interface'] = $proxy['interface'];
 				}
 			}
 		}

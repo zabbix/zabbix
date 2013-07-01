@@ -20,6 +20,8 @@
 
 
 /**
+ * Class containing methods for operations with users.
+ *
  * @package API
  */
 class CUser extends CZBXAPI {

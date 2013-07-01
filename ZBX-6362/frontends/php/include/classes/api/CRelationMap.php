@@ -73,14 +73,10 @@ class CRelationMap {
 		foreach ($baseObjects as $baseObjectId => &$baseObject) {
 			$baseObject[$name] = array();
 
-			// add the related objects if there are any
 			if (isset($this->map[$baseObjectId]) && $this->map[$baseObjectId]) {
-				// fetch the related objects for the current base objects
-				$matchingRelatedObjects = array_intersect_key($relatedObjects, $this->map[$baseObjectId]);
-				$matchingRelatedObjects = array_values($matchingRelatedObjects);
+				$matchingRelatedObjects = array_values(array_intersect_key($relatedObjects, $this->map[$baseObjectId]));
 
 				if ($matchingRelatedObjects) {
-					// limit the number of results
 					if ($limit) {
 						$matchingRelatedObjects = array_slice($matchingRelatedObjects, 0, $limit);
 					}
@@ -108,7 +104,6 @@ class CRelationMap {
 		foreach ($baseObjects as $baseObjectId => &$baseObject) {
 			$matchingRelatedObject = array();
 
-			// add the related objects if there are any
 			if (isset($this->map[$baseObjectId])) {
 				$matchingRelatedId = reset($this->map[$baseObjectId]);
 

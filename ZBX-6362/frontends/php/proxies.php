@@ -33,7 +33,7 @@ $fields = array(
 	'proxyid' =>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		'isset({form})&&{form}=="update"'),
 	'host' =>			array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({save})', _('Proxy name')),
 	'status' =>			array(T_ZBX_INT, O_OPT, null,	BETWEEN(HOST_STATUS_PROXY_ACTIVE,HOST_STATUS_PROXY_PASSIVE), 'isset({save})'),
-	'interface' =>		array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({save})&&{status}=='.HOST_STATUS_PROXY_PASSIVE),
+	'interface' =>		array(T_ZBX_STR, O_OPT, null,	null,		'isset({save})&&{status}=='.HOST_STATUS_PROXY_PASSIVE),
 	'hosts' =>			array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
 	// actions
 	'go' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
@@ -140,14 +140,13 @@ elseif (str_in_array($_REQUEST['go'], array('activate', 'disable')) && isset($_R
 
 	DBstart();
 
-	foreach ($hosts as $hostid) {
+	foreach ($hosts as $hostId) {
 		$dbHosts = DBselect(
 			'SELECT h.hostid,h.status'.
 			' FROM hosts h'.
-			' WHERE h.proxy_hostid='.$hostid.
+			' WHERE h.proxy_hostid='.$hostId.
 				andDbNode('h.hostid')
 		);
-
 		while ($dbHost = DBfetch($dbHosts)) {
 			$oldStatus = $dbHost['status'];
 			if ($oldStatus == $status) {

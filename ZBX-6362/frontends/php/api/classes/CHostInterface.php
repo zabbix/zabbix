@@ -20,7 +20,9 @@
 
 
 /**
- * Class containing methods for operations with host iterfaces.
+ * Class containing methods for operations with host interfaces.
+ *
+ * @package API
  */
 class CHostInterface extends CZBXAPI {
 

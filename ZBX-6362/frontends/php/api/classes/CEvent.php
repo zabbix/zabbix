@@ -20,7 +20,7 @@
 
 
 /**
- * File containing CEvent class for API.
+ * Class containing methods for operations with events.
  *
  * @package API
  */
