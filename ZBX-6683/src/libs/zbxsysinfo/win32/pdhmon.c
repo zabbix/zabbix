@@ -79,7 +79,7 @@ int	USER_PERF_COUNTER(AGENT_REQUEST *request, AGENT_RESULT *result)
 int	PERF_COUNTER(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	const char		*__function_name = "PERF_COUNTER";
-	char			*counterpath, *tmp;
+	char			counterpath[PDH_MAX_COUNTER_PATH], *tmp;
 	int			interval, ret = SYSINFO_RET_FAIL;
 	double			value;
 	PERF_COUNTER_DATA	*perfs = NULL;
@@ -89,10 +89,12 @@ int	PERF_COUNTER(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if (2 < request->nparam)
 		goto clean;
 
-	counterpath = get_rparam(request, 0);
+	tmp = get_rparam(request, 0);
 
-	if (NULL == counterpath || '\0' == *counterpath)
+	if (NULL == tmp || '\0' == *tmp)
 		goto clean;
+
+	strscpy(counterpath, tmp);
 
 	tmp = get_rparam(request, 1);
 

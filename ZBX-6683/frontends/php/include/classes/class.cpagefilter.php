@@ -122,10 +122,8 @@ class CPageFilter {
 
 	/**
 	 * Contains information about the selected values.
-	 *
 	 * The '*Selected' value is set to true if a specific object is chosen or the corresponding filter is set to 'All'
 	 * and contains objects.
-	 *
 	 * The '*All' value is set to true if the corresponding filter is set to 'All' and contains objects.
 	 *
 	 * @var array
@@ -214,6 +212,7 @@ class CPageFilter {
 	 * @param bool   $options['config']['individual']
 	 * @param bool   $options['config']['allow_all']
 	 * @param bool   $options['config']['deny_all']
+	 * @param array  $options['config']['DDFirstLabels']
 	 * @param array  $options['hosts']
 	 * @param string $options['hostid']
 	 * @param array  $options['groups']
@@ -306,15 +305,12 @@ class CPageFilter {
 
 	/**
 	 * Retrieve objects stored in the user profile.
-	 *
 	 * If the 'select_latest' option is used, the IDs will be loaded from the web.latest.objectid profile values,
 	 * otherwise - from the web.*.objectid field, depending on the use of the 'individial' option.
-	 *
 	 * If the 'DDReset' option is used, IDs will be reset to zeroes.
-	 *
 	 * The method also sets the scope for remembering the selected values, see the 'individual' option for more info.
 	 *
-	 * @param $options
+	 * @param array $options
 	 */
 	private function _getProfiles(array $options) {
 		global $page;
@@ -413,13 +409,12 @@ class CPageFilter {
 
 	/**
 	 * Load available host groups, choose the selected host group and remember the selection.
-	 *
 	 * If the host given in the 'hostid' option does not belong to the selected host group, the selected host group
 	 * will be reset to 0.
 	 *
-	 * @param $groupid
-	 * @param $options
-	 * @param $hostid
+	 * @param int   $groupid
+	 * @param array $options
+	 * @param int   $hostid
 	 */
 	private function _initGroups($groupid, array $options, $hostid) {
 		$def_options = array(
@@ -474,67 +469,75 @@ class CPageFilter {
 
 	/**
 	 * Load available hosts, choose the selected host and remember the selection.
-	 *
 	 * If no host group is selected, reset the selected host to 0.
 	 *
-	 * @param $hostid
-	 * @param $options
+	 * @param int    $hostId
+	 * @param array  $options
+	 * @param string $options['DDFirstLabel']
 	 */
-	private function _initHosts($hostid, array $options) {
+	private function _initHosts($hostId, array $options) {
 		$this->data['hosts'] = array();
 
+		if (isset($options['DDFirstLabel'])) {
+			$this->config['DDFirstLabels']['hosts'] = $options['DDFirstLabel'];
+
+			unset($options['DDFirstLabel']);
+		}
+
 		if (!$this->groupsSelected) {
-			$hostid = 0;
+			$hostId = 0;
 		}
 		else {
-			$def_options = array(
+			$defaultOptions = array(
 				'nodeids' => $this->config['all_nodes'] ? get_current_nodeid() : null,
 				'output' => array('hostid', 'name'),
 				'groupids' => ($this->groupid > 0) ? $this->groupid : null
 			);
-			$options = zbx_array_merge($def_options, $options);
-			$hosts = API::Host()->get($options);
-			order_result($hosts, 'name');
+			$hosts = API::Host()->get(zbx_array_merge($defaultOptions, $options));
 
-			foreach ($hosts as $host) {
-				$this->data['hosts'][$host['hostid']] = $host['name'];
+			if ($hosts) {
+				order_result($hosts, 'name');
+
+				foreach ($hosts as $host) {
+					$this->data['hosts'][$host['hostid']] = $host['name'];
+				}
 			}
 
 			// select remebered selection
-			if (is_null($hostid) && $this->_profileIds['hostid']) {
-				$hostid = $this->_profileIds['hostid'];
+			if (is_null($hostId) && $this->_profileIds['hostid']) {
+				$hostId = $this->_profileIds['hostid'];
 			}
 
 			// nonexisting or unset $hostid
-			if ((!isset($this->data['hosts'][$hostid]) && $hostid > 0) || is_null($hostid)) {
+			if ((!isset($this->data['hosts'][$hostId]) && $hostId > 0) || is_null($hostId)) {
 				// for popup select first host in the list
 				if ($this->config['popupDD'] && !empty($this->data['hosts'])) {
 					reset($this->data['hosts']);
-					$hostid = key($this->data['hosts']);
+					$hostId = key($this->data['hosts']);
 				}
 				// otherwise hostid = 0 for 'Dropdown first entry' option ALL or NONE
 				else {
-					$hostid = 0;
+					$hostId = 0;
 				}
 			}
 		}
 
 		if (!is_null($this->_requestIds['hostid'])) {
-			CProfile::update($this->_profileIdx['hosts'], $hostid, PROFILE_TYPE_ID);
-			CProfile::update(self::HOST_LATEST_IDX, $hostid, PROFILE_TYPE_ID);
+			CProfile::update($this->_profileIdx['hosts'], $hostId, PROFILE_TYPE_ID);
+			CProfile::update(self::HOST_LATEST_IDX, $hostId, PROFILE_TYPE_ID);
 		}
-		$this->isSelected['hostsSelected'] = ($this->config['DDFirst'] == ZBX_DROPDOWN_FIRST_ALL && !empty($this->data['hosts'])) || $hostid > 0;
-		$this->isSelected['hostsAll'] = $this->config['DDFirst'] == ZBX_DROPDOWN_FIRST_ALL && !empty($this->data['hosts']) && $hostid == 0;
-		$this->ids['hostid'] = $hostid;
+
+		$this->isSelected['hostsSelected'] = (($this->config['DDFirst'] == ZBX_DROPDOWN_FIRST_ALL && !empty($this->data['hosts'])) || $hostId > 0);
+		$this->isSelected['hostsAll'] = ($this->config['DDFirst'] == ZBX_DROPDOWN_FIRST_ALL && !empty($this->data['hosts']) && $hostId == 0);
+		$this->ids['hostid'] = $hostId;
 	}
 
 	/**
 	 * Load available graphs, choose the selected graph and remember the selection.
-	 *
 	 * If no host is selected, reset the selected graph to 0.
 	 *
-	 * @param $graphid
-	 * @param $options
+	 * @param int   $graphid
+	 * @param array $options
 	 */
 	private function _initGraphs($graphid, array $options) {
 		$this->data['graphs'] = array();
@@ -595,11 +598,10 @@ class CPageFilter {
 
 	/**
 	 * Load available triggers, choose the selected trigger and remember the selection.
-	 *
 	 * If no host is elected, or the host selection is set to 'All', reset the selected trigger to 0.
 	 *
-	 * @param $triggerid
-	 * @param $options
+	 * @param int   $triggerid
+	 * @param array $options
 	 */
 	private function _initTriggers($triggerid, array $options) {
 		$this->data['triggers'] = array();
@@ -635,8 +637,8 @@ class CPageFilter {
 	/**
 	 * Load the available network discovery rules, choose the selected rule and remember the selection.
 	 *
-	 * @param $druleid
-	 * @param $options
+	 * @param int   $druleid
+	 * @param array $options
 	 */
 	private function _initDiscoveries($druleid, array $options) {
 		$def_options = array(
@@ -681,8 +683,8 @@ class CPageFilter {
 	 *  - applicationsSelected: if an application selected, i.e. not 'not selected'
 	 * Applications are dependent on groups.
 	 *
-	 * @param $application
-	 * @param $options
+	 * @param int   $application
+	 * @param array $options
 	 */
 	private function _initApplications($application, array $options) {
 		$this->data['applications'] = array();
@@ -761,7 +763,7 @@ class CPageFilter {
 	 * @return CComboBox
 	 */
 	public function getHostsCB($withNode = false) {
-		return $this->_getCB('hostid', $this->hostid, $this->hosts, $withNode);
+		return $this->_getCB('hostid', $this->hostid, $this->hosts, $withNode, array('objectName' => 'hosts'));
 	}
 
 	/**
@@ -772,7 +774,7 @@ class CPageFilter {
 	 * @return CComboBox
 	 */
 	public function getGroupsCB($withNode = false) {
-		return $this->_getCB('groupid', $this->groupid, $this->groups, $withNode);
+		return $this->_getCB('groupid', $this->groupid, $this->groups, $withNode, array('objectName' => 'groups'));
 	}
 
 	/**
@@ -809,7 +811,7 @@ class CPageFilter {
 	 * @return CComboBox
 	 */
 	public function getDiscoveryCB($withNode = false) {
-		return $this->_getCB('druleid', $this->druleid, $this->drules, $withNode);
+		return $this->_getCB('druleid', $this->druleid, $this->drules, $withNode, array('objectName' => 'discovery'));
 	}
 
 	/**
@@ -820,7 +822,9 @@ class CPageFilter {
 	 * @return CComboBox
 	 */
 	public function getApplicationsCB($withNode = false) {
-		return $this->_getCB('application', $this->application, $this->applications, $withNode, '');
+		return $this->_getCB('application', $this->application, $this->applications, $withNode, array(
+			'objectName' => 'applications'
+		));
 	}
 
 	/**
@@ -841,10 +845,12 @@ class CPageFilter {
 	 * @param array  $items
 	 * @param bool   $withNode
 	 * @param int    $allValue
+	 * @param array  $options
+	 * @param string $options['objectName']
 	 *
 	 * @return CComboBox
 	 */
-	private function _getCB($name, $selectedId, $items, $withNode, $allValue = 0) {
+	private function _getCB($name, $selectedId, $items, $withNode, array $options = array()) {
 		$comboBox = new CComboBox($name, $selectedId, 'javascript: submit();');
 
 		if ($withNode) {
@@ -855,10 +861,16 @@ class CPageFilter {
 
 		natcasesort($items);
 
+		// add drop down first item
 		if (!$this->config['popupDD']) {
-			$items = array(
-				$allValue => ($this->config['DDFirst'] == ZBX_DROPDOWN_FIRST_NONE) ? _('not selected') : _('all')
-			) + $items;
+			if (isset($this->config['DDFirstLabels'][$options['objectName']])) {
+				$firstLabel = $this->config['DDFirstLabels'][$options['objectName']];
+			}
+			else {
+				$firstLabel = ($this->config['DDFirst'] == ZBX_DROPDOWN_FIRST_NONE) ? _('not selected') : _('all');
+			}
+
+			$items = array($firstLabel) + $items;
 		}
 
 		foreach ($items as $id => $name) {

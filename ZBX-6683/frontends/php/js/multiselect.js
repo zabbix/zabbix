@@ -697,7 +697,11 @@ jQuery(function($) {
 	}
 
 	function cleanSearchInput(obj) {
-		$('input[type="text"]', obj).val('');
+		var input = $('input[type="text"]', obj);
+
+		if (!(IE && input.val() == input.attr('placeholder'))) {
+			input.val('');
+		}
 	}
 
 	function resizeSelected(obj, values, options) {
@@ -802,7 +806,9 @@ jQuery(function($) {
 	}
 
 	function setPlaceholder(obj, options) {
-		$('input[type="text"]', obj).prop('placeholder', options.labels['type here to search']);
+		$('input[type="text"]', obj).attr('placeholder', options.labels['type here to search']);
+
+		createPlaceholders();
 	}
 
 	function removePlaceholder(obj) {

@@ -38,7 +38,7 @@ class CItemPrototype extends CItemGeneral {
 	}
 
 	/**
-	 * Get Itemprototype data
+	 * Get Itemprototype data.
 	 */
 	public function get($options = array()) {
 		$result = array();
@@ -213,7 +213,6 @@ class CItemPrototype extends CItemGeneral {
 			}
 		}
 
-
 // search
 		if (is_array($options['search'])) {
 			zbx_db_search('items i', $options, $sqlParts);
@@ -350,12 +349,13 @@ class CItemPrototype extends CItemGeneral {
 		parent::checkInput($items, $update);
 	}
 
-/**
- * Add Itemprototype
- *
- * @param array $items
- * @return array|boolean
- */
+	/**
+	 * Create item prototype.
+	 *
+	 * @param array $items
+	 *
+	 * @return array
+	 */
 	public function create($items) {
 		$items = zbx_toArray($items);
 		$this->checkInput($items);
@@ -458,12 +458,12 @@ class CItemPrototype extends CItemGeneral {
 		}
 	}
 
-/**
- * Update Itemprototype
- *
- * @param array $items
- * @return boolean
- */
+	/**
+	 * Update Itemprototype.
+	 *
+	 * @param array $items
+	 * @return boolean
+	 */
 	public function update($items) {
 		$items = zbx_toArray($items);
 		$this->checkInput($items, true);

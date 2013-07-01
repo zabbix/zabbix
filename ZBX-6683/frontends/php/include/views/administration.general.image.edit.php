@@ -51,10 +51,10 @@ $imageTab->addTab('imageTab', _('Image'), $imageFormList);
 // append buttons
 $imageForm->addItem($imageTab);
 if (!empty($this->data['imageid'])) {
-	$imageForm->addItem(makeFormFooter(array(new CSubmit('save', _('Save'))), array(new CButtonDelete(_('Delete selected image?'), url_param('form').url_param('imageid')), new CButtonCancel())));
+	$imageForm->addItem(makeFormFooter(new CSubmit('save', _('Save')), array(new CButtonDelete(_('Delete selected image?'), url_param('form').url_param('imageid')), new CButtonCancel())));
 }
 else {
-	$imageForm->addItem(makeFormFooter(array(new CSubmit('save', _('Save'))), new CButtonCancel()));
+	$imageForm->addItem(makeFormFooter(new CSubmit('save', _('Save')), new CButtonCancel()));
 }
 
 return $imageForm;
