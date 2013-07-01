@@ -304,7 +304,7 @@ class testInheritanceTrigger extends CWebTest {
 					'status' => false
 				)
 			),
-array(
+			array(
 				array(
 					'expected' => TRIGGER_GOOD,
 					'description' => 'MyTrigger_priority3',
