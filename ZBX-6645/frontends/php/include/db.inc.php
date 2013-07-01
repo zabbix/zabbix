@@ -26,7 +26,7 @@
  * @param bool $debug turns On or Off trace calls when making connections. Suggested debug mode Off during Zabbix setup
  * @return bool
  */
-function DBconnect(&$error, $debug = true) {
+function DBconnect(&$error) {
 	global $DB;
 
 	if (isset($DB['DB'])) {
@@ -49,20 +49,11 @@ function DBconnect(&$error, $debug = true) {
 	else {
 		$DB['TYPE'] = zbx_strtoupper($DB['TYPE']);
 
-		if (!$debug) {
-			$errorReportingLevel = error_reporting();
-		}
-
 		switch ($DB['TYPE']) {
 			case ZBX_DB_MYSQL:
 				$mysql_server = $DB['SERVER'].(!empty($DB['PORT']) ? ':'.$DB['PORT'] : '');
 
-				// avoids using @ before functions
-				if (!$debug && $errorReportingLevel > 0) {
-					error_reporting(0);
-				}
-
-				if (!$DB['DB'] = mysql_connect($mysql_server, $DB['USER'], $DB['PASSWORD'])) {
+				if (!$DB['DB'] = @mysql_connect($mysql_server, $DB['USER'], $DB['PASSWORD'])) {
 					$error = 'Error connecting to database ['.trim(mysql_error()).']';
 					$result = false;
 				}
@@ -74,11 +65,6 @@ function DBconnect(&$error, $debug = true) {
 					else {
 						DBexecute('SET NAMES utf8');
 					}
-				}
-
-				// turn other error reporting back on to display futher errors
-				if (!$debug && $errorReportingLevel > 0) {
-					error_reporting($errorReportingLevel);
 				}
 
 				if ($result) {
@@ -93,11 +79,7 @@ function DBconnect(&$error, $debug = true) {
 					(!empty($DB['PASSWORD']) ? 'password=\''.pg_connect_escape($DB['PASSWORD']).'\' ' : '').
 					(!empty($DB['PORT']) ? 'port='.pg_connect_escape($DB['PORT']) : '');
 
-				if (!$debug && $errorReportingLevel > 0) {
-					error_reporting(0);
-				}
-
-				$DB['DB']= pg_connect($pg_connection_string);
+				$DB['DB']= @pg_connect($pg_connection_string);
 				if (!$DB['DB']) {
 					$error = 'Error connecting to database';
 					$result = false;
@@ -107,10 +89,6 @@ function DBconnect(&$error, $debug = true) {
 						// change the output format for values of type bytea from hex (the default) to escape
 						DBexecute('set bytea_output = escape');
 					}
-				}
-
-				if (!$debug && $errorReportingLevel > 0) {
-					error_reporting($errorReportingLevel);
 				}
 
 				if ($result) {
@@ -130,21 +108,13 @@ function DBconnect(&$error, $debug = true) {
 					}
 				}
 
-				if (!$debug && $errorReportingLevel > 0) {
-					error_reporting(0);
-				}
-
-				$DB['DB'] = oci_connect($DB['USER'], $DB['PASSWORD'], $connect);
+				$DB['DB'] = @oci_connect($DB['USER'], $DB['PASSWORD'], $connect);
 				if ($DB['DB']) {
 					DBexecute('ALTER SESSION SET NLS_NUMERIC_CHARACTERS='.zbx_dbstr('. '));
 				}
 				else {
 					$error = 'Error connecting to database';
 					$result = false;
-				}
-
-				if (!$debug && $errorReportingLevel > 0) {
-					error_reporting($errorReportingLevel);
 				}
 
 				if ($result) {
@@ -160,11 +130,7 @@ function DBconnect(&$error, $debug = true) {
 				$connect .= 'UID='.$DB['USER'].';';
 				$connect .= 'PWD='.$DB['PASSWORD'].';';
 
-				if (!$debug && $errorReportingLevel > 0) {
-					error_reporting(0);
-				}
-
-				$DB['DB'] = db2_connect($connect, $DB['USER'], $DB['PASSWORD']);
+				$DB['DB'] = @db2_connect($connect, $DB['USER'], $DB['PASSWORD']);
 				if (!$DB['DB']) {
 					$error = 'Error connecting to database';
 					$result = false;
@@ -179,24 +145,16 @@ function DBconnect(&$error, $debug = true) {
 					}
 				}
 
-				if (!$debug && $errorReportingLevel > 0) {
-					error_reporting($errorReportingLevel);
-				}
-
 				if ($result) {
 					$dbBackend = new Db2DbBackend();
 				}
 				break;
 			case ZBX_DB_SQLITE3:
-				if (!$debug && $errorReportingLevel > 0) {
-					error_reporting(0);
-				}
-
 				if (file_exists($DB['DATABASE'])) {
 					init_sqlite3_access();
 					lock_sqlite3_access();
 					try{
-						$DB['DB'] = new SQLite3($DB['DATABASE'], SQLITE3_OPEN_READWRITE);
+						$DB['DB'] = @new SQLite3($DB['DATABASE'], SQLITE3_OPEN_READWRITE);
 					}
 					catch (Exception $e) {
 						$error = 'Error connecting to database';
@@ -207,10 +165,6 @@ function DBconnect(&$error, $debug = true) {
 				else {
 					$error = 'Missing database';
 					$result = false;
-				}
-
-				if (!$debug && $errorReportingLevel > 0) {
-					error_reporting($errorReportingLevel);
 				}
 
 				if ($result) {

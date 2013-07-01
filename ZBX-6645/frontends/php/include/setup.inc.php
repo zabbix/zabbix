@@ -498,7 +498,7 @@ class CsetupWizard extends CForm {
 		$error = '';
 
 		// during setup set debug to false to avoid displaying unwanted PHP errors in messages
-		if (!$result = DBconnect($error, false)) {
+		if (!$result = DBconnect($error)) {
 			error($error);
 		}
 		else {
