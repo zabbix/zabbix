@@ -314,7 +314,7 @@ if (!empty($this->data['triggerid'])) {
 }
 $buttons[] = new CButtonCancel(url_param('groupid').url_param('hostid').url_param('parent_discoveryid'));
 $triggersForm->addItem(makeFormFooter(
-	array(new CSubmit('save', _('Save'))),
+	new CSubmit('save', _('Save')),
 	array($buttons)
 ));
 

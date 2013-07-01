@@ -695,7 +695,7 @@ class CService extends CZBXAPI {
 	}
 
 	/**
-	 * Deletes the the dependencies of the parent services on the given services.
+	 * Deletes the dependencies of the parent services on the given services.
 	 *
 	 * @param $serviceIds
 	 *
@@ -749,7 +749,7 @@ class CService extends CZBXAPI {
 			if ($time['type'] == SERVICE_TIME_TYPE_UPTIME) {
 				$this->expandPeriodicalTimes($data, $periodStart, $periodEnd, $time['ts_from'], $time['ts_to'], 'ut');
 
-				// if exist any uptime - unmarked time is downtime
+				// if an uptime period exists - unmarked time is downtime
 				$unmarkedPeriodType = 'dt';
 			}
 			elseif ($time['type'] == SERVICE_TIME_TYPE_DOWNTIME) {
