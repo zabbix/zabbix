@@ -261,7 +261,7 @@ static void	zbx_validate_config()
 	}
 	if (0 != CONFIG_VALUE_CACHE_SIZE && 128 * ZBX_KIBIBYTE > CONFIG_VALUE_CACHE_SIZE)
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "Value cache size must be eihter 0 or greater than 128KB");
+		zabbix_log(LOG_LEVEL_CRIT, "Value cache size must be either 0 or greater than 128KB");
 		exit(1);
 	}
 }
