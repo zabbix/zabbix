@@ -20,7 +20,11 @@
 
 
 $valueMappingTable = new CTableInfo(_('No value map defined.'));
-$valueMappingTable->setHeader(array(_('Name'), _('Value map')));
+$valueMappingTable->setHeader(array(
+	$this->data['displayNodes'] ? _('Node') : null,
+	_('Name'),
+	_('Value map')
+));
 
 foreach ($this->data['valuemaps'] as $valuemap) {
 	order_result($valuemap['maps'], 'value');
@@ -31,10 +35,8 @@ foreach ($this->data['valuemaps'] as $valuemap) {
 		$mappings[] = BR();
 	}
 	$valueMappingTable->addRow(array(
-		new CSpan(array(
-			new CSpan($valuemap['nodename'], 'unknown'),
-			new CLink($valuemap['name'], 'adm.valuemapping.php?form=update&valuemapid='.$valuemap['valuemapid'])
-		)),
+		$this->data['displayNodes'] ? $valuemap['nodename'] : null,
+		new CLink($valuemap['name'], 'adm.valuemapping.php?form=update&valuemapid='.$valuemap['valuemapid']),
 		$mappings
 	));
 }

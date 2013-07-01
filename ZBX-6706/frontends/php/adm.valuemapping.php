@@ -191,12 +191,13 @@ if (isset($_REQUEST['form'])) {
 	$valueMapForm = new CView('administration.general.valuemapping.edit', $data);
 }
 else {
-	$data = array('valuemaps' => array());
+	$data = array(
+		'valuemaps' => array(),
+		'displayNodes' => is_array(get_current_nodeid())
+	);
 
 	$valueMapWidget->addHeader(_('Value mapping'));
 	$valueMapWidget->addItem(BR());
-
-	$isAllNodes = is_array(get_current_nodeid());
 
 	$dbValueMaps = DBselect(
 		'SELECT v.valuemapid,v.name'.
@@ -204,8 +205,8 @@ else {
 			whereDbNode('v.valuemapid')
 	);
 	while ($dbValueMap = DBfetch($dbValueMaps)) {
-		$dbValueMap['nodename'] = $isAllNodes
-			? get_node_name_by_elid($dbValueMap['valuemapid'], true, NAME_DELIMITER)
+		$dbValueMap['nodename'] = $data['displayNodes']
+			? get_node_name_by_elid($dbValueMap['valuemapid'], true)
 			: '';
 
 		$data['valuemaps'][$dbValueMap['valuemapid']] = $dbValueMap;
