@@ -121,10 +121,8 @@ catch (Exception $e) {
 /*
  * Display
  */
-$form = new CForm();
-$form->cleanItems();
-$cmbConf = new CComboBox('configDropDown', 'adm.valuemapping.php', 'redirect(this.options[this.selectedIndex].value);');
-$cmbConf->addItems(array(
+$generalComboBox = new CComboBox('configDropDown', 'adm.valuemapping.php', 'redirect(this.options[this.selectedIndex].value);');
+$generalComboBox->addItems(array(
 	'adm.gui.php' => _('GUI'),
 	'adm.housekeeper.php' => _('Housekeeper'),
 	'adm.images.php' => _('Images'),
@@ -137,27 +135,30 @@ $cmbConf->addItems(array(
 	'adm.triggerdisplayoptions.php' => _('Trigger displaying options'),
 	'adm.other.php' => _('Other')
 ));
-$form->addItem($cmbConf);
+
+$valueMapForm = new CForm();
+$valueMapForm->cleanItems();
+$valueMapForm->addItem($generalComboBox);
 if (!isset($_REQUEST['form'])) {
-	$form->addItem(new CSubmit('form', _('Create value map')));
+	$valueMapForm->addItem(new CSubmit('form', _('Create value map')));
 }
 
-$cnf_wdgt = new CWidget();
-$cnf_wdgt->addPageHeader(_('CONFIGURATION OF VALUE MAPPING'), $form);
+$valueMapWidget = new CWidget();
+$valueMapWidget->addPageHeader(_('CONFIGURATION OF VALUE MAPPING'), $valueMapForm);
 
-$data = array();
 if (isset($_REQUEST['form'])) {
-	$data['form'] = get_request('form', 1);
-	$data['form_refresh'] = get_request('form_refresh', 0);
-	$data['valuemapid'] = get_request('valuemapid');
-	$data['mappings'] = array();
-	$data['mapname'] = '';
-	$data['confirmMessage'] = null;
-	$data['add_value'] = get_request('add_value');
-	$data['add_newvalue'] = get_request('add_newvalue');
+	$data = array(
+		'form' => get_request('form', 1),
+		'form_refresh' => get_request('form_refresh', 0),
+		'valuemapid' => get_request('valuemapid'),
+		'mappings' => array(),
+		'mapname' => '',
+		'confirmMessage' => null,
+		'add_value' => get_request('add_value'),
+		'add_newvalue' => get_request('add_newvalue')
+	);
 
 	if (isset($data['valuemapid'])) {
-
 		$data['mapname'] = $dbValueMap['name'];
 
 		if (empty($data['form_refresh'])) {
@@ -187,20 +188,25 @@ if (isset($_REQUEST['form'])) {
 
 	order_result($data['mappings'], 'value');
 
-	$valueMappingForm = new CView('administration.general.valuemapping.edit', $data);
+	$valueMapForm = new CView('administration.general.valuemapping.edit', $data);
 }
 else {
-	$cnf_wdgt->addHeader(_('Value mapping'));
-	$cnf_wdgt->addItem(BR());
+	$data = array('valuemaps' => array());
 
-	$data['valuemaps'] = array();
+	$valueMapWidget->addHeader(_('Value mapping'));
+	$valueMapWidget->addItem(BR());
+
+	$isAllNodes = is_array(get_current_nodeid());
+
 	$dbValueMaps = DBselect(
 		'SELECT v.valuemapid,v.name'.
 		' FROM valuemaps v'.
 			whereDbNode('v.valuemapid')
 	);
 	while ($dbValueMap = DBfetch($dbValueMaps)) {
-		$dbValueMap['nodename'] = get_node_name_by_elid($dbValueMap['valuemapid'], true, NAME_DELIMITER);
+		$dbValueMap['nodename'] = $isAllNodes
+			? get_node_name_by_elid($dbValueMap['valuemapid'], true, NAME_DELIMITER)
+			: '';
 
 		$data['valuemaps'][$dbValueMap['valuemapid']] = $dbValueMap;
 		$data['valuemaps'][$dbValueMap['valuemapid']]['maps'] = array();
@@ -219,10 +225,10 @@ else {
 		);
 	}
 
-	$valueMappingForm = new CView('administration.general.valuemapping.list', $data);
+	$valueMapForm = new CView('administration.general.valuemapping.list', $data);
 }
 
-$cnf_wdgt->addItem($valueMappingForm->render());
-$cnf_wdgt->show();
+$valueMapWidget->addItem($valueMapForm->render());
+$valueMapWidget->show();
 
 require_once dirname(__FILE__).'/include/page_footer.php';
