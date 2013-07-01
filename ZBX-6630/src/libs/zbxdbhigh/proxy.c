@@ -575,15 +575,16 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 	struct zbx_json_parse	jp_data, jp_row;
 	char			buf[MAX_STRING_LEN], *esc;
 	const char		*p, *pf;
-	zbx_uint64_t		recid;
+	zbx_uint64_t		recid, *p_recid = NULL;
 	zbx_vector_uint64_t	ins, moves;
 	char			*sql = NULL, *field_names = NULL, *recs = NULL;
 	size_t			sql_alloc = 4 * ZBX_KIBIBYTE, sql_offset,
 				field_names_alloc = 1 * ZBX_KIBIBYTE, field_names_offset = 0,
-				recs_alloc = 20 * ZBX_KIBIBYTE, recs_offset = 0, r_offset;
+				recs_alloc = 20 * ZBX_KIBIBYTE, recs_offset = 0;
 	DB_RESULT		result;
 	DB_ROW			row;
-	zbx_hashset_t           h_id_offsets;
+	zbx_hashset_t           h_id_offsets, h_del;
+	zbx_hashset_iter_t	iter;
 	ZBX_ID_OFFSET		id_offset, *p_id_offset = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() table:'%s'", __function_name, table->table);
@@ -665,26 +666,26 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 	/* all records will be stored in one large string */
 	recs = zbx_malloc(recs, recs_alloc);
 
-	/* a hash set will be used as index for fast access to records via IDs */
-	zbx_hashset_create(&h_id_offsets, 1000, id_offset_hash_func, id_offset_compare_func);
+	/* hash set as index for fast access to records via IDs */
+	zbx_hashset_create(&h_id_offsets, 10000, id_offset_hash_func, id_offset_compare_func);
+
+	/* a hash set as a list for finding records to be deleted */
+	zbx_hashset_create(&h_del, 10000, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	while (NULL != (row = DBfetch(result)))
 	{
 		ZBX_STR2UINT64(recid, row[id_field_nr]);
-		zbx_vector_uint64_append(del, recid);
 
-		r_offset = recs_offset;
-		remember_record(&recs, &recs_alloc, &recs_offset, row, field_count);
-
-		/* insert ID and offset into hash set */
 		id_offset.id = recid;
-		id_offset.offset = r_offset;
+		id_offset.offset = recs_offset;
+
 		zbx_hashset_insert(&h_id_offsets, &id_offset, sizeof(id_offset));
+		zbx_hashset_insert(&h_del, &recid, sizeof(recid));
+
+		remember_record(&recs, &recs_alloc, &recs_offset, row, field_count);
 	}
 	DBfree_result(result);
 	zbx_free(field_names);
-
-	zbx_vector_uint64_sort(del, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	/* these tables have unique indexes, need special preparation to avoid conflicts during inserts/updates */
 	if (0 == strcmp("hosts_templates", table->table))
@@ -722,9 +723,9 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 
 		/* check whether we need to update existing entry or insert a new one */
 		ZBX_STR2UINT64(recid, buf);
-		if (FAIL != (i = zbx_vector_uint64_bsearch(del, recid, ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
+		if (NULL != zbx_hashset_search(&h_del, &recid))
 		{
-			zbx_vector_uint64_remove(del, i);
+			zbx_hashset_remove(&h_del, &recid);
 
 			if (1 == move_out)
 			{
@@ -761,6 +762,12 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 		else
 			zbx_vector_uint64_append(&ins, recid);
 	}
+
+	/* copy IDs of records to be deleted from hash set to vector */
+	zbx_hashset_iter_reset(&h_del, &iter);
+	while (NULL != (p_recid = zbx_hashset_iter_next(&iter)))
+		zbx_vector_uint64_append(del, *p_recid);
+	zbx_vector_uint64_sort(del, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	zbx_vector_uint64_sort(&ins, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
@@ -977,6 +984,7 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 	ret = SUCCEED;
 clean:
 	zbx_hashset_destroy(&h_id_offsets);
+	zbx_hashset_destroy(&h_del);
 	zbx_vector_uint64_destroy(&ins);
 	if (1 == move_out)
 		zbx_vector_uint64_destroy(&moves);
