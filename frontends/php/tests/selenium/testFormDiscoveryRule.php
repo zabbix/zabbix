@@ -65,7 +65,7 @@ class testFormDiscoveryRule extends CWebTest {
 	// Returns layout data
 	public static function layout() {
 		return array(
-			array(
+		/*	array(
 				array('type' => 'Zabbix agent', 'host' => 'Simple form test host')
 			),
 			array(
@@ -229,7 +229,7 @@ class testFormDiscoveryRule extends CWebTest {
 			),
 			array(
 				array('type' => 'JMX agent', 'template' => 'Inheritance test template')
-			)
+			)*/
 		);
 	}
 
@@ -675,7 +675,7 @@ class testFormDiscoveryRule extends CWebTest {
 	/**
 	 * @dataProvider update
 	 */
-	public function testFormDiscoveryRule_SimpleUpdate($data) {
+/*	public function testFormDiscoveryRule_SimpleUpdate($data) {
 		$name = $data['name'];
 
 		$sqlDiscovery = 'select itemid, hostid, name, key_, delay from items order by itemid';
@@ -693,11 +693,11 @@ class testFormDiscoveryRule extends CWebTest {
 		$this->assertEquals($oldHashDiscovery, DBhash($sqlDiscovery));
 
 	}
-
+*/
 	// Returns create data
 	public static function create() {
 		return array(
-			array(
+		/*	array(
 				array(
 					'expected' => DISCOVERY_BAD,
 					'errors' => array(
@@ -1213,7 +1213,29 @@ class testFormDiscoveryRule extends CWebTest {
 					)
 				)
 			),
+*/			// Flexfields with negative number in flexdelay
 			array(
+				array(
+					'expected' => DISCOVERY_GOOD,
+					'name' => 'Item flex-negative flexdelay',
+					'key' => 'item-flex-negative-flexdelay',
+					'flexPeriod' => array(
+						array('flexDelay' => '-50', 'flexTime' => '1-7,00:00-24:00')
+					)
+				)
+			),
+			// Flexfields with symbols in flexdelay
+			array(
+				array(
+					'expected' => DISCOVERY_GOOD,
+					'name' => 'Item flex-symbols in flexdelay',
+					'key' => 'item-flex-symbols-flexdelay',
+					'flexPeriod' => array(
+						array('flexDelay' => '50abc', 'flexTime' => '1-7,00:00-24:00')
+					)
+				)
+			),
+/*			array(
 				array(
 					'expected' => DISCOVERY_GOOD,
 					'name' =>'!@#$%^&*()_+-=[]{};:"|,./<>?',
@@ -1470,7 +1492,7 @@ class testFormDiscoveryRule extends CWebTest {
 							'Check the key, please. Default example was passed.'
 					)
 				)
-			)
+			)*/
 		);
 	}
 
