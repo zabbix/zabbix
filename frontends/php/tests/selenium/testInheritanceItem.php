@@ -608,6 +608,28 @@ class testInheritanceItem extends CWebTest {
 					'formCheck' => true
 				)
 			),
+			// Flexfields with negative number in flexdelay
+			array(
+				array(
+					'expected' => ITEM_GOOD,
+					'name' => 'Item flex-negative flexdelay',
+					'key' => 'item-flex-negative-flexdelay',
+					'flexPeriod' => array(
+						array('flexDelay' => '-50', 'flexTime' => '1-7,00:00-24:00')
+					)
+				)
+			),
+			// Flexfields with symbols in flexdelay
+			array(
+				array(
+					'expected' => ITEM_GOOD,
+					'name' => 'Item flex-symbols in flexdelay',
+					'key' => 'item-flex-symbols-flexdelay',
+					'flexPeriod' => array(
+						array('flexDelay' => '50abc', 'flexTime' => '1-7,00:00-24:00')
+					)
+				)
+			),
 			// History
 			array(
 				array(
