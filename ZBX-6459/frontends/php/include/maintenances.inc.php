@@ -55,15 +55,17 @@ function shedule2str($timeperiod) {
 	if ($timeperiod['timeperiod_type'] == TIMEPERIOD_TYPE_ONETIME) {
 		$str = _s('At %1$s:%2$s on %3$s',
 			date('H', $timeperiod['start_date']),
-			date('i',$timeperiod['start_date']),
-			zbx_date2str(_('d M Y'), $timeperiod['start_date']));
+			date('i', $timeperiod['start_date']),
+			zbx_date2str(_('d M Y'), $timeperiod['start_date'])
+		);
 	}
 	elseif ($timeperiod['timeperiod_type'] == TIMEPERIOD_TYPE_DAILY) {
 		$str = _n('At %2$s:%3$s on every day',
 			'At %2$s:%3$s on every %1$s days',
 			$timeperiod['every'],
 			$timeperiod['hour'],
-			$timeperiod['minute']);
+			$timeperiod['minute']
+		);
 	}
 	elseif ($timeperiod['timeperiod_type'] == TIMEPERIOD_TYPE_WEEKLY) {
 		$days = '';
@@ -83,7 +85,8 @@ function shedule2str($timeperiod) {
 			$timeperiod['every'],
 			$timeperiod['hour'],
 			$timeperiod['minute'],
-			$days);
+			$days
+		);
 	}
 	elseif ($timeperiod['timeperiod_type'] == TIMEPERIOD_TYPE_MONTHLY) {
 		$months = '';
@@ -124,14 +127,16 @@ function shedule2str($timeperiod) {
 				$timeperiod['minute'],
 				$every,
 				$days,
-				$months);
+				$months
+			);
 		}
 		else {
 			$str = _s('At %1$s:%2$s on day %3$s of every %4$s',
 				$timeperiod['hour'],
 				$timeperiod['minute'],
 				$timeperiod['day'],
-				$months);
+				$months
+			);
 		}
 	}
 	return $str;
