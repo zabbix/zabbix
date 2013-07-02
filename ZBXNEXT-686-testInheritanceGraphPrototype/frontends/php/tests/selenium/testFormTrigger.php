@@ -36,43 +36,56 @@ class testFormTrigger extends CWebTest {
 	public static function layout() {
 		return array(
 			array(
-				array('constructor' => 'open', 'host' => 'Simple form test host')
+				array('constructor' => 'open', 'host' => 'Simple form test host'
+				)
 			),
 			array(
-				array('constructor' => 'open_close', 'host' => 'Simple form test host')
+				array('constructor' => 'open_close', 'host' => 'Simple form test host'
+				)
 			),
 			array(
-				array('constructor' => 'open', 'severity' => 'Warning', 'host' => 'Simple form test host')
+				array('constructor' => 'open', 'severity' => 'Warning', 'host' => 'Simple form test host'
+				)
 			),
 			array(
-				array('constructor' => 'open_close', 'severity' => 'Disaster', 'host' => 'Simple form test host')
+				array('constructor' => 'open_close', 'severity' => 'Disaster', 'host' => 'Simple form test host'
+				)
 			),
 			array(
-				array('severity' => 'Not classified', 'host' => 'Simple form test host')
+				array('severity' => 'Not classified', 'host' => 'Simple form test host'
+				)
 			),
 			array(
-				array('severity' => 'Information', 'host' => 'Simple form test host')
+				array('severity' => 'Information', 'host' => 'Simple form test host'
+				)
 			),
 			array(
-				array('severity' => 'Warning', 'host' => 'Simple form test host')
+				array('severity' => 'Warning', 'host' => 'Simple form test host'
+				)
 			),
 			array(
-				array('severity' => 'Average', 'host' => 'Simple form test host')
+				array('severity' => 'Average', 'host' => 'Simple form test host'
+				)
 			),
 			array(
-				array('severity' => 'High', 'host' => 'Simple form test host')
+				array('severity' => 'High', 'host' => 'Simple form test host'
+				)
 			),
 			array(
-				array('severity' => 'Disaster', 'host' => 'Simple form test host')
+				array('severity' => 'Disaster', 'host' => 'Simple form test host'
+				)
 			),
 			array(
-				array('constructor' => 'open', 'template' => 'Inheritance test template')
+				array('constructor' => 'open', 'template' => 'Inheritance test template'
+				)
 			),
 			array(
-				array('constructor' => 'open_close', 'template' => 'Inheritance test template')
+				array('constructor' => 'open_close', 'template' => 'Inheritance test template'
+				)
 			),
 			array(
-				array('constructor' => 'open', 'severity' => 'Warning', 'template' => 'Inheritance test template')
+				array('constructor' => 'open', 'severity' => 'Warning', 'template' => 'Inheritance test template'
+				)
 			),
 			array(
 				array(
@@ -82,28 +95,36 @@ class testFormTrigger extends CWebTest {
 				)
 			),
 			array(
-				array('severity' => 'Not classified', 'template' => 'Inheritance test template')
+				array('severity' => 'Not classified', 'template' => 'Inheritance test template'
+				)
 			),
 			array(
-				array('severity' => 'Information', 'template' => 'Inheritance test template')
+				array('severity' => 'Information', 'template' => 'Inheritance test template'
+				)
 			),
 			array(
-				array('severity' => 'Warning', 'template' => 'Inheritance test template')
+				array('severity' => 'Warning', 'template' => 'Inheritance test template'
+				)
 			),
 			array(
-				array('severity' => 'Average', 'template' => 'Inheritance test template')
+				array('severity' => 'Average', 'template' => 'Inheritance test template'
+				)
 			),
 			array(
-				array('severity' => 'High', 'template' => 'Inheritance test template')
+				array('severity' => 'High', 'template' => 'Inheritance test template'
+				)
 			),
 			array(
-				array('severity' => 'Disaster', 'template' => 'Inheritance test template')
+				array('severity' => 'Disaster', 'template' => 'Inheritance test template'
+				)
 			),
 			array(
-				array('host' => 'Simple form test host', 'form' => 'testFormTrigger1')
+				array('host' => 'Simple form test host', 'form' => 'testFormTrigger1'
+				)
 			),
 			array(
-				array('template' => 'Inheritance test template', 'form' => 'testInheritanceTrigger1')
+				array('template' => 'Inheritance test template', 'form' => 'testInheritanceTrigger1'
+				)
 			),
 			array(
 				array(
