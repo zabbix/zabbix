@@ -863,11 +863,11 @@ void	zbx_on_exit()
 
 	DBconnect(ZBX_DB_CONNECT_EXIT);
 
-	/* free history value cache */
-	zbx_vc_destroy();
-
 	free_database_cache();
 	free_configuration_cache();
+
+	/* free history value cache */
+	zbx_vc_destroy();
 
 	zbx_destroy_services_lock();
 
