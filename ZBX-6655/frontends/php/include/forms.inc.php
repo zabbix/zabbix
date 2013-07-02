@@ -287,33 +287,32 @@
 		$output = array();
 
 		foreach ($data as $id => $element) {
-			$element['name'] = nbsp($element['name']);
+			$element['name'] = nbsp(CHtml::encode($element['name']));
 
 			// is activated
 			if (str_in_array($id, $subfilter)) {
 				$span = new CSpan($element['name'].SPACE.'('.$element['count'].')', 'subfilter_enabled');
-				$span->onClick(CHtml::encode('javascript: create_var("zbx_filter", '.CJs::encodeJson($subfilterName.'['.$id.']').', null, true);'));
+				$span->onClick(CHtml::encode('javascript: create_var("zbx_filter", '.
+					CJs::encodeJson($subfilterName.'['.$id.']').', null, true);'));
 				$output[] = $span;
 			}
 
 			// isn't activated
 			else {
-				$script = CHtml::encode('javascript: create_var("zbx_filter", '.CJs::encodeJson($subfilterName.'['.$id.']').', '.CJs::encodeJson($id).', true);');
-
 				// subfilter has 0 items
 				if ($element['count'] == 0) {
 					$span = new CSpan($element['name'].SPACE.'('.$element['count'].')', 'subfilter_inactive');
-					$span->onClick($script);
 					$output[] = $span;
 				}
 				else {
 					// this level has no active subfilters
-					$nspan = empty($subfilter)
-						? new CSpan(SPACE.'('.$element['count'].')', 'subfilter_active')
-						: new CSpan(SPACE.'(+'.$element['count'].')', 'subfilter_active');
+					$nspan = $subfilter
+						? new CSpan(SPACE.'(+'.$element['count'].')', 'subfilter_active')
+						: new CSpan(SPACE.'('.$element['count'].')', 'subfilter_active');
 
 					$span = new CSpan($element['name'], 'subfilter_disabled');
-					$span->onClick($script);
+					$span->onClick(CHtml::encode('javascript: create_var("zbx_filter", '.
+						CJs::encodeJson($subfilterName.'['.$id.']').', '.CJs::encodeJson($id).', true);'));
 
 					$output[] = $span;
 					$output[] = $nspan;
@@ -1079,6 +1078,7 @@
 				if (!empty($item)) {
 					$host = reset($item['hosts']);
 					if (!empty($item['hosts'])) {
+						$host['name'] = CHtml::encode($host['name']);
 						if (bccomp($data['itemid'], $itemid) == 0) {
 						}
 						// discovery rule
@@ -1241,13 +1241,6 @@
 			$data['alreadyPopulated'] = zbx_toHash($data['alreadyPopulated'], 'inventory_link');
 		}
 
-		// host groups
-		$data['hostGroups'] = API::HostGroup()->get(array(
-			'editable' => true,
-			'output' => API_OUTPUT_EXTEND
-		));
-		order_result($data['hostGroups'], 'name');
-
 		// template
 		$data['is_template'] = isTemplate($data['hostid']);
 
@@ -1383,7 +1376,11 @@
 						$link = 'triggers.php?form=update&triggerid='.$db_triggers['triggerid'].'&hostid='.$db_triggers['hostid'];
 					}
 
-					$data['templates'][] = new CLink($db_triggers['name'], $link, 'highlight underline weight_normal');
+					$data['templates'][] = new CLink(
+						CHtml::encode($db_triggers['name']),
+						$link,
+						'highlight underline weight_normal'
+					);
 					$data['templates'][] = SPACE.RARR.SPACE;
 				}
 				$tmp_triggerid = $db_triggers['templateid'];

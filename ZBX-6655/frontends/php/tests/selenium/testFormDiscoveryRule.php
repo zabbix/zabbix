@@ -678,7 +678,7 @@ class testFormDiscoveryRule extends CWebTest {
 	public function testFormDiscoveryRule_SimpleUpdate($data) {
 		$name = $data['name'];
 
-		$sqlDiscovery = 'select itemid, hostid, name, key_, delay, history, trends, value_type, formula, templateid, flags, lifetime from items';
+		$sqlDiscovery = 'select itemid, hostid, name, key_, delay from items order by itemid';
 		$oldHashDiscovery = DBhash($sqlDiscovery);
 
 		$this->zbxTestLogin('hosts.php');
@@ -1210,6 +1210,28 @@ class testFormDiscoveryRule extends CWebTest {
 					),
 					'errors' => array(
 						'Maximum number of flexible intervals added'
+					)
+				)
+			),
+			// Flexfields with negative number in flexdelay
+			array(
+				array(
+					'expected' => DISCOVERY_GOOD,
+					'name' => 'Item flex-negative flexdelay',
+					'key' => 'item-flex-negative-flexdelay',
+					'flexPeriod' => array(
+						array('flexDelay' => '-50', 'flexTime' => '1-7,00:00-24:00')
+					)
+				)
+			),
+			// Flexfields with symbols in flexdelay
+			array(
+				array(
+					'expected' => DISCOVERY_GOOD,
+					'name' => 'Item flex-symbols in flexdelay',
+					'key' => 'item-flex-symbols-flexdelay',
+					'flexPeriod' => array(
+						array('flexDelay' => '50abc', 'flexTime' => '1-7,00:00-24:00')
 					)
 				)
 			),

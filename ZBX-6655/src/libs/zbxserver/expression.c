@@ -1216,7 +1216,7 @@ static int	DBget_trigger_event_count(zbx_uint64_t triggerid, char **replace_to, 
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static int	DBget_dhost_value_by_event(DB_EVENT *event, char **replace_to, const char *fieldname)
+static int	DBget_dhost_value_by_event(const DB_EVENT *event, char **replace_to, const char *fieldname)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -1278,7 +1278,7 @@ static int	DBget_dhost_value_by_event(DB_EVENT *event, char **replace_to, const 
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static int	DBget_dservice_value_by_event(DB_EVENT *event, char **replace_to, const char *fieldname)
+static int	DBget_dservice_value_by_event(const DB_EVENT *event, char **replace_to, const char *fieldname)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -1321,7 +1321,7 @@ static int	DBget_dservice_value_by_event(DB_EVENT *event, char **replace_to, con
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static int	DBget_drule_value_by_event(DB_EVENT *event, char **replace_to, const char *fieldname)
+static int	DBget_drule_value_by_event(const DB_EVENT *event, char **replace_to, const char *fieldname)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -1645,7 +1645,7 @@ fail:
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static void	get_escalation_history(DB_EVENT *event, DB_ESCALATION *escalation, char **replace_to)
+static void	get_escalation_history(const DB_EVENT *event, DB_ESCALATION *escalation, char **replace_to)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -1757,7 +1757,7 @@ static void	get_escalation_history(DB_EVENT *event, DB_ESCALATION *escalation, c
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static void	get_event_ack_history(DB_EVENT *event, char **replace_to)
+static void	get_event_ack_history(const DB_EVENT *event, char **replace_to)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -1885,7 +1885,7 @@ static int	get_node_value(const char *expression, char **replace_to, int N_funct
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static int	get_autoreg_value_by_event(DB_EVENT *event, char **replace_to, const char *fieldname)
+static int	get_autoreg_value_by_event(const DB_EVENT *event, char **replace_to, const char *fieldname)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -2390,7 +2390,7 @@ static void	get_recovery_event_value(const char *macro, DB_EVENT *r_event, char 
  * Purpose: request event value by macro                                      *
  *                                                                            *
  ******************************************************************************/
-static void	get_event_value(const char *macro, DB_EVENT *event, char **replace_to)
+static void	get_event_value(const char *macro, const DB_EVENT *event, char **replace_to)
 {
 	if (0 == strcmp(macro, MVAR_EVENT_AGE))
 	{
@@ -2525,7 +2525,7 @@ fail:
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  ******************************************************************************/
-int	substitute_simple_macros(zbx_uint64_t *actionid, DB_EVENT *event, DB_EVENT *r_event, zbx_uint64_t *userid,
+int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_EVENT *r_event, zbx_uint64_t *userid,
 		zbx_uint64_t *hostid, DC_HOST *dc_host, DC_ITEM *dc_item, DB_ESCALATION *escalation, char **data,
 		int macro_type, char *error, int maxerrlen)
 {
@@ -2584,7 +2584,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, DB_EVENT *event, DB_EVENT *
 
 		if (0 != (macro_type & (MACRO_TYPE_MESSAGE_NORMAL | MACRO_TYPE_MESSAGE_RECOVERY)))
 		{
-			DB_EVENT	*c_event;
+			const DB_EVENT	*c_event;
 
 			c_event = (0 != (macro_type & MACRO_TYPE_MESSAGE_RECOVERY) ? r_event : event);
 

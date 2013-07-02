@@ -33,7 +33,7 @@ if (isset($_REQUEST['pservices']) || isset($_REQUEST['cservices'])) {
 	define('ZBX_PAGE_NO_MENU', 1);
 }
 
-include_once('include/page_header.php');
+require_once dirname(__FILE__).'/include/page_header.php';
 
 //	VAR		TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 $fields = array(
@@ -294,7 +294,6 @@ if (isset($_REQUEST['pservices'])) {
 	$servicesView = new CView('configuration.services.parent.list', $data);
 	$servicesView->render();
 	$servicesView->show();
-	include_once('include/page_footer.php');
 }
 
 /*
@@ -337,7 +336,6 @@ if (isset($_REQUEST['cservices'])) {
 	$servicesView = new CView('configuration.services.child.list', $data);
 	$servicesView->render();
 	$servicesView->show();
-	include_once('include/page_footer.php');
 }
 
 /*
@@ -477,4 +475,4 @@ else {
 	$servicesView->show();
 }
 
-include_once('include/page_footer.php');
+require_once dirname(__FILE__).'/include/page_footer.php';

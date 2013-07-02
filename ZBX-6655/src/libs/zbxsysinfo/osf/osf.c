@@ -31,8 +31,8 @@ ZBX_METRIC	parameters_specific[] =
 
 	{"vm.memory.size",	CF_HAVEPARAMS,	VM_MEMORY_SIZE,		"free"},
 
-	{"proc.num",		CF_HAVEPARAMS,	PROC_NUM,		"inetd,,"},
-	{"proc.mem",		CF_HAVEPARAMS,	PROC_MEM,		"inetd,,"},
+	{"proc.num",		CF_HAVEPARAMS,	PROC_NUM,		"inetd"},
+	{"proc.mem",		CF_HAVEPARAMS,	PROC_MEM,		"inetd"},
 
 	{"system.cpu.util",	CF_HAVEPARAMS,	SYSTEM_CPU_UTIL,	"all,user,avg1"},
 	{"system.cpu.load",	CF_HAVEPARAMS,	SYSTEM_CPU_LOAD,	"all,avg1"},
