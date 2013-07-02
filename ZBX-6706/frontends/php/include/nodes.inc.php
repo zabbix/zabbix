@@ -162,7 +162,7 @@ function get_viewed_nodes() {
 	}
 
 	$availableNodes = get_accessible_nodes_by_user(CWebUser::$data, PERM_READ, PERM_RES_DATA_ARRAY);
-	$availableNodes = get_tree_by_parentid($ZBX_LOCALNODEID, $availableNodes, 'masterid'); // remove parent nodes
+	$availableNodes = get_tree_by_parentid($ZBX_LOCALNODEID, $availableNodes, 'masterid');
 	$selectedNodeIds = get_request('selected_nodes', get_node_profile(array(CWebUser::$data['node']['nodeid'])));
 
 	$nodeIds = array();
@@ -306,7 +306,8 @@ function add_node($nodeId, $name, $ip, $port, $nodeType, $masterId) {
 	if ($result && $nodeType == ZBX_NODE_MASTER) {
 		DBexecute('UPDATE nodes SET masterid='.$nodeId.' WHERE nodeid='.$ZBX_LOCALNODEID);
 
-		$ZBX_CURMASTERID = $nodeId; // apply master node for this script
+		// apply master node for this script
+		$ZBX_CURMASTERID = $nodeId;
 	}
 
 	return $result ? $nodeId : $result;
