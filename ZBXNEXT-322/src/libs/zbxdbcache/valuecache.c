@@ -264,6 +264,9 @@ ZBX_VECTOR_IMPL(vc_itemweight, zbx_vc_item_weight_t);
 /* the value cache */
 static zbx_vc_cache_t	*vc_cache = NULL;
 
+/* function prototypes */
+static void	vc_value_copy(zbx_vc_value_t* dst, const zbx_vc_value_t* src, int value_type);
+
 /******************************************************************************************************************
  *                                                                                                                *
  * Database access API                                                                                            *
@@ -496,10 +499,11 @@ static int	vc_db_read_value(zbx_uint64_t itemid, int value_type, const zbx_times
 {
 	char			*sql = NULL;
 	size_t			sql_alloc = 0, sql_offset = 0;
-	int			ret = FAIL;
+	int			ret = FAIL, now;
 	DB_RESULT		result;
 	DB_ROW			row;
 	zbx_vc_history_table_t	*table = &vc_history_tables[value_type];
+	zbx_vector_vc_value_t	values;
 
 	/* first try to find a value matching the target timestamp */
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
@@ -511,38 +515,34 @@ static int	vc_db_read_value(zbx_uint64_t itemid, int value_type, const zbx_times
 
 	result = DBselect("%s", sql);
 
-	if (NULL == (row = DBfetch(result)))
-	{
-		/* if failed find the last value with a timestamp less than specified */
-		DBfree_result(result);
-
-		sql_offset = 0;
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-				"select clock,ns,%s"
-				" from %s"
-				" where itemid=" ZBX_FS_UI64
-					" and clock<=%d"
-				" order by clock desc,ns desc",
-				table->fields, table->name, itemid, ts->sec);
-
-		result = DBselect("%s", sql);
-
-		while (NULL != (row = DBfetch(result)))
-		{
-			if (atoi(row[0]) < ts->sec || atoi(row[1]) <= ts->ns)
-				break;
-		}
-	}
-
 	zbx_free(sql);
 
-	if (NULL != row)
+	if (NULL != (row = DBfetch(result)))
 	{
 		value->timestamp.sec = atoi(row[0]);
 		value->timestamp.ns = atoi(row[1]);
 		table->rtov(&value->value, row + 2);
 		ret = SUCCEED;
 	}
+	else
+	{
+		/* if failed to find a value matching target timestamp - */
+		/* find the older value closest to the timestamp         */
+
+		now = ZBX_VC_TIME();
+
+		zbx_vc_value_vector_create(&values);
+		vc_db_read_values_by_count(itemid, value_type, &values, 1, now, now, 1);
+
+		if (0 < values.values_num)
+		{
+			vc_value_copy(value, &values.values[0], value_type);
+			ret = SUCCEED;
+		}
+
+		zbx_vc_value_vector_destroy(&values, value_type);
+	}
+
 	DBfree_result(result);
 
 	return ret;
