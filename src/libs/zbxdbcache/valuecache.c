@@ -2019,7 +2019,9 @@ static void	vch_item_get_values(const zbx_vc_item_t *item, zbx_vector_vc_value_t
  ******************************************************************************/
 static size_t	vch_item_free_chunk(zbx_vc_item_t *item, zbx_vc_chunk_t *chunk)
 {
-	size_t	freed = vc_item_free_values(item, chunk->slots, chunk->first_value, chunk->last_value);
+	size_t	freed;
+
+	freed = vc_item_free_values(item, chunk->slots, chunk->first_value, chunk->last_value);
 
 	__vc_mem_free_func(chunk);
 
