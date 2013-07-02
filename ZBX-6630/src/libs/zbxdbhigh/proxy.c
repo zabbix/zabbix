@@ -499,15 +499,32 @@ void	get_proxyconfig_data(zbx_uint64_t proxy_hostid, struct zbx_json *j)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
-static void	remember_record(char **recs, size_t *recs_alloc, size_t *recs_offset,
+static void	remember_record(const ZBX_FIELD **fields, char **recs, size_t *recs_alloc, size_t *recs_offset,
 		DB_ROW row, int field_count)
 {
 	int	f;
 
 	for (f = 0; f < field_count; f++)
 	{
-		zbx_strcpy_alloc(recs, recs_alloc, recs_offset, row[f]);
-		*recs_offset += sizeof(char);	/* preserve field boundaries, do not overwrite terminating '\0' */
+		if (0 != (fields[f]->flags & ZBX_NOTNULL))	/* field value can not be NULL */
+		{
+			zbx_strcpy_alloc(recs, recs_alloc, recs_offset, row[f]);
+			*recs_offset += sizeof(char);	/* preserve terminating '\0' at field boundaries */
+		}
+		else if (SUCCEED != DBis_null(row[f]))	/* field value can be NULL but it is not */
+		{
+			/* a string and a byte '\1' means non-NULL value */
+			zbx_strcpy_alloc(recs, recs_alloc, recs_offset, row[f]);
+			*recs_offset += sizeof(char);
+			zbx_chrcpy_alloc(recs, recs_alloc, recs_offset, '\1');
+		}
+		else	/* field value is NULL */
+		{
+			/* empty string and byte '\2' means NULL value */
+			zbx_strcpy_alloc(recs, recs_alloc, recs_offset, "");
+			*recs_offset += sizeof(char);
+			zbx_chrcpy_alloc(recs, recs_alloc, recs_offset, '\2');
+		}
 	}
 }
 
@@ -539,18 +556,51 @@ static int	find_field_by_name(const ZBX_FIELD **fields, int field_count, const c
 	return f;
 }
 
-static int	compare_nth_field(char *fields, int n, char *str)
+static int	compare_nth_field(const ZBX_FIELD **fields, char *rec_data, int n, char *str, int is_null,
+				int *last_n, size_t *last_pos)
 {
-	int	i = 0;
-	char	*p = fields;
+	int	i = *last_n, null_in_db = 0;
+	char	*p = rec_data + *last_pos, *field_start = NULL;
 
-	while (n > i)	/* skip fields until field n */
+	while (n >= i)		/* find starting position of the n-th field */
 	{
-		if ('\0' == *p++)
-			i++;
+		field_start = p;
+		while ('\0' != *p++)
+			;
+
+		null_in_db = 0;
+
+		if (0 == (fields[i++]->flags & ZBX_NOTNULL))	/* field could be NULL */
+		{
+			if ((rec_data == p - 1 || '\0' == *(p - 2)) && '\2' == *p)	/* field value is NULL */
+			{
+				null_in_db = 1;
+				p++;
+			}
+			else if ('\1' == *p)
+			{
+				p++;
+			}
+			else
+			{
+				THIS_SHOULD_NEVER_HAPPEN;
+				return 1;
+			}
+		}
 	}
 
-	return strcmp(p, str);
+	*last_n = i;				/* Preserve number of field and its start position */
+	*last_pos = (size_t)(p - rec_data);	/* across calls to avoid searching from start. */
+
+	if (1 == null_in_db)
+	{
+		if ('\0' == *str && 0 != is_null)
+			return 0;	/* fields are "equal" - both contain NULL */
+		else
+			return 1;
+	}
+	else
+		return strcmp(field_start, str);
 }
 
 /******************************************************************************
@@ -682,7 +732,7 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 		zbx_hashset_insert(&h_id_offsets, &id_offset, sizeof(id_offset));
 		zbx_hashset_insert(&h_del, &recid, sizeof(recid));
 
-		remember_record(&recs, &recs_alloc, &recs_offset, row, field_count);
+		remember_record(fields, &recs, &recs_alloc, &recs_offset, row, field_count);
 	}
 	DBfree_result(result);
 	zbx_free(field_names);
@@ -729,6 +779,9 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 
 			if (1 == move_out)
 			{
+				int	last_n = 0;
+				size_t	last_pos = 0;
+
 				/* locate a copy of this record as found in database */
 				id_offset.id = recid;
 				if (NULL == (p_id_offset = zbx_hashset_search(&h_id_offsets, &id_offset)))
@@ -755,8 +808,11 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 					f++;
 				}
 
-				if (0 != compare_nth_field(recs + p_id_offset->offset, move_field_nr, buf))
+				if (0 != compare_nth_field(fields, recs + p_id_offset->offset, move_field_nr, buf,
+						is_null, &last_n, &last_pos))
+				{
 					zbx_vector_uint64_append(&moves, recid);
+				}
 			}
 		}
 		else
@@ -849,7 +905,8 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 	while (NULL != (p = zbx_json_next(&jp_data, p)))
 	{
 		int	rec_differ = 0;			/* how many fields differ */
-		size_t	tmp_offset = sql_offset;
+		int	last_n = 0;
+		size_t	tmp_offset = sql_offset, last_pos = 0;
 
 		zbx_json_brackets_open(p, &jp_row);
 		pf = zbx_json_next_value(&jp_row, NULL, buf, sizeof(buf), NULL);
@@ -901,7 +958,8 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 
 			if (0 == insert)
 			{
-				if (0 != (field_differ = compare_nth_field(recs + p_id_offset->offset, f, buf)))
+				if (0 != (field_differ = compare_nth_field(fields, recs + p_id_offset->offset, f, buf,
+						is_null, &last_n, &last_pos)))
 				{
 					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%s=", fields[f]->name);
 					rec_differ++;
