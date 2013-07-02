@@ -142,19 +142,22 @@ class testInheritanceGraphPrototype extends CWebTest {
 				array('expected' => GRAPH_GOOD,
 					'graphName' => 'graphSimple',
 					'hostCheck' => true,
-					'dbCheck' => true)
+					'dbCheck' => true
+				)
 			),
 			array(
 				array('expected' => GRAPH_GOOD,
 					'graphName' => 'graphName',
-					'hostCheck' => true)
+					'hostCheck' => true
+				)
 			),
 			array(
 				array('expected' => GRAPH_GOOD,
 					'graphName' => 'graphRemove',
 					'hostCheck' => true,
 					'dbCheck' => true,
-					'remove' => true)
+					'remove' => true
+				)
 			),
 			array(
 				array('expected' => GRAPH_GOOD,
@@ -162,7 +165,8 @@ class testInheritanceGraphPrototype extends CWebTest {
 					'hostCheck' => true,
 					'dbCheck' => true,
 					'hostRemove' => true,
-					'remove' => true)
+					'remove' => true
+				)
 			),
 			array(
 				array('expected' => GRAPH_GOOD,
@@ -171,7 +175,8 @@ class testInheritanceGraphPrototype extends CWebTest {
 					'hostCheck' => true,
 					'dbCheck' => true,
 					'hostRemove' => true,
-					'remove' => true)
+					'remove' => true
+				)
 			),
 			array(
 				array('expected' => GRAPH_GOOD,
@@ -182,7 +187,8 @@ class testInheritanceGraphPrototype extends CWebTest {
 					'hostCheck' => true,
 					'dbCheck' => true,
 					'hostRemove' => true,
-					'remove' => true)
+					'remove' => true
+				)
 			),
 			array(
 				array('expected' => GRAPH_GOOD,
@@ -192,7 +198,8 @@ class testInheritanceGraphPrototype extends CWebTest {
 					'hostCheck' => true,
 					'dbCheck' => true,
 					'hostRemove' => true,
-					'remove' => true)
+					'remove' => true
+				)
 			),
 			array(
 				array('expected' => GRAPH_GOOD,
@@ -202,7 +209,8 @@ class testInheritanceGraphPrototype extends CWebTest {
 					'hostCheck' => true,
 					'dbCheck' => true,
 					'hostRemove' => true,
-					'remove' => true)
+					'remove' => true
+				)
 			),
 			array(
 				array('expected' => GRAPH_GOOD,
@@ -212,7 +220,8 @@ class testInheritanceGraphPrototype extends CWebTest {
 					'hostCheck' => true,
 					'dbCheck' => true,
 					'hostRemove' => true,
-					'remove' => true)
+					'remove' => true
+				)
 			),
 			array(
 				array('expected' => GRAPH_GOOD,
@@ -223,7 +232,8 @@ class testInheritanceGraphPrototype extends CWebTest {
 					'hostCheck' => true,
 					'dbCheck' => true,
 					'hostRemove' => true,
-					'remove' => true)
+					'remove' => true
+				)
 			),
 			array(
 				array('expected' => GRAPH_GOOD,
@@ -234,7 +244,8 @@ class testInheritanceGraphPrototype extends CWebTest {
 					'hostCheck' => true,
 					'dbCheck' => true,
 					'hostRemove' => true,
-					'remove' => true)
+					'remove' => true
+				)
 			),
 			array(
 				array('expected' => GRAPH_GOOD,
@@ -244,7 +255,8 @@ class testInheritanceGraphPrototype extends CWebTest {
 					'hostCheck' => true,
 					'dbCheck' => true,
 					'hostRemove' => true,
-					'remove' => true)
+					'remove' => true
+				)
 			),
 			array(
 				array('expected' => GRAPH_GOOD,
@@ -254,7 +266,8 @@ class testInheritanceGraphPrototype extends CWebTest {
 					'hostCheck' => true,
 					'dbCheck' => true,
 					'hostRemove' => true,
-					'remove' => true)
+					'remove' => true
+				)
 			),
 			array(
 				array('expected' => GRAPH_GOOD,
@@ -263,7 +276,8 @@ class testInheritanceGraphPrototype extends CWebTest {
 					'hostCheck' => true,
 					'dbCheck' => true,
 					'hostRemove' => true,
-					'remove' => true)
+					'remove' => true
+				)
 			),
 			array(
 				array('expected' => GRAPH_GOOD,
@@ -272,7 +286,8 @@ class testInheritanceGraphPrototype extends CWebTest {
 					'hostCheck' => true,
 					'dbCheck' => true,
 					'hostRemove' => true,
-					'remove' => true)
+					'remove' => true
+				)
 			),
 			array(
 				array('expected' => GRAPH_GOOD,
@@ -281,7 +296,8 @@ class testInheritanceGraphPrototype extends CWebTest {
 					'hostCheck' => true,
 					'dbCheck' => true,
 					'hostRemove' => true,
-					'remove' => true)
+					'remove' => true
+				)
 			),
 			array(
 				array('expected' => GRAPH_GOOD,
@@ -289,14 +305,16 @@ class testInheritanceGraphPrototype extends CWebTest {
 					'hostCheck' => true,
 					'dbCheck' => true,
 					'hostRemove' => true,
-					'remove' => true)
+					'remove' => true
+				)
 			),
 			array(
 				array('expected' => GRAPH_BAD,
 					'graphName' => 'graphSimple',
 					'errors' => array(
 						'ERROR: Cannot add graph',
-						'Graph with name "graphSimple" already exists in graphs or graph prototypes')
+						'Graph with name "graphSimple" already exists in graphs or graph prototypes'
+					)
 				)
 			),
 			array(
@@ -402,7 +420,8 @@ class testInheritanceGraphPrototype extends CWebTest {
 		$itemName = $this->item;
 
 		$this->checkTitle('Configuration of graph prototypes');
-		$this->zbxTestTextPresent(array('CONFIGURATION OF GRAPH PROTOTYPES', "Graph prototypes of ".$this->discoveryRule));
+		$this->zbxTestTextPresent(array('CONFIGURATION OF GRAPH PROTOTYPES', "Graph prototypes of "
+			.$this->discoveryRule));
 
 		$this->zbxTestClickWait('form');
 		$this->checkTitle('Configuration of graph prototypes');
