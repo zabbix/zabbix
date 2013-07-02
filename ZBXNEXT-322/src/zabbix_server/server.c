@@ -864,14 +864,15 @@ void	zbx_on_exit()
 	DBconnect(ZBX_DB_CONNECT_EXIT);
 
 	free_database_cache();
+
+	DBclose();
+
 	free_configuration_cache();
 
 	/* free history value cache */
 	zbx_vc_destroy();
 
 	zbx_destroy_services_lock();
-
-	DBclose();
 
 	zbx_mutex_destroy(&node_sync_access);
 
