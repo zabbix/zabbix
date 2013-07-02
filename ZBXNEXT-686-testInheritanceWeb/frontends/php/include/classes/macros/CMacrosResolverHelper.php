@@ -198,6 +198,84 @@ class CMacrosResolverHelper {
 	}
 
 	/**
+	 * Resolve positional macros and functional item macros, for example, {{HOST.HOST1}:key.func(param)}.
+	 *
+	 * @param type	    $name				string in which macros should be resolved
+	 * @param array     $items				list of graph items
+	 * @param int       $items[n]['hostid'] graph n-th item corresponding host Id
+	 * @param string    $items[n]['host']   graph n-th item corresponding host name
+	 *
+	 * @return string	string with macros replaced with corresponding values
+	 */
+	public static function resolveGraphName($name, $items) {
+		self::init();
+		$graph = reset(self::$macrosResolver->resolve(array(
+			'config' => 'graphName',
+			'data' => array(array('name' => $name, 'items' => $items))
+		)));
+		return $graph['name'];
+	}
+
+	/**
+	 * Resolve positional macros and functional item macros, for example, {{HOST.HOST1}:key.func(param)}.
+	 *
+	 *  ! if same graph will be passed more than once only name for first entry will be resolved.
+	 *
+	 * @param array		$data				list or hashmap of graphs
+	 * @param int		$data[]['graphid']	id of graph
+	 * @param string	$data[]['name']		name of graph
+	 *
+	 * @return array	inputted data with resolved names
+	 */
+	public static function resolveGraphNameByIds($data) {
+		self::init();
+
+		$graphIds = array();
+		$graphMap = array();
+		foreach ($data as $graph) {
+			// skip graphs without macros
+			if (strpos($graph['name'], '{') !== false) {
+				$graphMap[$graph['graphid']] = array(
+					'graphid' => $graph['graphid'],
+					'name' => $graph['name'],
+					'items' => array()
+				);
+				$graphIds[] = $graph['graphid'];
+			}
+		}
+
+		sort($graphIds, SORT_NUMERIC);
+		$items = DBfetchArray(DBselect(
+			'SELECT i.hostid,gi.graphid,h.host'.
+			' FROM graphs_items gi,items i,hosts h'.
+			' WHERE gi.itemid=i.itemid'.
+				' AND i.hostid=h.hostid'.
+				' AND '.dbConditionInt('gi.graphid', $graphIds).
+			' ORDER BY gi.sortorder'
+		));
+
+		foreach ($items as $item) {
+			$graphMap[$item['graphid']]['items'][] = array('hostid' => $item['hostid'], 'host' => $item['host']);
+		}
+
+		$graphMap = self::$macrosResolver->resolve(array(
+			'config' => 'graphName',
+			'data' => $graphMap
+		));
+
+		$resolvedGraph = reset($graphMap);
+		foreach ($data as &$graph) {
+			if ($graph['graphid'] === $resolvedGraph['graphid']) {
+				$graph['name'] = $resolvedGraph['name'];
+				$resolvedGraph = next($graphMap);
+			}
+		}
+		unset($graph);
+
+		return $data;
+	}
+
+	/**
 	 * Create CMacrosResolver object and store in static variable.
 	 *
 	 * @static

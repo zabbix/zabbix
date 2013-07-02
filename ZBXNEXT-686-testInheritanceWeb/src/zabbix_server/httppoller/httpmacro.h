@@ -20,6 +20,15 @@
 #ifndef ZABBIX_HTTPMACRO_H
 #define ZABBIX_HTTPMACRO_H
 
-void	http_substitute_macros(const char *macros, char **data);
+typedef struct
+{
+	DB_HTTPTEST		httptest;
+	/* httptest macro cache consisting of (key, value) pair array */
+	zbx_vector_ptr_pair_t   macros;
+}
+zbx_httptest_t;
+
+void	http_substitute_variables(zbx_httptest_t *httptest, char **data);
+int	http_process_variables(zbx_httptest_t *httptest, const char *variables, const char *data, char **err_str);
 
 #endif

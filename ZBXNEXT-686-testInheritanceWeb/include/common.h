@@ -204,7 +204,8 @@ typedef enum
 {
 	ITEM_AUTHTYPE_PASSWORD = 0,
 	ITEM_AUTHTYPE_PUBLICKEY
-} zbx_item_authtype_t;
+}
+zbx_item_authtype_t;
 
 /* event sources */
 #define EVENT_SOURCE_TRIGGERS		0
@@ -230,7 +231,8 @@ typedef enum
 	DOBJECT_STATUS_DOWN,
 	DOBJECT_STATUS_DISCOVER,
 	DOBJECT_STATUS_LOST
-} zbx_dstatus_t;
+}
+zbx_dstatus_t;
 
 /* item value types */
 typedef enum
@@ -239,8 +241,11 @@ typedef enum
 	ITEM_VALUE_TYPE_STR,
 	ITEM_VALUE_TYPE_LOG,
 	ITEM_VALUE_TYPE_UINT64,
-	ITEM_VALUE_TYPE_TEXT
-} zbx_item_value_type_t;
+	ITEM_VALUE_TYPE_TEXT,
+	/* the number of defined value types */
+	ITEM_VALUE_TYPE_COUNT
+}
+zbx_item_value_type_t;
 const char	*zbx_item_value_type_string(zbx_item_value_type_t value_type);
 
 typedef union
@@ -259,7 +264,8 @@ typedef enum
 	ITEM_DATA_TYPE_OCTAL,
 	ITEM_DATA_TYPE_HEXADECIMAL,
 	ITEM_DATA_TYPE_BOOLEAN
-} zbx_item_data_type_t;
+}
+zbx_item_data_type_t;
 const char	*zbx_item_data_type_string(zbx_item_data_type_t data_type);
 
 /* service supported by discoverer */
@@ -281,7 +287,8 @@ typedef enum
 	SVC_SNMPv3,
 	SVC_HTTPS,
 	SVC_TELNET
-} zbx_dservice_type_t;
+}
+zbx_dservice_type_t;
 const char	*zbx_dservice_type_string(zbx_dservice_type_t service);
 
 /* item snmpv3 security levels */
@@ -340,6 +347,7 @@ const char	*zbx_dservice_type_string(zbx_dservice_type_t service);
 #define CONDITION_TYPE_DOBJECT			21
 #define CONDITION_TYPE_HOST_NAME		22
 #define CONDITION_TYPE_EVENT_TYPE		23
+#define CONDITION_TYPE_HOST_METADATA		24
 
 /* condition operators */
 #define CONDITION_OPERATOR_EQUAL		0
@@ -366,14 +374,16 @@ typedef enum
 	SYSMAP_ELEMENT_TYPE_TRIGGER,
 	SYSMAP_ELEMENT_TYPE_HOST_GROUP,
 	SYSMAP_ELEMENT_TYPE_IMAGE
-} zbx_sysmap_element_types_t;
+}
+zbx_sysmap_element_types_t;
 
 typedef enum
 {
 	GRAPH_YAXIS_TYPE_CALCULATED = 0,
 	GRAPH_YAXIS_TYPE_FIXED,
 	GRAPH_YAXIS_TYPE_ITEM_VALUE
-} zbx_graph_yaxis_types_t;
+}
+zbx_graph_yaxis_types_t;
 
 typedef enum
 {
@@ -406,7 +416,8 @@ typedef enum
 	AUDIT_RESOURCE_PROXY,
 	AUDIT_RESOURCE_MAINTENANCE,
 	AUDIT_RESOURCE_REGEXP
-} zbx_auditlog_resourcetype_t;
+}
+zbx_auditlog_resourcetype_t;
 
 /* special item key used for ICMP pings */
 #define SERVER_ICMPPING_KEY	"icmpping"
@@ -431,7 +442,8 @@ typedef enum
 	MEDIA_TYPE_SMS,
 	MEDIA_TYPE_JABBER,
 	MEDIA_TYPE_EZ_TEXTING = 100
-} zbx_media_type_t;
+}
+zbx_media_type_t;
 
 /* alert statuses */
 typedef enum
@@ -439,7 +451,8 @@ typedef enum
 	ALERT_STATUS_NOT_SENT = 0,
 	ALERT_STATUS_SENT,
 	ALERT_STATUS_FAILED
-} zbx_alert_status_t;
+}
+zbx_alert_status_t;
 const char	*zbx_alert_status_string(unsigned char type, unsigned char status);
 
 /* escalation statuses */
@@ -458,7 +471,8 @@ typedef enum
 {
 	ALERT_TYPE_MESSAGE = 0,
 	ALERT_TYPE_COMMAND
-} zbx_alert_type_t;
+}
+zbx_alert_type_t;
 const char	*zbx_alert_type_string(unsigned char type);
 
 /* item statuses */
@@ -475,7 +489,8 @@ typedef enum
 {
        GROUP_STATUS_ACTIVE = 0,
        GROUP_STATUS_DISABLED
-} zbx_group_status_type_t;
+}
+zbx_group_status_type_t;
 
 /* daemon type */
 #define ZBX_DAEMON_TYPE_SERVER		0x01
@@ -491,14 +506,16 @@ typedef enum
 /*	TIMEPERIOD_TYPE_HOURLY,*/
 	TIMEPERIOD_TYPE_DAILY = 2,
 	TIMEPERIOD_TYPE_WEEKLY,
-	TIMEPERIOD_TYPE_MONTHLY,
-} zbx_timeperiod_type_t;
+	TIMEPERIOD_TYPE_MONTHLY
+}
+zbx_timeperiod_type_t;
 
 typedef enum
 {
 	MAINTENANCE_TYPE_NORMAL = 0,
 	MAINTENANCE_TYPE_NODATA
-} zbx_maintenance_type_t;
+}
+zbx_maintenance_type_t;
 
 /* regular expressions */
 typedef enum
@@ -508,13 +525,15 @@ typedef enum
 	EXPRESSION_TYPE_NOT_INCLUDED,
 	EXPRESSION_TYPE_TRUE,
 	EXPRESSION_TYPE_FALSE
-} zbx_expression_type_t;
+}
+zbx_expression_type_t;
 
 typedef enum
 {
 	ZBX_IGNORE_CASE = 0,
 	ZBX_CASE_SENSITIVE
-} zbx_case_sensitive_t;
+}
+zbx_case_sensitive_t;
 
 /* HTTP tests statuses */
 #define HTTPTEST_STATUS_MONITORED	0
@@ -558,6 +577,7 @@ typedef enum
 #define TRIGGER_VALUE_OK		0
 #define TRIGGER_VALUE_PROBLEM		1
 #define TRIGGER_VALUE_UNKNOWN		2	/* only in server code, never in DB */
+const char	*zbx_trigger_value_string(unsigned char value);
 
 /* trigger states */
 #define TRIGGER_STATE_NORMAL		0
@@ -634,14 +654,16 @@ typedef enum
 	USER_TYPE_ZABBIX_USER = 1,
 	USER_TYPE_ZABBIX_ADMIN,
 	USER_TYPE_SUPER_ADMIN
-} zbx_user_type_t;
+}
+zbx_user_type_t;
 
 typedef enum
 {
 	PERM_DENY = 0,
 	PERM_READ = 2,
 	PERM_READ_WRITE
-} zbx_user_permission_t;
+}
+zbx_user_permission_t;
 
 const char	*zbx_permission_string(int perm);
 
@@ -734,9 +756,11 @@ extern const char	title_message[];
 extern const char	usage_message[];
 extern const char	*help_message[];
 
-void	help();
-void	usage();
-void	version();
+#define ARRSIZE(a)	(sizeof(a) / sizeof(*a))
+
+void	help(void);
+void	usage(void);
+void	version(void);
 
 /* max length of base64 data */
 #define ZBX_MAX_B64_LEN 16 * 1024
@@ -763,7 +787,8 @@ typedef enum
 	HTTPTEST_AUTH_NONE = 0,
 	HTTPTEST_AUTH_BASIC,
 	HTTPTEST_AUTH_NTLM
-} zbx_httptest_auth_t;
+}
+zbx_httptest_auth_t;
 
 #define ZBX_TASK_FLAG_MULTIPLE_AGENTS 0x01
 
@@ -869,9 +894,9 @@ void	__zbx_zbx_setproctitle(const char *fmt, ...);
 
 #define ZBX_MAX_RECV_DATA_SIZE	(64 * ZBX_MEBIBYTE)
 
-double	zbx_time();
+double	zbx_time(void);
 void	zbx_timespec(zbx_timespec_t *ts);
-double	zbx_current_time();
+double	zbx_current_time(void);
 
 #ifdef HAVE___VA_ARGS__
 #	define zbx_error(fmt, ...) __zbx_zbx_error(ZBX_CONST_STRING(fmt), ##__VA_ARGS__)
@@ -936,14 +961,18 @@ typedef struct
 ZBX_REGEXP;
 
 /* regular expressions */
-char    *zbx_regexp_match(const char *string, const char *pattern, int *len);
-char    *zbx_iregexp_match(const char *string, const char *pattern, int *len);
+char	*zbx_regexp_match(const char *string, const char *pattern, int *len);
+char	*zbx_iregexp_match(const char *string, const char *pattern, int *len);
+char	*zbx_regexp_sub(const char *string, const char *pattern, const char *output_template);
+char	*zbx_mregexp_sub(const char *string, const char *pattern, const char *output_template);
 
 void	clean_regexps_ex(ZBX_REGEXP *regexps, int *regexps_num);
 void	add_regexp_ex(ZBX_REGEXP **regexps, int *regexps_alloc, int *regexps_num,
 		const char *name, const char *expression, int expression_type, char exp_delimiter, int case_sensitive);
 int	regexp_match_ex(ZBX_REGEXP *regexps, int regexps_num, const char *string, const char *pattern,
 		zbx_case_sensitive_t cs);
+int	regexp_sub_ex(ZBX_REGEXP *regexps, int regexps_num, const char *string, const char *pattern,
+		zbx_case_sensitive_t cs, const char *output_template, char **output);
 
 /* misc functions */
 #ifdef HAVE_IPV6
@@ -952,8 +981,6 @@ int	is_ip6(const char *ip);
 int	is_ip4(const char *ip);
 
 void	zbx_on_exit(); /* calls exit() at the end! */
-
-int	get_nodeid_by_id(zbx_uint64_t id);
 
 int	int_in_list(char *list, int value);
 int	uint64_in_list(char *list, zbx_uint64_t value);
@@ -981,6 +1008,8 @@ void	uint64_array_merge(zbx_uint64_t **values, int *alloc, int *num, zbx_uint64_
 int	uint64_array_exists(zbx_uint64_t *values, int num, zbx_uint64_t value);
 void	uint64_array_remove(zbx_uint64_t *values, int *num, zbx_uint64_t *rm_values, int rm_num);
 void	uint64_array_remove_both(zbx_uint64_t *values, int *num, zbx_uint64_t *rm_values, int *rm_num);
+
+const char	*zbx_event_value_string(unsigned char source, unsigned char object, unsigned char value);
 
 #ifdef _WINDOWS
 LPTSTR	zbx_acp_to_unicode(LPCSTR acp_string);

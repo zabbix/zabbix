@@ -19,8 +19,8 @@
 **/
 ?>
 <?php
-require_once 'include/config.inc.php';
-require_once 'include/items.inc.php';
+require_once dirname(__FILE__).'/include/config.inc.php';
+require_once dirname(__FILE__).'/include/items.inc.php';
 
 $page['title'] = _('Queue');
 $page['file'] = 'queue.php';
@@ -28,7 +28,7 @@ $page['hist_arg'] = array('config');
 
 define('ZBX_PAGE_DO_REFRESH', 1);
 
-require_once 'include/page_header.php';
+require_once dirname(__FILE__).'/include/page_header.php';
 ?>
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
@@ -292,4 +292,3 @@ require_once 'include/page_header.php';
 
 
 require_once dirname(__FILE__).'/include/page_footer.php';
-?>
