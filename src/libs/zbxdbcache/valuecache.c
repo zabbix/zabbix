@@ -58,7 +58,7 @@
 /* the period of low memory warning messages */
 #define ZBX_VC_LOW_MEMORY_WARNING_PERIOD	(60 * 5)
 
-static zbx_mem_info_t *vc_mem = NULL;
+static zbx_mem_info_t	*vc_mem = NULL;
 
 static ZBX_MUTEX	vc_lock;
 
@@ -101,13 +101,12 @@ zbx_vc_chunk_t;
 
 /* min/max number number of item history values to store in chunk */
 
-/* The minimum number is calculated so that 3 chunks of 1/2 value count size takes less space */
-/* than 2 chunks of 1 value count size.                                                       */
-#define ZBX_VC_MIN_CHUNK_RECORDS	(1 + (sizeof(zbx_vc_chunk_t) - sizeof(zbx_vc_value_t)) / \
-						sizeof(zbx_vc_value_t))
+/* the minimum number is calculated so that 3 chunks of 1/2 value count size takes less space */
+/* than 2 chunks of 1 value count size                                                        */
+#define ZBX_VC_MIN_CHUNK_RECORDS	(1 + (sizeof(zbx_vc_chunk_t) - sizeof(zbx_vc_value_t)) / sizeof(zbx_vc_value_t))
 
-/* The maximum number is calculated so that the chunk size does not exceed 4KB */
-#define ZBX_VC_MAX_CHUNK_RECORDS	((4096 - sizeof(zbx_vc_chunk_t)) /  sizeof(zbx_vc_value_t) + 1)
+/* the maximum number is calculated so that the chunk size does not exceed 4KB */
+#define ZBX_VC_MAX_CHUNK_RECORDS	((4 * ZBX_KIBIBYTE - sizeof(zbx_vc_chunk_t)) / sizeof(zbx_vc_value_t) + 1)
 
 /* data storage modes */
 #define ZBX_VC_MODE_LASTVALUE	0
@@ -132,7 +131,7 @@ typedef struct
 	/* Used to determine if data can be removed from cache.  */
 	int		range;
 
-	/* The flag indicating that all data from DB are cached. */
+	/* the flag indicating that all data from DB are cached  */
 	int		cached_all;
 
 	/* the number of slots in chunk to store the largest     */
@@ -144,8 +143,6 @@ typedef struct
 
 	/* the first (oldest) chunk if item history data         */
 	zbx_vc_chunk_t	*tail;
-
-
 }
 zbx_vc_data_history_t;
 
@@ -228,7 +225,7 @@ extern zbx_vc_idata_t	*vc_data_interface[2];
 
 #define ZBX_VC_TIME()		time(NULL)
 
-/* The value cache data  */
+/* the value cache data  */
 typedef struct
 {
 	/* the number of cache hits, used for statistics */
@@ -243,11 +240,10 @@ typedef struct
 	/* the cached items */
 	zbx_hashset_t	items;
 
-	/* the string pool for str,text and log item values */
+	/* the string pool for str, text and log item values */
 	zbx_hashset_t	strpool;
 }
 zbx_vc_cache_t;
-
 
 /* the item weight data, used to determine if item can be removed from cache */
 typedef struct
@@ -280,10 +276,10 @@ typedef void (*vc_str2value_func_t)(history_value_t *value, DB_ROW row);
 typedef struct
 {
 	/* table name */
-	const char *name;
+	const char		*name;
 
 	/* field list */
-	const char *fields;
+	const char		*fields;
 
 	/* string to value converter function, used to convert string value of DB row */
 	/* to the value of appropriate type                                           */
@@ -312,17 +308,11 @@ static void	row2value_log(history_value_t *value, DB_ROW row)
 {
 	value->log = zbx_malloc(0, sizeof(zbx_history_log_t));
 
-	memset(value->log, 0, sizeof(zbx_history_log_t));
-
 	value->log->timestamp = atoi(row[0]);
 	value->log->logeventid = atoi(row[1]);
 	value->log->severity = atoi(row[2]);
-
-	if (NULL != row[3])
-		value->log->source = zbx_strdup(NULL, row[3]);
-
-	if (NULL != row[4])
-		value->log->value = zbx_strdup(NULL, row[4]);
+	value->log->source = (SUCCEED == DBis_null(row[3]) ? NULL : zbx_strdup(NULL, row[3]));
+	value->log->value = (SUCCEED == DBis_null(row[4]) ? NULL : zbx_strdup(NULL, row[4]));
 }
 
 /* value_type - history table data mapping */
@@ -344,8 +334,7 @@ static zbx_vc_history_table_t	vc_history_tables[] = {
  * 		value_type    - [IN] the value type (see ITEM_VALUE_TYPE_* defs) *
  *              values        - [OUT] the item history data values               *
  *              seconds       - [IN] the time period to read                     *
- *              end_timestamp - [IN] the value timestamp to start reading        *
- *                               with                                            *
+ *              end_timestamp - [IN] the value timestamp to start reading with   *
  *                                                                               *
  * Return value: SUCCEED - the history data were read successfully               *
  *               FAIL -                                                          *
@@ -357,17 +346,22 @@ static zbx_vc_history_table_t	vc_history_tables[] = {
 static int	vc_db_read_values_by_time(zbx_uint64_t itemid, int value_type, zbx_vector_vc_value_t *values,
 		int seconds, int end_timestamp)
 {
-	char			*sql = 0;
+	char			*sql = NULL;
 	size_t	 		sql_alloc = 0, sql_offset = 0;
 	DB_RESULT		result;
 	DB_ROW			row;
 	zbx_vc_history_table_t	*table = &vc_history_tables[value_type];
 
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "select clock,ns,%s from %s"
-			" where itemid=" ZBX_FS_UI64 " and clock>%d and clock<=%d",
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+			"select clock,ns,%s"
+			" from %s"
+			" where itemid=" ZBX_FS_UI64
+				" and clock>%d and clock<=%d",
 			table->fields, table->name, itemid, end_timestamp - seconds, end_timestamp);
 
 	result = DBselect("%s", sql);
+
+	zbx_free(sql);
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -391,12 +385,10 @@ static int	vc_db_read_values_by_time(zbx_uint64_t itemid, int value_type, zbx_ve
  * Purpose: reads item history data from database                                   *
  *                                                                                  *
  * Parameters:  itemid          - [IN] the itemid                                   *
- * 		value_type      - [IN] the value type (see ITEM_VALUE_TYPE_* defs)  *
+ *              value_type      - [IN] the value type (see ITEM_VALUE_TYPE_* defs)  *
  *              count           - [IN] the number of values to read                 *
- *              read_timestamp  - [IN] the value timestamp to start reading         *
- *                                with                                              *
- *              count_timestamp - [IN] the value timestamp to start counting        *
- *                                with                                              *
+ *              read_timestamp  - [IN] the value timestamp to start reading with    *
+ *              count_timestamp - [IN] the value timestamp to start counting with   *
  *              direct          - [IN] 1 - data is read from DB to directly         *
  *                                         return it  to user.                      *
  *                                     0 - data is read from DB to store in cache   *
@@ -421,7 +413,7 @@ static int	vc_db_read_values_by_time(zbx_uint64_t itemid, int value_type, zbx_ve
 static int	vc_db_read_values_by_count(zbx_uint64_t itemid, int value_type, zbx_vector_vc_value_t *values,
 		int count, int read_timestamp, int count_timestamp, int direct)
 {
-	char			*sql = 0;
+	char			*sql = NULL;
 	size_t	 		sql_alloc = 0, sql_offset = 0;
 	int			last_timestamp = 0, clock_to, clock_from, step = 0;
 	DB_RESULT		result;
@@ -436,8 +428,11 @@ static int	vc_db_read_values_by_count(zbx_uint64_t itemid, int value_type, zbx_v
 		clock_from = clock_to - periods[step];
 
 		sql_offset = 0;
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "select clock,ns,%s from %s"
-				" where itemid=" ZBX_FS_UI64 " and clock<=%d",
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+				"select clock,ns,%s"
+				" from %s"
+				" where itemid=" ZBX_FS_UI64
+					" and clock<=%d",
 				table->fields, table->name, itemid, clock_to);
 
 		if (clock_from != clock_to)
@@ -476,6 +471,8 @@ static int	vc_db_read_values_by_count(zbx_uint64_t itemid, int value_type, zbx_v
 		step++;
 	}
 
+	zbx_free(sql);
+
 	return SUCCEED;
 }
 
@@ -492,23 +489,24 @@ static int	vc_db_read_values_by_count(zbx_uint64_t itemid, int value_type, zbx_v
  *              value         - [OUT] the read value                             *
  *                                                                               *
  * Return value: SUCCEED - the history data were read successfully               *
- *               FAIL -                                                          *
- *                                                                               *
- * Comments:                                                                     *
+ *               FAIL - otherwise                                                *
  *                                                                               *
  *********************************************************************************/
 static int	vc_db_read_value(zbx_uint64_t itemid, int value_type, const zbx_timespec_t *ts, zbx_vc_value_t *value)
 {
-	char		*sql = 0;
-	size_t		sql_alloc = 0, sql_offset = 0;
-	int		ret = FAIL;
-	DB_RESULT	result;
-	DB_ROW		row;
+	char			*sql = NULL;
+	size_t			sql_alloc = 0, sql_offset = 0;
+	int			ret = FAIL;
+	DB_RESULT		result;
+	DB_ROW			row;
 	zbx_vc_history_table_t	*table = &vc_history_tables[value_type];
 
 	/* first try to find a value matching the target timestamp */
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "select clock,ns,%s from %s"
-			" where itemid=" ZBX_FS_UI64 " and clock=%d and ns=%d",
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+			"select clock,ns,%s"
+			" from %s"
+			" where itemid=" ZBX_FS_UI64
+				" and clock=%d and ns=%d",
 			table->fields, table->name, itemid, ts->sec, ts->ns);
 
 	result = DBselect("%s", sql);
@@ -519,9 +517,13 @@ static int	vc_db_read_value(zbx_uint64_t itemid, int value_type, const zbx_times
 		DBfree_result(result);
 
 		sql_offset = 0;
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "select clock,ns,%s from %s"
-				" where itemid=" ZBX_FS_UI64 " and clock<=%d order by clock desc,ns desc",
-				table->fields, table->name, itemid, ts->sec, ts->ns);
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+				"select clock,ns,%s"
+				" from %s"
+				" where itemid=" ZBX_FS_UI64
+					" and clock<=%d"
+				" order by clock desc,ns desc",
+				table->fields, table->name, itemid, ts->sec);
 
 		result = DBselect("%s", sql);
 
@@ -531,6 +533,8 @@ static int	vc_db_read_value(zbx_uint64_t itemid, int value_type, const zbx_times
 				break;
 		}
 	}
+
+	zbx_free(sql);
 
 	if (NULL != row)
 	{
