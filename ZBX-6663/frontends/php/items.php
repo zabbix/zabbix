@@ -37,6 +37,7 @@ $paramsFieldName = getParamFieldNameByType(get_request('type', 0));
 $fields = array(
 	'groupid' =>				array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
 	'hostid' =>					array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID.NOT_ZERO, 'isset({form})&&!isset({itemid})'),
+	'referid' =>				array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
 	'interfaceid' =>			array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null, _('Interface')),
 	'copy_type' =>				array(T_ZBX_INT, O_OPT, P_SYS,	IN('0,1'),	'isset({copy})'),
 	'copy_mode' =>				array(T_ZBX_INT, O_OPT, P_SYS,	IN('0'),	null),
@@ -312,6 +313,8 @@ foreach (array('subfilter_apps', 'subfilter_types', 'subfilter_value_types', 'su
 			'subfilter_history', 'subfilter_trends') as $name) {
 	$_REQUEST[$name] = isset($_REQUEST['filter_set']) ? array() : get_request($name, array());
 }
+
+resetCurrentPageCookies($_REQUEST['hostid'], get_request('referid', 0));
 
 /*
  * Actions

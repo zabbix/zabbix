@@ -76,7 +76,7 @@ foreach ($this->data['items'] as $item) {
 	// description
 	$description = array();
 	if (!empty($item['template_host'])) {
-		$description[] = new CLink(CHtml::encode($item['template_host']['name']), '?hostid='.$item['template_host']['hostid'].'&filter_set=1', 'unknown');
+		$description[] = new CLink(CHtml::encode($item['template_host']['name']), '?hostid='.$item['template_host']['hostid'].'&filter_set=1&referid='.$this->data['hostid'], 'unknown');
 		$description[] = NAME_DELIMITER;
 	}
 	if (!empty($item['discoveryRule'])) {
