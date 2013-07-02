@@ -471,7 +471,6 @@ class CTrigger extends CTriggerGeneral {
 					'objectids' => $triggerId,
 					'output' => $options['selectLastEvent'],
 					'nopermissions' => true,
-					'filter' => array('value_changed' => TRIGGER_VALUE_CHANGED_YES),
 					'sortfield' => array('eventid'),
 					'sortorder' => ZBX_SORT_DOWN,
 					'limit' => 1

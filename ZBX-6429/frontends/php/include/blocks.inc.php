@@ -277,8 +277,7 @@ function make_system_status($filter) {
 			$trigger['event'] = array(
 				'acknowledged' => false,
 				'clock' => $trigger['lastchange'],
-				'value' => $trigger['value'],
-				'value_changed' => 0
+				'value' => $trigger['value']
 			);
 		}
 		else {
