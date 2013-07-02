@@ -354,6 +354,7 @@ static int	vc_db_read_values_by_time(zbx_uint64_t itemid, int value_type, zbx_ve
 	DB_RESULT		result;
 	DB_ROW			row;
 	zbx_vc_history_table_t	*table = &vc_history_tables[value_type];
+	int			ret = FAIL;
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 			"select clock,ns,%s"
@@ -365,6 +366,9 @@ static int	vc_db_read_values_by_time(zbx_uint64_t itemid, int value_type, zbx_ve
 	result = DBselect("%s", sql);
 
 	zbx_free(sql);
+
+	if (NULL == result)
+		goto out;
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -378,7 +382,9 @@ static int	vc_db_read_values_by_time(zbx_uint64_t itemid, int value_type, zbx_ve
 	}
 	DBfree_result(result);
 
-	return SUCCEED;
+	ret = SUCCEED;
+out:
+	return ret;
 }
 
 /************************************************************************************
@@ -418,7 +424,7 @@ static int	vc_db_read_values_by_count(zbx_uint64_t itemid, int value_type, zbx_v
 {
 	char			*sql = NULL;
 	size_t	 		sql_alloc = 0, sql_offset = 0;
-	int			last_timestamp = 0, clock_to, clock_from, step = 0;
+	int			last_timestamp = 0, clock_to, clock_from, step = 0, ret = FAIL;
 	DB_RESULT		result;
 	DB_ROW			row;
 	zbx_vc_history_table_t	*table = &vc_history_tables[value_type];
@@ -448,6 +454,9 @@ static int	vc_db_read_values_by_count(zbx_uint64_t itemid, int value_type, zbx_v
 		else
 			result = DBselect("%s", sql);
 
+		if (NULL == result)
+			goto out;
+
 		while (NULL != (row = DBfetch(result)))
 		{
 			zbx_vc_value_t	value;
@@ -474,9 +483,11 @@ static int	vc_db_read_values_by_count(zbx_uint64_t itemid, int value_type, zbx_v
 		step++;
 	}
 
+	ret = SUCCEED;
+out:
 	zbx_free(sql);
 
-	return SUCCEED;
+	return ret;
 }
 
 /*********************************************************************************
