@@ -17,8 +17,8 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
+
 /**
  * Class containing common methods for operations with triggers.
  */
@@ -61,7 +61,7 @@ abstract class CTriggerGeneral extends CZBXAPI {
 	 *
 	 * @return bool
 	 */
-	protected function inherit(array $trigger, array $hostids = null) {
+	protected function inherit(array $trigger, array $hostIds = null) {
 		$triggerTemplates = API::Template()->get(array(
 			'triggerids' => $trigger['triggerid'],
 			'output' => API_OUTPUT_EXTEND,
@@ -92,25 +92,21 @@ abstract class CTriggerGeneral extends CZBXAPI {
 		}
 
 		// fetch all of the child hosts
-		$chdHosts = API::Host()->get(array(
+		$childHosts = API::Host()->get(array(
 			'templateids' => zbx_objectValues($triggerTemplates, 'templateid'),
-			'output' => array(
-				'hostid',
-				'host'
-			),
+			'output' => array('hostid', 'host'),
 			'preservekeys' => true,
-			'hostids' => $hostids,
+			'hostids' => $hostIds,
 			'nopermissions' => true,
 			'templated_hosts' => true
 		));
 
-		foreach ($chdHosts as $childHost) {
+		foreach ($childHosts as $childHost) {
 			// update the child trigger on the child host
 			$newTrigger = $this->inheritOnHost($trigger, $childHost, $triggerTemplates);
 
 			// propagate the trigger inheritance to all child hosts
 			$this->inherit($newTrigger);
-
 		}
 
 		return true;
@@ -160,7 +156,7 @@ abstract class CTriggerGeneral extends CZBXAPI {
 		$childTriggers = $this->get(array(
 			'filter' => array('templateid' => $newTrigger['templateid']),
 			'output' => API_OUTPUT_EXTEND,
-			'preservekeys' => 1,
+			'preservekeys' => true,
 			'hostids' => $chdHost['hostid']
 		));
 
@@ -177,8 +173,8 @@ abstract class CTriggerGeneral extends CZBXAPI {
 					'flags' => null
 				),
 				'output' => API_OUTPUT_EXTEND,
-				'preservekeys' => 1,
-				'nopermissions' => 1,
+				'preservekeys' => true,
+				'nopermissions' => true,
 				'hostids' => $chdHost['hostid']
 			));
 
@@ -229,7 +225,7 @@ abstract class CTriggerGeneral extends CZBXAPI {
 	 *
 	 * @return void
 	 */
-	protected function checkIfExistsOnHost(array $trigger, $hostid = null) {
+	protected function checkIfExistsOnHost(array $trigger, $hostId = null) {
 		// skip the check if the description and expression haven't been changed
 		if (!isset($trigger['description']) && !isset($trigger['expression'])) {
 			return;
@@ -239,14 +235,16 @@ abstract class CTriggerGeneral extends CZBXAPI {
 		if (!isset($trigger['description']) || !isset($trigger['expression'])) {
 			$explodeExpression = !isset($trigger['expression']);
 			$trigger = $this->extendObject($this->tableName(), $trigger, array('description', 'expression'));
+
 			if ($explodeExpression) {
 				$trigger['expression'] = explode_exp($trigger['expression']);
 			}
 		}
 
 		$filter = array('description' => $trigger['description']);
-		if ($hostid) {
-			$filter['hostid'] = $hostid;
+
+		if ($hostId) {
+			$filter['hostid'] = $hostId;
 		}
 		else {
 			$expressionData = new CTriggerExpression($trigger['expression']);
@@ -260,11 +258,13 @@ abstract class CTriggerGeneral extends CZBXAPI {
 			'output' => array('expression', 'triggerid'),
 			'nopermissions' => true
 		));
+
 		foreach ($triggers as $dbTrigger) {
 			$tmpExp = explode_exp($dbTrigger['expression']);
 
 			// check if the expressions are also equal and that this is a different trigger
 			$differentTrigger = (!isset($trigger['triggerid']) || !idcmp($trigger['triggerid'], $dbTrigger['triggerid']));
+
 			if (strcmp($tmpExp, $trigger['expression']) == 0 && $differentTrigger) {
 				$options = array(
 					'output' => array('name'),
@@ -276,12 +276,13 @@ abstract class CTriggerGeneral extends CZBXAPI {
 					$options['filter'] = array('host' => $filter['host']);
 				}
 				else {
-					$options['hostids'] = $hostid;
+					$options['hostids'] = $hostId;
 				}
 				$host = API::Host()->get($options);
 				$host = reset($host);
 
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Trigger "%1$s" already exists on "%2$s".', $trigger['description'], $host['name']));
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Trigger "%1$s" already exists on "%2$s".', $trigger['description'], $host['name']));
 			}
 		}
 	}
@@ -356,6 +357,4 @@ abstract class CTriggerGeneral extends CZBXAPI {
 
 		return $result;
 	}
-
-
 }

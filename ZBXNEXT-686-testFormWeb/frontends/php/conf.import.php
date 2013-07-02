@@ -19,7 +19,7 @@
 **/
 
 
-require_once 'include/config.inc.php';
+require_once dirname(__FILE__).'/include/config.inc.php';
 
 $page['file'] = 'conf.import.php';
 $page['title'] = _('Configuration import');
@@ -28,7 +28,7 @@ $page['hist_arg'] = array();
 
 ob_start();
 
-require_once 'include/page_header.php';
+require_once dirname(__FILE__).'/include/page_header.php';
 
 $fields = array(
 	'rules' => array(T_ZBX_STR, O_OPT, null, null, null),
@@ -140,4 +140,4 @@ $view = new CView('conf.import', $data);
 $view->render();
 $view->show();
 
-require_once('include/page_footer.php');
+require_once dirname(__FILE__).'/include/page_footer.php';

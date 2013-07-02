@@ -20,6 +20,9 @@
 ?>
 <?php
 
+/**
+ * Draws a table containing text or images.
+ */
 class CImageTextTable {
 
 	public $image;
@@ -28,7 +31,14 @@ class CImageTextTable {
 	public $align;
 	public $x;
 	public $y;
+
+	/**
+	 * Minimal row height. If the height of some row is bigger then given, the $rowheight will be set to this height.
+	 *
+	 * @var int
+	 */
 	public $rowheight;
+
 	private $table;
 	private $numrows;
 
@@ -48,7 +58,23 @@ class CImageTextTable {
 		return $this->numrows;
 	}
 
-	public function addCell($numrow, $cell) {
+	/**
+	 * Adds a new table cell.
+	 *
+	 * Supported $cell options:
+	 * - marginRight    - right margin, defaults to 20
+	 * - image          - resource of the image to display in the cell
+	 * - text           - text to display in the cell
+	 * - color          - text color resource
+	 * - align          - text alignment: 0 - left, 1 - center, 2 - right
+	 * - fontsize       - text font size
+	 *
+	 * @param int   $numrow
+	 * @param array $cell
+	 *
+	 * @return void
+	 */
+	public function addCell($numrow, array $cell) {
 		if ($numrow >= $this->numrows) {
 			$numrow = $this->numrows;
 			$this->numrows++;
@@ -70,36 +96,74 @@ class CImageTextTable {
 			$rowx = $this->x;
 
 			foreach ($row as $col) {
-				$text_color = isset($col['color']) ? $col['color'] : $this->color;
-				$align = $this->align;
-				if (isset($col['align'])) {
-					if ($col['align'] == 1) {
-						$align = floor(($col['width'] - $col['size']['width']) / 2); // center
-					}
-					elseif ($col['align'] == 2) {
-						$align = $col['width'] - $col['size']['width']; // right
-					}
+				$col['marginRight'] = (isset($col['marginRight'])) ? $col['marginRight'] : 20;
+
+				// draw image
+				if (isset($col['image'])) {
+					$imageWidth = imagesx($col['image']);
+					$imageHeight = imagesy($col['image']);
+
+					imagecopy(
+						$this->image,
+						$col['image'],
+						$rowx,
+						$coly - $imageHeight + 1,
+						0,
+						0,
+						$imageWidth,
+						$imageHeight
+					);
 				}
-				imageText($this->image, $col['fontsize'], 0, $rowx+$align, $coly, $text_color, $col['text']);
-				$rowx += $col['width'] + 20;
+				// draw text
+				else {
+					$text_color = isset($col['color']) ? $col['color'] : $this->color;
+					$align = $this->align;
+					if (isset($col['align'])) {
+						if ($col['align'] == 1) {
+							$align = floor(($col['width'] - $col['size']['width']) / 2); // center
+						}
+						elseif ($col['align'] == 2) {
+							$align = $col['width'] - $col['size']['width']; // right
+						}
+					}
+					imageText($this->image, $col['fontsize'], 0, $rowx+$align, $coly, $text_color, $col['text']);
+				}
+
+				$rowx += $col['width'] + $col['marginRight'];
 				$height = $col['height'];
 			}
 			$coly += $height;
 		}
 	}
 
+	/**
+	 * Calculates the size of each row and column.
+	 *
+	 * @return void
+	 */
 	private function calcRows() {
 		$rowHeight = 0;
 		$colWidth = array();
 
 		foreach ($this->table as $y => $row) {
 			foreach ($row as $x => $col) {
-				if (!isset($col['fontsize'])) {
-					$col['fontsize'] = $this->fontsize;
+				// calculate size from image
+				if (isset($col['image'])) {
+					$dims = array(
+						'width' => imagesx($col['image']),
+						'height' => imagesy($col['image'])
+					);
 				}
-				$this->table[$y][$x]['fontsize'] = $col['fontsize'];
+				// calculate size from text
+				else {
+					if (!isset($col['fontsize'])) {
+						$col['fontsize'] = $this->fontsize;
+					}
+					$this->table[$y][$x]['fontsize'] = $col['fontsize'];
 
-				$dims = imageTextSize($col['fontsize'], 0, $col['text']);
+					$dims = imageTextSize($col['fontsize'], 0, $col['text']);
+				}
+
 				$this->table[$y][$x]['size'] = $dims;
 
 				$rowHeight = ($dims['height'] > $rowHeight) ? $dims['height'] : $rowHeight;

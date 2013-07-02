@@ -22,7 +22,7 @@ body { background: #E5E5E5; }
 
 .ui-widget-header.sub_menu, .ui-widget-header.page_footer { background: url("images/bg_h-hard_55.gif") repeat-x scroll left top #365081; border: 0; }
 table.menu tr td.active { background: url("images/bg_h-hard_55.gif") repeat-x scroll left top #5C9CCC; border-color: #365081; }
-div.thin_header { background: url("images/menu_not_active2.gif") repeat-x scroll left top #4E6EA7; }
+.thin_header { background: url("images/menu_not_active2.gif") repeat-x scroll left top #4E6EA7; }
 
 table.flicker,
 table.formtable tr td.form_row_first, table.formtable tr td.form_row_last,

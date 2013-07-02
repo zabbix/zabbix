@@ -71,23 +71,9 @@ else {
 	$slideWidget->addHeader($this->data['slideshows'][$this->data['elementid']]['name'], $slideForm);
 
 	if (!empty($this->data['screen'])) {
-		// append groups to form
-		if (!empty($this->data['page_groups'])) {
-			$groupsComboBox = new CComboBox('groupid', $this->data['page_groups']['selected'], 'javascript: submit();');
-			foreach ($this->data['page_groups']['groups'] as $groupid => $name) {
-				$groupsComboBox->addItem($groupid, get_node_name_by_elid($groupid, null, NAME_DELIMITER).$name);
-			}
-			$slideForm->addItem(array(SPACE._('Group').SPACE, $groupsComboBox));
-		}
-
-		// append hosts to form
-		if (!empty($this->data['page_hosts'])) {
-			$this->data['page_hosts']['hosts']['0'] = _('Default');
-			$hostsComboBox = new CComboBox('hostid', $this->data['page_hosts']['selected'], 'javascript: submit();');
-			foreach ($this->data['page_hosts']['hosts'] as $hostid => $name) {
-				$hostsComboBox->addItem($hostid, get_node_name_by_elid($hostid, null, NAME_DELIMITER).$name);
-			}
-			$slideForm->addItem(array(SPACE._('Host').SPACE, $hostsComboBox));
+		if (isset($this->data['isDynamicItems'])) {
+			$slideForm->addItem(array(SPACE, _('Group'), SPACE, $this->data['pageFilter']->getGroupsCB()));
+			$slideForm->addItem(array(SPACE, _('Host'), SPACE, $this->data['pageFilter']->getHostsCB()));
 		}
 
 		$scrollDiv = new CDiv();

@@ -241,7 +241,9 @@ typedef enum
 	ITEM_VALUE_TYPE_STR,
 	ITEM_VALUE_TYPE_LOG,
 	ITEM_VALUE_TYPE_UINT64,
-	ITEM_VALUE_TYPE_TEXT
+	ITEM_VALUE_TYPE_TEXT,
+	/* the number of defined value types */
+	ITEM_VALUE_TYPE_COUNT
 }
 zbx_item_value_type_t;
 const char	*zbx_item_value_type_string(zbx_item_value_type_t value_type);
@@ -345,6 +347,7 @@ const char	*zbx_dservice_type_string(zbx_dservice_type_t service);
 #define CONDITION_TYPE_DOBJECT			21
 #define CONDITION_TYPE_HOST_NAME		22
 #define CONDITION_TYPE_EVENT_TYPE		23
+#define CONDITION_TYPE_HOST_METADATA		24
 
 /* condition operators */
 #define CONDITION_OPERATOR_EQUAL		0
@@ -503,7 +506,7 @@ typedef enum
 /*	TIMEPERIOD_TYPE_HOURLY,*/
 	TIMEPERIOD_TYPE_DAILY = 2,
 	TIMEPERIOD_TYPE_WEEKLY,
-	TIMEPERIOD_TYPE_MONTHLY,
+	TIMEPERIOD_TYPE_MONTHLY
 }
 zbx_timeperiod_type_t;
 
@@ -574,6 +577,7 @@ zbx_case_sensitive_t;
 #define TRIGGER_VALUE_OK		0
 #define TRIGGER_VALUE_PROBLEM		1
 #define TRIGGER_VALUE_UNKNOWN		2	/* only in server code, never in DB */
+const char	*zbx_trigger_value_string(unsigned char value);
 
 /* trigger states */
 #define TRIGGER_STATE_NORMAL		0
@@ -752,11 +756,11 @@ extern const char	title_message[];
 extern const char	usage_message[];
 extern const char	*help_message[];
 
-#define ARRSIZE(a)	sizeof(a) / sizeof(*a)
+#define ARRSIZE(a)	(sizeof(a) / sizeof(*a))
 
-void	help();
-void	usage();
-void	version();
+void	help(void);
+void	usage(void);
+void	version(void);
 
 /* max length of base64 data */
 #define ZBX_MAX_B64_LEN 16 * 1024
@@ -890,9 +894,9 @@ void	__zbx_zbx_setproctitle(const char *fmt, ...);
 
 #define ZBX_MAX_RECV_DATA_SIZE	(64 * ZBX_MEBIBYTE)
 
-double	zbx_time();
+double	zbx_time(void);
 void	zbx_timespec(zbx_timespec_t *ts);
-double	zbx_current_time();
+double	zbx_current_time(void);
 
 #ifdef HAVE___VA_ARGS__
 #	define zbx_error(fmt, ...) __zbx_zbx_error(ZBX_CONST_STRING(fmt), ##__VA_ARGS__)
@@ -960,6 +964,7 @@ ZBX_REGEXP;
 char	*zbx_regexp_match(const char *string, const char *pattern, int *len);
 char	*zbx_iregexp_match(const char *string, const char *pattern, int *len);
 char	*zbx_regexp_sub(const char *string, const char *pattern, const char *output_template);
+char	*zbx_mregexp_sub(const char *string, const char *pattern, const char *output_template);
 
 void	clean_regexps_ex(ZBX_REGEXP *regexps, int *regexps_num);
 void	add_regexp_ex(ZBX_REGEXP **regexps, int *regexps_alloc, int *regexps_num,
@@ -976,8 +981,6 @@ int	is_ip6(const char *ip);
 int	is_ip4(const char *ip);
 
 void	zbx_on_exit(); /* calls exit() at the end! */
-
-int	get_nodeid_by_id(zbx_uint64_t id);
 
 int	int_in_list(char *list, int value);
 int	uint64_in_list(char *list, zbx_uint64_t value);
@@ -1005,6 +1008,8 @@ void	uint64_array_merge(zbx_uint64_t **values, int *alloc, int *num, zbx_uint64_
 int	uint64_array_exists(zbx_uint64_t *values, int num, zbx_uint64_t value);
 void	uint64_array_remove(zbx_uint64_t *values, int *num, zbx_uint64_t *rm_values, int rm_num);
 void	uint64_array_remove_both(zbx_uint64_t *values, int *num, zbx_uint64_t *rm_values, int *rm_num);
+
+const char	*zbx_event_value_string(unsigned char source, unsigned char object, unsigned char value);
 
 #ifdef _WINDOWS
 LPTSTR	zbx_acp_to_unicode(LPCSTR acp_string);

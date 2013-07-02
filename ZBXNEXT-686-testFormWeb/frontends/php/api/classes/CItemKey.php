@@ -176,7 +176,7 @@ class CItemKey {
 					}
 					elseif ($this->key[$this->currentByte] != ' ') {
 						$state = 2;
-						// this is a first symbol of unquoted param
+						// this is the first symbol of unquoted param
 						$this->parameters[$currParamNo] .= $this->key[$this->currentByte];
 					}
 					elseif ($nestLevel > 0) {
@@ -225,7 +225,7 @@ class CItemKey {
 						}
 						$state = 0;
 					}
-					//escaped quote (\")
+					// escaped quote (\")
 					elseif ($this->key[$this->currentByte] == '\\' && isset($this->key[$this->currentByte + 1]) && $this->key[$this->currentByte + 1] == '"') {
 						if ($nestLevel > 0) {
 							$this->parameters[$currParamNo] .= $this->key[$this->currentByte];

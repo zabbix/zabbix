@@ -35,8 +35,8 @@ ZBX_METRIC	parameters_specific[] =
 
 	{"vm.memory.size",	CF_HAVEPARAMS,	VM_MEMORY_SIZE,		"free"},
 
-	{"proc.num",		CF_HAVEPARAMS,	PROC_NUM,		"inetd,,"},
-	{"proc.mem",		CF_HAVEPARAMS,	PROC_MEM,		"inetd,,"},
+	{"proc.num",		CF_HAVEPARAMS,	PROC_NUM,		"inetd"},
+	{"proc.mem",		CF_HAVEPARAMS,	PROC_MEM,		"inetd"},
 
 	{"system.cpu.switches",	0,		SYSTEM_CPU_SWITCHES,	NULL},
 	{"system.cpu.intr",	0,		SYSTEM_CPU_INTR,	NULL},
@@ -47,6 +47,6 @@ ZBX_METRIC	parameters_specific[] =
 	{"system.uptime",	0,		SYSTEM_UPTIME,		NULL},
 
 	{"system.stat",		CF_HAVEPARAMS,	SYSTEM_STAT,		"page,fi"},
-	{"system.swap.size",	CF_USEUPARAM,	SYSTEM_SWAP_SIZE,	"all,free"},
+	{"system.swap.size",	CF_HAVEPARAMS,	SYSTEM_SWAP_SIZE,	"all,free"},
 	{NULL}
 };
