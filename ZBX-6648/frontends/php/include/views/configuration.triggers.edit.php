@@ -296,7 +296,8 @@ if (empty($this->data['parent_discoveryid'])) {
 						'&srcfld1=triggerid'.
 						'&monitored_hosts=1'.
 						'&reference=deptrigger'.
-						'&multiselect=1", 1000, 700);',
+						'&multiselect=1'.
+						'&with_triggers=1", 1000, 700);',
 					'link_menu'
 				)
 			),
