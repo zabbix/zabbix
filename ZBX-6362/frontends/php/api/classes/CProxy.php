@@ -82,6 +82,9 @@ class CProxy extends CZBXAPI {
 		);
 		$options = zbx_array_merge($defOptions, $options);
 
+		// deprecated
+		$options = $this->convertDeprecatedParam($options, 'selectInterfaces', 'selectInterface');
+
 		// editable + PERMISSION CHECK
 		if ($userType != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
 			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ;
@@ -253,6 +256,8 @@ class CProxy extends CZBXAPI {
 	public function create($proxies) {
 		$proxies = zbx_toArray($proxies);
 
+		$proxies = $this->convertDeprecatedValues($proxies);
+
 		$this->checkInput($proxies, __FUNCTION__);
 
 		$proxyIds = DB::insert('hosts', $proxies);
@@ -283,10 +288,12 @@ class CProxy extends CZBXAPI {
 
 	public function update($proxies) {
 		$proxies = zbx_toArray($proxies);
-		$proxyIds = array();
+
+		$proxies = $this->convertDeprecatedValues($proxies);
 
 		$this->checkInput($proxies, __FUNCTION__);
 
+		$proxyIds = array();
 		$proxyUpdate = array();
 		$hostUpdate = array();
 
@@ -537,10 +544,8 @@ class CProxy extends CZBXAPI {
 	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
 		$sqlParts = parent::applyQueryOutputOptions($tableName, $tableAlias, $options, $sqlParts);
 
-		if ($options['countOutput'] === null) {
-			if ($options['selectInterface'] !== null) {
-				$sqlParts = $this->addQuerySelect('h.hostid', $sqlParts);
-			}
+		if ($options['countOutput'] === null && $options['selectInterface'] !== null) {
+			$sqlParts = $this->addQuerySelect('h.hostid', $sqlParts);
 		}
 
 		return $sqlParts;
@@ -587,5 +592,25 @@ class CProxy extends CZBXAPI {
 		}
 
 		return $result;
+	}
+
+	/**
+	 * Convert deprecated "interfaces" to "interface".
+	 *
+	 * @param array $proxies
+	 */
+	protected function convertDeprecatedValues($proxies) {
+		foreach ($proxies as $key => $proxy) {
+			if (isset($proxy['interfaces'])) {
+				$this->deprecated('Array of "interfaces" is deprecated, use single "interface" instead.');
+
+				$proxy['interface'] = reset($proxy['interfaces']);
+				unset($proxy['interfaces']);
+
+				$proxies[$key] = $proxy;
+			}
+		}
+
+		return $proxies;
 	}
 }
