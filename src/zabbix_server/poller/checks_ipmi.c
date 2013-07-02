@@ -841,6 +841,9 @@ static void	sensor_change(enum ipmi_update_e op, ipmi_entity_t *ent, ipmi_sensor
 				break;
 			case IPMI_DELETED:
 				delete_ipmi_sensor(h, sensor);
+				break;
+			case IPMI_CHANGED:
+				break;
 		}
 	}
 
@@ -855,14 +858,17 @@ static void	control_change(enum ipmi_update_e op, ipmi_entity_t *ent, ipmi_contr
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() phost:%p host:'[%s]:%d'", __function_name, h, h->ip, h->port);
 
-	if (IPMI_ADDED == op)
+	switch (op)
 	{
-		if (NULL == get_ipmi_control(h, control))
-			allocate_ipmi_control(h, control);
-	}
-	else if (IPMI_DELETED == op)
-	{
-		delete_ipmi_control(h, control);
+		case IPMI_ADDED:
+			if (NULL == get_ipmi_control(h, control))
+				allocate_ipmi_control(h, control);
+			break;
+		case IPMI_DELETED:
+			delete_ipmi_control(h, control);
+			break;
+		case IPMI_CHANGED:
+			break;
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);

@@ -304,6 +304,13 @@ static struct snmp_session	*snmp_open_session(DC_ITEM *item, char *err)
 		session.securityName = item->snmpv3_securityname;
 		session.securityNameLen = strlen(session.securityName);
 
+		/* set the SNMPv3 context if specified */
+		if ('\0' != *item->snmpv3_contextname)
+		{
+			session.contextName = item->snmpv3_contextname;
+			session.contextNameLen = strlen(session.contextName);
+		}
+
 		/* set the security level to authenticated, but not encrypted */
 		switch (item->snmpv3_securitylevel)
 		{

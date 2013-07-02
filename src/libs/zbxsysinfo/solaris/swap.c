@@ -20,172 +20,134 @@
 #include "common.h"
 #include "sysinfo.h"
 
-static void	get_swapinfo(double *total, double *fr)
+/******************************************************************************
+ *                                                                            *
+ * Function: get_swapinfo                                                     *
+ *                                                                            *
+ * Purpose: get swap usage statistics                                         *
+ *                                                                            *
+ * Return value: SUCCEED if swap usage statistics retrieved successfully      *
+ *               FAIL otherwise                                               *
+ *                                                                            *
+ * Author: Vladimir Levijev                                                   *
+ *                                                                            *
+ * Comments: we make calculations the same way swap -s works:                 *
+ *           total = total swap memory                                        *
+ *           used = allocated + reserved                                      *
+ *           free = total - used                                              *
+ *                                                                            *
+ ******************************************************************************/
+static int	get_swapinfo(zbx_uint64_t *total, zbx_uint64_t *used)
 {
-	register int cnt, i, page_size;
-/* Support for >2Gb */
-/*	register int t, f;*/
-	double	t, f;
-	struct swaptable *swt;
-	struct swapent *ste;
-	static char path[256];
+	static int	pagesize = 0;
 
-	/* get total number of swap entries */
-	cnt = swapctl(SC_GETNSWP, 0);
+	struct anoninfo	ai;
 
-	/* allocate enough space to hold count + n swapents */
-	swt = (struct swaptable *)malloc(sizeof(int) +
-		cnt * sizeof(struct swapent));
+	if (-1 == swapctl(SC_AINFO, &ai))
+		return FAIL;
 
-	if (swt == NULL)
-	{
-		*total = 0;
-		*fr = 0;
-		return;
-	}
-	swt->swt_n = cnt;
+	if (0 == pagesize)
+		pagesize = getpagesize();
 
-/* fill in ste_path pointers: we don't care about the paths, so we
-point them all to the same buffer */
-	ste = &(swt->swt_ent[0]);
-	i = cnt;
-	while (--i >= 0)
-	{
-		ste++->ste_path = path;
-	}
+	*total = ai.ani_max * pagesize;
+	*used = ai.ani_resv * pagesize;
 
-	/* grab all swap info */
-	swapctl(SC_LIST, swt);
-
-	/* walk through the structs and sum up the fields */
-	t = f = 0;
-	ste = &(swt->swt_ent[0]);
-	i = cnt;
-	while (--i >= 0)
-	{
-		/* don't count slots being deleted */
-		if (!(ste->ste_flags & ST_INDEL) &&
-		!(ste->ste_flags & ST_DOINGDEL))
-		{
-			t += ste->ste_pages;
-			f += ste->ste_free;
-		}
-		ste++;
-	}
-
-	page_size=getpagesize();
-
-	/* fill in the results */
-	*total = page_size*t;
-	*fr = page_size*f;
-	free(swt);
+	return SUCCEED;
 }
 
-int	SYSTEM_SWAP_FREE(AGENT_REQUEST *request, AGENT_RESULT *result)
+static int	SYSTEM_SWAP_TOTAL(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	double	swaptotal, swapfree;
+	zbx_uint64_t	total, used;
 
-	get_swapinfo(&swaptotal, &swapfree);
+	if (SUCCEED != get_swapinfo(&total, &used))
+		return SYSINFO_RET_FAIL;
 
-	SET_UI64_RESULT(result, swapfree);
+	SET_UI64_RESULT(result, total);
+
 	return SYSINFO_RET_OK;
 }
 
-int	SYSTEM_SWAP_TOTAL(AGENT_REQUEST *request, AGENT_RESULT *result)
+static int	SYSTEM_SWAP_USED(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	double	swaptotal, swapfree;
+	zbx_uint64_t	total, used;
 
-	get_swapinfo(&swaptotal, &swapfree);
+	if (SUCCEED != get_swapinfo(&total, &used))
+		return SYSINFO_RET_FAIL;
 
-	SET_UI64_RESULT(result, swaptotal);
+	SET_UI64_RESULT(result, used);
+
 	return SYSINFO_RET_OK;
 }
 
-static int	SYSTEM_SWAP_PFREE(AGENT_REQUEST *request, AGENT_RESULT *result)
+static int	SYSTEM_SWAP_FREE(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	AGENT_RESULT	result_tmp;
-	zbx_uint64_t	tot_val = 0;
-	zbx_uint64_t	free_val = 0;
+	zbx_uint64_t	total, used;
 
-        init_result(&result_tmp);
-
-	if (SYSINFO_RET_OK != SYSTEM_SWAP_TOTAL(request, &result_tmp) || !(result_tmp.type & AR_UINT64))
+	if (SUCCEED != get_swapinfo(&total, &used))
 		return SYSINFO_RET_FAIL;
-	tot_val = result_tmp.ui64;
 
-	/* Check for division by zero */
-	if (0 == tot_val)
-	{
-		free_result(&result_tmp);
-		return SYSINFO_RET_FAIL;
-	}
-
-	if (SYSINFO_RET_OK != SYSTEM_SWAP_FREE(request, &result_tmp) || !(result_tmp.type & AR_UINT64))
-		return SYSINFO_RET_FAIL;
-	free_val = result_tmp.ui64;
-
-	free_result(&result_tmp);
-
-	SET_DBL_RESULT(result, (100.0 * (double)free_val) / (double)tot_val);
+	SET_UI64_RESULT(result, total - used);
 
 	return SYSINFO_RET_OK;
 }
 
 static int	SYSTEM_SWAP_PUSED(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	AGENT_RESULT	result_tmp;
-	zbx_uint64_t	tot_val = 0;
-	zbx_uint64_t	free_val = 0;
+	zbx_uint64_t	total, used;
 
-        init_result(&result_tmp);
-
-	if (SYSINFO_RET_OK != SYSTEM_SWAP_TOTAL(request, &result_tmp) || !(result_tmp.type & AR_UINT64))
+	if (SUCCEED != get_swapinfo(&total, &used))
 		return SYSINFO_RET_FAIL;
-	tot_val = result_tmp.ui64;
 
-	/* Check for division by zero */
-	if (0 == tot_val)
-	{
-		free_result(&result_tmp);
+	if (0 == total)
 		return SYSINFO_RET_FAIL;
-	}
 
-	if (SYSINFO_RET_OK != SYSTEM_SWAP_FREE(request, &result_tmp) || !(result_tmp.type & AR_UINT64))
+	SET_DBL_RESULT(result, 100.0 * (double)used / (double)total);
+
+	return SYSINFO_RET_OK;
+}
+
+static int	SYSTEM_SWAP_PFREE(AGENT_REQUEST *request, AGENT_RESULT *result)
+{
+	zbx_uint64_t	total, used;
+
+	if (SUCCEED != get_swapinfo(&total, &used))
 		return SYSINFO_RET_FAIL;
-	free_val = result_tmp.ui64;
 
-	free_result(&result_tmp);
+	if (0 == total)
+		return SYSINFO_RET_FAIL;
 
-	SET_DBL_RESULT(result, 100.0 - (100.0 * (double)free_val) / (double)tot_val);
+	SET_DBL_RESULT(result, 100.0 * (double)(total - used) / (double)total);
 
-        return SYSINFO_RET_OK;
+	return SYSINFO_RET_OK;
 }
 
 int	SYSTEM_SWAP_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char	*tmp;
-	int	ret = SYSINFO_RET_FAIL;
+	int	ret;
 
 	if (2 < request->nparam)
 		return SYSINFO_RET_FAIL;
 
 	tmp = get_rparam(request, 0);
 
-	if (NULL != tmp && '\0' != *tmp && 0 != strcmp(tmp, "all"))
+	if (NULL != tmp && '\0' != *tmp && 0 != strcmp(tmp, "all"))	/* default parameter */
 		return SYSINFO_RET_FAIL;
 
 	tmp = get_rparam(request, 1);
 
-	if (NULL == tmp || '\0' == *tmp || 0 == strcmp(tmp, "free"))
+	if (NULL == tmp || '\0' == *tmp || 0 == strcmp(tmp, "free"))	/* default parameter */
 		ret = SYSTEM_SWAP_FREE(request, result);
-	else if (0 ==strcmp(tmp, "total"))
+	else if (0 == strcmp(tmp, "total"))
 		ret = SYSTEM_SWAP_TOTAL(request, result);
-	else if (0 ==strcmp(tmp, "pfree"))
+	else if (0 == strcmp(tmp, "used"))
+		ret = SYSTEM_SWAP_USED(request, result);
+	else if (0 == strcmp(tmp, "pfree"))
 		ret = SYSTEM_SWAP_PFREE(request, result);
-	else if (0 ==strcmp(tmp, "pused"))
+	else if (0 == strcmp(tmp, "pused"))
 		ret = SYSTEM_SWAP_PUSED(request, result);
 	else
-		ret = SYSINFO_RET_FAIL;
+		return SYSINFO_RET_FAIL;
 
 	return ret;
 }
@@ -264,7 +226,7 @@ int	SYSTEM_SWAP_IN(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (NULL == tmp || '\0' == *tmp || 0 == strcmp(tmp, "count"))
 		ret = get_swap_io(&value, NULL, NULL, NULL);
-	else if (0 == strcmp(tmp,"pages"))
+	else if (0 == strcmp(tmp, "pages"))
 		ret = get_swap_io(NULL, &value, NULL, NULL);
 	else
 		ret =  SYSINFO_RET_FAIL;
@@ -294,7 +256,7 @@ int	SYSTEM_SWAP_OUT(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (NULL == tmp || '\0' == *tmp || 0 == strcmp(tmp, "count"))
 		ret = get_swap_io(NULL, NULL, &value, NULL);
-	else if (0 == strcmp(tmp,"pages"))
+	else if (0 == strcmp(tmp, "pages"))
 		ret = get_swap_io(NULL, NULL, NULL, &value);
 	else
 		ret = SYSINFO_RET_FAIL;

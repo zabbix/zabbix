@@ -176,36 +176,75 @@ DROP LANGUAGE 'plpgsql';
 
 -- adding web.test.error[<web check>] items
 
-CREATE SEQUENCE items_seq;
-CREATE SEQUENCE httptestitem_seq;
-CREATE SEQUENCE items_applications_seq;
+CREATE LANGUAGE 'plpgsql';
 
-SELECT setval('items_seq', max(itemid)) FROM items;
-SELECT setval('httptestitem_seq', max(httptestitemid)) FROM httptestitem;
-SELECT setval('items_applications_seq', max(itemappid)) FROM items_applications;
+CREATE OR REPLACE FUNCTION zbx_add_web_error_items()
+RETURNS void AS $$
+DECLARE
+	httptest_nodeid INT;
+	init_nodeid BIGINT;
+	min_nodeid BIGINT;
+	max_nodeid BIGINT;
+	node_cursor CURSOR FOR (SELECT DISTINCT httptestid / 100000000000000 FROM httptest);
+	res BIGINT;
+BEGIN
 
-INSERT INTO items (itemid, hostid, type, name, key_, value_type, units, delay, history, trends, status)
-	SELECT NEXTVAL('items_seq'), hostid, type, 'Last error message of scenario ''$1''', 'web.test.error' || SUBSTR(key_, STRPOS(key_, '[')), 1, '', delay, history, 0, status
-	FROM items
-	WHERE type = 9
-		AND key_ LIKE 'web.test.fail%';
+	OPEN node_cursor;
+	LOOP
+		FETCH node_cursor INTO httptest_nodeid;
+		IF NOT FOUND THEN
+			EXIT;
+		END IF;
 
-INSERT INTO httptestitem (httptestitemid, httptestid, itemid, type)
-	SELECT NEXTVAL('httptestitem_seq'), ht.httptestid, i.itemid, 4
-	FROM httptest ht,applications a,items i
-	WHERE ht.applicationid=a.applicationid
-		AND a.hostid=i.hostid
-		AND 'web.test.error[' || ht.name || ']' = i.key_;
+		min_nodeid := httptest_nodeid * 100000000000000;
+		max_nodeid := min_nodeid + 99999999999999;
+		init_nodeid := (httptest_nodeid * 1000 + httptest_nodeid) * 100000000000;
 
-INSERT INTO items_applications (itemappid, applicationid, itemid)
-	SELECT NEXTVAL('items_applications_seq'), ht.applicationid, hti.itemid
-	FROM httptest ht, httptestitem hti
-	WHERE ht.httptestid = hti.httptestid
-		AND hti.type = 4;
+		CREATE SEQUENCE items_seq;
+		CREATE SEQUENCE httptestitem_seq;
+		CREATE SEQUENCE items_applications_seq;
 
-DROP SEQUENCE items_applications_seq;
-DROP SEQUENCE httptestitem_seq;
-DROP SEQUENCE items_seq;
+		SELECT setval('items_seq', GREATEST(MAX(itemid), init_nodeid)) INTO res FROM items WHERE itemid BETWEEN min_nodeid AND max_nodeid;
+		SELECT setval('httptestitem_seq', GREATEST(MAX(httptestitemid), init_nodeid)) INTO res FROM httptestitem WHERE httptestitemid BETWEEN min_nodeid AND max_nodeid;
+		SELECT setval('items_applications_seq', GREATEST(MAX(itemappid), init_nodeid)) INTO res FROM items_applications WHERE itemappid BETWEEN min_nodeid AND max_nodeid;
+
+		INSERT INTO items (itemid, hostid, type, name, key_, value_type, units, delay, history, trends, status)
+			SELECT NEXTVAL('items_seq'), hostid, type, 'Last error message of scenario ''$1''', 'web.test.error' || SUBSTR(key_, STRPOS(key_, '[')), 1, '', delay, history, 0, status
+			FROM items
+			WHERE type = 9
+				AND key_ LIKE 'web.test.fail%'
+				AND itemid BETWEEN min_nodeid AND max_nodeid;
+
+		INSERT INTO httptestitem (httptestitemid, httptestid, itemid, type)
+			SELECT NEXTVAL('httptestitem_seq'), ht.httptestid, i.itemid, 4
+			FROM httptest ht,applications a,items i
+			WHERE ht.applicationid=a.applicationid
+				AND a.hostid=i.hostid
+				AND 'web.test.error[' || ht.name || ']' = i.key_
+				AND itemid BETWEEN min_nodeid AND max_nodeid;
+
+		INSERT INTO items_applications (itemappid, applicationid, itemid)
+			SELECT NEXTVAL('items_applications_seq'), ht.applicationid, hti.itemid
+			FROM httptest ht, httptestitem hti
+			WHERE ht.httptestid = hti.httptestid
+				AND hti.type = 4
+				AND itemid BETWEEN min_nodeid AND max_nodeid;
+
+		DROP SEQUENCE items_applications_seq;
+		DROP SEQUENCE httptestitem_seq;
+		DROP SEQUENCE items_seq;
+
+	END LOOP;
+
+	CLOSE node_cursor;
+END;
+$$ LANGUAGE 'plpgsql';
+
+SELECT zbx_add_web_error_items();
+
+DROP FUNCTION zbx_add_web_error_items();
+
+DROP LANGUAGE 'plpgsql';
 
 DELETE FROM ids WHERE table_name IN ('items', 'httptestitem', 'items_applications');
 
