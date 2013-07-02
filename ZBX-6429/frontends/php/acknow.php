@@ -49,7 +49,7 @@ $fields = array(
 	// form
 	'saveandreturn' =>	array(T_ZBX_STR, O_OPT,	P_ACT|P_SYS, null,	null),
 	'save' =>			array(T_ZBX_STR, O_OPT,	P_ACT|P_SYS, null,	null),
-	'cancel' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null)
+	'cancel' =>			array(T_ZBX_STR, O_OPT,	P_SYS|P_ACT, null,	null)
 );
 check_fields($fields);
 
@@ -139,7 +139,7 @@ if (isset($_REQUEST['save']) || isset($_REQUEST['saveandreturn'])) {
 		$_REQUEST['events'] = API::Event()->get(array(
 			'objectids' => $_REQUEST['triggers'],
 			'output' => array('eventid'),
-			'acknowledged' => 0
+			'acknowledged' => EVENT_NOT_ACKNOWLEDGED
 		));
 	}
 
