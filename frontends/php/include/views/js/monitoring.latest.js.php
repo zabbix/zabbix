@@ -30,7 +30,7 @@
 
 		// click event for main toggle (+-) button
 		$('.app-list-toggle-all').click(function(){
-			// this is for Opera browser with large tables, which renders table layout while showing/hidding rows
+			// this is for Opera browser with large tables, which renders table layout while showing/hiding rows
 			$('.tableinfo').fadeTo(0, 0);
 
 			var openState = $(this).data('openState'),

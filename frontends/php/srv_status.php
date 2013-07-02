@@ -30,7 +30,7 @@ $page['hist_arg'] = array();
 
 define('ZBX_PAGE_DO_REFRESH', 1);
 
-include_once('include/page_header.php');
+require_once dirname(__FILE__).'/include/page_header.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = array(
@@ -167,4 +167,5 @@ else {
 		error(_('Cannot format Tree. Check logic structure in service links.'));
 	}
 }
-include_once('include/page_footer.php');
+
+require_once dirname(__FILE__).'/include/page_footer.php';

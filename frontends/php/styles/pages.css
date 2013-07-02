@@ -123,6 +123,9 @@
 .event-action-cont { text-align: center; }
 .event-action-cont div { padding: 0 2px 0 2px; display: table-cell; width: 10px; }
 
+/* action edit */
+.action-edit .newActionConditionTable tr td { vertical-align: top; }
+
 /* administration of triggers */
 div.trigger_displaying_form_col { width: 12em; zoom: 1; *display: inline; }
 

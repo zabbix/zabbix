@@ -91,13 +91,15 @@ class testInheritanceTrigger extends CWebTest {
 					'description' => 'triggerSimple',
 					'expression' => 'default',
 					'hostCheck' => true,
-					'dbCheck' => true)
+					'dbCheck' => true
+				)
 			),
 			array(
 				array('expected' => TRIGGER_GOOD,
 					'description' => 'triggerName',
 					'expression' => 'default',
-					'hostCheck' => true)
+					'hostCheck' => true
+				)
 			),
 			array(
 				array('expected' => TRIGGER_GOOD,
@@ -105,7 +107,8 @@ class testInheritanceTrigger extends CWebTest {
 					'expression' => 'default',
 					'hostCheck' => true,
 					'dbCheck' => true,
-					'remove' => true)
+					'remove' => true
+				)
 			),
 			array(
 				array('expected' => TRIGGER_GOOD,
@@ -114,7 +117,8 @@ class testInheritanceTrigger extends CWebTest {
 					'hostCheck' => true,
 					'dbCheck' => true,
 					'hostRemove' => true,
-					'remove' => true)
+					'remove' => true
+				)
 			),
 			array(
 				array('expected' => TRIGGER_BAD,
@@ -122,7 +126,8 @@ class testInheritanceTrigger extends CWebTest {
 					'expression' => 'default',
 					'errors' => array(
 						'ERROR: Cannot add trigger',
-						'Trigger "triggerSimple" already exists on "Inheritance test template".')
+						'Trigger "triggerSimple" already exists on "Inheritance test template".'
+					)
 				)
 			),
 			array(
@@ -183,7 +188,7 @@ class testInheritanceTrigger extends CWebTest {
 					'description' => 'MyTrigger_sysUptime',
 					'expression' => '{Inheritance test template:key-item-inheritance.last(0)}<0',
 					'expressionHost' => '{Template inheritance test host:key-item-inheritance.last(0)}<0',
-					'hostCheck' => true,
+					'hostCheck' => true
 				)
 			),
 			array(
@@ -192,7 +197,7 @@ class testInheritanceTrigger extends CWebTest {
 					'description' => '1234567890',
 					'expression' => '{Inheritance test template:key-item-inheritance.last(0)}<0',
 					'expressionHost' => '{Template inheritance test host:key-item-inheritance.last(0)}<0',
-					'hostCheck' => true,
+					'hostCheck' => true
 				)
 			),
 			array(
@@ -201,7 +206,7 @@ class testInheritanceTrigger extends CWebTest {
 					'description' => 'a?aa+',
 					'expression' => '{Inheritance test template:key-item-inheritance.last(0)}<0',
 					'expressionHost' => '{Template inheritance test host:key-item-inheritance.last(0)}<0',
-					'hostCheck' => true,
+					'hostCheck' => true
 				)
 			),
 			array(
@@ -210,7 +215,7 @@ class testInheritanceTrigger extends CWebTest {
 					'description' => '}aa]a{',
 					'expression' => '{Inheritance test template:key-item-inheritance.last(0)}<0',
 					'expressionHost' => '{Template inheritance test host:key-item-inheritance.last(0)}<0',
-					'hostCheck' => true,
+					'hostCheck' => true
 				)
 			),
 			array(
@@ -219,7 +224,7 @@ class testInheritanceTrigger extends CWebTest {
 					'description' => '-aaa=%',
 					'expression' => '{Inheritance test template:key-item-inheritance.last(0)}<0',
 					'expressionHost' => '{Template inheritance test host:key-item-inheritance.last(0)}<0',
-					'hostCheck' => true,
+					'hostCheck' => true
 				)
 			),
 			array(
@@ -228,7 +233,7 @@ class testInheritanceTrigger extends CWebTest {
 					'description' => 'aaa,;:',
 					'expression' => '{Inheritance test template:key-item-inheritance.last(0)}<0',
 					'expressionHost' => '{Template inheritance test host:key-item-inheritance.last(0)}<0',
-					'hostCheck' => true,
+					'hostCheck' => true
 				)
 			),
 			array(
@@ -236,7 +241,7 @@ class testInheritanceTrigger extends CWebTest {
 					'expected' => TRIGGER_GOOD,
 					'description' => 'aaa><.',
 					'expression' => '{Inheritance test template:key-item-inheritance.last(0)}<0',
-					'hostCheck' => true,
+					'hostCheck' => true
 				)
 			),
 			array(
@@ -244,7 +249,7 @@ class testInheritanceTrigger extends CWebTest {
 					'expected' => TRIGGER_GOOD,
 					'description' => 'aaa*&_',
 					'expression' => '{Inheritance test template:key-item-inheritance.last(0)}<0',
-					'hostCheck' => true,
+					'hostCheck' => true
 				)
 			),
 			array(
@@ -252,7 +257,7 @@ class testInheritanceTrigger extends CWebTest {
 					'expected' => TRIGGER_GOOD,
 					'description' => 'aaa#@!',
 					'expression' => '{Inheritance test template:key-item-inheritance.last(0)}<0',
-					'hostCheck' => true,
+					'hostCheck' => true
 				)
 			),
 			array(
@@ -260,7 +265,7 @@ class testInheritanceTrigger extends CWebTest {
 					'expected' => TRIGGER_GOOD,
 					'description' => '([)$^',
 					'expression' => '{Inheritance test template:key-item-inheritance.last(0)}<0',
-					'hostCheck' => true,
+					'hostCheck' => true
 				)
 			),
 			array(
@@ -272,7 +277,7 @@ class testInheritanceTrigger extends CWebTest {
 					'comments' => 'Trigger status (expression) is recalculated every time Zabbix server receives new value, if this value is part of this expression. If time based functions are used in the expression, it is recalculated every 30 seconds by a zabbix timer process. ',
 					'url' => 'www.zabbix.com',
 					'priority' => 'Not classified',
-					'status' => false,
+					'status' => false
 				)
 			),
 			array(
@@ -284,7 +289,7 @@ class testInheritanceTrigger extends CWebTest {
 					'comments' => 'Trigger status (expression) is recalculated every time Zabbix server receives new value, if this value is part of this expression. If time based functions are used in the expression, it is recalculated every 30 seconds by a zabbix timer process. ',
 					'url' => 'www.zabbix.com',
 					'priority' => 'Information',
-					'status' => false,
+					'status' => false
 				)
 			),
 			array(
@@ -296,10 +301,10 @@ class testInheritanceTrigger extends CWebTest {
 					'comments' => 'Trigger status (expression) is recalculated every time Zabbix server receives new value, if this value is part of this expression. If time based functions are used in the expression, it is recalculated every 30 seconds by a zabbix timer process. ',
 					'url' => 'www.zabbix.com',
 					'priority' => 'Warning',
-					'status' => false,
+					'status' => false
 				)
 			),
-array(
+			array(
 				array(
 					'expected' => TRIGGER_GOOD,
 					'description' => 'MyTrigger_priority3',
@@ -308,7 +313,7 @@ array(
 					'comments' => 'Trigger status (expression) is recalculated every time Zabbix server receives new value, if this value is part of this expression. If time based functions are used in the expression, it is recalculated every 30 seconds by a zabbix timer process. ',
 					'url' => 'www.zabbix.com',
 					'priority' => 'Average',
-					'status' => false,
+					'status' => false
 				)
 			),
 			array(
@@ -320,7 +325,7 @@ array(
 					'comments' => 'Trigger status (expression) is recalculated every time Zabbix server receives new value, if this value is part of this expression. If time based functions are used in the expression, it is recalculated every 30 seconds by a zabbix timer process. ',
 					'url' => 'www.zabbix.com',
 					'priority' => 'High',
-					'status' => false,
+					'status' => false
 				)
 			),
 			array(
@@ -332,7 +337,7 @@ array(
 					'comments' => 'Trigger status (expression) is recalculated every time Zabbix server receives new value, if this value is part of this expression. If time based functions are used in the expression, it is recalculated every 30 seconds by a zabbix timer process. ',
 					'url' => 'www.zabbix.com',
 					'priority' => 'Disaster',
-					'status' => false,
+					'status' => false
 				)
 			),
 			array(
@@ -427,7 +432,7 @@ array(
 					'constructor' => array(array(
 						'errors' => array(
 							'ERROR: Expression Syntax Error.',
-							'Incorrect trigger expression. Check expression part starting from "{Inheritance test template@:key-item-inheritance.last(0)}".'),
+							'Incorrect trigger expression. Check expression part starting from "{Inheritance test template@:key-item-inheritance.last(0)}".')
 						)
 					)
 				)
@@ -440,7 +445,7 @@ array(
 					'constructor' => array(array(
 						'errors' => array(
 							'ERROR: Expression Syntax Error.',
-							'Incorrect trigger expression. Check expression part starting from "{Inheritance test template:system .uptime.last(0)}".'),
+							'Incorrect trigger expression. Check expression part starting from "{Inheritance test template:system .uptime.last(0)}".')
 						)
 					)
 				)
@@ -453,7 +458,7 @@ array(
 					'constructor' => array(array(
 						'errors' => array(
 							'ERROR: Expression Syntax Error.',
-							'Incorrect trigger expression. Check expression part starting from "{Inheritance test template:system .uptime.last(0)}".'),
+							'Incorrect trigger expression. Check expression part starting from "{Inheritance test template:system .uptime.last(0)}".')
 						)
 					)
 				)
@@ -466,7 +471,7 @@ array(
 					'constructor' => array(array(
 						'errors' => array(
 							'ERROR: Expression Syntax Error.',
-							'Incorrect trigger expression. Check expression part starting from "{Inheritance test template:key-item-inheritance.lastA(0)}".'),
+							'Incorrect trigger expression. Check expression part starting from "{Inheritance test template:key-item-inheritance.lastA(0)}".')
 						)
 					)
 				)

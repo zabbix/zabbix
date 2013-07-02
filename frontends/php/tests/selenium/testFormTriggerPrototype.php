@@ -19,73 +19,134 @@
 **/
 
 require_once dirname(__FILE__).'/../include/class.cwebtest.php';
+require_once dirname(__FILE__).'/../../include/items.inc.php';
 
 define('TRIGGER_GOOD', 0);
 define('TRIGGER_BAD', 1);
 
-class testFormTrigger extends CWebTest {
+/**
+ * Test the creation of inheritance of new objects on a previously linked template.
+ */
+class testFormTriggerPrototype extends CWebTest {
 
 	/**
-	 * The name of the Simple form test host created in the test data set.
+	 * The name of the test template created in the test data set.
+	 *
+	 * @var string
+	 */
+	protected $template = 'Inheritance test template';
+
+	/**
+	 * The name of the test host created in the test data set.
 	 *
 	 * @var string
 	 */
 	protected $host = 'Simple form test host';
 
+	/**
+	 * The name of the form test discovery rule created in the test data set.
+	 *
+	 * @var string
+	 */
+	protected $discoveryRule = 'testFormDiscoveryRule';
+
+	/**
+	 * The name of the form test discovery rule created in the test data set.
+	 *
+	 * @var string
+	 */
+	protected $discoveryRuleTemplate = 'testInheritanceDiscoveryRule';
+
+	/**
+	 * The name of the test discovery rule key created in the test data set.
+	 *
+	 * @var string
+	 */
+	protected $discoveryKey = 'discovery-rule-form';
+
+	/**
+	 * The name of the test item prototype within test discovery rule created in the test data set.
+	 *
+	 * @var string
+	 */
+	protected $item = 'testFormItemReuse';
+
+	/**
+	 * The name of the test item prototype key within test discovery rule created in the test data set.
+	 *
+	 * @var string
+	 */
+	protected $itemKey = 'item-prototype-reuse';
+
+
+	/**
+	 * Backup the tables that will be modified during the tests.
+	 */
+	public function testFormTriggerPrototype_Setup() {
+		DBsave_tables('triggers');
+	}
+
 	// Returns layout data
 	public static function layout() {
 		return array(
 			array(
-				array('constructor' => 'open', 'host' => 'Simple form test host'
+				array('constructor' => 'open', 'host' => 'Simple form test host')
+			),
+			array(
+				array('constructor' => 'open_close', 'host' => 'Simple form test host')
+			),
+			array(
+				array('constructor' => 'open', 'severity' => 'Warning', 'host' => 'Simple form test host')
+			),
+			array(
+				array('constructor' => 'open_close', 'severity' => 'Disaster', 'host' => 'Simple form test host')
+			),
+			array(
+				array('severity' => 'Not classified', 'host' => 'Simple form test host')
+			),
+			array(
+				array('severity' => 'Information', 'host' => 'Simple form test host')
+			),
+			array(
+				array('severity' => 'Warning', 'host' => 'Simple form test host')
+			),
+			array(
+				array('severity' => 'Average', 'host' => 'Simple form test host')
+			),
+			array(
+				array('severity' => 'High', 'host' => 'Simple form test host')
+			),
+			array(
+				array('severity' => 'Disaster', 'host' => 'Simple form test host')
+			),
+			array(
+				array(
+					'host' => 'Simple form test host',
+					'form' => 'testFormTriggerPrototype1',
+					'constructor' => 'open'
 				)
 			),
 			array(
-				array('constructor' => 'open_close', 'host' => 'Simple form test host'
+				array(
+					'host' => 'Simple form test host',
+					'form' => 'testFormTriggerPrototype1',
+					'constructor' => 'open_close'
 				)
 			),
 			array(
-				array('constructor' => 'open', 'severity' => 'Warning', 'host' => 'Simple form test host'
+				array(
+					'host' => 'Simple form test host',
+					'form' => 'testFormTriggerPrototype1'
 				)
 			),
 			array(
-				array('constructor' => 'open_close', 'severity' => 'Disaster', 'host' => 'Simple form test host'
-				)
+				array('constructor' => 'open', 'template' => 'Inheritance test template')
 			),
 			array(
-				array('severity' => 'Not classified', 'host' => 'Simple form test host'
-				)
+				array('constructor' => 'open_close', 'template' => 'Inheritance test template')
 			),
 			array(
-				array('severity' => 'Information', 'host' => 'Simple form test host'
-				)
-			),
-			array(
-				array('severity' => 'Warning', 'host' => 'Simple form test host'
-				)
-			),
-			array(
-				array('severity' => 'Average', 'host' => 'Simple form test host'
-				)
-			),
-			array(
-				array('severity' => 'High', 'host' => 'Simple form test host'
-				)
-			),
-			array(
-				array('severity' => 'Disaster', 'host' => 'Simple form test host'
-				)
-			),
-			array(
-				array('constructor' => 'open', 'template' => 'Inheritance test template'
-				)
-			),
-			array(
-				array('constructor' => 'open_close', 'template' => 'Inheritance test template'
-				)
-			),
-			array(
-				array('constructor' => 'open', 'severity' => 'Warning', 'template' => 'Inheritance test template'
-				)
+				array('constructor' => 'open', 'severity' => 'Warning', 'template' => 'Inheritance test template')
 			),
 			array(
 				array(
@@ -95,41 +156,33 @@ class testFormTrigger extends CWebTest {
 				)
 			),
 			array(
-				array('severity' => 'Not classified', 'template' => 'Inheritance test template'
-				)
+				array('severity' => 'Not classified', 'template' => 'Inheritance test template')
 			),
 			array(
-				array('severity' => 'Information', 'template' => 'Inheritance test template'
-				)
+				array('severity' => 'Information', 'template' => 'Inheritance test template')
 			),
 			array(
-				array('severity' => 'Warning', 'template' => 'Inheritance test template'
-				)
+				array('severity' => 'Warning', 'template' => 'Inheritance test template')
 			),
 			array(
-				array('severity' => 'Average', 'template' => 'Inheritance test template'
-				)
+				array('severity' => 'Average', 'template' => 'Inheritance test template')
 			),
 			array(
-				array('severity' => 'High', 'template' => 'Inheritance test template'
-				)
+				array('severity' => 'High', 'template' => 'Inheritance test template')
 			),
 			array(
-				array('severity' => 'Disaster', 'template' => 'Inheritance test template'
-				)
+				array('severity' => 'Disaster', 'template' => 'Inheritance test template')
 			),
 			array(
-				array('host' => 'Simple form test host', 'form' => 'testFormTrigger1'
-				)
+				array('host' => 'Simple form test host', 'form' => 'testFormTriggerPrototype1')
 			),
 			array(
-				array('template' => 'Inheritance test template', 'form' => 'testInheritanceTrigger1'
-				)
+				array('template' => 'Inheritance test template', 'form' => 'testInheritanceTriggerPrototype1')
 			),
 			array(
 				array(
 					'host' => 'Template inheritance test host',
-					'form' => 'testInheritanceTrigger1',
+					'form' => 'testInheritanceTriggerPrototype1',
 					'templatedHost' => true,
 					'hostTemplate' => 'Inheritance test template'
 				)
@@ -137,29 +190,22 @@ class testFormTrigger extends CWebTest {
 			array(
 				array(
 					'host' => 'Template inheritance test host',
-					'form' => 'testInheritanceTrigger2',
+					'form' => 'testInheritanceTriggerPrototype1',
 					'templatedHost' => true,
 					'hostTemplate' => 'Inheritance test template'
-				)
-			),
-			array(
-				array(
-					'host' => 'Simple form test host',
-					'form' => 'testFormTrigger1',
-					'constructor' => 'open'
 				)
 			),
 			array(
 				array(
 					'template' => 'Inheritance test template',
-					'form' => 'testInheritanceTrigger1',
+					'form' => 'testInheritanceTriggerPrototype1',
 					'constructor' => 'open'
 				)
 			),
 			array(
 				array(
 					'host' => 'Template inheritance test host',
-					'form' => 'testInheritanceTrigger1',
+					'form' => 'testInheritanceTriggerPrototype1',
 					'templatedHost' => true,
 					'constructor' => 'open'
 				)
@@ -168,30 +214,33 @@ class testFormTrigger extends CWebTest {
 	}
 
 	/**
-	 * Backup the tables that will be modified during the tests.
-	 */
-	public function testFormTrigger_Setup() {
-		DBsave_tables('triggers');
-	}
-
-	/**
 	 * @dataProvider layout
 	 */
-	public function testFormTrigger_CheckLayout($data) {
+	public function testFormTriggerPrototype_CheckLayout($data) {
 
 		if (isset($data['template'])) {
 			$this->zbxTestLogin('templates.php');
 			$this->zbxTestClickWait('link='.$data['template']);
+			$discoveryRule = $this->discoveryRuleTemplate;
 		}
 
 		if (isset($data['host'])) {
 			$this->zbxTestLogin('hosts.php');
 			$this->zbxTestClickWait('link='.$data['host']);
+			if (!isset($data['templatedHost'])) {
+				$discoveryRule = $this->discoveryRule;
+			}
+			else {
+				$discoveryRule = $this->discoveryRuleTemplate;
+			}
 		}
 
-		$this->zbxTestClickWait("//div[@class='w']//a[text()='Triggers']");
-		$this->checkTitle('Configuration of triggers');
-		$this->zbxTestTextPresent('CONFIGURATION OF TRIGGERS');
+		$this->zbxTestClickWait('link=Discovery rules');
+		$this->zbxTestClickWait('link='.$discoveryRule);
+		$this->zbxTestClickWait('link=Trigger prototypes');
+
+		$this->checkTitle('Configuration of trigger prototypes');
+		$this->zbxTestTextPresent(array('CONFIGURATION OF TRIGGER PROTOTYPES', "Trigger prototypes of ".$discoveryRule));
 
 		if (isset($data['form'])) {
 			$this->zbxTestClickWait('link='.$data['form']);
@@ -199,7 +248,10 @@ class testFormTrigger extends CWebTest {
 		else {
 			$this->zbxTestClickWait('form');
 		}
-		$this->checkTitle('Configuration of triggers');
+
+		$this->checkTitle('Configuration of trigger prototypes');
+		$this->zbxTestTextPresent('CONFIGURATION OF TRIGGER PROTOTYPES');
+		$this->assertElementPresent("//div[@id='tab_triggersTab' and text()='Trigger prototype']");
 
 		if (isset($data['constructor'])) {
 			switch ($data['constructor']) {
@@ -213,7 +265,7 @@ class testFormTrigger extends CWebTest {
 			}
 		}
 
-		$this->zbxTestTextPresent('Trigger');
+		$this->zbxTestTextPresent('Trigger prototype');
 
 		if (isset($data['templatedHost'])) {
 			$this->zbxTestTextPresent('Parent triggers');
@@ -230,7 +282,7 @@ class testFormTrigger extends CWebTest {
 		$this->assertAttribute("//input[@id='description']/@maxlength", '255');
 		$this->assertAttribute("//input[@id='description']/@size", '50');
 
-		if (!isset($data['constructor']) || $data['constructor'] == 'open_close') {
+		if (!(isset($data['constructor'])) || $data['constructor'] == 'open_close') {
 			$this->zbxTestTextPresent(array('Expression', 'Expression constructor'));
 			$this->assertVisible("//textarea[@id='expression']");
 			$this->assertAttribute("//textarea[@id='expression']/@rows", '7');
@@ -247,8 +299,8 @@ class testFormTrigger extends CWebTest {
 			$this->assertElementNotPresent('add_expression');
 			$this->assertElementNotPresent('insert_macro');
 			$this->assertElementNotPresent('exp_list');
-		}
-		else {
+			}
+			else {
 			$this->zbxTestTextPresent('Expression');
 			$this->assertVisible('expr_temp');
 			$this->assertAttribute("//textarea[@id='expr_temp']/@rows", '7');
@@ -277,10 +329,10 @@ class testFormTrigger extends CWebTest {
 			}
 
 			if (!isset($data['templatedHost'])) {
-				$this->zbxTestTextPresent(array('Target', 'Expression', 'Error', 'Action', 'Close expression constructor'));
+				$this->zbxTestTextPresent(array('Target', 'Expression', 'Action', 'Close expression constructor'));
 			}
 			else {
-				$this->zbxTestTextPresent(array('Expression', 'Error', 'Close expression constructor'));
+				$this->zbxTestTextPresent(array('Expression', 'Close expression constructor'));
 			}
 			$this->assertVisible('exp_list');
 			$this->zbxTestTextPresent('Close expression constructor');
@@ -333,6 +385,8 @@ class testFormTrigger extends CWebTest {
 				case 'Disaster':
 					$this->zbxTestClick('priority_5');
 					break;
+				default:
+					break;
 			}
 		}
 
@@ -361,42 +415,39 @@ class testFormTrigger extends CWebTest {
 			$this->assertElementNotPresent('delete');
 		}
 
-		$this->zbxTestClick('link=Dependencies');
-		$this->zbxTestTextPresent(array('Dependencies', 'Name', 'Action', 'No dependencies defined'));
-		$this->assertElementPresent('bnt1');
-		$this->assertAttribute("//input[@id='bnt1']/@value", 'Add');
 	}
 
 	// Returns update data
 	public static function update() {
-		return DBdata("select description from triggers t left join functions f on f.triggerid=t.triggerid where f.itemid='30004' and t.description LIKE 'testFormTrigger%'");
+		return DBdata("select * from triggers t left join functions f on f.triggerid=t.triggerid where f.itemid='23804' and t.description LIKE 'testFormTriggerPrototype%'");
 	}
 
 	/**
 	 * @dataProvider update
 	 */
-	public function testFormTrigger_SimpleUpdate($data) {
-		$sqlTriggers = 'select * from triggers order by triggerid';
-		$sqlFunctions = 'select * from functions order by functionid';
+	public function testFormTriggerPrototype_SimpleUpdate($data) {
+		$description = $data['description'];
 
+		$sqlTriggers = "select * from triggers ORDER BY triggerid";
 		$oldHashTriggers = DBhash($sqlTriggers);
-		$oldHashFunctions = DBhash($sqlFunctions);
 
 		$this->zbxTestLogin('hosts.php');
 		$this->zbxTestClickWait('link='.$this->host);
-		$this->zbxTestClickWait("//div[@class='w']//a[text()='Triggers']");
-		$this->zbxTestClickWait('link='.$data['description']);
+		$this->zbxTestClickWait('link=Discovery rules');
+		$this->zbxTestClickWait('link='.$this->discoveryRule);
+		$this->zbxTestClickWait('link=Trigger prototypes');
+
+		$this->zbxTestClickWait('link='.$description);
 		$this->zbxTestClickWait('save');
-		$this->checkTitle('Configuration of triggers');
 		$this->zbxTestTextPresent('Trigger updated');
-		$this->zbxTestTextPresent($data['description']);
-		$this->zbxTestTextPresent('TRIGGERS');
+		$this->checkTitle('Configuration of trigger prototypes');
+		$this->zbxTestTextPresent(array('CONFIGURATION OF TRIGGER PROTOTYPES', "Trigger prototypes of ".$this->discoveryRule));
+		$this->zbxTestTextPresent("$description");
 
 		$this->assertEquals($oldHashTriggers, DBhash($sqlTriggers));
-		$this->assertEquals($oldHashFunctions, DBhash($sqlFunctions));
 	}
 
-	// Returns create data
+
 	public static function create() {
 		return array(
 			array(
@@ -433,17 +484,6 @@ class testFormTrigger extends CWebTest {
 				array(
 					'expected' => TRIGGER_BAD,
 					'description' => 'MyTrigger',
-					'expression' => '6 & 0 | 0',
-					'errors' => array(
-						'ERROR: Cannot add trigger',
-						'Trigger expression must contain at least one host:key reference.'
-					)
-				)
-			),
-			array(
-				array(
-					'expected' => TRIGGER_BAD,
-					'description' => 'MyTrigger',
 					'expression' => '{Simple form test host}',
 					'errors' => array(
 						'ERROR: Cannot add trigger',
@@ -454,141 +494,83 @@ class testFormTrigger extends CWebTest {
 			array(
 				array(
 					'expected' => TRIGGER_GOOD,
-					'description' => 'MyTrigger_simple',
-					'expression' => '{Simple form test host:test-item-reuse.last(0)}<0',
-					'formCheck' => true
-				)
-			),
-			array(
-				array(
-					'expected' => TRIGGER_GOOD,
-					'description' => 'HTML_symbols&#8704;&forall;&#8734;&ne;&sup;&Eta;&#937;&#958;&pi;&#8194;&mdash;&#8364;&loz;',
-					'expression' => '{Simple form test host:test-item-reuse.last(0)}<0',
-					'formCheck' => true
-				)
-			),
-			array(
-				array(
-					'expected' => TRIGGER_GOOD,
-					'description' => 'ASCII_characters&#33;&#40;&#51;&#101;&#10;&#25;',
-					'expression' => '{Simple form test host:test-item-reuse.last(0)}<0',
-					'formCheck' => true
-				)
-			),
-			array(
-				array(
-					'expected' => TRIGGER_GOOD,
-					'description' => 'MyTrigger_allFields',
-					'type' => true,
-					'comments' => 'MyTrigger_allFields -Description textbox for comments',
-					'url' => 'MyTrigger_allFields -URL field for link',
-					'severity' => 'Disaster',
-					'status' => false,
-					'expression' => '{Simple form test host:test-item-reuse.last(0)}<0',
-					'formCheck' => true
+					'description' => 'MyTrigger_sysUptime',
+					'expression' => '{Simple form test host:item-prototype-reuse.last(0)}<0',
 				)
 			),
 			array(
 				array(
 					'expected' => TRIGGER_GOOD,
 					'description' => '1234567890',
-					'expression' => '{Simple form test host:test-item-reuse.last(0)}<0',
-					'formCheck' => true
-				)
-			),
-			array(
-				array(
-					'expected' => TRIGGER_GOOD,
-					'description' => '0',
-					'expression' => '{Simple form test host:test-item-reuse.last(0)}<0',
-					'formCheck' => true
+					'expression' => '{Simple form test host:item-prototype-reuse.last(0)}<0',
 				)
 			),
 			array(
 				array(
 					'expected' => TRIGGER_GOOD,
 					'description' => 'a?aa+',
-					'expression' => '{Simple form test host:test-item-reuse.last(0)}<0',
-					'formCheck' => true
+					'expression' => '{Simple form test host:item-prototype-reuse.last(0)}<0',
 				)
 			),
 			array(
 				array(
 					'expected' => TRIGGER_GOOD,
 					'description' => '}aa]a{',
-					'expression' => '{Simple form test host:test-item-reuse.last(0)}<0',
-					'formCheck' => true
+					'expression' => '{Simple form test host:item-prototype-reuse.last(0)}<0',
 				)
 			),
 			array(
 				array(
 					'expected' => TRIGGER_GOOD,
 					'description' => '-aaa=%',
-					'expression' => '{Simple form test host:test-item-reuse.last(0)}<0',
-					'formCheck' => true
+					'expression' => '{Simple form test host:item-prototype-reuse.last(0)}<0',
 				)
 			),
 			array(
 				array(
 					'expected' => TRIGGER_GOOD,
 					'description' => 'aaa,;:',
-					'expression' => '{Simple form test host:test-item-reuse.last(0)}<0',
-					'formCheck' => true
+					'expression' => '{Simple form test host:item-prototype-reuse.last(0)}<0',
 				)
 			),
 			array(
 				array(
 					'expected' => TRIGGER_GOOD,
 					'description' => 'aaa><.',
-					'expression' => '{Simple form test host:test-item-reuse.last(0)}<0',
-					'formCheck' => true
+					'expression' => '{Simple form test host:item-prototype-reuse.last(0)}<0',
 				)
 			),
 			array(
 				array(
 					'expected' => TRIGGER_GOOD,
 					'description' => 'aaa*&_',
-					'expression' => '{Simple form test host:test-item-reuse.last(0)}<0',
-					'formCheck' => true
+					'expression' => '{Simple form test host:item-prototype-reuse.last(0)}<0',
 				)
 			),
 			array(
 				array(
 					'expected' => TRIGGER_GOOD,
 					'description' => 'aaa#@!',
-					'expression' => '{Simple form test host:test-item-reuse.last(0)}<0',
-					'formCheck' => true
+					'expression' => '{Simple form test host:item-prototype-reuse.last(0)}<0',
 				)
 			),
 			array(
 				array(
 					'expected' => TRIGGER_GOOD,
 					'description' => '([)$^',
-					'expression' => '{Simple form test host:test-item-reuse.last(0)}<0',
-					'formCheck' => true
+					'expression' => '{Simple form test host:item-prototype-reuse.last(0)}<0',
 				)
 			),
 			array(
 				array(
 					'expected' => TRIGGER_GOOD,
 					'description' => 'MyTrigger_generalCheck',
-					'expression' => '{Simple form test host:test-item-reuse.last(0)}<5',
+					'expression' => '{Simple form test host:item-prototype-reuse.last(0)}<5',
 					'type' => true,
-					'comments' => 'Trigger status (expression) is recalculated every time Zabbix server receives new value, if this value is part of this expression. If time based functions are used in the expression, it is recalculated every 30 seconds by a zabbix timer process.',
+					'comments' => 'Trigger status (expression) is recalculated every time Zabbix server receives new value, if this value is part of this expression. If time based functions are used in the expression, it is recalculated every 30 seconds by a zabbix timer process. ',
 					'url' => 'www.zabbix.com',
 					'severity' => 'High',
-					'status' => false
-				)
-			),
-			array(
-				array(
-					'expected' => TRIGGER_BAD,
-					'description' => 'MyTrigger',
-					'expression' => '{Zabbix host:test-item-reuse.last(0)}<0',
-					'errors' => array(
-						'ERROR: Cannot add trigger',
-						'Incorrect trigger expression. Host "Zabbix host" does not exist or you have no access to this host.'
-					)
+					'status' => false,
 				)
 			),
 			array(
@@ -598,7 +580,7 @@ class testFormTrigger extends CWebTest {
 					'expression' => '{Simple form test host:someItem.uptime.last(0)}<0',
 					'errors' => array(
 						'ERROR: Cannot add trigger',
-						'Incorrect item key "someItem.uptime" provided for trigger expression on "Simple form test host".'
+						'Trigger prototype expression "{Simple form test host:someItem.uptime.last(0)}<0" must contain at least one item prototype.'
 					)
 				)
 			),
@@ -606,10 +588,10 @@ class testFormTrigger extends CWebTest {
 				array(
 					'expected' => TRIGGER_BAD,
 					'description' => 'MyTrigger',
-					'expression' => '{Simple form test host:test-item-reuse.somefunc(0)}<0',
+					'expression' => '{Simple form test host:item-prototype-reuse.somefunc(0)}<0',
 					'errors' => array(
 						'ERROR: Cannot add trigger',
-						'Cannot implode expression "{Simple form test host:test-item-reuse.somefunc(0)}<0". Incorrect trigger function "somefunc(0)" provided in expression. Unknown function.'
+						'Cannot implode expression "{Simple form test host:item-prototype-reuse.somefunc(0)}<0". Incorrect trigger function "somefunc(0)" provided in expression. Unknown function.'
 					)
 				)
 			),
@@ -617,21 +599,10 @@ class testFormTrigger extends CWebTest {
 				array(
 					'expected' => TRIGGER_BAD,
 					'description' => 'MyTrigger',
-					'expression' => '{Simple form test host:test-item-reuse.last(0)} | {#MACRO}',
-					'errors' => array(
-						'ERROR: Cannot add trigger',
-						'Incorrect trigger expression. Check expression part starting from " {#MACRO}".'
-					)
-				)
-			),
-			array(
-				array(
-					'expected' => TRIGGER_BAD,
-					'description' => 'MyTrigger',
-					'expression' => '{Simple form test host:test-item-reuse.last(0)} | {#MACRO}',
+					'expression' => '{Simple form test host:item-prototype-reuse.last(0)} | {#MACRO}',
 					'constructor' => array(array(
 						'text' => array('A | B', 'A', 'B'),
-						'elements' => array('expr_0_46', 'expr_50_57')
+						'elements' => array('expr_0_59', 'expr_63_70')
 						)
 					)
 				)
@@ -640,11 +611,10 @@ class testFormTrigger extends CWebTest {
 				array(
 					'expected' => TRIGGER_BAD,
 					'description' => 'MyTrigger',
-					'expression' => '{Zabbix host:test-item-reuse.last(0)}<0 | 8 & 9',
+					'expression' => '{Zabbix host:item-prototype-reuse.last(0)}<0 | 8 & 9',
 					'constructor' => array(array(
 						'text' => array('A | (B & C)', 'OR', 'AND', 'A', 'B', 'C'),
-						'elements' => array('expr_0_38', 'expr_42_42', 'expr_46_46'),
-						'elementError' => true
+						'elements' => array('expr_0_47', 'expr_51_51', 'expr_55_55')
 						)
 					)
 				)
@@ -653,11 +623,10 @@ class testFormTrigger extends CWebTest {
 				array(
 					'expected' => TRIGGER_BAD,
 					'description' => 'MyTrigger',
-					'expression' => '{Simple form test host:someItem.uptime.last(0)}<0 | 8 & 9 + {Simple form test host:test-item-reuse.last(0)}',
+					'expression' => '{Simple form test host:someItem.uptime.last(0)}<0 | 8 & 9 + {Simple form test host:item-prototype-reuse.last(0)}',
 					'constructor' => array(array(
 						'text' => array('A | (B & C)', 'A', 'B', 'C'),
-						'elements' => array('expr_0_48', 'expr_52_52', 'expr_56_106'),
-						'elementError' => true
+						'elements' => array('expr_0_52', 'expr_56_56', 'expr_60_123')
 						)
 					)
 				)
@@ -666,11 +635,10 @@ class testFormTrigger extends CWebTest {
 				array(
 					'expected' => TRIGGER_BAD,
 					'description' => 'MyTrigger',
-					'expression' => '{Simple form test host:test-item-reuse.lasta(0)}<0 | 8 & 9 + {Simple form test host:test-item-reuse.last(0)}',
+					'expression' => '{Simple form test host:item-prototype-reuse.lasta(0)}<0 | 8 & 9 + {Simple form test host:item-prototype-reuse.last(0)}',
 					'constructor' => array(array(
 						'text' => array('A | (B & C)', 'A', 'B', 'C'),
-						'elements' => array('expr_0_49', 'expr_53_53', 'expr_57_107'),
-						'elementError' => true
+						'elements' => array('expr_0_62', 'expr_66_66', 'expr_70_133')
 						)
 					)
 				)
@@ -679,11 +647,11 @@ class testFormTrigger extends CWebTest {
 				array(
 					'expected' => TRIGGER_BAD,
 					'description' => 'MyTrigger',
-					'expression' => '{Simple form test host@:test-item-reuse.last(0)}',
+					'expression' => '{Simple form test host@:item-prototype-reuse.last(0)}',
 					'constructor' => array(array(
 						'errors' => array(
 							'ERROR: Expression Syntax Error.',
-							'Incorrect trigger expression. Check expression part starting from "{Simple form test host@:test-item-reuse.last(0)}".'),
+							'Incorrect trigger expression. Check expression part starting from "{Simple form test host@:item-prototype-reuse.last(0)}".'),
 						)
 					)
 				)
@@ -718,12 +686,50 @@ class testFormTrigger extends CWebTest {
 				array(
 					'expected' => TRIGGER_BAD,
 					'description' => 'MyTrigger',
-					'expression' => '{Simple form test host:test-item-reuse.lastA(0)}',
+					'expression' => '{Simple form test host:item-prototype-reuse.lastA(0)}',
 					'constructor' => array(array(
 						'errors' => array(
 							'ERROR: Expression Syntax Error.',
-							'Incorrect trigger expression. Check expression part starting from "{Simple form test host:test-item-reuse.lastA(0)}".'),
+							'Incorrect trigger expression. Check expression part starting from "{Simple form test host:item-prototype-reuse.lastA(0)}".'),
 						)
+					)
+				)
+			),
+			array(
+				array(
+					'expected' => TRIGGER_GOOD,
+					'description' => 'triggerSimple',
+					'expression' => 'default',
+					'formCheck' =>true,
+					'dbCheck' => true,
+					'remove' => true
+				)
+			),
+			array(
+				array(
+					'expected' => TRIGGER_GOOD,
+					'description' => 'triggerName',
+					'expression' => 'default'
+				)
+			),
+			array(
+				array(
+					'expected' => TRIGGER_GOOD,
+					'description' => 'triggerRemove',
+					'expression' => 'default',
+					'formCheck' =>true,
+					'dbCheck' => true,
+					'remove' => true
+				)
+			),
+			array(
+				array(
+					'expected' => TRIGGER_BAD,
+					'description' => 'triggerName',
+					'expression' => 'default',
+					'errors' => array(
+						'ERROR: Cannot add trigger',
+						'Trigger "triggerName" already exists on "Simple form test host".'
 					)
 				)
 			)
@@ -733,47 +739,45 @@ class testFormTrigger extends CWebTest {
 	/**
 	 * @dataProvider create
 	 */
-	public function testFormTrigger_SimpleCreate($data) {
+	public function testFormTriggerPrototype_SimpleCreate($data) {
 
 		$this->zbxTestLogin('hosts.php');
 		$this->zbxTestClickWait('link='.$this->host);
-		$this->zbxTestClickWait("//div[@class='w']//a[text()='Triggers']");
-		$this->checkTitle('Configuration of triggers');
-		$this->zbxTestTextPresent('CONFIGURATION OF TRIGGERS');
-		$this->zbxTestDropdownSelectWait('groupid', 'all');
-
+		$this->zbxTestClickWait('link=Discovery rules');
+		$this->zbxTestClickWait('link='.$this->discoveryRule);
+		$this->zbxTestClickWait('link=Trigger prototypes');
 		$this->zbxTestClickWait('form');
-		$this->checkTitle('Configuration of triggers');
-		$this->zbxTestTextPresent('CONFIGURATION OF TRIGGERS');
 
 		if (isset($data['description'])) {
 			$this->input_type('description', $data['description']);
+			$description = $data['description'];
 		}
-		$description = $this->getValue('description');
 
 		if (isset($data['expression'])) {
-			$this->input_type('expression', $data['expression']);
+			switch ($data['expression']) {
+				case 'default':
+					$expression = '{'.$this->host.':'.$this->itemKey.'.last(0)}=0';
+					$this->input_type('expression', $expression);
+					break;
+				default:
+					$expression = $data['expression'];
+					$this->input_type('expression', $expression);
+					break;
+			}
 		}
-		$expression = $this->getValue('expression');
+
 
 		if (isset($data['type'])) {
 			$this->zbxTestCheckboxSelect('type');
-			$type = 'checked';
 		}
-		else {
-			$type = 'unchecked';
-		}
-
 
 		if (isset($data['comments'])) {
-			$this->input_type('comments', $data['comments']);
+			$this->input_type('comments', $data['comments']);;
 		}
-		$comments = $this->getValue('comments');
 
 		if (isset($data['url'])) {
-			$this->input_type('url', $data['url']);
+			$this->input_type('url', $data['url']);;
 		}
-		$url = $this->getValue('url');
 
 		if (isset($data['severity'])) {
 			switch ($data['severity']) {
@@ -796,18 +800,10 @@ class testFormTrigger extends CWebTest {
 					$this->zbxTestClick('priority_5');
 					break;
 			}
-			$severity = $data['severity'];
-		}
-		else {
-			$severity = 'Not classified';
 		}
 
 		if (isset($data['status'])) {
 			$this->zbxTestCheckboxUnselect('status');
-			$status = 'unchecked';
-		}
-		else {
-			$status = 'checked';
 		}
 
 		if (isset($data['constructor'])) {
@@ -820,29 +816,15 @@ class testFormTrigger extends CWebTest {
 					}
 				}
 				else {
-					$this->assertAttribute("//input[@id='and_expression']/@value", 'AND');
-					$this->assertElementPresent('and_expression');
+					$this->assertElementPresent('test_expression');
 
 					$this->assertAttribute("//input[@id='or_expression']/@value", 'OR');
-					$this->assertElementPresent('or_expression');
+					$this->assertElementPresent("//span[text()='Delete']");
 
-					$this->assertAttribute("//input[@id='replace_expression']/@value", 'Replace');
-					$this->assertElementPresent('replace_expression');
 					if (isset($constructor['text'])) {
 						foreach($constructor['text'] as $txt) {
 							$this->zbxTestTextPresent($txt);
 						}
-					}
-					if (isset($constructor['elements'])) {
-						foreach($constructor['elements'] as $elem) {
-							$this->assertElementPresent($elem);
-						}
-					}
-					if (isset($constructor['elementError'])) {
-						$this->assertElementPresent('//img[@alt="expression_errors"]');
-					}
-					else {
-						$this->assertElementPresent('//img[@alt="expression_no_errors"]');
 					}
 				}
 			}
@@ -853,77 +835,69 @@ class testFormTrigger extends CWebTest {
 			switch ($data['expected']) {
 				case TRIGGER_GOOD:
 					$this->zbxTestTextPresent('Trigger added');
-					$this->checkTitle('Configuration of triggers');
-					$this->zbxTestTextPresent('CONFIGURATION OF TRIGGERS');
-					$this->zbxTestTextPresent(array($description, $expression));
+					$this->checkTitle('Configuration of trigger prototypes');
+					$this->zbxTestTextPresent(array('CONFIGURATION OF TRIGGER PROTOTYPES', "Trigger prototypes of ".$this->discoveryRule));
 					break;
 				case TRIGGER_BAD:
-					$this->checkTitle('Configuration of triggers');
-					$this->zbxTestTextPresent('CONFIGURATION OF TRIGGERS');
+					$this->checkTitle('Configuration of trigger prototypes');
+					$this->zbxTestTextPresent('CONFIGURATION OF TRIGGER PROTOTYPES');
+					$this->assertElementPresent("//div[@id='tab_triggersTab' and text()='Trigger prototype']");
 					foreach ($data['errors'] as $msg) {
 						$this->zbxTestTextPresent($msg);
 					}
-					$this->zbxTestTextPresent('Name');
-					$this->zbxTestTextPresent('Expression');
-					$this->zbxTestTextPresent('Description');
+					$this->zbxTestTextPresent(array('Name', 'Expression', 'Description'));
 					break;
 			}
+		}
 
-			if (isset($data['formCheck'])) {
-				$this->zbxTestClickWait('link='.$description);
-				$this->assertAttribute("//input[@id='description']/@value", 'exact:'.$description);
-				$exp = $this->getValue('expression');
+		if (isset($data['formCheck'])) {
+			$this->zbxTestOpenWait('hosts.php');
+			$this->zbxTestClickWait('link='.$this->host);
+			$this->zbxTestClickWait('link=Discovery rules');
+			$this->zbxTestClickWait('link='.$this->discoveryRule);
+			$this->zbxTestClickWait('link=Trigger prototypes');
 
-				$this->assertEquals($exp, $expression);
+			$this->zbxTestClickWait('link='.$description);
+			$desc = $this->getValue('description');
+			$this->assertEquals($this->getValue('description'), $description);
+			$this->assertVisible("//textarea[@id='expression'][text()='".$expression."']");
+		}
 
-				if ($type == 'checked') {
-					$this->assertAttribute("//input[@id='type']/@checked", 'checked');
-				}
-				else {
-					$this->assertElementNotPresent("//input[@id='type']/@checked");
-				}
-
-				$comment = $this->getValue('comments');
-				$this->assertEquals($comment, $comments);
-
-				$url_ = $this->getValue('url');
-				$this->assertEquals($url_, $url);
-
-				switch ($severity) {
-					case 'Not classified':
-						$this->assertElementPresent("//label[@id='priority_label_0']/@aria-pressed");
-						break;
-					case 'Information':
-						$this->assertElementPresent("//label[@id='priority_label_1']/@aria-pressed");
-						break;
-					case 'Warning':
-						$this->assertElementPresent("//label[@id='priority_label_2']/@aria-pressed");
-						break;
-					case 'Average':
-						$this->assertElementPresent("//label[@id='priority_label_3']/@aria-pressed");
-						break;
-					case 'High':
-						$this->assertElementPresent("//label[@id='priority_label_4']/@aria-pressed");
-						break;
-					case 'Disaster':
-						$this->assertElementPresent("//label[@id='priority_label_5']/@aria-pressed");
-						break;
-				}
-
-				if ($status == 'checked') {
-					$this->assertAttribute("//input[@id='status']/@checked", 'checked');
-				}
-				else {
-					$this->assertElementNotPresent("//input[@id='status']/@checked");
-				}
+		if (isset($data['dbCheck'])) {
+			$result = DBselect("SELECT description FROM triggers where description = '".$description."' limit 1");
+			while ($row = DBfetch($result)) {
+				$this->assertEquals($row['description'], $description);
 			}
+		}
+
+		if (isset($data['remove'])) {
+			$result = DBselect("SELECT description, triggerid FROM triggers where description = '".$description."' limit 1");
+			while ($row = DBfetch($result)) {
+				$triggerId = $row['triggerid'];
+			}
+
+			$this->zbxTestOpenWait('hosts.php');
+			$this->zbxTestClickWait('link='.$this->host);
+			$this->zbxTestClickWait("link=Discovery rules");
+			$this->zbxTestClickWait('link='.$this->discoveryRule);
+			$this->zbxTestClickWait("link=Trigger prototypes");
+
+			$this->zbxTestCheckboxSelect("g_triggerid_$triggerId");
+			$this->zbxTestDropdownSelect('go', 'Delete selected');
+			$this->zbxTestClick('goButton');
+
+			$this->getConfirmation();
+			$this->wait();
+
+			$this->zbxTestTextPresent('Triggers deleted');
+			$this->zbxTestTextNotPresent($this->host.": $description");
 		}
 	}
 
 	/**
 	 * Restore the original tables.
 	 */
-	public function testFormTrigger_Teardown() {
+	public function testFormTriggerPrototype_Teardown() {
 		DBrestore_tables('triggers');
 	}
 }

@@ -646,7 +646,7 @@ function operation_type2str($type = null) {
 }
 
 function sortOperations($eventsource, &$operations) {
-	if ($eventsource == EVENT_SOURCE_TRIGGERS) {
+	if ($eventsource == EVENT_SOURCE_TRIGGERS || $eventsource == EVENT_SOURCE_INTERNAL) {
 		$esc_step_from = array();
 		$esc_step_to = array();
 		$esc_period = array();

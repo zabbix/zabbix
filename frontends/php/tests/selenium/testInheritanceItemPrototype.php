@@ -19,7 +19,6 @@
 **/
 
 require_once dirname(__FILE__).'/../include/class.cwebtest.php';
-require_once dirname(__FILE__).'/../../include/items.inc.php';
 
 define('ITEM_GOOD', 0);
 define('ITEM_BAD', 1);
@@ -27,14 +26,14 @@ define('ITEM_BAD', 1);
 /**
  * Test the creation of inheritance of new objects on a previously linked template.
  */
-class testInheritanceItem extends CWebTest {
+class testInheritanceItemPrototype extends CWebTest {
 
 	/**
-	 * The name of the template created in the test data set.
+	 * The name of the test template created in the test data set.
 	 *
 	 * @var string
 	 */
-	protected $template  = 'Inheritance test template';
+	protected $template = 'Inheritance test template';
 
 	/**
 	 * The name of the test host created in the test data set.
@@ -42,6 +41,13 @@ class testInheritanceItem extends CWebTest {
 	 * @var string
 	 */
 	protected $host = 'Template inheritance test host';
+
+	/**
+	 * The name of the test discovery rule created in the test data set.
+	 *
+	 * @var string
+	 */
+	protected $discoveryRule = 'testInheritanceDiscoveryRule';
 
 	/**
 	 * The id of the templated test host created in the test data set.
@@ -60,33 +66,33 @@ class testInheritanceItem extends CWebTest {
 	/**
 	 * Backup the tables that will be modified during the tests.
 	 */
-	public function testInheritanceItem_Setup() {
+	public function testInheritanceItemPrototype_Setup() {
 		DBsave_tables('items');
 	}
 
-	// Returns updata data
+	// Returns update data
 	public static function update() {
-		return DBdata("select * from items where hostid = 30000 and key_ LIKE 'test-inheritance-item%'");
+		return DBdata("select * from items where hostid = 30000 and key_ LIKE 'item-prototype-test%'");
 	}
 
 	/**
 	 * @dataProvider update
 	 */
-	public function testInheritanceItem_SimpleUpdate($data) {
+	public function testInheritanceItemPrototype_SimpleUpdate($data) {
 		$name = $data['name'];
 
-		$sqlItems = "select itemid,hostid, name, key_, delay from items order by itemid";
+		$sqlItems = "select itemid, hostid, name, key_, delay from items order by itemid";
 		$oldHashItems = DBhash($sqlItems);
 
 		$this->zbxTestLogin('templates.php');
 		$this->zbxTestClickWait('link='.$this->template);
-		$this->zbxTestClickWait("//div[@class='w']//a[text()='Items']");
+		$this->zbxTestClickWait('link=Discovery rules');
+		$this->zbxTestClickWait('link='.$this->discoveryRule);
+		$this->zbxTestClickWait('link=Item prototypes');
 		$this->zbxTestClickWait('link='.$name);
 		$this->zbxTestClickWait('save');
-		$this->checkTitle('Configuration of items');
-		$this->zbxTestTextPresent('Item updated');
-		$this->zbxTestTextPresent("$name");
-		$this->zbxTestTextPresent('ITEMS');
+		$this->checkTitle('Configuration of item prototypes');
+		$this->zbxTestTextPresent(array('Item updated', "$name", 'CONFIGURATION OF ITEM PROTOTYPES', 'Item prototypes of '.$this->discoveryRule));
 
 		$this->assertEquals($oldHashItems, DBhash($sqlItems));
 	}
@@ -97,19 +103,19 @@ class testInheritanceItem extends CWebTest {
 			array(
 				array(
 					'expected' => ITEM_GOOD,
-					'name' =>'Checksum of $1',
-					'key' =>'vfs.file.cksum[/sbin/shutdown]',
+					'name' => 'Checksum of $1',
+					'key' => 'vfs.file.cksum[/sbin/shutdown]',
 					'dbName' => 'Checksum of /sbin/shutdown',
 					'dbCheck' => true,
-					'hostCheck' => true
+					'hostCheck' =>true
 				)
 			),
 			// Duplicate item
 			array(
 				array(
 					'expected' => ITEM_BAD,
-					'name' =>'Checksum of $1',
-					'key' =>'vfs.file.cksum[/sbin/shutdown]',
+					'name' => 'Checksum of $1',
+					'key' => 'vfs.file.cksum[/sbin/shutdown]',
 					'errors' => array(
 						'ERROR: Cannot add item',
 						'Item with key "vfs.file.cksum[/sbin/shutdown]" already exists on'
@@ -120,7 +126,7 @@ class testInheritanceItem extends CWebTest {
 			array(
 				array(
 					'expected' => ITEM_BAD,
-					'itemKey' =>'item-name-missing',
+					'key' =>'item-name-missing',
 					'errors' => array(
 						'Page received incorrect data',
 						'Warning. Incorrect value for field "Name": cannot be empty.'
@@ -131,7 +137,7 @@ class testInheritanceItem extends CWebTest {
 			array(
 				array(
 					'expected' => ITEM_BAD,
-					'name' =>'Item name',
+					'name' => 'Item name',
 					'errors' => array(
 						'Page received incorrect data',
 						'Warning. Incorrect value for field "Key": cannot be empty.'
@@ -139,6 +145,20 @@ class testInheritanceItem extends CWebTest {
 				)
 			),
 			// Empty formula
+			array(
+				array(
+					'expected' => ITEM_BAD,
+					'name' => 'Item formula',
+					'key' => 'item-formula-test',
+					'formula' => '',
+					'formulaValue' => '',
+					'errors' => array(
+						'ERROR: Page received incorrect data',
+						'Warning. Field "Custom multiplier" is not decimal number.'
+					)
+				)
+			),
+			// Incorrect formula
 			array(
 				array(
 					'expected' => ITEM_BAD,
@@ -232,12 +252,25 @@ class testInheritanceItem extends CWebTest {
 					'formCheck' => true
 				)
 			),
+			// Empty timedelay
+			array(
+				array(
+					'expected' => ITEM_BAD,
+					'name' => 'Item delay',
+					'key' => 'item-delay-test',
+					'delay' => 0,
+					'errors' => array(
+						'ERROR: Cannot add item',
+						'Item will not be refreshed. Please enter a correct update interval.'
+					)
+				)
+			),
 			// Incorrect timedelay
 			array(
 				array(
 					'expected' => ITEM_BAD,
-					'name' =>'Item delay',
-					'key' =>'item-delay-test',
+					'name' => 'Item delay',
+					'key' => 'item-delay-test',
 					'delay' => '-30',
 					'errors' => array(
 						'ERROR: Page received incorrect data',
@@ -249,8 +282,8 @@ class testInheritanceItem extends CWebTest {
 			array(
 				array(
 					'expected' => ITEM_BAD,
-					'name' =>'Item delay',
-					'key' =>'item-delay-test',
+					'name' => 'Item delay',
+					'key' => 'item-delay-test',
 					'delay' => 86401,
 					'errors' => array(
 						'ERROR: Page received incorrect data',
@@ -262,8 +295,8 @@ class testInheritanceItem extends CWebTest {
 			array(
 				array(
 					'expected' => ITEM_BAD,
-					'name' =>'Item flex',
-					'key' =>'item-flex-test',
+					'name' => 'Item flex',
+					'key' => 'item-flex-test',
 					'flexPeriod' => array(
 						array('flexDelay' => '', 'flexTime' => '', 'instantCheck' => true)
 					),
@@ -277,8 +310,8 @@ class testInheritanceItem extends CWebTest {
 			array(
 				array(
 					'expected' => ITEM_BAD,
-					'name' =>'Item flex',
-					'key' =>'item-flex-test',
+					'name' => 'Item flex',
+					'key' => 'item-flex-test',
 					'flexPeriod' => array(
 						array('flexTime' => '1-11,00:00-24:00', 'instantCheck' => true)
 					),
@@ -292,8 +325,8 @@ class testInheritanceItem extends CWebTest {
 			array(
 				array(
 					'expected' => ITEM_BAD,
-					'name' =>'Item flex',
-					'key' =>'item-flex-test',
+					'name' => 'Item flex',
+					'key' => 'item-flex-test',
 					'flexPeriod' => array(
 						array('flexTime' => '1-7,00:00-25:00', 'instantCheck' => true)
 					),
@@ -307,8 +340,8 @@ class testInheritanceItem extends CWebTest {
 			array(
 				array(
 					'expected' => ITEM_BAD,
-					'name' =>'Item flex',
-					'key' =>'item-flex-test',
+					'name' => 'Item flex',
+					'key' => 'item-flex-test',
 					'flexPeriod' => array(
 						array('flexTime' => '1-7,24:00-00:00', 'instantCheck' => true)
 					),
@@ -322,8 +355,8 @@ class testInheritanceItem extends CWebTest {
 			array(
 				array(
 					'expected' => ITEM_BAD,
-					'name' =>'Item flex',
-					'key' =>'item-flex-test',
+					'name' => 'Item flex',
+					'key' => 'item-flex-test',
 					'flexPeriod' => array(
 						array('flexTime' => '1,00:00-24:00;2,00:00-24:00', 'instantCheck' => true)
 					),
@@ -337,8 +370,8 @@ class testInheritanceItem extends CWebTest {
 			array(
 				array(
 					'expected' => ITEM_GOOD,
-					'name' =>'Item flex',
-					'key' =>'item-flex-test',
+					'name' => 'Item flex',
+					'key' => 'item-flex-test',
 					'flexPeriod' => array(
 						array('flexTime' => '1,00:00-24:00'),
 						array('flexTime' => '2,00:00-24:00'),
@@ -351,8 +384,8 @@ class testInheritanceItem extends CWebTest {
 			array(
 				array(
 					'expected' => ITEM_BAD,
-					'name' =>'Item flex',
-					'key' =>'item-flex-delay',
+					'name' => 'Item flex',
+					'key' => 'item-flex-delay',
 					'flexPeriod' => array(
 						array('flexDelay' => 0, 'flexTime' => '1,00:00-24:00'),
 						array('flexDelay' => 0, 'flexTime' => '2,00:00-24:00'),
@@ -372,8 +405,8 @@ class testInheritanceItem extends CWebTest {
 			array(
 				array(
 					'expected' => ITEM_GOOD,
-					'name' =>'Item flex1',
-					'key' =>'item-flex-delay1',
+					'name' => 'Item flex1',
+					'key' => 'item-flex-delay1',
 					'flexPeriod' => array(
 						array('flexTime' => '1,00:00-24:00'),
 						array('flexTime' => '2,00:00-24:00'),
@@ -389,8 +422,8 @@ class testInheritanceItem extends CWebTest {
 			array(
 				array(
 					'expected' => ITEM_BAD,
-					'name' =>'Item flex',
-					'key' =>'item-flex-delay',
+					'name' => 'Item flex',
+					'key' => 'item-flex-delay',
 					'delay' => 0,
 					'flexPeriod' => array(
 						array('flexDelay' => 0, 'flexTime' => '1,00:00-24:00'),
@@ -411,23 +444,23 @@ class testInheritanceItem extends CWebTest {
 			array(
 				array(
 					'expected' => ITEM_GOOD,
-					'name' =>'Item flex2',
-					'key' =>'item-flex-delay2',
+					'name' => 'Item flex2',
+					'key' => 'item-flex-delay2',
 					'delay' => 0,
 					'flexPeriod' => array(
 						array('flexTime' => '1-5,00:00-24:00'),
 						array('flexTime' => '6-7,00:00-24:00')
 					),
 					'dbCheck' => true,
-					'formCheck' => true
+					'hostCheck' => true
 				)
 			),
 			// Delay combined with flex periods
 			array(
 				array(
 					'expected' => ITEM_BAD,
-					'name' =>'Item flex',
-					'key' =>'item-flex-delay',
+					'name' => 'Item flex',
+					'key' => 'item-flex-delay',
 					'flexPeriod' => array(
 						array('flexDelay' => 0, 'flexTime' => '1-5,00:00-24:00'),
 						array('flexDelay' => 0, 'flexTime' => '6-7,00:00-24:00')
@@ -442,8 +475,8 @@ class testInheritanceItem extends CWebTest {
 			array(
 				array(
 					'expected' => ITEM_GOOD,
-					'name' =>'Item flex',
-					'key' =>'item-flex-delay3',
+					'name' => 'Item flex',
+					'key' => 'item-flex-delay3',
 					'flexPeriod' => array(
 						array('flexTime' => '1-5,00:00-24:00'),
 						array('flexTime' => '6-7,00:00-24:00')
@@ -454,8 +487,8 @@ class testInheritanceItem extends CWebTest {
 			array(
 				array(
 					'expected' => ITEM_GOOD,
-					'name' =>'Item flex',
-					'key' =>'item-flex-delay4',
+					'name' => 'Item flex',
+					'key' => 'item-flex-delay4',
 					'delay' => 0,
 					'flexPeriod' => array(
 						array('flexTime' => '1-7,00:00-24:00')
@@ -466,8 +499,8 @@ class testInheritanceItem extends CWebTest {
 			array(
 				array(
 					'expected' => ITEM_BAD,
-					'name' =>'Item flex',
-					'key' =>'item-flex-delay',
+					'name' => 'Item flex',
+					'key' => 'item-flex-delay',
 					'flexPeriod' => array(
 						array('flexDelay' => 0, 'flexTime' => '1-7,00:00-24:00')
 					),
@@ -481,8 +514,8 @@ class testInheritanceItem extends CWebTest {
 			array(
 				array(
 					'expected' => ITEM_GOOD,
-					'name' =>'Item flex',
-					'key' =>'item-flex-delay5',
+					'name' => 'Item flex',
+					'key' => 'item-flex-delay5',
 					'flexPeriod' => array(
 						array('flexTime' => '1-7,00:00-24:00')
 					)
@@ -492,8 +525,8 @@ class testInheritanceItem extends CWebTest {
 			array(
 				array(
 					'expected' => ITEM_BAD,
-					'name' =>'Item flex',
-					'key' =>'item-flex-delay',
+					'name' => 'Item flex',
+					'key' => 'item-flex-delay',
 					'flexPeriod' => array(
 						array('flexDelay' => 0, 'flexTime' => '1-5,00:00-24:00'),
 						array('flexDelay' => 0, 'flexTime' => '6-7,00:00-24:00'),
@@ -510,8 +543,8 @@ class testInheritanceItem extends CWebTest {
 			array(
 				array(
 					'expected' => ITEM_BAD,
-					'name' =>'Item flex',
-					'key' =>'item-flex-delay',
+					'name' => 'Item flex',
+					'key' => 'item-flex-delay',
 					'flexPeriod' => array(
 						array('flexTime' => '1-5,00:00-24:00'),
 						array('flexTime' => '6-7,00:00-24:00'),
@@ -528,8 +561,8 @@ class testInheritanceItem extends CWebTest {
 			array(
 				array(
 					'expected' => ITEM_BAD,
-					'name' =>'Item flex',
-					'key' =>'item-flex-delay',
+					'name' => 'Item flex',
+					'key' => 'item-flex-delay',
 					'flexPeriod' => array(
 						array('flexTime' => '1-7,00:00-24:00'),
 						array('flexDelay' => 0, 'flexTime' => '1-7,00:00-24:00')
@@ -544,8 +577,8 @@ class testInheritanceItem extends CWebTest {
 			array(
 				array(
 					'expected' => ITEM_BAD,
-					'name' =>'Item flex',
-					'key' =>'item-flex-delay',
+					'name' => 'Item flex',
+					'key' => 'item-flex-delay',
 					'flexPeriod' => array(
 						array('flexDelay' => 0, 'flexTime' => '1-7,00:00-24:00'),
 						array('flexTime' => '1-7,00:00-24:00')
@@ -560,8 +593,8 @@ class testInheritanceItem extends CWebTest {
 			array(
 				array(
 					'expected' => ITEM_GOOD,
-					'name' =>'Item flex',
-					'key' =>'item-flex-delay6',
+					'name' => 'Item flex',
+					'key' => 'item-flex-delay6',
 					'flexPeriod' => array(
 						array('flexDelay' => 0, 'flexTime' => '1,00:00-24:00', 'remove' => true),
 						array('flexDelay' => 0, 'flexTime' => '2,00:00-24:00', 'remove' => true),
@@ -584,8 +617,8 @@ class testInheritanceItem extends CWebTest {
 			array(
 				array(
 					'expected' => ITEM_GOOD,
-					'name' =>'Item flex',
-					'key' =>'item-flex-delay7',
+					'name' => 'Item flex',
+					'key' => 'item-flex-delay7',
 					'flexPeriod' => array(
 						array('flexDelay' => 0, 'flexTime' => '1-7,00:00-24:00', 'remove' => true),
 						array('flexTime' => '1-7,00:00-24:00')
@@ -596,8 +629,8 @@ class testInheritanceItem extends CWebTest {
 			array(
 				array(
 					'expected' => ITEM_GOOD,
-					'name' =>'Item flex Check',
-					'key' =>'item-flex-delay8',
+					'name' => 'Item flex Check',
+					'key' => 'item-flex-delay8',
 					'flexPeriod' => array(
 						array('flexDelay' => 0, 'flexTime' => '1-5,00:00-24:00', 'remove' => true),
 						array('flexDelay' => 0, 'flexTime' => '6-7,00:00-24:00', 'remove' => true),
@@ -605,7 +638,87 @@ class testInheritanceItem extends CWebTest {
 						array('flexTime' => '6-7,00:00-24:00')
 					),
 					'dbCheck' => true,
+					'hostCheck' => true
+				)
+			),
+			// Maximum flexfields allowed reached- error
+			array(
+				array(
+					'expected' => ITEM_BAD,
+					'name' => 'Item flex-maximum entries',
+					'key' => 'item-flex-maximum',
+					'flexPeriod' => array(
+						array('flexTime' => '1-7,00:00-24:00'),
+						array('flexTime' => '1-7,00:00-24:00'),
+						array('flexTime' => '1-7,00:00-24:00'),
+						array('flexTime' => '1-7,00:00-24:00'),
+						array('flexTime' => '1-7,00:00-24:00'),
+						array('flexTime' => '1-7,00:00-24:00'),
+						array('flexTime' => '1-7,00:00-24:00', 'instantCheck' => true, 'maximumItems' => true)
+					),
+					'errors' => array(
+						'Maximum number of flexible intervals added'
+					)
+				)
+			),
+			// Maximum flexfields allowed reached- error
+			array(
+				array(
+					'expected' => ITEM_BAD,
+					'name' => 'Item flex-maximum entries',
+					'key' => 'item-flex-maximum',
+					'flexPeriod' => array(
+						array('flexTime' => '1-7,00:00-24:00'),
+						array('flexTime' => '1-7,00:00-24:00'),
+						array('flexTime' => '1-7,00:00-24:00'),
+						array('flexTime' => '1-7,00:00-24:00'),
+						array('flexTime' => '1-7,00:00-24:00'),
+						array('flexTime' => '1-7,00:00-24:00'),
+						array('flexTime' => '1-7,00:00-24:00', 'instantCheck' => true, 'maximumItems' => true)
+					),
+					'errors' => array(
+						'Maximum number of flexible intervals added'
+					)
+				)
+			),
+			// Maximum flexfields allowed reached- save OK
+			array(
+				array(
+					'expected' => ITEM_GOOD,
+					'name' => 'Item flex-maximum save OK',
+					'key' => 'item-flex-maximum-save',
+					'flexPeriod' => array(
+						array('flexTime' => '1-7,00:00-24:00'),
+						array('flexTime' => '1-7,00:00-24:00'),
+						array('flexTime' => '1-7,00:00-24:00'),
+						array('flexTime' => '1-7,00:00-24:00'),
+						array('flexTime' => '1-7,00:00-24:00'),
+						array('flexTime' => '1-7,00:00-24:00'),
+						array('flexTime' => '1-7,00:00-24:00', 'maximumItems' => true)
+					),
+					'dbCheck' => true,
 					'formCheck' => true
+				)
+			),
+			// Maximum flexfields allowed reached- remove one item
+			array(
+				array(
+					'expected' => ITEM_BAD,
+					'name' => 'Item flex-maximum with remove',
+					'key' => 'item-flex-maximum-remove',
+					'flexPeriod' => array(
+						array('flexTime' => '1-7,00:00-24:00'),
+						array('flexTime' => '1-7,00:00-24:00'),
+						array('flexTime' => '1-7,00:00-24:00'),
+						array('flexTime' => '1-7,00:00-24:00'),
+						array('flexTime' => '1-7,00:00-24:00'),
+						array('flexTime' => '1-7,00:00-24:00'),
+						array('flexTime' => '1-7,00:00-24:00', 'instantCheck' => true, 'maximumItems' => true, 'remove' => true),
+						array('flexTime' => '1-7,00:00-24:00', 'instantCheck' => true, 'maximumItems' => true)
+					),
+					'errors' => array(
+						'Maximum number of flexible intervals added'
+					)
 				)
 			),
 			// Flexfields with negative number in flexdelay
@@ -634,8 +747,8 @@ class testInheritanceItem extends CWebTest {
 			array(
 				array(
 					'expected' => ITEM_GOOD,
-					'name' =>'Item history',
-					'key' =>'item-history-empty',
+					'name' => 'Item history',
+					'key' => 'item-history-empty',
 					'history' => ''
 				)
 			),
@@ -643,8 +756,8 @@ class testInheritanceItem extends CWebTest {
 			array(
 				array(
 					'expected' => ITEM_BAD,
-					'name' =>'Item history',
-					'key' =>'item-history-test',
+					'name' => 'Item history',
+					'key' => 'item-history-test',
 					'history' => 65536,
 					'errors' => array(
 						'ERROR: Page received incorrect data',
@@ -656,8 +769,8 @@ class testInheritanceItem extends CWebTest {
 			array(
 				array(
 					'expected' => ITEM_BAD,
-					'name' =>'Item history',
-					'key' =>'item-history-test',
+					'name' => 'Item history',
+					'key' => 'item-history-test',
 					'history' => '-1',
 					'errors' => array(
 							'ERROR: Page received incorrect data',
@@ -669,8 +782,8 @@ class testInheritanceItem extends CWebTest {
 			array(
 				array(
 					'expected' => ITEM_GOOD,
-					'name' =>'Item history',
-					'key' =>'item-history-test',
+					'name' => 'Item history',
+					'key' => 'item-history-test',
 					'history' => 'days'
 				)
 			),
@@ -678,8 +791,8 @@ class testInheritanceItem extends CWebTest {
 			array(
 				array(
 					'expected' => ITEM_GOOD,
-					'name' =>'Item trends',
-					'key' =>'item-trends-empty',
+					'name' => 'Item trends',
+					'key' => 'item-trends-empty',
 					'trends' => '',
 					'dbCheck' => true,
 					'hostCheck' => true
@@ -689,8 +802,8 @@ class testInheritanceItem extends CWebTest {
 			array(
 				array(
 					'expected' => ITEM_BAD,
-					'name' =>'Item trends',
-					'key' =>'item-trends-test',
+					'name' => 'Item trends',
+					'key' => 'item-trends-test',
 					'trends' => '-1',
 					'errors' => array(
 							'ERROR: Page received incorrect data',
@@ -702,8 +815,8 @@ class testInheritanceItem extends CWebTest {
 			array(
 				array(
 					'expected' => ITEM_BAD,
-					'name' =>'Item trends',
-					'key' =>'item-trends-test',
+					'name' => 'Item trends',
+					'key' => 'item-trends-test',
 					'trends' => 65536,
 					'errors' => array(
 							'ERROR: Page received incorrect data',
@@ -715,8 +828,8 @@ class testInheritanceItem extends CWebTest {
 			array(
 				array(
 					'expected' => ITEM_GOOD,
-					'name' =>'Item trends Check',
-					'key' =>'item-trends-test',
+					'name' => 'Item trends Check',
+					'key' => 'item-trends-test',
 					'trends' => 'trends',
 					'dbCheck' => true,
 					'hostCheck' => true
@@ -725,46 +838,53 @@ class testInheritanceItem extends CWebTest {
 			array(
 				array(
 					'expected' => ITEM_GOOD,
-					'name' =>'!@#$%^&*()_+-=[]{};:"|,./<>?',
-					'key' =>'item-symbols-test',
+					'name' => '!@#$%^&*()_+-=[]{};:"|,./<>?',
+					'key' => 'item-symbols-test',
 					'dbCheck' => true,
 					'hostCheck' => true
 				)
 			),
 			array(
-				array('expected' => ITEM_GOOD,
-					'name' =>'itemSimple',
-					'key' =>'key-template-simple',
+				array(
+					'expected' => ITEM_GOOD,
+					'name' => 'itemSimple',
+					'key' => 'key-template-simple',
 					'hostCheck' => true,
-					'dbCheck' => true)
+					'dbCheck' => true
+				)
 			),
 			array(
-				array('expected' => ITEM_GOOD,
-					'name' =>'itemName',
-					'key' =>'key-template-item',
+				array(
+					'expected' => ITEM_GOOD,
+					'name' => 'itemName',
+					'key' => 'key-template-item',
 					'hostCheck' => true)
 			),
 			array(
-				array('expected' => ITEM_GOOD,
-					'name' =>'itemTrigger',
-					'key' =>'key-template-trigger',
+				array(
+					'expected' => ITEM_GOOD,
+					'name' => 'itemTrigger',
+					'key' => 'key-template-trigger',
 					'hostCheck' => true,
 					'dbCheck' => true,
-					'remove' => true)
+					'remove' => true
+				)
 			),
 			array(
-				array('expected' => ITEM_GOOD,
-					'name' =>'itemRemove',
-					'key' =>'key-template-remove',
+				array(
+					'expected' => ITEM_GOOD,
+					'name' => 'itemRemove',
+					'key' => 'key-template-remove',
 					'hostCheck' => true,
 					'dbCheck' => true,
 					'hostRemove' => true,
 					'remove' => true)
 			),
 			array(
-				array('expected' => ITEM_BAD,
-					'name' =>'itemInheritance',
-					'key' =>'key-item-inheritance',
+				array(
+					'expected' => ITEM_BAD,
+					'name' => 'itemInheritance',
+					'key' => 'key-item-inheritance',
 					'errors' => array(
 						'ERROR: Cannot add item',
 						'Item with key "key-item-inheritance" already exists on "Inheritance test template".')
@@ -776,11 +896,9 @@ class testInheritanceItem extends CWebTest {
 					'expected' => ITEM_GOOD,
 					'type' => 'Zabbix agent',
 					'name' => 'Zabbix agent',
-					'key' => 'template-zabbix-agent',
+					'key' => 'item-zabbix-agent',
 					'dbCheck' => true,
-					'hostCheck' => true,
-					'hostRemove' => true,
-					'remove' => true
+					'formCheck' => true
 				)
 			),
 			array(
@@ -788,9 +906,9 @@ class testInheritanceItem extends CWebTest {
 					'expected' => ITEM_GOOD,
 					'type' => 'Zabbix agent (active)',
 					'name' => 'Zabbix agent (active)',
-					'key' => 'template-zabbix-agent-active',
+					'key' => 'item-zabbix-agent-active',
 					'dbCheck' => true,
-					'hostCheck' => true
+					'formCheck' => true
 				)
 			),
 			array(
@@ -798,11 +916,9 @@ class testInheritanceItem extends CWebTest {
 					'expected' => ITEM_GOOD,
 					'type' => 'Simple check',
 					'name' => 'Simple check',
-					'key' => 'template-simple-check',
+					'key' => 'item-simple-check',
 					'dbCheck' => true,
-					'hostCheck' => true,
-					'hostRemove' => true,
-					'remove' => true
+					'formCheck' => true
 				)
 			),
 			array(
@@ -810,9 +926,9 @@ class testInheritanceItem extends CWebTest {
 					'expected' => ITEM_GOOD,
 					'type' => 'SNMPv1 agent',
 					'name' => 'SNMPv1 agent',
-					'key' => 'template-snmpv1-agent',
+					'key' => 'item-snmpv1-agent',
 					'dbCheck' => true,
-					'hostCheck' => true
+					'formCheck' => true
 				)
 			),
 			array(
@@ -820,9 +936,9 @@ class testInheritanceItem extends CWebTest {
 					'expected' => ITEM_GOOD,
 					'type' => 'SNMPv2 agent',
 					'name' => 'SNMPv2 agent',
-					'key' => 'template-snmpv2-agent',
+					'key' => 'item-snmpv2-agent',
 					'dbCheck' => true,
-					'hostCheck' => true
+					'formCheck' => true
 				)
 			),
 			array(
@@ -830,7 +946,7 @@ class testInheritanceItem extends CWebTest {
 					'expected' => ITEM_GOOD,
 					'type' => 'SNMPv3 agent',
 					'name' => 'SNMPv3 agent',
-					'key' => 'template-snmpv3-agent',
+					'key' => 'item-snmpv3-agent',
 					'dbCheck' => true,
 					'formCheck' => true
 				)
@@ -842,7 +958,7 @@ class testInheritanceItem extends CWebTest {
 					'name' => 'SNMP trap',
 					'key' => 'snmptrap.fallback',
 					'dbCheck' => true,
-					'hostCheck' => true
+					'formCheck' => true
 				)
 			),
 			array(
@@ -850,9 +966,9 @@ class testInheritanceItem extends CWebTest {
 					'expected' => ITEM_GOOD,
 					'type' => 'Zabbix internal',
 					'name' => 'Zabbix internal',
-					'key' => 'template-zabbix-internal',
+					'key' => 'item-zabbix-internal',
 					'dbCheck' => true,
-					'hostCheck' => true
+					'formCheck' => true
 				)
 			),
 			array(
@@ -860,11 +976,9 @@ class testInheritanceItem extends CWebTest {
 					'expected' => ITEM_GOOD,
 					'type' => 'Zabbix trapper',
 					'name' => 'Zabbix trapper',
-					'key' => 'template-zabbix-trapper',
+					'key' => 'item-zabbix-trapper',
 					'dbCheck' => true,
-					'hostCheck' => true,
-					'hostRemove' => true,
-					'remove' => true
+					'formCheck' => true
 				)
 			),
 			array(
@@ -874,7 +988,7 @@ class testInheritanceItem extends CWebTest {
 					'name' => 'Zabbix aggregate',
 					'key' => 'grpmax[Zabbix servers group,some-item-key,last,0]',
 					'dbCheck' => true,
-					'hostCheck' => true
+					'formCheck' => true
 				)
 			),
 			array(
@@ -882,10 +996,10 @@ class testInheritanceItem extends CWebTest {
 					'expected' => ITEM_BAD,
 					'type' => 'Zabbix aggregate',
 					'name' => 'Zabbix aggregate',
-					'key' => 'template-zabbix-aggregate',
+					'key' => 'item-zabbix-aggregate',
 					'errors' => array(
 						'ERROR: Cannot add item',
-						'Key "template-zabbix-aggregate" does not match <grpmax|grpmin|grpsum|grpavg>["Host group(s)", "Item key", "<last|min|max|avg|sum|count>", "parameter"]'
+						'Key "item-zabbix-aggregate" does not match'
 					)
 				)
 			),
@@ -894,9 +1008,9 @@ class testInheritanceItem extends CWebTest {
 					'expected' => ITEM_GOOD,
 					'type' => 'External check',
 					'name' => 'External check',
-					'key' => 'template-external-check',
+					'key' => 'item-external-check',
 					'dbCheck' => true,
-					'hostCheck' => true
+					'formCheck' => true
 				)
 			),
 			array(
@@ -904,9 +1018,9 @@ class testInheritanceItem extends CWebTest {
 					'expected' => ITEM_GOOD,
 					'type' => 'Database monitor',
 					'name' => 'Database monitor',
-					'key' => 'template-database-monitor',
+					'key' => 'item-database-monitor',
 					'dbCheck' => true,
-					'hostCheck' => true
+					'formCheck' => true
 				)
 			),
 			array(
@@ -914,10 +1028,22 @@ class testInheritanceItem extends CWebTest {
 					'expected' => ITEM_GOOD,
 					'type' => 'IPMI agent',
 					'name' => 'IPMI agent',
-					'key' => 'template-ipmi-agent',
+					'key' => 'item-ipmi-agent',
 					'ipmi_sensor' => 'ipmi_sensor',
 					'dbCheck' => true,
-					'hostCheck' => true
+					'formCheck' => true
+				)
+			),
+			array(
+				array(
+					'expected' => ITEM_GOOD,
+					'type' => 'IPMI agent',
+					'name' => 'IPMI agent with spaces',
+					'key' => 'item-ipmi-agent-spaces',
+					'ipmi_sensor' => 'ipmi_sensor',
+					'ipmiSpaces' => true,
+					'dbCheck' => true,
+					'formCheck' => true
 				)
 			),
 			array(
@@ -925,11 +1051,11 @@ class testInheritanceItem extends CWebTest {
 					'expected' => ITEM_GOOD,
 					'type' => 'SSH agent',
 					'name' => 'SSH agent',
-					'key' => 'template-ssh-agent',
+					'key' => 'item-ssh-agent',
 					'username' => 'zabbix',
 					'params_es' => 'executed script',
 					'dbCheck' => true,
-					'hostCheck' => true
+					'formCheck' => true
 				)
 			),
 			array(
@@ -937,11 +1063,11 @@ class testInheritanceItem extends CWebTest {
 					'expected' => ITEM_GOOD,
 					'type' => 'TELNET agent',
 					'name' => 'TELNET agent',
-					'key' => 'template-telnet-agent',
+					'key' => 'item-telnet-agent',
 					'username' => 'zabbix',
 					'params_es' => 'executed script',
 					'dbCheck' => true,
-					'hostCheck' => true
+					'formCheck' => true
 				)
 			),
 			array(
@@ -949,7 +1075,7 @@ class testInheritanceItem extends CWebTest {
 					'expected' => ITEM_BAD,
 					'type' => 'IPMI agent',
 					'name' => 'IPMI agent error',
-					'key' => 'template-ipmi-agent-error',
+					'key' => 'item-ipmi-agent-error',
 					'errors' => array(
 							'ERROR: Page received incorrect data',
 							'Warning. Incorrect value for field "IPMI sensor": cannot be empty.'
@@ -961,10 +1087,10 @@ class testInheritanceItem extends CWebTest {
 					'expected' => ITEM_BAD,
 					'type' => 'SSH agent',
 					'name' => 'SSH agent error',
-					'key' => 'template-ssh-agent-error',
+					'key' => 'item-ssh-agent-error',
 					'errors' => array(
 							'ERROR: Page received incorrect data',
-							'Warning. Incorrect value for field "User name": cannot be empty',
+							'Warning. Incorrect value for field "User name": cannot be empty.',
 							'Warning. Incorrect value for field "Executed script": cannot be empty.'
 					)
 				)
@@ -974,10 +1100,10 @@ class testInheritanceItem extends CWebTest {
 					'expected' => ITEM_BAD,
 					'type' => 'TELNET agent',
 					'name' => 'TELNET agent error',
-					'key' => 'template-telnet-agent-error',
+					'key' => 'item-telnet-agent-error',
 					'errors' => array(
 							'ERROR: Page received incorrect data',
-							'Warning. Incorrect value for field "User name": cannot be empty',
+							'Warning. Incorrect value for field "User name": cannot be empty.',
 							'Warning. Incorrect value for field "Executed script": cannot be empty.'
 					)
 				)
@@ -987,11 +1113,9 @@ class testInheritanceItem extends CWebTest {
 					'expected' => ITEM_GOOD,
 					'type' => 'JMX agent',
 					'name' => 'JMX agent',
-					'key' => 'template-jmx-agent',
+					'key' => 'proto-jmx-agent',
 					'dbCheck' => true,
-					'hostCheck' => true,
-					'hostRemove' => true,
-					'remove' => true
+					'formCheck' => true
 				)
 			),
 			array(
@@ -999,10 +1123,10 @@ class testInheritanceItem extends CWebTest {
 					'expected' => ITEM_GOOD,
 					'type' => 'Calculated',
 					'name' => 'Calculated',
-					'key' => 'template-calculated',
+					'key' => 'item-calculated',
 					'params_f' => 'formula',
 					'dbCheck' => true,
-					'hostCheck' => true
+					'formCheck' => true
 				)
 			),
 			array(
@@ -1010,7 +1134,7 @@ class testInheritanceItem extends CWebTest {
 					'expected' => ITEM_BAD,
 					'type' => 'Calculated',
 					'name' => 'Calculated',
-					'key' => 'template-calculated',
+					'key' => 'item-calculated',
 					'errors' => array(
 							'ERROR: Page received incorrect data',
 							'Warning. Incorrect value for field "Formula": cannot be empty.'
@@ -1077,19 +1201,20 @@ class testInheritanceItem extends CWebTest {
 	/**
 	 * @dataProvider create
 	 */
-	public function testInheritanceItem_SimpleCreate($data) {
+	public function testInheritanceItemPrototype_SimpleCreate($data) {
 		$this->zbxTestLogin('templates.php');
 
 		if (isset($data['name'])) {
 			$itemName = $data['name'];
 		}
-
 		if (isset($data['key'])) {
 			$keyName = $data['key'];
 		}
 
 		$this->zbxTestClickWait('link='.$this->template);
-		$this->zbxTestClickWait('link=Items');
+		$this->zbxTestClickWait("link=Discovery rules");
+		$this->zbxTestClickWait('link='.$this->discoveryRule);
+		$this->zbxTestClickWait("link=Item prototypes");
 		$this->zbxTestClickWait('form');
 
 		if (isset($data['type'])) {
@@ -1110,6 +1235,10 @@ class testInheritanceItem extends CWebTest {
 			$this->input_type('username', $data['username']);
 		}
 
+		if (isset($data['ipmi_sensor'])) {
+			$this->input_type('ipmi_sensor', $data['ipmi_sensor']);
+		}
+
 		if (isset($data['params_es'])) {
 			$this->input_type('params_es', $data['params_es']);
 		}
@@ -1118,13 +1247,10 @@ class testInheritanceItem extends CWebTest {
 			$this->input_type('params_f', $data['params_f']);
 		}
 
+
 		if (isset($data['formula'])) {
 			$this->zbxTestCheckboxSelect('multiplier');
 			$this->input_type('formula', $data['formula']);
-		}
-
-		if (isset($data['ipmi_sensor'])) {
-			$this->input_type('ipmi_sensor', $data['ipmi_sensor']);
 		}
 
 		if (isset($data['delay']))	{
@@ -1172,17 +1298,17 @@ class testInheritanceItem extends CWebTest {
 			switch ($expected) {
 				case ITEM_GOOD:
 					$this->zbxTestTextPresent('Item added');
-					$this->checkTitle('Configuration of items');
-					$this->zbxTestTextPresent('CONFIGURATION OF ITEMS');
+					$this->checkTitle('Configuration of item prototypes');
+					$this->zbxTestTextPresent(array('CONFIGURATION OF ITEM PROTOTYPES', "Item prototypes of ".$this->discoveryRule));
 					break;
 
 				case ITEM_BAD:
-					$this->checkTitle('Configuration of items');
-					$this->zbxTestTextPresent('CONFIGURATION OF ITEMS');
+					$this->checkTitle('Configuration of item prototypes');
+					$this->zbxTestTextPresent(array('CONFIGURATION OF ITEM PROTOTYPES', 'Item prototype'));
 					foreach ($data['errors'] as $msg) {
 						$this->zbxTestTextPresent($msg);
 					}
-					$this->zbxTestTextPresent(array('Host', 'Name', 'Key'));
+					$this->zbxTestTextPresent(array('Name', 'Type', 'Key'));
 					if (isset($data['formula'])) {
 						$formulaValue = $this->getValue('formula');
 						$this->assertEquals($data['formulaValue'], $formulaValue);
@@ -1190,10 +1316,14 @@ class testInheritanceItem extends CWebTest {
 					break;
 			}
 		}
+
 		if (isset($data['hostCheck'])) {
 			$this->zbxTestOpenWait('hosts.php');
 			$this->zbxTestClickWait('link='.$this->host);
-			$this->zbxTestClickWait('link=Items');
+			$this->zbxTestClickWait("link=Discovery rules");
+			$this->zbxTestClickWait('link='.$this->discoveryRule);
+			$this->zbxTestClickWait("link=Item prototypes");
+
 
 			if (isset ($data['dbName'])) {
 				$itemNameDB = $data['dbName'];
@@ -1204,6 +1334,9 @@ class testInheritanceItem extends CWebTest {
 				$this->zbxTestTextPresent($this->template.": $itemName");
 				$this->zbxTestClickWait("link=$itemName");
 			}
+
+			$this->zbxTestTextPresent('Parent items');
+			$this->assertElementPresent('link='.$this->template);
 			$this->assertElementValue('name', $itemName);
 			$this->assertElementValue('key', $keyName);
 		}
@@ -1231,7 +1364,9 @@ class testInheritanceItem extends CWebTest {
 
 			$this->zbxTestOpenWait('hosts.php');
 			$this->zbxTestClickWait('link='.$this->host);
-			$this->zbxTestClickWait('link=Items');
+			$this->zbxTestClickWait("link=Discovery rules");
+			$this->zbxTestClickWait('link='.$this->discoveryRule);
+			$this->zbxTestClickWait("link=Item prototypes");
 
 			$this->zbxTestCheckboxSelect("group_itemid_$itemId");
 			$this->zbxTestDropdownSelect('go', 'Delete selected');
@@ -1239,7 +1374,7 @@ class testInheritanceItem extends CWebTest {
 
 			$this->getConfirmation();
 			$this->wait();
-			$this->zbxTestTextPresent(array('ERROR: Cannot delete items', 'Cannot delete templated item.'));
+			$this->zbxTestTextPresent(array('ERROR: Cannot delete items', 'Cannot delete templated items'));
 		}
 
 		if (isset($data['remove'])) {
@@ -1250,7 +1385,9 @@ class testInheritanceItem extends CWebTest {
 
 			$this->zbxTestOpenWait('templates.php');
 			$this->zbxTestClickWait('link='.$this->template);
-			$this->zbxTestClickWait('link=Items');
+			$this->zbxTestClickWait("link=Discovery rules");
+			$this->zbxTestClickWait('link='.$this->discoveryRule);
+			$this->zbxTestClickWait("link=Item prototypes");
 
 			$this->zbxTestCheckboxSelect("group_itemid_$itemId");
 			$this->zbxTestDropdownSelect('go', 'Delete selected');
@@ -1263,132 +1400,10 @@ class testInheritanceItem extends CWebTest {
 		}
 	}
 
-	public function testFormItem_linkHost(){
-		$this->zbxTestLogin('hosts.php');
-		$this->zbxTestClickWait('link=Template inheritance test host');
-
-		$this->zbxTestClick('tab_templateTab');
-
-		$this->assertElementPresent("//div[@id='templates_']/input");
-		$this->input_type("//div[@id='templates_']/input", 'Template App Zabbix Agent');
-		sleep(1);
-		$this->zbxTestClick("//span[@class='matched']");
-		$this->zbxTestClickWait('add_template');
-
-		$this->zbxTestTextPresent('Template App Zabbix Agent');
-		$this->zbxTestClickWait('save');
-
-		$this->zbxTestTextPresent('Host updated');
-	}
-
-	// Returns item data for inheritance testing
-	public static function linkData() {
-	// result, template, itemName, keyName, errorMsg
-		return array(
-			array(
-				ITEM_GOOD,
-				'Inheritance test template',
-				'Test LLD item1',
-				'test-general-item',
-				array()
-					),
-			// Dublicated item on Template inheritance test host
-			array(
-				ITEM_BAD,
-				'Template App Zabbix Agent',
-				'Test LLD item1',
-				'test-general-item',
-				array(
-						'ERROR: Cannot add item',
-						'Item "test-general-item" already exists on "Template inheritance test host", inherited from '.
-							'another template.'
-						)
-				),
-			// Item added to Template inheritance test host
-			array(
-				ITEM_GOOD,
-				'Template App Zabbix Agent',
-				'Test LLD item2',
-				'test-additional-item',
-				array()
-				)
-			);
-	}
-
-	/**
-	 * @dataProvider linkData
-	 */
-	public function testFormItem_Create($result, $template, $itemName, $keyName, $errorMsgs) {
-		$this->zbxTestLogin('templates.php');
-
-		// create an item
-		$this->zbxTestClickWait("link=$template");
-		$this->zbxTestClickWait('link=Items');
-		$this->zbxTestClickWait('form');
-
-		$this->input_type('name', $itemName);
-		$this->input_type('key', $keyName);
-
-
-		$this->zbxTestClickWait('save');
-
-		switch ($result) {
-			case ITEM_GOOD:
-				$this->zbxTestTextPresent('Item added');
-				$this->checkTitle('Configuration of items');
-				$this->zbxTestTextPresent('CONFIGURATION OF ITEMS');
-				break;
-
-			case ITEM_BAD:
-				$this->checkTitle('Configuration of items');
-				$this->zbxTestTextPresent('CONFIGURATION OF ITEMS');
-				foreach ($errorMsgs as $msg) {
-					$this->zbxTestTextPresent($msg);
-				}
-				$this->zbxTestTextPresent('Host');
-				$this->zbxTestTextPresent('Name');
-				$this->zbxTestTextPresent('Key');
-				break;
-		}
-
-		switch ($result) {
-			case ITEM_GOOD:
-				// check that the inherited item matches the original
-				$this->zbxTestOpenWait('hosts.php');
-				$this->zbxTestClickWait('link=Template inheritance test host');
-				$this->zbxTestClickWait('link=Items');
-				$this->zbxTestTextPresent("$template: $itemName");
-				$this->zbxTestClickWait("link=$itemName");
-				$this->assertElementValue('name', $itemName);
-				$this->assertElementValue('key', $keyName);
-				break;
-			case ITEM_BAD:
-				break;
-		}
-	}
-
-	public function testFormItem_unlinkHost(){
-
-		$sql = "select hostid from hosts where host='Template App Zabbix Agent';";
-		$this->assertEquals(1, DBcount($sql));
-		$row = DBfetch(DBselect($sql));
-		$hostid = $row['hostid'];
-
-		$this->zbxTestLogin('hosts.php');
-		$this->zbxTestClickWait('link=Template inheritance test host');
-
-		$this->zbxTestClick('tab_templateTab');
-		sleep(1);
-		$this->zbxTestClickWait('unlink_and_clear_'.$hostid);
-		$this->zbxTestClickWait('save');
-
-		$this->zbxTestTextPresent('Host updated');
-	}
-
 	/**
 	 * Restore the original tables.
 	 */
-	public function testInheritanceItem_Teardown() {
+	public function testInheritanceItemPrototype_Teardown() {
 		DBrestore_tables('items');
 	}
 }
