@@ -261,7 +261,7 @@ class CHttpTestManager {
 
 		$httpTests = array();
 		$dbCursor = DBselect(
-			'SELECT ht.httptestid,ht.name,ht.applicationid,ht.delay,ht.status,ht.macros,ht.agent,'.
+			'SELECT ht.httptestid,ht.name,ht.applicationid,ht.delay,ht.status,ht.variables,ht.agent,'.
 				'ht.authentication,ht.http_user,ht.http_password,ht.hostid,ht.templateid'.
 			' FROM httptest ht'.
 			' WHERE ht.hostid='.zbx_dbstr($templateId)
@@ -271,7 +271,7 @@ class CHttpTestManager {
 		}
 
 		$dbCursor = DBselect(
-			'SELECT hs.httpstepid,hs.httptestid,hs.name,hs.no,hs.url,hs.timeout,hs.posts,hs.required,hs.status_codes'.
+			'SELECT hs.httpstepid,hs.httptestid,hs.name,hs.no,hs.url,hs.timeout,hs.posts,hs.variables,hs.required,hs.status_codes'.
 			' FROM httpstep hs'.
 			' WHERE '.dbConditionInt('hs.httptestid', array_keys($httpTests))
 		);
@@ -306,7 +306,7 @@ class CHttpTestManager {
 	}
 
 	/**
-	 * Get array with hosts that are linked with templates which passed http tests belongs to as key and templateid that host
+	 * Get array with hosts that are linked with templates which passed http tests belong to as key and templateid that host
 	 * is linked to as value.
 	 * If second parameter $hostIds is not empty, result should contain only passed host ids.
 	 *
@@ -334,7 +334,7 @@ class CHttpTestManager {
 
 	/**
 	 * Generate http tests data for inheritance.
-	 * Using passed parameters decide if new http tests must be created on host or existing one must be updated.
+	 * Using passed parameters decide if new http tests must be created on host or existing ones must be updated.
 	 *
 	 * @param array $httpTests which we need to inherit
 	 * @param array $hostsTemaplatesMap
@@ -956,7 +956,7 @@ class CHttpTestManager {
 	}
 
 	/**
-	 * Update web items application linkage.
+	 * Update web item application linkage.
 	 *
 	 * @param array  $itemIds
 	 * @param string $appId

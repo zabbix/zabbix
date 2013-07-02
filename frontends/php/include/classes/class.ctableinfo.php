@@ -75,12 +75,13 @@ class CTableInfo extends CTable {
 								"-o-transform-origin": transform
 							};
 
-							if (IE9) {
-								css["-ms-transform-origin"] = transform;
-							}
-
 							if (IE) {
 								css["font-family"] = "monospace";
+								css["-ms-transform-origin"] = "50% 50%";
+							}
+
+							if (IE9) {
+								css["-ms-transform-origin"] = transform;
 							}
 
 							var divInner = $("<div>", {

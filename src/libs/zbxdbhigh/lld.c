@@ -1057,7 +1057,7 @@ static int	DBlld_make_graph(zbx_uint64_t hostid, zbx_uint64_t parent_graphid, zb
 
 	graph = zbx_calloc(NULL, 1, sizeof(zbx_lld_graph_t));
 	graph->name = zbx_strdup(NULL, name_proto);
-	substitute_discovery_macros(&graph->name, jp_row, ZBX_MACRO_ANY, NULL, 0);
+	substitute_discovery_macros(&graph->name, jp_row, ZBX_MACRO_SIMPLE, NULL, 0);
 
 	name_esc = DBdyn_escape_string_len(graph->name, GRAPH_NAME_LEN);
 
@@ -1087,7 +1087,7 @@ static int	DBlld_make_graph(zbx_uint64_t hostid, zbx_uint64_t parent_graphid, zb
 			char	*old_name = NULL;
 
 			old_name = zbx_strdup(old_name, row[1]);
-			substitute_discovery_macros(&old_name, jp_row, ZBX_MACRO_ANY, NULL, 0);
+			substitute_discovery_macros(&old_name, jp_row, ZBX_MACRO_SIMPLE, NULL, 0);
 
 			if (0 == strcmp(old_name, row[2]))
 				ZBX_STR2UINT64(graph->graphid, row[0]);
@@ -1684,7 +1684,8 @@ void	DBlld_process_discovery_rule(zbx_uint64_t discovery_itemid, char *value, zb
 		db_error = zbx_strdup(db_error, row[4]);
 
 		lifetime_str = zbx_strdup(NULL, row[5]);
-		substitute_simple_macros(NULL, NULL, &hostid, NULL, NULL, NULL, &lifetime_str, MACRO_TYPE_COMMON, NULL, 0);
+		substitute_simple_macros(NULL, NULL, NULL, NULL, &hostid, NULL, NULL, NULL,
+				&lifetime_str, MACRO_TYPE_COMMON, NULL, 0);
 		if (SUCCEED != is_ushort(lifetime_str, &lifetime))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "cannot process lost resources for the discovery rule \"%s:%s\":"

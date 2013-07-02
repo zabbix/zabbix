@@ -166,11 +166,6 @@ frontends/php/images/sysmaps/old/Printer.png -text svneol=unset#unset
 frontends/php/images/sysmaps/old/Router.png -text svneol=unset#unset
 frontends/php/images/sysmaps/old/Server.png -text svneol=unset#unset
 frontends/php/images/sysmaps/old/Workstation.png -text svneol=unset#unset
-frontends/php/include/classes/class.cmultiselect.php -text
-frontends/php/include/classes/validators/CSetValidator.php -text
-frontends/php/include/classes/validators/event/CEventSourceObjectValidator.php -text
-frontends/php/include/draw.inc.php -text
-frontends/php/include/views/monitoring.dashconf.php -text
 frontends/php/js/flickerfreescreen.js -text svneol=unset#text/plain
 frontends/php/js/multiselect.js -text svneol=unset#text/plain
 frontends/php/js/servercheck.js -text
@@ -261,9 +256,9 @@ frontends/php/styles/themes/originalblue/images/icons_d40000.png -text
 frontends/php/styles/themes/originalblue/images/icons_ffffff.png -text
 frontends/php/styles/themes/originalblue/images/preloader.gif -text
 frontends/php/tests/bootstrap.php.template -text
+frontends/php/tests/selenium/testFormGraphPrototype.php -text
+frontends/php/tests/selenium/testInheritanceGraphPrototype.php -text
 frontends/php/tests/selenium/testInheritanceWeb.php -text
-include/module.h -text
-include/zbxmodules.h -text
 man/zabbix_agentd.man -text
 man/zabbix_get.man -text
 man/zabbix_proxy.man -text
@@ -541,7 +536,6 @@ misc/init.d/fedora/core5/zabbix_agentd -text
 misc/init.d/freebsd/zabbix_agentd -text
 misc/init.d/freebsd/zabbix_server -text
 misc/init.d/tru64/zabbix_server -text
-src/libs/zbxcommon/int128.c -text
 src/zabbix_java/lib/logback-classic-0.9.27.jar -text
 src/zabbix_java/lib/logback-core-0.9.27.jar -text
 src/zabbix_java/lib/org-json-2010-12-28.jar -text

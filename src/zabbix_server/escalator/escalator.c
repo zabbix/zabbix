@@ -485,8 +485,8 @@ static void	execute_commands(DB_EVENT *event, zbx_uint64_t actionid, zbx_uint64_
 		if (ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT != script.type)
 		{
 			script.command = zbx_strdup(script.command, row[11]);
-			substitute_simple_macros(event, NULL, NULL, NULL, NULL, NULL,
-					&script.command, MACRO_TYPE_MESSAGE, NULL, 0);
+			substitute_simple_macros(&actionid, event, NULL, NULL, NULL, NULL, NULL, NULL,
+					&script.command, MACRO_TYPE_MESSAGE_NORMAL, NULL, 0);
 		}
 
 		if (SUCCEED == rc)
@@ -525,7 +525,7 @@ static void	execute_commands(DB_EVENT *event, zbx_uint64_t actionid, zbx_uint64_
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
-static void	add_message_alert(DB_ESCALATION *escalation, DB_EVENT *event, DB_ACTION *action,
+static void	add_message_alert(DB_ESCALATION *escalation, DB_EVENT *event, DB_EVENT *r_event, DB_ACTION *action,
 		zbx_uint64_t userid, zbx_uint64_t mediatypeid, const char *subject, const char *message)
 {
 	const char	*__function_name = "add_message_alert";
@@ -533,17 +533,23 @@ static void	add_message_alert(DB_ESCALATION *escalation, DB_EVENT *event, DB_ACT
 	DB_RESULT	result;
 	DB_ROW		row;
 	zbx_uint64_t	alertid;
-	int		now, severity, medias = 0;
+	int		now, severity, medias = 0, macro_type;
 	char		*subject_dyn, *message_dyn, *sendto_esc, *subject_esc, *message_esc, *error_esc;
 	char		error[MAX_STRING_LEN];
+	DB_EVENT	*c_event;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	subject_dyn = zbx_strdup(NULL, subject);
 	message_dyn = zbx_strdup(NULL, message);
 
-	substitute_simple_macros(event, &userid, NULL, NULL, NULL, NULL, &subject_dyn, MACRO_TYPE_MESSAGE, NULL, 0);
-	substitute_simple_macros(event, &userid, NULL, NULL, NULL, NULL, &message_dyn, MACRO_TYPE_MESSAGE, NULL, 0);
+	macro_type = (NULL != r_event ? MACRO_TYPE_MESSAGE_RECOVERY : MACRO_TYPE_MESSAGE_NORMAL);
+	c_event = (NULL != r_event ? r_event : event);
+
+	substitute_simple_macros(&action->actionid, event, r_event, &userid, NULL, NULL, NULL, NULL,
+			&subject_dyn, macro_type, NULL, 0);
+	substitute_simple_macros(&action->actionid, event, r_event, &userid, NULL, NULL, NULL, NULL,
+			&message_dyn, macro_type, NULL, 0);
 
 	now = time(NULL);
 	subject_esc = DBdyn_escape_string_len(subject_dyn, ALERT_SUBJECT_LEN);
@@ -576,28 +582,28 @@ static void	add_message_alert(DB_ESCALATION *escalation, DB_EVENT *event, DB_ACT
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		medias		= 1;
+		medias = 1;
 
 		ZBX_STR2UINT64(mediatypeid, row[0]);
-		severity	= atoi(row[2]);
+		severity = atoi(row[2]);
 
-		zabbix_log(LOG_LEVEL_DEBUG, "Trigger severity [%d] Media severity [%d] Period [%s]",
-				(int)event->trigger.priority, severity, row[3]);
+		zabbix_log(LOG_LEVEL_DEBUG, "trigger severity:%d, media severity:%d, period:'%s'",
+				(int)c_event->trigger.priority, severity, row[3]);
 
-		if (((1 << event->trigger.priority) & severity) == 0)
+		if (((1 << c_event->trigger.priority) & severity) == 0)
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "Won't send message (severity)");
+			zabbix_log(LOG_LEVEL_DEBUG, "will not send message (severity)");
 			continue;
 		}
 
 		if (FAIL == check_time_period(row[3], (time_t)NULL))
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "Won't send message (period)");
+			zabbix_log(LOG_LEVEL_DEBUG, "will not send message (period)");
 			continue;
 		}
 
-		alertid		= DBget_maxid("alerts");
-		sendto_esc	= DBdyn_escape_string_len(row[1], ALERT_SENDTO_LEN);
+		alertid = DBget_maxid("alerts");
+		sendto_esc = DBdyn_escape_string_len(row[1], ALERT_SENDTO_LEN);
 
 		if (MEDIA_TYPE_STATUS_ACTIVE == atoi(row[4]))
 		{
@@ -607,7 +613,7 @@ static void	add_message_alert(DB_ESCALATION *escalation, DB_EVENT *event, DB_ACT
 					"," ZBX_FS_UI64 ",'%s','%s','%s',%d,%d,%d)",
 					alertid,
 					action->actionid,
-					event->eventid,
+					c_event->eventid,
 					userid,
 					now,
 					mediatypeid,
@@ -628,7 +634,7 @@ static void	add_message_alert(DB_ESCALATION *escalation, DB_EVENT *event, DB_ACT
 					"," ZBX_FS_UI64 ",'%s','%s','%s',%d,%d,%d,'%s')",
 					alertid,
 					action->actionid,
-					event->eventid,
+					c_event->eventid,
 					userid,
 					now,
 					mediatypeid,
@@ -662,7 +668,7 @@ static void	add_message_alert(DB_ESCALATION *escalation, DB_EVENT *event, DB_ACT
 				",'%s','%s',%d,%d,'%s',%d)",
 				alertid,
 				action->actionid,
-				event->eventid,
+				c_event->eventid,
 				userid,
 				ALERT_MAX_RETRIES,
 				now,
@@ -881,7 +887,7 @@ static void	execute_operations(DB_ESCALATION *escalation, DB_EVENT *event, DB_AC
 		p = user_msg;
 		user_msg = user_msg->next;
 
-		add_message_alert(escalation, event, action, p->userid, p->mediatypeid, p->subject, p->message);
+		add_message_alert(escalation, event, NULL, action, p->userid, p->mediatypeid, p->subject, p->message);
 
 		zbx_free(p->subject);
 		zbx_free(p->message);
@@ -920,7 +926,7 @@ static void	execute_operations(DB_ESCALATION *escalation, DB_EVENT *event, DB_AC
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
-static void	process_recovery_msg(DB_ESCALATION *escalation, DB_EVENT *r_event, DB_ACTION *action)
+static void	process_recovery_msg(DB_ESCALATION *escalation, DB_EVENT *event, DB_EVENT *r_event, DB_ACTION *action)
 {
 	const char	*__function_name = "process_recovery_msg";
 	DB_RESULT	result;
@@ -946,7 +952,7 @@ static void	process_recovery_msg(DB_ESCALATION *escalation, DB_EVENT *r_event, D
 			ZBX_STR2UINT64(mediatypeid, row[1]);
 
 			escalation->esc_step = 0;
-			add_message_alert(escalation, r_event, action, userid, mediatypeid, action->shortdata,
+			add_message_alert(escalation, event, r_event, action, userid, mediatypeid, action->shortdata,
 					action->longdata);
 		}
 		DBfree_result(result);
@@ -1060,7 +1066,7 @@ static void	execute_escalation(DB_ESCALATION *escalation)
 	DB_RESULT	result;
 	DB_ROW		row;
 	DB_ACTION	action;
-	DB_EVENT	event;
+	DB_EVENT	event, r_event;
 	char		*error = NULL;
 	unsigned char	object = 0;
 
@@ -1172,9 +1178,13 @@ static void	execute_escalation(DB_ESCALATION *escalation)
 				}
 				break;
 			case ESCALATION_STATUS_RECOVERY:
-				if (SUCCEED == get_event_info(escalation->r_eventid, &event))
+				if (SUCCEED == get_event_info(escalation->eventid, &event))
 				{
-					process_recovery_msg(escalation, &event, &action);
+					if (SUCCEED == get_event_info(escalation->r_eventid, &r_event))
+					{
+						process_recovery_msg(escalation, &event, &r_event, &action);
+						free_event_info(&r_event);
+					}
 					free_event_info(&event);
 				}
 				break;
@@ -1330,20 +1340,18 @@ next:
 
 	DBfree_result(result);
 
+	zbx_free(sql);
+
 	/* delete completed escalations */
 	if (0 != escalationids.values_num)
 	{
-		sql_offset = 0;
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "delete from escalations where");
-		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "escalationid",
-				escalationids.values, escalationids.values_num);
+		zbx_vector_uint64_sort(&escalationids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 		DBbegin();
-		DBexecute("%s", sql);
+		DBexecute_multiple_query("delete from escalations where", "escalationid", &escalationids);
 		DBcommit();
 	}
 
-	zbx_free(sql);
 	zbx_vector_uint64_destroy(&escalationids);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);

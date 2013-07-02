@@ -30,7 +30,7 @@
 
 		// click event for main toggle (+-) button
 		$('.app-list-toggle-all').click(function(){
-			// this is for Opera browser with large tables, which renders table layout while showing/hidding rows
+			// this is for Opera browser with large tables, which renders table layout while showing/hiding rows
 			$('.tableinfo').fadeTo(0, 0);
 
 			var openState = $(this).data('openState'),
@@ -42,6 +42,7 @@
 			if (openState) {
 				$('.app-list-toggle.icon-minus-9x9').each(function(){
 					$(this).toggleClass('icon-minus-9x9');
+					$(this).data('openState', 0);
 					$('tr[parent_app_id=' + $(this).data('appId') + ']').hide();
 					appIdList.push($(this).data('appId'));
 				});
@@ -49,6 +50,7 @@
 			else {
 				$('.app-list-toggle').not('.icon-minus-9x9').each(function(){
 					$(this).toggleClass('icon-minus-9x9');
+					$(this).data('openState', 1);
 					$('tr[parent_app_id=' + $(this).data('appId') + ']').show();
 					appIdList.push($(this).data('appId'));
 				});
@@ -60,7 +62,7 @@
 
 			rebuildRowColoring();
 
-			// this is for Opera browser with large tables, which renders table layout while showing/hidding rows
+			// this is for Opera browser with large tables, which renders table layout while showing/hiding rows
 			$('.tableinfo').fadeTo(0, 1);
 
 			// store toggle state in DB
