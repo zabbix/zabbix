@@ -572,7 +572,8 @@ static int	compare_nth_field(const ZBX_FIELD **fields, char *rec_data, int n, ch
 
 		if (0 == (fields[i++]->flags & ZBX_NOTNULL))	/* field could be NULL */
 		{
-			if ((rec_data == p - 1 || '\0' == *(p - 2)) && '\2' == *p)	/* field value is NULL */
+			if ('\2' == *p && (rec_data == p - 1 || '\0' == *(p - 2) || '\1' == *(p - 2) ||
+					'\2' == *(p - 2)))	/* field value is NULL */
 			{
 				null_in_db = 1;
 				p++;
@@ -584,6 +585,8 @@ static int	compare_nth_field(const ZBX_FIELD **fields, char *rec_data, int n, ch
 			else
 			{
 				THIS_SHOULD_NEVER_HAPPEN;
+				*last_n = 0;
+				*last_pos = 0;
 				return 1;
 			}
 		}
