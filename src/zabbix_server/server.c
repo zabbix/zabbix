@@ -54,6 +54,8 @@
 #include "proxypoller/proxypoller.h"
 #include "selfmon/selfmon.h"
 
+#include "valuecache.h"
+
 #define INIT_SERVER(type, count)								\
 	process_type = type;									\
 	process_num = server_num - server_count + count;					\
