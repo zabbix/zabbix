@@ -179,43 +179,43 @@ $allowedSrcFields = array(
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = array(
-	'dstfrm' =>				array(T_ZBX_STR, O_OPT, P_SYS,	NOT_EMPTY,	'!isset({multiselect})'),
-	'dstfld1' =>			array(T_ZBX_STR, O_OPT, P_SYS,	NOT_EMPTY,	'!isset({multiselect})'),
-	'srctbl' =>				array(T_ZBX_STR, O_MAND, P_SYS,	NOT_EMPTY,	null),
-	'srcfld1' =>			array(T_ZBX_STR, O_MAND, P_SYS,	IN($allowedSrcFields[$_REQUEST['srctbl']]), null),
-	'nodeid' =>				array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
-	'groupid' =>			array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
-	'group' =>				array(T_ZBX_STR, O_OPT, null,	null,		null),
-	'hostid' =>				array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
-	'host' =>				array(T_ZBX_STR, O_OPT, null,	null,		null),
-	'parent_discoveryid' => array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
-	'screenid' =>			array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
-	'templates' =>			array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	null),
-	'host_templates' =>		array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	null),
-	'existed_templates' =>	array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	null),
-	'multiselect' =>		array(T_ZBX_INT, O_OPT, null,	null,		null),
-	'submit' =>				array(T_ZBX_STR, O_OPT, null,	null,		null),
-	'excludeids' =>			array(T_ZBX_STR, O_OPT, null,	null,		null),
-	'only_hostid' =>		array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
-	'monitored_hosts' =>	array(T_ZBX_INT, O_OPT, null,	IN('0,1'),	null),
-	'templated_hosts' =>	array(T_ZBX_INT, O_OPT, null,	IN('0,1'),	null),
-	'real_hosts' =>			array(T_ZBX_INT, O_OPT, null,	IN('0,1'),	null),
-	'normal_only' =>		array(T_ZBX_INT, O_OPT, null,	IN('0,1'),	null),
-	'simpleName' =>			array(T_ZBX_INT, O_OPT, null,	IN('0,1'),	null),
-	'with_applications' =>	array(T_ZBX_INT, O_OPT, null,	IN('0,1'),	null),
-	'with_graphs' =>		array(T_ZBX_INT, O_OPT, null,	IN('0,1'),	null),
-	'with_items' =>			array(T_ZBX_INT, O_OPT, null,	IN('0,1'),	null),
-	'with_simple_graph_items' => array(T_ZBX_INT, O_OPT, null, IN('0,1'), null),
-	'with_triggers' =>		array(T_ZBX_INT, O_OPT, null,	IN('0,1'),	null),
-	'with_monitored_triggers' => array(T_ZBX_INT, O_OPT, null, IN('0,1'), null),
-	'itemtype' =>			array(T_ZBX_INT, O_OPT, null,	null,		null),
-	'value_types' =>		array(T_ZBX_INT, O_OPT, null,	BETWEEN(0, 15), null),
-	'numeric' =>			array(T_ZBX_INT, O_OPT, null,	IN('0,1'),	null),
-	'reference' =>			array(T_ZBX_STR, O_OPT, null,	null,		null),
-	'writeonly' =>			array(T_ZBX_STR, O_OPT, null,	null,		null),
-	'noempty' =>			array(T_ZBX_STR, O_OPT, null,	null,		null),
-	'select' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
-	'submitParent' =>		array(T_ZBX_INT, O_OPT, null,	IN('0,1'),	null)
+	'dstfrm' =>						array(T_ZBX_STR, O_OPT, P_SYS,	NOT_EMPTY,	'!isset({multiselect})'),
+	'dstfld1' =>					array(T_ZBX_STR, O_OPT, P_SYS,	NOT_EMPTY,	'!isset({multiselect})'),
+	'srctbl' =>						array(T_ZBX_STR, O_MAND, P_SYS,	NOT_EMPTY,	null),
+	'srcfld1' =>					array(T_ZBX_STR, O_MAND, P_SYS,	IN($allowedSrcFields[$_REQUEST['srctbl']]), null),
+	'nodeid' =>						array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
+	'groupid' =>					array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
+	'group' =>						array(T_ZBX_STR, O_OPT, null,	null,		null),
+	'hostid' =>						array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
+	'host' =>						array(T_ZBX_STR, O_OPT, null,	null,		null),
+	'parent_discoveryid' =>			array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
+	'screenid' =>					array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
+	'templates' =>					array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	null),
+	'host_templates' =>				array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	null),
+	'existed_templates' =>			array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	null),
+	'multiselect' =>				array(T_ZBX_INT, O_OPT, null,	null,		null),
+	'submit' =>						array(T_ZBX_STR, O_OPT, null,	null,		null),
+	'excludeids' =>					array(T_ZBX_STR, O_OPT, null,	null,		null),
+	'only_hostid' =>				array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
+	'monitored_hosts' =>			array(T_ZBX_INT, O_OPT, null,	IN('0,1'),	null),
+	'templated_hosts' =>			array(T_ZBX_INT, O_OPT, null,	IN('0,1'),	null),
+	'real_hosts' =>					array(T_ZBX_INT, O_OPT, null,	IN('0,1'),	null),
+	'normal_only' =>				array(T_ZBX_INT, O_OPT, null,	IN('0,1'),	null),
+	'simpleName' =>					array(T_ZBX_INT, O_OPT, null,	IN('0,1'),	null),
+	'with_applications' =>			array(T_ZBX_INT, O_OPT, null,	IN('0,1'),	null),
+	'with_graphs' =>				array(T_ZBX_INT, O_OPT, null,	IN('0,1'),	null),
+	'with_items' =>					array(T_ZBX_INT, O_OPT, null,	IN('0,1'),	null),
+	'with_simple_graph_items' =>	array(T_ZBX_INT, O_OPT, null,	IN('0,1'), null),
+	'with_triggers' =>				array(T_ZBX_INT, O_OPT, null,	IN('0,1'),	null),
+	'with_monitored_triggers' =>	array(T_ZBX_INT, O_OPT, null,	IN('0,1'), null),
+	'itemtype' =>					array(T_ZBX_INT, O_OPT, null,	null,		null),
+	'value_types' =>				array(T_ZBX_INT, O_OPT, null,	BETWEEN(0, 15), null),
+	'numeric' =>					array(T_ZBX_INT, O_OPT, null,	IN('0,1'),	null),
+	'reference' =>					array(T_ZBX_STR, O_OPT, null,	null,		null),
+	'writeonly' =>					array(T_ZBX_STR, O_OPT, null,	null,		null),
+	'noempty' =>					array(T_ZBX_STR, O_OPT, null,	null,		null),
+	'select' =>						array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
+	'submitParent' =>				array(T_ZBX_INT, O_OPT, null,	IN('0,1'),	null)
 );
 
 // unset disabled item types
@@ -247,27 +247,27 @@ $multiselect = get_request('multiselect', 0); // if create popup with checkboxes
 $dstact = get_request('dstact', '');
 $writeonly = get_request('writeonly');
 $simpleName = get_request('simpleName');
-$with_applications = get_request('with_applications', 0);
-$with_graphs = get_request('with_graphs', 0);
-$with_items = get_request('with_items', 0);
+$withApplications = get_request('with_applications', 0);
+$withGraphs = get_request('with_graphs', 0);
+$withItems = get_request('with_items', 0);
 $noempty = get_request('noempty'); // display/hide "Empty" button
-$existed_templates = get_request('existed_templates', null);
+$existedTemplates = get_request('existed_templates', null);
 $excludeids = get_request('excludeids', null);
 $reference = get_request('reference', get_request('srcfld1', 'unknown'));
-$real_hosts = get_request('real_hosts', 0);
-$monitored_hosts = get_request('monitored_hosts', 0);
-$templated_hosts = get_request('templated_hosts', 0);
-$with_simple_graph_items = get_request('with_simple_graph_items', 0);
-$with_triggers = get_request('with_triggers', 0);
-$with_monitored_triggers = get_request('with_monitored_triggers', 0);
+$realHosts = get_request('real_hosts', 0);
+$monitoredHosts = get_request('monitored_hosts', 0);
+$templatedHosts = get_request('templated_hosts', 0);
+$withSimpleGraphItems = get_request('with_simple_graph_items', 0);
+$withTriggers = get_request('with_triggers', 0);
+$withMonitoredTriggers = get_request('with_monitored_triggers', 0);
 $submitParent = get_request('submitParent', 0);
-$normal_only = get_request('normal_only');
+$normalOnly = get_request('normal_only');
 $nodeid = get_request('nodeid', get_current_nodeid(false));
 $group = get_request('group', '');
 $host = get_request('host', '');
-$only_hostid = get_request('only_hostid', null);
-if (isset($only_hostid)) {
-	$_REQUEST['hostid'] = $only_hostid;
+$onlyHostid = get_request('only_hostid', null);
+if (isset($onlyHostid)) {
+	$_REQUEST['hostid'] = $onlyHostid;
 	unset($_REQUEST['groupid'], $_REQUEST['nodeid']);
 }
 
@@ -330,16 +330,16 @@ if (!is_null($writeonly)) {
 $host_status = null;
 $templated = null;
 
-if ($monitored_hosts) {
+if ($monitoredHosts) {
 	$options['groups']['monitored_hosts'] = true;
 	$options['hosts']['monitored_hosts'] = true;
 	$host_status = 'monitored_hosts';
 }
-elseif ($real_hosts) {
+elseif ($realHosts) {
 	$options['groups']['real_hosts'] = true;
 	$templated = 0;
 }
-elseif ($templated_hosts) {
+elseif ($templatedHosts) {
 	$options['hosts']['templated_hosts'] = true;
 	$options['groups']['templated_hosts'] = true;
 	$templated = 1;
@@ -350,23 +350,23 @@ else {
 	$options['hosts']['templated_hosts'] = true; // for hosts templated_hosts comes with monitored and not monitored hosts
 }
 
-if ($with_applications) {
+if ($withApplications) {
 	$options['groups']['with_applications'] = true;
 	$options['hosts']['with_applications'] = true;
 }
-elseif ($with_graphs) {
+elseif ($withGraphs) {
 	$options['groups']['with_graphs'] = true;
 	$options['hosts']['with_graphs'] = true;
 }
-elseif ($with_simple_graph_items) {
+elseif ($withSimpleGraphItems) {
 	$options['groups']['with_simple_graph_items'] = true;
 	$options['hosts']['with_simple_graph_items'] = true;
 }
-elseif ($with_triggers) {
+elseif ($withTriggers) {
 	$options['groups']['with_triggers'] = true;
 	$options['hosts']['with_triggers'] = true;
 }
-elseif ($with_monitored_triggers) {
+elseif ($withMonitoredTriggers) {
 	$options['groups']['with_monitored_triggers'] = true;
 	$options['hosts']['with_monitored_triggers'] = true;
 }
@@ -393,55 +393,55 @@ if ($pageFilter->hostsSelected) {
 else {
 	$hostid = 0;
 }
-if (isset($only_hostid)) {
-	$hostid = $only_hostid;
+if (isset($onlyHostid)) {
+	$hostid = $onlyHostid;
 }
 
 /*
  * Display table header
  */
 $frmTitle = new CForm();
-if ($monitored_hosts) {
+if ($monitoredHosts) {
 	$frmTitle->addVar('monitored_hosts', 1);
 }
-if ($real_hosts) {
+if ($realHosts) {
 	$frmTitle->addVar('real_hosts', 1);
 }
-if ($templated_hosts) {
+if ($templatedHosts) {
 	$frmTitle->addVar('templated_hosts', 1);
 }
-if ($with_applications) {
+if ($withApplications) {
 	$frmTitle->addVar('with_applications', 1);
 }
-if ($with_graphs) {
+if ($withGraphs) {
 	$frmTitle->addVar('with_graphs', 1);
 }
-if ($with_items) {
+if ($withItems) {
 	$frmTitle->addVar('with_items', 1);
 }
-if ($with_simple_graph_items) {
+if ($withSimpleGraphItems) {
 	$frmTitle->addVar('with_simple_graph_items', 1);
 }
-if ($with_triggers) {
+if ($withTriggers) {
 	$frmTitle->addVar('with_triggers', 1);
 }
-if ($with_monitored_triggers) {
+if ($withMonitoredTriggers) {
 	$frmTitle->addVar('with_monitored_triggers', 1);
 }
 if ($value_types) {
 	$frmTitle->addVar('value_types', $value_types);
 }
-if ($normal_only) {
-	$frmTitle->addVar('normal_only', $normal_only);
+if ($normalOnly) {
+	$frmTitle->addVar('normal_only', $normalOnly);
 }
-if (!is_null($existed_templates)) {
-	$frmTitle->addVar('existed_templates', $existed_templates);
+if (!is_null($existedTemplates)) {
+	$frmTitle->addVar('existed_templates', $existedTemplates);
 }
 if (!is_null($excludeids)) {
 	$frmTitle->addVar('excludeids', $excludeids);
 }
-if (isset($only_hostid)) {
-	$frmTitle->addVar('only_hostid', $only_hostid);
+if (isset($onlyHostid)) {
+	$frmTitle->addVar('only_hostid', $onlyHostid);
 }
 if (get_request('screenid')) {
 	$frmTitle->addVar('screenid', get_request('screenid'));
@@ -464,7 +464,7 @@ for ($i = 1; $i <= $srcfldCount; $i++) {
 	$frmTitle->addVar('srcfld'.$i, get_request('srcfld'.$i));
 }
 
-if (isset($only_hostid)) {
+if (isset($onlyHostid)) {
 	$only_hosts = API::Host()->get(array(
 		'hostids' => $hostid,
 		'templated_hosts' => true,
@@ -616,15 +616,15 @@ if ($srctbl == 'hosts') {
  * Templates
  */
 elseif ($srctbl == 'templates') {
-	$existed_templates = get_request('existed_templates', array());
+	$existedTemplates = get_request('existed_templates', array());
 	$excludeids = get_request('excludeids', array());
 	$templates = get_request('templates', array());
-	$templates = $templates + $existed_templates;
+	$templates = $templates + $existedTemplates;
 	if (!validate_templates(array_keys($templates))) {
 		show_error_message(_('Conflict between selected templates.'));
 	}
 	elseif (isset($_REQUEST['select'])) {
-		$new_templates = array_diff($templates, $existed_templates);
+		$new_templates = array_diff($templates, $existedTemplates);
 		$script = '';
 		if (count($new_templates) > 0) {
 			foreach ($new_templates as $id => $name) {
@@ -652,18 +652,18 @@ elseif ($srctbl == 'templates') {
 	$dbTemplates = API::Template()->get($options);
 	foreach ($dbTemplates as $host) {
 		$chk = new CCheckBox('templates['.$host['templateid'].']', isset($templates[$host['templateid']]), null, $host['name']);
-		$chk->setEnabled(!isset($existed_templates[$host['templateid']]) && !isset($excludeids[$host['templateid']]));
+		$chk->setEnabled(!isset($existedTemplates[$host['templateid']]) && !isset($excludeids[$host['templateid']]));
 		$table->addRow(array(array($chk, $host['name'])));
 	}
 
 	$table->setFooter(new CSubmit('select', _('Select')));
 	$form = new CForm();
-	$form->addVar('existed_templates', $existed_templates);
+	$form->addVar('existed_templates', $existedTemplates);
 
-	if ($monitored_hosts) {
+	if ($monitoredHosts) {
 		$form->addVar('monitored_hosts', 1);
 	}
-	if ($real_hosts) {
+	if ($realHosts) {
 		$form->addVar('real_hosts', 1);
 	}
 	$form->addVar('dstfrm', $dstfrm);
@@ -1004,7 +1004,7 @@ elseif ($srctbl == 'triggers') {
 	if (!is_null($templated)) {
 		$options['templated'] = $templated;
 	}
-	if ($with_monitored_triggers) {
+	if ($withMonitoredTriggers) {
 		$options['monitored'] = true;
 	}
 	$triggers = API::Trigger()->get($options);
@@ -1112,7 +1112,7 @@ elseif ($srctbl == 'items') {
 		'selectHosts' => array('hostid', 'name'),
 		'preservekeys' => true
 	);
-	if (!is_null($normal_only)) {
+	if (!is_null($normalOnly)) {
 		$options['filter']['flags'] = ZBX_FLAG_DISCOVERY_NORMAL;
 	}
 	if (!is_null($writeonly)) {
@@ -1138,7 +1138,7 @@ elseif ($srctbl == 'items') {
 
 		$item['name'] = itemName($item);
 		$description = new CLink($item['name'], '#');
-		$item['name'] = ($only_hostid) ? $item['name'] : $item['hostname'].NAME_DELIMITER.$item['name'];
+		$item['name'] = ($onlyHostid) ? $item['name'] : $item['hostname'].NAME_DELIMITER.$item['name'];
 
 		if ($multiselect) {
 			$js_action = 'javascript: addValue('.zbx_jsvalue($reference).', '.zbx_jsvalue($item['itemid']).');';
