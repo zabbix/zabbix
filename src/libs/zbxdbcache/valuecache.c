@@ -1363,140 +1363,133 @@ static void	vc_remove_item(zbx_vc_item_t *item)
 
 /******************************************************************************
  *                                                                            *
- * Function: vc_prepare_item                                                  *
+ * Function: vc_add_item                                                      *
  *                                                                            *
- * Purpose: prepares cache item for a value request                           *
+ * Purpose: adds a new item to the cache with the requested history data      *
  *                                                                            *
  * Parameters: itemid     - [IN] the item id                                  *
  *             value_type - [IN] the item value type                          *
  *             seconds    - [IN] the time period to retrieve data for         *
  *             count      - [IN] the number of history values to retrieve.    *
  *             timestamp  - [IN] the period end timestamp                     *
+ *             ts         - [IN] the value timestamp                          *
+ *             values     - [OUT] the cached values                           *
  *                                                                            *
- * Return value:  the prepared item or NULL if item could not be prepared     *
+ * Return value:  the prepared item or NULL if item could not be added        *
  *                (not enough memory to store item data)                      *
  *                                                                            *
- * Comments: If item is not in cache, this function will add item to cache,   *
- *           read the required values from database and add to the item cache.*
- *                                                                            *
- *           If item is already in cache, this function will ensure that the  *
- *           item value type matches the requested value type and that data   *
- *           storage mode is sufficient for the request range.                *
+ * Comments: In low memory mode only items with request data <= 2 are added   *
+ *           to the cache.                                                    *
  *                                                                            *
  ******************************************************************************/
-static zbx_vc_item_t	*vc_prepare_item(zbx_uint64_t itemid, int value_type, int seconds, int count,
-		int timestamp, const zbx_timespec_t *ts)
+static zbx_vc_item_t	*vc_add_item(zbx_uint64_t itemid, int value_type, int seconds, int count,
+		int timestamp, const zbx_timespec_t *ts, zbx_vector_vc_value_t *values)
 {
-	int			ret = FAIL;
+	int			ret = FAIL, now;
 	zbx_vc_item_t		*item;
-	zbx_vector_vc_value_t	values;
 
-	if (NULL == (item = zbx_hashset_search(&vc_cache->items, &itemid)))
+	now = ZBX_VC_TIME();
+
+	/* Read the item values from database (try to get at least 2 records */
+	/* to fill the lastvalue cache)                                      */
+	if (NULL != ts)
 	{
-		int	create_item = 0, now;
-
-		now = ZBX_VC_TIME();
-
-		/* add a new item to the cache either when cache is working in normal mode  */
-		/* or when the estimated request size is low                                */
-		if (0 == vc_cache->low_memory)
-			create_item = 1;
-		else
-		{
-			if (NULL != ts)
-				create_item = now = 120 > now - ts->sec;
-			else
-			{
-				if (60 > now - timestamp)
-				{
-					if (count != 0)
-						create_item = 2 >= count;
-					else
-						create_item = 120 >= seconds;
-				}
-			}
-		}
-		if (0 != create_item)
-		{
-			zbx_vc_item_t	new_item = {itemid, value_type, ZBX_VC_MODE_LASTVALUE};
-
-			item = zbx_hashset_insert(&vc_cache->items, &new_item, sizeof(zbx_vc_item_t));
-		}
-
-		if (NULL == item)
-			goto out;
-
-		zbx_vc_value_vector_create(&values);
-
-		/* Read the item values from database (try to get at least 2 records */
-		/* to fill the lastvalue cache)                                      */
-		if (NULL != ts)
-		{
-			ret = vc_db_read_values_by_count(itemid, value_type, &values, 2, now, ts->sec, 0);
-		}
-		else if (0 == count)
-		{
-			ret = vc_db_read_values_by_time(itemid, value_type, &values, now - timestamp + seconds, now);
-		}
-		else
-		{
-			if (1 == count)
-				count++;
-
-			ret = vc_db_read_values_by_count(itemid, value_type, &values, count, now, timestamp, 0);
-		}
-
-		if (SUCCEED == ret)
-		{
-			zbx_vector_vc_value_sort(&values, (zbx_compare_func_t)vc_value_compare_asc_func);
-
-			/* find the storage mode sufficient to cache the values */
-			while (SUCCEED != CACHE(item)->init(item, &values, seconds, count, timestamp, ts))
-					item->mode++;
-		}
-
-		zbx_vc_value_vector_destroy(&values, value_type);
+		ret = vc_db_read_values_by_count(itemid, value_type, values, 2, now, ts->sec, 0);
+	}
+	else if (0 == count)
+	{
+		ret = vc_db_read_values_by_time(itemid, value_type, values, now - timestamp + seconds, now);
 	}
 	else
 	{
-		if (item->value_type != value_type)
-			vc_item_change_value_type(item, value_type);
+		if (1 == count)
+			count++;
 
-		ret = SUCCEED;
+		ret = vc_db_read_values_by_count(itemid, value_type, values, count, now, timestamp, 0);
+	}
 
-		/* check if the request is supported by storage mode mode */
-		if (SUCCEED != CACHE(item)->supports_request(item, seconds, count, timestamp, ts))
-		{
-			if (1 == vc_cache->low_memory)
-			{
-				/* in low memory mode storage mode should not be changed */
-				item = NULL;
-				goto out;
-			}
+	if (SUCCEED == ret && 2 >= values->values_num)
+	{
+		zbx_vc_item_t	new_item = {itemid, value_type, ZBX_VC_MODE_LASTVALUE};
 
-			zbx_vc_value_vector_create(&values);
+		if (NULL == (item = zbx_hashset_insert(&vc_cache->items, &new_item, sizeof(zbx_vc_item_t))))
+			goto out;
 
-			CACHE(item)->get_all_values(item, &values);
+		zbx_vector_vc_value_sort(values, (zbx_compare_func_t)vc_value_compare_asc_func);
 
-			/* drop the item cache to ensure that there are no holes left when */
-			/* converting to the new storage mode                              */
-			CACHE(item)->free(item);
-
-			/* increase mode until find one that supports the request */
-			do
-			{
+		/* find the storage mode sufficient to cache the values */
+		while (SUCCEED != CACHE(item)->init(item, values, seconds, count, timestamp, ts))
 				item->mode++;
-			}
-			while (SUCCEED != CACHE(item)->supports_request(item, seconds, count, timestamp, ts));
+	}
 
+out:
+	return item;
+}
 
-			memset(&item->data, 0, sizeof(item->data));
+/******************************************************************************
+ *                                                                            *
+ * Function: vc_prepare_item                                                  *
+ *                                                                            *
+ * Purpose: prepares the item for history request                             *
+ *                                                                            *
+ * Parameters: item       - [IN] the item to prepare                          *
+ *             value_type - [IN] the new value type                           *
+ *             seconds    - [IN] the time period to retrieve data for         *
+ *             count      - [IN] the number of history values to retrieve.    *
+ *             timestamp  - [IN] the period end timestamp                     *
+ *             ts         - [IN] the value timestamp                          *
+ *                                                                            *
+ * Return value:  SUCCEED - the item can't handle the history request         *
+ *                FAIL    - the item can't handle the request and  the data   *
+ *                          must be read from database.                       *
+ *                                                                            *
+ * Comments: In low memory mode cached items can't change storage mode which  *
+ *           is the only possible failure cause.                              *
+ *                                                                            *
+ ******************************************************************************/
+static int	vc_prepare_item(zbx_vc_item_t *item, int value_type, int seconds, int count,
+		int timestamp, const zbx_timespec_t *ts)
+{
+	int			ret = SUCCEED;
+	zbx_vector_vc_value_t	values;
 
-			if (0 != values.values_num)
-				ret = CACHE(item)->add_values(item, values.values, values.values_num);
+	if (item->value_type != value_type)
+		vc_item_change_value_type(item, value_type);
 
-			zbx_vc_value_vector_destroy(&values, value_type);
+	/* check if the request is supported by storage mode mode */
+	if (SUCCEED != CACHE(item)->supports_request(item, seconds, count, timestamp, ts))
+	{
+		if (1 == vc_cache->low_memory)
+		{
+			/* in low memory mode storage mode should not be changed, */
+			/* but item still must be kept in the cache               */
+			item = NULL;
+			ret = FAIL;
+			goto out;
 		}
+
+		zbx_vc_value_vector_create(&values);
+
+		CACHE(item)->get_all_values(item, &values);
+
+		/* drop the item cache to ensure that there are no holes left when */
+		/* converting to the new storage mode                              */
+		CACHE(item)->free(item);
+
+		/* increase mode until find one that supports the request */
+		do
+		{
+			item->mode++;
+		}
+		while (SUCCEED != CACHE(item)->supports_request(item, seconds, count, timestamp, ts));
+
+
+		memset(&item->data, 0, sizeof(item->data));
+
+		if (0 != values.values_num)
+			ret = CACHE(item)->add_values(item, values.values, values.values_num);
+
+		zbx_vc_value_vector_destroy(&values, value_type);
 	}
 out:
 	if (FAIL == ret && NULL != item)
@@ -1506,7 +1499,7 @@ out:
 		item = NULL;
 	}
 
-	return item;
+	return ret;
 }
 
 /******************************************************************************************************************
@@ -3407,7 +3400,48 @@ int	zbx_vc_get_value_range(zbx_uint64_t itemid, int value_type, zbx_vector_vc_va
 	if (1 == vc_cache->low_memory)
 		vc_warn_low_memory();
 
-	if (NULL == (item = vc_prepare_item(itemid, value_type, seconds, count, timestamp, NULL)))
+	if (NULL == (item = zbx_hashset_search(&vc_cache->items, &itemid)))
+	{
+		int	i, start = 0;
+
+		item = vc_add_item(itemid, value_type, seconds, count, timestamp, NULL, values);
+
+		/* prepare value vector so it can be returned as history request result */
+
+		/* sort it in descending order */
+		zbx_vector_vc_value_sort(values, (zbx_compare_func_t)vc_value_compare_desc_func);
+
+		/* release resources of values beyond request period end timestamp */
+		while (start < values->values_num && values->values[start].timestamp.sec > timestamp)
+		{
+			zbx_vc_value_clear(&values->values[start], value_type);
+			start++;
+		}
+
+		/* Count based requests might have returned more values than requested to */
+		/* ensure cache continuity. Cut the overhead.                             */
+		if (0 != count && values->values_num > count + start)
+		{
+			for (i = count + start; i < values->values_num; i++)
+				zbx_vc_value_clear(&values->values[i], value_type);
+
+			values->values_num = count + start;
+		}
+
+		/* shift the vector downwards if necessary */
+		if (0 != start)
+		{
+			memmove(values->values, &values->values[start],
+					(values->values_num - start) * sizeof(zbx_vc_value_t));
+
+		}
+
+		ret = SUCCEED;
+
+		goto out;
+	}
+
+	if (FAIL == vc_prepare_item(item, value_type, seconds, count, timestamp, NULL))
 		goto out;
 
 	ret = CACHE(item)->get_value_range(item, values, seconds, count, timestamp);
@@ -3479,7 +3513,33 @@ int	zbx_vc_get_value(zbx_uint64_t itemid, int value_type, const zbx_timespec_t *
 	if (1 == vc_cache->low_memory)
 		vc_warn_low_memory();
 
-	if (NULL == (item = vc_prepare_item(itemid, value_type, 0, 0, 0, ts)))
+	if (NULL == (item = zbx_hashset_search(&vc_cache->items, &itemid)))
+	{
+		zbx_vector_vc_value_t	values;
+		int			i;
+
+		zbx_vector_vc_value_create(&values);
+
+		item = vc_add_item(itemid, value_type, 0, 0, 0, ts, &values);
+
+		for (i = 0; i < values.values_num; i++)
+		{
+			zbx_vc_value_t	*cache_value = &values.values[i];
+
+			if (cache_value->timestamp.sec < ts->sec ||
+					(cache_value->timestamp.sec == ts->sec && cache_value->timestamp.ns < ts->ns))
+			{
+				vc_value_copy(value, cache_value, value_type);
+				ret = SUCCEED;
+				break;
+			}
+		}
+		zbx_vc_value_vector_destroy(&values, value_type);
+
+		goto finish;
+	}
+
+	if (FAIL == vc_prepare_item(item, value_type, 0, 0, 0, ts))
 		goto out;
 
 	ret = CACHE(item)->get_value(item, ts, value);
@@ -3496,9 +3556,7 @@ out:
 			vc_update_statistics(NULL, 0, 1);
 	}
 
-	if (1 == vc_cache->low_memory)
-		vc_warn_low_memory();
-
+finish:
 	vc_try_unlock();
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s cached:%d", __function_name, zbx_result_string(ret), cache_used);
