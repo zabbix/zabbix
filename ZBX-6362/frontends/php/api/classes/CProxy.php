@@ -598,6 +598,8 @@ class CProxy extends CZBXAPI {
 	 * Convert deprecated "interfaces" to "interface".
 	 *
 	 * @param array $proxies
+	 *
+	 * @return array
 	 */
 	protected function convertDeprecatedValues($proxies) {
 		foreach ($proxies as $key => $proxy) {
