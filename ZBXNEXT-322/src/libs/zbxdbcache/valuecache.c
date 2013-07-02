@@ -68,7 +68,7 @@ static int	vc_locked = 0;
 /* the value cache size */
 extern zbx_uint64_t	CONFIG_VALUE_CACHE_SIZE;
 
-ZBX_MEM_FUNC_IMPL(vc, vc_mem)
+ZBX_MEM_FUNC_IMPL(__vc, vc_mem)
 
 #define VC_STRPOOL_INIT_SIZE	(1000)
 #define VC_ITEMS_INIT_SIZE	(1000)
@@ -1014,13 +1014,13 @@ static void	*vc_item_malloc(zbx_vc_item_t *item, size_t size)
 {
 	char	*ptr;
 
-	if (NULL == (ptr = vc_mem_malloc_func(NULL, size)))
+	if (NULL == (ptr = __vc_mem_malloc_func(NULL, size)))
 	{
 		/* If failed to allocate required memory, try to free space in      */
 		/* cache and allocate again. If there still is not enough space -   */
 		/* return NULL as failure.                                          */
 		vc_release_space(item, size);
-		ptr = vc_mem_malloc_func(NULL, size);
+		ptr = __vc_mem_malloc_func(NULL, size);
 	}
 	return ptr;
 }
@@ -1161,7 +1161,7 @@ out:
 		if (NULL != plog->value)
 			vc_item_strfree(plog->value);
 
-		vc_mem_free_func(plog);
+		__vc_mem_free_func(plog);
 	}
 	return NULL;
 }
@@ -1190,7 +1190,7 @@ static size_t	vc_item_logfree(zbx_history_log_t *log)
 	if (NULL != log->value)
 		freed += vc_item_strfree(log->value);
 
-	vc_mem_free_func(log);
+	__vc_mem_free_func(log);
 
 	return freed + sizeof(zbx_history_log_t);
 }
@@ -1999,7 +1999,7 @@ static size_t	vch_item_free_chunk(zbx_vc_item_t *item, zbx_vc_chunk_t *chunk)
 {
 	size_t	freed = vc_item_free_values(item, chunk->slots, chunk->first_value, chunk->last_value);
 
-	vc_mem_free_func(chunk);
+	__vc_mem_free_func(chunk);
 
 	return freed + sizeof(zbx_vc_chunk_t) + (chunk->last_value - chunk->first_value) * sizeof(zbx_vc_value_t);
 }
@@ -3220,7 +3220,7 @@ void	zbx_vc_init(void)
 
 	CONFIG_VALUE_CACHE_SIZE -= size_reserved;
 
-	vc_cache = vc_mem_malloc_func(vc_cache, sizeof(zbx_vc_cache_t));
+	vc_cache = __vc_mem_malloc_func(vc_cache, sizeof(zbx_vc_cache_t));
 
 	if (NULL == vc_cache)
 	{
@@ -3230,7 +3230,7 @@ void	zbx_vc_init(void)
 	memset(vc_cache, 0, sizeof(zbx_vc_cache_t));
 
 	zbx_hashset_create_ext(&vc_cache->items, VC_ITEMS_INIT_SIZE, ZBX_DEFAULT_UINT64_HASH_FUNC,
-			ZBX_DEFAULT_UINT64_COMPARE_FUNC, vc_mem_malloc_func, vc_mem_realloc_func, vc_mem_free_func);
+			ZBX_DEFAULT_UINT64_COMPARE_FUNC, __vc_mem_malloc_func, __vc_mem_realloc_func, __vc_mem_free_func);
 
 	if (NULL == vc_cache->items.slots)
 	{
@@ -3239,7 +3239,7 @@ void	zbx_vc_init(void)
 	}
 
 	zbx_hashset_create_ext(&vc_cache->strpool, VC_STRPOOL_INIT_SIZE, vc_strpool_hash_func, vc_strpool_compare_func,
-			vc_mem_malloc_func, vc_mem_realloc_func, vc_mem_free_func);
+			__vc_mem_malloc_func, __vc_mem_realloc_func, __vc_mem_free_func);
 
 	if (NULL == vc_cache->strpool.slots)
 	{
