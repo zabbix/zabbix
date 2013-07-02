@@ -91,7 +91,7 @@ ZBX_HASHSET_ENTRY_T
 {
 	ZBX_HASHSET_ENTRY_T	*next;
 	zbx_hash_t		hash;
-	char			data[0];
+	char			data[1];
 };
 
 typedef struct
