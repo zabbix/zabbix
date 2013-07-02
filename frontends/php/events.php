@@ -325,8 +325,19 @@ if ($source == EVENT_SOURCE_TRIGGERS) {
 		new CCol(_('Trigger'), 'form_row_l'),
 		new CCol(array(
 			new CTextBox('trigger', $trigger, 96, 'yes'),
-			new CButton('btn1', _('Select'), 'return PopUp("popup.php?dstfrm='.$filterForm->getName().
-				'&dstfld1=triggerid&dstfld2=trigger&srctbl=triggers&srcfld1=triggerid&srcfld2=description&real_hosts=1");', 'T')
+			new CButton('btn1', _('Select'),
+				'return PopUp("popup.php?'.
+					'dstfrm='.$filterForm->getName().
+					'&dstfld1=triggerid'.
+					'&dstfld2=trigger'.
+					'&srctbl=triggers'.
+					'&srcfld1=triggerid'.
+					'&srcfld2=description'.
+					'&real_hosts=1'.
+					'&monitored_hosts=1'.
+					'&with_monitored_triggers=1");',
+				'T'
+			)
 		), 'form_row_r')
 	)));
 
