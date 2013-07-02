@@ -94,6 +94,7 @@ require_once dirname(__FILE__).'/testInheritanceGraph.php';
 require_once dirname(__FILE__).'/testInheritanceDiscoveryRule.php';
 require_once dirname(__FILE__).'/testInheritanceItemPrototype.php';
 require_once dirname(__FILE__).'/testInheritanceTriggerPrototype.php';
+require_once dirname(__FILE__).'/testInheritanceGraphPrototype.php';
 require_once dirname(__FILE__).'/testTemplateInheritance.php';
 
 class SeleniumTests {
@@ -175,6 +176,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testInheritanceDiscoveryRule');
 		$suite->addTestSuite('testInheritanceItemPrototype');
 		$suite->addTestSuite('testInheritanceTriggerPrototype');
+		$suite->addTestSuite('testInheritanceGraphPrototype');
 		$suite->addTestSuite('testTemplateInheritance');
 
 		return $suite;

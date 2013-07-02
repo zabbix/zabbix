@@ -257,6 +257,7 @@ frontends/php/styles/themes/originalblue/images/icons_ffffff.png -text
 frontends/php/styles/themes/originalblue/images/preloader.gif -text
 frontends/php/tests/bootstrap.php.template -text
 frontends/php/tests/selenium/testFormGraphPrototype.php -text
+frontends/php/tests/selenium/testInheritanceGraphPrototype.php -text
 man/zabbix_agentd.man -text
 man/zabbix_get.man -text
 man/zabbix_proxy.man -text
