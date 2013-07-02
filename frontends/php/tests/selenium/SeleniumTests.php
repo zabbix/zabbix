@@ -85,6 +85,7 @@ require_once dirname(__FILE__).'/testFormTemplate.php';
 require_once dirname(__FILE__).'/testFormDiscoveryRule.php';
 require_once dirname(__FILE__).'/testFormItemPrototype.php';
 require_once dirname(__FILE__).'/testFormTriggerPrototype.php';
+require_once dirname(__FILE__).'/testFormGraphPrototype.php';
 require_once dirname(__FILE__).'/testPageApplications.php';
 require_once dirname(__FILE__).'/testPageBrowserWarning.php';
 require_once dirname(__FILE__).'/testInheritanceItem.php';
@@ -165,6 +166,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormDiscoveryRule');
 		$suite->addTestSuite('testFormItemPrototype');
 		$suite->addTestSuite('testFormTriggerPrototype');
+		$suite->addTestSuite('testFormGraphPrototype');
 		$suite->addTestSuite('testPageApplications');
 		$suite->addTestSuite('testPageBrowserWarning');
 		$suite->addTestSuite('testInheritanceItem');
