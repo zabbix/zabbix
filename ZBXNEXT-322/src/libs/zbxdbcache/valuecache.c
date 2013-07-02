@@ -797,7 +797,9 @@ static void	vc_update_statistics(zbx_vc_item_t *item, int hits, int misses)
 static void	vc_warn_low_memory()
 {
 	static int	last_warning_time = 0;
-	int		now = ZBX_VC_TIME();
+	int		now;
+
+	now = ZBX_VC_TIME();
 
 	if (now - last_warning_time  > ZBX_VC_LOW_MEMORY_WARNING_PERIOD)
 	{
@@ -831,9 +833,11 @@ static void	vc_release_space(zbx_vc_item_t *source_item, size_t space)
 {
 	zbx_hashset_iter_t		iter;
 	zbx_vc_item_t			*item;
-	int				timestamp = ZBX_VC_TIME() - SEC_PER_DAY, i;
+	int				timestamp, i;
 	size_t				freed = 0;
 	zbx_vector_vc_itemweight_t	items;
+
+	timestamp = ZBX_VC_TIME() - SEC_PER_DAY;
 
 	/* reserve at least VC_MIN_FREE_SPACE bytes to avoid spamming with free space requests */
 	if (space < VC_MIN_FREE_SPACE)
@@ -1064,8 +1068,9 @@ static void	*vc_item_malloc(zbx_vc_item_t *item, size_t size)
 static char	*vc_item_strdup(zbx_vc_item_t *item, const char *str)
 {
 	void	*ptr;
-	int	len = strlen(str) + 1;
+	int	len;
 
+	len = strlen(str) + 1;
 	ptr = zbx_hashset_search(&vc_cache->strpool, str - REFCOUNT_FIELD_SIZE);
 
 	if (NULL == ptr)
@@ -1388,7 +1393,9 @@ static zbx_vc_item_t	*vc_prepare_item(zbx_uint64_t itemid, int value_type, int s
 
 	if (NULL == (item = zbx_hashset_search(&vc_cache->items, &itemid)))
 	{
-		int	create_item = 0, now = ZBX_VC_TIME();
+		int	create_item = 0, now;
+
+		now = ZBX_VC_TIME();
 
 		/* add a new item to the cache either when cache is working in normal mode  */
 		/* or when the estimated request size is low                                */
@@ -2074,7 +2081,9 @@ static void	vch_item_clean_cache(zbx_vc_item_t *item)
 	{
 		zbx_vc_chunk_t	*tail = data->tail;
 		zbx_vc_chunk_t	*chunk = tail;
-		int		timestamp = ZBX_VC_TIME() - data->range;
+		int		timestamp;
+
+		timestamp = ZBX_VC_TIME() - data->range;
 
 		/* try to remove chunks with all history values older than maximum request range */
 		while (NULL != chunk && chunk->slots[chunk->last_value].timestamp.sec < timestamp)
@@ -2438,9 +2447,11 @@ static int	vch_item_get_values_by_time(zbx_vc_item_t *item, zbx_vector_vc_value_
 		int timestamp)
 {
 	zbx_vc_data_history_t	*data = &item->data.history;
-	int			ret = SUCCEED, index, now = ZBX_VC_TIME();
+	int			ret = SUCCEED, index, now;
 	int			start = timestamp - seconds;
 	zbx_vc_chunk_t		*chunk;
+
+	now = ZBX_VC_TIME();
 
 	if (data->range < seconds + now - timestamp)
 		data->range = seconds + now - timestamp;
@@ -2492,8 +2503,10 @@ static int	vch_item_get_values_by_count(zbx_vc_item_t *item,  zbx_vector_vc_valu
 		int timestamp)
 {
 	zbx_vc_data_history_t	*data = &item->data.history;
-	int			ret = SUCCEED, index, now = ZBX_VC_TIME();
+	int			ret = SUCCEED, index, now;
 	zbx_vc_chunk_t		*chunk;
+
+	now = ZBX_VC_TIME();
 
 	if (FAIL == vch_item_get_last_value(item, timestamp, &chunk, &index))
 	{
@@ -2554,10 +2567,12 @@ static int	vch_item_get_value_range(zbx_vc_item_t *item,  zbx_vector_vc_value_t 
 		int timestamp)
 {
 	zbx_vc_data_history_t	*data = &item->data.history;
-	int			ret, now = ZBX_VC_TIME(), records_read, hits, misses;
+	int			ret, now, records_read, hits, misses;
 
 	values->values_num = 0;
 	item->last_accessed = now;
+
+	now = ZBX_VC_TIME();
 
 	if (0 == count)
 	{
@@ -2624,10 +2639,12 @@ out:
 static int	vch_item_get_value(zbx_vc_item_t *item, const zbx_timespec_t *ts, zbx_vc_value_t *value)
 {
 	zbx_vc_data_history_t	*data = &item->data.history;
-	int			index, ret = FAIL, hits = 0, misses = 0, now = ZBX_VC_TIME();
+	int			index, ret = FAIL, hits = 0, misses = 0, now;
 	zbx_vc_chunk_t		*chunk;
 
-	item->last_accessed = ZBX_VC_TIME();
+	now = ZBX_VC_TIME();
+
+	item->last_accessed = now;
 
 	if (NULL == data->tail || data->tail->slots[data->tail->first_value].timestamp.sec > ts->sec)
 	{
