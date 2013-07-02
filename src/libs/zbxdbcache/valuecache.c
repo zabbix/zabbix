@@ -3204,13 +3204,13 @@ void	zbx_vc_init(void)
 	if (-1 == (shm_key = zbx_ftok(CONFIG_FILE, ZBX_IPC_VALUECACHE_ID)))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot create IPC key for value cache");
-		exit(FAIL);
+		exit(EXIT_FAILURE);
 	}
 
 	if (ZBX_MUTEX_ERROR == zbx_mutex_create_force(&vc_lock, ZBX_MUTEX_VALUECACHE))
 	{
 		zbx_error("cannot create mutex for value cache");
-		exit(FAIL);
+		exit(EXIT_FAILURE);
 	}
 
 	size_reserved = zbx_mem_required_size(1, "value cache size", "ValueCacheSize");
@@ -3225,7 +3225,7 @@ void	zbx_vc_init(void)
 	if (NULL == vc_cache)
 	{
 		zbx_error("cannot allocate value cache header");
-		exit(FAIL);
+		exit(EXIT_FAILURE);
 	}
 	memset(vc_cache, 0, sizeof(zbx_vc_cache_t));
 
@@ -3235,7 +3235,7 @@ void	zbx_vc_init(void)
 	if (NULL == vc_cache->items.slots)
 	{
 		zbx_error("cannot allocate value cache data storage");
-		exit(FAIL);
+		exit(EXIT_FAILURE);
 	}
 
 	zbx_hashset_create_ext(&vc_cache->strpool, VC_STRPOOL_INIT_SIZE, vc_strpool_hash_func, vc_strpool_compare_func,
@@ -3244,7 +3244,7 @@ void	zbx_vc_init(void)
 	if (NULL == vc_cache->strpool.slots)
 	{
 		zbx_error("cannot allocate string pool for value cache data storage");
-		exit(FAIL);
+		exit(EXIT_FAILURE);
 	}
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
