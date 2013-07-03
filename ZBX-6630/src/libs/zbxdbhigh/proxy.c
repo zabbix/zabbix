@@ -502,25 +502,35 @@ void	get_proxyconfig_data(zbx_uint64_t proxy_hostid, struct zbx_json *j)
 static void	remember_record(const ZBX_FIELD **fields, char **recs, size_t *recs_alloc, size_t *recs_offset,
 		DB_ROW row, int field_count)
 {
+	/* A record is stored as a sequence of fields and flag bytes for handling NULL values.	*/
+	/* A field is stored as a '\0'-terminated string to preserve field boundaries.		*/
+	/* If a field value can be NULL a flag byte is inserted after the field to distinguish	*/
+	/* between empty string and NULL value. The flag byte can be '\1' (not NULL value) or	*/
+	/* '\2' (NULL value).									*/
+	/* Examples of representation:								*/
+	/*    \0 \2   - the field can be NULL and it is NULL,					*/
+	/*    \0 \1   - the field can be NULL but is empty string,				*/
+	/*    A \0 \1 - the field can be NULL but is a string "A",				*/
+	/*    \0      - the field can not be NULL and is empty string,				*/
+	/*    A \0    - the field can not be NULL and is a string "A".				*/
+
 	int	f;
 
 	for (f = 0; f < field_count; f++)
 	{
-		if (0 != (fields[f]->flags & ZBX_NOTNULL))	/* field value can not be NULL */
+		if (0 != (fields[f]->flags & ZBX_NOTNULL))
 		{
 			zbx_strcpy_alloc(recs, recs_alloc, recs_offset, row[f]);
-			*recs_offset += sizeof(char);	/* preserve terminating '\0' at field boundaries */
+			*recs_offset += sizeof(char);
 		}
-		else if (SUCCEED != DBis_null(row[f]))	/* field value can be NULL but it is not */
+		else if (SUCCEED != DBis_null(row[f]))
 		{
-			/* a string and a byte '\1' means non-NULL value */
 			zbx_strcpy_alloc(recs, recs_alloc, recs_offset, row[f]);
 			*recs_offset += sizeof(char);
 			zbx_chrcpy_alloc(recs, recs_alloc, recs_offset, '\1');
 		}
-		else	/* field value is NULL */
+		else
 		{
-			/* empty string and byte '\2' means NULL value */
 			zbx_strcpy_alloc(recs, recs_alloc, recs_offset, "");
 			*recs_offset += sizeof(char);
 			zbx_chrcpy_alloc(recs, recs_alloc, recs_offset, '\2');
@@ -559,6 +569,15 @@ static int	find_field_by_name(const ZBX_FIELD **fields, int field_count, const c
 static int	compare_nth_field(const ZBX_FIELD **fields, char *rec_data, int n, char *str, int is_null,
 				int *last_n, size_t *last_pos)
 {
+	/* This function compares a value from JSON record with the value of the n-th field of	*/
+	/* DB record. For description how DB record is stored in memory see comments in		*/
+	/* function remember_record().								*/
+	/* Comparing deals with 4 cases:							*/
+	/*    - JSON value is not NULL, DB value is not NULL,					*/
+	/*    - JSON value is not NULL, DB value is NULL,					*/
+	/*    - JSON value is NULL, DB value is NULL.						*/
+	/*    - JSON value is NULL, DB value is not NULL,					*/
+
 	int	i = *last_n, null_in_db = 0;
 	char	*p = rec_data + *last_pos, *field_start = NULL;
 
@@ -595,15 +614,30 @@ static int	compare_nth_field(const ZBX_FIELD **fields, char *rec_data, int n, ch
 	*last_n = i;				/* Preserve number of field and its start position */
 	*last_pos = (size_t)(p - rec_data);	/* across calls to avoid searching from start. */
 
-	if (1 == null_in_db)
+	if (0 == is_null)	/* value in JSON is not NULL*/
 	{
-		if ('\0' == *str && 0 != is_null)
-			return 0;	/* fields are "equal" - both contain NULL */
+		if (0 == null_in_db)
+			return strcmp(field_start, str);
 		else
 			return 1;
 	}
 	else
-		return strcmp(field_start, str);
+	{
+		if ('\0' == *str)
+		{
+			if (1 == null_in_db)
+				return 0;	/* fields are "equal" - both contain NULL */
+			else
+				return 1;
+		}
+		else
+		{
+			THIS_SHOULD_NEVER_HAPPEN;
+			*last_n = 0;
+			*last_pos = 0;
+			return 1;
+		}
+	}
 }
 
 /******************************************************************************
