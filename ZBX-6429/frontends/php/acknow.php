@@ -46,7 +46,6 @@ $fields = array(
 	'backurl' =>		array(T_ZBX_STR, O_OPT, null,	null,		null),
 	// actions
 	'go' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
-	// form
 	'saveandreturn' =>	array(T_ZBX_STR, O_OPT, P_ACT|P_SYS, null,	null),
 	'save' =>			array(T_ZBX_STR, O_OPT, P_ACT|P_SYS, null,	null),
 	'cancel' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null)
@@ -77,7 +76,7 @@ if (isset($_REQUEST['cancel'])) {
 
 /*
  * Permissions
-*/
+ */
 if (!isset($_REQUEST['events']) && !isset($_REQUEST['eventid']) && !isset($_REQUEST['triggers'])) {
 	show_message(_('No events to acknowledge'));
 	require_once dirname(__FILE__).'/include/page_footer.php';
@@ -105,7 +104,7 @@ elseif (get_request('triggers')) {
 
 /*
  * Actions
-*/
+ */
 $eventTrigger = null;
 $eventAcknowledged = null;
 
@@ -113,14 +112,14 @@ $bulk = !isset($_REQUEST['eventid']);
 
 if (!$bulk) {
 	$events = API::Event()->get(array(
+		'eventids' => $_REQUEST['eventid'],
 		'output' => API_OUTPUT_EXTEND,
-		'selectRelatedObject' => API_OUTPUT_EXTEND,
-		'eventids' => $_REQUEST['eventid']
+		'selectRelatedObject' => API_OUTPUT_EXTEND
 	));
 	if ($events) {
 		$event = reset($events);
 
-		$eventTrigger = $event['relatedObject'];
+		$eventTriggerName = CMacrosResolverHelper::resolveTriggerName($event['relatedObject']);
 		$eventAcknowledged = $event['acknowledged'];
 	}
 
@@ -143,18 +142,18 @@ if (isset($_REQUEST['save']) || isset($_REQUEST['saveandreturn'])) {
 		));
 	}
 
-	$result = API::Event()->acknowledge(array(
+	$acknowledgeEvent = API::Event()->acknowledge(array(
 		'eventids' => zbx_objectValues($_REQUEST['events'], 'eventid'),
 		'message' => $_REQUEST['message']
 	));
 
-	show_messages($result, _('Event acknowledged'), _('Cannot acknowledge event'));
+	show_messages($acknowledgeEvent, _('Event acknowledged'), _('Cannot acknowledge event'));
 
-	if ($result) {
+	if ($acknowledgeEvent) {
 		$eventAcknowledged = true;
 
 		add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_TRIGGER, _('Acknowledge added').
-			' ['.($bulk ? ' BULK ACKNOWLEDGE ' : $eventTrigger).']'.
+			' ['.($bulk ? ' BULK ACKNOWLEDGE ' : $eventTriggerName).']'.
 			' ['.$_REQUEST['message'].']');
 	}
 
@@ -181,9 +180,7 @@ ob_end_flush();
 /*
  * Display
  */
-$msg = $bulk ? ' BULK ACKNOWLEDGE ' : CMacrosResolverHelper::resolveTriggerName($eventTrigger);
-
-show_table_header(array(_('ALARM ACKNOWLEDGES').NAME_DELIMITER, $msg));
+show_table_header(array(_('ALARM ACKNOWLEDGES').NAME_DELIMITER, ($bulk ? ' BULK ACKNOWLEDGE ' : $eventTriggerName)));
 
 echo SBR;
 
