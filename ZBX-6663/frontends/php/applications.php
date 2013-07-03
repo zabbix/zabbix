@@ -32,18 +32,19 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = array(
-	'applications' =>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,	null),
+	'applications' =>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,			null),
 	'hostid' =>				array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID.NOT_ZERO, 'isset({form})&&!isset({applicationid})'),
-	'groupid' =>			array(T_ZBX_INT, O_OPT, null,	DB_ID,	null),
-	'applicationid' =>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,	'isset({form})&&{form}=="update"'),
-	'appname' =>			array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY, 'isset({save})', _('Name')),
+	'referid' =>			array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,			null),
+	'groupid' =>			array(T_ZBX_INT, O_OPT, null,	DB_ID,			null),
+	'applicationid' =>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,			'isset({form})&&{form}=="update"'),
+	'appname' =>			array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,		'isset({save})', _('Name')),
 	// actions
-	'go' =>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
-	'save' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
-	'clone' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
-	'delete' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
-	'form' =>				array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
-	'form_refresh' =>		array(T_ZBX_INT, O_OPT, null,	null,	null)
+	'go' =>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+	'save' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+	'clone' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+	'delete' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+	'form' =>				array(T_ZBX_STR, O_OPT, P_SYS,			null,	null),
+	'form_refresh' =>		array(T_ZBX_INT, O_OPT, null,			null,	null)
 );
 check_fields($fields);
 validate_sort_and_sortorder('name', ZBX_SORT_UP);
@@ -87,6 +88,8 @@ if (get_request('hostid', 0) > 0) {
 	}
 }
 $_REQUEST['go'] = get_request('go', 'none');
+
+resetCurrentPageCookies($_REQUEST['hostid'], get_request('referid', 0));
 
 /*
  * Actions

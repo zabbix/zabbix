@@ -101,22 +101,45 @@ foreach ($this->data['graphs'] as $graph) {
 	if (!empty($graph['templateid'])) {
 		$realHosts = get_realhosts_by_graphid($graph['templateid']);
 		$realHosts = DBfetch($realHosts);
-		$name[] = new CLink($realHosts['name'], 'graphs.php?hostid='.$realHosts['hostid'], 'unknown');
+		$name[] = new CLink(
+			$realHosts['name'],
+			'graphs.php?'.
+				'hostid='.$realHosts['hostid'].
+				'&referid='.$this->data['hostid'],
+			'unknown'
+		);
 		$name[] = NAME_DELIMITER;
-		$name[] = new CLink($graph['name'],
-			'graphs.php?form=update&graphid='.$graphid.url_param('parent_discoveryid').'&hostid='.$this->data['hostid']);
+		$name[] = new CLink(
+			$graph['name'],
+			'graphs.php?'.
+				'form=update'.
+				'&graphid='.$graphid.url_param('parent_discoveryid').
+				'&hostid='.$this->data['hostid']
+		);
 
 		$isCheckboxEnabled = false;
 	}
 	elseif (!empty($graph['discoveryRule']) && empty($this->data['parent_discoveryid'])) {
-		$name[] = new CLink($graph['discoveryRule']['name'], 'host_discovery.php?form=update&itemid='.$graph['discoveryRule']['itemid'], 'gold');
+		$name[] = new CLink(
+			$graph['discoveryRule']['name'],
+			'host_discovery.php?'.
+				'form=update'.
+				'&itemid='.$graph['discoveryRule']['itemid'],
+			'gold'
+		);
 		$name[] = NAME_DELIMITER;
 		$name[] = new CSpan($graph['name']);
 
 		$isCheckboxEnabled = false;
 	}
 	else {
-		$name[] = new CLink($graph['name'], 'graphs.php?form=update&graphid='.$graphid.url_param('parent_discoveryid').'&hostid='.$this->data['hostid']);
+		$name[] = new CLink(
+			$graph['name'],
+			'graphs.php?'.
+				'form=update'.
+				'&graphid='.$graphid.url_param('parent_discoveryid').
+				'&hostid='.$this->data['hostid']
+		);
 	}
 
 	$checkBox = new CCheckBox('group_graphid['.$graphid.']', null, null, $graphid);

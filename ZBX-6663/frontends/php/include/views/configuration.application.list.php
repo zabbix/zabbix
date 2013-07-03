@@ -68,7 +68,13 @@ foreach ($this->data['applications'] as $application) {
 
 		$name = array();
 		foreach ($application['sourceTemplates'] as $template) {
-			$name[] = new CLink($template['name'], 'applications.php?hostid='.$template['hostid'], 'unknown');
+			$name[] = new CLink(
+				$template['name'],
+				'applications.php?'.
+					'hostid='.$template['hostid'].
+					'&referid='.$this->data['hostid'],
+				'unknown'
+			);
 			$name[] = ', ';
 		}
 		array_pop($name);
@@ -77,7 +83,14 @@ foreach ($this->data['applications'] as $application) {
 	}
 	// normal app
 	else {
-		$name = new CLink($application['name'], 'applications.php?form=update&applicationid='.$application['applicationid'].'&hostid='.$application['hostid'].'&groupid='.$this->data['groupid']);
+		$name = new CLink(
+			$application['name'],
+			'applications.php?'.
+				'form=update'.
+				'&applicationid='.$application['applicationid'].
+				'&hostid='.$application['hostid'].
+				'&groupid='.$this->data['groupid']
+		);
 	}
 
 	$applicationTable->addRow(array(
@@ -85,7 +98,13 @@ foreach ($this->data['applications'] as $application) {
 		($this->data['hostid'] > 0) ? null : $application['host'],
 		$name,
 		array(
-			new CLink(_('Items'), 'items.php?hostid='.$application['hostid'].'&filter_set=1&filter_application='.urlencode($application['name'])),
+			new CLink(
+				_('Items'),
+				'items.php?'.
+					'hostid='.$application['hostid'].
+					'&filter_set=1'.
+					'&filter_application='.urlencode($application['name'])
+			),
 			SPACE.'('.count($application['items']).')'
 		)
 	));

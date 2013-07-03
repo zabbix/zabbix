@@ -61,7 +61,10 @@ if (!empty($this->data['parent_discoveryid'])) {
 		'[ ',
 		new CLink(
 			$this->data['showdisabled'] ? _('Hide disabled triggers') : _('Show disabled triggers'),
-			'trigger_prototypes.php?showdisabled='.($this->data['showdisabled'] ? 0 : 1).'&hostid='.$this->data['hostid'].'&parent_discoveryid='.$this->data['parent_discoveryid']
+			'trigger_prototypes.php?'.
+				'showdisabled='.($this->data['showdisabled'] ? 0 : 1).
+				'&hostid='.$this->data['hostid'].
+				'&parent_discoveryid='.$this->data['parent_discoveryid']
 		),
 		' ]'
 	));
@@ -76,7 +79,9 @@ else {
 		'[ ',
 		new CLink(
 			$this->data['showdisabled'] ? _('Hide disabled triggers') : _('Show disabled triggers'),
-			'triggers.php?hostid='.$this->data['hostid'].'&showdisabled='.($this->data['showdisabled'] ? 0 : 1)
+			'triggers.php?'.
+				'hostid='.$this->data['hostid'].
+				'&showdisabled='.($this->data['showdisabled'] ? 0 : 1)
 		),
 		' ]'
 	));
@@ -128,14 +133,19 @@ foreach ($this->data['triggers'] as $tnum => $trigger) {
 				$tpl_disc_ruleid = get_realrule_by_itemid_and_hostid($this->data['parent_discoveryid'], $real_host['hostid']);
 				$description[] = new CLink(
 					CHtml::encode($real_host['name']),
-					'trigger_prototypes.php?hostid='.$real_host['hostid'].'&parent_discoveryid='.$tpl_disc_ruleid,
+					'trigger_prototypes.php?'.
+						'hostid='.$real_host['hostid'].
+						'&parent_discoveryid='.$tpl_disc_ruleid.
+						'&referid='.$this->data['parent_discoveryid'],
 					'unknown'
 				);
 			}
 			else {
 				$description[] = new CLink(
 					CHtml::encode($real_host['name']),
-					'triggers.php?hostid='.$real_host['hostid'],
+					'triggers.php?'.
+						'hostid='.$real_host['hostid'].
+						'&referid='.$this->data['hostid'],
 					'unknown'
 				);
 			}
@@ -147,8 +157,8 @@ foreach ($this->data['triggers'] as $tnum => $trigger) {
 		if (!empty($trigger['discoveryRule'])) {
 			$description[] = new CLink(
 				CHtml::encode($trigger['discoveryRule']['name']),
-				'trigger_prototypes.php'.
-					'?hostid='.$this->data['hostid'].
+				'trigger_prototypes.php?'.
+					'hostid='.$this->data['hostid'].
 					'&parent_discoveryid='.$trigger['discoveryRule']['itemid'],
 				'gold'
 			);
@@ -157,7 +167,10 @@ foreach ($this->data['triggers'] as $tnum => $trigger) {
 		else {
 			$description[] = new CLink(
 				CHtml::encode($trigger['description']),
-				'triggers.php?form=update&hostid='.$this->data['hostid'].'&triggerid='.$triggerid
+				'triggers.php?'.
+					'form=update'.
+					'&hostid='.$this->data['hostid'].
+					'&triggerid='.$triggerid
 			);
 		}
 
@@ -181,8 +194,8 @@ foreach ($this->data['triggers'] as $tnum => $trigger) {
 	else {
 		$description[] = new CLink(
 			CHtml::encode($trigger['description']),
-			'trigger_prototypes.php'.
-				'?form=update'.
+			'trigger_prototypes.php?'.
+				'form=update'.
 				'&hostid='.$this->data['hostid'].
 				'&parent_discoveryid='.$this->data['parent_discoveryid'].
 				'&triggerid='.$triggerid
@@ -214,16 +227,21 @@ foreach ($this->data['triggers'] as $tnum => $trigger) {
 	if (!empty($this->data['parent_discoveryid'])) {
 		$status = new CLink(
 			triggerIndicator($trigger['status']),
-			'trigger_prototypes.php?go='.($trigger['status'] == TRIGGER_STATUS_DISABLED ? 'activate' : 'disable').
-				'&hostid='.$this->data['hostid'].'&g_triggerid='.$triggerid.'&parent_discoveryid='.$this->data['parent_discoveryid'],
+			'trigger_prototypes.php?'.
+				'go='.($trigger['status'] == TRIGGER_STATUS_DISABLED ? 'activate' : 'disable').
+				'&hostid='.$this->data['hostid'].
+				'&g_triggerid='.$triggerid.
+				'&parent_discoveryid='.$this->data['parent_discoveryid'],
 			triggerIndicatorStyle($trigger['status'])
 		);
 	}
 	else {
 		$status = new CLink(
 			triggerIndicator($trigger['status'], $trigger['state']),
-			'triggers.php?go='.($trigger['status'] == TRIGGER_STATUS_DISABLED ? 'activate' : 'disable').
-				'&hostid='.$this->data['hostid'].'&g_triggerid='.$triggerid,
+			'triggers.php?'.
+				'go='.($trigger['status'] == TRIGGER_STATUS_DISABLED ? 'activate' : 'disable').
+				'&hostid='.$this->data['hostid'].
+				'&g_triggerid='.$triggerid,
 			triggerIndicatorStyle($trigger['status'], $trigger['state'])
 		);
 	}
