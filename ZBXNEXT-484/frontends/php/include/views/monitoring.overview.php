@@ -46,9 +46,10 @@ for ($i = 0; $i < TRIGGER_SEVERITY_COUNT; $i++) {
 	$hintTable->addRow(array(getSeverityCell($i), _('PROBLEM')));
 }
 
+$config = select_config();
+
 if ($this->data['type'] == SHOW_TRIGGERS) {
 	// blinking preview in help popup (only if blinking is enabled)
-	$config = select_config();
 	if ($config['blink_period'] > 0) {
 		$row = new CRow(null);
 		$row->addItem(new CCol(SPACE, 'normal'));
@@ -91,19 +92,24 @@ $hostLocationForm->additem(array(_('Hosts location'), SPACE, $styleComboBox));
 
 $overviewWidget->addHeader($hostLocationForm);
 
-if ($this->data['type'] == SHOW_DATA) {
-	$dataTable = get_items_data_overview(
-		array_keys($this->data['pageFilter']->hosts),
-		$this->data['pageFilter']->application,
-		$this->data['view_style']
-	);
+if ($config['dropdown_first_entry'] || $this->data['pageFilter']->applicationsSelected) {
+	if ($this->data['type'] == SHOW_DATA) {
+		$dataTable = get_items_data_overview(
+			array_keys($this->data['pageFilter']->hosts),
+			$this->data['pageFilter']->application,
+			$this->data['view_style']
+		);
+	}
+	elseif ($this->data['type'] == SHOW_TRIGGERS) {
+		$dataTable = get_triggers_overview(
+			array_keys($this->data['pageFilter']->hosts),
+			$this->data['pageFilter']->application,
+			$this->data['view_style']
+		);
+	}
 }
-elseif ($this->data['type'] == SHOW_TRIGGERS) {
-	$dataTable = get_triggers_overview(
-		array_keys($this->data['pageFilter']->hosts),
-		$this->data['pageFilter']->application,
-		$this->data['view_style']
-	);
+else {
+	$dataTable = new CTableInfo(_('No items selected.'));
 }
 
 $overviewWidget->addItem($dataTable);
