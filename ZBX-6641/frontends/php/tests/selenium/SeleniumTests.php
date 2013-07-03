@@ -85,6 +85,7 @@ require_once dirname(__FILE__).'/testFormTemplate.php';
 require_once dirname(__FILE__).'/testFormDiscoveryRule.php';
 require_once dirname(__FILE__).'/testFormItemPrototype.php';
 require_once dirname(__FILE__).'/testFormTriggerPrototype.php';
+require_once dirname(__FILE__).'/testFormGraphPrototype.php';
 require_once dirname(__FILE__).'/testPageApplications.php';
 require_once dirname(__FILE__).'/testPageBrowserWarning.php';
 require_once dirname(__FILE__).'/testInheritanceItem.php';
@@ -93,7 +94,7 @@ require_once dirname(__FILE__).'/testInheritanceGraph.php';
 require_once dirname(__FILE__).'/testInheritanceDiscoveryRule.php';
 require_once dirname(__FILE__).'/testInheritanceItemPrototype.php';
 require_once dirname(__FILE__).'/testInheritanceTriggerPrototype.php';
-require_once dirname(__FILE__).'/testTemplateInheritance.php';
+require_once dirname(__FILE__).'/testInheritanceGraphPrototype.php';
 
 class SeleniumTests {
 	public static function suite() {
@@ -165,6 +166,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormDiscoveryRule');
 		$suite->addTestSuite('testFormItemPrototype');
 		$suite->addTestSuite('testFormTriggerPrototype');
+		$suite->addTestSuite('testFormGraphPrototype');
 		$suite->addTestSuite('testPageApplications');
 		$suite->addTestSuite('testPageBrowserWarning');
 		$suite->addTestSuite('testInheritanceItem');
@@ -173,7 +175,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testInheritanceDiscoveryRule');
 		$suite->addTestSuite('testInheritanceItemPrototype');
 		$suite->addTestSuite('testInheritanceTriggerPrototype');
-		$suite->addTestSuite('testTemplateInheritance');
+		$suite->addTestSuite('testInheritanceGraphPrototype');
 
 		return $suite;
 	}
