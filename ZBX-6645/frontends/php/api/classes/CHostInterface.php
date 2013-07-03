@@ -17,11 +17,7 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
-/**
- * @package API
- */
+
 
 /**
  * Class containing methods for operations with host iterfaces.
@@ -33,27 +29,27 @@ class CHostInterface extends CZBXAPI {
 	protected $sortColumns = array('interfaceid', 'dns', 'ip');
 
 	/**
-	 * Get Interface Interface data
+	 * Get interface data.
 	 *
 	 * @param array   $options
-	 * @param array   $options['nodeids']     Node IDs
-	 * @param array   $options['hostids']     Interface IDs
-	 * @param boolean $options['editable']    only with read-write permission. Ignored for SuperAdmins
-	 * @param boolean $options['selectHosts'] select Interface hosts
-	 * @param boolean $options['selectItems'] select Items
-	 * @param int	  $options['count']       count Interfaces, returned column name is rowscount
-	 * @param string  $options['pattern']     search hosts by pattern in Interface name
-	 * @param int	  $options['limit']       limit selection
-	 * @param string  $options['sortfield']   field to sort by
-	 * @param string  $options['sortorder']   sort order
+	 * @param array   $options['nodeids']		Node IDs
+	 * @param array   $options['hostids']		Interface IDs
+	 * @param boolean $options['editable']		only with read-write permission. Ignored for SuperAdmins
+	 * @param boolean $options['selectHosts']	select Interface hosts
+	 * @param boolean $options['selectItems']	select Items
+	 * @param int     $options['count']			count Interfaces, returned column name is rowscount
+	 * @param string  $options['pattern']		search hosts by pattern in Interface name
+	 * @param int     $options['limit']			limit selection
+	 * @param string  $options['sortfield']		field to sort by
+	 * @param string  $options['sortorder']		sort order
 	 *
 	 * @return array|boolean Interface data as array or false if error
 	 */
-	public function get(array $options=array()) {
+	public function get(array $options = array()) {
 		$result = array();
 		$nodeCheck = false;
 		$userType = self::$userData['type'];
-		$userid = self::$userData['userid'];
+		$userId = self::$userData['userid'];
 
 		$sqlParts = array(
 			'select'	=> array('interface' => 'hi.interfaceid'),
@@ -98,23 +94,23 @@ class CHostInterface extends CZBXAPI {
 		if ($userType != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
 			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ;
 
-			$userGroups = getUserGroupsByUserId($userid);
+			$userGroups = getUserGroupsByUserId($userId);
 
 			$sqlParts['where'][] = 'EXISTS ('.
-					'SELECT NULL'.
-					' FROM hosts_groups hgg'.
-						' JOIN rights r'.
-							' ON r.id=hgg.groupid'.
-								' AND '.dbConditionInt('r.groupid', $userGroups).
-					' WHERE hi.hostid=hgg.hostid'.
-					' GROUP BY hgg.hostid'.
-					' HAVING MIN(r.permission)>'.PERM_DENY.
-						' AND MAX(r.permission)>='.$permission.
-					')';
+				'SELECT NULL'.
+				' FROM hosts_groups hgg'.
+					' JOIN rights r'.
+						' ON r.id=hgg.groupid'.
+							' AND '.dbConditionInt('r.groupid', $userGroups).
+				' WHERE hi.hostid=hgg.hostid'.
+				' GROUP BY hgg.hostid'.
+				' HAVING MIN(r.permission)>'.PERM_DENY.
+					' AND MAX(r.permission)>='.$permission.
+				')';
 		}
 
 		// nodeids
-		$nodeids = !is_null($options['nodeids']) ? $options['nodeids'] : get_current_nodeid();
+		$nodeids = is_null($options['nodeids']) ? get_current_nodeid() : $options['nodeids'];
 
 		// interfaceids
 		if (!is_null($options['interfaceids'])) {
@@ -171,8 +167,7 @@ class CHostInterface extends CZBXAPI {
 			}
 		}
 
-		// node check !!!!!
-		// should last, after all ****IDS checks
+		// node check, should last, after all ****IDS checks
 		if (!$nodeCheck) {
 			$sqlParts['where'] = sqlPartDbNode($sqlParts['where'], 'hi.interfaceid', $nodeids);
 		}
@@ -240,17 +235,14 @@ class CHostInterface extends CZBXAPI {
 	}
 
 	/**
+	 * Is interface exist.
+	 *
 	 * @param array $object
 	 *
 	 * @return bool
 	 */
 	public function exists(array $object) {
-		$keyFields = array(
-			'interfaceid',
-			'hostid',
-			'ip',
-			'dns'
-		);
+		$keyFields = array('interfaceid', 'hostid', 'ip', 'dns');
 
 		$options = array(
 			'filter' => zbx_array_mintersect($keyFields, $object),
@@ -272,6 +264,8 @@ class CHostInterface extends CZBXAPI {
 	}
 
 	/**
+	 * Check interfaces input.
+	 *
 	 * @param array  $interfaces
 	 * @param string $method
 	 */
@@ -356,14 +350,14 @@ class CHostInterface extends CZBXAPI {
 			}
 
 			if ($interface['useip'] == INTERFACE_USE_DNS && zbx_empty($interface['dns'])) {
-				if (!empty($dbHosts) && !empty($dbHosts[$interface['hostid']]['host'])) {
+				if ($dbHosts && !empty($dbHosts[$interface['hostid']]['host'])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
 						_s('Interface with IP "%1$s" cannot have empty DNS name while having "Use DNS" property on "%2$s".',
 							$interface['ip'],
 							$dbHosts[$interface['hostid']]['host']
 					));
 				}
-				elseif (!empty($dbProxies) && !empty($dbProxies[$interface['hostid']]['host'])) {
+				elseif ($dbProxies && !empty($dbProxies[$interface['hostid']]['host'])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
 						_s('Interface with IP "%1$s" cannot have empty DNS name while having "Use DNS" property on "%2$s".',
 							$interface['ip'],
@@ -405,9 +399,9 @@ class CHostInterface extends CZBXAPI {
 		$this->checkInput($interfaces, __FUNCTION__);
 		$this->checkMainInterfacesOnCreate($interfaces);
 
-		$interfaceids = DB::insert('interface', $interfaces);
+		$interfaceIds = DB::insert('interface', $interfaces);
 
-		return array('interfaceids' => $interfaceids);
+		return array('interfaceids' => $interfaceIds);
 	}
 
 	/**
@@ -438,6 +432,7 @@ class CHostInterface extends CZBXAPI {
 	protected function clearValues(array $interface) {
 		if (isset($interface['port']) && $interface['port'] != '') {
 			$interface['port'] = ltrim($interface['port'], '0');
+
 			if ($interface['port'] == '') {
 				$interface['port'] = 0;
 			}
@@ -493,9 +488,9 @@ class CHostInterface extends CZBXAPI {
 			}
 		}
 
-		$interfaceids = $this->create($insertData);
+		$interfaceIds = $this->create($insertData);
 
-		return array('interfaceids' => $interfaceids);
+		return array('interfaceids' => $interfaceIds);
 	}
 
 	protected function validateMassRemove(array $data) {
@@ -529,14 +524,14 @@ class CHostInterface extends CZBXAPI {
 	}
 
 	/**
-	 * Remove Hosts from Hostinterfaces
+	 * Remove hosts from interfaces.
 	 *
 	 * @param array $data
 	 * @param array $data['interfaceids']
 	 * @param array $data['hostids']
 	 * @param array $data['templateids']
 	 *
-	 * @return boolean
+	 * @return array
 	 */
 	public function massRemove(array $data) {
 		$data['interfaces'] = zbx_toArray($data['interfaces']);
@@ -557,13 +552,14 @@ class CHostInterface extends CZBXAPI {
 	}
 
 	/**
-	 * Replace existing host interfaces with input interfaces.
+	 * Replace existing interfaces with input interfaces.
 	 *
 	 * @param $host
 	 */
 	public function replaceHostInterfaces(array $host) {
 		if (isset($host['interfaces']) && !is_null($host['interfaces'])) {
 			$host['interfaces'] = zbx_toArray($host['interfaces']);
+
 			$this->checkHostInterfaces($host['interfaces'], $host['hostid']);
 
 			$interfacesToDelete = API::HostInterface()->get(array(
@@ -575,6 +571,7 @@ class CHostInterface extends CZBXAPI {
 
 			$interfacesToAdd = array();
 			$interfacesToUpdate = array();
+
 			foreach ($host['interfaces'] as $interface) {
 				$interface['hostid'] = $host['hostid'];
 
@@ -587,8 +584,9 @@ class CHostInterface extends CZBXAPI {
 				}
 			}
 
-			if (!empty($interfacesToUpdate)) {
+			if ($interfacesToUpdate) {
 				API::HostInterface()->checkInput($interfacesToUpdate, 'update');
+
 				$data = array();
 				foreach ($interfacesToUpdate as $interface) {
 					$data[] = array(
@@ -599,12 +597,12 @@ class CHostInterface extends CZBXAPI {
 				DB::update('interface', $data);
 			}
 
-			if (!empty($interfacesToAdd)) {
+			if ($interfacesToAdd) {
 				$this->checkInput($interfacesToAdd, 'create');
 				DB::insert('interface', $interfacesToAdd);
 			}
 
-			if (!empty($interfacesToDelete)) {
+			if ($interfacesToDelete) {
 				$this->delete(zbx_objectValues($interfacesToDelete, 'interfaceid'));
 			}
 		}
@@ -660,7 +658,7 @@ class CHostInterface extends CZBXAPI {
 	 *
 	 * @throws APIException if the user doesn't have write permissions for the given hosts
 	 *
-	 * @param array $hostIds    an array of host IDs
+	 * @param array $hostIds	an array of host IDs
 	 */
 	protected function checkHostPermissions(array $hostIds) {
 		if (!API::Host()->isWritable($hostIds)) {
@@ -670,6 +668,7 @@ class CHostInterface extends CZBXAPI {
 
 	private function checkHostInterfaces(array $interfaces, $hostid) {
 		$interfacesWithMissingData = array();
+
 		foreach ($interfaces as $interface) {
 			if (!isset($interface['type'], $interface['main'])) {
 				$interfacesWithMissingData[] = $interface['interfaceid'];
@@ -696,13 +695,13 @@ class CHostInterface extends CZBXAPI {
 	}
 
 	private function checkMainInterfacesOnCreate(array $interfaces) {
-		$hostids = array();
+		$hostIds = array();
 		foreach ($interfaces as $interface) {
-			$hostids[$interface['hostid']] = $interface['hostid'];
+			$hostIds[$interface['hostid']] = $interface['hostid'];
 		}
 
 		$dbInterfaces = API::HostInterface()->get(array(
-			'hostids' => $hostids,
+			'hostids' => $hostIds,
 			'output' => array('hostid', 'main', 'type'),
 			'preservekeys' => true,
 			'nopermissions' => true
@@ -713,7 +712,7 @@ class CHostInterface extends CZBXAPI {
 	}
 
 	private function checkMainInterfacesOnUpdate(array $interfaces) {
-		$interfaceidsWithoutHostids = array();
+		$interfaceidsWithoutHostIds = array();
 
 		// gather all hostids where interfaces should be checked
 		foreach ($interfaces as $interface) {
@@ -722,22 +721,22 @@ class CHostInterface extends CZBXAPI {
 					$hostids[$interface['hostid']] = $interface['hostid'];
 				}
 				else {
-					$interfaceidsWithoutHostids[] = $interface['interfaceid'];
+					$interfaceidsWithoutHostIds[] = $interface['interfaceid'];
 				}
 			}
 		}
 
 		// gathrer missing host ids
-		$hostids = array();
-		if ($interfaceidsWithoutHostids) {
-			$dbResult = DBselect('SELECT DISTINCT i.hostid FROM interface i WHERE '.dbConditionInt('i.interfaceid', $interfaceidsWithoutHostids));
+		$hostIds = array();
+		if ($interfaceidsWithoutHostIds) {
+			$dbResult = DBselect('SELECT DISTINCT i.hostid FROM interface i WHERE '.dbConditionInt('i.interfaceid', $interfaceidsWithoutHostIds));
 			while ($hostData = DBfetch($dbResult)) {
-				$hostids[$hostData['hostid']] = $hostData['hostid'];
+				$hostIds[$hostData['hostid']] = $hostData['hostid'];
 			}
 		}
 
 		$dbInterfaces = API::HostInterface()->get(array(
-			'hostids' => $hostids,
+			'hostids' => $hostIds,
 			'output' => array('hostid', 'main', 'type'),
 			'preservekeys' => true,
 			'nopermissions' => true
@@ -756,11 +755,11 @@ class CHostInterface extends CZBXAPI {
 		$this->checkMainInterfaces($dbInterfaces);
 	}
 
-	private function checkMainInterfacesOnDelete(array $interfaceids) {
-		$this->checkIfInterfaceHasItems($interfaceids);
+	private function checkMainInterfacesOnDelete(array $interfaceIds) {
+		$this->checkIfInterfaceHasItems($interfaceIds);
 
 		$hostids = array();
-		$dbResult = DBselect('SELECT DISTINCT i.hostid FROM interface i WHERE '.dbConditionInt('i.interfaceid', $interfaceids));
+		$dbResult = DBselect('SELECT DISTINCT i.hostid FROM interface i WHERE '.dbConditionInt('i.interfaceid', $interfaceIds));
 		while ($hostData = DBfetch($dbResult)) {
 			$hostids[$hostData['hostid']] = $hostData['hostid'];
 		}
@@ -772,8 +771,8 @@ class CHostInterface extends CZBXAPI {
 			'nopermissions' => true
 		));
 
-		foreach ($interfaceids as $interfaceid) {
-			unset($dbInterfaces[$interfaceid]);
+		foreach ($interfaceIds as $interfaceId) {
+			unset($dbInterfaces[$interfaceId]);
 		}
 
 		$this->checkMainInterfaces($dbInterfaces);
@@ -826,11 +825,11 @@ class CHostInterface extends CZBXAPI {
 		}
 	}
 
-	private function checkIfInterfaceHasItems(array $interfaceids) {
+	private function checkIfInterfaceHasItems(array $interfaceIds) {
 		$items = API::Item()->get(array(
 			'output' => array('name'),
 			'selectHosts' => array('name'),
-			'interfaceids' => $interfaceids,
+			'interfaceids' => $interfaceIds,
 			'preservekeys' => true,
 			'nopermissions' => true,
 			'limit' => 1
@@ -838,17 +837,17 @@ class CHostInterface extends CZBXAPI {
 
 		foreach ($items as $item) {
 			$host = reset($item['hosts']);
-			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Interface is linked to item "%1$s" on "%2$s".', $item['name'], $host['name']));
+
+			self::exception(ZBX_API_ERROR_PARAMETERS,
+				_s('Interface is linked to item "%1$s" on "%2$s".', $item['name'], $host['name']));
 		}
 	}
 
 	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
 		$sqlParts = parent::applyQueryOutputOptions($tableName, $tableAlias, $options, $sqlParts);
 
-		if ($options['countOutput'] === null) {
-			if ($options['selectHosts'] !== null) {
-				$sqlParts = $this->addQuerySelect('hi.hostid', $sqlParts);
-			}
+		if ($options['countOutput'] === null && $options['selectHosts'] !== null) {
+			$sqlParts = $this->addQuerySelect('hi.hostid', $sqlParts);
 		}
 
 		return $sqlParts;
@@ -897,13 +896,8 @@ class CHostInterface extends CZBXAPI {
 					'groupCount' => true
 				));
 				$items = zbx_toHash($items, 'interfaceid');
-				foreach ($result as $interfaceid => $interface) {
-					if (isset($items[$interfaceid])) {
-						$result[$interfaceid]['items'] = $items[$interfaceid]['rowscount'];
-					}
-					else {
-						$result[$interfaceid]['items'] = 0;
-					}
+				foreach ($result as $interfaceId => $interface) {
+					$result[$interfaceId]['items'] = isset($items[$interfaceId]) ? $items[$interfaceId]['rowscount'] : 0;
 				}
 			}
 		}
@@ -911,4 +905,3 @@ class CHostInterface extends CZBXAPI {
 		return $result;
 	}
 }
-?>
