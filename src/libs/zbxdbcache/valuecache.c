@@ -1150,20 +1150,20 @@ static zbx_history_log_t	*vc_item_logdup(zbx_vc_item_t *item, const zbx_history_
 	zbx_history_log_t	*plog = NULL;
 
 	if (NULL == (plog = vc_item_malloc(item, sizeof(zbx_history_log_t))))
-		goto out;
+		goto fail;
 
 	memset(plog, 0, sizeof(zbx_history_log_t));
 
 	if (NULL != log->source)
 	{
 		if (NULL == (plog->source = vc_item_strdup(item, log->source)))
-			goto out;
+			goto fail;
 	}
 
 	if (NULL != log->value)
 	{
 		if (NULL == (plog->value = vc_item_strdup(item, log->value)))
-			goto out;
+			goto fail;
 	}
 
 	plog->timestamp = log->timestamp;
@@ -1172,7 +1172,7 @@ static zbx_history_log_t	*vc_item_logdup(zbx_vc_item_t *item, const zbx_history_
 
 	return plog;
 
-out:
+fail:
 	if (NULL != plog)
 	{
 		if (NULL != plog->source)
@@ -1408,20 +1408,24 @@ static zbx_vc_item_t	*vc_add_item(zbx_uint64_t itemid, int value_type, int secon
 		ret = vc_db_read_values_by_count(itemid, value_type, values, count, now, timestamp, 0);
 	}
 
-	if (SUCCEED == ret && 2 >= values->values_num)
+	if (SUCCEED == ret)
 	{
-		zbx_vc_item_t	new_item = {itemid, value_type, ZBX_VC_MODE_LASTVALUE};
-
-		if (NULL == (item = zbx_hashset_insert(&vc_cache->items, &new_item, sizeof(zbx_vc_item_t))))
-			goto out;
-
 		zbx_vector_vc_value_sort(values, (zbx_compare_func_t)vc_value_compare_asc_func);
 
-		/* find the storage mode sufficient to cache the values */
-		while (SUCCEED != CACHE(item)->init(item, values, seconds, count, timestamp, ts))
-				item->mode++;
-	}
+		/* add item only if working in normal mode or the data to cache can be stored */
+		/* in lastvalue storage mode                                                  */
+		if (0 == vc_cache->low_memory || 2 >= values->values_num)
+		{
+			zbx_vc_item_t	new_item = {itemid, value_type, ZBX_VC_MODE_LASTVALUE};
 
+			if (NULL == (item = zbx_hashset_insert(&vc_cache->items, &new_item, sizeof(zbx_vc_item_t))))
+				goto out;
+
+			/* find the storage mode sufficient to cache the values */
+			while (SUCCEED != CACHE(item)->init(item, values, seconds, count, timestamp, ts))
+					item->mode++;
+		}
+	}
 out:
 	return item;
 }
@@ -3386,7 +3390,7 @@ int	zbx_vc_get_value_range(zbx_uint64_t itemid, int value_type, zbx_vector_vc_va
 		int count, int timestamp)
 {
 	const char	*__function_name = "zbx_vc_get_value_range";
-	zbx_vc_item_t	*item = NULL;
+	zbx_vc_item_t	*item;
 	int 		ret = FAIL, cache_used = 1;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() itemid:" ZBX_FS_UI64 " value_type:%d seconds:%d count:%d timestamp:%d",
@@ -3406,7 +3410,13 @@ int	zbx_vc_get_value_range(zbx_uint64_t itemid, int value_type, zbx_vector_vc_va
 
 		item = vc_add_item(itemid, value_type, seconds, count, timestamp, NULL, values);
 
-		/* prepare value vector so it can be returned as history request result */
+		/* The values vector contains cache data sorted in ascending order, which  */
+		/* might be larger than requested number of values for timeshift and count */
+		/* based requests. To convert it in the expected format the following must */
+		/* be done:                                                                */
+		/*    1) sort it in descending order                                       */
+		/*    2) remove values outside (newer) timeshift range                     */
+		/*    3) remove values outside (older) count request range                 */
 
 		/* sort it in descending order */
 		zbx_vector_vc_value_sort(values, (zbx_compare_func_t)vc_value_compare_desc_func);
@@ -3433,7 +3443,7 @@ int	zbx_vc_get_value_range(zbx_uint64_t itemid, int value_type, zbx_vector_vc_va
 		{
 			memmove(values->values, &values->values[start],
 					(values->values_num - start) * sizeof(zbx_vc_value_t));
-
+			values->values_num -= start;
 		}
 
 		ret = SUCCEED;
@@ -3499,7 +3509,7 @@ out:
 int	zbx_vc_get_value(zbx_uint64_t itemid, int value_type, const zbx_timespec_t *ts, zbx_vc_value_t *value)
 {
 	const char	*__function_name = "zbx_vc_get_value";
-	zbx_vc_item_t	*item = NULL;
+	zbx_vc_item_t	*item;
 	int 		ret = FAIL, cache_used = 1;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() itemid:" ZBX_FS_UI64 " value_type:%d timestamp:%d.%d",
@@ -3522,7 +3532,10 @@ int	zbx_vc_get_value(zbx_uint64_t itemid, int value_type, const zbx_timespec_t *
 
 		item = vc_add_item(itemid, value_type, 0, 0, 0, ts, &values);
 
-		for (i = 0; i < values.values_num; i++)
+		/* the values vector contains cache data sorted in ascending order - */
+		/* find the target value inside this vector                          */
+
+		for (i = values.values_num - 1; i >= 0; i--)
 		{
 			zbx_vc_value_t	*cache_value = &values.values[i];
 
