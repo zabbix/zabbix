@@ -1097,16 +1097,14 @@ function createPlaceholders() {
 		jQuery(document).ready(function() {
 			jQuery('[placeholder]').focus(function() {
 				var obj = jQuery(this);
-
-				if (obj.val() == obj.prop('placeholder')) {
+				if (obj.val() == obj.attr('placeholder')) {
 					obj.val('');
 					obj.removeClass('placeholder');
 				}
 			}).blur(function() {
 				var obj = jQuery(this);
-
-				if (obj.val() == '' || obj.val() == obj.prop('placeholder')) {
-					obj.val(obj.prop('placeholder'));
+				if (obj.val() == '' || obj.val() == obj.attr('placeholder')) {
+					obj.val(obj.attr('placeholder'));
 					obj.addClass('placeholder');
 				}
 			}).blur();

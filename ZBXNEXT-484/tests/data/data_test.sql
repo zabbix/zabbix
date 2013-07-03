@@ -863,3 +863,79 @@ INSERT INTO items (name, key_, hostid, value_type, itemid, flags, delay, params,
 INSERT INTO items (name, key_, hostid, value_type, itemid, flags, templateid, delay, params, description) VALUES ('testInheritanceItemPrototype4', 'item-prototype-test4', 30001, 3, 23707, 2, 23706, 5, '', '');
 INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid) values (407, 23706, 23500);
 INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid) values (408, 23707, 23501);
+
+-- testFormTriggerPrototype.SimpleCreate
+INSERT INTO items (name, key_, hostid, value_type, itemid, flags, delay, params, description) VALUES ('testFormItemReuse', 'item-prototype-reuse', 40001, 3, 23804, 2, 5, '', '');
+INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid) values (505, 23804, 33800);
+
+-- testFormTriggerPrototype.SimpleUpdate
+INSERT INTO triggers (triggerid,expression,description,url,status,value,priority,lastchange,comments,error,templateid,type,state,flags) VALUES (13518,'{12947}=0','testFormTriggerPrototype1','',0,0,0,0,'','',NULL,0,0,2);
+INSERT INTO triggers (triggerid,expression,description,url,status,value,priority,lastchange,comments,error,templateid,type,state,flags) VALUES (13519,'{12948}=0','testFormTriggerPrototype2','',0,0,0,0,'','',NULL,0,0,2);
+INSERT INTO triggers (triggerid,expression,description,url,status,value,priority,lastchange,comments,error,templateid,type,state,flags) VALUES (13520,'{12949}=0','testFormTriggerPrototype3','',0,0,0,0,'','',NULL,0,0,2);
+INSERT INTO triggers (triggerid,expression,description,url,status,value,priority,lastchange,comments,error,templateid,type,state,flags) VALUES (13521,'{12950}=0','testFormTriggerPrototype4','',0,0,0,0,'','',NULL,0,0,2);
+INSERT INTO functions (functionid,itemid,triggerid,function,parameter) VALUES (12947,23804,13518,'last','0');
+INSERT INTO functions (functionid,itemid,triggerid,function,parameter) VALUES (12948,23804,13519,'last','0');
+INSERT INTO functions (functionid,itemid,triggerid,function,parameter) VALUES (12949,23804,13520,'last','0');
+INSERT INTO functions (functionid,itemid,triggerid,function,parameter) VALUES (12950,23804,13521,'last','0');
+
+-- testFormTriggerPrototype.LayoutCheck, testInheritanceTriggerPrototype.SimpleUpdate
+INSERT INTO triggers (triggerid, expression, description, comments, flags) VALUES (16000, '{16000}=0', 'testInheritanceTriggerPrototype1', '', 2);
+INSERT INTO functions (functionid, itemid, triggerid, function, parameter) VALUES (16000, 23600 ,16000,'last',0);
+INSERT INTO triggers (triggerid, expression, description, comments, templateid, flags) VALUES (16001, '{16001}=0', 'testInheritanceTriggerPrototype1', '', 16000, 2);
+INSERT INTO functions (functionid, itemid, triggerid, function, parameter) VALUES (16001, 23601 ,16001,'last',0);
+INSERT INTO triggers (triggerid, expression, description, comments, flags) VALUES (16002, '{16002}=0', 'testInheritanceTriggerPrototype2', '', 2);
+INSERT INTO functions (functionid, itemid, triggerid, function, parameter) VALUES (16002, 23600 ,16002,'last',0);
+INSERT INTO triggers (triggerid, expression, description, comments, templateid, flags) VALUES (16003, '{16003}=0', 'testInheritanceTriggerPrototype2', '', 16002, 2);
+INSERT INTO functions (functionid, itemid, triggerid, function, parameter) VALUES (16003, 23601 ,16003,'last',0);
+INSERT INTO triggers (triggerid, expression, description, comments, flags) VALUES (16004, '{16004}=0', 'testInheritanceTriggerPrototype3', '', 2);
+INSERT INTO functions (functionid, itemid, triggerid, function, parameter) VALUES (16004, 23600 ,16004,'last',0);
+INSERT INTO triggers (triggerid, expression, description, comments, templateid, flags) VALUES (16005, '{16005}=0', 'testInheritanceTriggerPrototype3', '', 16004, 2);
+INSERT INTO functions (functionid, itemid, triggerid, function, parameter) VALUES (16005, 23601 ,16005,'last',0);
+INSERT INTO triggers (triggerid, expression, description, comments, flags) VALUES (16006, '{16006}=0', 'testInheritanceTriggerPrototype4', '', 2);
+INSERT INTO functions (functionid, itemid, triggerid, function, parameter) VALUES (16006, 23600 ,16006,'last',0);
+INSERT INTO triggers (triggerid, expression, description, comments, templateid, flags) VALUES (16007, '{16007}=0', 'testInheritanceTriggerPrototype4', '', 16006, 2);
+INSERT INTO functions (functionid, itemid, triggerid, function, parameter) VALUES (16007, 23601 ,16007,'last',0);
+
+-- testFormGraphPrototype.LayoutCheck and testFormGraphPrototype.SimpleUpdate
+INSERT INTO graphs (graphid, name, width, height, yaxismin, yaxismax, templateid, show_work_period, show_triggers, graphtype, show_legend, show_3d, percent_left, percent_right, ymin_type, ymax_type, ymin_itemid, ymax_itemid, flags) VALUES (600000,'testFormGraphPrototype1',900,200,0.0,100.0,NULL,1,0,1,1,0,0.0,0.0,1,1,NULL,NULL,2);
+INSERT INTO graphs (graphid, name, width, height, yaxismin, yaxismax, templateid, show_work_period, show_triggers, graphtype, show_legend, show_3d, percent_left, percent_right, ymin_type, ymax_type, ymin_itemid, ymax_itemid, flags) VALUES (600001,'testFormGraphPrototype2',900,200,0.0,100.0,NULL,1,0,1,1,0,0.0,0.0,1,1,NULL,NULL,2);
+INSERT INTO graphs (graphid, name, width, height, yaxismin, yaxismax, templateid, show_work_period, show_triggers, graphtype, show_legend, show_3d, percent_left, percent_right, ymin_type, ymax_type, ymin_itemid, ymax_itemid, flags) VALUES (600002,'testFormGraphPrototype3',900,200,0.0,100.0,NULL,1,0,1,1,0,0.0,0.0,1,1,NULL,NULL,2);
+INSERT INTO graphs (graphid, name, width, height, yaxismin, yaxismax, templateid, show_work_period, show_triggers, graphtype, show_legend, show_3d, percent_left, percent_right, ymin_type, ymax_type, ymin_itemid, ymax_itemid, flags) VALUES (600003,'testFormGraphPrototype4',900,200,0.0,100.0,NULL,1,0,1,1,0,0.0,0.0,1,1,NULL,NULL,2);
+
+-- testFormGraphPrototype.LayoutCheck and testFormGraphPrototype.SimpleUpdate
+INSERT INTO graphs_items (gitemid, graphid, itemid, drawtype, sortorder, color, yaxisside, calc_fnc, type) VALUES (600000, 600000, 30004, 1, 1, 'FF5555', 0, 2, 0);
+INSERT INTO graphs_items (gitemid, graphid, itemid, drawtype, sortorder, color, yaxisside, calc_fnc, type) VALUES (600001, 600000, 23804, 1, 1, 'FF5555', 0, 2, 0);
+INSERT INTO graphs_items (gitemid, graphid, itemid, drawtype, sortorder, color, yaxisside, calc_fnc, type) VALUES (600002, 600001, 30004, 1, 1, 'FF5555', 0, 2, 0);
+INSERT INTO graphs_items (gitemid, graphid, itemid, drawtype, sortorder, color, yaxisside, calc_fnc, type) VALUES (600003, 600001, 23804, 1, 1, 'FF5555', 0, 2, 0);
+INSERT INTO graphs_items (gitemid, graphid, itemid, drawtype, sortorder, color, yaxisside, calc_fnc, type) VALUES (600004, 600002, 30004, 1, 1, 'FF5555', 0, 2, 0);
+INSERT INTO graphs_items (gitemid, graphid, itemid, drawtype, sortorder, color, yaxisside, calc_fnc, type) VALUES (600005, 600002, 23804, 1, 1, 'FF5555', 0, 2, 0);
+INSERT INTO graphs_items (gitemid, graphid, itemid, drawtype, sortorder, color, yaxisside, calc_fnc, type) VALUES (600006, 600003, 30004, 1, 1, 'FF5555', 0, 2, 0);
+INSERT INTO graphs_items (gitemid, graphid, itemid, drawtype, sortorder, color, yaxisside, calc_fnc, type) VALUES (600007, 600003, 23804, 1, 1, 'FF5555', 0, 2, 0);
+
+-- testFormGraphPrototype.LayoutCheck and testInheritanceGraphPrototype.SimpleUpdate
+INSERT INTO graphs (graphid, name, width, height, yaxismin, yaxismax, templateid, show_work_period, show_triggers, graphtype, show_legend, show_3d, percent_left, percent_right, ymin_type, ymax_type, ymin_itemid, ymax_itemid, flags) VALUES (700000,'testInheritanceGraphPrototype1',900,200,0.0,100.0,NULL,1,0,1,1,0,0.0,0.0,1,1,NULL,NULL,2);
+INSERT INTO graphs (graphid, name, width, height, yaxismin, yaxismax, templateid, show_work_period, show_triggers, graphtype, show_legend, show_3d, percent_left, percent_right, ymin_type, ymax_type, ymin_itemid, ymax_itemid, flags) VALUES (700001,'testInheritanceGraphPrototype1',900,200,0.0,100.0,700000,1,0,1,1,0,0.0,0.0,1,1,NULL,NULL,2);
+INSERT INTO graphs (graphid, name, width, height, yaxismin, yaxismax, templateid, show_work_period, show_triggers, graphtype, show_legend, show_3d, percent_left, percent_right, ymin_type, ymax_type, ymin_itemid, ymax_itemid, flags) VALUES (700002,'testInheritanceGraphPrototype2',900,200,0.0,100.0,NULL,1,0,1,1,0,0.0,0.0,1,1,NULL,NULL,2);
+INSERT INTO graphs (graphid, name, width, height, yaxismin, yaxismax, templateid, show_work_period, show_triggers, graphtype, show_legend, show_3d, percent_left, percent_right, ymin_type, ymax_type, ymin_itemid, ymax_itemid, flags) VALUES (700003,'testInheritanceGraphPrototype2',900,200,0.0,100.0,700002,1,0,1,1,0,0.0,0.0,1,1,NULL,NULL,2);
+INSERT INTO graphs (graphid, name, width, height, yaxismin, yaxismax, templateid, show_work_period, show_triggers, graphtype, show_legend, show_3d, percent_left, percent_right, ymin_type, ymax_type, ymin_itemid, ymax_itemid, flags) VALUES (700004,'testInheritanceGraphPrototype3',900,200,0.0,100.0,NULL,1,0,1,1,0,0.0,0.0,1,1,NULL,NULL,2);
+INSERT INTO graphs (graphid, name, width, height, yaxismin, yaxismax, templateid, show_work_period, show_triggers, graphtype, show_legend, show_3d, percent_left, percent_right, ymin_type, ymax_type, ymin_itemid, ymax_itemid, flags) VALUES (700005,'testInheritanceGraphPrototype3',900,200,0.0,100.0,700004,1,0,1,1,0,0.0,0.0,1,1,NULL,NULL,2);
+INSERT INTO graphs (graphid, name, width, height, yaxismin, yaxismax, templateid, show_work_period, show_triggers, graphtype, show_legend, show_3d, percent_left, percent_right, ymin_type, ymax_type, ymin_itemid, ymax_itemid, flags) VALUES (700006,'testInheritanceGraphPrototype4',900,200,0.0,100.0,NULL,1,0,1,1,0,0.0,0.0,1,1,NULL,NULL,2);
+INSERT INTO graphs (graphid, name, width, height, yaxismin, yaxismax, templateid, show_work_period, show_triggers, graphtype, show_legend, show_3d, percent_left, percent_right, ymin_type, ymax_type, ymin_itemid, ymax_itemid, flags) VALUES (700007,'testInheritanceGraphPrototype4',900,200,0.0,100.0,700006,1,0,1,1,0,0.0,0.0,1,1,NULL,NULL,2);
+
+-- testFormGraphPrototype.LayoutCheck and testInheritanceGraphPrototype.SimpleUpdate
+INSERT INTO graphs_items (gitemid, graphid, itemid, drawtype, sortorder, color, yaxisside, calc_fnc, type) VALUES (700000, 700000, 23600, 1, 1, 'FF5555', 0, 2, 0);
+INSERT INTO graphs_items (gitemid, graphid, itemid, drawtype, sortorder, color, yaxisside, calc_fnc, type) VALUES (700001, 700001, 23601, 1, 1, 'FF5555', 0, 2, 0);
+INSERT INTO graphs_items (gitemid, graphid, itemid, drawtype, sortorder, color, yaxisside, calc_fnc, type) VALUES (700002, 700002, 23600, 1, 1, 'FF5555', 0, 2, 0);
+INSERT INTO graphs_items (gitemid, graphid, itemid, drawtype, sortorder, color, yaxisside, calc_fnc, type) VALUES (700003, 700003, 23601, 1, 1, 'FF5555', 0, 2, 0);
+INSERT INTO graphs_items (gitemid, graphid, itemid, drawtype, sortorder, color, yaxisside, calc_fnc, type) VALUES (700004, 700004, 23600, 1, 1, 'FF5555', 0, 2, 0);
+INSERT INTO graphs_items (gitemid, graphid, itemid, drawtype, sortorder, color, yaxisside, calc_fnc, type) VALUES (700005, 700005, 23601, 1, 1, 'FF5555', 0, 2, 0);
+INSERT INTO graphs_items (gitemid, graphid, itemid, drawtype, sortorder, color, yaxisside, calc_fnc, type) VALUES (700006, 700006, 23600, 1, 1, 'FF5555', 0, 2, 0);
+INSERT INTO graphs_items (gitemid, graphid, itemid, drawtype, sortorder, color, yaxisside, calc_fnc, type) VALUES (700007, 700007, 23601, 1, 1, 'FF5555', 0, 2, 0);
+INSERT INTO graphs_items (gitemid, graphid, itemid, drawtype, sortorder, color, yaxisside, calc_fnc, type) VALUES (700008, 700000, 24329, 1, 1, 'FF5555', 0, 2, 0);
+INSERT INTO graphs_items (gitemid, graphid, itemid, drawtype, sortorder, color, yaxisside, calc_fnc, type) VALUES (700009, 700001, 24333, 1, 1, 'FF5555', 0, 2, 0);
+INSERT INTO graphs_items (gitemid, graphid, itemid, drawtype, sortorder, color, yaxisside, calc_fnc, type) VALUES (700010, 700002, 24329, 1, 1, 'FF5555', 0, 2, 0);
+INSERT INTO graphs_items (gitemid, graphid, itemid, drawtype, sortorder, color, yaxisside, calc_fnc, type) VALUES (700011, 700003, 24333, 1, 1, 'FF5555', 0, 2, 0);
+INSERT INTO graphs_items (gitemid, graphid, itemid, drawtype, sortorder, color, yaxisside, calc_fnc, type) VALUES (700012, 700004, 24329, 1, 1, 'FF5555', 0, 2, 0);
+INSERT INTO graphs_items (gitemid, graphid, itemid, drawtype, sortorder, color, yaxisside, calc_fnc, type) VALUES (700013, 700005, 24333, 1, 1, 'FF5555', 0, 2, 0);
+INSERT INTO graphs_items (gitemid, graphid, itemid, drawtype, sortorder, color, yaxisside, calc_fnc, type) VALUES (700014, 700006, 24329, 1, 1, 'FF5555', 0, 2, 0);
+INSERT INTO graphs_items (gitemid, graphid, itemid, drawtype, sortorder, color, yaxisside, calc_fnc, type) VALUES (700015, 700007, 24333, 1, 1, 'FF5555', 0, 2, 0);
