@@ -90,7 +90,7 @@ class CJSON {
 	 *
 	 * Constructor.
 	 *
-	 * ifthe $config param is an array, it is merged with the class
+	 * If the $config param is an array, it is merged with the class
 	 * config array and any values from the Solar.config.php file.
 	 *
 	 * The Solar.config.php values are inherited along class parent
@@ -373,8 +373,8 @@ class CJSON {
 				return '"'.$ascii.'"';
 			case 'array':
 				/*
-				 * As per JSON spec ifany array key is not an integer
-				 * we must treat the the whole array as an object. We
+				 * As per JSON spec if any array key is not an integer
+				 * we must treat the whole array as an object. We
 				 * also try to catch a sparsely populated associative
 				 * array with numeric keys here because some JS engines
 				 * will create an array with empty indexes up to
