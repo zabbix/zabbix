@@ -62,7 +62,12 @@ foreach ($data['discoveries'] as $discovery) {
 	$description = array();
 	if ($discovery['templateid']) {
 		$template_host = get_realhost_by_itemid($discovery['templateid']);
-		$description[] = new CLink($template_host['name'], '?hostid='.$template_host['hostid'], 'unknown');
+		$description[] = new CLink(
+			$template_host['name'],
+			'?hostid='.$template_host['hostid'].
+				'&referid='.$this->data['hostid'],
+			'unknown'
+		);
 		$description[] = NAME_DELIMITER;
 	}
 	$discovery['name_expanded'] = itemName($discovery);

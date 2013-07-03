@@ -36,6 +36,7 @@ $fields = array(
 	'parent_discoveryid' =>	array(T_ZBX_INT, O_OPT, P_SYS,		DB_ID,			null),
 	'groupid' =>			array(T_ZBX_INT, O_OPT, P_SYS,		DB_ID,			null),
 	'hostid' =>				array(T_ZBX_INT, O_OPT, P_SYS,		DB_ID,			null),
+	'referid' =>			array(T_ZBX_INT, O_OPT, P_SYS,		DB_ID,			null),
 	'copy_type' =>			array(T_ZBX_INT, O_OPT, P_SYS,		IN('0,1'),		'isset({copy})'),
 	'copy_mode' =>			array(T_ZBX_INT, O_OPT, P_SYS,		IN('0'),		null),
 	'graphid' =>			array(T_ZBX_INT, O_OPT, P_SYS,		DB_ID,			'(isset({form})&&({form}=="update"))'),
@@ -155,6 +156,11 @@ if (CUser::$userData['type'] !== USER_TYPE_SUPER_ADMIN) {
 		}
 	}
 }
+
+resetCurrentPageCookies(
+	empty($_REQUEST['parent_discoveryid']) ? $_REQUEST['hostid'] : $_REQUEST['parent_discoveryid'],
+	get_request('referid', 0)
+);
 
 /*
  * Actions
