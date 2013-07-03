@@ -166,7 +166,7 @@ elseif (str_in_array($_REQUEST['go'], array('activate', 'disable')) && isset($_R
 elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['hosts'])) {
 	DBstart();
 
-	$goResult = API::Proxy()->delete(get_request('hosts', array()));
+	$goResult = API::Proxy()->delete(get_request('hosts'));
 	$goResult = DBend($goResult);
 
 	show_messages($goResult, _('Proxy deleted'), _('Cannot delete proxy'));
