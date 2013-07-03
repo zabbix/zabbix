@@ -608,6 +608,28 @@ class testInheritanceItem extends CWebTest {
 					'formCheck' => true
 				)
 			),
+			// Flexfields with negative number in flexdelay
+			array(
+				array(
+					'expected' => ITEM_GOOD,
+					'name' => 'Item flex-negative flexdelay',
+					'key' => 'item-flex-negative-flexdelay',
+					'flexPeriod' => array(
+						array('flexDelay' => '-50', 'flexTime' => '1-7,00:00-24:00')
+					)
+				)
+			),
+			// Flexfields with symbols in flexdelay
+			array(
+				array(
+					'expected' => ITEM_GOOD,
+					'name' => 'Item flex-symbols in flexdelay',
+					'key' => 'item-flex-symbols-flexdelay',
+					'flexPeriod' => array(
+						array('flexDelay' => '50abc', 'flexTime' => '1-7,00:00-24:00')
+					)
+				)
+			),
 			// History
 			array(
 				array(
@@ -1239,6 +1261,128 @@ class testInheritanceItem extends CWebTest {
 			$this->zbxTestTextPresent('Items deleted');
 			$this->zbxTestTextNotPresent($this->template.": $itemName");
 		}
+	}
+
+	public function testFormItem_linkHost(){
+		$this->zbxTestLogin('hosts.php');
+		$this->zbxTestClickWait('link=Template inheritance test host');
+
+		$this->zbxTestClick('tab_templateTab');
+
+		$this->assertElementPresent("//div[@id='templates_']/input");
+		$this->input_type("//div[@id='templates_']/input", 'Template App Zabbix Agent');
+		sleep(1);
+		$this->zbxTestClick("//span[@class='matched']");
+		$this->zbxTestClickWait('add_template');
+
+		$this->zbxTestTextPresent('Template App Zabbix Agent');
+		$this->zbxTestClickWait('save');
+
+		$this->zbxTestTextPresent('Host updated');
+	}
+
+	// Returns item data for inheritance testing
+	public static function linkData() {
+	// result, template, itemName, keyName, errorMsg
+		return array(
+			array(
+				ITEM_GOOD,
+				'Inheritance test template',
+				'Test LLD item1',
+				'test-general-item',
+				array()
+					),
+			// Dublicated item on Template inheritance test host
+			array(
+				ITEM_BAD,
+				'Template App Zabbix Agent',
+				'Test LLD item1',
+				'test-general-item',
+				array(
+						'ERROR: Cannot add item',
+						'Item "test-general-item" already exists on "Template inheritance test host", inherited from '.
+							'another template.'
+						)
+				),
+			// Item added to Template inheritance test host
+			array(
+				ITEM_GOOD,
+				'Template App Zabbix Agent',
+				'Test LLD item2',
+				'test-additional-item',
+				array()
+				)
+			);
+	}
+
+	/**
+	 * @dataProvider linkData
+	 */
+	public function testFormItem_Create($result, $template, $itemName, $keyName, $errorMsgs) {
+		$this->zbxTestLogin('templates.php');
+
+		// create an item
+		$this->zbxTestClickWait("link=$template");
+		$this->zbxTestClickWait('link=Items');
+		$this->zbxTestClickWait('form');
+
+		$this->input_type('name', $itemName);
+		$this->input_type('key', $keyName);
+
+
+		$this->zbxTestClickWait('save');
+
+		switch ($result) {
+			case ITEM_GOOD:
+				$this->zbxTestTextPresent('Item added');
+				$this->checkTitle('Configuration of items');
+				$this->zbxTestTextPresent('CONFIGURATION OF ITEMS');
+				break;
+
+			case ITEM_BAD:
+				$this->checkTitle('Configuration of items');
+				$this->zbxTestTextPresent('CONFIGURATION OF ITEMS');
+				foreach ($errorMsgs as $msg) {
+					$this->zbxTestTextPresent($msg);
+				}
+				$this->zbxTestTextPresent('Host');
+				$this->zbxTestTextPresent('Name');
+				$this->zbxTestTextPresent('Key');
+				break;
+		}
+
+		switch ($result) {
+			case ITEM_GOOD:
+				// check that the inherited item matches the original
+				$this->zbxTestOpenWait('hosts.php');
+				$this->zbxTestClickWait('link=Template inheritance test host');
+				$this->zbxTestClickWait('link=Items');
+				$this->zbxTestTextPresent("$template: $itemName");
+				$this->zbxTestClickWait("link=$itemName");
+				$this->assertElementValue('name', $itemName);
+				$this->assertElementValue('key', $keyName);
+				break;
+			case ITEM_BAD:
+				break;
+		}
+	}
+
+	public function testFormItem_unlinkHost(){
+
+		$sql = "select hostid from hosts where host='Template App Zabbix Agent';";
+		$this->assertEquals(1, DBcount($sql));
+		$row = DBfetch(DBselect($sql));
+		$hostid = $row['hostid'];
+
+		$this->zbxTestLogin('hosts.php');
+		$this->zbxTestClickWait('link=Template inheritance test host');
+
+		$this->zbxTestClick('tab_templateTab');
+		sleep(1);
+		$this->zbxTestClickWait('unlink_and_clear_'.$hostid);
+		$this->zbxTestClickWait('save');
+
+		$this->zbxTestTextPresent('Host updated');
 	}
 
 	/**
