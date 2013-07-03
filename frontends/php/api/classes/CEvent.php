@@ -433,18 +433,19 @@ class CEvent extends CZBXAPI {
 
 		$this->validateAcknowledge($data);
 
-		$eventids = zbx_toHash($data['eventids']);
-		$sql = 'UPDATE events SET acknowledged=1 WHERE '.dbConditionInt('eventid', $eventids);
-		if (!DBexecute($sql)) {
+		$eventIds = zbx_toHash($data['eventids']);
+
+		if (!DBexecute('UPDATE events SET acknowledged=1 WHERE '.dbConditionInt('eventid', $eventIds))) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
 		}
 
 		$time = time();
 		$dataInsert = array();
-		foreach ($eventids as $eventid) {
+
+		foreach ($eventIds as $eventId) {
 			$dataInsert[] = array(
 				'userid' => self::$userData['userid'],
-				'eventid' => $eventid,
+				'eventid' => $eventId,
 				'clock' => $time,
 				'message'=> $data['message']
 			);
@@ -452,7 +453,7 @@ class CEvent extends CZBXAPI {
 
 		DB::insert('acknowledges', $dataInsert);
 
-		return array('eventids' => array_values($eventids));
+		return array('eventids' => array_values($eventIds));
 	}
 
 	/**
