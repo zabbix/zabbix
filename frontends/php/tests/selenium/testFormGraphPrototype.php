@@ -1104,23 +1104,29 @@ class testFormGraphPrototype extends CWebTest {
 		}
 
 		if (!isset($data['noItem'])) {
-		$this->zbxTestLaunchPopup('add_item');
-		$this->zbxTestClick('link='.$this->itemSimple);
-		$this->selectWindow(null);
-		sleep(1);
+			$this->zbxTestLaunchPopup('add_item');
+			sleep(1);
+			$this->zbxTestDropdownSelectWait('groupid', 'Zabbix servers');
+			$this->zbxTestDropdownSelectWait('hostid', $this->host);
+			$this->zbxTestClick('link='.$this->itemSimple);
+			$this->selectWindow(null);
+			sleep(1);
 
-		$this->zbxTestLaunchPopup('add_protoitem');
-		$this->zbxTestClick("//span[text()='"."$this->item"."']");
-		$this->selectWindow(null);
-		sleep(1);
+			$this->zbxTestLaunchPopup('add_protoitem');
+			$this->zbxTestClick("//span[text()='"."$this->item"."']");
+			$this->selectWindow(null);
+			sleep(1);
 
-			if(isset($data['removeItem'])) {
+			if (isset($data['removeItem'])) {
 				$this->zbxTestClick('items_0_remove');
 				sleep(1);
 				$this->zbxTestClick('items_0_remove');
 				sleep(1);
 
 				$this->zbxTestLaunchPopup('add_item');
+				sleep(1);
+				$this->zbxTestDropdownSelectWait('groupid', 'Zabbix servers');
+				$this->zbxTestDropdownSelectWait('hostid', $this->host);
 				$this->zbxTestClick('link='.$this->itemSimple);
 				$this->selectWindow(null);
 				sleep(1);
