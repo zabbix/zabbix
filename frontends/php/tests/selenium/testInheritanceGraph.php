@@ -64,7 +64,7 @@ class testInheritanceGraph extends CWebTest {
 	/**
 	 * @dataProvider update
 	 */
-/*	public function testInheritanceGraph_SimpleUpdate($data) {
+	public function testInheritanceGraph_SimpleUpdate($data) {
 		$name = $data['name'];
 
 		$sqlGraphs = "select * from graphs";
@@ -82,7 +82,7 @@ class testInheritanceGraph extends CWebTest {
 
 		$this->assertEquals($oldHashGraphs, DBhash($sqlGraphs));
 	}
-*/
+
 	// Returns create data
 	public static function create() {
 		return array(
@@ -95,7 +95,7 @@ class testInheritanceGraph extends CWebTest {
 					)
 				)
 			),
-		/*	array(
+			array(
 				array(
 					'expected' => GRAPH_GOOD,
 					'name' => 'graphSaveCheck',
@@ -316,7 +316,7 @@ class testInheritanceGraph extends CWebTest {
 						'ERROR: Cannot add graph',
 						'Graph with name "graphSimple" already exists in graphs or graph prototypes')
 				)
-			)*/
+			)
 		);
 	}
 
