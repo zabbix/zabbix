@@ -38,18 +38,18 @@ $bulk = ($_REQUEST['go'] == 'bulkacknowledge');
 //	VAR		TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 $fields = array(
 	'eventid' =>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
-	'triggers' =>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,		null),
-	'triggerid' =>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,		null),
-	'screenid' =>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,		null),
-	'events' =>			array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,		null),
-	'message' =>		array(T_ZBX_STR, O_OPT,	null,	$bulk ? null : NOT_EMPTY, 'isset({save})||isset({saveandreturn})'),
-	'backurl' =>		array(T_ZBX_STR, O_OPT,	null,	null,		null),
+	'triggers' =>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
+	'triggerid' =>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
+	'screenid' =>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
+	'events' =>			array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
+	'message' =>		array(T_ZBX_STR, O_OPT, null,	$bulk ? null : NOT_EMPTY, 'isset({save})||isset({saveandreturn})'),
+	'backurl' =>		array(T_ZBX_STR, O_OPT, null,	null,		null),
 	// actions
-	'go' =>				array(T_ZBX_STR, O_OPT,	P_SYS|P_ACT, null,	null),
+	'go' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	// form
-	'saveandreturn' =>	array(T_ZBX_STR, O_OPT,	P_ACT|P_SYS, null,	null),
-	'save' =>			array(T_ZBX_STR, O_OPT,	P_ACT|P_SYS, null,	null),
-	'cancel' =>			array(T_ZBX_STR, O_OPT,	P_SYS|P_ACT, null,	null)
+	'saveandreturn' =>	array(T_ZBX_STR, O_OPT, P_ACT|P_SYS, null,	null),
+	'save' =>			array(T_ZBX_STR, O_OPT, P_ACT|P_SYS, null,	null),
+	'cancel' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null)
 );
 check_fields($fields);
 
@@ -61,7 +61,7 @@ $_REQUEST['backurl'] = get_request('backurl', 'tr_status.php');
 if (isset($_REQUEST['cancel'])) {
 	ob_end_clean();
 
-	if (in_array($_REQUEST['backurl'], array('tr_events.php', 'events.php'), true)) {
+	if (in_array($_REQUEST['backurl'], array('tr_events.php', 'events.php'))) {
 		redirect($_REQUEST['backurl'].'?eventid='.$_REQUEST['eventid'].'&triggerid='.$_REQUEST['triggerid']);
 	}
 	elseif ($_REQUEST['backurl'] == 'screenedit.php') {
@@ -161,7 +161,7 @@ if (isset($_REQUEST['save']) || isset($_REQUEST['saveandreturn'])) {
 	if (isset($_REQUEST['saveandreturn'])) {
 		ob_end_clean();
 
-		if (in_array($_REQUEST['backurl'], array('tr_events.php', 'events.php'), true)) {
+		if (in_array($_REQUEST['backurl'], array('tr_events.php', 'events.php'))) {
 			redirect($_REQUEST['backurl'].'?eventid='.$_REQUEST['eventid'].'&triggerid='.$_REQUEST['triggerid']);
 		}
 		elseif ($_REQUEST['backurl'] == 'screenedit.php') {
@@ -189,7 +189,7 @@ echo SBR;
 
 if ($bulk) {
 	$title = _('Acknowledge alarm by');
-	$submitLabel = _('Acknowledge and return');
+	$saveAndReturnLabel = _('Acknowledge and return');
 }
 else {
 	$acknowledges = DBselect(
@@ -230,11 +230,11 @@ else {
 $messageTable = new CFormTable($title.' "'.CWebUser::$data['alias'].'"');
 $messageTable->addVar('backurl', $_REQUEST['backurl']);
 
-if (in_array($_REQUEST['backurl'], array('tr_events.php', 'events.php'), true)) {
+if (in_array($_REQUEST['backurl'], array('tr_events.php', 'events.php'))) {
 	$messageTable->addVar('eventid', $_REQUEST['eventid']);
 	$messageTable->addVar('triggerid', $_REQUEST['triggerid']);
 }
-elseif ($_REQUEST['backurl'] == 'screenedit.php' || $_REQUEST['backurl'] == 'screens.php') {
+elseif (in_array($_REQUEST['backurl'], array('screenedit.php', 'screens.php'))) {
 	$messageTable->addVar('screenid', $_REQUEST['screenid']);
 }
 
