@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 class API {
 
 	const RETURN_TYPE_API = 'api';
@@ -134,7 +135,7 @@ class API {
 	}
 
 	public static function getObject($className) {
-		return self::$return == self::RETURN_TYPE_API ? self::getApi($className) : self::getRpc($className);
+		return (self::$return == self::RETURN_TYPE_API) ? self::getApi($className) : self::getRpc($className);
 	}
 
 	/**

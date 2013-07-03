@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2013 Zabbix SIA
+** Copyright (C) 2000-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -9,7 +9,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -17,29 +17,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_STRPOOL_H
-#define ZABBIX_STRPOOL_H
+#ifndef JSON_PARSER_H_
+#define JSON_PARSER_H_
 
-#include "mutexs.h"
-#include "zbxalgo.h"
-#include "memalloc.h"
+#define SKIP_WHITESPACE(src)	\
+	while ('\0' != *src && NULL != strchr(ZBX_WHITESPACE, *src)) src++;
 
-typedef struct
-{
-	zbx_mem_info_t	*mem_info;
-	zbx_hashset_t	*hashset;
-}
-zbx_strpool_t;
-
-void		zbx_strpool_create(size_t size);
-void		zbx_strpool_destroy();
-
-const char	*zbx_strpool_intern(const char *str);
-const char	*zbx_strpool_acquire(const char *str);
-void		zbx_strpool_release(const char *str);
-
-void		zbx_strpool_clear();
-
-const zbx_strpool_t	*zbx_strpool_info();
+int	zbx_json_validate(const char *start, char **error);
 
 #endif

@@ -226,7 +226,7 @@ int	SYSTEM_SWAP_IN(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (NULL == tmp || '\0' == *tmp || 0 == strcmp(tmp, "count"))
 		ret = get_swap_io(&value, NULL, NULL, NULL);
-	else if (0 == strcmp(tmp,"pages"))
+	else if (0 == strcmp(tmp, "pages"))
 		ret = get_swap_io(NULL, &value, NULL, NULL);
 	else
 		ret =  SYSINFO_RET_FAIL;
@@ -256,7 +256,7 @@ int	SYSTEM_SWAP_OUT(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (NULL == tmp || '\0' == *tmp || 0 == strcmp(tmp, "count"))
 		ret = get_swap_io(NULL, NULL, &value, NULL);
-	else if (0 == strcmp(tmp,"pages"))
+	else if (0 == strcmp(tmp, "pages"))
 		ret = get_swap_io(NULL, NULL, NULL, &value);
 	else
 		ret = SYSINFO_RET_FAIL;
