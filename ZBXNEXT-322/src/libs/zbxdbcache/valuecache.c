@@ -2569,7 +2569,6 @@ static int	vch_item_get_value_range(zbx_vc_item_t *item,  zbx_vector_vc_value_t 
 	int			ret, now, records_read, hits, misses;
 
 	values->values_num = 0;
-	item->last_accessed = now;
 
 	now = ZBX_VC_TIME();
 
@@ -2642,8 +2641,6 @@ static int	vch_item_get_value(zbx_vc_item_t *item, const zbx_timespec_t *ts, zbx
 	zbx_vc_chunk_t		*chunk;
 
 	now = ZBX_VC_TIME();
-
-	item->last_accessed = now;
 
 	if (NULL == data->tail || data->tail->slots[data->tail->first_value].timestamp.sec > ts->sec)
 	{
@@ -2962,10 +2959,7 @@ static int	vcl_item_get_value_range(zbx_vc_item_t *item,  zbx_vector_vc_value_t 
 	}
 
 	if (SUCCEED == ret)
-	{
-		item->last_accessed = ZBX_VC_TIME();
 		vc_update_statistics(item, values->values_num, 0);
-	}
 
 	return ret;
 }
@@ -2998,7 +2992,6 @@ static int	vcl_item_get_value(zbx_vc_item_t *item, const zbx_timespec_t *ts, zbx
 				data->values[i].timestamp.sec < ts->sec)
 		{
 			vc_value_copy(value, &data->values[i], item->value_type);
-			item->last_accessed = ZBX_VC_TIME();
 			vc_update_statistics(item, 1, 0);
 			ret = SUCCEED;
 
@@ -3474,6 +3467,8 @@ out:
 			vc_update_statistics(NULL, 0, values->values_num);
 		}
 	}
+	else
+		item->last_accessed = ZBX_VC_TIME();
 
 	vc_try_unlock();
 
@@ -3568,6 +3563,8 @@ out:
 		if (SUCCEED == (ret = vc_db_read_value(itemid, value_type, ts, value)))
 			vc_update_statistics(NULL, 0, 1);
 	}
+	else
+		item->last_accessed = ZBX_VC_TIME();
 
 finish:
 	vc_try_unlock();
