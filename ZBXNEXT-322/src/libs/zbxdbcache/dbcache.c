@@ -1802,9 +1802,7 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 
 	if (sql_offset > 16)	/* In ORACLE always present begin..end; */
 	{
-		int	rc = DBexecute("%s", sql);
-
-		if (0 <= rc && 0 != (daemon_type & ZBX_DAEMON_TYPE_SERVER))
+		if (ZBX_DB_OK <= DBexecute("%s", sql) && 0 != (daemon_type & ZBX_DAEMON_TYPE_SERVER))
 		{
 			/* the history values were written into database, now add to value cache */
 			zbx_history_log_t	log;
@@ -2308,6 +2306,7 @@ int	DCsync_history(int sync_type)
 									zbx_strdup(NULL, cache->history[f].value.str);
 							cache->text_free += strlen(cache->history[f].value.str) + 1;
 						}
+						/* break; is not missing here */
 					case ITEM_VALUE_TYPE_STR:
 					case ITEM_VALUE_TYPE_TEXT:
 						history[history_num].value_orig.str =
