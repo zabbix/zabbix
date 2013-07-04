@@ -23,6 +23,7 @@
  * Creates global database connection
  *
  * @param string $error returns a message in case of an error
+ * @param bool $debug turns On or Off trace calls when making connections. Suggested debug mode Off during Zabbix setup
  * @return bool
  */
 function DBconnect(&$error) {
@@ -52,13 +53,13 @@ function DBconnect(&$error) {
 			case ZBX_DB_MYSQL:
 				$mysql_server = $DB['SERVER'].(!empty($DB['PORT']) ? ':'.$DB['PORT'] : '');
 
-				if (!$DB['DB'] = mysql_connect($mysql_server, $DB['USER'], $DB['PASSWORD'])) {
-					$error = 'Error connecting to database ['.mysql_error().']';
+				if (!$DB['DB'] = @mysql_connect($mysql_server, $DB['USER'], $DB['PASSWORD'])) {
+					$error = 'Error connecting to database ['.trim(mysql_error()).']';
 					$result = false;
 				}
 				else {
 					if (!mysql_select_db($DB['DATABASE'])) {
-						$error = 'Error database in selection ['.mysql_error().']';
+						$error = 'Error database in selection ['.trim(mysql_error()).']';
 						$result = false;
 					}
 					else {
@@ -78,7 +79,7 @@ function DBconnect(&$error) {
 					(!empty($DB['PASSWORD']) ? 'password=\''.pg_connect_escape($DB['PASSWORD']).'\' ' : '').
 					(!empty($DB['PORT']) ? 'port='.pg_connect_escape($DB['PORT']) : '');
 
-				$DB['DB']= pg_connect($pg_connection_string);
+				$DB['DB']= @pg_connect($pg_connection_string);
 				if (!$DB['DB']) {
 					$error = 'Error connecting to database';
 					$result = false;
@@ -89,6 +90,7 @@ function DBconnect(&$error) {
 						DBexecute('set bytea_output = escape');
 					}
 				}
+
 				if ($result) {
 					$dbBackend = new PostgresqlDbBackend();
 				}
@@ -106,7 +108,7 @@ function DBconnect(&$error) {
 					}
 				}
 
-				$DB['DB'] = oci_connect($DB['USER'], $DB['PASSWORD'], $connect);
+				$DB['DB'] = @oci_connect($DB['USER'], $DB['PASSWORD'], $connect);
 				if ($DB['DB']) {
 					DBexecute('ALTER SESSION SET NLS_NUMERIC_CHARACTERS='.zbx_dbstr('. '));
 				}
@@ -114,6 +116,7 @@ function DBconnect(&$error) {
 					$error = 'Error connecting to database';
 					$result = false;
 				}
+
 				if ($result) {
 					$dbBackend = new OracleDbBackend();
 				}
@@ -127,7 +130,7 @@ function DBconnect(&$error) {
 				$connect .= 'UID='.$DB['USER'].';';
 				$connect .= 'PWD='.$DB['PASSWORD'].';';
 
-				$DB['DB'] = db2_connect($connect, $DB['USER'], $DB['PASSWORD']);
+				$DB['DB'] = @db2_connect($connect, $DB['USER'], $DB['PASSWORD']);
 				if (!$DB['DB']) {
 					$error = 'Error connecting to database';
 					$result = false;
@@ -141,6 +144,7 @@ function DBconnect(&$error) {
 						DBexecute("SET CURRENT SCHEMA='".$DB['SCHEMA']."'");
 					}
 				}
+
 				if ($result) {
 					$dbBackend = new Db2DbBackend();
 				}
@@ -150,7 +154,7 @@ function DBconnect(&$error) {
 					init_sqlite3_access();
 					lock_sqlite3_access();
 					try{
-						$DB['DB'] = new SQLite3($DB['DATABASE'], SQLITE3_OPEN_READWRITE);
+						$DB['DB'] = @new SQLite3($DB['DATABASE'], SQLITE3_OPEN_READWRITE);
 					}
 					catch (Exception $e) {
 						$error = 'Error connecting to database';
@@ -162,6 +166,7 @@ function DBconnect(&$error) {
 					$error = 'Missing database';
 					$result = false;
 				}
+
 				if ($result) {
 					$dbBackend = new SqliteDbBackend();
 				}
@@ -1022,7 +1027,9 @@ function dbConditionInt($fieldName, array $values, $notIn = false) {
 				$betweens[] = array(bcsub($valueL, $len, 0), bcsub($valueL, 1, 0));
 			}
 			else {
-				$ins = array_merge($ins, array_slice($values, $pos - $len, $len));
+				foreach (array_slice($values, $pos - $len, $len) as $val) {
+					array_push($ins, $val);
+				}
 			}
 
 			$len = 1;
@@ -1038,7 +1045,9 @@ function dbConditionInt($fieldName, array $values, $notIn = false) {
 		$betweens[] = array(bcadd(bcsub($valueL, $len, 0), 1, 0), $valueL);
 	}
 	else {
-		$ins = array_merge($ins, array_slice($values, $pos - $len, $len));
+		foreach (array_slice($values, $pos - $len, $len) as $val) {
+			array_push($ins, $val);
+		}
 	}
 
 	$operand = $notIn ? 'AND' : 'OR';
