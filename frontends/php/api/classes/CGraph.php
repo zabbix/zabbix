@@ -20,11 +20,9 @@
 
 
 /**
- * File containing graph class for API.
+ * Class containing methods for operations with graph.
+ *
  * @package API
- */
-/**
- * Class containing methods for operations with graphs
  */
 class CGraph extends CGraphGeneral {
 

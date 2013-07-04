@@ -20,6 +20,8 @@
 
 
 /**
+ * Class containing methods for operations with graphs.
+ *
  * @package API
  */
 abstract class CGraphGeneral extends CZBXAPI {
@@ -504,6 +506,4 @@ abstract class CGraphGeneral extends CZBXAPI {
 
 		return $result;
 	}
-
-
 }
