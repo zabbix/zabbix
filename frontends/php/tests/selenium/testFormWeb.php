@@ -35,6 +35,13 @@ class testFormWeb extends CWebTest {
 	protected $host = 'Simple form test host';
 
 	/**
+	 * The name of the test template created in the test data set.
+	 *
+	 * @var string
+	 */
+	protected $template = 'Inheritance test template';
+
+	/**
 	 * The number of the test host created in the test data set.
 	 *
 	 * @var int
@@ -54,109 +61,291 @@ class testFormWeb extends CWebTest {
 			array(
 				array(
 					'agent' => 'Internet Explorer 10.0',
-					'authentication' => 'None'
+					'authentication' => 'None',
+					'host' => 'Simple form test host'
 				)
 			),
 			array(
 				array(
 					'agent' => 'Internet Explorer 10.0',
-					'authentication' => 'Basic authentication'
+					'authentication' => 'Basic authentication',
+					'host' => 'Simple form test host'
 				)
 			),
 			array(
 				array(
 					'agent' => 'Internet Explorer 10.0',
-					'authentication' => 'NTLM authentication'
+					'authentication' => 'NTLM authentication',
+					'host' => 'Simple form test host'
 				)
 			),
 			array(
 				array(
 					'agent' => 'Mozilla Firefox 8.0',
-					'authentication' => 'None'
+					'authentication' => 'None',
+					'host' => 'Simple form test host'
 				)
 			),
 			array(
 				array(
 					'agent' => 'Mozilla Firefox 8.0',
-					'authentication' => 'Basic authentication'
+					'authentication' => 'Basic authentication',
+					'host' => 'Simple form test host'
 				)
 			),
 			array(
 				array(
 					'agent' => 'Mozilla Firefox 8.0',
-					'authentication' => 'NTLM authentication'
+					'authentication' => 'NTLM authentication',
+					'host' => 'Simple form test host'
 				)
 			),
 			array(
 				array(
 					'agent' => 'Opera 12.00',
-					'authentication' => 'None'
+					'authentication' => 'None',
+					'host' => 'Simple form test host'
 				)
 			),
 			array(
 				array(
 					'agent' => 'Opera 12.00',
-					'authentication' => 'Basic authentication'
+					'authentication' => 'Basic authentication',
+					'host' => 'Simple form test host'
 				)
 			),
 			array(
 				array(
 					'agent' => 'Opera 12.00',
-					'authentication' => 'NTLM authentication'
+					'authentication' => 'NTLM authentication',
+					'host' => 'Simple form test host'
 				)
 			),
 			array(
 				array(
 					'agent' => 'Safari 5.0',
-					'authentication' => 'None'
+					'authentication' => 'None',
+					'host' => 'Simple form test host'
 				)
 			),
 			array(
 				array(
 					'agent' => 'Safari 5.0',
-					'authentication' => 'Basic authentication'
+					'authentication' => 'Basic authentication',
+					'host' => 'Simple form test host'
 				)
 			),
 			array(
 				array(
 					'agent' => 'Safari 5.0',
-					'authentication' => 'NTLM authentication'
+					'authentication' => 'NTLM authentication',
+					'host' => 'Simple form test host'
 				)
 			),
 			array(
 				array(
 					'agent' => 'Google Chrome 17',
-					'authentication' => 'None'
+					'authentication' => 'None',
+					'host' => 'Simple form test host'
 				)
 			),
 			array(
 				array(
 					'agent' => 'Google Chrome 17',
-					'authentication' => 'Basic authentication'
+					'authentication' => 'Basic authentication',
+					'host' => 'Simple form test host'
 				)
 			),
 			array(
 				array(
 					'agent' => 'Google Chrome 17',
-					'authentication' => 'NTLM authentication'
+					'authentication' => 'NTLM authentication',
+					'host' => 'Simple form test host'
 				)
 			),
 			array(
 				array(
 					'agent' => '(other ...)',
-					'authentication' => 'None'
+					'authentication' => 'None',
+					'host' => 'Simple form test host'
 				)
 			),
 			array(
 				array(
 					'agent' => '(other ...)',
-					'authentication' => 'Basic authentication'
+					'authentication' => 'Basic authentication',
+					'host' => 'Simple form test host'
 				)
 			),
 			array(
 				array(
 					'agent' => '(other ...)',
-					'authentication' => 'NTLM authentication'
+					'authentication' => 'NTLM authentication',
+					'host' => 'Simple form test host'
+				)
+			),
+			array(
+				array(
+					'template' => 'Inheritance test template',
+					'agent' => 'Internet Explorer 10.0',
+					'authentication' => 'None',
+					'template' => 'Inheritance test template'
+				)
+			),
+			array(
+				array(
+					'template' => 'Inheritance test template',
+					'agent' => 'Internet Explorer 10.0',
+					'authentication' => 'Basic authentication',
+					'template' => 'Inheritance test template'
+				)
+			),
+			array(
+				array(
+					'template' => 'Inheritance test template',
+					'agent' => 'Internet Explorer 10.0',
+					'authentication' => 'NTLM authentication',
+					'template' => 'Inheritance test template'
+				)
+			),
+			array(
+				array(
+					'template' => 'Inheritance test template',
+					'agent' => 'Mozilla Firefox 8.0',
+					'authentication' => 'None',
+					'template' => 'Inheritance test template'
+				)
+			),
+			array(
+				array(
+					'template' => 'Inheritance test template',
+					'agent' => 'Mozilla Firefox 8.0',
+					'authentication' => 'Basic authentication',
+					'template' => 'Inheritance test template'
+				)
+			),
+			array(
+				array(
+					'template' => 'Inheritance test template',
+					'agent' => 'Mozilla Firefox 8.0',
+					'authentication' => 'NTLM authentication',
+					'template' => 'Inheritance test template'
+				)
+			),
+			array(
+				array(
+					'template' => 'Inheritance test template',
+					'agent' => 'Opera 12.00',
+					'authentication' => 'None',
+					'template' => 'Inheritance test template'
+				)
+			),
+			array(
+				array(
+					'template' => 'Inheritance test template',
+					'agent' => 'Opera 12.00',
+					'authentication' => 'Basic authentication',
+					'template' => 'Inheritance test template'
+				)
+			),
+			array(
+				array(
+					'template' => 'Inheritance test template',
+					'agent' => 'Opera 12.00',
+					'authentication' => 'NTLM authentication',
+					'template' => 'Inheritance test template'
+				)
+			),
+			array(
+				array(
+					'template' => 'Inheritance test template',
+					'agent' => 'Safari 5.0',
+					'authentication' => 'None',
+					'template' => 'Inheritance test template'
+				)
+			),
+			array(
+				array(
+					'template' => 'Inheritance test template',
+					'agent' => 'Safari 5.0',
+					'authentication' => 'Basic authentication',
+					'template' => 'Inheritance test template'
+				)
+			),
+			array(
+				array(
+					'template' => 'Inheritance test template',
+					'agent' => 'Safari 5.0',
+					'authentication' => 'NTLM authentication',
+					'template' => 'Inheritance test template'
+				)
+			),
+			array(
+				array(
+					'template' => 'Inheritance test template',
+					'agent' => 'Google Chrome 17',
+					'authentication' => 'None',
+					'template' => 'Inheritance test template'
+				)
+			),
+			array(
+				array(
+					'template' => 'Inheritance test template',
+					'agent' => 'Google Chrome 17',
+					'authentication' => 'Basic authentication',
+					'template' => 'Inheritance test template'
+				)
+			),
+			array(
+				array(
+					'template' => 'Inheritance test template',
+					'agent' => 'Google Chrome 17',
+					'authentication' => 'NTLM authentication',
+					'template' => 'Inheritance test template'
+				)
+			),
+			array(
+				array(
+					'template' => 'Inheritance test template',
+					'agent' => '(other ...)',
+					'authentication' => 'None',
+					'template' => 'Inheritance test template'
+				)
+			),
+			array(
+				array(
+					'template' => 'Inheritance test template',
+					'agent' => '(other ...)',
+					'authentication' => 'Basic authentication',
+					'template' => 'Inheritance test template'
+				)
+			),
+			array(
+				array(
+					'template' => 'Inheritance test template',
+					'agent' => '(other ...)',
+					'authentication' => 'NTLM authentication',
+					'template' => 'Inheritance test template'
+				)
+			),
+			array(
+				array(
+					'host' => 'Simple form test host',
+					'form' => 'testFormWeb1'
+				)
+			),
+			array(
+				array(
+					'template' => 'Inheritance test template',
+					'form' => 'testInheritanceWeb1'
+				)
+			),
+			array(
+				array(
+					'host' => 'Template inheritance test host',
+					'form' => 'testInheritanceWeb1',
+					'templatedHost' => true,
+					'hostTemplate' => 'Inheritance test template'
 				)
 			)
 		);
@@ -166,17 +355,41 @@ class testFormWeb extends CWebTest {
 	 * @dataProvider layout
 	 */
 	public function testFormWeb_CheckLayout($data) {
-		$this->zbxTestLogin('hosts.php');
-		$this->zbxTestClickWait('link='.$this->host);
+		if (isset($data['template'])) {
+			$this->zbxTestLogin('templates.php');
+			$this->zbxTestClickWait('link='.$data['template']);
+		}
+
+		if (isset($data['host'])) {
+			$this->zbxTestLogin('hosts.php');
+			$this->zbxTestClickWait('link='.$data['host']);
+		}
+
 		$this->zbxTestClickWait('link=Web scenarios');
 
 		$this->checkTitle('Configuration of web monitoring');
 		$this->zbxTestTextPresent('CONFIGURATION OF WEB MONITORING');
 
-		$this->zbxTestClickWait('form');
+		if (isset($data['form'])) {
+			$this->zbxTestClickWait('link='.$data['form']);
+		}
+		else {
+			$this->zbxTestClickWait('form');
+		}
+
 		$this->checkTitle('Configuration of web monitoring');
 		$this->zbxTestTextPresent('CONFIGURATION OF WEB MONITORING');
 		$this->zbxTestTextPresent('Scenario');
+
+		if (isset($data['templatedHost'])) {
+			$this->zbxTestTextPresent('Parent web scenarios');
+			if (isset($data['hostTemplate'])) {
+				$this->assertElementPresent("//a[text()='".$data['hostTemplate']."']");
+			}
+		}
+		else {
+			$this->zbxTestTextNotPresent('Parent web scenarios');
+		}
 
 		if (isset($data['authentication'])) {
 			$this->zbxTestDropdownSelectWait('authentication', $data['authentication']);
@@ -200,7 +413,12 @@ class testFormWeb extends CWebTest {
 		$this->assertVisible('name');
 		$this->assertAttribute("//input[@id='name']/@maxlength", 64);
 		$this->assertAttribute("//input[@id='name']/@size", 50);
-		$this->assertAttribute("//input[@id='name']/@autofocus", 'autofocus');
+		if (isset($data['templatedHost'])) {
+			$this->assertAttribute("//input[@id='name']/@readonly", 'readonly');
+		}
+		else {
+			$this->assertAttribute("//input[@id='name']/@autofocus", 'autofocus');
+		}
 
 		$this->zbxTestTextPresent('Application');
 
@@ -246,10 +464,12 @@ class testFormWeb extends CWebTest {
 		$this->assertAttribute("//input[@id='retries']/@size", 2);
 		$this->assertAttribute("//input[@id='retries']/@value", 1);
 
-		if ($data['agent']!='(other ...)') {
+		if ((isset($data['agent']) && $data['agent'] !='(other ...)') || !isset($data['agent'])) {
 			$this->zbxTestTextPresent('Agent');
 			$this->assertVisible('agent');
-			$this->assertElementPresent("//select[@id='agent']/option[text()='(other ...)']");
+			if (!isset($data['form'])) {
+				$this->assertElementPresent("//select[@id='agent']/option[text()='(other ...)']");
+			}
 			$this->assertElementPresent("//select[@id='agent']/optgroup[@label='Internet Explorer']");
 			$this->assertElementPresent("//select[@id='agent']/optgroup[@label='Internet Explorer']/option[text()='Internet Explorer 10.0']");
 			$this->assertElementPresent("//select[@id='agent']/optgroup[@label='Internet Explorer']/option[text()='Internet Explorer 9.0']");
@@ -323,14 +543,47 @@ class testFormWeb extends CWebTest {
 		$this->assertAttribute("//input[@id='cancel']/@value", 'Cancel');
 		$this->assertAttribute("//input[@id='cancel']/@role", 'button');
 
+		if (isset($data['form']) && !isset($data['templatedHost'])) {
+			$this->assertVisible('clone');
+			$this->assertAttribute("//input[@id='clone']/@value", 'Clone');
+
+			$this->assertVisible('delete');
+			$this->assertAttribute("//input[@id='delete']/@value", 'Delete');
+		}
+		elseif (isset($data['form']) && isset($data['templatedHost']))  {
+			$this->assertVisible('clone');
+			$this->assertAttribute("//input[@id='clone']/@value", 'Clone');
+		}
+		else {
+			$this->assertElementNotPresent('clone');
+			$this->assertElementNotPresent('delete');
+		}
+
 		$this->zbxTestClick('link=Steps');
 		$this->zbxTestTextPresent('Steps');
 		$this->zbxTestTextPresent(array('Steps', 'Name', 'Timeout', 'URL', 'Required' ,'Status codes'));
 		$this->assertVisible('tab_stepTab');
 
-		$this->assertVisible('add_step');
-		$this->assertAttribute("//input[@id='add_step']/@value", 'Add');
-		$this->assertAttribute("//input[@id='add_step']/@type", 'button');
+		if (isset($data['form']) && !isset($data['templatedHost'])) {
+			$this->assertVisible('add_step');
+			$this->assertAttribute("//input[@id='add_step']/@value", 'Add');
+			$this->assertAttribute("//input[@id='add_step']/@type", 'button');
+
+			$this->assertVisible('remove_0');
+			$this->assertAttribute("//input[@id='remove_0']/@value", 'Remove');
+			$this->assertAttribute("//input[@id='remove_0']/@type", 'button');
+		}
+		elseif (!isset($data['form'])) {
+			$this->assertVisible('add_step');
+			$this->assertAttribute("//input[@id='add_step']/@value", 'Add');
+			$this->assertAttribute("//input[@id='add_step']/@type", 'button');
+
+			$this->assertElementNotPresent('remove_0');
+		}
+		else {
+			$this->assertElementNotPresent('add_step');
+			$this->assertElementNotPresent('remove_0');
+		}
 	}
 
 	// Returns update data
@@ -341,7 +594,7 @@ class testFormWeb extends CWebTest {
 	/**
 	 * @dataProvider update
 	 */
-	public function testFormWeb_SimpleUpdate($data) {
+/*	public function testFormWeb_SimpleUpdate($data) {
 		$name = $data['name'];
 
 		$sqlItems = "select * from items";
@@ -360,12 +613,12 @@ class testFormWeb extends CWebTest {
 
 		$this->assertEquals($oldHashItems, DBhash($sqlItems));
 	}
-
+*/
 	// Returns create data
 	public static function create() {
 		return array(
 			// Empty name/steps
-			array(
+		/*	array(
 				array(
 					'expected' => WEB_BAD,
 					'errors' => array(
@@ -1255,7 +1508,7 @@ class testFormWeb extends CWebTest {
 					'formCheck' => true,
 					'remove' => true
 				)
-			)
+			)*/
 		);
 	}
 
