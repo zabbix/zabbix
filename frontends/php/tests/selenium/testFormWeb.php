@@ -594,7 +594,7 @@ class testFormWeb extends CWebTest {
 	/**
 	 * @dataProvider update
 	 */
-/*	public function testFormWeb_SimpleUpdate($data) {
+	public function testFormWeb_SimpleUpdate($data) {
 		$name = $data['name'];
 
 		$sqlItems = "select * from items";
@@ -613,12 +613,12 @@ class testFormWeb extends CWebTest {
 
 		$this->assertEquals($oldHashItems, DBhash($sqlItems));
 	}
-*/
+
 	// Returns create data
 	public static function create() {
 		return array(
 			// Empty name/steps
-		/*	array(
+			array(
 				array(
 					'expected' => WEB_BAD,
 					'errors' => array(
@@ -1508,7 +1508,7 @@ class testFormWeb extends CWebTest {
 					'formCheck' => true,
 					'remove' => true
 				)
-			)*/
+			)
 		);
 	}
 
