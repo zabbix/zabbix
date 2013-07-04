@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-07-04 12:12+0300\n"
-"PO-Revision-Date: 2013-04-03 08:36+0200\n"
+"POT-Creation-Date: 2013-07-04 12:18+0300\n"
+"PO-Revision-Date: 2013-07-02 18:51+0200\n"
 "Last-Translator: dotneft <dotneft@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: ru\n"
@@ -120,7 +120,7 @@ msgstr "(без прокси)"
 
 #: include/blocks.inc.php:1467
 msgid "-"
-msgstr ""
+msgstr "-"
 
 #: popup.php:1732 popup.php:1733
 msgid "- all groups -"
@@ -909,11 +909,11 @@ msgstr "Пароль подключения (Bind password)"
 
 #: popup_trexpr.php:521
 msgid "Bitwise AND of last (most recent) T value and mask is = N"
-msgstr ""
+msgstr "Побитовое AND последних (наиболее новых) T значений и маска = N"
 
 #: popup_trexpr.php:526
 msgid "Bitwise AND of last (most recent) T value and mask is NOT N"
-msgstr ""
+msgstr "Побитовое AND последних (наиболее новых) T значений и маска NOT N"
 
 #: include/classes/core/ZBase.php:226
 msgid "Black & Blue"
@@ -1862,12 +1862,12 @@ msgstr "Невозможно сохранить правило обнаруже�
 #: api/classes/CItemGeneral.php:231
 #, php-format
 msgid "Cannot set \"%1$s\" for item \"%2$s\"."
-msgstr ""
+msgstr "Не удалось установить \"%1$s\" для элемента данных \"%2$s\"."
 
 #: api/classes/CTrigger.php:668
 #, php-format
 msgid "Cannot set \"%1$s\" for trigger \"%2$s\"."
-msgstr ""
+msgstr "Не удалось установить \"%1$s\" для триггера \"%2$s\"."
 
 #: api/classes/CApplication.php:341
 #, php-format
@@ -1945,12 +1945,12 @@ msgstr "Не удалось отсоединить триггер \"%s\", он �
 #: api/classes/CItemGeneral.php:198
 #, php-format
 msgid "Cannot update \"%1$s\" for item \"%2$s\"."
-msgstr ""
+msgstr "Не удалось обновить \"%1$s\" для элемента данных \"%2$s\"."
 
 #: api/classes/CTrigger.php:665
 #, php-format
 msgid "Cannot update \"%1$s\" for trigger \"%2$s\"."
-msgstr ""
+msgstr "Не удалось обновить \"%1$s\" для триггера \"%2$s\"."
 
 #: api/classes/CApplication.php:338
 #, php-format
@@ -2696,7 +2696,7 @@ msgstr "Создать группу элементов данных"
 
 #: include/views/configuration.application.list.php:30
 msgid "Create application (select host first)"
-msgstr ""
+msgstr "Создать группу элементов данных (выберите узел сети сначала)"
 
 #: include/views/configuration.discovery.list.php:27
 #: include/views/configuration.host.discovery.list.php:29
@@ -2738,7 +2738,7 @@ msgstr "Создать элемент данных"
 
 #: include/views/configuration.item.list.php:31
 msgid "Create item (select host first)"
-msgstr ""
+msgstr "Создать элемент данных (выберите узел сети сначала)"
 
 #: include/views/configuration.item.prototype.list.php:28
 msgid "Create item prototype"
@@ -2770,7 +2770,7 @@ msgstr "Создать сценарий"
 
 #: include/views/configuration.httpconf.list.php:29
 msgid "Create scenario (select host first)"
-msgstr ""
+msgstr "Создать сценарий (выберите узел сети сначала)"
 
 #: include/views/configuration.screen.list.php:27
 msgid "Create screen"
@@ -2794,7 +2794,7 @@ msgstr "Создать триггер"
 
 #: include/views/configuration.triggers.list.php:46
 msgid "Create trigger (select host first)"
-msgstr ""
+msgstr "Создать триггер (выберите узел сети сначала)"
 
 #: include/views/configuration.triggers.list.php:40
 msgid "Create trigger prototype"
@@ -4416,7 +4416,7 @@ msgstr "Детали источника события"
 
 #: include/actions.inc.php:94
 msgid "Event type"
-msgstr ""
+msgstr "Тип события"
 
 #: events.php:289 include/menu.inc.php:57 include/triggers.inc.php:1277
 #: jsLoader.php:111 search.php:135 search.php:217 search.php:274
@@ -6129,15 +6129,15 @@ msgstr "Некорректная задержка."
 #: include/classes/validators/event/CEventSourceObjectValidator.php:43
 #, php-format
 msgid "Incorrect event object \"%1$s\" (%2$s) for event source \"%3$s\" (%4$s), only the following objects are supported: %5$s."
-msgstr ""
+msgstr "Некорректный \"%1$s\" (%2$s) объект события для \"%3$s\" (%4$s) источника события, поддерживаются только следующие объекты: %5$s."
 
 #: api/classes/CAlert.php:355
 msgid "Incorrect eventobject value."
-msgstr ""
+msgstr "Некорректное значение eventobject."
 
 #: api/classes/CAlert.php:348
 msgid "Incorrect eventsource value."
-msgstr ""
+msgstr "Некорректное значение eventsource."
 
 #: include/classes/db/DB.php:543 include/classes/db/DB.php:710
 #, php-format
@@ -6300,7 +6300,7 @@ msgstr "Некорректный тип ноды."
 
 #: api/classes/CEvent.php:411
 msgid "Incorrect object value."
-msgstr ""
+msgstr "Некорректное значение объекта."
 
 #: api/classes/CAction.php:533 api/classes/CAction.php:568
 #, php-format
@@ -6402,7 +6402,7 @@ msgstr "Некорректный порядок сортировки для ус
 
 #: api/classes/CEvent.php:404
 msgid "Incorrect source value."
-msgstr ""
+msgstr "Некорректное значение источника."
 
 #: api/classes/CService.php:1231
 #, php-format
@@ -6821,11 +6821,11 @@ msgstr "Элемент данных удален"
 
 #: include/actions.inc.php:1127
 msgid "Item in \"normal\" state"
-msgstr ""
+msgstr "Элемент данных в \"нормальном\" состоянии"
 
 #: include/actions.inc.php:1126
 msgid "Item in \"not supported\" state"
-msgstr ""
+msgstr "Элемент данных в \"неподдерживаемом\" состоянии"
 
 #: include/forms.inc.php:1115
 msgid "Item prototype"
@@ -7561,11 +7561,11 @@ msgstr "Потерян"
 
 #: include/actions.inc.php:1129
 msgid "Low-level discovery rule in \"normal\" state"
-msgstr ""
+msgstr "Правило низкоуровневого обнаружения в \"нормальном\" состоянии"
 
 #: include/actions.inc.php:1128
 msgid "Low-level discovery rule in \"not supported\" state"
-msgstr ""
+msgstr "Правило низкоуровневого обнаружения в \"неподдерживаемом\" состоянии"
 
 #: include/func.inc.php:405 include/func.inc.php:614
 msgctxt "Mega short"
@@ -7825,7 +7825,7 @@ msgstr "Пометить выбранное"
 
 #: popup_trexpr.php:106
 msgid "Mask"
-msgstr ""
+msgstr "Маска"
 
 #: hosts.php:945 include/views/configuration.item.list.php:257
 #: include/views/configuration.item.massupdate.php:558
@@ -7890,7 +7890,7 @@ msgstr[2] "Максимальная длина имени узла сети %2$d
 #: include/views/configuration.item.edit.php:321
 #: include/views/configuration.item.massupdate.php:372
 msgid "Maximum number of flexible intervals added"
-msgstr ""
+msgstr "Добавлено максимальное количество переменных интервалов"
 
 #: popup_trexpr.php:259
 msgid "Maximum value for period T is < N"
@@ -8181,7 +8181,7 @@ msgstr "Ежемесячно"
 
 #: include/classes/class.cmultiselect.php:50 jsLoader.php:189
 msgid "More matches found..."
-msgstr ""
+msgstr "Найдено больше совпадений..."
 
 #: queue.php:165 queue.php:228
 msgid "More than 10 minutes"
@@ -8190,7 +8190,7 @@ msgstr "Более 10 минут"
 #: api/classes/CGraphGeneral.php:130
 #, php-format
 msgid "More than one graph with name \"%1$s\" within host."
-msgstr "Более чем один график с  именем \"%1$s\" у узла сети."
+msgstr "Более чем один график с именем \"%1$s\" у узла сети."
 
 #: report5.php:24
 msgid "Most busy triggers top 100"
@@ -8506,11 +8506,11 @@ msgstr "Нет заданных данных."
 
 #: popup_trexpr.php:511
 msgid "No data received during period of time T, then N = 1, 0 - otherwise"
-msgstr ""
+msgstr "Не получено данных в течении T периода времени, тогда N = 1, 0 - в противном случае"
 
 #: popup_trexpr.php:516
 msgid "No data received during period of time T, then N NOT 1, 0 - otherwise"
-msgstr ""
+msgstr "Не получено данных в течении T периода времени, тогда N NOT 1, 0 - в противном случае"
 
 #: api/classes/CHostInterface.php:818
 #, php-format
@@ -8624,7 +8624,7 @@ msgstr "История не найдена."
 
 #: api/classes/CHost.php:1415
 msgid "No host ID given."
-msgstr ""
+msgstr "ID узла сети не задан."
 
 #: api/classes/CDiscoveryRule.php:429
 msgid "No host IDs given."
@@ -8753,7 +8753,7 @@ msgstr "Карты сети не заданы."
 
 #: include/classes/class.cmultiselect.php:49 jsLoader.php:188
 msgid "No matches found"
-msgstr ""
+msgstr "Совпадения не найдены"
 
 #: include/views/administration.users.edit.php:133
 msgid "No media defined."
@@ -8880,7 +8880,7 @@ msgstr "Без прокси"
 
 #: api/classes/CProxy.php:367
 msgid "No proxy ID given."
-msgstr ""
+msgstr "ID прокси не задан."
 
 #: api/classes/CAction.php:1282
 #, php-format
@@ -8979,7 +8979,7 @@ msgstr "Триггеры не найдены."
 
 #: api/classes/CUser.php:566
 msgid "No user ID given."
-msgstr ""
+msgstr "ID пользователя не задан."
 
 #: include/views/administration.usergroups.list.php:42 popup.php:843
 #: popup_usrgrp.php:89
@@ -9406,7 +9406,7 @@ msgstr "Индикатор отображает только последние 
 
 #: api/classes/CEvent.php:718
 msgid "Only trigger events can be acknowledged."
-msgstr ""
+msgstr "Могут быть подтверждены только события триггеров."
 
 #: include/blocks.inc.php:749
 msgid "Only triggers assigned to enabled hosts and depending on enabled items are counted"
@@ -9774,7 +9774,7 @@ msgstr "Родительские правила обнаружения"
 
 #: include/views/configuration.graph.edit.php:51
 msgid "Parent graphs"
-msgstr ""
+msgstr "Родительские графики"
 
 #: include/views/configuration.item.edit.php:56
 msgid "Parent items"
@@ -9790,7 +9790,7 @@ msgstr "Родительские триггеры"
 
 #: include/views/configuration.httpconf.edit.php:51
 msgid "Parent web scenarios"
-msgstr ""
+msgstr "Родительские веб-сценарии"
 
 #: api/classes/CImage.php:283
 #, php-format
@@ -9960,7 +9960,7 @@ msgstr "Portuguese (pt_BR)"
 
 #: include/locales.inc.php:62
 msgid "Portuguese (pt_PT)"
-msgstr ""
+msgstr "Португальский (pt_PT)"
 
 #: tr_logform.php:303
 msgid "Position"
@@ -10550,7 +10550,7 @@ msgstr "Тип результата"
 
 #: httpconf.php:46 include/views/configuration.httpconf.edit.php:90
 msgid "Retries"
-msgstr ""
+msgstr "Попыток"
 
 #: include/actions.inc.php:821 include/classes/screens/CScreenActions.php:68
 #: include/classes/screens/CScreenActions.php:73
@@ -11265,7 +11265,7 @@ msgstr "Услуга не может быть родительской и под
 
 #: services.php:154
 msgid "Service created"
-msgstr ""
+msgstr "Услуга создана"
 
 #: services.php:107
 msgid "Service deleted"
@@ -11396,7 +11396,7 @@ msgstr "Показать выбранное"
 
 #: include/views/monitoring.dashconf.php:56
 msgid "Show selected groups"
-msgstr ""
+msgstr "Показать выбранные группы"
 
 #: include/views/configuration.screen.constructor.edit.php:280
 msgid "Show text as HTML"
@@ -11729,7 +11729,7 @@ msgstr "Шаг сценария"
 #: include/views/configuration.httpconf.popup.php:32
 #, php-format
 msgid "Step with name \"%1$s\" already exists."
-msgstr ""
+msgstr "Шаг с именем \"%1$s\" уже существует."
 
 #: httpconf.php:50 include/views/configuration.action.edit.php:328
 #: include/views/configuration.httpconf.edit.php:234
@@ -11777,7 +11777,7 @@ msgstr "Аудит успеха"
 
 #: popup_trexpr.php:345
 msgid "Sum of values of a period T is < N"
-msgstr ""
+msgstr "Сумма значений за период T < N"
 
 #: popup_trexpr.php:355
 msgid "Sum of values of a period T is = N"
@@ -11789,7 +11789,7 @@ msgstr "Сумма значений за период T > N"
 
 #: popup_trexpr.php:360
 msgid "Sum of values of a period T is NOT N"
-msgstr ""
+msgstr "Сумма значений за период T NOT N"
 
 #: include/func.inc.php:194
 msgid "Sun"
@@ -12372,11 +12372,11 @@ msgstr "У триггера есть элементы данных из шабл
 
 #: include/actions.inc.php:1131
 msgid "Trigger in \"normal\" state"
-msgstr ""
+msgstr "Триггер в \"нормальном\" состоянии"
 
 #: include/actions.inc.php:1130
 msgid "Trigger in \"unknown\" state"
-msgstr ""
+msgstr "Триггер в \"неизвестном\" состоянии"
 
 #: api/classes/CHostGeneral.php:274
 #, php-format
@@ -12457,7 +12457,7 @@ msgstr "Триггеры"
 
 #: include/classes/class.cserverinfo.php:64
 msgid "Triggers (e/d)[p/o]"
-msgstr ""
+msgstr "Триггеры (а/д)[п/о]"
 
 #: trigger_prototypes.php:287 triggers.php:355
 msgid "Triggers deleted"
@@ -12507,7 +12507,7 @@ msgstr "Вторник"
 
 #: include/locales.inc.php:67
 msgid "Turkish (tr_TR)"
-msgstr ""
+msgstr "Турецкий (tr_TR)"
 
 #: jsLoader.php:151
 msgid "Two elements should be selected"
