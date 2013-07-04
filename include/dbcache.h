@@ -202,6 +202,26 @@ typedef struct
 }
 zbx_config_hk_t;
 
+
+typedef struct
+{
+	zbx_uint64_t		itemid;
+	zbx_timespec_t		ts;
+	history_value_t		value;
+}
+zbx_item_history_value_t;
+
+/* item queue data */
+typedef struct
+{
+	zbx_uint64_t	itemid;
+	zbx_uint64_t	proxy_hostid;
+	int		type;
+	int		nextcheck;
+}
+zbx_queue_item_t;
+
+
 void	dc_add_history(zbx_uint64_t itemid, unsigned char value_type, unsigned char flags, AGENT_RESULT *value,
 		zbx_timespec_t *ts, unsigned char state, const char *error, int timestamp, const char *source,
 		int severity, int logeventid, zbx_uint64_t lastlogsize, int mtime);
@@ -297,5 +317,12 @@ void	DCget_user_macro(zbx_uint64_t *hostids, int host_num, const char *macro, ch
 
 int	DCconfig_update_host_availability(zbx_uint64_t hostid, unsigned char item_type, unsigned char available,
 		int errors_from, int disable_until);
+
+void	DCget_delta_items(zbx_hashset_t *items, const zbx_vector_uint64_t *ids);
+void	DCset_delta_items(zbx_hashset_t *items);
+
+void	DCfree_item_queue(zbx_vector_ptr_t *queue);
+void	DCget_item_queue(zbx_vector_ptr_t *queue, int from, int to);
+
 
 #endif

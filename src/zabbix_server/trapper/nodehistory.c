@@ -394,112 +394,6 @@ error:
 
 /******************************************************************************
  *                                                                            *
- * Function: update_items                                                     *
- *                                                                            *
- * Purpose: process record update                                             *
- *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:  SUCCEED - processed successfully                            *
- *                FAIL - an error occurred                                    *
- *                                                                            *
- * Author:                                                                    *
- *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
- ******************************************************************************/
-static int	process_items(char **sql, size_t *sql_alloc, size_t *sql_offset, int sender_nodeid, int nodeid, const ZBX_TABLE *table,
-		const char *record, int lastrecord)
-{
-	const char	*r;
-	int		f, res = FAIL;
-	zbx_uint64_t	itemid = 0;
-	char		*value_esc;
-	int		clock = 0, value_type = -1;
-	double		value_double = 0;
-	zbx_uint64_t	value_uint64 = 0;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In process_items()");
-
-	if (*sql_offset == 0)
-		DBbegin_multiple_update(sql, sql_alloc, sql_offset);
-
-	zbx_strcpy_alloc(sql, sql_alloc, sql_offset, "update items set prevvalue=lastvalue");
-
-	for (r = record, f = 0; table->fields[f].name != 0; f++)
-	{
-		if (0 != (table->flags & ZBX_HISTORY_SYNC) && 0 == (table->fields[f].flags & ZBX_HISTORY_SYNC))
-			continue;
-
-		if (NULL == r)
-			goto error;
-
-		zbx_get_next_field(&r, &buffer, &buffer_alloc, ZBX_DM_DELIMITER);
-
-		if (0 == strcmp(table->fields[f].name, "itemid"))
-			ZBX_STR2UINT64(itemid, buffer);
-
-		if (table->fields[f].type == ZBX_TYPE_INT ||
-				table->fields[f].type == ZBX_TYPE_UINT ||
-				table->fields[f].type == ZBX_TYPE_ID ||
-				table->fields[f].type == ZBX_TYPE_FLOAT)
-		{
-			if (0 == strcmp(table->fields[f].name, "clock"))
-			{
-				zbx_snprintf_alloc(sql, sql_alloc, sql_offset, ",lastclock=%s", buffer);
-				clock = atoi(buffer);
-			}
-			else if (0 == strcmp(table->fields[f].name, "value"))
-			{
-				zbx_snprintf_alloc(sql, sql_alloc, sql_offset, ",lastvalue=%s", buffer);
-
-				value_type = table->fields[f].type;
-				if (value_type == ZBX_TYPE_FLOAT)
-					value_double = atof(buffer);
-				else if (value_type == ZBX_TYPE_UINT)
-					ZBX_STR2UINT64(value_uint64, buffer);
-			}
-		}
-		else	/* ZBX_TYPE_TEXT, ZBX_TYPE_CHAR, ZBX_TYPE_SHORTTEXT, ZBX_TYPE_LONGTEXT */
-		{
-			if (0 == strcmp(table->fields[f].name, "value"))
-			{
-				zbx_hex2binary(buffer);
-				value_esc = DBdyn_escape_string_len(buffer, ITEM_LASTVALUE_LEN);
-				zbx_snprintf_alloc(sql, sql_alloc, sql_offset, ",lastvalue='%s'", value_esc);
-				zbx_free(value_esc);
-			}
-		}
-	}
-
-	if (value_type == ZBX_TYPE_FLOAT)
-		DBadd_trend(itemid, value_double, clock);
-	else if (value_type == ZBX_TYPE_UINT)
-		DBadd_trend_uint(itemid, value_uint64, clock);
-
-	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, " where itemid=" ZBX_FS_UI64 ";\n", itemid);
-
-	if (lastrecord || *sql_offset > ZBX_MAX_SQL_SIZE)
-	{
-		DBend_multiple_update(sql, sql_alloc, sql_offset);
-
-		if (DBexecute("%s", *sql) >= ZBX_DB_OK)
-			res = SUCCEED;
-		*sql_offset = 0;
-	}
-	else
-		res = SUCCEED;
-
-	return res;
-error:
-	zabbix_log(LOG_LEVEL_ERR, "NODE %d: received invalid record from node %d for node %d [%s]",
-		CONFIG_NODEID, sender_nodeid, nodeid, record);
-
-	return FAIL;
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: node_history                                                     *
  *                                                                            *
  * Purpose: process new history received from a slave node                    *
@@ -630,12 +524,6 @@ int	node_history(char *data, size_t datalen)
 			{
 				res = process_record(&sql1, &sql1_alloc, &sql1_offset, sender_nodeid,
 						nodeid, table, r, newline ? 0 : 1, acknowledges, &ack_eventids);
-
-				if (SUCCEED == res && 0 != history)
-				{
-					res = process_items(&sql2, &sql2_alloc, &sql2_offset, sender_nodeid,
-							nodeid, table, r, newline ? 0 : 1);
-				}
 
 				if (SUCCEED == res && NULL != table_sync && 0 != CONFIG_MASTER_NODEID)
 				{

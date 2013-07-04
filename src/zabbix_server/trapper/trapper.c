@@ -200,6 +200,227 @@ static void	recv_proxy_heartbeat(zbx_sock_t *sock, struct zbx_json_parse *jp)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
+#define ZBX_GET_QUEUE_OVERVIEW		0
+#define ZBX_GET_QUEUE_PROXY		1
+#define ZBX_GET_QUEUE_DETAILS		2
+
+/* queue stats split by delay times */
+typedef struct
+{
+	zbx_uint64_t	id;
+	int		delay5;
+	int		delay10;
+	int		delay30;
+	int		delay60;
+	int		delay300;
+	int		delay600;
+}
+zbx_queue_stats_t;
+
+/******************************************************************************
+ *                                                                            *
+ * Function: queue_stats_update                                               *
+ *                                                                            *
+ * Purpose: update queue stats with a new item delay                          *
+ *                                                                            *
+ * Parameters: stats   - [IN] the queue stats                                 *
+ *             delay   - [IN] the delay time of an delayed item               *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+static void	queue_stats_update(zbx_queue_stats_t *stats, int delay)
+{
+	if (5 < delay)
+	{
+		if (10 >= delay)
+			stats->delay5++;
+		else if (30 >= delay)
+			stats->delay10++;
+		else if (60 >= delay)
+			stats->delay30++;
+		else if (300 >= delay)
+			stats->delay60++;
+		else if (600 >= delay)
+			stats->delay300++;
+		else
+			stats->delay600++;
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: queue_stats_export                                               *
+ *                                                                            *
+ * Purpose: export queue stats to JSON format                                 *
+ *                                                                            *
+ * Parameters: queue_stats - [IN] a hashset containing item stats             *
+ *             id_name     - [IN] the name of stats id field                  *
+ *             json        - [OUT] the output JSON                            *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+static void	queue_stats_export(zbx_hashset_t *queue_stats, const char *id_name, struct zbx_json *json)
+{
+	zbx_hashset_iter_t	iter;
+	zbx_queue_stats_t	*stats;
+
+	zbx_json_addarray(json, "data");
+
+	zbx_hashset_iter_reset(queue_stats, &iter);
+	while (NULL != (stats = zbx_hashset_iter_next(&iter)))
+	{
+		zbx_json_addobject(json, NULL);
+		zbx_json_adduint64(json, id_name, stats->id);
+		zbx_json_adduint64(json, "delay5", stats->delay5);
+		zbx_json_adduint64(json, "delay10", stats->delay10);
+		zbx_json_adduint64(json, "delay30", stats->delay30);
+		zbx_json_adduint64(json, "delay60", stats->delay60);
+		zbx_json_adduint64(json, "delay300", stats->delay300);
+		zbx_json_adduint64(json, "delay600", stats->delay600);
+		zbx_json_close(json);
+	}
+
+	zbx_json_close(json);
+}
+
+/* queue item comparison function used to sort queue by nextcheck */
+static int	queue_compare_by_nextcheck_asc(void **d1, void **d2)
+{
+	zbx_queue_item_t	*i1 = *d1, *i2 = *d2;
+
+	return i1->nextcheck - i2->nextcheck;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: recv_getqueue                                                    *
+ *                                                                            *
+ * Purpose: process queue request                                             *
+ *                                                                            *
+ * Parameters:  sock  - [IN] the request socket                               *
+ *              jp    - [IN] the request data                                 *
+ *                                                                            *
+ * Return value:  SUCCEED - processed successfully                            *
+ *                FAIL - an error occurred                                    *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+static int	recv_getqueue(zbx_sock_t *sock, struct zbx_json_parse *jp)
+{
+	const char		*__function_name = "recv_getqueue";
+	int			ret = FAIL, request_type = -1, now, i;
+	char			type[MAX_STRING_LEN];
+	zbx_vector_ptr_t	queue;
+	struct zbx_json		json;
+	zbx_hashset_t		queue_stats;
+	zbx_queue_stats_t	*stats;
+	zbx_hashset_iter_t	iter;
+
+	if (FAIL == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_TYPE, type, sizeof(type)))
+		goto out;
+
+	if (0 == strcmp(type, ZBX_PROTO_VALUE_GET_QUEUE_OVERVIEW))
+		request_type = ZBX_GET_QUEUE_OVERVIEW;
+	else if (0 == strcmp(type, ZBX_PROTO_VALUE_GET_QUEUE_PROXY))
+		request_type = ZBX_GET_QUEUE_PROXY;
+	else if (0 == strcmp(type, ZBX_PROTO_VALUE_GET_QUEUE_DETAILS))
+		request_type = ZBX_GET_QUEUE_DETAILS;
+	else
+	{
+		zbx_send_response(sock, ret, "invalid 'get queue' request type", CONFIG_TIMEOUT);
+		goto out;
+	}
+
+	now = time(NULL);
+	DCget_item_queue(&queue, 6, -1);
+	zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
+
+	switch (request_type)
+	{
+		case ZBX_GET_QUEUE_OVERVIEW:
+			zbx_hashset_create(&queue_stats, 32, ZBX_DEFAULT_UINT64_HASH_FUNC,
+					ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+			/* gather queue stats by item type */
+			for (i = 0; i < queue.values_num; i++)
+			{
+				zbx_queue_item_t	*item = queue.values[i];
+				zbx_uint64_t		id = item->type;
+
+				if (NULL == (stats = zbx_hashset_search(&queue_stats,  &id)))
+				{
+					zbx_queue_stats_t	data = {id};
+
+					stats = zbx_hashset_insert(&queue_stats, &data, sizeof(data));
+				}
+				queue_stats_update(stats, now - item->nextcheck);
+			}
+
+			zbx_json_addstring(&json, ZBX_PROTO_TAG_RESPONSE, ZBX_PROTO_VALUE_SUCCESS, ZBX_JSON_TYPE_STRING);
+			queue_stats_export(&queue_stats, "itemtype", &json);
+			zbx_hashset_destroy(&queue_stats);
+
+			break;
+		case ZBX_GET_QUEUE_PROXY:
+			zbx_hashset_create(&queue_stats, 32, ZBX_DEFAULT_UINT64_HASH_FUNC,
+					ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+			/* gather queue stats by proxy hostid */
+			for (i = 0; i < queue.values_num; i++)
+			{
+				zbx_queue_item_t	*item = queue.values[i];
+				zbx_uint64_t		id = item->proxy_hostid;
+
+				if (NULL == (stats = zbx_hashset_search(&queue_stats,  &id)))
+				{
+					zbx_queue_stats_t	data = {id};
+
+					stats = zbx_hashset_insert(&queue_stats, &data, sizeof(data));
+				}
+				queue_stats_update(stats, now - item->nextcheck);
+			}
+
+			zbx_json_addstring(&json, ZBX_PROTO_TAG_RESPONSE, ZBX_PROTO_VALUE_SUCCESS, ZBX_JSON_TYPE_STRING);
+			queue_stats_export(&queue_stats, "proxyid", &json);
+			zbx_hashset_destroy(&queue_stats);
+
+			break;
+		case ZBX_GET_QUEUE_DETAILS:
+			zbx_vector_ptr_sort(&queue, (zbx_compare_func_t)queue_compare_by_nextcheck_asc);
+			zbx_json_addstring(&json, ZBX_PROTO_TAG_RESPONSE, ZBX_PROTO_VALUE_SUCCESS, ZBX_JSON_TYPE_STRING);
+			zbx_json_addarray(&json, "data");
+
+			for (i = 0; i < queue.values_num && i <= 500; i++)
+			{
+				zbx_queue_item_t	*item = queue.values[i];
+
+				zbx_json_addobject(&json, NULL);
+				zbx_json_adduint64(&json, "itemid", item->itemid);
+				zbx_json_adduint64(&json, "nextcheck", item->nextcheck);
+				zbx_json_close(&json);
+			}
+
+			zbx_json_close(&json);
+
+			break;
+	}
+	zbx_tcp_send_to(sock, json.buffer, CONFIG_TIMEOUT);
+
+	DCfree_item_queue(&queue);
+	zbx_json_free(&json);
+
+	ret = SUCCEED;
+out:
+	return ret;
+}
+
 static int	process_trap(zbx_sock_t	*sock, char *s)
 {
 	char	*pl, *pr, *data, value_dec[MAX_BUFFER_LEN];
@@ -342,6 +563,10 @@ static int	process_trap(zbx_sock_t	*sock, char *s)
 				else if (0 == strcmp(value, ZBX_PROTO_VALUE_COMMAND))
 				{
 					ret = node_process_command(sock, s, &jp);
+				}
+				else if (0 == strcmp(value, ZBX_PROTO_VALUE_GET_QUEUE))
+				{
+					ret = recv_getqueue(sock, &jp);
 				}
 				else
 					zabbix_log(LOG_LEVEL_WARNING, "unknown request received [%s]", value);

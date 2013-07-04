@@ -27,6 +27,7 @@
 #include "strpool.h"
 #include "zbxserver.h"
 #include "zbxalgo.h"
+#include "dbcache.h"
 
 static int	sync_in_progress = 0;
 #define	LOCK_CACHE	if (0 == sync_in_progress) zbx_mutex_lock(&config_lock)
@@ -185,6 +186,8 @@ typedef struct
 }
 ZBX_DC_CALCITEM;
 
+typedef zbx_item_history_value_t ZBX_DC_DELTAITEM;
+
 typedef struct
 {
 	zbx_uint64_t	hostid;
@@ -337,6 +340,7 @@ typedef struct
 	zbx_hashset_t		telnetitems;
 	zbx_hashset_t		jmxitems;
 	zbx_hashset_t		calcitems;
+	zbx_hashset_t		deltaitems;		/* history data for delta value calculations */
 	zbx_hashset_t		functions;
 	zbx_hashset_t		triggers;
 	zbx_hashset_t		trigdeps;
@@ -768,6 +772,7 @@ static void	DCsync_items(DB_RESULT result)
 	ZBX_DC_CALCITEM		*calcitem;
 	ZBX_DC_INTERFACE_ITEM	*interface_snmpitem;
 	ZBX_DC_ITEM_HK		*item_hk, item_hk_local;
+	ZBX_DC_DELTAITEM	*deltaitem;
 
 	time_t			now;
 	unsigned char		state, old_poller_type;
@@ -853,10 +858,7 @@ static void	DCsync_items(DB_RESULT result)
 		if (0 == found)
 		{
 			item->triggers = NULL;
-			if (SUCCEED != DBis_null(row[28]))
-				item->lastclock = atoi(row[28]);
-			else
-				item->lastclock = 0;
+			item->lastclock = 0;
 		}
 		else if (NULL != item->triggers && NULL == item->triggers[0])
 		{
@@ -941,9 +943,9 @@ static void	DCsync_items(DB_RESULT result)
 			snmpitem->snmpv3_securitylevel = (unsigned char)atoi(row[11]);
 			DCstrpool_replace(found, &snmpitem->snmpv3_authpassphrase, row[12]);
 			DCstrpool_replace(found, &snmpitem->snmpv3_privpassphrase, row[13]);
-			snmpitem->snmpv3_authprotocol = (unsigned char)atoi(row[29]);
-			snmpitem->snmpv3_privprotocol = (unsigned char)atoi(row[30]);
-			DCstrpool_replace(found, &snmpitem->snmpv3_contextname, row[31]);
+			snmpitem->snmpv3_authprotocol = (unsigned char)atoi(row[28]);
+			snmpitem->snmpv3_privprotocol = (unsigned char)atoi(row[29]);
+			DCstrpool_replace(found, &snmpitem->snmpv3_contextname, row[30]);
 		}
 		else if (NULL != (snmpitem = zbx_hashset_search(&config->snmpitems, &itemid)))
 		{
@@ -1270,6 +1272,11 @@ static void	DCsync_items(DB_RESULT result)
 			zbx_strpool_release(calcitem->params);
 			zbx_hashset_remove(&config->calcitems, &itemid);
 		}
+
+		/* delta items */
+
+		if (NULL != (deltaitem = zbx_hashset_search(&config->deltaitems, &itemid)))
+			zbx_hashset_remove(&config->deltaitems, &itemid);
 
 		/* items */
 
@@ -2350,8 +2357,7 @@ void	DCsync_configuration()
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	sec = zbx_time();
-	conf_result = DCsync_config_select();
+	sec = zbx_time();	conf_result = DCsync_config_select();
 	csec = zbx_time() - sec;
 
 	sec = zbx_time();
@@ -2361,7 +2367,7 @@ void	DCsync_configuration()
 				"i.snmpv3_securitylevel,i.snmpv3_authpassphrase,i.snmpv3_privpassphrase,"
 				"i.ipmi_sensor,i.delay,i.delay_flex,i.trapper_hosts,i.logtimefmt,i.params,"
 				"i.state,i.authtype,i.username,i.password,i.publickey,i.privatekey,"
-				"i.flags,i.interfaceid,i.lastclock,i.snmpv3_authprotocol,i.snmpv3_privprotocol,"
+				"i.flags,i.interfaceid,i.snmpv3_authprotocol,i.snmpv3_privprotocol,"
 				"i.snmpv3_contextname"
 			" from items i,hosts h"
 			" where i.hostid=h.hostid"
@@ -2552,6 +2558,8 @@ void	DCsync_configuration()
 			config->jmxitems.num_data, config->jmxitems.num_slots);
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() calcitems  : %d (%d slots)", __function_name,
 			config->calcitems.num_data, config->calcitems.num_slots);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() deltaitems  : %d (%d slots)", __function_name,
+			config->deltaitems.num_data, config->deltaitems.num_slots);
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() functions  : %d (%d slots)", __function_name,
 			config->functions.num_data, config->functions.num_slots);
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() triggers   : %d (%d slots)", __function_name,
@@ -2919,6 +2927,7 @@ void	init_configuration_cache()
 	CREATE_HASHSET(config->telnetitems);
 	CREATE_HASHSET(config->jmxitems);
 	CREATE_HASHSET(config->calcitems);
+	CREATE_HASHSET(config->deltaitems);
 	CREATE_HASHSET(config->functions);
 	CREATE_HASHSET(config->triggers);
 	CREATE_HASHSET(config->trigdeps);
@@ -4605,3 +4614,212 @@ void	DCget_user_macro(zbx_uint64_t *hostids, int host_num, const char *macro, ch
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DCget_delta_items                                                *
+ *                                                                            *
+ * Purpose: Get a copy of delta item history stored in configuration cache    *
+ *                                                                            *
+ * Parameters: items - [OUT] the copy of item history                         *
+ *             ids   - [IN] a vector of item ids to get the history for       *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Comments: The hahset is created in DCget_delta_items and must be later     *
+ *           destroyed by the caller with zbx_hashset_destroy() function      *
+ *                                                                            *
+ ******************************************************************************/
+void	DCget_delta_items(zbx_hashset_t *items, const zbx_vector_uint64_t *ids)
+{
+	ZBX_DC_DELTAITEM	*deltaitem;
+	int			i;
+
+	zbx_hashset_create(items, 1000, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+	LOCK_CACHE;
+
+	/* only FLOAT and UINT64 value types can be used for delta calculations, */
+	/* so just copying data is safe                                          */
+	for (i = 0; i < ids->values_num; i++)
+	{
+		if (NULL != (deltaitem = zbx_hashset_search(&config->deltaitems, &ids->values[i])))
+			zbx_hashset_insert(items, deltaitem, sizeof(ZBX_DC_DELTAITEM));
+
+	}
+	UNLOCK_CACHE;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DCset_delta_items                                                *
+ *                                                                            *
+ * Purpose: Updates delta item history data in cache                          *
+ *                                                                            *
+ * Parameters: items - [IN] the new delta item history data. If the timestamp *
+ *                          seconds is set to 0 then item history data is     *
+ *                          removed from cache.                               *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+void	DCset_delta_items(zbx_hashset_t *items)
+{
+	zbx_hashset_iter_t	iter;
+	ZBX_DC_DELTAITEM	*deltaitem, *item;
+
+	LOCK_CACHE;
+
+	zbx_hashset_iter_reset(items, &iter);
+	while (NULL != (item = zbx_hashset_iter_next(&iter)))
+	{
+		if (NULL == (deltaitem = zbx_hashset_search(&config->deltaitems, &item->itemid)))
+		{
+			if (0 != item->ts.sec)
+				zbx_hashset_insert(&config->deltaitems, item, sizeof(ZBX_DC_DELTAITEM));
+		}
+		else
+		{
+			if (0 != item->ts.sec)
+			{
+				if (0 < zbx_timespec_compare(&item->ts, &deltaitem->ts))
+				{
+					deltaitem->ts = item->ts;
+					deltaitem->value = item->value;
+				}
+			}
+			else
+				zbx_hashset_remove(&config->deltaitems, &item->itemid);
+		}
+	}
+
+	UNLOCK_CACHE;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DCfree_item_queue                                                *
+ *                                                                            *
+ * Purpose: frees the item queue data vector created by DCget_item_queue()    *
+ *                                                                            *
+ * Parameters: queue - [IN] the item queue data vector to free                *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+void	DCfree_item_queue(zbx_vector_ptr_t *queue)
+{
+	int	i;
+
+	for (i = 0; i < queue->values_num; i++)
+		free(queue->values[i]);
+
+	zbx_vector_ptr_destroy(queue);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DCget_item_queue                                                 *
+ *                                                                            *
+ * Purpose: retrieves vector of delayed items                                 *
+ *                                                                            *
+ * Parameters: queue - [OUT] the vector of delayed items                      *
+ *             from  - [IN] the minimum delay time in seconds or -1 if there  *
+ *                          is no minimum limit                               *
+ *             to    - [IN] the maximum delay time in seconds or -1 if there  *
+ *                          is no maximum limit                               *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+void	DCget_item_queue(zbx_vector_ptr_t *queue, int from, int to)
+{
+	zbx_hashset_iter_t	iter;
+	ZBX_DC_ITEM		*item;
+	ZBX_DC_HOST		*host;
+	ZBX_DC_FLEXITEM		*flex_item;
+	int			pass = FAIL, delay, nextcheck, now;
+	zbx_queue_item_t	*queue_item;
+
+	now = time(NULL);
+	zbx_vector_ptr_create(queue);
+
+	LOCK_CACHE;
+
+	zbx_hashset_iter_reset(&config->items, &iter);
+	while (NULL != (item = zbx_hashset_iter_next(&iter)))
+	{
+		if (ITEM_STATE_NORMAL != item->state)
+			continue;
+
+		if (ITEM_VALUE_TYPE_LOG == item->value_type)
+			continue;
+
+		if (ZBX_FLAG_DISCOVERY_CHILD == item->flags)
+			continue;
+
+		if (0 == item->lastclock)
+			continue;
+
+		if (NULL == (host = zbx_hashset_search(&config->hosts, &item->hostid)))
+			continue;
+
+		if (ITEM_TYPE_ZABBIX_ACTIVE == item->type || ITEM_TYPE_SSH == item->type ||
+				ITEM_TYPE_TELNET == item->type || ITEM_TYPE_SIMPLE == item->type ||
+				ITEM_TYPE_INTERNAL == item->type || ITEM_TYPE_DB_MONITOR == item->type ||
+				ITEM_TYPE_AGGREGATE == item->type || ITEM_TYPE_EXTERNAL == item->type ||
+				ITEM_TYPE_CALCULATED == item->type)
+		{
+			pass = SUCCEED;
+		}
+		else if (HOST_AVAILABLE_FALSE != host->available && ITEM_TYPE_ZABBIX == item->type)
+		{
+			pass = SUCCEED;
+		}
+		else if (HOST_AVAILABLE_FALSE != host->snmp_available && (ITEM_TYPE_SNMPv1 == item->type ||
+				ITEM_TYPE_SNMPv2c == item->type || ITEM_TYPE_SNMPv3 == item->type))
+		{
+			pass = SUCCEED;
+		}
+		else if (HOST_AVAILABLE_FALSE != host->ipmi_available && ITEM_TYPE_IPMI == item->type)
+		{
+			pass = SUCCEED;
+		}
+		else if (HOST_AVAILABLE_FALSE != host->jmx_available && ITEM_TYPE_JMX == item->type)
+		{
+			pass = SUCCEED;
+		}
+
+		if (SUCCEED != pass)
+			continue;
+
+		flex_item = zbx_hashset_search(&config->flexitems, &item->itemid);
+
+		nextcheck = calculate_item_nextcheck(item->interfaceid, item->itemid, item->type,
+				item->delay, NULL == flex_item ? NULL : flex_item->delay_flex, item->lastclock, &delay);
+
+		if (0 != host->proxy_hostid)
+			nextcheck = item->lastclock + delay;
+
+		if ((-1 != from && from > now - nextcheck) || (-1 != to && now - nextcheck > to))
+			continue;
+
+		queue_item = zbx_malloc(NULL, sizeof(zbx_queue_item_t));
+		queue_item->itemid = item->itemid;
+		queue_item->type = item->type;
+		queue_item->proxy_hostid = host->proxy_hostid;
+		queue_item->nextcheck = nextcheck;
+
+		zbx_vector_ptr_append(queue, queue_item);
+	}
+
+	UNLOCK_CACHE;
+}
+
+
