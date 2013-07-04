@@ -518,10 +518,10 @@ void	get_proxyconfig_data(zbx_uint64_t proxy_hostid, struct zbx_json *j)
  *          abc\0   - the field can not be NULL and is a string "abc"         *
  *                                                                            *
  ******************************************************************************/
-static void	remember_record(const ZBX_FIELD **fields, size_t fields_count, char **recs, size_t *recs_alloc,
+static void	remember_record(const ZBX_FIELD **fields, int fields_count, char **recs, size_t *recs_alloc,
 		size_t *recs_offset, DB_ROW row)
 {
-	size_t	f;
+	int	f;
 
 	for (f = 0; f < fields_count; f++)
 	{
@@ -566,9 +566,9 @@ static int	id_offset_compare_func(const void *d1, const void *d2)
  * Purpose: find a number of the field                                        *
  *                                                                            *
  ******************************************************************************/
-static int	find_field_by_name(const ZBX_FIELD **fields, size_t fields_count, const char *field_name)
+static int	find_field_by_name(const ZBX_FIELD **fields, int fields_count, const char *field_name)
 {
-	size_t	f;
+	int	f;
 
 	for (f = 0; f < fields_count; f++)
 	{
@@ -675,7 +675,7 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 		zbx_vector_uint64_t *del, char **error)
 {
 	const char		*__function_name = "process_proxyconfig_table";
-	int			insert, is_null, i, ret = FAIL, id_field_nr = 0,
+	int			f, fields_count = 0, insert, is_null, i, ret = FAIL, id_field_nr = 0,
 				move_out = 0, move_field_nr = 0;
 	const ZBX_FIELD		*fields[ZBX_MAX_FIELDS];
 	struct zbx_json_parse	jp_data, jp_row;
@@ -685,8 +685,7 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 	zbx_vector_uint64_t	ins, moves;
 	char			*sql = NULL, *recs = NULL;
 	size_t			sql_alloc = 4 * ZBX_KIBIBYTE, sql_offset,
-				recs_alloc = 20 * ZBX_KIBIBYTE, recs_offset = 0,
-				fields_count = 0, f;
+				recs_alloc = 20 * ZBX_KIBIBYTE, recs_offset = 0;
 	DB_RESULT		result;
 	DB_ROW			row;
 	zbx_hashset_t           h_id_offsets, h_del;
