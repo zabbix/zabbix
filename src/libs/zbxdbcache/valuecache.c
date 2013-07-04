@@ -1386,7 +1386,7 @@ static zbx_vc_item_t	*vc_add_item(zbx_uint64_t itemid, int value_type, int secon
 		int timestamp, const zbx_timespec_t *ts, zbx_vector_vc_value_t *values)
 {
 	int			ret = FAIL, now;
-	zbx_vc_item_t		*item;
+	zbx_vc_item_t		*item = NULL;
 
 	now = ZBX_VC_TIME();
 
@@ -2145,7 +2145,7 @@ static int	vch_item_add_values_at_end(zbx_vc_item_t *item, const zbx_vc_value_t 
 	if (NULL != data->head && 0 < vc_value_compare_asc_func(&data->head->slots[data->head->last_value], values))
 	{
 		zbx_vc_chunk_t	*chunk;
-		int		index, start = 0;
+		int		index, start = 0, now;
 
 		/* To avoid creating potential holes in cache skip adding values with timestamps */
 		/* lower than the first value in cache.                                          */
@@ -2153,6 +2153,17 @@ static int	vch_item_add_values_at_end(zbx_vc_item_t *item, const zbx_vc_value_t 
 		{
 			if (0 >= vc_value_compare_asc_func(&data->tail->slots[data->tail->first_value], &values[start]))
 				break;
+		}
+
+		if (0 < start)
+		{
+			/* if some of values were not added to cache, the cached_all flag */
+			/* must be reset and the maximum request range adjusted           */
+			data->cached_all = 0;
+
+			now = ZBX_VC_TIME();
+			if (now - values[start - 1].timestamp.sec <= data->range)
+				data->range = now - values[start - 1].timestamp.sec - 1;
 		}
 
 		if (start >= values_num)
@@ -2338,7 +2349,7 @@ static int	vch_item_cache_values_by_time(zbx_vc_item_t *item, int seconds, int t
 	}
 
 	/* update cache if necessary */
-	if (0 < update_seconds)
+	if (0 < update_seconds && 0 == data->cached_all)
 	{
 		zbx_vector_vc_value_t	records;
 
@@ -2566,11 +2577,9 @@ static int	vch_item_get_value_range(zbx_vc_item_t *item,  zbx_vector_vc_value_t 
 		int timestamp)
 {
 	zbx_vc_data_history_t	*data = &item->data.history;
-	int			ret, now, records_read, hits, misses;
+	int			ret, records_read, hits, misses;
 
 	values->values_num = 0;
-
-	now = ZBX_VC_TIME();
 
 	if (0 == count)
 	{
@@ -2943,12 +2952,8 @@ static int	vcl_item_get_value_range(zbx_vc_item_t *item,  zbx_vector_vc_value_t 
 
 	if (0 == count)
 	{
-		for (i = start; i < item->values_total; i++)
-		{
-			if (data->values[i].timestamp.sec > timestamp - seconds)
-				vc_value_vector_append(values, item->value_type, &data->values[i]);
-		}
-		ret = SUCCEED;
+		/* only count based requests are supported by lastvalue storage mode */
+		ret = FAIL;
 	}
 	else
 	{
@@ -3019,9 +3024,20 @@ out:
  ******************************************************************************/
 static void	vcl_item_get_values(const zbx_vc_item_t *item, zbx_vector_vc_value_t *values)
 {
-	/* In lastvalue mode there is no guarantees that values with the same */
-	/* timestamp seconds are no split between cache and DB. So return     */
-	/* empty cache, forcing converter it to re-read it from DB.           */
+	const zbx_vc_data_lastvalue_t		*data = &item->data.lastvalue;
+
+	/* In lastvalue mode there is no guarantees that values with the same  */
+	/* timestamp seconds are no split between cache and DB. The exception  */
+	/* is when only one value is stored (meaning there are no more history */
+	/* data).                                                              */
+	if (1 == item->values_total)
+	{
+		zbx_vc_value_t	value;
+
+		vc_value_copy(&value, &data->values[0], item->value_type);
+		zbx_vector_vc_value_append_ptr(values, &value);
+	}
+
 	return;
 }
 
@@ -3071,6 +3087,15 @@ static int	vcl_supports_request(zbx_vc_item_t *item, int seconds, int count, int
 	}
 	if (0 != count) /* count request */
 	{
+		if (2 > item->values_total)
+		{
+			/* lastvalue storage mode always cashes 2 values. The only exception is when */
+			/* there are not enough historical data. In this case all data (0-1 records) */
+			/* are cached and any request can be processed.                              */
+			ret = SUCCEED;
+			goto out;
+		}
+
 		/* check if the cache contains the requested number of values before timestamp */
 		for (i = item->values_total - 1; i >= 0 && 0 < count; i--)
 		{
@@ -3086,13 +3111,7 @@ static int	vcl_supports_request(zbx_vc_item_t *item, int seconds, int count, int
 		goto out;
 	}
 
-	/* seconds request */
-
-	/* only if the last cached value is outside the requested time period */
-	/* we can be sure that the request range is fully cached              */
-	if (data->values[item->values_total - 1].timestamp.sec <= timestamp - seconds)
-		ret = SUCCEED;
-
+	/* seconds request is not supported by lastvalue storage mode */
 out:
 	return ret;
 }
@@ -3124,30 +3143,17 @@ static int	vcl_init(zbx_vc_item_t *item, zbx_vector_vc_value_t *values, int seco
 {
 	int	ret = FAIL;
 
-	if (0 == values->values_num)
+	/* lastvalue storage mode supports only count based requests and */
+	/* can store only 2 values - last and previous                   */
+	if (0 == seconds && 2 >= values->values_num)
 	{
-		/* Only with count based requests we can be sure that DB really does  */
-		/* not contain any data. Otherwise the data might need to be fetched  */
-		/* from DB later, which is not supported by lastvalue storage mode.   */
-		if (0 == seconds)
-			ret = SUCCEED;
+		if (SUCCEED == (ret = vcl_item_add_values(item, values->values, values->values_num)))
+			vc_update_statistics(item, 0, values->values_num);
 	}
-	else
-	{
-		/* lastvalue storage mode can store only 2 values - last and previous */
-		if (values->values_num <= 2)
-			ret = SUCCEED;
-	}
-
-	if (SUCCEED == ret)
-		ret = vcl_item_add_values(item, values->values, values->values_num);
-
-	if (SUCCEED == ret)
-		vc_update_statistics(item, 0, values->values_num);
-
 
 	return ret;
 }
+
 
 /******************************************************************************
  *                                                                            *
@@ -3468,8 +3474,10 @@ out:
 		}
 	}
 	else
-		item->last_accessed = ZBX_VC_TIME();
-
+	{
+		if (NULL != item)
+			item->last_accessed = ZBX_VC_TIME();
+	}
 	vc_try_unlock();
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s count:%d cached:%d",
@@ -3555,17 +3563,16 @@ out:
 
 	if (FAIL == ret)
 	{
-		if (NULL != item)
-			vc_remove_item(item);
-
 		cache_used = 0;
 
 		if (SUCCEED == (ret = vc_db_read_value(itemid, value_type, ts, value)))
 			vc_update_statistics(NULL, 0, 1);
 	}
 	else
-		item->last_accessed = ZBX_VC_TIME();
-
+	{
+		if (NULL != item)
+			item->last_accessed = ZBX_VC_TIME();
+	}
 finish:
 	vc_try_unlock();
 
