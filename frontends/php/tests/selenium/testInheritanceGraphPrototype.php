@@ -47,14 +47,14 @@ class testInheritanceGraphPrototype extends CWebTest {
 	 *
 	 * @var string
 	 */
-	protected $discoveryRule = 'discoveryRuleTest';
+	protected $discoveryRule = 'testInheritanceDiscoveryRule';
 
 	/**
 	 * The name of the test discovery rule key created in the test data set.
 	 *
 	 * @var string
 	 */
-	protected $discoveryKey = 'discovery-rule-test';
+	protected $discoveryKey = 'inheritance-discovery-rule';
 
 	/**
 	 * The name of the test item created in the test data set.
