@@ -36,6 +36,7 @@
 
 static char	*sysfs_read_attr(const char *device);
 static void	get_device_sensors(int do_task, const char *device, const char *name, double *aggr, int *cnt);
+int	get_device_info(const char *dev_path, const char *dev_name, char *device_info);
 
 static void	count_sensor(int do_task, const char *filename, double *aggr, int *cnt)
 {
@@ -68,18 +69,23 @@ static void	count_sensor(int do_task, const char *filename, double *aggr, int *c
 		{
 			case DO_ONE:
 				*aggr = value;
+				printf("DO_ONE\n");
 				break;
 			case DO_AVG:
+				printf("DO_AVG\n");
 				*aggr += value;
 				break;
 			case DO_MAX:
+				printf("DO_MAX\n");
 				*aggr = (1 == *cnt ? value : MAX(*aggr, value));
 				break;
 			case DO_MIN:
+				printf("DO_MIN\n");
 				*aggr = (1 == *cnt ? value : MIN(*aggr, value));
 				break;
 		}
 	}
+	printf("Value from file %s: %f, aggr: %f, cnt: %d\n", filename, value, *aggr, *cnt);
 }
 
 static void	get_device_sensors(int do_task, const char *device, const char *name, double *aggr, int *cnt)
@@ -140,7 +146,7 @@ static void	get_device_sensors(int do_task, const char *device, const char *name
 	char		deviced[MAX_STRING_LEN];
 	char		device_info[MAX_STRING_LEN];
 	int		dev_len;
-	char		*bus, *addr, *device_p;
+	char		*device_p;
 	int		err;
 
 	zbx_snprintf(hwmon_dir, sizeof(hwmon_dir), "%s", DEVICE_DIR);
@@ -155,8 +161,6 @@ static void	get_device_sensors(int do_task, const char *device, const char *name
 
 	while(NULL != (deviceent = readdir(devicedir)))
 	{
-		struct stat st;
-
 		if(strcmp(deviceent->d_name, ".") == 0 || strcmp(deviceent->d_name, "..") == 0)
 			continue;
 
@@ -181,6 +185,7 @@ static void	get_device_sensors(int do_task, const char *device, const char *name
 			if (DO_ONE == do_task)
 			{
 				zbx_snprintf(sensorname, sizeof(sensorname), "%s/%s_input", devicepath, name);
+				printf("Filename: %s\n", sensorname);
 				count_sensor(do_task, sensorname, aggr, cnt);
 			}
 			else
@@ -215,7 +220,6 @@ int	get_device_info(const char *dev_path, const char *dev_name, char *device_inf
 	char		*subsys, *prefix;
 	int		domain, bus, slot, fn, addr, vendor, product;
 	short int	bus_spi, bus_i2c;
-	int		err;
 	char		*bus_attr;
 	int		sub_len;
 
@@ -375,6 +379,8 @@ int	GET_SENSOR(AGENT_REQUEST *request, AGENT_RESULT *result)
 		return SYSINFO_RET_FAIL;
 
 	get_device_sensors(do_task, device, name, &aggr, &cnt);
+
+	printf("aggr: %f, cnt: %d\n", aggr, cnt);
 
 	if (0 == cnt)
 		return SYSINFO_RET_FAIL;
