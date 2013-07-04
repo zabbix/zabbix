@@ -1786,7 +1786,7 @@ function getPagingLine(&$items) {
 			$pageLine[] = ' | ';
 		}
 
-		array_pop($pageline);
+		array_pop($pageLine);
 
 		if ($currentPage < $pagesCount) {
 			$pageLine[] = ' | ';
