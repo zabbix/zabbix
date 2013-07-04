@@ -1521,7 +1521,7 @@ static int	DBitem_lastvalue(const char *expression, char **lastvalue, int N_func
 		goto fail;
 
 	result = DBselect(
-			"select itemid,value_type,valuemapid,units,lastvalue"
+			"select itemid,value_type,valuemapid,units"
 			" from items"
 			" where itemid=" ZBX_FS_UI64,
 			itemid);
@@ -1537,25 +1537,25 @@ static int	DBitem_lastvalue(const char *expression, char **lastvalue, int N_func
 		value_type = atoi(row[1]);
 		ZBX_DBROW2UINT64(valuemapid, row[2]);
 
+		h_value = DBget_history(itemid, value_type, ZBX_DB_GET_HIST_VALUE, 0, 0, NULL, NULL, 1);
+
+		if (NULL == h_value[0])
+			goto fail;
+
 		switch (value_type)
 		{
 			case ITEM_VALUE_TYPE_LOG:
 			case ITEM_VALUE_TYPE_TEXT:
-				h_value = DBget_history(itemid, value_type, ZBX_DB_GET_HIST_VALUE, 0, 0, NULL, NULL, 1);
-
-				if (NULL != h_value[0])
-					*lastvalue = zbx_strdup(*lastvalue, h_value[0]);
-				else
-					ZBX_STRDUP(*lastvalue, row[4]);
-
-				DBfree_history(h_value);
+				*lastvalue = zbx_strdup(*lastvalue, h_value[0]);
 				break;
 			default:
-				zbx_strlcpy(tmp, row[4], sizeof(tmp));
+				zbx_strlcpy(tmp, h_value[0], sizeof(tmp));
 				zbx_format_value(tmp, sizeof(tmp), valuemapid, row[3], value_type);
 				ZBX_STRDUP(*lastvalue, tmp);
 				break;
 		}
+		DBfree_history(h_value);
+
 		ret = SUCCEED;
 	}
 	DBfree_result(result);
@@ -3809,7 +3809,6 @@ static void	zbx_evaluate_item_functions(zbx_vector_ptr_t *ifuncs)
 			else
 				func->value = zbx_strdup(func->value, value);
 		}
-		DBfree_item_from_db(&item);	/* free cached historical fields item.h_* */
 	}
 	DBfree_result(result);
 

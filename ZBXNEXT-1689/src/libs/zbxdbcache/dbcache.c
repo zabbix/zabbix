@@ -875,12 +875,10 @@ static int	DBchk_double(double value)
  *             h    - [IN/OUT] a reference to history cache value             *
  *                                                                            *
  ******************************************************************************/
-static void	DCadd_update_item_sql(size_t *sql_offset, DB_ITEM *item, ZBX_DC_HISTORY *h)
+static void	DCadd_update_item_sql(size_t *sql_offset, DB_ITEM *item, ZBX_DC_HISTORY *h,
+		zbx_item_history_value_t *deltaitem)
 {
-	char	*value_esc;
-
-	zbx_snprintf_alloc(&sql, &sql_alloc, sql_offset, "update items set lastclock=%d,lastns=%d",
-			h->ts.sec, h->ts.ns);
+	char	*value_esc, *sql_start = "update items set ", *sql_continue = ",";
 
 	if (ITEM_STATE_NOTSUPPORTED == h->state)
 		goto notsupported;
@@ -891,11 +889,8 @@ static void	DCadd_update_item_sql(size_t *sql_offset, DB_ITEM *item, ZBX_DC_HIST
 			switch (item->delta)
 			{
 				case ITEM_STORE_AS_IS:
-					if (0 == item->prevorgvalue_null)
-					{
-						zbx_strcpy_alloc(&sql, &sql_alloc, sql_offset, ",prevorgvalue=null");
-						item->prevorgvalue_null = 1;
-					}
+					if (NULL != deltaitem)
+						deltaitem->ts.sec = 0;
 
 					h->value.dbl = multiply_item_value_float(item, h->value_orig.dbl);
 
@@ -906,13 +901,13 @@ static void	DCadd_update_item_sql(size_t *sql_offset, DB_ITEM *item, ZBX_DC_HIST
 					}
 					break;
 				case ITEM_STORE_SPEED_PER_SECOND:
-					if (0 == item->prevorgvalue_null && item->prevorgvalue.dbl <= h->value_orig.dbl &&
-							(item->lastclock < h->ts.sec ||
-								(item->lastclock == h->ts.sec && item->lastns < h->ts.ns)))
+					if (NULL != deltaitem && 0 != deltaitem->ts.sec &&
+							deltaitem->value.dbl <= h->value_orig.dbl &&
+							0 > zbx_timespec_compare(&deltaitem->ts, &h->ts))
 					{
-						h->value.dbl = (h->value_orig.dbl - item->prevorgvalue.dbl) /
-								((h->ts.sec - item->lastclock) +
-									(double)(h->ts.ns - item->lastns) / 1000000000);
+						h->value.dbl = (h->value_orig.dbl - deltaitem->value.dbl) /
+								((h->ts.sec - deltaitem->ts.sec) +
+									(double)(h->ts.ns - deltaitem->ts.ns) / 1000000000);
 						h->value.dbl = multiply_item_value_float(item, h->value.dbl);
 
 						if (SUCCEED != DBchk_double(h->value.dbl))
@@ -924,17 +919,11 @@ static void	DCadd_update_item_sql(size_t *sql_offset, DB_ITEM *item, ZBX_DC_HIST
 					else
 						h->value_null = 1;
 
-					if (ITEM_STATE_NOTSUPPORTED != h->state)
-					{
-						zbx_snprintf_alloc(&sql, &sql_alloc, sql_offset,
-								",prevorgvalue='" ZBX_FS_DBL "'", h->value_orig.dbl);
-						item->prevorgvalue_null = 0;
-					}
-					break;
 				case ITEM_STORE_SIMPLE_CHANGE:
-					if (0 == item->prevorgvalue_null && item->prevorgvalue.dbl <= h->value_orig.dbl)
+					if (NULL != deltaitem && 0 != deltaitem->ts.sec &&
+							deltaitem->value.dbl <= h->value_orig.dbl)
 					{
-						h->value.dbl = h->value_orig.dbl - item->prevorgvalue.dbl;
+						h->value.dbl = h->value_orig.dbl - deltaitem->value.dbl;
 						h->value.dbl = multiply_item_value_float(item, h->value.dbl);
 
 						if (SUCCEED != DBchk_double(h->value.dbl))
@@ -946,20 +935,7 @@ static void	DCadd_update_item_sql(size_t *sql_offset, DB_ITEM *item, ZBX_DC_HIST
 					else
 						h->value_null = 1;
 
-					if (ITEM_STATE_NOTSUPPORTED != h->state)
-					{
-						zbx_snprintf_alloc(&sql, &sql_alloc, sql_offset,
-								",prevorgvalue='" ZBX_FS_DBL "'", h->value_orig.dbl);
-						item->prevorgvalue_null = 0;
-					}
 					break;
-			}
-
-			if (0 == h->value_null)
-			{
-				zbx_snprintf_alloc(&sql, &sql_alloc, sql_offset,
-						",prevvalue=lastvalue,lastvalue='" ZBX_FS_DBL "'",
-						h->value.dbl);
 			}
 
 			if (ITEM_STATE_NOTSUPPORTED == h->state)
@@ -977,66 +953,60 @@ static void	DCadd_update_item_sql(size_t *sql_offset, DB_ITEM *item, ZBX_DC_HIST
 			switch (item->delta)
 			{
 				case ITEM_STORE_AS_IS:
-					if (0 == item->prevorgvalue_null)
-					{
-						zbx_strcpy_alloc(&sql, &sql_alloc, sql_offset, ",prevorgvalue=null");
-						item->prevorgvalue_null = 1;
-					}
+					if (NULL != deltaitem)
+						deltaitem->ts.sec = 0;
 
 					h->value.ui64 = multiply_item_value_uint64(item, h->value_orig.ui64);
 					break;
 				case ITEM_STORE_SPEED_PER_SECOND:
-					if (0 == item->prevorgvalue_null &&
-							item->prevorgvalue.ui64 <= h->value_orig.ui64 &&
-							(item->lastclock < h->ts.sec ||
-								(item->lastclock == h->ts.sec && item->lastns < h->ts.ns)))
+					if (NULL != deltaitem && 0 != deltaitem->ts.sec &&
+							deltaitem->value.ui64 <= h->value_orig.ui64 &&
+							0 > zbx_timespec_compare(&deltaitem->ts, &h->ts))
 					{
-						h->value.ui64 = (h->value_orig.ui64 - item->prevorgvalue.ui64) /
-								((h->ts.sec - item->lastclock) +
-									(double)(h->ts.ns - item->lastns) / 1000000000);
+						h->value.ui64 = (h->value_orig.ui64 - deltaitem->value.ui64) /
+								((h->ts.sec - deltaitem->ts.sec) +
+									(double)(h->ts.ns - deltaitem->ts.ns) / 1000000000);
 						h->value.ui64 = multiply_item_value_uint64(item, h->value.ui64);
 					}
 					else
 						h->value_null = 1;
 
-					zbx_snprintf_alloc(&sql, &sql_alloc, sql_offset,
-							",prevorgvalue='" ZBX_FS_UI64 "'", h->value_orig.ui64);
-					item->prevorgvalue_null = 0;
 					break;
 				case ITEM_STORE_SIMPLE_CHANGE:
-					if (0 == item->prevorgvalue_null && item->prevorgvalue.ui64 <= h->value_orig.ui64)
+					if (NULL != deltaitem && 0 != deltaitem->ts.sec &&
+							deltaitem->value.ui64 <= h->value_orig.ui64)
 					{
-						h->value.ui64 = h->value_orig.ui64 - item->prevorgvalue.ui64;
+						h->value.ui64 = h->value_orig.ui64 - deltaitem->value.ui64;
 						h->value.ui64 = multiply_item_value_uint64(item, h->value.ui64);
 					}
 					else
 						h->value_null = 1;
 
-					zbx_snprintf_alloc(&sql, &sql_alloc, sql_offset,
-							",prevorgvalue='" ZBX_FS_UI64 "'", h->value_orig.ui64);
-					item->prevorgvalue_null = 0;
 					break;
 			}
 
-			if (0 == h->value_null)
-			{
-				zbx_snprintf_alloc(&sql, &sql_alloc, sql_offset,
-						",prevvalue=lastvalue,lastvalue='" ZBX_FS_UI64 "'",
-						h->value.ui64);
-			}
 			break;
 		case ITEM_VALUE_TYPE_LOG:
-			zbx_snprintf_alloc(&sql, &sql_alloc, sql_offset, ",lastlogsize=" ZBX_FS_UI64 ",mtime=%d",
-					h->lastlogsize, h->mtime);
-		case ITEM_VALUE_TYPE_STR:
-		case ITEM_VALUE_TYPE_TEXT:
-			value_esc = DBdyn_escape_string_len(h->value_orig.str, ITEM_LASTVALUE_LEN);
-			zbx_snprintf_alloc(&sql, &sql_alloc, sql_offset, ",prevvalue=lastvalue,lastvalue='%s'",
-					value_esc);
-			zbx_free(value_esc);
+			zbx_snprintf_alloc(&sql, &sql_alloc, sql_offset, "%slastlogsize=" ZBX_FS_UI64 ",mtime=%d",
+					sql_start, h->lastlogsize, h->mtime);
+			sql_start = sql_continue;
 			break;
 	}
+
 notsupported:
+
+	if (ITEM_STORE_AS_IS != item->delta && NULL != deltaitem &&
+			(ITEM_VALUE_TYPE_FLOAT == h->value_type || ITEM_VALUE_TYPE_UINT64 == h->value_type))
+	{
+		if (ITEM_STATE_NOTSUPPORTED == h->state)
+			deltaitem->ts.sec = 0;
+		else
+		{
+			deltaitem->ts = h->ts;
+			deltaitem->value = h->value_orig;
+		}
+	}
+
 	if (ITEM_STATE_NOTSUPPORTED == h->state)
 	{
 		if (ITEM_STATE_NOTSUPPORTED != item->state)
@@ -1049,20 +1019,15 @@ notsupported:
 			object = (0 != (ZBX_FLAG_DISCOVERY & item->flags) ? EVENT_OBJECT_LLDRULE : EVENT_OBJECT_ITEM);
 			add_event(0, EVENT_SOURCE_INTERNAL, object, item->itemid, &h->ts, h->state, NULL, NULL, 0, 0);
 
-			zbx_snprintf_alloc(&sql, &sql_alloc, sql_offset, ",state=%d", (int)h->state);
-		}
-
-		if (0 == item->prevorgvalue_null)
-		{
-			zbx_snprintf_alloc(&sql, &sql_alloc, sql_offset,
-					",prevorgvalue=null");
-			item->prevorgvalue_null = 1;
+			zbx_snprintf_alloc(&sql, &sql_alloc, sql_offset, "%sstate=%d", sql_start, (int)h->state);
+			sql_start = sql_continue;
 		}
 
 		if (0 != strcmp(item->error, h->value_orig.err))
 		{
 			value_esc = DBdyn_escape_string_len(h->value_orig.err, ITEM_ERROR_LEN);
-			zbx_snprintf_alloc(&sql, &sql_alloc, sql_offset, ",error='%s'", value_esc);
+			zbx_snprintf_alloc(&sql, &sql_alloc, sql_offset, "%serror='%s'", sql_start, value_esc);
+			sql_start = sql_continue;
 			zbx_free(value_esc);
 		}
 
@@ -1079,11 +1044,13 @@ notsupported:
 			add_event(0, EVENT_SOURCE_INTERNAL, EVENT_OBJECT_ITEM, item->itemid, &h->ts, h->state,
 					NULL, NULL, 0, 0);
 
-			zbx_snprintf_alloc(&sql, &sql_alloc, sql_offset, ",state=%d,error=''", (int)h->state);
+			zbx_snprintf_alloc(&sql, &sql_alloc, sql_offset, "%sstate=%d,error=''", sql_start,
+					(int)h->state);
+			sql_start = sql_continue;
 		}
 	}
-
-	zbx_snprintf_alloc(&sql, &sql_alloc, sql_offset, " where itemid=" ZBX_FS_UI64 ";\n", item->itemid);
+	if (sql_start == sql_continue)
+		zbx_snprintf_alloc(&sql, &sql_alloc, sql_offset, " where itemid=" ZBX_FS_UI64 ";\n", item->itemid);
 }
 
 static void	DCadd_update_inventory_sql(size_t *sql_offset, DB_ITEM *item, ZBX_DC_HISTORY *h, unsigned char inventory_link)
@@ -1140,16 +1107,18 @@ static void	DCadd_update_inventory_sql(size_t *sql_offset, DB_ITEM *item, ZBX_DC
  ******************************************************************************/
 static void	DCmass_update_items(ZBX_DC_HISTORY *history, int history_num)
 {
-	const char		*__function_name = "DCmass_update_items";
-	DB_RESULT		result;
-	DB_ROW			row;
-	DB_ITEM			item;
-	size_t			sql_offset = 0;
-	ZBX_DC_HISTORY		*h;
-	zbx_vector_uint64_t	ids;
-	int			i;
-	unsigned char		inventory_link;
-	zbx_config_hk_t		config_hk;
+	const char			*__function_name = "DCmass_update_items";
+	DB_RESULT			result;
+	DB_ROW				row;
+	DB_ITEM				item;
+	size_t				sql_offset = 0;
+	ZBX_DC_HISTORY			*h;
+	zbx_vector_uint64_t		ids;
+	int				i;
+	unsigned char			inventory_link;
+	zbx_config_hk_t			config_hk;
+	zbx_hashset_t			delta_history = {NULL};
+	zbx_item_history_value_t	*deltaitem;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -1163,9 +1132,11 @@ static void	DCmass_update_items(ZBX_DC_HISTORY *history, int history_num)
 
 	zbx_vector_uint64_sort(&ids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
+	DCget_delta_items(&delta_history, &ids);
+
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-			"select i.itemid,i.state,i.lastclock,i.prevorgvalue,i.delta,i.multiplier,i.formula,"
-				"i.history,i.trends,i.lastns,i.hostid,i.inventory_link,hi.inventory_mode,i.valuemapid,"
+			"select i.itemid,i.state,i.delta,i.multiplier,i.formula,"
+				"i.history,i.trends,i.hostid,i.inventory_link,hi.inventory_mode,i.valuemapid,"
 				"i.units,i.error,i.flags"
 			" from items i"
 				" left join host_inventory hi"
@@ -1177,6 +1148,8 @@ static void	DCmass_update_items(ZBX_DC_HISTORY *history, int history_num)
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "i.itemid", ids.values, ids.values_num);
 
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " order by i.itemid");
+
+
 
 	result = DBselect("%s", sql);
 
@@ -1206,53 +1179,37 @@ static void	DCmass_update_items(ZBX_DC_HISTORY *history, int history_num)
 			continue;
 
 		item.state = (unsigned char)atoi(row[1]);
-		if (SUCCEED != DBis_null(row[2]))
-			item.lastclock = atoi(row[2]);
-		else
-			item.lastclock = 0;
-		if (SUCCEED != DBis_null(row[9]))
-			item.lastns = atoi(row[9]);
-		else
-			item.lastns = 0;
-		if (SUCCEED != DBis_null(row[3]))
-		{
-			item.prevorgvalue_null = 0;
-			switch (h->value_type)
-			{
-				case ITEM_VALUE_TYPE_FLOAT:
-					item.prevorgvalue.dbl = atof(row[3]);
-					break;
-				case ITEM_VALUE_TYPE_UINT64:
-					ZBX_STR2UINT64(item.prevorgvalue.ui64, row[3]);
-					break;
-			}
-		}
-		else
-			item.prevorgvalue_null = 1;
+		item.delta = atoi(row[2]);
+		item.multiplier = atoi(row[3]);
+		item.formula = row[4];
 
-		item.delta = atoi(row[4]);
-		item.multiplier = atoi(row[5]);
-		item.formula = row[6];
+		item.history = (ZBX_HK_OPTION_ENABLED == config_hk.history_global ? config_hk.history : atoi(row[5]));
+		item.trends = (ZBX_HK_OPTION_ENABLED == config_hk.trends_global ? config_hk.trends : atoi(row[6]));
 
-		item.history = (ZBX_HK_OPTION_ENABLED == config_hk.history_global ? config_hk.history : atoi(row[7]));
-		item.trends = (ZBX_HK_OPTION_ENABLED == config_hk.trends_global ? config_hk.trends : atoi(row[8]));
+		ZBX_STR2UINT64(item.hostid, row[7]);
 
-		ZBX_STR2UINT64(item.hostid, row[10]);
-
-		if (SUCCEED != DBis_null(row[12]) && HOST_INVENTORY_AUTOMATIC == (unsigned char)atoi(row[12]))
-			inventory_link = (unsigned char)atoi(row[11]);
+		if (SUCCEED != DBis_null(row[9]) && HOST_INVENTORY_AUTOMATIC == (unsigned char)atoi(row[9]))
+			inventory_link = (unsigned char)atoi(row[8]);
 		else
 			inventory_link = 0;
 
-		ZBX_DBROW2UINT64(item.valuemapid, row[13]);
-		item.units = row[14];
-		item.error = row[15];
-		item.flags = (unsigned char)atoi(row[16]);
+		ZBX_DBROW2UINT64(item.valuemapid, row[10]);
+		item.units = row[11];
+		item.error = row[12];
+		item.flags = (unsigned char)atoi(row[13]);
 
 		h->keep_history = (0 != item.history ? 1 : 0);
 		h->keep_trends = (0 != item.trends ? 1 : 0);
 
-		DCadd_update_item_sql(&sql_offset, &item, h);
+		if (NULL == (deltaitem = zbx_hashset_search(&delta_history, &item.itemid)) &&
+				item.delta != ITEM_STORE_AS_IS)
+		{
+			zbx_item_history_value_t	value = {item.itemid};
+
+			deltaitem = zbx_hashset_insert(&delta_history, &value, sizeof(value));
+		}
+
+		DCadd_update_item_sql(&sql_offset, &item, h, deltaitem);
 		DCadd_update_inventory_sql(&sql_offset, &item, h, inventory_link);
 
 		DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
@@ -1267,6 +1224,9 @@ static void	DCmass_update_items(ZBX_DC_HISTORY *history, int history_num)
 	}
 
 	zbx_vector_uint64_destroy(&ids);
+
+	DCset_delta_items(&delta_history);
+	zbx_hashset_destroy(&delta_history);
 
 	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 

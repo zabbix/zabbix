@@ -205,6 +205,9 @@ static int	evaluate_aggregate(DC_ITEM *item, AGENT_RESULT *res, int grp_func, co
 	unsigned char		value_type;
 	history_value_t		value;
 	int			num = 0, ret = FAIL;
+	int			clock_from, count;
+	unsigned int		period;
+	char			**h_value;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() grp_func:%d groups:'%s' itemkey:'%s' item_func:%d param:'%s'",
 			__function_name, grp_func, groups, itemkey, item_func, param);
@@ -222,64 +225,46 @@ static int	evaluate_aggregate(DC_ITEM *item, AGENT_RESULT *res, int grp_func, co
 
 	sql = zbx_malloc(sql, sql_alloc);
 
+	if (FAIL == is_uint_suffix(param, &period))
+	{
+		SET_MSG_RESULT(res, zbx_strdup(NULL, "Invalid fourth parameter"));
+		goto clean;
+	}
+
 	if (ZBX_DB_GET_HIST_VALUE == item_func)
 	{
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-				"select value_type,lastvalue"
-				" from items"
-				" where lastvalue is not null"
-					" and value_type in (%d,%d)"
-					" and",
-				ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64);
-		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", itemids.values, itemids.values_num);
-
-		result = DBselect("%s", sql);
-
-		while (NULL != (row = DBfetch(result)))
-		{
-			value_type = (unsigned char)atoi(row[0]);
-
-			evaluate_one(item, &value, &num, grp_func, row[1], value_type);
-		}
-		DBfree_result(result);
+		clock_from = 0;
+		count = 1;
 	}
 	else
 	{
-		int		clock_from;
-		unsigned int	period;
-		char		**h_value;
-
-		if (FAIL == is_uint_suffix(param, &period))
-		{
-			SET_MSG_RESULT(res, zbx_strdup(NULL, "Invalid fourth parameter"));
-			goto clean;
-		}
-
 		clock_from = time(NULL) - period;
-
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-				"select itemid,value_type"
-				" from items"
-				" where value_type in (%d,%d)"
-					" and",
-				ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64);
-		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", itemids.values, itemids.values_num);
-
-		result = DBselect("%s", sql);
-
-		while (NULL != (row = DBfetch(result)))
-		{
-			ZBX_STR2UINT64(itemid, row[0]);
-			value_type = (unsigned char)atoi(row[1]);
-
-			h_value = DBget_history(itemid, value_type, item_func, clock_from, 0, NULL, NULL, 0);
-
-			if (NULL != h_value[0])
-				evaluate_one(item, &value, &num, grp_func, h_value[0], value_type);
-			DBfree_history(h_value);
-		}
-		DBfree_result(result);
+		count = 0;
 	}
+
+
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+			"select itemid,value_type"
+			" from items"
+			" where value_type in (%d,%d)"
+				" and",
+			ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64);
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", itemids.values, itemids.values_num);
+
+	result = DBselect("%s", sql);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		ZBX_STR2UINT64(itemid, row[0]);
+		value_type = (unsigned char)atoi(row[1]);
+
+		h_value = DBget_history(itemid, value_type, item_func, clock_from, 0, NULL, NULL, count);
+
+		if (NULL != h_value[0])
+			evaluate_one(item, &value, &num, grp_func, h_value[0], value_type);
+		DBfree_history(h_value);
+	}
+	DBfree_result(result);
 
 	if (0 == num)
 	{

@@ -196,13 +196,11 @@ zbx_graph_item_type;
 #define PROXY_DHISTORY_KEY_LEN		255
 #define PROXY_DHISTORY_VALUE_LEN	255
 
-#define ZBX_SQL_ITEM_FIELDS	"i.itemid,i.key_,h.host,i.type,i.history,i.lastvalue,"		\
-				"i.prevvalue,i.hostid,i.value_type,i.delta,i.prevorgvalue,"	\
-				"i.lastclock,i.units,i.multiplier,i.formula,i.state,"		\
-				"i.valuemapid,i.trends,i.data_type"
+#define ZBX_SQL_ITEM_FIELDS	"i.itemid,i.key_,h.host,i.type,i.history,i.hostid,i.value_type,i.delta,"	\
+				"i.units,i.multiplier,i.formula,i.state,i.valuemapid,i.trends,i.data_type"
 #define ZBX_SQL_ITEM_TABLES	"hosts h,items i"
 #define ZBX_SQL_TIME_FUNCTIONS	"'nodata','date','dayofmonth','dayofweek','time','now'"
-#define ZBX_SQL_ITEM_FIELDS_NUM	19
+#define ZBX_SQL_ITEM_FIELDS_NUM	15
 #define ZBX_SQL_ITEM_SELECT	ZBX_SQL_ITEM_FIELDS " from " ZBX_SQL_ITEM_TABLES
 
 #ifdef HAVE_ORACLE
@@ -319,11 +317,6 @@ typedef struct
 	char			*host_name;
 	int			history;
 	int			trends;
-	char			*lastvalue[2];
-	int			prevorgvalue_null;
-	history_value_t		prevorgvalue;
-	int			lastclock;
-	int			lastns;
 	zbx_item_value_type_t	value_type;
 	int			delta;
 	int			multiplier;
@@ -332,10 +325,6 @@ typedef struct
 	zbx_uint64_t		valuemapid;
 	char			*error;
 
-	char			*h_lastvalue[2];
-	char			*h_lasteventid;
-	char			*h_lastsource;
-	char			*h_lastseverity;
 	unsigned char		state;
 	unsigned char		flags;
 }
@@ -519,7 +508,6 @@ int	DBupdate_item_status_to_notsupported(DB_ITEM *item, int clock, const char *e
 void	process_triggers(zbx_vector_ptr_t *triggers);
 int	DBget_row_count(const char *table_name);
 int	DBget_items_unsupported_count();
-int	DBget_queue_count(int from, int to);
 double	DBget_requiredperformance();
 int	DBget_proxy_lastaccess(const char *hostname, int *lastaccess, char **error);
 
@@ -530,7 +518,6 @@ char	*DBdyn_escape_string_len(const char *src, size_t max_src_len);
 char	*DBdyn_escape_like_pattern(const char *src);
 
 void    DBget_item_from_db(DB_ITEM *item, DB_ROW row);
-void	DBfree_item_from_db(DB_ITEM *item);
 
 zbx_uint64_t	DBadd_host(char *server, int port, int status, int useip, char *ip, int disable_until, int available);
 int	DBhost_exists(char *server);
