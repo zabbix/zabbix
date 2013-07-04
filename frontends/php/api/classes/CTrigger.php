@@ -20,7 +20,7 @@
 
 
 /**
- * File containing CTrigger class for API.
+ * Class containing methods for operations with triggers.
  *
  * @package API
  */

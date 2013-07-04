@@ -20,10 +20,9 @@
 
 
 /**
+ * Class containing methods for operations with maps.
+ *
  * @package API
- */
-/**
- * Class containing methods for operations with Maps
  */
 class CMap extends CMapElement {
 
