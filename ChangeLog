@@ -75,6 +75,7 @@ A.F.I...S. [ZBXNEXT-1186] increased length to 2048 characters of expression fiel
 ........S. [ZBXNEXT-1663] added support for notification macros {TRIGGER.NAME.ORIG}, {ITEM.NAME.ORIG}, {ITEM.KEY.ORIG} (dimir)
 
 Bug fixes:
+..F....... [ZBX-2622] added link to last event in monitoring triggers page (Ivo)
 A.F....... [ZBX-6362] fixed proxy interface array structure (Eduard)
 ..F.I..... [ZBX-6645] suppressed PHP error messages for DB connection tests in installation wizard step 3 (Ivo)
 ..F....... [ZBXNEXT-484] fixed displaying data and triggers in monitoring overview page if no applications defined (Ivo)
