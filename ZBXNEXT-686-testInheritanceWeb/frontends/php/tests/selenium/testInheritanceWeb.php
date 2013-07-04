@@ -267,26 +267,6 @@ class testInheritanceWeb extends CWebTest {
 			$agent = $this->getSelectedLabel('agent');
 		}
 
-		$this->zbxTestTextPresent('Host');
-		$this->assertVisible('hostname');
-		$this->assertAttribute("//input[@id='hostname']/@maxlength", 255);
-		$this->assertAttribute("//input[@id='hostname']/@size", 50);
-		if (isset($data['template'])) {
-			$this->assertAttribute("//*[@id='hostname']/@value", $data['template']);
-		}
-		elseif (isset($data['host'])) {
-			$this->assertAttribute("//*[@id='hostname']/@value", $data['host']);
-		}
-		$this->assertAttribute("//*[@id='hostname']/@readonly", 'readonly');
-
-		if (!isset($data['form'])) {
-			$this->assertVisible('button_popup');
-			$this->assertAttribute("//input[@id='button_popup']/@value", 'Select');
-		}
-		else {
-			$this->assertElementNotPresent('button_popup');
-		}
-
 		$this->zbxTestTextPresent('Name');
 		$this->assertVisible('name');
 		$this->assertAttribute("//input[@id='name']/@maxlength", 64);
@@ -406,8 +386,8 @@ class testInheritanceWeb extends CWebTest {
 		$this->assertElementPresent("//input[@placeholder='http://[username[:password]@]proxy.example.com[:port]']");
 
 		$this->zbxTestTextPresent('Variables');
-		$this->assertVisible('macros');
-		$this->assertAttribute("//textarea[@id='macros']/@rows", 7);
+		$this->assertVisible('variables');
+		$this->assertAttribute("//textarea[@id='variables']/@rows", 7);
 
 		$this->zbxTestTextPresent('Enabled');
 		$this->assertVisible('status');
@@ -965,40 +945,40 @@ class testInheritanceWeb extends CWebTest {
 					)
 				)
 			),
-			// Macros -just numbers
+			// Variables -just numbers
 			array(
 				array(
 					'expected' => WEB_GOOD,
-					'name' => 'Macros -just numbers',
-					'macros' => '1234567890',
+					'name' => 'Variables -just numbers',
+					'variables' => '1234567890',
 					'add_step' => array(
-						array('step' => 'Macros -just numbers')
+						array('step' => 'Variables -just numbers')
 					)
 				)
 			),
-			// Macros -symbols
+			// Variables -symbols
 			array(
 				array(
 					'expected' => WEB_GOOD,
-					'name' => 'Macros -symbols',
-					'macros' => '!@#$%^&*()_+{}:"|<>?,./',
+					'name' => 'Variables -symbols',
+					'variables' => '!@#$%^&*()_+{}:"|<>?,./',
 					'add_step' => array(
-						array('step' => 'Macros -symbols')
+						array('step' => 'Variables -symbols')
 					)
 				)
 			),
-			// Macros -255 length-allowed more
+			// Variables -255 length-allowed more
 			array(
 				array(
 					'expected' => WEB_GOOD,
-					'name' => 'Macros -255 length',
+					'name' => 'Variables -255 length',
 					'http_proxy' => 'qwertyuiopqwertyuiopqwertyuiopqwertyui'.
 						'opqwertyuiopqwertyuiopqwertyuiopqwertyuiopqwe.'.
 						'rtyuiopqwertyuiopqwertyuiopqwertyuiopqwertyuiopqw'.
 						'ertyuiopqwertyuiopqwertyuiopqwertyuiopqwertyuiopqwer'.
 						'tyuiopqwertyuiopqwertyuiopqwertyuiopqwertyuiopqwertyuiop123456789012345',
 					'add_step' => array(
-						array('step' => 'Macros -255 length')
+						array('step' => 'Variables -255 length')
 					)
 				)
 			),
@@ -1528,8 +1508,8 @@ class testInheritanceWeb extends CWebTest {
 			$this->input_type('http_proxy', $data['http_proxy']);
 		}
 
-		if (isset($data['macros'])) {
-			$this->input_type('macros', $data['macros']);
+		if (isset($data['variables'])) {
+			$this->input_type('variables', $data['variables']);
 		}
 
 		$check = false;
