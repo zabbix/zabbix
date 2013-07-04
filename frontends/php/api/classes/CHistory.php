@@ -20,12 +20,9 @@
 
 
 /**
- * File containing CHistory class for API.
- * @package API
- */
-/**
- * Class containing methods for operations with History of Items
+ * Class containing methods for operations with histories.
  *
+ * @package API
  */
 class CHistory extends CZBXAPI {
 

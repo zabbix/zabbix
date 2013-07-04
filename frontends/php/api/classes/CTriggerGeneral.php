@@ -21,6 +21,8 @@
 
 /**
  * Class containing common methods for operations with triggers.
+ *
+ * @package API
  */
 abstract class CTriggerGeneral extends CZBXAPI {
 

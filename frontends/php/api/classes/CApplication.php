@@ -18,8 +18,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 /**
- * API application class.
+ * Class containing methods for operations with applications.
+ *
+ * @package API
  */
 class CApplication extends CZBXAPI {
 
@@ -28,22 +31,23 @@ class CApplication extends CZBXAPI {
 	protected $sortColumns = array('applicationid', 'name');
 
 	/**
-	* Get Applications data
-	*
-	* @param array $options
-	* @param array $options['itemids']
-	* @param array $options['hostids']
-	* @param array $options['groupids']
-	* @param array $options['triggerids']
-	* @param array $options['applicationids']
-	* @param boolean $options['status']
-	* @param boolean $options['editable']
-	* @param boolean $options['count']
-	* @param string $options['pattern']
-	* @param int $options['limit']
-	* @param string $options['order']
-	* @return array|int item data as array or false if error
-	*/
+	 * Get applications data.
+	 *
+	 * @param array  $options
+	 * @param array  $options['itemids']
+	 * @param array  $options['hostids']
+	 * @param array  $options['groupids']
+	 * @param array  $options['triggerids']
+	 * @param array  $options['applicationids']
+	 * @param bool   $options['status']
+	 * @param bool   $options['editable']
+	 * @param bool   $options['count']
+	 * @param string $options['pattern']
+	 * @param int    $options['limit']
+	 * @param string $options['order']
+	 *
+	 * @return array	item data as array or false if error
+	 */
 	public function get($options = array()) {
 		$result = array();
 		$userType = self::$userData['type'];
