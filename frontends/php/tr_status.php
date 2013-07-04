@@ -744,7 +744,7 @@ foreach ($triggers as $trigger) {
 			else {
 				$ackColumn = new CCol(
 					new CLink(
-						_('Acknowledge'),
+						_('Acknowledged'),
 						'acknow.php?'.
 							'eventid='.$trigger['lastEvent']['eventid'].
 							'&triggerid='.$trigger['lastEvent']['objectid'].
