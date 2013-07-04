@@ -561,6 +561,7 @@ class CProxy extends CZBXAPI {
 			$hosts = API::Host()->get(array(
 				'output' => $this->outputExtend('hosts', array('hostid', 'proxy_hostid'), $options['selectHosts']),
 				'nodeids' => $options['nodeids'],
+				'editable' => $options['editable'],
 				'proxyids' => $proxyIds,
 				'preservekeys' => true
 			));

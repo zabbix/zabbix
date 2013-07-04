@@ -262,7 +262,7 @@ class CDService extends CZBXAPI{
 		$options = array(
 			'filter' => zbx_array_mintersect($keyFields, $object),
 			'output' => array('dserviceid'),
-			'nopermissions' => 1,
+			'nopermissions' => true,
 			'limit' => 1
 		);
 		if (isset($object['node']))
@@ -330,6 +330,7 @@ class CDService extends CZBXAPI{
 			$drules = API::DRule()->get(array(
 				'output' => $options['selectDRules'],
 				'nodeids' => $options['nodeids'],
+				'editable' => $options['editable'],
 				'druleids' => $relationMap->getRelatedIds(),
 				'preservekeys' => true
 			));
@@ -345,6 +346,7 @@ class CDService extends CZBXAPI{
 			$dhosts = API::DHost()->get(array(
 				'output' => $options['selectDHosts'],
 				'nodeids' => $options['nodeids'],
+				'editable' => $options['editable'],
 				'dhosts' => $relationMap->getRelatedIds(),
 				'preservekeys' => true
 			));
@@ -372,6 +374,7 @@ class CDService extends CZBXAPI{
 				$hosts = API::Host()->get(array(
 					'output' => $options['selectHosts'],
 					'nodeids' => $options['nodeids'],
+					'editable' => $options['editable'],
 					'hostids' => $relationMap->getRelatedIds(),
 					'preservekeys' => true,
 					'sortfield' => 'status'
@@ -384,6 +387,7 @@ class CDService extends CZBXAPI{
 			else {
 				$hosts = API::Host()->get(array(
 					'nodeids' => $options['nodeids'],
+					'editable' => $options['editable'],
 					'dserviceids' => $dserviceIds,
 					'countOutput' => true,
 					'groupCount' => true

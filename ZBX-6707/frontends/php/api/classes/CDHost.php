@@ -223,7 +223,7 @@ class CDHost extends CZBXAPI {
 		$options = array(
 			'filter' => zbx_array_mintersect($keyFields, $object),
 			'output' => array('dhostid'),
-			'nopermissions' => 1,
+			'nopermissions' => true,
 			'limit' => 1
 		);
 		if (isset($object['node']))
@@ -288,6 +288,7 @@ class CDHost extends CZBXAPI {
 			$drules = API::DRule()->get(array(
 				'output' => $options['selectDRules'],
 				'nodeids' => $options['nodeids'],
+				'editable' => $options['editable'],
 				'druleids' => $relationMap->getRelatedIds(),
 				'preservekeys' => true
 			));
@@ -305,6 +306,7 @@ class CDHost extends CZBXAPI {
 				$dservices = API::DService()->get(array(
 					'output' => $this->outputExtend('dservices', array('dserviceid', 'dhostid'), $options['selectDServices']),
 					'nodeids' => $options['nodeids'],
+					'editable' => $options['editable'],
 					'dhostids' => $dhostIds,
 					'preservekeys' => true
 				));
@@ -320,6 +322,7 @@ class CDHost extends CZBXAPI {
 				$dservices = API::DService()->get(array(
 					'output' => $options['selectDServices'],
 					'nodeids' => $options['nodeids'],
+					'editable' => $options['editable'],
 					'dhostids' => $dhostIds,
 					'countOutput' => true,
 					'groupCount' => true

@@ -314,7 +314,8 @@ function get_header_host_table($currentElement, $hostid, $discoveryid = null) {
 	$options = array(
 		'hostids' => $hostid,
 		'output' => API_OUTPUT_EXTEND,
-		'templated_hosts' => true
+		'templated_hosts' => true,
+		'editable' => true
 	);
 	if (isset($elements['items'])) {
 		$options['selectItems'] = API_OUTPUT_COUNT;

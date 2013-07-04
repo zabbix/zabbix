@@ -1023,6 +1023,7 @@ class CUserMacro extends CZBXAPI {
 				$relationMap = $this->createRelationMap($result, 'hostmacroid', 'hostid');
 				$templates = API::Template()->get(array(
 					'output' => $options['selectTemplates'],
+					'editable' => $options['editable'],
 					'templateids' => $relationMap->getRelatedIds(),
 					'preservekeys' => true
 				));
@@ -1034,6 +1035,7 @@ class CUserMacro extends CZBXAPI {
 				$relationMap = $this->createRelationMap($result, 'hostmacroid', 'hostid');
 				$templates = API::Host()->get(array(
 					'output' => $options['selectHosts'],
+					'editable' => $options['editable'],
 					'hostids' => $relationMap->getRelatedIds(),
 					'preservekeys' => true
 				));

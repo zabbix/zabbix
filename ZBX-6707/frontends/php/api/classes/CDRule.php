@@ -736,6 +736,7 @@ class CDRule extends CZBXAPI {
 				$dhosts = API::DHost()->get(array(
 					'output' => $options['selectDHosts'],
 					'nodeids' => $options['nodeids'],
+					'editable' => $options['editable'],
 					'dhostids' => $relationMap->getRelatedIds(),
 					'preservekeys' => true
 				));
@@ -747,6 +748,7 @@ class CDRule extends CZBXAPI {
 			else {
 				$dhosts = API::DHost()->get(array(
 					'nodeids' => $options['nodeids'],
+					'editable' => $options['editable'],
 					'druleids' => $druleids,
 					'countOutput' => true,
 					'groupCount' => true

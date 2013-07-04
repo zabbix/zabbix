@@ -813,7 +813,8 @@ else {
 		'selectTriggers' => API_OUTPUT_COUNT,
 		'selectGraphs' => API_OUTPUT_COUNT,
 		'selectApplications' => API_OUTPUT_COUNT,
-		'selectHttpTests' => API_OUTPUT_COUNT
+		'selectHttpTests' => API_OUTPUT_COUNT,
+		'editable' => true
 	));
 	order_result($hosts, $sortfield, $sortorder);
 

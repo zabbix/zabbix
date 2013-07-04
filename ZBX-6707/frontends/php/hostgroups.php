@@ -168,7 +168,7 @@ elseif (str_in_array($_REQUEST['go'], array('activate', 'disable'))) {
 		DBstart();
 		$hosts = API::Host()->get(array(
 			'groupids' => $groups,
-			'editable' => 1,
+			'editable' => true,
 			'output' => API_OUTPUT_EXTEND
 		));
 
@@ -216,7 +216,7 @@ if (isset($_REQUEST['form'])) {
 
 			$options = array(
 				'groupids' => $data['groupid'],
-				'templated_hosts' => 1,
+				'templated_hosts' => true,
 				'output' => array('hostid')
 			);
 			$data['hosts'] = API::Host()->get($options);
@@ -226,13 +226,12 @@ if (isset($_REQUEST['form'])) {
 	}
 
 	// get all possible groups
-	$options = array(
-		'not_proxy_host' => 1,
+	$data['db_groups'] = API::HostGroup()->get(array(
+		'not_proxy_hosts' => true,
 		'sortfield' => 'name',
 		'editable' => true,
 		'output' => API_OUTPUT_EXTEND
-	);
-	$data['db_groups'] = API::HostGroup()->get($options);
+	));
 
 	if ($data['twb_groupid'] == -1) {
 		$gr = reset($data['db_groups']);
@@ -242,9 +241,9 @@ if (isset($_REQUEST['form'])) {
 	if ($data['twb_groupid'] == 0) {
 		// get all hosts from all groups
 		$options = array(
-			'templated_hosts' => 1,
+			'templated_hosts' => true,
 			'sortfield' => 'name',
-			'editable' => 1,
+			'editable' => true,
 			'output' => API_OUTPUT_EXTEND
 		);
 	}
@@ -252,31 +251,29 @@ if (isset($_REQUEST['form'])) {
 		// get hosts from selected twb_groupid combo
 		$options = array(
 			'groupids' => $data['twb_groupid'],
-			'templated_hosts' => 1,
+			'templated_hosts' => true,
 			'sortfield' => 'name',
-			'editable' => 1,
+			'editable' => true,
 			'output' => API_OUTPUT_EXTEND
 		);
 	}
 	$data['db_hosts'] = API::Host()->get($options);
 
 	// get selected hosts
-	$options = array(
+	$data['r_hosts'] = API::Host()->get(array(
 		'hostids' => $data['hosts'],
-		'templated_hosts' => 1,
+		'templated_hosts' => true,
 		'sortfield' => 'name',
 		'output' => API_OUTPUT_EXTEND
-	);
-	$data['r_hosts'] = API::Host()->get($options);
+	));
 
 	// get hosts ids
-	$options = array(
+	$data['rw_hosts'] = API::Host()->get(array(
 		'hostids' => $data['hosts'],
-		'templated_hosts' =>1,
-		'editable' => 1,
+		'templated_hosts' => true,
+		'editable' => true,
 		'output' => array('hostid')
-	);
-	$data['rw_hosts'] = API::Host()->get($options);
+	));
 	$data['rw_hosts'] = zbx_toHash($data['rw_hosts'], 'hostid');
 
 	if (!empty($data['groupid'])) {
@@ -293,36 +290,34 @@ else {
 
 	$sortfield = getPageSortField('name');
 	$sortorder =  getPageSortOrder();
-	$options = array(
-		'editable' => 1,
+
+	$groups = API::HostGroup()->get(array(
+		'editable' => true,
 		'output' => array('groupid'),
 		'sortfield' => $sortfield,
 		'limit' => $config['search_limit'] + 1
-	);
-	$groups = API::HostGroup()->get($options);
+	));
 
 	$data['paging'] = getPagingLine($groups);
 
 	// get hosts and templates count
-	$options = array(
+	$data['groupCounts'] = API::HostGroup()->get(array(
 		'groupids' => zbx_objectValues($groups, 'groupid'),
 		'selectHosts' => API_OUTPUT_COUNT,
 		'selectTemplates' => API_OUTPUT_COUNT,
-		'nopermissions' => 1
-	);
-	$data['groupCounts'] = API::HostGroup()->get($options);
+		'nopermissions' => true
+	));
 	$data['groupCounts'] = zbx_toHash($data['groupCounts'], 'groupid');
 
 	// get host groups
-	$options = array(
+	$data['groups'] = API::HostGroup()->get(array(
 		'groupids' => zbx_objectValues($groups, 'groupid'),
 		'selectHosts' => array('hostid', 'name', 'status'),
 		'selectTemplates' => array('hostid', 'name', 'status'),
 		'output' => API_OUTPUT_EXTEND,
-		'nopermissions' => 1,
+		'nopermissions' => true,
 		'limitSelects' => $config['max_in_table'] + 1
-	);
-	$data['groups'] = API::HostGroup()->get($options);
+	));
 	order_result($data['groups'], $sortfield, $sortorder);
 
 	// render view

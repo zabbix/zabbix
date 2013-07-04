@@ -752,6 +752,7 @@ class CMaintenance extends CZBXAPI {
 			$relationMap = $this->createRelationMap($result, 'maintenanceid', 'groupid', 'maintenances_groups');
 			$groups = API::HostGroup()->get(array(
 				'output' => $options['selectGroups'],
+				'editable' => $options['editable'],
 				'hostgroupids' => $relationMap->getRelatedIds(),
 				'preservekeys' => true
 			));
@@ -763,6 +764,7 @@ class CMaintenance extends CZBXAPI {
 			$relationMap = $this->createRelationMap($result, 'maintenanceid', 'hostid', 'maintenances_hosts');
 			$groups = API::Host()->get(array(
 				'output' => $options['selectHosts'],
+				'editable' => $options['editable'],
 				'hostids' => $relationMap->getRelatedIds(),
 				'preservekeys' => true
 			));

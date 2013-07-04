@@ -310,6 +310,7 @@ abstract class CTriggerGeneral extends CZBXAPI {
 
 			$groups = API::HostGroup()->get(array(
 				'nodeids' => $options['nodeids'],
+				'editable' => $options['editable'],
 				'output' => $options['selectGroups'],
 				'groupids' => $relationMap->getRelatedIds(),
 				'preservekeys' => true

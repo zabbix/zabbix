@@ -262,7 +262,8 @@ class CDCheck extends CZBXAPI {
 				'output' => $options['selectDRules'],
 				'druleids' => $relationMap->getRelatedIds(),
 				'nodeids' => $options['nodeids'],
-				'preservekeys' => 1
+				'editable' => $options['editable'],
+				'preservekeys' => true
 			));
 			if (!is_null($options['limitSelects'])) {
 				order_result($drules, 'name');

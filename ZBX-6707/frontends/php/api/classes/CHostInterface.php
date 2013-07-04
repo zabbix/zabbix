@@ -866,6 +866,7 @@ class CHostInterface extends CZBXAPI {
 			$hosts = API::Host()->get(array(
 				'output' => $options['selectHosts'],
 				'nodeids' => $options['nodeids'],
+				'editable' => $options['editable'],
 				'hosts' => $relationMap->getRelatedIds(),
 				'preservekeys' => true
 			));

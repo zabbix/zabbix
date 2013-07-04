@@ -186,6 +186,7 @@ class CGraphItem extends CZBXAPI {
 			$relationMap = $this->createRelationMap($result, 'gitemid', 'graphid');
 			$graphs = API::Graph()->get(array(
 				'nodeids' => $options['nodeids'],
+				'editable' => $options['editable'],
 				'output' => $options['selectGraphs'],
 				'gitemids' => $relationMap->getRelatedIds(),
 				'preservekeys' => true

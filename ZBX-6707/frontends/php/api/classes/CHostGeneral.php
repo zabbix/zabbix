@@ -871,6 +871,7 @@ abstract class CHostGeneral extends CZBXAPI {
 			$groups = API::HostGroup()->get(array(
 				'nodeids' => $options['nodeids'],
 				'output' => $options['selectGroups'],
+				'editable' => $options['editable'],
 				'groupids' => $relationMap->getRelatedIds(),
 				'preservekeys' => true
 			));
@@ -884,6 +885,7 @@ abstract class CHostGeneral extends CZBXAPI {
 				$templates = API::Template()->get(array(
 					'output' => $options['selectParentTemplates'],
 					'nodeids' => $options['nodeids'],
+					'editable' => $options['editable'],
 					'templateids' => $relationMap->getRelatedIds(),
 					'preservekeys' => true
 				));
@@ -896,6 +898,7 @@ abstract class CHostGeneral extends CZBXAPI {
 				$templates = API::Template()->get(array(
 					'nodeids' => $options['nodeids'],
 					'hostids' => $hostids,
+					'editable' => $options['editable'],
 					'countOutput' => true,
 					'groupCount' => true
 				));
@@ -994,6 +997,7 @@ abstract class CHostGeneral extends CZBXAPI {
 				$triggers = API::Trigger()->get(array(
 					'output' => $options['selectTriggers'],
 					'nodeids' => $options['nodeids'],
+					'editable' => $options['editable'],
 					'triggerids' => $relationMap->getRelatedIds(),
 					'preservekeys' => true
 				));
@@ -1006,6 +1010,7 @@ abstract class CHostGeneral extends CZBXAPI {
 				$triggers = API::Trigger()->get(array(
 					'nodeids' => $options['nodeids'],
 					'hostids' => $hostids,
+					'editable' => $options['editable'],
 					'countOutput' => true,
 					'groupCount' => true
 				));
@@ -1035,6 +1040,7 @@ abstract class CHostGeneral extends CZBXAPI {
 				$graphs = API::Graph()->get(array(
 					'output' => $options['selectGraphs'],
 					'nodeids' => $options['nodeids'],
+					'editable' => $options['editable'],
 					'graphids' => $relationMap->getRelatedIds(),
 					'preservekeys' => true
 				));
@@ -1047,6 +1053,7 @@ abstract class CHostGeneral extends CZBXAPI {
 				$graphs = API::Graph()->get(array(
 					'nodeids' => $options['nodeids'],
 					'hostids' => $hostids,
+					'editable' => $options['editable'],
 					'countOutput' => true,
 					'groupCount' => true
 				));

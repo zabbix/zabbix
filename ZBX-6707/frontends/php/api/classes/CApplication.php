@@ -624,9 +624,9 @@ class CApplication extends CZBXAPI {
 			$hosts = API::Host()->get(array(
 				'output' => $options['selectHosts'],
 				'hostids' => $relationMap->getRelatedIds(),
-				'nopermissions' => 1,
+				'nopermissions' => true,
 				'templated_hosts' => true,
-				'preservekeys' => 1
+				'preservekeys' => true
 			));
 			$result = $relationMap->mapMany($result, $hosts, 'hosts');
 		}

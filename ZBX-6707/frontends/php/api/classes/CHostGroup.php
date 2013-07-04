@@ -999,6 +999,7 @@ class CHostGroup extends CZBXAPI {
 				$hosts = API::Host()->get(array(
 					'output' => $options['selectHosts'],
 					'nodeids' => $options['nodeids'],
+					'editable' => $options['editable'],
 					'hostids' => $relationMap->getRelatedIds(),
 					'preservekeys' => true
 				));
@@ -1010,6 +1011,7 @@ class CHostGroup extends CZBXAPI {
 			else {
 				$hosts = API::Host()->get(array(
 					'nodeids' => $options['nodeids'],
+					'editable' => $options['editable'],
 					'groupids' => $groupIds,
 					'countOutput' => true,
 					'groupCount' => true
@@ -1033,6 +1035,7 @@ class CHostGroup extends CZBXAPI {
 				$hosts = API::Template()->get(array(
 					'output' => $options['selectTemplates'],
 					'nodeids' => $options['nodeids'],
+					'editable' => $options['editable'],
 					'templateids' => $relationMap->getRelatedIds(),
 					'preservekeys' => true
 				));
@@ -1045,6 +1048,7 @@ class CHostGroup extends CZBXAPI {
 				$hosts = API::Template()->get(array(
 					'nodeids' => $options['nodeids'],
 					'groupids' => $groupIds,
+					'editable' => $options['editable'],
 					'countOutput' => true,
 					'groupCount' => true
 				));

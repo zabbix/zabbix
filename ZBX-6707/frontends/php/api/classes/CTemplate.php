@@ -1090,6 +1090,7 @@ class CTemplate extends CHostGeneral {
 				$templates = API::Template()->get(array(
 					'output' => $options['selectTemplates'],
 					'nodeids' => $options['nodeids'],
+					'editable' => $options['editable'],
 					'templateids' => $relationMap->getRelatedIds(),
 					'preservekeys' => true
 				));
@@ -1101,6 +1102,7 @@ class CTemplate extends CHostGeneral {
 			else {
 				$templates = API::Template()->get(array(
 					'nodeids' => $options['nodeids'],
+					'editable' => $options['editable'],
 					'parentTemplateids' => $templateids,
 					'countOutput' => true,
 					'groupCount' => true
@@ -1122,6 +1124,7 @@ class CTemplate extends CHostGeneral {
 				$hosts = API::Host()->get(array(
 					'output' => $options['selectHosts'],
 					'nodeids' => $options['nodeids'],
+					'editable' => $options['editable'],
 					'hostids' => $relationMap->getRelatedIds(),
 					'preservekeys' => true
 				));
@@ -1133,6 +1136,7 @@ class CTemplate extends CHostGeneral {
 			else {
 				$hosts = API::Host()->get(array(
 					'nodeids' => $options['nodeids'],
+					'editable' => $options['editable'],
 					'templateids' => $templateids,
 					'countOutput' => true,
 					'groupCount' => true

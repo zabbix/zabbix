@@ -1005,6 +1005,7 @@ class CDiscoveryRule extends CItemGeneral {
 				$triggers = API::TriggerPrototype()->get(array(
 					'output' => $options['selectTriggers'],
 					'nodeids' => $options['nodeids'],
+					'editable' => $options['editable'],
 					'triggerids' => $relationMap->getRelatedIds(),
 					'preservekeys' => true
 				));
@@ -1013,6 +1014,7 @@ class CDiscoveryRule extends CItemGeneral {
 			else {
 				$triggers = API::TriggerPrototype()->get(array(
 					'nodeids' => $options['nodeids'],
+					'editable' => $options['editable'],
 					'discoveryids' => $itemIds,
 					'countOutput' => true,
 					'groupCount' => true
@@ -1043,6 +1045,7 @@ class CDiscoveryRule extends CItemGeneral {
 				$graphs = API::GraphPrototype()->get(array(
 					'output' => $options['selectGraphs'],
 					'nodeids' => $options['nodeids'],
+					'editable' => $options['editable'],
 					'graphids' => $relationMap->getRelatedIds(),
 					'preservekeys' => true
 				));
@@ -1051,6 +1054,7 @@ class CDiscoveryRule extends CItemGeneral {
 			else {
 				$graphs = API::GraphPrototype()->get(array(
 					'nodeids' => $options['nodeids'],
+					'editable' => $options['editable'],
 					'discoveryids' => $itemIds,
 					'countOutput' => true,
 					'groupCount' => true

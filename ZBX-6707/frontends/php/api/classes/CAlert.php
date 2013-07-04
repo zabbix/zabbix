@@ -417,6 +417,7 @@ class CAlert extends CZBXAPI {
 			}
 			$hosts = API::Host()->get(array(
 				'output' => $options['selectHosts'],
+				'editable' => $options['editable'],
 				'hostids' => $relationMap->getRelatedIds(),
 				'preservekeys' => true
 			));
