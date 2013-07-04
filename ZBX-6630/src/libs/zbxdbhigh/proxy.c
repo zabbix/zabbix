@@ -499,24 +499,31 @@ void	get_proxyconfig_data(zbx_uint64_t proxy_hostid, struct zbx_json *j)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
-static void	remember_record(const ZBX_FIELD **fields, char **recs, size_t *recs_alloc, size_t *recs_offset,
-		DB_ROW row, int field_count)
+/******************************************************************************
+ *                                                                            *
+ * Function: remember_record                                                  *
+ *                                                                            *
+ * Purpose: A record is stored as a sequence of fields and flag bytes for     *
+ *          handling NULL values. A field is stored as a null-terminated      *
+ *          string to preserve field boundaries. If a field value can be NULL *
+ *          a flag byte is inserted after the field to distinguish between    *
+ *          empty string and NULL value. The flag byte can be '\1'            *
+ *          (not NULL value) or '\2' (NULL value).                            *
+ *                                                                            *
+ * Examples of representation:                                                *
+ *          \0\2    - the field can be NULL and it is NULL                    *
+ *          \0\1    - the field can be NULL but is empty string               *
+ *          abc\0\1 - the field can be NULL but is a string "abc"             *
+ *          \0      - the field can not be NULL and is empty string           *
+ *          abc\0   - the field can not be NULL and is a string "abc"         *
+ *                                                                            *
+ ******************************************************************************/
+static void	remember_record(const ZBX_FIELD **fields, size_t fields_count, char **recs, size_t *recs_alloc,
+		size_t *recs_offset, DB_ROW row)
 {
-	/* A record is stored as a sequence of fields and flag bytes for handling NULL values.	*/
-	/* A field is stored as a '\0'-terminated string to preserve field boundaries.		*/
-	/* If a field value can be NULL a flag byte is inserted after the field to distinguish	*/
-	/* between empty string and NULL value. The flag byte can be '\1' (not NULL value) or	*/
-	/* '\2' (NULL value).									*/
-	/* Examples of representation:								*/
-	/*    \0 \2   - the field can be NULL and it is NULL,					*/
-	/*    \0 \1   - the field can be NULL but is empty string,				*/
-	/*    A \0 \1 - the field can be NULL but is a string "A",				*/
-	/*    \0      - the field can not be NULL and is empty string,				*/
-	/*    A \0    - the field can not be NULL and is a string "A".				*/
+	size_t	f;
 
-	int	f;
-
-	for (f = 0; f < field_count; f++)
+	for (f = 0; f < fields_count; f++)
 	{
 		if (0 != (fields[f]->flags & ZBX_NOTNULL))
 		{
@@ -552,12 +559,18 @@ static int	id_offset_compare_func(const void *d1, const void *d2)
 	return ZBX_DEFAULT_UINT64_COMPARE_FUNC(&p1->id, &p2->id);
 }
 
-static int	find_field_by_name(const ZBX_FIELD **fields, int field_count, const char *field_name)
+/******************************************************************************
+ *                                                                            *
+ * Function: find_field_by_name                                               *
+ *                                                                            *
+ * Purpose: find a number of the field                                        *
+ *                                                                            *
+ ******************************************************************************/
+static int	find_field_by_name(const ZBX_FIELD **fields, size_t fields_count, const char *field_name)
 {
-	int	f;
+	size_t	f;
 
-	/* find a number of the field */
-	for (f = 0; f < field_count; f++)
+	for (f = 0; f < fields_count; f++)
 	{
 		if (0 == strcmp(fields[f]->name, field_name))
 			break;
@@ -566,20 +579,26 @@ static int	find_field_by_name(const ZBX_FIELD **fields, int field_count, const c
 	return f;
 }
 
-static int	compare_nth_field(const ZBX_FIELD **fields, char *rec_data, int n, char *str, int is_null,
-				int *last_n, size_t *last_pos)
+/******************************************************************************
+ *                                                                            *
+ * Function: compare_nth_field                                                *
+ *                                                                            *
+ * Purpose: This function compares a value from JSON record with the value    *
+ *          of the n-th field of DB record. For description how DB record is  *
+ *          stored in memory see comments in function remember_record().      *
+ *                                                                            *
+ * Comparing deals with 4 cases:                                              *
+ *          - JSON value is not NULL, DB value is not NULL                    *
+ *          - JSON value is not NULL, DB value is NULL                        *
+ *          - JSON value is NULL, DB value is NULL                            *
+ *          - JSON value is NULL, DB value is not NULL                        *
+ *                                                                            *
+ ******************************************************************************/
+static int	compare_nth_field(const ZBX_FIELD **fields, const char *rec_data, int n, const char *str, int is_null,
+		int *last_n, size_t *last_pos)
 {
-	/* This function compares a value from JSON record with the value of the n-th field of	*/
-	/* DB record. For description how DB record is stored in memory see comments in		*/
-	/* function remember_record().								*/
-	/* Comparing deals with 4 cases:							*/
-	/*    - JSON value is not NULL, DB value is not NULL,					*/
-	/*    - JSON value is not NULL, DB value is NULL,					*/
-	/*    - JSON value is NULL, DB value is NULL.						*/
-	/*    - JSON value is NULL, DB value is not NULL,					*/
-
-	int	i = *last_n, null_in_db = 0;
-	char	*p = rec_data + *last_pos, *field_start = NULL;
+	int		i = *last_n, null_in_db = 0;
+	const char	*p = rec_data + *last_pos, *field_start = NULL;
 
 	while (n >= i)		/* find starting position of the n-th field */
 	{
@@ -656,7 +675,7 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 		zbx_vector_uint64_t *del, char **error)
 {
 	const char		*__function_name = "process_proxyconfig_table";
-	int			f, field_count, insert, is_null, i, ret = FAIL, id_field_nr = 0,
+	int			insert, is_null, i, ret = FAIL, id_field_nr = 0,
 				move_out = 0, move_field_nr = 0;
 	const ZBX_FIELD		*fields[ZBX_MAX_FIELDS];
 	struct zbx_json_parse	jp_data, jp_row;
@@ -664,10 +683,10 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 	const char		*p, *pf;
 	zbx_uint64_t		recid, *p_recid = NULL;
 	zbx_vector_uint64_t	ins, moves;
-	char			*sql = NULL, *field_names = NULL, *recs = NULL;
+	char			*sql = NULL, *recs = NULL;
 	size_t			sql_alloc = 4 * ZBX_KIBIBYTE, sql_offset,
-				field_names_alloc = 1 * ZBX_KIBIBYTE, field_names_offset = 0,
-				recs_alloc = 20 * ZBX_KIBIBYTE, recs_offset = 0;
+				recs_alloc = 20 * ZBX_KIBIBYTE, recs_offset = 0,
+				fields_count = 0, f;
 	DB_RESULT		result;
 	DB_ROW			row;
 	zbx_hashset_t           h_id_offsets, h_del;
@@ -717,11 +736,10 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 	}
 
 	p = NULL;
-	field_count = 0;
 	/* iterate column names (lines 4-6 in T1) */
 	while (NULL != (p = zbx_json_next_value(&jp_data, p, buf, sizeof(buf), NULL)))
 	{
-		if (NULL == (fields[field_count++] = DBget_field(table, buf)))
+		if (NULL == (fields[fields_count++] = DBget_field(table, buf)))
 		{
 			*error = zbx_dsprintf(*error, "invalid field name \"%s.%s\"", table->table, buf);
 			goto out;
@@ -735,21 +753,6 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 		goto out;
 	}
 
-	/* make a string with a list of fields for SELECT */
-	field_names = zbx_malloc(field_names, field_names_alloc);
-	for (f = 0; f < field_count; f++)
-	{
-		zbx_strcpy_alloc(&field_names, &field_names_alloc, &field_names_offset, fields[f]->name);
-		if (field_count - 1 > f)
-			zbx_strcpy_alloc(&field_names, &field_names_alloc, &field_names_offset, ",");
-	}
-
-	/* Find a number of the ID field. Usually the 1st field. */
-	id_field_nr = find_field_by_name(fields, field_count, table->recid);
-
-	/* select all existing records */
-	result = DBselect("select %s from %s", field_names, table->table);
-
 	/* all records will be stored in one large string */
 	recs = zbx_malloc(recs, recs_alloc);
 
@@ -758,6 +761,28 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 
 	/* a hash set as a list for finding records to be deleted */
 	zbx_hashset_create(&h_del, 10000, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+	sql = zbx_malloc(sql, sql_alloc);
+
+	sql_offset = 0;
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select ");
+
+	/* make a string with a list of fields for SELECT */
+	for (f = 0; f < fields_count; f++)
+	{
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, fields[f]->name);
+		zbx_chrcpy_alloc(&sql, &sql_alloc, &sql_offset, ',');
+	}
+
+	sql_offset--;
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " from ");
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, table->table);
+
+	/* Find a number of the ID field. Usually the 1st field. */
+	id_field_nr = find_field_by_name(fields, fields_count, table->recid);
+
+	/* select all existing records */
+	result = DBselect("%s", sql);
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -769,29 +794,27 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 		zbx_hashset_insert(&h_id_offsets, &id_offset, sizeof(id_offset));
 		zbx_hashset_insert(&h_del, &recid, sizeof(recid));
 
-		remember_record(fields, &recs, &recs_alloc, &recs_offset, row, field_count);
+		remember_record(fields, fields_count, &recs, &recs_alloc, &recs_offset, row);
 	}
 	DBfree_result(result);
-	zbx_free(field_names);
 
 	/* these tables have unique indexes, need special preparation to avoid conflicts during inserts/updates */
 	if (0 == strcmp("hosts_templates", table->table))
 	{
 		move_out = 1;
-		move_field_nr = find_field_by_name(fields, field_count, "templateid");
+		move_field_nr = find_field_by_name(fields, fields_count, "templateid");
 	}
 	else if (0 == strcmp("hostmacro", table->table))
 	{
 		move_out = 1;
-		move_field_nr = find_field_by_name(fields, field_count, "macro");
+		move_field_nr = find_field_by_name(fields, fields_count, "macro");
 	}
 	else if (0 == strcmp("items", table->table))
 	{
 		move_out = 1;
-		move_field_nr = find_field_by_name(fields, field_count, "key_");
+		move_field_nr = find_field_by_name(fields, fields_count, "key_");
 	}
 
-	sql = zbx_malloc(sql, sql_alloc);
 	zbx_vector_uint64_create(&ins);
 
 	if (1 == move_out)
@@ -809,7 +832,9 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 		}
 
 		/* check whether we need to update existing entry or insert a new one */
+
 		ZBX_STR2UINT64(recid, buf);
+
 		if (NULL != zbx_hashset_search(&h_del, &recid))
 		{
 			zbx_hashset_remove(&h_del, &recid);
@@ -833,7 +858,7 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 				{
 					/* parse values for the entry (lines 10-12 in T1) */
 
-					if (field_count == f)
+					if (fields_count == f)
 					{
 						*error = zbx_dsprintf(*error, "invalid number of fields \"%.*s\"",
 								jp_row.end - jp_row.start + 1, jp_row.start);
@@ -878,6 +903,7 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 				zbx_vector_uint64_append(del, moves.values[i]);
 				zbx_vector_uint64_append(&ins, moves.values[i]);
 			}
+
 			if (0 < moves.values_num)
 			{
 				zbx_vector_uint64_clear(&moves);
@@ -901,7 +927,7 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 
 		/* special preprocessing for 'hostmacro' and 'items' tables to eliminate conflicts */
 		/* in the 'hostid,macro' and 'hostid,key_' unique indexes */
-		if (0 != moves.values_num)
+		if (1 < moves.values_num)
 		{
 			sql_offset = 0;
 			if (0 == strcmp("hostmacro", table->table))
@@ -956,13 +982,13 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 		{
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "insert into %s (", table->table);
 
-			for (f = 0; f < field_count; f++)
+			for (f = 0; f < fields_count; f++)
 				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%s,", fields[f]->name);
 
 			sql_offset--;
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ") values (" ZBX_FS_UI64 ",", recid);
 		}
-		else if (1 == field_count)	/* only primary key given, no update needed */
+		else if (1 == fields_count)	/* only primary key given, no update needed */
 		{
 			continue;
 		}
@@ -986,7 +1012,7 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 
 			/* parse values for the entry (lines 10-12 in T1) */
 
-			if (f == field_count)
+			if (f == fields_count)
 			{
 				*error = zbx_dsprintf(*error, "invalid number of fields \"%.*s\"",
 						jp_row.end - jp_row.start + 1, jp_row.start);
@@ -1038,7 +1064,7 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 			f++;
 		}
 
-		if (f != field_count)
+		if (f != fields_count)
 		{
 			*error = zbx_dsprintf(*error, "invalid number of fields \"%.*s\"",
 					jp_row.end - jp_row.start + 1, jp_row.start);
