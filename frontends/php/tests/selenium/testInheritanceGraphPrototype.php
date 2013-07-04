@@ -358,14 +358,28 @@ class testInheritanceGraphPrototype extends CWebTest {
 			array(
 				array(
 					'expected' => GRAPH_BAD,
-					'graphName' => 'graphStackedSome',
+					'graphName' => 'graphStackedNoMinAxisItem',
 					'graphtype' => 'Stacked',
 					'noAxisItem' => true,
 					'ymin_type' => 'Item',
 					'ymax_type' => 'Fixed',
 					'errors' => array(
 						'ERROR: Cannot add graph',
-						'Incorrect item for axis value.'
+						'No permissions to referred object or it does not exist!'
+					)
+				)
+			),
+			array(
+				array(
+					'expected' => GRAPH_BAD,
+					'graphName' => 'graphStackedNoMaxAxisItem',
+					'graphtype' => 'Stacked',
+					'noAxisItem' => true,
+					'ymin_type' => 'Fixed',
+					'ymax_type' => 'Item',
+					'errors' => array(
+						'ERROR: Cannot add graph',
+						'No permissions to referred object or it does not exist!'
 					)
 				)
 			),
