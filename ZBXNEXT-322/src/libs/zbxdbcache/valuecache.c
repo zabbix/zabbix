@@ -656,14 +656,14 @@ static int	vc_item_weight_compare_func(const zbx_vc_item_weight_t *d1, const zbx
 
 /******************************************************************************
  *                                                                            *
- * Function: vc_history_log_free                                              *
+ * Function: vc_history_logfree                                               *
  *                                                                            *
  * Purpose: frees history log and all resources allocated for it              *
  *                                                                            *
  * Parameters: log   - [IN] the history log to free                           *
  *                                                                            *
  ******************************************************************************/
-static void	vc_history_log_free(zbx_history_log_t *log)
+static void	vc_history_logfree(zbx_history_log_t *log)
 {
 	zbx_free(log->source);
 	zbx_free(log->value);
@@ -672,7 +672,7 @@ static void	vc_history_log_free(zbx_history_log_t *log)
 
 /******************************************************************************
  *                                                                            *
- * Function: vc_history_log_dup                                               *
+ * Function: vc_history_logdup                                                *
  *                                                                            *
  * Purpose: duplicates history log by allocating necessary resources and      *
  *          copying the target log values.                                    *
@@ -682,7 +682,7 @@ static void	vc_history_log_free(zbx_history_log_t *log)
  * Return value: the duplicated history log                                   *
  *                                                                            *
  ******************************************************************************/
-static zbx_history_log_t	*vc_history_log_dup(const zbx_history_log_t *log)
+static zbx_history_log_t	*vc_history_logdup(const zbx_history_log_t *log)
 {
 	zbx_history_log_t	*plog;
 
@@ -884,7 +884,7 @@ static void	vc_value_copy(zbx_vc_value_t* dst, const zbx_vc_value_t* src, int va
 			dst->value.str = zbx_strdup(NULL, src->value.str);
 			break;
 		case ITEM_VALUE_TYPE_LOG:
-			dst->value.log = vc_history_log_dup(src->value.log);
+			dst->value.log = vc_history_logdup(src->value.log);
 			break;
 		default:
 			dst->value = src->value;
@@ -955,7 +955,7 @@ static void	vc_value_vector_copy(zbx_vector_vc_value_t *vector, int value_type,
 			{
 				zbx_vc_value_t	value;
 
-				value.value.log = vc_history_log_dup(values[i].value.log);
+				value.value.log = vc_history_logdup(values[i].value.log);
 				value.timestamp = values[i].timestamp;
 				zbx_vector_vc_value_append_ptr(vector, &value);
 			}
@@ -1111,8 +1111,6 @@ static zbx_history_log_t	*vc_item_logdup(zbx_vc_item_t *item, const zbx_history_
 	if (NULL == (plog = vc_item_malloc(item, sizeof(zbx_history_log_t))))
 		return NULL;
 
-	memset(plog, 0, sizeof(zbx_history_log_t));
-
 	plog->timestamp = log->timestamp;
 	plog->logeventid = log->logeventid;
 	plog->severity = log->severity;
@@ -1122,6 +1120,8 @@ static zbx_history_log_t	*vc_item_logdup(zbx_vc_item_t *item, const zbx_history_
 		if (NULL == (plog->source = vc_item_strdup(item, log->source)))
 			goto fail;
 	}
+	else
+		plog->source = NULL;
 
 	if (NULL == (plog->value = vc_item_strdup(item, log->value)))
 		goto fail;
@@ -2689,7 +2689,7 @@ static int	vch_init(zbx_vc_item_t *item, zbx_vector_vc_value_t *values, int seco
 		}
 
 	}
-	if (SUCCEED == (ret = vch_item_add_values_at_end(item, values->values, values->values_num)))
+	if (SUCCEED == (ret = vch_item_add_values_at_beginning(item, values->values, values->values_num)))
 		vc_update_statistics(item, 0, values->values_num);
 
 	return ret;
@@ -2987,7 +2987,9 @@ static int	vcl_supports_request(zbx_vc_item_t *item, int seconds, int count, int
 
 		goto out;
 	}
-	if (0 != count) /* count request */
+
+	/* seconds request is not supported by lastvalue storage mode, check only count requests */
+	if (0 != count && 2 >= count)
 	{
 		if (2 > item->values_total)
 		{
@@ -3009,11 +3011,7 @@ static int	vcl_supports_request(zbx_vc_item_t *item, int seconds, int count, int
 
 		if (0 == count)
 			ret = SUCCEED;
-
-		goto out;
 	}
-
-	/* seconds request is not supported by lastvalue storage mode */
 out:
 	return ret;
 }
@@ -3045,9 +3043,13 @@ static int	vcl_init(zbx_vc_item_t *item, zbx_vector_vc_value_t *values, int seco
 {
 	int	ret = FAIL;
 
-	/* lastvalue storage mode supports only count based requests and */
-	/* can store only 2 values - last and previous                   */
-	if (0 == seconds && 2 >= values->values_num)
+	/* lastvalue storage mode supports only count based requests and   */
+	/* can store only 2 values - last and previous. And there is no    */
+	/* point in using lastvalue storage mode for larger count requests */
+	/* even if currently only 2 values are returned - when more values */
+	/* are added to item it will be switched to history storage mode   */
+	/* anyway.                                                         */
+	if (0 == seconds && 2 >= count && 2 >= values->values_num)
 	{
 		if (SUCCEED == (ret = vcl_item_add_values(item, values->values, values->values_num)))
 			vc_update_statistics(item, 0, values->values_num);
@@ -3493,7 +3495,7 @@ int	zbx_vc_get_statistics(zbx_vc_stats_t *stats)
 	stats->misses = vc_cache->misses;
 	stats->low_memory = vc_cache->low_memory;
 
-	stats->total = CONFIG_VALUE_CACHE_SIZE;
+	stats->total = vc_mem->total_size;
 	stats->used = vc_mem->used_size;
 
 	vc_try_unlock();
@@ -3529,7 +3531,7 @@ void	zbx_vc_value_vector_destroy(zbx_vector_vc_value_t *vector, int value_type)
 				break;
 			case ITEM_VALUE_TYPE_LOG:
 				for (i = 0; i < vector->values_num; i++)
-					vc_history_log_free(vector->values[i].value.log);
+					vc_history_logfree(vector->values[i].value.log);
 		}
 		zbx_vector_vc_value_destroy(vector);
 	}
@@ -3555,7 +3557,7 @@ void	zbx_vc_value_clear(zbx_vc_value_t *value, int value_type)
 
 			break;
 		case ITEM_VALUE_TYPE_LOG:
-			vc_history_log_free(value->value.log);
+			vc_history_logfree(value->value.log);
 	}
 }
 
