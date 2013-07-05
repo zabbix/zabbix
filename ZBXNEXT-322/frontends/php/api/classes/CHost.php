@@ -20,6 +20,8 @@
 
 
 /**
+ * Class containing methods for operations with hosts.
+ *
  * @package API
  */
 class CHost extends CHostGeneral {
@@ -27,7 +29,7 @@ class CHost extends CHostGeneral {
 	protected $sortColumns = array('hostid', 'host', 'name', 'status');
 
 	/**
-	 * Get Host data
+	 * Get host data.
 	 *
 	 * @param array         $options
 	 * @param array         $options['nodeids']                  Node IDs

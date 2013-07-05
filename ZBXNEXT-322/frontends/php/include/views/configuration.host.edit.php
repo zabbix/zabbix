@@ -510,6 +510,8 @@ $linkedTemplates = API::Template()->get(array(
 	'output' => array('templateid', 'name')
 ));
 
+CArrayHelper::sort($linkedTemplates, array('name'));
+
 $ignoredTemplates = array();
 foreach ($linkedTemplates as $template) {
 	$tmplList->addVar('exist_templates[]', $template['templateid']);

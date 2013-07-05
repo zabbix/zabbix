@@ -1718,7 +1718,7 @@ function getPagingLine(&$items) {
 
 	$rowsPerPage = CWebUser::$data['rows_per_page'];
 	$itemsCount = count($items);
-	$pagesCount = $itemsCount > 0 ? ceil($itemsCount / $rowsPerPage) : 1;
+	$pagesCount = ($itemsCount > 0) ? ceil($itemsCount / $rowsPerPage) : 1;
 
 	$currentPage = getPageNumber();
 	if ($currentPage < 1) {

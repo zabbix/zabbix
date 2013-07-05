@@ -20,11 +20,9 @@
 
 
 /**
- * File containing CUser class for API.
+ * Class containing methods for operations with users media.
+ *
  * @package API
- */
-/**
- * Class containing methods for operations with Users
  */
 class CUserMedia extends CZBXAPI {
 
@@ -227,6 +225,7 @@ class CUserMedia extends CZBXAPI {
 		if (is_null($options['preservekeys'])) {
 			$result = zbx_cleanHashes($result);
 		}
+
 		return $result;
 	}
 }

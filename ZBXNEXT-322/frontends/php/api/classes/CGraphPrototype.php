@@ -20,7 +20,9 @@
 
 
 /**
- * Class containing methods for operations with graphs
+ * Class containing methods for operations with graph prototypes.
+ *
+ * @package API
  */
 class CGraphPrototype extends CGraphGeneral {
 
@@ -715,5 +717,4 @@ class CGraphPrototype extends CGraphGeneral {
 
 		return $result;
 	}
-
 }
