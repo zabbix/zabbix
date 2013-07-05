@@ -1988,7 +1988,7 @@ static void	vch_item_clean_cache(zbx_vc_item_t *item)
 		zbx_vc_chunk_t	*chunk = tail;
 		int		timestamp;
 
-		timestamp = ZBX_VC_TIME() - data->range;
+		timestamp = ZBX_VC_TIME() - data->range - SEC_PER_MIN;
 
 		/* try to remove chunks with all history values older than maximum request range */
 		while (NULL != chunk && chunk->slots[chunk->last_value].timestamp.sec < timestamp)
@@ -2367,8 +2367,14 @@ static int	vch_item_get_values_by_time(zbx_vc_item_t *item, zbx_vector_vc_value_
 
 	now = ZBX_VC_TIME();
 
-	if (data->range < seconds + now - timestamp)
-		data->range = seconds + now - timestamp;
+	/* Check if maximum request range is not set and all data are cached.  */
+	/* Because that indicates there was a count based request with unknown */
+	/* range which might be greater than the current request range.        */
+	if (0 != data->range || 0 == data->cached_all)
+	{
+		if (data->range < seconds + now - timestamp)
+			data->range = seconds + now - timestamp;
+	}
 
 	if (FAIL == vch_item_get_last_value(item, timestamp, &chunk, &index))
 	{
@@ -2440,12 +2446,23 @@ static int	vch_item_get_values_by_count(zbx_vc_item_t *item,  zbx_vector_vc_valu
 		index = chunk->last_value;
 	}
 
-	if (0 != values->values_num)
+	/* Try setting maximum range only if all requested data was returned.   */
+	/* Otherwise the current request range is unknown and can't be compared */
+	/* to the maximum request range.                                        */
+	if (values->values_num == count)
 	{
 		if (data->range < now - values->values[values->values_num - 1].timestamp.sec)
 			data->range = now - values->values[values->values_num - 1].timestamp.sec;
 	}
 out:
+	if (values->values_num < count)
+	{
+		/* not enough data in db to fulfill the request */
+		data->range = 0;
+		data->cached_all = 1;
+	}
+
+
 	return ret;
 }
 
@@ -2655,14 +2672,13 @@ static int	vch_init(zbx_vc_item_t *item, zbx_vector_vc_value_t *values, int seco
 		const zbx_timespec_t *ts)
 {
 	zbx_vc_data_history_t	*data = &item->data.history;
-	int			ret;
+	int			ret, now;
 
 	memset(data, 0, sizeof(zbx_vc_data_history_t));
 
 	if (0 < values->values_num)
 	{
 		data->slots_max = values->values_num;
-		data->range = ZBX_VC_TIME() - values->values->timestamp.sec;
 
 		if (NULL != ts)
 		{
@@ -2688,6 +2704,18 @@ static int	vch_init(zbx_vc_item_t *item, zbx_vector_vc_value_t *values, int seco
 				data->cached_all = 1;
 		}
 
+		now = ZBX_VC_TIME();
+
+		if (0 != seconds)
+		{
+			data->range = now - timestamp + seconds;
+		}
+		else
+		{
+			/* don't set the range if all data was cached by the initial request */
+			if (0 == data->cached_all)
+				data->range = now - values->values->timestamp.sec;
+		}
 	}
 	if (SUCCEED == (ret = vch_item_add_values_at_beginning(item, values->values, values->values_num)))
 		vc_update_statistics(item, 0, values->values_num);
