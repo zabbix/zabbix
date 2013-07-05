@@ -201,7 +201,13 @@ class CProxy extends CZBXAPI {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Wrong fields for proxy "%s".', $proxy['host']));
 			}
 
-			$status = isset($proxy['status']) ? $proxy['status'] : $dbProxies[$proxy['proxyid']]['status'];
+			if (empty($proxy['status'])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Missing value for field "%1$s"', 'status'));
+			}
+			elseif ($proxy['status'] != HOST_STATUS_PROXY_ACTIVE && $proxy['status'] != HOST_STATUS_PROXY_PASSIVE) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Incorrect value "%1$s" for field "%2$s"', $proxy['status'], 'status'));
+			}
 
 			if ($update) {
 				if (!isset($dbProxies[$proxy['proxyid']])) {
@@ -231,7 +237,7 @@ class CProxy extends CZBXAPI {
 			}
 
 			// interface
-			if ($status == HOST_STATUS_PROXY_PASSIVE) {
+			if ($proxy['status'] == HOST_STATUS_PROXY_PASSIVE) {
 				if ($create && empty($proxy['interface'])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('No interface provided for proxy "%s".', $proxy['host']));
 				}
@@ -247,6 +253,36 @@ class CProxy extends CZBXAPI {
 
 					// mark the interface as main to pass host interface validation
 					$proxy['interface']['main'] = INTERFACE_PRIMARY;
+				}
+			}
+
+			// linked hosts
+			if ($proxy['hosts']) {
+				$hostids = array_keys($proxy['hosts']);
+
+				$hosts = API::Host()->get(array(
+					'hostids' => $hostids,
+					'editable' => true,
+					'output' => array('hostid', 'proxy_hostid', 'name'),
+					'preservekeys' => true
+				));
+
+				// check if host is already linked and unset any additional invalid host that was passed
+				foreach ($proxy['hosts'] as $host) {
+					if (isset($hosts[$host])) {
+						if (!empty($hosts[$host]['proxy_hostid'])) {
+							self::exception(ZBX_API_ERROR_PARAMETERS,
+								_s('Cannot add host "%1$s". Host must be unlinked first.', $hosts[$host]['name']));
+						}
+					}
+					else {
+						unset($proxy['hosts'][$host]);
+					}
+				}
+
+				if (empty($hosts)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_('No permissions to referred object or it does not exist!'));
 				}
 			}
 		}
