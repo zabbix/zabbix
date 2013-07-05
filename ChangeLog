@@ -1,6 +1,7 @@
 Changes for 2.1.0
 
 New features:
+........S. [ZBXNEXT-322] implemented value cache (wiper)
 ...G...... [ZBXNEXT-1571] added support for proc.num for HP-UX (igors)
 ...G...PS. [ZBX-6299] added JSON validator (wiper)
 A.FGI..PS. [ZBXNEXT-1726] added support for optional host metadata to active agent for auto-registration (dimir, Oleg)
