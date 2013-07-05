@@ -94,9 +94,17 @@ if (empty($this->data['parent_discoveryid'])) {
 		array(
 			$dependenciesTable,
 			new CButton('btn1', _('Add'),
-				'return PopUp(\'popup.php?dstfrm=massupdate&dstact=add_dependency&reference=deptrigger'.
-				'&dstfld1=new_dependency[]&srctbl=triggers&objname=triggers&srcfld1=triggerid&multiselect=1'.
-				'\', 1000, 700);',
+				'return PopUp("popup.php?'.
+					'dstfrm=massupdate'.
+					'&dstact=add_dependency'.
+					'&reference=deptrigger'.
+					'&dstfld1=new_dependency[]'.
+					'&srctbl=triggers'.
+					'&objname=triggers'.
+					'&srcfld1=triggerid'.
+					'&multiselect=1'.
+					'&monitored_hosts=1'.
+					'&with_triggers=1", 1000, 700);',
 				'link_menu'
 			)
 		),

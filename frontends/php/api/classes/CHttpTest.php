@@ -19,6 +19,11 @@
 **/
 
 
+/**
+ * Class containing methods for operations with http tests.
+ *
+ * @package API
+ */
 class CHttpTest extends CZBXAPI {
 
 	protected $tableName = 'httptest';
