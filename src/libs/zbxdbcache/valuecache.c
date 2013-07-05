@@ -2498,7 +2498,7 @@ static int	vch_item_get_value_range(zbx_vc_item_t *item,  zbx_vector_vc_value_t 
 		int timestamp)
 {
 	zbx_vc_data_history_t	*data = &item->data.history;
-	int			ret, records_read, hits, misses;
+	int			ret, records_read, hits, misses, nslots;
 
 	values->values_num = 0;
 
@@ -2523,8 +2523,9 @@ static int	vch_item_get_value_range(zbx_vc_item_t *item,  zbx_vector_vc_value_t 
 			goto out;
 	}
 
-	if (data->slots_max < values->values_num)
-		data->slots_max = values->values_num;
+	nslots = MAX(values->values_num, count);
+	if (data->slots_max < nslots)
+		data->slots_max = nslots;
 
 	/* calculate hits/misses */
 	if (values->values_num >= records_read)
