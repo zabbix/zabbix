@@ -4677,16 +4677,16 @@ void	DCset_delta_items(zbx_hashset_t *items)
 	{
 		if (NULL == (deltaitem = zbx_hashset_search(&config->deltaitems, &item->itemid)))
 		{
-			if (0 != item->ts.sec)
+			if (0 != item->timestamp.sec)
 				zbx_hashset_insert(&config->deltaitems, item, sizeof(ZBX_DC_DELTAITEM));
 		}
 		else
 		{
-			if (0 != item->ts.sec)
+			if (0 != item->timestamp.sec)
 			{
-				if (0 < zbx_timespec_compare(&item->ts, &deltaitem->ts))
+				if (0 < zbx_timespec_compare(&item->timestamp, &deltaitem->timestamp))
 				{
-					deltaitem->ts = item->ts;
+					deltaitem->timestamp = item->timestamp;
 					deltaitem->value = item->value;
 				}
 			}

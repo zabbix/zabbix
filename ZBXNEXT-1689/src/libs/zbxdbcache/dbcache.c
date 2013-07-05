@@ -865,11 +865,142 @@ static int	DBchk_double(double value)
 
 /******************************************************************************
  *                                                                            *
+ * Function: DCcalculate_item_delta_float                                     *
+ *                                                                            *
+ * Purpose: calculate delta value for items of float value type               *
+ *                                                                            *
+ * Parameters: item      - [IN] item reference                                *
+ *             h         - [IN/OUT] a reference to history cache value        *
+ *             last      - [IN] a reference to the last raw history value     *
+ *                         (value + timestamp)                                *
+ *                                                                            *
+ ******************************************************************************/
+static void	DCcalculate_item_delta_float(DB_ITEM *item, ZBX_DC_HISTORY *h, zbx_item_history_value_t *last)
+{
+	switch (item->delta)
+	{
+		case ITEM_STORE_AS_IS:
+			/* set timestamp.sec to zero to remove this record from delta items later */
+			if (NULL != last)
+				last->timestamp.sec = 0;
+
+			h->value.dbl = multiply_item_value_float(item, h->value_orig.dbl);
+
+			if (SUCCEED != DBchk_double(h->value.dbl))
+			{
+				h->state = ITEM_STATE_NOTSUPPORTED;
+				h->value_null = 1;
+			}
+			break;
+		case ITEM_STORE_SPEED_PER_SECOND:
+			if (NULL != last && 0 != last->timestamp.sec &&
+					last->value.dbl <= h->value_orig.dbl &&
+					0 > zbx_timespec_compare(&last->timestamp, &h->ts))
+			{
+				h->value.dbl = (h->value_orig.dbl - last->value.dbl) /
+						((h->ts.sec - last->timestamp.sec) +
+							(double)(h->ts.ns - last->timestamp.ns) / 1000000000);
+				h->value.dbl = multiply_item_value_float(item, h->value.dbl);
+
+				if (SUCCEED != DBchk_double(h->value.dbl))
+				{
+					h->state = ITEM_STATE_NOTSUPPORTED;
+					h->value_null = 1;
+				}
+			}
+			else
+				h->value_null = 1;
+
+		case ITEM_STORE_SIMPLE_CHANGE:
+			if (NULL != last && 0 != last->timestamp.sec &&
+					last->value.dbl <= h->value_orig.dbl)
+			{
+				h->value.dbl = h->value_orig.dbl - last->value.dbl;
+				h->value.dbl = multiply_item_value_float(item, h->value.dbl);
+
+				if (SUCCEED != DBchk_double(h->value.dbl))
+				{
+					h->state = ITEM_STATE_NOTSUPPORTED;
+					h->value_null = 1;
+				}
+			}
+			else
+				h->value_null = 1;
+
+			break;
+	}
+
+	if (ITEM_STATE_NOTSUPPORTED == h->state)
+	{
+		int	errcode = SUCCEED;
+
+		h->value_orig.err = zbx_dsprintf(NULL, "Type of received value"
+				" [" ZBX_FS_DBL "] is not suitable for value type [%s]",
+				h->value.dbl, zbx_item_value_type_string(h->value_type));
+
+		DCrequeue_items(&h->itemid, &h->state, &h->ts.sec, &errcode, 1);
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DCcalculate_item_delta_uint64                                    *
+ *                                                                            *
+ * Purpose: calculate delta value for items of uint64 value type              *
+ *                                                                            *
+ * Parameters: item      - [IN] item reference                                *
+ *             h         - [IN/OUT] a reference to history cache value        *
+ *             deltaitem - [IN] a reference to the last raw history value     *
+ *                         (value + timestamp)                                *
+ *                                                                            *
+ ******************************************************************************/
+static void	DCcalculate_item_delta_uint64(DB_ITEM *item, ZBX_DC_HISTORY *h, zbx_item_history_value_t *last)
+{
+	switch (item->delta)
+	{
+		case ITEM_STORE_AS_IS:
+			/* set timestamp.sec to zero to remove this record from delta items later */
+			if (NULL != last)
+				last->timestamp.sec = 0;
+
+			h->value.ui64 = multiply_item_value_uint64(item, h->value_orig.ui64);
+			break;
+		case ITEM_STORE_SPEED_PER_SECOND:
+			if (NULL != last && 0 != last->timestamp.sec &&
+					last->value.ui64 <= h->value_orig.ui64 &&
+					0 > zbx_timespec_compare(&last->timestamp, &h->ts))
+			{
+				h->value.ui64 = (h->value_orig.ui64 - last->value.ui64) /
+						((h->ts.sec - last->timestamp.sec) +
+							(double)(h->ts.ns - last->timestamp.ns) / 1000000000);
+				h->value.ui64 = multiply_item_value_uint64(item, h->value.ui64);
+			}
+			else
+				h->value_null = 1;
+
+			break;
+		case ITEM_STORE_SIMPLE_CHANGE:
+			if (NULL != last && 0 != last->timestamp.sec &&
+					last->value.ui64 <= h->value_orig.ui64)
+			{
+				h->value.ui64 = h->value_orig.ui64 - last->value.ui64;
+				h->value.ui64 = multiply_item_value_uint64(item, h->value.ui64);
+			}
+			else
+				h->value_null = 1;
+
+			break;
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: DCadd_update_item_sql                                            *
  *                                                                            *
  * Purpose: 1) generate sql for updating item in database                     *
- *          2) add events (item supported/not supported)                      *
- *          3) update cache (requeue item, add nextcheck)                     *
+ *          2) calculate item delta value                                     *
+ *          3) add events (item supported/not supported)                      *
+ *          4) update cache (requeue item, add nextcheck)                     *
  *                                                                            *
  * Parameters: item - [IN/OUT] item reference                                 *
  *             h    - [IN/OUT] a reference to history cache value             *
@@ -886,105 +1017,10 @@ static void	DCadd_update_item_sql(size_t *sql_offset, DB_ITEM *item, ZBX_DC_HIST
 	switch (h->value_type)
 	{
 		case ITEM_VALUE_TYPE_FLOAT:
-			switch (item->delta)
-			{
-				case ITEM_STORE_AS_IS:
-					if (NULL != deltaitem)
-						deltaitem->ts.sec = 0;
-
-					h->value.dbl = multiply_item_value_float(item, h->value_orig.dbl);
-
-					if (SUCCEED != DBchk_double(h->value.dbl))
-					{
-						h->state = ITEM_STATE_NOTSUPPORTED;
-						h->value_null = 1;
-					}
-					break;
-				case ITEM_STORE_SPEED_PER_SECOND:
-					if (NULL != deltaitem && 0 != deltaitem->ts.sec &&
-							deltaitem->value.dbl <= h->value_orig.dbl &&
-							0 > zbx_timespec_compare(&deltaitem->ts, &h->ts))
-					{
-						h->value.dbl = (h->value_orig.dbl - deltaitem->value.dbl) /
-								((h->ts.sec - deltaitem->ts.sec) +
-									(double)(h->ts.ns - deltaitem->ts.ns) / 1000000000);
-						h->value.dbl = multiply_item_value_float(item, h->value.dbl);
-
-						if (SUCCEED != DBchk_double(h->value.dbl))
-						{
-							h->state = ITEM_STATE_NOTSUPPORTED;
-							h->value_null = 1;
-						}
-					}
-					else
-						h->value_null = 1;
-
-				case ITEM_STORE_SIMPLE_CHANGE:
-					if (NULL != deltaitem && 0 != deltaitem->ts.sec &&
-							deltaitem->value.dbl <= h->value_orig.dbl)
-					{
-						h->value.dbl = h->value_orig.dbl - deltaitem->value.dbl;
-						h->value.dbl = multiply_item_value_float(item, h->value.dbl);
-
-						if (SUCCEED != DBchk_double(h->value.dbl))
-						{
-							h->state = ITEM_STATE_NOTSUPPORTED;
-							h->value_null = 1;
-						}
-					}
-					else
-						h->value_null = 1;
-
-					break;
-			}
-
-			if (ITEM_STATE_NOTSUPPORTED == h->state)
-			{
-				int	errcode = SUCCEED;
-
-				h->value_orig.err = zbx_dsprintf(NULL, "Type of received value"
-						" [" ZBX_FS_DBL "] is not suitable for value type [%s]",
-						h->value.dbl, zbx_item_value_type_string(h->value_type));
-
-				DCrequeue_items(&h->itemid, &h->state, &h->ts.sec, &errcode, 1);
-			}
+			DCcalculate_item_delta_float(item, h, deltaitem);
 			break;
 		case ITEM_VALUE_TYPE_UINT64:
-			switch (item->delta)
-			{
-				case ITEM_STORE_AS_IS:
-					if (NULL != deltaitem)
-						deltaitem->ts.sec = 0;
-
-					h->value.ui64 = multiply_item_value_uint64(item, h->value_orig.ui64);
-					break;
-				case ITEM_STORE_SPEED_PER_SECOND:
-					if (NULL != deltaitem && 0 != deltaitem->ts.sec &&
-							deltaitem->value.ui64 <= h->value_orig.ui64 &&
-							0 > zbx_timespec_compare(&deltaitem->ts, &h->ts))
-					{
-						h->value.ui64 = (h->value_orig.ui64 - deltaitem->value.ui64) /
-								((h->ts.sec - deltaitem->ts.sec) +
-									(double)(h->ts.ns - deltaitem->ts.ns) / 1000000000);
-						h->value.ui64 = multiply_item_value_uint64(item, h->value.ui64);
-					}
-					else
-						h->value_null = 1;
-
-					break;
-				case ITEM_STORE_SIMPLE_CHANGE:
-					if (NULL != deltaitem && 0 != deltaitem->ts.sec &&
-							deltaitem->value.ui64 <= h->value_orig.ui64)
-					{
-						h->value.ui64 = h->value_orig.ui64 - deltaitem->value.ui64;
-						h->value.ui64 = multiply_item_value_uint64(item, h->value.ui64);
-					}
-					else
-						h->value_null = 1;
-
-					break;
-			}
-
+			DCcalculate_item_delta_uint64(item, h, deltaitem);
 			break;
 		case ITEM_VALUE_TYPE_LOG:
 			zbx_snprintf_alloc(&sql, &sql_alloc, sql_offset, "%slastlogsize=" ZBX_FS_UI64 ",mtime=%d",
@@ -995,14 +1031,15 @@ static void	DCadd_update_item_sql(size_t *sql_offset, DB_ITEM *item, ZBX_DC_HIST
 
 notsupported:
 
+	/* update the last value (raw) of the delta items */
 	if (ITEM_STORE_AS_IS != item->delta && NULL != deltaitem &&
 			(ITEM_VALUE_TYPE_FLOAT == h->value_type || ITEM_VALUE_TYPE_UINT64 == h->value_type))
 	{
 		if (ITEM_STATE_NOTSUPPORTED == h->state)
-			deltaitem->ts.sec = 0;
+			deltaitem->timestamp.sec = 0;
 		else
 		{
-			deltaitem->ts = h->ts;
+			deltaitem->timestamp = h->ts;
 			deltaitem->value = h->value_orig;
 		}
 	}
