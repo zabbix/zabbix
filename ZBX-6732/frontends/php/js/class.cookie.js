@@ -24,13 +24,13 @@ var cookie = {
 	init: function() {
 		var path = new Curl();
 		var page = path.getPath(); // current path with filename
-		this.relPath = page.substring(0, page.lastIndexOf("/") + 1); // current path without filename
+		this.relPath = page.substring(0, page.lastIndexOf('/') + 1); // current path without filename
 
 		var allCookies = document.cookie.split('; ');
 		for (var i = 0; i < allCookies.length; i++) {
 			var cookiePair = allCookies[i].split('=');
 			if (cookiePair[0].indexOf('cb_') > -1 && cookiePair[0].indexOf('cb_' + page) == -1) {
-				this.erase(cookiePair[0]);
+				this.erase(cookiePair[0], this.relPath);
 			}
 			else {
 				this.cookies[cookiePair[0]] = cookiePair[1];
@@ -41,7 +41,7 @@ var cookie = {
 	create: function(name, value, days, path) {
 		var expires = '';
 
-		if (typeof(days) != 'undefined' && days.length > 0) {
+		if (typeof(days) != 'undefined') {
 			var date = new Date();
 			date.setTime(date.getTime() + days * 24 * 60 * 60 * 1000);
 			expires = '; expires=' + date.toGMTString();
@@ -56,7 +56,7 @@ var cookie = {
 
 		// apache header size limit
 		if (document.cookie.length > 8000) {
-			document.cookie = name + '=; path=/';
+			document.cookie = name + '=; path=' + path;
 			alert(locale['S_MAX_COOKIE_SIZE_REACHED']);
 			return false;
 		}
