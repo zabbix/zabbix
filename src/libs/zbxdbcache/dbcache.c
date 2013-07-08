@@ -30,6 +30,7 @@
 #include "events.h"
 #include "memalloc.h"
 #include "zbxalgo.h"
+#include "valuecache.h"
 
 static zbx_mem_info_t	*history_mem = NULL;
 static zbx_mem_info_t	*history_text_mem = NULL;
@@ -1797,7 +1798,47 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	if (sql_offset > 16)	/* In ORACLE always present begin..end; */
-		DBexecute("%s", sql);
+	{
+		if (ZBX_DB_OK <= DBexecute("%s", sql) && 0 != (daemon_type & ZBX_DAEMON_TYPE_SERVER))
+		{
+			/* the history values were written into database, now add to value cache */
+			zbx_history_log_t	log;
+			history_value_t		value, *pvalue;
+
+			value.log = &log;
+
+			zbx_vc_lock();
+
+			for (i = 0; i < history_num; i++)
+			{
+				if (0 == history[i].keep_history || 0 != history[i].value_null)
+					continue;
+
+				switch (history[i].value_type)
+				{
+					case ITEM_VALUE_TYPE_FLOAT:
+					case ITEM_VALUE_TYPE_UINT64:
+						pvalue = &history[i].value;
+						break;
+					case ITEM_VALUE_TYPE_STR:
+					case ITEM_VALUE_TYPE_TEXT:
+						pvalue = &history[i].value_orig;
+						break;
+					case ITEM_VALUE_TYPE_LOG:
+						log.timestamp = history[i].timestamp;
+						log.severity = history[i].severity;
+						log.logeventid = history[i].logeventid;
+						log.value = history[i].value_orig.str;
+						log.source = history[i].value.str;
+						pvalue = &value;
+						break;
+				}
+				zbx_vc_add_value(history[i].itemid, history[i].value_type, &history[i].ts, pvalue);
+			}
+
+			zbx_vc_unlock();
+		}
+	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
@@ -2262,6 +2303,7 @@ int	DCsync_history(int sync_type)
 									zbx_strdup(NULL, cache->history[f].value.str);
 							cache->text_free += strlen(cache->history[f].value.str) + 1;
 						}
+						/* break; is not missing here */
 					case ITEM_VALUE_TYPE_STR:
 					case ITEM_VALUE_TYPE_TEXT:
 						history[history_num].value_orig.str =
@@ -3115,7 +3157,7 @@ static void	init_trend_cache()
 
 	sz = zbx_mem_required_size(1, "trend cache", "TrendCacheSize");
 	zbx_mem_create(&trend_mem, trend_shm_key, ZBX_NO_MUTEX, CONFIG_TRENDS_CACHE_SIZE,
-			"trend cache", "TrendCacheSize");
+			"trend cache", "TrendCacheSize", 0);
 	CONFIG_TRENDS_CACHE_SIZE -= sz;
 
 	cache->trends_num = 0;
@@ -3191,7 +3233,7 @@ void	init_database_cache()
 
 	sz += sz_history;
 
-	zbx_mem_create(&history_mem, history_shm_key, ZBX_NO_MUTEX, sz, "history cache", "HistoryCacheSize");
+	zbx_mem_create(&history_mem, history_shm_key, ZBX_NO_MUTEX, sz, "history cache", "HistoryCacheSize", 0);
 
 	cache = (ZBX_DC_CACHE *)__history_mem_malloc_func(NULL, sizeof(ZBX_DC_CACHE));
 
@@ -3211,7 +3253,7 @@ void	init_database_cache()
 	sz = zbx_mem_required_size(1, "history text cache", "HistoryTextCacheSize");
 
 	zbx_mem_create(&history_text_mem, history_text_shm_key, ZBX_NO_MUTEX, CONFIG_TEXT_CACHE_SIZE,
-			"history text cache", "HistoryTextCacheSize");
+			"history text cache", "HistoryTextCacheSize", 0);
 	CONFIG_TEXT_CACHE_SIZE -= sz;
 
 	cache->text = (char *)__history_text_mem_malloc_func(NULL, CONFIG_TEXT_CACHE_SIZE);

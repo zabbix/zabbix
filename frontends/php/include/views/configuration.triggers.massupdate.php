@@ -94,9 +94,17 @@ if (empty($this->data['parent_discoveryid'])) {
 		array(
 			$dependenciesTable,
 			new CButton('btn1', _('Add'),
-				'return PopUp(\'popup.php?dstfrm=massupdate&dstact=add_dependency&reference=deptrigger'.
-				'&dstfld1=new_dependency[]&srctbl=triggers&objname=triggers&srcfld1=triggerid&multiselect=1'.
-				'\', 1000, 700);',
+				'return PopUp("popup.php?'.
+					'dstfrm=massupdate'.
+					'&dstact=add_dependency'.
+					'&reference=deptrigger'.
+					'&dstfld1=new_dependency[]'.
+					'&srctbl=triggers'.
+					'&objname=triggers'.
+					'&srcfld1=triggerid'.
+					'&multiselect=1'.
+					'&monitored_hosts=1'.
+					'&with_triggers=1", 1000, 700);',
 				'link_menu'
 			)
 		),
@@ -121,8 +129,8 @@ $triggersForm->addItem($triggersTab);
 
 // append buttons to form
 $triggersForm->addItem(makeFormFooter(
-	array(new CSubmit('mass_save', _('Save'))),
-	array(new CButtonCancel(url_param('groupid').url_param('parent_discoveryid')))
+	new CSubmit('mass_save', _('Save')),
+	new CButtonCancel(url_param('groupid').url_param('parent_discoveryid'))
 ));
 
 $triggersWidget->addItem($triggersForm);

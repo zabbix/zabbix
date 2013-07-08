@@ -1141,7 +1141,6 @@ void	DBget_item_from_db(DB_ITEM *item, DB_ROW row)
 	ZBX_DBROW2UINT64(item->valuemapid, row[12]);
 
 	item->data_type = atoi(row[14]);
-
 }
 
 const ZBX_TABLE *DBget_table(const char *tablename)
@@ -1588,6 +1587,33 @@ zbx_uint64_t	multiply_item_value_uint64(DB_ITEM *item, zbx_uint64_t value)
 
 /******************************************************************************
  *                                                                            *
+ * Function: DBsql_id_cmp                                                     *
+ *                                                                            *
+ * Purpose: construct where condition                                         *
+ *                                                                            *
+ * Return value: "=<id>" if id not equal zero,                                *
+ *               otherwise " is null"                                         *
+ *                                                                            *
+ * Author: Alexander Vladishev                                                *
+ *                                                                            *
+ * Comments: NB! Do not use this function more than once in same SQL query    *
+ *                                                                            *
+ ******************************************************************************/
+static const char	*DBsql_id_cmp(zbx_uint64_t id)
+{
+	static char		buf[22];	/* 1 - '=', 20 - value size, 1 - '\0' */
+	static const char	is_null[9] = " is null";
+
+	if (0 == id)
+		return is_null;
+
+	zbx_snprintf(buf, sizeof(buf), "=" ZBX_FS_UI64, id);
+
+	return buf;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: DBregister_host                                                  *
  *                                                                            *
  * Purpose: register unknown host and generate event                          *
@@ -1597,10 +1623,10 @@ zbx_uint64_t	multiply_item_value_uint64(DB_ITEM *item, zbx_uint64_t value)
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
-void	DBregister_host(zbx_uint64_t proxy_hostid, const char *host, const char *ip,
-		const char *dns, unsigned short port, int now)
+void	DBregister_host(zbx_uint64_t proxy_hostid, const char *host, const char *ip, const char *dns,
+		unsigned short port, const char *host_metadata, int now)
 {
-	char		*host_esc, *ip_esc, *dns_esc;
+	char		*host_esc, *ip_esc, *dns_esc, *host_metadata_esc;
 	DB_RESULT	result;
 	DB_ROW		row;
 	zbx_uint64_t	autoreg_hostid;
@@ -1617,10 +1643,10 @@ void	DBregister_host(zbx_uint64_t proxy_hostid, const char *host, const char *ip
 		result = DBselect(
 				"select hostid"
 				" from hosts"
-				" where proxy_hostid%s"
+				" where proxy_hostid=" ZBX_FS_UI64
 					" and host='%s'"
 					ZBX_SQL_NODE,
-				DBsql_id_cmp(proxy_hostid), host_esc,
+				proxy_hostid, host_esc,
 				DBand_node_local("hostid"));
 
 		if (NULL != DBfetch(result))
@@ -1632,6 +1658,7 @@ void	DBregister_host(zbx_uint64_t proxy_hostid, const char *host, const char *ip
 	{
 		ip_esc = DBdyn_escape_string_len(ip, INTERFACE_IP_LEN);
 		dns_esc = DBdyn_escape_string_len(dns, INTERFACE_DNS_LEN);
+		host_metadata_esc = DBdyn_escape_string(host_metadata);
 
 		result = DBselect(
 				"select autoreg_hostid"
@@ -1647,22 +1674,24 @@ void	DBregister_host(zbx_uint64_t proxy_hostid, const char *host, const char *ip
 			ZBX_STR2UINT64(autoreg_hostid, row[0]);
 
 			DBexecute("update autoreg_host"
-					" set listen_ip='%s',listen_dns='%s',listen_port=%d"
+					" set listen_ip='%s',listen_dns='%s',listen_port=%d,host_metadata='%s'"
 					" where autoreg_hostid=" ZBX_FS_UI64,
-					ip_esc, dns_esc, (int)port, autoreg_hostid);
+					ip_esc, dns_esc, (int)port, host_metadata_esc, autoreg_hostid);
 		}
 		else
 		{
 			autoreg_hostid = DBget_maxid("autoreg_host");
 			DBexecute("insert into autoreg_host"
-					" (autoreg_hostid,proxy_hostid,host,listen_ip,listen_dns,listen_port)"
+					" (autoreg_hostid,proxy_hostid,host,listen_ip,listen_dns,listen_port,"
+						"host_metadata)"
 					" values"
-					" (" ZBX_FS_UI64 ",%s,'%s','%s','%s',%d)",
+					" (" ZBX_FS_UI64 ",%s,'%s','%s','%s',%d,'%s')",
 					autoreg_hostid, DBsql_id_ins(proxy_hostid),
-					host_esc, ip_esc, dns_esc, (int)port);
+					host_esc, ip_esc, dns_esc, (int)port, host_metadata_esc);
 		}
 		DBfree_result(result);
 
+		zbx_free(host_metadata_esc);
 		zbx_free(dns_esc);
 		zbx_free(ip_esc);
 
@@ -1685,20 +1714,23 @@ void	DBregister_host(zbx_uint64_t proxy_hostid, const char *host, const char *ip
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
-void	DBproxy_register_host(const char *host, const char *ip, const char *dns, unsigned short port)
+void	DBproxy_register_host(const char *host, const char *ip, const char *dns, unsigned short port,
+		const char *host_metadata)
 {
-	char	*host_esc, *ip_esc, *dns_esc;
+	char	*host_esc, *ip_esc, *dns_esc, *host_metadata_esc;
 
 	host_esc = DBdyn_escape_string_len(host, HOST_HOST_LEN);
 	ip_esc = DBdyn_escape_string_len(ip, INTERFACE_IP_LEN);
 	dns_esc = DBdyn_escape_string_len(dns, INTERFACE_DNS_LEN);
+	host_metadata_esc = DBdyn_escape_string(host_metadata);
 
 	DBexecute("insert into proxy_autoreg_host"
-			" (clock,host,listen_ip,listen_dns,listen_port)"
+			" (clock,host,listen_ip,listen_dns,listen_port,host_metadata)"
 			" values"
-			" (%d,'%s','%s','%s',%d)",
-			(int)time(NULL), host_esc, ip_esc, dns_esc, (int)port);
+			" (%d,'%s','%s','%s',%d,'%s')",
+			(int)time(NULL), host_esc, ip_esc, dns_esc, (int)port, host_metadata_esc);
 
+	zbx_free(host_metadata_esc);
 	zbx_free(dns_esc);
 	zbx_free(ip_esc);
 	zbx_free(host_esc);
@@ -1839,34 +1871,6 @@ clean:
 
 /******************************************************************************
  *                                                                            *
- * Function: DBsql_id_cmp                                                     *
- *                                                                            *
- * Purpose: construct where condition                                         *
- *                                                                            *
- * Return value: "=<id>" if id not equal zero,                                *
- *               otherwise " is null"                                         *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
- ******************************************************************************/
-const char	*DBsql_id_cmp(zbx_uint64_t id)
-{
-	static unsigned char	n = 0;
-	static char		buf[4][22];	/* 1 - '=', 20 - value size, 1 - '\0' */
-	static const char	is_null[9] = " is null";
-
-	if (0 == id)
-		return is_null;
-
-	n = (n + 1) & 3;
-
-	zbx_snprintf(buf[n], sizeof(buf[n]), "=" ZBX_FS_UI64, id);
-
-	return buf[n];
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: DBsql_id_ins                                                     *
  *                                                                            *
  * Purpose: construct insert statement                                        *
@@ -1977,203 +1981,6 @@ unsigned short	DBget_inventory_field_len(unsigned char inventory_link)
 }
 
 #undef ZBX_MAX_INVENTORY_FIELDS
-
-static const char	*get_table_by_value_type(unsigned char value_type)
-{
-	switch (value_type)
-	{
-		case ITEM_VALUE_TYPE_FLOAT:
-			return "history";
-		case ITEM_VALUE_TYPE_STR:
-			return "history_str";
-		case ITEM_VALUE_TYPE_LOG:
-			return "history_log";
-		case ITEM_VALUE_TYPE_UINT64:
-			return "history_uint";
-		case ITEM_VALUE_TYPE_TEXT:
-			return "history_text";
-		default:
-			assert(0);
-	}
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: DBget_history                                                    *
- *                                                                            *
- * Parameters: itemid     - [IN] item identificator from database             *
- *                               required parameter                           *
- *             value_type - [IN] item value type                              *
- *                               required parameter                           *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
- ******************************************************************************/
-char	**DBget_history(zbx_uint64_t itemid, unsigned char value_type, int function, int clock_from, int clock_to,
-		zbx_timespec_t *ts, const char *field_name, int last_n)
-{
-	const char	*__function_name = "DBget_history";
-	char		sql[512];
-	size_t		offset;
-	DB_RESULT	result;
-	DB_ROW		row;
-	char		**h_value = NULL;
-	int		h_alloc = 1, h_num = 0, retry = 0, sec = 0, ns = 0;
-	const char	*func[] = {"min", "avg", "max", "sum", "count"};
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
-
-	if (NULL == field_name)
-		field_name = "value";
-
-	if (ZBX_DB_GET_HIST_VALUE == function)
-		h_alloc = (0 == last_n ? 128 : last_n);
-
-	h_value = zbx_malloc(h_value, (h_alloc + 1) * sizeof(char *));
-retry:
-	switch (function)
-	{
-		case ZBX_DB_GET_HIST_MIN:
-		case ZBX_DB_GET_HIST_AVG:
-		case ZBX_DB_GET_HIST_MAX:
-		case ZBX_DB_GET_HIST_SUM:
-			offset = zbx_snprintf(sql, sizeof(sql), "select %s(%s)", func[function], field_name);
-			break;
-		case ZBX_DB_GET_HIST_COUNT:
-			offset = zbx_snprintf(sql, sizeof(sql), "select %s(*)", func[function]);
-			break;
-		case ZBX_DB_GET_HIST_DELTA:
-			offset = zbx_snprintf(sql, sizeof(sql), "select max(%s)-min(%s)", field_name, field_name);
-			break;
-		case ZBX_DB_GET_HIST_VALUE:
-			offset = zbx_snprintf(sql, sizeof(sql), "select %s", field_name);
-			break;
-		default:
-			assert(0);
-	}
-
-	offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, " from %s where itemid=" ZBX_FS_UI64,
-			get_table_by_value_type(value_type), itemid);
-
-	if (NULL == ts)
-	{
-		if (0 != last_n && 0 == clock_from && 0 != clock_to)
-		{
-			const int	steps[] = {SEC_PER_HOUR, SEC_PER_DAY, SEC_PER_WEEK, SEC_PER_MONTH};
-
-			if (0 != retry)
-				clock_to -= steps[retry - 1];
-			if (4 != retry)
-			{
-				offset += zbx_snprintf(sql + offset, sizeof(sql) - offset,
-						" and clock>%d", clock_to - steps[retry]);
-			}
-		}
-		if (0 != clock_from)
-			offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, " and clock>%d", clock_from);
-		if (0 != clock_to)
-			offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, " and clock<=%d", clock_to);
-	}
-	else if (1 == retry)
-	{
-		offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, " and clock=%d", sec);
-		if (-1 != ns)
-			offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, " and ns<%d", ns);
-	}
-	else
-		offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, " and clock=%d and ns=%d", ts->sec, ts->ns);
-
-	if (0 != last_n)
-	{
-		if (NULL == ts)
-		{
-			switch (value_type)
-			{
-				case ITEM_VALUE_TYPE_FLOAT:
-				case ITEM_VALUE_TYPE_UINT64:
-				case ITEM_VALUE_TYPE_STR:
-					offset += zbx_snprintf(sql + offset, sizeof(sql) - offset,
-							" order by clock desc");
-					break;
-				default:
-					offset += zbx_snprintf(sql + offset, sizeof(sql) - offset,
-							" order by id desc");
-					break;
-			}
-		}
-		else if (1 == retry)
-		{
-			offset += zbx_snprintf(sql + offset, sizeof(sql) - offset,
-					" order by ns desc");
-		}
-
-		result = DBselectN(sql, last_n - h_num);
-	}
-	else
-		result = DBselect("%s", sql);
-
-	while (NULL != (row = DBfetch(result)) && SUCCEED != DBis_null(row[0]))
-	{
-		if (h_alloc == h_num)
-		{
-			h_alloc = MAX(h_alloc + 1, h_alloc * 3 / 2);
-			h_value = zbx_realloc(h_value, (h_alloc + 1) * sizeof(char *));
-		}
-
-		h_value[h_num++] = zbx_strdup(NULL, row[0]);
-	}
-	DBfree_result(result);
-
-	if (NULL != ts && 0 == h_num && 0 == retry)
-	{
-		result = DBselect(
-				"select max(clock)"
-				" from %s"
-				" where itemid=" ZBX_FS_UI64
-					" and clock<=%d",
-				get_table_by_value_type(value_type), itemid, ts->sec);
-
-		if (NULL != (row = DBfetch(result)) && SUCCEED != DBis_null(row[0]))
-		{
-			if (ts->sec == (sec = atoi(row[0])))
-				ns = ts->ns;
-			else
-				ns = -1;
-			retry = 1;
-		}
-		DBfree_result(result);
-
-		if (1 == retry)
-			goto retry;
-	}
-
-	if (NULL == ts && 0 != last_n && 0 == clock_from && 0 != clock_to && h_num != last_n && 4 != retry)
-	{
-		retry++;
-		goto retry;
-	}
-
-	h_value[h_num] = NULL;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() h_num:%d", __function_name, h_num);
-
-	return h_value;
-}
-
-void	DBfree_history(char **h_value)
-{
-	const char	*__function_name = "DBfree_history";
-	int		h_num;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
-
-	for (h_num = 0; NULL != h_value[h_num]; h_num++)
-		zbx_free(h_value[h_num]);
-
-	zbx_free(h_value);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
-}
 
 int	DBtxn_status()
 {

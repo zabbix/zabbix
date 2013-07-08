@@ -4859,6 +4859,12 @@ return array(
 				'length' => 64,
 				'default' => '',
 			),
+			'host_metadata' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => '',
+			),
 		),
 	),
 	'proxy_autoreg_host' => array(
@@ -4898,6 +4904,12 @@ return array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 64,
+				'default' => '',
+			),
+			'host_metadata' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
 				'default' => '',
 			),
 		),

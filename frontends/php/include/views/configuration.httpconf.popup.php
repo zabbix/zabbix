@@ -90,12 +90,11 @@ else {
 	// append buttons to form
 	$stepid = get_request('stepid', null);
 	$httpPopupForm->addItem(makeFormFooter(
-		array(new CSubmit('save', isset($stepid) ? _('Update') : _('Add'))),
-		array(new CButtonCancel(null, 'close_window();'))
+		new CSubmit('save', isset($stepid) ? _('Update') : _('Add')),
+		new CButtonCancel(null, 'close_window();')
 	));
 
 	$httpPopupWidget->addItem($httpPopupForm);
 }
 
 return $httpPopupWidget;
-

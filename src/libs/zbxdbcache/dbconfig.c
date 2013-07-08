@@ -2898,7 +2898,7 @@ void	init_configuration_cache()
 		exit(FAIL);
 	}
 
-	zbx_mem_create(&config_mem, shm_key, ZBX_NO_MUTEX, config_size, "configuration cache", "CacheSize");
+	zbx_mem_create(&config_mem, shm_key, ZBX_NO_MUTEX, config_size, "configuration cache", "CacheSize", 0);
 
 	config = __config_mem_malloc_func(NULL, sizeof(ZBX_DC_CONFIG) +
 			CONFIG_TIMER_FORKS * sizeof(zbx_vector_ptr_t));
@@ -4179,7 +4179,7 @@ int	DCconfig_update_host_availability(zbx_uint64_t hostid, unsigned char item_ty
 		case ITEM_TYPE_IPMI:
 			dc_host->ipmi_errors_from = errors_from;
 			dc_host->ipmi_available = available;
-			dc_host->ipmi_disable_until = available;
+			dc_host->ipmi_disable_until = disable_until;
 			break;
 		case ITEM_TYPE_JMX:
 			dc_host->jmx_errors_from = errors_from;
