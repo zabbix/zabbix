@@ -977,11 +977,11 @@ function delete_trends_by_itemid($itemIds) {
  * @param string    $item['units']          units of item
  * @param int       $item['valuemapid']     id of mapping set of values
  * @param string    $unknownString          the text to be used if the item has no data
- * @param bool		$ellipsis		        text will be cut and ellipsis "..." added if set to true
+ * @param bool		$trim		        text will be cut and ellipsis "..." added if set to true
  *
  * @return string
  */
-function formatItemLastValue(array $item, $unknownString = '-', $ellipsis = true) {
+function formatItemLastValue(array $item, $unknownString = '-', $trim = true) {
 	if (!isset($item['lastvalue']) || $item['lastclock'] == 0) {
 		return $unknownString;
 	}
@@ -995,7 +995,7 @@ function formatItemLastValue(array $item, $unknownString = '-', $ellipsis = true
 			// break; is not missing here
 		case ITEM_VALUE_TYPE_TEXT:
 		case ITEM_VALUE_TYPE_LOG:
-			if ($ellipsis && zbx_strlen($value) > 20) {
+			if ($trim && zbx_strlen($value) > 20) {
 				$value = zbx_substr($value, 0, 20).'...';
 			}
 
@@ -1006,6 +1006,60 @@ function formatItemLastValue(array $item, $unknownString = '-', $ellipsis = true
 		default:
 			$value = applyValueMap($value, $item['valuemapid']);
 	}
+	return $value;
+}
+
+/**
+ * Format history value.
+ * First format the value according to the configuration of the item. Then apply the value mapping to the formatted (!)
+ * value.
+ *
+ * @param array     $history
+ * @param int       $history['clock']       time when the value was received
+ * @param mixed     $history['value']       value
+ * @param array     $item
+ * @param int       $item['value_type']     type of the value: ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64, ...
+ * @param string    $item['units']          units of item
+ * @param int       $item['valuemapid']     id of mapping set of values
+ * @param bool      $trim
+ *
+ * @return string
+ */
+function formatHistoryValue(array $history, array $item, $trim = true) {
+	$mapping = false;
+
+	// format value
+	if ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT || $item['value_type'] == ITEM_VALUE_TYPE_UINT64) {
+		$value = convert_units($history['value'], $item['units']);
+	}
+	elseif ($item['value_type'] == ITEM_VALUE_TYPE_STR
+		|| $item['value_type'] == ITEM_VALUE_TYPE_TEXT
+		|| $item['value_type'] == ITEM_VALUE_TYPE_LOG) {
+		$value = $history['value'];
+	}
+	else {
+		$value = _('Unknown value type');
+	}
+
+	// apply value mapping
+	switch ($item['value_type']) {
+		case ITEM_VALUE_TYPE_STR:
+			$mapping = getMappedValue($value, $item['valuemapid']);
+		// break; is not missing here
+		case ITEM_VALUE_TYPE_TEXT:
+		case ITEM_VALUE_TYPE_LOG:
+			if ($trim && zbx_strlen($value) > 20) {
+				$value = zbx_substr($value, 0, 20).'...';
+			}
+
+			if ($mapping !== false) {
+				$value = $mapping.' ('.$value.')';
+			}
+			break;
+		default:
+			$value = applyValueMap($value, $item['valuemapid']);
+	}
+
 	return $value;
 }
 

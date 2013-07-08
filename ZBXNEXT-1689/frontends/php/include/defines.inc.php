@@ -790,6 +790,7 @@ define('SPACE',	'&nbsp;');
 define('RARR',	'&rArr;');
 define('SQUAREBRACKETS', '%5B%5D');
 define('NAME_DELIMITER', ': ');
+define('UNKNOWN_VALUE', '-');
 
 // affects multibyte strings [in mb_ereg char "-" must be backslashed]!!!
 if (in_array(ini_get('mbstring.func_overload'), array(2,3,6,7))) {
