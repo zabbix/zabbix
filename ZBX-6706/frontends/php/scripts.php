@@ -305,8 +305,10 @@ else {
 	$data['paging'] = getPagingLine($data['scripts']);
 
 	// nodes
-	foreach ($data['scripts'] as $key => $script) {
-		$data['scripts'][$key]['nodename'] = $data['displayNodes'] ? get_node_name_by_elid($script['scriptid'], true) : '';
+	if ($data['displayNodes']) {
+		foreach ($data['scripts'] as $key => $script) {
+			$data['scripts'][$key]['nodename'] = get_node_name_by_elid($script['scriptid'], true);
+		}
 	}
 
 	// render view

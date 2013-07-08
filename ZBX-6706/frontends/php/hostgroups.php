@@ -337,8 +337,10 @@ else {
 	order_result($data['groups'], $sortfield, getPageSortOrder());
 
 	// nodes
-	foreach ($data['groups'] as $key => $group) {
-		$data['groups'][$key]['nodename'] = $data['displayNodes'] ? get_node_name_by_elid($group['groupid'], true) : '';
+	if ($data['displayNodes']) {
+		foreach ($data['groups'] as $key => $group) {
+			$data['groups'][$key]['nodename'] = get_node_name_by_elid($group['groupid'], true);
+		}
 	}
 
 	// render view

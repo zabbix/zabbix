@@ -476,10 +476,12 @@ else {
 	$data['paging'] = getPagingLine($data['actions']);
 
 	// nodes
-	foreach ($data['actions'] as &$action) {
-		$action['nodename'] = $data['displayNodes'] ? get_node_name_by_elid($action['actionid'], true) : '';
+	if ($data['displayNodes']) {
+		foreach ($data['actions'] as &$action) {
+			$action['nodename'] = get_node_name_by_elid($action['actionid'], true);
+		}
+		unset($action);
 	}
-	unset($action);
 
 	// render view
 	$actionView = new CView('configuration.action.list', $data);

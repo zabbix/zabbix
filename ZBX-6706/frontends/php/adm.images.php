@@ -179,10 +179,12 @@ else {
 	));
 
 	// nodes
-	foreach ($data['images'] as &$image) {
-		$image['nodename'] = $data['displayNodes'] ? get_node_name_by_elid($image['imageid'], true).NAME_DELIMITER : '';
+	if ($data['displayNodes']) {
+		foreach ($data['images'] as &$image) {
+			$image['nodename'] = get_node_name_by_elid($image['imageid'], true).NAME_DELIMITER;
+		}
+		unset($image);
 	}
-	unset($image);
 
 	$imageForm = new CView('administration.general.image.list', $data);
 }

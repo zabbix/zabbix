@@ -19,6 +19,13 @@
 **/
 
 
+/**
+ * Find user theme or get default theme.
+ *
+ * @param array $userData
+ *
+ * @return string
+ */
 function getUserTheme($userData) {
 	$config = select_config();
 
@@ -35,6 +42,13 @@ function getUserTheme($userData) {
 	return $css;
 }
 
+/**
+ * Get user type name.
+ *
+ * @param int $userType
+ *
+ * @return string
+ */
 function user_type2str($userType = null) {
 	$userTypes = array(
 		USER_TYPE_ZABBIX_USER => _('Zabbix User'),
@@ -53,6 +67,13 @@ function user_type2str($userType = null) {
 	}
 }
 
+/**
+ * Get user authentication name.
+ *
+ * @param int $authType
+ *
+ * @return string
+ */
 function user_auth_type2str($authType) {
 	if ($authType === null) {
 		$authType = get_user_auth(CWebUser::$data['userid']);
@@ -67,12 +88,26 @@ function user_auth_type2str($authType) {
 	return isset($authUserType[$authType]) ? $authUserType[$authType] : _('Unknown');
 }
 
+/**
+ * Unblock user account.
+ *
+ * @param array $userIds
+ *
+ * @return bool
+ */
 function unblock_user_login($userIds) {
 	zbx_value2array($userIds);
 
 	return DBexecute('UPDATE users SET attempt_failed=0 WHERE '.dbConditionInt('userid', $userIds));
 }
 
+/**
+ * Get users ids by groups ids.
+ *
+ * @param array $userGroupIds
+ *
+ * @return array
+ */
 function get_userid_by_usrgrpid($userGroupIds) {
 	zbx_value2array($userGroupIds);
 
@@ -92,6 +127,14 @@ function get_userid_by_usrgrpid($userGroupIds) {
 	return $userIds;
 }
 
+/**
+ * Append user to group.
+ *
+ * @param string $userId
+ * @param string $userGroupId
+ *
+ * @return bool
+ */
 function add_user_to_group($userId, $userGroupId) {
 	if (granted2move_user($userId, $userGroupId)) {
 		DBexecute('DELETE FROM users_groups WHERE userid='.$userId.' AND usrgrpid='.$userGroupId);
@@ -109,6 +152,14 @@ function add_user_to_group($userId, $userGroupId) {
 	return false;
 }
 
+/**
+ * Remove user from group.
+ *
+ * @param string $userId
+ * @param string $userGroupId
+ *
+ * @return bool
+ */
 function remove_user_from_group($userId, $userGroupId) {
 	if (granted2move_user($userId, $userGroupId)) {
 		return DBexecute('DELETE FROM users_groups WHERE userid='.$userId.' AND usrgrpid='.$userGroupId);
@@ -120,6 +171,13 @@ function remove_user_from_group($userId, $userGroupId) {
 	return false;
 }
 
+/**
+ * Check if group has permissions for update.
+ *
+ * @param array $userGroupIds
+ *
+ * @return bool
+ */
 function granted2update_group($userGroupIds) {
 	zbx_value2array($userGroupIds);
 
@@ -128,6 +186,14 @@ function granted2update_group($userGroupIds) {
 	return !isset($users[CWebUser::$data['userid']]);
 }
 
+/**
+ * Check if user can be appended to group.
+ *
+ * @param string $userId
+ * @param string $userGroupId
+ *
+ * @return bool
+ */
 function granted2move_user($userId, $userGroupId) {
 	$group = API::UserGroup()->get(array(
 		'usrgrpids' => $userGroupId,
@@ -142,6 +208,14 @@ function granted2move_user($userId, $userGroupId) {
 	return true;
 }
 
+/**
+ * Change group status.
+ *
+ * @param array $userGroupIds
+ * @param int   $usersStatus
+ *
+ * @return bool
+ */
 function change_group_status($userGroupIds, $usersStatus) {
 	zbx_value2array($userGroupIds);
 
@@ -159,6 +233,14 @@ function change_group_status($userGroupIds, $usersStatus) {
 	return false;
 }
 
+/**
+ * Change gui access for group.
+ *
+ * @param array $userGroupIds
+ * @param int   $guiAccess
+ *
+ * @return bool
+ */
 function change_group_gui_access($userGroupIds, $guiAccess) {
 	zbx_value2array($userGroupIds);
 
@@ -176,6 +258,14 @@ function change_group_gui_access($userGroupIds, $guiAccess) {
 	return false;
 }
 
+/**
+ * Change debug mode for group.
+ *
+ * @param array $userGroupIds
+ * @param int   $debugMode
+ *
+ * @return bool
+ */
 function change_group_debug_mode($userGroupIds, $debugMode) {
 	zbx_value2array($userGroupIds);
 

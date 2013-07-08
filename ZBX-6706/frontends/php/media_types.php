@@ -277,8 +277,10 @@ else {
 		$data['paging'] = getPagingLine($data['mediatypes']);
 
 		// nodes
-		foreach ($data['mediatypes'] as $key => $mediaType) {
-			$data['mediatypes'][$key]['nodename'] = $data['displayNodes'] ? get_node_name_by_elid($mediaType['mediatypeid'], true) : '';
+		if ($data['displayNodes']) {
+			foreach ($data['mediatypes'] as $key => $mediaType) {
+				$data['mediatypes'][$key]['nodename'] = get_node_name_by_elid($mediaType['mediatypeid'], true);
+			}
 		}
 	}
 	else {

@@ -316,9 +316,10 @@ else {
 		}
 
 		// nodes
-		foreach ($data['applications'] as $key => $application) {
-			$data['applications'][$key]['nodename'] = $data['displayNodes']
-				? get_node_name_by_elid($application['applicationid'], true) : '';
+		if ($data['displayNodes']) {
+			foreach ($data['applications'] as $key => $application) {
+				$data['applications'][$key]['nodename'] = get_node_name_by_elid($application['applicationid'], true);
+			}
 		}
 	}
 	else {

@@ -458,10 +458,12 @@ else {
 	$data['paging'] = getPagingLine($data['usergroups']);
 
 	// nodes
-	foreach ($data['usergroups'] as &$userGroup) {
-		$userGroup['nodename'] = $data['displayNodes'] ? get_node_name_by_elid($userGroup['usrgrpid'], true) : '';
+	if ($data['displayNodes']) {
+		foreach ($data['usergroups'] as &$userGroup) {
+			$userGroup['nodename'] = get_node_name_by_elid($userGroup['usrgrpid'], true);
+		}
+		unset($userGroup);
 	}
-	unset($userGroup);
 
 	// render view
 	$userGroupsView = new CView('administration.usergroups.list', $data);
