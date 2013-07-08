@@ -276,8 +276,8 @@ class CProxy extends CZBXAPI {
 				// check if host is already linked
 				foreach ($hostIds as $hostId) {
 					if (isset($hosts[$hostId])) {
-						if (!empty($hosts[$hostId]['proxy_hostid']) &&
-								$hosts[$hostId]['proxy_hostid'] != $proxy['proxyid']) {
+						if (!empty($hosts[$hostId]['proxy_hostid'])
+								&& $hosts[$hostId]['proxy_hostid'] != $proxy['proxyid']) {
 							self::exception(ZBX_API_ERROR_PARAMETERS,
 								_s('Cannot add host "%1$s". Host must be unlinked first.', $hosts[$hostId]['name']));
 						}
