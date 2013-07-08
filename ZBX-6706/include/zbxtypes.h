@@ -23,9 +23,6 @@
 #define	ZBX_FS_DBL		"%lf"
 #define	ZBX_FS_DBL_EXT(p)	"%." #p "lf"
 
-#define ZBX_FS_SIZE_T		"%u"
-#define zbx_fs_size_t		unsigned int	/* use this type only in calls to printf() for formatting size_t */
-
 #define ZBX_PTR_SIZE		sizeof(void *)
 
 #if defined(_WINDOWS)
@@ -114,6 +111,9 @@
 #endif
 
 #endif	/* _WINDOWS */
+
+#define ZBX_FS_SIZE_T		ZBX_FS_UI64
+#define zbx_fs_size_t		zbx_uint64_t	/* use this type only in calls to printf() for formatting size_t */
 
 #ifndef S_ISREG
 #	define S_ISREG(x) (((x) & S_IFMT) == S_IFREG)
