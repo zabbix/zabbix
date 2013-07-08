@@ -1031,4 +1031,48 @@ class CHttpTestManager {
 
 		return false;
 	}
+
+	/**
+	 * Returns the data about the last execution of the given HTTP tests.
+	 *
+	 * The following values will be returned for each executed HTTP test:
+	 * - lastcheck      - time when the test has been executed last
+	 * - lastfailedstep - number of the last failed step
+	 * - error          - error message
+	 *
+	 * If a HTTP test has never been executed, no value will be returned.
+	 *
+	 * @param array $httpTestIds
+	 *
+	 * @return array    an array with HTTP test IDs as keys and arrays of data as values
+	 */
+	public function fetchLastData(array $httpTestIds) {
+		$httpItems = DBfetchArray(DBselect(
+			'SELECT hti.httptestid,hti.type,i.itemid,i.value_type'.
+			' FROM httptestitem hti,items i'.
+			' WHERE hti.itemid=i.itemid'.
+				' AND hti.type IN ('.HTTPSTEP_ITEM_TYPE_LASTSTEP.','.HTTPSTEP_ITEM_TYPE_LASTERROR.')'.
+				' AND '.dbConditionInt('hti.httptestid', $httpTestIds)
+		));
+
+		$historyManager = new CHistoryManager();
+		$history = $historyManager->fetchLast($httpItems);
+
+		$data = array();
+		foreach ($httpItems as $httpItem) {
+			if (isset($history[$httpItem['itemid']])) {
+				$itemHistory = $history[$httpItem['itemid']][0];
+
+				if ($httpItem['type'] == HTTPSTEP_ITEM_TYPE_LASTSTEP) {
+					$data[$httpItem['httptestid']]['lastcheck'] = $itemHistory['clock'];
+					$data[$httpItem['httptestid']]['lastfailedstep'] = $itemHistory['value'];
+				}
+				else {
+					$data[$httpItem['httptestid']]['error'] = $itemHistory['value'];
+				}
+			}
+		}
+
+		return $data;
+	}
 }

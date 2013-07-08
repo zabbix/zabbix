@@ -117,43 +117,33 @@ if ($pageFilter->hostsSelected) {
 
 	order_result($httpTests, getPageSortField('name'), getPageSortOrder());
 
-	$dbSteps = DBselect(
-		'SELECT hti.httptestid,hti.type,i.lastvalue,i.lastclock'.
-				' FROM httptestitem hti,items i'.
-				' WHERE hti.itemid=i.itemid'.
-				' AND hti.type IN ('.HTTPSTEP_ITEM_TYPE_LASTSTEP.','.HTTPSTEP_ITEM_TYPE_LASTERROR.')'.
-				' AND i.lastclock IS NOT NULL'.
-				' AND '.dbConditionInt('hti.httptestid', array_keys($httpTests))
-	);
-	while ($dbStep = DBfetch($dbSteps)) {
-		if ($dbStep['type'] == HTTPSTEP_ITEM_TYPE_LASTSTEP) {
-			if (!isset($httpTests[$dbStep['httptestid']]['lastcheck'])) {
-				$httpTests[$dbStep['httptestid']]['lastcheck'] = $dbStep['lastclock'];
-			}
-			$httpTests[$dbStep['httptestid']]['lastfailedstep'] = $dbStep['lastvalue'];
-		}
-		else {
-			$httpTests[$dbStep['httptestid']]['error'] = $dbStep['lastvalue'];
-		}
-	}
-
+	// fetch the latest results of the web scenario
+	$httpTestManager = new CHttpTestManager();
+	$lastHttpTestData = $httpTestManager->fetchLastData(array_keys($httpTests));
 
 	foreach($httpTests as $httpTest) {
-		$lastcheck = isset($httpTest['lastcheck']) ? zbx_date2str(_('d M Y H:i:s'), $httpTest['lastcheck']) : _('Never');
+		$lastData = isset($lastHttpTestData[$httpTest['httptestid']]) ? $lastHttpTestData[$httpTest['httptestid']] : null;
 
-		if (!isset($httpTest['lastcheck'])) {
+		// test has history data
+		if ($lastData) {
+			$lastcheck = zbx_date2str(_('d M Y H:i:s'), $lastData['lastcheck']);
+
+			if ($lastData['lastfailedstep'] != 0) {
+				$step_data = get_httpstep_by_no($httpTest['httptestid'], $lastData['lastfailedstep']);
+				$status['msg'] = _s('Step "%1$s" [%2$s of %3$s] failed: %4$s', $step_data['name'],
+					$lastData['lastfailedstep'], $httpTest['steps'], $lastData['error']);
+				$status['style'] = 'disabled';
+			}
+			else {
+				$status['msg'] = _('OK');
+				$status['style'] = 'enabled';
+			}
+		}
+		// no history data exists
+		else {
+			$lastcheck =  _('Never');
 			$status['msg'] = _('Unknown');
 			$status['style'] = 'unknown';
-		}
-		elseif ($httpTest['lastfailedstep'] != 0) {
-			$step_data = get_httpstep_by_no($httpTest['httptestid'], $httpTest['lastfailedstep']);
-			$status['msg'] = _s('Step "%1$s" [%2$s of %3$s] failed: %4$s', $step_data['name'],
-				$httpTest['lastfailedstep'], $httpTest['steps'], $httpTest['error']);
-			$status['style'] = 'disabled';
-		}
-		else {
-			$status['msg'] = _('OK');
-			$status['style'] = 'enabled';
 		}
 
 		$table->addRow(new CRow(array(
