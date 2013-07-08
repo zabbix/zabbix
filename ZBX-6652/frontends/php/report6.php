@@ -144,8 +144,33 @@ require_once dirname(__FILE__).'/include/page_header.php';
 		}
 		unset($_REQUEST['delete_period'], $_REQUEST['group_pid']);
 	}
-?>
-<?php
+
+	// item validation
+	if (isset($_REQUEST['items'])) {
+		$itemIds = zbx_objectValues($_REQUEST['items'], 'itemid');
+		$hosts = API::Host()->get(array(
+			'monitored_hosts' => true,
+			'itemids' => $itemIds
+		));
+
+		if (empty($hosts)) {
+			unset($_REQUEST['items']);
+		}
+		else {
+			$itemIds = array();
+			foreach ($hosts as $item) {
+				$itemIds = array_merge($itemIds, zbx_objectValues($item['items'], 'itemid'));
+			}
+
+			// remove all invalid items
+			foreach ($_REQUEST['items'] as $idx => $item) {
+				if (!in_array($item['itemid'], $itemIds)) {
+					unset($_REQUEST['items'][$idx]);
+				}
+			}
+		}
+	}
+
 	$config = $_REQUEST['config'] = get_request('config',1);
 
 	$_REQUEST['report_timesince'] = zbxDateToTime(get_request('report_timesince', date('YmdHis', time() - SEC_PER_DAY)));
