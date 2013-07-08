@@ -21,10 +21,10 @@
 
 function getRegexp($regexpId) {
 	return DBfetch(DBselect(
-			'SELECT re.*'.
-			' FROM regexps re'.
-			' WHERE regexpid='.$regexpId.
-				andDbNode('re.regexpid')
+		'SELECT re.*'.
+		' FROM regexps re'.
+		' WHERE regexpid='.$regexpId.
+			andDbNode('re.regexpid')
 	));
 }
 
@@ -54,9 +54,9 @@ function addRegexp(array $regexp, array $expressions) {
 		}
 
 		// check duplicate name
-		$sql = 'SELECT re.regexpid '.
-				'FROM regexps re '.
-				'WHERE re.name='.zbx_dbstr($regexp['name']).
+		$sql = 'SELECT re.regexpid'.
+				' FROM regexps re'.
+				' WHERE re.name='.zbx_dbstr($regexp['name']).
 					andDbNode('re.regexpid');
 		if (DBfetch(DBselect($sql))) {
 			throw new Exception(_s('Regular expression "%s" already exists.', $regexp['name']));
@@ -93,9 +93,9 @@ function updateRegexp(array $regexp, array $expressions) {
 
 		// check duplicate name
 		$dbRegexp = DBfetch(DBselect(
-			'SELECT re.regexpid '.
-			'FROM regexps re '.
-			'WHERE re.name='.zbx_dbstr($regexp['name']).
+			'SELECT re.regexpid'.
+			' FROM regexps re'.
+			' WHERE re.name='.zbx_dbstr($regexp['name']).
 				andDbNode('re.regexpid')
 		));
 		if ($dbRegexp && bccomp($regexpId, $dbRegexp['regexpid']) != 0) {
@@ -122,14 +122,15 @@ function updateRegexp(array $regexp, array $expressions) {
  * If all fields are equal to existing expression, that expression is not touched.
  * Other expressions are removed and new ones created.
  *
- * @param $regexpId
- * @param array $expressions
+ * @param string $regexpId
+ * @param array  $expressions
  */
 function rewriteRegexpExpressions($regexpId, array $expressions) {
 	$dbExpressions = getRegexpExpressions($regexpId);
 
 	$expressionsToAdd = array();
 	$expressionsToUpdate = array();
+
 	foreach ($expressions as $expression) {
 		if (!isset($expression['expressionid'])) {
 			$expressionsToAdd[] = $expression;
@@ -140,16 +141,16 @@ function rewriteRegexpExpressions($regexpId, array $expressions) {
 		}
 	}
 
-	if (!empty($dbExpressions)) {
+	if ($dbExpressions) {
 		$dbExpressionIds = zbx_objectValues($dbExpressions, 'expressionid');
 		deleteRegexpExpressions($dbExpressionIds);
 	}
 
-	if (!empty($expressionsToAdd)) {
+	if ($expressionsToAdd) {
 		addRegexpExpressions($regexpId, $expressionsToAdd);
 	}
 
-	if (!empty($expressionsToUpdate)) {
+	if ($expressionsToUpdate) {
 		updateRegexpExpressions($expressionsToUpdate);
 	}
 }

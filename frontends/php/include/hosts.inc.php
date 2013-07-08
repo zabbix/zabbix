@@ -40,7 +40,7 @@ function ipmiAuthTypes($type = null) {
 		IPMI_AUTHTYPE_MD5 => _('MD5'),
 		IPMI_AUTHTYPE_STRAIGHT => _('Straight'),
 		IPMI_AUTHTYPE_OEM => _('OEM'),
-		IPMI_AUTHTYPE_RMCP_PLUS => _('RMCP+'),
+		IPMI_AUTHTYPE_RMCP_PLUS => _('RMCP+')
 	);
 
 	if (is_null($type)) {
@@ -67,7 +67,7 @@ function ipmiPrivileges($type = null) {
 		IPMI_PRIVILEGE_USER => _('User'),
 		IPMI_PRIVILEGE_OPERATOR => _('Operator'),
 		IPMI_PRIVILEGE_ADMIN => _('Admin'),
-		IPMI_PRIVILEGE_OEM => _('OEM'),
+		IPMI_PRIVILEGE_OEM => _('OEM')
 	);
 
 	if (is_null($type)) {
@@ -82,18 +82,19 @@ function ipmiPrivileges($type = null) {
 }
 
 /**
- * Get info about what host inventory fields we have, their numbers and names
+ * Get info about what host inventory fields we have, their numbers and names.
  * Example of usage:
  *      $inventories = getHostInventories();
  *      echo $inventories[1]['db_field']; // host_networks
  *      echo $inventories[1]['title']; // Host networks
  *      echo $inventories[1]['nr']; // 1
- * @author Konstantin Buravcov
- * @param bool $orderedByTitle whether an array should be ordered by field title, not by number
+ *
+ * @param bool $orderedByTitle	whether an array should be ordered by field title, not by number
+ *
  * @return array
  */
 function getHostInventories($orderedByTitle = false) {
-	/**
+	/*
 	 * WARNING! Before modifying this array, make sure changes are synced with C
 	 * C analog is located in function DBget_inventory_field() in src/libs/zbxdbhigh/db.c
 	 */
@@ -484,9 +485,11 @@ function hostInterfaceTypeNumToName($type) {
 
 function get_hostgroup_by_groupid($groupid) {
 	$groups = DBfetch(DBselect('SELECT g.* FROM groups g WHERE g.groupid='.$groupid));
-	if (!empty($groups)) {
+
+	if ($groups) {
 		return $groups;
 	}
+
 	error(_s('No host groups with groupid "%s".', $groupid));
 
 	return false;
@@ -518,22 +521,27 @@ function get_host_by_itemid($itemids) {
 		$result = $hosts;
 		unset($hosts);
 	}
+
 	return $result;
 }
 
 function get_host_by_hostid($hostid, $no_error_message = 0) {
 	$row = DBfetch(DBselect('SELECT h.* FROM hosts h WHERE h.hostid='.$hostid));
+
 	if ($row) {
 		return $row;
 	}
+
 	if ($no_error_message == 0) {
 		error(_s('No host with hostid "%s".', $hostid));
 	}
+
 	return false;
 }
 
 function get_hosts_by_templateid($templateids) {
 	zbx_value2array($templateids);
+
 	return DBselect(
 		'SELECT h.*'.
 		' FROM hosts h,hosts_templates ht'.
@@ -544,14 +552,15 @@ function get_hosts_by_templateid($templateids) {
 
 function updateHostStatus($hostids, $status) {
 	zbx_value2array($hostids);
+
 	$hostIds = array();
 	$oldStatus = ($status == HOST_STATUS_MONITORED ? HOST_STATUS_NOT_MONITORED : HOST_STATUS_MONITORED);
 
 	$db_hosts = DBselect(
 		'SELECT h.hostid,h.host,h.status'.
-			' FROM hosts h'.
-			' WHERE '.dbConditionInt('h.hostid', $hostids).
-				' AND h.status='.$oldStatus
+		' FROM hosts h'.
+		' WHERE '.dbConditionInt('h.hostid', $hostids).
+			' AND h.status='.$oldStatus
 	);
 	while ($host = DBfetch($db_hosts)) {
 		$hostIds[] = $host['hostid'];
@@ -570,9 +579,11 @@ function updateHostStatus($hostids, $status) {
 
 function get_application_by_applicationid($applicationid, $no_error_message = 0) {
 	$row = DBfetch(DBselect('SELECT a.* FROM applications a WHERE a.applicationid='.$applicationid));
+
 	if ($row) {
 		return $row;
 	}
+
 	if ($no_error_message == 0) {
 		error(_s('No application with ID "%1$s".', $applicationid));
 	}
@@ -635,14 +646,8 @@ function getApplicationSourceParentIds(array $applicationIds, array $templateApp
 }
 
 /**
- * Function: validate_templates
- *
- * Description:
- *     Check collisions between templates
- *
- * Comments:
- *           $templateid_list can be numeric or numeric array
- *
+ * Check collisions between templates.
+ * $param int|array $templateid_list
  */
 function validate_templates($templateid_list) {
 	if (is_numeric($templateid_list)) {
@@ -752,6 +757,7 @@ function getDeletableHostGroups($groupids = null) {
  */
 function hostMenuData(array $host, array $scripts = array()) {
 	$menuScripts = array();
+
 	foreach ($scripts as $script) {
 		$menuScripts[] = array(
 			'scriptid' => $script['scriptid'],
@@ -768,15 +774,16 @@ function hostMenuData(array $host, array $scripts = array()) {
 	);
 }
 
-function isTemplate($hostid) {
-	$dbHost = DBfetch(DBselect('SELECT h.status FROM hosts h WHERE h.hostid='.$hostid));
+function isTemplate($hostId) {
+	$dbHost = DBfetch(DBselect('SELECT h.status FROM hosts h WHERE h.hostid='.$hostId));
 
-	return !empty($dbHost) && $dbHost['status'] == HOST_STATUS_TEMPLATE;
+	return ($dbHost && $dbHost['status'] == HOST_STATUS_TEMPLATE);
 }
 
 function isTemplateInHost($hosts) {
-	if (!empty($hosts)) {
+	if ($hosts) {
 		$hosts = zbx_toArray($hosts);
+
 		foreach ($hosts as $host) {
 			if (!empty($host['templateid'])) {
 				return $host['templateid'];
