@@ -1,6 +1,7 @@
 Changes for 2.1.0
 
 New features:
+........S. [ZBXNEXT-322] implemented value cache (wiper)
 ...G...... [ZBXNEXT-1571] added support for proc.num for HP-UX (igors)
 ...G...PS. [ZBX-6299] added JSON validator (wiper)
 A.FGI..PS. [ZBXNEXT-1726] added support for optional host metadata to active agent for auto-registration (dimir, Oleg)
@@ -271,6 +272,7 @@ A......... [ZBX-6407] improved data retrieval performance for CTrigger get() wit
 A.F....... [ZBX-1357] updated Brazilian Portuguese, Chinese (China), Latvian, Spanish and Turkish translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+.......P.. [ZBX-6630] faster proxy configuration synchronization (Andris)
 ...G...... [ZBX-6655] fixed possible agent crash when processing system.sw.packages[] (igors)
 A......... [ZBX-6725] fixed undefined indexes in item list view when trigger has items from different hosts (Toms)
 ....I..... [ZBX-6700] improved PostgreSQL upgrade patch (dotneft, Oleg)
