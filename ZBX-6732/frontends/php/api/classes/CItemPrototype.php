@@ -20,6 +20,8 @@
 
 
 /**
+ * Class containing methods for operations with item prototypes.
+ *
  * @package API
  */
 class CItemPrototype extends CItemGeneral {
