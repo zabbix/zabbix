@@ -936,7 +936,7 @@ static int	DBpatch_2010049(void)
 	return DBcreate_index("escalations", "escalations_1", "actionid,triggerid,itemid,escalationid", 1);
 }
 
-static int	DBpatch_2010050()
+static int	DBpatch_2010050(void)
 {
 	char		*fields[] = {"ts_from", "ts_to", NULL};
 	DB_RESULT	result;
@@ -1257,25 +1257,39 @@ static int	DBpatch_2010084(void)
 
 static int	DBpatch_2010085(void)
 {
-	return DBdrop_field("items", "lastclock");
+	const ZBX_FIELD	field = {"host_metadata", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("autoreg_host", &field);
 }
 
 static int	DBpatch_2010086(void)
 {
-	return DBdrop_field("items", "lastns");
+	const ZBX_FIELD	field = {"host_metadata", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("proxy_autoreg_host", &field);
 }
 
 static int	DBpatch_2010087(void)
 {
-	return DBdrop_field("items", "lastvalue");
+	return DBdrop_field("items", "lastclock");
 }
 
 static int	DBpatch_2010088(void)
 {
-	return DBdrop_field("items", "prevvalue");
+	return DBdrop_field("items", "lastns");
 }
 
 static int	DBpatch_2010089(void)
+{
+	return DBdrop_field("items", "lastvalue");
+}
+
+static int	DBpatch_2010090(void)
+{
+	return DBdrop_field("items", "prevvalue");
+}
+
+static int	DBpatch_2010091(void)
 {
 	return DBdrop_field("items", "prevorgvalue");
 }
@@ -1418,6 +1432,8 @@ int	DBcheck_version(void)
 	DBPATCH_ADD(2010087, 0, 1)
 	DBPATCH_ADD(2010088, 0, 1)
 	DBPATCH_ADD(2010089, 0, 1)
+	DBPATCH_ADD(2010090, 0, 1)
+	DBPATCH_ADD(2010091, 0, 1)
 
 	DBPATCH_END()
 
@@ -1428,7 +1444,7 @@ int	DBcheck_version(void)
 	if (SUCCEED != DBtable_exists(dbversion_table_name))
 	{
 #ifndef HAVE_SQLITE3
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() \"%s\" doesn't exist",
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() \"%s\" does not exist",
 				__function_name, dbversion_table_name);
 
 		if (SUCCEED != DBfield_exists("config", "server_check_interval"))

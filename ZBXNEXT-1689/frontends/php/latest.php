@@ -636,4 +636,4 @@ foreach ($db_hosts as $hostId => $dbHost) {
 $latest_wdgt->addItem($table);
 $latest_wdgt->show();
 
-require_once 'include/page_footer.php';
+require_once dirname(__FILE__).'/include/page_footer.php';

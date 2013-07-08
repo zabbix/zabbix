@@ -246,17 +246,28 @@ typedef enum
 	ITEM_VALUE_TYPE_UINT64,
 	ITEM_VALUE_TYPE_TEXT,
 	/* the number of defined value types */
-	ITEM_VALUE_TYPE_COUNT
+	ITEM_VALUE_TYPE_MAX
 }
 zbx_item_value_type_t;
 const char	*zbx_item_value_type_string(zbx_item_value_type_t value_type);
 
+typedef struct
+{
+	int	timestamp;
+	int	logeventid;
+	int	severity;
+	char	*source;
+	char	*value;
+}
+zbx_history_log_t;
+
 typedef union
 {
-	double		dbl;
-	zbx_uint64_t	ui64;
-	char		*str;
-	char		*err;
+	double			dbl;
+	zbx_uint64_t		ui64;
+	char			*str;
+	char			*err;
+	zbx_history_log_t	*log;
 }
 history_value_t;
 
@@ -350,6 +361,7 @@ const char	*zbx_dservice_type_string(zbx_dservice_type_t service);
 #define CONDITION_TYPE_DOBJECT			21
 #define CONDITION_TYPE_HOST_NAME		22
 #define CONDITION_TYPE_EVENT_TYPE		23
+#define CONDITION_TYPE_HOST_METADATA		24
 
 /* condition operators */
 #define CONDITION_OPERATOR_EQUAL		0

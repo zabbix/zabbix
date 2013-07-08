@@ -20,6 +20,8 @@
 
 
 /**
+ * Class containing methods for operations with graphs.
+ *
  * @package API
  */
 abstract class CGraphGeneral extends CZBXAPI {
@@ -388,7 +390,8 @@ abstract class CGraphGeneral extends CZBXAPI {
 				'itemids' => $axisItems,
 				'output' => array('itemid'),
 				'countOutput' => true,
-				'filter' => array('flags' => null)
+				'webitems' => true,
+				'filter' => array('flags' => null, 'value_type' => array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64))
 			);
 			if ($tpl) {
 				$options['hostids'] = $tpl;
@@ -503,6 +506,4 @@ abstract class CGraphGeneral extends CZBXAPI {
 
 		return $result;
 	}
-
-
 }

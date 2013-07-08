@@ -19,8 +19,10 @@
 
 #include "common.h"
 #include "log.h"
+#include "valuecache.h"
 
 #include "checks_aggregate.h"
+
 
 #define ZBX_GRP_FUNC_MIN	0
 #define ZBX_GRP_FUNC_AVG	1
@@ -28,21 +30,19 @@
 #define ZBX_GRP_FUNC_SUM	3
 
 static void	evaluate_one(DC_ITEM *item, history_value_t *result, int *num, int grp_func,
-		const char *value_str, unsigned char value_type)
+		const history_value_t *pvalue, unsigned char value_type)
 {
-	history_value_t	value;
+	history_value_t		value = *pvalue;
 
 	switch (value_type)
 	{
 		case ITEM_VALUE_TYPE_FLOAT:
-			value.dbl = atof(value_str);
 			if (ITEM_VALUE_TYPE_UINT64 == item->value_type)
-				value.ui64 = (zbx_uint64_t)value.dbl;
+				value.ui64 = (zbx_uint64_t)pvalue->dbl;
 			break;
 		case ITEM_VALUE_TYPE_UINT64:
-			ZBX_STR2UINT64(value.ui64, value_str);
 			if (ITEM_VALUE_TYPE_FLOAT == item->value_type)
-				value.dbl = (double)value.ui64;
+				value.dbl = (double)pvalue->ui64;
 			break;
 		default:
 			assert(0);
@@ -204,15 +204,17 @@ static int	evaluate_aggregate(DC_ITEM *item, AGENT_RESULT *res, int grp_func, co
 	DB_ROW			row;
 	unsigned char		value_type;
 	history_value_t		value;
-	int			num = 0, ret = FAIL;
-	int			clock_from, count;
-	unsigned int		period;
-	char			**h_value;
+	int			num = 0, ret = FAIL, now, *errorcodes = NULL, i, count, seconds;
+	DC_ITEM			*items = NULL;
+	zbx_vector_vc_value_t	values;
+
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() grp_func:%d groups:'%s' itemkey:'%s' item_func:%d param:'%s'",
 			__function_name, grp_func, groups, itemkey, item_func, param);
 
 	memset(&value, 0, sizeof(value));
+
+	now = time(NULL);
 
 	zbx_vector_uint64_create(&itemids);
 	aggregate_get_items(&itemids, groups, itemkey);
@@ -225,46 +227,45 @@ static int	evaluate_aggregate(DC_ITEM *item, AGENT_RESULT *res, int grp_func, co
 
 	sql = zbx_malloc(sql, sql_alloc);
 
-	if (FAIL == is_uint_suffix(param, &period))
-	{
-		SET_MSG_RESULT(res, zbx_strdup(NULL, "Invalid fourth parameter"));
-		goto clean;
-	}
+	items = zbx_malloc(NULL, sizeof(DC_ITEM) * itemids.values_num);
+	errorcodes = zbx_malloc(NULL, sizeof(int) * itemids.values_num);
+
+	DCconfig_get_items_by_itemids(items, itemids.values, errorcodes, itemids.values_num);
 
 	if (ZBX_DB_GET_HIST_VALUE == item_func)
 	{
-		clock_from = 0;
 		count = 1;
+		seconds = 0;
 	}
 	else
 	{
-		clock_from = time(NULL) - period;
+		if (FAIL == is_uint_suffix(param, &seconds))
+		{
+			SET_MSG_RESULT(res, zbx_strdup(NULL, "Invalid fourth parameter"));
+			goto clean;
+		}
 		count = 0;
 	}
 
-
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-			"select itemid,value_type"
-			" from items"
-			" where value_type in (%d,%d)"
-				" and",
-			ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64);
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", itemids.values, itemids.values_num);
-
-	result = DBselect("%s", sql);
-
-	while (NULL != (row = DBfetch(result)))
+	for (i = 0; i < itemids.values_num; i++)
 	{
-		ZBX_STR2UINT64(itemid, row[0]);
-		value_type = (unsigned char)atoi(row[1]);
+		if (SUCCEED != errorcodes[i] || (items[i].value_type != ITEM_VALUE_TYPE_FLOAT &&
+				items[i].value_type != ITEM_VALUE_TYPE_UINT64))
+			continue;
 
-		h_value = DBget_history(itemid, value_type, item_func, clock_from, 0, NULL, NULL, count);
+		zbx_vc_value_vector_create(&values);
 
-		if (NULL != h_value[0])
-			evaluate_one(item, &value, &num, grp_func, h_value[0], value_type);
-		DBfree_history(h_value);
+		if (SUCCEED == zbx_vc_get_value_range(items[i].itemid, items[i].value_type, &values, seconds,
+				count, now))
+		{
+			int	ival;
+
+			for (ival = 0; ival < values.values_num; ival++)
+				evaluate_one(item, &value, &num, grp_func, &values.values[ival].value, value_type);
+		}
+
+		zbx_vc_value_vector_destroy(&values, items[i].value_type);
 	}
-	DBfree_result(result);
 
 	if (0 == num)
 	{
@@ -296,6 +297,8 @@ static int	evaluate_aggregate(DC_ITEM *item, AGENT_RESULT *res, int grp_func, co
 clean:
 	zbx_vector_uint64_destroy(&itemids);
 	zbx_free(sql);
+	zbx_free(errorcodes);
+	zbx_free(items);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 

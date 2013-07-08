@@ -23,6 +23,7 @@
 #include "db.h"
 #include "log.h"
 #include "zbxalgo.h"
+#include "valuecache.h"
 
 /******************************************************************************
  *                                                                            *
@@ -1216,7 +1217,7 @@ static int	DBget_trigger_event_count(zbx_uint64_t triggerid, char **replace_to, 
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static int	DBget_dhost_value_by_event(DB_EVENT *event, char **replace_to, const char *fieldname)
+static int	DBget_dhost_value_by_event(const DB_EVENT *event, char **replace_to, const char *fieldname)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -1278,7 +1279,7 @@ static int	DBget_dhost_value_by_event(DB_EVENT *event, char **replace_to, const 
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static int	DBget_dservice_value_by_event(DB_EVENT *event, char **replace_to, const char *fieldname)
+static int	DBget_dservice_value_by_event(const DB_EVENT *event, char **replace_to, const char *fieldname)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -1321,7 +1322,7 @@ static int	DBget_dservice_value_by_event(DB_EVENT *event, char **replace_to, con
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static int	DBget_drule_value_by_event(DB_EVENT *event, char **replace_to, const char *fieldname)
+static int	DBget_drule_value_by_event(const DB_EVENT *event, char **replace_to, const char *fieldname)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -1358,44 +1359,6 @@ static int	DBget_drule_value_by_event(DB_EVENT *event, char **replace_to, const 
 
 /******************************************************************************
  *                                                                            *
- * Function: DBget_history_value                                              *
- *                                                                            *
- * Purpose: retrieve value by clock                                           *
- *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value: upon successful completion return SUCCEED                    *
- *               otherwise FAIL                                               *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
- ******************************************************************************/
-static int	DBget_history_value(zbx_uint64_t itemid, unsigned char value_type, char **replace_to,
-		const char *field_name, int clock, int ns)
-{
-	int		ret = FAIL;
-	char		**h_value;
-	zbx_timespec_t	ts;
-
-	ts.sec = clock;
-	ts.ns = ns;
-
-	h_value = DBget_history(itemid, value_type, ZBX_DB_GET_HIST_VALUE, 0, 0, &ts, field_name, 1);
-
-	if (NULL != h_value[0])
-	{
-		*replace_to = zbx_strdup(*replace_to, h_value[0]);
-		ret = SUCCEED;
-	}
-	DBfree_history(h_value);
-
-	return ret;
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: DBget_history_log_value                                          *
  *                                                                            *
  * Purpose: retrieve a particular attribute of a log value                    *
@@ -1418,6 +1381,8 @@ static int	DBget_history_log_value(zbx_uint64_t itemid, char **replace_to, int r
 	DB_RESULT	result;
 	DB_ROW		row;
 	int		ret = FAIL;
+	zbx_vc_value_t	value;
+	char		buffer[MAX_STRING_LEN];
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -1427,35 +1392,45 @@ static int	DBget_history_log_value(zbx_uint64_t itemid, char **replace_to, int r
 	{
 		if (ITEM_VALUE_TYPE_LOG == atoi(row[0]))
 		{
-			const char	*field_names[] = {"timestamp", "timestamp", "timestamp", "source", "severity",
-					"severity", "logeventid"};
+			zbx_timespec_t	ts = {clock, ns};
 
-			ret = DBget_history_value(itemid, ITEM_VALUE_TYPE_LOG, replace_to, field_names[request],
-					clock, ns);
+			ret = zbx_vc_get_value(itemid, ITEM_VALUE_TYPE_LOG, &ts, &value);
 		}
 	}
-	DBfree_result(result);
 
 	if (SUCCEED != ret)
-		goto fail;
+		goto out;
 
 	switch (request)
 	{
 		case ZBX_REQUEST_ITEM_LOG_DATE:
-			*replace_to = zbx_strdup(*replace_to, zbx_date2str((time_t)atoi(*replace_to)));
+			*replace_to = zbx_strdup(*replace_to, zbx_date2str((time_t)value.value.log->timestamp));
 			break;
 		case ZBX_REQUEST_ITEM_LOG_TIME:
-			*replace_to = zbx_strdup(*replace_to, zbx_time2str((time_t)atoi(*replace_to)));
+			*replace_to = zbx_strdup(*replace_to, zbx_time2str((time_t)value.value.log->timestamp));
 			break;
 		case ZBX_REQUEST_ITEM_LOG_AGE:
-			*replace_to = zbx_strdup(*replace_to, zbx_age2str(time(NULL) - atoi(*replace_to)));
+			*replace_to = zbx_strdup(*replace_to, zbx_age2str(time(NULL) - value.value.log->timestamp));
+			break;
+		case ZBX_REQUEST_ITEM_LOG_SOURCE:
+			*replace_to = zbx_strdup(*replace_to, value.value.log->source);
 			break;
 		case ZBX_REQUEST_ITEM_LOG_SEVERITY:
 			*replace_to = zbx_strdup(*replace_to,
-					zbx_item_logtype_string((unsigned char)atoi(*replace_to)));
+					zbx_item_logtype_string((unsigned char)value.value.log->severity));
+			break;
+		case ZBX_REQUEST_ITEM_LOG_NSEVERITY:
+			zbx_snprintf(buffer, sizeof(buffer), "%d", value.value.log->severity);
+			*replace_to = zbx_strdup(*replace_to, buffer);
+			break;
+		case ZBX_REQUEST_ITEM_LOG_EVENTID:
+			zbx_snprintf(buffer, sizeof(buffer), "%d", value.value.log->logeventid);
+			*replace_to = zbx_strdup(*replace_to, buffer);
 			break;
 	}
-fail:
+
+	zbx_vc_value_clear(&value, ITEM_VALUE_TYPE_LOG);
+out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
@@ -1518,48 +1493,41 @@ static int	DBitem_lastvalue(const char *expression, char **lastvalue, int N_func
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	if (FAIL == get_N_itemid(expression, N_functionid, &itemid))
-		goto fail;
+		goto out;
 
 	result = DBselect(
-			"select itemid,value_type,valuemapid,units"
+			"select value_type,valuemapid,units"
 			" from items"
 			" where itemid=" ZBX_FS_UI64,
 			itemid);
 
-	if (NULL != (row = DBfetch(result)) && SUCCEED != DBis_null(row[4]))
+	if (NULL != (row = DBfetch(result)))
 	{
-		zbx_uint64_t	itemid, valuemapid;
-		unsigned char	value_type;
-		char		**h_value;
-		char		tmp[MAX_STRING_LEN];
+		zbx_uint64_t		valuemapid;
+		unsigned char		value_type;
+		char			tmp[MAX_STRING_LEN];
+		zbx_vector_vc_value_t	values = {0};
 
-		ZBX_STR2UINT64(itemid, row[0]);
-		value_type = atoi(row[1]);
-		ZBX_DBROW2UINT64(valuemapid, row[2]);
+		zbx_vc_value_vector_create(&values);
 
-		h_value = DBget_history(itemid, value_type, ZBX_DB_GET_HIST_VALUE, 0, 0, NULL, NULL, 1);
+		value_type = atoi(row[0]);
+		ZBX_DBROW2UINT64(valuemapid, row[1]);
 
-		if (NULL == h_value[0])
-			goto fail;
+		if (SUCCEED != zbx_vc_get_value_range(itemid, value_type, &values, 0, 1, time(NULL)))
+			goto out;
 
-		switch (value_type)
+		if (0 < values.values_num)
 		{
-			case ITEM_VALUE_TYPE_LOG:
-			case ITEM_VALUE_TYPE_TEXT:
-				*lastvalue = zbx_strdup(*lastvalue, h_value[0]);
-				break;
-			default:
-				zbx_strlcpy(tmp, h_value[0], sizeof(tmp));
-				zbx_format_value(tmp, sizeof(tmp), valuemapid, row[3], value_type);
-				ZBX_STRDUP(*lastvalue, tmp);
-				break;
-		}
-		DBfree_history(h_value);
+			zbx_vc_history_value2str(tmp, sizeof(tmp), &values.values[0].value, value_type);
+			zbx_format_value(tmp, sizeof(tmp), valuemapid, row[2], value_type);
+			*lastvalue = zbx_strdup(*lastvalue, tmp);
 
-		ret = SUCCEED;
+			ret = SUCCEED;
+		}
+		zbx_vc_value_vector_destroy(&values, value_type);
 	}
 	DBfree_result(result);
-fail:
+out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
@@ -1606,23 +1574,27 @@ static int	DBitem_value(const char *expression, char **value, int N_functionid, 
 		zbx_uint64_t	itemid, valuemapid;
 		unsigned char	value_type;
 		char		tmp[MAX_STRING_LEN];
+		zbx_timespec_t	ts = {clock, ns};
+		zbx_vc_value_t	vc_value;
 
 		ZBX_STR2UINT64(itemid, row[0]);
 		value_type = (unsigned char)atoi(row[1]);
 		ZBX_DBROW2UINT64(valuemapid, row[2]);
 
-		if (SUCCEED == (ret = DBget_history_value(itemid, value_type, value, "value", clock, ns)))
+		if (SUCCEED == (ret = zbx_vc_get_value(itemid, value_type, &ts, &vc_value)))
 		{
+			zbx_vc_history_value2str(tmp, sizeof(tmp), &vc_value.value, value_type);
+			zbx_vc_value_clear(&vc_value, value_type);
+
 			switch (value_type)
 			{
 				case ITEM_VALUE_TYPE_FLOAT:
 				case ITEM_VALUE_TYPE_UINT64:
 				case ITEM_VALUE_TYPE_STR:
-					zbx_strlcpy(tmp, *value, sizeof(tmp));
 					zbx_format_value(tmp, sizeof(tmp), valuemapid, row[3], value_type);
-					ZBX_STRDUP(*value, tmp);
 					break;
 			}
+			*value = zbx_strdup(*value, tmp);
 		}
 	}
 	DBfree_result(result);
@@ -1645,7 +1617,7 @@ fail:
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static void	get_escalation_history(DB_EVENT *event, DB_ESCALATION *escalation, char **replace_to)
+static void	get_escalation_history(const DB_EVENT *event, DB_ESCALATION *escalation, char **replace_to)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -1757,7 +1729,7 @@ static void	get_escalation_history(DB_EVENT *event, DB_ESCALATION *escalation, c
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static void	get_event_ack_history(DB_EVENT *event, char **replace_to)
+static void	get_event_ack_history(const DB_EVENT *event, char **replace_to)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -1885,7 +1857,7 @@ static int	get_node_value(const char *expression, char **replace_to, int N_funct
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static int	get_autoreg_value_by_event(DB_EVENT *event, char **replace_to, const char *fieldname)
+static int	get_autoreg_value_by_event(const DB_EVENT *event, char **replace_to, const char *fieldname)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -1938,6 +1910,7 @@ static int	get_autoreg_value_by_event(DB_EVENT *event, char **replace_to, const 
 #define MVAR_HOST_HOST			"{HOST.HOST}"
 #define MVAR_HOST_IP			"{HOST.IP}"
 #define MVAR_IPADDRESS			"{IPADDRESS}"			/* deprecated */
+#define MVAR_HOST_METADATA		"{HOST.METADATA}"
 #define MVAR_HOST_NAME			"{HOST.NAME}"
 #define MVAR_HOSTNAME			"{HOSTNAME}"			/* deprecated */
 #define MVAR_HOST_PORT			"{HOST.PORT}"
@@ -2389,7 +2362,7 @@ static void	get_recovery_event_value(const char *macro, DB_EVENT *r_event, char 
  * Purpose: request event value by macro                                      *
  *                                                                            *
  ******************************************************************************/
-static void	get_event_value(const char *macro, DB_EVENT *event, char **replace_to)
+static void	get_event_value(const char *macro, const DB_EVENT *event, char **replace_to)
 {
 	if (0 == strcmp(macro, MVAR_EVENT_AGE))
 	{
@@ -2524,7 +2497,7 @@ fail:
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  ******************************************************************************/
-int	substitute_simple_macros(zbx_uint64_t *actionid, DB_EVENT *event, DB_EVENT *r_event, zbx_uint64_t *userid,
+int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_EVENT *r_event, zbx_uint64_t *userid,
 		zbx_uint64_t *hostid, DC_HOST *dc_host, DC_ITEM *dc_item, DB_ESCALATION *escalation, char **data,
 		int macro_type, char *error, int maxerrlen)
 {
@@ -2583,7 +2556,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, DB_EVENT *event, DB_EVENT *
 
 		if (0 != (macro_type & (MACRO_TYPE_MESSAGE_NORMAL | MACRO_TYPE_MESSAGE_RECOVERY)))
 		{
-			DB_EVENT	*c_event;
+			const DB_EVENT	*c_event;
 
 			c_event = (0 != (macro_type & MACRO_TYPE_MESSAGE_RECOVERY) ? r_event : event);
 
@@ -3103,6 +3076,10 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, DB_EVENT *event, DB_EVENT *
 				else if (0 == strncmp(m, MVAR_EVENT, sizeof(MVAR_EVENT) - 1))
 				{
 					get_event_value(m, event, &replace_to);
+				}
+				else if (0 == strcmp(m, MVAR_HOST_METADATA))
+				{
+					ret = get_autoreg_value_by_event(c_event, &replace_to, "host_metadata");
 				}
 				else if (0 == strcmp(m, MVAR_HOST_HOST))
 				{

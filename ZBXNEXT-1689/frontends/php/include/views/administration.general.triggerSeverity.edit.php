@@ -73,7 +73,7 @@ $severityForm = new CForm();
 $severityForm->setName('triggerSeverity');
 $severityForm->addVar('form_refresh', $this->data['form_refresh'] + 1);
 $severityForm->addItem($severityView);
-$severityForm->addItem(makeFormFooter(array(new CSubmit('save', _('Save'))), new CButton('resetDefaults', _('Reset defaults'))));
+$severityForm->addItem(makeFormFooter(new CSubmit('save', _('Save')), new CButton('resetDefaults', _('Reset defaults'))));
 
 return $severityForm;
 ?>

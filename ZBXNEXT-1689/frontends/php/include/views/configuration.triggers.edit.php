@@ -290,7 +290,16 @@ if (empty($this->data['parent_discoveryid'])) {
 		new CDiv(
 			array(
 				$dependenciesTable,
-				new CButton('bnt1', _('Add'), 'return PopUp("popup.php?srctbl=triggers&srcfld1=triggerid&reference=deptrigger&multiselect=1", 1000, 700);', 'link_menu')
+				new CButton('bnt1', _('Add'),
+					'return PopUp("popup.php?'.
+						'srctbl=triggers'.
+						'&srcfld1=triggerid'.
+						'&monitored_hosts=1'.
+						'&reference=deptrigger'.
+						'&multiselect=1'.
+						'&with_triggers=1", 1000, 700);',
+					'link_menu'
+				)
 			),
 			'objectgroup inlineblock border_dotted ui-corner-all'
 		)
@@ -314,7 +323,7 @@ if (!empty($this->data['triggerid'])) {
 }
 $buttons[] = new CButtonCancel(url_param('groupid').url_param('hostid').url_param('parent_discoveryid'));
 $triggersForm->addItem(makeFormFooter(
-	array(new CSubmit('save', _('Save'))),
+	new CSubmit('save', _('Save')),
 	array($buttons)
 ));
 
