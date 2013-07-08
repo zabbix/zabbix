@@ -202,9 +202,10 @@ class CProxy extends CZBXAPI {
 			}
 
 			if (empty($proxy['status'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Missing value for field "%1$s"', 'status'));
+				$proxy['status'] = $update ? $dbProxies[$proxy['proxyid']]['status'] : HOST_STATUS_PROXY_ACTIVE;
 			}
-			elseif ($proxy['status'] != HOST_STATUS_PROXY_ACTIVE && $proxy['status'] != HOST_STATUS_PROXY_PASSIVE) {
+
+			if ($proxy['status'] != HOST_STATUS_PROXY_ACTIVE && $proxy['status'] != HOST_STATUS_PROXY_PASSIVE) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
 					_s('Incorrect value "%1$s" for field "%2$s"', $proxy['status'], 'status'));
 			}
@@ -257,32 +258,34 @@ class CProxy extends CZBXAPI {
 			}
 
 			// linked hosts
-			if ($proxy['hosts']) {
-				$hostids = array_keys($proxy['hosts']);
+			if (isset($proxy['hosts']) && !empty($proxy['hosts'])) {
+				$hostIds = zbx_objectValues($proxy['hosts'], 'hostid');
 
 				$hosts = API::Host()->get(array(
-					'hostids' => $hostids,
+					'hostids' => $hostIds,
 					'editable' => true,
 					'output' => array('hostid', 'proxy_hostid', 'name'),
 					'preservekeys' => true
 				));
 
-				// check if host is already linked and unset any additional invalid host that was passed
-				foreach ($proxy['hosts'] as $host) {
-					if (isset($hosts[$host])) {
-						if (!empty($hosts[$host]['proxy_hostid'])) {
-							self::exception(ZBX_API_ERROR_PARAMETERS,
-								_s('Cannot add host "%1$s". Host must be unlinked first.', $hosts[$host]['name']));
-						}
-					}
-					else {
-						unset($proxy['hosts'][$host]);
-					}
-				}
-
 				if (empty($hosts)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
 						_('No permissions to referred object or it does not exist!'));
+				}
+
+				// check if host is already linked
+				foreach ($hostIds as $hostId) {
+					if (isset($hosts[$hostId])) {
+						if (!empty($hosts[$hostId]['proxy_hostid']) &&
+								$hosts[$hostId]['proxy_hostid'] != $proxy['proxyid']) {
+							self::exception(ZBX_API_ERROR_PARAMETERS,
+								_s('Cannot add host "%1$s". Host must be unlinked first.', $hosts[$hostId]['name']));
+						}
+					}
+					else {
+						self::exception(ZBX_API_ERROR_PARAMETERS,
+							_s('Invalid host with ID "%1$s".', $hostId));
+					}
 				}
 			}
 		}
