@@ -84,23 +84,29 @@ if (!$httpTest) {
 $httpTest['lastfailedstep'] = 0;
 $httpTest['error'] = '';
 
-$result = DBselect(
-	'SELECT hti.httptestid,hti.type,i.lastvalue,i.lastclock'.
-	' FROM httptestitem hti,items i'.
-	' WHERE hti.itemid=i.itemid'.
-		' AND hti.type IN ('.HTTPSTEP_ITEM_TYPE_LASTSTEP.','.HTTPSTEP_ITEM_TYPE_LASTERROR.')'.
-		' AND i.lastclock IS NOT NULL'.
-		' AND hti.httptestid='.$httpTest['httptestid']
+// fetch http test execution data
+$httpTestManager = new CHttpTestManager();
+$httpTestData = $httpTestManager->fetchLastData(array($httpTest['httptestid']));
+$httpTestData = array_pop($httpTestData);
+
+// fetch HTTP step items
+$query = DBselect(
+	'SELECT i.value_type,i.valuemapid,i.units,i.itemid,hi.type AS httpitem_type,hs.httpstepid'.
+	' FROM items i,httpstepitem hi,httpstep hs'.
+	' WHERE hi.itemid=i.itemid'.
+		' AND hi.httpstepid=hs.httpstepid'.
+		' AND hs.httptestid='.$httpTest['httptestid']
 );
-while ($row = DBfetch($result)) {
-	if ($row['type'] == HTTPSTEP_ITEM_TYPE_LASTSTEP) {
-		$httpTest['lastcheck'] = $row['lastclock'];
-		$httpTest['lastfailedstep'] = $row['lastvalue'];
-	}
-	else {
-		$httpTest['error'] = $row['lastvalue'];
-	}
+$httpStepItems = array();
+$items = array();
+while ($item = DBfetch($query)) {
+	$items[] = $item;
+	$httpStepItems[$item['httpstepid']][$item['httpitem_type']] = $item;
 }
+
+// fetch HTTP item history
+$historyManager = new CHistoryManager();
+$itemHistory = $historyManager->fetchLast($items);
 
 /*
  * Display
@@ -108,8 +114,8 @@ while ($row = DBfetch($result)) {
 $httpdetailsWidget = new CWidget();
 
 $lastcheck = null;
-if (isset($httpTest['lastcheck'])) {
-	$lastcheck = ' ['.zbx_date2str(_('d M Y H:i:s'), $httpTest['lastcheck']).']';
+if (isset($httpTestData['lastcheck'])) {
+	$lastcheck = ' ['.zbx_date2str(_('d M Y H:i:s'), $httpTestData['lastcheck']).']';
 }
 
 $httpdetailsWidget->addPageHeader(
@@ -133,27 +139,28 @@ $httpdetailsTable->setHeader(array(
 $db_httpsteps = DBselect('SELECT * FROM httpstep WHERE httptestid='.$httpTest['httptestid'].' ORDER BY no');
 
 $totalTime = array(
-	'lastvalue' => 0,
+	'value' => 0,
 	'value_type' => null,
 	'valuemapid' => null,
 	'units' => null
 );
 
-
 while ($httpstep_data = DBfetch($db_httpsteps)) {
+	$httpStepItemsByType = $httpStepItems[$httpstep_data['httpstepid']];
+
 	$status['msg'] = _('OK');
 	$status['style'] = 'enabled';
 
-	if (!isset($httpTest['lastcheck'])) {
+	if (!isset($httpTestData['lastcheck'])) {
 		$status['msg'] = _('Never executed');
 		$status['style'] = 'unknown';
 	}
-	elseif ($httpTest['lastfailedstep'] != 0) {
-		if ($httpTest['lastfailedstep'] == $httpstep_data['no']) {
-			$status['msg'] = _s('Error: %1$s', $httpTest['error']);
+	elseif ($httpTestData['lastfailedstep'] != 0) {
+		if ($httpTestData['lastfailedstep'] == $httpstep_data['no']) {
+			$status['msg'] = _s('Error: %1$s', $httpTestData['error']);
 			$status['style'] = 'disabled';
 		}
-		elseif ($httpTest['lastfailedstep'] < $httpstep_data['no']) {
+		elseif ($httpTestData['lastfailedstep'] < $httpstep_data['no']) {
 			$status['msg'] = _('Unknown');
 			$status['style'] = 'unknown';
 			$status['skip'] = true;
@@ -161,50 +168,69 @@ while ($httpstep_data = DBfetch($db_httpsteps)) {
 	}
 
 	$itemIds = array();
-	$db_items = DBselect(
-		'SELECT i.lastvalue,i.lastclock,i.value_type,i.valuemapid,i.units,i.itemid,hi.type AS httpitem_type'.
-			' FROM items i,httpstepitem hi'.
-			' WHERE hi.itemid=i.itemid'.
-				' AND hi.httpstepid='.$httpstep_data['httpstepid']
-	);
-	while ($item_data = DBfetch($db_items)) {
+	foreach ($httpStepItemsByType as &$httpStepItem) {
 		if (isset($status['skip'])) {
-			$item_data['lastvalue'] = null;
+			$httpStepItem['lastvalue'] = null;
 		}
 
-		$httpstep_data['item_data'][$item_data['httpitem_type']] = $item_data;
+		if ($httpStepItem['httpitem_type'] == HTTPSTEP_ITEM_TYPE_TIME) {
+			$totalTime['value_type'] = $httpStepItem['value_type'];
+			$totalTime['valuemapid'] = $httpStepItem['valuemapid'];
+			$totalTime['units'] = $httpStepItem['units'];
 
-		if ($item_data['httpitem_type'] == HTTPSTEP_ITEM_TYPE_TIME) {
-			$totalTime['lastvalue'] += $item_data['lastvalue'];
-			$totalTime['lastclock'] = $item_data['lastclock'];
-			$totalTime['value_type'] = $item_data['value_type'];
-			$totalTime['valuemapid'] = $item_data['valuemapid'];
-			$totalTime['units'] = $item_data['units'];
+			if (isset($itemHistory[$httpStepItem['itemid']])) {
+				$history = $itemHistory[$httpStepItem['itemid']][0];
+
+				$totalTime['value'] += $history['value'];
+			}
 		}
 
-		$itemIds[] = $item_data['itemid'];
+		$itemIds[] = $httpStepItem['itemid'];
+	}
+	unset($httpStepItem);
+
+	// step speed
+	$speedItem = $httpStepItemsByType[HTTPSTEP_ITEM_TYPE_IN];
+	if (isset($itemHistory[$speedItem['itemid']]) && $itemHistory[$speedItem['itemid']][0]['value'] > 0) {
+		$speed = formatHistoryValue($itemHistory[$speedItem['itemid']][0]['value'], $speedItem);
+	}
+	else {
+		$speed = UNKNOWN_VALUE;
 	}
 
-	$speed = formatItemLastValue($httpstep_data['item_data'][HTTPSTEP_ITEM_TYPE_IN]);
-	$resp = formatItemLastValue($httpstep_data['item_data'][HTTPSTEP_ITEM_TYPE_RSPCODE]);
-	$respTime = $httpstep_data['item_data'][HTTPSTEP_ITEM_TYPE_TIME]['lastvalue'];
-	$respItemTime = formatItemLastValue($httpstep_data['item_data'][HTTPSTEP_ITEM_TYPE_TIME]);
+	// step response time
+	$respTimeItem = $httpStepItemsByType[HTTPSTEP_ITEM_TYPE_TIME];
+	if (isset($itemHistory[$respTimeItem['itemid']]) && $itemHistory[$respTimeItem['itemid']][0]['value'] > 0) {
+		$respTime = formatHistoryValue($itemHistory[$respTimeItem['itemid']][0]['value'], $respTimeItem);
+	}
+	else {
+		$respTime = UNKNOWN_VALUE;
+	}
+
+	// step response code
+	$respItem = $httpStepItemsByType[HTTPSTEP_ITEM_TYPE_RSPCODE];
+	if (isset($itemHistory[$respItem['itemid']]) && $itemHistory[$respItem['itemid']][0]['value'] > 0) {
+		$resp = formatHistoryValue($itemHistory[$respItem['itemid']][0]['value'], $respItem);
+	}
+	else {
+		$resp = UNKNOWN_VALUE;
+	}
 
 	$httpdetailsTable->addRow(array(
 		CMacrosResolverHelper::resolveHttpTestName($httpTest['hostid'], $httpstep_data['name']),
 		$speed,
-		($respTime == 0 ? '-' : $respItemTime),
+		$respTime,
 		$resp,
 		new CSpan($status['msg'], $status['style'])
 	));
 }
 
-if (!isset($httpTest['lastcheck'])) {
+if (!isset($httpTestData['lastcheck'])) {
 	$status['msg'] = _('Never executed');
 	$status['style'] = 'unknown';
 }
-elseif ($httpTest['lastfailedstep'] != 0) {
-	$status['msg'] = _s('Error: %1$s', $httpTest['error']);
+elseif ($httpTestData['lastfailedstep'] != 0) {
+	$status['msg'] = _s('Error: %1$s', $httpTestData['error']);
 	$status['style'] = 'disabled';
 }
 else {
@@ -215,7 +241,7 @@ else {
 $httpdetailsTable->addRow(array(
 	bold(_('TOTAL')),
 	SPACE,
-	bold(formatItemLastValue($totalTime)),
+	bold(($totalTime['value']) ? formatHistoryValue($totalTime['value'], $totalTime) : UNKNOWN_VALUE),
 	SPACE,
 	new CSpan($status['msg'], $status['style'].' bold')
 ));

@@ -327,7 +327,7 @@ foreach ($dbItems as $db_item){
 	// last check time and last value
 	if ($lastHistory) {
 		$lastClock = zbx_date2str(_('d M Y H:i:s'), $lastHistory['clock']);
-		$lastValue = formatHistoryValue($lastHistory, $db_item, false);
+		$lastValue = formatHistoryValue($lastHistory['value'], $db_item, false);
 	}
 	else {
 		$lastClock = UNKNOWN_VALUE;
@@ -532,7 +532,7 @@ foreach ($dbItems as $db_item){
 	// last check time and last value
 	if ($lastHistory) {
 		$lastClock = zbx_date2str(_('d M Y H:i:s'), $lastHistory['clock']);
-		$lastValue = formatHistoryValue($lastHistory, $db_item, false);
+		$lastValue = formatHistoryValue($lastHistory['value'], $db_item, false);
 	}
 	else {
 		$lastClock = UNKNOWN_VALUE;

@@ -1014,9 +1014,7 @@ function formatItemLastValue(array $item, $unknownString = '-', $trim = true) {
  * First format the value according to the configuration of the item. Then apply the value mapping to the formatted (!)
  * value.
  *
- * @param array     $history
- * @param int       $history['clock']       time when the value was received
- * @param mixed     $history['value']       value
+ * @param mixed     $value
  * @param array     $item
  * @param int       $item['value_type']     type of the value: ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64, ...
  * @param string    $item['units']          units of item
@@ -1025,19 +1023,17 @@ function formatItemLastValue(array $item, $unknownString = '-', $trim = true) {
  *
  * @return string
  */
-function formatHistoryValue(array $history, array $item, $trim = true) {
+function formatHistoryValue($value, array $item, $trim = true) {
 	$mapping = false;
 
 	// format value
 	if ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT || $item['value_type'] == ITEM_VALUE_TYPE_UINT64) {
-		$value = convert_units($history['value'], $item['units']);
+		$value = convert_units($value, $item['units']);
 	}
-	elseif ($item['value_type'] == ITEM_VALUE_TYPE_STR
-		|| $item['value_type'] == ITEM_VALUE_TYPE_TEXT
-		|| $item['value_type'] == ITEM_VALUE_TYPE_LOG) {
-		$value = $history['value'];
-	}
-	else {
+	elseif ($item['value_type'] != ITEM_VALUE_TYPE_STR
+		&& $item['value_type'] != ITEM_VALUE_TYPE_TEXT
+		&& $item['value_type'] != ITEM_VALUE_TYPE_LOG) {
+
 		$value = _('Unknown value type');
 	}
 
