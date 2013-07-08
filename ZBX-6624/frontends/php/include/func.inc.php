@@ -449,10 +449,11 @@ function convertUnitsUptime($value) {
  * 1y 4d, not 1y 0m 4d or 1y 4d #h.
  *
  * @param int $value	time period in seconds
+ * @param bool $noMs	without ms (1s 200 ms = 1.2s)
  *
  * @return string
  */
-function convertUnitsS($value) {
+function convertUnitsS($value, $noMs = false) {
 	if (($secs = round($value * 1000, ZBX_UNITS_ROUNDOFF_UPPER_LIMIT) / 1000) < 0) {
 		$secs = -$secs;
 		$str = '-';
@@ -516,8 +517,15 @@ function convertUnitsS($value) {
 		$values['s'] = $n;
 	}
 
-	if ($n_unit < 1 && ($n = round($secs * 1000, ZBX_UNITS_ROUNDOFF_UPPER_LIMIT)) != 0) {
-		$values['ms'] = $n;
+	if ($noMs) {
+		if ($n_unit < 1 && ($n = round($secs, ZBX_UNITS_ROUNDOFF_UPPER_LIMIT)) != 0) {
+			$values['s'] += $n;
+		}
+	}
+	else {
+		if ($n_unit < 1 && ($n = round($secs * 1000, ZBX_UNITS_ROUNDOFF_UPPER_LIMIT)) != 0) {
+			$values['ms'] = $n;
+		}
 	}
 
 	$str .= isset($values['y']) ? $values['y']._x('y', 'year short').' ' : '';
@@ -541,10 +549,11 @@ function convertUnitsS($value) {
  * @param string $convert
  * @param string $byteStep
  * @param string $pow
+ * @param bool $noMs
  *
  * @return string
  */
-function convert_units($value, $units, $convert = ITEM_CONVERT_WITH_UNITS, $byteStep = false, $pow = false) {
+function convert_units($value, $units, $convert = ITEM_CONVERT_WITH_UNITS, $byteStep = false, $pow = false, $noMs = false) {
 	// special processing for unix timestamps
 	if ($units == 'unixtime') {
 		return zbx_date2str(_('Y.m.d H:i:s'), $value);
@@ -557,7 +566,7 @@ function convert_units($value, $units, $convert = ITEM_CONVERT_WITH_UNITS, $byte
 
 	// special processing for seconds
 	if ($units == 's') {
-		return convertUnitsS($value);
+		return convertUnitsS($value, $noMs);
 	}
 
 	// any other unit
