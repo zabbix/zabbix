@@ -486,7 +486,6 @@ static int	evaluate_COUNT(char *value, DB_ITEM *item, const char *function, cons
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	numeric_search = (ITEM_VALUE_TYPE_UINT64 == item->value_type || ITEM_VALUE_TYPE_FLOAT == item->value_type);
-	op = (0 != numeric_search ? OP_EQ : OP_LIKE);
 
 	if (4 < (nparams = num_param(parameters)))
 		goto out;
@@ -504,7 +503,9 @@ static int	evaluate_COUNT(char *value, DB_ITEM *item, const char *function, cons
 		if (FAIL == get_function_parameter_str(item->hostid, parameters, 3, &arg3))
 			goto clean;
 
-		if (0 == strcmp(arg3, "eq"))
+		if ('\0' == *arg3)
+			op = (0 != numeric_search ? OP_EQ : OP_LIKE);
+		else if (0 == strcmp(arg3, "eq"))
 			op = OP_EQ;
 		else if (0 == strcmp(arg3, "ne"))
 			op = OP_NE;
@@ -545,6 +546,8 @@ static int	evaluate_COUNT(char *value, DB_ITEM *item, const char *function, cons
 		if (0 != fail)
 			goto clean;
 	}
+	else
+		op = (0 != numeric_search ? OP_EQ : OP_LIKE);
 
 	if (4 <= nparams)
 	{
