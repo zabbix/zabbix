@@ -257,7 +257,9 @@ frontends/php/styles/themes/originalblue/images/icons_ffffff.png -text
 frontends/php/styles/themes/originalblue/images/preloader.gif -text
 frontends/php/tests/bootstrap.php.template -text
 frontends/php/tests/selenium/testFormGraphPrototype.php -text
+frontends/php/tests/selenium/testFormWeb.php -text
 frontends/php/tests/selenium/testInheritanceGraphPrototype.php -text
+frontends/php/tests/selenium/testInheritanceWeb.php -text
 man/zabbix_agentd.man -text
 man/zabbix_get.man -text
 man/zabbix_proxy.man -text
@@ -535,6 +537,9 @@ misc/init.d/fedora/core5/zabbix_agentd -text
 misc/init.d/freebsd/zabbix_agentd -text
 misc/init.d/freebsd/zabbix_server -text
 misc/init.d/tru64/zabbix_server -text
+src/libs/zbxalgo/vectorimpl.h -text
+src/libs/zbxdbcache/valuecache.c -text
+src/libs/zbxdbcache/valuecache.h -text
 src/zabbix_java/lib/logback-classic-0.9.27.jar -text
 src/zabbix_java/lib/logback-core-0.9.27.jar -text
 src/zabbix_java/lib/org-json-2010-12-28.jar -text

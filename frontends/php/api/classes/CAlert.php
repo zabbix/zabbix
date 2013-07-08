@@ -18,8 +18,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 **/
 
+
 /**
- * Class containing methods for operations with Alerts.
+ * Class containing methods for operations with alerts.
+ *
+ * @package API
  */
 class CAlert extends CZBXAPI {
 
@@ -28,7 +31,7 @@ class CAlert extends CZBXAPI {
 	protected $sortColumns = array('alertid', 'clock', 'eventid', 'status');
 
 	/**
-	 * Get Alerts data.
+	 * Get alerts data.
 	 *
 	 * @param array $options
 	 * @param array $options['itemids']

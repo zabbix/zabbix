@@ -1,6 +1,7 @@
 Changes for 2.1.0
 
 New features:
+........S. [ZBXNEXT-322] implemented value cache (wiper)
 ...G...... [ZBXNEXT-1571] added support for proc.num for HP-UX (igors)
 ...G...PS. [ZBX-6299] added JSON validator (wiper)
 A.FGI..PS. [ZBXNEXT-1726] added support for optional host metadata to active agent for auto-registration (dimir, Oleg)
@@ -76,6 +77,11 @@ A.F.I...S. [ZBXNEXT-1186] increased length to 2048 characters of expression fiel
 
 Bug fixes:
 ..F....... [ZBX-6732] added "path" variable for cookies (Ivo)
+..F....... [ZBX-2622] added link to last event in monitoring triggers page (Ivo)
+A.F....... [ZBX-6362] fixed proxy interface array structure (Eduard)
+..F.I..... [ZBX-6645] suppressed PHP error messages for DB connection tests in installation wizard step 3 (Ivo)
+..F....... [ZBXNEXT-484] fixed displaying data and triggers in monitoring overview page if no applications defined (Ivo)
+A.F....... [ZBX-6429] fixed Monitoring -> Events filter clearing and events acknowledging (Eduard, Oleg, Toms)
 ..F....... [ZBX-6648] improved trigger filter popup - shows hosts and groups that are enabled and have monitored triggers (Ivo)
 ..F....... [ZBXNEXT-1682] added negative number validation for "New flexible interval" field (Ivo)
 ..F....... [ZBX-6459] improved localization in maintenance (Ivo)
@@ -266,6 +272,7 @@ A......... [ZBX-6407] improved data retrieval performance for CTrigger get() wit
 A.F....... [ZBX-1357] updated Brazilian Portuguese, Chinese (China), Latvian, Spanish and Turkish translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+.......P.. [ZBX-6630] faster proxy configuration synchronization (Andris)
 ...G...... [ZBX-6655] fixed possible agent crash when processing system.sw.packages[] (igors)
 A......... [ZBX-6725] fixed undefined indexes in item list view when trigger has items from different hosts (Toms)
 ....I..... [ZBX-6700] improved PostgreSQL upgrade patch (dotneft, Oleg)
