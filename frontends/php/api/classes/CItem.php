@@ -1156,12 +1156,19 @@ class CItem extends CItemGeneral {
 		}
 
 		// adding history data
-		$requestedOutput = array(
-			'lastclock' => $this->outputIsRequested('lastclock', $options['output']),
-			'lastns' => $this->outputIsRequested('lastns', $options['output']),
-			'lastvalue' => $this->outputIsRequested('lastvalue', $options['output']),
-			'prevvalue' => $this->outputIsRequested('prevvalue', $options['output'])
-		);
+		$requestedOutput = array();
+		if ($this->outputIsRequested('lastclock', $options['output'])) {
+			$requestedOutput['lastclock'] = true;
+		}
+		if ($this->outputIsRequested('lastns', $options['output'])) {
+			$requestedOutput['lastns'] = true;
+		}
+		if ($this->outputIsRequested('lastvalue', $options['output'])) {
+			$requestedOutput['lastvalue'] = true;
+		}
+		if ($this->outputIsRequested('prevvalue', $options['output'])) {
+			$requestedOutput['prevvalue'] = true;
+		}
 		if ($requestedOutput) {
 			$historyManager = new CHistoryManager();
 			$history = $historyManager->fetchLast($result, 2);
@@ -1169,16 +1176,16 @@ class CItem extends CItemGeneral {
 				$lastHistory = isset($history[$item['itemid']][0]) ? $history[$item['itemid']][0] : null;
 				$prevHistory = isset($history[$item['itemid']][1]) ? $history[$item['itemid']][1] : null;
 
-				if ($requestedOutput['lastclock']) {
+				if (isset($requestedOutput['lastclock'])) {
 					$item['lastclock'] = $lastHistory ? $lastHistory['clock'] : '0';
 				}
-				if ($requestedOutput['lastns']) {
+				if (isset($requestedOutput['lastns'])) {
 					$item['lastns'] = $lastHistory ? $lastHistory['ns'] : '0';
 				}
-				if ($requestedOutput['lastvalue']) {
+				if (isset($requestedOutput['lastvalue'])) {
 					$item['lastvalue'] = $lastHistory ? $lastHistory['value'] : '0';
 				}
-				if ($requestedOutput['prevvalue']) {
+				if (isset($requestedOutput['prevvalue'])) {
 					$item['prevvalue'] = $prevHistory ? $prevHistory['value'] : '0';
 				}
 			}
