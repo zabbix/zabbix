@@ -2511,6 +2511,9 @@ static int	vch_item_get_value_range(zbx_vc_item_t *item,  zbx_vector_vc_value_t 
 
 		if (FAIL == (ret = vch_item_get_values_by_time(item, values, seconds, timestamp)))
 			goto out;
+
+		if (records_read > values->values_num)
+			records_read = values->values_num;
 	}
 	else
 	{
@@ -2521,25 +2524,17 @@ static int	vch_item_get_value_range(zbx_vc_item_t *item,  zbx_vector_vc_value_t 
 
 		if (FAIL == (ret = vch_item_get_values_by_count(item, values, count, timestamp)))
 			goto out;
+
+		if (records_read > count)
+			records_read = count;
 	}
 
 	nslots = MAX(values->values_num, count);
 	if (data->slots_max < nslots)
 		data->slots_max = nslots;
 
-	/* calculate hits/misses */
-	if (values->values_num >= records_read)
-	{
-		hits = values->values_num - records_read;
-		misses = records_read;
-	}
-	else
-	{
-		/* timeshift was outside cached value range, resulting in reading */
-		/* more records than returned by request                          */
-		hits = 0;
-		misses = values->values_num;
-	}
+	hits = values->values_num - records_read;
+	misses = records_read;
 
 	vc_update_statistics(item, hits, misses);
 out:
