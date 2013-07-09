@@ -599,6 +599,17 @@ function convert_units($value, $units, $convert = ITEM_CONVERT_WITH_UNITS, $byte
 		}
 	}
 
+	if ($value < 0) {
+		$abs = bcmul($value, '-1');
+	}
+	else {
+		$abs = $value;
+	}
+
+	if (bccomp($abs, 1) == -1) {
+		return round($value, ZBX_UNITS_ROUNDOFF_MIDDLE_LIMIT).' '.$units;
+	}
+
 	// init intervals
 	static $digitUnits;
 	if (is_null($digitUnits)) {
@@ -607,8 +618,6 @@ function convert_units($value, $units, $convert = ITEM_CONVERT_WITH_UNITS, $byte
 
 	if (!isset($digitUnits[$step])) {
 		$digitUnits[$step] = array(
-			array('pow' => -2, 'short' => _x('µ', 'Micro short'), 'long' => _('Micro')),
-			array('pow' => -1, 'short' => _x('m', 'Milli short'), 'long' => _('Milli')),
 			array('pow' => 0, 'short' => '', 'long' => ''),
 			array('pow' => 1, 'short' => _x('K', 'Kilo short'), 'long' => _('Kilo')),
 			array('pow' => 2, 'short' => _x('M', 'Mega short'), 'long' => _('Mega')),
@@ -626,12 +635,6 @@ function convert_units($value, $units, $convert = ITEM_CONVERT_WITH_UNITS, $byte
 		}
 	}
 
-	if ($value < 0) {
-		$abs = bcmul($value, '-1');
-	}
-	else {
-		$abs = $value;
-	}
 
 	$valUnit = array('pow' => 0, 'short' => '', 'long' => '', 'value' => $value);
 
@@ -654,14 +657,8 @@ function convert_units($value, $units, $convert = ITEM_CONVERT_WITH_UNITS, $byte
 		}
 	}
 
-	if (round($valUnit['value'], ZBX_UNITS_ROUNDOFF_LOWER_LIMIT) > 0) {
-		if ($valUnit['pow'] >= 0) {
-			$valUnit['value'] = bcdiv(sprintf('%.6f',$value), sprintf('%.6f', $valUnit['value']),
-				ZBX_UNITS_ROUNDOFF_LOWER_LIMIT);
-		}
-		else {
-			$valUnit['value'] = bcdiv(sprintf('%.10f',$value), sprintf('%.10f', $valUnit['value']), ZBX_PRECISION_10);
-		}
+	if (round($valUnit['value'], ZBX_UNITS_ROUNDOFF_MIDDLE_LIMIT) > 0) {
+		$valUnit['value'] = bcdiv(sprintf('%.10f',$value), sprintf('%.10f', $valUnit['value']), ZBX_PRECISION_10);
 	}
 	else {
 		$valUnit['value'] = 0;
@@ -673,7 +670,9 @@ function convert_units($value, $units, $convert = ITEM_CONVERT_WITH_UNITS, $byte
 		case 2: $desc = $valUnit['long']; break;
 	}
 
-	$value = preg_replace('/^([\-0-9]+)(\.)([0-9]*)[0]+$/U','$1$2$3', round($valUnit['value'], ZBX_UNITS_ROUNDOFF_UPPER_LIMIT));
+	$value = preg_replace('/^([\-0-9]+)(\.)([0-9]*)[0]+$/U','$1$2$3', round($valUnit['value'],
+		ZBX_UNITS_ROUNDOFF_UPPER_LIMIT));
+
 	$value = rtrim($value, '.');
 
 	// fix negative zero
