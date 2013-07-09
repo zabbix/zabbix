@@ -1,13 +1,18 @@
 Changes for 2.0.7rc1
 
 New features:
+.......PS. [ZBX-6683] removed string pool semaphore; increased configuration cache update performance (Sasha)
 A......... [ZBX-6603] improved CTrigger lastEvents parameter performance (Toms)
 A......... [ZBX-6603] improved performance for dbConditionInt() function (Toms)
 A......... [ZBX-6407] improved data retrieval performance for CTrigger get() with post SQL filtering (Toms)
 ........S. [ZBX-6493] improved performance when working with Oracle by changing memory based prefetch to rows based (dimir)
-A.F....... [ZBX-1357] updated Chinese (China), Spanish and Turkish translations; thanks to Zabbix translators (Richlv)
+A.F....... [ZBX-1357] updated Brazilian Portuguese, Chinese (China), Latvian, Spanish and Turkish translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+.......P.. [ZBX-6630] faster proxy configuration synchronization (Andris)
+...G...... [ZBX-6655] fixed possible agent crash when processing system.sw.packages[] (igors)
+A......... [ZBX-6725] fixed undefined indexes in item list view when trigger has items from different hosts (Toms)
+....I..... [ZBX-6700] improved PostgreSQL upgrade patch (dotneft, Oleg)
 ..F....... [ZBX-6682] added value mapping in map labels (Oleg)
 A......... [ZBX-6673] fixed errors after parent graph deleting (Oleg)
 .......PS. [ZBX-6610] fixed invalid next check values of IPMI items (dimir)

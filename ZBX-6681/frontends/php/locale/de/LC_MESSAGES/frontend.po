@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-04-15 01:48+0300\n"
+"POT-Creation-Date: 2013-05-28 18:26+0300\n"
 "PO-Revision-Date: 2013-04-07 21:14+0200\n"
 "Last-Translator: richlv <richlv@nakts.net>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -63,7 +63,7 @@ msgstr[0] "Fehlgeschlagener Anmeldungversuch von %1$s protokolliert. Letzter Feh
 msgstr[1] "Fehlgeschlagene Anmeldungversuche von %1$s protokolliert. Letzter Fehlversuch stammt von %2$s auf %3$s um %4$s."
 
 # Was sind Issues?
-#: include/blocks.inc.php:980
+#: include/blocks.inc.php:981
 #, php-format
 msgid "%2$d of %1$d issue is shown"
 msgid_plural "%2$d of %1$d issues are shown"
@@ -211,7 +211,7 @@ msgid "Account is blocked for %s seconds"
 msgstr "Konto ist für %s Sekunden blockiert"
 
 #: events.php:565 events.php:578 include/actions.inc.php:245
-#: include/blocks.inc.php:899 include/blocks.inc.php:1415
+#: include/blocks.inc.php:900 include/blocks.inc.php:1416
 #: include/events.inc.php:137 include/events.inc.php:210
 #: include/views/configuration.action.edit.php:938
 msgid "Ack"
@@ -316,8 +316,8 @@ msgstr "Aktionsoperationen"
 msgid "Action updated"
 msgstr "Aktion geändert"
 
-#: events.php:566 events.php:579 include/blocks.inc.php:900
-#: include/blocks.inc.php:1416 include/events.inc.php:138
+#: events.php:566 events.php:579 include/blocks.inc.php:901
+#: include/blocks.inc.php:1417 include/events.inc.php:138
 #: include/menu.inc.php:193 include/views/administration.auditacts.list.php:29
 #: include/views/administration.auditacts.list.php:32
 #: include/views/administration.auditlogs.list.php:29
@@ -353,9 +353,9 @@ msgstr "Aktiv seit"
 msgid "Active till"
 msgstr "Aktiv bis"
 
-#: dashconf.php:211 include/blocks.inc.php:1139 include/blocks.inc.php:1145
-#: include/blocks.inc.php:1258 include/blocks.inc.php:1303
-#: include/blocks.inc.php:1309 include/forms.inc.php:1705
+#: dashconf.php:211 include/blocks.inc.php:1140 include/blocks.inc.php:1146
+#: include/blocks.inc.php:1259 include/blocks.inc.php:1304
+#: include/blocks.inc.php:1310 include/forms.inc.php:1705
 #: include/forms.inc.php:2009 include/reports.inc.php:332
 #: include/reports.inc.php:428 include/reports.inc.php:468
 #: include/views/administration.auditlogs.list.php:45
@@ -474,7 +474,7 @@ msgstr "Administration"
 msgid "Advanced labels"
 msgstr "Erweiterte Beschriftungen"
 
-#: include/blocks.inc.php:897 include/blocks.inc.php:1413
+#: include/blocks.inc.php:898 include/blocks.inc.php:1414
 #: include/events.inc.php:136 include/events.inc.php:210
 #: include/events.inc.php:213 tr_status.php:288
 msgid "Age"
@@ -511,9 +511,9 @@ msgstr "Alias"
 msgid "Align icons"
 msgstr "Symbole ausrichten"
 
-#: dashconf.php:173 dashconf.php:254 include/blocks.inc.php:1237
-#: include/blocks.inc.php:1246 include/blocks.inc.php:1291
-#: include/blocks.inc.php:1375 include/blocks.inc.php:1384
+#: dashconf.php:173 dashconf.php:254 include/blocks.inc.php:1238
+#: include/blocks.inc.php:1247 include/blocks.inc.php:1292
+#: include/blocks.inc.php:1376 include/blocks.inc.php:1385
 #: include/nodes.inc.php:156 include/page_header.php:331
 #: include/reports.inc.php:554
 #: include/views/administration.auditlogs.list.php:42
@@ -1140,7 +1140,7 @@ msgstr "Kann Aktion nicht hinzufügen"
 msgid "Cannot add application"
 msgstr "Kann Kategorie nicht hinzufügen"
 
-#: api/classes/CTrigger.php:1820
+#: api/classes/CTrigger.php:1733
 msgid "Cannot add dependency from a host to a template."
 msgstr "Abhängigkeit von einem Host zu einer Vorlage nicht möglich."
 
@@ -1310,11 +1310,11 @@ msgstr "Kann den Trigger \"%1$s:%2$s\" nicht kopieren, weil er mehrere Hosts im 
 msgid "Cannot create another database connection."
 msgstr "Kann keine weitere Datenbankverbindung aufbauen."
 
-#: api/classes/CTrigger.php:1854
+#: api/classes/CTrigger.php:1767
 msgid "Cannot create circular dependencies."
 msgstr "Kann keine zirkuläre Abhängigkeit erstellen."
 
-#: api/classes/CTrigger.php:1826
+#: api/classes/CTrigger.php:1739
 msgid "Cannot create dependency on trigger itself."
 msgstr "Trigger kann nicht von sich selbst abhängig sein."
 
@@ -1365,7 +1365,7 @@ msgstr "Kann Aktion nicht löschen"
 msgid "Cannot delete application"
 msgstr "Kann Kategorie nicht löschen"
 
-#: api/classes/CTrigger.php:1548
+#: api/classes/CTrigger.php:1461
 msgid "Cannot delete dependency"
 msgstr "Kann Abhängigkeit nicht löschen"
 
@@ -1518,7 +1518,7 @@ msgstr "Kann vorlagenbasierte Elemente nicht löschen"
 msgid "Cannot delete templated items."
 msgstr "Kann vorlagenbasierte Elemente nicht löschen."
 
-#: api/classes/CTrigger.php:1134 api/classes/CTriggerPrototype.php:925
+#: api/classes/CTrigger.php:1047 api/classes/CTriggerPrototype.php:925
 #, php-format
 msgid "Cannot delete templated trigger \"%1$s:%2$s\"."
 msgstr "Kann vorlagenbasierten Auslöser \"%1$s:%2$s\" nicht löschen."
@@ -1671,7 +1671,7 @@ msgstr "Kann Baum nicht formatieren."
 msgid "Cannot have empty visible template name"
 msgstr "Sichtbarer Vorlagenname darf nicht leer sein"
 
-#: api/classes/CTrigger.php:1579 api/classes/CTrigger.php:1654
+#: api/classes/CTrigger.php:1492 api/classes/CTrigger.php:1567
 #: api/classes/CTriggerPrototype.php:1006
 #: api/classes/CTriggerPrototype.php:1064
 #, php-format
@@ -1777,7 +1777,7 @@ msgstr "Kann \"templateid\" nicht setzen für Element \"%1$s\"."
 msgid "Cannot set \"templateid\" for screen \"%1$s\"."
 msgstr "Kann \"templateid\" nicht setzen für Tafel \"%1$s\"."
 
-#: api/classes/CTrigger.php:1119
+#: api/classes/CTrigger.php:1032
 #, php-format
 msgid "Cannot set \"templateid\" for trigger \"%1$s\"."
 msgstr "Kann \"templateid\" nicht setzen für Auslöser \"%1$s\"."
@@ -1852,7 +1852,7 @@ msgstr "Kann \"templateid\" nicht ändern für Element \"%1$s\"."
 msgid "Cannot update \"templateid\" for screen \"%1$s\"."
 msgstr "Kann \"templateid\" nicht ändern für Tafel \"%1$s\"."
 
-#: api/classes/CTrigger.php:1116
+#: api/classes/CTrigger.php:1029
 #, php-format
 msgid "Cannot update \"templateid\" for trigger \"%1$s\"."
 msgstr "Kann \"templateid\" nicht ändern für Auslöser \"%1$s\"."
@@ -2695,7 +2695,7 @@ msgstr "Erstellt: Element \"%1$s\" auf \"%2$s\"."
 msgid "Created: Item prototype \"%1$s\" on \"%2$s\"."
 msgstr "Erstellt: Element-Prototyp \"%1$s\" auf \"%2$s\"."
 
-#: api/classes/CTrigger.php:1589
+#: api/classes/CTrigger.php:1502
 #, php-format
 msgid "Created: Trigger \"%1$s\" on \"%2$s\"."
 msgstr "Erstellt: Auslöser \"%1$s\" auf \"%2$s\"."
@@ -2824,7 +2824,7 @@ msgstr "Benutzerdefinierte Diagramme"
 msgid "Custom label"
 msgstr "Einheitlich"
 
-#: api/classes/CMap.php:592
+#: api/classes/CMap.php:593
 #, php-format
 msgid "Custom label for map \"%2$s\" elements of type \"%1$s\" may not be empty."
 msgstr "Benutzerdefinierte Bezeichnung der Karte \"%2$s\", Elemente des Typs \"%1$s\" dürfen nicht leer sein."
@@ -2944,7 +2944,7 @@ msgstr "Linie (gestrichelt)"
 msgid "Data"
 msgstr "Wert"
 
-#: include/classes/class.cchart.php:2363 include/classes/class.cpie.php:702
+#: include/classes/class.cchart.php:2376 include/classes/class.cpie.php:702
 #, php-format
 msgid "Data from %1$s. Generated in %2$s sec."
 msgstr "Daten von %1$s. Erzeugt in %2$s Sek."
@@ -3467,7 +3467,7 @@ msgid "Deleted: Template \"%1$s\"."
 msgstr "Gelöscht: Vorlage \"%1$s\"."
 
 #: api/classes/CTriggerGeneral.php:86 api/classes/CTriggerGeneral.php:141
-#: api/classes/CTrigger.php:1353
+#: api/classes/CTrigger.php:1266
 #, php-format
 msgid "Deleted: Trigger \"%1$s\" on \"%2$s\"."
 msgstr "Gelöscht: Auslöser \"%1$s\" auf \"%2$s\"."
@@ -3748,7 +3748,7 @@ msgid "Discovery object"
 msgstr "Discovery-Objekt"
 
 #: include/actions.inc.php:70 include/audit.inc.php:44
-#: include/blocks.inc.php:1110 include/forms.inc.php:1018
+#: include/blocks.inc.php:1111 include/forms.inc.php:1018
 #: include/views/configuration.discovery.edit.php:76
 #: include/views/configuration.discovery.list.php:29
 #: include/views/monitoring.discovery.php:34
@@ -3874,7 +3874,7 @@ msgstr "Erledigt"
 msgid "Dot"
 msgstr "Punkte"
 
-#: include/blocks.inc.php:1112
+#: include/blocks.inc.php:1113
 msgctxt "discovery results in dashboard"
 msgid "Down"
 msgstr "Nicht erreichbar"
@@ -3935,7 +3935,7 @@ msgstr "Erster Eintrag im Dropdown \"%1$s\"."
 msgid "Dropdown remember selected \"%1$s\"."
 msgstr "Dropdown merkt sich Auswahl \"%1$s\"."
 
-#: api/classes/CTrigger.php:1996
+#: api/classes/CTrigger.php:1909
 #, php-format
 msgid "Duplicate dependencies in trigger \"%1$s\"."
 msgstr "Abhängigkeits-Duplikat bei Auslöser \"%1$s\"."
@@ -3950,7 +3950,7 @@ msgstr "Doppelter Host. Es existiert bereits ein Host mit gleichem Namen \"%s\".
 msgid "Duplicate host. Host with the same visible name \"%s\" already exists in data."
 msgstr "Doppelter Host. Es existiert bereits ein Host mit gleichem sichtbaren Namen \"%s\"."
 
-#: api/classes/CMap.php:560
+#: api/classes/CMap.php:561
 #, php-format
 msgid "Duplicate map name for map \"%s\"."
 msgstr "Karte namens \"%s\" bereits vorhanden."
@@ -4067,8 +4067,8 @@ msgstr "Aktions-Bedingung leer."
 #: api/classes/CProxy.php:547 api/classes/CService.php:344
 #: api/classes/CService.php:380 api/classes/CService.php:446
 #: api/classes/CService.php:518 api/classes/CTemplate.php:1112
-#: api/classes/CTrigger.php:1325 api/classes/CTrigger.php:1421
-#: api/classes/CTrigger.php:1513 api/classes/CTriggerPrototype.php:907
+#: api/classes/CTrigger.php:1238 api/classes/CTrigger.php:1334
+#: api/classes/CTrigger.php:1426 api/classes/CTriggerPrototype.php:907
 #: api/classes/CUserGroup.php:701 api/classes/CUserMacro.php:495
 #: api/classes/CUserMacro.php:647
 msgid "Empty input parameter."
@@ -4458,7 +4458,7 @@ msgstr "FTP"
 msgid "Fail"
 msgstr "Ausfall"
 
-#: include/actions.inc.php:961 include/blocks.inc.php:1021
+#: include/actions.inc.php:961 include/blocks.inc.php:1022
 msgid "Failed"
 msgstr "Gescheitert"
 
@@ -4475,15 +4475,15 @@ msgstr "Vorlage konnte nicht geändert werden"
 msgid "Failure Audit"
 msgstr "Ausfall Audit"
 
-#: dashboard.php:259 include/blocks.inc.php:1132
+#: dashboard.php:259 include/blocks.inc.php:1133
 msgid "Favourite graphs"
 msgstr "Bevorzugte Diagramme"
 
-#: dashboard.php:273 include/blocks.inc.php:1256
+#: dashboard.php:273 include/blocks.inc.php:1257
 msgid "Favourite maps"
 msgstr "Bevorzugte Karten"
 
-#: dashboard.php:266 include/blocks.inc.php:1301
+#: dashboard.php:266 include/blocks.inc.php:1302
 msgid "Favourite screens"
 msgstr "Bevorzugte Übersichtskarten"
 
@@ -4690,7 +4690,7 @@ msgstr "GUI-Zugang deaktiviert."
 msgid "General"
 msgstr "Allgemein"
 
-#: chart4.php:180 chart5.php:200 include/classes/class.cbar.php:739
+#: chart4.php:180 chart5.php:200 include/classes/class.cbar.php:770
 #, php-format
 msgid "Generated in %s sec"
 msgstr "Erstellt in %s s"
@@ -4759,7 +4759,7 @@ msgstr "Google Chrome"
 msgid "Gradient line"
 msgstr "Linie (Gradient)"
 
-#: include/audit.inc.php:29 include/blocks.inc.php:1139
+#: include/audit.inc.php:29 include/blocks.inc.php:1140
 #: include/screens.inc.php:30 include/views/configuration.graph.edit.php:287
 #: include/views/monitoring.charts.php:27
 #: include/views/monitoring.history.php:60 latest.php:318 latest.php:495
@@ -4883,7 +4883,7 @@ msgstr "Diagramm namens \"%1$s\" existiert bereits (ggf. als Diagrammprototyp)."
 msgid "Graph with same name but other type exist."
 msgstr "Namensgleiches Diagramm anderen Typs existiert bereits."
 
-#: dashboard.php:260 hosts.php:686 hosts.php:765 include/blocks.inc.php:1237
+#: dashboard.php:260 hosts.php:686 hosts.php:765 include/blocks.inc.php:1238
 #: include/html.inc.php:464 include/html.inc.php:468 include/items.inc.php:802
 #: include/menu.inc.php:62 include/triggers.inc.php:1311
 #: include/views/configuration.graph.list.php:56
@@ -5018,8 +5018,8 @@ msgid "H:i"
 msgstr "H:i"
 
 #: include/blocks.inc.php:363 include/blocks.inc.php:701
-#: include/blocks.inc.php:769 include/blocks.inc.php:978
-#: include/blocks.inc.php:1068 include/blocks.inc.php:1126
+#: include/blocks.inc.php:769 include/blocks.inc.php:979
+#: include/blocks.inc.php:1069 include/blocks.inc.php:1127
 #: include/classes/screens/CScreenSystemStatus.php:47
 #: include/views/configuration.item.list.php:102
 msgid "H:i:s"
@@ -5154,8 +5154,8 @@ msgstr "Horizontale Ausrichtung"
 #: httpconf.php:331 httpconf.php:351 httpmon.php:121 httpmon.php:141
 #: include/actions.inc.php:64 include/audit.inc.php:27
 #: include/blocks.inc.php:587 include/blocks.inc.php:634
-#: include/blocks.inc.php:884 include/blocks.inc.php:894
-#: include/blocks.inc.php:1411 include/classes/screens/CScreenEvents.php:46
+#: include/blocks.inc.php:885 include/blocks.inc.php:895
+#: include/blocks.inc.php:1412 include/classes/screens/CScreenEvents.php:46
 #: include/classes/screens/CScreenHostgroupTriggers.php:121
 #: include/classes/screens/CScreenHostTriggers.php:63
 #: include/classes/screens/CScreenHostTriggers.php:123
@@ -5248,7 +5248,7 @@ msgstr "Host gelöscht"
 
 #: include/actions.inc.php:60 include/audit.inc.php:35
 #: include/blocks.inc.php:185 include/blocks.inc.php:372
-#: include/blocks.inc.php:1019 include/forms.inc.php:486
+#: include/blocks.inc.php:1020 include/forms.inc.php:486
 #: include/maps.inc.php:25 include/reports.inc.php:111
 #: include/views/administration.script.list.php:42
 #: include/views/configuration.hostgroups.edit.php:63
@@ -5801,8 +5801,8 @@ msgstr "Einfügen"
 msgid "Incorrect \"soft\" field value for dependency for service \"%1$s\"."
 msgstr "Falscher Wert im Feld \"weich\" für die Abhängigkeit von Dienst \"%1$s\"."
 
-#: api/classes/CMap.php:585 api/classes/CMap.php:589 api/classes/CMap.php:596
-#: api/classes/CMap.php:601
+#: api/classes/CMap.php:586 api/classes/CMap.php:590 api/classes/CMap.php:597
+#: api/classes/CMap.php:602
 #, php-format
 msgid "Incorrect %1$s label type value for map \"%2$s\"."
 msgstr "Falscher Wert für %1$s Beschriftungstyp der Karte \"%2$s\"."
@@ -6011,11 +6011,11 @@ msgstr "Ungültiger Ausdruck"
 msgid "Incorrect field \"%1$s\" name or value in where statement for table \"%2$s\"."
 msgstr "Falsches Feld \"%1$s\" Name oder Wert in Where-Klausel für Tabelle \"%2$s\"."
 
-#: api/classes/CMap.php:545
+#: api/classes/CMap.php:546
 msgid "Incorrect fields for sysmap"
 msgstr "Falsche Felder für sysmap"
 
-#: api/classes/CTrigger.php:1125
+#: api/classes/CTrigger.php:1038
 msgid "Incorrect fields for trigger."
 msgstr "Falsche Felder für Auslöser."
 
@@ -6091,7 +6091,7 @@ msgstr "Falsche Element-ID \"%s\" angegeben für Element der Übersichtstafel."
 msgid "Incorrect item for axis value."
 msgstr "Unzulässiges Element für Achswert."
 
-#: api/classes/CTrigger.php:1226 include/triggers.inc.php:917
+#: api/classes/CTrigger.php:1139 include/triggers.inc.php:917
 #, php-format
 msgid "Incorrect item key \"%1$s\" provided for trigger expression on \"%2$s\"."
 msgstr "Falscher Element-Schlüssel \"%1$s\" für Auslöser-Ausdruck auf \"%2$s\" verwendet."
@@ -6156,12 +6156,12 @@ msgstr "Falsche Wartungswoche"
 msgid "Incorrect map ID \"%s\" provided for screen element."
 msgstr "Falsche Karten-ID \"%s\" angegeben für Element der Ansichtstafel."
 
-#: api/classes/CMap.php:569
+#: api/classes/CMap.php:570
 #, php-format
 msgid "Incorrect map height value for map \"%s\"."
 msgstr "Kartenhöhe-Wert falsch für Karte \"%s\"."
 
-#: api/classes/CMap.php:566
+#: api/classes/CMap.php:567
 #, php-format
 msgid "Incorrect map width value for map \"%s\"."
 msgstr "Kartenbreite-Wert falsch für Karte \"%s\"."
@@ -6312,12 +6312,12 @@ msgstr "Ungültiger Auslöser-Ausdruck."
 msgid "Incorrect trigger expression. Host \"%1$s\" does not exist or you have no access to this host."
 msgstr "Ungültiger Auslöser-Ausdruck. Host \"%1$s\" existiert nicht oder Sie haben keinen Zugriff auf ihn."
 
-#: api/classes/CTrigger.php:1206
+#: api/classes/CTrigger.php:1119
 #, php-format
 msgid "Incorrect trigger expression. Host \"%s\" does not exist or you have no access to this host."
 msgstr "Falscher Auslöser-Ausdruck. Host \"%s\" existiert nicht or Sie haben keinen Zugriff auf ihn."
 
-#: api/classes/CTrigger.php:1212
+#: api/classes/CTrigger.php:1125
 msgid "Incorrect trigger expression. Trigger expression elements should not belong to a template and a host simultaneously."
 msgstr "Falscher Auslöser-Ausdruck. Die Elemente eines Ausdrucks sollten nicht gleichzeitig zu einer Vorlage und einem Host gehören."
 
@@ -6397,7 +6397,7 @@ msgstr "Falsches Element für das Y-Minimum von Diagramm \"%1$s\"."
 msgid "Indonesian (id_ID)"
 msgstr "Indonesisch (id_ID)"
 
-#: include/blocks.inc.php:898 include/blocks.inc.php:1414
+#: include/blocks.inc.php:899 include/blocks.inc.php:1415
 #: include/classes/class.cformlist.php:65 tr_status.php:286
 msgid "Info"
 msgstr "Info"
@@ -6557,8 +6557,8 @@ msgstr "Inventarmodus"
 msgid "Is online?"
 msgstr "Online?"
 
-#: include/blocks.inc.php:886 include/blocks.inc.php:895
-#: include/blocks.inc.php:1412
+#: include/blocks.inc.php:887 include/blocks.inc.php:896
+#: include/blocks.inc.php:1413
 msgid "Issue"
 msgstr "Problem"
 
@@ -6980,7 +6980,7 @@ msgstr "Letzten 365 Tage"
 msgid "Last 7 days"
 msgstr "Letzten 7 Tage"
 
-#: include/blocks.inc.php:888 include/blocks.inc.php:896 tr_status.php:287
+#: include/blocks.inc.php:889 include/blocks.inc.php:897 tr_status.php:287
 msgid "Last change"
 msgstr "Letzte Änderung"
 
@@ -7082,22 +7082,22 @@ msgstr "Verbindung"
 msgid "Link indicators"
 msgstr "Indikatoren"
 
-#: api/classes/CMap.php:631
+#: api/classes/CMap.php:632
 #, php-format
 msgid "Link name should be unique for map \"%s\"."
 msgstr "Der Name der Verbindung sollte eindeutig sein für die Karte \"%s\"."
 
-#: api/classes/CMap.php:642
+#: api/classes/CMap.php:643
 #, php-format
 msgid "Link selementid1 field is pointing to a nonexistent map selement ID \"%1$s\" for map \"%2$s\"."
 msgstr "Das Verknüfpungs-Feld selementid1 verweist auf ein nicht existierendes Karten-selement ID \"%1$s\" für Karte \"%2$s\"."
 
-#: api/classes/CMap.php:645
+#: api/classes/CMap.php:646
 #, php-format
 msgid "Link selementid2 field is pointing to a nonexistent map selement ID \"%1$s\" for map \"%2$s\"."
 msgstr "Das Verknüfpungs-Feld selementid2 verweist auf ein nicht existierendes Karten-selement ID \"%1$s\" für Karte \"%2$s\"."
 
-#: api/classes/CMap.php:628
+#: api/classes/CMap.php:629
 #, php-format
 msgid "Link should have both \"name\" and \"url\" fields for map \"%s\"."
 msgstr "Verknüpfung muss \"name\" und \"url\" Felder haben für Karte \"%s\"."
@@ -7388,11 +7388,11 @@ msgstr "Wartungsart"
 msgid "Maintenance updated"
 msgstr "Wartung geändert"
 
-#: include/blocks.inc.php:926 tr_status.php:623
+#: include/blocks.inc.php:927 tr_status.php:623
 msgid "Maintenance with data collection"
 msgstr "Wartung mit Datenerhebung"
 
-#: include/blocks.inc.php:925 tr_status.php:622
+#: include/blocks.inc.php:926 tr_status.php:622
 msgid "Maintenance without data collection"
 msgstr "Wartung ohne Datenerhebung"
 
@@ -7414,7 +7414,7 @@ msgstr "Manuell"
 msgid "Manual Logout"
 msgstr "Manuelles Abmelden"
 
-#: include/audit.inc.php:40 include/blocks.inc.php:1258
+#: include/audit.inc.php:40 include/blocks.inc.php:1259
 #: include/maps.inc.php:27 include/screens.inc.php:34
 #: include/views/configuration.sysmap.edit.php:201
 #: include/views/js/configuration.sysmaps.js.php:16
@@ -7455,7 +7455,7 @@ msgstr "Beschriftung Karte"
 msgid "Map save operation failed."
 msgstr "Karten speichen fehlgeschlagen."
 
-#: api/classes/CMap.php:661
+#: api/classes/CMap.php:662
 #, php-format
 msgid "Map with name \"%s\" already exists"
 msgstr "Eine Karte namens \"%s\" existiert bereits"
@@ -7474,7 +7474,7 @@ msgstr "Zuordnungswert \"%1$s\" ist nicht eindeutig."
 msgid "Mappings"
 msgstr "Zuordnungen"
 
-#: dashboard.php:274 include/blocks.inc.php:1291 include/menu.inc.php:72
+#: dashboard.php:274 include/blocks.inc.php:1292 include/menu.inc.php:72
 #: include/menu.inc.php:206 include/views/conf.import.php:36 popup.php:101
 #: sysmaps.php:251
 msgid "Maps"
@@ -8491,14 +8491,14 @@ msgstr "Keine Berechtigung zum System-Zugang."
 #: api/classes/CMaintenance.php:429 api/classes/CMaintenance.php:537
 #: api/classes/CMaintenance.php:554 api/classes/CMaintenance.php:621
 #: api/classes/CMapElement.php:519 api/classes/CMapElement.php:575
-#: api/classes/CMap.php:550 api/classes/CProxy.php:318
+#: api/classes/CMap.php:551 api/classes/CProxy.php:318
 #: api/classes/CProxy.php:332 api/classes/CScreenItem.php:330
 #: api/classes/CScreenItem.php:414 api/classes/CScreen.php:499
 #: api/classes/CScreen.php:578 api/classes/CService.php:1252
 #: api/classes/CService.php:1267 api/classes/CTemplateScreen.php:775
 #: api/classes/CTemplateScreen.php:796 api/classes/CTemplateScreen.php:802
-#: api/classes/CTrigger.php:1110 api/classes/CTrigger.php:1440
-#: api/classes/CTrigger.php:1464 api/classes/CTriggerPrototype.php:822
+#: api/classes/CTrigger.php:1023 api/classes/CTrigger.php:1353
+#: api/classes/CTrigger.php:1377 api/classes/CTriggerPrototype.php:822
 #: api/classes/CTriggerPrototype.php:920 api/classes/CUserMacro.php:824
 #: api/classes/CUserMacro.php:933 api/classes/CWebCheck.php:444
 #: include/config.inc.php:244
@@ -8644,8 +8644,8 @@ msgstr "Keine Web-Szenarios definiert."
 #: events.php:559 events.php:572 hostinventories.php:156 httpmon.php:140
 #: include/actions.inc.php:68 include/audit.inc.php:42
 #: include/blocks.inc.php:184 include/blocks.inc.php:371
-#: include/blocks.inc.php:893 include/blocks.inc.php:1018
-#: include/blocks.inc.php:1109 include/blocks.inc.php:1410
+#: include/blocks.inc.php:894 include/blocks.inc.php:1019
+#: include/blocks.inc.php:1110 include/blocks.inc.php:1411
 #: include/classes/screens/CScreenEvents.php:45 include/page_header.php:354
 #: include/triggers.inc.php:1582 include/views/administration.node.edit.php:83
 #: include/views/configuration.httpconf.list.php:66
@@ -8707,7 +8707,7 @@ msgstr "Unbestätigt"
 msgid "Not Templated items"
 msgstr "Keine Elemente aus Vorlagen"
 
-#: api/classes/CTrigger.php:1899
+#: api/classes/CTrigger.php:1812
 #, php-format
 msgid "Not all templates are linked to \"%s\"."
 msgstr "Nicht alle Vorlagen sind verbunden mit \"%s\"."
@@ -8932,7 +8932,7 @@ msgstr "Oktober"
 msgid "Off"
 msgstr "Aus"
 
-#: include/actions.inc.php:958 include/blocks.inc.php:1020
+#: include/actions.inc.php:958 include/blocks.inc.php:1021
 #: include/classes/class.ctriggersinfo.php:134
 #: include/views/administration.users.list.php:86 report2.php:238
 #: report3.php:85
@@ -9947,10 +9947,10 @@ msgstr "Mich merken für 30 Tage"
 msgid "Remote command"
 msgstr "Entfernter Befehl"
 
-#: include/blocks.inc.php:1151 include/blocks.inc.php:1237
-#: include/blocks.inc.php:1246 include/blocks.inc.php:1263
-#: include/blocks.inc.php:1291 include/blocks.inc.php:1314
-#: include/blocks.inc.php:1375 include/blocks.inc.php:1384
+#: include/blocks.inc.php:1152 include/blocks.inc.php:1238
+#: include/blocks.inc.php:1247 include/blocks.inc.php:1264
+#: include/blocks.inc.php:1292 include/blocks.inc.php:1315
+#: include/blocks.inc.php:1376 include/blocks.inc.php:1385
 #: include/views/administration.general.iconmap.edit.php:69
 #: include/views/administration.general.iconmap.edit.php:106
 #: include/views/common.macros.php:38
@@ -10574,7 +10574,7 @@ msgstr "Szenarios"
 msgid "Schedule"
 msgstr "Zeitplanung"
 
-#: include/audit.inc.php:41 include/blocks.inc.php:1303
+#: include/audit.inc.php:41 include/blocks.inc.php:1304
 #: include/screens.inc.php:36 include/views/configuration.screen.edit.php:45
 #: include/views/configuration.screen.list.php:51
 #: include/views/configuration.slideconf.edit.php:48
@@ -10644,7 +10644,7 @@ msgstr "Übersichtstafel mit ID \"%s\" existiert nicht."
 msgid "Screen with name \"%s\" does not exist."
 msgstr "Übersichtstafel namens \"%s\" existiert nicht."
 
-#: dashboard.php:267 include/blocks.inc.php:1375 include/html.inc.php:477
+#: dashboard.php:267 include/blocks.inc.php:1376 include/html.inc.php:477
 #: include/html.inc.php:481 include/menu.inc.php:67 include/menu.inc.php:197
 #: include/views/configuration.screen.list.php:38
 #: include/views/configuration.template.edit.php:386
@@ -11126,11 +11126,11 @@ msgstr "Einfach"
 msgid "Simple check"
 msgstr "Einfache Prüfung"
 
-#: include/blocks.inc.php:1145 include/screens.inc.php:38 popup.php:97
+#: include/blocks.inc.php:1146 include/screens.inc.php:38 popup.php:97
 msgid "Simple graph"
 msgstr "Einfaches Diagramm"
 
-#: include/blocks.inc.php:1246 jsLoader.php:107
+#: include/blocks.inc.php:1247 jsLoader.php:107
 msgid "Simple graphs"
 msgstr "Einfache Diagramme"
 
@@ -11181,7 +11181,7 @@ msgstr "Kopieren des Diagramms \"%1$s\" zum Host \"%2$s\" übersprungen."
 msgid "Slide"
 msgstr "Vorführung"
 
-#: include/audit.inc.php:45 include/blocks.inc.php:1309
+#: include/audit.inc.php:45 include/blocks.inc.php:1310
 #: include/views/monitoring.slides.php:69
 msgid "Slide show"
 msgstr "Vorführung"
@@ -11213,7 +11213,7 @@ msgstr "Vorführung geändert"
 msgid "Slide shows"
 msgstr "Vorführung"
 
-#: include/blocks.inc.php:1384
+#: include/blocks.inc.php:1385
 #: include/views/configuration.slideconf.edit.php:96
 msgid "Slides"
 msgstr "Seiten"
@@ -11989,7 +11989,7 @@ msgstr "Auslöser \"%1$s\" übersprungen -- Benutzerregel."
 msgid "Trigger \"%1$s:%2$s\" does not have item prototype."
 msgstr "Auslöser \"%1$s:%2$s\" hat keinen Elementen-Prototyp."
 
-#: api/classes/CTrigger.php:2038
+#: api/classes/CTrigger.php:1951
 #, php-format
 msgid "Trigger \"%s\" belongs to templates with different linkages."
 msgstr "Auslöser \"%s\" gehört zu Vorlagen mit unterschiedlichen Verknüpfungen."
@@ -11999,7 +11999,7 @@ msgstr "Auslöser \"%s\" gehört zu Vorlagen mit unterschiedlichen Verknüpfunge
 msgid "Trigger added"
 msgstr "Auslöser hinzugefügt"
 
-#: api/classes/CTrigger.php:1942
+#: api/classes/CTrigger.php:1855
 msgid "Trigger cannot be dependant on a trigger, that is inherited from it."
 msgstr "Auslöser kann nicht von einem Auslöser abhängen, den er beerbt."
 
@@ -12023,7 +12023,7 @@ msgstr "Auslöser-Anzeige"
 msgid "Trigger expression condition"
 msgstr "Bedingung für Auslöserausdruck"
 
-#: api/classes/CTrigger.php:1186 api/classes/CTriggerPrototype.php:1052
+#: api/classes/CTrigger.php:1099 api/classes/CTriggerPrototype.php:1052
 msgid "Trigger expression must contain at least one host:key reference."
 msgstr "Auslöser-Ausdrücke muss mindestens eine Kombination Host:Schlüssel beinhalten."
 
@@ -12353,7 +12353,7 @@ msgstr "Einheit"
 #: include/actions.inc.php:190 include/actions.inc.php:198
 #: include/actions.inc.php:212 include/actions.inc.php:223
 #: include/actions.inc.php:251 include/actions.inc.php:570
-#: include/blocks.inc.php:1022 include/classes/class.chostsinfo.php:127
+#: include/blocks.inc.php:1023 include/classes/class.chostsinfo.php:127
 #: include/discovery.inc.php:128 include/discovery.inc.php:162
 #: include/events.inc.php:29 include/graphs.inc.php:37
 #: include/graphs.inc.php:77 include/hosts.inc.php:53 include/hosts.inc.php:80
@@ -12482,7 +12482,7 @@ msgstr "Nicht unterstützte Import-Dateiendung \"%1$s\"."
 msgid "Unsupported import format \"%1$s\"."
 msgstr "Nicht unterstütztes Importformat \"%1$s\"."
 
-#: include/blocks.inc.php:1111
+#: include/blocks.inc.php:1112
 msgctxt "discovery results in dashboard"
 msgid "Up"
 msgstr "Erreichbar"
@@ -12525,8 +12525,8 @@ msgid "Updated status of host"
 msgstr "Geänderter Status des Hosts"
 
 #: include/blocks.inc.php:363 include/blocks.inc.php:701
-#: include/blocks.inc.php:769 include/blocks.inc.php:978
-#: include/blocks.inc.php:1068 include/blocks.inc.php:1126
+#: include/blocks.inc.php:769 include/blocks.inc.php:979
+#: include/blocks.inc.php:1069 include/blocks.inc.php:1127
 #: include/classes/screens/CScreenSystemStatus.php:47
 #, php-format
 msgid "Updated: %s"
@@ -12552,7 +12552,7 @@ msgstr "Geändert: Element \"%1$s\" auf \"%2$s\"."
 msgid "Updated: Item prototype \"%1$s\" on \"%2$s\"."
 msgstr "Geändert: Elementen-Prototyp \"%1$s\" auf \"%2$s\"."
 
-#: api/classes/CTrigger.php:1693
+#: api/classes/CTrigger.php:1606
 #, php-format
 msgid "Updated: Trigger \"%1$s\" on \"%2$s\"."
 msgstr "Geändert: Auslöser \"%1$s\" auf \"%2$s\"."
@@ -12766,17 +12766,17 @@ msgstr "Benutzer entsperrt"
 msgid "Value"
 msgstr "Wert"
 
-#: api/classes/CMap.php:615
+#: api/classes/CMap.php:616
 #, php-format
 msgid "Value \"%1$s\" is invalid for parameter \"grid_align\". Choices are: \"%2$s\" and \"%3$s\""
 msgstr "Wert \"%1$s\" ist unzulässig für Parameter \"grid_align\". Zur Wahl stehen: \"%2$s\" and \"%3$s\""
 
-#: api/classes/CMap.php:611
+#: api/classes/CMap.php:612
 #, php-format
 msgid "Value \"%1$s\" is invalid for parameter \"grid_show\". Choices are: \"%2$s\""
 msgstr "Wert \"%1$s\" ist unzulässig für Parameter \"grid_show\". Zur Wahl stehen: \"%2$s\""
 
-#: api/classes/CMap.php:619
+#: api/classes/CMap.php:620
 #, php-format
 msgid "Value \"%1$s\" is invalid for parameter \"grid_show\". Choices are: \"%2$s\" and \"%3$s\""
 msgstr "Wert \"%1$s\" ist unzulässig für Parameter \"grid_show\". Zur Wahl stehen: \"%2$s\" and \"%3$s\""
@@ -13517,7 +13517,7 @@ msgstr "[Falscher Wert für Monat: \"%s\" ]"
 msgid "agent"
 msgstr "Agent"
 
-#: include/classes/class.cchart.php:1761
+#: include/classes/class.cchart.php:1764
 #: include/classes/class.cpagefilter.php:631
 #: include/classes/screens/CScreenHostgroupTriggers.php:104
 #: include/classes/screens/CScreenHostgroupTriggers.php:110
@@ -13559,7 +13559,7 @@ msgstr "als Grün"
 msgid "as Red"
 msgstr "als Rot"
 
-#: include/classes/class.cchart.php:1743 include/classes/class.cchart.php:1765
+#: include/classes/class.cchart.php:1746 include/classes/class.cchart.php:1768
 #: include/graphs.inc.php:95
 #: include/views/js/configuration.graph.edit.js.php:40
 #: include/views/js/configuration.graph.edit.js.php:48 popup_bitem.php:129
@@ -13584,7 +13584,7 @@ msgid "d M Y H:i"
 msgstr "d M Y H:i"
 
 #: acknow.php:162 events.php:282 httpdetails.php:115 httpmon.php:242
-#: include/acknow.inc.php:59 include/blocks.inc.php:952
+#: include/acknow.inc.php:59 include/blocks.inc.php:953
 #: include/classes/screens/CScreenEvents.php:63
 #: include/classes/screens/CScreenPlainText.php:95 include/events.inc.php:116
 #: include/events.inc.php:187 include/events.inc.php:243
@@ -13689,19 +13689,19 @@ msgstr "h"
 msgid "hh"
 msgstr "hh"
 
-#: api/classes/CMap.php:575
+#: api/classes/CMap.php:576
 msgid "host"
 msgstr "Host"
 
-#: api/classes/CMap.php:574
+#: api/classes/CMap.php:575
 msgid "host group"
 msgstr "Host-Gruppe"
 
-#: api/classes/CMap.php:572
+#: api/classes/CMap.php:573
 msgid "icon"
 msgstr "Symbol"
 
-#: api/classes/CMap.php:578
+#: api/classes/CMap.php:579
 msgid "image"
 msgstr "Bild"
 
@@ -13714,7 +13714,7 @@ msgstr "in"
 msgid "is"
 msgstr "-"
 
-#: include/classes/class.cchart.php:1741 include/graphs.inc.php:92
+#: include/classes/class.cchart.php:1744 include/graphs.inc.php:92
 #: include/views/js/configuration.graph.edit.js.php:42
 msgid "last"
 msgstr "letzte"
@@ -13750,18 +13750,18 @@ msgstr "Makro(s)"
 msgid "maintenance"
 msgstr "Wartung"
 
-#: api/classes/CMap.php:577
+#: api/classes/CMap.php:578
 msgid "map"
 msgstr "Karte"
 
-#: include/classes/class.cchart.php:1744 include/classes/class.cchart.php:1758
+#: include/classes/class.cchart.php:1747 include/classes/class.cchart.php:1761
 #: include/graphs.inc.php:90
 #: include/views/js/configuration.graph.edit.js.php:41
 #: include/views/js/configuration.graph.edit.js.php:49 popup_bitem.php:130
 msgid "max"
 msgstr "max."
 
-#: include/classes/class.cchart.php:1742 include/classes/class.cchart.php:1755
+#: include/classes/class.cchart.php:1745 include/classes/class.cchart.php:1758
 #: include/graphs.inc.php:88
 #: include/views/js/configuration.graph.edit.js.php:39
 #: include/views/js/configuration.graph.edit.js.php:47 popup_bitem.php:128
@@ -13810,7 +13810,7 @@ msgstr "muss ein gültiger LDAP-Benutzer sein"
 msgid "no"
 msgstr "kein(e)"
 
-#: include/blocks.inc.php:1435 include/classes/class.cchart.php:1794
+#: include/blocks.inc.php:1436 include/classes/class.cchart.php:1825
 #: include/classes/class.cpie.php:320 include/maps.inc.php:435
 #: include/maps.inc.php:468
 #, php-format
@@ -13938,7 +13938,7 @@ msgstr "Vorlagen ID \"%1$s\" kommt %2$s mal vor"
 msgid "to"
 msgstr "bis"
 
-#: api/classes/CMap.php:576
+#: api/classes/CMap.php:577
 msgid "trigger"
 msgstr "Auslöser"
 
