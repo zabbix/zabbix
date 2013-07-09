@@ -11,7 +11,7 @@ New features:
 
 Bug fixes:
 ..F....... [ZBX-6732] cookie path is now automatically set from current URL (Ivo)
-..F....... [ZBX-6706] improved node displaing in frontend (Eduard)
+..F....... [ZBX-6706] improved node displaying in frontend (Eduard)
 
 --------------------------------------------------------------------------------
 Changes for 2.1.0
