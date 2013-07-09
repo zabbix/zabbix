@@ -124,6 +124,7 @@ elseif (isset($_REQUEST['delete'])) {
 		unset($_REQUEST['form'], $_REQUEST['proxyid']);
 		$proxy = reset($dbProxy);
 	}
+
 	show_messages($result, _('Proxy deleted'), _('Cannot delete proxy'));
 
 	unset($_REQUEST['delete']);
@@ -161,6 +162,7 @@ elseif (str_in_array($_REQUEST['go'], array('activate', 'disable')) && isset($_R
 	}
 
 	$goResult = DBend($goResult && $hosts);
+
 	show_messages($goResult, _('Host status updated'), null);
 }
 elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['hosts'])) {
@@ -230,7 +232,9 @@ if (isset($_REQUEST['form'])) {
 	$proxyView->show();
 }
 else {
-	$data = array();
+	$data = array(
+		'displayNodes' => is_array(get_current_nodeid())
+	);
 
 	$sortfield = getPageSortField('host');
 
@@ -245,10 +249,15 @@ else {
 
 	$proxyIds = array_keys($data['proxies']);
 
+	// sorting & paging
 	order_result($data['proxies'], $sortfield, getPageSortOrder());
-
-	// paging
 	$data['paging'] = getPagingLine($data['proxies']);
+
+	// nodes
+	foreach ($data['proxies'] as &$proxy) {
+		$proxy['nodename'] = $data['displayNodes'] ? get_node_name_by_elid($proxy['proxyid'], true) : '';
+	}
+	unset($proxy);
 
 	// calculate performance
 	$dbPerformance = DBselect(
