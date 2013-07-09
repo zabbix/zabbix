@@ -954,3 +954,26 @@ function getBase1024Interval($interval, $minY, $maxY) {
 
 	return $interval;
 }
+
+/**
+ * Returns digit count for the item with most digit after point in given array.
+ * Example:
+ *	Input: array(0, 0.1, 0.25, 0.005)
+ *	Return 3
+ *
+ * @param array $calcValues
+ *
+ * @return int
+ */
+function calcMaxLengthAfterDot($calcValues) {
+	$maxLength = 0;
+
+	foreach ($calcValues as $calcValue) {
+		preg_match('/^-?[0-9].?([0-9]*)\s?/', $calcValue, $matches);
+		if ($matches['1'] != 0 && strlen($matches['1']) > $maxLength) {
+			$maxLength = strlen($matches['1']);
+		}
+	}
+
+	return $maxLength;
+}
