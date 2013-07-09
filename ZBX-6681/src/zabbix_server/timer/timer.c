@@ -44,7 +44,7 @@ extern unsigned char	process_type;
  * Author: Alexei Vladishev, Aleksandrs Saveljevs                             *
  *                                                                            *
  ******************************************************************************/
-static void	process_time_functions()
+static void	process_time_functions(void)
 {
 	const char		*__function_name = "process_time_functions";
 	char			*sql = NULL;
@@ -131,8 +131,8 @@ typedef struct
 	char		*host;
 	time_t		maintenance_from;
 	zbx_uint64_t	maintenanceid;
-	int		maintenance_type;
 	zbx_uint64_t	host_maintenanceid;
+	int		maintenance_type;
 	int		host_maintenance_status;
 	int		host_maintenance_type;
 	int		host_maintenance_from;
@@ -664,7 +664,7 @@ static int	day_in_month(int year, int mon)
 		return month[mon];
 }
 
-static void	process_maintenance()
+static void	process_maintenance(void)
 {
 	const char			*__function_name = "process_maintenance";
 	DB_RESULT			result;
@@ -822,6 +822,8 @@ static void	process_maintenance()
 
 	while (0 != hm_count--)
 		zbx_free(hm[hm_count].host);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 /******************************************************************************
@@ -839,7 +841,7 @@ static void	process_maintenance()
  * Comments: does update once per 30 seconds (hardcoded)                      *
  *                                                                            *
  ******************************************************************************/
-void	main_timer_loop()
+void	main_timer_loop(void)
 {
 	int	now, nextcheck, sleeptime;
 
