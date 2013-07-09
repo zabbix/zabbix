@@ -892,6 +892,7 @@ static void	DCcalculate_item_delta_float(DB_ITEM *item, ZBX_DC_HISTORY *h, zbx_i
 				h->state = ITEM_STATE_NOTSUPPORTED;
 				h->value_null = 1;
 			}
+
 			break;
 		case ITEM_STORE_SPEED_PER_SECOND:
 			if (NULL != last && 0 != last->timestamp.sec &&
@@ -912,6 +913,7 @@ static void	DCcalculate_item_delta_float(DB_ITEM *item, ZBX_DC_HISTORY *h, zbx_i
 			else
 				h->value_null = 1;
 
+			break;
 		case ITEM_STORE_SIMPLE_CHANGE:
 			if (NULL != last && 0 != last->timestamp.sec &&
 					last->value.dbl <= h->value_orig.dbl)
@@ -965,6 +967,7 @@ static void	DCcalculate_item_delta_uint64(DB_ITEM *item, ZBX_DC_HISTORY *h, zbx_
 				last->timestamp.sec = 0;
 
 			h->value.ui64 = multiply_item_value_uint64(item, h->value_orig.ui64);
+
 			break;
 		case ITEM_STORE_SPEED_PER_SECOND:
 			if (NULL != last && 0 != last->timestamp.sec &&
