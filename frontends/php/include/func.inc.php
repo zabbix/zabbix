@@ -541,10 +541,11 @@ function convertUnitsS($value) {
  * @param string $convert
  * @param string $byteStep
  * @param string $pow
+ * @param string $length
  *
  * @return string
  */
-function convert_units($value, $units, $convert = ITEM_CONVERT_WITH_UNITS, $byteStep = false, $pow = false) {
+function convert_units($value, $units, $convert = ITEM_CONVERT_WITH_UNITS, $byteStep = false, $pow = false, $length = false) {
 	// special processing for unix timestamps
 	if ($units == 'unixtime') {
 		return zbx_date2str(_('Y.m.d H:i:s'), $value);
@@ -572,12 +573,7 @@ function convert_units($value, $units, $convert = ITEM_CONVERT_WITH_UNITS, $byte
 		$value = preg_replace('/^([\-0-9]+)(\.)([0-9]*)[0]+$/U', '$1$2$3', $value);
 		$value = rtrim($value, '.');
 
-		if (zbx_empty($units)) {
-			return $value;
-		}
-		else {
-			return $value.' '.$units;
-		}
+		return trim($value.' '.$units);
 	}
 
 	// if one or more items is B or Bps, then Y-scale use base 8 and calculated in bytes
@@ -607,7 +603,10 @@ function convert_units($value, $units, $convert = ITEM_CONVERT_WITH_UNITS, $byte
 	}
 
 	if (bccomp($abs, 1) == -1) {
-		return round($value, ZBX_UNITS_ROUNDOFF_MIDDLE_LIMIT).' '.$units;
+		$value = round($value, ZBX_UNITS_ROUNDOFF_MIDDLE_LIMIT);
+		$value = ($length && $value != 0) ? sprintf('%.'.$length.'f',$value) : $value;
+
+		return trim($value.' '.$units);
 	}
 
 	// init intervals
@@ -680,7 +679,7 @@ function convert_units($value, $units, $convert = ITEM_CONVERT_WITH_UNITS, $byte
 		$value = 0;
 	}
 
-	return rtrim(sprintf('%s %s%s', $value, $desc, $units));
+	return trim(sprintf('%s %s%s', $length ? sprintf('%.'.$length.'f',$value) : $value, $desc, $units));
 }
 
 /**

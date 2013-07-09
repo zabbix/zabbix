@@ -1482,18 +1482,34 @@ class CChart extends CGraphDraw {
 			$newPow = $maxYPow['pow'];
 		}
 
+		// get all values in y-axis
+		$calcValues = array();
 		for ($i = 0; $i <= $hstr_count; $i++) {
-			// division by zero
 			$hstr_count = ($hstr_count == 0) ? 1 : $hstr_count;
 
-			// using bc library, incase of large numbers
 			$val = bcadd(bcmul($i, $step), $minY);
 
 			if (bccomp(bcadd($val, bcdiv($step,2)), $maxY) == 1) {
 				continue;
 			}
 
-			$str = convert_units($val, $units, ITEM_CONVERT_NO_UNITS, $byteStep, $newPow);
+			$calcValues[] = convert_units($val, null, ITEM_CONVERT_NO_UNITS, $byteStep, $newPow);
+		}
+
+		$calcValues[] = convert_units($maxY, null, ITEM_CONVERT_NO_UNITS, $byteStep, $newPow);
+
+		$maxLength = calcMaxLengthAfterDot($calcValues);
+
+		for ($i = 0; $i <= $hstr_count; $i++) {
+			$hstr_count = ($hstr_count == 0) ? 1 : $hstr_count;
+
+			$val = bcadd(bcmul($i, $step), $minY);
+
+			if (bccomp(bcadd($val, bcdiv($step,2)), $maxY) == 1) {
+				continue;
+			}
+
+			$str = convert_units($val, $units, ITEM_CONVERT_NO_UNITS, $byteStep, $newPow, $maxLength);
 
 			$dims = imageTextSize(8, 0, $str);
 
@@ -1511,7 +1527,7 @@ class CChart extends CGraphDraw {
 			);
 		}
 
-		$str = convert_units($maxY, $units, ITEM_CONVERT_NO_UNITS, $byteStep, $newPow);
+		$str = convert_units($maxY, $units, ITEM_CONVERT_NO_UNITS, $byteStep, $newPow, $maxLength);
 
 		$dims = imageTextSize(8, 0, $str);
 		imageText(
@@ -1623,19 +1639,34 @@ class CChart extends CGraphDraw {
 			$newPow = $maxYPow['pow'];
 		}
 
+		// get all values in y-axis
+		$calcValues = array();
 		for ($i = 0; $i <= $hstr_count; $i++) {
-			if ($hstr_count == 0) {
+			$hstr_count = ($hstr_count == 0) ? 1 : $hstr_count;
+
+			$val = bcadd(bcmul($i, $step), $minY);
+
+			if (bccomp(bcadd($val, bcdiv($step,2)), $maxY) == 1) {
 				continue;
 			}
 
-			// using bc module in case of large numbers
+			$calcValues[] = convert_units($val, null, ITEM_CONVERT_NO_UNITS, $byteStep, $newPow);
+		}
+
+		$calcValues[] = convert_units($maxY, null, ITEM_CONVERT_NO_UNITS, $byteStep, $newPow);
+
+		$maxLength = calcMaxLengthAfterDot($calcValues);
+
+		for ($i = 0; $i <= $hstr_count; $i++) {
+			$hstr_count = ($hstr_count == 0) ? 1 : $hstr_count;
+
 			$val = bcadd(bcmul($i, $step), $minY);
 
 			if (bccomp(bcadd($val, bcdiv($step, 2)), $maxY) == 1) {
 				continue;
 			}
 
-			$str = convert_units($val, $units, ITEM_CONVERT_NO_UNITS, $byteStep, $newPow);
+			$str = convert_units($val, $units, ITEM_CONVERT_NO_UNITS, $byteStep, $newPow, $maxLength);
 
 			// marker Y coordinate
 			$posY = $this->sizeY + $this->shiftY - $this->gridStepX[GRAPH_YAXIS_SIDE_RIGHT] * $i + 4;
@@ -1651,7 +1682,7 @@ class CChart extends CGraphDraw {
 			);
 		}
 
-		$str = convert_units($maxY, $units, ITEM_CONVERT_NO_UNITS, $byteStep, $newPow);
+		$str = convert_units($maxY, $units, ITEM_CONVERT_NO_UNITS, $byteStep, $newPow, $maxLength);
 		imageText(
 			$this->im,
 			8,
