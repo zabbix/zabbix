@@ -10,6 +10,8 @@ Changes for 2.1.1
 New features:
 
 Bug fixes:
+..F....... [ZBX-6732] cookie path is now automatically set from current URL (Ivo)
+..F....... [ZBX-6706] improved node displaing in frontend (Eduard)
 
 --------------------------------------------------------------------------------
 Changes for 2.1.0
@@ -90,8 +92,6 @@ A.F.I...S. [ZBXNEXT-1186] increased length to 2048 characters of expression fiel
 ........S. [ZBXNEXT-1663] added support for notification macros {TRIGGER.NAME.ORIG}, {ITEM.NAME.ORIG}, {ITEM.KEY.ORIG} (dimir)
 
 Bug fixes:
-..F....... [ZBX-6732] cookie path is now automatically set from current URL (Ivo)
-..F....... [ZBX-6706] improved node displaing in frontend (Eduard)
 ..F....... [ZBX-2622] added link to last event in monitoring triggers page (Ivo)
 A.F....... [ZBX-6362] fixed proxy interface array structure (Eduard)
 ..F.I..... [ZBX-6645] suppressed PHP error messages for DB connection tests in installation wizard step 3 (Ivo)
