@@ -57,16 +57,19 @@ $applicationForm->addVar('hostid', $this->data['hostid']);
 $applicationTable = new CTableInfo(_('No applications defined.'));
 $applicationTable->setHeader(array(
 	new CCheckBox('all_applications', null, "checkAll('".$applicationForm->getName()."', 'all_applications', 'applications');"),
+	$this->data['displayNodes'] ? _('Node') : null,
 	($this->data['hostid'] > 0) ? null : _('Host'),
 	make_sorting_header(_('Application'), 'name'),
 	_('Show')
 ));
+
 foreach ($this->data['applications'] as $application) {
 	// inherited app, display the template list
-	if ($application['templateids']) {
+	if ($application['templateids'] && !empty($application['sourceTemplates'])) {
+		$name = array();
+
 		CArrayHelper::sort($application['sourceTemplates'], array('name'));
 
-		$name = array();
 		foreach ($application['sourceTemplates'] as $template) {
 			$name[] = new CLink(
 				$template['name'],
@@ -81,7 +84,6 @@ foreach ($this->data['applications'] as $application) {
 		$name[] = NAME_DELIMITER;
 		$name[] = $application['name'];
 	}
-	// normal app
 	else {
 		$name = new CLink(
 			$application['name'],
@@ -95,6 +97,7 @@ foreach ($this->data['applications'] as $application) {
 
 	$applicationTable->addRow(array(
 		new CCheckBox('applications['.$application['applicationid'].']', null, null, $application['applicationid']),
+		$this->data['displayNodes'] ? $application['nodename'] : null,
 		($this->data['hostid'] > 0) ? null : $application['host'],
 		$name,
 		array(

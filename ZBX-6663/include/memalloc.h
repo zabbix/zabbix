@@ -28,19 +28,26 @@ typedef struct
 	void		**buckets;
 	void		*lo_bound;
 	void		*hi_bound;
-	uint32_t	free_size;
-	uint32_t	used_size;
-	uint32_t	orig_size;
-	uint32_t	total_size;
+	zbx_uint64_t	free_size;
+	zbx_uint64_t	used_size;
+	zbx_uint64_t	orig_size;
+	zbx_uint64_t	total_size;
 	int		shm_id;
 	char		use_lock;
+
+	/* Continue execution in out of memory situation.                         */
+	/* Normally allocator forces exit when it runs out of allocatable memory. */
+	/* Set this flag to 1 to allow execution in out of memory situations.     */
+	char		allow_oom;
+
 	ZBX_MUTEX	mem_lock;
 	const char	*mem_descr;
 	const char	*mem_param;
 }
 zbx_mem_info_t;
 
-void	zbx_mem_create(zbx_mem_info_t **info, key_t shm_key, int lock_name, size_t size, const char *descr, const char *param);
+void	zbx_mem_create(zbx_mem_info_t **info, key_t shm_key, int lock_name, zbx_uint64_t size,
+		const char *descr, const char *param, int allow_oom);
 void	zbx_mem_destroy(zbx_mem_info_t *info);
 
 #define	zbx_mem_malloc(info, old, size) __zbx_mem_malloc(__FILE__, __LINE__, info, old, size)

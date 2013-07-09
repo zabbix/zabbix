@@ -19,26 +19,22 @@
 **/
 
 
-function get_last_event_by_triggerid($triggerid) {
+function get_last_event_by_triggerid($triggerId) {
 	$dbEvents = DBfetch(DBselect(
 		'SELECT e.*'.
 		' FROM events e'.
-		' WHERE e.objectid='.$triggerid.
+		' WHERE e.objectid='.$triggerId.
 			' AND e.source='.EVENT_SOURCE_TRIGGERS.
 			' AND e.object='.EVENT_OBJECT_TRIGGER.
 		' ORDER BY e.objectid DESC,e.object DESC,e.eventid DESC',
 		1
 	));
 
-	return !empty($dbEvents) ? $dbEvents : false;
-}
-
-function get_acknowledges_by_eventid($eventid) {
-	return DBselect('SELECT a.*,u.alias FROM acknowledges a LEFT JOIN users u ON u.userid=a.userid WHERE a.eventid='.$eventid);
+	return $dbEvents ? $dbEvents : false;
 }
 
 /**
- * Generate acknowledgement table
+ * Get acknowledgement table.
  *
  * @param array $event
  * @param array $event['acknowledges']
@@ -49,18 +45,18 @@ function get_acknowledges_by_eventid($eventid) {
  * @return CTableInfo
  */
 function makeAckTab($event) {
-	$table = new CTableInfo(_('No acknowledges defined.'));
-	$table->setHeader(array(_('Time'), _('User'), _('Comments')));
+	$acknowledgeTable = new CTableInfo(_('No acknowledges defined.'));
+	$acknowledgeTable->setHeader(array(_('Time'), _('User'), _('Comments')));
 
 	if (!empty($event['acknowledges']) && is_array($event['acknowledges'])) {
-		foreach ($event['acknowledges'] as $ack) {
-			$table->addRow(array(
-				zbx_date2str(_('d M Y H:i:s'), $ack['clock']),
-				$ack['alias'],
-				new CCol(zbx_nl2br($ack['message']), 'wraptext')
+		foreach ($event['acknowledges'] as $acknowledge) {
+			$acknowledgeTable->addRow(array(
+				zbx_date2str(_('d M Y H:i:s'), $acknowledge['clock']),
+				$acknowledge['alias'],
+				new CCol(zbx_nl2br($acknowledge['message']), 'wraptext')
 			));
 		}
 	}
 
-	return $table;
+	return $acknowledgeTable;
 }

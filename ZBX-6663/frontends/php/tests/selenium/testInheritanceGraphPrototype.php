@@ -47,14 +47,14 @@ class testInheritanceGraphPrototype extends CWebTest {
 	 *
 	 * @var string
 	 */
-	protected $discoveryRule = 'discoveryRuleTest';
+	protected $discoveryRule = 'testInheritanceDiscoveryRule';
 
 	/**
 	 * The name of the test discovery rule key created in the test data set.
 	 *
 	 * @var string
 	 */
-	protected $discoveryKey = 'discovery-rule-test';
+	protected $discoveryKey = 'inheritance-discovery-rule';
 
 	/**
 	 * The name of the test item created in the test data set.
@@ -358,14 +358,28 @@ class testInheritanceGraphPrototype extends CWebTest {
 			array(
 				array(
 					'expected' => GRAPH_BAD,
-					'graphName' => 'graphStackedSome',
+					'graphName' => 'graphStackedNoMinAxisItem',
 					'graphtype' => 'Stacked',
 					'noAxisItem' => true,
 					'ymin_type' => 'Item',
 					'ymax_type' => 'Fixed',
 					'errors' => array(
 						'ERROR: Cannot add graph',
-						'Incorrect item for axis value.'
+						'No permissions to referred object or it does not exist!'
+					)
+				)
+			),
+			array(
+				array(
+					'expected' => GRAPH_BAD,
+					'graphName' => 'graphStackedNoMaxAxisItem',
+					'graphtype' => 'Stacked',
+					'noAxisItem' => true,
+					'ymin_type' => 'Fixed',
+					'ymax_type' => 'Item',
+					'errors' => array(
+						'ERROR: Cannot add graph',
+						'No permissions to referred object or it does not exist!'
 					)
 				)
 			),

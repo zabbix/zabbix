@@ -17,8 +17,8 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
+
 $userGroupWidget = new CWidget();
 $userGroupWidget->addPageHeader(_('CONFIGURATION OF USER GROUP'));
 
@@ -97,7 +97,11 @@ foreach ($this->data['group_rights'] as $id => $rights) {
 	}
 }
 
-$permissionsTable->addRow(array(new CCol($lstWrite, 'read_write'), new CCol($lstRead, 'read_only'), new CCol($lstDeny, 'deny')));
+$permissionsTable->addRow(array(
+	new CCol($lstWrite, 'read_write'),
+	new CCol($lstRead, 'read_only'),
+	new CCol($lstDeny, 'deny')
+));
 $permissionsTable->addRow(array(
 	array(
 		new CButton('add_read_write', _('Add'), "return PopUp('popup_right.php?dstfrm=".$userGroupForm->getName().'&permission='.PERM_READ_WRITE."', 450, 450);", 'formlist'),
@@ -146,5 +150,5 @@ else {
 
 // append form to widget
 $userGroupWidget->addItem($userGroupForm);
+
 return $userGroupWidget;
-?>

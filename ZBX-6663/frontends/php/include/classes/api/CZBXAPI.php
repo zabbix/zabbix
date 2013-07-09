@@ -123,8 +123,8 @@ class CZBXAPI {
 	 * @return string
 	 */
 	protected function tableId($tableName = null, $tableAlias = null) {
-		$tableName = !empty($tableName) ? $tableName : $this->tableName();
-		$tableAlias = !empty($tableAlias) ? $tableAlias : $this->tableAlias();
+		$tableName = $tableName ? $tableName : $this->tableName();
+		$tableAlias = $tableAlias ? $tableAlias : $this->tableAlias();
 
 		return $tableName.' '.$tableAlias;
 	}
@@ -139,7 +139,7 @@ class CZBXAPI {
 	 * @return string
 	 */
 	protected function fieldId($fieldName, $tableAlias = null) {
-		$tableAlias = ($tableAlias) ? $tableAlias : $this->tableAlias();
+		$tableAlias = $tableAlias ? $tableAlias : $this->tableAlias();
 
 		return $tableAlias.'.'.$fieldName;
 	}
@@ -155,9 +155,11 @@ class CZBXAPI {
 	public function pk($tableName = null) {
 		if ($tableName) {
 			$schema = $this->getTableSchema($tableName);
+
 			if (strpos($schema['key'], ',') !== false) {
 				throw new Exception('Composite private keys are not supported in this API version.');
 			}
+
 			return $schema['key'];
 		}
 
@@ -185,7 +187,7 @@ class CZBXAPI {
 	 * @return array
 	 */
 	protected function getTableSchema($tableName = null) {
-		$tableName = ($tableName) ? $tableName : $this->tableName();
+		$tableName = $tableName ? $tableName : $this->tableName();
 
 		return DB::getSchema($tableName);
 	}
@@ -219,9 +221,9 @@ class CZBXAPI {
 	/**
 	 * Adds the given fields to the "output" option if it's not already present.
 	 *
-	 * @param string $tableName
-	 * @param string|array $fields  either a single field name, or an array of fields
-	 * @param string $output
+	 * @param string       $tableName
+	 * @param string|array $fields		either a single field name, or an array of fields
+	 * @param string       $output
 	 *
 	 * @return mixed
 	 */
@@ -230,11 +232,9 @@ class CZBXAPI {
 
 		foreach ($fields as $field) {
 			if ($output == API_OUTPUT_REFER) {
-				$output = array(
-					$this->pk($tableName),
-					$field
-				);
+				$output = array($this->pk($tableName), $field);
 			}
+
 			if (is_array($output) && !in_array($field, $output)) {
 				$output[] = $field;
 			}
@@ -258,9 +258,11 @@ class CZBXAPI {
 			case API_OUTPUT_EXTEND:
 			case API_OUTPUT_REFER:
 				return true;
+
 			// if the number of objects is requested, return false
 			case API_OUTPUT_COUNT:
 				return false;
+
 			// if an array of fields is passed, check if the field is present in the array
 			default:
 				return in_array($field, $output);
@@ -270,9 +272,9 @@ class CZBXAPI {
 	/**
 	 * Unsets fields $field from the given objects if they are not requested in $output.
 	 *
-	 * @param array $objects
-	 * @param array $fields
-	 * @param string|array $output  desired output
+	 * @param array        $objects
+	 * @param array        $fields
+	 * @param string|array $output		desired output
 	 *
 	 * @return array
 	 */
@@ -304,10 +306,10 @@ class CZBXAPI {
 	 * If the $table parameter is set, the relations will be loaded from a database table, otherwise the map will be
 	 * built from two base object properties.
 	 *
-	 * @param array $objects        a hash of base objects
-	 * @param string $baseField     the base object ID field
-	 * @param string $foreignField  the related objects ID field
-	 * @param string $table         table to load the relation from
+	 * @param array  $objects			a hash of base objects
+	 * @param string $baseField			the base object ID field
+	 * @param string $foreignField		the related objects ID field
+	 * @param string $table				table to load the relation from
 	 *
 	 * @return CRelationMap
 	 */
@@ -318,14 +320,13 @@ class CZBXAPI {
 		if ($table) {
 			$res = DBselect(API::getApi()->createSelectQuery($table, array(
 				'output' => array($baseField, $foreignField),
-				'filter' => array(
-					$baseField => array_keys($objects)
-				)
+				'filter' => array($baseField => array_keys($objects))
 			)));
 			while ($relation = DBfetch($res)) {
 				$relationMap->addRelation($relation[$baseField], $relation[$foreignField]);
 			}
 		}
+
 		// create a map from the base objects
 		else {
 			foreach ($objects as $object) {
@@ -343,7 +344,7 @@ class CZBXAPI {
 	 * TODO: add global 'countOutput' support
 	 *
 	 * @param string $tableName
-	 * @param array $options
+	 * @param array  $options
 	 *
 	 * @return array
 	 */
@@ -351,9 +352,8 @@ class CZBXAPI {
 		$limit = isset($options['limit']) ? $options['limit'] : null;
 
 		$sql = $this->createSelectQuery($tableName, $options);
-		$query = DBSelect($sql, $limit);
 
-		$objects = DBfetchArray($query);
+		$objects = DBfetchArray(DBSelect($sql, $limit));
 
 		if (isset($options['preservekeys'])) {
 			$rs = array();
@@ -371,8 +371,8 @@ class CZBXAPI {
 	/**
 	 * Creates an SQL SELECT query from the given options.
 	 *
-	 * @param $tableName
-	 * @param array $options
+	 * @param string $tableName
+	 * @param array  $options
 	 *
 	 * @return array
 	 */
@@ -387,9 +387,9 @@ class CZBXAPI {
 	 *
 	 * @param string $tableName
 	 * @param string $tableAlias
-	 * @param array $options
+	 * @param array  $options
 	 *
-	 * @return array         The resulting SQL parts array
+	 * @return array		The resulting SQL parts array
 	 */
 	protected function createSelectQueryParts($tableName, $tableAlias, array $options) {
 		// extend default options
@@ -422,24 +422,23 @@ class CZBXAPI {
 	/**
 	 * Creates a SELECT SQL query from the given SQL parts array.
 	 *
-	 * @param array $sqlParts  An SQL parts array
+	 * @param array $sqlParts	An SQL parts array
 	 *
-	 * @return string          The resulting SQL query
+	 * @return string			The resulting SQL query
 	 */
 	protected function createSelectQueryFromParts(array $sqlParts) {
 		// build query
 		$sqlSelect = implode(',', array_unique($sqlParts['select']));
 		$sqlFrom = implode(',', array_unique($sqlParts['from']));
-		$sqlWhere = (!empty($sqlParts['where'])) ? ' WHERE '.implode(' AND ', array_unique($sqlParts['where'])) : '';
-		$sqlGroup = (!empty($sqlParts['group'])) ? ' GROUP BY '.implode(',', array_unique($sqlParts['group'])) : '';
-		$sqlOrder = (!empty($sqlParts['order'])) ? ' ORDER BY '.implode(',', array_unique($sqlParts['order'])) : '';
-		$sql = 'SELECT '.zbx_db_distinct($sqlParts).' '.$sqlSelect.
+		$sqlWhere = empty($sqlParts['where']) ? '' : ' WHERE '.implode(' AND ', array_unique($sqlParts['where']));
+		$sqlGroup = empty($sqlParts['group']) ? '' : ' GROUP BY '.implode(',', array_unique($sqlParts['group']));
+		$sqlOrder = empty($sqlParts['order']) ? '' : ' ORDER BY '.implode(',', array_unique($sqlParts['order']));
+
+		return 'SELECT '.zbx_db_distinct($sqlParts).' '.$sqlSelect.
 				' FROM '.$sqlFrom.
 				$sqlWhere.
 				$sqlGroup.
 				$sqlOrder;
-
-		return $sql;
 	}
 
 	/**
@@ -450,7 +449,7 @@ class CZBXAPI {
 	 * @param array  $options
 	 * @param array  $sqlParts
 	 *
-	 * @return array         The resulting SQL parts array
+	 * @return array		The resulting SQL parts array
 	 */
 	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
 		$pkFieldId = $this->fieldId($this->pk($tableName), $tableAlias);
@@ -495,7 +494,7 @@ class CZBXAPI {
 	 * @param array $options
 	 * @param array $sqlParts
 	 *
-	 * @return array         The resulting SQL parts array
+	 * @return array		The resulting SQL parts array
 	 */
 	protected function applyQueryFilterOptions($tableName, $tableAlias, array $options, array $sqlParts) {
 		$pkOption = $this->pkOption($tableName);
@@ -523,10 +522,10 @@ class CZBXAPI {
 	/**
 	 * Modifies the SQL parts to implement all of the node related options.
 	 *
-	 * @param $tableName
-	 * @param $tableAlias
-	 * @param array $options
-	 * @param array $sqlParts
+	 * @param string $tableName
+	 * @param string $tableAlias
+	 * @param array  $options
+	 * @param array  $sqlParts
 	 *
 	 * @return array
 	 */
@@ -536,8 +535,8 @@ class CZBXAPI {
 
 		// if no specific ids are given, apply the node filter
 		if (!isset($options[$pkOption])) {
-			$nodeids = (isset($options['nodeids'])) ? $options['nodeids'] : get_current_nodeid();
-			$sqlParts['where'] = sqlPartDbNode($sqlParts['where'], $pkFieldId, $nodeids);
+			$nodeIds = isset($options['nodeids']) ? $options['nodeids'] : get_current_nodeid();
+			$sqlParts['where'] = sqlPartDbNode($sqlParts['where'], $pkFieldId, $nodeIds);
 		}
 
 		return $sqlParts;
@@ -628,6 +627,7 @@ class CZBXAPI {
 			if ($field == '*') {
 				foreach ($sqlParts['select'] as $key => $selectFieldId) {
 					list($selectTableAlias,) = explode('.', $selectFieldId);
+
 					if ($selectTableAlias == $tableAlias) {
 						unset($sqlParts['select'][$key]);
 					}
@@ -643,9 +643,9 @@ class CZBXAPI {
 	/**
 	 * Adds the given field to the ORDER BY part of the $sqlParts array.
 	 *
-	 * @param $fieldId
-	 * @param array $sqlParts
-	 * @param string $sortorder     sort direction, ZBX_SORT_UP or ZBX_SORT_DOWN
+	 * @param string $fieldId
+	 * @param array  $sqlParts
+	 * @param string $sortorder		sort direction, ZBX_SORT_UP or ZBX_SORT_DOWN
 	 *
 	 * @return array
 	 */
@@ -653,7 +653,7 @@ class CZBXAPI {
 		// some databases require the sortable column to be present in the SELECT part of the query
 		$sqlParts = $this->addQuerySelect($fieldId, $sqlParts);
 
-		$sqlParts['order'][$fieldId] = $fieldId.(($sortorder) ? ' '.$sortorder : '');
+		$sqlParts['order'][$fieldId] = $fieldId.($sortorder ? ' '.$sortorder : '');
 
 		return $sqlParts;
 	}
@@ -662,7 +662,7 @@ class CZBXAPI {
 	 * Adds the related objects requested by "select*" options to the resulting object set.
 	 *
 	 * @param array $options
-	 * @param array $result             an object hash with PKs as keys
+	 * @param array $result		an object hash with PKs as keys
 
 	 * @return array mixed
 	 */
@@ -680,17 +680,15 @@ class CZBXAPI {
 	 * @param array $pks
 	 */
 	protected function deleteByPks(array $pks) {
-		DB::delete($this->tableName(), array(
-			$this->pk() => $pks
-		));
+		DB::delete($this->tableName(), array($this->pk() => $pks));
 	}
 
 	/**
 	 * Fetches the fields given in $fields from the database and extends the objects with the loaded data.
 	 *
-	 * @param $tableName
-	 * @param array $objects
-	 * @param array $fields
+	 * @param string $tableName
+	 * @param array  $objects
+	 * @param array  $fields
 	 *
 	 * @return array
 	 */
@@ -716,25 +714,26 @@ class CZBXAPI {
 	 *
 	 * @see extendObjects()
 	 *
-	 * @param $tableName
-	 * @param array $object
-	 * @param array $fields
+	 * @param string $tableName
+	 * @param array  $object
+	 * @param array  $fields
 	 *
 	 * @return mixed
 	 */
 	protected function extendObject($tableName, array $object, array $fields) {
 		$objects = $this->extendObjects($tableName, array($object), $fields);
+
 		return reset($objects);
 	}
 
 	/**
 	 * Checks if the object has any fields, that are not defined in the schema or in $additionalFields.
 	 *
-	 * @param $tableName
-	 * @param array $object
-	 * @param $error
-	 * @param array $extraFields    an array of field names, that are not present in the schema, but may be
-	 *                              used in requests
+	 * @param string $tableName
+	 * @param array  $object
+	 * @param string $error
+	 * @param array  $extraFields	an array of field names, that are not present in the schema, but may be
+	 *								used in requests
 	 *
 	 * @throws APIException
 	 */
@@ -751,11 +750,11 @@ class CZBXAPI {
 	/**
 	 * Checks if an objects contains any of the given parameters.
 	 *
-	 * @throws APIException     if any of the parameters are present in the object
+	 * @throws APIException		if any of the parameters are present in the object
 	 *
-	 * @param array $object
-	 * @param array $params
-	 * @param $error
+	 * @param array  $object
+	 * @param array  $params
+	 * @param string $error
 	 */
 	protected function checkNoParameters(array $object, array $params, $error) {
 		foreach ($params as $param) {
@@ -770,8 +769,8 @@ class CZBXAPI {
 	 *
 	 * @static
 	 *
-	 * @param type $code
-	 * @param type $error
+	 * @param int    $code
+	 * @param string $error
 	 */
 	protected static function exception($code = ZBX_API_ERROR_INTERNAL, $error = '') {
 		throw new APIException($code, $error);
@@ -779,10 +778,9 @@ class CZBXAPI {
 
 	/**
 	 * Triggers a deprecated notice. Should be called when a deprecated parameter or method is used.
-	 *
 	 * The notice will not be displayed in the result returned by an API method.
 	 *
-	 * @param string $error     error text
+	 * @param string $error		error text
 	 */
 	protected function deprecated($error) {
 		trigger_error($error, E_USER_NOTICE);
@@ -816,7 +814,7 @@ class CZBXAPI {
 				: dbConditionString($fieldName, $value);
 		}
 
-		if (!empty($filter)) {
+		if ($filter) {
 			if (isset($sqlParts['where']['filter'])) {
 				$filter[] = $sqlParts['where']['filter'];
 			}
@@ -837,12 +835,11 @@ class CZBXAPI {
 	/**
 	 * Converts a deprecated parameter to a new one in the $params array. If both parameter are used,
 	 * the new parameter will override the deprecated one.
-	 *
 	 * If a deprecated parameter is used, a notice will be triggered in the frontend.
 	 *
-	 * @param array     $params
-	 * @param string    $deprecatedParam
-	 * @param string    $newParam
+	 * @param array  $params
+	 * @param string $deprecatedParam
+	 * @param string $newParam
 	 *
 	 * @return array
 	 */
@@ -864,14 +861,13 @@ class CZBXAPI {
 
 	/**
 	 * Check if a set of parameters contains a deprecated parameter or a a parameter with a deprecated value.
-	 *
 	 * If $value is not set, the method will trigger a deprecated notice if $params contains the $paramName key.
 	 * If $value is set, the method will trigger a notice if the value of the parameter is equal to the deprecated value
 	 * or the parameter is an array and contains a deprecated value.
 	 *
-	 * @param array     $params
-	 * @param string    $paramName
-	 * @param string    $value
+	 * @param array  $params
+	 * @param string $paramName
+	 * @param string $value
 	 *
 	 * @return void
 	 */
@@ -890,10 +886,10 @@ class CZBXAPI {
 	 * Adds a deprecated property to an array of resulting objects if it's requested in $output. The value for the
 	 * deprecated property will be taken from the new one.
 	 *
-	 * @param array         $objects
-	 * @param string        $deprecatedProperty
-	 * @param string        $newProperty
-	 * @param string|array  $output
+	 * @param array        $objects
+	 * @param string       $deprecatedProperty
+	 * @param string       $newProperty
+	 * @param string|array $output
 	 *
 	 * @return array
 	 */
@@ -913,20 +909,23 @@ class CZBXAPI {
 	 * If post SQL filtering is necessary, several queries will be executed. SQL limit is calculated so that minimum
 	 * amount of queries would be executed and minimum amount of unnecessary data retrieved.
 	 *
-	 * @param   string    $query      SQL query
-	 * @param   array     $options    API call parameters
+	 * @param string $query		SQL query
+	 * @param array  $options	API call parameters
 	 *
-	 * @return  array
+	 * @return array
 	 */
 	protected function customFetch($query, array $options) {
 		if ($this->requiresPostSqlFiltering($options)) {
 			$offset = 0;
+
 			// we think that taking twice as necessary elements in first query is fair guess, this cast to int as well
 			$limit = $options['limit'] ? 2 * $options['limit'] : null;
+
 			// we use $minLimit for setting minimum limit twice as big for each consecutive query to not run in lots
 			// of queries for some cases
 			$minLimit = $limit;
 			$allElements = array();
+
 			do {
 				// fetch group of elements
 				$elements = DBfetchArray(DBselect($query, $limit, $offset));
@@ -948,13 +947,14 @@ class CZBXAPI {
 				if ($limit) {
 					$offset += $limit;
 					$minLimit *= 2;
+
 					// take care of division by zero
 					$elemCount = count($elements) ? count($elements) : 1;
+
 					// we take $limit as $minLimit or reasonable estimate to get all necessary data in two queries
 					// with high probability
 					$limit = max($minLimit, round($limit / $elemCount * ($options['limit'] - count($allElements)) * 2));
 				}
-
 			} while ($hasMore);
 
 			return $allElements;
@@ -967,9 +967,9 @@ class CZBXAPI {
 	/**
 	 * Checks if post SQL filtering necessary.
 	 *
-	 * @param   array   $options    API call parameters
+	 * @param array $options	API call parameters
 	 *
-	 * @return  bool                true if filtering necessary false otherwise
+	 * @return bool				true if filtering necessary false otherwise
 	 */
 	protected function requiresPostSqlFiltering(array $options) {
 		// must be implemented in each API separately
@@ -980,15 +980,14 @@ class CZBXAPI {
 	/**
 	 * Removes elements which could not be removed within SQL query.
 	 *
-	 * @param   array   $elements   list of elements on whom perform filtering
-	 * @param   array   $options    API call parameters
+	 * @param array $elements	list of elements on whom perform filtering
+	 * @param array $options	API call parameters
 	 *
-	 * @return  array               input array $elements with some elements removed
+	 * @return array			input array $elements with some elements removed
 	 */
 	protected function applyPostSqlFiltering(array $elements, array $options) {
 		// must be implemented in each API separately
 
 		return $elements;
 	}
-
 }

@@ -36,19 +36,19 @@ var cookie = {
 	},
 
 	create: function(name, value, days) {
+		var expires = '';
+
 		if (typeof(days) != 'undefined') {
 			var date = new Date();
 			date.setTime(date.getTime() + days * 24 * 60 * 60 * 1000);
-			var expires = '; expires=' + date.toGMTString();
+			expires = '; expires=' + date.toGMTString();
 		}
-		else {
-			var expires = '';
-		}
-		document.cookie = name + '=' + value + expires + '; path=/';
+
+		document.cookie = name + '=' + value + expires;
 
 		// apache header size limit
 		if (document.cookie.length > 8000) {
-			document.cookie = name + '=; path=/';
+			document.cookie = name + '=;';
 			alert(locale['S_MAX_COOKIE_SIZE_REACHED']);
 			return false;
 		}
@@ -87,7 +87,7 @@ var cookie = {
 				break;
 			}
 		}
-		this.create(name + '_parts', part - 1);
+		this.create(name + '_parts', part - 1, days);
 
 		while (part <= part_count) {
 			this.erase(name + '_' + part);

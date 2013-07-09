@@ -76,14 +76,14 @@ if (isset($_REQUEST['go'])) {
 	}
 }
 if (get_request('groupid', 0) > 0) {
-	$groupids = available_groups($_REQUEST['groupid'], 1);
-	if (empty($groupids)) {
+	$groupIds = available_groups($_REQUEST['groupid'], 1);
+	if (empty($groupIds)) {
 		access_deny();
 	}
 }
 if (get_request('hostid', 0) > 0) {
-	$hostids = available_hosts($_REQUEST['hostid'], 1);
-	if (empty($hostids)) {
+	$hostIds = available_hosts($_REQUEST['hostid'], 1);
+	if (empty($hostIds)) {
 		access_deny();
 	}
 }
@@ -96,6 +96,7 @@ resetCurrentPageCookies($_REQUEST['hostid'], get_request('referid', 0));
  */
 if (isset($_REQUEST['save'])) {
 	DBstart();
+
 	$application = array(
 		'name' => $_REQUEST['appname'],
 		'hostid' => $_REQUEST['hostid']
@@ -121,8 +122,9 @@ if (isset($_REQUEST['save'])) {
 	show_messages($result, $msgOk, $msgFail);
 
 	if ($result) {
-		$applicationid = reset($dbApplications['applicationids']);
-		add_audit($action, AUDIT_RESOURCE_APPLICATION, _('Application').' ['.$_REQUEST['appname'].' ] ['.$applicationid.']');
+		$applicationId = reset($dbApplications['applicationids']);
+
+		add_audit($action, AUDIT_RESOURCE_APPLICATION, _('Application').' ['.$_REQUEST['appname'].' ] ['.$applicationId.']');
 		unset($_REQUEST['form']);
 	}
 	unset($_REQUEST['save']);
@@ -134,13 +136,16 @@ elseif (isset($_REQUEST['clone']) && isset($_REQUEST['applicationid'])) {
 elseif (isset($_REQUEST['delete'])) {
 	if (isset($_REQUEST['applicationid'])) {
 		$result = false;
+
 		if ($app = get_application_by_applicationid($_REQUEST['applicationid'])) {
 			$host = get_host_by_hostid($app['hostid']);
 
 			DBstart();
+
 			$result = API::Application()->delete($_REQUEST['applicationid']);
 			$result = DBend($result);
 		}
+
 		show_messages($result, _('Application deleted'), _('Cannot delete application'));
 
 		if ($result) {
@@ -154,22 +159,28 @@ elseif ($_REQUEST['go'] == 'delete') {
 	$applications = get_request('applications', array());
 
 	DBstart();
+
 	$dbApplications = DBselect(
 		'SELECT a.applicationid,a.name,a.hostid'.
 		' FROM applications a'.
 		' WHERE '.dbConditionInt('a.applicationid', $applications).
 			andDbNode('a.applicationid')
 	);
-	while ($db_app = DBfetch($dbApplications)) {
-		if (!isset($applications[$db_app['applicationid']])) {
+	while ($dbApplication = DBfetch($dbApplications)) {
+		if (!isset($applications[$dbApplication['applicationid']])) {
 			continue;
 		}
-		$go_result &= (bool) API::Application()->delete($db_app['applicationid']);
+
+		$go_result &= (bool) API::Application()->delete($dbApplication['applicationid']);
+
 		if ($go_result) {
-			$host = get_host_by_hostid($db_app['hostid']);
-			add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_APPLICATION, 'Application ['.$db_app['name'].'] from host ['.$host['host'].']');
+			$host = get_host_by_hostid($dbApplication['hostid']);
+
+			add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_APPLICATION,
+				'Application ['.$dbApplication['name'].'] from host ['.$host['host'].']');
 		}
 	}
+
 	$go_result = DBend($go_result);
 
 	show_messages($go_result, _('Application deleted'), _('Cannot delete application'));
@@ -179,6 +190,7 @@ elseif (str_in_array($_REQUEST['go'], array('activate', 'disable'))) {
 	$applications = get_request('applications', array());
 
 	DBstart();
+
 	foreach ($applications as $id => $appid) {
 		$db_items = DBselect(
 			'SELECT ia.itemid,i.hostid,i.key_'.
@@ -198,7 +210,9 @@ elseif (str_in_array($_REQUEST['go'], array('activate', 'disable'))) {
 			}
 		}
 	}
+
 	$go_result = DBend($go_result);
+
 	if ($_REQUEST['go'] == 'activate') {
 		show_messages($go_result, _('Items activated'), null);
 	}
@@ -247,7 +261,8 @@ else {
 			'hosts' => array('editable' => true, 'templated_hosts' => true),
 			'hostid' => get_request('hostid'),
 			'groupid' => get_request('groupid')
-		))
+		)),
+		'displayNodes' => is_array(get_current_nodeid())
 	);
 	$data['groupid'] = $data['pageFilter']->groupid;
 	$data['hostid'] = $data['pageFilter']->hostid;
@@ -257,19 +272,14 @@ else {
 		$sortfield = getPageSortField('name');
 		$sortorder = getPageSortOrder();
 
-		$options = array(
+		$data['applications'] = API::Application()->get(array(
+			'hostids' => ($data['pageFilter']->hostid > 0) ? $data['pageFilter']->hostid : null,
+			'groupids' => ($data['pageFilter']->groupid > 0) ? $data['pageFilter']->groupid : null,
 			'output' => array('applicationid'),
 			'editable' => true,
 			'sortfield' => $sortfield,
 			'limit' => $config['search_limit'] + 1
-		);
-		if ($data['pageFilter']->hostid > 0) {
-			$options['hostids'] = $data['pageFilter']->hostid;
-		}
-		elseif ($data['pageFilter']->groupid > 0) {
-			$options['groupids'] = $data['pageFilter']->groupid;
-		}
-		$data['applications'] = API::Application()->get($options);
+		));
 
 		// get applications
 		$data['applications'] = API::Application()->get(array(
@@ -278,16 +288,19 @@ else {
 			'selectItems' => API_OUTPUT_REFER,
 			'expandData' => true
 		));
+
 		order_result($data['applications'], $sortfield, $sortorder);
 
 		// fetch template application source parents
 		$applicationSourceParentIds = getApplicationSourceParentIds(zbx_objectValues($data['applications'], 'applicationid'));
 		$parentAppIds = array();
+
 		foreach ($applicationSourceParentIds as $applicationParentIds) {
 			foreach ($applicationParentIds as $parentId) {
 				$parentAppIds[$parentId] = $parentId;
 			}
 		}
+
 		if ($parentAppIds) {
 			$parentTemplates = DBfetchArrayAssoc(DBselect(
 				'SELECT a.applicationid,h.hostid,h.name'.
@@ -296,12 +309,19 @@ else {
 					' AND '.dbConditionInt('a.applicationid', $parentAppIds)
 			), 'applicationid');
 
-			foreach ($data['applications'] as &$app) {
-				if ($app['templateids']) {
-					foreach ($applicationSourceParentIds[$app['applicationid']] as $parentAppId) {
-						$app['sourceTemplates'][] = $parentTemplates[$parentAppId];
+			foreach ($data['applications'] as &$application) {
+				if ($application['templateids'] && isset($applicationSourceParentIds[$application['applicationid']])) {
+					foreach ($applicationSourceParentIds[$application['applicationid']] as $parentAppId) {
+						$application['sourceTemplates'][] = $parentTemplates[$parentAppId];
 					}
 				}
+			}
+		}
+
+		// nodes
+		if ($data['displayNodes']) {
+			foreach ($data['applications'] as $key => $application) {
+				$data['applications'][$key]['nodename'] = get_node_name_by_elid($application['applicationid'], true);
 			}
 		}
 	}
