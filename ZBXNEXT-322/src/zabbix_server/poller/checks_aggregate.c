@@ -28,13 +28,13 @@
 #define ZBX_GRP_FUNC_MAX	2
 #define ZBX_GRP_FUNC_SUM	3
 
-#define ZBX_DB_GET_HIST_MIN	0
-#define ZBX_DB_GET_HIST_AVG	1
-#define ZBX_DB_GET_HIST_MAX	2
-#define ZBX_DB_GET_HIST_SUM	3
-#define ZBX_DB_GET_HIST_COUNT	4
-#define ZBX_DB_GET_HIST_DELTA	5
-#define ZBX_DB_GET_HIST_VALUE	6
+#define ZBX_ITEM_FUNC_MIN	0
+#define ZBX_ITEM_FUNC_AVG	1
+#define ZBX_ITEM_FUNC_MAX	2
+#define ZBX_ITEM_FUNC_SUM	3
+#define ZBX_ITEM_FUNC_COUNT	4
+#define ZBX_ITEM_FUNC_DELTA	5
+#define ZBX_ITEM_FUNC_LAST	6
 
 static void	evaluate_one(DC_ITEM *item, history_value_t *result, int *num, int grp_func,
 		const history_value_t *pvalue, unsigned char value_type)
@@ -191,7 +191,7 @@ static void	aggregate_get_items(zbx_vector_uint64_t *itemids, const char *groups
  *             grp_func  - [IN] one of ZBX_GRP_FUNC_*                         *
  *             groups    - [IN] list of comma-separated host groups           *
  *             itemkey   - [IN] item key to aggregate                         *
- *             item_func - [IN] one of ZBX_DB_GET_HIST_*                      *
+ *             item_func - [IN] one of ZBX_ITEM_FUNC_*                        *
  *             param     - [IN] item_func parameter (optional)                *
  *                                                                            *
  * Return value: SUCCEED - aggregate item evaluated successfully              *
@@ -229,7 +229,7 @@ static int	evaluate_aggregate(DC_ITEM *item, AGENT_RESULT *res, int grp_func, co
 
 	sql = zbx_malloc(sql, sql_alloc);
 
-	if (ZBX_DB_GET_HIST_VALUE == item_func)
+	if (ZBX_ITEM_FUNC_LAST == item_func)
 	{
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 				"select value_type,lastvalue"
@@ -244,23 +244,24 @@ static int	evaluate_aggregate(DC_ITEM *item, AGENT_RESULT *res, int grp_func, co
 
 		while (NULL != (row = DBfetch(result)))
 		{
-			history_value_t	value;
+			history_value_t	db_value;
 
 			value_type = (unsigned char)atoi(row[0]);
 
 			switch (value_type)
 			{
 				case ITEM_VALUE_TYPE_FLOAT:
-					value.dbl = atof(row[1]);
+					db_value.dbl = atof(row[1]);
 					break;
 				case ITEM_VALUE_TYPE_UINT64:
-					ZBX_STR2UINT64(value.ui64, row[1]);
+					ZBX_STR2UINT64(db_value.ui64, row[1]);
 					break;
 				default:
 					assert(0);
 			}
 
-			evaluate_one(item, &value, &num, grp_func, &value, value_type);
+			evaluate_one(item, &value, &num, grp_func, &db_value, value_type);
+
 		}
 		DBfree_result(result);
 	}
@@ -408,17 +409,17 @@ int	get_value_aggregate(DC_ITEM *item, AGENT_RESULT *result)
 		return NOTSUPPORTED;
 
 	if (0 == strcmp(tmp, "min"))
-		item_func = ZBX_DB_GET_HIST_MIN;
+		item_func = ZBX_ITEM_FUNC_MIN;
 	else if (0 == strcmp(tmp, "avg"))
-		item_func = ZBX_DB_GET_HIST_AVG;
+		item_func = ZBX_ITEM_FUNC_AVG;
 	else if (0 == strcmp(tmp, "max"))
-		item_func = ZBX_DB_GET_HIST_MAX;
+		item_func = ZBX_ITEM_FUNC_MAX;
 	else if (0 == strcmp(tmp, "sum"))
-		item_func = ZBX_DB_GET_HIST_SUM;
+		item_func = ZBX_ITEM_FUNC_SUM;
 	else if (0 == strcmp(tmp, "count"))
-		item_func = ZBX_DB_GET_HIST_COUNT;
+		item_func = ZBX_ITEM_FUNC_COUNT;
 	else if (0 == strcmp(tmp, "last"))
-		item_func = ZBX_DB_GET_HIST_VALUE;
+		item_func = ZBX_ITEM_FUNC_LAST;
 	else
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter"));
