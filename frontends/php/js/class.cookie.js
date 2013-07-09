@@ -178,17 +178,6 @@ var cookie = {
 			}
 			this.erase('cb_' + name + '_parts');
 		}
-	},
-
-	eraseArrayByPattern: function(pattern) {
-		for (var name in this.cookies) {
-			if (!isset(name, this.cookies) || empty(this.cookies[name])) {
-				continue;
-			}
-			if (name.indexOf('cb_' + pattern) == -1) {
-				this.erase(name);
-			}
-		}
 	}
 };
 

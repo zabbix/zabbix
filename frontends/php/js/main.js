@@ -168,9 +168,10 @@ var chkbxRange = {
 		var path = new Curl();
 		this.page = path.getPath();
 		this.selected_ids = cookie.readJSON('cb_' + this.page);
-		var chk_bx = document.getElementsByTagName('input');
-		for (var i = 0; i < chk_bx.length; i++) {
-			if (typeof(chk_bx[i]) != 'undefined' && chk_bx[i].type.toLowerCase() == 'checkbox') {
+		var chk_bx = jQuery('table.tableinfo input.checkbox:not(:disabled)');
+
+		if (chk_bx.length > 0) {
+			for (var i = 0; i < chk_bx.length; i++) {
 				this.implement(chk_bx[i]);
 			}
 		}
@@ -181,13 +182,14 @@ var chkbxRange = {
 		if (!is_null(this.goButton)) {
 			addListener(this.goButton, 'click', this.submitGo.bindAsEventListener(this), false);
 		}
+
 		this.setGo();
 	},
 
 	implement: function(obj) {
 		var obj_name = obj.name.split('[')[0];
 
-		if (typeof(this.chkboxes[obj_name]) == 'undefined') {
+		if (typeof(this.chkboxes[obj_name]) === 'undefined') {
 			this.chkboxes[obj_name] = [];
 		}
 		this.chkboxes[obj_name].push(obj);
@@ -195,37 +197,25 @@ var chkbxRange = {
 		addListener(obj, 'click', this.check.bindAsEventListener(this), false);
 
 		if (obj_name == this.pageGoName) {
-			var obj_id  = obj.name.split('[')[1];
-			obj_id = obj_id.substring(0, obj_id.lastIndexOf(']'));
-
+			var obj_id = jQuery(obj).val();
 			if (isset(obj_id, this.selected_ids)) {
 				obj.checked = true;
 			}
 		}
 	},
 
-	// check if all checkboxes are checked
+	// check if all chkboxes are checked
 	allSelected: function() {
-		var chkbx_list = this.chkboxes[this.pageGoName];
-		var checkboxes_checked = 0;
-		var checkboxes_total = chkbx_list.length;
+		var chkboxesAvailable = jQuery('table.tableinfo tr:not(.header) input.checkbox:not(:disabled)').length;
+		var chkboxesChecked = jQuery('table.tableinfo tr:not(.header) input.checkbox:not(:disabled):checked').length;
+		var mainCheckbox = jQuery('table.tableinfo tr.header input.checkbox:not(:disabled)')[0];
 
-		for (var i = 0; i < checkboxes_total; i++) {
-			if (chkbx_list[i].checked) {
-				// see if checked value is in selected_ids array
-				if (in_array(chkbx_list[i].value, this.selected_ids)) {
-					checkboxes_checked++;
-				}
-			}
+		if (chkboxesAvailable > 0) {
+			mainCheckbox.checked = (chkboxesChecked == chkboxesAvailable) ? true : false;
 		}
-
-		// if all checkboxes on page are checked, mark top checkbox also as checked
-		if (checkboxes_checked == checkboxes_total) {
-			for (key in this.chkboxes) {
-				if (key.indexOf('all_') > -1) {
-					this.chkboxes[key][0].checked = true;
-				}
-			}
+		else if (mainCheckbox.length > 0) {
+			mainCheckbox.checked = false;
+			mainCheckbox.disabled = true;
 		}
 	},
 
@@ -249,18 +239,18 @@ var chkbxRange = {
 		// check range selection
 		if (e.ctrlKey || e.shiftKey) {
 			if (!is_null(this.startbox) && this.startbox_name == obj_name && obj.name != this.startbox.name) {
-				var chkbx_list = this.chkboxes[obj_name];
+				var chkboxes = this.chkboxes[obj_name];
 				var flag = false;
 
-				for (var i = 0; i < chkbx_list.length; i++) {
-					if (typeof(chkbx_list[i]) != 'undefined') {
+				for (var i = 0; i < chkboxes.length; i++) {
+					if (typeof(chkboxes[i]) != 'undefined') {
 						if (flag) {
-							chkbx_list[i].checked = this.startbox.checked;
+							chkboxes[i].checked = this.startbox.checked;
 						}
-						if (obj.name == chkbx_list[i].name) {
+						if (obj.name == chkboxes[i].name) {
 							break;
 						}
-						if (this.startbox.name == chkbx_list[i].name) {
+						if (this.startbox.name == chkboxes[i].name) {
 							flag = true;
 						}
 					}
@@ -271,18 +261,18 @@ var chkbxRange = {
 					return true;
 				}
 				else {
-					for (var i = chkbx_list.length - 1; i >= 0; i--) {
-						if (typeof(chkbx_list[i]) != 'undefined') {
+					for (var i = chkboxes.length - 1; i >= 0; i--) {
+						if (typeof(chkboxes[i]) != 'undefined') {
 							if (flag) {
-								chkbx_list[i].checked = this.startbox.checked;
+								chkboxes[i].checked = this.startbox.checked;
 							}
 
-							if (obj.name == chkbx_list[i].name) {
+							if (obj.name == chkboxes[i].name) {
 								this.setGo();
 								return true;
 							}
 
-							if (this.startbox.name == chkbx_list[i].name) {
+							if (this.startbox.name == chkboxes[i].name) {
 								flag = true;
 							}
 						}
