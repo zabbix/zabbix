@@ -19,18 +19,16 @@
 
 var cookie = {
 	cookies: [],
-	relPath: null, // relative path
 
 	init: function() {
 		var path = new Curl();
-		var page = path.getPath(); // current path with filename
-		this.relPath = page.substring(0, page.lastIndexOf('/') + 1); // current path without filename
+		var page = path.getPath();
 
 		var allCookies = document.cookie.split('; ');
 		for (var i = 0; i < allCookies.length; i++) {
 			var cookiePair = allCookies[i].split('=');
 			if (cookiePair[0].indexOf('cb_') > -1 && cookiePair[0].indexOf('cb_' + page) == -1) {
-				this.erase(cookiePair[0], this.relPath);
+				this.erase(cookiePair[0]);
 			}
 			else {
 				this.cookies[cookiePair[0]] = cookiePair[1];
@@ -38,7 +36,7 @@ var cookie = {
 		}
 	},
 
-	create: function(name, value, days, path) {
+	create: function(name, value, days) {
 		var expires = '';
 
 		if (typeof(days) != 'undefined') {
@@ -47,16 +45,11 @@ var cookie = {
 			expires = '; expires=' + date.toGMTString();
 		}
 
-		// if no path set, use current relative path
-		if (typeof(path) == 'undefined' || (typeof(path) != 'undefined' && path.length == 0)) {
-			path = this.relPath;
-		}
-
-		document.cookie = name + '=' + value + expires + '; path=' + path;
+		document.cookie = name + '=' + value + expires;
 
 		// apache header size limit
 		if (document.cookie.length > 8000) {
-			document.cookie = name + '=; path=' + path;
+			document.cookie = name + '=;';
 			alert(locale['S_MAX_COOKIE_SIZE_REACHED']);
 			return false;
 		}
@@ -66,7 +59,7 @@ var cookie = {
 		return true;
 	},
 
-	createArray: function(name, value, days, path) {
+	createArray: function(name, value, days) {
 		var list = value.join(',');
 		var list_part = '';
 		var part = 1;
@@ -88,29 +81,29 @@ var cookie = {
 					list_part = list_part.substring(0, tmp_index + 1);
 				}
 			}
-			result = this.create(name + '_' + part, list_part, days, path);
+			result = this.create(name + '_' + part, list_part, days);
 			part++;
 
 			if (!result) {
 				break;
 			}
 		}
-		this.create(name + '_parts', part - 1, days, path);
+		this.create(name + '_parts', part - 1, days);
 
 		while (part <= part_count) {
-			this.erase(name + '_' + part, path);
+			this.erase(name + '_' + part);
 			part++;
 		}
 	},
 
-	createJSON: function(name, value, days, path) {
+	createJSON: function(name, value, days) {
 		var value_array = [];
 		for (var key in value) {
 			if (!empty(value[key])) {
 				value_array.push(value[key]);
 			}
 		}
-		this.createArray(name, value_array, days, path);
+		this.createArray(name, value_array, days);
 	},
 
 	read: function(name) {
@@ -173,28 +166,28 @@ var cookie = {
 		}
 	},
 
-	erase: function(name, path) {
-		this.create(name, '', -1, path);
+	erase: function(name) {
+		this.create(name, '', -1);
 		this.cookies[name] = undefined;
 	},
 
-	eraseArray: function(name, path) {
+	eraseArray: function(name) {
 		var part_count = parseInt(this.read('cb_' + name + '_parts'), 10);
 		if (!is_null(part_count)) {
 			for (var i = 1; i <= part_count; i++) {
-				this.erase('cb_' + name + '_' + i, path);
+				this.erase('cb_' + name + '_' + i);
 			}
-			this.erase('cb_' + name + '_parts', path);
+			this.erase('cb_' + name + '_parts');
 		}
 	},
 
-	eraseArrayByPattern: function(pattern, path) {
+	eraseArrayByPattern: function(pattern) {
 		for (var name in this.cookies) {
 			if (!isset(name, this.cookies) || empty(this.cookies[name])) {
 				continue;
 			}
 			if (name.indexOf('cb_' + pattern) == -1) {
-				this.erase(name, path);
+				this.erase(name);
 			}
 		}
 	}
