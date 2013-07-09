@@ -20,6 +20,6 @@
 #ifndef ZABBIX_TIMER_H
 #define ZABBIX_TIMER_H
 
-void	main_timer_loop();
+void	main_timer_loop(void);
 
 #endif
