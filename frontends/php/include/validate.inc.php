@@ -71,11 +71,13 @@ function validate_ipv4($str, &$arr) {
 	if (!preg_match('/^([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})$/', $str, $arr)) {
 		return false;
 	}
+
 	for ($i = 1; $i <= 4; $i++) {
 		if (!is_numeric($arr[$i]) || $arr[$i] > 255 || $arr[$i] < 0 ) {
 			return false;
 		}
 	}
+
 	return true;
 }
 
@@ -103,9 +105,11 @@ function validate_ip($str, &$arr) {
 	if (validate_ipv4($str, $arr)) {
 		return true;
 	}
+
 	if (defined('ZBX_HAVE_IPV6')) {
 		return validate_ipv6($str);
 	}
+
 	return false;
 }
 

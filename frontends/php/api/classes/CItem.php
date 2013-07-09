@@ -20,6 +20,8 @@
 
 
 /**
+ * Class containing methods for operations with items.
+ *
  * @package API
  */
 class CItem extends CItemGeneral {

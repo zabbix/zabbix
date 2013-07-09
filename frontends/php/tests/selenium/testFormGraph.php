@@ -606,7 +606,7 @@ class testFormGraph extends CWebTest {
 
 	// Returns update data
 	public static function update() {
-		return DBdata("select * from graphs g left join graphs_items gi on gi.graphid=g.graphid where gi.itemid='30004' and g.name LIKE 'testFormGraph%'");
+		return DBdata("select * from graphs g left join graphs_items gi on gi.graphid=g.graphid where g.graphid LIKE '30000%' and g.name LIKE 'testFormGraph%'");
 	}
 
 	/**
