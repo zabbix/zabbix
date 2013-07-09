@@ -205,6 +205,4 @@ void	zbx_vector_ ## __id ## _clear(zbx_vector_ ## __id ## _t *vector)					\
 		vector->values_alloc = 0;									\
 	}													\
 }
-
-
-#endif /* VECTOR_IMPL_H_ */
+#endif	/* VECTOR_IMPL_H_ */

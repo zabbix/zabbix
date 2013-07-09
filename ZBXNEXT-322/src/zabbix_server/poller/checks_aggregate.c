@@ -23,16 +23,23 @@
 
 #include "checks_aggregate.h"
 
-
 #define ZBX_GRP_FUNC_MIN	0
 #define ZBX_GRP_FUNC_AVG	1
 #define ZBX_GRP_FUNC_MAX	2
 #define ZBX_GRP_FUNC_SUM	3
 
+#define ZBX_DB_GET_HIST_MIN	0
+#define ZBX_DB_GET_HIST_AVG	1
+#define ZBX_DB_GET_HIST_MAX	2
+#define ZBX_DB_GET_HIST_SUM	3
+#define ZBX_DB_GET_HIST_COUNT	4
+#define ZBX_DB_GET_HIST_DELTA	5
+#define ZBX_DB_GET_HIST_VALUE	6
+
 static void	evaluate_one(DC_ITEM *item, history_value_t *result, int *num, int grp_func,
 		const history_value_t *pvalue, unsigned char value_type)
 {
-	history_value_t		value = *pvalue;
+	history_value_t	value = *pvalue;
 
 	switch (value_type)
 	{
@@ -237,7 +244,7 @@ static int	evaluate_aggregate(DC_ITEM *item, AGENT_RESULT *res, int grp_func, co
 
 		while (NULL != (row = DBfetch(result)))
 		{
-			history_value_t		value;
+			history_value_t	value;
 
 			value_type = (unsigned char)atoi(row[0]);
 
@@ -259,7 +266,7 @@ static int	evaluate_aggregate(DC_ITEM *item, AGENT_RESULT *res, int grp_func, co
 	}
 	else
 	{
-		int		clock_from, now = time(NULL);
+		int		clock_from, now;
 		unsigned int	period;
 
 		if (FAIL == is_uint_suffix(param, &period))
@@ -268,6 +275,7 @@ static int	evaluate_aggregate(DC_ITEM *item, AGENT_RESULT *res, int grp_func, co
 			goto clean;
 		}
 
+		now = time(NULL);
 		clock_from = now - period;
 
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
