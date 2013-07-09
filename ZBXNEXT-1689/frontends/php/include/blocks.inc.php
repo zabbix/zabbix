@@ -1050,22 +1050,24 @@ function make_webmon_overview($filter) {
 
 	$data = array();
 
-	$result = DBselect(
-		'SELECT DISTINCT ht.httptestid,i.lastclock,i.lastvalue,hg.groupid'.
-		' FROM items i,httptestitem hti,httptest ht,hosts_groups hg'.
-		' WHERE i.itemid=hti.itemid'.
-			' AND hti.httptestid=ht.httptestid'.
-			' AND hti.type='.HTTPSTEP_ITEM_TYPE_LASTSTEP.
-			' AND ht.status='.HTTPTEST_STATUS_ACTIVE.
-			' AND ht.hostid=hg.hostid'.
+	// fetch links between HTTP tests and host groups
+	$result = DbFetchArray(DBselect(
+		'SELECT DISTINCT ht.httptestid,hg.groupid'.
+		' FROM httptest ht,hosts_groups hg'.
+		' WHERE ht.hostid=hg.hostid'.
 			' AND '.dbConditionInt('hg.hostid', $availableHostIds).
 			' AND '.dbConditionInt('hg.groupid', $groupIds)
-	);
-	while ($row = DBfetch($result)) {
-		if (!$row['lastclock']) {
+	));
+
+	// fetch HTTP test execution data
+	$httpTestManager = new CHttpTestManager();
+	$httpTestData = $httpTestManager->fetchLastData(zbx_objectValues($result, 'httptestid'));
+
+	foreach ($result as $row) {
+		if (!isset($httpTestData[$row['httptestid']])) {
 			$data[$row['groupid']]['unknown'] = empty($data[$row['groupid']]['unknown']) ? 1 : ++$data[$row['groupid']]['unknown'];
 		}
-		elseif ($row['lastvalue'] != 0) {
+		elseif ($httpTestData[$row['httptestid']]['lastfailedstep'] != 0) {
 			$data[$row['groupid']]['failed'] = empty($data[$row['groupid']]['failed']) ? 1 : ++$data[$row['groupid']]['failed'];
 		}
 		else {
