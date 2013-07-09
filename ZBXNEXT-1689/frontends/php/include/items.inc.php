@@ -722,8 +722,8 @@ function get_items_data_overview($hostids, $application, $view_style) {
 		$sqlWhere = ' AND i.itemid=ia.itemid AND a.applicationid=ia.applicationid AND a.name='.zbx_dbstr($application);
 	}
 
-	$db_items = DBselect(
-		'SELECT DISTINCT h.hostid,h.name AS hostname,i.itemid,i.key_,i.value_type,i.lastvalue,i.units,i.lastclock,'.
+	$db_items = DBfetchArray(DBselect(
+		'SELECT DISTINCT h.hostid,h.name AS hostname,i.itemid,i.key_,i.value_type,i.units,'.
 			'i.name,t.priority,i.valuemapid,t.value AS tr_value,t.triggerid'.
 		' FROM hosts h,'.$sqlFrom.'items i'.
 			' LEFT JOIN functions f ON f.itemid=i.itemid'.
@@ -735,7 +735,11 @@ function get_items_data_overview($hostids, $application, $view_style) {
 			' AND '.dbConditionInt('i.flags', array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)).
 				$sqlWhere.
 		' ORDER BY i.name,i.itemid'
-	);
+	));
+
+	// fetch latest values
+	$historyManager = new CHistoryManager();
+	$history = $historyManager->fetchLast(zbx_toHash($db_items, 'itemid'));
 
 	$options = array(
 		'output' => array('name', 'hostid'),
@@ -754,7 +758,7 @@ function get_items_data_overview($hostids, $application, $view_style) {
 	$hosts = API::Host()->get($options);
 
 	$items = array();
-	while ($row = DBfetch($db_items)) {
+	foreach ($db_items as $row) {
 		$descr = itemName($row);
 		$row['hostname'] = get_node_name_by_elid($row['hostid'], null, NAME_DELIMITER).$row['hostname'];
 		$hostnames[$row['hostid']] = $row['hostname'];
@@ -765,11 +769,11 @@ function get_items_data_overview($hostids, $application, $view_style) {
 				|| (($items[$descr][$row['hostname']]['tr_value'] == TRIGGER_VALUE_FALSE && $row['tr_value'] == TRIGGER_VALUE_TRUE)
 					|| (($items[$descr][$row['hostname']]['tr_value'] == TRIGGER_VALUE_FALSE || $row['tr_value'] == TRIGGER_VALUE_TRUE)
 						&& $row['priority'] > $items[$descr][$row['hostname']]['severity']))) {
+
 			$items[$descr][$row['hostname']] = array(
 				'itemid' => $row['itemid'],
 				'value_type' => $row['value_type'],
-				'lastvalue' => $row['lastvalue'],
-				'lastclock' => $row['lastclock'],
+				'value' => isset($history[$row['itemid']]) ? $history[$row['itemid']][0]['value'] : null,
 				'units' => $row['units'],
 				'name' => $row['name'],
 				'valuemapid' => $row['valuemapid'],
@@ -838,18 +842,21 @@ function get_item_data_overview_cells(&$table_row, &$ithosts, $hostname) {
 	$value = '-';
 	$ack = null;
 	if (isset($ithosts[$hostname])) {
-		if ($ithosts[$hostname]['tr_value'] == TRIGGER_VALUE_TRUE) {
-			$css_class = getSeverityStyle($ithosts[$hostname]['severity']);
-			$ack = get_last_event_by_triggerid($ithosts[$hostname]['triggerid']);
+		$item = $ithosts[$hostname];
+
+		if ($item['tr_value'] == TRIGGER_VALUE_TRUE) {
+			$css_class = getSeverityStyle($item['severity']);
+			$ack = get_last_event_by_triggerid($item['triggerid']);
 			$ack = ($ack['acknowledged'] == 1)
 				? array(SPACE, new CImg('images/general/tick.png', 'ack'))
 				: null;
 		}
-		$value = formatItemLastValue($ithosts[$hostname]);
+
+		$value = formatHistoryValue($item['value'], $item);
 
 		$it_ov_menu = array(
 			array(_('Values'), null, null, array('outer' => array('pum_oheader'), 'inner' => array('pum_iheader'))),
-			array(_('500 latest values'), 'history.php?action=showlatest&itemid='.$ithosts[$hostname]['itemid'], array('tw' => '_blank'))
+			array(_('500 latest values'), 'history.php?action=showlatest&itemid='.$item['itemid'], array('tw' => '_blank'))
 		);
 
 		switch ($ithosts[$hostname]['value_type']) {
@@ -860,9 +867,9 @@ function get_item_data_overview_cells(&$table_row, &$ithosts, $hostname) {
 					array(_('Graphs'), null, null,
 						array('outer' => array('pum_oheader'), 'inner' => array('pum_iheader'))
 					),
-					array(_('Last hour graph'), 'history.php?period=3600&action=showgraph&itemid='.$ithosts[$hostname]['itemid'], array('tw' => '_blank')),
-					array(_('Last week graph'), 'history.php?period=604800&action=showgraph&itemid='.$ithosts[$hostname]['itemid'], array('tw' => '_blank')),
-					array(_('Last month graph'), 'history.php?period=2678400&action=showgraph&itemid='.$ithosts[$hostname]['itemid'], array('tw' => '_blank'))
+					array(_('Last hour graph'), 'history.php?period=3600&action=showgraph&itemid='.$item['itemid'], array('tw' => '_blank')),
+					array(_('Last week graph'), 'history.php?period=604800&action=showgraph&itemid='.$item['itemid'], array('tw' => '_blank')),
+					array(_('Last month graph'), 'history.php?period=2678400&action=showgraph&itemid='.$item['itemid'], array('tw' => '_blank'))
 				), $it_ov_menu);
 				break;
 			default:
