@@ -1506,7 +1506,7 @@ static int	DBitem_lastvalue(const char *expression, char **lastvalue, int N_func
 		zbx_uint64_t		valuemapid;
 		unsigned char		value_type;
 		char			tmp[MAX_STRING_LEN];
-		zbx_vector_vc_value_t	values = {0};
+		zbx_vector_vc_value_t	values;
 
 		zbx_vc_value_vector_create(&values);
 
