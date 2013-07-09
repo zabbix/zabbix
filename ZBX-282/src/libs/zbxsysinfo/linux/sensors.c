@@ -52,9 +52,11 @@ static void	count_sensor(int do_task, const char *filename, double *aggr, int *c
 	zbx_fclose(f);
 
 #if defined(KERNEL_2_4)
-	if (1 == sscanf(line, "%*f\t%*f\t%lf\n", &value)){
+	if (1 == sscanf(line, "%*f\t%*f\t%lf\n", &value))
+	{
 #else
-	if (1 == sscanf(line, "%lf", &value)){
+	if (1 == sscanf(line, "%lf", &value))
+	{
 		if(NULL == strstr(filename, "fan"))
 			value = value / 1000;
 #endif
@@ -77,27 +79,28 @@ static void	count_sensor(int do_task, const char *filename, double *aggr, int *c
 				break;
 		}
 	}
-	printf("Value from file %s: %f, aggr: %f, cnt: %d\n", filename, value, *aggr, *cnt);
 }
 
 /*Read a name attribute of a sensor from sysfs*/
 static char	*sysfs_read_attr(const char *device)
 {
-	char	path[MAX_STRING_LEN];
-	char	buf[ATTR_MAX], *p;
+	char	path[MAX_STRING_LEN], buf[ATTR_MAX], *p;
 	FILE	*f;
 
 	zbx_snprintf(path, MAX_STRING_LEN, "%s/%s", device, "name");
 
 	if (!(f = fopen(path, "r")))
 		return NULL;
+
 	p = fgets(buf, ATTR_MAX, f);
 	zbx_fclose(f);
+
 	if (!p)
 		return NULL;
 
 	/* Last byte is a '\n'; chop that off */
 	p = strndup(buf, strlen(buf) - 1);
+
 	if (!p)
 		return NULL;
 
@@ -113,7 +116,7 @@ int	get_device_info(const char *dev_path, const char *dev_name, char *device_inf
 
 	/* ignore any device without name attribute */
 	if (!(prefix = sysfs_read_attr(dev_path)))
-		return -1;
+		return FAIL;
 
 	if (NULL == dev_name)
 	{
@@ -121,32 +124,39 @@ int	get_device_info(const char *dev_path, const char *dev_name, char *device_inf
 		/* Assuming that virtual devices are unique */
 		addr=0;
 		zbx_snprintf(device_info, MAX_STRING_LEN, "%s-virtual-%x", prefix, addr);
-		return 0;
+		free(prefix);
+		return SUCCEED;
 	}
 
 	/* Find bus type */
 	zbx_snprintf(linkpath, MAX_STRING_LEN, "%s/subsystem", dev_path);
 
 	sub_len = readlink(linkpath, subsys_path, MAX_STRING_LEN - 1);
+
 	if (0 > sub_len && ENOENT == errno)
 	{
 		/* Fallback to "bus" link for kernels <= 2.6.17 */
 		zbx_snprintf(linkpath, MAX_STRING_LEN, "%s/bus", dev_path);
 		sub_len = readlink(linkpath, subsys_path, MAX_STRING_LEN - 1);
 	}
+
 	if (0 > sub_len)
 	{
 		/* Older kernels (<= 2.6.11) have neither the subsystem symlink nor the bus symlink */
 		if (errno == ENOENT)
 			subsys = NULL;
 		else
-			return -1;
+		{
+			free(prefix);
+			return FAIL;
+		}
 	}
 	else
 	{
 		subsys_path[sub_len] = '\0';
 		subsys = strrchr(subsys_path, '/') + 1;
 	}
+
 	if ((!subsys || !strcmp(subsys, "i2c")) && 2 == sscanf(dev_name, "%hd-%x", &bus_i2c, &addr))
 	{
 		/* find out if legacy ISA or not */
@@ -170,13 +180,13 @@ int	get_device_info(const char *dev_path, const char *dev_name, char *device_inf
 			else zbx_snprintf(device_info, MAX_STRING_LEN, "%s-i2c-%hd-%02x", prefix, bus_i2c, addr);
 		}
 	}
-	else if ((!subsys || !strcmp(subsys, "spi")) && sscanf(dev_name, "spi%hd.%d", &bus_spi, &addr) == 2)
+	else if ((!subsys || !strcmp(subsys, "spi")) && 2 == sscanf(dev_name, "spi%hd.%d", &bus_spi, &addr))
 	{
 		/* SPI */
 		zbx_snprintf(device_info, MAX_STRING_LEN, "%s-spi-%hd-%x", prefix, bus_spi, addr);
 	}
 	else if ((!subsys || !strcmp(subsys, "pci")) &&
-			(sscanf(dev_name, "%x:%x:%x.%x", &domain, &bus, &slot, &fn) == 4))
+			(4 == sscanf(dev_name, "%x:%x:%x.%x", &domain, &bus, &slot, &fn)))
 	{
 		/* PCI */
 		addr = (domain << 16) + (bus << 8) + (slot << 3) + fn;
@@ -185,7 +195,7 @@ int	get_device_info(const char *dev_path, const char *dev_name, char *device_inf
 	else if ((!subsys || !strcmp(subsys, "platform") || !strcmp(subsys, "of_platform")))
 	{
 		/* must be new ISA (platform driver) */
-		if (sscanf(dev_name, "%*[a-z0-9_].%d", &addr) != 1)
+		if (1 != sscanf(dev_name, "%*[a-z0-9_].%d", &addr))
 			addr = 0;
 		zbx_snprintf(device_info, MAX_STRING_LEN, "%s-isa-%04x", prefix, addr);
 	}
@@ -196,7 +206,7 @@ int	get_device_info(const char *dev_path, const char *dev_name, char *device_inf
 		zbx_snprintf(device_info, MAX_STRING_LEN, "%s-acpi-%x", prefix, addr);
 	}
 	else if (subsys && !strcmp(subsys, "hid") &&
-			(sscanf(dev_name, "%x:%x:%x.%x", &bus, &vendor, &product, &addr) == 4))
+			(4 == sscanf(dev_name, "%x:%x:%x.%x", &bus, &vendor, &product, &addr)))
 	{
 		/* As of kernel 2.6.32, the hid device names do not look good */
 		zbx_snprintf(device_info, MAX_STRING_LEN, "%s-hid-%hd-%x", prefix, bus, addr);
@@ -205,11 +215,11 @@ int	get_device_info(const char *dev_path, const char *dev_name, char *device_inf
 	{
 		/* Ignore unknown device */
 		free(prefix);
-		return -1;
+		return FAIL;
 	}
-	free(prefix);
 
-	return 0;
+	free(prefix);
+	return SUCCEED;
 }
 
 static void	get_device_sensors(int do_task, const char *device, const char *name, double *aggr, int *cnt)
@@ -260,20 +270,20 @@ static void	get_device_sensors(int do_task, const char *device, const char *name
 		closedir(devicedir);
 	}
 #else
-	DIR		*sensordir = NULL, *devicedir;
+	DIR		*sensordir = NULL, *devicedir = NULL;
 	struct dirent	*sensorent, *deviceent;
-	char		hwmon_dir[MAX_STRING_LEN], devicepath[MAX_STRING_LEN], deviced[MAX_STRING_LEN];
-	char		device_info[MAX_STRING_LEN], regex[MAX_STRING_LEN], *device_p;
+	char		hwmon_dir[MAX_STRING_LEN], devicepath[MAX_STRING_LEN], deviced[MAX_STRING_LEN],
+			device_info[MAX_STRING_LEN], regex[MAX_STRING_LEN], *device_p;
 	int		err, dev_len;
 
 	zbx_snprintf(hwmon_dir, sizeof(hwmon_dir), "%s", DEVICE_DIR);
 
 	devicedir = opendir(hwmon_dir);
 
-	if (devicedir == NULL)
+	if (NULL == devicedir)
 		return;
 
-	while(NULL != (deviceent = readdir(devicedir)))
+	while (NULL != (deviceent = readdir(devicedir)))
 	{
 		if (0 == strcmp(deviceent->d_name, ".") || 0 == strcmp(deviceent->d_name, ".."))
 			continue;
@@ -281,7 +291,7 @@ static void	get_device_sensors(int do_task, const char *device, const char *name
 		zbx_snprintf(devicepath, sizeof(devicepath), "%s/%s/device", DEVICE_DIR, deviceent->d_name);
 		dev_len = readlink(devicepath, deviced, MAX_STRING_LEN - 1);
 
-		if (dev_len < 0)
+		if (0 > dev_len)
 		{
 			/* No device link? Treat device as virtual */
 			zbx_snprintf(devicepath, sizeof(devicepath), "%s/%s", DEVICE_DIR, deviceent->d_name);
@@ -292,10 +302,18 @@ static void	get_device_sensors(int do_task, const char *device, const char *name
 			deviced[dev_len] = '\0';
 			device_p = strrchr(deviced, '/') + 1;
 
-			err = get_device_info(devicepath, device_p, device_info);
+			if (0 == strcmp(device, device_p))
+			{
+				zbx_snprintf(device_info, sizeof(device_info), "%s", device);
+				err = SUCCEED;
+			}
+			else
+			{
+				err = get_device_info(devicepath, device_p, device_info);
+			}
 		}
 
-		if (0 == err && NULL != zbx_regexp_match(device_info, device, NULL))
+		if (SUCCEED == err && 0 == strcmp(device_info, device))
 		{
 			if (DO_ONE == do_task)
 			{
@@ -362,6 +380,9 @@ int	GET_SENSOR(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (DO_ONE != do_task && 0 != isdigit(name[strlen(name)-1]))
 		do_task = DO_ONE;
+
+	if (DO_ONE != do_task && 0 == isalpha(name[strlen(name)-1]))
+		return SYSINFO_RET_FAIL;
 
 	get_device_sensors(do_task, device, name, &aggr, &cnt);
 
