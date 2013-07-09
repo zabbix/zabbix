@@ -597,7 +597,7 @@ class testFormWeb extends CWebTest {
 	public function testFormWeb_SimpleUpdate($data) {
 		$name = $data['name'];
 
-		$sqlItems = "select * from items";
+		$sqlItems = "select * from items ORDER BY itemid";
 		$oldHashItems = DBhash($sqlItems);
 
 		$this->zbxTestLogin('hosts.php');
