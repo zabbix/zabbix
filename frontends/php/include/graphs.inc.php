@@ -886,26 +886,21 @@ function convertToBase1024 ($value, $step = false) {
 		}
 	}
 
-	if (round($valData['value'], ZBX_UNITS_ROUNDOFF_LOWER_LIMIT) > 0) {
-		if ($valData['pow'] >= 0) {
-			$valData['value'] = bcdiv(sprintf('%.6f',$value), sprintf('%.6f', $valData['value']),
-				ZBX_UNITS_ROUNDOFF_LOWER_LIMIT);
+	if ($valData['pow'] >= 0) {
+		$valData['value'] = bcdiv(sprintf('%.10f',$value), sprintf('%.10f', $valData['value']),
+			ZBX_PRECISION_10);
 
-			$valData['value'] = sprintf('%.6f', round(bcmul($valData['value'], bcpow(1024, $valData['pow'])),
-				ZBX_UNITS_ROUNDOFF_UPPER_LIMIT));
-		}
-		else {
-			$valData['value'] = bcmul(sprintf('%.10f',$value), sprintf('%.10f', $valData['value']), ZBX_PRECISION_10);
-
-			for ($i = 0; $i > $valData['pow']; $i--) {
-				$valData['value'] = bcdiv(bcmul($valData['value'], 1000, ZBX_PRECISION_10), 1.024, ZBX_PRECISION_10);
-			}
-
-			$valData['value'] = sprintf('%.10f', $valData['value']);
-		}
+		$valData['value'] = sprintf('%.10f', round(bcmul($valData['value'], bcpow(1024, $valData['pow'])),
+			ZBX_PRECISION_10));
 	}
 	else {
-		$valData['value'] = 0;
+		$valData['pow'] = 0;
+		if (round($valData['value'], ZBX_UNITS_ROUNDOFF_LOWER_LIMIT) > 0) {
+			$valData['value'] = $value;
+		}
+		else {
+			$valData['value'] = 0;
+		}
 	}
 
 	return $valData;
