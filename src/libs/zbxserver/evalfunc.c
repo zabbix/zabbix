@@ -1286,7 +1286,7 @@ static int	evaluate_CHANGE(char *value, DB_ITEM *item, const char *function, con
 	{
 		case ITEM_VALUE_TYPE_FLOAT:
 			zbx_snprintf(value, MAX_BUFFER_LEN, ZBX_FS_DBL,
-					fabs(values.values[0].value.dbl - values.values[1].value.dbl));
+					values.values[0].value.dbl - values.values[1].value.dbl);
 			break;
 		case ITEM_VALUE_TYPE_UINT64:
 			/* to avoid overflow */

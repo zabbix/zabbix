@@ -23,6 +23,200 @@
 
 #include "checks_aggregate.h"
 
+/******************************************************************************
+ *                                                                            *
+ * Function: evaluate_item_func_min                                           *
+ *                                                                            *
+ * Purpose: calculate minimum value from the history value vector             *
+ *                                                                            *
+ * Parameters: values      - [IN] a vector containing history values          *
+ *             value_type  - [IN] the type of values. Only float/uint64       *
+ *                           values are supported.                            *
+ *             result      - [OUT] the resulting value                        *
+ *                                                                            *
+ ******************************************************************************/
+static void	evaluate_item_func_min(zbx_vector_vc_value_t *values, int value_type, history_value_t *result)
+{
+	int	i;
+
+	*result = values->values[0].value;
+
+	if (ITEM_VALUE_TYPE_UINT64 == value_type)
+	{
+		for (i = 1; i < values->values_num; i++)
+			if (values->values[i].value.ui64 < result->ui64)
+				result->ui64 = values->values[i].value.ui64;
+	}
+	else
+	{
+		for (i = 1; i < values->values_num; i++)
+			if (values->values[i].value.dbl < result->dbl)
+				result->dbl = values->values[i].value.dbl;
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: evaluate_item_func_max                                           *
+ *                                                                            *
+ * Purpose: calculate maximum value from the history value vector             *
+ *                                                                            *
+ * Parameters: values      - [IN] a vector containing history values          *
+ *             value_type  - [IN] the type of values. Only float/uint64       *
+ *                           values are supported.                            *
+ *             result      - [OUT] the resulting value                        *
+ *                                                                            *
+ ******************************************************************************/
+static void	evaluate_item_func_max(zbx_vector_vc_value_t *values, int value_type, history_value_t *result)
+{
+	int	i;
+
+	*result = values->values[0].value;
+
+	if (ITEM_VALUE_TYPE_UINT64 == value_type)
+	{
+		for (i = 1; i < values->values_num; i++)
+			if (values->values[i].value.ui64 > result->ui64)
+				result->ui64 = values->values[i].value.ui64;
+	}
+	else
+	{
+		for (i = 1; i < values->values_num; i++)
+			if (values->values[i].value.dbl > result->dbl)
+				result->dbl = values->values[i].value.dbl;
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: evaluate_item_func_sum                                           *
+ *                                                                            *
+ * Purpose: calculate sum of values from the history value vector             *
+ *                                                                            *
+ * Parameters: values      - [IN] a vector containing history values          *
+ *             value_type  - [IN] the type of values. Only float/uint64       *
+ *                           values are supported.                            *
+ *             result      - [OUT] the resulting value                        *
+ *                                                                            *
+ ******************************************************************************/
+static void	evaluate_item_func_sum(zbx_vector_vc_value_t *values, int value_type, history_value_t *result)
+{
+	int	i;
+
+	if (ITEM_VALUE_TYPE_UINT64 == value_type)
+	{
+		result->ui64 = 0;
+		for (i = 0; i < values->values_num; i++)
+			result->ui64 += values->values[i].value.ui64;
+	}
+	else
+	{
+		result->dbl = 0;
+		for (i = 0; i < values->values_num; i++)
+			result->dbl += values->values[i].value.dbl;
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: evaluate_item_func_sum                                           *
+ *                                                                            *
+ * Purpose: calculate average value of values from the history value vector   *
+ *                                                                            *
+ * Parameters: values      - [IN] a vector containing history values          *
+ *             value_type  - [IN] the type of values. Only float/uint64       *
+ *                           values are supported.                            *
+ *             result      - [OUT] the resulting value                        *
+ *                                                                            *
+ ******************************************************************************/
+static void	evaluate_item_func_avg(zbx_vector_vc_value_t *values, int value_type, history_value_t *result)
+{
+	evaluate_item_func_sum(values, value_type, result);
+
+	if (ITEM_VALUE_TYPE_UINT64 == value_type)
+		result->ui64 /= values->values_num;
+	else
+		result->dbl /= values->values_num;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: evaluate_item_func_count                                         *
+ *                                                                            *
+ * Purpose: calculate number of values in value vector                        *
+ *                                                                            *
+ * Parameters: values      - [IN] a vector containing history values          *
+ *             value_type  - [IN] the type of values. Only float/uint64       *
+ *                           values are supported.                            *
+ *             result      - [OUT] the resulting value                        *
+ *                                                                            *
+ ******************************************************************************/
+static void	evaluate_item_func_count(zbx_vector_vc_value_t *values, int value_type, history_value_t *result)
+{
+	if (ITEM_VALUE_TYPE_UINT64 == value_type)
+		result->ui64 = values->values_num;
+	else
+		result->dbl = values->values_num;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: evaluate_item_func_value                                         *
+ *                                                                            *
+ * Purpose: calculate the last (newest) value in value vector                 *
+ *                                                                            *
+ * Parameters: values      - [IN] a vector containing history values          *
+ *             value_type  - [IN] the type of values. Only float/uint64       *
+ *                           values are supported.                            *
+ *             result      - [OUT] the resulting value                        *
+ *                                                                            *
+ ******************************************************************************/
+static void	evaluate_item_func_value(zbx_vector_vc_value_t *values, int value_type, history_value_t *result)
+{
+	*result = values->values[0].value;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: evaluate_item_func                                               *
+ *                                                                            *
+ * Purpose: calculate function with values from value vector                  *
+ *                                                                            *
+ * Parameters: values      - [IN] a vector containing history values          *
+ *             value_type  - [IN] the type of values. Only float/uint64       *
+ *                           values are supported.                            *
+ *             func        - [IN] the function to calculate. Only             *
+ *                           ZBX_DB_GET_HIST_MIN, ZBX_DB_GET_HIST_VALUE       *
+ *                           ZBX_DB_GET_HIST_AVG, ZBX_DB_GET_HIST_MAX,        *
+ *                           ZBX_DB_GET_HIST_SUM, ZBX_DB_GET_HIST_COUNT       *
+ *                           ZBX_DB_GET_HIST_VALUE functions are supported.   *
+ *             result      - [OUT] the resulting value                        *
+ *                                                                            *
+ ******************************************************************************/
+static void	evaluate_item_func(zbx_vector_vc_value_t *values, int value_type, int func, history_value_t *result)
+{
+	switch (func)
+	{
+		case ZBX_DB_GET_HIST_MIN:
+			evaluate_item_func_min(values, value_type, result);
+			break;
+		case ZBX_DB_GET_HIST_AVG:
+			evaluate_item_func_avg(values, value_type, result);
+			break;
+		case ZBX_DB_GET_HIST_MAX:
+			evaluate_item_func_max(values, value_type, result);
+			break;
+		case ZBX_DB_GET_HIST_SUM:
+			evaluate_item_func_sum(values, value_type, result);
+			break;
+		case ZBX_DB_GET_HIST_COUNT:
+			evaluate_item_func_count(values, value_type, result);
+			break;
+		case ZBX_DB_GET_HIST_VALUE:
+			evaluate_item_func_value(values, value_type, result);
+			break;
+	}
+}
 
 #define ZBX_GRP_FUNC_MIN	0
 #define ZBX_GRP_FUNC_AVG	1
@@ -203,7 +397,7 @@ static int	evaluate_aggregate(DC_ITEM *item, AGENT_RESULT *res, int grp_func, co
 	DB_RESULT		result;
 	DB_ROW			row;
 	unsigned char		value_type;
-	history_value_t		value;
+	history_value_t		value, item_func_result;
 	int			num = 0, ret = FAIL, now, *errorcodes = NULL, i, count, seconds;
 	DC_ITEM			*items = NULL;
 	zbx_vector_vc_value_t	values;
@@ -256,12 +450,10 @@ static int	evaluate_aggregate(DC_ITEM *item, AGENT_RESULT *res, int grp_func, co
 		zbx_vc_value_vector_create(&values);
 
 		if (SUCCEED == zbx_vc_get_value_range(items[i].itemid, items[i].value_type, &values, seconds,
-				count, now))
+				count, now) && 0 < values.values_num)
 		{
-			int	ival;
-
-			for (ival = 0; ival < values.values_num; ival++)
-				evaluate_one(item, &value, &num, grp_func, &values.values[ival].value, value_type);
+			evaluate_item_func(&values, items[i].value_type, item_func, &item_func_result);
+			evaluate_one(item, &value, &num, grp_func, &item_func_result, items[i].value_type);
 		}
 
 		zbx_vc_value_vector_destroy(&values, items[i].value_type);
