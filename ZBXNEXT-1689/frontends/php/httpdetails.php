@@ -150,6 +150,7 @@ while ($httpstep_data = DBfetch($db_httpsteps)) {
 
 	$status['msg'] = _('OK');
 	$status['style'] = 'enabled';
+	$status['afterError'] = false;
 
 	if (!isset($httpTestData['lastcheck'])) {
 		$status['msg'] = _('Never executed');
@@ -163,17 +164,15 @@ while ($httpstep_data = DBfetch($db_httpsteps)) {
 		elseif ($httpTestData['lastfailedstep'] < $httpstep_data['no']) {
 			$status['msg'] = _('Unknown');
 			$status['style'] = 'unknown';
-			$status['skip'] = true;
+			$status['afterError'] = true;
 		}
 	}
 
 	$itemIds = array();
 	foreach ($httpStepItemsByType as &$httpStepItem) {
-		if (isset($status['skip'])) {
-			$httpStepItem['lastvalue'] = null;
-		}
-
-		if ($httpStepItem['httpitem_type'] == HTTPSTEP_ITEM_TYPE_TIME) {
+		// calculate the total time it took to execute the scenario
+		// skip steps that come after a failed step
+		if (!$status['afterError'] && $httpStepItem['httpitem_type'] == HTTPSTEP_ITEM_TYPE_TIME) {
 			$totalTime['value_type'] = $httpStepItem['value_type'];
 			$totalTime['valuemapid'] = $httpStepItem['valuemapid'];
 			$totalTime['units'] = $httpStepItem['units'];
@@ -191,7 +190,7 @@ while ($httpstep_data = DBfetch($db_httpsteps)) {
 
 	// step speed
 	$speedItem = $httpStepItemsByType[HTTPSTEP_ITEM_TYPE_IN];
-	if (isset($itemHistory[$speedItem['itemid']]) && $itemHistory[$speedItem['itemid']][0]['value'] > 0) {
+	if (!$status['afterError'] && isset($itemHistory[$speedItem['itemid']]) && $itemHistory[$speedItem['itemid']][0]['value'] > 0) {
 		$speed = formatHistoryValue($itemHistory[$speedItem['itemid']][0]['value'], $speedItem);
 	}
 	else {
@@ -200,7 +199,7 @@ while ($httpstep_data = DBfetch($db_httpsteps)) {
 
 	// step response time
 	$respTimeItem = $httpStepItemsByType[HTTPSTEP_ITEM_TYPE_TIME];
-	if (isset($itemHistory[$respTimeItem['itemid']]) && $itemHistory[$respTimeItem['itemid']][0]['value'] > 0) {
+	if (!$status['afterError'] && isset($itemHistory[$respTimeItem['itemid']]) && $itemHistory[$respTimeItem['itemid']][0]['value'] > 0) {
 		$respTime = formatHistoryValue($itemHistory[$respTimeItem['itemid']][0]['value'], $respTimeItem);
 	}
 	else {
@@ -209,7 +208,7 @@ while ($httpstep_data = DBfetch($db_httpsteps)) {
 
 	// step response code
 	$respItem = $httpStepItemsByType[HTTPSTEP_ITEM_TYPE_RSPCODE];
-	if (isset($itemHistory[$respItem['itemid']]) && $itemHistory[$respItem['itemid']][0]['value'] > 0) {
+	if (!$status['afterError'] && isset($itemHistory[$respItem['itemid']]) && $itemHistory[$respItem['itemid']][0]['value'] > 0) {
 		$resp = formatHistoryValue($itemHistory[$respItem['itemid']][0]['value'], $respItem);
 	}
 	else {
