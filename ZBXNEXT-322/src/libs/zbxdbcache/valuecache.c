@@ -2689,7 +2689,7 @@ static int	vch_init(zbx_vc_item_t *item, zbx_vector_vc_value_t *values, int seco
 			zbx_timespec_t	*first_ts = &values->values->timestamp;
 
 			/* check if the init value vector contains the requested value */
-			if ((first_ts->sec == ts->sec && first_ts->ns) > ts->ns || first_ts->sec > ts->sec)
+			if ((first_ts->sec == ts->sec && first_ts->ns > ts->ns) || first_ts->sec > ts->sec)
 				data->cached_all = 1;
 		}
 		else if (0 != count)
@@ -3439,6 +3439,8 @@ int	zbx_vc_get_value(zbx_uint64_t itemid, int value_type, const zbx_timespec_t *
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() itemid:" ZBX_FS_UI64 " value_type:%d timestamp:%d.%d",
 			__function_name, itemid, value_type, ts->sec, ts->ns);
 
+	*found = 0;
+
 	vc_try_lock();
 
 	if (NULL == vc_cache)
@@ -3467,11 +3469,13 @@ int	zbx_vc_get_value(zbx_uint64_t itemid, int value_type, const zbx_timespec_t *
 					(cache_value->timestamp.sec == ts->sec && cache_value->timestamp.ns <= ts->ns))
 			{
 				vc_value_copy(value, cache_value, value_type);
-				ret = SUCCEED;
+				*found = 1;
 				break;
 			}
 		}
 		zbx_vc_value_vector_destroy(&values, value_type);
+
+		ret = SUCCEED;
 
 		goto finish;
 	}
@@ -3484,7 +3488,6 @@ out:
 	if (FAIL == ret)
 	{
 		cache_used = 0;
-		*found = 0;
 
 		if (SUCCEED == (ret = vc_db_read_value(itemid, value_type, ts, value)))
 		{
