@@ -145,7 +145,7 @@ static int	evaluate_LOGEVENTID(char *value, DB_ITEM *item, const char *function,
 {
 	const char	*__function_name = "evaluate_LOGEVENTID";
 	char		*arg1 = NULL, *arg1_esc;
-	int		ret = FAIL;
+	int		ret = FAIL, found;
 	ZBX_REGEXP	*regexps = NULL;
 	int		regexps_alloc = 0, regexps_num = 0;
 	zbx_timespec_t	ts = {now, 999999999};
@@ -183,7 +183,8 @@ static int	evaluate_LOGEVENTID(char *value, DB_ITEM *item, const char *function,
 		DBfree_result(result);
 	}
 
-	if (SUCCEED == (ret = zbx_vc_get_value(item->itemid, item->value_type, &ts, &last_value)))
+	if (SUCCEED == (ret = zbx_vc_get_value(item->itemid, item->value_type, &ts, &last_value, &found)) &&
+			1 == found)
 	{
 		char	*logeventid = NULL;
 		size_t	size = 0, offset = 0;
@@ -230,7 +231,7 @@ static int	evaluate_LOGSOURCE(char *value, DB_ITEM *item, const char *function, 
 {
 	const char	*__function_name = "evaluate_LOGSOURCE";
 	char		*arg1 = NULL;
-	int		ret = FAIL;
+	int		ret = FAIL, found;
 	zbx_timespec_t	ts = {now, 999999999};
 	zbx_vc_value_t	last_value;
 
@@ -245,7 +246,8 @@ static int	evaluate_LOGSOURCE(char *value, DB_ITEM *item, const char *function, 
 	if (FAIL == get_function_parameter_str(item->hostid, parameters, 1, &arg1))
 		goto out;
 
-	if (SUCCEED == (ret = zbx_vc_get_value(item->itemid, item->value_type, &ts, &last_value)))
+	if (SUCCEED == (ret = zbx_vc_get_value(item->itemid, item->value_type, &ts, &last_value, &found)) &&
+			1 == found)
 	{
 		if (0 == strcmp(last_value.value.log->source, arg1))
 			zbx_strlcpy(value, "1", MAX_BUFFER_LEN);
@@ -280,7 +282,7 @@ out:
 static int	evaluate_LOGSEVERITY(char *value, DB_ITEM *item, const char *function, const char *parameters, time_t now)
 {
 	const char	*__function_name = "evaluate_LOGSEVERITY";
-	int		ret = FAIL;
+	int		ret = FAIL, found;
 	zbx_timespec_t	ts = {now, 999999999};
 	zbx_vc_value_t	last_value;
 
@@ -289,7 +291,8 @@ static int	evaluate_LOGSEVERITY(char *value, DB_ITEM *item, const char *function
 	if (ITEM_VALUE_TYPE_LOG != item->value_type)
 		goto out;
 
-	if (SUCCEED == (ret = zbx_vc_get_value(item->itemid, item->value_type, &ts, &last_value)))
+	if (SUCCEED == (ret = zbx_vc_get_value(item->itemid, item->value_type, &ts, &last_value, &found)) &&
+			1 == found)
 	{
 		zbx_snprintf(value, MAX_BUFFER_LEN, "%d", last_value.value.log->severity);
 		zbx_vc_value_clear(&last_value, item->value_type);

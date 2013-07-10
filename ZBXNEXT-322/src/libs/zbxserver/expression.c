@@ -1380,7 +1380,7 @@ static int	DBget_history_log_value(zbx_uint64_t itemid, char **replace_to, int r
 
 	DB_RESULT	result;
 	DB_ROW		row;
-	int		ret = FAIL;
+	int		ret = FAIL, found = 0;
 	zbx_vc_value_t	value;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
@@ -1393,11 +1393,11 @@ static int	DBget_history_log_value(zbx_uint64_t itemid, char **replace_to, int r
 		{
 			zbx_timespec_t	ts = {clock, ns};
 
-			ret = zbx_vc_get_value(itemid, ITEM_VALUE_TYPE_LOG, &ts, &value);
+			ret = zbx_vc_get_value(itemid, ITEM_VALUE_TYPE_LOG, &ts, &value, &found);
 		}
 	}
 
-	if (SUCCEED != ret)
+	if (SUCCEED != ret || 1 != found)
 		goto out;
 
 	switch (request)
@@ -1485,7 +1485,7 @@ static int	DBitem_lastvalue(const char *expression, char **lastvalue, int N_func
 	DB_RESULT	result;
 	DB_ROW		row;
 	zbx_uint64_t	itemid;
-	int		ret = FAIL;
+	int		ret = FAIL, found;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -1516,7 +1516,8 @@ static int	DBitem_lastvalue(const char *expression, char **lastvalue, int N_func
 				zbx_timespec_t	ts = {time(NULL), 999999999};
 				zbx_vc_value_t	value;
 
-				if (SUCCEED == zbx_vc_get_value(itemid, value_type, &ts, &value))
+				if (SUCCEED == zbx_vc_get_value(itemid, value_type, &ts, &value, &found) &&
+						1 == found)
 				{
 					char	*pvalue;
 
@@ -1571,7 +1572,7 @@ static int	DBitem_value(const char *expression, char **value, int N_functionid, 
 	DB_RESULT	result;
 	DB_ROW		row;
 	zbx_uint64_t	itemid;
-	int		ret = FAIL;
+	int		ret = FAIL, found;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -1596,7 +1597,8 @@ static int	DBitem_value(const char *expression, char **value, int N_functionid, 
 		value_type = (unsigned char)atoi(row[1]);
 		ZBX_DBROW2UINT64(valuemapid, row[2]);
 
-		if (SUCCEED == (ret = zbx_vc_get_value(itemid, value_type, &ts, &vc_value)))
+		if (SUCCEED == (ret = zbx_vc_get_value(itemid, value_type, &ts, &vc_value, &found)) &&
+				1 == found)
 		{
 			zbx_vc_history_value2str(tmp, sizeof(tmp), &vc_value.value, value_type);
 			zbx_vc_value_clear(&vc_value, value_type);

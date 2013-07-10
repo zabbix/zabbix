@@ -207,7 +207,7 @@ typedef struct
 			int timestamp);
 
 	/* retrieves the specified value (ts) from cache */
-	int (*get_value)(zbx_vc_item_t *item, const zbx_timespec_t *ts, zbx_vc_value_t *value);
+	int (*get_value)(zbx_vc_item_t *item, const zbx_timespec_t *ts, zbx_vc_value_t *value, int *found);
 
 	/* retrieves all values from cache */
 	void (*get_all_values)(const zbx_vc_item_t *item, zbx_vector_vc_value_t *values);
@@ -266,6 +266,8 @@ static zbx_vc_cache_t	*vc_cache = NULL;
 
 /* function prototypes */
 static void	vc_value_copy(zbx_vc_value_t* dst, const zbx_vc_value_t* src, int value_type);
+static int	vc_value_compare_asc_func(const zbx_vc_value_t *d1, const zbx_vc_value_t *d2);
+static int	vc_value_compare_desc_func(const zbx_vc_value_t *d1, const zbx_vc_value_t *d2);
 
 /******************************************************************************************************************
  *                                                                                                                *
@@ -510,7 +512,7 @@ static int	vc_db_read_value(zbx_uint64_t itemid, int value_type, const zbx_times
 {
 	char			*sql = NULL;
 	size_t			sql_alloc = 0, sql_offset = 0;
-	int			ret = FAIL, now;
+	int			ret = FAIL, i;
 	DB_RESULT		result;
 	DB_ROW			row;
 	zbx_vc_history_table_t	*table = &vc_history_tables[value_type];
@@ -540,15 +542,18 @@ static int	vc_db_read_value(zbx_uint64_t itemid, int value_type, const zbx_times
 		/* if failed to find a value matching target timestamp - */
 		/* find the older value closest to the timestamp         */
 
-		now = ZBX_VC_TIME();
-
 		zbx_vc_value_vector_create(&values);
-		vc_db_read_values_by_count(itemid, value_type, &values, 1, now, now, 1);
+		vc_db_read_values_by_count(itemid, value_type, &values, 1, ts->sec, ts->sec, 0);
+		zbx_vector_vc_value_sort(&values, (zbx_compare_func_t)vc_value_compare_desc_func);
 
-		if (0 < values.values_num)
+		for (i = 0; i < values.values_num; i++)
 		{
-			vc_value_copy(value, &values.values[0], value_type);
-			ret = SUCCEED;
+			if ((values.values[i].timestamp.sec == ts->sec && values.values[i].timestamp.ns <= ts->ns) ||
+					values.values[i].timestamp.sec < ts->sec)
+			{
+				vc_value_copy(value, &values.values[0], value_type);
+				ret = SUCCEED;
+			}
 		}
 
 		zbx_vc_value_vector_destroy(&values, value_type);
@@ -2560,13 +2565,14 @@ out:
  *           memory to cache DB values), then this function also fails.       *
  *                                                                            *
  ******************************************************************************/
-static int	vch_item_get_value(zbx_vc_item_t *item, const zbx_timespec_t *ts, zbx_vc_value_t *value)
+static int	vch_item_get_value(zbx_vc_item_t *item, const zbx_timespec_t *ts, zbx_vc_value_t *value, int *found)
 {
 	zbx_vc_data_history_t	*data = &item->data.history;
 	int			index, ret = FAIL, hits = 0, misses = 0, now;
 	zbx_vc_chunk_t		*chunk;
 
 	now = ZBX_VC_TIME();
+	*found = 0;
 
 	if (NULL == data->tail || data->tail->slots[data->tail->first_value].timestamp.sec > ts->sec)
 	{
@@ -2579,6 +2585,8 @@ static int	vch_item_get_value(zbx_vc_item_t *item, const zbx_timespec_t *ts, zbx
 	else
 		hits++;
 
+	ret = SUCCEED;
+
 	if (FAIL == vch_item_get_last_value(item, ts->sec, &chunk, &index))
 	{
 		/* event after cache update the requested value is not there */
@@ -2590,10 +2598,7 @@ static int	vch_item_get_value(zbx_vc_item_t *item, const zbx_timespec_t *ts, zbx
 		if (--index < chunk->first_value)
 		{
 			if (NULL == (chunk = chunk->prev))
-			{
-				ret = FAIL;
 				goto out;
-			}
 
 			index = chunk->last_value;
 		}
@@ -2609,8 +2614,11 @@ static int	vch_item_get_value(zbx_vc_item_t *item, const zbx_timespec_t *ts, zbx
 	if (data->range < now - value->timestamp.sec)
 		data->range = now - value->timestamp.sec;
 
-	ret = SUCCEED;
+	*found = 1;
 out:
+	if (0 == *found)
+		data->cached_all = 1;
+
 	return ret;
 }
 
@@ -2912,9 +2920,9 @@ static int	vcl_item_get_value_range(zbx_vc_item_t *item,  zbx_vector_vc_value_t 
  * Comments: If the requested value was not cached this function fails        *
  *                                                                            *
  ******************************************************************************/
-static int	vcl_item_get_value(zbx_vc_item_t *item, const zbx_timespec_t *ts, zbx_vc_value_t *value)
+static int	vcl_item_get_value(zbx_vc_item_t *item, const zbx_timespec_t *ts, zbx_vc_value_t *value, int *found)
 {
-	int				ret = FAIL, i;
+	int				i;
 	zbx_vc_data_lastvalue_t		*data = &item->data.lastvalue;
 
 	for (i = 0; i < item->values_total; i++)
@@ -2924,14 +2932,14 @@ static int	vcl_item_get_value(zbx_vc_item_t *item, const zbx_timespec_t *ts, zbx
 		{
 			vc_value_copy(value, &data->values[i], item->value_type);
 			vc_update_statistics(item, 1, 0);
-			ret = SUCCEED;
+			*found = 1;
 
 			goto out;
 		}
 	}
-
+	*found = 0;
 out:
-	return ret;
+	return SUCCEED;
 }
 
 /******************************************************************************
@@ -3411,6 +3419,7 @@ out:
  *             value_type - [IN] the item value type                          *
  *             ts         - [IN] the target timestamp                         *
  *             value      - [OUT] the value found                             *
+ *             found      - [OUT] 1 - the value was found, 0 - otherwise      *
  *                                                                            *
  * Return value:  SUCCEED - the item history data was retrieved successfully  *
  *                FAIL    - the item history data was not retrieved           *
@@ -3419,11 +3428,9 @@ out:
  *           to store value data. To free it use zbx_vc_history_value_clear() *
  *           function.                                                        *
  *                                                                            *
- *           Note that there is no distinction between failing because of an  *
- *           error or because there are no values with matching timestamp.    *
- *                                                                            *
  ******************************************************************************/
-int	zbx_vc_get_value(zbx_uint64_t itemid, int value_type, const zbx_timespec_t *ts, zbx_vc_value_t *value)
+int	zbx_vc_get_value(zbx_uint64_t itemid, int value_type, const zbx_timespec_t *ts, zbx_vc_value_t *value,
+		int *found)
 {
 	const char	*__function_name = "zbx_vc_get_value";
 	zbx_vc_item_t	*item = NULL;
@@ -3472,14 +3479,18 @@ int	zbx_vc_get_value(zbx_uint64_t itemid, int value_type, const zbx_timespec_t *
 	if (FAIL == vc_prepare_item(item, value_type, 0, 0, 0, ts))
 		goto out;
 
-	ret = CACHE(item)->get_value(item, ts, value);
+	ret = CACHE(item)->get_value(item, ts, value, found);
 out:
 	if (FAIL == ret)
 	{
 		cache_used = 0;
+		*found = 0;
 
 		if (SUCCEED == (ret = vc_db_read_value(itemid, value_type, ts, value)))
+		{
 			vc_update_statistics(NULL, 0, 1);
+			*found = 1;
+		}
 	}
 	else
 	{
