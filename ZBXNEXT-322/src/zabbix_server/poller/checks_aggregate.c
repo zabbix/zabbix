@@ -337,6 +337,7 @@ static int	evaluate_aggregate(DC_ITEM *item, AGENT_RESULT *res, int grp_func, co
 			__function_name, grp_func, groups, itemkey, item_func, param);
 
 	memset(&value, 0, sizeof(value));
+	zbx_vc_value_vector_create(&group_values);
 
 	now = time(NULL);
 
@@ -368,8 +369,6 @@ static int	evaluate_aggregate(DC_ITEM *item, AGENT_RESULT *res, int grp_func, co
 		}
 		count = 0;
 	}
-
-	zbx_vc_value_vector_create(&group_values);
 
 	for (i = 0; i < itemids.values_num; i++)
 	{
