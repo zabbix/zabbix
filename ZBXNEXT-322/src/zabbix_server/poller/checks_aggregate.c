@@ -423,7 +423,7 @@ skip:
 
 	ret = SUCCEED;
 out:
-	zbx_vc_value_vector_destroy(&values, item->value_type);
+	zbx_vc_value_vector_destroy(&group_values, item->value_type);
 	zbx_vector_uint64_destroy(&itemids);
 	zbx_free(errorcodes);
 	zbx_free(items);
