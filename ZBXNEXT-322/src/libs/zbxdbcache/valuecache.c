@@ -3457,7 +3457,7 @@ int	zbx_vc_get_value(zbx_uint64_t itemid, int value_type, const zbx_timespec_t *
 			zbx_vc_value_t	*cache_value = &values.values[i];
 
 			if (cache_value->timestamp.sec < ts->sec ||
-					(cache_value->timestamp.sec == ts->sec && cache_value->timestamp.ns < ts->ns))
+					(cache_value->timestamp.sec == ts->sec && cache_value->timestamp.ns <= ts->ns))
 			{
 				vc_value_copy(value, cache_value, value_type);
 				ret = SUCCEED;
@@ -3474,7 +3474,6 @@ int	zbx_vc_get_value(zbx_uint64_t itemid, int value_type, const zbx_timespec_t *
 
 	ret = CACHE(item)->get_value(item, ts, value);
 out:
-
 	if (FAIL == ret)
 	{
 		cache_used = 0;

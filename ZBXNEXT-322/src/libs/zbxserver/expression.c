@@ -1382,7 +1382,6 @@ static int	DBget_history_log_value(zbx_uint64_t itemid, char **replace_to, int r
 	DB_ROW		row;
 	int		ret = FAIL;
 	zbx_vc_value_t	value;
-	char		buffer[MAX_STRING_LEN];
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -1420,12 +1419,10 @@ static int	DBget_history_log_value(zbx_uint64_t itemid, char **replace_to, int r
 					zbx_item_logtype_string((unsigned char)value.value.log->severity));
 			break;
 		case ZBX_REQUEST_ITEM_LOG_NSEVERITY:
-			zbx_snprintf(buffer, sizeof(buffer), "%d", value.value.log->severity);
-			*replace_to = zbx_strdup(*replace_to, buffer);
+			*replace_to = zbx_dsprintf(*replace_to, "%d", value.value.log->severity);
 			break;
 		case ZBX_REQUEST_ITEM_LOG_EVENTID:
-			zbx_snprintf(buffer, sizeof(buffer), "%d", value.value.log->logeventid);
-			*replace_to = zbx_strdup(*replace_to, buffer);
+			*replace_to = zbx_dsprintf(*replace_to, "%d", value.value.log->logeventid);
 			break;
 	}
 
