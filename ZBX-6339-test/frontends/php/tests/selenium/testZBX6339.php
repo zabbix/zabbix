@@ -43,9 +43,11 @@ class testZBX6339 extends CWebTest {
 	*/
 	public function testZBX6339_MassDelete($screen) {
 
-		$host = $screen['host'];
 		$screenid = $screen['screenid'];
 		$name = $screen['name'];
+
+		$host = $screen['host'];
+		$hostid = $screen['hostid'];
 
 		$this->chooseOkOnNextConfirmation();
 
@@ -63,6 +65,7 @@ class testZBX6339 extends CWebTest {
 
 		$this->checkTitle('Configuration of screens');
 		$this->zbxTestTextPresent(array('Screen deleted','CONFIGURATION OF SCREENS', $host));
+		$this->assertElementPresent('//form[@name="screenForm"]/input[@id="templateid" and @value="'.$hostid.'"]');
 
 		$sql = "select * from screens where screenid=$screenid";
 		$this->assertEquals(0, DBcount($sql));
