@@ -389,15 +389,10 @@ static int	evaluate_aggregate(DC_ITEM *item, AGENT_RESULT *res, int grp_func, co
 				group_value.value = item_result;
 			else
 			{
-				switch (item->value_type)
-				{
-					case ITEM_VALUE_TYPE_UINT64:
-						group_value.value.ui64 = (zbx_uint64_t)item_result.dbl;
-						break;
-					case ITEM_VALUE_TYPE_FLOAT:
-						group_value.value.dbl = (double)item_result.ui64;
-						break;
-				}
+				if (ITEM_VALUE_TYPE_UINT64 == item->value_type)
+					group_value.value.ui64 = (zbx_uint64_t)item_result.dbl;
+				else
+					group_value.value.dbl = (double)item_result.ui64;
 			}
 
 			zbx_vector_vc_value_append_ptr(&group_values, &group_value);
