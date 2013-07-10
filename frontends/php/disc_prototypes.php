@@ -39,7 +39,6 @@ $fields = array(
 	'itemid' =>					array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		'(isset({form})&&({form}=="update"))'),
 	'groupid' =>				array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
 	'hostid' =>					array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
-	'referid' =>				array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
 	'interfaceid' =>			array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null, _('Interface')),
 	'name' =>					array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({save})', _('Name')),
 	'description' =>			array(T_ZBX_STR, O_OPT, null,	null,		'isset({save})'),
@@ -180,8 +179,6 @@ if (PAGE_TYPE_JS == $page['type'] || PAGE_TYPE_HTML_BLOCK == $page['type']) {
 	require_once dirname(__FILE__).'/include/page_footer.php';
 	exit();
 }
-
-resetCurrentPageCookies($_REQUEST['parent_discoveryid'], get_request('referid', 0));
 
 /*
  * Actions

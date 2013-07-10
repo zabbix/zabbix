@@ -34,7 +34,6 @@ require_once dirname(__FILE__).'/include/page_header.php';
 $fields = array(
 	'groupid' =>			array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
 	'hostid' =>				array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
-	'referid' =>			array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
 	'triggerid' =>			array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		'(isset({form})&&({form}=="update"))'),
 	'copy_type' =>			array(T_ZBX_INT, O_OPT, P_SYS,	IN('0,1'),	'isset({copy})'),
 	'copy_mode' =>			array(T_ZBX_INT, O_OPT, P_SYS,	IN('0'),	null),
@@ -110,8 +109,6 @@ elseif (get_request('hostid', 0) > 0) {
 		access_deny();
 	}
 }
-
-resetCurrentPageCookies($_REQUEST['hostid'], get_request('referid', 0));
 
 /*
  * Actions

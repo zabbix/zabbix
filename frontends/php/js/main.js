@@ -156,19 +156,22 @@ var MMenu = {
  */
 var chkbxRange = {
 	startbox:		null,	// start checkbox obj
-	startbox_name:	null,	// start checkbox name
+	startboxName:	null,	// start checkbox name
 	chkboxes:		{},		// ckbx list
+	prefix:			null,	// prefix for cookie name
 	pageGoName:		null,	// which checkboxes should be counted by Go button
 	pageGoCount:	0,		// selected checkboxes
-	selected_ids:	{},		// ids of selected checkboxes
+	selectedIds:	{},		// ids of selected checkboxes
 	goButton:		null,
 	page:			null,	// loaded page name
+	cookieName:		null,
 
 	init: function() {
 		var path = new Curl();
 		this.page = path.getPath();
-		this.selected_ids = cookie.readJSON('cb_' + this.page);
-		var chkboxes = jQuery('table.tableinfo input.checkbox:not(:disabled)');
+		this.cookieName = 'cb_' + (is_null(this.prefix) ? '' : this.prefix + '_') + this.page;
+		this.selectedIds = cookie.readJSON(this.cookieName);
+		var chkboxes = jQuery('.tableinfo .checkbox:not(:disabled)');
 
 		if (chkboxes.length > 0) {
 			for (var i = 0; i < chkboxes.length; i++) {
@@ -198,13 +201,13 @@ var chkbxRange = {
 
 		if (objName == this.pageGoName) {
 			var objId = jQuery(obj).val();
-			if (isset(objId, this.selected_ids)) {
+			if (isset(objId, this.selectedIds)) {
 				obj.checked = true;
 			}
 		}
 	},
 
-	// check if all checkboxes are selected and select main checkbox
+	// check if all checkboxes are selected and select main checkbox, else disable checkbox, select options and button
 	selectMainCheckbox: function() {
 		var countAvailable = jQuery('.tableinfo tr:not(.header) .checkbox:not(:disabled)').length;
 		var countChecked = jQuery('.tableinfo tr:not(.header) .checkbox:not(:disabled):checked').length;
@@ -215,6 +218,8 @@ var chkbxRange = {
 		}
 		else if (typeof(mainCheckbox) !== 'undefined') {
 			mainCheckbox.disabled = true;
+			jQuery('#go')[0].disabled = true;
+			jQuery('#goButton')[0].disabled = true;
 		}
 	},
 
@@ -237,7 +242,7 @@ var chkbxRange = {
 
 		// check range selection
 		if (e.ctrlKey || e.shiftKey) {
-			if (!is_null(this.startbox) && this.startbox_name == objName && obj.name != this.startbox.name) {
+			if (!is_null(this.startbox) && this.startboxName == objName && obj.name != this.startbox.name) {
 				var chkboxes = this.chkboxes[objName];
 				var flag = false;
 
@@ -288,7 +293,7 @@ var chkbxRange = {
 		}
 
 		this.startbox = obj;
-		this.startbox_name = objName;
+		this.startboxName = objName;
 	},
 
 	checkAll: function(name, value) {
@@ -331,7 +336,7 @@ var chkbxRange = {
 							crow.className = 'selected';
 						}
 						if (objName == this.pageGoName) {
-							this.selected_ids[objId] = objId;
+							this.selectedIds[objId] = objId;
 						}
 					}
 					else {
@@ -344,15 +349,15 @@ var chkbxRange = {
 							}
 						}
 						if (objName == this.pageGoName) {
-							delete(this.selected_ids[objId]);
+							delete(this.selectedIds[objId]);
 						}
 					}
 				}
 			}
 
 			var countChecked = 0;
-			for (var key in this.selected_ids) {
-				if (!empty(this.selected_ids[key])) {
+			for (var key in this.selectedIds) {
+				if (!empty(this.selectedIds[key])) {
 					countChecked++;
 				}
 			}
@@ -362,7 +367,7 @@ var chkbxRange = {
 				this.goButton.value = tmp_val[0] + ' (' + countChecked + ')';
 			}
 
-			cookie.createJSON('cb_' + this.page, this.selected_ids);
+			cookie.createJSON(this.cookieName, this.selectedIds);
 
 			this.pageGoCount = countChecked;
 		}
@@ -381,8 +386,8 @@ var chkbxRange = {
 			}
 
 			var form = getParent(this.goButton, 'form');
-			for (var key in this.selected_ids) {
-				if (!empty(this.selected_ids[key])) {
+			for (var key in this.selectedIds) {
+				if (!empty(this.selectedIds[key])) {
 					create_var(form.name, this.pageGoName + '[' + key + ']', key, false);
 				}
 			}

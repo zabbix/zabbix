@@ -104,8 +104,7 @@ foreach ($this->data['graphs'] as $graph) {
 		$name[] = new CLink(
 			$realHosts['name'],
 			'graphs.php?'.
-				'hostid='.$realHosts['hostid'].
-				'&referid='.$this->data['hostid'],
+				'hostid='.$realHosts['hostid'],
 			'unknown'
 		);
 		$name[] = NAME_DELIMITER;
@@ -167,7 +166,16 @@ $goComboBox->addItem($goOption);
 
 $goButton = new CSubmit('goButton', _('Go').' (0)');
 $goButton->attr('id', 'goButton');
+
 zbx_add_post_js('chkbxRange.pageGoName = "group_graphid";');
+if (empty($this->data['parent_discoveryid'])) {
+	zbx_add_post_js('chkbxRange.prefix = "'.$this->data['hostid'].'";');
+	zbx_add_post_js('cookie.prefix = "'.$this->data['hostid'].'";');
+}
+else {
+	zbx_add_post_js('chkbxRange.prefix = "'.$this->data['parent_discoveryid'].'";');
+	zbx_add_post_js('cookie.prefix = "'.$this->data['parent_discoveryid'].'";');
+}
 
 // append table to form
 $graphForm->addItem(array($this->data['paging'], $graphTable, $this->data['paging'], get_table_header(array($goComboBox, $goButton))));

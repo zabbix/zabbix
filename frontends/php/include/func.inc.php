@@ -2568,17 +2568,3 @@ function no_errors() {
 function checkRequiredKeys(array $array, array $keys) {
 	return array_diff($keys, array_keys($array));
 }
-
-/**
- * Resets currect page cookies if host ID does not match referer ID on page load.
- *
- * @param int $hostid		valid host ID or parent discovery ID
- * @param int $referid		referrer ID
- */
-function resetCurrentPageCookies($hostid, $referid) {
-	if ($_REQUEST['go'] == 'none' && $referid > 0 && $hostid != $referid) {
-		$url = new CUrl();
-		$path = $url->getPath();
-		insert_js('cookie.eraseArray("'.$path.'")');
-	}
-}

@@ -19,14 +19,17 @@
 
 var cookie = {
 	cookies: [],
+	prefix:	null,
 
 	init: function() {
 		var path = new Curl();
 		var page = path.getPath();
 		var allCookies = document.cookie.split('; ');
+
 		for (var i = 0; i < allCookies.length; i++) {
 			var cookiePair = allCookies[i].split('=');
-			if (cookiePair[0].indexOf('cb_') > -1 && cookiePair[0].indexOf('cb_' + page) == -1) {
+			if (cookiePair[0].indexOf('cb_') > -1
+					&& cookiePair[0].indexOf('cb_' + (is_null(this.prefix) ? '' : this.prefix + '_') + page) == -1) {
 				this.erase(cookiePair[0]);
 			}
 			else {
@@ -171,12 +174,14 @@ var cookie = {
 	},
 
 	eraseArray: function(name) {
-		var part_count = parseInt(this.read('cb_' + name + '_parts'), 10);
-		if (!is_null(part_count)) {
-			for (var i = 1; i <= part_count; i++) {
-				this.erase('cb_' + name + '_' + i);
+		var name = 'cb_' + (is_null(this.prefix) ? '' : this.prefix + '_') + name;
+		var partCount = parseInt(this.read(name + '_parts'), 10);
+
+		if (!is_null(partCount)) {
+			for (var i = 1; i <= partCount; i++) {
+				this.erase(name + '_' + i);
 			}
-			this.erase('cb_' + name + '_parts');
+			this.erase(name + '_parts');
 		}
 	}
 };

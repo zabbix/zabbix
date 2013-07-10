@@ -36,7 +36,6 @@ $paramsFieldName = getParamFieldNameByType(get_request('type', 0));
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = array(
 	'hostid' =>				array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		'!isset({form})'),
-	'referid' =>			array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
 	'itemid' =>				array(T_ZBX_INT, O_NO,	P_SYS,	DB_ID,		'(isset({form})&&({form}=="update"))'),
 	'interfaceid' =>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID, null, _('Interface')),
 	'name' =>				array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY, 'isset({save})', _('Name')),
@@ -160,8 +159,6 @@ if ($page['type'] == PAGE_TYPE_JS || $page['type'] == PAGE_TYPE_HTML_BLOCK) {
 	require_once dirname(__FILE__).'/include/page_footer.php';
 	exit();
 }
-
-resetCurrentPageCookies($_REQUEST['hostid'], get_request('referid', 0));
 
 /*
  * Actions

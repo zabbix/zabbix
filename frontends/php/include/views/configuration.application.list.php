@@ -74,8 +74,7 @@ foreach ($this->data['applications'] as $application) {
 			$name[] = new CLink(
 				$template['name'],
 				'applications.php?'.
-					'hostid='.$template['hostid'].
-					'&referid='.$this->data['hostid'],
+					'hostid='.$template['hostid'],
 				'unknown'
 			);
 			$name[] = ', ';
@@ -129,7 +128,10 @@ $goComboBox->addItem($goOption);
 
 $goButton = new CSubmit('goButton', _('Go').' (0)');
 $goButton->setAttribute('id', 'goButton');
+
 zbx_add_post_js('chkbxRange.pageGoName = "applications";');
+zbx_add_post_js('chkbxRange.prefix = "'.$this->data['hostid'].'";');
+zbx_add_post_js('cookie.prefix = "'.$this->data['hostid'].'";');
 
 // append table to form
 $applicationForm->addItem(array($this->data['paging'], $applicationTable, $this->data['paging'], get_table_header(array($goComboBox, $goButton))));

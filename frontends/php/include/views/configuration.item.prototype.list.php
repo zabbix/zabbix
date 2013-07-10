@@ -65,8 +65,7 @@ foreach ($this->data['items'] as $item) {
 		$templateDiscoveryRuleId = get_realrule_by_itemid_and_hostid($this->data['parent_discoveryid'], $template_host['hostid']);
 
 		$description[] = new CLink($template_host['name'],
-			'?parent_discoveryid='.$templateDiscoveryRuleId.
-				'&referid='.$this->data['parent_discoveryid'],
+			'?parent_discoveryid='.$templateDiscoveryRuleId,
 			'unknown'
 		);
 		$description[] = NAME_DELIMITER;
@@ -128,7 +127,10 @@ $goComboBox->addItem($goOption);
 
 $goButton = new CSubmit('goButton', _('Go').' (0)');
 $goButton->setAttribute('id', 'goButton');
+
 zbx_add_post_js('chkbxRange.pageGoName = "group_itemid";');
+zbx_add_post_js('chkbxRange.prefix = "'.$this->data['parent_discoveryid'].'";');
+zbx_add_post_js('cookie.prefix = "'.$this->data['parent_discoveryid'].'";');
 
 // append table to form
 $itemForm->addItem(array($this->data['paging'], $itemTable, $this->data['paging'], get_table_header(array($goComboBox, $goButton))));

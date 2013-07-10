@@ -34,7 +34,6 @@ require_once dirname(__FILE__).'/include/page_header.php';
 $fields = array(
 	'parent_discoveryid' => array(T_ZBX_INT, O_MAND, P_SYS,	DB_ID,		null),
 	'hostid' =>				array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
-	'referid' =>			array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
 	'triggerid' =>			array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		'(isset({form})&&({form}=="update"))'),
 	'copy_type' =>			array(T_ZBX_INT, O_OPT, P_SYS,	IN('0,1'),	'isset({copy})'),
 	'copy_mode' =>			array(T_ZBX_INT, O_OPT, P_SYS,	IN('0'),	null),
@@ -120,8 +119,6 @@ else {
 
 $showdisabled = get_request('showdisabled', 0);
 CProfile::update('web.triggers.showdisabled', $showdisabled, PROFILE_TYPE_INT);
-
-resetCurrentPageCookies($_REQUEST['parent_discoveryid'], get_request('referid', 0));
 
 /*
  * Actions

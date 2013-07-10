@@ -79,8 +79,7 @@ foreach ($this->data['items'] as $item) {
 		$description[] = new CLink(
 			CHtml::encode($item['template_host']['name']),
 			'?hostid='.$item['template_host']['hostid'].
-				'&filter_set=1'.
-				'&referid='.$this->data['hostid'],
+				'&filter_set=1',
 			'unknown'
 		);
 		$description[] = NAME_DELIMITER;
@@ -104,9 +103,13 @@ foreach ($this->data['items'] as $item) {
 	}
 
 	// status
-	$status = new CCol(new CLink(itemIndicator($item['status'], $item['state']), '?group_itemid='.$item['itemid'].'&hostid='.$item['hostid'].'&go='.
-		($item['status'] ? 'activate' : 'disable'), itemIndicatorStyle($item['status'], $item['state']))
-	);
+	$status = new CCol(new CLink(
+		itemIndicator($item['status'], $item['state']),
+		'?group_itemid='.$item['itemid'].
+			'&hostid='.$item['hostid'].
+			'&go='.($item['status'] ? 'activate' : 'disable'),
+		itemIndicatorStyle($item['status'], $item['state'])
+	));
 
 	$statusIcons = array();
 	if ($item['status'] == ITEM_STATUS_ACTIVE) {
@@ -296,7 +299,10 @@ $goComboBox->addItem($goOption);
 
 $goButton = new CSubmit('goButton', _('Go').' (0)');
 $goButton->setAttribute('id', 'goButton');
+
 zbx_add_post_js('chkbxRange.pageGoName = "group_itemid";');
+zbx_add_post_js('chkbxRange.prefix = "'.$this->data['hostid'].'";');
+zbx_add_post_js('cookie.prefix = "'.$this->data['hostid'].'";');
 
 // append table to form
 $itemForm->addItem(array($this->data['paging'], $itemTable, $this->data['paging'], get_table_header(array($goComboBox, $goButton))));
