@@ -37,7 +37,7 @@ class testZBX6339 extends CWebTest {
 				' LEFT JOIN screens s'.
 					' ON h.hostid=s.templateid'.
 			' WHERE s.templateid IS NOT NULL'.
-				' AND h.status='.HOST_STATUS_TEMPLATE
+				' AND h.status='.HOST_STATUS_TEMPLATE.
 			' ORDER BY s.screenid'
 		);
 	}
