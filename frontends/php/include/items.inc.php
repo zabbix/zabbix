@@ -738,8 +738,7 @@ function get_items_data_overview($hostids, $application, $view_style) {
 	));
 
 	// fetch latest values
-	$historyManager = new CHistoryManager();
-	$history = $historyManager->fetchLast(zbx_toHash($db_items, 'itemid'));
+	$history = Manager::History()->fetchLast(zbx_toHash($db_items, 'itemid'));
 
 	$options = array(
 		'output' => array('name', 'hostid'),

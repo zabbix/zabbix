@@ -1055,8 +1055,7 @@ class CHttpTestManager {
 				' AND '.dbConditionInt('hti.httptestid', $httpTestIds)
 		));
 
-		$historyManager = new CHistoryManager();
-		$history = $historyManager->fetchLast($httpItems);
+		$history = Manager::History()->fetchLast($httpItems);
 
 		$data = array();
 		foreach ($httpItems as $httpItem) {

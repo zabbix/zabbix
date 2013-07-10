@@ -118,8 +118,7 @@ if ($pageFilter->hostsSelected) {
 	order_result($httpTests, getPageSortField('name'), getPageSortOrder());
 
 	// fetch the latest results of the web scenario
-	$httpTestManager = new CHttpTestManager();
-	$lastHttpTestData = $httpTestManager->fetchLastData(array_keys($httpTests));
+	$lastHttpTestData = Manager::HttpTest()->fetchLastData(array_keys($httpTests));
 
 	foreach($httpTests as $httpTest) {
 		$lastData = isset($lastHttpTestData[$httpTest['httptestid']]) ? $lastHttpTestData[$httpTest['httptestid']] : null;
