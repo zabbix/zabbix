@@ -35,6 +35,7 @@ $nameTextBox->attr('autofocus', 'autofocus');
 $imageFormList->addRow(_('Name'), $nameTextBox);
 $imageFormList->addRow(_('Type'), $imageComboBox);
 $imageFormList->addRow(_('Upload'), new CFile('image'));
+
 if (!empty($this->data['imageid'])) {
 	if ($data['imagetype'] == IMAGE_TYPE_BACKGROUND) {
 		$imageFormList->addRow(_('Image'), new CLink(new CImg('imgstore.php?width=200&height=200&iconid='.$this->data['imageid'], 'no image'), 'image.php?imageid='.$this->data['imageid']));
@@ -47,14 +48,20 @@ if (!empty($this->data['imageid'])) {
 // append tab
 $imageTab = new CTabView();
 $imageTab->addTab('imageTab', _('Image'), $imageFormList);
+$imageForm->addItem($imageTab);
 
 // append buttons
-$imageForm->addItem($imageTab);
-if (!empty($this->data['imageid'])) {
-	$imageForm->addItem(makeFormFooter(new CSubmit('save', _('Save')), array(new CButtonDelete(_('Delete selected image?'), url_param('form').url_param('imageid')), new CButtonCancel())));
+if (empty($this->data['imageid'])) {
+	$imageForm->addItem(makeFormFooter(new CSubmit('save', _('Save')), new CButtonCancel()));
 }
 else {
-	$imageForm->addItem(makeFormFooter(new CSubmit('save', _('Save')), new CButtonCancel()));
+	$imageForm->addItem(makeFormFooter(
+		new CSubmit('save', _('Save')),
+		array(
+			new CButtonDelete(_('Delete selected image?'), url_param('form').url_param('imageid')),
+			new CButtonCancel()
+		)
+	));
 }
 
 return $imageForm;
