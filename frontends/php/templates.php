@@ -212,8 +212,8 @@ elseif (isset($_REQUEST['save'])) {
 
 		$linkedTemplates = $templates;
 		$templates = array();
-		foreach ($linkedTemplates as $templateId) {
-			$templates[] = array('templateid' => $templateId);
+		foreach ($linkedTemplates as $linkedTemplateId) {
+			$templates[] = array('templateid' => $linkedTemplateId);
 		}
 
 		$templatesClear = zbx_toObject($templatesClear, 'templateid');
