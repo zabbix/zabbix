@@ -973,50 +973,6 @@ function delete_trends_by_itemid($itemIds) {
 }
 
 /**
- * Format item lastvalue.
- * First format the value according to the configuration of the item. Then apply the value mapping to the formatted (!)
- * value.
- *
- * @param type      $item
- * @param int       $item['value_type']     type of the value: ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64, ...
- * @param mixed     $item['lastvalue']      value of item
- * @param mixed     $item['lastclock']      time when last value had stored
- * @param string    $item['units']          units of item
- * @param int       $item['valuemapid']     id of mapping set of values
- * @param string    $unknownString          the text to be used if the item has no data
- * @param bool		$trim		        text will be cut and ellipsis "..." added if set to true
- *
- * @return string
- */
-function formatItemLastValue(array $item, $unknownString = '-', $trim = true) {
-	if (!isset($item['lastvalue']) || $item['lastclock'] == 0) {
-		return $unknownString;
-	}
-
-	$mapping = false;
-	$value = formatItemValueType($item);
-
-	switch ($item['value_type']) {
-		case ITEM_VALUE_TYPE_STR:
-			$mapping = getMappedValue($value, $item['valuemapid']);
-			// break; is not missing here
-		case ITEM_VALUE_TYPE_TEXT:
-		case ITEM_VALUE_TYPE_LOG:
-			if ($trim && zbx_strlen($value) > 20) {
-				$value = zbx_substr($value, 0, 20).'...';
-			}
-
-			if ($mapping !== false) {
-				$value = $mapping.' ('.$value.')';
-			}
-			break;
-		default:
-			$value = applyValueMap($value, $item['valuemapid']);
-	}
-	return $value;
-}
-
-/**
  * Format history value.
  * First format the value according to the configuration of the item. Then apply the value mapping to the formatted (!)
  * value.
@@ -1108,32 +1064,6 @@ function getItemFunctionalValue($item, $function, $param) {
 			return UNRESOLVED_MACRO_STRING;
 		}
 	}
-}
-
-/**
- * Format item lastvalue depending on it's value type.
- *
- * @param array $item
- * @param int $item['value_type'] type of the value: ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64, ...
- * @param mixed $item['lastvalue'] value of item
- * @param string $item['units'] units of item
- *
- * @return string
- */
-function formatItemValueType(array $item) {
-	if ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT || $item['value_type'] == ITEM_VALUE_TYPE_UINT64) {
-		$value = convert_units($item['lastvalue'], $item['units']);
-	}
-	elseif ($item['value_type'] == ITEM_VALUE_TYPE_STR
-			|| $item['value_type'] == ITEM_VALUE_TYPE_TEXT
-			|| $item['value_type'] == ITEM_VALUE_TYPE_LOG) {
-		$value = $item['lastvalue'];
-	}
-	else {
-		$value = _('Unknown value type');
-	}
-
-	return $value;
 }
 
 /*
