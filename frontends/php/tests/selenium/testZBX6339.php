@@ -31,11 +31,15 @@ class testZBX6339 extends CWebTest {
 
 	// Returns all screens
 	public static function allScreens() {
-		return DBdata('SELECT * FROM hosts h '.
-			'LEFT JOIN screens s ON h.hostid=s.templateid '.
-			'WHERE s.templateid IS NOT NULL '.
-			'AND h.status=3 '.
-			'ORDER BY screenid');
+		return DBdata(
+			'SELECT s.screenid,s.name,h.name as host_name'.
+			' FROM hosts h'.
+				' LEFT JOIN screens s'.
+					' ON h.hostid=s.templateid'.
+			' WHERE s.templateid IS NOT NULL'.
+				' AND h.status='.HOST_STATUS_TEMPLATE
+			' ORDER BY s.screenid'
+		);
 	}
 
 	/**
@@ -46,8 +50,7 @@ class testZBX6339 extends CWebTest {
 		$screenid = $screen['screenid'];
 		$name = $screen['name'];
 
-		$host = $screen['host'];
-		$hostid = $screen['hostid'];
+		$host = $screen['host_name'];
 
 		$this->chooseOkOnNextConfirmation();
 
@@ -64,15 +67,7 @@ class testZBX6339 extends CWebTest {
 		$this->getConfirmation();
 
 		$this->checkTitle('Configuration of screens');
-		$this->zbxTestTextPresent(array('Screen deleted','CONFIGURATION OF SCREENS', $host));
-		$this->assertElementPresent('//form[@name="screenForm"]/input[@id="templateid" and @value="'.$hostid.'"]');
-
-		$sql = "select * from screens where screenid=$screenid";
-		$this->assertEquals(0, DBcount($sql));
-		$sql = "select * from screens_items where screenid=$screenid";
-		$this->assertEquals(0, DBcount($sql));
-		$sql = "select * from slides where screenid=$screenid";
-		$this->assertEquals(0, DBcount($sql));
+		$this->zbxTestTextPresent(array('Screen deleted', 'CONFIGURATION OF SCREENS', $host));
 	}
 
 	/**
