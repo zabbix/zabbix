@@ -270,8 +270,7 @@ $sql = 'SELECT DISTINCT i.*, ia.applicationid '.
 $dbItems = DBfetchArray(DBselect($sql));
 
 // select history
-$historyManager = new CHistoryManager();
-$history = $historyManager->fetchLast($dbItems, 2);
+$history = Manager::History()->fetchLast($dbItems, 2);
 
 foreach ($dbItems as $key => &$dbItem) {
 	// if needed, skip items without data
@@ -476,7 +475,7 @@ $sql = 'SELECT DISTINCT h.host as hostname,h.hostid,i.* '.
 $dbItems = DBfetchArray(DBselect($sql));
 
 // select history
-$history = $historyManager->fetchLast($dbItems, 2);
+$history = Manager::History()->fetchLast($dbItems, 2);
 
 foreach ($dbItems as $key => &$dbItem) {
 	// if needed, skip items without data
