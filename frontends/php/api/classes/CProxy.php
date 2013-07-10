@@ -198,33 +198,39 @@ class CProxy extends CZBXAPI {
 
 		foreach ($proxies as &$proxy) {
 			if (!check_db_fields($proxyDBfields, $proxy)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Wrong fields for proxy "%s".', $proxy['host']));
-			}
-
-			if (empty($proxy['status'])) {
-				$proxy['status'] = $update ? $dbProxies[$proxy['proxyid']]['status'] : HOST_STATUS_PROXY_ACTIVE;
-			}
-
-			if ($proxy['status'] != HOST_STATUS_PROXY_ACTIVE && $proxy['status'] != HOST_STATUS_PROXY_PASSIVE) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Incorrect value "%1$s" for field "%2$s"', $proxy['status'], 'status'));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Wrong fields for proxy "%1$s".', $proxy['host']));
 			}
 
 			if ($update) {
 				if (!isset($dbProxies[$proxy['proxyid']])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_('No permissions to referred object or it does not exist!'));
+				}
+
+				if (empty($proxy['status'])) {
+					$proxy['status'] = $dbProxies[$proxy['proxyid']]['status'];
 				}
 			}
 			else {
 				if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
+					self::exception(ZBX_API_ERROR_PERMISSIONS,
+						_('No permissions to referred object or it does not exist!'));
+				}
+
+				if (empty($proxy['status'])) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('No status for proxy.'));
+				}
+				elseif ($proxy['status'] != HOST_STATUS_PROXY_ACTIVE && $proxy['status'] != HOST_STATUS_PROXY_PASSIVE) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Incorrect value used for proxy status "%1$s".', $proxy['status']));
 				}
 			}
 
 			// host
 			if (isset($proxy['host'])) {
 				if (!preg_match('/^'.ZBX_PREG_HOST_FORMAT.'$/', $proxy['host'])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect characters used for Proxy name "%s".', $proxy['host']));
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Incorrect characters used for proxy name "%1$s".', $proxy['host']));
 				}
 
 				$proxiesExists = $this->get(array(
@@ -240,16 +246,19 @@ class CProxy extends CZBXAPI {
 			// interface
 			if ($proxy['status'] == HOST_STATUS_PROXY_PASSIVE) {
 				if ($create && empty($proxy['interface'])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('No interface provided for proxy "%s".', $proxy['host']));
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('No interface provided for proxy "%s".', $proxy['host']));
 				}
 
 				if (isset($proxy['interface'])) {
 					if (!is_array($proxy['interface']) || empty($proxy['interface'])) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s('No interface provided for proxy "%s".', $proxy['host']));
+						self::exception(ZBX_API_ERROR_PARAMETERS,
+							_s('No interface provided for proxy "%s".', $proxy['host']));
 					}
 
 					if (!validate_ip($proxy['interface']['ip'], $arr)) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect IP for passive proxy "%1$s" interface.', $proxy['interface']['ip']));
+						self::exception(ZBX_API_ERROR_PARAMETERS,
+							_s('Incorrect IP for passive proxy "%1$s" interface.', $proxy['interface']['ip']));
 					}
 
 					// mark the interface as main to pass host interface validation
@@ -258,7 +267,7 @@ class CProxy extends CZBXAPI {
 			}
 
 			// linked hosts
-			if (isset($proxy['hosts']) && !empty($proxy['hosts'])) {
+			if (!empty($proxy['hosts'])) {
 				$hostIds = zbx_objectValues($proxy['hosts'], 'hostid');
 
 				$hosts = API::Host()->get(array(
@@ -284,7 +293,7 @@ class CProxy extends CZBXAPI {
 					}
 					else {
 						self::exception(ZBX_API_ERROR_PARAMETERS,
-							_s('Invalid host with ID "%1$s".', $hostId));
+							_('No permissions to referred object or it does not exist!'));
 					}
 				}
 			}
