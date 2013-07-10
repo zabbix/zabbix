@@ -27,7 +27,7 @@
 #include "sysinfo.h"
 #include "zbxjson.h"
 
-#define PPA(n) (*(dl_hp_ppa_info_t *)(buf_ctl + ack.dl_offset + n * sizeof(dl_hp_ppa_info_t)))
+#define PPA(n) (*(dl_hp_ppa_info_t *)(ppa_data_buf + n * sizeof(dl_hp_ppa_info_t)))
 
 static char	buf_ctl[1024];
 
@@ -300,9 +300,9 @@ static int	dlpi_get_stats(int fd, Ext_mib_t *mib)
 static int get_ppa(int fd, char *if_name, int *ppa)
 {
 	dl_hp_ppa_req_t		ppa_req;
-	dl_hp_ppa_ack_t		ack;
-	int			i, flags = RS_HIPRI;
-	char			*buf = NULL;
+	dl_hp_ppa_ack_t		*dlp;
+	int			i, ret, flags = RS_HIPRI;
+	char			*buf = NULL, *ppa_data_buf;
 
 	ppa_req.dl_primitive = DL_HP_PPA_REQ;
 
@@ -313,31 +313,62 @@ static int get_ppa(int fd, char *if_name, int *ppa)
 		return FAIL;
 
 	ctlbuf.buf = buf_ctl;
-	ctlbuf.maxlen = sizeof(buf_ctl);
+	ctlbuf.maxlen = DL_HP_PPA_ACK_SIZE;
 
-	if (0 > getmsg(fd, &ctlbuf, NULL, &flags))
+	ret = getmsg(fd, &ctlbuf, NULL, &flags);
+
+	/* get the head first */
+	if (0 > ret)
 		return FAIL;
 
-	if (DL_HP_PPA_ACK != *(int *)buf_ctl)
+	dlp = (dl_hp_ppa_ack_t *)ctlbuf.buf;
+
+	if (DL_HP_PPA_ACK != dlp->dl_primitive)
 		return FAIL;
 
-	ack = *(dl_hp_ppa_ack_t *)buf_ctl;
+	if (DL_HP_PPA_ACK_SIZE > ctlbuf.len)
+		return FAIL;
 
-	buf = zbx_malloc(buf, strlen(if_name) + 1);
-
-	for (i = 0; i < ack.dl_count; i++)
+	if (MORECTL == ret)
 	{
-		zbx_snprintf(buf, strlen(if_name) + 1, "%s%d", PPA(i).dl_module_id_1, PPA(i).dl_ppa);
+		if (NULL == (ppa_data_buf = (char *)malloc(dlp->dl_count * sizeof(dl_hp_ppa_info_t))))
+			return FAIL;
 
-		if (0 == strcmp(if_name, buf))
+		ctlbuf.maxlen = dlp->dl_count * sizeof(dl_hp_ppa_info_t);
+		ctlbuf.len = 0;
+		ctlbuf.buf = ppa_data_buf;
+
+		/* get the data */
+		if (0 > getmsg(fd, &ctlbuf, NULL, &flags))
 		{
-			*ppa = PPA(i).dl_ppa;
-			zbx_free(buf);
-			return SUCCEED;
+			free(ppa_data_buf);
+			return FAIL;
 		}
-	}
 
-	zbx_free(buf);
+		if (ctlbuf.len < dlp->dl_length)
+		{
+			free(ppa_data_buf);
+			return FAIL;
+		}
+
+		buf = zbx_malloc(buf, strlen(if_name) + 1);
+
+		for (i = 0; i < dlp->dl_count; i++)
+		{
+			zbx_snprintf(buf, strlen(if_name) + 1, "%s%d", PPA(i).dl_module_id_1, PPA(i).dl_ppa);
+
+			if (0 == strcmp(if_name, buf))
+			{
+				*ppa = PPA(i).dl_ppa;
+				zbx_free(buf);
+				zbx_free(ppa_data_buf);
+				return SUCCEED;
+			}
+		}
+		zbx_free(ppa_data_buf);
+		zbx_free(buf);
+		return FAIL;
+	}
 	return FAIL;
 }
 
