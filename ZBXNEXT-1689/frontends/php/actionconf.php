@@ -153,7 +153,7 @@ elseif (isset($_REQUEST['save'])) {
 	$result = DBend($result);
 	if ($result) {
 		add_audit(
-			!isset($_REQUEST['actionid']) ? AUDIT_ACTION_ADD : AUDIT_ACTION_UPDATE,
+			isset($_REQUEST['actionid']) ? AUDIT_ACTION_UPDATE : AUDIT_ACTION_ADD,
 			AUDIT_RESOURCE_ACTION,
 			_('Name').NAME_DELIMITER.$_REQUEST['name']
 		);
@@ -455,7 +455,8 @@ if (isset($_REQUEST['form'])) {
 }
 else {
 	$data = array(
-		'eventsource' => get_request('eventsource')
+		'eventsource' => get_request('eventsource'),
+		'displayNodes' => is_array(get_current_nodeid())
 	);
 
 	$sortfield = getPageSortField('name');
@@ -473,6 +474,14 @@ else {
 	// sorting && paging
 	order_result($data['actions'], $sortfield, getPageSortOrder());
 	$data['paging'] = getPagingLine($data['actions']);
+
+	// nodes
+	if ($data['displayNodes']) {
+		foreach ($data['actions'] as &$action) {
+			$action['nodename'] = get_node_name_by_elid($action['actionid'], true);
+		}
+		unset($action);
+	}
 
 	// render view
 	$actionView = new CView('configuration.action.list', $data);
