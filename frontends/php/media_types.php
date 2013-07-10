@@ -285,7 +285,7 @@ else {
 	}
 	else {
 		$arr = array();
-		$data['paging'] = getPagingLine();
+		$data['paging'] = getPagingLine($arr);
 	}
 
 	// render view
