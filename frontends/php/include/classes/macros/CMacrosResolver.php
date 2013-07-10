@@ -805,7 +805,7 @@ class CMacrosResolver {
 		}
 
 		// build item retrieval query from host-key pairs
-		$query = 'SELECT h.host,i.key_,i.itemid,i.lastclock,i.lastvalue,i.value_type,i.units,i.valuemapid'.
+		$query = 'SELECT h.host,i.key_,i.itemid,i.value_type,i.units,i.valuemapid'.
 					' FROM items i, hosts h'.
 					' WHERE i.hostid=h.hostid AND (';
 		foreach ($hostKeyPairs as $host => $keys) {
@@ -825,7 +825,7 @@ class CMacrosResolver {
 		$allowedItems = API::Item()->get(array(
 			'itemids' => array_keys($items),
 			'webitems' => true,
-			'output' => API_OUTPUT_REFER,
+			'output' => array('itemid', 'value_type'),
 			'preservekeys' => true
 		));
 
@@ -835,6 +835,10 @@ class CMacrosResolver {
 				$hostKeyPairs[$item['host']][$item['key_']] = $item;
 			}
 		}
+
+		// fetch history
+		$historyManager = new CHistoryManager();
+		$history = $historyManager->fetchLast($items);
 
 		// replace macros with their corresponding values in graph strings
 		$matches = reset($matchesList);
@@ -850,7 +854,12 @@ class CMacrosResolver {
 
 					// macro function is "last"
 					if ($matches['functions'][$i][0] == 'last') {
-						$value = formatItemLastValue($item, UNRESOLVED_MACRO_STRING);
+						if (isset($history[$item['itemid']])) {
+							$value = formatHistoryValue($history[$item['itemid']][0]['value'], $item);
+						}
+						else {
+							$value = UNRESOLVED_MACRO_STRING;
+						}
 					}
 					// macro function is "max", "min" or "avg"
 					else {
