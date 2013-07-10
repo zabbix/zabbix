@@ -372,8 +372,10 @@ static int	evaluate_aggregate(DC_ITEM *item, AGENT_RESULT *res, int grp_func, co
 
 	for (i = 0; i < itemids.values_num; i++)
 	{
-		if (SUCCEED != errorcodes[i] || (items[i].value_type != ITEM_VALUE_TYPE_FLOAT &&
-				items[i].value_type != ITEM_VALUE_TYPE_UINT64))
+		if (SUCCEED != errorcodes[i])
+			continue;
+
+		if (ITEM_VALUE_TYPE_FLOAT != items[i].value_type && ITEM_VALUE_TYPE_UINT64 != items[i].value_type)
 			continue;
 
 		zbx_vc_value_vector_create(&values);
@@ -395,15 +397,12 @@ static int	evaluate_aggregate(DC_ITEM *item, AGENT_RESULT *res, int grp_func, co
 					case ITEM_VALUE_TYPE_FLOAT:
 						group_value.value.dbl = (double)item_result.ui64;
 						break;
-					default:
-						THIS_SHOULD_NEVER_HAPPEN;
-						goto skip;
 				}
 			}
 
 			zbx_vector_vc_value_append_ptr(&group_values, &group_value);
 		}
-skip:
+
 		zbx_vc_value_vector_destroy(&values, items[i].value_type);
 	}
 
