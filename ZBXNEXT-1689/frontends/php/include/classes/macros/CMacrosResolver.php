@@ -607,24 +607,29 @@ class CMacrosResolver {
 	 * @return bool
 	 */
 	private function resolveItemMacros(array $macros, array $triggers, array $macroValues) {
-		if (!empty($macros)) {
-			$dbFuncs = DBselect(
-				'SELECT f.triggerid,f.functionid,i.itemid,i.lastvalue,i.lastclock,i.value_type,i.units,i.valuemapid,m.mappingid,m.newvalue'.
+		if ($macros) {
+			$functions = DbFetchArray(DBselect(
+				'SELECT f.triggerid,f.functionid,i.itemid,i.value_type,i.units,i.valuemapid'.
 				' FROM functions f'.
 					' JOIN items i ON f.itemid=i.itemid'.
 					' JOIN hosts h ON i.hostid=h.hostid'.
-					' LEFT JOIN mappings m ON i.valuemapid=m.valuemapid AND i.lastvalue=m.value'.
 				' WHERE '.dbConditionInt('f.functionid', array_keys($macros))
-			);
+			));
+
+			$historyManager = new CHistoryManager();
+			$history = $historyManager->fetchLast($functions);
+
 			// false passed to DBfetch to get data without null converted to 0, which is done by default
-			while ($func = DBfetch($dbFuncs, false)) {
+			foreach ($functions as $func) {
 				foreach ($macros[$func['functionid']] as $macro => $fNums) {
+					$lastValue = isset($history[$func['itemid']]) ? $history[$func['itemid']][0]['value'] : null;
+
 					switch ($macro) {
 						case 'ITEM.LASTVALUE':
-							$replace = $this->resolveItemLastvalueMacro($func);
+							$replace = $this->resolveItemLastvalueMacro($lastValue, $func);
 							break;
 						case 'ITEM.VALUE':
-							$replace = $this->resolveItemValueMacro($func, $triggers[$func['triggerid']]);
+							$replace = $this->resolveItemValueMacro($lastValue, $func, $triggers[$func['triggerid']]);
 							break;
 					}
 
@@ -639,14 +644,13 @@ class CMacrosResolver {
 	/**
 	 * Resolve {ITEM.LASTVALUE} macro.
 	 *
+	 * @param mixed $lastValue
 	 * @param array $item
 	 *
 	 * @return string
 	 */
-	private function resolveItemLastvalueMacro(array $item) {
-		return is_null($item['mappingid'])
-			? formatItemLastValue($item, UNRESOLVED_MACRO_STRING)
-			: $item['newvalue'].' ('.$item['lastvalue'].')';
+	private function resolveItemLastvalueMacro($lastValue, array $item) {
+		return ($lastValue !== null) ? formatHistoryValue($lastValue, $item) : UNRESOLVED_MACRO_STRING;
 	}
 
 	/**
@@ -654,19 +658,20 @@ class CMacrosResolver {
 	 * For triggers macro is resolved in same way as {ITEM.LASTVALUE} macro. Separate methods are created for event description,
 	 * where {ITEM.VALUE} macro resolves in different way.
 	 *
+	 * @param mixed $lastValue
 	 * @param array $item
 	 * @param array $trigger
 	 *
 	 * @return string
 	 */
-	private function resolveItemValueMacro(array $item, array $trigger) {
+	private function resolveItemValueMacro($lastValue, array $item, array $trigger) {
 		if ($this->config == 'eventDescription') {
-			$item['lastvalue'] = item_get_history($item, 0, $trigger['clock'], $trigger['ns']);
+			$value = item_get_history($item, 0, $trigger['clock'], $trigger['ns']);
 
-			return formatItemLastValue($item, UNRESOLVED_MACRO_STRING);
+			return ($value !== null) ? formatHistoryValue($value, $item) : UNRESOLVED_MACRO_STRING;
 		}
 		else {
-			return $this->resolveItemLastvalueMacro($item);
+			return $this->resolveItemLastvalueMacro($lastValue, $item);
 		}
 	}
 
