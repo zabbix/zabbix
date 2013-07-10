@@ -168,15 +168,15 @@ var chkbxRange = {
 		var path = new Curl();
 		this.page = path.getPath();
 		this.selected_ids = cookie.readJSON('cb_' + this.page);
-		var chk_bx = jQuery('table.tableinfo input.checkbox:not(:disabled)');
+		var chkboxes = jQuery('table.tableinfo input.checkbox:not(:disabled)');
 
-		if (chk_bx.length > 0) {
-			for (var i = 0; i < chk_bx.length; i++) {
-				this.implement(chk_bx[i]);
+		if (chkboxes.length > 0) {
+			for (var i = 0; i < chkboxes.length; i++) {
+				this.implement(chkboxes[i]);
 			}
 		}
 
-		this.allSelected();
+		this.selectMainCheckbox();
 
 		this.goButton = $('goButton');
 		if (!is_null(this.goButton)) {
@@ -187,34 +187,33 @@ var chkbxRange = {
 	},
 
 	implement: function(obj) {
-		var obj_name = obj.name.split('[')[0];
+		var objName = obj.name.split('[')[0];
 
-		if (typeof(this.chkboxes[obj_name]) === 'undefined') {
-			this.chkboxes[obj_name] = [];
+		if (typeof(this.chkboxes[objName]) === 'undefined') {
+			this.chkboxes[objName] = [];
 		}
-		this.chkboxes[obj_name].push(obj);
+		this.chkboxes[objName].push(obj);
 
 		addListener(obj, 'click', this.check.bindAsEventListener(this), false);
 
-		if (obj_name == this.pageGoName) {
-			var obj_id = jQuery(obj).val();
-			if (isset(obj_id, this.selected_ids)) {
+		if (objName == this.pageGoName) {
+			var objId = jQuery(obj).val();
+			if (isset(objId, this.selected_ids)) {
 				obj.checked = true;
 			}
 		}
 	},
 
-	// check if all chkboxes are checked
-	allSelected: function() {
-		var chkboxesAvailable = jQuery('table.tableinfo tr:not(.header) input.checkbox:not(:disabled)').length;
-		var chkboxesChecked = jQuery('table.tableinfo tr:not(.header) input.checkbox:not(:disabled):checked').length;
-		var mainCheckbox = jQuery('table.tableinfo tr.header input.checkbox:not(:disabled)')[0];
+	// check if all checkboxes are selected and select main checkbox
+	selectMainCheckbox: function() {
+		var countAvailable = jQuery('.tableinfo tr:not(.header) .checkbox:not(:disabled)').length;
+		var countChecked = jQuery('.tableinfo tr:not(.header) .checkbox:not(:disabled):checked').length;
+		var mainCheckbox = jQuery('.tableinfo .header .checkbox:not(:disabled)')[0];
 
-		if (chkboxesAvailable > 0) {
-			mainCheckbox.checked = (chkboxesChecked == chkboxesAvailable) ? true : false;
+		if (countAvailable > 0) {
+			mainCheckbox.checked = (countChecked == countAvailable) ? true : false;
 		}
-		else if (mainCheckbox.length > 0) {
-			mainCheckbox.checked = false;
+		else if (typeof(mainCheckbox) !== 'undefined') {
 			mainCheckbox.disabled = true;
 		}
 	},
@@ -225,7 +224,7 @@ var chkbxRange = {
 
 		PageRefresh.restart();
 
-		if (typeof(obj) == 'undefined' || obj.type.toLowerCase() != 'checkbox') {
+		if (typeof(obj) === 'undefined' || obj.type.toLowerCase() != 'checkbox' || obj.disabled === true) {
 			return true;
 		}
 
@@ -234,16 +233,16 @@ var chkbxRange = {
 		if (obj.name.indexOf('all_') > -1 || obj.name.indexOf('_single') > -1) {
 			return true;
 		}
-		var obj_name = obj.name.split('[')[0];
+		var objName = obj.name.split('[')[0];
 
 		// check range selection
 		if (e.ctrlKey || e.shiftKey) {
-			if (!is_null(this.startbox) && this.startbox_name == obj_name && obj.name != this.startbox.name) {
-				var chkboxes = this.chkboxes[obj_name];
+			if (!is_null(this.startbox) && this.startbox_name == objName && obj.name != this.startbox.name) {
+				var chkboxes = this.chkboxes[objName];
 				var flag = false;
 
 				for (var i = 0; i < chkboxes.length; i++) {
-					if (typeof(chkboxes[i]) != 'undefined') {
+					if (typeof(chkboxes[i]) !== 'undefined') {
 						if (flag) {
 							chkboxes[i].checked = this.startbox.checked;
 						}
@@ -258,17 +257,19 @@ var chkbxRange = {
 
 				if (flag) {
 					this.setGo();
+					this.selectMainCheckbox();
 					return true;
 				}
 				else {
 					for (var i = chkboxes.length - 1; i >= 0; i--) {
-						if (typeof(chkboxes[i]) != 'undefined') {
+						if (typeof(chkboxes[i]) !== 'undefined') {
 							if (flag) {
 								chkboxes[i].checked = this.startbox.checked;
 							}
 
 							if (obj.name == chkboxes[i].name) {
 								this.setGo();
+								this.selectMainCheckbox();
 								return true;
 							}
 
@@ -279,25 +280,28 @@ var chkbxRange = {
 					}
 				}
 			}
+
 			this.setGo();
 		}
-		this.startbox = obj;
-		this.startbox_name = obj_name;
+		else {
+			this.selectMainCheckbox();
+		}
 
-		this.allSelected();
+		this.startbox = obj;
+		this.startbox_name = objName;
 	},
 
 	checkAll: function(name, value) {
-		if (typeof(this.chkboxes[name]) == 'undefined') {
+		if (typeof(this.chkboxes[name]) === 'undefined') {
 			return false;
 		}
 
-		var chk_bx = this.chkboxes[name];
-		for (var i = 0; i < chk_bx.length; i++) {
-			if (typeof(chk_bx[i]) != 'undefined' && chk_bx[i].disabled != true) {
-				var obj_name = chk_bx[i].name.split('[')[0];
-				if (obj_name == name) {
-					chk_bx[i].checked = value;
+		var chkboxes = this.chkboxes[name];
+		for (var i = 0; i < chkboxes.length; i++) {
+			if (typeof(chkboxes[i]) !== 'undefined' && chkboxes[i].disabled !== true) {
+				var objName = chkboxes[i].name.split('[')[0];
+				if (objName == name) {
+					chkboxes[i].checked = value;
 				}
 			}
 		}
@@ -305,17 +309,17 @@ var chkbxRange = {
 
 	setGo: function() {
 		if (!is_null(this.pageGoName)) {
-			if (typeof(this.chkboxes[this.pageGoName]) == 'undefined') {
+			if (typeof(this.chkboxes[this.pageGoName]) === 'undefined') {
 				return false;
 			}
 
-			var chk_bx = this.chkboxes[this.pageGoName];
-			for (var i = 0; i < chk_bx.length; i++) {
-				if (typeof(chk_bx[i]) != 'undefined') {
-					var box = chk_bx[i];
-					var obj_name = box.name.split('[')[0];
-					var obj_id  = box.name.split('[')[1];
-					obj_id = obj_id.substring(0, obj_id.lastIndexOf(']'));
+			var chkboxes = this.chkboxes[this.pageGoName];
+			for (var i = 0; i < chkboxes.length; i++) {
+				if (typeof(chkboxes[i]) !== 'undefined') {
+					var box = chkboxes[i];
+					var objName = box.name.split('[')[0];
+					var objId  = box.name.split('[')[1];
+					objId = objId.substring(0, objId.lastIndexOf(']'));
 					var crow = getParent(box, 'tr');
 
 					if (box.checked) {
@@ -326,8 +330,8 @@ var chkbxRange = {
 							}
 							crow.className = 'selected';
 						}
-						if (obj_name == this.pageGoName) {
-							this.selected_ids[obj_id] = obj_id;
+						if (objName == this.pageGoName) {
+							this.selected_ids[objId] = objId;
 						}
 					}
 					else {
@@ -339,8 +343,8 @@ var chkbxRange = {
 								crow.removeAttribute('origClass');
 							}
 						}
-						if (obj_name == this.pageGoName) {
-							delete(this.selected_ids[obj_id]);
+						if (objName == this.pageGoName) {
+							delete(this.selected_ids[objId]);
 						}
 					}
 				}
