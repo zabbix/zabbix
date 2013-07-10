@@ -64,8 +64,7 @@ foreach ($data['discoveries'] as $discovery) {
 		$template_host = get_realhost_by_itemid($discovery['templateid']);
 		$description[] = new CLink(
 			$template_host['name'],
-			'?hostid='.$template_host['hostid'].
-				'&referid='.$this->data['hostid'],
+			'?hostid='.$template_host['hostid'],
 			'unknown'
 		);
 		$description[] = NAME_DELIMITER;
@@ -120,7 +119,10 @@ $goComboBox->addItem($goOption);
 
 $goButton = new CSubmit('goButton', _('Go').' (0)');
 $goButton->setAttribute('id', 'goButton');
+
 zbx_add_post_js('chkbxRange.pageGoName = "g_hostdruleid";');
+zbx_add_post_js('chkbxRange.prefix = "'.$this->data['hostid'].'";');
+zbx_add_post_js('cookie.prefix = "'.$this->data['hostid'].'";');
 
 // append table to form
 $discoveryForm->addItem(array($this->data['paging'], $discoveryTable, $this->data['paging'], get_table_header(array($goComboBox, $goButton))));
@@ -128,4 +130,3 @@ $discoveryForm->addItem(array($this->data['paging'], $discoveryTable, $this->dat
 // append form to widget
 $discoveryWidget->addItem($discoveryForm);
 return $discoveryWidget;
-?>

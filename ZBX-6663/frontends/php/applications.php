@@ -34,7 +34,6 @@ require_once dirname(__FILE__).'/include/page_header.php';
 $fields = array(
 	'applications' =>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,			null),
 	'hostid' =>				array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID.NOT_ZERO, 'isset({form})&&!isset({applicationid})'),
-	'referid' =>			array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,			null),
 	'groupid' =>			array(T_ZBX_INT, O_OPT, null,	DB_ID,			null),
 	'applicationid' =>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,			'isset({form})&&{form}=="update"'),
 	'appname' =>			array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,		'isset({save})', _('Name')),
@@ -88,8 +87,6 @@ if (get_request('hostid', 0) > 0) {
 	}
 }
 $_REQUEST['go'] = get_request('go', 'none');
-
-resetCurrentPageCookies($_REQUEST['hostid'], get_request('referid', 0));
 
 /*
  * Actions
