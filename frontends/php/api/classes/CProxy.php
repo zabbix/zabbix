@@ -1,4 +1,4 @@
-<?php
+/<?php
 /*
 ** Zabbix
 ** Copyright (C) 2001-2013 Zabbix SIA
@@ -268,7 +268,7 @@ class CProxy extends CZBXAPI {
 				}
 			}
 
-			// linked hosts
+			// check if hosts exist
 			if (!empty($proxy['hosts'])) {
 				$hostIds = zbx_objectValues($proxy['hosts'], 'hostid');
 
@@ -282,21 +282,6 @@ class CProxy extends CZBXAPI {
 				if (empty($hosts)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
 						_('No permissions to referred object or it does not exist!'));
-				}
-
-				// check if host is already linked
-				foreach ($hostIds as $hostId) {
-					if (isset($hosts[$hostId])) {
-						if (!empty($hosts[$hostId]['proxy_hostid'])
-								&& $hosts[$hostId]['proxy_hostid'] != $proxy['proxyid']) {
-							self::exception(ZBX_API_ERROR_PARAMETERS,
-								_s('Cannot add host "%1$s". Host must be unlinked first.', $hosts[$hostId]['name']));
-						}
-					}
-					else {
-						self::exception(ZBX_API_ERROR_PARAMETERS,
-							_('No permissions to referred object or it does not exist!'));
-					}
 				}
 			}
 		}
