@@ -101,12 +101,7 @@ foreach ($this->data['graphs'] as $graph) {
 	if (!empty($graph['templateid'])) {
 		$realHosts = get_realhosts_by_graphid($graph['templateid']);
 		$realHosts = DBfetch($realHosts);
-		$name[] = new CLink(
-			$realHosts['name'],
-			'graphs.php?'.
-				'hostid='.$realHosts['hostid'],
-			'unknown'
-		);
+		$name[] = new CLink($realHosts['name'], 'graphs.php?hostid='.$realHosts['hostid'], 'unknown');
 		$name[] = NAME_DELIMITER;
 		$name[] = new CLink(
 			$graph['name'],
@@ -121,9 +116,7 @@ foreach ($this->data['graphs'] as $graph) {
 	elseif (!empty($graph['discoveryRule']) && empty($this->data['parent_discoveryid'])) {
 		$name[] = new CLink(
 			$graph['discoveryRule']['name'],
-			'host_discovery.php?'.
-				'form=update'.
-				'&itemid='.$graph['discoveryRule']['itemid'],
+			'host_discovery.php?form=update&itemid='.$graph['discoveryRule']['itemid'],
 			'gold'
 		);
 		$name[] = NAME_DELIMITER;

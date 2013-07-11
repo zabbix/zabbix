@@ -163,16 +163,15 @@ var chkbxRange = {
 	pageGoCount:	0,		// selected checkboxes
 	selectedIds:	{},		// ids of selected checkboxes
 	goButton:		null,
-	page:			null,	// loaded page name
 	cookieName:		null,
 
 	init: function() {
 		var path = new Curl();
-		this.page = path.getPath();
-		this.cookieName = 'cb_' + (is_null(this.prefix) ? '' : this.prefix + '_') + this.page;
+		var filename = basename(path.getPath(), '.php');
+		this.cookieName = 'cb_' + filename + (is_null(this.prefix) ? '' : '_' + this.prefix);
 		this.selectedIds = cookie.readJSON(this.cookieName);
-		var chkboxes = jQuery('.tableinfo .checkbox:not(:disabled)');
 
+		var chkboxes = jQuery('.tableinfo .checkbox:not(:disabled)');
 		if (chkboxes.length > 0) {
 			for (var i = 0; i < chkboxes.length; i++) {
 				this.implement(chkboxes[i]);
@@ -214,12 +213,16 @@ var chkbxRange = {
 		var mainCheckbox = jQuery('.tableinfo .header .checkbox:not(:disabled)')[0];
 
 		if (countAvailable > 0) {
-			mainCheckbox.checked = (countChecked == countAvailable) ? true : false;
+			mainCheckbox.checked = (countChecked == countAvailable);
+			if (mainCheckbox.checked) {
+				jQuery('.tableinfo .header').addClass('selectedMain');
+			}
+			else {
+				jQuery('.tableinfo .header').removeClass('selectedMain');
+			}
 		}
 		else if (typeof(mainCheckbox) !== 'undefined') {
 			mainCheckbox.disabled = true;
-			jQuery('#go')[0].disabled = true;
-			jQuery('#goButton')[0].disabled = true;
 		}
 	},
 
@@ -310,49 +313,56 @@ var chkbxRange = {
 				}
 			}
 		}
+
+		var mainCheckbox = jQuery('.tableinfo .header .checkbox:not(:disabled)')[0];
+		if (mainCheckbox.checked) {
+			jQuery('.tableinfo .header').addClass('selectedMain');
+		}
+		else {
+			jQuery('.tableinfo .header').removeClass('selectedMain');
+		}
 	},
 
 	setGo: function() {
 		if (!is_null(this.pageGoName)) {
-			if (typeof(this.chkboxes[this.pageGoName]) === 'undefined') {
-				return false;
-			}
+			if (typeof(this.chkboxes[this.pageGoName]) !== 'undefined') {
+				var chkboxes = this.chkboxes[this.pageGoName];
+				for (var i = 0; i < chkboxes.length; i++) {
+					if (typeof(chkboxes[i]) !== 'undefined') {
+						var box = chkboxes[i];
+						var objName = box.name.split('[')[0];
+						var objId = box.name.split('[')[1];
+						objId = objId.substring(0, objId.lastIndexOf(']'));
+						var crow = getParent(box, 'tr');
 
-			var chkboxes = this.chkboxes[this.pageGoName];
-			for (var i = 0; i < chkboxes.length; i++) {
-				if (typeof(chkboxes[i]) !== 'undefined') {
-					var box = chkboxes[i];
-					var objName = box.name.split('[')[0];
-					var objId  = box.name.split('[')[1];
-					objId = objId.substring(0, objId.lastIndexOf(']'));
-					var crow = getParent(box, 'tr');
-
-					if (box.checked) {
-						if (!is_null(crow)) {
-							var origClass = crow.getAttribute('origClass');
-							if (is_null(origClass)) {
-								crow.setAttribute('origClass', crow.className);
+						if (box.checked) {
+							if (!is_null(crow)) {
+								var origClass = crow.getAttribute('origClass');
+								if (is_null(origClass)) {
+									crow.setAttribute('origClass', crow.className);
+								}
+								crow.className = 'selected';
 							}
-							crow.className = 'selected';
-						}
-						if (objName == this.pageGoName) {
-							this.selectedIds[objId] = objId;
-						}
-					}
-					else {
-						if (!is_null(crow)) {
-							var origClass = crow.getAttribute('origClass');
-
-							if (!is_null(origClass)) {
-								crow.className = origClass;
-								crow.removeAttribute('origClass');
+							if (objName == this.pageGoName) {
+								this.selectedIds[objId] = objId;
 							}
 						}
-						if (objName == this.pageGoName) {
-							delete(this.selectedIds[objId]);
+						else {
+							if (!is_null(crow)) {
+								var origClass = crow.getAttribute('origClass');
+
+								if (!is_null(origClass)) {
+									crow.className = origClass;
+									crow.removeAttribute('origClass');
+								}
+							}
+							if (objName == this.pageGoName) {
+								delete(this.selectedIds[objId]);
+							}
 						}
 					}
 				}
+
 			}
 
 			var countChecked = 0;
@@ -368,6 +378,9 @@ var chkbxRange = {
 			}
 
 			cookie.createJSON(this.cookieName, this.selectedIds);
+
+			jQuery('#go')[0].disabled = (countChecked == 0);
+			jQuery('#goButton')[0].disabled = (countChecked == 0);
 
 			this.pageGoCount = countChecked;
 		}

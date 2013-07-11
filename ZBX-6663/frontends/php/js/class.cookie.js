@@ -23,13 +23,13 @@ var cookie = {
 
 	init: function() {
 		var path = new Curl();
-		var page = path.getPath();
+		var filename = basename(path.getPath(), '.php');
+		var cookieName = 'cb_' + filename + (is_null(this.prefix) ? '' : '_' + this.prefix);
 		var allCookies = document.cookie.split('; ');
 
 		for (var i = 0; i < allCookies.length; i++) {
 			var cookiePair = allCookies[i].split('=');
-			if (cookiePair[0].indexOf('cb_') > -1
-					&& cookiePair[0].indexOf('cb_' + (is_null(this.prefix) ? '' : this.prefix + '_') + page) == -1) {
+			if (cookiePair[0].indexOf('cb_') > -1 && cookiePair[0].indexOf(cookieName) == -1) {
 				this.erase(cookiePair[0]);
 			}
 			else {
@@ -174,7 +174,7 @@ var cookie = {
 	},
 
 	eraseArray: function(name) {
-		var name = 'cb_' + (is_null(this.prefix) ? '' : this.prefix + '_') + name;
+		var name = 'cb_' + name + (is_null(this.prefix) ? '' : '_' + this.prefix);
 		var partCount = parseInt(this.read(name + '_parts'), 10);
 
 		if (!is_null(partCount)) {

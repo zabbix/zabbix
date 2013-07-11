@@ -133,17 +133,14 @@ foreach ($this->data['triggers'] as $tnum => $trigger) {
 				$tpl_disc_ruleid = get_realrule_by_itemid_and_hostid($this->data['parent_discoveryid'], $real_host['hostid']);
 				$description[] = new CLink(
 					CHtml::encode($real_host['name']),
-					'trigger_prototypes.php?'.
-						'hostid='.$real_host['hostid'].
-						'&parent_discoveryid='.$tpl_disc_ruleid,
+					'trigger_prototypes.php?hostid='.$real_host['hostid'].'&parent_discoveryid='.$tpl_disc_ruleid,
 					'unknown'
 				);
 			}
 			else {
 				$description[] = new CLink(
 					CHtml::encode($real_host['name']),
-					'triggers.php?'.
-						'hostid='.$real_host['hostid'],
+					'triggers.php?hostid='.$real_host['hostid'],
 					'unknown'
 				);
 			}
@@ -156,8 +153,7 @@ foreach ($this->data['triggers'] as $tnum => $trigger) {
 			$description[] = new CLink(
 				CHtml::encode($trigger['discoveryRule']['name']),
 				'trigger_prototypes.php?'.
-					'hostid='.$this->data['hostid'].
-					'&parent_discoveryid='.$trigger['discoveryRule']['itemid'],
+					'hostid='.$this->data['hostid'].'&parent_discoveryid='.$trigger['discoveryRule']['itemid'],
 				'gold'
 			);
 			$description[] = NAME_DELIMITER.$trigger['description'];
@@ -165,10 +161,7 @@ foreach ($this->data['triggers'] as $tnum => $trigger) {
 		else {
 			$description[] = new CLink(
 				CHtml::encode($trigger['description']),
-				'triggers.php?'.
-					'form=update'.
-					'&hostid='.$this->data['hostid'].
-					'&triggerid='.$triggerid
+				'triggers.php?form=update&hostid='.$this->data['hostid'].'&triggerid='.$triggerid
 			);
 		}
 
