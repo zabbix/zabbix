@@ -101,12 +101,10 @@ zbx_vc_chunk_t;
 
 /* min/max number number of item history values to store in chunk */
 
-/* the minimum number is calculated so that 3 chunks of 1/2 value count size takes less space */
-/* than 2 chunks of 1 value count size                                                        */
-#define ZBX_VC_MIN_CHUNK_RECORDS	(1 + (sizeof(zbx_vc_chunk_t) - sizeof(zbx_vc_value_t)) / sizeof(zbx_vc_value_t))
+#define ZBX_VC_MIN_CHUNK_RECORDS	8
 
-/* the maximum number is calculated so that the chunk size does not exceed 4KB */
-#define ZBX_VC_MAX_CHUNK_RECORDS	((4 * ZBX_KIBIBYTE - sizeof(zbx_vc_chunk_t)) / sizeof(zbx_vc_value_t) + 1)
+/* the maximum number is calculated so that the chunk size does not exceed 64KB */
+#define ZBX_VC_MAX_CHUNK_RECORDS	((64 * ZBX_KIBIBYTE - sizeof(zbx_vc_chunk_t)) / sizeof(zbx_vc_value_t) + 1)
 
 /* data storage modes */
 #define ZBX_VC_MODE_LASTVALUE	0
@@ -133,10 +131,6 @@ typedef struct
 
 	/* the flag indicating that all data from DB are cached  */
 	int		cached_all;
-
-	/* the number of slots in chunk to store the largest     */
-	/* request data in a signle chunk                        */
-	int		slots_max;
 
 	/* the last (newest) chunk if item history data          */
 	zbx_vc_chunk_t	*head;
@@ -2134,7 +2128,7 @@ static int	vch_item_add_values_at_end(zbx_vc_item_t *item, const zbx_vc_value_t 
 			/* When appending values (adding newer data) keep the chunk slot count at the half  */
 			/* of max values per request. This way the memory taken by item cache will be:      */
 			/*   3 * (<max values per request> * <slot count> + <chunk header size> )           */
-			nslots = vch_get_new_chunk_slot_count(data->slots_max / 2 + 1);
+			nslots = vch_get_new_chunk_slot_count(item->values_total / 2 + 1);
 
 			if (FAIL == vch_item_add_chunk(item, nslots, NULL))
 				goto out;
@@ -2503,7 +2497,7 @@ static int	vch_item_get_value_range(zbx_vc_item_t *item,  zbx_vector_vc_value_t 
 		int timestamp)
 {
 	zbx_vc_data_history_t	*data = &item->data.history;
-	int			ret, records_read, hits, misses, nslots;
+	int			ret, records_read, hits, misses;
 
 	values->values_num = 0;
 
@@ -2533,10 +2527,6 @@ static int	vch_item_get_value_range(zbx_vc_item_t *item,  zbx_vector_vc_value_t 
 		if (records_read > count)
 			records_read = count;
 	}
-
-	nslots = MAX(values->values_num, count);
-	if (data->slots_max < nslots)
-		data->slots_max = nslots;
 
 	hits = values->values_num - records_read;
 	misses = records_read;
@@ -2619,9 +2609,6 @@ static int	vch_item_get_value(zbx_vc_item_t *item, const zbx_timespec_t *ts, zbx
 
 	vc_value_copy(value, &chunk->slots[index], item->value_type);
 
-	if (1 > data->slots_max)
-		data->slots_max = 1;
-
 	if (data->range < now - value->timestamp.sec)
 		data->range = now - value->timestamp.sec;
 
@@ -2693,8 +2680,6 @@ static int	vch_init(zbx_vc_item_t *item, zbx_vector_vc_value_t *values, int seco
 
 	if (0 < values->values_num)
 	{
-		data->slots_max = values->values_num;
-
 		if (NULL != ts)
 		{
 			zbx_timespec_t	*first_ts = &values->values->timestamp;
