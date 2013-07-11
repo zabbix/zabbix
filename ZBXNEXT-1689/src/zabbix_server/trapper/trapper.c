@@ -411,7 +411,7 @@ static int	recv_getqueue(zbx_sock_t *sock, struct zbx_json_parse *jp)
 
 			break;
 	}
-	zbx_tcp_send_to(sock, json.buffer, CONFIG_TIMEOUT);
+	zbx_tcp_send_raw(sock, json.buffer);
 
 	DCfree_item_queue(&queue);
 	zbx_json_free(&json);
