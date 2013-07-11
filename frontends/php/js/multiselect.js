@@ -406,8 +406,10 @@ jQuery(function($) {
 			}
 
 			// resize
-			resizeSelected(obj, values, options);
-			resizeAvailable(obj);
+			if (!options.selectedLimit || $('.selected li', obj).length < options.selectedLimit) {
+				resizeSelected(obj, values, options);
+				resizeAvailable(obj);
+			}
 		});
 	};
 
@@ -547,8 +549,13 @@ jQuery(function($) {
 			});
 
 			var text = $('<span>', {
+				'class': 'text'
+			});
+
+			var textDiv = $('<div>', {
 				'class': 'text',
-				text: empty(item.prefix) ? item.name : item.prefix + item.name
+				text: empty(item.prefix) ? item.name : item.prefix + item.name,
+				css: {width: values.width - 20}
 			});
 
 			if (options.disabled) {
@@ -563,14 +570,16 @@ jQuery(function($) {
 					removeSelected($(this).data('id'), obj, values, options);
 				});
 
-				$('.selected ul', obj).append(li.append(text, arrow));
+				$('.selected ul', obj).append(li.append(text.append(textDiv.append(arrow))));
 			}
 
 			removePlaceholder(obj);
 
 			// resize
-			resizeSelected(obj, values, options);
-			resizeAvailable(obj);
+			if (!options.selectedLimit || $('.selected li', obj).length < options.selectedLimit) {
+				resizeSelected(obj, values, options);
+				resizeAvailable(obj);
+			}
 
 			// set readonly
 			if (options.selectedLimit > 0 && $('.selected li', obj).length == options.selectedLimit) {
@@ -587,8 +596,10 @@ jQuery(function($) {
 		delete values.selected[id];
 
 		// resize
-		resizeSelected(obj, values, options);
-		resizeAvailable(obj);
+		if (!options.selectedLimit || $('.selected li', obj).length < options.selectedLimit) {
+			resizeSelected(obj, values, options);
+			resizeAvailable(obj);
+		}
 
 		// remove readonly
 		if ($('.selected li', obj).length == 0) {
