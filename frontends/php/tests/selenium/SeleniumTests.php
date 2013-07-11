@@ -182,7 +182,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testInheritanceItemPrototype');
 		$suite->addTestSuite('testInheritanceTriggerPrototype');
 		$suite->addTestSuite('testInheritanceGraphPrototype');
-		$suite->addTestSuite('testZBX6339.php');
+		$suite->addTestSuite('testZBX6339');
 		$suite->addTestSuite('testZBX6663.php');
 
 		return $suite;
