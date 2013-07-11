@@ -32,26 +32,27 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = array(
-	'regexpids' =>				array(T_ZBX_INT, O_OPT, P_SYS,       DB_ID,     null),
-	'regexpid' =>				array(T_ZBX_INT, O_OPT, P_SYS,       DB_ID,     'isset({form})&&({form}=="update")'),
-	'name' =>					array(T_ZBX_STR, O_OPT, null,        NOT_EMPTY, 'isset({save})', _('Name')),
-	'test_string' =>			array(T_ZBX_STR, O_OPT, null,        null,      'isset({save})', _('Test string')),
-	'expressions' =>			array(T_ZBX_STR, O_OPT, null,        null,      'isset({save})'),
-	'save' =>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,      null),
-	'delete' =>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,      null),
-	'clone' =>					array(T_ZBX_STR, O_OPT, null,        null,      null),
-	'go' =>						array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,      null),
-	'form' =>					array(T_ZBX_STR, O_OPT, P_SYS,       null,      null),
-	'form_refresh' =>			array(T_ZBX_INT, O_OPT, null,        null,      null),
+	'regexpids' =>				array(T_ZBX_INT, O_OPT, P_SYS,		DB_ID,	null),
+	'regexpid' =>				array(T_ZBX_INT, O_OPT, P_SYS,		DB_ID,	'isset({form})&&{form}=="update"'),
+	'name' =>					array(T_ZBX_STR, O_OPT, null,		NOT_EMPTY, 'isset({save})', _('Name')),
+	'test_string' =>			array(T_ZBX_STR, O_OPT, null,		null,	'isset({save})', _('Test string')),
+	'expressions' =>			array(T_ZBX_STR, O_OPT, null,		null,	'isset({save})'),
+	'save' =>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
+	'delete' =>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
+	'clone' =>					array(T_ZBX_STR, O_OPT, null,		null,	null),
+	'go' =>						array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
+	'form' =>					array(T_ZBX_STR, O_OPT, P_SYS,		null,	null),
+	'form_refresh' =>			array(T_ZBX_INT, O_OPT, null,		null,	null),
 	// ajax
-	'output' =>					array(T_ZBX_STR, O_OPT, P_ACT,       null,      null),
-	'ajaxaction' =>				array(T_ZBX_STR, O_OPT, P_ACT,       null,      null),
-	'ajaxdata' =>				array(T_ZBX_STR, O_OPT, P_ACT,       null,      null)
+	'output' =>					array(T_ZBX_STR, O_OPT, P_ACT,		null,	null),
+	'ajaxaction' =>				array(T_ZBX_STR, O_OPT, P_ACT,		null,	null),
+	'ajaxdata' =>				array(T_ZBX_STR, O_OPT, P_ACT,		null,	null)
 );
 check_fields($fields);
 
-
-// ajax
+/*
+ * Ajax
+ */
 if (isset($_REQUEST['output']) && $_REQUEST['output'] == 'ajax') {
 	$ajaxResponse = new AjaxResponse;
 	$ajaxData = get_request('ajaxdata', array());
@@ -93,7 +94,9 @@ if (isset($_REQUEST['go']) && !isset($_REQUEST['regexpid'])) {
 		access_deny();
 	}
 	else {
-		$regExpChk = DBfetch(DBSelect('SELECT COUNT(*) AS cnt FROM regexps re WHERE '.dbConditionInt('re.regexpid', $_REQUEST['regexpids'])));
+		$regExpChk = DBfetch(DBSelect(
+			'SELECT COUNT(*) AS cnt FROM regexps re WHERE '.dbConditionInt('re.regexpid', $_REQUEST['regexpids'])
+		));
 		if ($regExpChk['cnt'] != count($_REQUEST['regexpids'])) {
 			access_deny();
 		}
@@ -115,6 +118,7 @@ elseif (isset($_REQUEST['save'])) {
 	$expressions = get_request('expressions', array());
 
 	DBstart();
+
 	if (isset($_REQUEST['regexpid'])) {
 		$regExp['regexpid'] = $_REQUEST['regexpid'];
 		$result = updateRegexp($regExp, $expressions);
@@ -137,38 +141,42 @@ elseif (isset($_REQUEST['save'])) {
 
 		unset($_REQUEST['form']);
 	}
+
 	Dbend($result);
 }
 elseif (isset($_REQUEST['go'])) {
 	if ($_REQUEST['go'] == 'delete') {
-		$regExpids = get_request('regexpid', array());
+		$regExpIds = get_request('regexpid', array());
+
 		if (isset($_REQUEST['regexpids'])) {
-			$regExpids = $_REQUEST['regexpids'];
+			$regExpIds = $_REQUEST['regexpids'];
 		}
 
-		zbx_value2array($regExpids);
+		zbx_value2array($regExpIds);
 
 		$regExps = array();
-		foreach ($regExpids as $regExpid) {
-			$regExps[$regExpid] = getRegexp($regExpid);
+		foreach ($regExpIds as $regExpId) {
+			$regExps[$regExpId] = getRegexp($regExpId);
 		}
 
 		DBstart();
-		$result = DBexecute('DELETE FROM regexps WHERE '.dbConditionInt('regexpid', $regExpids));
+
+		$result = DBexecute('DELETE FROM regexps WHERE '.dbConditionInt('regexpid', $regExpIds));
 		$result = Dbend($result);
 
-		$regExpCount = count($regExpids);
+		$regExpCount = count($regExpIds);
+
 		show_messages($result,
 			_n('Regular expression deleted', 'Regular expressions deleted', $regExpCount),
 			_n('Cannot delete regular expression', 'Cannot delete regular expressions', $regExpCount)
 		);
+
 		if ($result) {
-			foreach ($regExps as $regExpid => $regExp) {
-				add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_REGEXP, 'Id ['.$regExpid.'] '._('Name').' ['.$regExp['name'].']');
+			foreach ($regExps as $regExpId => $regExp) {
+				add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_REGEXP, 'Id ['.$regExpId.'] '._('Name').' ['.$regExp['name'].']');
 			}
 
-			unset($_REQUEST['form']);
-			unset($_REQUEST['regexpid']);
+			unset($_REQUEST['form'], $_REQUEST['regexpid']);
 
 			$url = new CUrl();
 			$path = $url->getPath();
@@ -177,14 +185,11 @@ elseif (isset($_REQUEST['go'])) {
 	}
 }
 
-
 /*
  * Display
  */
-$form = new CForm();
-$form->cleanItems();
-$cmbConf = new CComboBox('configDropDown', 'adm.regexps.php', 'redirect(this.options[this.selectedIndex].value);');
-$cmbConf->addItems(array(
+$generalComboBox = new CComboBox('configDropDown', 'adm.regexps.php', 'redirect(this.options[this.selectedIndex].value);');
+$generalComboBox->addItems(array(
 	'adm.gui.php' => _('GUI'),
 	'adm.housekeeper.php' => _('Housekeeper'),
 	'adm.images.php' => _('Images'),
@@ -197,34 +202,38 @@ $cmbConf->addItems(array(
 	'adm.triggerdisplayoptions.php' => _('Trigger displaying options'),
 	'adm.other.php' => _('Other')
 ));
-$form->addItem($cmbConf);
+$regExpForm = new CForm();
+$regExpForm->cleanItems();
+$regExpForm->addItem($generalComboBox);
 if (!isset($_REQUEST['form'])) {
-	$form->addItem(new CSubmit('form', _('New regular expression')));
+	$regExpForm->addItem(new CSubmit('form', _('New regular expression')));
 }
 
-$cnf_wdgt = new CWidget();
-$cnf_wdgt->addPageHeader(_('CONFIGURATION OF REGULAR EXPRESSIONS'), $form);
+$regExpWidget = new CWidget();
+$regExpWidget->addPageHeader(_('CONFIGURATION OF REGULAR EXPRESSIONS'), $regExpForm);
 
-$data = array();
 if (isset($_REQUEST['form'])) {
-	$data['regexpid'] = get_request('regexpid');
+	$data = array(
+		'regexpid' => get_request('regexpid')
+	);
 
 	if (isset($_REQUEST['regexpid']) && !isset($_REQUEST['form_refresh'])) {
 		$regExp = DBfetch(DBSelect(
-				'SELECT re.name,re.test_string'.
-				' FROM regexps re'.
-				' WHERE re.regexpid='.$_REQUEST['regexpid'].
-					andDbNode('re.regexpid')
+			'SELECT re.name,re.test_string'.
+			' FROM regexps re'.
+			' WHERE re.regexpid='.$_REQUEST['regexpid'].
+				andDbNode('re.regexpid')
 		));
+
 		$data['name'] = $regExp['name'];
 		$data['test_string'] = $regExp['test_string'];
 
 		$dbExpressions = DBselect(
-				'SELECT e.expressionid,e.expression,e.expression_type,e.exp_delimiter,e.case_sensitive'.
-				' FROM expressions e'.
-				' WHERE e.regexpid='.$_REQUEST['regexpid'].
-					andDbNode('e.expressionid').
-				' ORDER BY e.expression_type'
+			'SELECT e.expressionid,e.expression,e.expression_type,e.exp_delimiter,e.case_sensitive'.
+			' FROM expressions e'.
+			' WHERE e.regexpid='.$_REQUEST['regexpid'].
+				andDbNode('e.expressionid').
+			' ORDER BY e.expression_type'
 		);
 		$data['expressions'] = DBfetchArray($dbExpressions);
 	}
@@ -237,34 +246,36 @@ if (isset($_REQUEST['form'])) {
 	$regExpForm = new CView('administration.general.regularexpressions.edit', $data);
 }
 else {
-	$data['cnf_wdgt'] = &$cnf_wdgt;
-	$data['regexps'] = array();
-	$data['regexpids'] = array();
-
-	$db_regexps = DBselect(
-			'SELECT re.*'.
-			' FROM regexps re'.
-			whereDbNode('re.regexpid')
+	$data = array(
+		'displayNodes' => is_array(get_current_nodeid()),
+		'cnf_wdgt' => &$regExpWidget,
+		'regexps' => array(),
+		'regexpids' => array()
 	);
-	while ($regExp = DBfetch($db_regexps)) {
+
+	$dbRegExp = DBselect('SELECT re.* FROM regexps re '.whereDbNode('re.regexpid'));
+	while ($regExp = DBfetch($dbRegExp)) {
 		$regExp['expressions'] = array();
+		$regExp['nodename'] = $data['displayNodes'] ? get_node_name_by_elid($regExp['regexpid'], true) : '';
+
 		$data['regexps'][$regExp['regexpid']] = $regExp;
 		$data['regexpids'][$regExp['regexpid']] = $regExp['regexpid'];
 	}
+
 	order_result($data['regexps'], 'name');
 
 	$data['db_exps'] = DBfetchArray(DBselect(
-			'SELECT e.*'.
-			' FROM expressions e'.
-			' WHERE '.dbConditionInt('e.regexpid', $data['regexpids']).
-				andDbNode('e.expressionid').
-			' ORDER BY e.expression_type'
+		'SELECT e.*'.
+		' FROM expressions e'.
+		' WHERE '.dbConditionInt('e.regexpid', $data['regexpids']).
+			andDbNode('e.expressionid').
+		' ORDER BY e.expression_type'
 	));
 
 	$regExpForm = new CView('administration.general.regularexpressions.list', $data);
 }
 
-$cnf_wdgt->addItem($regExpForm->render());
-$cnf_wdgt->show();
+$regExpWidget->addItem($regExpForm->render());
+$regExpWidget->show();
 
 require_once dirname(__FILE__).'/include/page_footer.php';

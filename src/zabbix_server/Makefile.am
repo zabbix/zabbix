@@ -80,7 +80,8 @@ zabbix_server_CFLAGS = \
 	-DZABBIX_DAEMON \
 	-DSYSCONFDIR="\"@sysconfdir@\"" \
 	-DDATADIR="\"@datadir@\"" \
-	-DLIBDIR="\"@libdir@\""
+	-DLIBDIR="\"@libdir@\"" \
+	-I@top_srcdir@/src/libs/zbxdbcache
 
 SERVER_CONFIG = zabbix_server.conf
 INCLUDE_DIR = $(DESTDIR)@sysconfdir@/$(SERVER_CONFIG).d

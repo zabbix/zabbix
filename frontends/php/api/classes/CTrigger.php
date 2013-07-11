@@ -20,7 +20,7 @@
 
 
 /**
- * File containing CTrigger class for API.
+ * Class containing methods for operations with triggers.
  *
  * @package API
  */
@@ -146,6 +146,8 @@ class CTrigger extends CTriggerGeneral {
 		// groupids
 		if (!is_null($options['groupids'])) {
 			zbx_value2array($options['groupids']);
+
+			sort($options['groupids']);
 
 			$sqlParts['select']['groupid'] = 'hg.groupid';
 			$sqlParts['from']['functions'] = 'functions f';
@@ -459,38 +461,6 @@ class CTrigger extends CTriggerGeneral {
 				$result[$trigger['triggerid']] = array();
 			}
 
-			// groups
-			if (isset($trigger['groupid']) && is_null($options['selectGroups'])) {
-				if (!isset($result[$trigger['triggerid']]['groups'])) {
-					$result[$trigger['triggerid']]['groups'] = array();
-				}
-
-				$result[$trigger['triggerid']]['groups'][] = array('groupid' => $trigger['groupid']);
-				unset($trigger['groupid']);
-			}
-
-			// hostids
-			if (isset($trigger['hostid']) && is_null($options['selectHosts'])) {
-				if (!isset($result[$trigger['triggerid']]['hosts'])) {
-					$result[$trigger['triggerid']]['hosts'] = array();
-				}
-
-				$result[$trigger['triggerid']]['hosts'][] = array('hostid' => $trigger['hostid']);
-
-				if (is_null($options['expandData'])) {
-					unset($trigger['hostid']);
-				}
-			}
-			// itemids
-			if (isset($trigger['itemid']) && is_null($options['selectItems'])) {
-				if (!isset($result[$trigger['triggerid']]['items'])) {
-					$result[$trigger['triggerid']]['items'] = array();
-				}
-
-				$result[$trigger['triggerid']]['items'][] = array('itemid' => $trigger['itemid']);
-				unset($trigger['itemid']);
-			}
-
 			$result[$trigger['triggerid']] += $trigger;
 		}
 
@@ -501,7 +471,6 @@ class CTrigger extends CTriggerGeneral {
 					'objectids' => $triggerId,
 					'output' => $options['selectLastEvent'],
 					'nopermissions' => true,
-					'filter' => array('value_changed' => TRIGGER_VALUE_CHANGED_YES),
 					'sortfield' => array('eventid'),
 					'sortorder' => ZBX_SORT_DOWN,
 					'limit' => 1
@@ -509,6 +478,16 @@ class CTrigger extends CTriggerGeneral {
 
 				$result[$triggerId]['lastEvent'] = $lastEvent ? reset($lastEvent) : array();
 			}
+		}
+
+		if ($options['groupids'] !== null && $options['selectGroups'] === null) {
+			$options['selectGroups'] = API_OUTPUT_REFER;
+		}
+		if ($options['hostids'] !== null && $options['selectHosts'] === null) {
+			$options['selectHosts'] = API_OUTPUT_REFER;
+		}
+		if ($options['itemids'] !== null && $options['selectItems'] === null) {
+			$options['selectItems'] = API_OUTPUT_REFER;
 		}
 
 		if ($result) {

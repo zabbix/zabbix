@@ -68,8 +68,19 @@ $servicesFormList->addRow(_('Calculate SLA, acceptable SLA (in %)'), array($show
 // append trigger to form list
 $servicesFormList->addRow(_('Trigger'), array(
 	new CTextBox('trigger', $this->data['trigger'], ZBX_TEXTBOX_STANDARD_SIZE, 'yes'),
-	new CButton('btn1', _('Select'), "return PopUp('popup.php?"."dstfrm=".$servicesForm->getName()."&dstfld1=triggerid".
-		"&dstfld2=trigger&srctbl=triggers&srcfld1=triggerid&srcfld2=description&real_hosts=1&with_triggers=1');", 'formlist')
+	new CButton('btn1', _('Select'),
+		'return PopUp("popup.php?'.
+			'dstfrm='.$servicesForm->getName().
+			'&dstfld1=triggerid'.
+			'&dstfld2=trigger'.
+			'&srctbl=triggers'.
+			'&srcfld1=triggerid'.
+			'&srcfld2=description'.
+			'&real_hosts=1'.
+			'&monitored_hosts=1'.
+			'&with_triggers=1");',
+		'formlist'
+	)
 ));
 $servicesFormList->addRow(_('Sort order (0->999)'), new CTextBox('sortorder', $this->data['sortorder'], 3, 'no', 3));
 

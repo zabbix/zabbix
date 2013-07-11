@@ -19,6 +19,11 @@
 **/
 
 
+/**
+ * Class containing methods for operations with user macro.
+ *
+ * @package API
+ */
 class CUserMacro extends CZBXAPI {
 
 	protected $tableName = 'hostmacro';
