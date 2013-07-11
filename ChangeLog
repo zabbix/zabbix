@@ -10,7 +10,7 @@ Changes for 2.1.1
 New features:
 
 Bug fixes:
-A......... [ZBX-6771] fixed "status" field and linked host validation in Proxy API (Ivo)
+A......... [ZBX-6771] fixed "status" field and existing host validation in Proxy API (Ivo)
 ..F....... [ZBX-6732] cookie path is now automatically set from current URL (Ivo)
 ..F....... [ZBX-6706] improved node displaying in frontend (Eduard)
 
