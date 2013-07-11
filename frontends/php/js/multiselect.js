@@ -580,7 +580,8 @@ jQuery(function($) {
 
 						if ($this.height () <= targetHeight) {
 							start = length;
-						} else {
+						}
+						else {
 							end = length - 1;
 						}
 					}
