@@ -1393,11 +1393,11 @@ static int	DBget_history_log_value(zbx_uint64_t itemid, char **replace_to, int r
 		{
 			zbx_timespec_t	ts = {clock, ns};
 
-			ret = zbx_vc_get_value(itemid, ITEM_VALUE_TYPE_LOG, &ts, &value, &found);
+			zbx_vc_get_value(itemid, ITEM_VALUE_TYPE_LOG, &ts, &value, &found);
 		}
 	}
 
-	if (SUCCEED != ret || 1 != found)
+	if (1 != found)
 		goto out;
 
 	switch (request)
@@ -1427,6 +1427,8 @@ static int	DBget_history_log_value(zbx_uint64_t itemid, char **replace_to, int r
 	}
 
 	zbx_vc_value_clear(&value, ITEM_VALUE_TYPE_LOG);
+
+	ret = SUCCEED;
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
@@ -1485,69 +1487,51 @@ static int	DBitem_lastvalue(const char *expression, char **lastvalue, int N_func
 	DB_RESULT	result;
 	DB_ROW		row;
 	zbx_uint64_t	itemid;
-	int		ret = FAIL, found;
+	int		ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	if (FAIL == get_N_itemid(expression, N_functionid, &itemid))
-		goto fail;
+		goto out;
 
 	result = DBselect(
-			"select itemid,value_type,valuemapid,units,lastvalue"
+			"select value_type,valuemapid,units"
 			" from items"
 			" where itemid=" ZBX_FS_UI64,
 			itemid);
 
-	if (NULL != (row = DBfetch(result)) && SUCCEED != DBis_null(row[4]))
+	if (NULL != (row = DBfetch(result)))
 	{
-		zbx_uint64_t	itemid, valuemapid;
-		unsigned char	value_type;
-		char		tmp[MAX_STRING_LEN];
+		zbx_uint64_t		valuemapid;
+		unsigned char		value_type;
+		char			tmp[MAX_STRING_LEN];
+		zbx_vector_vc_value_t	values;
 
-		ZBX_STR2UINT64(itemid, row[0]);
-		value_type = atoi(row[1]);
-		ZBX_DBROW2UINT64(valuemapid, row[2]);
+		zbx_vc_value_vector_create(&values);
 
-		switch (value_type)
+		value_type = atoi(row[0]);
+		ZBX_DBROW2UINT64(valuemapid, row[1]);
+
+		if (SUCCEED != zbx_vc_get_value_range(itemid, value_type, &values, 0, 1, time(NULL)))
+			goto out;
+
+		if (0 < values.values_num)
 		{
-			case ITEM_VALUE_TYPE_LOG:
-			case ITEM_VALUE_TYPE_TEXT:
-			{
-				zbx_timespec_t	ts = {time(NULL), 999999999};
-				zbx_vc_value_t	value;
+			zbx_vc_history_value2str(tmp, sizeof(tmp), &values.values[0].value, value_type);
+			zbx_format_value(tmp, sizeof(tmp), valuemapid, row[2], value_type);
+			*lastvalue = zbx_strdup(*lastvalue, tmp);
 
-				if (SUCCEED == zbx_vc_get_value(itemid, value_type, &ts, &value, &found) &&
-						1 == found)
-				{
-					char	*pvalue;
-
-					if (ITEM_VALUE_TYPE_LOG == value_type)
-						pvalue = value.value.log->value;
-					else
-						pvalue = value.value.str;
-
-					*lastvalue = zbx_strdup(*lastvalue, pvalue);
-					zbx_vc_value_clear(&value, value_type);
-				}
-				else
-					*lastvalue = zbx_strdup(*lastvalue, row[4]);
-
-				break;
-			}
-			default:
-				zbx_strlcpy(tmp, row[4], sizeof(tmp));
-				zbx_format_value(tmp, sizeof(tmp), valuemapid, row[3], value_type);
-				*lastvalue = zbx_strdup(*lastvalue, tmp);
-				break;
+			ret = SUCCEED;
 		}
-		ret = SUCCEED;
+		zbx_vc_value_vector_destroy(&values, value_type);
 	}
 	DBfree_result(result);
-fail:
+out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
 }
+
 
 /******************************************************************************
  *                                                                            *
@@ -1597,7 +1581,7 @@ static int	DBitem_value(const char *expression, char **value, int N_functionid, 
 		value_type = (unsigned char)atoi(row[1]);
 		ZBX_DBROW2UINT64(valuemapid, row[2]);
 
-		if (SUCCEED == (ret = zbx_vc_get_value(itemid, value_type, &ts, &vc_value, &found)) &&
+		if (SUCCEED == zbx_vc_get_value(itemid, value_type, &ts, &vc_value, &found) &&
 				1 == found)
 		{
 			zbx_vc_history_value2str(tmp, sizeof(tmp), &vc_value.value, value_type);
@@ -1612,6 +1596,8 @@ static int	DBitem_value(const char *expression, char **value, int N_functionid, 
 					break;
 			}
 			*value = zbx_strdup(*value, tmp);
+
+			ret = SUCCEED;
 		}
 	}
 	DBfree_result(result);

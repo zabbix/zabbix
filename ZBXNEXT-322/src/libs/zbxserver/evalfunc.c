@@ -140,18 +140,18 @@ clean:
  *               FAIL - failed to evaluate function                           *
  *                                                                            *
  ******************************************************************************/
-static int	evaluate_LOGEVENTID(char *value, DB_ITEM *item, const char *function, const char *parameters,
-		time_t now)
+static int	evaluate_LOGEVENTID(char *value, DB_ITEM *item, const char *function, const char *parameters, time_t now)
 {
-	const char	*__function_name = "evaluate_LOGEVENTID";
-	char		*arg1 = NULL, *arg1_esc;
-	int		ret = FAIL, found;
-	ZBX_REGEXP	*regexps = NULL;
-	int		regexps_alloc = 0, regexps_num = 0;
-	zbx_timespec_t	ts = {now, 999999999};
-	zbx_vc_value_t	last_value;
+	const char		*__function_name = "evaluate_LOGEVENTID";
+	char			*arg1 = NULL, *arg1_esc;
+	int			ret = FAIL;
+	ZBX_REGEXP		*regexps = NULL;
+	int			regexps_alloc = 0, regexps_num = 0;
+	zbx_vector_vc_value_t	values;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	zbx_vc_value_vector_create(&values);
 
 	if (ITEM_VALUE_TYPE_LOG != item->value_type)
 		goto out;
@@ -183,21 +183,22 @@ static int	evaluate_LOGEVENTID(char *value, DB_ITEM *item, const char *function,
 		DBfree_result(result);
 	}
 
-	if (SUCCEED == (ret = zbx_vc_get_value(item->itemid, item->value_type, &ts, &last_value, &found)) &&
-			1 == found)
+	if (SUCCEED ==  zbx_vc_get_value_range(item->itemid, item->value_type, &values, 0, 1, now) &&
+			0 < values.values_num)
 	{
 		char	*logeventid = NULL;
 		size_t	size = 0, offset = 0;
 
-		zbx_snprintf_alloc(&logeventid, &size, &offset, "%d", last_value.value.log->logeventid);
-
-		if (SUCCEED == regexp_match_ex(regexps, regexps_num, logeventid, arg1, ZBX_CASE_SENSITIVE))
+		zbx_snprintf_alloc(&logeventid, &size, &offset, "%d", values.values[0].value.log->logeventid);
+		if (SUCCEED == regexp_match_ex(regexps, regexps_num, logeventid, arg1,
+				ZBX_CASE_SENSITIVE))
 			zbx_strlcpy(value, "1", MAX_BUFFER_LEN);
 		else
 			zbx_strlcpy(value, "0", MAX_BUFFER_LEN);
 
 		zbx_free(logeventid);
-		zbx_vc_value_clear(&last_value, item->value_type);
+
+		ret = SUCCEED;
 	}
 	else
 		zabbix_log(LOG_LEVEL_DEBUG, "result for LOGEVENTID is empty");
@@ -209,6 +210,8 @@ static int	evaluate_LOGEVENTID(char *value, DB_ITEM *item, const char *function,
 	}
 	zbx_free(arg1);
 out:
+	zbx_vc_value_vector_destroy(&values, item->value_type);
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
@@ -229,13 +232,14 @@ out:
  ******************************************************************************/
 static int	evaluate_LOGSOURCE(char *value, DB_ITEM *item, const char *function, const char *parameters, time_t now)
 {
-	const char	*__function_name = "evaluate_LOGSOURCE";
-	char		*arg1 = NULL;
-	int		ret = FAIL, found;
-	zbx_timespec_t	ts = {now, 999999999};
-	zbx_vc_value_t	last_value;
+	const char		*__function_name = "evaluate_LOGSOURCE";
+	char			*arg1 = NULL;
+	int			ret = FAIL;
+	zbx_vector_vc_value_t	values;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	zbx_vc_value_vector_create(&values);
 
 	if (ITEM_VALUE_TYPE_LOG != item->value_type)
 		goto out;
@@ -246,21 +250,23 @@ static int	evaluate_LOGSOURCE(char *value, DB_ITEM *item, const char *function, 
 	if (FAIL == get_function_parameter_str(item->hostid, parameters, 1, &arg1))
 		goto out;
 
-	if (SUCCEED == (ret = zbx_vc_get_value(item->itemid, item->value_type, &ts, &last_value, &found)) &&
-			1 == found)
+	if (SUCCEED == zbx_vc_get_value_range(item->itemid, item->value_type, &values, 0, 1, now) &&
+			0 < values.values_num)
 	{
-		if (0 == strcmp(last_value.value.log->source, arg1))
+		if (0 == strcmp(values.values[0].value.log->source, arg1))
 			zbx_strlcpy(value, "1", MAX_BUFFER_LEN);
 		else
 			zbx_strlcpy(value, "0", MAX_BUFFER_LEN);
 
-		zbx_vc_value_clear(&last_value, item->value_type);
+		ret = SUCCEED;
 	}
 	else
 		zabbix_log(LOG_LEVEL_DEBUG, "result for LOGSOURCE is empty");
 
 	zbx_free(arg1);
 out:
+	zbx_vc_value_vector_destroy(&values, item->value_type);
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
@@ -281,26 +287,30 @@ out:
  ******************************************************************************/
 static int	evaluate_LOGSEVERITY(char *value, DB_ITEM *item, const char *function, const char *parameters, time_t now)
 {
-	const char	*__function_name = "evaluate_LOGSEVERITY";
-	int		ret = FAIL, found;
-	zbx_timespec_t	ts = {now, 999999999};
-	zbx_vc_value_t	last_value;
+	const char		*__function_name = "evaluate_LOGSEVERITY";
+	int			ret = FAIL;
+	zbx_vector_vc_value_t	values;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	zbx_vc_value_vector_create(&values);
 
 	if (ITEM_VALUE_TYPE_LOG != item->value_type)
 		goto out;
 
-	if (SUCCEED == (ret = zbx_vc_get_value(item->itemid, item->value_type, &ts, &last_value, &found)) &&
-			1 == found)
+	if (SUCCEED == zbx_vc_get_value_range(item->itemid, item->value_type, &values, 0, 1, now) &&
+			0 < values.values_num)
 	{
-		zbx_snprintf(value, MAX_BUFFER_LEN, "%d", last_value.value.log->severity);
-		zbx_vc_value_clear(&last_value, item->value_type);
+		zbx_snprintf(value, MAX_BUFFER_LEN, "%d", values.values[0].value.log->severity);
+
+		ret = SUCCEED;
 	}
 	else
 		zabbix_log(LOG_LEVEL_DEBUG, "result for LOGSEVERITY is empty");
 
 out:
+	zbx_vc_value_vector_destroy(&values, item->value_type);
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
