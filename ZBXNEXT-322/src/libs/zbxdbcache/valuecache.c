@@ -73,9 +73,6 @@ ZBX_MEM_FUNC_IMPL(__vc, vc_mem)
 #define VC_STRPOOL_INIT_SIZE	(1000)
 #define VC_ITEMS_INIT_SIZE	(1000)
 
-/* the minimum number of bytes that will be freed when freeing cache space */
-#define VC_MIN_FREE_SPACE	(ZBX_KIBIBYTE * 16)
-
 /* the data chunk used to store data fragment for history storage mode */
 typedef struct _zbx_vc_chunk_t
 {
@@ -230,6 +227,9 @@ typedef struct
 
 	/* the low memory mode flag */
 	int		low_memory;
+
+	/* the minimum number of bytes to be freed when cache runs out of space */
+	int		min_free_request;
 
 	/* the cached items */
 	zbx_hashset_t	items;
@@ -804,8 +804,8 @@ static void	vc_release_space(zbx_vc_item_t *source_item, size_t space)
 	timestamp = ZBX_VC_TIME() - SEC_PER_DAY;
 
 	/* reserve at least VC_MIN_FREE_SPACE bytes to avoid spamming with free space requests */
-	if (space < VC_MIN_FREE_SPACE)
-		space = VC_MIN_FREE_SPACE;
+	if (space < vc_cache->min_free_request)
+		space = vc_cache->min_free_request;
 
 	/* first remove items with the last accessed time older than a day */
 	zbx_hashset_iter_reset(&vc_cache->items, &iter);
@@ -3148,7 +3148,7 @@ void	zbx_vc_init(void)
 {
 	const char	*__function_name = "zbx_vc_init";
 	key_t		shm_key;
-	zbx_uint64_t	size_reserved;
+	zbx_uint64_t	size_reserved, min_free_request;
 
 	if (0 == CONFIG_VALUE_CACHE_SIZE)
 		goto out;
@@ -3200,6 +3200,10 @@ void	zbx_vc_init(void)
 		zbx_error("cannot allocate string pool for value cache data storage");
 		exit(EXIT_FAILURE);
 	}
+
+	/* the free space request should be 5% of cache size, but no more than 128KB */
+	min_free_request = (CONFIG_VALUE_CACHE_SIZE / 100) * 5;
+	vc_cache->min_free_request = min_free_request < 128 * ZBX_KIBIBYTE ? min_free_request : 128 * ZBX_KIBIBYTE;
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
