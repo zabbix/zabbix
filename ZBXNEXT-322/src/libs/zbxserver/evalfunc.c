@@ -140,7 +140,8 @@ clean:
  *               FAIL - failed to evaluate function                           *
  *                                                                            *
  ******************************************************************************/
-static int	evaluate_LOGEVENTID(char *value, DB_ITEM *item, const char *function, const char *parameters, time_t now)
+static int	evaluate_LOGEVENTID(char *value, DB_ITEM *item, const char *function, const char *parameters,
+		time_t now)
 {
 	const char		*__function_name = "evaluate_LOGEVENTID";
 	char			*arg1 = NULL, *arg1_esc;
@@ -183,15 +184,14 @@ static int	evaluate_LOGEVENTID(char *value, DB_ITEM *item, const char *function,
 		DBfree_result(result);
 	}
 
-	if (SUCCEED ==  zbx_vc_get_value_range(item->itemid, item->value_type, &values, 0, 1, now) &&
+	if (SUCCEED == zbx_vc_get_value_range(item->itemid, item->value_type, &values, 0, 1, now) &&
 			0 < values.values_num)
 	{
 		char	*logeventid = NULL;
 		size_t	size = 0, offset = 0;
 
 		zbx_snprintf_alloc(&logeventid, &size, &offset, "%d", values.values[0].value.log->logeventid);
-		if (SUCCEED == regexp_match_ex(regexps, regexps_num, logeventid, arg1,
-				ZBX_CASE_SENSITIVE))
+		if (SUCCEED == regexp_match_ex(regexps, regexps_num, logeventid, arg1, ZBX_CASE_SENSITIVE))
 			zbx_strlcpy(value, "1", MAX_BUFFER_LEN);
 		else
 			zbx_strlcpy(value, "0", MAX_BUFFER_LEN);
@@ -307,7 +307,6 @@ static int	evaluate_LOGSEVERITY(char *value, DB_ITEM *item, const char *function
 	}
 	else
 		zabbix_log(LOG_LEVEL_DEBUG, "result for LOGSEVERITY is empty");
-
 out:
 	zbx_vc_value_vector_destroy(&values, item->value_type);
 

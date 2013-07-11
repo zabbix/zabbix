@@ -2496,8 +2496,7 @@ out:
 static int	vch_item_get_value_range(zbx_vc_item_t *item,  zbx_vector_vc_value_t *values, int seconds, int count,
 		int timestamp)
 {
-	zbx_vc_data_history_t	*data = &item->data.history;
-	int			ret, records_read, hits, misses;
+	int	ret, records_read, hits, misses;
 
 	values->values_num = 0;
 
@@ -2565,7 +2564,7 @@ static int	vch_item_get_value(zbx_vc_item_t *item, const zbx_timespec_t *ts, zbx
 	*found = 0;
 
 	if (NULL == data->tail || data->tail->slots[data->tail->first_value].timestamp.sec > ts->sec ||
-			(data->tail->slots[data->tail->first_value].timestamp.sec == ts->sec  &&
+			(data->tail->slots[data->tail->first_value].timestamp.sec == ts->sec &&
 					data->tail->slots[data->tail->first_value].timestamp.ns > ts->ns))
 	{
 		int	offset;
@@ -3148,7 +3147,7 @@ void	zbx_vc_init(void)
 {
 	const char	*__function_name = "zbx_vc_init";
 	key_t		shm_key;
-	zbx_uint64_t	size_reserved, min_free_request;
+	zbx_uint64_t	size_reserved;
 
 	if (0 == CONFIG_VALUE_CACHE_SIZE)
 		goto out;
@@ -3202,8 +3201,9 @@ void	zbx_vc_init(void)
 	}
 
 	/* the free space request should be 5% of cache size, but no more than 128KB */
-	min_free_request = (CONFIG_VALUE_CACHE_SIZE / 100) * 5;
-	vc_cache->min_free_request = min_free_request < 128 * ZBX_KIBIBYTE ? min_free_request : 128 * ZBX_KIBIBYTE;
+	vc_cache->min_free_request = (CONFIG_VALUE_CACHE_SIZE / 100) * 5;
+	if (vc_cache->min_free_request > 128 * ZBX_KIBIBYTE)
+		vc_cache->min_free_request = 128 * ZBX_KIBIBYTE;
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
