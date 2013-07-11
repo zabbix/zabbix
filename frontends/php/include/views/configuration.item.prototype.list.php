@@ -64,17 +64,12 @@ foreach ($this->data['items'] as $item) {
 		$template_host = get_realhost_by_itemid($item['templateid']);
 		$templateDiscoveryRuleId = get_realrule_by_itemid_and_hostid($this->data['parent_discoveryid'], $template_host['hostid']);
 
-		$description[] = new CLink($template_host['name'],
-			'?parent_discoveryid='.$templateDiscoveryRuleId,
-			'unknown'
-		);
+		$description[] = new CLink($template_host['name'], '?parent_discoveryid='.$templateDiscoveryRuleId, 'unknown');
 		$description[] = NAME_DELIMITER;
 	}
 	$description[] = new CLink(
 		itemName($item),
-		'?form=update'.
-			'&itemid='.$item['itemid'].
-			'&parent_discoveryid='.$this->data['parent_discoveryid']
+		'?form=update&itemid='.$item['itemid'].'&parent_discoveryid='.$this->data['parent_discoveryid']
 	);
 
 	$status = new CLink(

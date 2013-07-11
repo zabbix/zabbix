@@ -78,8 +78,7 @@ foreach ($this->data['items'] as $item) {
 	if (!empty($item['template_host'])) {
 		$description[] = new CLink(
 			CHtml::encode($item['template_host']['name']),
-			'?hostid='.$item['template_host']['hostid'].
-				'&filter_set=1',
+			'?hostid='.$item['template_host']['hostid'].'&filter_set=1',
 			'unknown'
 		);
 		$description[] = NAME_DELIMITER;
@@ -87,8 +86,7 @@ foreach ($this->data['items'] as $item) {
 	if (!empty($item['discoveryRule'])) {
 		$description[] = new CLink(
 			CHtml::encode($item['discoveryRule']['name']),
-			'disc_prototypes.php?'.
-				'parent_discoveryid='.$item['discoveryRule']['itemid'],
+			'disc_prototypes.php?parent_discoveryid='.$item['discoveryRule']['itemid'],
 			'gold'
 		);
 		$description[] = NAME_DELIMITER.$item['name_expanded'];
@@ -96,18 +94,14 @@ foreach ($this->data['items'] as $item) {
 	else {
 		$description[] = new CLink(
 			CHtml::encode($item['name_expanded']),
-			'?form=update'.
-				'&hostid='.$item['hostid'].
-				'&itemid='.$item['itemid']
+			'?form=update&hostid='.$item['hostid'].'&itemid='.$item['itemid']
 		);
 	}
 
 	// status
 	$status = new CCol(new CLink(
 		itemIndicator($item['status'], $item['state']),
-		'?group_itemid='.$item['itemid'].
-			'&hostid='.$item['hostid'].
-			'&go='.($item['status'] ? 'activate' : 'disable'),
+		'?group_itemid='.$item['itemid'].'&hostid='.$item['hostid'].'&go='.($item['status'] ? 'activate' : 'disable'),
 		itemIndicatorStyle($item['status'], $item['state'])
 	));
 
@@ -155,8 +149,7 @@ foreach ($this->data['items'] as $item) {
 				$realHost = reset($this->data['triggerRealHosts'][$trigger['triggerid']]);
 				$triggerDescription[] = new CLink(
 					CHtml::encode($realHost['name']),
-						'triggers.php?'.
-							'hostid='.$realHost['hostid'],
+					'triggers.php?hostid='.$realHost['hostid'],
 					'unknown'
 				);
 				$triggerDescription[] = ':';
@@ -171,10 +164,7 @@ foreach ($this->data['items'] as $item) {
 		else {
 			$triggerDescription[] = new CLink(
 				CHtml::encode($trigger['description']),
-				'triggers.php?'.
-					'form=update'.
-					'&hostid='.key($trigger['hosts']).
-					'&triggerid='.$trigger['triggerid']
+				'triggers.php?form=update&hostid='.key($trigger['hosts']).'&triggerid='.$trigger['triggerid']
 			);
 		}
 
