@@ -166,6 +166,11 @@ class CProxy extends CZBXAPI {
 	}
 
 	protected function checkInput(&$proxies, $method) {
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS,
+				_('No permissions to referred object or it does not exist!'));
+		}
+
 		$create = ($method == 'create');
 		$update = ($method == 'update');
 
@@ -207,23 +212,25 @@ class CProxy extends CZBXAPI {
 						_('No permissions to referred object or it does not exist!'));
 				}
 
-				if (empty($proxy['status'])) {
-					$proxy['status'] = $dbProxies[$proxy['proxyid']]['status'];
-				}
-			}
-			else {
-				if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
-					self::exception(ZBX_API_ERROR_PERMISSIONS,
-						_('No permissions to referred object or it does not exist!'));
+				if (isset($proxy['status'])
+						&& ($proxy['status'] != HOST_STATUS_PROXY_ACTIVE
+						&& $proxy['status'] != HOST_STATUS_PROXY_PASSIVE)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Incorrect value used for proxy status "%1$s".', $proxy['status']));
 				}
 
-				if (empty($proxy['status'])) {
+				$status = $dbProxies[$proxy['proxyid']]['status'];
+			}
+			else {
+				if (!isset($proxy['status'])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('No status for proxy.'));
 				}
 				elseif ($proxy['status'] != HOST_STATUS_PROXY_ACTIVE && $proxy['status'] != HOST_STATUS_PROXY_PASSIVE) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
 						_s('Incorrect value used for proxy status "%1$s".', $proxy['status']));
 				}
+
+				$status = $proxy['status'];
 			}
 
 			// host
@@ -244,7 +251,7 @@ class CProxy extends CZBXAPI {
 			}
 
 			// interface
-			if ($proxy['status'] == HOST_STATUS_PROXY_PASSIVE) {
+			if ($status == HOST_STATUS_PROXY_PASSIVE) {
 				if ($create && empty($proxy['interface'])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
 						_s('No interface provided for proxy "%s".', $proxy['host']));
