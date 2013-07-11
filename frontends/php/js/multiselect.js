@@ -549,19 +549,50 @@ jQuery(function($) {
 			});
 
 			var text = $('<span>', {
-				'class': 'text'
+				'class': 'textValue',
+				text: empty(item.prefix) ? item.name : item.prefix + item.name
 			});
 
-			var textDiv = $('<div>', {
-				'class': 'text',
-				text: empty(item.prefix) ? item.name : item.prefix + item.name,
-				css: {width: values.width - 20}
-			});
+			$('.selected ul', obj).append(li.append(text));
 
-			if (options.disabled) {
-				$('.selected ul', obj).append(li.append(text));
+			if (options.selectedLimit == 1) {
+				var $this = text;
+				var text = $('.selected .textValue', obj).text();
+				var originalHeight = $this.height();
+
+				$this.text('1');
+				var rowHeight = $this.height();
+				var targetHeight = rowHeight;
+
+				if (originalHeight > targetHeight) {
+					var start = 1;
+					var end = text.length;
+
+					while (start < end) {
+						var length = Math.ceil((start + end) / 2);
+
+						if (options.disabled) {
+							$this.text(text.slice(0, length) + '...');
+						}
+						else {
+							$this.text(text.slice(0, length) + '...[x]');
+						}
+
+						if ($this.height () <= targetHeight) {
+							start = length;
+						} else {
+							end = length - 1;
+						}
+					}
+
+					$this.text(text.slice(0, start) + '...');
+				}
+				else {
+					$this.text(text);
+				}
 			}
-			else {
+
+			if (!options.disabled) {
 				var arrow = $('<span>', {
 					'class': 'arrow',
 					'data-id': item.id
@@ -570,7 +601,7 @@ jQuery(function($) {
 					removeSelected($(this).data('id'), obj, values, options);
 				});
 
-				$('.selected ul', obj).append(li.append(text.append(textDiv.append(arrow))));
+				$('.selected ul', obj).append(li.append(arrow));
 			}
 
 			removePlaceholder(obj);
