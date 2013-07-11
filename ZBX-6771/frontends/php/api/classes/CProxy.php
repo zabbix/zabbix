@@ -219,7 +219,7 @@ class CProxy extends CZBXAPI {
 						_s('Incorrect value used for proxy status "%1$s".', $proxy['status']));
 				}
 
-				$status = $dbProxies[$proxy['proxyid']]['status'];
+				$status = isset($proxy['status']) ? $proxy['status'] : $dbProxies[$proxy['proxyid']]['status'];
 			}
 			else {
 				if (!isset($proxy['status'])) {
