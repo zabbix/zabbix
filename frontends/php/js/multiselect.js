@@ -549,36 +549,34 @@ jQuery(function($) {
 			});
 
 			var text = $('<span>', {
-				'class': 'textValue',
+				'class': 'text',
 				text: empty(item.prefix) ? item.name : item.prefix + item.name
 			});
 
 			$('.selected ul', obj).append(li.append(text));
 
 			if (options.selectedLimit == 1) {
-				var $this = text;
-				var text = $('.selected .textValue', obj).text();
-				var originalHeight = $this.height();
+				var textSpan = tempText = text,
+					text = $('.selected .text', obj).text();
 
-				$this.text('1');
-				var rowHeight = $this.height();
-				var targetHeight = rowHeight;
+				tempText.text(text + (options.disabled ? '' : '[x]'));
 
-				if (originalHeight > targetHeight) {
-					var start = 1;
-					var end = text.length;
+				var	originalHeight = tempText.height();
+
+				textSpan.text('1');
+
+				var rowHeight = textSpan.height();
+
+				if (originalHeight > rowHeight) {
+					var start = 1,
+						end = text.length;
 
 					while (start < end) {
 						var length = Math.ceil((start + end) / 2);
 
-						if (options.disabled) {
-							$this.text(text.slice(0, length) + '...');
-						}
-						else {
-							$this.text(text.slice(0, length) + '...[x]');
-						}
+						textSpan.text(text.slice(0, length) + (options.disabled ? '...' : '...[x]'));
 
-						if ($this.height () <= targetHeight) {
+						if (textSpan.height () <= rowHeight) {
 							start = length;
 						}
 						else {
@@ -586,10 +584,10 @@ jQuery(function($) {
 						}
 					}
 
-					$this.text(text.slice(0, start) + '...');
+					textSpan.text(text.slice(0, start) + '...');
 				}
 				else {
-					$this.text(text);
+					textSpan.text(text);
 				}
 			}
 

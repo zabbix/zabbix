@@ -525,7 +525,7 @@ div.suggest { position: absolute; border: 1px #5C7099 solid; width: 162px; z-ind
 	border-radius: 3px; -webkit-border-radius: 3px; -moz-border-radius: 3px;
 }
 .multiselect .selected ul li.pressed { background: #D4D4D4; }
-.multiselect .selected ul li span.textValue { padding: 0 4px 0 4px; }
+.multiselect .selected ul li span.text { padding: 0 4px 0 4px; }
 .multiselect .selected ul li span.arrow {
 	padding: 0 0 0 12px; cursor: pointer; position: relative; z-index: 11;
 	background: url("../images/general/multiselect.png") no-repeat -12px 1px;
