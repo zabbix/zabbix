@@ -17,14 +17,12 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
+
 /**
- * File containing CGraphItem class for API.
+ * Class containing methods for operations with graph items.
+ *
  * @package API
- */
-/**
- * Class containing methods for operations with GraphItems
  */
 class CGraphItem extends CZBXAPI {
 
@@ -198,4 +196,3 @@ class CGraphItem extends CZBXAPI {
 		return $result;
 	}
 }
-?>

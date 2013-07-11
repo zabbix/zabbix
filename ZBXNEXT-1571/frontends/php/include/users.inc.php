@@ -19,8 +19,16 @@
 **/
 
 
+/**
+ * Find user theme or get default theme.
+ *
+ * @param array $userData
+ *
+ * @return string
+ */
 function getUserTheme($userData) {
 	$config = select_config();
+
 	if (isset($config['default_theme'])) {
 		$css = $config['default_theme'];
 	}
@@ -30,138 +38,238 @@ function getUserTheme($userData) {
 	if (!isset($css)) {
 		$css = ZBX_DEFAULT_THEME;
 	}
+
 	return $css;
 }
 
-function user_type2str($user_type = null) {
-	$user_types = array(
+/**
+ * Get user type name.
+ *
+ * @param int $userType
+ *
+ * @return string
+ */
+function user_type2str($userType = null) {
+	$userTypes = array(
 		USER_TYPE_ZABBIX_USER => _('Zabbix User'),
 		USER_TYPE_ZABBIX_ADMIN => _('Zabbix Admin'),
 		USER_TYPE_SUPER_ADMIN => _('Zabbix Super Admin')
 	);
-	if (is_null($user_type)) {
-		return $user_types;
+
+	if ($userType === null) {
+		return $userTypes;
 	}
-	elseif (isset($user_types[$user_type])) {
-		return $user_types[$user_type];
+	elseif (isset($userTypes[$userType])) {
+		return $userTypes[$userType];
 	}
 	else {
 		return _('Unknown');
 	}
 }
 
-function user_auth_type2str($auth_type) {
-	if (is_null($auth_type)) {
-		$auth_type = get_user_auth(CWebUser::$data['userid']);
+/**
+ * Get user authentication name.
+ *
+ * @param int $authType
+ *
+ * @return string
+ */
+function user_auth_type2str($authType) {
+	if ($authType === null) {
+		$authType = get_user_auth(CWebUser::$data['userid']);
 	}
-	$auth_user_type[GROUP_GUI_ACCESS_SYSTEM] = _('System default');
-	$auth_user_type[GROUP_GUI_ACCESS_INTERNAL] = _('Internal');
-	$auth_user_type[GROUP_GUI_ACCESS_DISABLED] = _('Disabled');
 
-	if (isset($auth_user_type[$auth_type])) {
-		return $auth_user_type[$auth_type];
-	}
-	return _('Unknown');
+	$authUserType = array(
+		GROUP_GUI_ACCESS_SYSTEM => _('System default'),
+		GROUP_GUI_ACCESS_INTERNAL => _('Internal'),
+		GROUP_GUI_ACCESS_DISABLED => _('Disabled')
+	);
+
+	return isset($authUserType[$authType]) ? $authUserType[$authType] : _('Unknown');
 }
 
-function unblock_user_login($userids) {
-	zbx_value2array($userids);
-	return DBexecute('UPDATE users SET attempt_failed=0 WHERE '.dbConditionInt('userid', $userids));
+/**
+ * Unblock user account.
+ *
+ * @param array $userIds
+ *
+ * @return bool
+ */
+function unblock_user_login($userIds) {
+	zbx_value2array($userIds);
+
+	return DBexecute('UPDATE users SET attempt_failed=0 WHERE '.dbConditionInt('userid', $userIds));
 }
 
-function get_userid_by_usrgrpid($usrgrpids) {
-	zbx_value2array($usrgrpids);
-	$userids = array();
+/**
+ * Get users ids by groups ids.
+ *
+ * @param array $userGroupIds
+ *
+ * @return array
+ */
+function get_userid_by_usrgrpid($userGroupIds) {
+	zbx_value2array($userGroupIds);
 
-	$db_users = DBselect(
+	$userIds = array();
+
+	$dbUsers = DBselect(
 		'SELECT DISTINCT u.userid'.
 		' FROM users u,users_groups ug'.
 		' WHERE u.userid=ug.userid'.
-			' AND '.dbConditionInt('ug.usrgrpid', $usrgrpids).
+			' AND '.dbConditionInt('ug.usrgrpid', $userGroupIds).
 			andDbNode('ug.usrgrpid', false)
 	);
-	while($user = DBFetch($db_users)){
-		$userids[$user['userid']] = $user['userid'];
+	while ($user = DBFetch($dbUsers)) {
+		$userIds[$user['userid']] = $user['userid'];
 	}
-	return $userids;
+
+	return $userIds;
 }
 
-function add_user_to_group($userid, $usrgrpid) {
-	$result = false;
-	if (granted2move_user($userid,$usrgrpid)) {
-		DBexecute('DELETE FROM users_groups WHERE userid='.$userid.' AND usrgrpid='.$usrgrpid);
-		$users_groups_id = get_dbid('users_groups', 'id');
-		$result = DBexecute('INSERT INTO users_groups (id,usrgrpid,userid) VALUES ('.$users_groups_id.','.$usrgrpid.','.$userid.')');
-	}
-	else{
-		error(_('User cannot change status of himself.'));
-	}
-	return $result;
-}
+/**
+ * Append user to group.
+ *
+ * @param string $userId
+ * @param string $userGroupId
+ *
+ * @return bool
+ */
+function add_user_to_group($userId, $userGroupId) {
+	if (granted2move_user($userId, $userGroupId)) {
+		DBexecute('DELETE FROM users_groups WHERE userid='.$userId.' AND usrgrpid='.$userGroupId);
 
-function remove_user_from_group($userid, $usrgrpid) {
-	$result = false;
-	if (granted2move_user($userid,$usrgrpid)) {
-		$result = DBexecute('DELETE FROM users_groups WHERE userid='.$userid.' AND usrgrpid='.$usrgrpid);
+		$usersGroupsId = get_dbid('users_groups', 'id');
+
+		return DBexecute(
+			'INSERT INTO users_groups (id,usrgrpid,userid) VALUES ('.$usersGroupsId.','.$userGroupId.','.$userId.')'
+		);
 	}
 	else {
 		error(_('User cannot change status of himself.'));
 	}
-	return $result;
+
+	return false;
 }
 
-// checks if user is adding himself to disabled group
-function granted2update_group($usrgrpids) {
-	zbx_value2array($usrgrpids);
-	$users = get_userid_by_usrgrpid($usrgrpids);
-	return (!isset($users[CWebUser::$data['userid']]));
+/**
+ * Remove user from group.
+ *
+ * @param string $userId
+ * @param string $userGroupId
+ *
+ * @return bool
+ */
+function remove_user_from_group($userId, $userGroupId) {
+	if (granted2move_user($userId, $userGroupId)) {
+		return DBexecute('DELETE FROM users_groups WHERE userid='.$userId.' AND usrgrpid='.$userGroupId);
+	}
+	else {
+		error(_('User cannot change status of himself.'));
+	}
+
+	return false;
 }
 
-// checks if user is adding himself to disabled group
-function granted2move_user($userid, $usrgrpid) {
-	$result = true;
-	$group = API::UserGroup()->get(array('usrgrpids' => $usrgrpid, 'output' => API_OUTPUT_EXTEND));
+/**
+ * Check if group has permissions for update.
+ *
+ * @param array $userGroupIds
+ *
+ * @return bool
+ */
+function granted2update_group($userGroupIds) {
+	zbx_value2array($userGroupIds);
+
+	$users = get_userid_by_usrgrpid($userGroupIds);
+
+	return !isset($users[CWebUser::$data['userid']]);
+}
+
+/**
+ * Check if user can be appended to group.
+ *
+ * @param string $userId
+ * @param string $userGroupId
+ *
+ * @return bool
+ */
+function granted2move_user($userId, $userGroupId) {
+	$group = API::UserGroup()->get(array(
+		'usrgrpids' => $userGroupId,
+		'output' => API_OUTPUT_EXTEND
+	));
 	$group = reset($group);
-	if ($group['gui_access'] == GROUP_GUI_ACCESS_DISABLED || $group['users_status'] == GROUP_STATUS_DISABLED){
-		$result = (bccomp(CWebUser::$data['userid'], $userid) != 0);
+
+	if ($group['gui_access'] == GROUP_GUI_ACCESS_DISABLED || $group['users_status'] == GROUP_STATUS_DISABLED) {
+		return (bccomp(CWebUser::$data['userid'], $userId) != 0);
 	}
-	return $result;
+
+	return true;
 }
 
-function change_group_status($usrgrpids, $users_status) {
-	zbx_value2array($usrgrpids);
-	$result = false;
-	$grant = true;
-	if ($users_status == GROUP_STATUS_DISABLED) {
-		$grant = granted2update_group($usrgrpids);
-	}
+/**
+ * Change group status.
+ *
+ * @param array $userGroupIds
+ * @param int   $usersStatus
+ *
+ * @return bool
+ */
+function change_group_status($userGroupIds, $usersStatus) {
+	zbx_value2array($userGroupIds);
+
+	$grant = ($usersStatus == GROUP_STATUS_DISABLED) ? granted2update_group($userGroupIds) : true;
 
 	if ($grant) {
-		$result = DBexecute('UPDATE usrgrp SET users_status='.$users_status.' WHERE '.dbConditionInt('usrgrpid', $usrgrpids));
+		return DBexecute(
+			'UPDATE usrgrp SET users_status='.$usersStatus.' WHERE '.dbConditionInt('usrgrpid', $userGroupIds)
+		);
 	}
 	else {
 		error(_('User cannot change status of himself.'));
 	}
-	return $result;
+
+	return false;
 }
 
-function change_group_gui_access($usrgrpids, $gui_access) {
-	zbx_value2array($usrgrpids);
-	$result = false;
-	$grant = true;
-	if ($gui_access == GROUP_GUI_ACCESS_DISABLED) {
-		$grant = granted2update_group($usrgrpids);
-	}
+/**
+ * Change gui access for group.
+ *
+ * @param array $userGroupIds
+ * @param int   $guiAccess
+ *
+ * @return bool
+ */
+function change_group_gui_access($userGroupIds, $guiAccess) {
+	zbx_value2array($userGroupIds);
+
+	$grant = ($guiAccess == GROUP_GUI_ACCESS_DISABLED) ? granted2update_group($userGroupIds) : true;
+
 	if ($grant) {
-		$result = DBexecute('UPDATE usrgrp SET gui_access='.$gui_access.' WHERE '.dbConditionInt('usrgrpid',$usrgrpids));
+		return DBexecute(
+			'UPDATE usrgrp SET gui_access='.$guiAccess.' WHERE '.dbConditionInt('usrgrpid', $userGroupIds)
+		);
 	}
 	else {
 		error(_('User cannot change GUI access for himself.'));
 	}
-	return $result;
+
+	return false;
 }
 
-function change_group_debug_mode($usrgrpids, $debug_mode){
-	zbx_value2array($usrgrpids);
-	return DBexecute('UPDATE usrgrp SET debug_mode='.$debug_mode.' WHERE '.dbConditionInt('usrgrpid', $usrgrpids));
+/**
+ * Change debug mode for group.
+ *
+ * @param array $userGroupIds
+ * @param int   $debugMode
+ *
+ * @return bool
+ */
+function change_group_debug_mode($userGroupIds, $debugMode) {
+	zbx_value2array($userGroupIds);
+
+	return DBexecute(
+		'UPDATE usrgrp SET debug_mode='.$debugMode.' WHERE '.dbConditionInt('usrgrpid', $userGroupIds)
+	);
 }
