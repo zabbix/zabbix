@@ -2574,7 +2574,9 @@ static int	vch_item_get_value(zbx_vc_item_t *item, const zbx_timespec_t *ts, zbx
 	now = ZBX_VC_TIME();
 	*found = 0;
 
-	if (NULL == data->tail || data->tail->slots[data->tail->first_value].timestamp.sec > ts->sec)
+	if (NULL == data->tail || data->tail->slots[data->tail->first_value].timestamp.sec > ts->sec ||
+			(data->tail->slots[data->tail->first_value].timestamp.sec == ts->sec  &&
+					data->tail->slots[data->tail->first_value].timestamp.ns > ts->ns))
 	{
 		/* the requested value is not in cache, request cache update */
 		if (FAIL == vch_item_cache_values_by_count(item, 1, ts->sec))
