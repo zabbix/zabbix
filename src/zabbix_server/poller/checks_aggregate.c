@@ -226,7 +226,7 @@ static void	evaluate_item_func(zbx_vector_vc_value_t *values, int value_type, in
 static void	evaluate_one(DC_ITEM *item, history_value_t *result, int *num, int grp_func,
 		const history_value_t *pvalue, unsigned char value_type)
 {
-	history_value_t		value = *pvalue;
+	history_value_t	value = *pvalue;
 
 	switch (value_type)
 	{
