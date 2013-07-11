@@ -559,7 +559,7 @@ out:
  *         Otherwise, FAIL is returned.                                       *
  *                                                                            *
  ******************************************************************************/
-static int	vcenter_clusters_get(CURL *easyhandle, char **error)
+static int	vcenter_clusters_get(CURL *easyhandle, char **clusters, char **error)
 {
 #	define ZBX_POST_VCENTER_CLUSTER								\
 		ZBX_POST_VSPHERE_HEADER								\
@@ -704,6 +704,8 @@ static int	vcenter_clusters_get(CURL *easyhandle, char **error)
 	if (NULL != (*error = read_xml_value(page.data, ZBX_XPATH_LN1("faultstring"))))
 		goto out;
 
+	*clusters = zbx_strdup(*clusters, page.data);
+
 	ret = SUCCEED;
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
@@ -835,7 +837,7 @@ out:
 	return ret;
 }
 
-static int	vcenter_hv_data_get(CURL *easyhandle, const char *guesthvid)
+static int	vcenter_hv_data_get(CURL *easyhandle, const char *guesthvid, char **hv_details)
 {
 #	define ZBX_POST_VCENTER_HV_DETAILS 							\
 		ZBX_POST_VSPHERE_HEADER								\
@@ -886,6 +888,8 @@ static int	vcenter_hv_data_get(CURL *easyhandle, const char *guesthvid)
 		zbx_free(error);
 		goto out;
 	}
+
+	*hv_details = zbx_strdup(*hv_details, page.data);
 
 	ret = SUCCEED;
 out:
@@ -1540,7 +1544,7 @@ static int	vcenter_update(const char *url, const char *username, const char *pas
 	zbx_hv_t		*hv;
 	zbx_vm_t		*vm;
 	zbx_cluster_t		*cluster;
-	char			*uuid, *name, *event_session = NULL,
+	char			*uuid, *name, *event_session = NULL, *clusters = NULL,
 				xpath[MAX_STRING_LEN];
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() url:'%s' username:'%s' password:'%s'",
@@ -1601,11 +1605,16 @@ static int	vcenter_update(const char *url, const char *username, const char *pas
 
 	for (i = 0; i < guesthvids.values_num; i++)
 	{
-		if (SUCCEED != vcenter_hv_data_get(easyhandle, guesthvids.values[i]))
+		char	*hv_details = NULL;
+
+		if (SUCCEED != vcenter_hv_data_get(easyhandle, guesthvids.values[i], &hv_details))
 			continue;
 
-		if (NULL == (uuid = read_xml_value(page.data, ZBX_XPATH_LN2("hardware", "uuid"))))
+		if (NULL == (uuid = read_xml_value(hv_details, ZBX_XPATH_LN2("hardware", "uuid"))))
+		{
+			zbx_free(hv_details);
 			continue;
+		}
 
 		if (NULL == (hv = hv_get(&vcenter->hvs, uuid)))
 		{
@@ -1622,14 +1631,15 @@ static int	vcenter_update(const char *url, const char *username, const char *pas
 		{
 			zbx_free(uuid);
 			zbx_free(hv->id);
+			zbx_free(hv->details);
 			zbx_free(hv->clusterid);
 		}
 
 		hv->id = zbx_strdup(hv->id, guesthvids.values[i]);
-		hv->details = zbx_strdup(hv->details, page.data);
-		hv->clusterid = read_xml_value(page.data, "//*[@type='ClusterComputeResource']");
+		hv->details = hv_details;
+		hv->clusterid = read_xml_value(hv_details, "//*[@type='ClusterComputeResource']");
 
-		read_xml_values(page.data, "//*[@type='VirtualMachine']", &guestvmids);
+		read_xml_values(hv_details, "//*[@type='VirtualMachine']", &guestvmids);
 
 		for (j = 0; j < guestvmids.values_num; j++)
 		{
@@ -1701,17 +1711,17 @@ static int	vcenter_update(const char *url, const char *username, const char *pas
 
 	/* clusters */
 
-	if (SUCCEED != vcenter_clusters_get(easyhandle, error))
+	if (SUCCEED != vcenter_clusters_get(easyhandle, &clusters, error))
 		goto clean;
 
-	read_xml_values(page.data, "//*[@type='ClusterComputeResource']", &clusterids);
+	read_xml_values(clusters, "//*[@type='ClusterComputeResource']", &clusterids);
 
 	for (i = 0; i < clusterids.values_num; i++)
 	{
 		zbx_snprintf(xpath, sizeof(xpath), "//*[@type='ClusterComputeResource'][.='%s']"
 				"/.." ZBX_XPATH_LN2("propSet", "val"), clusterids.values[i]);
 
-		if (NULL == (name = read_xml_value(page.data, xpath)))
+		if (NULL == (name = read_xml_value(clusters, xpath)))
 			continue;
 
 		if (NULL == (cluster = cluster_get(&vcenter->clusters, clusterids.values[i])))
@@ -1732,6 +1742,8 @@ static int	vcenter_update(const char *url, const char *username, const char *pas
 		if (SUCCEED != vcenter_cluster_status_get(easyhandle, clusterids.values[i], &cluster->status, error))
 			goto clean;
 	}
+
+	zbx_free(clusters);
 
 	vcenter->lastcheck = time(NULL);
 
