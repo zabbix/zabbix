@@ -2568,16 +2568,25 @@ out:
 static int	vch_item_get_value(zbx_vc_item_t *item, const zbx_timespec_t *ts, zbx_vc_value_t *value, int *found)
 {
 	zbx_vc_data_history_t	*data = &item->data.history;
-	int			index, ret = FAIL, hits = 0, misses = 0, now, offset = 0;
+	int			index, ret = FAIL, hits = 0, misses = 0, now;
 	zbx_vc_chunk_t		*chunk;
 
 	now = ZBX_VC_TIME();
 	*found = 0;
 
 	if (NULL == data->tail || data->tail->slots[data->tail->first_value].timestamp.sec > ts->sec ||
-			((offset = data->tail->slots[data->tail->first_value].timestamp.sec == ts->sec)  &&
+			(data->tail->slots[data->tail->first_value].timestamp.sec == ts->sec  &&
 					data->tail->slots[data->tail->first_value].timestamp.ns > ts->ns))
 	{
+		int	offset;
+
+		/* caching does not work with nanosecond resolution, so when first value timestamp */
+		/* seconds matches request timestamp try to cache value(s) a second before         */
+		if (data->tail->slots[data->tail->first_value].timestamp.sec == ts->sec)
+			offset = 1;
+		else
+			offset = 0;
+
 		/* the requested value is not in cache, request cache update */
 		if (FAIL == vch_item_cache_values_by_count(item, 1, ts->sec - offset))
 			goto out;
