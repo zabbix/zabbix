@@ -216,14 +216,14 @@ elseif (isset($_REQUEST['delete']) || $_REQUEST['go'] == 'delete') {
 		$maintenances[$maintenanceid] = get_maintenance_by_maintenanceid($maintenanceid);
 	}
 
-	$go_result = API::Maintenance()->delete($maintenanceids);
-	if ($go_result) {
+	$goResult = API::Maintenance()->delete($maintenanceids);
+	if ($goResult) {
 		foreach ($maintenances as $maintenanceid => $maintenance) {
 			add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_MAINTENANCE, 'Id ['.$maintenanceid.'] '._('Name').' ['.$maintenance['name'].']');
 		}
 		unset($_REQUEST['form'], $_REQUEST['maintenanceid']);
 	}
-	show_messages($go_result, _('Maintenance deleted'), _('Cannot delete maintenance'));
+	show_messages($goResult, _('Maintenance deleted'), _('Cannot delete maintenance'));
 }
 elseif (isset($_REQUEST['add_timeperiod']) && isset($_REQUEST['new_timeperiod'])) {
 	$new_timeperiod = $_REQUEST['new_timeperiod'];
@@ -372,10 +372,10 @@ elseif (isset($_REQUEST['edit_timeperiodid'])) {
 	}
 }
 
-if ($_REQUEST['go'] != 'none' && !empty($go_result)) {
+if ($_REQUEST['go'] != 'none' && !empty($goResult)) {
 	$url = new CUrl();
 	$path = $url->getPath();
-	insert_js('cookie.eraseArray("'.$path.'")');
+	insert_js('cookie.eraseArray("'.basename($path, '.php').'")');
 }
 
 $options = array(

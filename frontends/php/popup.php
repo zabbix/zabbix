@@ -282,7 +282,7 @@ elseif (get_request('numeric')) {
 
 $url = new CUrl();
 $path = $url->getPath();
-insert_js('cookie.eraseArray(\''.$path.'\')');
+insert_js('cookie.eraseArray("'.basename($path, '.php').'")');
 
 function get_window_opener($frame, $field, $value) {
 	if (empty($field)) {

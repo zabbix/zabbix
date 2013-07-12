@@ -154,25 +154,25 @@ elseif (isset($_REQUEST['delete'])) {
 elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['scripts'])) {
 	$scriptIds = $_REQUEST['scripts'];
 
-	$go_result = API::Script()->delete($scriptIds);
+	$goResult = API::Script()->delete($scriptIds);
 
-	if ($go_result) {
+	if ($goResult) {
 		foreach ($scriptIds as $scriptId) {
 			add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_SCRIPT, _('Script').' ['.$scriptId.']');
 		}
 	}
 
-	show_messages($go_result, _('Script deleted'), _('Cannot delete script'));
+	show_messages($goResult, _('Script deleted'), _('Cannot delete script'));
 
-	if ($go_result) {
+	if ($goResult) {
 		unset($_REQUEST['form'], $_REQUEST['scriptid']);
 	}
 }
 
-if ($_REQUEST['go'] != 'none' && isset($go_result) && $go_result) {
+if ($_REQUEST['go'] != 'none' && !empty($goResult)) {
 	$url = new CUrl();
 	$path = $url->getPath();
-	insert_js('cookie.eraseArray("'.$path.'")');
+	insert_js('cookie.eraseArray("'.basename($path, '.php').'")');
 }
 
 /*

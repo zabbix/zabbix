@@ -258,15 +258,15 @@ elseif (isset($_REQUEST['delete']) && isset($_REQUEST['graphid'])) {
 	show_messages($result, _('Graph deleted'), _('Cannot delete graph'));
 }
 elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['group_graphid'])) {
-	$go_result = !empty($_REQUEST['parent_discoveryid'])
+	$goResult = !empty($_REQUEST['parent_discoveryid'])
 		? API::GraphPrototype()->delete($_REQUEST['group_graphid'])
 		: API::Graph()->delete($_REQUEST['group_graphid']);
 
-	show_messages($go_result, _('Graphs deleted'), _('Cannot delete graphs'));
+	show_messages($goResult, _('Graphs deleted'), _('Cannot delete graphs'));
 }
 elseif ($_REQUEST['go'] == 'copy_to' && isset($_REQUEST['copy']) && isset($_REQUEST['group_graphid'])) {
 	if (!empty($_REQUEST['copy_targetid']) && isset($_REQUEST['copy_type'])) {
-		$go_result = true;
+		$goResult = true;
 
 		$options = array(
 			'editable' => true,
@@ -303,12 +303,12 @@ elseif ($_REQUEST['go'] == 'copy_to' && isset($_REQUEST['copy']) && isset($_REQU
 		DBstart();
 		foreach ($_REQUEST['group_graphid'] as $graphid) {
 			foreach ($dbHosts as $host) {
-				$go_result &= (bool) copy_graph_to_host($graphid, $host['hostid']);
+				$goResult &= (bool) copy_graph_to_host($graphid, $host['hostid']);
 			}
 		}
-		$go_result = DBend($go_result);
+		$goResult = DBend($goResult);
 
-		show_messages($go_result, _('Graphs copied'), _('Cannot copy graphs'));
+		show_messages($goResult, _('Graphs copied'), _('Cannot copy graphs'));
 		$_REQUEST['go'] = 'none2';
 	}
 	else {
@@ -316,10 +316,13 @@ elseif ($_REQUEST['go'] == 'copy_to' && isset($_REQUEST['copy']) && isset($_REQU
 	}
 	show_messages();
 }
-if ($_REQUEST['go'] != 'none' && isset($go_result) && $go_result) {
+
+if ($_REQUEST['go'] != 'none' && !empty($goResult)) {
 	$url = new CUrl();
 	$path = $url->getPath();
-	insert_js('cookie.eraseArray("'.$path.'")');
+	insert_js('cookie.eraseArray("'.basename($path, '.php').
+		(empty($_REQUEST['parent_discoveryid']) ? '_'.$_REQUEST['hostid'] : '_'.$_REQUEST['parent_discoveryid']).'")'
+	);
 }
 
 /*

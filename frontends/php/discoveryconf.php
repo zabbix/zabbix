@@ -176,33 +176,33 @@ elseif (isset($_REQUEST['delete']) && isset($_REQUEST['druleid'])) {
 elseif (str_in_array($_REQUEST['go'], array('activate', 'disable')) && isset($_REQUEST['g_druleid'])) {
 	$status = ($_REQUEST['go'] == 'activate') ? DRULE_STATUS_ACTIVE : DRULE_STATUS_DISABLED;
 
-	$go_result = false;
+	$goResult = false;
 	foreach ($_REQUEST['g_druleid'] as $drid) {
 		if (DBexecute('UPDATE drules SET status='.$status.' WHERE druleid='.$drid)) {
 			$rule_data = get_discovery_rule_by_druleid($drid);
 			add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_DISCOVERY_RULE, '['.$drid.'] '.$rule_data['name']);
-			$go_result = true;
+			$goResult = true;
 		}
 	}
 
-	show_messages($go_result, _('Discovery rules updated'));
+	show_messages($goResult, _('Discovery rules updated'));
 }
 elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['g_druleid'])) {
-	$go_result = false;
+	$goResult = false;
 	foreach ($_REQUEST['g_druleid'] as $drid) {
 		if (delete_discovery_rule($drid)) {
 			add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_DISCOVERY_RULE, '['.$drid.']');
-			$go_result = true;
+			$goResult = true;
 		}
 	}
 
-	show_messages($go_result, _('Discovery rules deleted'));
+	show_messages($goResult, _('Discovery rules deleted'));
 }
 
-if ($_REQUEST['go'] != 'none' && isset($go_result) && $go_result) {
+if ($_REQUEST['go'] != 'none' && !empty($goResult)) {
 	$url = new CUrl();
 	$path = $url->getPath();
-	insert_js('cookie.eraseArray("'.$path.'")');
+	insert_js('cookie.eraseArray("'.basename($path, '.php').'")');
 }
 
 /*

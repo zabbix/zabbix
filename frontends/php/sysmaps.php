@@ -201,10 +201,10 @@ elseif ((isset($_REQUEST['delete']) && isset($_REQUEST['sysmapid'])) || $_REQUES
 	}
 }
 
-if ($_REQUEST['go'] != 'none' && isset($goResult) && $goResult) {
+if ($_REQUEST['go'] != 'none' && !empty($goResult)) {
 	$url = new CUrl();
 	$path = $url->getPath();
-	insert_js('cookie.eraseArray("'.$path.'")');
+	insert_js('cookie.eraseArray("'.basename($path, '.php').'")');
 }
 
 /*

@@ -343,7 +343,7 @@ elseif (isset($_REQUEST['save'])) {
 elseif (isset($_REQUEST['delete']) && isset($_REQUEST['templateid'])) {
 	DBstart();
 
-	$go_result = true;
+	$goResult = true;
 
 	$result = API::Template()->massUpdate(array(
 		'templates' => zbx_toObject($_REQUEST['templateid'], 'templateid'),
@@ -365,7 +365,7 @@ elseif (isset($_REQUEST['delete']) && isset($_REQUEST['templateid'])) {
 elseif (isset($_REQUEST['delete_and_clear']) && isset($_REQUEST['templateid'])) {
 	DBstart();
 
-	$go_result = true;
+	$goResult = true;
 	$result = API::Template()->delete($_REQUEST['templateid']);
 
 	$result = DBend($result);
@@ -382,28 +382,28 @@ elseif (str_in_array($_REQUEST['go'], array('delete', 'delete_and_clear')) && is
 
 	DBstart();
 
-	$go_result = true;
+	$goResult = true;
 
 	if (isset($_REQUEST['delete'])) {
-		$go_result = API::Template()->massUpdate(array(
+		$goResult = API::Template()->massUpdate(array(
 			'templateids' => $templates,
 			'hosts' => array()
 		));
 	}
 
-	if ($go_result) {
-		$go_result = API::Template()->delete($templates);
+	if ($goResult) {
+		$goResult = API::Template()->delete($templates);
 	}
 
-	$go_result = DBend($go_result);
+	$goResult = DBend($goResult);
 
-	show_messages($go_result, _('Template deleted'), _('Cannot delete template'));
+	show_messages($goResult, _('Template deleted'), _('Cannot delete template'));
 }
 
-if ($_REQUEST['go'] != 'none' && isset($go_result) && $go_result) {
+if ($_REQUEST['go'] != 'none' && !empty($goResult)) {
 	$url = new CUrl();
 	$path = $url->getPath();
-	insert_js('cookie.eraseArray("'.$path.'")');
+	insert_js('cookie.eraseArray("'.basename($path, '.php').'")');
 }
 
 /*

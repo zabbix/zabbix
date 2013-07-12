@@ -323,6 +323,10 @@ var chkbxRange = {
 		}
 	},
 
+	clearSelectedOnFilterChange: function() {
+		cookie.eraseArray(this.cookieName);
+	},
+
 	setGo: function() {
 		if (!is_null(this.pageGoName)) {
 			if (typeof(this.chkboxes[this.pageGoName]) !== 'undefined') {

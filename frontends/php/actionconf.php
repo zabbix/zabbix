@@ -316,10 +316,10 @@ elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['g_actionid'])) {
 	show_messages($goResult, _('Selected actions deleted'), _('Cannot delete selected actions'));
 }
 
-if ($_REQUEST['go'] != 'none' && isset($goResult) && $goResult) {
+if ($_REQUEST['go'] != 'none' && !empty($goResult)) {
 	$url = new CUrl();
 	$path = $url->getPath();
-	insert_js('cookie.eraseArray("'.$path.'")');
+	insert_js('cookie.eraseArray("'.basename($path, '.php').'")');
 }
 
 /*

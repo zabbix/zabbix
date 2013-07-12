@@ -317,22 +317,24 @@ elseif (($_REQUEST['go'] == 'activate' || $_REQUEST['go'] == 'disable') && isset
 	$group_itemid = $_REQUEST['group_itemid'];
 
 	DBstart();
-	$go_result = ($_REQUEST['go'] == 'activate') ? activate_item($group_itemid) : disable_item($group_itemid);
-	$go_result = DBend($go_result);
-	show_messages($go_result, ($_REQUEST['go'] == 'activate') ? _('Items activated') : _('Items disabled'), null);
+	$goResult = ($_REQUEST['go'] == 'activate') ? activate_item($group_itemid) : disable_item($group_itemid);
+	$goResult = DBend($goResult);
+	show_messages($goResult, ($_REQUEST['go'] == 'activate') ? _('Items activated') : _('Items disabled'), null);
 }
 elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['group_itemid'])) {
 	$group_itemid = $_REQUEST['group_itemid'];
 	DBstart();
-	$go_result = API::Itemprototype()->delete($group_itemid);
-	$go_result = DBend($go_result);
-	show_messages($go_result, _('Items deleted'), _('Cannot delete items'));
+	$goResult = API::Itemprototype()->delete($group_itemid);
+	$goResult = DBend($goResult);
+	show_messages($goResult, _('Items deleted'), _('Cannot delete items'));
 }
 
-if ($_REQUEST['go'] != 'none' && isset($go_result) && $go_result) {
+if ($_REQUEST['go'] != 'none' && !empty($goResult)) {
 	$url = new CUrl();
 	$path = $url->getPath();
-	insert_js('cookie.eraseArray("'.$path.'")');
+	insert_js('cookie.eraseArray("'.basename($path, '.php').
+		(empty($_REQUEST['parent_discoveryid']) ? '' : '_'.$_REQUEST['parent_discoveryid']).'")'
+	);
 }
 
 /*

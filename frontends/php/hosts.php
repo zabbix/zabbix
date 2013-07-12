@@ -354,7 +354,7 @@ elseif (isset($_REQUEST['go']) && $_REQUEST['go'] == 'massupdate' && isset($_REQ
 
 		$url = new CUrl();
 		$path = $url->getPath();
-		insert_js('cookie.eraseArray("'.$path.'")');
+		insert_js('cookie.eraseArray("'.basename($path, '.php'));
 	}
 	catch (Exception $e) {
 		DBend(false);
@@ -589,10 +589,10 @@ elseif ($_REQUEST['go'] == 'delete') {
 
 	DBstart();
 
-	$go_result = API::Host()->delete($hostIds);
-	$go_result = DBend($go_result);
+	$goResult = API::Host()->delete($hostIds);
+	$goResult = DBend($goResult);
 
-	show_messages($go_result, _('Host deleted'), _('Cannot delete host'));
+	show_messages($goResult, _('Host deleted'), _('Cannot delete host'));
 }
 elseif (str_in_array($_REQUEST['go'], array('activate', 'disable'))) {
 	$status = ($_REQUEST['go'] == 'activate') ? HOST_STATUS_MONITORED : HOST_STATUS_NOT_MONITORED;
@@ -601,16 +601,16 @@ elseif (str_in_array($_REQUEST['go'], array('activate', 'disable'))) {
 
 	DBstart();
 
-	$go_result = updateHostStatus($act_hosts, $status);
-	$go_result = DBend($go_result);
+	$goResult = updateHostStatus($act_hosts, $status);
+	$goResult = DBend($goResult);
 
-	show_messages($go_result, _('Host status updated'), _('Cannot update host status'));
+	show_messages($goResult, _('Host status updated'), _('Cannot update host status'));
 }
 
-if ($_REQUEST['go'] != 'none' && isset($go_result) && $go_result) {
+if ($_REQUEST['go'] != 'none' && !empty($goResult)) {
 	$url = new CUrl();
 	$path = $url->getPath();
-	insert_js('cookie.eraseArray("'.$path.'")');
+	insert_js('cookie.eraseArray("'.basename($path, '.php'));
 }
 
 /*
@@ -734,7 +734,9 @@ else {
 		array(bold(_('Port').NAME_DELIMITER), new CTextBox('filter_port', $_REQUEST['filter_port'], 20))
 	));
 
-	$filter = new CButton('filter', _('Filter'), "javascript: create_var('zbx_filter', 'filter_set', '1', true);");
+	$filter = new CButton('filter', _('Filter'),
+		"javascript: create_var('zbx_filter', 'filter_set', '1', true); chkbxRange.clearSelectedOnFilterChange();"
+	);
 	$filter->useJQueryStyle('main');
 
 	$reset = new CButton('reset', _('Reset'), "javascript: clearAllForm('zbx_filter');");
