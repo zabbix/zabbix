@@ -553,27 +553,27 @@ jQuery(function($) {
 			$('.selected ul', obj).append(li.append(text));
 
 			if (options.selectedLimit == 1) {
-				var t = textTemp = text,
-					text = $('.selected .text', obj).text();
+				var spanObj = textTemp = text,
+					t = $('.selected .text', obj).text();
 
-				textTemp.text(text + (options.disabled ? '' : '[x]'));
+				textTemp.text(t + (options.disabled ? '' : '[x]'));
 
-				var originalHeight = textTemp.height();
+				var	originalHeight = textTemp.height();
 
-				t.text('1');
+				spanObj.text('1');
 
-				var rowHeight = t.height();
+				var rowHeight = spanObj.height();
 
 				if (originalHeight > rowHeight) {
 					var start = 1,
-						end = text.length;
+						end = t.length;
 
 					while (start < end) {
 						var length = Math.ceil((start + end) / 2);
 
-						t.text(text.slice(0, length) + (options.disabled ? '...' : '...[x]'));
+						spanObj.text(t.slice(0, length) + (options.disabled ? '...' : '...x]'));
 
-						if (t.height () <= rowHeight) {
+						if (spanObj.height () <= rowHeight) {
 							start = length;
 						}
 						else {
@@ -581,10 +581,12 @@ jQuery(function($) {
 						}
 					}
 
-					t.text(text.slice(0, start) + '...');
+					spanObj.text(t.slice(0, start) + '...');
+					spanObj.css('text-align', 'justify');
+					li.css('width', $('.selected ul', obj).width() - 3);
 				}
 				else {
-					t.text(text);
+					spanObj.text(t);
 				}
 			}
 
