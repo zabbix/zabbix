@@ -1020,7 +1020,8 @@ function dbConditionInt($fieldName, array $values, $notIn = false) {
 		$between = array();
 
 		// analyze by chunk
-		if (bccomp(bcadd($values[$i], $MIN_NUM_BETWEEN), $values[$i + $MIN_NUM_BETWEEN]) == 0) {
+		if (isset($values[$i + $MIN_NUM_BETWEEN])
+				&& bccomp(bcadd($values[$i], $MIN_NUM_BETWEEN), $values[$i + $MIN_NUM_BETWEEN]) == 0) {
 			for ($sizeMinBetween = $i + $MIN_NUM_BETWEEN; $i < $sizeMinBetween; $i++) {
 				$between[] = $values[$i];
 			}
@@ -1029,7 +1030,7 @@ function dbConditionInt($fieldName, array $values, $notIn = false) {
 
 			// analyze by one
 			for (; $i < $size; $i++) {
-				if (bccomp(bcadd($values[$i], 1), $values[$i + 1]) == 0) {
+				if (isset($values[$i + 1]) && bccomp(bcadd($values[$i], 1), $values[$i + 1]) == 0) {
 					$between[] = $values[$i + 1];
 				}
 				else {
