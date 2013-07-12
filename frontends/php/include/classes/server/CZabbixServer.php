@@ -27,6 +27,21 @@
 class CZabbixServer {
 
 	/**
+	 * Return item queue overview.
+	 */
+	const QUEUE_OVERVIEW = 'overview';
+
+	/**
+	 * Return item queue overview by proxy.
+	 */
+	const QUEUE_OVERVIEW_BY_PROXY = 'overview by proxy';
+
+	/**
+	 * Return a detailed item queue.
+	 */
+	const QUEUE_DETAILS = 'details';
+
+	/**
 	 * Zabbix server host name.
 	 *
 	 * @var string
@@ -60,6 +75,13 @@ class CZabbixServer {
 	 * @var int
 	 */
 	protected $readBytesLimit = 8192;
+
+	/**
+	 * Zabbix server socket resource.
+	 *
+	 * @var resource
+	 */
+	protected $socket;
 
 	/**
 	 * Error message.
@@ -97,6 +119,25 @@ class CZabbixServer {
 			'nodeid' => id2nodeid($hostId),
 			'scriptid' => $scriptId,
 			'hostid' => $hostId
+		));
+	}
+
+	/**
+	 * Retrieve item queue information.
+	 *
+	 * Possible $type values:
+	 * - self::QUEUE_OVERVIEW
+	 * - self::QUEUE_OVERVIEW_BY_PROXY
+	 * - self::QUEUE_DETAILS
+	 *
+	 * @param string $type
+	 *
+	 * @return bool|array
+	 */
+	public function getQueue($type) {
+		return $this->request(array(
+			'request' => 'queue.get',
+			'type' => $type
 		));
 	}
 
@@ -183,7 +224,18 @@ class CZabbixServer {
 
 		fclose($socket);
 
-		return CJs::decodeJson($response);
+		$response = CJs::decodeJson($response);
+
+		// script executed successfully
+		if ($response['response'] == 'success') {
+			return $response['data'];
+		}
+		// an error on the server side occurred
+		else {
+			$this->error = _('Error description').':'.$response['value'];
+
+			return false;
+		}
 	}
 
 	/**
@@ -193,36 +245,40 @@ class CZabbixServer {
 	 * @return bool|resource
 	 */
 	protected function connect() {
-		if (!$this->host || !$this->port) {
-			return false;
-		}
-
-		if (!$socket = @fsockopen($this->host, $this->port, $errorCode, $errorMsg, $this->timeout)) {
-			switch ($errorMsg) {
-				case 'Connection refused':
-					$dErrorMsg = _s("Connection to Zabbix server \"%s\" refused. Possible reasons:\n1. Incorrect server IP/DNS in the \"zabbix.conf.php\";\n2. Security environment (for example, SELinux) is blocking the connection;\n3. Zabbix server daemon not running;\n4. Firewall is blocking TCP connection.\n", $this->host);
-					break;
-
-				case 'No route to host':
-					$dErrorMsg = _s("Zabbix server \"%s\" can not be reached. Possible reasons:\n1. Incorrect server IP/DNS in the \"zabbix.conf.php\";\n2. Incorrect network configuration.\n", $this->host);
-					break;
-
-				case 'Connection timed out':
-					$dErrorMsg = _s("Connection to Zabbix server \"%s\" timed out. Possible reasons:\n1. Incorrect server IP/DNS in the \"zabbix.conf.php\";\n2. Firewall is blocking TCP connection.\n", $this->host);
-					break;
-
-				case 'php_network_getaddresses: getaddrinfo failed: Name or service not known':
-					$dErrorMsg = _s("Connection to Zabbix server \"%s\" failed. Possible reasons:\n1. Incorrect server IP/DNS in the \"zabbix.conf.php\";\n2. Incorrect DNS server configuration.\n", $this->host);
-					break;
-
-				default:
-					$dErrorMsg = '';
+		if (!$this->socket) {
+			if (!$this->host || !$this->port) {
+				return false;
 			}
 
-			$this->error = $dErrorMsg._('Error description').NAME_DELIMITER.$errorMsg;
+			if (!$socket = @fsockopen($this->host, $this->port, $errorCode, $errorMsg, $this->timeout)) {
+				switch ($errorMsg) {
+					case 'Connection refused':
+						$dErrorMsg = _s("Connection to Zabbix server \"%s\" refused. Possible reasons:\n1. Incorrect server IP/DNS in the \"zabbix.conf.php\";\n2. Security environment (for example, SELinux) is blocking the connection;\n3. Zabbix server daemon not running;\n4. Firewall is blocking TCP connection.\n", $this->host);
+						break;
+
+					case 'No route to host':
+						$dErrorMsg = _s("Zabbix server \"%s\" can not be reached. Possible reasons:\n1. Incorrect server IP/DNS in the \"zabbix.conf.php\";\n2. Incorrect network configuration.\n", $this->host);
+						break;
+
+					case 'Connection timed out':
+						$dErrorMsg = _s("Connection to Zabbix server \"%s\" timed out. Possible reasons:\n1. Incorrect server IP/DNS in the \"zabbix.conf.php\";\n2. Firewall is blocking TCP connection.\n", $this->host);
+						break;
+
+					case 'php_network_getaddresses: getaddrinfo failed: Name or service not known':
+						$dErrorMsg = _s("Connection to Zabbix server \"%s\" failed. Possible reasons:\n1. Incorrect server IP/DNS in the \"zabbix.conf.php\";\n2. Incorrect DNS server configuration.\n", $this->host);
+						break;
+
+					default:
+						$dErrorMsg = '';
+				}
+
+				$this->error = $dErrorMsg._('Error description').NAME_DELIMITER.$errorMsg;
+			}
+
+			$this->socket = $socket;
 		}
 
-		return $socket;
+		return $this->socket;
 	}
 
 }
