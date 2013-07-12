@@ -2337,7 +2337,7 @@ static int	vch_item_cache_values_by_time(zbx_vc_item_t *item, int seconds, int t
  *           cached and updates cache from database if necessary.             *
  *                                                                            *
  ******************************************************************************/
-static int	vch_item_cache_values_by_count(zbx_vc_item_t *item,  int count, const zbx_timespec_t *timestamp)
+static int	vch_item_cache_values_by_count(zbx_vc_item_t *item, int count, const zbx_timespec_t *timestamp)
 {
 	zbx_vc_data_history_t	*data = &item->data.history;
 	int			ret = SUCCEED, cache_records = 0, update_end;
@@ -3403,7 +3403,9 @@ out:
 		cache_used = 0;
 
 		if (0 == count)
+		{
 			ret = vc_db_read_values_by_time(itemid, value_type, values, seconds, timestamp);
+		}
 		else
 		{
 			zbx_timespec_t	ts = {timestamp, VC_MAX_NANOSECONDS};
