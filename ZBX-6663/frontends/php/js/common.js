@@ -646,6 +646,14 @@ function zbx_throw(msg) {
 	throw(msg);
 }
 
+/**
+ * Returns the file name of the given path
+ *
+ * @param string path
+ * @param string suffix
+ *
+ * @return string
+ */
 function basename(path, suffix) {
 	var name = path.replace(/^.*[\/\\]/g, '');
 

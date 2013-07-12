@@ -271,18 +271,21 @@ elseif (($_REQUEST['go'] == 'activate' || ($_REQUEST['go'] == 'disable')) && iss
 	$groupHostDiscoveryRuleId = $_REQUEST['g_hostdruleid'];
 
 	DBstart();
-	$go_result = ($_REQUEST['go'] == 'activate') ? activate_item($groupHostDiscoveryRuleId) : disable_item($groupHostDiscoveryRuleId);
-	$go_result = DBend($go_result);
-	show_messages($go_result, ($_REQUEST['go'] == 'activate') ? _('Discovery rules activated') : _('Discovery rules disabled'), null);
+	$goResult = ($_REQUEST['go'] == 'activate') ? activate_item($groupHostDiscoveryRuleId) : disable_item($groupHostDiscoveryRuleId);
+	$goResult = DBend($goResult);
+	show_messages($goResult, ($_REQUEST['go'] == 'activate') ? _('Discovery rules activated') : _('Discovery rules disabled'), null);
 }
 elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['g_hostdruleid'])) {
-	$go_result = API::DiscoveryRule()->delete($_REQUEST['g_hostdruleid']);
-	show_messages($go_result, _('Discovery rules deleted'), _('Cannot delete discovery rules'));
+	$goResult = API::DiscoveryRule()->delete($_REQUEST['g_hostdruleid']);
+	show_messages($goResult, _('Discovery rules deleted'), _('Cannot delete discovery rules'));
 }
-if ($_REQUEST['go'] != 'none' && isset($go_result) && $go_result) {
+
+if ($_REQUEST['go'] != 'none' && !empty($goResult)) {
 	$url = new CUrl();
 	$path = $url->getPath();
-	insert_js('cookie.eraseArray("'.$path.'")');
+	insert_js('cookie.eraseArray("'.basename($path, '.php').
+		(empty($_REQUEST['hostid']) ? '' : '_'.$_REQUEST['hostid']).'")'
+	);
 }
 
 /*

@@ -287,10 +287,10 @@ elseif ($_REQUEST['go'] == 'unblock' && isset($_REQUEST['group_userid'])) {
 
 	DBstart();
 
-	$go_result = unblock_user_login($groupUserId);
-	$go_result = DBend($go_result);
+	$goResult = unblock_user_login($groupUserId);
+	$goResult = DBend($goResult);
 
-	if ($go_result) {
+	if ($goResult) {
 		$users = API::User()->get(array(
 			'userids' => $groupUserId,
 			'output' => API_OUTPUT_EXTEND
@@ -302,10 +302,10 @@ elseif ($_REQUEST['go'] == 'unblock' && isset($_REQUEST['group_userid'])) {
 		}
 	}
 
-	show_messages($go_result, _('Users unblocked'), _('Cannot unblock users'));
+	show_messages($goResult, _('Users unblocked'), _('Cannot unblock users'));
 }
 elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['group_userid'])) {
-	$go_result = false;
+	$goResult = false;
 
 	$groupUserId = get_request('group_userid', array());
 
@@ -324,21 +324,21 @@ elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['group_userid'])) {
 
 		$userData = $dbUsers[$userId];
 
-		$go_result |= (bool) API::User()->delete(array($userId));
+		$goResult |= (bool) API::User()->delete(array($userId));
 
-		if ($go_result) {
+		if ($goResult) {
 			add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_USER, 'User alias ['.$userData['alias'].'] name ['.$userData['name'].'] surname ['.$userData['surname'].']');
 		}
 	}
 
-	$go_result = DBend($go_result);
-	show_messages($go_result, _('User deleted'), _('Cannot delete user'));
+	$goResult = DBend($goResult);
+	show_messages($goResult, _('User deleted'), _('Cannot delete user'));
 }
 
-if ($_REQUEST['go'] != 'none' && isset($go_result) && $go_result) {
+if ($_REQUEST['go'] != 'none' && !empty($goResult)) {
 	$url = new CUrl();
 	$path = $url->getPath();
-	insert_js('cookie.eraseArray("'.$path.'")');
+	insert_js('cookie.eraseArray("'.basename($path, '.php').'")');
 }
 
 /*

@@ -203,10 +203,10 @@ elseif ($_REQUEST['go'] == 'massupdate' && isset($_REQUEST['mass_save']) && isse
 	if ($result) {
 		unset($_REQUEST['massupdate'], $_REQUEST['form']);
 	}
-	$go_result = $result;
+	$goResult = $result;
 }
 elseif (str_in_array($_REQUEST['go'], array('activate', 'disable')) && isset($_REQUEST['g_triggerid'])) {
-	$go_result = true;
+	$goResult = true;
 
 	if ($_REQUEST['go'] == 'activate') {
 		$status = TRIGGER_STATUS_ENABLED;
@@ -279,19 +279,20 @@ elseif (str_in_array($_REQUEST['go'], array('activate', 'disable')) && isset($_R
 			$host['host'].':'.$trigger['description'], 'triggers', $statusOld, $statusNew);
 	}
 
-	$go_result = DBend($go_result);
-	show_messages($go_result, _('Status updated'), _('Cannot update status'));
+	$goResult = DBend($goResult);
+	show_messages($goResult, _('Status updated'), _('Cannot update status'));
 }
 elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['g_triggerid'])) {
-	$go_result = API::TriggerPrototype()->delete($_REQUEST['g_triggerid']);
-	show_messages($go_result, _('Triggers deleted'), _('Cannot delete triggers'));
+	$goResult = API::TriggerPrototype()->delete($_REQUEST['g_triggerid']);
+	show_messages($goResult, _('Triggers deleted'), _('Cannot delete triggers'));
 }
 
-if ($_REQUEST['go'] != 'none' && !empty($go_result)) {
+if ($_REQUEST['go'] != 'none' && !empty($goResult)) {
 	$url = new CUrl();
 	$path = $url->getPath();
-	insert_js('cookie.eraseArray(\''.$path.'\')');
-	$_REQUEST['go'] = 'none';
+	insert_js('cookie.eraseArray("'.basename($path, '.php').
+		(empty($_REQUEST['parent_discoveryid']) ? '' : '_'.$_REQUEST['parent_discoveryid']).'")'
+	);
 }
 
 /*

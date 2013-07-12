@@ -152,7 +152,7 @@ elseif (isset($_REQUEST['delete'])) {
 	}
 }
 elseif ($_REQUEST['go'] == 'delete') {
-	$go_result = true;
+	$goResult = true;
 	$applications = get_request('applications', array());
 
 	DBstart();
@@ -168,9 +168,9 @@ elseif ($_REQUEST['go'] == 'delete') {
 			continue;
 		}
 
-		$go_result &= (bool) API::Application()->delete($dbApplication['applicationid']);
+		$goResult &= (bool) API::Application()->delete($dbApplication['applicationid']);
 
-		if ($go_result) {
+		if ($goResult) {
 			$host = get_host_by_hostid($dbApplication['hostid']);
 
 			add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_APPLICATION,
@@ -178,12 +178,12 @@ elseif ($_REQUEST['go'] == 'delete') {
 		}
 	}
 
-	$go_result = DBend($go_result);
+	$goResult = DBend($goResult);
 
-	show_messages($go_result, _('Application deleted'), _('Cannot delete application'));
+	show_messages($goResult, _('Application deleted'), _('Cannot delete application'));
 }
 elseif (str_in_array($_REQUEST['go'], array('activate', 'disable'))) {
-	$go_result = true;
+	$goResult = true;
 	$applications = get_request('applications', array());
 
 	DBstart();
@@ -200,27 +200,30 @@ elseif (str_in_array($_REQUEST['go'], array('activate', 'disable'))) {
 		);
 		while ($item = DBfetch($db_items)) {
 			if ($_REQUEST['go'] == 'activate') {
-				$go_result &= activate_item($item['itemid']);
+				$goResult &= activate_item($item['itemid']);
 			}
 			else {
-				$go_result &= disable_item($item['itemid']);
+				$goResult &= disable_item($item['itemid']);
 			}
 		}
 	}
 
-	$go_result = DBend($go_result);
+	$goResult = DBend($goResult);
 
 	if ($_REQUEST['go'] == 'activate') {
-		show_messages($go_result, _('Items activated'), null);
+		show_messages($goResult, _('Items activated'), null);
 	}
 	else {
-		show_messages($go_result, _('Items disabled'), null);
+		show_messages($goResult, _('Items disabled'), null);
 	}
 }
-if ($_REQUEST['go'] != 'none' && !empty($go_result)) {
+
+if ($_REQUEST['go'] != 'none' && !empty($goResult)) {
 	$url = new CUrl();
 	$path = $url->getPath();
-	insert_js('cookie.eraseArray("'.$path.'")');
+	insert_js('cookie.eraseArray("'.basename($path, '.php').
+		(empty($_REQUEST['hostid']) ? '' : '_'.$_REQUEST['hostid']).'")'
+	);
 }
 
 /*

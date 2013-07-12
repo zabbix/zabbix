@@ -180,7 +180,7 @@ elseif (isset($_REQUEST['go'])) {
 
 			$url = new CUrl();
 			$path = $url->getPath();
-			insert_js('cookie.eraseArray("'.$path.'")');
+			insert_js('cookie.eraseArray("'.basename($path, '.php').'")');
 		}
 	}
 }

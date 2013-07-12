@@ -109,7 +109,7 @@ var cookie = {
 	},
 
 	read: function(name) {
-		if (typeof(this.cookies[name]) != 'undefined') {
+		if (typeof(this.cookies[name]) !== 'undefined') {
 			return this.cookies[name];
 		}
 		else if (document.cookie.indexOf(name) != -1) {
@@ -174,7 +174,10 @@ var cookie = {
 	},
 
 	eraseArray: function(name) {
-		var name = 'cb_' + name + (is_null(this.prefix) ? '' : '_' + this.prefix);
+		if (name.indexOf('cb_') != 0) {
+			name = 'cb_' + name;
+		}
+
 		var partCount = parseInt(this.read(name + '_parts'), 10);
 
 		if (!is_null(partCount)) {

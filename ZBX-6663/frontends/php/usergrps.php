@@ -220,15 +220,15 @@ elseif ($_REQUEST['go'] == 'delete') {
 	}
 
 	if ($groups) {
-		$go_result = API::UserGroup()->delete($groupIds);
+		$goResult = API::UserGroup()->delete($groupIds);
 
-		if ($go_result) {
+		if ($goResult) {
 			foreach ($groups as $groupId => $group) {
 				add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_USER_GROUP, 'Group name ['.$group['name'].']');
 			}
 		}
 
-		show_messages($go_result, _('Group deleted'), _('Cannot delete group'));
+		show_messages($goResult, _('Group deleted'), _('Cannot delete group'));
 	}
 }
 elseif ($_REQUEST['go'] == 'set_gui_access') {
@@ -249,10 +249,10 @@ elseif ($_REQUEST['go'] == 'set_gui_access') {
 	if ($groups) {
 		DBstart();
 
-		$go_result = change_group_gui_access($groupIds, $_REQUEST['set_gui_access']);
-		$go_result = DBend($go_result);
+		$goResult = change_group_gui_access($groupIds, $_REQUEST['set_gui_access']);
+		$goResult = DBend($goResult);
 
-		if ($go_result) {
+		if ($goResult) {
 			$auditAction = ($_REQUEST['set_gui_access'] == GROUP_GUI_ACCESS_DISABLED) ? AUDIT_ACTION_DISABLE : AUDIT_ACTION_ENABLE;
 
 			foreach ($groups as $groupId => $group) {
@@ -260,7 +260,7 @@ elseif ($_REQUEST['go'] == 'set_gui_access') {
 			}
 		}
 
-		show_messages($go_result, _('Frontend access updated'), _('Cannot update frontend access'));
+		show_messages($goResult, _('Frontend access updated'), _('Cannot update frontend access'));
 	}
 }
 elseif (str_in_array($_REQUEST['go'], array('enable_debug', 'disable_debug'))) {
@@ -283,10 +283,10 @@ elseif (str_in_array($_REQUEST['go'], array('enable_debug', 'disable_debug'))) {
 	if ($groups) {
 		DBstart();
 
-		$go_result = change_group_debug_mode($groupIds, $setDebugMode);
-		$go_result = DBend($go_result);
+		$goResult = change_group_debug_mode($groupIds, $setDebugMode);
+		$goResult = DBend($goResult);
 
-		if ($go_result) {
+		if ($goResult) {
 			$auditAction = ($setDebugMode == GROUP_DEBUG_MODE_DISABLED) ? AUDIT_ACTION_DISABLE : AUDIT_ACTION_ENABLE;
 
 			foreach ($groups as $groupId => $group) {
@@ -294,7 +294,7 @@ elseif (str_in_array($_REQUEST['go'], array('enable_debug', 'disable_debug'))) {
 			}
 		}
 
-		show_messages($go_result, _('Debug mode updated'), _('Cannot update debug mode'));
+		show_messages($goResult, _('Debug mode updated'), _('Cannot update debug mode'));
 	}
 }
 elseif (str_in_array($_REQUEST['go'], array('enable_status', 'disable_status'))) {
@@ -317,10 +317,10 @@ elseif (str_in_array($_REQUEST['go'], array('enable_status', 'disable_status')))
 	if ($groups) {
 		DBstart();
 
-		$go_result = change_group_status($groupIds, $setUsersStatus);
-		$go_result = DBend($go_result);
+		$goResult = change_group_status($groupIds, $setUsersStatus);
+		$goResult = DBend($goResult);
 
-		if ($go_result) {
+		if ($goResult) {
 			$auditAction = ($setUsersStatus == GROUP_STATUS_ENABLED) ? AUDIT_ACTION_ENABLE : AUDIT_ACTION_DISABLE;
 
 			foreach ($groups as $groupId => $group) {
@@ -328,14 +328,14 @@ elseif (str_in_array($_REQUEST['go'], array('enable_status', 'disable_status')))
 			}
 		}
 
-		show_messages($go_result, _('Users status updated'), _('Cannot update users status'));
+		show_messages($goResult, _('Users status updated'), _('Cannot update users status'));
 	}
 }
 
-if ($_REQUEST['go'] != 'none' && isset($go_result) && $go_result) {
+if ($_REQUEST['go'] != 'none' && !empty($goResult)) {
 	$url = new CUrl();
 	$path = $url->getPath();
-	insert_js('cookie.eraseArray("'.$path.'")');
+	insert_js('cookie.eraseArray("'.basename($path, '.php').'")');
 }
 
 /*

@@ -215,10 +215,13 @@ elseif (str_in_array($_REQUEST['go'], array('activate', 'disable'))) {
 		show_messages($go_result, _('Host status updated'), _('Cannot update host'));
 	}
 }
-if ($_REQUEST['go'] != 'none' && isset($go_result) && $go_result) {
+
+if ($_REQUEST['go'] != 'none' && !empty($go_result)) {
 	$url = new CUrl();
 	$path = $url->getPath();
-	insert_js('cookie.eraseArray("'.$path.'")');
+	insert_js('cookie.eraseArray("'.basename($path, '.php').
+		(empty($_REQUEST['hostid']) ? '' : '_'.$_REQUEST['hostid']).'")'
+	);
 }
 
 /*

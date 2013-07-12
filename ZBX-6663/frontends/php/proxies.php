@@ -177,7 +177,7 @@ elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['hosts'])) {
 if ($_REQUEST['go'] != 'none' && !empty($goResult)) {
 	$url = new CUrl();
 	$path = $url->getPath();
-	insert_js('cookie.eraseArray("'.$path.'")');
+	insert_js('cookie.eraseArray("'.basename($path, '.php').'")');
 }
 
 /*
