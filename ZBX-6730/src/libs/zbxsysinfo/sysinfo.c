@@ -419,12 +419,15 @@ notsupported:
 	{
 #define	COL_WIDTH	45
 
-		int	n1;
+		int	n1, n2 = 0;
 
-		n1 = printf("%s", in_command);
+		n1 = printf("%s", usr_cmd);
 
-		if (0 < n1 && COL_WIDTH > n1)
-			printf("%-*s", COL_WIDTH - n1, " ");
+		if (0 < n1 && '\0' != *param)
+			n2 = printf("[%s]", param);
+
+		if (0 < n1 && 0 <= n2 && COL_WIDTH > n1 + n2)
+			printf("%-*s", COL_WIDTH - n1 - n2, " ");
 	}
 
 	if (NOTSUPPORTED == ret)
