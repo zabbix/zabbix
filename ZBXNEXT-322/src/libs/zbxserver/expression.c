@@ -1546,7 +1546,7 @@ out:
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-int	DBitem_value(const char *expression, char **value, int N_functionid, int clock, int ns)
+static int	DBitem_value(const char *expression, char **value, int N_functionid, int clock, int ns)
 {
 	const char	*__function_name = "DBitem_value";
 
