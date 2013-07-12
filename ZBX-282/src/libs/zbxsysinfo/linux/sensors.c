@@ -119,7 +119,7 @@ static char	*sysfs_read_attr(const char *device)
 int	get_device_info(const char *dev_path, const char *dev_name, char *device_info)
 {
 	char		bus_path[MAX_STRING_LEN], linkpath[MAX_STRING_LEN], subsys_path[MAX_STRING_LEN];
-	char		*subsys, *prefix, *bus_attr;
+	char		*subsys, *prefix, *bus_attr = NULL;
 	int		domain, bus, slot, fn, addr, vendor, product, sub_len, ret = FAIL;
 	short int	bus_spi, bus_i2c;
 
@@ -180,10 +180,10 @@ int	get_device_info(const char *dev_path, const char *dev_name, char *device_inf
 
 			if (NULL != (bus_attr = sysfs_read_attr(bus_path)))
 			{
-				if (0 == strncmp(bus_attr, "ISA ", 4))
-					zbx_snprintf(device_info, MAX_STRING_LEN, "%s-isa-%04x", prefix, addr);
-				/* TODO: handle situation when bus_attr is not equal to "ISA " */
-				zbx_free(bus_attr);
+				if (0 != strncmp(bus_attr, "ISA ", 4))
+					goto out;
+
+				zbx_snprintf(device_info, MAX_STRING_LEN, "%s-isa-%04x", prefix, addr);
 			}
 			else
 				zbx_snprintf(device_info, MAX_STRING_LEN, "%s-i2c-%hd-%02x", prefix, bus_i2c, addr);
@@ -241,6 +241,7 @@ int	get_device_info(const char *dev_path, const char *dev_name, char *device_inf
 		ret = SUCCEED;
 	}
 out:
+	zbx_free(bus_attr);
 	zbx_free(prefix);
 
 	return ret;
