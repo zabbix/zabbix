@@ -532,6 +532,14 @@ else {
 	$data['paging'] = getPagingLine($data['maintenances']);
 	$data['pageFilter'] = $pageFilter;
 
+	// nodes
+	if ($data['displayNodes'] = is_array(get_current_nodeid())) {
+		foreach ($data['maintenances'] as &$maintenance) {
+			$maintenance['nodename'] = get_node_name_by_elid($maintenance['maintenanceid'], true);
+		}
+		unset($maintenance);
+	}
+
 	// render view
 	$maintenanceView = new CView('configuration.maintenance.list', $data);
 	$maintenanceView->render();
