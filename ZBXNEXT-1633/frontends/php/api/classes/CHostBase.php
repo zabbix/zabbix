@@ -30,23 +30,23 @@ abstract class CHostBase extends CZBXAPI {
 	/**
 	 * Links the templates to the given hosts.
 	 *
-	 * @param array $templateids
-	 * @param array $targetids		an array of host IDs to link the templates to
+	 * @param array $templateIds
+	 * @param array $targetIds		an array of host IDs to link the templates to
 	 *
 	 * @return bool
 	 */
-	protected function link(array $templateids, array $targetids) {
-		if (empty($templateids)) {
+	protected function link(array $templateIds, array $targetIds) {
+		if (empty($templateIds)) {
 			return;
 		}
 
 		// permission check
-		if (!API::Template()->isReadable($templateids)) {
+		if (!API::Template()->isReadable($templateIds)) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
 		// check if someone passed duplicate templates in the same query
-		$templateIdDuplicates = zbx_arrayFindDuplicates($templateids);
+		$templateIdDuplicates = zbx_arrayFindDuplicates($templateIds);
 		if (!zbx_empty($templateIdDuplicates)) {
 			$duplicatesFound = array();
 			foreach ($templateIdDuplicates as $value => $count) {
@@ -59,14 +59,14 @@ abstract class CHostBase extends CZBXAPI {
 		}
 
 		// check if any templates linked to targets have more than one unique item key/application
-		foreach ($targetids as $targetid) {
+		foreach ($targetIds as $targetid) {
 			$linkedTpls = API::Template()->get(array(
 				'nopermissions' => true,
 				'output' => array('templateid'),
 				'hostids' => $targetid
 			));
 
-			$templateIdsAll = array_merge($templateids, zbx_objectValues($linkedTpls, 'templateid'));
+			$templateIdsAll = array_merge($templateIds, zbx_objectValues($linkedTpls, 'templateid'));
 
 			$dbItems = DBselect(
 				'SELECT i.key_'.
@@ -97,7 +97,7 @@ abstract class CHostBase extends CZBXAPI {
 		}
 
 		// get DB templates which exists in all targets
-		$res = DBselect('SELECT * FROM hosts_templates WHERE '.dbConditionInt('hostid', $targetids));
+		$res = DBselect('SELECT * FROM hosts_templates WHERE '.dbConditionInt('hostid', $targetIds));
 		$mas = array();
 		while ($row = DBfetch($res)) {
 			if (!isset($mas[$row['templateid']])) {
@@ -105,7 +105,7 @@ abstract class CHostBase extends CZBXAPI {
 			}
 			$mas[$row['templateid']][$row['hostid']] = 1;
 		}
-		$targetIdCount = count($targetids);
+		$targetIdCount = count($targetIds);
 		$commonDBTemplateIds = array();
 		foreach ($mas as $templateId => $targetList) {
 			if (count($targetList) == $targetIdCount) {
@@ -114,8 +114,8 @@ abstract class CHostBase extends CZBXAPI {
 		}
 
 		// check if there are any template with triggers which depends on triggers in templates which will be not linked
-		$commonTemplateIds = array_unique(array_merge($commonDBTemplateIds, $templateids));
-		foreach ($templateids as $templateid) {
+		$commonTemplateIds = array_unique(array_merge($commonDBTemplateIds, $templateIds));
+		foreach ($templateIds as $templateid) {
 			$triggerids = array();
 			$dbTriggers = get_triggers_by_hostid($templateid);
 			while ($trigger = DBfetch($dbTriggers)) {
@@ -147,8 +147,8 @@ abstract class CHostBase extends CZBXAPI {
 		$res = DBselect(
 			'SELECT ht.hostid,ht.templateid'.
 				' FROM hosts_templates ht'.
-				' WHERE '.dbConditionInt('ht.hostid', $targetids).
-				' AND '.dbConditionInt('ht.templateid', $templateids)
+				' WHERE '.dbConditionInt('ht.hostid', $targetIds).
+				' AND '.dbConditionInt('ht.templateid', $templateIds)
 		);
 		$linked = array();
 		while ($row = DBfetch($res)) {
@@ -160,8 +160,8 @@ abstract class CHostBase extends CZBXAPI {
 
 		// add template linkages, if problems rollback later
 		$hostsLinkageInserts = array();
-		foreach ($targetids as $targetid) {
-			foreach ($templateids as $templateid) {
+		foreach ($targetIds as $targetid) {
+			foreach ($templateIds as $templateid) {
 				if (isset($linked[$targetid]) && isset($linked[$targetid][$templateid])) {
 					continue;
 				}
@@ -179,8 +179,8 @@ abstract class CHostBase extends CZBXAPI {
 			' AND f.triggerid=t.triggerid'.
 			' AND i.hostid=h.hostid'.
 			' AND h.status='.HOST_STATUS_TEMPLATE.
-			' AND NOT EXISTS (SELECT 1 FROM hosts_templates ht WHERE ht.templateid=i.hostid AND '.dbConditionInt('ht.hostid', $targetids).')'.
-			' AND EXISTS (SELECT 1 FROM functions ff,items ii WHERE ff.itemid=ii.itemid AND ff.triggerid=t.triggerid AND '.dbConditionInt('ii.hostid', $templateids). ')';
+			' AND NOT EXISTS (SELECT 1 FROM hosts_templates ht WHERE ht.templateid=i.hostid AND '.dbConditionInt('ht.hostid', $targetIds).')'.
+			' AND EXISTS (SELECT 1 FROM functions ff,items ii WHERE ff.itemid=ii.itemid AND ff.triggerid=t.triggerid AND '.dbConditionInt('ii.hostid', $templateIds). ')';
 		if ($dbNotLinkedTpl = DBfetch(DBSelect($sql, 1))) {
 			self::exception(
 				ZBX_API_ERROR_PARAMETERS,

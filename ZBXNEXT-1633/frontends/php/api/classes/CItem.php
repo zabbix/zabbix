@@ -18,7 +18,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 /**
+ * Class containing methods for operations with items.
+ *
  * @package API
  */
 class CItem extends CItemGeneral {
@@ -35,7 +38,6 @@ class CItem extends CItemGeneral {
 			self::ERROR_EXISTS => _('Item "%1$s" already exists on "%2$s".')
 		));
 	}
-
 
 	/**
 	 * Get items data.

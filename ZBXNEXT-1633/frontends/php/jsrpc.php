@@ -247,7 +247,7 @@ switch ($data['method']) {
 
 				if ($hostGroups) {
 					foreach ($hostGroups as &$hostGroup) {
-						$hostGroup['nodename'] = get_node_name_by_elid($hostGroup['groupid'], true, ': ');
+						$hostGroup['nodename'] = get_node_name_by_elid($hostGroup['groupid'], true, NAME_DELIMITER);
 					}
 					unset($hostGroup);
 

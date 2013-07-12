@@ -19,25 +19,25 @@
 **/
 
 
-$hostgroupWidget = new CWidget();
-$hostgroupWidget->addPageHeader(_('CONFIGURATION OF HOST GROUPS'));
+$hostGroupWidget = new CWidget();
+$hostGroupWidget->addPageHeader(_('CONFIGURATION OF HOST GROUPS'));
 
 // create form
-$hostgroupForm = new CForm();
-$hostgroupForm->setName('hostgroupForm');
-$hostgroupForm->addVar('form', $this->data['form']);
+$hostGroupForm = new CForm();
+$hostGroupForm->setName('hostgroupForm');
+$hostGroupForm->addVar('form', $this->data['form']);
 if (isset($this->data['groupid'])) {
-	$hostgroupForm->addVar('groupid', $this->data['groupid']);
+	$hostGroupForm->addVar('groupid', $this->data['groupid']);
 }
 
 // create hostgroup form list
-$hostgroupFormList = new CFormList('hostgroupFormList');
+$hostGroupFormList = new CFormList('hostgroupFormList');
 $nameTextBox = new CTextBox('name', $this->data['name'], ZBX_TEXTBOX_STANDARD_SIZE,
 	($this->data['groupid'] && $this->data['group']['flags'] == ZBX_FLAG_DISCOVERY_CREATED),
 	64
 );
 $nameTextBox->attr('autofocus', 'autofocus');
-$hostgroupFormList->addRow(_('Group name'), $nameTextBox);
+$hostGroupFormList->addRow(_('Group name'), $nameTextBox);
 
 // append groups and hosts to form list
 $groupsComboBox = new CComboBox('twb_groupid', $this->data['twb_groupid'], 'submit()');
@@ -46,7 +46,7 @@ foreach ($this->data['db_groups'] as $row) {
 	$groupsComboBox->addItem($row['groupid'], $row['name']);
 }
 
-$hostsComboBox = new CTweenBox($hostgroupForm, 'hosts', $this->data['hosts'], 25);
+$hostsComboBox = new CTweenBox($hostGroupForm, 'hosts', $this->data['hosts'], 25);
 foreach ($this->data['db_hosts'] as $host) {
 	// add all hosts except selected
 	if (!isset($this->data['hosts'][$host['hostid']])) {
@@ -61,16 +61,16 @@ foreach ($this->data['r_hosts'] as $host) {
 		$hostsComboBox->addItem($host['hostid'], $host['name'], true, false);
 	}
 }
-$hostgroupFormList->addRow(_('Hosts'), $hostsComboBox->get(_('Hosts in'), array(_('Other hosts | Group').SPACE, $groupsComboBox)));
+$hostGroupFormList->addRow(_('Hosts'), $hostsComboBox->get(_('Hosts in'), array(_('Other hosts | Group').SPACE, $groupsComboBox)));
 
 // append tabs to form
-$hostgroupTab = new CTabView();
-$hostgroupTab->addTab('hostgroupTab', _('Host group'), $hostgroupFormList);
-$hostgroupForm->addItem($hostgroupTab);
+$hostGroupTab = new CTabView();
+$hostGroupTab->addTab('hostgroupTab', _('Host group'), $hostGroupFormList);
+$hostGroupForm->addItem($hostGroupTab);
 
 // append buttons to form
 if (empty($this->data['groupid'])) {
-	$hostgroupForm->addItem(makeFormFooter(
+	$hostGroupForm->addItem(makeFormFooter(
 		new CSubmit('save', _('Save')),
 		new CButtonCancel()
 	));
@@ -80,7 +80,8 @@ else {
 	if (empty($this->data['deletableHostGroups'])) {
 		$deleteButton->attr('disabled', 'disabled');
 	}
-	$hostgroupForm->addItem(makeFormFooter(
+
+	$hostGroupForm->addItem(makeFormFooter(
 		new CSubmit('save', _('Save')),
 		array(
 			new CSubmit('clone', _('Clone')),
@@ -89,6 +90,6 @@ else {
 	));
 }
 
-$hostgroupWidget->addItem($hostgroupForm);
+$hostGroupWidget->addItem($hostGroupForm);
 
-return $hostgroupWidget;
+return $hostGroupWidget;

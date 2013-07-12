@@ -36,19 +36,19 @@ var cookie = {
 	},
 
 	create: function(name, value, days) {
+		var expires = '';
+
 		if (typeof(days) != 'undefined') {
 			var date = new Date();
 			date.setTime(date.getTime() + days * 24 * 60 * 60 * 1000);
-			var expires = '; expires=' + date.toGMTString();
+			expires = '; expires=' + date.toGMTString();
 		}
-		else {
-			var expires = '';
-		}
-		document.cookie = name + '=' + value + expires + '; path=/';
+
+		document.cookie = name + '=' + value + expires;
 
 		// apache header size limit
 		if (document.cookie.length > 8000) {
-			document.cookie = name + '=; path=/';
+			document.cookie = name + '=;';
 			alert(locale['S_MAX_COOKIE_SIZE_REACHED']);
 			return false;
 		}
@@ -87,7 +87,7 @@ var cookie = {
 				break;
 			}
 		}
-		this.create(name + '_parts', part - 1);
+		this.create(name + '_parts', part - 1, days);
 
 		while (part <= part_count) {
 			this.erase(name + '_' + part);
@@ -221,7 +221,7 @@ var cookie = {
  * @option Number|Date expires Either an integer specifying the expiration date from now on in days or a Date object.
  *                             If a negative value is specified (e.g. a date in the past), the cookie will be deleted.
  *                             If set to null or omitted, the cookie will be a session cookie and will not be retained
- *                             when the the browser exits.
+ *                             when the browser exits.
  * @option String path The value of the path atribute of the cookie (default: path of page that created the cookie).
  * @option String domain The value of the domain attribute of the cookie (default: domain of page that created the cookie).
  * @option Boolean secure If true, the secure attribute of the cookie will be set and the cookie transmission will

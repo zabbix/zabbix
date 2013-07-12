@@ -20,11 +20,9 @@
 
 
 /**
- * File containing CScreenItem class for API.
+ * Class containing methods for operations with screen items.
+ *
  * @package API
- */
-/**
- * Class containing methods for operations with ScreenItems
  */
 class CScreenItem extends CZBXAPI {
 

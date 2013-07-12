@@ -20,6 +20,8 @@
 
 
 /**
+ * Class containing methods for operations with item general.
+ *
  * @package API
  */
 abstract class CItemGeneral extends CZBXAPI {

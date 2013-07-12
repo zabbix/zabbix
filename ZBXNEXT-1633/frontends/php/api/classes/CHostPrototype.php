@@ -995,12 +995,12 @@ class CHostPrototype extends CHostBase {
 		return count($ids) == $count;
 	}
 
-	protected function link(array $templateids, array $targetids) {
-		if (!$this->isWritable($targetids)) {
+	protected function link(array $templateIds, array $targetIds) {
+		if (!$this->isWritable($targetIds)) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
-		parent::link($templateids, $targetids);
+		parent::link($templateIds, $targetIds);
 	}
 
 	/**

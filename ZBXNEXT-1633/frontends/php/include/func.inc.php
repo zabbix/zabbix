@@ -1686,15 +1686,15 @@ function getPagingLine(&$items) {
 
 	$config = select_config();
 
-	$search_limit = '';
+	$searchLimit = '';
 	if ($config['search_limit'] < count($items)) {
 		array_pop($items);
-		$search_limit = '+';
+		$searchLimit = '+';
 	}
 
 	$rowsPerPage = CWebUser::$data['rows_per_page'];
 	$itemsCount = count($items);
-	$pagesCount = $itemsCount > 0 ? ceil($itemsCount / $rowsPerPage) : 1;
+	$pagesCount = ($itemsCount > 0) ? ceil($itemsCount / $rowsPerPage) : 1;
 
 	$currentPage = getPageNumber();
 	if ($currentPage < 1) {
@@ -1706,6 +1706,7 @@ function getPagingLine(&$items) {
 	}
 
 	$start = ($currentPage - 1) * $rowsPerPage;
+
 	CProfile::update('web.paging.lastpage', $page['file'], PROFILE_TYPE_STR);
 	CProfile::update('web.paging.page', $currentPage, PROFILE_TYPE_INT);
 
@@ -1725,21 +1726,23 @@ function getPagingLine(&$items) {
 
 	$startPage = ($endPage > $pagingNavRange) ? $endPage - $pagingNavRange + 1 : 1;
 
-	$pageline = array();
+	$pageLine = array();
 
 	$table = null;
+
 	if ($pagesCount > 1) {
 		$url = new Curl();
+
 		if ($startPage > 1) {
 			$url->setArgument('page', 1);
-			$pageline[] = new CLink('<< '._x('First', 'page navigation'), $url->getUrl(), null, null, true);
-			$pageline[] = '&nbsp;&nbsp;';
+			$pageLine[] = new CLink('<< '._x('First', 'page navigation'), $url->getUrl(), null, null, true);
+			$pageLine[] = '&nbsp;&nbsp;';
 		}
 
 		if ($currentPage > 1) {
 			$url->setArgument('page', $currentPage - 1);
-			$pageline[] = new CLink('< '._x('Previous', 'page navigation'), $url->getUrl(), null, null, true);
-			$pageline[] = ' | ';
+			$pageLine[] = new CLink('< '._x('Previous', 'page navigation'), $url->getUrl(), null, null, true);
+			$pageLine[] = ' | ';
 		}
 
 		for ($p = $startPage; $p <= $pagesCount; $p++) {
@@ -1755,53 +1758,53 @@ function getPagingLine(&$items) {
 				$pagespan = new CLink($p, $url->getUrl(), null, null, true);
 			}
 
-			$pageline[] = $pagespan;
-			$pageline[] = ' | ';
+			$pageLine[] = $pagespan;
+			$pageLine[] = ' | ';
 		}
 
-		array_pop($pageline);
+		array_pop($pageLine);
 
 		if ($currentPage < $pagesCount) {
-			$pageline[] = ' | ';
+			$pageLine[] = ' | ';
 
 			$url->setArgument('page', $currentPage + 1);
-			$pageline[] = new CLink(_x('Next', 'page navigation').' >', $url->getUrl(), null, null, true);
+			$pageLine[] = new CLink(_x('Next', 'page navigation').' >', $url->getUrl(), null, null, true);
 		}
 
 		if ($p < $pagesCount) {
-			$pageline[] = '&nbsp;&nbsp;';
+			$pageLine[] = '&nbsp;&nbsp;';
 
 			$url->setArgument('page', $pagesCount);
-			$pageline[] = new CLink(_x('Last', 'page navigation').' >>', $url->getUrl(), null, null, true);
+			$pageLine[] = new CLink(_x('Last', 'page navigation').' >>', $url->getUrl(), null, null, true);
 		}
 
 		$table = new CTable(null, 'paging');
-		$table->addRow(new CCol($pageline));
+		$table->addRow(new CCol($pageLine));
 	}
 
-	$view_from_page = ($currentPage - 1) * $rowsPerPage + 1;
+	$viewFromPage = ($currentPage - 1) * $rowsPerPage + 1;
 
-	$view_till_page = $currentPage * $rowsPerPage;
-	if ($view_till_page > $itemsCount) {
-		$view_till_page = $itemsCount;
+	$viewTillPage = $currentPage * $rowsPerPage;
+	if ($viewTillPage > $itemsCount) {
+		$viewTillPage = $itemsCount;
 	}
 
-	$page_view = array();
-	$page_view[] = _('Displaying').SPACE;
+	$pageView = array();
+	$pageView[] = _('Displaying').SPACE;
 	if ($itemsCount > 0) {
-		$page_view[] = new CSpan($view_from_page, 'info');
-		$page_view[] = SPACE._('to').SPACE;
+		$pageView[] = new CSpan($viewFromPage, 'info');
+		$pageView[] = SPACE._('to').SPACE;
 	}
 
-	$page_view[] = new CSpan($view_till_page, 'info');
-	$page_view[] = SPACE._('of').SPACE;
-	$page_view[] = new CSpan($itemsCount, 'info');
-	$page_view[] = $search_limit;
-	$page_view[] = SPACE._('found');
+	$pageView[] = new CSpan($viewTillPage, 'info');
+	$pageView[] = SPACE._('of').SPACE;
+	$pageView[] = new CSpan($itemsCount, 'info');
+	$pageView[] = $searchLimit;
+	$pageView[] = SPACE._('found');
 
-	$page_view = new CSpan($page_view);
+	$pageView = new CSpan($pageView);
 
-	zbx_add_post_js('insertInElement("numrows", '.zbx_jsvalue($page_view->toString()).', "div");');
+	zbx_add_post_js('insertInElement("numrows", '.zbx_jsvalue($pageView->toString()).', "div");');
 
 	return $table;
 }

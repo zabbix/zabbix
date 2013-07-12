@@ -188,7 +188,8 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 				'&srctbl=items'.
 				'&srcfld1=itemid'.
 				'&srcfld2=name'.
-				'&numeric=1" + getOnlyHostParam(), 0, 0, "zbx_popup_item");',
+				'&numeric=1'.
+				'&writeonly=1" + getOnlyHostParam(), 0, 0, "zbx_popup_item");',
 			'formlist'
 		);
 
@@ -242,7 +243,8 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 				'&srctbl=items'.
 				'&srcfld1=itemid'.
 				'&srcfld2=name'.
-				'&numeric=1" + getOnlyHostParam(), 0, 0, "zbx_popup_item");',
+				'&numeric=1'.
+				'&writeonly=1" + getOnlyHostParam(), 0, 0, "zbx_popup_item");',
 			'formlist'
 		);
 

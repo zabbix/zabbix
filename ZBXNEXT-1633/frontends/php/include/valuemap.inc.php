@@ -32,7 +32,10 @@ function addValueMap(array $valueMap, array $mappings) {
 	checkValueMapMappings($mappings);
 
 	// check duplicate name
-	$sql = 'SELECT v.valuemapid FROM valuemaps v WHERE v.name='.zbx_dbstr($valueMap['name']);
+	$sql = 'SELECT v.valuemapid'.
+			' FROM valuemaps v'.
+			' WHERE v.name='.zbx_dbstr($valueMap['name']).
+			' '.andDbNode('v.valuemapid');
 	if (DBfetch(DBselect($sql))) {
 		throw new Exception(_s('Value map "%1$s" already exists.', $valueMap['name']));
 	}
@@ -59,13 +62,18 @@ function updateValueMap(array $valueMap, array $mappings) {
 	unset($valueMap['valuemapid']);
 
 	// check existence
-	if (!DBfetch(DBselect('SELECT v.valuemapid FROM valuemaps v WHERE v.valuemapid='.$valueMapId))) {
+	$sql = 'SELECT v.valuemapid FROM valuemaps v WHERE v.valuemapid='.$valueMapId.' '.andDbNode('v.valuemapid');
+	if (!DBfetch(DBselect($sql))) {
 		throw new Exception(_s('Value map with valuemapid "%1$s" does not exist.', $valueMapId));
 	}
 
 	// check duplicate name
-	$sql = 'SELECT v.valuemapid FROM valuemaps v WHERE v.name='.zbx_dbstr($valueMap['name']);
-	$dbValueMap = DBfetch(DBselect($sql));
+	$dbValueMap = DBfetch(DBselect(
+		'SELECT v.valuemapid'.
+		' FROM valuemaps v'.
+		' WHERE v.name='.zbx_dbstr($valueMap['name']).
+			' '.andDbNode('v.valuemapid')
+	));
 	if ($dbValueMap && bccomp($valueMapId, $dbValueMap['valuemapid']) != 0) {
 		throw new Exception(_s('Value map "%1$s" already exists.', $valueMap['name']));
 	}
@@ -225,7 +233,8 @@ function getValueMapMappings($valueMapId) {
 	$dbMappings = DBselect(
 		'SELECT m.mappingid,m.value,m.newvalue'.
 		' FROM mappings m'.
-		' WHERE m.valuemapid='.$valueMapId
+		' WHERE m.valuemapid='.$valueMapId.
+			' '.andDbNode('m.mappingid')
 	);
 	while ($mapping = DBfetch($dbMappings)) {
 		$mappings[$mapping['mappingid']] = $mapping;
@@ -238,8 +247,8 @@ function getValueMapMappings($valueMapId) {
  * Get mapping for value.
  * If there is no mapping return false.
  *
- * @param string $value	     value that mapping should be applied to
- * @param int    $valueMapId value map id which should be used
+ * @param string $value			value that mapping should be applied to
+ * @param int    $valueMapId	value map id which should be used
  *
  * @return string|bool
  */
@@ -256,12 +265,14 @@ function getMappedValue($value, $valueMapId) {
 
 	$dbMappings = DBselect(
 		'SELECT m.newvalue'.
-			' FROM mappings m'.
-			' WHERE m.valuemapid='.$valueMapId.
-			' AND m.value='.zbx_dbstr($value)
+		' FROM mappings m'.
+		' WHERE m.valuemapid='.$valueMapId.
+			' AND m.value='.zbx_dbstr($value).
+			' '.andDbNode('m.mappingid')
 	);
 	if ($mapping = DBfetch($dbMappings)) {
 		$valueMaps[$valueMapId][$value] = $mapping['newvalue'];
+
 		return $mapping['newvalue'];
 	}
 
@@ -273,13 +284,13 @@ function getMappedValue($value, $valueMapId) {
  * If value map or mapping is not found unchanged value returned,
  * otherwise mapped value returned in format: "<mapped_value> (<initial_value>)".
  *
- * @param string $value	     value that mapping should be applied to
- * @param int    $valueMapId value map id which should be used
+ * @param string $value			value that mapping should be applied to
+ * @param int    $valueMapId	value map id which should be used
  *
  * @return string
  */
 function applyValueMap($value, $valueMapId) {
 	$mapping = getMappedValue($value, $valueMapId);
 
-	return $mapping === false ? $value : $mapping.' ('.$value.')';
+	return ($mapping === false) ? $value : $mapping.' ('.$value.')';
 }
