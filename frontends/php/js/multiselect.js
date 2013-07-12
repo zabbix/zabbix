@@ -406,10 +406,7 @@ jQuery(function($) {
 			}
 
 			// resize
-			if (!options.selectedLimit || $('.selected li', obj).length < options.selectedLimit) {
-				resizeSelected(obj, values, options);
-				resizeAvailable(obj);
-			}
+			resize(obj, values, options);
 		});
 	};
 
@@ -556,16 +553,16 @@ jQuery(function($) {
 			$('.selected ul', obj).append(li.append(text));
 
 			if (options.selectedLimit == 1) {
-				var textSpan = tempText = text,
+				var t = textTemp = text,
 					text = $('.selected .text', obj).text();
 
-				tempText.text(text + (options.disabled ? '' : '[x]'));
+				textTemp.text(text + (options.disabled ? '' : '[x]'));
 
-				var	originalHeight = tempText.height();
+				var originalHeight = textTemp.height();
 
-				textSpan.text('1');
+				t.text('1');
 
-				var rowHeight = textSpan.height();
+				var rowHeight = t.height();
 
 				if (originalHeight > rowHeight) {
 					var start = 1,
@@ -574,9 +571,9 @@ jQuery(function($) {
 					while (start < end) {
 						var length = Math.ceil((start + end) / 2);
 
-						textSpan.text(text.slice(0, length) + (options.disabled ? '...' : '...[x]'));
+						t.text(text.slice(0, length) + (options.disabled ? '...' : '...[x]'));
 
-						if (textSpan.height () <= rowHeight) {
+						if (t.height () <= rowHeight) {
 							start = length;
 						}
 						else {
@@ -584,10 +581,10 @@ jQuery(function($) {
 						}
 					}
 
-					textSpan.text(text.slice(0, start) + '...');
+					t.text(text.slice(0, start) + '...');
 				}
 				else {
-					textSpan.text(text);
+					t.text(text);
 				}
 			}
 
@@ -606,10 +603,7 @@ jQuery(function($) {
 			removePlaceholder(obj);
 
 			// resize
-			if (!options.selectedLimit || $('.selected li', obj).length < options.selectedLimit) {
-				resizeSelected(obj, values, options);
-				resizeAvailable(obj);
-			}
+			resize(obj, values, options);
 
 			// set readonly
 			if (options.selectedLimit > 0 && $('.selected li', obj).length == options.selectedLimit) {
@@ -626,10 +620,7 @@ jQuery(function($) {
 		delete values.selected[id];
 
 		// resize
-		if (!options.selectedLimit || $('.selected li', obj).length < options.selectedLimit) {
-			resizeSelected(obj, values, options);
-			resizeAvailable(obj);
-		}
+		resize(obj, values, options);
 
 		// remove readonly
 		if ($('.selected li', obj).length == 0) {
@@ -742,6 +733,13 @@ jQuery(function($) {
 
 		if (!(IE && input.val() == input.attr('placeholder'))) {
 			input.val('');
+		}
+	}
+
+	function resize(obj, values, options) {
+		if (!options.selectedLimit || $('.selected li', obj).length < options.selectedLimit) {
+			resizeSelected(obj, values, options);
+			resizeAvailable(obj);
 		}
 	}
 
