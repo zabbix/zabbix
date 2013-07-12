@@ -296,6 +296,13 @@ else {
 	// paging
 	$data['paging'] = getPagingLine($data['screens']);
 
+	// nodes
+	if ($data['displayNodes'] = is_array(get_current_nodeid())) {
+		foreach ($data['screens'] as &$screen) {
+			$screen['nodename'] = get_node_name_by_elid($screen['screenid'], true);
+		}
+		unset($screen);
+	}
 
 	// render view
 	$screenView = new CView('configuration.screen.list', $data);
