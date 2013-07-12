@@ -270,7 +270,7 @@ static void	queue_stats_export(zbx_hashset_t *queue_stats, const char *id_name, 
 	zbx_hashset_iter_t	iter;
 	zbx_queue_stats_t	*stats;
 
-	zbx_json_addarray(json, "data");
+	zbx_json_addarray(json, ZBX_PROTO_TAG_VALUE);
 
 	zbx_hashset_iter_reset(queue_stats, &iter);
 	while (NULL != (stats = zbx_hashset_iter_next(&iter)))
@@ -395,7 +395,7 @@ static int	recv_getqueue(zbx_sock_t *sock, struct zbx_json_parse *jp)
 		case ZBX_GET_QUEUE_DETAILS:
 			zbx_vector_ptr_sort(&queue, (zbx_compare_func_t)queue_compare_by_nextcheck_asc);
 			zbx_json_addstring(&json, ZBX_PROTO_TAG_RESPONSE, ZBX_PROTO_VALUE_SUCCESS, ZBX_JSON_TYPE_STRING);
-			zbx_json_addarray(&json, "data");
+			zbx_json_addarray(&json, ZBX_PROTO_TAG_VALUE);
 
 			for (i = 0; i < queue.values_num && i <= 500; i++)
 			{
