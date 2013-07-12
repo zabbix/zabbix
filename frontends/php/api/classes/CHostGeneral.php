@@ -20,6 +20,8 @@
 
 
 /**
+ * Class containing methods for operations with hosts.
+ *
  * @package API
  */
 abstract class CHostGeneral extends CHostBase {
@@ -132,84 +134,84 @@ abstract class CHostGeneral extends CHostBase {
 		return array($this->pkOption() => $data[$this->pkOption()]);
 	}
 
-	protected function link(array $templateids, array $targetids) {
-		if (!API::Host()->isWritable($targetids)) {
+	protected function link(array $templateIds, array $targetIds) {
+		if (!API::Host()->isWritable($targetIds)) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
-		parent::link($templateids, $targetids);
+		parent::link($templateIds, $targetIds);
 
 		$appManager = new CApplicationManager();
 		$httpTestManager = new CHttpTestManager();
 
-		foreach ($targetids as $targetid) {
-			foreach ($templateids as $templateid) {
-				if (isset($linked[$targetid]) && isset($linked[$targetid][$templateid])) {
+		foreach ($targetIds as $targetId) {
+			foreach ($templateIds as $templateId) {
+				if (isset($linked[$targetId]) && isset($linked[$targetId][$templateId])) {
 					continue;
 				}
 
-				$appManager->link($templateid, $targetid);
+				$appManager->link($templateId, $targetId);
 
 				API::DiscoveryRule()->syncTemplates(array(
-					'hostids' => $targetid,
-					'templateids' => $templateid
+					'hostids' => $targetId,
+					'templateids' => $templateId
 				));
 
 				API::Itemprototype()->syncTemplates(array(
-					'hostids' => $targetid,
-					'templateids' => $templateid
+					'hostids' => $targetId,
+					'templateids' => $templateId
 				));
 
 				API::HostPrototype()->syncTemplates(array(
-					'hostids' => $targetid,
-					'templateids' => $templateid
+					'hostids' => $targetId,
+					'templateids' => $templateId
 				));
 
 				API::Item()->syncTemplates(array(
-					'hostids' => $targetid,
-					'templateids' => $templateid
+					'hostids' => $targetId,
+					'templateids' => $templateId
 				));
 
-				$httpTestManager->link($templateid, $targetid);
+				$httpTestManager->link($templateId, $targetId);
 			}
 
 			// we do linkage in two separate loops because for triggers you need all items already created on host
-			foreach ($templateids as $templateid) {
-				if (isset($linked[$targetid]) && isset($linked[$targetid][$templateid])) {
+			foreach ($templateIds as $templateId) {
+				if (isset($linked[$targetId]) && isset($linked[$targetId][$templateId])) {
 					continue;
 				}
 
 				API::Trigger()->syncTemplates(array(
-					'hostids' => $targetid,
-					'templateids' => $templateid
+					'hostids' => $targetId,
+					'templateids' => $templateId
 				));
 
 				API::TriggerPrototype()->syncTemplates(array(
-					'hostids' => $targetid,
-					'templateids' => $templateid
+					'hostids' => $targetId,
+					'templateids' => $templateId
 				));
 
 				API::GraphPrototype()->syncTemplates(array(
-					'hostids' => $targetid,
-					'templateids' => $templateid
+					'hostids' => $targetId,
+					'templateids' => $templateId
 				));
 
 				API::Graph()->syncTemplates(array(
-					'hostids' => $targetid,
-					'templateids' => $templateid
+					'hostids' => $targetId,
+					'templateids' => $templateId
 				));
 			}
 		}
 
-		foreach ($targetids as $targetid) {
-			foreach ($templateids as $templateid) {
-				if (isset($linked[$targetid]) && isset($linked[$targetid][$templateid])) {
+		foreach ($targetIds as $targetId) {
+			foreach ($templateIds as $templateId) {
+				if (isset($linked[$targetId]) && isset($linked[$targetId][$templateId])) {
 					continue;
 				}
 
 				API::Trigger()->syncTemplateDependencies(array(
-					'templateids' => $templateid,
-					'hostids' => $targetid,
+					'templateids' => $templateId,
+					'hostids' => $targetId
 				));
 			}
 		}
@@ -219,18 +221,15 @@ abstract class CHostGeneral extends CHostBase {
 	 * Unlinks the templates from the given hosts. If $tragetids is set to null, the templates will be unlinked from
 	 * all hosts.
 	 *
-	 * @param $templateids
-	 * @param null|array $targetids the IDs of the hosts to unlink the templates from
-	 * @param bool $clear           delete all of the inherited objects from the hosts
-	 *
-	 * @return void
+	 * @param array      $templateids
+	 * @param null|array $targetids		the IDs of the hosts to unlink the templates from
+	 * @param bool       $clear			delete all of the inherited objects from the hosts
 	 */
 	protected function unlink($templateids, $targetids = null, $clear = false) {
 		$flags = ($clear)
 			? array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_RULE)
 			: array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_RULE, ZBX_FLAG_DISCOVERY_PROTOTYPE);
 
-		/* TRIGGERS {{{ */
 		// check that all triggers on templates that we unlink, don't have items from another templates
 		$sql = 'SELECT DISTINCT t.description'.
 			' FROM triggers t,functions f,items i'.
@@ -251,7 +250,6 @@ abstract class CHostGeneral extends CHostBase {
 				_s('Cannot unlink trigger "%s", it has items from template that is left linked to host.', $dbTrigger['description'])
 			);
 		}
-
 
 		$sqlFrom = ' triggers t,hosts h';
 		$sqlWhere = ' EXISTS ('.
@@ -324,8 +322,6 @@ abstract class CHostGeneral extends CHostBase {
 				}
 			}
 		}
-		/* }}} TRIGGERS */
-
 
 		/* ITEMS, DISCOVERY RULES {{{ */
 		$sqlFrom = ' items i1,items i2,hosts h';
@@ -370,7 +366,6 @@ abstract class CHostGeneral extends CHostBase {
 			}
 		}
 
-
 		if (!empty($items[ZBX_FLAG_DISCOVERY_NORMAL])) {
 			if ($clear) {
 				$result = API::Item()->delete(array_keys($items[ZBX_FLAG_DISCOVERY_NORMAL]), true);
@@ -387,7 +382,6 @@ abstract class CHostGeneral extends CHostBase {
 				}
 			}
 		}
-
 
 		if (!empty($items[ZBX_FLAG_DISCOVERY_PROTOTYPE])) {
 			if ($clear) {
@@ -488,7 +482,6 @@ abstract class CHostGeneral extends CHostBase {
 				}
 			}
 		}
-
 
 		if (!empty($graphs[ZBX_FLAG_DISCOVERY_NORMAL])) {
 			if ($clear) {

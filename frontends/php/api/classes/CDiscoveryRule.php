@@ -20,6 +20,8 @@
 
 
 /**
+ * Class containing methods for operations with discovery rules.
+ *
  * @package API
  */
 class CDiscoveryRule extends CItemGeneral {
@@ -100,16 +102,16 @@ class CDiscoveryRule extends CItemGeneral {
 			$userGroups = getUserGroupsByUserId($userid);
 
 			$sqlParts['where'][] = 'EXISTS ('.
-					'SELECT NULL'.
-					' FROM hosts_groups hgg'.
-						' JOIN rights r'.
-							' ON r.id=hgg.groupid'.
-								' AND '.dbConditionInt('r.groupid', $userGroups).
-					' WHERE i.hostid=hgg.hostid'.
-					' GROUP BY hgg.hostid'.
-					' HAVING MIN(r.permission)>'.PERM_DENY.
-						' AND MAX(r.permission)>='.$permission.
-					')';
+				'SELECT NULL'.
+				' FROM hosts_groups hgg'.
+					' JOIN rights r'.
+						' ON r.id=hgg.groupid'.
+							' AND '.dbConditionInt('r.groupid', $userGroups).
+				' WHERE i.hostid=hgg.hostid'.
+				' GROUP BY hgg.hostid'.
+				' HAVING MIN(r.permission)>'.PERM_DENY.
+					' AND MAX(r.permission)>='.$permission.
+				')';
 		}
 
 		// templateids
@@ -264,6 +266,7 @@ class CDiscoveryRule extends CItemGeneral {
 		if (is_null($options['preservekeys'])) {
 			$result = zbx_cleanHashes($result);
 		}
+
 		return $result;
 	}
 
@@ -281,7 +284,6 @@ class CDiscoveryRule extends CItemGeneral {
 		if (isset($object['host'])) {
 			$options['filter']['host'] = $object['host'];
 		}
-
 		if (isset($object['node'])) {
 			$options['nodeids'] = getNodeIdByNodeName($object['node']);
 		}
@@ -289,58 +291,64 @@ class CDiscoveryRule extends CItemGeneral {
 			$options['nodeids'] = $object['nodeids'];
 		}
 		$objs = $this->get($options);
+
 		return !empty($objs);
 	}
 
 	/**
-	 * Add DiscoveryRule
+	 * Add DiscoveryRule.
 	 *
 	 * @param array $items
-	 * @return array|boolean
+	 *
+	 * @return array
 	 */
 	public function create($items) {
 		$items = zbx_toArray($items);
 		$this->checkInput($items);
 		$this->createReal($items);
 		$this->inherit($items);
+
 		return array('itemids' => zbx_objectValues($items, 'itemid'));
 	}
 
 	/**
-	 * Update DiscoveryRule
+	 * Update DiscoveryRule.
 	 *
 	 * @param array $items
-	 * @return boolean
+	 *
+	 * @return array
 	 */
 	public function update($items) {
 		$items = zbx_toArray($items);
 		$this->checkInput($items, true);
 		$this->updateReal($items);
 		$this->inherit($items);
+
 		return array('itemids' => zbx_objectValues($items, 'itemid'));
 	}
 
 	/**
-	 * Delete DiscoveryRules
+	 * Delete DiscoveryRules.
 	 *
 	 * @param array $ruleids
-	 * @return
+	 *
+	 * @return array
 	 */
 	public function delete($ruleids, $nopermissions = false) {
 		if (empty($ruleids)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 		}
+
 		$delRuleIds = zbx_toArray($ruleids);
 		$ruleids = zbx_toHash($ruleids);
 
-		$options = array(
+		$delRules = $this->get(array(
 			'output' => API_OUTPUT_EXTEND,
 			'itemids' => $ruleids,
 			'editable' => true,
 			'preservekeys' => true,
 			'selectHosts' => array('name')
-		);
-		$delRules = $this->get($options);
+		));
 
 		// TODO: remove $nopermissions hack
 		if (!$nopermissions) {
@@ -366,14 +374,13 @@ class CDiscoveryRule extends CItemGeneral {
 			}
 		} while (!empty($parentItemids));
 
-		$options = array(
+		$delRulesChilds = $this->get(array(
 			'output' => API_OUTPUT_EXTEND,
 			'itemids' => $childTuleids,
 			'nopermissions' => true,
 			'preservekeys' => true,
 			'selectHosts' => array('name')
-		);
-		$delRulesChilds = $this->get($options);
+		));
 
 		$delRules = array_merge($delRules, $delRulesChilds);
 		$ruleids = array_merge($ruleids, $childTuleids);
@@ -414,6 +421,7 @@ class CDiscoveryRule extends CItemGeneral {
 			$host = reset($item['hosts']);
 			info(_s('Deleted: Discovery rule "%1$s" on "%2$s".', $item['name'], $host['name']));
 		}
+
 		return array('ruleids' => $delRuleIds);
 	}
 
@@ -424,8 +432,10 @@ class CDiscoveryRule extends CItemGeneral {
 	 * the user doesn't have the necessary permissions.
 	 *
 	 * @param array $data
-	 * @param array $data['discoveryruleids'] An array of item ids to be cloned
-	 * @param array $data['hostids']          An array of host ids were the items should be cloned to
+	 * @param array $data['discoveryruleids']	An array of item ids to be cloned
+	 * @param array $data['hostids']			An array of host ids were the items should be cloned to
+	 *
+	 * @return bool
 	 */
 	public function copy(array $data) {
 		// validate data
@@ -467,12 +477,11 @@ class CDiscoveryRule extends CItemGeneral {
 			}
 		}
 
-		$options = array(
+		$items = $this->get(array(
 			'hostids' => $data['templateids'],
 			'preservekeys' => true,
 			'output' => $selectFields
-		);
-		$items = $this->get($options);
+		));
 
 		$this->inherit($items, $data['hostids']);
 
@@ -483,8 +492,9 @@ class CDiscoveryRule extends CItemGeneral {
 	 * Returns true if the given discovery rules exists and are available for
 	 * reading.
 	 *
-	 * @param array     $ids  An array if item IDs
-	 * @return boolean
+	 * @param array $ids	An array if item IDs
+	 *
+	 * @return bool
 	 */
 	public function isReadable($ids) {
 		if (!is_array($ids)) {
@@ -509,8 +519,9 @@ class CDiscoveryRule extends CItemGeneral {
 	 * Returns true if the given discovery rules exists and are available for
 	 * writing.
 	 *
-	 * @param array     $ids  An array if item IDs
-	 * @return boolean
+	 * @param array $ids	An array if item IDs
+	 *
+	 * @return bool
 	 */
 	public function isWritable($ids) {
 		if (!is_array($ids)) {
@@ -638,8 +649,6 @@ class CDiscoveryRule extends CItemGeneral {
 	 *
 	 * @param array $items passed by reference
 	 * @param bool  $update
-	 *
-	 * @return void
 	 */
 	protected function checkInput(array &$items, $update = false) {
 		// add the values that cannot be changed, but are required for further processing
@@ -827,6 +836,7 @@ class CDiscoveryRule extends CItemGeneral {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot clone item prototypes.'));
 			}
 		}
+
 		return $rs;
 	}
 
@@ -941,6 +951,7 @@ class CDiscoveryRule extends CItemGeneral {
 		if (!$rs) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot clone graph prototypes.'));
 		}
+
 		return $rs;
 	}
 
@@ -1048,8 +1059,8 @@ class CDiscoveryRule extends CItemGeneral {
 				$relationMap = new CRelationMap();
 				$res = DBselect(
 					'SELECT id.parent_itemid,f.triggerid'.
-						' FROM item_discovery id,items i,functions f'.
-						' WHERE '.dbConditionInt('id.parent_itemid', $itemIds).
+					' FROM item_discovery id,items i,functions f'.
+					' WHERE '.dbConditionInt('id.parent_itemid', $itemIds).
 						' AND id.itemid=i.itemid'.
 						' AND i.itemid=f.itemid'
 				);
@@ -1086,8 +1097,8 @@ class CDiscoveryRule extends CItemGeneral {
 				$relationMap = new CRelationMap();
 				$res = DBselect(
 					'SELECT id.parent_itemid,gi.graphid'.
-						' FROM item_discovery id,items i,graphs_items gi'.
-						' WHERE '.dbConditionInt('id.parent_itemid', $itemIds).
+					' FROM item_discovery id,items i,graphs_items gi'.
+					' WHERE '.dbConditionInt('id.parent_itemid', $itemIds).
 						' AND id.itemid=i.itemid'.
 						' AND i.itemid=gi.itemid'
 				);

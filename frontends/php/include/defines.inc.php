@@ -18,8 +18,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-define('ZABBIX_VERSION',     '2.1.0');
-define('ZABBIX_API_VERSION', '2.1.0');
+define('ZABBIX_VERSION',     '2.3.0');
+define('ZABBIX_API_VERSION', '2.3.0');
 define('ZABBIX_DB_VERSION',	 2010105);
 
 define('ZABBIX_COPYRIGHT_FROM', '2001');
@@ -429,9 +429,6 @@ define('TRIGGER_VALUE_UNKNOWN', 2); // only in "events" table
 
 define('TRIGGER_STATE_NORMAL',	0);
 define('TRIGGER_STATE_UNKNOWN',	1);
-
-define('TRIGGER_VALUE_CHANGED_NO',	0);
-define('TRIGGER_VALUE_CHANGED_YES', 1);
 
 define('TRIGGER_SEVERITY_NOT_CLASSIFIED',	0);
 define('TRIGGER_SEVERITY_INFORMATION',		1);

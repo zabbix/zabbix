@@ -33,7 +33,7 @@ $page['hist_arg'] = array('triggerid', 'eventid');
 $page['scripts'] = array();
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
-require_once 'include/page_header.php';
+require_once dirname(__FILE__).'/include/page_header.php';
 
 define('PAGE_SIZE', 100);
 

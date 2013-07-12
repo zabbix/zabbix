@@ -20,6 +20,8 @@
 
 
 /**
+ * Class containing methods for operations with template.
+ *
  * @package API
  */
 class CTemplate extends CHostGeneral {
@@ -1198,5 +1200,4 @@ class CTemplate extends CHostGeneral {
 
 		return $result;
 	}
-
 }

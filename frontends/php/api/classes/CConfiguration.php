@@ -19,10 +19,16 @@
 **/
 
 
+/**
+ * Class containing methods for operations with configuration.
+ *
+ * @package API
+ */
 class CConfiguration extends CZBXAPI {
 
 	/**
 	 * Export configuration data.
+	 *
 	 * $params structure:
 	 * array(
 	 * 	'options' => array(
@@ -47,9 +53,9 @@ class CConfiguration extends CZBXAPI {
 		return $export->export();
 	}
 
-
 	/**
 	 * Import configuration data.
+	 *
 	 * $params structure:
 	 * array(
 	 * 	'format' => 'json'|'xml'
@@ -69,6 +75,7 @@ class CConfiguration extends CZBXAPI {
 		$importReader = CImportReaderFactory::getReader($params['format']);
 		$configurationImport = new CConfigurationImport($params['source'], $params['rules']);
 		$configurationImport->setReader($importReader);
+
 		return $configurationImport->import();
 	}
 }

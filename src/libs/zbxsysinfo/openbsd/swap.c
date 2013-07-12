@@ -230,7 +230,7 @@ int	SYSTEM_SWAP_OUT(AGENT_REQUEST *request, AGENT_RESULT *result)
 		if (SYSINFO_RET_OK != get_swap_io(NULL, NULL, &value, NULL))
 			return SYSINFO_RET_FAIL;
 	}
-	else if (0 == strcmp(mode,"pages"))
+	else if (0 == strcmp(mode, "pages"))
 	{
 		if (SYSINFO_RET_OK != get_swap_io(NULL, NULL, NULL, &value))
 			return SYSINFO_RET_FAIL;

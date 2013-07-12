@@ -297,7 +297,6 @@ $frmHost->addItem($divTabs);
 /*
  * footer
  */
-$main = array(new CSubmit('save', _('Save')));
 $others = array();
 if ($hostPrototype['hostid']) {
 	$btnDelete = new CButtonDelete(_('Delete selected host prototype?'), url_param('form').url_param('hostid').url_param('parent_discoveryid'));
@@ -308,7 +307,7 @@ if ($hostPrototype['hostid']) {
 }
 $others[] = new CButtonCancel(url_param('parent_discoveryid'));
 
-$frmHost->addItem(makeFormFooter($main, $others));
+$frmHost->addItem(makeFormFooter(new CSubmit('save', _('Save')), $others));
 
 $widget->addItem($frmHost);
 

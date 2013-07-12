@@ -19,29 +19,29 @@
 **/
 
 
-$hostgroupWidget = new CWidget();
+$hostGroupWidget = new CWidget();
 
 // create new hostgroup button
 $createForm = new CForm('get');
 $createForm->cleanItems();
 if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
-	$tmp_item = new CSubmit('form', _('Create host group'));
+	$tmpItem = new CSubmit('form', _('Create host group'));
 }
 else {
-	$tmp_item = new CSubmit('form', _('Create host group').SPACE._('(Only super admins can create groups)'));
-	$tmp_item->setEnabled(false);
+	$tmpItem = new CSubmit('form', _('Create host group').SPACE._('(Only super admins can create groups)'));
+	$tmpItem->setEnabled(false);
 }
-$createForm->addItem($tmp_item);
+$createForm->addItem($tmpItem);
 
-$hostgroupWidget->addPageHeader(_('CONFIGURATION OF HOST GROUPS'), $createForm);
+$hostGroupWidget->addPageHeader(_('CONFIGURATION OF HOST GROUPS'), $createForm);
 
 // header
-$hostgroupWidget->addHeader(_('Host groups'));
-$hostgroupWidget->addHeaderRowNumber();
+$hostGroupWidget->addHeader(_('Host groups'));
+$hostGroupWidget->addHeaderRowNumber();
 
 // create form
-$hostgroupForm = new CForm();
-$hostgroupForm->setName('hostgroupForm');
+$hostGroupForm = new CForm();
+$hostGroupForm->setName('hostgroupForm');
 
 // if any of the groups are about to be deleted, show the status column
 $showStatus = false;
@@ -53,9 +53,10 @@ foreach ($this->data['groups'] as $hostGroup) {
 }
 
 // create table
-$hostgroupTable = new CTableInfo(_('No host groups defined.'));
-$hostgroupTable->setHeader(array(
-	new CCheckBox('all_groups', null, "checkAll('".$hostgroupForm->getName()."', 'all_groups', 'groups');"),
+$hostGroupTable = new CTableInfo(_('No host groups defined.'));
+$hostGroupTable->setHeader(array(
+	new CCheckBox('all_groups', null, "checkAll('".$hostGroupForm->getName()."', 'all_groups', 'groups');"),
+	$this->data['displayNodes'] ? _('Node') : null,
 	make_sorting_header(_('Name'), 'name'),
 	' # ',
 	_('Members'),
@@ -63,34 +64,37 @@ $hostgroupTable->setHeader(array(
 ));
 
 foreach ($this->data['groups'] as $group) {
-	$tpl_count = 0;
-	$host_count = 0;
-	$hosts_output = array();
+	$hostsOutput = array();
 	$i = 0;
 
 	foreach ($group['templates'] as $template) {
 		$i++;
+
 		if ($i > $this->data['config']['max_in_table']) {
-			$hosts_output[] = '...';
-			$hosts_output[] = '//empty for array_pop';
+			$hostsOutput[] = '...';
+			$hostsOutput[] = '//empty for array_pop';
 			break;
 		}
 
 		$url = 'templates.php?form=update&templateid='.$template['templateid'].'&groupid='.$group['groupid'];
-		$hosts_output[] = new CLink($template['name'], $url, 'unknown');
-		$hosts_output[] = ', ';
+
+		$hostsOutput[] = new CLink($template['name'], $url, 'unknown');
+		$hostsOutput[] = ', ';
 	}
-	if (!empty($hosts_output)) {
-		array_pop($hosts_output);
-		$hosts_output[] = BR();
-		$hosts_output[] = BR();
+
+	if ($hostsOutput) {
+		array_pop($hostsOutput);
+
+		$hostsOutput[] = BR();
+		$hostsOutput[] = BR();
 	}
 
 	foreach ($group['hosts'] as $host) {
 		$i++;
+
 		if ($i > $this->data['config']['max_in_table']) {
-			$hosts_output[] = '...';
-			$hosts_output[] = '//empty for array_pop';
+			$hostsOutput[] = '...';
+			$hostsOutput[] = '//empty for array_pop';
 			break;
 		}
 
@@ -99,15 +103,17 @@ foreach ($this->data['groups'] as $group) {
 				$style = 'on';
 				$url = 'hosts.php?form=update&hostid='.$host['hostid'].'&groupid='.$group['groupid'];
 				break;
+
 			default:
 				$style = null;
 				$url = 'hosts.php?form=update&hostid='.$host['hostid'].'&groupid='.$group['groupid'];
 			break;
 		}
-		$hosts_output[] = new CLink($host['name'], $url, $style);
-		$hosts_output[] = ', ';
+
+		$hostsOutput[] = new CLink($host['name'], $url, $style);
+		$hostsOutput[] = ', ';
 	}
-	array_pop($hosts_output);
+	array_pop($hostsOutput);
 
 	$hostCount = $this->data['groupCounts'][$group['groupid']]['hosts'];
 	$templateCount = $this->data['groupCounts'][$group['groupid']]['templates'];
@@ -136,13 +142,14 @@ foreach ($this->data['groups'] as $group) {
 		}
 	}
 
-	$hostgroupTable->addRow(array(
+	$hostGroupTable->addRow(array(
 		new CCheckBox('groups['.$group['groupid'].']', null, null, $group['groupid']),
+		$this->data['displayNodes'] ? $group['nodename'] : null,
 		$name,
 		array(
 			array(new CLink(_('Templates'), 'templates.php?groupid='.$group['groupid'], 'unknown'), ' ('.$templateCount.')'),
 			BR(),
-			array(new CLink(_('Hosts'), 'hosts.php?groupid='.$group['groupid']), ' ('.$hostCount.')'),
+			array(new CLink(_('Hosts'), 'hosts.php?groupid='.$group['groupid']), ' ('.$hostCount.')')
 		),
 		new CCol(empty($hosts_output) ? '-' : $hosts_output, 'wraptext'),
 		($showStatus) ? $status : null
@@ -165,9 +172,9 @@ $goButton->setAttribute('id', 'goButton');
 zbx_add_post_js('chkbxRange.pageGoName = "groups";');
 
 // append table to form
-$hostgroupForm->addItem(array($this->data['paging'], $hostgroupTable, $this->data['paging'], get_table_header(array($goComboBox, $goButton))));
+$hostGroupForm->addItem(array($this->data['paging'], $hostGroupTable, $this->data['paging'], get_table_header(array($goComboBox, $goButton))));
 
 // append form to widget
-$hostgroupWidget->addItem($hostgroupForm);
+$hostGroupWidget->addItem($hostGroupForm);
 
-return $hostgroupWidget;
+return $hostGroupWidget;

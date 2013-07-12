@@ -19,16 +19,16 @@
 **/
 
 
-require_once 'include/config.inc.php';
-require_once 'include/hosts.inc.php';
-require_once 'include/forms.inc.php';
+require_once dirname(__FILE__).'/include/config.inc.php';
+require_once dirname(__FILE__).'/include/hosts.inc.php';
+require_once dirname(__FILE__).'/include/forms.inc.php';
 
 $page['title'] = _('Scripts');
 $page['file'] = 'scripts_exec.php';
 
 define('ZBX_PAGE_NO_MENU', 1);
 
-require_once ('include/page_header.php');
+require_once dirname(__FILE__).'/include/page_header.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = array(
@@ -71,4 +71,4 @@ if (isset($_REQUEST['execute'])) {
 	$scriptView->show();
 }
 
-require_once 'include/page_footer.php';
+require_once dirname(__FILE__).'/include/page_footer.php';

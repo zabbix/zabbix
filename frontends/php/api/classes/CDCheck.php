@@ -17,14 +17,12 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
+
 /**
- * File containing CDCheck class for API.
+ * Class containing methods for operations with discovery checks.
+ *
  * @package API
- */
-/**
- * Class containing methods for operations with Discovery checks for discovery rules
  */
 class CDCheck extends CZBXAPI {
 
@@ -275,4 +273,3 @@ class CDCheck extends CZBXAPI {
 		return $result;
 	}
 }
-?>

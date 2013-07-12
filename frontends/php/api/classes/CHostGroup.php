@@ -18,7 +18,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 /**
+ * Class containing methods for operations with host groups.
+ *
  * @package API
  */
 class CHostGroup extends CZBXAPI {
