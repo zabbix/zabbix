@@ -393,7 +393,11 @@ class CScript extends CZBXAPI {
 		// execute the script
 		$zabbixServer = new CZabbixServer($ZBX_SERVER, $ZBX_SERVER_PORT, ZBX_SCRIPT_TIMEOUT, ZBX_SCRIPT_BYTES_LIMIT);
 		if ($result = $zabbixServer->executeScript($scriptId, $hostId)) {
-			return $result;
+			// return the result as the server would
+			return array(
+				'response' => 'success',
+				'value' => $result
+			);
 		}
 		else {
 			self::exception(ZBX_API_ERROR_INTERNAL, $zabbixServer->getError());
