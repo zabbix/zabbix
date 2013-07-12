@@ -183,7 +183,7 @@ int	get_device_info(const char *dev_path, const char *dev_name, char *device_inf
 				if (0 == strncmp(bus_attr, "ISA ", 4))
 					zbx_snprintf(device_info, MAX_STRING_LEN, "%s-isa-%04x", prefix, addr);
 				/* TODO: handle situation when bus_attr is not equal to "ISA " */
-				free(bus_attr);
+				zbx_free(bus_attr);
 			}
 			else
 				zbx_snprintf(device_info, MAX_STRING_LEN, "%s-i2c-%hd-%02x", prefix, bus_i2c, addr);
