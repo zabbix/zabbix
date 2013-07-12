@@ -1707,7 +1707,7 @@ static int	vch_item_get_last_value_by_timespec(const zbx_vc_item_t *item, const 
 				if (NULL == (*pchunk = (*pchunk)->prev))
 					goto out;
 
-				*pindex = (*pchunk)->first_value;
+				*pindex = (*pchunk)->last_value;
 			}
 		}
 		ret = SUCCEED;
