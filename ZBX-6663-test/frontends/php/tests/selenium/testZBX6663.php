@@ -24,255 +24,145 @@ class testZBX6663 extends CWebTest {
 
 
 	/**
-	 * Backup the tables that will be modified during the tests.
+	 * The name of the discovery rule created in the test data set.
+	 *
+	 * @var string
 	 */
-	public function testZBX6663_Setup() {
-		DBsave_tables('hosts');
+	protected $discoveryRule = 'DiscoveryRule ZBX6663 Second';
 
-		// Link template to host
-		$this->zbxTestLogin('hosts.php');
-		$this->zbxTestClickWait('link=Simple form test host');
+	/**
+	 * The template created in the test data set.
+	 *
+	 * @var string
+	 */
+	protected $templated = 'Template ZBX6663 Second';
 
-		$this->zbxTestClick('tab_templateTab');
-
-		$this->assertElementPresent("//div[@id='templates_']/input");
-		$this->input_type("//div[@id='templates_']/input", 'Inheritance test template');
-		sleep(1);
-		$this->zbxTestClick("//span[@class='matched']");
-		$this->zbxTestClickWait('add_template');
-
-		$this->zbxTestTextPresent('Inheritance test template');
-		$this->zbxTestClickWait('save');
-
-		$this->zbxTestTextPresent('Host updated');
-
-		// Link template to template
-		$this->zbxTestOpen('templates.php');
-		$this->zbxTestClickWait('link=Inheritance test template');
-
-		$this->zbxTestClick('tab_templateTab');
-
-		$this->assertElementPresent("//div[@id='templates_']/input");
-		$this->input_type("//div[@id='templates_']/input", 'Template App MySQL');
-		sleep(1);
-		$this->zbxTestClick("//span[@class='matched']");
-		$this->zbxTestClickWait('add_template');
-
-		$this->input_type("//div[@id='templates_']/input", 'Template OS AIX');
-		sleep(1);
-		$this->zbxTestClick("//span[@class='matched']");
-		$this->zbxTestClickWait('add_template');
-
-		$this->zbxTestTextPresent(array('Template App MySQL', 'Template OS AIX'));
-		$this->zbxTestClickWait('save');
-
-		$this->zbxTestTextPresent('Template updated');
-
-		// Create graph prototype for the host
-		$this->zbxTestOpen('hosts.php');
-		$this->zbxTestClickWait('link=Simple form test host');
-		$this->zbxTestClickWait('link=Discovery rules');
-		$this->zbxTestClickWait('link=testInheritanceDiscoveryRule');
-		$this->zbxTestClickWait('link=Graph prototypes');
-
-		$this->zbxTestClickWait('form');
-		$this->input_type('name', 'testGraphPrototypeZBX6663');
-		$this->zbxTestLaunchPopup('add_protoitem');
-		$this->zbxTestClick("//span[text()='itemDiscovery']");
-		sleep(1);
-		$this->selectWindow(null);
-
-		$this->zbxTestClickWait('save');
-		$this->zbxTestTextPresent('Graph added');
-
-		// Create graph prototype for the host
-		$this->zbxTestOpen('hosts.php');
-		$this->zbxTestClickWait('link=Inheritance test template');
-		$this->zbxTestClickWait('link=Discovery rules');
-		$this->zbxTestClickWait('link=Mounted filesystem discovery');
-		$this->zbxTestClickWait('link=Graph prototypes');
-
-		$this->zbxTestClickWait('form');
-		$this->input_type('name', 'testGraphPrototypeInheritanceZBX6663');
-		$this->zbxTestLaunchPopup('add_protoitem');
-		$this->zbxTestClick("//span[text()='Free disk space on {#FSNAME}']");
-		sleep(1);
-		$this->selectWindow(null);
-
-		$this->zbxTestClickWait('save');
-		$this->zbxTestTextPresent('Graph added');
-
-		// Add web scenario to the template
-		$this->zbxTestLogin('templates.php');
-		$this->zbxTestClickWait('link=Template App MySQL');
-		$this->zbxTestClickWait('link=Web scenarios');
-
-		$this->zbxTestClickWait('form');
-		$this->input_type('name', 'testWebZBX6663');
-		$this->zbxTestClick('tab_stepTab');
-		$this->zbxTestClick('add_step');
-		$this->waitForPopUp('zbx_popup', 6000);
-		$this->selectWindow('zbx_popup');
-		$this->zbxTestCheckFatalErrors();
-		$this->input_type('name','testWebZBX6663 step');
-		$this->input_type('url', 'testWebZBX6663 url');
-		$this->zbxTestClick('save');
-		$this->selectWindow(null);
-		$this->wait();
-		$this->zbxTestClickWait('save');
-
-		$this->zbxTestTextPresent('Scenario added');
-	}
 
 	// Returns test data
 	public static function zbx_data() {
 		return array(
 			array(
 				array(
-					'host' => 'ЗАББИКС Сервер',
-					'templated' => 'Template App Zabbix Agent',
+					'host' => 'Host ZBX6663',
 					'link' => 'Applications',
 					'checkbox' => 'applications'
 				)
 			),
 			array(
 				array(
-					'host' => 'ЗАББИКС Сервер',
-					'templated' => 'Template App Zabbix Agent',
+					'host' => 'Host ZBX6663',
 					'link' => 'Items',
 					'checkbox' => 'items'
 				)
 			),
 			array(
 				array(
-					'host' => 'ЗАББИКС Сервер',
-					'templated' => 'Template App Zabbix Agent',
+					'host' => 'Host ZBX6663',
 					'link' => 'Triggers',
 					'checkbox' => 'triggers'
 				)
 			),
 			array(
 				array(
-					'host' => 'Simple form test host',
-					'templated' => 'Inheritance test template',
+					'host' => 'Host ZBX6663',
 					'link' => 'Graphs',
 					'checkbox' => 'graphs'
 				)
 			),
 			array(
 				array(
-					'host' => 'ЗАББИКС Сервер',
-					'templated' => 'Template OS Linux',
+					'host' => 'Host ZBX6663',
 					'link' => 'Discovery rules',
 					'checkbox' => 'items'
 				)
 			),
 			array(
 				array(
-					'host' => 'ЗАББИКС Сервер',
-					'templated' => 'Template OS Linux',
-					'discoveryRule' => 'Mounted filesystem discovery',
-					'link' => 'Item prototypes',
+					'host' => 'Host ZBX6663',
+					'discoveryRule' => 'Item prototypes',
 					'checkbox' => 'items'
 				)
 			),
 			array(
 				array(
-					'host' => 'ЗАББИКС Сервер',
-					'templated' => 'Template OS Linux',
-					'discoveryRule' => 'Mounted filesystem discovery',
-					'link' => 'Trigger prototypes',
+					'host' => 'Host ZBX6663',
+					'discoveryRule' => 'Trigger prototypes',
 					'checkbox' => 'triggers'
 				)
 			),
 			array(
 				array(
-					'host' => 'Simple form test host',
-					'templated' => 'Inheritance test template',
-					'discoveryRule' => 'testInheritanceDiscoveryRule',
-					'link' => 'Graph prototypes',
+					'host' => 'Host ZBX6663',
+					'discoveryRule' => 'Graph prototypes',
 					'checkbox' => 'graphs'
 				)
 			),
 			array(
 				array(
-					'host' => 'Simple form test host',
-					'templated' => 'Inheritance test template',
+					'host' => 'Host ZBX6663',
 					'link' => 'Web scenarios',
 					'checkbox' => 'httptests'
 				)
 			),
 			array(
 				array(
-					'template' => 'Template OS AIX',
-					'templated' => 'Template App Zabbix Agent',
+					'template' => 'Template ZBX6663 First',
 					'link' => 'Applications',
 					'checkbox' => 'applications'
 				)
 			),
 			array(
 				array(
-					'template' => 'Template OS AIX',
-					'templated' => 'Template App Zabbix Agent',
+					'template' => 'Template ZBX6663 First',
 					'link' => 'Items',
 					'checkbox' => 'items'
 				)
 			),
 			array(
 				array(
-					'template' => 'Template OS AIX',
-					'templated' => 'Template App Zabbix Agent',
+					'template' => 'Template ZBX6663 First',
 					'link' => 'Triggers',
 					'checkbox' => 'triggers'
 				)
 			),
 			array(
 				array(
-					'template' => 'Inheritance test template',
-					'templated' => 'Template App MySQL',
+					'template' => 'Template ZBX6663 First',
 					'link' => 'Graphs',
 					'checkbox' => 'graphs'
 				)
 			),
 			array(
 				array(
-					'template' => 'Inheritance test template',
-					'templated' => 'Template OS AIX',
+					'template' => 'Template ZBX6663 First',
 					'link' => 'Discovery rules',
 					'checkbox' => 'items'
 				)
 			),
 			array(
 				array(
-					'template' => 'Inheritance test template',
-					'templated' => 'Template OS AIX',
-					'discoveryRule' => 'Mounted filesystem discovery',
-					'link' => 'Item prototypes',
+					'template' => 'Template ZBX6663 First',
+					'discoveryRule' => 'Item prototypes',
 					'checkbox' => 'items'
 				)
 			),
 			array(
 				array(
-					'template' => 'Inheritance test template',
-					'templated' => 'Template OS AIX',
-					'discoveryRule' => 'Mounted filesystem discovery',
-					'link' => 'Trigger prototypes',
+					'template' => 'Template ZBX6663 First',
+					'discoveryRule' => 'Trigger prototypes',
 					'checkbox' => 'triggers'
 				)
 			),
 			array(
 				array(
-					'template' => 'Inheritance test template',
-					'templated' => 'Template OS AIX',
-					'discoveryRule' => 'Mounted filesystem discovery',
-					'link' => 'Graph prototypes',
+					'template' => 'Template ZBX6663 First',
+					'discoveryRule' => 'Graph prototypes',
 					'checkbox' => 'graphs'
 				)
 			),
 			array(
 				array(
-					'template' => 'Inheritance test template',
-					'templated' => 'Template App MySQL',
+					'template' => 'Template ZBX6663 First',
 					'link' => 'Web scenarios',
 					'checkbox' => 'httptests'
 				)
@@ -286,8 +176,6 @@ class testZBX6663 extends CWebTest {
 	 */
 	public function testZBX6663_MassSelect($zbx_data) {
 
-		$templated = $zbx_data['templated'];
-		$link = $zbx_data['link'];
 		$checkbox = $zbx_data['checkbox'];
 
 		if (isset($zbx_data['host'])) {
@@ -302,22 +190,18 @@ class testZBX6663 extends CWebTest {
 
 		if (isset($zbx_data['discoveryRule'])) {
 			$this->zbxTestClickWait('link=Discovery rules');
+			$this->zbxTestClickWait('link='.$this->discoveryRule);
 			$this->zbxTestClickWait('link='.$zbx_data['discoveryRule']);
 		}
-
-		$this->zbxTestClickWait("//div[@class='w']//a[text()='$link']");
+		else {
+			$link = $zbx_data['link'];
+			$this->zbxTestClickWait("//div[@class='w']//a[text()='$link']");
+		}
 
 		$this->assertVisible('//input[@value="Go (0)"]');
 		$this->zbxTestCheckboxSelect("all_$checkbox");
 
-		$this->zbxTestClickWait('link='.$templated);
+		$this->zbxTestClickWait('link='.$this->templated);
 		$this->assertVisible('//input[@value="Go (0)"]');
-	}
-
-	/**
-	 * Restore the original tables.
-	 */
-	public function testZBX6663_Teardown() {
-		DBrestore_tables('hosts');
 	}
 }
