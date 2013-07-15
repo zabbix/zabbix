@@ -553,58 +553,56 @@ jQuery(function($) {
 			$('.selected ul', obj).append(li.append(text));
 
 			// check width
-			var maxWidth = $('.selected ul', obj).width(),
+			var maxWidth = $('.selected ul', obj).width() - 3,
 				spanObj = textTemp = text,
-					t = $('.selected .text', obj).text(),
+					t = text.text(),
 					tTemp = t + (options.disabled ? '' : '[x]');
 
 			textTemp.text(tTemp);
 
-			if (maxWidth - 3 < textTemp.width()) {
+			if (maxWidth < textTemp.width()) {
 				var i = 1;
 
-				while (maxWidth - 3 < textTemp.width()) {
+				while (maxWidth < textTemp.width()) {
 					var length = tTemp.length;
-					textTemp.text(tTemp.slice(0, tTemp.length - i) + ' ' + tTemp.slice(tTemp.length - i, tTemp.length));
+					textTemp.text(tTemp.substring(0, length - i) + '...[x]');
 					i++;
 				}
 
-				t = t.slice(0, t.length - i) + ' ' + t.slice(t.length - i, t.length);
+				t = t.substring(0, t.length - i) + ' ' + t.substring(t.length - i, t.length);
 				spanObj.text(t);
 			}
 
 			// cut multi row value if set options.selectedLimit
-			if (options.selectedLimit == 1) {
-				var	originalHeight = textTemp.height();
+			var	originalHeight = textTemp.height();
 
-				spanObj.text('1');
+			spanObj.text('1');
 
-				var rowHeight = spanObj.height();
+			var rowHeight = spanObj.height();
 
-				if (originalHeight > rowHeight) {
-					var start = 1,
-						end = t.length;
+			if (originalHeight > rowHeight) {
+				var start = 1,
+					end = t.length;
 
-					while (start < end) {
-						var length = Math.ceil((start + end) / 2);
+				while (start < end) {
+					var length = Math.ceil((start + end) / 2);
 
-						spanObj.text(t.slice(0, length) + (options.disabled ? '...' : '...[x]'));
+					spanObj.text(t.substring(0, length) + (options.disabled ? '...' : '...[x]'));
 
-						if (spanObj.height () <= rowHeight) {
-							start = length;
-						}
-						else {
-							end = length - 1;
-						}
+					if (spanObj.height () <= rowHeight) {
+						start = length;
 					}
+					else {
+						end = length - 1;
+					}
+				}
 
-					spanObj.text(t.slice(0, start) + '...');
-					spanObj.css('text-align', 'justify');
-					li.css('width', maxWidth - 3);
-				}
-				else {
-					spanObj.text(t);
-				}
+				spanObj.text(t.substring(0, start) + '...');
+				spanObj.css('text-align', 'justify');
+				li.css('width', maxWidth);
+			}
+			else {
+				spanObj.text(t);
 			}
 
 			if (!options.disabled) {
