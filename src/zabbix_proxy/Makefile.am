@@ -29,7 +29,6 @@ zabbix_proxy_LDADD = \
 	datasender/libzbxdatasender.a \
 	$(top_srcdir)/src/zabbix_server/selfmon/libzbxselfmon.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/libzbxproxysysinfo.a \
-	$(top_srcdir)/src/libs/zbxsysinfo/libzbxhostname.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/$(ARCH)/libspecsysinfo.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/common/libcommonsysinfo.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/simple/libsimplesysinfo.a \
