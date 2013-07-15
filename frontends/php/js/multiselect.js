@@ -552,12 +552,29 @@ jQuery(function($) {
 
 			$('.selected ul', obj).append(li.append(text));
 
+			// check width
+			var maxWidth = $('.selected ul', obj).width(),
+				spanObj = textTemp = text,
+					t = $('.selected .text', obj).text(),
+					tTemp = t + (options.disabled ? '' : '[x]');
+
+			textTemp.text(tTemp);
+
+			if (maxWidth - 3 < textTemp.width()) {
+				var i = 1;
+
+				while (maxWidth - 3 < textTemp.width()) {
+					var length = tTemp.length;
+					textTemp.text(tTemp.slice(0, tTemp.length - i) + ' ' + tTemp.slice(tTemp.length - i, tTemp.length));
+					i++;
+				}
+
+				t = t.slice(0, t.length - i) + ' ' + t.slice(t.length - i, t.length);
+				spanObj.text(t);
+			}
+
+			// cut multi row value if set options.selectedLimit
 			if (options.selectedLimit == 1) {
-				var spanObj = textTemp = text,
-					t = $('.selected .text', obj).text();
-
-				textTemp.text(t + (options.disabled ? '' : '[x]'));
-
 				var	originalHeight = textTemp.height();
 
 				spanObj.text('1');
@@ -571,7 +588,7 @@ jQuery(function($) {
 					while (start < end) {
 						var length = Math.ceil((start + end) / 2);
 
-						spanObj.text(t.slice(0, length) + (options.disabled ? '...' : '...x]'));
+						spanObj.text(t.slice(0, length) + (options.disabled ? '...' : '...[x]'));
 
 						if (spanObj.height () <= rowHeight) {
 							start = length;
@@ -583,7 +600,7 @@ jQuery(function($) {
 
 					spanObj.text(t.slice(0, start) + '...');
 					spanObj.css('text-align', 'justify');
-					li.css('width', $('.selected ul', obj).width() - 3);
+					li.css('width', maxWidth - 3);
 				}
 				else {
 					spanObj.text(t);
