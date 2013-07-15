@@ -1660,7 +1660,7 @@ void	DBlld_process_discovery_rule(zbx_uint64_t discovery_itemid, char *value, zb
 	int			regexps_alloc = 0, regexps_num = 0;
 	char			*sql = NULL;
 	size_t			sql_alloc = 128, sql_offset = 0;
-	char			*sql_start = "update items set ", *sql_continue = ",";
+	const char		*sql_start = "update items set ", *sql_continue = ",";
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() itemid:" ZBX_FS_UI64, __function_name, discovery_itemid);
 

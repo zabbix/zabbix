@@ -226,10 +226,6 @@ zbx_queue_stats_t;
  * Parameters: stats   - [IN] the queue stats                                 *
  *             delay   - [IN] the delay time of an delayed item               *
  *                                                                            *
- * Return value:                                                              *
- *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
  ******************************************************************************/
 static void	queue_stats_update(zbx_queue_stats_t *stats, int delay)
 {
@@ -260,10 +256,6 @@ static void	queue_stats_update(zbx_queue_stats_t *stats, int delay)
  *             id_name     - [IN] the name of stats id field                  *
  *             json        - [OUT] the output JSON                            *
  *                                                                            *
- * Return value:                                                              *
- *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
  ******************************************************************************/
 static void	queue_stats_export(zbx_hashset_t *queue_stats, const char *id_name, struct zbx_json *json)
 {
@@ -273,6 +265,7 @@ static void	queue_stats_export(zbx_hashset_t *queue_stats, const char *id_name, 
 	zbx_json_addarray(json, ZBX_PROTO_TAG_VALUE);
 
 	zbx_hashset_iter_reset(queue_stats, &iter);
+
 	while (NULL != (stats = zbx_hashset_iter_next(&iter)))
 	{
 		zbx_json_addobject(json, NULL);
@@ -309,8 +302,6 @@ static int	queue_compare_by_nextcheck_asc(void **d1, void **d2)
  * Return value:  SUCCEED - processed successfully                            *
  *                FAIL - an error occurred                                    *
  *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
  ******************************************************************************/
 static int	recv_getqueue(zbx_sock_t *sock, struct zbx_json_parse *jp)
 {
@@ -334,7 +325,7 @@ static int	recv_getqueue(zbx_sock_t *sock, struct zbx_json_parse *jp)
 		request_type = ZBX_GET_QUEUE_DETAILS;
 	else
 	{
-		zbx_send_response(sock, ret, "invalid 'get queue' request type", CONFIG_TIMEOUT);
+		zbx_send_response(sock, ret, "unsupported request type", CONFIG_TIMEOUT);
 		goto out;
 	}
 
@@ -354,7 +345,7 @@ static int	recv_getqueue(zbx_sock_t *sock, struct zbx_json_parse *jp)
 				zbx_queue_item_t	*item = queue.values[i];
 				zbx_uint64_t		id = item->type;
 
-				if (NULL == (stats = zbx_hashset_search(&queue_stats,  &id)))
+				if (NULL == (stats = zbx_hashset_search(&queue_stats, &id)))
 				{
 					zbx_queue_stats_t	data = {id};
 
@@ -363,7 +354,8 @@ static int	recv_getqueue(zbx_sock_t *sock, struct zbx_json_parse *jp)
 				queue_stats_update(stats, now - item->nextcheck);
 			}
 
-			zbx_json_addstring(&json, ZBX_PROTO_TAG_RESPONSE, ZBX_PROTO_VALUE_SUCCESS, ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(&json, ZBX_PROTO_TAG_RESPONSE, ZBX_PROTO_VALUE_SUCCESS,
+					ZBX_JSON_TYPE_STRING);
 			queue_stats_export(&queue_stats, "itemtype", &json);
 			zbx_hashset_destroy(&queue_stats);
 
@@ -378,7 +370,7 @@ static int	recv_getqueue(zbx_sock_t *sock, struct zbx_json_parse *jp)
 				zbx_queue_item_t	*item = queue.values[i];
 				zbx_uint64_t		id = item->proxy_hostid;
 
-				if (NULL == (stats = zbx_hashset_search(&queue_stats,  &id)))
+				if (NULL == (stats = zbx_hashset_search(&queue_stats, &id)))
 				{
 					zbx_queue_stats_t	data = {id};
 
@@ -387,14 +379,16 @@ static int	recv_getqueue(zbx_sock_t *sock, struct zbx_json_parse *jp)
 				queue_stats_update(stats, now - item->nextcheck);
 			}
 
-			zbx_json_addstring(&json, ZBX_PROTO_TAG_RESPONSE, ZBX_PROTO_VALUE_SUCCESS, ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(&json, ZBX_PROTO_TAG_RESPONSE, ZBX_PROTO_VALUE_SUCCESS,
+					ZBX_JSON_TYPE_STRING);
 			queue_stats_export(&queue_stats, "proxyid", &json);
 			zbx_hashset_destroy(&queue_stats);
 
 			break;
 		case ZBX_GET_QUEUE_DETAILS:
 			zbx_vector_ptr_sort(&queue, (zbx_compare_func_t)queue_compare_by_nextcheck_asc);
-			zbx_json_addstring(&json, ZBX_PROTO_TAG_RESPONSE, ZBX_PROTO_VALUE_SUCCESS, ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(&json, ZBX_PROTO_TAG_RESPONSE, ZBX_PROTO_VALUE_SUCCESS,
+					ZBX_JSON_TYPE_STRING);
 			zbx_json_addarray(&json, ZBX_PROTO_TAG_VALUE);
 
 			for (i = 0; i < queue.values_num && i <= 500; i++)

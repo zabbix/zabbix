@@ -204,7 +204,6 @@ typedef struct
 }
 zbx_config_hk_t;
 
-
 typedef struct
 {
 	zbx_uint64_t		itemid;
@@ -222,7 +221,6 @@ typedef struct
 	int		nextcheck;
 }
 zbx_queue_item_t;
-
 
 void	dc_add_history(zbx_uint64_t itemid, unsigned char value_type, unsigned char flags, AGENT_RESULT *value,
 		zbx_timespec_t *ts, unsigned char state, const char *error, int timestamp, const char *source,
@@ -257,8 +255,6 @@ void	DCflush_nextchecks();
 void	*DCget_stats(int request);
 
 zbx_uint64_t	DCget_nextid(const char *table_name, int num);
-
-int	DCget_item_lastclock(zbx_uint64_t itemid);
 
 void	DCsync_configuration();
 void	init_configuration_cache();
@@ -325,6 +321,5 @@ void	DCset_delta_items(zbx_hashset_t *items);
 
 void	DCfree_item_queue(zbx_vector_ptr_t *queue);
 void	DCget_item_queue(zbx_vector_ptr_t *queue, int from, int to);
-
 
 #endif
