@@ -332,7 +332,7 @@ elseif (isset($_REQUEST['go']) && $_REQUEST['go'] == 'massupdate' && isset($_REQ
 		}
 
 		// add new host groups
-		if ($existGroups && (!isset($visible['groups']) || !isset($replaceHostGroups))) {
+		if (isset($existGroups) && (!isset($visible['groups']) || !isset($replaceHostGroups))) {
 			$add['groups'] = $existGroups;
 		}
 
@@ -349,12 +349,9 @@ elseif (isset($_REQUEST['go']) && $_REQUEST['go'] == 'massupdate' && isset($_REQ
 		DBend(true);
 
 		show_message(_('Hosts updated'));
+		clearCookies(true);
 
 		unset($_REQUEST['massupdate'], $_REQUEST['form'], $_REQUEST['hosts']);
-
-		$url = new CUrl();
-		$path = $url->getPath();
-		insert_js('cookie.eraseArray("'.basename($path, '.php'));
 	}
 	catch (Exception $e) {
 		DBend(false);
@@ -551,6 +548,7 @@ elseif (isset($_REQUEST['save'])) {
 		$result = DBend(true);
 
 		show_messages($result, $msgOk, $msgFail);
+		clearCookies($result);
 
 		unset($_REQUEST['form'], $_REQUEST['hostid']);
 	}
@@ -572,17 +570,9 @@ elseif (isset($_REQUEST['delete']) && isset($_REQUEST['hostid'])) {
 	if ($result) {
 		unset($_REQUEST['form'], $_REQUEST['hostid']);
 	}
+
 	unset($_REQUEST['delete']);
-}
-elseif (isset($_REQUEST['chstatus']) && isset($_REQUEST['hostid'])) {
-	DBstart();
-
-	$result = updateHostStatus($_REQUEST['hostid'], $_REQUEST['chstatus']);
-	$result = DBend($result);
-
-	show_messages($result, _('Host status updated'), _('Cannot update host status'));
-
-	unset($_REQUEST['chstatus'], $_REQUEST['hostid']);
+	clearCookies($result);
 }
 elseif ($_REQUEST['go'] == 'delete') {
 	$hostIds = get_request('hosts', array());
@@ -593,6 +583,7 @@ elseif ($_REQUEST['go'] == 'delete') {
 	$goResult = DBend($goResult);
 
 	show_messages($goResult, _('Host deleted'), _('Cannot delete host'));
+	clearCookies($goResult);
 }
 elseif (str_in_array($_REQUEST['go'], array('activate', 'disable'))) {
 	$status = ($_REQUEST['go'] == 'activate') ? HOST_STATUS_MONITORED : HOST_STATUS_NOT_MONITORED;
@@ -605,12 +596,7 @@ elseif (str_in_array($_REQUEST['go'], array('activate', 'disable'))) {
 	$goResult = DBend($goResult);
 
 	show_messages($goResult, _('Host status updated'), _('Cannot update host status'));
-}
-
-if ($_REQUEST['go'] != 'none' && !empty($goResult)) {
-	$url = new CUrl();
-	$path = $url->getPath();
-	insert_js('cookie.eraseArray("'.basename($path, '.php'));
+	clearCookies($goResult);
 }
 
 /*

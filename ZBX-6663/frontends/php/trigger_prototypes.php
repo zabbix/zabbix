@@ -167,14 +167,20 @@ elseif (isset($_REQUEST['save'])) {
 
 		show_messages($result, _('Trigger added'), _('Cannot add trigger'));
 	}
+
 	if ($result) {
 		unset($_REQUEST['form']);
+		clearCookies($result, $_REQUEST['parent_discoveryid']);
 	}
+
+	unset($_REQUEST['save']);
 }
 elseif (isset($_REQUEST['delete']) && isset($_REQUEST['triggerid'])) {
 	$result = API::TriggerPrototype()->delete($_REQUEST['triggerid']);
 
 	show_messages($result, _('Trigger deleted'), _('Cannot delete trigger'));
+	clearCookies($result, $_REQUEST['parent_discoveryid']);
+
 	if ($result) {
 		unset($_REQUEST['form'], $_REQUEST['triggerid']);
 	}
@@ -200,10 +206,11 @@ elseif ($_REQUEST['go'] == 'massupdate' && isset($_REQUEST['mass_save']) && isse
 	}
 
 	show_messages($result, _('Trigger updated'), _('Cannot update trigger'));
+	clearCookies($result, $_REQUEST['parent_discoveryid']);
+
 	if ($result) {
-		unset($_REQUEST['massupdate'], $_REQUEST['form']);
+		unset($_REQUEST['massupdate'], $_REQUEST['form'], $_REQUEST['g_triggerid']);
 	}
-	$goResult = $result;
 }
 elseif (str_in_array($_REQUEST['go'], array('activate', 'disable')) && isset($_REQUEST['g_triggerid'])) {
 	$goResult = true;
@@ -280,19 +287,15 @@ elseif (str_in_array($_REQUEST['go'], array('activate', 'disable')) && isset($_R
 	}
 
 	$goResult = DBend($goResult);
+
 	show_messages($goResult, _('Status updated'), _('Cannot update status'));
+	clearCookies($goResult, $_REQUEST['parent_discoveryid']);
 }
 elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['g_triggerid'])) {
 	$goResult = API::TriggerPrototype()->delete($_REQUEST['g_triggerid']);
-	show_messages($goResult, _('Triggers deleted'), _('Cannot delete triggers'));
-}
 
-if ($_REQUEST['go'] != 'none' && !empty($goResult)) {
-	$url = new CUrl();
-	$path = $url->getPath();
-	insert_js('cookie.eraseArray("'.basename($path, '.php').
-		(empty($_REQUEST['parent_discoveryid']) ? '' : '_'.$_REQUEST['parent_discoveryid']).'")'
-	);
+	show_messages($goResult, _('Triggers deleted'), _('Cannot delete triggers'));
+	clearCookies($goResult, $_REQUEST['parent_discoveryid']);
 }
 
 /*

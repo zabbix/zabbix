@@ -159,9 +159,12 @@ if (isset($_REQUEST['save'])) {
 
 	if ($result) {
 		$druleid = reset($result['druleids']);
-		add_audit(isset($discoveryRule['druleid']) ? AUDIT_ACTION_UPDATE : AUDIT_ACTION_ADD, AUDIT_RESOURCE_DISCOVERY_RULE
-			, '['.$druleid.'] '.$discoveryRule['name']);
+		add_audit(isset($discoveryRule['druleid']) ? AUDIT_ACTION_UPDATE : AUDIT_ACTION_ADD,
+			AUDIT_RESOURCE_DISCOVERY_RULE,
+			'['.$druleid.'] '.$discoveryRule['name']
+		);
 		unset($_REQUEST['form']);
+		clearCookies($result);
 	}
 }
 elseif (isset($_REQUEST['delete']) && isset($_REQUEST['druleid'])) {
@@ -170,7 +173,9 @@ elseif (isset($_REQUEST['delete']) && isset($_REQUEST['druleid'])) {
 
 	if ($result) {
 		add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_DISCOVERY_RULE, '['.$_REQUEST['druleid'].']');
+
 		unset($_REQUEST['form'], $_REQUEST['druleid']);
+		clearCookies($result);
 	}
 }
 elseif (str_in_array($_REQUEST['go'], array('activate', 'disable')) && isset($_REQUEST['g_druleid'])) {
@@ -186,6 +191,7 @@ elseif (str_in_array($_REQUEST['go'], array('activate', 'disable')) && isset($_R
 	}
 
 	show_messages($goResult, _('Discovery rules updated'));
+	clearCookies($goResult);
 }
 elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['g_druleid'])) {
 	$goResult = false;
@@ -197,12 +203,7 @@ elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['g_druleid'])) {
 	}
 
 	show_messages($goResult, _('Discovery rules deleted'));
-}
-
-if ($_REQUEST['go'] != 'none' && !empty($goResult)) {
-	$url = new CUrl();
-	$path = $url->getPath();
-	insert_js('cookie.eraseArray("'.basename($path, '.php').'")');
+	clearCookies($goResult);
 }
 
 /*

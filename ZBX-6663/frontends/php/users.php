@@ -207,6 +207,7 @@ elseif (isset($_REQUEST['save'])) {
 		if ($result) {
 			add_audit($action, AUDIT_RESOURCE_USER, 'User alias ['.$_REQUEST['alias'].'] name ['.$_REQUEST['name'].'] surname ['.$_REQUEST['surname'].']');
 			unset($_REQUEST['form']);
+			clearCookies($result);
 		}
 	}
 }
@@ -230,6 +231,7 @@ elseif (isset($_REQUEST['delete']) && isset($_REQUEST['userid'])) {
 	$result = API::User()->delete(array($user['userid']));
 
 	show_messages($result, _('User deleted'), _('Cannot delete user'));
+	clearCookies($result);
 
 	if ($result) {
 		add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_USER, 'User alias ['.$user['alias'].'] name ['.$user['name'].'] surname ['.$user['surname'].']');
@@ -251,6 +253,7 @@ elseif (isset($_REQUEST['grpaction']) && isset($_REQUEST['usrgrpid']) && isset($
 	$result = DBend($result);
 
 	show_messages($result, _('User updated'), _('Cannot update user'));
+	clearCookies($result);
 
 	if ($result) {
 		add_audit(AUDIT_ACTION_ADD, AUDIT_RESOURCE_USER_GROUP, 'User alias ['.$user['alias'].'] name ['.$user['name'].'] surname ['.$user['surname'].']');
@@ -274,6 +277,7 @@ elseif (isset($_REQUEST['grpaction']) && isset($_REQUEST['usrgrpid']) && isset($
 	$result = DBend($result);
 
 	show_messages($result, _('User updated'), _('Cannot update user'));
+	clearCookies($result);
 
 	if ($result) {
 		add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_USER_GROUP, 'User alias ['.$user['alias'].'] name ['.$user['name'].'] surname ['.$user['surname'].']');
@@ -303,6 +307,7 @@ elseif ($_REQUEST['go'] == 'unblock' && isset($_REQUEST['group_userid'])) {
 	}
 
 	show_messages($goResult, _('Users unblocked'), _('Cannot unblock users'));
+	clearCookies($goResult);
 }
 elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['group_userid'])) {
 	$goResult = false;
@@ -332,13 +337,9 @@ elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['group_userid'])) {
 	}
 
 	$goResult = DBend($goResult);
-	show_messages($goResult, _('User deleted'), _('Cannot delete user'));
-}
 
-if ($_REQUEST['go'] != 'none' && !empty($goResult)) {
-	$url = new CUrl();
-	$path = $url->getPath();
-	insert_js('cookie.eraseArray("'.basename($path, '.php').'")');
+	show_messages($goResult, _('User deleted'), _('Cannot delete user'));
+	clearCookies($goResult);
 }
 
 /*

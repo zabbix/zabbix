@@ -188,6 +188,7 @@ elseif (isset($_REQUEST['save'])) {
 	if ($result) {
 		add_audit($action, AUDIT_RESOURCE_USER_GROUP, 'Group name ['.$_REQUEST['gname'].']');
 		unset($_REQUEST['form']);
+		clearCookies($result);
 	}
 }
 elseif (isset($_REQUEST['delete'])) {
@@ -197,6 +198,7 @@ elseif (isset($_REQUEST['delete'])) {
 	$result = DBend($result);
 
 	show_messages($result, _('Group deleted'), _('Cannot delete group'));
+	clearCookies($result);
 
 	if ($result) {
 		$group = reset($dbUserGroup);
@@ -229,6 +231,7 @@ elseif ($_REQUEST['go'] == 'delete') {
 		}
 
 		show_messages($goResult, _('Group deleted'), _('Cannot delete group'));
+		clearCookies($goResult);
 	}
 }
 elseif ($_REQUEST['go'] == 'set_gui_access') {
@@ -261,6 +264,7 @@ elseif ($_REQUEST['go'] == 'set_gui_access') {
 		}
 
 		show_messages($goResult, _('Frontend access updated'), _('Cannot update frontend access'));
+		clearCookies($goResult);
 	}
 }
 elseif (str_in_array($_REQUEST['go'], array('enable_debug', 'disable_debug'))) {
@@ -295,6 +299,7 @@ elseif (str_in_array($_REQUEST['go'], array('enable_debug', 'disable_debug'))) {
 		}
 
 		show_messages($goResult, _('Debug mode updated'), _('Cannot update debug mode'));
+		clearCookies($goResult);
 	}
 }
 elseif (str_in_array($_REQUEST['go'], array('enable_status', 'disable_status'))) {
@@ -329,13 +334,8 @@ elseif (str_in_array($_REQUEST['go'], array('enable_status', 'disable_status')))
 		}
 
 		show_messages($goResult, _('Users status updated'), _('Cannot update users status'));
+		clearCookies($goResult);
 	}
-}
-
-if ($_REQUEST['go'] != 'none' && !empty($goResult)) {
-	$url = new CUrl();
-	$path = $url->getPath();
-	insert_js('cookie.eraseArray("'.basename($path, '.php').'")');
 }
 
 /*

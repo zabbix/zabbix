@@ -227,11 +227,18 @@ elseif (isset($_REQUEST['save'])) {
 			if (!$result) {
 				throw new Exception();
 			}
+			else {
+				clearCookies($result);
+			}
+
 		}
 		else {
 			$result = API::HttpTest()->create($httpTest);
 			if (!$result) {
 				throw new Exception();
+			}
+			else {
+				clearCookies($result);
 			}
 			$httptestid = reset($result['httptestids']);
 		}
@@ -253,7 +260,7 @@ elseif (isset($_REQUEST['save'])) {
 		show_messages(false, null, $message_false);
 	}
 }
-elseif (($_REQUEST['go'] == 'activate' || $_REQUEST['go'] == 'disable')&& isset($_REQUEST['group_httptestid'])) {
+elseif (str_in_array($_REQUEST['go'], array('activate', 'disable')) && isset($_REQUEST['group_httptestid'])) {
 	$goResult = false;
 	$group_httptestid = $_REQUEST['group_httptestid'];
 	$status = ($_REQUEST['go'] == 'activate') ? HTTPTEST_STATUS_ACTIVE : HTTPTEST_STATUS_DISABLED;
@@ -275,7 +282,9 @@ elseif (($_REQUEST['go'] == 'activate' || $_REQUEST['go'] == 'disable')&& isset(
 				($_REQUEST['go'] == 'activate' ? 'Web scenario activated' : 'Web scenario disabled'));
 		}
 	}
+
 	show_messages($goResult, $msg_ok, $msg_problem);
+	clearCookies($goResult);
 }
 elseif ($_REQUEST['go'] == 'clean_history' && isset($_REQUEST['group_httptestid'])) {
 	$goResult = false;
@@ -294,17 +303,15 @@ elseif ($_REQUEST['go'] == 'clean_history' && isset($_REQUEST['group_httptestid'
 				'] Host ['.$host['host'].'] history cleared');
 		}
 	}
+
 	show_messages($goResult, _('History cleared'), null);
+	clearCookies($goResult);
 }
 elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['group_httptestid'])) {
 	$goResult = API::HttpTest()->delete($_REQUEST['group_httptestid']);
-	show_messages($goResult, _('Web scenario deleted'), _('Cannot delete web scenario'));
-}
 
-if ($_REQUEST['go'] != 'none' && !empty($goResult)) {
-	$url = new CUrl();
-	$path = $url->getPath();
-	insert_js('cookie.eraseArray("'.basename($path, '.php'));
+	show_messages($goResult, _('Web scenario deleted'), _('Cannot delete web scenario'));
+	clearCookies($goResult);
 }
 
 show_messages();

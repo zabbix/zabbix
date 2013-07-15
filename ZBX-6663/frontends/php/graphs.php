@@ -185,59 +185,58 @@ if (isset($_REQUEST['clone']) && isset($_REQUEST['graphid'])) {
 	$_REQUEST['form'] = 'clone';
 }
 elseif (isset($_REQUEST['save'])) {
-	$result = true;
-
 	$items = get_request('items', array());
 
-	if ($result) {
-		$graph = array(
-			'name' => $_REQUEST['name'],
-			'width' => $_REQUEST['width'],
-			'height' => $_REQUEST['height'],
-			'ymin_type' => get_request('ymin_type', 0),
-			'ymax_type' => get_request('ymax_type', 0),
-			'yaxismin' => get_request('yaxismin', 0),
-			'yaxismax' => get_request('yaxismax', 0),
-			'ymin_itemid' => $_REQUEST['ymin_itemid'],
-			'ymax_itemid' => $_REQUEST['ymax_itemid'],
-			'show_work_period' => get_request('show_work_period', 0),
-			'show_triggers' => get_request('show_triggers', 0),
-			'graphtype' => $_REQUEST['graphtype'],
-			'show_legend' => get_request('show_legend', 1),
-			'show_3d' => get_request('show_3d', 0),
-			'percent_left' => get_request('percent_left', 0),
-			'percent_right' => get_request('percent_right', 0),
-			'gitems' => $items
-		);
+	$graph = array(
+		'name' => $_REQUEST['name'],
+		'width' => $_REQUEST['width'],
+		'height' => $_REQUEST['height'],
+		'ymin_type' => get_request('ymin_type', 0),
+		'ymax_type' => get_request('ymax_type', 0),
+		'yaxismin' => get_request('yaxismin', 0),
+		'yaxismax' => get_request('yaxismax', 0),
+		'ymin_itemid' => $_REQUEST['ymin_itemid'],
+		'ymax_itemid' => $_REQUEST['ymax_itemid'],
+		'show_work_period' => get_request('show_work_period', 0),
+		'show_triggers' => get_request('show_triggers', 0),
+		'graphtype' => $_REQUEST['graphtype'],
+		'show_legend' => get_request('show_legend', 1),
+		'show_3d' => get_request('show_3d', 0),
+		'percent_left' => get_request('percent_left', 0),
+		'percent_right' => get_request('percent_right', 0),
+		'gitems' => $items
+	);
 
-		if (!empty($_REQUEST['parent_discoveryid'])) {
-			$graph['flags'] = ZBX_FLAG_DISCOVERY_CHILD;
-		}
+	if (!empty($_REQUEST['parent_discoveryid'])) {
+		$graph['flags'] = ZBX_FLAG_DISCOVERY_CHILD;
+	}
 
-		if (isset($_REQUEST['graphid'])) {
-			$graph['graphid'] = $_REQUEST['graphid'];
+	if (isset($_REQUEST['graphid'])) {
+		$graph['graphid'] = $_REQUEST['graphid'];
 
-			$result = !empty($_REQUEST['parent_discoveryid'])
-				? API::GraphPrototype()->update($graph)
-				: API::Graph()->update($graph);
-
-			if ($result) {
-				add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_GRAPH, 'Graph ID ['.$_REQUEST['graphid'].'] Graph ['.$_REQUEST['name'].']');
-			}
-		}
-		else {
-			$result = !empty($_REQUEST['parent_discoveryid'])
-				? API::GraphPrototype()->create($graph)
-				: API::Graph()->create($graph);
-
-			if ($result) {
-				add_audit(AUDIT_ACTION_ADD, AUDIT_RESOURCE_GRAPH, 'Graph ['.$_REQUEST['name'].']');
-			}
-		}
+		$result = !empty($_REQUEST['parent_discoveryid'])
+			? API::GraphPrototype()->update($graph)
+			: API::Graph()->update($graph);
 
 		if ($result) {
-			unset($_REQUEST['form']);
+			add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_GRAPH, 'Graph ID ['.$_REQUEST['graphid'].'] Graph ['.$_REQUEST['name'].']');
 		}
+	}
+	else {
+		$result = !empty($_REQUEST['parent_discoveryid'])
+			? API::GraphPrototype()->create($graph)
+			: API::Graph()->create($graph);
+
+		if ($result) {
+			add_audit(AUDIT_ACTION_ADD, AUDIT_RESOURCE_GRAPH, 'Graph ['.$_REQUEST['name'].']');
+		}
+	}
+
+	if ($result) {
+		unset($_REQUEST['form']);
+		clearCookies($result,
+			empty($_REQUEST['parent_discoveryid']) ? $_REQUEST['hostid'] : $_REQUEST['parent_discoveryid']
+		);
 	}
 
 	if (isset($_REQUEST['graphid'])) {
@@ -255,7 +254,11 @@ elseif (isset($_REQUEST['delete']) && isset($_REQUEST['graphid'])) {
 	if ($result) {
 		unset($_REQUEST['form']);
 	}
+
 	show_messages($result, _('Graph deleted'), _('Cannot delete graph'));
+	clearCookies($result,
+		empty($_REQUEST['parent_discoveryid']) ? $_REQUEST['hostid'] : $_REQUEST['parent_discoveryid']
+	);
 }
 elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['group_graphid'])) {
 	$goResult = !empty($_REQUEST['parent_discoveryid'])
@@ -263,6 +266,9 @@ elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['group_graphid'])) {
 		: API::Graph()->delete($_REQUEST['group_graphid']);
 
 	show_messages($goResult, _('Graphs deleted'), _('Cannot delete graphs'));
+	clearCookies($goResult,
+		empty($_REQUEST['parent_discoveryid']) ? $_REQUEST['hostid'] : $_REQUEST['parent_discoveryid']
+	);
 }
 elseif ($_REQUEST['go'] == 'copy_to' && isset($_REQUEST['copy']) && isset($_REQUEST['group_graphid'])) {
 	if (!empty($_REQUEST['copy_targetid']) && isset($_REQUEST['copy_type'])) {
@@ -309,20 +315,16 @@ elseif ($_REQUEST['go'] == 'copy_to' && isset($_REQUEST['copy']) && isset($_REQU
 		$goResult = DBend($goResult);
 
 		show_messages($goResult, _('Graphs copied'), _('Cannot copy graphs'));
+		clearCookies($goResult,
+			empty($_REQUEST['parent_discoveryid']) ? $_REQUEST['hostid'] : $_REQUEST['parent_discoveryid']
+		);
+
 		$_REQUEST['go'] = 'none2';
 	}
 	else {
 		error(_('No target selected.'));
 	}
 	show_messages();
-}
-
-if ($_REQUEST['go'] != 'none' && !empty($goResult)) {
-	$url = new CUrl();
-	$path = $url->getPath();
-	insert_js('cookie.eraseArray("'.basename($path, '.php').
-		(empty($_REQUEST['parent_discoveryid']) ? '_'.$_REQUEST['hostid'] : '_'.$_REQUEST['parent_discoveryid']).'")'
-	);
 }
 
 /*
