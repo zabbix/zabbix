@@ -54,7 +54,7 @@ ul li.linear { float: left; list-style-type: none; margin-right: 2px; }
 .rarr { font-size: 16px; }
 .nowrap { white-space: nowrap; word-spacing: 0; }
 .delimiter { font-weight: bold; color: #000; }
-.pointer:hover { cursor: pointer; }
+div.pointer:hover { cursor: pointer; }
 .move { cursor: move; }
 
 /* font */
@@ -136,7 +136,6 @@ a.weight_normal { font-weight: normal; }
 /* form */
 fieldset { margin: 0 0 2px 0; padding: 2px; border: 1px solid gray; }
 fieldset legend { margin: 0.2em 0.5em; }
-label { cursor: pointer; }
 form { margin: 0; }
 .input {
 	font-size: 10px; font-family: Verdana, arial, helvetica, sans-serif;
@@ -149,7 +148,7 @@ form { margin: 0; }
 .input[disabled]:focus { text-decoration: none; border-color: #ACA899; }
 .input[disabled]:hover { text-decoration: none; border-color: #ACA899; }
 .select {
-	margin: 0 2px 0 0; cursor: pointer; height: 14px; line-height: 14px;
+	margin: 0 2px 0 0; height: 14px; line-height: 14px;
 	-moz-box-sizing: content-box; -webkit-box-sizing: content-box; box-sizing: content-box;
 }
 select[multiple="multiple"], select.openView { height: auto; }
