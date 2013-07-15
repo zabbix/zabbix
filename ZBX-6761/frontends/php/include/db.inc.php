@@ -1089,7 +1089,7 @@ function dbConditionInt($fieldName, array $values, $notIn = false, $sort = true)
 		}
 	}
 
-	return (($dataSize && $betweenSize) || $betweenSize > 1) ? '('.$condition.')' : $condition;
+	return (($dataSize && $betweenSize) || $betweenSize > 1 || $dataSize > 1) ? '('.$condition.')' : $condition;
 }
 
 /**
