@@ -115,7 +115,7 @@ class testFormAdministrationDMProxies extends CWebTest {
 				'proxy123.zabbix.com',
 				11051,
 				0,
-				array('Cannot add proxy', 'Incorrect IP for passive proxy "wrong ip" interface.')
+				array('Cannot add proxy', 'Incorrect interface IP parameter "wrong ip" provided.')
 			),
 			array(
 				PROXY_BAD,
@@ -126,7 +126,7 @@ class testFormAdministrationDMProxies extends CWebTest {
 				'proxy123.zabbix.com',
 				11051,
 				0,
-				array('Cannot add proxy', 'Incorrect characters used for Proxy name "%^&".')
+				array('Cannot add proxy', 'Incorrect characters used for proxy name "%^&".')
 			),
 			array(
 				PROXY_BAD,
@@ -137,7 +137,7 @@ class testFormAdministrationDMProxies extends CWebTest {
 				'proxy123.zabbix.com',
 				11051,
 				0,
-				array('Cannot add proxy', 'Incorrect characters used for Proxy name "Прокси".')
+				array('Cannot add proxy', 'Incorrect characters used for proxy name "Прокси".')
 			),
 			array(
 				PROXY_BAD,
