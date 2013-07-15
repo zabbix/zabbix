@@ -20,11 +20,9 @@
 
 
 /**
- * File containing CScreen class for API.
+ * Class containing methods for operations with screens.
+ *
  * @package API
- */
-/**
- * Class containing methods for operations with Screens
  */
 class CScreen extends CZBXAPI {
 

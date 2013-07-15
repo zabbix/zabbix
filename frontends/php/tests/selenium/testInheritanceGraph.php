@@ -267,7 +267,8 @@ class testInheritanceGraph extends CWebTest {
 				)
 			),
 			array(
-				array('expected' => GRAPH_GOOD,
+				array(
+					'expected' => GRAPH_GOOD,
 					'name' => 'graphSimple',
 					'hostCheck' => true,
 					'dbCheck' => true
@@ -280,7 +281,8 @@ class testInheritanceGraph extends CWebTest {
 				)
 			),
 			array(
-				array('expected' => GRAPH_GOOD,
+				array(
+					'expected' => GRAPH_GOOD,
 					'name' => 'graphRemove',
 					'hostCheck' => true,
 					'dbCheck' => true,
@@ -288,7 +290,8 @@ class testInheritanceGraph extends CWebTest {
 				)
 			),
 			array(
-				array('expected' => GRAPH_GOOD,
+				array(
+					'expected' => GRAPH_GOOD,
 					'name' => 'graphNotRemove',
 					'hostCheck' => true,
 					'dbCheck' => true,
@@ -296,7 +299,8 @@ class testInheritanceGraph extends CWebTest {
 					'remove' => true)
 			),
 			array(
-				array('expected' => GRAPH_GOOD,
+				array(
+					'expected' => GRAPH_GOOD,
 					'name' => 'graphSomeRemove',
 					'hostCheck' => true,
 					'dbCheck' => true,
@@ -305,7 +309,8 @@ class testInheritanceGraph extends CWebTest {
 				)
 			),
 			array(
-				array('expected' => GRAPH_BAD,
+				array(
+					'expected' => GRAPH_BAD,
 					'name' => 'graphSimple',
 					'errors' => array(
 						'ERROR: Cannot add graph',
@@ -350,6 +355,7 @@ class testInheritanceGraph extends CWebTest {
 		}
 		elseif (!isset($data['noItems'])) {
 			$this->zbxTestLaunchPopup('add_item');
+			sleep(1);
 			$this->zbxTestClick('link='.$this->item);
 			sleep(1);
 			$this->selectWindow(null);

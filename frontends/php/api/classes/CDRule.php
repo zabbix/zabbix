@@ -20,11 +20,9 @@
 
 
 /**
- * File containing drule class for API.
+ * Class containing methods for operations with discovery rules.
+ *
  * @package API
- */
-/**
- * Class containing methods for operations with discovery rules
  */
 class CDRule extends CZBXAPI {
 

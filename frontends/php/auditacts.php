@@ -96,6 +96,7 @@ $data = array(
 $from = zbxDateToTime($data['stime']);
 $till = $from + $effectivePeriod;
 
+$user = null;
 $queryData = true;
 $firstAlert = null;
 
