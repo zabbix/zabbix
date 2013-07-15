@@ -1111,3 +1111,18 @@ INSERT INTO httpstepitem (httpstepitemid,httpstepid,itemid,type) VALUES (21,7,30
 INSERT INTO httpstepitem (httpstepitemid,httpstepid,itemid,type) VALUES (22,8,30050,2);
 INSERT INTO httpstepitem (httpstepitemid,httpstepid,itemid,type) VALUES (23,8,30051,1);
 INSERT INTO httpstepitem (httpstepitemid,httpstepid,itemid,type) VALUES (24,8,30052,0);
+
+-- testZBX6663.MassSelect
+INSERT INTO hosts (hostid, proxy_hostid, host, status, disable_until, error, available, errors_from, lastaccess, ipmi_authtype, ipmi_privilege, ipmi_username, ipmi_password, ipmi_disable_until, ipmi_available, snmp_disable_until, snmp_available, maintenanceid, maintenance_status, maintenance_type, maintenance_from, ipmi_errors_from, snmp_errors_from, ipmi_error, snmp_error,name) VALUES (50000,NULL,'Template ZBX6663 First',3,0,'',0,0,0,0,2,'','',0,0,0,0,NULL,0,0,0,0,0,'','','Template ZBX6663 First');
+INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50000, 50000, 1);
+INSERT INTO hosts (hostid, proxy_hostid, host, status, disable_until, error, available, errors_from, lastaccess, ipmi_authtype, ipmi_privilege, ipmi_username, ipmi_password, ipmi_disable_until, ipmi_available, snmp_disable_until, snmp_available, maintenanceid, maintenance_status, maintenance_type, maintenance_from, ipmi_errors_from, snmp_errors_from, ipmi_error, snmp_error,name) VALUES (52000,NULL,'Template ZBX6663 Second',3,0,'',0,0,0,0,2,'','',0,0,0,0,NULL,0,0,0,0,0,'','','Template ZBX6663 Second');
+INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50001, 52000, 1);
+INSERT INTO hosts (hostid, host, name, status) VALUES (51000, 'Host ZBX6663 First','Host ZBX6663 First', 0);
+INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50002, 51000, 4);
+INSERT INTO hosts (hostid, host, name, status) VALUES (53000, 'Host ZBX6663 Second','Host ZBX6663 Second', 0);
+INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50003, 53000, 4);
+INSERT INTO hosts_templates (hosttemplateid, hostid, templateid) VALUES (50000, 51000, 52000);
+INSERT INTO hosts_templates (hosttemplateid, hostid, templateid) VALUES (50001, 53000, 52000);
+INSERT INTO hosts_templates (hosttemplateid, hostid, templateid) VALUES (50002, 50000, 52000);
+INSERT INTO interface (type, ip, dns, useip, port, main, hostid, interfaceid) VALUES (1, '127.0.7.1', '', '1', '10071', '1', 51000, 50015);
+INSERT INTO interface (type, ip, dns, useip, port, main, hostid, interfaceid) VALUES (1, '127.0.7.1', '', '1', '10071', '1', 53000, 50016);
