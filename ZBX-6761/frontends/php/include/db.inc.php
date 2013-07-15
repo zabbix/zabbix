@@ -1002,7 +1002,7 @@ function check_db_fields($dbFields, &$args) {
  *
  * @return string
  */
-function dbConditionInt($fieldName, array $values, $notIn = false, $sort = true, $cleanHashes = true) {
+function dbConditionInt($fieldName, array $values, $notIn = false, $sort = true) {
 	$MAX_EXPRESSIONS = 950; // maximum  number of values for using "IN (id1>,<id2>,...,<idN>)"
 	$MIN_NUM_BETWEEN = 5; // minimum number of consecutive values for using "BETWEEN <id1> AND <idN>"
 
@@ -1010,13 +1010,13 @@ function dbConditionInt($fieldName, array $values, $notIn = false, $sort = true,
 		return '1=0';
 	}
 
-	if ($cleanHashes) {
-		zbx_cleanHashes($values);
-	}
+	$values = array_unique($values);
 
 	if ($sort) {
-		CArrayHelper::sort($values, array());
+		natsort($values);
 	}
+
+	zbx_cleanHashes($values);
 
 	$betweens = array();
 	$data = array();
