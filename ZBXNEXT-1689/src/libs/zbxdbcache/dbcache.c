@@ -872,19 +872,15 @@ static int	DBchk_double(double value)
  *                                                                            *
  * Parameters: item      - [IN] item reference                                *
  *             h         - [IN/OUT] a reference to history cache value        *
- *             last      - [IN] a reference to the last raw history value     *
+ *             deltaitem - [IN] a reference to the last raw history value     *
  *                         (value + timestamp)                                *
  *                                                                            *
  ******************************************************************************/
-static void	DCcalculate_item_delta_float(DB_ITEM *item, ZBX_DC_HISTORY *h, zbx_item_history_value_t *last)
+static void	DCcalculate_item_delta_float(DB_ITEM *item, ZBX_DC_HISTORY *h, zbx_item_history_value_t *deltaitem)
 {
 	switch (item->delta)
 	{
 		case ITEM_STORE_AS_IS:
-			/* set timestamp.sec to zero to remove this record from delta items later */
-			if (NULL != last)
-				last->timestamp.sec = 0;
-
 			h->value.dbl = multiply_item_value_float(item, h->value_orig.dbl);
 
 			if (SUCCEED != DBchk_double(h->value.dbl))
@@ -895,13 +891,12 @@ static void	DCcalculate_item_delta_float(DB_ITEM *item, ZBX_DC_HISTORY *h, zbx_i
 
 			break;
 		case ITEM_STORE_SPEED_PER_SECOND:
-			if (NULL != last && 0 != last->timestamp.sec &&
-					last->value.dbl <= h->value_orig.dbl &&
-					0 > zbx_timespec_compare(&last->timestamp, &h->ts))
+			if (0 != deltaitem->timestamp.sec && deltaitem->value.dbl <= h->value_orig.dbl &&
+					0 > zbx_timespec_compare(&deltaitem->timestamp, &h->ts))
 			{
-				h->value.dbl = (h->value_orig.dbl - last->value.dbl) /
-						((h->ts.sec - last->timestamp.sec) +
-							(double)(h->ts.ns - last->timestamp.ns) / 1000000000);
+				h->value.dbl = (h->value_orig.dbl - deltaitem->value.dbl) /
+						((h->ts.sec - deltaitem->timestamp.sec) +
+							(double)(h->ts.ns - deltaitem->timestamp.ns) / 1000000000);
 				h->value.dbl = multiply_item_value_float(item, h->value.dbl);
 
 				if (SUCCEED != DBchk_double(h->value.dbl))
@@ -915,10 +910,9 @@ static void	DCcalculate_item_delta_float(DB_ITEM *item, ZBX_DC_HISTORY *h, zbx_i
 
 			break;
 		case ITEM_STORE_SIMPLE_CHANGE:
-			if (NULL != last && 0 != last->timestamp.sec &&
-					last->value.dbl <= h->value_orig.dbl)
+			if (0 != deltaitem->timestamp.sec && deltaitem->value.dbl <= h->value_orig.dbl)
 			{
-				h->value.dbl = h->value_orig.dbl - last->value.dbl;
+				h->value.dbl = h->value_orig.dbl - deltaitem->value.dbl;
 				h->value.dbl = multiply_item_value_float(item, h->value.dbl);
 
 				if (SUCCEED != DBchk_double(h->value.dbl))
@@ -957,26 +951,21 @@ static void	DCcalculate_item_delta_float(DB_ITEM *item, ZBX_DC_HISTORY *h, zbx_i
  *                         (value + timestamp)                                *
  *                                                                            *
  ******************************************************************************/
-static void	DCcalculate_item_delta_uint64(DB_ITEM *item, ZBX_DC_HISTORY *h, zbx_item_history_value_t *last)
+static void	DCcalculate_item_delta_uint64(DB_ITEM *item, ZBX_DC_HISTORY *h, zbx_item_history_value_t *deltaitem)
 {
 	switch (item->delta)
 	{
 		case ITEM_STORE_AS_IS:
-			/* set timestamp.sec to zero to remove this record from delta items later */
-			if (NULL != last)
-				last->timestamp.sec = 0;
-
 			h->value.ui64 = multiply_item_value_uint64(item, h->value_orig.ui64);
 
 			break;
 		case ITEM_STORE_SPEED_PER_SECOND:
-			if (NULL != last && 0 != last->timestamp.sec &&
-					last->value.ui64 <= h->value_orig.ui64 &&
-					0 > zbx_timespec_compare(&last->timestamp, &h->ts))
+			if (0 != deltaitem->timestamp.sec && deltaitem->value.ui64 <= h->value_orig.ui64 &&
+					0 > zbx_timespec_compare(&deltaitem->timestamp, &h->ts))
 			{
-				h->value.ui64 = (h->value_orig.ui64 - last->value.ui64) /
-						((h->ts.sec - last->timestamp.sec) +
-							(double)(h->ts.ns - last->timestamp.ns) / 1000000000);
+				h->value.ui64 = (h->value_orig.ui64 - deltaitem->value.ui64) /
+						((h->ts.sec - deltaitem->timestamp.sec) +
+							(double)(h->ts.ns - deltaitem->timestamp.ns) / 1000000000);
 				h->value.ui64 = multiply_item_value_uint64(item, h->value.ui64);
 			}
 			else
@@ -984,10 +973,9 @@ static void	DCcalculate_item_delta_uint64(DB_ITEM *item, ZBX_DC_HISTORY *h, zbx_
 
 			break;
 		case ITEM_STORE_SIMPLE_CHANGE:
-			if (NULL != last && 0 != last->timestamp.sec &&
-					last->value.ui64 <= h->value_orig.ui64)
+			if (0 != deltaitem->timestamp.sec && deltaitem->value.ui64 <= h->value_orig.ui64)
 			{
-				h->value.ui64 = h->value_orig.ui64 - last->value.ui64;
+				h->value.ui64 = h->value_orig.ui64 - deltaitem->value.ui64;
 				h->value.ui64 = multiply_item_value_uint64(item, h->value.ui64);
 			}
 			else
@@ -1013,7 +1001,8 @@ static void	DCcalculate_item_delta_uint64(DB_ITEM *item, ZBX_DC_HISTORY *h, zbx_
 static void	DCadd_update_item_sql(size_t *sql_offset, DB_ITEM *item, ZBX_DC_HISTORY *h,
 		zbx_item_history_value_t *deltaitem)
 {
-	char	*value_esc, *sql_start = "update items set ", *sql_continue = ",";
+	char		*value_esc;
+	const char	*sql_start = "update items set ", *sql_continue = ",";
 
 	if (ITEM_STATE_NOTSUPPORTED == h->state)
 		goto notsupported;
@@ -1034,12 +1023,11 @@ static void	DCadd_update_item_sql(size_t *sql_offset, DB_ITEM *item, ZBX_DC_HIST
 	}
 
 notsupported:
-
 	/* update the last value (raw) of the delta items */
-	if (ITEM_STORE_AS_IS != item->delta && NULL != deltaitem &&
-			(ITEM_VALUE_TYPE_FLOAT == h->value_type || ITEM_VALUE_TYPE_UINT64 == h->value_type))
+	if (NULL != deltaitem && (ITEM_VALUE_TYPE_FLOAT == h->value_type || ITEM_VALUE_TYPE_UINT64 == h->value_type))
 	{
-		if (ITEM_STATE_NOTSUPPORTED == h->state)
+		/* set timestamp.sec to zero to remove this record from delta items later */
+		if (ITEM_STATE_NOTSUPPORTED == h->state || ITEM_STORE_AS_IS == item->delta)
 			deltaitem->timestamp.sec = 0;
 		else
 		{
@@ -1176,9 +1164,8 @@ static void	DCmass_update_items(ZBX_DC_HISTORY *history, int history_num)
 	DCget_delta_items(&delta_history, &ids);
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-			"select i.itemid,i.state,i.delta,i.multiplier,i.formula,"
-				"i.history,i.trends,i.hostid,i.inventory_link,hi.inventory_mode,i.valuemapid,"
-				"i.units,i.error,i.flags"
+			"select i.itemid,i.state,i.delta,i.multiplier,i.formula,i.history,i.trends,i.hostid,"
+				"i.inventory_link,hi.inventory_mode,i.valuemapid,i.units,i.error,i.flags"
 			" from items i"
 				" left join host_inventory hi"
 					" on hi.hostid=i.hostid"
@@ -1189,8 +1176,6 @@ static void	DCmass_update_items(ZBX_DC_HISTORY *history, int history_num)
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "i.itemid", ids.values, ids.values_num);
 
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " order by i.itemid");
-
-
 
 	result = DBselect("%s", sql);
 
@@ -1243,7 +1228,7 @@ static void	DCmass_update_items(ZBX_DC_HISTORY *history, int history_num)
 		h->keep_trends = (0 != item.trends ? 1 : 0);
 
 		if (NULL == (deltaitem = zbx_hashset_search(&delta_history, &item.itemid)) &&
-				item.delta != ITEM_STORE_AS_IS)
+				ITEM_STORE_AS_IS != item.delta)
 		{
 			zbx_item_history_value_t	value = {item.itemid};
 
@@ -3416,43 +3401,4 @@ zbx_uint64_t	DCget_nextid(const char *table_name, int num)
 			__function_name, table_name, nextid, lastid);
 
 	return nextid;
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: DCget_item_lastclock                                             *
- *                                                                            *
- * Return value: last clock or FAIL if item not found in dbcache              *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
- ******************************************************************************/
-int	DCget_item_lastclock(zbx_uint64_t itemid)
-{
-	const char	*__function_name = "DCget_item_lastclock";
-	int		i, index, clock = FAIL;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() itemid:" ZBX_FS_UI64, __function_name, itemid);
-
-	LOCK_CACHE;
-
-	index = (cache->history_first + cache->history_num - 1) % ZBX_HISTORY_SIZE;
-
-	for (i = cache->history_num - 1; i >= 0; i--)
-	{
-		if (cache->history[index].itemid == itemid)
-		{
-			clock = cache->history[index].ts.sec;
-			break;
-		}
-
-		if (--index < 0)
-			index = ZBX_HISTORY_SIZE - 1;
-	}
-
-	UNLOCK_CACHE;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __function_name, clock);
-
-	return clock;
 }
