@@ -184,10 +184,15 @@ $icons = DBselect(
 	' WHERE i.imagetype='.IMAGE_TYPE_ICON.
 		andDbNode('i.imageid')
 );
+$tempArray=array();
 while ($icon = DBfetch($icons)) {
-	$data['iconList'][] = array('imageid' => $icon['imageid'], 'name' => $icon['name']);
+	$tempArray[] = array('imageid' => $icon['imageid'], 'name' => $icon['name']);
 }
-order_result($data['iconList'], 'name');
+CArrayHelper::sort($tempArray,array('name'));
+foreach($tempArray as $value){
+	$data['iconList'][]=$value;
+}
+unset($tempArray);
 
 $data['sysmap']['selements'] = zbx_toHash($data['sysmap']['selements'], 'selementid');
 $data['sysmap']['links'] = zbx_toHash($data['sysmap']['links'], 'linkid');
