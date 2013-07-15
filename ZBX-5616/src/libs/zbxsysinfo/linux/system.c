@@ -26,21 +26,12 @@
 int	SYSTEM_UNAME(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	struct utsname	name;
-	size_t 		length;
 
 	if (-1 == uname(&name))
 		return SYSINFO_RET_FAIL;
 
-	length = strlen(name.sysname) + strlen(name.nodename) + strlen(name.release) + strlen(name.version) + strlen(name.machine);
-
-	char	*buf=zbx_malloc(buf, length+5);
-
-	if (NULL == buf)
-		return SYSINFO_RET_FAIL;
-
-	zbx_snprintf(buf, length+5, "%s %s %s %s %s", name.sysname, name.nodename, name.release, name.version, name.machine);
-
-	SET_STR_RESULT(result, buf);
+	SET_STR_RESULT(result, zbx_dsprintf(NULL, "%s %s %s %s %s", name.sysname, name.nodename, name.release,
+			name.version, name.machine));
 
 	return SYSINFO_RET_OK;
 }

@@ -25,9 +25,9 @@ EXTRA_DIST = \
 	aix/aix.c \
 	freebsd/freebsd.c \
 	hpux/hpux.c \
-	linux/linux.c \
-	netbsd/netbsd.c \
-	openbsd/openbsd.c \
+	linux/linux.c linux/hostname.c \
+	netbsd/netbsd.c netbsd/hostname.c \
+	openbsd/openbsd.c openbsd/hostname.c \
 	osf/osf.c \
 	osx/osx.c \
 	solaris/solaris.c \
@@ -36,7 +36,6 @@ EXTRA_DIST = \
 
 noinst_LIBRARIES = \
 	libzbxagentsysinfo.a \
-	libzbxhostname.a \
 	libzbxproxysysinfo.a \
 	libzbxserversysinfo.a
 
@@ -50,7 +49,8 @@ libzbxagentsysinfo_a_CFLAGS = \
 
 libzbxagentsysinfo_a_SOURCES = \
 	sysinfo.c \
-	@ARCH@/@ARCH@.c specsysinfo.h
+	@ARCH@/@ARCH@.c specsysinfo.h \
+	@ARCH@/hostname.c
 
 # SERVER version of sysinfo library
 libzbxserversysinfo_a_CFLAGS = \
@@ -67,8 +67,5 @@ libzbxproxysysinfo_a_CFLAGS = \
 	-DWITH_HOSTNAME_METRIC
 
 libzbxproxysysinfo_a_SOURCES = \
-	sysinfo.c
-
-# Hostname library
-libzbxhostname_a_SOURCES = \
+	sysinfo.c \
 	@ARCH@/hostname.c
