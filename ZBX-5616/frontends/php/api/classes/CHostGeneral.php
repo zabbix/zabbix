@@ -20,6 +20,8 @@
 
 
 /**
+ * Class containing methods for operations with hosts.
+ *
  * @package API
  */
 abstract class CHostGeneral extends CZBXAPI {
@@ -173,7 +175,7 @@ abstract class CHostGeneral extends CZBXAPI {
 				'SELECT i.key_,i.flags'.
 				' FROM items i'.
 				' WHERE '.dbConditionInt('i.hostid', $templateIdsAll).
-				' GROUP BY i.key_'.
+				' GROUP BY i.key_,i.flags'.
 				' HAVING COUNT(i.itemid)>1'
 			);
 

@@ -17,8 +17,8 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
+
 $usersWidget = new CWidget();
 
 // append page header to widget
@@ -51,6 +51,7 @@ $usersForm->setName('userForm');
 $usersTable = new CTableInfo(_('No users defined.'));
 $usersTable->setHeader(array(
 	new CCheckBox('all_users', null, "checkAll('".$usersForm->getName()."', 'all_users', 'group_userid');"),
+	$this->data['displayNodes'] ? _('Node') : null,
 	make_sorting_header(_('Alias'), 'alias'),
 	make_sorting_header(_('Name'), 'name'),
 	make_sorting_header(_('Surname'), 'surname'),
@@ -64,13 +65,14 @@ $usersTable->setHeader(array(
 ));
 
 foreach ($this->data['users'] as $user) {
-	$userid = $user['userid'];
-	$session = $this->data['usersSessions'][$userid];
+	$userId = $user['userid'];
+	$session = $this->data['usersSessions'][$userId];
 
 	// online time
-	$online_time = ($user['autologout'] == 0 || ZBX_USER_ONLINE_TIME < $user['autologout']) ? ZBX_USER_ONLINE_TIME : $user['autologout'];
 	if ($session['lastaccess']) {
-		$online = (($session['lastaccess'] + $online_time) >= time())
+		$onlineTime = ($user['autologout'] == 0 || ZBX_USER_ONLINE_TIME < $user['autologout']) ? ZBX_USER_ONLINE_TIME : $user['autologout'];
+
+		$online = (($session['lastaccess'] + $onlineTime) >= time())
 			? new CCol(_('Yes').' ('.date('r', $session['lastaccess']).')', 'enabled')
 			: new CCol(_('No').' ('.date('r', $session['lastaccess']).')', 'disabled');
 	}
@@ -79,52 +81,50 @@ foreach ($this->data['users'] as $user) {
 	}
 
 	// blocked
-	if ($user['attempt_failed'] >= ZBX_LOGIN_ATTEMPTS) {
-		$blocked = new CLink(_('Blocked'), 'users.php?go=unblock&group_userid'.SQUAREBRACKETS.'='.$userid, 'on');
-	}
-	else {
-		$blocked = new CSpan(_('Ok'), 'green');
-	}
+	$blocked = ($user['attempt_failed'] >= ZBX_LOGIN_ATTEMPTS)
+		? new CLink(_('Blocked'), 'users.php?go=unblock&group_userid'.SQUAREBRACKETS.'='.$userId, 'on')
+		: new CSpan(_('Ok'), 'green');
 
 	// user groups
-	$users_groups = array();
-	$usrgrps = $user['usrgrps'];
-	order_result($usrgrps, 'name');
-	foreach ($usrgrps as $usrgrp) {
-		$users_groups[] = new CLink($usrgrp['name'], 'usergrps.php?form=update&usrgrpid='.$usrgrp['usrgrpid']);
-		$users_groups[] = BR();
+	order_result($user['usrgrps'], 'name');
+
+	$usersGroups = array();
+	foreach ($user['usrgrps'] as $userGroup) {
+		$usersGroups[] = new CLink($userGroup['name'], 'usergrps.php?form=update&usrgrpid='.$userGroup['usrgrpid']);
+		$usersGroups[] = BR();
 	}
-	array_pop($users_groups);
+	array_pop($usersGroups);
 
 	// user type style
-	$user_type_style = 'enabled';
-	if (USER_TYPE_ZABBIX_ADMIN == $user['type']) {
-		$user_type_style = 'orange';
+	$userTypeStyle = 'enabled';
+	if ($user['type'] == USER_TYPE_ZABBIX_ADMIN) {
+		$userTypeStyle = 'orange';
 	}
-	if (USER_TYPE_SUPER_ADMIN == $user['type']) {
-		$user_type_style = 'disabled';
+	if ($user['type'] == USER_TYPE_SUPER_ADMIN) {
+		$userTypeStyle = 'disabled';
 	}
 
 	// gui access style
-	$gui_access_style = 'green';
+	$guiAccessStyle = 'green';
 	if ($user['gui_access'] == GROUP_GUI_ACCESS_INTERNAL) {
-		$gui_access_style = 'orange';
+		$guiAccessStyle = 'orange';
 	}
 	if ($user['gui_access'] == GROUP_GUI_ACCESS_DISABLED) {
-		$gui_access_style = 'disabled';
+		$guiAccessStyle = 'disabled';
 	}
 
 	// append user to table
 	$usersTable->addRow(array(
-		new CCheckBox('group_userid['.$userid.']', null, null, $userid),
-		new CLink($user['alias'], 'users.php?form=update&userid='.$userid),
+		new CCheckBox('group_userid['.$userId.']', null, null, $userId),
+		$this->data['displayNodes'] ? $user['nodename'] : null,
+		new CLink($user['alias'], 'users.php?form=update&userid='.$userId),
 		$user['name'],
 		$user['surname'],
 		user_type2str($user['type']),
-		$users_groups,
+		$usersGroups,
 		$online,
 		$blocked,
-		new CSpan(user_auth_type2str($user['gui_access']), $gui_access_style),
+		new CSpan(user_auth_type2str($user['gui_access']), $guiAccessStyle),
 		($user['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) ? new CSpan(_('Enabled'), 'orange') : new CSpan(_('Disabled'), 'green'),
 		($user['users_status'] == 1) ? new CSpan(_('Disabled'), 'red') : new CSpan(_('Enabled'), 'green')
 	));
@@ -132,15 +132,12 @@ foreach ($this->data['users'] as $user) {
 
 // append Go buttons
 $goComboBox = new CComboBox('go');
-
 $goOption = new CComboItem('unblock', _('Unblock selected'));
 $goOption->setAttribute('confirm', _('Unblock selected users?'));
 $goComboBox->addItem($goOption);
-
 $goOption = new CComboItem('delete', _('Delete selected'));
 $goOption->setAttribute('confirm', _('Delete selected users?'));
 $goComboBox->addItem($goOption);
-
 $goButton = new CSubmit('goButton', _('Go').' (0)');
 $goButton->setAttribute('id', 'goButton');
 zbx_add_post_js('chkbxRange.pageGoName = "group_userid";');
@@ -150,5 +147,5 @@ $usersForm->addItem(array($this->data['paging'], $usersTable, $this->data['pagin
 
 // append form to widget
 $usersWidget->addItem($usersForm);
+
 return $usersWidget;
-?>
