@@ -133,6 +133,7 @@ elseif (isset($_REQUEST['save'])) {
 		if ($result) {
 			add_audit($auditAction, AUDIT_RESOURCE_SCRIPT, ' Name ['.$_REQUEST['name'].'] id ['.$scriptId.']');
 			unset($_REQUEST['action'], $_REQUEST['form'], $_REQUEST['scriptid']);
+			clearCookies($result);
 		}
 	}
 }
@@ -146,6 +147,7 @@ elseif (isset($_REQUEST['delete'])) {
 	}
 
 	show_messages($result, _('Script deleted'), _('Cannot delete script'));
+	clearCookies($result);
 
 	if ($result) {
 		unset($_REQUEST['form'], $_REQUEST['scriptid']);
@@ -163,16 +165,11 @@ elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['scripts'])) {
 	}
 
 	show_messages($goResult, _('Script deleted'), _('Cannot delete script'));
+	clearCookies($goResult);
 
 	if ($goResult) {
 		unset($_REQUEST['form'], $_REQUEST['scriptid']);
 	}
-}
-
-if ($_REQUEST['go'] != 'none' && !empty($goResult)) {
-	$url = new CUrl();
-	$path = $url->getPath();
-	insert_js('cookie.eraseArray("'.basename($path, '.php').'")');
 }
 
 /*

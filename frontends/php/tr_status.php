@@ -215,9 +215,7 @@ else {
  * Clean cookies
  */
 if (get_request('show_events') != CProfile::get('web.tr_status.filter.show_events')) {
-	$url = new CUrl();
-	$path = $url->getPath();
-	insert_js('cookie.eraseArray("'.basename($path, '.php').'")');
+	clearCookies(true);
 }
 
 /*

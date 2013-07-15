@@ -123,6 +123,7 @@ if (isset($_REQUEST['save'])) {
 
 		add_audit($action, AUDIT_RESOURCE_APPLICATION, _('Application').' ['.$_REQUEST['appname'].' ] ['.$applicationId.']');
 		unset($_REQUEST['form']);
+		clearCookies($result, $_REQUEST['hostid']);
 	}
 	unset($_REQUEST['save']);
 }
@@ -148,7 +149,9 @@ elseif (isset($_REQUEST['delete'])) {
 		if ($result) {
 			add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_APPLICATION, 'Application ['.$app['name'].'] from host ['.$host['host'].']');
 		}
+
 		unset($_REQUEST['form'], $_REQUEST['applicationid']);
+		clearCookies($result, $_REQUEST['hostid']);
 	}
 }
 elseif ($_REQUEST['go'] == 'delete') {
@@ -181,6 +184,7 @@ elseif ($_REQUEST['go'] == 'delete') {
 	$goResult = DBend($goResult);
 
 	show_messages($goResult, _('Application deleted'), _('Cannot delete application'));
+	clearCookies($goResult, $_REQUEST['hostid']);
 }
 elseif (str_in_array($_REQUEST['go'], array('activate', 'disable'))) {
 	$goResult = true;
@@ -216,18 +220,12 @@ elseif (str_in_array($_REQUEST['go'], array('activate', 'disable'))) {
 	else {
 		show_messages($goResult, _('Items disabled'), null);
 	}
-}
 
-if ($_REQUEST['go'] != 'none' && !empty($goResult)) {
-	$url = new CUrl();
-	$path = $url->getPath();
-	insert_js('cookie.eraseArray("'.basename($path, '.php').
-		(empty($_REQUEST['hostid']) ? '' : '_'.$_REQUEST['hostid']).'")'
-	);
+	clearCookies($goResult, $_REQUEST['hostid']);
 }
 
 /*
- * Dsiplay
+ * Display
  */
 if (isset($_REQUEST['form'])) {
 	$data = array(

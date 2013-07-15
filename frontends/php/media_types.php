@@ -130,6 +130,7 @@ if (isset($_REQUEST['save'])) {
 	if ($result) {
 		add_audit($action, AUDIT_RESOURCE_MEDIA_TYPE, 'Media type ['.$mediaType['description'].']');
 		unset($_REQUEST['form']);
+		clearCookies($result);
 	}
 }
 elseif (isset($_REQUEST['delete']) && !empty($mediaTypeId)) {
@@ -140,6 +141,7 @@ elseif (isset($_REQUEST['delete']) && !empty($mediaTypeId)) {
 	}
 
 	show_messages($result, _('Media type deleted'), _('Cannot delete media type'));
+	clearCookies($result);
 }
 elseif ($_REQUEST['go'] == 'activate') {
 	$mediaTypeIds = get_request('mediatypeids', array());
@@ -156,6 +158,7 @@ elseif ($_REQUEST['go'] == 'activate') {
 	$goResult = API::Mediatype()->update($options);
 
 	show_messages($goResult, _('Media type enabled'), _('Cannot enable media type'));
+	clearCookies($goResult);
 }
 elseif ($_REQUEST['go'] == 'disable') {
 	$mediaTypeIds = get_request('mediatypeids', array());
@@ -172,17 +175,13 @@ elseif ($_REQUEST['go'] == 'disable') {
 	$goResult = API::Mediatype()->update($options);
 
 	show_messages($goResult, _('Media type disabled'), _('Cannot disable media type'));
+	clearCookies($goResult);
 }
 elseif ($_REQUEST['go'] == 'delete') {
 	$goResult = API::Mediatype()->delete(get_request('mediatypeids', array()));
 
 	show_messages($goResult, _('Media type deleted'), _('Cannot delete media type'));
-}
-
-if ($_REQUEST['go'] != 'none' && !empty($goResult)) {
-	$url = new CUrl();
-	$path = $url->getPath();
-	insert_js('cookie.eraseArray("'.basename($path, '.php').'")');
+	clearCookies($goResult);
 }
 
 /*

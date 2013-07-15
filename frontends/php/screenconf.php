@@ -176,6 +176,7 @@ elseif (isset($_REQUEST['save'])) {
 
 	if (!empty($screenids)) {
 		unset($_REQUEST['form'], $_REQUEST['screenid']);
+		clearCookies(!empty($screenids));
 	}
 }
 elseif (isset($_REQUEST['delete']) && isset($_REQUEST['screenid']) || $_REQUEST['go'] == 'delete') {
@@ -220,12 +221,7 @@ elseif (isset($_REQUEST['delete']) && isset($_REQUEST['screenid']) || $_REQUEST[
 	}
 
 	show_messages($goResult, _('Screen deleted'), _('Cannot delete screen'));
-}
-
-if ($_REQUEST['go'] != 'none' && !empty($goResult)) {
-	$url = new CUrl();
-	$path = $url->getPath();
-	insert_js('cookie.eraseArray("'.basename($path, '.php').'")');
+	clearCookies($goResult);
 }
 
 /*

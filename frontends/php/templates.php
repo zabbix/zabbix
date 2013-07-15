@@ -327,11 +327,13 @@ elseif (isset($_REQUEST['save'])) {
 		DBend(true);
 
 		show_messages(true, $msgOk, $msgFail);
+		clearCookies(true);
 
 		if ($created) {
 			add_audit_ext(AUDIT_ACTION_ADD, AUDIT_RESOURCE_TEMPLATE, $templateId, $templateName, 'hosts', null, null);
 		}
 		unset($_REQUEST['form'], $_REQUEST['templateid']);
+
 	}
 	catch (Exception $e) {
 		DBend(false);
@@ -356,6 +358,7 @@ elseif (isset($_REQUEST['delete']) && isset($_REQUEST['templateid'])) {
 	$result = DBend($result);
 
 	show_messages($result, _('Template deleted'), _('Cannot delete template'));
+	clearCookies($result);
 
 	if ($result) {
 		unset($_REQUEST['form'], $_REQUEST['templateid']);
@@ -371,6 +374,7 @@ elseif (isset($_REQUEST['delete_and_clear']) && isset($_REQUEST['templateid'])) 
 	$result = DBend($result);
 
 	show_messages($result, _('Template deleted'), _('Cannot delete template'));
+	clearCookies($result);
 
 	if ($result) {
 		unset($_REQUEST['form'], $_REQUEST['templateid']);
@@ -398,12 +402,7 @@ elseif (str_in_array($_REQUEST['go'], array('delete', 'delete_and_clear')) && is
 	$goResult = DBend($goResult);
 
 	show_messages($goResult, _('Template deleted'), _('Cannot delete template'));
-}
-
-if ($_REQUEST['go'] != 'none' && !empty($goResult)) {
-	$url = new CUrl();
-	$path = $url->getPath();
-	insert_js('cookie.eraseArray("'.basename($path, '.php').'")');
+	clearCookies($goResult);
 }
 
 /*

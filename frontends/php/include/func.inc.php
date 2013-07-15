@@ -2568,3 +2568,17 @@ function no_errors() {
 function checkRequiredKeys(array $array, array $keys) {
 	return array_diff($keys, array_keys($array));
 }
+
+/**
+ * clear page cookies on action
+ *
+ * @param bool $goResult
+ * @param int $id
+ */
+function clearCookies($goResult = false, $id = null) {
+	if (!empty($goResult)) {
+		$url = new CUrl();
+		$path = $url->getPath();
+		insert_js('cookie.eraseArray("'.basename($path, '.php').(empty($id) ? '' : '_'.$id).'")');
+	}
+}

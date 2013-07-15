@@ -198,11 +198,13 @@ if (isset($_REQUEST['add_delay_flex']) && isset($_REQUEST['new_delay_flex'])) {
 }
 elseif (isset($_REQUEST['delete']) && isset($_REQUEST['itemid'])) {
 	DBstart();
+
 	$result = API::Itemprototype()->delete($_REQUEST['itemid']);
 	$result = DBend($result);
-	show_messages($result, _('Item deleted'), _('Cannot delete item'));
 
+	show_messages($result, _('Item deleted'), _('Cannot delete item'));
 	unset($_REQUEST['itemid'], $_REQUEST['form']);
+	clearCookies($result, $_REQUEST['parent_discoveryid']);
 }
 elseif (isset($_REQUEST['clone']) && isset($_REQUEST['itemid'])) {
 	unset($_REQUEST['itemid']);
@@ -310,31 +312,30 @@ elseif (isset($_REQUEST['save'])) {
 	$result = DBend($result);
 	if ($result) {
 		unset($_REQUEST['itemid'], $_REQUEST['form']);
+		clearCookies($result, $_REQUEST['parent_discoveryid']);
 	}
 }
-// GO
-elseif (($_REQUEST['go'] == 'activate' || $_REQUEST['go'] == 'disable') && isset($_REQUEST['group_itemid'])) {
+elseif (str_in_array($_REQUEST['go'], array('activate', 'disable')) && isset($_REQUEST['group_itemid'])) {
 	$group_itemid = $_REQUEST['group_itemid'];
 
 	DBstart();
+
 	$goResult = ($_REQUEST['go'] == 'activate') ? activate_item($group_itemid) : disable_item($group_itemid);
 	$goResult = DBend($goResult);
+
 	show_messages($goResult, ($_REQUEST['go'] == 'activate') ? _('Items activated') : _('Items disabled'), null);
+	clearCookies($goResult, $_REQUEST['parent_discoveryid']);
 }
 elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['group_itemid'])) {
 	$group_itemid = $_REQUEST['group_itemid'];
+
 	DBstart();
+
 	$goResult = API::Itemprototype()->delete($group_itemid);
 	$goResult = DBend($goResult);
-	show_messages($goResult, _('Items deleted'), _('Cannot delete items'));
-}
 
-if ($_REQUEST['go'] != 'none' && !empty($goResult)) {
-	$url = new CUrl();
-	$path = $url->getPath();
-	insert_js('cookie.eraseArray("'.basename($path, '.php').
-		(empty($_REQUEST['parent_discoveryid']) ? '' : '_'.$_REQUEST['parent_discoveryid']).'")'
-	);
+	show_messages($goResult, _('Items deleted'), _('Cannot delete items'));
+	clearCookies($goResult, $_REQUEST['parent_discoveryid']);
 }
 
 /*
