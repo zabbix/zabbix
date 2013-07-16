@@ -312,7 +312,8 @@ static int	recv_getqueue(zbx_sock_t *sock, struct zbx_json_parse *jp)
 	struct zbx_json		json;
 	zbx_hashset_t		queue_stats;
 	zbx_queue_stats_t	*stats;
-	zbx_hashset_iter_t	iter;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	if (FAIL == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_TYPE, type, sizeof(type)))
 		goto out;
@@ -412,6 +413,8 @@ static int	recv_getqueue(zbx_sock_t *sock, struct zbx_json_parse *jp)
 
 	ret = SUCCEED;
 out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+
 	return ret;
 }
 

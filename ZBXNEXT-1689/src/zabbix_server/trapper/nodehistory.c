@@ -413,13 +413,13 @@ int	node_history(char *data, size_t datalen)
 	const char		*r;
 	char			*newline = NULL;
 	char			*pos;
-	int			sender_nodeid = 0, nodeid = 0, firstline = 1, events = 0, history = 0, acknowledges = 0;
+	int			sender_nodeid = 0, nodeid = 0, firstline = 1, events = 0, acknowledges = 0;
 	const ZBX_TABLE		*table_sync = NULL, *table = NULL;
 	int			res = SUCCEED;
 
-	char			*sql1 = NULL, *sql2 = NULL, *sql3 = NULL;
-	size_t			sql1_alloc, sql2_alloc, sql3_alloc;
-	size_t			sql1_offset, sql2_offset, sql3_offset;
+	char			*sql1 = NULL, *sql3 = NULL;
+	size_t			sql1_alloc, sql3_alloc;
+	size_t			sql1_offset, sql3_offset;
 
 	zbx_vector_uint64_t	ack_eventids;
 
@@ -429,13 +429,11 @@ int	node_history(char *data, size_t datalen)
 
 	buffer_alloc = 4 * ZBX_KIBIBYTE;
 	sql1_alloc = 32 * ZBX_KIBIBYTE;
-	sql2_alloc = 32 * ZBX_KIBIBYTE;
 	sql3_alloc = 32 * ZBX_KIBIBYTE;
 	tmp_alloc = 4 * ZBX_KIBIBYTE;
 
 	buffer = zbx_malloc(buffer, buffer_alloc);
 	sql1 = zbx_malloc(sql1, sql1_alloc);
-	sql2 = zbx_malloc(sql2, sql2_alloc);
 	sql3 = zbx_malloc(sql3, sql3_alloc);
 	tmp = zbx_malloc(tmp, tmp_alloc);
 
@@ -497,9 +495,6 @@ int	node_history(char *data, size_t datalen)
 				if (0 == strcmp(table->table, "events"))
 					events = 1;
 
-				if (0 == strncmp(table->table, "history", 7))
-					history = 1;
-
 				if (0 == strcmp(table->table, "acknowledges"))
 					acknowledges = 1;
 			}
@@ -511,7 +506,6 @@ int	node_history(char *data, size_t datalen)
 			}
 			firstline = 0;
 			sql1_offset = 0;
-			sql2_offset = 0;
 			sql3_offset = 0;
 		}
 		else if (NULL != table)
@@ -551,7 +545,6 @@ int	node_history(char *data, size_t datalen)
 
 	zbx_free(tmp);
 	zbx_free(sql1);
-	zbx_free(sql2);
 	zbx_free(sql3);
 	zbx_free(buffer);
 
