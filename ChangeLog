@@ -289,6 +289,7 @@ A......... [ZBX-6407] improved data retrieval performance for CTrigger get() wit
 A.F....... [ZBX-1357] updated Brazilian Portuguese, Chinese (China), Latvian, Spanish and Turkish translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+..F....... [ZBX-6761] fixed dbConditionInt() performance (Eduard)
 ........S. [ZBX-6681] fixed bug when one time maintenance period was ignored if it started before maintenance active time (wiper)
 .......P.. [ZBX-6630] faster proxy configuration synchronization (Andris)
 ...G...... [ZBX-6655] fixed possible agent crash when processing system.sw.packages[] (igors)
