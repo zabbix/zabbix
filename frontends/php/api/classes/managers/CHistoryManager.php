@@ -39,7 +39,7 @@ class CHistoryManager {
 			$queries[$table][] = DBaddLimit(
 				'SELECT * '.
 				'FROM '.$table.' h '.
-				'WHERE itemid='.$item['itemid'].' '.
+				'WHERE itemid='.zbx_dbstr($item['itemid']).' '.
 				'ORDER BY clock DESC',
 				$limit
 			);
@@ -50,6 +50,37 @@ class CHistoryManager {
 			$query = DBunion($tableQueries, $limit);
 			while ($history = DBfetch($query)) {
 				$rs[$history['itemid']][] = $history;
+			}
+		}
+
+		return $rs;
+	}
+
+	/**
+	 * Returns those items from $items that have history data.
+	 *
+	 * @param array $items
+	 *
+	 * @return array
+	 */
+	public function fetchItemsWithData(array $items) {
+		$tableItems = array();
+		foreach ($items as $item) {
+			$table = self::getTableName($item['value_type']);
+			$tableItems[$table][] = $item['itemid'];
+		}
+
+		$items = zbx_toHash($items, 'itemid');
+		$rs = array();
+		foreach ($tableItems as $table => $itemIds) {
+			$query = DBselect(
+				'SELECT DISTINCT h.itemid '.
+				'FROM '.$table.' h '.
+				'WHERE '.dbConditionInt('itemid', $itemIds)
+			);
+
+			while ($item = DBfetch($query)) {
+				$rs[] = $items[$item['itemid']];
 			}
 		}
 
