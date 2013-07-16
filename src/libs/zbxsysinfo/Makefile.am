@@ -22,15 +22,15 @@ SUBDIRS = \
 	@ARCH@
 
 EXTRA_DIST = \
-	aix/aix.c \
-	freebsd/freebsd.c \
-	hpux/hpux.c \
+	aix/aix.c aix/hostname.c \
+	freebsd/freebsd.c freebsd/hostname.c \
+	hpux/hpux.c hpux/hostname.c \
 	linux/linux.c linux/hostname.c \
 	netbsd/netbsd.c netbsd/hostname.c \
 	openbsd/openbsd.c openbsd/hostname.c \
-	osf/osf.c \
-	osx/osx.c \
-	solaris/solaris.c \
+	osf/osf.c osf/hostname.c \
+	osx/osx.c osx/hostname.c \
+	solaris/solaris.c solaris/hostname.c \
 	unknown/unknown.c \
 	win32
 
