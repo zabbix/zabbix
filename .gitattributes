@@ -261,6 +261,7 @@ frontends/php/tests/selenium/testFormWeb.php -text
 frontends/php/tests/selenium/testInheritanceGraphPrototype.php -text
 frontends/php/tests/selenium/testInheritanceWeb.php -text
 frontends/php/tests/selenium/testZBX6339.php -text
+frontends/php/tests/selenium/testZBX6663.php -text
 man/zabbix_agentd.man -text
 man/zabbix_get.man -text
 man/zabbix_proxy.man -text
