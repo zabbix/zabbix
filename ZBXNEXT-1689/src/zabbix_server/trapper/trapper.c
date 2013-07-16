@@ -564,7 +564,8 @@ static int	process_trap(zbx_sock_t	*sock, char *s)
 				}
 				else if (0 == strcmp(value, ZBX_PROTO_VALUE_GET_QUEUE))
 				{
-					ret = recv_getqueue(sock, &jp);
+					if (0 != (daemon_type & ZBX_DAEMON_TYPE_SERVER))
+						ret = recv_getqueue(sock, &jp);
 				}
 				else
 					zabbix_log(LOG_LEVEL_WARNING, "unknown request received [%s]", value);

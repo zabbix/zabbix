@@ -2065,8 +2065,8 @@ static void	add_value_suffix(char *value, size_t max_len, const char *units, uns
 				time = (time_t)atoi(value);
 				local_time = localtime(&time);
 				strftime(value, max_len, "%Y.%m.%d %H:%M:%S", local_time);
+				break;
 			}
-			break;
 		case ITEM_VALUE_TYPE_FLOAT:
 			if (0 == strcmp(units, "s"))
 				add_value_suffix_s(value, max_len);
