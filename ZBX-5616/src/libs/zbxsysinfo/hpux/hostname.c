@@ -23,15 +23,18 @@
 #	include <sys/utsname.h>
 #endif
 
-int	SYSTEM_UNAME(AGENT_REQUEST *request, AGENT_RESULT *result)
+ZBX_METRIC	parameter_hostname =
+/*	KEY			FLAG		FUNCTION		TEST PARAMETERS */
+	{"system.hostname",     0,              SYSTEM_HOSTNAME,        NULL};
+
+int	SYSTEM_HOSTNAME(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	struct utsname	name;
 
 	if (-1 == uname(&name))
 		return SYSINFO_RET_FAIL;
 
-	SET_STR_RESULT(result, zbx_dsprintf(NULL, "%s %s %s %s %s %s", name.sysname, name.nodename, name.release,
-			name.version, name.machine, name.idnumber));
+	SET_STR_RESULT(result, zbx_strdup(NULL, name.nodename));
 
 	return SYSINFO_RET_OK;
 }

@@ -17,7 +17,6 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
 #include "sysinfo.h"
 #include "log.h"
 #include "perfmon.h"
@@ -201,52 +200,6 @@ static void	get_cpu_type(char **os, size_t *os_alloc, size_t *os_offset, SYSTEM_
 			zbx_strcpy_alloc(os, os_alloc, os_offset, " Intel Itanium-based");
 			break;
 	}
-}
-
-int	SYSTEM_HOSTNAME(AGENT_REQUEST *request, AGENT_RESULT *result)
-{
-	DWORD	dwSize = 256;
-	TCHAR	computerName[256];
-	char	*type, buffer[256];
-	int	netbios, ret;
-	WSADATA sockInfo;
-
-	if (1 < request->nparam)
-		return SYSINFO_RET_FAIL;
-
-	type = get_rparam(request, 0);
-
-	if (NULL == type || '\0' == *type || 0 == strcmp(type, "netbios"))
-		netbios = 1;
-	else if (0 == strcmp(type, "host"))
-		netbios = 0;
-	else
-		return SYSINFO_RET_FAIL;
-
-	if (1 == netbios)
-	{
-		/* Buffer size is chosen large enough to contain any DNS name, not just MAX_COMPUTERNAME_LENGTH + 1 */
-		/* characters. MAX_COMPUTERNAME_LENGTH is usually less than 32, but it varies among systems, so we  */
-		/* cannot use the constant in a precompiled Windows agent, which is expected to work on any system. */
-		if (0 == GetComputerName(computerName, &dwSize))
-			zabbix_log(LOG_LEVEL_ERR, "GetComputerName() failed: %s", strerror_from_system(GetLastError()));
-		else
-			SET_STR_RESULT(result, zbx_unicode_to_utf8(computerName));
-	}
-	else
-	{
-		if (0 != (ret = WSAStartup(MAKEWORD(2, 2), &sockInfo)))
-			zabbix_log(LOG_LEVEL_ERR, "WSAStartup() failed: %s", strerror_from_system(ret));
-		else if (SUCCEED != gethostname(buffer, sizeof(buffer)))
-			zabbix_log(LOG_LEVEL_ERR, "gethostname() failed: %s", strerror_from_system(WSAGetLastError()));
-		else
-			SET_STR_RESULT(result, zbx_strdup(NULL, buffer));
-	}
-
-	if (ISSET_STR(result))
-		return SYSINFO_RET_OK;
-
-	return SYSINFO_RET_FAIL;
 }
 
 int	SYSTEM_UNAME(AGENT_REQUEST *request, AGENT_RESULT *result)
