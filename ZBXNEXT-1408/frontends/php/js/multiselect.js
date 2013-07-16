@@ -554,31 +554,29 @@ jQuery(function($) {
 
 			// check width
 			var maxWidth = $('.selected ul', obj).width() - 3,
-				spanObj = textTemp = text,
-					t = text.text(),
-					tTemp = t + (options.disabled ? '' : '[x]');
+				t = text.text(),
+				tTemp = (options.disabled ? '' : '[x]') + t;
 
-			textTemp.text(tTemp);
+			text.text(tTemp);
 
-			if (maxWidth < textTemp.width()) {
+			if (maxWidth < text.width()) {
 				var i = 1;
 
-				while (maxWidth < textTemp.width()) {
-					var length = tTemp.length;
-					textTemp.text(tTemp.substring(0, length - i) + '...[x]');
+				while (maxWidth < text.width()) {
+					text.text(tTemp.substring(0, tTemp.length - i) + '...');
+					cdump(text.text());
 					i++;
 				}
 
-				t = t.substring(0, t.length - i) + ' ' + t.substring(t.length - i, t.length);
-				spanObj.text(t);
+				t = t.substring(0, t.length - i) + '\n' + t.substring(t.length - i, t.length);
+				text.text(t);
 			}
 
-			// cut multi row value if set options.selectedLimit
-			var	originalHeight = textTemp.height();
+			var originalHeight = text.height();
 
-			spanObj.text('1');
+			text.text('1');
 
-			var rowHeight = spanObj.height();
+			var rowHeight = text.height();
 
 			if (originalHeight > rowHeight) {
 				var start = 1,
@@ -587,9 +585,9 @@ jQuery(function($) {
 				while (start < end) {
 					var length = Math.ceil((start + end) / 2);
 
-					spanObj.text(t.substring(0, length) + (options.disabled ? '...' : '...[x]'));
+					text.text(t.substring(0, length) + (options.disabled ? '...' : '...[x]'));
 
-					if (spanObj.height () <= rowHeight) {
+					if (text.height () <= rowHeight) {
 						start = length;
 					}
 					else {
@@ -597,12 +595,12 @@ jQuery(function($) {
 					}
 				}
 
-				spanObj.text(t.substring(0, start) + '...');
-				spanObj.css('text-align', 'justify');
+				text.text(t.substring(0, start) + '...');
+				text.css('text-align', 'justify');
 				li.css('width', maxWidth);
 			}
 			else {
-				spanObj.text(t);
+				text.text(t);
 			}
 
 			if (!options.disabled) {
