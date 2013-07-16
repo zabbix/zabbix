@@ -54,7 +54,8 @@ ul li.linear { float: left; list-style-type: none; margin-right: 2px; }
 .rarr { font-size: 16px; }
 .nowrap { white-space: nowrap; word-spacing: 0; }
 .delimiter { font-weight: bold; color: #000; }
-div.pointer:hover { cursor: pointer; }
+div.pointer:hover, img.pointer:hover { cursor: pointer; }
+
 .move { cursor: move; }
 
 /* font */
@@ -365,6 +366,7 @@ table.flicker tr td.flicker_c { height: 16px; padding-left: 4px; padding-right: 
 table.flicker tr td.flicker_l { text-align: left; height: 16px; padding-left: 4px; line-height: 12px; }
 table.flicker tr td.flicker_r {text-align: right; height: 16px; padding-right: 4px; line-height: 12px; }
 table.flicker a { color: #0BF; }
+td.flicker_c{ cursor: pointer; };
 
 /* acknowledgements */
 table.ack_msgs { width: 70%; background-color: #EEEEEE; padding: 0; border: 0 solid; }
