@@ -789,7 +789,6 @@ static int	evaluate_LAST(char *value, DB_ITEM *item, const char *function, const
 	int			arg1, flag, time_shift_flag, ret = FAIL, timeshift = 0;
 	zbx_vector_vc_value_t	values;
 
-
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	if (FAIL == get_function_parameter_uint31(item->hostid, parameters, 1, &arg1, &flag))
@@ -1199,11 +1198,15 @@ static int	evaluate_ABSCHANGE(char *value, DB_ITEM *item, const char *function, 
 		case ITEM_VALUE_TYPE_UINT64:
 			/* to avoid overflow */
 			if (values.values[0].value.ui64 >= values.values[1].value.ui64)
+			{
 				zbx_snprintf(value, MAX_BUFFER_LEN, ZBX_FS_UI64,
 						values.values[0].value.ui64 - values.values[1].value.ui64);
+			}
 			else
+			{
 				zbx_snprintf(value, MAX_BUFFER_LEN, ZBX_FS_UI64,
 						values.values[1].value.ui64 - values.values[0].value.ui64);
+			}
 			break;
 		case ITEM_VALUE_TYPE_LOG:
 			if (0 == strcmp(values.values[0].value.log->value, values.values[1].value.log->value))

@@ -420,8 +420,6 @@ out:
 	zbx_vector_uint64_destroy(&itemids);
 	zbx_free(errorcodes);
 	zbx_free(items);
-	zbx_free(errorcodes);
-	zbx_free(items);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
