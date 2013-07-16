@@ -1011,13 +1011,13 @@ function dbConditionInt($fieldName, array $values, $notIn = false, $sort = true)
 		return '1=0';
 	}
 
-	$values = array_keys(array_flip($values));
+	$values = array_unique($values);
 
 	if ($sort) {
 		natsort($values);
 	}
 
-	$values = array_values($values);
+	zbx_cleanHashes($values);
 
 	$betweens = array();
 	$data = array();
