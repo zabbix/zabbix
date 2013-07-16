@@ -4065,6 +4065,11 @@ static void	DCrequeue_reachable_item(ZBX_DC_ITEM *dc_item, int lastclock)
 	unsigned char	old_poller_type;
 	int		old_nextcheck;
 
+	dc_item->nextcheck = DCget_reachable_nextcheck(dc_item, lastclock);
+
+	if (ZBX_NO_POLLER == dc_item->poller_type)
+		return;
+
 	if (ZBX_LOC_POLLER == dc_item->location)
 		dc_item->location = ZBX_LOC_NOWHERE;
 
@@ -4082,8 +4087,6 @@ static void	DCrequeue_reachable_item(ZBX_DC_ITEM *dc_item, int lastclock)
 				dc_item->type, dc_item->key, dc_item->flags);
 	}
 
-	dc_item->nextcheck = DCget_reachable_nextcheck(dc_item, lastclock);
-
 	DCupdate_item_queue(dc_item, old_poller_type, old_nextcheck);
 }
 
@@ -4093,11 +4096,16 @@ static void	DCrequeue_unreachable_item(ZBX_DC_ITEM *dc_item)
 	unsigned char	old_poller_type;
 	int		old_nextcheck;
 
-	if (ZBX_LOC_POLLER == dc_item->location)
-		dc_item->location = ZBX_LOC_NOWHERE;
-
 	if (NULL == (dc_host = zbx_hashset_search(&config->hosts, &dc_item->hostid)))
 		return;
+
+	dc_item->nextcheck = DCget_unreachable_nextcheck(dc_item, dc_host);
+
+	if (ZBX_NO_POLLER == dc_item->poller_type)
+		return;
+
+	if (ZBX_LOC_POLLER == dc_item->location)
+		dc_item->location = ZBX_LOC_NOWHERE;
 
 	old_poller_type = dc_item->poller_type;
 	old_nextcheck = dc_item->nextcheck;
@@ -4106,8 +4114,6 @@ static void	DCrequeue_unreachable_item(ZBX_DC_ITEM *dc_item)
 			ZBX_POLLER_TYPE_IPMI == dc_item->poller_type ||
 			ZBX_POLLER_TYPE_JAVA == dc_item->poller_type)
 		dc_item->poller_type = ZBX_POLLER_TYPE_UNREACHABLE;
-
-	dc_item->nextcheck = DCget_unreachable_nextcheck(dc_item, dc_host);
 
 	DCupdate_item_queue(dc_item, old_poller_type, old_nextcheck);
 }
@@ -4129,9 +4135,6 @@ void	DCrequeue_items(zbx_uint64_t *itemids, unsigned char *states, int *lastcloc
 
 		dc_item->state = states[i];
 		dc_item->lastclock = lastclocks[i];
-
-		if (ZBX_NO_POLLER == dc_item->poller_type)
-			continue;
 
 		switch (errcodes[i])
 		{
@@ -4803,15 +4806,8 @@ int	DCget_item_queue(zbx_vector_ptr_t *queue, int from, int to)
 		switch (item->state)
 		{
 			case ITEM_STATE_NORMAL:
-				flex_item = zbx_hashset_search(&config->flexitems, &item->itemid);
-
-				nextcheck = calculate_item_nextcheck(item->interfaceid, item->itemid, item->type,
-						item->delay, NULL == flex_item ? NULL : flex_item->delay_flex,
-						item->lastclock, NULL);
-				break;
 			case ITEM_STATE_NOTSUPPORTED:
-				nextcheck = calculate_item_nextcheck(item->interfaceid, item->itemid, item->type,
-						config->config->refresh_unsupported, NULL, item->lastclock, NULL);
+				nextcheck = item->nextcheck;
 				break;
 			default:
 				continue;
