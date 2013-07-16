@@ -1,4 +1,4 @@
-/*
+./*
 ** Zabbix
 ** Copyright (C) 2001-2013 Zabbix SIA
 **
@@ -177,7 +177,7 @@ textarea.textarea_big { height: auto; }
 .textarea_standard { width: 312px; }
 .textarea_big { width: 524px; }
 .button { border: 1px solid #808080; vertical-align: top; margin: 1px 2px 1px 1px; background: #F0F0F0 url('../images/gradients/button.gif') repeat-x top left; }
-.button:hover { text-decoration: underline; border-color: black; cursor: pointer; }
+.button:hover { border-color: black; cursor: pointer; }
 
 /* button displayed as link */
 .link_menu {
