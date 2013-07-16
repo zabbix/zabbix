@@ -124,6 +124,8 @@ $pageHeader->addCssInit();
 $pageHeader->addCssFile('styles/themes/originalblue/main.css');
 $pageHeader->addJsFile('js/jquery/jquery.js');
 $pageHeader->addJsFile('js/jquery/jquery-ui.js');
+$pageHeader->addJsFile('js/common.js');
+$pageHeader->addJsFile('js/main.js');
 $pageHeader->display();
 ?>
 <body class="originalblue setupBG">
