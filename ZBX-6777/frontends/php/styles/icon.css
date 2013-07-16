@@ -72,7 +72,6 @@
 	height: 14px;
 	width: 14px;
 	background-repeat: no-repeat;
-	cursor: pointer;
 	margin: 0 1px 0 1px;
 }
 
@@ -80,22 +79,22 @@
 	margin-top: -2px;
 }
 
-.iconerror			{ background-image: url('../images/general/error2.png');}
+.iconerror			{ background-image: url('../images/general/error2.png'); cursor: pointer;}
 .iconok				{ background-image: url('../images/general/ok_icon.png');}
 .iconwarning		{ background-image: url('../images/general/warning.png');}
 .iconunknown		{ background-image: url('../images/general/unknown_icon.png');}
 .iconzbxunknown		{ background-image: url('../images/general/zabbix_unknown.png');}
 .iconzbxavailable	{ background-image: url('../images/general/zabbix_available.png');}
-.iconzbxunavailable	{ background-image: url('../images/general/zabbix_unavailable.png');}
+.iconzbxunavailable	{ background-image: url('../images/general/zabbix_unavailable.png'); cursor: pointer;}
 .iconsnmpunknown	{ background-image: url('../images/general/snmp_unknown.png');}
 .iconsnmpavailable	{ background-image: url('../images/general/snmp_available.png');}
-.iconsnmpunavailable{ background-image: url('../images/general/snmp_unavailable.png');}
+.iconsnmpunavailable{ background-image: url('../images/general/snmp_unavailable.png'); cursor: pointer;}
 .iconjmxunknown		{ background-image: url('../images/general/jmx_unknown.png');}
 .iconjmxavailable	{ background-image: url('../images/general/jmx_available.png');}
-.iconjmxunavailable	{ background-image: url('../images/general/jmx_unavailable.png');}
+.iconjmxunavailable	{ background-image: url('../images/general/jmx_unavailable.png'); cursor: pointer;}
 .iconipmiunknown	{ background-image: url('../images/general/ipmi_unknown.png');}
 .iconipmiavailable	{ background-image: url('../images/general/ipmi_available.png');}
-.iconipmiunavailable{ background-image: url('../images/general/ipmi_unavailable.png');}
+.iconipmiunavailable{ background-image: url('../images/general/ipmi_unavailable.png'); cursor: pointer;}
 
 .dbl_arrow_down {
 	height: 10px;
