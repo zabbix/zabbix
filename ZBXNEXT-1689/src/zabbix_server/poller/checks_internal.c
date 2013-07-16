@@ -446,14 +446,10 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 		{
 			if (0 == strcmp(tmp1, "hits"))
 				SET_UI64_RESULT(result, stats.hits);
-			else if (0 == strcmp(tmp1, "phits"))
-				SET_DBL_RESULT(result, (double)stats.hits / (stats.hits + stats.misses) * 100);
 			else if (0 == strcmp(tmp1, "requests"))
 				SET_UI64_RESULT(result, stats.hits + stats.misses);
 			else if (0 == strcmp(tmp1, "misses"))
 				SET_UI64_RESULT(result, stats.misses);
-			else if (0 == strcmp(tmp1, "pmisses"))
-				SET_DBL_RESULT(result, (double)stats.misses / (stats.hits + stats.misses) * 100);
 			else
 				goto notsupported;
 		}
