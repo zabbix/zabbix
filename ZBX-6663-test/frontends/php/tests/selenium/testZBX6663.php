@@ -180,11 +180,13 @@ class testZBX6663 extends CWebTest {
 
 		if (isset($zbx_data['host'])) {
 			$this->zbxTestLogin('hosts.php');
+			$this->zbxTestDropdownSelectWait('groupid', 'all');
 			$this->zbxTestClickWait('link='.$zbx_data['host']);
 		}
 
 		if (isset($zbx_data['template'])) {
 			$this->zbxTestLogin('templates.php');
+			$this->zbxTestDropdownSelectWait('groupid', 'all');
 			$this->zbxTestClickWait('link='.$zbx_data['template']);
 		}
 
