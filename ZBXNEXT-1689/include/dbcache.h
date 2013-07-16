@@ -320,6 +320,6 @@ void	DCget_delta_items(zbx_hashset_t *items, const zbx_vector_uint64_t *ids);
 void	DCset_delta_items(zbx_hashset_t *items);
 
 void	DCfree_item_queue(zbx_vector_ptr_t *queue);
-void	DCget_item_queue(zbx_vector_ptr_t *queue, int from, int to);
+int	DCget_item_queue(zbx_vector_ptr_t *queue, int from, int to);
 
 #endif
