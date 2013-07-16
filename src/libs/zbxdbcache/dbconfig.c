@@ -4731,7 +4731,7 @@ int	DCget_item_queue(zbx_vector_ptr_t *queue, int from, int to)
 	ZBX_DC_ITEM		*item;
 	ZBX_DC_HOST		*host = NULL;
 	ZBX_DC_FLEXITEM		*flex_item;
-	int			pass = FAIL, delay, nextcheck, now, nitems = 0;
+	int			delay, nextcheck, now, nitems = 0;
 	zbx_queue_item_t	*queue_item;
 
 	now = time(NULL);
@@ -4765,42 +4765,40 @@ int	DCget_item_queue(zbx_vector_ptr_t *queue, int from, int to)
 			case ITEM_TYPE_AGGREGATE:
 			case ITEM_TYPE_EXTERNAL:
 			case ITEM_TYPE_CALCULATED:
-				pass = SUCCEED;
 				break;
 			case ITEM_TYPE_ZABBIX:
-				if (NULL != (host = zbx_hashset_search(&config->hosts, &item->hostid)) &&
-						0 == host->errors_from)
+				if (NULL == (host = zbx_hashset_search(&config->hosts, &item->hostid)) ||
+						0 != host->errors_from)
 				{
-					pass = SUCCEED;
+					continue;
 				}
 				break;
 			case ITEM_TYPE_SNMPv1:
 			case ITEM_TYPE_SNMPv2c:
 			case ITEM_TYPE_SNMPv3:
-				if (NULL != (host = zbx_hashset_search(&config->hosts, &item->hostid)) &&
-						0 == host->snmp_errors_from)
+				if (NULL == (host = zbx_hashset_search(&config->hosts, &item->hostid)) ||
+						0 != host->snmp_errors_from)
 				{
-					pass = SUCCEED;
+					continue;
 				}
 				break;
 			case ITEM_TYPE_IPMI:
-				if (NULL != (host = zbx_hashset_search(&config->hosts, &item->hostid)) &&
-						0 == host->ipmi_errors_from)
+				if (NULL == (host = zbx_hashset_search(&config->hosts, &item->hostid)) ||
+						0 != host->ipmi_errors_from)
 				{
-					pass = SUCCEED;
+					continue;
 				}
 				break;
 			case ITEM_TYPE_JMX:
-				if (NULL != (host = zbx_hashset_search(&config->hosts, &item->hostid)) &&
-						0 == host->jmx_errors_from)
+				if (NULL == (host = zbx_hashset_search(&config->hosts, &item->hostid)) ||
+						0 != host->jmx_errors_from)
 				{
-					pass = SUCCEED;
+					continue;
 				}
 				break;
+			default:
+				continue;
 		}
-
-		if (SUCCEED != pass)
-			continue;
 
 		switch (item->state)
 		{
