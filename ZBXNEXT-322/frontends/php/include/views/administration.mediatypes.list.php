@@ -36,42 +36,48 @@ $mediaTypeForm->setName('mediaTypesForm');
 $mediaTypeTable = new CTableInfo(_('No media types defined.'));
 $mediaTypeTable->setHeader(array(
 	new CCheckBox('all_media_types', null, "checkAll('".$mediaTypeForm->getName()."', 'all_media_types', 'mediatypeids');"),
+	$this->data['displayNodes'] ? _('Node') : null,
 	make_sorting_header(_('Name'), 'description'),
 	make_sorting_header(_('Type'), 'type'),
 	_('Status'),
 	_('Used in actions'),
 	_('Details')
 ));
-foreach ($this->data['mediatypes'] as $mediatype) {
-	switch ($mediatype['typeid']) {
+
+foreach ($this->data['mediatypes'] as $mediaType) {
+	switch ($mediaType['typeid']) {
 		case MEDIA_TYPE_EMAIL:
 			$details =
-			_('SMTP server').': "'.$mediatype['smtp_server'].'", '.
-			_('SMTP helo').': "'.$mediatype['smtp_helo'].'", '.
-			_('SMTP email').': "'.$mediatype['smtp_email'].'"';
+				_('SMTP server').NAME_DELIMITER.'"'.$mediaType['smtp_server'].'", '.
+				_('SMTP helo').NAME_DELIMITER.'"'.$mediaType['smtp_helo'].'", '.
+				_('SMTP email').NAME_DELIMITER.'"'.$mediaType['smtp_email'].'"';
 			break;
+
 		case MEDIA_TYPE_EXEC:
-			$details = _('Script name').': "'.$mediatype['exec_path'].'"';
+			$details = _('Script name').NAME_DELIMITER.'"'.$mediaType['exec_path'].'"';
 			break;
+
 		case MEDIA_TYPE_SMS:
-			$details = _('GSM modem').': "'.$mediatype['gsm_modem'].'"';
+			$details = _('GSM modem').NAME_DELIMITER.'"'.$mediaType['gsm_modem'].'"';
 			break;
+
 		case MEDIA_TYPE_JABBER:
-			$details = _('Jabber identifier').': "'.$mediatype['username'].'"';
+			$details = _('Jabber identifier').NAME_DELIMITER.'"'.$mediaType['username'].'"';
 			break;
+
 		case MEDIA_TYPE_EZ_TEXTING:
-			$details = _('Username').': "'.$mediatype['username'].'"';
+			$details = _('Username').NAME_DELIMITER.'"'.$mediaType['username'].'"';
 			break;
+
 		default:
 			$details = '';
 			break;
 	}
 
+	// action list
 	$actionLinks = array();
-	if (!empty($mediatype['listOfActions'])) {
-		order_result($mediatype['listOfActions'], 'name');
-
-		foreach ($mediatype['listOfActions'] as $action) {
+	if (!empty($mediaType['listOfActions'])) {
+		foreach ($mediaType['listOfActions'] as $action) {
 			$actionLinks[] = new CLink($action['name'], 'actionconf.php?form=edit&actionid='.$action['actionid']);
 			$actionLinks[] = ', ';
 		}
@@ -83,21 +89,19 @@ foreach ($this->data['mediatypes'] as $mediatype) {
 	$actionColumn = new CCol($actionLinks);
 	$actionColumn->setAttribute('style', 'white-space: normal;');
 
-	$statusLink = 'media_types.php?go='.(($mediatype['status'] == MEDIA_TYPE_STATUS_DISABLED) ? 'activate' : 'disable').
-		'&mediatypeids'.SQUAREBRACKETS.'='.$mediatype['mediatypeid'];
+	$statusLink = 'media_types.php?go='.(($mediaType['status'] == MEDIA_TYPE_STATUS_DISABLED) ? 'activate' : 'disable').
+		'&mediatypeids'.SQUAREBRACKETS.'='.$mediaType['mediatypeid'];
 
-	if (MEDIA_TYPE_STATUS_ACTIVE == $mediatype['status']) {
-		$status = new CLink(_('Enabled'), $statusLink, 'enabled');
-	}
-	else {
-		$status = new CLink(_('Disabled'), $statusLink, 'disabled');
-	}
+	$status = (MEDIA_TYPE_STATUS_ACTIVE == $mediaType['status'])
+		? new CLink(_('Enabled'), $statusLink, 'enabled')
+		: new CLink(_('Disabled'), $statusLink, 'disabled');
 
 	// append row
 	$mediaTypeTable->addRow(array(
-		new CCheckBox('mediatypeids['.$mediatype['mediatypeid'].']', null, null, $mediatype['mediatypeid']),
-		new CLink($mediatype['description'], '?form=edit&mediatypeid='.$mediatype['mediatypeid']),
-		media_type2str($mediatype['typeid']),
+		new CCheckBox('mediatypeids['.$mediaType['mediatypeid'].']', null, null, $mediaType['mediatypeid']),
+		$this->data['displayNodes'] ? $mediaType['nodename'] : null,
+		new CLink($mediaType['description'], '?form=edit&mediatypeid='.$mediaType['mediatypeid']),
+		media_type2str($mediaType['typeid']),
 		$status,
 		$actionColumn,
 		$details

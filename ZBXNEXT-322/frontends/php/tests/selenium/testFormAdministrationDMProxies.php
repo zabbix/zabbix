@@ -74,12 +74,12 @@ class testFormAdministrationDMProxies extends CWebTest {
 		// this check will fail in case of incorrect maxlength value for this "host" element!!!
 		$this->assertAttribute("//input[@id='host']/@maxlength", '64');
 		$this->assertElementPresent('status');
-		$this->assertElementPresent('interfaces_0_ip');
-		$this->assertAttribute("//input[@id='interfaces_0_ip']/@maxlength", '39');
-		$this->assertElementPresent('interfaces_0_dns');
-		$this->assertAttribute("//input[@id='interfaces_0_dns']/@maxlength", '64');
-		$this->assertElementPresent('interfaces_0_port');
-		$this->assertAttribute("//input[@id='interfaces_0_port']/@maxlength", '64');
+		$this->assertElementPresent('interface_ip');
+		$this->assertAttribute("//input[@id='interface_ip']/@maxlength", '39');
+		$this->assertElementPresent('interface_dns');
+		$this->assertAttribute("//input[@id='interface_dns']/@maxlength", '64');
+		$this->assertElementPresent('interface_port');
+		$this->assertAttribute("//input[@id='interface_port']/@maxlength", '64');
 		$this->assertElementPresent('hosts_left');
 		$this->assertElementPresent('hosts_right');
 		$this->assertElementPresent('save');
@@ -115,7 +115,7 @@ class testFormAdministrationDMProxies extends CWebTest {
 				'proxy123.zabbix.com',
 				11051,
 				0,
-				array('Cannot add proxy', 'Incorrect interface IP parameter')
+				array('Cannot add proxy', 'Incorrect IP for passive proxy "wrong ip" interface.')
 			),
 			array(
 				PROXY_BAD,
@@ -178,7 +178,7 @@ class testFormAdministrationDMProxies extends CWebTest {
 				'proxy123.zabbix.com',
 				0,
 				11051,
-				array('Cannot add proxy', 'Incorrect interface IP parameter "$PROXY_IP" provided.')
+				array('Cannot add proxy', 'Incorrect IP for passive proxy "$PROXY_IP')
 			)
 		);
 	}
@@ -218,10 +218,10 @@ class testFormAdministrationDMProxies extends CWebTest {
 
 			case HOST_STATUS_PROXY_PASSIVE:
 				$this->zbxTestDropdownSelectWait('status', 'Passive');
-				$this->input_type('interfaces_0_ip', $ip);
-				$this->input_type('interfaces_0_dns', $dns);
+				$this->input_type('interface_ip', $ip);
+				$this->input_type('interface_dns', $dns);
 // TODO connect_to is not supported yet
-				$this->input_type('interfaces_0_port', $port);
+				$this->input_type('interface_port', $port);
 				break;
 		}
 

@@ -25,14 +25,14 @@ require_once dirname(__FILE__).'/include/screens.inc.php';
 require_once dirname(__FILE__).'/include/forms.inc.php';
 require_once dirname(__FILE__).'/include/ident.inc.php';
 
-if(isset($_REQUEST['go']) && ($_REQUEST['go'] == 'export') && isset($_REQUEST['templates'])){
-	$EXPORT_DATA = true;
+if (isset($_REQUEST['go']) && $_REQUEST['go'] == 'export' && isset($_REQUEST['templates'])) {
+	$exportData = true;
 
 	$page['type'] = detect_page_type(PAGE_TYPE_XML);
 	$page['file'] = 'zbx_export_templates.xml';
 }
-else{
-	$EXPORT_DATA = false;
+else {
+	$exportData = false;
 
 	$page['type'] = detect_page_type(PAGE_TYPE_HTML);
 	$page['title'] = _('Configuration of templates');
@@ -43,57 +43,52 @@ else{
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
-
 //		VAR						TYPE		OPTIONAL FLAGS			VALIDATION	EXCEPTION
 $fields = array(
-	'hosts'				=> array(T_ZBX_INT,	O_OPT,	P_SYS,			DB_ID, 	null),
-	'groups'			=> array(T_ZBX_INT, O_OPT,	P_SYS,			DB_ID, 	null),
-	'clear_templates'	=> array(T_ZBX_INT, O_OPT,	P_SYS,			DB_ID, 	null),
-	'templates'			=> array(T_ZBX_INT, O_OPT,	null,			DB_ID,	null),
-	'add_template' 		=> array(T_ZBX_STR, O_OPT,	null,			null,	null),
-	'exist_templates' 	=> array(T_ZBX_INT, O_OPT,	null,			DB_ID,	null),
-	'templateid'		=> array(T_ZBX_INT,	O_OPT,	P_SYS,			DB_ID,	'isset({form})&&({form}=="update")'),
-	'template_name'		=> array(T_ZBX_STR,	O_OPT,	NOT_EMPTY,		null,	'isset({save})'),
-	'visiblename'		=> array(T_ZBX_STR,	O_OPT,	null,			null,	'isset({save})'),
-	'groupid'			=> array(T_ZBX_INT, O_OPT,	P_SYS,			DB_ID,	null),
-	'twb_groupid'		=> array(T_ZBX_INT, O_OPT,	P_SYS,			DB_ID,	null),
-	'newgroup'			=> array(T_ZBX_STR, O_OPT,	null,			null,	null),
-
-	'macros_rem'		=> array(T_ZBX_STR, O_OPT,	P_SYS|P_ACT,	null,	null),
-	'macros'			=> array(T_ZBX_STR, O_OPT,	P_SYS,			null,	null),
-	'macro_new'			=> array(T_ZBX_STR, O_OPT,	P_SYS|P_ACT,	null,	'isset({macro_add})'),
-	'value_new'			=> array(T_ZBX_STR, O_OPT,	P_SYS|P_ACT,	null,	'isset({macro_add})'),
-	'macro_add'			=> array(T_ZBX_STR, O_OPT,	P_SYS|P_ACT,	null,	null),
-// actions
-	'go'				=> array(T_ZBX_STR, O_OPT,	P_SYS|P_ACT,	null,	null),
-//form
-	'unlink'			=> array(T_ZBX_STR, O_OPT,	P_SYS|P_ACT,	null,	null),
-	'unlink_and_clear'	=> array(T_ZBX_STR, O_OPT,	P_SYS|P_ACT,	null,	null),
-	'save'				=> array(T_ZBX_STR, O_OPT,	P_SYS|P_ACT,	null,	null),
-	'clone'				=> array(T_ZBX_STR, O_OPT,	P_SYS|P_ACT,	null,	null),
-	'full_clone'		=> array(T_ZBX_STR, O_OPT,	P_SYS|P_ACT,	null,	null),
-	'delete'			=> array(T_ZBX_STR, O_OPT,	P_SYS|P_ACT,	null,	null),
-	'delete_and_clear'	=> array(T_ZBX_STR, O_OPT,	P_SYS|P_ACT,	null,	null),
-	'cancel'			=> array(T_ZBX_STR, O_OPT,	P_SYS,			null,	null),
-// other
-	'form'				=> array(T_ZBX_STR, O_OPT,	P_SYS,			null,	null),
-	'form_refresh'		=> array(T_ZBX_STR, O_OPT,	null,			null,	null),
+	'hosts'				=> array(T_ZBX_INT, O_OPT, P_SYS,		DB_ID,	null),
+	'groups'			=> array(T_ZBX_INT, O_OPT, P_SYS,		DB_ID,	null),
+	'clear_templates'	=> array(T_ZBX_INT, O_OPT, P_SYS,		DB_ID,	null),
+	'templates'			=> array(T_ZBX_INT, O_OPT, null,		DB_ID,	null),
+	'add_template' 		=> array(T_ZBX_STR, O_OPT, null,		null,	null),
+	'exist_templates' 	=> array(T_ZBX_INT, O_OPT, null,		DB_ID,	null),
+	'templateid'		=> array(T_ZBX_INT, O_OPT, P_SYS,		DB_ID,	'isset({form})&&{form}=="update"'),
+	'template_name'		=> array(T_ZBX_STR, O_OPT, NOT_EMPTY,	null,	'isset({save})'),
+	'visiblename'		=> array(T_ZBX_STR, O_OPT, null,		null,	'isset({save})'),
+	'groupid'			=> array(T_ZBX_INT, O_OPT, P_SYS,		DB_ID,	null),
+	'twb_groupid'		=> array(T_ZBX_INT, O_OPT, P_SYS,		DB_ID,	null),
+	'newgroup'			=> array(T_ZBX_STR, O_OPT, null,		null,	null),
+	'macros_rem'		=> array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+	'macros'			=> array(T_ZBX_STR, O_OPT, P_SYS,		null,	null),
+	'macro_new'			=> array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	'isset({macro_add})'),
+	'value_new'			=> array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	'isset({macro_add})'),
+	'macro_add'			=> array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+	// actions
+	'go'				=> array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+	'unlink'			=> array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+	'unlink_and_clear'	=> array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+	'save'				=> array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+	'clone'				=> array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+	'full_clone'		=> array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+	'delete'			=> array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+	'delete_and_clear'	=> array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+	'cancel'			=> array(T_ZBX_STR, O_OPT, P_SYS,		null,	null),
+	'form'				=> array(T_ZBX_STR, O_OPT, P_SYS,		null,	null),
+	'form_refresh'		=> array(T_ZBX_STR, O_OPT, null,		null,	null)
 );
-
-// OUTER DATA
 check_fields($fields);
 validate_sort_and_sortorder('name', ZBX_SORT_UP);
 
 $_REQUEST['go'] = get_request('go', 'none');
 
-// PERMISSIONS
+/*
+ * Permissions
+ */
 if (get_request('groupid', 0) > 0) {
-	$groupids = available_groups($_REQUEST['groupid'], 1);
-	if (!$groupids) {
+	$groupIds = available_groups($_REQUEST['groupid'], 1);
+	if (!$groupIds) {
 		access_deny();
 	}
 }
-
 if (get_request('templateid', 0) > 0) {
 	$templates = API::Template()->get(array(
 		'templateids' => $_REQUEST['templateid'],
@@ -104,14 +99,14 @@ if (get_request('templateid', 0) > 0) {
 	}
 }
 
-
 $templateIds = get_request('templates', array());
 
-if ($EXPORT_DATA) {
+if ($exportData) {
 	$export = new CConfigurationExport(array('templates' => $templateIds));
 	$export->setBuilder(new CConfigurationExportBuilder());
 	$export->setWriter(CExportWriterFactory::getWriter(CExportWriterFactory::XML));
 	$exportData = $export->export();
+
 	if (no_errors()) {
 		print($exportData);
 	}
@@ -121,51 +116,37 @@ if ($EXPORT_DATA) {
 	exit();
 }
 
-
-/**********************************/
-/* <<<--- TEMPLATE ACTIONS --->>> */
-/**********************************/
+/*
+ * Actions
+ */
 if (isset($_REQUEST['exist_templates'])) {
-	$_REQUEST['templates'] = isset($_REQUEST['templates']) && isset($_REQUEST['add_template'])
+	$_REQUEST['templates'] = (isset($_REQUEST['templates']) && isset($_REQUEST['add_template']))
 		? array_merge($_REQUEST['exist_templates'], $_REQUEST['templates'])
 		: $_REQUEST['templates'] = $_REQUEST['exist_templates'];
 }
-
-/*
- * Unlink, unlink_and_clear
- */
 if (isset($_REQUEST['unlink']) || isset($_REQUEST['unlink_and_clear'])) {
 	$_REQUEST['clear_templates'] = get_request('clear_templates', array());
 
 	if (isset($_REQUEST['unlink'])) {
-		$unlink_templates = array_keys($_REQUEST['unlink']);
+		$unlinkTemplates = array_keys($_REQUEST['unlink']);
 	}
 	else {
-		$unlink_templates = array_keys($_REQUEST['unlink_and_clear']);
-		$_REQUEST['clear_templates'] = zbx_array_merge($_REQUEST['clear_templates'], $unlink_templates);
+		$unlinkTemplates = array_keys($_REQUEST['unlink_and_clear']);
+		$_REQUEST['clear_templates'] = zbx_array_merge($_REQUEST['clear_templates'], $unlinkTemplates);
 	}
-	foreach ($unlink_templates as $id) {
+
+	foreach ($unlinkTemplates as $id) {
 		unset($_REQUEST['templates'][array_search($id, $_REQUEST['templates'])]);
 	}
 }
-/*
- * Clone
- */
 elseif (isset($_REQUEST['clone']) && isset($_REQUEST['templateid'])) {
-	unset($_REQUEST['templateid']);
-	unset($_REQUEST['hosts']);
 	$_REQUEST['form'] = 'clone';
+	unset($_REQUEST['templateid'], $_REQUEST['hosts']);
 }
-/*
- * Full_clone
- */
 elseif (isset($_REQUEST['full_clone']) && isset($_REQUEST['templateid'])) {
 	$_REQUEST['form'] = 'full_clone';
 	$_REQUEST['hosts'] = array();
 }
-/*
- * Save
- */
 elseif (isset($_REQUEST['save'])) {
 	try {
 		DBstart();
@@ -174,51 +155,55 @@ elseif (isset($_REQUEST['save'])) {
 		$groups = get_request('groups', array());
 		$hosts = get_request('hosts', array());
 		$templates = get_request('templates', array());
-		$templates_clear = get_request('clear_templates', array());
-		$templateid = get_request('templateid', 0);
-		$newgroup = get_request('newgroup', 0);
-		$template_name = get_request('template_name', '');
-		$visiblename = get_request('visiblename', '');
+		$templatesClear = get_request('clear_templates', array());
+		$templateId = get_request('templateid', 0);
+		$newGroup = get_request('newgroup', 0);
+		$templateName = get_request('template_name', '');
+		$visibleName = get_request('visiblename', '');
+		$cloneTemplateId = false;
 
-		$clone_templateid = false;
 		if ($_REQUEST['form'] == 'full_clone') {
-			$clone_templateid = $templateid;
-			$templateid = null;
+			$cloneTemplateId = $templateId;
+			$templateId = null;
 		}
 
-		if ($templateid) {
-			$msg_ok = _('Template updated');
-			$msg_fail = _('Cannot update template');
+		if ($templateId) {
+			$msgOk = _('Template updated');
+			$msgFail = _('Cannot update template');
 		}
 		else {
-			$msg_ok = _('Template added');
-			$msg_fail = _('Cannot add template');
+			$msgOk = _('Template added');
+			$msgFail = _('Cannot add template');
 		}
 
-		foreach ($macros as $mnum => $macro) {
+		foreach ($macros as $key => $macro) {
 			if (zbx_empty($macro['macro']) && zbx_empty($macro['value'])) {
-				unset($macros[$mnum]);
+				unset($macros[$key]);
 			}
 		}
 
-		foreach ($macros as $mnum => $macro) {
+		foreach ($macros as $key => $macro) {
 			// transform macros to uppercase {$aaa} => {$AAA}
-			$macros[$mnum]['macro'] = zbx_strtoupper($macro['macro']);
+			$macros[$key]['macro'] = zbx_strtoupper($macro['macro']);
 		}
 
-		// Create new group
+		// create new group
 		$groups = zbx_toObject($groups, 'groupid');
-		if (!zbx_empty($newgroup)) {
-			$result = API::HostGroup()->create(array('name' => $newgroup));
+
+		if (!zbx_empty($newGroup)) {
+			$result = API::HostGroup()->create(array('name' => $newGroup));
+
 			if (!$result) {
 				throw new Exception();
 			}
-			$newgroup = API::HostGroup()->get(array(
+
+			$newGroup = API::HostGroup()->get(array(
 				'groupids' => $result['groupids'],
 				'output' => API_OUTPUT_EXTEND
 			));
-			if ($newgroup) {
-				$groups = array_merge($groups, $newgroup);
+
+			if ($newGroup) {
+				$groups = array_merge($groups, $newGroup);
 			}
 			else {
 				throw new Exception();
@@ -227,27 +212,29 @@ elseif (isset($_REQUEST['save'])) {
 
 		$linkedTemplates = $templates;
 		$templates = array();
-		foreach ($linkedTemplates as $templateId) {
-			$templates[] = array('templateid' => $templateId);
+		foreach ($linkedTemplates as $linkedTemplateId) {
+			$templates[] = array('templateid' => $linkedTemplateId);
 		}
-		$templates_clear = zbx_toObject($templates_clear, 'templateid');
+
+		$templatesClear = zbx_toObject($templatesClear, 'templateid');
 
 		$hosts = zbx_toObject($hosts, 'hostid');
 
 		$template = array(
-			'host' => $template_name,
-			'name' => $visiblename,
+			'host' => $templateName,
+			'name' => $visibleName,
 			'groups' => $groups,
 			'templates' => $templates,
 			'hosts' => $hosts,
 			'macros' => $macros
 		);
 
-		// Create/update template
-		if ($templateid) {
+		// create/update template
+		if ($templateId) {
 			$created = false;
-			$template['templateid'] = $templateid;
-			$template['templates_clear'] = $templates_clear;
+			$template['templateid'] = $templateId;
+			$template['templates_clear'] = $templatesClear;
+
 			if (!API::Template()->update($template)) {
 				throw new Exception();
 			}
@@ -255,60 +242,64 @@ elseif (isset($_REQUEST['save'])) {
 		else {
 			$created = true;
 			$result = API::Template()->create($template);
+
 			if ($result) {
-				$templateid = reset($result['templateids']);
+				$templateId = reset($result['templateids']);
 			}
 			else {
 				throw new Exception();
 			}
 		}
 
-		// Full clone
-		if (!zbx_empty($templateid) && $templateid && $clone_templateid && $_REQUEST['form'] == 'full_clone') {
-			if (!copyApplications($clone_templateid, $templateid)) {
+		// full clone
+		if (!zbx_empty($templateId) && $templateId && $cloneTemplateId && $_REQUEST['form'] == 'full_clone') {
+			if (!copyApplications($cloneTemplateId, $templateId)) {
 				throw new Exception();
 			}
 
-			if (!copyItems($clone_templateid, $templateid)) {
+			if (!copyItems($cloneTemplateId, $templateId)) {
 				throw new Exception();
 			}
 
 			// clone triggers
 			$triggers = API::Trigger()->get(array(
+				'hostids' => $cloneTemplateId,
 				'output' => array('triggerid'),
-				'hostids' => $clone_templateid,
 				'inherited' => false
 			));
 			if ($triggers) {
-				if (!copyTriggersToHosts(zbx_objectValues($triggers, 'triggerid'), $templateid, $clone_templateid)) {
+				if (!copyTriggersToHosts(zbx_objectValues($triggers, 'triggerid'), $templateId, $cloneTemplateId)) {
 					throw new Exception();
 				}
 			}
 
-			// Host graphs
-			$db_graphs = API::Graph()->get(array(
-				'hostids' => $clone_templateid,
+			// host graphs
+			$dbGraphs = API::Graph()->get(array(
+				'hostids' => $cloneTemplateId,
 				'inherited' => false,
 				'output' => API_OUTPUT_REFER
 			));
+
 			$result = true;
-			foreach ($db_graphs as $db_graph) {
-				$result &= (bool) copy_graph_to_host($db_graph['graphid'], $templateid);
+			foreach ($dbGraphs as $dbGraph) {
+				$result &= (bool) copy_graph_to_host($dbGraph['graphid'], $templateId);
 			}
+
 			if (!$result) {
 				throw new Exception();
 			}
 
 			// clone discovery rules
 			$discoveryRules = API::DiscoveryRule()->get(array(
-				'hostids' => $clone_templateid,
+				'hostids' => $cloneTemplateId,
 				'inherited' => false
 			));
 			if ($discoveryRules) {
 				$copyDiscoveryRules = API::DiscoveryRule()->copy(array(
 					'discoveryids' => zbx_objectValues($discoveryRules, 'itemid'),
-					'hostids' => array($templateid)
+					'hostids' => array($templateId)
 				));
+
 				if (!$copyDiscoveryRules) {
 					throw new Exception();
 				}
@@ -316,7 +307,7 @@ elseif (isset($_REQUEST['save'])) {
 
 			// clone screens
 			$screens = API::TemplateScreen()->get(array(
-				'templateids' => $clone_templateid,
+				'templateids' => $cloneTemplateId,
 				'output' => array('screenid'),
 				'preservekeys' => true,
 				'inherited' => false
@@ -324,8 +315,9 @@ elseif (isset($_REQUEST['save'])) {
 			if ($screens) {
 				$screensCopied = API::TemplateScreen()->copy(array(
 					'screenIds' => zbx_objectValues($screens, 'screenid'),
-					'templateIds' => $templateid
+					'templateIds' => $templateId
 				));
+
 				if (!$screensCopied) {
 					throw new Exception();
 				}
@@ -333,28 +325,26 @@ elseif (isset($_REQUEST['save'])) {
 		}
 
 		DBend(true);
-		show_messages(true, $msg_ok, $msg_fail);
+
+		show_messages(true, $msgOk, $msgFail);
 
 		if ($created) {
-			add_audit_ext(AUDIT_ACTION_ADD, AUDIT_RESOURCE_TEMPLATE, $templateid, $template_name, 'hosts', NULL, NULL);
+			add_audit_ext(AUDIT_ACTION_ADD, AUDIT_RESOURCE_TEMPLATE, $templateId, $templateName, 'hosts', null, null);
 		}
-		unset($_REQUEST['form']);
-		unset($_REQUEST['templateid']);
-
+		unset($_REQUEST['form'], $_REQUEST['templateid']);
 	}
 	catch (Exception $e) {
 		DBend(false);
-		show_messages(false, $msg_ok, $msg_fail);
+
+		show_messages(false, $msgOk, $msgFail);
 	}
 	unset($_REQUEST['save']);
 }
-/*
- * Delete
- */
 elseif (isset($_REQUEST['delete']) && isset($_REQUEST['templateid'])) {
 	DBstart();
 
 	$go_result = true;
+
 	$result = API::Template()->massUpdate(array(
 		'templates' => zbx_toObject($_REQUEST['templateid'], 'templateid'),
 		'hosts' => array()
@@ -366,15 +356,12 @@ elseif (isset($_REQUEST['delete']) && isset($_REQUEST['templateid'])) {
 	$result = DBend($result);
 
 	show_messages($result, _('Template deleted'), _('Cannot delete template'));
+
 	if ($result) {
-		unset($_REQUEST['form']);
-		unset($_REQUEST['templateid']);
+		unset($_REQUEST['form'], $_REQUEST['templateid']);
 	}
 	unset($_REQUEST['delete']);
 }
-/*
- * Delete_and_clear
- */
 elseif (isset($_REQUEST['delete_and_clear']) && isset($_REQUEST['templateid'])) {
 	DBstart();
 
@@ -384,65 +371,70 @@ elseif (isset($_REQUEST['delete_and_clear']) && isset($_REQUEST['templateid'])) 
 	$result = DBend($result);
 
 	show_messages($result, _('Template deleted'), _('Cannot delete template'));
+
 	if ($result) {
-		unset($_REQUEST['form']);
-		unset($_REQUEST['templateid']);
+		unset($_REQUEST['form'], $_REQUEST['templateid']);
 	}
 	unset($_REQUEST['delete']);
 }
-// ---------- GO ---------
-else if(str_in_array($_REQUEST['go'], array('delete', 'delete_and_clear')) && isset($_REQUEST['templates'])){
-
+elseif (str_in_array($_REQUEST['go'], array('delete', 'delete_and_clear')) && isset($_REQUEST['templates'])) {
 	$templates = get_request('templates', array());
+
 	DBstart();
 
 	$go_result = true;
-	if(isset($_REQUEST['delete'])){
+
+	if (isset($_REQUEST['delete'])) {
 		$go_result = API::Template()->massUpdate(array(
 			'templateids' => $templates,
 			'hosts' => array()
 		));
 	}
-	if($go_result)
+
+	if ($go_result) {
 		$go_result = API::Template()->delete($templates);
+	}
 
 	$go_result = DBend($go_result);
 
 	show_messages($go_result, _('Template deleted'), _('Cannot delete template'));
 }
 
-if(($_REQUEST['go'] != 'none') && isset($go_result) && $go_result){
+if ($_REQUEST['go'] != 'none' && isset($go_result) && $go_result) {
 	$url = new CUrl();
 	$path = $url->getPath();
 	insert_js('cookie.eraseArray("'.$path.'")');
 }
 
+/*
+ * Display
+ */
+$templateWidget = new CWidget();
 
-$template_wdgt = new CWidget();
-
-$options = array(
+$pageFilter = new CPageFilter(array(
 	'config' => array(
 		'individual' => 1
 	),
 	'groups' => array(
-		'templated_hosts' => 1,
-		'editable' => 1,
+		'templated_hosts' => true,
+		'editable' => true
 	),
-	'groupid' => get_request('groupid', null),
-);
-$pageFilter = new CPageFilter($options);
+	'groupid' => get_request('groupid', null)
+));
 $_REQUEST['groupid'] = $pageFilter->groupid;
 
 if (isset($_REQUEST['form'])) {
-	$template_wdgt->addPageHeader(_('CONFIGURATION OF TEMPLATES'));
+	$templateWidget->addPageHeader(_('CONFIGURATION OF TEMPLATES'));
 
-	if ($templateid = get_request('templateid', 0)) {
-		$template_wdgt->addItem(get_header_host_table('', $templateid));
+	if ($templateId = get_request('templateid', 0)) {
+		$templateWidget->addItem(get_header_host_table('', $templateId));
 	}
+
 	$data = array();
-	if ($templateid > 0) {
+
+	if ($templateId) {
 		$dbTemplates = API::Template()->get(array(
-			'templateids' => $templateid,
+			'templateids' => $templateId,
 			'selectGroups' => API_OUTPUT_EXTEND,
 			'selectParentTemplates' => API_OUTPUT_EXTEND,
 			'selectMacros' => API_OUTPUT_EXTEND,
@@ -459,8 +451,9 @@ if (isset($_REQUEST['form'])) {
 		$data['original_templates'] = array();
 	}
 
-	$templateIds = isset($_REQUEST['unlink']) || isset($_REQUEST['add_template'])
-		|| isset($_REQUEST['exist_templates']) ? get_request('templates', array()) : $data['original_templates'];
+	$templateIds = (isset($_REQUEST['unlink']) || isset($_REQUEST['add_template']) || isset($_REQUEST['exist_templates']))
+		? get_request('templates', array())
+		: $data['original_templates'];
 
 	sort($templateIds);
 
@@ -472,34 +465,34 @@ if (isset($_REQUEST['form'])) {
 	CArrayHelper::sort($data['linkedTemplates'], array('name'));
 
 	$templateForm = new CView('configuration.template.edit', $data);
-	$template_wdgt->addItem($templateForm->render());
+	$templateWidget->addItem($templateForm->render());
 }
 else {
-	$frmForm = new CForm();
+	$displayNodes = is_array(get_current_nodeid());
 
+	$frmForm = new CForm();
 	$frmForm->cleanItems();
-	$buttons = new CDiv(array(
+	$frmForm->addItem(new CDiv(array(
 		new CSubmit('form', _('Create template')),
 		new CButton('form', _('Import'), 'redirect("conf.import.php?rules_preset=template")')
-	));
-	$frmForm->addItem($buttons);
+	)));
 	$frmForm->addItem(new CVar('groupid', $_REQUEST['groupid'], 'filter_groupid_id'));
 
-	$template_wdgt->addPageHeader(_('CONFIGURATION OF TEMPLATES'), $frmForm);
+	$templateWidget->addPageHeader(_('CONFIGURATION OF TEMPLATES'), $frmForm);
 
 	$frmGroup = new CForm('get');
 	$frmGroup->addItem(array(_('Group').SPACE, $pageFilter->getGroupsCB()));
 
-	$template_wdgt->addHeader(_('Templates'), $frmGroup);
-	$template_wdgt->addHeaderRowNumber();
+	$templateWidget->addHeader(_('Templates'), $frmGroup);
+	$templateWidget->addHeaderRowNumber();
 
 	$form = new CForm();
 	$form->setName('templates');
 
 	$table = new CTableInfo(_('No templates defined.'));
-
 	$table->setHeader(array(
-		new CCheckBox('all_templates', NULL, "checkAll('".$form->getName()."', 'all_templates', 'templates');"),
+		new CCheckBox('all_templates', null, "checkAll('".$form->getName()."', 'all_templates', 'templates');"),
+		$displayNodes ? _('Node') : null,
 		make_sorting_header(_('Templates'), 'name'),
 		_('Applications'),
 		_('Items'),
@@ -512,34 +505,28 @@ else {
 		_('Linked to')
 	));
 
-
-// get templates
+	// get templates
 	$templates = array();
 
 	$sortfield = getPageSortField('name');
 	$sortorder = getPageSortOrder();
 
 	if ($pageFilter->groupsSelected) {
-		$options = array(
-			'editable' => 1,
+		$templates = API::Template()->get(array(
+			'groupids' => ($pageFilter->groupid > 0) ? $pageFilter->groupid : null,
+			'editable' => true,
 			'sortfield' => $sortfield,
-			'sortorder' => $sortorder,
-			'limit' => ($config['search_limit']+1)
-		);
-
-		if ($pageFilter->groupid > 0) $options['groupids'] = $pageFilter->groupid;
-
-		$templates = API::Template()->get($options);
+			'limit' => $config['search_limit'] + 1
+		));
 	}
 
-// sorting && paging
+	// sorting && paging
 	order_result($templates, $sortfield, $sortorder);
 	$paging = getPagingLine($templates);
-//--------
 
-	$options = array(
+	$templates = API::Template()->get(array(
 		'templateids' => zbx_objectValues($templates, 'templateid'),
-		'editable' => 1,
+		'editable' => true,
 		'output' => array('name', 'proxy_hostid'),
 		'selectHosts' => array('hostid', 'name', 'status'),
 		'selectTemplates' => array('hostid', 'name', 'status'),
@@ -551,20 +538,21 @@ else {
 		'selectDiscoveries' => API_OUTPUT_COUNT,
 		'selectScreens' => API_OUTPUT_COUNT,
 		'selectHttpTests' => API_OUTPUT_COUNT,
-		'nopermissions' => 1
-	);
+		'nopermissions' => true
+	));
 
-	$templates = API::Template()->get($options);
 	order_result($templates, $sortfield, $sortorder);
-//-----
 
-	foreach($templates as $template){
-		$templates_output = array();
-		if($template['proxy_hostid']){
+	foreach ($templates as $template) {
+		$templatesOutput = array();
+
+		if ($template['proxy_hostid']) {
 			$proxy = get_host_by_hostid($template['proxy_hostid']);
-			$templates_output[] = $proxy['host'].NAME_DELIMITER;
+
+			$templatesOutput[] = $proxy['host'].NAME_DELIMITER;
 		}
-		$templates_output[] = new CLink($template['name'], 'templates.php?form=update&templateid='.$template['templateid'].url_param('groupid'));
+
+		$templatesOutput[] = new CLink($template['name'], 'templates.php?form=update&templateid='.$template['templateid'].url_param('groupid'));
 
 		$applications = array(new CLink(_('Applications'), 'applications.php?groupid='.$_REQUEST['groupid'].'&hostid='.$template['templateid']),
 			' ('.$template['applications'].')');
@@ -581,69 +569,75 @@ else {
 		$httpTests = array(new CLink(_('Web'), 'httpconf.php?groupid='.$_REQUEST['groupid'].'&hostid='.$template['templateid']),
 			' ('.$template['httpTests'].')');
 
-
-		$i = 0;
-		$linked_templates_output = array();
 		order_result($template['parentTemplates'], 'name');
-		foreach($template['parentTemplates'] as $linked_template){
-			$i++;
-			if($i > $config['max_in_table']){
-				$linked_templates_output[] = '...';
-				$linked_templates_output[] = '//empty element for array_pop';
-				break;
-			}
-
-			$url = 'templates.php?form=update&templateid='.$linked_template['templateid'].url_param('groupid');
-			$linked_templates_output[] = new CLink($linked_template['name'], $url, 'unknown');
-			$linked_templates_output[] = ', ';
-		}
-		array_pop($linked_templates_output);
-
 
 		$i = 0;
-		$linked_to_output = array();
-		$linked_to_objects = array();
-		foreach($template['hosts'] as $h){
-			$h['objectid'] = $h['hostid'];
-			$linked_to_objects[] = $h;
-		}
-		foreach($template['templates'] as $h){
-			$h['objectid'] = $h['templateid'];
-			$linked_to_objects[] = $h;
-		}
+		$linkedTemplatesOutput = array();
 
-		order_result($linked_to_objects, 'name');
-		foreach($linked_to_objects as $linked_to_host){
-			if(++$i > $config['max_in_table']){
-				$linked_to_output[] = '...';
-				$linked_to_output[] = '//empty element for array_pop';
+		foreach ($template['parentTemplates'] as $linkedTemplate) {
+			$i++;
+
+			if ($i > $config['max_in_table']) {
+				$linkedTemplatesOutput[] = '...';
+				$linkedTemplatesOutput[] = '//empty element for array_pop';
 				break;
 			}
 
-			switch($linked_to_host['status']){
+			$url = 'templates.php?form=update&templateid='.$linkedTemplate['templateid'].url_param('groupid');
+
+			$linkedTemplatesOutput[] = new CLink($linkedTemplate['name'], $url, 'unknown');
+			$linkedTemplatesOutput[] = ', ';
+		}
+		array_pop($linkedTemplatesOutput);
+
+		$i = 0;
+		$linkedToOutput = array();
+		$linkedToObjects = array();
+
+		foreach ($template['hosts'] as $h) {
+			$h['objectid'] = $h['hostid'];
+			$linkedToObjects[] = $h;
+		}
+
+		foreach ($template['templates'] as $h) {
+			$h['objectid'] = $h['templateid'];
+			$linkedToObjects[] = $h;
+		}
+
+		order_result($linkedToObjects, 'name');
+
+		foreach ($linkedToObjects as $linkedToHost) {
+			if (++$i > $config['max_in_table']) {
+				$linkedToOutput[] = '...';
+				$linkedToOutput[] = '//empty element for array_pop';
+				break;
+			}
+
+			switch ($linkedToHost['status']) {
 				case HOST_STATUS_NOT_MONITORED:
 					$style = 'on';
-					$url = 'hosts.php?form=update&hostid='.$linked_to_host['objectid'].'&groupid='.$_REQUEST['groupid'];
-				break;
+					$url = 'hosts.php?form=update&hostid='.$linkedToHost['objectid'].'&groupid='.$_REQUEST['groupid'];
+					break;
+
 				case HOST_STATUS_TEMPLATE:
 					$style = 'unknown';
-					$url = 'templates.php?form=update&templateid='.$linked_to_host['objectid'];
-				break;
+					$url = 'templates.php?form=update&templateid='.$linkedToHost['objectid'];
+					break;
+
 				default:
 					$style = null;
-					$url = 'hosts.php?form=update&hostid='.$linked_to_host['objectid'].'&groupid='.$_REQUEST['groupid'];
-				break;
+					$url = 'hosts.php?form=update&hostid='.$linkedToHost['objectid'].'&groupid='.$_REQUEST['groupid'];
 			}
 
-			$linked_to_output[] = new CLink($linked_to_host['name'], $url, $style);
-			$linked_to_output[] = ', ';
+			$linkedToOutput[] = new CLink($linkedToHost['name'], $url, $style);
+			$linkedToOutput[] = ', ';
 		}
-		array_pop($linked_to_output);
-
+		array_pop($linkedToOutput);
 
 		$table->addRow(array(
-			new CCheckBox('templates['.$template['templateid'].']', NULL, NULL, $template['templateid']),
-			$templates_output,
+			new CCheckBox('templates['.$template['templateid'].']', null, null, $template['templateid']),
+			$displayNodes ? get_node_name_by_elid($template['templateid'], true) : null,
+			$templatesOutput,
 			$applications,
 			$items,
 			$triggers,
@@ -651,36 +645,30 @@ else {
 			$screens,
 			$discoveries,
 			$httpTests,
-			(empty($linked_templates_output) ? '-' : new CCol($linked_templates_output, 'wraptext')),
-			(empty($linked_to_output) ? '-' : new CCol($linked_to_output, 'wraptext'))
+			$linkedTemplatesOutput ? new CCol($linkedTemplatesOutput, 'wraptext') : '-',
+			$linkedToOutput ? new CCol($linkedToOutput, 'wraptext') : '-'
 		));
 	}
 
-// GO{
 	$goBox = new CComboBox('go');
 	$goBox->addItem('export', _('Export selected'));
-
 	$goOption = new CComboItem('delete', _('Delete selected'));
 	$goOption->setAttribute('confirm', _('Delete selected templates?'));
 	$goBox->addItem($goOption);
-
 	$goOption = new CComboItem('delete_and_clear', _('Delete selected with linked elements'));
 	$goOption->setAttribute('confirm', _('Delete and clear selected templates? (Warning: all linked hosts will be cleared!)'));
 	$goBox->addItem($goOption);
-
-// goButton name is necessary!!!
 	$goButton = new CSubmit('goButton', _('Go').' (0)');
 	$goButton->setAttribute('id', 'goButton');
 
 	zbx_add_post_js('chkbxRange.pageGoName = "templates";');
 
 	$footer = get_table_header(array($goBox, $goButton));
-// }GO
 
-	$form->addItem(array($paging,$table,$paging,$footer));
-	$template_wdgt->addItem($form);
+	$form->addItem(array($paging, $table, $paging, $footer));
+	$templateWidget->addItem($form);
 }
 
-$template_wdgt->show();
+$templateWidget->show();
 
 require_once dirname(__FILE__).'/include/page_footer.php';
