@@ -394,6 +394,76 @@ error:
 
 /******************************************************************************
  *                                                                            *
+ * Function: update_items                                                     *
+ *                                                                            *
+ * Purpose: process record update                                             *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value:  SUCCEED - processed successfully                            *
+ *                FAIL - an error occurred                                    *
+ *                                                                            *
+ * Author:                                                                    *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+static int	process_items(int sender_nodeid, int nodeid,  const ZBX_TABLE *table, const char *record,
+		int lastrecord)
+{
+	int		f, clock;
+	const char	*r;
+	zbx_uint64_t	itemid = 0;
+	int		value_type = -1;
+	double		value_double = 0;
+	zbx_uint64_t	value_uint64 = 0;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In process_items()");
+
+	for (r = record, f = 0; table->fields[f].name != 0; f++)
+	{
+		if (0 != (table->flags & ZBX_HISTORY_SYNC) && 0 == (table->fields[f].flags & ZBX_HISTORY_SYNC))
+			continue;
+
+		if (NULL == r)
+			goto error;
+
+		zbx_get_next_field(&r, &buffer, &buffer_alloc, ZBX_DM_DELIMITER);
+
+		if (0 == strcmp(table->fields[f].name, "itemid"))
+		{
+			ZBX_STR2UINT64(itemid, buffer);
+		}
+		else if (0 == strcmp(table->fields[f].name, "clock"))
+		{
+			clock = atoi(buffer);
+		}
+		else if (0 == strcmp(table->fields[f].name, "value"))
+		{
+			value_type = table->fields[f].type;
+
+			if (value_type == ZBX_TYPE_FLOAT)
+				value_double = atof(buffer);
+			else if (value_type == ZBX_TYPE_UINT)
+				ZBX_STR2UINT64(value_uint64, buffer);
+		}
+	}
+
+	if (value_type == ZBX_TYPE_FLOAT)
+		DBadd_trend(itemid, value_double, clock);
+	else if (value_type == ZBX_TYPE_UINT)
+		DBadd_trend_uint(itemid, value_uint64, clock);
+
+	return SUCCEED;
+error:
+	zabbix_log(LOG_LEVEL_ERR, "NODE %d: received invalid record from node %d for node %d [%s]",
+		CONFIG_NODEID, sender_nodeid, nodeid, record);
+
+	return FAIL;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: node_history                                                     *
  *                                                                            *
  * Purpose: process new history received from a slave node                    *
@@ -415,8 +485,7 @@ int	node_history(char *data, size_t datalen)
 	char			*pos;
 	int			sender_nodeid = 0, nodeid = 0, firstline = 1, events = 0, acknowledges = 0;
 	const ZBX_TABLE		*table_sync = NULL, *table = NULL;
-	int			res = SUCCEED;
-
+	int			ret = SUCCEED, history = 0;
 	char			*sql1 = NULL, *sql3 = NULL;
 	size_t			sql1_alloc, sql3_alloc;
 	size_t			sql1_offset, sql3_offset;
@@ -441,7 +510,7 @@ int	node_history(char *data, size_t datalen)
 
 	DBbegin();
 
-	for (r = data; *r != '\0' && res == SUCCEED;)
+	for (r = data; *r != '\0' && ret == SUCCEED;)
 	{
 		if (NULL != (newline = strchr(r, '\n')))
 			*newline = '\0';
@@ -460,14 +529,14 @@ int	node_history(char *data, size_t datalen)
 				zabbix_log(LOG_LEVEL_ERR, "NODE %d: received data from node %d"
 							" that is not a direct slave node",
 						CONFIG_NODEID, sender_nodeid);
-				res = FAIL;
+				ret = FAIL;
 			}
 
 			if (FAIL == is_slave_node(CONFIG_NODEID, nodeid))
 			{
 				zabbix_log(LOG_LEVEL_ERR, "NODE %d: received history for unknown slave node %d",
 						CONFIG_NODEID, nodeid);
-				res = FAIL;
+				ret = FAIL;
 			}
 
 			table = DBget_table(buffer);
@@ -488,12 +557,15 @@ int	node_history(char *data, size_t datalen)
 			{
 				zabbix_log(LOG_LEVEL_ERR, "NODE %d: invalid data received: unknown tablename \"%s\"",
 						CONFIG_NODEID, buffer);
-				res = FAIL;
+				ret = FAIL;
 			}
 			else
 			{
 				if (0 == strcmp(table->table, "events"))
 					events = 1;
+
+				if (0 == strncmp(table->table, "history", 7))
+					history = 1;
 
 				if (0 == strcmp(table->table, "acknowledges"))
 					acknowledges = 1;
@@ -512,16 +584,20 @@ int	node_history(char *data, size_t datalen)
 		{
 			if (0 != events)
 			{
-				res = process_record_event(sender_nodeid, nodeid, table, r);
+				ret = process_record_event(sender_nodeid, nodeid, table, r);
 			}
 			else
 			{
-				res = process_record(&sql1, &sql1_alloc, &sql1_offset, sender_nodeid,
+				ret = process_record(&sql1, &sql1_alloc, &sql1_offset, sender_nodeid,
 						nodeid, table, r, newline ? 0 : 1, acknowledges, &ack_eventids);
 
-				if (SUCCEED == res && NULL != table_sync && 0 != CONFIG_MASTER_NODEID)
+				if (SUCCEED == ret && 0 != history)
 				{
-					res = process_record(&sql3, &sql3_alloc, &sql3_offset, sender_nodeid,
+					ret = process_items(sender_nodeid, nodeid, table, r, newline ? 0 : 1);
+				}
+				if (SUCCEED == ret && NULL != table_sync && 0 != CONFIG_MASTER_NODEID)
+				{
+					ret = process_record(&sql3, &sql3_alloc, &sql3_offset, sender_nodeid,
 							nodeid, table_sync, r, newline ? 0 : 1, 0, NULL);
 				}
 			}
@@ -536,7 +612,7 @@ int	node_history(char *data, size_t datalen)
 			break;
 	}
 
-	if (SUCCEED == res)
+	if (SUCCEED == ret)
 		DBcommit();
 	else
 		DBrollback();
@@ -548,5 +624,5 @@ int	node_history(char *data, size_t datalen)
 	zbx_free(sql3);
 	zbx_free(buffer);
 
-	return res;
+	return ret;
 }
