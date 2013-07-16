@@ -331,7 +331,9 @@ static int	recv_getqueue(zbx_sock_t *sock, struct zbx_json_parse *jp)
 	}
 
 	now = time(NULL);
+	zbx_vector_ptr_create(&queue);
 	DCget_item_queue(&queue, 6, -1);
+
 	zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
 
 	switch (request_type)
@@ -409,6 +411,8 @@ static int	recv_getqueue(zbx_sock_t *sock, struct zbx_json_parse *jp)
 	zbx_tcp_send_raw(sock, json.buffer);
 
 	DCfree_item_queue(&queue);
+	zbx_vector_ptr_destroy(&queue);
+
 	zbx_json_free(&json);
 
 	ret = SUCCEED;

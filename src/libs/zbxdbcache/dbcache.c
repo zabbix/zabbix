@@ -1161,6 +1161,7 @@ static void	DCmass_update_items(ZBX_DC_HISTORY *history, int history_num)
 
 	zbx_vector_uint64_sort(&ids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
+	zbx_hashset_create(&delta_history, 1000, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 	DCget_delta_items(&delta_history, &ids);
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,

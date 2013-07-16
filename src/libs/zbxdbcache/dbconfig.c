@@ -4625,16 +4625,15 @@ void	DCget_user_macro(zbx_uint64_t *hostids, int host_num, const char *macro, ch
  * Parameters: items - [OUT] the copy of item history                         *
  *             ids   - [IN] a vector of item ids to get the history for       *
  *                                                                            *
- * Comments: The hahset is created in DCget_delta_items and must be later     *
- *           destroyed by the caller with zbx_hashset_destroy() function      *
+ * Comments: The hahset must be created by the caller like:                   *
+ *            zbx_hashset_create(items, 1000, ZBX_DEFAULT_UINT64_HASH_FUNC,   *
+ *                               ZBX_DEFAULT_UINT64_COMPARE_FUNC)             *
  *                                                                            *
  ******************************************************************************/
 void	DCget_delta_items(zbx_hashset_t *items, const zbx_vector_uint64_t *ids)
 {
 	ZBX_DC_DELTAITEM	*deltaitem;
 	int			i;
-
-	zbx_hashset_create(items, 1000, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	LOCK_CACHE;
 
@@ -4709,8 +4708,6 @@ void	DCfree_item_queue(zbx_vector_ptr_t *queue)
 
 	for (i = 0; i < queue->values_num; i++)
 		free(queue->values[i]);
-
-	zbx_vector_ptr_destroy(queue);
 }
 
 /******************************************************************************
@@ -4719,24 +4716,25 @@ void	DCfree_item_queue(zbx_vector_ptr_t *queue)
  *                                                                            *
  * Purpose: retrieves vector of delayed items                                 *
  *                                                                            *
- * Parameters: queue - [OUT] the vector of delayed items                      *
+ * Parameters: queue - [OUT] the vector of delayed items (optional)           *
  *             from  - [IN] the minimum delay time in seconds or -1 if there  *
  *                          is no minimum limit                               *
  *             to    - [IN] the maximum delay time in seconds or -1 if there  *
  *                          is no maximum limit                               *
  *                                                                            *
+ * Return value: the number of delayed items,                                 *
+ *                                                                            *
  ******************************************************************************/
-void	DCget_item_queue(zbx_vector_ptr_t *queue, int from, int to)
+int	DCget_item_queue(zbx_vector_ptr_t *queue, int from, int to)
 {
 	zbx_hashset_iter_t	iter;
 	ZBX_DC_ITEM		*item;
 	ZBX_DC_HOST		*host;
 	ZBX_DC_FLEXITEM		*flex_item;
-	int			pass = FAIL, delay, nextcheck, now;
+	int			pass = FAIL, delay, nextcheck, now, nitems = 0;
 	zbx_queue_item_t	*queue_item;
 
 	now = time(NULL);
-	zbx_vector_ptr_create(queue);
 
 	LOCK_CACHE;
 
@@ -4800,20 +4798,23 @@ void	DCget_item_queue(zbx_vector_ptr_t *queue, int from, int to)
 		nextcheck = calculate_item_nextcheck(item->interfaceid, item->itemid, item->type,
 				item->delay, NULL == flex_item ? NULL : flex_item->delay_flex, item->lastclock, &delay);
 
-		if (0 != host->proxy_hostid)
-			nextcheck = item->lastclock + delay;
-
 		if ((-1 != from && from > now - nextcheck) || (-1 != to && now - nextcheck >= to))
 			continue;
 
-		queue_item = zbx_malloc(NULL, sizeof(zbx_queue_item_t));
-		queue_item->itemid = item->itemid;
-		queue_item->type = item->type;
-		queue_item->proxy_hostid = host->proxy_hostid;
-		queue_item->nextcheck = nextcheck;
+		if (NULL != queue)
+		{
+			queue_item = zbx_malloc(NULL, sizeof(zbx_queue_item_t));
+			queue_item->itemid = item->itemid;
+			queue_item->type = item->type;
+			queue_item->proxy_hostid = host->proxy_hostid;
+			queue_item->nextcheck = nextcheck;
 
-		zbx_vector_ptr_append(queue, queue_item);
+			zbx_vector_ptr_append(queue, queue_item);
+		}
+		nitems++;
 	}
 
 	UNLOCK_CACHE;
+
+	return nitems;
 }

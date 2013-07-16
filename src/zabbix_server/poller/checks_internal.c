@@ -99,8 +99,7 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 	}
 	else if (0 == strcmp(tmp, "queue"))			/* zabbix["queue",<from>,<to>] */
 	{
-		unsigned int		from = 6, to = (unsigned int)-1;
-		zbx_vector_ptr_t	queue;
+		unsigned int	from = 6, to = (unsigned int)-1;
 
 		if (3 < nparams)
 		{
@@ -138,9 +137,7 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 			goto notsupported;
 		}
 
-		DCget_item_queue(&queue, from, to);
-		SET_UI64_RESULT(result, queue.values_num);
-		DCfree_item_queue(&queue);
+		SET_UI64_RESULT(result, DCget_item_queue(NULL, from, to));
 	}
 	else if (0 == strcmp(tmp, "requiredperformance"))	/* zabbix["requiredperformance"] */
 	{
