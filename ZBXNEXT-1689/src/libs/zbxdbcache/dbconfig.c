@@ -4733,8 +4733,7 @@ int	DCget_item_queue(zbx_vector_ptr_t *queue, int from, int to)
 	zbx_hashset_iter_t	iter;
 	ZBX_DC_ITEM		*item;
 	ZBX_DC_HOST		*host = NULL;
-	ZBX_DC_FLEXITEM		*flex_item;
-	int			nextcheck, now, nitems = 0;
+	int			now, nitems = 0;
 	zbx_queue_item_t	*queue_item;
 
 	now = time(NULL);
@@ -4803,17 +4802,7 @@ int	DCget_item_queue(zbx_vector_ptr_t *queue, int from, int to)
 				continue;
 		}
 
-		switch (item->state)
-		{
-			case ITEM_STATE_NORMAL:
-			case ITEM_STATE_NOTSUPPORTED:
-				nextcheck = item->nextcheck;
-				break;
-			default:
-				continue;
-		}
-
-		if ((-1 != from && from > now - nextcheck) || (-1 != to && now - nextcheck >= to))
+		if ((-1 != from && from > now - item->nextcheck) || (-1 != to && now - item->nextcheck >= to))
 			continue;
 
 		if (NULL != queue)
@@ -4821,7 +4810,7 @@ int	DCget_item_queue(zbx_vector_ptr_t *queue, int from, int to)
 			queue_item = zbx_malloc(NULL, sizeof(zbx_queue_item_t));
 			queue_item->itemid = item->itemid;
 			queue_item->type = item->type;
-			queue_item->nextcheck = nextcheck;
+			queue_item->nextcheck = item->nextcheck;
 
 			if (NULL != host || (NULL != (host = zbx_hashset_search(&config->hosts, &item->hostid))))
 				queue_item->proxy_hostid = host->proxy_hostid;
