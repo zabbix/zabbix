@@ -229,21 +229,18 @@ zbx_queue_stats_t;
  ******************************************************************************/
 static void	queue_stats_update(zbx_queue_stats_t *stats, int delay)
 {
-	if (5 < delay)
-	{
-		if (10 >= delay)
-			stats->delay5++;
-		else if (30 >= delay)
-			stats->delay10++;
-		else if (60 >= delay)
-			stats->delay30++;
-		else if (300 >= delay)
-			stats->delay60++;
-		else if (600 >= delay)
-			stats->delay300++;
-		else
-			stats->delay600++;
-	}
+	if (10 >= delay)
+		stats->delay5++;
+	else if (30 >= delay)
+		stats->delay10++;
+	else if (60 >= delay)
+		stats->delay30++;
+	else if (300 >= delay)
+		stats->delay60++;
+	else if (600 >= delay)
+		stats->delay300++;
+	else
+		stats->delay600++;
 }
 
 /******************************************************************************
