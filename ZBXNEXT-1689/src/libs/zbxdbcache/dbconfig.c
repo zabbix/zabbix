@@ -4729,7 +4729,7 @@ int	DCget_item_queue(zbx_vector_ptr_t *queue, int from, int to)
 {
 	zbx_hashset_iter_t	iter;
 	ZBX_DC_ITEM		*item;
-	ZBX_DC_HOST		*host;
+	ZBX_DC_HOST		*host = NULL;
 	ZBX_DC_FLEXITEM		*flex_item;
 	int			pass = FAIL, delay, nextcheck, now, nitems = 0;
 	zbx_queue_item_t	*queue_item;
@@ -4742,84 +4742,81 @@ int	DCget_item_queue(zbx_vector_ptr_t *queue, int from, int to)
 
 	while (NULL != (item = zbx_hashset_iter_next(&iter)))
 	{
-		if (ITEM_STATE_NORMAL == item->state)
-		{
-			if (ZBX_FLAG_DISCOVERY_CHILD == item->flags)
-				continue;
-
-			if (0 == item->lastclock)
-				continue;
-
-			if (NULL == (host = zbx_hashset_search(&config->hosts, &item->hostid)))
-				continue;
-
-			switch (item->type)
-			{
-				case ITEM_TYPE_ZABBIX_ACTIVE:
-					if (0 == strncmp(item->key, "log[", 4) ||
-							0 == strncmp(item->key, "logrt[", 6) ||
-							0 == strncmp(item->key, "eventlog[", 9))
-					{
-						continue;
-					}
-				case ITEM_TYPE_SSH:
-				case ITEM_TYPE_TELNET:
-				case ITEM_TYPE_SIMPLE:
-				case ITEM_TYPE_INTERNAL:
-				case ITEM_TYPE_DB_MONITOR:
-				case ITEM_TYPE_AGGREGATE:
-				case ITEM_TYPE_EXTERNAL:
-				case ITEM_TYPE_CALCULATED:
-					if (NULL != (host = zbx_hashset_search(&config->hosts, &item->hostid)))
-						pass = SUCCEED;
-					break;
-				case ITEM_TYPE_ZABBIX:
-					if (NULL != (host = zbx_hashset_search(&config->hosts, &item->hostid)) &&
-							0 == host->errors_from)
-					{
-						pass = SUCCEED;
-					}
-					break;
-				case ITEM_TYPE_SNMPv1:
-				case ITEM_TYPE_SNMPv2c:
-				case ITEM_TYPE_SNMPv3:
-					if (NULL != (host = zbx_hashset_search(&config->hosts, &item->hostid)) &&
-							0 == host->snmp_errors_from)
-					{
-						pass = SUCCEED;
-					}
-					break;
-				case ITEM_TYPE_IPMI:
-					if (NULL != (host = zbx_hashset_search(&config->hosts, &item->hostid)) &&
-							0 == host->ipmi_errors_from)
-					{
-						pass = SUCCEED;
-					}
-					break;
-				case ITEM_TYPE_JMX:
-					if (NULL != (host = zbx_hashset_search(&config->hosts, &item->hostid)) &&
-							0 == host->jmx_errors_from)
-					{
-						pass = SUCCEED;
-					}
-					break;
-			}
-
-			if (SUCCEED != pass)
-				continue;
-
-			flex_item = zbx_hashset_search(&config->flexitems, &item->itemid);
-
-			nextcheck = calculate_item_nextcheck(item->interfaceid, item->itemid, item->type,
-					item->delay, NULL == flex_item ? NULL : flex_item->delay_flex, item->lastclock,
-							&delay);
-		}
-		else if (ITEM_STATE_NOTSUPPORTED == item->state)
-		{
-			nextcheck = item->lastclock + config->config->refresh_unsupported;
-		}
-		else
+		if (ZBX_FLAG_DISCOVERY_CHILD == item->flags)
 			continue;
+
+		if (0 == item->lastclock)
+			continue;
+
+		switch (item->type)
+		{
+			case ITEM_TYPE_ZABBIX_ACTIVE:
+				if (0 == strncmp(item->key, "log[", 4) ||
+						0 == strncmp(item->key, "logrt[", 6) ||
+						0 == strncmp(item->key, "eventlog[", 9))
+				{
+					continue;
+				}
+			case ITEM_TYPE_SSH:
+			case ITEM_TYPE_TELNET:
+			case ITEM_TYPE_SIMPLE:
+			case ITEM_TYPE_INTERNAL:
+			case ITEM_TYPE_DB_MONITOR:
+			case ITEM_TYPE_AGGREGATE:
+			case ITEM_TYPE_EXTERNAL:
+			case ITEM_TYPE_CALCULATED:
+				pass = SUCCEED;
+				break;
+			case ITEM_TYPE_ZABBIX:
+				if (NULL != (host = zbx_hashset_search(&config->hosts, &item->hostid)) &&
+						0 == host->errors_from)
+				{
+					pass = SUCCEED;
+				}
+				break;
+			case ITEM_TYPE_SNMPv1:
+			case ITEM_TYPE_SNMPv2c:
+			case ITEM_TYPE_SNMPv3:
+				if (NULL != (host = zbx_hashset_search(&config->hosts, &item->hostid)) &&
+						0 == host->snmp_errors_from)
+				{
+					pass = SUCCEED;
+				}
+				break;
+			case ITEM_TYPE_IPMI:
+				if (NULL != (host = zbx_hashset_search(&config->hosts, &item->hostid)) &&
+						0 == host->ipmi_errors_from)
+				{
+					pass = SUCCEED;
+				}
+				break;
+			case ITEM_TYPE_JMX:
+				if (NULL != (host = zbx_hashset_search(&config->hosts, &item->hostid)) &&
+						0 == host->jmx_errors_from)
+				{
+					pass = SUCCEED;
+				}
+				break;
+		}
+
+		if (SUCCEED != pass)
+			continue;
+
+		switch (item->state)
+		{
+			case ITEM_STATE_NORMAL:
+				flex_item = zbx_hashset_search(&config->flexitems, &item->itemid);
+
+				nextcheck = calculate_item_nextcheck(item->interfaceid, item->itemid, item->type,
+						item->delay, NULL == flex_item ? NULL : flex_item->delay_flex,
+						item->lastclock, &delay);
+				break;
+			case ITEM_STATE_NOTSUPPORTED:
+				nextcheck = item->lastclock + config->config->refresh_unsupported;
+				break;
+			default:
+				continue;
+		}
 
 		if ((-1 != from && from > now - nextcheck) || (-1 != to && now - nextcheck >= to))
 			continue;
@@ -4829,8 +4826,12 @@ int	DCget_item_queue(zbx_vector_ptr_t *queue, int from, int to)
 			queue_item = zbx_malloc(NULL, sizeof(zbx_queue_item_t));
 			queue_item->itemid = item->itemid;
 			queue_item->type = item->type;
-			queue_item->proxy_hostid = host->proxy_hostid;
 			queue_item->nextcheck = nextcheck;
+
+			if (NULL != host || (NULL != (host = zbx_hashset_search(&config->hosts, &item->hostid))))
+				queue_item->proxy_hostid = host->proxy_hostid;
+			else
+				queue_item->proxy_hostid = 0;
 
 			zbx_vector_ptr_append(queue, queue_item);
 		}
