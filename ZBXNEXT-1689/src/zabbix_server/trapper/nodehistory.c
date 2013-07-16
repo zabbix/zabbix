@@ -398,14 +398,8 @@ error:
  *                                                                            *
  * Purpose: process record update                                             *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
  * Return value:  SUCCEED - processed successfully                            *
  *                FAIL - an error occurred                                    *
- *                                                                            *
- * Author:                                                                    *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 static int	process_items(int sender_nodeid, int nodeid,  const ZBX_TABLE *table, const char *record,
@@ -483,9 +477,9 @@ int	node_history(char *data, size_t datalen)
 	const char		*r;
 	char			*newline = NULL;
 	char			*pos;
-	int			sender_nodeid = 0, nodeid = 0, firstline = 1, events = 0, acknowledges = 0;
+	int			sender_nodeid = 0, nodeid = 0, firstline = 1, events = 0, history = 0, acknowledges = 0;
 	const ZBX_TABLE		*table_sync = NULL, *table = NULL;
-	int			ret = SUCCEED, history = 0;
+	int			ret = SUCCEED;
 	char			*sql1 = NULL, *sql3 = NULL;
 	size_t			sql1_alloc, sql3_alloc;
 	size_t			sql1_offset, sql3_offset;

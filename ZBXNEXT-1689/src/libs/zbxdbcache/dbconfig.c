@@ -4731,7 +4731,7 @@ int	DCget_item_queue(zbx_vector_ptr_t *queue, int from, int to)
 	ZBX_DC_ITEM		*item;
 	ZBX_DC_HOST		*host = NULL;
 	ZBX_DC_FLEXITEM		*flex_item;
-	int			delay, nextcheck, now, nitems = 0;
+	int			nextcheck, now, nitems = 0;
 	zbx_queue_item_t	*queue_item;
 
 	now = time(NULL);
@@ -4807,10 +4807,11 @@ int	DCget_item_queue(zbx_vector_ptr_t *queue, int from, int to)
 
 				nextcheck = calculate_item_nextcheck(item->interfaceid, item->itemid, item->type,
 						item->delay, NULL == flex_item ? NULL : flex_item->delay_flex,
-						item->lastclock, &delay);
+						item->lastclock, NULL);
 				break;
 			case ITEM_STATE_NOTSUPPORTED:
-				nextcheck = item->lastclock + config->config->refresh_unsupported;
+				nextcheck = calculate_item_nextcheck(item->interfaceid, item->itemid, item->type,
+						config->config->refresh_unsupported, NULL, item->lastclock, NULL);
 				break;
 			default:
 				continue;
