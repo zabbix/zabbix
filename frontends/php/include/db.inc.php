@@ -999,6 +999,7 @@ function check_db_fields($dbFields, &$args) {
  * @param string $fieldName		field name to be used in SQL WHERE condition
  * @param array  $values		array of numerical values sorted in ascending order to be included in WHERE
  * @param bool   $notIn			builds inverted condition
+ * @param bool   $sort			values mandatory must be sorted
  *
  * @return string
  */
@@ -1010,13 +1011,13 @@ function dbConditionInt($fieldName, array $values, $notIn = false, $sort = true)
 		return '1=0';
 	}
 
-	$values = array_unique($values);
+	$values = array_keys(array_flip($values));
 
 	if ($sort) {
 		natsort($values);
 	}
 
-	zbx_cleanHashes($values);
+	$values = array_values($values);
 
 	$betweens = array();
 	$data = array();
