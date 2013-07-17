@@ -48,10 +48,6 @@ class dbConditionIntTest extends CZabbixTest {
 				'1=0'
 			),
 			array(
-				array('field', array(new CZabbixTest())),
-				'1=0'
-			),
-			array(
 				array('field', array(true)),
 				'1=0'
 			),
