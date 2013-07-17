@@ -230,11 +230,11 @@ class CZabbixServer {
 
 		// script executed successfully
 		if ($response['response'] == 'success') {
-			return $response['value'];
+			return $response['data'];
 		}
 		// an error on the server side occurred
 		else {
-			$this->error = _('Error description').':'.$response['value'];
+			$this->error = _('Error description').':'.$response['info'];
 
 			return false;
 		}

@@ -259,7 +259,7 @@ static void	queue_stats_export(zbx_hashset_t *queue_stats, const char *id_name, 
 	zbx_hashset_iter_t	iter;
 	zbx_queue_stats_t	*stats;
 
-	zbx_json_addarray(json, ZBX_PROTO_TAG_VALUE);
+	zbx_json_addarray(json, ZBX_PROTO_TAG_DATA);
 
 	zbx_hashset_iter_reset(queue_stats, &iter);
 
@@ -304,26 +304,26 @@ static int	queue_compare_by_nextcheck_asc(void **d1, void **d2)
  ******************************************************************************/
 static int	zbx_session_validate(const char *sessionid, int access_level)
 {
-	char		*sql = NULL, *sessionid_esc;
+	char		*sessionid_esc;
 	int		ret = FAIL;
 	DB_RESULT	result;
 	DB_ROW		row;
 
 	sessionid_esc = DBdyn_escape_string(sessionid);
 
-	sql = zbx_dsprintf(sql, "select u.type from users u,sessions s where u.userid=s.userid"
-			" and s.status=%d and s.sessionid='%s'", ZBX_SESSION_ACTIVE, sessionid_esc);
-
-	result = DBselect("%s", sql);
+	result = DBselect(
+			"select null"
+			" from users u,sessions s"
+			" where u.userid=s.userid"
+				" and s.status=%d"
+				" and s.sessionid='%s'"
+				" and u.type>=%d",
+			ZBX_SESSION_ACTIVE, sessionid_esc, access_level);
 
 	if (NULL != (row = DBfetch(result)))
-	{
-		if (atoi(row[0]) >= access_level)
-			ret = SUCCEED;
-	}
+		ret = SUCCEED;
 	DBfree_result(result);
 
-	zbx_free(sql);
 	zbx_free(sessionid_esc);
 
 	return ret;
@@ -357,7 +357,7 @@ static int	recv_getqueue(zbx_sock_t *sock, struct zbx_json_parse *jp)
 	if (FAIL == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_SID, sessionid, sizeof(sessionid)) ||
 		FAIL == zbx_session_validate(sessionid, USER_TYPE_SUPER_ADMIN))
 	{
-		zbx_send_response_raw(sock, ret, "Authorization failed", CONFIG_TIMEOUT);
+		zbx_send_response_raw(sock, ret, "Permission denied.", CONFIG_TIMEOUT);
 		goto out;
 	}
 
@@ -372,7 +372,7 @@ static int	recv_getqueue(zbx_sock_t *sock, struct zbx_json_parse *jp)
 		request_type = ZBX_GET_QUEUE_DETAILS;
 	else
 	{
-		zbx_send_response_raw(sock, ret, "Unsupported request type", CONFIG_TIMEOUT);
+		zbx_send_response_raw(sock, ret, "Unsupported request type.", CONFIG_TIMEOUT);
 		goto out;
 	}
 
@@ -438,7 +438,7 @@ static int	recv_getqueue(zbx_sock_t *sock, struct zbx_json_parse *jp)
 			zbx_vector_ptr_sort(&queue, (zbx_compare_func_t)queue_compare_by_nextcheck_asc);
 			zbx_json_addstring(&json, ZBX_PROTO_TAG_RESPONSE, ZBX_PROTO_VALUE_SUCCESS,
 					ZBX_JSON_TYPE_STRING);
-			zbx_json_addarray(&json, ZBX_PROTO_TAG_VALUE);
+			zbx_json_addarray(&json, ZBX_PROTO_TAG_DATA);
 
 			for (i = 0; i < queue.values_num && i <= 500; i++)
 			{
@@ -454,6 +454,9 @@ static int	recv_getqueue(zbx_sock_t *sock, struct zbx_json_parse *jp)
 
 			break;
 	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() json.buffer:'%s'", __function_name, json.buffer);
+
 	zbx_tcp_send_raw(sock, json.buffer);
 
 	DCfree_item_queue(&queue);
