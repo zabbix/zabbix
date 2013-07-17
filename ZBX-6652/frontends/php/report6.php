@@ -146,7 +146,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 	}
 
 	// item validation
-	if (isset($_REQUEST['items'])) {
+	if (!empty($_REQUEST['items'])) {
 		$itemIds = zbx_objectValues($_REQUEST['items'], 'itemid');
 		$hosts = API::Host()->get(array(
 			'monitored_hosts' => true,
@@ -154,7 +154,9 @@ require_once dirname(__FILE__).'/include/page_header.php';
 		));
 
 		if (empty($hosts)) {
-			unset($_REQUEST['items']);
+			show_error_message(_('No permissions to referred object or it does not exist!'));
+			require_once dirname(__FILE__).'/include/page_footer.php';
+			exit;
 		}
 		else {
 			$itemIds = array();
@@ -162,10 +164,11 @@ require_once dirname(__FILE__).'/include/page_header.php';
 				$itemIds = array_merge($itemIds, zbx_objectValues($item['items'], 'itemid'));
 			}
 
-			// remove all invalid items
 			foreach ($_REQUEST['items'] as $idx => $item) {
-				if (!in_array($item['itemid'], $itemIds)) {
-					unset($_REQUEST['items'][$idx]);
+				if (!isset($item['itemid']) || !in_array($item['itemid'], $itemIds)) {
+					show_error_message(_('No permissions to referred object or it does not exist!'));
+					require_once dirname(__FILE__).'/include/page_footer.php';
+					exit;
 				}
 			}
 		}
