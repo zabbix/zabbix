@@ -323,7 +323,7 @@ static int	recv_getqueue(zbx_sock_t *sock, struct zbx_json_parse *jp)
 		request_type = ZBX_GET_QUEUE_DETAILS;
 	else
 	{
-		zbx_send_response(sock, ret, "unsupported request type", CONFIG_TIMEOUT);
+		zbx_send_response(sock, ret, "Unsupported request type.", CONFIG_TIMEOUT);
 		goto out;
 	}
 
