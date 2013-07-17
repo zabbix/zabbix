@@ -1,15 +1,11 @@
-Changes for 2.3.0
-
-New features:
-
-Bug fixes:
-
---------------------------------------------------------------------------------
 Changes for 2.1.1
 
 New features:
 
 Bug fixes:
+....I..... [ZBX-6637] added -m64 compilation flag for solaris to be able to understand all attributes of a 64-bit processes (igors)
+..F....... [ZBX-6800] added required javascripts for showing hintbox in Zabbix setup. (Guntis)
+..F....... [ZBX-6796] added check in UI pre-requisites check, is memory_limit set to unlimited. (Guntis)
 ..F....... [ZBX-6776] added sorting by icon names in Map element configuration form (Guntis)
 A......... [ZBX-6771] fixed "status" field and existing host validation in Proxy API (Ivo)
 ..F....... [ZBX-6732] cookie path is now automatically set from current URL (Ivo)
@@ -289,6 +285,8 @@ A......... [ZBX-6407] improved data retrieval performance for CTrigger get() wit
 A.F....... [ZBX-1357] updated Brazilian Portuguese, Chinese (China), Latvian, Spanish and Turkish translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+....I..... [ZBX-6637] added -m64 compilation flag for solaris to be able to understand all attributes of a 64-bit processes (igors)
+..F....... [ZBX-6761] fixed dbConditionInt() performance (Eduard)
 ........S. [ZBX-6681] fixed bug when one time maintenance period was ignored if it started before maintenance active time (wiper)
 .......P.. [ZBX-6630] faster proxy configuration synchronization (Andris)
 ...G...... [ZBX-6655] fixed possible agent crash when processing system.sw.packages[] (igors)
