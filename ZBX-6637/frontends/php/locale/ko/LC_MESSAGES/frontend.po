@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-04-15 01:48+0300\n"
+"POT-Creation-Date: 2013-05-28 18:26+0300\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Konstantin <konstantin.buravcov@zabbix.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -57,7 +57,7 @@ msgid "%1$s failed login attempt logged. Last failed attempt was from %2$s on %3
 msgid_plural "%1$s failed login attempts logged. Last failed attempt was from %2$s on %3$s at %4$s."
 msgstr[0] ""
 
-#: include/blocks.inc.php:980
+#: include/blocks.inc.php:981
 #, php-format
 msgid "%2$d of %1$d issue is shown"
 msgid_plural "%2$d of %1$d issues are shown"
@@ -203,7 +203,7 @@ msgid "Account is blocked for %s seconds"
 msgstr ""
 
 #: events.php:565 events.php:578 include/actions.inc.php:245
-#: include/blocks.inc.php:899 include/blocks.inc.php:1415
+#: include/blocks.inc.php:900 include/blocks.inc.php:1416
 #: include/events.inc.php:137 include/events.inc.php:210
 #: include/views/configuration.action.edit.php:938
 msgid "Ack"
@@ -308,8 +308,8 @@ msgstr ""
 msgid "Action updated"
 msgstr "액션을 갱신하였습니다"
 
-#: events.php:566 events.php:579 include/blocks.inc.php:900
-#: include/blocks.inc.php:1416 include/events.inc.php:138
+#: events.php:566 events.php:579 include/blocks.inc.php:901
+#: include/blocks.inc.php:1417 include/events.inc.php:138
 #: include/menu.inc.php:193 include/views/administration.auditacts.list.php:29
 #: include/views/administration.auditacts.list.php:32
 #: include/views/administration.auditlogs.list.php:29
@@ -344,9 +344,9 @@ msgstr ""
 msgid "Active till"
 msgstr ""
 
-#: dashconf.php:211 include/blocks.inc.php:1139 include/blocks.inc.php:1145
-#: include/blocks.inc.php:1258 include/blocks.inc.php:1303
-#: include/blocks.inc.php:1309 include/forms.inc.php:1705
+#: dashconf.php:211 include/blocks.inc.php:1140 include/blocks.inc.php:1146
+#: include/blocks.inc.php:1259 include/blocks.inc.php:1304
+#: include/blocks.inc.php:1310 include/forms.inc.php:1705
 #: include/forms.inc.php:2009 include/reports.inc.php:332
 #: include/reports.inc.php:428 include/reports.inc.php:468
 #: include/views/administration.auditlogs.list.php:45
@@ -465,7 +465,7 @@ msgstr "관리"
 msgid "Advanced labels"
 msgstr ""
 
-#: include/blocks.inc.php:897 include/blocks.inc.php:1413
+#: include/blocks.inc.php:898 include/blocks.inc.php:1414
 #: include/events.inc.php:136 include/events.inc.php:210
 #: include/events.inc.php:213 tr_status.php:288
 msgid "Age"
@@ -502,9 +502,9 @@ msgstr "로그인 이름"
 msgid "Align icons"
 msgstr ""
 
-#: dashconf.php:173 dashconf.php:254 include/blocks.inc.php:1237
-#: include/blocks.inc.php:1246 include/blocks.inc.php:1291
-#: include/blocks.inc.php:1375 include/blocks.inc.php:1384
+#: dashconf.php:173 dashconf.php:254 include/blocks.inc.php:1238
+#: include/blocks.inc.php:1247 include/blocks.inc.php:1292
+#: include/blocks.inc.php:1376 include/blocks.inc.php:1385
 #: include/nodes.inc.php:156 include/page_header.php:331
 #: include/reports.inc.php:554
 #: include/views/administration.auditlogs.list.php:42
@@ -1122,7 +1122,7 @@ msgstr "액션을 추가할 수 없습니다"
 msgid "Cannot add application"
 msgstr "애플리케이션을 추가할 수 없습니다"
 
-#: api/classes/CTrigger.php:1820
+#: api/classes/CTrigger.php:1733
 msgid "Cannot add dependency from a host to a template."
 msgstr ""
 
@@ -1290,11 +1290,11 @@ msgstr ""
 msgid "Cannot create another database connection."
 msgstr ""
 
-#: api/classes/CTrigger.php:1854
+#: api/classes/CTrigger.php:1767
 msgid "Cannot create circular dependencies."
 msgstr ""
 
-#: api/classes/CTrigger.php:1826
+#: api/classes/CTrigger.php:1739
 msgid "Cannot create dependency on trigger itself."
 msgstr ""
 
@@ -1345,7 +1345,7 @@ msgstr "액션을 삭제할 수 없습니다"
 msgid "Cannot delete application"
 msgstr "애플리케이션을 삭제할 수 없습니다"
 
-#: api/classes/CTrigger.php:1548
+#: api/classes/CTrigger.php:1461
 msgid "Cannot delete dependency"
 msgstr ""
 
@@ -1497,7 +1497,7 @@ msgstr ""
 msgid "Cannot delete templated items."
 msgstr ""
 
-#: api/classes/CTrigger.php:1134 api/classes/CTriggerPrototype.php:925
+#: api/classes/CTrigger.php:1047 api/classes/CTriggerPrototype.php:925
 #, php-format
 msgid "Cannot delete templated trigger \"%1$s:%2$s\"."
 msgstr ""
@@ -1650,7 +1650,7 @@ msgstr ""
 msgid "Cannot have empty visible template name"
 msgstr ""
 
-#: api/classes/CTrigger.php:1579 api/classes/CTrigger.php:1654
+#: api/classes/CTrigger.php:1492 api/classes/CTrigger.php:1567
 #: api/classes/CTriggerPrototype.php:1006
 #: api/classes/CTriggerPrototype.php:1064
 #, php-format
@@ -1754,7 +1754,7 @@ msgstr ""
 msgid "Cannot set \"templateid\" for screen \"%1$s\"."
 msgstr ""
 
-#: api/classes/CTrigger.php:1119
+#: api/classes/CTrigger.php:1032
 #, php-format
 msgid "Cannot set \"templateid\" for trigger \"%1$s\"."
 msgstr ""
@@ -1829,7 +1829,7 @@ msgstr ""
 msgid "Cannot update \"templateid\" for screen \"%1$s\"."
 msgstr ""
 
-#: api/classes/CTrigger.php:1116
+#: api/classes/CTrigger.php:1029
 #, php-format
 msgid "Cannot update \"templateid\" for trigger \"%1$s\"."
 msgstr ""
@@ -2655,7 +2655,7 @@ msgstr ""
 msgid "Created: Item prototype \"%1$s\" on \"%2$s\"."
 msgstr ""
 
-#: api/classes/CTrigger.php:1589
+#: api/classes/CTrigger.php:1502
 #, php-format
 msgid "Created: Trigger \"%1$s\" on \"%2$s\"."
 msgstr ""
@@ -2783,7 +2783,7 @@ msgstr "커스텀 그래프"
 msgid "Custom label"
 msgstr ""
 
-#: api/classes/CMap.php:592
+#: api/classes/CMap.php:593
 #, php-format
 msgid "Custom label for map \"%2$s\" elements of type \"%1$s\" may not be empty."
 msgstr ""
@@ -2901,7 +2901,7 @@ msgstr "파선"
 msgid "Data"
 msgstr "데이터"
 
-#: include/classes/class.cchart.php:2363 include/classes/class.cpie.php:702
+#: include/classes/class.cchart.php:2376 include/classes/class.cpie.php:702
 #, php-format
 msgid "Data from %1$s. Generated in %2$s sec."
 msgstr ""
@@ -3422,7 +3422,7 @@ msgid "Deleted: Template \"%1$s\"."
 msgstr ""
 
 #: api/classes/CTriggerGeneral.php:86 api/classes/CTriggerGeneral.php:141
-#: api/classes/CTrigger.php:1353
+#: api/classes/CTrigger.php:1266
 #, php-format
 msgid "Deleted: Trigger \"%1$s\" on \"%2$s\"."
 msgstr ""
@@ -3702,7 +3702,7 @@ msgid "Discovery object"
 msgstr ""
 
 #: include/actions.inc.php:70 include/audit.inc.php:44
-#: include/blocks.inc.php:1110 include/forms.inc.php:1018
+#: include/blocks.inc.php:1111 include/forms.inc.php:1018
 #: include/views/configuration.discovery.edit.php:76
 #: include/views/configuration.discovery.list.php:29
 #: include/views/monitoring.discovery.php:34
@@ -3828,7 +3828,7 @@ msgstr ""
 msgid "Dot"
 msgstr "점선"
 
-#: include/blocks.inc.php:1112
+#: include/blocks.inc.php:1113
 msgctxt "discovery results in dashboard"
 msgid "Down"
 msgstr ""
@@ -3889,7 +3889,7 @@ msgstr ""
 msgid "Dropdown remember selected \"%1$s\"."
 msgstr ""
 
-#: api/classes/CTrigger.php:1996
+#: api/classes/CTrigger.php:1909
 #, php-format
 msgid "Duplicate dependencies in trigger \"%1$s\"."
 msgstr ""
@@ -3904,7 +3904,7 @@ msgstr ""
 msgid "Duplicate host. Host with the same visible name \"%s\" already exists in data."
 msgstr ""
 
-#: api/classes/CMap.php:560
+#: api/classes/CMap.php:561
 #, php-format
 msgid "Duplicate map name for map \"%s\"."
 msgstr ""
@@ -4017,8 +4017,8 @@ msgstr ""
 #: api/classes/CProxy.php:547 api/classes/CService.php:344
 #: api/classes/CService.php:380 api/classes/CService.php:446
 #: api/classes/CService.php:518 api/classes/CTemplate.php:1112
-#: api/classes/CTrigger.php:1325 api/classes/CTrigger.php:1421
-#: api/classes/CTrigger.php:1513 api/classes/CTriggerPrototype.php:907
+#: api/classes/CTrigger.php:1238 api/classes/CTrigger.php:1334
+#: api/classes/CTrigger.php:1426 api/classes/CTriggerPrototype.php:907
 #: api/classes/CUserGroup.php:701 api/classes/CUserMacro.php:495
 #: api/classes/CUserMacro.php:647
 msgid "Empty input parameter."
@@ -4406,7 +4406,7 @@ msgstr "FTP"
 msgid "Fail"
 msgstr "실패"
 
-#: include/actions.inc.php:961 include/blocks.inc.php:1021
+#: include/actions.inc.php:961 include/blocks.inc.php:1022
 msgid "Failed"
 msgstr ""
 
@@ -4423,15 +4423,15 @@ msgstr ""
 msgid "Failure Audit"
 msgstr ""
 
-#: dashboard.php:259 include/blocks.inc.php:1132
+#: dashboard.php:259 include/blocks.inc.php:1133
 msgid "Favourite graphs"
 msgstr ""
 
-#: dashboard.php:273 include/blocks.inc.php:1256
+#: dashboard.php:273 include/blocks.inc.php:1257
 msgid "Favourite maps"
 msgstr ""
 
-#: dashboard.php:266 include/blocks.inc.php:1301
+#: dashboard.php:266 include/blocks.inc.php:1302
 msgid "Favourite screens"
 msgstr ""
 
@@ -4637,7 +4637,7 @@ msgstr ""
 msgid "General"
 msgstr "일반"
 
-#: chart4.php:180 chart5.php:200 include/classes/class.cbar.php:739
+#: chart4.php:180 chart5.php:200 include/classes/class.cbar.php:770
 #, php-format
 msgid "Generated in %s sec"
 msgstr ""
@@ -4706,7 +4706,7 @@ msgstr ""
 msgid "Gradient line"
 msgstr ""
 
-#: include/audit.inc.php:29 include/blocks.inc.php:1139
+#: include/audit.inc.php:29 include/blocks.inc.php:1140
 #: include/screens.inc.php:30 include/views/configuration.graph.edit.php:287
 #: include/views/monitoring.charts.php:27
 #: include/views/monitoring.history.php:60 latest.php:318 latest.php:495
@@ -4830,7 +4830,7 @@ msgstr ""
 msgid "Graph with same name but other type exist."
 msgstr ""
 
-#: dashboard.php:260 hosts.php:686 hosts.php:765 include/blocks.inc.php:1237
+#: dashboard.php:260 hosts.php:686 hosts.php:765 include/blocks.inc.php:1238
 #: include/html.inc.php:464 include/html.inc.php:468 include/items.inc.php:802
 #: include/menu.inc.php:62 include/triggers.inc.php:1311
 #: include/views/configuration.graph.list.php:56
@@ -4962,8 +4962,8 @@ msgid "H:i"
 msgstr ""
 
 #: include/blocks.inc.php:363 include/blocks.inc.php:701
-#: include/blocks.inc.php:769 include/blocks.inc.php:978
-#: include/blocks.inc.php:1068 include/blocks.inc.php:1126
+#: include/blocks.inc.php:769 include/blocks.inc.php:979
+#: include/blocks.inc.php:1069 include/blocks.inc.php:1127
 #: include/classes/screens/CScreenSystemStatus.php:47
 #: include/views/configuration.item.list.php:102
 msgid "H:i:s"
@@ -5097,8 +5097,8 @@ msgstr "가로 위치"
 #: httpconf.php:331 httpconf.php:351 httpmon.php:121 httpmon.php:141
 #: include/actions.inc.php:64 include/audit.inc.php:27
 #: include/blocks.inc.php:587 include/blocks.inc.php:634
-#: include/blocks.inc.php:884 include/blocks.inc.php:894
-#: include/blocks.inc.php:1411 include/classes/screens/CScreenEvents.php:46
+#: include/blocks.inc.php:885 include/blocks.inc.php:895
+#: include/blocks.inc.php:1412 include/classes/screens/CScreenEvents.php:46
 #: include/classes/screens/CScreenHostgroupTriggers.php:121
 #: include/classes/screens/CScreenHostTriggers.php:63
 #: include/classes/screens/CScreenHostTriggers.php:123
@@ -5189,7 +5189,7 @@ msgstr "호스트를 삭제하였습니다"
 
 #: include/actions.inc.php:60 include/audit.inc.php:35
 #: include/blocks.inc.php:185 include/blocks.inc.php:372
-#: include/blocks.inc.php:1019 include/forms.inc.php:486
+#: include/blocks.inc.php:1020 include/forms.inc.php:486
 #: include/maps.inc.php:25 include/reports.inc.php:111
 #: include/views/administration.script.list.php:42
 #: include/views/configuration.hostgroups.edit.php:63
@@ -5741,8 +5741,8 @@ msgstr ""
 msgid "Incorrect \"soft\" field value for dependency for service \"%1$s\"."
 msgstr ""
 
-#: api/classes/CMap.php:585 api/classes/CMap.php:589 api/classes/CMap.php:596
-#: api/classes/CMap.php:601
+#: api/classes/CMap.php:586 api/classes/CMap.php:590 api/classes/CMap.php:597
+#: api/classes/CMap.php:602
 #, php-format
 msgid "Incorrect %1$s label type value for map \"%2$s\"."
 msgstr ""
@@ -5951,11 +5951,11 @@ msgstr ""
 msgid "Incorrect field \"%1$s\" name or value in where statement for table \"%2$s\"."
 msgstr ""
 
-#: api/classes/CMap.php:545
+#: api/classes/CMap.php:546
 msgid "Incorrect fields for sysmap"
 msgstr ""
 
-#: api/classes/CTrigger.php:1125
+#: api/classes/CTrigger.php:1038
 msgid "Incorrect fields for trigger."
 msgstr ""
 
@@ -6030,7 +6030,7 @@ msgstr ""
 msgid "Incorrect item for axis value."
 msgstr ""
 
-#: api/classes/CTrigger.php:1226 include/triggers.inc.php:917
+#: api/classes/CTrigger.php:1139 include/triggers.inc.php:917
 #, php-format
 msgid "Incorrect item key \"%1$s\" provided for trigger expression on \"%2$s\"."
 msgstr ""
@@ -6095,12 +6095,12 @@ msgstr ""
 msgid "Incorrect map ID \"%s\" provided for screen element."
 msgstr ""
 
-#: api/classes/CMap.php:569
+#: api/classes/CMap.php:570
 #, php-format
 msgid "Incorrect map height value for map \"%s\"."
 msgstr ""
 
-#: api/classes/CMap.php:566
+#: api/classes/CMap.php:567
 #, php-format
 msgid "Incorrect map width value for map \"%s\"."
 msgstr ""
@@ -6251,12 +6251,12 @@ msgstr ""
 msgid "Incorrect trigger expression. Host \"%1$s\" does not exist or you have no access to this host."
 msgstr ""
 
-#: api/classes/CTrigger.php:1206
+#: api/classes/CTrigger.php:1119
 #, php-format
 msgid "Incorrect trigger expression. Host \"%s\" does not exist or you have no access to this host."
 msgstr ""
 
-#: api/classes/CTrigger.php:1212
+#: api/classes/CTrigger.php:1125
 msgid "Incorrect trigger expression. Trigger expression elements should not belong to a template and a host simultaneously."
 msgstr ""
 
@@ -6336,7 +6336,7 @@ msgstr ""
 msgid "Indonesian (id_ID)"
 msgstr ""
 
-#: include/blocks.inc.php:898 include/blocks.inc.php:1414
+#: include/blocks.inc.php:899 include/blocks.inc.php:1415
 #: include/classes/class.cformlist.php:65 tr_status.php:286
 msgid "Info"
 msgstr ""
@@ -6496,8 +6496,8 @@ msgstr ""
 msgid "Is online?"
 msgstr "로그인 상태"
 
-#: include/blocks.inc.php:886 include/blocks.inc.php:895
-#: include/blocks.inc.php:1412
+#: include/blocks.inc.php:887 include/blocks.inc.php:896
+#: include/blocks.inc.php:1413
 msgid "Issue"
 msgstr ""
 
@@ -6917,7 +6917,7 @@ msgstr ""
 msgid "Last 7 days"
 msgstr ""
 
-#: include/blocks.inc.php:888 include/blocks.inc.php:896 tr_status.php:287
+#: include/blocks.inc.php:889 include/blocks.inc.php:897 tr_status.php:287
 msgid "Last change"
 msgstr "최근 갱신"
 
@@ -7019,22 +7019,22 @@ msgstr "연결"
 msgid "Link indicators"
 msgstr ""
 
-#: api/classes/CMap.php:631
+#: api/classes/CMap.php:632
 #, php-format
 msgid "Link name should be unique for map \"%s\"."
 msgstr ""
 
-#: api/classes/CMap.php:642
+#: api/classes/CMap.php:643
 #, php-format
 msgid "Link selementid1 field is pointing to a nonexistent map selement ID \"%1$s\" for map \"%2$s\"."
 msgstr ""
 
-#: api/classes/CMap.php:645
+#: api/classes/CMap.php:646
 #, php-format
 msgid "Link selementid2 field is pointing to a nonexistent map selement ID \"%1$s\" for map \"%2$s\"."
 msgstr ""
 
-#: api/classes/CMap.php:628
+#: api/classes/CMap.php:629
 #, php-format
 msgid "Link should have both \"name\" and \"url\" fields for map \"%s\"."
 msgstr ""
@@ -7325,11 +7325,11 @@ msgstr ""
 msgid "Maintenance updated"
 msgstr ""
 
-#: include/blocks.inc.php:926 tr_status.php:623
+#: include/blocks.inc.php:927 tr_status.php:623
 msgid "Maintenance with data collection"
 msgstr ""
 
-#: include/blocks.inc.php:925 tr_status.php:622
+#: include/blocks.inc.php:926 tr_status.php:622
 msgid "Maintenance without data collection"
 msgstr ""
 
@@ -7351,7 +7351,7 @@ msgstr ""
 msgid "Manual Logout"
 msgstr ""
 
-#: include/audit.inc.php:40 include/blocks.inc.php:1258
+#: include/audit.inc.php:40 include/blocks.inc.php:1259
 #: include/maps.inc.php:27 include/screens.inc.php:34
 #: include/views/configuration.sysmap.edit.php:201
 #: include/views/js/configuration.sysmaps.js.php:16
@@ -7392,7 +7392,7 @@ msgstr ""
 msgid "Map save operation failed."
 msgstr ""
 
-#: api/classes/CMap.php:661
+#: api/classes/CMap.php:662
 #, php-format
 msgid "Map with name \"%s\" already exists"
 msgstr ""
@@ -7411,7 +7411,7 @@ msgstr ""
 msgid "Mappings"
 msgstr ""
 
-#: dashboard.php:274 include/blocks.inc.php:1291 include/menu.inc.php:72
+#: dashboard.php:274 include/blocks.inc.php:1292 include/menu.inc.php:72
 #: include/menu.inc.php:206 include/views/conf.import.php:36 popup.php:101
 #: sysmaps.php:251
 msgid "Maps"
@@ -8423,14 +8423,14 @@ msgstr ""
 #: api/classes/CMaintenance.php:429 api/classes/CMaintenance.php:537
 #: api/classes/CMaintenance.php:554 api/classes/CMaintenance.php:621
 #: api/classes/CMapElement.php:519 api/classes/CMapElement.php:575
-#: api/classes/CMap.php:550 api/classes/CProxy.php:318
+#: api/classes/CMap.php:551 api/classes/CProxy.php:318
 #: api/classes/CProxy.php:332 api/classes/CScreenItem.php:330
 #: api/classes/CScreenItem.php:414 api/classes/CScreen.php:499
 #: api/classes/CScreen.php:578 api/classes/CService.php:1252
 #: api/classes/CService.php:1267 api/classes/CTemplateScreen.php:775
 #: api/classes/CTemplateScreen.php:796 api/classes/CTemplateScreen.php:802
-#: api/classes/CTrigger.php:1110 api/classes/CTrigger.php:1440
-#: api/classes/CTrigger.php:1464 api/classes/CTriggerPrototype.php:822
+#: api/classes/CTrigger.php:1023 api/classes/CTrigger.php:1353
+#: api/classes/CTrigger.php:1377 api/classes/CTriggerPrototype.php:822
 #: api/classes/CTriggerPrototype.php:920 api/classes/CUserMacro.php:824
 #: api/classes/CUserMacro.php:933 api/classes/CWebCheck.php:444
 #: include/config.inc.php:244
@@ -8576,8 +8576,8 @@ msgstr ""
 #: events.php:559 events.php:572 hostinventories.php:156 httpmon.php:140
 #: include/actions.inc.php:68 include/audit.inc.php:42
 #: include/blocks.inc.php:184 include/blocks.inc.php:371
-#: include/blocks.inc.php:893 include/blocks.inc.php:1018
-#: include/blocks.inc.php:1109 include/blocks.inc.php:1410
+#: include/blocks.inc.php:894 include/blocks.inc.php:1019
+#: include/blocks.inc.php:1110 include/blocks.inc.php:1411
 #: include/classes/screens/CScreenEvents.php:45 include/page_header.php:354
 #: include/triggers.inc.php:1582 include/views/administration.node.edit.php:83
 #: include/views/configuration.httpconf.list.php:66
@@ -8639,7 +8639,7 @@ msgstr ""
 msgid "Not Templated items"
 msgstr ""
 
-#: api/classes/CTrigger.php:1899
+#: api/classes/CTrigger.php:1812
 #, php-format
 msgid "Not all templates are linked to \"%s\"."
 msgstr ""
@@ -8861,7 +8861,7 @@ msgstr ""
 msgid "Off"
 msgstr "OFF"
 
-#: include/actions.inc.php:958 include/blocks.inc.php:1020
+#: include/actions.inc.php:958 include/blocks.inc.php:1021
 #: include/classes/class.ctriggersinfo.php:134
 #: include/views/administration.users.list.php:86 report2.php:238
 #: report3.php:85
@@ -9869,10 +9869,10 @@ msgstr ""
 msgid "Remote command"
 msgstr "원격 명령"
 
-#: include/blocks.inc.php:1151 include/blocks.inc.php:1237
-#: include/blocks.inc.php:1246 include/blocks.inc.php:1263
-#: include/blocks.inc.php:1291 include/blocks.inc.php:1314
-#: include/blocks.inc.php:1375 include/blocks.inc.php:1384
+#: include/blocks.inc.php:1152 include/blocks.inc.php:1238
+#: include/blocks.inc.php:1247 include/blocks.inc.php:1264
+#: include/blocks.inc.php:1292 include/blocks.inc.php:1315
+#: include/blocks.inc.php:1376 include/blocks.inc.php:1385
 #: include/views/administration.general.iconmap.edit.php:69
 #: include/views/administration.general.iconmap.edit.php:106
 #: include/views/common.macros.php:38
@@ -10491,7 +10491,7 @@ msgstr "시나리오"
 msgid "Schedule"
 msgstr ""
 
-#: include/audit.inc.php:41 include/blocks.inc.php:1303
+#: include/audit.inc.php:41 include/blocks.inc.php:1304
 #: include/screens.inc.php:36 include/views/configuration.screen.edit.php:45
 #: include/views/configuration.screen.list.php:51
 #: include/views/configuration.slideconf.edit.php:48
@@ -10561,7 +10561,7 @@ msgstr ""
 msgid "Screen with name \"%s\" does not exist."
 msgstr ""
 
-#: dashboard.php:267 include/blocks.inc.php:1375 include/html.inc.php:477
+#: dashboard.php:267 include/blocks.inc.php:1376 include/html.inc.php:477
 #: include/html.inc.php:481 include/menu.inc.php:67 include/menu.inc.php:197
 #: include/views/configuration.screen.list.php:38
 #: include/views/configuration.template.edit.php:386
@@ -11038,11 +11038,11 @@ msgstr "표준"
 msgid "Simple check"
 msgstr "간단 검사"
 
-#: include/blocks.inc.php:1145 include/screens.inc.php:38 popup.php:97
+#: include/blocks.inc.php:1146 include/screens.inc.php:38 popup.php:97
 msgid "Simple graph"
 msgstr "단순 그래프"
 
-#: include/blocks.inc.php:1246 jsLoader.php:107
+#: include/blocks.inc.php:1247 jsLoader.php:107
 msgid "Simple graphs"
 msgstr ""
 
@@ -11091,7 +11091,7 @@ msgstr ""
 msgid "Slide"
 msgstr ""
 
-#: include/audit.inc.php:45 include/blocks.inc.php:1309
+#: include/audit.inc.php:45 include/blocks.inc.php:1310
 #: include/views/monitoring.slides.php:69
 msgid "Slide show"
 msgstr "슬라이드쇼"
@@ -11123,7 +11123,7 @@ msgstr ""
 msgid "Slide shows"
 msgstr "슬라이드쇼"
 
-#: include/blocks.inc.php:1384
+#: include/blocks.inc.php:1385
 #: include/views/configuration.slideconf.edit.php:96
 msgid "Slides"
 msgstr "슬라이드"
@@ -11891,7 +11891,7 @@ msgstr ""
 msgid "Trigger \"%1$s:%2$s\" does not have item prototype."
 msgstr ""
 
-#: api/classes/CTrigger.php:2038
+#: api/classes/CTrigger.php:1951
 #, php-format
 msgid "Trigger \"%s\" belongs to templates with different linkages."
 msgstr ""
@@ -11901,7 +11901,7 @@ msgstr ""
 msgid "Trigger added"
 msgstr "트리거를 추가하였습니다"
 
-#: api/classes/CTrigger.php:1942
+#: api/classes/CTrigger.php:1855
 msgid "Trigger cannot be dependant on a trigger, that is inherited from it."
 msgstr ""
 
@@ -11925,7 +11925,7 @@ msgstr ""
 msgid "Trigger expression condition"
 msgstr ""
 
-#: api/classes/CTrigger.php:1186 api/classes/CTriggerPrototype.php:1052
+#: api/classes/CTrigger.php:1099 api/classes/CTriggerPrototype.php:1052
 msgid "Trigger expression must contain at least one host:key reference."
 msgstr ""
 
@@ -12254,7 +12254,7 @@ msgstr "단위"
 #: include/actions.inc.php:190 include/actions.inc.php:198
 #: include/actions.inc.php:212 include/actions.inc.php:223
 #: include/actions.inc.php:251 include/actions.inc.php:570
-#: include/blocks.inc.php:1022 include/classes/class.chostsinfo.php:127
+#: include/blocks.inc.php:1023 include/classes/class.chostsinfo.php:127
 #: include/discovery.inc.php:128 include/discovery.inc.php:162
 #: include/events.inc.php:29 include/graphs.inc.php:37
 #: include/graphs.inc.php:77 include/hosts.inc.php:53 include/hosts.inc.php:80
@@ -12382,7 +12382,7 @@ msgstr ""
 msgid "Unsupported import format \"%1$s\"."
 msgstr ""
 
-#: include/blocks.inc.php:1111
+#: include/blocks.inc.php:1112
 msgctxt "discovery results in dashboard"
 msgid "Up"
 msgstr ""
@@ -12425,8 +12425,8 @@ msgid "Updated status of host"
 msgstr ""
 
 #: include/blocks.inc.php:363 include/blocks.inc.php:701
-#: include/blocks.inc.php:769 include/blocks.inc.php:978
-#: include/blocks.inc.php:1068 include/blocks.inc.php:1126
+#: include/blocks.inc.php:769 include/blocks.inc.php:979
+#: include/blocks.inc.php:1069 include/blocks.inc.php:1127
 #: include/classes/screens/CScreenSystemStatus.php:47
 #, php-format
 msgid "Updated: %s"
@@ -12452,7 +12452,7 @@ msgstr ""
 msgid "Updated: Item prototype \"%1$s\" on \"%2$s\"."
 msgstr ""
 
-#: api/classes/CTrigger.php:1693
+#: api/classes/CTrigger.php:1606
 #, php-format
 msgid "Updated: Trigger \"%1$s\" on \"%2$s\"."
 msgstr ""
@@ -12666,17 +12666,17 @@ msgstr ""
 msgid "Value"
 msgstr "값"
 
-#: api/classes/CMap.php:615
+#: api/classes/CMap.php:616
 #, php-format
 msgid "Value \"%1$s\" is invalid for parameter \"grid_align\". Choices are: \"%2$s\" and \"%3$s\""
 msgstr ""
 
-#: api/classes/CMap.php:611
+#: api/classes/CMap.php:612
 #, php-format
 msgid "Value \"%1$s\" is invalid for parameter \"grid_show\". Choices are: \"%2$s\""
 msgstr ""
 
-#: api/classes/CMap.php:619
+#: api/classes/CMap.php:620
 #, php-format
 msgid "Value \"%1$s\" is invalid for parameter \"grid_show\". Choices are: \"%2$s\" and \"%3$s\""
 msgstr ""
@@ -13410,7 +13410,7 @@ msgstr ""
 msgid "agent"
 msgstr ""
 
-#: include/classes/class.cchart.php:1761
+#: include/classes/class.cchart.php:1764
 #: include/classes/class.cpagefilter.php:631
 #: include/classes/screens/CScreenHostgroupTriggers.php:104
 #: include/classes/screens/CScreenHostgroupTriggers.php:110
@@ -13452,7 +13452,7 @@ msgstr "녹색"
 msgid "as Red"
 msgstr "빨강"
 
-#: include/classes/class.cchart.php:1743 include/classes/class.cchart.php:1765
+#: include/classes/class.cchart.php:1746 include/classes/class.cchart.php:1768
 #: include/graphs.inc.php:95
 #: include/views/js/configuration.graph.edit.js.php:40
 #: include/views/js/configuration.graph.edit.js.php:48 popup_bitem.php:129
@@ -13477,7 +13477,7 @@ msgid "d M Y H:i"
 msgstr ""
 
 #: acknow.php:162 events.php:282 httpdetails.php:115 httpmon.php:242
-#: include/acknow.inc.php:59 include/blocks.inc.php:952
+#: include/acknow.inc.php:59 include/blocks.inc.php:953
 #: include/classes/screens/CScreenEvents.php:63
 #: include/classes/screens/CScreenPlainText.php:95 include/events.inc.php:116
 #: include/events.inc.php:187 include/events.inc.php:243
@@ -13581,19 +13581,19 @@ msgstr ""
 msgid "hh"
 msgstr ""
 
-#: api/classes/CMap.php:575
+#: api/classes/CMap.php:576
 msgid "host"
 msgstr ""
 
-#: api/classes/CMap.php:574
+#: api/classes/CMap.php:575
 msgid "host group"
 msgstr ""
 
-#: api/classes/CMap.php:572
+#: api/classes/CMap.php:573
 msgid "icon"
 msgstr ""
 
-#: api/classes/CMap.php:578
+#: api/classes/CMap.php:579
 msgid "image"
 msgstr ""
 
@@ -13605,7 +13605,7 @@ msgstr "범위 내"
 msgid "is"
 msgstr ""
 
-#: include/classes/class.cchart.php:1741 include/graphs.inc.php:92
+#: include/classes/class.cchart.php:1744 include/graphs.inc.php:92
 #: include/views/js/configuration.graph.edit.js.php:42
 msgid "last"
 msgstr ""
@@ -13641,18 +13641,18 @@ msgstr ""
 msgid "maintenance"
 msgstr ""
 
-#: api/classes/CMap.php:577
+#: api/classes/CMap.php:578
 msgid "map"
 msgstr ""
 
-#: include/classes/class.cchart.php:1744 include/classes/class.cchart.php:1758
+#: include/classes/class.cchart.php:1747 include/classes/class.cchart.php:1761
 #: include/graphs.inc.php:90
 #: include/views/js/configuration.graph.edit.js.php:41
 #: include/views/js/configuration.graph.edit.js.php:49 popup_bitem.php:130
 msgid "max"
 msgstr "최대"
 
-#: include/classes/class.cchart.php:1742 include/classes/class.cchart.php:1755
+#: include/classes/class.cchart.php:1745 include/classes/class.cchart.php:1758
 #: include/graphs.inc.php:88
 #: include/views/js/configuration.graph.edit.js.php:39
 #: include/views/js/configuration.graph.edit.js.php:47 popup_bitem.php:128
@@ -13701,7 +13701,7 @@ msgstr ""
 msgid "no"
 msgstr ""
 
-#: include/blocks.inc.php:1435 include/classes/class.cchart.php:1794
+#: include/blocks.inc.php:1436 include/classes/class.cchart.php:1825
 #: include/classes/class.cpie.php:320 include/maps.inc.php:435
 #: include/maps.inc.php:468
 #, php-format
@@ -13825,7 +13825,7 @@ msgstr ""
 msgid "to"
 msgstr ""
 
-#: api/classes/CMap.php:576
+#: api/classes/CMap.php:577
 msgid "trigger"
 msgstr ""
 

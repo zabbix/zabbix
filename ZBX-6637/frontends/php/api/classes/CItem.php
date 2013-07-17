@@ -542,6 +542,10 @@ class CItem extends CItemGeneral {
 					unset($triggers[$triggerid]['items']);
 					$count = array();
 					foreach ($trigger['items'] as $item) {
+						// skip trigger assignment for unwanted items from other hosts
+						if (!isset($result[$item['itemid']])) {
+							continue;
+						}
 						if (!is_null($options['limitSelects'])) {
 							if (!isset($count[$item['itemid']])) {
 								$count[$item['itemid']] = 0;

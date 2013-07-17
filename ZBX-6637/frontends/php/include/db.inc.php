@@ -1059,118 +1059,104 @@ function check_db_fields($db_fields, &$args) {
 
 /**
  * Takes an initial part of SQL query and appends a generated WHERE condition.
- * The WHERE condidion is generated from the given list of values as a mix of
+ * The WHERE condition is generated from the given list of values as a mix of
  * <fieldname> BETWEEN <id1> AND <idN>" and "<fieldname> IN (<id1>,<id2>,...,<idN>)" elements.
  *
- * @param string $fieldName  field name to be used in SQL WHERE condition
- * @param array  $values     array of numerical values sorted in ascending order to be included in WHERE
- * @param bool   $notIn      builds inverted condition
+ * @param string $fieldName		field name to be used in SQL WHERE condition
+ * @param array  $values		array of numerical values sorted in ascending order to be included in WHERE
+ * @param bool   $notIn			builds inverted condition
+ * @param bool   $sort			values mandatory must be sorted
  *
  * @return string
  */
-function dbConditionInt($fieldName, array $values, $notIn = false) {
+function dbConditionInt($fieldName, array $values, $notIn = false, $sort = true) {
 	$MAX_EXPRESSIONS = 950; // maximum  number of values for using "IN (id1>,<id2>,...,<idN>)"
-	$MIN_NUM_BETWEEN = 5; // minimum number of consecutive values for using "BETWEEN <id1> AND <idN>"
+	$MIN_NUM_BETWEEN = 4; // minimum number of consecutive values for using "BETWEEN <id1> AND <idN>"
 
 	if (count($values) == 0) {
 		return '1=0';
 	}
 
-	$condition = '';
+	$values = array_unique($values);
+
+	if ($sort) {
+		natsort($values);
+	}
+
+	zbx_cleanHashes($values);
 
 	$betweens = array();
-	$ins = array();
+	$data = array();
 
-	$pos = 1;
-	$len = 1;
+	for ($i = 0, $size = count($values); $i < $size; $i++) {
+		$between = array();
 
-	foreach ($values as $valueR) {
-		if (!isset($valueL)) {
-			$valueL = $valueR;
-			continue;
-		}
-
-		$valueL = bcadd($valueL, 1, 0);
-
-		if (bccomp($valueR, $valueL) != 0) {
-			if ($len >= $MIN_NUM_BETWEEN) {
-				$betweens[] = array(bcsub($valueL, $len, 0), bcsub($valueL, 1, 0));
+		// analyze by chunk
+		if (isset($values[$i + $MIN_NUM_BETWEEN])
+				&& bccomp(bcadd($values[$i], $MIN_NUM_BETWEEN), $values[$i + $MIN_NUM_BETWEEN]) == 0) {
+			for ($sizeMinBetween = $i + $MIN_NUM_BETWEEN; $i < $sizeMinBetween; $i++) {
+				$between[] = $values[$i];
 			}
-			else {
-				foreach (array_slice($values, $pos - $len, $len) as $val) {
-					array_push($ins, $val);
+
+			$i--; // shift 1 back
+
+			// analyze by one
+			for (; $i < $size; $i++) {
+				if (isset($values[$i + 1]) && bccomp(bcadd($values[$i], 1), $values[$i + 1]) == 0) {
+					$between[] = $values[$i + 1];
+				}
+				else {
+					break;
 				}
 			}
 
-			$len = 1;
-			$valueL = $valueR;
+			$betweens[] = $between;
 		}
 		else {
-			$len++;
+			$data[] = $values[$i];
 		}
-		$pos++;
 	}
 
-	if ($len >= $MIN_NUM_BETWEEN) {
-		$betweens[] = array(bcadd(bcsub($valueL, $len, 0), 1, 0), $valueL);
+	// concatenate conditions
+	$dataSize = count($data);
+	$betweenSize = count($betweens);
+
+	$condition = '';
+	$operatorAnd = $notIn ? ' AND ' : ' OR ';
+
+	if ($betweens) {
+		$operatorNot = $notIn ? 'NOT ' : '';
+
+		foreach ($betweens as $between) {
+			$between = $operatorNot.$fieldName.' BETWEEN '.zbx_dbstr($between[0]).' AND '.zbx_dbstr(end($between));
+
+			$condition .= $condition ? $operatorAnd.$between : $between;
+		}
+	}
+
+	if ($dataSize == 1) {
+		$operator = $notIn ? '!=' : '=';
+
+		$condition .= ($condition ? $operatorAnd : '').$fieldName.$operator.zbx_dbstr($data[0]);
 	}
 	else {
-		foreach (array_slice($values, $pos - $len, $len) as $val) {
-			array_push($ins, $val);
-		}
-	}
+		$operatorNot = $notIn ? ' NOT' : '';
+		$data = array_chunk($data, $MAX_EXPRESSIONS);
 
-	$operand = $notIn ? 'AND' : 'OR';
-	$not = $notIn ? 'NOT ' : '';
-	$inNum = count($ins);
-	$betweenNum = count($betweens);
+		foreach ($data as $chunk) {
+			$chunkIns = '';
 
-	if ($MAX_EXPRESSIONS < $inNum || 1 < $betweenNum || (0 < $inNum && 0 < $betweenNum)) {
-		$condition .= '(';
-	}
-
-	// compose "BETWEEN"s
-	$first = true;
-	foreach ($betweens as $between) {
-		if (!$first) {
-			$condition .= ' '.$operand.' ';
-		}
-		$condition .= $not.$fieldName.' BETWEEN '.zbx_dbstr($between[0]).' AND '.zbx_dbstr($between[1]);
-		$first = false;
-	}
-
-	if (0 < $inNum && 0 < $betweenNum) {
-		$condition .= ' '.$operand.' ';
-	}
-
-	if ($inNum == 1) {
-		foreach ($ins as $insValue) {
-			$condition .= $notIn
-				? $fieldName.'!='.zbx_dbstr($insValue)
-				: $fieldName.'='.zbx_dbstr($insValue);
-			break;
-		}
-	}
-
-	// compose "IN"s
-	else {
-		$first = true;
-		foreach (array_chunk($ins, $MAX_EXPRESSIONS) as $in) {
-			if (!$first) {
-				$condition .= ' '.$operand.' ';
+			foreach ($chunk as $value) {
+				$chunkIns .= ','.zbx_dbstr($value);
 			}
 
-			$in = array_map('zbx_dbstr', $in);
-			$condition .= $fieldName.' '.$not.'IN ('.implode(',', $in).')';
-			$first = false;
+			$chunkIns = $fieldName.$operatorNot.' IN ('.substr($chunkIns, 1).')';
+
+			$condition .= $condition ? $operatorAnd.$chunkIns : $chunkIns;
 		}
 	}
 
-	if ($MAX_EXPRESSIONS < $inNum || 1 < $betweenNum || (0 < $inNum && 0 < $betweenNum)) {
-		$condition .= ')';
-	}
-
-	return $condition;
+	return (($dataSize && $betweenSize) || $betweenSize > 1 || $dataSize > $MAX_EXPRESSIONS) ? '('.$condition.')' : $condition;
 }
 
 /**
