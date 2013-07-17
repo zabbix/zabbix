@@ -17,28 +17,42 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
 #include "sysinfo.h"
 
-ZBX_METRIC	parameters_specific[] =
-/* 	KEY			FLAG		FUNCTION 		TEST PARAMETERS */
+int	SYSTEM_SW_ARCH(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	{"vfs.fs.size",		CF_HAVEPARAMS,	VFS_FS_SIZE,		"/,free"},
-	{"vfs.fs.inode",	CF_HAVEPARAMS,	VFS_FS_INODE,		"/,free"},
-	{"vfs.fs.discovery",	0,		VFS_FS_DISCOVERY,	NULL},
+	typedef void (WINAPI *PGNSI)(LPSYSTEM_INFO);
 
-	{"net.if.discovery",	0,		NET_IF_DISCOVERY,	NULL},
+	SYSTEM_INFO	si;
+	char		*os = NULL;
+	PGNSI		pGNSI;
 
-	{"vm.memory.size",	CF_HAVEPARAMS,	VM_MEMORY_SIZE,		"free"},
+	memset(&si, 0, sizeof(si));
 
-	{"proc.num",            CF_HAVEPARAMS,  PROC_NUM,               "inetd"},
+	if (NULL != (pGNSI = (PGNSI)GetProcAddress(GetModuleHandle(TEXT("kernel32.dll")), "GetNativeSystemInfo")))
+		pGNSI(&si);
+	else
+		GetSystemInfo(&si);
 
-	{"system.cpu.util",	CF_HAVEPARAMS,	SYSTEM_CPU_UTIL,	"all,user,avg1"},
-	{"system.cpu.load",	CF_HAVEPARAMS,	SYSTEM_CPU_LOAD,	"all,avg1"},
-	{"system.cpu.num",	CF_HAVEPARAMS,	SYSTEM_CPU_NUM,		"online"},
+	switch (si.wProcessorArchitecture)
+	{
+		case PROCESSOR_ARCHITECTURE_INTEL:
+			os = zbx_malloc(os, 4);
+			zbx_strdup(os, "x86");
+			break;
+		case PROCESSOR_ARCHITECTURE_AMD64:
+			os = zbx_malloc(os, 4);
+			zbx_strdup(os, "x64");
+			break;
+		case PROCESSOR_ARCHITECTURE_IA64:
+			os = zbx_malloc(os, 20);
+			zbx_strdup(os, "Intel Itanium-based");
+			break;
+		default :
+			return SYSINFO_RET_FAIL;
+	}
 
-	{"system.uname",	0,		SYSTEM_UNAME,		NULL},
-	{"system.sw.arch",	0,		SYSTEM_SW_ARCH,		NULL},
+	SET_STR_RESULT(result, os);
 
-	{NULL}
-};
+	return SYSINFO_RET_OK;
+}

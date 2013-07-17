@@ -17,28 +17,20 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
 #include "sysinfo.h"
 
-ZBX_METRIC	parameters_specific[] =
-/* 	KEY			FLAG		FUNCTION 		TEST PARAMETERS */
+#ifdef HAVE_SYS_UTSNAME_H
+#       include <sys/utsname.h>
+#endif
+
+int	SYSTEM_SW_ARCH(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	{"vfs.fs.size",		CF_HAVEPARAMS,	VFS_FS_SIZE,		"/,free"},
-	{"vfs.fs.inode",	CF_HAVEPARAMS,	VFS_FS_INODE,		"/,free"},
-	{"vfs.fs.discovery",	0,		VFS_FS_DISCOVERY,	NULL},
+	struct utsname	name;
 
-	{"net.if.discovery",	0,		NET_IF_DISCOVERY,	NULL},
+	if (-1 == uname(&name))
+		return SYSINFO_RET_FAIL;
 
-	{"vm.memory.size",	CF_HAVEPARAMS,	VM_MEMORY_SIZE,		"free"},
+	SET_STR_RESULT(result, zbx_strdup(NULL, name.machine));
 
-	{"proc.num",            CF_HAVEPARAMS,  PROC_NUM,               "inetd"},
-
-	{"system.cpu.util",	CF_HAVEPARAMS,	SYSTEM_CPU_UTIL,	"all,user,avg1"},
-	{"system.cpu.load",	CF_HAVEPARAMS,	SYSTEM_CPU_LOAD,	"all,avg1"},
-	{"system.cpu.num",	CF_HAVEPARAMS,	SYSTEM_CPU_NUM,		"online"},
-
-	{"system.uname",	0,		SYSTEM_UNAME,		NULL},
-	{"system.sw.arch",	0,		SYSTEM_SW_ARCH,		NULL},
-
-	{NULL}
-};
+	return SYSINFO_RET_OK;
+}
