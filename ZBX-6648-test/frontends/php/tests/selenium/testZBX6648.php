@@ -45,6 +45,13 @@ class testZBX6648 extends CWebTest {
 					'host' => 'ZBX6648 Enabled Triggers Host',
 					'triggers' => 'enabled'
 				)
+			),
+			array(
+				array(
+					'hostgroup' => 'ZBX6648 All Triggers',
+					'host' => 'ZBX6648 All Triggers Host',
+					'triggers' => 'both'
+				)
 			)
 		);
 	}
@@ -55,11 +62,12 @@ class testZBX6648 extends CWebTest {
 	public function testZBX6648_eventFilter($zbx_data) {
 		$this->zbxTestLogin('events.php');
 
-		$this->zbxTestDropdownSelectWait('groupid', 'all');
-		$this->zbxTestDropdownSelectWait('hostid', 'all');
-
 		switch ($zbx_data['triggers']) {
 			case 'enabled' :
+				$this->zbxTestDropdownSelectWait('groupid', $zbx_data['hostgroup']);
+				$this->zbxTestDropdownSelectWait('hostid', $zbx_data['host']);
+				break;
+			case 'both' :
 				$this->zbxTestDropdownSelectWait('groupid', $zbx_data['hostgroup']);
 				$this->zbxTestDropdownSelectWait('hostid', $zbx_data['host']);
 				break;
