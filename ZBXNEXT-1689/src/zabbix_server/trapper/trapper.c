@@ -289,6 +289,48 @@ static int	queue_compare_by_nextcheck_asc(void **d1, void **d2)
 
 /******************************************************************************
  *                                                                            *
+ * Function: zbx_session_validate                                             *
+ *                                                                            *
+ * Purpose: validates active session by access level                          *
+ *                                                                            *
+ * Parameters:  sessionid    - [IN] the session id to validate                *
+ *              access_level - [IN] the required access rights                *
+ *                                                                            *
+ * Return value:  SUCCEED - the session is active and user has the required   *
+ *                          access rights.                                    *
+ *                FAIL    - the session is not active or usr has not enough   *
+ *                          access rights.                                    *
+ *                                                                            *
+ ******************************************************************************/
+static int	zbx_session_validate(const char *sessionid, int access_level)
+{
+	char		*sql = NULL, *sessionid_esc;
+	int		ret = FAIL;
+	DB_RESULT	result;
+	DB_ROW		row;
+
+	sessionid_esc = DBdyn_escape_string(sessionid);
+
+	sql = zbx_dsprintf(sql, "select u.type from users u,sessions s where u.userid=s.userid"
+			" and s.status=%d and s.sessionid='%s'", ZBX_SESSION_ACTIVE, sessionid_esc);
+
+	result = DBselect("%s", sql);
+
+	if (NULL != (row = DBfetch(result)))
+	{
+		if (atoi(row[0]) >= access_level)
+			ret = SUCCEED;
+	}
+	DBfree_result(result);
+
+	zbx_free(sql);
+	zbx_free(sessionid_esc);
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: recv_getqueue                                                    *
  *                                                                            *
  * Purpose: process queue request                                             *
@@ -304,13 +346,20 @@ static int	recv_getqueue(zbx_sock_t *sock, struct zbx_json_parse *jp)
 {
 	const char		*__function_name = "recv_getqueue";
 	int			ret = FAIL, request_type = -1, now, i;
-	char			type[MAX_STRING_LEN];
+	char			type[MAX_STRING_LEN], sessionid[MAX_STRING_LEN];
 	zbx_vector_ptr_t	queue;
 	struct zbx_json		json;
 	zbx_hashset_t		queue_stats;
 	zbx_queue_stats_t	*stats;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	if (FAIL == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_SID, sessionid, sizeof(sessionid)) ||
+		FAIL == zbx_session_validate(sessionid, USER_TYPE_SUPER_ADMIN))
+	{
+		zbx_send_response_raw(sock, ret, "Authorization failed", CONFIG_TIMEOUT);
+		goto out;
+	}
 
 	if (FAIL == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_TYPE, type, sizeof(type)))
 		goto out;
@@ -323,7 +372,7 @@ static int	recv_getqueue(zbx_sock_t *sock, struct zbx_json_parse *jp)
 		request_type = ZBX_GET_QUEUE_DETAILS;
 	else
 	{
-		zbx_send_response(sock, ret, "Unsupported request type.", CONFIG_TIMEOUT);
+		zbx_send_response_raw(sock, ret, "Unsupported request type", CONFIG_TIMEOUT);
 		goto out;
 	}
 

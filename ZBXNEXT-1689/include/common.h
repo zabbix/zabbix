@@ -1099,4 +1099,7 @@ void uinc128_128(zbx_uint128_t *base, const zbx_uint128_t *value);
 void udiv128_64(zbx_uint128_t *result, const zbx_uint128_t *base, zbx_uint64_t value);
 void umul64_64(zbx_uint128_t *result, zbx_uint64_t value, zbx_uint64_t factor);
 
+#define ZBX_SESSION_ACTIVE	0
+#define ZBX_SESSION_PASSIVE	1
+
 #endif
