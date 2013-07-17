@@ -280,9 +280,7 @@ elseif (get_request('numeric')) {
 	$value_types = array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64);
 }
 
-$url = new CUrl();
-$path = $url->getPath();
-insert_js('cookie.eraseArray(\''.$path.'\')');
+clearCookies(true);
 
 function get_window_opener($frame, $field, $value) {
 	if (empty($field)) {

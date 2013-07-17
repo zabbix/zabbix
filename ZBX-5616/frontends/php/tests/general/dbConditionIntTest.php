@@ -44,6 +44,14 @@ class dbConditionIntTest extends CZabbixTest {
 				"field='1'"
 			),
 			array(
+				array('field', array()),
+				'1=0'
+			),
+			array(
+				array('field', array(true)),
+				'1=0'
+			),
+			array(
 				array('field', array(0, 1)),
 				"field IN ('0','1')"
 			),
