@@ -22,7 +22,7 @@
 
 ZBX_METRIC	parameter_hostname =
 /*	KEY			FLAG		FUNCTION		TEST PARAMETERS */
-	{"system.hostname",     0,              SYSTEM_HOSTNAME,        NULL};
+	{"system.hostname",     CF_HAVEPARAMS,  SYSTEM_HOSTNAME,        NULL};
 
 int	SYSTEM_HOSTNAME(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
