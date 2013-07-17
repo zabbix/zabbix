@@ -2572,13 +2572,12 @@ function checkRequiredKeys(array $array, array $keys) {
 /**
  * clear page cookies on action
  *
- * @param bool $goResult
- * @param int $id
+ * @param bool $clear
+ * @param string $id	parent id, is used as cookie prefix
  */
-function clearCookies($goResult = false, $id = null) {
-	if (!empty($goResult)) {
+function clearCookies($clear = false, $id = null) {
+	if ($clear) {
 		$url = new CUrl();
-		$path = $url->getPath();
-		insert_js('cookie.eraseArray("'.basename($path, '.php').(empty($id) ? '' : '_'.$id).'")');
+		insert_js('cookie.eraseArray("'.basename($url->getPath(), '.php').($id ? '' : '_'.$id).'")');
 	}
 }
