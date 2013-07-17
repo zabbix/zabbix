@@ -238,7 +238,7 @@ if (!defined('ZBX_PAGE_NO_MENU')) {
 	}
 
 	if (CWebUser::isGuest()) {
-		$page_header_r_col[] = array(new CLink(_('Login'), 'index.php?reconnect=1', 'small_font', null, 'nosid'));
+		$page_header_r_col[] = array(new CLink(_('Login'), 'index.php?reconnect=1', 'small_font', null, null));
 	}
 	else {
 		// it is not possible to logout from HTTP authentication
@@ -248,7 +248,7 @@ if (!defined('ZBX_PAGE_NO_MENU')) {
 			$logout->setHint(_s('It is not possible to logout from HTTP authentication.'), null, null, false);
 		}
 		else {
-			$logout =  new CLink(_('Logout'), 'index.php?reconnect=1', 'small_font', null, 'nosid');
+			$logout =  new CLink(_('Logout'), 'index.php?reconnect=1', 'small_font', null, null);
 		}
 		array_push($page_header_r_col, $logout);
 	}
