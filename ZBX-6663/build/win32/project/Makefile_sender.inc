@@ -7,8 +7,7 @@ MESSAGES_H = messages.h
 RESOURCE_H = resource.h
 RESOURCE_RC = resource.rc
 RESOURCE_RES = zabbix_sender.res
-OBJS = ..\..\..\src\libs\zbxcommon\alias.o \
-	..\..\..\src\libs\zbxcommon\comms.o \
+OBJS = ..\..\..\src\libs\zbxcommon\comms.o \
 	..\..\..\src\libs\zbxcommon\gnuregex.o \
 	..\..\..\src\libs\zbxcommon\misc.o \
 	..\..\..\src\libs\zbxcommon\regexp.o \
