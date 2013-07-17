@@ -31,14 +31,8 @@
  *                                                                            *
  * Purpose: executing command                                                 *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
  * Return value:  SUCCEED - processed successfully                            *
  *                FAIL - an error occurred                                    *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, char **result)
@@ -75,7 +69,7 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, char **res
 
 	if (SUCCEED != rc)
 	{
-		zbx_snprintf(error, sizeof(error), "Unknown Host ID [" ZBX_FS_UI64 "]", hostid);
+		zbx_snprintf(error, sizeof(error), "Unknown Host ID [" ZBX_FS_UI64 "].", hostid);
 		goto fail;
 	}
 
@@ -107,14 +101,8 @@ fail:
  *                                                                            *
  * Purpose: sending command to slave node                                     *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
  * Return value:  SUCCEED - processed successfully                            *
  *                FAIL - an error occurred                                    *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 static int	send_script(int nodeid, const char *data, char **result)
@@ -140,7 +128,7 @@ static int	send_script(int nodeid, const char *data, char **result)
 		{
 			if (FAIL == (ret = zbx_tcp_send(&sock, data)))
 			{
-				*result = zbx_dsprintf(*result, "NODE %d: Error while sending data to Node [%d]: %s",
+				*result = zbx_dsprintf(*result, "NODE %d: Error while sending data to Node [%d]: %s.",
 						CONFIG_NODEID, nodeid, zbx_tcp_strerror());
 				goto exit_sock;
 			}
@@ -148,17 +136,18 @@ static int	send_script(int nodeid, const char *data, char **result)
 			if (SUCCEED == (ret = zbx_tcp_recv(&sock, &answer)))
 				*result = zbx_dsprintf(*result, "%s", answer);
 			else
-				*result = zbx_dsprintf(*result, "NODE %d: Error while receiving data from Node [%d]: %s",
+				*result = zbx_dsprintf(*result,
+						"NODE %d: Error while receiving data from Node [%d]: %s.",
 						CONFIG_NODEID, nodeid, zbx_tcp_strerror());
 exit_sock:
 			zbx_tcp_close(&sock);
 		}
 		else
-			*result = zbx_dsprintf(*result, "NODE %d: Unable to connect to Node [%d]: %s",
+			*result = zbx_dsprintf(*result, "NODE %d: Unable to connect to Node [%d]: %s.",
 					CONFIG_NODEID, nodeid, zbx_tcp_strerror());
 	}
 	else
-		*result = zbx_dsprintf(*result, "NODE %d: Unknown Node ID [%d]",
+		*result = zbx_dsprintf(*result, "NODE %d: Unknown Node ID [%d].",
 				CONFIG_NODEID, nodeid);
 
 	DBfree_result(db_result);
@@ -172,14 +161,8 @@ exit_sock:
  *                                                                            *
  * Purpose: find next point to slave node                                     *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
  * Return value:  SUCCEED - processed successfully                            *
  *                FAIL - an error occurred                                    *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 static int	get_next_point_to_node(int current_nodeid, int slave_nodeid, int *nodeid)
@@ -188,8 +171,7 @@ static int	get_next_point_to_node(int current_nodeid, int slave_nodeid, int *nod
 	DB_ROW		db_row;
 	int		id, res = FAIL;
 
-	db_result = DBselect("select nodeid from nodes where masterid=%d",
-		current_nodeid);
+	db_result = DBselect("select nodeid from nodes where masterid=%d", current_nodeid);
 
 	while (NULL != (db_row = DBfetch(db_result)))
 	{
@@ -213,14 +195,8 @@ static int	get_next_point_to_node(int current_nodeid, int slave_nodeid, int *nod
  *                                                                            *
  * Purpose: process command received from a master node or php                *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
  * Return value:  SUCCEED - processed successfully                            *
  *                FAIL - an error occurred                                    *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 int	node_process_command(zbx_sock_t *sock, const char *data, struct zbx_json_parse *jp)
@@ -231,26 +207,27 @@ int	node_process_command(zbx_sock_t *sock, const char *data, struct zbx_json_par
 	struct zbx_json	j;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In node_process_command()");
-	zbx_json_init(&j, 256);
+
+	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
 
 	if (SUCCEED != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_NODEID, tmp, sizeof(tmp)) ||
 			FAIL == is_uint31(tmp, &nodeid))
 	{
-		result = zbx_dsprintf(result, "Failed to parse command request tag: %s", ZBX_PROTO_TAG_NODEID);
+		result = zbx_dsprintf(result, "Failed to parse command request tag: %s.", ZBX_PROTO_TAG_NODEID);
 		goto finish;
 	}
 
 	if (SUCCEED != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_SCRIPTID, tmp, sizeof(tmp)) ||
 			FAIL == is_uint64(tmp, &scriptid))
 	{
-		result = zbx_dsprintf(result, "Failed to parse command request tag: %s", ZBX_PROTO_TAG_SCRIPTID);
+		result = zbx_dsprintf(result, "Failed to parse command request tag: %s.", ZBX_PROTO_TAG_SCRIPTID);
 		goto finish;
 	}
 
 	if (SUCCEED != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_HOSTID, tmp, sizeof(tmp)) ||
 			FAIL == is_uint64(tmp, &hostid))
 	{
-		result = zbx_dsprintf(result, "Failed to parse command request tag: %s", ZBX_PROTO_TAG_HOSTID);
+		result = zbx_dsprintf(result, "Failed to parse command request tag: %s.", ZBX_PROTO_TAG_HOSTID);
 		goto finish;
 	}
 
@@ -259,7 +236,7 @@ int	node_process_command(zbx_sock_t *sock, const char *data, struct zbx_json_par
 		if (SUCCEED == (ret = execute_script(scriptid, hostid, &result)))
 		{
 			zbx_json_addstring(&j, ZBX_PROTO_TAG_RESPONSE, ZBX_PROTO_VALUE_SUCCESS, ZBX_JSON_TYPE_STRING);
-			zbx_json_addstring(&j, ZBX_PROTO_TAG_VALUE, result, ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(&j, ZBX_PROTO_TAG_DATA, result, ZBX_JSON_TYPE_STRING);
 			send = j.buffer;
 		}
 	}
@@ -272,12 +249,12 @@ int	node_process_command(zbx_sock_t *sock, const char *data, struct zbx_json_par
 			send = result;
 	}
 	else
-		result = zbx_dsprintf(result, "NODE %d: Unknown Node ID [%d]", CONFIG_NODEID, nodeid);
+		result = zbx_dsprintf(result, "NODE %d: Unknown Node ID [%d].", CONFIG_NODEID, nodeid);
 finish:
 	if (FAIL == ret)
 	{
 		zbx_json_addstring(&j, ZBX_PROTO_TAG_RESPONSE, ZBX_PROTO_VALUE_FAILED, ZBX_JSON_TYPE_STRING);
-		zbx_json_addstring(&j, ZBX_PROTO_TAG_VALUE, (NULL != result) ? result : "Unknown error",
+		zbx_json_addstring(&j, ZBX_PROTO_TAG_INFO, (NULL != result ? result : "Unknown error."),
 				ZBX_JSON_TYPE_STRING);
 		send = j.buffer;
 	}
