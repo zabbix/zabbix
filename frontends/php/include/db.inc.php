@@ -996,6 +996,9 @@ function check_db_fields($dbFields, &$args) {
  * The WHERE condition is generated from the given list of values as a mix of
  * <fieldname> BETWEEN <id1> AND <idN>" and "<fieldname> IN (<id1>,<id2>,...,<idN>)" elements.
  *
+ * In some frontend places we can get array with bool as input values parameter. This is fail!
+ * Therefore we need check it and return 1=0 as temporary solution to not break the frontend.
+ *
  * @param string $fieldName		field name to be used in SQL WHERE condition
  * @param array  $values		array of numerical values sorted in ascending order to be included in WHERE
  * @param bool   $notIn			builds inverted condition
@@ -1007,17 +1010,17 @@ function dbConditionInt($fieldName, array $values, $notIn = false, $sort = true)
 	$MAX_EXPRESSIONS = 950; // maximum  number of values for using "IN (id1>,<id2>,...,<idN>)"
 	$MIN_NUM_BETWEEN = 4; // minimum number of consecutive values for using "BETWEEN <id1> AND <idN>"
 
-	if (count($values) == 0) {
+	if (is_bool(reset($values))) {
 		return '1=0';
 	}
 
-	$values = array_unique($values);
+	$values = array_keys(array_flip($values));
 
 	if ($sort) {
 		natsort($values);
 	}
 
-	zbx_cleanHashes($values);
+	$values = array_values($values);
 
 	$betweens = array();
 	$data = array();
