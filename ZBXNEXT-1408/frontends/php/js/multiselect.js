@@ -564,7 +564,6 @@ jQuery(function($) {
 
 				while (maxWidth < text.width()) {
 					text.text(tTemp.substring(0, tTemp.length - i) + '...');
-					cdump(text.text());
 					i++;
 				}
 
@@ -595,12 +594,15 @@ jQuery(function($) {
 					}
 				}
 
+				// remove "/n"
+				t = t.replace(/\n/g, '');
+
 				text.text(t.substring(0, start) + '...');
-				text.css('text-align', 'justify');
 				li.css('width', maxWidth);
 			}
 			else {
 				text.text(t);
+				text.css('padding', '0 16px 0 4px');
 			}
 
 			if (!options.disabled) {
