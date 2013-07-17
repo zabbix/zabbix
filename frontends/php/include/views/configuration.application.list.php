@@ -79,8 +79,14 @@ foreach ($this->data['applications'] as $application) {
 		$name[] = $application['name'];
 	}
 	else {
-		$name = new CLink($application['name'], 'applications.php?form=update&applicationid='.
-			$application['applicationid'].'&hostid='.$application['hostid'].'&groupid='.$this->data['groupid']);
+		$name = new CLink(
+			$application['name'],
+			'applications.php?'.
+				'form=update'.
+				'&applicationid='.$application['applicationid'].
+				'&hostid='.$application['hostid'].
+				'&groupid='.$this->data['groupid']
+		);
 	}
 
 	$applicationTable->addRow(array(
@@ -89,8 +95,13 @@ foreach ($this->data['applications'] as $application) {
 		($this->data['hostid'] > 0) ? null : $application['host'],
 		$name,
 		array(
-			new CLink(_('Items'), 'items.php?hostid='.$application['hostid'].
-				'&filter_set=1&filter_application='.urlencode($application['name'])),
+			new CLink(
+				_('Items'),
+				'items.php?'.
+					'hostid='.$application['hostid'].
+					'&filter_set=1'.
+					'&filter_application='.urlencode($application['name'])
+			),
 			SPACE.'('.count($application['items']).')'
 		)
 	));
@@ -112,7 +123,10 @@ $goComboBox->addItem($goOption);
 
 $goButton = new CSubmit('goButton', _('Go').' (0)');
 $goButton->setAttribute('id', 'goButton');
+
 zbx_add_post_js('chkbxRange.pageGoName = "applications";');
+zbx_add_post_js('chkbxRange.prefix = "'.$this->data['hostid'].'";');
+zbx_add_post_js('cookie.prefix = "'.$this->data['hostid'].'";');
 
 // append table to form
 $applicationForm->addItem(array($this->data['paging'], $applicationTable, $this->data['paging'], get_table_header(array($goComboBox, $goButton))));
