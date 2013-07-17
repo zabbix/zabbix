@@ -361,16 +361,17 @@ static int	recv_getqueue(zbx_sock_t *sock, struct zbx_json_parse *jp)
 		goto out;
 	}
 
-	if (FAIL == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_TYPE, type, sizeof(type)))
-		goto out;
+	if (FAIL != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_TYPE, type, sizeof(type)))
+	{
+		if (0 == strcmp(type, ZBX_PROTO_VALUE_GET_QUEUE_OVERVIEW))
+			request_type = ZBX_GET_QUEUE_OVERVIEW;
+		else if (0 == strcmp(type, ZBX_PROTO_VALUE_GET_QUEUE_PROXY))
+			request_type = ZBX_GET_QUEUE_PROXY;
+		else if (0 == strcmp(type, ZBX_PROTO_VALUE_GET_QUEUE_DETAILS))
+			request_type = ZBX_GET_QUEUE_DETAILS;
+	}
 
-	if (0 == strcmp(type, ZBX_PROTO_VALUE_GET_QUEUE_OVERVIEW))
-		request_type = ZBX_GET_QUEUE_OVERVIEW;
-	else if (0 == strcmp(type, ZBX_PROTO_VALUE_GET_QUEUE_PROXY))
-		request_type = ZBX_GET_QUEUE_PROXY;
-	else if (0 == strcmp(type, ZBX_PROTO_VALUE_GET_QUEUE_DETAILS))
-		request_type = ZBX_GET_QUEUE_DETAILS;
-	else
+	if (-1 == request_type)
 	{
 		zbx_send_response_raw(sock, ret, "Unsupported request type.", CONFIG_TIMEOUT);
 		goto out;
