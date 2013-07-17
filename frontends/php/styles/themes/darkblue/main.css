@@ -499,7 +499,7 @@ div.calendar input[type="button"] {
 .shadow {}
 .shadow:hover{ -webkit-box-shadow: 0 0 6px #77B7DA; -moz-box-shadow: 0 0 6px #77B7DA; box-shadow: 0 0 6px #77B7DA; }
 
-.select { cursor: pointer; margin: 1px 4px 1px 1px; }
+.select { margin: 1px 4px 1px 1px; }
 .button{  border-color: #77B7DA; background: #022744; color: #77B7DA; }
 .button:hover { border-color: #022744; color: #022744; background: #77B7DA; text-decoration: none; }
 
