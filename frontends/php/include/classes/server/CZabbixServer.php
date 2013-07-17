@@ -131,12 +131,14 @@ class CZabbixServer {
 	 * - self::QUEUE_DETAILS
 	 *
 	 * @param string $type
+	 * @param string $sid   user session ID
 	 *
 	 * @return bool|array
 	 */
-	public function getQueue($type) {
+	public function getQueue($type, $sid) {
 		return $this->request(array(
 			'request' => 'queue.get',
+			'sid' => $sid,
 			'type' => $type
 		));
 	}

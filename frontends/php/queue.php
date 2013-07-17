@@ -63,7 +63,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 	$queue_wdgt->addPageHeader(_('QUEUE OF ITEMS TO BE UPDATED'), $form);
 
 	$zabbixServer = new CZabbixServer($ZBX_SERVER, $ZBX_SERVER_PORT, ZBX_SOCKET_TIMEOUT);
-	$queueData = $zabbixServer->getQueue($config);
+	$queueData = $zabbixServer->getQueue($config, get_cookie('zbx_sessionid'));
 
 	// check for errors error
 	if ($zabbixServer->getError()) {
