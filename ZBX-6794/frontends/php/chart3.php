@@ -92,8 +92,7 @@ if ($httptestid = get_request('httptestid', false)) {
 
 	$name = CMacrosResolverHelper::resolveHttpTestName($httpTest['hostid'], $httpTest['name']);
 }
-else {
-	$items = get_request('items', array());
+elseif ($items = get_request('items', array())) {
 	asort_by_key($items, 'sortorder');
 
 	$dbItems = API::Item()->get(array(
@@ -112,6 +111,10 @@ else {
 		}
 	}
 	$name = get_request('name', '');
+}
+else {
+	show_error_message(_('No items defined.'));
+	exit;
 }
 
 /*
