@@ -81,8 +81,8 @@
 
 .iconerror			{ background-image: url('../images/general/error2.png'); cursor: pointer;}
 .iconok				{ background-image: url('../images/general/ok_icon.png');}
-.iconwarning		{ background-image: url('../images/general/warning.png');}
-.iconunknown		{ background-image: url('../images/general/unknown_icon.png');}
+.iconwarning		{ background-image: url('../images/general/warning.png'); cursor: pointer;}
+.iconunknown		{ background-image: url('../images/general/unknown_icon.png'); cursor: pointer;}
 .iconzbxunknown		{ background-image: url('../images/general/zabbix_unknown.png');}
 .iconzbxavailable	{ background-image: url('../images/general/zabbix_available.png');}
 .iconzbxunavailable	{ background-image: url('../images/general/zabbix_unavailable.png'); cursor: pointer;}
