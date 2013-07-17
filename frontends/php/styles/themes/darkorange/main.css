@@ -461,7 +461,7 @@ ul.formlist li.new { background: #2F2F2F; }
 .shadow {}
 .shadow:hover{ -webkit-box-shadow: 0 0 6px #FF5500; -moz-box-shadow: 0 0 6px #FF5500; box-shadow: 0 0 6px #FF5500; }
 
-.select { cursor: pointer; margin: 1px 4px 1px 1px; }
+.select { margin: 1px 4px 1px 1px; }
 .button{  border-color: #FF5500; background: #2f2f2f; color: #FF5500; }
 .button:hover { border-color: #2f2f2f; color: #2f2f2f; background: #FF5500; text-decoration: none; }
 

@@ -45,7 +45,7 @@ extern int		process_num;
  * Author: Alexei Vladishev, Aleksandrs Saveljevs                             *
  *                                                                            *
  ******************************************************************************/
-static void	process_time_functions()
+static void	process_time_functions(void)
 {
 	const char		*__function_name = "process_time_functions";
 	DC_TRIGGER		*trigger_info = NULL;
@@ -84,8 +84,8 @@ typedef struct
 	char		*host;
 	time_t		maintenance_from;
 	zbx_uint64_t	maintenanceid;
-	int		maintenance_type;
 	zbx_uint64_t	host_maintenanceid;
+	int		maintenance_type;
 	int		host_maintenance_status;
 	int		host_maintenance_type;
 	int		host_maintenance_from;
@@ -602,7 +602,7 @@ static int	day_in_month(int year, int mon)
 		return month[mon];
 }
 
-static void	process_maintenance()
+static void	process_maintenance(void)
 {
 	const char			*__function_name = "process_maintenance";
 	DB_RESULT			result;
@@ -740,13 +740,17 @@ static void	process_maintenance()
 			continue;
 		}
 
-		if (db_start_date < db_active_since)
+		/* allow one time periods to start before active time */
+		if (db_start_date < db_active_since && TIMEPERIOD_TYPE_ONETIME != db_timeperiod_type)
 			continue;
 
 		if (db_start_date > now || now >= db_start_date + db_period)
 			continue;
 
 		maintenance_from = db_start_date;
+
+		if (maintenance_from < db_active_since)
+			maintenance_from = db_active_since;
 
 		process_maintenance_hosts(&hm, &hm_alloc, &hm_count, maintenance_from, db_maintenanceid, db_maintenance_type);
 	}
@@ -756,6 +760,8 @@ static void	process_maintenance()
 
 	while (0 != hm_count--)
 		zbx_free(hm[hm_count].host);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 /******************************************************************************
@@ -773,7 +779,7 @@ static void	process_maintenance()
  * Comments: does update once per 30 seconds (hardcoded)                      *
  *                                                                            *
  ******************************************************************************/
-void	main_timer_loop()
+void	main_timer_loop(void)
 {
 	int	now, nextcheck, sleeptime;
 
