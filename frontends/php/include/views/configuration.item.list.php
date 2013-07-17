@@ -76,21 +76,34 @@ foreach ($this->data['items'] as $item) {
 	// description
 	$description = array();
 	if (!empty($item['template_host'])) {
-		$description[] = new CLink(CHtml::encode($item['template_host']['name']), '?hostid='.$item['template_host']['hostid'].'&filter_set=1', 'unknown');
+		$description[] = new CLink(
+			CHtml::encode($item['template_host']['name']),
+			'?hostid='.$item['template_host']['hostid'].'&filter_set=1',
+			'unknown'
+		);
 		$description[] = NAME_DELIMITER;
 	}
 	if (!empty($item['discoveryRule'])) {
-		$description[] = new CLink(CHtml::encode($item['discoveryRule']['name']), 'disc_prototypes.php?parent_discoveryid='.$item['discoveryRule']['itemid'], 'gold');
+		$description[] = new CLink(
+			CHtml::encode($item['discoveryRule']['name']),
+			'disc_prototypes.php?parent_discoveryid='.$item['discoveryRule']['itemid'],
+			'gold'
+		);
 		$description[] = NAME_DELIMITER.$item['name_expanded'];
 	}
 	else {
-		$description[] = new CLink(CHtml::encode($item['name_expanded']), '?form=update&hostid='.$item['hostid'].'&itemid='.$item['itemid']);
+		$description[] = new CLink(
+			CHtml::encode($item['name_expanded']),
+			'?form=update&hostid='.$item['hostid'].'&itemid='.$item['itemid']
+		);
 	}
 
 	// status
-	$status = new CCol(new CLink(itemIndicator($item['status'], $item['state']), '?group_itemid='.$item['itemid'].'&hostid='.$item['hostid'].'&go='.
-		($item['status'] ? 'activate' : 'disable'), itemIndicatorStyle($item['status'], $item['state']))
-	);
+	$status = new CCol(new CLink(
+		itemIndicator($item['status'], $item['state']),
+		'?group_itemid='.$item['itemid'].'&hostid='.$item['hostid'].'&go='.($item['status'] ? 'activate' : 'disable'),
+		itemIndicatorStyle($item['status'], $item['state'])
+	));
 
 	$statusIcons = array();
 	if ($item['status'] == ITEM_STATUS_ACTIVE) {
@@ -134,7 +147,11 @@ foreach ($this->data['items'] as $item) {
 			}
 			else {
 				$realHost = reset($this->data['triggerRealHosts'][$trigger['triggerid']]);
-				$triggerDescription[] = new CLink(CHtml::encode($realHost['name']), 'triggers.php?&hostid='.$realHost['hostid'], 'unknown');
+				$triggerDescription[] = new CLink(
+					CHtml::encode($realHost['name']),
+					'triggers.php?hostid='.$realHost['hostid'],
+					'unknown'
+				);
 				$triggerDescription[] = ':';
 			}
 		}
@@ -145,8 +162,10 @@ foreach ($this->data['items'] as $item) {
 			$triggerDescription[] = new CSpan(CHtml::encode($trigger['description']));
 		}
 		else {
-			$triggerDescription[] = new CLink(CHtml::encode($trigger['description']), 'triggers.php?form=update&hostid='.
-				key($trigger['hosts']).'&triggerid='.$trigger['triggerid']);
+			$triggerDescription[] = new CLink(
+				CHtml::encode($trigger['description']),
+				'triggers.php?form=update&hostid='.key($trigger['hosts']).'&triggerid='.$trigger['triggerid']
+			);
 		}
 
 		if ($trigger['state'] == TRIGGER_STATE_UNKNOWN) {
@@ -270,7 +289,10 @@ $goComboBox->addItem($goOption);
 
 $goButton = new CSubmit('goButton', _('Go').' (0)');
 $goButton->setAttribute('id', 'goButton');
+
 zbx_add_post_js('chkbxRange.pageGoName = "group_itemid";');
+zbx_add_post_js('chkbxRange.prefix = "'.$this->data['hostid'].'";');
+zbx_add_post_js('cookie.prefix = "'.$this->data['hostid'].'";');
 
 // append table to form
 $itemForm->addItem(array($this->data['paging'], $itemTable, $this->data['paging'], get_table_header(array($goComboBox, $goButton))));

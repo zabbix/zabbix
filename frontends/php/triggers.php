@@ -187,15 +187,20 @@ elseif (isset($_REQUEST['save'])) {
 		$result = API::Trigger()->create($trigger);
 		show_messages($result, _('Trigger added'), _('Cannot add trigger'));
 	}
+
 	if ($result) {
 		unset($_REQUEST['form']);
+		clearCookies($result, $_REQUEST['hostid']);
 	}
 }
 elseif (isset($_REQUEST['delete']) && isset($_REQUEST['triggerid'])) {
 	DBstart();
+
 	$result = API::Trigger()->delete($_REQUEST['triggerid']);
 	$result = DBend($result);
+
 	show_messages($result, _('Trigger deleted'), _('Cannot delete trigger'));
+	clearCookies($result, $_REQUEST['hostid']);
 
 	if ($result) {
 		unset($_REQUEST['form'], $_REQUEST['triggerid']);
@@ -230,17 +235,19 @@ elseif ($_REQUEST['go'] == 'massupdate' && isset($_REQUEST['mass_save']) && isse
 	}
 
 	DBstart();
+
 	$result = API::Trigger()->update($triggersToUpdate);
 	$result = DBend($result);
+
 	show_messages($result, _('Trigger updated'), _('Cannot update trigger'));
+	clearCookies($result, $_REQUEST['hostid']);
 
 	if ($result) {
-		unset($_REQUEST['massupdate'], $_REQUEST['form']);
+		unset($_REQUEST['massupdate'], $_REQUEST['form'], $_REQUEST['g_triggerid']);
 	}
-	$go_result = $result;
 }
 elseif (str_in_array($_REQUEST['go'], array('activate', 'disable')) && isset($_REQUEST['g_triggerid'])) {
-	$go_result = true;
+	$goResult = true;
 
 	if ($_REQUEST['go'] == 'activate') {
 		$status = TRIGGER_STATUS_ENABLED;
@@ -314,10 +321,11 @@ elseif (str_in_array($_REQUEST['go'], array('activate', 'disable')) && isset($_R
 	}
 	catch(Exception $e) {
 		DBend(false);
-		$go_result = false;
+		$goResult = false;
 	}
 
-	show_messages($go_result, _('Status updated'), _('Cannot update status'));
+	show_messages($goResult, _('Status updated'), _('Cannot update status'));
+	clearCookies($goResult, $_REQUEST['hostid']);
 }
 elseif ($_REQUEST['go'] == 'copy_to' && isset($_REQUEST['copy']) && isset($_REQUEST['g_triggerid'])) {
 	if (isset($_REQUEST['copy_targetid']) && $_REQUEST['copy_targetid'] > 0 && isset($_REQUEST['copy_type'])) {
@@ -340,10 +348,13 @@ elseif ($_REQUEST['go'] == 'copy_to' && isset($_REQUEST['copy']) && isset($_REQU
 		}
 
 		DBstart();
-		$go_result = copyTriggersToHosts($_REQUEST['g_triggerid'], $hosts_ids, get_request('hostid'));
-		$go_result = DBend($go_result);
 
-		show_messages($go_result, _('Trigger added'), _('Cannot add trigger'));
+		$goResult = copyTriggersToHosts($_REQUEST['g_triggerid'], $hosts_ids, get_request('hostid'));
+		$goResult = DBend($goResult);
+
+		show_messages($goResult, _('Trigger added'), _('Cannot add trigger'));
+		clearCookies($goResult, $_REQUEST['hostid']);
+
 		$_REQUEST['go'] = 'none2';
 	}
 	else {
@@ -351,14 +362,10 @@ elseif ($_REQUEST['go'] == 'copy_to' && isset($_REQUEST['copy']) && isset($_REQU
 	}
 }
 elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['g_triggerid'])) {
-	$go_result = API::Trigger()->delete($_REQUEST['g_triggerid']);
-	show_messages($go_result, _('Triggers deleted'), _('Cannot delete triggers'));
-}
-if ($_REQUEST['go'] != 'none' && !empty($go_result)) {
-	$url = new CUrl();
-	$path = $url->getPath();
-	insert_js('cookie.eraseArray(\''.$path.'\')');
-	$_REQUEST['go'] = 'none';
+	$goResult = API::Trigger()->delete($_REQUEST['g_triggerid']);
+
+	show_messages($goResult, _('Triggers deleted'), _('Cannot delete triggers'));
+	clearCookies($goResult, $_REQUEST['hostid']);
 }
 
 /*

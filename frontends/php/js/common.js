@@ -645,3 +645,21 @@ function switchElementsClass(obj, class1, class2) {
 function zbx_throw(msg) {
 	throw(msg);
 }
+
+/**
+ * Returns the file name of the given path
+ *
+ * @param string path
+ * @param string suffix
+ *
+ * @return string
+ */
+function basename(path, suffix) {
+	var name = path.replace(/^.*[\/\\]/g, '');
+
+	if (typeof(suffix) == 'string' && name.substr(name.length - suffix.length) == suffix) {
+		name = name.substr(0, name.length - suffix.length);
+	}
+
+	return name;
+}
