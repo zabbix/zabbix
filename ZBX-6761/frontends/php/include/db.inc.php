@@ -1007,17 +1007,17 @@ function dbConditionInt($fieldName, array $values, $notIn = false, $sort = true)
 	$MAX_EXPRESSIONS = 950; // maximum  number of values for using "IN (id1>,<id2>,...,<idN>)"
 	$MIN_NUM_BETWEEN = 4; // minimum number of consecutive values for using "BETWEEN <id1> AND <idN>"
 
-	if (count($values) == 0) {
+	if (is_bool(current($values)) || is_object(current($values)) || count($values) == 0) {
 		return '1=0';
 	}
 
-	$values = array_unique($values);
+	$values = array_keys(array_flip($values));
 
 	if ($sort) {
 		natsort($values);
 	}
 
-	zbx_cleanHashes($values);
+	$values = array_values($values);
 
 	$betweens = array();
 	$data = array();
