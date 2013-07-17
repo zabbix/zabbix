@@ -999,6 +999,7 @@ function check_db_fields($dbFields, &$args) {
  * @param string $fieldName		field name to be used in SQL WHERE condition
  * @param array  $values		array of numerical values sorted in ascending order to be included in WHERE
  * @param bool   $notIn			builds inverted condition
+ * @param bool   $sort			values mandatory must be sorted
  *
  * @return string
  */

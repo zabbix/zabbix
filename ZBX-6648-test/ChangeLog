@@ -1,15 +1,10 @@
-Changes for 2.3.0
-
-New features:
-
-Bug fixes:
-
---------------------------------------------------------------------------------
 Changes for 2.1.1
 
 New features:
 
 Bug fixes:
+..F....... [ZBX-6800] added required javascripts for showing hintbox in Zabbix setup. (Guntis)
+..F....... [ZBX-6796] added check in UI pre-requisites check, is memory_limit set to unlimited. (Guntis)
 ..F....... [ZBX-6776] added sorting by icon names in Map element configuration form (Guntis)
 A......... [ZBX-6771] fixed "status" field and existing host validation in Proxy API (Ivo)
 ..F....... [ZBX-6732] cookie path is now automatically set from current URL (Ivo)
