@@ -39,7 +39,6 @@ define('ZBX_GRAPH_FONT_NAME',		'DejaVuSans'); // font file name
 define('ZBX_GRAPH_LEGEND_HEIGHT',	120); // when graph height is less then this value, some legend will not show up
 
 define('ZBX_SCRIPT_TIMEOUT',		60); // in seconds
-define('ZBX_SCRIPT_BYTES_LIMIT',	1048576); // 1048576 is 1MB in bytes
 
 define('GRAPH_YAXIS_SIDE_DEFAULT', 0); // 0 - LEFT SIDE, 1 - RIGHT SIDE
 
@@ -881,8 +880,8 @@ define('IPMI_PRIVILEGE_OEM',		5);
 
 define('ZBX_HAVE_IPV6', 1);
 
-
-define('ZBX_SOCKET_TIMEOUT', 3);
+define('ZBX_SOCKET_TIMEOUT',        3);         // socket timeout limit
+define('ZBX_SOCKET_BYTES_LIMIT',    1048576);   // socket response size limit, 1048576 is 1MB in bytes
 
 // value is also used in servercheck.js file
 define('SERVER_CHECK_INTERVAL', 10);
