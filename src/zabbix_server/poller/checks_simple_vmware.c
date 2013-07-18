@@ -536,6 +536,8 @@ static int	vcenter_guesthvids_get(CURL *easyhandle, char **error)
 		goto out;
 	}
 
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() page.data:'%s'", __function_name, page.data);
+
 	if (NULL != (*error = read_xml_value(page.data, ZBX_XPATH_LN1("faultstring"))))
 		goto out;
 
@@ -1091,17 +1093,14 @@ static void	vmware_get_counterid_by_key(const char *key, zbx_uint64_t *counterid
 	zbx_free(value);
 }
 
-static int	vmware_perf_counter_details_get(CURL *easyhandle, const zbx_vector_ptr_t *vms, zbx_counters_t *counters,
+static int	vmware_perf_counter_details_get(CURL *easyhandle, const zbx_vector_uint64_t *counterids, zbx_counters_t *counters,
 		char **error, unsigned flags)
 {
-	const char		*__function_name = "vmware_perf_counter_details_get";
+	const char	*__function_name = "vmware_perf_counter_details_get";
 
-	int			i, j, k, err, o, ret = FAIL;
-	char			*tmp = NULL;
-	size_t			tmp_alloc = 0, tmp_offset = 0;
-	zbx_vector_uint64_t	counterids;
-	zbx_vm_t		*vm;
-	zbx_dev_t		*dev;
+	int		i, err, o, ret = FAIL;
+	char		*tmp = NULL;
+	size_t		tmp_alloc = 0, tmp_offset = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -1111,38 +1110,18 @@ static int	vmware_perf_counter_details_get(CURL *easyhandle, const zbx_vector_pt
 		goto out;
 	}
 
-	zbx_vector_uint64_create(&counterids);
-
-	for (i = 0; i < vms->values_num; i++)
-	{
-		vm = (zbx_vm_t *)vms->values[i];
-
-		for (j = 0; j < vm->devs.values_num; j++)
-		{
-			dev = (zbx_dev_t *)vm->devs.values[j];
-
-			for (k = 0; k < dev->counterids.values_num; k++)
-				zbx_vector_uint64_append(&counterids, dev->counterids.values[k]);
-		}
-	}
-
-	zbx_vector_uint64_sort(&counterids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-	zbx_vector_uint64_uniq(&counterids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-
 	zbx_strcpy_alloc(&tmp, &tmp_alloc, &tmp_offset, ZBX_POST_VSPHERE_HEADER);
 	zbx_strcpy_alloc(&tmp, &tmp_alloc, &tmp_offset, "<ns0:QueryPerfCounter>");
 	zbx_strcpy_alloc(&tmp, &tmp_alloc, &tmp_offset, "<ns0:_this type=\"PerformanceManager\">");
 	zbx_strcpy_alloc(&tmp, &tmp_alloc, &tmp_offset, ZBX_VMWARE_FLAG_VCENTER == flags ? "PerfMgr" : "ha-perfmgr");
 	zbx_strcpy_alloc(&tmp, &tmp_alloc, &tmp_offset, "</ns0:_this>");
-	for (i = 0; i < counterids.values_num; i++)
+	for (i = 0; i < counterids->values_num; i++)
 	{
 		zbx_snprintf_alloc(&tmp, &tmp_alloc, &tmp_offset, "<ns0:counterId>" ZBX_FS_UI64 "</ns0:counterId>",
-				counterids.values[i]);
+				counterids->values[i]);
 	}
 	zbx_strcpy_alloc(&tmp, &tmp_alloc, &tmp_offset, "</ns0:QueryPerfCounter>");
 	zbx_strcpy_alloc(&tmp, &tmp_alloc, &tmp_offset, ZBX_POST_VSPHERE_FOOTER);
-
-	zbx_vector_uint64_destroy(&counterids);
 
 	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, o = CURLOPT_POSTFIELDS, tmp)))
 	{
@@ -1537,7 +1516,7 @@ static int	vcenter_update(const char *url, const char *username, const char *pas
 	const char		*__function_name = "vcenter_update";
 
 	CURL			*easyhandle = NULL;
-	int			o, i, j, err, ret = FAIL;
+	int			o, i, j, k, l, err, ret = FAIL;
 	zbx_vector_str_t	guesthvids, guestvmids, clusterids;
 	struct curl_slist	*headers = NULL;
 	zbx_vcenter_t		*vcenter;
@@ -1546,9 +1525,13 @@ static int	vcenter_update(const char *url, const char *username, const char *pas
 	zbx_cluster_t		*cluster;
 	char			*uuid, *name, *event_session = NULL, *clusters = NULL,
 				xpath[MAX_STRING_LEN];
+	zbx_vector_uint64_t	counterids;
+	zbx_dev_t		*dev;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() url:'%s' username:'%s' password:'%s'",
 			__function_name, url, username, password);
+
+	zbx_vector_uint64_create(&counterids);
 
 	if (0 == vcenters_initialized)
 	{
@@ -1674,6 +1657,14 @@ static int	vcenter_update(const char *url, const char *username, const char *pas
 			vm->status_ex = zbx_strdup(vm->status_ex, page.data);
 
 			vmware_perf_counters_get(easyhandle, guestvmids.values[j], vm, ZBX_VMWARE_FLAG_VCENTER);
+
+			for (k = 0; k < vm->devs.values_num; k++)
+			{
+				dev = (zbx_dev_t *)vm->devs.values[k];
+
+				for (l = 0; l < dev->counterids.values_num; l++)
+					zbx_vector_uint64_append(&counterids, dev->counterids.values[l]);
+			}
 		}
 
 		for (j = 0; j < guestvmids.values_num; j++)
@@ -1681,7 +1672,10 @@ static int	vcenter_update(const char *url, const char *username, const char *pas
 		guestvmids.values_num = 0;
 	}
 
-	if (SUCCEED != vmware_perf_counter_details_get(easyhandle, &hv->vms, &vcenter->counters, error,
+	zbx_vector_uint64_sort(&counterids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	zbx_vector_uint64_uniq(&counterids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+	if (SUCCEED != vmware_perf_counter_details_get(easyhandle, &counterids, &vcenter->counters, error,
 			ZBX_VMWARE_FLAG_VCENTER))
 	{
 		goto clean;
@@ -1765,6 +1759,8 @@ clean:
 
 	curl_slist_free_all(headers);
 	curl_easy_cleanup(easyhandle);
+
+	zbx_vector_uint64_destroy(&counterids);
 out:
 	if (SUCCEED != ret)
 		zabbix_log(LOG_LEVEL_DEBUG, "VMWare URL \"%s\" error: %s", url, *error);
@@ -1852,15 +1848,19 @@ static int	vsphere_update(const char *url, const char *username, const char *pas
 	const char		*__function_name = "vsphere_update";
 
 	CURL			*easyhandle = NULL;
-	int			o, i, err, ret = FAIL;
+	int			o, i, j, k, err, ret = FAIL;
 	zbx_vector_str_t	guestvmids;
 	struct curl_slist	*headers = NULL;
 	zbx_vsphere_t		*vsphere;
 	zbx_vm_t		*vm;
 	char			*uuid, *event_session = NULL;
+	zbx_vector_uint64_t	counterids;
+	zbx_dev_t		*dev;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() url:'%s' username:'%s' password:'%s'",
 			__function_name, url, username, password);
+
+	zbx_vector_uint64_create(&counterids);
 
 	if (0 == vspheres_initialized)
 	{
@@ -1944,9 +1944,20 @@ static int	vsphere_update(const char *url, const char *username, const char *pas
 		vm->status_ex = zbx_strdup(vm->status_ex, page.data);
 
 		vmware_perf_counters_get(easyhandle, guestvmids.values[i], vm, ZBX_VMWARE_FLAG_VSPHERE);
+
+		for (j = 0; j < vm->devs.values_num; j++)
+		{
+			dev = (zbx_dev_t *)vm->devs.values[j];
+
+			for (k = 0; k < dev->counterids.values_num; k++)
+				zbx_vector_uint64_append(&counterids, dev->counterids.values[k]);
+		}
 	}
 
-	if (SUCCEED != vmware_perf_counter_details_get(easyhandle, &vsphere->vms, &vsphere->counters, error,
+	zbx_vector_uint64_sort(&counterids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	zbx_vector_uint64_uniq(&counterids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+	if (SUCCEED != vmware_perf_counter_details_get(easyhandle, &counterids, &vsphere->counters, error,
 			ZBX_VMWARE_FLAG_VSPHERE))
 	{
 		goto clean;
@@ -1981,6 +1992,8 @@ clean:
 
 	curl_slist_free_all(headers);
 	curl_easy_cleanup(easyhandle);
+
+	zbx_vector_uint64_destroy(&counterids);
 out:
 	if (SUCCEED != ret)
 		zabbix_log(LOG_LEVEL_DEBUG, "VMWare URL \"%s\" error: %s", url, *error);
