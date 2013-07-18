@@ -797,7 +797,7 @@ jQuery(function($) {
 		});
 	}
 
-	function resizeSelectedText(li, text, obj, options) {
+	function resizeSelectedText(selectedItem, text, obj, options) {
 		// check width
 		var maxWidth = $('.selected ul', obj).width() - 3,
 			t = text.text(),
@@ -853,7 +853,7 @@ jQuery(function($) {
 				text.text(t.substring(0, start) + '...');
 			}
 
-			li.css('width', maxWidth);
+			selectedItem.css('width', maxWidth);
 		}
 		else {
 			text.text(t);
