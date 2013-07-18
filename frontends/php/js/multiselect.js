@@ -136,6 +136,18 @@ jQuery(function($) {
 			};
 
 			/**
+			 * Rezise multiselect selected text
+			 */
+			$.fn.multiSelect.resize = function() {
+				$.each(window.multiSelect, function(i) {
+					var ms = window.multiSelect[i];
+					if (!empty(ms.options.data)) {
+						resizeAllSelectedTexts(ms.obj, ms.options, ms.values);
+					}
+				});
+			}
+
+			/**
 			 * MultiSelect object.
 			 */
 			if (empty(window.multiSelect)) {
@@ -552,58 +564,7 @@ jQuery(function($) {
 
 			$('.selected ul', obj).append(li.append(text));
 
-			// check width
-			var maxWidth = $('.selected ul', obj).width() - 3,
-				t = text.text(),
-				tTemp = (options.disabled ? '' : '[x]') + t;
-
-			text.text(tTemp);
-
-			if (maxWidth < text.width()) {
-				var i = 1;
-
-				while (maxWidth < text.width()) {
-					text.text(tTemp.substring(0, tTemp.length - i) + '...');
-					i++;
-				}
-
-				t = t.substring(0, t.length - i) + '\n' + t.substring(t.length - i, t.length);
-				text.text(t);
-			}
-
-			var originalHeight = text.height();
-
-			text.text('1');
-
-			var rowHeight = text.height();
-
-			if (originalHeight > rowHeight) {
-				var start = 1,
-					end = t.length;
-
-				while (start < end) {
-					var length = Math.ceil((start + end) / 2);
-
-					text.text(t.substring(0, length) + (options.disabled ? '...' : '...[x]'));
-
-					if (text.height () <= rowHeight) {
-						start = length;
-					}
-					else {
-						end = length - 1;
-					}
-				}
-
-				// remove "/n"
-				t = t.replace(/\n/g, '');
-
-				text.text(t.substring(0, start) + '...');
-				li.css('width', maxWidth);
-			}
-			else {
-				text.text(t);
-				text.css('padding', '0 16px 0 4px');
-			}
+			resizeSelectedText(li, text, obj, options);
 
 			if (!options.disabled) {
 				var arrow = $('<span>', {
@@ -762,10 +723,9 @@ jQuery(function($) {
 
 	function resizeSelected(obj, values, options) {
 		// settings
-		var settingTopPaddings = IE8 ? 1 : 0,
+		var settingTopPaddings = IE8 ? 1 : 2,
 			settingTopPaddingsInit = 3,
 			settingRightPaddings = 4,
-			settingLeftPaddings = 13,
 			settingMinimumWidth = 50,
 			settingMinimumHeight = 12,
 			settingNewLineTopPaddings = 6;
@@ -776,12 +736,11 @@ jQuery(function($) {
 			height = 0;
 
 		if ($('.selected li', obj).length > 0) {
-			var position = options.disabled
-				? $('.selected li:last-child', obj).position()
-				: $('.selected li:last-child .arrow', obj).position();
+			var lastItem = $('.selected li:last-child', obj),
+				position = lastItem.position();
 
-			top = position.top + settingTopPaddings - 1;
-			left = position.left + settingLeftPaddings;
+			top = position.top + settingTopPaddings;
+			left = position.left + lastItem.width();
 			height = $('.selected li:last-child', obj).height();
 		}
 		else {
@@ -835,6 +794,83 @@ jQuery(function($) {
 
 		$('.available', obj).css({
 			top: (selectedHeight > 0) ? selectedHeight : 20
+		});
+	}
+
+	function resizeSelectedText(li, text, obj, options) {
+		// check width
+		var maxWidth = $('.selected ul', obj).width() - 3,
+			t = text.text(),
+			tTemp = (options.disabled ? '' : '[x]') + t;
+
+		text.text(tTemp);
+
+		if (maxWidth < text.width()) {
+			var i = 1,
+				textWidth = text.width();
+
+				text.text(tTemp.substring(0, tTemp.length) + '...');
+
+			if (textWidth != text.width()) {
+				text.text(tTemp);
+				while (maxWidth < text.width()) {
+					text.text(tTemp.substring(0, tTemp.length - i) + '...');
+					i++;
+				}
+			}
+
+			t = t.substring(0, t.length - i) + ' ' + t.substring(t.length - i, t.length);
+			text.text(t);
+		}
+
+		var originalHeight = text.height();
+
+		text.text('1');
+
+		var rowHeight = text.height();
+
+		if (originalHeight > rowHeight) {
+			var start = 1,
+				end = t.length;
+
+			while (start < end) {
+				var length = Math.ceil((start + end) / 2);
+
+				text.text(t.substring(0, length) + (options.disabled ? '...' : '...[x]'));
+
+				if (text.height() <= rowHeight) {
+					start = length;
+				}
+				else {
+					end = length - 1;
+				}
+			}
+
+			if (t.substring(start - 1, start) == ' ') {
+				text.text(t.substring(0, start - 1) + '...');
+			}
+			else {
+				text.text(t.substring(0, start) + '...');
+			}
+
+			li.css('width', maxWidth);
+		}
+		else {
+			text.text(t);
+			if (!options.disabled) {
+				text.css('padding-right', '16px');
+			}
+		}
+	}
+
+	function resizeAllSelectedTexts(obj, options, values) {
+		$('.selected li', obj).each(function() {
+			var li = $(this),
+				text = $(li.children()[0]);
+
+			text.text(values.selected[li.data('id')]['name']);
+
+			resizeSelectedText(li, text, obj, options);
 		});
 	}
 
