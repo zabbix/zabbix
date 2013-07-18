@@ -799,67 +799,28 @@ jQuery(function($) {
 	}
 
 	function resizeSelectedText(selectedItem, text, obj, options) {
-		// check width
-		var maxWidth = $('.selected ul', obj).width() - 3,
-			t = text.text(),
-			tTemp = (options.disabled ? '' : '[x]') + t;
+		// settings
+		var settingLineHeight = 15,
+			settingArrowSpace = options.disabled ? 15 : 30;
 
-		text.text(tTemp);
+		// calculate
+		var maxWidth = $('.selected ul', obj).width() - settingArrowSpace,
+			textWidth = text.width();
 
-		if (maxWidth < text.width()) {
-			var i = 1,
-				textWidth = text.width();
+		if (textWidth > maxWidth || text.height() > settingLineHeight) {
+			while (text.width() > maxWidth || text.height() > settingLineHeight) {
+				var t = text.text();
 
-				text.text(tTemp.substring(0, tTemp.length) + '...');
-
-			if (textWidth != text.width()) {
-				text.text(tTemp);
-				while (maxWidth < text.width()) {
-					text.text(tTemp.substring(0, tTemp.length - i) + '...');
-					i++;
-				}
+				text.text(t.substring(0, t.length - 1));
 			}
 
-			t = t.substring(0, t.length - i) + ' ' + t.substring(t.length - i, t.length);
-			text.text(t);
-		}
+			text.text(text.text() + '...');
 
-		var originalHeight = text.height();
-
-		text.text('1');
-
-		var rowHeight = text.height();
-
-		if (originalHeight > rowHeight) {
-			var start = 1,
-				end = t.length;
-
-			while (start < end) {
-				var length = Math.ceil((start + end) / 2);
-
-				text.text(t.substring(0, length) + (options.disabled ? '...' : '...[x]'));
-
-				if (text.height() <= rowHeight) {
-					start = length;
-				}
-				else {
-					end = length - 1;
-				}
-			}
-
-			if (t.substring(start - 1, start) == ' ') {
-				text.text(t.substring(0, start - 1) + '...');
-			}
-			else {
-				text.text(t.substring(0, start) + '...');
-			}
-
-			selectedItem.css('width', maxWidth);
+			selectedItem.css('width', $('.selected ul', obj).width() - 3);
 		}
 		else {
-			text.text(t);
 			if (!options.disabled) {
-				text.css('padding-right', '16px');
+				text.css('padding-right', 16);
 			}
 		}
 	}
