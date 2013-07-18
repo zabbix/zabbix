@@ -801,7 +801,7 @@ jQuery(function($) {
 	function resizeSelectedText(selectedItem, text, obj, options) {
 		// settings
 		var settingLineHeight = 15,
-			settingArrowSpace = options.disabled ? 20 : 30,
+			settingArrowSpace = options.disabled ? 22 : 32,
 			settingPaddings = 3;
 
 		// calculate
