@@ -143,16 +143,16 @@ clean:
 static int	evaluate_LOGEVENTID(char *value, DB_ITEM *item, const char *function, const char *parameters,
 		time_t now)
 {
-	const char		*__function_name = "evaluate_LOGEVENTID";
-	char			*arg1 = NULL, *arg1_esc;
-	int			ret = FAIL;
-	ZBX_REGEXP		*regexps = NULL;
-	int			regexps_alloc = 0, regexps_num = 0;
-	zbx_vector_vc_value_t	values;
+	const char			*__function_name = "evaluate_LOGEVENTID";
+	char				*arg1 = NULL, *arg1_esc;
+	int				ret = FAIL;
+	ZBX_REGEXP			*regexps = NULL;
+	int				regexps_alloc = 0, regexps_num = 0;
+	zbx_vector_history_record_t	values;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	zbx_vc_value_vector_create(&values);
+	zbx_history_record_vector_create(&values);
 
 	if (ITEM_VALUE_TYPE_LOG != item->value_type)
 		goto out;
@@ -210,7 +210,7 @@ static int	evaluate_LOGEVENTID(char *value, DB_ITEM *item, const char *function,
 	}
 	zbx_free(arg1);
 out:
-	zbx_vc_value_vector_destroy(&values, item->value_type);
+	zbx_history_record_vector_destroy(&values, item->value_type);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
@@ -232,14 +232,14 @@ out:
  ******************************************************************************/
 static int	evaluate_LOGSOURCE(char *value, DB_ITEM *item, const char *function, const char *parameters, time_t now)
 {
-	const char		*__function_name = "evaluate_LOGSOURCE";
-	char			*arg1 = NULL;
-	int			ret = FAIL;
-	zbx_vector_vc_value_t	values;
+	const char			*__function_name = "evaluate_LOGSOURCE";
+	char				*arg1 = NULL;
+	int				ret = FAIL;
+	zbx_vector_history_record_t	values;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	zbx_vc_value_vector_create(&values);
+	zbx_history_record_vector_create(&values);
 
 	if (ITEM_VALUE_TYPE_LOG != item->value_type)
 		goto out;
@@ -265,7 +265,7 @@ static int	evaluate_LOGSOURCE(char *value, DB_ITEM *item, const char *function, 
 
 	zbx_free(arg1);
 out:
-	zbx_vc_value_vector_destroy(&values, item->value_type);
+	zbx_history_record_vector_destroy(&values, item->value_type);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
@@ -287,13 +287,13 @@ out:
  ******************************************************************************/
 static int	evaluate_LOGSEVERITY(char *value, DB_ITEM *item, const char *function, const char *parameters, time_t now)
 {
-	const char		*__function_name = "evaluate_LOGSEVERITY";
-	int			ret = FAIL;
-	zbx_vector_vc_value_t	values;
+	const char			*__function_name = "evaluate_LOGSEVERITY";
+	int				ret = FAIL;
+	zbx_vector_history_record_t	values;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	zbx_vc_value_vector_create(&values);
+	zbx_history_record_vector_create(&values);
 
 	if (ITEM_VALUE_TYPE_LOG != item->value_type)
 		goto out;
@@ -308,7 +308,7 @@ static int	evaluate_LOGSEVERITY(char *value, DB_ITEM *item, const char *function
 	else
 		zabbix_log(LOG_LEVEL_DEBUG, "result for LOGSEVERITY is empty");
 out:
-	zbx_vc_value_vector_destroy(&values, item->value_type);
+	zbx_history_record_vector_destroy(&values, item->value_type);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
@@ -481,15 +481,15 @@ static int	evaluate_COUNT_one(unsigned char value_type, int op, history_value_t 
  ******************************************************************************/
 static int	evaluate_COUNT(char *value, DB_ITEM *item, const char *function, const char *parameters, time_t now)
 {
-	const char		*__function_name = "evaluate_COUNT";
-	int			arg1, flag, op, numeric_search, nparams, count = 0, i, ret = FAIL;
-	int			time_shift = 0, time_shift_flag, seconds = 0, nvalues = 0;
-	char			*arg2 = NULL, *arg2_2 = NULL, *arg3 = NULL;
-	zbx_vector_vc_value_t	values;
+	const char			*__function_name = "evaluate_COUNT";
+	int				arg1, flag, op, numeric_search, nparams, count = 0, i, ret = FAIL;
+	int				time_shift = 0, time_shift_flag, seconds = 0, nvalues = 0;
+	char				*arg2 = NULL, *arg2_2 = NULL, *arg3 = NULL;
+	zbx_vector_history_record_t	values;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	zbx_vc_value_vector_create(&values);
+	zbx_history_record_vector_create(&values);
 
 	numeric_search = (ITEM_VALUE_TYPE_UINT64 == item->value_type || ITEM_VALUE_TYPE_FLOAT == item->value_type);
 
@@ -592,7 +592,7 @@ static int	evaluate_COUNT(char *value, DB_ITEM *item, const char *function, cons
 out:
 	zbx_free(arg2);
 
-	zbx_vc_value_vector_destroy(&values, item->value_type);
+	zbx_history_record_vector_destroy(&values, item->value_type);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
@@ -624,13 +624,13 @@ out:
  ******************************************************************************/
 static int	evaluate_SUM(char *value, DB_ITEM *item, const char *function, const char *parameters, time_t now)
 {
-	const char		*__function_name = "evaluate_SUM";
-	int			nparams, arg1, flag, i, ret = FAIL, seconds = 0, nvalues = 0;
-	zbx_vector_vc_value_t	values;
+	const char			*__function_name = "evaluate_SUM";
+	int				nparams, arg1, flag, i, ret = FAIL, seconds = 0, nvalues = 0;
+	zbx_vector_history_record_t	values;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	zbx_vc_value_vector_create(&values);
+	zbx_history_record_vector_create(&values);
 
 	if (ITEM_VALUE_TYPE_FLOAT != item->value_type && ITEM_VALUE_TYPE_UINT64 != item->value_type)
 		goto out;
@@ -682,7 +682,7 @@ static int	evaluate_SUM(char *value, DB_ITEM *item, const char *function, const 
 	else
 		zabbix_log(LOG_LEVEL_DEBUG, "result for SUM is empty");
 out:
-	zbx_vc_value_vector_destroy(&values, item->value_type);
+	zbx_history_record_vector_destroy(&values, item->value_type);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
@@ -704,13 +704,13 @@ out:
  ******************************************************************************/
 static int	evaluate_AVG(char *value, DB_ITEM *item, const char *function, const char *parameters, time_t now)
 {
-	const char		*__function_name = "evaluate_AVG";
-	int			nparams, arg1, flag, ret = FAIL, i, seconds = 0, nvalues = 0;
-	zbx_vector_vc_value_t	values;
+	const char			*__function_name = "evaluate_AVG";
+	int				nparams, arg1, flag, ret = FAIL, i, seconds = 0, nvalues = 0;
+	zbx_vector_history_record_t	values;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	zbx_vc_value_vector_create(&values);
+	zbx_history_record_vector_create(&values);
 
 	if (ITEM_VALUE_TYPE_FLOAT != item->value_type && ITEM_VALUE_TYPE_UINT64 != item->value_type)
 		goto out;
@@ -762,7 +762,7 @@ static int	evaluate_AVG(char *value, DB_ITEM *item, const char *function, const 
 	else
 		zabbix_log(LOG_LEVEL_DEBUG, "result for AVG is empty");
 out:
-	zbx_vc_value_vector_destroy(&values, item->value_type);
+	zbx_history_record_vector_destroy(&values, item->value_type);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
@@ -785,9 +785,9 @@ out:
  ******************************************************************************/
 static int	evaluate_LAST(char *value, DB_ITEM *item, const char *function, const char *parameters, time_t now)
 {
-	const char		*__function_name = "evaluate_LAST";
-	int			arg1, flag, time_shift_flag, ret = FAIL, timeshift = 0;
-	zbx_vector_vc_value_t	values;
+	const char			*__function_name = "evaluate_LAST";
+	int				arg1, flag, time_shift_flag, ret = FAIL, timeshift = 0;
+	zbx_vector_history_record_t	values;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -816,7 +816,7 @@ static int	evaluate_LAST(char *value, DB_ITEM *item, const char *function, const
 			goto out;
 	}
 
-	zbx_vc_value_vector_create(&values);
+	zbx_history_record_vector_create(&values);
 
 	if (SUCCEED == zbx_vc_get_value_range(item->itemid, item->value_type, &values, 0, arg1, now))
 	{
@@ -828,7 +828,7 @@ static int	evaluate_LAST(char *value, DB_ITEM *item, const char *function, const
 		}
 	}
 
-	zbx_vc_value_vector_destroy(&values, item->value_type);
+	zbx_history_record_vector_destroy(&values, item->value_type);
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
@@ -850,13 +850,13 @@ out:
  ******************************************************************************/
 static int	evaluate_MIN(char *value, DB_ITEM *item, const char *function, const char *parameters, time_t now)
 {
-	const char		*__function_name = "evaluate_MIN";
-	int			nparams, arg1, flag, i, ret = FAIL, seconds = 0, nvalues = 0;
-	zbx_vector_vc_value_t	values;
+	const char			*__function_name = "evaluate_MIN";
+	int				nparams, arg1, flag, i, ret = FAIL, seconds = 0, nvalues = 0;
+	zbx_vector_history_record_t	values;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	zbx_vc_value_vector_create(&values);
+	zbx_history_record_vector_create(&values);
 
 	if (ITEM_VALUE_TYPE_FLOAT != item->value_type && ITEM_VALUE_TYPE_UINT64 != item->value_type)
 		goto out;
@@ -914,7 +914,7 @@ static int	evaluate_MIN(char *value, DB_ITEM *item, const char *function, const 
 	else
 		zabbix_log(LOG_LEVEL_DEBUG, "result for MIN is empty");
 out:
-	zbx_vc_value_vector_destroy(&values, item->value_type);
+	zbx_history_record_vector_destroy(&values, item->value_type);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
@@ -936,13 +936,13 @@ out:
  ******************************************************************************/
 static int	evaluate_MAX(char *value, DB_ITEM *item, const char *function, const char *parameters, time_t now)
 {
-	const char		*__function_name = "evaluate_MAX";
-	int			nparams, arg1, flag, ret = FAIL, i, seconds = 0, nvalues = 0;
-	zbx_vector_vc_value_t	values;
+	const char			*__function_name = "evaluate_MAX";
+	int				nparams, arg1, flag, ret = FAIL, i, seconds = 0, nvalues = 0;
+	zbx_vector_history_record_t	values;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	zbx_vc_value_vector_create(&values);
+	zbx_history_record_vector_create(&values);
 
 	if (ITEM_VALUE_TYPE_FLOAT != item->value_type && ITEM_VALUE_TYPE_UINT64 != item->value_type)
 		goto out;
@@ -1000,7 +1000,7 @@ static int	evaluate_MAX(char *value, DB_ITEM *item, const char *function, const 
 	else
 		zabbix_log(LOG_LEVEL_DEBUG, "result for MAX is empty");
 out:
-	zbx_vc_value_vector_destroy(&values, item->value_type);
+	zbx_history_record_vector_destroy(&values, item->value_type);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
@@ -1022,13 +1022,13 @@ out:
  ******************************************************************************/
 static int	evaluate_DELTA(char *value, DB_ITEM *item, const char *function, const char *parameters, time_t now)
 {
-	const char		*__function_name = "evaluate_DELTA";
-	int			nparams, arg1, flag, ret = FAIL, i, seconds = 0, nvalues = 0;
-	zbx_vector_vc_value_t	values;
+	const char			*__function_name = "evaluate_DELTA";
+	int				nparams, arg1, flag, ret = FAIL, i, seconds = 0, nvalues = 0;
+	zbx_vector_history_record_t	values;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	zbx_vc_value_vector_create(&values);
+	zbx_history_record_vector_create(&values);
 
 	if (ITEM_VALUE_TYPE_FLOAT != item->value_type && ITEM_VALUE_TYPE_UINT64 != item->value_type)
 		goto out;
@@ -1098,7 +1098,7 @@ static int	evaluate_DELTA(char *value, DB_ITEM *item, const char *function, cons
 	else
 		zabbix_log(LOG_LEVEL_DEBUG, "result for DELTA is empty");
 out:
-	zbx_vc_value_vector_destroy(&values, item->value_type);
+	zbx_history_record_vector_destroy(&values, item->value_type);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
@@ -1120,13 +1120,13 @@ out:
  ******************************************************************************/
 static int	evaluate_NODATA(char *value, DB_ITEM *item, const char *function, const char *parameters)
 {
-	const char		*__function_name = "evaluate_NODATA";
-	int			arg1, flag, now, ret = FAIL;
-	zbx_vector_vc_value_t	values;
+	const char			*__function_name = "evaluate_NODATA";
+	int				arg1, flag, now, ret = FAIL;
+	zbx_vector_history_record_t	values;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	zbx_vc_value_vector_create(&values);
+	zbx_history_record_vector_create(&values);
 
 	if (1 < num_param(parameters))
 		goto out;
@@ -1155,7 +1155,7 @@ static int	evaluate_NODATA(char *value, DB_ITEM *item, const char *function, con
 
 	ret = SUCCEED;
 out:
-	zbx_vc_value_vector_destroy(&values, item->value_type);
+	zbx_history_record_vector_destroy(&values, item->value_type);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
@@ -1177,13 +1177,13 @@ out:
  ******************************************************************************/
 static int	evaluate_ABSCHANGE(char *value, DB_ITEM *item, const char *function, const char *parameters, time_t now)
 {
-	const char		*__function_name = "evaluate_ABSCHANGE";
-	int			ret = FAIL;
-	zbx_vector_vc_value_t	values;
+	const char			*__function_name = "evaluate_ABSCHANGE";
+	int				ret = FAIL;
+	zbx_vector_history_record_t	values;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	zbx_vc_value_vector_create(&values);
+	zbx_history_record_vector_create(&values);
 
 	if (SUCCEED != zbx_vc_get_value_range(item->itemid, item->value_type, &values, 0, 2, now) ||
 			2 > values.values_num)
@@ -1227,7 +1227,7 @@ static int	evaluate_ABSCHANGE(char *value, DB_ITEM *item, const char *function, 
 	}
 	ret = SUCCEED;
 out:
-	zbx_vc_value_vector_destroy(&values, item->value_type);
+	zbx_history_record_vector_destroy(&values, item->value_type);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
@@ -1249,13 +1249,13 @@ out:
  ******************************************************************************/
 static int	evaluate_CHANGE(char *value, DB_ITEM *item, const char *function, const char *parameters, time_t now)
 {
-	const char		*__function_name = "evaluate_CHANGE";
-	int			ret = FAIL;
-	zbx_vector_vc_value_t	values;
+	const char			*__function_name = "evaluate_CHANGE";
+	int				ret = FAIL;
+	zbx_vector_history_record_t	values;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	zbx_vc_value_vector_create(&values);
+	zbx_history_record_vector_create(&values);
 
 	if (SUCCEED != zbx_vc_get_value_range(item->itemid, item->value_type, &values, 0, 2, now) ||
 			2 > values.values_num)
@@ -1296,7 +1296,7 @@ static int	evaluate_CHANGE(char *value, DB_ITEM *item, const char *function, con
 
 	ret = SUCCEED;
 out:
-	zbx_vc_value_vector_destroy(&values, item->value_type);
+	zbx_history_record_vector_destroy(&values, item->value_type);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
@@ -1318,13 +1318,13 @@ out:
  ******************************************************************************/
 static int	evaluate_DIFF(char *value, DB_ITEM *item, const char *function, const char *parameters, time_t now)
 {
-	const char		*__function_name = "evaluate_DIFF";
-	int			ret = FAIL;
-	zbx_vector_vc_value_t	values;
+	const char			*__function_name = "evaluate_DIFF";
+	int				ret = FAIL;
+	zbx_vector_history_record_t	values;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	zbx_vc_value_vector_create(&values);
+	zbx_history_record_vector_create(&values);
 
 	if (SUCCEED != zbx_vc_get_value_range(item->itemid, item->value_type, &values, 0, 2, now) ||
 			2 > values.values_num)
@@ -1365,7 +1365,7 @@ static int	evaluate_DIFF(char *value, DB_ITEM *item, const char *function, const
 
 	ret = SUCCEED;
 out:
-	zbx_vc_value_vector_destroy(&values, item->value_type);
+	zbx_history_record_vector_destroy(&values, item->value_type);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
@@ -1409,18 +1409,18 @@ static int	evaluate_STR_one(int func, ZBX_REGEXP *regexps, int regexps_num, cons
 
 static int	evaluate_STR(char *value, DB_ITEM *item, const char *function, const char *parameters, time_t now)
 {
-	const char		*__function_name = "evaluate_STR";
-	DB_RESULT		result;
-	DB_ROW			row;
-	char			*arg1 = NULL, *arg1_esc;
-	int			arg2, flag, func, found = 0, i, ret = FAIL, seconds = 0, nvalues = 0;
-	ZBX_REGEXP		*regexps = NULL;
-	int			regexps_alloc = 0, regexps_num = 0;
-	zbx_vector_vc_value_t	values;
+	const char			*__function_name = "evaluate_STR";
+	DB_RESULT			result;
+	DB_ROW				row;
+	char				*arg1 = NULL, *arg1_esc;
+	int				arg2, flag, func, found = 0, i, ret = FAIL, seconds = 0, nvalues = 0;
+	ZBX_REGEXP			*regexps = NULL;
+	int				regexps_alloc = 0, regexps_num = 0;
+	zbx_vector_history_record_t	values;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	zbx_vc_value_vector_create(&values);
+	zbx_history_record_vector_create(&values);
 
 	if (ITEM_VALUE_TYPE_STR != item->value_type && ITEM_VALUE_TYPE_TEXT != item->value_type &&
 			ITEM_VALUE_TYPE_LOG != item->value_type)
@@ -1508,7 +1508,7 @@ static int	evaluate_STR(char *value, DB_ITEM *item, const char *function, const 
 	zbx_snprintf(value, MAX_BUFFER_LEN, "%d", found);
 	ret = SUCCEED;
 out:
-	zbx_vc_value_vector_destroy(&values, item->value_type);
+	zbx_history_record_vector_destroy(&values, item->value_type);
 
 	clean_regexps_ex(regexps, &regexps_num);
 	zbx_free(regexps);
@@ -1575,14 +1575,14 @@ clean:
  ******************************************************************************/
 static int	evaluate_FUZZYTIME(char *value, DB_ITEM *item, const char *function, const char *parameters, time_t now)
 {
-	const char		*__function_name = "evaluate_FUZZYTIME";
-	int			arg1, flag, fuzlow, fuzhig, ret = FAIL;
-	zbx_vector_vc_value_t	values;
-	history_value_t		*lastvalue;
+	const char			*__function_name = "evaluate_FUZZYTIME";
+	int				arg1, flag, fuzlow, fuzhig, ret = FAIL;
+	zbx_vector_history_record_t	values;
+	history_value_t			*lastvalue;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	zbx_vc_value_vector_create(&values);
+	zbx_history_record_vector_create(&values);
 
 	if (ITEM_VALUE_TYPE_FLOAT != item->value_type && ITEM_VALUE_TYPE_UINT64 != item->value_type)
 		goto out;
@@ -1622,7 +1622,7 @@ static int	evaluate_FUZZYTIME(char *value, DB_ITEM *item, const char *function, 
 
 	ret = SUCCEED;
 out:
-	zbx_vc_value_vector_destroy(&values, item->value_type);
+	zbx_history_record_vector_destroy(&values, item->value_type);
 
 	return ret;
 }
