@@ -115,7 +115,9 @@ if (isset($_REQUEST['save'])) {
 	}
 
 	$result = DBend($proxyIds);
+
 	show_messages($result, $msgOk, $msgFail);
+	clearCookies($result);
 
 	if ($result) {
 		add_audit($action, AUDIT_RESOURCE_PROXY, '['.$_REQUEST['host'].'] ['.reset($proxyIds['proxyids']).']');
@@ -132,6 +134,7 @@ elseif (isset($_REQUEST['delete'])) {
 	}
 
 	show_messages($result, _('Proxy deleted'), _('Cannot delete proxy'));
+	clearCookies($result);
 
 	unset($_REQUEST['delete']);
 }
@@ -170,6 +173,7 @@ elseif (str_in_array($_REQUEST['go'], array('activate', 'disable')) && isset($_R
 	$goResult = DBend($goResult && $hosts);
 
 	show_messages($goResult, _('Host status updated'), null);
+	clearCookies($goResult);
 }
 elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['hosts'])) {
 	DBstart();
@@ -178,12 +182,7 @@ elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['hosts'])) {
 	$goResult = DBend($goResult);
 
 	show_messages($goResult, _('Proxy deleted'), _('Cannot delete proxy'));
-}
-
-if ($_REQUEST['go'] != 'none' && !empty($goResult)) {
-	$url = new CUrl();
-	$path = $url->getPath();
-	insert_js('cookie.eraseArray("'.$path.'")');
+	clearCookies($goResult);
 }
 
 /*

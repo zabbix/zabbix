@@ -337,7 +337,7 @@ elseif (isset($_REQUEST['go']) && $_REQUEST['go'] == 'massupdate' && isset($_REQ
 		}
 
 		// add new host groups
-		if ($existGroups && (!isset($visible['groups']) || !isset($replaceHostGroups))) {
+		if (isset($existGroups) && (!isset($visible['groups']) || !isset($replaceHostGroups))) {
 			$add['groups'] = $existGroups;
 		}
 
@@ -354,12 +354,9 @@ elseif (isset($_REQUEST['go']) && $_REQUEST['go'] == 'massupdate' && isset($_REQ
 		DBend(true);
 
 		show_message(_('Hosts updated'));
+		clearCookies(true);
 
 		unset($_REQUEST['massupdate'], $_REQUEST['form'], $_REQUEST['hosts']);
-
-		$url = new CUrl();
-		$path = $url->getPath();
-		insert_js('cookie.eraseArray("'.$path.'")');
 	}
 	catch (Exception $e) {
 		DBend(false);
@@ -567,6 +564,7 @@ elseif (isset($_REQUEST['save'])) {
 		$result = DBend(true);
 
 		show_messages($result, $msgOk, $msgFail);
+		clearCookies($result);
 
 		unset($_REQUEST['form'], $_REQUEST['hostid']);
 	}
@@ -588,27 +586,20 @@ elseif (isset($_REQUEST['delete']) && isset($_REQUEST['hostid'])) {
 	if ($result) {
 		unset($_REQUEST['form'], $_REQUEST['hostid']);
 	}
+
 	unset($_REQUEST['delete']);
-}
-elseif (isset($_REQUEST['chstatus']) && isset($_REQUEST['hostid'])) {
-	DBstart();
-
-	$result = updateHostStatus($_REQUEST['hostid'], $_REQUEST['chstatus']);
-	$result = DBend($result);
-
-	show_messages($result, _('Host status updated'), _('Cannot update host status'));
-
-	unset($_REQUEST['chstatus'], $_REQUEST['hostid']);
+	clearCookies($result);
 }
 elseif ($_REQUEST['go'] == 'delete') {
 	$hostIds = get_request('hosts', array());
 
 	DBstart();
 
-	$go_result = API::Host()->delete($hostIds);
-	$go_result = DBend($go_result);
+	$goResult = API::Host()->delete($hostIds);
+	$goResult = DBend($goResult);
 
-	show_messages($go_result, _('Host deleted'), _('Cannot delete host'));
+	show_messages($goResult, _('Host deleted'), _('Cannot delete host'));
+	clearCookies($goResult);
 }
 elseif (str_in_array($_REQUEST['go'], array('activate', 'disable'))) {
 	$status = ($_REQUEST['go'] == 'activate') ? HOST_STATUS_MONITORED : HOST_STATUS_NOT_MONITORED;
@@ -617,16 +608,11 @@ elseif (str_in_array($_REQUEST['go'], array('activate', 'disable'))) {
 
 	DBstart();
 
-	$go_result = updateHostStatus($act_hosts, $status);
-	$go_result = DBend($go_result);
+	$goResult = updateHostStatus($act_hosts, $status);
+	$goResult = DBend($goResult);
 
-	show_messages($go_result, _('Host status updated'), _('Cannot update host status'));
-}
-
-if ($_REQUEST['go'] != 'none' && isset($go_result) && $go_result) {
-	$url = new CUrl();
-	$path = $url->getPath();
-	insert_js('cookie.eraseArray("'.$path.'")');
+	show_messages($goResult, _('Host status updated'), _('Cannot update host status'));
+	clearCookies($goResult);
 }
 
 /*
@@ -750,7 +736,9 @@ else {
 		array(bold(_('Port').NAME_DELIMITER), new CTextBox('filter_port', $_REQUEST['filter_port'], 20))
 	));
 
-	$filter = new CButton('filter', _('Filter'), "javascript: create_var('zbx_filter', 'filter_set', '1', true);");
+	$filter = new CButton('filter', _('Filter'),
+		"javascript: create_var('zbx_filter', 'filter_set', '1', true); chkbxRange.clearSelectedOnFilterChange();"
+	);
 	$filter->useJQueryStyle('main');
 
 	$reset = new CButton('reset', _('Reset'), "javascript: clearAllForm('zbx_filter');");
@@ -983,6 +971,7 @@ else {
 	$goBox->addItem($goOption);
 	$goButton = new CSubmit('goButton', _('Go').' (0)');
 	$goButton->setAttribute('id', 'goButton');
+
 	zbx_add_post_js('chkbxRange.pageGoName = "hosts";');
 
 	$form->addItem(array($paging, $table, $paging, get_table_header(array($goBox, $goButton))));

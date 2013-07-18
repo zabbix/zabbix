@@ -507,7 +507,6 @@ char	*DBdyn_escape_string_len(const char *src, size_t max_src_len);
 char	*DBdyn_escape_like_pattern(const char *src);
 
 void    DBget_item_from_db(DB_ITEM *item, DB_ROW row);
-void	DBfree_item_from_db(DB_ITEM *item);
 
 zbx_uint64_t	DBadd_host(char *server, int port, int status, int useip, char *ip, int disable_until, int available);
 int	DBhost_exists(char *server);
@@ -560,17 +559,6 @@ zbx_uint64_t	DBadd_interface(zbx_uint64_t hostid, unsigned char type,
 
 const char	*DBget_inventory_field(unsigned char inventory_link);
 unsigned short	DBget_inventory_field_len(unsigned char inventory_link);
-
-#define ZBX_DB_GET_HIST_MIN	0
-#define ZBX_DB_GET_HIST_AVG	1
-#define ZBX_DB_GET_HIST_MAX	2
-#define ZBX_DB_GET_HIST_SUM	3
-#define ZBX_DB_GET_HIST_COUNT	4
-#define ZBX_DB_GET_HIST_DELTA	5
-#define ZBX_DB_GET_HIST_VALUE	6
-char	**DBget_history(zbx_uint64_t itemid, unsigned char value_type, int function, int clock_from, int clock_to,
-		zbx_timespec_t *ts, const char *field_name, int last_n);
-void	DBfree_history(char **value);
 
 int	DBtxn_status();
 int	DBtxn_ongoing();
