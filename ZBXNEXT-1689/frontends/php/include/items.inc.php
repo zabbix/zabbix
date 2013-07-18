@@ -851,7 +851,7 @@ function get_item_data_overview_cells(&$table_row, &$ithosts, $hostname) {
 				: null;
 		}
 
-		$value = formatHistoryValue($item['value'], $item);
+		$value = ($item['value'] !== null) ? formatHistoryValue($item['value'], $item) : UNKNOWN_VALUE;
 
 		$it_ov_menu = array(
 			array(_('Values'), null, null, array('outer' => array('pum_oheader'), 'inner' => array('pum_iheader'))),
