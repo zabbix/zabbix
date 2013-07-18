@@ -801,13 +801,13 @@ jQuery(function($) {
 	function resizeSelectedText(selectedItem, text, obj, options) {
 		// settings
 		var settingLineHeight = 15,
-			settingArrowSpace = options.disabled ? 15 : 30;
+			settingArrowSpace = options.disabled ? 20 : 30,
+			settingPaddings = 3;
 
 		// calculate
-		var maxWidth = $('.selected ul', obj).width() - settingArrowSpace,
-			textWidth = text.width();
+		var maxWidth = $('.selected ul', obj).width() - settingArrowSpace;
 
-		if (textWidth > maxWidth || text.height() > settingLineHeight) {
+		if (text.width() > maxWidth || text.height() > settingLineHeight) {
 			while (text.width() > maxWidth || text.height() > settingLineHeight) {
 				var t = text.text();
 
@@ -816,7 +816,7 @@ jQuery(function($) {
 
 			text.text(text.text() + '...');
 
-			selectedItem.css('width', $('.selected ul', obj).width() - 3);
+			selectedItem.css('width', $('.selected ul', obj).width() - settingPaddings);
 		}
 		else {
 			if (!options.disabled) {
