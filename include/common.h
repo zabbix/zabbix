@@ -259,15 +259,15 @@ typedef struct
 	char	*source;
 	char	*value;
 }
-zbx_history_log_t;
+zbx_log_value_t;
 
 typedef union
 {
-	double			dbl;
-	zbx_uint64_t		ui64;
-	char			*str;
-	char			*err;
-	zbx_history_log_t	*log;
+	double		dbl;
+	zbx_uint64_t	ui64;
+	char		*str;
+	char		*err;
+	zbx_log_value_t	*log;
 }
 history_value_t;
 
