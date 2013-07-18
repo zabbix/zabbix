@@ -985,6 +985,12 @@ function change_flicker_state(divid) {
 	if (typeof(moveSBoxes) != 'undefined') {
 		moveSBoxes();
 	}
+
+	if (typeof(flickerResizeMultiselect) == 'undefined' && filter_state == 1) {
+		flickerResizeMultiselect = true;
+
+		jQuery('#' + divid).multiSelect.resize();
+	}
 }
 
 function changeHatStateUI(icon, divid) {

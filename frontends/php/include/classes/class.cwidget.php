@@ -131,7 +131,7 @@ class CWidget {
 
 			$thin_tab = $this->createFlicker($icons_row);
 			$thin_tab->attr('id', 'filter_icon');
-			$thin_tab->addAction('onclick', "javascript: change_flicker_state('".$flicker_domid."'); javascript: jQuery('#flicker_".$this->bodyId."').multiSelect.resize();");
+			$thin_tab->addAction('onclick', "javascript: change_flicker_state('".$flicker_domid."');");
 
 			$flicker_tab->addRow($thin_tab, 'textcolorstyles pointer');
 			$flicker_tab->addRow($div);

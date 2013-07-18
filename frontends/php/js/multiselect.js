@@ -723,7 +723,8 @@ jQuery(function($) {
 
 	function resizeSelected(obj, values, options) {
 		// settings
-		var settingTopPaddings = IE8 ? 1 : 2,
+		var settingTopPaddingsEmpty = IE8 ? 1 : 0,
+			settingTopPaddingsExist = IE8 ? 1 : 2,
 			settingTopPaddingsInit = 3,
 			settingRightPaddings = 4,
 			settingMinimumWidth = 50,
@@ -739,12 +740,12 @@ jQuery(function($) {
 			var lastItem = $('.selected li:last-child', obj),
 				position = lastItem.position();
 
-			top = position.top + settingTopPaddings;
+			top = position.top + settingTopPaddingsExist;
 			left = position.left + lastItem.width();
 			height = $('.selected li:last-child', obj).height();
 		}
 		else {
-			top = settingTopPaddingsInit + settingTopPaddings;
+			top = settingTopPaddingsInit + settingTopPaddingsEmpty;
 			height = 0;
 		}
 
