@@ -9,6 +9,7 @@ A......... [ZBX-6407] improved data retrieval performance for CTrigger get() wit
 A.F....... [ZBX-1357] updated Brazilian Portuguese, Chinese (China), Latvian, Spanish and Turkish translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+........S. [ZBX-6801] fixed processing of host availability data received from proxy (wiper)
 ....I..... [ZBX-6637] added -m64 compilation flag for Solaris to be able to understand all attributes of 64-bit processes (igors)
 ..F....... [ZBX-6761] fixed dbConditionInt() performance (Eduard)
 ........S. [ZBX-6681] fixed bug when one time maintenance period was ignored if it started before maintenance active time (wiper)
