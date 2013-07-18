@@ -99,6 +99,7 @@ $link = $link->getUrl();
 $triggersTable = new CTableInfo(_('No triggers defined.'));
 $triggersTable->setHeader(array(
 	new CCheckBox('all_triggers', null, "checkAll('".$triggersForm->getName()."', 'all_triggers', 'g_triggerid');"),
+	$this->data['displayNodes'] ? _('Node') : null,
 	make_sorting_header(_('Severity'), 'priority', $link),
 	empty($this->data['hostid']) ? _('Host') : null,
 	make_sorting_header(_('Name'), 'description', $link),
@@ -246,6 +247,7 @@ foreach ($this->data['triggers'] as $tnum => $trigger) {
 
 	$triggersTable->addRow(array(
 		$checkBox,
+		$this->data['displayNodes'] ? $trigger['nodename'] : null,
 		getSeverityCell($trigger['priority']),
 		$hosts,
 		$description,
