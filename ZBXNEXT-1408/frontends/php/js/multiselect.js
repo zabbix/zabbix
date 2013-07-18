@@ -798,7 +798,7 @@ jQuery(function($) {
 		});
 	}
 
-	function resizeSelectedText(selectedItem, text, obj, options) {
+	function resizeSelectedText(item, text, obj, options) {
 		// settings
 		var settingLineHeight = 15,
 			settingArrowSpace = options.disabled ? 22 : 32,
@@ -825,10 +825,10 @@ jQuery(function($) {
 
 			text.text(text.text() + '...');
 
-			selectedItem.css('width', $('.selected ul', obj).width() - settingPaddings);
+			item.css('width', $('.selected ul', obj).width() - settingPaddings);
 		}
 		else {
-			selectedItem.css('width', '');
+			item.css('width', '');
 
 			if (!options.disabled) {
 				text.css('padding-right', 16);
@@ -838,16 +838,17 @@ jQuery(function($) {
 
 	function resizeAllSelectedTexts(obj, options, values) {
 		$('.selected li', obj).each(function() {
-			var li = $(this),
-				text = $(li.children()[0]),
-				t = empty(values.selected[li.data('id')].prefix)
-					? values.selected[li.data('id')].name
-					: values.selected[li.data('id')].prefix + values.selected[li.data('id')].name;
+			var item = $(this),
+				id = item.data('id'),
+				text = $(item.children()[0]),
+				t = empty(values.selected[id].prefix)
+					? values.selected[id].name
+					: values.selected[id].prefix + values.selected[id].name;
 
 			// rewrite previous text to original
 			text.text(t);
 
-			resizeSelectedText(li, text, obj, options);
+			resizeSelectedText(item, text, obj, options);
 		});
 	}
 
