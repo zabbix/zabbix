@@ -802,16 +802,25 @@ jQuery(function($) {
 		// settings
 		var settingLineHeight = 15,
 			settingArrowSpace = options.disabled ? 22 : 32,
-			settingPaddings = 3;
+			settingPaddings = 3,
+			settingTextMax = 510;
 
 		// calculate
 		var maxWidth = $('.selected ul', obj).width() - settingArrowSpace;
 
 		if (text.width() > maxWidth || text.height() > settingLineHeight) {
+			var i = 0;
+
 			while (text.width() > maxWidth || text.height() > settingLineHeight) {
 				var t = text.text();
 
 				text.text(t.substring(0, t.length - 1));
+
+				i++;
+
+				if (i > settingTextMax) {
+					break;
+				}
 			}
 
 			text.text(text.text() + '...');
@@ -819,6 +828,8 @@ jQuery(function($) {
 			selectedItem.css('width', $('.selected ul', obj).width() - settingPaddings);
 		}
 		else {
+			selectedItem.css('width', '');
+
 			if (!options.disabled) {
 				text.css('padding-right', 16);
 			}
@@ -828,9 +839,13 @@ jQuery(function($) {
 	function resizeAllSelectedTexts(obj, options, values) {
 		$('.selected li', obj).each(function() {
 			var li = $(this),
-				text = $(li.children()[0]);
+				text = $(li.children()[0]),
+				t = empty(values.selected[li.data('id')].prefix)
+					? values.selected[li.data('id')].name
+					: values.selected[li.data('id')].prefix + values.selected[li.data('id')].name;
 
-			text.text(values.selected[li.data('id')]['name']);
+			// rewrite previous text to original
+			text.text(t);
 
 			resizeSelectedText(li, text, obj, options);
 		});
