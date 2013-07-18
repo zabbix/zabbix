@@ -185,6 +185,10 @@ else {
 /*
  * Actions
  */
+if (!isset($_REQUEST['add_template'])) {
+	unset($_REQUEST['templates']);
+}
+
 if (isset($_REQUEST['exist_templates'])) {
 	$_REQUEST['templates'] = (isset($_REQUEST['templates']) && isset($_REQUEST['add_template']))
 		? array_merge($_REQUEST['exist_templates'], $_REQUEST['templates'])
