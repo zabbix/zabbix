@@ -1246,6 +1246,13 @@ void	process_proxyconfig(struct zbx_json_parse *jp_data)
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
+#define CHECK_ARRAY_SIZE(array, alloc, num)				\
+	if (num == alloc)						\
+	{								\
+		alloc = (0 == alloc ? 8 : alloc * 3 / 2);		\
+		array = zbx_realloc(array, alloc * sizeof(*array));	\
+	}
+
 int	get_host_availability_data(struct zbx_json *j)
 {
 	typedef struct
@@ -1274,7 +1281,9 @@ int	get_host_availability_data(struct zbx_json *j)
 	result = DBselect(
 			"select hostid,available,error,snmp_available,snmp_error,"
 				"ipmi_available,ipmi_error,jmx_available,jmx_error"
-			" from hosts");
+			" from hosts"
+			" where status in (%d,%d)",
+			HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED);
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -1286,11 +1295,7 @@ int	get_host_availability_data(struct zbx_json *j)
 
 		if (index == ha_num || ha[index].hostid != hostid)
 		{
-			if (ha_num == ha_alloc)
-			{
-				ha_alloc += 8;
-				ha = zbx_realloc(ha, sizeof(zbx_host_availability_t) * ha_alloc);
-			}
+			CHECK_ARRAY_SIZE(ha, ha_alloc, ha_num);
 
 			if (0 != (sz = sizeof(zbx_host_availability_t) * (ha_num - index)))
 				memmove(&ha[index + 1], &ha[index], sz);
@@ -1393,13 +1398,6 @@ int	get_host_availability_data(struct zbx_json *j)
 	return ret;
 }
 
-#define INC_ARRAY_INDEX(array, size, index)				\
-	if (++(index) == size)						\
-	{								\
-		size = size * 3 / 2 + 1;				\
-		array = zbx_realloc(array, size * sizeof(*array));	\
-	}
-
 /******************************************************************************
  *                                                                            *
  * Function: process_host_availability                                        *
@@ -1417,7 +1415,7 @@ void	process_host_availability(struct zbx_json_parse *jp)
 	const char		*p = NULL;
 	char			tmp[HOST_ERROR_LEN_MAX], *sql = NULL, *error_esc;
 	size_t			sql_alloc = 4 * ZBX_KIBIBYTE, sql_offset = 0, tmp_offset;
-	int			availability_alloc = 32, availability_num = 0, availability_last = 0;
+	int			availability_alloc = 0, availability_num = 0, availability_last = 0;
 	zbx_host_availability_t	*availability = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
@@ -1432,7 +1430,6 @@ void	process_host_availability(struct zbx_json_parse *jp)
 	if (SUCCEED == zbx_json_object_is_empty(&jp_data))
 		goto out;
 
-	availability = zbx_malloc(availability, availability_alloc * sizeof(*availability));
 	sql = zbx_malloc(sql, sql_alloc);
 
 	DBbegin();
@@ -1461,6 +1458,8 @@ void	process_host_availability(struct zbx_json_parse *jp)
 
 		if (SUCCEED == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_AVAILABLE, tmp, sizeof(tmp)))
 		{
+			CHECK_ARRAY_SIZE(availability, availability_alloc, availability_num);
+
 			availability[availability_num].hostid = hostid;
 			availability[availability_num].type = ITEM_TYPE_ZABBIX;
 			availability[availability_num].available = atoi(tmp);
@@ -1470,11 +1469,13 @@ void	process_host_availability(struct zbx_json_parse *jp)
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "available=%d,",
 					availability[availability_num].available);
 
-			INC_ARRAY_INDEX(availability, availability_alloc, availability_num);
+			availability_num++;
 		}
 
 		if (SUCCEED == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_SNMP_AVAILABLE, tmp, sizeof(tmp)))
 		{
+			CHECK_ARRAY_SIZE(availability, availability_alloc, availability_num);
+
 			availability[availability_num].hostid = hostid;
 			availability[availability_num].type = ITEM_TYPE_SNMPv1;
 			availability[availability_num].available = atoi(tmp);
@@ -1484,11 +1485,13 @@ void	process_host_availability(struct zbx_json_parse *jp)
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "snmp_available=%d,",
 					availability[availability_num].available);
 
-			INC_ARRAY_INDEX(availability, availability_alloc, availability_num);
+			availability_num++;
 		}
 
 		if (SUCCEED == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_IPMI_AVAILABLE, tmp, sizeof(tmp)))
 		{
+			CHECK_ARRAY_SIZE(availability, availability_alloc, availability_num);
+
 			availability[availability_num].hostid = hostid;
 			availability[availability_num].type = ITEM_TYPE_IPMI;
 			availability[availability_num].available = atoi(tmp);
@@ -1498,11 +1501,13 @@ void	process_host_availability(struct zbx_json_parse *jp)
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "ipmi_available=%d,",
 					availability[availability_num].available);
 
-			INC_ARRAY_INDEX(availability, availability_alloc, availability_num);
+			availability_num++;
 		}
 
 		if (SUCCEED == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_JMX_AVAILABLE, tmp, sizeof(tmp)))
 		{
+			CHECK_ARRAY_SIZE(availability, availability_alloc, availability_num);
+
 			availability[availability_num].hostid = hostid;
 			availability[availability_num].type = ITEM_TYPE_JMX;
 			availability[availability_num].available = atoi(tmp);
@@ -1512,7 +1517,7 @@ void	process_host_availability(struct zbx_json_parse *jp)
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "jmx_available=%d,",
 					availability[availability_num].available);
 
-			INC_ARRAY_INDEX(availability, availability_alloc, availability_num);
+			availability_num++;
 		}
 
 		if (SUCCEED == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_ERROR, tmp, sizeof(tmp)))
@@ -1564,7 +1569,6 @@ void	process_host_availability(struct zbx_json_parse *jp)
 	DBcommit();
 
 	DCconfig_update_host_availability(availability, availability_num);
-
 out:
 	zbx_free(availability);
 	zbx_free(sql);
