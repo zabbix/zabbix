@@ -915,7 +915,7 @@ int	zbx_json_value_by_name_dyn(const struct zbx_json_parse *jp, const char *name
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
-int	zbx_json_brackets_open(const const char *p, struct zbx_json_parse *jp)
+int	zbx_json_brackets_open(const char *p, struct zbx_json_parse *jp)
 {
 	if (NULL == (jp->end = __zbx_json_rbracket(p)))
 	{

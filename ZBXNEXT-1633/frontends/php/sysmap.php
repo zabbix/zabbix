@@ -187,7 +187,8 @@ $icons = DBselect(
 while ($icon = DBfetch($icons)) {
 	$data['iconList'][] = array('imageid' => $icon['imageid'], 'name' => $icon['name']);
 }
-order_result($data['iconList'], 'name');
+CArrayHelper::sort($data['iconList'], array('name'));
+$data['iconList'] = array_values($data['iconList']);
 
 $data['sysmap']['selements'] = zbx_toHash($data['sysmap']['selements'], 'selementid');
 $data['sysmap']['links'] = zbx_toHash($data['sysmap']['links'], 'linkid');

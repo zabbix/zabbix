@@ -155,6 +155,7 @@ elseif (isset($_REQUEST['save'])) {
 
 	if ($result) {
 		unset($_REQUEST['form']);
+		clearCookies($result);
 	}
 	unset($_REQUEST['save']);
 }
@@ -165,13 +166,15 @@ elseif (isset($_REQUEST['delete']) && isset($_REQUEST['groupid'])) {
 
 	if ($result) {
 		unset($_REQUEST['form']);
+		clearCookies($result);
 	}
 	unset($_REQUEST['delete']);
 }
 elseif ($_REQUEST['go'] == 'delete') {
-	$go_result = API::HostGroup()->delete(get_request('groups', array()));
+	$goResult = API::HostGroup()->delete(get_request('groups', array()));
 
-	show_messages($go_result, _('Group deleted'), _('Cannot delete group'));
+	show_messages($goResult, _('Group deleted'), _('Cannot delete group'));
+	clearCookies($goResult);
 }
 elseif (str_in_array($_REQUEST['go'], array('activate', 'disable'))) {
 	$status = ($_REQUEST['go'] == 'activate') ? HOST_STATUS_MONITORED : HOST_STATUS_NOT_MONITORED;
@@ -188,12 +191,12 @@ elseif (str_in_array($_REQUEST['go'], array('activate', 'disable'))) {
 		));
 
 		if ($hosts) {
-			$go_result = API::Host()->massUpdate(array(
+			$goResult = API::Host()->massUpdate(array(
 				'hosts' => $hosts,
 				'status' => $status
 			));
 
-			if ($go_result) {
+			if ($goResult) {
 				foreach ($hosts as $host) {
 					add_audit_ext(
 						AUDIT_ACTION_UPDATE,
@@ -208,18 +211,14 @@ elseif (str_in_array($_REQUEST['go'], array('activate', 'disable'))) {
 			}
 		}
 		else {
-			$go_result = true;
+			$goResult = true;
 		}
 
-		$go_result = DBend($go_result);
+		$goResult = DBend($goResult);
 
-		show_messages($go_result, _('Host status updated'), _('Cannot update host'));
+		show_messages($goResult, _('Host status updated'), _('Cannot update host'));
+		clearCookies($goResult);
 	}
-}
-if ($_REQUEST['go'] != 'none' && isset($go_result) && $go_result) {
-	$url = new CUrl();
-	$path = $url->getPath();
-	insert_js('cookie.eraseArray("'.$path.'")');
 }
 
 /*

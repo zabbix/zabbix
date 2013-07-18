@@ -117,7 +117,7 @@ class FrontendSetup {
 			'name' => _('PHP option memory_limit'),
 			'current' => $current,
 			'required' => mem2str(self::MIN_PHP_MEMORY_LIMIT),
-			'result' => str2mem($current) >= self::MIN_PHP_MEMORY_LIMIT,
+			'result' => $current == '-1' || str2mem($current) >= self::MIN_PHP_MEMORY_LIMIT,
 			'error' => _s('Minimum required PHP memory limit is %s (configuration option "memory_limit")', mem2str(self::MIN_PHP_MEMORY_LIMIT))
 		);
 

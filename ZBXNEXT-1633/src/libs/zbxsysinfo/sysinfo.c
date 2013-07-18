@@ -40,6 +40,10 @@
 #	include "specsysinfo.h"
 #endif
 
+#ifdef WITH_HOSTNAME_METRIC
+extern ZBX_METRIC      parameter_hostname;
+#endif
+
 static ZBX_METRIC	*commands = NULL;
 
 /******************************************************************************
@@ -153,6 +157,14 @@ void	init_metrics()
 			zabbix_log(LOG_LEVEL_CRIT, "cannot add item key: %s", error);
 			exit(EXIT_FAILURE);
 		}
+	}
+#endif
+
+#ifdef WITH_HOSTNAME_METRIC
+	if (SUCCEED != add_metric(&parameter_hostname, error, sizeof(error)))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot add item key: %s", error);
+		exit(EXIT_FAILURE);
 	}
 #endif
 }

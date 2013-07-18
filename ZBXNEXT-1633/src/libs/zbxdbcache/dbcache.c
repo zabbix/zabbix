@@ -1836,6 +1836,9 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 						log.source = history[i].value.str;
 						pvalue = &value;
 						break;
+					default:
+						THIS_SHOULD_NEVER_HAPPEN;
+						continue;
 				}
 				zbx_vc_add_value(history[i].itemid, history[i].value_type, &history[i].ts, pvalue);
 			}
