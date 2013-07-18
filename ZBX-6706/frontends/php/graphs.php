@@ -590,6 +590,13 @@ else {
 		$data['graphs'][$gnum]['graphtype'] = graphType($graph['graphtype']);
 	}
 
+	// nodes
+	if ($data['displayNodes'] = is_array(get_current_nodeid())) {
+		foreach ($data['graphs'] as $key => $graph) {
+			$data['graphs'][$key]['nodename'] = get_node_name_by_elid($graph['graphid'], true);
+		}
+	}
+
 	order_result($data['graphs'], $sortfield, $sortorder);
 
 	// render view
