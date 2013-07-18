@@ -345,9 +345,12 @@ static zbx_uint64_t	add_discovered_host(DB_EVENT *event)
 					"select hostid,proxy_hostid"
 					" from hosts"
 					" where host='%s'"
+					" and status in (%d,%d)"
 						DB_NODE
 					" order by hostid",
 					host_esc,
+					HOST_STATUS_MONITORED,
+					HOST_STATUS_NOT_MONITORED,
 					DBnode_local("hostid"));
 
 			result2 = DBselectN(sql, 1);
