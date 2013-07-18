@@ -796,89 +796,6 @@ int	DBget_items_unsupported_count()
 	return count;
 }
 
-int	DBget_queue_count(int from, int to)
-{
-	const char	*__function_name = "DBget_queue_count";
-	int		count = 0, now;
-	DB_RESULT	result;
-	DB_ROW		row;
-	zbx_uint64_t	interfaceid, itemid, proxy_hostid;
-	int		item_type, delay, effective_delay, nextcheck;
-	char		*delay_flex;
-	time_t		lastclock;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s(): from [%d] to [%d]", __function_name, from, to);
-
-	now = time(NULL);
-
-	result = DBselect(
-			"select i.itemid,i.type,i.delay,i.delay_flex,i.lastclock,i.interfaceid,h.proxy_hostid"
-			" from items i,hosts h"
-			" where i.hostid=h.hostid"
-				" and h.status=%d"
-				" and i.status=%d"
-				" and i.state=%d"
-				" and i.value_type<>%d"
-				" and ("
-					"i.lastclock is not null"
-					" and i.lastclock<%d"
-					")"
-				" and ("
-					"i.type in (%d,%d,%d,%d,%d,%d,%d,%d,%d)"
-					" or (h.available<>%d and i.type=%d)"
-					" or (h.snmp_available<>%d and i.type in (%d,%d,%d))"
-					" or (h.ipmi_available<>%d and i.type=%d)"
-					" or (h.jmx_available<>%d and i.type=%d)"
-					")"
-				" and i.flags<>%d"
-				ZBX_SQL_NODE,
-			HOST_STATUS_MONITORED,
-			ITEM_STATUS_ACTIVE,
-			ITEM_STATE_NORMAL,
-			ITEM_VALUE_TYPE_LOG,
-			now - from,
-				ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_SSH, ITEM_TYPE_TELNET,
-				ITEM_TYPE_SIMPLE, ITEM_TYPE_INTERNAL, ITEM_TYPE_DB_MONITOR,
-				ITEM_TYPE_AGGREGATE, ITEM_TYPE_EXTERNAL, ITEM_TYPE_CALCULATED,
-			HOST_AVAILABLE_FALSE,
-				ITEM_TYPE_ZABBIX,
-			HOST_AVAILABLE_FALSE,
-				ITEM_TYPE_SNMPv1, ITEM_TYPE_SNMPv2c, ITEM_TYPE_SNMPv3,
-			HOST_AVAILABLE_FALSE,
-				ITEM_TYPE_IPMI,
-			HOST_AVAILABLE_FALSE,
-				ITEM_TYPE_JMX,
-			ZBX_FLAG_DISCOVERY_CHILD,
-			DBand_node_local("i.itemid"));
-
-	while (NULL != (row = DBfetch(result)))
-	{
-		ZBX_STR2UINT64(itemid, row[0]);
-		item_type	= atoi(row[1]);
-		delay		= atoi(row[2]);
-		delay_flex	= row[3];
-		ZBX_DBROW2UINT64(interfaceid, row[5]);
-		ZBX_DBROW2UINT64(proxy_hostid, row[6]);
-
-		if (FAIL == (lastclock = DCget_item_lastclock(itemid)))
-			lastclock = (time_t)atoi(row[4]);
-
-		nextcheck = calculate_item_nextcheck(interfaceid, itemid, item_type,
-				delay, delay_flex, lastclock, &effective_delay);
-
-		if (0 != proxy_hostid)
-			nextcheck = lastclock + effective_delay;
-
-		if ((-1 == from || from <= now - nextcheck) && (-1 == to || now - nextcheck <= to))
-			count++;
-	}
-	DBfree_result(result);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): %d", __function_name, count);
-
-	return count;
-}
-
 double	DBget_requiredperformance()
 {
 	const char	*__function_name = "DBget_requiredperformance";
@@ -1211,54 +1128,19 @@ void	DBget_item_from_db(DB_ITEM *item, DB_ROW row)
 	item->host_name = row[2];
 	item->type = atoi(row[3]);
 	item->history = atoi(row[4]);
-	item->trends = atoi(row[17]);
-	item->value_type = atoi(row[8]);
+	item->trends = atoi(row[13]);
+	item->value_type = atoi(row[6]);
 
-	if (SUCCEED != DBis_null(row[5]))
-		item->lastvalue[0] = row[5];
-	else
-		item->lastvalue[0] = NULL;
+	ZBX_STR2UINT64(item->hostid, row[5]);
+	item->delta = atoi(row[7]);
 
-	if (SUCCEED != DBis_null(row[6]))
-		item->lastvalue[1] = row[6];
-	else
-		item->lastvalue[1] = NULL;
+	item->units = row[8];
+	item->multiplier = atoi(row[9]);
+	item->formula = row[10];
+	item->state = (unsigned char)atoi(row[11]);
+	ZBX_DBROW2UINT64(item->valuemapid, row[12]);
 
-	ZBX_STR2UINT64(item->hostid, row[7]);
-	item->delta = atoi(row[9]);
-
-	if (SUCCEED != DBis_null(row[10]))
-	{
-		item->prevorgvalue_null = 0;
-
-		switch (item->value_type)
-		{
-			case ITEM_VALUE_TYPE_FLOAT:
-				item->prevorgvalue.dbl = atof(row[10]);
-				break;
-			case ITEM_VALUE_TYPE_UINT64:
-				ZBX_STR2UINT64(item->prevorgvalue.ui64, row[10]);
-				break;
-			default:
-				item->prevorgvalue.str = row[10];
-				break;
-		}
-	}
-	else
-		item->prevorgvalue_null = 1;
-
-	if (SUCCEED == DBis_null(row[11]))
-		item->lastclock = 0;
-	else
-		item->lastclock = atoi(row[11]);
-
-	item->units = row[12];
-	item->multiplier = atoi(row[13]);
-	item->formula = row[14];
-	item->state = (unsigned char)atoi(row[15]);
-	ZBX_DBROW2UINT64(item->valuemapid, row[16]);
-
-	item->data_type = atoi(row[18]);
+	item->data_type = atoi(row[14]);
 }
 
 const ZBX_TABLE *DBget_table(const char *tablename)
