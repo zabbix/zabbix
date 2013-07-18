@@ -391,7 +391,7 @@ class CScript extends CZBXAPI {
 		}
 
 		// execute the script
-		$zabbixServer = new CZabbixServer($ZBX_SERVER, $ZBX_SERVER_PORT, ZBX_SCRIPT_TIMEOUT, ZBX_SCRIPT_BYTES_LIMIT);
+		$zabbixServer = new CZabbixServer($ZBX_SERVER, $ZBX_SERVER_PORT, ZBX_SCRIPT_TIMEOUT, ZBX_SOCKET_BYTES_LIMIT);
 		if ($result = $zabbixServer->executeScript($scriptId, $hostId)) {
 			// return the result as the server would
 			return array(

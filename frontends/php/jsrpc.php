@@ -164,7 +164,7 @@ switch ($data['method']) {
 	case 'zabbix.status':
 		$session = Z::getInstance()->getSession();
 		if (!isset($session['serverCheckResult']) || ($session['serverCheckTime'] + SERVER_CHECK_INTERVAL) <= time()) {
-			$zabbixServer = new CZabbixServer($ZBX_SERVER, $ZBX_SERVER_PORT, ZBX_SOCKET_TIMEOUT);
+			$zabbixServer = new CZabbixServer($ZBX_SERVER, $ZBX_SERVER_PORT, ZBX_SOCKET_TIMEOUT, 0);
 			$session['serverCheckResult'] = $zabbixServer->isRunning();
 			$session['serverCheckTime'] = time();
 		}

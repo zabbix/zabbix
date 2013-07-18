@@ -2351,7 +2351,7 @@ function get_status() {
 	);
 
 	// server
-	$zabbixServer = new CZabbixServer($ZBX_SERVER, $ZBX_SERVER_PORT, ZBX_SOCKET_TIMEOUT);
+	$zabbixServer = new CZabbixServer($ZBX_SERVER, $ZBX_SERVER_PORT, ZBX_SOCKET_TIMEOUT, 0);
 	$status['zabbix_server'] = $zabbixServer->isRunning() ? _('Yes') : _('No');
 
 	// triggers

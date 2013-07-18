@@ -42,6 +42,16 @@ class CZabbixServer {
 	const QUEUE_DETAILS = 'details';
 
 	/**
+	 * Response value if the request has been executed successfully.
+	 */
+	const RESPONSE_SUCCESS = 'success';
+
+	/**
+	 * Response value if an error occurred.
+	 */
+	const RESPONSE_FAILED = 'failed';
+
+	/**
 	 * Zabbix server host name.
 	 *
 	 * @var string
@@ -98,7 +108,7 @@ class CZabbixServer {
 	 * @param int $timeout
 	 * @param int $totalBytesLimit
 	 */
-	public function __construct($host, $port, $timeout, $totalBytesLimit = null) {
+	public function __construct($host, $port, $timeout, $totalBytesLimit) {
 		$this->host = $host;
 		$this->port = $port;
 		$this->timeout = $timeout;
@@ -179,7 +189,7 @@ class CZabbixServer {
 
 		// send the command
 		if (fwrite($socket, CJs::encodeJson($params)) === false) {
-			$this->error = _('Error description: can\'t send command, check connection.');
+			$this->error = _s('Cannot send command, check connection with Zabbix server "%1$s".', $this->host);
 
 			return false;
 		}
@@ -197,12 +207,12 @@ class CZabbixServer {
 		while (!feof($socket)) {
 			$i++;
 			if ((time() - $now) >= $this->timeout) {
-				$this->error = _('Error description: defined in "include/defines.inc.php" constant ZBX_SCRIPT_TIMEOUT timeout is reached. You can try to increase this value.');
+				$this->error = _s('Connection timeout of %1$s seconds exceeded when connecting to Zabbix server "%2$s".', $this->timeout, $this->host);
 
 				return false;
 			}
 			elseif ($this->totalBytesLimit && ($i * $readBytesLimit) >= $this->totalBytesLimit) {
-				$this->error = _('Error description: defined in "include/defines.inc.php" constant ZBX_SCRIPT_BYTES_LIMIT read bytes limit is reached. You can try to increase this value.');
+				$this->error = _s('Size of the response received from Zabbix server "%1$s" exceeds the allowed size of %2$s bytes. This value can be increased in the ZBX_SOCKET_BYTES_LIMIT constant in include/defines.inc.php.', $this->host, $this->totalBytesLimit);
 
 				return false;
 			}
@@ -211,30 +221,35 @@ class CZabbixServer {
 				$response .= $out;
 			}
 			else {
-				$this->error = _('Error description: defined in "include/defines.inc.php" constant ZBX_SCRIPT_BYTES_LIMIT read bytes limit is reached. You can try to increase this value.');
+				$this->error = _s('Cannot read the response, check connection with the Zabbix server "%1$s".', $this->host);
 
 				return false;
 			}
 		}
 
+		fclose($socket);
+
 		// check if the response is empty
 		if (!strlen($response)) {
-			$this->error = _('Error description: empty response received.');
+			$this->error = _s('Empty response received from Zabbix server "%1$s".', $this->host);
 
 			return false;
 		}
 
-		fclose($socket);
-
 		$response = CJs::decodeJson($response);
+		if (!$response || !$this->validateResponse($response)) {
+			$this->error = _s('Incorrect response received from Zabbix server "%1$s".', $this->host);
 
-		// script executed successfully
-		if ($response['response'] == 'success') {
+			return false;
+		}
+
+		// request executed successfully
+		if ($response['response'] == self::RESPONSE_SUCCESS) {
 			return $response['data'];
 		}
 		// an error on the server side occurred
 		else {
-			$this->error = _('Error description').':'.$response['info'];
+			$this->error = $response['info'];
 
 			return false;
 		}
@@ -274,13 +289,26 @@ class CZabbixServer {
 						$dErrorMsg = '';
 				}
 
-				$this->error = $dErrorMsg._('Error description').NAME_DELIMITER.$errorMsg;
+				$this->error = $dErrorMsg.$errorMsg;
 			}
 
 			$this->socket = $socket;
 		}
 
 		return $this->socket;
+	}
+
+	/**
+	 * Returns true if the response received from the Zabbix server is valid.
+	 *
+	 * @param array $response
+	 *
+	 * @return bool
+	 */
+	protected function validateResponse(array $response) {
+		return (isset($response['response'])
+			&& ($response['response'] == self::RESPONSE_SUCCESS && isset($response['data'])
+				|| $response['response'] == self::RESPONSE_FAILED && isset($response['info'])));
 	}
 
 }
