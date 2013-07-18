@@ -44,9 +44,13 @@ ZBX_METRIC	parameters_specific[] =
 	{"system.cpu.load",	CF_HAVEPARAMS,	SYSTEM_CPU_LOAD,	"all,avg1"},
 	{"system.cpu.num",	CF_HAVEPARAMS,	SYSTEM_CPU_NUM,		"online"},
 
+	{"system.sw.arch",	0,		SYSTEM_SW_ARCH,		NULL},
+
 	{"system.swap.size",	CF_HAVEPARAMS,	SYSTEM_SWAP_SIZE,	"all,free"},
 
 	{"system.uptime",	0,		SYSTEM_UPTIME,		NULL},
+
+	{"system.uname",	0,		SYSTEM_UNAME,		NULL},
 
 	{"service_state",	CF_HAVEPARAMS,	SERVICE_STATE,		ZABBIX_SERVICE_NAME},
 	{"services",		CF_HAVEPARAMS,	SERVICES,		NULL},
