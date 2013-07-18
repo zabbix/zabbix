@@ -27,52 +27,6 @@
 
 /******************************************************************************
  *                                                                            *
- * Function: DBget_macro_value_by_triggerid                                   *
- *                                                                            *
- * Purpose: get value of a user macro                                         *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
- ******************************************************************************/
-static void	DBget_macro_value_by_triggerid(zbx_uint64_t triggerid, const char *macro, char **replace_to)
-{
-	const char		*__function_name = "DBget_macro_value_by_triggerid";
-
-	DB_RESULT		result;
-	DB_ROW			row;
-	zbx_vector_uint64_t	hostids;
-	zbx_uint64_t		hostid;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() triggerid:" ZBX_FS_UI64, __function_name, triggerid);
-
-	zbx_vector_uint64_create(&hostids);
-	zbx_vector_uint64_reserve(&hostids, 8);
-
-	result = DBselect(
-			"select distinct i.hostid"
-			" from items i,functions f"
-			" where f.itemid=i.itemid"
-				" and f.triggerid=" ZBX_FS_UI64,
-			triggerid);
-
-	while (NULL != (row = DBfetch(result)))
-	{
-		ZBX_STR2UINT64(hostid, row[0]);
-		zbx_vector_uint64_append(&hostids, hostid);
-	}
-	DBfree_result(result);
-
-	zbx_vector_uint64_sort(&hostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-
-	DCget_user_macro(hostids.values, hostids.values_num, macro, replace_to);
-
-	zbx_vector_uint64_destroy(&hostids);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: get_N_functionid                                                 *
  *                                                                            *
  * Parameters: expression   - [IN] null terminated trigger expression         *
@@ -2492,13 +2446,14 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 		zbx_uint64_t *hostid, DC_HOST *dc_host, DC_ITEM *dc_item, DB_ESCALATION *escalation, char **data,
 		int macro_type, char *error, int maxerrlen)
 {
-	const char	*__function_name = "substitute_simple_macros";
+	const char		*__function_name = "substitute_simple_macros";
 
-	char		*p, *bl, *br, c, *replace_to = NULL, sql[64];
-	const char	*m;
-	int		N_functionid, ret, res = SUCCEED;
-	size_t		data_alloc, data_len;
-	DC_INTERFACE	interface;
+	char			*p, *bl, *br, c, *replace_to = NULL, sql[64];
+	const char		*m;
+	int			N_functionid, ret, res = SUCCEED;
+	size_t			data_alloc, data_len;
+	DC_INTERFACE		interface;
+	zbx_vector_uint64_t	trigger_hosts;
 
 	if (NULL == data || NULL == *data || '\0' == **data)
 	{
@@ -2514,6 +2469,8 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 	p = *data;
 	if (NULL == (m = bl = strchr(p, '{')))
 		return res;
+
+	zbx_vector_uint64_create(&trigger_hosts);
 
 	data_alloc = data_len = strlen(*data) + 1;
 
@@ -3345,7 +3302,8 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 				}
 				else if (0 == strncmp(m, "{$", 2))	/* user defined macros */
 				{
-					DBget_macro_value_by_triggerid(event->objectid, m, &replace_to);
+					DCget_trigger_hosts(&trigger_hosts, event->objectid);
+					DCget_user_macro(trigger_hosts.values, trigger_hosts.values_num, m, &replace_to);
 				}
 			}
 		}
@@ -3357,9 +3315,14 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 					replace_to = zbx_dsprintf(replace_to, "%d", event->value);
 				else if (0 == strncmp(m, "{$", 2))	/* user defined macros */
 				{
-					DBget_macro_value_by_triggerid(event->objectid, m, &replace_to);
-					if (NULL != replace_to && FAIL == (res = is_double_suffix(replace_to)) && NULL != error)
+					DCget_trigger_hosts(&trigger_hosts, event->objectid);
+					DCget_user_macro(trigger_hosts.values, trigger_hosts.values_num, m, &replace_to);
+
+					if (NULL != replace_to && FAIL == (res = is_double_suffix(replace_to)) &&
+							NULL != error)
+					{
 						zbx_snprintf(error, maxerrlen, "Macro '%s' value is not numeric", m);
+					}
 				}
 			}
 		}
@@ -3539,6 +3502,8 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 		else
 			p = bl + 1;
 	}
+
+	zbx_vector_uint64_destroy(&trigger_hosts);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End %s() data:'%s'", __function_name, *data);
 

@@ -4605,3 +4605,47 @@ void	DCget_user_macro(zbx_uint64_t *hostids, int host_num, const char *macro, ch
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DCget_trigger_hosts                                              *
+ *                                                                            *
+ * Purpose: get hosts with items used in the source trigger expression        *
+ *                                                                            *
+ * Parameters: hosts     - [OUT] a vector of host identifiers                 *
+ *             triggerid - [IN] the source triggger id                        *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ ******************************************************************************/
+void	DCget_trigger_hosts(zbx_vector_uint64_t *hosts, zbx_uint64_t triggerid)
+{
+	zbx_hashset_iter_t	iter;
+	ZBX_DC_FUNCTION		*function;
+
+	/* assume hosts are already cached, just return */
+	if (0 != hosts->values_num)
+		return;
+
+	zbx_vector_uint64_reserve(hosts, 8);
+
+	LOCK_CACHE;
+
+	zbx_hashset_iter_reset(&config->functions, &iter);
+
+	while (NULL != (function = zbx_hashset_iter_next(&iter)))
+	{
+		if (function->triggerid == triggerid)
+		{
+			ZBX_DC_ITEM	*item;
+
+			if (NULL != (item = zbx_hashset_search(&config->items, &function->itemid)))
+				zbx_vector_uint64_append(hosts, item->hostid);
+		}
+	}
+
+	UNLOCK_CACHE;
+
+	zbx_vector_uint64_sort(hosts, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	zbx_vector_uint64_uniq(hosts, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+}
