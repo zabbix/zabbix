@@ -178,9 +178,10 @@ if (isset($_REQUEST['add_delay_flex']) && isset($_REQUEST['new_delay_flex'])) {
 }
 elseif (isset($_REQUEST['delete']) && isset($_REQUEST['itemid'])) {
 	$result = API::DiscoveryRule()->delete($_REQUEST['itemid']);
-	show_messages($result, _('Discovery rule deleted'), _('Cannot delete discovery rule'));
 
+	show_messages($result, _('Discovery rule deleted'), _('Cannot delete discovery rule'));
 	unset($_REQUEST['itemid'], $_REQUEST['form']);
+	clearCookies($result, $_REQUEST['hostid']);
 }
 elseif (isset($_REQUEST['clone']) && isset($_REQUEST['itemid'])) {
 	unset($_REQUEST['itemid']);
@@ -265,24 +266,30 @@ elseif (isset($_REQUEST['save'])) {
 
 	if ($result) {
 		unset($_REQUEST['itemid'], $_REQUEST['form']);
+		clearCookies($result, $_REQUEST['hostid']);
 	}
 }
-elseif (($_REQUEST['go'] == 'activate' || ($_REQUEST['go'] == 'disable')) && isset($_REQUEST['g_hostdruleid'])) {
+elseif (str_in_array($_REQUEST['go'], array('activate', 'disable')) && isset($_REQUEST['g_hostdruleid'])) {
 	$groupHostDiscoveryRuleId = $_REQUEST['g_hostdruleid'];
 
 	DBstart();
-	$go_result = ($_REQUEST['go'] == 'activate') ? activate_item($groupHostDiscoveryRuleId) : disable_item($groupHostDiscoveryRuleId);
-	$go_result = DBend($go_result);
-	show_messages($go_result, ($_REQUEST['go'] == 'activate') ? _('Discovery rules activated') : _('Discovery rules disabled'), null);
+
+	$goResult = ($_REQUEST['go'] == 'activate')
+		? activate_item($groupHostDiscoveryRuleId)
+		: disable_item($groupHostDiscoveryRuleId);
+	$goResult = DBend($goResult);
+
+	show_messages($goResult,
+		($_REQUEST['go'] == 'activate') ? _('Discovery rules activated') : _('Discovery rules disabled'),
+		null
+	);
+	clearCookies($goResult, $_REQUEST['hostid']);
 }
 elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['g_hostdruleid'])) {
-	$go_result = API::DiscoveryRule()->delete($_REQUEST['g_hostdruleid']);
-	show_messages($go_result, _('Discovery rules deleted'), _('Cannot delete discovery rules'));
-}
-if ($_REQUEST['go'] != 'none' && isset($go_result) && $go_result) {
-	$url = new CUrl();
-	$path = $url->getPath();
-	insert_js('cookie.eraseArray("'.$path.'")');
+	$goResult = API::DiscoveryRule()->delete($_REQUEST['g_hostdruleid']);
+
+	show_messages($goResult, _('Discovery rules deleted'), _('Cannot delete discovery rules'));
+	clearCookies($goResult, $_REQUEST['hostid']);
 }
 
 /*

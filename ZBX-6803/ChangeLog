@@ -3,8 +3,10 @@ Changes for 2.1.1
 New features:
 
 Bug fixes:
+...G...... [ZBX-5616] improved system.hostname request mechanism and added system.sw.arch item support for NetBSD, OpenBSD, Mac OS X, AIX, HP-UX, Solaris, Tru64, FreeBSD and Windows platforms
+..F....... [ZBX-6663] fixed checkbox "Select all" in lists when all checkboxes are selected (Ivo)
 ..F....... [ZBX-6777] fixed usage of cursor pointer (Guntis)
-....I..... [ZBX-6637] added -m64 compilation flag for solaris to be able to understand all attributes of a 64-bit processes (igors)
+....I..... [ZBX-6637] added -m64 compilation flag for Solaris to be able to understand all attributes of 64-bit processes (igors)
 ..F....... [ZBX-6800] added required javascripts for showing hintbox in Zabbix setup (Guntis)
 ..F....... [ZBX-6796] added check in UI pre-requisites check, is memory_limit set to unlimited. (Guntis)
 ..F....... [ZBX-6776] added sorting by icon names in Map element configuration form (Guntis)
@@ -286,7 +288,8 @@ A......... [ZBX-6407] improved data retrieval performance for CTrigger get() wit
 A.F....... [ZBX-1357] updated Brazilian Portuguese, Chinese (China), Latvian, Spanish and Turkish translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
-....I..... [ZBX-6637] added -m64 compilation flag for solaris to be able to understand all attributes of a 64-bit processes (igors)
+........S. [ZBX-6801] fixed processing of host availability data received from proxy (wiper)
+....I..... [ZBX-6637] added -m64 compilation flag for Solaris to be able to understand all attributes of 64-bit processes (igors)
 ..F....... [ZBX-6761] fixed dbConditionInt() performance (Eduard)
 ........S. [ZBX-6681] fixed bug when one time maintenance period was ignored if it started before maintenance active time (wiper)
 .......P.. [ZBX-6630] faster proxy configuration synchronization (Andris)

@@ -32,18 +32,18 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = array(
-	'applications' =>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,	null),
+	'applications' =>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,			null),
 	'hostid' =>				array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID.NOT_ZERO, 'isset({form})&&!isset({applicationid})'),
-	'groupid' =>			array(T_ZBX_INT, O_OPT, null,	DB_ID,	null),
-	'applicationid' =>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,	'isset({form})&&{form}=="update"'),
-	'appname' =>			array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY, 'isset({save})', _('Name')),
+	'groupid' =>			array(T_ZBX_INT, O_OPT, null,	DB_ID,			null),
+	'applicationid' =>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,			'isset({form})&&{form}=="update"'),
+	'appname' =>			array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,		'isset({save})', _('Name')),
 	// actions
-	'go' =>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
-	'save' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
-	'clone' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
-	'delete' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
-	'form' =>				array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
-	'form_refresh' =>		array(T_ZBX_INT, O_OPT, null,	null,	null)
+	'go' =>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+	'save' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+	'clone' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+	'delete' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+	'form' =>				array(T_ZBX_STR, O_OPT, P_SYS,			null,	null),
+	'form_refresh' =>		array(T_ZBX_INT, O_OPT, null,			null,	null)
 );
 check_fields($fields);
 validate_sort_and_sortorder('name', ZBX_SORT_UP);
@@ -123,6 +123,7 @@ if (isset($_REQUEST['save'])) {
 
 		add_audit($action, AUDIT_RESOURCE_APPLICATION, _('Application').' ['.$_REQUEST['appname'].' ] ['.$applicationId.']');
 		unset($_REQUEST['form']);
+		clearCookies($result, $_REQUEST['hostid']);
 	}
 	unset($_REQUEST['save']);
 }
@@ -148,11 +149,13 @@ elseif (isset($_REQUEST['delete'])) {
 		if ($result) {
 			add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_APPLICATION, 'Application ['.$app['name'].'] from host ['.$host['host'].']');
 		}
+
 		unset($_REQUEST['form'], $_REQUEST['applicationid']);
+		clearCookies($result, $_REQUEST['hostid']);
 	}
 }
 elseif ($_REQUEST['go'] == 'delete') {
-	$go_result = true;
+	$goResult = true;
 	$applications = get_request('applications', array());
 
 	DBstart();
@@ -168,9 +171,9 @@ elseif ($_REQUEST['go'] == 'delete') {
 			continue;
 		}
 
-		$go_result &= (bool) API::Application()->delete($dbApplication['applicationid']);
+		$goResult &= (bool) API::Application()->delete($dbApplication['applicationid']);
 
-		if ($go_result) {
+		if ($goResult) {
 			$host = get_host_by_hostid($dbApplication['hostid']);
 
 			add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_APPLICATION,
@@ -178,12 +181,13 @@ elseif ($_REQUEST['go'] == 'delete') {
 		}
 	}
 
-	$go_result = DBend($go_result);
+	$goResult = DBend($goResult);
 
-	show_messages($go_result, _('Application deleted'), _('Cannot delete application'));
+	show_messages($goResult, _('Application deleted'), _('Cannot delete application'));
+	clearCookies($goResult, $_REQUEST['hostid']);
 }
 elseif (str_in_array($_REQUEST['go'], array('activate', 'disable'))) {
-	$go_result = true;
+	$goResult = true;
 	$applications = get_request('applications', array());
 
 	DBstart();
@@ -200,31 +204,28 @@ elseif (str_in_array($_REQUEST['go'], array('activate', 'disable'))) {
 		);
 		while ($item = DBfetch($db_items)) {
 			if ($_REQUEST['go'] == 'activate') {
-				$go_result &= activate_item($item['itemid']);
+				$goResult &= activate_item($item['itemid']);
 			}
 			else {
-				$go_result &= disable_item($item['itemid']);
+				$goResult &= disable_item($item['itemid']);
 			}
 		}
 	}
 
-	$go_result = DBend($go_result);
+	$goResult = DBend($goResult);
 
 	if ($_REQUEST['go'] == 'activate') {
-		show_messages($go_result, _('Items activated'), null);
+		show_messages($goResult, _('Items activated'), null);
 	}
 	else {
-		show_messages($go_result, _('Items disabled'), null);
+		show_messages($goResult, _('Items disabled'), null);
 	}
-}
-if ($_REQUEST['go'] != 'none' && !empty($go_result)) {
-	$url = new CUrl();
-	$path = $url->getPath();
-	insert_js('cookie.eraseArray("'.$path.'")');
+
+	clearCookies($goResult, $_REQUEST['hostid']);
 }
 
 /*
- * Dsiplay
+ * Display
  */
 if (isset($_REQUEST['form'])) {
 	$data = array(
