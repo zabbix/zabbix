@@ -286,7 +286,6 @@ $filterForm->addRow(_('Events'), $eventsComboBox);
 
 $severityComboBox = new CComboBox('show_severity', $showSeverity);
 $severityComboBox->addItems(array(
-	-1 => _('All'),
 	TRIGGER_SEVERITY_NOT_CLASSIFIED => getSeverityCaption(TRIGGER_SEVERITY_NOT_CLASSIFIED),
 	TRIGGER_SEVERITY_INFORMATION => getSeverityCaption(TRIGGER_SEVERITY_INFORMATION),
 	TRIGGER_SEVERITY_WARNING => getSeverityCaption(TRIGGER_SEVERITY_WARNING),
@@ -402,7 +401,7 @@ if ($ackStatus == ZBX_ACK_STS_WITH_UNACK) {
 if ($ackStatus == ZBX_ACK_STS_WITH_LAST_UNACK) {
 	$options['withLastEventUnacknowledged'] = 1;
 }
-if ($showSeverity > -1) {
+if ($showSeverity > TRIGGER_SEVERITY_NOT_CLASSIFIED) {
 	$options['min_severity'] = $showSeverity;
 }
 if ($_REQUEST['status_change']) {
