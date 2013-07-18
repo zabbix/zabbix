@@ -79,7 +79,7 @@
 				</td>
 				<td>
 					<select id="label_location" class="input select" name="label_location">
-						<option value="-1">-</option>
+						<option value="-1"><?php echo _('Map default'); ?></option>
 						<option value="<?php echo MAP_LABEL_LOC_BOTTOM; ?>"><?php echo _('Bottom'); ?></option>
 						<option value="<?php echo MAP_LABEL_LOC_LEFT; ?>"><?php echo _('Left'); ?></option>
 						<option value="<?php echo MAP_LABEL_LOC_RIGHT; ?>"><?php echo _('Right'); ?></option>
@@ -241,7 +241,7 @@
 				</td>
 				<td>
 					<select id="massLabelLocation" class="input select" name="label_location">
-						<option value="-1">-</option>
+						<option value="-1"><?php echo _('Map default'); ?></option>
 						<option value="<?php echo MAP_LABEL_LOC_BOTTOM; ?>"><?php echo _('Bottom'); ?></option>
 						<option value="<?php echo MAP_LABEL_LOC_LEFT; ?>"><?php echo _('Left'); ?></option>
 						<option value="<?php echo MAP_LABEL_LOC_RIGHT; ?>"><?php echo _('Right'); ?></option>
