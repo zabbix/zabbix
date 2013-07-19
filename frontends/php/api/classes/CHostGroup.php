@@ -66,7 +66,6 @@ class CHostGroup extends CZBXAPI {
 			'with_items'				=> null,
 			'with_simple_graph_items'	=> null,
 			'with_monitored_items'		=> null,
-			'with_historical_items'		=> null,
 			'with_triggers'				=> null,
 			'with_monitored_triggers'	=> null,
 			'with_httptests'			=> null,
@@ -220,7 +219,7 @@ class CHostGroup extends CZBXAPI {
 			$sqlParts['where'][] = 'h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.','.HOST_STATUS_TEMPLATE.')';
 		}
 
-		// with_items, with_monitored_items, with_historical_items, with_simple_graph_items
+		// with_items, with_monitored_items, with_simple_graph_items
 		if (!is_null($options['with_items'])) {
 			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
 			$sqlParts['where']['hgg'] = 'g.groupid=hg.groupid';
@@ -241,18 +240,6 @@ class CHostGroup extends CZBXAPI {
 						' AND i.hostid=h.hostid'.
 						' AND h.status='.HOST_STATUS_MONITORED.
 						' AND i.status='.ITEM_STATUS_ACTIVE.
-						' AND i.flags IN ('.ZBX_FLAG_DISCOVERY_NORMAL.','.ZBX_FLAG_DISCOVERY_CREATED.')'.
-					')';
-		}
-		elseif (!is_null($options['with_historical_items'])) {
-			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
-			$sqlParts['where']['hgg'] = 'g.groupid=hg.groupid';
-			$sqlParts['where'][] = 'EXISTS ('.
-					'SELECT NULL'.
-					' FROM items i'.
-					' WHERE hg.hostid=i.hostid'.
-						' AND i.status='.ITEM_STATUS_ACTIVE.
-						' AND i.lastvalue IS NOT NULL'.
 						' AND i.flags IN ('.ZBX_FLAG_DISCOVERY_NORMAL.','.ZBX_FLAG_DISCOVERY_CREATED.')'.
 					')';
 		}

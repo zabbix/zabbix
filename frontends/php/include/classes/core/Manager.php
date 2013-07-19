@@ -1,3 +1,4 @@
+<?php
 /*
 ** Zabbix
 ** Copyright (C) 2001-2013 Zabbix SIA
@@ -17,17 +18,34 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package com.zabbix.gateway;
 
-class GeneralInformation
-{
-	public static final String APPLICATION_NAME = "Zabbix Java Gateway";
-	public static final String REVISION_DATE = "18 July 2013";
-	public static final String REVISION = "{ZABBIX_REVISION}";
-	public static final String VERSION = "2.1.2";
+/**
+ * A class for creating a storing instances of DB objects managers.
+ */
+class Manager extends CFactoryRegistry {
 
-	public static void printVersion()
-	{
-		System.out.printf("%s v%s (revision %s) (%s)\n", APPLICATION_NAME, VERSION, REVISION, REVISION_DATE);
+	public static function getInstance($class = __CLASS__) {
+		return parent::getInstance($class);
+	}
+
+	/**
+	 * @return CApplicationManager
+	 */
+	public static function Application() {
+		return self::getInstance()->getObject('CApplicationManager');
+	}
+
+	/**
+	 * @return CHistoryManager
+	 */
+	public static function History() {
+		return self::getInstance()->getObject('CHistoryManager');
+	}
+
+	/**
+	 * @return CHttpTestManager
+	 */
+	public static function HttpTest() {
+		return self::getInstance()->getObject('CHttpTestManager');
 	}
 }
