@@ -771,31 +771,6 @@ int	DBget_row_count(const char *table_name)
 	return count;
 }
 
-int	DBget_items_unsupported_count()
-{
-	const char	*__function_name = "DBget_items_unsupported_count";
-	int		count = 0;
-	DB_RESULT	result;
-	DB_ROW		row;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
-
-	result = DBselect(
-			"select count(*)"
-			" from items"
-			" where status=%d"
-				" and state=%d",
-			ITEM_STATUS_ACTIVE, ITEM_STATE_NOTSUPPORTED);
-
-	if (NULL != (row = DBfetch(result)))
-		count = atoi(row[0]);
-	DBfree_result(result);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __function_name, count);
-
-	return count;
-}
-
 int	DBget_queue_count(int from, int to)
 {
 	const char	*__function_name = "DBget_queue_count";
@@ -877,33 +852,6 @@ int	DBget_queue_count(int from, int to)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): %d", __function_name, count);
 
 	return count;
-}
-
-double	DBget_requiredperformance()
-{
-	const char	*__function_name = "DBget_requiredperformance";
-	double		qps_total = 0;
-	DB_RESULT	result;
-	DB_ROW		row;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
-
-	/* !!! Don't forget to sync the code with PHP !!! */
-	result = DBselect(
-			"select sum(1.0/i.delay)"
-			" from hosts h,items i"
-			" where h.hostid=i.hostid"
-				" and h.status=%d"
-				" and i.status=%d"
-				" and i.delay<>0",
-			HOST_STATUS_MONITORED, ITEM_STATUS_ACTIVE);
-	if (NULL != (row = DBfetch(result)) && SUCCEED != DBis_null(row[0]))
-		qps_total = atof(row[0]);
-	DBfree_result(result);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): " ZBX_FS_DBL, __function_name, qps_total);
-
-	return qps_total;
 }
 
 int	DBget_proxy_lastaccess(const char *hostname, int *lastaccess, char **error)
