@@ -39,7 +39,6 @@ class CHost extends CHostGeneral {
 	 * @param boolean       $options['templated_hosts']          include templates in result
 	 * @param boolean       $options['with_items']               only with items
 	 * @param boolean       $options['with_monitored_items']     only with monitored items
-	 * @param boolean       $options['with_historical_items']    only with historical items
 	 * @param boolean       $options['with_triggers']            only with triggers
 	 * @param boolean       $options['with_monitored_triggers']  only with monitored triggers
 	 * @param boolean       $options['with_httptests']           only with http tests
@@ -96,7 +95,6 @@ class CHost extends CHostGeneral {
 			'proxy_hosts'				=> null,
 			'with_items'				=> null,
 			'with_monitored_items'		=> null,
-			'with_historical_items'		=> null,
 			'with_simple_graph_items'	=> null,
 			'with_triggers'				=> null,
 			'with_monitored_triggers'	=> null,
@@ -307,7 +305,7 @@ class CHost extends CHostGeneral {
 			$sqlParts['where']['status'] = 'h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.')';
 		}
 
-		// with_items, with_monitored_items, with_historical_items, with_simple_graph_items
+		// with_items, with_monitored_items, with_simple_graph_items
 		if (!is_null($options['with_items'])) {
 			$sqlParts['where'][] = 'EXISTS ('.
 					'SELECT NULL'.
@@ -322,16 +320,6 @@ class CHost extends CHostGeneral {
 					' FROM items i'.
 					' WHERE h.hostid=i.hostid'.
 						' AND i.status='.ITEM_STATUS_ACTIVE.
-						' AND i.flags IN ('.ZBX_FLAG_DISCOVERY_NORMAL.','.ZBX_FLAG_DISCOVERY_CREATED.')'.
-					')';
-		}
-		elseif (!is_null($options['with_historical_items'])) {
-			$sqlParts['where'][] = 'EXISTS ('.
-					'SELECT NULL'.
-					' FROM items i'.
-					' WHERE h.hostid=i.hostid'.
-						' AND i.status='.ITEM_STATUS_ACTIVE.
-						' AND i.lastvalue IS NOT NULL'.
 						' AND i.flags IN ('.ZBX_FLAG_DISCOVERY_NORMAL.','.ZBX_FLAG_DISCOVERY_CREATED.')'.
 					')';
 		}

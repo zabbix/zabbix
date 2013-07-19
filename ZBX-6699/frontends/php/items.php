@@ -471,7 +471,6 @@ elseif (isset($_REQUEST['del_history']) && isset($_REQUEST['itemid'])) {
 	}
 
 	if ($result) {
-		DBexecute('UPDATE items SET lastvalue=null,lastclock=null,prevvalue=null WHERE itemid='.$_REQUEST['itemid']);
 		$host = get_host_by_hostid($_REQUEST['hostid']);
 		add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ITEM, _('Item').' ['.$item['key_'].'] ['.$_REQUEST['itemid'].'] '.
 			_('Host').' ['.$host['name'].'] '._('History cleared'));
@@ -705,7 +704,6 @@ elseif ($_REQUEST['go'] == 'clean_history' && isset($_REQUEST['group_itemid'])) 
 
 	$goResult = delete_history_by_itemid($_REQUEST['group_itemid']);
 
-	DBexecute('UPDATE items SET lastvalue=null,lastclock=null,prevvalue=null WHERE '.dbConditionInt('itemid', $_REQUEST['group_itemid']));
 
 	foreach ($_REQUEST['group_itemid'] as $id) {
 		if (!$item = get_item_by_itemid($id)) {
