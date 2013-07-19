@@ -259,15 +259,15 @@ typedef struct
 	char	*source;
 	char	*value;
 }
-zbx_history_log_t;
+zbx_log_value_t;
 
 typedef union
 {
-	double			dbl;
-	zbx_uint64_t		ui64;
-	char			*str;
-	char			*err;
-	zbx_history_log_t	*log;
+	double		dbl;
+	zbx_uint64_t	ui64;
+	char		*str;
+	char		*err;
+	zbx_log_value_t	*log;
 }
 history_value_t;
 
@@ -1098,5 +1098,8 @@ void uinc128_64(zbx_uint128_t *base, zbx_uint64_t value);
 void uinc128_128(zbx_uint128_t *base, const zbx_uint128_t *value);
 void udiv128_64(zbx_uint128_t *result, const zbx_uint128_t *base, zbx_uint64_t value);
 void umul64_64(zbx_uint128_t *result, zbx_uint64_t value, zbx_uint64_t factor);
+
+#define ZBX_SESSION_ACTIVE	0
+#define ZBX_SESSION_PASSIVE	1
 
 #endif
