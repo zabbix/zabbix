@@ -19,9 +19,6 @@
 
 
 jQuery(function($) {
-
-	cookie.init();
-
 	// search
 	if ($('#search').length) {
 		createSuggest('search');

@@ -147,6 +147,17 @@ class CPie extends CGraphDraw {
 
 		$strvaluelength = 0; // we need to know how long in px will be our legend
 
+		// fetch values for items with the "last" function
+		$lastValueItems = array();
+		foreach ($this->items as $item) {
+			if ($item['calc_fnc'] == CALC_FNC_LST) {
+				$lastValueItems[] = $item;
+			}
+		}
+		if ($lastValueItems) {
+			$history = Manager::History()->fetchLast($lastValueItems);
+		}
+
 		for ($i = 0; $i < $this->num; $i++) {
 			$real_item = get_item_by_itemid($this->items[$i]['itemid']);
 			$type = $this->items[$i]['calc_type'];
@@ -165,10 +176,8 @@ class CPie extends CGraphDraw {
 				array_push($sql_arr,
 					'SELECT h.itemid,'.
 						'AVG(h.value) AS avg,MIN(h.value) AS min,'.
-						'MAX(h.value) AS max,MAX(h.clock) AS clock,'.
-						'MAX(i.lastvalue) AS lst'.
+						'MAX(h.value) AS max,MAX(h.clock) AS clock'.
 					' FROM history h'.
-						' LEFT JOIN items i ON h.itemid=i.itemid'.
 					' WHERE h.itemid='.$this->items[$i]['itemid'].
 						' AND h.clock>='.$from_time.
 						' AND h.clock<='.$to_time.
@@ -176,10 +185,8 @@ class CPie extends CGraphDraw {
 					,
 					'SELECT hu.itemid,'.
 						'AVG(hu.value) AS avg,MIN(hu.value) AS min,'.
-						'MAX(hu.value) AS max,MAX(hu.clock) AS clock,'.
-						'MAX(i.lastvalue) AS lst'.
+						'MAX(hu.value) AS max,MAX(hu.clock) AS clock'.
 					' FROM history_uint hu'.
-						' LEFT JOIN items i ON hu.itemid=i.itemid'.
 					' WHERE hu.itemid='.$this->items[$i]['itemid'].
 						' AND hu.clock>='.$from_time.
 						' AND hu.clock<='.$to_time.
@@ -191,10 +198,8 @@ class CPie extends CGraphDraw {
 				array_push($sql_arr,
 					'SELECT t.itemid,'.
 						'AVG(t.value_avg) AS avg,MIN(t.value_min) AS min,'.
-						'MAX(t.value_max) AS max,MAX(t.clock) AS clock,'.
-						'MAX(i.lastvalue) AS lst'.
+						'MAX(t.value_max) AS max,MAX(t.clock) AS clock'.
 					' FROM trends t'.
-						' LEFT JOIN items i ON t.itemid=i.itemid'.
 					' WHERE t.itemid='.$this->items[$i]['itemid'].
 						' AND t.clock>='.$from_time.
 						' AND t.clock<='.$to_time.
@@ -202,10 +207,8 @@ class CPie extends CGraphDraw {
 					,
 					'SELECT t.itemid,'.
 						'AVG(t.value_avg) AS avg,MIN(t.value_min) AS min,'.
-						'MAX(t.value_max) AS max,MAX(t.clock) AS clock,'.
-						'MAX(i.lastvalue) AS lst'.
+						'MAX(t.value_max) AS max,MAX(t.clock) AS clock'.
 					' FROM trends_uint t'.
-						' LEFT JOIN items i ON t.itemid=i.itemid'.
 					' WHERE t.itemid='.$this->items[$i]['itemid'].
 						' AND t.clock>='.$from_time.
 						' AND t.clock<='.$to_time.
@@ -213,6 +216,11 @@ class CPie extends CGraphDraw {
 				);
 			}
 
+			$this->data[$this->items[$i]['itemid']][$type]['last'] = isset($history[$real_item['itemid']])
+				? $history[$real_item['itemid']][0]['value'] : null;
+			$this->data[$this->items[$i]['itemid']][$type]['shift_min'] = 0;
+			$this->data[$this->items[$i]['itemid']][$type]['shift_max'] = 0;
+			$this->data[$this->items[$i]['itemid']][$type]['shift_avg'] = 0;
 
 			foreach ($sql_arr as $sql) {
 				$result = DBselect($sql);
@@ -220,11 +228,7 @@ class CPie extends CGraphDraw {
 					$this->data[$this->items[$i]['itemid']][$type]['min'] = $row['min'];
 					$this->data[$this->items[$i]['itemid']][$type]['max'] = $row['max'];
 					$this->data[$this->items[$i]['itemid']][$type]['avg'] = $row['avg'];
-					$this->data[$this->items[$i]['itemid']][$type]['last'] = $row['lst'];
 					$this->data[$this->items[$i]['itemid']][$type]['clock'] = $row['clock'];
-					$this->data[$this->items[$i]['itemid']][$type]['shift_min'] = 0;
-					$this->data[$this->items[$i]['itemid']][$type]['shift_max'] = 0;
-					$this->data[$this->items[$i]['itemid']][$type]['shift_avg'] = 0;
 				}
 				unset($row);
 			}

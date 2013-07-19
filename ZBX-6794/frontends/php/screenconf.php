@@ -176,6 +176,7 @@ elseif (isset($_REQUEST['save'])) {
 
 	if (!empty($screenids)) {
 		unset($_REQUEST['form'], $_REQUEST['screenid']);
+		clearCookies(!empty($screenids));
 	}
 }
 elseif (isset($_REQUEST['delete']) && isset($_REQUEST['screenid']) || $_REQUEST['go'] == 'delete') {
@@ -191,18 +192,18 @@ elseif (isset($_REQUEST['delete']) && isset($_REQUEST['screenid']) || $_REQUEST[
 	));
 
 	if (!empty($screens)) {
-		$go_result = API::Screen()->delete($screenids);
+		$goResult = API::Screen()->delete($screenids);
 
-		if ($go_result) {
+		if ($goResult) {
 			foreach ($screens as $screen) {
 				add_audit_details(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_SCREEN, $screen['screenid'], $screen['name']);
 			}
 		}
 	}
 	else {
-		$go_result = API::TemplateScreen()->delete($screenids);
+		$goResult = API::TemplateScreen()->delete($screenids);
 
-		if ($go_result) {
+		if ($goResult) {
 			$templatedScreens = API::TemplateScreen()->get(array(
 				'screenids' => $screenids,
 				'output' => API_OUTPUT_EXTEND,
@@ -215,16 +216,12 @@ elseif (isset($_REQUEST['delete']) && isset($_REQUEST['screenid']) || $_REQUEST[
 		}
 	}
 
-	if ($go_result) {
+	if ($goResult) {
 		unset($_REQUEST['screenid'], $_REQUEST['form']);
 	}
 
-	show_messages($go_result, _('Screen deleted'), _('Cannot delete screen'));
-}
-if ($_REQUEST['go'] != 'none' && isset($go_result) && $go_result) {
-	$url = new CUrl();
-	$path = $url->getPath();
-	insert_js('cookie.eraseArray("'.$path.'")');
+	show_messages($goResult, _('Screen deleted'), _('Cannot delete screen'));
+	clearCookies($goResult);
 }
 
 /*
