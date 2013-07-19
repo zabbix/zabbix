@@ -2330,6 +2330,8 @@ function parse_period($str) {
 }
 
 function get_status() {
+	global $ZBX_SERVER, $ZBX_SERVER_PORT;
+
 	$status = array(
 		'triggers_count' => 0,
 		'triggers_count_enabled' => 0,
@@ -2349,7 +2351,8 @@ function get_status() {
 	);
 
 	// server
-	$status['zabbix_server'] = zabbixIsRunning() ? _('Yes') : _('No');
+	$zabbixServer = new CZabbixServer($ZBX_SERVER, $ZBX_SERVER_PORT, ZBX_SOCKET_TIMEOUT, 0);
+	$status['zabbix_server'] = $zabbixServer->isRunning() ? _('Yes') : _('No');
 
 	// triggers
 	$dbTriggers = DBselect(
@@ -2462,21 +2465,6 @@ function get_status() {
 	return $status;
 }
 
-function zabbixIsRunning() {
-	global $ZBX_SERVER, $ZBX_SERVER_PORT;
-
-	if (empty($ZBX_SERVER) || empty ($ZBX_SERVER_PORT)) {
-		return false;
-	}
-
-	$result = (bool) fsockopen($ZBX_SERVER, $ZBX_SERVER_PORT, $errnum, $errstr, ZBX_SOCKET_TIMEOUT);
-	if (!$result) {
-		clear_messages();
-	}
-
-	return $result;
-}
-
 function set_image_header($format = null) {
 	global $IMAGE_FORMAT_DEFAULT;
 
@@ -2567,4 +2555,17 @@ function no_errors() {
  */
 function checkRequiredKeys(array $array, array $keys) {
 	return array_diff($keys, array_keys($array));
+}
+
+/**
+ * Clear page cookies on action.
+ *
+ * @param bool   $clear
+ * @param string $id	parent id, is used as cookie prefix
+ */
+function clearCookies($clear = false, $id = null) {
+	if ($clear) {
+		$url = new CUrl();
+		insert_js('cookie.eraseArray("'.basename($url->getPath(), '.php').($id ? '_'.$id : '').'")');
+	}
 }

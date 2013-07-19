@@ -160,6 +160,8 @@ elseif (isset($_REQUEST['save'])) {
 
 		unset($_REQUEST['form']);
 	}
+
+	clearCookies($result);
 }
 elseif (isset($_REQUEST['delete']) && isset($_REQUEST['actionid'])) {
 	$result = API::Action()->delete($_REQUEST['actionid']);
@@ -168,6 +170,7 @@ elseif (isset($_REQUEST['delete']) && isset($_REQUEST['actionid'])) {
 
 	if ($result) {
 		unset($_REQUEST['form'], $_REQUEST['actionid']);
+		clearCookies($result);
 	}
 }
 elseif (isset($_REQUEST['add_condition']) && isset($_REQUEST['new_condition'])) {
@@ -310,16 +313,14 @@ elseif (str_in_array($_REQUEST['go'], array('activate', 'disable')) && isset($_R
 		show_messages($goResult, _('Status updated'), _('Cannot update status'));
 		add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ACTION, ' Actions ['.implode(',', $actionIds).'] '.$statusName);
 	}
+
+	clearCookies($goResult);
 }
 elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['g_actionid'])) {
 	$goResult = API::Action()->delete($_REQUEST['g_actionid']);
-	show_messages($goResult, _('Selected actions deleted'), _('Cannot delete selected actions'));
-}
 
-if ($_REQUEST['go'] != 'none' && isset($goResult) && $goResult) {
-	$url = new CUrl();
-	$path = $url->getPath();
-	insert_js('cookie.eraseArray("'.$path.'")');
+	show_messages($goResult, _('Selected actions deleted'), _('Cannot delete selected actions'));
+	clearCookies($goResult);
 }
 
 /*
