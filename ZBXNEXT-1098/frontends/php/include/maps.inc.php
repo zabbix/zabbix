@@ -433,7 +433,7 @@ function resolveMapLabelMacros($label, $replaceHosts = null) {
 
 		// do function type (last, min, max, avg) related actions
 		if (0 == strcmp($function, 'last')) {
-			$value = formatItemLastValue($item, UNRESOLVED_MACRO_STRING);
+			$value = ($item['lastclock']) ? formatHistoryValue($item['lastvalue'], $item) : UNRESOLVED_MACRO_STRING;
 		}
 		elseif (0 == strcmp($function, 'min') || 0 == strcmp($function, 'max') || 0 == strcmp($function, 'avg')) {
 			$value = getItemFunctionalValue($item, $function, $parameter);

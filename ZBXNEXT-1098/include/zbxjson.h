@@ -65,6 +65,7 @@
 #define ZBX_PROTO_TAG_JMX_ERROR		"jmx_error"
 #define ZBX_PROTO_TAG_USERNAME		"username"
 #define ZBX_PROTO_TAG_PASSWORD		"password"
+#define ZBX_PROTO_TAG_SID		"sid"
 
 #define ZBX_PROTO_VALUE_FAILED		"failed"
 #define ZBX_PROTO_VALUE_SUCCESS		"success"
@@ -81,6 +82,11 @@
 #define ZBX_PROTO_VALUE_COMMAND			"command"
 #define ZBX_PROTO_VALUE_JAVA_GATEWAY_INTERNAL	"java gateway internal"
 #define ZBX_PROTO_VALUE_JAVA_GATEWAY_JMX	"java gateway jmx"
+#define ZBX_PROTO_VALUE_GET_QUEUE		"queue.get"
+
+#define ZBX_PROTO_VALUE_GET_QUEUE_OVERVIEW	"overview"
+#define ZBX_PROTO_VALUE_GET_QUEUE_PROXY		"overview by proxy"
+#define ZBX_PROTO_VALUE_GET_QUEUE_DETAILS	"details"
 
 typedef enum
 {

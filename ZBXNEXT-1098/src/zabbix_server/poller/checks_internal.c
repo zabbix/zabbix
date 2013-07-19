@@ -155,7 +155,7 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 			goto notsupported;
 		}
 
-		SET_UI64_RESULT(result, DBget_queue_count((int)from, (int)to));
+		SET_UI64_RESULT(result, DCget_item_queue(NULL, from, to));
 	}
 	else if (0 == strcmp(tmp, "requiredperformance"))	/* zabbix["requiredperformance"] */
 	{
