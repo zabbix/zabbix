@@ -1336,7 +1336,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.17rc1
 
-A......... [ZBX-6582] fixed that {$ITEM.VALUE} and {$ITEM.LASTVALUE} macro was not truncated in Monitoring > Triggers (Toms)
+A......... [ZBX-6582] fixed that {ITEM.VALUE} and {ITEM.LASTVALUE} macro was not truncated in Monitoring > Triggers (Toms)
 ...G...... [ZBX-6584] fixed possible logrt crash on windows platform when logfile was moved during processing (wiper)
 ..F....... [ZBX-1129] fixed graph time period in bar reports (Oleg)
 ..F....... [ZBX-6484] fixed bar report calculation (Oleg)
