@@ -1,9 +1,26 @@
+Changes for 2.1.2
+
+New features:
+...G...... [ZBXNEXT-1528] added net.if.in, net.if.out and net.if.total item support on HP-UX platforms (igors)
+
+Bug fixes:
+..F....... [ZBX-6372] in trigger filtering, trigger severity default value changed to "Not classified" (Guntis)
+..F....... [ZBX-6624] fixed incorrect y-axis interval names for "s" units (Oleg)
+...G...... [ZBX-282] added sensor item support for Linux kernels newer than v2.4 (igors)
+
+--------------------------------------------------------------------------------
 Changes for 2.1.1
 
 New features:
+A.F.....S. [ZBXNEXT-1689] decreased number of operations with table "items" (Pavels, wiper)
+A......... [ZBXNEXT-1689] dropped support of the prevorgvalue property in the item API (Pavels)
+A......... [ZBXNEXT-1689] removed the with_historical_items parameter from host.get and hostgroup.get (Pavels)
+..F....... [ZBXNEXT-1689] item last value information will no longer be available if history storage period is set to 0 (Pavels)
+..F....... [ZBXNEXT-1689] item last check dates will no longer be displayed for unsupported items (Pavels)
 
 Bug fixes:
-...G...... [ZBX-5616] improved system.hostname request mechanism and added system.sw.arch item support for NetBSD, OpenBSD, Mac OS X, AIX, HP-UX, Solaris, Tru64, FreeBSD and Windows platforms
+..F....... [ZBX-6803] fixed screens data in "Template OS OpenBSD" template (Guntis)
+...G...... [ZBX-5616] improved system.hostname request mechanism and added system.sw.arch item support for NetBSD, OpenBSD, Mac OS X, AIX, HP-UX, Solaris, Tru64, FreeBSD and Windows platforms (igors)
 ..F....... [ZBX-6663] fixed checkbox "Select all" in lists when all checkboxes are selected (Ivo)
 ..F....... [ZBX-6777] fixed usage of cursor pointer (Guntis)
 ....I..... [ZBX-6637] added -m64 compilation flag for Solaris to be able to understand all attributes of 64-bit processes (igors)
@@ -288,6 +305,8 @@ A......... [ZBX-6407] improved data retrieval performance for CTrigger get() wit
 A.F....... [ZBX-1357] updated Brazilian Portuguese, Chinese (China), Latvian, Spanish and Turkish translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+..F....... [ZBX-6652] added item validation in bar reports page (Ivo)
+...G...... [ZBX-6730] fixed zabbix_agentd -t duplicate printing of parameters (igors)
 ........S. [ZBX-6801] fixed processing of host availability data received from proxy (wiper)
 ....I..... [ZBX-6637] added -m64 compilation flag for Solaris to be able to understand all attributes of 64-bit processes (igors)
 ..F....... [ZBX-6761] fixed dbConditionInt() performance (Eduard)
@@ -1615,7 +1634,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.17rc1
 
-A......... [ZBX-6582] fixed that {$ITEM.VALUE} and {$ITEM.LASTVALUE} macro was not truncated in Monitoring > Triggers (Toms)
+A......... [ZBX-6582] fixed that {ITEM.VALUE} and {ITEM.LASTVALUE} macro was not truncated in Monitoring > Triggers (Toms)
 ...G...... [ZBX-6584] fixed possible logrt crash on windows platform when logfile was moved during processing (wiper)
 ..F....... [ZBX-1129] fixed graph time period in bar reports (Oleg)
 ..F....... [ZBX-6484] fixed bar report calculation (Oleg)
