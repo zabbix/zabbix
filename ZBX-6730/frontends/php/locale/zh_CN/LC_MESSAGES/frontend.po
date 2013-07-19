@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-05-09 10:03+0300\n"
+"POT-Creation-Date: 2013-05-28 18:26+0300\n"
 "PO-Revision-Date: 2013-04-28 10:14+0200\n"
 "Last-Translator: 鹏 <pengyao@pengyao.org>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -2798,7 +2798,7 @@ msgstr "自定义图形"
 msgid "Custom label"
 msgstr "自定义标示"
 
-#: api/classes/CMap.php:592
+#: api/classes/CMap.php:593
 #, php-format
 msgid "Custom label for map \"%2$s\" elements of type \"%1$s\" may not be empty."
 msgstr "自定义标示给类型 \"%1$s\"的拓扑图 \"%2$s\"组件, 其不得为空白."
@@ -3919,7 +3919,7 @@ msgstr "重复的主机. 有相同主机名称\"%s\"的主机已存于数据中.
 msgid "Duplicate host. Host with the same visible name \"%s\" already exists in data."
 msgstr "重复的主机. 有相同主机可视名称\"%s\"的主机已存于数据中."
 
-#: api/classes/CMap.php:560
+#: api/classes/CMap.php:561
 #, php-format
 msgid "Duplicate map name for map \"%s\"."
 msgstr "重复的拓扑图\"%s\"的拓扑图名称."
@@ -5756,8 +5756,8 @@ msgstr "包含"
 msgid "Incorrect \"soft\" field value for dependency for service \"%1$s\"."
 msgstr "不正确的相依性\"soft\"字段值予服务\"%1$s\"."
 
-#: api/classes/CMap.php:585 api/classes/CMap.php:589 api/classes/CMap.php:596
-#: api/classes/CMap.php:601
+#: api/classes/CMap.php:586 api/classes/CMap.php:590 api/classes/CMap.php:597
+#: api/classes/CMap.php:602
 #, php-format
 msgid "Incorrect %1$s label type value for map \"%2$s\"."
 msgstr "不正确的%1$s标示类型值予拓扑图\"%2$s\"."
@@ -5966,7 +5966,7 @@ msgstr "错误的表达式"
 msgid "Incorrect field \"%1$s\" name or value in where statement for table \"%2$s\"."
 msgstr "不正确的字段名称\"%1$s\"或用于表\"%2$s\"的where陈述式的值."
 
-#: api/classes/CMap.php:545
+#: api/classes/CMap.php:546
 msgid "Incorrect fields for sysmap"
 msgstr "不正确的sysmap字段"
 
@@ -6110,12 +6110,12 @@ msgstr "不正确的维护周期间"
 msgid "Incorrect map ID \"%s\" provided for screen element."
 msgstr "提供了不正确的拓朴图ID\"%s\"给筛选组件."
 
-#: api/classes/CMap.php:569
+#: api/classes/CMap.php:570
 #, php-format
 msgid "Incorrect map height value for map \"%s\"."
 msgstr "予拓扑图\"%s\"不正确的拓扑图高度."
 
-#: api/classes/CMap.php:566
+#: api/classes/CMap.php:567
 #, php-format
 msgid "Incorrect map width value for map \"%s\"."
 msgstr "予拓扑图\"%s\"不正确的拓扑图宽度."
@@ -7034,22 +7034,22 @@ msgstr "链接"
 msgid "Link indicators"
 msgstr "链接指示器"
 
-#: api/classes/CMap.php:631
+#: api/classes/CMap.php:632
 #, php-format
 msgid "Link name should be unique for map \"%s\"."
 msgstr "拓扑图\"%s\"的链接名称必须是唯一的."
 
-#: api/classes/CMap.php:642
+#: api/classes/CMap.php:643
 #, php-format
 msgid "Link selementid1 field is pointing to a nonexistent map selement ID \"%1$s\" for map \"%2$s\"."
 msgstr "链接字段selementid1是为拓扑图\"%2$s\"指向不存在的拓扑图 selement ID \"%1$s\"."
 
-#: api/classes/CMap.php:645
+#: api/classes/CMap.php:646
 #, php-format
 msgid "Link selementid2 field is pointing to a nonexistent map selement ID \"%1$s\" for map \"%2$s\"."
 msgstr "链接字段selementid2是为拓扑图\"%2$s\"指向不存在的拓扑图 selement ID \"%1$s\"."
 
-#: api/classes/CMap.php:628
+#: api/classes/CMap.php:629
 #, php-format
 msgid "Link should have both \"name\" and \"url\" fields for map \"%s\"."
 msgstr "于拓扑图\"%s\"的链接应都有 \"name\"和\"url\"."
@@ -7407,7 +7407,7 @@ msgstr "拓朴图标示类型"
 msgid "Map save operation failed."
 msgstr "拓扑图保存动作失败"
 
-#: api/classes/CMap.php:661
+#: api/classes/CMap.php:662
 #, php-format
 msgid "Map with name \"%s\" already exists"
 msgstr "拓扑图其名称\"%s\"已存在"
@@ -8438,7 +8438,7 @@ msgstr "没有系统访问的许可权"
 #: api/classes/CMaintenance.php:429 api/classes/CMaintenance.php:537
 #: api/classes/CMaintenance.php:554 api/classes/CMaintenance.php:621
 #: api/classes/CMapElement.php:519 api/classes/CMapElement.php:575
-#: api/classes/CMap.php:550 api/classes/CProxy.php:318
+#: api/classes/CMap.php:551 api/classes/CProxy.php:318
 #: api/classes/CProxy.php:332 api/classes/CScreenItem.php:330
 #: api/classes/CScreenItem.php:414 api/classes/CScreen.php:499
 #: api/classes/CScreen.php:578 api/classes/CService.php:1252
@@ -12681,17 +12681,17 @@ msgstr "未被锁定的用户"
 msgid "Value"
 msgstr "值"
 
-#: api/classes/CMap.php:615
+#: api/classes/CMap.php:616
 #, php-format
 msgid "Value \"%1$s\" is invalid for parameter \"grid_align\". Choices are: \"%2$s\" and \"%3$s\""
 msgstr "参数\"grid_align\"的值\"%1$s\"是无效的. 可用的是: \"%2$s\"和\"%3$s\""
 
-#: api/classes/CMap.php:611
+#: api/classes/CMap.php:612
 #, php-format
 msgid "Value \"%1$s\" is invalid for parameter \"grid_show\". Choices are: \"%2$s\""
 msgstr "参数\"grid_show\"的值\"%1$s\"是无效的. 可用的是: \"%2$s\""
 
-#: api/classes/CMap.php:619
+#: api/classes/CMap.php:620
 #, php-format
 msgid "Value \"%1$s\" is invalid for parameter \"grid_show\". Choices are: \"%2$s\" and \"%3$s\""
 msgstr "参数\"grid_show\"的值\"%1$s\"是无效的. 可用的是: \"%2$s\"和\"%3$s\""
@@ -13599,19 +13599,19 @@ msgstr "h"
 msgid "hh"
 msgstr "hh"
 
-#: api/classes/CMap.php:575
+#: api/classes/CMap.php:576
 msgid "host"
 msgstr "主机"
 
-#: api/classes/CMap.php:574
+#: api/classes/CMap.php:575
 msgid "host group"
 msgstr "主机组"
 
-#: api/classes/CMap.php:572
+#: api/classes/CMap.php:573
 msgid "icon"
 msgstr "图示"
 
-#: api/classes/CMap.php:578
+#: api/classes/CMap.php:579
 msgid "image"
 msgstr "图片"
 
@@ -13659,7 +13659,7 @@ msgstr "宏"
 msgid "maintenance"
 msgstr "维护"
 
-#: api/classes/CMap.php:577
+#: api/classes/CMap.php:578
 msgid "map"
 msgstr "拓扑图"
 
@@ -13843,7 +13843,7 @@ msgstr "模板ID\"%1$s\"已传送%2$s次"
 msgid "to"
 msgstr "到"
 
-#: api/classes/CMap.php:576
+#: api/classes/CMap.php:577
 msgid "trigger"
 msgstr "触发器"
 

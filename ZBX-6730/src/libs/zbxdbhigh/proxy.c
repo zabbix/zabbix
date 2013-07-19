@@ -26,6 +26,7 @@
 #include "proxy.h"
 #include "dbcache.h"
 #include "discovery.h"
+#include "zbxalgo.h"
 
 typedef struct
 {
@@ -43,6 +44,13 @@ typedef struct
 	ZBX_HISTORY_FIELD	fields[ZBX_MAX_FIELDS];
 }
 ZBX_HISTORY_TABLE;
+
+typedef struct
+{
+	zbx_uint64_t	id;
+	size_t		offset;
+}
+ZBX_ID_OFFSET;
 
 static ZBX_HISTORY_TABLE ht = {
 	"proxy_history", "history_lastid", "hosts h,items i,", "h.hostid=i.hostid and i.itemid=p.itemid and ",
@@ -493,6 +501,166 @@ void	get_proxyconfig_data(zbx_uint64_t proxy_hostid, struct zbx_json *j)
 
 /******************************************************************************
  *                                                                            *
+ * Function: remember_record                                                  *
+ *                                                                            *
+ * Purpose: A record is stored as a sequence of fields and flag bytes for     *
+ *          handling NULL values. A field is stored as a null-terminated      *
+ *          string to preserve field boundaries. If a field value can be NULL *
+ *          a flag byte is inserted after the field to distinguish between    *
+ *          empty string and NULL value. The flag byte can be '\1'            *
+ *          (not NULL value) or '\2' (NULL value).                            *
+ *                                                                            *
+ * Examples of representation:                                                *
+ *          \0\2    - the field can be NULL and it is NULL                    *
+ *          \0\1    - the field can be NULL but is empty string               *
+ *          abc\0\1 - the field can be NULL but is a string "abc"             *
+ *          \0      - the field can not be NULL and is empty string           *
+ *          abc\0   - the field can not be NULL and is a string "abc"         *
+ *                                                                            *
+ ******************************************************************************/
+static void	remember_record(const ZBX_FIELD **fields, int fields_count, char **recs, size_t *recs_alloc,
+		size_t *recs_offset, DB_ROW row)
+{
+	int	f;
+
+	for (f = 0; f < fields_count; f++)
+	{
+		if (0 != (fields[f]->flags & ZBX_NOTNULL))
+		{
+			zbx_strcpy_alloc(recs, recs_alloc, recs_offset, row[f]);
+			*recs_offset += sizeof(char);
+		}
+		else if (SUCCEED != DBis_null(row[f]))
+		{
+			zbx_strcpy_alloc(recs, recs_alloc, recs_offset, row[f]);
+			*recs_offset += sizeof(char);
+			zbx_chrcpy_alloc(recs, recs_alloc, recs_offset, '\1');
+		}
+		else
+		{
+			zbx_strcpy_alloc(recs, recs_alloc, recs_offset, "");
+			*recs_offset += sizeof(char);
+			zbx_chrcpy_alloc(recs, recs_alloc, recs_offset, '\2');
+		}
+	}
+}
+
+static zbx_hash_t	id_offset_hash_func(const void *data)
+{
+	const ZBX_ID_OFFSET *p = data;
+
+	return ZBX_DEFAULT_UINT64_HASH_ALGO(&p->id, sizeof(zbx_uint64_t), ZBX_DEFAULT_HASH_SEED);
+}
+
+static int	id_offset_compare_func(const void *d1, const void *d2)
+{
+	const ZBX_ID_OFFSET *p1 = d1, *p2 = d2;
+
+	return ZBX_DEFAULT_UINT64_COMPARE_FUNC(&p1->id, &p2->id);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: find_field_by_name                                               *
+ *                                                                            *
+ * Purpose: find a number of the field                                        *
+ *                                                                            *
+ ******************************************************************************/
+static int	find_field_by_name(const ZBX_FIELD **fields, int fields_count, const char *field_name)
+{
+	int	f;
+
+	for (f = 0; f < fields_count; f++)
+	{
+		if (0 == strcmp(fields[f]->name, field_name))
+			break;
+	}
+
+	return f;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: compare_nth_field                                                *
+ *                                                                            *
+ * Purpose: This function compares a value from JSON record with the value    *
+ *          of the n-th field of DB record. For description how DB record is  *
+ *          stored in memory see comments in function remember_record().      *
+ *                                                                            *
+ * Comparing deals with 4 cases:                                              *
+ *          - JSON value is not NULL, DB value is not NULL                    *
+ *          - JSON value is not NULL, DB value is NULL                        *
+ *          - JSON value is NULL, DB value is NULL                            *
+ *          - JSON value is NULL, DB value is not NULL                        *
+ *                                                                            *
+ ******************************************************************************/
+static int	compare_nth_field(const ZBX_FIELD **fields, const char *rec_data, int n, const char *str, int is_null,
+		int *last_n, size_t *last_pos)
+{
+	int		i = *last_n, null_in_db = 0;
+	const char	*p = rec_data + *last_pos, *field_start = NULL;
+
+	while (n >= i)		/* find starting position of the n-th field */
+	{
+		field_start = p;
+		while ('\0' != *p++)
+			;
+
+		null_in_db = 0;
+
+		if (0 == (fields[i++]->flags & ZBX_NOTNULL))	/* field could be NULL */
+		{
+			if ('\2' == *p && (rec_data == p - 1 || '\0' == *(p - 2) || '\1' == *(p - 2) ||
+					'\2' == *(p - 2)))	/* field value is NULL */
+			{
+				null_in_db = 1;
+				p++;
+			}
+			else if ('\1' == *p)
+			{
+				p++;
+			}
+			else
+			{
+				THIS_SHOULD_NEVER_HAPPEN;
+				*last_n = 0;
+				*last_pos = 0;
+				return 1;
+			}
+		}
+	}
+
+	*last_n = i;				/* Preserve number of field and its start position */
+	*last_pos = (size_t)(p - rec_data);	/* across calls to avoid searching from start. */
+
+	if (0 == is_null)	/* value in JSON is not NULL*/
+	{
+		if (0 == null_in_db)
+			return strcmp(field_start, str);
+		else
+			return 1;
+	}
+	else
+	{
+		if ('\0' == *str)
+		{
+			if (1 == null_in_db)
+				return 0;	/* fields are "equal" - both contain NULL */
+			else
+				return 1;
+		}
+		else
+		{
+			THIS_SHOULD_NEVER_HAPPEN;
+			*last_n = 0;
+			*last_pos = 0;
+			return 1;
+		}
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: process_proxyconfig_table                                        *
  *                                                                            *
  * Purpose: update configuration table                                        *
@@ -507,17 +675,22 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 		zbx_vector_uint64_t *del, char **error)
 {
 	const char		*__function_name = "process_proxyconfig_table";
-	int			f, field_count, insert, is_null, i, ret = FAIL;
+	int			f, fields_count = 0, insert, is_null, i, ret = FAIL, id_field_nr = 0,
+				move_out = 0, move_field_nr = 0;
 	const ZBX_FIELD		*fields[ZBX_MAX_FIELDS];
 	struct zbx_json_parse	jp_data, jp_row;
 	char			buf[MAX_STRING_LEN], *esc;
 	const char		*p, *pf;
-	zbx_uint64_t		recid;
-	zbx_vector_uint64_t	ins;
-	char			*sql = NULL;
-	size_t			sql_alloc = 4 * ZBX_KIBIBYTE, sql_offset;
+	zbx_uint64_t		recid, *p_recid = NULL;
+	zbx_vector_uint64_t	ins, moves;
+	char			*sql = NULL, *recs = NULL;
+	size_t			sql_alloc = 4 * ZBX_KIBIBYTE, sql_offset,
+				recs_alloc = 20 * ZBX_KIBIBYTE, recs_offset = 0;
 	DB_RESULT		result;
 	DB_ROW			row;
+	zbx_hashset_t           h_id_offsets, h_del;
+	zbx_hashset_iter_t	iter;
+	ZBX_ID_OFFSET		id_offset, *p_id_offset = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() table:'%s'", __function_name, table->table);
 
@@ -562,11 +735,10 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 	}
 
 	p = NULL;
-	field_count = 0;
 	/* iterate column names (lines 4-6 in T1) */
 	while (NULL != (p = zbx_json_next_value(&jp_data, p, buf, sizeof(buf), NULL)))
 	{
-		if (NULL == (fields[field_count++] = DBget_field(table, buf)))
+		if (NULL == (fields[fields_count++] = DBget_field(table, buf)))
 		{
 			*error = zbx_dsprintf(*error, "invalid field name \"%s.%s\"", table->table, buf);
 			goto out;
@@ -580,20 +752,72 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 		goto out;
 	}
 
-	/* selecting all existing records */
-	result = DBselect("select %s from %s", table->recid, table->table);
+	/* all records will be stored in one large string */
+	recs = zbx_malloc(recs, recs_alloc);
+
+	/* hash set as index for fast access to records via IDs */
+	zbx_hashset_create(&h_id_offsets, 10000, id_offset_hash_func, id_offset_compare_func);
+
+	/* a hash set as a list for finding records to be deleted */
+	zbx_hashset_create(&h_del, 10000, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+	sql = zbx_malloc(sql, sql_alloc);
+
+	sql_offset = 0;
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select ");
+
+	/* make a string with a list of fields for SELECT */
+	for (f = 0; f < fields_count; f++)
+	{
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, fields[f]->name);
+		zbx_chrcpy_alloc(&sql, &sql_alloc, &sql_offset, ',');
+	}
+
+	sql_offset--;
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " from ");
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, table->table);
+
+	/* Find a number of the ID field. Usually the 1st field. */
+	id_field_nr = find_field_by_name(fields, fields_count, table->recid);
+
+	/* select all existing records */
+	result = DBselect("%s", sql);
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		ZBX_STR2UINT64(recid, row[0]);
-		zbx_vector_uint64_append(del, recid);
+		ZBX_STR2UINT64(recid, row[id_field_nr]);
+
+		id_offset.id = recid;
+		id_offset.offset = recs_offset;
+
+		zbx_hashset_insert(&h_id_offsets, &id_offset, sizeof(id_offset));
+		zbx_hashset_insert(&h_del, &recid, sizeof(recid));
+
+		remember_record(fields, fields_count, &recs, &recs_alloc, &recs_offset, row);
 	}
 	DBfree_result(result);
 
-	zbx_vector_uint64_sort(del, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	/* these tables have unique indexes, need special preparation to avoid conflicts during inserts/updates */
+	if (0 == strcmp("hosts_templates", table->table))
+	{
+		move_out = 1;
+		move_field_nr = find_field_by_name(fields, fields_count, "templateid");
+	}
+	else if (0 == strcmp("hostmacro", table->table))
+	{
+		move_out = 1;
+		move_field_nr = find_field_by_name(fields, fields_count, "macro");
+	}
+	else if (0 == strcmp("items", table->table))
+	{
+		move_out = 1;
+		move_field_nr = find_field_by_name(fields, fields_count, "key_");
+	}
 
-	sql = zbx_malloc(sql, sql_alloc);
 	zbx_vector_uint64_create(&ins);
+
+	if (1 == move_out)
+		zbx_vector_uint64_create(&moves);
 
 	p = NULL;
 	/* iterate the entries (lines 9, 14 and 19 in T1) */
@@ -607,45 +831,130 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 		}
 
 		/* check whether we need to update existing entry or insert a new one */
+
 		ZBX_STR2UINT64(recid, buf);
-		if (FAIL != (i = zbx_vector_uint64_bsearch(del, recid, ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
-			zbx_vector_uint64_remove(del, i);
+
+		if (NULL != zbx_hashset_search(&h_del, &recid))
+		{
+			zbx_hashset_remove(&h_del, &recid);
+
+			if (1 == move_out)
+			{
+				int	last_n = 0;
+				size_t	last_pos = 0;
+
+				/* locate a copy of this record as found in database */
+				id_offset.id = recid;
+				if (NULL == (p_id_offset = zbx_hashset_search(&h_id_offsets, &id_offset)))
+				{
+					THIS_SHOULD_NEVER_HAPPEN;
+					goto clean;
+				}
+
+				/* find the field requiring special preprocessing in JSON record */
+				f = 1;
+				while (NULL != (pf = zbx_json_next_value(&jp_row, pf, buf, sizeof(buf), &is_null)))
+				{
+					/* parse values for the entry (lines 10-12 in T1) */
+
+					if (fields_count == f)
+					{
+						*error = zbx_dsprintf(*error, "invalid number of fields \"%.*s\"",
+								jp_row.end - jp_row.start + 1, jp_row.start);
+						goto clean;
+					}
+
+					if (move_field_nr == f)
+						break;
+					f++;
+				}
+
+				if (0 != compare_nth_field(fields, recs + p_id_offset->offset, move_field_nr, buf,
+						is_null, &last_n, &last_pos))
+				{
+					zbx_vector_uint64_append(&moves, recid);
+				}
+			}
+		}
 		else
 			zbx_vector_uint64_append(&ins, recid);
 	}
 
+	/* copy IDs of records to be deleted from hash set to vector */
+	zbx_hashset_iter_reset(&h_del, &iter);
+	while (NULL != (p_recid = zbx_hashset_iter_next(&iter)))
+		zbx_vector_uint64_append(del, *p_recid);
+	zbx_vector_uint64_sort(del, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
 	zbx_vector_uint64_sort(&ins, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
-	/* these tables have unique indexes */
-	if (0 != del->values_num && SUCCEED == str_in_list("hosts_templates,hostmacro,items", table->table, ','))
+	if (1 == move_out)
 	{
-		sql_offset = 0;
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "delete from %s where", table->table);
-		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, table->recid, del->values, del->values_num);
-
-		if (ZBX_DB_OK > DBexecute("%s", sql))
-			goto clean;
-
-		zbx_vector_uint64_clear(del);
-
-		/* special preprocessing for 'hostmacro' and 'items' tables */
-		/* in order to eliminate the conflicts in the 'hostid,macro' and 'hostid,key_' unique indexes */
-		if (0 == strcmp(table->table, "hostmacro"))
+		/* special preprocessing for 'hosts_templates' table to eliminate conflicts */
+		/* in the 'hostid, templateid' unique index */
+		if (0 == strcmp("hosts_templates", table->table))
 		{
-#ifdef HAVE_MYSQL
-			if (ZBX_DB_OK > DBexecute("update hostmacro set macro=concat('#',hostmacroid)"))
-#else
-			if (ZBX_DB_OK > DBexecute("update hostmacro set macro='#'||hostmacroid"))
-#endif
-				goto clean;
+			/* Making the 'hostid, templateid' combination unique to avoid collisions when new records */
+			/* are inserted and existing ones are updated is a bit complex. Let's take a simpler approach */
+			/* - delete affected old records and insert the new ones. */
+			for (i = 0; i < moves.values_num; i++)
+			{
+				zbx_vector_uint64_append(del, moves.values[i]);
+				zbx_vector_uint64_append(&ins, moves.values[i]);
+			}
+
+			if (0 < moves.values_num)
+			{
+				zbx_vector_uint64_clear(&moves);
+				zbx_vector_uint64_sort(del, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+				zbx_vector_uint64_sort(&ins, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+			}
 		}
-		else if (0 == strcmp(table->table, "items"))
+
+		if (0 != del->values_num)
 		{
+			sql_offset = 0;
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "delete from %s where", table->table);
+			DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, table->recid, del->values,
+					del->values_num);
+
+			if (ZBX_DB_OK > DBexecute("%s", sql))
+				goto clean;
+
+			zbx_vector_uint64_clear(del);
+		}
+
+		/* special preprocessing for 'hostmacro' and 'items' tables to eliminate conflicts */
+		/* in the 'hostid,macro' and 'hostid,key_' unique indexes */
+		if (1 < moves.values_num)
+		{
+			sql_offset = 0;
+			if (0 == strcmp("hostmacro", table->table))
+			{
 #ifdef HAVE_MYSQL
-			if (ZBX_DB_OK > DBexecute("update items set key_=concat('#',itemid)"))
+				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update hostmacro "
+						"set macro=concat('#',hostmacroid) where");
 #else
-			if (ZBX_DB_OK > DBexecute("update items set key_='#'||itemid"))
+				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update hostmacro "
+						"set macro='#'||hostmacroid where");
 #endif
+			}
+			else if (0 == strcmp("items", table->table))
+			{
+#ifdef HAVE_MYSQL
+				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update items "
+						"set key_=concat('#',itemid) where");
+#else
+				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update items "
+						"set key_='#'||itemid where");
+#endif
+			}
+
+			zbx_vector_uint64_sort(&moves, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+			DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, table->recid, moves.values,
+					moves.values_num);
+
+			if (ZBX_DB_OK > DBexecute("%s", sql))
 				goto clean;
 		}
 	}
@@ -657,10 +966,14 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 	/* iterate the entries (lines 9, 14 and 19 in T1) */
 	while (NULL != (p = zbx_json_next(&jp_data, p)))
 	{
+		int	rec_differ = 0;			/* how many fields differ */
+		int	last_n = 0;
+		size_t	tmp_offset = sql_offset, last_pos = 0;
+
 		zbx_json_brackets_open(p, &jp_row);
 		pf = zbx_json_next_value(&jp_row, NULL, buf, sizeof(buf), NULL);
 
-		/* check whether we need to insert a new entry or update an existing */
+		/* check whether we need to insert a new entry or update an existing one */
 		ZBX_STR2UINT64(recid, buf);
 		insert = (FAIL != zbx_vector_uint64_bsearch(&ins, recid, ZBX_DEFAULT_UINT64_COMPARE_FUNC));
 
@@ -668,25 +981,37 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 		{
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "insert into %s (", table->table);
 
-			for (f = 0; f < field_count; f++)
+			for (f = 0; f < fields_count; f++)
 				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%s,", fields[f]->name);
 
 			sql_offset--;
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ") values (" ZBX_FS_UI64 ",", recid);
 		}
-		else if (1 == field_count)	/* only primary key given, no update needed */
+		else if (1 == fields_count)	/* only primary key given, no update needed */
 		{
 			continue;
 		}
 		else
+		{
+			/* locate a copy of this record as found in database */
+			id_offset.id = recid;
+			if (NULL == (p_id_offset = zbx_hashset_search(&h_id_offsets, &id_offset)))
+			{
+				THIS_SHOULD_NEVER_HAPPEN;
+				goto clean;
+			}
+
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update %s set ", table->table);
+		}
 
 		f = 1;
 		while (NULL != (pf = zbx_json_next_value(&jp_row, pf, buf, sizeof(buf), &is_null)))
 		{
+			int	field_differ = 1;
+
 			/* parse values for the entry (lines 10-12 in T1) */
 
-			if (f == field_count)
+			if (f == fields_count)
 			{
 				*error = zbx_dsprintf(*error, "invalid number of fields \"%.*s\"",
 						jp_row.end - jp_row.start + 1, jp_row.start);
@@ -694,7 +1019,14 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 			}
 
 			if (0 == insert)
-				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%s=", fields[f]->name);
+			{
+				if (0 != (field_differ = compare_nth_field(fields, recs + p_id_offset->offset, f, buf,
+						is_null, &last_n, &last_pos)))
+				{
+					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%s=", fields[f]->name);
+					rec_differ++;
+				}
+			}
 
 			if (0 != is_null)
 			{
@@ -705,29 +1037,33 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 					goto clean;
 				}
 
-				zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "null,");
+				if (0 != field_differ)
+					zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "null,");
 			}
 			else
 			{
-				switch (fields[f]->type)
+				if (0 != field_differ)
 				{
-					case ZBX_TYPE_INT:
-					case ZBX_TYPE_UINT:
-					case ZBX_TYPE_ID:
-					case ZBX_TYPE_FLOAT:
-						zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%s,", buf);
-						break;
-					default:
-						esc = DBdyn_escape_string(buf);
-						zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "'%s',", esc);
-						zbx_free(esc);
+					switch (fields[f]->type)
+					{
+						case ZBX_TYPE_INT:
+						case ZBX_TYPE_UINT:
+						case ZBX_TYPE_ID:
+						case ZBX_TYPE_FLOAT:
+							zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%s,", buf);
+							break;
+						default:
+							esc = DBdyn_escape_string(buf);
+							zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "'%s',", esc);
+							zbx_free(esc);
+					}
 				}
 			}
 
 			f++;
 		}
 
-		if (f != field_count)
+		if (f != fields_count)
 		{
 			*error = zbx_dsprintf(*error, "invalid number of fields \"%.*s\"",
 					jp_row.end - jp_row.start + 1, jp_row.start);
@@ -741,8 +1077,16 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 		}
 		else
 		{
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " where %s=" ZBX_FS_UI64 ";\n",
-					table->recid, recid);
+			if (0 != rec_differ)
+			{
+				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " where %s=" ZBX_FS_UI64 ";\n",
+						table->recid, recid);
+			}
+			else
+			{
+				sql_offset = tmp_offset;	/* discard this update, all fields are the same */
+				*(sql + sql_offset) = '\0';
+			}
 		}
 
 		if (SUCCEED != DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset))
@@ -759,8 +1103,13 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 
 	ret = SUCCEED;
 clean:
+	zbx_hashset_destroy(&h_id_offsets);
+	zbx_hashset_destroy(&h_del);
 	zbx_vector_uint64_destroy(&ins);
+	if (1 == move_out)
+		zbx_vector_uint64_destroy(&moves);
 	zbx_free(sql);
+	zbx_free(recs);
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
@@ -897,6 +1246,13 @@ void	process_proxyconfig(struct zbx_json_parse *jp_data)
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
+#define CHECK_ARRAY_SIZE(array, alloc, num)				\
+	if (num == alloc)						\
+	{								\
+		alloc = (0 == alloc ? 8 : alloc * 3 / 2);		\
+		array = zbx_realloc(array, alloc * sizeof(*array));	\
+	}
+
 int	get_host_availability_data(struct zbx_json *j)
 {
 	typedef struct
@@ -925,7 +1281,9 @@ int	get_host_availability_data(struct zbx_json *j)
 	result = DBselect(
 			"select hostid,available,error,snmp_available,snmp_error,"
 				"ipmi_available,ipmi_error,jmx_available,jmx_error"
-			" from hosts");
+			" from hosts"
+			" where status in (%d,%d)",
+			HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED);
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -937,11 +1295,7 @@ int	get_host_availability_data(struct zbx_json *j)
 
 		if (index == ha_num || ha[index].hostid != hostid)
 		{
-			if (ha_num == ha_alloc)
-			{
-				ha_alloc += 8;
-				ha = zbx_realloc(ha, sizeof(zbx_host_availability_t) * ha_alloc);
-			}
+			CHECK_ARRAY_SIZE(ha, ha_alloc, ha_num);
 
 			if (0 != (sz = sizeof(zbx_host_availability_t) * (ha_num - index)))
 				memmove(&ha[index + 1], &ha[index], sz);
@@ -1061,8 +1415,8 @@ void	process_host_availability(struct zbx_json_parse *jp)
 	const char		*p = NULL;
 	char			tmp[HOST_ERROR_LEN_MAX], *sql = NULL, *error_esc;
 	size_t			sql_alloc = 4 * ZBX_KIBIBYTE, sql_offset = 0, tmp_offset;
-	int			no_data, item_type = -1;
-	unsigned char		available = 0;
+	int			availability_alloc = 0, availability_num = 0, availability_last = 0;
+	zbx_host_availability_t	*availability = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -1070,11 +1424,11 @@ void	process_host_availability(struct zbx_json_parse *jp)
 	if (SUCCEED != zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_DATA, &jp_data))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "invalid host availability data: %s", zbx_json_strerror());
-		goto exit;
+		goto out;
 	}
 
 	if (SUCCEED == zbx_json_object_is_empty(&jp_data))
-		goto exit;
+		goto out;
 
 	sql = zbx_malloc(sql, sql_alloc);
 
@@ -1090,41 +1444,80 @@ void	process_host_availability(struct zbx_json_parse *jp)
 			continue;
 		}
 
+		if (SUCCEED != zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_HOSTID, tmp, sizeof(tmp)) ||
+				SUCCEED != is_uint64(tmp, &hostid))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "invalid host availability data: %s", zbx_json_strerror());
+			continue;
+		}
+
 		tmp_offset = sql_offset;
-		no_data = 1;
+		availability_last = availability_num;
 
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "update hosts set ");
 
 		if (SUCCEED == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_AVAILABLE, tmp, sizeof(tmp)))
 		{
-			available = atoi(tmp);
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "available=%d,", available);
-			no_data = 0;
-			item_type = ITEM_TYPE_ZABBIX;
+			CHECK_ARRAY_SIZE(availability, availability_alloc, availability_num);
+
+			availability[availability_num].hostid = hostid;
+			availability[availability_num].type = ITEM_TYPE_ZABBIX;
+			availability[availability_num].available = atoi(tmp);
+			availability[availability_num].errors_from = 0;
+			availability[availability_num].disable_until = 0;
+
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "available=%d,",
+					availability[availability_num].available);
+
+			availability_num++;
 		}
 
 		if (SUCCEED == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_SNMP_AVAILABLE, tmp, sizeof(tmp)))
 		{
-			available = atoi(tmp);
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "snmp_available=%d,", available);
-			no_data = 0;
-			item_type = ITEM_TYPE_SNMPv1;
+			CHECK_ARRAY_SIZE(availability, availability_alloc, availability_num);
+
+			availability[availability_num].hostid = hostid;
+			availability[availability_num].type = ITEM_TYPE_SNMPv1;
+			availability[availability_num].available = atoi(tmp);
+			availability[availability_num].errors_from = 0;
+			availability[availability_num].disable_until = 0;
+
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "snmp_available=%d,",
+					availability[availability_num].available);
+
+			availability_num++;
 		}
 
 		if (SUCCEED == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_IPMI_AVAILABLE, tmp, sizeof(tmp)))
 		{
-			available = atoi(tmp);
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "ipmi_available=%d,", available);
-			no_data = 0;
-			item_type = ITEM_TYPE_IPMI;
+			CHECK_ARRAY_SIZE(availability, availability_alloc, availability_num);
+
+			availability[availability_num].hostid = hostid;
+			availability[availability_num].type = ITEM_TYPE_IPMI;
+			availability[availability_num].available = atoi(tmp);
+			availability[availability_num].errors_from = 0;
+			availability[availability_num].disable_until = 0;
+
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "ipmi_available=%d,",
+					availability[availability_num].available);
+
+			availability_num++;
 		}
 
 		if (SUCCEED == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_JMX_AVAILABLE, tmp, sizeof(tmp)))
 		{
-			available = atoi(tmp);
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "jmx_available=%d,", available);
-			no_data = 0;
-			item_type = ITEM_TYPE_JMX;
+			CHECK_ARRAY_SIZE(availability, availability_alloc, availability_num);
+
+			availability[availability_num].hostid = hostid;
+			availability[availability_num].type = ITEM_TYPE_JMX;
+			availability[availability_num].available = atoi(tmp);
+			availability[availability_num].errors_from = 0;
+			availability[availability_num].disable_until = 0;
+
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "jmx_available=%d,",
+					availability[availability_num].available);
+
+			availability_num++;
 		}
 
 		if (SUCCEED == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_ERROR, tmp, sizeof(tmp)))
@@ -1132,7 +1525,6 @@ void	process_host_availability(struct zbx_json_parse *jp)
 			error_esc = DBdyn_escape_string_len(tmp, HOST_ERROR_LEN);
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "error='%s',", error_esc);
 			zbx_free(error_esc);
-			no_data = 0;
 		}
 
 		if (SUCCEED == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_SNMP_ERROR, tmp, sizeof(tmp)))
@@ -1140,7 +1532,6 @@ void	process_host_availability(struct zbx_json_parse *jp)
 			error_esc = DBdyn_escape_string_len(tmp, HOST_ERROR_LEN);
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "snmp_error='%s',", error_esc);
 			zbx_free(error_esc);
-			no_data = 0;
 		}
 
 		if (SUCCEED == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_IPMI_ERROR, tmp, sizeof(tmp)))
@@ -1148,7 +1539,6 @@ void	process_host_availability(struct zbx_json_parse *jp)
 			error_esc = DBdyn_escape_string_len(tmp, HOST_ERROR_LEN);
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "ipmi_error='%s',", error_esc);
 			zbx_free(error_esc);
-			no_data = 0;
 		}
 
 		if (SUCCEED == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_JMX_ERROR, tmp, sizeof(tmp)))
@@ -1156,17 +1546,9 @@ void	process_host_availability(struct zbx_json_parse *jp)
 			error_esc = DBdyn_escape_string_len(tmp, HOST_ERROR_LEN);
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "jmx_error='%s',", error_esc);
 			zbx_free(error_esc);
-			no_data = 0;
 		}
 
-		if (SUCCEED != zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_HOSTID, tmp, sizeof(tmp)))
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "invalid host availability data: %s", zbx_json_strerror());
-			sql_offset = tmp_offset;
-			continue;
-		}
-
-		if (SUCCEED != is_uint64(tmp, &hostid) || 1 == no_data)
+		if (availability_last == availability_num)
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "invalid host availability data");
 			sql_offset = tmp_offset;
@@ -1186,12 +1568,11 @@ void	process_host_availability(struct zbx_json_parse *jp)
 
 	DBcommit();
 
+	DCconfig_update_host_availability(availability, availability_num);
+out:
+	zbx_free(availability);
 	zbx_free(sql);
 
-	if (-1 != item_type)
-		DCconfig_update_host_availability(hostid, item_type, available, 0, 0);
-
-exit:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 

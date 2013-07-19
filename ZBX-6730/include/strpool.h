@@ -28,7 +28,6 @@ typedef struct
 {
 	zbx_mem_info_t	*mem_info;
 	zbx_hashset_t	*hashset;
-	ZBX_MUTEX	pool_lock;
 }
 zbx_strpool_t;
 
