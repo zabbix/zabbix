@@ -12,7 +12,9 @@ libspecsysinfo_a_SOURCES = \
 	memory.c \
 	net.c \
 	proc.c \
+	software.c \
 	swap.c \
+	system.c \
 	uptime.c \
 	vmstats.c
 
