@@ -542,8 +542,9 @@ class CChart extends CGraphDraw {
 		}
 		if ($this->ymin_type == GRAPH_YAXIS_TYPE_ITEM_VALUE) {
 			$item = get_item_by_itemid($this->ymin_itemid);
-			if ($item && isset($item['lastvalue']) && !is_null($item['lastvalue'])) {
-				return $item['lastvalue'];
+			$history = Manager::History()->fetchLast(array($item));
+			if (isset($history[$item['itemid']])) {
+				return $history[$item['itemid']][0]['value'];
 			}
 		}
 
@@ -613,8 +614,9 @@ class CChart extends CGraphDraw {
 		}
 		if ($this->ymax_type == GRAPH_YAXIS_TYPE_ITEM_VALUE) {
 			$item = get_item_by_itemid($this->ymax_itemid);
-			if ($item && isset($item['lastvalue']) && !is_null($item['lastvalue'])) {
-				 return $item['lastvalue'];
+			$history = Manager::History()->fetchLast(array($item));
+			if (isset($history[$item['itemid']])) {
+				return $history[$item['itemid']][0]['value'];
 			}
 		}
 
