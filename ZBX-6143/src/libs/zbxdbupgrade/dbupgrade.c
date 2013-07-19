@@ -1269,6 +1269,31 @@ static int	DBpatch_2010086(void)
 	return DBadd_field("proxy_autoreg_host", &field);
 }
 
+static int	DBpatch_2010087(void)
+{
+	return DBdrop_field("items", "lastclock");
+}
+
+static int	DBpatch_2010088(void)
+{
+	return DBdrop_field("items", "lastns");
+}
+
+static int	DBpatch_2010089(void)
+{
+	return DBdrop_field("items", "lastvalue");
+}
+
+static int	DBpatch_2010090(void)
+{
+	return DBdrop_field("items", "prevvalue");
+}
+
+static int	DBpatch_2010091(void)
+{
+	return DBdrop_field("items", "prevorgvalue");
+}
+
 #define DBPATCH_START()					zbx_dbpatch_t	patches[] = {
 #define DBPATCH_ADD(version, duplicates, mandatory)	{DBpatch_##version, version, duplicates, mandatory},
 #define DBPATCH_END()					{NULL}};
@@ -1404,6 +1429,11 @@ int	DBcheck_version(void)
 	DBPATCH_ADD(2010084, 0, 1)
 	DBPATCH_ADD(2010085, 0, 1)
 	DBPATCH_ADD(2010086, 0, 1)
+	DBPATCH_ADD(2010087, 0, 1)
+	DBPATCH_ADD(2010088, 0, 1)
+	DBPATCH_ADD(2010089, 0, 1)
+	DBPATCH_ADD(2010090, 0, 1)
+	DBPATCH_ADD(2010091, 0, 1)
 
 	DBPATCH_END()
 
