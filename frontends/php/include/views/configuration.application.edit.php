@@ -49,18 +49,18 @@ $applicationForm->addItem($applicationTab);
 // append buttons to form
 if (!empty($this->data['applicationid'])) {
 	$applicationForm->addItem(makeFormFooter(
-		array(new CSubmit('save', _('Save'))),
+		new CSubmit('save', _('Save')),
 		array(
 			new CSubmit('clone', _('Clone')),
-			new CButtonDelete(_('Delete application?'), url_param('config').url_param('hostid').url_param('groupid').url_param('form').url_param('applicationid')),
+			new CButtonDelete(_('Delete application?'), url_params(array('config', 'hostid', 'groupid', 'form', 'applicationid'))),
 			new CButtonCancel(url_param('config').url_param('hostid').url_param('groupid'))
 		)
 	));
 }
 else {
 	$applicationForm->addItem(makeFormFooter(
-		array(new CSubmit('save', _('Save'))),
-		array(new CButtonCancel(url_param('config').url_param('hostid').url_param('groupid')))
+		new CSubmit('save', _('Save')),
+		new CButtonCancel(url_param('config').url_param('hostid').url_param('groupid'))
 	));
 }
 

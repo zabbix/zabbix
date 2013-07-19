@@ -215,9 +215,7 @@ else {
  * Clean cookies
  */
 if (get_request('show_events') != CProfile::get('web.tr_status.filter.show_events')) {
-	$url = new CUrl();
-	$path = $url->getPath();
-	insert_js('cookie.eraseArray("'.$path.'")');
+	clearCookies(true);
 }
 
 /*
@@ -313,8 +311,9 @@ $filterForm->addRow(_('Age less than'), array($statusChangeCheckBox, $statusChan
 $filterForm->addRow(_('Show details'), new CCheckBox('show_details', $_REQUEST['show_details'], null, 1));
 $filterForm->addRow(_('Filter by name'), new CTextBox('txt_select', $_REQUEST['txt_select'], 40));
 $filterForm->addRow(_('Show hosts in maintenance'), new CCheckBox('show_maintenance', $_REQUEST['show_maintenance'], null, 1));
-$filterForm->addItemToBottomRow(new CSubmit('filter_set', _('Filter')));
-$filterForm->addItemToBottomRow(new CSubmit('filter_rst', _('Reset')));
+
+$filterForm->addItemToBottomRow(new CSubmit('filter_set', _('Filter'), 'chkbxRange.clearSelectedOnFilterChange();'));
+$filterForm->addItemToBottomRow(new CSubmit('filter_rst', _('Reset'), 'chkbxRange.clearSelectedOnFilterChange();'));
 
 $triggerWidget->addFlicker($filterForm, CProfile::get('web.tr_status.filter.state', 0));
 
@@ -424,6 +423,7 @@ $options = array(
 	'selectHosts' => array('hostid', 'name', 'maintenance_status', 'maintenance_type', 'maintenanceid', 'description'),
 	'selectItems' => API_OUTPUT_EXTEND,
 	'selectDependencies' => API_OUTPUT_EXTEND,
+	'selectLastEvent' => true,
 	'expandDescription' => true,
 	'preservekeys' => true
 );
@@ -721,17 +721,35 @@ foreach ($triggers as $trigger) {
 		$config['event_ack_enable'] ? ($trigger['event_count'] == 0) : false
 	);
 
-	$lastChange = new CLink(zbx_date2str(_('d M Y H:i:s'), $trigger['lastchange']), 'events.php?triggerid='.$trigger['triggerid']);
+	$lastChangeDate = zbx_date2str(_('d M Y H:i:s'), $trigger['lastchange']);
+	$lastChange = empty($trigger['lastchange'])
+		? $lastChangeDate
+		: new CLink($lastChangeDate, 'events.php?triggerid='.$trigger['triggerid']);
 
 	// acknowledge
 	if ($config['event_ack_enable']) {
 		if ($trigger['hasEvents']) {
 			if ($trigger['event_count']) {
-				$ackColumn = new CCol(array(new CLink(_('Acknowledge'), 'acknow.php?triggers[]='.$trigger['triggerid'].'&backurl='
-					.$page['file'], 'on'), ' ('.$trigger['event_count'].')'));
+				$ackColumn = new CCol(array(
+					new CLink(
+						_('Acknowledge'),
+						'acknow.php?'.
+							'triggers[]='.$trigger['triggerid'].
+							'&backurl='.$page['file'],
+						'on'
+					), ' ('.$trigger['event_count'].')'
+				));
 			}
 			else {
-				$ackColumn = new CCol(_('Acknowledged'), 'off');
+				$ackColumn = new CCol(
+					new CLink(
+						_('Acknowledged'),
+						'acknow.php?'.
+							'eventid='.$trigger['lastEvent']['eventid'].
+							'&triggerid='.$trigger['lastEvent']['objectid'].
+							'&backurl='.$page['file'],
+						'off'
+				));
 			}
 		}
 		else {
@@ -785,7 +803,7 @@ foreach ($triggers as $trigger) {
 		$statusSpan,
 		$unknown,
 		$lastChange,
-		zbx_date2age($trigger['lastchange']),
+		empty($trigger['lastchange']) ? '-' : zbx_date2age($trigger['lastchange']),
 		$showEventColumn ? SPACE : null,
 		$ackColumn,
 		get_node_name_by_elid($trigger['triggerid']),

@@ -20,11 +20,9 @@
 
 
 /**
- * File containing CMediatype class for API.
+ * Class containing methods for operations media types.
+ *
  * @package API
- */
-/**
- * Class containing methods for operations with Media types
  */
 class CMediatype extends CZBXAPI {
 

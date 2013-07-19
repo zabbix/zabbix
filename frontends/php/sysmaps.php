@@ -174,6 +174,7 @@ if (isset($_REQUEST['save'])) {
 	if ($result) {
 		add_audit($auditAction, AUDIT_RESOURCE_MAP, 'Name ['.$_REQUEST['name'].']');
 		unset($_REQUEST['form']);
+		clearCookies($result);
 	}
 }
 elseif ((isset($_REQUEST['delete']) && isset($_REQUEST['sysmapid'])) || $_REQUEST['go'] == 'delete') {
@@ -191,6 +192,7 @@ elseif ((isset($_REQUEST['delete']) && isset($_REQUEST['sysmapid'])) || $_REQUES
 	$goResult = API::Map()->delete($sysmapIds);
 
 	show_messages($goResult, _('Network map deleted'), _('Cannot delete network map'));
+	clearCookies($goResult);
 
 	if ($goResult) {
 		unset($_REQUEST['form']);
@@ -199,12 +201,6 @@ elseif ((isset($_REQUEST['delete']) && isset($_REQUEST['sysmapid'])) || $_REQUES
 			add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_MAP, $map['sysmapid'], $map['name'], null, null, null);
 		}
 	}
-}
-
-if ($_REQUEST['go'] != 'none' && isset($goResult) && $goResult) {
-	$url = new CUrl();
-	$path = $url->getPath();
-	insert_js('cookie.eraseArray("'.$path.'")');
 }
 
 /*

@@ -153,13 +153,15 @@ elseif (isset($_REQUEST['save'])) {
 	$result = DBend($result);
 	if ($result) {
 		add_audit(
-			!isset($_REQUEST['actionid']) ? AUDIT_ACTION_ADD : AUDIT_ACTION_UPDATE,
+			isset($_REQUEST['actionid']) ? AUDIT_ACTION_UPDATE : AUDIT_ACTION_ADD,
 			AUDIT_RESOURCE_ACTION,
 			_('Name').NAME_DELIMITER.$_REQUEST['name']
 		);
 
 		unset($_REQUEST['form']);
 	}
+
+	clearCookies($result);
 }
 elseif (isset($_REQUEST['delete']) && isset($_REQUEST['actionid'])) {
 	$result = API::Action()->delete($_REQUEST['actionid']);
@@ -168,6 +170,7 @@ elseif (isset($_REQUEST['delete']) && isset($_REQUEST['actionid'])) {
 
 	if ($result) {
 		unset($_REQUEST['form'], $_REQUEST['actionid']);
+		clearCookies($result);
 	}
 }
 elseif (isset($_REQUEST['add_condition']) && isset($_REQUEST['new_condition'])) {
@@ -310,16 +313,14 @@ elseif (str_in_array($_REQUEST['go'], array('activate', 'disable')) && isset($_R
 		show_messages($goResult, _('Status updated'), _('Cannot update status'));
 		add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ACTION, ' Actions ['.implode(',', $actionIds).'] '.$statusName);
 	}
+
+	clearCookies($goResult);
 }
 elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['g_actionid'])) {
 	$goResult = API::Action()->delete($_REQUEST['g_actionid']);
-	show_messages($goResult, _('Selected actions deleted'), _('Cannot delete selected actions'));
-}
 
-if ($_REQUEST['go'] != 'none' && isset($goResult) && $goResult) {
-	$url = new CUrl();
-	$path = $url->getPath();
-	insert_js('cookie.eraseArray("'.$path.'")');
+	show_messages($goResult, _('Selected actions deleted'), _('Cannot delete selected actions'));
+	clearCookies($goResult);
 }
 
 /*
@@ -366,6 +367,8 @@ if (isset($_REQUEST['form'])) {
 		$data['action']['recovery_msg'] = get_request('recovery_msg', 0);
 		$data['action']['conditions'] = get_request('conditions', array());
 		$data['action']['operations'] = get_request('operations', array());
+
+		sortOperations($data['action']['eventsource'], $data['action']['operations']);
 
 		if (!empty($data['actionid']) && isset($_REQUEST['form_refresh'])) {
 			$data['action']['def_shortdata'] = get_request('def_shortdata');
@@ -453,7 +456,8 @@ if (isset($_REQUEST['form'])) {
 }
 else {
 	$data = array(
-		'eventsource' => get_request('eventsource')
+		'eventsource' => get_request('eventsource'),
+		'displayNodes' => is_array(get_current_nodeid())
 	);
 
 	$sortfield = getPageSortField('name');
@@ -471,6 +475,14 @@ else {
 	// sorting && paging
 	order_result($data['actions'], $sortfield, getPageSortOrder());
 	$data['paging'] = getPagingLine($data['actions']);
+
+	// nodes
+	if ($data['displayNodes']) {
+		foreach ($data['actions'] as &$action) {
+			$action['nodename'] = get_node_name_by_elid($action['actionid'], true);
+		}
+		unset($action);
+	}
 
 	// render view
 	$actionView = new CView('configuration.action.list', $data);

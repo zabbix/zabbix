@@ -1,7 +1,6 @@
-<?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2012 Zabbix SIA
+** Copyright (C) 2001-2013 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -10,7 +9,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -18,17 +17,21 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "sysinfo.h"
 
-class CEventDescription extends CTriggerDescription {
+#ifdef HAVE_SYS_UTSNAME_H
+#	include <sys/utsname.h>
+#endif
 
-	protected function resolveItemValueMacro(array $item, array $trigger) {
-		$item['lastvalue'] = item_get_history(
-			$item,
-			0,
-			$trigger['clock'],
-			$trigger['ns']
-		);
+int	SYSTEM_UNAME(AGENT_REQUEST *request, AGENT_RESULT *result)
+{
+	struct utsname	name;
 
-		return formatItemLastValue($item, UNRESOLVED_MACRO_STRING);
-	}
+	if (-1 == uname(&name))
+		return SYSINFO_RET_FAIL;
+
+	SET_STR_RESULT(result, zbx_dsprintf(NULL, "%s %s %s %s %s %s", name.sysname, name.nodename, name.release,
+			name.version, name.machine, name.idnumber));
+
+	return SYSINFO_RET_OK;
 }

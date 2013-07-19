@@ -66,13 +66,6 @@ ZBX_METRIC	parameters_common[] =
 	{"net.tcp.dns.query",	CF_HAVEPARAMS,	NET_DNS_RECORD,		",zabbix.com"}, /* deprecated */
 	{"net.tcp.port",	CF_HAVEPARAMS,	NET_TCP_PORT,		",80"},
 
-#ifdef _WINDOWS
-	{"system.hostname",	CF_HAVEPARAMS,	SYSTEM_HOSTNAME,	NULL},
-#else
-	{"system.hostname",	0,		SYSTEM_HOSTNAME,	NULL},
-#endif
-	{"system.uname",	0,		SYSTEM_UNAME,		NULL},
-
 	{"system.users.num",	0,		SYSTEM_USERS_NUM,	NULL},
 
 	{"log",			CF_HAVEPARAMS,	ONLY_ACTIVE, 		"logfile"},

@@ -7,7 +7,62 @@ MESSAGES_H = messages.h
 RESOURCE_H = resource.h
 RESOURCE_RC = resource.rc
 RESOURCE_RES = zabbix_agent.res
-OBJS  = ..\..\..\src\libs\zbxcommon\alias.o ..\..\..\src\libs\zbxcommon\comms.o ..\..\..\src\libs\zbxcommon\gnuregex.o ..\..\..\src\libs\zbxcommon\misc.o ..\..\..\src\libs\zbxcommon\regexp.o ..\..\..\src\libs\zbxcommon\str.o ..\..\..\src\libs\zbxcommon\xml.o ..\..\..\src\libs\zbxcommon\zbxgetopt.o ..\..\..\src\libs\zbxcommon\file.o ..\..\..\src\libs\zbxcomms\comms.o ..\..\..\src\libs\zbxcomms\telnet.o ..\..\..\src\libs\zbxconf\cfg.o ..\..\..\src\libs\zbxcrypto\base64.o ..\..\..\src\libs\zbxcrypto\md5.o ..\..\..\src\libs\zbxjson\json.o ..\..\..\src\libs\zbxlog\log.o ..\..\..\src\libs\zbxsys\mutexs.o ..\..\..\src\libs\zbxsys\symbols.o ..\..\..\src\libs\zbxsys\threads.o ..\..\..\src\libs\zbxexec\execute.o ..\..\..\src\libs\zbxsysinfo\agent\agent.o ..\..\..\src\libs\zbxsysinfo\common\common.o ..\..\..\src\libs\zbxsysinfo\common\file.o ..\..\..\src\libs\zbxsysinfo\common\http.o ..\..\..\src\libs\zbxsysinfo\common\net.o ..\..\..\src\libs\zbxsysinfo\common\system.o ..\..\..\src\libs\zbxsysinfo\simple\ntp.o ..\..\..\src\libs\zbxsysinfo\simple\simple.o ..\..\..\src\libs\zbxsysinfo\win32\cpu.o ..\..\..\src\libs\zbxsysinfo\win32\diskio.o ..\..\..\src\libs\zbxsysinfo\win32\diskspace.o ..\..\..\src\libs\zbxsysinfo\win32\memory.o ..\..\..\src\libs\zbxsysinfo\win32\net.o ..\..\..\src\libs\zbxsysinfo\win32\pdhmon.o ..\..\..\src\libs\zbxsysinfo\win32\proc.o ..\..\..\src\libs\zbxsysinfo\win32\services.o ..\..\..\src\libs\zbxsysinfo\win32\swap.o ..\..\..\src\libs\zbxsysinfo\win32\uptime.o ..\..\..\src\libs\zbxsysinfo\win32\win32.o ..\..\..\src\libs\zbxsysinfo\sysinfo.o ..\..\..\src\libs\zbxwin32\perfmon.o ..\..\..\src\libs\zbxwin32\service.o ..\..\..\src\zabbix_agent\active.o ..\..\..\src\zabbix_agent\cpustat.o ..\..\..\src\zabbix_agent\eventlog.o ..\..\..\src\zabbix_agent\listener.o ..\..\..\src\zabbix_agent\logfiles.o ..\..\..\src\zabbix_agent\perfstat.o ..\..\..\src\zabbix_agent\stats.o ..\..\..\src\zabbix_agent\zabbix_agentd.o ..\..\..\src\zabbix_agent\zbxconf.o
+OBJS  = ..\..\..\src\libs\zbxcommon\alias.o \
+	..\..\..\src\libs\zbxcommon\comms.o \
+	..\..\..\src\libs\zbxcommon\gnuregex.o \
+	..\..\..\src\libs\zbxcommon\misc.o \
+	..\..\..\src\libs\zbxcommon\regexp.o \
+	..\..\..\src\libs\zbxcommon\str.o \
+	..\..\..\src\libs\zbxcommon\xml.o \
+	..\..\..\src\libs\zbxcommon\zbxgetopt.o \
+	..\..\..\src\libs\zbxcommon\file.o \
+	..\..\..\src\libs\zbxcomms\comms.o \
+	..\..\..\src\libs\zbxcomms\telnet.o \
+	..\..\..\src\libs\zbxconf\cfg.o \
+	..\..\..\src\libs\zbxcrypto\base64.o \
+	..\..\..\src\libs\zbxcrypto\md5.o \
+	..\..\..\src\libs\zbxjson\json.o \
+	..\..\..\src\libs\zbxjson\json_parser.o \
+	..\..\..\src\libs\zbxlog\log.o \
+	..\..\..\src\libs\zbxsys\mutexs.o \
+	..\..\..\src\libs\zbxsys\symbols.o \
+	..\..\..\src\libs\zbxsys\threads.o \
+	..\..\..\src\libs\zbxexec\execute.o \
+	..\..\..\src\libs\zbxsysinfo\agent\agent.o \
+	..\..\..\src\libs\zbxsysinfo\common\common.o \
+	..\..\..\src\libs\zbxsysinfo\common\file.o \
+	..\..\..\src\libs\zbxsysinfo\common\http.o \
+	..\..\..\src\libs\zbxsysinfo\common\net.o \
+	..\..\..\src\libs\zbxsysinfo\common\system.o \
+	..\..\..\src\libs\zbxsysinfo\simple\ntp.o \
+	..\..\..\src\libs\zbxsysinfo\simple\simple.o \
+	..\..\..\src\libs\zbxsysinfo\win32\cpu.o \
+	..\..\..\src\libs\zbxsysinfo\win32\diskio.o \
+	..\..\..\src\libs\zbxsysinfo\win32\diskspace.o \
+	..\..\..\src\libs\zbxsysinfo\win32\memory.o \
+	..\..\..\src\libs\zbxsysinfo\win32\net.o \
+	..\..\..\src\libs\zbxsysinfo\win32\pdhmon.o \
+	..\..\..\src\libs\zbxsysinfo\win32\proc.o \
+	..\..\..\src\libs\zbxsysinfo\win32\services.o \
+	..\..\..\src\libs\zbxsysinfo\win32\swap.o \
+	..\..\..\src\libs\zbxsysinfo\win32\uptime.o \
+	..\..\..\src\libs\zbxsysinfo\win32\win32.o \
+	..\..\..\src\libs\zbxsysinfo\sysinfo.o \
+	..\..\..\src\libs\zbxsysinfo\win32\software.o \
+	..\..\..\src\libs\zbxsysinfo\win32\system.o \
+	..\..\..\src\libs\zbxsysinfo\win32\hostname.o \
+	..\..\..\src\libs\zbxwin32\perfmon.o \
+	..\..\..\src\libs\zbxwin32\service.o \
+	..\..\..\src\zabbix_agent\active.o \
+	..\..\..\src\zabbix_agent\cpustat.o \
+	..\..\..\src\zabbix_agent\eventlog.o \
+	..\..\..\src\zabbix_agent\listener.o \
+	..\..\..\src\zabbix_agent\logfiles.o \
+	..\..\..\src\zabbix_agent\perfstat.o \
+	..\..\..\src\zabbix_agent\stats.o \
+	..\..\..\src\zabbix_agent\zabbix_agentd.o \
+	..\..\..\src\zabbix_agent\zbxconf.o
+
 LIBS = ws2_32.lib psapi.lib pdh.lib Wldap32.lib advapi32.lib uuid.lib Iphlpapi.lib
 
 all: $(PROGNAME)
@@ -70,6 +125,9 @@ $(RESOURCE_RES): $(RESOURCE_RC) $(RESOURCE_H)
 ..\..\..\src\libs\zbxjson\json.o: ..\..\..\src\libs\zbxjson\json.c
 	$(CC) ..\..\..\src\libs\zbxjson\json.c /Fo"..\..\..\src\libs\zbxjson\json.o" $(CFLAGS)
 
+..\..\..\src\libs\zbxjson\json_parser.o: ..\..\..\src\libs\zbxjson\json_parser.c
+	$(CC) ..\..\..\src\libs\zbxjson\json_parser.c /Fo"..\..\..\src\libs\zbxjson\json_parser.o" $(CFLAGS)
+
 ..\..\..\src\libs\zbxlog\log.o: ..\..\..\src\libs\zbxlog\log.c
 	$(CC) ..\..\..\src\libs\zbxlog\log.c /Fo"..\..\..\src\libs\zbxlog\log.o" $(CFLAGS)
 
@@ -124,6 +182,15 @@ $(RESOURCE_RES): $(RESOURCE_RC) $(RESOURCE_H)
 ..\..\..\src\libs\zbxsysinfo\win32\net.o: ..\..\..\src\libs\zbxsysinfo\win32\net.c
 	$(CC) ..\..\..\src\libs\zbxsysinfo\win32\net.c /Fo"..\..\..\src\libs\zbxsysinfo\win32\net.o" $(CFLAGS)
 
+..\..\..\src\libs\zbxsysinfo\win32\system.o: ..\..\..\src\libs\zbxsysinfo\win32\system.c
+	$(CC) ..\..\..\src\libs\zbxsysinfo\win32\system.c /Fo"..\..\..\src\libs\zbxsysinfo\win32\system.o" $(CFLAGS)
+
+..\..\..\src\libs\zbxsysinfo\win32\hostname.o: ..\..\..\src\libs\zbxsysinfo\win32\hostname.c
+	$(CC) ..\..\..\src\libs\zbxsysinfo\win32\hostname.c /Fo"..\..\..\src\libs\zbxsysinfo\win32\hostname.o" $(CFLAGS)
+
+..\..\..\src\libs\zbxsysinfo\win32\software.o: ..\..\..\src\libs\zbxsysinfo\win32\software.c
+	$(CC) ..\..\..\src\libs\zbxsysinfo\win32\software.c /Fo"..\..\..\src\libs\zbxsysinfo\win32\software.o" $(CFLAGS)
+
 ..\..\..\src\libs\zbxsysinfo\win32\pdhmon.o: ..\..\..\src\libs\zbxsysinfo\win32\pdhmon.c
 	$(CC) ..\..\..\src\libs\zbxsysinfo\win32\pdhmon.c /Fo"..\..\..\src\libs\zbxsysinfo\win32\pdhmon.o" $(CFLAGS)
 
@@ -177,3 +244,5 @@ $(RESOURCE_RES): $(RESOURCE_RC) $(RESOURCE_H)
 
 ..\..\..\src\zabbix_agent\zbxconf.o: ..\..\..\src\zabbix_agent\zbxconf.c
 	$(CC) ..\..\..\src\zabbix_agent\zbxconf.c /Fo"..\..\..\src\zabbix_agent\zbxconf.o" $(CFLAGS)
+
+

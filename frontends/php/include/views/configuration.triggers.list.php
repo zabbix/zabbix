@@ -61,7 +61,10 @@ if (!empty($this->data['parent_discoveryid'])) {
 		'[ ',
 		new CLink(
 			$this->data['showdisabled'] ? _('Hide disabled triggers') : _('Show disabled triggers'),
-			'trigger_prototypes.php?showdisabled='.($this->data['showdisabled'] ? 0 : 1).'&hostid='.$this->data['hostid'].'&parent_discoveryid='.$this->data['parent_discoveryid']
+			'trigger_prototypes.php?'.
+				'showdisabled='.($this->data['showdisabled'] ? 0 : 1).
+				'&hostid='.$this->data['hostid'].
+				'&parent_discoveryid='.$this->data['parent_discoveryid']
 		),
 		' ]'
 	));
@@ -76,7 +79,9 @@ else {
 		'[ ',
 		new CLink(
 			$this->data['showdisabled'] ? _('Hide disabled triggers') : _('Show disabled triggers'),
-			'triggers.php?hostid='.$this->data['hostid'].'&showdisabled='.($this->data['showdisabled'] ? 0 : 1)
+			'triggers.php?'.
+				'hostid='.$this->data['hostid'].
+				'&showdisabled='.($this->data['showdisabled'] ? 0 : 1)
 		),
 		' ]'
 	));
@@ -126,10 +131,18 @@ foreach ($this->data['triggers'] as $tnum => $trigger) {
 
 			if (!empty($this->data['parent_discoveryid'])) {
 				$tpl_disc_ruleid = get_realrule_by_itemid_and_hostid($this->data['parent_discoveryid'], $real_host['hostid']);
-				$description[] = new CLink($real_host['name'], 'trigger_prototypes.php?hostid='.$real_host['hostid'].'&parent_discoveryid='.$tpl_disc_ruleid, 'unknown');
+				$description[] = new CLink(
+					CHtml::encode($real_host['name']),
+					'trigger_prototypes.php?hostid='.$real_host['hostid'].'&parent_discoveryid='.$tpl_disc_ruleid,
+					'unknown'
+				);
 			}
 			else {
-				$description[] = new CLink($real_host['name'], 'triggers.php?hostid='.$real_host['hostid'], 'unknown');
+				$description[] = new CLink(
+					CHtml::encode($real_host['name']),
+					'triggers.php?hostid='.$real_host['hostid'],
+					'unknown'
+				);
 			}
 			$description[] = NAME_DELIMITER;
 		}
@@ -137,11 +150,19 @@ foreach ($this->data['triggers'] as $tnum => $trigger) {
 
 	if (empty($this->data['parent_discoveryid'])) {
 		if (!empty($trigger['discoveryRule'])) {
-			$description[] = new CLink($trigger['discoveryRule']['name'], 'trigger_prototypes.php?hostid='.$this->data['hostid'].'&parent_discoveryid='.$trigger['discoveryRule']['itemid'], 'gold');
+			$description[] = new CLink(
+				CHtml::encode($trigger['discoveryRule']['name']),
+				'trigger_prototypes.php?'.
+					'hostid='.$this->data['hostid'].'&parent_discoveryid='.$trigger['discoveryRule']['itemid'],
+				'gold'
+			);
 			$description[] = NAME_DELIMITER.$trigger['description'];
 		}
 		else {
-			$description[] = new CLink($trigger['description'], 'triggers.php?form=update&hostid='.$this->data['hostid'].'&triggerid='.$triggerid);
+			$description[] = new CLink(
+				CHtml::encode($trigger['description']),
+				'triggers.php?form=update&hostid='.$this->data['hostid'].'&triggerid='.$triggerid
+			);
 		}
 
 		$dependencies = $trigger['dependencies'];
@@ -152,17 +173,24 @@ foreach ($this->data['triggers'] as $tnum => $trigger) {
 
 				$db_hosts = get_hosts_by_triggerid($dep_trigger['triggerid']);
 				while ($host = DBfetch($db_hosts)) {
-					$description[] = $host['name'];
+					$description[] = CHtml::encode($host['name']);
 					$description[] = ', ';
 				}
 				array_pop($description);
 				$description[] = NAME_DELIMITER;
-				$description[] = $dep_trigger['description'];
+				$description[] = CHtml::encode($dep_trigger['description']);
 			}
 		}
 	}
 	else {
-		$description[] = new CLink($trigger['description'], 'trigger_prototypes.php?form=update&hostid='.$this->data['hostid'].'&parent_discoveryid='.$this->data['parent_discoveryid'].'&triggerid='.$triggerid);
+		$description[] = new CLink(
+			CHtml::encode($trigger['description']),
+			'trigger_prototypes.php?'.
+				'form=update'.
+				'&hostid='.$this->data['hostid'].
+				'&parent_discoveryid='.$this->data['parent_discoveryid'].
+				'&triggerid='.$triggerid
+		);
 	}
 
 	$templated = false;
@@ -190,16 +218,21 @@ foreach ($this->data['triggers'] as $tnum => $trigger) {
 	if (!empty($this->data['parent_discoveryid'])) {
 		$status = new CLink(
 			triggerIndicator($trigger['status']),
-			'trigger_prototypes.php?go='.($trigger['status'] == TRIGGER_STATUS_DISABLED ? 'activate' : 'disable').
-				'&hostid='.$this->data['hostid'].'&g_triggerid='.$triggerid.'&parent_discoveryid='.$this->data['parent_discoveryid'],
+			'trigger_prototypes.php?'.
+				'go='.($trigger['status'] == TRIGGER_STATUS_DISABLED ? 'activate' : 'disable').
+				'&hostid='.$this->data['hostid'].
+				'&g_triggerid='.$triggerid.
+				'&parent_discoveryid='.$this->data['parent_discoveryid'],
 			triggerIndicatorStyle($trigger['status'])
 		);
 	}
 	else {
 		$status = new CLink(
 			triggerIndicator($trigger['status'], $trigger['state']),
-			'triggers.php?go='.($trigger['status'] == TRIGGER_STATUS_DISABLED ? 'activate' : 'disable').
-				'&hostid='.$this->data['hostid'].'&g_triggerid='.$triggerid,
+			'triggers.php?'.
+				'go='.($trigger['status'] == TRIGGER_STATUS_DISABLED ? 'activate' : 'disable').
+				'&hostid='.$this->data['hostid'].
+				'&g_triggerid='.$triggerid,
 			triggerIndicatorStyle($trigger['status'], $trigger['state'])
 		);
 	}
@@ -251,7 +284,16 @@ $goOption->setAttribute('confirm', _('Delete selected triggers?'));
 $goComboBox->addItem($goOption);
 $goButton = new CSubmit('goButton', _('Go').' (0)');
 $goButton->setAttribute('id', 'goButton');
+
 zbx_add_post_js('chkbxRange.pageGoName = "g_triggerid";');
+if (empty($this->data['parent_discoveryid'])) {
+	zbx_add_post_js('chkbxRange.prefix = "'.$this->data['hostid'].'";');
+	zbx_add_post_js('cookie.prefix = "'.$this->data['hostid'].'";');
+}
+else {
+	zbx_add_post_js('chkbxRange.prefix = "'.$this->data['parent_discoveryid'].'";');
+	zbx_add_post_js('cookie.prefix = "'.$this->data['parent_discoveryid'].'";');
+}
 
 // append table to form
 $triggersForm->addItem(array($this->data['paging'], $triggersTable, $this->data['paging'], get_table_header(array($goComboBox, $goButton))));

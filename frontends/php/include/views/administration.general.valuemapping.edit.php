@@ -39,9 +39,7 @@ $valueMappingFormList->addRow(_('Name'), $nameTextBox);
 $mappingsTable = new CTable(SPACE, 'formElementTable');
 $mappingsTable->setAttribute('id', 'mappingsTable');
 $mappingsTable->addRow(array(_('Value'), SPACE, _('Mapped to'), SPACE));
-$addCol = new CCol(new CButton('addMapping', _('Add'), '', 'link_menu'));
-$addCol->setColSpan(4);
-$mappingsTable->addRow($addCol);
+$mappingsTable->addRow(new CCol(new CButton('addMapping', _('Add'), '', 'link_menu'), null, 4));
 $valueMappingFormList->addRow(_('Mappings'), new CDiv($mappingsTable, 'border_dotted inlineblock objectgroup'));
 
 // add mappings to form by js
@@ -59,15 +57,17 @@ $valueMappingTab->addTab('valuemapping', _('Value mapping'), $valueMappingFormLi
 $valueMappingForm->addItem($valueMappingTab);
 
 // append buttons
-$saveButton = new CSubmit('save', _('Save'));
 if (!empty($this->data['valuemapid'])) {
-	$valueMappingForm->addItem(makeFormFooter(array($saveButton), array(
-		new CButtonDelete($this->data['confirmMessage'], url_param('valuemapid')),
-		new CButtonCancel())
+	$valueMappingForm->addItem(makeFormFooter(
+		new CSubmit('save', _('Save')),
+		array(
+			new CButtonDelete($this->data['confirmMessage'], url_param('valuemapid')),
+			new CButtonCancel()
+		)
 	));
 }
 else {
-	$valueMappingForm->addItem(makeFormFooter(array($saveButton), new CButtonCancel()));
+	$valueMappingForm->addItem(makeFormFooter(new CSubmit('save', _('Save')), new CButtonCancel()));
 }
 
 return $valueMappingForm;

@@ -103,12 +103,11 @@ $mediaTypeTab->addTab('mediaTypeTab', _('Media type'), $mediaTypeFormList);
 $mediaTypeForm->addItem($mediaTypeTab);
 
 // append buttons to form
-$saveButton = new CSubmit('save', _('Save'));
 if (empty($this->data['mediatypeid'])) {
-	$mediaTypeForm->addItem(makeFormFooter(array($saveButton), array(new CButtonCancel(url_param('config')))));
+	$mediaTypeForm->addItem(makeFormFooter(new CSubmit('save', _('Save')), array(new CButtonCancel(url_param('config')))));
 }
 else {
-	$mediaTypeForm->addItem(makeFormFooter(array($saveButton), array(new CButtonDelete(_('Delete selected media type?'), url_param('form').url_param('mediatypeid').url_param('config')), new CButtonCancel(url_param('config')))));
+	$mediaTypeForm->addItem(makeFormFooter(new CSubmit('save', _('Save')), array(new CButtonDelete(_('Delete selected media type?'), url_param('form').url_param('mediatypeid').url_param('config')), new CButtonCancel(url_param('config')))));
 }
 
 // append form to widget

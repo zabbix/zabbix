@@ -30,6 +30,7 @@
 #define ZBX_PROTO_TAG_DRULE		"drule"
 #define ZBX_PROTO_TAG_DCHECK		"dcheck"
 #define ZBX_PROTO_TAG_HOST		"host"
+#define ZBX_PROTO_TAG_HOST_METADATA	"host_metadata"
 #define ZBX_PROTO_TAG_INFO		"info"
 #define ZBX_PROTO_TAG_IP		"ip"
 #define ZBX_PROTO_TAG_DNS		"dns"
@@ -64,6 +65,7 @@
 #define ZBX_PROTO_TAG_JMX_ERROR		"jmx_error"
 #define ZBX_PROTO_TAG_USERNAME		"username"
 #define ZBX_PROTO_TAG_PASSWORD		"password"
+#define ZBX_PROTO_TAG_SID		"sid"
 
 #define ZBX_PROTO_VALUE_FAILED		"failed"
 #define ZBX_PROTO_VALUE_SUCCESS		"success"
@@ -80,6 +82,11 @@
 #define ZBX_PROTO_VALUE_COMMAND			"command"
 #define ZBX_PROTO_VALUE_JAVA_GATEWAY_INTERNAL	"java gateway internal"
 #define ZBX_PROTO_VALUE_JAVA_GATEWAY_JMX	"java gateway jmx"
+#define ZBX_PROTO_VALUE_GET_QUEUE		"queue.get"
+
+#define ZBX_PROTO_VALUE_GET_QUEUE_OVERVIEW	"overview"
+#define ZBX_PROTO_VALUE_GET_QUEUE_PROXY		"overview by proxy"
+#define ZBX_PROTO_VALUE_GET_QUEUE_DETAILS	"details"
 
 typedef enum
 {
@@ -129,16 +136,16 @@ void	zbx_json_addstring(struct zbx_json *j, const char *name, const char *string
 void	zbx_json_adduint64(struct zbx_json *j, const char *name, zbx_uint64_t value);
 int	zbx_json_close(struct zbx_json *j);
 
-int		zbx_json_open(char *buffer, struct zbx_json_parse *jp);
-const char	*zbx_json_next(struct zbx_json_parse *jp, const char *p);
-const char	*zbx_json_next_value(struct zbx_json_parse *jp, const char *p, char *string, size_t len, int *is_null);
-const char	*zbx_json_pair_next(struct zbx_json_parse *jp, const char *p, char *name, size_t len);
-const char	*zbx_json_pair_by_name(struct zbx_json_parse *jp, const char *name);
-int		zbx_json_value_by_name(struct zbx_json_parse *jp, const char *name, char *string, size_t len);
-int		zbx_json_value_by_name_dyn(struct zbx_json_parse *jp, const char *name, char **string, size_t *string_alloc);
-int		zbx_json_brackets_open(const char *p, struct zbx_json_parse *jp);
-int		zbx_json_brackets_by_name(struct zbx_json_parse *jp, const char *name, struct zbx_json_parse *out);
-int		zbx_json_object_is_empty(struct zbx_json_parse *jp);
-int		zbx_json_count(struct zbx_json_parse *jp);
+int		zbx_json_open(const char *buffer, struct zbx_json_parse *jp);
+const char	*zbx_json_next(const struct zbx_json_parse *jp, const char *p);
+const char	*zbx_json_next_value(const struct zbx_json_parse *jp, const char *p, char *string, size_t len, int *is_null);
+const char	*zbx_json_pair_next(const struct zbx_json_parse *jp, const char *p, char *name, size_t len);
+const char	*zbx_json_pair_by_name(const struct zbx_json_parse *jp, const char *name);
+int		zbx_json_value_by_name(const struct zbx_json_parse *jp, const char *name, char *string, size_t len);
+int		zbx_json_value_by_name_dyn(const struct zbx_json_parse *jp, const char *name, char **string, size_t *string_alloc);
+int		zbx_json_brackets_open(const char *p, struct zbx_json_parse *out);
+int		zbx_json_brackets_by_name(const struct zbx_json_parse *jp, const char *name, struct zbx_json_parse *out);
+int		zbx_json_object_is_empty(const struct zbx_json_parse *jp);
+int		zbx_json_count(const struct zbx_json_parse *jp);
 
 #endif /* ZABBIX_ZJSON_H */

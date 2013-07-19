@@ -20,6 +20,8 @@
 
 
 /**
+ * Class containing methods for operations with actions.
+ *
  * @package API
  */
 class CAction extends CZBXAPI {
@@ -29,9 +31,9 @@ class CAction extends CZBXAPI {
 	protected $sortColumns = array('actionid', 'name', 'status');
 
 	/**
-	 * Get Actions data
+	 * Get actions data
 	 *
-	 * @param _array $options
+	 * @param array $options
 	 * @param array $options['itemids']
 	 * @param array $options['hostids']
 	 * @param array $options['groupids']
@@ -44,6 +46,7 @@ class CAction extends CZBXAPI {
 	 * @param array $options['pattern']
 	 * @param array $options['limit']
 	 * @param array $options['order']
+	 *
 	 * @return array|int item data as array or false if error
 	 */
 	public function get($options = array()) {
@@ -711,7 +714,7 @@ class CAction extends CZBXAPI {
 			}
 
 			$actionid = $action['actionid'];
-			unset($action['actionid']);
+			unset($action['actionid'], $action['conditions'], $action['operations']);
 			if (!empty($action)) {
 				$update[] = array(
 					'values' => $action,
@@ -1490,6 +1493,7 @@ class CAction extends CZBXAPI {
 				case CONDITION_TYPE_DVALUE:
 				case CONDITION_TYPE_APPLICATION:
 				case CONDITION_TYPE_HOST_NAME:
+				case CONDITION_TYPE_HOST_METADATA:
 				case CONDITION_TYPE_EVENT_TYPE:
 					if (zbx_empty($condition['value'])) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty action condition.'));
@@ -1764,6 +1768,4 @@ class CAction extends CZBXAPI {
 
 		return $result;
 	}
-
-
 }

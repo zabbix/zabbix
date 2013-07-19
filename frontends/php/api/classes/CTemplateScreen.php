@@ -21,6 +21,8 @@
 
 /**
  * Class containing methods for operations with template screens.
+ *
+ * @package API
  */
 class CTemplateScreen extends CScreen {
 
