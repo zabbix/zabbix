@@ -18,7 +18,6 @@
 **/
 
 #include "common.h"
-#include "mutexs.h"
 #include "ipc.h"
 #include "log.h"
 
@@ -26,9 +25,6 @@
 #include "memalloc.h"
 
 #include "strpool.h"
-
-#define LOCK_POOL	zbx_mutex_lock(&strpool.pool_lock)
-#define UNLOCK_POOL	zbx_mutex_unlock(&strpool.pool_lock)
 
 extern char		*CONFIG_FILE;
 
@@ -72,13 +68,7 @@ void	zbx_strpool_create(size_t size)
 		exit(FAIL);
 	}
 
-	zbx_mem_create(&strpool.mem_info, shm_key, ZBX_NO_MUTEX, size, "string pool", "CacheSize");
-
-	if (ZBX_MUTEX_ERROR == zbx_mutex_create_force(&strpool.pool_lock, ZBX_MUTEX_STRPOOL))
-	{
-		zabbix_log(LOG_LEVEL_CRIT, "cannot create mutex for string pool");
-		exit(FAIL);
-	}
+	zbx_mem_create(&strpool.mem_info, shm_key, ZBX_NO_MUTEX, size, "string pool", "CacheSize", 0);
 
 	strpool.hashset = __strpool_mem_malloc_func(NULL, sizeof(zbx_hashset_t));
 	zbx_hashset_create_ext(strpool.hashset, INIT_HASHSET_SIZE,
@@ -95,7 +85,6 @@ void	zbx_strpool_destroy()
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	zbx_mem_destroy(strpool.mem_info);
-	zbx_mutex_destroy(&strpool.pool_lock);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
@@ -104,8 +93,6 @@ const char	*zbx_strpool_intern(const char *str)
 {
 	void		*record;
 	uint32_t	*refcount;
-
-	LOCK_POOL;
 
 	record = zbx_hashset_search(strpool.hashset, str - REFCOUNT_FIELD_SIZE);
 
@@ -119,8 +106,6 @@ const char	*zbx_strpool_intern(const char *str)
 	refcount = (uint32_t *)record;
 	(*refcount)++;
 
-	UNLOCK_POOL;
-
 	return record + REFCOUNT_FIELD_SIZE;
 }
 
@@ -128,12 +113,8 @@ const char	*zbx_strpool_acquire(const char *str)
 {
 	uint32_t	*refcount;
 
-	LOCK_POOL;
-
 	refcount = (uint32_t *)(str - REFCOUNT_FIELD_SIZE);
 	(*refcount)++;
-
-	UNLOCK_POOL;
 
 	return str;
 }
@@ -142,13 +123,9 @@ void	zbx_strpool_release(const char *str)
 {
 	uint32_t	*refcount;
 
-	LOCK_POOL;
-
 	refcount = (uint32_t *)(str - REFCOUNT_FIELD_SIZE);
 	if (0 == --(*refcount))
 		zbx_hashset_remove(strpool.hashset, str - REFCOUNT_FIELD_SIZE);
-
-	UNLOCK_POOL;
 }
 
 void	zbx_strpool_clear()
@@ -157,16 +134,12 @@ void	zbx_strpool_clear()
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	LOCK_POOL;
-
 	zbx_mem_clear(strpool.mem_info);
 
 	strpool.hashset = __strpool_mem_malloc_func(NULL, sizeof(zbx_hashset_t));
 	zbx_hashset_create_ext(strpool.hashset, INIT_HASHSET_SIZE,
 				__strpool_hash_func, __strpool_compare_func,
 				__strpool_mem_malloc_func, __strpool_mem_realloc_func, __strpool_mem_free_func);
-
-	UNLOCK_POOL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }

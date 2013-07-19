@@ -42,8 +42,8 @@ require_once dirname(__FILE__).'/include/setup.inc.php';
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = array(
 	'type' =>				array(T_ZBX_STR, O_OPT, null,	IN('"'.ZBX_DB_MYSQL.'","'.ZBX_DB_POSTGRESQL.'","'.ZBX_DB_ORACLE.'","'.ZBX_DB_DB2.'","'.ZBX_DB_SQLITE3.'"'), null),
-	'server' =>				array(T_ZBX_STR, O_OPT, null,	null,				null),
-	'port' =>				array(T_ZBX_INT, O_OPT, null,	BETWEEN(0, 65535),	null, _('Port')),
+	'server' =>				array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,			null, _('Database host')),
+	'port' =>				array(T_ZBX_INT, O_OPT, null,	BETWEEN(0, 65535),	null, _('Database port')),
 	'database' =>			array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,			null, _('Database name')),
 	'user' =>				array(T_ZBX_STR, O_OPT, null,	null,				null),
 	'password' =>			array(T_ZBX_STR, O_OPT, null,	null, 				null),
@@ -62,7 +62,6 @@ $fields = array(
 	'form' =>				array(T_ZBX_STR, O_OPT, P_SYS,	null,				null),
 	'form_refresh' =>		array(T_ZBX_INT, O_OPT, null,	null,				null)
 );
-check_fields($fields, false);
 
 if (isset($_REQUEST['cancel']) || isset($_REQUEST['finish'])) {
 	zbx_unsetcookie('ZBX_CONFIG');
@@ -71,6 +70,7 @@ if (isset($_REQUEST['cancel']) || isset($_REQUEST['finish'])) {
 
 $ZBX_CONFIG = get_cookie('ZBX_CONFIG', null);
 $ZBX_CONFIG = isset($ZBX_CONFIG) ? unserialize($ZBX_CONFIG) : array();
+$ZBX_CONFIG['check_fields_result'] = check_fields($fields, false);
 
 if (!isset($ZBX_CONFIG['step'])) {
 	$ZBX_CONFIG['step'] = 0;
@@ -124,6 +124,9 @@ $pageHeader->addCssInit();
 $pageHeader->addCssFile('styles/themes/originalblue/main.css');
 $pageHeader->addJsFile('js/jquery/jquery.js');
 $pageHeader->addJsFile('js/jquery/jquery-ui.js');
+$path = 'jsLoader.php?ver='.ZABBIX_VERSION.'&amp;lang='.CWebUser::$data['lang'].'&amp;files[]=common.js&amp;files[]=main.js';
+$pageHeader->addJsFile($path);
+
 $pageHeader->display();
 ?>
 <body class="originalblue setupBG">

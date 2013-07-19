@@ -19,6 +19,11 @@
 **/
 
 
+/**
+ * Class containing methods for operations with http tests.
+ *
+ * @package API
+ */
 class CHttpTest extends CZBXAPI {
 
 	protected $tableName = 'httptest';
@@ -286,8 +291,7 @@ class CHttpTest extends CZBXAPI {
 
 		$this->validateCreate($httpTests);
 
-		$httpTestManager = new CHttpTestManager();
-		$httpTests = $httpTestManager->persist($httpTests);
+		$httpTests = Manager::HttpTest()->persist($httpTests);
 
 		return array('httptestids' => zbx_objectValues($httpTests, 'httptestid'));
 	}
@@ -355,8 +359,7 @@ class CHttpTest extends CZBXAPI {
 
 		$this->validateUpdate($httpTests);
 
-		$httpTestManager = new CHttpTestManager();
-		$httpTestManager->persist($httpTests);
+		Manager::HttpTest()->persist($httpTests);
 
 		return array('httptestids' => zbx_objectValues($httpTests, 'httptestid'));
 	}

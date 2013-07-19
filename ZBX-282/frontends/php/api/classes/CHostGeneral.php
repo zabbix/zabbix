@@ -20,6 +20,8 @@
 
 
 /**
+ * Class containing methods for operations with hosts.
+ *
  * @package API
  */
 abstract class CHostGeneral extends CZBXAPI {
@@ -173,7 +175,7 @@ abstract class CHostGeneral extends CZBXAPI {
 				'SELECT i.key_,i.flags'.
 				' FROM items i'.
 				' WHERE '.dbConditionInt('i.hostid', $templateIdsAll).
-				' GROUP BY i.key_'.
+				' GROUP BY i.key_,i.flags'.
 				' HAVING COUNT(i.itemid)>1'
 			);
 
@@ -209,9 +211,21 @@ abstract class CHostGeneral extends CZBXAPI {
 
 				$template = reset($template);
 
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Template "%1$s" with item key "%2$s" already linked to host.',
-						$template['name'], $dbItem['key_']));
+				if ($dbItem['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Template "%1$s" with item key "%2$s" already linked to host.',
+							$template['name'], $dbItem['key_']));
+				}
+				elseif ($dbItem['flags'] == ZBX_FLAG_DISCOVERY) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Template "%1$s" with low level discovery rule key "%2$s" already linked to host.',
+							$template['name'], $dbItem['key_']));
+				}
+				else {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Template "%1$s" with item prototype key "%2$s" already linked to host.',
+							$template['name'], $dbItem['key_']));
+				}
 			}
 		}
 
@@ -363,16 +377,13 @@ abstract class CHostGeneral extends CZBXAPI {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
-		$appManager = new CApplicationManager();
-		$httpTestManager = new CHttpTestManager();
-
 		foreach ($targetIds as $targetId) {
 			foreach ($templateIds as $templateId) {
 				if (isset($linked[$targetId]) && isset($linked[$targetId][$templateId])) {
 					continue;
 				}
 
-				$appManager->link($templateId, $targetId);
+				Manager::Application()->link($templateId, $targetId);
 
 				API::DiscoveryRule()->syncTemplates(array(
 					'hostids' => $targetId,
@@ -389,7 +400,7 @@ abstract class CHostGeneral extends CZBXAPI {
 					'templateids' => $templateId
 				));
 
-				$httpTestManager->link($templateId, $targetId);
+				Manager::HttpTest()->link($templateId, $targetId);
 			}
 
 			// we do linkage in two separate loops because for triggers you need all items already created on host

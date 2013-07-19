@@ -23,6 +23,7 @@
 #include "db.h"
 #include "log.h"
 #include "zbxalgo.h"
+#include "valuecache.h"
 
 /******************************************************************************
  *                                                                            *
@@ -1358,44 +1359,6 @@ static int	DBget_drule_value_by_event(const DB_EVENT *event, char **replace_to, 
 
 /******************************************************************************
  *                                                                            *
- * Function: DBget_history_value                                              *
- *                                                                            *
- * Purpose: retrieve value by clock                                           *
- *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value: upon successful completion return SUCCEED                    *
- *               otherwise FAIL                                               *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
- ******************************************************************************/
-static int	DBget_history_value(zbx_uint64_t itemid, unsigned char value_type, char **replace_to,
-		const char *field_name, int clock, int ns)
-{
-	int		ret = FAIL;
-	char		**h_value;
-	zbx_timespec_t	ts;
-
-	ts.sec = clock;
-	ts.ns = ns;
-
-	h_value = DBget_history(itemid, value_type, ZBX_DB_GET_HIST_VALUE, 0, 0, &ts, field_name, 1);
-
-	if (NULL != h_value[0])
-	{
-		*replace_to = zbx_strdup(*replace_to, h_value[0]);
-		ret = SUCCEED;
-	}
-	DBfree_history(h_value);
-
-	return ret;
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: DBget_history_log_value                                          *
  *                                                                            *
  * Purpose: retrieve a particular attribute of a log value                    *
@@ -1415,47 +1378,57 @@ static int	DBget_history_log_value(zbx_uint64_t itemid, char **replace_to, int r
 {
 	const char	*__function_name = "DBget_history_log_value";
 
-	DB_RESULT	result;
-	DB_ROW		row;
-	int		ret = FAIL;
+	DB_RESULT		result;
+	DB_ROW			row;
+	int			ret = FAIL, found;
+	unsigned char		value_type = ITEM_VALUE_TYPE_MAX;
+	zbx_timespec_t		ts = {clock, ns};
+	zbx_history_record_t	value;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	result = DBselect("select value_type from items where itemid=" ZBX_FS_UI64, itemid);
 
 	if (NULL != (row = DBfetch(result)))
-	{
-		if (ITEM_VALUE_TYPE_LOG == atoi(row[0]))
-		{
-			const char	*field_names[] = {"timestamp", "timestamp", "timestamp", "source", "severity",
-					"severity", "logeventid"};
-
-			ret = DBget_history_value(itemid, ITEM_VALUE_TYPE_LOG, replace_to, field_names[request],
-					clock, ns);
-		}
-	}
+		value_type = (unsigned char)atoi(row[0]);
 	DBfree_result(result);
 
-	if (SUCCEED != ret)
-		goto fail;
+	if (ITEM_VALUE_TYPE_LOG != value_type)
+		goto out;
+
+	if (SUCCEED != zbx_vc_get_value(itemid, value_type, &ts, &value, &found) || 1 != found)
+		goto out;
 
 	switch (request)
 	{
 		case ZBX_REQUEST_ITEM_LOG_DATE:
-			*replace_to = zbx_strdup(*replace_to, zbx_date2str((time_t)atoi(*replace_to)));
+			*replace_to = zbx_strdup(*replace_to, zbx_date2str((time_t)value.value.log->timestamp));
 			break;
 		case ZBX_REQUEST_ITEM_LOG_TIME:
-			*replace_to = zbx_strdup(*replace_to, zbx_time2str((time_t)atoi(*replace_to)));
+			*replace_to = zbx_strdup(*replace_to, zbx_time2str((time_t)value.value.log->timestamp));
 			break;
 		case ZBX_REQUEST_ITEM_LOG_AGE:
-			*replace_to = zbx_strdup(*replace_to, zbx_age2str(time(NULL) - atoi(*replace_to)));
+			*replace_to = zbx_strdup(*replace_to, zbx_age2str(time(NULL) - value.value.log->timestamp));
+			break;
+		case ZBX_REQUEST_ITEM_LOG_SOURCE:
+			*replace_to = zbx_strdup(*replace_to, value.value.log->source);
 			break;
 		case ZBX_REQUEST_ITEM_LOG_SEVERITY:
 			*replace_to = zbx_strdup(*replace_to,
-					zbx_item_logtype_string((unsigned char)atoi(*replace_to)));
+					zbx_item_logtype_string((unsigned char)value.value.log->severity));
+			break;
+		case ZBX_REQUEST_ITEM_LOG_NSEVERITY:
+			*replace_to = zbx_dsprintf(*replace_to, "%d", value.value.log->severity);
+			break;
+		case ZBX_REQUEST_ITEM_LOG_EVENTID:
+			*replace_to = zbx_dsprintf(*replace_to, "%d", value.value.log->logeventid);
 			break;
 	}
-fail:
+
+	zbx_history_record_clear(&value, ITEM_VALUE_TYPE_LOG);
+
+	ret = SUCCEED;
+out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
@@ -1518,48 +1491,40 @@ static int	DBitem_lastvalue(const char *expression, char **lastvalue, int N_func
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	if (FAIL == get_N_itemid(expression, N_functionid, &itemid))
-		goto fail;
+		goto out;
 
 	result = DBselect(
-			"select itemid,value_type,valuemapid,units,lastvalue"
+			"select value_type,valuemapid,units"
 			" from items"
 			" where itemid=" ZBX_FS_UI64,
 			itemid);
 
-	if (NULL != (row = DBfetch(result)) && SUCCEED != DBis_null(row[4]))
+	if (NULL != (row = DBfetch(result)))
 	{
-		zbx_uint64_t	itemid, valuemapid;
-		unsigned char	value_type;
-		char		**h_value;
-		char		tmp[MAX_STRING_LEN];
+		unsigned char			value_type;
+		zbx_uint64_t			valuemapid;
+		zbx_vector_history_record_t	values;
 
-		ZBX_STR2UINT64(itemid, row[0]);
-		value_type = atoi(row[1]);
-		ZBX_DBROW2UINT64(valuemapid, row[2]);
+		zbx_history_record_vector_create(&values);
 
-		switch (value_type)
+		value_type = (unsigned char)atoi(row[0]);
+		ZBX_DBROW2UINT64(valuemapid, row[1]);
+
+		if (SUCCEED == zbx_vc_get_value_range(itemid, value_type, &values, 0, 1, time(NULL)) &&
+				0 < values.values_num)
 		{
-			case ITEM_VALUE_TYPE_LOG:
-			case ITEM_VALUE_TYPE_TEXT:
-				h_value = DBget_history(itemid, value_type, ZBX_DB_GET_HIST_VALUE, 0, 0, NULL, NULL, 1);
+			char	tmp[MAX_STRING_LEN];
 
-				if (NULL != h_value[0])
-					*lastvalue = zbx_strdup(*lastvalue, h_value[0]);
-				else
-					ZBX_STRDUP(*lastvalue, row[4]);
+			zbx_vc_history_value2str(tmp, sizeof(tmp), &values.values[0].value, value_type);
+			zbx_format_value(tmp, sizeof(tmp), valuemapid, row[2], value_type);
+			*lastvalue = zbx_strdup(*lastvalue, tmp);
 
-				DBfree_history(h_value);
-				break;
-			default:
-				zbx_strlcpy(tmp, row[4], sizeof(tmp));
-				zbx_format_value(tmp, sizeof(tmp), valuemapid, row[3], value_type);
-				ZBX_STRDUP(*lastvalue, tmp);
-				break;
+			ret = SUCCEED;
 		}
-		ret = SUCCEED;
+		zbx_history_record_vector_destroy(&values, value_type);
 	}
 	DBfree_result(result);
-fail:
+out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
@@ -1588,45 +1553,43 @@ static int	DBitem_value(const char *expression, char **value, int N_functionid, 
 	DB_RESULT	result;
 	DB_ROW		row;
 	zbx_uint64_t	itemid;
-	int		ret = FAIL;
+	int		ret = FAIL, found;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	if (FAIL == get_N_itemid(expression, N_functionid, &itemid))
-		goto fail;
+		goto out;
 
 	result = DBselect(
-			"select itemid,value_type,valuemapid,units"
+			"select value_type,valuemapid,units"
 			" from items"
 			" where itemid=" ZBX_FS_UI64,
 			itemid);
 
 	if (NULL != (row = DBfetch(result)))
 	{
-		zbx_uint64_t	itemid, valuemapid;
-		unsigned char	value_type;
-		char		tmp[MAX_STRING_LEN];
+		unsigned char		value_type;
+		zbx_uint64_t		valuemapid;
+		zbx_timespec_t		ts = {clock, ns};
+		zbx_history_record_t	vc_value;
 
-		ZBX_STR2UINT64(itemid, row[0]);
-		value_type = (unsigned char)atoi(row[1]);
-		ZBX_DBROW2UINT64(valuemapid, row[2]);
+		value_type = (unsigned char)atoi(row[0]);
+		ZBX_DBROW2UINT64(valuemapid, row[1]);
 
-		if (SUCCEED == (ret = DBget_history_value(itemid, value_type, value, "value", clock, ns)))
+		if (SUCCEED == zbx_vc_get_value(itemid, value_type, &ts, &vc_value, &found) && 1 == found)
 		{
-			switch (value_type)
-			{
-				case ITEM_VALUE_TYPE_FLOAT:
-				case ITEM_VALUE_TYPE_UINT64:
-				case ITEM_VALUE_TYPE_STR:
-					zbx_strlcpy(tmp, *value, sizeof(tmp));
-					zbx_format_value(tmp, sizeof(tmp), valuemapid, row[3], value_type);
-					ZBX_STRDUP(*value, tmp);
-					break;
-			}
+			char	tmp[MAX_STRING_LEN];
+
+			zbx_vc_history_value2str(tmp, sizeof(tmp), &vc_value.value, value_type);
+			zbx_history_record_clear(&vc_value, value_type);
+			zbx_format_value(tmp, sizeof(tmp), valuemapid, row[2], value_type);
+			*value = zbx_strdup(*value, tmp);
+
+			ret = SUCCEED;
 		}
 	}
 	DBfree_result(result);
-fail:
+out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
@@ -3814,7 +3777,6 @@ static void	zbx_evaluate_item_functions(zbx_vector_ptr_t *ifuncs)
 			else
 				func->value = zbx_strdup(func->value, value);
 		}
-		DBfree_item_from_db(&item);	/* free cached historical fields item.h_* */
 	}
 	DBfree_result(result);
 

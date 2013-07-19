@@ -17,17 +17,16 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
-/**
- * @package API
- */
+
 
 /**
- * Class for operating icon maps.
+ * Class containing methods for operations with icon maps.
+ *
  * Icon maps work only with map elements that represent hosts, and used for automatic changing
  * icons based on host inventory data.
  * Icon maps has read access for everyone and write access only for superamins
+ *
+ * @package API
  */
 class CIconMap extends CZBXAPI {
 
@@ -485,4 +484,3 @@ class CIconMap extends CZBXAPI {
 		return $result;
 	}
 }
-?>

@@ -156,6 +156,9 @@ typedef struct
 }
 zbx_timespec_t;
 
+#define zbx_timespec_compare(t1, t2)	\
+	((t1)->sec == (t2)->sec ? (t1)->ns - (t2)->ns : (t1)->sec - (t2)->sec)
+
 /* item types */
 typedef enum
 {
@@ -243,10 +246,20 @@ typedef enum
 	ITEM_VALUE_TYPE_UINT64,
 	ITEM_VALUE_TYPE_TEXT,
 	/* the number of defined value types */
-	ITEM_VALUE_TYPE_COUNT
+	ITEM_VALUE_TYPE_MAX
 }
 zbx_item_value_type_t;
 const char	*zbx_item_value_type_string(zbx_item_value_type_t value_type);
+
+typedef struct
+{
+	int	timestamp;
+	int	logeventid;
+	int	severity;
+	char	*source;
+	char	*value;
+}
+zbx_log_value_t;
 
 typedef union
 {
@@ -254,6 +267,7 @@ typedef union
 	zbx_uint64_t	ui64;
 	char		*str;
 	char		*err;
+	zbx_log_value_t	*log;
 }
 history_value_t;
 
@@ -1084,5 +1098,8 @@ void uinc128_64(zbx_uint128_t *base, zbx_uint64_t value);
 void uinc128_128(zbx_uint128_t *base, const zbx_uint128_t *value);
 void udiv128_64(zbx_uint128_t *result, const zbx_uint128_t *base, zbx_uint64_t value);
 void umul64_64(zbx_uint128_t *result, zbx_uint64_t value, zbx_uint64_t factor);
+
+#define ZBX_SESSION_ACTIVE	0
+#define ZBX_SESSION_PASSIVE	1
 
 #endif
