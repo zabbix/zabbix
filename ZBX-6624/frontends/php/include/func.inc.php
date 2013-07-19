@@ -449,11 +449,11 @@ function convertUnitsUptime($value) {
  * 1y 4d, not 1y 0m 4d or 1y 4d #h.
  *
  * @param int $value	time period in seconds
- * @param bool $displayMillisec	without ms (1s 200 ms = 1.2s)
+ * @param bool $ignoreMillisec	without ms (1s 200 ms = 1.2s)
  *
  * @return string
  */
-function convertUnitsS($value, $displayMillisec = false) {
+function convertUnitsS($value, $ignoreMillisec = false) {
 	if (($secs = round($value * 1000, ZBX_UNITS_ROUNDOFF_UPPER_LIMIT) / 1000) < 0) {
 		$secs = -$secs;
 		$str = '-';
@@ -517,7 +517,7 @@ function convertUnitsS($value, $displayMillisec = false) {
 		$values['s'] = $n;
 	}
 
-	if ($displayMillisec) {
+	if ($ignoreMillisec) {
 		if ($n_unit < 1 && ($n = round($secs, ZBX_UNITS_ROUNDOFF_UPPER_LIMIT)) != 0) {
 			$values['s'] += $n;
 		}
@@ -549,11 +549,11 @@ function convertUnitsS($value, $displayMillisec = false) {
  * @param string $convert
  * @param string $byteStep
  * @param string $pow
- * @param bool $displayMillisec
+ * @param bool $ignoreMillisec
  *
  * @return string
  */
-function convert_units($value, $units, $convert = ITEM_CONVERT_WITH_UNITS, $byteStep = false, $pow = false, $displayMillisec = false) {
+function convert_units($value, $units, $convert = ITEM_CONVERT_WITH_UNITS, $byteStep = false, $pow = false, $ignoreMillisec = false) {
 	// special processing for unix timestamps
 	if ($units == 'unixtime') {
 		return zbx_date2str(_('Y.m.d H:i:s'), $value);
@@ -566,7 +566,7 @@ function convert_units($value, $units, $convert = ITEM_CONVERT_WITH_UNITS, $byte
 
 	// special processing for seconds
 	if ($units == 's') {
-		return convertUnitsS($value, $displayMillisec);
+		return convertUnitsS($value, $ignoreMillisec);
 	}
 
 	// any other unit
