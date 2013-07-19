@@ -54,7 +54,8 @@ ul li.linear { float: left; list-style-type: none; margin-right: 2px; }
 .rarr { font-size: 16px; }
 .nowrap { white-space: nowrap; word-spacing: 0; }
 .delimiter { font-weight: bold; color: #000; }
-.pointer:hover { cursor: pointer; }
+div.pointer:hover, img.pointer:hover { cursor: pointer; }
+
 .move { cursor: move; }
 
 /* font */
@@ -136,7 +137,6 @@ a.weight_normal { font-weight: normal; }
 /* form */
 fieldset { margin: 0 0 2px 0; padding: 2px; border: 1px solid gray; }
 fieldset legend { margin: 0.2em 0.5em; }
-label { cursor: pointer; }
 form { margin: 0; }
 .input {
 	font-size: 10px; font-family: Verdana, arial, helvetica, sans-serif;
@@ -149,7 +149,7 @@ form { margin: 0; }
 .input[disabled]:focus { text-decoration: none; border-color: #ACA899; }
 .input[disabled]:hover { text-decoration: none; border-color: #ACA899; }
 .select {
-	margin: 0 2px 0 0; cursor: pointer; height: 14px; line-height: 14px;
+	margin: 0 2px 0 0; height: 14px; line-height: 14px;
 	-moz-box-sizing: content-box; -webkit-box-sizing: content-box; box-sizing: content-box;
 }
 select[multiple="multiple"], select.openView { height: auto; }
@@ -178,7 +178,7 @@ textarea.textarea_big { height: auto; }
 .textarea_standard { width: 312px; }
 .textarea_big { width: 524px; }
 .button { border: 1px solid #808080; vertical-align: top; margin: 1px 2px 1px 1px; background: #F0F0F0 url('../images/gradients/button.gif') repeat-x top left; }
-.button:hover { text-decoration: underline; border-color: black; cursor: pointer; }
+.button:hover { border-color: black; cursor: pointer; }
 
 /* button displayed as link */
 .link_menu {
@@ -366,6 +366,7 @@ table.flicker tr td.flicker_c { height: 16px; padding-left: 4px; padding-right: 
 table.flicker tr td.flicker_l { text-align: left; height: 16px; padding-left: 4px; line-height: 12px; }
 table.flicker tr td.flicker_r {text-align: right; height: 16px; padding-right: 4px; line-height: 12px; }
 table.flicker a { color: #0BF; }
+td.flicker_c { cursor: pointer; };
 
 /* acknowledgements */
 table.ack_msgs { width: 70%; background-color: #EEEEEE; padding: 0; border: 0 solid; }
@@ -524,10 +525,11 @@ div.suggest { position: absolute; border: 1px #5C7099 solid; width: 162px; z-ind
 	background-image: linear-gradient(#F4F4F4 20%, #F0F0F0 50%, #E8E8E8 52%, #EEE 100%);
 	border-radius: 3px; -webkit-border-radius: 3px; -moz-border-radius: 3px;
 }
+.multiselect .selected ul li { position: relative; }
 .multiselect .selected ul li.pressed { background: #D4D4D4; }
-.multiselect .selected ul li span.text { padding: 0 4px 0 4px; }
+.multiselect .selected ul li span.text { padding: 0 4px; text-align: justify; white-space: nowrap; }
 .multiselect .selected ul li span.arrow {
-	padding: 0 6px; cursor: pointer; position: relative; z-index: 11;
+	padding: 0 -12px 0 12px; cursor: pointer; position: absolute; z-index: 11; width: 12px; height: 12px; right: 0px;
 	background: url("../images/general/multiselect.png") no-repeat -12px 1px;
 }
 .multiselect .selected ul li span.arrow:hover { background-position: -12px -19px; }

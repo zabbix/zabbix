@@ -143,6 +143,8 @@ elseif (isset($_REQUEST['save'])) {
 	}
 
 	Dbend($result);
+
+	clearCookies($result);
 }
 elseif (isset($_REQUEST['go'])) {
 	if ($_REQUEST['go'] == 'delete') {
@@ -177,10 +179,7 @@ elseif (isset($_REQUEST['go'])) {
 			}
 
 			unset($_REQUEST['form'], $_REQUEST['regexpid']);
-
-			$url = new CUrl();
-			$path = $url->getPath();
-			insert_js('cookie.eraseArray("'.$path.'")');
+			clearCookies($result);
 		}
 	}
 }

@@ -81,6 +81,7 @@ if ($page['type'] == PAGE_TYPE_HTML) {
 	}
 
 	// the chkbxRange.init() method must be called after the inserted post scripts
+	$post_script .= "cookie.init();\n";
 	$post_script .= "chkbxRange.init();\n";
 	$post_script .= '});'."\n";
 
@@ -109,6 +110,7 @@ if ($page['type'] == PAGE_TYPE_HTML) {
 		));
 		$table->show();
 	}
+
 	insert_js($post_script);
 
 	echo '</body>'."\n".

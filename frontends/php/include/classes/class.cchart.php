@@ -542,8 +542,9 @@ class CChart extends CGraphDraw {
 		}
 		if ($this->ymin_type == GRAPH_YAXIS_TYPE_ITEM_VALUE) {
 			$item = get_item_by_itemid($this->ymin_itemid);
-			if ($item && isset($item['lastvalue']) && !is_null($item['lastvalue'])) {
-				return $item['lastvalue'];
+			$history = Manager::History()->fetchLast(array($item));
+			if (isset($history[$item['itemid']])) {
+				return $history[$item['itemid']][0]['value'];
 			}
 		}
 
@@ -613,8 +614,9 @@ class CChart extends CGraphDraw {
 		}
 		if ($this->ymax_type == GRAPH_YAXIS_TYPE_ITEM_VALUE) {
 			$item = get_item_by_itemid($this->ymax_itemid);
-			if ($item && isset($item['lastvalue']) && !is_null($item['lastvalue'])) {
-				 return $item['lastvalue'];
+			$history = Manager::History()->fetchLast(array($item));
+			if (isset($history[$item['itemid']])) {
+				return $history[$item['itemid']][0]['value'];
 			}
 		}
 
@@ -1475,6 +1477,10 @@ class CChart extends CGraphDraw {
 		$step = $this->gridStep[GRAPH_YAXIS_SIDE_LEFT];
 		$hstr_count = $this->gridLinesCount[GRAPH_YAXIS_SIDE_LEFT];
 
+		// ignore milliseconds if  -1 <= maxY => 1 or -1 <= minY => 1
+		$ignoreMillisec = (bccomp($maxY, -1) <= 0 || bccomp($maxY, 1) >= 0
+				|| bccomp($minY, -1) <= 0 || bccomp($minY, 1) >= 0);
+
 		$newPow = false;
 		if ($byteStep) {
 			$maxYPow = convertToBase1024($maxY, 1024);
@@ -1513,7 +1519,7 @@ class CChart extends CGraphDraw {
 				continue;
 			}
 
-			$str = convert_units($val, $units, ITEM_CONVERT_NO_UNITS, $byteStep, $newPow);
+			$str = convert_units($val, $units, ITEM_CONVERT_NO_UNITS, $byteStep, $newPow, $ignoreMillisec);
 
 			$dims = imageTextSize(8, 0, $str);
 
@@ -1531,7 +1537,7 @@ class CChart extends CGraphDraw {
 			);
 		}
 
-		$str = convert_units($maxY, $units, ITEM_CONVERT_NO_UNITS, $byteStep, $newPow);
+		$str = convert_units($maxY, $units, ITEM_CONVERT_NO_UNITS, $byteStep, $newPow, $ignoreMillisec);
 
 		$dims = imageTextSize(8, 0, $str);
 		imageText(
@@ -1616,6 +1622,10 @@ class CChart extends CGraphDraw {
 		$step = $this->gridStep[GRAPH_YAXIS_SIDE_RIGHT];
 		$hstr_count = $this->gridLinesCount[GRAPH_YAXIS_SIDE_RIGHT];
 
+		// ignore milliseconds if  -1 <= maxY => 1 or -1 <= minY => 1
+		$ignoreMillisec = (bccomp($maxY, -1) <= 0 || bccomp($maxY, 1) >= 0
+				|| bccomp($minY, -1) <= 0 || bccomp($minY, 1) >= 0);
+
 		$newPow = false;
 		if ($byteStep) {
 			$maxYPow = convertToBase1024($maxY, 1024);
@@ -1655,7 +1665,7 @@ class CChart extends CGraphDraw {
 				continue;
 			}
 
-			$str = convert_units($val, $units, ITEM_CONVERT_NO_UNITS, $byteStep, $newPow);
+			$str = convert_units($val, $units, ITEM_CONVERT_NO_UNITS, $byteStep, $newPow, $ignoreMillisec);
 
 			// marker Y coordinate
 			$posY = $this->sizeY + $this->shiftY - $this->gridStepX[GRAPH_YAXIS_SIDE_RIGHT] * $i + 4;
@@ -1671,7 +1681,7 @@ class CChart extends CGraphDraw {
 			);
 		}
 
-		$str = convert_units($maxY, $units, ITEM_CONVERT_NO_UNITS, $byteStep, $newPow);
+		$str = convert_units($maxY, $units, ITEM_CONVERT_NO_UNITS, $byteStep, $newPow, $ignoreMillisec);
 		imageText(
 			$this->im,
 			8,
