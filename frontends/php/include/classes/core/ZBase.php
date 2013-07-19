@@ -200,6 +200,7 @@ class ZBase {
 			$this->rootDir.'/include/classes/import/importers',
 			$this->rootDir.'/include/classes/import/readers',
 			$this->rootDir.'/include/classes/import/formatters',
+			$this->rootDir.'/include/classes/server',
 			$this->rootDir.'/include/classes/screens',
 			$this->rootDir.'/include/classes/sysmaps',
 			$this->rootDir.'/include/classes/helpers',
