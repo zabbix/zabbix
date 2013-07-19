@@ -3,6 +3,7 @@ Changes for 2.1.2
 New features:
 
 Bug fixes:
+...G...... [ZBX-282] added sensor item support for Linux kernels newer than v2.4 (igors)
 
 --------------------------------------------------------------------------------
 Changes for 2.1.1
@@ -16,7 +17,7 @@ A......... [ZBXNEXT-1689] removed the with_historical_items parameter from host.
 
 Bug fixes:
 ..F....... [ZBX-6803] fixed screens data in "Template OS OpenBSD" template (Guntis)
-...G...... [ZBX-5616] improved system.hostname request mechanism and added system.sw.arch item support for NetBSD, OpenBSD, Mac OS X, AIX, HP-UX, Solaris, Tru64, FreeBSD and Windows platforms
+...G...... [ZBX-5616] improved system.hostname request mechanism and added system.sw.arch item support for NetBSD, OpenBSD, Mac OS X, AIX, HP-UX, Solaris, Tru64, FreeBSD and Windows platforms (igors)
 ..F....... [ZBX-6663] fixed checkbox "Select all" in lists when all checkboxes are selected (Ivo)
 ..F....... [ZBX-6777] fixed usage of cursor pointer (Guntis)
 ....I..... [ZBX-6637] added -m64 compilation flag for Solaris to be able to understand all attributes of 64-bit processes (igors)
