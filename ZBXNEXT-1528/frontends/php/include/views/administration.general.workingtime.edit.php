@@ -32,6 +32,6 @@ $workingTimeForm->setName('workingTimeForm');
 
 $workingTimeForm->addVar('form_refresh', $this->data['form_refresh'] + 1);
 $workingTimeForm->addItem($workingTimeView);
-$workingTimeForm->addItem(makeFormFooter(array(new CSubmit('save', _('Save')))));
+$workingTimeForm->addItem(makeFormFooter(new CSubmit('save', _('Save'))));
 
 return $workingTimeForm;

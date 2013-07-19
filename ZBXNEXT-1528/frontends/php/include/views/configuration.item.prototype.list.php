@@ -67,10 +67,17 @@ foreach ($this->data['items'] as $item) {
 		$description[] = new CLink($template_host['name'], '?parent_discoveryid='.$templateDiscoveryRuleId, 'unknown');
 		$description[] = NAME_DELIMITER;
 	}
-	$description[] = new CLink(itemName($item), '?form=update&itemid='.$item['itemid'].'&parent_discoveryid='.$this->data['parent_discoveryid']);
+	$description[] = new CLink(
+		itemName($item),
+		'?form=update&itemid='.$item['itemid'].'&parent_discoveryid='.$this->data['parent_discoveryid']
+	);
 
-	$status = new CLink(itemIndicator($item['status']), '?group_itemid='.$item['itemid'].'&parent_discoveryid='.$this->data['parent_discoveryid'].
-		'&go='.($item['status'] ? 'activate' : 'disable'), itemIndicatorStyle($item['status'])
+	$status = new CLink(
+		itemIndicator($item['status']),
+		'?group_itemid='.$item['itemid'].
+			'&parent_discoveryid='.$this->data['parent_discoveryid'].
+			'&go='.($item['status'] ? 'activate' : 'disable'),
+		itemIndicatorStyle($item['status'])
 	);
 
 	if (!empty($item['applications'])) {
@@ -115,7 +122,10 @@ $goComboBox->addItem($goOption);
 
 $goButton = new CSubmit('goButton', _('Go').' (0)');
 $goButton->setAttribute('id', 'goButton');
+
 zbx_add_post_js('chkbxRange.pageGoName = "group_itemid";');
+zbx_add_post_js('chkbxRange.prefix = "'.$this->data['parent_discoveryid'].'";');
+zbx_add_post_js('cookie.prefix = "'.$this->data['parent_discoveryid'].'";');
 
 // append table to form
 $itemForm->addItem(array($this->data['paging'], $itemTable, $this->data['paging'], get_table_header(array($goComboBox, $goButton))));

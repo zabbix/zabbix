@@ -336,8 +336,8 @@ elseif (isset($_REQUEST['delete']) && isset($_REQUEST['itemid'])) {
 		$result = API::Item()->delete($_REQUEST['itemid']);
 	}
 	show_messages($result, _('Item deleted'), _('Cannot delete item'));
-
 	unset($_REQUEST['itemid'], $_REQUEST['form']);
+	clearCookies($result, $_REQUEST['hostid']);
 }
 elseif (isset($_REQUEST['clone']) && isset($_REQUEST['itemid'])) {
 	unset($_REQUEST['itemid']);
@@ -457,24 +457,29 @@ elseif (isset($_REQUEST['save'])) {
 
 	if ($result) {
 		unset($_REQUEST['itemid'], $_REQUEST['form']);
+		clearCookies($result, $_REQUEST['hostid']);
 	}
 }
 // cleaning history for one item
 elseif (isset($_REQUEST['del_history']) && isset($_REQUEST['itemid'])) {
 	$result = false;
+
 	DBstart();
 
 	if ($item = get_item_by_itemid($_REQUEST['itemid'])) {
 		$result = delete_history_by_itemid($_REQUEST['itemid']);
 	}
+
 	if ($result) {
-		DBexecute('UPDATE items SET lastvalue=null,lastclock=null,prevvalue=null WHERE itemid='.$_REQUEST['itemid']);
 		$host = get_host_by_hostid($_REQUEST['hostid']);
 		add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ITEM, _('Item').' ['.$item['key_'].'] ['.$_REQUEST['itemid'].'] '.
 			_('Host').' ['.$host['name'].'] '._('History cleared'));
 	}
+
 	$result = DBend($result);
+
 	show_messages($result, _('History cleared'), _('Cannot clear history'));
+	clearCookies($result, $_REQUEST['hostid']);
 }
 // mass update
 elseif (isset($_REQUEST['update']) && isset($_REQUEST['massupdate']) && isset($_REQUEST['group_itemid'])) {
@@ -625,28 +630,37 @@ elseif (isset($_REQUEST['update']) && isset($_REQUEST['massupdate']) && isset($_
 	catch (Exception $e) {
 		$result = false;
 	}
+
 	$result = DBend($result);
+
 	show_messages($result, _('Items updated'), _('Cannot update items'));
 
 	if ($result) {
 		unset($_REQUEST['group_itemid'], $_REQUEST['massupdate'], $_REQUEST['update'], $_REQUEST['form']);
+		clearCookies($result, $_REQUEST['hostid']);
 	}
 }
 elseif ($_REQUEST['go'] == 'activate' && isset($_REQUEST['group_itemid'])) {
 	$group_itemid = $_REQUEST['group_itemid'];
 
 	DBstart();
-	$go_result = activate_item($group_itemid);
-	$go_result = DBend($go_result);
-	show_messages($go_result, _('Items activated'), null);
+
+	$goResult = activate_item($group_itemid);
+	$goResult = DBend($goResult);
+
+	show_messages($goResult, _('Items activated'), null);
+	clearCookies($goResult, $_REQUEST['hostid']);
 }
 elseif ($_REQUEST['go'] == 'disable' && isset($_REQUEST['group_itemid'])) {
 	$group_itemid = $_REQUEST['group_itemid'];
 
 	DBstart();
-	$go_result = disable_item($group_itemid);
-	$go_result = DBend($go_result);
-	show_messages($go_result, _('Items disabled'), null);
+
+	$goResult = disable_item($group_itemid);
+	$goResult = DBend($goResult);
+
+	show_messages($goResult, _('Items disabled'), null);
+	clearCookies($goResult, $_REQUEST['hostid']);
 }
 elseif ($_REQUEST['go'] == 'copy_to' && isset($_REQUEST['copy']) && isset($_REQUEST['group_itemid'])) {
 	if (isset($_REQUEST['copy_targetid']) && $_REQUEST['copy_targetid'] > 0 && isset($_REQUEST['copy_type'])) {
@@ -671,10 +685,13 @@ elseif ($_REQUEST['go'] == 'copy_to' && isset($_REQUEST['copy']) && isset($_REQU
 		}
 
 		DBstart();
-		$go_result = copyItemsToHosts($_REQUEST['group_itemid'], $hosts_ids);
-		$go_result = DBend($go_result);
 
-		show_messages($go_result, _('Items copied'), _('Cannot copy items'));
+		$goResult = copyItemsToHosts($_REQUEST['group_itemid'], $hosts_ids);
+		$goResult = DBend($goResult);
+
+		show_messages($goResult, _('Items copied'), _('Cannot copy items'));
+		clearCookies($goResult, $_REQUEST['hostid']);
+
 		$_REQUEST['go'] = 'none2';
 	}
 	else {
@@ -684,8 +701,9 @@ elseif ($_REQUEST['go'] == 'copy_to' && isset($_REQUEST['copy']) && isset($_REQU
 // clean history for selected items
 elseif ($_REQUEST['go'] == 'clean_history' && isset($_REQUEST['group_itemid'])) {
 	DBstart();
-	$go_result = delete_history_by_itemid($_REQUEST['group_itemid']);
-	DBexecute('UPDATE items SET lastvalue=null,lastclock=null,prevvalue=null WHERE '.dbConditionInt('itemid', $_REQUEST['group_itemid']));
+
+	$goResult = delete_history_by_itemid($_REQUEST['group_itemid']);
+
 
 	foreach ($_REQUEST['group_itemid'] as $id) {
 		if (!$item = get_item_by_itemid($id)) {
@@ -696,11 +714,15 @@ elseif ($_REQUEST['go'] == 'clean_history' && isset($_REQUEST['group_itemid'])) 
 			_('Item').' ['.$item['key_'].'] ['.$id.'] '._('Host').' ['.$host['host'].'] '._('History cleared')
 		);
 	}
-	$go_result = DBend($go_result);
-	show_messages($go_result, _('History cleared'), $go_result);
+
+	$goResult = DBend($goResult);
+
+	show_messages($goResult, _('History cleared'), $goResult);
+	clearCookies($goResult, $_REQUEST['hostid']);
 }
 elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['group_itemid'])) {
 	DBstart();
+
 	$group_itemid = $_REQUEST['group_itemid'];
 
 	$itemsToDelete = API::Item()->get(array(
@@ -710,9 +732,9 @@ elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['group_itemid'])) {
 		'preservekeys' => true
 	));
 
-	$go_result = API::Item()->delete($group_itemid);
+	$goResult = API::Item()->delete($group_itemid);
 
-	if ($go_result) {
+	if ($goResult) {
 		foreach ($itemsToDelete as $item) {
 			$host = reset($item['hosts']);
 			add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_ITEM, _('Item').' ['.$item['key_'].'] ['.$item['itemid'].'] '.
@@ -720,12 +742,8 @@ elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['group_itemid'])) {
 		}
 	}
 
-	show_messages(DBend($go_result), _('Items deleted'), _('Cannot delete items'));
-}
-if ($_REQUEST['go'] != 'none' && !empty($go_result)) {
-	$url = new CUrl();
-	$path = $url->getPath();
-	insert_js('cookie.eraseArray("'.$path.'")');
+	show_messages(DBend($goResult), _('Items deleted'), _('Cannot delete items'));
+	clearCookies($goResult, $_REQUEST['hostid']);
 }
 
 /*
@@ -951,6 +969,7 @@ else {
 		$options['filter']['status'] = $_REQUEST['filter_status'];
 	}
 	if (isset($_REQUEST['filter_state']) && !zbx_empty($_REQUEST['filter_state']) && $_REQUEST['filter_state'] != -1) {
+		$options['filter']['status'] = ITEM_STATUS_ACTIVE;
 		$options['filter']['state'] = $_REQUEST['filter_state'];
 	}
 	if (isset($_REQUEST['filter_templated_items']) && !zbx_empty($_REQUEST['filter_templated_items'])

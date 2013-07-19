@@ -41,7 +41,7 @@
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-int	zbx_send_response(zbx_sock_t *sock, int result, const char *info, int timeout)
+int	zbx_send_response_ext(zbx_sock_t *sock, int result, const char *info, int protocol, int timeout)
 {
 	const char	*__function_name = "zbx_send_response";
 
@@ -58,14 +58,11 @@ int	zbx_send_response(zbx_sock_t *sock, int result, const char *info, int timeou
 	zbx_json_addstring(&json, ZBX_PROTO_TAG_RESPONSE, resp, ZBX_JSON_TYPE_STRING);
 
 	if (NULL != info && '\0' != *info)
-	{
 		zbx_json_addstring(&json, ZBX_PROTO_TAG_INFO, info, ZBX_JSON_TYPE_STRING);
-	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() '%s'",
-			__function_name, json.buffer);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() '%s'", __function_name, json.buffer);
 
-	if (FAIL == (ret = zbx_tcp_send_to(sock, json.buffer, timeout)))
+	if (FAIL == (ret = zbx_tcp_send_ext(sock, json.buffer, protocol, timeout)))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "Error sending result back: %s", zbx_tcp_strerror());
 		ret = NETWORK_ERROR;
@@ -115,24 +112,23 @@ int	zbx_recv_response(zbx_sock_t *sock, char *info, int max_info_size, int timeo
 		/* side is just too busy processing our data if there is no response */
 		zabbix_log(LOG_LEVEL_DEBUG, "Did not receive response from host");
 		ret = NETWORK_ERROR;
-		goto exit;
+		goto out;
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() '%s'",
-			__function_name, answer);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() '%s'", __function_name, answer);
 
 	if (FAIL == (ret = zbx_json_open(answer, &jp)))
-		goto exit;
+		goto out;
 
 	if (NULL != info)
 		zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_INFO, info, max_info_size);
 
 	if (FAIL == (ret = zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_RESPONSE, value, sizeof(value))))
-		goto exit;
+		goto out;
 
 	if (0 != strcmp(value, ZBX_PROTO_VALUE_SUCCESS))
 		ret = FAIL;
-exit:
+out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;

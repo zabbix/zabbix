@@ -110,7 +110,7 @@ zbx_graph_item_type;
 #define INTERFACE_DNS_LEN_MAX		INTERFACE_DNS_LEN+1
 #define INTERFACE_IP_LEN		39
 #define INTERFACE_IP_LEN_MAX		INTERFACE_IP_LEN+1
-#define INTERFACE_ADDR_LEN		64 /* MAX(INTERFACE_DNS_LEN,INTERFACE_IP_LEN) */
+#define INTERFACE_ADDR_LEN		64	/* MAX(INTERFACE_DNS_LEN,INTERFACE_IP_LEN) */
 #define INTERFACE_ADDR_LEN_MAX		INTERFACE_ADDR_LEN+1
 #define INTERFACE_PORT_LEN		64
 #define INTERFACE_PORT_LEN_MAX		INTERFACE_PORT_LEN+1
@@ -196,13 +196,11 @@ zbx_graph_item_type;
 #define PROXY_DHISTORY_KEY_LEN		255
 #define PROXY_DHISTORY_VALUE_LEN	255
 
-#define ZBX_SQL_ITEM_FIELDS	"i.itemid,i.key_,h.host,i.type,i.history,i.lastvalue,"		\
-				"i.prevvalue,i.hostid,i.value_type,i.delta,i.prevorgvalue,"	\
-				"i.lastclock,i.units,i.multiplier,i.formula,i.state,"		\
-				"i.valuemapid,i.trends,i.data_type"
+#define ZBX_SQL_ITEM_FIELDS	"i.itemid,i.key_,h.host,i.type,i.history,i.hostid,i.value_type,i.delta,"	\
+				"i.units,i.multiplier,i.formula,i.state,i.valuemapid,i.trends,i.data_type"
 #define ZBX_SQL_ITEM_TABLES	"hosts h,items i"
 #define ZBX_SQL_TIME_FUNCTIONS	"'nodata','date','dayofmonth','dayofweek','time','now'"
-#define ZBX_SQL_ITEM_FIELDS_NUM	19
+#define ZBX_SQL_ITEM_FIELDS_NUM	15
 #define ZBX_SQL_ITEM_SELECT	ZBX_SQL_ITEM_FIELDS " from " ZBX_SQL_ITEM_TABLES
 
 #ifdef HAVE_ORACLE
@@ -319,11 +317,6 @@ typedef struct
 	char			*host_name;
 	int			history;
 	int			trends;
-	char			*lastvalue[2];
-	int			prevorgvalue_null;
-	history_value_t		prevorgvalue;
-	int			lastclock;
-	int			lastns;
 	zbx_item_value_type_t	value_type;
 	int			delta;
 	int			multiplier;
@@ -332,10 +325,6 @@ typedef struct
 	zbx_uint64_t		valuemapid;
 	char			*error;
 
-	char			*h_lastvalue[2];
-	char			*h_lasteventid;
-	char			*h_lastsource;
-	char			*h_lastseverity;
 	unsigned char		state;
 	unsigned char		flags;
 }
@@ -519,7 +508,6 @@ int	DBupdate_item_status_to_notsupported(DB_ITEM *item, int clock, const char *e
 void	process_triggers(zbx_vector_ptr_t *triggers);
 int	DBget_row_count(const char *table_name);
 int	DBget_items_unsupported_count();
-int	DBget_queue_count(int from, int to);
 double	DBget_requiredperformance();
 int	DBget_proxy_lastaccess(const char *hostname, int *lastaccess, char **error);
 
@@ -530,7 +518,6 @@ char	*DBdyn_escape_string_len(const char *src, size_t max_src_len);
 char	*DBdyn_escape_like_pattern(const char *src);
 
 void    DBget_item_from_db(DB_ITEM *item, DB_ROW row);
-void	DBfree_item_from_db(DB_ITEM *item);
 
 zbx_uint64_t	DBadd_host(char *server, int port, int status, int useip, char *ip, int disable_until, int available);
 int	DBhost_exists(char *server);
@@ -558,7 +545,8 @@ void	DBupdate_services(zbx_uint64_t triggerid, int status, int clock);
 void	DBadd_trend(zbx_uint64_t itemid, double value, int clock);
 void	DBadd_trend_uint(zbx_uint64_t itemid, zbx_uint64_t value, int clock);
 
-void	DBadd_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_offset, const char *fieldname, const zbx_uint64_t *values, const int num);
+void	DBadd_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_offset, const char *fieldname,
+		const zbx_uint64_t *values, const int num);
 
 const char	*zbx_host_string(zbx_uint64_t hostid);
 const char	*zbx_host_key_string(zbx_uint64_t itemid);
@@ -568,12 +556,13 @@ const char	*zbx_user_string(zbx_uint64_t userid);
 double	multiply_item_value_float(DB_ITEM *item, double value);
 zbx_uint64_t	multiply_item_value_uint64(DB_ITEM *item, zbx_uint64_t value);
 
-void	DBregister_host(zbx_uint64_t proxy_hostid, const char *host, const char *ip, const char *dns, unsigned short port, int now);
-void	DBproxy_register_host(const char *host, const char *ip, const char *dns, unsigned short port);
+void	DBregister_host(zbx_uint64_t proxy_hostid, const char *host, const char *ip, const char *dns,
+		unsigned short port, const char *host_metadata, int now);
+void	DBproxy_register_host(const char *host, const char *ip, const char *dns, unsigned short port,
+		const char *host_metadata);
 int	DBexecute_overflowed_sql(char **sql, size_t *sql_alloc, size_t *sql_offset);
 char	*DBget_unique_hostname_by_sample(const char *host_name_sample);
 
-const char	*DBsql_id_cmp(zbx_uint64_t id);
 const char	*DBsql_id_ins(zbx_uint64_t id);
 
 zbx_uint64_t	DBadd_interface(zbx_uint64_t hostid, unsigned char type,
@@ -581,17 +570,6 @@ zbx_uint64_t	DBadd_interface(zbx_uint64_t hostid, unsigned char type,
 
 const char	*DBget_inventory_field(unsigned char inventory_link);
 unsigned short	DBget_inventory_field_len(unsigned char inventory_link);
-
-#define ZBX_DB_GET_HIST_MIN	0
-#define ZBX_DB_GET_HIST_AVG	1
-#define ZBX_DB_GET_HIST_MAX	2
-#define ZBX_DB_GET_HIST_SUM	3
-#define ZBX_DB_GET_HIST_COUNT	4
-#define ZBX_DB_GET_HIST_DELTA	5
-#define ZBX_DB_GET_HIST_VALUE	6
-char	**DBget_history(zbx_uint64_t itemid, unsigned char value_type, int function, int clock_from, int clock_to,
-		zbx_timespec_t *ts, const char *field_name, int last_n);
-void	DBfree_history(char **value);
 
 int	DBtxn_status();
 int	DBtxn_ongoing();

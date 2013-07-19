@@ -17,38 +17,26 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
+
 function media_type2str($type = null) {
-	$media_types = array(
+	$mediaTypes = array(
 		MEDIA_TYPE_EMAIL => _('Email'),
 		MEDIA_TYPE_EXEC => _('Script'),
 		MEDIA_TYPE_SMS => _('SMS'),
 		MEDIA_TYPE_JABBER => _('Jabber'),
-		MEDIA_TYPE_EZ_TEXTING => _('Ez Texting'),
+		MEDIA_TYPE_EZ_TEXTING => _('Ez Texting')
 	);
 
-	if (is_null($type)) {
-		natsort($media_types);
-		return $media_types;
+	if ($type === null) {
+		natsort($mediaTypes);
+
+		return $mediaTypes;
 	}
-	elseif (isset($media_types[$type])) {
-		return $media_types[$type];
+	elseif (isset($mediaTypes[$type])) {
+		return $mediaTypes[$type];
 	}
 	else {
 		return _('Unknown');
 	}
 }
-
-function media_severity2str($severity) {
-	$result = array();
-	foreach (getSeverityCaption() as $i => $caption) {
-		$style = ($severity & (1 << $i)) ? 'enabled' : null;
-
-		$result[$i] = new CSpan(zbx_substr($caption, 0, 1), $style);
-		$result[$i]->setHint($caption.' ('.(isset($map['style']) ? 'on' : 'off').')');
-	}
-
-	return $result;
-}
-?>

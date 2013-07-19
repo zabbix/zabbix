@@ -59,10 +59,12 @@ class testFormItem extends CWebTest {
 	public static function layout() {
 		return array(
 			array(
-				array('type' => 'Zabbix agent', 'host' => 'Simple form test host')
+				array('type' => 'Zabbix agent', 'host' => 'Simple form test host'
+				)
 			),
 			array(
-				array('host' => 'Simple form test host', 'form' => 'testFormItem1')
+				array('host' => 'Simple form test host', 'form' => 'testFormItem1'
+				)
 			),
 			array(
 				array(
@@ -89,34 +91,44 @@ class testFormItem extends CWebTest {
 				)
 			),
 			array(
-				array('type' => 'Zabbix agent', 'value_type' => 'Numeric (float)', 'host' => 'Simple form test host')
+				array('type' => 'Zabbix agent', 'value_type' => 'Numeric (float)', 'host' => 'Simple form test host'
+				)
 			),
 			array(
-				array('type' => 'Zabbix agent', 'value_type' => 'Character', 'host' => 'Simple form test host')
+				array('type' => 'Zabbix agent', 'value_type' => 'Character', 'host' => 'Simple form test host'
+				)
 			),
 			array(
-				array('type' => 'Zabbix agent', 'value_type' => 'Log', 'host' => 'Simple form test host')
+				array('type' => 'Zabbix agent', 'value_type' => 'Log', 'host' => 'Simple form test host'
+				)
 			),
 			array(
-				array('type' => 'Zabbix agent', 'value_type' => 'Text', 'host' => 'Simple form test host')
+				array('type' => 'Zabbix agent', 'value_type' => 'Text', 'host' => 'Simple form test host'
+				)
 			),
 			array(
-				array('type' => 'Zabbix agent (active)', 'host' => 'Simple form test host'),
+				array('type' => 'Zabbix agent (active)', 'host' => 'Simple form test host'
+				)
 			),
 			array(
-				array('type' => 'Simple check', 'host' => 'Simple form test host')
+				array('type' => 'Simple check', 'host' => 'Simple form test host'
+				)
 			),
 			array(
-				array('type' => 'SNMPv1 agent', 'host' => 'Simple form test host')
+				array('type' => 'SNMPv1 agent', 'host' => 'Simple form test host'
+				)
 			),
 			array(
-				array('type' => 'SNMPv1 agent', 'value_type' => 'Numeric (float)', 'host' => 'Simple form test host')
+				array('type' => 'SNMPv1 agent', 'value_type' => 'Numeric (float)', 'host' => 'Simple form test host'
+				)
 			),
 			array(
-				array('type' => 'SNMPv2 agent', 'host' => 'Simple form test host')
+				array('type' => 'SNMPv2 agent', 'host' => 'Simple form test host'
+				)
 			),
 			array(
-				array('type' => 'SNMPv3 agent', 'host' => 'Simple form test host')
+				array('type' => 'SNMPv3 agent', 'host' => 'Simple form test host'
+				)
 			),
 			array(
 				array(
@@ -192,10 +204,12 @@ class testFormItem extends CWebTest {
 				)
 			),
 			array(
-				array('type' => 'SNMP trap', 'host' => 'Simple form test host')
+				array('type' => 'SNMP trap', 'host' => 'Simple form test host'
+				)
 			),
 			array(
-				array('type' => 'Zabbix internal', 'host' => 'Simple form test host')
+				array('type' => 'Zabbix internal', 'host' => 'Simple form test host'
+				)
 			),
 			array(
 				array(
@@ -206,28 +220,36 @@ class testFormItem extends CWebTest {
 				)
 			),
 			array(
-				array('type' => 'Zabbix trapper', 'host' => 'Simple form test host')
+				array('type' => 'Zabbix trapper', 'host' => 'Simple form test host'
+				)
 			),
 			array(
-				array('type' => 'Zabbix aggregate', 'host' => 'Simple form test host')
+				array('type' => 'Zabbix aggregate', 'host' => 'Simple form test host'
+				)
 			),
 			array(
-				array('type' => 'External check', 'host' => 'Simple form test host')
+				array('type' => 'External check', 'host' => 'Simple form test host'
+				)
 			),
 			array(
-				array('type' => 'Database monitor', 'host' => 'Simple form test host')
+				array('type' => 'Database monitor', 'host' => 'Simple form test host'
+				)
 			),
 			array(
-				array('type' => 'IPMI agent', 'host' => 'Simple form test host')
+				array('type' => 'IPMI agent', 'host' => 'Simple form test host'
+				)
 			),
 			array(
-				array('type' => 'SSH agent', 'host' => 'Simple form test host')
+				array('type' => 'SSH agent', 'host' => 'Simple form test host'
+				)
 			),
 			array(
-				array('type' => 'SSH agent', 'authtype' => 'Public key', 'host' => 'Simple form test host')
+				array('type' => 'SSH agent', 'authtype' => 'Public key', 'host' => 'Simple form test host'
+				)
 			),
 			array(
-				array('type' => 'SSH agent', 'authtype' => 'Password', 'host' => 'Simple form test host')
+				array('type' => 'SSH agent', 'authtype' => 'Password', 'host' => 'Simple form test host'
+				)
 			),
 			array(
 				array(
@@ -246,13 +268,16 @@ class testFormItem extends CWebTest {
 				)
 			),
 			array(
-				array('type' => 'TELNET agent', 'host' => 'Simple form test host')
+				array('type' => 'TELNET agent', 'host' => 'Simple form test host'
+				)
 			),
 			array(
-				array('type' => 'JMX agent', 'host' => 'Simple form test host')
+				array('type' => 'JMX agent', 'host' => 'Simple form test host'
+				)
 			),
 			array(
-				array('type' => 'Calculated', 'host' => 'Simple form test host')
+				array('type' => 'Calculated', 'host' => 'Simple form test host'
+				)
 			),
 			array(
 				array('type' => 'Zabbix agent', 'template' => 'Inheritance test template')
@@ -331,19 +356,24 @@ class testFormItem extends CWebTest {
 				)
 			),
 			array(
-				array('type' => 'Zabbix agent', 'value_type' => 'Log', 'template' => 'Inheritance test template')
+				array('type' => 'Zabbix agent', 'value_type' => 'Log', 'template' => 'Inheritance test template'
+				)
 			),
 			array(
-				array('type' => 'Zabbix agent', 'value_type' => 'Text', 'template' => 'Inheritance test template')
+				array('type' => 'Zabbix agent', 'value_type' => 'Text', 'template' => 'Inheritance test template'
+				)
 			),
 			array(
-				array('type' => 'Zabbix agent (active)', 'template' => 'Inheritance test template')
+				array('type' => 'Zabbix agent (active)', 'template' => 'Inheritance test template'
+				)
 			),
 			array(
-				array('type' => 'Simple check', 'template' => 'Inheritance test template')
+				array('type' => 'Simple check', 'template' => 'Inheritance test template'
+				)
 			),
 			array(
-				array('type' => 'SNMPv1 agent', 'template' => 'Inheritance test template')
+				array('type' => 'SNMPv1 agent', 'template' => 'Inheritance test template'
+				)
 			),
 			array(
 				array(
@@ -353,10 +383,12 @@ class testFormItem extends CWebTest {
 				)
 			),
 			array(
-				array('type' => 'SNMPv2 agent', 'template' => 'Inheritance test template')
+				array('type' => 'SNMPv2 agent', 'template' => 'Inheritance test template'
+				)
 			),
 			array(
-				array('type' => 'SNMPv3 agent', 'template' => 'Inheritance test template')
+				array('type' => 'SNMPv3 agent', 'template' => 'Inheritance test template'
+				)
 			),
 			array(
 				array(
@@ -424,10 +456,12 @@ class testFormItem extends CWebTest {
 				)
 			),
 			array(
-				array('type' => 'SNMP trap', 'template' => 'Inheritance test template')
+				array('type' => 'SNMP trap', 'template' => 'Inheritance test template'
+				)
 			),
 			array(
-				array('type' => 'Zabbix internal', 'template' => 'Inheritance test template')
+				array('type' => 'Zabbix internal', 'template' => 'Inheritance test template'
+				)
 			),
 			array(
 				array(
@@ -445,28 +479,36 @@ class testFormItem extends CWebTest {
 				)
 			),
 			array(
-				array('type' => 'Zabbix trapper', 'template' => 'Inheritance test template')
+				array('type' => 'Zabbix trapper', 'template' => 'Inheritance test template'
+				)
 			),
 			array(
-				array('type' => 'Zabbix aggregate', 'template' => 'Inheritance test template')
+				array('type' => 'Zabbix aggregate', 'template' => 'Inheritance test template'
+				)
 			),
 			array(
-				array('type' => 'External check', 'template' => 'Inheritance test template')
+				array('type' => 'External check', 'template' => 'Inheritance test template'
+				)
 			),
 			array(
-				array('type' => 'Database monitor', 'template' => 'Inheritance test template')
+				array('type' => 'Database monitor', 'template' => 'Inheritance test template'
+				)
 			),
 			array(
-				array('type' => 'IPMI agent', 'template' => 'Inheritance test template')
+				array('type' => 'IPMI agent', 'template' => 'Inheritance test template'
+				)
 			),
 			array(
-				array('type' => 'SSH agent', 'template' => 'Inheritance test template')
+				array('type' => 'SSH agent', 'template' => 'Inheritance test template'
+				)
 			),
 			array(
-				array('type' => 'SSH agent', 'authtype' => 'Public key', 'template' => 'Inheritance test template')
+				array('type' => 'SSH agent', 'authtype' => 'Public key', 'template' => 'Inheritance test template'
+				)
 			),
 			array(
-				array('type' => 'SSH agent', 'authtype' => 'Password', 'template' => 'Inheritance test template')
+				array('type' => 'SSH agent', 'authtype' => 'Password', 'template' => 'Inheritance test template'
+				)
 			),
 			array(
 				array(
@@ -485,13 +527,16 @@ class testFormItem extends CWebTest {
 				)
 			),
 			array(
-				array('type' => 'TELNET agent', 'template' => 'Inheritance test template')
+				array('type' => 'TELNET agent', 'template' => 'Inheritance test template'
+				)
 			),
 			array(
-				array('type' => 'JMX agent', 'template' => 'Inheritance test template')
+				array('type' => 'JMX agent', 'template' => 'Inheritance test template'
+				)
 			),
 			array(
-				array('type' => 'Calculated', 'template' => 'Inheritance test template')
+				array('type' => 'Calculated', 'template' => 'Inheritance test template'
+				)
 			)
 		);
 	}
@@ -1876,6 +1921,28 @@ class testFormItem extends CWebTest {
 					),
 					'errors' => array(
 						'Maximum number of flexible intervals added'
+					)
+				)
+			),
+			// Flexfields with negative number in flexdelay
+			array(
+				array(
+					'expected' => ITEM_GOOD,
+					'name' => 'Item flex-negative flexdelay',
+					'key' => 'item-flex-negative-flexdelay',
+					'flexPeriod' => array(
+						array('flexDelay' => '-50', 'flexTime' => '1-7,00:00-24:00')
+					)
+				)
+			),
+			// Flexfields with symbols in flexdelay
+			array(
+				array(
+					'expected' => ITEM_GOOD,
+					'name' => 'Item flex-symbols in flexdelay',
+					'key' => 'item-flex-symbols-flexdelay',
+					'flexPeriod' => array(
+						array('flexDelay' => '50abc', 'flexTime' => '1-7,00:00-24:00')
 					)
 				)
 			),

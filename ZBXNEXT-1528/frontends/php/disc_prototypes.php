@@ -40,9 +40,9 @@ $fields = array(
 	'groupid' =>				array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
 	'hostid' =>					array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
 	'interfaceid' =>			array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null, _('Interface')),
-	'name' =>					array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY, 'isset({save})', _('Name')),
+	'name' =>					array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({save})', _('Name')),
 	'description' =>			array(T_ZBX_STR, O_OPT, null,	null,		'isset({save})'),
-	'key' =>					array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY, 'isset({save})', _('Key')),
+	'key' =>					array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({save})', _('Key')),
 	'delay' =>					array(T_ZBX_INT, O_OPT, null,	BETWEEN(0, SEC_PER_DAY),
 		'isset({save})&&(isset({type})&&({type}!='.ITEM_TYPE_TRAPPER.'&&{type}!='.ITEM_TYPE_SNMPTRAP.'))',
 		_('Update interval (in sec)')),
@@ -198,11 +198,13 @@ if (isset($_REQUEST['add_delay_flex']) && isset($_REQUEST['new_delay_flex'])) {
 }
 elseif (isset($_REQUEST['delete']) && isset($_REQUEST['itemid'])) {
 	DBstart();
+
 	$result = API::Itemprototype()->delete($_REQUEST['itemid']);
 	$result = DBend($result);
-	show_messages($result, _('Item deleted'), _('Cannot delete item'));
 
+	show_messages($result, _('Item deleted'), _('Cannot delete item'));
 	unset($_REQUEST['itemid'], $_REQUEST['form']);
+	clearCookies($result, $_REQUEST['parent_discoveryid']);
 }
 elseif (isset($_REQUEST['clone']) && isset($_REQUEST['itemid'])) {
 	unset($_REQUEST['itemid']);
@@ -310,29 +312,30 @@ elseif (isset($_REQUEST['save'])) {
 	$result = DBend($result);
 	if ($result) {
 		unset($_REQUEST['itemid'], $_REQUEST['form']);
+		clearCookies($result, $_REQUEST['parent_discoveryid']);
 	}
 }
-// GO
-elseif (($_REQUEST['go'] == 'activate' || $_REQUEST['go'] == 'disable') && isset($_REQUEST['group_itemid'])) {
+elseif (str_in_array($_REQUEST['go'], array('activate', 'disable')) && isset($_REQUEST['group_itemid'])) {
 	$group_itemid = $_REQUEST['group_itemid'];
 
 	DBstart();
-	$go_result = ($_REQUEST['go'] == 'activate') ? activate_item($group_itemid) : disable_item($group_itemid);
-	$go_result = DBend($go_result);
-	show_messages($go_result, ($_REQUEST['go'] == 'activate') ? _('Items activated') : _('Items disabled'), null);
+
+	$goResult = ($_REQUEST['go'] == 'activate') ? activate_item($group_itemid) : disable_item($group_itemid);
+	$goResult = DBend($goResult);
+
+	show_messages($goResult, ($_REQUEST['go'] == 'activate') ? _('Items activated') : _('Items disabled'), null);
+	clearCookies($goResult, $_REQUEST['parent_discoveryid']);
 }
 elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['group_itemid'])) {
 	$group_itemid = $_REQUEST['group_itemid'];
-	DBstart();
-	$go_result = API::Itemprototype()->delete($group_itemid);
-	$go_result = DBend($go_result);
-	show_messages($go_result, _('Items deleted'), _('Cannot delete items'));
-}
 
-if ($_REQUEST['go'] != 'none' && isset($go_result) && $go_result) {
-	$url = new CUrl();
-	$path = $url->getPath();
-	insert_js('cookie.eraseArray("'.$path.'")');
+	DBstart();
+
+	$goResult = API::Itemprototype()->delete($group_itemid);
+	$goResult = DBend($goResult);
+
+	show_messages($goResult, _('Items deleted'), _('Cannot delete items'));
+	clearCookies($goResult, $_REQUEST['parent_discoveryid']);
 }
 
 /*
@@ -379,4 +382,3 @@ else {
 }
 
 require_once dirname(__FILE__).'/include/page_footer.php';
-?>

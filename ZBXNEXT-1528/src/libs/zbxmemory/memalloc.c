@@ -34,7 +34,7 @@
  *                                                                            *
  *                                                                            *
  *                    +-------- size of + --------------+                     *
- *                    |       (4 bytes) |               |                     *
+ *                    |       (8 bytes) |               |                     *
  *                    |                 v               |                     *
  *                    |                                 |                     *
  *                    |    +- allocatable memory --+    |                     *
@@ -44,7 +44,7 @@
  *                |--------|----------------...----|--------|                 *
  *                                                                            *
  *                ^        ^                       ^        ^                 *
- *            4-aligned    |                       |    4-aligned             *
+ *            8-aligned    |                       |    8-aligned             *
  *                                                                            *
  *                     8-aligned               8-aligned                      *
  *                                                                            *
@@ -98,11 +98,11 @@ static void	*ALIGN4(void *ptr);
 static void	*ALIGN8(void *ptr);
 static void	*ALIGNPTR(void *ptr);
 
-static uint32_t	mem_proper_alloc_size(uint32_t size);
-static int	mem_bucket_by_size(uint32_t size);
+static zbx_uint64_t	mem_proper_alloc_size(zbx_uint64_t size);
+static int	mem_bucket_by_size(zbx_uint64_t size);
 
-static void	mem_set_chunk_size(void *chunk, uint32_t size);
-static void	mem_set_used_chunk_size(void *chunk, uint32_t size);
+static void	mem_set_chunk_size(void *chunk, zbx_uint64_t size);
+static void	mem_set_used_chunk_size(void *chunk, zbx_uint64_t size);
 
 static void	*mem_get_prev_chunk(void *chunk);
 static void	mem_set_prev_chunk(void *chunk, void *prev);
@@ -114,25 +114,26 @@ static void	**mem_ptr_to_next_field(void *chunk, void **first_chunk);
 static void	mem_link_chunk(zbx_mem_info_t *info, void *chunk);
 static void	mem_unlink_chunk(zbx_mem_info_t *info, void *chunk);
 
-static void	*__mem_malloc(zbx_mem_info_t *info, uint32_t size);
-static void	*__mem_realloc(zbx_mem_info_t *info, void *old, uint32_t size);
+static void	*__mem_malloc(zbx_mem_info_t *info, zbx_uint64_t size);
+static void	*__mem_realloc(zbx_mem_info_t *info, void *old, zbx_uint64_t size);
 static void	__mem_free(zbx_mem_info_t *info, void *ptr);
 
-#define MEM_SIZE_FIELD	sizeof(uint32_t)
+#define MEM_SIZE_FIELD		sizeof(zbx_uint64_t)
 
-#define MEM_FLG_USED	(((uint32_t)1)<<31)
+#define MEM_FLG_USED		((__UINT64_C(1))<<63)
 
-#define FREE_CHUNK(ptr)	(((*(uint32_t *)(ptr)) & MEM_FLG_USED) == 0)
-#define CHUNK_SIZE(ptr) ((*(uint32_t *)(ptr)) & ~MEM_FLG_USED)
+#define FREE_CHUNK(ptr)		(((*(zbx_uint64_t *)(ptr)) & MEM_FLG_USED) == 0)
+#define CHUNK_SIZE(ptr)		((*(zbx_uint64_t *)(ptr)) & ~MEM_FLG_USED)
 
-#define	MEM_MIN_SIZE	128
-#define MEM_MAX_SIZE	0x7fffffff	/* just below 2 GB */
+
+#define MEM_MIN_SIZE		__UINT64_C(128)
+#define MEM_MAX_SIZE		__UINT64_C(0x1000000000)	/* 64 GB */
 
 #define MEM_MIN_ALLOC	24	/* should be a multiple of 8 and at least (2 * ZBX_PTR_SIZE) */
 
-#define	MEM_MIN_BUCKET_SIZE	MEM_MIN_ALLOC
-#define	MEM_MAX_BUCKET_SIZE	256 /* starting from this size all free chunks are put into the same bucket */
-#define	MEM_BUCKET_COUNT	((MEM_MAX_BUCKET_SIZE - MEM_MIN_BUCKET_SIZE) / 8 + 1)
+#define MEM_MIN_BUCKET_SIZE	MEM_MIN_ALLOC
+#define MEM_MAX_BUCKET_SIZE	256 /* starting from this size all free chunks are put into the same bucket */
+#define MEM_BUCKET_COUNT	((MEM_MAX_BUCKET_SIZE - MEM_MIN_BUCKET_SIZE) / 8 + 1)
 
 /* helper functions */
 
@@ -155,15 +156,15 @@ static void	*ALIGNPTR(void *ptr)
 	assert(0);
 }
 
-static uint32_t	mem_proper_alloc_size(uint32_t size)
+static zbx_uint64_t	mem_proper_alloc_size(zbx_uint64_t size)
 {
 	if (size >= MEM_MIN_ALLOC)
-		return size + (8 - size % 8) % 8;	/* allocate in multiples of 8... */
+		return size + ((8 - (size & 7)) & 7);	/* allocate in multiples of 8... */
 	else
 		return MEM_MIN_ALLOC;			/* ...and at least MEM_MIN_ALLOC */
 }
 
-static int	mem_bucket_by_size(uint32_t size)
+static int	mem_bucket_by_size(zbx_uint64_t size)
 {
 	if (size < MEM_MIN_BUCKET_SIZE)
 		return 0;
@@ -172,16 +173,16 @@ static int	mem_bucket_by_size(uint32_t size)
 	return MEM_BUCKET_COUNT - 1;
 }
 
-static void	mem_set_chunk_size(void *chunk, uint32_t size)
+static void	mem_set_chunk_size(void *chunk, zbx_uint64_t size)
 {
-	*(uint32_t *)chunk = size;
-	*(uint32_t *)(chunk + MEM_SIZE_FIELD + size) = size;
+	*(zbx_uint64_t *)chunk = size;
+	*(zbx_uint64_t *)(chunk + MEM_SIZE_FIELD + size) = size;
 }
 
-static void	mem_set_used_chunk_size(void *chunk, uint32_t size)
+static void	mem_set_used_chunk_size(void *chunk, zbx_uint64_t size)
 {
-	*(uint32_t *)chunk = MEM_FLG_USED | size;
-	*(uint32_t *)(chunk + MEM_SIZE_FIELD + size) = MEM_FLG_USED | size;
+	*(zbx_uint64_t *)chunk = MEM_FLG_USED | size;
+	*(zbx_uint64_t *)(chunk + MEM_SIZE_FIELD + size) = MEM_FLG_USED | size;
 }
 
 static void	*mem_get_prev_chunk(void *chunk)
@@ -250,11 +251,11 @@ static void	mem_unlink_chunk(zbx_mem_info_t *info, void *chunk)
 
 /* private memory functions */
 
-static void	*__mem_malloc(zbx_mem_info_t *info, uint32_t size)
+static void	*__mem_malloc(zbx_mem_info_t *info, zbx_uint64_t size)
 {
 	int		index;
 	void		*chunk;
-	uint32_t	chunk_size;
+	zbx_uint64_t	chunk_size;
 
 	size = mem_proper_alloc_size(size);
 
@@ -272,8 +273,7 @@ static void	*__mem_malloc(zbx_mem_info_t *info, uint32_t size)
 		/* otherwise, find a chunk big enough according to first-fit strategy */
 
 		int		counter = 0;
-		uint32_t	skip_min = 0xffffffff, skip_max = 0;
-
+		zbx_uint64_t	skip_min = __UINT64_C(0xffffffffffffffff), skip_max = __UINT64_C(0);
 		while (NULL != chunk && CHUNK_SIZE(chunk) < size)
 		{
 			counter++;
@@ -282,12 +282,16 @@ static void	*__mem_malloc(zbx_mem_info_t *info, uint32_t size)
 			chunk = mem_get_next_chunk(chunk);
 		}
 
-		if (NULL == chunk)
-			zabbix_log(LOG_LEVEL_CRIT, "__mem_malloc: skipped %d asked %u skip_min %u skip_max %u",
-					counter, size, skip_min, skip_max);
-		else if (counter >= 100)
-			zabbix_log(LOG_LEVEL_DEBUG, "__mem_malloc: skipped %d asked %u skip_min %u skip_max %u size %u",
-					counter, size, skip_min, skip_max, CHUNK_SIZE(chunk));
+		/* don't log errors if malloc can return null in low memory situations */
+		if (0 == info->allow_oom)
+		{
+			if (NULL == chunk)
+				zabbix_log(LOG_LEVEL_CRIT, "__mem_malloc: skipped %d asked %u skip_min %u skip_max %u",
+						counter, size, skip_min, skip_max);
+			else if (counter >= 100)
+				zabbix_log(LOG_LEVEL_DEBUG, "__mem_malloc: skipped %d asked %u skip_min %u skip_max %u size %u",
+						counter, size, skip_min, skip_max, CHUNK_SIZE(chunk));
+		}
 	}
 
 	if (NULL == chunk)
@@ -308,7 +312,7 @@ static void	*__mem_malloc(zbx_mem_info_t *info, uint32_t size)
 	else
 	{
 		void		*new_chunk;
-		uint32_t	new_chunk_size;
+		zbx_uint64_t	new_chunk_size;
 
 		new_chunk = chunk + MEM_SIZE_FIELD + size + MEM_SIZE_FIELD;
 		new_chunk_size = chunk_size - size - 2 * MEM_SIZE_FIELD;
@@ -325,10 +329,10 @@ static void	*__mem_malloc(zbx_mem_info_t *info, uint32_t size)
 	return chunk;
 }
 
-static void	*__mem_realloc(zbx_mem_info_t *info, void *old, uint32_t size)
+static void	*__mem_realloc(zbx_mem_info_t *info, void *old, zbx_uint64_t size)
 {
 	void		*chunk, *new_chunk, *next_chunk;
-	uint32_t	chunk_size, new_chunk_size;
+	zbx_uint64_t	chunk_size, new_chunk_size;
 	int		next_free;
 
 	size = mem_proper_alloc_size(size);
@@ -432,6 +436,10 @@ static void	*__mem_realloc(zbx_mem_info_t *info, void *old, uint32_t size)
 	{
 		void	*tmp = NULL;
 
+		/* in allow_oom mode realloc failure must keep the original memory untouched */
+		if (1 == info->allow_oom)
+			return NULL;
+
 		tmp = zbx_malloc(tmp, chunk_size);
 
 		memcpy(tmp, chunk + MEM_SIZE_FIELD, chunk_size);
@@ -453,7 +461,7 @@ static void	__mem_free(zbx_mem_info_t *info, void *ptr)
 {
 	void		*chunk;
 	void		*prev_chunk, *next_chunk;
-	uint32_t	chunk_size;
+	zbx_uint64_t	chunk_size;
 	int		prev_free, next_free;
 
 	chunk = ptr - MEM_SIZE_FIELD;
@@ -518,12 +526,13 @@ static void	__mem_free(zbx_mem_info_t *info, void *ptr)
 
 /* public memory interface */
 
-void	zbx_mem_create(zbx_mem_info_t **info, key_t shm_key, int lock_name, size_t size, const char *descr, const char *param)
+void	zbx_mem_create(zbx_mem_info_t **info, key_t shm_key, int lock_name, zbx_uint64_t size,
+		const char *descr, const char *param, int allow_oom)
 {
 	const char	*__function_name = "zbx_mem_create";
 
 	int		shm_id, index;
-	void		*base, *chunk_lsize, *chunk_rsize;
+	void		*base;
 
 	descr = (NULL == descr ? "(null)" : descr);
 	param = (NULL == param ? "(null)" : param);
@@ -542,8 +551,8 @@ void	zbx_mem_create(zbx_mem_info_t **info, key_t shm_key, int lock_name, size_t 
 
 	if (!(MEM_MIN_SIZE <= size && size <= MEM_MAX_SIZE))
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "requested size " ZBX_FS_SIZE_T " not within bounds [%d <= size <= %d]",
-				(zbx_fs_size_t)size, MEM_MIN_SIZE, MEM_MAX_SIZE);
+		zabbix_log(LOG_LEVEL_CRIT, "requested size " ZBX_FS_SIZE_T " not within bounds [" ZBX_FS_UI64
+				" <= size <= " ZBX_FS_UI64 "]", (zbx_fs_size_t)size, MEM_MIN_SIZE, MEM_MAX_SIZE);
 		exit(FAIL);
 	}
 
@@ -563,7 +572,7 @@ void	zbx_mem_create(zbx_mem_info_t **info, key_t shm_key, int lock_name, size_t 
 
 	*info = ALIGN8(base);
 	(*info)->shm_id = shm_id;
-	(*info)->orig_size = (uint32_t)size;
+	(*info)->orig_size = size;
 	size -= (void *)(*info + 1) - base;
 	base = (void *)(*info + 1);
 
@@ -582,6 +591,8 @@ void	zbx_mem_create(zbx_mem_info_t **info, key_t shm_key, int lock_name, size_t 
 	size -= strlen(param) + 1;
 	base += strlen(param) + 1;
 
+	(*info)->allow_oom = allow_oom;
+
 	/* allocate mutex */
 
 	if (ZBX_NO_MUTEX != lock_name)
@@ -599,20 +610,10 @@ void	zbx_mem_create(zbx_mem_info_t **info, key_t shm_key, int lock_name, size_t 
 		(*info)->use_lock = 0;
 
 	/* prepare shared memory for further allocation by creating one big chunk */
+	(*info)->lo_bound = ALIGN8(base);
+	(*info)->hi_bound = ALIGN8(base + size - 8);
 
-	chunk_lsize = ALIGN8(base);
-	if (chunk_lsize - MEM_SIZE_FIELD < base)
-		chunk_lsize += 8;
-	chunk_lsize -= MEM_SIZE_FIELD;
-
-	chunk_rsize = ALIGN8(base + size - 8);
-	if (chunk_rsize + MEM_SIZE_FIELD > base + size)
-		chunk_rsize -= 8;
-
-	(*info)->lo_bound = chunk_lsize;
-	(*info)->hi_bound = chunk_rsize + MEM_SIZE_FIELD;
-
-	(*info)->total_size = (uint32_t)(chunk_rsize - chunk_lsize - MEM_SIZE_FIELD);
+	(*info)->total_size = (zbx_uint64_t)((*info)->hi_bound - (*info)->lo_bound - 2 * MEM_SIZE_FIELD);
 
 	index = mem_bucket_by_size((*info)->total_size);
 	(*info)->buckets[index] = (*info)->lo_bound;
@@ -671,12 +672,15 @@ void	*__zbx_mem_malloc(const char *file, int line, zbx_mem_info_t *info, const v
 
 	LOCK_INFO;
 
-	chunk = __mem_malloc(info, (uint32_t)size);
+	chunk = __mem_malloc(info, size);
 
 	UNLOCK_INFO;
 
 	if (NULL == chunk)
 	{
+		if (1 == info->allow_oom)
+			return NULL;
+
 		zabbix_log(LOG_LEVEL_CRIT, "[file:%s,line:%d] %s(): out of memory (requested " ZBX_FS_SIZE_T " bytes)",
 				file, line, __function_name, (zbx_fs_size_t)size);
 		zabbix_log(LOG_LEVEL_CRIT, "[file:%s,line:%d] %s(): please increase %s configuration parameter",
@@ -703,14 +707,17 @@ void	*__zbx_mem_realloc(const char *file, int line, zbx_mem_info_t *info, void *
 	LOCK_INFO;
 
 	if (NULL == old)
-		chunk = __mem_malloc(info, (uint32_t)size);
+		chunk = __mem_malloc(info, size);
 	else
-		chunk = __mem_realloc(info, old, (uint32_t)size);
+		chunk = __mem_realloc(info, old, size);
 
 	UNLOCK_INFO;
 
 	if (NULL == chunk)
 	{
+		if (1 == info->allow_oom)
+			return NULL;
+
 		zabbix_log(LOG_LEVEL_CRIT, "[file:%s,line:%d] %s(): out of memory (requested " ZBX_FS_SIZE_T " bytes)",
 				file, line, __function_name, (zbx_fs_size_t)size);
 		zabbix_log(LOG_LEVEL_CRIT, "[file:%s,line:%d] %s(): please increase %s configuration parameter",
@@ -766,8 +773,9 @@ void	zbx_mem_clear(zbx_mem_info_t *info)
 void	zbx_mem_dump_stats(zbx_mem_info_t *info)
 {
 	void		*chunk;
-	int		index, counter, total, total_free = 0;
-	uint32_t	min_size = 0xffffffff, max_size = 0;
+	int		index;
+	zbx_uint64_t	counter, total, total_free = 0;
+	zbx_uint64_t	min_size = __UINT64_C(0xffffffffffffffff), max_size = __UINT64_C(0);
 
 	LOCK_INFO;
 
@@ -830,7 +838,7 @@ size_t	zbx_mem_required_size(int chunks_num, const char *descr, const char *para
 	size += (MEM_SIZE_FIELD - 1) + 8;		/* ensure we allocate enough to align the first chunk */
 	size += (MEM_SIZE_FIELD - 1) + 8;		/* ensure we allocate enough to align right size field */
 
-	size += (chunks_num - 1) * 8;			/* each additional chunk requires 8 bytes of overhead */
+	size += (chunks_num - 1) * MEM_SIZE_FIELD * 2;	/* each additional chunk requires 16 bytes of overhead */
 	size += chunks_num * (MEM_MIN_ALLOC - 1);	/* each chunk has size of at least MEM_MIN_ALLOC bytes */
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() size:" ZBX_FS_SIZE_T, __function_name, (zbx_fs_size_t)size);

@@ -164,7 +164,8 @@ switch ($data['method']) {
 	case 'zabbix.status':
 		$session = Z::getInstance()->getSession();
 		if (!isset($session['serverCheckResult']) || ($session['serverCheckTime'] + SERVER_CHECK_INTERVAL) <= time()) {
-			$session['serverCheckResult'] = zabbixIsRunning();
+			$zabbixServer = new CZabbixServer($ZBX_SERVER, $ZBX_SERVER_PORT, ZBX_SOCKET_TIMEOUT, 0);
+			$session['serverCheckResult'] = $zabbixServer->isRunning();
 			$session['serverCheckTime'] = time();
 		}
 
@@ -232,6 +233,8 @@ switch ($data['method']) {
 	 * @return array(int => array('value' => int, 'text' => string))
 	 */
 	case 'multiselect.get':
+		$config = select_config();
+
 		switch ($data['objectName']) {
 			case 'hostGroup':
 				$hostGroups = API::HostGroup()->get(array(
@@ -239,12 +242,12 @@ switch ($data['method']) {
 					'output' => array('groupid', 'name'),
 					'startSearch' => true,
 					'search' => isset($data['search']) ? array('name' => $data['search']) : null,
-					'limit' => isset($data['limit']) ? $data['limit'] : null
+					'limit' => $config['search_limit']
 				));
 
 				if ($hostGroups) {
 					foreach ($hostGroups as &$hostGroup) {
-						$hostGroup['nodename'] = get_node_name_by_elid($hostGroup['groupid'], true, ': ');
+						$hostGroup['nodename'] = get_node_name_by_elid($hostGroup['groupid'], true, NAME_DELIMITER);
 					}
 					unset($hostGroup);
 
@@ -252,6 +255,10 @@ switch ($data['method']) {
 						array('field' => 'nodename', 'order' => ZBX_SORT_UP),
 						array('field' => 'name', 'order' => ZBX_SORT_UP)
 					));
+
+					if (isset($data['limit'])) {
+						$hostGroups = array_slice($hostGroups, 0, $data['limit']);
+					}
 
 					foreach ($hostGroups as $hostGroup) {
 						$result[] = array(
@@ -269,13 +276,17 @@ switch ($data['method']) {
 					'output' => array('hostid', 'name'),
 					'startSearch' => true,
 					'search' => isset($data['search']) ? array('name' => $data['search']) : null,
-					'limit' => isset($data['limit']) ? $data['limit'] : null
+					'limit' => $config['search_limit']
 				));
 
 				if ($hosts) {
 					CArrayHelper::sort($hosts, array(
 						array('field' => 'name', 'order' => ZBX_SORT_UP)
 					));
+
+					if (isset($data['limit'])) {
+						$hosts = array_slice($hosts, 0, $data['limit']);
+					}
 
 					foreach ($hosts as $host) {
 						$result[] = array(
@@ -293,13 +304,17 @@ switch ($data['method']) {
 					'output' => array('templateid', 'name'),
 					'startSearch' => true,
 					'search' => isset($data['search']) ? array('name' => $data['search']) : null,
-					'limit' => isset($data['limit']) ? $data['limit'] : null
+					'limit' => $config['search_limit']
 				));
 
 				if ($templates) {
 					CArrayHelper::sort($templates, array(
 						array('field' => 'name', 'order' => ZBX_SORT_UP)
 					));
+
+					if (isset($data['limit'])) {
+						$templates = array_slice($templates, 0, $data['limit']);
+					}
 
 					foreach ($templates as $template) {
 						$result[] = array(
@@ -317,13 +332,17 @@ switch ($data['method']) {
 					'output' => array('applicationid', 'name'),
 					'startSearch' => true,
 					'search' => isset($data['search']) ? array('name' => $data['search']) : null,
-					'limit' => isset($data['limit']) ? $data['limit'] : null
+					'limit' => $config['search_limit']
 				));
 
 				if ($applications) {
 					CArrayHelper::sort($applications, array(
 						array('field' => 'name', 'order' => ZBX_SORT_UP)
 					));
+
+					if (isset($data['limit'])) {
+						$applications = array_slice($applications, 0, $data['limit']);
+					}
 
 					foreach ($applications as $application) {
 						$result[] = array(
@@ -342,13 +361,17 @@ switch ($data['method']) {
 					'selectHosts' => array('name'),
 					'startSearch' => true,
 					'search' => isset($data['search']) ? array('description' => $data['search']) : null,
-					'limit' => isset($data['limit']) ? $data['limit'] : null
+					'limit' => $config['search_limit']
 				));
 
 				if ($triggers) {
 					CArrayHelper::sort($triggers, array(
 						array('field' => 'description', 'order' => ZBX_SORT_UP)
 					));
+
+					if (isset($data['limit'])) {
+						$triggers = array_slice($triggers, 0, $data['limit']);
+					}
 
 					foreach ($triggers as $trigger) {
 						$hostName = '';
