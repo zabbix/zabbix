@@ -271,12 +271,12 @@ if (isset($only_hostid)) {
 }
 
 // value types
-$valueTypes = null;
+$value_types = null;
 if (get_request('value_types')) {
-	$valueTypes = get_request('value_types');
+	$value_types = get_request('value_types');
 }
 elseif (get_request('numeric')) {
-	$valueTypes = array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64);
+	$value_types = array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64);
 }
 
 $url = new CUrl();
