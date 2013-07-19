@@ -372,8 +372,7 @@ ZBX_MEM_FUNC_IMPL(__config, config_mem);
 static unsigned char	poller_by_item(zbx_uint64_t itemid, zbx_uint64_t proxy_hostid,
 		unsigned char item_type, const char *key, unsigned char flags)
 {
-	if (0 != proxy_hostid && (ITEM_TYPE_INTERNAL != item_type &&
-				ITEM_TYPE_AGGREGATE != item_type &&
+	if (0 != proxy_hostid && (ITEM_TYPE_AGGREGATE != item_type &&
 				ITEM_TYPE_CALCULATED != item_type))
 	{
 		return ZBX_NO_POLLER;
@@ -4618,4 +4617,106 @@ void	DCget_user_macro(zbx_uint64_t *hostids, int host_num, const char *macro, ch
 	UNLOCK_CACHE;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DCget_item_count                                                 *
+ *                                                                            *
+ * Purpose: return the number of active items                                 *
+ *                                                                            *
+ * Return value: the number of active items                                   *
+ *                                                                            *
+ ******************************************************************************/
+int	DCget_item_count()
+{
+	return config->items.num_data;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DCget_item_unsupported_count                                     *
+ *                                                                            *
+ * Purpose: return the number of active unsupported items                     *
+ *                                                                            *
+ * Return value: the number of active unsupported items                       *
+ *                                                                            *
+ ******************************************************************************/
+int	DCget_item_unsupported_count()
+{
+	int			count = 0;
+	zbx_hashset_iter_t	iter;
+	ZBX_DC_ITEM		*item;
+
+	LOCK_CACHE;
+
+	zbx_hashset_iter_reset(&config->items, &iter);
+
+	while (NULL != (item = zbx_hashset_iter_next(&iter)))
+	{
+		if (ITEM_STATE_NOTSUPPORTED == item->state)
+			count++;
+	}
+
+	UNLOCK_CACHE;
+
+	return count;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DCget_trigger_count                                              *
+ *                                                                            *
+ * Purpose: return the number of triggers                                     *
+ *                                                                            *
+ * Return value: the number of triggers                                       *
+ *                                                                            *
+ ******************************************************************************/
+int	DCget_trigger_count()
+{
+	return config->triggers.num_data;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DCget_host_count                                                 *
+ *                                                                            *
+ * Purpose: return the number of monitored hosts                              *
+ *                                                                            *
+ * Return value: the number of monitored hosts                                *
+ *                                                                            *
+ ******************************************************************************/
+int	DCget_host_count()
+{
+	return config->hosts.num_data;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DCget_required_performance                                       *
+ *                                                                            *
+ * Purpose: calculate the required server performance (values per second)     *
+ *                                                                            *
+ * Return value: the required nvps number                                     *
+ *                                                                            *
+ ******************************************************************************/
+double	DCget_required_performance()
+{
+	double			nvps = 0;
+	zbx_hashset_iter_t	iter;
+	ZBX_DC_ITEM		*item;
+
+	LOCK_CACHE;
+
+	zbx_hashset_iter_reset(&config->items, &iter);
+
+	while (NULL != (item = zbx_hashset_iter_next(&iter)))
+	{
+		if (0 != item->delay)
+			nvps += 1.0 / item->delay;
+	}
+
+	UNLOCK_CACHE;
+
+	return nvps;
 }

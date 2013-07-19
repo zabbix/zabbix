@@ -309,4 +309,10 @@ void	DCget_user_macro(zbx_uint64_t *hostids, int host_num, const char *macro, ch
 
 int	DCconfig_update_host_availability(const zbx_host_availability_t *availability, int availability_num);
 
+int	DCget_item_count();
+int	DCget_item_unsupported_count();
+int	DCget_trigger_count();
+double	DCget_required_performance();
+int	DCget_host_count();
+
 #endif
