@@ -142,6 +142,23 @@ require_once dirname(__FILE__).'/include/page_header.php';
 		unset($_REQUEST['delete_period'], $_REQUEST['group_pid']);
 	}
 
+	// item validation
+	if (isset($_REQUEST['items']) && $_REQUEST['items']) {
+		$itemIds = zbx_objectValues($_REQUEST['items'], 'itemid');
+
+		$itemCount = API::Item()->get(array(
+			'itemids' => $itemIds,
+			'webitems' => true,
+			'countOutput' => true
+		));
+
+		if ($itemCount != count($itemIds)) {
+			show_error_message(_('No permissions to referred object or it does not exist!'));
+			require_once dirname(__FILE__).'/include/page_footer.php';
+			exit;
+		}
+	}
+
 	$config = $_REQUEST['config'] = get_request('config',1);
 
 	$_REQUEST['report_timesince'] = zbxDateToTime(get_request('report_timesince', date(TIMESTAMP_FORMAT, time() - SEC_PER_DAY)));

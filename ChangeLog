@@ -303,6 +303,7 @@ A......... [ZBX-6407] improved data retrieval performance for CTrigger get() wit
 A.F....... [ZBX-1357] updated Brazilian Portuguese, Chinese (China), Latvian, Spanish and Turkish translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+..F....... [ZBX-6652] added item validation in bar reports page (Ivo)
 ...G...... [ZBX-6730] fixed zabbix_agentd -t duplicate printing of parameters (igors)
 ........S. [ZBX-6801] fixed processing of host availability data received from proxy (wiper)
 ....I..... [ZBX-6637] added -m64 compilation flag for Solaris to be able to understand all attributes of 64-bit processes (igors)
