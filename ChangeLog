@@ -1,6 +1,7 @@
 Changes for 2.1.2
 
 New features:
+...G...... [ZBXNEXT-1528] added net.if.in, net.if.out and net.if.total item support on HP-UX platforms (igors)
 
 Bug fixes:
 ...G...... [ZBX-282] added sensor item support for Linux kernels newer than v2.4 (igors)
