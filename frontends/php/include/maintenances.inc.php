@@ -52,13 +52,20 @@ function shedule2str($timeperiod) {
 		$timeperiod['minute'] = '0'.$timeperiod['minute'];
 	}
 
-	$str = _('At').SPACE.$timeperiod['hour'].':'.$timeperiod['minute'].SPACE._('on').SPACE;
-
 	if ($timeperiod['timeperiod_type'] == TIMEPERIOD_TYPE_ONETIME) {
-		$str = _('At').SPACE.date('H', $timeperiod['start_date']).':'.date('i',$timeperiod['start_date']).SPACE._('on').SPACE.zbx_date2str(_('d M Y'), $timeperiod['start_date']);
+		$str = _s('At %1$s:%2$s on %3$s',
+			date('H', $timeperiod['start_date']),
+			date('i', $timeperiod['start_date']),
+			zbx_date2str(_('d M Y'), $timeperiod['start_date'])
+		);
 	}
 	elseif ($timeperiod['timeperiod_type'] == TIMEPERIOD_TYPE_DAILY) {
-		$str .= _('every').SPACE.(($timeperiod['every'] > 1) ? $timeperiod['every'].SPACE._('days') : _('day'));
+		$str = _n('At %2$s:%3$s on every day',
+			'At %2$s:%3$s on every %1$s days',
+			$timeperiod['every'],
+			$timeperiod['hour'],
+			$timeperiod['minute']
+		);
 	}
 	elseif ($timeperiod['timeperiod_type'] == TIMEPERIOD_TYPE_WEEKLY) {
 		$days = '';
@@ -72,7 +79,14 @@ function shedule2str($timeperiod) {
 				$days .= getDayOfWeekCaption($i + 1);
 			}
 		}
-		$str.= _('every').SPACE.$days.SPACE._('of every').SPACE.(($timeperiod['every'] > 1) ? $timeperiod['every'].SPACE._('weeks') : _('week'));
+
+		$str = _n('At %2$s:%3$s on every %4$s of every week',
+			'At %2$s:%3$s on every %4$s of every %1$s weeks',
+			$timeperiod['every'],
+			$timeperiod['hour'],
+			$timeperiod['minute'],
+			$days
+		);
 	}
 	elseif ($timeperiod['timeperiod_type'] == TIMEPERIOD_TYPE_MONTHLY) {
 		$months = '';
@@ -107,10 +121,22 @@ function shedule2str($timeperiod) {
 				case 4: $every = _('Fourth'); break;
 				case 5: $every = _('Last'); break;
 			}
-			$str .= $every.SPACE.$days.SPACE._('of every').SPACE.$months;
+
+			$str = _s('At %1$s:%2$s on %3$s %4$s of every %5$s',
+				$timeperiod['hour'],
+				$timeperiod['minute'],
+				$every,
+				$days,
+				$months
+			);
 		}
 		else {
-			$str .= _('day').SPACE.$timeperiod['day'].SPACE._('of every').SPACE.$months;
+			$str = _s('At %1$s:%2$s on day %3$s of every %4$s',
+				$timeperiod['hour'],
+				$timeperiod['minute'],
+				$timeperiod['day'],
+				$months
+			);
 		}
 	}
 	return $str;

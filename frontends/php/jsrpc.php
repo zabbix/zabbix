@@ -164,7 +164,8 @@ switch ($data['method']) {
 	case 'zabbix.status':
 		$session = Z::getInstance()->getSession();
 		if (!isset($session['serverCheckResult']) || ($session['serverCheckTime'] + SERVER_CHECK_INTERVAL) <= time()) {
-			$session['serverCheckResult'] = zabbixIsRunning();
+			$zabbixServer = new CZabbixServer($ZBX_SERVER, $ZBX_SERVER_PORT, ZBX_SOCKET_TIMEOUT, 0);
+			$session['serverCheckResult'] = $zabbixServer->isRunning();
 			$session['serverCheckTime'] = time();
 		}
 
@@ -246,7 +247,7 @@ switch ($data['method']) {
 
 				if ($hostGroups) {
 					foreach ($hostGroups as &$hostGroup) {
-						$hostGroup['nodename'] = get_node_name_by_elid($hostGroup['groupid'], true, ': ');
+						$hostGroup['nodename'] = get_node_name_by_elid($hostGroup['groupid'], true, NAME_DELIMITER);
 					}
 					unset($hostGroup);
 

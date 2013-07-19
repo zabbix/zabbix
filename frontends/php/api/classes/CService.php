@@ -20,7 +20,8 @@
 
 
 /**
- * Class containing methods for operations with IT Services
+ * Class containing methods for operations with IT services.
+ *
  * @package API
  */
 class CService extends CZBXAPI {

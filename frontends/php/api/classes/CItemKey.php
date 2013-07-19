@@ -17,17 +17,21 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
+
 /**
- * Class is used to validate and parse item keys
+ * Class is used to validate and parse item keys.
+ *
  * Example of usage:
  *		$itemKey = new CItemKey('test.key[a, b, c]');
  *		echo $itemKey->isValid(); // true
  *		echo $itemKey->getKeyId(); // test.key
  *		print_r($itemKey->parameters()); // array('a', 'b', 'c')
+ *
+ * @package API
  */
 class CItemKey {
+
 	private $key;
 	private $keyByteCnt;
 	private $currentByte;
@@ -298,4 +302,3 @@ class CItemKey {
 		return $this->keyId;
 	}
 }
-?>

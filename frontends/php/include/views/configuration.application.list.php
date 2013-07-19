@@ -57,16 +57,19 @@ $applicationForm->addVar('hostid', $this->data['hostid']);
 $applicationTable = new CTableInfo(_('No applications defined.'));
 $applicationTable->setHeader(array(
 	new CCheckBox('all_applications', null, "checkAll('".$applicationForm->getName()."', 'all_applications', 'applications');"),
+	$this->data['displayNodes'] ? _('Node') : null,
 	($this->data['hostid'] > 0) ? null : _('Host'),
 	make_sorting_header(_('Application'), 'name'),
 	_('Show')
 ));
+
 foreach ($this->data['applications'] as $application) {
 	// inherited app, display the template list
-	if ($application['templateids']) {
+	if ($application['templateids'] && !empty($application['sourceTemplates'])) {
+		$name = array();
+
 		CArrayHelper::sort($application['sourceTemplates'], array('name'));
 
-		$name = array();
 		foreach ($application['sourceTemplates'] as $template) {
 			$name[] = new CLink($template['name'], 'applications.php?hostid='.$template['hostid'], 'unknown');
 			$name[] = ', ';
@@ -75,17 +78,30 @@ foreach ($this->data['applications'] as $application) {
 		$name[] = NAME_DELIMITER;
 		$name[] = $application['name'];
 	}
-	// normal app
 	else {
-		$name = new CLink($application['name'], 'applications.php?form=update&applicationid='.$application['applicationid'].'&hostid='.$application['hostid'].'&groupid='.$this->data['groupid']);
+		$name = new CLink(
+			$application['name'],
+			'applications.php?'.
+				'form=update'.
+				'&applicationid='.$application['applicationid'].
+				'&hostid='.$application['hostid'].
+				'&groupid='.$this->data['groupid']
+		);
 	}
 
 	$applicationTable->addRow(array(
 		new CCheckBox('applications['.$application['applicationid'].']', null, null, $application['applicationid']),
+		$this->data['displayNodes'] ? $application['nodename'] : null,
 		($this->data['hostid'] > 0) ? null : $application['host'],
 		$name,
 		array(
-			new CLink(_('Items'), 'items.php?hostid='.$application['hostid'].'&filter_set=1&filter_application='.urlencode($application['name'])),
+			new CLink(
+				_('Items'),
+				'items.php?'.
+					'hostid='.$application['hostid'].
+					'&filter_set=1'.
+					'&filter_application='.urlencode($application['name'])
+			),
 			SPACE.'('.count($application['items']).')'
 		)
 	));
@@ -107,7 +123,10 @@ $goComboBox->addItem($goOption);
 
 $goButton = new CSubmit('goButton', _('Go').' (0)');
 $goButton->setAttribute('id', 'goButton');
+
 zbx_add_post_js('chkbxRange.pageGoName = "applications";');
+zbx_add_post_js('chkbxRange.prefix = "'.$this->data['hostid'].'";');
+zbx_add_post_js('cookie.prefix = "'.$this->data['hostid'].'";');
 
 // append table to form
 $applicationForm->addItem(array($this->data['paging'], $applicationTable, $this->data['paging'], get_table_header(array($goComboBox, $goButton))));

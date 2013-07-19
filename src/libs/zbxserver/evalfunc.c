@@ -21,6 +21,7 @@
 #include "db.h"
 #include "log.h"
 #include "zbxserver.h"
+#include "valuecache.h"
 
 #include "evalfunc.h"
 
@@ -33,7 +34,7 @@ static int	get_function_parameter_uint31(zbx_uint64_t hostid, const char *parame
 {
 	const char	*__function_name = "get_function_parameter_uint31";
 	char		*parameter = NULL;
-	int		res = FAIL;
+	int		ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() parameters:'%s' Nparam:%d", __function_name, parameters, Nparam);
 
@@ -49,30 +50,30 @@ static int	get_function_parameter_uint31(zbx_uint64_t hostid, const char *parame
 		{
 			*flag = ZBX_FLAG_VALUES;
 			if (SUCCEED == is_uint31(parameter + 1, (uint32_t*)value) && 0 < *value)
-				res = SUCCEED;
+				ret = SUCCEED;
 		}
 		else if (SUCCEED == is_uint_suffix(parameter, (unsigned int *)value) && 0 <= *value)
 		{
 			*flag = ZBX_FLAG_SEC;
-			res = SUCCEED;
+			ret = SUCCEED;
 		}
 	}
 
-	if (SUCCEED == res)
+	if (SUCCEED == ret)
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() flag:%d value:%d", __function_name, *flag, *value);
 clean:
 	zbx_free(parameter);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(res));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
-	return res;
+	return ret;
 }
 
 static int	get_function_parameter_uint64(zbx_uint64_t hostid, const char *parameters, int Nparam, zbx_uint64_t *value, int *flag)
 {
 	const char	*__function_name = "get_function_parameter_uint64";
 	char		*parameter = NULL;
-	int		res = FAIL;
+	int		ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() parameters:'%s' Nparam:%d", __function_name, parameters, Nparam);
 
@@ -87,24 +88,24 @@ static int	get_function_parameter_uint64(zbx_uint64_t hostid, const char *parame
 		if (SUCCEED == is_uint64(parameter, value))
 		{
 			*flag = ZBX_FLAG_SEC;
-			res = SUCCEED;
+			ret = SUCCEED;
 		}
 	}
 
-	if (SUCCEED == res)
+	if (SUCCEED == ret)
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() flag:%d value:" ZBX_FS_UI64, __function_name, *flag, *value);
 clean:
 	zbx_free(parameter);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(res));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
-	return res;
+	return ret;
 }
 
 static int	get_function_parameter_str(zbx_uint64_t hostid, const char *parameters, int Nparam, char **value)
 {
 	const char	*__function_name = "get_function_parameter_str";
-	int		res = FAIL;
+	int		ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() parameters:'%s' Nparam:%d", __function_name, parameters, Nparam);
 
@@ -113,17 +114,17 @@ static int	get_function_parameter_str(zbx_uint64_t hostid, const char *parameter
 	if (0 != get_param(parameters, Nparam, *value, FUNCTION_PARAMETER_LEN_MAX))
 		goto clean;
 
-	res = substitute_simple_macros(NULL, NULL, NULL, NULL, &hostid, NULL, NULL, NULL,
+	ret = substitute_simple_macros(NULL, NULL, NULL, NULL, &hostid, NULL, NULL, NULL,
 			value, MACRO_TYPE_COMMON, NULL, 0);
 clean:
-	if (SUCCEED == res)
+	if (SUCCEED == ret)
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() value:'%s'", __function_name, *value);
 	else
 		zbx_free(*value);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(res));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
-	return res;
+	return ret;
 }
 
 /******************************************************************************
@@ -138,28 +139,29 @@ clean:
  * Return value: SUCCEED - evaluated successfully, result is stored in 'value'*
  *               FAIL - failed to evaluate function                           *
  *                                                                            *
- * Author: Alexei Vladishev, Rudolfs Kreicbergs                               *
- *                                                                            *
  ******************************************************************************/
-static int	evaluate_LOGEVENTID(char *value, DB_ITEM *item, const char *function, const char *parameters, time_t now)
+static int	evaluate_LOGEVENTID(char *value, DB_ITEM *item, const char *function, const char *parameters,
+		time_t now)
 {
-	const char	*__function_name = "evaluate_LOGEVENTID";
-	char		*arg1 = NULL, *arg1_esc;
-	int		res = FAIL;
-	ZBX_REGEXP	*regexps = NULL;
-	int		regexps_alloc = 0, regexps_num = 0;
-	char		**h_value;
+	const char			*__function_name = "evaluate_LOGEVENTID";
+	char				*arg1 = NULL, *arg1_esc;
+	int				ret = FAIL;
+	ZBX_REGEXP			*regexps = NULL;
+	int				regexps_alloc = 0, regexps_num = 0;
+	zbx_vector_history_record_t	values;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
+	zbx_history_record_vector_create(&values);
+
 	if (ITEM_VALUE_TYPE_LOG != item->value_type)
-		goto clean;
+		goto out;
 
 	if (1 < num_param(parameters))
-		goto clean;
+		goto out;
 
 	if (FAIL == get_function_parameter_str(item->hostid, parameters, 1, &arg1))
-		goto clean;
+		goto out;
 
 	if ('@' == *arg1)
 	{
@@ -182,30 +184,24 @@ static int	evaluate_LOGEVENTID(char *value, DB_ITEM *item, const char *function,
 		DBfree_result(result);
 	}
 
-	if (NULL == item->h_lasteventid)
+	if (SUCCEED == zbx_vc_get_value_range(item->itemid, item->value_type, &values, 0, 1, now) &&
+			0 < values.values_num)
 	{
-		h_value = DBget_history(item->itemid, item->value_type, ZBX_DB_GET_HIST_VALUE,
-				0, 0, NULL, "logeventid", 1);
+		char	*logeventid = NULL;
+		size_t	size = 0, offset = 0;
 
-		if (NULL != h_value[0])
-		{
-			item->h_lasteventid = zbx_strdup(item->h_lasteventid, h_value[0]);
-			res = SUCCEED;
-		}
-		else
-			zabbix_log(LOG_LEVEL_DEBUG, "result for LOGEVENTID is empty");
-		DBfree_history(h_value);
-	}
-	else
-		res = SUCCEED;
-
-	if (SUCCEED == res)
-	{
-		if (SUCCEED == regexp_match_ex(regexps, regexps_num, item->h_lasteventid, arg1, ZBX_CASE_SENSITIVE))
+		zbx_snprintf_alloc(&logeventid, &size, &offset, "%d", values.values[0].value.log->logeventid);
+		if (SUCCEED == regexp_match_ex(regexps, regexps_num, logeventid, arg1, ZBX_CASE_SENSITIVE))
 			zbx_strlcpy(value, "1", MAX_BUFFER_LEN);
 		else
 			zbx_strlcpy(value, "0", MAX_BUFFER_LEN);
+
+		zbx_free(logeventid);
+
+		ret = SUCCEED;
 	}
+	else
+		zabbix_log(LOG_LEVEL_DEBUG, "result for LOGEVENTID is empty");
 
 	if ('@' == *arg1)
 	{
@@ -213,10 +209,12 @@ static int	evaluate_LOGEVENTID(char *value, DB_ITEM *item, const char *function,
 		zbx_free(regexps);
 	}
 	zbx_free(arg1);
-clean:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(res));
+out:
+	zbx_history_record_vector_destroy(&values, item->value_type);
 
-	return res;
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+
+	return ret;
 }
 
 /******************************************************************************
@@ -231,57 +229,47 @@ clean:
  * Return value: SUCCEED - evaluated successfully, result is stored in 'value'*
  *               FAIL - failed to evaluate function                           *
  *                                                                            *
- * Author: Alexei Vladishev                                                   *
- *                                                                            *
  ******************************************************************************/
 static int	evaluate_LOGSOURCE(char *value, DB_ITEM *item, const char *function, const char *parameters, time_t now)
 {
-	const char	*__function_name = "evaluate_LOGSOURCE";
-	char		*arg1 = NULL;
-	int		res = FAIL;
-	char		**h_value;
+	const char			*__function_name = "evaluate_LOGSOURCE";
+	char				*arg1 = NULL;
+	int				ret = FAIL;
+	zbx_vector_history_record_t	values;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
+	zbx_history_record_vector_create(&values);
+
 	if (ITEM_VALUE_TYPE_LOG != item->value_type)
-		goto clean;
+		goto out;
 
 	if (1 < num_param(parameters))
-		goto clean;
+		goto out;
 
 	if (FAIL == get_function_parameter_str(item->hostid, parameters, 1, &arg1))
-		goto clean;
+		goto out;
 
-	if (NULL == item->h_lastsource)
+	if (SUCCEED == zbx_vc_get_value_range(item->itemid, item->value_type, &values, 0, 1, now) &&
+			0 < values.values_num)
 	{
-		h_value = DBget_history(item->itemid, item->value_type, ZBX_DB_GET_HIST_VALUE,
-				0, 0, NULL, "source", 1);
-
-		if (NULL != h_value[0])
-		{
-			item->h_lastsource = zbx_strdup(item->h_lastsource, h_value[0]);
-			res = SUCCEED;
-		}
-		else
-			zabbix_log(LOG_LEVEL_DEBUG, "result for LOGSOURCE is empty");
-		DBfree_history(h_value);
-	}
-	else
-		res = SUCCEED;
-
-	if (SUCCEED == res)
-	{
-		if (0 == strcmp(item->h_lastsource, arg1))
+		if (0 == strcmp(values.values[0].value.log->source, arg1))
 			zbx_strlcpy(value, "1", MAX_BUFFER_LEN);
 		else
 			zbx_strlcpy(value, "0", MAX_BUFFER_LEN);
+
+		ret = SUCCEED;
 	}
+	else
+		zabbix_log(LOG_LEVEL_DEBUG, "result for LOGSOURCE is empty");
 
 	zbx_free(arg1);
-clean:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(res));
+out:
+	zbx_history_record_vector_destroy(&values, item->value_type);
 
-	return res;
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+
+	return ret;
 }
 
 /******************************************************************************
@@ -296,42 +284,35 @@ clean:
  * Return value: SUCCEED - evaluated successfully, result is stored in 'value'*
  *               FAIL - failed to evaluate function                           *
  *                                                                            *
- * Author: Alexei Vladishev                                                   *
- *                                                                            *
  ******************************************************************************/
 static int	evaluate_LOGSEVERITY(char *value, DB_ITEM *item, const char *function, const char *parameters, time_t now)
 {
-	const char	*__function_name = "evaluate_LOGSEVERITY";
-	int		res = FAIL;
-	char		**h_value;
+	const char			*__function_name = "evaluate_LOGSEVERITY";
+	int				ret = FAIL;
+	zbx_vector_history_record_t	values;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
+	zbx_history_record_vector_create(&values);
+
 	if (ITEM_VALUE_TYPE_LOG != item->value_type)
-		goto clean;
+		goto out;
 
-	if (NULL == item->h_lastseverity)
+	if (SUCCEED == zbx_vc_get_value_range(item->itemid, item->value_type, &values, 0, 1, now) &&
+			0 < values.values_num)
 	{
-		h_value = DBget_history(item->itemid, item->value_type, ZBX_DB_GET_HIST_VALUE, 0, 0, NULL, "severity", 1);
+		zbx_snprintf(value, MAX_BUFFER_LEN, "%d", values.values[0].value.log->severity);
 
-		if (NULL != h_value[0])
-		{
-			item->h_lastseverity = zbx_strdup(item->h_lastseverity, h_value[0]);
-			res = SUCCEED;
-		}
-		else
-			zabbix_log(LOG_LEVEL_DEBUG, "result for LOGSEVERITY is empty");
-		DBfree_history(h_value);
+		ret = SUCCEED;
 	}
 	else
-		res = SUCCEED;
+		zabbix_log(LOG_LEVEL_DEBUG, "result for LOGSEVERITY is empty");
+out:
+	zbx_history_record_vector_destroy(&values, item->value_type);
 
-	if (SUCCEED == res)
-		zbx_strlcpy(value, item->h_lastseverity, MAX_BUFFER_LEN);
-clean:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(res));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
-	return res;
+	return ret;
 }
 
 #define OP_EQ	0
@@ -344,42 +325,42 @@ clean:
 #define OP_BAND	7
 #define OP_MAX	8
 
-static int	evaluate_COUNT_one(unsigned char value_type, int op, const char *value, const char *arg2, const char *arg2_2)
+static int	evaluate_COUNT_one(unsigned char value_type, int op, history_value_t *value, const char *arg2,
+		const char *arg2_2)
 {
-	zbx_uint64_t	value_uint64 = 0, arg2_uint64, arg2_2_uint64;
-	double		value_double = 0, arg2_double;
+	zbx_uint64_t	 arg2_uint64, arg2_2_uint64;
+	double		 arg2_double;
 
 	switch (value_type)
 	{
 		case ITEM_VALUE_TYPE_UINT64:
 			if (SUCCEED != str2uint64(arg2, "KMGTsmhdw", &arg2_uint64))
 				return FAIL;
-			ZBX_STR2UINT64(value_uint64, value);
 
 			switch (op)
 			{
 				case OP_EQ:
-					if (value_uint64 == arg2_uint64)
+					if (value->ui64 == arg2_uint64)
 						return SUCCEED;
 					break;
 				case OP_NE:
-					if (value_uint64 != arg2_uint64)
+					if (value->ui64 != arg2_uint64)
 						return SUCCEED;
 					break;
 				case OP_GT:
-					if (value_uint64 > arg2_uint64)
+					if (value->ui64 > arg2_uint64)
 						return SUCCEED;
 					break;
 				case OP_GE:
-					if (value_uint64 >= arg2_uint64)
+					if (value->ui64 >= arg2_uint64)
 						return SUCCEED;
 					break;
 				case OP_LT:
-					if (value_uint64 < arg2_uint64)
+					if (value->ui64 < arg2_uint64)
 						return SUCCEED;
 					break;
 				case OP_LE:
-					if (value_uint64 <= arg2_uint64)
+					if (value->ui64 <= arg2_uint64)
 						return SUCCEED;
 					break;
 				case OP_BAND:
@@ -391,7 +372,7 @@ static int	evaluate_COUNT_one(unsigned char value_type, int op, const char *valu
 					else
 						arg2_2_uint64 = arg2_uint64;
 
-					if (arg2_uint64 == (value_uint64 & arg2_2_uint64))
+					if (arg2_uint64 == (value->ui64 & arg2_2_uint64))
 						return SUCCEED;
 					break;
 			}
@@ -401,38 +382,55 @@ static int	evaluate_COUNT_one(unsigned char value_type, int op, const char *valu
 			if (SUCCEED != is_double_suffix(arg2))
 				return FAIL;
 			arg2_double = str2double(arg2);
-			value_double = atof(value);
 
 			switch (op)
 			{
 				case OP_EQ:
-					if (value_double > arg2_double - TRIGGER_EPSILON &&
-							value_double < arg2_double + TRIGGER_EPSILON)
+					if (value->dbl > arg2_double - TRIGGER_EPSILON &&
+							value->dbl < arg2_double + TRIGGER_EPSILON)
 					{
 						return SUCCEED;
 					}
 					break;
 				case OP_NE:
-					if (!(value_double > arg2_double - TRIGGER_EPSILON &&
-								value_double < arg2_double + TRIGGER_EPSILON))
+					if (!(value->dbl > arg2_double - TRIGGER_EPSILON &&
+							value->dbl < arg2_double + TRIGGER_EPSILON))
 					{
 						return SUCCEED;
 					}
 					break;
 				case OP_GT:
-					if (value_double >= arg2_double + TRIGGER_EPSILON)
+					if (value->dbl >= arg2_double + TRIGGER_EPSILON)
 						return SUCCEED;
 					break;
 				case OP_GE:
-					if (value_double > arg2_double - TRIGGER_EPSILON)
+					if (value->dbl > arg2_double - TRIGGER_EPSILON)
 						return SUCCEED;
 					break;
 				case OP_LT:
-					if (value_double <= arg2_double - TRIGGER_EPSILON)
+					if (value->dbl <= arg2_double - TRIGGER_EPSILON)
 						return SUCCEED;
 					break;
 				case OP_LE:
-					if (value_double < arg2_double + TRIGGER_EPSILON)
+					if (value->dbl < arg2_double + TRIGGER_EPSILON)
+						return SUCCEED;
+					break;
+			}
+
+			break;
+		case ITEM_VALUE_TYPE_LOG:
+			switch (op)
+			{
+				case OP_EQ:
+					if (0 == strcmp(value->log->value, arg2))
+						return SUCCEED;
+					break;
+				case OP_NE:
+					if (0 != strcmp(value->log->value, arg2))
+						return SUCCEED;
+					break;
+				case OP_LIKE:
+					if (NULL != strstr(value->log->value, arg2))
 						return SUCCEED;
 					break;
 			}
@@ -442,59 +440,21 @@ static int	evaluate_COUNT_one(unsigned char value_type, int op, const char *valu
 			switch (op)
 			{
 				case OP_EQ:
-					if (0 == strcmp(value, arg2))
+					if (0 == strcmp(value->str, arg2))
 						return SUCCEED;
 					break;
 				case OP_NE:
-					if (0 != strcmp(value, arg2))
+					if (0 != strcmp(value->str, arg2))
 						return SUCCEED;
 					break;
 				case OP_LIKE:
-					if (NULL != strstr(value, arg2))
+					if (NULL != strstr(value->str, arg2))
 						return SUCCEED;
 					break;
 			}
 	}
 
 	return FAIL;
-}
-
-static int	evaluate_COUNT_local(DB_ITEM *item, int op, int arg1, const char *arg2, const char *arg2_2, int *count)
-{
-	int	h_num;
-
-	if (2 < arg1)
-		return FAIL;
-
-	for (h_num = 0; h_num < arg1; h_num++)
-	{
-		const char	*lastvalue;
-
-		if (NULL == item->lastvalue[h_num])
-			break;
-
-		if (NULL == arg2)
-		{
-			(*count)++;
-			continue;
-		}
-
-		if ((ITEM_VALUE_TYPE_TEXT == item->value_type || ITEM_VALUE_TYPE_LOG == item->value_type) &&
-				NULL == item->h_lastvalue[h_num] &&
-				ITEM_LASTVALUE_LEN == zbx_strlen_utf8(item->lastvalue[h_num]))
-		{
-			*count = 0;
-			return FAIL;
-		}
-
-		lastvalue = (NULL == item->h_lastvalue[h_num] ? item->lastvalue[h_num] :
-				item->h_lastvalue[h_num]);
-
-		if (SUCCEED == evaluate_COUNT_one(item->value_type, op, lastvalue, arg2, arg2_2))
-			(*count)++;
-	}
-
-	return SUCCEED;
 }
 
 /******************************************************************************
@@ -518,37 +478,36 @@ static int	evaluate_COUNT_local(DB_ITEM *item, int op, int arg1, const char *arg
  * Return value: SUCCEED - evaluated successfully, result is stored in 'value'*
  *               FAIL - failed to evaluate function                           *
  *                                                                            *
- * Author: Alexei Vladishev, Aleksandrs Saveljevs                             *
- *                                                                            *
  ******************************************************************************/
 static int	evaluate_COUNT(char *value, DB_ITEM *item, const char *function, const char *parameters, time_t now)
 {
-	const char	*__function_name = "evaluate_COUNT";
-	int		arg1, flag, op, numeric_search, nparams, count = 0, h_num, res = FAIL;
-	int		time_shift = 0, time_shift_flag;
-	char		*arg2 = NULL, *arg2_2 = NULL, *arg3 = NULL;
-	char		**h_value;
+	const char			*__function_name = "evaluate_COUNT";
+	int				arg1, flag, op, numeric_search, nparams, count = 0, i, ret = FAIL;
+	int				time_shift = 0, time_shift_flag, seconds = 0, nvalues = 0;
+	char				*arg2 = NULL, *arg2_2 = NULL, *arg3 = NULL;
+	zbx_vector_history_record_t	values;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
+	zbx_history_record_vector_create(&values);
+
 	numeric_search = (ITEM_VALUE_TYPE_UINT64 == item->value_type || ITEM_VALUE_TYPE_FLOAT == item->value_type);
-	op = (numeric_search ? OP_EQ : OP_LIKE);
 
 	if (4 < (nparams = num_param(parameters)))
-		goto exit;
+		goto out;
 
 	if (FAIL == get_function_parameter_uint31(item->hostid, parameters, 1, &arg1, &flag) || 0 >= arg1)
-		goto exit;
+		goto out;
 
 	if (2 <= nparams && FAIL == get_function_parameter_str(item->hostid, parameters, 2, &arg2))
-		goto exit;
+		goto out;
 
 	if (3 <= nparams)
 	{
 		int	fail = 2;
 
 		if (FAIL == get_function_parameter_str(item->hostid, parameters, 3, &arg3))
-			goto clean;
+			goto out;
 
 		if ('\0' == *arg3)
 			op = (0 != numeric_search ? OP_EQ : OP_LIKE);
@@ -591,15 +550,17 @@ static int	evaluate_COUNT(char *value, DB_ITEM *item, const char *function, cons
 		zbx_free(arg3);
 
 		if (0 != fail)
-			goto clean;
+			goto out;
 	}
+	else
+		op = (0 != numeric_search ? OP_EQ : OP_LIKE);
 
 	if (4 <= nparams)
 	{
 		if (FAIL == get_function_parameter_uint31(item->hostid, parameters, 4, &time_shift, &time_shift_flag) ||
 				ZBX_FLAG_SEC != time_shift_flag)
 		{
-			goto clean;
+			goto out;
 		}
 
 		now -= time_shift;
@@ -608,67 +569,34 @@ static int	evaluate_COUNT(char *value, DB_ITEM *item, const char *function, cons
 	if (NULL != arg2 && '\0' == *arg2 && (0 != numeric_search || OP_LIKE == op))
 		zbx_free(arg2);
 
-	if (ZBX_FLAG_SEC == flag && NULL == arg2)
-	{
-		h_value = DBget_history(item->itemid, item->value_type, ZBX_DB_GET_HIST_COUNT,
-				now - arg1, now, NULL, NULL, 0);
-
-		if (NULL == h_value[0])
-			zbx_strlcpy(value, "0", MAX_BUFFER_LEN);
-		else
-			zbx_snprintf(value, MAX_BUFFER_LEN, "%s", h_value[0]);
-		DBfree_history(h_value);
-	}
+	if (ZBX_FLAG_SEC == flag)
+		seconds = arg1;
 	else
+		nvalues = arg1;
+
+	if (FAIL == zbx_vc_get_value_range(item->itemid, item->value_type, &values, seconds, nvalues, now))
+		goto out;
+
+	for (i = 0; i < values.values_num; i++)
 	{
-		if (ZBX_FLAG_VALUES == flag)
+		if (NULL == arg2 || SUCCEED == evaluate_COUNT_one(item->value_type, op, &values.values[i].value, arg2,
+				arg2_2))
 		{
-			if (0 == time_shift && SUCCEED == evaluate_COUNT_local(item, op, arg1, arg2, arg2_2, &count))
-				goto skip_get_history;
-
-			h_value = DBget_history(item->itemid, item->value_type, ZBX_DB_GET_HIST_VALUE,
-					0, now, NULL, NULL, arg1);
+			count++;
 		}
-		else
-		{
-			h_value = DBget_history(item->itemid, item->value_type, ZBX_DB_GET_HIST_VALUE,
-					now - arg1, now, NULL, NULL, 0);
-		}
-
-		if (ZBX_FLAG_VALUES == flag && 0 == time_shift &&
-				(ITEM_VALUE_TYPE_TEXT == item->value_type || ITEM_VALUE_TYPE_LOG == item->value_type))
-		{
-			/* only last and prev value will be cached */
-
-			for (h_num = 0; NULL != h_value[h_num] && 2 > h_num; h_num++)
-			{
-				if (NULL == item->h_lastvalue[h_num] &&
-						ITEM_LASTVALUE_LEN <= zbx_strlen_utf8(h_value[h_num]))
-				{
-					item->h_lastvalue[h_num] = zbx_strdup(NULL, h_value[h_num]);
-				}
-			}
-		}
-
-		for (h_num = 0; NULL != h_value[h_num]; h_num++)
-		{
-			if (NULL == arg2 || SUCCEED == evaluate_COUNT_one(item->value_type, op, h_value[h_num], arg2, arg2_2))
-				count++;
-		}
-		DBfree_history(h_value);
-skip_get_history:
-		zbx_snprintf(value, MAX_BUFFER_LEN, "%d", count);
 	}
 
-	res = SUCCEED;
+	zbx_snprintf(value, MAX_BUFFER_LEN, "%d", count);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() value:%s", __function_name, value);
-clean:
+	ret = SUCCEED;
+out:
 	zbx_free(arg2);
-exit:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(res));
 
-	return res;
+	zbx_history_record_vector_destroy(&values, item->value_type);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+
+	return ret;
 }
 
 #undef OP_EQ
@@ -693,88 +621,72 @@ exit:
  * Return value: SUCCEED - evaluated successfully, result is stored in 'value'*
  *               FAIL - failed to evaluate function                           *
  *                                                                            *
- * Author: Alexei Vladishev                                                   *
- *                                                                            *
  ******************************************************************************/
 static int	evaluate_SUM(char *value, DB_ITEM *item, const char *function, const char *parameters, time_t now)
 {
-	const char	*__function_name = "evaluate_SUM";
-	int		nparams, arg1, flag, h_num, res = FAIL;
-	double		sum = 0;
-	zbx_uint64_t	l, sum_uint64 = 0;
-	char		**h_value;
+	const char			*__function_name = "evaluate_SUM";
+	int				nparams, arg1, flag, i, ret = FAIL, seconds = 0, nvalues = 0;
+	zbx_vector_history_record_t	values;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
+	zbx_history_record_vector_create(&values);
+
 	if (ITEM_VALUE_TYPE_FLOAT != item->value_type && ITEM_VALUE_TYPE_UINT64 != item->value_type)
-		goto clean;
+		goto out;
 
 	if (2 < (nparams = num_param(parameters)))
-		goto clean;
+		goto out;
 
 	if (FAIL == get_function_parameter_uint31(item->hostid, parameters, 1, &arg1, &flag))
-		goto clean;
+		goto out;
 
 	if (2 == nparams)
 	{
 		int	time_shift, time_shift_flag;
 
 		if (FAIL == get_function_parameter_uint31(item->hostid, parameters, 2, &time_shift, &time_shift_flag))
-			goto clean;
+			goto out;
 		if (ZBX_FLAG_SEC != time_shift_flag)
-			goto clean;
+			goto out;
 
 		now -= time_shift;
 	}
 
 	if (ZBX_FLAG_SEC == flag)
+		seconds = arg1;
+	else
+		nvalues = arg1;
+
+	if (FAIL == zbx_vc_get_value_range(item->itemid, item->value_type, &values, seconds, nvalues, now))
+		goto out;
+
+	if (0 < values.values_num)
 	{
-		h_value = DBget_history(item->itemid, item->value_type, ZBX_DB_GET_HIST_SUM,
-			now - arg1, now, NULL, NULL, 0);
+		history_value_t	result = {0};
 
-		if (NULL != h_value[0])
+		if (ITEM_VALUE_TYPE_FLOAT == item->value_type)
 		{
-			zbx_strlcpy(value, h_value[0], MAX_BUFFER_LEN);
-			res = SUCCEED;
+			for (i = 0; i < values.values_num; i++)
+				result.dbl += values.values[i].value.dbl;
 		}
 		else
-			zabbix_log(LOG_LEVEL_DEBUG, "result for SUM is empty");
-		DBfree_history(h_value);
+		{
+			for (i = 0; i < values.values_num; i++)
+				result.ui64 += values.values[i].value.ui64;
+		}
+		zbx_vc_history_value2str(value, MAX_BUFFER_LEN, &result, item->value_type);
+
+		ret = SUCCEED;
 	}
-	else if (ZBX_FLAG_VALUES == flag)
-	{
-		h_value = DBget_history(item->itemid, item->value_type, ZBX_DB_GET_HIST_VALUE, 0, now, NULL, NULL, arg1);
+	else
+		zabbix_log(LOG_LEVEL_DEBUG, "result for SUM is empty");
+out:
+	zbx_history_record_vector_destroy(&values, item->value_type);
 
-		if (ITEM_VALUE_TYPE_UINT64 == item->value_type)
-		{
-			for (h_num = 0; NULL != h_value[h_num]; h_num++)
-			{
-				ZBX_STR2UINT64(l, h_value[h_num]);
-				sum_uint64 += l;
-			}
-		}
-		else
-		{
-			for (h_num = 0; NULL != h_value[h_num]; h_num++)
-				sum += atof(h_value[h_num]);
-		}
-		DBfree_history(h_value);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
-		if (0 != h_num)
-		{
-			if (ITEM_VALUE_TYPE_UINT64 == item->value_type)
-				zbx_snprintf(value, MAX_BUFFER_LEN, ZBX_FS_UI64, sum_uint64);
-			else
-				zbx_snprintf(value, MAX_BUFFER_LEN, ZBX_FS_DBL, sum);
-			res = SUCCEED;
-		}
-		else
-			zabbix_log(LOG_LEVEL_DEBUG, "result for SUM is empty");
-	}
-clean:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(res));
-
-	return res;
+	return ret;
 }
 
 /******************************************************************************
@@ -789,74 +701,72 @@ clean:
  * Return value: SUCCEED - evaluated successfully, result is stored in 'value'*
  *               FAIL - failed to evaluate function                           *
  *                                                                            *
- * Author: Alexei Vladishev                                                   *
- *                                                                            *
  ******************************************************************************/
 static int	evaluate_AVG(char *value, DB_ITEM *item, const char *function, const char *parameters, time_t now)
 {
-	const char	*__function_name = "evaluate_AVG";
-	int		nparams, arg1, flag, h_num, res = FAIL;
-	double		sum = 0;
-	char		**h_value;
+	const char			*__function_name = "evaluate_AVG";
+	int				nparams, arg1, flag, ret = FAIL, i, seconds = 0, nvalues = 0;
+	zbx_vector_history_record_t	values;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
+	zbx_history_record_vector_create(&values);
+
 	if (ITEM_VALUE_TYPE_FLOAT != item->value_type && ITEM_VALUE_TYPE_UINT64 != item->value_type)
-		goto clean;
+		goto out;
 
 	if (2 < (nparams = num_param(parameters)))
-		goto clean;
+		goto out;
 
 	if (FAIL == get_function_parameter_uint31(item->hostid, parameters, 1, &arg1, &flag) || 0 >= arg1)
-		goto clean;
+		goto out;
 
 	if (2 == nparams)
 	{
 		int	time_shift, time_shift_flag;
 
 		if (FAIL == get_function_parameter_uint31(item->hostid, parameters, 2, &time_shift, &time_shift_flag))
-			goto clean;
+			goto out;
 		if (ZBX_FLAG_SEC != time_shift_flag)
-			goto clean;
+			goto out;
 
 		now -= time_shift;
 	}
 
 	if (ZBX_FLAG_SEC == flag)
-	{
-		h_value = DBget_history(item->itemid, item->value_type, ZBX_DB_GET_HIST_AVG,
-				now - arg1, now, NULL, NULL, 0);
+		seconds = arg1;
+	else
+		nvalues = arg1;
 
-		if (NULL != h_value[0])
+	if (FAIL == zbx_vc_get_value_range(item->itemid, item->value_type, &values, seconds, nvalues, now))
+		goto out;
+
+	if (0 < values.values_num)
+	{
+		double	sum = 0;
+
+		if (ITEM_VALUE_TYPE_FLOAT == item->value_type)
 		{
-			zbx_strlcpy(value, h_value[0], MAX_BUFFER_LEN);
-			res = SUCCEED;
+			for (i = 0; i < values.values_num; i++)
+				sum += values.values[i].value.dbl;
 		}
 		else
-			zabbix_log(LOG_LEVEL_DEBUG, "result for AVG is empty");
-		DBfree_history(h_value);
-	}
-	else if (ZBX_FLAG_VALUES == flag)
-	{
-		h_value = DBget_history(item->itemid, item->value_type, ZBX_DB_GET_HIST_VALUE,
-				0, now, NULL, NULL, arg1);
-
-		for (h_num = 0; NULL != h_value[h_num]; h_num++)
-			sum += atof(h_value[h_num]);
-		DBfree_history(h_value);
-
-		if (0 != h_num)
 		{
-			zbx_snprintf(value, MAX_BUFFER_LEN, ZBX_FS_DBL, sum / (double)h_num);
-			res = SUCCEED;
+			for (i = 0; i < values.values_num; i++)
+				sum += values.values[i].value.ui64;
 		}
-		else
-			zabbix_log(LOG_LEVEL_DEBUG, "result for AVG is empty");
-	}
-clean:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(res));
+		zbx_snprintf(value, MAX_BUFFER_LEN, ZBX_FS_DBL, sum / values.values_num);
 
-	return res;
+		ret = SUCCEED;
+	}
+	else
+		zabbix_log(LOG_LEVEL_DEBUG, "result for AVG is empty");
+out:
+	zbx_history_record_vector_destroy(&values, item->value_type);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+
+	return ret;
 }
 
 /******************************************************************************
@@ -872,111 +782,57 @@ clean:
  * Return value: SUCCEED - evaluated successfully, result is stored in 'value'*
  *               FAIL - failed to evaluate function                           *
  *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
  ******************************************************************************/
 static int	evaluate_LAST(char *value, DB_ITEM *item, const char *function, const char *parameters, time_t now)
 {
-	const char	*__function_name = "evaluate_LAST";
-	int		arg1, flag, time_shift = 0, time_shift_flag, res = FAIL, h_num;
-	char		**h_value;
+	const char			*__function_name = "evaluate_LAST";
+	int				arg1, flag, time_shift_flag, ret = FAIL, timeshift = 0;
+	zbx_vector_history_record_t	values;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	if (0 == strcmp(function, "last"))
-	{
-		if (FAIL == get_function_parameter_uint31(item->hostid, parameters, 1, &arg1, &flag))
-			goto clean;
+	if (FAIL == get_function_parameter_uint31(item->hostid, parameters, 1, &arg1, &flag))
+		goto out;
 
-		if (ZBX_FLAG_VALUES != flag)
-		{
-			arg1 = 1;
-			flag = ZBX_FLAG_VALUES;
-		}
-
-		if (2 == num_param(parameters))
-		{
-			if (SUCCEED == get_function_parameter_uint31(item->hostid, parameters, 2, &time_shift, &time_shift_flag) &&
-					ZBX_FLAG_SEC == time_shift_flag)
-			{
-				now -= time_shift;
-				time_shift = 1;
-			}
-			else
-				goto clean;
-		}
-	}
-	else if (0 == strcmp(function, "prev"))
+	if (ZBX_FLAG_VALUES != flag)
 	{
-		arg1 = 2;
+		arg1 = 1;
 		flag = ZBX_FLAG_VALUES;
 	}
 	else
-		goto clean;
-
-	if (0 == time_shift && 1 <= arg1 && arg1 <= 2)
 	{
-		int index = arg1 - 1;
+		if (1 > arg1)
+			goto out;
+	}
 
-		if (NULL != item->lastvalue[index])
+	if (2 == num_param(parameters))
+	{
+		if (SUCCEED == get_function_parameter_uint31(item->hostid, parameters, 2, &timeshift, &time_shift_flag) &&
+				ZBX_FLAG_SEC == time_shift_flag)
 		{
-			res = SUCCEED;
+			now -= timeshift;
+		}
+		else
+			goto out;
+	}
 
-			switch (item->value_type)
-			{
-				case ITEM_VALUE_TYPE_FLOAT:
-				case ITEM_VALUE_TYPE_UINT64:
-				case ITEM_VALUE_TYPE_STR:
-					zbx_strlcpy(value, item->lastvalue[index], MAX_BUFFER_LEN);
-					break;
-				default:
-					if (NULL == item->h_lastvalue[index])
-					{
-						zbx_strlcpy(value, item->lastvalue[index], MAX_BUFFER_LEN);
-						if (ITEM_LASTVALUE_LEN == zbx_strlen_utf8(item->lastvalue[index]))
-							goto history;
-					}
-					else
-						zbx_strlcpy(value, item->h_lastvalue[index], MAX_BUFFER_LEN);
-					break;
-			}
+	zbx_history_record_vector_create(&values);
+
+	if (SUCCEED == zbx_vc_get_value_range(item->itemid, item->value_type, &values, 0, arg1, now))
+	{
+		if (arg1 <= values.values_num)
+		{
+			zbx_vc_history_value2str(value, MAX_BUFFER_LEN, &values.values[arg1 - 1].value,
+					item->value_type);
+			ret = SUCCEED;
 		}
 	}
-	else
-	{
-history:
-		h_value = DBget_history(item->itemid, item->value_type, ZBX_DB_GET_HIST_VALUE,
-				0, now, NULL, NULL, arg1);
 
-		if (0 == time_shift && (ITEM_VALUE_TYPE_TEXT == item->value_type || ITEM_VALUE_TYPE_LOG == item->value_type))
-		{
-			/* only last and prev value will be cached */
+	zbx_history_record_vector_destroy(&values, item->value_type);
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
-			for (h_num = 0; NULL != h_value[h_num] && 2 > h_num; h_num++)
-			{
-				if (NULL == item->h_lastvalue[h_num] &&
-						ITEM_LASTVALUE_LEN <= zbx_strlen_utf8(h_value[h_num]))
-				{
-					item->h_lastvalue[h_num] = zbx_strdup(NULL, h_value[h_num]);
-				}
-			}
-		}
-
-		for (h_num = 0; NULL != h_value[h_num]; h_num++)
-		{
-			if (arg1 == h_num + 1)
-			{
-				zbx_strlcpy(value, h_value[h_num], MAX_BUFFER_LEN);
-				res = SUCCEED;
-				break;
-			}
-		}
-		DBfree_history(h_value);
-	}
-clean:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(res));
-
-	return res;
+	return ret;
 }
 
 /******************************************************************************
@@ -991,94 +847,78 @@ clean:
  * Return value: SUCCEED - evaluated successfully, result is stored in 'value'*
  *               FAIL - failed to evaluate function                           *
  *                                                                            *
- * Author: Alexei Vladishev                                                   *
- *                                                                            *
  ******************************************************************************/
 static int	evaluate_MIN(char *value, DB_ITEM *item, const char *function, const char *parameters, time_t now)
 {
-	const char	*__function_name = "evaluate_MIN";
-	int		nparams, arg1, flag, h_num, res = FAIL;
-	zbx_uint64_t	min_uint64 = 0, l;
-	double		min = 0, f;
-	char		**h_value;
+	const char			*__function_name = "evaluate_MIN";
+	int				nparams, arg1, flag, i, ret = FAIL, seconds = 0, nvalues = 0;
+	zbx_vector_history_record_t	values;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
+	zbx_history_record_vector_create(&values);
+
 	if (ITEM_VALUE_TYPE_FLOAT != item->value_type && ITEM_VALUE_TYPE_UINT64 != item->value_type)
-		goto clean;
+		goto out;
 
 	if (2 < (nparams = num_param(parameters)))
-		goto clean;
+		goto out;
 
 	if (FAIL == get_function_parameter_uint31(item->hostid, parameters, 1, &arg1, &flag) || 0 >= arg1)
-		goto clean;
+		goto out;
 
 	if (2 == nparams)
 	{
 		int	time_shift, time_shift_flag;
 
 		if (FAIL == get_function_parameter_uint31(item->hostid, parameters, 2, &time_shift, &time_shift_flag))
-			goto clean;
+			goto out;
 		if (ZBX_FLAG_SEC != time_shift_flag)
-			goto clean;
+			goto out;
 
 		now -= time_shift;
 	}
 
 	if (ZBX_FLAG_SEC == flag)
-	{
-		h_value = DBget_history(item->itemid, item->value_type, ZBX_DB_GET_HIST_MIN,
-				now - arg1, now, NULL, NULL, 0);
+		seconds = arg1;
+	else
+		nvalues = arg1;
 
-		if (NULL != h_value[0])
-		{
-			zbx_strlcpy(value, h_value[0], MAX_BUFFER_LEN);
-			res = SUCCEED;
-		}
-		else
-			zabbix_log(LOG_LEVEL_DEBUG, "result for MIN is empty");
-		DBfree_history(h_value);
-	}
-	else if (ZBX_FLAG_VALUES == flag)
+	if (FAIL == zbx_vc_get_value_range(item->itemid, item->value_type, &values, seconds, nvalues, now))
+		goto out;
+
+	if (0 < values.values_num)
 	{
-		h_value = DBget_history(item->itemid, item->value_type, ZBX_DB_GET_HIST_VALUE,
-				0, now, NULL, NULL, arg1);
+		int	index = 0;
 
 		if (ITEM_VALUE_TYPE_UINT64 == item->value_type)
 		{
-			for (h_num = 0; NULL != h_value[h_num]; h_num++)
+			for (i = 1; i < values.values_num; i++)
 			{
-				ZBX_STR2UINT64(l, h_value[h_num]);
-				if (0 == h_num || l < min_uint64)
-					min_uint64 = l;
+				if (values.values[i].value.ui64 < values.values[index].value.ui64)
+					index = i;
 			}
 		}
 		else
 		{
-			for (h_num = 0; NULL != h_value[h_num]; h_num++)
+			for (i = 1; i < values.values_num; i++)
 			{
-				f = atof(h_value[h_num]);
-				if (0 == h_num || f < min)
-					min = f;
+				if (values.values[i].value.dbl < values.values[index].value.dbl)
+					index = i;
 			}
 		}
-		DBfree_history(h_value);
+		zbx_vc_history_value2str(value, MAX_BUFFER_LEN, &values.values[index].value, item->value_type);
 
-		if (0 != h_num)
-		{
-			if (item->value_type == ITEM_VALUE_TYPE_UINT64)
-				zbx_snprintf(value, MAX_BUFFER_LEN, ZBX_FS_UI64, min_uint64);
-			else
-				zbx_snprintf(value, MAX_BUFFER_LEN, ZBX_FS_DBL, min);
-			res = SUCCEED;
-		}
-		else
-			zabbix_log(LOG_LEVEL_DEBUG, "result for MIN is empty");
+		ret = SUCCEED;
 	}
-clean:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(res));
+	else
+		zabbix_log(LOG_LEVEL_DEBUG, "result for MIN is empty");
+out:
+	zbx_history_record_vector_destroy(&values, item->value_type);
 
-	return res;
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+
+	return ret;
 }
 
 /******************************************************************************
@@ -1093,94 +933,78 @@ clean:
  * Return value: SUCCEED - evaluated successfully, result is stored in 'value'*
  *               FAIL - failed to evaluate function                           *
  *                                                                            *
- * Author: Alexei Vladishev                                                   *
- *                                                                            *
  ******************************************************************************/
 static int	evaluate_MAX(char *value, DB_ITEM *item, const char *function, const char *parameters, time_t now)
 {
-	const char	*__function_name = "evaluate_MAX";
-	int		nparams, arg1, flag, h_num, res = FAIL;
-	zbx_uint64_t	max_uint64 = 0, l;
-	double		max = 0, f;
-	char		**h_value;
+	const char			*__function_name = "evaluate_MAX";
+	int				nparams, arg1, flag, ret = FAIL, i, seconds = 0, nvalues = 0;
+	zbx_vector_history_record_t	values;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
+	zbx_history_record_vector_create(&values);
+
 	if (ITEM_VALUE_TYPE_FLOAT != item->value_type && ITEM_VALUE_TYPE_UINT64 != item->value_type)
-		goto clean;
+		goto out;
 
 	if (2 < (nparams = num_param(parameters)))
-		goto clean;
+		goto out;
 
 	if (FAIL == get_function_parameter_uint31(item->hostid, parameters, 1, &arg1, &flag) || 0 >= arg1)
-		goto clean;
+		goto out;
 
 	if (2 == nparams)
 	{
 		int	time_shift, time_shift_flag;
 
 		if (FAIL == get_function_parameter_uint31(item->hostid, parameters, 2, &time_shift, &time_shift_flag))
-			goto clean;
+			goto out;
 		if (ZBX_FLAG_SEC != time_shift_flag)
-			goto clean;
+			goto out;
 
 		now -= time_shift;
 	}
 
 	if (ZBX_FLAG_SEC == flag)
-	{
-		h_value = DBget_history(item->itemid, item->value_type, ZBX_DB_GET_HIST_MAX,
-				now - arg1, now, NULL, NULL, 0);
+		seconds = arg1;
+	else
+		nvalues = arg1;
 
-		if (NULL != h_value[0])
-		{
-			zbx_strlcpy(value, h_value[0], MAX_BUFFER_LEN);
-			res = SUCCEED;
-		}
-		else
-			zabbix_log(LOG_LEVEL_DEBUG, "result for MAX is empty");
-		DBfree_history(h_value);
-	}
-	else if (ZBX_FLAG_VALUES == flag)
+	if (FAIL == zbx_vc_get_value_range(item->itemid, item->value_type, &values, seconds, nvalues, now))
+		goto out;
+
+	if (0 < values.values_num)
 	{
-		h_value = DBget_history(item->itemid, item->value_type, ZBX_DB_GET_HIST_VALUE,
-				0, now, NULL, NULL, arg1);
+		int	index = 0;
 
 		if (ITEM_VALUE_TYPE_UINT64 == item->value_type)
 		{
-			for (h_num = 0; NULL != h_value[h_num]; h_num++)
+			for (i = 1; i < values.values_num; i++)
 			{
-				ZBX_STR2UINT64(l, h_value[h_num]);
-				if (0 == h_num || l > max_uint64)
-					max_uint64 = l;
+				if (values.values[i].value.ui64 > values.values[index].value.ui64)
+					index = i;
 			}
 		}
 		else
 		{
-			for (h_num = 0; NULL != h_value[h_num]; h_num++)
+			for (i = 1; i < values.values_num; i++)
 			{
-				f = atof(h_value[h_num]);
-				if (0 == h_num || f > max)
-					max = f;
+				if (values.values[i].value.dbl > values.values[index].value.dbl)
+					index = i;
 			}
 		}
-		DBfree_history(h_value);
+		zbx_vc_history_value2str(value, MAX_BUFFER_LEN, &values.values[index].value, item->value_type);
 
-		if (0 != h_num)
-		{
-			if (ITEM_VALUE_TYPE_UINT64 == item->value_type)
-				zbx_snprintf(value, MAX_BUFFER_LEN, ZBX_FS_UI64, max_uint64);
-			else
-				zbx_snprintf(value, MAX_BUFFER_LEN, ZBX_FS_DBL, max);
-			res = SUCCEED;
-		}
-		else
-			zabbix_log(LOG_LEVEL_DEBUG, "result for MAX is empty");
+		ret = SUCCEED;
 	}
-clean:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(res));
+	else
+		zabbix_log(LOG_LEVEL_DEBUG, "result for MAX is empty");
+out:
+	zbx_history_record_vector_destroy(&values, item->value_type);
 
-	return res;
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+
+	return ret;
 }
 
 /******************************************************************************
@@ -1195,98 +1019,90 @@ clean:
  * Return value: SUCCEED - evaluated successfully, result is stored in 'value'*
  *               FAIL - failed to evaluate function                           *
  *                                                                            *
- * Author: Alexei Vladishev                                                   *
- *                                                                            *
  ******************************************************************************/
 static int	evaluate_DELTA(char *value, DB_ITEM *item, const char *function, const char *parameters, time_t now)
 {
-	const char	*__function_name = "evaluate_DELTA";
-	int		nparams, arg1, flag, h_num, res = FAIL;
-	zbx_uint64_t	min_uint64 = 0, max_uint64 = 0, l;
-	double		min = 0, max = 0, f;
-	char		**h_value;
+	const char			*__function_name = "evaluate_DELTA";
+	int				nparams, arg1, flag, ret = FAIL, i, seconds = 0, nvalues = 0;
+	zbx_vector_history_record_t	values;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
+	zbx_history_record_vector_create(&values);
+
 	if (ITEM_VALUE_TYPE_FLOAT != item->value_type && ITEM_VALUE_TYPE_UINT64 != item->value_type)
-		goto clean;
+		goto out;
 
 	if (2 < (nparams = num_param(parameters)))
-		goto clean;
+		goto out;
 
 	if (FAIL == get_function_parameter_uint31(item->hostid, parameters, 1, &arg1, &flag) || 0 >= arg1)
-		goto clean;
+		goto out;
 
 	if (2 == nparams)
 	{
 		int	time_shift, time_shift_flag;
 
 		if (FAIL == get_function_parameter_uint31(item->hostid, parameters, 2, &time_shift, &time_shift_flag))
-			goto clean;
+			goto out;
 		if (ZBX_FLAG_SEC != time_shift_flag)
-			goto clean;
+			goto out;
 
 		now -= time_shift;
 	}
 
 	if (ZBX_FLAG_SEC == flag)
-	{
-		h_value = DBget_history(item->itemid, item->value_type, ZBX_DB_GET_HIST_DELTA,
-				now - arg1, now, NULL, NULL, 0);
+		seconds = arg1;
+	else
+		nvalues = arg1;
 
-		if (NULL != h_value[0])
-		{
-			zbx_strlcpy(value, h_value[0], MAX_BUFFER_LEN);
-			res = SUCCEED;
-		}
-		else
-			zabbix_log(LOG_LEVEL_DEBUG, "result for DELTA is empty");
-		DBfree_history(h_value);
-	}
-	else if (ZBX_FLAG_VALUES == flag)
+	if (FAIL == zbx_vc_get_value_range(item->itemid, item->value_type, &values, seconds, nvalues, now))
+		goto out;
+
+	if (0 < values.values_num)
 	{
-		h_value = DBget_history(item->itemid, item->value_type, ZBX_DB_GET_HIST_VALUE,
-				0, now, NULL, NULL, arg1);
+		history_value_t		result;
+		int 			index_min = 0, index_max = 0;
 
 		if (ITEM_VALUE_TYPE_UINT64 == item->value_type)
 		{
-			for (h_num = 0; NULL != h_value[h_num]; h_num++)
+			for (i = 1; i < values.values_num; i++)
 			{
-				ZBX_STR2UINT64(l, h_value[h_num]);
-				if (0 == h_num || l < min_uint64)
-					min_uint64 = l;
-				if (0 == h_num || l > max_uint64)
-					max_uint64 = l;
-			}
-		}
-		else
-		{
-			for (h_num = 0; NULL != h_value[h_num]; h_num++)
-			{
-				f = atof(h_value[h_num]);
-				if (0 == h_num || f < min)
-					min = f;
-				if (0 == h_num || f > max)
-					max = f;
-			}
-		}
-		DBfree_history(h_value);
+				if (values.values[i].value.ui64 > values.values[index_max].value.ui64)
+					index_max = i;
 
-		if (0 != h_num)
-		{
-			if (ITEM_VALUE_TYPE_UINT64 == item->value_type)
-				zbx_snprintf(value, MAX_BUFFER_LEN, ZBX_FS_UI64, max_uint64 - min_uint64);
-			else
-				zbx_snprintf(value, MAX_BUFFER_LEN, ZBX_FS_DBL, max - min);
-			res = SUCCEED;
+				if (values.values[i].value.ui64 < values.values[index_min].value.ui64)
+					index_min = i;
+			}
+
+			result.ui64 = values.values[index_max].value.ui64 - values.values[index_min].value.ui64;
 		}
 		else
-			zabbix_log(LOG_LEVEL_DEBUG, "result for DELTA is empty");
+		{
+			for (i = 1; i < values.values_num; i++)
+			{
+				if (values.values[i].value.dbl > values.values[index_max].value.dbl)
+					index_max = i;
+
+				if (values.values[i].value.dbl < values.values[index_min].value.dbl)
+					index_min = i;
+			}
+
+			result.dbl = values.values[index_max].value.dbl - values.values[index_min].value.dbl;
+		}
+
+		zbx_vc_history_value2str(value, MAX_BUFFER_LEN, &result, item->value_type);
+
+		ret = SUCCEED;
 	}
-clean:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(res));
+	else
+		zabbix_log(LOG_LEVEL_DEBUG, "result for DELTA is empty");
+out:
+	zbx_history_record_vector_destroy(&values, item->value_type);
 
-	return res;
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+
+	return ret;
 }
 
 /******************************************************************************
@@ -1301,93 +1117,49 @@ clean:
  * Return value: SUCCEED - evaluated successfully, result is stored in 'value'*
  *               FAIL - failed to evaluate function                           *
  *                                                                            *
- * Author: Alexei Vladishev                                                   *
- *                                                                            *
  ******************************************************************************/
 static int	evaluate_NODATA(char *value, DB_ITEM *item, const char *function, const char *parameters)
 {
-	const char	*__function_name = "evaluate_NODATA";
-	int		arg1, flag, now, res = FAIL;
+	const char			*__function_name = "evaluate_NODATA";
+	int				arg1, flag, now, ret = FAIL;
+	zbx_vector_history_record_t	values;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
+	zbx_history_record_vector_create(&values);
+
 	if (1 < num_param(parameters))
-		goto clean;
+		goto out;
 
 	if (FAIL == get_function_parameter_uint31(item->hostid, parameters, 1, &arg1, &flag))
-		goto clean;
+		goto out;
 
 	if (ZBX_FLAG_SEC != flag)
-		goto clean;
+		goto out;
 
 	now = (int)time(NULL);
 
-	if (item->lastclock + arg1 > now)
+	if (SUCCEED != zbx_vc_get_value_range(item->itemid, item->value_type, &values, 0, 1, now) ||
+			1 > values.values_num)
+		goto out;
+
+	if (values.values[0].timestamp.sec + arg1 > now)
 		zbx_strlcpy(value, "0", MAX_BUFFER_LEN);
 	else
 	{
 		if (CONFIG_SERVER_STARTUP_TIME + arg1 > now)
-			goto clean;
+			goto out;
 
 		zbx_strlcpy(value, "1", MAX_BUFFER_LEN);
 	}
 
-	res = SUCCEED;
-clean:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(res));
+	ret = SUCCEED;
+out:
+	zbx_history_record_vector_destroy(&values, item->value_type);
 
-	return res;
-}
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
-/******************************************************************************
- *                                                                            *
- * Function: compare_last_and_prev                                            *
- *                                                                            *
- * Purpose: compare lastvalue[0] and lastvalue[1] for an item                 *
- *                                                                            *
- * Parameters: item - item (performance metric)                               *
- *                                                                            *
- * Return value: 0 - values are equal                                         *
- *               non-zero - otherwise                                         *
- *                                                                            *
- * Author: Aleksandrs Saveljevs, Alexander Vladishev                          *
- *                                                                            *
- * Comments: To be used by functions abschange(), change(), and diff().       *
- *                                                                            *
- ******************************************************************************/
-static int	compare_last_and_prev(DB_ITEM *item, time_t now)
-{
-	int	i, res;
-	char	**h_value;
-
-	if (NULL != item->h_lastvalue[0] && NULL != item->h_lastvalue[1])
-		return strcmp(item->h_lastvalue[0], item->h_lastvalue[1]);
-
-	for (i = 0; '\0' != item->lastvalue[0][i] || '\0' != item->lastvalue[1][i]; i++)
-	{
-		if (item->lastvalue[0][i] != item->lastvalue[1][i])
-			return 1;
-	}
-
-	if (ITEM_VALUE_TYPE_STR == item->value_type || ITEM_LASTVALUE_LEN > zbx_strlen_utf8(item->lastvalue[0]))
-		return 0;
-
-	res = 0;	/* if values are no longer in history, consider them equal */
-
-	h_value = DBget_history(item->itemid, item->value_type, ZBX_DB_GET_HIST_VALUE,
-			0, now, NULL, NULL, 2);
-
-	for (i = 0; NULL != h_value[i]; i++)
-	{
-		if (NULL == item->h_lastvalue[i] && ITEM_LASTVALUE_LEN <= zbx_strlen_utf8(h_value[i]))
-			item->h_lastvalue[i] = zbx_strdup(NULL, h_value[i]);
-	}
-
-	if (NULL != h_value[0] && NULL != h_value[1])
-		res = strcmp(h_value[0], h_value[1]);
-	DBfree_history(h_value);
-
-	return res;
+	return ret;
 }
 
 /******************************************************************************
@@ -1402,48 +1174,64 @@ static int	compare_last_and_prev(DB_ITEM *item, time_t now)
  * Return value: SUCCEED - evaluated successfully, result is stored in 'value'*
  *               FAIL - failed to evaluate function                           *
  *                                                                            *
- * Author: Alexei Vladishev                                                   *
- *                                                                            *
  ******************************************************************************/
 static int	evaluate_ABSCHANGE(char *value, DB_ITEM *item, const char *function, const char *parameters, time_t now)
 {
-	const char	*__function_name = "evaluate_ABSCHANGE";
-	history_value_t	lastvalue[2];
-	int		res = FAIL;
+	const char			*__function_name = "evaluate_ABSCHANGE";
+	int				ret = FAIL;
+	zbx_vector_history_record_t	values;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	if (NULL == item->lastvalue[0] || NULL == item->lastvalue[1])
-		goto clean;
+	zbx_history_record_vector_create(&values);
+
+	if (SUCCEED != zbx_vc_get_value_range(item->itemid, item->value_type, &values, 0, 2, now) ||
+			2 > values.values_num)
+		goto out;
 
 	switch (item->value_type)
 	{
 		case ITEM_VALUE_TYPE_FLOAT:
-			lastvalue[0].dbl = atof(item->lastvalue[0]);
-			lastvalue[1].dbl = atof(item->lastvalue[1]);
-			zbx_snprintf(value, MAX_BUFFER_LEN, ZBX_FS_DBL, fabs(lastvalue[0].dbl - lastvalue[1].dbl));
+			zbx_snprintf(value, MAX_BUFFER_LEN, ZBX_FS_DBL,
+					fabs(values.values[0].value.dbl - values.values[1].value.dbl));
 			break;
 		case ITEM_VALUE_TYPE_UINT64:
-			ZBX_STR2UINT64(lastvalue[0].ui64, item->lastvalue[0]);
-			ZBX_STR2UINT64(lastvalue[1].ui64, item->lastvalue[1]);
 			/* to avoid overflow */
-			if (lastvalue[0].ui64 >= lastvalue[1].ui64)
-				zbx_snprintf(value, MAX_BUFFER_LEN, ZBX_FS_UI64, lastvalue[0].ui64 - lastvalue[1].ui64);
+			if (values.values[0].value.ui64 >= values.values[1].value.ui64)
+			{
+				zbx_snprintf(value, MAX_BUFFER_LEN, ZBX_FS_UI64,
+						values.values[0].value.ui64 - values.values[1].value.ui64);
+			}
 			else
-				zbx_snprintf(value, MAX_BUFFER_LEN, ZBX_FS_UI64, lastvalue[1].ui64 - lastvalue[0].ui64);
+			{
+				zbx_snprintf(value, MAX_BUFFER_LEN, ZBX_FS_UI64,
+						values.values[1].value.ui64 - values.values[0].value.ui64);
+			}
 			break;
-		default:
-			if (0 == compare_last_and_prev(item, now))
+		case ITEM_VALUE_TYPE_LOG:
+			if (0 == strcmp(values.values[0].value.log->value, values.values[1].value.log->value))
 				zbx_strlcpy(value, "0", MAX_BUFFER_LEN);
 			else
 				zbx_strlcpy(value, "1", MAX_BUFFER_LEN);
 			break;
-	}
-	res = SUCCEED;
-clean:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(res));
 
-	return res;
+		case ITEM_VALUE_TYPE_STR:
+		case ITEM_VALUE_TYPE_TEXT:
+			if (0 == strcmp(values.values[0].value.str, values.values[1].value.str))
+				zbx_strlcpy(value, "0", MAX_BUFFER_LEN);
+			else
+				zbx_strlcpy(value, "1", MAX_BUFFER_LEN);
+			break;
+		default:
+			goto out;
+	}
+	ret = SUCCEED;
+out:
+	zbx_history_record_vector_destroy(&values, item->value_type);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+
+	return ret;
 }
 
 /******************************************************************************
@@ -1458,54 +1246,61 @@ clean:
  * Return value: SUCCEED - evaluated successfully, result is stored in 'value'*
  *               FAIL - failed to evaluate function                           *
  *                                                                            *
- * Author: Alexei Vladishev                                                   *
- *                                                                            *
  ******************************************************************************/
 static int	evaluate_CHANGE(char *value, DB_ITEM *item, const char *function, const char *parameters, time_t now)
 {
-	const char	*__function_name = "evaluate_CHANGE";
-	history_value_t	lastvalue[2];
-	int		res = FAIL;
+	const char			*__function_name = "evaluate_CHANGE";
+	int				ret = FAIL;
+	zbx_vector_history_record_t	values;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	if (NULL == item->lastvalue[0] || NULL == item->lastvalue[1])
-		goto clean;
+	zbx_history_record_vector_create(&values);
+
+	if (SUCCEED != zbx_vc_get_value_range(item->itemid, item->value_type, &values, 0, 2, now) ||
+			2 > values.values_num)
+		goto out;
 
 	switch (item->value_type)
 	{
 		case ITEM_VALUE_TYPE_FLOAT:
-			lastvalue[0].dbl = atof(item->lastvalue[0]);
-			lastvalue[1].dbl = atof(item->lastvalue[1]);
-			zbx_snprintf(value, MAX_BUFFER_LEN, ZBX_FS_DBL, lastvalue[0].dbl - lastvalue[1].dbl);
+			zbx_snprintf(value, MAX_BUFFER_LEN, ZBX_FS_DBL,
+					values.values[0].value.dbl - values.values[1].value.dbl);
 			break;
 		case ITEM_VALUE_TYPE_UINT64:
-			ZBX_STR2UINT64(lastvalue[0].ui64, item->lastvalue[0]);
-			ZBX_STR2UINT64(lastvalue[1].ui64, item->lastvalue[1]);
 			/* to avoid overflow */
-			if (lastvalue[0].ui64 >= lastvalue[1].ui64)
-			{
-				zbx_snprintf(value, MAX_BUFFER_LEN, ZBX_FS_UI64, lastvalue[0].ui64 - lastvalue[1].ui64);
-			}
+			if (values.values[0].value.ui64 >= values.values[1].value.ui64)
+				zbx_snprintf(value, MAX_BUFFER_LEN, ZBX_FS_UI64,
+						values.values[0].value.ui64 - values.values[1].value.ui64);
 			else
-			{
 				zbx_snprintf(value, MAX_BUFFER_LEN, "-" ZBX_FS_UI64,
-						lastvalue[1].ui64 - lastvalue[0].ui64);
-			}
+						values.values[1].value.ui64 - values.values[0].value.ui64);
 			break;
-		default:
-			if (0 == compare_last_and_prev(item, now))
+		case ITEM_VALUE_TYPE_LOG:
+			if (0 == strcmp(values.values[0].value.log->value, values.values[1].value.log->value))
 				zbx_strlcpy(value, "0", MAX_BUFFER_LEN);
 			else
 				zbx_strlcpy(value, "1", MAX_BUFFER_LEN);
 			break;
+
+		case ITEM_VALUE_TYPE_STR:
+		case ITEM_VALUE_TYPE_TEXT:
+			if (0 == strcmp(values.values[0].value.str, values.values[1].value.str))
+				zbx_strlcpy(value, "0", MAX_BUFFER_LEN);
+			else
+				zbx_strlcpy(value, "1", MAX_BUFFER_LEN);
+			break;
+		default:
+			goto out;
 	}
 
-	res = SUCCEED;
-clean:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(res));
+	ret = SUCCEED;
+out:
+	zbx_history_record_vector_destroy(&values, item->value_type);
 
-	return res;
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+
+	return ret;
 }
 
 /******************************************************************************
@@ -1520,51 +1315,61 @@ clean:
  * Return value: SUCCEED - evaluated successfully, result is stored in 'value'*
  *               FAIL - failed to evaluate function                           *
  *                                                                            *
- * Author: Alexei Vladishev                                                   *
- *                                                                            *
  ******************************************************************************/
 static int	evaluate_DIFF(char *value, DB_ITEM *item, const char *function, const char *parameters, time_t now)
 {
-	const char	*__function_name = "evaluate_DIFF";
-	history_value_t	lastvalue[2];
-	int		res = FAIL;
+	const char			*__function_name = "evaluate_DIFF";
+	int				ret = FAIL;
+	zbx_vector_history_record_t	values;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	if (NULL == item->lastvalue[0] || NULL == item->lastvalue[1])
-		goto clean;
+	zbx_history_record_vector_create(&values);
+
+	if (SUCCEED != zbx_vc_get_value_range(item->itemid, item->value_type, &values, 0, 2, now) ||
+			2 > values.values_num)
+		goto out;
 
 	switch (item->value_type)
 	{
 		case ITEM_VALUE_TYPE_FLOAT:
-			lastvalue[0].dbl = atof(item->lastvalue[0]);
-			lastvalue[1].dbl = atof(item->lastvalue[1]);
-			if (SUCCEED == cmp_double(lastvalue[0].dbl, lastvalue[1].dbl))
+			if (SUCCEED == cmp_double(values.values[0].value.dbl, values.values[1].value.dbl))
 				zbx_strlcpy(value, "0", MAX_BUFFER_LEN);
 			else
 				zbx_strlcpy(value, "1", MAX_BUFFER_LEN);
 			break;
+			break;
 		case ITEM_VALUE_TYPE_UINT64:
-			ZBX_STR2UINT64(lastvalue[0].ui64, item->lastvalue[0]);
-			ZBX_STR2UINT64(lastvalue[1].ui64, item->lastvalue[1]);
-			if (lastvalue[0].ui64 == lastvalue[1].ui64)
+			if (values.values[0].value.ui64 == values.values[1].value.ui64)
+				zbx_strlcpy(value, "0", MAX_BUFFER_LEN);
+			else
+				zbx_strlcpy(value, "1", MAX_BUFFER_LEN);
+			break;
+		case ITEM_VALUE_TYPE_LOG:
+			if (0 == strcmp(values.values[0].value.log->value, values.values[1].value.log->value))
+				zbx_strlcpy(value, "0", MAX_BUFFER_LEN);
+			else
+				zbx_strlcpy(value, "1", MAX_BUFFER_LEN);
+			break;
+
+		case ITEM_VALUE_TYPE_STR:
+		case ITEM_VALUE_TYPE_TEXT:
+			if (0 == strcmp(values.values[0].value.str, values.values[1].value.str))
 				zbx_strlcpy(value, "0", MAX_BUFFER_LEN);
 			else
 				zbx_strlcpy(value, "1", MAX_BUFFER_LEN);
 			break;
 		default:
-			if (0 == compare_last_and_prev(item, now))
-				zbx_strlcpy(value, "0", MAX_BUFFER_LEN);
-			else
-				zbx_strlcpy(value, "1", MAX_BUFFER_LEN);
-			break;
+			goto out;
 	}
 
-	res = SUCCEED;
-clean:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(res));
+	ret = SUCCEED;
+out:
+	zbx_history_record_vector_destroy(&values, item->value_type);
 
-	return res;
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+
+	return ret;
 }
 
 /******************************************************************************
@@ -1578,8 +1383,6 @@ clean:
  *                                                                            *
  * Return value: SUCCEED - evaluated successfully, result is stored in 'value'*
  *               FAIL - failed to evaluate function                           *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
 
@@ -1604,57 +1407,25 @@ static int	evaluate_STR_one(int func, ZBX_REGEXP *regexps, int regexps_num, cons
 	return FAIL;
 }
 
-static int	evaluate_STR_local(DB_ITEM *item, int func, ZBX_REGEXP *regexps, int regexps_num,
-			const char *arg1, int arg2, int *found)
-{
-	int	h_num;
-
-	for (h_num = 0; h_num < MIN(arg2, 2); h_num++)
-	{
-		const char	*lastvalue;
-
-		if (NULL == item->lastvalue[h_num])
-			return SUCCEED;
-
-		if (ITEM_VALUE_TYPE_STR != item->value_type && NULL == item->h_lastvalue[h_num] &&
-				ITEM_LASTVALUE_LEN == zbx_strlen_utf8(item->lastvalue[h_num]))
-		{
-			return FAIL;
-		}
-
-		lastvalue = (NULL == item->h_lastvalue[h_num] ? item->lastvalue[h_num] :
-				item->h_lastvalue[h_num]);
-
-		if (SUCCEED == evaluate_STR_one(func, regexps, regexps_num, lastvalue, arg1))
-		{
-			*found = 1;
-			return SUCCEED;
-		}
-	}
-
-	if (2 >= arg2)
-		return SUCCEED;
-
-	return FAIL;
-}
-
 static int	evaluate_STR(char *value, DB_ITEM *item, const char *function, const char *parameters, time_t now)
 {
-	const char	*__function_name = "evaluate_STR";
-	DB_RESULT	result;
-	DB_ROW		row;
-	char		*arg1 = NULL, *arg1_esc;
-	int		arg2, flag, func, found = 0, h_num, res = FAIL;
-	ZBX_REGEXP	*regexps = NULL;
-	int		regexps_alloc = 0, regexps_num = 0;
-	char		**h_value;
+	const char			*__function_name = "evaluate_STR";
+	DB_RESULT			result;
+	DB_ROW				row;
+	char				*arg1 = NULL, *arg1_esc;
+	int				arg2, flag, func, found = 0, i, ret = FAIL, seconds = 0, nvalues = 0;
+	ZBX_REGEXP			*regexps = NULL;
+	int				regexps_alloc = 0, regexps_num = 0;
+	zbx_vector_history_record_t	values;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	zbx_history_record_vector_create(&values);
 
 	if (ITEM_VALUE_TYPE_STR != item->value_type && ITEM_VALUE_TYPE_TEXT != item->value_type &&
 			ITEM_VALUE_TYPE_LOG != item->value_type)
 	{
-		goto exit;
+		goto out;
 	}
 
 	if (0 == strcmp(function, "str"))
@@ -1664,13 +1435,13 @@ static int	evaluate_STR(char *value, DB_ITEM *item, const char *function, const 
 	else if (0 == strcmp(function, "iregexp"))
 		func = ZBX_FUNC_IREGEXP;
 	else
-		goto exit;
+		goto out;
 
 	if (2 < num_param(parameters))
-		goto exit;
+		goto out;
 
 	if (FAIL == get_function_parameter_str(item->hostid, parameters, 1, &arg1))
-		goto exit;
+		goto out;
 
 	if (FAIL == get_function_parameter_uint31(item->hostid, parameters, 2, &arg2, &flag))
 	{
@@ -1696,73 +1467,57 @@ static int	evaluate_STR(char *value, DB_ITEM *item, const char *function, const 
 		DBfree_result(result);
 	}
 
-	if (ZBX_FLAG_VALUES == flag)
+	if (ZBX_FLAG_SEC == flag)
+		seconds = arg2;
+	else
+		nvalues = arg2;
+
+	if (FAIL == zbx_vc_get_value_range(item->itemid, item->value_type, &values, seconds, nvalues, now))
+		goto out;
+
+	if (0 == values.values_num)
 	{
-		if (0 == arg2 || NULL == item->lastvalue[0])
+		zabbix_log(LOG_LEVEL_DEBUG, "result for STR is empty");
+		goto out;
+	}
+
+	/* at this point the value type can be only str, tex or log */
+	if (ITEM_VALUE_TYPE_LOG == item->value_type)
+	{
+		for (i = 0; i < values.values_num; i++)
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "result for STR is empty");
-			goto clean;
+			if (SUCCEED == evaluate_STR_one(func, regexps, regexps_num, values.values[i].value.log->value, arg1))
+			{
+				found = 1;
+				break;
+			}
 		}
-
-		if (SUCCEED == evaluate_STR_local(item, func, regexps, regexps_num, arg1, arg2, &found))
-			goto skip_get_history;
-
-		h_value = DBget_history(item->itemid, item->value_type, ZBX_DB_GET_HIST_VALUE,
-				0, now, NULL, NULL, arg2);
 	}
 	else
-		h_value = DBget_history(item->itemid, item->value_type, ZBX_DB_GET_HIST_VALUE,
-				now - arg2, now, NULL, NULL, 0);
-
-	if (ZBX_FLAG_VALUES == flag && ITEM_VALUE_TYPE_STR != item->value_type)
 	{
-		/* only last and prev value will be cached */
-
-		for (h_num = 0; NULL != h_value[h_num] && 2 > h_num; h_num++)
+		for (i = 0; i < values.values_num; i++)
 		{
-			if (NULL == item->h_lastvalue[h_num] &&
-					ITEM_LASTVALUE_LEN <= zbx_strlen_utf8(h_value[h_num]))
+			if (SUCCEED == evaluate_STR_one(func, regexps, regexps_num, values.values[i].value.str, arg1))
 			{
-				item->h_lastvalue[h_num] = zbx_strdup(NULL, h_value[h_num]);
+				found = 1;
+				break;
 			}
 		}
 	}
 
-	if (NULL == h_value[0])
-	{
-		zabbix_log(LOG_LEVEL_DEBUG, "result for STR is empty");
-		DBfree_history(h_value);
-		goto clean;
-	}
+	zbx_snprintf(value, MAX_BUFFER_LEN, "%d", found);
+	ret = SUCCEED;
+out:
+	zbx_history_record_vector_destroy(&values, item->value_type);
 
-	for (h_num = 0; NULL != h_value[h_num]; h_num++)
-	{
-		if (SUCCEED == evaluate_STR_one(func, regexps, regexps_num, h_value[h_num], arg1))
-		{
-			found = 1;
-			break;
-		}
-	}
-	DBfree_history(h_value);
-skip_get_history:
-	if (1 == found)
-		zbx_strlcpy(value, "1", MAX_BUFFER_LEN);
-	else
-		zbx_strlcpy(value, "0", MAX_BUFFER_LEN);
-
-	res = SUCCEED;
-clean:
-	if ((ZBX_FUNC_REGEXP == func || ZBX_FUNC_IREGEXP == func) && '@' == *arg1)
-	{
-		clean_regexps_ex(regexps, &regexps_num);
-		zbx_free(regexps);
-	}
+	clean_regexps_ex(regexps, &regexps_num);
+	zbx_free(regexps);
 
 	zbx_free(arg1);
-exit:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(res));
 
-	return res;
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+
+	return ret;
 }
 
 #undef ZBX_FUNC_STR
@@ -1782,13 +1537,11 @@ exit:
  * Return value: SUCCEED - evaluated successfully, result is stored in 'value'*
  *               FAIL - failed to evaluate function                           *
  *                                                                            *
- * Author: Aleksandrs Saveljevs                                               *
- *                                                                            *
  ******************************************************************************/
 static int	evaluate_STRLEN(char *value, DB_ITEM *item, const char *function, const char *parameters, time_t now)
 {
 	const char	*__function_name = "evaluate_STRLEN";
-	int		res = FAIL;
+	int		ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -1799,12 +1552,12 @@ static int	evaluate_STRLEN(char *value, DB_ITEM *item, const char *function, con
 	if (SUCCEED == evaluate_LAST(value, item, "last", parameters, now))
 	{
 		zbx_snprintf(value, MAX_BUFFER_LEN, ZBX_FS_SIZE_T, (zbx_fs_size_t)zbx_strlen_utf8(value));
-		res = SUCCEED;
+		ret = SUCCEED;
 	}
 clean:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(res));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
-	return res;
+	return ret;
 }
 
 /******************************************************************************
@@ -1819,57 +1572,59 @@ clean:
  * Return value: SUCCEED - evaluated successfully, result is stored in 'value'*
  *               FAIL - failed to evaluate function                           *
  *                                                                            *
- * Author: Alexei Vladishev                                                   *
- *                                                                            *
  ******************************************************************************/
 static int	evaluate_FUZZYTIME(char *value, DB_ITEM *item, const char *function, const char *parameters, time_t now)
 {
-	const char	*__function_name = "evaluate_FUZZYTIME";
-	history_value_t	lastvalue;
-	int		arg1, flag, fuzlow, fuzhig, res = FAIL;
+	const char			*__function_name = "evaluate_FUZZYTIME";
+	int				arg1, flag, fuzlow, fuzhig, ret = FAIL;
+	zbx_vector_history_record_t	values;
+	history_value_t			*lastvalue;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
+	zbx_history_record_vector_create(&values);
+
 	if (ITEM_VALUE_TYPE_FLOAT != item->value_type && ITEM_VALUE_TYPE_UINT64 != item->value_type)
-		goto clean;
+		goto out;
 
 	if (1 < num_param(parameters))
-		goto clean;
+		goto out;
 
 	if (FAIL == get_function_parameter_uint31(item->hostid, parameters, 1, &arg1, &flag))
-		goto clean;
+		goto out;
 
 	if (ZBX_FLAG_SEC != flag)
-		goto clean;
+		goto out;
 
-	if (NULL == item->lastvalue[0])
-		goto clean;
+	if (SUCCEED != zbx_vc_get_value_range(item->itemid, item->value_type, &values, 0, 1, now) ||
+			1 > values.values_num)
+		goto out;
 
 	fuzlow = (int)(now - arg1);
 	fuzhig = (int)(now + arg1);
 
+	lastvalue = &values.values[0].value;
+
 	if (ITEM_VALUE_TYPE_UINT64 == item->value_type)
 	{
-		ZBX_STR2UINT64(lastvalue.ui64, item->lastvalue[0]);
-		if (lastvalue.ui64 >= fuzlow && lastvalue.ui64 <= fuzhig)
+		if (lastvalue->ui64 >= fuzlow && lastvalue->ui64 <= fuzhig)
 			zbx_strlcpy(value, "1", MAX_BUFFER_LEN);
 		else
 			zbx_strlcpy(value, "0", MAX_BUFFER_LEN);
 	}
 	else
 	{
-		lastvalue.dbl = atof(item->lastvalue[0]);
-		if (lastvalue.dbl >= fuzlow && lastvalue.dbl <= fuzhig)
+		if (lastvalue->dbl >= fuzlow && lastvalue->dbl <= fuzhig)
 			zbx_strlcpy(value, "1", MAX_BUFFER_LEN);
 		else
 			zbx_strlcpy(value, "0", MAX_BUFFER_LEN);
 	}
 
-	res = SUCCEED;
-clean:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(res));
+	ret = SUCCEED;
+out:
+	zbx_history_record_vector_destroy(&values, item->value_type);
 
-	return res;
+	return ret;
 }
 
 /******************************************************************************
@@ -1897,7 +1652,7 @@ static int	evaluate_BAND(char *value, DB_ITEM *item, const char *function, const
 {
 	const char	*__function_name = "evaluate_BAND";
 	char		*last_parameters = NULL;
-	int		mask_flag, nparams, res = FAIL;
+	int		mask_flag, nparams, ret = FAIL;
 	zbx_uint64_t	last_uint64, mask;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
@@ -1922,14 +1677,14 @@ static int	evaluate_BAND(char *value, DB_ITEM *item, const char *function, const
 	{
 		ZBX_STR2UINT64(last_uint64, value);
 		zbx_snprintf(value, MAX_BUFFER_LEN, ZBX_FS_UI64, last_uint64 & (zbx_uint64_t)mask);
-		res = SUCCEED;
+		ret = SUCCEED;
 	}
 
 	zbx_free(last_parameters);
 clean:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(res));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
-	return res;
+	return ret;
 }
 
 /******************************************************************************
@@ -1945,8 +1700,6 @@ clean:
  * Return value: SUCCEED - evaluated successfully, value contains its value   *
  *               FAIL - evaluation failed                                     *
  *                                                                            *
- * Author: Alexei Vladishev                                                   *
- *                                                                            *
  ******************************************************************************/
 int	evaluate_function(char *value, DB_ITEM *item, const char *function, const char *parameter, time_t now)
 {
@@ -1960,9 +1713,13 @@ int	evaluate_function(char *value, DB_ITEM *item, const char *function, const ch
 
 	*value = '\0';
 
-	if (0 == strcmp(function, "last") || 0 == strcmp(function, "prev"))
+	if (0 == strcmp(function, "last"))
 	{
 		ret = evaluate_LAST(value, item, function, parameter, now);
+	}
+	else if (0 == strcmp(function, "prev"))
+	{
+		ret = evaluate_LAST(value, item, "last", "#2", now);
 	}
 	else if (0 == strcmp(function, "min"))
 	{
@@ -2084,8 +1841,6 @@ int	evaluate_function(char *value, DB_ITEM *item, const char *function, const ch
  * Parameters: value - value for adjusting                                    *
  *             max_len - max len of the value                                 *
  *                                                                            *
- * Author: Alexei Vladishev                                                   *
- *                                                                            *
  ******************************************************************************/
 static void	add_value_suffix_uptime(char *value, size_t max_len)
 {
@@ -2133,8 +1888,6 @@ static void	add_value_suffix_uptime(char *value, size_t max_len)
  *                                                                            *
  * Parameters: value - value for adjusting                                    *
  *             max_len - max len of the value                                 *
- *                                                                            *
- * Author: Alexei Vladishev                                                   *
  *                                                                            *
  ******************************************************************************/
 static void	add_value_suffix_s(char *value, size_t max_len)
@@ -2226,8 +1979,6 @@ clean:
  *             max_len - max len of the value                                 *
  *             units - units (bps, b, B, etc)                                 *
  *                                                                            *
- * Author: Alexei Vladishev                                                   *
- *                                                                            *
  ******************************************************************************/
 static void	add_value_suffix_normal(char *value, size_t max_len, const char *units)
 {
@@ -2298,10 +2049,6 @@ static void	add_value_suffix_normal(char *value, size_t max_len, const char *uni
  * Return value: SUCCEED - suffix added successfully, value contains new value*
  *               FAIL - adding failed, value contains old value               *
  *                                                                            *
- * Author: Alexei Vladishev                                                   *
- *                                                                            *
- * Comments: !!! Don't forget sync code with PHP (function convert_units) !!! *
- *                                                                            *
  ******************************************************************************/
 static void	add_value_suffix(char *value, size_t max_len, const char *units, unsigned char value_type)
 {
@@ -2349,8 +2096,6 @@ static void	add_value_suffix(char *value, size_t max_len, const char *units, uns
  *                                                                            *
  * Return value: SUCCEED - evaluated successfully, value contains new value   *
  *               FAIL - evaluation failed, value contains old value           *
- *                                                                            *
- * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  ******************************************************************************/
 static int	replace_value_by_map(char *value, size_t max_len, zbx_uint64_t valuemapid)
@@ -2404,12 +2149,6 @@ clean:
  *             units      - [IN] units                                        *
  *             value_type - [IN] value type; ITEM_VALUE_TYPE_*                *
  *                                                                            *
- * Return value:                                                              *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
  ******************************************************************************/
 void	zbx_format_value(char *value, size_t max_len, zbx_uint64_t valuemapid,
 		const char *units, unsigned char value_type)
@@ -2450,8 +2189,6 @@ void	zbx_format_value(char *value, size_t max_len, zbx_uint64_t valuemapid,
  * Return value: SUCCEED - evaluated successfully, value contains its value   *
  *               FAIL - evaluation failed                                     *
  *                                                                            *
- * Author: Alexei Vladishev                                                   *
- *                                                                            *
  * Comments: used for evaluation of notification macros                       *
  *           output buffer size should be MAX_BUFFER_LEN                      *
  *                                                                            *
@@ -2464,7 +2201,7 @@ int	evaluate_macro_function(char *value, const char *host, const char *key, cons
 	DB_RESULT	result;
 	DB_ROW		row;
 	char		*host_esc, *key_esc;
-	int		res;
+	int		ret;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() function:'%s:%s.%s(%s)'",
 			__function_name, host, key, function, parameter);
@@ -2493,7 +2230,7 @@ int	evaluate_macro_function(char *value, const char *host, const char *key, cons
 
 	DBget_item_from_db(&item, row);
 
-	if (SUCCEED == (res = evaluate_function(value, &item, function, parameter, time(NULL))))
+	if (SUCCEED == (ret = evaluate_function(value, &item, function, parameter, time(NULL))))
 	{
 		if (SUCCEED == str_in_list("last,prev", function, ','))
 		{
@@ -2516,7 +2253,7 @@ int	evaluate_macro_function(char *value, const char *host, const char *key, cons
 	DBfree_result(result); /* cannot call DBfree_result until evaluate_FUNC */
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s value:'%s'", __function_name,
-			zbx_result_string(res), value);
+			zbx_result_string(ret), value);
 
-	return res;
+	return ret;
 }

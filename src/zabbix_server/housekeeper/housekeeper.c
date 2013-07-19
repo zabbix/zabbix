@@ -88,7 +88,7 @@ static zbx_hk_cleanup_table_t	hk_cleanup_tables[] = {
 };
 
 /* trends table offsets in the hk_cleanup_tables[] mapping  */
-#define HK_UPADTE_CACHE_OFFSET_TREND_FLOAT	ITEM_VALUE_TYPE_COUNT
+#define HK_UPADTE_CACHE_OFFSET_TREND_FLOAT	ITEM_VALUE_TYPE_MAX
 #define HK_UPADTE_CACHE_OFFSET_TREND_UINT	(HK_UPADTE_CACHE_OFFSET_TREND_FLOAT + 1)
 
 /* the oldest record timestamp cache for items in history tables */
@@ -362,7 +362,7 @@ static void	hk_history_update(zbx_hk_history_rule_t *rules, int now)
 		history = atoi(row[2]);
 		trends = atoi(row[3]);
 
-		if (value_type < ITEM_VALUE_TYPE_COUNT)
+		if (value_type < ITEM_VALUE_TYPE_MAX)
 		{
 			rule = rules + value_type;
 			if (ZBX_HK_OPTION_ENABLED == *rule->poption_global)

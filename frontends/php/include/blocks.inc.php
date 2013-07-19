@@ -184,12 +184,12 @@ function make_system_status($filter) {
 	$table->setHeader(array(
 		is_show_all_nodes() ? _('Node') : null,
 		_('Host group'),
-		is_null($filter['severity']) || isset($filter['severity'][TRIGGER_SEVERITY_DISASTER]) ? getSeverityCaption(TRIGGER_SEVERITY_DISASTER) : null,
-		is_null($filter['severity']) || isset($filter['severity'][TRIGGER_SEVERITY_HIGH]) ? getSeverityCaption(TRIGGER_SEVERITY_HIGH) : null,
-		is_null($filter['severity']) || isset($filter['severity'][TRIGGER_SEVERITY_AVERAGE]) ? getSeverityCaption(TRIGGER_SEVERITY_AVERAGE) : null,
-		is_null($filter['severity']) || isset($filter['severity'][TRIGGER_SEVERITY_WARNING]) ? getSeverityCaption(TRIGGER_SEVERITY_WARNING) : null,
-		is_null($filter['severity']) || isset($filter['severity'][TRIGGER_SEVERITY_INFORMATION]) ? getSeverityCaption(TRIGGER_SEVERITY_INFORMATION) : null,
-		is_null($filter['severity']) || isset($filter['severity'][TRIGGER_SEVERITY_NOT_CLASSIFIED]) ? getSeverityCaption(TRIGGER_SEVERITY_NOT_CLASSIFIED) : null
+		(is_null($filter['severity']) || isset($filter['severity'][TRIGGER_SEVERITY_DISASTER])) ? getSeverityCaption(TRIGGER_SEVERITY_DISASTER) : null,
+		(is_null($filter['severity']) || isset($filter['severity'][TRIGGER_SEVERITY_HIGH])) ? getSeverityCaption(TRIGGER_SEVERITY_HIGH) : null,
+		(is_null($filter['severity']) || isset($filter['severity'][TRIGGER_SEVERITY_AVERAGE])) ? getSeverityCaption(TRIGGER_SEVERITY_AVERAGE) : null,
+		(is_null($filter['severity']) || isset($filter['severity'][TRIGGER_SEVERITY_WARNING])) ? getSeverityCaption(TRIGGER_SEVERITY_WARNING) : null,
+		(is_null($filter['severity']) || isset($filter['severity'][TRIGGER_SEVERITY_INFORMATION])) ? getSeverityCaption(TRIGGER_SEVERITY_INFORMATION) : null,
+		(is_null($filter['severity']) || isset($filter['severity'][TRIGGER_SEVERITY_NOT_CLASSIFIED])) ? getSeverityCaption(TRIGGER_SEVERITY_NOT_CLASSIFIED) : null
 	));
 
 	// get host groups
@@ -259,6 +259,13 @@ function make_system_status($filter) {
 		$triggers[$tnum]['event'] = $trigger['lastEvent'];
 		unset($triggers[$tnum]['lastEvent']);
 	}
+	if ($eventIds) {
+		$eventAcknowledges = API::Event()->get(array(
+			'eventids' => $eventIds,
+			'select_acknowledges' => API_OUTPUT_EXTEND,
+			'preservekeys' => true
+		));
+	}
 
 	// actions
 	$actions = getEventActionsStatus($eventIds);
@@ -270,8 +277,7 @@ function make_system_status($filter) {
 			$trigger['event'] = array(
 				'acknowledged' => false,
 				'clock' => $trigger['lastchange'],
-				'value' => $trigger['value'],
-				'value_changed' => 0
+				'value' => $trigger['value']
 			);
 		}
 		else {
@@ -282,6 +288,9 @@ function make_system_status($filter) {
 
 		// groups
 		foreach ($trigger['groups'] as $group) {
+			if (!isset($groups[$group['groupid']])) {
+				continue;
+			}
 			if (in_array($filter['extAck'], array(EXTACK_OPTION_ALL, EXTACK_OPTION_BOTH))) {
 				$groups[$group['groupid']]['tab_priority'][$trigger['priority']]['count']++;
 
@@ -412,7 +421,8 @@ function make_hoststat_summary($filter) {
 			'priority' => $filter['severity'],
 			'value' => TRIGGER_VALUE_TRUE
 		),
-		'output' => array('triggerid', 'priority')
+		'output' => array('triggerid', 'priority'),
+		'selectHosts' => array('hostid')
 	));
 
 	if ($filter['extAck']) {
@@ -1040,22 +1050,23 @@ function make_webmon_overview($filter) {
 
 	$data = array();
 
-	$result = DBselect(
-		'SELECT DISTINCT ht.httptestid,i.lastclock,i.lastvalue,hg.groupid'.
-		' FROM items i,httptestitem hti,httptest ht,hosts_groups hg'.
-		' WHERE i.itemid=hti.itemid'.
-			' AND hti.httptestid=ht.httptestid'.
-			' AND hti.type='.HTTPSTEP_ITEM_TYPE_LASTSTEP.
-			' AND ht.status='.HTTPTEST_STATUS_ACTIVE.
-			' AND ht.hostid=hg.hostid'.
+	// fetch links between HTTP tests and host groups
+	$result = DbFetchArray(DBselect(
+		'SELECT DISTINCT ht.httptestid,hg.groupid'.
+		' FROM httptest ht,hosts_groups hg'.
+		' WHERE ht.hostid=hg.hostid'.
 			' AND '.dbConditionInt('hg.hostid', $availableHostIds).
 			' AND '.dbConditionInt('hg.groupid', $groupIds)
-	);
-	while ($row = DBfetch($result)) {
-		if (!$row['lastclock']) {
+	));
+
+	// fetch HTTP test execution data
+	$httpTestData = Manager::HttpTest()->fetchLastData(zbx_objectValues($result, 'httptestid'));
+
+	foreach ($result as $row) {
+		if (!isset($httpTestData[$row['httptestid']])) {
 			$data[$row['groupid']]['unknown'] = empty($data[$row['groupid']]['unknown']) ? 1 : ++$data[$row['groupid']]['unknown'];
 		}
-		elseif ($row['lastvalue'] != 0) {
+		elseif ($httpTestData[$row['httptestid']]['lastfailedstep'] != 0) {
 			$data[$row['groupid']]['failed'] = empty($data[$row['groupid']]['failed']) ? 1 : ++$data[$row['groupid']]['failed'];
 		}
 		else {
