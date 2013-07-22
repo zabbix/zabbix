@@ -108,6 +108,7 @@ elseif (isset($_REQUEST['save'])) {
 	if ($result) {
 		add_audit($audit_action, AUDIT_RESOURCE_SLIDESHOW, ' Name "'.$_REQUEST['name'].'" ');
 		unset($_REQUEST['form'], $_REQUEST['slideshowid']);
+		clearCookies($result);
 	}
 }
 elseif (isset($_REQUEST['delete']) && isset($_REQUEST['slideshowid'])) {
@@ -121,27 +122,29 @@ elseif (isset($_REQUEST['delete']) && isset($_REQUEST['slideshowid'])) {
 	}
 
 	unset($_REQUEST['slideshowid'], $_REQUEST['form']);
+	clearCookies($result);
 }
 elseif ($_REQUEST['go'] == 'delete') {
-	$go_result = true;
+	$goResult = true;
+
 	$shows = get_request('shows', array());
 	DBstart();
+
 	foreach ($shows as $showid) {
-		$go_result &= delete_slideshow($showid);
-		if (!$go_result) {
+		$goResult &= delete_slideshow($showid);
+		if (!$goResult) {
 			break;
 		}
 	}
-	$go_result = DBend($go_result);
-	if ($go_result) {
+
+	$goResult = DBend($goResult);
+
+	if ($goResult) {
 		unset($_REQUEST['form']);
 	}
-	show_messages($go_result, _('Slide show deleted'), _('Cannot delete slide show'));
-}
-if ($_REQUEST['go'] != 'none' && !empty($go_result)) {
-	$url = new CUrl();
-	$path = $url->getPath();
-	insert_js('cookie.eraseArray(\''.$path.'\')');
+
+	show_messages($goResult, _('Slide show deleted'), _('Cannot delete slide show'));
+	clearCookies($goResult);
 }
 
 /*

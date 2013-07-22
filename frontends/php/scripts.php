@@ -133,6 +133,7 @@ elseif (isset($_REQUEST['save'])) {
 		if ($result) {
 			add_audit($auditAction, AUDIT_RESOURCE_SCRIPT, ' Name ['.$_REQUEST['name'].'] id ['.$scriptId.']');
 			unset($_REQUEST['action'], $_REQUEST['form'], $_REQUEST['scriptid']);
+			clearCookies($result);
 		}
 	}
 }
@@ -146,6 +147,7 @@ elseif (isset($_REQUEST['delete'])) {
 	}
 
 	show_messages($result, _('Script deleted'), _('Cannot delete script'));
+	clearCookies($result);
 
 	if ($result) {
 		unset($_REQUEST['form'], $_REQUEST['scriptid']);
@@ -154,25 +156,20 @@ elseif (isset($_REQUEST['delete'])) {
 elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['scripts'])) {
 	$scriptIds = $_REQUEST['scripts'];
 
-	$go_result = API::Script()->delete($scriptIds);
+	$goResult = API::Script()->delete($scriptIds);
 
-	if ($go_result) {
+	if ($goResult) {
 		foreach ($scriptIds as $scriptId) {
 			add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_SCRIPT, _('Script').' ['.$scriptId.']');
 		}
 	}
 
-	show_messages($go_result, _('Script deleted'), _('Cannot delete script'));
+	show_messages($goResult, _('Script deleted'), _('Cannot delete script'));
+	clearCookies($goResult);
 
-	if ($go_result) {
+	if ($goResult) {
 		unset($_REQUEST['form'], $_REQUEST['scriptid']);
 	}
-}
-
-if ($_REQUEST['go'] != 'none' && isset($go_result) && $go_result) {
-	$url = new CUrl();
-	$path = $url->getPath();
-	insert_js('cookie.eraseArray("'.$path.'")');
 }
 
 /*

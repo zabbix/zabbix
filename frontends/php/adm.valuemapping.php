@@ -177,7 +177,7 @@ if (isset($_REQUEST['form'])) {
 
 		$data['confirmMessage'] = $valueMapCount['cnt']
 			? _n('Delete selected value mapping? It is used for %d item!',
-					'Delete selected value mapping? It is used for %d items!', $valuemap_count['cnt'])
+					'Delete selected value mapping? It is used for %d items!', $valueMapCount['cnt'])
 			: _('Delete selected value mapping?');
 	}
 

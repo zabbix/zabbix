@@ -13,4 +13,6 @@ libspecsysinfo_a_SOURCES = \
 	kernel.c \
 	memory.c \
 	net.c \
+	software.c \
+	system.c \
 	uptime.c
