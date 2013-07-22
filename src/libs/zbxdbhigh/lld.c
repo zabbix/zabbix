@@ -50,12 +50,9 @@ void	DBlld_process_discovery_rule(zbx_uint64_t lld_ruleid, char *value, zbx_time
 	int			regexps_alloc = 0, regexps_num = 0;
 	char			*sql = NULL;
 	size_t			sql_alloc = 128, sql_offset = 0;
+	const char		*sql_start = "update items set ", *sql_continue = ",";
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() itemid:" ZBX_FS_UI64, __function_name, lld_ruleid);
-
-	sql = zbx_malloc(sql, sql_alloc);
-
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update items set lastclock=%d,lastns=%d", ts->sec, ts->ns);
 
 	result = DBselect(
 			"select hostid,key_,state,filter,error,lifetime"
@@ -160,25 +157,30 @@ void	DBlld_process_discovery_rule(zbx_uint64_t lld_ruleid, char *value, zbx_time
 				NULL, NULL, 0, 0);
 		process_events();
 
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ",state=%d", ITEM_STATE_NORMAL);
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%sstate=%d", sql_start, ITEM_STATE_NORMAL);
+		sql_start = sql_continue;
 	}
 error:
 	if (NULL != error && 0 != strcmp(error, db_error))
 	{
 		error_esc = DBdyn_escape_string_len(error, ITEM_ERROR_LEN);
 
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ",error='%s'", error_esc);
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%serror='%s'", sql_start, error_esc);
+		sql_start = sql_continue;
 
 		zbx_free(error_esc);
 	}
 
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " where itemid=" ZBX_FS_UI64, lld_ruleid);
+	if (sql_start == sql_continue)
+	{
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " where itemid=" ZBX_FS_UI64, lld_ruleid);
 
-	DBbegin();
+		DBbegin();
 
-	DBexecute("%s", sql);
+		DBexecute("%s", sql);
 
-	DBcommit();
+		DBcommit();
+	}
 clean:
 	zbx_free(error);
 	zbx_free(db_error);

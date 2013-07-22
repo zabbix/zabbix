@@ -225,16 +225,12 @@ FIELD		|key_		|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|delay		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|history	|t_integer	|'90'	|NOT NULL	|ZBX_SYNC
 FIELD		|trends		|t_integer	|'365'	|NOT NULL	|ZBX_SYNC
-FIELD		|lastvalue	|t_varchar(255)	|	|NULL		|ZBX_NODATA
-FIELD		|lastclock	|t_time		|	|NULL		|ZBX_NODATA
-FIELD		|prevvalue	|t_varchar(255)	|	|NULL		|ZBX_NODATA
 FIELD		|status		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|value_type	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|trapper_hosts	|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|units		|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|multiplier	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|delta		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|prevorgvalue	|t_varchar(255)	|	|NULL		|ZBX_NODATA
 FIELD		|snmpv3_securityname|t_varchar(64)|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|snmpv3_securitylevel|t_integer	|'0'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|snmpv3_authpassphrase|t_varchar(64)|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
@@ -255,7 +251,6 @@ FIELD		|password	|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|publickey	|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|privatekey	|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|mtime		|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
-FIELD		|lastns		|t_nanosec	|	|NULL		|ZBX_NODATA
 FIELD		|flags		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|filter		|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|interfaceid	|t_id		|	|NULL		|ZBX_SYNC,ZBX_PROXY	|4|interface	|		|RESTRICT
@@ -1267,4 +1262,4 @@ UNIQUE		|1			|applicationid,templateid
 TABLE|dbversion||
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|2010105	|2010105
+ROW		|2010110	|2010110
