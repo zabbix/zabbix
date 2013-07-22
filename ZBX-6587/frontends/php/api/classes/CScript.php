@@ -17,11 +17,11 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
 
 /**
- * Class containing methods for operations with Scripts
+ * Class containing methods for operations with scripts.
+ *
  * @package API
  */
 class CScript extends CZBXAPI {
@@ -31,21 +31,22 @@ class CScript extends CZBXAPI {
 	protected $sortColumns = array('scriptid', 'name');
 
 	/**
-	 * Get Scripts data
+	 * Get scripts data.
 	 *
-	 * @param array $options
-	 * @param array $options['itemids']
-	 * @param array $options['hostids'] - depricated (very slow)
-	 * @param array $options['groupids']
-	 * @param array $options['triggerids']
-	 * @param array $options['scriptids']
-	 * @param boolean $options['status']
-	 * @param boolean $options['editable']
-	 * @param boolean $options['count']
+	 * @param array  $options
+	 * @param array  $options['itemids']
+	 * @param array  $options['hostids']	deprecated (very slow)
+	 * @param array  $options['groupids']
+	 * @param array  $options['triggerids']
+	 * @param array  $options['scriptids']
+	 * @param bool   $options['status']
+	 * @param bool   $options['editable']
+	 * @param bool   $options['count']
 	 * @param string $options['pattern']
-	 * @param int $options['limit']
+	 * @param int    $options['limit']
 	 * @param string $options['order']
-	 * @return array|int item data as array or false if error
+	 *
+	 * @return array
 	 */
 	public function get($options = array()) {
 		$result = array();
@@ -88,7 +89,7 @@ class CScript extends CZBXAPI {
 		$options = zbx_array_merge($defOptions, $options);
 
 		// editable + permission check
-		if (USER_TYPE_SUPER_ADMIN == $userType) {
+		if ($userType == USER_TYPE_SUPER_ADMIN) {
 		}
 		elseif (!is_null($options['editable'])) {
 			return $result;
@@ -204,56 +205,29 @@ class CScript extends CZBXAPI {
 		return $result;
 	}
 
-	/**
-	 * Get Script ID by host.name and item.key
-	 *
-	 * @param array $script
-	 * @param array $script['name']
-	 * @param array $script['hostid']
-	 * @return int|boolean
-	 */
-	public function getObjects($script) {
-		$result = array();
-		$scriptids = array();
-
-		$dbScripts = DBselect(
-				'SELECT s.scriptid'.
-				' FROM scripts s'.
-				' WHERE s.name='.zbx_dbstr($script['name']).
-					andDbNode('s.scriptid')
-		);
-		while ($script = DBfetch($dbScripts)) {
-			$scriptids[$script['scriptid']] = $script['scriptid'];
-		}
-
-		if (!empty($scriptids)) {
-			$result = $this->get(array('scriptids' => $scriptids, 'output' => API_OUTPUT_EXTEND));
-		}
-		return $result;
-	}
-
 	private function _clearData(&$scripts) {
-		foreach ($scripts as $snum => $script) {
+		foreach ($scripts as $key => $script) {
 			if (isset($script['type']) && $script['type'] == ZBX_SCRIPT_TYPE_IPMI) {
-				unset($scripts[$snum]['execute_on']);
+				unset($scripts[$key]['execute_on']);
 			}
 		}
 	}
 
 	/**
-	 * Add Scripts
+	 * Add scripts.
 	 *
-	 * @param _array $scripts
-	 * @param array $script['name']
-	 * @param array $script['hostid']
-	 * @return boolean
+	 * @param array $scripts
+	 * @param array $scripts['name']
+	 * @param array $scripts['hostid']
+	 *
+	 * @return array
 	 */
 	public function create($scripts) {
-		$scripts = zbx_toArray($scripts);
-
-		if (USER_TYPE_SUPER_ADMIN != self::$userData['type']) {
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
 		}
+
+		$scripts = zbx_toArray($scripts);
 
 		$scriptNames = array();
 		foreach ($scripts as $script) {
@@ -281,35 +255,37 @@ class CScript extends CZBXAPI {
 		}
 
 		$this->_clearData($scripts);
-		$scriptids = DB::insert('scripts', $scripts);
 
-		return array('scriptids' => $scriptids);
+		$scriptIds = DB::insert('scripts', $scripts);
+
+		return array('scriptids' => $scriptIds);
 	}
 
 	/**
-	 * Update Scripts
+	 * Update scripts.
 	 *
-	 * @param _array $scripts
-	 * @param array $script['name']
-	 * @param array $script['hostid']
-	 * @return boolean
+	 * @param array $scripts
+	 * @param array $scripts['name']
+	 * @param array $scripts['hostid']
+	 *
+	 * @return array
 	 */
 	public function update($scripts) {
-		$scripts = zbx_toHash($scripts, 'scriptid');
-		$scriptids = array_keys($scripts);
-
-		if (USER_TYPE_SUPER_ADMIN != self::$userData['type']) {
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
 		}
 
-		$updScripts = $this->get(array(
-			'scriptids' => $scriptids,
+		$scripts = zbx_toHash($scripts, 'scriptid');
+		$scriptIds = array_keys($scripts);
+
+		$updateScripts = $this->get(array(
+			'scriptids' => $scriptIds,
 			'output' => array('scriptid'),
 			'preservekeys' => true
 		));
 		$scriptNames = array();
 		foreach ($scripts as $script) {
-			if (!isset($updScripts[$script['scriptid']])) {
+			if (!isset($updateScripts[$script['scriptid']])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Script with scriptid "%s" does not exist.', $script['scriptid']));
 			}
 
@@ -335,54 +311,54 @@ class CScript extends CZBXAPI {
 		}
 
 		$this->_clearData($scripts);
+
 		$update = array();
 		foreach ($scripts as $script) {
-			$scriptid = $script['scriptid'];
+			$scriptId = $script['scriptid'];
 			unset($script['scriptid']);
 
 			$update[] = array(
 				'values' => $script,
-				'where' => array('scriptid' => $scriptid)
+				'where' => array('scriptid' => $scriptId)
 			);
 		}
 		DB::update('scripts', $update);
 
-		return array('scriptids' => $scriptids);
+		return array('scriptids' => $scriptIds);
 	}
 
 	/**
-	 * Delete Scripts
+	 * Delete scripts.
 	 *
-	 * @param _array $scriptids
-	 * @param array $scriptids
-	 * @return boolean
+	 * @param array $scriptIds
+	 *
+	 * @return array
 	 */
-	public function delete($scriptids) {
-		$scriptids = zbx_toArray($scriptids);
-
-		if (USER_TYPE_SUPER_ADMIN != self::$userData['type']) {
+	public function delete($scriptIds) {
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
 		}
-
-		if (empty($scriptids)) {
+		if (empty($scriptIds)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete scripts. Empty input parameter "scriptids".'));
 		}
 
+		$scriptIds = zbx_toArray($scriptIds);
+
 		$dbScripts = $this->get(array(
-			'scriptids' => $scriptids,
+			'scriptids' => $scriptIds,
 			'editable' => true,
 			'output' => API_OUTPUT_EXTEND,
 			'preservekeys' => true
 		));
-		foreach ($scriptids as $scriptid) {
-			if (isset($dbScripts[$scriptid])) {
+		foreach ($scriptIds as $scriptId) {
+			if (isset($dbScripts[$scriptId])) {
 				continue;
 			}
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Cannot delete scripts. Script with scriptid "%s" does not exist.', $scriptid));
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Cannot delete scripts. Script with scriptid "%s" does not exist.', $scriptId));
 		}
 
 		$scriptActions = API::Action()->get(array(
-			'scriptids' => $scriptids,
+			'scriptids' => $scriptIds,
 			'nopermissions' => true,
 			'preservekeys' => true,
 			'output' => array('actionid', 'name')
@@ -393,94 +369,39 @@ class CScript extends CZBXAPI {
 				$dbScripts[$action['scriptid']]['name'], $action['name']));
 		}
 
-		DB::delete('scripts', array('scriptid' => $scriptids));
+		DB::delete('scripts', array('scriptid' => $scriptIds));
 
-		return array('scriptids' => $scriptids);
+		return array('scriptids' => $scriptIds);
 	}
 
 	public function execute($data) {
 		global $ZBX_SERVER, $ZBX_SERVER_PORT;
 
-		$scriptid = $data['scriptid'];
-		$hostid = $data['hostid'];
+		$scriptId = $data['scriptid'];
+		$hostId = $data['hostid'];
 
 		$alowedScripts = $this->get(array(
-			'hostids' => $hostid,
-			'scriptids' => $scriptid,
+			'hostids' => $hostId,
+			'scriptids' => $scriptId,
 			'output' => array('scriptid'),
 			'preservekeys' => true
 		));
-		if (!isset($alowedScripts[$scriptid])) {
+		if (!isset($alowedScripts[$scriptId])) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
 		}
-		if (!$socket = @fsockopen($ZBX_SERVER, $ZBX_SERVER_PORT, $errorCode, $errorMsg, ZBX_SCRIPT_TIMEOUT)) {
-			switch ($errorMsg) {
-				case 'Connection refused':
-					$dErrorMsg = _s("Connection to Zabbix server \"%s\" refused. Possible reasons:\n1. Incorrect server IP/DNS in the \"zabbix.conf.php\";\n2. Security environment (for example, SELinux) is blocking the connection;\n3. Zabbix server daemon not running;\n4. Firewall is blocking TCP connection.\n", $ZBX_SERVER);
-					break;
-				case 'No route to host':
-					$dErrorMsg = _s("Zabbix server \"%s\" can not be reached. Possible reasons:\n1. Incorrect server IP/DNS in the \"zabbix.conf.php\";\n2. Incorrect network configuration.\n", $ZBX_SERVER);
-					break;
-				case 'Connection timed out':
-					$dErrorMsg = _s("Connection to Zabbix server \"%s\" timed out. Possible reasons:\n1. Incorrect server IP/DNS in the \"zabbix.conf.php\";\n2. Firewall is blocking TCP connection.\n", $ZBX_SERVER);
-					break;
-				case 'php_network_getaddresses: getaddrinfo failed: Name or service not known':
-					$dErrorMsg = _s("Connection to Zabbix server \"%s\" failed. Possible reasons:\n1. Incorrect server IP/DNS in the \"zabbix.conf.php\";\n2. Incorrect DNS server configuration.\n", $ZBX_SERVER);
-					break;
-				default:
-					$dErrorMsg = '';
-			}
-			self::exception(ZBX_API_ERROR_INTERNAL, $dErrorMsg._('Error description').': '.$errorMsg);
-		}
 
-		$json = new CJSON();
-		$array = array(
-			'request' => 'command',
-			'nodeid' => id2nodeid($hostid),
-			'scriptid' => $scriptid,
-			'hostid' => $hostid
-		);
-		$dataToSend = $json->encode($array, false);
-
-		stream_set_timeout($socket, ZBX_SCRIPT_TIMEOUT);
-
-		if (fwrite($socket, $dataToSend) === false) {
-			self::exception(ZBX_API_ERROR_INTERNAL, _('Error description: can\'t send command, check connection.'));
-		}
-
-		$response = '';
-
-		$pbl = ZBX_SCRIPT_BYTES_LIMIT > 8192 ? 8192 : ZBX_SCRIPT_BYTES_LIMIT; // PHP read bytes limit
-		$now = time();
-		$i = 0;
-		while (!feof($socket)) {
-			$i++;
-			if ((time() - $now) >= ZBX_SCRIPT_TIMEOUT) {
-				self::exception(ZBX_API_ERROR_INTERNAL,
-					_('Error description: defined in "include/defines.inc.php" constant ZBX_SCRIPT_TIMEOUT timeout is reached. You can try to increase this value.'));
-			}
-			elseif (($i * $pbl) >= ZBX_SCRIPT_BYTES_LIMIT) {
-				self::exception(ZBX_API_ERROR_INTERNAL,
-					_('Error description: defined in "include/defines.inc.php" constant ZBX_SCRIPT_BYTES_LIMIT read bytes limit is reached. You can try to increase this value.'));
-			}
-
-			if (($out = fread($socket, $pbl)) !== false) {
-				$response .= $out;
-			}
-			else {
-				self::exception(ZBX_API_ERROR_INTERNAL, _('Error description: can\'t read script response, check connection.'));
-			}
-		}
-
-		if (strlen($response) > 0) {
-			$rcv = $json->decode($response, true);
+		// execute the script
+		$zabbixServer = new CZabbixServer($ZBX_SERVER, $ZBX_SERVER_PORT, ZBX_SCRIPT_TIMEOUT, ZBX_SOCKET_BYTES_LIMIT);
+		if ($result = $zabbixServer->executeScript($scriptId, $hostId)) {
+			// return the result as the server would
+			return array(
+				'response' => 'success',
+				'value' => $result
+			);
 		}
 		else {
-			self::exception(ZBX_API_ERROR_INTERNAL, _('Error description: empty response received.'));
+			self::exception(ZBX_API_ERROR_INTERNAL, $zabbixServer->getError());
 		}
-		fclose($socket);
-
-		return $rcv;
 	}
 
 	/**
@@ -506,7 +427,7 @@ class CScript extends CZBXAPI {
 			'preservekeys' => true
 		));
 
-		if (!empty($scripts)) {
+		if ($scripts) {
 			// resolve macros
 			$macrosData = array();
 			foreach ($scripts as $script) {
@@ -518,7 +439,7 @@ class CScript extends CZBXAPI {
 					}
 				}
 			}
-			if (!empty($macrosData)) {
+			if ($macrosData) {
 				$macrosData = CMacrosResolverHelper::resolve(array(
 					'config' => 'scriptConfirmation',
 					'data' => $macrosData
@@ -581,10 +502,10 @@ class CScript extends CZBXAPI {
 
 		// adding groups
 		if ($options['selectGroups'] !== null && $options['selectGroups'] != API_OUTPUT_COUNT) {
-			foreach ($result as $scriptid => $script) {
-				$result[$scriptid]['groups'] = API::HostGroup()->get(array(
+			foreach ($result as $scriptId => $script) {
+				$result[$scriptId]['groups'] = API::HostGroup()->get(array(
 					'output' => $options['selectGroups'],
-					'groupids' => ($script['groupid']) ? $script['groupid'] : null,
+					'groupids' => $script['groupid'] ? $script['groupid'] : null,
 					'editable' => ($script['host_access'] == PERM_READ_WRITE) ? true : null
 				));
 			}
@@ -594,20 +515,20 @@ class CScript extends CZBXAPI {
 		if ($options['selectHosts'] !== null && $options['selectHosts'] != API_OUTPUT_COUNT) {
 			$processedGroups = array();
 
-			foreach ($result as $scriptid => $script) {
+			foreach ($result as $scriptId => $script) {
 				if (isset($processedGroups[$script['groupid'].'_'.$script['host_access']])) {
-					$result[$scriptid]['hosts'] = $result[$processedGroups[$script['groupid'].'_'.$script['host_access']]]['hosts'];
+					$result[$scriptId]['hosts'] = $result[$processedGroups[$script['groupid'].'_'.$script['host_access']]]['hosts'];
 				}
 				else {
-					$result[$scriptid]['hosts'] = API::Host()->get(array(
+					$result[$scriptId]['hosts'] = API::Host()->get(array(
 						'output' => $options['selectHosts'],
-						'groupids' => ($script['groupid']) ? $script['groupid'] : null,
-						'hostids' => ($options['hostids']) ? $options['hostids'] : null,
+						'groupids' => $script['groupid'] ? $script['groupid'] : null,
+						'hostids' => $options['hostids'] ? $options['hostids'] : null,
 						'editable' => ($script['host_access'] == PERM_READ_WRITE) ? true : null,
 						'nodeids' => id2nodeid($script['scriptid'])
 					));
 
-					$processedGroups[$script['groupid'].'_'.$script['host_access']] = $scriptid;
+					$processedGroups[$script['groupid'].'_'.$script['host_access']] = $scriptId;
 				}
 			}
 		}
@@ -615,4 +536,3 @@ class CScript extends CZBXAPI {
 		return $result;
 	}
 }
-?>

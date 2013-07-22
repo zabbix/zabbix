@@ -88,7 +88,7 @@ static zbx_hk_cleanup_table_t	hk_cleanup_tables[] = {
 };
 
 /* trends table offsets in the hk_cleanup_tables[] mapping  */
-#define HK_UPADTE_CACHE_OFFSET_TREND_FLOAT	ITEM_VALUE_TYPE_COUNT
+#define HK_UPADTE_CACHE_OFFSET_TREND_FLOAT	ITEM_VALUE_TYPE_MAX
 #define HK_UPADTE_CACHE_OFFSET_TREND_UINT	(HK_UPADTE_CACHE_OFFSET_TREND_FLOAT + 1)
 
 /* the oldest record timestamp cache for items in history tables */
@@ -110,11 +110,6 @@ typedef struct
 }
 zbx_hk_delete_queue_t;
 
-/* the item rule state  */
-#define HK_ITEM_RULE_NOT_INITIALIZED		0x00
-#define HK_ITEM_RULE_ITEM_CACHE_PREPARED	0x01
-#define HK_ITEM_RULE_DELETE_QUEUE_PREPARED	0x02
-
 /* this structure is used to remove old records from history (trends) tables */
 typedef struct
 {
@@ -123,9 +118,6 @@ typedef struct
 
 	/* history setting field name in items table (history|trends) */
 	char			*history;
-
-	/* the cache status, see HK_ITEM_RULE_* defines */
-	int			state;
 
 	/* a reference to the housekeeping configuration mode (enable) option for this table */
 	unsigned char		*poption_mode;
@@ -146,13 +138,13 @@ zbx_hk_history_rule_t;
 
 /* the history item rules, used for housekeeping history and trends tables */
 static zbx_hk_history_rule_t	hk_history_rules[] = {
-	{"history", "history", 0, &hk_config.history_mode, &hk_config.history_global, &hk_config.history},
-	{"history_str", "history", 0, &hk_config.history_mode, &hk_config.history_global, &hk_config.history},
-	{"history_log", "history", 0, &hk_config.history_mode, &hk_config.history_global, &hk_config.history},
-	{"history_uint", "history", 0, &hk_config.history_mode, &hk_config.history_global, &hk_config.history},
-	{"history_text", "history", 0, &hk_config.history_mode, &hk_config.history_global, &hk_config.history},
-	{"trends", "trends", 0, &hk_config.trends_mode, &hk_config.trends_global, &hk_config.trends},
-	{"trends_uint","trends", 0, &hk_config.trends_mode, &hk_config.trends_global, &hk_config.trends},
+	{"history", "history", &hk_config.history_mode, &hk_config.history_global, &hk_config.history},
+	{"history_str", "history", &hk_config.history_mode, &hk_config.history_global, &hk_config.history},
+	{"history_log", "history", &hk_config.history_mode, &hk_config.history_global, &hk_config.history},
+	{"history_uint", "history", &hk_config.history_mode, &hk_config.history_global, &hk_config.history},
+	{"history_text", "history", &hk_config.history_mode, &hk_config.history_global, &hk_config.history},
+	{"trends", "trends", &hk_config.trends_mode, &hk_config.trends_global, &hk_config.trends},
+	{"trends_uint","trends", &hk_config.trends_mode, &hk_config.trends_global, &hk_config.trends},
 	{NULL}
 };
 
@@ -250,39 +242,23 @@ static void	hk_history_prepare(zbx_hk_history_rule_t *rule, int now)
 	zbx_vector_ptr_create(&rule->delete_queue);
 	zbx_vector_ptr_reserve(&rule->delete_queue, HK_INITIAL_DELETE_QUEUE_SIZE);
 
-	if (ZBX_HK_OPTION_ENABLED != *rule->poption_global)
-	{
-		result = DBselect(
-				"select i.itemid,min(t.clock),i.%s"
-				" from %s t,items i"
-				" where t.itemid=i.itemid"
-				" group by i.itemid",
-				rule->history, rule->table);
-	}
-	else
-		result = DBselect("select itemid,min(clock) from %s group by itemid", rule->table);
+	result = DBselect("select itemid,min(clock) from %s group by itemid", rule->table);
 
 	while (NULL != (row = DBfetch(result)))
 	{
 		zbx_uint64_t		itemid;
-		int			min_clock, history;
+		int			min_clock;
 		zbx_hk_item_cache_t	item_record;
 
 		ZBX_STR2UINT64(itemid, row[0]);
 		min_clock = atoi(row[1]);
 
-		history = (ZBX_HK_OPTION_ENABLED == *rule->poption_global) ? *rule->poption : atoi(row[2]);
-
 		item_record.itemid = itemid;
 		item_record.min_clock = min_clock;
-
-		hk_history_delete_queue_append(rule, now, &item_record, history);
 
 		zbx_hashset_insert(&rule->item_cache, &item_record, sizeof(zbx_hk_item_cache_t));
 	}
 	DBfree_result(result);
-
-	rule->state = HK_ITEM_RULE_ITEM_CACHE_PREPARED | HK_ITEM_RULE_DELETE_QUEUE_PREPARED;
 }
 
 /******************************************************************************
@@ -302,13 +278,11 @@ static void	hk_history_prepare(zbx_hk_history_rule_t *rule, int now)
  ******************************************************************************/
 static void	hk_history_release(zbx_hk_history_rule_t *rule)
 {
-	if (HK_ITEM_RULE_NOT_INITIALIZED == rule->state)
+	if (0 == rule->item_cache.num_slots)
 		return;
 
 	zbx_hashset_destroy(&rule->item_cache);
 	zbx_vector_ptr_destroy(&rule->delete_queue);
-
-	rule->state = HK_ITEM_RULE_NOT_INITIALIZED;
 }
 
 /******************************************************************************
@@ -388,36 +362,27 @@ static void	hk_history_update(zbx_hk_history_rule_t *rules, int now)
 		history = atoi(row[2]);
 		trends = atoi(row[3]);
 
-		if (value_type < ITEM_VALUE_TYPE_COUNT)
+		if (value_type < ITEM_VALUE_TYPE_MAX)
 		{
 			rule = rules + value_type;
-			if (0 == (rule->state & HK_ITEM_RULE_DELETE_QUEUE_PREPARED))
-			{
-				if (ZBX_HK_OPTION_ENABLED == *rule->poption_global)
-					history = *rule->poption;
-				hk_history_item_update(rule, now, itemid, history);
-			}
+			if (ZBX_HK_OPTION_ENABLED == *rule->poption_global)
+				history = *rule->poption;
+			hk_history_item_update(rule, now, itemid, history);
 		}
 		if (value_type == ITEM_VALUE_TYPE_FLOAT)
 		{
 			rule = rules + HK_UPADTE_CACHE_OFFSET_TREND_FLOAT;
-			if (0 == (rule->state & HK_ITEM_RULE_DELETE_QUEUE_PREPARED))
-			{
-				if (ZBX_HK_OPTION_ENABLED == *rule->poption_global)
-					trends = *rule->poption;
-				hk_history_item_update(rule, now, itemid, trends);
-			}
+			if (ZBX_HK_OPTION_ENABLED == *rule->poption_global)
+				trends = *rule->poption;
+			hk_history_item_update(rule, now, itemid, trends);
 		}
 		else if (value_type == ITEM_VALUE_TYPE_UINT64)
 		{
 			rule = rules + HK_UPADTE_CACHE_OFFSET_TREND_UINT;
 
-			if (0 == (rule->state & HK_ITEM_RULE_DELETE_QUEUE_PREPARED))
-			{
-				if (ZBX_HK_OPTION_ENABLED == *rule->poption_global)
-					trends = *rule->poption;
-				hk_history_item_update(rule, now, itemid, trends);
-			}
+			if (ZBX_HK_OPTION_ENABLED == *rule->poption_global)
+				trends = *rule->poption;
+			hk_history_item_update(rule, now, itemid, trends);
 		}
 	}
 	DBfree_result(result);
@@ -443,7 +408,6 @@ static void	hk_history_delete_queue_prepare_all(zbx_hk_history_rule_t *rules, in
 {
 	const char		*__function_name = "hk_history_delete_queue_prepare_all";
 
-	int			update_cache = 0;
 	zbx_hk_history_rule_t	*rule;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
@@ -453,20 +417,14 @@ static void	hk_history_delete_queue_prepare_all(zbx_hk_history_rule_t *rules, in
 	{
 		if (ZBX_HK_OPTION_ENABLED == *rule->poption_mode)
 		{
-			if (HK_ITEM_RULE_NOT_INITIALIZED == rule->state)
+			if (0 == rule->item_cache.num_slots)
 				hk_history_prepare(rule, now);
-			else
-				update_cache = 1;
 		}
-		else if (0 != (rule->state & HK_ITEM_RULE_ITEM_CACHE_PREPARED))
+		else if (0 != rule->item_cache.num_slots)
 			hk_history_release(rule);
 	}
 
-	if (1 == update_cache)
-	{
-		/* cache update is requested because already initialized rule was found */
-		hk_history_update(rules, now);
-	}
+	hk_history_update(rules, now);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
@@ -492,7 +450,6 @@ static void	hk_history_delete_queue_clear(zbx_hk_history_rule_t *rule)
 		zbx_free(rule->delete_queue.values[i]);
 	}
 	rule->delete_queue.values_num = 0;
-	rule->state &= (~HK_ITEM_RULE_DELETE_QUEUE_PREPARED);
 }
 
 /******************************************************************************

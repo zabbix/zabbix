@@ -23,6 +23,7 @@
 #include "log.h"
 #include "dbcache.h"
 #include "zbxself.h"
+#include "valuecache.h"
 
 /******************************************************************************
  *                                                                            *
@@ -136,7 +137,7 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 			goto notsupported;
 		}
 
-		SET_UI64_RESULT(result, DBget_queue_count((int)from, (int)to));
+		SET_UI64_RESULT(result, DCget_item_queue(NULL, from, to));
 	}
 	else if (0 == strcmp(tmp, "requiredperformance"))	/* zabbix["requiredperformance"] */
 	{
@@ -398,6 +399,54 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 				SET_UI64_RESULT(result, *(zbx_uint64_t *)DCconfig_get_stats(ZBX_CONFSTATS_BUFFER_USED));
 			else if (0 == strcmp(tmp1, "free"))
 				SET_UI64_RESULT(result, *(zbx_uint64_t *)DCconfig_get_stats(ZBX_CONFSTATS_BUFFER_FREE));
+			else
+				goto notsupported;
+		}
+		else
+			goto notsupported;
+	}
+	else if (0 == strcmp(tmp, "vcache"))
+	{
+		zbx_vc_stats_t	stats;
+
+		if (FAIL == zbx_vc_get_statistics(&stats))
+		{
+			error = zbx_strdup(error, "Value cache is disabled");
+			goto notsupported;
+		}
+
+		if (3 < nparams)
+			goto notsupported;
+
+		if (0 != get_param(params, 2, tmp, sizeof(tmp)))
+			goto notsupported;
+
+		if (0 != get_param(params, 3, tmp1, sizeof(tmp1)))
+			*tmp1 = '\0';
+
+		if (0 == strcmp(tmp, "buffer"))
+		{
+			if (0 == strcmp(tmp1, "free"))
+				SET_UI64_RESULT(result, stats.total - stats.used);
+			else if (0 == strcmp(tmp1, "pfree"))
+				SET_DBL_RESULT(result, (double)(stats.total - stats.used) / stats.total * 100);
+			else if (0 == strcmp(tmp1, "total"))
+				SET_UI64_RESULT(result, stats.total);
+			else if (0 == strcmp(tmp1, "used"))
+				SET_UI64_RESULT(result, stats.used);
+			else if (0 == strcmp(tmp1, "pused"))
+				SET_DBL_RESULT(result, (double)stats.used / stats.total * 100);
+			else
+				goto notsupported;
+		}
+		else if (0 == strcmp(tmp, "cache"))
+		{
+			if (0 == strcmp(tmp1, "hits"))
+				SET_UI64_RESULT(result, stats.hits);
+			else if (0 == strcmp(tmp1, "requests"))
+				SET_UI64_RESULT(result, stats.hits + stats.misses);
+			else if (0 == strcmp(tmp1, "misses"))
+				SET_UI64_RESULT(result, stats.misses);
 			else
 				goto notsupported;
 		}

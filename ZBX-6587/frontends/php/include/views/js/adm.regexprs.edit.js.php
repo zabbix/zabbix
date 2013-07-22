@@ -3,7 +3,7 @@
 		<td>#{expression}</td>
 		<td>#{type}</td>
 		<td>#{case_sensitive}</td>
-		<td>
+		<td class="nowrap">
 			<button class="input link_menu exprEdit" type="button" data-id="#{id}"><?php echo _('Edit'); ?></button>&nbsp;
 			<button class="input link_menu exprRemove" type="button" data-id="#{id}"><?php echo _('Remove'); ?></button>
 		</td>
@@ -27,8 +27,6 @@
 
 <script>
 	(function($) {
-		'use strict';
-
 		/**
 		 * Class for single expression from global regular expression.
 		 * @constructor
@@ -44,15 +42,13 @@
 		function Expression(expression) {
 			this.data = expression;
 
-			if (typeof expression.expressionid === 'undefined') {
-				this.id = getUniqueId();
-			}
-			else {
-				this.id = expression.expressionid;
-			}
+			this.id = (typeof expression.expressionid === 'undefined')
+				? getUniqueId()
+				: expression.expressionid;
 
 			this.render(true);
 		}
+
 		Expression.prototype = {
 
 			/**
@@ -79,7 +75,7 @@
 					$('#exprTable tr.footer').before(this.expressionRowTpl.evaluate(tplData));
 				}
 				else {
-					$('#exprRow_'+this.id).replaceWith(this.expressionRowTpl.evaluate(tplData));
+					$('#exprRow_' + this.id).replaceWith(this.expressionRowTpl.evaluate(tplData));
 				}
 			},
 
@@ -87,7 +83,7 @@
 			 * Remove expression row.
 			 */
 			remove: function() {
-				$('#exprRow_'+this.id).remove();
+				$('#exprRow_' + this.id).remove();
 			},
 
 			/**
@@ -155,13 +151,12 @@
 			 * @return {Boolean}
 			 */
 			equals: function(obj) {
-				return this.data.expression === obj.expression
+				return (this.data.expression === obj.expression
 						&& this.data.expression_type === obj.expression_type
 						&& this.data.case_sensitive === obj.case_sensitive
-						&& this.data.exp_delimiter === obj.exp_delimiter;
+						&& this.data.exp_delimiter === obj.exp_delimiter);
 			}
 		};
-
 
 		/**
 		 * Object to manage expression related GUI elements.
@@ -220,6 +215,7 @@
 					alert('<?php echo _('Expression cannot be empty'); ?>');
 					return false;
 				}
+
 				for (var id in this.expressions) {
 					// if we update expression, no error if equals itself
 					if (id != this.selectedID && this.expressions[id].equals(data)) {
@@ -267,18 +263,18 @@
 				// when type is updated fire change event to show/hide delimiter row
 				$('#typeNew').change();
 
-				$('#exprForm').show();
+				$('#exprForm').removeClass('hidden');
 			},
 
 			/**
 			 * Hide expression form.
 			 */
 			hideForm: function() {
-				$('#exprForm').hide();
+				$('#exprForm').addClass('hidden');
 			},
 
 			/**
-			 * Either update data of existing expression or create new expression with data in form.			 *
+			 * Either update data of existing expression or create new expression with data in form.
 			 */
 			saveForm: function() {
 				var data = {
@@ -316,11 +312,11 @@
 			 * @param {String} string Test string to test expression against
 			 */
 			testExpressions: function(string) {
-				var ajaxData = {
-					testString: string,
-					expressions: {}
-				},
-					url;
+				var url,
+					ajaxData = {
+						testString: string,
+						expressions: {}
+					};
 
 				if ($.isEmptyObject(this.expressions)) {
 					$('#testResultTable tr:not(.header)').remove();
@@ -328,9 +324,7 @@
 				else {
 					url = new Curl();
 
-					$('#testResultTable').css({
-						opacity: 0.5
-					});
+					$('#testResultTable').css({opacity: 0.5});
 					$('#testPreloader').show();
 
 					for (var id in this.expressions) {
@@ -338,10 +332,10 @@
 					}
 
 					$.post(
-							'adm.regexps.php?output=ajax&ajaxaction=test&sid='+url.getArgument('sid'),
-							{ajaxdata: ajaxData},
-							$.proxy(this.showTestResults, this),
-							'json'
+						'adm.regexps.php?output=ajax&ajaxaction=test&sid=' + url.getArgument('sid'),
+						{ajaxdata: ajaxData},
+						$.proxy(this.showTestResults, this),
+						'json'
 					);
 				}
 			},
@@ -374,19 +368,15 @@
 					resultClass: response.data.final ? 'green' : 'red',
 					result: response.data.final ? '<?php echo _('TRUE'); ?>' : '<?php echo _('FALSE'); ?>'
 				};
-				$('#testResultTable').append(this.testCombinedTableRowTpl.evaluate(tplData));
 
-				$('#testResultTable').css({
-					opacity: 1
-				});
+				$('#testResultTable').append(this.testCombinedTableRowTpl.evaluate(tplData));
+				$('#testResultTable').css({opacity: 1});
 				$('#testPreloader').hide();
 			}
 		};
 	}(jQuery));
 
 	jQuery(function($) {
-		'use strict';
-
 		$('#exprTable').on('click', 'button.exprRemove', function() {
 			zabbixRegExp.removeExpression($(this).data('id'));
 		});
@@ -421,11 +411,12 @@
 				expr = zabbixRegExp.expressions[id].data;
 
 				for (var fieldName in expr) {
-					$("<input>").attr({
-						'type': 'hidden',
-						'name': 'expressions['+counter+']['+fieldName + ']'
+					$('<input>').attr({
+						type: 'hidden',
+						name: 'expressions[' + counter + '][' + fieldName + ']'
 					}).val(expr[fieldName]).appendTo(form);
 				}
+
 				counter++;
 			}
 		});
@@ -437,6 +428,7 @@
 			$('#clone').remove();
 			$('#delete').remove();
 			$('#cancel').addClass('ui-corner-left');
+
 			for (var id in zabbixRegExp.expressions) {
 				delete zabbixRegExp.expressions[id].data['expressionid'];
 			}
@@ -444,11 +436,11 @@
 
 		// handler for type select in form, show/hide delimiter select
 		$('#typeNew').change(function() {
-			if ($(this).val() !== '<?php echo EXPRESSION_TYPE_ANY_INCLUDED; ?>') {
-				$('#delimiterNewRow').hide();
+			if ($(this).val() === '<?php echo EXPRESSION_TYPE_ANY_INCLUDED; ?>') {
+				$('#delimiterNewRow').show();
 			}
 			else {
-				$('#delimiterNewRow').show();
+				$('#delimiterNewRow').hide();
 			}
 		});
 	});

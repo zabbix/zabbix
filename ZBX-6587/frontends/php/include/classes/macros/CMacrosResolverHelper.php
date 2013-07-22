@@ -209,10 +209,12 @@ class CMacrosResolverHelper {
 	 */
 	public static function resolveGraphName($name, $items) {
 		self::init();
-		$graph = reset(self::$macrosResolver->resolve(array(
+		$graph = self::$macrosResolver->resolve(array(
 			'config' => 'graphName',
 			'data' => array(array('name' => $name, 'items' => $items))
-		)));
+		));
+		$graph = reset($graph);
+
 		return $graph['name'];
 	}
 

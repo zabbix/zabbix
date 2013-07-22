@@ -20,6 +20,8 @@
 
 
 /**
+ * Class containing methods for operations with hosts.
+ *
  * @package API
  */
 class CHost extends CHostGeneral {
@@ -27,7 +29,7 @@ class CHost extends CHostGeneral {
 	protected $sortColumns = array('hostid', 'host', 'name', 'status');
 
 	/**
-	 * Get Host data
+	 * Get host data.
 	 *
 	 * @param array         $options
 	 * @param array         $options['nodeids']                  Node IDs
@@ -37,7 +39,6 @@ class CHost extends CHostGeneral {
 	 * @param boolean       $options['templated_hosts']          include templates in result
 	 * @param boolean       $options['with_items']               only with items
 	 * @param boolean       $options['with_monitored_items']     only with monitored items
-	 * @param boolean       $options['with_historical_items']    only with historical items
 	 * @param boolean       $options['with_triggers']            only with triggers
 	 * @param boolean       $options['with_monitored_triggers']  only with monitored triggers
 	 * @param boolean       $options['with_httptests']           only with http tests
@@ -94,7 +95,6 @@ class CHost extends CHostGeneral {
 			'proxy_hosts'				=> null,
 			'with_items'				=> null,
 			'with_monitored_items'		=> null,
-			'with_historical_items'		=> null,
 			'with_simple_graph_items'	=> null,
 			'with_triggers'				=> null,
 			'with_monitored_triggers'	=> null,
@@ -305,7 +305,7 @@ class CHost extends CHostGeneral {
 			$sqlParts['where']['status'] = 'h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.')';
 		}
 
-		// with_items, with_monitored_items, with_historical_items, with_simple_graph_items
+		// with_items, with_monitored_items, with_simple_graph_items
 		if (!is_null($options['with_items'])) {
 			$sqlParts['where'][] = 'EXISTS ('.
 					'SELECT NULL'.
@@ -319,15 +319,6 @@ class CHost extends CHostGeneral {
 					' FROM items i'.
 					' WHERE h.hostid=i.hostid'.
 						' AND i.status='.ITEM_STATUS_ACTIVE.
-					')';
-		}
-		elseif (!is_null($options['with_historical_items'])) {
-			$sqlParts['where'][] = 'EXISTS ('.
-					'SELECT NULL'.
-					' FROM items i'.
-					' WHERE h.hostid=i.hostid'.
-						' AND i.status='.ITEM_STATUS_ACTIVE.
-						' AND i.lastvalue IS NOT NULL'.
 					')';
 		}
 		elseif (!is_null($options['with_simple_graph_items'])) {
@@ -663,6 +654,11 @@ class CHost extends CHostGeneral {
 			}
 
 			if (isset($host['inventory']) && !empty($host['inventory'])) {
+
+				if (isset($host['inventory_mode']) && $host['inventory_mode'] == HOST_INVENTORY_DISABLED) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot set inventory fields for disabled inventory.'));
+				}
+
 				$fields = array_keys($host['inventory']);
 				foreach ($fields as $field) {
 					if (!in_array($field, $inventoryFields)) {
@@ -995,22 +991,22 @@ class CHost extends CHostGeneral {
 	}
 
 	/**
-	 * Mass update hosts
+	 * Mass update hosts.
 	 *
-	 * @param array $hosts multidimensional array with Hosts data
-	 * @param array  $hosts ['hosts'] Array of Host objects to update
-	 * @param string $hosts ['fields']['host'] Host name.
-	 * @param array  $hosts ['fields']['groupids'] HostGroup IDs add Host to.
-	 * @param int    $hosts ['fields']['port'] Port. OPTIONAL
-	 * @param int    $hosts ['fields']['status'] Host Status. OPTIONAL
-	 * @param int    $hosts ['fields']['useip'] Use IP. OPTIONAL
-	 * @param string $hosts ['fields']['dns'] DNS. OPTIONAL
-	 * @param string $hosts ['fields']['ip'] IP. OPTIONAL
-	 * @param int    $hosts ['fields']['proxy_hostid'] Proxy Host ID. OPTIONAL
-	 * @param int    $hosts ['fields']['ipmi_authtype'] IPMI authentication type. OPTIONAL
-	 * @param int    $hosts ['fields']['ipmi_privilege'] IPMI privilege. OPTIONAL
-	 * @param string $hosts ['fields']['ipmi_username'] IPMI username. OPTIONAL
-	 * @param string $hosts ['fields']['ipmi_password'] IPMI password. OPTIONAL
+	 * @param array  $hosts								multidimensional array with Hosts data
+	 * @param array  $hosts['hosts']					Array of Host objects to update
+	 * @param string $hosts['fields']['host']			Host name.
+	 * @param array  $hosts['fields']['groupids']		HostGroup IDs add Host to.
+	 * @param int    $hosts['fields']['port']			Port. OPTIONAL
+	 * @param int    $hosts['fields']['status']			Host Status. OPTIONAL
+	 * @param int    $hosts['fields']['useip']			Use IP. OPTIONAL
+	 * @param string $hosts['fields']['dns']			DNS. OPTIONAL
+	 * @param string $hosts['fields']['ip']				IP. OPTIONAL
+	 * @param int    $hosts['fields']['proxy_hostid']	Proxy Host ID. OPTIONAL
+	 * @param int    $hosts['fields']['ipmi_authtype']	IPMI authentication type. OPTIONAL
+	 * @param int    $hosts['fields']['ipmi_privilege']	IPMI privilege. OPTIONAL
+	 * @param string $hosts['fields']['ipmi_username']	IPMI username. OPTIONAL
+	 * @param string $hosts['fields']['ipmi_password']	IPMI password. OPTIONAL
 	 *
 	 * @return boolean
 	 */
@@ -1018,7 +1014,7 @@ class CHost extends CHostGeneral {
 		$hosts = zbx_toArray($data['hosts']);
 		$inputHostIds = zbx_objectValues($hosts, 'hostid');
 		$hostids = array_unique($inputHostIds);
-		// sort for DBConditionInt()
+
 		sort($hostids);
 
 		$updHosts = $this->get(array(
@@ -1077,32 +1073,28 @@ class CHost extends CHostGeneral {
 
 		if (isset($data['groups'])) {
 			$updateGroups = $data['groups'];
-			unset($data['groups']);
 		}
 
 		if (isset($data['interfaces'])) {
 			$updateInterfaces = $data['interfaces'];
-			unset($data['interfaces']);
 		}
 
 		if (isset($data['templates_clear'])) {
 			$updateTemplatesClear = zbx_toArray($data['templates_clear']);
-			unset($data['templates_clear']);
 		}
 
 		if (isset($data['templates'])) {
 			$updateTemplates = $data['templates'];
-			unset($data['templates']);
 		}
 
 		if (isset($data['macros'])) {
 			$updateMacros = $data['macros'];
-			unset($data['macros']);
 		}
 
-		if (isset($data['inventory'])) {
+		// second check is necessary, because import incorrectly inputs unset 'inventory' as empty string rather than null
+		if (isset($data['inventory']) && $data['inventory']) {
 			$updateInventory = $data['inventory'];
-			unset($data['inventory']);
+			$updateInventory['inventory_mode'] = null;
 
 			if (isset($data['inventory_mode']) && $data['inventory_mode'] == HOST_INVENTORY_DISABLED) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot set inventory fields for disabled inventory.'));
@@ -1114,21 +1106,20 @@ class CHost extends CHostGeneral {
 				$updateInventory = array();
 			}
 			$updateInventory['inventory_mode'] = $data['inventory_mode'];
-			unset($data['inventory_mode']);
 		}
 
 		if (isset($data['status'])) {
 			$updateStatus = $data['status'];
-			unset($data['status']);
 		}
 
-		unset($data['hosts']);
+		unset($data['hosts'], $data['groups'], $data['interfaces'], $data['templates_clear'], $data['templates'],
+			$data['macros'], $data['inventory'], $data['inventory_mode'], $data['status']);
+
 		if (!zbx_empty($data)) {
-			$update = array(
+			DB::update('hosts', array(
 				'values' => $data,
 				'where' => array('hostid' => $hostids)
-			);
-			DB::update('hosts', $update);
+			));
 		}
 
 		if (isset($updateStatus)) {
@@ -1155,7 +1146,7 @@ class CHost extends CHostGeneral {
 
 			$groupidsToDel = array_diff($hostGroupids, $newGroupids);
 
-			if (!empty($groupidsToDel)) {
+			if ($groupidsToDel) {
 				$result = $this->massRemove(array(
 					'hostids' => $hostids,
 					'groupids' => $groupidsToDel
@@ -1189,13 +1180,9 @@ class CHost extends CHostGeneral {
 
 		if (isset($updateTemplatesClear)) {
 			$templateidsClear = zbx_objectValues($updateTemplatesClear, 'templateid');
-			if (!empty($updateTemplatesClear)) {
-				$this->massRemove(
-					array(
-						'hostids' => $hostids,
-						'templateids_clear' => $templateidsClear
-					)
-				);
+
+			if ($updateTemplatesClear) {
+				$this->massRemove(array('hostids' => $hostids, 'templateids_clear' => $templateidsClear));
 			}
 		}
 		else {
@@ -1218,7 +1205,7 @@ class CHost extends CHostGeneral {
 			$templatesToDel = array_diff($hostTemplateids, $newTemplateids);
 			$templatesToDel = array_diff($templatesToDel, $templateidsClear);
 
-			if (!empty($templatesToDel)) {
+			if ($templatesToDel) {
 				$result = $this->massRemove(array(
 					'hostids' => $hostids,
 					'templateids' => $templatesToDel
@@ -1264,6 +1251,7 @@ class CHost extends CHostGeneral {
 					' FROM host_inventory'.
 					' WHERE '.dbConditionInt('hostid', $hostids)
 				), 'hostid');
+
 				// check for hosts with disabled inventory mode
 				if ($updateInventory['inventory_mode'] === null && count($existingInventoriesDb) !== count($hostids)) {
 					foreach ($hostids as $hostId) {

@@ -17,10 +17,10 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
-require_once ('include/config.inc.php');
-require_once ('include/reports.inc.php');
+
+
+require_once dirname(__FILE__).'/include/config.inc.php';
+require_once dirname(__FILE__).'/include/reports.inc.php';
 
 $page['title']	= _('Bar reports');
 $page['file']	= 'report6.php';
@@ -28,8 +28,7 @@ $page['hist_arg'] = array('period');
 $page['scripts'] = array('class.calendar.js');
 
 require_once dirname(__FILE__).'/include/page_header.php';
-?>
-<?php
+
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
 		'config'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	IN('0,1,2,3'),	NULL),
@@ -87,8 +86,6 @@ require_once dirname(__FILE__).'/include/page_header.php';
 		exit();
 	}
 //--------
-?>
-<?php
 
 	if(isset($_REQUEST['new_graph_item'])){
 		$_REQUEST['items'] = get_request('items', array());
@@ -144,8 +141,24 @@ require_once dirname(__FILE__).'/include/page_header.php';
 		}
 		unset($_REQUEST['delete_period'], $_REQUEST['group_pid']);
 	}
-?>
-<?php
+
+	// item validation
+	if (isset($_REQUEST['items']) && $_REQUEST['items']) {
+		$itemIds = zbx_objectValues($_REQUEST['items'], 'itemid');
+
+		$itemCount = API::Item()->get(array(
+			'itemids' => $itemIds,
+			'webitems' => true,
+			'countOutput' => true
+		));
+
+		if ($itemCount != count($itemIds)) {
+			show_error_message(_('No permissions to referred object or it does not exist!'));
+			require_once dirname(__FILE__).'/include/page_footer.php';
+			exit;
+		}
+	}
+
 	$config = $_REQUEST['config'] = get_request('config',1);
 
 	$_REQUEST['report_timesince'] = zbxDateToTime(get_request('report_timesince', date(TIMESTAMP_FORMAT, time() - SEC_PER_DAY)));
@@ -215,9 +228,5 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 	$rep6_wdgt->addItem($outer_table);
 	$rep6_wdgt->show();
-?>
-<?php
 
 require_once dirname(__FILE__).'/include/page_footer.php';
-
-?>

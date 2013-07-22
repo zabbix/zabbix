@@ -18,7 +18,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 /**
+ * Class containing methods for operations with items.
+ *
  * @package API
  */
 class CItem extends CItemGeneral {
@@ -36,22 +39,21 @@ class CItem extends CItemGeneral {
 		));
 	}
 
-
 	/**
 	 * Get items data.
 	 *
-	 * @param array $options
-	 * @param array $options['itemids']
-	 * @param array $options['hostids']
-	 * @param array $options['groupids']
-	 * @param array $options['triggerids']
-	 * @param array $options['applicationids']
-	 * @param boolean $options['status']
-	 * @param boolean $options['templated_items']
-	 * @param boolean $options['editable']
-	 * @param boolean $options['count']
+	 * @param array  $options
+	 * @param array  $options['itemids']
+	 * @param array  $options['hostids']
+	 * @param array  $options['groupids']
+	 * @param array  $options['triggerids']
+	 * @param array  $options['applicationids']
+	 * @param bool   $options['status']
+	 * @param bool   $options['templated_items']
+	 * @param bool   $options['editable']
+	 * @param bool   $options['count']
 	 * @param string $options['pattern']
-	 * @param int $options['limit']
+	 * @param int    $options['limit']
 	 * @param string $options['order']
 	 *
 	 * @return array|int item data as array or false if error
@@ -409,7 +411,7 @@ class CItem extends CItemGeneral {
 		// add other related objects
 		if ($result) {
 			$result = $this->addRelatedObjects($options, $result);
-			$result = $this->unsetExtraFields($result, array('hostid', 'interfaceid'), $options['output']);
+			$result = $this->unsetExtraFields($result, array('hostid', 'interfaceid', 'value_type'), $options['output']);
 		}
 
 		// removing keys (hash -> array)
@@ -1155,6 +1157,42 @@ class CItem extends CItemGeneral {
 			$result = $relationMap->mapOne($result, $itemDiscoveries, 'itemDiscovery');
 		}
 
+		// adding history data
+		$requestedOutput = array();
+		if ($this->outputIsRequested('lastclock', $options['output'])) {
+			$requestedOutput['lastclock'] = true;
+		}
+		if ($this->outputIsRequested('lastns', $options['output'])) {
+			$requestedOutput['lastns'] = true;
+		}
+		if ($this->outputIsRequested('lastvalue', $options['output'])) {
+			$requestedOutput['lastvalue'] = true;
+		}
+		if ($this->outputIsRequested('prevvalue', $options['output'])) {
+			$requestedOutput['prevvalue'] = true;
+		}
+		if ($requestedOutput) {
+			$history = Manager::History()->fetchLast($result, 2);
+			foreach ($result as &$item) {
+				$lastHistory = isset($history[$item['itemid']][0]) ? $history[$item['itemid']][0] : null;
+				$prevHistory = isset($history[$item['itemid']][1]) ? $history[$item['itemid']][1] : null;
+
+				if (isset($requestedOutput['lastclock'])) {
+					$item['lastclock'] = $lastHistory ? $lastHistory['clock'] : '0';
+				}
+				if (isset($requestedOutput['lastns'])) {
+					$item['lastns'] = $lastHistory ? $lastHistory['ns'] : '0';
+				}
+				if (isset($requestedOutput['lastvalue'])) {
+					$item['lastvalue'] = $lastHistory ? $lastHistory['value'] : '0';
+				}
+				if (isset($requestedOutput['prevvalue'])) {
+					$item['prevvalue'] = $prevHistory ? $prevHistory['value'] : '0';
+				}
+			}
+			unset($item);
+		}
+
 		return $result;
 	}
 
@@ -1168,6 +1206,14 @@ class CItem extends CItemGeneral {
 
 			if ($options['selectInterfaces'] !== null) {
 				$sqlParts = $this->addQuerySelect('i.interfaceid', $sqlParts);
+			}
+
+			if ($this->outputIsRequested('lastclock', $options['output'])
+					|| $this->outputIsRequested('lastns', $options['output'])
+					|| $this->outputIsRequested('lastvalue', $options['output'])
+					|| $this->outputIsRequested('prevvalue', $options['output'])) {
+
+				$sqlParts = $this->addQuerySelect('i.value_type', $sqlParts);
 			}
 		}
 

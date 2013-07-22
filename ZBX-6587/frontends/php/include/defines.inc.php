@@ -18,9 +18,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-define('ZABBIX_VERSION',     '2.1.0');
-define('ZABBIX_API_VERSION', '2.1.0');
-define('ZABBIX_DB_VERSION',	 2010075);
+define('ZABBIX_VERSION',     '2.1.2');
+define('ZABBIX_API_VERSION', '2.1.2');
+define('ZABBIX_DB_VERSION',	 2010091);
 
 define('ZABBIX_COPYRIGHT_FROM', '2001');
 define('ZABBIX_COPYRIGHT_TO',   '2013');
@@ -39,7 +39,6 @@ define('ZBX_GRAPH_FONT_NAME',		'DejaVuSans'); // font file name
 define('ZBX_GRAPH_LEGEND_HEIGHT',	120); // when graph height is less then this value, some legend will not show up
 
 define('ZBX_SCRIPT_TIMEOUT',		60); // in seconds
-define('ZBX_SCRIPT_BYTES_LIMIT',	1048576); // 1048576 is 1MB in bytes
 
 define('GRAPH_YAXIS_SIDE_DEFAULT', 0); // 0 - LEFT SIDE, 1 - RIGHT SIDE
 
@@ -201,7 +200,7 @@ define('CONDITION_TYPE_DSERVICE_PORT',		9);
 define('CONDITION_TYPE_DSTATUS',			10);
 define('CONDITION_TYPE_DUPTIME',			11);
 define('CONDITION_TYPE_DVALUE',				12);
-define('CONDITION_TYPE_HOST_TEMPLATE',		13);
+define('CONDITION_TYPE_TEMPLATE',			13);
 define('CONDITION_TYPE_EVENT_ACKNOWLEDGED',	14);
 define('CONDITION_TYPE_APPLICATION',		15);
 define('CONDITION_TYPE_MAINTENANCE',		16);
@@ -212,6 +211,7 @@ define('CONDITION_TYPE_PROXY',				20);
 define('CONDITION_TYPE_DOBJECT',			21);
 define('CONDITION_TYPE_HOST_NAME',			22);
 define('CONDITION_TYPE_EVENT_TYPE',			23);
+define('CONDITION_TYPE_HOST_METADATA',		24);
 
 define('CONDITION_OPERATOR_EQUAL',		0);
 define('CONDITION_OPERATOR_NOT_EQUAL',	1);
@@ -280,6 +280,7 @@ define('MAP_LABEL_TYPE_STATUS',		3);
 define('MAP_LABEL_TYPE_NOTHING',	4);
 define('MAP_LABEL_TYPE_CUSTOM',		5);
 
+define('MAP_LABEL_LOC_DEFAULT', -1);
 define('MAP_LABEL_LOC_BOTTOM',	0);
 define('MAP_LABEL_LOC_LEFT',	1);
 define('MAP_LABEL_LOC_RIGHT',	2);
@@ -428,9 +429,6 @@ define('TRIGGER_VALUE_UNKNOWN', 2); // only in "events" table
 
 define('TRIGGER_STATE_NORMAL',	0);
 define('TRIGGER_STATE_UNKNOWN',	1);
-
-define('TRIGGER_VALUE_CHANGED_NO',	0);
-define('TRIGGER_VALUE_CHANGED_YES', 1);
 
 define('TRIGGER_SEVERITY_NOT_CLASSIFIED',	0);
 define('TRIGGER_SEVERITY_INFORMATION',		1);
@@ -790,6 +788,7 @@ define('SPACE',	'&nbsp;');
 define('RARR',	'&rArr;');
 define('SQUAREBRACKETS', '%5B%5D');
 define('NAME_DELIMITER', ': ');
+define('UNKNOWN_VALUE', '-');
 
 // affects multibyte strings [in mb_ereg char "-" must be backslashed]!!!
 if (in_array(ini_get('mbstring.func_overload'), array(2,3,6,7))) {
@@ -882,8 +881,8 @@ define('IPMI_PRIVILEGE_OEM',		5);
 
 define('ZBX_HAVE_IPV6', 1);
 
-
-define('ZBX_SOCKET_TIMEOUT', 3);
+define('ZBX_SOCKET_TIMEOUT',        3);         // socket timeout limit
+define('ZBX_SOCKET_BYTES_LIMIT',    1048576);   // socket response size limit, 1048576 is 1MB in bytes
 
 // value is also used in servercheck.js file
 define('SERVER_CHECK_INTERVAL', 10);

@@ -21,6 +21,8 @@
 
 /**
  * Class containing methods for operations with template screens.
+ *
+ * @package API
  */
 class CTemplateScreen extends CScreen {
 
@@ -232,6 +234,10 @@ class CTemplateScreen extends CScreen {
 				}
 				$result[$screen['screenid']] += $screen;
 			}
+		}
+
+		if ($options['countOutput'] !== null && $options['groupCount'] === null) {
+			return $result;
 		}
 
 		$screenIds = array_keys($result);
@@ -537,7 +543,7 @@ class CTemplateScreen extends CScreen {
 			// get same items on destination template
 			$resourceItemsMap = array();
 			$dbItems = DBselect(
-				'SELECT src.itemid as srcid,dest.itemid as destid'.
+				'SELECT src.itemid AS srcid,dest.itemid as destid'.
 						' FROM items dest,items src'.
 						' WHERE dest.key_=src.key_'.
 						' AND dest.hostid='.$templateId.
@@ -550,7 +556,7 @@ class CTemplateScreen extends CScreen {
 			// get same graphs on destination template
 			$resourceGraphsMap = array();
 			$dbItems = DBselect(
-				'SELECT src.graphid as srcid,dest.graphid as destid'.
+				'SELECT src.graphid AS srcid,dest.graphid as destid'.
 						' FROM graphs dest,graphs src,graphs_items destgi,items desti'.
 						' WHERE dest.name=src.name'.
 						' AND destgi.graphid=dest.graphid'.

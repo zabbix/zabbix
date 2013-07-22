@@ -17,8 +17,7 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
 
 $macrosForm = new CForm();
 $macrosForm->setName('macrosForm');
@@ -36,7 +35,6 @@ $saveButton->attr('data-removed-count', 0);
 $saveButton->addClass('main');
 
 $macrosForm->addItem($macrosTab);
-$macrosForm->addItem(makeFormFooter(array(), array($saveButton)));
+$macrosForm->addItem(makeFormFooter(null, array($saveButton)));
 
 return $macrosForm;
-?>

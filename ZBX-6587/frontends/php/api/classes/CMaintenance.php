@@ -20,11 +20,9 @@
 
 
 /**
- * File containing CMaintenance class for API.
- * @package API
- */
-/**
  * Class containing methods for operations with maintenances.
+ *
+ * * @package API
  */
 class CMaintenance extends CZBXAPI {
 

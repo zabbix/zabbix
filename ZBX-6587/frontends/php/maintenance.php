@@ -26,7 +26,7 @@ require_once dirname(__FILE__).'/include/forms.inc.php';
 
 $page['title'] = _('Configuration of maintenance');
 $page['file'] = 'maintenance.php';
-$page['hist_arg'] = array('groupid', 'hostid');
+$page['hist_arg'] = array('groupid');
 $page['scripts'] = array('class.calendar.js');
 
 require_once dirname(__FILE__).'/include/page_header.php';
@@ -37,10 +37,9 @@ $fields = array(
 	'groups' =>								array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
 	'hostids' =>							array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
 	'groupids' =>							array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
-	'hostid' =>								array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
 	'groupid' =>							array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
 	// maintenance
-	'maintenanceid' =>						array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		'isset({form})&&({form}=="update")'),
+	'maintenanceid' =>						array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		'isset({form})&&{form}=="update"'),
 	'maintenanceids' =>						array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID, 		null),
 	'mname' =>								array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({save})', _('Name')),
 	'maintenance_type' =>					array(T_ZBX_INT, O_OPT, null,	null,		'isset({save})'),
@@ -81,6 +80,7 @@ $fields = array(
 );
 check_fields($fields);
 validate_sort_and_sortorder('name', ZBX_SORT_UP);
+
 /*
  * Permissions
  */
@@ -104,12 +104,6 @@ if (get_request('groupid', 0) > 0) {
 		access_deny();
 	}
 }
-if (get_request('hostid', 0) > 0) {
-	$hostids = available_hosts($_REQUEST['hostid'], 1);
-	if (empty($hostids)) {
-		access_deny();
-	}
-}
 $_REQUEST['go'] = get_request('go', 'none');
 
 /*
@@ -123,10 +117,6 @@ elseif (isset($_REQUEST['cancel_new_timeperiod'])) {
 	unset($_REQUEST['new_timeperiod']);
 }
 elseif (isset($_REQUEST['save'])) {
-	if (!count(get_accessible_nodes_by_user(CWebUser::$data, PERM_READ_WRITE, PERM_RES_IDS_ARRAY))) {
-		access_deny();
-	}
-
 	if (isset($_REQUEST['maintenanceid'])) {
 		$msg1 = _('Maintenance updated');
 		$msg2 = _('Cannot update maintenance');
@@ -167,20 +157,24 @@ elseif (isset($_REQUEST['save'])) {
 
 	if ($result) {
 		if (isset($_REQUEST['active_since'])) {
-			$activeSince = mktime($_REQUEST['active_since_hour'],
-					$_REQUEST['active_since_minute'],
-					0,
-					$_REQUEST['active_since_month'],
-					$_REQUEST['active_since_day'],
-					$_REQUEST['active_since_year']);
+			$activeSince = mktime(
+				$_REQUEST['active_since_hour'],
+				$_REQUEST['active_since_minute'],
+				0,
+				$_REQUEST['active_since_month'],
+				$_REQUEST['active_since_day'],
+				$_REQUEST['active_since_year']
+			);
 		}
 		if (isset($_REQUEST['active_till'])) {
-			$activeTill = mktime($_REQUEST['active_till_hour'],
-					$_REQUEST['active_till_minute'],
-					0,
-					$_REQUEST['active_till_month'],
-					$_REQUEST['active_till_day'],
-					$_REQUEST['active_till_year']);
+			$activeTill = mktime(
+				$_REQUEST['active_till_hour'],
+				$_REQUEST['active_till_minute'],
+				0,
+				$_REQUEST['active_till_month'],
+				$_REQUEST['active_till_day'],
+				$_REQUEST['active_till_year']
+			);
 		}
 
 		$maintenance = array(
@@ -207,13 +201,11 @@ elseif (isset($_REQUEST['save'])) {
 		add_audit(!isset($_REQUEST['maintenanceid']) ? AUDIT_ACTION_ADD : AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_MAINTENANCE, _('Name').NAME_DELIMITER.$_REQUEST['mname']);
 		unset($_REQUEST['form']);
 	}
+
 	show_messages($result, $msg1, $msg2);
+	clearCookies($result);
 }
 elseif (isset($_REQUEST['delete']) || $_REQUEST['go'] == 'delete') {
-	if (!count(get_accessible_nodes_by_user(CWebUser::$data, PERM_READ_WRITE, PERM_RES_IDS_ARRAY))) {
-		access_deny();
-	}
-
 	$maintenanceids = get_request('maintenanceid', array());
 	if (isset($_REQUEST['maintenanceids'])) {
 		$maintenanceids = $_REQUEST['maintenanceids'];
@@ -226,14 +218,16 @@ elseif (isset($_REQUEST['delete']) || $_REQUEST['go'] == 'delete') {
 		$maintenances[$maintenanceid] = get_maintenance_by_maintenanceid($maintenanceid);
 	}
 
-	$go_result = API::Maintenance()->delete($maintenanceids);
-	if ($go_result) {
+	$goResult = API::Maintenance()->delete($maintenanceids);
+	if ($goResult) {
 		foreach ($maintenances as $maintenanceid => $maintenance) {
 			add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_MAINTENANCE, 'Id ['.$maintenanceid.'] '._('Name').' ['.$maintenance['name'].']');
 		}
 		unset($_REQUEST['form'], $_REQUEST['maintenanceid']);
 	}
-	show_messages($go_result, _('Maintenance deleted'), _('Cannot delete maintenance'));
+
+	show_messages($goResult, _('Maintenance deleted'), _('Cannot delete maintenance'));
+	clearCookies($goResult);
 }
 elseif (isset($_REQUEST['add_timeperiod']) && isset($_REQUEST['new_timeperiod'])) {
 	$new_timeperiod = $_REQUEST['new_timeperiod'];
@@ -245,6 +239,7 @@ elseif (isset($_REQUEST['add_timeperiod']) && isset($_REQUEST['new_timeperiod'])
 			$_REQUEST['new_timeperiod_start_date_day'],
 			$_REQUEST['new_timeperiod_start_date_year']);
 	}
+
 	// start time
 	$new_timeperiod['start_time'] = ($new_timeperiod['hour'] * SEC_PER_HOUR) + ($new_timeperiod['minute'] * SEC_PER_MIN);
 
@@ -381,12 +376,6 @@ elseif (isset($_REQUEST['edit_timeperiodid'])) {
 	}
 }
 
-if ($_REQUEST['go'] != 'none' && !empty($go_result)) {
-	$url = new CUrl();
-	$path = $url->getPath();
-	insert_js('cookie.eraseArray("'.$path.'")');
-}
-
 $options = array(
 	'groups' => array('editable' => 1),
 	'groupid' => get_request('groupid', null)
@@ -398,6 +387,7 @@ $_REQUEST['groupid'] = $pageFilter->groupid;
  * Display
  */
 $data = array('form' => get_request('form'));
+
 if (!empty($data['form'])) {
 	$data['maintenanceid'] = get_request('maintenanceid');
 	$data['form_refresh'] = get_request('form_refresh', 0);
@@ -415,23 +405,21 @@ if (!empty($data['form'])) {
 		CArrayHelper::sort($data['timeperiods'], array('timeperiod_type', 'start_date'));
 
 		// get hosts
-		$options = array(
+		$data['hostids'] = API::Host()->get(array(
 			'maintenanceids' => $data['maintenanceid'],
 			'real_hosts' => true,
 			'output' => array('hostid'),
 			'editable' => true
-		);
-		$data['hostids'] = API::Host()->get($options);
+		));
 		$data['hostids'] = zbx_objectValues($data['hostids'], 'hostid');
 
 		// get groupids
-		$options = array(
+		$data['groupids'] = API::HostGroup()->get(array(
 			'maintenanceids' => $data['maintenanceid'],
 			'real_hosts' => true,
 			'output' => array('groupid'),
 			'editable' => true
-		);
-		$data['groupids'] = API::HostGroup()->get($options);
+		));
 		$data['groupids'] = zbx_objectValues($data['groupids'], 'groupid');
 	}
 	else {
@@ -466,13 +454,12 @@ if (!empty($data['form'])) {
 	}
 
 	// get groups
-	$options = array(
+	$data['all_groups'] = API::HostGroup()->get(array(
 		'editable' => true,
 		'output' => array('groupid', 'name'),
 		'real_hosts' => true,
 		'preservekeys' => true
-	);
-	$data['all_groups'] = API::HostGroup()->get($options);
+	));
 	order_result($data['all_groups'], 'name');
 
 	$data['twb_groupid'] = get_request('twb_groupid', 0);
@@ -482,23 +469,21 @@ if (!empty($data['form'])) {
 	}
 
 	// get hosts from selected twb group
-	$options = array(
+	$data['hosts'] = API::Host()->get(array(
 		'output' => array('hostid', 'name'),
-		'real_hosts' => 1,
-		'editable' => 1,
+		'real_hosts' => true,
+		'editable' => true,
 		'groupids' => $data['twb_groupid']
-	);
-	$data['hosts'] = API::Host()->get($options);
+	));
 
 	// selected hosts
-	$options = array(
+	$hostsSelected = API::Host()->get(array(
 		'output' => array('hostid', 'name'),
-		'real_hosts' => 1,
-		'editable' => 1,
+		'real_hosts' => true,
+		'editable' => true,
 		'hostids' => $data['hostids']
-	);
-	$hosts_selected = API::Host()->get($options);
-	$data['hosts'] = array_merge($data['hosts'], $hosts_selected);
+	));
+	$data['hosts'] = array_merge($data['hosts'], $hostsSelected);
 	$data['hosts'] = zbx_toHash($data['hosts'], 'hostid');
 	order_result($data['hosts'], 'name');
 
@@ -513,7 +498,7 @@ else {
 	$sortorder = getPageSortOrder();
 	$options = array(
 		'output' => API_OUTPUT_EXTEND,
-		'editable' => 1,
+		'editable' => true,
 		'sortfield' => $sortfield,
 		'sortorder' => $sortorder,
 		'limit' => $config['search_limit'] + 1

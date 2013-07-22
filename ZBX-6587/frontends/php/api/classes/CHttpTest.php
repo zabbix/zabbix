@@ -19,6 +19,11 @@
 **/
 
 
+/**
+ * Class containing methods for operations with http tests.
+ *
+ * @package API
+ */
 class CHttpTest extends CZBXAPI {
 
 	protected $tableName = 'httptest';
@@ -63,7 +68,7 @@ class CHttpTest extends CZBXAPI {
 			'search'         => null,
 			'searchByAny'    => null,
 			'startSearch'    => null,
-			'exludeSearch'   => null,
+			'excludeSearch'  => null,
 			// output
 			'output'         => API_OUTPUT_REFER,
 			'expandName'     => null,
@@ -90,13 +95,12 @@ class CHttpTest extends CZBXAPI {
 
 			$sqlParts['where'][] = 'EXISTS ('.
 					'SELECT NULL'.
-					' FROM applications a,hosts_groups hgg'.
+					' FROM hosts_groups hgg'.
 						' JOIN rights r'.
 							' ON r.id=hgg.groupid'.
 								' AND '.dbConditionInt('r.groupid', $userGroups).
-					' WHERE a.applicationid=ht.applicationid'.
-						' AND a.hostid=hgg.hostid'.
-					' GROUP BY a.applicationid'.
+					' WHERE ht.hostid=hgg.hostid'.
+					' GROUP BY hgg.hostid'.
 					' HAVING MIN(r.permission)>'.PERM_DENY.
 						' AND MAX(r.permission)>='.$permission.
 					')';
@@ -287,8 +291,7 @@ class CHttpTest extends CZBXAPI {
 
 		$this->validateCreate($httpTests);
 
-		$httpTestManager = new CHttpTestManager();
-		$httpTests = $httpTestManager->persist($httpTests);
+		$httpTests = Manager::HttpTest()->persist($httpTests);
 
 		return array('httptestids' => zbx_objectValues($httpTests, 'httptestid'));
 	}
@@ -356,8 +359,7 @@ class CHttpTest extends CZBXAPI {
 
 		$this->validateUpdate($httpTests);
 
-		$httpTestManager = new CHttpTestManager();
-		$httpTestManager->persist($httpTests);
+		Manager::HttpTest()->persist($httpTests);
 
 		return array('httptestids' => zbx_objectValues($httpTests, 'httptestid'));
 	}

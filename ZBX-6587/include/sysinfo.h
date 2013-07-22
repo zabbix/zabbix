@@ -147,10 +147,8 @@ extern int	CONFIG_UNSAFE_USER_PARAMETERS;
 int	get_diskstat(const char *devname, zbx_uint64_t *dstat);
 
 /* flags for process */
-#define PROCESS_TEST		1
-#define PROCESS_USE_TEST_PARAM	2
-#define PROCESS_LOCAL_COMMAND	4
-#define PROCESS_MODULE_COMMAND	8
+#define PROCESS_LOCAL_COMMAND	1
+#define PROCESS_MODULE_COMMAND	2
 
 void	init_metrics();
 int	add_metric(ZBX_METRIC *new, char *error, size_t max_error_len);
@@ -161,7 +159,7 @@ int	process(const char *in_command, unsigned flags, AGENT_RESULT *result);
 int	add_user_parameter(const char *key, char *command, char *error, size_t max_error_len);
 int	add_user_module(const char *key, int (*function)());
 void	test_parameters();
-void	test_parameter(const char *key, unsigned flags);
+void	test_parameter(const char *key);
 
 void	init_result(AGENT_RESULT *result);
 void	free_result(AGENT_RESULT *result);
@@ -192,6 +190,7 @@ int	SYSTEM_CPU_INTR(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	SYSTEM_CPU_LOAD(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	SYSTEM_CPU_UTIL(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	SYSTEM_CPU_NUM(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	SYSTEM_HOSTNAME(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	SYSTEM_HW_CHASSIS(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	SYSTEM_HW_CPU(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	SYSTEM_HW_DEVICES(AGENT_REQUEST *request, AGENT_RESULT *result);
@@ -203,6 +202,7 @@ int	SYSTEM_SWAP_IN(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	SYSTEM_SWAP_OUT(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	SYSTEM_SWAP_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	SYSTEM_UPTIME(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	SYSTEM_UNAME(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	SYSTEM_BOOTTIME(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	VFS_DEV_READ(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	VFS_DEV_WRITE(AGENT_REQUEST *request, AGENT_RESULT *result);

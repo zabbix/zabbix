@@ -17,8 +17,8 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
+
 $userGroupsWidget = new CWidget();
 
 // append page header to widget
@@ -42,6 +42,7 @@ $userGroupsForm->setName('userGroupsForm');
 $userGroupTable = new CTableInfo(_('No user groups defined.'));
 $userGroupTable->setHeader(array(
 	new CCheckBox('all_groups', null, "checkAll('".$userGroupsForm->getName()."','all_groups','group_groupid');"),
+	$this->data['displayNodes'] ? _('Node') : null,
 	make_sorting_header(_('Name'), 'name'),
 	'#',
 	_('Members'),
@@ -51,75 +52,79 @@ $userGroupTable->setHeader(array(
 ));
 
 foreach ($this->data['usergroups'] as $usrgrp) {
-	$usrgrpid = $usrgrp['usrgrpid'];
+	$userGroupId = $usrgrp['usrgrpid'];
 
-	$debug_mode = ($usrgrp['debug_mode'] == GROUP_DEBUG_MODE_ENABLED)
-		? new CLink(_('Enabled'), 'usergrps.php?go=disable_debug&usrgrpid='.$usrgrpid, 'orange')
-		: new CLink(_('Disabled'), 'usergrps.php?go=enable_debug&usrgrpid='.$usrgrpid, 'enabled');
+	$debugMode = ($usrgrp['debug_mode'] == GROUP_DEBUG_MODE_ENABLED)
+		? new CLink(_('Enabled'), 'usergrps.php?go=disable_debug&usrgrpid='.$userGroupId, 'orange')
+		: new CLink(_('Disabled'), 'usergrps.php?go=enable_debug&usrgrpid='.$userGroupId, 'enabled');
 
 	// gui access
-	$gui_access = user_auth_type2str($usrgrp['gui_access']);
-	$gui_access_style = 'enabled';
+	$guiAccess = user_auth_type2str($usrgrp['gui_access']);
+	$guiAccessStyle = 'enabled';
 	if ($usrgrp['gui_access'] == GROUP_GUI_ACCESS_INTERNAL) {
-		$gui_access_style = 'orange';
+		$guiAccessStyle = 'orange';
 	}
 	if ($usrgrp['gui_access'] == GROUP_GUI_ACCESS_DISABLED) {
-		$gui_access_style = 'disabled';
+		$guiAccessStyle = 'disabled';
 	}
 
-	if (granted2update_group($usrgrpid)) {
-		$next_gui_auth = ($usrgrp['gui_access'] + 1 > GROUP_GUI_ACCESS_DISABLED) ? GROUP_GUI_ACCESS_SYSTEM : ($usrgrp['gui_access'] + 1);
-		$gui_access = new CLink(
-			$gui_access,
-			'usergrps.php?go=set_gui_access&set_gui_access='.$next_gui_auth.'&usrgrpid='.$usrgrpid,
-			$gui_access_style
+	if (granted2update_group($userGroupId)) {
+		$nextGuiAuth = ($usrgrp['gui_access'] + 1 > GROUP_GUI_ACCESS_DISABLED)
+			? GROUP_GUI_ACCESS_SYSTEM
+			: $usrgrp['gui_access'] + 1;
+
+		$guiAccess = new CLink(
+			$guiAccess,
+			'usergrps.php?go=set_gui_access&set_gui_access='.$nextGuiAuth.'&usrgrpid='.$userGroupId,
+			$guiAccessStyle
 		);
 
-		$users_status = ($usrgrp['users_status'] == GROUP_STATUS_ENABLED)
-			? new CLink(_('Enabled'), 'usergrps.php?go=disable_status&usrgrpid='.$usrgrpid, 'enabled')
-			: new CLink(_('Disabled'), 'usergrps.php?go=enable_status&usrgrpid='.$usrgrpid, 'disabled');
+		$usersStatus = ($usrgrp['users_status'] == GROUP_STATUS_ENABLED)
+			? new CLink(_('Enabled'), 'usergrps.php?go=disable_status&usrgrpid='.$userGroupId, 'enabled')
+			: new CLink(_('Disabled'), 'usergrps.php?go=enable_status&usrgrpid='.$userGroupId, 'disabled');
 	}
 	else {
-		$gui_access = new CSpan($gui_access, $gui_access_style);
-		$users_status = ($usrgrp['users_status'] == GROUP_STATUS_ENABLED) ? new CSpan(_('Enabled'), 'enabled') : new CSpan(_('Disabled'), 'disabled');
+		$guiAccess = new CSpan($guiAccess, $guiAccessStyle);
+		$usersStatus = ($usrgrp['users_status'] == GROUP_STATUS_ENABLED) ? new CSpan(_('Enabled'), 'enabled') : new CSpan(_('Disabled'), 'disabled');
 	}
 
 	if (isset($usrgrp['users'])) {
-		$usrgrpusers = $usrgrp['users'];
-		order_result($usrgrpusers, 'alias');
+		$userGroupUsers = $usrgrp['users'];
+		order_result($userGroupUsers, 'alias');
 
 		$users = array();
-		foreach ($usrgrpusers as $user) {
-			$user_type_style = 'enabled';
+		foreach ($userGroupUsers as $user) {
+			$userTypeStyle = 'enabled';
 			if ($user['type'] == USER_TYPE_ZABBIX_ADMIN) {
-				$user_type_style = 'orange';
+				$userTypeStyle = 'orange';
 			}
 			if ($user['type'] == USER_TYPE_SUPER_ADMIN) {
-				$user_type_style = 'disabled';
+				$userTypeStyle = 'disabled';
 			}
 
-			$user_status_style = 'enabled';
+			$userStatusStyle = 'enabled';
 			if ($user['gui_access'] == GROUP_GUI_ACCESS_DISABLED) {
-				$user_status_style = 'disabled';
+				$userStatusStyle = 'disabled';
 			}
 			if ($user['users_status'] == GROUP_STATUS_DISABLED) {
-				$user_status_style = 'disabled';
+				$userStatusStyle = 'disabled';
 			}
 
-			$users[] = new CLink($user['alias'],'users.php?form=update&userid='.$user['userid'], $user_status_style);
+			$users[] = new CLink($user['alias'],'users.php?form=update&userid='.$user['userid'], $userStatusStyle);
 			$users[] = ', ';
 		}
 		array_pop($users);
 	}
 
 	$userGroupTable->addRow(array(
-		new CCheckBox('group_groupid['.$usrgrpid.']', null, null, $usrgrpid),
-		new CLink($usrgrp['name'], 'usergrps.php?form=update&usrgrpid='.$usrgrpid),
-		array(new CLink(_('Users'), 'users.php?&filter_usrgrpid='.$usrgrpid), ' (', count($usrgrp['users']), ')'),
+		new CCheckBox('group_groupid['.$userGroupId.']', null, null, $userGroupId),
+		$this->data['displayNodes'] ? $usrgrp['nodename'] : null,
+		new CLink($usrgrp['name'], 'usergrps.php?form=update&usrgrpid='.$userGroupId),
+		array(new CLink(_('Users'), 'users.php?&filter_usrgrpid='.$userGroupId), ' (', count($usrgrp['users']), ')'),
 		new CCol($users, 'wraptext'),
-		$users_status,
-		$gui_access,
-		$debug_mode
+		$usersStatus,
+		$guiAccess,
+		$debugMode
 	));
 }
 
@@ -155,5 +160,5 @@ $userGroupsForm->addItem(array($this->data['paging'], $userGroupTable, $this->da
 
 // append form to widget
 $userGroupsWidget->addItem($userGroupsForm);
+
 return $userGroupsWidget;
-?>
