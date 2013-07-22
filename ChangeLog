@@ -1,6 +1,7 @@
 Changes for 2.1.2
 
 New features:
+...GI..... [ZBX-6587] fixed Windows binaries descriptions (dimir)
 ...G...... [ZBXNEXT-1528] added net.if.in, net.if.out and net.if.total item support on HP-UX platforms (igors)
 
 Bug fixes:
