@@ -788,19 +788,25 @@ class CMacrosResolver {
 				'(?<parameters>([0-9]+[smhdw]?))'.
 				'\)}{1})/Uux', $str, $matches, PREG_OFFSET_CAPTURE);
 
-			// resolve positional macros in host part and build host-key pair array
-			foreach ($matches['hosts'] as $i => $host) {
-				$matches['hosts'][$i][0] = $this->resolveGraphPositionalMacros($host[0], $items);
-				if ($matches['hosts'][$i][0] !== UNRESOLVED_MACRO_STRING) {
-					if (!isset($hostKeyPairs[$matches['hosts'][$i][0]])) {
-						$hostKeyPairs[$matches['hosts'][$i][0]] = array();
+			if (!empty($matches['hosts'])) {
+				foreach ($matches['hosts'] as $i => $host) {
+					$matches['hosts'][$i][0] = $this->resolveGraphPositionalMacros($host[0], $items);
+					if ($matches['hosts'][$i][0] !== UNRESOLVED_MACRO_STRING) {
+						if (!isset($hostKeyPairs[$matches['hosts'][$i][0]])) {
+							$hostKeyPairs[$matches['hosts'][$i][0]] = array();
+						}
+						$hostKeyPairs[$matches['hosts'][$i][0]][$matches['keys'][$i][0]] = 1;
 					}
-					$hostKeyPairs[$matches['hosts'][$i][0]][$matches['keys'][$i][0]] = 1;
 				}
-			}
 
-			$matchesList[] = $matches;
-			$items = next($itemsList);
+				$matchesList[] = $matches;
+				$items = next($itemsList);
+			}
+		}
+
+		// stop, if no macros found
+		if (empty($matchesList)) {
+			return $strList;
 		}
 
 		// build item retrieval query from host-key pairs
@@ -874,6 +880,7 @@ class CMacrosResolver {
 
 			$matches = next($matchesList);
 		}
+		unset($str);
 
 		return $strList;
 	}
