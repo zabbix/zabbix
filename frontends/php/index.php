@@ -45,6 +45,7 @@ check_fields($fields);
 if (isset($_REQUEST['reconnect'])) {
 	add_audit(AUDIT_ACTION_LOGOUT, AUDIT_RESOURCE_USER, _('Manual Logout'));
 	CWebUser::logout();
+	redirect("index.php");
 }
 
 $config = select_config();
