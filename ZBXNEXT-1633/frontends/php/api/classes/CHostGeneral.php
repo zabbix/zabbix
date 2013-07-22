@@ -141,16 +141,13 @@ abstract class CHostGeneral extends CHostBase {
 
 		parent::link($templateIds, $targetIds);
 
-		$appManager = new CApplicationManager();
-		$httpTestManager = new CHttpTestManager();
-
 		foreach ($targetIds as $targetId) {
 			foreach ($templateIds as $templateId) {
 				if (isset($linked[$targetId]) && isset($linked[$targetId][$templateId])) {
 					continue;
 				}
 
-				$appManager->link($templateId, $targetId);
+				Manager::Application()->link($templateId, $targetId);
 
 				API::DiscoveryRule()->syncTemplates(array(
 					'hostids' => $targetId,
@@ -172,7 +169,7 @@ abstract class CHostGeneral extends CHostBase {
 					'templateids' => $templateId
 				));
 
-				$httpTestManager->link($templateId, $targetId);
+				Manager::HttpTest()->link($templateId, $targetId);
 			}
 
 			// we do linkage in two separate loops because for triggers you need all items already created on host

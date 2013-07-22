@@ -396,7 +396,7 @@ doesnotexist:-o-prefocus, #graphTab .formlist select { padding-top: 1px; padding
 /* menu */
 table.menu { height: 2.8em; }
 table.menu tr { background: #AAAAAA url('../images/gradients/menu_not_active.gif') repeat-x top left; }
-table.menu td { padding: 2px 5px 2px 5px; font-weight: bold; border: 1px solid #aaaaaa; margin: 0; }
+table.menu td { padding: 2px 5px 2px 5px; font-weight: bold; border: 1px solid #aaaaaa; margin: 0; cursor: pointer; }
 table.menu tr td.active { background: #5c9ccc url(themes/originalblue/images/bg_h-hard_55.png) 50% 50% repeat-x; border-color: #4c8cbc; }
 
 /* sub menu */
@@ -532,10 +532,11 @@ div.suggest { position: absolute; border: 1px #5C7099 solid; width: 162px; z-ind
 	background-image: linear-gradient(#F4F4F4 20%, #F0F0F0 50%, #E8E8E8 52%, #EEE 100%);
 	border-radius: 3px; -webkit-border-radius: 3px; -moz-border-radius: 3px;
 }
+.multiselect .selected ul li { position: relative; }
 .multiselect .selected ul li.pressed { background: #D4D4D4; }
-.multiselect .selected ul li span.text { padding: 0 4px 0 4px; }
+.multiselect .selected ul li span.text { padding: 0 4px; text-align: justify; white-space: nowrap; }
 .multiselect .selected ul li span.arrow {
-	padding: 0 6px; cursor: pointer; position: relative; z-index: 11;
+	padding: 0 -12px 0 12px; cursor: pointer; position: absolute; z-index: 11; width: 12px; height: 12px; right: 0px;
 	background: url("../images/general/multiselect.png") no-repeat -12px 1px;
 }
 .multiselect .selected ul li span.arrow:hover { background-position: -12px -19px; }
