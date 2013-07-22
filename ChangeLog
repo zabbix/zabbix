@@ -4,6 +4,7 @@ New features:
 ...G...... [ZBXNEXT-1528] added net.if.in, net.if.out and net.if.total item support on HP-UX platforms (igors)
 
 Bug fixes:
+..F....... [ZBX-6143] fixed choice for icon label location (Guntis)
 ..F....... [ZBX-6372] in trigger filtering, trigger severity default value changed to "Not classified" (Guntis)
 ..F....... [ZBX-6624] fixed incorrect y-axis interval names for "s" units (Oleg)
 ...G...... [ZBX-282] added sensor item support for Linux kernels newer than v2.4 (igors)
