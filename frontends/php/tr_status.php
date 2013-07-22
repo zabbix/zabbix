@@ -101,7 +101,7 @@ if (isset($_REQUEST['filter_rst'])) {
 	$_REQUEST['show_triggers'] = TRIGGERS_OPTION_ONLYTRUE;
 	$_REQUEST['show_events'] = EVENTS_OPTION_NOEVENT;
 	$_REQUEST['ack_status'] = ZBX_ACK_STS_ANY;
-	$_REQUEST['show_severity'] = -1;
+	$_REQUEST['show_severity'] = TRIGGER_SEVERITY_NOT_CLASSIFIED;
 	$_REQUEST['txt_select'] = '';
 	$_REQUEST['status_change'] = 0;
 	$_REQUEST['status_change_days'] = 14;
@@ -164,7 +164,7 @@ if (isset($_REQUEST['show_severity'])) {
 	CProfile::update('web.tr_status.filter.show_severity', $_REQUEST['show_severity'], PROFILE_TYPE_INT);
 }
 else {
-	$_REQUEST['show_severity'] = CProfile::get('web.tr_status.filter.show_severity', -1);
+	$_REQUEST['show_severity'] = CProfile::get('web.tr_status.filter.show_severity', TRIGGER_SEVERITY_NOT_CLASSIFIED);
 }
 
 // status change
@@ -286,7 +286,6 @@ $filterForm->addRow(_('Events'), $eventsComboBox);
 
 $severityComboBox = new CComboBox('show_severity', $showSeverity);
 $severityComboBox->addItems(array(
-	-1 => _('All'),
 	TRIGGER_SEVERITY_NOT_CLASSIFIED => getSeverityCaption(TRIGGER_SEVERITY_NOT_CLASSIFIED),
 	TRIGGER_SEVERITY_INFORMATION => getSeverityCaption(TRIGGER_SEVERITY_INFORMATION),
 	TRIGGER_SEVERITY_WARNING => getSeverityCaption(TRIGGER_SEVERITY_WARNING),
@@ -402,7 +401,7 @@ if ($ackStatus == ZBX_ACK_STS_WITH_UNACK) {
 if ($ackStatus == ZBX_ACK_STS_WITH_LAST_UNACK) {
 	$options['withLastEventUnacknowledged'] = 1;
 }
-if ($showSeverity > -1) {
+if ($showSeverity > TRIGGER_SEVERITY_NOT_CLASSIFIED) {
 	$options['min_severity'] = $showSeverity;
 }
 if ($_REQUEST['status_change']) {

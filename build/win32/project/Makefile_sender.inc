@@ -5,6 +5,7 @@ MC = mc.exe
 MT = mt.exe
 MESSAGES_H = messages.h
 RESOURCE_H = resource.h
+DESC_H = zabbix_sender_desc.h
 RESOURCE_RC = resource.rc
 RESOURCE_RES = zabbix_sender.res
 OBJS = ..\..\..\src\libs\zbxcommon\comms.o \
@@ -40,7 +41,7 @@ $(PROGNAME): $(MESSAGES_H) $(OBJS) $(RESOURCE_RES)
 $(MESSAGES_H): messages.mc
 	$(MC) -U -h ".\\" -r ".\\" messages.mc
 
-$(RESOURCE_RES): $(RESOURCE_RC) $(RESOURCE_H)
+$(RESOURCE_RES): $(RESOURCE_RC) $(RESOURCE_H) $(DESC_H)
 	$(RC) /d "NDEBUG" /d "_VC80_UPGRADE=0x0600" /l 0x419 /fo"$(RESOURCE_RES)" $(RESOURCE_RC)
 
 ..\..\..\src\libs\zbxcommon\alias.o: ..\..\..\src\libs\zbxcommon\alias.c
