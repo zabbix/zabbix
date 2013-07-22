@@ -257,26 +257,36 @@ class CTemplate extends CHostGeneral {
 
 		// with_items
 		if (!is_null($options['with_items'])) {
-			$sqlParts['where'][] = 'EXISTS (SELECT NULL FROM items i WHERE h.hostid=i.hostid )';
+			$sqlParts['where'][] = 'EXISTS ('.
+				'SELECT NULL'.
+				' FROM items i'.
+				' WHERE h.hostid=i.hostid'.
+					' AND i.flags IN ('.ZBX_FLAG_DISCOVERY_NORMAL.','.ZBX_FLAG_DISCOVERY_CREATED.')'.
+				')';
 		}
 
 		// with_triggers
 		if (!is_null($options['with_triggers'])) {
-			$sqlParts['where'][] = 'EXISTS('.
+			$sqlParts['where'][] = 'EXISTS ('.
 				'SELECT NULL'.
 				' FROM items i,functions f,triggers t'.
 				' WHERE i.hostid=h.hostid'.
-				' AND i.itemid=f.itemid'.
-				' AND f.triggerid=t.triggerid)';
+					' AND i.itemid=f.itemid'.
+					' AND f.triggerid=t.triggerid'.
+					' AND t.flags IN ('.ZBX_FLAG_DISCOVERY_NORMAL.','.ZBX_FLAG_DISCOVERY_CREATED.')'.
+				')';
 		}
 
 		// with_graphs
 		if (!is_null($options['with_graphs'])) {
-			$sqlParts['where'][] = 'EXISTS('.
+			$sqlParts['where'][] = 'EXISTS ('.
 				'SELECT NULL'.
-				' FROM items i,graphs_items gi'.
+				' FROM items i,graphs_items gi,graphs g'.
 				' WHERE i.hostid=h.hostid'.
-				' AND i.itemid=gi.itemid)';
+					' AND i.itemid=gi.itemid'.
+					' AND gi.graphid=g.graphid'.
+					' AND g.flags IN ('.ZBX_FLAG_DISCOVERY_NORMAL.','.ZBX_FLAG_DISCOVERY_CREATED.')'.
+				')';
 		}
 
 		// with_httptests
