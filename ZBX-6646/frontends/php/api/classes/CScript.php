@@ -390,79 +390,18 @@ class CScript extends CZBXAPI {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
 		}
 
-		if (!$socket = @fsockopen($ZBX_SERVER, $ZBX_SERVER_PORT, $errorCode, $errorMsg, ZBX_SCRIPT_TIMEOUT)) {
-			switch ($errorMsg) {
-				case 'Connection refused':
-					$dErrorMsg = _s("Connection to Zabbix server \"%s\" refused. Possible reasons:\n1. Incorrect server IP/DNS in the \"zabbix.conf.php\";\n2. Security environment (for example, SELinux) is blocking the connection;\n3. Zabbix server daemon not running;\n4. Firewall is blocking TCP connection.\n", $ZBX_SERVER);
-					break;
-
-				case 'No route to host':
-					$dErrorMsg = _s("Zabbix server \"%s\" can not be reached. Possible reasons:\n1. Incorrect server IP/DNS in the \"zabbix.conf.php\";\n2. Incorrect network configuration.\n", $ZBX_SERVER);
-					break;
-
-				case 'Connection timed out':
-					$dErrorMsg = _s("Connection to Zabbix server \"%s\" timed out. Possible reasons:\n1. Incorrect server IP/DNS in the \"zabbix.conf.php\";\n2. Firewall is blocking TCP connection.\n", $ZBX_SERVER);
-					break;
-
-				case 'php_network_getaddresses: getaddrinfo failed: Name or service not known':
-					$dErrorMsg = _s("Connection to Zabbix server \"%s\" failed. Possible reasons:\n1. Incorrect server IP/DNS in the \"zabbix.conf.php\";\n2. Incorrect DNS server configuration.\n", $ZBX_SERVER);
-					break;
-
-				default:
-					$dErrorMsg = '';
-			}
-			self::exception(ZBX_API_ERROR_INTERNAL, $dErrorMsg._('Error description').NAME_DELIMITER.$errorMsg);
-		}
-
-		$json = new CJSON();
-		$array = array(
-			'request' => 'command',
-			'nodeid' => id2nodeid($hostId),
-			'scriptid' => $scriptId,
-			'hostid' => $hostId
-		);
-		$dataToSend = $json->encode($array, false);
-
-		stream_set_timeout($socket, ZBX_SCRIPT_TIMEOUT);
-
-		if (fwrite($socket, $dataToSend) === false) {
-			self::exception(ZBX_API_ERROR_INTERNAL, _('Error description: can\'t send command, check connection.'));
-		}
-
-		$response = '';
-
-		$pbl = (ZBX_SCRIPT_BYTES_LIMIT > 8192) ? 8192 : ZBX_SCRIPT_BYTES_LIMIT; // PHP read bytes limit
-		$now = time();
-		$i = 0;
-		while (!feof($socket)) {
-			$i++;
-			if ((time() - $now) >= ZBX_SCRIPT_TIMEOUT) {
-				self::exception(ZBX_API_ERROR_INTERNAL,
-					_('Error description: defined in "include/defines.inc.php" constant ZBX_SCRIPT_TIMEOUT timeout is reached. You can try to increase this value.'));
-			}
-			elseif (($i * $pbl) >= ZBX_SCRIPT_BYTES_LIMIT) {
-				self::exception(ZBX_API_ERROR_INTERNAL,
-					_('Error description: defined in "include/defines.inc.php" constant ZBX_SCRIPT_BYTES_LIMIT read bytes limit is reached. You can try to increase this value.'));
-			}
-
-			if (($out = fread($socket, $pbl)) !== false) {
-				$response .= $out;
-			}
-			else {
-				self::exception(ZBX_API_ERROR_INTERNAL, _('Error description: can\'t read script response, check connection.'));
-			}
-		}
-
-		if (strlen($response) > 0) {
-			$rcv = $json->decode($response, true);
+		// execute the script
+		$zabbixServer = new CZabbixServer($ZBX_SERVER, $ZBX_SERVER_PORT, ZBX_SCRIPT_TIMEOUT, ZBX_SOCKET_BYTES_LIMIT);
+		if ($result = $zabbixServer->executeScript($scriptId, $hostId)) {
+			// return the result as the server would
+			return array(
+				'response' => 'success',
+				'value' => $result
+			);
 		}
 		else {
-			self::exception(ZBX_API_ERROR_INTERNAL, _('Error description: empty response received.'));
+			self::exception(ZBX_API_ERROR_INTERNAL, $zabbixServer->getError());
 		}
-
-		fclose($socket);
-
-		return $rcv;
 	}
 
 	/**

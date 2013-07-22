@@ -130,6 +130,7 @@ if (isset($_REQUEST['save'])) {
 	if ($result) {
 		add_audit($action, AUDIT_RESOURCE_MEDIA_TYPE, 'Media type ['.$mediaType['description'].']');
 		unset($_REQUEST['form']);
+		clearCookies($result);
 	}
 }
 elseif (isset($_REQUEST['delete']) && !empty($mediaTypeId)) {
@@ -140,6 +141,7 @@ elseif (isset($_REQUEST['delete']) && !empty($mediaTypeId)) {
 	}
 
 	show_messages($result, _('Media type deleted'), _('Cannot delete media type'));
+	clearCookies($result);
 }
 elseif ($_REQUEST['go'] == 'activate') {
 	$mediaTypeIds = get_request('mediatypeids', array());
@@ -153,9 +155,10 @@ elseif ($_REQUEST['go'] == 'activate') {
 		);
 	}
 
-	$go_result = API::Mediatype()->update($options);
+	$goResult = API::Mediatype()->update($options);
 
-	show_messages($go_result, _('Media type enabled'), _('Cannot enable media type'));
+	show_messages($goResult, _('Media type enabled'), _('Cannot enable media type'));
+	clearCookies($goResult);
 }
 elseif ($_REQUEST['go'] == 'disable') {
 	$mediaTypeIds = get_request('mediatypeids', array());
@@ -169,20 +172,16 @@ elseif ($_REQUEST['go'] == 'disable') {
 		);
 	}
 
-	$go_result = API::Mediatype()->update($options);
+	$goResult = API::Mediatype()->update($options);
 
-	show_messages($go_result, _('Media type disabled'), _('Cannot disable media type'));
+	show_messages($goResult, _('Media type disabled'), _('Cannot disable media type'));
+	clearCookies($goResult);
 }
 elseif ($_REQUEST['go'] == 'delete') {
-	$go_result = API::Mediatype()->delete(get_request('mediatypeids', array()));
+	$goResult = API::Mediatype()->delete(get_request('mediatypeids', array()));
 
-	show_messages($go_result, _('Media type deleted'), _('Cannot delete media type'));
-}
-
-if ($_REQUEST['go'] != 'none' && isset($go_result) && $go_result) {
-	$url = new CUrl();
-	$path = $url->getPath();
-	insert_js('cookie.eraseArray("'.$path.'")');
+	show_messages($goResult, _('Media type deleted'), _('Cannot delete media type'));
+	clearCookies($goResult);
 }
 
 /*
@@ -285,7 +284,7 @@ else {
 	}
 	else {
 		$arr = array();
-		$data['paging'] = getPagingLine();
+		$data['paging'] = getPagingLine($arr);
 	}
 
 	// render view

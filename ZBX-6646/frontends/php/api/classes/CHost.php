@@ -39,7 +39,6 @@ class CHost extends CHostGeneral {
 	 * @param boolean       $options['templated_hosts']          include templates in result
 	 * @param boolean       $options['with_items']               only with items
 	 * @param boolean       $options['with_monitored_items']     only with monitored items
-	 * @param boolean       $options['with_historical_items']    only with historical items
 	 * @param boolean       $options['with_triggers']            only with triggers
 	 * @param boolean       $options['with_monitored_triggers']  only with monitored triggers
 	 * @param boolean       $options['with_httptests']           only with http tests
@@ -96,7 +95,6 @@ class CHost extends CHostGeneral {
 			'proxy_hosts'				=> null,
 			'with_items'				=> null,
 			'with_monitored_items'		=> null,
-			'with_historical_items'		=> null,
 			'with_simple_graph_items'	=> null,
 			'with_triggers'				=> null,
 			'with_monitored_triggers'	=> null,
@@ -307,12 +305,13 @@ class CHost extends CHostGeneral {
 			$sqlParts['where']['status'] = 'h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.')';
 		}
 
-		// with_items, with_monitored_items, with_historical_items, with_simple_graph_items
+		// with_items, with_monitored_items, with_simple_graph_items
 		if (!is_null($options['with_items'])) {
 			$sqlParts['where'][] = 'EXISTS ('.
 					'SELECT NULL'.
 					' FROM items i'.
 					' WHERE h.hostid=i.hostid'.
+						' AND i.flags IN ('.ZBX_FLAG_DISCOVERY_NORMAL.','.ZBX_FLAG_DISCOVERY_CREATED.')'.
 					')';
 		}
 		elseif (!is_null($options['with_monitored_items'])) {
@@ -321,15 +320,7 @@ class CHost extends CHostGeneral {
 					' FROM items i'.
 					' WHERE h.hostid=i.hostid'.
 						' AND i.status='.ITEM_STATUS_ACTIVE.
-					')';
-		}
-		elseif (!is_null($options['with_historical_items'])) {
-			$sqlParts['where'][] = 'EXISTS ('.
-					'SELECT NULL'.
-					' FROM items i'.
-					' WHERE h.hostid=i.hostid'.
-						' AND i.status='.ITEM_STATUS_ACTIVE.
-						' AND i.lastvalue IS NOT NULL'.
+						' AND i.flags IN ('.ZBX_FLAG_DISCOVERY_NORMAL.','.ZBX_FLAG_DISCOVERY_CREATED.')'.
 					')';
 		}
 		elseif (!is_null($options['with_simple_graph_items'])) {
@@ -347,9 +338,11 @@ class CHost extends CHostGeneral {
 		if (!is_null($options['with_triggers'])) {
 			$sqlParts['where'][] = 'EXISTS ('.
 					'SELECT NULL'.
-					' FROM items i,functions f'.
+					' FROM items i,functions f,triggers t'.
 					' WHERE h.hostid=i.hostid'.
 						' AND i.itemid=f.itemid'.
+						' AND f.triggerid=t.triggerid'.
+						' AND t.flags IN ('.ZBX_FLAG_DISCOVERY_NORMAL.','.ZBX_FLAG_DISCOVERY_CREATED.')'.
 					')';
 		}
 		elseif (!is_null($options['with_monitored_triggers'])) {
@@ -361,6 +354,7 @@ class CHost extends CHostGeneral {
 						' AND f.triggerid=t.triggerid'.
 						' AND i.status='.ITEM_STATUS_ACTIVE.
 						' AND t.status='.TRIGGER_STATUS_ENABLED.
+						' AND t.flags IN ('.ZBX_FLAG_DISCOVERY_NORMAL.','.ZBX_FLAG_DISCOVERY_CREATED.')'.
 					')';
 		}
 
@@ -370,19 +364,23 @@ class CHost extends CHostGeneral {
 		}
 		elseif (!empty($options['with_monitored_httptests'])) {
 			$sqlParts['where'][] = 'EXISTS ('.
-				' SELECT NULL'.
+				'SELECT NULL'.
 				' FROM httptest ht'.
 				' WHERE h.hostid=ht.hostid'.
-					' AND ht.status='.HTTPTEST_STATUS_ACTIVE.')';
+					' AND ht.status='.HTTPTEST_STATUS_ACTIVE.
+				')';
 		}
 
 		// with_graphs
 		if (!is_null($options['with_graphs'])) {
 			$sqlParts['where'][] = 'EXISTS ('.
-					' SELECT NULL'.
-					' FROM items i,graphs_items gi'.
+					'SELECT NULL'.
+					' FROM items i,graphs_items gi,graphs g'.
 					' WHERE i.hostid=h.hostid'.
-						' AND i.itemid=gi.itemid '.zbx_limit(1).')';
+						' AND i.itemid=gi.itemid '.
+						' AND gi.graphid=g.graphid'.
+						' AND g.flags IN ('.ZBX_FLAG_DISCOVERY_NORMAL.','.ZBX_FLAG_DISCOVERY_CREATED.')'.
+					')';
 		}
 
 		// with applications
@@ -395,7 +393,8 @@ class CHost extends CHostGeneral {
 		if (!is_null($options['withInventory']) && $options['withInventory']) {
 			$sqlParts['where'][] = ' h.hostid IN ('.
 					' SELECT hin.hostid'.
-					' FROM host_inventory hin)';
+					' FROM host_inventory hin'.
+					')';
 		}
 
 		// search

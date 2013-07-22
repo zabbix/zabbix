@@ -542,8 +542,9 @@ class CChart extends CGraphDraw {
 		}
 		if ($this->ymin_type == GRAPH_YAXIS_TYPE_ITEM_VALUE) {
 			$item = get_item_by_itemid($this->ymin_itemid);
-			if ($item && isset($item['lastvalue']) && !is_null($item['lastvalue'])) {
-				return $item['lastvalue'];
+			$history = Manager::History()->fetchLast(array($item));
+			if (isset($history[$item['itemid']])) {
+				return $history[$item['itemid']][0]['value'];
 			}
 		}
 
@@ -613,8 +614,9 @@ class CChart extends CGraphDraw {
 		}
 		if ($this->ymax_type == GRAPH_YAXIS_TYPE_ITEM_VALUE) {
 			$item = get_item_by_itemid($this->ymax_itemid);
-			if ($item && isset($item['lastvalue']) && !is_null($item['lastvalue'])) {
-				 return $item['lastvalue'];
+			$history = Manager::History()->fetchLast(array($item));
+			if (isset($history[$item['itemid']])) {
+				return $history[$item['itemid']][0]['value'];
 			}
 		}
 
@@ -727,6 +729,9 @@ class CChart extends CGraphDraw {
 		}
 
 		// check if items use B or Bps units
+		$leftBase1024 = false;
+		$rightBase1024 = false;
+
 		for ($item = 0; $item < $this->num; $item++) {
 			if ($this->items[$item]['units'] == 'B' || $this->items[$item]['units'] == 'Bps') {
 				if ($this->items[$item]['axisside'] == GRAPH_YAXIS_SIDE_LEFT) {
@@ -804,12 +809,22 @@ class CChart extends CGraphDraw {
 			$rightBase1024 = $tempBase;
 		}
 
-		$tmp_minY = array();
-		$tmp_maxY = array();
-		$tmp_minY[GRAPH_YAXIS_SIDE_LEFT] = $this->m_minY[GRAPH_YAXIS_SIDE_LEFT];
-		$tmp_minY[GRAPH_YAXIS_SIDE_RIGHT] = $this->m_minY[GRAPH_YAXIS_SIDE_RIGHT];
-		$tmp_maxY[GRAPH_YAXIS_SIDE_LEFT] = $this->m_maxY[GRAPH_YAXIS_SIDE_LEFT];
-		$tmp_maxY[GRAPH_YAXIS_SIDE_RIGHT] = $this->m_maxY[GRAPH_YAXIS_SIDE_RIGHT];
+		if (!isset($this->m_minY[$side])) {
+			$this->m_minY[$side] = 0;
+		}
+		if (!isset($this->m_maxY[$side])) {
+			$this->m_maxY[$side] = 0;
+		}
+
+		if (!isset($this->m_minY[$other_side])) {
+			$this->m_minY[$other_side] = 0;
+		}
+		if (!isset($this->m_maxY[$other_side])) {
+			$this->m_maxY[$other_side] = 0;
+		}
+
+		$tmp_minY = $this->m_minY;
+		$tmp_maxY = $this->m_maxY;
 
 		// calc interval
 		$columnInterval = bcdiv(bcmul($this->gridPixelsVert, (bcsub($this->m_maxY[$side], $this->m_minY[$side]))), $this->sizeY);
@@ -833,7 +848,7 @@ class CChart extends CGraphDraw {
 		}
 
 		// calculate interval, if left side use B or Bps
-		if (isset($leftBase1024)) {
+		if ($leftBase1024) {
 			$interval = getBase1024Interval($interval, $this->m_minY[$side], $this->m_maxY[$side]);
 		}
 
@@ -858,7 +873,7 @@ class CChart extends CGraphDraw {
 		}
 
 		// calculate interval, if right side use B or Bps
-		if (isset($rightBase1024)) {
+		if ($rightBase1024) {
 			$interval_other_side = getBase1024Interval($interval_other_side, $this->m_minY[$other_side],
 				$this->m_maxY[$other_side]);
 		}
@@ -867,6 +882,13 @@ class CChart extends CGraphDraw {
 		foreach ($sides as $graphSide) {
 			$minY[$graphSide] = $this->m_minY[$graphSide];
 			$maxY[$graphSide] = $this->m_maxY[$graphSide];
+		}
+
+		if (!isset($minY[$side])) {
+			$minY[$side] = 0;
+		}
+		if (!isset($maxY[$side])) {
+			$maxY[$side] = 0;
 		}
 
 		// correcting MIN & MAX
@@ -1455,6 +1477,10 @@ class CChart extends CGraphDraw {
 		$step = $this->gridStep[GRAPH_YAXIS_SIDE_LEFT];
 		$hstr_count = $this->gridLinesCount[GRAPH_YAXIS_SIDE_LEFT];
 
+		// ignore milliseconds if  -1 <= maxY => 1 or -1 <= minY => 1
+		$ignoreMillisec = (bccomp($maxY, -1) <= 0 || bccomp($maxY, 1) >= 0
+				|| bccomp($minY, -1) <= 0 || bccomp($minY, 1) >= 0);
+
 		$newPow = false;
 		if ($byteStep) {
 			$maxYPow = convertToBase1024($maxY, 1024);
@@ -1493,7 +1519,7 @@ class CChart extends CGraphDraw {
 				continue;
 			}
 
-			$calcValues[] = convert_units($val, null, ITEM_CONVERT_NO_UNITS, $byteStep, $newPow);
+			$str = convert_units($val, $units, ITEM_CONVERT_NO_UNITS, $byteStep, $newPow, $ignoreMillisec);
 		}
 
 		$calcValues[] = convert_units($maxY, null, ITEM_CONVERT_NO_UNITS, $byteStep, $newPow);
@@ -1509,7 +1535,7 @@ class CChart extends CGraphDraw {
 				continue;
 			}
 
-			$str = convert_units($val, $units, ITEM_CONVERT_NO_UNITS, $byteStep, $newPow, $maxLength);
+			$str = convert_units($val, $units, ITEM_CONVERT_NO_UNITS, $byteStep, $newPow, $ignoreMillisec, $maxLength);
 
 			$dims = imageTextSize(8, 0, $str);
 
@@ -1527,7 +1553,7 @@ class CChart extends CGraphDraw {
 			);
 		}
 
-		$str = convert_units($maxY, $units, ITEM_CONVERT_NO_UNITS, $byteStep, $newPow, $maxLength);
+		$str = convert_units($maxY, $units, ITEM_CONVERT_NO_UNITS, $byteStep, $newPow, $ignoreMillisec, $maxLength);
 
 		$dims = imageTextSize(8, 0, $str);
 		imageText(
@@ -1612,6 +1638,10 @@ class CChart extends CGraphDraw {
 		$step = $this->gridStep[GRAPH_YAXIS_SIDE_RIGHT];
 		$hstr_count = $this->gridLinesCount[GRAPH_YAXIS_SIDE_RIGHT];
 
+		// ignore milliseconds if  -1 <= maxY => 1 or -1 <= minY => 1
+		$ignoreMillisec = (bccomp($maxY, -1) <= 0 || bccomp($maxY, 1) >= 0
+				|| bccomp($minY, -1) <= 0 || bccomp($minY, 1) >= 0);
+
 		$newPow = false;
 		if ($byteStep) {
 			$maxYPow = convertToBase1024($maxY, 1024);
@@ -1666,7 +1696,7 @@ class CChart extends CGraphDraw {
 				continue;
 			}
 
-			$str = convert_units($val, $units, ITEM_CONVERT_NO_UNITS, $byteStep, $newPow, $maxLength);
+			$str = convert_units($val, $units, ITEM_CONVERT_NO_UNITS, $byteStep, $newPow, $ignoreMillisec, $maxLength);
 
 			// marker Y coordinate
 			$posY = $this->sizeY + $this->shiftY - $this->gridStepX[GRAPH_YAXIS_SIDE_RIGHT] * $i + 4;
@@ -1682,7 +1712,7 @@ class CChart extends CGraphDraw {
 			);
 		}
 
-		$str = convert_units($maxY, $units, ITEM_CONVERT_NO_UNITS, $byteStep, $newPow, $maxLength);
+		$str = convert_units($maxY, $units, ITEM_CONVERT_NO_UNITS, $byteStep, $newPow, $ignoreMillisec, $maxLength);
 		imageText(
 			$this->im,
 			8,
@@ -1874,17 +1904,17 @@ class CChart extends CGraphDraw {
 			$color = $this->getColor($this->items[$i]['color'], GRAPH_STACKED_ALFA);
 			switch ($this->items[$i]['calc_fnc']) {
 				case CALC_FNC_MIN:
-					$fnc_name = _('min');
+					$fncRealName = _('min');
 					break;
 				case CALC_FNC_MAX:
-					$fnc_name = _('max');
+					$fncRealName = _('max');
 					break;
 				case CALC_FNC_ALL:
-					$fnc_name = _('all');
+					$fncRealName = _('all');
 					break;
 				case CALC_FNC_AVG:
 				default:
-					$fnc_name = _('avg');
+					$fncRealName = _('avg');
 			}
 
 			$data = &$this->data[$this->items[$i]['itemid']][$this->items[$i]['calc_type']];
@@ -1919,7 +1949,7 @@ class CChart extends CGraphDraw {
 
 				$legend->addCell($rowNum, array('image' => $colorSquare, 'marginRight' => 5));
 				$legend->addCell($rowNum, array('text' => $item_caption));
-				$legend->addCell($rowNum, array('text' => '['.$fnc_name.']'));
+				$legend->addCell($rowNum, array('text' => '['.$fncRealName.']'));
 				$legend->addCell($rowNum, array(
 					'text' => convert_units($this->getLastValue($i), $this->items[$i]['units'], ITEM_CONVERT_NO_UNITS),
 					'align' => 2

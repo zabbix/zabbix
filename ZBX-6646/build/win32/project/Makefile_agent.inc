@@ -5,6 +5,7 @@ MC = mc.exe
 MT = mt.exe
 MESSAGES_H = messages.h
 RESOURCE_H = resource.h
+DESC_H = zabbix_agent_desc.h
 RESOURCE_RC = resource.rc
 RESOURCE_RES = zabbix_agent.res
 OBJS  = ..\..\..\src\libs\zbxcommon\alias.o \
@@ -48,6 +49,9 @@ OBJS  = ..\..\..\src\libs\zbxcommon\alias.o \
 	..\..\..\src\libs\zbxsysinfo\win32\uptime.o \
 	..\..\..\src\libs\zbxsysinfo\win32\win32.o \
 	..\..\..\src\libs\zbxsysinfo\sysinfo.o \
+	..\..\..\src\libs\zbxsysinfo\win32\software.o \
+	..\..\..\src\libs\zbxsysinfo\win32\system.o \
+	..\..\..\src\libs\zbxsysinfo\win32\hostname.o \
 	..\..\..\src\libs\zbxwin32\perfmon.o \
 	..\..\..\src\libs\zbxwin32\service.o \
 	..\..\..\src\zabbix_agent\active.o \
@@ -74,7 +78,7 @@ $(PROGNAME): $(MESSAGES_H) $(OBJS) $(RESOURCE_RES)
 $(MESSAGES_H): messages.mc
 	$(MC) -U -h ".\\" -r ".\\" messages.mc
 
-$(RESOURCE_RES): $(RESOURCE_RC) $(RESOURCE_H)
+$(RESOURCE_RES): $(RESOURCE_RC) $(RESOURCE_H) $(DESC_H)
 	$(RC) /d "NDEBUG" /d "_VC80_UPGRADE=0x0600" /l 0x419 /fo"$(RESOURCE_RES)" $(RESOURCE_RC)
 
 ..\..\..\src\libs\zbxcommon\alias.o: ..\..\..\src\libs\zbxcommon\alias.c
@@ -179,6 +183,15 @@ $(RESOURCE_RES): $(RESOURCE_RC) $(RESOURCE_H)
 ..\..\..\src\libs\zbxsysinfo\win32\net.o: ..\..\..\src\libs\zbxsysinfo\win32\net.c
 	$(CC) ..\..\..\src\libs\zbxsysinfo\win32\net.c /Fo"..\..\..\src\libs\zbxsysinfo\win32\net.o" $(CFLAGS)
 
+..\..\..\src\libs\zbxsysinfo\win32\system.o: ..\..\..\src\libs\zbxsysinfo\win32\system.c
+	$(CC) ..\..\..\src\libs\zbxsysinfo\win32\system.c /Fo"..\..\..\src\libs\zbxsysinfo\win32\system.o" $(CFLAGS)
+
+..\..\..\src\libs\zbxsysinfo\win32\hostname.o: ..\..\..\src\libs\zbxsysinfo\win32\hostname.c
+	$(CC) ..\..\..\src\libs\zbxsysinfo\win32\hostname.c /Fo"..\..\..\src\libs\zbxsysinfo\win32\hostname.o" $(CFLAGS)
+
+..\..\..\src\libs\zbxsysinfo\win32\software.o: ..\..\..\src\libs\zbxsysinfo\win32\software.c
+	$(CC) ..\..\..\src\libs\zbxsysinfo\win32\software.c /Fo"..\..\..\src\libs\zbxsysinfo\win32\software.o" $(CFLAGS)
+
 ..\..\..\src\libs\zbxsysinfo\win32\pdhmon.o: ..\..\..\src\libs\zbxsysinfo\win32\pdhmon.c
 	$(CC) ..\..\..\src\libs\zbxsysinfo\win32\pdhmon.c /Fo"..\..\..\src\libs\zbxsysinfo\win32\pdhmon.o" $(CFLAGS)
 
@@ -232,3 +245,5 @@ $(RESOURCE_RES): $(RESOURCE_RC) $(RESOURCE_H)
 
 ..\..\..\src\zabbix_agent\zbxconf.o: ..\..\..\src\zabbix_agent\zbxconf.c
 	$(CC) ..\..\..\src\zabbix_agent\zbxconf.c /Fo"..\..\..\src\zabbix_agent\zbxconf.o" $(CFLAGS)
+
+

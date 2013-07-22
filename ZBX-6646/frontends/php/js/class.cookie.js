@@ -19,14 +19,17 @@
 
 var cookie = {
 	cookies: [],
+	prefix:	null,
 
 	init: function() {
 		var path = new Curl();
-		var page = path.getPath();
+		var filename = basename(path.getPath(), '.php');
+		var cookieName = 'cb_' + filename + (is_null(this.prefix) ? '' : '_' + this.prefix);
 		var allCookies = document.cookie.split('; ');
+
 		for (var i = 0; i < allCookies.length; i++) {
 			var cookiePair = allCookies[i].split('=');
-			if (cookiePair[0].indexOf('cb_') > -1 && cookiePair[0].indexOf('cb_' + page) == -1) {
+			if (cookiePair[0].indexOf('cb_') > -1 && cookiePair[0].indexOf(cookieName) == -1) {
 				this.erase(cookiePair[0]);
 			}
 			else {
@@ -36,19 +39,19 @@ var cookie = {
 	},
 
 	create: function(name, value, days) {
+		var expires = '';
+
 		if (typeof(days) != 'undefined') {
 			var date = new Date();
 			date.setTime(date.getTime() + days * 24 * 60 * 60 * 1000);
-			var expires = '; expires=' + date.toGMTString();
+			expires = '; expires=' + date.toGMTString();
 		}
-		else {
-			var expires = '';
-		}
-		document.cookie = name + '=' + value + expires + '; path=/';
+
+		document.cookie = name + '=' + value + expires;
 
 		// apache header size limit
 		if (document.cookie.length > 8000) {
-			document.cookie = name + '=; path=/';
+			document.cookie = name + '=;';
 			alert(locale['S_MAX_COOKIE_SIZE_REACHED']);
 			return false;
 		}
@@ -87,7 +90,7 @@ var cookie = {
 				break;
 			}
 		}
-		this.create(name + '_parts', part - 1);
+		this.create(name + '_parts', part - 1, days);
 
 		while (part <= part_count) {
 			this.erase(name + '_' + part);
@@ -106,7 +109,7 @@ var cookie = {
 	},
 
 	read: function(name) {
-		if (typeof(this.cookies[name]) != 'undefined') {
+		if (typeof(this.cookies[name]) !== 'undefined') {
 			return this.cookies[name];
 		}
 		else if (document.cookie.indexOf(name) != -1) {
@@ -171,23 +174,17 @@ var cookie = {
 	},
 
 	eraseArray: function(name) {
-		var part_count = parseInt(this.read('cb_' + name + '_parts'), 10);
-		if (!is_null(part_count)) {
-			for (var i = 1; i <= part_count; i++) {
-				this.erase('cb_' + name + '_' + i);
-			}
-			this.erase('cb_' + name + '_parts');
+		if (name.indexOf('cb_') != 0) {
+			name = 'cb_' + name;
 		}
-	},
 
-	eraseArrayByPattern: function(pattern) {
-		for (var name in this.cookies) {
-			if (!isset(name, this.cookies) || empty(this.cookies[name])) {
-				continue;
+		var partCount = parseInt(this.read(name + '_parts'), 10);
+
+		if (!is_null(partCount)) {
+			for (var i = 1; i <= partCount; i++) {
+				this.erase(name + '_' + i);
 			}
-			if (name.indexOf('cb_' + pattern) == -1) {
-				this.erase(name);
-			}
+			this.erase(name + '_parts');
 		}
 	}
 };
