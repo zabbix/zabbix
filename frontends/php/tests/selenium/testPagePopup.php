@@ -324,9 +324,8 @@ class testPagePopup extends CWebTest {
 			' FROM groups g'.
 			' WHERE g.groupid IN ('.
 				'SELECT hg.groupid'.
-				' FROM hosts_groups hg,hosts h,applications a'.
+				' FROM hosts_groups hg,hosts h'.
 				' WHERE hg.hostid=h.hostid'.
-					' AND h.hostid=a.hostid'.
 					' AND h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.','.HOST_STATUS_TEMPLATE.')'.
 			')'
 		);
