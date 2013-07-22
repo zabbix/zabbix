@@ -243,7 +243,7 @@ if (!defined('ZBX_PAGE_NO_MENU')) {
 	else {
 		// it is not possible to logout from HTTP authentication
 		$chck = $page['file'] == 'authentication.php' && isset($_REQUEST['save'], $_REQUEST['config']);
-		if ($chck && $_REQUEST['config'] == ZBX_AUTH_HTTP || !$chck && $config['authentication_type'] == ZBX_AUTH_HTTP) {
+		if ($chck && $_REQUEST['config'] == ZBX_AUTH_HTTP || !$chck && isset($config) && $config['authentication_type'] == ZBX_AUTH_HTTP) {
 			$logout =  new CLink(_('Logout'), '', 'small_font', null, 'nosid');
 			$logout->setHint(_s('It is not possible to logout from HTTP authentication.'), null, null, false);
 		}
