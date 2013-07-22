@@ -132,8 +132,6 @@ class CGraphDraw {
 
 	public function showLegend($type = true) {
 		$this->drawLegend = $type;
-
-		return $this->drawLegend;
 	}
 
 	public function setPeriod($period) {
