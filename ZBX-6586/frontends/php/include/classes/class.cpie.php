@@ -17,8 +17,7 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
 
 class CPie extends CGraphDraw {
 
@@ -40,7 +39,7 @@ class CPie extends CGraphDraw {
 		$this->items[$this->num]['name'] = itemName($this->items[$this->num]);
 		$host = get_host_by_hostid($this->items[$this->num]['hostid']);
 
-		$this->items[$this->num]['host'] = $host['name'];
+		$this->items[$this->num]['hostname'] = $host['name'];
 		$this->items[$this->num]['color'] = is_null($color) ? 'Dark Green' : $color;
 		$this->items[$this->num]['calc_fnc'] = is_null($calc_fnc) ? CALC_FNC_AVG : $calc_fnc;
 		$this->items[$this->num]['calc_type'] = is_null($type) ? GRAPH_ITEM_SIMPLE : $type;
@@ -217,42 +216,41 @@ class CPie extends CGraphDraw {
 				);
 			}
 
-			$curr_data = &$this->data[$this->items[$i]['itemid']][$type];
-			$curr_data->min = null;
-			$curr_data->max = null;
-			$curr_data->avg = null;
-			$curr_data->clock = null;
-			$curr_data->lst = isset($history[$real_item['itemid']]) ? $history[$real_item['itemid']][0]['value'] : null;
+			$this->data[$this->items[$i]['itemid']][$type]['last'] = isset($history[$real_item['itemid']])
+				? $history[$real_item['itemid']][0]['value'] : null;
+			$this->data[$this->items[$i]['itemid']][$type]['shift_min'] = 0;
+			$this->data[$this->items[$i]['itemid']][$type]['shift_max'] = 0;
+			$this->data[$this->items[$i]['itemid']][$type]['shift_avg'] = 0;
 
 			foreach ($sql_arr as $sql) {
 				$result = DBselect($sql);
-
 				while ($row = DBfetch($result)) {
-					$curr_data->min = $row['min'];
-					$curr_data->max = $row['max'];
-					$curr_data->avg = $row['avg'];
-					$curr_data->clock = $row['clock'];
-					$curr_data->shift_min = 0;
-					$curr_data->shift_max = 0;
-					$curr_data->shift_avg = 0;
+					$this->data[$this->items[$i]['itemid']][$type]['min'] = $row['min'];
+					$this->data[$this->items[$i]['itemid']][$type]['max'] = $row['max'];
+					$this->data[$this->items[$i]['itemid']][$type]['avg'] = $row['avg'];
+					$this->data[$this->items[$i]['itemid']][$type]['clock'] = $row['clock'];
 				}
 				unset($row);
 			}
 
 			switch ($this->items[$i]['calc_fnc']) {
 				case CALC_FNC_MIN:
-					$item_value = abs($curr_data->min);
+					$fncName = 'min';
 					break;
 				case CALC_FNC_MAX:
-					$item_value = abs($curr_data->max);
+					$fncName = 'max';
 					break;
 				case CALC_FNC_LST:
-					$item_value = abs($curr_data->lst);
+					$fncName = 'last';
 					break;
 				case CALC_FNC_AVG:
 				default:
-					$item_value = abs($curr_data->avg);
+					$fncName = 'avg';
 			}
+
+			$item_value = empty($this->data[$this->items[$i]['itemid']][$type][$fncName])
+				? 0
+				: abs($this->data[$this->items[$i]['itemid']][$type][$fncName]);
 
 			if ($type == GRAPH_ITEM_SUM) {
 				$this->background = $i;
@@ -260,7 +258,7 @@ class CPie extends CGraphDraw {
 			}
 
 			$this->sum += $item_value;
-			$strvaluelength = max($strvaluelength, zbx_strlen(convert_units($item_value, $this->items[$i]['unit'])));
+			$strvaluelength = max($strvaluelength, zbx_strlen(convert_units($item_value, $this->items[$i]['units'])));
 		}
 
 		if (isset($graph_sum)) {
@@ -274,7 +272,7 @@ class CPie extends CGraphDraw {
 		$max_host_len = 0;
 		$max_name_len = 0;
 
-		for ($i = 0;$i < $this->num; $i++) {
+		for ($i = 0; $i < $this->num; $i++) {
 			if (zbx_strlen($this->items[$i]['host']) > $max_host_len) {
 				$max_host_len = zbx_strlen($this->items[$i]['host']);
 			}
@@ -285,28 +283,31 @@ class CPie extends CGraphDraw {
 
 		for ($i = 0; $i < $this->num; $i++) {
 			$color = $this->getColor($this->items[$i]['color'], 0);
-			$data = &$this->data[$this->items[$i]['itemid']][$this->items[$i]['calc_type']];
+			$type = $this->items[$i]['calc_type'];
+
+			$data = &$this->data[$this->items[$i]['itemid']][$type];
 
 			switch ($this->items[$i]['calc_fnc']) {
 				case CALC_FNC_MIN:
-					$fnc_name = 'min';
-					$datavalue = $data->min;
+					$fncName = 'min';
+					$fncRealName = _('min');
 					break;
 				case CALC_FNC_MAX:
-					$fnc_name = 'max';
-					$datavalue = $data->max;
+					$fncName = 'max';
+					$fncRealName = _('max');
 					break;
 				case CALC_FNC_LST:
-					$fnc_name = 'last';
-					$datavalue = $data->lst;
+					$fncName = 'last';
+					$fncRealName = _('last');
 					break;
 				case CALC_FNC_AVG:
 				default:
-					$fnc_name = 'avg';
-					$datavalue = $data->avg;
+					$fncName = 'avg';
+					$fncRealName = _('avg');
 			}
+			$datavalue = $this->data[$this->items[$i]['itemid']][$type][$fncName];
 
-			$proc = ($datavalue * 100) / $this->sum;
+			$proc = $this->sum == 0 ? 0 : ($datavalue * 100) / $this->sum;
 
 			if (isset($data) && isset($datavalue)) {
 				$strvalue = sprintf(_('Value').': %s ('.(round($proc) != $proc? '%0.2f' : '%s').'%%)',
@@ -315,7 +316,7 @@ class CPie extends CGraphDraw {
 				$str = sprintf('%s: %s [%s] ',
 					str_pad($this->items[$i]['host'], $max_host_len, ' '),
 					str_pad($this->items[$i]['name'], $max_name_len, ' '),
-					$fnc_name
+					$fncRealName
 				);
 			}
 			else {
@@ -657,28 +658,34 @@ class CPie extends CGraphDraw {
 		$this->drawHeader();
 
 		// for each metric
-		for ($item = 0; $item < $this->num; $item++) {
-			$data = &$this->data[$this->items[$item]['itemid']][$this->items[$item]['calc_type']];
+		$values = array();
+		for ($i = 0; $i < $this->num; $i++) {
+			$type = $this->items[$i]['calc_type'];
+
+			$data = &$this->data[$this->items[$i]['itemid']][$type];
 
 			if (!isset($data)) {
 				continue;
 			}
-			$calc_fnc = $this->items[$item]['calc_fnc'];
 
-			switch ($calc_fnc) {
-				case CALC_FNC_MAX:
-					$values[$item] = abs($data->max);
-					break;
+			switch ($this->items[$i]['calc_fnc']) {
 				case CALC_FNC_MIN:
-					$values[$item] = abs($data->min);
+					$fncName = 'min';
 					break;
-				case CALC_FNC_AVG:
-					$values[$item] = abs($data->avg);
+				case CALC_FNC_MAX:
+					$fncName = 'max';
 					break;
 				case CALC_FNC_LST:
-					$values[$item] = abs($data->lst);
+					$fncName = 'last';
 					break;
+				case CALC_FNC_AVG:
+				default:
+					$fncName = 'avg';
 			}
+
+			$values[$i] = empty($this->data[$this->items[$i]['itemid']][$type][$fncName])
+				? 0
+				: abs($this->data[$this->items[$i]['itemid']][$type][$fncName]);
 		}
 
 		switch ($this->type) {
@@ -693,7 +700,6 @@ class CPie extends CGraphDraw {
 				break;
 			default:
 				$this->drawElementPie($values);
-				break;
 		}
 
 		$this->drawLogo();
@@ -719,4 +725,3 @@ class CPie extends CGraphDraw {
 		imageOut($this->im);
 	}
 }
-?>
