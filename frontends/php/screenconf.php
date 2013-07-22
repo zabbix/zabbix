@@ -45,9 +45,9 @@ require_once dirname(__FILE__).'/include/page_header.php';
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = array(
 	'screens' =>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,			null),
-	'screenid' =>		array(T_ZBX_INT, O_NO,	P_SYS,	DB_ID,			'(isset({form})&&({form}=="update"))'),
+	'screenid' =>		array(T_ZBX_INT, O_NO,	P_SYS,	DB_ID,			'isset({form})&&{form}=="update"'),
 	'templateid' =>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,			null),
-	'name' =>			array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY, 'isset({save})', _('Name')),
+	'name' =>			array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,		'isset({save})', _('Name')),
 	'hsize' =>			array(T_ZBX_INT, O_OPT, null,	BETWEEN(1, 100), 'isset({save})', _('Columns')),
 	'vsize' =>			array(T_ZBX_INT, O_OPT, null,	BETWEEN(1, 100), 'isset({save})', _('Rows')),
 	// actions
@@ -153,10 +153,6 @@ elseif (isset($_REQUEST['save'])) {
 		show_messages(!empty($screenids), _('Screen updated'), _('Cannot update screen'));
 	}
 	else {
-		if (!count(get_accessible_nodes_by_user(CWebUser::$data, PERM_READ_WRITE, PERM_RES_IDS_ARRAY))) {
-			access_deny();
-		}
-
 		$screen = array(
 			'name' => $_REQUEST['name'],
 			'hsize' => $_REQUEST['hsize'],
@@ -180,6 +176,7 @@ elseif (isset($_REQUEST['save'])) {
 
 	if (!empty($screenids)) {
 		unset($_REQUEST['form'], $_REQUEST['screenid']);
+		clearCookies(!empty($screenids));
 	}
 }
 elseif (isset($_REQUEST['delete']) && isset($_REQUEST['screenid']) || $_REQUEST['go'] == 'delete') {
@@ -195,18 +192,18 @@ elseif (isset($_REQUEST['delete']) && isset($_REQUEST['screenid']) || $_REQUEST[
 	));
 
 	if (!empty($screens)) {
-		$go_result = API::Screen()->delete($screenids);
+		$goResult = API::Screen()->delete($screenids);
 
-		if ($go_result) {
+		if ($goResult) {
 			foreach ($screens as $screen) {
 				add_audit_details(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_SCREEN, $screen['screenid'], $screen['name']);
 			}
 		}
 	}
 	else {
-		$go_result = API::TemplateScreen()->delete($screenids);
+		$goResult = API::TemplateScreen()->delete($screenids);
 
-		if ($go_result) {
+		if ($goResult) {
 			$templatedScreens = API::TemplateScreen()->get(array(
 				'screenids' => $screenids,
 				'output' => API_OUTPUT_EXTEND,
@@ -219,16 +216,12 @@ elseif (isset($_REQUEST['delete']) && isset($_REQUEST['screenid']) || $_REQUEST[
 		}
 	}
 
-	if ($go_result) {
+	if ($goResult) {
 		unset($_REQUEST['screenid'], $_REQUEST['form']);
 	}
 
-	show_messages($go_result, _('Screen deleted'), _('Cannot delete screen'));
-}
-if ($_REQUEST['go'] != 'none' && isset($go_result) && $go_result) {
-	$url = new CUrl();
-	$path = $url->getPath();
-	insert_js('cookie.eraseArray("'.$path.'")');
+	show_messages($goResult, _('Screen deleted'), _('Cannot delete screen'));
+	clearCookies($goResult);
 }
 
 /*

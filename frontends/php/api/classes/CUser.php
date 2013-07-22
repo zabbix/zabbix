@@ -20,6 +20,8 @@
 
 
 /**
+ * Class containing methods for operations with users.
+ *
  * @package API
  */
 class CUser extends CZBXAPI {
@@ -561,6 +563,7 @@ class CUser extends CZBXAPI {
 		// deprecated input support
 		if ($userIds && is_array($userIds[0])) {
 			$this->deprecated('Passing objects is deprecated, use an array of IDs instead.');
+
 			foreach ($userIds as $user) {
 				if (!check_db_fields(array('userid' => null), $user)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('No user ID given.'));

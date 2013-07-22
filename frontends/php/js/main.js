@@ -156,49 +156,73 @@ var MMenu = {
  */
 var chkbxRange = {
 	startbox:		null,	// start checkbox obj
-	startbox_name:	null,	// start checkbox name
+	startboxName:	null,	// start checkbox name
 	chkboxes:		{},		// ckbx list
+	prefix:			null,	// prefix for cookie name
 	pageGoName:		null,	// which checkboxes should be counted by Go button
 	pageGoCount:	0,		// selected checkboxes
-	selected_ids:	{},		// ids of selected checkboxes
+	selectedIds:	{},		// ids of selected checkboxes
 	goButton:		null,
-	page:			null,	// loaded page name
+	cookieName:		null,
 
 	init: function() {
 		var path = new Curl();
-		this.page = path.getPath();
-		this.selected_ids = cookie.readJSON('cb_' + this.page);
-		var chk_bx = document.getElementsByTagName('input');
-		for (var i = 0; i < chk_bx.length; i++) {
-			if (typeof(chk_bx[i]) != 'undefined' && chk_bx[i].type.toLowerCase() == 'checkbox') {
-				this.implement(chk_bx[i]);
+		var filename = basename(path.getPath(), '.php');
+		this.cookieName = 'cb_' + filename + (is_null(this.prefix) ? '' : '_' + this.prefix);
+		this.selectedIds = cookie.readJSON(this.cookieName);
+
+		var chkboxes = jQuery('.tableinfo .checkbox:not(:disabled)');
+		if (chkboxes.length > 0) {
+			for (var i = 0; i < chkboxes.length; i++) {
+				this.implement(chkboxes[i]);
 			}
 		}
+
+		this.selectMainCheckbox();
 
 		this.goButton = $('goButton');
 		if (!is_null(this.goButton)) {
 			addListener(this.goButton, 'click', this.submitGo.bindAsEventListener(this), false);
 		}
+
 		this.setGo();
 	},
 
 	implement: function(obj) {
-		var obj_name = obj.name.split('[')[0];
+		var objName = obj.name.split('[')[0];
 
-		if (typeof(this.chkboxes[obj_name]) == 'undefined') {
-			this.chkboxes[obj_name] = [];
+		if (typeof(this.chkboxes[objName]) === 'undefined') {
+			this.chkboxes[objName] = [];
 		}
-		this.chkboxes[obj_name].push(obj);
+		this.chkboxes[objName].push(obj);
 
 		addListener(obj, 'click', this.check.bindAsEventListener(this), false);
 
-		if (obj_name == this.pageGoName) {
-			var obj_id  = obj.name.split('[')[1];
-			obj_id = obj_id.substring(0, obj_id.lastIndexOf(']'));
-
-			if (isset(obj_id, this.selected_ids)) {
+		if (objName == this.pageGoName) {
+			var objId = jQuery(obj).val();
+			if (isset(objId, this.selectedIds)) {
 				obj.checked = true;
 			}
+		}
+	},
+
+	// check if all checkboxes are selected and select main checkbox, else disable checkbox, select options and button
+	selectMainCheckbox: function() {
+		var countAvailable = jQuery('.tableinfo tr:not(.header) .checkbox:not(:disabled)').length;
+		var countChecked = jQuery('.tableinfo tr:not(.header) .checkbox:not(:disabled):checked').length;
+		var mainCheckbox = jQuery('.tableinfo .header .checkbox:not(:disabled)')[0];
+
+		if (countAvailable > 0) {
+			mainCheckbox.checked = (countChecked == countAvailable);
+			if (mainCheckbox.checked) {
+				jQuery('.tableinfo .header').addClass('selectedMain');
+			}
+			else {
+				jQuery('.tableinfo .header').removeClass('selectedMain');
+			}
+		}
+		else if (typeof(mainCheckbox) !== 'undefined') {
+			mainCheckbox.disabled = true;
 		}
 	},
 
@@ -208,7 +232,7 @@ var chkbxRange = {
 
 		PageRefresh.restart();
 
-		if (typeof(obj) == 'undefined' || obj.type.toLowerCase() != 'checkbox') {
+		if (typeof(obj) === 'undefined' || obj.type.toLowerCase() != 'checkbox' || obj.disabled === true) {
 			return true;
 		}
 
@@ -217,23 +241,23 @@ var chkbxRange = {
 		if (obj.name.indexOf('all_') > -1 || obj.name.indexOf('_single') > -1) {
 			return true;
 		}
-		var obj_name = obj.name.split('[')[0];
+		var objName = obj.name.split('[')[0];
 
 		// check range selection
 		if (e.ctrlKey || e.shiftKey) {
-			if (!is_null(this.startbox) && this.startbox_name == obj_name && obj.name != this.startbox.name) {
-				var chkbx_list = this.chkboxes[obj_name];
+			if (!is_null(this.startbox) && this.startboxName == objName && obj.name != this.startbox.name) {
+				var chkboxes = this.chkboxes[objName];
 				var flag = false;
 
-				for (var i = 0; i < chkbx_list.length; i++) {
-					if (typeof(chkbx_list[i]) != 'undefined') {
+				for (var i = 0; i < chkboxes.length; i++) {
+					if (typeof(chkboxes[i]) !== 'undefined') {
 						if (flag) {
-							chkbx_list[i].checked = this.startbox.checked;
+							chkboxes[i].checked = this.startbox.checked;
 						}
-						if (obj.name == chkbx_list[i].name) {
+						if (obj.name == chkboxes[i].name) {
 							break;
 						}
-						if (this.startbox.name == chkbx_list[i].name) {
+						if (this.startbox.name == chkboxes[i].name) {
 							flag = true;
 						}
 					}
@@ -241,95 +265,113 @@ var chkbxRange = {
 
 				if (flag) {
 					this.setGo();
+					this.selectMainCheckbox();
 					return true;
 				}
 				else {
-					for (var i = chkbx_list.length - 1; i >= 0; i--) {
-						if (typeof(chkbx_list[i]) != 'undefined') {
+					for (var i = chkboxes.length - 1; i >= 0; i--) {
+						if (typeof(chkboxes[i]) !== 'undefined') {
 							if (flag) {
-								chkbx_list[i].checked = this.startbox.checked;
+								chkboxes[i].checked = this.startbox.checked;
 							}
 
-							if (obj.name == chkbx_list[i].name) {
+							if (obj.name == chkboxes[i].name) {
 								this.setGo();
+								this.selectMainCheckbox();
 								return true;
 							}
 
-							if (this.startbox.name == chkbx_list[i].name) {
+							if (this.startbox.name == chkboxes[i].name) {
 								flag = true;
 							}
 						}
 					}
 				}
 			}
+
 			this.setGo();
 		}
+		else {
+			this.selectMainCheckbox();
+		}
+
 		this.startbox = obj;
-		this.startbox_name = obj_name;
+		this.startboxName = objName;
 	},
 
 	checkAll: function(name, value) {
-		if (typeof(this.chkboxes[name]) == 'undefined') {
+		if (typeof(this.chkboxes[name]) === 'undefined') {
 			return false;
 		}
 
-		var chk_bx = this.chkboxes[name];
-		for (var i = 0; i < chk_bx.length; i++) {
-			if (typeof(chk_bx[i]) != 'undefined' && chk_bx[i].disabled != true) {
-				var obj_name = chk_bx[i].name.split('[')[0];
-				if (obj_name == name) {
-					chk_bx[i].checked = value;
+		var chkboxes = this.chkboxes[name];
+		for (var i = 0; i < chkboxes.length; i++) {
+			if (typeof(chkboxes[i]) !== 'undefined' && chkboxes[i].disabled !== true) {
+				var objName = chkboxes[i].name.split('[')[0];
+				if (objName == name) {
+					chkboxes[i].checked = value;
 				}
 			}
 		}
+
+		var mainCheckbox = jQuery('.tableinfo .header .checkbox:not(:disabled)')[0];
+		if (mainCheckbox.checked) {
+			jQuery('.tableinfo .header').addClass('selectedMain');
+		}
+		else {
+			jQuery('.tableinfo .header').removeClass('selectedMain');
+		}
+	},
+
+	clearSelectedOnFilterChange: function() {
+		cookie.eraseArray(this.cookieName);
 	},
 
 	setGo: function() {
 		if (!is_null(this.pageGoName)) {
-			if (typeof(this.chkboxes[this.pageGoName]) == 'undefined') {
-				return false;
-			}
+			if (typeof(this.chkboxes[this.pageGoName]) !== 'undefined') {
+				var chkboxes = this.chkboxes[this.pageGoName];
+				for (var i = 0; i < chkboxes.length; i++) {
+					if (typeof(chkboxes[i]) !== 'undefined') {
+						var box = chkboxes[i];
+						var objName = box.name.split('[')[0];
+						var objId = box.name.split('[')[1];
+						objId = objId.substring(0, objId.lastIndexOf(']'));
+						var crow = getParent(box, 'tr');
 
-			var chk_bx = this.chkboxes[this.pageGoName];
-			for (var i = 0; i < chk_bx.length; i++) {
-				if (typeof(chk_bx[i]) != 'undefined') {
-					var box = chk_bx[i];
-					var obj_name = box.name.split('[')[0];
-					var obj_id  = box.name.split('[')[1];
-					obj_id = obj_id.substring(0, obj_id.lastIndexOf(']'));
-					var crow = getParent(box, 'tr');
-
-					if (box.checked) {
-						if (!is_null(crow)) {
-							var origClass = crow.getAttribute('origClass');
-							if (is_null(origClass)) {
-								crow.setAttribute('origClass', crow.className);
+						if (box.checked) {
+							if (!is_null(crow)) {
+								var origClass = crow.getAttribute('origClass');
+								if (is_null(origClass)) {
+									crow.setAttribute('origClass', crow.className);
+								}
+								crow.className = 'selected';
 							}
-							crow.className = 'selected';
-						}
-						if (obj_name == this.pageGoName) {
-							this.selected_ids[obj_id] = obj_id;
-						}
-					}
-					else {
-						if (!is_null(crow)) {
-							var origClass = crow.getAttribute('origClass');
-
-							if (!is_null(origClass)) {
-								crow.className = origClass;
-								crow.removeAttribute('origClass');
+							if (objName == this.pageGoName) {
+								this.selectedIds[objId] = objId;
 							}
 						}
-						if (obj_name == this.pageGoName) {
-							delete(this.selected_ids[obj_id]);
+						else {
+							if (!is_null(crow)) {
+								var origClass = crow.getAttribute('origClass');
+
+								if (!is_null(origClass)) {
+									crow.className = origClass;
+									crow.removeAttribute('origClass');
+								}
+							}
+							if (objName == this.pageGoName) {
+								delete(this.selectedIds[objId]);
+							}
 						}
 					}
 				}
+
 			}
 
 			var countChecked = 0;
-			for (var key in this.selected_ids) {
-				if (!empty(this.selected_ids[key])) {
+			for (var key in this.selectedIds) {
+				if (!empty(this.selectedIds[key])) {
 					countChecked++;
 				}
 			}
@@ -339,7 +381,10 @@ var chkbxRange = {
 				this.goButton.value = tmp_val[0] + ' (' + countChecked + ')';
 			}
 
-			cookie.createJSON('cb_' + this.page, this.selected_ids);
+			cookie.createJSON(this.cookieName, this.selectedIds);
+
+			jQuery('#go')[0].disabled = (countChecked == 0);
+			jQuery('#goButton')[0].disabled = (countChecked == 0);
 
 			this.pageGoCount = countChecked;
 		}
@@ -358,8 +403,8 @@ var chkbxRange = {
 			}
 
 			var form = getParent(this.goButton, 'form');
-			for (var key in this.selected_ids) {
-				if (!empty(this.selected_ids[key])) {
+			for (var key in this.selectedIds) {
+				if (!empty(this.selectedIds[key])) {
 					create_var(form.name, this.pageGoName + '[' + key + ']', key, false);
 				}
 			}
@@ -985,6 +1030,12 @@ function change_flicker_state(divid) {
 	if (typeof(moveSBoxes) != 'undefined') {
 		moveSBoxes();
 	}
+
+	if (typeof(flickerResizeMultiselect) == 'undefined' && filter_state == 1) {
+		flickerResizeMultiselect = true;
+
+		jQuery('#' + divid).multiSelect.resize();
+	}
 }
 
 function changeHatStateUI(icon, divid) {
@@ -1095,17 +1146,17 @@ function switch_mute(icon) {
 function createPlaceholders() {
 	if (IE) {
 		jQuery(document).ready(function() {
-			'use strict';
-
 			jQuery('[placeholder]').focus(function() {
-				if (jQuery(this).val() == jQuery(this).attr('placeholder')) {
-					jQuery(this).val('');
-					jQuery(this).removeClass('placeholder');
+				var obj = jQuery(this);
+				if (obj.val() == obj.attr('placeholder')) {
+					obj.val('');
+					obj.removeClass('placeholder');
 				}
 			}).blur(function() {
-				if (jQuery(this).val() == '' || jQuery(this).val() == jQuery(this).attr('placeholder')) {
-					jQuery(this).addClass('placeholder');
-					jQuery(this).val(jQuery(this).attr('placeholder'));
+				var obj = jQuery(this);
+				if (obj.val() == '' || obj.val() == obj.attr('placeholder')) {
+					obj.val(obj.attr('placeholder'));
+					obj.addClass('placeholder');
 				}
 			}).blur();
 		});

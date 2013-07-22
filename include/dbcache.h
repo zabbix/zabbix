@@ -37,10 +37,12 @@
 
 extern char	*CONFIG_FILE;
 extern int	CONFIG_TIMEOUT;
-extern int	CONFIG_CONF_CACHE_SIZE;
-extern int	CONFIG_HISTORY_CACHE_SIZE;
-extern int	CONFIG_TRENDS_CACHE_SIZE;
-extern int	CONFIG_TEXT_CACHE_SIZE;
+
+extern zbx_uint64_t	CONFIG_CONF_CACHE_SIZE;
+extern zbx_uint64_t	CONFIG_HISTORY_CACHE_SIZE;
+extern zbx_uint64_t	CONFIG_TRENDS_CACHE_SIZE;
+extern zbx_uint64_t	CONFIG_TEXT_CACHE_SIZE;
+
 extern int	CONFIG_POLLER_FORKS;
 extern int	CONFIG_UNREACHABLE_POLLER_FORKS;
 extern int	CONFIG_IPMIPOLLER_FORKS;
@@ -202,6 +204,34 @@ typedef struct
 }
 zbx_config_hk_t;
 
+typedef struct
+{
+	zbx_uint64_t		itemid;
+	zbx_timespec_t		timestamp;
+	history_value_t		value;
+}
+zbx_item_history_value_t;
+
+/* item queue data */
+typedef struct
+{
+	zbx_uint64_t	itemid;
+	zbx_uint64_t	proxy_hostid;
+	int		type;
+	int		nextcheck;
+}
+zbx_queue_item_t;
+
+typedef struct
+{
+	zbx_uint64_t	hostid;
+	int		errors_from;
+	int		disable_until;
+	unsigned char	type;
+	unsigned char	available;
+}
+zbx_host_availability_t;
+
 void	dc_add_history(zbx_uint64_t itemid, unsigned char value_type, unsigned char flags, AGENT_RESULT *value,
 		zbx_timespec_t *ts, unsigned char state, const char *error, int timestamp, const char *source,
 		int severity, int logeventid, zbx_uint64_t lastlogsize, int mtime);
@@ -235,8 +265,6 @@ void	DCflush_nextchecks();
 void	*DCget_stats(int request);
 
 zbx_uint64_t	DCget_nextid(const char *table_name, int num);
-
-int	DCget_item_lastclock(zbx_uint64_t itemid);
 
 void	DCsync_configuration();
 void	init_configuration_cache();
@@ -295,7 +323,12 @@ void	DCrequeue_proxy(zbx_uint64_t hostid, unsigned char update_nextcheck);
 
 void	DCget_user_macro(zbx_uint64_t *hostids, int host_num, const char *macro, char **replace_to);
 
-int	DCconfig_update_host_availability(zbx_uint64_t hostid, unsigned char item_type, unsigned char available,
-		int errors_from, int disable_until);
+int	DCconfig_update_host_availability(const zbx_host_availability_t *availability, int availability_num);
+
+void	DCget_delta_items(zbx_hashset_t *items, const zbx_vector_uint64_t *ids);
+void	DCset_delta_items(zbx_hashset_t *items);
+
+void	DCfree_item_queue(zbx_vector_ptr_t *queue);
+int	DCget_item_queue(zbx_vector_ptr_t *queue, int from, int to);
 
 #endif

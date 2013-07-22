@@ -39,7 +39,8 @@ jQuery(function($) {
 		options.labels = {
 			'No matches found': t('No matches found'),
 			'More matches found...': t('More matches found...'),
-			'type here to search': t('type here to search')
+			'type here to search': t('type here to search'),
+			'new': t('new')
 		};
 
 		return this.each(function() {
@@ -51,6 +52,7 @@ jQuery(function($) {
 	/**
 	 * Create multi select input element.
 	 *
+	 * @param string options['id']				multi select id in dom
 	 * @param string options['url']				backend url
 	 * @param string options['name']			input element name
 	 * @param object options['labels']			translated labels
@@ -58,8 +60,10 @@ jQuery(function($) {
 	 * @param string options['data'][id]
 	 * @param string options['data'][name]
 	 * @param string options['data'][prefix]
+	 * @param array  options['ignored']			preload ignored {id: name}
 	 * @param string options['defaultValue']	default value for input element
 	 * @param bool   options['disabled']		turn on/off readonly state
+	 * @param bool   options['addNew']			allow user to create new names
 	 * @param int    options['selectedLimit']	how many items can be selected
 	 * @param int    options['limit']			how many available items can be received from backend
 	 *
@@ -67,14 +71,18 @@ jQuery(function($) {
 	 */
 	$.fn.multiSelect = function(options) {
 		var defaults = {
+			id: '',
 			url: '',
 			name: '',
 			labels: {
 				'No matches found': 'No matches found',
 				'More matches found...': 'More matches found...',
-				'type here to search': 'type here to search'
+				'type here to search': 'type here to search',
+				'new': 'new'
 			},
 			data: [],
+			ignored: [],
+			addNew: false,
 			defaultValue: null,
 			disabled: false,
 			selectedLimit: null,
@@ -98,12 +106,14 @@ jQuery(function($) {
 			/**
 			 * Clean multi select object values.
 			 */
-			$.fn.multiSelect.clean = function() {
-				for (var id in values.selected) {
-					removeSelected(id, obj, values, options);
+			$.fn.multiSelect.clean = function(msId) {
+				var ms = window.multiSelect[msId];
+
+				for (var id in ms.values.selected) {
+					removeSelected(id, ms.obj, ms.values, ms.options);
 				}
 
-				cleanAvailable(obj, values);
+				cleanAvailable(ms.obj, ms.values);
 			};
 
 			/**
@@ -126,20 +136,47 @@ jQuery(function($) {
 			};
 
 			/**
+			 * Rezise multiselect selected text
+			 */
+			$.fn.multiSelect.resize = function() {
+				$.each(window.multiSelect, function(i) {
+					var ms = window.multiSelect[i];
+					if (!empty(ms.options.data)) {
+						resizeAllSelectedTexts(ms.obj, ms.options, ms.values);
+					}
+				});
+			}
+
+			/**
 			 * MultiSelect object.
 			 */
-			var obj = $(this),
-				jqxhr = null,
-				values = {
+			if (empty(window.multiSelect)) {
+				window.multiSelect = {};
+			}
+
+			window.multiSelect[options.id] = {
+				options: options,
+				obj: $(this),
+				jqxhr: null,
+				values: {
 					search: '',
-					width: parseInt(obj.css('width')),
+					width: null,
 					isWaiting: false,
 					isAjaxLoaded: true,
 					isMoreMatchesFound: false,
 					isAvailableOpenned: false,
 					selected: {},
-					available: {}
-				};
+					available: {},
+					ignored: empty(options.ignored) ? [] : options.ignored
+				}
+			};
+
+			var ms = window.multiSelect[options.id],
+				obj = ms.obj,
+				jqxhr = ms.jqxhr,
+				values = ms.values;
+
+			ms.values.width = parseInt(obj.css('width'));
 
 			// search input
 			if (!options.disabled) {
@@ -155,7 +192,8 @@ jQuery(function($) {
 						return false;
 					}
 
-					if ($('.selected li', obj).length > 0 && $('.selected li', obj).length == options.selectedLimit) {
+					if ($('.selected li', obj).length > 0
+							&& $('.selected li', obj).length == options.selectedLimit) {
 						setReadonly(obj);
 						return false;
 					}
@@ -380,8 +418,7 @@ jQuery(function($) {
 			}
 
 			// resize
-			resizeSelected(obj, values, options);
-			resizeAvailable(obj);
+			resize(obj, values, options);
 		});
 	};
 
@@ -410,6 +447,60 @@ jQuery(function($) {
 
 	function loadAvailable(data, obj, values, options) {
 		cleanAvailable(obj, values);
+
+		// add new
+		if (options.addNew) {
+			var value = values['search'].replace(/^\s+|\s+$/g, '');
+
+			if (!empty(value)) {
+				var addNew = false;
+
+				if (!empty(data) || objectLength(values.selected) > 0) {
+					// check if value exist in availables
+					if (!empty(data)) {
+						var names = {};
+
+						$.each(data, function(i, item) {
+							names[item.name.toUpperCase()] = true;
+						});
+
+						if (typeof(names[value.toUpperCase()]) == 'undefined') {
+							addNew = true;
+						}
+					}
+
+					// check if value exist in selected
+					if (!addNew && objectLength(values.selected) > 0) {
+						var names = {};
+
+						$.each(values.selected, function(i, item) {
+							if (typeof(item.isNew) == 'undefined') {
+								names[item.name.toUpperCase()] = true;
+							}
+							else {
+								names[item.id.toUpperCase()] = true;
+							}
+						});
+
+						if (typeof(names[value.toUpperCase()]) == 'undefined') {
+							addNew = true;
+						}
+					}
+				}
+				else {
+					addNew = true;
+				}
+
+				if (addNew) {
+					data[data.length] = {
+						id: value,
+						prefix: '',
+						name: value + ' (' + options.labels['new'] + ')',
+						isNew: true
+					};
+				}
+			}
+		}
 
 		if (!empty(data)) {
 			$.each(data, function(i, item) {
@@ -455,7 +546,7 @@ jQuery(function($) {
 			// add hidden input
 			obj.append($('<input>', {
 				type: 'hidden',
-				name: options.name,
+				name: (options.addNew && item.isNew) ? options.name + '[new]' : options.name,
 				value: item.id,
 				'data-name': item.name,
 				'data-prefix': item.prefix
@@ -471,10 +562,11 @@ jQuery(function($) {
 				text: empty(item.prefix) ? item.name : item.prefix + item.name
 			});
 
-			if (options.disabled) {
-				$('.selected ul', obj).append(li.append(text));
-			}
-			else {
+			$('.selected ul', obj).append(li.append(text));
+
+			resizeSelectedText(li, text, obj, options);
+
+			if (!options.disabled) {
 				var arrow = $('<span>', {
 					'class': 'arrow',
 					'data-id': item.id
@@ -483,14 +575,13 @@ jQuery(function($) {
 					removeSelected($(this).data('id'), obj, values, options);
 				});
 
-				$('.selected ul', obj).append(li.append(text, arrow));
+				$('.selected ul', obj).append(li.append(arrow));
 			}
 
 			removePlaceholder(obj);
 
 			// resize
-			resizeSelected(obj, values, options);
-			resizeAvailable(obj);
+			resize(obj, values, options);
 
 			// set readonly
 			if (options.selectedLimit > 0 && $('.selected li', obj).length == options.selectedLimit) {
@@ -507,8 +598,7 @@ jQuery(function($) {
 		delete values.selected[id];
 
 		// resize
-		resizeSelected(obj, values, options);
-		resizeAvailable(obj);
+		resize(obj, values, options);
 
 		// remove readonly
 		if ($('.selected li', obj).length == 0) {
@@ -531,7 +621,9 @@ jQuery(function($) {
 
 	function addAvailable(item, obj, values, options) {
 		if (empty(options.limit) || (options.limit > 0 && $('.available li', obj).length < options.limit)) {
-			if (typeof(values.available[item.id]) == 'undefined' && typeof(values.selected[item.id]) == 'undefined') {
+			if (typeof(values.available[item.id]) == 'undefined'
+					&& typeof(values.selected[item.id]) == 'undefined'
+					&& typeof(values.ignored[item.id]) == 'undefined') {
 				values.available[item.id] = item;
 
 				var prefix = $('<span>', {
@@ -615,16 +707,28 @@ jQuery(function($) {
 	}
 
 	function cleanSearchInput(obj) {
-		$('input[type="text"]', obj).val('');
+		var input = $('input[type="text"]', obj);
+
+		if (!(IE && input.val() == input.attr('placeholder'))) {
+			input.val('');
+		}
+	}
+
+	function resize(obj, values, options) {
+		if (!options.selectedLimit || $('.selected li', obj).length < options.selectedLimit) {
+			resizeSelected(obj, values, options);
+			resizeAvailable(obj);
+		}
 	}
 
 	function resizeSelected(obj, values, options) {
 		// settings
-		var settingTopPaddings = IE8 ? 1 : 0,
+		var settingTopPaddingsEmpty = IE8 ? 1 : 0,
+			settingTopPaddingsExist = IE8 ? 1 : 2,
 			settingTopPaddingsInit = 3,
 			settingRightPaddings = 4,
-			settingLeftPaddings = 13,
 			settingMinimumWidth = 50,
+			settingMinimumHeight = 12,
 			settingNewLineTopPaddings = 6;
 
 		// calculate
@@ -633,16 +737,15 @@ jQuery(function($) {
 			height = 0;
 
 		if ($('.selected li', obj).length > 0) {
-			var position = options.disabled
-				? $('.selected li:last-child', obj).position()
-				: $('.selected li:last-child .arrow', obj).position();
+			var lastItem = $('.selected li:last-child', obj),
+				position = lastItem.position();
 
-			top = position.top + settingTopPaddings - 1;
-			left = position.left + settingLeftPaddings;
+			top = position.top + settingTopPaddingsExist;
+			left = position.left + lastItem.width();
 			height = $('.selected li:last-child', obj).height();
 		}
 		else {
-			top = settingTopPaddingsInit + settingTopPaddings;
+			top = settingTopPaddingsInit + settingTopPaddingsEmpty;
 			height = 0;
 		}
 
@@ -650,8 +753,8 @@ jQuery(function($) {
 			top = top * 2;
 		}
 
-		if (left + settingMinimumWidth > values.width) {
-			var topPaddings = (height > 20) ? height / 2 : height;
+		if (left + settingMinimumWidth > values.width || height > settingMinimumHeight) {
+			var topPaddings = (height > settingMinimumHeight) ? height / 2 : height;
 
 			topPaddings += settingNewLineTopPaddings;
 
@@ -672,11 +775,19 @@ jQuery(function($) {
 			});
 		}
 
-		$('input[type="text"]', obj).css({
-			'padding-top': top,
-			'padding-left': left,
-			width: values.width - left - settingRightPaddings
-		});
+		if (IE) {
+			$('input[type="text"]', obj).css({
+				'padding-top': top,
+				'padding-left': left
+			});
+		}
+		else {
+			$('input[type="text"]', obj).css({
+				'padding-top': top,
+				'padding-left': left,
+				width: values.width - left - settingRightPaddings
+			});
+		}
 	}
 
 	function resizeAvailable(obj) {
@@ -684,6 +795,60 @@ jQuery(function($) {
 
 		$('.available', obj).css({
 			top: (selectedHeight > 0) ? selectedHeight : 20
+		});
+	}
+
+	function resizeSelectedText(item, text, obj, options) {
+		// settings
+		var settingLineHeight = 15,
+			settingArrowSpace = options.disabled ? 22 : 32,
+			settingPaddings = 3,
+			settingTextMax = 510;
+
+		// calculate
+		var maxWidth = $('.selected ul', obj).width() - settingArrowSpace;
+
+		if (text.width() > maxWidth || text.height() > settingLineHeight) {
+			var i = 0;
+
+			while (text.width() > maxWidth || text.height() > settingLineHeight) {
+				var t = text.text();
+
+				text.text(t.substring(0, t.length - 1));
+
+				i++;
+
+				if (i > settingTextMax) {
+					break;
+				}
+			}
+
+			text.text(text.text() + '...');
+
+			item.css('width', $('.selected ul', obj).width() - settingPaddings);
+		}
+		else {
+			item.css('width', '');
+
+			if (!options.disabled) {
+				text.css('padding-right', 16);
+			}
+		}
+	}
+
+	function resizeAllSelectedTexts(obj, options, values) {
+		$('.selected li', obj).each(function() {
+			var item = $(this),
+				id = item.data('id'),
+				text = $(item.children()[0]),
+				t = empty(values.selected[id].prefix)
+					? values.selected[id].name
+					: values.selected[id].prefix + values.selected[id].name;
+
+			// rewrite previous text to original
+			text.text(t);
+
+			resizeSelectedText(item, text, obj, options);
 		});
 	}
 
@@ -711,7 +876,9 @@ jQuery(function($) {
 	}
 
 	function setPlaceholder(obj, options) {
-		$('input[type="text"]', obj).prop('placeholder', options.labels['type here to search']);
+		$('input[type="text"]', obj).attr('placeholder', options.labels['type here to search']);
+
+		createPlaceholders();
 	}
 
 	function removePlaceholder(obj) {
@@ -720,8 +887,26 @@ jQuery(function($) {
 
 	function getLimit(values, options) {
 		return (options.limit > 0)
-			? options.limit + objectLength(values.selected) + 1
+			? options.limit + countMatches(values.selected, values.search) + countMatches(values.ignored, values.search) + 1
 			: null;
+	}
+
+	function countMatches(data, search) {
+		var count = 0;
+
+		if (empty(data)) {
+			return count;
+		}
+
+		for (var id in data) {
+			var name = (typeof(data[id]) == 'object') ? data[id].name : data[id];
+
+			if (name.substr(0, search.length).toUpperCase() == search.toUpperCase()) {
+				count++;
+			}
+		}
+
+		return count;
 	}
 
 	function objectLength(obj) {

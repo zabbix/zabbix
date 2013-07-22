@@ -17,17 +17,16 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-/********* DIV IMG *********/
-.zabbix_logo{
+.zabbix_logo {
 	height: 31px;
 	width: 118px;
 	background: #FFFFFF url('../images/general/zabbix.png') no-repeat;
 	cursor: pointer;
 }
 
-.menu_icon{
+.menu_icon {
 	display: inline-block;
-	background-repeat:no-repeat;
+	background-repeat: no-repeat;
 	height: 16px;
 	width: 16px;
 	cursor: pointer;
@@ -37,8 +36,7 @@
 	-o-border-radius: 2px;
 	border-radius: 2px;
 }
-
-.menu_icon:hover{ -webkit-box-shadow: 0 0 6px white; -moz-box-shadow: 0 0 6px white; box-shadow: 0 0 6px white; }
+.menu_icon:hover { -webkit-box-shadow: 0 0 6px white; -moz-box-shadow: 0 0 6px white; box-shadow: 0 0 6px white; }
 
 .iconminus		{ background-image: url('../images/general/bttn/minus.png'); }
 .iconplus		{ background-image: url('../images/general/bttn/plus.png'); }
@@ -73,66 +71,61 @@
 	vertical-align: middle;
 	height: 14px;
 	width: 14px;
-	background-repeat:no-repeat;
-	cursor:pointer;
+	background-repeat: no-repeat;
 	margin: 0 1px 0 1px;
 }
 
 .status_icon_extra {
-	margin-top:-2px;
+	margin-top: -2px;
 }
 
-.iconerror			{ background-image: url('../images/general/error2.png');}
+.iconerror			{ background-image: url('../images/general/error2.png'); cursor: pointer;}
 .iconok				{ background-image: url('../images/general/ok_icon.png');}
-.iconwarning		{ background-image: url('../images/general/warning.png');}
-.iconunknown		{ background-image: url('../images/general/unknown_icon.png');}
+.iconwarning		{ background-image: url('../images/general/warning.png'); cursor: pointer;}
+.iconunknown		{ background-image: url('../images/general/unknown_icon.png'); cursor: pointer;}
 .iconzbxunknown		{ background-image: url('../images/general/zabbix_unknown.png');}
 .iconzbxavailable	{ background-image: url('../images/general/zabbix_available.png');}
-.iconzbxunavailable	{ background-image: url('../images/general/zabbix_unavailable.png');}
+.iconzbxunavailable	{ background-image: url('../images/general/zabbix_unavailable.png'); cursor: pointer;}
 .iconsnmpunknown	{ background-image: url('../images/general/snmp_unknown.png');}
 .iconsnmpavailable	{ background-image: url('../images/general/snmp_available.png');}
-.iconsnmpunavailable{ background-image: url('../images/general/snmp_unavailable.png');}
+.iconsnmpunavailable{ background-image: url('../images/general/snmp_unavailable.png'); cursor: pointer;}
 .iconjmxunknown		{ background-image: url('../images/general/jmx_unknown.png');}
 .iconjmxavailable	{ background-image: url('../images/general/jmx_available.png');}
-.iconjmxunavailable	{ background-image: url('../images/general/jmx_unavailable.png');}
+.iconjmxunavailable	{ background-image: url('../images/general/jmx_unavailable.png'); cursor: pointer;}
 .iconipmiunknown	{ background-image: url('../images/general/ipmi_unknown.png');}
 .iconipmiavailable	{ background-image: url('../images/general/ipmi_available.png');}
-.iconipmiunavailable{ background-image: url('../images/general/ipmi_unavailable.png');}
-/* </status icons> */
+.iconipmiunavailable{ background-image: url('../images/general/ipmi_unavailable.png'); cursor: pointer;}
 
-
-.dbl_arrow_down{
+.dbl_arrow_down {
 	height: 10px;
 	width: 9px;
 	background: url('../images/general/dbl_arrow_down2.png') no-repeat;
-	display:block;
-	cursor:pointer;
+	display: block;
+	cursor: pointer;
 }
-.dbl_arrow_up{
+.dbl_arrow_up {
 	height: 10px;
 	width: 9px;
 	background: url('../images/general/dbl_arrow_up2.png') no-repeat;
-	cursor:pointer;
+	cursor: pointer;
 }
 
-.icon_sortup{
+.icon_sortup {
 	height: 16px;
 	width: 19px;
 	background: url('../images/general/sort_up.png') no-repeat;
 	cursor: pointer;
-	display:inline-block;
+	display: inline-block;
 }
-.icon_sortdown{
+.icon_sortdown {
 	height: 16px;
 	width: 19px;
 	background: url('../images/general/sort_down.png') no-repeat;
 	cursor: pointer;
-	display:inline-block;
+	display: inline-block;
 }
-.default_cursor{
+.default_cursor {
 	cursor: default !important;
 }
-/********* DIV IMG END *********/
 
-span.ui-icon.state-disabled { opacity: .5; filter:Alpha(Opacity=50); background-image: none; }
-
+span.ui-icon.state-disabled { opacity: .5; filter: Alpha(Opacity=50); background-image: none; }

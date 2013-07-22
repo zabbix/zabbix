@@ -44,12 +44,20 @@ class dbConditionIntTest extends CZabbixTest {
 				"field='1'"
 			),
 			array(
+				array('field', array()),
+				'1=0'
+			),
+			array(
+				array('field', array(true)),
+				'1=0'
+			),
+			array(
 				array('field', array(0, 1)),
 				"field IN ('0','1')"
 			),
 			array(
 				array('field', array(1, 0)),
-				"field IN ('1','0')"
+				"field IN ('0','1')"
 			),
 			array(
 				array('field', array(1), true),
@@ -77,11 +85,11 @@ class dbConditionIntTest extends CZabbixTest {
 			),
 			array(
 				array('field', array_merge(range(1, 4), range(1, 4), range(20, 30))),
-				"(field BETWEEN '20' AND '30' OR field IN ('1','2','3','4','1','2','3','4'))"
+				"(field BETWEEN '20' AND '30' OR field IN ('1','2','3','4'))"
 			),
 			array(
 				array('field', array_merge(range(1, 4), range(1, 4), range(20, 30)), true),
-				"(NOT field BETWEEN '20' AND '30' AND field NOT IN ('1','2','3','4','1','2','3','4'))"
+				"(NOT field BETWEEN '20' AND '30' AND field NOT IN ('1','2','3','4'))"
 			),
 			array(
 				array('field', array_merge(range(20, 30), array(10))),
@@ -93,6 +101,10 @@ class dbConditionIntTest extends CZabbixTest {
 			),
 			array(
 				array('field', array('9223372036854775802', '9223372036854775803', '9223372036854775804', '9223372036854775805', '9223372036854775806', '9223372036854775807')),
+				"field BETWEEN '9223372036854775802' AND '9223372036854775807'"
+			),
+			array(
+				array('field', array('9223372036854775807', '9223372036854775806', '9223372036854775805', '9223372036854775804', '9223372036854775803', '9223372036854775802')),
 				"field BETWEEN '9223372036854775802' AND '9223372036854775807'"
 			)
 		);

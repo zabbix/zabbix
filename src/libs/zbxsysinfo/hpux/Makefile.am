@@ -10,4 +10,7 @@ libspecsysinfo_a_SOURCES = \
 	diskspace.c \
 	inodes.c \
 	memory.c \
-	net.c
+	net.c \
+	proc.c \
+	software.c \
+	system.c

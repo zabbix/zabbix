@@ -27,7 +27,7 @@ Curl.prototype = {
 	protocol:	'',
 	username:	'',
 	password:	'',
-	filr:		'',
+	file:		'',
 	reference:	'',
 	path:		'',
 	query:		'',

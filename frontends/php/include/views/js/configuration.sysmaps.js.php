@@ -79,7 +79,7 @@
 				</td>
 				<td>
 					<select id="label_location" class="input select" name="label_location">
-						<option value="-1">-</option>
+						<option value="<?php echo MAP_LABEL_LOC_DEFAULT; ?>"><?php echo _('Default'); ?></option>
 						<option value="<?php echo MAP_LABEL_LOC_BOTTOM; ?>"><?php echo _('Bottom'); ?></option>
 						<option value="<?php echo MAP_LABEL_LOC_LEFT; ?>"><?php echo _('Left'); ?></option>
 						<option value="<?php echo MAP_LABEL_LOC_RIGHT; ?>"><?php echo _('Right'); ?></option>
@@ -108,7 +108,7 @@
 				<td>
 					<input readonly="readonly" size="50" id="elementNameTrigger" name="elementName" class="input">
 					<input type="hidden" id="elementExpressionTrigger" name="elementExpressionTrigger">
-					<span class="link" onclick="PopUp('popup.php?writeonly=1&dstfrm=selementForm&dstfld1=elementid&dstfld2=elementNameTrigger&dstfld3=elementExpressionTrigger&srctbl=triggers&srcfld1=triggerid&srcfld2=description&srcfld3=expression',450,450)"><?php echo _('Select'); ?></span>
+					<span class="link" onclick="PopUp('popup.php?writeonly=1&dstfrm=selementForm&dstfld1=elementid&dstfld2=elementNameTrigger&dstfld3=elementExpressionTrigger&srctbl=triggers&srcfld1=triggerid&srcfld2=description&srcfld3=expression&monitored_hosts=1&with_triggers=1',450,450)"><?php echo _('Select'); ?></span>
 				</td>
 			</tr>
 			<tr id="mapSelectRow">
@@ -241,7 +241,7 @@
 				</td>
 				<td>
 					<select id="massLabelLocation" class="input select" name="label_location">
-						<option value="-1">-</option>
+						<option value="<?php echo MAP_LABEL_LOC_DEFAULT; ?>"><?php echo _('Default'); ?></option>
 						<option value="<?php echo MAP_LABEL_LOC_BOTTOM; ?>"><?php echo _('Bottom'); ?></option>
 						<option value="<?php echo MAP_LABEL_LOC_LEFT; ?>"><?php echo _('Left'); ?></option>
 						<option value="<?php echo MAP_LABEL_LOC_RIGHT; ?>"><?php echo _('Right'); ?></option>
@@ -399,7 +399,7 @@
 							<tfoot>
 							<tr>
 								<td colspan="4">
-									<span class="link_menu" onclick="PopUp('popup.php?srctbl=triggers&srcfld1=triggerid&real_hosts=1&reference=linktrigger&multiselect=1&writeonly=1');"><?php echo _('Add'); ?></span>
+									<span class="link_menu" onclick="PopUp('popup.php?srctbl=triggers&srcfld1=triggerid&real_hosts=1&reference=linktrigger&multiselect=1&writeonly=1&monitored_hosts=1&with_triggers=1');"><?php echo _('Add'); ?></span>
 								</td>
 							</tr>
 							</tfoot>

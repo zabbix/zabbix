@@ -619,13 +619,6 @@ return array(
 				'length' => 255,
 				'default' => '',
 			),
-			'templateid' => array(
-				'null' => true,
-				'type' => DB::FIELD_TYPE_ID,
-				'length' => 20,
-				'ref_table' => 'applications',
-				'ref_field' => 'applicationid',
-			),
 		),
 	),
 	'httptest' => array(
@@ -924,21 +917,6 @@ return array(
 				'length' => 10,
 				'default' => '365',
 			),
-			'lastvalue' => array(
-				'null' => true,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 255,
-			),
-			'lastclock' => array(
-				'null' => true,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-			),
-			'prevvalue' => array(
-				'null' => true,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 255,
-			),
 			'status' => array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
@@ -974,11 +952,6 @@ return array(
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
 				'default' => '0',
-			),
-			'prevorgvalue' => array(
-				'null' => true,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 255,
 			),
 			'snmpv3_securityname' => array(
 				'null' => false,
@@ -1100,11 +1073,6 @@ return array(
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
 				'default' => '0',
-			),
-			'lastns' => array(
-				'null' => true,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
 			),
 			'flags' => array(
 				'null' => false,
@@ -3412,6 +3380,12 @@ return array(
 				'length' => 10,
 				'default' => '0',
 			),
+			'severity_min' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0',
+			),
 		),
 	),
 	'sysmaps_elements' => array(
@@ -4885,6 +4859,12 @@ return array(
 				'length' => 64,
 				'default' => '',
 			),
+			'host_metadata' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => '',
+			),
 		),
 	),
 	'proxy_autoreg_host' => array(
@@ -4924,6 +4904,12 @@ return array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 64,
+				'default' => '',
+			),
+			'host_metadata' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
 				'default' => '',
 			),
 		),
@@ -5884,6 +5870,31 @@ return array(
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 255,
 				'default' => '',
+			),
+		),
+	),
+	'application_template' => array(
+		'type' => DB::TABLE_TYPE_CONFIG,
+		'key' => 'application_templateid',
+		'fields' => array(
+			'application_templateid' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+			),
+			'applicationid' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'applications',
+				'ref_field' => 'applicationid',
+			),
+			'templateid' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'applications',
+				'ref_field' => 'applicationid',
 			),
 		),
 	),

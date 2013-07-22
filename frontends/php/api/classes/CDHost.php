@@ -17,14 +17,12 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
+
 /**
- * File containing CCHost class for API.
+ * Class containing methods for operations with discovery hosts.
+ *
  * @package API
- */
-/**
- * Class containing methods for operations with Discovered Hosts
  */
 class CDHost extends CZBXAPI {
 
@@ -32,32 +30,32 @@ class CDHost extends CZBXAPI {
 	protected $tableAlias = 'dh';
 	protected $sortColumns = array('dhostid', 'druleid');
 
-/**
- * Get Host data
- *
- * @param _array $options
- * @param array $options['nodeids'] Node IDs
- * @param array $options['groupids'] HostGroup IDs
- * @param boolean $options['monitored_hosts'] only monitored Hosts
- * @param boolean $options['templated_hosts'] include templates in result
- * @param boolean $options['with_items'] only with items
- * @param boolean $options['with_historical_items'] only with historical items
- * @param boolean $options['with_triggers'] only with triggers
- * @param boolean $options['with_httptests'] only with http tests
- * @param boolean $options['with_graphs'] only with graphs
- * @param boolean $options['editable'] only with read-write permission. Ignored for SuperAdmins
- * @param boolean $options['selectTemplates'] select Templates
- * @param boolean $options['selectItems'] select Items
- * @param boolean $options['selectTriggers'] select Triggers
- * @param boolean $options['selectGraphs'] select Graphs
- * @param int $options['count'] count Hosts, returned column name is rowscount
- * @param string $options['pattern'] search hosts by pattern in Host name
- * @param string $options['extendPattern'] search hosts by pattern in Host name, ip and DNS
- * @param int $options['limit'] limit selection
- * @param string $options['sortfield'] field to sort by
- * @param string $options['sortorder'] sort order
- * @return array|boolean Host data as array or false if error
- */
+	/**
+	 * Get host data.
+	 *
+	 * @param array  $options
+	 * @param array  $options['nodeids']				Node IDs
+	 * @param array  $options['groupids']				HostGroup IDs
+	 * @param bool   $options['monitored_hosts']		only monitored Hosts
+	 * @param bool   $options['templated_hosts']		include templates in result
+	 * @param bool   $options['with_items']				only with items
+	 * @param bool   $options['with_triggers']			only with triggers
+	 * @param bool   $options['with_httptests']			only with http tests
+	 * @param bool   $options['with_graphs']			only with graphs
+	 * @param bool   $options['editable']				only with read-write permission. Ignored for SuperAdmins
+	 * @param bool   $options['selectTemplates']		select Templates
+	 * @param bool   $options['selectItems']			select Items
+	 * @param bool   $options['selectTriggers']			select Triggers
+	 * @param bool   $options['selectGraphs']			select Graphs
+	 * @param int    $options['count']					count Hosts, returned column name is rowscount
+	 * @param string $options['pattern']				search hosts by pattern in Host name
+	 * @param string $options['extendPattern']			search hosts by pattern in Host name, ip and DNS
+	 * @param int    $options['limit']					limit selection
+	 * @param string $options['sortfield']				field to sort by
+	 * @param string $options['sortorder']				sort order
+	 *
+	 * @return array									Host data as array or false if error
+	 */
 	public function get($options = array()) {
 		$result = array();
 		$nodeCheck = false;
@@ -338,4 +336,3 @@ class CDHost extends CZBXAPI {
 		return $result;
 	}
 }
-?>

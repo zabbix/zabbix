@@ -1,3 +1,4 @@
+<?php
 /*
 ** Zabbix
 ** Copyright (C) 2001-2013 Zabbix SIA
@@ -17,9 +18,34 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-/* Normal screen CSS Document */
-.formrow .dt { width: 20%; }
-.formrow .dd { width: 77%; margin-left: 21%; }
 
-.formlist .text, .formlist textarea, .formlist .password { padding: 3px; }
-.formlist select { padding: 2px; }
+/**
+ * A class for creating a storing instances of DB objects managers.
+ */
+class Manager extends CFactoryRegistry {
+
+	public static function getInstance($class = __CLASS__) {
+		return parent::getInstance($class);
+	}
+
+	/**
+	 * @return CApplicationManager
+	 */
+	public static function Application() {
+		return self::getInstance()->getObject('CApplicationManager');
+	}
+
+	/**
+	 * @return CHistoryManager
+	 */
+	public static function History() {
+		return self::getInstance()->getObject('CHistoryManager');
+	}
+
+	/**
+	 * @return CHttpTestManager
+	 */
+	public static function HttpTest() {
+		return self::getInstance()->getObject('CHttpTestManager');
+	}
+}

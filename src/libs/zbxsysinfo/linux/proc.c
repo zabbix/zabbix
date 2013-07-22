@@ -346,7 +346,7 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 	int		zbx_proc_stat;
 	zbx_uint64_t	proccount = 0;
 
-	if (request->nparam > 4)
+	if (4 < request->nparam)
 		return SYSINFO_RET_FAIL;
 
 	procname = get_rparam(request, 0);

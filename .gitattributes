@@ -166,14 +166,7 @@ frontends/php/images/sysmaps/old/Printer.png -text svneol=unset#unset
 frontends/php/images/sysmaps/old/Router.png -text svneol=unset#unset
 frontends/php/images/sysmaps/old/Server.png -text svneol=unset#unset
 frontends/php/images/sysmaps/old/Workstation.png -text svneol=unset#unset
-frontends/php/include/classes/class.cmultiselect.php -text
-frontends/php/include/classes/macros/CEventDescription.php -text
-frontends/php/include/classes/macros/CTriggerDescription.php -text
-frontends/php/include/classes/validators/CSetValidator.php -text
-frontends/php/include/classes/validators/event/CEventSourceObjectValidator.php -text
-frontends/php/include/draw.inc.php -text
-frontends/php/include/views/js/administration.general.housekeeper.edit.js.php -text
-frontends/php/include/views/monitoring.dashconf.php -text
+frontends/php/include/classes/core/Manager.php -text
 frontends/php/js/flickerfreescreen.js -text svneol=unset#text/plain
 frontends/php/js/multiselect.js -text svneol=unset#text/plain
 frontends/php/js/servercheck.js -text
@@ -264,9 +257,13 @@ frontends/php/styles/themes/originalblue/images/icons_d40000.png -text
 frontends/php/styles/themes/originalblue/images/icons_ffffff.png -text
 frontends/php/styles/themes/originalblue/images/preloader.gif -text
 frontends/php/tests/bootstrap.php.template -text
-frontends/php/tests/general/CTriggerFunctionValidatorTest.php -text
-include/module.h -text
-include/zbxmodules.h -text
+frontends/php/tests/selenium/testFormGraphPrototype.php -text
+frontends/php/tests/selenium/testFormWeb.php -text
+frontends/php/tests/selenium/testInheritanceGraphPrototype.php -text
+frontends/php/tests/selenium/testInheritanceWeb.php -text
+frontends/php/tests/selenium/testZBX6339.php -text
+frontends/php/tests/selenium/testZBX6648.php -text
+frontends/php/tests/selenium/testZBX6663.php -text
 man/zabbix_agentd.man -text
 man/zabbix_get.man -text
 man/zabbix_proxy.man -text
@@ -544,7 +541,28 @@ misc/init.d/fedora/core5/zabbix_agentd -text
 misc/init.d/freebsd/zabbix_agentd -text
 misc/init.d/freebsd/zabbix_server -text
 misc/init.d/tru64/zabbix_server -text
-src/libs/zbxcommon/int128.c -text
+src/libs/zbxalgo/vectorimpl.h -text
+src/libs/zbxdbcache/valuecache.c -text
+src/libs/zbxdbcache/valuecache.h -text
+src/libs/zbxsysinfo/aix/hostname.c -text
+src/libs/zbxsysinfo/aix/software.c -text
+src/libs/zbxsysinfo/freebsd/hostname.c -text
+src/libs/zbxsysinfo/freebsd/software.c -text
+src/libs/zbxsysinfo/hpux/hostname.c -text
+src/libs/zbxsysinfo/hpux/software.c -text
+src/libs/zbxsysinfo/linux/hostname.c -text
+src/libs/zbxsysinfo/netbsd/hostname.c -text
+src/libs/zbxsysinfo/netbsd/software.c -text
+src/libs/zbxsysinfo/openbsd/hostname.c -text
+src/libs/zbxsysinfo/openbsd/software.c -text
+src/libs/zbxsysinfo/osf/hostname.c -text
+src/libs/zbxsysinfo/osf/software.c -text
+src/libs/zbxsysinfo/osx/hostname.c -text
+src/libs/zbxsysinfo/osx/software.c -text
+src/libs/zbxsysinfo/solaris/hostname.c -text
+src/libs/zbxsysinfo/solaris/software.c -text
+src/libs/zbxsysinfo/win32/hostname.c -text
+src/libs/zbxsysinfo/win32/software.c -text
 src/zabbix_java/lib/logback-classic-0.9.27.jar -text
 src/zabbix_java/lib/logback-core-0.9.27.jar -text
 src/zabbix_java/lib/org-json-2010-12-28.jar -text
