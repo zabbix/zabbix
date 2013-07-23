@@ -521,17 +521,21 @@ function check_field(&$fields, &$field, $checks) {
 }
 
 function invalid_url($msg = null) {
-	global $ZBX_MESSAGES;
 	if (empty($msg)) {
 		$msg = _('Zabbix has received an incorrect request.');
 	}
 
-	$_temp = $ZBX_MESSAGES;
-	$ZBX_MESSAGES=null;
+	// required global parameters for correct including page_header.php
+	global $DB, $ZBX_MESSAGES;
+
+	// backup messages before including page_header.php
+	$temp = $ZBX_MESSAGES;
+	$ZBX_MESSAGES = null;
 
 	require_once dirname(__FILE__).'/page_header.php';
 
-	$ZBX_MESSAGES = $_temp;
+	// rollback reseted messages
+	$ZBX_MESSAGES = $temp;
 
 	unset_all();
 	show_error_message($msg);
