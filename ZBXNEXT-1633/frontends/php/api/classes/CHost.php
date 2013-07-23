@@ -948,7 +948,7 @@ class CHost extends CHostGeneral {
 		$macros = array();
 		foreach ($hosts as $host) {
 			// extend host inventory with the required data
-			if (isset($host['inventory'])) {
+			if (isset($host['inventory']) && $host['inventory']) {
 				$inventory = $inventories[$host['hostid']];
 
 				// if no host inventory record exists in the DB, it's disabled
