@@ -1517,33 +1517,36 @@ class CChart extends CGraphDraw {
 				$newPow = $maxYPow['pow'];
 			}
 
-			// get all values in y-axis
-			$calcValues = array();
-			for ($i = 0; $i <= $hstr_count; $i++) {
-				$hstr_count = ($hstr_count == 0) ? 1 : $hstr_count;
+			$maxLength = false;
+			// get all values in y-axis if units != 's'
+			if ($units != 's') {
+				$calcValues = array();
+				for ($i = 0; $i <= $hstr_count; $i++) {
+					$hstr_count = ($hstr_count == 0) ? 1 : $hstr_count;
 
-				$val = bcadd(bcmul($i, $step), $minY);
+					$val = bcadd(bcmul($i, $step), $minY);
 
-				if (bccomp(bcadd($val, bcdiv($step,2)), $maxY) == 1) {
-					continue;
+					if (bccomp(bcadd($val, bcdiv($step,2)), $maxY) == 1) {
+						continue;
+					}
+
+					$calcValues[] = convert_units(array(
+						'value' => $val,
+						'convert' => ITEM_CONVERT_NO_UNITS,
+						'byteStep' => $byteStep,
+						'pow' => $newPow
+					));
 				}
 
 				$calcValues[] = convert_units(array(
-					'value' => $val,
+					'value' => $maxY,
 					'convert' => ITEM_CONVERT_NO_UNITS,
 					'byteStep' => $byteStep,
 					'pow' => $newPow
 				));
+
+				$maxLength = calcMaxLengthAfterDot($calcValues);
 			}
-
-			$calcValues[] = convert_units(array(
-				'value' => $maxY,
-				'convert' => ITEM_CONVERT_NO_UNITS,
-				'byteStep' => $byteStep,
-				'pow' => $newPow
-			));
-
-			$maxLength = calcMaxLengthAfterDot($calcValues);
 
 			for ($i = 0; $i <= $hstr_count; $i++) {
 				$hstr_count = ($hstr_count == 0) ? 1 : $hstr_count;
