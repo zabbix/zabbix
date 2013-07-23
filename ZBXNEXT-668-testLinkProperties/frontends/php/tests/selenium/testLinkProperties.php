@@ -29,7 +29,7 @@ class testLinkProperties extends CWebTest {
 	public static function zbx_data() {
 		return array(
 			// Host groups
-			array(
+		/*	array(
 				array(
 					'expected' => LINK_GOOD,
 					'login' => 'hostgroups.php?form=update&groupid=1',
@@ -419,8 +419,59 @@ class testLinkProperties extends CWebTest {
 					)
 				)
 			),
-			// Web scenarios
+*/			// Overview
 			array(
+				array(
+					'expected' => LINK_GOOD,
+					'login' => 'overview.php?&form_refresh=1&groupid=4&application=Filesystems&type=0',
+					'title' => 'Overview \[refreshed every 30 sec\]',
+					'text' => 'OVERVIEW'
+				)
+			),
+			array(
+				array(
+					'expected' => LINK_BAD,
+					'login' => 'overview.php?&form_refresh=1&groupid=4444&application=Filesystems&type=0',
+					'title' => 'Overview \[refreshed every 30 sec\]',
+					'errors' => array(
+						'ERROR: No permissions to referred object or it does not exist!'
+					)
+				)
+			),
+			array(
+				array(
+					'expected' => LINK_BAD,
+					'login' => 'overview.php?&form_refresh=1&groupid=4&application=SomeApplication&type=0',
+					'title' => 'Overview \[refreshed every 30 sec\]',
+					'errors' => array(
+						'ERROR: No permissions to referred object or it does not exist!'
+					)
+				)
+			),
+			array(
+				array(
+					'expected' => LINK_BAD,
+					'login' => 'overview.php?&form_refresh=1&groupid=abc&application=Filesystems&type=0',
+					'title' => 'Overview \[refreshed every 30 sec\]'
+					'errors' => array(
+						'ERROR: Zabbix has received an incorrect request.',
+						'Critical error. Field "groupid" is not integer.'
+					)
+				)
+			),
+			array(
+				array(
+					'expected' => LINK_BAD,
+					'login' => 'overview.php?&form_refresh=1&groupid=&application=Filesystems&type=0',
+					'title' => 'Overview \[refreshed every 30 sec\]'
+					'errors' => array(
+						'ERROR: Zabbix has received an incorrect request.',
+						'Critical error. Field "groupid" is not integer.'
+					)
+				)
+			),
+			// Web scenarios
+		/*	array(
 				array(
 					'expected' => LINK_GOOD,
 					'login' => 'httpdetails.php?httptestid=1',
@@ -753,7 +804,254 @@ class testLinkProperties extends CWebTest {
 						'Critical error. Field "sysmapid" is not integer.'
 					)
 				)
-			)
+			),*/
+			// Discovery rule
+			array(
+				array(
+					'expected' => LINK_GOOD,
+					'login' => 'discovery.php?&form_refresh=1&fullscreen=0&druleid=3',
+					'title' => 'Status of discovery',
+					'text' => 'STATUS OF DISCOVERY'
+				)
+			),
+			array(
+				array(
+					'expected' => LINK_BAD,
+					'login' => 'discovery.php?&form_refresh=1&fullscreen=0&druleid=11111',
+					'title' => 'Status of discovery',
+					'errors' => array(
+						'ERROR: No permissions to referred object or it does not exist!'
+					)
+				)
+			),
+			array(
+				array(
+					'expected' => LINK_BAD,
+					'login' => 'discovery.php?&form_refresh=1&fullscreen=0&druleid=abc',
+					'title' => 'Status of discovery',
+					'errors' => array(
+						'ERROR: Zabbix has received an incorrect request.',
+						'Critical error. Field "druleid" is not integer.'
+					)
+				)
+			),
+			array(
+				array(
+					'expected' => LINK_BAD,
+					'login' => 'discovery.php?&form_refresh=1&fullscreen=0&druleid=',
+					'title' => 'Status of discovery',
+					'errors' => array(
+						'ERROR: Zabbix has received an incorrect request.',
+						'Critical error. Field "druleid" is not integer.'
+					)
+				)
+			),
+			// IT services
+			array(
+				array(
+					'expected' => LINK_GOOD,
+					'login' => '/srv_status.php?&form_refresh=1&fullscreen=0&period=month',
+					'title' => 'IT services \[refreshed every 30 sec\]',
+					'text' => 'IT SERVICES'
+				)
+			),
+			array(
+				array(
+					'expected' => LINK_BAD,
+					'login' => '/srv_status.php?&form_refresh=1&fullscreen=0&period=1',
+					'title' => 'IT services \[refreshed every 30 sec\]',
+					'errors' => array(
+						'ERROR: No permissions to referred object or it does not exist!'
+					)
+				)
+			),
+			array(
+				array(
+					'expected' => LINK_BAD,
+					'login' => '/srv_status.php?&form_refresh=1&fullscreen=0&period=abc',
+					'title' => 'IT services \[refreshed every 30 sec\]',
+					'errors' => array(
+						'ERROR: Zabbix has received an incorrect request.',
+						'Critical error. Field "druleid" is not string.'
+					)
+				)
+			),
+			array(
+				array(
+					'expected' => LINK_BAD,
+					'login' => '/srv_status.php?&form_refresh=1&fullscreen=0&period=month',
+					'title' => 'IT services \[refreshed every 30 sec\]',
+					'errors' => array(
+						'ERROR: Zabbix has received an incorrect request.',
+						'Critical error. Field "druleid" is not string.'
+					)
+				)
+			),
+			// Inventory overview
+			array(
+				array(
+					'expected' => LINK_GOOD,
+					'login' => 'hostinventoriesoverview.php?&form_refresh=1&groupid=50003&groupby=chassis',
+					'title' => 'Host inventory overview',
+					'text' => 'HOST INVENTORY OVERVIEW'
+				)
+			),
+			array(
+				array(
+					'expected' => LINK_BAD,
+					'login' => 'hostinventoriesoverview.php?&form_refresh=1&groupid=78&groupby=chassis',
+					'title' => 'Host inventory overview',
+					'errors' => array(
+						'ERROR: No permissions to referred object or it does not exist!'
+					)
+				)
+			),
+			array(
+				array(
+					'expected' => LINK_BAD,
+					'login' => 'hostinventoriesoverview.php?&form_refresh=1&groupid=abc&groupby=chassis',
+					'title' => 'Host inventory overview',
+					'errors' => array(
+						'ERROR: Zabbix has received an incorrect request.',
+						'Critical error. Field "groupid" is not string.'
+					)
+				)
+			),
+			array(
+				array(
+					'expected' => LINK_BAD,
+					'login' => 'hostinventoriesoverview.php?&form_refresh=1&groupid=&groupby=chassis',
+					'title' => 'Host inventory overview',
+					'errors' => array(
+						'ERROR: Zabbix has received an incorrect request.',
+						'Critical error. Field "groupid" is not string.'
+					)
+				)
+			),
+			// Host inventories
+			array(
+				array(
+					'expected' => LINK_GOOD,
+					'login' => 'hostinventories.php?&form_refresh=1&groupid=50003',
+					'title' => 'Host inventories',
+					'text' => 'HOST INVENTORIES'
+				)
+			),
+			array(
+				array(
+					'expected' => LINK_BAD,
+					'login' => 'hostinventories.php?&form_refresh=1&groupid=1111',
+					'title' => 'Host inventories',
+					'errors' => array(
+						'ERROR: No permissions to referred object or it does not exist!'
+					)
+				)
+			),
+			array(
+				array(
+					'expected' => LINK_BAD,
+					'login' => 'hostinventories.php?&form_refresh=1&groupid=abc',
+					'title' => 'Host inventories',
+					'errors' => array(
+						'ERROR: Zabbix has received an incorrect request.',
+						'Critical error. Field "groupid" is not string.'
+					)
+				)
+			),
+			array(
+				array(
+					'expected' => LINK_BAD,
+					'login' => 'hostinventories.php?&form_refresh=1&groupid=',
+					'title' => 'Host inventories',
+					'errors' => array(
+						'ERROR: Zabbix has received an incorrect request.',
+						'Critical error. Field "groupid" is not string.'
+					)
+				)
+			),
+			// Availability report
+				array(
+					'expected' => LINK_GOOD,
+					'login' => 'report2.php?filter_groupid=0&filter_hostid=50001&triggerid=16012',
+					'title' => 'Availability report',
+					'text' => 'AVAILABILITY REPORT'
+				)
+			),
+			array(
+				array(
+					'expected' => LINK_BAD,
+					'login' => 'report2.php?filter_groupid=0&filter_hostid=11111&triggerid=16012',
+					'title' => 'Availability report',
+					'errors' => array(
+						'ERROR: No permissions to referred object or it does not exist!'
+					)
+				)
+			),
+			array(
+				array(
+					'expected' => LINK_BAD,
+					'login' => 'report2.php?filter_groupid=0&filter_hostid=50001&triggerid=11111',
+					'title' => 'Availability report',
+					'errors' => array(
+						'ERROR: No permissions to referred object or it does not exist!'
+					)
+				)
+			),
+			array(
+				array(
+					'expected' => LINK_BAD,
+					'login' => 'report2.php?filter_groupid=11111&filter_hostid=50001&triggerid=16012',
+					'title' => 'Availability report',
+					'errors' => array(
+						'ERROR: No permissions to referred object or it does not exist!'
+					)
+				)
+			),
+			array(
+				array(
+					'expected' => LINK_BAD,
+					'login' => 'report2.php?filter_groupid=abc&filter_hostid=abc&triggerid=abc',
+					'title' => 'Availability report',
+					'errors' => array(
+						'ERROR: Zabbix has received an incorrect request.',
+						'Critical error. Field "triggerid" is not string.',
+						'Critical error. Field "filter_groupid" is not string.',
+						'Critical error. Field "filter_hostid" is not string.'
+					)
+				)
+			),
+			array(
+				array(
+					'expected' => LINK_BAD,
+					'login' => 'report2.php?filter_groupid=&filter_hostid=&triggerid=',
+					'title' => 'Availability report',
+					'errors' => array(
+						'ERROR: Zabbix has received an incorrect request.',
+						'Critical error. Field "triggerid" is not string.',
+						'Critical error. Field "filter_groupid" is not string.',
+						'Critical error. Field "filter_hostid" is not string.'
+					)
+				)
+			),
+			// Bar reports
+			array(
+				array(
+					'expected' => LINK_GOOD,
+					'login' => 'report6.php?&form_refresh=1&form=1&config=1&items[0][caption]=item1&items[0][itemid]=24338&items[0][color]=009900&items[0][calc_fnc]=2&items[0][axisside]=0&report_timesince=20130722170101&report_timetill=20130723170101&title=Report+1&xlabel=&ylabel=&scaletype=3&report_timesince_day=22&report_timesince_month=07&report_timesince_year=2013&report_timesince_hour=17&report_timesince_minute=01&report_timetill_day=23&report_timetill_month=07&report_timetill_year=2013&report_timetill_hour=17&report_timetill_minute=01&report_show=Show',
+					'title' => 'Bar reports',
+					'text' => 'Report'
+				)
+			),
+			array(
+				array(
+					'expected' => LINK_BAD,
+					'login' => 'report6.php?&form_refresh=1&form=1&config=1&items[0][caption]=item1&items[0][itemid]=11111&items[0][color]=009900&items[0][calc_fnc]=2&items[0][axisside]=0&report_timesince=20130722170101&report_timetill=20130723170101&title=Report+1&xlabel=&ylabel=&scaletype=3&report_timesince_day=22&report_timesince_month=07&report_timesince_year=2013&report_timesince_hour=17&report_timesince_minute=01&report_timetill_day=23&report_timetill_month=07&report_timetill_year=2013&report_timetill_hour=17&report_timetill_minute=01&report_show=Show',
+					'title' => 'Bar reports',
+					'errors' => array(
+						'ERROR: No permissions to referred object or it does not exist!'
+					)
+				)
+			),
 		);
 	}
 
