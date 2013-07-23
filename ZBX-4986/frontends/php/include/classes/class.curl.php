@@ -201,17 +201,28 @@ class Curl {
 		}
 		$this->formatQuery();
 	}
-
-	public function getUrl() {
+	/**
+	 * Return relative url.
+	 *
+	 * @param boolean $absoluteUrl   required absolute url
+	 *
+	 * @return string
+	 */
+	public function getUrl($absoluteUrl = false) {
 		$this->formatQuery();
 
-		$url = $this->protocol ? $this->protocol.'://' : '';
-		$url .= $this->username ? $this->username : '';
-		$url .= $this->password ? ':'.$this->password : '';
-		$url .= $this->username || $this->password ? '@' : '';
-		$url .= $this->host ? $this->host : '';
-		$url .= $this->port ? ':'.$this->port : '';
-		$url .= $this->path ? $this->path : '';
+		$url = '';
+		if($absoluteUrl) {
+			$url .= $this->protocol ? $this->protocol.'://' : '';
+			$url .= $this->username ? $this->username : '';
+			$url .= $this->password ? ':'.$this->password : '';
+			$url .= $this->username || $this->password ? '@' : '';
+			$url .= $this->host ? $this->host : '';
+			$url .= $this->port ? ':'.$this->port : '';
+			$url .= $this->path ? $this->path : '';
+		} else {
+			$url .= $this->path ? basename($this->path) : '';
+		}
 		$url .= $this->query ? '?'.$this->query : '';
 		$url .= $this->reference ? '#'.urlencode($this->reference) : '';
 		return $url;
