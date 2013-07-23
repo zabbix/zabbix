@@ -174,36 +174,50 @@ elseif (isset($_REQUEST['delete']) && isset($_REQUEST['actionid'])) {
 	}
 }
 elseif (isset($_REQUEST['add_condition']) && isset($_REQUEST['new_condition'])) {
+	$errors = 0;
 	try {
 		$newCondition = get_request('new_condition');
-
 		if ($newCondition) {
 			$conditions = get_request('conditions', array());
 
+			// in order to add maintenance, it must have a not null value
+			if ($newCondition['conditiontype'] == CONDITION_TYPE_MAINTENANCE) {
+				$newCondition['value'] = 1;
+			}
+
+			// check existing conditions and don't add same values twice for same type
 			foreach ($conditions as $condition) {
 				if ($newCondition['conditiontype'] == $condition['conditiontype']) {
 					if (is_array($newCondition['value'])) {
 						foreach ($newCondition['value'] as $key => $newValue) {
 							if ($condition['value'] == $newValue) {
+								// remove condition and show error that it cannot be added
 								unset($newCondition['value'][$key]);
+								$errors++;
+								error(_s('Cannot add same value twice for type "%1$s"',
+									condition_type2str($newCondition['conditiontype'])));
 							}
 						}
 					}
 					else {
 						if ($condition['value'] == $newCondition['value']) {
+							// remove condition and show error that it cannot be added
 							$newCondition['value'] = null;
+							$errors++;
+							error(_s('Cannot add same value twice for type "%1$s"',
+								condition_type2str($newCondition['conditiontype'])));
 						}
 					}
 				}
 			}
 
-			if (!zbx_empty($newCondition['value'])) {
+			// null, zero and empty validations are done later on
+			if (isset($newCondition['value'])) {
 				$newConditionValues = zbx_toArray($newCondition['value']);
 
 				foreach ($newConditionValues as $newValue) {
 					$condition = $newCondition;
 					$condition['value'] = $newValue;
-
 					$_REQUEST['conditions'][] = $condition;
 				}
 			}
@@ -214,7 +228,13 @@ elseif (isset($_REQUEST['add_condition']) && isset($_REQUEST['new_condition'])) 
 		}
 	}
 	catch (APIException $e) {
+		$errors++;
 		error($e->getMessage());
+	}
+
+	if ($errors) {
+		show_error_message(_n('A problem has been encountered while adding a condition',
+			'A problem has been encountered while adding conditions', $errors));
 	}
 }
 elseif (isset($_REQUEST['add_opcondition']) && isset($_REQUEST['new_opcondition'])) {
@@ -398,7 +418,10 @@ if (isset($_REQUEST['form'])) {
 		}
 	}
 
-	if (empty($data['action']['actionid']) && !isset($_REQUEST['form_refresh'])) {
+	if (empty($data['action']['actionid']) &&
+		!isset($_REQUEST['form_refresh']) &&
+		$data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
+
 		$data['action']['conditions'] = array(
 			array(
 				'conditiontype' => CONDITION_TYPE_TRIGGER_VALUE,
