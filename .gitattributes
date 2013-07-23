@@ -261,6 +261,7 @@ frontends/php/tests/selenium/testFormGraphPrototype.php -text
 frontends/php/tests/selenium/testFormWeb.php -text
 frontends/php/tests/selenium/testInheritanceGraphPrototype.php -text
 frontends/php/tests/selenium/testInheritanceWeb.php -text
+frontends/php/tests/selenium/testLinkProperties.php -text
 frontends/php/tests/selenium/testZBX6339.php -text
 frontends/php/tests/selenium/testZBX6648.php -text
 frontends/php/tests/selenium/testZBX6663.php -text
