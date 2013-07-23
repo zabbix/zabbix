@@ -29,7 +29,7 @@ class testLinkProperties extends CWebTest {
 	public static function zbx_data() {
 		return array(
 			// Host groups
-		/*	array(
+			array(
 				array(
 					'expected' => LINK_GOOD,
 					'login' => 'hostgroups.php?form=update&groupid=1',
@@ -418,21 +418,21 @@ class testLinkProperties extends CWebTest {
 						'Critical error. Field "druleid" is not integer.'
 					)
 				)
-			),*/
+			),
 			// Web scenarios
 			array(
 				array(
 					'expected' => LINK_GOOD,
-					'login' => 'httpdetails.php?httptestid=102',
-					'title' => 'Configuration of scenario',
-					'text' => 'CONFIGURATION OF WEB MONITORING'
+					'login' => 'httpdetails.php?httptestid=1',
+					'title' => 'Details of scenario',
+					'text' => 'DETAILS OF SCENARIO'
 				)
 			),
-		/*	array(
+			array(
 				array(
 					'expected' => LINK_BAD,
 					'login' => 'httpdetails.php?httptestid=1111',
-					'title' => 'Configuration of scenario',
+					'title' => 'Details of scenario',
 					'errors' => array(
 						'ERROR: No permissions to referred object or it does not exist!'
 					)
@@ -442,7 +442,7 @@ class testLinkProperties extends CWebTest {
 				array(
 					'expected' => LINK_BAD,
 					'login' => 'httpdetails.php?httptestid=abc',
-					'title' => 'Configuration of scenario',
+					'title' => 'Details of scenario',
 					'errors' => array(
 						'ERROR: Zabbix has received an incorrect request.',
 						'Critical error. Field "httptestid" is not integer.'
@@ -453,7 +453,7 @@ class testLinkProperties extends CWebTest {
 				array(
 					'expected' => LINK_BAD,
 					'login' => 'httpdetails.php?httptestid=',
-					'title' => 'Configuration of scenario',
+					'title' => 'Details of scenario',
 					'errors' => array(
 						'ERROR: Zabbix has received an incorrect request.',
 						'Critical error. Field "httptestid" is not integer.'
@@ -465,7 +465,7 @@ class testLinkProperties extends CWebTest {
 				array(
 					'expected' => LINK_GOOD,
 					'login' => 'latest.php?&form_refresh=1&groupid=4&hostid=30001',
-					'title' => 'Latest events [refreshed every 30 sec]',
+					'title' => 'Latest data \[refreshed every 30 sec\]',
 					'text' => 'LATEST DATA'
 				)
 			),
@@ -473,7 +473,7 @@ class testLinkProperties extends CWebTest {
 				array(
 					'expected' => LINK_BAD,
 					'login' => 'latest.php?&form_refresh=1&groupid=4&hostid=111111',
-					'title' => 'Latest events [refreshed every 30 sec]',
+					'title' => 'Latest data \[refreshed every 30 sec\]',
 					'errors' => array(
 						'ERROR: No permissions to referred object or it does not exist!'
 					)
@@ -483,7 +483,7 @@ class testLinkProperties extends CWebTest {
 				array(
 					'expected' => LINK_BAD,
 					'login' => 'latest.php?&form_refresh=1&groupid=123&hostid=30001',
-					'title' => 'Latest events [refreshed every 30 sec]',
+					'title' => 'Latest data \[refreshed every 30 sec\]',
 					'errors' => array(
 						'ERROR: No permissions to referred object or it does not exist!'
 					)
@@ -493,7 +493,7 @@ class testLinkProperties extends CWebTest {
 				array(
 					'expected' => LINK_BAD,
 					'login' => 'latest.php?&form_refresh=1&groupid=abc&hostid=abc',
-					'title' => 'Latest events [refreshed every 30 sec]',
+					'title' => 'Latest data \[refreshed every 30 sec\]',
 					'errors' => array(
 						'ERROR: Zabbix has received an incorrect request.',
 						'Critical error. Field "groupid" is not integer.',
@@ -505,60 +505,7 @@ class testLinkProperties extends CWebTest {
 				array(
 					'expected' => LINK_BAD,
 					'login' => 'latest.php?&form_refresh=1&groupid=&hostid=',
-					'title' => 'Latest events [refreshed every 30 sec]',
-					'errors' => array(
-						'ERROR: Zabbix has received an incorrect request.',
-						'Critical error. Field "groupid" is not integer.',
-						'Critical error. Field "hostid" is not integer.'
-					)
-				)
-			),
-			// Latest data
-			array(
-				array(
-					'expected' => LINK_GOOD,
-					'login' => 'latest.php?&form_refresh=1&groupid=4&hostid=30001',
-					'title' => 'Latest events [refreshed every 30 sec]',
-					'text' => 'LATEST DATA'
-				)
-			),
-			array(
-				array(
-					'expected' => LINK_BAD,
-					'login' => 'latest.php?&form_refresh=1&groupid=4&hostid=111111',
-					'title' => 'Latest events [refreshed every 30 sec]',
-					'errors' => array(
-						'ERROR: No permissions to referred object or it does not exist!'
-					)
-				)
-			),
-			array(
-				array(
-					'expected' => LINK_BAD,
-					'login' => 'latest.php?&form_refresh=1&groupid=123&hostid=30001',
-					'title' => 'Latest events [refreshed every 30 sec]',
-					'errors' => array(
-						'ERROR: No permissions to referred object or it does not exist!'
-					)
-				)
-			),
-			array(
-				array(
-					'expected' => LINK_BAD,
-					'login' => 'latest.php?&form_refresh=1&groupid=abc&hostid=abc',
-					'title' => 'Latest events [refreshed every 30 sec]',
-					'errors' => array(
-						'ERROR: Zabbix has received an incorrect request.',
-						'Critical error. Field "groupid" is not integer.',
-						'Critical error. Field "hostid" is not integer.'
-					)
-				)
-			),
-			array(
-				array(
-					'expected' => LINK_BAD,
-					'login' => 'latest.php?&form_refresh=1&groupid=&hostid=',
-					'title' => 'Latest events [refreshed every 30 sec]',
+					'title' => 'Latest data \[refreshed every 30 sec\]',
 					'errors' => array(
 						'ERROR: Zabbix has received an incorrect request.',
 						'Critical error. Field "groupid" is not integer.',
@@ -571,7 +518,7 @@ class testLinkProperties extends CWebTest {
 				array(
 					'expected' => LINK_GOOD,
 					'login' => 'tr_status.php?&form_refresh=1&groupid=4&hostid=0&fullscreen=0',
-					'title' => 'Status of triggers [refreshed every 30 sec]',
+					'title' => 'Status of triggers \[refreshed every 30 sec\]',
 					'text' => 'STATUS OF TRIGGERS'
 				)
 			),
@@ -579,7 +526,17 @@ class testLinkProperties extends CWebTest {
 				array(
 					'expected' => LINK_BAD,
 					'login' => 'tr_status.php?&form_refresh=1&groupid=15&hostid=0&fullscreen=0',
-					'title' => 'Status of triggers [refreshed every 30 sec]',
+					'title' => 'Status of triggers \[refreshed every 30 sec\]',
+					'errors' => array(
+						'ERROR: No permissions to referred object or it does not exist!'
+					)
+				)
+			),
+			array(
+				array(
+					'expected' => LINK_BAD,
+					'login' => 'tr_status.php?&form_refresh=1&groupid=1&hostid=1234&fullscreen=0',
+					'title' => 'Status of triggers \[refreshed every 30 sec\]',
 					'errors' => array(
 						'ERROR: No permissions to referred object or it does not exist!'
 					)
@@ -589,7 +546,7 @@ class testLinkProperties extends CWebTest {
 				array(
 					'expected' => LINK_BAD,
 					'login' => 'tr_status.php?&form_refresh=1&groupid=abc&hostid=abc&fullscreen=0',
-					'title' => 'Status of triggers [refreshed every 30 sec]',
+					'title' => 'Status of triggers \[refreshed every 30 sec\]',
 					'errors' => array(
 						'ERROR: Zabbix has received an incorrect request.',
 						'Critical error. Field "groupid" is not integer.',
@@ -601,7 +558,7 @@ class testLinkProperties extends CWebTest {
 				array(
 					'expected' => LINK_BAD,
 					'login' => 'tr_status.php?&form_refresh=1&groupid=&hostid=&fullscreen=0',
-					'title' => 'Status of triggers [refreshed every 30 sec]',
+					'title' => 'Status of triggers \[refreshed every 30 sec\]',
 					'errors' => array(
 						'ERROR: Zabbix has received an incorrect request.',
 						'Critical error. Field "groupid" is not integer.',
@@ -614,7 +571,7 @@ class testLinkProperties extends CWebTest {
 				array(
 					'expected' => LINK_GOOD,
 					'login' => 'events.php?triggerid=13498',
-					'title' => 'Latest events [refreshed every 30 sec]',
+					'title' => 'Latest events \[refreshed every 30 sec\]',
 					'text' => 'HISTORY OF EVENTS'
 				)
 			),
@@ -622,7 +579,7 @@ class testLinkProperties extends CWebTest {
 				array(
 					'expected' => LINK_BAD,
 					'login' => 'events.php?triggerid=1',
-					'title' => 'Latest events [refreshed every 30 sec]',
+					'title' => 'Latest events \[refreshed every 30 sec\]',
 					'errors' => array(
 						'ERROR: No permissions to referred object or it does not exist!'
 					)
@@ -632,7 +589,7 @@ class testLinkProperties extends CWebTest {
 				array(
 					'expected' => LINK_BAD,
 					'login' => 'events.php?triggerid=abc',
-					'title' => 'Latest events [refreshed every 30 sec]',
+					'title' => 'Latest events \[refreshed every 30 sec\]',
 					'errors' => array(
 						'ERROR: Zabbix has received an incorrect request.',
 						'Critical error. Field "triggerid" is not integer.'
@@ -643,7 +600,7 @@ class testLinkProperties extends CWebTest {
 				array(
 					'expected' => LINK_BAD,
 					'login' => 'events.php?triggerid=',
-					'title' => 'Latest events [refreshed every 30 sec]',
+					'title' => 'Latest events \[refreshed every 30 sec\]',
 					'errors' => array(
 						'ERROR: Zabbix has received an incorrect request.',
 						'Critical error. Field "triggerid" is not integer.'
@@ -655,7 +612,7 @@ class testLinkProperties extends CWebTest {
 				array(
 					'expected' => LINK_GOOD,
 					'login' => 'charts.php?&form_refresh=1&fullscreen=0&groupid=0&hostid=40001&graphid=0',
-					'title' => 'Custom graphs [refreshed every 30 sec]',
+					'title' => 'Custom graphs \[refreshed every 30 sec\]',
 					'text' => 'Graphs'
 				)
 			),
@@ -673,7 +630,7 @@ class testLinkProperties extends CWebTest {
 				array(
 					'expected' => LINK_BAD,
 					'login' => 'charts.php?&form_refresh=1&fullscreen=0&groupid=15&hostid=0&graphid=0',
-					'title' => 'Custom graphs [refreshed every 30 sec]',
+					'title' => 'Custom graphs \[refreshed every 30 sec\]',
 					'errors' => array(
 						'ERROR: No permissions to referred object or it does not exist!'
 					)
@@ -693,7 +650,7 @@ class testLinkProperties extends CWebTest {
 				array(
 					'expected' => LINK_BAD,
 					'login' => 'charts.php?&form_refresh=1&fullscreen=0&groupid=abc&hostid=abc&graphid=abc',
-					'title' => 'Custom graphs [refreshed every 30 sec]',
+					'title' => 'Custom graphs \[refreshed every 30 sec\]',
 					'errors' => array(
 						'ERROR: Zabbix has received an incorrect request.',
 						'Critical error. Field "groupid" is not integer.',
@@ -706,7 +663,7 @@ class testLinkProperties extends CWebTest {
 				array(
 					'expected' => LINK_BAD,
 					'login' => 'charts.php?&form_refresh=1&fullscreen=0&groupid=&hostid=&graphid=',
-					'title' => 'Custom graphs [refreshed every 30 sec]',
+					'title' => 'Custom graphs \[refreshed every 30 sec\]',
 					'errors' => array(
 						'ERROR: Zabbix has received an incorrect request.',
 						'Critical error. Field "groupid" is not integer.',
@@ -720,7 +677,7 @@ class testLinkProperties extends CWebTest {
 				array(
 					'expected' => LINK_GOOD,
 					'login' => 'screens.php?&form_refresh=1&fullscreen=0&elementid=200019',
-					'title' => 'Custom screens [refreshed every 30 sec]',
+					'title' => 'Custom screens \[refreshed every 30 sec\]',
 					'text' => 'SCREENS'
 				)
 			),
@@ -728,7 +685,7 @@ class testLinkProperties extends CWebTest {
 				array(
 					'expected' => LINK_BAD,
 					'login' => 'screens.php?&form_refresh=1&fullscreen=0&elementid=1',
-					'title' => 'Custom screens [refreshed every 30 sec]',
+					'title' => 'Custom screens \[refreshed every 30 sec\]',
 					'errors' => array(
 						'ERROR: Screen with ID "1" does not exist.'
 					)
@@ -738,7 +695,7 @@ class testLinkProperties extends CWebTest {
 				array(
 					'expected' => LINK_BAD,
 					'login' => 'screens.php?&form_refresh=1&fullscreen=0&elementid=abc',
-					'title' => 'Custom screens [refreshed every 30 sec]',
+					'title' => 'Custom screens \[refreshed every 30 sec\]',
 					'errors' => array(
 						'ERROR: Zabbix has received an incorrect request.',
 						'Critical error. Field "elementid" is not integer.'
@@ -749,7 +706,7 @@ class testLinkProperties extends CWebTest {
 				array(
 					'expected' => LINK_BAD,
 					'login' => 'screens.php?&form_refresh=1&fullscreen=0&elementid=',
-					'title' => 'Custom screens [refreshed every 30 sec]',
+					'title' => 'Custom screens \[refreshed every 30 sec\]',
 					'errors' => array(
 						'ERROR: Zabbix has received an incorrect request.',
 						'Critical error. Field "elementid" is not integer.'
@@ -761,42 +718,42 @@ class testLinkProperties extends CWebTest {
 				array(
 					'expected' => LINK_GOOD,
 					'login' => 'maps.php?&form_refresh=1&fullscreen=0&sysmapid=3',
-					'title' => 'Network maps [refreshed every 30 sec]',
-					'text' => 'SCREENS'
+					'title' => 'Network maps \[refreshed every 30 sec\]',
+					'text' => 'NETWORK MAPS'
 				)
 			),
 			array(
 				array(
 					'expected' => LINK_BAD,
-					'login' => 'screens.php?&form_refresh=1&fullscreen=0&elementid=1',
-					'title' => 'Custom screens [refreshed every 30 sec]',
+					'login' => 'maps.php?&form_refresh=1&fullscreen=0&sysmapid=3333',
+					'title' => 'Network maps \[refreshed every 30 sec\]',
 					'errors' => array(
-						'ERROR: Screen with ID "1" does not exist.'
+						'ERROR: No permissions to referred object or it does not exist!'
 					)
 				)
 			),
 			array(
 				array(
 					'expected' => LINK_BAD,
-					'login' => 'screens.php?&form_refresh=1&fullscreen=0&elementid=abc',
-					'title' => 'Custom screens [refreshed every 30 sec]',
-					'errors' => array(
-						'ERROR: Zabbix has received an incorrect request.',
-						'Critical error. Field "elementid" is not integer.'
-					)
-				)
-			),
-			array(
-				array(
-					'expected' => LINK_BAD,
-					'login' => 'screens.php?&form_refresh=1&fullscreen=0&elementid=',
-					'title' => 'Custom screens [refreshed every 30 sec]',
+					'login' => 'maps.php?&form_refresh=1&fullscreen=0&sysmapid=abc',
+					'title' => 'Network maps \[refreshed every 30 sec\]',
 					'errors' => array(
 						'ERROR: Zabbix has received an incorrect request.',
-						'Critical error. Field "elementid" is not integer.'
+						'Critical error. Field "sysmapid" is not integer.'
 					)
 				)
-			)*/
+			),
+			array(
+				array(
+					'expected' => LINK_BAD,
+					'login' => 'maps.php?&form_refresh=1&fullscreen=0&sysmapid=',
+					'title' => 'Network maps \[refreshed every 30 sec\]',
+					'errors' => array(
+						'ERROR: Zabbix has received an incorrect request.',
+						'Critical error. Field "sysmapid" is not integer.'
+					)
+				)
+			)
 		);
 	}
 
