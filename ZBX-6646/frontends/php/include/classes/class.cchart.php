@@ -1528,10 +1528,20 @@ class CChart extends CGraphDraw {
 					continue;
 				}
 
-				$calcValues[] = convert_units($val, null, ITEM_CONVERT_NO_UNITS, $byteStep, $newPow);
+				$calcValues[] = convert_units(array(
+					'value' => $val,
+					'convert' => ITEM_CONVERT_NO_UNITS,
+					'byteStep' => $byteStep,
+					'pow' => $newPow
+				));
 			}
 
-			$calcValues[] = convert_units($maxY, null, ITEM_CONVERT_NO_UNITS, $byteStep, $newPow);
+			$calcValues[] = convert_units(array(
+				'value' => $maxY,
+				'convert' => ITEM_CONVERT_NO_UNITS,
+				'byteStep' => $byteStep,
+				'pow' => $newPow
+			));
 
 			$maxLength = calcMaxLengthAfterDot($calcValues);
 
@@ -1544,7 +1554,15 @@ class CChart extends CGraphDraw {
 					continue;
 				}
 
-				$str = convert_units($val, $units, ITEM_CONVERT_NO_UNITS, $byteStep, $newPow, $ignoreMillisec, $maxLength);
+				$str = convert_units(array(
+					'value' => $val,
+					'units' => $units,
+					'convert' => ITEM_CONVERT_NO_UNITS,
+					'byteStep' => $byteStep,
+					'pow' => $newPow,
+					'ignoreMillisec' => $ignoreMillisec,
+					'length' => $maxLength
+				));
 
 				if ($side == GRAPH_YAXIS_SIDE_LEFT) {
 					$dims = imageTextSize(8, 0, $str);
@@ -1568,7 +1586,16 @@ class CChart extends CGraphDraw {
 				);
 			}
 
-			$str = convert_units($maxY, $units, ITEM_CONVERT_NO_UNITS, $byteStep, $newPow, $ignoreMillisec, $maxLength);
+			$str = convert_units(array(
+				'value' => $maxY,
+				'units' => $units,
+				'convert' => ITEM_CONVERT_NO_UNITS,
+				'byteStep' => $byteStep,
+				'pow' => $newPow,
+				'ignoreMillisec' => $ignoreMillisec,
+				'length' => $maxLength
+			));
+
 			if ($side == GRAPH_YAXIS_SIDE_LEFT) {
 				$dims = imageTextSize(8, 0, $str);
 				$posX = $this->shiftXleft - $dims['width'] - 9;
@@ -1817,19 +1844,35 @@ class CChart extends CGraphDraw {
 				$legend->addCell($rowNum, array('text' => $item_caption));
 				$legend->addCell($rowNum, array('text' => '['.$fncRealName.']'));
 				$legend->addCell($rowNum, array(
-					'text' => convert_units($this->getLastValue($i), $this->items[$i]['units'], ITEM_CONVERT_NO_UNITS),
+					'text' => convert_units(array(
+						'value' => $this->getLastValue($i),
+						'units' => $this->items[$i]['units'],
+						'convert' => ITEM_CONVERT_NO_UNITS
+					)),
 					'align' => 2
 				));
 				$legend->addCell($rowNum, array(
-					'text' => convert_units(min($data['min']), $this->items[$i]['units'], ITEM_CONVERT_NO_UNITS),
+					'text' => convert_units(array(
+						'value' => min($data['min']),
+						'units' => $this->items[$i]['units'],
+						'convert' => ITEM_CONVERT_NO_UNITS
+					)),
 					'align' => 2
 				));
 				$legend->addCell($rowNum, array(
-					'text' => convert_units($data['avg_orig'], $this->items[$i]['units'], ITEM_CONVERT_NO_UNITS),
+					'text' => convert_units(array(
+						'value' => $data['avg_orig'],
+						'units' => $this->items[$i]['units'],
+						'convert' => ITEM_CONVERT_NO_UNITS
+					)),
 					'align' => 2
 				));
 				$legend->addCell($rowNum, array(
-					'text' => convert_units(max($data['max']), $this->items[$i]['units'], ITEM_CONVERT_NO_UNITS),
+					'text' => convert_units(array(
+						'value' => max($data['max']),
+						'units' => $this->items[$i]['units'],
+						'convert' => ITEM_CONVERT_NO_UNITS
+					)),
 					'align' => 2
 				));
 			}
@@ -1870,8 +1913,12 @@ class CChart extends CGraphDraw {
 			foreach ($this->percentile as $side => $percentile) {
 				if ($percentile['percent'] > 0 && $percentile['value']) {
 					$percentile['percent'] = (float) $percentile['percent'];
+					$convertedUnit = convert_units(array(
+						'value' => $percentile['value'],
+						'units' => $units[$side]
+					));
 					$legend->addCell($rowNum, array(
-						'text' => $percentile['percent'].'th percentile: '.convert_units($percentile['value'], $units[$side]).' ('.$side.')',
+						'text' => $percentile['percent'].'th percentile: '.$convertedUnit.' ('.$side.')',
 						ITEM_CONVERT_NO_UNITS
 					));
 					if ($side == 'left') {
