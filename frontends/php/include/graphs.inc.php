@@ -887,10 +887,10 @@ function convertToBase1024 ($value, $step = false) {
 	}
 
 	if ($valData['pow'] >= 0) {
-		if (sprintf('%.10f', $valData['value'] == 0)) {
-			$valData['value'] = 0;
-		}
-		else {
+		if ($valData['value'] != 0) {
+			$valData['value'] = bcdiv(sprintf('%.10f',$value), sprintf('%.10f', $valData['value']),
+				ZBX_PRECISION_10);
+
 			$valData['value'] = sprintf('%.10f', round(bcmul($valData['value'], bcpow(1024, $valData['pow'])),
 				ZBX_PRECISION_10));
 		}
