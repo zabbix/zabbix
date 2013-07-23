@@ -311,6 +311,7 @@ A......... [ZBX-6407] improved data retrieval performance for CTrigger get() wit
 A.F....... [ZBX-1357] updated Brazilian Portuguese, Chinese (China), Latvian, Spanish and Turkish translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+..F....... [ZBX-6464] fixed item display in popup for simple graphs and plain text items (Ivo)
 ..F....... [ZBX-6652] added item validation in bar reports page (Ivo)
 ...G...... [ZBX-6730] fixed zabbix_agentd -t duplicate printing of parameters (igors)
 ........S. [ZBX-6801] fixed processing of host availability data received from proxy (wiper)
