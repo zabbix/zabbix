@@ -286,7 +286,7 @@ class CConfigurationExportBuilder {
 				'description' => $discoveryRule['description'],
 				'item_prototypes' => $this->formatItems($discoveryRule['itemPrototypes']),
 				'trigger_prototypes' => $this->formatTriggers($discoveryRule['triggerPrototypes']),
-				'graph_prototypes' => $this->formatGraphs($discoveryRule['graphPrototypes'])
+				'graph_prototypes' => $this->formatGraphs($discoveryRule['graphPrototypes']),
 				'host_prototypes' => $this->formatHostPrototypes($discoveryRule['hostPrototypes'])
 			);
 			if (isset($discoveryRule['interface_ref'])) {
