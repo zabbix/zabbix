@@ -10,6 +10,11 @@ A.F....... [ZBX-1357] updated Brazilian Portuguese, Chinese (China), Latvian, Sp
 
 Bug fixes:
 ..F....... [ZBX-6464] fixed item display in popup for simple graphs and plain text items (Ivo)
+..F....... [ZBX-6652] added item validation in bar reports page (Ivo)
+...G...... [ZBX-6730] fixed zabbix_agentd -t duplicate printing of parameters (igors)
+........S. [ZBX-6801] fixed processing of host availability data received from proxy (wiper)
+....I..... [ZBX-6637] added -m64 compilation flag for Solaris to be able to understand all attributes of 64-bit processes (igors)
+..F....... [ZBX-6761] fixed dbConditionInt() performance (Eduard)
 ........S. [ZBX-6681] fixed bug when one time maintenance period was ignored if it started before maintenance active time (wiper)
 .......P.. [ZBX-6630] faster proxy configuration synchronization (Andris)
 ...G...... [ZBX-6655] fixed possible agent crash when processing system.sw.packages[] (igors)
@@ -1334,7 +1339,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.17rc1
 
-A......... [ZBX-6582] fixed that {$ITEM.VALUE} and {$ITEM.LASTVALUE} macro was not truncated in Monitoring > Triggers (Toms)
+A......... [ZBX-6582] fixed that {ITEM.VALUE} and {ITEM.LASTVALUE} macro was not truncated in Monitoring > Triggers (Toms)
 ...G...... [ZBX-6584] fixed possible logrt crash on windows platform when logfile was moved during processing (wiper)
 ..F....... [ZBX-1129] fixed graph time period in bar reports (Oleg)
 ..F....... [ZBX-6484] fixed bar report calculation (Oleg)
