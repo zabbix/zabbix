@@ -172,17 +172,17 @@ elseif ($resourcetype == SCREEN_RESOURCE_SIMPLE_GRAPH) {
 
 	if ($this->data['screen']['templateid']) {
 		$selectButton = new CButton('select', _('Select'),
-			'javascript: return PopUp("popup.php?srctbl=simple_graph&srcfld1=itemid&srcfld2=name'.
+			'javascript: return PopUp("popup.php?srctbl=items&srcfld1=itemid&srcfld2=name'.
 				'&dstfrm='.$screenForm->getName().'&dstfld1=resourceid&dstfld2=caption'.
 				'&templated_hosts=1&only_hostid='.$this->data['screen']['templateid'].
-				'&simpleName=1&writeonly=1", 800, 450);', 'formlist'
+				'&templated=1&writeonly=1&numeric=1", 800, 450);', 'formlist'
 		);
 	}
 	else {
 		$selectButton = new CButton('select', _('Select'),
-			'javascript: return PopUp("popup.php?srctbl=simple_graph&srcfld1=itemid&srcfld2=name'.
+			'javascript: return PopUp("popup.php?srctbl=items&srcfld1=itemid&srcfld2=name'.
 				'&dstfrm='.$screenForm->getName().'&dstfld1=resourceid&dstfld2=caption'.
-				'&real_hosts=1&with_simple_graph_items=1&writeonly=1", 800, 450);',
+				'&real_hosts=1&with_simple_graph_items=1&writeonly=1&templated=0&numeric=1", 800, 450);',
 			'formlist'
 		);
 	}
@@ -253,7 +253,7 @@ elseif ($resourcetype == SCREEN_RESOURCE_PLAIN_TEXT) {
 
 	if ($this->data['screen']['templateid']) {
 		$selectButton = new CButton('select', _('Select'),
-			'javascript: return PopUp("popup.php?srctbl=plain_text&srcfld1=itemid&srcfld2=name'.
+			'javascript: return PopUp("popup.php?srctbl=items&srcfld1=itemid&srcfld2=name'.
 				'&dstfrm='.$screenForm->getName().'&dstfld1=resourceid&dstfld2=caption'.
 				'&templated_hosts=1&only_hostid='.$this->data['screen']['templateid'].
 				'&writeonly=1", 800, 450);',
@@ -262,9 +262,9 @@ elseif ($resourcetype == SCREEN_RESOURCE_PLAIN_TEXT) {
 	}
 	else {
 		$selectButton = new CButton('select', _('Select'),
-			'javascript: return PopUp("popup.php?srctbl=plain_text&srcfld1=itemid&srcfld2=name'.
+			'javascript: return PopUp("popup.php?srctbl=items&srcfld1=itemid&srcfld2=name'.
 				'&dstfrm='.$screenForm->getName().'&dstfld1=resourceid&dstfld2=caption'.
-				'&real_hosts=1&writeonly=1", 800, 450);',
+				'&real_hosts=1&writeonly=1&templated=0", 800, 450);',
 			'formlist'
 		);
 	}
