@@ -237,7 +237,7 @@ elseif (isset($_REQUEST['go']) && $_REQUEST['go'] == 'massupdate' && isset($_REQ
 		// filter only normal hosts, ignore discovered
 		$hosts = API::Host()->get(array(
 			'output' => array('hostid'),
-			'hostids' => $hostids,
+			'hostids' => $hostIds,
 			'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL)
 		));
 		$hosts = array('hosts' => $hosts);
