@@ -280,18 +280,28 @@ if (isset($_REQUEST['form'])) {
 		'sortfield' => 'name',
 		'output' => API_OUTPUT_EXTEND
 	));
+	$data['r_hosts'] = zbx_toHash($data['r_hosts'], 'hostid');
 
-	// get hosts ids
-	$data['rw_hosts'] = API::Host()->get(array(
-		'hostids' => $data['hosts'],
-		'templated_hosts' => true,
-		'editable' => true,
-		'output' => array('hostid')
-	));
-	$data['rw_hosts'] = zbx_toHash($data['rw_hosts'], 'hostid');
-
+	// deletable groups
 	if (!empty($data['groupid'])) {
 		$data['deletableHostGroups'] = getDeletableHostGroups($data['groupid']);
+	}
+
+	// nodes
+	if (is_array(get_current_nodeid())) {
+		foreach ($data['db_groups'] as $key => $group) {
+			$data['db_groups'][$key]['name'] = get_node_name_by_elid($group['groupid'], true, NAME_DELIMITER).$group['name'];
+		}
+
+		foreach ($data['r_hosts'] as $key => $host) {
+			$data['r_hosts'][$key]['name'] = get_node_name_by_elid($host['hostid'], true, NAME_DELIMITER).$host['name'];
+		}
+
+		if (!$data['twb_groupid']) {
+			foreach ($data['db_hosts'] as $key => $host) {
+				$data['db_hosts'][$key]['name'] = get_node_name_by_elid($host['hostid'], true, NAME_DELIMITER).$host['name'];
+			}
+		}
 	}
 
 	// render view

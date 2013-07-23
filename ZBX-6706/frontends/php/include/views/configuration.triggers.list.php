@@ -68,8 +68,8 @@ if (!empty($this->data['parent_discoveryid'])) {
 }
 else {
 	$filterForm = new CForm('get');
-	$filterForm->addItem(array(_('Group').SPACE, $this->data['pageFilter']->getGroupsCB()));
-	$filterForm->addItem(array(SPACE._('Host').SPACE, $this->data['pageFilter']->getHostsCB()));
+	$filterForm->addItem(array(_('Group').SPACE, $this->data['pageFilter']->getGroupsCB(true)));
+	$filterForm->addItem(array(SPACE._('Host').SPACE, $this->data['pageFilter']->getHostsCB(true)));
 
 	$triggersWidget->addHeader(_('Triggers'), $filterForm);
 	$triggersWidget->addHeaderRowNumber(array(

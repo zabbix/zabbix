@@ -40,8 +40,8 @@ $httpWidget->addPageHeader(_('CONFIGURATION OF WEB MONITORING'), $createForm);
 
 // header
 $filterForm = new CForm('get');
-$filterForm->addItem(array(_('Group').SPACE, $this->data['pageFilter']->getGroupsCB()));
-$filterForm->addItem(array(SPACE._('Host').SPACE, $this->data['pageFilter']->getHostsCB()));
+$filterForm->addItem(array(_('Group').SPACE, $this->data['pageFilter']->getGroupsCB(true)));
+$filterForm->addItem(array(SPACE._('Host').SPACE, $this->data['pageFilter']->getHostsCB(true)));
 
 $httpWidget->addHeader(_('Scenarios'), $filterForm);
 $httpWidget->addHeaderRowNumber(array(

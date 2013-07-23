@@ -29,7 +29,7 @@ $maintenanceWidget->addPageHeader(_('CONFIGURATION OF MAINTENANCE PERIODS'), $cr
 
 // header
 $filterForm = new CForm('get');
-$filterForm->addItem(array(_('Group').SPACE, $this->data['pageFilter']->getGroupsCB()));
+$filterForm->addItem(array(_('Group').SPACE, $this->data['pageFilter']->getGroupsCB(true)));
 $maintenanceWidget->addHeader(_('Maintenance periods'), $filterForm);
 $maintenanceWidget->addHeaderRowNumber();
 

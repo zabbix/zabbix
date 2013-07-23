@@ -236,6 +236,8 @@ if (isset($audio) && !$mute) {
 /*
  * Display
  */
+$displayNodes = (is_show_all_nodes() && $pageFilter->groupid == 0 && $pageFilter->hostid == 0);
+
 $showTriggers = $_REQUEST['show_triggers'];
 $showEvents = $_REQUEST['show_events'];
 $showSeverity = $_REQUEST['show_severity'];
@@ -362,7 +364,7 @@ $triggerTable->setHeader(array(
 	_('Age'),
 	$showEventColumn ? _('Duration') : null,
 	$config['event_ack_enable'] ? _('Acknowledged') : null,
-	is_show_all_nodes() ? _('Node') : null,
+	$displayNodes ? _('Node') : null,
 	_('Host'),
 	make_sorting_header(_('Name'), 'description'),
 	_('Comments')
@@ -807,7 +809,7 @@ foreach ($triggers as $trigger) {
 		empty($trigger['lastchange']) ? '-' : zbx_date2age($trigger['lastchange']),
 		$showEventColumn ? SPACE : null,
 		$ackColumn,
-		get_node_name_by_elid($trigger['triggerid']),
+		$displayNodes ? get_node_name_by_elid($trigger['triggerid']) : null,
 		$hostColumn,
 		$triggerDescription,
 		$comments
@@ -855,7 +857,7 @@ foreach ($triggers as $trigger) {
 				zbx_date2age($event['clock']),
 				zbx_date2age($nextClock, $event['clock']),
 				($config['event_ack_enable']) ? $ack : null,
-				is_show_all_nodes() ? SPACE : null,
+				$displayNodes ? SPACE : null,
 				$emptyColumn
 			), 'odd_row');
 			$row->setAttribute('data-parentid', $trigger['triggerid']);
