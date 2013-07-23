@@ -5,7 +5,7 @@ New features:
 ...G...... [ZBXNEXT-1528] added net.if.in, net.if.out and net.if.total item support on HP-UX platforms (igors)
 
 Bug fixes:
-
+A.F....... [ZBX-6808] fixed "Host metadata" field in actions and improved validation for action conditions (Ivo)
 ..F....... [ZBX-6777] added pointer cursor to the main menu tabs (Guntis)
 A......... [ZBX-6699] added object flags in Host, Host group, Template and Item get methods (Ivo)
 ..F....... [ZBX-6794] fixed host name displaying in pie charts (Ivo)
