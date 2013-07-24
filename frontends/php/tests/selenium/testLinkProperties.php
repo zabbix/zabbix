@@ -1013,9 +1013,9 @@ class testLinkProperties extends CWebTest {
 					'title' => 'Availability report',
 					'errors' => array(
 						'ERROR: Zabbix has received an incorrect request.',
-						'Critical error. Field "triggerid" is not string.',
-						'Critical error. Field "filter_groupid" is not string.',
-						'Critical error. Field "filter_hostid" is not string.'
+						'Critical error. Field "triggerid" is not integer.',
+						'Critical error. Field "filter_groupid" is not integer.',
+						'Critical error. Field "filter_hostid" is not integer.'
 					)
 				)
 			),
@@ -1026,9 +1026,9 @@ class testLinkProperties extends CWebTest {
 					'title' => 'Availability report',
 					'errors' => array(
 						'ERROR: Zabbix has received an incorrect request.',
-						'Critical error. Field "triggerid" is not string.',
-						'Critical error. Field "filter_groupid" is not string.',
-						'Critical error. Field "filter_hostid" is not string.'
+						'Critical error. Field "triggerid" is not integer.',
+						'Critical error. Field "filter_groupid" is not integer.',
+						'Critical error. Field "filter_hostid" is not integer.'
 					)
 				)
 			),
