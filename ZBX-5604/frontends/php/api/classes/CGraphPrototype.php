@@ -34,7 +34,10 @@ class CGraphPrototype extends CGraphGeneral {
 		parent::__construct();
 
 		$this->errorMessages = array_merge($this->errorMessages, array(
-			self::ERROR_TEMPLATE_HOST_MIX => _('Graph prototype "%1$s" with templated items cannot contain items from other hosts.')
+			self::ERROR_TEMPLATE_HOST_MIX =>
+				_('Graph prototype "%1$s" with templated items cannot contain items from other hosts.'),
+			self::ERROR_MISSING_ITEMS =>
+				_('Missing items for graph prototype "%1$s".')
 		));
 	}
 
@@ -583,13 +586,6 @@ class CGraphPrototype extends CGraphGeneral {
 	protected function checkInput($graphs, $update = false) {
 		$itemids = array();
 		foreach ($graphs as $graph) {
-			// validate graph items on create
-			if (!$update) {
-				if (!isset($graph['gitems']) || !is_array($graph['gitems']) || empty($graph['gitems'])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Missing items for graph "%1$s".', $graph['name']));
-				}
-			}
-
 			$fields = array('itemid' => null);
 			foreach ($graph['gitems'] as $gitem) {
 				if (!check_db_fields($fields, $gitem)) {
