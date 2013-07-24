@@ -326,6 +326,14 @@ else {
 	// paging
 	$data['paging'] = getPagingLine($data['discoveries']);
 
+	// for determine is the host template
+	if (!empty($hosts)) {
+		$host = reset($hosts);
+		$data['host_status'] = $host['status'];
+	}else{
+		$data['host_status'] = 0;
+	}
+
 	// render view
 	$discoveryView = new CView('configuration.host.discovery.list', $data);
 	$discoveryView->render();
