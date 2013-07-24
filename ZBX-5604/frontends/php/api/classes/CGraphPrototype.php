@@ -583,9 +583,11 @@ class CGraphPrototype extends CGraphGeneral {
 	protected function checkInput($graphs, $update = false) {
 		$itemids = array();
 		foreach ($graphs as $graph) {
-			// no items
-			if (!isset($graph['gitems']) || !is_array($graph['gitems']) || empty($graph['gitems'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Missing items for graph "%1$s".', $graph['name']));
+			// validate graph items on create
+			if (!$update) {
+				if (!isset($graph['gitems']) || !is_array($graph['gitems']) || empty($graph['gitems'])) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Missing items for graph "%1$s".', $graph['name']));
+				}
 			}
 
 			$fields = array('itemid' => null);
@@ -638,18 +640,20 @@ class CGraphPrototype extends CGraphGeneral {
 
 		parent::checkInput($graphs, $update);
 
-		foreach ($graphs as $graph) {
-			// check if the graph has at least one prototype
-			$hasPrototype = false;
-			foreach ($graph['gitems'] as $gitem) {
-				// $allowedItems used because it is possible to make API call without full item data
-				if ($allowedItems[$gitem['itemid']]['flags'] == ZBX_FLAG_DISCOVERY_CHILD) {
-					$hasPrototype = true;
-					break;
+		if (!$update) {
+			foreach ($graphs as $graph) {
+				// check if the graph has at least one prototype
+				$hasPrototype = false;
+				foreach ($graph['gitems'] as $gitem) {
+					// $allowedItems used because it is possible to make API call without full item data
+					if ($allowedItems[$gitem['itemid']]['flags'] == ZBX_FLAG_DISCOVERY_CHILD) {
+						$hasPrototype = true;
+						break;
+					}
 				}
-			}
-			if (!$hasPrototype) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Graph prototype must have at least one prototype.'));
+				if (!$hasPrototype) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Graph prototype must have at least one prototype.'));
+				}
 			}
 		}
 
