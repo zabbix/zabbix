@@ -774,7 +774,7 @@ static void	DCsync_items(DB_RESULT result)
 	ZBX_DC_DELTAITEM	*deltaitem;
 
 	time_t			now;
-	unsigned char		state, old_poller_type;
+	unsigned char		old_poller_type;
 	int			delay, found;
 	int			update_index, old_nextcheck;
 	zbx_uint64_t		itemid, hostid, proxy_hostid;
@@ -803,7 +803,6 @@ static void	DCsync_items(DB_RESULT result)
 		ZBX_STR2UINT64(hostid, row[1]);
 		ZBX_DBROW2UINT64(proxy_hostid, row[2]);
 		delay = atoi(row[15]);
-		state = (unsigned char)atoi(row[20]);
 
 		/* array of selected items */
 		zbx_vector_uint64_append(&ids, itemid);
@@ -887,9 +886,10 @@ static void	DCsync_items(DB_RESULT result)
 		{
 			item->location = ZBX_LOC_NOWHERE;
 			item->poller_type = ZBX_NO_POLLER;
+			item->state = (unsigned char)atoi(row[20]);
 			old_nextcheck = 0;
 
-			if (ITEM_STATE_NOTSUPPORTED == state)
+			if (ITEM_STATE_NOTSUPPORTED == item->state)
 			{
 				item->nextcheck = calculate_item_nextcheck(item->interfaceid, itemid,
 						item->type, config->config->refresh_unsupported, NULL, now, NULL);
@@ -904,19 +904,13 @@ static void	DCsync_items(DB_RESULT result)
 		{
 			old_nextcheck = item->nextcheck;
 
-			if (ITEM_STATE_NORMAL == state && (state != item->state || delay != item->delay))
+			if (ITEM_STATE_NORMAL == item->state && delay != item->delay)
 			{
 				item->nextcheck = calculate_item_nextcheck(item->interfaceid, itemid,
 						item->type, delay, row[16], now, NULL);
 			}
-			else if (ITEM_STATE_NOTSUPPORTED == state && state != item->state)
-			{
-				item->nextcheck = calculate_item_nextcheck(item->interfaceid, itemid,
-						item->type, config->config->refresh_unsupported, NULL, now, NULL);
-			}
 		}
 
-		item->state = state;
 		item->delay = delay;
 
 		old_poller_type = item->poller_type;

@@ -2451,19 +2451,16 @@ int	proxy_get_history_count()
 {
 	DB_RESULT	result;
 	DB_ROW		row;
-	char		sql[128];
 	zbx_uint64_t	id;
 	int 		count = 0;
 
 	proxy_get_lastid("proxy_history", "history_lastid", &id);
 
-	zbx_snprintf(sql, sizeof(sql),
+	result = DBselect(
 			"select count(*)"
 			" from proxy_history"
 			" where id>" ZBX_FS_UI64,
 			id);
-
-	result = DBselect("%s", sql);
 
 	if (NULL != (row = DBfetch(result)))
 		count = atoi(row[0]);
