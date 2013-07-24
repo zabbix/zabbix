@@ -109,7 +109,7 @@ $triggersTable->setHeader(array(
 	make_sorting_header(_('Name'), 'description', $link),
 	_('Expression'),
 	make_sorting_header(_('Status'), 'status', $link),
-	empty($this->data['parent_discoveryid']) ? _('Error') : null
+	(empty($this->data['parent_discoveryid']) && $this->get('host_status') != HOST_STATUS_TEMPLATE) ? _('Error') : null
 ));
 foreach ($this->data['triggers'] as $tnum => $trigger) {
 	$triggerid = $trigger['triggerid'];
@@ -260,7 +260,7 @@ foreach ($this->data['triggers'] as $tnum => $trigger) {
 		$description,
 		$expressionColumn,
 		$status,
-		$error
+		(empty($this->data['parent_discoveryid']) && $this->get('host_status') != HOST_STATUS_TEMPLATE) ? $error : null
 	));
 	$triggers[$tnum] = $trigger;
 }

@@ -69,7 +69,7 @@ $itemTable->setHeader(array(
 	make_sorting_header(_('Type'), 'type'),
 	_('Applications'),
 	make_sorting_header(_('Status'), 'status'),
-	_('Error')
+	$this->get('host_status') != HOST_STATUS_TEMPLATE ? _('Error') : null
 ));
 
 foreach ($this->data['items'] as $item) {
@@ -259,7 +259,7 @@ foreach ($this->data['items'] as $item) {
 		item_type2str($item['type']),
 		new CCol(CHtml::encode($item['applications_list']), 'wraptext'),
 		$status,
-		$statusIcons
+		$this->get('host_status') != HOST_STATUS_TEMPLATE ? $statusIcons : null
 	));
 }
 

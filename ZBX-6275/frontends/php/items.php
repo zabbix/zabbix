@@ -902,6 +902,13 @@ else {
 		'sortfield' => getPageSortField('name')
 	);
 
+	// for determine is the host template
+	if (!empty($host)) {
+		$data['host_status'] = $host['status'];
+	} else {
+		$data['host_status'] = 0;
+	}
+
 	// items
 	$options = array(
 		'hostids' => $data['hostid'],
