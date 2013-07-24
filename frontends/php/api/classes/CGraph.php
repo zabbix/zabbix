@@ -576,9 +576,11 @@ class CGraph extends CGraphGeneral {
 	protected function checkInput($graphs, $update = false) {
 		$itemids = array();
 		foreach ($graphs as $graph) {
-			// no items
-			if (!isset($graph['gitems']) || !is_array($graph['gitems']) || empty($graph['gitems'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Missing items for graph "%1$s".', $graph['name']));
+			// validate graph items on create
+			if (!$update) {
+				if (!isset($graph['gitems']) || !is_array($graph['gitems']) || empty($graph['gitems'])) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Missing items for graph "%1$s".', $graph['name']));
+				}
 			}
 
 			$fields = array('itemid' => null);
