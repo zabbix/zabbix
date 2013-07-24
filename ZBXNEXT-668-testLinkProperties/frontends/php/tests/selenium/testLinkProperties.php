@@ -29,7 +29,7 @@ class testLinkProperties extends CWebTest {
 	public static function zbx_data() {
 		return array(
 			// Host groups
-		/*	array(
+			array(
 				array(
 					'expected' => LINK_GOOD,
 					'login' => 'hostgroups.php?form=update&groupid=1',
@@ -419,7 +419,7 @@ class testLinkProperties extends CWebTest {
 					)
 				)
 			),
-*/			// Overview
+			// Overview
 			array(
 				array(
 					'expected' => LINK_GOOD,
@@ -452,7 +452,7 @@ class testLinkProperties extends CWebTest {
 				array(
 					'expected' => LINK_BAD,
 					'login' => 'overview.php?&form_refresh=1&groupid=abc&application=Filesystems&type=0',
-					'title' => 'Overview \[refreshed every 30 sec\]'
+					'title' => 'Overview \[refreshed every 30 sec\]',
 					'errors' => array(
 						'ERROR: Zabbix has received an incorrect request.',
 						'Critical error. Field "groupid" is not integer.'
@@ -463,7 +463,7 @@ class testLinkProperties extends CWebTest {
 				array(
 					'expected' => LINK_BAD,
 					'login' => 'overview.php?&form_refresh=1&groupid=&application=Filesystems&type=0',
-					'title' => 'Overview \[refreshed every 30 sec\]'
+					'title' => 'Overview \[refreshed every 30 sec\]',
 					'errors' => array(
 						'ERROR: Zabbix has received an incorrect request.',
 						'Critical error. Field "groupid" is not integer.'
@@ -471,7 +471,7 @@ class testLinkProperties extends CWebTest {
 				)
 			),
 			// Web scenarios
-		/*	array(
+			array(
 				array(
 					'expected' => LINK_GOOD,
 					'login' => 'httpdetails.php?httptestid=1',
@@ -804,7 +804,7 @@ class testLinkProperties extends CWebTest {
 						'Critical error. Field "sysmapid" is not integer.'
 					)
 				)
-			),*/
+			),
 			// Discovery rule
 			array(
 				array(
@@ -850,7 +850,7 @@ class testLinkProperties extends CWebTest {
 			array(
 				array(
 					'expected' => LINK_GOOD,
-					'login' => '/srv_status.php?&form_refresh=1&fullscreen=0&period=month',
+					'login' => 'srv_status.php?&form_refresh=1&fullscreen=0&period=month',
 					'title' => 'IT services \[refreshed every 30 sec\]',
 					'text' => 'IT SERVICES'
 				)
@@ -858,7 +858,7 @@ class testLinkProperties extends CWebTest {
 			array(
 				array(
 					'expected' => LINK_BAD,
-					'login' => '/srv_status.php?&form_refresh=1&fullscreen=0&period=1',
+					'login' => 'srv_status.php?&form_refresh=1&fullscreen=0&period=1',
 					'title' => 'IT services \[refreshed every 30 sec\]',
 					'errors' => array(
 						'ERROR: No permissions to referred object or it does not exist!'
@@ -868,22 +868,20 @@ class testLinkProperties extends CWebTest {
 			array(
 				array(
 					'expected' => LINK_BAD,
-					'login' => '/srv_status.php?&form_refresh=1&fullscreen=0&period=abc',
+					'login' => 'srv_status.php?&form_refresh=1&fullscreen=0&period=abc',
 					'title' => 'IT services \[refreshed every 30 sec\]',
 					'errors' => array(
-						'ERROR: Zabbix has received an incorrect request.',
-						'Critical error. Field "druleid" is not string.'
+						'ERROR: No permissions to referred object or it does not exist!'
 					)
 				)
 			),
 			array(
 				array(
 					'expected' => LINK_BAD,
-					'login' => '/srv_status.php?&form_refresh=1&fullscreen=0&period=month',
+					'login' => 'srv_status.php?&form_refresh=1&fullscreen=0&period=',
 					'title' => 'IT services \[refreshed every 30 sec\]',
 					'errors' => array(
-						'ERROR: Zabbix has received an incorrect request.',
-						'Critical error. Field "druleid" is not string.'
+						'ERROR: No permissions to referred object or it does not exist!'
 					)
 				)
 			),
@@ -954,7 +952,7 @@ class testLinkProperties extends CWebTest {
 					'title' => 'Host inventories',
 					'errors' => array(
 						'ERROR: Zabbix has received an incorrect request.',
-						'Critical error. Field "groupid" is not string.'
+						'Critical error. Field "groupid" is not integer.'
 					)
 				)
 			),
@@ -965,11 +963,12 @@ class testLinkProperties extends CWebTest {
 					'title' => 'Host inventories',
 					'errors' => array(
 						'ERROR: Zabbix has received an incorrect request.',
-						'Critical error. Field "groupid" is not string.'
+						'Critical error. Field "groupid" is not integer.'
 					)
 				)
 			),
 			// Availability report
+			array(
 				array(
 					'expected' => LINK_GOOD,
 					'login' => 'report2.php?filter_groupid=0&filter_hostid=50001&triggerid=16012',
@@ -1051,7 +1050,7 @@ class testLinkProperties extends CWebTest {
 						'ERROR: No permissions to referred object or it does not exist!'
 					)
 				)
-			),
+			)
 		);
 	}
 
