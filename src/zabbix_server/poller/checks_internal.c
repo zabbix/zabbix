@@ -180,9 +180,6 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 	}
 	else if (0 == strcmp(tmp, "host"))			/* zabbix["host",<type>,"available"] */
 	{
-		if (0 == (daemon_type & ZBX_DAEMON_TYPE_SERVER))
-			goto notsupported;
-
 		if (3 != nparams)
 			goto notsupported;
 
