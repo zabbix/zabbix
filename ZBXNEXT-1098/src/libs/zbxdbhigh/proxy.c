@@ -2453,7 +2453,7 @@ int	proxy_get_history_count()
 	DB_ROW		row;
 	char		sql[128];
 	zbx_uint64_t	id;
-	int 		count;
+	int 		count = 0;
 
 	proxy_get_lastid("proxy_history", "history_lastid", &id);
 
