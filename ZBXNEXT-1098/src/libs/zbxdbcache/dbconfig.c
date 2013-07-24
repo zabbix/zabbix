@@ -4909,7 +4909,23 @@ int	DCget_trigger_count()
  ******************************************************************************/
 int	DCget_host_count()
 {
-	return config->hosts.num_data;
+	int			nhosts = 0;
+	zbx_hashset_iter_t	iter;
+	ZBX_DC_HOST		*host;
+
+	LOCK_CACHE;
+
+	zbx_hashset_iter_reset(&config->hosts, &iter);
+
+	while (NULL != (host = zbx_hashset_iter_next(&iter)))
+	{
+		if (HOST_STATUS_MONITORED == host->status)
+			nhosts++;
+	}
+
+	UNLOCK_CACHE;
+
+	return nhosts;
 }
 
 /******************************************************************************
