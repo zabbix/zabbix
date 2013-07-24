@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-07-24 15:52+0300\n"
-"PO-Revision-Date: 2013-04-04 14:10+0200\n"
+"POT-Creation-Date: 2013-07-24 15:58+0300\n"
+"PO-Revision-Date: 2013-07-21 10:13+0200\n"
 "Last-Translator: Jan <jan.garaj@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: sk\n"
@@ -716,29 +716,29 @@ msgstr "August"
 
 #: include/menu.inc.php:249 include/views/configuration.httpconf.edit.php:59
 msgid "Authentication"
-msgstr "Prihlasovanie"
+msgstr "Autentifikácia"
 
 #: include/views/configuration.host.edit.php:534
 msgid "Authentication algorithm"
-msgstr "Prihlasovací algoritmus"
+msgstr "Autentifikačný algoritmus"
 
 #: include/views/configuration.action.edit.php:673
 #: include/views/configuration.item.edit.php:173
 #: include/views/configuration.item.massupdate.php:200
 msgid "Authentication method"
-msgstr "Metódy prihlasovania"
+msgstr "Metóda autentifikácie"
 
 #: authentication.php:158 authentication.php:159
 msgid "Authentication method changed to HTTP"
-msgstr "Metóda prihlasovania bola zmenená na HTTP"
+msgstr "Metóda autentifikácie bola zmenená na HTTP"
 
 #: authentication.php:121 authentication.php:122
 msgid "Authentication method changed to LDAP"
-msgstr "Metóda prihlasovania bola zmenená na LDAP"
+msgstr "Metóda autentifikácie bola zmenená na LDAP"
 
 #: authentication.php:83 authentication.php:84
 msgid "Authentication method changed to Zabbix internal"
-msgstr "Metóda prihlasovania bola zmenená na Zabbix internal"
+msgstr "Metóda autentifikácie bola zmenená na Zabbix internal"
 
 #: include/views/configuration.action.list.php:35
 msgid "Auto registration"
@@ -1348,7 +1348,7 @@ msgstr "Nie možné vytvoriť obrazovku."
 #: api/classes/CUser.php:370
 #, php-format
 msgid "Cannot delete Zabbix internal user \"%1$s\", try disabling that user."
-msgstr "Nie je možné zmazať interného Zabbix používateľa \"%1$s\", skúste ho disablovať."
+msgstr "Nie je možné zmazať interného Zabbix používateľa \"%1$s\", skúste ho vypnúť."
 
 #: actionconf.php:170
 msgid "Cannot delete action"
@@ -1460,7 +1460,7 @@ msgstr "Nie je možné zmazať scenár"
 
 #: screenconf.php:226
 msgid "Cannot delete screen"
-msgstr "Nie je možné zmazať Obrazovku"
+msgstr "Nie je možné zmazať obrazovku"
 
 #: scripts.php:139 scripts.php:155
 msgid "Cannot delete script"
@@ -1748,7 +1748,7 @@ msgstr "Nie je možné odstrániť makro."
 
 #: api/classes/CUser.php:380
 msgid "Cannot rename guest user."
-msgstr "Nie je možné premenovať užívateľa \"guest\"."
+msgstr "Nie je možné premenovať používateľa \"guest\"."
 
 #: api/classes/CDRule.php:445
 msgid "Cannot save discovery rule without checks."
@@ -1790,7 +1790,7 @@ msgstr "Nie je môžné prepnúť hosta pre interface."
 
 #: users.php:294
 msgid "Cannot unblock users"
-msgstr "Nie je možné odblokovať užívateľov"
+msgstr "Nie je možné odblokovať používateľov"
 
 #: api/classes/CHostGeneral.php:704
 msgid "Cannot unlink and clear applications"
@@ -2009,7 +2009,7 @@ msgstr "Nie je možné upraviť spúšťač"
 
 #: profile.php:173 users.php:189 users.php:251 users.php:271
 msgid "Cannot update user"
-msgstr "Nie je možné upraviť užívateľa"
+msgstr "Nie je možné upraviť používateľa"
 
 #: api/classes/CUser.php:807
 msgid "Cannot update user media."
@@ -2017,11 +2017,11 @@ msgstr "Nie je možné upraviť médiá používateľa."
 
 #: profile.php:110 users.php:147
 msgid "Cannot update user. Both passwords must be equal."
-msgstr "Nie je možné upraviť užívateľa. Heslá musia byť rovnaké."
+msgstr "Nie je možné upraviť používateľa. Heslá musia byť rovnaké."
 
 #: usergrps.php:303
 msgid "Cannot update users status"
-msgstr "Nie je možné upraviť stav užívateľa"
+msgstr "Nie je možné upraviť stav používateľa"
 
 #: adm.valuemapping.php:64
 msgid "Cannot update value map"
@@ -2420,11 +2420,11 @@ msgstr "Nastavenie spúšťačov"
 
 #: usergrps.php:29
 msgid "Configuration of user groups"
-msgstr "Nastavenie skupín užívateľov"
+msgstr "Nastavenie skupín používateľov"
 
 #: users.php:29
 msgid "Configuration of users"
-msgstr "Nastavenie užívateľov"
+msgstr "Nastavenie používateľov"
 
 #: adm.valuemapping.php:24
 msgid "Configuration of value mapping"
@@ -12286,7 +12286,7 @@ msgstr "Odblokovať označené"
 
 #: include/views/administration.users.list.php:137
 msgid "Unblock selected users?"
-msgstr "Odblokovať označených používatelov?"
+msgstr "Odblokovať označených používateľov?"
 
 #: include/views/configuration.item.edit.php:233
 #: include/views/configuration.item.massupdate.php:187
@@ -12571,7 +12571,7 @@ msgstr "Používateľ si nemôže sám sebe zmeniť typ"
 
 #: api/classes/CUserGroup.php:560
 msgid "User cannot add himself to a disabled group or a group with disabled GUI access."
-msgstr "Používateľ nemôže sám seba pridať do vypnutej skupiny alebo do skupiny so vypnutým GUI prístupom."
+msgstr "Používateľ nemôže sám seba pridať do vypnutej skupiny alebo do skupiny s vypnutým GUI prístupom."
 
 #: include/users.inc.php:160
 msgid "User cannot change GUI access for himself."
@@ -12701,7 +12701,7 @@ msgstr "Stav používateľov aktualizovaný"
 
 #: users.php:294
 msgid "Users unblocked"
-msgstr "Používatelia odblokovaný"
+msgstr "Používatelia odblokovaní"
 
 #: include/blocks.inc.php:713 include/classes/class.cpie.php:309
 #: include/classes/screens/CScreenEvents.php:48
@@ -13300,7 +13300,7 @@ msgstr "Nemáte oprávnenia na zmazanie používateľa alebo používateľ neexi
 
 #: api/classes/CUser.php:358
 msgid "You do not have permissions to delete users."
-msgstr "Nemáte oprávnenia na zmazaniie používateľov."
+msgstr "Nemáte oprávnenia na zmazanie používateľov."
 
 #: api/classes/CUser.php:351
 msgid "You do not have permissions to update other users."

@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-07-24 15:52+0300\n"
-"PO-Revision-Date: 2013-06-24 19:20+0200\n"
+"POT-Creation-Date: 2013-07-24 15:58+0300\n"
+"PO-Revision-Date: 2013-07-01 20:21+0200\n"
 "Last-Translator: Jaba <janis.jaunbalodis@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: lv\n"
@@ -470,7 +470,7 @@ msgstr "Papildus parametri"
 
 #: include/hosts.inc.php:69
 msgid "Admin"
-msgstr ""
+msgstr "Administrators"
 
 #: include/menu.inc.php:220
 msgid "Administration"
@@ -598,7 +598,7 @@ msgstr "Rādītāju grupa izdzēsta"
 
 #: api/rpc/class.cjsonrpc.php:206
 msgid "Application error."
-msgstr ""
+msgstr "Aplikācijas kļūda."
 
 #: applications.php:121
 msgid "Application updated"
@@ -705,7 +705,7 @@ msgstr ""
 
 #: auditlogs.php:27
 msgid "Audit logs"
-msgstr ""
+msgstr "Audita žurnalēšanas faili"
 
 #: include/func.inc.php:225
 msgid "Aug"
@@ -748,11 +748,11 @@ msgstr ""
 
 #: include/views/administration.users.edit.php:119
 msgid "Auto-login"
-msgstr ""
+msgstr "Automātiska pieteikšanās"
 
 #: include/views/administration.users.edit.php:120 profile.php:47 users.php:60
 msgid "Auto-logout (min 90 seconds)"
-msgstr ""
+msgstr "Automātiska atteikšanās (min 90 sekundes)"
 
 #: include/views/configuration.host.edit.php:574
 #: include/views/configuration.host.massupdate.php:179
@@ -774,7 +774,7 @@ msgstr "Pieejamība"
 
 #: include/menu.inc.php:129 report2.php:26
 msgid "Availability report"
-msgstr ""
+msgstr "Pieejamības ziņojums"
 
 #: include/classes/class.chostsinfo.php:125 popup.php:586
 msgid "Available"
@@ -816,7 +816,7 @@ msgstr "B"
 
 #: include/page_header.php:224
 msgid "BACK"
-msgstr ""
+msgstr "ATPAKAĻ"
 
 #: include/views/administration.general.image.edit.php:29
 #: include/views/administration.general.image.list.php:25
@@ -834,20 +834,20 @@ msgstr ""
 #: authentication.php:39
 #: include/views/administration.authentication.edit.php:59
 msgid "Base DN"
-msgstr ""
+msgstr "Bāzes DN"
 
 #: include/httptest.inc.php:28
 msgid "Basic authentication"
-msgstr ""
+msgstr "Pamata autentifikācija"
 
 #: include/views/administration.authentication.edit.php:61
 msgid "Bind DN"
-msgstr ""
+msgstr "Bind DN"
 
 #: authentication.php:49
 #: include/views/administration.authentication.edit.php:62
 msgid "Bind password"
-msgstr ""
+msgstr "Bind parole"
 
 #: include/classes/core/ZBase.php:137
 msgid "Black & Blue"
@@ -855,7 +855,7 @@ msgstr "Melns & Zils"
 
 #: include/views/administration.general.triggerDisplayOptions.edit.php:28
 msgid "Blinking"
-msgstr ""
+msgstr "Mirgošana"
 
 #: include/views/administration.users.list.php:83
 msgid "Blocked"
@@ -868,7 +868,7 @@ msgstr "Treknraksta līnija"
 
 #: include/items.inc.php:131
 msgid "Boolean"
-msgstr ""
+msgstr "Loģiskais"
 
 #: include/views/configuration.screen.constructor.edit.php:602
 #: include/views/configuration.sysmap.edit.php:132
@@ -933,7 +933,7 @@ msgstr "GRAFIKU KONFIGURĀCIJA"
 
 #: adm.gui.php:107
 msgid "CONFIGURATION OF GUI"
-msgstr ""
+msgstr "GRAFISKĀS SASKARNES KONFIGURĀCIJA"
 
 #: include/views/configuration.hostgroups.edit.php:23
 #: include/views/configuration.hostgroups.list.php:36
@@ -954,7 +954,7 @@ msgstr ""
 
 #: adm.images.php:149
 msgid "CONFIGURATION OF IMAGES"
-msgstr ""
+msgstr "ATTĒLU KONFIGURĀCIJA"
 
 #: include/views/configuration.services.edit.php:28
 #: include/views/configuration.services.list.php:25
@@ -1176,7 +1176,7 @@ msgstr ""
 
 #: adm.macros.php:120
 msgid "Cannot add macro."
-msgstr ""
+msgstr "Nevar pievienot makro."
 
 #: maintenance.php:137
 msgid "Cannot add maintenance"
@@ -1197,7 +1197,7 @@ msgstr "Nav iespējams pievienot tīkla karti"
 
 #: httpconf.php:256
 msgid "Cannot add new application."
-msgstr ""
+msgstr "Nevar pievienot jaunu aplikāciju."
 
 #: nodes.php:77
 msgid "Cannot add node"
@@ -1213,7 +1213,7 @@ msgstr ""
 
 #: httpconf.php:210
 msgid "Cannot add scenario"
-msgstr ""
+msgstr "Nevar pievienot scenāriju"
 
 #: screenconf.php:178
 msgid "Cannot add screen"
@@ -1250,7 +1250,7 @@ msgstr "Lietotāju nav iespējams pievienot. Abām parolēm jāsakrīt."
 
 #: api/classes/CUserGroup.php:363
 msgid "Cannot add users."
-msgstr ""
+msgstr "Nevar pievienot lietotājus."
 
 #: adm.valuemapping.php:72
 msgid "Cannot add value map"
@@ -2139,7 +2139,7 @@ msgstr ""
 
 #: include/classes/core/ZBase.php:135
 msgid "Classic"
-msgstr ""
+msgstr "Klasiskais"
 
 #: jsLoader.php:164
 msgid "Clear"
@@ -2160,7 +2160,7 @@ msgstr ""
 
 #: include/screens.inc.php:28
 msgid "Clock"
-msgstr ""
+msgstr "Pulkstenis"
 
 #: include/forms.inc.php:1872
 #: include/views/administration.general.iconmap.edit.php:141
@@ -2181,7 +2181,7 @@ msgstr ""
 #: include/views/configuration.template.edit.php:435
 #: include/views/configuration.triggers.edit.php:302
 msgid "Clone"
-msgstr ""
+msgstr "Klonēt"
 
 #: include/views/js/configuration.sysmaps.js.php:186
 #: include/views/js/configuration.sysmaps.js.php:275
@@ -2233,7 +2233,7 @@ msgstr "Gala rezultāts"
 #: include/views/administration.auditacts.list.php:106
 #: include/views/administration.script.edit.php:68
 msgid "Command"
-msgstr ""
+msgstr "Komanda"
 
 #: tr_events.php:134
 msgid "Command actions"
@@ -2249,11 +2249,11 @@ msgstr ""
 #: include/views/configuration.action.edit.php:727 popup.php:1808
 #: popup.php:1815
 msgid "Commands"
-msgstr ""
+msgstr "Komandas"
 
 #: tr_comments.php:63
 msgid "Comment updated"
-msgstr ""
+msgstr "Komentārs atjaunots"
 
 #: include/acknow.inc.php:54 tr_comments.php:70 tr_comments.php:88
 #: tr_comments.php:90 tr_logform.php:367 tr_status.php:294
@@ -2262,7 +2262,7 @@ msgstr "Komentāri"
 
 #: include/views/administration.mediatypes.edit.php:44
 msgid "Commercial"
-msgstr ""
+msgstr "Komerciāls"
 
 #: report6.php:176
 msgid "Compare values for multiple periods"
@@ -2510,7 +2510,7 @@ msgstr ""
 
 #: include/views/js/configuration.sysmaps.js.php:151
 msgid "Coordinates"
-msgstr ""
+msgstr "Koordinātes"
 
 #: include/views/configuration.copy.elements.php:102
 #: include/views/configuration.item.copy.php:82
@@ -2920,16 +2920,16 @@ msgstr "Pārtraukta līnija"
 
 #: include/views/monitoring.overview.php:28
 msgid "Data"
-msgstr ""
+msgstr "Dati"
 
 #: include/classes/class.cchart.php:2376 include/classes/class.cpie.php:702
 #, php-format
 msgid "Data from %1$s. Generated in %2$s sec."
-msgstr ""
+msgstr "Dati no %1$s. Uzģenerēti %2$s sek."
 
 #: include/screens.inc.php:29
 msgid "Data overview"
-msgstr ""
+msgstr "Datu pārskats"
 
 #: include/forms.inc.php:443 include/views/configuration.item.edit.php:232
 #: include/views/configuration.item.massupdate.php:177
@@ -2963,15 +2963,15 @@ msgstr "Datubāzes ports"
 
 #: include/setup.inc.php:272 include/setup.inc.php:361
 msgid "Database schema"
-msgstr ""
+msgstr "Datubāzes shēma"
 
 #: include/setup.inc.php:350
 msgid "Database server"
-msgstr ""
+msgstr "Datubāzes serveris"
 
 #: include/setup.inc.php:249 include/setup.inc.php:338
 msgid "Database type"
-msgstr ""
+msgstr "Datubāzes tips"
 
 #: include/setup.inc.php:358
 msgid "Database user"
@@ -3063,7 +3063,7 @@ msgstr "Atkļūdošanas režīms atjaunots"
 
 #: include/func.inc.php:229
 msgid "Dec"
-msgstr ""
+msgstr "Dec"
 
 #: include/forms.inc.php:1568 include/func.inc.php:115
 #: include/func.inc.php:246 jsLoader.php:125
@@ -3108,12 +3108,12 @@ msgstr "Noklusētā tēma"
 
 #: include/views/administration.general.gui.edit.php:31
 msgid "Default theme"
-msgstr ""
+msgstr "Noklusētais dizains"
 
 #: adm.gui.php:70
 #, php-format
 msgid "Default theme \"%1$s\"."
-msgstr ""
+msgstr "Noklusētais dizains \"%1$s\"."
 
 #: include/views/configuration.discovery.list.php:42
 #: include/views/configuration.slideconf.edit.php:49
@@ -3123,7 +3123,7 @@ msgstr "Aizture"
 
 #: include/views/configuration.discovery.edit.php:48
 msgid "Delay (in sec)"
-msgstr ""
+msgstr "Aizkave (sek)"
 
 #: queue.php:247
 msgid "Delayed by"
@@ -3691,7 +3691,7 @@ msgstr "Katastrofa"
 
 #: include/discovery.inc.php:151
 msgid "Discovered"
-msgstr ""
+msgstr "Atklāts"
 
 #: include/views/monitoring.discovery.php:43
 msgid "Discovered device"
@@ -3876,7 +3876,7 @@ msgstr ""
 #: include/views/monitoring.discovery.php:45
 #: include/views/monitoring.discovery.php:168 report3.php:85
 msgid "Downtime"
-msgstr ""
+msgstr "Dīkstāve"
 
 #: include/views/configuration.host.edit.php:271
 msgid "Drag here to change the type of the interface to \"IPMI\" type."
@@ -4004,11 +4004,11 @@ msgstr "Rediģēt kartes elementu"
 
 #: jsLoader.php:182
 msgid "Edit service"
-msgstr ""
+msgstr "Labot servisu"
 
 #: include/views/configuration.item.list.php:181
 msgid "Edit trigger"
-msgstr ""
+msgstr "Labot trigeri"
 
 #: include/views/configuration.sysmap.edit.php:151
 msgid "Element"
@@ -4016,7 +4016,7 @@ msgstr "Elements"
 
 #: include/maps.inc.php:47 include/views/js/configuration.sysmaps.js.php:297
 msgid "Element name"
-msgstr ""
+msgstr "Elementa vārds"
 
 #: include/media.inc.php:24
 #: include/views/administration.mediatypes.edit.php:39
@@ -4238,7 +4238,7 @@ msgstr "Notikums"
 
 #: include/classes/screens/CScreenHistory.php:167
 msgid "Event ID"
-msgstr ""
+msgstr "Notikuma ID"
 
 #: popup_trexpr.php:426
 msgid "Event ID of last log entry matching regular expression T, then N = 1, 0 - otherwise"
@@ -4323,7 +4323,7 @@ msgstr ""
 
 #: include/items.inc.php:1334 include/views/configuration.item.edit.php:186
 msgid "Executed script"
-msgstr ""
+msgstr "Palaist skriptu"
 
 #: include/views/js/general.script.confirm.js.php:16
 msgid "Execution confirmation"
@@ -4362,7 +4362,7 @@ msgstr ""
 
 #: events.php:279
 msgid "Export to CSV"
-msgstr ""
+msgstr "Eksportēt uz CSV"
 
 #: include/forms.inc.php:1775 include/forms.inc.php:1906
 #: include/forms.inc.php:1979 include/triggers.inc.php:1606
@@ -4378,7 +4378,7 @@ msgstr "Izteiksme"
 #: include/forms.inc.php:1341 include/forms.inc.php:1346
 #: include/forms.inc.php:1359
 msgid "Expression Syntax Error."
-msgstr ""
+msgstr "Izteiksmes sintakses kļūda."
 
 #: tr_testexpr.php:56
 msgid "Expression Variable Elements"
@@ -4390,7 +4390,7 @@ msgstr "Izteiksme nedrīkst būt tukša"
 
 #: include/views/configuration.triggers.edit.php:126
 msgid "Expression constructor"
-msgstr ""
+msgstr "Izteiksmes konstruktors"
 
 #: include/forms.inc.php:1988
 msgid "Expression type"
@@ -4413,11 +4413,11 @@ msgstr "Ez Texting"
 #: jsLoader.php:130
 msgctxt "Friday short"
 msgid "F"
-msgstr ""
+msgstr "P"
 
 #: include/forms.inc.php:1831 include/forms.inc.php:1851
 msgid "FALSE"
-msgstr ""
+msgstr "NEPATIESS"
 
 #: include/discovery.inc.php:60
 #: include/views/js/configuration.discovery.edit.js.php:120
@@ -4537,7 +4537,7 @@ msgstr ""
 
 #: include/setup.inc.php:130
 msgid "Finish"
-msgstr ""
+msgstr "Finišs"
 
 #: include/locales.inc.php:51
 msgid "Finnish (fi_FI)"
@@ -4545,7 +4545,7 @@ msgstr "Somu (fi_FI)"
 
 #: include/forms.inc.php:1597 include/maintenances.inc.php:103
 msgid "First"
-msgstr ""
+msgstr "Pirmais"
 
 #: include/func.inc.php:1656
 msgctxt "page navigation"
@@ -4559,7 +4559,7 @@ msgstr ""
 #: include/views/configuration.graph.edit.php:163
 #: include/views/configuration.graph.edit.php:221
 msgid "Fixed"
-msgstr ""
+msgstr "Fiksēts"
 
 #: include/views/configuration.item.edit.php:296
 #: include/views/configuration.item.massupdate.php:298
@@ -4584,7 +4584,7 @@ msgstr "Franču (fr_FR)"
 
 #: include/func.inc.php:199
 msgid "Fri"
-msgstr ""
+msgstr "Pie"
 
 #: include/forms.inc.php:1531 include/forms.inc.php:1612
 #: include/func.inc.php:127 include/func.inc.php:211
@@ -4637,7 +4637,7 @@ msgstr ""
 #: include/func.inc.php:566
 msgctxt "Giga short"
 msgid "G"
-msgstr ""
+msgstr "G"
 
 #: include/views/administration.mediatypes.edit.php:60
 #: include/views/administration.mediatypes.list.php:57
@@ -4823,7 +4823,7 @@ msgstr ""
 #: include/views/configuration.host.edit.php:494
 #: include/views/configuration.template.edit.php:365
 msgid "Graph prototypes"
-msgstr ""
+msgstr "Grafika prototipi"
 
 #: include/views/configuration.graph.list.php:32
 msgid "Graph prototypes of"
@@ -5021,7 +5021,7 @@ msgstr "HTTPS"
 
 #: include/hosts.inc.php:249
 msgid "HW architecture"
-msgstr ""
+msgstr "Datordzelžu arhitektūra"
 
 #: include/hosts.inc.php:169
 msgid "Hardware"
@@ -5409,18 +5409,18 @@ msgstr "Ungāru (hu_HU)"
 #: include/discovery.inc.php:70
 #: include/views/js/configuration.discovery.edit.js.php:123
 msgid "ICMP ping"
-msgstr ""
+msgstr "ICMP ping"
 
 #: include/views/administration.auditlogs.list.php:90
 #: include/views/administration.node.edit.php:41
 #: include/views/administration.node.list.php:41 nodes.php:34
 msgid "ID"
-msgstr ""
+msgstr "ID"
 
 #: include/discovery.inc.php:64
 #: include/views/js/configuration.discovery.edit.js.php:124
 msgid "IMAP"
-msgstr ""
+msgstr "IMAP"
 
 #: events.php:483 events.php:492 hosts.php:653
 #: include/views/administration.auditlogs.list.php:87
@@ -5473,7 +5473,7 @@ msgstr ""
 
 #: include/views/configuration.host.massupdate.php:168
 msgid "IPMI password"
-msgstr ""
+msgstr "IPMI parole"
 
 #: include/views/configuration.host.massupdate.php:150
 msgid "IPMI privilege level"
@@ -5486,7 +5486,7 @@ msgstr "IPMI sensors"
 
 #: include/views/configuration.host.massupdate.php:159
 msgid "IPMI username"
-msgstr ""
+msgstr "IPMI lietotājvārds"
 
 #: srv_status.php:179
 msgid "IT SERVICES"
@@ -5707,15 +5707,15 @@ msgstr "Importēt"
 
 #: conf.import.php:135
 msgid "Import failed"
-msgstr ""
+msgstr "Importa mēģinājums neveiksmīgs"
 
 #: include/views/conf.import.php:64
 msgid "Import file"
-msgstr ""
+msgstr "Importa fails"
 
 #: conf.import.php:131
 msgid "Imported successfully"
-msgstr ""
+msgstr "Imports veiksmīgs"
 
 #: hostinventories.php:187
 #, php-format
@@ -5734,13 +5734,13 @@ msgstr ""
 
 #: include/views/administration.usergroups.edit.php:53
 msgid "In group"
-msgstr ""
+msgstr "Grupā"
 
 #: include/views/configuration.host.edit.php:186
 #: include/views/configuration.host.massupdate.php:46
 #: include/views/configuration.template.edit.php:135
 msgid "In groups"
-msgstr ""
+msgstr "Grupās"
 
 #: hosts.php:789 include/views/configuration.maintenance.edit.php:188
 #: include/views/configuration.maintenance.edit.php:196
@@ -6370,15 +6370,15 @@ msgstr "Informācija"
 
 #: include/views/configuration.triggers.expression.php:129
 msgid "Insert"
-msgstr ""
+msgstr "Ievietot"
 
 #: include/forms.inc.php:1353 jsLoader.php:102
 msgid "Insert macro"
-msgstr ""
+msgstr "Ievietot makro"
 
 #: include/menu.inc.php:279 include/profiles.inc.php:228 setup.php:25
 msgid "Installation"
-msgstr ""
+msgstr "Instalācija"
 
 #: include/hosts.inc.php:264
 msgid "Installer name"
@@ -6715,7 +6715,7 @@ msgstr "JMX aģents"
 
 #: include/views/configuration.host.edit.php:265
 msgid "JMX interfaces"
-msgstr ""
+msgstr "JMX interfeisi"
 
 #: api/rpc/class.cjsonrpc.php:149
 #, php-format
@@ -6899,7 +6899,7 @@ msgstr ""
 #: include/func.inc.php:1696
 msgctxt "page navigation"
 msgid "Last"
-msgstr ""
+msgstr "Pēdējā"
 
 #: dashboard.php:317
 #, php-format
@@ -7211,17 +7211,17 @@ msgstr "Žurnalēšanas faili"
 
 #: include/discovery.inc.php:152
 msgid "Lost"
-msgstr ""
+msgstr "Pazaudēt"
 
 #: include/func.inc.php:404 include/func.inc.php:565
 msgctxt "Mega short"
 msgid "M"
-msgstr ""
+msgstr "M"
 
 #: jsLoader.php:126
 msgctxt "Monday short"
 msgid "M"
-msgstr ""
+msgstr "P"
 
 #: include/translateDefines.inc.php:41 report3.php:116
 msgid "M Y"
@@ -7392,7 +7392,7 @@ msgstr ""
 #: sysmap.php:184
 #, php-format
 msgid "Map \"%s\""
-msgstr ""
+msgstr "Karte \"%s\""
 
 #: include/classes/import/CXmlImport18.php:819
 #, php-format
@@ -7604,7 +7604,7 @@ msgstr ""
 
 #: include/func.inc.php:565
 msgid "Mega"
-msgstr ""
+msgstr "Mega"
 
 #: include/views/administration.usergroups.list.php:47
 #: include/views/configuration.hostgroups.list.php:52
@@ -7680,7 +7680,7 @@ msgstr ""
 #: include/classes/class.cwidget.php:124 include/classes/class.cwidget.php:127
 #: include/config.inc.php:346
 msgid "Minimize"
-msgstr ""
+msgstr "Minimizēt"
 
 #: include/classes/class.frontendsetup.php:121
 #, php-format
@@ -7695,7 +7695,7 @@ msgstr ""
 #: include/classes/class.frontendsetup.php:102
 #, php-format
 msgid "Minimum required PHP version is %s"
-msgstr ""
+msgstr "Minimālā nepieciešamā PHP versija ir %s"
 
 #: include/classes/class.frontendsetup.php:178
 #, php-format
@@ -7770,7 +7770,7 @@ msgstr ""
 
 #: include/func.inc.php:195
 msgid "Mon"
-msgstr ""
+msgstr "Pir"
 
 #: include/forms.inc.php:1527 include/forms.inc.php:1608
 #: include/func.inc.php:123 include/func.inc.php:207
@@ -7804,7 +7804,7 @@ msgstr "Mēnesis"
 #: include/reports.inc.php:221 include/reports.inc.php:667
 #: include/reports.inc.php:675 report3.php:62 report4.php:100
 msgid "Monthly"
-msgstr ""
+msgstr "Mēnesī"
 
 #: queue.php:164 queue.php:227
 msgid "More than 10 minutes"
@@ -7955,7 +7955,7 @@ msgstr ""
 #: include/views/configuration.discovery.edit.php:54
 #: include/views/configuration.maintenance.edit.php:163
 msgid "New"
-msgstr ""
+msgstr "Jauns"
 
 #: include/views/configuration.item.edit.php:394
 msgid "New application"
@@ -8406,7 +8406,7 @@ msgstr ""
 
 #: slides.php:103
 msgid "No permissions"
-msgstr ""
+msgstr "Nav tiesības"
 
 #: include/views/administration.usergroups.edit.php:79
 msgid "No permissions defined."
@@ -8639,7 +8639,7 @@ msgstr ""
 #: include/views/administration.node.list.php:32
 #: include/views/administration.proxy.list.php:26 popup.php:114
 msgid "Nodes"
-msgstr ""
+msgstr "Mezgli"
 
 #: adm.other.php:81 include/hosts.inc.php:38 include/httptest.inc.php:27
 #: include/services.inc.php:316
@@ -8744,7 +8744,7 @@ msgstr "Novembris"
 
 #: jsLoader.php:133
 msgid "Now"
-msgstr ""
+msgstr "Tagad"
 
 #: include/blocks.inc.php:725 include/blocks.inc.php:727
 msgid "Number of hosts (monitored/not monitored/templates)"
@@ -8806,13 +8806,13 @@ msgstr "Lietotāju skaits (tiešsaistē)"
 #: include/triggers.inc.php:2200 include/views/configuration.item.edit.php:216
 #: include/views/configuration.item.massupdate.php:159
 msgid "Numeric (float)"
-msgstr ""
+msgstr "Numurs (peldošais)"
 
 #: include/triggers.inc.php:2199 include/triggers.inc.php:2218
 #: include/triggers.inc.php:2228 include/triggers.inc.php:2233
 #: include/triggers.inc.php:2237
 msgid "Numeric (integer 64bit)"
-msgstr ""
+msgstr "Numurs (vesels skaitlis 64bit)"
 
 #: include/forms.inc.php:416 include/items.inc.php:116
 #: include/views/configuration.item.edit.php:215
@@ -8822,7 +8822,7 @@ msgstr ""
 
 #: include/hosts.inc.php:42 include/hosts.inc.php:70
 msgid "OEM"
-msgstr ""
+msgstr "OEM"
 
 #: chart4.php:167 chart5.php:192 httpdetails.php:146 httpdetails.php:213
 #: httpmon.php:259 include/classes/tree/CServiceTree.php:46
@@ -8854,7 +8854,7 @@ msgstr "VAI"
 
 #: hostinventories.php:161 include/hosts.inc.php:124
 msgid "OS"
-msgstr ""
+msgstr "OS"
 
 #: include/hosts.inc.php:129
 msgid "OS (Full details)"
@@ -9009,7 +9009,7 @@ msgstr ""
 
 #: include/views/js/administration.general.valuemapping.edit.js.php:6
 msgid "Only whole numbers"
-msgstr ""
+msgstr "Tikai veseli skaitļi"
 
 #: include/views/configuration.httpconf.edit.php:85
 msgid "Opera"
@@ -9026,11 +9026,11 @@ msgstr ""
 
 #: include/views/configuration.action.edit.php:949
 msgid "Operation condition"
-msgstr ""
+msgstr "Operācijas nosacījums"
 
 #: include/views/configuration.action.edit.php:957
 msgid "Operation details"
-msgstr ""
+msgstr "Operācijas detaļas"
 
 #: api/classes/CAction.php:1591
 msgid "Operation has no group to operate."
@@ -9042,16 +9042,16 @@ msgstr ""
 
 #: include/views/configuration.action.edit.php:447
 msgid "Operation type"
-msgstr ""
+msgstr "Operācijas tips"
 
 #: include/views/configuration.action.edit.php:967
 #: include/views/configuration.action.list.php:52
 msgid "Operations"
-msgstr ""
+msgstr "Operācija"
 
 #: include/hosts.inc.php:68
 msgid "Operator"
-msgstr ""
+msgstr "Operators"
 
 #: include/views/configuration.host.massupdate.php:44
 #: include/views/configuration.host.massupdate.php:52
@@ -9121,7 +9121,7 @@ msgstr ""
 #: include/views/configuration.maintenance.edit.php:196
 #: include/views/configuration.template.edit.php:135
 msgid "Other groups"
-msgstr ""
+msgstr "Citas grupas"
 
 #: include/views/administration.proxy.edit.php:82
 msgid "Other hosts"
@@ -9166,7 +9166,7 @@ msgstr "PERSONĀLAIS INFOPANELIS"
 
 #: include/classes/class.frontendsetup.php:316
 msgid "PHP bcmath"
-msgstr ""
+msgstr "PHP bcmath"
 
 #: include/classes/class.frontendsetup.php:320
 msgid "PHP bcmath extension missing (PHP configuration parameter --enable-bcmath)"
@@ -9174,7 +9174,7 @@ msgstr ""
 
 #: include/classes/class.frontendsetup.php:547
 msgid "PHP ctype"
-msgstr ""
+msgstr "PHP ctype"
 
 #: include/classes/class.frontendsetup.php:551
 msgid "PHP ctype extension missing (PHP configuration parameter --enable-ctype)"
@@ -9186,31 +9186,31 @@ msgstr "PHP datubāzu atbalsts"
 
 #: include/classes/class.frontendsetup.php:380
 msgid "PHP gd"
-msgstr ""
+msgstr "PHP gd"
 
 #: include/classes/class.frontendsetup.php:456
 msgid "PHP gd FreeType support"
-msgstr ""
+msgstr "PHP gd FreeType atbalsts"
 
 #: include/classes/class.frontendsetup.php:460
 msgid "PHP gd FreeType support missing"
-msgstr ""
+msgstr "Nav PHP gd FreeType atbalsts"
 
 #: include/classes/class.frontendsetup.php:435
 msgid "PHP gd JPEG image support missing"
-msgstr ""
+msgstr "Nav PHP gd JPEG image atbalsts"
 
 #: include/classes/class.frontendsetup.php:431
 msgid "PHP gd JPEG support"
-msgstr ""
+msgstr "PHP gd JPEG atbalsts"
 
 #: include/classes/class.frontendsetup.php:409
 msgid "PHP gd PNG image support missing"
-msgstr ""
+msgstr "Nav PHP gd PNG attēlu atbalsts"
 
 #: include/classes/class.frontendsetup.php:405
 msgid "PHP gd PNG support"
-msgstr ""
+msgstr "PHP gd PNG atbalsts"
 
 #: include/classes/class.frontendsetup.php:384
 msgid "PHP gd extension missing (PHP configuration parameter --with-gd)"
@@ -9218,7 +9218,7 @@ msgstr ""
 
 #: include/classes/class.frontendsetup.php:604
 msgid "PHP gettext"
-msgstr ""
+msgstr "PHP gettext"
 
 #: include/classes/class.frontendsetup.php:608
 msgid "PHP gettext extension missing (PHP configuration parameter --with-gettext)"
@@ -9242,27 +9242,27 @@ msgstr ""
 
 #: include/classes/class.frontendsetup.php:174
 msgid "PHP option max_execution_time"
-msgstr ""
+msgstr "PHP opcija max_execution_time"
 
 #: include/classes/class.frontendsetup.php:193
 msgid "PHP option max_input_time"
-msgstr ""
+msgstr "PHP opcija max_input_time"
 
 #: include/classes/class.frontendsetup.php:117
 msgid "PHP option memory_limit"
-msgstr ""
+msgstr "PHP opcija memory_limit"
 
 #: include/classes/class.frontendsetup.php:136
 msgid "PHP option post_max_size"
-msgstr ""
+msgstr "PHP opcija post_max_size"
 
 #: include/classes/class.frontendsetup.php:155
 msgid "PHP option upload_max_filesize"
-msgstr ""
+msgstr "PHP opcija upload_max_filesize"
 
 #: include/classes/class.frontendsetup.php:566
 msgid "PHP session"
-msgstr ""
+msgstr "PHP sesija"
 
 #: include/classes/class.frontendsetup.php:585
 msgid "PHP session auto start"
@@ -9278,7 +9278,7 @@ msgstr ""
 
 #: include/classes/class.frontendsetup.php:354
 msgid "PHP sockets"
-msgstr ""
+msgstr "PHP ligzdas"
 
 #: include/classes/class.frontendsetup.php:358
 msgid "PHP sockets extension missing (PHP configuration parameter --enable-sockets)"
@@ -9448,7 +9448,7 @@ msgstr ""
 #: popup_period.php:92 popup_period.php:175 report3.php:64 report4.php:96
 #: srv_status.php:176
 msgid "Period"
-msgstr ""
+msgstr "Periods"
 
 #: include/forms.inc.php:1509
 #: include/views/configuration.maintenance.edit.php:133
@@ -9458,12 +9458,12 @@ msgstr ""
 #: include/views/configuration.maintenance.edit.php:160
 #: include/views/configuration.maintenance.edit.php:206
 msgid "Periods"
-msgstr ""
+msgstr "Periodi"
 
 #: include/views/administration.usergroups.edit.php:123
 #: include/views/administration.users.edit.php:316
 msgid "Permissions"
-msgstr ""
+msgstr "Pieejas tiesības"
 
 #: include/views/administration.users.edit.php:315
 msgid "Permissions can be assigned for user groups only."
@@ -9475,11 +9475,11 @@ msgstr "Persiešu (fa_IR)"
 
 #: include/func.inc.php:568
 msgid "Peta"
-msgstr ""
+msgstr "Peta"
 
 #: include/graphs.inc.php:26 popup.php:1410
 msgid "Pie"
-msgstr ""
+msgstr "Pīrāgs"
 
 #: include/views/js/configuration.sysmaps.js.php:57
 msgid "Placing algorithm"
@@ -9542,7 +9542,7 @@ msgstr ""
 
 #: include/views/js/configuration.discovery.edit.js.php:27
 msgid "Port range"
-msgstr ""
+msgstr "Portu diapazons"
 
 #: include/locales.inc.php:64
 msgid "Portuguese (pt_BR)"
@@ -9550,11 +9550,11 @@ msgstr "Protugāļu (pt_BR)"
 
 #: include/locales.inc.php:65
 msgid "Portuguese (pt_PT)"
-msgstr ""
+msgstr "Portugāļu (pt_PT)"
 
 #: tr_logform.php:303
 msgid "Position"
-msgstr ""
+msgstr "Pozīcija"
 
 #: include/views/configuration.httpconf.popup.php:61
 msgid "Post"
@@ -9565,7 +9565,7 @@ msgstr ""
 #: include/views/administration.general.iconmap.edit.php:124
 #: include/views/configuration.graph.edit.php:297
 msgid "Preview"
-msgstr ""
+msgstr "Priekšskatījums"
 
 #: include/setup.inc.php:147
 msgid "Previous"
@@ -9632,7 +9632,7 @@ msgstr "Privātās atslēgas fails"
 
 #: include/views/configuration.host.edit.php:540
 msgid "Privilege level"
-msgstr ""
+msgstr "Privilēģiju līmenis"
 
 #: api/classes/CUser.php:835
 msgid "Probably php-ldap module is missing."
@@ -9641,7 +9641,7 @@ msgstr ""
 #: include/maps.inc.php:695 include/maps.inc.php:785 include/maps.inc.php:883
 #: include/views/js/configuration.sysmaps.js.php:127 tr_status.php:194
 msgid "Problem"
-msgstr ""
+msgstr "Problēma"
 
 #: dashconf.php:262 include/views/configuration.sysmap.edit.php:146
 msgid "Problem display"
@@ -9761,25 +9761,25 @@ msgstr "RMCP+"
 #: include/views/administration.script.edit.php:95
 #: include/views/administration.script.list.php:83
 msgid "Read"
-msgstr ""
+msgstr "Lasīšana"
 
 #: include/forms.inc.php:272 include/perm.inc.php:24
 #: include/views/administration.usergroups.edit.php:80
 msgid "Read only"
-msgstr ""
+msgstr "Tikai lasīšana"
 
 #: include/forms.inc.php:272 include/perm.inc.php:23
 #: include/views/administration.usergroups.edit.php:80
 msgid "Read-write"
-msgstr ""
+msgstr "Lasīšana un rakstīšana"
 
 #: srv_status.php:158
 msgid "Reason"
-msgstr ""
+msgstr "Iemesls"
 
 #: include/actions.inc.php:86
 msgid "Received value"
-msgstr ""
+msgstr "Saņemtā vērtība"
 
 #: include/views/administration.auditacts.list.php:42
 msgid "Recipient"
@@ -9787,11 +9787,11 @@ msgstr "Saņēmējs"
 
 #: include/views/configuration.screen.constructor.edit.php:365
 msgid "Recipient (ascending)"
-msgstr ""
+msgstr "Saņēmējs (augoši)"
 
 #: include/views/configuration.screen.constructor.edit.php:364
 msgid "Recipient (descending)"
-msgstr ""
+msgstr "Saņēmējs (dilstoši)"
 
 #: include/actions.inc.php:734 include/classes/screens/CScreenActions.php:78
 #: include/classes/screens/CScreenActions.php:83
@@ -9807,7 +9807,7 @@ msgstr "Atjaunošana"
 #: actionconf.php:43 include/views/configuration.action.edit.php:54
 #: include/views/configuration.action.edit.php:57
 msgid "Recovery message"
-msgstr ""
+msgstr "Atjaunošanas ziņojums"
 
 #: actionconf.php:42 include/views/configuration.action.edit.php:56
 msgid "Recovery subject"
@@ -9815,15 +9815,15 @@ msgstr ""
 
 #: include/views/administration.users.edit.php:121 profile.php:49 users.php:62
 msgid "Refresh (in seconds)"
-msgstr ""
+msgstr "Atsvaidzināt (sekundēs)"
 
 #: include/func.inc.php:1770
 msgid "Refresh time in seconds"
-msgstr ""
+msgstr "Atsvaidzināšanas laiks sekundēs"
 
 #: include/func.inc.php:1774
 msgid "Refresh time multiplier"
-msgstr ""
+msgstr "Atsvaidzināšanas laika reizinātājs"
 
 #: adm.other.php:33 include/views/administration.general.other.edit.php:36
 msgid "Refresh unsupported items (in sec)"
@@ -9836,7 +9836,7 @@ msgstr ""
 
 #: include/views/configuration.item.edit.php:340
 msgid "Regexp"
-msgstr ""
+msgstr "Regexp"
 
 #: include/audit.inc.php:47
 #: include/views/administration.general.regularexpressions.edit.php:30
@@ -9979,7 +9979,7 @@ msgstr "Dzēst iezīmētos"
 #: include/views/configuration.host.massupdate.php:115
 #: include/views/configuration.triggers.edit.php:118
 msgid "Replace"
-msgstr ""
+msgstr "Aizstāt"
 
 #: include/views/configuration.triggers.massupdate.php:109
 msgid "Replace depenencies"
@@ -10053,7 +10053,7 @@ msgstr ""
 #: include/views/administration.auditlogs.list.php:67 latest.php:139
 #: tr_status.php:249
 msgid "Reset"
-msgstr ""
+msgstr "Atiestatīt"
 
 #: include/views/js/administration.general.triggerDisplayOptions.js.php:12
 msgid "Reset all fields to default values?"
@@ -10077,7 +10077,7 @@ msgstr ""
 
 #: jsrpc.php:113
 msgid "Resolved"
-msgstr ""
+msgstr "Atrisināts"
 
 #: include/views/administration.auditlogs.list.php:63
 #: include/views/administration.auditlogs.list.php:88
@@ -10174,7 +10174,7 @@ msgstr "Ieriaksti lapā"
 
 #: include/views/conf.import.php:65
 msgid "Rules"
-msgstr ""
+msgstr "Noteikumi"
 
 #: include/actions.inc.php:428
 msgid "Run IPMI command"
@@ -10243,7 +10243,7 @@ msgstr "MEKLĒT"
 
 #: include/classes/screens/CScreenClock.php:64
 msgid "SERVER"
-msgstr ""
+msgstr "SERVERIS"
 
 #: report3.php:85 srv_status.php:160
 msgid "SLA"
@@ -10302,7 +10302,7 @@ msgstr ""
 
 #: include/views/configuration.host.edit.php:250
 msgid "SNMP interfaces"
-msgstr ""
+msgstr "SNMP interfeiss"
 
 #: include/items.inc.php:82
 msgid "SNMP trap"
@@ -10331,25 +10331,25 @@ msgstr "SNMPv3 aģents"
 #: include/views/configuration.item.massupdate.php:129
 #: include/views/js/configuration.discovery.edit.js.php:55
 msgid "SNMPv3 auth passphrase"
-msgstr ""
+msgstr "SNMPv3 auth parole"
 
 #: include/views/configuration.item.edit.php:157
 #: include/views/configuration.item.massupdate.php:139
 #: include/views/js/configuration.discovery.edit.js.php:60
 msgid "SNMPv3 priv passphrase"
-msgstr ""
+msgstr "SNMPv3 priv parole"
 
 #: include/views/configuration.item.edit.php:152
 #: include/views/configuration.item.massupdate.php:119
 #: include/views/js/configuration.discovery.edit.js.php:45
 msgid "SNMPv3 security level"
-msgstr ""
+msgstr "SNMPv3 drošības līmenis"
 
 #: include/forms.inc.php:464 include/views/configuration.item.edit.php:142
 #: include/views/configuration.item.massupdate.php:105
 #: include/views/js/configuration.discovery.edit.js.php:40
 msgid "SNMPv3 security name"
-msgstr ""
+msgstr "SNMPv3 drošības nosaukums"
 
 #: include/classes/debug/CProfiler.php:141
 #, php-format
@@ -10370,7 +10370,7 @@ msgstr ""
 #: include/views/configuration.action.edit.php:647
 #: include/views/js/configuration.discovery.edit.js.php:133
 msgid "SSH"
-msgstr ""
+msgstr "SSH"
 
 #: include/items.inc.php:89
 msgid "SSH agent"
@@ -10383,7 +10383,7 @@ msgstr ""
 #: include/classes/screens/CScreenHostgroupTriggers.php:127
 #: include/classes/screens/CScreenHostTriggers.php:127 tr_status.php:177
 msgid "STATUS OF TRIGGERS"
-msgstr ""
+msgstr "TRIGERU STATUS"
 
 #: httpmon.php:97
 msgid "STATUS OF WEB MONITORING"
@@ -10395,7 +10395,7 @@ msgstr "ZABBIX STĀVOKLIS"
 
 #: include/views/configuration.httpconf.edit.php:91
 msgid "Safari"
-msgstr ""
+msgstr "Safari"
 
 #: include/func.inc.php:200
 msgid "Sat"
@@ -10468,7 +10468,7 @@ msgstr ""
 #: httpconf.php:350 include/audit.inc.php:43
 #: include/views/configuration.httpconf.edit.php:209
 msgid "Scenario"
-msgstr ""
+msgstr "Scenārijs"
 
 #: api/classes/CWebCheck.php:483
 #, php-format
@@ -10491,7 +10491,7 @@ msgstr ""
 
 #: httpconf.php:209
 msgid "Scenario added"
-msgstr ""
+msgstr "Scenārijs pievienots"
 
 #: httpconf.php:185 httpconf.php:358
 msgid "Scenario deleted"
@@ -10615,7 +10615,7 @@ msgstr "Skripts"
 #: api/classes/CScript.php:325 api/classes/CScript.php:377
 #, php-format
 msgid "Script \"%s\" already exists."
-msgstr ""
+msgstr "Skripts \"%s\" jau eksistē."
 
 #: scripts.php:117
 msgid "Script added"
@@ -10703,7 +10703,7 @@ msgstr ""
 #: include/views/configuration.triggers.expression.php:100
 #: include/views/configuration.triggers.expression.php:107 popup_trexpr.php:44
 msgid "Seconds"
-msgstr ""
+msgstr "Sekundes"
 
 #: events.php:358 include/forms.inc.php:489 include/forms.inc.php:507
 #: include/forms.inc.php:529 include/page_header.php:358
@@ -10753,7 +10753,7 @@ msgstr ""
 #: popup.php:1557 popup.php:1619 popup.php:1874 popup_right.php:109
 #: popup_usrgrp.php:102 tr_logform.php:274
 msgid "Select"
-msgstr ""
+msgstr "Atlasīt"
 
 #: include/page_header.php:324
 msgid "Select Nodes"
@@ -10771,7 +10771,7 @@ msgstr ""
 
 #: dashconf.php:174 include/views/monitoring.history.php:123
 msgid "Selected"
-msgstr ""
+msgstr "Atlasītie"
 
 #: actionconf.php:308
 msgid "Selected actions deleted"
@@ -10779,11 +10779,11 @@ msgstr ""
 
 #: include/views/js/configuration.sysmaps.js.php:206
 msgid "Selected elements"
-msgstr ""
+msgstr "Atlasītie elementi"
 
 #: include/reports.inc.php:546
 msgid "Selected groups"
-msgstr ""
+msgstr "Atlasītās grupas"
 
 #: include/reports.inc.php:591
 msgid "Selected hosts"
@@ -10819,11 +10819,11 @@ msgstr ""
 
 #: include/actions.inc.php:886
 msgid "Sent"
-msgstr ""
+msgstr "Sūtīt"
 
 #: include/func.inc.php:226
 msgid "Sep"
-msgstr ""
+msgstr "Sep"
 
 #: dashconf.php:255 include/views/configuration.sysmap.edit.php:139
 msgid "Separated"
@@ -10845,15 +10845,15 @@ msgstr ""
 #: include/views/administration.script.list.php:67 popup.php:1859
 #: queue.php:186
 msgid "Server"
-msgstr ""
+msgstr "Serveris"
 
 #: include/screens.inc.php:37
 msgid "Server info"
-msgstr ""
+msgstr "Servera info"
 
 #: include/views/configuration.screen.constructor.edit.php:512
 msgid "Server time"
-msgstr ""
+msgstr "Servera laiks"
 
 #: events.php:522 include/actions.inc.php:103
 #: include/views/configuration.services.child.list.php:38
@@ -10897,7 +10897,7 @@ msgstr ""
 
 #: include/actions.inc.php:80
 msgid "Service port"
-msgstr ""
+msgstr "Servisa ports"
 
 #: include/services.inc.php:504
 msgid "Service start time must be less than end time."
@@ -10909,7 +10909,7 @@ msgstr ""
 
 #: include/actions.inc.php:78
 msgid "Service type"
-msgstr ""
+msgstr "Servisa tips"
 
 #: services.php:157
 msgid "Service updated"
@@ -10917,7 +10917,7 @@ msgstr ""
 
 #: include/views/configuration.services.edit.php:78
 msgid "Services"
-msgstr ""
+msgstr "Servisi"
 
 #: api/classes/CService.php:1449
 msgid "Services form a circular dependency."
@@ -11350,7 +11350,7 @@ msgstr ""
 #: api/classes/CWebCheck.php:702
 #, php-format
 msgid "Step \"%s\" already exists."
-msgstr ""
+msgstr "Solis \"%s\" jau eksistē."
 
 #: include/views/configuration.action.edit.php:430
 msgid "Step duration"
@@ -11436,7 +11436,7 @@ msgstr "Svētdiena"
 
 #: include/views/general.login.php:40
 msgid "Support"
-msgstr ""
+msgstr "Atbalsts"
 
 #: include/views/administration.users.edit.php:51
 #: include/views/administration.users.list.php:56 popup.php:898 users.php:45
@@ -11497,7 +11497,7 @@ msgstr ""
 
 #: include/forms.inc.php:1829 include/forms.inc.php:1848
 msgid "TRUE"
-msgstr ""
+msgstr "PATIESS"
 
 #: include/classes/db/DB.php:198
 #, php-format
@@ -11534,7 +11534,7 @@ msgstr ""
 #: include/views/configuration.action.edit.php:648
 #: include/views/js/configuration.discovery.edit.js.php:134
 msgid "Telnet"
-msgstr ""
+msgstr "Telnet"
 
 #: include/audit.inc.php:51 include/forms.inc.php:541
 #: include/forms.inc.php:843 include/html.inc.php:357
@@ -11640,14 +11640,14 @@ msgstr ""
 
 #: include/func.inc.php:567
 msgid "Tera"
-msgstr ""
+msgstr "Tera"
 
 #: include/forms.inc.php:1868
 #: include/views/administration.authentication.edit.php:88
 #: include/views/configuration.triggers.edit.php:213 tr_testexpr.php:25
 #: tr_testexpr.php:121 tr_testexpr.php:170
 msgid "Test"
-msgstr ""
+msgstr "Tests"
 
 #: include/views/administration.authentication.edit.php:63
 msgid "Test authentication"
@@ -11694,11 +11694,11 @@ msgstr ""
 
 #: queue.php:121
 msgid "The queue is empty"
-msgstr ""
+msgstr "Rinda ir tukša"
 
 #: api/rpc/class.cjsonrpc.php:187
 msgid "The received JSON is not a valid JSON-RPC Request."
-msgstr ""
+msgstr "Saņemtais JSON pieprasījums nav derīgs JSON-RPC."
 
 #: api/rpc/class.cjsonrpc.php:192
 msgid "The requested remote-procedure does not exist / is not available"
@@ -11706,7 +11706,7 @@ msgstr ""
 
 #: include/views/administration.users.edit.php:111
 msgid "Theme"
-msgstr ""
+msgstr "Motīvs"
 
 #: authentication.php:148
 #, php-format
@@ -11718,7 +11718,7 @@ msgstr[2] ""
 
 #: include/forms.inc.php:1599 include/maintenances.inc.php:105
 msgid "Third"
-msgstr ""
+msgstr "Trešais"
 
 #: include/views/configuration.host.edit.php:604
 #, php-format
@@ -11747,7 +11747,7 @@ msgstr "Šis gads"
 
 #: include/func.inc.php:198
 msgid "Thu"
-msgstr ""
+msgstr "Cet"
 
 #: include/forms.inc.php:1530 include/forms.inc.php:1611
 #: include/func.inc.php:126 include/func.inc.php:210
@@ -11782,11 +11782,11 @@ msgstr "Laiks"
 
 #: include/views/configuration.screen.constructor.edit.php:357
 msgid "Time (ascending)"
-msgstr ""
+msgstr "Laiks (augoši)"
 
 #: include/views/configuration.screen.constructor.edit.php:356
 msgid "Time (descending)"
-msgstr ""
+msgstr "Laiks (dilstoši)"
 
 #: include/actions.inc.php:66
 msgid "Time period"
@@ -11807,7 +11807,7 @@ msgstr ""
 #: include/views/configuration.httpconf.edit.php:131
 #: include/views/configuration.httpconf.popup.php:62 popup_httpstep.php:39
 msgid "Timeout"
-msgstr ""
+msgstr "Taimauts"
 
 #: include/classes/screens/CScreenHistory.php:162
 #: include/classes/screens/CScreenHistory.php:266
@@ -11827,7 +11827,7 @@ msgstr ""
 #: include/reports.inc.php:212 include/reports.inc.php:374
 #: include/reports.inc.php:523
 msgid "Title"
-msgstr ""
+msgstr "Virsraksts"
 
 #: include/views/configuration.action.edit.php:420
 #: include/views/js/configuration.sysmaps.js.php:309
@@ -11989,22 +11989,22 @@ msgstr ""
 
 #: include/actions.inc.php:52
 msgid "Trigger name"
-msgstr ""
+msgstr "Trigera nosaukums"
 
 #: include/audit.inc.php:34
 msgid "Trigger prototype"
-msgstr ""
+msgstr "Trigera prototips"
 
 #: include/html.inc.php:428 include/html.inc.php:432
 #: include/views/configuration.host.discovery.list.php:89
 #: include/views/configuration.host.edit.php:470
 #: include/views/configuration.template.edit.php:344
 msgid "Trigger prototypes"
-msgstr ""
+msgstr "Trigeru prototipi"
 
 #: include/views/configuration.triggers.list.php:50
 msgid "Trigger prototypes of"
-msgstr ""
+msgstr "Trigeru prototipi no"
 
 #: adm.gui.php:100 adm.housekeeper.php:79 adm.iconmapping.php:117
 #: adm.images.php:139 adm.macros.php:166 adm.other.php:112 adm.regexps.php:216
@@ -12025,11 +12025,11 @@ msgstr ""
 #: trigger_prototypes.php:163 trigger_prototypes.php:202 triggers.php:152
 #: triggers.php:203 tr_logform.php:112
 msgid "Trigger updated"
-msgstr ""
+msgstr "Trigeris atjaunots"
 
 #: include/actions.inc.php:48
 msgid "Trigger value"
-msgstr ""
+msgstr "Trigera vērtība"
 
 #: hosts.php:685 hosts.php:763 include/events.inc.php:25
 #: include/forms.inc.php:517 include/html.inc.php:439 include/html.inc.php:443
@@ -12060,7 +12060,7 @@ msgstr "Trigeri izdzēsti"
 
 #: include/classes/class.ctriggersinfo.php:110 include/screens.inc.php:42
 msgid "Triggers info"
-msgstr ""
+msgstr "Informācija par trigeriem"
 
 #: include/views/configuration.triggers.massupdate.php:119
 msgid "Triggers massupdate"
@@ -12072,7 +12072,7 @@ msgstr ""
 
 #: tr_status.php:195
 msgid "Triggers status"
-msgstr ""
+msgstr "Trigera status"
 
 #: include/menu.inc.php:133
 msgid "Triggers top 100"
@@ -12184,11 +12184,11 @@ msgstr ""
 
 #: include/forms.inc.php:828
 msgid "Types"
-msgstr ""
+msgstr "Tipi"
 
 #: include/translateDefines.inc.php:24 include/triggers.inc.php:167
 msgid "UNKNOWN"
-msgstr ""
+msgstr "NEZINĀMS"
 
 #: include/triggers.inc.php:178
 msgid "UP"
@@ -12201,7 +12201,7 @@ msgstr ""
 #: include/views/js/configuration.sysmaps.js.php:168 popup_httpstep.php:37
 #: tr_logform.php:368 tr_status.php:519
 msgid "URL"
-msgstr ""
+msgstr "Saite"
 
 #: include/views/administration.users.edit.php:123
 msgid "URL (after login)"
@@ -12332,7 +12332,7 @@ msgstr ""
 
 #: include/hosts.inc.php:479
 msgid "Unknown interface type."
-msgstr ""
+msgstr "Nezināms interfeisa tips."
 
 #: include/audit.inc.php:62
 msgid "Unknown resource"
@@ -12340,7 +12340,7 @@ msgstr "Nezināms resurss"
 
 #: include/items.inc.php:953
 msgid "Unknown value type"
-msgstr ""
+msgstr "Nezināms vērtības tips"
 
 #: include/triggers.inc.php:1735 tr_testexpr.php:33
 msgid "Unknown variable type, testing not available"
@@ -12520,7 +12520,7 @@ msgstr "Darbspējas laiks/Zaudlaiks"
 #: include/screens.inc.php:44
 #: include/views/configuration.screen.constructor.edit.php:566
 msgid "Url"
-msgstr ""
+msgstr "Saite"
 
 #: include/views/configuration.item.edit.php:263
 msgid "Use custom multiplier"
@@ -12657,7 +12657,7 @@ msgstr "Lietotāja tips"
 
 #: profile.php:173 users.php:189 users.php:251 users.php:271
 msgid "User updated"
-msgstr ""
+msgstr "Lietotāja dati atjaunoti"
 
 #: api/classes/CUser.php:465
 #, php-format
@@ -12669,7 +12669,7 @@ msgstr ""
 #: include/views/configuration.host.edit.php:541
 #: include/views/general.login.php:62 index.php:35
 msgid "Username"
-msgstr ""
+msgstr "Lietotājvārds"
 
 #: include/menu.inc.php:253
 #: include/views/administration.usergroups.edit.php:53
@@ -12734,7 +12734,7 @@ msgstr ""
 #: include/audit.inc.php:38
 #: include/views/administration.general.valuemapping.list.php:23
 msgid "Value map"
-msgstr ""
+msgstr "Vērtību karte"
 
 #: adm.valuemapping.php:103
 #, php-format
@@ -12808,7 +12808,7 @@ msgstr "Vertikāli"
 
 #: include/views/configuration.screen.constructor.edit.php:604
 msgid "Vertical align"
-msgstr ""
+msgstr "Vertikāls novietojums"
 
 #: include/classes/class.cview.php:129
 msgid "View is not rendered."
@@ -12929,7 +12929,7 @@ msgstr "Tīmeklis"
 
 #: httpmon.php:123
 msgid "Web checks"
-msgstr ""
+msgstr "Tīmekļa pārbaudes"
 
 #: api/classes/CWebCheck.php:680 api/classes/CWebCheck.php:779
 #, php-format
@@ -12966,7 +12966,7 @@ msgstr "Nedēļa"
 #: include/reports.inc.php:220 include/reports.inc.php:666
 #: include/reports.inc.php:674 report3.php:61 report4.php:99
 msgid "Weekly"
-msgstr ""
+msgstr "Nedēļas"
 
 #: popup_media.php:123
 msgid "When active"
@@ -12997,7 +12997,7 @@ msgstr "Ar problēmām"
 #: include/forms.inc.php:520 include/forms.inc.php:744
 #: include/forms.inc.php:848
 msgid "With triggers"
-msgstr ""
+msgstr "Ar trigeriem"
 
 #: tr_status.php:200
 msgid "With unacknowledged events"
@@ -13120,7 +13120,7 @@ msgstr "X"
 #: include/reports.inc.php:213 include/reports.inc.php:375
 #: include/reports.inc.php:524
 msgid "X label"
-msgstr ""
+msgstr "X iezīme"
 
 #: include/classes/import/readers/CXmlImportReader.php:48
 #, php-format
@@ -13141,11 +13141,11 @@ msgstr ""
 #: include/classes/import/readers/CXmlImportReader.php:45
 #, php-format
 msgid "XML file contains warning %1$s:"
-msgstr ""
+msgstr "XML fails satur brīdinājumu %1$s:"
 
 #: include/views/js/configuration.sysmaps.js.php:155 report3.php:98
 msgid "Y"
-msgstr ""
+msgstr "Y"
 
 #: include/func.inc.php:571
 msgctxt "Yotta short"
@@ -13160,7 +13160,7 @@ msgstr ""
 
 #: include/views/configuration.graph.edit.php:274
 msgid "Y axis MAX value"
-msgstr ""
+msgstr "Y ass MAX vērtība"
 
 #: api/classes/CGraphGeneral.php:93
 msgid "Y axis MAX value must be greater than Y axis MIN value."
@@ -13168,7 +13168,7 @@ msgstr ""
 
 #: include/views/configuration.graph.edit.php:216
 msgid "Y axis MIN value"
-msgstr ""
+msgstr "Y ass MIN vērtība"
 
 #: include/views/configuration.graph.edit.php:74
 msgid "Y axis side"
@@ -13177,7 +13177,7 @@ msgstr ""
 #: include/reports.inc.php:214 include/reports.inc.php:376
 #: include/reports.inc.php:525
 msgid "Y label"
-msgstr ""
+msgstr "Y iezīme"
 
 #: include/translateDefines.inc.php:31 include/translateDefines.inc.php:32
 msgid "Y-m-d H:i:s"
@@ -13191,7 +13191,7 @@ msgstr ""
 
 #: include/translateDefines.inc.php:38
 msgid "Y.m.d"
-msgstr ""
+msgstr "G.m.d"
 
 #: include/translateDefines.inc.php:37
 msgid "Y.m.d H:i"
@@ -13242,7 +13242,7 @@ msgstr ""
 
 #: include/config.inc.php:252
 msgid "You cannot view this URL as a"
-msgstr ""
+msgstr "Jūs nevarat apskatīt šo saiti kā"
 
 #: include/views/js/configuration.action.edit.js.php:319
 msgid "You did not specify host for operation."
@@ -13281,23 +13281,23 @@ msgstr ""
 
 #: api/classes/CUser.php:339
 msgid "You do not have permissions to create users."
-msgstr ""
+msgstr "Jums nav tiesības veidot jaunus lietotājus."
 
 #: api/classes/CUser.php:362
 msgid "You do not have permissions to delete user or user does not exist."
-msgstr ""
+msgstr "Jums nav tiesības dzēst lietotāju vai lietotājs vairāk neeksistē."
 
 #: api/classes/CUser.php:358
 msgid "You do not have permissions to delete users."
-msgstr ""
+msgstr "Jums nav tiesības dzēst citus lietotājus."
 
 #: api/classes/CUser.php:351
 msgid "You do not have permissions to update other users."
-msgstr ""
+msgstr "Jums nav tiesības atjaunot citu lietotāju datus."
 
 #: api/classes/CUser.php:346
 msgid "You do not have permissions to update user or user does not exist."
-msgstr ""
+msgstr "Jums nav tiesības atjaunot citu lietotāju datus vai arī lietotājs vairāk neeksistē."
 
 #: include/config.inc.php:256
 msgid "You must login to view this page."
@@ -13310,7 +13310,7 @@ msgstr ""
 #: include/func.inc.php:570
 msgctxt "Zetta short"
 msgid "Z"
-msgstr ""
+msgstr "Z"
 
 #: index.php:30
 msgid "ZABBIX"
@@ -13324,7 +13324,7 @@ msgstr "Zabbix"
 #: include/views/general.login.php:47
 #, php-format
 msgid "Zabbix %1$s Copyright %2$s-%3$s by Zabbix SIA"
-msgstr ""
+msgstr "Zabbix %1$s Autortiesības aizsargātas %2$s-%3$s ar Zabbix SIA"
 
 #: include/users.inc.php:40
 msgid "Zabbix Admin"
@@ -13417,7 +13417,7 @@ msgstr ""
 
 #: include/setup.inc.php:368
 msgid "Zabbix server port"
-msgstr ""
+msgstr "Zabbix servera ports"
 
 #: include/items.inc.php:84
 msgid "Zabbix trapper"
@@ -13425,11 +13425,11 @@ msgstr ""
 
 #: include/func.inc.php:570
 msgid "Zetta"
-msgstr ""
+msgstr "Zetta"
 
 #: jsLoader.php:88
 msgid "Zoom"
-msgstr ""
+msgstr "Tālummaiņa"
 
 #: include/classes/screens/CScreenHostgroupTriggers.php:127
 #: include/classes/screens/CScreenHostTriggers.php:127
@@ -13534,11 +13534,11 @@ msgstr "d M H:i:s"
 
 #: chart4.php:127 chart5.php:137
 msgid "d.M"
-msgstr ""
+msgstr "d.M"
 
 #: include/classes/class.cchart.php:1230 include/classes/class.cchart.php:1283
 msgid "d.m"
-msgstr ""
+msgstr "d.m"
 
 #: include/classes/class.cchart.php:1252 include/classes/class.cchart.php:1267
 #: include/classes/class.cchart.php:1286
@@ -13547,7 +13547,7 @@ msgstr ""
 
 #: include/translateDefines.inc.php:49
 msgid "d.m.y"
-msgstr ""
+msgstr "d.m.g"
 
 #: include/maintenances.inc.php:60 include/maintenances.inc.php:112
 msgid "day"
@@ -13723,7 +13723,7 @@ msgstr "ms"
 
 #: include/views/administration.authentication.edit.php:63
 msgid "must be a valid LDAP user"
-msgstr ""
+msgstr "nepieciešams derīgs LDAP lietotājs"
 
 #: include/classes/class.frontendsetup.php:289
 #: include/classes/class.frontendsetup.php:317

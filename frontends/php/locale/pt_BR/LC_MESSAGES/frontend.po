@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-07-24 15:52+0300\n"
-"PO-Revision-Date: 2013-06-27 22:18+0200\n"
+"POT-Creation-Date: 2013-07-24 15:58+0300\n"
+"PO-Revision-Date: 2013-07-17 12:07+0200\n"
 "Last-Translator: Adail <the.spaww@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pt_BR\n"
@@ -27,7 +27,7 @@ msgstr "\"Exibe triggers OK\" precisa ser \"0\" ou um inteiro positivo."
 
 #: include/profiles.inc.php:291
 msgid "\"Triggers blink on status change\" needs to be \"0\" or a positive integer."
-msgstr "\"Gatilhos piscam na mudança de estado\" é necessário ser \"0\" ou um inteiro positivo."
+msgstr "\"Triggers piscam na mudança de estado\" é necessário ser \"0\" ou um inteiro positivo."
 
 #: include/func.inc.php:433
 #, php-format
@@ -1750,7 +1750,7 @@ msgstr "Não foi possível salvar as regras de descoberta sem checar."
 #: api/classes/CApplication.php:459
 #, php-format
 msgid "Cannot set \"templateid\" for application \"%1$s\"."
-msgstr "Não foi possível definir o \"ID de template\" para a aplicação \"%1$s\"."
+msgstr "Não foi possível definir o \"templateid\" para a aplicação \"%1$s\"."
 
 #: api/classes/CGraphGeneral.php:62
 #, php-format
