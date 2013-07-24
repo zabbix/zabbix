@@ -5,7 +5,7 @@ New features:
 ...G...... [ZBXNEXT-1528] added net.if.in, net.if.out and net.if.total item support on HP-UX platforms (igors)
 
 Bug fixes:
-
+..F....... [ZBX-6646] removed Micro and Milli units, unifieded length for y-axis values and fixed division by zero in graphs (Oleg)
 ..F....... [ZBX-6777] added pointer cursor to the main menu tabs (Guntis)
 A......... [ZBX-6699] added object flags in Host, Host group, Template and Item get methods (Ivo)
 ..F....... [ZBX-6794] fixed host name displaying in pie charts (Ivo)
