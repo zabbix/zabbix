@@ -24,6 +24,7 @@
 #include "dbcache.h"
 #include "zbxself.h"
 #include "valuecache.h"
+#include "proxy.h"
 
 extern unsigned char	daemon_type;
 
