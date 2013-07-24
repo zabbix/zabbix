@@ -262,7 +262,8 @@ else {
 	);
 	$data['groupid'] = $data['pageFilter']->groupid;
 	$data['hostid'] = $data['pageFilter']->hostid;
-	$data['displayNodes'] = (is_array(get_current_nodeid()) && $data['pageFilter']->groupid == 0 && $data['pageFilter']->hostid == 0);
+	$data['displayNodes'] = (is_array(get_current_nodeid())
+		&& $data['pageFilter']->groupid == 0 && $data['pageFilter']->hostid == 0);
 
 	if ($data['pageFilter']->hostsSelected) {
 		// get application ids

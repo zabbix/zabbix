@@ -290,7 +290,8 @@ if (isset($_REQUEST['form'])) {
 	// nodes
 	if (is_array(get_current_nodeid())) {
 		foreach ($data['db_groups'] as $key => $group) {
-			$data['db_groups'][$key]['name'] = get_node_name_by_elid($group['groupid'], true, NAME_DELIMITER).$group['name'];
+			$data['db_groups'][$key]['name'] =
+				get_node_name_by_elid($group['groupid'], true, NAME_DELIMITER).$group['name'];
 		}
 
 		foreach ($data['r_hosts'] as $key => $host) {
@@ -299,7 +300,8 @@ if (isset($_REQUEST['form'])) {
 
 		if (!$data['twb_groupid']) {
 			foreach ($data['db_hosts'] as $key => $host) {
-				$data['db_hosts'][$key]['name'] = get_node_name_by_elid($host['hostid'], true, NAME_DELIMITER).$host['name'];
+				$data['db_hosts'][$key]['name'] =
+					get_node_name_by_elid($host['hostid'], true, NAME_DELIMITER).$host['name'];
 			}
 		}
 	}

@@ -55,6 +55,7 @@ $pageFilter = new CPageFilter($options);
 $_REQUEST['groupid'] = $pageFilter->groupid;
 $_REQUEST['hostid'] = $pageFilter->hostid;
 
+$displayNodes = (is_array(get_current_nodeid()) && $pageFilter->groupid == 0 && $pageFilter->hostid == 0);
 
 $r_form = new CForm('get');
 $r_form->addVar('fullscreen',$_REQUEST['fullscreen']);
@@ -72,6 +73,7 @@ $httpmon_wdgt->addHeaderRowNumber();
 // TABLE
 $table = new CTableInfo(_('No web checks defined.'));
 $table->SetHeader(array(
+	$displayNodes ? _('Node') : null,
 	$_REQUEST['hostid'] == 0 ? make_sorting_header(_('Host'), 'hostname') : null,
 	make_sorting_header(_('Name'), 'name'),
 	_('Number of steps'),
@@ -157,6 +159,7 @@ if ($pageFilter->hostsSelected) {
 		}
 
 		$table->addRow(new CRow(array(
+			$displayNodes ? get_node_name_by_elid($httpTest['httptestid'], true) : null,
 			($_REQUEST['hostid'] > 0) ? null : $httpTest['hostname'],
 			new CLink($httpTest['name'], 'httpdetails.php?httptestid='.$httpTest['httptestid']),
 			$httpTest['steps'],

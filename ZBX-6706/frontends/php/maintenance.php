@@ -495,7 +495,8 @@ if (!empty($data['form'])) {
 	// nodes
 	if ($data['displayNodes']) {
 		foreach ($data['all_groups'] as $key => $group) {
-			$data['all_groups'][$key]['name'] = get_node_name_by_elid($group['groupid'], true, NAME_DELIMITER).$group['name'];
+			$data['all_groups'][$key]['name'] =
+				get_node_name_by_elid($group['groupid'], true, NAME_DELIMITER).$group['name'];
 		}
 
 		foreach ($data['hosts'] as $key => $host) {
