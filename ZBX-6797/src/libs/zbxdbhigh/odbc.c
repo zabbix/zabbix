@@ -23,7 +23,7 @@
 
 static char	zbx_last_odbc_strerror[255];
 
-const char	*get_last_odbc_strerror()
+const char	*get_last_odbc_strerror(void)
 {
 	return zbx_last_odbc_strerror;
 }
