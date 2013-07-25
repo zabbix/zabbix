@@ -101,7 +101,7 @@ if (isset($_REQUEST['filter_rst'])) {
 	$_REQUEST['show_triggers'] = TRIGGERS_OPTION_ONLYTRUE;
 	$_REQUEST['show_events'] = EVENTS_OPTION_NOEVENT;
 	$_REQUEST['ack_status'] = ZBX_ACK_STS_ANY;
-	$_REQUEST['show_severity'] = -1;
+	$_REQUEST['show_severity'] = TRIGGER_SEVERITY_NOT_CLASSIFIED;
 	$_REQUEST['txt_select'] = '';
 	$_REQUEST['status_change'] = 0;
 	$_REQUEST['status_change_days'] = 14;
@@ -164,7 +164,7 @@ if (isset($_REQUEST['show_severity'])) {
 	CProfile::update('web.tr_status.filter.show_severity', $_REQUEST['show_severity'], PROFILE_TYPE_INT);
 }
 else {
-	$_REQUEST['show_severity'] = CProfile::get('web.tr_status.filter.show_severity', -1);
+	$_REQUEST['show_severity'] = CProfile::get('web.tr_status.filter.show_severity', TRIGGER_SEVERITY_NOT_CLASSIFIED);
 }
 
 // status change
@@ -234,6 +234,8 @@ if (isset($audio) && !$mute) {
 /*
  * Display
  */
+$displayNodes = (is_show_all_nodes() && $pageFilter->groupid == 0 && $pageFilter->hostid == 0);
+
 $showTriggers = $_REQUEST['show_triggers'];
 $showEvents = $_REQUEST['show_events'];
 $showSeverity = $_REQUEST['show_severity'];
@@ -286,7 +288,6 @@ $filterForm->addRow(_('Events'), $eventsComboBox);
 
 $severityComboBox = new CComboBox('show_severity', $showSeverity);
 $severityComboBox->addItems(array(
-	-1 => _('All'),
 	TRIGGER_SEVERITY_NOT_CLASSIFIED => getSeverityCaption(TRIGGER_SEVERITY_NOT_CLASSIFIED),
 	TRIGGER_SEVERITY_INFORMATION => getSeverityCaption(TRIGGER_SEVERITY_INFORMATION),
 	TRIGGER_SEVERITY_WARNING => getSeverityCaption(TRIGGER_SEVERITY_WARNING),
@@ -361,7 +362,7 @@ $triggerTable->setHeader(array(
 	_('Age'),
 	$showEventColumn ? _('Duration') : null,
 	$config['event_ack_enable'] ? _('Acknowledged') : null,
-	is_show_all_nodes() ? _('Node') : null,
+	$displayNodes ? _('Node') : null,
 	_('Host'),
 	make_sorting_header(_('Name'), 'description'),
 	_('Comments')
@@ -402,7 +403,7 @@ if ($ackStatus == ZBX_ACK_STS_WITH_UNACK) {
 if ($ackStatus == ZBX_ACK_STS_WITH_LAST_UNACK) {
 	$options['withLastEventUnacknowledged'] = 1;
 }
-if ($showSeverity > -1) {
+if ($showSeverity > TRIGGER_SEVERITY_NOT_CLASSIFIED) {
 	$options['min_severity'] = $showSeverity;
 }
 if ($_REQUEST['status_change']) {
@@ -806,7 +807,7 @@ foreach ($triggers as $trigger) {
 		empty($trigger['lastchange']) ? '-' : zbx_date2age($trigger['lastchange']),
 		$showEventColumn ? SPACE : null,
 		$ackColumn,
-		get_node_name_by_elid($trigger['triggerid']),
+		$displayNodes ? get_node_name_by_elid($trigger['triggerid']) : null,
 		$hostColumn,
 		$triggerDescription,
 		$comments
@@ -854,7 +855,7 @@ foreach ($triggers as $trigger) {
 				zbx_date2age($event['clock']),
 				zbx_date2age($nextClock, $event['clock']),
 				($config['event_ack_enable']) ? $ack : null,
-				is_show_all_nodes() ? SPACE : null,
+				$displayNodes ? SPACE : null,
 				$emptyColumn
 			), 'odd_row');
 			$row->setAttribute('data-parentid', $trigger['triggerid']);
