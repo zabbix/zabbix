@@ -633,11 +633,10 @@ class CGraphPrototype extends CGraphGeneral {
 			}
 		}
 
-
 		parent::checkInput($graphs, $update);
 
-		if (!$update) {
-			foreach ($graphs as $graph) {
+		foreach ($graphs as $graph) {
+			if ($graph['gitems']) {
 				// check if the graph has at least one prototype
 				$hasPrototype = false;
 				foreach ($graph['gitems'] as $gitem) {
@@ -652,6 +651,7 @@ class CGraphPrototype extends CGraphGeneral {
 				}
 			}
 		}
+
 
 		$allowedValueTypes = array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64);
 
