@@ -633,25 +633,27 @@ class CGraphPrototype extends CGraphGeneral {
 			}
 		}
 
-		parent::checkInput($graphs, $update);
-
 		foreach ($graphs as $graph) {
-			if ($graph['gitems']) {
-				// check if the graph has at least one prototype
+			if (($update && isset($graph['gitems'])) || !$update) {
 				$hasPrototype = false;
-				foreach ($graph['gitems'] as $gitem) {
-					// $allowedItems used because it is possible to make API call without full item data
-					if ($allowedItems[$gitem['itemid']]['flags'] == ZBX_FLAG_DISCOVERY_CHILD) {
-						$hasPrototype = true;
-						break;
+				if ($graph['gitems']) {
+					// check if the graph has at least one prototype
+					foreach ($graph['gitems'] as $gitem) {
+						// $allowedItems used because it is possible to make API call without full item data
+						if ($allowedItems[$gitem['itemid']]['flags'] == ZBX_FLAG_DISCOVERY_CHILD) {
+							$hasPrototype = true;
+							break;
+						}
 					}
 				}
-				if (!$hasPrototype) {
+
+				if (!$graph['gitems'] || !$hasPrototype) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('Graph prototype must have at least one prototype.'));
 				}
 			}
 		}
 
+		parent::checkInput($graphs, $update);
 
 		$allowedValueTypes = array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64);
 
