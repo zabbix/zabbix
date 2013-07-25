@@ -4009,11 +4009,9 @@ void	evaluate_expressions(zbx_vector_ptr_t *triggers)
 
 		tr->expression = zbx_strdup(NULL, tr->expression_orig);
 
-		event.trigger.triggerid = tr->triggerid;
-		event.trigger.description = tr->description;
-		event.trigger.expression = tr->expression;
-		event.trigger.type = tr->type;
-		event.trigger.priority = tr->priority;
+		/* the trigger expression is used to parse function ids for referenced hostid caching */
+		/* when evaluating trigger expression                                                 */
+		event.trigger.expression = tr->expression_orig;
 
 		zbx_remove_whitespace(tr->expression);
 
