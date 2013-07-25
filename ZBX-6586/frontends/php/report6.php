@@ -149,7 +149,8 @@ require_once dirname(__FILE__).'/include/page_header.php';
 		$itemCount = API::Item()->get(array(
 			'itemids' => $itemIds,
 			'webitems' => true,
-			'countOutput' => true
+			'countOutput' => true,
+			'filter' => array('value_type' => array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64))
 		));
 
 		if ($itemCount != count($itemIds)) {
