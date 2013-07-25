@@ -116,11 +116,11 @@ define('ZBX_PAGE_NO_MENU', 1);
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
-if ($min_user_type > CWebUser::$data['type']) {
-	access_deny();
-}
 if (isset($error)) {
 	invalid_url();
+}
+if ($min_user_type > CWebUser::$data['type']) {
+	access_deny();
 }
 
 /*
