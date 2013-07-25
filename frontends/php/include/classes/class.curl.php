@@ -49,99 +49,88 @@ class Curl {
 		if (empty($url)) {
 			$this->formatGetArguments();
 
-			$protocol = ((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') || $_SERVER['SERVER_PORT'] == 443) ? 'https' : 'http';
-
-			$this->url = $url = $protocol.'://'.$_SERVER['SERVER_NAME'].':'.$_SERVER['SERVER_PORT'].$_SERVER['SCRIPT_NAME'].'?'.$this->getQuery();
+			$this->protocol = ((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') || $_SERVER['SERVER_PORT'] == 443) ? 'https' : 'http';
+			$this->host = $_SERVER['SERVER_NAME'];
+			$this->port = $_SERVER['SERVER_PORT'];
+			$this->path = $_SERVER['SCRIPT_NAME'];
+			$this->query = $this->getQuery();
+			$this->url = basename($_SERVER['SCRIPT_NAME']);
 		}
 		else {
 			$this->url = $url;
 
-			$tmp_pos = zbx_strpos($this->url, '?');
-			$this->query = ($tmp_pos !== false) ? substr($this->url, $tmp_pos + 1) : '';
+			$tmp_pos = zbx_strpos($url, '?');
+			// parse query
+			if ($tmp_pos !== false) {
+				$this->query = zbx_substring($url, $tmp_pos + 1);
+				$this->url = $url = zbx_substring($url, 0, $tmp_pos);
+			}
 
+			// parse reference
 			$tmp_pos = zbx_strpos($this->query, '#');
 			if ($tmp_pos !== false) {
+				$this->reference = zbx_substring($this->query, $tmp_pos + 1);
 				$this->query = zbx_substring($this->query, 0, $tmp_pos);
 			}
 			$this->formatArguments($this->query);
-		}
 
-		$protocolSepIndex=zbx_strpos($this->url, '://');
-		if ($protocolSepIndex !== false) {
-			$this->protocol = zbx_strtolower(zbx_substring($this->url, 0, $protocolSepIndex));
-			$this->host = substr($this->url, $protocolSepIndex + 3);
+			// parse protocol and host
+			$protocolSepIndex=zbx_strpos($url, '://');
+			if ($protocolSepIndex !== false) {
+				$this->protocol = zbx_strtolower(zbx_substring($url, 0, $protocolSepIndex));
+				$this->host = substr($url, $protocolSepIndex + 3);
 
-			$tmp_pos = zbx_strpos($this->host, '/');
-			if ($tmp_pos !== false) {
-				$this->host = zbx_substring($this->host, 0, $tmp_pos);
-			}
+				$tmp_pos = zbx_strpos($this->host, '/');
+				if ($tmp_pos !== false) {
+					$this->path = zbx_substring($this->host, $tmp_pos);
+					$this->host = zbx_substring($this->host, 0, $tmp_pos);
+				}
 
-			$atIndex = zbx_strpos($this->host, '@');
-			if ($atIndex !== false) {
-				$credentials = zbx_substring($this->host, 0, $atIndex);
+				// parse user password credentials from host
+				$atIndex = zbx_strpos($this->host, '@');
+				if ($atIndex !== false) {
+					$credentials = zbx_substring($this->host, 0, $atIndex);
 
-				$colonIndex = zbx_strpos($credentials, ':');
-				if ($colonIndex !== false) {
-					$this->username = zbx_substring($credentials, 0, $colonIndex);
-					$this->password = substr($credentials, $colonIndex);
+					$colonIndex = zbx_strpos($credentials, ':');
+					if ($colonIndex !== false) {
+						$this->username = zbx_substring($credentials, 0, $colonIndex);
+						$this->password = substr($credentials, $colonIndex);
+					}
+					else {
+						$this->username = $credentials;
+					}
+					$this->host = substr($this->host, $atIndex + 1);
+				}
+
+				$host_ipv6 = zbx_strpos($this->host, ']');
+				if ($host_ipv6 !== false) {
+					if ($host_ipv6 < (zbx_strlen($this->host) - 1)) {
+						$host_ipv6++;
+						$host_less = substr($this->host, $host_ipv6);
+
+						$portColonIndex = zbx_strpos($host_less, ':');
+						if ($portColonIndex !== false) {
+							$this->host = zbx_substring($this->host, 0, $host_ipv6);
+							$this->port = substr($host_less, $portColonIndex + 1);
+						}
+					}
 				}
 				else {
-					$this->username = $credentials;
-				}
-				$this->host = substr($this->host, $atIndex + 1);
-			}
+					$portColonIndex = zbx_strpos($this->host, ':');
 
-			$host_ipv6 = zbx_strpos($this->host, ']');
-			if ($host_ipv6 !== false) {
-				if ($host_ipv6 < (zbx_strlen($this->host) - 1)) {
-					$host_ipv6++;
-					$host_less = substr($this->host, $host_ipv6);
-
-					$portColonIndex = zbx_strpos($host_less, ':');
 					if ($portColonIndex !== false) {
-						$this->host = zbx_substring($this->host, 0, $host_ipv6);
-						$this->port = substr($host_less, $portColonIndex + 1);
+						$this->port = substr($this->host, $portColonIndex+1);
+						$this->host = zbx_substring($this->host, 0, $portColonIndex);
 					}
 				}
 			}
 			else {
-				$portColonIndex = zbx_strpos($this->host, ':');
-
-				if ($portColonIndex !== false) {
-					$this->port = substr($this->host, $portColonIndex+1);
-					$this->host = zbx_substring($this->host, 0, $portColonIndex);
-				}
-			}
-
-			$this->file = substr($this->url, $protocolSepIndex + 3);
-			$this->file = substr($this->file, zbx_strpos($this->file, '/'));
-
-			if ($this->file == $this->host) {
-				$this->file = '';
+				$this->path = $url;
 			}
 		}
-		else {
-			$this->file = $this->url;
-		}
 
-		$tmp_pos = zbx_strpos($this->file, '?');
-		if ($tmp_pos !== false) {
-			$this->file = zbx_substring($this->file, 0, $tmp_pos);
-		}
+		$this->file = basename($this->path);
 
-		$refSepIndex = zbx_strpos($url, '#');
-		if ($refSepIndex !== false) {
-			$this->file = zbx_substring($this->file, 0, $refSepIndex);
-			$this->reference = substr($url, zbx_strpos($url, '#') + 1);
-		}
-
-		$this->path = $this->file;
-		if (zbx_strlen($this->query) > 0) {
-			$this->file .= '?'.$this->query;
-		}
-		if (zbx_strlen($this->reference) > 0) {
-			$this->file .= '#'.$this->reference;
-		}
 		if (isset($_COOKIE['zbx_sessionid'])) {
 			$this->setArgument('sid', substr($_COOKIE['zbx_sessionid'], 16, 16));
 		}
@@ -204,25 +193,12 @@ class Curl {
 	/**
 	 * Return relative url.
 	 *
-	 * @param boolean $absoluteUrl   required absolute url
-	 *
 	 * @return string
 	 */
-	public function getUrl($absoluteUrl = false) {
+	public function getUrl() {
 		$this->formatQuery();
 
-		$url = '';
-		if($absoluteUrl) {
-			$url .= $this->protocol ? $this->protocol.'://' : '';
-			$url .= $this->username ? $this->username : '';
-			$url .= $this->password ? ':'.$this->password : '';
-			$url .= $this->username || $this->password ? '@' : '';
-			$url .= $this->host ? $this->host : '';
-			$url .= $this->port ? ':'.$this->port : '';
-			$url .= $this->path ? $this->path : '';
-		} else {
-			$url .= $this->path ? basename($this->path) : '';
-		}
+		$url = $this->url;
 		$url .= $this->query ? '?'.$this->query : '';
 		$url .= $this->reference ? '#'.urlencode($this->reference) : '';
 		return $url;
@@ -295,12 +271,13 @@ class Curl {
 		return $this->password;
 	}
 
-	// returns the file part of $this url, i.e. everything after the host name.
+	/*
+	 * returns the file part of $this url, i.e. everything after the host name.
+	 * @deprecated
+	 * @see getUrl()
+	 */
 	public function getFile() {
-		$url = $this->path ? $this->path : '';
-		$url .= $this->query ? '?'.$this->query : '';
-		$url .= $this->reference ? '#'.urlencode($this->reference) : '';
-		return $url;
+		return $this->getUrl();
 	}
 
 	public function setReference($reference) {
