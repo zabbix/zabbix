@@ -1363,12 +1363,12 @@ static int	DBget_history_log_value(zbx_uint64_t itemid, char **replace_to, int r
 {
 	const char	*__function_name = "DBget_history_log_value";
 
-	DB_RESULT	result;
-	DB_ROW		row;
-	int		ret = FAIL, found;
-	unsigned char	value_type = ITEM_VALUE_TYPE_MAX;
-	zbx_timespec_t	ts = {clock, ns};
-	zbx_vc_value_t	value;
+	DB_RESULT		result;
+	DB_ROW			row;
+	int			ret = FAIL, found;
+	unsigned char		value_type = ITEM_VALUE_TYPE_MAX;
+	zbx_timespec_t		ts = {clock, ns};
+	zbx_history_record_t	value;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -1410,7 +1410,7 @@ static int	DBget_history_log_value(zbx_uint64_t itemid, char **replace_to, int r
 			break;
 	}
 
-	zbx_vc_value_clear(&value, ITEM_VALUE_TYPE_LOG);
+	zbx_history_record_clear(&value, ITEM_VALUE_TYPE_LOG);
 
 	ret = SUCCEED;
 out:
@@ -1486,11 +1486,11 @@ static int	DBitem_lastvalue(const char *expression, char **lastvalue, int N_func
 
 	if (NULL != (row = DBfetch(result)))
 	{
-		unsigned char		value_type;
-		zbx_uint64_t		valuemapid;
-		zbx_vector_vc_value_t	values;
+		unsigned char			value_type;
+		zbx_uint64_t			valuemapid;
+		zbx_vector_history_record_t	values;
 
-		zbx_vc_value_vector_create(&values);
+		zbx_history_record_vector_create(&values);
 
 		value_type = (unsigned char)atoi(row[0]);
 		ZBX_DBROW2UINT64(valuemapid, row[1]);
@@ -1506,7 +1506,7 @@ static int	DBitem_lastvalue(const char *expression, char **lastvalue, int N_func
 
 			ret = SUCCEED;
 		}
-		zbx_vc_value_vector_destroy(&values, value_type);
+		zbx_history_record_vector_destroy(&values, value_type);
 	}
 	DBfree_result(result);
 out:
@@ -1553,10 +1553,10 @@ static int	DBitem_value(const char *expression, char **value, int N_functionid, 
 
 	if (NULL != (row = DBfetch(result)))
 	{
-		unsigned char	value_type;
-		zbx_uint64_t	valuemapid;
-		zbx_timespec_t	ts = {clock, ns};
-		zbx_vc_value_t	vc_value;
+		unsigned char		value_type;
+		zbx_uint64_t		valuemapid;
+		zbx_timespec_t		ts = {clock, ns};
+		zbx_history_record_t	vc_value;
 
 		value_type = (unsigned char)atoi(row[0]);
 		ZBX_DBROW2UINT64(valuemapid, row[1]);
@@ -1566,7 +1566,7 @@ static int	DBitem_value(const char *expression, char **value, int N_functionid, 
 			char	tmp[MAX_STRING_LEN];
 
 			zbx_vc_history_value2str(tmp, sizeof(tmp), &vc_value.value, value_type);
-			zbx_vc_value_clear(&vc_value, value_type);
+			zbx_history_record_clear(&vc_value, value_type);
 			zbx_format_value(tmp, sizeof(tmp), valuemapid, row[2], value_type);
 			*value = zbx_strdup(*value, tmp);
 

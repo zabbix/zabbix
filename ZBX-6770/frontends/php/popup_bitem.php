@@ -118,7 +118,7 @@ else{
 	$btnSelect = new CSubmit('btn1',_('Select'),
 			"return PopUp('popup.php?dstfrm=".$frmGItem->GetName().
 			'&dstfld1=itemid&dstfld2=name&srctbl=items'.
-			"&srcfld1=itemid&srcfld2=name&monitored_hosts=1');",
+			"&srcfld1=itemid&srcfld2=name&monitored_hosts=1&numeric=1');",
 			'T');
 
 	$frmGItem->addRow(_('Parameter') ,array($txtCondVal,$btnSelect));

@@ -722,8 +722,8 @@ function get_items_data_overview($hostids, $application, $view_style) {
 		$sqlWhere = ' AND i.itemid=ia.itemid AND a.applicationid=ia.applicationid AND a.name='.zbx_dbstr($application);
 	}
 
-	$db_items = DBselect(
-		'SELECT DISTINCT h.hostid,h.name AS hostname,i.itemid,i.key_,i.value_type,i.lastvalue,i.units,i.lastclock,'.
+	$db_items = DBfetchArray(DBselect(
+		'SELECT DISTINCT h.hostid,h.name AS hostname,i.itemid,i.key_,i.value_type,i.units,'.
 			'i.name,t.priority,i.valuemapid,t.value AS tr_value,t.triggerid'.
 		' FROM hosts h,'.$sqlFrom.'items i'.
 			' LEFT JOIN functions f ON f.itemid=i.itemid'.
@@ -735,7 +735,10 @@ function get_items_data_overview($hostids, $application, $view_style) {
 			' AND '.dbConditionInt('i.flags', array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)).
 				$sqlWhere.
 		' ORDER BY i.name,i.itemid'
-	);
+	));
+
+	// fetch latest values
+	$history = Manager::History()->fetchLast(zbx_toHash($db_items, 'itemid'));
 
 	$options = array(
 		'output' => array('name', 'hostid'),
@@ -754,7 +757,7 @@ function get_items_data_overview($hostids, $application, $view_style) {
 	$hosts = API::Host()->get($options);
 
 	$items = array();
-	while ($row = DBfetch($db_items)) {
+	foreach ($db_items as $row) {
 		$descr = itemName($row);
 		$row['hostname'] = get_node_name_by_elid($row['hostid'], null, NAME_DELIMITER).$row['hostname'];
 		$hostnames[$row['hostid']] = $row['hostname'];
@@ -765,11 +768,11 @@ function get_items_data_overview($hostids, $application, $view_style) {
 				|| (($items[$descr][$row['hostname']]['tr_value'] == TRIGGER_VALUE_FALSE && $row['tr_value'] == TRIGGER_VALUE_TRUE)
 					|| (($items[$descr][$row['hostname']]['tr_value'] == TRIGGER_VALUE_FALSE || $row['tr_value'] == TRIGGER_VALUE_TRUE)
 						&& $row['priority'] > $items[$descr][$row['hostname']]['severity']))) {
+
 			$items[$descr][$row['hostname']] = array(
 				'itemid' => $row['itemid'],
 				'value_type' => $row['value_type'],
-				'lastvalue' => $row['lastvalue'],
-				'lastclock' => $row['lastclock'],
+				'value' => isset($history[$row['itemid']]) ? $history[$row['itemid']][0]['value'] : null,
 				'units' => $row['units'],
 				'name' => $row['name'],
 				'valuemapid' => $row['valuemapid'],
@@ -838,18 +841,21 @@ function get_item_data_overview_cells(&$table_row, &$ithosts, $hostname) {
 	$value = '-';
 	$ack = null;
 	if (isset($ithosts[$hostname])) {
-		if ($ithosts[$hostname]['tr_value'] == TRIGGER_VALUE_TRUE) {
-			$css_class = getSeverityStyle($ithosts[$hostname]['severity']);
-			$ack = get_last_event_by_triggerid($ithosts[$hostname]['triggerid']);
+		$item = $ithosts[$hostname];
+
+		if ($item['tr_value'] == TRIGGER_VALUE_TRUE) {
+			$css_class = getSeverityStyle($item['severity']);
+			$ack = get_last_event_by_triggerid($item['triggerid']);
 			$ack = ($ack['acknowledged'] == 1)
 				? array(SPACE, new CImg('images/general/tick.png', 'ack'))
 				: null;
 		}
-		$value = formatItemLastValue($ithosts[$hostname]);
+
+		$value = ($item['value'] !== null) ? formatHistoryValue($item['value'], $item) : UNKNOWN_VALUE;
 
 		$it_ov_menu = array(
 			array(_('Values'), null, null, array('outer' => array('pum_oheader'), 'inner' => array('pum_iheader'))),
-			array(_('500 latest values'), 'history.php?action=showlatest&itemid='.$ithosts[$hostname]['itemid'], array('tw' => '_blank'))
+			array(_('500 latest values'), 'history.php?action=showlatest&itemid='.$item['itemid'], array('tw' => '_blank'))
 		);
 
 		switch ($ithosts[$hostname]['value_type']) {
@@ -860,9 +866,9 @@ function get_item_data_overview_cells(&$table_row, &$ithosts, $hostname) {
 					array(_('Graphs'), null, null,
 						array('outer' => array('pum_oheader'), 'inner' => array('pum_iheader'))
 					),
-					array(_('Last hour graph'), 'history.php?period=3600&action=showgraph&itemid='.$ithosts[$hostname]['itemid'], array('tw' => '_blank')),
-					array(_('Last week graph'), 'history.php?period=604800&action=showgraph&itemid='.$ithosts[$hostname]['itemid'], array('tw' => '_blank')),
-					array(_('Last month graph'), 'history.php?period=2678400&action=showgraph&itemid='.$ithosts[$hostname]['itemid'], array('tw' => '_blank'))
+					array(_('Last hour graph'), 'history.php?period=3600&action=showgraph&itemid='.$item['itemid'], array('tw' => '_blank')),
+					array(_('Last week graph'), 'history.php?period=604800&action=showgraph&itemid='.$item['itemid'], array('tw' => '_blank')),
+					array(_('Last month graph'), 'history.php?period=2678400&action=showgraph&itemid='.$item['itemid'], array('tw' => '_blank'))
 				), $it_ov_menu);
 				break;
 			default:
@@ -966,36 +972,44 @@ function delete_trends_by_itemid($itemIds) {
 }
 
 /**
- * Format item lastvalue.
+ * Format history value.
  * First format the value according to the configuration of the item. Then apply the value mapping to the formatted (!)
  * value.
  *
- * @param type      $item
+ * @param mixed     $value
+ * @param array     $item
  * @param int       $item['value_type']     type of the value: ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64, ...
- * @param mixed     $item['lastvalue']      value of item
- * @param mixed     $item['lastclock']      time when last value had stored
  * @param string    $item['units']          units of item
  * @param int       $item['valuemapid']     id of mapping set of values
- * @param string    $unknownString          the text to be used if the item has no data
- * @param bool		$ellipsis		        text will be cut and ellipsis "..." added if set to true
+ * @param bool      $trim
  *
  * @return string
  */
-function formatItemLastValue(array $item, $unknownString = '-', $ellipsis = true) {
-	if (!isset($item['lastvalue']) || $item['lastclock'] == 0) {
-		return $unknownString;
+function formatHistoryValue($value, array $item, $trim = true) {
+	$mapping = false;
+
+	// format value
+	if ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT || $item['value_type'] == ITEM_VALUE_TYPE_UINT64) {
+		$value = convert_units(array(
+				'value' => $value,
+				'units' => $item['units']
+		));
+	}
+	elseif ($item['value_type'] != ITEM_VALUE_TYPE_STR
+		&& $item['value_type'] != ITEM_VALUE_TYPE_TEXT
+		&& $item['value_type'] != ITEM_VALUE_TYPE_LOG) {
+
+		$value = _('Unknown value type');
 	}
 
-	$mapping = false;
-	$value = formatItemValueType($item);
-
+	// apply value mapping
 	switch ($item['value_type']) {
 		case ITEM_VALUE_TYPE_STR:
 			$mapping = getMappedValue($value, $item['valuemapid']);
-			// break; is not missing here
+		// break; is not missing here
 		case ITEM_VALUE_TYPE_TEXT:
 		case ITEM_VALUE_TYPE_LOG:
-			if ($ellipsis && zbx_strlen($value) > 20) {
+			if ($trim && zbx_strlen($value) > 20) {
 				$value = zbx_substr($value, 0, 20).'...';
 			}
 
@@ -1006,6 +1020,7 @@ function formatItemLastValue(array $item, $unknownString = '-', $ellipsis = true
 		default:
 			$value = applyValueMap($value, $item['valuemapid']);
 	}
+
 	return $value;
 }
 
@@ -1044,39 +1059,13 @@ function getItemFunctionalValue($item, $function, $param) {
 			' HAVING COUNT(*)>0' // necessary because DBselect() return 0 if empty data set, for graph templates
 		);
 		if ($row = DBfetch($result)) {
-			return convert_units($row['value'], $item['units']);
+			return convert_units(array('value' => $row['value'], 'units' => $item['units']));
 		}
 		// no data in history
 		else {
 			return UNRESOLVED_MACRO_STRING;
 		}
 	}
-}
-
-/**
- * Format item lastvalue depending on it's value type.
- *
- * @param array $item
- * @param int $item['value_type'] type of the value: ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64, ...
- * @param mixed $item['lastvalue'] value of item
- * @param string $item['units'] units of item
- *
- * @return string
- */
-function formatItemValueType(array $item) {
-	if ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT || $item['value_type'] == ITEM_VALUE_TYPE_UINT64) {
-		$value = convert_units($item['lastvalue'], $item['units']);
-	}
-	elseif ($item['value_type'] == ITEM_VALUE_TYPE_STR
-			|| $item['value_type'] == ITEM_VALUE_TYPE_TEXT
-			|| $item['value_type'] == ITEM_VALUE_TYPE_LOG) {
-		$value = $item['lastvalue'];
-	}
-	else {
-		$value = _('Unknown value type');
-	}
-
-	return $value;
 }
 
 /*

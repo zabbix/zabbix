@@ -542,8 +542,9 @@ class CChart extends CGraphDraw {
 		}
 		if ($this->ymin_type == GRAPH_YAXIS_TYPE_ITEM_VALUE) {
 			$item = get_item_by_itemid($this->ymin_itemid);
-			if ($item && isset($item['lastvalue']) && !is_null($item['lastvalue'])) {
-				return $item['lastvalue'];
+			$history = Manager::History()->fetchLast(array($item));
+			if (isset($history[$item['itemid']])) {
+				return $history[$item['itemid']][0]['value'];
 			}
 		}
 
@@ -613,8 +614,9 @@ class CChart extends CGraphDraw {
 		}
 		if ($this->ymax_type == GRAPH_YAXIS_TYPE_ITEM_VALUE) {
 			$item = get_item_by_itemid($this->ymax_itemid);
-			if ($item && isset($item['lastvalue']) && !is_null($item['lastvalue'])) {
-				 return $item['lastvalue'];
+			$history = Manager::History()->fetchLast(array($item));
+			if (isset($history[$item['itemid']])) {
+				return $history[$item['itemid']][0]['value'];
 			}
 		}
 
@@ -727,6 +729,9 @@ class CChart extends CGraphDraw {
 		}
 
 		// check if items use B or Bps units
+		$leftBase1024 = false;
+		$rightBase1024 = false;
+
 		for ($item = 0; $item < $this->num; $item++) {
 			if ($this->items[$item]['units'] == 'B' || $this->items[$item]['units'] == 'Bps') {
 				if ($this->items[$item]['axisside'] == GRAPH_YAXIS_SIDE_LEFT) {
@@ -804,12 +809,22 @@ class CChart extends CGraphDraw {
 			$rightBase1024 = $tempBase;
 		}
 
-		$tmp_minY = array();
-		$tmp_maxY = array();
-		$tmp_minY[GRAPH_YAXIS_SIDE_LEFT] = $this->m_minY[GRAPH_YAXIS_SIDE_LEFT];
-		$tmp_minY[GRAPH_YAXIS_SIDE_RIGHT] = $this->m_minY[GRAPH_YAXIS_SIDE_RIGHT];
-		$tmp_maxY[GRAPH_YAXIS_SIDE_LEFT] = $this->m_maxY[GRAPH_YAXIS_SIDE_LEFT];
-		$tmp_maxY[GRAPH_YAXIS_SIDE_RIGHT] = $this->m_maxY[GRAPH_YAXIS_SIDE_RIGHT];
+		if (!isset($this->m_minY[$side])) {
+			$this->m_minY[$side] = 0;
+		}
+		if (!isset($this->m_maxY[$side])) {
+			$this->m_maxY[$side] = 0;
+		}
+
+		if (!isset($this->m_minY[$other_side])) {
+			$this->m_minY[$other_side] = 0;
+		}
+		if (!isset($this->m_maxY[$other_side])) {
+			$this->m_maxY[$other_side] = 0;
+		}
+
+		$tmp_minY = $this->m_minY;
+		$tmp_maxY = $this->m_maxY;
 
 		// calc interval
 		$columnInterval = bcdiv(bcmul($this->gridPixelsVert, (bcsub($this->m_maxY[$side], $this->m_minY[$side]))), $this->sizeY);
@@ -833,7 +848,7 @@ class CChart extends CGraphDraw {
 		}
 
 		// calculate interval, if left side use B or Bps
-		if (isset($leftBase1024)) {
+		if ($leftBase1024) {
 			$interval = getBase1024Interval($interval, $this->m_minY[$side], $this->m_maxY[$side]);
 		}
 
@@ -858,7 +873,7 @@ class CChart extends CGraphDraw {
 		}
 
 		// calculate interval, if right side use B or Bps
-		if (isset($rightBase1024)) {
+		if ($rightBase1024) {
 			$interval_other_side = getBase1024Interval($interval_other_side, $this->m_minY[$other_side],
 				$this->m_maxY[$other_side]);
 		}
@@ -867,6 +882,13 @@ class CChart extends CGraphDraw {
 		foreach ($sides as $graphSide) {
 			$minY[$graphSide] = $this->m_minY[$graphSide];
 			$maxY[$graphSide] = $this->m_maxY[$graphSide];
+		}
+
+		if (!isset($minY[$side])) {
+			$minY[$side] = 0;
+		}
+		if (!isset($maxY[$side])) {
+			$maxY[$side] = 0;
 		}
 
 		// correcting MIN & MAX
@@ -1395,283 +1417,218 @@ class CChart extends CGraphDraw {
 		);
 	}
 
-	private function drawLeftSide() {
-		if ($this->yaxisleft == 0 || $this->skipLeftScale == 1) {
-			return;
+	private function drawSides() {
+		if (isset($this->axis_valuetype[GRAPH_YAXIS_SIDE_RIGHT])
+				&& ($this->yaxisright != 0 || $this->skipRightScale != 1)) {
+			$sides[] = GRAPH_YAXIS_SIDE_RIGHT;
 		}
 
-		$minY = $this->m_minY[GRAPH_YAXIS_SIDE_LEFT];
-		$maxY = $this->m_maxY[GRAPH_YAXIS_SIDE_LEFT];
-
-		$units = null;
-		$unitsLong = null;
-		$byteStep = false;
-		for ($item = 0; $item < $this->num; $item++) {
-			if ($this->items[$item]['axisside'] == GRAPH_YAXIS_SIDE_LEFT) {
-				// check if items use B or Bps units
-				if ($this->items[$item]['units'] == 'B' || $this->items[$item]['units'] == 'Bps') {
-					$byteStep = true;
-				}
-				if (is_null($units)) {
-					$units = $this->items[$item]['units'];
-				}
-				elseif ($this->items[$item]['units'] != $units) {
-					$units = '';
-				}
-			}
+		if (((isset($this->axis_valuetype[GRAPH_YAXIS_SIDE_LEFT]))
+				&& ($this->yaxisleft != 0 || $this->skipLeftScale != 1)) || !isset($sides)) {
+			$sides[] = GRAPH_YAXIS_SIDE_LEFT;
 		}
 
-		if (is_null($units) || $units === false) {
-			$units = '';
-		}
-		else {
+		foreach ($sides as $side) {
+			$minY = $this->m_minY[$side];
+			$maxY = $this->m_maxY[$side];
+			$units = null;
+			$unitsLong = null;
+			$byteStep = false;
+
 			for ($item = 0; $item < $this->num; $item++) {
-				if ($this->items[$item]['axisside'] == GRAPH_YAXIS_SIDE_LEFT && !empty($this->items[$item]['unitsLong'])) {
-					$unitsLong = $this->items[$item]['unitsLong'];
-					break;
+				if ($this->items[$item]['axisside'] == $side) {
+					// check if items use B or Bps units
+					if ($this->items[$item]['units'] == 'B' || $this->items[$item]['units'] == 'Bps') {
+						$byteStep = true;
+					}
+					if (is_null($units)) {
+						$units = $this->items[$item]['units'];
+					}
+					elseif ($this->items[$item]['units'] != $units) {
+						$units = '';
+					}
 				}
 			}
-		}
 
-		if (!empty($unitsLong)) {
-			$dims = imageTextSize(9, 90, $unitsLong);
-
-			$tmpY = $this->sizeY / 2 + $this->shiftY+$dims['height'] / 2;
-			if ($tmpY < $dims['height']) {
-				$tmpY = $dims['height'] + 6;
+			if (is_null($units) || $units === false) {
+				$units = '';
+			}
+			else {
+				for ($item = 0; $item < $this->num; $item++) {
+					if ($this->items[$item]['axisside'] == $side && !empty($this->items[$item]['unitsLong'])) {
+						$unitsLong = $this->items[$item]['unitsLong'];
+						break;
+					}
+				}
 			}
 
-			imageText(
-				$this->im,
-				9,
-				90,
-				$dims['width'] + 8,
-				$tmpY,
-				$this->getColor($this->graphtheme['textcolor'], 0),
-				$unitsLong
-			);
-		}
+			if (!empty($unitsLong)) {
+				$dims = imageTextSize(9, 90, $unitsLong);
 
-		$step = $this->gridStep[GRAPH_YAXIS_SIDE_LEFT];
-		$hstr_count = $this->gridLinesCount[GRAPH_YAXIS_SIDE_LEFT];
+				$tmpY = $this->sizeY / 2 + $this->shiftY + $dims['height'] / 2;
+				if ($tmpY < $dims['height']) {
+					$tmpY = $dims['height'] + 6;
+				}
 
-		$newPow = false;
-		if ($byteStep) {
-			$maxYPow = convertToBase1024($maxY, 1024);
-			$minYPow = convertToBase1024($minY, 1024);
-			$powStep = 1024;
-		} else {
-			$maxYPow = convertToBase1024($maxY);
-			$minYPow = convertToBase1024($minY);
-			$powStep = 1000;
-		}
+				$tmpX = $side == GRAPH_YAXIS_SIDE_LEFT ? $dims['width'] + 8 : $this->fullSizeX - $dims['width'];
 
-		if (abs($maxYPow['pow']) > abs($minYPow['pow']) && $maxYPow['value'] != 0) {
-			$newPow = $maxYPow['pow'];
-			if (abs(bcdiv($minYPow['value'], bcpow($powStep, $maxYPow['pow']))) > 1000) {
+				imageText(
+					$this->im,
+					9,
+					90,
+					$tmpX,
+					$tmpY,
+					$this->getColor($this->graphtheme['textcolor'], 0),
+					$unitsLong
+				);
+			}
+
+			$step = $this->gridStep[$side];
+			$hstr_count = $this->gridLinesCount[$side];
+
+			// ignore milliseconds if  -1 <= maxY => 1 or -1 <= minY => 1
+			$ignoreMillisec = (bccomp($maxY, -1) <= 0 || bccomp($maxY, 1) >= 0
+					|| bccomp($minY, -1) <= 0 || bccomp($minY, 1) >= 0);
+
+			$newPow = false;
+			if ($byteStep) {
+				$maxYPow = convertToBase1024($maxY, 1024);
+				$minYPow = convertToBase1024($minY, 1024);
+				$powStep = 1024;
+			} else {
+				$maxYPow = convertToBase1024($maxY);
+				$minYPow = convertToBase1024($minY);
+				$powStep = 1000;
+			}
+
+			if (abs($maxYPow['pow']) > abs($minYPow['pow']) && $maxYPow['value'] != 0) {
+				$newPow = $maxYPow['pow'];
+				if (abs(bcdiv($minYPow['value'], bcpow($powStep, $maxYPow['pow']))) > 1000) {
+					$newPow = $minYPow['pow'];
+				}
+			}
+			if (abs($maxYPow['pow']) < abs($minYPow['pow']) && $minYPow['value'] != 0) {
 				$newPow = $minYPow['pow'];
+				if (abs(bcdiv($maxYPow['value'], bcpow($powStep, $minYPow['pow']))) > 1000) {
+					$newPow = $maxYPow['pow'];
+				}
 			}
-		}
-		if (abs($maxYPow['pow']) < abs($minYPow['pow']) && $minYPow['value'] != 0) {
-			$newPow = $minYPow['pow'];
-			if (abs(bcdiv($maxYPow['value'], bcpow($powStep, $minYPow['pow']))) > 1000) {
+			if ($maxYPow['pow'] == $minYPow['pow']) {
 				$newPow = $maxYPow['pow'];
 			}
-		}
-		if ($maxYPow['pow'] == $minYPow['pow']) {
-			$newPow = $maxYPow['pow'];
-		}
 
-		for ($i = 0; $i <= $hstr_count; $i++) {
-			// division by zero
-			$hstr_count = ($hstr_count == 0) ? 1 : $hstr_count;
+			$maxLength = false;
+			// get all values in y-axis if units != 's'
+			if ($units != 's') {
+				$calcValues = array();
+				for ($i = 0; $i <= $hstr_count; $i++) {
+					$hstr_count = ($hstr_count == 0) ? 1 : $hstr_count;
 
-			// using bc library, incase of large numbers
-			$val = bcadd(bcmul($i, $step), $minY);
+					$val = bcadd(bcmul($i, $step), $minY);
 
-			if (bccomp(bcadd($val, bcdiv($step,2)), $maxY) == 1) {
-				continue;
+					if (bccomp(bcadd($val, bcdiv($step,2)), $maxY) == 1) {
+						continue;
+					}
+
+					$calcValues[] = convert_units(array(
+						'value' => $val,
+						'convert' => ITEM_CONVERT_NO_UNITS,
+						'byteStep' => $byteStep,
+						'pow' => $newPow
+					));
+				}
+
+				$calcValues[] = convert_units(array(
+					'value' => $maxY,
+					'convert' => ITEM_CONVERT_NO_UNITS,
+					'byteStep' => $byteStep,
+					'pow' => $newPow
+				));
+
+				$maxLength = calcMaxLengthAfterDot($calcValues);
 			}
 
-			$str = convert_units($val, $units, ITEM_CONVERT_NO_UNITS, $byteStep, $newPow);
+			for ($i = 0; $i <= $hstr_count; $i++) {
+				$hstr_count = ($hstr_count == 0) ? 1 : $hstr_count;
 
-			$dims = imageTextSize(8, 0, $str);
+				$val = bcadd(bcmul($i, $step), $minY);
 
-			// marker Y coordinate
-			$posY = $this->sizeY + $this->shiftY - $this->gridStepX[GRAPH_YAXIS_SIDE_LEFT] * $i + 4;
+				if (bccomp(bcadd($val, bcdiv($step, 2)), $maxY) == 1) {
+					continue;
+				}
+
+				$str = convert_units(array(
+					'value' => $val,
+					'units' => $units,
+					'convert' => ITEM_CONVERT_NO_UNITS,
+					'byteStep' => $byteStep,
+					'pow' => $newPow,
+					'ignoreMillisec' => $ignoreMillisec,
+					'length' => $maxLength
+				));
+
+				if ($side == GRAPH_YAXIS_SIDE_LEFT) {
+					$dims = imageTextSize(8, 0, $str);
+					$posX = $this->shiftXleft - $dims['width'] - 9;
+				}
+				else {
+					$posX = $this->sizeX + $this->shiftXleft + 12;
+				}
+
+				// marker Y coordinate
+				$posY = $this->sizeY + $this->shiftY - $this->gridStepX[$side] * $i + 4;
+
+				imageText(
+					$this->im,
+					8,
+					0,
+					$posX,
+					$posY,
+					$this->getColor($this->graphtheme['textcolor'], 0),
+					$str
+				);
+			}
+
+			$str = convert_units(array(
+				'value' => $maxY,
+				'units' => $units,
+				'convert' => ITEM_CONVERT_NO_UNITS,
+				'byteStep' => $byteStep,
+				'pow' => $newPow,
+				'ignoreMillisec' => $ignoreMillisec,
+				'length' => $maxLength
+			));
+
+			if ($side == GRAPH_YAXIS_SIDE_LEFT) {
+				$dims = imageTextSize(8, 0, $str);
+				$posX = $this->shiftXleft - $dims['width'] - 9;
+				$color = $this->getColor(GRAPH_ZERO_LINE_COLOR_LEFT);
+			}
+			else {
+				$posX = $this->sizeX + $this->shiftXleft + 12;
+				$color = $this->getColor(GRAPH_ZERO_LINE_COLOR_RIGHT);
+			}
 
 			imageText(
 				$this->im,
 				8,
 				0,
-				$this->shiftXleft - $dims['width'] - 9,
-				$posY,
+				$posX,
+				$this->shiftY + 4,
 				$this->getColor($this->graphtheme['textcolor'], 0),
 				$str
 			);
-		}
 
-		$str = convert_units($maxY, $units, ITEM_CONVERT_NO_UNITS, $byteStep, $newPow);
-
-		$dims = imageTextSize(8, 0, $str);
-		imageText(
-			$this->im,
-			8,
-			0,
-			$this->shiftXleft - $dims['width'] - 9,
-			$this->shiftY  + 4,
-			$this->getColor($this->graphtheme['textcolor'], 0),
-			$str
-		);
-
-		if ($this->zero[GRAPH_YAXIS_SIDE_LEFT] != ($this->sizeY + $this->shiftY) && $this->zero[GRAPH_YAXIS_SIDE_LEFT] != $this->shiftY) {
-			zbx_imageline(
-				$this->im,
-				$this->shiftXleft,
-				$this->zero[GRAPH_YAXIS_SIDE_LEFT],
-				$this->shiftXleft + $this->sizeX,
-				$this->zero[GRAPH_YAXIS_SIDE_LEFT],
-				$this->getColor(GRAPH_ZERO_LINE_COLOR_LEFT)
-			);
-		}
-	}
-
-	private function drawRightSide() {
-		if ($this->yaxisright == 0 || $this->skipRightScale == 1) {
-			return;
-		}
-
-		$minY = $this->m_minY[GRAPH_YAXIS_SIDE_RIGHT];
-		$maxY = $this->m_maxY[GRAPH_YAXIS_SIDE_RIGHT];
-
-		$units = null;
-		$unitsLong = null;
-		$byteStep = false;
-		for ($item = 0; $item < $this->num; $item++) {
-			if ($this->items[$item]['axisside'] == GRAPH_YAXIS_SIDE_RIGHT) {
-				// check if items use B or Bps units
-				if ($this->items[$item]['units'] == 'B' || $this->items[$item]['units'] == 'Bps') {
-					$byteStep = true;
-				}
-				if (is_null($units)) {
-					$units = $this->items[$item]['units'];
-				}
-				elseif ($this->items[$item]['units'] != $units) {
-					$units = '';
-				}
+			if ($this->zero[$side] != $this->sizeY + $this->shiftY && $this->zero[$side] != $this->shiftY) {
+				zbx_imageline(
+					$this->im,
+					$this->shiftXleft,
+					$this->zero[$side],
+					$this->shiftXleft + $this->sizeX,
+					$this->zero[$side],
+					$color
+				);
 			}
-		}
-
-		if (is_null($units) || $units === false) {
-			$units = '';
-		}
-		else {
-			for ($item = 0; $item < $this->num; $item++) {
-				if ($this->items[$item]['axisside'] == GRAPH_YAXIS_SIDE_RIGHT && !empty($this->items[$item]['unitsLong'])) {
-					$unitsLong = $this->items[$item]['unitsLong'];
-					break;
-				}
-			}
-		}
-
-		if (!empty($unitsLong)) {
-			$dims = imageTextSize(9, 90, $unitsLong);
-
-			$tmpY = $this->sizeY / 2 + $this->shiftY + $dims['height'] / 2;
-			if ($tmpY < $dims['height']) {
-				$tmpY = $dims['height'] + 6;
-			}
-
-			imageText(
-				$this->im,
-				9,
-				90,
-				$this->fullSizeX - $dims['width'],
-				$tmpY,
-				$this->getColor($this->graphtheme['textcolor'], 0),
-				$unitsLong
-			);
-		}
-
-		$step = $this->gridStep[GRAPH_YAXIS_SIDE_RIGHT];
-		$hstr_count = $this->gridLinesCount[GRAPH_YAXIS_SIDE_RIGHT];
-
-		$newPow = false;
-		if ($byteStep) {
-			$maxYPow = convertToBase1024($maxY, 1024);
-			$minYPow = convertToBase1024($minY, 1024);
-			$powStep = 1024;
-		} else {
-			$maxYPow = convertToBase1024($maxY);
-			$minYPow = convertToBase1024($minY);
-			$powStep = 1000;
-		}
-
-		if (abs($maxYPow['pow']) > abs($minYPow['pow']) && $maxYPow['value'] != 0) {
-			$newPow = $maxYPow['pow'];
-			if (abs(bcdiv($minYPow['value'], bcpow($powStep, $maxYPow['pow']))) > 1000) {
-				$newPow = $minYPow['pow'];
-			}
-		}
-		if (abs($maxYPow['pow']) < abs($minYPow['pow']) && $minYPow['value'] != 0) {
-			$newPow = $minYPow['pow'];
-			if (abs(bcdiv($maxYPow['value'], bcpow($powStep, $minYPow['pow']))) > 1000) {
-				$newPow = $maxYPow['pow'];
-			}
-		}
-		if ($maxYPow['pow'] == $minYPow['pow']) {
-			$newPow = $maxYPow['pow'];
-		}
-
-		for ($i = 0; $i <= $hstr_count; $i++) {
-			if ($hstr_count == 0) {
-				continue;
-			}
-
-			// using bc module in case of large numbers
-			$val = bcadd(bcmul($i, $step), $minY);
-
-			if (bccomp(bcadd($val, bcdiv($step, 2)), $maxY) == 1) {
-				continue;
-			}
-
-			$str = convert_units($val, $units, ITEM_CONVERT_NO_UNITS, $byteStep, $newPow);
-
-			// marker Y coordinate
-			$posY = $this->sizeY + $this->shiftY - $this->gridStepX[GRAPH_YAXIS_SIDE_RIGHT] * $i + 4;
-
-			imageText(
-				$this->im,
-				8,
-				0,
-				$this->sizeX + $this->shiftXleft + 12,
-				$posY,
-				$this->getColor($this->graphtheme['textcolor'], 0),
-				$str
-			);
-		}
-
-		$str = convert_units($maxY, $units, ITEM_CONVERT_NO_UNITS, $byteStep, $newPow);
-		imageText(
-			$this->im,
-			8,
-			0,
-			$this->sizeX + $this->shiftXleft + 12,
-			$this->shiftY + 4,
-			$this->getColor($this->graphtheme['textcolor'], 0),
-			$str
-		);
-
-		if ($this->zero[GRAPH_YAXIS_SIDE_RIGHT] != $this->sizeY + $this->shiftY
-				&& $this->zero[GRAPH_YAXIS_SIDE_RIGHT] != $this->shiftY) {
-			zbx_imageline(
-				$this->im,
-				$this->shiftXleft,
-				$this->zero[GRAPH_YAXIS_SIDE_RIGHT],
-				$this->shiftXleft + $this->sizeX,
-				$this->zero[GRAPH_YAXIS_SIDE_RIGHT],
-				$this->getColor(GRAPH_ZERO_LINE_COLOR_RIGHT)
-			);
 		}
 	}
 
@@ -1843,17 +1800,17 @@ class CChart extends CGraphDraw {
 			$color = $this->getColor($this->items[$i]['color'], GRAPH_STACKED_ALFA);
 			switch ($this->items[$i]['calc_fnc']) {
 				case CALC_FNC_MIN:
-					$fnc_name = _('min');
+					$fncRealName = _('min');
 					break;
 				case CALC_FNC_MAX:
-					$fnc_name = _('max');
+					$fncRealName = _('max');
 					break;
 				case CALC_FNC_ALL:
-					$fnc_name = _('all');
+					$fncRealName = _('all');
 					break;
 				case CALC_FNC_AVG:
 				default:
-					$fnc_name = _('avg');
+					$fncRealName = _('avg');
 			}
 
 			$data = &$this->data[$this->items[$i]['itemid']][$this->items[$i]['calc_type']];
@@ -1888,21 +1845,37 @@ class CChart extends CGraphDraw {
 
 				$legend->addCell($rowNum, array('image' => $colorSquare, 'marginRight' => 5));
 				$legend->addCell($rowNum, array('text' => $item_caption));
-				$legend->addCell($rowNum, array('text' => '['.$fnc_name.']'));
+				$legend->addCell($rowNum, array('text' => '['.$fncRealName.']'));
 				$legend->addCell($rowNum, array(
-					'text' => convert_units($this->getLastValue($i), $this->items[$i]['units'], ITEM_CONVERT_NO_UNITS),
+					'text' => convert_units(array(
+						'value' => $this->getLastValue($i),
+						'units' => $this->items[$i]['units'],
+						'convert' => ITEM_CONVERT_NO_UNITS
+					)),
 					'align' => 2
 				));
 				$legend->addCell($rowNum, array(
-					'text' => convert_units(min($data['min']), $this->items[$i]['units'], ITEM_CONVERT_NO_UNITS),
+					'text' => convert_units(array(
+						'value' => min($data['min']),
+						'units' => $this->items[$i]['units'],
+						'convert' => ITEM_CONVERT_NO_UNITS
+					)),
 					'align' => 2
 				));
 				$legend->addCell($rowNum, array(
-					'text' => convert_units($data['avg_orig'], $this->items[$i]['units'], ITEM_CONVERT_NO_UNITS),
+					'text' => convert_units(array(
+						'value' => $data['avg_orig'],
+						'units' => $this->items[$i]['units'],
+						'convert' => ITEM_CONVERT_NO_UNITS
+					)),
 					'align' => 2
 				));
 				$legend->addCell($rowNum, array(
-					'text' => convert_units(max($data['max']), $this->items[$i]['units'], ITEM_CONVERT_NO_UNITS),
+					'text' => convert_units(array(
+						'value' => max($data['max']),
+						'units' => $this->items[$i]['units'],
+						'convert' => ITEM_CONVERT_NO_UNITS
+					)),
 					'align' => 2
 				));
 			}
@@ -1943,8 +1916,12 @@ class CChart extends CGraphDraw {
 			foreach ($this->percentile as $side => $percentile) {
 				if ($percentile['percent'] > 0 && $percentile['value']) {
 					$percentile['percent'] = (float) $percentile['percent'];
+					$convertedUnit = convert_units(array(
+						'value' => $percentile['value'],
+						'units' => $units[$side]
+					));
 					$legend->addCell($rowNum, array(
-						'text' => $percentile['percent'].'th percentile: '.convert_units($percentile['value'], $units[$side]).' ('.$side.')',
+						'text' => $percentile['percent'].'th percentile: '.$convertedUnit.' ('.$side.')',
 						ITEM_CONVERT_NO_UNITS
 					));
 					if ($side == 'left') {
@@ -2471,13 +2448,7 @@ class CChart extends CGraphDraw {
 			}
 		}
 
-		if (isset($this->axis_valuetype[GRAPH_YAXIS_SIDE_LEFT])) {
-			$this->drawLeftSide();
-		}
-
-		if (isset($this->axis_valuetype[GRAPH_YAXIS_SIDE_RIGHT])) {
-			$this->drawRightSide();
-		}
+		$this->drawSides();
 
 		if ($this->drawLegend) {
 			$this->drawTriggers();
