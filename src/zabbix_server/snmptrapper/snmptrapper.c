@@ -158,6 +158,7 @@ static int	process_trap_for_interface(zbx_uint64_t interfaceid, char *trap, zbx_
 		ret = SUCCEED;
 	}
 
+	clean_regexps_ex(regexps, &regexps_num);
 	zbx_free(regexps);
 
 	if (FAIL == ret && -1 != fb)
