@@ -51,17 +51,10 @@ abstract class CGraphGeneral extends CZBXAPI {
 			$graphs = $this->extendObjects($this->tableName(), $graphs, array('name'));
 		}
 		foreach ($graphs as $gnum => $graph) {
-			if ($update) {
-				if (isset($graph['gitems']) && !$graph['gitems']) {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s($this->getErrorMsg(self::ERROR_MISSING_ITEMS), $graph['name']));
-				}
-			}
-			else {
-				if (!isset($graph['gitems']) || !is_array($graph['gitems']) || empty($graph['gitems'])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s($this->getErrorMsg(self::ERROR_MISSING_ITEMS), $graph['name']));
-				}
+			if (($update && isset($graph['gitems']) && (!is_array($graph['gitems']) || !$graph['gitems']))
+					|| (!$update && (!isset($graph['gitems']) || !is_array($graph['gitems']) || !$graph['gitems']))) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s($this->getErrorMsg(self::ERROR_MISSING_ITEMS), $graph['name']));
 			}
 
 			// graph fields
