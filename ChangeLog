@@ -6,6 +6,7 @@ New features:
 ...G...... [ZBXNEXT-1528] added net.if.in, net.if.out and net.if.total item support on HP-UX platforms (igors)
 
 Bug fixes:
+..F....... [ZBX-6586] added sid checking for logout action (Guntis)
 .......PS. [ZBX-6819] fixed memory leak in snmp trapper regular expression processing (wiper)
 ..F....... [ZBX-6646] removed Micro and Milli units, unifieded length for y-axis values and fixed division by zero in graphs (Oleg)
 ..F....... [ZBX-6777] added pointer cursor to the main menu tabs (Guntis)
