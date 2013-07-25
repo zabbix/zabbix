@@ -1046,7 +1046,7 @@ class CHttpTestManager {
 	 *
 	 * @return array    an array with HTTP test IDs as keys and arrays of data as values
 	 */
-	public function fetchLastData(array $httpTestIds) {
+	public function getLastData(array $httpTestIds) {
 		$httpItems = DBfetchArray(DBselect(
 			'SELECT hti.httptestid,hti.type,i.itemid,i.value_type'.
 			' FROM httptestitem hti,items i'.
@@ -1055,7 +1055,7 @@ class CHttpTestManager {
 				' AND '.dbConditionInt('hti.httptestid', $httpTestIds)
 		));
 
-		$history = Manager::History()->fetchLast($httpItems);
+		$history = Manager::History()->getLast($httpItems);
 
 		$data = array();
 		foreach ($httpItems as $httpItem) {

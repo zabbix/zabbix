@@ -85,7 +85,7 @@ $httpTest['lastfailedstep'] = 0;
 $httpTest['error'] = '';
 
 // fetch http test execution data
-$httpTestData = Manager::HttpTest()->fetchLastData(array($httpTest['httptestid']));
+$httpTestData = Manager::HttpTest()->getLastData(array($httpTest['httptestid']));
 $httpTestData = array_pop($httpTestData);
 
 // fetch HTTP step items
@@ -104,7 +104,7 @@ while ($item = DBfetch($query)) {
 }
 
 // fetch HTTP item history
-$itemHistory = Manager::History()->fetchLast($items);
+$itemHistory = Manager::History()->getLast($items);
 
 /*
  * Display

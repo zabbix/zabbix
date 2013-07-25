@@ -616,7 +616,7 @@ class CMacrosResolver {
 				' WHERE '.dbConditionInt('f.functionid', array_keys($macros))
 			));
 
-			$history = Manager::History()->fetchLast($functions);
+			$history = Manager::History()->getLast($functions);
 
 			// false passed to DBfetch to get data without null converted to 0, which is done by default
 			foreach ($functions as $func) {
@@ -842,7 +842,7 @@ class CMacrosResolver {
 		}
 
 		// fetch history
-		$history = Manager::History()->fetchLast($items);
+		$history = Manager::History()->getLast($items);
 
 		// replace macros with their corresponding values in graph strings
 		$matches = reset($matchesList);
