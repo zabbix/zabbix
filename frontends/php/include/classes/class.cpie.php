@@ -258,7 +258,12 @@ class CPie extends CGraphDraw {
 			}
 
 			$this->sum += $item_value;
-			$strvaluelength = max($strvaluelength, zbx_strlen(convert_units($item_value, $this->items[$i]['units'])));
+
+			$convertedUnit = zbx_strlen(convert_units(array(
+				'value' => $item_value,
+				'units' => $this->items[$i]['units']
+			)));
+			$strvaluelength = max($strvaluelength, $convertedUnit);
 		}
 
 		if (isset($graph_sum)) {
@@ -311,7 +316,11 @@ class CPie extends CGraphDraw {
 
 			if (isset($data) && isset($datavalue)) {
 				$strvalue = sprintf(_('Value').': %s ('.(round($proc) != $proc? '%0.2f' : '%s').'%%)',
-					convert_units($datavalue, $this->items[$i]['units']), $proc);
+					convert_units(array(
+					'value' => $datavalue,
+					'units' => $this->items[$i]['units']
+					)),
+					$proc);
 
 				$str = sprintf('%s: %s [%s] ',
 					str_pad($this->items[$i]['host'], $max_host_len, ' '),
