@@ -89,11 +89,9 @@ switch ($srctbl) {
 		$min_user_type = USER_TYPE_ZABBIX_ADMIN;
 		break;
 	case 'nodes':
-		if (ZBX_DISTRIBUTED) {
-			$page['title'] = _('Nodes');
-			$min_user_type = USER_TYPE_ZABBIX_USER;
-			break;
-		}
+		$page['title'] = _('Nodes');
+		$min_user_type = USER_TYPE_ZABBIX_USER;
+		break;
 	case 'drules':
 		$page['title'] = _('Discovery rules');
 		$min_user_type = USER_TYPE_ZABBIX_ADMIN;
