@@ -216,13 +216,13 @@ static void	get_proxyconfig_table(zbx_uint64_t proxy_hostid, struct zbx_json *j,
 				",hosts r where t.hostid=r.hostid"
 					" and r.proxy_hostid=" ZBX_FS_UI64
 					" and r.status in (%d,%d)"
-					" and t.type in (%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d)",
+					" and t.type in (%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d)",
 				proxy_hostid,
 				HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED,
 				ITEM_TYPE_ZABBIX, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_SNMPv1, ITEM_TYPE_SNMPv2c,
 				ITEM_TYPE_SNMPv3, ITEM_TYPE_IPMI, ITEM_TYPE_TRAPPER, ITEM_TYPE_SIMPLE,
 				ITEM_TYPE_HTTPTEST, ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_SSH,
-				ITEM_TYPE_TELNET, ITEM_TYPE_JMX, ITEM_TYPE_SNMPTRAP);
+				ITEM_TYPE_TELNET, ITEM_TYPE_JMX, ITEM_TYPE_SNMPTRAP, ITEM_TYPE_INTERNAL);
 	}
 	else if (0 == strcmp(table->table, "drules"))
 	{
@@ -1963,8 +1963,7 @@ void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid,
 				items[i].host.maintenance_from <= values[i].ts.sec)
 			continue;
 
-		if (ITEM_TYPE_INTERNAL == items[i].type || ITEM_TYPE_AGGREGATE == items[i].type ||
-				ITEM_TYPE_CALCULATED == items[i].type)
+		if (ITEM_TYPE_AGGREGATE == items[i].type || ITEM_TYPE_CALCULATED == items[i].type)
 			continue;
 
 		if (0 == proxy_hostid && ITEM_TYPE_TRAPPER != items[i].type && ITEM_TYPE_ZABBIX_ACTIVE != items[i].type)
@@ -2437,4 +2436,36 @@ exit:
 	zbx_free(host_metadata);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: proxy_get_history_count                                          *
+ *                                                                            *
+ * Purpose: get the number of values waiting to be sent to the sever          *
+ *                                                                            *
+ * Return value: the number of history values                                 *
+ *                                                                            *
+ ******************************************************************************/
+int	proxy_get_history_count()
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+	zbx_uint64_t	id;
+	int 		count = 0;
+
+	proxy_get_lastid("proxy_history", "history_lastid", &id);
+
+	result = DBselect(
+			"select count(*)"
+			" from proxy_history"
+			" where id>" ZBX_FS_UI64,
+			id);
+
+	if (NULL != (row = DBfetch(result)))
+		count = atoi(row[0]);
+
+	DBfree_result(result);
+
+	return count;
 }
