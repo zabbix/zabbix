@@ -4608,38 +4608,29 @@ void	DCget_user_macro(zbx_uint64_t *hostids, int host_num, const char *macro, ch
 
 /******************************************************************************
  *                                                                            *
- * Function: DCget_trigger_hosts                                              *
+ * Function: DCget_functions_hostids                                          *
  *                                                                            *
- * Purpose: get hosts with items used in the source trigger expression        *
+ * Purpose: get hosts with items associated with a set of functions           *
  *                                                                            *
- * Parameters: hosts     - [OUT] a vector of host identifiers                 *
- *             triggerid - [IN] the source triggger id                        *
+ * Parameters: hosts       - [OUT] a vector of host identifiers               *
+ *             functionids - [IN] a vector containing source function ids     *
  *                                                                            *
  ******************************************************************************/
-void	DCget_trigger_hosts(zbx_vector_uint64_t *hosts, zbx_uint64_t triggerid)
+void	DCget_functions_hostids(zbx_vector_uint64_t *hosts, zbx_vector_uint64_t *functionids)
 {
-	zbx_hashset_iter_t	iter;
 	ZBX_DC_FUNCTION		*function;
-
-	/* assume hosts are already cached, just return */
-	if (0 != hosts->values_num)
-		return;
-
-	zbx_vector_uint64_reserve(hosts, 8);
+	ZBX_DC_ITEM		*item;
+	int			i;
 
 	LOCK_CACHE;
 
-	zbx_hashset_iter_reset(&config->functions, &iter);
-
-	while (NULL != (function = zbx_hashset_iter_next(&iter)))
+	for (i = 0; i < functionids->values_num; i++)
 	{
-		if (function->triggerid == triggerid)
-		{
-			ZBX_DC_ITEM	*item;
+		if (NULL == (function = zbx_hashset_search(&config->functions, &functionids->values[i])))
+			continue;
 
-			if (NULL != (item = zbx_hashset_search(&config->items, &function->itemid)))
-				zbx_vector_uint64_append(hosts, item->hostid);
-		}
+		if (NULL != (item = zbx_hashset_search(&config->items, &function->itemid)))
+			zbx_vector_uint64_append(hosts, item->hostid);
 	}
 
 	UNLOCK_CACHE;
