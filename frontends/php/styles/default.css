@@ -396,7 +396,7 @@ doesnotexist:-o-prefocus, #graphTab .formlist select { padding-top: 1px; padding
 /* menu */
 table.menu { height: 2.8em; }
 table.menu tr { background: #AAAAAA url('../images/gradients/menu_not_active.gif') repeat-x top left; }
-table.menu td { padding: 2px 5px 2px 5px; font-weight: bold; border: 1px solid #aaaaaa; margin: 0; }
+table.menu td { padding: 2px 5px 2px 5px; font-weight: bold; border: 1px solid #aaaaaa; margin: 0; cursor: pointer; }
 table.menu tr td.active { background: #5c9ccc url(themes/originalblue/images/bg_h-hard_55.png) 50% 50% repeat-x; border-color: #4c8cbc; }
 
 /* sub menu */
