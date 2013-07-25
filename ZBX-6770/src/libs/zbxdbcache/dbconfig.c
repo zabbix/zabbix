@@ -4616,7 +4616,7 @@ void	DCget_user_macro(zbx_uint64_t *hostids, int host_num, const char *macro, ch
  *             functionids - [IN] a vector containing source function ids     *
  *                                                                            *
  ******************************************************************************/
-void	DCget_functions_hostids(zbx_vector_uint64_t *hosts, zbx_vector_uint64_t *functionids)
+void	DCget_functions_hostids(zbx_vector_uint64_t *hosts, const zbx_vector_uint64_t *functionids)
 {
 	ZBX_DC_FUNCTION		*function;
 	ZBX_DC_ITEM		*item;

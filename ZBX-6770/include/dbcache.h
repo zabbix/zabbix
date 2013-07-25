@@ -300,6 +300,6 @@ void	DCget_user_macro(zbx_uint64_t *hostids, int host_num, const char *macro, ch
 int	DCconfig_update_host_availability(zbx_uint64_t hostid, unsigned char item_type, unsigned char available,
 		int errors_from, int disable_until);
 
-void	DCget_functions_hostids(zbx_vector_uint64_t *hosts, zbx_vector_uint64_t *functionids);
+void	DCget_functions_hostids(zbx_vector_uint64_t *hosts, const zbx_vector_uint64_t *functionids);
 
 #endif

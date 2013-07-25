@@ -45,7 +45,8 @@ static int	get_N_functionid(const char *expression, int N_functionid, zbx_uint64
 	int				num = 0, ret = FAIL;
 	const char			*c, *p_functionid = NULL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() expression:'%s' num:%d", __function_name, expression, N_functionid);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() expression:'%s' N_functionid:%d",
+			__function_name, expression, N_functionid);
 
 	for (c = expression; '\0' != *c; c++)
 	{
@@ -60,6 +61,9 @@ static int	get_N_functionid(const char *expression, int N_functionid, zbx_uint64
 			{
 				if (++num == N_functionid)
 				{
+					zabbix_log(LOG_LEVEL_DEBUG, "%s() functionid:" ZBX_FS_UI64,
+							__function_name, *functionid);
+
 					if (NULL != end)
 						*end = c + 1;
 
@@ -72,12 +76,10 @@ static int	get_N_functionid(const char *expression, int N_functionid, zbx_uint64
 		}
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "%s():%s, functionid:" ZBX_FS_UI64, __function_name, zbx_result_string(ret),
-			*functionid);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
 }
-
 
 /******************************************************************************
  *                                                                            *
@@ -88,16 +90,19 @@ static int	get_N_functionid(const char *expression, int N_functionid, zbx_uint64
  * Parameters: expression   - [IN] null terminated trigger expression         *
  *                            '{11}=1 & {2346734}>5'                          *
  *             count        - [IN] the maximum number of functions to parse   *
- *             ids          - [OUT] the resulting vector of function ids      *
+ *             functionids  - [OUT] the resulting vector of function ids      *
  *                                                                            *
  ******************************************************************************/
-static void	get_functionids(zbx_vector_uint64_t *ids, const char *expression)
+static void	get_functionids(zbx_vector_uint64_t *functionids, const char *expression)
 {
 	const char	*start = expression;
 	zbx_uint64_t	functionid;
 
 	while (SUCCEED == get_N_functionid(start, 1, &functionid, &start))
-		zbx_vector_uint64_append(ids, functionid);
+		zbx_vector_uint64_append(functionids, functionid);
+
+	zbx_vector_uint64_sort(functionids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	zbx_vector_uint64_uniq(functionids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 }
 
 /******************************************************************************
@@ -2466,19 +2471,19 @@ fail:
  * Purpose: cache host identifiers referenced by trigger expression           *
  *                                                                            *
  * Parameters: hostids    - [OUT] the host identifier cache                   *
- *             trigger    - [IN] the trigger                                  *
+ *             expression - [IN] the trigger expression                       *
  *                                                                            *
  ******************************************************************************/
-static void	cache_trigger_hostids(zbx_vector_uint64_t *hostids, const DB_TRIGGER *trigger)
+static void	cache_trigger_hostids(zbx_vector_uint64_t *hostids, const char *expression)
 {
 	if (0 == hostids->values_num)
 	{
-		zbx_vector_uint64_t	ids;
+		zbx_vector_uint64_t	functionids;
 
-		zbx_vector_uint64_create(&ids);
-		get_functionids(&ids, trigger->expression);
-		DCget_functions_hostids(hostids, &ids);
-		zbx_vector_uint64_destroy(&ids);
+		zbx_vector_uint64_create(&functionids);
+		get_functionids(&functionids, expression);
+		DCget_functions_hostids(hostids, &functionids);
+		zbx_vector_uint64_destroy(&functionids);
 	}
 }
 
@@ -2502,7 +2507,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 	int			N_functionid, ret, res = SUCCEED;
 	size_t			data_alloc, data_len;
 	DC_INTERFACE		interface;
-	zbx_vector_uint64_t	trigger_hosts;
+	zbx_vector_uint64_t	hostids;
 
 	if (NULL == data || NULL == *data || '\0' == **data)
 	{
@@ -2519,7 +2524,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 	if (NULL == (m = bl = strchr(p, '{')))
 		return res;
 
-	zbx_vector_uint64_create(&trigger_hosts);
+	zbx_vector_uint64_create(&hostids);
 
 	data_alloc = data_len = strlen(*data) + 1;
 
@@ -3351,8 +3356,8 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 				}
 				else if (0 == strncmp(m, "{$", 2))	/* user defined macros */
 				{
-					cache_trigger_hostids(&trigger_hosts, &event->trigger);
-					DCget_user_macro(trigger_hosts.values, trigger_hosts.values_num, m, &replace_to);
+					cache_trigger_hostids(&hostids, event->trigger.expression);
+					DCget_user_macro(hostids.values, hostids.values_num, m, &replace_to);
 				}
 			}
 		}
@@ -3364,8 +3369,8 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 					replace_to = zbx_dsprintf(replace_to, "%d", event->value);
 				else if (0 == strncmp(m, "{$", 2))	/* user defined macros */
 				{
-					cache_trigger_hostids(&trigger_hosts, &event->trigger);
-					DCget_user_macro(trigger_hosts.values, trigger_hosts.values_num, m, &replace_to);
+					cache_trigger_hostids(&hostids, event->trigger.expression);
+					DCget_user_macro(hostids.values, hostids.values_num, m, &replace_to);
 
 					if (NULL != replace_to && FAIL == (res = is_double_suffix(replace_to)) &&
 							NULL != error)
@@ -3552,7 +3557,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 			p = bl + 1;
 	}
 
-	zbx_vector_uint64_destroy(&trigger_hosts);
+	zbx_vector_uint64_destroy(&hostids);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End %s() data:'%s'", __function_name, *data);
 
