@@ -1036,7 +1036,7 @@ class testLinkProperties extends CWebTest {
 			array(
 				array(
 					'expected' => LINK_GOOD,
-					'login' => 'report6.php?&form_refresh=1&form=1&config=1&items[0][caption]=item1&items[0][itemid]=24338&items[0][color]=009900&items[0][calc_fnc]=2&items[0][axisside]=0&report_timesince=20130722170101&report_timetill=20130723170101&title=Report+1&xlabel=&ylabel=&scaletype=3&report_timesince_day=22&report_timesince_month=07&report_timesince_year=2013&report_timesince_hour=17&report_timesince_minute=01&report_timetill_day=23&report_timetill_month=07&report_timetill_year=2013&report_timetill_hour=17&report_timetill_minute=01&report_show=Show',
+					'login' => 'report6.php?items[0][caption]=Agent+ping&items[0][itemid]=23455&items[0][color]=009900&items[0][calc_fnc]=2&items[0][axisside]=0&report_show=Show',
 					'title' => 'Bar reports',
 					'text' => 'Report'
 				)
@@ -1044,7 +1044,7 @@ class testLinkProperties extends CWebTest {
 			array(
 				array(
 					'expected' => LINK_BAD,
-					'login' => 'report6.php?&form_refresh=1&form=1&config=1&items[0][caption]=item1&items[0][itemid]=11111&items[0][color]=009900&items[0][calc_fnc]=2&items[0][axisside]=0&report_timesince=20130722170101&report_timetill=20130723170101&title=Report+1&xlabel=&ylabel=&scaletype=3&report_timesince_day=22&report_timesince_month=07&report_timesince_year=2013&report_timesince_hour=17&report_timesince_minute=01&report_timetill_day=23&report_timetill_month=07&report_timetill_year=2013&report_timetill_hour=17&report_timetill_minute=01&report_show=Show',
+					'login' => 'report6.php?items[0][caption]=Agent+ping&items[0][itemid]=11111&items[0][color]=009900&items[0][calc_fnc]=2&items[0][axisside]=0&report_show=Show',
 					'title' => 'Bar reports',
 					'errors' => array(
 						'ERROR: No permissions to referred object or it does not exist!'
