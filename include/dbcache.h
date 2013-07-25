@@ -210,8 +210,6 @@ void	*DCget_stats(int request);
 
 zbx_uint64_t	DCget_nextid(const char *table_name, int num);
 
-int	DCget_item_lastclock(zbx_uint64_t itemid);
-
 void	DCsync_configuration();
 void	init_configuration_cache();
 void	free_configuration_cache();

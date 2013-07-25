@@ -1,6 +1,7 @@
 Changes for 2.0.7rc1
 
 New features:
+........S. [ZBX-6708] reduced configuration locking when calculating item queue (wiper)
 .......PS. [ZBX-6683] removed string pool semaphore; increased configuration cache update performance (Sasha)
 A......... [ZBX-6603] improved CTrigger lastEvents parameter performance (Toms)
 A......... [ZBX-6603] improved performance for dbConditionInt() function (Toms)
