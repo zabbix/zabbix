@@ -318,11 +318,11 @@ class CHttpTestManager {
 	protected function getChildHostsFromHttpTests(array $httpTests, array $hostIds = array()) {
 		$hostsTemaplatesMap = array();
 
-		$sqlWhere = empty($hostIds) ? '' : ' AND '.dbConditionInt('ht.hostid', $hostIds);
+		$sqlWhere = $hostIds ? ' AND '.dbConditionInt('ht.hostid', $hostIds) : '';
 		$dbCursor = DBselect(
 			'SELECT ht.templateid,ht.hostid'.
 			' FROM hosts_templates ht'.
-			' WHERE '.dbConditionInt('ht.templateid', array_unique(zbx_objectValues($httpTests, 'hostid'))).
+			' WHERE '.dbConditionInt('ht.templateid', zbx_objectValues($httpTests, 'hostid')).
 				$sqlWhere
 		);
 		while ($dbHost = DBfetch($dbCursor)) {
