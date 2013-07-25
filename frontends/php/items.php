@@ -899,15 +899,9 @@ else {
 	$data = array(
 		'form' => get_request('form'),
 		'hostid' => get_request('hostid'),
-		'sortfield' => getPageSortField('name')
+		'sortfield' => getPageSortField('name'),
+		'host' => empty($host) ? array() : $host
 	);
-
-	// for determine is the host template
-	if (!empty($host)) {
-		$data['host_status'] = $host['status'];
-	} else {
-		$data['host_status'] = 0;
-	}
 
 	// items
 	$options = array(

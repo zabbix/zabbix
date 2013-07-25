@@ -46,6 +46,10 @@ $sortLink = new CUrl();
 $sortLink->setArgument('hostid', $this->data['hostid']);
 $sortLink = $sortLink->getUrl();
 
+$showErrorColumn = !(isset($this->data['host'])
+					&& isset($this->data['host']['status'])
+					&& $this->data['host']['status'] == HOST_STATUS_TEMPLATE);
+
 
 $discoveryTable->setHeader(array(
 	new CCheckBox('all_items', null, "checkAll('".$discoveryForm->getName()."', 'all_items', 'g_hostdruleid');"),
@@ -57,7 +61,7 @@ $discoveryTable->setHeader(array(
 	make_sorting_header(_('Interval'), 'delay', $sortLink),
 	make_sorting_header(_('Type'), 'type', $sortLink),
 	make_sorting_header(_('Status'), 'status', $sortLink),
-	$this->get('host_status') != ITEM_STATUS_DISABLED ? _('Error') : null
+	$showErrorColumn ? _('Error') : null
 ));
 foreach ($data['discoveries'] as $discovery) {
 	$description = array();
@@ -96,7 +100,7 @@ foreach ($data['discoveries'] as $discovery) {
 		$discovery['delay'],
 		item_type2str($discovery['type']),
 		$status,
-		$this->get('host_status') != ITEM_STATUS_DISABLED ? $error : null
+		$showErrorColumn ? $error : null
 	));
 }
 

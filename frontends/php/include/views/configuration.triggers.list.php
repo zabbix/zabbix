@@ -101,6 +101,10 @@ if (!empty($this->data['parent_discoveryid'])) {
 $link->setArgument('hostid', $this->data['hostid']);
 $link = $link->getUrl();
 
+$showErrorColumn = !(isset($this->data['host'])
+					&& isset($this->data['host']['status'])
+					&& $this->data['host']['status'] == HOST_STATUS_TEMPLATE);
+
 $triggersTable = new CTableInfo(_('No triggers defined.'));
 $triggersTable->setHeader(array(
 	new CCheckBox('all_triggers', null, "checkAll('".$triggersForm->getName()."', 'all_triggers', 'g_triggerid');"),
@@ -109,7 +113,7 @@ $triggersTable->setHeader(array(
 	make_sorting_header(_('Name'), 'description', $link),
 	_('Expression'),
 	make_sorting_header(_('Status'), 'status', $link),
-	(empty($this->data['parent_discoveryid']) && $this->get('host_status') != HOST_STATUS_TEMPLATE) ? _('Error') : null
+	(empty($this->data['parent_discoveryid']) && $showErrorColumn) ? _('Error') : null
 ));
 foreach ($this->data['triggers'] as $tnum => $trigger) {
 	$triggerid = $trigger['triggerid'];
@@ -260,7 +264,7 @@ foreach ($this->data['triggers'] as $tnum => $trigger) {
 		$description,
 		$expressionColumn,
 		$status,
-		(empty($this->data['parent_discoveryid']) && $this->get('host_status') != HOST_STATUS_TEMPLATE) ? $error : null
+		(empty($this->data['parent_discoveryid']) && $showErrorColumn) ? $error : null
 	));
 	$triggers[$tnum] = $trigger;
 }
