@@ -866,7 +866,7 @@ int	DBget_items_unsupported_count()
 int	DBget_queue_count(int from, int to)
 {
 	const char	*__function_name = "DBget_queue_count";
-	int		count = 0, now, counter = 0;
+	int		count = 0, now;
 	DB_RESULT	result;
 	DB_ROW		row;
 	zbx_uint64_t	interfaceid, itemid, proxy_hostid;
@@ -925,10 +925,7 @@ int	DBget_queue_count(int from, int to)
 		ZBX_DBROW2UINT64(interfaceid, row[5]);
 		ZBX_DBROW2UINT64(proxy_hostid, row[6]);
 
-		counter++;
-
-		if (FAIL == (lastclock = DCget_item_lastclock(itemid)))
-			lastclock = (time_t)atoi(row[4]);
+		lastclock = (time_t)atoi(row[4]);
 
 		nextcheck = calculate_item_nextcheck(interfaceid, itemid, item_type,
 				delay, delay_flex, lastclock, &effective_delay);
@@ -940,8 +937,6 @@ int	DBget_queue_count(int from, int to)
 			count++;
 	}
 	DBfree_result(result);
-
-	zabbix_log(LOG_LEVEL_ERR, "WDN get_queue: %d seconds, count=%d, items=%d", time(NULL) - now, count, counter);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): %d", __function_name, count);
 

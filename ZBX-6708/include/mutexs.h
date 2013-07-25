@@ -35,13 +35,7 @@
 
 #else	/* not _WINDOWS */
 
-//#define MUTEX_ORIGINAL			1
-
-#ifdef MUTEX_ORIGINAL
 #	define ZBX_MUTEX		int
-#else
-#	define ZBX_MUTEX		int*
-#endif
 #	define ZBX_MUTEX_NULL		0
 
 #	define ZBX_MUTEX_ERROR		-1

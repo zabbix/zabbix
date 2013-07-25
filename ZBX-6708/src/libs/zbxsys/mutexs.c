@@ -17,9 +17,6 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include <linux/futex.h>
-#include <sys/syscall.h>
-
 #include "common.h"
 #include "mutexs.h"
 #include "log.h"
@@ -63,7 +60,6 @@
  * Comments: use alias 'zbx_mutex_create' and 'zbx_mutex_create_force'        *
  *                                                                            *
  ******************************************************************************/
-#ifdef MUTEX_ORIGINAL
 int zbx_mutex_create_ext(ZBX_MUTEX *mutex, ZBX_MUTEX_NAME name, unsigned char forced)
 {
 #ifdef _WINDOWS
@@ -174,47 +170,6 @@ lbl_return:
 
 	return ZBX_MUTEX_OK;
 }
-#else
-
-static int	mutex_shmid = 0;
-static int	*mutex_addr = NULL;
-
-
-static void	zbx_mutex_initialize()
-{
-	key_t		shm_key;
-
-	if (-1 == (shm_key = ftok(CONFIG_FILE, (int)'W')))
-	{
-		zabbix_log(LOG_LEVEL_ERR, "Cannot create IPC key for mutex\n");
-		exit(1);
-	}
-
-	if (-1 == (mutex_shmid = shmget(shm_key, 32, IPC_CREAT | 0666)))
-	{
-		zabbix_log(LOG_LEVEL_ERR, "Cannot acquire shared memory for mutex\n");
-		exit(1);
-	}
-
-	if ((int *)-1 == (mutex_addr = shmat(mutex_shmid, NULL, 0)))
-	{
-		zabbix_log(LOG_LEVEL_ERR, "Cannot attach to shared memory for mutex\n");
-		exit(1);
-	}
-
-}
-
-int zbx_mutex_create_ext(ZBX_MUTEX *mutex, ZBX_MUTEX_NAME name, unsigned char forced)
-{
-	if (NULL == mutex_addr)
-		zbx_mutex_initialize();
-
-	*mutex = mutex_addr + name;
-	**mutex = 0;
-
-	return 0;
-}
-#endif
 
 /******************************************************************************
  *                                                                            *
@@ -227,7 +182,6 @@ int zbx_mutex_create_ext(ZBX_MUTEX *mutex, ZBX_MUTEX_NAME name, unsigned char fo
  * Author: Eugene Grigorjev, Alexander Vladishev                              *
  *                                                                            *
  ******************************************************************************/
-#ifdef MUTEX_ORIGINAL
 void	__zbx_mutex_lock(const char *filename, int line, ZBX_MUTEX *mutex)
 {
 #ifndef _WINDOWS
@@ -259,23 +213,7 @@ void	__zbx_mutex_lock(const char *filename, int line, ZBX_MUTEX *mutex)
 	}
 #endif
 }
-#else
-void	__zbx_mutex_lock(const char *filename, int line, ZBX_MUTEX *mutex)
-{
-	int	lock;
 
-	if (0 != (lock = __sync_val_compare_and_swap(*mutex, 0, 1)))
-	{
-		if (2 != lock)
-			lock = __sync_lock_test_and_set(*mutex, 2);
-		while (0 != lock)
-		{
-			syscall(SYS_futex, mutex, FUTEX_WAIT, 2, NULL, NULL, 0);
-			lock = __sync_lock_test_and_set(*mutex, 2);
-		}
-	}
-}
-#endif
 /******************************************************************************
  *                                                                            *
  * Function: zbx_mutex_unlock                                                 *
@@ -287,7 +225,6 @@ void	__zbx_mutex_lock(const char *filename, int line, ZBX_MUTEX *mutex)
  * Author: Eugene Grigorjev, Alexander Vladishev                              *
  *                                                                            *
  ******************************************************************************/
-#ifdef MUTEX_ORIGINAL
 void	__zbx_mutex_unlock(const char *filename, int line, ZBX_MUTEX *mutex)
 {
 #ifndef _WINDOWS
@@ -319,16 +256,7 @@ void	__zbx_mutex_unlock(const char *filename, int line, ZBX_MUTEX *mutex)
 	}
 #endif
 }
-#else
-void	__zbx_mutex_unlock(const char *filename, int line, ZBX_MUTEX *mutex)
-{
-	if (1 != __sync_fetch_and_sub(*mutex, 1))
-	{
-		**mutex = 0;
-		syscall(SYS_futex, mutex, FUTEX_WAKE, 1, NULL, NULL, 0);
-	}
-}
-#endif
+
 /******************************************************************************
  *                                                                            *
  * Function: zbx_mutex_destroy                                                *
@@ -342,7 +270,6 @@ void	__zbx_mutex_unlock(const char *filename, int line, ZBX_MUTEX *mutex)
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  ******************************************************************************/
-#ifdef MUTEX_ORIGINAL
 int	zbx_mutex_destroy(ZBX_MUTEX *mutex)
 {
 #ifdef _WINDOWS
@@ -363,15 +290,9 @@ int	zbx_mutex_destroy(ZBX_MUTEX *mutex)
 
 	return ZBX_MUTEX_OK;
 }
-#else
-
-int	zbx_mutex_destroy(ZBX_MUTEX *mutex)
-{
-	return ZBX_MUTEX_OK;
-}
-#endif
 
 #if defined(HAVE_SQLITE3)
+
 /*
    +----------------------------------------------------------------------+
    | PHP Version 5                                                        |
