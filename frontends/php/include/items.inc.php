@@ -106,7 +106,7 @@ function item_type2str($type = null) {
 /**
  * Returns human readable an item value type
  *
- * @param integer $valueType
+ * @param int $valueType
  *
  * @return string
  */
@@ -738,7 +738,7 @@ function get_items_data_overview($hostids, $application, $view_style) {
 	));
 
 	// fetch latest values
-	$history = Manager::History()->fetchLast(zbx_toHash($db_items, 'itemid'));
+	$history = Manager::History()->getLast(zbx_toHash($db_items, 'itemid'));
 
 	$options = array(
 		'output' => array('name', 'hostid'),

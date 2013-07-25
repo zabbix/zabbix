@@ -270,10 +270,10 @@ $sql = 'SELECT DISTINCT i.itemid,i.name,i.value_type,i.units,i.state,i.valuemapi
 $allItems = DBfetchArray(DBselect($sql));
 
 // if needed, skip items without data
-$itemsWithHistory = Manager::History()->fetchItemsWithData($allItems);
+$itemsWithHistory = Manager::History()->getItemsWithData($allItems);
 
 // select history
-$history = Manager::History()->fetchLast($itemsWithHistory, 2);
+$history = Manager::History()->getLast($itemsWithHistory, 2);
 
 $displayItems = get_request('show_without_data') ? $allItems : $itemsWithHistory;
 foreach ($displayItems as $key => &$dbItem) {
@@ -469,10 +469,10 @@ $sql = 'SELECT DISTINCT i.hostid,i.itemid,i.name,i.value_type,i.units,i.state,i.
 $allItems = DBfetchArray(DBselect($sql));
 
 // if needed, skip items without data
-$itemsWithHistory = Manager::History()->fetchItemsWithData($allItems);
+$itemsWithHistory = Manager::History()->getItemsWithData($allItems);
 
 // select history
-$history = Manager::History()->fetchLast($itemsWithHistory, 2);
+$history = Manager::History()->getLast($itemsWithHistory, 2);
 
 $displayItems = get_request('show_without_data') ? $allItems : $itemsWithHistory;
 foreach ($displayItems as $key => &$dbItem) {
