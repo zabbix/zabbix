@@ -23,7 +23,11 @@ require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 define('LINK_GOOD', 0);
 define('LINK_BAD', 1);
 
-class testLinkProperties extends CWebTest {
+class testUrlParameters extends CWebTest {
+
+	public function testUrlParameters_login() {
+		$this->zbxTestLogin('dashboard.php');
+	}
 
 	// Returns test data
 	public static function zbx_data() {
@@ -32,7 +36,7 @@ class testLinkProperties extends CWebTest {
 			array(
 				array(
 					'expected' => LINK_GOOD,
-					'login' => 'hostgroups.php?form=update&groupid=1',
+					'url' => 'hostgroups.php?form=update&groupid=1',
 					'title' => 'Configuration of host groups',
 					'text' => 'CONFIGURATION OF HOST GROUPS'
 				)
@@ -40,7 +44,7 @@ class testLinkProperties extends CWebTest {
 			array(
 				array(
 					'expected' => LINK_BAD,
-					'login' => 'hostgroups.php?form=update&groupid=123',
+					'url' => 'hostgroups.php?form=update&groupid=123',
 					'title' => 'Configuration of host groups',
 					'errors' => array(
 						'ERROR: No permissions to referred object or it does not exist!'
@@ -50,7 +54,7 @@ class testLinkProperties extends CWebTest {
 			array(
 				array(
 					'expected' => LINK_BAD,
-					'login' => 'hostgroups.php?form=update&groupid=abc',
+					'url' => 'hostgroups.php?form=update&groupid=abc',
 					'title' => 'Configuration of host groups',
 					'errors' => array(
 						'ERROR: Zabbix has received an incorrect request.',
@@ -61,7 +65,7 @@ class testLinkProperties extends CWebTest {
 			array(
 				array(
 					'expected' => LINK_BAD,
-					'login' => 'hostgroups.php?form=update&groupid=',
+					'url' => 'hostgroups.php?form=update&groupid=',
 					'title' => 'Configuration of host groups',
 					'errors' => array(
 						'ERROR: Zabbix has received an incorrect request.',
@@ -73,7 +77,7 @@ class testLinkProperties extends CWebTest {
 			array(
 				array(
 					'expected' => LINK_GOOD,
-					'login' => 'templates.php?form=update&templateid=40000&groupid=0',
+					'url' => 'templates.php?form=update&templateid=40000&groupid=0',
 					'title' => 'Configuration of templates',
 					'text' => 'CONFIGURATION OF TEMPLATES'
 				)
@@ -81,7 +85,7 @@ class testLinkProperties extends CWebTest {
 			array(
 				array(
 					'expected' => LINK_GOOD,
-					'login' => 'templates.php?form=update&templateid=50000&groupid=50000',
+					'url' => 'templates.php?form=update&templateid=50000&groupid=50000',
 					'title' => 'Configuration of templates',
 					'text' => 'CONFIGURATION OF TEMPLATES'
 				)
@@ -89,7 +93,7 @@ class testLinkProperties extends CWebTest {
 			array(
 				array(
 					'expected' => LINK_BAD,
-					'login' => 'templates.php?form=update&templateid=1&groupid=1',
+					'url' => 'templates.php?form=update&templateid=1&groupid=1',
 					'title' => 'Configuration of templates',
 					'errors' => array(
 						'ERROR: No permissions to referred object or it does not exist!'
@@ -99,7 +103,7 @@ class testLinkProperties extends CWebTest {
 			array(
 				array(
 					'expected' => LINK_BAD,
-					'login' => 'templates.php?form=update&templateid=abc&groupid=abc',
+					'url' => 'templates.php?form=update&templateid=abc&groupid=abc',
 					'title' => 'Configuration of templates',
 					'errors' => array(
 						'ERROR: Zabbix has received an incorrect request.',
@@ -111,12 +115,23 @@ class testLinkProperties extends CWebTest {
 			array(
 				array(
 					'expected' => LINK_BAD,
-					'login' => 'templates.php?form=update&templateid=&groupid=',
+					'url' => 'templates.php?form=update&templateid=&groupid=',
 					'title' => 'Configuration of templates',
 					'errors' => array(
 						'ERROR: Zabbix has received an incorrect request.',
 						'Critical error. Field "templateid" is not integer.',
 						'Critical error. Field "groupid" is not integer.'
+					)
+				)
+			),
+			array(
+				array(
+					'expected' => LINK_BAD,
+					'url' => 'templates.php?form=update',
+					'title' => 'Configuration of templates',
+					'errors' => array(
+						'ERROR: Zabbix has received an incorrect request.',
+						'Critical error. Field "templateid" is mandatory.'
 					)
 				)
 			),
@@ -124,7 +139,7 @@ class testLinkProperties extends CWebTest {
 			array(
 				array(
 					'expected' => LINK_GOOD,
-					'login' => 'hosts.php?form=update&hostid=50001&groupid=0',
+					'url' => 'hosts.php?form=update&hostid=50001&groupid=0',
 					'title' => 'Configuration of hosts',
 					'text' => 'CONFIGURATION OF HOSTS'
 				)
@@ -132,7 +147,7 @@ class testLinkProperties extends CWebTest {
 			array(
 				array(
 					'expected' => LINK_BAD,
-					'login' => 'hosts.php?form=update&hostid=50001&groupid=111111',
+					'url' => 'hosts.php?form=update&hostid=50001&groupid=111111',
 					'title' => 'Configuration of hosts',
 					'errors' => array(
 						'ERROR: No permissions to referred object or it does not exist!'
@@ -142,7 +157,7 @@ class testLinkProperties extends CWebTest {
 			array(
 				array(
 					'expected' => LINK_BAD,
-					'login' => 'hosts.php?form=update&hostid=1&groupid=0',
+					'url' => 'hosts.php?form=update&hostid=1&groupid=0',
 					'title' => 'Configuration of hosts',
 					'errors' => array(
 						'ERROR: No permissions to referred object or it does not exist!'
@@ -152,7 +167,7 @@ class testLinkProperties extends CWebTest {
 			array(
 				array(
 					'expected' => LINK_BAD,
-					'login' => 'hosts.php?form=update&hostid=abc&groupid=abc',
+					'url' => 'hosts.php?form=update&hostid=abc&groupid=abc',
 					'title' => 'Configuration of hosts',
 					'errors' => array(
 						'ERROR: Zabbix has received an incorrect request.',
@@ -164,12 +179,23 @@ class testLinkProperties extends CWebTest {
 			array(
 				array(
 					'expected' => LINK_BAD,
-					'login' => 'hosts.php?form=update&hostid=&groupid=',
+					'url' => 'hosts.php?form=update&hostid=&groupid=',
 					'title' => 'Configuration of hosts',
 					'errors' => array(
 						'ERROR: Zabbix has received an incorrect request.',
 						'Critical error. Field "groupid" is not integer.',
 						'Critical error. Field "hostid" is not integer.'
+					)
+				)
+			),
+			array(
+				array(
+					'expected' => LINK_BAD,
+					'url' => 'hosts.php?form=update',
+					'title' => 'Configuration of hosts',
+					'errors' => array(
+						'ERROR: Zabbix has received an incorrect request.',
+						'Critical error. Field "hostid" is mandatory.'
 					)
 				)
 			),
@@ -177,7 +203,7 @@ class testLinkProperties extends CWebTest {
 			array(
 				array(
 					'expected' => LINK_GOOD,
-					'login' => 'maintenance.php?form=update&maintenanceid=1#form',
+					'url' => 'maintenance.php?form=update&maintenanceid=1#form',
 					'title' => 'Configuration of maintenance',
 					'text' => 'CONFIGURATION OF MAINTENANCE PERIODS'
 				)
@@ -185,7 +211,7 @@ class testLinkProperties extends CWebTest {
 			array(
 				array(
 					'expected' => LINK_BAD,
-					'login' => 'maintenance.php?form=update&maintenanceid=2000#form',
+					'url' => 'maintenance.php?form=update&maintenanceid=2000#form',
 					'title' => 'Configuration of maintenance',
 					'errors' => array(
 						'ERROR: No permissions to referred object or it does not exist!'
@@ -195,7 +221,7 @@ class testLinkProperties extends CWebTest {
 			array(
 				array(
 					'expected' => LINK_BAD,
-					'login' => 'maintenance.php?form=update&maintenanceid=abc#form',
+					'url' => 'maintenance.php?form=update&maintenanceid=abc#form',
 					'title' => 'Configuration of maintenance',
 					'errors' => array(
 						'ERROR: Zabbix has received an incorrect request.',
@@ -206,11 +232,22 @@ class testLinkProperties extends CWebTest {
 			array(
 				array(
 					'expected' => LINK_BAD,
-					'login' => 'maintenance.php?form=update&maintenanceid=',
+					'url' => 'maintenance.php?form=update&maintenanceid=',
 					'title' => 'Configuration of maintenance',
 					'errors' => array(
 						'ERROR: Zabbix has received an incorrect request.',
 						'Critical error. Field "maintenanceid" is not integer.'
+					)
+				)
+			),
+			array(
+				array(
+					'expected' => LINK_BAD,
+					'url' => 'maintenance.php?form=update',
+					'title' => 'Configuration of maintenance',
+					'errors' => array(
+						'ERROR: Zabbix has received an incorrect request.',
+						'Critical error. Field "maintenanceid" is mandatory.'
 					)
 				)
 			),
@@ -218,7 +255,7 @@ class testLinkProperties extends CWebTest {
 			array(
 				array(
 					'expected' => LINK_GOOD,
-					'login' => 'actionconf.php?form=update&actionid=11',
+					'url' => 'actionconf.php?form=update&actionid=11',
 					'title' => 'Configuration of actions',
 					'text' => 'CONFIGURATION OF ACTIONS'
 				)
@@ -226,7 +263,7 @@ class testLinkProperties extends CWebTest {
 			array(
 				array(
 					'expected' => LINK_BAD,
-					'login' => 'actionconf.php?form=update&actionid=12222',
+					'url' => 'actionconf.php?form=update&actionid=12222',
 					'title' => 'Configuration of actions',
 					'errors' => array(
 						'ERROR: No permissions to referred object or it does not exist!'
@@ -236,7 +273,7 @@ class testLinkProperties extends CWebTest {
 			array(
 				array(
 					'expected' => LINK_BAD,
-					'login' => 'actionconf.php?form=update&actionid=abc',
+					'url' => 'actionconf.php?form=update&actionid=abc',
 					'title' => 'Configuration of actions',
 					'errors' => array(
 						'ERROR: Zabbix has received an incorrect request.',
@@ -247,11 +284,22 @@ class testLinkProperties extends CWebTest {
 			array(
 				array(
 					'expected' => LINK_BAD,
-					'login' => 'actionconf.php?form=update&actionid=',
+					'url' => 'actionconf.php?form=update&actionid=',
 					'title' => 'Configuration of actions',
 					'errors' => array(
 						'ERROR: Zabbix has received an incorrect request.',
 						'Critical error. Field "actionid" is not integer.'
+					)
+				)
+			),
+			array(
+				array(
+					'expected' => LINK_BAD,
+					'url' => 'actionconf.php?form=update',
+					'title' => 'Configuration of actions',
+					'errors' => array(
+						'ERROR: Zabbix has received an incorrect request.',
+						'Critical error. Field "actionid" is mandatory.'
 					)
 				)
 			),
@@ -259,7 +307,7 @@ class testLinkProperties extends CWebTest {
 			array(
 				array(
 					'expected' => LINK_GOOD,
-					'login' => 'screenedit.php?screenid=200000',
+					'url' => 'screenedit.php?screenid=200000',
 					'title' => 'Configuration of screens',
 					'text' => 'CONFIGURATION OF SCREEN'
 				)
@@ -267,7 +315,7 @@ class testLinkProperties extends CWebTest {
 			array(
 				array(
 					'expected' => LINK_BAD,
-					'login' => 'screenedit.php?screenid=111111',
+					'url' => 'screenedit.php?screenid=111111',
 					'title' => 'Configuration of screens',
 					'errors' => array(
 						'ERROR: No permissions to referred object or it does not exist!'
@@ -277,7 +325,7 @@ class testLinkProperties extends CWebTest {
 			array(
 				array(
 					'expected' => LINK_BAD,
-					'login' => 'screenedit.php?screenid=abc',
+					'url' => 'screenedit.php?screenid=abc',
 					'title' => 'Configuration of screens',
 					'errors' => array(
 						'ERROR: Zabbix has received an incorrect request.',
@@ -288,11 +336,22 @@ class testLinkProperties extends CWebTest {
 			array(
 				array(
 					'expected' => LINK_BAD,
-					'login' => 'screenedit.php?screenid=',
+					'url' => 'screenedit.php?screenid=',
 					'title' => 'Configuration of screens',
 					'errors' => array(
 						'ERROR: Zabbix has received an incorrect request.',
 						'Critical error. Field "screenid" is not integer.'
+					)
+				)
+			),
+			array(
+				array(
+					'expected' => LINK_BAD,
+					'url' => 'screenedit.php',
+					'title' => 'Configuration of screens',
+					'errors' => array(
+						'ERROR: Zabbix has received an incorrect request.',
+						'Critical error. Field "screenid" is mandatory.'
 					)
 				)
 			),
@@ -300,7 +359,7 @@ class testLinkProperties extends CWebTest {
 			array(
 				array(
 					'expected' => LINK_GOOD,
-					'login' => 'slideconf.php?config=1&form=update&slideshowid=200001',
+					'url' => 'slideconf.php?config=1&form=update&slideshowid=200001',
 					'title' => 'Configuration of slide shows',
 					'text' => 'CONFIGURATION OF SLIDE SHOWS'
 				)
@@ -308,7 +367,7 @@ class testLinkProperties extends CWebTest {
 			array(
 				array(
 					'expected' => LINK_BAD,
-					'login' => 'slideconf.php?config=1&form=update&slideshowid=111111',
+					'url' => 'slideconf.php?config=1&form=update&slideshowid=111111',
 					'title' => 'Configuration of slide shows',
 					'errors' => array(
 						'ERROR: No permissions to referred object or it does not exist!'
@@ -318,7 +377,7 @@ class testLinkProperties extends CWebTest {
 			array(
 				array(
 					'expected' => LINK_BAD,
-					'login' => 'slideconf.php?config=1&form=update&slideshowid=abc',
+					'url' => 'slideconf.php?config=1&form=update&slideshowid=abc',
 					'title' => 'Configuration of slide shows',
 					'errors' => array(
 						'ERROR: Zabbix has received an incorrect request.',
@@ -329,11 +388,22 @@ class testLinkProperties extends CWebTest {
 			array(
 				array(
 					'expected' => LINK_BAD,
-					'login' => 'slideconf.php?config=1&form=update&slideshowid=',
+					'url' => 'slideconf.php?config=1&form=update&slideshowid=',
 					'title' => 'Configuration of slide shows',
 					'errors' => array(
 						'ERROR: Zabbix has received an incorrect request.',
 						'Critical error. Field "slideshowid" is not integer.'
+					)
+				)
+			),
+			array(
+				array(
+					'expected' => LINK_BAD,
+					'url' => 'slideconf.php?config=1&form=update',
+					'title' => 'Configuration of slide shows',
+					'errors' => array(
+						'ERROR: Zabbix has received an incorrect request.',
+						'Critical error. Field "slideshowid" is mandatory.'
 					)
 				)
 			),
@@ -341,7 +411,7 @@ class testLinkProperties extends CWebTest {
 			array(
 				array(
 					'expected' => LINK_GOOD,
-					'login' => 'sysmap.php?sysmapid=3',
+					'url' => 'sysmap.php?sysmapid=3',
 					'title' => 'Configuration of network maps',
 					'text' => 'CONFIGURATION OF NETWORK MAPS'
 				)
@@ -349,7 +419,7 @@ class testLinkProperties extends CWebTest {
 			array(
 				array(
 					'expected' => LINK_BAD,
-					'login' => 'sysmap.php?sysmapid=111',
+					'url' => 'sysmap.php?sysmapid=111',
 					'title' => 'Configuration of network maps',
 					'errors' => array(
 						'ERROR: No permissions to referred object or it does not exist!'
@@ -359,7 +429,7 @@ class testLinkProperties extends CWebTest {
 			array(
 				array(
 					'expected' => LINK_BAD,
-					'login' => 'sysmap.php?sysmapid=abc',
+					'url' => 'sysmap.php?sysmapid=abc',
 					'title' => 'Configuration of network maps',
 					'errors' => array(
 						'ERROR: Zabbix has received an incorrect request.',
@@ -370,11 +440,22 @@ class testLinkProperties extends CWebTest {
 			array(
 				array(
 					'expected' => LINK_BAD,
-					'login' => 'sysmap.php?sysmapid=',
+					'url' => 'sysmap.php?sysmapid=',
 					'title' => 'Configuration of network maps',
 					'errors' => array(
 						'ERROR: Zabbix has received an incorrect request.',
 						'Critical error. Field "sysmapid" is not integer.'
+					)
+				)
+			),
+			array(
+				array(
+					'expected' => LINK_BAD,
+					'url' => 'sysmap.php?',
+					'title' => 'Configuration of network maps',
+					'errors' => array(
+						'ERROR: Zabbix has received an incorrect request.',
+						'Critical error. Field "sysmapid" is mandatory.'
 					)
 				)
 			),
@@ -382,7 +463,7 @@ class testLinkProperties extends CWebTest {
 			array(
 				array(
 					'expected' => LINK_GOOD,
-					'login' => 'discoveryconf.php?form=update&druleid=3',
+					'url' => 'discoveryconf.php?form=update&druleid=3',
 					'title' => 'Configuration of discovery',
 					'text' => 'CONFIGURATION OF DISCOVERY RULE'
 				)
@@ -390,7 +471,7 @@ class testLinkProperties extends CWebTest {
 			array(
 				array(
 					'expected' => LINK_BAD,
-					'login' => 'discoveryconf.php?form=update&druleid=111',
+					'url' => 'discoveryconf.php?form=update&druleid=111',
 					'title' => 'Configuration of discovery',
 					'errors' => array(
 						'ERROR: No permissions to referred object or it does not exist!'
@@ -400,7 +481,7 @@ class testLinkProperties extends CWebTest {
 			array(
 				array(
 					'expected' => LINK_BAD,
-					'login' => 'discoveryconf.php?form=update&druleid=abc',
+					'url' => 'discoveryconf.php?form=update&druleid=abc',
 					'title' => 'Configuration of discovery',
 					'errors' => array(
 						'ERROR: Zabbix has received an incorrect request.',
@@ -411,11 +492,22 @@ class testLinkProperties extends CWebTest {
 			array(
 				array(
 					'expected' => LINK_BAD,
-					'login' => 'discoveryconf.php?form=update&druleid=',
+					'url' => 'discoveryconf.php?form=update&druleid=',
 					'title' => 'Configuration of discovery',
 					'errors' => array(
 						'ERROR: Zabbix has received an incorrect request.',
 						'Critical error. Field "druleid" is not integer.'
+					)
+				)
+			),
+			array(
+				array(
+					'expected' => LINK_BAD,
+					'url' => 'discoveryconf.php?form=update',
+					'title' => 'Configuration of discovery',
+					'errors' => array(
+						'ERROR: Zabbix has received an incorrect request.',
+						'Critical error. Field "druleid" is mandatory.'
 					)
 				)
 			),
@@ -423,7 +515,7 @@ class testLinkProperties extends CWebTest {
 			array(
 				array(
 					'expected' => LINK_GOOD,
-					'login' => 'overview.php?&form_refresh=1&groupid=4&application=Filesystems&type=0',
+					'url' => 'overview.php?&form_refresh=1&groupid=4&application=Filesystems&type=0',
 					'title' => 'Overview \[refreshed every 30 sec\]',
 					'text' => 'OVERVIEW'
 				)
@@ -431,7 +523,7 @@ class testLinkProperties extends CWebTest {
 			array(
 				array(
 					'expected' => LINK_BAD,
-					'login' => 'overview.php?&form_refresh=1&groupid=4444&application=Filesystems&type=0',
+					'url' => 'overview.php?&form_refresh=1&groupid=4444&application=Filesystems&type=0',
 					'title' => 'Overview \[refreshed every 30 sec\]',
 					'errors' => array(
 						'ERROR: No permissions to referred object or it does not exist!'
@@ -441,7 +533,7 @@ class testLinkProperties extends CWebTest {
 			array(
 				array(
 					'expected' => LINK_BAD,
-					'login' => 'overview.php?&form_refresh=1&groupid=4&application=SomeApplication&type=0',
+					'url' => 'overview.php?&form_refresh=1&groupid=4&application=SomeApplication&type=0',
 					'title' => 'Overview \[refreshed every 30 sec\]',
 					'errors' => array(
 						'ERROR: No permissions to referred object or it does not exist!'
@@ -451,7 +543,7 @@ class testLinkProperties extends CWebTest {
 			array(
 				array(
 					'expected' => LINK_BAD,
-					'login' => 'overview.php?&form_refresh=1&groupid=abc&application=Filesystems&type=0',
+					'url' => 'overview.php?&form_refresh=1&groupid=abc&application=Filesystems&type=0',
 					'title' => 'Overview \[refreshed every 30 sec\]',
 					'errors' => array(
 						'ERROR: Zabbix has received an incorrect request.',
@@ -462,11 +554,22 @@ class testLinkProperties extends CWebTest {
 			array(
 				array(
 					'expected' => LINK_BAD,
-					'login' => 'overview.php?&form_refresh=1&groupid=&application=Filesystems&type=0',
+					'url' => 'overview.php?&form_refresh=1&groupid=&application=Filesystems&type=0',
 					'title' => 'Overview \[refreshed every 30 sec\]',
 					'errors' => array(
 						'ERROR: Zabbix has received an incorrect request.',
 						'Critical error. Field "groupid" is not integer.'
+					)
+				)
+			),
+			array(
+				array(
+					'expected' => LINK_BAD,
+					'url' => 'overview.php?&form_refresh=1',
+					'title' => 'Overview \[refreshed every 30 sec\]',
+					'errors' => array(
+						'ERROR: Zabbix has received an incorrect request.',
+						'Critical error. Field "groupid" is mandatory.'
 					)
 				)
 			),
@@ -474,7 +577,7 @@ class testLinkProperties extends CWebTest {
 			array(
 				array(
 					'expected' => LINK_GOOD,
-					'login' => 'httpdetails.php?httptestid=1',
+					'url' => 'httpdetails.php?httptestid=1',
 					'title' => 'Details of scenario',
 					'text' => 'DETAILS OF SCENARIO'
 				)
@@ -482,7 +585,7 @@ class testLinkProperties extends CWebTest {
 			array(
 				array(
 					'expected' => LINK_BAD,
-					'login' => 'httpdetails.php?httptestid=1111',
+					'url' => 'httpdetails.php?httptestid=1111',
 					'title' => 'Details of scenario',
 					'errors' => array(
 						'ERROR: No permissions to referred object or it does not exist!'
@@ -492,7 +595,7 @@ class testLinkProperties extends CWebTest {
 			array(
 				array(
 					'expected' => LINK_BAD,
-					'login' => 'httpdetails.php?httptestid=abc',
+					'url' => 'httpdetails.php?httptestid=abc',
 					'title' => 'Details of scenario',
 					'errors' => array(
 						'ERROR: Zabbix has received an incorrect request.',
@@ -503,11 +606,22 @@ class testLinkProperties extends CWebTest {
 			array(
 				array(
 					'expected' => LINK_BAD,
-					'login' => 'httpdetails.php?httptestid=',
+					'url' => 'httpdetails.php?httptestid=',
 					'title' => 'Details of scenario',
 					'errors' => array(
 						'ERROR: Zabbix has received an incorrect request.',
 						'Critical error. Field "httptestid" is not integer.'
+					)
+				)
+			),
+			array(
+				array(
+					'expected' => LINK_BAD,
+					'url' => 'httpdetails.php?',
+					'title' => 'Details of scenario',
+					'errors' => array(
+						'ERROR: Zabbix has received an incorrect request.',
+						'Critical error. Field "httptestid" is mandatory.'
 					)
 				)
 			),
@@ -515,7 +629,7 @@ class testLinkProperties extends CWebTest {
 			array(
 				array(
 					'expected' => LINK_GOOD,
-					'login' => 'latest.php?&form_refresh=1&groupid=4&hostid=30001',
+					'url' => 'latest.php?&form_refresh=1&groupid=4&hostid=30001',
 					'title' => 'Latest data \[refreshed every 30 sec\]',
 					'text' => 'LATEST DATA'
 				)
@@ -523,7 +637,7 @@ class testLinkProperties extends CWebTest {
 			array(
 				array(
 					'expected' => LINK_BAD,
-					'login' => 'latest.php?&form_refresh=1&groupid=4&hostid=111111',
+					'url' => 'latest.php?&form_refresh=1&groupid=4&hostid=111111',
 					'title' => 'Latest data \[refreshed every 30 sec\]',
 					'errors' => array(
 						'ERROR: No permissions to referred object or it does not exist!'
@@ -533,7 +647,7 @@ class testLinkProperties extends CWebTest {
 			array(
 				array(
 					'expected' => LINK_BAD,
-					'login' => 'latest.php?&form_refresh=1&groupid=123&hostid=30001',
+					'url' => 'latest.php?&form_refresh=1&groupid=123&hostid=30001',
 					'title' => 'Latest data \[refreshed every 30 sec\]',
 					'errors' => array(
 						'ERROR: No permissions to referred object or it does not exist!'
@@ -543,7 +657,7 @@ class testLinkProperties extends CWebTest {
 			array(
 				array(
 					'expected' => LINK_BAD,
-					'login' => 'latest.php?&form_refresh=1&groupid=abc&hostid=abc',
+					'url' => 'latest.php?&form_refresh=1&groupid=abc&hostid=abc',
 					'title' => 'Latest data \[refreshed every 30 sec\]',
 					'errors' => array(
 						'ERROR: Zabbix has received an incorrect request.',
@@ -555,12 +669,24 @@ class testLinkProperties extends CWebTest {
 			array(
 				array(
 					'expected' => LINK_BAD,
-					'login' => 'latest.php?&form_refresh=1&groupid=&hostid=',
+					'url' => 'latest.php?&form_refresh=1&groupid=&hostid=',
 					'title' => 'Latest data \[refreshed every 30 sec\]',
 					'errors' => array(
 						'ERROR: Zabbix has received an incorrect request.',
 						'Critical error. Field "groupid" is not integer.',
 						'Critical error. Field "hostid" is not integer.'
+					)
+				)
+			),
+			array(
+				array(
+					'expected' => LINK_BAD,
+					'url' => 'latest.php?&form_refresh=1',
+					'title' => 'Latest data \[refreshed every 30 sec\]',
+					'errors' => array(
+						'ERROR: Zabbix has received an incorrect request.',
+						'Critical error. Field "groupid" is mandatory.',
+						'Critical error. Field "hostid" is mandatory.'
 					)
 				)
 			),
@@ -568,7 +694,7 @@ class testLinkProperties extends CWebTest {
 			array(
 				array(
 					'expected' => LINK_GOOD,
-					'login' => 'tr_status.php?&form_refresh=1&groupid=4&hostid=0&fullscreen=0',
+					'url' => 'tr_status.php?&form_refresh=1&groupid=4&hostid=0&fullscreen=0',
 					'title' => 'Status of triggers \[refreshed every 30 sec\]',
 					'text' => 'STATUS OF TRIGGERS'
 				)
@@ -576,7 +702,7 @@ class testLinkProperties extends CWebTest {
 			array(
 				array(
 					'expected' => LINK_BAD,
-					'login' => 'tr_status.php?&form_refresh=1&groupid=15&hostid=0&fullscreen=0',
+					'url' => 'tr_status.php?&form_refresh=1&groupid=15&hostid=0&fullscreen=0',
 					'title' => 'Status of triggers \[refreshed every 30 sec\]',
 					'errors' => array(
 						'ERROR: No permissions to referred object or it does not exist!'
@@ -586,7 +712,7 @@ class testLinkProperties extends CWebTest {
 			array(
 				array(
 					'expected' => LINK_BAD,
-					'login' => 'tr_status.php?&form_refresh=1&groupid=1&hostid=1234&fullscreen=0',
+					'url' => 'tr_status.php?&form_refresh=1&groupid=1&hostid=1234&fullscreen=0',
 					'title' => 'Status of triggers \[refreshed every 30 sec\]',
 					'errors' => array(
 						'ERROR: No permissions to referred object or it does not exist!'
@@ -596,7 +722,7 @@ class testLinkProperties extends CWebTest {
 			array(
 				array(
 					'expected' => LINK_BAD,
-					'login' => 'tr_status.php?&form_refresh=1&groupid=abc&hostid=abc&fullscreen=0',
+					'url' => 'tr_status.php?&form_refresh=1&groupid=abc&hostid=abc&fullscreen=0',
 					'title' => 'Status of triggers \[refreshed every 30 sec\]',
 					'errors' => array(
 						'ERROR: Zabbix has received an incorrect request.',
@@ -608,12 +734,24 @@ class testLinkProperties extends CWebTest {
 			array(
 				array(
 					'expected' => LINK_BAD,
-					'login' => 'tr_status.php?&form_refresh=1&groupid=&hostid=&fullscreen=0',
+					'url' => 'tr_status.php?&form_refresh=1&groupid=&hostid=&fullscreen=0',
 					'title' => 'Status of triggers \[refreshed every 30 sec\]',
 					'errors' => array(
 						'ERROR: Zabbix has received an incorrect request.',
 						'Critical error. Field "groupid" is not integer.',
 						'Critical error. Field "hostid" is not integer.'
+					)
+				)
+			),
+			array(
+				array(
+					'expected' => LINK_BAD,
+					'url' => 'tr_status.php?&form_refresh=1',
+					'title' => 'Status of triggers \[refreshed every 30 sec\]',
+					'errors' => array(
+						'ERROR: Zabbix has received an incorrect request.',
+						'Critical error. Field "groupid" is mandatory.',
+						'Critical error. Field "hostid" is mandatory.'
 					)
 				)
 			),
@@ -621,7 +759,7 @@ class testLinkProperties extends CWebTest {
 			array(
 				array(
 					'expected' => LINK_GOOD,
-					'login' => 'events.php?triggerid=13498',
+					'url' => 'events.php?triggerid=13498',
 					'title' => 'Latest events \[refreshed every 30 sec\]',
 					'text' => 'HISTORY OF EVENTS'
 				)
@@ -629,7 +767,7 @@ class testLinkProperties extends CWebTest {
 			array(
 				array(
 					'expected' => LINK_BAD,
-					'login' => 'events.php?triggerid=1',
+					'url' => 'events.php?triggerid=1',
 					'title' => 'Latest events \[refreshed every 30 sec\]',
 					'errors' => array(
 						'ERROR: No permissions to referred object or it does not exist!'
@@ -639,7 +777,7 @@ class testLinkProperties extends CWebTest {
 			array(
 				array(
 					'expected' => LINK_BAD,
-					'login' => 'events.php?triggerid=abc',
+					'url' => 'events.php?triggerid=abc',
 					'title' => 'Latest events \[refreshed every 30 sec\]',
 					'errors' => array(
 						'ERROR: Zabbix has received an incorrect request.',
@@ -650,11 +788,22 @@ class testLinkProperties extends CWebTest {
 			array(
 				array(
 					'expected' => LINK_BAD,
-					'login' => 'events.php?triggerid=',
+					'url' => 'events.php?triggerid=',
 					'title' => 'Latest events \[refreshed every 30 sec\]',
 					'errors' => array(
 						'ERROR: Zabbix has received an incorrect request.',
 						'Critical error. Field "triggerid" is not integer.'
+					)
+				)
+			),
+			array(
+				array(
+					'expected' => LINK_BAD,
+					'url' => 'events.php?',
+					'title' => 'Latest events \[refreshed every 30 sec\]',
+					'errors' => array(
+						'ERROR: Zabbix has received an incorrect request.',
+						'Critical error. Field "triggerid" is mandatory.'
 					)
 				)
 			),
@@ -662,7 +811,7 @@ class testLinkProperties extends CWebTest {
 			array(
 				array(
 					'expected' => LINK_GOOD,
-					'login' => 'charts.php?&form_refresh=1&fullscreen=0&groupid=0&hostid=40001&graphid=0',
+					'url' => 'charts.php?&form_refresh=1&fullscreen=0&groupid=0&hostid=40001&graphid=0',
 					'title' => 'Custom graphs \[refreshed every 30 sec\]',
 					'text' => 'Graphs'
 				)
@@ -670,7 +819,7 @@ class testLinkProperties extends CWebTest {
 			array(
 				array(
 					'expected' => LINK_BAD,
-					'login' => 'charts.php?&form_refresh=1&fullscreen=0&groupid=0&hostid=1&graphid=0',
+					'url' => 'charts.php?&form_refresh=1&fullscreen=0&groupid=0&hostid=1&graphid=0',
 					'title' => 'Custom graphs [refreshed every 30 sec]',
 					'errors' => array(
 						'ERROR: No permissions to referred object or it does not exist!'
@@ -680,7 +829,7 @@ class testLinkProperties extends CWebTest {
 			array(
 				array(
 					'expected' => LINK_BAD,
-					'login' => 'charts.php?&form_refresh=1&fullscreen=0&groupid=15&hostid=0&graphid=0',
+					'url' => 'charts.php?&form_refresh=1&fullscreen=0&groupid=15&hostid=0&graphid=0',
 					'title' => 'Custom graphs \[refreshed every 30 sec\]',
 					'errors' => array(
 						'ERROR: No permissions to referred object or it does not exist!'
@@ -690,7 +839,7 @@ class testLinkProperties extends CWebTest {
 			array(
 				array(
 					'expected' => LINK_BAD,
-					'login' => 'charts.php?&form_refresh=1&fullscreen=0&groupid=0&hostid=0&graphid=15',
+					'url' => 'charts.php?&form_refresh=1&fullscreen=0&groupid=0&hostid=0&graphid=15',
 					'title' => 'Custom graphs [refreshed every 30 sec]',
 					'errors' => array(
 						'ERROR: No permissions to referred object or it does not exist!'
@@ -700,7 +849,7 @@ class testLinkProperties extends CWebTest {
 			array(
 				array(
 					'expected' => LINK_BAD,
-					'login' => 'charts.php?&form_refresh=1&fullscreen=0&groupid=abc&hostid=abc&graphid=abc',
+					'url' => 'charts.php?&form_refresh=1&fullscreen=0&groupid=abc&hostid=abc&graphid=abc',
 					'title' => 'Custom graphs \[refreshed every 30 sec\]',
 					'errors' => array(
 						'ERROR: Zabbix has received an incorrect request.',
@@ -713,13 +862,26 @@ class testLinkProperties extends CWebTest {
 			array(
 				array(
 					'expected' => LINK_BAD,
-					'login' => 'charts.php?&form_refresh=1&fullscreen=0&groupid=&hostid=&graphid=',
+					'url' => 'charts.php?&form_refresh=1&fullscreen=0&groupid=&hostid=&graphid=',
 					'title' => 'Custom graphs \[refreshed every 30 sec\]',
 					'errors' => array(
 						'ERROR: Zabbix has received an incorrect request.',
 						'Critical error. Field "groupid" is not integer.',
 						'Critical error. Field "hostid" is not integer.',
 						'Critical error. Field "graphid" is not integer.'
+					)
+				)
+			),
+			array(
+				array(
+					'expected' => LINK_BAD,
+					'url' => 'charts.php?&form_refresh=1',
+					'title' => 'Custom graphs \[refreshed every 30 sec\]',
+					'errors' => array(
+						'ERROR: Zabbix has received an incorrect request.',
+						'Critical error. Field "groupid" is mandatory.',
+						'Critical error. Field "hostid" is mandatory.',
+						'Critical error. Field "graphid" is mandatory.'
 					)
 				)
 			),
@@ -727,7 +889,7 @@ class testLinkProperties extends CWebTest {
 			array(
 				array(
 					'expected' => LINK_GOOD,
-					'login' => 'screens.php?&form_refresh=1&fullscreen=0&elementid=200019',
+					'url' => 'screens.php?&form_refresh=1&fullscreen=0&elementid=200019',
 					'title' => 'Custom screens \[refreshed every 30 sec\]',
 					'text' => 'SCREENS'
 				)
@@ -735,7 +897,7 @@ class testLinkProperties extends CWebTest {
 			array(
 				array(
 					'expected' => LINK_BAD,
-					'login' => 'screens.php?&form_refresh=1&fullscreen=0&elementid=1',
+					'url' => 'screens.php?&form_refresh=1&fullscreen=0&elementid=1',
 					'title' => 'Custom screens \[refreshed every 30 sec\]',
 					'errors' => array(
 						'ERROR: Screen with ID "1" does not exist.'
@@ -745,7 +907,7 @@ class testLinkProperties extends CWebTest {
 			array(
 				array(
 					'expected' => LINK_BAD,
-					'login' => 'screens.php?&form_refresh=1&fullscreen=0&elementid=abc',
+					'url' => 'screens.php?&form_refresh=1&fullscreen=0&elementid=abc',
 					'title' => 'Custom screens \[refreshed every 30 sec\]',
 					'errors' => array(
 						'ERROR: Zabbix has received an incorrect request.',
@@ -756,11 +918,22 @@ class testLinkProperties extends CWebTest {
 			array(
 				array(
 					'expected' => LINK_BAD,
-					'login' => 'screens.php?&form_refresh=1&fullscreen=0&elementid=',
+					'url' => 'screens.php?&form_refresh=1&fullscreen=0&elementid=',
 					'title' => 'Custom screens \[refreshed every 30 sec\]',
 					'errors' => array(
 						'ERROR: Zabbix has received an incorrect request.',
 						'Critical error. Field "elementid" is not integer.'
+					)
+				)
+			),
+			array(
+				array(
+					'expected' => LINK_BAD,
+					'url' => 'screens.php?&form_refresh=1',
+					'title' => 'Custom screens \[refreshed every 30 sec\]',
+					'errors' => array(
+						'ERROR: Zabbix has received an incorrect request.',
+						'Critical error. Field "elementid" is mandatory.'
 					)
 				)
 			),
@@ -768,7 +941,7 @@ class testLinkProperties extends CWebTest {
 			array(
 				array(
 					'expected' => LINK_GOOD,
-					'login' => 'maps.php?&form_refresh=1&fullscreen=0&sysmapid=3',
+					'url' => 'maps.php?&form_refresh=1&fullscreen=0&sysmapid=3',
 					'title' => 'Network maps \[refreshed every 30 sec\]',
 					'text' => 'NETWORK MAPS'
 				)
@@ -776,7 +949,7 @@ class testLinkProperties extends CWebTest {
 			array(
 				array(
 					'expected' => LINK_BAD,
-					'login' => 'maps.php?&form_refresh=1&fullscreen=0&sysmapid=3333',
+					'url' => 'maps.php?&form_refresh=1&fullscreen=0&sysmapid=3333',
 					'title' => 'Network maps \[refreshed every 30 sec\]',
 					'errors' => array(
 						'ERROR: No permissions to referred object or it does not exist!'
@@ -786,7 +959,7 @@ class testLinkProperties extends CWebTest {
 			array(
 				array(
 					'expected' => LINK_BAD,
-					'login' => 'maps.php?&form_refresh=1&fullscreen=0&sysmapid=abc',
+					'url' => 'maps.php?&form_refresh=1&fullscreen=0&sysmapid=abc',
 					'title' => 'Network maps \[refreshed every 30 sec\]',
 					'errors' => array(
 						'ERROR: Zabbix has received an incorrect request.',
@@ -797,11 +970,22 @@ class testLinkProperties extends CWebTest {
 			array(
 				array(
 					'expected' => LINK_BAD,
-					'login' => 'maps.php?&form_refresh=1&fullscreen=0&sysmapid=',
+					'url' => 'maps.php?&form_refresh=1&fullscreen=0&sysmapid=',
 					'title' => 'Network maps \[refreshed every 30 sec\]',
 					'errors' => array(
 						'ERROR: Zabbix has received an incorrect request.',
 						'Critical error. Field "sysmapid" is not integer.'
+					)
+				)
+			),
+			array(
+				array(
+					'expected' => LINK_BAD,
+					'url' => 'maps.php?&form_refresh=1',
+					'title' => 'Network maps \[refreshed every 30 sec\]',
+					'errors' => array(
+						'ERROR: Zabbix has received an incorrect request.',
+						'Critical error. Field "sysmapid" is mandatory.'
 					)
 				)
 			),
@@ -809,7 +993,7 @@ class testLinkProperties extends CWebTest {
 			array(
 				array(
 					'expected' => LINK_GOOD,
-					'login' => 'discovery.php?&form_refresh=1&fullscreen=0&druleid=3',
+					'url' => 'discovery.php?&form_refresh=1&fullscreen=0&druleid=3',
 					'title' => 'Status of discovery',
 					'text' => 'STATUS OF DISCOVERY'
 				)
@@ -817,7 +1001,7 @@ class testLinkProperties extends CWebTest {
 			array(
 				array(
 					'expected' => LINK_BAD,
-					'login' => 'discovery.php?&form_refresh=1&fullscreen=0&druleid=11111',
+					'url' => 'discovery.php?&form_refresh=1&fullscreen=0&druleid=11111',
 					'title' => 'Status of discovery',
 					'errors' => array(
 						'ERROR: No permissions to referred object or it does not exist!'
@@ -827,7 +1011,7 @@ class testLinkProperties extends CWebTest {
 			array(
 				array(
 					'expected' => LINK_BAD,
-					'login' => 'discovery.php?&form_refresh=1&fullscreen=0&druleid=abc',
+					'url' => 'discovery.php?&form_refresh=1&fullscreen=0&druleid=abc',
 					'title' => 'Status of discovery',
 					'errors' => array(
 						'ERROR: Zabbix has received an incorrect request.',
@@ -838,11 +1022,22 @@ class testLinkProperties extends CWebTest {
 			array(
 				array(
 					'expected' => LINK_BAD,
-					'login' => 'discovery.php?&form_refresh=1&fullscreen=0&druleid=',
+					'url' => 'discovery.php?&form_refresh=1&fullscreen=0&druleid=',
 					'title' => 'Status of discovery',
 					'errors' => array(
 						'ERROR: Zabbix has received an incorrect request.',
 						'Critical error. Field "druleid" is not integer.'
+					)
+				)
+			),
+			array(
+				array(
+					'expected' => LINK_BAD,
+					'url' => 'discovery.php?&form_refresh=1',
+					'title' => 'Status of discovery',
+					'errors' => array(
+						'ERROR: Zabbix has received an incorrect request.',
+						'Critical error. Field "druleid" is mandatory.'
 					)
 				)
 			),
@@ -850,7 +1045,7 @@ class testLinkProperties extends CWebTest {
 			array(
 				array(
 					'expected' => LINK_GOOD,
-					'login' => 'srv_status.php?&form_refresh=1&fullscreen=0&period=month',
+					'url' => 'srv_status.php?&form_refresh=1&fullscreen=0&period=month',
 					'title' => 'IT services \[refreshed every 30 sec\]',
 					'text' => 'IT SERVICES'
 				)
@@ -858,7 +1053,7 @@ class testLinkProperties extends CWebTest {
 			array(
 				array(
 					'expected' => LINK_BAD,
-					'login' => 'srv_status.php?&form_refresh=1&fullscreen=0&period=1',
+					'url' => 'srv_status.php?&form_refresh=1&fullscreen=0&period=1',
 					'title' => 'IT services \[refreshed every 30 sec\]',
 					'errors' => array(
 						'ERROR: No permissions to referred object or it does not exist!'
@@ -868,7 +1063,7 @@ class testLinkProperties extends CWebTest {
 			array(
 				array(
 					'expected' => LINK_BAD,
-					'login' => 'srv_status.php?&form_refresh=1&fullscreen=0&period=abc',
+					'url' => 'srv_status.php?&form_refresh=1&fullscreen=0&period=abc',
 					'title' => 'IT services \[refreshed every 30 sec\]',
 					'errors' => array(
 						'ERROR: No permissions to referred object or it does not exist!'
@@ -878,7 +1073,17 @@ class testLinkProperties extends CWebTest {
 			array(
 				array(
 					'expected' => LINK_BAD,
-					'login' => 'srv_status.php?&form_refresh=1&fullscreen=0&period=',
+					'url' => 'srv_status.php?&form_refresh=1&fullscreen=0&period=',
+					'title' => 'IT services \[refreshed every 30 sec\]',
+					'errors' => array(
+						'ERROR: No permissions to referred object or it does not exist!'
+					)
+				)
+			),
+			array(
+				array(
+					'expected' => LINK_BAD,
+					'url' => 'srv_status.php?&form_refresh=1',
 					'title' => 'IT services \[refreshed every 30 sec\]',
 					'errors' => array(
 						'ERROR: No permissions to referred object or it does not exist!'
@@ -889,7 +1094,7 @@ class testLinkProperties extends CWebTest {
 			array(
 				array(
 					'expected' => LINK_GOOD,
-					'login' => 'hostinventoriesoverview.php?&form_refresh=1&groupid=50003&groupby=chassis',
+					'url' => 'hostinventoriesoverview.php?&form_refresh=1&groupid=50003&groupby=chassis',
 					'title' => 'Host inventory overview',
 					'text' => 'HOST INVENTORY OVERVIEW'
 				)
@@ -897,7 +1102,7 @@ class testLinkProperties extends CWebTest {
 			array(
 				array(
 					'expected' => LINK_BAD,
-					'login' => 'hostinventoriesoverview.php?&form_refresh=1&groupid=78&groupby=chassis',
+					'url' => 'hostinventoriesoverview.php?&form_refresh=1&groupid=78&groupby=chassis',
 					'title' => 'Host inventory overview',
 					'errors' => array(
 						'ERROR: No permissions to referred object or it does not exist!'
@@ -907,7 +1112,7 @@ class testLinkProperties extends CWebTest {
 			array(
 				array(
 					'expected' => LINK_BAD,
-					'login' => 'hostinventoriesoverview.php?&form_refresh=1&groupid=abc&groupby=chassis',
+					'url' => 'hostinventoriesoverview.php?&form_refresh=1&groupid=abc&groupby=chassis',
 					'title' => 'Host inventory overview',
 					'errors' => array(
 						'ERROR: Zabbix has received an incorrect request.',
@@ -918,11 +1123,22 @@ class testLinkProperties extends CWebTest {
 			array(
 				array(
 					'expected' => LINK_BAD,
-					'login' => 'hostinventoriesoverview.php?&form_refresh=1&groupid=&groupby=chassis',
+					'url' => 'hostinventoriesoverview.php?&form_refresh=1&groupid=&groupby=chassis',
 					'title' => 'Host inventory overview',
 					'errors' => array(
 						'ERROR: Zabbix has received an incorrect request.',
 						'Critical error. Field "groupid" is not string.'
+					)
+				)
+			),
+			array(
+				array(
+					'expected' => LINK_BAD,
+					'url' => 'hostinventoriesoverview.php?&form_refresh=1',
+					'title' => 'Host inventory overview',
+					'errors' => array(
+						'ERROR: Zabbix has received an incorrect request.',
+						'Critical error. Field "groupid" is mandatory.'
 					)
 				)
 			),
@@ -930,7 +1146,7 @@ class testLinkProperties extends CWebTest {
 			array(
 				array(
 					'expected' => LINK_GOOD,
-					'login' => 'hostinventories.php?&form_refresh=1&groupid=50003',
+					'url' => 'hostinventories.php?&form_refresh=1&groupid=50003',
 					'title' => 'Host inventories',
 					'text' => 'HOST INVENTORIES'
 				)
@@ -938,7 +1154,7 @@ class testLinkProperties extends CWebTest {
 			array(
 				array(
 					'expected' => LINK_BAD,
-					'login' => 'hostinventories.php?&form_refresh=1&groupid=1111',
+					'url' => 'hostinventories.php?&form_refresh=1&groupid=1111',
 					'title' => 'Host inventories',
 					'errors' => array(
 						'ERROR: No permissions to referred object or it does not exist!'
@@ -948,7 +1164,7 @@ class testLinkProperties extends CWebTest {
 			array(
 				array(
 					'expected' => LINK_BAD,
-					'login' => 'hostinventories.php?&form_refresh=1&groupid=abc',
+					'url' => 'hostinventories.php?&form_refresh=1&groupid=abc',
 					'title' => 'Host inventories',
 					'errors' => array(
 						'ERROR: Zabbix has received an incorrect request.',
@@ -959,11 +1175,22 @@ class testLinkProperties extends CWebTest {
 			array(
 				array(
 					'expected' => LINK_BAD,
-					'login' => 'hostinventories.php?&form_refresh=1&groupid=',
+					'url' => 'hostinventories.php?&form_refresh=1&groupid=',
 					'title' => 'Host inventories',
 					'errors' => array(
 						'ERROR: Zabbix has received an incorrect request.',
 						'Critical error. Field "groupid" is not integer.'
+					)
+				)
+			),
+			array(
+				array(
+					'expected' => LINK_BAD,
+					'url' => 'hostinventories.php?&form_refresh=1',
+					'title' => 'Host inventories',
+					'errors' => array(
+						'ERROR: Zabbix has received an incorrect request.',
+						'Critical error. Field "groupid" is mandatory.'
 					)
 				)
 			),
@@ -971,7 +1198,7 @@ class testLinkProperties extends CWebTest {
 			array(
 				array(
 					'expected' => LINK_GOOD,
-					'login' => 'report2.php?filter_groupid=0&filter_hostid=50001&triggerid=16012',
+					'url' => 'report2.php?filter_groupid=0&filter_hostid=50001&triggerid=16012',
 					'title' => 'Availability report',
 					'text' => 'AVAILABILITY REPORT'
 				)
@@ -979,7 +1206,7 @@ class testLinkProperties extends CWebTest {
 			array(
 				array(
 					'expected' => LINK_BAD,
-					'login' => 'report2.php?filter_groupid=0&filter_hostid=11111&triggerid=16012',
+					'url' => 'report2.php?filter_groupid=0&filter_hostid=11111&triggerid=16012',
 					'title' => 'Availability report',
 					'errors' => array(
 						'ERROR: No permissions to referred object or it does not exist!'
@@ -989,7 +1216,7 @@ class testLinkProperties extends CWebTest {
 			array(
 				array(
 					'expected' => LINK_BAD,
-					'login' => 'report2.php?filter_groupid=0&filter_hostid=50001&triggerid=11111',
+					'url' => 'report2.php?filter_groupid=0&filter_hostid=50001&triggerid=11111',
 					'title' => 'Availability report',
 					'errors' => array(
 						'ERROR: No permissions to referred object or it does not exist!'
@@ -999,7 +1226,7 @@ class testLinkProperties extends CWebTest {
 			array(
 				array(
 					'expected' => LINK_BAD,
-					'login' => 'report2.php?filter_groupid=11111&filter_hostid=50001&triggerid=16012',
+					'url' => 'report2.php?filter_groupid=11111&filter_hostid=50001&triggerid=16012',
 					'title' => 'Availability report',
 					'errors' => array(
 						'ERROR: No permissions to referred object or it does not exist!'
@@ -1009,7 +1236,7 @@ class testLinkProperties extends CWebTest {
 			array(
 				array(
 					'expected' => LINK_BAD,
-					'login' => 'report2.php?filter_groupid=abc&filter_hostid=abc&triggerid=abc',
+					'url' => 'report2.php?filter_groupid=abc&filter_hostid=abc&triggerid=abc',
 					'title' => 'Availability report',
 					'errors' => array(
 						'ERROR: Zabbix has received an incorrect request.',
@@ -1022,13 +1249,26 @@ class testLinkProperties extends CWebTest {
 			array(
 				array(
 					'expected' => LINK_BAD,
-					'login' => 'report2.php?filter_groupid=&filter_hostid=&triggerid=',
+					'url' => 'report2.php?filter_groupid=&filter_hostid=&triggerid=',
 					'title' => 'Availability report',
 					'errors' => array(
 						'ERROR: Zabbix has received an incorrect request.',
 						'Critical error. Field "triggerid" is not integer.',
 						'Critical error. Field "filter_groupid" is not integer.',
 						'Critical error. Field "filter_hostid" is not integer.'
+					)
+				)
+			),
+			array(
+				array(
+					'expected' => LINK_BAD,
+					'url' => 'report2.php?',
+					'title' => 'Availability report',
+					'errors' => array(
+						'ERROR: Zabbix has received an incorrect request.',
+						'Critical error. Field "triggerid" is mandatory.',
+						'Critical error. Field "filter_groupid" is mandatory.',
+						'Critical error. Field "filter_hostid" is mandatory.'
 					)
 				)
 			),
@@ -1036,15 +1276,34 @@ class testLinkProperties extends CWebTest {
 			array(
 				array(
 					'expected' => LINK_GOOD,
-					'login' => 'report6.php?&form_refresh=1&form=1&config=1&items[0][caption]=item1&items[0][itemid]=24338&items[0][color]=009900&items[0][calc_fnc]=2&items[0][axisside]=0&report_timesince=20130722170101&report_timetill=20130723170101&title=Report+1&xlabel=&ylabel=&scaletype=3&report_timesince_day=22&report_timesince_month=07&report_timesince_year=2013&report_timesince_hour=17&report_timesince_minute=01&report_timetill_day=23&report_timetill_month=07&report_timetill_year=2013&report_timetill_hour=17&report_timetill_minute=01&report_show=Show',
-					'title' => 'Bar reports',
+					'url' => 'report6.php?items[0][caption]=Agent+ping&items[0][itemid]=23455&items[0][color]=009900&items[0][calc_fnc]=2&items[0][axisside]=0&report_show=Show',
 					'text' => 'Report'
 				)
 			),
 			array(
 				array(
 					'expected' => LINK_BAD,
-					'login' => 'report6.php?&form_refresh=1&form=1&config=1&items[0][caption]=item1&items[0][itemid]=11111&items[0][color]=009900&items[0][calc_fnc]=2&items[0][axisside]=0&report_timesince=20130722170101&report_timetill=20130723170101&title=Report+1&xlabel=&ylabel=&scaletype=3&report_timesince_day=22&report_timesince_month=07&report_timesince_year=2013&report_timesince_hour=17&report_timesince_minute=01&report_timetill_day=23&report_timetill_month=07&report_timetill_year=2013&report_timetill_hour=17&report_timetill_minute=01&report_show=Show',
+					'url' => 'report6.php?items[0][caption]=Agent+ping&items[0][itemid]=11111&items[0][color]=009900&items[0][calc_fnc]=2&items[0][axisside]=0&report_show=Show',
+					'title' => 'Bar reports',
+					'errors' => array(
+						'ERROR: No permissions to referred object or it does not exist!'
+					)
+				)
+			),
+			array(
+				array(
+					'expected' => LINK_BAD,
+					'url' => 'report6.php?items[0][caption]=Agent+ping&items[0][itemid]=abc&items[0][color]=009900&items[0][calc_fnc]=2&items[0][axisside]=0&report_show=Show',
+					'title' => 'Bar reports',
+					'errors' => array(
+						'ERROR: No permissions to referred object or it does not exist!'
+					)
+				)
+			),
+			array(
+				array(
+					'expected' => LINK_BAD,
+					'url' => 'report6.php?items[0][caption]=Agent+ping&items[0][itemid]=&items[0][color]=009900&items[0][calc_fnc]=2&items[0][axisside]=0&report_show=Show',
 					'title' => 'Bar reports',
 					'errors' => array(
 						'ERROR: No permissions to referred object or it does not exist!'
@@ -1057,8 +1316,8 @@ class testLinkProperties extends CWebTest {
 	/**
 	 * @dataProvider zbx_data
 	 */
-	public function testLinkProperties_linkLoad($zbx_data) {
-		$this->zbxTestLogin($zbx_data['login']);
+	public function testUrlParameters_UrlLoad($zbx_data) {
+		$this->zbxTestOpen($zbx_data['url']);
 		switch ($zbx_data['expected']) {
 			case LINK_GOOD:
 				$this->checkTitle($zbx_data['title']);
