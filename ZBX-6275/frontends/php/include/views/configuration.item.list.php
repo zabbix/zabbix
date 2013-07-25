@@ -54,6 +54,10 @@ if (!empty($this->data['hostid'])) {
 	$itemForm->addVar('hostid', $this->data['hostid']);
 }
 
+$showErrorColumn = !(isset($this->data['host'])
+					&& isset($this->data['host']['status'])
+					&& $this->data['host']['status'] == HOST_STATUS_TEMPLATE);
+
 // create table
 $itemTable = new CTableInfo(_('No items defined.'));
 $itemTable->setHeader(array(
@@ -69,9 +73,8 @@ $itemTable->setHeader(array(
 	make_sorting_header(_('Type'), 'type'),
 	_('Applications'),
 	make_sorting_header(_('Status'), 'status'),
-	$this->get('host_status') != HOST_STATUS_TEMPLATE ? _('Error') : null
+	$showErrorColumn ? _('Error') : null
 ));
-
 foreach ($this->data['items'] as $item) {
 	// description
 	$description = array();
@@ -245,7 +248,9 @@ foreach ($this->data['items'] as $item) {
 
 	$checkBox = new CCheckBox('group_itemid['.$item['itemid'].']', null, null, $item['itemid']);
 	$checkBox->setEnabled(empty($item['discoveryRule']));
-
+//	echo "<pre>";
+//	print_r($this->data);
+//	echo "</pre>"
 	$itemTable->addRow(array(
 		$checkBox,
 		$menuIcon,
@@ -259,7 +264,7 @@ foreach ($this->data['items'] as $item) {
 		item_type2str($item['type']),
 		new CCol(CHtml::encode($item['applications_list']), 'wraptext'),
 		$status,
-		$this->get('host_status') != HOST_STATUS_TEMPLATE ? $statusIcons : null
+		$showErrorColumn ? $statusIcons : null
 	));
 }
 

@@ -444,13 +444,7 @@ else {
 	// get real hosts
 	$data['realHosts'] = getParentHostsByTriggers($data['triggers']);
 
-	// for determine is the host template
-	if (!empty($hosts)) {
-		$host = reset($hosts);
-		$data['host_status'] = $host['status'];
-	}else{
-		$data['host_status'] = 0;
-	}
+	$data['host'] = empty($hosts) ? array() : reset($hosts);
 
 	// render view
 	$triggersView = new CView('configuration.triggers.list', $data);

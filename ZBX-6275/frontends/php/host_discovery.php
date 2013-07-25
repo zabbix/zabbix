@@ -317,7 +317,8 @@ else {
 		'selectGraphs' => API_OUTPUT_COUNT,
 		'selectTriggers' => API_OUTPUT_COUNT,
 		'sortfield' => $sortfield,
-		'limit' => $config['search_limit'] + 1
+		'limit' => $config['search_limit'] + 1,
+		'host' => empty($hosts) ? array() : reset($hosts)
 	));
 	if (!empty($data['discoveries'])) {
 		order_result($data['discoveries'], $sortfield, getPageSortOrder());
@@ -325,14 +326,6 @@ else {
 
 	// paging
 	$data['paging'] = getPagingLine($data['discoveries']);
-
-	// for determine is the host template
-	if (!empty($hosts)) {
-		$host = reset($hosts);
-		$data['host_status'] = $host['status'];
-	}else{
-		$data['host_status'] = 0;
-	}
 
 	// render view
 	$discoveryView = new CView('configuration.host.discovery.list', $data);
