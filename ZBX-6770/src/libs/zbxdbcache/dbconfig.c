@@ -4615,8 +4615,6 @@ void	DCget_user_macro(zbx_uint64_t *hostids, int host_num, const char *macro, ch
  * Parameters: hosts     - [OUT] a vector of host identifiers                 *
  *             triggerid - [IN] the source triggger id                        *
  *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  ******************************************************************************/
 void	DCget_trigger_hosts(zbx_vector_uint64_t *hosts, zbx_uint64_t triggerid)
 {
