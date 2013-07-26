@@ -886,23 +886,26 @@ function convertToBase1024 ($value, $step = false) {
 		}
 	}
 
-	if ($valData['pow'] >= 0) {
-		if ($valData['value'] != 0) {
-			$valData['value'] = bcdiv(sprintf('%.10f',$value), sprintf('%.10f', $valData['value']),
-				ZBX_PRECISION_10);
+	if (round($valData['value'], ZBX_UNITS_ROUNDOFF_LOWER_LIMIT) > 0) {
+		if ($valData['pow'] >= 0) {
+			$valData['value'] = bcdiv(sprintf('%.6f',$value), sprintf('%.6f', $valData['value']),
+				ZBX_UNITS_ROUNDOFF_LOWER_LIMIT);
 
-			$valData['value'] = sprintf('%.10f', round(bcmul($valData['value'], bcpow(1024, $valData['pow'])),
-				ZBX_PRECISION_10));
+			$valData['value'] = sprintf('%.6f', round(bcmul($valData['value'], bcpow(1024, $valData['pow'])),
+				ZBX_UNITS_ROUNDOFF_UPPER_LIMIT));
+		}
+		else {
+			$valData['value'] = bcmul(sprintf('%.10f',$value), sprintf('%.10f', $valData['value']), ZBX_PRECISION_10);
+
+			for ($i = 0; $i > $valData['pow']; $i--) {
+				$valData['value'] = bcdiv(bcmul($valData['value'], 1000, ZBX_PRECISION_10), 1.024, ZBX_PRECISION_10);
+			}
+
+			$valData['value'] = sprintf('%.10f', $valData['value']);
 		}
 	}
 	else {
-		$valData['pow'] = 0;
-		if (round($valData['value'], ZBX_UNITS_ROUNDOFF_LOWER_LIMIT) > 0) {
-			$valData['value'] = $value;
-		}
-		else {
-			$valData['value'] = 0;
-		}
+		$valData['value'] = 0;
 	}
 
 	return $valData;
@@ -955,27 +958,4 @@ function getBase1024Interval($interval, $minY, $maxY) {
 	}
 
 	return $interval;
-}
-
-/**
- * Returns digit count for the item with most digit after point in given array.
- * Example:
- *	Input: array(0, 0.1, 0.25, 0.005)
- *	Return 3
- *
- * @param array $calcValues
- *
- * @return int
- */
-function calcMaxLengthAfterDot($calcValues) {
-	$maxLength = 0;
-
-	foreach ($calcValues as $calcValue) {
-		preg_match('/^-?[0-9].?([0-9]*)\s?/', $calcValue, $matches);
-		if ($matches['1'] != 0 && strlen($matches['1']) > $maxLength) {
-			$maxLength = strlen($matches['1']);
-		}
-	}
-
-	return $maxLength;
 }

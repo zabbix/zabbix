@@ -900,8 +900,7 @@ else {
 		'form' => get_request('form'),
 		'hostid' => get_request('hostid'),
 		'sortfield' => getPageSortField('name'),
-		'host' => empty($host) ? array() : $host,
-		'displayNodes' => (is_array(get_current_nodeid()) && empty($_REQUEST['filter_groupid']) && empty($_REQUEST['filter_hostid']))
+		'host' => empty($host) ? array() : $host
 	);
 
 	// items
@@ -1101,13 +1100,6 @@ else {
 		'preservekeys' => true
 	));
 	$data['triggerRealHosts'] = getParentHostsByTriggers($data['itemTriggers']);
-
-	// nodes
-	if ($data['displayNodes']) {
-		foreach ($data['items'] as $key => $item) {
-			$data['items'][$key]['nodename'] = get_node_name_by_elid($item['itemid'], true);
-		}
-	}
 
 	// render view
 	$itemView = new CView('configuration.item.list', $data);

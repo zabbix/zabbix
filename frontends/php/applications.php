@@ -259,12 +259,11 @@ else {
 			'hosts' => array('editable' => true, 'templated_hosts' => true),
 			'hostid' => get_request('hostid'),
 			'groupid' => get_request('groupid')
-		))
+		)),
+		'displayNodes' => is_array(get_current_nodeid())
 	);
 	$data['groupid'] = $data['pageFilter']->groupid;
 	$data['hostid'] = $data['pageFilter']->hostid;
-	$data['displayNodes'] = (is_array(get_current_nodeid())
-		&& $data['pageFilter']->groupid == 0 && $data['pageFilter']->hostid == 0);
 
 	if ($data['pageFilter']->hostsSelected) {
 		// get application ids
