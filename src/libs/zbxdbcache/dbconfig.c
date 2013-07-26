@@ -4951,3 +4951,36 @@ double	DCget_required_performance()
 
 	return nvps;
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DCget_functions_hostids                                          *
+ *                                                                            *
+ * Purpose: get hosts with items associated with a set of functions           *
+ *                                                                            *
+ * Parameters: hosts       - [OUT] a vector of host identifiers               *
+ *             functionids - [IN] a vector containing source function ids     *
+ *                                                                            *
+ ******************************************************************************/
+void	DCget_functions_hostids(zbx_vector_uint64_t *hosts, const zbx_vector_uint64_t *functionids)
+{
+	ZBX_DC_FUNCTION		*function;
+	ZBX_DC_ITEM		*item;
+	int			i;
+
+	LOCK_CACHE;
+
+	for (i = 0; i < functionids->values_num; i++)
+	{
+		if (NULL == (function = zbx_hashset_search(&config->functions, &functionids->values[i])))
+			continue;
+
+		if (NULL != (item = zbx_hashset_search(&config->items, &function->itemid)))
+			zbx_vector_uint64_append(hosts, item->hostid);
+	}
+
+	UNLOCK_CACHE;
+
+	zbx_vector_uint64_sort(hosts, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	zbx_vector_uint64_uniq(hosts, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+}
