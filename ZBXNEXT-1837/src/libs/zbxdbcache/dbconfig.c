@@ -28,6 +28,7 @@
 #include "zbxserver.h"
 #include "zbxalgo.h"
 #include "dbcache.h"
+#include "zbxregexp.h"
 
 static int	sync_in_progress = 0;
 #define	LOCK_CACHE	if (0 == sync_in_progress) zbx_mutex_lock(&config_lock)
@@ -317,6 +318,23 @@ ZBX_DC_INTERFACE_ITEM;
 
 typedef struct
 {
+	const char		*name;
+	zbx_vector_uint64_t	expressionids;
+}
+ZBX_DC_REGEXP;
+
+typedef struct
+{
+	zbx_uint64_t	expressionid;
+	const char	*expression;
+	char		delimiter;
+	unsigned char	type;
+	unsigned char	case_sensitive;
+}
+ZBX_DC_EXPRESSION;
+
+typedef struct
+{
 	const char	*severity_name[TRIGGER_SEVERITY_COUNT];
 	zbx_uint64_t	discovery_groupid;
 	int		refresh_unsupported;
@@ -358,6 +376,8 @@ typedef struct
 	zbx_hashset_t		interfaces_ht;		/* hostid, type */
 	zbx_hashset_t		interface_snmpaddrs;	/* addr, interfaceids for SNMP interfaces */
 	zbx_hashset_t		interface_snmpitems;	/* interfaceid, itemids for SNMP trap items */
+	zbx_hashset_t		regexps;
+	zbx_hashset_t		expressions;
 	zbx_binary_heap_t	queues[ZBX_POLLER_TYPE_COUNT];
 	zbx_binary_heap_t	pqueue;
 	ZBX_DC_CONFIG_TABLE	*config;
@@ -2302,12 +2322,101 @@ static void	DCsync_interfaces(DB_RESULT result)
 
 /******************************************************************************
  *                                                                            *
+ * Function: DCsync_expressions                                               *
+ *                                                                            *
+ * Purpose: Updates expressions configuration cache                           *
+ *                                                                            *
+ * Parameters: result - [IN] the result of expressions database select        *
+ *                                                                            *
+ ******************************************************************************/
+static void	DCsync_expressions(DB_RESULT result)
+{
+	const char		*__function_name = "DCsync_expressions";
+	DB_ROW			row;
+	zbx_hashset_iter_t	iter;
+	ZBX_DC_EXPRESSION	*expression;
+	ZBX_DC_REGEXP		*regexp;
+	zbx_vector_uint64_t	ids;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	zbx_vector_uint64_create(&ids);
+
+	zbx_hashset_iter_reset(&config->regexps, &iter);
+
+	/* reset regexp -> expressions mapping */
+	while (NULL != (regexp = zbx_hashset_iter_next(&iter)))
+		regexp->expressionids.values_num = 0;
+
+	/* update expressions from db */
+	while (NULL != (row = DBfetch(result)))
+	{
+		ZBX_DC_REGEXP	new_regexp = {row[0]};
+		zbx_uint64_t	expressionid;
+		int 		found;
+
+		if (NULL == (regexp = zbx_hashset_search(&config->regexps, &new_regexp)))
+		{
+			DCstrpool_replace(0, &new_regexp.name, row[0]);
+			zbx_vector_uint64_create_ext(&new_regexp.expressionids,
+					__config_mem_malloc_func,
+					__config_mem_realloc_func,
+					__config_mem_free_func);
+
+			regexp = zbx_hashset_insert(&config->regexps, &new_regexp, sizeof(ZBX_DC_REGEXP));
+		}
+
+		ZBX_STR2UINT64(expressionid, row[1]);
+		zbx_vector_uint64_append(&regexp->expressionids, expressionid);
+
+		expression = DCfind_id(&config->expressions, expressionid, sizeof(ZBX_DC_EXPRESSION), &found);
+		DCstrpool_replace(found, &expression->expression, row[2]);
+		expression->type = atoi(row[3]);
+		expression->delimiter = *row[4];
+		expression->case_sensitive = atoi(row[5]);
+
+		zbx_vector_uint64_append(&ids, expressionid);
+	}
+
+	/* remove regexps with no expressions related to it */
+	zbx_hashset_iter_reset(&config->regexps, &iter);
+
+	while (NULL != (regexp = zbx_hashset_iter_next(&iter)))
+	{
+		if (0 < regexp->expressionids.values_num)
+			continue;
+
+		zbx_strpool_release(regexp->name);
+		zbx_vector_uint64_destroy(&regexp->expressionids);
+		zbx_hashset_iter_remove(&iter);
+	}
+
+	/* remove unused expressions */
+	zbx_vector_uint64_sort(&ids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	zbx_hashset_iter_reset(&config->expressions, &iter);
+
+	while (NULL != (expression = zbx_hashset_iter_next(&iter)))
+	{
+		if (FAIL != zbx_vector_uint64_bsearch(&ids, expression->expressionid, ZBX_DEFAULT_UINT64_COMPARE_FUNC))
+			continue;
+
+		zbx_strpool_release(expression->expression);
+		zbx_hashset_iter_remove(&iter);
+	}
+
+	zbx_vector_uint64_destroy(&ids);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+}
+
+
+/******************************************************************************
+ *                                                                            *
  * Function: DCsync_config_select                                             *
  *                                                                            *
  * Purpose: Executes SQL select statement used to synchronize configuration   *
  *          data with DCsync_config()                                         *
  *                                                                            *
- * Author: Andris Zeila                                                       *
  *                                                                            *
  ******************************************************************************/
 static DB_RESULT	DCsync_config_select()
@@ -2349,10 +2458,12 @@ void	DCsync_configuration()
 	DB_RESULT		hmacro_result;
 	DB_RESULT		if_result;
 	DB_RESULT		conf_result;
+	DB_RESULT		expr_result;
 
 	int			i;
 	double			sec, csec, isec, tsec, dsec, fsec, hsec, htsec, gmsec, hmsec, ifsec,
-				csec2, isec2, tsec2, dsec2, fsec2, hsec2, htsec2, gmsec2, hmsec2, ifsec2, total2;
+				csec2, isec2, tsec2, dsec2, fsec2, hsec2, htsec2, gmsec2, hmsec2, ifsec2, total2,
+				expr_sec, expr_sec2;
 	const zbx_strpool_t	*strpool;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
@@ -2476,6 +2587,14 @@ void	DCsync_configuration()
 			DBwhere_node_local("interfaceid"));
 	ifsec = zbx_time() - sec;
 
+	sec = zbx_time();
+	expr_result = DBselect(
+			"select r.name,e.expressionid,e.expression,e.expression_type,e.exp_delimiter,e.case_sensitive"
+			" from regexps r,expressions e"
+				" where r.regexpid=e.regexpid" ZBX_SQL_NODE,
+			DBand_node_local("r.regexpid"));
+	expr_sec = zbx_time() - sec;
+
 	START_SYNC;
 
 	sec = zbx_time();
@@ -2518,22 +2637,38 @@ void	DCsync_configuration()
 	DCsync_interfaces(if_result);	/* resolves macros for interface_snmpaddrs, must be after DCsync_hmacros() */
 	ifsec2 = zbx_time() - sec;
 
+	sec = zbx_time();
+	DCsync_expressions(expr_result);
+	expr_sec2 = zbx_time() - sec;
+
 	strpool = zbx_strpool_info();
 
-	total2 = csec2 + isec2 + tsec2 + dsec2 + fsec2 + hsec2 + htsec2 + gmsec2 + hmsec2 + ifsec2;
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() config     : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec.", __function_name, csec, csec2);
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() items      : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec.", __function_name, isec, isec2);
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() triggers   : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec.", __function_name, tsec, tsec2);
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() trigdeps   : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec.", __function_name, dsec, dsec2);
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() functions  : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec.", __function_name, fsec, fsec2);
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() hosts      : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec.", __function_name, hsec, hsec2);
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() templates  : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec.", __function_name, htsec, htsec2);
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() globmacros : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec.", __function_name, gmsec, gmsec2);
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() hostmacros : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec.", __function_name, hmsec, hmsec2);
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() interfaces : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec.", __function_name, ifsec, ifsec2);
+	total2 = csec2 + isec2 + tsec2 + dsec2 + fsec2 + hsec2 + htsec2 + gmsec2 + hmsec2 + ifsec2 + expr_sec2;
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() config     : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec.", __function_name,
+			csec, csec2);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() items      : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec.", __function_name,
+			isec, isec2);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() triggers   : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec.", __function_name,
+			tsec, tsec2);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() trigdeps   : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec.", __function_name,
+			dsec, dsec2);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() functions  : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec.", __function_name,
+			fsec, fsec2);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() hosts      : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec.", __function_name,
+			hsec, hsec2);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() templates  : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec.", __function_name,
+			htsec, htsec2);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() globmacros : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec.", __function_name,
+			gmsec, gmsec2);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() hostmacros : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec.", __function_name,
+			hmsec, hmsec2);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() interfaces : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec.", __function_name,
+			ifsec, ifsec2);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() expressions: sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec.", __function_name,
+			expr_sec, expr_sec2);
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() total sync : " ZBX_FS_DBL " sec.", __function_name, total2);
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() total      : " ZBX_FS_DBL " sec.", __function_name,
-			csec + isec + tsec + dsec + fsec + hsec + htsec + gmsec + hmsec + ifsec + total2);
+			csec + isec + tsec + dsec + fsec + hsec + htsec + gmsec + hmsec + ifsec + expr_sec + total2);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() items      : %d (%d slots)", __function_name,
 			config->items.num_data, config->items.num_slots);
@@ -2598,6 +2733,8 @@ void	DCsync_configuration()
 			config->interface_snmpitems.num_data, config->interface_snmpitems.num_slots);
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() if_snmpaddr: %d (%d slots)", __function_name,
 			config->interface_snmpaddrs.num_data, config->interface_snmpaddrs.num_slots);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() expressions: %d (%d slots)", __function_name,
+			config->expressions.num_data, config->expressions.num_slots);
 
 	for (i = 0; ZBX_POLLER_TYPE_COUNT > i; i++)
 	{
@@ -2873,6 +3010,22 @@ static int	__config_proxy_compare(const void *d1, const void *d2)
 	return 0;
 }
 
+/* hash and compare functitions for expressions hashset */
+static zbx_hash_t	__config_regexp_hash(const void *data)
+{
+	const ZBX_DC_REGEXP	*regexp = (const ZBX_DC_REGEXP *)data;
+
+	return ZBX_DEFAULT_STRING_HASH_FUNC(regexp->name);
+}
+
+static int	__config_regexp_compare(const void *d1, const void *d2)
+{
+	const ZBX_DC_REGEXP	*r1 = (const ZBX_DC_REGEXP *)d1;
+	const ZBX_DC_REGEXP	*r2 = (const ZBX_DC_REGEXP *)d2;
+
+	return r1->name == r2->name ? 0 : strcmp(r1->name, r2->name);
+}
+
 void	init_configuration_cache()
 {
 	const char	*__function_name = "init_configuration_cache";
@@ -2940,6 +3093,7 @@ void	init_configuration_cache()
 	CREATE_HASHSET(config->hmacros);
 	CREATE_HASHSET(config->interfaces);
 	CREATE_HASHSET(config->interface_snmpitems);
+	CREATE_HASHSET(config->expressions);
 
 	CREATE_HASHSET_EXT(config->items_hk, __config_item_hk_hash, __config_item_hk_compare);
 	CREATE_HASHSET_EXT(config->hosts_ph, __config_host_ph_hash, __config_host_ph_compare);
@@ -2947,6 +3101,7 @@ void	init_configuration_cache()
 	CREATE_HASHSET_EXT(config->hmacros_hm, __config_hmacro_hm_hash, __config_hmacro_hm_compare);
 	CREATE_HASHSET_EXT(config->interfaces_ht, __config_interface_ht_hash, __config_interface_ht_compare);
 	CREATE_HASHSET_EXT(config->interface_snmpaddrs, __config_interface_addr_hash, __config_interface_addr_compare);
+	CREATE_HASHSET_EXT(config->regexps, __config_regexp_hash, __config_regexp_compare);
 
 	for (i = 0; i < CONFIG_TIMER_FORKS; i++)
 	{
@@ -4840,3 +4995,57 @@ int	DCget_item_queue(zbx_vector_ptr_t *queue, int from, int to)
 
 	return nitems;
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DCget_expressions                                                *
+ *                                                                            *
+ * Purpose: retrieves stored expression data from cache                       *
+ *                                                                            *
+ * Parameters: expressions  - [OUT] a vector of expression data pointers      *
+ *             name         - [IN] the regular expression name                *
+ *                                                                            *
+ * Comment: The expressions vector contains allocated data, which must be     *
+ *          freed afterwards with zbx_regexp_clean_expressions() function.    *
+ *                                                                            *
+ ******************************************************************************/
+void	DCget_expressions(zbx_vector_ptr_t *expressions, const char *name)
+{
+	int			i, success = 0;
+	ZBX_DC_EXPRESSION	*expression;
+	ZBX_DC_REGEXP		*regexp, search_regexp = {name};
+
+	for (i = 0; i < expressions->values_num; i++)
+	{
+		zbx_expression_t	*rxp = expressions->values[i];
+
+		if (0 == strcmp(rxp->name, name))
+			return;
+	}
+
+	LOCK_CACHE;
+
+	if (NULL != (regexp = zbx_hashset_search(&config->regexps, &search_regexp)))
+	{
+		for (i = 0; i < regexp->expressionids.values_num; i++)
+		{
+			zbx_uint64_t		expressionid = regexp->expressionids.values[i];
+			zbx_expression_t	*rxp;
+
+			if (NULL == (expression = zbx_hashset_search(&config->expressions, &expressionid)))
+				continue;
+
+			rxp = zbx_malloc(NULL, sizeof(zbx_expression_t));
+			zbx_strlcpy(rxp->name, regexp->name, sizeof(rxp->name));
+			zbx_strlcpy(rxp->expression, expression->expression, sizeof(rxp->expression));
+			rxp->exp_delimiter = expression->delimiter;
+			rxp->case_sensitive = expression->case_sensitive;
+			rxp->expression_type = expression->type;
+
+			zbx_vector_ptr_append(expressions, rxp);
+		}
+	}
+
+	UNLOCK_CACHE;
+}
+

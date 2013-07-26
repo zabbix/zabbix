@@ -22,6 +22,7 @@
 #include "log.h"
 #include "zbxalgo.h"
 #include "zbxserver.h"
+#include "zbxregexp.h"
 
 typedef struct
 {
@@ -1389,8 +1390,8 @@ static void	DBlld_remove_lost_resources(zbx_vector_ptr_t *items, unsigned short 
  *                                                                            *
  ******************************************************************************/
 void	DBlld_update_items(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, struct zbx_json_parse *jp_data, char **error,
-		const char *f_macro, const char *f_regexp, ZBX_REGEXP *regexps, int regexps_num,
-		unsigned short lifetime, int lastcheck)
+		const char *f_macro, const char *f_regexp, zbx_vector_ptr_t *regexps, unsigned short lifetime,
+		int lastcheck)
 {
 	const char		*__function_name = "DBlld_update_items";
 
@@ -1484,7 +1485,7 @@ void	DBlld_update_items(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, struct zbx
 			if (FAIL == zbx_json_brackets_open(p, &jp_row))
 				continue;
 
-			if (SUCCEED != lld_check_record(&jp_row, f_macro, f_regexp, regexps, regexps_num))
+			if (SUCCEED != lld_check_record(&jp_row, f_macro, f_regexp, regexps))
 				continue;
 
 			DBlld_item_make(&items, name_proto, key_proto, params_proto, snmp_oid_proto, description_proto,

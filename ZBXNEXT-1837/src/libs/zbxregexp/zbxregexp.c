@@ -18,6 +18,7 @@
 **/
 
 #include "common.h"
+#include "zbxregexp.h"
 
 #if defined(_WINDOWS)
 #	include "gnuregex.h"
@@ -79,8 +80,6 @@ char	*zbx_iregexp_match(const char *string, const char *pattern, int *len)
  *             nmatch          - [IN] the number of items in captured group data *
  *                                                                               *
  * Return value: Allocated string containing output value                        *
- *                                                                               *
- * Author: Andris Zeila                                                          *
  *                                                                               *
  *********************************************************************************/
 static char	*regexp_sub_replace(const char *text, const char *output_template, regmatch_t *match, size_t nmatch)
@@ -173,8 +172,6 @@ out:
  *               string matches the specified regular expression or NULL         *
  *               otherwise.                                                      *
  *                                                                               *
- * Author: Andris Zeila                                                          *
- *                                                                               *
  *********************************************************************************/
 static char	*regexp_sub(const char *string, const char *pattern, const char *output_template, int flags)
 {
@@ -220,8 +217,6 @@ static char	*regexp_sub(const char *string, const char *pattern, const char *out
  *                                                                               *
  * Comments: This function performs case sensitive match                         *
  *                                                                               *
- * Author: Andris Zeila                                                          *
- *                                                                               *
  *********************************************************************************/
 char	*zbx_regexp_sub(const char *string, const char *pattern, const char *output_template)
 {
@@ -235,46 +230,47 @@ char	*zbx_regexp_sub(const char *string, const char *pattern, const char *output
  * Purpose: This function is similar to zbx_regexp_sub() with exception that     *
  *          multiline matches are accepted.                                      *
  *                                                                               *
- * Author: Andris Zeila                                                          *
- *                                                                               *
  *********************************************************************************/
 char	*zbx_mregexp_sub(const char *string, const char *pattern, const char *output_template)
 {
 	return regexp_sub(string, pattern, output_template, REG_EXTENDED);
 }
 
-void	clean_regexps_ex(ZBX_REGEXP *regexps, int *regexps_num)
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_regexp_clean_expressions                                     *
+ *                                                                            *
+ * Purpose: frees expression data retrieved by DCget_expressions function or  *
+ *          prepared with add_regexp_ex() function calls                      *
+ *                                                                            *
+ * Parameters: expressions  - [IN] a vector of expression data pointers       *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_regexp_clean_expressions(zbx_vector_ptr_t *expressions)
 {
 	int	i;
 
-	for (i = 0; i < *regexps_num; i++)
-	{
-		zbx_free(regexps[i].name);
-		zbx_free(regexps[i].expression);
-	}
+	for (i = 0; i < expressions->values_num; i++)
+		zbx_free(expressions->values[i]);
 
-	*regexps_num = 0;
+	expressions->values_num = 0;
 }
 
-void	add_regexp_ex(ZBX_REGEXP **regexps, int *regexps_alloc, int *regexps_num,
-		const char *name, const char *expression, int expression_type, char exp_delimiter, int case_sensitive)
+void	add_regexp_ex(zbx_vector_ptr_t *regexps, const char *name, const char *expression, int expression_type,
+		char exp_delimiter, int case_sensitive)
 {
-	if (*regexps_alloc == *regexps_num)
-	{
-		*regexps_alloc += 16;
-		if (NULL == *regexps)
-			*regexps = zbx_malloc(*regexps, *regexps_alloc * sizeof(ZBX_REGEXP));
-		else
-			*regexps = zbx_realloc(*regexps, *regexps_alloc * sizeof(ZBX_REGEXP));
-	}
+	zbx_expression_t	*regexp;
 
-	(*regexps)[*regexps_num].name = strdup(name);
-	(*regexps)[*regexps_num].expression = strdup(expression);
-	(*regexps)[*regexps_num].expression_type = expression_type;
-	(*regexps)[*regexps_num].exp_delimiter = exp_delimiter;
-	(*regexps)[*regexps_num].case_sensitive = case_sensitive;
+	regexp = zbx_malloc(NULL, sizeof(zbx_expression_t));
 
-	(*regexps_num)++;
+	zbx_strlcpy(regexp->name, name, sizeof(regexp->name));
+	zbx_strlcpy(regexp->expression, expression, sizeof(regexp->expression));
+
+	regexp->expression_type = expression_type;
+	regexp->exp_delimiter = exp_delimiter;
+	regexp->case_sensitive = case_sensitive;
+
+	zbx_vector_ptr_append(regexps, regexp);
 }
 
 
@@ -305,10 +301,8 @@ void	add_regexp_ex(ZBX_REGEXP **regexps, int *regexps_alloc, int *regexps_num,
  *               FAIL    - the string does not match the specified regular        *
  *                         expression                                             *
  *                                                                                *
- * Author: Andris Zeila                                                           *
- *                                                                                *
  **********************************************************************************/
-static int	regexp_match_ex_regsub(const char *string, const char *pattern, zbx_case_sensitive_t cs,
+static int	regexp_match_ex_regsub(const char *string, const char *pattern, int cs,
 		const char *output_template, char **output)
 {
 	char	*ptr = NULL;
@@ -340,10 +334,8 @@ static int	regexp_match_ex_regsub(const char *string, const char *pattern, zbx_c
  * Return value: SUCCEED - string contains the specified substring                *
  *               FAIL    - string does not contain the specified substring        *
  *                                                                                *
- * Author: Andris Zeila                                                           *
- *                                                                                *
  **********************************************************************************/
-static int	regexp_match_ex_substring(const char *string, const char *pattern, zbx_case_sensitive_t cs)
+static int	regexp_match_ex_substring(const char *string, const char *pattern, int cs)
 {
 	char	*ptr = NULL;
 
@@ -377,10 +369,8 @@ static int	regexp_match_ex_substring(const char *string, const char *pattern, zb
  * Return value: SUCCEED - string contains a substring from the list              *
  *               FAIL    - string contains no substrings from the list            *
  *                                                                                *
- * Author: Andris Zeila                                                           *
- *                                                                                *
  **********************************************************************************/
-static int	regexp_match_ex_substring_list(const char *string, char *pattern, zbx_case_sensitive_t cs,
+static int	regexp_match_ex_substring_list(const char *string, char *pattern, int cs,
 		char delimiter)
 {
 	int	ret = FAIL;
@@ -441,11 +431,9 @@ static int	regexp_match_ex_substring_list(const char *string, char *pattern, zbx
  *           output variable. For the other global regular expression types the   *
  *           whole string is stored into output variable.                         *
  *                                                                                *
- * Author: Andris Zeila                                                           *
- *                                                                                *
  **********************************************************************************/
-int	regexp_sub_ex(ZBX_REGEXP *regexps, int regexps_num, const char *string, const char *pattern,
-		zbx_case_sensitive_t cs, const char *output_template, char **output)
+int	regexp_sub_ex(zbx_vector_ptr_t *regexps, const char *string, const char *pattern,
+		int cs, const char *output_template, char **output)
 {
 	int	i, ret = FAIL;
 
@@ -464,39 +452,43 @@ int	regexp_sub_ex(ZBX_REGEXP *regexps, int regexps_num, const char *string, cons
 
 	pattern++;
 
-	for (i = 0; i < regexps_num; i++)
+	for (i = 0; i < regexps->values_num; i++)
 	{
-		if (0 != strcmp(regexps[i].name, pattern))
+		zbx_expression_t	*regexp = regexps->values[i];
+
+		if (0 != strcmp(regexp->name, pattern))
 			continue;
 
 		ret = FAIL;
 
-		switch (regexps[i].expression_type)
+		switch (regexp->expression_type)
 		{
 			case EXPRESSION_TYPE_TRUE:
-				ret = regexp_match_ex_regsub(string, regexps[i].expression, regexps[i].case_sensitive,
+				ret = regexp_match_ex_regsub(string, regexp->expression, regexp->case_sensitive,
 						output_template, output);
 				break;
 			case EXPRESSION_TYPE_FALSE:
-				ret = regexp_match_ex_regsub(string, regexps[i].expression, regexps[i].case_sensitive,
+				ret = regexp_match_ex_regsub(string, regexp->expression, regexp->case_sensitive,
 						NULL, NULL);
 				/* invert output value */
 				ret = (SUCCEED == ret) ? FAIL : SUCCEED;
 				break;
 			case EXPRESSION_TYPE_INCLUDED:
-				ret = regexp_match_ex_substring(string, regexps[i].expression, regexps[i].case_sensitive);
+				ret = regexp_match_ex_substring(string, regexp->expression, regexp->case_sensitive);
 				break;
 			case EXPRESSION_TYPE_NOT_INCLUDED:
-				ret = regexp_match_ex_substring(string, regexps[i].expression, regexps[i].case_sensitive);
+				ret = regexp_match_ex_substring(string, regexp->expression, regexp->case_sensitive);
 				/* invert output value */
 				ret = (SUCCEED == ret) ? FAIL : SUCCEED;
 				break;
 			case EXPRESSION_TYPE_ANY_INCLUDED:
-				ret = regexp_match_ex_substring_list(string, regexps[i].expression, regexps[i].case_sensitive,
-						regexps[i].exp_delimiter);
+				ret = regexp_match_ex_substring_list(string, regexp->expression, regexp->case_sensitive,
+						regexp->exp_delimiter);
 				break;
 		}
-		break;
+
+		if (FAIL == ret)
+			break;
 	}
 out:
 	if (SUCCEED == ret && NULL != output && NULL == *output)
@@ -512,8 +504,9 @@ out:
 	return ret;
 }
 
-int	regexp_match_ex(ZBX_REGEXP *regexps, int regexps_num, const char *string, const char *pattern,
-		zbx_case_sensitive_t cs)
+int	regexp_match_ex(zbx_vector_ptr_t *regexps, const char *string, const char *pattern,
+		int cs)
 {
-	return regexp_sub_ex(regexps, regexps_num, string, pattern, cs, NULL, NULL);
+	return regexp_sub_ex(regexps, string, pattern, cs, NULL, NULL);
 }
+

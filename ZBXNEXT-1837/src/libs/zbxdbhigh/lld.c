@@ -328,8 +328,8 @@ static void	DBlld_get_trigger_functions(zbx_uint64_t triggerid, struct zbx_json_
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
-int	lld_check_record(struct zbx_json_parse *jp_row, const char *f_macro, const char *f_regexp, ZBX_REGEXP *regexps,
-	int regexps_num)
+int	lld_check_record(struct zbx_json_parse *jp_row, const char *f_macro, const char *f_regexp,
+		zbx_vector_ptr_t *regexps)
 {
 	const char	*__function_name = "lld_check_record";
 
@@ -344,7 +344,7 @@ int	lld_check_record(struct zbx_json_parse *jp_row, const char *f_macro, const c
 		goto out;
 
 	if (SUCCEED == zbx_json_value_by_name_dyn(jp_row, f_macro, &value, &value_alloc))
-		res = regexp_match_ex(regexps, regexps_num, value, f_regexp, ZBX_CASE_SENSITIVE);
+		res = regexp_match_ex(regexps, value, f_regexp, ZBX_CASE_SENSITIVE);
 
 	zbx_free(value);
 out:
@@ -876,7 +876,7 @@ static void	DBlld_save_triggers(zbx_vector_ptr_t *triggers, unsigned char status
  ******************************************************************************/
 static void	DBlld_update_triggers(zbx_uint64_t hostid, zbx_uint64_t discovery_itemid,
 		struct zbx_json_parse *jp_data, char **error, const char *f_macro,
-		const char *f_regexp, ZBX_REGEXP *regexps, int regexps_num)
+		const char *f_regexp, zbx_vector_ptr_t *regexps)
 {
 	const char		*__function_name = "DBlld_update_triggers";
 
@@ -950,7 +950,7 @@ static void	DBlld_update_triggers(zbx_uint64_t hostid, zbx_uint64_t discovery_it
 			if (FAIL == zbx_json_brackets_open(p, &jp_row))
 				continue;
 
-			if (SUCCEED != lld_check_record(&jp_row, f_macro, f_regexp, regexps, regexps_num))
+			if (SUCCEED != lld_check_record(&jp_row, f_macro, f_regexp, regexps))
 				continue;
 
 			DBlld_make_trigger(hostid, parent_triggerid, &triggers, description_proto, expression_proto,
@@ -1469,7 +1469,7 @@ static void	DBlld_save_graphs(zbx_vector_ptr_t *graphs, int width, int height, d
  ******************************************************************************/
 static void	DBlld_update_graphs(zbx_uint64_t hostid, zbx_uint64_t discovery_itemid,
 		struct zbx_json_parse *jp_data, char **error, const char *f_macro,
-		const char *f_regexp, ZBX_REGEXP *regexps, int regexps_num)
+		const char *f_regexp, zbx_vector_ptr_t *regexps)
 {
 	const char		*__function_name = "DBlld_update_graphs";
 
@@ -1589,7 +1589,7 @@ static void	DBlld_update_graphs(zbx_uint64_t hostid, zbx_uint64_t discovery_item
 			if (FAIL == zbx_json_brackets_open(p, &jp_row))
 				continue;
 
-			if (SUCCEED != lld_check_record(&jp_row, f_macro, f_regexp, regexps, regexps_num))
+			if (SUCCEED != lld_check_record(&jp_row, f_macro, f_regexp, regexps))
 				continue;
 
 			DBlld_make_graph(hostid, parent_graphid, &graphs, name_proto, gitems_proto, gitems_proto_num,
@@ -1656,13 +1656,14 @@ void	DBlld_process_discovery_rule(zbx_uint64_t discovery_itemid, char *value, zb
 	unsigned char		state = 0;
 	unsigned short		lifetime;
 	char			*f_macro = NULL, *f_regexp = NULL;
-	ZBX_REGEXP		*regexps = NULL;
-	int			regexps_alloc = 0, regexps_num = 0;
+	zbx_vector_ptr_t	regexps;
 	char			*sql = NULL;
 	size_t			sql_alloc = 128, sql_offset = 0;
 	const char		*sql_start = "update items set ", *sql_continue = ",";
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() itemid:" ZBX_FS_UI64, __function_name, discovery_itemid);
+
+	zbx_vector_ptr_create(&regexps);
 
 	result = DBselect(
 			"select hostid,key_,state,filter,error,lifetime"
@@ -1722,40 +1723,15 @@ void	DBlld_process_discovery_rule(zbx_uint64_t discovery_itemid, char *value, zb
 		*f_regexp++ = '\0';
 
 		if ('@' == *f_regexp)
-		{
-			DB_RESULT	result;
-			DB_ROW		row;
-			char		*f_regexp_esc;
-
-			f_regexp_esc = DBdyn_escape_string(f_regexp + 1);
-
-			result = DBselect("select e.expression,e.expression_type,e.exp_delimiter,e.case_sensitive"
-					" from regexps r,expressions e"
-					" where r.regexpid=e.regexpid"
-						" and r.name='%s'" ZBX_SQL_NODE,
-					f_regexp_esc, DBand_node_local("r.regexpid"));
-
-			zbx_free(f_regexp_esc);
-
-			while (NULL != (row = DBfetch(result)))
-			{
-				add_regexp_ex(&regexps, &regexps_alloc, &regexps_num,
-						f_regexp + 1, row[0], atoi(row[1]), row[2][0], atoi(row[3]));
-			}
-			DBfree_result(result);
-		}
+			DCget_expressions(&regexps, f_regexp + 1);
 
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() f_macro:'%s' f_regexp:'%s'",
 				__function_name, f_macro, f_regexp);
 	}
 
-	DBlld_update_items(hostid, discovery_itemid, &jp_data, &error, f_macro, f_regexp, regexps, regexps_num,
-			lifetime, ts->sec);
-	DBlld_update_triggers(hostid, discovery_itemid, &jp_data, &error, f_macro, f_regexp, regexps, regexps_num);
-	DBlld_update_graphs(hostid, discovery_itemid, &jp_data, &error, f_macro, f_regexp, regexps, regexps_num);
-
-	clean_regexps_ex(regexps, &regexps_num);
-	zbx_free(regexps);
+	DBlld_update_items(hostid, discovery_itemid, &jp_data, &error, f_macro, f_regexp, &regexps, lifetime, ts->sec);
+	DBlld_update_triggers(hostid, discovery_itemid, &jp_data, &error, f_macro, f_regexp, &regexps);
+	DBlld_update_graphs(hostid, discovery_itemid, &jp_data, &error, f_macro, f_regexp, &regexps);
 
 	if (ITEM_STATE_NOTSUPPORTED == state)
 	{
@@ -1791,6 +1767,9 @@ error:
 		DBcommit();
 	}
 clean:
+	zbx_regexp_clean_expressions(&regexps);
+	zbx_vector_ptr_destroy(&regexps);
+
 	zbx_free(error);
 	zbx_free(db_error);
 	zbx_free(filter);
