@@ -445,7 +445,12 @@ else {
 	// get real hosts
 	$data['realHosts'] = getParentHostsByTriggers($data['triggers']);
 
-	$data['host'] = (isset($hosts) && is_array($hosts)) ? reset($hosts) : array();
+	// determine, show or not column of errors
+	if (isset($hosts))
+		$hosts = reset($hosts);
+	$data['showErrorColumn'] = !(isset($hosts)
+					&& isset($hosts['status'])
+					&& $hosts['status'] == HOST_STATUS_TEMPLATE);
 
 	// nodes
 	if ($data['displayNodes']) {

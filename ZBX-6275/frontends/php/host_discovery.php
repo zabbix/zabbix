@@ -320,7 +320,12 @@ else {
 		'limit' => $config['search_limit'] + 1
 	));
 
-	$data['host'] = (isset($hosts) && is_array($hosts)) ? reset($hosts) : array();
+	// determine, show or not column of errors
+	if (isset($hosts))
+		$hosts = reset($hosts);
+	$data['showErrorColumn'] = !(isset($hosts)
+					&& isset($hosts['status'])
+					&& $hosts['status'] == HOST_STATUS_TEMPLATE);
 
 	if (!empty($data['discoveries'])) {
 		order_result($data['discoveries'], $sortfield, getPageSortOrder());

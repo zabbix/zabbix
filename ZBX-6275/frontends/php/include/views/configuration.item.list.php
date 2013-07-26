@@ -54,10 +54,6 @@ if (!empty($this->data['hostid'])) {
 	$itemForm->addVar('hostid', $this->data['hostid']);
 }
 
-$showErrorColumn = !(isset($this->data['host'])
-					&& isset($this->data['host']['status'])
-					&& $this->data['host']['status'] == HOST_STATUS_TEMPLATE);
-
 // create table
 $itemTable = new CTableInfo(_('No items defined.'));
 $itemTable->setHeader(array(
@@ -74,7 +70,7 @@ $itemTable->setHeader(array(
 	make_sorting_header(_('Type'), 'type'),
 	_('Applications'),
 	make_sorting_header(_('Status'), 'status'),
-	$showErrorColumn ? _('Error') : null
+	$data['showErrorColumn'] ? _('Error') : null
 ));
 foreach ($this->data['items'] as $item) {
 	// description
@@ -110,7 +106,7 @@ foreach ($this->data['items'] as $item) {
 	));
 
 	$statusIcons = array();
-	if ($item['status'] == ITEM_STATUS_ACTIVE) {
+	if ($data['showErrorColumn'] && $item['status'] == ITEM_STATUS_ACTIVE) {
 		if (zbx_empty($item['error'])) {
 			$error = new CDiv(SPACE, 'status_icon iconok');
 		}
@@ -264,7 +260,7 @@ foreach ($this->data['items'] as $item) {
 		item_type2str($item['type']),
 		new CCol(CHtml::encode($item['applications_list']), 'wraptext'),
 		$status,
-		$showErrorColumn ? $statusIcons : null
+		$data['showErrorColumn'] ? $statusIcons : null
 	));
 }
 
