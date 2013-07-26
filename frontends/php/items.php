@@ -900,7 +900,6 @@ else {
 		'form' => get_request('form'),
 		'hostid' => get_request('hostid'),
 		'sortfield' => getPageSortField('name'),
-		'host' => (isset($host) && is_array($host)) ? $host : array(),
 		'displayNodes' => (is_array(get_current_nodeid()) && empty($_REQUEST['filter_groupid']) && empty($_REQUEST['filter_hostid']))
 	);
 
@@ -1108,6 +1107,13 @@ else {
 			$data['items'][$key]['nodename'] = get_node_name_by_elid($item['itemid'], true);
 		}
 	}
+
+	// determine, show or not column of errors
+	if (isset($hosts))
+		$hosts = reset($hosts);
+	$data['showErrorColumn'] = !(isset($hosts)
+					&& isset($hosts['status'])
+					&& $hosts['status'] == HOST_STATUS_TEMPLATE);
 
 	// render view
 	$itemView = new CView('configuration.item.list', $data);

@@ -46,11 +46,6 @@ $sortLink = new CUrl();
 $sortLink->setArgument('hostid', $this->data['hostid']);
 $sortLink = $sortLink->getUrl();
 
-$showErrorColumn = !(isset($this->data['host'])
-					&& isset($this->data['host']['status'])
-					&& $this->data['host']['status'] == HOST_STATUS_TEMPLATE);
-
-
 $discoveryTable->setHeader(array(
 	new CCheckBox('all_items', null, "checkAll('".$discoveryForm->getName()."', 'all_items', 'g_hostdruleid');"),
 	make_sorting_header(_('Name'), 'name', $sortLink),
@@ -61,7 +56,7 @@ $discoveryTable->setHeader(array(
 	make_sorting_header(_('Interval'), 'delay', $sortLink),
 	make_sorting_header(_('Type'), 'type', $sortLink),
 	make_sorting_header(_('Status'), 'status', $sortLink),
-	$showErrorColumn ? _('Error') : null
+	$data['showErrorColumn'] ? _('Error') : null
 ));
 foreach ($data['discoveries'] as $discovery) {
 	$description = array();
@@ -80,7 +75,7 @@ foreach ($data['discoveries'] as $discovery) {
 	);
 
 	$error = '';
-	if ($discovery['status'] == ITEM_STATUS_ACTIVE) {
+	if ($data['showErrorColumn'] && $discovery['status'] == ITEM_STATUS_ACTIVE) {
 		if (zbx_empty($discovery['error'])) {
 			$error = new CDiv(SPACE, 'status_icon iconok');
 		}
@@ -100,7 +95,7 @@ foreach ($data['discoveries'] as $discovery) {
 		$discovery['delay'],
 		item_type2str($discovery['type']),
 		$status,
-		$showErrorColumn ? $error : null
+		$data['showErrorColumn'] ? $error : null
 	));
 }
 
