@@ -74,8 +74,8 @@ foreach ($data['discoveries'] as $discovery) {
 		itemIndicatorStyle($discovery['status'], $discovery['state'])
 	);
 
-	$error = '';
 	if ($data['showErrorColumn'] && $discovery['status'] == ITEM_STATUS_ACTIVE) {
+		$error = '';
 		if (zbx_empty($discovery['error'])) {
 			$error = new CDiv(SPACE, 'status_icon iconok');
 		}
