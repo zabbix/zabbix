@@ -105,27 +105,29 @@ foreach ($this->data['items'] as $item) {
 		itemIndicatorStyle($item['status'], $item['state'])
 	));
 
-	$statusIcons = array();
-	if ($data['showErrorColumn'] && $item['status'] == ITEM_STATUS_ACTIVE) {
-		if (zbx_empty($item['error'])) {
-			$error = new CDiv(SPACE, 'status_icon iconok');
+	if ($data['showErrorColumn']) {
+		$statusIcons = array();
+		if ($item['status'] == ITEM_STATUS_ACTIVE) {
+			if (zbx_empty($item['error'])) {
+				$error = new CDiv(SPACE, 'status_icon iconok');
+			}
+			else {
+				$error = new CDiv(SPACE, 'status_icon iconerror');
+				$error->setHint($item['error'], '', 'on');
+			}
+			$statusIcons[] = $error;
 		}
-		else {
-			$error = new CDiv(SPACE, 'status_icon iconerror');
-			$error->setHint($item['error'], '', 'on');
-		}
-		$statusIcons[] = $error;
-	}
 
-	// discovered item lifetime indicator
-	if ($item['flags'] == ZBX_FLAG_DISCOVERY_CREATED && $item['itemDiscovery']['ts_delete']) {
-		$deleteError = new CDiv(SPACE, 'status_icon iconwarning');
-		$deleteError->setHint(
-			_s('The item is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s).',
-				zbx_date2age($item['itemDiscovery']['ts_delete']), zbx_date2str(_('d M Y'), $item['itemDiscovery']['ts_delete']),
-				zbx_date2str(_('H:i:s'), $item['itemDiscovery']['ts_delete'])
-		));
-		$statusIcons[] = $deleteError;
+		// discovered item lifetime indicator
+		if ($item['flags'] == ZBX_FLAG_DISCOVERY_CREATED && $item['itemDiscovery']['ts_delete']) {
+			$deleteError = new CDiv(SPACE, 'status_icon iconwarning');
+			$deleteError->setHint(
+				_s('The item is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s).',
+					zbx_date2age($item['itemDiscovery']['ts_delete']), zbx_date2str(_('d M Y'), $item['itemDiscovery']['ts_delete']),
+					zbx_date2str(_('H:i:s'), $item['itemDiscovery']['ts_delete'])
+			));
+			$statusIcons[] = $deleteError;
+		}
 	}
 
 	$triggerHintTable = new CTableInfo();

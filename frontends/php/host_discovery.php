@@ -321,13 +321,8 @@ else {
 	));
 
 	// determine, show or not column of errors
-	if (isset($hosts)) {
-		$h = reset($hosts);
-		$data['showErrorColumn'] = ($h['status'] != HOST_STATUS_TEMPLATE);
-	}
-	else {
-		$data['showErrorColumn'] = true;
-	}
+	$h = reset($hosts);
+	$data['showErrorColumn'] = ($h['status'] != HOST_STATUS_TEMPLATE);
 
 	if (!empty($data['discoveries'])) {
 		order_result($data['discoveries'], $sortfield, getPageSortOrder());
