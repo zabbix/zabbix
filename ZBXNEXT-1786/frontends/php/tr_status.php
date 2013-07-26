@@ -535,6 +535,7 @@ $hosts = API::Host()->get(array(
 
 // get host scripts
 $scriptsByHosts = API::Script()->getScriptsByHosts($hostIds);
+$triggerWidget->addItem(new CMenuPopup(array('scripts' => true, 'hostids' => $hostIds)));
 
 // get trigger dependencies
 $dbTriggerDependencies = DBselect(
@@ -649,9 +650,10 @@ foreach ($triggers as $trigger) {
 		$hostsSpan = new CDiv(null, 'floatleft');
 
 		// fetch scripts for the host js menu
-		$menuScripts = array();
+		$scripts = array();
 		if (isset($scriptsByHosts[$triggerHost['hostid']])) {
 			foreach ($scriptsByHosts[$triggerHost['hostid']] as $script) {
+				$scripts[] = $script;
 				$menuScripts[] = array(
 					'scriptid' => $script['scriptid'],
 					'confirmation' => $script['confirmation'],
@@ -661,12 +663,14 @@ foreach ($triggers as $trigger) {
 		}
 
 		$hostsName = new CSpan($triggerHost['name'], 'link_menu menu-host');
-		$hostsName->setAttribute('data-menu', array(
+		/*$hostsName->setAttribute('data-menu', array(
 			'scripts' => $menuScripts,
 			'hostid' => $triggerHost['hostid'],
 			'hasScreens' => (bool) $host['screens'],
 			'hasInventory' => (bool) $host['inventory']
-		));
+		));*/
+
+		//$triggerWidget->addItem(new CMenuPopup(array('scripts' => true, 'hostids' => $hostIds)));
 
 		$hostsSpan->addItem($hostsName);
 

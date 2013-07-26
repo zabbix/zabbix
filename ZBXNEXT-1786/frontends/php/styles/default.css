@@ -548,3 +548,7 @@ div.suggest { position: absolute; border: 1px #5C7099 solid; width: 162px; z-ind
 .multiselect .available ul li { padding: 3px 2px 3px 4px; list-style: none outside none; display: list-item; cursor: pointer; }
 .multiselect .available ul li.hover { background: #7A9FC1; color: #FFFFFF; }
 .multiselect .available ul li.hover .prefix { color: #F1F1F1; }
+
+/* menu popup */
+.menuPopup {}
+.menuPopup .ui-menu { width: 150px; }

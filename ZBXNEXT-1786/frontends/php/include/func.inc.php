@@ -2578,3 +2578,7 @@ function clearCookies($clear = false, $id = null) {
 		insert_js('cookie.eraseArray("'.basename($url->getPath(), '.php').($id ? '_'.$id : '').'")');
 	}
 }
+
+function removeBackslash($s) {
+	return str_replace('\/', '/', $s);
+}
