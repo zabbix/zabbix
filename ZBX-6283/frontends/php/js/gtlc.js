@@ -226,7 +226,8 @@ var timeControl = {
 			}
 
 			// calculate new gradation
-			this.scrollbar.px2sec = (this.timeline.endtime() - this.timeline.starttime()) / this.scrollbar.size.scrollline;
+			this.scrollbar.px2sec =
+				(this.timeline.endtime() - this.timeline.starttime()) / this.scrollbar.size.scrollline;
 
 			// scrollbar
 			this.scrollbar.setBarPosition();
