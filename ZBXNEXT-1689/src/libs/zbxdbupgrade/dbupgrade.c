@@ -1294,6 +1294,16 @@ static int	DBpatch_2010091(void)
 	return DBdrop_field("items", "prevorgvalue");
 }
 
+static int	DBpatch_2010092(void)
+{
+	if (ZBX_DB_OK <= DBexecute("update items set history=1 where history=0"))
+	{
+		return SUCCEED;
+	}
+
+	return FAIL;
+}
+
 #define DBPATCH_START()					zbx_dbpatch_t	patches[] = {
 #define DBPATCH_ADD(version, duplicates, mandatory)	{DBpatch_##version, version, duplicates, mandatory},
 #define DBPATCH_END()					{NULL}};
@@ -1434,6 +1444,7 @@ int	DBcheck_version(void)
 	DBPATCH_ADD(2010089, 0, 1)
 	DBPATCH_ADD(2010090, 0, 1)
 	DBPATCH_ADD(2010091, 0, 1)
+	DBPATCH_ADD(2010092, 0, 1)
 
 	DBPATCH_END()
 
