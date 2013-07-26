@@ -1,11 +1,16 @@
 Changes for 2.1.2
 
 New features:
+........S. [ZBX-6770] improved host macro resolving by using configuration cache to get hosts used in trigger expressions (wiper)
+.......PS. [ZBXNEXT-1098] added internal check support to Zabbix proxies (wiper)
 ...GI..... [ZBX-6587] fixed Windows binaries descriptions (dimir)
 ...G...... [ZBXNEXT-1528] added net.if.in, net.if.out and net.if.total item support on HP-UX platforms (igors)
 
 Bug fixes:
 A......... [ZBX-5604] fixed updating graphs and graph prototypes when items are not specified (Ivo)
+..F....... [ZBX-6586] added sid checking for logout action (Guntis)
+.......PS. [ZBX-6819] fixed memory leak in snmp trapper regular expression processing (wiper)
+..F....... [ZBX-6646] removed Micro and Milli units, unifieded length for y-axis values and fixed division by zero in graphs (Oleg)
 ..F....... [ZBX-6777] added pointer cursor to the main menu tabs (Guntis)
 A......... [ZBX-6699] added object flags in Host, Host group, Template and Item get methods (Ivo)
 ..F....... [ZBX-6794] fixed host name displaying in pie charts (Ivo)
@@ -303,14 +308,16 @@ A......... [ZBX-5498] applications API refactoring (Vedmak)
 Changes for 2.0.7rc1
 
 New features:
+........S. [ZBX-6708] reduced configuration locking when calculating item queue (wiper)
 .......PS. [ZBX-6683] removed string pool semaphore; increased configuration cache update performance (Sasha)
 A......... [ZBX-6603] improved CTrigger lastEvents parameter performance (Toms)
 A......... [ZBX-6603] improved performance for dbConditionInt() function (Toms)
 A......... [ZBX-6407] improved data retrieval performance for CTrigger get() with post SQL filtering (Toms)
 ........S. [ZBX-6493] improved performance when working with Oracle by changing memory based prefetch to rows based (dimir)
-A.F....... [ZBX-1357] updated Brazilian Portuguese, Chinese (China), Latvian, Spanish and Turkish translations; thanks to Zabbix translators (Richlv)
+A.F....... [ZBX-1357] updated Brazilian Portuguese, Chinese (China), Latvian, Polish, Slovak, Spanish and Turkish translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+.......PS. [ZBX-6819] fixed memory leak in snmp trapper regular expression processing (wiper)
 ..F....... [ZBX-6464] fixed item display in popup for simple graphs and plain text items (Ivo)
 ..F....... [ZBX-6652] added item validation in bar reports page (Ivo)
 ...G...... [ZBX-6730] fixed zabbix_agentd -t duplicate printing of parameters (igors)

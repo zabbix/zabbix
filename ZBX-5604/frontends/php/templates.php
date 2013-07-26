@@ -471,7 +471,7 @@ if (isset($_REQUEST['form'])) {
 	$templateWidget->addItem($templateForm->render());
 }
 else {
-	$displayNodes = is_array(get_current_nodeid());
+	$displayNodes = (is_array(get_current_nodeid()) && $pageFilter->groupid == 0);
 
 	$frmForm = new CForm();
 	$frmForm->cleanItems();
@@ -484,7 +484,7 @@ else {
 	$templateWidget->addPageHeader(_('CONFIGURATION OF TEMPLATES'), $frmForm);
 
 	$frmGroup = new CForm('get');
-	$frmGroup->addItem(array(_('Group').SPACE, $pageFilter->getGroupsCB()));
+	$frmGroup->addItem(array(_('Group').SPACE, $pageFilter->getGroupsCB(true)));
 
 	$templateWidget->addHeader(_('Templates'), $frmGroup);
 	$templateWidget->addHeaderRowNumber();

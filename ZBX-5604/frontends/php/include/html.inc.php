@@ -371,15 +371,17 @@ function get_header_host_table($currentElement, $hostid, $discoveryid = null) {
 	/*
 	 * Name
 	 */
-	$description = '';
+	$proxyName = '';
 	if ($dbHost['proxy_hostid']) {
 		$proxy = get_host_by_hostid($dbHost['proxy_hostid']);
-		$description .= CHtml::encode($proxy['host']).NAME_DELIMITER;
+
+		$proxyName = CHtml::encode($proxy['host']).NAME_DELIMITER;
 	}
-	$description .= CHtml::encode($dbHost['name']);
+
+	$name = get_node_name_by_elid($dbHost['hostid'], true, NAME_DELIMITER).$proxyName.CHtml::encode($dbHost['name']);
 
 	if ($dbHost['status'] == HOST_STATUS_TEMPLATE) {
-		$list->addItem(array(bold(_('Template').NAME_DELIMITER), new CLink($description, 'templates.php?form=update&templateid='.$dbHost['hostid'])));
+		$list->addItem(array(bold(_('Template').NAME_DELIMITER), new CLink($name, 'templates.php?form=update&templateid='.$dbHost['hostid'])));
 	}
 	else {
 		switch ($dbHost['status']) {
@@ -394,7 +396,7 @@ function get_header_host_table($currentElement, $hostid, $discoveryid = null) {
 				break;
 		}
 
-		$list->addItem(array(bold(_('Host').NAME_DELIMITER), new CLink($description, 'hosts.php?form=update&hostid='.$dbHost['hostid'])));
+		$list->addItem(array(bold(_('Host').NAME_DELIMITER), new CLink($name, 'hosts.php?form=update&hostid='.$dbHost['hostid'])));
 		$list->addItem($status);
 		$list->addItem(getAvailabilityTable($dbHost));
 	}
