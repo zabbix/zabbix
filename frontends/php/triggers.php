@@ -445,7 +445,7 @@ else {
 	// get real hosts
 	$data['realHosts'] = getParentHostsByTriggers($data['triggers']);
 
-	$data['host'] = empty($hosts) ? array() : reset($hosts);
+	$data['host'] = (isset($hosts) && is_array($hosts)) ? reset($hosts) : array();
 
 	// nodes
 	if ($data['displayNodes']) {

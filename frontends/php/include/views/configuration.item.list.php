@@ -249,9 +249,7 @@ foreach ($this->data['items'] as $item) {
 
 	$checkBox = new CCheckBox('group_itemid['.$item['itemid'].']', null, null, $item['itemid']);
 	$checkBox->setEnabled(empty($item['discoveryRule']));
-//	echo "<pre>";
-//	print_r($this->data);
-//	echo "</pre>"
+
 	$itemTable->addRow(array(
 		$checkBox,
 		$this->data['displayNodes'] ? $item['nodename'] : null,
