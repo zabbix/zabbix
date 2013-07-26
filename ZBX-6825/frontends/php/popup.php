@@ -832,7 +832,7 @@ elseif ($srctbl == 'items') {
 
 		$item['name'] = itemName($item);
 		$description = new CLink($item['name'], '#');
-		$item['name'] = ($onlyHostid) ? $item['name'] : $item['hostname'].NAME_DELIMITER.$item['name'];
+		$item['name'] = $item['hostname'].NAME_DELIMITER.$item['name'];
 
 		if ($multiselect) {
 			$js_action = 'javascript: addValue('.zbx_jsvalue($reference).', '.zbx_jsvalue($item['itemid']).');';
