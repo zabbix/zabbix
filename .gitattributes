@@ -544,6 +544,7 @@ misc/init.d/tru64/zabbix_server -text
 src/libs/zbxalgo/vectorimpl.h -text
 src/libs/zbxdbcache/valuecache.c -text
 src/libs/zbxdbcache/valuecache.h -text
+src/libs/zbxregexp/Makefile.am -text
 src/libs/zbxsysinfo/aix/hostname.c -text
 src/libs/zbxsysinfo/aix/software.c -text
 src/libs/zbxsysinfo/freebsd/hostname.c -text

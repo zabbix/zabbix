@@ -331,4 +331,6 @@ void	DCset_delta_items(zbx_hashset_t *items);
 void	DCfree_item_queue(zbx_vector_ptr_t *queue);
 int	DCget_item_queue(zbx_vector_ptr_t *queue, int from, int to);
 
+void	DCget_expressions(zbx_vector_ptr_t *expressions, const char *name);
+
 #endif
