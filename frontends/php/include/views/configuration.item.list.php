@@ -58,6 +58,7 @@ if (!empty($this->data['hostid'])) {
 $itemTable = new CTableInfo(_('No items defined.'));
 $itemTable->setHeader(array(
 	new CCheckBox('all_items', null, "checkAll('".$itemForm->getName()."', 'all_items', 'group_itemid');"),
+	$this->data['displayNodes'] ? _('Node') : null,
 	_('Wizard'),
 	empty($this->data['filter_hostid']) ? _('Host') : null,
 	make_sorting_header(_('Name'), 'name'),
@@ -248,6 +249,7 @@ foreach ($this->data['items'] as $item) {
 
 	$itemTable->addRow(array(
 		$checkBox,
+		$this->data['displayNodes'] ? $item['nodename'] : null,
 		$menuIcon,
 		empty($this->data['filter_hostid']) ? $item['host'] : null,
 		$description,
