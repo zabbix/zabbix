@@ -143,7 +143,7 @@ foreach ($this->data['drules'] as $drule) {
 			new CSpan(empty($h_data['host']) ? '-' : $h_data['host']),
 			new CSpan((($h_data['time'] == 0 || $h_data['type'] === 'slave')
 				? ''
-				: convert_units(array('value' => time() - $h_data['time'], 'units' => 'uptime'))), $h_data['class'])
+				: convert_units(time() - $h_data['time'], 'uptime')), $h_data['class'])
 		);
 
 		foreach ($this->data['services'] as $name => $foo) {
