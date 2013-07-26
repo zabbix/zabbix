@@ -1,3 +1,7 @@
+Changes for 1.8.17
+
+1.8.17rc1 was released as 1.8.17 without any changes
+
 Changes for 1.8.17rc1
 
 A......... [ZBX-6582] fixed that {ITEM.VALUE} and {ITEM.LASTVALUE} macro was not truncated in Monitoring > Triggers (Toms)
