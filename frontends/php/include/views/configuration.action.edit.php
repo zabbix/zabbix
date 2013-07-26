@@ -534,7 +534,7 @@ if (!empty($this->data['new_operation'])) {
 
 			$users = API::User()->get(array(
 				'userids' => $userids,
-				'output' => array('alias')
+				'output' => array('alias', 'name', 'surname')
 			));
 			order_result($users, 'alias');
 

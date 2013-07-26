@@ -1029,12 +1029,23 @@ class CUser extends CZBXAPI {
 			' WHERE u.userid='.$userid
 		));
 
+		$fullname = '';
+		if ($userData['name']) {
+			$fullname = $userData['name'];
+		}
+		if ($userData['surname']) {
+			$fullname .= $fullname ? ' '.$userData['surname'] : $userData['surname'];
+		}
+		if ($fullname) {
+			$userData['fullname'] = $userData['alias'].' ('.$fullname.')';
+		}
+
 		$userData['debug_mode'] = (bool) DBfetch(DBselect(
 			'SELECT ug.userid'.
 			' FROM usrgrp g,users_groups ug'.
 			' WHERE ug.userid='.$userid.
-			' AND g.usrgrpid=ug.usrgrpid'.
-			' AND g.debug_mode='.GROUP_DEBUG_MODE_ENABLED
+				' AND g.usrgrpid=ug.usrgrpid'.
+				' AND g.debug_mode='.GROUP_DEBUG_MODE_ENABLED
 		));
 
 		$userData['userip'] = (isset($_SERVER['HTTP_X_FORWARDED_FOR']) && !empty($_SERVER['HTTP_X_FORWARDED_FOR']))

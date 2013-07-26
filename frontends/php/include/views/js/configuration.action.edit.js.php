@@ -40,7 +40,7 @@
 <tr id="opmsgUserRow_#{userid}">
 	<td>
 		<input name="new_operation[opmessage_usr][#{userid}][userid]" type="hidden" value="#{userid}" />
-		<span>#{alias}</span>
+		<span>#{fullname}</span>
 	</td>
 	<td>
 		<input type="button" class="input link_menu" name="remove" value="<?php echo CHtml::encode(_('Remove')); ?>" onclick="removeOpmsgUserRow(#{userid});" />
@@ -151,6 +151,16 @@
 
 			switch (list.object) {
 				case 'userid':
+					var fullname = '';
+					if (value.name) {
+						fullname = value.name;
+					}
+					if (value.surname) {
+						fullname = value.name ? value.name + ' ' + value.surname : value.surname;
+					}
+					if (fullname) {
+						value.fullname = value.alias + ' (' + fullname + ')';
+					}
 					if (jQuery('#opmsgUserRow_' + value.userid).length) {
 						continue;
 					}

@@ -642,7 +642,7 @@ class CEvent extends CZBXAPI {
 
 				// if the user alias is requested, join the users table
 				if ($this->outputIsRequested('alias', $options['select_acknowledges'])) {
-					$sqlParts = $this->addQuerySelect('u.alias', $sqlParts);
+					$sqlParts = $this->addQuerySelect('u.alias, u.name, u.surname', $sqlParts);
 					$sqlParts['from'][] = 'users u';
 					$sqlParts['where'][] = 'a.userid=u.userid';
 				}
