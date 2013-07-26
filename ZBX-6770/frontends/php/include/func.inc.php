@@ -449,11 +449,10 @@ function convertUnitsUptime($value) {
  * 1y 4d, not 1y 0m 4d or 1y 4d #h.
  *
  * @param int $value	time period in seconds
- * @param bool $ignoreMillisec	without ms (1s 200 ms = 1.2s)
  *
  * @return string
  */
-function convertUnitsS($value, $ignoreMillisec = false) {
+function convertUnitsS($value) {
 	if (($secs = round($value * 1000, ZBX_UNITS_ROUNDOFF_UPPER_LIMIT) / 1000) < 0) {
 		$secs = -$secs;
 		$str = '-';
@@ -517,15 +516,8 @@ function convertUnitsS($value, $ignoreMillisec = false) {
 		$values['s'] = $n;
 	}
 
-	if ($ignoreMillisec) {
-		if ($n_unit < 1 && ($n = round($secs, ZBX_UNITS_ROUNDOFF_UPPER_LIMIT)) != 0) {
-			$values['s'] += $n;
-		}
-	}
-	else {
-		if ($n_unit < 1 && ($n = round($secs * 1000, ZBX_UNITS_ROUNDOFF_UPPER_LIMIT)) != 0) {
-			$values['ms'] = $n;
-		}
+	if ($n_unit < 1 && ($n = round($secs * 1000, ZBX_UNITS_ROUNDOFF_UPPER_LIMIT)) != 0) {
+		$values['ms'] = $n;
 	}
 
 	$str .= isset($values['y']) ? $values['y']._x('y', 'year short').' ' : '';
@@ -544,93 +536,67 @@ function convertUnitsS($value, $ignoreMillisec = false) {
  * Example:
  * 	6442450944 B convert to 6 GB
  *
- * @param array  $options
- * @param string $options['value']
- * @param string $options['units']
- * @param string $options['convert']
- * @param string $options['byteStep']
- * @param string $options['pow']
- * @param bool   $options['ignoreMillisec']
- * @param string $options['length']
+ * @param string $value
+ * @param string $units
+ * @param string $convert
+ * @param string $byteStep
+ * @param string $pow
  *
  * @return string
  */
-function convert_units($options = array()) {
-	$defOptions = array(
-		'value' => null,
-		'units' => null,
-		'convert' => ITEM_CONVERT_WITH_UNITS,
-		'byteStep' => false,
-		'pow' => false,
-		'ignoreMillisec' => false,
-		'length' => false
-	);
-
-	$options = zbx_array_merge($defOptions, $options);
-
+function convert_units($value, $units, $convert = ITEM_CONVERT_WITH_UNITS, $byteStep = false, $pow = false) {
 	// special processing for unix timestamps
-	if ($options['units'] == 'unixtime') {
-		return zbx_date2str(_('Y.m.d H:i:s'), $options['value']);
+	if ($units == 'unixtime') {
+		return zbx_date2str(_('Y.m.d H:i:s'), $value);
 	}
 
 	// special processing of uptime
-	if ($options['units'] == 'uptime') {
-		return convertUnitsUptime($options['value']);
+	if ($units == 'uptime') {
+		return convertUnitsUptime($value);
 	}
 
 	// special processing for seconds
-	if ($options['units'] == 's') {
-		return convertUnitsS($options['value'], $options['ignoreMillisec']);
+	if ($units == 's') {
+		return convertUnitsS($value);
 	}
 
 	// any other unit
 	// black list wich do not require units metrics..
 	$blackList = array('%', 'ms', 'rpm', 'RPM');
 
-	if (in_array($options['units'], $blackList) || (zbx_empty($options['units'])
-			&& ($options['convert'] == ITEM_CONVERT_WITH_UNITS))) {
-		if (abs($options['value']) >= ZBX_UNITS_ROUNDOFF_THRESHOLD) {
-			$options['value'] = round($options['value'], ZBX_UNITS_ROUNDOFF_UPPER_LIMIT);
+	if (in_array($units, $blackList) || (zbx_empty($units) && ($convert == ITEM_CONVERT_WITH_UNITS))) {
+		if (abs($value) >= ZBX_UNITS_ROUNDOFF_THRESHOLD) {
+			$value = round($value, ZBX_UNITS_ROUNDOFF_UPPER_LIMIT);
 		}
-		$options['value'] = sprintf('%.'.ZBX_UNITS_ROUNDOFF_LOWER_LIMIT.'f', $options['value']);
-		$options['value'] = preg_replace('/^([\-0-9]+)(\.)([0-9]*)[0]+$/U', '$1$2$3', $options['value']);
-		$options['value'] = rtrim($options['value'], '.');
+		$value = sprintf('%.'.ZBX_UNITS_ROUNDOFF_LOWER_LIMIT.'f', $value);
+		$value = preg_replace('/^([\-0-9]+)(\.)([0-9]*)[0]+$/U', '$1$2$3', $value);
+		$value = rtrim($value, '.');
 
-		return trim($options['value'].' '.$options['units']);
+		if (zbx_empty($units)) {
+			return $value;
+		}
+		else {
+			return $value.' '.$units;
+		}
 	}
 
 	// if one or more items is B or Bps, then Y-scale use base 8 and calculated in bytes
-	if ($options['byteStep']) {
+	if ($byteStep) {
 		$step = 1024;
 	}
 	else {
-		switch ($options['units']) {
+		switch ($units) {
 			case 'Bps':
 			case 'B':
 				$step = 1024;
-				$options['convert'] = $options['convert'] ? $options['convert'] : ITEM_CONVERT_NO_UNITS;
+				$convert = $convert ? $convert : ITEM_CONVERT_NO_UNITS;
 				break;
 			case 'b':
 			case 'bps':
-				$options['convert'] = $options['convert'] ? $options['convert'] : ITEM_CONVERT_NO_UNITS;
+				$convert = $convert ? $convert : ITEM_CONVERT_NO_UNITS;
 			default:
 				$step = 1000;
 		}
-	}
-
-	if ($options['value'] < 0) {
-		$abs = bcmul($options['value'], '-1');
-	}
-	else {
-		$abs = $options['value'];
-	}
-
-	if (bccomp($abs, 1) == -1) {
-		$options['value'] = round($options['value'], ZBX_UNITS_ROUNDOFF_MIDDLE_LIMIT);
-		$options['value'] = ($options['length'] && $options['value'] != 0)
-			? sprintf('%.'.$options['length'].'f',$options['value']) : $options['value'];
-
-		return trim($options['value'].' '.$options['units']);
 	}
 
 	// init intervals
@@ -641,6 +607,8 @@ function convert_units($options = array()) {
 
 	if (!isset($digitUnits[$step])) {
 		$digitUnits[$step] = array(
+			array('pow' => -2, 'short' => _x('µ', 'Micro short'), 'long' => _('Micro')),
+			array('pow' => -1, 'short' => _x('m', 'Milli short'), 'long' => _('Milli')),
 			array('pow' => 0, 'short' => '', 'long' => ''),
 			array('pow' => 1, 'short' => _x('K', 'Kilo short'), 'long' => _('Kilo')),
 			array('pow' => 2, 'short' => _x('M', 'Mega short'), 'long' => _('Mega')),
@@ -658,10 +626,16 @@ function convert_units($options = array()) {
 		}
 	}
 
+	if ($value < 0) {
+		$abs = bcmul($value, '-1');
+	}
+	else {
+		$abs = $value;
+	}
 
-	$valUnit = array('pow' => 0, 'short' => '', 'long' => '', 'value' => $options['value']);
+	$valUnit = array('pow' => 0, 'short' => '', 'long' => '', 'value' => $value);
 
-	if ($options['pow'] === false || $options['value'] == 0) {
+	if ($pow === false || $value == 0) {
 		foreach ($digitUnits[$step] as $dnum => $data) {
 			if (bccomp($abs, $data['value']) > -1) {
 				$valUnit = $data;
@@ -673,40 +647,41 @@ function convert_units($options = array()) {
 	}
 	else {
 		foreach ($digitUnits[$step] as $data) {
-			if ($options['pow'] == $data['pow']) {
+			if ($pow == $data['pow']) {
 				$valUnit = $data;
 				break;
 			}
 		}
 	}
 
-	if (round($valUnit['value'], ZBX_UNITS_ROUNDOFF_MIDDLE_LIMIT) > 0) {
-		$valUnit['value'] = bcdiv(sprintf('%.10f',$options['value']), sprintf('%.10f', $valUnit['value'])
-			, ZBX_PRECISION_10);
+	if (round($valUnit['value'], ZBX_UNITS_ROUNDOFF_LOWER_LIMIT) > 0) {
+		if ($valUnit['pow'] >= 0) {
+			$valUnit['value'] = bcdiv(sprintf('%.6f',$value), sprintf('%.6f', $valUnit['value']),
+				ZBX_UNITS_ROUNDOFF_LOWER_LIMIT);
+		}
+		else {
+			$valUnit['value'] = bcdiv(sprintf('%.10f',$value), sprintf('%.10f', $valUnit['value']), ZBX_PRECISION_10);
+		}
 	}
 	else {
 		$valUnit['value'] = 0;
 	}
 
-	switch ($options['convert']) {
-		case 0: $options['units'] = trim($options['units']);
+	switch ($convert) {
+		case 0: $units = trim($units);
 		case 1: $desc = $valUnit['short']; break;
 		case 2: $desc = $valUnit['long']; break;
 	}
 
-	$options['value'] = preg_replace('/^([\-0-9]+)(\.)([0-9]*)[0]+$/U','$1$2$3', round($valUnit['value'],
-		ZBX_UNITS_ROUNDOFF_UPPER_LIMIT));
-
-	$options['value'] = rtrim($options['value'], '.');
+	$value = preg_replace('/^([\-0-9]+)(\.)([0-9]*)[0]+$/U','$1$2$3', round($valUnit['value'], ZBX_UNITS_ROUNDOFF_UPPER_LIMIT));
+	$value = rtrim($value, '.');
 
 	// fix negative zero
-	if (bccomp($options['value'], 0) == 0) {
-		$options['value'] = 0;
+	if (bccomp($value, 0) == 0) {
+		$value = 0;
 	}
 
-	return trim(sprintf('%s %s%s', $options['length']
-		? sprintf('%.'.$options['length'].'f',$options['value'])
-		: $options['value'], $desc, $options['units']));
+	return rtrim(sprintf('%s %s%s', $value, $desc, $units));
 }
 
 /**
@@ -2355,8 +2330,6 @@ function parse_period($str) {
 }
 
 function get_status() {
-	global $ZBX_SERVER, $ZBX_SERVER_PORT;
-
 	$status = array(
 		'triggers_count' => 0,
 		'triggers_count_enabled' => 0,
@@ -2376,8 +2349,7 @@ function get_status() {
 	);
 
 	// server
-	$zabbixServer = new CZabbixServer($ZBX_SERVER, $ZBX_SERVER_PORT, ZBX_SOCKET_TIMEOUT, 0);
-	$status['zabbix_server'] = $zabbixServer->isRunning() ? _('Yes') : _('No');
+	$status['zabbix_server'] = zabbixIsRunning() ? _('Yes') : _('No');
 
 	// triggers
 	$dbTriggers = DBselect(
@@ -2488,6 +2460,21 @@ function get_status() {
 	$status['qps_total'] = round($row['qps'], 2);
 
 	return $status;
+}
+
+function zabbixIsRunning() {
+	global $ZBX_SERVER, $ZBX_SERVER_PORT;
+
+	if (empty($ZBX_SERVER) || empty ($ZBX_SERVER_PORT)) {
+		return false;
+	}
+
+	$result = (bool) fsockopen($ZBX_SERVER, $ZBX_SERVER_PORT, $errnum, $errstr, ZBX_SOCKET_TIMEOUT);
+	if (!$result) {
+		clear_messages();
+	}
+
+	return $result;
 }
 
 function set_image_header($format = null) {

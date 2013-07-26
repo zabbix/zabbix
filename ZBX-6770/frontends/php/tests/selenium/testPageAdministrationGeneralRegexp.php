@@ -92,8 +92,10 @@ class testPageAdministrationGeneralRegexp extends CWebTest {
 
 		$this->openRegularExpressions();
 
-		$this->assertElementPresent("//select[@id='go' and @disabled]");
-		$this->assertElementPresent("//input[@id='goButton' and @disabled]");
+		$this->zbxTestDropdownSelect('go', 'Delete selected');
+		$this->zbxTestClick('goButton');
+		$this->waitForAlertPresent();
+		$this->assertAlert('No elements selected!');
 
 		$this->verifyHash();
 	}

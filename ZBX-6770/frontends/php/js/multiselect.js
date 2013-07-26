@@ -136,18 +136,6 @@ jQuery(function($) {
 			};
 
 			/**
-			 * Rezise multiselect selected text
-			 */
-			$.fn.multiSelect.resize = function() {
-				$.each(window.multiSelect, function(i) {
-					var ms = window.multiSelect[i];
-					if (!empty(ms.options.data)) {
-						resizeAllSelectedTexts(ms.obj, ms.options, ms.values);
-					}
-				});
-			}
-
-			/**
 			 * MultiSelect object.
 			 */
 			if (empty(window.multiSelect)) {
@@ -418,7 +406,8 @@ jQuery(function($) {
 			}
 
 			// resize
-			resize(obj, values, options);
+			resizeSelected(obj, values, options);
+			resizeAvailable(obj);
 		});
 	};
 
@@ -562,11 +551,10 @@ jQuery(function($) {
 				text: empty(item.prefix) ? item.name : item.prefix + item.name
 			});
 
-			$('.selected ul', obj).append(li.append(text));
-
-			resizeSelectedText(li, text, obj, options);
-
-			if (!options.disabled) {
+			if (options.disabled) {
+				$('.selected ul', obj).append(li.append(text));
+			}
+			else {
 				var arrow = $('<span>', {
 					'class': 'arrow',
 					'data-id': item.id
@@ -575,13 +563,14 @@ jQuery(function($) {
 					removeSelected($(this).data('id'), obj, values, options);
 				});
 
-				$('.selected ul', obj).append(li.append(arrow));
+				$('.selected ul', obj).append(li.append(text, arrow));
 			}
 
 			removePlaceholder(obj);
 
 			// resize
-			resize(obj, values, options);
+			resizeSelected(obj, values, options);
+			resizeAvailable(obj);
 
 			// set readonly
 			if (options.selectedLimit > 0 && $('.selected li', obj).length == options.selectedLimit) {
@@ -598,7 +587,8 @@ jQuery(function($) {
 		delete values.selected[id];
 
 		// resize
-		resize(obj, values, options);
+		resizeSelected(obj, values, options);
+		resizeAvailable(obj);
 
 		// remove readonly
 		if ($('.selected li', obj).length == 0) {
@@ -714,19 +704,12 @@ jQuery(function($) {
 		}
 	}
 
-	function resize(obj, values, options) {
-		if (!options.selectedLimit || $('.selected li', obj).length < options.selectedLimit) {
-			resizeSelected(obj, values, options);
-			resizeAvailable(obj);
-		}
-	}
-
 	function resizeSelected(obj, values, options) {
 		// settings
-		var settingTopPaddingsEmpty = IE8 ? 1 : 0,
-			settingTopPaddingsExist = IE8 ? 1 : 2,
+		var settingTopPaddings = IE8 ? 1 : 0,
 			settingTopPaddingsInit = 3,
 			settingRightPaddings = 4,
+			settingLeftPaddings = 13,
 			settingMinimumWidth = 50,
 			settingMinimumHeight = 12,
 			settingNewLineTopPaddings = 6;
@@ -737,15 +720,16 @@ jQuery(function($) {
 			height = 0;
 
 		if ($('.selected li', obj).length > 0) {
-			var lastItem = $('.selected li:last-child', obj),
-				position = lastItem.position();
+			var position = options.disabled
+				? $('.selected li:last-child', obj).position()
+				: $('.selected li:last-child .arrow', obj).position();
 
-			top = position.top + settingTopPaddingsExist;
-			left = position.left + lastItem.width();
+			top = position.top + settingTopPaddings - 1;
+			left = position.left + settingLeftPaddings;
 			height = $('.selected li:last-child', obj).height();
 		}
 		else {
-			top = settingTopPaddingsInit + settingTopPaddingsEmpty;
+			top = settingTopPaddingsInit + settingTopPaddings;
 			height = 0;
 		}
 
@@ -795,60 +779,6 @@ jQuery(function($) {
 
 		$('.available', obj).css({
 			top: (selectedHeight > 0) ? selectedHeight : 20
-		});
-	}
-
-	function resizeSelectedText(item, text, obj, options) {
-		// settings
-		var settingLineHeight = 15,
-			settingArrowSpace = options.disabled ? 22 : 32,
-			settingPaddings = 3,
-			settingTextMax = 510;
-
-		// calculate
-		var maxWidth = $('.selected ul', obj).width() - settingArrowSpace;
-
-		if (text.width() > maxWidth || text.height() > settingLineHeight) {
-			var i = 0;
-
-			while (text.width() > maxWidth || text.height() > settingLineHeight) {
-				var t = text.text();
-
-				text.text(t.substring(0, t.length - 1));
-
-				i++;
-
-				if (i > settingTextMax) {
-					break;
-				}
-			}
-
-			text.text(text.text() + '...');
-
-			item.css('width', $('.selected ul', obj).width() - settingPaddings);
-		}
-		else {
-			item.css('width', '');
-
-			if (!options.disabled) {
-				text.css('padding-right', 16);
-			}
-		}
-	}
-
-	function resizeAllSelectedTexts(obj, options, values) {
-		$('.selected li', obj).each(function() {
-			var item = $(this),
-				id = item.data('id'),
-				text = $(item.children()[0]),
-				t = empty(values.selected[id].prefix)
-					? values.selected[id].name
-					: values.selected[id].prefix + values.selected[id].name;
-
-			// rewrite previous text to original
-			text.text(t);
-
-			resizeSelectedText(item, text, obj, options);
 		});
 	}
 

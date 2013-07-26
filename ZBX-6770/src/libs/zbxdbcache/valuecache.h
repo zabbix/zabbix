@@ -45,8 +45,8 @@
  *
  *   The history data is accessed with zbx_vc_get_value_range() and zbx_vc_get_value()
  *   functions. Afterwards the retrieved history data must be freed by the caller by using
- *   either zbx_history_record_vector_destroy() function (free the zbx_vc_get_value_range()
- *   call output) or zbx_history_record_clear() function (free the zbx_vc_get_value() call output).
+ *   either zbx_vc_value_vector_destroy() function (free the zbx_vc_get_value_range()
+ *   call output) or zbx_vc_value_clear() function (free the zbx_vc_get_value() call output).
  *
  * Locking
  *
@@ -59,13 +59,13 @@
 /* the item history value */
 typedef struct
 {
-	zbx_timespec_t	timestamp;
+	zbx_timespec_t		timestamp;
 
-	history_value_t	value;
+	history_value_t		value;
 }
-zbx_history_record_t;
+zbx_vc_value_t;
 
-ZBX_VECTOR_DECL(history_record, zbx_history_record_t);
+ZBX_VECTOR_DECL(vc_value, zbx_vc_value_t);
 
 /* the cache statistics */
 typedef struct
@@ -89,25 +89,25 @@ void	zbx_vc_lock(void);
 
 void	zbx_vc_unlock(void);
 
-int	zbx_vc_get_value_range(zbx_uint64_t itemid, int value_type, zbx_vector_history_record_t *values, int seconds,
+int	zbx_vc_get_value_range(zbx_uint64_t itemid, int value_type, zbx_vector_vc_value_t *values, int seconds,
 		int count, int timestamp);
 
-int	zbx_vc_get_value(zbx_uint64_t itemid, int value_type, const zbx_timespec_t *ts, zbx_history_record_t *value,
+int	zbx_vc_get_value(zbx_uint64_t itemid, int value_type, const zbx_timespec_t *ts, zbx_vc_value_t *value,
 		int *found);
 
 int	zbx_vc_add_value(zbx_uint64_t itemid, int value_type, const zbx_timespec_t *timestamp, history_value_t *value);
 
 int	zbx_vc_get_statistics(zbx_vc_stats_t *stats);
 
-void	zbx_history_record_vector_destroy(zbx_vector_history_record_t *vector, int value_type);
+void	zbx_vc_value_vector_destroy(zbx_vector_vc_value_t *vector, int value_type);
 
-void	zbx_history_record_clear(zbx_history_record_t *value, int value_type);
+void	zbx_vc_value_clear(zbx_vc_value_t *value, int value_type);
 
 void	zbx_vc_history_value2str(char *buffer, size_t size, history_value_t *value, int value_type);
 
-/* In most cases zbx_history_record_vector_destroy() function should be used to free the  */
-/* value vector filled by zbx_vc_get_value* functions. This define simply better          */
-/* mirrors the vector creation function to vector destroying function.                    */
-#define zbx_history_record_vector_create(vector)	zbx_vector_history_record_create(vector);
+/* In most cases zbx_vc_value_vector_destroy() function should be used to free the  */
+/* value vector filled by zbx_vc_get_value* functions. This define simply better    */
+/* mirrors the vector creation function to vector destroying function.              */
+#define zbx_vc_value_vector_create(vector)	zbx_vector_vc_value_create(vector);
 
 #endif /* HISTORY_CACHE_H_ */

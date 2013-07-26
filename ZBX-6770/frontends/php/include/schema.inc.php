@@ -917,6 +917,21 @@ return array(
 				'length' => 10,
 				'default' => '365',
 			),
+			'lastvalue' => array(
+				'null' => true,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+			),
+			'lastclock' => array(
+				'null' => true,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+			),
+			'prevvalue' => array(
+				'null' => true,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+			),
 			'status' => array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
@@ -952,6 +967,11 @@ return array(
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
 				'default' => '0',
+			),
+			'prevorgvalue' => array(
+				'null' => true,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
 			),
 			'snmpv3_securityname' => array(
 				'null' => false,
@@ -1073,6 +1093,11 @@ return array(
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
 				'default' => '0',
+			),
+			'lastns' => array(
+				'null' => true,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
 			),
 			'flags' => array(
 				'null' => false,

@@ -377,13 +377,16 @@ abstract class CHostGeneral extends CZBXAPI {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
+		$appManager = new CApplicationManager();
+		$httpTestManager = new CHttpTestManager();
+
 		foreach ($targetIds as $targetId) {
 			foreach ($templateIds as $templateId) {
 				if (isset($linked[$targetId]) && isset($linked[$targetId][$templateId])) {
 					continue;
 				}
 
-				Manager::Application()->link($templateId, $targetId);
+				$appManager->link($templateId, $targetId);
 
 				API::DiscoveryRule()->syncTemplates(array(
 					'hostids' => $targetId,
@@ -400,7 +403,7 @@ abstract class CHostGeneral extends CZBXAPI {
 					'templateids' => $templateId
 				));
 
-				Manager::HttpTest()->link($templateId, $targetId);
+				$httpTestManager->link($templateId, $targetId);
 			}
 
 			// we do linkage in two separate loops because for triggers you need all items already created on host

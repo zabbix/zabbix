@@ -821,7 +821,7 @@ ZABBIX.apps.map = (function($) {
 					elementid: 0,
 					iconid_off: this.sysmap.iconList[0].imageid, // first imageid
 					label: locale['S_NEW_ELEMENT'],
-					label_location: -1, // set default map label location
+					label_location: this.sysmap.data.label_location, // set default map label location
 					x: 0,
 					y: 0,
 					urls: {},

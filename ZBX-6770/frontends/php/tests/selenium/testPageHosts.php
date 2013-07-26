@@ -23,15 +23,7 @@ require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 class testPageHosts extends CWebTest {
 	// Returns all hosts
 	public static function allHosts() {
-		return DBdata(
-			'SELECT h.name,h.hostid,g.name AS group_name'.
-			' FROM hosts h'.
-				' LEFT JOIN hosts_groups hg'.
-					' ON hg.hostid=h.hostid'.
-				' LEFT JOIN groups g'.
-					' ON g.groupid=hg.groupid'.
-			' WHERE h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.')'
-		);
+		return DBdata('select * from hosts where status in ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.')');
 	}
 
 	/**
@@ -39,7 +31,7 @@ class testPageHosts extends CWebTest {
 	*/
 	public function testPageHosts_CheckLayout($host) {
 		$this->zbxTestLogin('hosts.php');
-		$this->zbxTestDropdownSelectWait('groupid', $host['group_name']);
+		$this->zbxTestDropdownSelectWait('groupid', 'Zabbix servers');
 		$this->checkTitle('Configuration of hosts');
 		$this->zbxTestTextPresent('HOSTS');
 		$this->zbxTestTextPresent('Displaying');

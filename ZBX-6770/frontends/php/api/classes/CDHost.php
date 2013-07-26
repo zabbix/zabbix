@@ -39,6 +39,7 @@ class CDHost extends CZBXAPI {
 	 * @param bool   $options['monitored_hosts']		only monitored Hosts
 	 * @param bool   $options['templated_hosts']		include templates in result
 	 * @param bool   $options['with_items']				only with items
+	 * @param bool   $options['with_historical_items']	only with historical items
 	 * @param bool   $options['with_triggers']			only with triggers
 	 * @param bool   $options['with_httptests']			only with http tests
 	 * @param bool   $options['with_graphs']			only with graphs

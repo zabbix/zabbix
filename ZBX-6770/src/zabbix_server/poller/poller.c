@@ -203,13 +203,12 @@ static void	update_triggers_status_to_unknown(zbx_uint64_t hostid, zbx_item_type
 
 static void	activate_host(DC_ITEM *item, zbx_timespec_t *ts)
 {
-	const char		*__function_name = "activate_host";
-	char			sql[MAX_STRING_LEN], error_msg[MAX_STRING_LEN];
-	size_t			offset = 0;
-	int			*errors_from, *disable_until;
-	unsigned char		*available;
-	const char		*fld_errors_from, *fld_available, *fld_disable_until, *fld_error;
-	zbx_host_availability_t	availability;
+	const char	*__function_name = "activate_host";
+	char		sql[MAX_STRING_LEN], error_msg[MAX_STRING_LEN];
+	size_t		offset = 0;
+	int		*errors_from, *disable_until;
+	unsigned char	*available;
+	const char	*fld_errors_from, *fld_available, *fld_disable_until, *fld_error;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() hostid:" ZBX_FS_UI64 " itemid:" ZBX_FS_UI64 " type:%d",
 			__function_name, item->host.hostid, item->itemid, item->type);
@@ -290,14 +289,10 @@ static void	activate_host(DC_ITEM *item, zbx_timespec_t *ts)
 	offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, "%s=%d,%s=%d,%s='' where hostid=" ZBX_FS_UI64,
 			fld_errors_from, *errors_from, fld_disable_until, *disable_until, fld_error, item->host.hostid);
 
-	availability.hostid = item->host.hostid;
-	availability.type = item->type;
-	availability.available = *available;
-	availability.errors_from =  *errors_from;
-	availability.disable_until = *disable_until;
-
-	if (1 == DCconfig_update_host_availability(&availability, 1))
+	if (SUCCEED == DCconfig_update_host_availability(item->host.hostid, item->type,	*available, *errors_from,
+			*disable_until))
 	{
+
 		DBbegin();
 		DBexecute("%s", sql);
 		DBcommit();
@@ -308,13 +303,12 @@ static void	activate_host(DC_ITEM *item, zbx_timespec_t *ts)
 
 static void	deactivate_host(DC_ITEM *item, zbx_timespec_t *ts, const char *error)
 {
-	const char		*__function_name = "deactivate_host";
-	char			sql[MAX_STRING_LEN], *error_esc, error_msg[MAX_STRING_LEN];
-	size_t			offset = 0;
-	int			*errors_from, *disable_until;
-	unsigned char		*available;
-	const char		*fld_errors_from, *fld_available, *fld_disable_until, *fld_error;
-	zbx_host_availability_t	availability;
+	const char	*__function_name = "deactivate_host";
+	char		sql[MAX_STRING_LEN], *error_esc, error_msg[MAX_STRING_LEN];
+	size_t		offset = 0;
+	int		*errors_from, *disable_until;
+	unsigned char	*available;
+	const char	*fld_errors_from, *fld_available, *fld_disable_until, *fld_error;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() hostid:" ZBX_FS_UI64 " itemid:" ZBX_FS_UI64 " type:%d",
 			__function_name, item->host.hostid, item->itemid, item->type);
@@ -421,13 +415,8 @@ static void	deactivate_host(DC_ITEM *item, zbx_timespec_t *ts, const char *error
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() errors_from:%d available:%d", __function_name, *errors_from, *available);
 
-	availability.hostid = item->host.hostid;
-	availability.type = item->type;
-	availability.available = *available;
-	availability.errors_from =  *errors_from;
-	availability.disable_until = *disable_until;
-
-	if (1 == DCconfig_update_host_availability(&availability, 1))
+	if (SUCCEED == DCconfig_update_host_availability(item->host.hostid, item->type, *available, *errors_from,
+			*disable_until))
 	{
 		DBbegin();
 		DBexecute("%s", sql);

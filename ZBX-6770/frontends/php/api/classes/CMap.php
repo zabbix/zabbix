@@ -41,6 +41,7 @@ class CMap extends CMapElement {
 	 * @param bool   $options['templated_hosts']			include templates in result
 	 * @param bool   $options['with_items']					only with items
 	 * @param bool   $options['with_monitored_items']		only with monitored items
+	 * @param bool   $options['with_historical_items']		only with historical items
 	 * @param bool   $options['with_triggers'] only with	triggers
 	 * @param bool   $options['with_monitored_triggers']	only with monitored triggers
 	 * @param bool   $options['with_httptests'] only with	http tests

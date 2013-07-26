@@ -125,7 +125,7 @@ $dbGraphItems = DBselect(
 	'SELECT gi.*'.
 	' FROM graphs_items gi'.
 	' WHERE gi.graphid='.$dbGraph['graphid'].
-	' ORDER BY gi.sortorder,gi.itemid DESC'
+	' ORDER BY gi.sortorder, gi.itemid DESC'
 );
 while ($dbGraphItem = DBfetch($dbGraphItems)) {
 	$graph->addItem(

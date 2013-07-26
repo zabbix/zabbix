@@ -378,6 +378,20 @@ function DBrollback() {
 	return $result;
 }
 
+/* NOTE:
+	LIMIT and OFFSET records
+
+	Example: select 6-15 row.
+
+	MySQL:
+		SELECT a FROM tbl LIMIT 5,10
+		SELECT a FROM tbl LIMIT 10 OFFSET 5
+	PostgreSQL:
+		SELECT a FROM tbl LIMIT 10 OFFSET 5
+	Oracle:
+		SELECT a FROM tbe WHERE ROWNUM < 15 // ONLY < 15
+		SELECT * FROM (SELECT ROWNUM as RN, * FROM tbl) WHERE RN BETWEEN 6 AND 15
+//*/
 /**
  * Select data from DB. Use function DBexecute for non-selects.
  *
@@ -386,8 +400,8 @@ function DBrollback() {
  * DBselect('select * from users',50,200)
  *
  * @param string $query
- * @param integer $limit    max number of record to return
- * @param integer $offset   return starting from $offset record
+ * @param int    $limit max number of record to return
+ * @param int    $offset return starting from $offset record
  *
  * @return resource or object, False if failed
  */
@@ -400,13 +414,30 @@ function DBselect($query, $limit = null, $offset = 0) {
 		return $result;
 	}
 
-	// add the LIMIT clause
-	if(!$query = DBaddLimit($query, $limit, $offset)) {
-		return false;
+	if ((isset($limit) && ($limit < 0 || !zbx_ctype_digit($limit))) || $offset < 0 || !zbx_ctype_digit($offset)) {
+		$moreDetails = isset($limit) ? ' Limit ['.$limit.'] Offset ['.$offset.']' : ' Offset ['.$offset.']';
+		error('Incorrect parameters for limit and/or offset. Query ['.$query.']'.$moreDetails);
+		return $result;
 	}
 
 	$time_start = microtime(true);
 	$DB['SELECT_COUNT']++;
+
+	// Process limit and offset
+	if (isset($limit)) {
+		switch ($DB['TYPE']) {
+			case ZBX_DB_MYSQL:
+			case ZBX_DB_POSTGRESQL:
+			case ZBX_DB_SQLITE3:
+				$query .= ' LIMIT '.intval($limit).' OFFSET '.intval($offset);
+				break;
+			case ZBX_DB_ORACLE:
+			case ZBX_DB_DB2:
+				$till = $offset + $limit;
+				$query = 'SELECT * FROM ('.$query.') WHERE rownum BETWEEN '.intval($offset).' AND '.intval($till);
+				break;
+		}
+	}
 
 	switch ($DB['TYPE']) {
 		case ZBX_DB_MYSQL:
@@ -465,71 +496,6 @@ function DBselect($query, $limit = null, $offset = 0) {
 
 	CProfiler::getInstance()->profileSql(microtime(true) - $time_start, $query);
 	return $result;
-}
-
-/**
- * Add the LIMIT clause to the given query.
- *
- * NOTE:
- * LIMIT and OFFSET records
- *
- * Example: select 6-15 row.
- *
- * MySQL:
- * SELECT a FROM tbl LIMIT 5,10
- * SELECT a FROM tbl LIMIT 10 OFFSET 5
- *
- * PostgreSQL:
- * SELECT a FROM tbl LIMIT 10 OFFSET 5
- *
- * Oracle, DB2:
- * SELECT a FROM tbe WHERE rownum < 15 // ONLY < 15
- * SELECT * FROM (SELECT * FROM tbl) WHERE rownum BETWEEN 6 AND 15
- *
- * @param $query
- * @param integer $limit    max number of record to return
- * @param integer $offset   return starting from $offset record
- *
- * @return bool|string
- */
-function DBaddLimit($query, $limit = 0, $offset = 0) {
-	global $DB;
-
-	if ((isset($limit) && ($limit < 0 || !zbx_ctype_digit($limit))) || $offset < 0 || !zbx_ctype_digit($offset)) {
-		$moreDetails = isset($limit) ? ' Limit ['.$limit.'] Offset ['.$offset.']' : ' Offset ['.$offset.']';
-		error('Incorrect parameters for limit and/or offset. Query ['.$query.']'.$moreDetails);
-
-		return false;
-	}
-
-	// Process limit and offset
-	if (isset($limit)) {
-		switch ($DB['TYPE']) {
-			case ZBX_DB_MYSQL:
-			case ZBX_DB_POSTGRESQL:
-			case ZBX_DB_SQLITE3:
-				$query .= ' LIMIT '.intval($limit).' OFFSET '.intval($offset);
-				break;
-			case ZBX_DB_ORACLE:
-			case ZBX_DB_DB2:
-				$till = $offset + $limit;
-				$query = 'SELECT * FROM ('.$query.') WHERE rownum BETWEEN '.intval($offset).' AND '.intval($till);
-				break;
-		}
-	}
-
-	return $query;
-}
-
-/**
- * Create a UNION ALL query from an array of SELECT queries and the return the DB resource.
- *
- * @param array $queries
- *
- * @return resource
- */
-function DBunion(array $queries) {
-	return DBselect('('.implode($queries, ') UNION ALL (').')');
 }
 
 function DBexecute($query, $skip_error_messages = 0) {

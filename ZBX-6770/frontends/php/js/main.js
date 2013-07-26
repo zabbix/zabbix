@@ -393,21 +393,28 @@ var chkbxRange = {
 	submitGo: function(e) {
 		e = e || window.event;
 
-		var goSelect = $('go');
-		var confirmText = goSelect.options[goSelect.selectedIndex].getAttribute('confirm');
+		if (this.pageGoCount > 0) {
+			var goSelect = $('go');
+			var confirmText = goSelect.options[goSelect.selectedIndex].getAttribute('confirm');
 
-		if (!is_null(confirmText) && !confirm(confirmText)) {
+			if (!is_null(confirmText) && !confirm(confirmText)) {
+				Event.stop(e);
+				return false;
+			}
+
+			var form = getParent(this.goButton, 'form');
+			for (var key in this.selectedIds) {
+				if (!empty(this.selectedIds[key])) {
+					create_var(form.name, this.pageGoName + '[' + key + ']', key, false);
+				}
+			}
+			return true;
+		}
+		else {
+			alert(locale['S_NO_ELEMENTS_SELECTED']);
 			Event.stop(e);
 			return false;
 		}
-
-		var form = getParent(this.goButton, 'form');
-		for (var key in this.selectedIds) {
-			if (!empty(this.selectedIds[key])) {
-				create_var(form.name, this.pageGoName + '[' + key + ']', key, false);
-			}
-		}
-		return true;
 	}
 };
 
@@ -1022,12 +1029,6 @@ function change_flicker_state(divid) {
 	// selection box position
 	if (typeof(moveSBoxes) != 'undefined') {
 		moveSBoxes();
-	}
-
-	if (typeof(flickerResizeMultiselect) == 'undefined' && filter_state == 1) {
-		flickerResizeMultiselect = true;
-
-		jQuery('#' + divid).multiSelect.resize();
 	}
 }
 

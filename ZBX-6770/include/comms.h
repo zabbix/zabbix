@@ -141,15 +141,7 @@ int	zbx_tcp_check_security(zbx_sock_t *s, const char *ip_list, int allow_if_empt
 #define ZBX_DEFAULT_AGENT_PORT_STR	"10050"
 #define ZBX_DEFAULT_SERVER_PORT_STR	"10051"
 
-int	zbx_send_response_ext(zbx_sock_t *sock, int result, const char *info, int protocol, int timeout);
-
-#define zbx_send_response(sock, result, info, timeout) \
-		zbx_send_response_ext(sock, result, info, ZBX_TCP_PROTOCOL, timeout)
-
-#define zbx_send_response_raw(sock, result, info, timeout) \
-		zbx_send_response_ext(sock, result, info, 0, timeout)
-
-
+int	zbx_send_response(zbx_sock_t *sock, int result, const char *info, int timeout);
 int	zbx_recv_response(zbx_sock_t *sock, char *info, int max_info_len, int timeout);
 
 #endif

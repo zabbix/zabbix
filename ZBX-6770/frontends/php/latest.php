@@ -260,29 +260,18 @@ CArrayHelper::sort($db_apps, $sortFields);
 $tab_rows = array();
 
 // select items
-$sql = 'SELECT DISTINCT i.itemid,i.name,i.value_type,i.units,i.state,i.valuemapid,i.key_,ia.applicationid '.
+$sql = 'SELECT DISTINCT i.*, ia.applicationid '.
 		' FROM items i,items_applications ia'.
 		' WHERE '.dbConditionInt('ia.applicationid',$db_appids).
 			' AND i.itemid=ia.itemid'.
+			($_REQUEST['show_without_data'] ? '' : ' AND i.lastvalue IS NOT NULL').
 			' AND i.status='.ITEM_STATUS_ACTIVE.
 			' AND '.dbConditionInt('i.flags', array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED));
 
-$allItems = DBfetchArray(DBselect($sql));
+$dbItems = DBfetchArray(DBselect($sql));
 
-// if needed, skip items without data
-$itemsWithHistory = Manager::History()->fetchItemsWithData($allItems);
-
-// select history
-$history = Manager::History()->fetchLast($itemsWithHistory, 2);
-
-$displayItems = get_request('show_without_data') ? $allItems : $itemsWithHistory;
-foreach ($displayItems as $key => &$dbItem) {
+foreach ($dbItems as &$dbItem) {
 	$dbItem['resolvedName'] = itemName($dbItem);
-
-	// add item last update date for sorting
-	if (isset($history[$dbItem['itemid']])) {
-		$dbItem['lastclock'] = $history[$dbItem['itemid']][0]['clock'];
-	}
 }
 unset($dbItem);
 
@@ -298,15 +287,12 @@ elseif ($sortField == 'i.lastclock') {
 else {
 	$sortFields = array('resolvedName', 'itemid');
 }
-CArrayHelper::sort($displayItems, $sortFields);
+CArrayHelper::sort($dbItems, $sortFields);
 
-foreach ($displayItems as $db_item){
+foreach ($dbItems as $db_item){
 	if (!empty($_REQUEST['select']) && !zbx_stristr($db_item['resolvedName'], $_REQUEST['select'])) {
 		continue;
 	}
-
-	$lastHistory = isset($history[$db_item['itemid']][0]) ? $history[$db_item['itemid']][0] : null;
-	$prevHistory = isset($history[$db_item['itemid']][1]) ? $history[$db_item['itemid']][1] : null;
 
 	if(strpos($db_item['units'], ',') !== false)
 		list($db_item['units'], $db_item['unitsLong']) = explode(',', $db_item['units']);
@@ -320,36 +306,35 @@ foreach ($displayItems as $db_item){
 
 	$db_app['item_cnt']++;
 
-	// last check time and last value
-	if ($lastHistory) {
-		$lastClock = zbx_date2str(_('d M Y H:i:s'), $lastHistory['clock']);
-		$lastValue = formatHistoryValue($lastHistory['value'], $db_item, false);
+	if (isset($db_item['lastclock'])) {
+		$lastclock = zbx_date2str(_('d M Y H:i:s'), $db_item['lastclock']);
 	}
 	else {
-		$lastClock = UNKNOWN_VALUE;
-		$lastValue = UNKNOWN_VALUE;
+		$lastclock = ' - ';
 	}
 
-	// change
+	$lastvalue = formatItemLastValue($db_item, '-', false);
+
 	$digits = ($db_item['value_type'] == ITEM_VALUE_TYPE_FLOAT) ? 2 : 0;
-	if ($lastHistory && $prevHistory
+	if (isset($db_item['lastvalue']) && isset($db_item['prevvalue'])
 			&& ($db_item['value_type'] == ITEM_VALUE_TYPE_FLOAT || $db_item['value_type'] == ITEM_VALUE_TYPE_UINT64)
-			&& (bcsub($lastHistory['value'], $prevHistory['value'], $digits) != 0)) {
+			&& (bcsub($db_item['lastvalue'], $db_item['prevvalue'], $digits) != 0)) {
 
 		$change = '';
-		if (($lastHistory['value'] - $prevHistory['value']) > 0) {
+		if (($db_item['lastvalue'] - $db_item['prevvalue']) > 0) {
 			$change = '+';
 		}
 
 		// for 'unixtime' change should be calculated as uptime
-		$change .= convert_units(array(
-			'value' => bcsub($lastHistory['value'], $prevHistory['value'], $digits),
-			'units' => $db_item['units'] == 'unixtime' ? 'uptime' : $db_item['units']
-		));
+		$change .= convert_units(
+			bcsub($db_item['lastvalue'], $db_item['prevvalue'], $digits),
+			$db_item['units'] == 'unixtime' ? 'uptime' : $db_item['units'],
+			0
+		);
 		$change = nbsp($change);
 	}
 	else {
-		$change = UNKNOWN_VALUE;
+		$change = ' - ';
 	}
 
 	if(($db_item['value_type']==ITEM_VALUE_TYPE_FLOAT) || ($db_item['value_type']==ITEM_VALUE_TYPE_UINT64)){
@@ -363,11 +348,11 @@ foreach ($displayItems as $db_item){
 
 	array_push($app_rows, new CRow(array(
 		SPACE,
-		is_show_all_nodes() ? SPACE : null,
-		($_REQUEST['hostid'] > 0) ? null : SPACE,
+		is_show_all_nodes()?SPACE:null,
+		($_REQUEST['hostid']>0)?NULL:SPACE,
 		new CCol(new CDiv(SPACE.SPACE.$db_item['resolvedName'], $item_status)),
-		new CCol(new CDiv($lastClock, $item_status)),
-		new CCol(new CDiv($lastValue, $item_status)),
+		new CCol(new CDiv($lastclock, $item_status)),
+		new CCol(new CDiv($lastvalue, $item_status)),
 		new CCol(new CDiv($change, $item_status)),
 		$actions
 	)));
@@ -458,30 +443,21 @@ foreach ($dbHostRes as $dbHost) {
 $tab_rows = array();
 
 // select items
-$sql = 'SELECT DISTINCT i.hostid,i.itemid,i.name,i.value_type,i.units,i.state,i.valuemapid,i.key_ '.
-		' FROM items i '.
+$sql = 'SELECT DISTINCT h.host as hostname,h.hostid,i.* '.
+		' FROM hosts h'.$sql_from.', items i '.
 			' LEFT JOIN items_applications ia ON ia.itemid=i.itemid'.
 		' WHERE ia.itemid is NULL '.
+			$sql_where.
+			' AND h.hostid=i.hostid '.
+			($_REQUEST['show_without_data'] ? '' : ' AND i.lastvalue IS NOT NULL').
 			' AND i.status='.ITEM_STATUS_ACTIVE.
 			' AND '.dbConditionInt('i.flags', array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)).
-			' AND '.dbConditionInt('i.hostid', $db_hostids);
+			' AND '.dbConditionInt('h.hostid', $db_hostids);
 
-$allItems = DBfetchArray(DBselect($sql));
+$dbItems = DBfetchArray(DBselect($sql));
 
-// if needed, skip items without data
-$itemsWithHistory = Manager::History()->fetchItemsWithData($allItems);
-
-// select history
-$history = Manager::History()->fetchLast($itemsWithHistory, 2);
-
-$displayItems = get_request('show_without_data') ? $allItems : $itemsWithHistory;
-foreach ($displayItems as $key => &$dbItem) {
+foreach ($dbItems as &$dbItem) {
 	$dbItem['resolvedName'] = itemName($dbItem);
-
-	// add item last update date for sorting
-	if (isset($history[$dbItem['itemid']])) {
-		$dbItem['lastclock'] = $history[$dbItem['itemid']][0]['clock'];
-	}
 }
 unset($dbItem);
 
@@ -497,15 +473,12 @@ elseif ($sortField == 'i.lastclock') {
 else {
 	$sortFields = array('resolvedName', 'itemid');
 }
-CArrayHelper::sort($displayItems, $sortFields);
+CArrayHelper::sort($dbItems, $sortFields);
 
-foreach ($displayItems as $db_item){
+foreach ($dbItems as $db_item){
 	if (!empty($_REQUEST['select']) && !zbx_stristr($db_item['resolvedName'], $_REQUEST['select'])) {
 		continue;
 	}
-
-	$lastHistory = isset($history[$db_item['itemid']][0]) ? $history[$db_item['itemid']][0] : null;
-	$prevHistory = isset($history[$db_item['itemid']][1]) ? $history[$db_item['itemid']][1] : null;
 
 	if (strpos($db_item['units'], ',') !== false)
 		list($db_item['units'], $db_item['unitsLong']) = explode(',', $db_item['units']);
@@ -519,32 +492,34 @@ foreach ($displayItems as $db_item){
 
 	$db_host['item_cnt']++;
 
-	// last check time and last value
-	if ($lastHistory) {
-		$lastClock = zbx_date2str(_('d M Y H:i:s'), $lastHistory['clock']);
-		$lastValue = formatHistoryValue($lastHistory['value'], $db_item, false);
+	// column "lastclock"
+	if (isset($db_item['lastclock'])) {
+		$lastclock = zbx_date2str(_('d M Y H:i:s'), $db_item['lastclock']);
 	}
 	else {
-		$lastClock = UNKNOWN_VALUE;
-		$lastValue = UNKNOWN_VALUE;
+		$lastclock = ' - ';
 	}
+
+	// column "lastvalue"
+	$lastvalue = formatItemLastValue($db_item);
 
 	// column "change"
 	$digits = ($db_item['value_type'] == ITEM_VALUE_TYPE_FLOAT) ? 2 : 0;
-	if (isset($lastHistory['value']) && isset($prevHistory['value'])
+	if (isset($db_item['lastvalue']) && isset($db_item['prevvalue'])
 			&& ($db_item['value_type'] == ITEM_VALUE_TYPE_FLOAT || $db_item['value_type'] == ITEM_VALUE_TYPE_UINT64)
-			&& (bcsub($lastHistory['value'], $prevHistory['value'], $digits) != 0)) {
+			&& (bcsub($db_item['lastvalue'], $db_item['prevvalue'], $digits) != 0)) {
 
 		$change = '';
-		if (($lastHistory['value'] - $prevHistory['value']) > 0) {
+		if (($db_item['lastvalue'] - $db_item['prevvalue']) > 0) {
 			$change = '+';
 		}
 
 		// for 'unixtime' change should be calculated as uptime
-		$change .= convert_units(array(
-			'value' => bcsub($lastHistory['value'], $prevHistory['value'], $digits),
-			'units' => $db_item['units'] == 'unixtime' ? 'uptime' : $db_item['units']
-		));
+		$change .= convert_units(
+			bcsub($db_item['lastvalue'], $db_item['prevvalue'], $digits),
+			$db_item['units'] == 'unixtime' ? 'uptime' : $db_item['units'],
+			0
+		);
 		$change = nbsp($change);
 	}
 	else {
@@ -565,8 +540,8 @@ foreach ($displayItems as $db_item){
 		is_show_all_nodes() ? ($db_host['item_cnt'] ? SPACE : get_node_name_by_elid($db_item['itemid'])) : null,
 		$_REQUEST['hostid'] ? null : SPACE,
 		new CCol(new CDiv(SPACE.SPACE.$db_item['resolvedName'], $item_status)),
-		new CCol(new CDiv($lastClock, $item_status)),
-		new CCol(new CDiv($lastValue, $item_status)),
+		new CCol(new CDiv($lastclock, $item_status)),
+		new CCol(new CDiv($lastvalue, $item_status)),
 		new CCol(new CDiv($change, $item_status)),
 		new CCol(new CDiv($actions, $item_status))
 	)));

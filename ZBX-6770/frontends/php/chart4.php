@@ -143,10 +143,10 @@ for ($i = 1; $i <= $weeks; $i++) {
 
 	$yf = $sizeY * $false[$i - 1] / 100;
 	if ($yf > 0) {
-		imagefilledrectangle($im, $x1 + $shiftX, $yt + $shiftYup, $x1 + $shiftX + 8, $sizeY + $shiftYup, imagecolorallocate($im, 120, 235, 120)); // green
+		imagefilledrectangle($im, $x1 + $shiftX, $yt + $yu + $shiftYup, $x1 + $shiftX + 8, $sizeY + $shiftYup, imagecolorallocate($im, 120, 235, 120)); // green
 	}
 
-	if ($yt + $yf > 0) {
+	if ($yt + $yf + $yu > 0) {
 		imagerectangle($im, $x1 + $shiftX, $shiftYup, $x1 + $shiftX + 8, $sizeY + $shiftYup, $black);
 	}
 }

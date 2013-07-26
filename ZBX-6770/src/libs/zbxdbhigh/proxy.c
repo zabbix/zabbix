@@ -216,13 +216,13 @@ static void	get_proxyconfig_table(zbx_uint64_t proxy_hostid, struct zbx_json *j,
 				",hosts r where t.hostid=r.hostid"
 					" and r.proxy_hostid=" ZBX_FS_UI64
 					" and r.status in (%d,%d)"
-					" and t.type in (%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d)",
+					" and t.type in (%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d)",
 				proxy_hostid,
 				HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED,
 				ITEM_TYPE_ZABBIX, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_SNMPv1, ITEM_TYPE_SNMPv2c,
 				ITEM_TYPE_SNMPv3, ITEM_TYPE_IPMI, ITEM_TYPE_TRAPPER, ITEM_TYPE_SIMPLE,
 				ITEM_TYPE_HTTPTEST, ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_SSH,
-				ITEM_TYPE_TELNET, ITEM_TYPE_JMX, ITEM_TYPE_SNMPTRAP, ITEM_TYPE_INTERNAL);
+				ITEM_TYPE_TELNET, ITEM_TYPE_JMX, ITEM_TYPE_SNMPTRAP);
 	}
 	else if (0 == strcmp(table->table, "drules"))
 	{
@@ -1206,13 +1206,6 @@ void	process_proxyconfig(struct zbx_json_parse *jp_data)
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
-#define CHECK_ARRAY_SIZE(array, alloc, num)				\
-	if (num == alloc)						\
-	{								\
-		alloc = (0 == alloc ? 8 : alloc * 3 / 2);		\
-		array = zbx_realloc(array, alloc * sizeof(*array));	\
-	}
-
 int	get_host_availability_data(struct zbx_json *j)
 {
 	typedef struct
@@ -1242,8 +1235,7 @@ int	get_host_availability_data(struct zbx_json *j)
 			"select hostid,available,error,snmp_available,snmp_error,"
 				"ipmi_available,ipmi_error,jmx_available,jmx_error"
 			" from hosts"
-			" where status in (%d,%d)",
-			HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED);
+			" where status=%d", HOST_STATUS_MONITORED);
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -1255,7 +1247,11 @@ int	get_host_availability_data(struct zbx_json *j)
 
 		if (index == ha_num || ha[index].hostid != hostid)
 		{
-			CHECK_ARRAY_SIZE(ha, ha_alloc, ha_num);
+			if (ha_num == ha_alloc)
+			{
+				ha_alloc += 8;
+				ha = zbx_realloc(ha, sizeof(zbx_host_availability_t) * ha_alloc);
+			}
 
 			if (0 != (sz = sizeof(zbx_host_availability_t) * (ha_num - index)))
 				memmove(&ha[index + 1], &ha[index], sz);
@@ -1375,8 +1371,8 @@ void	process_host_availability(struct zbx_json_parse *jp)
 	const char		*p = NULL;
 	char			tmp[HOST_ERROR_LEN_MAX], *sql = NULL, *error_esc;
 	size_t			sql_alloc = 4 * ZBX_KIBIBYTE, sql_offset = 0, tmp_offset;
-	int			availability_alloc = 0, availability_num = 0, availability_last = 0;
-	zbx_host_availability_t	*availability = NULL;
+	int			no_data, item_type = -1;
+	unsigned char		available = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -1384,11 +1380,11 @@ void	process_host_availability(struct zbx_json_parse *jp)
 	if (SUCCEED != zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_DATA, &jp_data))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "invalid host availability data: %s", zbx_json_strerror());
-		goto out;
+		goto exit;
 	}
 
 	if (SUCCEED == zbx_json_object_is_empty(&jp_data))
-		goto out;
+		goto exit;
 
 	sql = zbx_malloc(sql, sql_alloc);
 
@@ -1404,80 +1400,41 @@ void	process_host_availability(struct zbx_json_parse *jp)
 			continue;
 		}
 
-		if (SUCCEED != zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_HOSTID, tmp, sizeof(tmp)) ||
-				SUCCEED != is_uint64(tmp, &hostid))
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "invalid host availability data: %s", zbx_json_strerror());
-			continue;
-		}
-
 		tmp_offset = sql_offset;
-		availability_last = availability_num;
+		no_data = 1;
 
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "update hosts set ");
 
 		if (SUCCEED == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_AVAILABLE, tmp, sizeof(tmp)))
 		{
-			CHECK_ARRAY_SIZE(availability, availability_alloc, availability_num);
-
-			availability[availability_num].hostid = hostid;
-			availability[availability_num].type = ITEM_TYPE_ZABBIX;
-			availability[availability_num].available = atoi(tmp);
-			availability[availability_num].errors_from = 0;
-			availability[availability_num].disable_until = 0;
-
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "available=%d,",
-					availability[availability_num].available);
-
-			availability_num++;
+			available = atoi(tmp);
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "available=%d,", available);
+			no_data = 0;
+			item_type = ITEM_TYPE_ZABBIX;
 		}
 
 		if (SUCCEED == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_SNMP_AVAILABLE, tmp, sizeof(tmp)))
 		{
-			CHECK_ARRAY_SIZE(availability, availability_alloc, availability_num);
-
-			availability[availability_num].hostid = hostid;
-			availability[availability_num].type = ITEM_TYPE_SNMPv1;
-			availability[availability_num].available = atoi(tmp);
-			availability[availability_num].errors_from = 0;
-			availability[availability_num].disable_until = 0;
-
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "snmp_available=%d,",
-					availability[availability_num].available);
-
-			availability_num++;
+			available = atoi(tmp);
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "snmp_available=%d,", available);
+			no_data = 0;
+			item_type = ITEM_TYPE_SNMPv1;
 		}
 
 		if (SUCCEED == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_IPMI_AVAILABLE, tmp, sizeof(tmp)))
 		{
-			CHECK_ARRAY_SIZE(availability, availability_alloc, availability_num);
-
-			availability[availability_num].hostid = hostid;
-			availability[availability_num].type = ITEM_TYPE_IPMI;
-			availability[availability_num].available = atoi(tmp);
-			availability[availability_num].errors_from = 0;
-			availability[availability_num].disable_until = 0;
-
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "ipmi_available=%d,",
-					availability[availability_num].available);
-
-			availability_num++;
+			available = atoi(tmp);
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "ipmi_available=%d,", available);
+			no_data = 0;
+			item_type = ITEM_TYPE_IPMI;
 		}
 
 		if (SUCCEED == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_JMX_AVAILABLE, tmp, sizeof(tmp)))
 		{
-			CHECK_ARRAY_SIZE(availability, availability_alloc, availability_num);
-
-			availability[availability_num].hostid = hostid;
-			availability[availability_num].type = ITEM_TYPE_JMX;
-			availability[availability_num].available = atoi(tmp);
-			availability[availability_num].errors_from = 0;
-			availability[availability_num].disable_until = 0;
-
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "jmx_available=%d,",
-					availability[availability_num].available);
-
-			availability_num++;
+			available = atoi(tmp);
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "jmx_available=%d,", available);
+			no_data = 0;
+			item_type = ITEM_TYPE_JMX;
 		}
 
 		if (SUCCEED == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_ERROR, tmp, sizeof(tmp)))
@@ -1485,6 +1442,7 @@ void	process_host_availability(struct zbx_json_parse *jp)
 			error_esc = DBdyn_escape_string_len(tmp, HOST_ERROR_LEN);
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "error='%s',", error_esc);
 			zbx_free(error_esc);
+			no_data = 0;
 		}
 
 		if (SUCCEED == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_SNMP_ERROR, tmp, sizeof(tmp)))
@@ -1492,6 +1450,7 @@ void	process_host_availability(struct zbx_json_parse *jp)
 			error_esc = DBdyn_escape_string_len(tmp, HOST_ERROR_LEN);
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "snmp_error='%s',", error_esc);
 			zbx_free(error_esc);
+			no_data = 0;
 		}
 
 		if (SUCCEED == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_IPMI_ERROR, tmp, sizeof(tmp)))
@@ -1499,6 +1458,7 @@ void	process_host_availability(struct zbx_json_parse *jp)
 			error_esc = DBdyn_escape_string_len(tmp, HOST_ERROR_LEN);
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "ipmi_error='%s',", error_esc);
 			zbx_free(error_esc);
+			no_data = 0;
 		}
 
 		if (SUCCEED == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_JMX_ERROR, tmp, sizeof(tmp)))
@@ -1506,9 +1466,17 @@ void	process_host_availability(struct zbx_json_parse *jp)
 			error_esc = DBdyn_escape_string_len(tmp, HOST_ERROR_LEN);
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "jmx_error='%s',", error_esc);
 			zbx_free(error_esc);
+			no_data = 0;
 		}
 
-		if (availability_last == availability_num)
+		if (SUCCEED != zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_HOSTID, tmp, sizeof(tmp)))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "invalid host availability data: %s", zbx_json_strerror());
+			sql_offset = tmp_offset;
+			continue;
+		}
+
+		if (SUCCEED != is_uint64(tmp, &hostid) || 1 == no_data)
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "invalid host availability data");
 			sql_offset = tmp_offset;
@@ -1528,11 +1496,12 @@ void	process_host_availability(struct zbx_json_parse *jp)
 
 	DBcommit();
 
-	DCconfig_update_host_availability(availability, availability_num);
-out:
-	zbx_free(availability);
 	zbx_free(sql);
 
+	if (-1 != item_type)
+		DCconfig_update_host_availability(hostid, item_type, available, 0, 0);
+
+exit:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
@@ -1963,7 +1932,8 @@ void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid,
 				items[i].host.maintenance_from <= values[i].ts.sec)
 			continue;
 
-		if (ITEM_TYPE_AGGREGATE == items[i].type || ITEM_TYPE_CALCULATED == items[i].type)
+		if (ITEM_TYPE_INTERNAL == items[i].type || ITEM_TYPE_AGGREGATE == items[i].type ||
+				ITEM_TYPE_CALCULATED == items[i].type)
 			continue;
 
 		if (0 == proxy_hostid && ITEM_TYPE_TRAPPER != items[i].type && ITEM_TYPE_ZABBIX_ACTIVE != items[i].type)
@@ -2436,36 +2406,4 @@ exit:
 	zbx_free(host_metadata);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: proxy_get_history_count                                          *
- *                                                                            *
- * Purpose: get the number of values waiting to be sent to the sever          *
- *                                                                            *
- * Return value: the number of history values                                 *
- *                                                                            *
- ******************************************************************************/
-int	proxy_get_history_count()
-{
-	DB_RESULT	result;
-	DB_ROW		row;
-	zbx_uint64_t	id;
-	int 		count = 0;
-
-	proxy_get_lastid("proxy_history", "history_lastid", &id);
-
-	result = DBselect(
-			"select count(*)"
-			" from proxy_history"
-			" where id>" ZBX_FS_UI64,
-			id);
-
-	if (NULL != (row = DBfetch(result)))
-		count = atoi(row[0]);
-
-	DBfree_result(result);
-
-	return count;
 }

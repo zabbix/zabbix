@@ -607,28 +607,24 @@ class CMacrosResolver {
 	 * @return bool
 	 */
 	private function resolveItemMacros(array $macros, array $triggers, array $macroValues) {
-		if ($macros) {
-			$functions = DbFetchArray(DBselect(
-				'SELECT f.triggerid,f.functionid,i.itemid,i.value_type,i.units,i.valuemapid'.
+		if (!empty($macros)) {
+			$dbFuncs = DBselect(
+				'SELECT f.triggerid,f.functionid,i.itemid,i.lastvalue,i.lastclock,i.value_type,i.units,i.valuemapid,m.mappingid,m.newvalue'.
 				' FROM functions f'.
 					' JOIN items i ON f.itemid=i.itemid'.
 					' JOIN hosts h ON i.hostid=h.hostid'.
+					' LEFT JOIN mappings m ON i.valuemapid=m.valuemapid AND i.lastvalue=m.value'.
 				' WHERE '.dbConditionInt('f.functionid', array_keys($macros))
-			));
-
-			$history = Manager::History()->fetchLast($functions);
-
+			);
 			// false passed to DBfetch to get data without null converted to 0, which is done by default
-			foreach ($functions as $func) {
+			while ($func = DBfetch($dbFuncs, false)) {
 				foreach ($macros[$func['functionid']] as $macro => $fNums) {
-					$lastValue = isset($history[$func['itemid']]) ? $history[$func['itemid']][0]['value'] : null;
-
 					switch ($macro) {
 						case 'ITEM.LASTVALUE':
-							$replace = $this->resolveItemLastvalueMacro($lastValue, $func);
+							$replace = $this->resolveItemLastvalueMacro($func);
 							break;
 						case 'ITEM.VALUE':
-							$replace = $this->resolveItemValueMacro($lastValue, $func, $triggers[$func['triggerid']]);
+							$replace = $this->resolveItemValueMacro($func, $triggers[$func['triggerid']]);
 							break;
 					}
 
@@ -643,13 +639,14 @@ class CMacrosResolver {
 	/**
 	 * Resolve {ITEM.LASTVALUE} macro.
 	 *
-	 * @param mixed $lastValue
 	 * @param array $item
 	 *
 	 * @return string
 	 */
-	private function resolveItemLastvalueMacro($lastValue, array $item) {
-		return ($lastValue !== null) ? formatHistoryValue($lastValue, $item) : UNRESOLVED_MACRO_STRING;
+	private function resolveItemLastvalueMacro(array $item) {
+		return is_null($item['mappingid'])
+			? formatItemLastValue($item, UNRESOLVED_MACRO_STRING)
+			: $item['newvalue'].' ('.$item['lastvalue'].')';
 	}
 
 	/**
@@ -657,20 +654,19 @@ class CMacrosResolver {
 	 * For triggers macro is resolved in same way as {ITEM.LASTVALUE} macro. Separate methods are created for event description,
 	 * where {ITEM.VALUE} macro resolves in different way.
 	 *
-	 * @param mixed $lastValue
 	 * @param array $item
 	 * @param array $trigger
 	 *
 	 * @return string
 	 */
-	private function resolveItemValueMacro($lastValue, array $item, array $trigger) {
+	private function resolveItemValueMacro(array $item, array $trigger) {
 		if ($this->config == 'eventDescription') {
-			$value = item_get_history($item, 0, $trigger['clock'], $trigger['ns']);
+			$item['lastvalue'] = item_get_history($item, 0, $trigger['clock'], $trigger['ns']);
 
-			return ($value !== null) ? formatHistoryValue($value, $item) : UNRESOLVED_MACRO_STRING;
+			return formatItemLastValue($item, UNRESOLVED_MACRO_STRING);
 		}
 		else {
-			return $this->resolveItemLastvalueMacro($lastValue, $item);
+			return $this->resolveItemLastvalueMacro($item);
 		}
 	}
 
@@ -788,29 +784,23 @@ class CMacrosResolver {
 				'(?<parameters>([0-9]+[smhdw]?))'.
 				'\)}{1})/Uux', $str, $matches, PREG_OFFSET_CAPTURE);
 
-			if (!empty($matches['hosts'])) {
-				foreach ($matches['hosts'] as $i => $host) {
-					$matches['hosts'][$i][0] = $this->resolveGraphPositionalMacros($host[0], $items);
-					if ($matches['hosts'][$i][0] !== UNRESOLVED_MACRO_STRING) {
-						if (!isset($hostKeyPairs[$matches['hosts'][$i][0]])) {
-							$hostKeyPairs[$matches['hosts'][$i][0]] = array();
-						}
-						$hostKeyPairs[$matches['hosts'][$i][0]][$matches['keys'][$i][0]] = 1;
+			// resolve positional macros in host part and build host-key pair array
+			foreach ($matches['hosts'] as $i => $host) {
+				$matches['hosts'][$i][0] = $this->resolveGraphPositionalMacros($host[0], $items);
+				if ($matches['hosts'][$i][0] !== UNRESOLVED_MACRO_STRING) {
+					if (!isset($hostKeyPairs[$matches['hosts'][$i][0]])) {
+						$hostKeyPairs[$matches['hosts'][$i][0]] = array();
 					}
+					$hostKeyPairs[$matches['hosts'][$i][0]][$matches['keys'][$i][0]] = 1;
 				}
-
-				$matchesList[] = $matches;
-				$items = next($itemsList);
 			}
-		}
 
-		// stop, if no macros found
-		if (empty($matchesList)) {
-			return $strList;
+			$matchesList[] = $matches;
+			$items = next($itemsList);
 		}
 
 		// build item retrieval query from host-key pairs
-		$query = 'SELECT h.host,i.key_,i.itemid,i.value_type,i.units,i.valuemapid'.
+		$query = 'SELECT h.host,i.key_,i.itemid,i.lastclock,i.lastvalue,i.value_type,i.units,i.valuemapid'.
 					' FROM items i, hosts h'.
 					' WHERE i.hostid=h.hostid AND (';
 		foreach ($hostKeyPairs as $host => $keys) {
@@ -830,7 +820,7 @@ class CMacrosResolver {
 		$allowedItems = API::Item()->get(array(
 			'itemids' => array_keys($items),
 			'webitems' => true,
-			'output' => array('itemid', 'value_type'),
+			'output' => API_OUTPUT_REFER,
 			'preservekeys' => true
 		));
 
@@ -840,9 +830,6 @@ class CMacrosResolver {
 				$hostKeyPairs[$item['host']][$item['key_']] = $item;
 			}
 		}
-
-		// fetch history
-		$history = Manager::History()->fetchLast($items);
 
 		// replace macros with their corresponding values in graph strings
 		$matches = reset($matchesList);
@@ -858,12 +845,7 @@ class CMacrosResolver {
 
 					// macro function is "last"
 					if ($matches['functions'][$i][0] == 'last') {
-						if (isset($history[$item['itemid']])) {
-							$value = formatHistoryValue($history[$item['itemid']][0]['value'], $item);
-						}
-						else {
-							$value = UNRESOLVED_MACRO_STRING;
-						}
+						$value = formatItemLastValue($item, UNRESOLVED_MACRO_STRING);
 					}
 					// macro function is "max", "min" or "avg"
 					else {
@@ -880,7 +862,6 @@ class CMacrosResolver {
 
 			$matches = next($matchesList);
 		}
-		unset($str);
 
 		return $strList;
 	}
