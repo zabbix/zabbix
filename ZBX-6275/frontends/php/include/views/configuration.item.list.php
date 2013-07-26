@@ -83,6 +83,7 @@ foreach ($this->data['items'] as $item) {
 		);
 		$description[] = NAME_DELIMITER;
 	}
+
 	if (!empty($item['discoveryRule'])) {
 		$description[] = new CLink(
 			CHtml::encode($item['discoveryRule']['name']),
