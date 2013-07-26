@@ -900,7 +900,7 @@ else {
 		'form' => get_request('form'),
 		'hostid' => get_request('hostid'),
 		'sortfield' => getPageSortField('name'),
-		'host' => empty($host) ? array() : $host,
+		'host' => (isset($host) && is_array($host)) ? $host : array(),
 		'displayNodes' => (is_array(get_current_nodeid()) && empty($_REQUEST['filter_groupid']) && empty($_REQUEST['filter_hostid']))
 	);
 

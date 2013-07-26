@@ -320,7 +320,7 @@ else {
 		'limit' => $config['search_limit'] + 1
 	));
 
-	$data['host'] = empty($hosts) ? array() : reset($hosts);
+	$data['host'] = (isset($hosts) && is_array($hosts)) ? reset($hosts) : array();
 
 	if (!empty($data['discoveries'])) {
 		order_result($data['discoveries'], $sortfield, getPageSortOrder());
