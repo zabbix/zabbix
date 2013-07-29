@@ -64,6 +64,18 @@ $fields=array(
 );
 
 check_fields($fields);
+if (get_request('groupid', 0) > 0) {
+	$groupId = available_groups($_REQUEST['groupid'], 0);
+	if (!$groupId) {
+		access_deny();
+	}
+}
+if (get_request('hostid', 0) > 0) {
+	$hostIds = available_hosts($_REQUEST['hostid'], 0);
+	if (empty($hostIds)) {
+		access_deny();
+	}
+}
 
 /* AJAX */
 if (isset($_REQUEST['favobj'])) {
@@ -123,7 +135,6 @@ else {
 	$_REQUEST['show_without_data'] = CProfile::get('web.latest.filter.show_without_data', 0);
 }
 // --------------
-
 $latest_wdgt = new CWidget(null, 'latest-mon');
 
 // Header
