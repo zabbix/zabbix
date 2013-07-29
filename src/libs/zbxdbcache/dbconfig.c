@@ -5000,7 +5000,58 @@ int	DCget_item_queue(zbx_vector_ptr_t *queue, int from, int to)
  *                                                                            *
  * Function: DCget_expressions                                                *
  *                                                                            *
- * Purpose: retrieves stored expression data from cache                       *
+ * Purpose: retrieves global expression data from cache                       *
+ *                                                                            *
+ * Parameters: expressions  - [OUT] a vector of expression data pointers      *
+ *             names        - [IN] a vector containing expression names       *
+ *             names_num    - [IN] the number of items in names vector        *
+ *                                                                            *
+ * Comment: The expressions vector contains allocated data, which must be     *
+ *          freed afterwards with zbx_regexp_clean_expressions() function.    *
+ *                                                                            *
+ ******************************************************************************/
+void	DCget_expressions_by_names(zbx_vector_ptr_t *expressions, const char **names, int names_num)
+{
+	int			i, iname;
+	ZBX_DC_EXPRESSION	*expression;
+	ZBX_DC_REGEXP		*regexp, search_regexp;
+
+	LOCK_CACHE;
+
+	for (iname = 0; iname < names_num; iname++)
+	{
+		search_regexp.name = names[iname];
+
+		if (NULL != (regexp = zbx_hashset_search(&config->regexps, &search_regexp)))
+		{
+			for (i = 0; i < regexp->expressionids.values_num; i++)
+			{
+				zbx_uint64_t		expressionid = regexp->expressionids.values[i];
+				zbx_expression_t	*rxp;
+
+				if (NULL == (expression = zbx_hashset_search(&config->expressions, &expressionid)))
+					continue;
+
+				rxp = zbx_malloc(NULL, sizeof(zbx_expression_t));
+				rxp->name = zbx_strdup(NULL, regexp->name);
+				rxp->expression = zbx_strdup(NULL, expression->expression);
+				rxp->exp_delimiter = expression->delimiter;
+				rxp->case_sensitive = expression->case_sensitive;
+				rxp->expression_type = expression->type;
+
+				zbx_vector_ptr_append(expressions, rxp);
+			}
+		}
+	}
+
+	UNLOCK_CACHE;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DCget_expression                                                 *
+ *                                                                            *
+ * Purpose: retrieves g expression data from cache                       *
  *                                                                            *
  * Parameters: expressions  - [OUT] a vector of expression data pointers      *
  *             name         - [IN] the regular expression name                *
@@ -5009,43 +5060,8 @@ int	DCget_item_queue(zbx_vector_ptr_t *queue, int from, int to)
  *          freed afterwards with zbx_regexp_clean_expressions() function.    *
  *                                                                            *
  ******************************************************************************/
-void	DCget_expressions(zbx_vector_ptr_t *expressions, const char *name)
+void	DCget_expressions_by_name(zbx_vector_ptr_t *expressions, const char *name)
 {
-	int			i, success = 0;
-	ZBX_DC_EXPRESSION	*expression;
-	ZBX_DC_REGEXP		*regexp, search_regexp = {name};
-
-	for (i = 0; i < expressions->values_num; i++)
-	{
-		zbx_expression_t	*rxp = expressions->values[i];
-
-		if (0 == strcmp(rxp->name, name))
-			return;
-	}
-
-	LOCK_CACHE;
-
-	if (NULL != (regexp = zbx_hashset_search(&config->regexps, &search_regexp)))
-	{
-		for (i = 0; i < regexp->expressionids.values_num; i++)
-		{
-			zbx_uint64_t		expressionid = regexp->expressionids.values[i];
-			zbx_expression_t	*rxp;
-
-			if (NULL == (expression = zbx_hashset_search(&config->expressions, &expressionid)))
-				continue;
-
-			rxp = zbx_malloc(NULL, sizeof(zbx_expression_t));
-			zbx_strlcpy(rxp->name, regexp->name, sizeof(rxp->name));
-			zbx_strlcpy(rxp->expression, expression->expression, sizeof(rxp->expression));
-			rxp->exp_delimiter = expression->delimiter;
-			rxp->case_sensitive = expression->case_sensitive;
-			rxp->expression_type = expression->type;
-
-			zbx_vector_ptr_append(expressions, rxp);
-		}
-	}
-
-	UNLOCK_CACHE;
+	DCget_expressions_by_names(expressions, &name, 1);
 }
 

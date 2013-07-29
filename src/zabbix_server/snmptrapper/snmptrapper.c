@@ -127,8 +127,7 @@ static int	process_trap_for_interface(zbx_uint64_t interfaceid, char *trap, zbx_
 			continue;
 
 		if ('@' == *regex)
-			DCget_expressions(&regexps, regex + 1);
-
+			DCget_expressions_by_name(&regexps, regex + 1);
 
 		if (SUCCEED != regexp_match_ex(&regexps, trap, regex, ZBX_CASE_SENSITIVE))
 			continue;
