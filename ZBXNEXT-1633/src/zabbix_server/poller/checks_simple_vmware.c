@@ -2787,6 +2787,54 @@ int	check_vcenter_vm_memory_size_swapped(AGENT_REQUEST *request, AGENT_RESULT *r
 	return ret;
 }
 
+int	check_vcenter_vm_memory_size_usage_guest(AGENT_REQUEST *request, AGENT_RESULT *result)
+{
+	int	ret;
+
+	ret = get_vcenter_vmstat(request, ZBX_XPATH_LN2("quickStats", "guestMemoryUsage"), result);
+
+	if (SYSINFO_RET_OK == ret && GET_UI64_RESULT(result))
+		result->ui64 = result->ui64 * ZBX_MEBIBYTE;
+
+	return ret;
+}
+
+int	check_vcenter_vm_memory_size_usage_host(AGENT_REQUEST *request, AGENT_RESULT *result)
+{
+	int	ret;
+
+	ret = get_vcenter_vmstat(request, ZBX_XPATH_LN2("quickStats", "hostMemoryUsage"), result);
+
+	if (SYSINFO_RET_OK == ret && GET_UI64_RESULT(result))
+		result->ui64 = result->ui64 * ZBX_MEBIBYTE;
+
+	return ret;
+}
+
+int	check_vcenter_vm_memory_size_private(AGENT_REQUEST *request, AGENT_RESULT *result)
+{
+	int	ret;
+
+	ret = get_vcenter_vmstat(request, ZBX_XPATH_LN2("quickStats", "privateMemory"), result);
+
+	if (SYSINFO_RET_OK == ret && GET_UI64_RESULT(result))
+		result->ui64 = result->ui64 * ZBX_MEBIBYTE;
+
+	return ret;
+}
+
+int	check_vcenter_vm_memory_size_shared(AGENT_REQUEST *request, AGENT_RESULT *result)
+{
+	int	ret;
+
+	ret = get_vcenter_vmstat(request, ZBX_XPATH_LN2("quickStats", "sharedMemory"), result);
+
+	if (SYSINFO_RET_OK == ret && GET_UI64_RESULT(result))
+		result->ui64 = result->ui64 * ZBX_MEBIBYTE;
+
+	return ret;
+}
+
 int	check_vcenter_vm_powerstate(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	return get_vcenter_vmstat(request, ZBX_XPATH_LN2("runtime", "powerState"), result);
@@ -3827,6 +3875,54 @@ int	check_vsphere_vm_memory_size_swapped(AGENT_REQUEST *request, AGENT_RESULT *r
 	int	ret;
 
 	ret = get_vsphere_vmstat(request, ZBX_XPATH_LN2("quickStats", "swappedMemory"), result);
+
+	if (SYSINFO_RET_OK == ret && GET_UI64_RESULT(result))
+		result->ui64 = result->ui64 * ZBX_MEBIBYTE;
+
+	return ret;
+}
+
+int	check_vsphere_vm_memory_size_usage_guest(AGENT_REQUEST *request, AGENT_RESULT *result)
+{
+	int	ret;
+
+	ret = get_vsphere_vmstat(request, ZBX_XPATH_LN2("quickStats", "guestMemoryUsage"), result);
+
+	if (SYSINFO_RET_OK == ret && GET_UI64_RESULT(result))
+		result->ui64 = result->ui64 * ZBX_MEBIBYTE;
+
+	return ret;
+}
+
+int	check_vsphere_vm_memory_size_usage_host(AGENT_REQUEST *request, AGENT_RESULT *result)
+{
+	int	ret;
+
+	ret = get_vsphere_vmstat(request, ZBX_XPATH_LN2("quickStats", "hostMemoryUsage"), result);
+
+	if (SYSINFO_RET_OK == ret && GET_UI64_RESULT(result))
+		result->ui64 = result->ui64 * ZBX_MEBIBYTE;
+
+	return ret;
+}
+
+int	check_vsphere_vm_memory_size_private(AGENT_REQUEST *request, AGENT_RESULT *result)
+{
+	int	ret;
+
+	ret = get_vsphere_vmstat(request, ZBX_XPATH_LN2("quickStats", "privateMemory"), result);
+
+	if (SYSINFO_RET_OK == ret && GET_UI64_RESULT(result))
+		result->ui64 = result->ui64 * ZBX_MEBIBYTE;
+
+	return ret;
+}
+
+int	check_vsphere_vm_memory_size_shared(AGENT_REQUEST *request, AGENT_RESULT *result)
+{
+	int	ret;
+
+	ret = get_vsphere_vmstat(request, ZBX_XPATH_LN2("quickStats", "sharedMemory"), result);
 
 	if (SYSINFO_RET_OK == ret && GET_UI64_RESULT(result))
 		result->ui64 = result->ui64 * ZBX_MEBIBYTE;
