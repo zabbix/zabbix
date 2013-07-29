@@ -176,6 +176,8 @@ frontends/php/include/classes/validators/CSchemaValidator.php -text
 frontends/php/include/classes/validators/hostgroup/CHostGroupNormalValidator.php -text
 frontends/php/include/classes/validators/string/CLldMacroStringValidator.php -text
 frontends/php/include/classes/validators/string/CStringValidator.php -text
+frontends/php/include/views/configuration.sysmap.constructor.php -text
+frontends/php/include/views/configuration.sysmap.list.php -text
 frontends/php/include/views/js/configuration.host.prototype.edit.js.php -text
 frontends/php/js/flickerfreescreen.js -text svneol=unset#text/plain
 frontends/php/js/multiselect.js -text svneol=unset#text/plain
@@ -271,6 +273,7 @@ frontends/php/tests/selenium/testFormGraphPrototype.php -text
 frontends/php/tests/selenium/testFormWeb.php -text
 frontends/php/tests/selenium/testInheritanceGraphPrototype.php -text
 frontends/php/tests/selenium/testInheritanceWeb.php -text
+frontends/php/tests/selenium/testUrlParameters.php -text
 frontends/php/tests/selenium/testZBX6339.php -text
 frontends/php/tests/selenium/testZBX6648.php -text
 frontends/php/tests/selenium/testZBX6663.php -text
