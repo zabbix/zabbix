@@ -23,6 +23,7 @@
 #include "events.h"
 #include "zbxalgo.h"
 #include "zbxserver.h"
+#include "zbxregexp.h"
 
 typedef struct
 {
