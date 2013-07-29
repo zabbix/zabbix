@@ -23,8 +23,8 @@
 
 typedef struct
 {
-	char		name[129];
-	char		expression[256];
+	char		*name;
+	char		*expression;
 	int		expression_type;
 	char		exp_delimiter;
 	unsigned char	case_sensitive;
