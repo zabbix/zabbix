@@ -210,7 +210,7 @@ int	PROC_MEM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *r
 		}
 
 		value = procsinfo.pi_size;
-		value <<= 10;	/* kB to Byte */
+		value <<= 12;	/* number of pages to bytes */
 
 		if (0 == proccount++)
 			memsize = value;
