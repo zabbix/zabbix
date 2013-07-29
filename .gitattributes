@@ -8,6 +8,7 @@ bin/win64/zabbix_get.exe -text
 bin/win64/zabbix_sender.exe -text
 create/src/data.tmpl -text
 frontends/php/api/classes/CHostBase.php -text
+frontends/php/api/classes/managers/CHistoryManager.php -text
 frontends/php/audio/alarm_average.wav -text
 frontends/php/audio/alarm_disaster.wav -text
 frontends/php/audio/alarm_high.wav -text
@@ -167,6 +168,8 @@ frontends/php/images/sysmaps/old/Printer.png -text svneol=unset#unset
 frontends/php/images/sysmaps/old/Router.png -text svneol=unset#unset
 frontends/php/images/sysmaps/old/Server.png -text svneol=unset#unset
 frontends/php/images/sysmaps/old/Workstation.png -text svneol=unset#unset
+frontends/php/include/classes/core/CFactoryRegistry.php -text
+frontends/php/include/classes/core/Manager.php -text
 frontends/php/include/classes/validators/CCollectionValidator.php -text
 frontends/php/include/classes/validators/CIdValidator.php -text
 frontends/php/include/classes/validators/CSchemaValidator.php -text
