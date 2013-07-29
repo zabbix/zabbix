@@ -110,7 +110,7 @@ $triggersTable->setHeader(array(
 	make_sorting_header(_('Name'), 'description', $link),
 	_('Expression'),
 	make_sorting_header(_('Status'), 'status', $link),
-	empty($this->data['parent_discoveryid']) ? _('Error') : null
+	$data['showErrorColumn'] ? _('Error') : null
 ));
 foreach ($this->data['triggers'] as $tnum => $trigger) {
 	$triggerid = $trigger['triggerid'];
@@ -194,15 +194,10 @@ foreach ($this->data['triggers'] as $tnum => $trigger) {
 		);
 	}
 
-	$templated = false;
-	foreach ($trigger['hosts'] as $hostid => $host) {
-		$templated |= (HOST_STATUS_TEMPLATE == $host['status']);
-	}
-
-	if (empty($this->data['parent_discoveryid'])) {
+	if ($data['showErrorColumn']) {
 		$error = '';
 		if ($trigger['status'] == TRIGGER_STATUS_ENABLED) {
-			if (!zbx_empty($trigger['error']) && !$templated) {
+			if (!zbx_empty($trigger['error'])) {
 				$error = new CDiv(SPACE, 'status_icon iconerror');
 				$error->setHint($trigger['error'], '', 'on');
 			}
@@ -210,9 +205,6 @@ foreach ($this->data['triggers'] as $tnum => $trigger) {
 				$error = new CDiv(SPACE, 'status_icon iconok');
 			}
 		}
-	}
-	else {
-		$error = null;
 	}
 
 	$status = '';
@@ -262,7 +254,7 @@ foreach ($this->data['triggers'] as $tnum => $trigger) {
 		$description,
 		$expressionColumn,
 		$status,
-		$error
+		$data['showErrorColumn'] ? $error : null
 	));
 	$triggers[$tnum] = $trigger;
 }
