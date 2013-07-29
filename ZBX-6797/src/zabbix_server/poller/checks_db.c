@@ -153,22 +153,34 @@ int	get_value_db(DC_ITEM *item, AGENT_RESULT *result)
 
 		if (SUCCEED == odbc_DBconnect(&dbh, db_dsn, db_user, db_pass))
 		{
-			if (NULL != (row = odbc_DBfetch(odbc_DBselect(&dbh, db_sql))))
+			if (NULL != odbc_DBselect(&dbh, db_sql))
 			{
-				if (NULL == row[0])
-					SET_MSG_RESULT(result, zbx_strdup(NULL, "SQL query returned NULL value."));
-				else if (SUCCEED == set_result_type(result, item->value_type, item->data_type, row[0]))
-					ret = SUCCEED;
+				if (NULL != (row = odbc_DBfetch(&dbh)))
+				{
+					if (NULL == row[0])
+					{
+						SET_MSG_RESULT(result, zbx_strdup(NULL, "SQL query returned NULL "
+								"value."));
+					}
+					else if (SUCCEED == set_result_type(result, item->value_type, item->data_type,
+							row[0]))
+					{
+						ret = SUCCEED;
+					}
+				}
+				else
+				{
+					const char	*last_error = get_last_odbc_strerror();
+
+					if ('\0' != *last_error)
+						SET_MSG_RESULT(result, zbx_strdup(NULL, last_error));
+					else
+						SET_MSG_RESULT(result, zbx_strdup(NULL, "SQL query returned empty "
+								"result."));
+				}
 			}
 			else
-			{
-				const char	*last_error = get_last_odbc_strerror();
-
-				if ('\0' != *last_error)
-					SET_MSG_RESULT(result, zbx_strdup(NULL, last_error));
-				else
-					SET_MSG_RESULT(result, zbx_strdup(NULL, "SQL query returned empty result."));
-			}
+				SET_MSG_RESULT(result, zbx_strdup(NULL, get_last_odbc_strerror()));
 
 			odbc_DBclose(&dbh);
 		}
@@ -183,6 +195,8 @@ int	get_value_db(DC_ITEM *item, AGENT_RESULT *result)
 #undef DB_ODBC_SELECT_KEY
 
 #endif	/* HAVE_ODBC */
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
 }
