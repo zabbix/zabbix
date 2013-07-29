@@ -1724,7 +1724,7 @@ void	DBlld_process_discovery_rule(zbx_uint64_t discovery_itemid, char *value, zb
 		*f_regexp++ = '\0';
 
 		if ('@' == *f_regexp)
-			DCget_expressions(&regexps, f_regexp + 1);
+			DCget_expressions_by_name(&regexps, f_regexp + 1);
 
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() f_macro:'%s' f_regexp:'%s'",
 				__function_name, f_macro, f_regexp);

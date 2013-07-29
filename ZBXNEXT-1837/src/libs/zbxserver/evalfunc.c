@@ -165,7 +165,7 @@ static int	evaluate_LOGEVENTID(char *value, DB_ITEM *item, const char *function,
 		goto out;
 
 	if ('@' == *arg1)
-		DCget_expressions(&regexps, arg1 + 1);
+		DCget_expressions_by_name(&regexps, arg1 + 1);
 
 	if (SUCCEED == zbx_vc_get_value_range(item->itemid, item->value_type, &values, 0, 1, now) &&
 			0 < values.values_num)
@@ -1432,7 +1432,7 @@ static int	evaluate_STR(char *value, DB_ITEM *item, const char *function, const 
 	}
 
 	if ((ZBX_FUNC_REGEXP == func || ZBX_FUNC_IREGEXP == func) && '@' == *arg1)
-		DCget_expressions(&regexps, arg1 + 1);
+		DCget_expressions_by_name(&regexps, arg1 + 1);
 
 	if (ZBX_FLAG_SEC == flag)
 		seconds = arg2;

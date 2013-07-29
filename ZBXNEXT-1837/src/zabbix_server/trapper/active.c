@@ -173,7 +173,7 @@ int	send_list_of_active_checks(zbx_sock_t *sock, char *request)
 	const char	*__function_name = "send_list_of_active_checks";
 
 	char		*host = NULL, *p, *buffer = NULL, error[MAX_STRING_LEN], ip[INTERFACE_IP_LEN_MAX];
-	size_t		buffer_alloc = 8 * ZBX_KIBIBYTE, buffer_offset = 0, items_num = 0;
+	size_t		buffer_alloc = 8 * ZBX_KIBIBYTE, buffer_offset = 0, items_num = 0, i;
 	int		ret = FAIL;
 	zbx_uint64_t	hostid, *itemids = NULL;
 	zbx_active_t	*items = NULL;
@@ -205,7 +205,7 @@ int	send_list_of_active_checks(zbx_sock_t *sock, char *request)
 	if (0 != items_num)
 	{
 		DC_ITEM	*dc_items;
-		int	*errcodes, i, refresh_unsupported, now;
+		int	*errcodes, refresh_unsupported, now;
 
 		dc_items = zbx_malloc(NULL, sizeof(DC_ITEM) * items_num);
 		errcodes = zbx_malloc(NULL, sizeof(int) * items_num);
@@ -269,6 +269,22 @@ out:
 
 /******************************************************************************
  *                                                                            *
+ * Function: zbx_vector_str_append_uniq                                       *
+ *                                                                            *
+ * Purpose: append non duplicate string to the string vector                  *
+ *                                                                            *
+ * Parameters: vector - [IN/OUT] the string vector                            *
+ *             str    - [IN] the string to append                             *
+ *                                                                            *
+ ******************************************************************************/
+static void	zbx_vector_str_append_uniq(zbx_vector_str_t *vector, char *str)
+{
+	if (FAIL == zbx_vector_str_search(vector, str, ZBX_DEFAULT_STR_COMPARE_FUNC))
+		zbx_vector_str_append(vector, zbx_strdup(NULL, str));
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: send_list_of_active_checks_json                                  *
  *                                                                            *
  * Purpose: send list of active checks to the host                            *
@@ -295,7 +311,7 @@ int	send_list_of_active_checks_json(zbx_sock_t *sock, struct zbx_json_parse *jp)
 	char			host[HOST_HOST_LEN_MAX], params[MAX_STRING_LEN], tmp[MAX_STRING_LEN],
 				ip[INTERFACE_IP_LEN_MAX], error[MAX_STRING_LEN], *host_metadata = NULL;
 	struct zbx_json		json;
-	int			ret = FAIL, n;
+	int			ret = FAIL, i;
 	zbx_uint64_t		hostid, *itemids = NULL;
 	zbx_active_t		*items = NULL;
 	size_t			items_num = 0, host_metadata_alloc = 1;	/* for at least NUL-termination char */
@@ -303,10 +319,12 @@ int	send_list_of_active_checks_json(zbx_sock_t *sock, struct zbx_json_parse *jp)
 
 	unsigned char		item_key;
 	zbx_vector_ptr_t	regexps;
+	zbx_vector_str_t	names;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	zbx_vector_ptr_create(&regexps);
+	zbx_vector_str_create(&names);
 
 	if (FAIL == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_HOST, host, sizeof(host)))
 	{
@@ -343,7 +361,7 @@ int	send_list_of_active_checks_json(zbx_sock_t *sock, struct zbx_json_parse *jp)
 	if (0 != items_num)
 	{
 		DC_ITEM	*dc_items;
-		int	*errcodes, i, refresh_unsupported, now;
+		int	*errcodes, refresh_unsupported, now;
 
 		dc_items = zbx_malloc(NULL, sizeof(DC_ITEM) * items_num);
 		errcodes = zbx_malloc(NULL, sizeof(int) * items_num);
@@ -353,7 +371,7 @@ int	send_list_of_active_checks_json(zbx_sock_t *sock, struct zbx_json_parse *jp)
 
 		now = time(NULL);
 
-		for (i = 0; i < items_num; i++)
+		for (i = 0; i < (int)items_num; i++)
 		{
 			if (SUCCEED != errcodes[i])
 			{
@@ -396,17 +414,17 @@ int	send_list_of_active_checks_json(zbx_sock_t *sock, struct zbx_json_parse *jp)
 			{
 				/* "params" parameter */
 				if (0 == get_param(params, 2, tmp, sizeof(tmp)) && '@' == *tmp)
-					DCget_expressions(&regexps, tmp + 1);
+					zbx_vector_str_append_uniq(&names, tmp + 1);
 
 				if (ZBX_KEY_EVENTLOG == item_key)
 				{
 					/* "severity" parameter */
 					if (0 == get_param(params, 3, tmp, sizeof(tmp)) && '@' == *tmp)
-						DCget_expressions(&regexps, tmp + 1);
+						zbx_vector_str_append_uniq(&names, tmp + 1);
 
 					/* "logeventid" parameter */
 					if (0 == get_param(params, 5, tmp, sizeof(tmp)) && '@' == *tmp)
-						DCget_expressions(&regexps, tmp + 1);
+						zbx_vector_str_append_uniq(&names, tmp + 1);
 				}
 			}
 
@@ -424,9 +442,10 @@ int	send_list_of_active_checks_json(zbx_sock_t *sock, struct zbx_json_parse *jp)
 
 	zbx_json_close(&json);
 
+	DCget_expressions_by_names(&regexps, names.values, names.values_num);
+
 	if (0 < regexps.values_num)
 	{
-		int	i;
 		char	buffer[32];
 
 		zbx_json_addarray(&json, ZBX_PROTO_TAG_REGEXP);
@@ -479,6 +498,11 @@ error:
 
 	zbx_json_free(&json);
 out:
+	for (i = 0; i < names.values_num; i++)
+		zbx_free(names.values[i]);
+
+	zbx_vector_str_destroy(&names);
+
 	zbx_regexp_clean_expressions(&regexps);
 	zbx_vector_ptr_destroy(&regexps);
 
