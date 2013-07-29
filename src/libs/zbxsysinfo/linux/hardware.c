@@ -22,6 +22,7 @@
 #include <sys/mman.h>
 #include "zbxalgo.h"
 #include "hardware.h"
+#include "zbxregexp.h"
 
 /******************************************************************************
  *                                                                            *
