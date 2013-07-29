@@ -251,7 +251,13 @@ void	zbx_regexp_clean_expressions(zbx_vector_ptr_t *expressions)
 	int	i;
 
 	for (i = 0; i < expressions->values_num; i++)
-		zbx_free(expressions->values[i]);
+	{
+		zbx_expression_t	*regexp = expressions->values[i];
+
+		zbx_free(regexp->name);
+		zbx_free(regexp->expression);
+		zbx_free(regexp);
+	}
 
 	expressions->values_num = 0;
 }
@@ -263,8 +269,8 @@ void	add_regexp_ex(zbx_vector_ptr_t *regexps, const char *name, const char *expr
 
 	regexp = zbx_malloc(NULL, sizeof(zbx_expression_t));
 
-	zbx_strlcpy(regexp->name, name, sizeof(regexp->name));
-	zbx_strlcpy(regexp->expression, expression, sizeof(regexp->expression));
+	regexp->name = zbx_strdup(NULL, name);
+	regexp->expression = zbx_strdup(NULL, expression);
 
 	regexp->expression_type = expression_type;
 	regexp->exp_delimiter = exp_delimiter;
