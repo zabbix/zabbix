@@ -7,6 +7,7 @@ New features:
 ...G...... [ZBXNEXT-1528] added net.if.in, net.if.out and net.if.total item support on HP-UX platforms (igors)
 
 Bug fixes:
+...G...... [ZBX-6664] removed printing of informative line about -vv option after zabbix_sender failure if this option was already used (wiper)
 ..F....... [ZBX-6275] removed the "error" columns in the template item, trigger and discovery rule lists (Guntis)
 A......... [ZBX-5604] fixed updating graphs and graph prototypes when items are not specified (Ivo)
 ..F....... [ZBX-6586] added sid checking for logout action (Guntis)

@@ -557,7 +557,10 @@ int	main(int argc, char **argv)
 	if (SUCCEED == ret)
 		printf("sent: %d; skipped: %d; total: %d\n", succeed_count, (total_count - succeed_count), total_count);
 	else
-		printf("Sending failed. Use option -vv for more detailed output.\n");
+	{
+		printf("Sending failed.%s\n", CONFIG_LOG_LEVEL != LOG_LEVEL_DEBUG ?
+				" Use option -vv for more detailed output." : "");
+	}
 exit:
 	zabbix_close_log();
 
