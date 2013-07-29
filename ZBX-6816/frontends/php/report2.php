@@ -50,7 +50,12 @@ $fields = array(
 	'favstate' =>			array(T_ZBX_INT, O_OPT, P_ACT, NOT_EMPTY,		'isset({favobj})&&"filter"=={favobj}')
 );
 check_fields($fields);
-
+if (get_request('triggerid', 0) > 0) {
+	$triggerIds = available_triggers($_REQUEST['triggerid'], 0);
+	if (empty($triggerIds)) {
+		access_deny();
+	}
+}
 /*
  * Ajax
  */

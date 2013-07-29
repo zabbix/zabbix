@@ -52,6 +52,28 @@ $fields = array(
 	'favaction' =>	array(T_ZBX_STR, O_OPT, P_ACT, IN("'add','remove'"), null)
 );
 check_fields($fields);
+if (get_request('groupid', 0) > 0) {
+	$groupId = available_groups($_REQUEST['groupid'], 0);
+	if (!$groupId) {
+		access_deny();
+	}
+}
+if (get_request('hostid', 0) > 0) {
+	$hostIds = available_hosts($_REQUEST['hostid'], 0);
+	if (empty($hostIds)) {
+		access_deny();
+	}
+}
+if (get_request('graphid', 0) > 0) {
+	$graphs = API::Graph()->get(array(
+				'nodeids' => get_current_nodeid(true),
+				'graphids' => array($_REQUEST['graphid']),
+				'editable' => false,
+			));
+	if (empty($graphs)) {
+		access_deny();
+	}
+}
 
 $pageFilter = new CPageFilter(array(
 	'groups' => array('monitored_hosts' => true, 'with_graphs' => true),

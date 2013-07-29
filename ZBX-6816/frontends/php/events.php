@@ -82,7 +82,24 @@ $fields = array(
 );
 
 check_fields($fields);
-
+if (get_request('groupid', 0) > 0) {
+	$groupId = available_groups($_REQUEST['groupid'], 0);
+	if (!$groupId) {
+		access_deny();
+	}
+}
+if (get_request('hostid', 0) > 0) {
+	$hostIds = available_hosts($_REQUEST['hostid'], 0);
+	if (empty($hostIds)) {
+		access_deny();
+	}
+}
+if (get_request('triggerid', 0) > 0) {
+	$triggerIds = available_triggers($_REQUEST['triggerid'], 0);
+	if (empty($triggerIds)) {
+		access_deny();
+	}
+}
 /*
  * Ajax
  */
