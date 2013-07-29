@@ -2650,7 +2650,7 @@ int	check_vcenter_vm_cpu_usage(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	int	ret;
 
-	ret = get_vcenter_vmstat(request, ZBX_XPATH_LN2("runtime", "maxCpuUsage"), result);
+	ret = get_vcenter_vmstat(request, ZBX_XPATH_LN2("quickStats", "overallCpuUsage"), result);
 
 	if (SYSINFO_RET_OK == ret && GET_UI64_RESULT(result))
 		result->ui64 = result->ui64 * 1000000;
@@ -3718,7 +3718,7 @@ int	check_vsphere_vm_cpu_usage(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	int	ret;
 
-	ret = get_vsphere_vmstat(request, ZBX_XPATH_LN2("runtime", "maxCpuUsage"), result);
+	ret = get_vsphere_vmstat(request, ZBX_XPATH_LN2("quickStats", "overallCpuUsage"), result);
 
 	if (SYSINFO_RET_OK == ret && GET_UI64_RESULT(result))
 		result->ui64 = result->ui64 * 1000000;
