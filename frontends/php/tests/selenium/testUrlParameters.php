@@ -995,7 +995,7 @@ class testUrlParameters extends CWebTest {
 					'title' => 'Host inventory overview',
 					'errors' => array(
 						'ERROR: Zabbix has received an incorrect request.',
-						'Critical error. Field "groupid" is not string.'
+						'Critical error. Field "groupid" is not integer.'
 					)
 				)
 			),
