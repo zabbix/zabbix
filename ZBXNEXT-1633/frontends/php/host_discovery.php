@@ -326,6 +326,11 @@ else {
 		'sortfield' => $sortfield,
 		'limit' => $config['search_limit'] + 1
 	));
+
+	// determine, show or not column of errors
+	$h = reset($hosts);
+	$data['showErrorColumn'] = ($h['status'] != HOST_STATUS_TEMPLATE);
+
 	if (!empty($data['discoveries'])) {
 		order_result($data['discoveries'], $sortfield, getPageSortOrder());
 	}
