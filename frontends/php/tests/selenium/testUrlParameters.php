@@ -292,17 +292,6 @@ class testUrlParameters extends CWebTest {
 					)
 				)
 			),
-			array(
-				array(
-					'expected' => LINK_BAD,
-					'url' => 'actionconf.php?form=update',
-					'title' => 'Configuration of actions',
-					'errors' => array(
-						'ERROR: Zabbix has received an incorrect request.',
-						'Critical error. Field "actionid" is mandatory.'
-					)
-				)
-			),
 			// Screens
 			array(
 				array(
@@ -500,17 +489,6 @@ class testUrlParameters extends CWebTest {
 					)
 				)
 			),
-			array(
-				array(
-					'expected' => LINK_BAD,
-					'url' => 'discoveryconf.php?form=update',
-					'title' => 'Configuration of discovery',
-					'errors' => array(
-						'ERROR: Zabbix has received an incorrect request.',
-						'Critical error. Field "druleid" is mandatory.'
-					)
-				)
-			),
 			// Overview
 			array(
 				array(
@@ -559,17 +537,6 @@ class testUrlParameters extends CWebTest {
 					'errors' => array(
 						'ERROR: Zabbix has received an incorrect request.',
 						'Critical error. Field "groupid" is not integer.'
-					)
-				)
-			),
-			array(
-				array(
-					'expected' => LINK_BAD,
-					'url' => 'overview.php?&form_refresh=1',
-					'title' => 'Overview \[refreshed every 30 sec\]',
-					'errors' => array(
-						'ERROR: Zabbix has received an incorrect request.',
-						'Critical error. Field "groupid" is mandatory.'
 					)
 				)
 			),
@@ -678,18 +645,6 @@ class testUrlParameters extends CWebTest {
 					)
 				)
 			),
-			array(
-				array(
-					'expected' => LINK_BAD,
-					'url' => 'latest.php?&form_refresh=1',
-					'title' => 'Latest data \[refreshed every 30 sec\]',
-					'errors' => array(
-						'ERROR: Zabbix has received an incorrect request.',
-						'Critical error. Field "groupid" is mandatory.',
-						'Critical error. Field "hostid" is mandatory.'
-					)
-				)
-			),
 			// Status of triggers
 			array(
 				array(
@@ -743,18 +698,6 @@ class testUrlParameters extends CWebTest {
 					)
 				)
 			),
-			array(
-				array(
-					'expected' => LINK_BAD,
-					'url' => 'tr_status.php?&form_refresh=1',
-					'title' => 'Status of triggers \[refreshed every 30 sec\]',
-					'errors' => array(
-						'ERROR: Zabbix has received an incorrect request.',
-						'Critical error. Field "groupid" is mandatory.',
-						'Critical error. Field "hostid" is mandatory.'
-					)
-				)
-			),
 			// Events, also Availability report
 			array(
 				array(
@@ -793,17 +736,6 @@ class testUrlParameters extends CWebTest {
 					'errors' => array(
 						'ERROR: Zabbix has received an incorrect request.',
 						'Critical error. Field "triggerid" is not integer.'
-					)
-				)
-			),
-			array(
-				array(
-					'expected' => LINK_BAD,
-					'url' => 'events.php?',
-					'title' => 'Latest events \[refreshed every 30 sec\]',
-					'errors' => array(
-						'ERROR: Zabbix has received an incorrect request.',
-						'Critical error. Field "triggerid" is mandatory.'
 					)
 				)
 			),
@@ -872,19 +804,6 @@ class testUrlParameters extends CWebTest {
 					)
 				)
 			),
-			array(
-				array(
-					'expected' => LINK_BAD,
-					'url' => 'charts.php?&form_refresh=1',
-					'title' => 'Custom graphs \[refreshed every 30 sec\]',
-					'errors' => array(
-						'ERROR: Zabbix has received an incorrect request.',
-						'Critical error. Field "groupid" is mandatory.',
-						'Critical error. Field "hostid" is mandatory.',
-						'Critical error. Field "graphid" is mandatory.'
-					)
-				)
-			),
 			// Custom screens
 			array(
 				array(
@@ -926,17 +845,6 @@ class testUrlParameters extends CWebTest {
 					)
 				)
 			),
-			array(
-				array(
-					'expected' => LINK_BAD,
-					'url' => 'screens.php?&form_refresh=1',
-					'title' => 'Custom screens \[refreshed every 30 sec\]',
-					'errors' => array(
-						'ERROR: Zabbix has received an incorrect request.',
-						'Critical error. Field "elementid" is mandatory.'
-					)
-				)
-			),
 			// Custom maps
 			array(
 				array(
@@ -975,17 +883,6 @@ class testUrlParameters extends CWebTest {
 					'errors' => array(
 						'ERROR: Zabbix has received an incorrect request.',
 						'Critical error. Field "sysmapid" is not integer.'
-					)
-				)
-			),
-			array(
-				array(
-					'expected' => LINK_BAD,
-					'url' => 'maps.php?&form_refresh=1',
-					'title' => 'Network maps \[refreshed every 30 sec\]',
-					'errors' => array(
-						'ERROR: Zabbix has received an incorrect request.',
-						'Critical error. Field "sysmapid" is mandatory.'
 					)
 				)
 			),
@@ -1131,17 +1028,6 @@ class testUrlParameters extends CWebTest {
 					)
 				)
 			),
-			array(
-				array(
-					'expected' => LINK_BAD,
-					'url' => 'hostinventoriesoverview.php?&form_refresh=1',
-					'title' => 'Host inventory overview',
-					'errors' => array(
-						'ERROR: Zabbix has received an incorrect request.',
-						'Critical error. Field "groupid" is mandatory.'
-					)
-				)
-			),
 			// Host inventories
 			array(
 				array(
@@ -1180,17 +1066,6 @@ class testUrlParameters extends CWebTest {
 					'errors' => array(
 						'ERROR: Zabbix has received an incorrect request.',
 						'Critical error. Field "groupid" is not integer.'
-					)
-				)
-			),
-			array(
-				array(
-					'expected' => LINK_BAD,
-					'url' => 'hostinventories.php?&form_refresh=1',
-					'title' => 'Host inventories',
-					'errors' => array(
-						'ERROR: Zabbix has received an incorrect request.',
-						'Critical error. Field "groupid" is mandatory.'
 					)
 				)
 			),
@@ -1256,19 +1131,6 @@ class testUrlParameters extends CWebTest {
 						'Critical error. Field "triggerid" is not integer.',
 						'Critical error. Field "filter_groupid" is not integer.',
 						'Critical error. Field "filter_hostid" is not integer.'
-					)
-				)
-			),
-			array(
-				array(
-					'expected' => LINK_BAD,
-					'url' => 'report2.php?',
-					'title' => 'Availability report',
-					'errors' => array(
-						'ERROR: Zabbix has received an incorrect request.',
-						'Critical error. Field "triggerid" is mandatory.',
-						'Critical error. Field "filter_groupid" is mandatory.',
-						'Critical error. Field "filter_hostid" is mandatory.'
 					)
 				)
 			),
