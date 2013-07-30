@@ -72,7 +72,7 @@ class Curl {
 				$this->reference = zbx_substring($this->query, $tmp_pos + 1);
 				$this->query = zbx_substring($this->query, 0, $tmp_pos);
 			}
-			$this->formatArguments($this->query);
+			$this->formatArguments();
 
 			// parse protocol and host
 			$protocolSepIndex=zbx_strpos($url, '://');
@@ -169,10 +169,10 @@ class Curl {
 	}
 
 	public function formatArguments($query = null) {
-		if (is_null($query)) {
-			$this->arguments = $_REQUEST;
+		if ($query === null) {
+			$query = $this->query;
 		}
-		else {
+		if ($query !== null) {
 			$args = explode('&', $query);
 			foreach ($args as $id => $arg) {
 				if (empty($arg)) {
