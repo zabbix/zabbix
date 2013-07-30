@@ -130,13 +130,13 @@ if (get_request('itemid', false)) {
 		'editable' => true
 	));
 	$item = reset($item);
-	if(!$item) {
+	if (!$item) {
 		access_deny();
 	}
 	$_REQUEST['hostid'] = $item['hostid'];
 	$hosts = $item['hosts'];
 }
-elseif (get_request('hostid', 0) > 0) {
+else {
 	$hosts = API::Host()->get(array(
 		'hostids' => $_REQUEST['hostid'],
 		'output' => array('status'),
@@ -323,8 +323,8 @@ else {
 	));
 
 	// determine, show or not column of errors
-	$h = reset($hosts);
-	$data['showErrorColumn'] = ($h['status'] != HOST_STATUS_TEMPLATE);
+	$host = reset($hosts);
+	$data['showErrorColumn'] = ($host['status'] != HOST_STATUS_TEMPLATE);
 
 	if (!empty($data['discoveries'])) {
 		order_result($data['discoveries'], $sortfield, getPageSortOrder());
