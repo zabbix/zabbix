@@ -21,11 +21,9 @@
 /* end clearfix */
 .originalblue .ui-helper-zfix { width: 100%; height: 100%; top: 0; left: 0; position: absolute; opacity: 0; filter:Alpha(Opacity=0); }
 
-
 /* Interaction Cues
 ----------------------------------*/
 .originalblue .ui-state-disabled { cursor: default !important; }
-
 
 /* Icons
 ----------------------------------*/
@@ -33,13 +31,11 @@
 /* states and images */
 .originalblue .ui-icon { display: block; text-indent: -99999px; overflow: hidden; background-repeat: no-repeat; }
 
-
 /* Misc visuals
 ----------------------------------*/
 
 /* Overlays */
 .originalblue .ui-widget-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
-
 
 /*
  * jQuery UI CSS Framework 1.8.7
@@ -52,7 +48,6 @@
  *
  * To view and modify this theme, visit http://jqueryui.com/themeroller/?ffDefault=Verdana,Arial,sans-serif&fwDefault=bold&fsDefault=1em&cornerRadius=2px&bgColorHeader=779dc0&bgTextureHeader=04_highlight_hard.png&bgImgOpacityHeader=55&borderColorHeader=7e9ab4&fcHeader=ffffff&iconColorHeader=ffffff&bgColorContent=ffffff&bgTextureContent=01_flat.png&bgImgOpacityContent=100&borderColorContent=7e9ab4&fcContent=000000&iconColorContent=5481ab&bgColorDefault=f5f8fa&bgTextureDefault=04_highlight_hard.png&bgImgOpacityDefault=85&borderColorDefault=9db2cd&fcDefault=5481ab&iconColorDefault=5481ab&bgColorHover=dae6f1&bgTextureHover=04_highlight_hard.png&bgImgOpacityHover=75&borderColorHover=7e9ab4&fcHover=456582&iconColorHover=456582&bgColorActive=dae6f1&bgTextureActive=06_inset_hard.png&bgImgOpacityActive=100&borderColorActive=7e9ab4&fcActive=456582&iconColorActive=456582&bgColorHighlight=fffce3&bgTextureHighlight=01_flat.png&bgImgOpacityHighlight=100&borderColorHighlight=dd9b60&fcHighlight=4a4a4a&iconColorHighlight=469bdd&bgColorError=fef1ec&bgTextureError=01_flat.png&bgImgOpacityError=100&borderColorError=d40000&fcError=d40000&iconColorError=d40000&bgColorOverlay=c9c9c9&bgTextureOverlay=01_flat.png&bgImgOpacityOverlay=0&opacityOverlay=30&bgColorShadow=999999&bgTextureShadow=01_flat.png&bgImgOpacityShadow=0&opacityShadow=30&thicknessShadow=5px&offsetTopShadow=-5px&offsetLeftShadow=-5px&cornerRadiusShadow=5px
  */
-
 
 /* Component containers
 ----------------------------------*/
@@ -275,7 +270,6 @@
 .originalblue .ui-icon-gripsmall-diagonal-se { background-position: -64px -224px; }
 .originalblue .ui-icon-grip-diagonal-se { background-position: -80px -224px; }
 
-
 /* Misc visuals
 ----------------------------------*/
 
@@ -292,7 +286,9 @@
 
 /* Overlays */
 .originalblue .ui-widget-overlay { background: #c9c9c9 url(images/bg_flat_0_c9c9c9.png) 50% 50% repeat-x; opacity: .30;filter:Alpha(Opacity=30); }
-.originalblue .ui-widget-shadow { margin: -5px 0 0 -5px; padding: 5px; background: #999999 url(images/bg_flat_0_999999.png) 50% 50% repeat-x; opacity: .30;filter:Alpha(Opacity=30); -moz-border-radius: 5px; -webkit-border-radius: 5px; border-radius: 5px; }/*
+.originalblue .ui-widget-shadow { margin: -5px 0 0 -5px; padding: 5px; background: #999999 url(images/bg_flat_0_999999.png) 50% 50% repeat-x; opacity: .30;filter:Alpha(Opacity=30); -moz-border-radius: 5px; -webkit-border-radius: 5px; border-radius: 5px; }
+
+/*
  * jQuery UI Resizable 1.8.7
  *
  * Copyright 2010, AUTHORS.txt (http://jqueryui.com/about)
@@ -311,7 +307,9 @@
 .originalblue .ui-resizable-se { cursor: se-resize; width: 12px; height: 12px; right: 1px; bottom: 1px; }
 .originalblue .ui-resizable-sw { cursor: sw-resize; width: 9px; height: 9px; left: -5px; bottom: -5px; }
 .originalblue .ui-resizable-nw { cursor: nw-resize; width: 9px; height: 9px; left: -5px; top: -5px; }
-.originalblue .ui-resizable-ne { cursor: ne-resize; width: 9px; height: 9px; right: -5px; top: -5px;}/*
+.originalblue .ui-resizable-ne { cursor: ne-resize; width: 9px; height: 9px; right: -5px; top: -5px;}
+
+/*
  * jQuery UI Selectable 1.8.7
  *
  * Copyright 2010, AUTHORS.txt (http://jqueryui.com/about)
@@ -321,6 +319,7 @@
  * http://docs.jquery.com/UI/Selectable#theming
  */
 .originalblue .ui-selectable-helper { position: absolute; z-index: 100; border:1px dotted black; }
+
 /*
  * jQuery UI Accordion 1.8.7
  *
@@ -330,7 +329,6 @@
  *
  * http://docs.jquery.com/UI/Accordion#theming
  */
-/* IE/Win - Fix animation bug - #4615 */
 .originalblue .ui-accordion { width: 100%; }
 .originalblue .ui-accordion .ui-accordion-header { cursor: pointer; position: relative; margin-top: 1px; zoom: 1; }
 .originalblue .ui-accordion .ui-accordion-li-fix { display: inline; }
@@ -339,7 +337,9 @@
 .originalblue .ui-accordion-icons .ui-accordion-header a { padding-left: 2.2em; }
 .originalblue .ui-accordion .ui-accordion-header .ui-icon { position: absolute; left: .5em; top: 50%; margin-top: -8px; }
 .originalblue .ui-accordion .ui-accordion-content { padding: 1em 2.2em; border-top: 0; margin-top: -2px; position: relative; top: 1px; margin-bottom: 2px; overflow: auto; display: none; zoom: 1; }
-.originalblue .ui-accordion .ui-accordion-content-active { display: block; }/*
+.originalblue .ui-accordion .ui-accordion-content-active { display: block; }
+
+/*
  * jQuery UI Autocomplete 1.8.7
  *
  * Copyright 2010, AUTHORS.txt (http://jqueryui.com/about)
@@ -412,7 +412,8 @@ input.ui-button { padding: .3em 1em; }
 .originalblue .ui-buttonset .ui-button { margin-left: 0; margin-right: 0; }
 
 /* workarounds */
-button.ui-button::-moz-focus-inner { border: 0; padding: 0; } /* reset extra padding in Firefox */
+button.ui-button::-moz-focus-inner { border: 0; padding: 0; }
+
 /*
  * jQuery UI Dialog 1.8.7
  *
@@ -422,19 +423,19 @@ button.ui-button::-moz-focus-inner { border: 0; padding: 0; } /* reset extra pad
  *
  * http://docs.jquery.com/UI/Dialog#theming
  */
-.originalblue .ui-dialog { position: absolute; padding: .2em; width: 300px; overflow: hidden; }
-.originalblue .ui-dialog .ui-dialog-titlebar { padding: .5em 1em .3em; position: relative;  }
-.originalblue .ui-dialog .ui-dialog-title { float: left; margin: .1em 16px .2em 0; }
-.originalblue .ui-dialog .ui-dialog-titlebar-close { position: absolute; right: .3em; top: 50%; width: 19px; margin: -10px 0 0 0; padding: 1px; height: 18px; }
-.originalblue .ui-dialog .ui-dialog-titlebar-close span { display: block; margin: 1px; }
-.originalblue .ui-dialog .ui-dialog-titlebar-close:hover, .originalblue .ui-dialog .ui-dialog-titlebar-close:focus { padding: 0; }
-.originalblue .ui-dialog .ui-dialog-content { position: relative; border: 0; padding: .5em 1em; background: none; overflow: auto; zoom: 1; }
-.originalblue .ui-dialog .ui-dialog-buttonpane { text-align: left; border-width: 1px 0 0 0; background-image: none; margin: .5em 0 0 0; padding: .3em 1em .5em .4em; }
+.originalblue .ui-dialog { position: absolute; top: 0; left: 0; padding: .2em; outline: 0; }
+.originalblue .ui-dialog .ui-dialog-titlebar { padding: .4em 1em; position: relative; }
+.originalblue .ui-dialog .ui-dialog-title { float: left; margin: .1em 0; white-space: nowrap; width: 90%; overflow: hidden; text-overflow: ellipsis; }
+.originalblue .ui-dialog .ui-dialog-titlebar-close { position: absolute; right: .3em; top: 50%; width: 21px; margin: -10px 0 0 0; padding: 1px; height: 20px; }
+.originalblue .ui-dialog .ui-dialog-content { position: relative; border: 0; padding: .5em 1em; background: none; overflow: auto; }
+.originalblue .ui-dialog .ui-dialog-buttonpane { text-align: left; border-width: 1px 0 0 0; background-image: none; margin-top: .5em; padding: .3em 1em .5em .4em; }
 .originalblue .ui-dialog .ui-dialog-buttonpane .ui-dialog-buttonset { float: right; }
-.originalblue .ui-dialog .ui-dialog-buttonpane button { margin: .5em .8em .5em 0; cursor: pointer; }
-.originalblue .ui-dialog .ui-resizable-se { width: 14px; height: 14px; right: 3px; bottom: 3px; }
+.originalblue .ui-dialog .ui-dialog-buttonpane button { margin: .5em .4em .5em 0; cursor: pointer; }
+.originalblue .ui-dialog .ui-resizable-se { width: 12px; height: 12px; right: -5px; bottom: -5px; background-position: 16px 16px; }
+
 .originalblue .ui-draggable .ui-dialog-titlebar { cursor: move; }
 .originalblue .ui-sortable-placeholder { border: 1px dotted #2f2f2f; }
+
 /*
  * jQuery UI Slider 1.8.7
  *
@@ -458,7 +459,9 @@ button.ui-button::-moz-focus-inner { border: 0; padding: 0; } /* reset extra pad
 .originalblue .ui-slider-vertical .ui-slider-handle { left: -.3em; margin-left: 0; margin-bottom: -.6em; }
 .originalblue .ui-slider-vertical .ui-slider-range { left: 0; width: 100%; }
 .originalblue .ui-slider-vertical .ui-slider-range-min { bottom: 0; }
-.originalblue .ui-slider-vertical .ui-slider-range-max { top: 0; }/*
+.originalblue .ui-slider-vertical .ui-slider-range-max { top: 0; }
+
+/*
  * jQuery UI Tabs 1.8.7
  *
  * Copyright 2010, AUTHORS.txt (http://jqueryui.com/about)
@@ -476,6 +479,7 @@ button.ui-button::-moz-focus-inner { border: 0; padding: 0; } /* reset extra pad
 .originalblue .ui-tabs .ui-tabs-nav li a, .originalblue .ui-tabs.ui-tabs-collapsible .ui-tabs-nav li.ui-tabs-selected a { cursor: pointer; } /* first selector in group seems obsolete, but required to overcome bug in Opera applying cursor: text overall if defined elsewhere... */
 .originalblue .ui-tabs .ui-tabs-panel { display: block; border-width: 0; padding: 1em 1.4em; background: none; }
 .originalblue .ui-tabs .ui-tabs-hide { display: none !important; }
+
 /*
  * jQuery UI Datepicker 1.8.7
  *
@@ -543,7 +547,9 @@ button.ui-button::-moz-focus-inner { border: 0; padding: 0; } /* reset extra pad
     left: -4px; /*must have*/
     width: 200px; /*must have*/
     height: 200px; /*must have*/
-}/*
+}
+
+/*
  * jQuery UI Progressbar 1.8.7
  *
  * Copyright 2010, AUTHORS.txt (http://jqueryui.com/about)

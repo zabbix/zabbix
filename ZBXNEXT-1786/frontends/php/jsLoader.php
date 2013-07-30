@@ -51,6 +51,7 @@ require_once dirname(__FILE__).'/include/translateDefines.inc.php';
 $availableJScripts = array(
 	'common.js' => '',
 	'menu.js' => '',
+	'menupopup.js' => '',
 	'gtlc.js' => '',
 	'functions.js' => '',
 	'main.js' => '',
@@ -209,6 +210,7 @@ if (empty($_GET['files'])) {
 		'main.js',
 		'functions.js',
 		'menu.js',
+		'menupopup.js',
 		'init.js'
 	);
 	// load frontend messaging only for some pages

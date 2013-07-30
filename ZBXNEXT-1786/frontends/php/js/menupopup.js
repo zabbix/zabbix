@@ -1,4 +1,3 @@
-<?php
 /*
 ** Zabbix
 ** Copyright (C) 2001-2013 Zabbix SIA
@@ -19,12 +18,42 @@
 **/
 
 
-class CListItem extends CTag {
+jQuery(function($) {
 
-	public function __construct($value, $class = null, $id = null) {
-		parent::__construct('li', 'yes');
-		$this->addItem($value);
-		$this->addClass($class);
-		$this->attr('id', $id);
-	}
-}
+	$.fn.menuPopup = function() {
+		var obj = $(this),
+			isActive = true;
+
+		// load
+		$('.menu', obj).menu();
+		obj.data('isLoaded', true);
+		obj.fadeIn(0);
+
+		// close
+		obj.mouseenter(function() {
+			isActive = true;
+		})
+		.mouseleave(function() {
+			isActive = false;
+
+			setTimeout(function() {
+				if (!isActive) {
+					obj.fadeOut(50);
+				}
+			}, 500);
+		});
+
+		// execute script
+		$('li', obj).each(function() {
+			var item = $(this);
+
+			if (!empty(item.data('scriptid'))) {
+				item.click(function() {
+					obj.fadeOut(50);
+
+					executeScript(item.data('hostid'), item.data('scriptid'), item.data('confirmation'));
+				});
+			}
+		});
+	};
+});

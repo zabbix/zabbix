@@ -535,7 +535,6 @@ $hosts = API::Host()->get(array(
 
 // get host scripts
 $scriptsByHosts = API::Script()->getScriptsByHosts($hostIds);
-$triggerWidget->addItem(new CMenuPopup(array('scripts' => true, 'hostids' => $hostIds)));
 
 // get trigger dependencies
 $dbTriggerDependencies = DBselect(
@@ -647,32 +646,35 @@ foreach ($triggers as $trigger) {
 	foreach ($trigger['hosts'] as $triggerHost) {
 		$host = $hosts[$triggerHost['hostid']];
 
-		$hostsSpan = new CDiv(null, 'floatleft');
-
 		// fetch scripts for the host js menu
 		$scripts = array();
 		if (isset($scriptsByHosts[$triggerHost['hostid']])) {
 			foreach ($scriptsByHosts[$triggerHost['hostid']] as $script) {
 				$scripts[] = $script;
-				$menuScripts[] = array(
-					'scriptid' => $script['scriptid'],
-					'confirmation' => $script['confirmation'],
-					'name' => $script['name']
-				);
 			}
 		}
 
-		$hostsName = new CSpan($triggerHost['name'], 'link_menu menu-host');
-		/*$hostsName->setAttribute('data-menu', array(
-			'scripts' => $menuScripts,
-			'hostid' => $triggerHost['hostid'],
-			'hasScreens' => (bool) $host['screens'],
-			'hasInventory' => (bool) $host['inventory']
-		));*/
+		$hostName = new CSpan($triggerHost['name'], 'link_menu');
+		$hostName->attr('data-menupopup', $trigger['triggerid']);
 
-		//$triggerWidget->addItem(new CMenuPopup(array('scripts' => true, 'hostids' => $hostIds)));
-
-		$hostsSpan->addItem($hostsName);
+		$hostsSpan = new CDiv(array(
+			$hostName,
+			new CMenuPopup(array(
+				'scripts' => $scripts,
+				'id' => $trigger['triggerid'],
+				'goto' => array(
+					'params' => array(
+						'hostid' => $triggerHost['hostid']
+					),
+					'items' => array(
+						'latest' => true,
+						'screens' => !empty($host['screens']),
+						'inventories' => !empty($host['inventory'])
+					)
+				)
+			))),
+			'floatleft'
+		);
 
 		// add maintenance icon with hint if host is in maintenance
 		if ($triggerHost['maintenance_status']) {

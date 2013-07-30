@@ -25,17 +25,18 @@ class CMenuPopup extends CTag {
 	 * @param string $options['id']
 	 * @param array  $options['hostids']
 	 * @param bool   $options['scripts']
+	 * @param array  $options['goto']
+	 * @param array  $options['goto']['params']
+	 * @param array  $options['goto']['items']
 	 */
 	public function __construct(array $options = array()) {
 		parent::__construct('div', 'yes');
-		$this->attr('id', isset($options['id']) ? zbx_formatDomId($options['id']) : uniqid());
+		$this->attr('id', $options['id']);
 		$this->addClass('menuPopup');
-
-		$menu = new CList(null, 'menu');
 
 		// scripts
 		if (!empty($options['scripts'])) {
-			if (!is_array($options['scripts'] && isset($options['hostids']))) {
+			if (is_bool($options['scripts']) && isset($options['hostids'])) {
 				$options['scripts'] = array();
 
 				foreach (API::Script()->getScriptsByHosts($options['hostids']) as $hostScripts) {
@@ -67,28 +68,94 @@ class CMenuPopup extends CTag {
 							}
 						}
 
-						$this->appendMenuItem($menuItems, $items, array(
-							'name' => $name,
+						$this->appendMenuItem($menuItems, $items, $name, array(
 							'scriptid' => $script['scriptid'],
+							'hostid' => $script['hostid'],
 							'confirmation' => $script['confirmation']
 						));
 					}
 					else {
-						$this->appendMenuItem($menuItems, array(), array(
-							'name' => $script['name'],
+						$this->appendMenuItem($menuItems, array(), $script['name'], array(
 							'scriptid' => $script['scriptid'],
+							'hostid' => $script['hostid'],
 							'confirmation' => $script['confirmation']
 						));
 					}
 				}
 
+				$this->addItem(new CDiv(_('Scripts'), 'title'));
+				$menu = new CList(null, 'menu');
 				$this->addMenu($menu, $menuItems['items']);
+				$this->addItem($menu);
 			}
 		}
 
-		$this->addItem($menu);
+		// goto
+		if (!empty($options['goto']['items'])) {
+			$params = '';
+			if (!empty($options['goto']['params'])) {
+				foreach ($options['goto']['params'] as $key => $value) {
+					$params .= ($params ? '&' : '?').$key.'='.$value;
+				}
+			}
 
-		zbx_add_post_js('jQuery("#'.$this->getAttribute('id').' .menu").menu();');
+			$this->addItem(new CDiv(_('Go to'), 'title'));
+			$menu = new CList(null, 'menu');
+
+			foreach ($options['goto']['items'] as $key => $isUsed) {
+				if ($isUsed) {
+					switch ($key) {
+						case 'latest':
+							$menu->addItem(new CLink(_('Latest data'), 'latest.php'.$params));
+							break;
+
+						case 'screens':
+							$menu->addItem(new CLink(_('Host screens'), 'host_screen.php'.$params));
+							break;
+
+						case 'inventories':
+							$menu->addItem(new CLink(_('Host inventories'), 'hostinventories.php'.$params));
+							break;
+					}
+				}
+			}
+
+			$this->addItem($menu);
+		}
+
+		// insert js
+		if (!defined('IS_MENU_POPUP_JS_INSERTED')) {
+			define('IS_MENU_POPUP_JS_INSERTED', true);
+
+			insert_js('
+				jQuery(document).ready(function() {
+					jQuery("[data-menupopup]").click(function() {
+						var obj = jQuery("#" + jQuery(this).data("menupopup"));
+
+						if (empty(obj.data("isLoaded"))) {
+							jQuery(".menuPopup").css("display", "none");
+
+							obj.menuPopup();
+						}
+						else {
+							if (obj.css("display") == "block") {
+								jQuery(".menuPopup").css("display", "none");
+							}
+							else {
+								jQuery(".menuPopup").css("display", "none");
+								obj.fadeIn(50);
+							}
+						}
+
+						obj.position({
+							of: jQuery(this),
+							my: "left top",
+							at: "left bottom"
+						});
+					});
+				});'
+			);
+		}
 	}
 
 	/**
@@ -96,10 +163,8 @@ class CMenuPopup extends CTag {
 	 *
 	 * array(
 	 * 	'a' => array(
-	 * 		'params' => array(),
 	 * 		'items' => array(
 	 * 			'a' => array(
-	 * 				'params' => array(),
 	 * 				'items' => array(
 	 * 					'a' => array(
 	 * 						'params' => array(),
@@ -112,7 +177,6 @@ class CMenuPopup extends CTag {
 	 * 				)
 	 * 			),
 	 * 			'b' => array(
-	 * 				'params' => array(),
 	 * 				'items' => array(
 	 * 					'a' => array(
 	 * 						'params' => array(),
@@ -144,33 +208,37 @@ class CMenuPopup extends CTag {
 				$this->addMenu($subMenu, $data['items']);
 			}
 
-			$menu->addItem(array(
-				new CLink($name, 'asdfasdf'),
-				$subMenu
-			));
+			$menuItem = new CListItem(array(new CLink($name), $subMenu));
+
+			if (!empty($data['params'])) {
+				foreach ($data['params'] as $key => $param) {
+					$menuItem->attr('data-'.$key, $param);
+				}
+			}
+
+			$menu->addItem($menuItem);
 		}
 	}
 
-	private function appendMenuItem(&$menu, array $items, array $params) {
+	private function appendMenuItem(&$menu, array $items, $name, array $params) {
 		if ($items) {
 			$item = current($items);
 
 			array_shift($items);
 
 			if (isset($menu['items'][$item])) {
-				$this->appendMenuItem($menu['items'][$item], $items, $params);
+				$this->appendMenuItem($menu['items'][$item], $items, $name, $params);
 			}
 			else {
 				$menu['items'][$item] = array(
-					'params' => $params,
 					'items' => array()
 				);
 
-				$this->appendMenuItem($menu['items'][$item], $items, $params);
+				$this->appendMenuItem($menu['items'][$item], $items, $name, $params);
 			}
 		}
 		else {
-			$menu['items'][$params['name']] = array(
+			$menu['items'][$name] = array(
 				'params' => $params,
 				'items' => array()
 			);

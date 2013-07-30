@@ -1,4 +1,4 @@
-<div id="scriptDialog" style="display: none; white-space: normal;"></div>
+<div id="scriptDialog" style="display: none; white-space: normal; z-index: 1000;"></div>
 
 <script type="text/javascript">
 	function showScriptDialog(confirmation, buttons) {
@@ -44,8 +44,9 @@
 				}}
 			];
 
-			var dialog = showScriptDialog(confirmation, buttons);
-			jQuery(dialog).find('button:first').addClass('main');
+			showScriptDialog(confirmation, buttons);
+
+			jQuery('.ui-dialog-buttonset button:first').addClass('main');
 		}
 	}
 </script>
