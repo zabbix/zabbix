@@ -2371,9 +2371,9 @@ static void	DCsync_expressions(DB_RESULT result)
 
 		expression = DCfind_id(&config->expressions, expressionid, sizeof(ZBX_DC_EXPRESSION), &found);
 		DCstrpool_replace(found, &expression->expression, row[2]);
-		expression->type = atoi(row[3]);
+		expression->type = (unsigned char)atoi(row[3]);
 		expression->delimiter = *row[4];
-		expression->case_sensitive = atoi(row[5]);
+		expression->case_sensitive = (unsigned char)atoi(row[5]);
 
 		zbx_vector_uint64_append(&ids, expressionid);
 	}
@@ -2408,7 +2408,6 @@ static void	DCsync_expressions(DB_RESULT result)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
-
 
 /******************************************************************************
  *                                                                            *
@@ -2461,9 +2460,9 @@ void	DCsync_configuration()
 	DB_RESULT		expr_result;
 
 	int			i;
-	double			sec, csec, isec, tsec, dsec, fsec, hsec, htsec, gmsec, hmsec, ifsec,
-				csec2, isec2, tsec2, dsec2, fsec2, hsec2, htsec2, gmsec2, hmsec2, ifsec2, total2,
-				expr_sec, expr_sec2;
+	double			sec, csec, isec, tsec, dsec, fsec, hsec, htsec, gmsec, hmsec, ifsec, expr_sec,
+				csec2, isec2, tsec2, dsec2, fsec2, hsec2, htsec2, gmsec2, hmsec2, ifsec2, expr_sec2,
+				total2;
 	const zbx_strpool_t	*strpool;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
@@ -5010,7 +5009,7 @@ int	DCget_item_queue(zbx_vector_ptr_t *queue, int from, int to)
  *          freed afterwards with zbx_regexp_clean_expressions() function.    *
  *                                                                            *
  ******************************************************************************/
-void	DCget_expressions_by_names(zbx_vector_ptr_t *expressions, char * const *names, int names_num)
+void	DCget_expressions_by_names(zbx_vector_ptr_t *expressions, const char * const *names, int names_num)
 {
 	int			i, iname;
 	ZBX_DC_EXPRESSION	*expression;
