@@ -188,17 +188,20 @@ if (get_request('itemid', false)) {
 		'itemids' => $_REQUEST['itemid'],
 		'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY_NORMAL)),
 		'output' => array('itemid'),
+		'selectHosts' => array('status'),
 		'editable' => true,
 		'preservekeys' => true
 	));
 	if (empty($item)) {
 		access_deny();
 	}
+	$item = reset($item);
+	$hosts = $item['hosts'];
 }
 elseif (get_request('hostid', 0) > 0) {
 	$hosts = API::Host()->get(array(
 		'hostids' => $_REQUEST['hostid'],
-		'output' => API_OUTPUT_EXTEND,
+		'output' => array('status'),
 		'templated_hosts' => true,
 		'editable' => true
 	));
@@ -221,10 +224,8 @@ if ($page['type'] == PAGE_TYPE_JS || $page['type'] == PAGE_TYPE_HTML_BLOCK) {
 	exit();
 }
 
-if (!empty($hosts)) {
-	$host = reset($hosts);
-	$_REQUEST['filter_hostid'] = $host['hostid'];
-}
+$host = reset($hosts);
+$_REQUEST['filter_hostid'] = $host['hostid'];
 
 // filter
 if (isset($_REQUEST['filter_set'])) {
@@ -1109,13 +1110,8 @@ else {
 	}
 
 	// determine, show or not column of errors
-	if (isset($hosts)) {
-		$h = reset($hosts);
-		$data['showErrorColumn'] = ($h['status'] != HOST_STATUS_TEMPLATE);
-	}
-	else {
-		$data['showErrorColumn'] = true;
-	}
+	$h = reset($hosts);
+	$data['showErrorColumn'] = ($h['status'] != HOST_STATUS_TEMPLATE);
 
 	// render view
 	$itemView = new CView('configuration.item.list', $data);
