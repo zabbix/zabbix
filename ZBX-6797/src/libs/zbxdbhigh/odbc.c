@@ -191,8 +191,8 @@ int	odbc_DBconnect(ZBX_ODBC_DBH *pdbh, char *db_dsn, char *user, char *pass, int
 			"Cannot create ODBC connection handle");
 
 	/* set login timeout */
-	CALLODBC(SQLSetConnectAttr(pdbh->hdbc, (SQLINTEGER)SQL_LOGIN_TIMEOUT, (SQLPOINTER)login_timeout, (SQLINTEGER)0),
-			SQL_HANDLE_DBC, pdbh->hdbc, "Cannot set ODBC login timeout");
+	CALLODBC(SQLSetConnectAttr(pdbh->hdbc, (SQLINTEGER)SQL_LOGIN_TIMEOUT, (SQLPOINTER)(intptr_t)login_timeout,
+			(SQLINTEGER)0), SQL_HANDLE_DBC, pdbh->hdbc, "Cannot set ODBC login timeout");
 
 	/* connect to data source */
 	CALLODBC(SQLConnect(pdbh->hdbc, (SQLCHAR *)db_dsn, SQL_NTS, (SQLCHAR *)user, SQL_NTS, (SQLCHAR *)pass, SQL_NTS),
@@ -284,8 +284,8 @@ ZBX_ODBC_RESULT	odbc_DBselect(ZBX_ODBC_DBH *pdbh, char *query)
 	pdbh->row_data = zbx_malloc(pdbh->row_data, sizeof(char *) * (size_t)pdbh->col_num);
 	memset(pdbh->row_data, 0, sizeof(char *) * (size_t)pdbh->col_num);
 
-	pdbh->data_len = zbx_malloc(pdbh->data_len, sizeof(SQLINTEGER) * (size_t)pdbh->col_num);
-	memset(pdbh->data_len, 0, sizeof(SQLINTEGER) * (size_t)pdbh->col_num);
+	pdbh->data_len = zbx_malloc(pdbh->data_len, sizeof(SQLLEN) * (size_t)pdbh->col_num);
+	memset(pdbh->data_len, 0, sizeof(SQLLEN) * (size_t)pdbh->col_num);
 
 	for (i = 0; i < pdbh->col_num; i++)
 	{
