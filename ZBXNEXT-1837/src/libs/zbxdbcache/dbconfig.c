@@ -5010,7 +5010,7 @@ int	DCget_item_queue(zbx_vector_ptr_t *queue, int from, int to)
  *          freed afterwards with zbx_regexp_clean_expressions() function.    *
  *                                                                            *
  ******************************************************************************/
-void	DCget_expressions_by_names(zbx_vector_ptr_t *expressions, const char **names, int names_num)
+void	DCget_expressions_by_names(zbx_vector_ptr_t *expressions, char * const *names, int names_num)
 {
 	int			i, iname;
 	ZBX_DC_EXPRESSION	*expression;

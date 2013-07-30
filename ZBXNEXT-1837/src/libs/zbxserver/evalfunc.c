@@ -144,10 +144,9 @@ static int	evaluate_LOGEVENTID(char *value, DB_ITEM *item, const char *function,
 		time_t now)
 {
 	const char			*__function_name = "evaluate_LOGEVENTID";
-	char				*arg1 = NULL, *arg1_esc;
+	char				*arg1 = NULL;
 	int				ret = FAIL;
 	zbx_vector_ptr_t		regexps;
-	int				regexp_num = 0;
 	zbx_vector_history_record_t	values;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
@@ -1391,12 +1390,9 @@ static int	evaluate_STR_one(int func, zbx_vector_ptr_t *regexps, const char *val
 static int	evaluate_STR(char *value, DB_ITEM *item, const char *function, const char *parameters, time_t now)
 {
 	const char			*__function_name = "evaluate_STR";
-	DB_RESULT			result;
-	DB_ROW				row;
-	char				*arg1 = NULL, *arg1_esc;
+	char				*arg1 = NULL;
 	int				arg2, flag, func, found = 0, i, ret = FAIL, seconds = 0, nvalues = 0;
 	zbx_vector_ptr_t		regexps;
-	int				regexp_num = 0;
 	zbx_vector_history_record_t	values;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
@@ -1543,9 +1539,10 @@ clean:
 static int	evaluate_FUZZYTIME(char *value, DB_ITEM *item, const char *function, const char *parameters, time_t now)
 {
 	const char			*__function_name = "evaluate_FUZZYTIME";
-	int				arg1, flag, fuzlow, fuzhig, ret = FAIL;
+	int				arg1, flag, ret = FAIL;
 	zbx_vector_history_record_t	values;
 	history_value_t			*lastvalue;
+	zbx_uint64_t			fuzlow, fuzhig;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -1557,7 +1554,7 @@ static int	evaluate_FUZZYTIME(char *value, DB_ITEM *item, const char *function, 
 	if (1 < num_param(parameters))
 		goto out;
 
-	if (FAIL == get_function_parameter_uint31(item->hostid, parameters, 1, &arg1, &flag))
+	if (FAIL == get_function_parameter_uint31(item->hostid, parameters, 1, &arg1, &flag) || now <= arg1)
 		goto out;
 
 	if (ZBX_FLAG_SEC != flag)
