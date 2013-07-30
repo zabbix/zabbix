@@ -98,8 +98,8 @@ if (get_request('triggerid', false)) {
 	if (empty($triggers)) {
 		access_deny();
 	}
-	$triggers = reset($triggers);
-	$hosts = $triggers['hosts'];
+	$trigger = reset($triggers);
+	$hosts = $trigger['hosts'];
 }
 elseif (get_request('hostid', 0) > 0) {
 	$hosts = API::Host()->get(array(
@@ -449,8 +449,13 @@ else {
 	$data['realHosts'] = getParentHostsByTriggers($data['triggers']);
 
 	// determine, show or not column of errors
-	$h = reset($hosts);
-	$data['showErrorColumn'] = ($h['status'] != HOST_STATUS_TEMPLATE);
+	if (isset($hosts)) {
+		$host = reset($hosts);
+		$data['showErrorColumn'] = ($host['status'] != HOST_STATUS_TEMPLATE);
+	}
+	else {
+		$data['showErrorColumn'] = true;
+	}
 
 	// nodes
 	if ($data['displayNodes']) {

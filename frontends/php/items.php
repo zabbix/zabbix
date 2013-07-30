@@ -224,8 +224,10 @@ if ($page['type'] == PAGE_TYPE_JS || $page['type'] == PAGE_TYPE_HTML_BLOCK) {
 	exit();
 }
 
-$host = reset($hosts);
-$_REQUEST['filter_hostid'] = $host['hostid'];
+if (!empty($hosts)) {
+	$host = reset($hosts);
+	$_REQUEST['filter_hostid'] = $host['hostid'];
+}
 
 // filter
 if (isset($_REQUEST['filter_set'])) {
@@ -1110,8 +1112,13 @@ else {
 	}
 
 	// determine, show or not column of errors
-	$h = reset($hosts);
-	$data['showErrorColumn'] = ($h['status'] != HOST_STATUS_TEMPLATE);
+	if (isset($hosts)) {
+		$host = reset($hosts);
+		$data['showErrorColumn'] = ($host['status'] != HOST_STATUS_TEMPLATE);
+	}
+	else {
+		$data['showErrorColumn'] = true;
+	}
 
 	// render view
 	$itemView = new CView('configuration.item.list', $data);
