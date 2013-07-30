@@ -81,7 +81,7 @@ static void	odbc_Diag(SQLSMALLINT h_type, SQLHANDLE h, SQLRETURN sql_rc, const c
 	SQLCHAR		sql_state[SQL_SQLSTATE_SIZE + 1], err_msg[128];
 	SQLINTEGER	native_err_code = 0;
 	int		rec_nr = 1;
-	char		rc_msg[40];		/* the longest message is "SQL_INVALID_HANDLE or SQL_DATA_AT_EXEC" */
+	char		rc_msg[40];		/* the longest message is "%d (unknown SQLRETURN code)" */
 	char		diag_msg[ODBC_ERR_MSG_LEN];
 	size_t		offset = 0;
 
@@ -92,7 +92,7 @@ static void	odbc_Diag(SQLSMALLINT h_type, SQLHANDLE h, SQLRETURN sql_rc, const c
 	switch (sql_rc)
 	{
 		case SQL_ERROR:
-			zbx_strlcpy(rc_msg, "SQL_ERRORorSQL_NULL_DATA", sizeof(rc_msg));
+			zbx_strlcpy(rc_msg, "SQL_ERROR", sizeof(rc_msg));
 			break;
 		case SQL_SUCCESS_WITH_INFO:
 			zbx_strlcpy(rc_msg, "SQL_SUCCESS_WITH_INFO", sizeof(rc_msg));
@@ -101,7 +101,7 @@ static void	odbc_Diag(SQLSMALLINT h_type, SQLHANDLE h, SQLRETURN sql_rc, const c
 			zbx_strlcpy(rc_msg, "SQL_NO_DATA", sizeof(rc_msg));
 			break;
 		case SQL_INVALID_HANDLE:
-			zbx_strlcpy(rc_msg, "SQL_INVALID_HANDLEorSQL_DATA_AT_EXEC", sizeof(rc_msg));
+			zbx_strlcpy(rc_msg, "SQL_INVALID_HANDLE", sizeof(rc_msg));
 			break;
 		case SQL_STILL_EXECUTING:
 			zbx_strlcpy(rc_msg, "SQL_STILL_EXECUTING", sizeof(rc_msg));
