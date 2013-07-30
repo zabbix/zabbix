@@ -91,17 +91,20 @@ if (get_request('triggerid', false)) {
 	$triggers = API::Trigger()->get(array(
 		'triggerids' => $_REQUEST['triggerid'],
 		'preservekeys' => true,
+		'selectHosts' => array('status'),
 		'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL),
 		'editable' => true
 	));
 	if (empty($triggers)) {
 		access_deny();
 	}
+	$triggers = reset($triggers);
+	$hosts = $triggers['hosts'];
 }
 elseif (get_request('hostid', 0) > 0) {
 	$hosts = API::Host()->get(array(
 		'hostids' => $_REQUEST['hostid'],
-		'output' => API_OUTPUT_EXTEND,
+		'output' => array('status'),
 		'templated_hosts' => true,
 		'editable' => true
 	));
@@ -446,13 +449,8 @@ else {
 	$data['realHosts'] = getParentHostsByTriggers($data['triggers']);
 
 	// determine, show or not column of errors
-	if (isset($hosts)) {
-		$h = reset($hosts);
-		$data['showErrorColumn'] = ($h['status'] != HOST_STATUS_TEMPLATE);
-	}
-	else {
-		$data['showErrorColumn'] = true;
-	}
+	$h = reset($hosts);
+	$data['showErrorColumn'] = ($h['status'] != HOST_STATUS_TEMPLATE);
 
 	// nodes
 	if ($data['displayNodes']) {
