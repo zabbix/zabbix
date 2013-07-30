@@ -35,9 +35,7 @@ class CGraph extends CGraphGeneral {
 
 		$this->errorMessages = array_merge($this->errorMessages, array(
 			self::ERROR_TEMPLATE_HOST_MIX =>
-				_('Graph "%1$s" with templated items cannot contain items from other hosts.'),
-			self::ERROR_MISSING_ITEMS =>
-				_('Missing items for graph "%1$s".')
+				_('Graph "%1$s" with templated items cannot contain items from other hosts.')
 		));
 	}
 
@@ -577,8 +575,27 @@ class CGraph extends CGraphGeneral {
 	 * @return void
 	 */
 	protected function checkInput($graphs, $update = false) {
+		// get graph name on update
+		if ($update){
+			$graphs = $this->extendObjects($this->tableName(), $graphs, array('name'));
+		}
+
 		$itemids = array();
+
 		foreach ($graphs as $graph) {
+			// validate graph name on create
+			$fields = array('name' => null);
+			if (!$update && !check_db_fields($fields, $graph)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Missing "name" field for graph.'));
+			}
+
+			// on create graph items are mandatory, but on update graph items are optional
+			if ((!$update && (!isset($graph['gitems']) || !is_array($graph['gitems']) || !$graph['gitems']))
+					|| ($update && isset($graph['gitems']) && (!is_array($graph['gitems']) || !$graph['gitems']))) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Missing items for graph "%1$s".', $graph['name']));
+			}
+
+			// validate item fields
 			$fields = array('itemid' => null);
 			foreach ($graph['gitems'] as $gitem) {
 				if (!check_db_fields($fields, $gitem)) {
