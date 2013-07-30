@@ -23,8 +23,8 @@ require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 class testPageDiscoveryRules extends CWebTest {
 
 	// Returns all Discovery Rules
-	public static function allRules() {
-		$sql = 'SELECT h.hostid, i.itemid'.
+	public static function data() {
+		$sql = 'SELECT h.hostid, i.itemid, h.host, h.status'.
 				' FROM hosts h, items i'.
 				' WHERE i.hostid=h.hostid'.
 					' AND i.flags='.ZBX_FLAG_DISCOVERY;
@@ -33,7 +33,92 @@ class testPageDiscoveryRules extends CWebTest {
 	}
 
 	/**
-	* @dataProvider allRules
+	* @dataProvider data
+	*/
+
+	public function testPageDiscoveryRules_CheckLayout($data) {
+		if ($data['status'] == HOST_STATUS_MONITORED || $data['status'] == HOST_STATUS_NOT_MONITORED) {
+			$hostid = $data['hostid'];
+var_dump($data['host']);
+			$this->zbxTestLogin('hosts.php');
+			$this->zbxTestDropdownSelectWait('groupid', 'all');
+
+			$this->checkTitle('Configuration of hosts');
+			$this->zbxTestTextPresent('HOSTS');
+			// Go to the list of drules
+			$this->href_click("host_discovery.php?&hostid=$hostid");
+			$this->wait();
+			// We are in the list of drules
+			$this->checkTitle('Configuration of discovery rules');
+			$this->zbxTestTextPresent('CONFIGURATION OF DISCOVERY RULES');
+			$this->zbxTestTextPresent('Discovery rules');
+			$this->zbxTestTextPresent('Displaying');
+			$this->zbxTestTextPresent('Host list');
+			// Header
+			$this->zbxTestTextPresent(
+				array(
+					'Name',
+					'Items',
+					'Triggers',
+					'Graphs',
+					'Key',
+					'Interval',
+					'Type',
+					'Status',
+					'Error'
+				)
+			);
+			// someday should check that interval is not shown for trapper items, trends not shown for non-numeric items etc
+
+			$this->zbxTestDropdownHasOptions('go', array(
+					'Enable selected',
+					'Disable selected',
+					'Delete selected'
+			));
+		}
+		if ($data['status'] == HOST_STATUS_TEMPLATE) {
+			$templateid = $data['hostid'];
+var_dump($data['host']);
+			$this->zbxTestLogin('templates.php');
+			$this->zbxTestDropdownSelectWait('groupid', 'all');
+
+			$this->checkTitle('Configuration of templates');
+			$this->zbxTestTextPresent('TEMPLATES');
+			// Go to the list of drules
+			$this->href_click("host_discovery.php?&hostid=$templateid");
+			$this->wait();
+			// We are in the list of drules
+			$this->checkTitle('Configuration of discovery rules');
+			$this->zbxTestTextPresent('CONFIGURATION OF DISCOVERY RULES');
+			$this->zbxTestTextPresent('Discovery rules');
+			$this->zbxTestTextPresent('Displaying');
+			$this->zbxTestTextPresent('Template list');
+			// Header
+			$this->zbxTestTextPresent(
+				array(
+					'Name',
+					'Items',
+					'Triggers',
+					'Graphs',
+					'Key',
+					'Interval',
+					'Type',
+					'Status'
+				)
+			);
+			$this->zbxTestTextNotPresent('Error');
+			// someday should check that interval is not shown for trapper items, trends not shown for non-numeric items etc
+
+			$this->zbxTestDropdownHasOptions('go', array(
+					'Enable selected',
+					'Disable selected',
+					'Delete selected'
+			));
+		}
+	}
+
+	/**
+	* @dataProvider data
 	*/
 	public function testPageActionsDiscovery_MassDelete($rule) {
 		$itemid = $rule['itemid'];
