@@ -40,7 +40,7 @@ typedef struct zbx_odbc_dbh_s
 
 typedef ZBX_ODBC_DBH*		ZBX_ODBC_RESULT;
 
-int		odbc_DBconnect(ZBX_ODBC_DBH *pdbh, char *db_name, char *user, char *pass);
+int		odbc_DBconnect(ZBX_ODBC_DBH *pdbh, char *db_name, char *user, char *pass, int login_timeout);
 void		odbc_DBclose(ZBX_ODBC_DBH *pdbh);
 
 ZBX_ODBC_RESULT odbc_DBselect(ZBX_ODBC_DBH *pdbh, char *query);

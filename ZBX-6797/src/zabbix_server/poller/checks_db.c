@@ -151,7 +151,7 @@ int	get_value_db(DC_ITEM *item, AGENT_RESULT *result)
 		db_pass = get_param_value(item->params, "password");
 		db_sql = get_param_value(item->params, "sql");
 
-		if (SUCCEED == odbc_DBconnect(&dbh, db_dsn, db_user, db_pass))
+		if (SUCCEED == odbc_DBconnect(&dbh, db_dsn, db_user, db_pass, CONFIG_TIMEOUT))
 		{
 			if (NULL != odbc_DBselect(&dbh, db_sql))
 			{

@@ -92,7 +92,7 @@ static void	odbc_Diag(SQLSMALLINT h_type, SQLHANDLE h, SQLRETURN sql_rc, const c
 	switch (sql_rc)
 	{
 		case SQL_ERROR:
-			zbx_strlcpy(rc_msg, "SQL_ERROR or SQL_NULL_DATA", sizeof(rc_msg));
+			zbx_strlcpy(rc_msg, "SQL_ERRORorSQL_NULL_DATA", sizeof(rc_msg));
 			break;
 		case SQL_SUCCESS_WITH_INFO:
 			zbx_strlcpy(rc_msg, "SQL_SUCCESS_WITH_INFO", sizeof(rc_msg));
@@ -101,7 +101,7 @@ static void	odbc_Diag(SQLSMALLINT h_type, SQLHANDLE h, SQLRETURN sql_rc, const c
 			zbx_strlcpy(rc_msg, "SQL_NO_DATA", sizeof(rc_msg));
 			break;
 		case SQL_INVALID_HANDLE:
-			zbx_strlcpy(rc_msg, "SQL_INVALID_HANDLE or SQL_DATA_AT_EXEC", sizeof(rc_msg));
+			zbx_strlcpy(rc_msg, "SQL_INVALID_HANDLEorSQL_DATA_AT_EXEC", sizeof(rc_msg));
 			break;
 		case SQL_STILL_EXECUTING:
 			zbx_strlcpy(rc_msg, "SQL_STILL_EXECUTING", sizeof(rc_msg));
@@ -164,7 +164,7 @@ void	odbc_DBclose(ZBX_ODBC_DBH *pdbh)
 	odbc_free_row_data(pdbh);
 }
 
-int	odbc_DBconnect(ZBX_ODBC_DBH *pdbh, char *db_dsn, char *user, char *pass)
+int	odbc_DBconnect(ZBX_ODBC_DBH *pdbh, char *db_dsn, char *user, char *pass, int login_timeout)
 {
 	const char	*__function_name = "odbc_DBconnect";
 	int		ret = FAIL;
@@ -190,13 +190,13 @@ int	odbc_DBconnect(ZBX_ODBC_DBH *pdbh, char *db_dsn, char *user, char *pass)
 	CALLODBC(SQLAllocHandle(SQL_HANDLE_DBC, pdbh->henv, &(pdbh->hdbc)), SQL_HANDLE_ENV, pdbh->henv,
 			"Cannot create ODBC connection handle");
 
-	/* set login timeout to 5 seconds */
-	CALLODBC(SQLSetConnectAttr(pdbh->hdbc, (SQLINTEGER)SQL_LOGIN_TIMEOUT, (SQLPOINTER)5, (SQLINTEGER)0),
+	/* set login timeout */
+	CALLODBC(SQLSetConnectAttr(pdbh->hdbc, (SQLINTEGER)SQL_LOGIN_TIMEOUT, (SQLPOINTER)login_timeout, (SQLINTEGER)0),
 			SQL_HANDLE_DBC, pdbh->hdbc, "Cannot set ODBC login timeout");
 
 	/* connect to data source */
-	CALLODBC(SQLConnect(pdbh->hdbc, (SQLCHAR *)db_dsn, SQL_NTS, (SQLCHAR *)user, SQL_NTS, (SQLCHAR *)pass,
-			SQL_NTS), SQL_HANDLE_DBC, pdbh->hdbc, "Cannot connect to ODBC DSN");
+	CALLODBC(SQLConnect(pdbh->hdbc, (SQLCHAR *)db_dsn, SQL_NTS, (SQLCHAR *)user, SQL_NTS, (SQLCHAR *)pass, SQL_NTS),
+			SQL_HANDLE_DBC, pdbh->hdbc, "Cannot connect to ODBC DSN");
 
 	/* allocate statement handle */
 	CALLODBC(SQLAllocHandle(SQL_HANDLE_STMT, pdbh->hdbc, &(pdbh->hstmt)), SQL_HANDLE_DBC, pdbh->hdbc,
@@ -281,11 +281,11 @@ ZBX_ODBC_RESULT	odbc_DBselect(ZBX_ODBC_DBH *pdbh, char *query)
 	CALLODBC(SQLNumResultCols(pdbh->hstmt, &pdbh->col_num), SQL_HANDLE_STMT, pdbh->hstmt,
 			"Cannot get number of columns in ODBC result");
 
-	pdbh->row_data = zbx_malloc(pdbh->row_data, sizeof(char *) * pdbh->col_num);
-	memset(pdbh->row_data, 0, sizeof(char *) * pdbh->col_num);
+	pdbh->row_data = zbx_malloc(pdbh->row_data, sizeof(char *) * (size_t)pdbh->col_num);
+	memset(pdbh->row_data, 0, sizeof(char *) * (size_t)pdbh->col_num);
 
-	pdbh->data_len = zbx_malloc(pdbh->data_len, sizeof(SQLINTEGER) * pdbh->col_num);
-	memset(pdbh->data_len, 0, sizeof(SQLINTEGER) * pdbh->col_num);
+	pdbh->data_len = zbx_malloc(pdbh->data_len, sizeof(SQLINTEGER) * (size_t)pdbh->col_num);
+	memset(pdbh->data_len, 0, sizeof(SQLINTEGER) * (size_t)pdbh->col_num);
 
 	for (i = 0; i < pdbh->col_num; i++)
 	{
