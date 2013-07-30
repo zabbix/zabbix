@@ -22,7 +22,7 @@
 
 #if defined(_WINDOWS)
 #	include "gnuregex.h"
-#endif /* _WINDOWS */
+#endif
 
 static char	*zbx_regexp(const char *string, const char *pattern, int *len, int flags)
 {
@@ -146,7 +146,6 @@ static char	*regexp_sub_replace(const char *text, const char *output_template, r
 out:
 	return ptr;
 }
-
 
 /*********************************************************************************
  *                                                                               *
@@ -279,7 +278,6 @@ void	add_regexp_ex(zbx_vector_ptr_t *regexps, const char *name, const char *expr
 	zbx_vector_ptr_append(regexps, regexp);
 }
 
-
 /**********************************************************************************
  *                                                                                *
  * Function: regexp_match_ex_regsub                                               *
@@ -376,8 +374,7 @@ static int	regexp_match_ex_substring(const char *string, const char *pattern, in
  *               FAIL    - string contains no substrings from the list            *
  *                                                                                *
  **********************************************************************************/
-static int	regexp_match_ex_substring_list(const char *string, char *pattern, int case_sensitive,
-		char delimiter)
+static int	regexp_match_ex_substring_list(const char *string, char *pattern, int case_sensitive, char delimiter)
 {
 	int	ret = FAIL;
 	char	*s, *c;
@@ -410,7 +407,6 @@ static int	regexp_match_ex_substring_list(const char *string, char *pattern, int
  *          result if necessary.                                                  *
  *                                                                                *
  * Parameters: regexps         - [IN] the global regular expression array         *
- *             regexps_num     - [IN] the number of global regular expressions    *
  *             string          - [IN] the string to check                         *
  *             pattern         - [IN] the regular expression or global regular    *
  *                                    expression name (@<global regexp name>).    *
@@ -514,4 +510,3 @@ int	regexp_match_ex(zbx_vector_ptr_t *regexps, const char *string, const char *p
 {
 	return regexp_sub_ex(regexps, string, pattern, case_sensitive, NULL, NULL);
 }
-

@@ -442,7 +442,7 @@ int	send_list_of_active_checks_json(zbx_sock_t *sock, struct zbx_json_parse *jp)
 
 	zbx_json_close(&json);
 
-	DCget_expressions_by_names(&regexps, names.values, names.values_num);
+	DCget_expressions_by_names(&regexps, (const char * const *)names.values, names.values_num);
 
 	if (0 < regexps.values_num)
 	{
