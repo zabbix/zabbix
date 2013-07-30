@@ -290,7 +290,7 @@ void	add_regexp_ex(zbx_vector_ptr_t *regexps, const char *name, const char *expr
  *                                                                                *
  * Parameters: string          - [IN] the string to check                         *
  *             pattern         - [IN] the regular expression                      *
- *             cs              - [IN] ZBX_IGNORE_CASE - case insensitive match.   *
+ *             case_sensitive  - [IN] ZBX_IGNORE_CASE - case insensitive match.   *
  *                                    ZBX_CASE_SENSITIVE - case sensitive match.  *
  *             output_template - [IN] the output string template. The output      *
  *                                    string is constructed from the template by  *
@@ -308,13 +308,13 @@ void	add_regexp_ex(zbx_vector_ptr_t *regexps, const char *name, const char *expr
  *                         expression                                             *
  *                                                                                *
  **********************************************************************************/
-static int	regexp_match_ex_regsub(const char *string, const char *pattern, int cs,
+static int	regexp_match_ex_regsub(const char *string, const char *pattern, int case_sensitive,
 		const char *output_template, char **output)
 {
 	char	*ptr = NULL;
 	int	regexp_flags = REG_EXTENDED | REG_NEWLINE;
 
-	if (ZBX_IGNORE_CASE == cs)
+	if (ZBX_IGNORE_CASE == case_sensitive)
 		regexp_flags |= REG_ICASE;
 
 	if (NULL == output)
@@ -334,18 +334,18 @@ static int	regexp_match_ex_regsub(const char *string, const char *pattern, int c
  *                                                                                *
  * Parameters: string          - [IN] the string to check                         *
  *             pattern         - [IN] the substring to search                     *
- *             cs              - [IN] ZBX_IGNORE_CASE - case insensitive search   *
+ *             case_sensitive  - [IN] ZBX_IGNORE_CASE - case insensitive search   *
  *                                    ZBX_CASE_SENSITIVE - case sensitive search  *
  *                                                                                *
  * Return value: SUCCEED - string contains the specified substring                *
  *               FAIL    - string does not contain the specified substring        *
  *                                                                                *
  **********************************************************************************/
-static int	regexp_match_ex_substring(const char *string, const char *pattern, int cs)
+static int	regexp_match_ex_substring(const char *string, const char *pattern, int case_sensitive)
 {
 	char	*ptr = NULL;
 
-	switch (cs)
+	switch (case_sensitive)
 	{
 		case ZBX_CASE_SENSITIVE:
 			ptr = strstr(string, pattern);
@@ -367,7 +367,7 @@ static int	regexp_match_ex_substring(const char *string, const char *pattern, in
  *                                                                                *
  * Parameters: string          - [IN] the string to check                         *
  *             pattern         - [IN] the substring list                          *
- *             cs              - [IN] ZBX_IGNORE_CASE - case insensitive search   *
+ *             case_sensitive  - [IN] ZBX_IGNORE_CASE - case insensitive search   *
  *                                    ZBX_CASE_SENSITIVE - case sensitive search  *
  *             delimiter       - [IN] the delimiter separating items in the       *
  *                                    substring list                              *
@@ -376,7 +376,7 @@ static int	regexp_match_ex_substring(const char *string, const char *pattern, in
  *               FAIL    - string contains no substrings from the list            *
  *                                                                                *
  **********************************************************************************/
-static int	regexp_match_ex_substring_list(const char *string, char *pattern, int cs,
+static int	regexp_match_ex_substring_list(const char *string, char *pattern, int case_sensitive,
 		char delimiter)
 {
 	int	ret = FAIL;
@@ -387,7 +387,7 @@ static int	regexp_match_ex_substring_list(const char *string, char *pattern, int
 		if (NULL != (c = strchr(s, delimiter)))
 			*c = '\0';
 
-		ret = regexp_match_ex_substring(string, s, cs);
+		ret = regexp_match_ex_substring(string, s, case_sensitive);
 
 		if (NULL != c)
 		{
@@ -414,7 +414,7 @@ static int	regexp_match_ex_substring_list(const char *string, char *pattern, int
  *             string          - [IN] the string to check                         *
  *             pattern         - [IN] the regular expression or global regular    *
  *                                    expression name (@<global regexp name>).    *
- *             cs              - [IN] ZBX_IGNORE_CASE - case insensitive match    *
+ *             case_sensitive  - [IN] ZBX_IGNORE_CASE - case insensitive match    *
  *                                    ZBX_CASE_SENSITIVE - case sensitive match   *
  *             output_template - [IN] the output string template. For regular     *
  *                                    expressions (type Result is TRUE) output    *
@@ -439,7 +439,7 @@ static int	regexp_match_ex_substring_list(const char *string, char *pattern, int
  *                                                                                *
  **********************************************************************************/
 int	regexp_sub_ex(zbx_vector_ptr_t *regexps, const char *string, const char *pattern,
-		int cs, const char *output_template, char **output)
+		int case_sensitive, const char *output_template, char **output)
 {
 	int	i, ret = FAIL;
 
@@ -452,7 +452,7 @@ int	regexp_sub_ex(zbx_vector_ptr_t *regexps, const char *string, const char *pat
 
 	if ('@' != *pattern)
 	{
-		ret = regexp_match_ex_regsub(string, pattern, cs, output_template, output);
+		ret = regexp_match_ex_regsub(string, pattern, case_sensitive, output_template, output);
 		goto out;
 	}
 
@@ -510,9 +510,8 @@ out:
 	return ret;
 }
 
-int	regexp_match_ex(zbx_vector_ptr_t *regexps, const char *string, const char *pattern,
-		int cs)
+int	regexp_match_ex(zbx_vector_ptr_t *regexps, const char *string, const char *pattern, int case_sensitive)
 {
-	return regexp_sub_ex(regexps, string, pattern, cs, NULL, NULL);
+	return regexp_sub_ex(regexps, string, pattern, case_sensitive, NULL, NULL);
 }
 
