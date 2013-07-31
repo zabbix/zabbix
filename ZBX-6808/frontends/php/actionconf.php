@@ -180,7 +180,7 @@ elseif (isset($_REQUEST['add_condition']) && isset($_REQUEST['new_condition'])) 
 		if ($newCondition) {
 			$conditions = get_request('conditions', array());
 
-			// in order to add maintenance, it must have a not null value
+			// when adding new maintenance, in order to check for an existing maintenance, it must have a not null value
 			if ($newCondition['conditiontype'] == CONDITION_TYPE_MAINTENANCE) {
 				$newCondition['value'] = '';
 			}
@@ -196,21 +196,30 @@ elseif (isset($_REQUEST['add_condition']) && isset($_REQUEST['new_condition'])) 
 						}
 					}
 					else {
-						if ($condition['value'] == $newCondition['value']) {
+						if ($newCondition['value'] == $condition['value']) {
 							$newCondition['value'] = null;
 						}
 					}
 				}
 			}
 
-			$validateConditions = $_REQUEST['conditions'] = $conditions;
+			// maintenance is not supposed to have a value
+			foreach ($conditions as $idx => $condition) {
+				if ($condition['conditiontype'] == CONDITION_TYPE_MAINTENANCE) {
+					unset($conditions[$idx]['value']);
+				}
+			}
 
-			if ($newCondition['value']) {
+			$validateConditions = $conditions;
+
+			if (isset($newCondition['value'])) {
 				$newConditionValues = zbx_toArray($newCondition['value']);
-
 				foreach ($newConditionValues as $newValue) {
 					$condition = $newCondition;
 					$condition['value'] = $newValue;
+					if ($condition['conditiontype'] == CONDITION_TYPE_MAINTENANCE) {
+						unset($condition['value']);
+					}
 					$validateConditions[] = $condition;
 				}
 			}
@@ -223,7 +232,7 @@ elseif (isset($_REQUEST['add_condition']) && isset($_REQUEST['new_condition'])) 
 		}
 	}
 	catch (APIException $e) {
-		show_error_message(_s('Cannot add action condition'));
+		show_error_message(_('Cannot add action condition'));
 		error($e->getMessage());
 	}
 }
