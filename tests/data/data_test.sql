@@ -1271,7 +1271,7 @@ INSERT INTO functions (functionid,itemid,triggerid,function,parameter) VALUES (1
 INSERT INTO functions (functionid,itemid,triggerid,function,parameter) VALUES (16020,40057,16020,'last','0');
 INSERT INTO functions (functionid,itemid,triggerid,function,parameter) VALUES (16021,40057,16021,'last','0');
 
--- testZBX6275.LayoutCheck, testZBX6275.MassDelete
+-- testPageDiscoveryRules, testPageItemPrototype, testPageTriggerPrototype
 INSERT INTO hosts (hostid, proxy_hostid, host, status, disable_until, error, available, errors_from, lastaccess, ipmi_authtype, ipmi_privilege, ipmi_username, ipmi_password, ipmi_disable_until, ipmi_available, snmp_disable_until, snmp_available, maintenanceid, maintenance_status, maintenance_type, maintenance_from, ipmi_errors_from, snmp_errors_from, ipmi_error, snmp_error,name) VALUES (50006,NULL,'Template ZBX6275',3,0,'',0,0,0,0,2,'','',0,0,0,0,NULL,0,0,0,0,0,'','','Template ZBX6275');
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50006, 50006, 1);
 INSERT INTO hosts (hostid, host, name, status) VALUES (50007, 'Host ZBX6275','Host ZBX6275', 0);
@@ -1279,3 +1279,11 @@ INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50007, 50006, 4)
 INSERT INTO interface (type, ip, dns, useip, port, main, hostid, interfaceid) VALUES (1, '127.0.7.1', '', '1', '10071', '1', 50007, 50019);
 INSERT INTO items (itemid,type,snmp_community,snmp_oid,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,multiplier,delta,snmpv3_securityname,snmpv3_securitylevel,snmpv3_authpassphrase,snmpv3_privpassphrase,formula,error,lastlogsize,logtimefmt,templateid,valuemapid,delay_flex,params,ipmi_sensor,data_type,authtype,username,password,publickey,privatekey,mtime,flags,filter,interfaceid,port,description,inventory_link,lifetime,snmpv3_authprotocol,snmpv3_privprotocol,state,snmpv3_contextname) VALUES (40058,0,'','',50006,'DiscoveryRule ZBX6274 Template','drule-ZBX6275-template',30,90,365,0,4,'','',0,0,'',0,'','','1','',0,'',NULL,NULL,'','','',0,0,'','','','',0,1,':',NULL,'','',0,'30',0,0,0,'');
 INSERT INTO items (itemid,type,snmp_community,snmp_oid,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,multiplier,delta,snmpv3_securityname,snmpv3_securitylevel,snmpv3_authpassphrase,snmpv3_privpassphrase,formula,error,lastlogsize,logtimefmt,templateid,valuemapid,delay_flex,params,ipmi_sensor,data_type,authtype,username,password,publickey,privatekey,mtime,flags,filter,interfaceid,port,description,inventory_link,lifetime,snmpv3_authprotocol,snmpv3_privprotocol,state,snmpv3_contextname) VALUES (40059,0,'','',50007,'DiscoveryRule ZBX6274 Host','drule-ZBX6275-host',30,90,365,0,4,'','',0,0,'',0,'','','1','',0,'',NULL,NULL,'','','',0,0,'','','','',0,1,':',NULL,'','',0,'30',0,0,0,'');
+INSERT INTO items (name, key_, hostid, value_type, itemid, flags, delay, params, description) VALUES ('itemprotozbx6275template', 'item-zbx6275-template', 50006, 3, 40060, 2, 5, '', '');
+INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid) values (513, 40060, 40058);
+INSERT INTO items (name, key_, hostid, value_type, itemid, flags, delay, params, description) VALUES ('itemprotozbx6275host', 'item-zbx6275-host', 50007, 3, 40061, 2, 5, '', '');
+INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid) values (514, 40061, 40059);
+INSERT INTO triggers (triggerid,expression,description,url,status,value,priority,lastchange,comments,error,templateid,type,state,flags) VALUES (16022,'{16022}=0','triggerprotozbx6275template','',0,0,0,0,'','',NULL,0,0,2);
+INSERT INTO functions (functionid,itemid,triggerid,function,parameter) VALUES (16022,40060,16022,'last','0');
+INSERT INTO triggers (triggerid, expression, description, comments, flags) VALUES (16023, '{16023}=0', 'triggerprotozbx6275host', '', 2);
+INSERT INTO functions (functionid, itemid, triggerid, function, parameter) VALUES (16023, 40061 ,16023,'last',0);
