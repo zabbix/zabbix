@@ -21,7 +21,7 @@
 #include "log.h"
 #include "zbxodbc.h"
 
-#define CALLODBC(fun, h_type, h, msg)	(SQL_SUCCESS != (rc = (fun)) && 0 == odbc_Diag((h_type), (h), rc, (msg)))
+#define CALLODBC(fun, rc, h_type, h, msg)	(SQL_SUCCESS != (rc = (fun)) && 0 == odbc_Diag((h_type), (h), rc, (msg)))
 
 #define ODBC_ERR_MSG_LEN	255
 
@@ -110,17 +110,18 @@ static int	odbc_Diag(SQLSMALLINT h_type, SQLHANDLE h, SQLRETURN sql_rc, const ch
 
 	if (SQL_ERROR == sql_rc || SQL_SUCCESS_WITH_INFO == sql_rc)
 	{
-		while (0 != SQL_SUCCEEDED(SQLGetDiagRec(h_type, h, (SQLSMALLINT)rec_nr++, sql_state, &native_err_code,
+		while (0 != SQL_SUCCEEDED(SQLGetDiagRec(h_type, h, (SQLSMALLINT)rec_nr, sql_state, &native_err_code,
 				err_msg, sizeof(err_msg), NULL)))
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "%s(): rc_msg:'%s' rec_nr:%d sql_state:'%s' native_err_code:%ld "
-					"err_msg:'%s'", __function_name, rc_msg, rec_nr - 1, sql_state,
+					"err_msg:'%s'", __function_name, rc_msg, rec_nr, sql_state,
 					(long)native_err_code, err_msg);
 			if (sizeof(diag_msg) > offset)
 			{
 				offset += zbx_snprintf(diag_msg + offset, sizeof(diag_msg) - offset, "[%s][%ld][%s]|",
 						sql_state, (long)native_err_code, err_msg);
 			}
+			rec_nr++;
 		}
 		*(diag_msg + offset) = '\0';
 	}
@@ -178,14 +179,14 @@ int	odbc_DBconnect(ZBX_ODBC_DBH *pdbh, char *db_dsn, char *user, char *pass, int
 	}
 
 	/* set the ODBC version environment attribute */
-	if (0 != CALLODBC(SQLSetEnvAttr(pdbh->henv, SQL_ATTR_ODBC_VERSION, (void*)SQL_OV_ODBC3, 0), SQL_HANDLE_ENV,
+	if (0 != CALLODBC(SQLSetEnvAttr(pdbh->henv, SQL_ATTR_ODBC_VERSION, (void*)SQL_OV_ODBC3, 0), rc, SQL_HANDLE_ENV,
 			pdbh->henv, "Cannot set ODBC version"))
 	{
 		goto end;
 	}
 
 	/* allocate connection handle */
-	if (0 != CALLODBC(SQLAllocHandle(SQL_HANDLE_DBC, pdbh->henv, &(pdbh->hdbc)), SQL_HANDLE_ENV, pdbh->henv,
+	if (0 != CALLODBC(SQLAllocHandle(SQL_HANDLE_DBC, pdbh->henv, &(pdbh->hdbc)), rc, SQL_HANDLE_ENV, pdbh->henv,
 			"Cannot create ODBC connection handle"))
 	{
 		goto end;
@@ -193,7 +194,7 @@ int	odbc_DBconnect(ZBX_ODBC_DBH *pdbh, char *db_dsn, char *user, char *pass, int
 
 	/* set login timeout */
 	if (0 != CALLODBC(SQLSetConnectAttr(pdbh->hdbc, (SQLINTEGER)SQL_LOGIN_TIMEOUT,
-			(SQLPOINTER)(intptr_t)login_timeout, (SQLINTEGER)0), SQL_HANDLE_DBC, pdbh->hdbc,
+			(SQLPOINTER)(intptr_t)login_timeout, (SQLINTEGER)0), rc, SQL_HANDLE_DBC, pdbh->hdbc,
 			"Cannot set ODBC login timeout"))
 	{
 		goto end;
@@ -201,13 +202,13 @@ int	odbc_DBconnect(ZBX_ODBC_DBH *pdbh, char *db_dsn, char *user, char *pass, int
 
 	/* connect to data source */
 	if (0 != CALLODBC(SQLConnect(pdbh->hdbc, (SQLCHAR *)db_dsn, SQL_NTS, (SQLCHAR *)user, SQL_NTS, (SQLCHAR *)pass,
-			SQL_NTS), SQL_HANDLE_DBC, pdbh->hdbc, "Cannot connect to ODBC DSN"))
+			SQL_NTS), rc, SQL_HANDLE_DBC, pdbh->hdbc, "Cannot connect to ODBC DSN"))
 	{
 		goto end;
 	}
 
 	/* allocate statement handle */
-	if (0 != CALLODBC(SQLAllocHandle(SQL_HANDLE_STMT, pdbh->hdbc, &(pdbh->hstmt)), SQL_HANDLE_DBC, pdbh->hdbc,
+	if (0 != CALLODBC(SQLAllocHandle(SQL_HANDLE_STMT, pdbh->hdbc, &(pdbh->hstmt)), rc, SQL_HANDLE_DBC, pdbh->hdbc,
 			"Cannot create ODBC statement handle."))
 	{
 		goto end;
@@ -287,13 +288,13 @@ ZBX_ODBC_RESULT	odbc_DBselect(ZBX_ODBC_DBH *pdbh, char *query)
 
 	odbc_free_row_data(pdbh);
 
-	if (0 != CALLODBC(SQLExecDirect(pdbh->hstmt, (SQLCHAR *)query, SQL_NTS), SQL_HANDLE_STMT, pdbh->hstmt,
+	if (0 != CALLODBC(SQLExecDirect(pdbh->hstmt, (SQLCHAR *)query, SQL_NTS), rc, SQL_HANDLE_STMT, pdbh->hstmt,
 			"Cannot execute ODBC query"))
 	{
 		goto end;
 	}
 
-	if (0 != CALLODBC(SQLNumResultCols(pdbh->hstmt, &pdbh->col_num), SQL_HANDLE_STMT, pdbh->hstmt,
+	if (0 != CALLODBC(SQLNumResultCols(pdbh->hstmt, &pdbh->col_num), rc, SQL_HANDLE_STMT, pdbh->hstmt,
 			"Cannot get number of columns in ODBC result"))
 	{
 		goto end;
@@ -309,7 +310,7 @@ ZBX_ODBC_RESULT	odbc_DBselect(ZBX_ODBC_DBH *pdbh, char *query)
 	{
 		pdbh->row_data[i] = zbx_malloc(pdbh->row_data[i], MAX_STRING_LEN);
 		if (0 != CALLODBC(SQLBindCol(pdbh->hstmt, (SQLUSMALLINT)(i + 1), SQL_C_CHAR, pdbh->row_data[i],
-				MAX_STRING_LEN, &pdbh->data_len[i]), SQL_HANDLE_STMT, pdbh->hstmt,
+				MAX_STRING_LEN, &pdbh->data_len[i]), rc, SQL_HANDLE_STMT, pdbh->hstmt,
 				"Cannot bind column in ODBC result"))
 		{
 			goto end;
