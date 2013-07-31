@@ -3,6 +3,8 @@ Changes for 2.0.8rc1
 New features:
 
 Bug fixes:
+.......PS. [ZBX-6798] improved error messages from UnixODBC library for Database Monitor items (Andris)
+.......PS. [ZBX-6797] added configurable ODBC login timeout (Andris)
 
 --------------------------------------------------------------------------------
 Changes for 2.0.7
