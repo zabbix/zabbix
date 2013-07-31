@@ -22,12 +22,16 @@
 class CMenuPopup extends CTag {
 
 	/**
+	 * @param bool   $options['isMap']
 	 * @param string $options['id']
 	 * @param string $options['hostid']
-	 * @param bool   $options['scripts']
+	 * @param array  $options['scripts']
 	 * @param array  $options['goto']
 	 * @param array  $options['goto']['params']
 	 * @param array  $options['goto']['items']
+	 * @param array  $options['urls']
+	 * @param array  $options['urls'][n]['name']
+	 * @param array  $options['urls'][n]['url']
 	 */
 	public function __construct(array $options = array()) {
 		parent::__construct('div', 'yes');
@@ -83,28 +87,39 @@ class CMenuPopup extends CTag {
 					}
 				}
 
-				$this->addItem(new CDiv(_('Scripts'), 'title'));
 				$menu = new CList(null, 'menu');
 				$this->addMenu($menu, $menuItems['items']);
-				$this->addItem($menu);
+
+				if (!$menu->emptyList) {
+					$this->addItem(new CDiv(_('Scripts'), 'title'));
+					$this->addItem($menu);
+				}
 			}
 		}
 
 		// goto
 		if (!empty($options['goto']['items'])) {
-			$params = '';
+			$paramsGlobal = '';
+
 			if (!empty($options['goto']['params'])) {
 				foreach ($options['goto']['params'] as $key => $value) {
-					$params .= ($params ? '&' : '?').$key.'='.$value;
+					$paramsGlobal .= ($paramsGlobal ? '&' : '?').$key.'='.$value;
 				}
 			}
 
-			$this->addItem(new CDiv(_('Go to'), 'title'));
 			$menu = new CList(null, 'menu');
 
-			foreach ($options['goto']['items'] as $key => $isUsed) {
-				if ($isUsed) {
-					switch ($key) {
+			foreach ($options['goto']['items'] as $name => $args) {
+				if ($args) {
+					$params = $paramsGlobal;
+
+					if (is_array($args)) {
+						foreach ($args as $key => $value) {
+							$params .= ($params ? '&' : '?').$key.'='.$value;
+						}
+					}
+
+					switch ($name) {
 						case 'latest':
 							$menu->addItem(new CLink(_('Latest data'), 'latest.php'.$params));
 							break;
@@ -116,45 +131,120 @@ class CMenuPopup extends CTag {
 						case 'inventories':
 							$menu->addItem(new CLink(_('Host inventories'), 'hostinventories.php'.$params));
 							break;
+
+						case 'triggerStatus':
+							$menu->addItem(new CLink(_('Status of triggers'), 'tr_status.php'.$params));
+							break;
+
+						case 'map':
+							$menu->addItem(new CLink(_('Submap'), 'maps.php'.$params));
+							break;
+
+						case 'events':
+							$menu->addItem(new CLink(_('Latest events'), 'events.php'.$params));
+							break;
 					}
 				}
 			}
 
-			$this->addItem($menu);
+			if (!$menu->emptyList) {
+				$this->addItem(new CDiv(_('Go to'), 'title'));
+				$this->addItem($menu);
+			}
+		}
+
+		// urls
+		if (!empty($options['urls'])) {
+			$menu = new CList(null, 'menu');
+
+			foreach ($options['urls'] as $url) {
+				$menu->addItem(new CLink($url['name'], $url['url']));
+			}
+
+			if (!$menu->emptyList) {
+				$this->addItem(new CDiv(_('URLs'), 'title'));
+				$this->addItem($menu);
+			}
 		}
 
 		// insert js
 		if (!defined('IS_MENU_POPUP_JS_INSERTED')) {
 			define('IS_MENU_POPUP_JS_INSERTED', true);
 
-			insert_js('
-				jQuery(document).ready(function() {
-					jQuery("[data-menupopupid]").click(function() {
-						var obj = jQuery("#" + jQuery(this).data("menupopupid"));
+			if (empty($options['isMap'])) {
+				insert_js('
+					jQuery(document).ready(function() {
+						jQuery("[data-menupopupid]").click(function() {
+							var obj = jQuery("#" + jQuery(this).data("menupopupid"));
 
-						if (empty(obj.data("isLoaded"))) {
-							jQuery(".menuPopup").css("display", "none");
-
-							obj.menuPopup();
-						}
-						else {
-							if (obj.css("display") == "block") {
+							if (empty(obj.data("isLoaded"))) {
 								jQuery(".menuPopup").css("display", "none");
+
+								obj.menuPopup();
 							}
 							else {
-								jQuery(".menuPopup").css("display", "none");
-								obj.fadeIn(50);
+								if (obj.css("display") == "block") {
+									jQuery(".menuPopup").css("display", "none");
+								}
+								else {
+									jQuery(".menuPopup").css("display", "none");
+									obj.fadeIn(50);
+								}
 							}
-						}
 
-						obj.position({
-							of: jQuery(this),
-							my: "left top",
-							at: "left bottom"
+							obj.position({
+								of: jQuery(this),
+								my: "left top",
+								at: "left bottom"
+							});
 						});
-					});
-				});'
-			);
+					});'
+				);
+			}
+
+			// map
+			else {
+				insert_js('
+					jQuery(document).ready(function() {
+						jQuery(".map-container [data-menupopup]").click(function(e) {
+							var container = jQuery("<div>", {
+									html: jQuery(this).data("menupopup"),
+									css: {
+										position: "absolute",
+										top: e.pageY,
+										left: e.pageX
+									}
+								}),
+								obj = container.children();
+
+							jQuery(".map-container").append(container);
+
+							if (empty(obj.data("isLoaded"))) {
+								jQuery(".menuPopup").css("display", "none");
+
+								obj.menuPopup();
+							}
+							else {
+								if (obj.css("display") == "block") {
+									jQuery(".menuPopup").css("display", "none");
+								}
+								else {
+									jQuery(".menuPopup").css("display", "none");
+									obj.fadeIn(50);
+								}
+							}
+
+							obj.position({
+								of: container,
+								my: "left top",
+								at: "left bottom"
+							});
+
+							return false;
+						});
+					});'
+				);
+			}
 		}
 	}
 

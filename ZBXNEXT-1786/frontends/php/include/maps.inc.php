@@ -78,34 +78,33 @@ function getActionMapBySysmap($sysmap, array $options = array()) {
 	$mapInfo = getSelementsInfo($sysmap, $options);
 	processAreasCoordinates($sysmap, $areas, $mapInfo);
 
-	$hostids = array();
-	foreach ($sysmap['selements'] as $sid => &$selement) {
+	$hostIds = array();
+	foreach ($sysmap['selements'] as $id => &$selement) {
 		if ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST) {
-			$hostids[$selement['elementid']] = $selement['elementid'];
+			$hostIds[$selement['elementid']] = $selement['elementid'];
 
 			// expanding hosts url macros again as some hosts were added from hostgroup areeas
 			// and automatic expanding only happens for elements that are defined for map in db
-			foreach ($selement['urls'] as $urlid => $url) {
-				$selement['urls'][$urlid]['url'] = str_replace('{HOST.ID}', $selement['elementid'], $url['url']);
+			foreach ($selement['urls'] as $urlId => $url) {
+				$selement['urls'][$urlId]['url'] = str_replace('{HOST.ID}', $selement['elementid'], $url['url']);
 			}
 		}
+
 		if ($selement['elementsubtype'] == SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP_ELEMENTS) {
-			unset($sysmap['selements'][$sid]);
+			unset($sysmap['selements'][$id]);
 		}
 	}
 	unset($selement);
 
-	if (count($hostids)) {
-		$scripts_by_hosts = API::Script()->getScriptsByHosts($hostids);
-	}
+	$scripts = API::Script()->getScriptsByHosts($hostIds);
 
 	$hosts = API::Host()->get(array(
 		'nodeids' => get_current_nodeid(true),
-		'hostids' => $hostids,
+		'hostids' => $hostIds,
 		'output' => array('status'),
 		'nopermissions' => true,
 		'preservekeys' => true,
-		'selectScreens' => API_OUTPUT_COUNT,
+		'selectScreens' => API_OUTPUT_COUNT
 	));
 
 	foreach ($sysmap['selements'] as $elem) {
@@ -121,24 +120,56 @@ function getActionMapBySysmap($sysmap, array $options = array()) {
 		);
 		$area->addClass('menu-map');
 
-		// pop up menu
 		order_result($elem['urls'], 'name');
 
-		$menuData = array(
-			'urls' => array_values($elem['urls']),
-			'elementId' => $elem['elementid'],
-			'elementType' => $elem['elementtype'],
-			'scripts' => array(),
-			'hasScreens' => false,
-			'isMonitored' => false
+		$menuPopupOptions = array(
+			'id' => $elem['elementid'],
+			'isMap' => true,
+			'goto' => array(
+				'params' => array(),
+				'items' => array()
+			),
+			'urls' => array_values($elem['urls'])
 		);
+
 		if ($elem['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST) {
 			$host = $hosts[$elem['elementid']];
-			$menuData['scripts'] = $scripts_by_hosts[$elem['elementid']];
-			$menuData['hasScreens'] = (bool) $host['screens'];
-			$menuData['isMonitored'] = $hosts[$elem['elementid']]['status'] == HOST_STATUS_MONITORED;
+
+			$menuPopupOptions['scripts'] = $scripts[$elem['elementid']];
+			$menuPopupOptions['goto']['params']['hostid'] = $elem['elementid'];
+			$menuPopupOptions['goto']['items']['triggerStatus'] = ($hosts[$elem['elementid']]['status'] == HOST_STATUS_MONITORED)
+				? array(
+					'filter_set' => 1,
+					'show_severity' => isset($options['severity_min']) ? $options['severity_min'] : null
+				)
+				: null;
+			$menuPopupOptions['goto']['items']['screens'] = !empty($host['screens']);
 		}
-		$area->setAttribute('data-menu', $menuData);
+		elseif ($elem['elementtype'] == SYSMAP_ELEMENT_TYPE_MAP) {
+			$menuPopupOptions['goto']['items']['map'] = array(
+				'sysmapid' => $elem['elementid'],
+				'severity_min' => isset($options['severity_min']) ? $options['severity_min'] : null
+			);
+		}
+		elseif ($elem['elementtype'] == SYSMAP_ELEMENT_TYPE_TRIGGER) {
+			$menuPopupOptions['goto']['items']['events'] = array(
+				'source' => 0,
+				'triggerid' => $elem['elementid'],
+				'nav_time' => time() - SEC_PER_WEEK
+			);
+		}
+		elseif ($elem['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST_GROUP) {
+			$menuPopupOptions['goto']['items']['triggerStatus'] = array(
+				'hostid' => 0,
+				'groupid' => $elem['elementid'],
+				'show_severity' => isset($options['severity_min']) ? $options['severity_min'] : null,
+				'filter_set' => 1
+			);
+		}
+
+		$menuPopup = new CMenuPopup($menuPopupOptions);
+
+		$area->attr('data-menupopup', $menuPopup->toString());
 
 		$actionMap->addItem($area);
 	}
