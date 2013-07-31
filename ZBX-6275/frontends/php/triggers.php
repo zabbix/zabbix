@@ -351,38 +351,17 @@ elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['g_triggerid'])) {
 /*
  * Display
  */
-$host = null;
-if (get_request('hostid', 0) > 0) {
-	$host = API::Host()->get(array(
-		'hostids' => $_REQUEST['hostid'],
-		'output' => array('status'),
-		'templated_hosts' => true,
-		'editable' => true
-	));
-	$host = reset($host);
-}
-
-
 if ($_REQUEST['go'] == 'massupdate' && isset($_REQUEST['g_triggerid'])) {
-	if (isset($host) && empty($host)) {
-		access_deny();
-	}
 	$triggersView = new CView('configuration.triggers.massupdate', getTriggerMassupdateFormData());
 	$triggersView->render();
 	$triggersView->show();
 }
 elseif (isset($_REQUEST['form'])) {
-	if (isset($host) && empty($host)) {
-		access_deny();
-	}
 	$triggersView = new CView('configuration.triggers.edit', getTriggerFormData());
 	$triggersView->render();
 	$triggersView->show();
 }
 elseif ($_REQUEST['go'] == 'copy_to' && isset($_REQUEST['g_triggerid'])) {
-	if (isset($host) && empty($host)) {
-		access_deny();
-	}
 	$triggersView = new CView('configuration.copy.elements', getCopyElementsFormData('g_triggerid', _('CONFIGURATION OF TRIGGERS')));
 	$triggersView->render();
 	$triggersView->show();
@@ -447,11 +426,16 @@ else {
 	$data['realHosts'] = getParentHostsByTriggers($data['triggers']);
 
 	// determine, show or not column of errors
-	if ($data['hostid'] > 0 && isset($host)) {
-		$data['showErrorColumn'] = ($host['status'] != HOST_STATUS_TEMPLATE);
-	}
-	else {
-		$data['showErrorColumn'] = true;
+	$data['showErrorColumn'] = true;
+	if ($data['hostid'] > 0) {
+		$host = API::Host()->get(array(
+			'hostids' => $_REQUEST['hostid'],
+			'output' => array('status'),
+			'templated_hosts' => true,
+			'editable' => true
+		));
+		$host = reset($host);
+		$data['showErrorColumn'] = (empty($host) || $host['status'] != HOST_STATUS_TEMPLATE);
 	}
 
 	// nodes
