@@ -125,10 +125,6 @@ class Curl {
 		return $url;
 	}
 
-	public function getFile() {
-		return $this->url;
-	}
-
 	public function removeArgument($key) {
 		unset($this->arguments[$key]);
 	}
