@@ -24,18 +24,12 @@ class Curl {
 	private $url;
 	protected $reference;
 	protected $query;
-	protected $arguments;
+	protected $arguments = array();
 
 	public function __construct($url = null) {
-		$this->url = null;
-		$this->reference = null;
-		$this->query = null;
-		$this->arguments = array();
-
 		if (empty($url)) {
 			$this->formatGetArguments();
 
-			$this->query = $this->getQuery();
 			$this->url = basename($_SERVER['SCRIPT_NAME']);
 		}
 		else {
