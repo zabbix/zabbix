@@ -21,15 +21,7 @@
 #include "log.h"
 #include "zbxodbc.h"
 
-#define CALLODBC(fun, h_type, h, msg)	{							\
-						SQLRETURN	rc = (fun);			\
-						if (SQL_SUCCESS != rc)				\
-						{						\
-							odbc_Diag((h_type), (h), rc, (msg));	\
-							if (0 == SQL_SUCCEEDED(rc))		\
-								goto end;			\
-						}						\
-					}
+#define CALLODBC(fun, h_type, h, msg)	(SQL_SUCCESS != (rc = (fun)) && 0 == odbc_Diag((h_type), (h), rc, (msg)))
 
 #define ODBC_ERR_MSG_LEN	255
 
@@ -75,7 +67,7 @@ static void	odbc_free_row_data(ZBX_ODBC_DBH *pdbh)
 	pdbh->col_num = 0;
 }
 
-static void	odbc_Diag(SQLSMALLINT h_type, SQLHANDLE h, SQLRETURN sql_rc, const char *msg)
+static int	odbc_Diag(SQLSMALLINT h_type, SQLHANDLE h, SQLRETURN sql_rc, const char *msg)
 {
 	const char	*__function_name = "odbc_Diag";
 	SQLCHAR		sql_state[SQL_SQLSTATE_SIZE + 1], err_msg[128];
@@ -133,6 +125,8 @@ static void	odbc_Diag(SQLSMALLINT h_type, SQLHANDLE h, SQLRETURN sql_rc, const c
 		*(diag_msg + offset) = '\0';
 	}
 	set_last_odbc_strerror("%s:[%s]:%s", msg, rc_msg, diag_msg);
+
+	return (int)SQL_SUCCEEDED(sql_rc);
 }
 
 void	odbc_DBclose(ZBX_ODBC_DBH *pdbh)
@@ -168,6 +162,7 @@ int	odbc_DBconnect(ZBX_ODBC_DBH *pdbh, char *db_dsn, char *user, char *pass, int
 {
 	const char	*__function_name = "odbc_DBconnect";
 	int		ret = FAIL;
+	SQLRETURN	rc;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() db_dsn:'%s' user:'%s'", __function_name, db_dsn, user);
 
@@ -183,24 +178,40 @@ int	odbc_DBconnect(ZBX_ODBC_DBH *pdbh, char *db_dsn, char *user, char *pass, int
 	}
 
 	/* set the ODBC version environment attribute */
-	CALLODBC(SQLSetEnvAttr(pdbh->henv, SQL_ATTR_ODBC_VERSION, (void*)SQL_OV_ODBC3, 0), SQL_HANDLE_ENV, pdbh->henv,
-			"Cannot set ODBC version");
+	if (0 != CALLODBC(SQLSetEnvAttr(pdbh->henv, SQL_ATTR_ODBC_VERSION, (void*)SQL_OV_ODBC3, 0), SQL_HANDLE_ENV,
+			pdbh->henv, "Cannot set ODBC version"))
+	{
+		goto end;
+	}
 
 	/* allocate connection handle */
-	CALLODBC(SQLAllocHandle(SQL_HANDLE_DBC, pdbh->henv, &(pdbh->hdbc)), SQL_HANDLE_ENV, pdbh->henv,
-			"Cannot create ODBC connection handle");
+	if (0 != CALLODBC(SQLAllocHandle(SQL_HANDLE_DBC, pdbh->henv, &(pdbh->hdbc)), SQL_HANDLE_ENV, pdbh->henv,
+			"Cannot create ODBC connection handle"))
+	{
+		goto end;
+	}
 
 	/* set login timeout */
-	CALLODBC(SQLSetConnectAttr(pdbh->hdbc, (SQLINTEGER)SQL_LOGIN_TIMEOUT, (SQLPOINTER)(intptr_t)login_timeout,
-			(SQLINTEGER)0), SQL_HANDLE_DBC, pdbh->hdbc, "Cannot set ODBC login timeout");
+	if (0 != CALLODBC(SQLSetConnectAttr(pdbh->hdbc, (SQLINTEGER)SQL_LOGIN_TIMEOUT,
+			(SQLPOINTER)(intptr_t)login_timeout, (SQLINTEGER)0), SQL_HANDLE_DBC, pdbh->hdbc,
+			"Cannot set ODBC login timeout"))
+	{
+		goto end;
+	}
 
 	/* connect to data source */
-	CALLODBC(SQLConnect(pdbh->hdbc, (SQLCHAR *)db_dsn, SQL_NTS, (SQLCHAR *)user, SQL_NTS, (SQLCHAR *)pass, SQL_NTS),
-			SQL_HANDLE_DBC, pdbh->hdbc, "Cannot connect to ODBC DSN");
+	if (0 != CALLODBC(SQLConnect(pdbh->hdbc, (SQLCHAR *)db_dsn, SQL_NTS, (SQLCHAR *)user, SQL_NTS, (SQLCHAR *)pass,
+			SQL_NTS), SQL_HANDLE_DBC, pdbh->hdbc, "Cannot connect to ODBC DSN"))
+	{
+		goto end;
+	}
 
 	/* allocate statement handle */
-	CALLODBC(SQLAllocHandle(SQL_HANDLE_STMT, pdbh->hdbc, &(pdbh->hstmt)), SQL_HANDLE_DBC, pdbh->hdbc,
-			"Cannot create ODBC statement handle.");
+	if (0 != CALLODBC(SQLAllocHandle(SQL_HANDLE_STMT, pdbh->hdbc, &(pdbh->hstmt)), SQL_HANDLE_DBC, pdbh->hdbc,
+			"Cannot create ODBC statement handle."))
+	{
+		goto end;
+	}
 
 	pdbh->connected = 1;
 
@@ -266,8 +277,9 @@ end:
 ZBX_ODBC_RESULT	odbc_DBselect(ZBX_ODBC_DBH *pdbh, char *query)
 {
 	const char	*__function_name = "odbc_DBselect";
-	SQLSMALLINT	i = 0;
+	int		i = 0;
 	ZBX_ODBC_RESULT	result = NULL;
+	SQLRETURN	rc;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() query:'%s'", __function_name, query);
 
@@ -275,11 +287,17 @@ ZBX_ODBC_RESULT	odbc_DBselect(ZBX_ODBC_DBH *pdbh, char *query)
 
 	odbc_free_row_data(pdbh);
 
-	CALLODBC(SQLExecDirect(pdbh->hstmt, (SQLCHAR *)query, SQL_NTS), SQL_HANDLE_STMT, pdbh->hstmt,
-			"Cannot execute ODBC query");
+	if (0 != CALLODBC(SQLExecDirect(pdbh->hstmt, (SQLCHAR *)query, SQL_NTS), SQL_HANDLE_STMT, pdbh->hstmt,
+			"Cannot execute ODBC query"))
+	{
+		goto end;
+	}
 
-	CALLODBC(SQLNumResultCols(pdbh->hstmt, &pdbh->col_num), SQL_HANDLE_STMT, pdbh->hstmt,
-			"Cannot get number of columns in ODBC result");
+	if (0 != CALLODBC(SQLNumResultCols(pdbh->hstmt, &pdbh->col_num), SQL_HANDLE_STMT, pdbh->hstmt,
+			"Cannot get number of columns in ODBC result"))
+	{
+		goto end;
+	}
 
 	pdbh->row_data = zbx_malloc(pdbh->row_data, sizeof(char *) * (size_t)pdbh->col_num);
 	memset(pdbh->row_data, 0, sizeof(char *) * (size_t)pdbh->col_num);
@@ -290,9 +308,12 @@ ZBX_ODBC_RESULT	odbc_DBselect(ZBX_ODBC_DBH *pdbh, char *query)
 	for (i = 0; i < pdbh->col_num; i++)
 	{
 		pdbh->row_data[i] = zbx_malloc(pdbh->row_data[i], MAX_STRING_LEN);
-		CALLODBC(SQLBindCol(pdbh->hstmt, i + 1, SQL_C_CHAR, pdbh->row_data[i], MAX_STRING_LEN,
-				&pdbh->data_len[i]), SQL_HANDLE_STMT, pdbh->hstmt,
-				"Cannot bind column in ODBC result");
+		if (0 != CALLODBC(SQLBindCol(pdbh->hstmt, (SQLUSMALLINT)(i + 1), SQL_C_CHAR, pdbh->row_data[i],
+				MAX_STRING_LEN, &pdbh->data_len[i]), SQL_HANDLE_STMT, pdbh->hstmt,
+				"Cannot bind column in ODBC result"))
+		{
+			goto end;
+		}
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() selected %i columns", __function_name, pdbh->col_num);
