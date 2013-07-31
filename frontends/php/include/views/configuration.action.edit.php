@@ -78,7 +78,7 @@ foreach ($this->data['action']['conditions'] as $condition) {
 		$condition['operator'] = 0;
 	}
 	if (!isset($condition['value'])) {
-		$condition['value'] = 0;
+		$condition['value'] = '';
 	}
 	if (!str_in_array($condition['conditiontype'], $this->data['allowedConditions'])) {
 		continue;
