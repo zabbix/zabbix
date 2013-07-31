@@ -86,33 +86,6 @@ $_REQUEST['status'] = isset($_REQUEST['status']) ? TRIGGER_STATUS_ENABLED : TRIG
 $_REQUEST['type'] = isset($_REQUEST['type']) ? TRIGGER_MULT_EVENT_ENABLED : TRIGGER_MULT_EVENT_DISABLED;
 $_REQUEST['go'] = get_request('go', 'none');
 
-// validate permissions
-if (get_request('triggerid', false)) {
-	$triggers = API::Trigger()->get(array(
-		'triggerids' => $_REQUEST['triggerid'],
-		'preservekeys' => true,
-		'selectHosts' => array('status'),
-		'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL),
-		'editable' => true
-	));
-	if (empty($triggers)) {
-		access_deny();
-	}
-	$trigger = reset($triggers);
-	$hosts = $trigger['hosts'];
-}
-elseif (get_request('hostid', 0) > 0) {
-	$hosts = API::Host()->get(array(
-		'hostids' => $_REQUEST['hostid'],
-		'output' => array('status'),
-		'templated_hosts' => true,
-		'editable' => true
-	));
-	if (empty($hosts)) {
-		access_deny();
-	}
-}
-
 /*
  * Actions
  */
@@ -154,8 +127,13 @@ elseif (isset($_REQUEST['save'])) {
 		$oldTrigger = API::Trigger()->get(array(
 			'triggerids' => $_REQUEST['triggerid'],
 			'output' => API_OUTPUT_EXTEND,
-			'selectDependencies' => array('triggerid')
+			'selectDependencies' => array('triggerid'),
+			'editable' => true
 		));
+		if (empty($oldTrigger)) {
+			access_deny();
+		}
+
 		$oldTrigger = reset($oldTrigger);
 		$oldTrigger['dependencies'] = zbx_toHash(zbx_objectValues($oldTrigger['dependencies'], 'triggerid'));
 
@@ -182,7 +160,6 @@ elseif (isset($_REQUEST['save'])) {
 		if ($updateDepencencies) {
 			$triggerToUpdate['dependencies'] = $newDependencies;
 		}
-
 		$result = API::Trigger()->update($triggerToUpdate);
 		show_messages($result, _('Trigger updated'), _('Cannot update trigger'));
 	}
@@ -374,17 +351,38 @@ elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['g_triggerid'])) {
 /*
  * Display
  */
+$host = null;
+if (get_request('hostid', 0) > 0) {
+	$host = API::Host()->get(array(
+		'hostids' => $_REQUEST['hostid'],
+		'output' => array('status'),
+		'templated_hosts' => true,
+		'editable' => true
+	));
+	$host = reset($host);
+}
+
+
 if ($_REQUEST['go'] == 'massupdate' && isset($_REQUEST['g_triggerid'])) {
+	if (isset($host) && empty($host)) {
+		access_deny();
+	}
 	$triggersView = new CView('configuration.triggers.massupdate', getTriggerMassupdateFormData());
 	$triggersView->render();
 	$triggersView->show();
 }
 elseif (isset($_REQUEST['form'])) {
+	if (isset($host) && empty($host)) {
+		access_deny();
+	}
 	$triggersView = new CView('configuration.triggers.edit', getTriggerFormData());
 	$triggersView->render();
 	$triggersView->show();
 }
 elseif ($_REQUEST['go'] == 'copy_to' && isset($_REQUEST['g_triggerid'])) {
+	if (isset($host) && empty($host)) {
+		access_deny();
+	}
 	$triggersView = new CView('configuration.copy.elements', getCopyElementsFormData('g_triggerid', _('CONFIGURATION OF TRIGGERS')));
 	$triggersView->render();
 	$triggersView->show();
@@ -449,8 +447,7 @@ else {
 	$data['realHosts'] = getParentHostsByTriggers($data['triggers']);
 
 	// determine, show or not column of errors
-	if (isset($hosts)) {
-		$host = reset($hosts);
+	if ($data['hostid'] > 0 && isset($host)) {
 		$data['showErrorColumn'] = ($host['status'] != HOST_STATUS_TEMPLATE);
 	}
 	else {
