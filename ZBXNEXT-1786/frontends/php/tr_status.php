@@ -655,13 +655,13 @@ foreach ($triggers as $trigger) {
 		}
 
 		$hostName = new CSpan($triggerHost['name'], 'link_menu');
-		$hostName->attr('data-menupopup', $trigger['triggerid']);
+		$hostName->attr('data-menupopupid', $trigger['triggerid']);
 
-		$hostsSpan = new CDiv(array(
+		$hostDiv = new CDiv(array(
 			$hostName,
 			new CMenuPopup(array(
-				'scripts' => $scripts,
 				'id' => $trigger['triggerid'],
+				'scripts' => $scripts,
 				'goto' => array(
 					'params' => array(
 						'hostid' => $triggerHost['hostid']
@@ -672,8 +672,7 @@ foreach ($triggers as $trigger) {
 						'inventories' => !empty($host['inventory'])
 					)
 				)
-			))),
-			'floatleft'
+			)))
 		);
 
 		// add maintenance icon with hint if host is in maintenance
@@ -700,15 +699,15 @@ foreach ($triggers as $trigger) {
 				$maintenanceIcon->addClass('pointer');
 			}
 
-			$hostsSpan->addItem($maintenanceIcon);
+			$hostDiv->addItem($maintenanceIcon);
 		}
 
 		// add comma after hosts, except last
 		if (next($trigger['hosts'])) {
-			$hostsSpan->addItem(','.SPACE);
+			$hostDiv->addItem(','.SPACE);
 		}
 
-		$hostList[] = $hostsSpan;
+		$hostList[] = $hostDiv;
 	}
 
 	// host

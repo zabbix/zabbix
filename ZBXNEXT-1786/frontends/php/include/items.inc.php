@@ -708,13 +708,13 @@ function get_realrule_by_itemid_and_hostid($itemid, $hostid) {
 /**
  * Retrieve overview table object for items.
  *
- * @param        $hostids
+ * @param array  $hostids
  * @param string $application name of application to filter
- * @param null   $view_style
+ * @param int    $viewMode
  *
  * @return CTableInfo
  */
-function get_items_data_overview($hostids, $application, $view_style) {
+function get_items_data_overview($hostids, $application, $viewMode) {
 	$sqlFrom = '';
 	$sqlWhere = '';
 	if ($application !== '') {
@@ -748,7 +748,7 @@ function get_items_data_overview($hostids, $application, $view_style) {
 		'preservekeys' => true
 	);
 
-	if ($view_style == STYLE_LEFT) {
+	if ($viewMode == STYLE_LEFT) {
 		$options['selectScreens'] = API_OUTPUT_COUNT;
 		$options['selectInventory'] = array('hostid');
 	}
@@ -790,7 +790,7 @@ function get_items_data_overview($hostids, $application, $view_style) {
 	$table->makeVerticalRotation();
 	order_result($hostnames);
 
-	if ($view_style == STYLE_TOP) {
+	if ($viewMode == STYLE_TOP) {
 		$header = array(new CCol(_('Items'), 'center'));
 		foreach ($hostnames as $hostname) {
 			$header[] = new CCol($hostname, 'vertical_rotation');
@@ -806,26 +806,41 @@ function get_items_data_overview($hostids, $application, $view_style) {
 		}
 	}
 	else {
-		$hostScripts = API::Script()->getScriptsByHosts(zbx_objectValues($hosts, 'hostid'));
-		foreach ($hostScripts as $hostid => $scripts) {
-			$hosts[$hostid]['scripts'] = $scripts;
-		}
+		$scripts = API::Script()->getScriptsByHosts(zbx_objectValues($hosts, 'hostid'));
+
 		$header = array(new CCol(_('Hosts'), 'center'));
 		foreach ($items as $descr => $ithosts) {
 			$header[] = new CCol($descr, 'vertical_rotation');
 		}
 		$table->setHeader($header, 'vertical_header');
 
-		foreach ($hostnames as $hostid => $hostname) {
-			$host = $hosts[$hostid];
+		foreach ($hostnames as $hostId => $hostName) {
+			$host = $hosts[$hostId];
 
-			// host js menu link
-			$hostSpan = new CSpan(nbsp($host['name']), 'link_menu menu-host');
-			$hostSpan->setAttribute('data-menu', hostMenuData($host, $hostScripts[$host['hostid']]));
+			$name = new CSpan($host['name'], 'link_menu');
+			$name->attr('data-menupopupid', $hostId);
 
-			$tableRow = array(new CCol($hostSpan));
+			$hostDiv = new CDiv(array(
+				$name,
+				new CMenuPopup(array(
+					'id' => $hostId,
+					'scripts' => $scripts[$hostId],
+					'goto' => array(
+						'params' => array(
+							'hostid' => $hostId
+						),
+						'items' => array(
+							'latest' => true,
+							'screens' => !empty($host['screens']),
+							'inventories' => !empty($host['inventory'])
+						)
+					)
+				)))
+			);
+
+			$tableRow = array(new CCol($hostDiv));
 			foreach ($items as $ithosts) {
-				$tableRow = get_item_data_overview_cells($tableRow, $ithosts, $hostname);
+				$tableRow = get_item_data_overview_cells($tableRow, $ithosts, $hostName);
 			}
 			$table->addRow($tableRow);
 		}

@@ -223,11 +223,6 @@ if($_REQUEST['hostid']>0){
 
 $hosts = API::Host()->get($options);
 
-// fetch scripts for the host JS menu
-if ($_REQUEST['hostid'] == 0) {
-	$hostScripts = API::Script()->getScriptsByHosts($options['hostids']);
-}
-
 // select hosts
 $sql = 'SELECT DISTINCT h.name as hostname,h.hostid, a.* '.
 		' FROM applications a, hosts h '.$sql_from.
@@ -360,21 +355,25 @@ foreach ($displayItems as $db_item){
 		$actions = new CLink(_('History'),'history.php?action=showvalues&itemid='.$db_item['itemid']);
 	}
 
-	$item_status = $db_item['state'] == ITEM_STATE_NOTSUPPORTED ? 'unknown' : null;
+	$stateCss = ($db_item['state'] == ITEM_STATE_NOTSUPPORTED) ? 'unknown txt' : 'txt';
 
 	array_push($app_rows, new CRow(array(
 		SPACE,
 		is_show_all_nodes() ? SPACE : null,
 		($_REQUEST['hostid'] > 0) ? null : SPACE,
-		new CCol(new CDiv(SPACE.SPACE.$db_item['resolvedName'], $item_status)),
-		new CCol(new CDiv($lastClock, $item_status)),
-		new CCol(new CDiv($lastValue, $item_status)),
-		new CCol(new CDiv($change, $item_status)),
+		new CCol(new CDiv(SPACE.SPACE.$db_item['resolvedName'], $stateCss)),
+		new CCol(new CDiv($lastClock, $stateCss)),
+		new CCol(new CDiv($lastValue, $stateCss)),
+		new CCol(new CDiv($change, $stateCss)),
 		$actions
 	)));
 }
 unset($app_rows);
 unset($db_app);
+
+if ($_REQUEST['hostid'] == 0) {
+	$scripts = API::Script()->getScriptsByHosts($options['hostids']);
+}
 
 foreach ($db_apps as $appid => $dbApp) {
 	$host = $hosts[$dbApp['hostid']];
@@ -392,24 +391,41 @@ foreach ($db_apps as $appid => $dbApp) {
 	$toggle->setAttribute('data-app-id', $dbApp['applicationid']);
 	$toggle->setAttribute('data-open-state', $openState);
 
-	$col = new CCol(array(bold($dbApp['name']),SPACE.'('._n('%1$s Item', '%1$s Items', $dbApp['item_cnt']).')'));
-	$col->setColSpan(5);
+	$hostDiv = null;
 
-	// host JS menu link
-	$hostSpan = null;
 	if ($_REQUEST['hostid'] == 0) {
-		$hostSpan = new CSpan($host['name'], 'link_menu menu-host');
-		$scripts = $hostScripts[$host['hostid']];
-		$hostSpan->setAttribute('data-menu', hostMenuData($host, $scripts));
-		$hostSpan = new CDiv($hostSpan);
+		$hostName = new CSpan($host['name'], 'link_menu');
+		$hostName->attr('data-menupopupid', $appid);
+
+		$hostDiv = new CDiv(array(
+			$hostName,
+			new CMenuPopup(array(
+				'id' => $appid,
+				'scripts' => $scripts[$host['hostid']],
+				'goto' => array(
+					'params' => array(
+						'hostid' => $host['hostid']
+					),
+					'items' => array(
+						'latest' => true,
+						'screens' => !empty($host['screens']),
+						'inventories' => !empty($host['inventory'])
+					)
+				)
+			)))
+		);
 	}
 
 	// add toggle row
 	$table->addRow(array(
 		$toggle,
 		get_node_name_by_elid($dbApp['applicationid']),
-		$hostSpan,
-		$col
+		$hostDiv,
+		new CCol(array(
+				bold($dbApp['name']),
+				SPACE.'('._n('%1$s Item', '%1$s Items', $dbApp['item_cnt']).')'
+			), null, 5
+		)
 	), 'odd_row');
 
 	// add toggle sub rows
@@ -561,16 +577,17 @@ foreach ($displayItems as $db_item){
 		$actions = new CLink(_('History'), 'history.php?action=showvalues&itemid='.$db_item['itemid']);
 	}
 
-	$item_status = $db_item['state'] == ITEM_STATE_NOTSUPPORTED ? 'unknown' : null;
+	$stateCss = ($db_item['state'] == ITEM_STATE_NOTSUPPORTED) ? 'unknown txt' : 'txt';
+
 	array_push($app_rows, new CRow(array(
 		SPACE,
 		is_show_all_nodes() ? ($db_host['item_cnt'] ? SPACE : get_node_name_by_elid($db_item['itemid'])) : null,
 		$_REQUEST['hostid'] ? null : SPACE,
-		new CCol(new CDiv(SPACE.SPACE.$db_item['resolvedName'], $item_status)),
-		new CCol(new CDiv($lastClock, $item_status)),
-		new CCol(new CDiv($lastValue, $item_status)),
-		new CCol(new CDiv($change, $item_status)),
-		new CCol(new CDiv($actions, $item_status))
+		new CCol(new CDiv(SPACE.SPACE.$db_item['resolvedName'], $stateCss)),
+		new CCol(new CDiv($lastClock, $stateCss)),
+		new CCol(new CDiv($lastValue, $stateCss)),
+		new CCol(new CDiv($change, $stateCss)),
+		new CCol(new CDiv($actions, $stateCss))
 	)));
 }
 unset($app_rows);
@@ -593,24 +610,43 @@ foreach ($db_hosts as $hostId => $dbHost) {
 	$toggle->setAttribute('data-app-id', '0_'.$host['hostid']);
 	$toggle->setAttribute('data-open-state', $openState);
 
-	$col = new CCol(array(bold('- '.('other').' -'), SPACE.'('._n('%1$s Item', '%1$s Items', $dbHost['item_cnt']).')'));
-	$col->setColSpan(5);
+	$hostDiv = null;
 
-	// host JS menu link
-	$hostSpan = null;
 	if ($_REQUEST['hostid'] == 0) {
-		$hostSpan = new CSpan($host['name'], 'link_menu menu-host');
-		$scripts = $hostScripts[$host['hostid']];
-		$hostSpan->setAttribute('data-menu', hostMenuData($host, $scripts));
-		$hostSpan = new CDiv($hostSpan);
+		$hostName = new CSpan($host['name'], 'link_menu');
+		$hostName->attr('data-menupopupid', $hostId);
+
+		$hostDiv = new CDiv(array(
+			$hostName,
+			new CMenuPopup(array(
+				'id' => $hostId,
+				'scripts' => $scripts[$host['hostid']],
+				'goto' => array(
+					'params' => array(
+						'hostid' => $host['hostid']
+					),
+					'items' => array(
+						'latest' => true,
+						'screens' => !empty($host['screens']),
+						'inventories' => !empty($host['inventory'])
+					)
+				)
+			)))
+		);
 	}
 
 	// add toggle row
 	$table->addRow(array(
 		$toggle,
 		get_node_name_by_elid($dbHost['hostid']),
-		$hostSpan,
-		$col
+		$hostDiv,
+		new CCol(
+			array(
+				bold('- '.('other').' -'),
+				SPACE.'('._n('%1$s Item', '%1$s Items', $dbHost['item_cnt']).')'
+			),
+			null, 5
+		)
 	), 'odd_row');
 
 	// add toggle sub rows

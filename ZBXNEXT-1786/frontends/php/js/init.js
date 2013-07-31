@@ -19,46 +19,12 @@
 
 
 jQuery(function($) {
-	// search
+
 	if ($('#search').length) {
 		createSuggest('search');
 	}
 
-	/**
-	 * Handles host pop up menus.
-	 */
-	$(document).on('click', '.menu-host', function(event) {
-		var menuData = $(this).data('menu');
-		var menu = [];
-
-		// add scripts
-		if (menuData.scripts.length) {
-			menu.push(createMenuHeader(t('Scripts')));
-			$.each(menuData.scripts, function(i, script) {
-				menu.push(createMenuItem(script.name, function () {
-					executeScript(menuData.hostid, script.scriptid, script.confirmation);
-					return false;
-				}));
-			});
-		}
-
-		// add go to links
-		menu.push(createMenuHeader(t('Go to')));
-		menu.push(createMenuItem(t('Latest data'), 'latest.php?hostid=' + menuData.hostid));
-		if (menuData.hasInventory) {
-			menu.push(createMenuItem(t('Host inventories'), 'hostinventories.php?hostid=' + menuData.hostid));
-		}
-		if (menuData.hasScreens) {
-			menu.push(createMenuItem(t('Host screens'), 'host_screen.php?hostid=' + menuData.hostid));
-		}
-
-		// render the menu
-		show_popup_menu(event, menu, 180);
-
-		return false;
-	});
-
 	if (IE || KQ) {
-		setTimeout(function () {$('[autofocus]').focus()}, 10);
+		setTimeout(function () { $('[autofocus]').focus(); }, 10);
 	}
 });

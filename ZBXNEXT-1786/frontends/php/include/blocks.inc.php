@@ -882,9 +882,6 @@ function make_latest_issues(array $filter = array()) {
 		'preservekeys' => true
 	));
 
-	// get scripts
-	$scripts_by_hosts = API::Script()->getScriptsByHosts($hostIds);
-
 	// actions
 	$actions = getEventActionsStatHints($eventIds);
 
@@ -915,19 +912,36 @@ function make_latest_issues(array $filter = array()) {
 		_('Actions')
 	));
 
+	$scripts = API::Script()->getScriptsByHosts($hostIds);
+
 	// triggers
 	foreach ($triggers as $trigger) {
-		// check for dependencies
-		$host = $hosts[$trigger['hostid']];
+		$hostId = $trigger['hostid'];
+		$host = $hosts[$hostId];
 
-		$hostSpan = new CDiv(null, 'maintenance-abs-cont');
+		$hostName = new CSpan($host['name'], 'link_menu');
+		$hostName->attr('data-menupopupid', $hostId);
 
-		$hostName = new CSpan($host['name'], 'link_menu menu-host');
-		$hostName->setAttribute('data-menu', hostMenuData($host, $scripts_by_hosts[$host['hostid']]));
+		$hostMenuPopup = new CMenuPopup(array(
+			'id' => $hostId,
+			'scripts' => $scripts[$hostId],
+			'goto' => array(
+				'params' => array(
+					'hostid' => $hostId
+				),
+				'items' => array(
+					'latest' => true,
+					'screens' => !empty($host['screens']),
+					'inventories' => !empty($host['inventory'])
+				)
+			)
+		));
 
 		// add maintenance icon with hint if host is in maintenance
+		$maintenanceIcon = null;
+
 		if ($host['maintenance_status']) {
-			$mntIco = new CDiv(null, 'icon-maintenance-abs');
+			$maintenanceIcon = new CDiv(null, 'icon-maintenance-abs');
 
 			// get maintenance
 			$maintenances = API::Maintenance()->get(array(
@@ -945,15 +959,17 @@ function make_latest_issues(array $filter = array()) {
 					$hint .= "\n".$maintenance['description'];
 				}
 
-				$mntIco->setHint($hint);
-				$mntIco->addClass('pointer');
+				$maintenanceIcon->setHint($hint);
+				$maintenanceIcon->addClass('pointer');
 			}
 
 			$hostName->addClass('left-to-icon-maintenance-abs');
-			$hostSpan->addItem($mntIco);
 		}
 
-		$hostSpan ->addItem($hostName);
+		$hostDiv = new CDiv(array(
+			new CDiv(array($hostName, $maintenanceIcon), 'maintenance-abs-cont'),
+			$hostMenuPopup
+		));
 
 		// unknown triggers
 		$unknown = SPACE;
@@ -976,7 +992,7 @@ function make_latest_issues(array $filter = array()) {
 
 			$table->addRow(array(
 				get_node_name_by_elid($trigger['triggerid']),
-				$hostSpan,
+				$hostDiv,
 				$description,
 				$clock,
 				zbx_date2age($trigger['event']['clock']),

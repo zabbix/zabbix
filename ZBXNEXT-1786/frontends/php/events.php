@@ -656,7 +656,7 @@ else {
 
 			// fetch scripts for the host JS menu
 			if ($_REQUEST['hostid'] == 0) {
-				$hostScripts = API::Script()->getScriptsByHosts($hostids);
+				$scripts = API::Script()->getScriptsByHosts($hostids);
 			}
 
 			// actions
@@ -707,11 +707,28 @@ else {
 				);
 
 				// host JS menu link
-				$hostSpan = null;
+				$hostDiv = null;
 				if ($_REQUEST['hostid'] == 0) {
-					$hostSpan = new CSpan($host['name'], 'link_menu menu-host');
-					$scripts = $hostScripts[$host['hostid']];
-					$hostSpan->setAttribute('data-menu', hostMenuData($host, $scripts));
+					$hostName = new CSpan($host['name'], 'link_menu');
+					$hostName->attr('data-menupopupid', $event['objectid']);
+
+					$hostDiv = new CDiv(array(
+						$hostName,
+						new CMenuPopup(array(
+							'id' => $event['objectid'],
+							'scripts' => $scripts[$host['hostid']],
+							'goto' => array(
+								'params' => array(
+									'hostid' => $host['hostid']
+								),
+								'items' => array(
+									'latest' => true,
+									'screens' => !empty($host['screens']),
+									'inventories' => !empty($host['inventory'])
+								)
+							)
+						)))
+					);
 				}
 
 				// action
@@ -723,7 +740,7 @@ else {
 						'action'
 					),
 					is_show_all_nodes() ? get_node_name_by_elid($event['objectid']) : null,
-					$hostSpan,
+					$hostDiv,
 					new CSpan($tr_desc, 'link_menu'),
 					$statusSpan,
 					getSeverityCell($trigger['priority'], null, !$event['value']),

@@ -23,7 +23,7 @@ class CMenuPopup extends CTag {
 
 	/**
 	 * @param string $options['id']
-	 * @param array  $options['hostids']
+	 * @param string $options['hostid']
 	 * @param bool   $options['scripts']
 	 * @param array  $options['goto']
 	 * @param array  $options['goto']['params']
@@ -36,10 +36,10 @@ class CMenuPopup extends CTag {
 
 		// scripts
 		if (!empty($options['scripts'])) {
-			if (is_bool($options['scripts']) && isset($options['hostids'])) {
+			if (is_bool($options['scripts']) && isset($options['hostid'])) {
 				$options['scripts'] = array();
 
-				foreach (API::Script()->getScriptsByHosts($options['hostids']) as $hostScripts) {
+				foreach (API::Script()->getScriptsByHosts($options['hostid']) as $hostScripts) {
 					$options['scripts'] = array_merge($options['scripts'], $hostScripts);
 				}
 			}
@@ -129,8 +129,8 @@ class CMenuPopup extends CTag {
 
 			insert_js('
 				jQuery(document).ready(function() {
-					jQuery("[data-menupopup]").click(function() {
-						var obj = jQuery("#" + jQuery(this).data("menupopup"));
+					jQuery("[data-menupopupid]").click(function() {
+						var obj = jQuery("#" + jQuery(this).data("menupopupid"));
 
 						if (empty(obj.data("isLoaded"))) {
 							jQuery(".menuPopup").css("display", "none");

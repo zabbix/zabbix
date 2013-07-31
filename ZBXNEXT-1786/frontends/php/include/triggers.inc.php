@@ -1190,10 +1190,6 @@ function get_triggers_overview($hostids, $application, $view_style = null, $scre
 		}
 	}
 	else {
-		$hostScripts = API::Script()->getScriptsByHosts(zbx_objectValues($hosts, 'hostid'));
-		foreach ($hostScripts as $hostid => $scripts) {
-			$hosts[$hostid]['scripts'] = $scripts;
-		}
 		// header
 		$header = array(new CCol(_('Host'), 'center'));
 		foreach ($triggers as $description => $triggerHosts) {
@@ -1202,17 +1198,35 @@ function get_triggers_overview($hostids, $application, $view_style = null, $scre
 		$triggerTable->setHeader($header, 'vertical_header');
 
 		// data
-		foreach ($hostNames as $hostid => $hostName) {
-			$host = $hosts[$hostid];
+		$scripts = API::Script()->getScriptsByHosts(zbx_objectValues($hosts, 'hostid'));
 
-			// host js link
-			$hostSpan = new CSpan(nbsp($hostName), 'link_menu menu-host');
-			$hostSpan->setAttribute('data-menu', hostMenuData($host, $hostScripts[$host['hostid']]));
+		foreach ($hostNames as $hostId => $hostName) {
+			$name = new CSpan($hostName, 'link_menu');
+			$name->attr('data-menupopupid', $hostId);
 
-			$tableColumns = array($hostSpan);
+			$hostDiv = new CDiv(array(
+				$name,
+				new CMenuPopup(array(
+					'id' => $hostId,
+					'scripts' => $scripts[$hostId],
+					'goto' => array(
+						'params' => array(
+							'hostid' => $hostId
+						),
+						'items' => array(
+							'latest' => true,
+							'screens' => !empty($hosts[$hostId]['screens']),
+							'inventories' => !empty($hosts[$hostId]['inventory'])
+						)
+					)
+				)))
+			);
+
+			$tableColumns = array($hostDiv);
 			foreach ($triggers as $triggerHosts) {
 				array_push($tableColumns, get_trigger_overview_cells($triggerHosts, $hostName, $screenId));
 			}
+
 			$triggerTable->addRow($tableColumns);
 		}
 	}
@@ -1570,36 +1584,54 @@ function get_triggers_unacknowledged($db_element, $count_problems = null, $ack =
 }
 
 function make_trigger_details($trigger) {
+	$hosts = reset($trigger['hosts']);
+	$hostId = $hosts['hostid'];
+
+	$hosts = API::Host()->get(array(
+		'output' => array('name', 'hostid'),
+		'hostids' => $hostId,
+		'selectScreens' => API_OUTPUT_COUNT,
+		'selectInventory' => array('hostid'),
+		'preservekeys' => true
+	));
+	$host = reset($hosts);
+
+	$hostName = new CSpan($host['name'], 'link_menu');
+	$hostName->attr('data-menupopupid', $hostId);
+
+	$hostDiv = new CDiv(array(
+		$hostName,
+		new CMenuPopup(array(
+			'id' => $hostId,
+			'hostid' => $hostId,
+			'scripts' => true,
+			'goto' => array(
+				'params' => array(
+					'hostid' => $hostId
+				),
+				'items' => array(
+					'latest' => true,
+					'screens' => !empty($host['screens']),
+					'inventories' => !empty($host['inventory'])
+				)
+			)
+		)))
+	);
+
 	$table = new CTableInfo();
 
 	if (is_show_all_nodes()) {
 		$table->addRow(array(_('Node'), get_node_name_by_elid($trigger['triggerid'])));
 	}
-	$expression = explode_exp($trigger['expression'], true, true);
 
-	$host = API::Host()->get(array(
-		'output' => array('name', 'hostid'),
-		'hostids' => $trigger['hosts'][0]['hostid'],
-		'selectScreens' => API_OUTPUT_COUNT,
-		'selectInventory' => array('hostid'),
-		'preservekeys' => true
-	));
-	$host = reset($host);
-
-	$hostScripts = API::Script()->getScriptsByHosts($host['hostid']);
-
-	// host js link
-	$hostSpan = new CSpan($host['name'], 'link_menu menu-host');
-	$scripts = $hostScripts[$host['hostid']];
-	$hostSpan->attr('data-menu', hostMenuData($host, $scripts));
-
-	// get visible name of the first host
-	$table->addRow(array(_('Host'), $hostSpan));
+	$table->addRow(array(_('Host'), $hostDiv));
 	$table->addRow(array(_('Trigger'), CMacrosResolverHelper::resolveTriggerName($trigger)));
 	$table->addRow(array(_('Severity'), getSeverityCell($trigger['priority'])));
-	$table->addRow(array(_('Expression'), $expression));
-	$table->addRow(array(_('Event generation'), _('Normal').(TRIGGER_MULT_EVENT_ENABLED == $trigger['type'] ? SPACE.'+'.SPACE._('Multiple PROBLEM events') : '')));
-	$table->addRow(array(_('Disabled'), (TRIGGER_STATUS_ENABLED == $trigger['status'] ? new CCol(_('No'), 'off') : new CCol(_('Yes'), 'on'))));
+	$table->addRow(array(_('Expression'), explode_exp($trigger['expression'], true, true)));
+	$table->addRow(array(_('Event generation'), _('Normal').((TRIGGER_MULT_EVENT_ENABLED == $trigger['type'])
+		? SPACE.'+'.SPACE._('Multiple PROBLEM events') : '')));
+	$table->addRow(array(_('Disabled'), ((TRIGGER_STATUS_ENABLED == $trigger['status'])
+		? new CCol(_('No'), 'off') : new CCol(_('Yes'), 'on'))));
 
 	return $table;
 }
