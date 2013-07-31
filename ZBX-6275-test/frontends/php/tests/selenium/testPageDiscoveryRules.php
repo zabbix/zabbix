@@ -119,16 +119,6 @@ var_dump($data['name']);
 		}
 	}
 
-	// Returns Discovery Rules that are not templated
-	public static function rules() {
-		$sql = 'SELECT h.hostid, h.host, h.status,i.itemid, i.name'.
-				' FROM hosts h, items i'.
-				' WHERE i.hostid=h.hostid'.
-					" AND h.host LIKE '%ZBX6275'";;
-
-		return DBdata($sql);
-	}
-
 	/**
 	 * Backup the tables that will be modified during the tests.
 	 */
@@ -137,7 +127,7 @@ var_dump($data['name']);
 	}
 
 	/**
-	* @dataProvider rules
+	* @dataProvider data
 	*/
 	public function testPageActionsDiscovery_MassDelete($rule) {
 		$itemid = $rule['itemid'];
