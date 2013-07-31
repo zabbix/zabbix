@@ -37,12 +37,10 @@ class testPageDiscoveryRules extends CWebTest {
 	*/
 
 	public function testPageDiscoveryRules_CheckLayout($data) {
-var_dump($data['host']);
-var_dump($data['name']);
 		if ($data['status'] == HOST_STATUS_MONITORED || $data['status'] == HOST_STATUS_NOT_MONITORED) {
 			$hostid = $data['hostid'];
 
-			$this->zbxTestOpen('hosts.php');
+			$this->zbxTestLogin('hosts.php');
 			$this->zbxTestDropdownSelectWait('groupid', 'all');
 
 			$this->checkTitle('Configuration of hosts');
@@ -81,7 +79,7 @@ var_dump($data['name']);
 		if ($data['status'] == HOST_STATUS_TEMPLATE) {
 			$templateid = $data['hostid'];
 
-			$this->zbxTestOpen('templates.php');
+			$this->zbxTestLogin('templates.php');
 			$this->zbxTestDropdownSelectWait('groupid', 'all');
 
 			$this->checkTitle('Configuration of templates');
@@ -129,15 +127,15 @@ var_dump($data['name']);
 	/**
 	* @dataProvider data
 	*/
-	public function testPageActionsDiscovery_MassDelete($rule) {
+	public function testPageActionsDiscovery_SimpleDelete($rule) {
 		$itemid = $rule['itemid'];
 		$this->chooseOkOnNextConfirmation();
-var_dump($rule['host']);
-var_dump($rule['name']);
+
 		$this->zbxTestLogin('host_discovery.php?&hostid='.$rule['hostid']);
 		$this->checkTitle('Configuration of discovery rules');
 		$this->zbxTestCheckboxSelect('g_hostdruleid_'.$itemid);
 		$this->zbxTestDropdownSelect('go', 'Delete selected');
+		sleep(1);
 		$this->zbxTestClickWait('goButton');
 
 		$this->getConfirmation();
@@ -160,6 +158,50 @@ var_dump($rule['name']);
 	 * Restore the original tables.
 	 */
 	public function testPageActionsDiscovery_Teardown() {
+		DBrestore_tables('triggers');
+	}
+
+	/**
+	 * Backup the tables that will be modified during the tests.
+	 */
+	public function testPageActionsDiscovery_SetupMass() {
+		DBsave_tables('triggers');
+	}
+
+	/**
+	* @dataProvider data
+	*/
+	public function testPageActionsDiscovery_MassDelete($rule) {
+		$itemid = $rule['itemid'];
+		$this->chooseOkOnNextConfirmation();
+
+		$this->zbxTestLogin('host_discovery.php?&hostid='.$rule['hostid']);
+		$this->checkTitle('Configuration of discovery rules');
+		$this->zbxTestCheckboxSelect('all_items');
+		$this->zbxTestDropdownSelect('go', 'Delete selected');
+		sleep(1);
+		$this->zbxTestClickWait('goButton');
+
+		$this->getConfirmation();
+
+		$this->checkTitle('Configuration of discovery rules');
+		$this->zbxTestTextPresent('Discovery rules deleted');
+		$this->zbxTestTextPresent('CONFIGURATION OF DISCOVERY RULES');
+
+		$sql = "SELECT * FROM items WHERE itemid=$itemid AND flags=".ZBX_FLAG_DISCOVERY;
+		$this->assertEquals(0, DBcount($sql));
+		$sql = "SELECT * FROM item_discovery WHERE parent_itemid=$itemid";
+		$this->assertEquals(0, DBcount($sql));
+		$sql = "SELECT gi.gitemid FROM graphs_items gi, item_discovery id WHERE gi.itemid=id.itemid AND id.parent_itemid=$itemid";
+		$this->assertEquals(0, DBcount($sql));
+		$sql = "SELECT f.functionid FROM functions f, item_discovery id WHERE f.itemid=id.itemid AND id.parent_itemid=$itemid";
+		$this->assertEquals(0, DBcount($sql));
+	}
+
+	/**
+	 * Restore the original tables.
+	 */
+	public function testPageActionsDiscovery_TeardownMass() {
 		DBrestore_tables('triggers');
 	}
 }
