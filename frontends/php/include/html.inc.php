@@ -338,7 +338,9 @@ function get_header_host_table($currentElement, $hostid, $discoveryid = null) {
 	// get hosts
 	$dbHost = API::Host()->get($options);
 	$dbHost = reset($dbHost);
-
+	if (empty($dbHost)) {
+		return '';
+	}
 	// get discoveries
 	if (!empty($discoveryid)) {
 		$options['itemids'] = $discoveryid;
