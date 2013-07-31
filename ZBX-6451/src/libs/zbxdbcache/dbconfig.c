@@ -4999,7 +4999,23 @@ int	DCget_item_queue(zbx_vector_ptr_t *queue, int from, int to)
  ******************************************************************************/
 int	DCget_item_count()
 {
-	return config->items.num_data;
+	int			count = 0;
+	zbx_hashset_iter_t	iter;
+	ZBX_DC_ITEM		*item;
+
+	LOCK_CACHE;
+
+	zbx_hashset_iter_reset(&config->items, &iter);
+
+	while (NULL != (item = zbx_hashset_iter_next(&iter)))
+	{
+		if (ZBX_FLAG_DISCOVERY_NORMAL == item->flags || ZBX_FLAG_DISCOVERY_CREATED == item->flags)
+			count++;
+	}
+
+	UNLOCK_CACHE;
+
+	return count;
 }
 
 /******************************************************************************
@@ -5023,6 +5039,9 @@ int	DCget_item_unsupported_count()
 
 	while (NULL != (item = zbx_hashset_iter_next(&iter)))
 	{
+		if (ZBX_FLAG_DISCOVERY_NORMAL != item->flags && ZBX_FLAG_DISCOVERY_CREATED != item->flags)
+			continue;
+
 		if (ITEM_STATE_NOTSUPPORTED == item->state)
 			count++;
 	}
