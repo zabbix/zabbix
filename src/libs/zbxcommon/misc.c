@@ -208,6 +208,8 @@ void    *zbx_calloc2(const char *filename, int line, void *old, size_t nmemb, si
 		zabbix_log(LOG_LEVEL_CRIT, "[file:%s,line:%d] zbx_calloc: allocating already allocated memory. "
 				"Please report this to Zabbix developers.",
 				filename, line);
+		/* exit if defined DEBUG, ignore otherwise */
+		zbx_dbg_assert(0);
 	}
 
 	for (
@@ -247,6 +249,8 @@ void    *zbx_malloc2(const char *filename, int line, void *old, size_t size)
 		zabbix_log(LOG_LEVEL_CRIT, "[file:%s,line:%d] zbx_malloc: allocating already allocated memory. "
 				"Please report this to Zabbix developers.",
 				filename, line);
+		/* exit if defined DEBUG, ignore otherwise */
+		zbx_dbg_assert(0);
 	}
 
 	for (

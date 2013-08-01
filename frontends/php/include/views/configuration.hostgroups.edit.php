@@ -39,18 +39,19 @@ $hostGroupFormList->addRow(_('Group name'), $nameTextBox);
 // append groups and hosts to form list
 $groupsComboBox = new CComboBox('twb_groupid', $this->data['twb_groupid'], 'submit()');
 $groupsComboBox->addItem('0', _('All'));
-foreach ($this->data['db_groups'] as $group) {
-	$groupsComboBox->addItem($group['groupid'], $group['name']);
+foreach ($this->data['db_groups'] as $row) {
+	$groupsComboBox->addItem($row['groupid'], $row['name']);
 }
 
 $hostsComboBox = new CTweenBox($hostGroupForm, 'hosts', $this->data['hosts'], 25);
 foreach ($this->data['db_hosts'] as $host) {
+	// add all hosts except selected
 	if (!isset($this->data['hosts'][$host['hostid']])) {
 		$hostsComboBox->addItem($host['hostid'], $host['name']);
 	}
 }
 foreach ($this->data['r_hosts'] as $host) {
-	if (isset($this->data['r_hosts'][$host['hostid']])) {
+	if (isset($this->data['rw_hosts'][$host['hostid']])) {
 		$hostsComboBox->addItem($host['hostid'], $host['name']);
 	}
 	else {

@@ -22,7 +22,6 @@
 #include "zbxexec.h"
 #include "cfg.h"
 #include "software.h"
-#include "zbxregexp.h"
 
 #ifdef HAVE_SYS_UTSNAME_H
 #       include <sys/utsname.h>

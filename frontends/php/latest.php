@@ -342,10 +342,11 @@ foreach ($displayItems as $db_item){
 		}
 
 		// for 'unixtime' change should be calculated as uptime
-		$change .= convert_units(array(
-			'value' => bcsub($lastHistory['value'], $prevHistory['value'], $digits),
-			'units' => $db_item['units'] == 'unixtime' ? 'uptime' : $db_item['units']
-		));
+		$change .= convert_units(
+			bcsub($lastHistory['value'], $prevHistory['value'], $digits),
+			$db_item['units'] == 'unixtime' ? 'uptime' : $db_item['units'],
+			0
+		);
 		$change = nbsp($change);
 	}
 	else {
@@ -541,10 +542,11 @@ foreach ($displayItems as $db_item){
 		}
 
 		// for 'unixtime' change should be calculated as uptime
-		$change .= convert_units(array(
-			'value' => bcsub($lastHistory['value'], $prevHistory['value'], $digits),
-			'units' => $db_item['units'] == 'unixtime' ? 'uptime' : $db_item['units']
-		));
+		$change .= convert_units(
+			bcsub($lastHistory['value'], $prevHistory['value'], $digits),
+			$db_item['units'] == 'unixtime' ? 'uptime' : $db_item['units'],
+			0
+		);
 		$change = nbsp($change);
 	}
 	else {

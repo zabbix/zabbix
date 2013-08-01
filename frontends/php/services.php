@@ -431,8 +431,10 @@ if (isset($_REQUEST['form'])) {
 	$servicesView->render();
 	$servicesView->show();
 }
+// service list
 else {
-	// services
+
+	// fetch services
 	$services = API::Service()->get(array(
 		'output' => array('name', 'serviceid', 'algorithm'),
 		'selectParent' => array('serviceid'),
@@ -442,8 +444,7 @@ else {
 		'sortfield' => 'sortorder',
 		'sortorder' => ZBX_SORT_UP
 	));
-
-	// triggers
+	// expand trigger descriptions
 	$triggers = zbx_objectValues($services, 'trigger');
 
 	$triggers = CMacrosResolverHelper::resolveTriggerNames($triggers);
@@ -454,14 +455,6 @@ else {
 		}
 	}
 	unset($service);
-
-	// nodes
-	if ($data['displayNodes'] = is_array(get_current_nodeid())) {
-		foreach ($services as &$service) {
-			$service['name'] = get_node_name_by_elid($service['serviceid'], true, NAME_DELIMITER).$service['name'];
-		}
-		unset($service);
-	}
 
 	$treeData = array();
 	createServiceConfigurationTree($services, $treeData);

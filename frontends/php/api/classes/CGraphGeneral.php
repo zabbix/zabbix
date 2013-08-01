@@ -27,7 +27,6 @@
 abstract class CGraphGeneral extends CZBXAPI {
 
 	const ERROR_TEMPLATE_HOST_MIX = 'templateHostMix';
-	const ERROR_MISSING_ITEMS = 'missingItems';
 
 	/**
 	 * Check $graphs:
@@ -51,12 +50,6 @@ abstract class CGraphGeneral extends CZBXAPI {
 			$graphs = $this->extendObjects($this->tableName(), $graphs, array('name'));
 		}
 		foreach ($graphs as $gnum => $graph) {
-			if (($update && isset($graph['gitems']) && (!is_array($graph['gitems']) || !$graph['gitems']))
-					|| (!$update && (!isset($graph['gitems']) || !is_array($graph['gitems']) || !$graph['gitems']))) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s($this->getErrorMsg(self::ERROR_MISSING_ITEMS), $graph['name']));
-			}
-
 			// graph fields
 			$fields = array('name' => null);
 			if (!$update && !check_db_fields($fields, $graph)) {
@@ -177,27 +170,25 @@ abstract class CGraphGeneral extends CZBXAPI {
 		foreach ($graphs as $graph) {
 			unset($graph['templateid']);
 
-			$templatedGraph = false;
-			if ($graph['gitems']) {
-				$graphHosts = API::Host()->get(array(
-					'itemids' => zbx_objectValues($graph['gitems'], 'itemid'),
-					'output' => API_OUTPUT_EXTEND,
-					'editable' => true,
-					'templated_hosts' => true
-				));
+			$graphHosts = API::Host()->get(array(
+				'itemids' => zbx_objectValues($graph['gitems'], 'itemid'),
+				'output' => API_OUTPUT_EXTEND,
+				'editable' => true,
+				'templated_hosts' => true
+			));
 
-				// mass templated items
-				foreach ($graphHosts as $host) {
-					if (HOST_STATUS_TEMPLATE == $host['status']) {
-						$templatedGraph = $host['hostid'];
-						if (count($graphHosts) > 1) {
-							self::exception(ZBX_API_ERROR_PARAMETERS,
-								_s($this->getErrorMsg(self::ERROR_TEMPLATE_HOST_MIX), $graph['name']));
-						}
-						break;
+			// mass templated items
+			$templatedGraph = false;
+			foreach ($graphHosts as $host) {
+				if (HOST_STATUS_TEMPLATE == $host['status']) {
+					$templatedGraph = $host['hostid'];
+					if (count($graphHosts) > 1) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s($this->getErrorMsg(self::ERROR_TEMPLATE_HOST_MIX), $graph['name']));
 					}
+					break;
 				}
 			}
+
 
 			// check ymin, ymax items
 			$this->checkAxisItems($graph, $templatedGraph);
@@ -301,12 +292,7 @@ abstract class CGraphGeneral extends CZBXAPI {
 
 		// update graph items
 		$insertGitems = array();
-		$deleteGitemIds = array();
-
-		// delete remaining items only if new items or items that require update are set
-		if ($graph['gitems']) {
-			$deleteGitemIds = array_combine($dbGitemIds, $dbGitemIds);
-		}
+		$deleteGitemIds = array_combine($dbGitemIds, $dbGitemIds);
 
 		foreach ($graph['gitems'] as $gitem) {
 			// updating an existing item

@@ -24,6 +24,62 @@
 #include "zbxtypes.h"
 #include "version.h"
 
+#ifdef DEBUG
+#	include "threads.h"
+
+#	define SDI(msg)		fprintf(stderr, "%6li:DEBUG INFO: %s\n", zbx_get_thread_id(), msg); fflush(stderr)
+#	define SDI2(msg,p1)	fprintf(stderr, "%6li:DEBUG INFO: " msg "\n", zbx_get_thread_id(), p1); fflush(stderr)
+#	define zbx_dbg_assert(exp)	assert(exp)
+#else
+#	define SDI(msg)			((void)(0))
+#	define SDI2(msg,p1)		((void)(0))
+#	define zbx_dbg_assert(exp)	((void)(0))
+#endif
+
+#if defined(ENABLE_CHECK_MEMOTY)
+#	include "crtdbg.h"
+
+#	define REINIT_CHECK_MEMORY() \
+		_CrtMemCheckpoint(&oldMemState)
+
+#	define INIT_CHECK_MEMORY() \
+		char DumpMessage[0x1FF]; \
+		_CrtMemState  oldMemState, newMemState, diffMemState; \
+		REINIT_CHECK_MEMORY()
+
+#	define CHECK_MEMORY(fncname, msg) \
+		DumpMessage[0] = '\0'; \
+		_CrtMemCheckpoint(&newMemState); \
+		if(_CrtMemDifference(&diffMemState, &oldMemState, &newMemState)) \
+		{ \
+			zbx_snprintf(DumpMessage, sizeof(DumpMessage), \
+				"%s\n" \
+				"free:  %10li bytes in %10li blocks\n" \
+				"normal:%10li bytes in %10li blocks\n" \
+				"CRT:   %10li bytes in %10li blocks\n", \
+				 \
+				fncname ": Memory changed! (" msg ")\n", \
+				 \
+				(long) diffMemState.lSizes[_FREE_BLOCK], \
+				(long) diffMemState.lCounts[_FREE_BLOCK], \
+				 \
+				(long) diffMemState.lSizes[_NORMAL_BLOCK], \
+				(long) diffMemState.lCounts[_NORMAL_BLOCK], \
+				 \
+				(long) diffMemState.lSizes[_CRT_BLOCK], \
+				(long) diffMemState.lCounts[_CRT_BLOCK]); \
+		} \
+		else \
+		{ \
+			zbx_snprintf(DumpMessage, sizeof(DumpMessage), \
+					"%s: Memory OK! (%s)", fncname, msg); \
+		} \
+		SDI2("MEMORY_LEAK: %s", DumpMessage)
+#else
+#	define INIT_CHECK_MEMORY() ((void)0)
+#	define CHECK_MEMORY(fncname, msg) ((void)0)
+#endif
+
 #ifndef va_copy
 #	if defined(__va_copy)
 #		define va_copy(d, s) __va_copy(d, s)
@@ -476,14 +532,22 @@ typedef enum
 zbx_maintenance_type_t;
 
 /* regular expressions */
-#define EXPRESSION_TYPE_INCLUDED	0
-#define EXPRESSION_TYPE_ANY_INCLUDED	1
-#define EXPRESSION_TYPE_NOT_INCLUDED	2
-#define EXPRESSION_TYPE_TRUE		3
-#define EXPRESSION_TYPE_FALSE		4
+typedef enum
+{
+	EXPRESSION_TYPE_INCLUDED = 0,
+	EXPRESSION_TYPE_ANY_INCLUDED,
+	EXPRESSION_TYPE_NOT_INCLUDED,
+	EXPRESSION_TYPE_TRUE,
+	EXPRESSION_TYPE_FALSE
+}
+zbx_expression_type_t;
 
-#define ZBX_IGNORE_CASE			0
-#define ZBX_CASE_SENSITIVE		1
+typedef enum
+{
+	ZBX_IGNORE_CASE = 0,
+	ZBX_CASE_SENSITIVE
+}
+zbx_case_sensitive_t;
 
 /* HTTP tests statuses */
 #define HTTPTEST_STATUS_MONITORED	0
@@ -899,6 +963,30 @@ int	comms_parse_response(char *xml, char *host, size_t host_len, char *key, size
 #define ZBX_COMMAND_WITHOUT_PARAMS	1
 #define ZBX_COMMAND_WITH_PARAMS		2
 int 	parse_command(const char *command, char *cmd, size_t cmd_max_len, char *param, size_t param_max_len);
+
+typedef struct
+{
+	char			*name;
+	char			*expression;
+	int			expression_type;
+	char			exp_delimiter;
+	zbx_case_sensitive_t	case_sensitive;
+}
+ZBX_REGEXP;
+
+/* regular expressions */
+char	*zbx_regexp_match(const char *string, const char *pattern, int *len);
+char	*zbx_iregexp_match(const char *string, const char *pattern, int *len);
+char	*zbx_regexp_sub(const char *string, const char *pattern, const char *output_template);
+char	*zbx_mregexp_sub(const char *string, const char *pattern, const char *output_template);
+
+void	clean_regexps_ex(ZBX_REGEXP *regexps, int *regexps_num);
+void	add_regexp_ex(ZBX_REGEXP **regexps, int *regexps_alloc, int *regexps_num,
+		const char *name, const char *expression, int expression_type, char exp_delimiter, int case_sensitive);
+int	regexp_match_ex(ZBX_REGEXP *regexps, int regexps_num, const char *string, const char *pattern,
+		zbx_case_sensitive_t cs);
+int	regexp_sub_ex(ZBX_REGEXP *regexps, int regexps_num, const char *string, const char *pattern,
+		zbx_case_sensitive_t cs, const char *output_template, char **output);
 
 /* misc functions */
 #ifdef HAVE_IPV6

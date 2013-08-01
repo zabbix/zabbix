@@ -19,8 +19,7 @@ agents_ldadd = \
 	$(top_srcdir)/src/libs/zbxcrypto/libzbxcrypto.a \
 	$(top_srcdir)/src/libs/zbxjson/libzbxjson.a \
 	$(top_srcdir)/src/libs/zbxexec/libzbxexec.a \
-	$(top_srcdir)/src/libs/zbxmodules/libzbxmodules.a \
-	$(top_srcdir)/src/libs/zbxregexp/libzbxregexp.a
+	$(top_srcdir)/src/libs/zbxmodules/libzbxmodules.a
 
 agents_ldadd += @AGENT_LIBS@
 
