@@ -62,6 +62,9 @@ class testZBX6648 extends CWebTest {
 	public function testZBX6648_eventFilter($zbx_data) {
 		$this->zbxTestLogin('events.php');
 		$this->zbxTestClickWait("//span[@class='active nowrap']//a[text()='Events']");
+		sleep(1);
+		$this->assertElementPresent("//select[@id='groupid']/option[text()='all']");
+		$this->assertElementPresent("//select[@id='hostid']/option[text()='all']");
 
 		switch ($zbx_data['triggers']) {
 			case 'both' :

@@ -58,6 +58,7 @@ if (!empty($this->data['hostid'])) {
 $itemTable = new CTableInfo(_('No items defined.'));
 $itemTable->setHeader(array(
 	new CCheckBox('all_items', null, "checkAll('".$itemForm->getName()."', 'all_items', 'group_itemid');"),
+	$this->data['displayNodes'] ? _('Node') : null,
 	_('Wizard'),
 	empty($this->data['filter_hostid']) ? _('Host') : null,
 	make_sorting_header(_('Name'), 'name'),
@@ -69,9 +70,8 @@ $itemTable->setHeader(array(
 	make_sorting_header(_('Type'), 'type'),
 	_('Applications'),
 	make_sorting_header(_('Status'), 'status'),
-	_('Error')
+	$data['showErrorColumn'] ? _('Error') : null
 ));
-
 foreach ($this->data['items'] as $item) {
 	// description
 	$description = array();
@@ -83,6 +83,7 @@ foreach ($this->data['items'] as $item) {
 		);
 		$description[] = NAME_DELIMITER;
 	}
+
 	if (!empty($item['discoveryRule'])) {
 		$description[] = new CLink(
 			CHtml::encode($item['discoveryRule']['name']),
@@ -105,27 +106,29 @@ foreach ($this->data['items'] as $item) {
 		itemIndicatorStyle($item['status'], $item['state'])
 	));
 
-	$statusIcons = array();
-	if ($item['status'] == ITEM_STATUS_ACTIVE) {
-		if (zbx_empty($item['error'])) {
-			$error = new CDiv(SPACE, 'status_icon iconok');
+	if ($data['showErrorColumn']) {
+		$statusIcons = array();
+		if ($item['status'] == ITEM_STATUS_ACTIVE) {
+			if (zbx_empty($item['error'])) {
+				$error = new CDiv(SPACE, 'status_icon iconok');
+			}
+			else {
+				$error = new CDiv(SPACE, 'status_icon iconerror');
+				$error->setHint($item['error'], '', 'on');
+			}
+			$statusIcons[] = $error;
 		}
-		else {
-			$error = new CDiv(SPACE, 'status_icon iconerror');
-			$error->setHint($item['error'], '', 'on');
-		}
-		$statusIcons[] = $error;
-	}
 
-	// discovered item lifetime indicator
-	if ($item['flags'] == ZBX_FLAG_DISCOVERY_CREATED && $item['itemDiscovery']['ts_delete']) {
-		$deleteError = new CDiv(SPACE, 'status_icon iconwarning');
-		$deleteError->setHint(
-			_s('The item is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s).',
-				zbx_date2age($item['itemDiscovery']['ts_delete']), zbx_date2str(_('d M Y'), $item['itemDiscovery']['ts_delete']),
-				zbx_date2str(_('H:i:s'), $item['itemDiscovery']['ts_delete'])
-		));
-		$statusIcons[] = $deleteError;
+		// discovered item lifetime indicator
+		if ($item['flags'] == ZBX_FLAG_DISCOVERY_CREATED && $item['itemDiscovery']['ts_delete']) {
+			$deleteError = new CDiv(SPACE, 'status_icon iconwarning');
+			$deleteError->setHint(
+				_s('The item is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s).',
+					zbx_date2age($item['itemDiscovery']['ts_delete']), zbx_date2str(_('d M Y'), $item['itemDiscovery']['ts_delete']),
+					zbx_date2str(_('H:i:s'), $item['itemDiscovery']['ts_delete'])
+			));
+			$statusIcons[] = $deleteError;
+		}
 	}
 
 	$triggerHintTable = new CTableInfo();
@@ -248,6 +251,7 @@ foreach ($this->data['items'] as $item) {
 
 	$itemTable->addRow(array(
 		$checkBox,
+		$this->data['displayNodes'] ? $item['nodename'] : null,
 		$menuIcon,
 		empty($this->data['filter_hostid']) ? $item['host'] : null,
 		$description,
@@ -259,7 +263,7 @@ foreach ($this->data['items'] as $item) {
 		item_type2str($item['type']),
 		new CCol(CHtml::encode($item['applications_list']), 'wraptext'),
 		$status,
-		$statusIcons
+		$data['showErrorColumn'] ? $statusIcons : null
 	));
 }
 
