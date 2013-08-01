@@ -3,6 +3,7 @@ Changes for 2.0.8rc1
 New features:
 
 Bug fixes:
+....I..... [ZBX-6831] fixed webtest item conversion in 1.8->2.0 database upgrade patch for mysql (wiper)
 ...G...... [ZBX-6527] fixed proc.mem calculations with getprocs() for AIX (wiper)
 ........S. [ZBX-5924] fixed curl verify host option setting in ez texting (wiper)
 .......PS. [ZBX-6798] improved error messages from UnixODBC library for Database Monitor items (Andris)
