@@ -19,6 +19,7 @@
 
 #include "common.h"
 #include "sysinfo.h"
+#include "zbxregexp.h"
 
 #if !defined(HAVE_SYS_PROCFS_H)
 #	include "../common/common.h"
