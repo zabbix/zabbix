@@ -203,13 +203,6 @@ elseif (isset($_REQUEST['add_condition']) && isset($_REQUEST['new_condition'])) 
 				}
 			}
 
-			// maintenance is not supposed to have a value
-			foreach ($conditions as $idx => $condition) {
-				if ($condition['conditiontype'] == CONDITION_TYPE_MAINTENANCE) {
-					unset($conditions[$idx]['value']);
-				}
-			}
-
 			$validateConditions = $conditions;
 
 			if (isset($newCondition['value'])) {
@@ -217,9 +210,6 @@ elseif (isset($_REQUEST['add_condition']) && isset($_REQUEST['new_condition'])) 
 				foreach ($newConditionValues as $newValue) {
 					$condition = $newCondition;
 					$condition['value'] = $newValue;
-					if ($condition['conditiontype'] == CONDITION_TYPE_MAINTENANCE) {
-						unset($condition['value']);
-					}
 					$validateConditions[] = $condition;
 				}
 			}
