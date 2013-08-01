@@ -16,10 +16,9 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-
 #include "common.h"
 #include "sysinfo.h"
-#include <stdio.h>
+#include "zbxregexp.h"
 
 #define DO_ONE	0
 #define DO_AVG	1
