@@ -573,10 +573,10 @@ class CAction extends CZBXAPI {
 						self::exception(ZBX_API_ERROR_PARAMETERS,
 							_s('Missing "%1$s" field for action condition.', 'conditiontype'));
 					}
-					if (!isset($condition['operator'])) {
-						self::exception(ZBX_API_ERROR_PARAMETERS,
-							_s('Missing "%1$s" field for action condition.', 'operator'));
-					}
+
+					$condition['operator'] = isset($condition['operator'])
+						? $condition['operator']
+						: CONDITION_OPERATOR_EQUAL;
 
 					$condition['actionid'] = $actionids[$anum];
 					$conditions[] = $condition;
