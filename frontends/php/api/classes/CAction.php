@@ -703,24 +703,12 @@ class CAction extends CZBXAPI {
 						$conditionsCreate[] = $condition;
 					}
 					elseif (isset($conditionsDb[$condition['conditionid']])) {
-						// value and operator validation depends on condition type, so it must be set
-						$dbConditionType = $conditionsDb[$condition['conditionid']]['conditiontype'];
-
-						if (isset($condition['conditiontype'])) {
-							// when changing type, new value must be re-validated, so add value from DB
-							if ($condition['conditiontype'] != $dbConditionType) {
-								$condition['operator'] = isset($condition['operator'])
-									? $condition['operator']
-									: $conditionsDb[$condition['conditionid']]['operator'];
-
-								$condition['value'] = isset($condition['value'])
-									? $condition['value']
-									: $conditionsDb[$condition['conditionid']]['value'];
-
-							}
-						}
-						else {
-							$condition['conditiontype'] = $dbConditionType;
+						// value and operator validation depends on condition type
+						$defaultFields = array('conditiontype', 'operator', 'value');
+						foreach ($defaultFields as $field) {
+							$condition[$field] = isset($condition[$field])
+								? $condition[$field]
+								: $conditionsDb[$condition['conditionid']][$field];
 						}
 
 						$conditionsUpdate[] = $condition;
