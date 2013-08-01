@@ -143,6 +143,7 @@ const char	*zbx_interface_type_string(zbx_interface_type_t type);
 #define INTERFACE_TYPE_COUNT	4	/* number of interface types */
 extern const int	INTERFACE_TYPE_PRIORITY[INTERFACE_TYPE_COUNT];
 
+#define ZBX_FLAG_DISCOVERY_NORMAL	0x00	/* normal item */
 #define ZBX_FLAG_DISCOVERY		0x01	/* low-level discovery rule */
 #define ZBX_FLAG_DISCOVERY_CHILD	0x02	/* low-level discovery proto-item, proto-trigger or proto-graph */
 #define ZBX_FLAG_DISCOVERY_CREATED	0x04	/* auto-created item, trigger or graph */
