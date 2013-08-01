@@ -24,11 +24,11 @@ class testPageItemPrototypes extends CWebTest {
 
 	// Returns all item protos
 	public static function data() {
-		$sql = 'SELECT h.status, i.name, d.parent_itemid, di.name AS d_name FROM items i, item_discovery d, items di, hosts h'.
+		$sql = 'SELECT h.status, i.name, i.itemid, d.parent_itemid, h.hostid, di.name AS d_name FROM items i, item_discovery d, items di, hosts h'.
 					' WHERE i.itemid=d.itemid'.
 					' AND h.hostid=i.hostid'.
 					' AND d.parent_itemid=di.itemid'.
-					' AND i.key_ LIKE "%zbx6275%"';
+					" AND i.key_ LIKE '%zbx6275%'";
 		return DBdata($sql);
 	}
 
@@ -43,30 +43,23 @@ class testPageItemPrototypes extends CWebTest {
 
 		if ($data['status'] == HOST_STATUS_MONITORED || $data['status'] == HOST_STATUS_NOT_MONITORED) {
 
-			$this->zbxTestLogin('hosts.php');
-			$this->zbxTestDropdownSelectWait('groupid', 'all');
-
-			$this->checkTitle('Configuration of hosts');
-			$this->zbxTestTextPresent('HOSTS');
-			// Go to the list of protos
-			$this->href_click("disc_prototypes.php?hostid=$hostid&parent_discoveryid=$druleid");
-			$this->wait();
+			$this->zbxTestLogin("disc_prototypes.php?hostid=$hostid&parent_discoveryid=$druleid");
 			// We are in the list of protos
 			$this->checkTitle('Configuration of item prototypes');
 			$this->zbxTestTextPresent('CONFIGURATION OF ITEM PROTOTYPES');
-			$this->zbxTestTextPresent('Item prototypes of'.$drule);
+			$this->zbxTestTextPresent('Item prototypes of '.$drule);
 			$this->zbxTestTextPresent('Displaying');
 			$this->zbxTestTextPresent('Host list');
 			// Header
 			$this->zbxTestTextPresent(
 				array(
 					'Name',
-					'Items',
-					'Triggers',
-					'Graphs',
 					'Key',
 					'Interval',
+					'History',
+					'Trends',
 					'Type',
+					'Applications',
 					'Status'
 				)
 			);
@@ -74,37 +67,30 @@ class testPageItemPrototypes extends CWebTest {
 			// someday should check that interval is not shown for trapper items, trends not shown for non-numeric items etc
 
 			$this->zbxTestDropdownHasOptions('go', array(
-					'Enable selected',
+					'Activate selected',
 					'Disable selected',
 					'Delete selected'
 			));
 		}
 		if ($data['status'] == HOST_STATUS_TEMPLATE) {
 
-			$this->zbxTestLogin('templates.php');
-			$this->zbxTestDropdownSelectWait('groupid', 'all');
-
-			$this->checkTitle('Configuration of templates');
-			$this->zbxTestTextPresent('TEMPLATES');
-			// Go to the list of protos
-			$this->href_click("disc_prototypes.php?hostid=$hostid&parent_discoveryid=$druleid");
-			$this->wait();
+			$this->zbxTestLogin("disc_prototypes.php?hostid=$hostid&parent_discoveryid=$druleid");
 			// We are in the list of protos
 			$this->checkTitle('Configuration of item prototypes');
 			$this->zbxTestTextPresent('CONFIGURATION OF ITEM PROTOTYPES');
-			$this->zbxTestTextPresent('Item prototypes of'.$drule);
+			$this->zbxTestTextPresent('Item prototypes of '.$drule);
 			$this->zbxTestTextPresent('Displaying');
 			$this->zbxTestTextPresent('Template list');
 			// Header
 			$this->zbxTestTextPresent(
 				array(
 					'Name',
-					'Items',
-					'Triggers',
-					'Graphs',
 					'Key',
 					'Interval',
+					'History',
+					'Trends',
 					'Type',
+					'Applications',
 					'Status'
 				)
 			);
@@ -112,7 +98,7 @@ class testPageItemPrototypes extends CWebTest {
 			// someday should check that interval is not shown for trapper items, trends not shown for non-numeric items etc
 
 			$this->zbxTestDropdownHasOptions('go', array(
-					'Enable selected',
+					'Activate selected',
 					'Disable selected',
 					'Delete selected'
 			));
@@ -133,6 +119,7 @@ class testPageItemPrototypes extends CWebTest {
 		$itemid = $rule['itemid'];
 		$druleid = $rule['parent_itemid'];
 		$drule = $rule['d_name'];
+		$hostid = $rule['hostid'];
 
 		$this->chooseOkOnNextConfirmation();
 
@@ -147,7 +134,7 @@ class testPageItemPrototypes extends CWebTest {
 
 		$this->checkTitle('Configuration of item prototypes');
 		$this->zbxTestTextPresent('CONFIGURATION OF ITEM PROTOTYPES');
-		$this->zbxTestTextPresent('Item prototypes of'.$drule);
+		$this->zbxTestTextPresent('Item prototypes of '.$drule);
 
 		$sql = "SELECT * FROM items WHERE itemid=$itemid AND flags=".ZBX_FLAG_DISCOVERY;
 		$this->assertEquals(0, DBcount($sql));
@@ -180,6 +167,7 @@ class testPageItemPrototypes extends CWebTest {
 		$itemid = $rule['itemid'];
 		$druleid = $rule['parent_itemid'];
 		$drule = $rule['d_name'];
+		$hostid = $rule['hostid'];
 
 		$this->chooseOkOnNextConfirmation();
 
@@ -194,7 +182,7 @@ class testPageItemPrototypes extends CWebTest {
 
 		$this->checkTitle('Configuration of item prototypes');
 		$this->zbxTestTextPresent('CONFIGURATION OF ITEM PROTOTYPES');
-		$this->zbxTestTextPresent('Item prototypes of'.$drule);
+		$this->zbxTestTextPresent('Item prototypes of '.$drule);
 
 		$sql = "SELECT * FROM items WHERE itemid=$itemid AND flags=".ZBX_FLAG_DISCOVERY;
 		$this->assertEquals(0, DBcount($sql));
