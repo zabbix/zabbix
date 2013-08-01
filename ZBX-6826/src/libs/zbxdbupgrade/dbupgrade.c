@@ -130,15 +130,22 @@ static void	DBfield_definition_string(char **sql, size_t *sql_alloc, size_t *sql
 	DBfield_type_string(sql, sql_alloc, sql_offset, field);
 	if (NULL != field->default_value)
 	{
-#if defined(HAVE_MYSQL)
-		if (ZBX_TYPE_SHORTTEXT != field->type)
-		{
-#endif
-			char	*default_value_esc;
+		char	*default_value_esc;
 
-			default_value_esc = DBdyn_escape_string(field->default_value);
-			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, " default '%s'", default_value_esc);
-			zbx_free(default_value_esc);
+#if defined(HAVE_MYSQL)
+		switch (field->type)
+		{
+			case ZBX_TYPE_BLOB:
+			case ZBX_TYPE_TEXT:
+			case ZBX_TYPE_SHORTTEXT:
+			case ZBX_TYPE_LONGTEXT:
+				/* MySQL: BLOB and TEXT columns cannot be assigned a default value */
+				break;
+			default:
+#endif
+				default_value_esc = DBdyn_escape_string(field->default_value);
+				zbx_snprintf_alloc(sql, sql_alloc, sql_offset, " default '%s'", default_value_esc);
+				zbx_free(default_value_esc);
 #if defined(HAVE_MYSQL)
 		}
 #endif
