@@ -990,10 +990,7 @@ function formatHistoryValue($value, array $item, $trim = true) {
 
 	// format value
 	if ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT || $item['value_type'] == ITEM_VALUE_TYPE_UINT64) {
-		$value = convert_units(array(
-				'value' => $value,
-				'units' => $item['units']
-		));
+		$value = convert_units($value, $item['units']);
 	}
 	elseif ($item['value_type'] != ITEM_VALUE_TYPE_STR
 		&& $item['value_type'] != ITEM_VALUE_TYPE_TEXT
@@ -1059,7 +1056,7 @@ function getItemFunctionalValue($item, $function, $param) {
 			' HAVING COUNT(*)>0' // necessary because DBselect() return 0 if empty data set, for graph templates
 		);
 		if ($row = DBfetch($result)) {
-			return convert_units(array('value' => $row['value'], 'units' => $item['units']));
+			return convert_units($row['value'], $item['units']);
 		}
 		// no data in history
 		else {

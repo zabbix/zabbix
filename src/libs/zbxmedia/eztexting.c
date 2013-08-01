@@ -205,7 +205,7 @@ int	send_ez_texting(const char *username, const char *password, const char *send
 			CURLE_OK != (err = curl_easy_setopt(easy_handle, opt = CURLOPT_WRITEFUNCTION, WRITEFUNCTION2)) ||
 			CURLE_OK != (err = curl_easy_setopt(easy_handle, opt = CURLOPT_HEADERFUNCTION, HEADERFUNCTION2)) ||
 			CURLE_OK != (err = curl_easy_setopt(easy_handle, opt = CURLOPT_SSL_VERIFYPEER, 1L)) ||
-			CURLE_OK != (err = curl_easy_setopt(easy_handle, opt = CURLOPT_SSL_VERIFYHOST, 2L)) ||
+			CURLE_OK != (err = curl_easy_setopt(easy_handle, opt = CURLOPT_SSL_VERIFYHOST, 1L)) ||
 			CURLE_OK != (err = curl_easy_setopt(easy_handle, opt = CURLOPT_POSTFIELDS, postfields)) ||
 			CURLE_OK != (err = curl_easy_setopt(easy_handle, opt = CURLOPT_POST, 1L)) ||
 			CURLE_OK != (err = curl_easy_setopt(easy_handle, opt = CURLOPT_URL, EZ_TEXTING_API_URL)) ||

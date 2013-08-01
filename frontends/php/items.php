@@ -899,8 +899,7 @@ else {
 	$data = array(
 		'form' => get_request('form'),
 		'hostid' => get_request('hostid'),
-		'sortfield' => getPageSortField('name'),
-		'displayNodes' => (is_array(get_current_nodeid()) && empty($_REQUEST['filter_groupid']) && empty($_REQUEST['filter_hostid']))
+		'sortfield' => getPageSortField('name')
 	);
 
 	// items
@@ -1100,22 +1099,6 @@ else {
 		'preservekeys' => true
 	));
 	$data['triggerRealHosts'] = getParentHostsByTriggers($data['itemTriggers']);
-
-	// nodes
-	if ($data['displayNodes']) {
-		foreach ($data['items'] as $key => $item) {
-			$data['items'][$key]['nodename'] = get_node_name_by_elid($item['itemid'], true);
-		}
-	}
-
-	// determine, show or not column of errors
-	if (isset($hosts)) {
-		$h = reset($hosts);
-		$data['showErrorColumn'] = ($h['status'] != HOST_STATUS_TEMPLATE);
-	}
-	else {
-		$data['showErrorColumn'] = true;
-	}
 
 	// render view
 	$itemView = new CView('configuration.item.list', $data);

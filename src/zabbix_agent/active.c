@@ -30,7 +30,6 @@
 #include "comms.h"
 #include "threads.h"
 #include "zbxjson.h"
-#include "zbxregexp.h"
 
 #if defined(ZABBIX_SERVICE)
 #	include "service.h"
@@ -41,11 +40,15 @@
 #ifdef _WINDOWS
 __declspec(thread) static ZBX_ACTIVE_METRIC	*active_metrics = NULL;
 __declspec(thread) static ZBX_ACTIVE_BUFFER	buffer;
-__declspec(thread) static zbx_vector_ptr_t	regexps;
+__declspec(thread) static ZBX_REGEXP		*regexps = NULL;
+__declspec(thread) static int			regexps_alloc = 0;
+__declspec(thread) static int			regexps_num = 0;
 #else
 static ZBX_ACTIVE_METRIC	*active_metrics = NULL;
 static ZBX_ACTIVE_BUFFER	buffer;
-static zbx_vector_ptr_t		regexps;
+static ZBX_REGEXP		*regexps = NULL;
+static int			regexps_alloc = 0;
+static int			regexps_num = 0;
 #endif
 
 static void	init_active_metrics(void)
@@ -68,8 +71,6 @@ static void	init_active_metrics(void)
 		buffer.lastsent = (int)time(NULL);
 		buffer.first_error = 0;
 	}
-
-	zbx_vector_ptr_create(&regexps);
 }
 
 static void	disable_all_metrics(void)
@@ -94,8 +95,9 @@ static void	free_active_metrics(void)
 
 	zbx_free(active_metrics);
 
-	zbx_regexp_clean_expressions(&regexps);
-	zbx_vector_ptr_destroy(&regexps);
+	clean_regexps_ex(regexps, &regexps_num);
+
+	zbx_free(regexps);
 }
 #endif
 
@@ -272,7 +274,7 @@ static int	parse_list_of_checks(char *str)
 		add_check(name, key_orig, delay, lastlogsize, mtime);
 	}
 
-	zbx_regexp_clean_expressions(&regexps);
+	clean_regexps_ex(regexps, &regexps_num);
 
 	if (SUCCEED == zbx_json_brackets_by_name(&jp, ZBX_PROTO_TAG_REGEXP, &jp_data))
 	{
@@ -322,7 +324,8 @@ static int	parse_list_of_checks(char *str)
 
 			case_sensitive = atoi(tmp);
 
-			add_regexp_ex(&regexps, name, expression, expression_type, exp_delimiter, case_sensitive);
+			add_regexp_ex(&regexps, &regexps_alloc, &regexps_num,
+					name, expression, expression_type, exp_delimiter, case_sensitive);
 		}
 	}
 
@@ -894,8 +897,8 @@ static void	process_active_checks(char *server, unsigned short port)
 						break;
 					}
 
-					if (SUCCEED == regexp_sub_ex(&regexps, value, pattern, ZBX_CASE_SENSITIVE,
-							output_template, &item_value))
+					if (SUCCEED == regexp_sub_ex(regexps, regexps_num, value, pattern,
+							ZBX_CASE_SENSITIVE, output_template, &item_value))
 					{
 						send_err = process_value(server, port, CONFIG_HOSTNAME,
 								active_metrics[i].key_orig, &item_value, &lastlogsize,
@@ -1003,8 +1006,8 @@ static void	process_active_checks(char *server, unsigned short port)
 						break;
 					}
 
-					if (SUCCEED == regexp_sub_ex(&regexps, value, pattern, ZBX_CASE_SENSITIVE,
-							output_template, &item_value))
+					if (SUCCEED == regexp_sub_ex(regexps, regexps_num, value, pattern,
+							ZBX_CASE_SENSITIVE, output_template, &item_value))
 					{
 						send_err = process_value(server, port, CONFIG_HOSTNAME,
 								active_metrics[i].key_orig, &item_value, &lastlogsize,
@@ -1142,12 +1145,12 @@ static void	process_active_checks(char *server, unsigned short port)
 
 					zbx_snprintf(str_logeventid, sizeof(str_logeventid), "%lu", logeventid);
 
-					if (SUCCEED == regexp_sub_ex(&regexps, value, pattern, ZBX_CASE_SENSITIVE,
-									output_template, &item_value) &&
-							SUCCEED == regexp_match_ex(&regexps, str_severity, key_severity,
-									ZBX_IGNORE_CASE) &&
+					if (SUCCEED == regexp_sub_ex(regexps, regexps_num, value, pattern,
+							ZBX_CASE_SENSITIVE, output_template, &item_value) &&
+							SUCCEED == regexp_match_ex(regexps, regexps_num, str_severity,
+									key_severity, ZBX_IGNORE_CASE) &&
 							(('\0' == *key_source) ? 1 : (0 == strcmp(key_source, source))) &&
-							SUCCEED == regexp_match_ex(&regexps, str_logeventid,
+							SUCCEED == regexp_match_ex(regexps, regexps_num, str_logeventid,
 									key_logeventid, ZBX_CASE_SENSITIVE))
 					{
 						send_err = process_value(server, port, CONFIG_HOSTNAME,

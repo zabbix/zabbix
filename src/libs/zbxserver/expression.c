@@ -27,17 +27,61 @@
 
 /******************************************************************************
  *                                                                            *
+ * Function: DBget_macro_value_by_triggerid                                   *
+ *                                                                            *
+ * Purpose: get value of a user macro                                         *
+ *                                                                            *
+ * Author: Alexander Vladishev                                                *
+ *                                                                            *
+ ******************************************************************************/
+static void	DBget_macro_value_by_triggerid(zbx_uint64_t triggerid, const char *macro, char **replace_to)
+{
+	const char		*__function_name = "DBget_macro_value_by_triggerid";
+
+	DB_RESULT		result;
+	DB_ROW			row;
+	zbx_vector_uint64_t	hostids;
+	zbx_uint64_t		hostid;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() triggerid:" ZBX_FS_UI64, __function_name, triggerid);
+
+	zbx_vector_uint64_create(&hostids);
+	zbx_vector_uint64_reserve(&hostids, 8);
+
+	result = DBselect(
+			"select distinct i.hostid"
+			" from items i,functions f"
+			" where f.itemid=i.itemid"
+				" and f.triggerid=" ZBX_FS_UI64,
+			triggerid);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		ZBX_STR2UINT64(hostid, row[0]);
+		zbx_vector_uint64_append(&hostids, hostid);
+	}
+	DBfree_result(result);
+
+	zbx_vector_uint64_sort(&hostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+	DCget_user_macro(hostids.values, hostids.values_num, macro, replace_to);
+
+	zbx_vector_uint64_destroy(&hostids);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: get_N_functionid                                                 *
  *                                                                            *
  * Parameters: expression   - [IN] null terminated trigger expression         *
  *                            '{11}=1 & {2346734}>5'                          *
  *             N_functionid - [IN] number of function in trigger expression   *
  *             functionid   - [OUT] ID of an N-th function in expression      *
- *             end          - [OUT] a pointer to text following the extracted *
- *                            function id (can be NULL)                       *
  *                                                                            *
  ******************************************************************************/
-static int	get_N_functionid(const char *expression, int N_functionid, zbx_uint64_t *functionid, const char **end)
+static int	get_N_functionid(const char *expression, int N_functionid, zbx_uint64_t *functionid)
 {
 	const char			*__function_name = "get_N_functionid";
 
@@ -48,7 +92,7 @@ static int	get_N_functionid(const char *expression, int N_functionid, zbx_uint64
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() expression:'%s' N_functionid:%d",
 			__function_name, expression, N_functionid);
 
-	for (c = expression; '\0' != *c; c++)
+	for (c = expression; '\0' != *c && ret != SUCCEED; c++)
 	{
 		if ('{' == *c)
 		{
@@ -63,12 +107,7 @@ static int	get_N_functionid(const char *expression, int N_functionid, zbx_uint64
 				{
 					zabbix_log(LOG_LEVEL_DEBUG, "%s() functionid:" ZBX_FS_UI64,
 							__function_name, *functionid);
-
-					if (NULL != end)
-						*end = c + 1;
-
 					ret = SUCCEED;
-					break;
 				}
 			}
 
@@ -79,30 +118,6 @@ static int	get_N_functionid(const char *expression, int N_functionid, zbx_uint64
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: get_functionids                                                  *
- *                                                                            *
- * Purpose: get identifiers of the functions used in expression               *
- *                                                                            *
- * Parameters: expression   - [IN] null terminated trigger expression         *
- *                            '{11}=1 & {2346734}>5'                          *
- *             count        - [IN] the maximum number of functions to parse   *
- *             functionids  - [OUT] the resulting vector of function ids      *
- *                                                                            *
- ******************************************************************************/
-static void	get_functionids(zbx_vector_uint64_t *functionids, const char *expression)
-{
-	const char	*start = expression;
-	zbx_uint64_t	functionid;
-
-	while (SUCCEED == get_N_functionid(start, 1, &functionid, &start))
-		zbx_vector_uint64_append(functionids, functionid);
-
-	zbx_vector_uint64_sort(functionids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-	zbx_vector_uint64_uniq(functionids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 }
 
 /******************************************************************************
@@ -127,7 +142,7 @@ static int	get_N_itemid(const char *expression, int N_functionid, zbx_uint64_t *
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() expression:'%s' N_functionid:%d",
 			__function_name, expression, N_functionid);
 
-	if (SUCCEED == get_N_functionid(expression, N_functionid, &functionid, NULL))
+	if (SUCCEED == get_N_functionid(expression, N_functionid, &functionid))
 	{
 		DCconfig_get_functions_by_functionids(&function, &functionid, &errcode, 1);
 
@@ -1811,7 +1826,7 @@ static int	get_node_value(const char *expression, char **replace_to, int N_funct
 {
 	zbx_uint64_t	functionid;
 
-	if (FAIL == get_N_functionid(expression, N_functionid, &functionid, NULL))
+	if (FAIL == get_N_functionid(expression, N_functionid, &functionid))
 		return FAIL;
 
 	return DBget_node_value(functionid, replace_to, request);
@@ -2466,29 +2481,6 @@ fail:
 
 /******************************************************************************
  *                                                                            *
- * Function: cache_expression_hostids                                         *
- *                                                                            *
- * Purpose: cache host identifiers referenced by trigger expression           *
- *                                                                            *
- * Parameters: hostids    - [OUT] the host identifier cache                   *
- *             expression - [IN] the trigger expression                       *
- *                                                                            *
- ******************************************************************************/
-static void	cache_trigger_hostids(zbx_vector_uint64_t *hostids, const char *expression)
-{
-	if (0 == hostids->values_num)
-	{
-		zbx_vector_uint64_t	functionids;
-
-		zbx_vector_uint64_create(&functionids);
-		get_functionids(&functionids, expression);
-		DCget_functions_hostids(hostids, &functionids);
-		zbx_vector_uint64_destroy(&functionids);
-	}
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: substitute_simple_macros                                         *
  *                                                                            *
  * Purpose: substitute simple macros in data string with real values          *
@@ -2500,14 +2492,13 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 		zbx_uint64_t *hostid, DC_HOST *dc_host, DC_ITEM *dc_item, DB_ESCALATION *escalation, char **data,
 		int macro_type, char *error, int maxerrlen)
 {
-	const char		*__function_name = "substitute_simple_macros";
+	const char	*__function_name = "substitute_simple_macros";
 
-	char			*p, *bl, *br, c, *replace_to = NULL, sql[64];
-	const char		*m;
-	int			N_functionid, ret, res = SUCCEED;
-	size_t			data_alloc, data_len;
-	DC_INTERFACE		interface;
-	zbx_vector_uint64_t	hostids;
+	char		*p, *bl, *br, c, *replace_to = NULL, sql[64];
+	const char	*m;
+	int		N_functionid, ret, res = SUCCEED;
+	size_t		data_alloc, data_len;
+	DC_INTERFACE	interface;
 
 	if (NULL == data || NULL == *data || '\0' == **data)
 	{
@@ -2523,8 +2514,6 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 	p = *data;
 	if (NULL == (m = bl = strchr(p, '{')))
 		return res;
-
-	zbx_vector_uint64_create(&hostids);
 
 	data_alloc = data_len = strlen(*data) + 1;
 
@@ -3356,8 +3345,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 				}
 				else if (0 == strncmp(m, "{$", 2))	/* user defined macros */
 				{
-					cache_trigger_hostids(&hostids, event->trigger.expression);
-					DCget_user_macro(hostids.values, hostids.values_num, m, &replace_to);
+					DBget_macro_value_by_triggerid(event->objectid, m, &replace_to);
 				}
 			}
 		}
@@ -3369,14 +3357,9 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 					replace_to = zbx_dsprintf(replace_to, "%d", event->value);
 				else if (0 == strncmp(m, "{$", 2))	/* user defined macros */
 				{
-					cache_trigger_hostids(&hostids, event->trigger.expression);
-					DCget_user_macro(hostids.values, hostids.values_num, m, &replace_to);
-
-					if (NULL != replace_to && FAIL == (res = is_double_suffix(replace_to)) &&
-							NULL != error)
-					{
+					DBget_macro_value_by_triggerid(event->objectid, m, &replace_to);
+					if (NULL != replace_to && FAIL == (res = is_double_suffix(replace_to)) && NULL != error)
 						zbx_snprintf(error, maxerrlen, "Macro '%s' value is not numeric", m);
-					}
 				}
 			}
 		}
@@ -3556,8 +3539,6 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 		else
 			p = bl + 1;
 	}
-
-	zbx_vector_uint64_destroy(&hostids);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End %s() data:'%s'", __function_name, *data);
 
@@ -4013,10 +3994,6 @@ void	evaluate_expressions(zbx_vector_ptr_t *triggers)
 		event.value = tr->value;
 
 		tr->expression = zbx_strdup(NULL, tr->expression_orig);
-
-		/* the trigger expression is used to parse function ids for referenced hostid caching */
-		/* when evaluating trigger expression                                                 */
-		event.trigger.expression = tr->expression_orig;
 
 		zbx_remove_whitespace(tr->expression);
 

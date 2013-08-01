@@ -56,7 +56,7 @@ $discoveryTable->setHeader(array(
 	make_sorting_header(_('Interval'), 'delay', $sortLink),
 	make_sorting_header(_('Type'), 'type', $sortLink),
 	make_sorting_header(_('Status'), 'status', $sortLink),
-	$data['showErrorColumn'] ? _('Error') : null
+	_('Error')
 ));
 foreach ($data['discoveries'] as $discovery) {
 	$description = array();
@@ -74,16 +74,14 @@ foreach ($data['discoveries'] as $discovery) {
 		itemIndicatorStyle($discovery['status'], $discovery['state'])
 	);
 
-	if ($data['showErrorColumn']) {
-		$error = '';
-		if ($discovery['status'] == ITEM_STATUS_ACTIVE) {
-			if (zbx_empty($discovery['error'])) {
-				$error = new CDiv(SPACE, 'status_icon iconok');
-			}
-			else {
-				$error = new CDiv(SPACE, 'status_icon iconerror');
-				$error->setHint($discovery['error'], '', 'on');
-			}
+	$error = '';
+	if ($discovery['status'] == ITEM_STATUS_ACTIVE) {
+		if (zbx_empty($discovery['error'])) {
+			$error = new CDiv(SPACE, 'status_icon iconok');
+		}
+		else {
+			$error = new CDiv(SPACE, 'status_icon iconerror');
+			$error->setHint($discovery['error'], '', 'on');
 		}
 	}
 
@@ -97,7 +95,7 @@ foreach ($data['discoveries'] as $discovery) {
 		$discovery['delay'],
 		item_type2str($discovery['type']),
 		$status,
-		$data['showErrorColumn'] ? $error : null
+		$error
 	));
 }
 
