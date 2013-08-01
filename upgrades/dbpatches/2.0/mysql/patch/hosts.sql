@@ -216,9 +216,9 @@ BEGIN
 			SET @itemappid = init_nodeid;
 		END IF;
 
-		INSERT INTO items (itemid, hostid, type, name, key_, value_type, units, delay, history, trends, status)
+		INSERT INTO items (itemid, hostid, type, name, key_, value_type, units, delay, history, trends, status, params, description)
 			SELECT @itemid := @itemid + 1, hostid, type, 'Last error message of scenario \'$1\'', CONCAT('web.test.error',
-				SUBSTR(key_, LOCATE('[', key_))), 1, '', delay, history, 0, status
+				SUBSTR(key_, LOCATE('[', key_))), 1, '', delay, history, 0, status, '', ''
 				FROM items
 				WHERE type = 9
 					AND key_ LIKE 'web.test.fail%'
