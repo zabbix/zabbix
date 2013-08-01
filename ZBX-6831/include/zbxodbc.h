@@ -35,17 +35,17 @@ typedef struct zbx_odbc_dbh_s
 	SQLHSTMT	hstmt;
 	SQLSMALLINT     col_num;
 	ZBX_ODBC_ROW	row_data;
-	SQLINTEGER	*data_len;
+	SQLLEN		*data_len;
 } ZBX_ODBC_DBH;
 
 typedef ZBX_ODBC_DBH*		ZBX_ODBC_RESULT;
 
-int		odbc_DBconnect(ZBX_ODBC_DBH *pdbh, const char *db_name, const char *user, const char *pass);
+int		odbc_DBconnect(ZBX_ODBC_DBH *pdbh, char *db_name, char *user, char *pass, int login_timeout);
 void		odbc_DBclose(ZBX_ODBC_DBH *pdbh);
 
-ZBX_ODBC_RESULT odbc_DBselect(ZBX_ODBC_DBH *pdbh, const char *query);
+ZBX_ODBC_RESULT odbc_DBselect(ZBX_ODBC_DBH *pdbh, char *query);
 ZBX_ODBC_ROW    odbc_DBfetch(ZBX_ODBC_RESULT pdbh);
 
-const char	*get_last_odbc_strerror();
+const char	*get_last_odbc_strerror(void);
 
 #endif /* ZABBIX_ZODBC_H */
