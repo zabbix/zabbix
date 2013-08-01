@@ -7,6 +7,7 @@ New features:
 ...G...... [ZBXNEXT-1528] added net.if.in, net.if.out and net.if.total item support on HP-UX platforms (igors)
 
 Bug fixes:
+..F....... [ZBX-6793] removed irrelevant condition for pie graphs that decide we should use data from history (Guntis)
 ..F....... [ZBX-4986] absolute urls replaced with relative (Guntis)
 ....I..... [ZBX-6831] fixed webtest item conversion in 1.8->2.0 database upgrade patch for mysql (wiper)
 .......PS. [ZBX-6451] fixed items,items_unsupported internal checks counting discovery rules as items (wiper)
