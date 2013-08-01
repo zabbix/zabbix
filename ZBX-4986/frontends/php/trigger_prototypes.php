@@ -314,12 +314,10 @@ elseif (isset($_REQUEST['form'])) {
 else {
 	$data = array(
 		'parent_discoveryid' => get_request('parent_discoveryid'),
-		'showErrorColumn' => false,
 		'discovery_rule' => $discovery_rule,
 		'hostid' => get_request('hostid'),
 		'showdisabled' => get_request('showdisabled', 1),
-		'triggers' => array(),
-		'displayNodes' => false
+		'triggers' => array()
 	);
 	CProfile::update('web.triggers.showdisabled', $data['showdisabled'], PROFILE_TYPE_INT);
 
