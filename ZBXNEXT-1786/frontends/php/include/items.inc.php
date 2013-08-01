@@ -817,13 +817,15 @@ function get_items_data_overview($hostids, $application, $viewMode) {
 		foreach ($hostnames as $hostId => $hostName) {
 			$host = $hosts[$hostId];
 
+			$menuPopupId = CMenuPopup::getId();
+
 			$name = new CSpan($host['name'], 'link_menu');
-			$name->attr('data-menupopupid', $hostId);
+			$name->attr('data-menupopupid', $menuPopupId);
 
 			$hostDiv = new CDiv(array(
 				$name,
 				new CMenuPopup(array(
-					'id' => $hostId,
+					'id' => $menuPopupId,
 					'scripts' => $scripts[$hostId],
 					'goto' => array(
 						'params' => array(

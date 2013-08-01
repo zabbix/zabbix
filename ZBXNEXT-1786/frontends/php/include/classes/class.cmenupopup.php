@@ -35,7 +35,7 @@ class CMenuPopup extends CTag {
 	 */
 	public function __construct(array $options = array()) {
 		parent::__construct('div', 'yes');
-		$this->attr('id', $options['id']);
+		$this->attr('id', isset($options['id']) ? $options['id'] : null);
 		$this->addClass('menuPopup');
 
 		// scripts
@@ -168,10 +168,10 @@ class CMenuPopup extends CTag {
 		}
 
 		// insert js
-		if (!defined('IS_MENU_POPUP_JS_INSERTED')) {
-			define('IS_MENU_POPUP_JS_INSERTED', true);
+		if (empty($options['isMap'])) {
+			if (!defined('IS_MENU_POPUP_COMMON_JS_INSERTED')) {
+				define('IS_MENU_POPUP_COMMON_JS_INSERTED', true);
 
-			if (empty($options['isMap'])) {
 				insert_js('
 					jQuery(document).ready(function() {
 						jQuery("[data-menupopupid]").click(function() {
@@ -201,23 +201,47 @@ class CMenuPopup extends CTag {
 					});'
 				);
 			}
+		}
 
-			// map
-			else {
+		// map
+		else {
+			if (!defined('IS_MENU_POPUP_MAP_JS_INSERTED')) {
+				define('IS_MENU_POPUP_MAP_JS_INSERTED', true);
+
 				insert_js('
 					jQuery(document).ready(function() {
 						jQuery(".map-container [data-menupopup]").click(function(e) {
-							var container = jQuery("<div>", {
+							var iframe = jQuery("#iframe"),
+								mapContainer = jQuery(this).parent().parent(),
+								container = jQuery(".menuPopupContainer", mapContainer),
+								top = e.clientY + document.body.scrollTop,
+								left = e.clientX;
+
+							if (iframe.length > 0) {
+								top -= iframe.position().top;
+							}
+
+							if (container.length > 0) {
+								container.html(jQuery(this).data("menupopup"));
+								container.css({
+									top: top,
+									left: left
+								});
+							}
+							else {
+								container = jQuery("<div>", {
+									"class": "menuPopupContainer",
 									html: jQuery(this).data("menupopup"),
 									css: {
 										position: "absolute",
-										top: e.pageY,
-										left: e.pageX
+										top: top,
+										left: left
 									}
 								}),
-								obj = container.children();
+								mapContainer.append(container);
+							}
 
-							jQuery(".map-container").append(container);
+							obj = container.children();
 
 							if (empty(obj.data("isLoaded"))) {
 								jQuery(".menuPopup").css("display", "none");
@@ -245,6 +269,75 @@ class CMenuPopup extends CTag {
 					});'
 				);
 			}
+		}
+
+		// insert script dialog
+		if (!empty($options['scripts']) && !defined('IS_MENU_POPUP_SCRIPT_DIALOG_JS_INSERTED')) {
+			define('IS_MENU_POPUP_SCRIPT_DIALOG_JS_INSERTED', true);
+
+			insert_js('
+				jQuery(document).ready(function() {
+					jQuery("body").append(jQuery("<div>", {
+						id: "scriptDialog",
+						css: {
+							display: "none",
+							"white-space": "normal",
+							"z-index": 1000
+						}
+					}));
+				});
+
+				function showScriptDialog(confirmation, buttons) {
+					var obj = jQuery("#scriptDialog");
+
+					obj.text(confirmation);
+
+					var width = obj.outerWidth() + 20;
+
+					obj.dialog({
+						buttons: buttons,
+						draggable: false,
+						modal: true,
+						width: (width > 600 ? 600 : "inherit"),
+						resizable: false,
+						minWidth: 200,
+						minHeight: 100,
+						title: '.CJs::encodeJson(_('Execution confirmation')).',
+						close: function() {
+							jQuery(this).dialog("destroy");
+						}
+					});
+
+					return obj.dialog("widget");
+				}
+
+				function executeScript(hostId, scriptId, confirmation) {
+					var execute = function() {
+						openWinCentered("scripts_exec.php?execute=1&hostid=" + hostId + "&scriptid=" + scriptId, "Tools", 560, 470,
+							"titlebar=no, resizable=yes, scrollbars=yes, dialog=no"
+						);
+					};
+
+					if (confirmation == "") {
+						execute();
+					}
+					else {
+						var buttons = [
+							{text: '.CJs::encodeJson(_('Execute')).', click: function() {
+								jQuery(this).dialog("destroy");
+								execute();
+							}},
+							{text: '.CJs::encodeJson(_('Cancel')).', click: function() {
+								jQuery(this).dialog("destroy");
+							}}
+						];
+
+						showScriptDialog(confirmation, buttons);
+
+						jQuery(".ui-dialog-buttonset button:first").addClass("main");
+					}
+				}'
+			);
 		}
 	}
 
@@ -333,5 +426,9 @@ class CMenuPopup extends CTag {
 				'items' => array()
 			);
 		}
+	}
+
+	public static function getId() {
+		return uniqid();
 	}
 }

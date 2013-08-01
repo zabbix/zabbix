@@ -19,7 +19,6 @@
 **/
 
 
-require_once dirname(__FILE__).'/js/general.script.confirm.js.php';
 zbx_add_post_js('jqBlink.blink();');
 
 $overviewWidget = new CWidget();

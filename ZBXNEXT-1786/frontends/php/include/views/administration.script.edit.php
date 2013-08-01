@@ -20,7 +20,6 @@
 
 
 include('include/views/js/administration.script.edit.js.php');
-include('include/views/js/general.script.confirm.js.php');
 
 $scriptsWidget = new CWidget();
 $scriptsWidget->addPageHeader(_('CONFIGURATION OF SCRIPTS'));

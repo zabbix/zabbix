@@ -123,7 +123,6 @@ function getActionMapBySysmap($sysmap, array $options = array()) {
 		order_result($elem['urls'], 'name');
 
 		$menuPopupOptions = array(
-			'id' => $elem['elementid'],
 			'isMap' => true,
 			'goto' => array(
 				'params' => array(),

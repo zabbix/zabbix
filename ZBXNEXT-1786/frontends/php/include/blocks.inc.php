@@ -919,11 +919,13 @@ function make_latest_issues(array $filter = array()) {
 		$hostId = $trigger['hostid'];
 		$host = $hosts[$hostId];
 
+		$menuPopupId = CMenuPopup::getId();
+
 		$hostName = new CSpan($host['name'], 'link_menu');
-		$hostName->attr('data-menupopupid', $hostId);
+		$hostName->attr('data-menupopupid', $menuPopupId);
 
 		$hostMenuPopup = new CMenuPopup(array(
-			'id' => $hostId,
+			'id' => $menuPopupId,
 			'scripts' => $scripts[$hostId],
 			'goto' => array(
 				'params' => array(

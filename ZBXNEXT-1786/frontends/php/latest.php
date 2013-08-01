@@ -175,7 +175,6 @@ $latest_wdgt->addFlicker($filterForm, CProfile::get('web.latest.filter.state', 1
 validate_sort_and_sortorder('i.name',ZBX_SORT_UP);
 
 // js templates
-require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php';
 require_once dirname(__FILE__).'/include/views/js/monitoring.latest.js.php';
 
 $link = new CCol(new CDiv(null, 'app-list-toggle-all icon-plus-9x9'));
@@ -394,13 +393,15 @@ foreach ($db_apps as $appid => $dbApp) {
 	$hostDiv = null;
 
 	if ($_REQUEST['hostid'] == 0) {
+		$menuPopupId = CMenuPopup::getId();
+
 		$hostName = new CSpan($host['name'], 'link_menu');
-		$hostName->attr('data-menupopupid', $appid);
+		$hostName->attr('data-menupopupid', $menuPopupId);
 
 		$hostDiv = new CDiv(array(
 			$hostName,
 			new CMenuPopup(array(
-				'id' => $appid,
+				'id' => $menuPopupId,
 				'scripts' => $scripts[$host['hostid']],
 				'goto' => array(
 					'params' => array(
@@ -613,13 +614,15 @@ foreach ($db_hosts as $hostId => $dbHost) {
 	$hostDiv = null;
 
 	if ($_REQUEST['hostid'] == 0) {
+		$menuPopupId = CMenuPopup::getId();
+
 		$hostName = new CSpan($host['name'], 'link_menu');
-		$hostName->attr('data-menupopupid', $hostId);
+		$hostName->attr('data-menupopupid', $menuPopupId);
 
 		$hostDiv = new CDiv(array(
 			$hostName,
 			new CMenuPopup(array(
-				'id' => $hostId,
+				'id' => $menuPopupId,
 				'scripts' => $scripts[$host['hostid']],
 				'goto' => array(
 					'params' => array(

@@ -1201,13 +1201,15 @@ function get_triggers_overview($hostids, $application, $view_style = null, $scre
 		$scripts = API::Script()->getScriptsByHosts(zbx_objectValues($hosts, 'hostid'));
 
 		foreach ($hostNames as $hostId => $hostName) {
+			$menuPopupId = CMenuPopup::getId();
+
 			$name = new CSpan($hostName, 'link_menu');
-			$name->attr('data-menupopupid', $hostId);
+			$name->attr('data-menupopupid', $menuPopupId);
 
 			$hostDiv = new CDiv(array(
 				$name,
 				new CMenuPopup(array(
-					'id' => $hostId,
+					'id' => $menuPopupId,
 					'scripts' => $scripts[$hostId],
 					'goto' => array(
 						'params' => array(
@@ -1596,13 +1598,15 @@ function make_trigger_details($trigger) {
 	));
 	$host = reset($hosts);
 
+	$menuPopupId = CMenuPopup::getId();
+
 	$hostName = new CSpan($host['name'], 'link_menu');
-	$hostName->attr('data-menupopupid', $hostId);
+	$hostName->attr('data-menupopupid', $menuPopupId);
 
 	$hostDiv = new CDiv(array(
 		$hostName,
 		new CMenuPopup(array(
-			'id' => $hostId,
+			'id' => $menuPopupId,
 			'hostid' => $hostId,
 			'scripts' => true,
 			'goto' => array(

@@ -708,14 +708,17 @@ else {
 
 				// host JS menu link
 				$hostDiv = null;
+
 				if ($_REQUEST['hostid'] == 0) {
+					$menuPopupId = CMenuPopup::getId();
+
 					$hostName = new CSpan($host['name'], 'link_menu');
-					$hostName->attr('data-menupopupid', $event['objectid']);
+					$hostName->attr('data-menupopupid', $menuPopupId);
 
 					$hostDiv = new CDiv(array(
 						$hostName,
 						new CMenuPopup(array(
-							'id' => $event['objectid'],
+							'id' => $menuPopupId,
 							'scripts' => $scripts[$host['hostid']],
 							'goto' => array(
 								'params' => array(
@@ -800,9 +803,6 @@ $objData = array(
 zbx_add_post_js('jqBlink.blink();');
 zbx_add_post_js('timeControl.addObject("scroll_events_id", '.zbx_jsvalue($timeline).', '.zbx_jsvalue($objData).');');
 zbx_add_post_js('timeControl.processObjects();');
-
-// js templates
-require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php';
 
 $eventsWidget->show();
 

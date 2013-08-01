@@ -19,8 +19,6 @@
 **/
 
 
-require_once dirname(__FILE__).'/js/general.script.confirm.js.php';
-
 $slideWidget = new CWidget('hat_slides');
 
 // create header form

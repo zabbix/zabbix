@@ -33,9 +33,6 @@ if ($page['type'] == PAGE_TYPE_HTML) {
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
-// js templates
-require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php';
-
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = array(
 	'groupid' =>			array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
@@ -654,13 +651,15 @@ foreach ($triggers as $trigger) {
 			}
 		}
 
+		$menuPopupId = CMenuPopup::getId();
+
 		$hostName = new CSpan($triggerHost['name'], 'link_menu');
-		$hostName->attr('data-menupopupid', $trigger['triggerid']);
+		$hostName->attr('data-menupopupid', $menuPopupId);
 
 		$hostDiv = new CDiv(array(
 			$hostName,
 			new CMenuPopup(array(
-				'id' => $trigger['triggerid'],
+				'id' => $menuPopupId,
 				'scripts' => $scripts,
 				'goto' => array(
 					'params' => array(
