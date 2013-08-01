@@ -1085,9 +1085,6 @@ elseif ($srctbl == 'graphs') {
 		$graph['hostname'] = $host['name'];
 		$description = new CSpan($graph['name'], 'link');
 		$graph['name'] = $graph['hostname'].NAME_DELIMITER.$graph['name'];
-		if (!$templated) {
-			$description = new CSpan($graph['name'], 'link');
-		}
 
 		if ($multiselect) {
 			$js_action = 'javascript: addValue('.zbx_jsvalue($reference).', '.zbx_jsvalue($graph['graphid']).');';
