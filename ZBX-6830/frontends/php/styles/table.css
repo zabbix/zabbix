@@ -1,0 +1,1269 @@
+/* CSS Document */
+table{
+	border-spacing:	0; /* cellspacing */
+}
+
+table.whitetext {
+	border-spacing:	0; /* cellspacing */
+	color: #CCCCCC;
+}
+
+table.home{
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size:10px;
+}
+
+table.nowrap tr td {
+	white-space: nowrap;
+	word-spacing: 0;
+}
+
+td,tr{
+	color: inherit;
+	font-family:Verdana, Arial, Helvetica, sans-serif;
+	font-size:10px;
+	text-decoration: none;
+}
+
+td.center{
+	text-align: center;
+}
+
+td.left{
+	text-align: left;
+}
+
+td.right{
+	text-align: right;
+}
+
+td.top{
+	vertical-align: top;
+}
+
+/**************** PAGE TABLE ****************/
+/* page_header */
+table.page_header{
+	background-color: #FFFFFF;
+	border: 0 solid #000000;
+	padding-right: 0;
+	padding-left: 0;
+	width: 100%;
+}
+
+table.page_header tr td.page_header_l{
+	vertical-align: middle;
+	padding: 0;
+}
+
+table.page_header tr td.page_header_r{
+	vertical-align: middle;
+	text-align: right;
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 10pt;
+}
+table.page_header tr td.page_header_r a{
+	margin: 0 5px;
+}
+/* footer */
+
+table.page_footer{
+	color: #FFFFFF;
+	background: #5C7099 url('../images/gradients/table_head.gif') repeat-x top left;
+	font-weight: bold;
+	border-top: 17px solid #E5E5E5;
+	width: 100%;
+}
+
+table.page_footer tr td.page_footer_l{
+	font-family:verdana, arial, helvetica, sans-serif;
+	font-size:10px;
+	height: 24px;
+	text-align: center;
+}
+
+table.page_footer tr td.page_footer_r{
+	font-family:verdana, arial, helvetica, sans-serif;
+	font-size:10px;
+	height: 24px;
+	text-align: right;
+}
+
+/********** FORM TABLE *************/
+table.formtable {
+	background-color: #FFFFFF;
+	color: #000000;
+	border: 1px solid #AAAAAA;
+	width: 50%;
+	margin: auto;
+}
+
+table.formtable tr td {
+	padding-left: 5px;
+	padding-right: 5px;
+	color: #000000;
+	font-family: verdana, arial, helvetica, sans-serif;
+	font-size: 10px;
+	height: 24px;
+	white-space: nowrap;
+	word-spacing: 0;
+	text-align: left;
+	text-decoration: none;
+	border: 0;
+}
+
+table.formtable tr.new td {
+	background-color: #E0F0E0;
+}
+
+table.formtable tr.edit {
+	background-color: #F0F0E0;
+}
+
+table.formtable tr.form_odd_row td{
+	background-color: #D8D8D8;
+}
+
+table.formtable tr.form_even_row td{
+	background-color: #DFDFDF;
+}
+
+table.formtable tr td {
+        text-decoration: none;
+	background-color: #EEEEEE;
+}
+
+table.formtable tr td.form_row_first{
+	background: #5C7099 url('../images/gradients/table_head2.gif') repeat-x top left;
+	color: #FFFFFF;
+	font-size:11px;
+	font-weight: bold;
+}
+
+table.formtable tr td.form_row_last {
+	color: #FFFFFF;
+	background: #5C7099 url('../images/gradients/table_head2.gif') repeat-x top left;
+	text-align: right;
+}
+
+/* left cell */
+table.formtable tr td.form_row_l {
+	width: 30%;
+}
+/* center cell */
+table.formtable tr td.form_row_c {
+	text-align: center;
+}
+/* right cell */
+table.formtable tr td.form_row_r { }
+
+table.formtable tr td.form_row_r table.calendar tr td{ /* right cell */
+	padding-left: 1px;
+	padding-right: 1px;
+}
+
+table.formlongtable{
+	width: 99%;
+}
+
+/*----------------- <TABLESTRIPPED> ----------------*/
+
+table.tablestripped {
+	color: #000000;
+	border: 1px solid #AAAAAA;
+	width: 100%;
+	text-decoration: none;
+}
+
+table.tablestripped tr > td:first-child{
+	width: 1%;
+}
+table.tablestripped tr >/**/ td:first-child{
+	width: 1px;
+}
+
+table.tablestripped tr td {
+	padding-left: 5px;
+	padding-right: 5px;
+	font-family: verdana, arial, helvetica, sans-serif;
+	font-size:10px;
+	height: 24px;
+	white-space: nowrap;
+	word-spacing: 0;
+}
+
+table.tablestripped tr.form_odd_row td{
+	background-color:#D8D8D8;
+}
+
+table.tablestripped tr.form_even_row td{
+	background-color:#DFDFDF;
+}
+
+table.tablestripped tr.header td{
+	color: #FFFFFF;
+	background: #5C7099 url('../images/gradients/table_head2.gif') repeat-x top left;
+	text-align: left;
+}
+
+table.tablestripped tr.footer td{
+	color: #FFFFFF;
+	background: #5C7099 url('../images/gradients/table_head2.gif') repeat-x top left;
+	text-align: right;
+}
+
+/*----------------- </TABLESTRIPPED> ----------------*/
+
+td.form_row_l_simple { /* left cell simple */
+	border-color: #AAAAAA;
+	text-align:	left;
+	white-space: nowrap;
+	word-spacing: 0;
+	width: 50%;
+}
+
+td.form_row_r_simple { /* right cell simple */
+	border-color: #AAAAAA;
+	text-align: left;
+}
+/*-------------- <SERVICES> -----------------*/
+
+
+/*-------------- </SERVICES> -----------------*/
+
+/************ HISTORY LOG TABLE ***********/
+table.log_history_table {
+	background-color: #AAAAAA;
+	width: 100%;
+	border-color: gray;
+	border-spacing: 1px 1px;
+}
+table.log_history_table tr td {
+	white-space: nowrap;
+	text-decoration: none;
+	background-color: #EEE;
+}
+
+/* table.log_history_table tr:hover td		{	background-color: #EEEEFE; } */
+
+table.log_history_table tr.mark_as_red td	{	background-color: #FFBBBB; }
+table.log_history_table tr.mark_as_green td	{	background-color: #BBFFBB; }
+table.log_history_table tr.mark_as_blue td	{	background-color: #BBBBFF; }
+
+table.log_history_table tr.header td {
+	padding-right: 5px;
+	padding-left: 5px;
+	white-space: nowrap;
+	word-spacing: 0;
+	text-align: left;
+	font-weight: bold;
+	background-color:#CCCCCC;
+}
+table.log_history_table tr td.message {
+	text-align: center;
+}
+
+/************* CHART TABLE ***************/
+table.chart{
+	width: 100%;
+	background-color: #DDDDDD;
+	text-align: center;
+}
+
+/************* SCREEN TABLE ***************/
+table.screen_edit{
+	background-color: #FFFFFF;
+	width: 100%;
+	border: 1px outset #DDDDDD;
+}
+
+table.screen_edit td{
+	background-color: #FFFFFF;
+	border: 1px inset #DDDDDD;
+	text-align: center;
+	vertical-align: middle;
+}
+
+table.screen_edit tr td.def_def {	text-align: center;	vertical-align: middle;		}
+table.screen_edit tr td.def_top {	text-align: center;	vertical-align: top;		}
+table.screen_edit tr td.def_mdl {	text-align: center;	vertical-align: middle;		}
+table.screen_edit tr td.def_btm {	text-align: center;	vertical-align: bottom;		}
+
+table.screen_edit tr td.left_top {	text-align: left;	vertical-align: top;		}
+table.screen_edit tr td.left_mdl {	text-align: left;	vertical-align: middle;		}
+table.screen_edit tr td.left_bttm {	text-align: left;	vertical-align: bottom;		}
+
+table.screen_edit tr td.cntr_top {	text-align: center;	vertical-align: top;		}
+table.screen_edit tr td.cntr_mdl {	text-align: center;	vertical-align: middle;		}
+table.screen_edit tr td.cntr_bttm {	text-align: center;	vertical-align: bottom;		}
+
+table.screen_edit tr td.right_top {	text-align: right;	vertical-align: top;		}
+table.screen_edit tr td.right_mdl {	text-align: right;	vertical-align: middle;		}
+table.screen_edit tr td.right_bttm {	text-align: right;	vertical-align: bottom;		}
+
+table.screen_view{
+	background-color: #FFFFFF;
+	width: 100%;
+	border: 1px #DDDDDD;
+}
+
+table.screen_view td{
+	background-color: #FFFFFF;
+	border: 1px #DDDDDD;
+	text-align: center;
+	vertical-align: middle;
+}
+
+table.screen_view iframe {
+	border: 0;
+}
+
+table.screen_view tr td.def_def {	text-align: center;	vertical-align: middle;		}
+table.screen_view tr td.def_top {	text-align: center;	vertical-align: top;		}
+table.screen_view tr td.def_mdl {	text-align: center;	vertical-align: middle;		}
+table.screen_view tr td.def_btm {	text-align: center;	vertical-align: bottom;		}
+
+table.screen_view tr td.left_top {	text-align: left;	vertical-align: top;		}
+table.screen_view tr td.left_mdl {	text-align: left;	vertical-align: middle;		}
+table.screen_view tr td.left_bttm {	text-align: left;	vertical-align: bottom;		}
+
+table.screen_view tr td.cntr_top {	text-align: center;	vertical-align: top;		}
+table.screen_view tr td.cntr_mdl {	text-align: center;	vertical-align: middle;		}
+table.screen_view tr td.cntr_bttm {	text-align: center;	vertical-align: bottom;		}
+
+table.screen_view tr td.right_top {	text-align: right;	vertical-align: top;		}
+table.screen_view tr td.right_mdl {	text-align: right;	vertical-align: middle;		}
+table.screen_view tr td.right_bttm {	text-align: right;	vertical-align: bottom;		}
+
+/*****************************************/
+/*************** Table Info **************/
+
+table.tableinfo{
+	empty-cells:show;
+	color: #000000;
+	width: 100%;
+	background-color: #AAAAAA;
+	border-spacing: 1px;
+
+/*	border: 1px #AAAAAA dotted; */
+}
+
+table.tableinfo tr td {
+	white-space: nowrap;
+	word-spacing: 0;
+	font-family:verdana, arial, helvetica, sans-serif;
+	font-size:8pt;
+	font-weight: normal;
+	text-decoration: none;
+	text-align: left;
+	border: 0;
+	padding-top: 0;
+	padding-bottom: 0;
+	height: 22px;
+}
+
+table.tableinfo tr.header td {
+	white-space: nowrap;
+	word-spacing: 0;
+	font-weight: bold;
+	background-color:#CCCCCC;
+	border-width: 0;
+}
+
+table.tableinfo tr.header td.hover_grey {
+	white-space: nowrap;
+	word-spacing: 0;
+	font-weight: bold;
+	background-color:#CCCCCC;
+	border-width: 0;
+	cursor: pointer;
+}
+
+table.tableinfo tr.header td.hover_grey:hover  {
+	color: #EEEEEE;
+	background-color:#999999;
+}
+
+
+
+table.tableinfo tr.vertical_header td {
+	padding: 5px 0 5px 5px;
+	margin: 0;
+	white-space: nowrap;
+	word-spacing: 0;
+	font-weight: bold;
+	background-color:#CCCCCC;
+	width: 20px;
+	text-align: center;
+}
+table.tableinfo tr.vertical_header td.left {
+	text-align: left;
+}
+table.tableinfo tr.vertical_header td.hover_grey:hover{
+	color: #EEEEEE;
+	background-color:#999999;
+	cursor: pointer;
+}
+
+table.tableinfo tr.footer td {
+	color: #FFFFFF;
+	background: #6d88ad url('../images/gradients/table_head2.gif') repeat-x top left;
+	vertical-align: middle;
+	padding-right: 5px;
+	padding-left: 5px;
+	font-family:verdana, arial, helvetica, sans-serif;
+	font-size:10px;
+}
+
+table.tableinfo tr > td:first-child{
+	width: 1%;
+}
+table.tableinfo tr >/**/ td:first-child{
+	width: 1px;
+}
+
+table.tableinfo tr td.wraptext {
+	white-space:normal;
+}
+
+table.tableinfo tr td.message {
+	text-align: center;
+}
+
+table.tableinfo tr td.pre {
+	white-space: pre;
+}
+
+table.tableinfo tr.selected > td { background-color: #FFFFBB; }
+table.tableinfo tr.selected:hover > td { background-color: #BBCCFF; }
+
+table.tableinfo tr.odd_row > td { background-color: #DDDDDD; }
+table.tableinfo tr.odd_row:hover > td { background-color: #BBCCFF; }
+
+table.tableinfo tr.even_row > td { background-color: #EEEEEE; }
+table.tableinfo tr.even_row:hover > td{ background-color: #BBCCFF; }
+
+table.tableinfo tr > td.center { vertical-align: middle; text-align: center; }
+
+table.tableinfo tr > td.disaster_empty { border: 1px #FF0000 solid; }
+table.tableinfo tr:hover > td.disaster_empty { border: 1px #FF0000 solid; }
+
+table.tableinfo tr > td.disaster { background-color: #FF0000;	border: 1px #FF0000 solid; }
+table.tableinfo tr:hover > td.disaster { background-color: #FA0000;	border: 1px #FA0000 solid; }
+
+table.tableinfo tr > td.high_empty { border: 1px #FF8888 solid; }
+table.tableinfo tr:hover > td.high_empty { border: 1px #FF8888 solid; }
+
+table.tableinfo tr > td.high				{	background-color: #FF8888;	border: 1px #FF8888 solid; }
+table.tableinfo tr:hover > td.high			{	background-color: #FA8388;	border: 1px #FA8388 solid; }
+
+table.tableinfo tr > td.average_empty			{	border: 1px #DDAAAA solid; }
+table.tableinfo tr:hover > td.average_empty		{	border: 1px #DDAAAA solid; }
+
+table.tableinfo tr > td.average				{	background-color: #DDAAAA;	border: 1px #DDAAAA solid; }
+table.tableinfo tr:hover > td.average			{	background-color: #D8A5AA;	border: 1px #D8A5AA solid; }
+
+table.tableinfo tr > td.warning_empty			{	border: 1px #EFEFCC solid; }
+table.tableinfo tr:hover > td.warning_empty		{	border: 1px #EAEACC solid; }
+
+table.tableinfo tr > td.warning				{	background-color: #EFEFCC;	border: 1px #EFEFCC solid; }
+table.tableinfo tr:hover > td.warning			{	background-color: #EAEACC;	border: 1px #EAEACC solid; }
+
+table.tableinfo tr > td.information_empty			{	border: 1px #BBE2BB solid; }
+table.tableinfo tr:hover > td.information_empty		{	border: 1px #B7DDBB solid; }
+
+table.tableinfo tr > td.information			{	background-color: #BBE2BB;	border: 1px #CCE2CC solid; }
+table.tableinfo tr:hover > td.information			{	background-color: #B7DDBB;	border: 1px #C7DDCC solid; }
+
+table.tableinfo tr > td.unknown_trigger_empty		{	border: 1px #ACACAC solid; }
+table.tableinfo tr:hover > td.unknown_trigger_empty	{	border: 1px #ACA7AC solid; }
+
+table.tableinfo tr > td.unknown_trigger			{	background-color: #BCBCBC;	border: 1px #BCBCBC solid; }
+table.tableinfo tr:hover > td.unknown_trigger		{	background-color: #BCB7BC;	border: 1px #BCB7BC solid; }
+
+table.tableinfo tr > td.normal				{	background-color: #AAFFAA;	border: 1px #AAFFAA solid; }
+table.tableinfo tr:hover > td.normal			{	background-color: #AAF9AA;	border: 1px #AAF9AA solid; }
+
+table.tableinfo tr > td.active				{	background-color: #AADDAA;	border: 1px #AADDAA solid; color: #222222;}
+table.tableinfo tr:hover > td.active			{	background-color: #AAD9AA;	border: 1px #AAD9AA solid; }
+
+table.tableinfo tr > td.inactive				{	background-color: #FF8888;	border: 1px #FF8888 solid; color: #222222;}
+table.tableinfo tr:hover > td.inactive			{	background-color: #FA8388;	border: 1px #FA8388 solid; }
+
+table.tableinfo tr.red						{	background-color: #FFBBBB; border: 1px #FFBBBB solid; }
+table.tableinfo tr.red:hover				{	background-color: #EEAAAA; border: 1px #EEAAAA solid; }
+
+table.tableinfo tr.green					{	background-color: #BBFFBB; border: 1px #BBFFBB solid; }
+table.tableinfo tr.green:hover				{	background-color: #AAEEAA; border: 1px #AAEEAA solid; }
+
+table.tableinfo tr.blue 					{	background-color: #BBBBFF; border: 1px #BBBBFF solid; }
+table.tableinfo tr.blue:hover 				{	background-color: #AAAAEE; border: 1px #AAAAEE solid; }
+
+/****** HEADER *********/
+
+table.header{
+	width: 100%;
+	color: #FFFFFF;
+	background: #6d88ad url('../images/gradients/table_head2.gif') repeat-x top left;
+	border: 0 solid #000000;
+	vertical-align: middle;
+}
+
+table.header tr td.header_l{
+	background:none;
+	font-family:verdana, arial, helvetica, sans-serif;
+	font-size:10px;
+	text-align: left;
+	height: 24px;
+	padding-left: 5px;
+	border-width: 0;
+}
+table.header tr td.header_r{
+	background:none;
+	font-family:verdana, arial, helvetica, sans-serif;
+	font-size:10px;
+	text-align: right;
+	height: 24px;
+	padding-right: 5px;
+	border-width: 0;
+}
+
+table.header a{
+	color: #FFFFFF;
+}
+
+table.bottom_space{
+	margin-bottom: 5px;
+}
+/****** FLICKER *********/
+table.flicker{
+	width: 100%;
+	color: #FFFFFF;
+	background: #6d88ad url('../images/gradients/menu_not_active2.gif') repeat-x top left;
+	border: 0 #000000 solid;
+	vertical-align:middle;
+}
+
+table.flicker tr td.flicker_c{
+	font-family:verdana, arial, helvetica, sans-serif;
+	font-size:10px;
+	height: 16px;
+	padding-left: 4px;
+	padding-right: 4px;
+	line-height: 12px;
+}
+
+table.flicker tr td.flicker_l{
+	font-family:verdana, arial, helvetica, sans-serif;
+	font-size:10px;
+	text-align: left;
+	height: 16px;
+	padding-left: 4px;
+	line-height: 12px;
+}
+table.flicker tr td.flicker_r{
+	font-family:verdana, arial, helvetica, sans-serif;
+	font-size:10px;
+	text-align: right;
+	height: 16px;
+	padding-right: 4px;
+	line-height: 12px;
+}
+
+table.flicker a{
+	color: #0BF;
+}
+
+table.itemfilter{
+	border: 1px solid #777777;
+	width: 100%;
+	background-color: white;
+}
+
+/**************** Aknowledges ****************/
+
+table.ack_msgs{
+	width: 70%;
+	background-color: #EEEEEE;
+	padding: 0;
+	border: 0 solid;
+}
+table.ack_msgs tr.title {
+	height: 14px;
+	vertical-align: middle;
+	color: #FFFFFF;
+	background: #5C7099 url('../images/gradients/table_head2.gif') repeat-x top left;
+}
+
+table.ack_msgs tr td.user{
+	padding-left: 10px;
+	padding-right: 10px;
+	text-align: left;
+}
+table.ack_msgs tr td.time{
+	padding-left: 10px;
+	padding-right: 10px;
+	text-align: center;
+	width: 150px;
+}
+table.ack_msgs tr.msg{
+	height: 25px;
+	background-color: #F8F8F8;
+}
+table.ack_msgs tr.msg td{
+	padding: 5px;
+	text-align: left;
+	vertical-align: top;
+	border: 1px dotted black;
+}
+
+/**************** TABLE FOR RIGHT DISPLAYING *********/
+
+.right_header {
+	font-weight: bold;
+	text-align: center;
+	border-left-style: solid;
+	border-right-style: solid;
+	border-bottom-style: none;
+	border-color: #AAAAAA;
+}
+
+table.right_table{
+	width: 100%;
+	border-width: 0;
+	margin: 0;
+	padding: 0;
+}
+
+table.right_table tr.header td{
+	font-weight: bold;
+	text-align: left;
+}
+
+table.right_table td{
+	margin: 0;
+	padding: 0;
+	text-align: right;
+	white-space: nowrap;
+	word-spacing: 0;
+}
+
+table.right_table select{
+	width: 200px;
+}
+
+table.right_table tr td.read_write select { color: #008800; width: 320px;}
+table.right_table tr td.read_only select { color: #CC8800; width: 320px;}
+table.right_table tr td.deny select { color: #CC0000; width: 320px;}
+
+/**************** GRAPH ****************/
+
+table.graph{
+	width: 100%;
+	text-align: center;
+}
+
+/**************** MAP ****************/
+
+table.map{
+	text-align: left;
+	border-width:0;
+	padding-top: 1px;
+	padding-bottom: 5px;
+}
+
+/************* MENU ************/
+
+table.menu{
+	height: 24px;
+	background-color: #FFFFFF;
+	color: #000000;
+	border: 0 solid #000000;
+}
+
+table.menu tr{
+	background: #AAAAAA url('../images/gradients/menu_not_active.gif') repeat-x top left;
+	padding-right: 5px;
+	padding-left: 5px;
+}
+
+table.menu td{
+	color: #ffffff;
+	font-family: verdana, arial, helvetica, sans-serif;
+	font-size:10px;
+	font-weight: bold;
+	border: 1px solid #aaaaaa;
+}
+
+table.menu tr td:hover{
+	cursor: pointer;
+}
+
+table.menu tr td.active{
+	background: #5C7099 url('../images/gradients/table_head.gif') repeat-x top left;
+	border-color: #6666AA;
+}
+
+/************* SUB MENU ************/
+
+table.sub_menu{
+	height: 24px;
+	background-color: #0000FC;
+	color: #000000;
+	border: 0 solid #000000;
+	width: 100%;
+/*	margin-bottom: 1px;*/
+}
+
+table.sub_menu tr{
+	color: #FFFFFF;
+	font-family:verdana, arial, helvetica, sans-serif;
+	font-size:10px;
+	background: #5C7099 url('../images/gradients/table_head.gif') repeat-x top left;
+	border: 0;
+	padding-right: 5px;
+	padding-left: 5px;
+}
+
+table.sub_menu tr td{
+	padding-top: 0;
+	padding-bottom: 0;
+}
+
+table.sub_menu tr td span.active a.highlight{
+	color: #ffcc00;
+}
+
+/**************** TRIGGERS INFORMATION MODULE ****************/
+table.triggers_info {
+	width: 100%;
+	background-color: #FFFFFF;
+	border: 0;
+}
+
+table.triggers_info tr td {
+	border: 0;
+	white-space: nowrap;
+	word-spacing: 0;
+	padding: 0 5px;
+	font-weight: bold;
+	color: #191970;
+	text-align: left;
+	font-family: Verdana, Helvetica, Geneva;
+	font-size: 11px;
+	height: 18px;
+}
+
+table.triggers_info tr td.header {
+	background: #5C7099 url('../images/gradients/table_head2.gif') repeat-x top left;
+	color: #FFFFFF;
+}
+table.triggers_info tr td 			{	background-color: #CCCCCC;	}
+table.triggers_info tr td.disaster		{	background-color: #FF0000;	}
+table.triggers_info tr td.high			{	background-color: #FF8888;	}
+table.triggers_info tr td.average		{	background-color: #DDAAAA;	}
+table.triggers_info tr td.warning		{	background-color: #EFEFCC;	}
+table.triggers_info tr td.information		{	background-color: #CCE2CC;	}
+table.triggers_info tr td.unknown_trigger	{	background-color: #BCBCBC;	}
+table.triggers_info tr td.normal		{	background-color: #AADDAA; 	}
+
+/**************** HOSTS INFORMATION MODULE ****************/
+table.hosts_info {
+	width: 100%;
+	background-color: #FFFFFF;
+	border: 1px gray dotted;
+}
+
+table.hosts_info tr td {
+	border: 0;
+	white-space: nowrap;
+	word-spacing:	0;
+	padding-left: 5px;
+	padding-right: 5px;
+	font-weight: bold;
+	color: #191970;
+	text-align: left;
+	font-family: Verdana, Helvetica, Geneva;
+	font-size: 11px;
+}
+
+table.hosts_info tr td.header {
+	background: #5C7099 url('../images/gradients/table_head2.gif') repeat-x top left;
+	color: #FFFFFF;
+}
+
+table.hosts_info tr td.avail{
+	background-color: #99F099;
+}
+
+table.hosts_info tr td.notav{
+	background-color: #F09999;
+}
+
+table.hosts_info tr td.uncn{
+	background-color: #CCCCCC;
+}
+
+/**************** SERVER INFORMATION MODULE ****************/
+table.server_info {
+	width: 100%;
+	background-color: #EFEFEF;
+	border: 1px gray dotted;
+}
+
+table.server_info tr td {
+	border: 0;
+	padding-left: 5px;
+	padding-right: 5px;
+	text-align: left;
+	font-family: Verdana, Helvetica, Geneva;
+	font-size: 11px;
+	background-color: #EFEFEF;
+	white-space: nowrap;
+	word-spacing: 0;
+}
+
+table.server_info tr td.header {
+	background: #5C7099 url('../images/gradients/table_head2.gif') repeat-x top left;
+	color: #FFFFFF;
+}
+
+table.server_info tr.status td{
+	white-space: nowrap;
+	word-spacing: 0;
+}
+/**************** WARNING ***********/
+
+table.warning{
+	border-spacing:	0; /* cellspacing */
+	border-collapse: collapse;
+	border: 2px solid gray;
+	border-right-color: #3F3F3F;
+	border-bottom-color: #3F3F3F;
+	background-color: #EAEAEA;
+}
+
+table.warning td{
+	padding:	10px;
+	line-height: 20px;
+}
+
+table.warning tr.header{
+	height:		24px;
+	border:		1px black solid;
+	background-color: #F00000;
+	color: 			white;
+	font-weight:	bold;
+}
+
+table.warning tr.header td{
+	padding:	2px;
+}
+
+table.warning tr.footer{
+	height:		34px;
+	border-top:	1px black dotted;
+}
+
+table.warning tr.footer td{
+	padding:	2px;
+}
+
+table.warning tr td.left{
+	padding-left: 	10px;
+	padding-right: 	5px;
+	white-space: 	nowrap;
+	word-spacing:	0;
+	text-align: 	left;
+}
+
+table.warning tr td.right{
+	width:		100%;
+	padding-left:	5px;
+	padding-right:	10px;
+	text-align: 	right;
+	vertical-align:	text-top;
+}
+
+table.warning tr.center td.left{
+	vertical-align:	text-top;
+	padding-top: 0;
+}
+
+table.warning tr.center td.right{
+	padding: 	5px;
+	vertical-align:	middle;
+	text-align: 	center;
+	border-top:	2px gray inset;
+	border-left:	2px gray inset;
+	background-color: white;
+}
+/*****************************************/
+
+/**************** SETUP WIZARD ***********/
+table.setup_wizard{
+	margin-top: 15px;
+	width: 640px;
+	height: 480px;
+	border-spacing:	0; /* cellspacing */
+	border-collapse: collapse;
+	border: 2px solid gray;
+	border-right-color: #3F3F3F;
+	border-bottom-color: #3F3F3F;
+}
+
+table.setup_wizard td{
+	padding: 2px 0;
+}
+
+table.setup_wizard tr.header{
+	height:		24px;
+	border:		1px black solid;
+	background-color: #F00000;
+	color: 		white;
+	font-weight:	bold;
+}
+
+table.setup_wizard tr.footer{
+	height:		34px;
+	border-top:	1px black dotted;
+}
+
+table.setup_wizard tr.footer input.button{
+	height: 25px;
+}
+
+table.setup_wizard tr.title{
+	height: 28px;
+}
+
+table.setup_wizard tr.title td{
+	font-size: 24px;
+	font-weight: normal;
+}
+
+table.setup_wizard tr td.left{
+	padding-left: 	10px;
+	padding-right: 	5px;
+	white-space: 	nowrap;
+	word-spacing:	0;
+	text-align: 	left;
+}
+
+table.setup_wizard tr td.right{
+	width:		100%;
+	padding-left:	5px;
+	padding-right:	10px;
+	text-align: 	right;
+	vertical-align:	text-top;
+}
+
+table.setup_wizard tr.center td.left{
+	vertical-align:	text-top;
+	padding-top: 0;
+}
+
+table.setup_wizard tr.center td.right{
+	padding: 	5px;
+	vertical-align:	middle;
+	text-align: 	center;
+	border-top:	2px gray inset;
+	border-left:	2px gray inset;
+	background-color: white;
+}
+
+table.setup_wizard ul li{
+	font-size: 14px;
+	font-weight: normal;
+	color: gray;
+	list-style-image: url('../images/general/inst_step.gif');
+}
+
+table.setup_wizard ul li.current{
+	color: black;
+	list-style-image: url('../images/general/inst_current.gif');
+}
+
+table.setup_wizard ul li.completed{
+	color: black;
+	list-style-image: url('../images/general/inst_completed.gif');
+}
+
+table.setup_wizard div.licence{
+	text-align: left;
+	height:	350px;
+	width: 100%;
+	border:	1px gray inset;
+	background-color: white;
+	overflow: scroll;
+}
+
+table.setup_wizard div.text{
+	text-align: left;
+	vertical-align:	text-top;
+	height: 100%;
+	width: 100%;
+	overflow: hidden;
+}
+
+/***************** <HISTORY> *****************/
+table.history{
+	margin-left: 5px;
+}
+
+table.history tr{
+	height: 16px;
+}
+
+table.history td{
+	color:#448;
+	font-family: Verdana, Helvetica, Geneva;
+	font-size:10px;
+	text-align:left;
+}
+
+table.history td.caption{
+	width: 48px;
+	color:#448;
+	font-weight:bold;
+	font-family: Verdana, Helvetica, Geneva;
+	font-size:10px;
+	text-align:left;
+}
+
+/**************** </HISTORY> *****************/
+
+
+/***************** <MESSAGE> *****************/
+table.msgok{
+	width: 100%;
+	border: 1px #44CC44 solid;
+}
+
+table.msgok tr td{
+	color:#333;
+	font-family: Verdana, Helvetica, Geneva;
+	font-size:11px;
+	text-align:center;
+}
+
+table.msgok tr td.clr{
+	width: 60px;
+	background-color:#44CC44;
+	font-size:10px;
+	font-weight: bold;
+}
+
+
+table.msgok tr td.msg_main{
+	height: 26px;
+}
+
+table.msgok tr td.msg{
+	background-color:#BBFFBB;
+}
+
+table.msgerr{
+	width: 100%;
+	border: 1px #CC4444 solid;
+}
+
+table.msgerr tr td{
+	color:#333;
+	font-family: Verdana, Helvetica, Geneva;
+	font-size:11px;
+	text-align:center;
+}
+
+table.msgerr tr td.clr{
+	width: 60px;
+	background-color:#CC4444;
+	font-size:10px;
+	font-weight: bold;
+}
+
+table.msgerr tr td.msg_main{
+	height: 26px;
+}
+
+table.msgerr tr td.msg{
+	background-color:#FFBBBB;
+}
+/**************** </MESSAGE> *****************/
+
+/********** <REQUIREMENTS> *************/
+table.requirements{
+	text-align: left;
+	border-spacing: 1px;
+}
+
+table.requirements tr td.header{
+	font-weight: bold;
+}
+
+table.requirements tr td{
+	white-space: nowrap;
+	padding-left: 5px;
+	padding-right: 15px;
+	background-color: #FFFFFF;
+}
+
+/********** </REQUIREMENTS> ************/
+
+/********** <INFOBOX> ************/
+table.infobox{
+	width: 100%;
+	margin-top: 4px;
+	border: 1px #3377AA solid;
+	background-color: #FFFFFF;
+	text-align: center;
+}
+/********** </INFOBOX> ************/
+
+/********** <FILTER> ************/
+table.filter{
+	width: 100%;
+	/*background-color: #F0F0F0;*/
+	background-color: #FFFFFF;
+	border-collapse: collapse;
+}
+table.filter tr > td:first-child{
+	width: 1%;
+	white-space: nowrap;
+}
+table.filter tr >/**/ td:first-child{
+	width: 1px;
+}
+
+table.filter tr td {
+	line-height: 20px;
+	height: 26px;
+	vertical-align: bottom;
+	border: 1px dotted silver;
+	padding-left: 6px;
+	padding-right: 4px;
+}
+
+table.filter_config{
+	width: 100%;
+	background-color: #FFFFFF;
+	border-collapse: collapse;
+}
+table.filter_config tr td {
+	white-space: nowrap;
+	line-height: 20px;
+	height: 26px;
+	vertical-align: bottom;
+	text-align: center;
+	border: 1px dotted silver;
+	padding-left: 6px;
+	padding-right: 4px;
+}
+/********** </FILTER> ************/
+
+/********** <INVISIBLE> ************/
+table.invisible{
+	border: 0;
+	margin: 0;
+	padding: 0;
+}
+table.invisible tr td{
+	border: 0;
+	margin: 0;
+	padding: 0;
+}
+/********** </INVISIBLE> ************/
+
+/********** <PAGING> ************/
+table.paging{
+	width: 100%;
+	padding: 2px;
+}
+
+table.paging tr td{
+	border: 0 black solid;
+	width: 100%;
+	font-size: 11px;
+	line-height: 18px;
+	text-align: center;
+	vertical-align: middle;
+
+}
+/********** </PAGING> ************/
+
+/****** HEADER NEW *********/
+
+table.header_wide{
+	width: 100%;
+	color: #222222;
+
+	border: 1px #3377AA solid;
+	vertical-align: middle;
+	background-color:#FFFFFF;
+}
+
+table.header_wide tr.first td.header_l{
+	font-family: arial, verdana, helvetica, sans-serif;
+	font-size: 14px;
+	font-weight: bold;
+
+	text-align: left;
+	height: 24px;
+
+	padding-left: 5px;
+	color: #224488;
+}
+
+table.header_wide tr.first td.header_r{
+	background:none;
+	font-family:verdana, arial, helvetica, sans-serif;
+	font-size:10px;
+	text-align: right;
+	height: 24px;
+	padding-right: 5px;
+	border-width: 0;
+}
+
+table.header_wide tr.next td.header_l{
+	background:none;
+	font-family:verdana, arial, helvetica, sans-serif;
+	font-size:10px;
+	text-align: left;
+	height: 20px;
+	padding-left: 5px;
+	border-width: 0;
+}
+
+table.header_wide tr.next td.header_r{
+	background:none;
+	font-family: Verdana, Arial, Helvetica, Sans-serif;
+	font-size: 10px;
+	text-align: right;
+	height: 20px;
+	padding-right: 5px;
+	border-width: 0;
+}
+
+/* Suggest */
+
+table.suggest{
+	width: 100%;
+	margin: 0;
+	border-spacing: 0;
+	background-color: #FEFEFE;
+}
+
+table.suggest tr{
+	background-color: #FEFEFE;
+}
+
+table.suggest tr.highlight{
+	background-color: #AACCFF;
+}
+table.suggest tr td{
+	text-align: left;
+	padding-left: 4px;
+	line-height: 18px;
+	font-size: 11px;
+	cursor: default;
+}
