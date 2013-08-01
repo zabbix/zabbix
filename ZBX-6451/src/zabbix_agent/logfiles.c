@@ -578,7 +578,7 @@ int	process_logrt(char *filename, zbx_uint64_t *lastlogsize, int *mtime, char **
 		zabbix_log(LOG_LEVEL_WARNING, "cannot close the find directory handle: %s", zbx_strerror(errno));
 #else
 	if (NULL != dir && -1 == closedir(dir))
-		zabbix_log(LOG_LEVEL_WARNING, "camnot close directory '%s': %s", directory, zbx_strerror(errno));
+		zabbix_log(LOG_LEVEL_WARNING, "cannot close directory '%s': %s", directory, zbx_strerror(errno));
 #endif
 
 	zbx_free(logfile_candidate);

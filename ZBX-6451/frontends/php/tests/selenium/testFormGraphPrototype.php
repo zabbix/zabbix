@@ -982,7 +982,7 @@ class testFormGraphPrototype extends CWebTest {
 					'noItem' => true,
 					'errors' => array(
 						'ERROR: Cannot add graph',
-						'Graph prototype must have at least one prototype.'
+						'Missing items for graph "graphSaveCheck".'
 					)
 				)
 			),
