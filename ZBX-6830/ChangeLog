@@ -1,5 +1,6 @@
 Changes for 1.8.18rc1
 
+..F....... [ZBX-6830] fixed dynamic item checkbox in Configuration > Screens (Ivo)
 ........S. [ZBX-5924] fixed curl verify host option setting in ez texting (wiper)
 
 Changes for 1.8.17
