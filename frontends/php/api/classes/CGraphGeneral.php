@@ -27,7 +27,6 @@
 abstract class CGraphGeneral extends CZBXAPI {
 
 	const ERROR_TEMPLATE_HOST_MIX = 'templateHostMix';
-	const ERROR_MISSING_ITEMS = 'missingItems';
 
 	/**
 	 * Check $graphs:
@@ -62,7 +61,8 @@ abstract class CGraphGeneral extends CZBXAPI {
 			// items fields
 			foreach ($graph['gitems'] as $gitem) {
 				// check color
-				if (!$colorValidator->validate($gitem['color'])) {
+				if ((!$update && !$colorValidator->validate($gitem['color']))
+						|| ($update && isset($gitem['color']) && !$colorValidator->validate($gitem['color']))) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, $colorValidator->getError());
 				}
 			}
@@ -150,21 +150,25 @@ abstract class CGraphGeneral extends CZBXAPI {
 			'selectGraphItems' => API_OUTPUT_EXTEND
 		));
 
-		foreach ($graphs as $graph) {
+		$defaultFields = array('gitems', 'graphtype', 'ymin_type', 'ymax_type', 'yaxismin', 'yaxismax');
+		foreach ($graphs as &$graph) {
 			// if missing in $updateGraphs then no permissions
 			if (!isset($updateGraphs[$graph['graphid']])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
 			}
+
+			foreach ($defaultFields as $field) {
+				if (!isset($graph[$field])) {
+					$graph[$field] = $updateGraphs[$graph['graphid']][$field];
+				}
+			}
 		}
+		unset($graph);
 
 		$this->checkInput($graphs, true);
 
 		foreach ($graphs as $graph) {
 			unset($graph['templateid']);
-
-			if (!$graph['gitems']) {
-				$graph['gitems'] = $updateGraphs[$graph['graphid']]['gitems'];
-			}
 
 			$templatedGraph = false;
 			$graphHosts = API::Host()->get(array(
