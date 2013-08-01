@@ -25,6 +25,7 @@
 #include "proxy.h"
 #include "snmptrapper.h"
 #include "zbxserver.h"
+#include "zbxregexp.h"
 
 static int	trap_fd = -1;
 static int	trap_lastsize;
@@ -73,15 +74,17 @@ static void	DBupdate_lastsize()
  ******************************************************************************/
 static int	process_trap_for_interface(zbx_uint64_t interfaceid, char *trap, zbx_timespec_t *ts)
 {
-	DC_ITEM		*items = NULL;
-	char		cmd[MAX_STRING_LEN], params[MAX_STRING_LEN], regex[MAX_STRING_LEN], error[ITEM_ERROR_LEN_MAX];
-	size_t		num, i;
-	int		ret = FAIL, fb = -1, *lastclocks = NULL, *errcodes = NULL, timestamp;
-	zbx_uint64_t	*itemids = NULL;
-	unsigned char	*states = NULL;
-	AGENT_RESULT	*results = NULL;
-	ZBX_REGEXP	*regexps = NULL;
-	int		regexps_alloc = 0, regexps_num = 0;
+	DC_ITEM			*items = NULL;
+	char			cmd[MAX_STRING_LEN], params[MAX_STRING_LEN], regex[MAX_STRING_LEN],
+				error[ITEM_ERROR_LEN_MAX];
+	size_t			num, i;
+	int			ret = FAIL, fb = -1, *lastclocks = NULL, *errcodes = NULL, timestamp;
+	zbx_uint64_t		*itemids = NULL;
+	unsigned char		*states = NULL;
+	AGENT_RESULT		*results = NULL;
+	zbx_vector_ptr_t	regexps;
+
+	zbx_vector_ptr_create(&regexps);
 
 	num = DCconfig_get_snmp_items_by_interfaceid(interfaceid, &items);
 
@@ -124,31 +127,9 @@ static int	process_trap_for_interface(zbx_uint64_t interfaceid, char *trap, zbx_
 			continue;
 
 		if ('@' == *regex)
-		{
-			DB_RESULT	result;
-			DB_ROW		row;
-			char		*regex_esc;
+			DCget_expressions_by_name(&regexps, regex + 1);
 
-			regexps_num = 0;
-
-			regex_esc = DBdyn_escape_string(regex + 1);
-			result = DBselect("select e.expression,e.expression_type,e.exp_delimiter,e.case_sensitive"
-					" from regexps r,expressions e"
-					" where r.regexpid=e.regexpid"
-						" and r.name='%s'" ZBX_SQL_NODE,
-					regex_esc, DBand_node_local("r.regexpid"));
-			zbx_free(regex_esc);
-
-			while (NULL != (row = DBfetch(result)))
-			{
-				add_regexp_ex(&regexps, &regexps_alloc, &regexps_num,
-						regex + 1, row[0], atoi(row[1]), row[2][0], atoi(row[3]));
-			}
-			DBfree_result(result);
-		}
-
-
-		if (SUCCEED != regexp_match_ex(regexps, regexps_num, trap, regex, ZBX_CASE_SENSITIVE))
+		if (SUCCEED != regexp_match_ex(&regexps, trap, regex, ZBX_CASE_SENSITIVE))
 			continue;
 
 		if (SUCCEED == set_result_type(&results[i], items[i].value_type, items[i].data_type, trap))
@@ -157,8 +138,6 @@ static int	process_trap_for_interface(zbx_uint64_t interfaceid, char *trap, zbx_
 			errcodes[i] = NOTSUPPORTED;
 		ret = SUCCEED;
 	}
-
-	zbx_free(regexps);
 
 	if (FAIL == ret && -1 != fb)
 	{
@@ -213,6 +192,9 @@ static int	process_trap_for_interface(zbx_uint64_t interfaceid, char *trap, zbx_
 
 	DCconfig_clean_items(items, NULL, num);
 	zbx_free(items);
+
+	zbx_regexp_clean_expressions(&regexps);
+	zbx_vector_ptr_destroy(&regexps);
 
 	dc_flush_history();
 
