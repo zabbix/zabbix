@@ -9,9 +9,7 @@ DESC_H = zabbix_sender_desc.h
 RESOURCE_RC = resource.rc
 RESOURCE_RES = zabbix_sender.res
 OBJS = ..\..\..\src\libs\zbxcommon\comms.o \
-	..\..\..\src\libs\zbxcommon\gnuregex.o \
 	..\..\..\src\libs\zbxcommon\misc.o \
-	..\..\..\src\libs\zbxcommon\regexp.o \
 	..\..\..\src\libs\zbxcommon\str.o \
 	..\..\..\src\libs\zbxcommon\xml.o \
 	..\..\..\src\libs\zbxcommon\zbxgetopt.o \
@@ -50,17 +48,11 @@ $(RESOURCE_RES): $(RESOURCE_RC) $(RESOURCE_H) $(DESC_H)
 ..\..\..\src\libs\zbxcommon\comms.o: ..\..\..\src\libs\zbxcommon\comms.c
 	$(CC) ..\..\..\src\libs\zbxcommon\comms.c /Fo"..\..\..\src\libs\zbxcommon\comms.o" $(CFLAGS)
 
-..\..\..\src\libs\zbxcommon\gnuregex.o: ..\..\..\src\libs\zbxcommon\gnuregex.c
-	$(CC) ..\..\..\src\libs\zbxcommon\gnuregex.c /Fo"..\..\..\src\libs\zbxcommon\gnuregex.o" $(CFLAGS)
-
 ..\..\..\src\libs\zbxcommon\misc.o: ..\..\..\src\libs\zbxcommon\misc.c
 	$(CC) ..\..\..\src\libs\zbxcommon\misc.c /Fo"..\..\..\src\libs\zbxcommon\misc.o" $(CFLAGS)
 
 ..\..\..\src\libs\zbxcommon\str.o: ..\..\..\src\libs\zbxcommon\str.c
 	$(CC) ..\..\..\src\libs\zbxcommon\str.c /Fo"..\..\..\src\libs\zbxcommon\str.o" $(CFLAGS)
-
-..\..\..\src\libs\zbxcommon\regexp.o: ..\..\..\src\libs\zbxcommon\regexp.c
-	$(CC) ..\..\..\src\libs\zbxcommon\regexp.c /Fo"..\..\..\src\libs\zbxcommon\regexp.o" $(CFLAGS)
 
 ..\..\..\src\libs\zbxcommon\xml.o: ..\..\..\src\libs\zbxcommon\xml.c
 	$(CC) ..\..\..\src\libs\zbxcommon\xml.c /Fo"..\..\..\src\libs\zbxcommon\xml.o" $(CFLAGS)

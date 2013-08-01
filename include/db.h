@@ -507,8 +507,6 @@ ZBX_GRAPH_ITEMS;
 int	DBupdate_item_status_to_notsupported(DB_ITEM *item, int clock, const char *error);
 void	process_triggers(zbx_vector_ptr_t *triggers);
 int	DBget_row_count(const char *table_name);
-int	DBget_items_unsupported_count();
-double	DBget_requiredperformance();
 int	DBget_proxy_lastaccess(const char *hostname, int *lastaccess, char **error);
 
 char	*DBdyn_escape_string(const char *src);
