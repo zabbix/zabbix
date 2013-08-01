@@ -563,9 +563,9 @@ class CAction extends CZBXAPI {
 		foreach ($actions as $anum => $action) {
 			// conditions are optional, but when set, its fields must be validated
 			if (isset($action['conditions'])) {
-				if (!$action['conditions']) {
+				if (!is_array($action['conditions'])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Action "%1$s" no conditions defined.', $action['name']));
+						_s('Incorrect action conditions for action "%1$s".', $action['name']));
 				}
 
 				foreach ($action['conditions'] as $condition) {
@@ -631,9 +631,11 @@ class CAction extends CZBXAPI {
 			'selectOperations' => API_OUTPUT_EXTEND,
 			'selectConditions' => API_OUTPUT_EXTEND
 		));
-			foreach ($actions as $action) {
+
+		foreach ($actions as $action) {
 			if (isset($action['actionid']) && !isset($updActions[$action['actionid']])) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+				self::exception(ZBX_API_ERROR_PERMISSIONS,
+					_('No permissions to referred object or it does not exist!'));
 			}
 		}
 
@@ -686,7 +688,7 @@ class CAction extends CZBXAPI {
 			if (isset($action['conditions'])) {
 				if (!is_array($action['conditions'])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Action "%1$s" no conditions defined.', $updActions[$action['actionid']]['name']));
+						_s('Incorrect action conditions for action "%1$s".', $updActions[$action['actionid']]['name']));
 				}
 
 				$conditionsDb = isset($updActions[$action['actionid']]['conditions'])

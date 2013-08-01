@@ -140,7 +140,7 @@ elseif (isset($_REQUEST['save'])) {
 	}
 	DBstart();
 	if (isset($_REQUEST['actionid'])) {
-		$action['actionid']= $_REQUEST['actionid'];
+		$action['actionid'] = $_REQUEST['actionid'];
 
 		$result = API::Action()->update($action);
 		show_messages($result, _('Action updated'), _('Cannot update action'));
