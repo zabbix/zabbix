@@ -25,10 +25,6 @@ define('LINK_BAD', 1);
 
 class testUrlParameters extends CWebTest {
 
-	public function testUrlParameters_login() {
-		$this->zbxTestLogin('dashboard.php');
-	}
-
 	// Returns test data
 	public static function zbx_data() {
 		return array(
@@ -1162,7 +1158,7 @@ class testUrlParameters extends CWebTest {
 	 * @dataProvider zbx_data
 	 */
 	public function testUrlParameters_UrlLoad($zbx_data) {
-		$this->zbxTestOpen($zbx_data['url']);
+		$this->zbxTestLogin($zbx_data['url']);
 		switch ($zbx_data['expected']) {
 			case LINK_GOOD:
 				$this->checkTitle($zbx_data['title']);
