@@ -771,11 +771,11 @@ class CAction extends CZBXAPI {
 
 		DB::update('actions', $update);
 
-		$this->addConditions($conditionsCreate);
 		self::validateConditions($conditionsCreate);
+		$this->addConditions($conditionsCreate);
 
-		$this->updateConditions($conditionsUpdate);
 		self::validateConditions($conditionsUpdate, true);
+		$this->updateConditions($conditionsUpdate);
 
 		if (!empty($conditionidsDelete)) {
 			$this->deleteConditions($conditionidsDelete);
