@@ -2590,6 +2590,7 @@ function checkRequiredKeys(array $array, array $keys) {
  */
 function clearCookies($clear = false, $id = null) {
 	if ($clear) {
-		insert_js('cookie.eraseArray("'.basename($_SERVER['SCRIPT_NAME'], '.php').($id ? '_'.$id : '').'")');
+		$url = new CUrl();
+		insert_js('cookie.eraseArray("'.basename($url->getPath(), '.php').($id ? '_'.$id : '').'")');
 	}
 }

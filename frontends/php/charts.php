@@ -106,7 +106,7 @@ if (!empty($_REQUEST['period']) || !empty($_REQUEST['stime'])) {
 		'stime' => get_request('stime')
 	));
 
-	$curl = new Curl();
+	$curl = new Curl($_SERVER['REQUEST_URI']);
 	$curl->removeArgument('period');
 	$curl->removeArgument('stime');
 
