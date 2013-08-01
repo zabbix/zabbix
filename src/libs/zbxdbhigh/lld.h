@@ -22,13 +22,12 @@
 
 #include "common.h"
 #include "zbxjson.h"
-#include "zbxalgo.h"
 
-int	lld_check_record(struct zbx_json_parse *jp_row, const char *f_macro, const char *f_regexp,
-		zbx_vector_ptr_t *regexps);
+int	lld_check_record(struct zbx_json_parse *jp_row, const char *f_macro, const char *f_regexp, ZBX_REGEXP *regexps,
+		int regexps_num);
 
 void	DBlld_update_items(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, struct zbx_json_parse *jp_data,
-		char **error, const char *f_macro, const char *f_regexp, zbx_vector_ptr_t *regexps,
+		char **error, const char *f_macro, const char *f_regexp, ZBX_REGEXP *regexps, int regexps_num,
 		unsigned short lifetime, int lastcheck);
 
 #endif

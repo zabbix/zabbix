@@ -198,14 +198,6 @@ else {
 
 	$data['paging'] = getPagingLine($data['slides']);
 
-	// nodes
-	if ($data['displayNodes'] = is_array(get_current_nodeid())) {
-		foreach ($data['slides'] as &$slide) {
-			$slide['nodename'] = get_node_name_by_elid($slide['slideshowid'], true);
-		}
-		unset($slide);
-	}
-
 	// render view
 	$slideshowView = new CView('configuration.slideconf.list', $data);
 	$slideshowView->render();

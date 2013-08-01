@@ -20,7 +20,6 @@
 #include "common.h"
 #include "logfiles.h"
 #include "log.h"
-#include "zbxregexp.h"
 
 /******************************************************************************
  *                                                                            *
