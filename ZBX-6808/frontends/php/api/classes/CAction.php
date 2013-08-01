@@ -711,15 +711,9 @@ class CAction extends CZBXAPI {
 									? $condition['operator']
 									: $conditionsDb[$condition['conditionid']]['operator'];
 
-								// maintenance value must not be set in API
-								if ($condition['conditiontype'] == CONDITION_TYPE_MAINTENANCE) {
-									$condition['value'] = '';
-								}
-								else {
-									$condition['value'] = isset($condition['value'])
-										? $condition['value']
-										: $conditionsDb[$condition['conditionid']]['value'];
-								}
+								$condition['value'] = isset($condition['value'])
+									? $condition['value']
+									: $conditionsDb[$condition['conditionid']]['value'];
 
 							}
 						}
@@ -1610,14 +1604,8 @@ class CAction extends CZBXAPI {
 						break;
 
 					case CONDITION_TYPE_MAINTENANCE:
-						// value must not be set for maintenance. when updating check if it's empty string.
-						// empty string is set by default, but any other value on update must be validated
-						if ($update && $condition['value'] === '') {
-							unset($condition['value']);
-						}
-
-						if (isset($condition['value'])) {
-							self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect action condition maintenance.'));
+						if (!zbx_empty($condition['value'])) {
+							self::exception(ZBX_API_ERROR_PARAMETERS, _('Maintenance action condition value must be empty.'));
 						}
 						break;
 
