@@ -235,7 +235,7 @@ if (!defined('ZBX_PAGE_NO_MENU')) {
 	$support = new CLink(_('Get support'), 'http://www.zabbix.com/support.php', 'small_font', null, 'nosid');
 	$support->setTarget('_blank');
 
-	$req = new CUrl($_SERVER['REQUEST_URI']);
+	$req = new CUrl();
 	$req->setArgument('print', 1);
 	$printview = new CLink(_('Print'), $req->getUrl(), 'small_font', null, 'nosid');
 
