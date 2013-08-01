@@ -27,7 +27,6 @@
 #include "common.h"
 #include "sysinfo.h"
 #include <sys/pstat.h>
-#include "zbxregexp.h"
 
 static int	check_procstate(struct pst_status pst, int zbx_proc_stat)
 {

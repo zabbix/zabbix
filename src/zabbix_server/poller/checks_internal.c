@@ -24,9 +24,6 @@
 #include "dbcache.h"
 #include "zbxself.h"
 #include "valuecache.h"
-#include "proxy.h"
-
-extern unsigned char	daemon_type;
 
 /******************************************************************************
  *                                                                            *
@@ -62,34 +59,24 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 
 	if (0 == strcmp(tmp, "triggers"))			/* zabbix["triggers"] */
 	{
-		if (0 == (daemon_type & ZBX_DAEMON_TYPE_SERVER))
-			goto notsupported;
-
 		if (1 != nparams)
 			goto notsupported;
 
-		SET_UI64_RESULT(result, DCget_trigger_count());
+		SET_UI64_RESULT(result, DBget_row_count("triggers"));
 	}
 	else if (0 == strcmp(tmp, "items"))			/* zabbix["items"] */
 	{
 		if (1 != nparams)
 			goto notsupported;
 
-		SET_UI64_RESULT(result, DCget_item_count());
+		SET_UI64_RESULT(result, DBget_row_count("items"));
 	}
 	else if (0 == strcmp(tmp, "items_unsupported"))		/* zabbix["items_unsupported"] */
 	{
 		if (1 != nparams)
 			goto notsupported;
 
-		SET_UI64_RESULT(result, DCget_item_unsupported_count());
-	}
-	else if (0 == strcmp(tmp, "hosts"))			/* zabbix["hosts"] */
-	{
-		if (1 != nparams)
-			goto notsupported;
-
-		SET_UI64_RESULT(result, DCget_host_count());
+		SET_UI64_RESULT(result, DBget_items_unsupported_count());
 	}
 	else if (0 == strcmp(tmp, "history") ||			/* zabbix["history"] */
 			0 == strcmp(tmp, "history_log") ||	/* zabbix["history_log"] */
@@ -97,9 +84,6 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 			0 == strcmp(tmp, "history_text") ||	/* zabbix["history_text"] */
 			0 == strcmp(tmp, "history_uint"))	/* zabbix["history_uint"] */
 	{
-		if (0 == (daemon_type & ZBX_DAEMON_TYPE_SERVER))
-			goto notsupported;
-
 		if (1 != nparams)
 			goto notsupported;
 
@@ -108,9 +92,6 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 	else if (0 == strcmp(tmp, "trends") ||			/* zabbix["trends"] */
 			0 == strcmp(tmp, "trends_uint"))	/* zabbix["trends_uint"] */
 	{
-		if (0 == (daemon_type & ZBX_DAEMON_TYPE_SERVER))
-			goto notsupported;
-
 		if (1 != nparams)
 			goto notsupported;
 
@@ -163,7 +144,7 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 		if (1 != nparams)
 			goto notsupported;
 
-		SET_DBL_RESULT(result, DCget_required_performance());
+		SET_DBL_RESULT(result, DBget_requiredperformance());
 	}
 	else if (0 == strcmp(tmp, "uptime"))			/* zabbix["uptime"] */
 	{
@@ -206,9 +187,6 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 	else if (0 == strcmp(tmp, "proxy"))			/* zabbix["proxy",<hostname>,"lastaccess"] */
 	{
 		int	lastaccess;
-
-		if (0 == (daemon_type & ZBX_DAEMON_TYPE_SERVER))
-			goto notsupported;
 
 		if (3 != nparams)
 			goto notsupported;
@@ -256,24 +234,6 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 		for (process_type = 0; process_type < ZBX_PROCESS_TYPE_COUNT; process_type++)
 			if (0 == strcmp(tmp, get_process_type_string(process_type)))
 				break;
-
-		switch (process_type)
-		{
-			case ZBX_PROCESS_TYPE_WATCHDOG:
-			case ZBX_PROCESS_TYPE_ALERTER:
-			case ZBX_PROCESS_TYPE_ESCALATOR:
-			case ZBX_PROCESS_TYPE_NODEWATCHER:
-			case ZBX_PROCESS_TYPE_PROXYPOLLER:
-			case ZBX_PROCESS_TYPE_TIMER:
-				if (0 == (daemon_type & ZBX_DAEMON_TYPE_SERVER))
-					process_type = ZBX_PROCESS_TYPE_COUNT;
-				break;
-			case ZBX_PROCESS_TYPE_DATASENDER:
-			case ZBX_PROCESS_TYPE_HEARTBEAT:
-				if (0 == (daemon_type & ZBX_DAEMON_TYPE_PROXY))
-					process_type = ZBX_PROCESS_TYPE_COUNT;
-				break;
-		}
 
 		if (ZBX_PROCESS_TYPE_COUNT == process_type)
 		{
@@ -391,9 +351,6 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 		}
 		else if (0 == strcmp(tmp, "trend"))
 		{
-			if (0 == (daemon_type & ZBX_DAEMON_TYPE_SERVER))
-				goto notsupported;
-
 			if ('\0' == *tmp1 || 0 == strcmp(tmp1, "pfree"))
 				SET_DBL_RESULT(result, *(double *)DCget_stats(ZBX_STATS_TREND_PFREE));
 			else if (0 == strcmp(tmp1, "total"))
@@ -452,9 +409,6 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 	{
 		zbx_vc_stats_t	stats;
 
-		if (0 == (daemon_type & ZBX_DAEMON_TYPE_SERVER))
-			goto notsupported;
-
 		if (FAIL == zbx_vc_get_statistics(&stats))
 		{
 			error = zbx_strdup(error, "Value cache is disabled");
@@ -498,16 +452,6 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 		}
 		else
 			goto notsupported;
-	}
-	else if (0 == strcmp(tmp, "proxy_history"))
-	{
-		if (0 == (daemon_type & ZBX_DAEMON_TYPE_PROXY))
-			goto notsupported;
-
-		if (1 != nparams)
-			goto notsupported;
-
-		SET_UI64_RESULT(result, proxy_get_history_count());
 	}
 	else
 		goto notsupported;

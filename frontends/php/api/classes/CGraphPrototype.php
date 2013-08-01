@@ -34,10 +34,7 @@ class CGraphPrototype extends CGraphGeneral {
 		parent::__construct();
 
 		$this->errorMessages = array_merge($this->errorMessages, array(
-			self::ERROR_TEMPLATE_HOST_MIX =>
-				_('Graph prototype "%1$s" with templated items cannot contain items from other hosts.'),
-			self::ERROR_MISSING_ITEMS =>
-				_('Missing items for graph prototype "%1$s".')
+			self::ERROR_TEMPLATE_HOST_MIX => _('Graph prototype "%1$s" with templated items cannot contain items from other hosts.')
 		));
 	}
 
@@ -586,6 +583,11 @@ class CGraphPrototype extends CGraphGeneral {
 	protected function checkInput($graphs, $update = false) {
 		$itemids = array();
 		foreach ($graphs as $graph) {
+			// no items
+			if (!isset($graph['gitems']) || !is_array($graph['gitems']) || empty($graph['gitems'])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Missing items for graph "%1$s".', $graph['name']));
+			}
+
 			$fields = array('itemid' => null);
 			foreach ($graph['gitems'] as $gitem) {
 				if (!check_db_fields($fields, $gitem)) {
@@ -633,27 +635,23 @@ class CGraphPrototype extends CGraphGeneral {
 			}
 		}
 
-		foreach ($graphs as $graph) {
-			if (($update && isset($graph['gitems'])) || !$update) {
-				$hasPrototype = false;
-				if ($graph['gitems']) {
-					// check if the graph has at least one prototype
-					foreach ($graph['gitems'] as $gitem) {
-						// $allowedItems used because it is possible to make API call without full item data
-						if ($allowedItems[$gitem['itemid']]['flags'] == ZBX_FLAG_DISCOVERY_CHILD) {
-							$hasPrototype = true;
-							break;
-						}
-					}
-				}
-
-				if (!$graph['gitems'] || !$hasPrototype) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('Graph prototype must have at least one prototype.'));
-				}
-			}
-		}
 
 		parent::checkInput($graphs, $update);
+
+		foreach ($graphs as $graph) {
+			// check if the graph has at least one prototype
+			$hasPrototype = false;
+			foreach ($graph['gitems'] as $gitem) {
+				// $allowedItems used because it is possible to make API call without full item data
+				if ($allowedItems[$gitem['itemid']]['flags'] == ZBX_FLAG_DISCOVERY_CHILD) {
+					$hasPrototype = true;
+					break;
+				}
+			}
+			if (!$hasPrototype) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Graph prototype must have at least one prototype.'));
+			}
+		}
 
 		$allowedValueTypes = array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64);
 

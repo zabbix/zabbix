@@ -328,8 +328,6 @@
 	}
 
 	function getItemFilterForm(&$items) {
-		$displayNodes = is_array(get_current_nodeid());
-
 		$filter_groupId				= $_REQUEST['filter_groupid'];
 		$filter_hostId				= $_REQUEST['filter_hostid'];
 		$filter_application			= $_REQUEST['filter_application'];
@@ -510,8 +508,7 @@
 			if (!empty($getHostInfo)) {
 				$groupFilter[] = array(
 					'id' => $getHostInfo['groupid'],
-					'name' => $getHostInfo['name'],
-					'prefix' => $displayNodes ? get_node_name_by_elid($getHostInfo['groupid'], true, NAME_DELIMITER) : ''
+					'name' => $getHostInfo['name']
 				);
 			}
 		}
@@ -520,13 +517,13 @@
 			new CCol(bold(_('Host group').NAME_DELIMITER), 'label col1'),
 			new CCol(array(
 				new CMultiSelect(array(
-					'name' => 'filter_groupid',
-					'selectedLimit' => 1,
-					'objectName' => 'hostGroup',
-					'objectOptions' => array(
-						'editable' => true
-					),
-					'data' => $groupFilter
+						'name' => 'filter_groupid',
+						'selectedLimit' => 1,
+						'objectName' => 'hostGroup',
+						'objectOptions' => array(
+							'editable' => true
+						),
+						'data' => $groupFilter
 				))
 			), 'col1'),
 			new CCol(bold(_('Type').NAME_DELIMITER), 'label col2'),
@@ -547,8 +544,7 @@
 			if (!empty($getHostInfo)) {
 				$hostFilterData[] = array(
 					'id' => $getHostInfo['hostid'],
-					'name' => $getHostInfo['name'],
-					'prefix' => $displayNodes ? get_node_name_by_elid($filter_hostId, true, NAME_DELIMITER) : ''
+					'name' => $getHostInfo['name']
 				);
 			}
 		}
@@ -557,13 +553,13 @@
 			new CCol(bold(_('Host').NAME_DELIMITER), 'label'),
 			new CCol(array(
 				new CMultiSelect(array(
-					'name' => 'filter_hostid',
-					'selectedLimit' => 1,
-					'objectName' => 'hosts',
-					'objectOptions' => array(
-						'editable' => true
-					),
-					'data' => $hostFilterData
+						'name' => 'filter_hostid',
+						'selectedLimit' => 1,
+						'objectName' => 'hosts',
+						'objectOptions' => array(
+							'editable' => true
+						),
+						'data' => $hostFilterData
 				))
 			), 'col1'),
 			new CCol($updateIntervalLabel, 'label'),
