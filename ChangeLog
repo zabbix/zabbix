@@ -7,6 +7,9 @@ New features:
 ...G...... [ZBXNEXT-1528] added net.if.in, net.if.out and net.if.total item support on HP-UX platforms (igors)
 
 Bug fixes:
+...G...... [ZBX-6527] fixed proc.mem calculations with getprocs() for AIX (wiper)
+..F....... [ZBX-4986] absolute urls replaced with relative (Guntis)
+........S. [ZBX-5924] fixed curl verify host option setting in ez texting (wiper)
 ...G...... [ZBX-6664] removed printing of informative line about -vv option after zabbix_sender failure if this option was already used (wiper)
 ..F....... [ZBX-6275] removed the "error" columns in the template item, trigger and discovery rule lists (Guntis)
 A......... [ZBX-5604] fixed updating graphs and graph prototypes when items are not specified (Ivo)
@@ -305,6 +308,17 @@ A......... [ZBX-5498] applications API refactoring (Vedmak)
 ..F....... [ZBX-5142] changed media type field label from 'Description' to 'Name' (Vedmak)
 ....I..... [ZBX-5314] increased size of autoincrement fields for PostgreSQL database (Sasha)
 ..F....... [ZBX-1845] added tabs to host massupdate form (Vedmak)
+
+--------------------------------------------------------------------------------
+Changes for 2.0.8rc1
+
+New features:
+
+Bug fixes:
+...G...... [ZBX-6527] fixed proc.mem calculations with getprocs() for AIX (wiper)
+........S. [ZBX-5924] fixed curl verify host option setting in ez texting (wiper)
+.......PS. [ZBX-6798] improved error messages from UnixODBC library for Database Monitor items (Andris)
+.......PS. [ZBX-6797] added configurable ODBC login timeout (Andris)
 
 --------------------------------------------------------------------------------
 Changes for 2.0.7
@@ -1655,6 +1669,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.18rc1
 
+........S. [ZBX-5924] fixed curl verify host option setting in ez texting (wiper)
 
 Changes for 1.8.17
 
