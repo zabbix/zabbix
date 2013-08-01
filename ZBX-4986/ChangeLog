@@ -7,9 +7,9 @@ New features:
 ...G...... [ZBXNEXT-1528] added net.if.in, net.if.out and net.if.total item support on HP-UX platforms (igors)
 
 Bug fixes:
+....I..... [ZBX-6831] fixed webtest item conversion in 1.8->2.0 database upgrade patch for mysql (wiper)
 .......PS. [ZBX-6451] fixed items,items_unsupported internal checks counting discovery rules as items (wiper)
 ...G...... [ZBX-6527] fixed proc.mem calculations with getprocs() for AIX (wiper)
-..F....... [ZBX-4986] absolute urls replaced with relative (Guntis)
 ........S. [ZBX-5924] fixed curl verify host option setting in ez texting (wiper)
 ...G...... [ZBX-6664] removed printing of informative line about -vv option after zabbix_sender failure if this option was already used (wiper)
 ..F....... [ZBX-6275] removed the "error" columns in the template item, trigger and discovery rule lists (Guntis)
@@ -316,6 +316,7 @@ Changes for 2.0.8rc1
 New features:
 
 Bug fixes:
+....I..... [ZBX-6831] fixed webtest item conversion in 1.8->2.0 database upgrade patch for mysql (wiper)
 ...G...... [ZBX-6527] fixed proc.mem calculations with getprocs() for AIX (wiper)
 ........S. [ZBX-5924] fixed curl verify host option setting in ez texting (wiper)
 .......PS. [ZBX-6798] improved error messages from UnixODBC library for Database Monitor items (Andris)
