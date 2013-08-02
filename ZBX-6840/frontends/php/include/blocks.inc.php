@@ -287,7 +287,8 @@ function make_system_status($filter) {
 
 		// groups
 		foreach ($trigger['groups'] as $group) {
-			if (in_array($filter['extAck'], array(EXTACK_OPTION_ALL, EXTACK_OPTION_BOTH))) {
+			if (in_array($filter['extAck'], array(EXTACK_OPTION_ALL, EXTACK_OPTION_BOTH))
+					&& isset($groups[$group['groupid']])) {
 				$groups[$group['groupid']]['tab_priority'][$trigger['priority']]['count']++;
 
 				if ($groups[$group['groupid']]['tab_priority'][$trigger['priority']]['count'] < 30) {
@@ -296,7 +297,8 @@ function make_system_status($filter) {
 			}
 
 			if (in_array($filter['extAck'], array(EXTACK_OPTION_UNACK, EXTACK_OPTION_BOTH))
-					&& !$trigger['event']['acknowledged']) {
+					&& !$trigger['event']['acknowledged']
+					&& isset($groups[$group['groupid']])) {
 				$groups[$group['groupid']]['tab_priority'][$trigger['priority']]['count_unack']++;
 
 				if ($groups[$group['groupid']]['tab_priority'][$trigger['priority']]['count_unack'] < 30) {
