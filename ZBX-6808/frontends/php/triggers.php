@@ -390,7 +390,8 @@ else {
 	$data = array(
 		'showdisabled' => get_request('showdisabled', 1),
 		'parent_discoveryid' => null,
-		'triggers' => array()
+		'triggers' => array(),
+		'displayNodes' => (is_array(get_current_nodeid()) && empty($_REQUEST['groupid']) && empty($_REQUEST['hostid']))
 	);
 	CProfile::update('web.triggers.showdisabled', $data['showdisabled'], PROFILE_TYPE_INT);
 
@@ -443,6 +444,23 @@ else {
 
 	// get real hosts
 	$data['realHosts'] = getParentHostsByTriggers($data['triggers']);
+
+	// determine, show or not column of errors
+	if (isset($hosts)) {
+		$h = reset($hosts);
+		$data['showErrorColumn'] = ($h['status'] != HOST_STATUS_TEMPLATE);
+	}
+	else {
+		$data['showErrorColumn'] = true;
+	}
+
+	// nodes
+	if ($data['displayNodes']) {
+		foreach ($data['triggers'] as &$trigger) {
+			$trigger['nodename'] = get_node_name_by_elid($trigger['triggerid'], true);
+		}
+		unset($trigger);
+	}
 
 	// render view
 	$triggersView = new CView('configuration.triggers.list', $data);

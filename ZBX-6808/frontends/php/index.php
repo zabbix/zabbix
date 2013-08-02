@@ -22,7 +22,6 @@
 define('ZBX_PAGE_NO_AUTHORIZATION', true);
 define('ZBX_NOT_ALLOW_ALL_NODES', true);
 define('ZBX_HIDE_NODE_SELECTION', true);
-define('ZBX_PAGE_NO_MENU', true);
 
 require_once dirname(__FILE__).'/include/config.inc.php';
 require_once dirname(__FILE__).'/include/forms.inc.php';
@@ -35,7 +34,7 @@ $fields = array(
 	'name' =>		array(T_ZBX_STR, O_NO,	null,	NOT_EMPTY,		'isset({enter})', _('Username')),
 	'password' =>	array(T_ZBX_STR, O_OPT, null,	null,			'isset({enter})'),
 	'sessionid' =>	array(T_ZBX_STR, O_OPT, null,	null,			null),
-	'reconnect' =>	array(T_ZBX_INT, O_OPT, P_SYS,	BETWEEN(0, 65535), null),
+	'reconnect' =>	array(T_ZBX_INT, O_OPT, P_SYS|P_ACT,	BETWEEN(0, 65535), null),
 	'enter' =>		array(T_ZBX_STR, O_OPT, P_SYS,	null,			null),
 	'autologin' =>	array(T_ZBX_INT, O_OPT, null,	null,			null),
 	'request' =>	array(T_ZBX_STR, O_OPT, null,	null,			null)
@@ -46,6 +45,7 @@ check_fields($fields);
 if (isset($_REQUEST['reconnect'])) {
 	add_audit(AUDIT_ACTION_LOGOUT, AUDIT_RESOURCE_USER, _('Manual Logout'));
 	CWebUser::logout();
+	redirect("index.php");
 }
 
 $config = select_config();

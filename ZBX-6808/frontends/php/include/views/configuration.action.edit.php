@@ -363,7 +363,9 @@ foreach ($this->data['action']['operations'] as $operationid => $operation) {
 			: $operation['esc_step_from'].' - '.$operation['esc_step_to'];
 
 		$esc_period_txt = $operation['esc_period'] ? $operation['esc_period'] : _('Default');
-		$esc_delay_txt = $delay[$operation['esc_step_from']] ? convert_units($delay[$operation['esc_step_from']], 'uptime') : _('Immediately');
+		$esc_delay_txt = $delay[$operation['esc_step_from']]
+			? convert_units(array('value' => $delay[$operation['esc_step_from']], 'units' => 'uptime'))
+			: _('Immediately');
 
 		$operationRow = array(
 			$esc_steps_txt,
