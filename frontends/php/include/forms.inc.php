@@ -541,6 +541,7 @@
 		if (!empty($filter_hostId)) {
 			$getHostInfo = API::Host()->get(array(
 				'hostids' => $filter_hostId,
+				'templated_hosts' => true,
 				'output' => array('name')
 			));
 			$getHostInfo = reset($getHostInfo);
