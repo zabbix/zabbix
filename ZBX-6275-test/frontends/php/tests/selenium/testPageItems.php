@@ -21,19 +21,18 @@
 require_once dirname(__FILE__) . '/../include/class.cwebtest.php';
 
 class testPageItems extends CWebTest {
-	// Returns all hosts
+	// returns all hosts and templates
 	public static function data() {
-		return DBdata('SELECT * FROM hosts
-					WHERE status IN ('
-						.HOST_STATUS_MONITORED.','
-						.HOST_STATUS_NOT_MONITORED.','
-						.HOST_STATUS_TEMPLATE.')');
+		return DBdata(
+			'SELECT hostid,status'.
+			' FROM hosts'.
+			' WHERE status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.','.HOST_STATUS_TEMPLATE.')'
+		);
 	}
 
 	/**
 	* @dataProvider data
 	*/
-
 	public function testPageItems_CheckLayout($data) {
 		if ($data['status'] == HOST_STATUS_MONITORED || $data['status'] == HOST_STATUS_NOT_MONITORED) {
 			$hostid = $data['hostid'];
@@ -44,7 +43,7 @@ class testPageItems extends CWebTest {
 			$this->checkTitle('Configuration of hosts');
 			$this->zbxTestTextPresent('HOSTS');
 			// Go to the list of items
-			$this->href_click("items.php?filter_set=1&hostid=$hostid&sid=");
+			$this->href_click('items.php?hostid='.$hostid);
 			$this->wait();
 			// We are in the list of items
 			$this->checkTitle('Configuration of items');
@@ -68,7 +67,7 @@ class testPageItems extends CWebTest {
 					'Error'
 				)
 			);
-			// someday should check that interval is not shown for trapper items, trends not shown for non-numeric items etc
+			// TODO someday should check that interval is not shown for trapper items, trends not shown for non-numeric items etc
 
 			$this->zbxTestDropdownHasOptions('go', array(
 					'Enable selected',
@@ -79,7 +78,7 @@ class testPageItems extends CWebTest {
 					'Delete selected'
 			));
 		}
-		if ($data['status'] == HOST_STATUS_TEMPLATE) {
+		elseif ($data['status'] == HOST_STATUS_TEMPLATE) {
 			$templateid = $data['hostid'];
 
 			$this->zbxTestLogin('templates.php');
@@ -88,7 +87,7 @@ class testPageItems extends CWebTest {
 			$this->checkTitle('Configuration of templates');
 			$this->zbxTestTextPresent('TEMPLATES');
 			// Go to the list of items
-			$this->href_click("items.php?filter_set=1&groupid=0&hostid=$templateid&sid=");
+			$this->href_click('items.php?hostid='.$templateid);
 			$this->wait();
 			// We are in the list of items
 			$this->checkTitle('Configuration of items');
@@ -112,7 +111,7 @@ class testPageItems extends CWebTest {
 				)
 			);
 			$this->zbxTestTextNotPresent('Error');
-			// someday should check that interval is not shown for trapper items, trends not shown for non-numeric items etc
+			// TODO someday should check that interval is not shown for trapper items, trends not shown for non-numeric items etc
 
 			$this->zbxTestDropdownHasOptions('go', array(
 					'Enable selected',

@@ -24,85 +24,51 @@ class testPageItemPrototypes extends CWebTest {
 
 	// Returns all item protos
 	public static function data() {
-		$sql = 'SELECT h.status, i.name, i.itemid, d.parent_itemid, h.hostid, di.name AS d_name FROM items i, item_discovery d, items di, hosts h'.
-					' WHERE i.itemid=d.itemid'.
-					' AND h.hostid=i.hostid'.
-					' AND d.parent_itemid=di.itemid'.
-					" AND i.key_ LIKE '%zbx6275%'";
-		return DBdata($sql);
+		return DBdata(
+			'SELECT h.status,i.name,i.itemid,d.parent_itemid,h.hostid,di.name AS d_name'.
+			' FROM items i,item_discovery d,items di,hosts h'.
+			' WHERE i.itemid=d.itemid'.
+				' AND h.hostid=i.hostid'.
+				' AND d.parent_itemid=di.itemid'.
+				' AND i.key_ LIKE '.zbx_dbstr('%zbx6275%');
+		);
 	}
 
 	/**
 	* @dataProvider data
 	*/
-
 	public function testPageItemPrototypes_CheckLayout($data) {
 		$druleid = $data['parent_itemid'];
 		$drule = $data['d_name'];
 		$hostid = $data['hostid'];
 
+		$this->zbxTestLogin('disc_prototypes.php?hostid='.$hostid.'&parent_discoveryid='.$druleid);
+
+		// We are in the list of protos
+		$this->checkTitle('Configuration of item prototypes');
+		$this->zbxTestTextPresent('CONFIGURATION OF ITEM PROTOTYPES');
+		$this->zbxTestTextPresent('Item prototypes of '.$drule);
+		$this->zbxTestTextPresent('Displaying');
+
 		if ($data['status'] == HOST_STATUS_MONITORED || $data['status'] == HOST_STATUS_NOT_MONITORED) {
-
-			$this->zbxTestLogin("disc_prototypes.php?hostid=$hostid&parent_discoveryid=$druleid");
-			// We are in the list of protos
-			$this->checkTitle('Configuration of item prototypes');
-			$this->zbxTestTextPresent('CONFIGURATION OF ITEM PROTOTYPES');
-			$this->zbxTestTextPresent('Item prototypes of '.$drule);
-			$this->zbxTestTextPresent('Displaying');
 			$this->zbxTestTextPresent('Host list');
-			// Header
-			$this->zbxTestTextPresent(
-				array(
-					'Name',
-					'Key',
-					'Interval',
-					'History',
-					'Trends',
-					'Type',
-					'Applications',
-					'Status'
-				)
-			);
-			$this->zbxTestTextNotPresent('Error');
-			// someday should check that interval is not shown for trapper items, trends not shown for non-numeric items etc
-
-			$this->zbxTestDropdownHasOptions('go', array(
-					'Activate selected',
-					'Disable selected',
-					'Delete selected'
-			));
 		}
 		if ($data['status'] == HOST_STATUS_TEMPLATE) {
-
-			$this->zbxTestLogin("disc_prototypes.php?hostid=$hostid&parent_discoveryid=$druleid");
-			// We are in the list of protos
-			$this->checkTitle('Configuration of item prototypes');
-			$this->zbxTestTextPresent('CONFIGURATION OF ITEM PROTOTYPES');
-			$this->zbxTestTextPresent('Item prototypes of '.$drule);
-			$this->zbxTestTextPresent('Displaying');
 			$this->zbxTestTextPresent('Template list');
-			// Header
-			$this->zbxTestTextPresent(
-				array(
-					'Name',
-					'Key',
-					'Interval',
-					'History',
-					'Trends',
-					'Type',
-					'Applications',
-					'Status'
-				)
-			);
-			$this->zbxTestTextNotPresent('Error');
-			// someday should check that interval is not shown for trapper items, trends not shown for non-numeric items etc
-
-			$this->zbxTestDropdownHasOptions('go', array(
-					'Activate selected',
-					'Disable selected',
-					'Delete selected'
-			));
 		}
+
+		// Header
+		$this->zbxTestTextPresent(
+			array('Name', 'Key', 'Interval', 'History', 'Trends', 'Type', 'Applications', 'Status')
+		);
+		$this->zbxTestTextNotPresent('Error');
+		// TODO someday should check that interval is not shown for trapper items, trends not shown for non-numeric items etc
+
+		$this->zbxTestDropdownHasOptions('go', array(
+			'Activate selected',
+			'Disable selected',
+			'Delete selected'
+		));
 	}
 
 	/**
@@ -123,7 +89,7 @@ class testPageItemPrototypes extends CWebTest {
 
 		$this->chooseOkOnNextConfirmation();
 
-		$this->zbxTestLogin("disc_prototypes.php?hostid=$hostid&parent_discoveryid=$druleid");
+		$this->zbxTestLogin('disc_prototypes.php?hostid='.$hostid.'&parent_discoveryid='.$druleid);
 		$this->checkTitle('Configuration of item prototypes');
 		$this->zbxTestCheckboxSelect('group_itemid_'.$itemid);
 		$this->zbxTestDropdownSelect('go', 'Delete selected');
@@ -136,13 +102,7 @@ class testPageItemPrototypes extends CWebTest {
 		$this->zbxTestTextPresent('CONFIGURATION OF ITEM PROTOTYPES');
 		$this->zbxTestTextPresent('Item prototypes of '.$drule);
 
-		$sql = "SELECT * FROM items WHERE itemid=$itemid AND flags=".ZBX_FLAG_DISCOVERY;
-		$this->assertEquals(0, DBcount($sql));
-		$sql = "SELECT * FROM item_discovery WHERE parent_itemid=$itemid";
-		$this->assertEquals(0, DBcount($sql));
-		$sql = "SELECT gi.gitemid FROM graphs_items gi, item_discovery id WHERE gi.itemid=id.itemid AND id.parent_itemid=$itemid";
-		$this->assertEquals(0, DBcount($sql));
-		$sql = "SELECT f.functionid FROM functions f, item_discovery id WHERE f.itemid=id.itemid AND id.parent_itemid=$itemid";
+		$sql = 'SELECT null FROM items WHERE itemid='.$itemid;
 		$this->assertEquals(0, DBcount($sql));
 	}
 
@@ -169,9 +129,12 @@ class testPageItemPrototypes extends CWebTest {
 		$drule = $rule['d_name'];
 		$hostid = $rule['hostid'];
 
+		$itemids = DBdata('select itemid from item_discovery where parent_itemid='.$druleid);
+		$itemids = zbx_objectValues($itemids, 'itemid');
+
 		$this->chooseOkOnNextConfirmation();
 
-		$this->zbxTestLogin("disc_prototypes.php?hostid=$hostid&parent_discoveryid=$druleid");
+		$this->zbxTestLogin('disc_prototypes.php?hostid='.$hostid.'&parent_discoveryid='.$druleid);
 		$this->checkTitle('Configuration of item prototypes');
 		$this->zbxTestCheckboxSelect('all_items');
 		$this->zbxTestDropdownSelect('go', 'Delete selected');
@@ -184,13 +147,7 @@ class testPageItemPrototypes extends CWebTest {
 		$this->zbxTestTextPresent('CONFIGURATION OF ITEM PROTOTYPES');
 		$this->zbxTestTextPresent('Item prototypes of '.$drule);
 
-		$sql = "SELECT * FROM items WHERE itemid=$itemid AND flags=".ZBX_FLAG_DISCOVERY;
-		$this->assertEquals(0, DBcount($sql));
-		$sql = "SELECT * FROM item_discovery WHERE parent_itemid=$itemid";
-		$this->assertEquals(0, DBcount($sql));
-		$sql = "SELECT gi.gitemid FROM graphs_items gi, item_discovery id WHERE gi.itemid=id.itemid AND id.parent_itemid=$itemid";
-		$this->assertEquals(0, DBcount($sql));
-		$sql = "SELECT f.functionid FROM functions f, item_discovery id WHERE f.itemid=id.itemid AND id.parent_itemid=$itemid";
+		$sql = 'SELECT null FROM items WHERE '.dbConditionInt('itemid', $itemids);
 		$this->assertEquals(0, DBcount($sql));
 	}
 
