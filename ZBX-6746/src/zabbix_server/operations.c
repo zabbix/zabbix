@@ -193,8 +193,10 @@ static zbx_uint64_t	add_discovered_host(DB_EVENT *event)
 
 	DB_RESULT		result;
 	DB_RESULT		result2;
+	DB_RESULT		result3;
 	DB_ROW			row;
 	DB_ROW			row2;
+	DB_ROW			row3;
 	zbx_uint64_t		dhostid, hostid = 0, proxy_hostid, host_proxy_hostid;
 	char			*host = NULL, *host_esc, *host_unique;
 	unsigned short		port;
@@ -341,6 +343,16 @@ static zbx_uint64_t	add_discovered_host(DB_EVENT *event)
 			host_esc = DBdyn_escape_string_len(row[1], HOST_HOST_LEN);
 			port = (unsigned short)atoi(row[4]);
 
+			zabbix_log(LOG_LEVEL_WARNING, "host_esc (%s)", host_esc);
+
+			result3 = DBselect("select host from hosts where host='%s' and status = %d", host_esc, HOST_STATUS_TEMPLATE);
+
+			if (NULL != (row3 = DBfetch(result3)))
+			{
+				zabbix_log(LOG_LEVEL_DEBUG, "cannot add discovered host: template with the same name already exists");
+				goto out;
+			}
+
 			zbx_snprintf(sql, sizeof(sql),
 					"select hostid,proxy_hostid"
 					" from hosts"
@@ -385,7 +397,7 @@ static zbx_uint64_t	add_discovered_host(DB_EVENT *event)
 				DBadd_interface(hostid, INTERFACE_TYPE_AGENT, 1, row[2], row[3], port);
 			}
 			DBfree_result(result2);
-
+out:
 			zbx_free(host_esc);
 		}
 		DBfree_result(result);
