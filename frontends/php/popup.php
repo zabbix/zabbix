@@ -322,6 +322,26 @@ else {
 if ($withApplications) {
 	$options['groups']['with_applications'] = true;
 	$options['hosts']['with_applications'] = true;
+
+	// for correct PageFilter work, required group if not specified.
+	if ($options['hostid'] > 0 && !$options['groupid']) {
+		$hostsResponse = API::Host()->get(array(
+			'hostids' => $options['hostid'],
+			'selectGroups' => array('groupid'),
+			'templated_hosts' => true,
+			'limit' => 1
+		));
+		if ($hostsResponse) {
+			$hostsResponse = reset($hostsResponse);
+			if ($hostsResponse['groups']) {
+				$hostsResponse = reset($hostsResponse['groups']);
+				$options['groupid'] = $hostsResponse['groupid'];
+			}
+		}
+	} // PageFilter dont unset 0 value
+	elseif ($options['hostid'] == 0) {
+		$options['hostid'] = null;
+	}
 }
 elseif ($withGraphs) {
 	$options['groups']['with_graphs'] = true;
@@ -339,6 +359,7 @@ elseif ($withMonitoredTriggers) {
 	$options['groups']['with_monitored_triggers'] = true;
 	$options['hosts']['with_monitored_triggers'] = true;
 }
+
 $pageFilter = new CPageFilter($options);
 
 // get groupid
