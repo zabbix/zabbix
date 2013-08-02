@@ -37,6 +37,7 @@ $slideForm->setName('slideForm');
 $slidesTable = new CTableInfo(_('No slide shows defined.'));
 $slidesTable->setHeader(array(
 	new CCheckBox('all_shows', null, "checkAll('".$slideForm->getName()."', 'all_shows', 'shows');"),
+	$this->data['displayNodes'] ? _('Node') : null,
 	make_sorting_header(_('Name'), 'name'),
 	make_sorting_header(_('Delay'), 'delay'),
 	make_sorting_header(_('Count of slides'), 'cnt')
@@ -48,6 +49,7 @@ foreach ($this->data['slides'] as $slide) {
 	}
 	$slidesTable->addRow(array(
 		new CCheckBox('shows['.$slide['slideshowid'].']', null, null, $slide['slideshowid']),
+		$this->data['displayNodes'] ? $slide['nodename'] : null,
 		new CLink($slide['name'], '?config=1&form=update&slideshowid='.$slide['slideshowid'], 'action'),
 		$slide['delay'],
 		$slide['cnt']

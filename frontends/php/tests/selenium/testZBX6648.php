@@ -28,15 +28,9 @@ class testZBX6648 extends CWebTest {
 		return array(
 			array(
 				array(
-					'hostgroup' => 'ZBX6648 Group No Hosts',
-					'triggers' => 'no triggers'
-				)
-			),
-			array(
-				array(
-					'hostgroup' => 'ZBX6648 Disabled Triggers',
-					'host' => 'ZBX6648 Disabled Triggers Host',
-					'triggers' => 'disabled'
+					'hostgroup' => 'ZBX6648 All Triggers',
+					'host' => 'ZBX6648 All Triggers Host',
+					'triggers' => 'both'
 				)
 			),
 			array(
@@ -48,9 +42,15 @@ class testZBX6648 extends CWebTest {
 			),
 			array(
 				array(
-					'hostgroup' => 'ZBX6648 All Triggers',
-					'host' => 'ZBX6648 All Triggers Host',
-					'triggers' => 'both'
+					'hostgroup' => 'ZBX6648 Disabled Triggers',
+					'host' => 'ZBX6648 Disabled Triggers Host',
+					'triggers' => 'disabled'
+				)
+			),
+			array(
+				array(
+					'hostgroup' => 'ZBX6648 Group No Hosts',
+					'triggers' => 'no triggers'
 				)
 			)
 		);
@@ -61,13 +61,14 @@ class testZBX6648 extends CWebTest {
 	 */
 	public function testZBX6648_eventFilter($zbx_data) {
 		$this->zbxTestLogin('events.php');
+		$this->zbxTestDropdownSelectWait('source', 'Trigger');
 
 		switch ($zbx_data['triggers']) {
-			case 'enabled' :
+			case 'both' :
 				$this->zbxTestDropdownSelectWait('groupid', $zbx_data['hostgroup']);
 				$this->zbxTestDropdownSelectWait('hostid', $zbx_data['host']);
 				break;
-			case 'both' :
+			case 'enabled' :
 				$this->zbxTestDropdownSelectWait('groupid', $zbx_data['hostgroup']);
 				$this->zbxTestDropdownSelectWait('hostid', $zbx_data['host']);
 				break;
