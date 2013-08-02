@@ -19,6 +19,7 @@
 
 #include "common.h"
 #include "sysinfo.h"
+#include "zbxregexp.h"
 
 #include <sys/sensors.h>
 
