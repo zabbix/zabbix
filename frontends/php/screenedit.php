@@ -74,7 +74,7 @@ include_once('include/page_header.php');
 	);
 
 	check_fields($fields);
-	$_REQUEST['dynmic'] = get_request('dynamic',SCREEN_SIMPLE_ITEM);
+	$_REQUEST['dynamic'] = get_request('dynamic',SCREEN_SIMPLE_ITEM);
 ?>
 <?php
 	$trigg_wdgt = new CWidget();
