@@ -7,6 +7,7 @@ New features:
 ...G...... [ZBXNEXT-1528] added net.if.in, net.if.out and net.if.total item support on HP-UX platforms (igors)
 
 Bug fixes:
+..F....... [ZBX-6825] fixed names of the added items, when editing graph (Guntis)
 ....I..... [ZBX-6843] fixed MySQL error while upgrading DB (Sasha)
 ....I..... [ZBX-6826] fixed default values for graphs.width and graphs.height (Sasha)
 ..F....... [ZBX-6793] removed irrelevant condition for pie graphs that decide we should use data from history (Guntis)
