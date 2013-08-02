@@ -99,14 +99,20 @@ function condition_type2str($conditionType) {
 	}
 }
 
-function discovery_object2str($object) {
-	switch ($object) {
-		case EVENT_OBJECT_DHOST:
-			return _('Device');
-		case EVENT_OBJECT_DSERVICE:
-			return _('Service');
-		default:
-			return _('Unknown');
+function discovery_object2str($object = null) {
+	$discoveryObjects = array(
+		EVENT_OBJECT_DHOST => _('Device'),
+		EVENT_OBJECT_DSERVICE => _('Service')
+	);
+
+	if ($object === null) {
+		return $discoveryObjects;
+	}
+	elseif (isset($discoveryObjects[$object])) {
+		return $discoveryObjects[$object];
+	}
+	else {
+		return _('Unknown');
 	}
 }
 
