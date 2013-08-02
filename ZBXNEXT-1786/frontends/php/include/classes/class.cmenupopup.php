@@ -24,6 +24,7 @@ class CMenuPopup extends CTag {
 	/**
 	 * @param bool   $options['isMap']
 	 * @param string $options['id']
+	 * @param int    $options['width']
 	 * @param string $options['hostid']
 	 * @param array  $options['scripts']
 	 * @param array  $options['goto']
@@ -32,11 +33,26 @@ class CMenuPopup extends CTag {
 	 * @param array  $options['urls']
 	 * @param array  $options['urls'][n]['name']
 	 * @param array  $options['urls'][n]['url']
+	 * @param array  $options['triggers']
+	 * @param array  $options['triggers']['items']
+	 * @param array  $options['history']
+	 * @param array  $options['history']['items']
+	 * @param array  $options['history']['items']['name']
+	 * @param array  $options['history']['items']['params']
+	 * @param array  $options['graphLatest']
+	 * @param array  $options['graphLatest']['itemid']
+	 * @param array  $options['values']
+	 * @param array  $options['latestValues']
+	 * @param array  $options['latestValues']['itemid']
 	 */
 	public function __construct(array $options = array()) {
 		parent::__construct('div', 'yes');
 		$this->attr('id', isset($options['id']) ? $options['id'] : null);
 		$this->addClass('menuPopup');
+
+		if (isset($options['width'])) {
+			$this->addStyle('width: '.$options['width'].'px;');
+		}
 
 		// scripts
 		if (!empty($options['scripts'])) {
@@ -165,6 +181,107 @@ class CMenuPopup extends CTag {
 				$this->addItem(new CDiv(_('URLs'), 'title'));
 				$this->addItem($menu);
 			}
+		}
+
+		// triggers
+		if (!empty($options['triggers']['items'])) {
+			$menu = new CList(null, 'menu');
+
+			foreach ($options['triggers']['items'] as $name => $args) {
+				if ($args) {
+					$params = '';
+
+					if (is_array($args)) {
+						foreach ($args as $key => $value) {
+							$params .= ($params ? '&' : '?').$key.'='.$value;
+						}
+					}
+
+					switch ($name) {
+						case 'acknow':
+							$link = new CLink(_('Acknowledge'), 'acknow.php'.$params);
+							$link->attr('target', '_blank');
+							break;
+
+						case 'events':
+							$link = new CLink(_('Events'), 'events.php'.$params);
+							$link->attr('target', '_blank');
+							break;
+					}
+
+					$menu->addItem($link);
+				}
+			}
+
+			if (!$menu->emptyList) {
+				$this->addItem(new CDiv(_('Trigger'), 'title'));
+				$this->addItem($menu);
+			}
+		}
+
+		// history
+		if (!empty($options['history']['items'])) {
+			$menuGraphs = new CList(null, 'menu');
+			$menuValues = new CList(null, 'menu');
+
+			foreach ($options['history']['items'] as $item) {
+				$params = '';
+
+				if (!empty($item['params'])) {
+					foreach ($item['params'] as $key => $value) {
+						$params .= ($params ? '&' : '?').$key.'='.$value;
+					}
+				}
+
+				$link = new CLink($item['name'], 'history.php'.$params);
+				$link->attr('target', '_blank');
+
+				if (isset($item['params']['action']) && $item['params']['action'] == 'showlatest') {
+					$menuValues->addItem($link);
+				}
+				else {
+					$menuGraphs->addItem($link);
+				}
+			}
+
+			if (!$menuGraphs->emptyList) {
+				$this->addItem(new CDiv(_('Graphs'), 'title'));
+				$this->addItem($menuGraphs);
+			}
+			if (!$menuValues->emptyList) {
+				$this->addItem(new CDiv(_('500 latest values'), 'title'));
+				$this->addItem($menuValues);
+			}
+		}
+
+		// graph latest
+		if (!empty($options['graphLatest'])) {
+			$this->addItem(new CDiv(_('Graphs'), 'title'));
+
+			$menu = new CList(null, 'menu');
+
+			$hourLink = new CLink(_('Last hour graph'), 'history.php?period=3600&action=showgraph&itemid='.$options['graphLatest']['itemid']);
+			$hourLink->attr('target', '_blank');
+			$menu->addItem($hourLink);
+
+			$weekLink = new CLink(_('Last week graph'), 'history.php?period=604800&action=showgraph&itemid='.$options['graphLatest']['itemid']);
+			$weekLink->attr('target', '_blank');
+			$menu->addItem($weekLink);
+
+			$monthLink = new CLink(_('Last month graph'), 'history.php?period=2678400&action=showgraph&itemid='.$options['graphLatest']['itemid']);
+			$monthLink->attr('target', '_blank');
+			$menu->addItem($monthLink);
+
+			$this->addItem($menu);
+		}
+
+		// latest values
+		if (!empty($options['latestValues'])) {
+			$link = new CLink(_('500 latest values'), 'history.php?action=showlatest&itemid='.$options['latestValues']['itemid']);
+			$link->attr('target', '_blank');
+
+			$this->addItem(new CDiv(_('Values'), 'title'));
+			$this->addItem(new CList($link, 'menu'));
 		}
 
 		// insert js

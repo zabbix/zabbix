@@ -93,14 +93,14 @@ $overviewWidget->addHeader($hostLocationForm);
 
 if ($config['dropdown_first_entry'] || $this->data['pageFilter']->applicationsSelected) {
 	if ($this->data['type'] == SHOW_DATA) {
-		$dataTable = get_items_data_overview(
+		$dataTable = getItemsDataOverview(
 			array_keys($this->data['pageFilter']->hosts),
 			$this->data['pageFilter']->application,
 			$this->data['view_style']
 		);
 	}
 	elseif ($this->data['type'] == SHOW_TRIGGERS) {
-		$dataTable = get_triggers_overview(
+		$dataTable = getTriggersOverview(
 			array_keys($this->data['pageFilter']->hosts),
 			$this->data['pageFilter']->application,
 			$this->data['view_style']

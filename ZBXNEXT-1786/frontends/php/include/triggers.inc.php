@@ -1084,35 +1084,33 @@ function replace_template_dependencies($deps, $hostid) {
 /**
  * Creates and returns the trigger overview table for the given hosts.
  *
- * Possible $view_style values:
- * - STYLE_TOP
- * - STYLE_LEFT
- *
- * @param string|array $hostids
- * @param string       $application name of application to filter
- * @param int          $view_style  table display style: either hosts on top, or host on the left side
- * @param string       $screenId    the ID of the screen, that contains the trigger overview table
+ * @param array  $hostIds
+ * @param string $application	name of application to filter
+ * @param int    $viewMode		table display style: either hosts on top, or host on the left side
+ * @param string $screenId		the ID of the screen, that contains the trigger overview table
  *
  * @return CTableInfo
  */
-function get_triggers_overview($hostids, $application, $view_style = null, $screenId = null) {
-	if (is_null($view_style)) {
-		$view_style = CProfile::get('web.overview.view.style', STYLE_TOP);
+function getTriggersOverview($hostIds, $application, $viewMode = null, $screenId = null) {
+	if (is_null($viewMode)) {
+		$viewMode = CProfile::get('web.overview.view.style', STYLE_TOP);
 	}
+
+	// get application ids
 	$applicationIds = null;
 	if ($application !== '') {
-		$dbApps = API::Application()->get(array(
-			'hostids' => $hostids,
+		$dbApplications = API::Application()->get(array(
+			'hostids' => $hostIds,
 			'filter' => array('name' => $application),
 			'output' => array('applicationid')
 		));
-		$applicationIds = zbx_objectValues($dbApps, 'applicationid');
-		$hostids = null;
+		$applicationIds = zbx_objectValues($dbApplications, 'applicationid');
+		$hostIds = null;
 	}
 
 	// get triggers
 	$dbTriggers = API::Trigger()->get(array(
-		'hostids' => $hostids,
+		'hostids' => $hostIds,
 		'applicationids' => $applicationIds,
 		'monitored' => true,
 		'skipDependent' => true,
@@ -1122,79 +1120,89 @@ function get_triggers_overview($hostids, $application, $view_style = null, $scre
 	));
 
 	// get hosts
-	$hostids = array();
+	$hostIds = array();
 	foreach ($dbTriggers as $trigger) {
-		$hostids[] = $trigger['hosts'][0]['hostid'];
+		$host = reset($trigger['hosts']);
+
+		$hostIds[$host['hostid']] = $host['hostid'];
 	}
 
-	$options = array(
+	$hosts = API::Host()->get(array(
 		'output' => array('name', 'hostid'),
-		'hostids' => $hostids,
-		'preservekeys' => true
-	);
-
-	if ($view_style == STYLE_LEFT) {
-		$options['selectScreens'] = API_OUTPUT_COUNT;
-		$options['selectInventory'] = array('hostid');
-	}
-	$hosts = API::Host()->get($options);
+		'hostids' => $hostIds,
+		'preservekeys' => true,
+		'selectScreens' => ($viewMode == STYLE_LEFT) ? API_OUTPUT_COUNT : null,
+		'selectInventory' => ($viewMode == STYLE_LEFT) ? array('hostid') : null
+	));
 
 	$triggers = array();
 	$hostNames = array();
-	foreach ($dbTriggers as $trigger) {
-		$trigger['host'] = $trigger['hosts'][0]['name'];
-		$trigger['hostid'] = $trigger['hosts'][0]['hostid'];
-		$trigger['host'] = get_node_name_by_elid($trigger['hostid'], null, NAME_DELIMITER).$trigger['host'];
-		$trigger['description'] = CMacrosResolverHelper::resolveTriggerReference($trigger['expression'], $trigger['description']);
 
-		$hostNames[$trigger['hostid']] = $trigger['host'];
+	foreach ($dbTriggers as $trigger) {
+		$host = reset($trigger['hosts']);
+
+		$host['name'] = get_node_name_by_elid($host['hostid'], null, NAME_DELIMITER).$host['name'];
+		$trigger['description'] = CMacrosResolverHelper::resolveTriggerReference($trigger['expression'], $trigger['description']);
+		$hostNames[$host['hostid']] = $host['name'];
 
 		// a little tricky check for attempt to overwrite active trigger (value=1) with
 		// inactive or active trigger with lower priority.
-		if (!isset($triggers[$trigger['description']][$trigger['host']])
-				|| (($triggers[$trigger['description']][$trigger['host']]['value'] == TRIGGER_VALUE_FALSE && $trigger['value'] == TRIGGER_VALUE_TRUE)
-					|| (($triggers[$trigger['description']][$trigger['host']]['value'] == TRIGGER_VALUE_FALSE || $trigger['value'] == TRIGGER_VALUE_TRUE)
-						&& $trigger['priority'] > $triggers[$trigger['description']][$trigger['host']]['priority']))) {
-			$triggers[$trigger['description']][$trigger['host']] = array(
-				'hostid'	=> $trigger['hostid'],
-				'triggerid'	=> $trigger['triggerid'],
-				'value'		=> $trigger['value'],
-				'lastchange'=> $trigger['lastchange'],
-				'priority'	=> $trigger['priority']
+		if (!isset($triggers[$trigger['description']][$host['name']])
+				|| (($triggers[$trigger['description']][$host['name']]['value'] == TRIGGER_VALUE_FALSE && $trigger['value'] == TRIGGER_VALUE_TRUE)
+					|| (($triggers[$trigger['description']][$host['name']]['value'] == TRIGGER_VALUE_FALSE || $trigger['value'] == TRIGGER_VALUE_TRUE)
+						&& $trigger['priority'] > $triggers[$trigger['description']][$host['name']]['priority']))) {
+			$triggers[$trigger['description']][$host['name']] = array(
+				'hostid' => $host['hostid'],
+				'triggerid' => $trigger['triggerid'],
+				'value' => $trigger['value'],
+				'lastchange' => $trigger['lastchange'],
+				'priority' => $trigger['priority']
 			);
 		}
 	}
 
 	$triggerTable = new CTableInfo(_('No triggers defined.'));
+
 	if (empty($hostNames)) {
 		return $triggerTable;
 	}
+
 	$triggerTable->makeVerticalRotation();
+
 	order_result($hostNames);
 
-	if ($view_style == STYLE_TOP) {
+	if ($viewMode == STYLE_TOP) {
 		// header
 		$header = array(new CCol(_('Triggers'), 'center'));
+
 		foreach ($hostNames as $hostName) {
 			$header[] = new CCol($hostName, 'vertical_rotation');
 		}
+
 		$triggerTable->setHeader($header, 'vertical_header');
 
 		// data
 		foreach ($triggers as $description => $triggerHosts) {
-			$tableColumns = array(nbsp($description));
-			foreach ($hostNames as $hostid => $hostName) {
-				array_push($tableColumns, get_trigger_overview_cells($triggerHosts, $hostName, $screenId));
+			$columns = array(nbsp($description));
+
+			foreach ($hostNames as $hostName) {
+				$columns[] = getTriggerOverviewCells(
+					isset($triggerHosts[$hostName]) ? $triggerHosts[$hostName] : null,
+					$screenId
+				);
 			}
-			$triggerTable->addRow($tableColumns);
+
+			$triggerTable->addRow($columns);
 		}
 	}
 	else {
 		// header
 		$header = array(new CCol(_('Host'), 'center'));
+
 		foreach ($triggers as $description => $triggerHosts) {
 			$header[] = new CCol($description, 'vertical_rotation');
 		}
+
 		$triggerTable->setHeader($header, 'vertical_header');
 
 		// data
@@ -1224,12 +1232,15 @@ function get_triggers_overview($hostids, $application, $view_style = null, $scre
 				)))
 			);
 
-			$tableColumns = array($hostDiv);
+			$columns = array($hostDiv);
 			foreach ($triggers as $triggerHosts) {
-				array_push($tableColumns, get_trigger_overview_cells($triggerHosts, $hostName, $screenId));
+				$columns[] = getTriggerOverviewCells(
+					isset($triggerHosts[$hostName]) ? $triggerHosts[$hostName] : null,
+					$screenId
+				);
 			}
 
-			$triggerTable->addRow($tableColumns);
+			$triggerTable->addRow($columns);
 		}
 	}
 
@@ -1239,188 +1250,168 @@ function get_triggers_overview($hostids, $application, $view_style = null, $scre
 /**
  * Creates and returns a trigger status cell for the trigger overview table.
  *
- * @see get_triggers_overview()
+ * @see getTriggersOverview()
  *
- * @param array $triggerHosts	an array with the data about the trigger for each host
- * @param string $hostName		the name of the cells corresponding host
+ * @param array  $trigger
  * @param string $screenId
  *
  * @return CCol
  */
-function get_trigger_overview_cells($triggerHosts, $hostName, $screenId = null) {
+function getTriggerOverviewCells($trigger, $screenId = null) {
 	$ack = null;
-	$css_class = null;
+	$css = null;
+	$style = null;
 	$desc = array();
 	$config = select_config(); // for how long triggers should blink on status change (set by user in administration->general)
+	$menuPopupOptions = array();
 
-	if (isset($triggerHosts[$hostName])) {
-		// problem trigger
-		if ($triggerHosts[$hostName]['value'] == TRIGGER_VALUE_TRUE) {
-				$css_class = getSeverityStyle($triggerHosts[$hostName]['priority']);
-				$ack = null;
-
-				if ($config['event_ack_enable'] == 1) {
-					$event = get_last_event_by_triggerid($triggerHosts[$hostName]['triggerid']);
-					if ($event) {
-						if ($screenId) {
-							global $page;
-							$ack_menu = array(_('Acknowledge'), 'acknow.php?eventid='.$event['eventid'].'&screenid='.$screenId.'&backurl='.$page['file']);
-						}
-						else {
-							$ack_menu = array(_('Acknowledge'), 'acknow.php?eventid='.$event['eventid'].'&backurl=overview.php', array('tw' => '_blank'));
-						}
-
-						if ($event['acknowledged'] == 1) {
-							$ack = new CImg('images/general/tick.png', 'ack');
-						}
-					}
-				}
-		}
-		// ok trigger
-		else {
-			$css_class = 'normal';
-		}
+	if ($trigger) {
 		$style = 'cursor: pointer; ';
 
-		unset($item_menu);
-		$tr_ov_menu = array(
-			// name, url, (target [tw], statusbar [sb]), css, submenu
-			array(
-				_('Trigger'),
-				null,
-				null,
-				array('outer' => array('pum_oheader'), 'inner' => array('pum_iheader'))),
-				array(_('Events'), 'events.php?triggerid='.$triggerHosts[$hostName]['triggerid'], array('tw' => '_blank')
+		$menuPopupOptions = array(
+			'width' => 200,
+			'triggers' => array(
+				'items' => array(
+					'events' => array('triggerid' => $trigger['triggerid'])
+				)
 			)
 		);
 
-		if (isset($ack_menu)) {
-			$tr_ov_menu[] = $ack_menu;
+		// problem trigger
+		if ($trigger['value'] == TRIGGER_VALUE_TRUE) {
+			$css = getSeverityStyle($trigger['priority']);
+			$ack = null;
+
+			if ($config['event_ack_enable'] == 1) {
+				if ($event = get_last_event_by_triggerid($trigger['triggerid'])) {
+					if ($screenId) {
+						global $page;
+
+						$menuPopupOptions['triggers']['items']['acknow'] = array(
+							'eventid' => $event['eventid'],
+							'screenid' => $screenId,
+							'backurl' => $page['file']
+						);
+					}
+					else {
+						$menuPopupOptions['triggers']['items']['acknow'] = array(
+							'eventid' => $event['eventid'],
+							'backurl' => 'overview.php'
+						);
+					}
+
+					if ($event['acknowledged'] == 1) {
+						$ack = new CImg('images/general/tick.png', 'ack');
+					}
+				}
+			}
 		}
+		// ok trigger
+		else {
+			$css = 'normal';
+		}
+
+		$itemMenu = array();
 
 		$dbItems = DBselect(
 			'SELECT DISTINCT i.itemid,i.name,i.key_,i.value_type'.
 			' FROM items i,functions f'.
 			' WHERE f.itemid=i.itemid'.
-				' AND f.triggerid='.$triggerHosts[$hostName]['triggerid']
+				' AND f.triggerid='.$trigger['triggerid']
 		);
 		while ($item = DBfetch($dbItems)) {
 			$description = itemName($item);
+
 			switch ($item['value_type']) {
 				case ITEM_VALUE_TYPE_UINT64:
 				case ITEM_VALUE_TYPE_FLOAT:
-					$action = 'showgraph';
-					$status_bar = _('Show graph of item').' \''.$description.'\'';
+					$menuPopupOptions['history']['items'][] = array(
+						'name' => $description,
+						'params' => array(
+							'action' => 'showgraph',
+							'itemid' => $item['itemid'],
+							'period' => 3600
+						)
+					);
 					break;
+
 				case ITEM_VALUE_TYPE_LOG:
 				case ITEM_VALUE_TYPE_STR:
 				case ITEM_VALUE_TYPE_TEXT:
 				default:
-					$action = 'showlatest';
-					$status_bar = _('Show values of item').' \''.$description.'\'';
+					$menuPopupOptions['history']['items'][] = array(
+						'name' => $description,
+						'params' => array(
+							'action' => 'showlatest',
+							'itemid' => $item['itemid'],
+							'period' => 3600
+						)
+					);
 					break;
 			}
-
-			if (zbx_strlen($description) > 25) {
-				$description = zbx_substr($description, 0, 22).'...';
-			}
-
-			$item_menu[$action][] = array(
-				$description,
-				'history.php?action='.$action.'&itemid='.$item['itemid'].'&period=3600',
-				array('tw' => '', 'sb' => $status_bar)
-			);
 		}
-
-		if (isset($item_menu['showgraph'])) {
-			$tr_ov_menu[] = array(
-				_('Graphs'),
-				null,
-				null,
-				array('outer' => array('pum_oheader'), 'inner' => array('pum_iheader'))
-			);
-			$tr_ov_menu = array_merge($tr_ov_menu, $item_menu['showgraph']);
-		}
-
-		if (isset($item_menu['showlatest'])) {
-			$tr_ov_menu[] = array(
-				_('Values'),
-				null,
-				null,
-				array('outer' => array('pum_oheader'), 'inner' => array('pum_iheader'))
-			);
-			$tr_ov_menu = array_merge($tr_ov_menu, $item_menu['showlatest']);
-		}
-		unset($item_menu);
 
 		// dependency: triggers on which depends this
-		$triggerid = !empty($triggerHosts[$hostName]['triggerid']) ? $triggerHosts[$hostName]['triggerid'] : 0;
+		$triggerId = empty($trigger['triggerid']) ? 0 : $trigger['triggerid'];
 
-		$dep_table = new CTableInfo();
-		$dep_table->setAttribute('style', 'width: 200px;');
-		$dep_table->addRow(bold(_('Depends on').NAME_DELIMITER));
+		// trigger dependency DOWN
+		$dependencyTable = new CTableInfo();
+		$dependencyTable->setAttribute('style', 'width: 200px;');
+		$dependencyTable->addRow(bold(_('Depends on').NAME_DELIMITER));
 
-		$dependency = false;
-		$dep_res = DBselect('SELECT td.* FROM trigger_depends td WHERE td.triggerid_down='.$triggerid);
-		while ($dep_row = DBfetch($dep_res)) {
-			$dep_table->addRow(SPACE.'-'.SPACE.CMacrosResolverHelper::resolveTriggerNameById($dep_row['triggerid_up']));
-			$dependency = true;
+		$isDependencyFound = false;
+		$dbDependencies = DBselect('SELECT td.* FROM trigger_depends td WHERE td.triggerid_down='.$triggerId);
+		while ($dbDependency = DBfetch($dbDependencies)) {
+			$dependencyTable->addRow(SPACE.'-'.SPACE.CMacrosResolverHelper::resolveTriggerNameById($dbDependency['triggerid_up']));
+			$isDependencyFound = true;
 		}
 
-		if ($dependency) {
-			$img = new Cimg('images/general/arrow_down2.png', 'DEP_DOWN');
-			$img->setAttribute('style', 'vertical-align: middle; border: 0px;');
-			$img->setHint($dep_table, '', '', false);
-			array_push($desc, $img);
-		}
-		unset($img, $dep_table, $dependency);
+		if ($isDependencyFound) {
+			$icon = new Cimg('images/general/arrow_down2.png', 'DEP_DOWN');
+			$icon->setAttribute('style', 'vertical-align: middle; border: 0px;');
+			$icon->setHint($dependencyTable, '', '', false);
 
-		// triggers that depend on this
-		$dep_table = new CTableInfo();
-		$dep_table->setAttribute('style', 'width: 200px;');
-		$dep_table->addRow(bold(_('Dependent').NAME_DELIMITER));
-
-		$dependency = false;
-		$dep_res = DBselect('SELECT td.* FROM trigger_depends td WHERE td.triggerid_up='.$triggerid);
-		while ($dep_row = DBfetch($dep_res)) {
-			$dep_table->addRow(SPACE.'-'.SPACE.CMacrosResolverHelper::resolveTriggerNameById($dep_row['triggerid_down']));
-			$dependency = true;
+			$desc[] = $icon;
 		}
 
-		if ($dependency) {
-			$img = new Cimg('images/general/arrow_up2.png', 'DEP_UP');
-			$img->setAttribute('style', 'vertical-align: middle; border: 0px;');
-			$img->setHint($dep_table, '', '', false);
-			array_push($desc, $img);
+		// trigger dependency UP
+		$dependencyTable = new CTableInfo();
+		$dependencyTable->setAttribute('style', 'width: 200px;');
+		$dependencyTable->addRow(bold(_('Dependent').NAME_DELIMITER));
+
+		$isDependencyFound = false;
+		$dbDependencies = DBselect('SELECT td.* FROM trigger_depends td WHERE td.triggerid_up='.$triggerId);
+		while ($dbDependency = DBfetch($dbDependencies)) {
+			$dependencyTable->addRow(SPACE.'-'.SPACE.CMacrosResolverHelper::resolveTriggerNameById($dbDependency['triggerid_down']));
+			$isDependencyFound = true;
 		}
-		unset($img, $dep_table, $dependency);
+
+		if ($isDependencyFound) {
+			$icon = new Cimg('images/general/arrow_up2.png', 'DEP_UP');
+			$icon->setAttribute('style', 'vertical-align: middle; border: none;');
+			$icon->setHint($dependencyTable, '', '', false);
+
+			$desc[] = $icon;
+		}
 	}
 
-	if ((is_array($desc) && count($desc) > 0) || $ack) {
-		$tableColumn = new CCol(array($desc, $ack), $css_class.' hosts');
-	}
-	else {
-		$tableColumn = new CCol(SPACE, $css_class.' hosts');
+	$column = ((is_array($desc) && count($desc) > 0) || $ack)
+		? new CCol(array($desc, $ack), $css.' hosts')
+		: new CCol(SPACE, $css.' hosts');
+
+	$column->setAttribute('style', $style);
+
+	if ($trigger && $config['blink_period'] > 0 && time() - $trigger['lastchange'] < $config['blink_period']) {
+		$column->addClass('blink');
+		$column->setAttribute('data-toggle-class', $css);
 	}
 
-	if (isset($style)) {
-		$tableColumn->setAttribute('style', $style);
-	}
+	$menuPopupOptions['id'] = CMenuPopup::getId();
 
-	if (isset($triggerHosts[$hostName]) && $config['blink_period'] > 0
-		&& time() - $triggerHosts[$hostName]['lastchange'] < $config['blink_period']) {
-		$tableColumn->addClass('blink');
-		$tableColumn->setAttribute('data-toggle-class', $css_class);
-	}
+	$column->attr('data-menupopupid', $menuPopupOptions['id']);
+	$column->addItem(new CMenuPopup($menuPopupOptions));
 
-	if (isset($tr_ov_menu)) {
-		$tr_ov_menu = new CPUMenu($tr_ov_menu, 170);
-		$tableColumn->onClick($tr_ov_menu->getOnActionJS());
-		$tableColumn->addAction('onmouseover', 'jQuery(this).css({border: "1px dotted #0C0CF0", padding: "0 2px"})');
-		$tableColumn->addAction('onmouseout', 'jQuery(this).css({border: "", padding: "1px 3px"})');
-	}
-
-	return $tableColumn;
+	return $column;
 }
 
 function calculate_availability($triggerid, $period_start, $period_end) {
