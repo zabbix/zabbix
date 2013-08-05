@@ -516,7 +516,8 @@ class CHostGroup extends CZBXAPI {
 		));
 		foreach ($groups as $group) {
 			if (!isset($updGroups[$group['groupid']])) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
+				self::exception(ZBX_API_ERROR_PERMISSIONS,
+					_('No permissions to referred object or it does not exist!'));
 			}
 		}
 
@@ -531,20 +532,24 @@ class CHostGroup extends CZBXAPI {
 
 		$update = array();
 		foreach ($groups as $group) {
-			if (isset($group['name'])
-				&& isset($groupsNames[$group['name']])
-				&& !idcmp($groupsNames[$group['name']]['groupid'], $group['groupid'])
-			) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Host group "%1$s" already exists.', $group['name']));
+			if (isset($group['name'])) {
+				if (zbx_empty($group['name'])) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty name for host group.'));
+				}
+
+				if (isset($groupsNames[$group['name']])
+						&& !idcmp($groupsNames[$group['name']]['groupid'], $group['groupid'])) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Host group "%1$s" already exists.', $group['name']));
+				}
+
+				$update[] = array(
+					'values' => array('name' => $group['name']),
+					'where' => array('groupid' => $group['groupid'])
+				);
 			}
 
 			// prevents updating several groups with same name
 			$groupsNames[$group['name']] = array('groupid' => $group['groupid']);
-
-			$update[] = array(
-				'values' => array('name' => $group['name']),
-				'where' => array('groupid' => $group['groupid'])
-			);
 		}
 
 		DB::update('groups', $update);

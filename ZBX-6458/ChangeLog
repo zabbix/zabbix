@@ -7,6 +7,7 @@ New features:
 ...G...... [ZBXNEXT-1528] added net.if.in, net.if.out and net.if.total item support on HP-UX platforms (igors)
 
 Bug fixes:
+A......... [ZBX-6458] added more proper "name" parameter validation for hostgroup.update method in API (Ivo)
 A.F....... [ZBX-6808] fixed "Host metadata" field in actions and improved validation for action conditions (Ivo)
 ..F....... [ZBX-6825] fixed names of the added items, when editing graph (Guntis)
 ....I..... [ZBX-6843] fixed MySQL error while upgrading DB (Sasha)
