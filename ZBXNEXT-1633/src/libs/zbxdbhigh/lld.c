@@ -80,7 +80,7 @@ void	DBlld_process_discovery_rule(zbx_uint64_t lld_ruleid, char *value, zbx_time
 			zabbix_log(LOG_LEVEL_WARNING, "cannot process lost resources for the discovery rule \"%s:%s\":"
 					" \"%s\" is not a valid value",
 					zbx_host_string(hostid), discovery_key, lifetime_str);
-			lifetime = 0xffff;
+			lifetime = 3650;	/* max value for the field */
 		}
 		zbx_free(lifetime_str);
 	}
