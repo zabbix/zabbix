@@ -148,6 +148,9 @@ src/libs/zbxmodules/Makefile.in
 src/libs/zbxnix/.deps
 src/libs/zbxnix/Makefile
 src/libs/zbxnix/Makefile.in
+src/libs/zbxregexp/.deps
+src/libs/zbxregexp/Makefile
+src/libs/zbxregexp/Makefile.in
 src/libs/zbxself/.deps
 src/libs/zbxself/Makefile
 src/libs/zbxself/Makefile.in
