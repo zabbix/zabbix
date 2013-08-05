@@ -19,14 +19,15 @@
 **/
 
 require_once dirname(__FILE__) . '/../include/class.cwebtest.php';
+require_once dirname(__FILE__) . '/../../include/db.inc.php';
 
 class testPageItems extends CWebTest {
-	// returns all hosts and templates
+	// returns hosts and templates
 	public static function data() {
 		return DBdata(
 			'SELECT hostid,status'.
 			' FROM hosts'.
-			' WHERE status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.','.HOST_STATUS_TEMPLATE.')'
+			' WHERE host LIKE '.zbx_dbstr('%-layout-test-%');
 		);
 	}
 
@@ -34,22 +35,15 @@ class testPageItems extends CWebTest {
 	* @dataProvider data
 	*/
 	public function testPageItems_CheckLayout($data) {
+		// Go to the list of items
+		$this->zbxTestLogin('items.php?hostid='.$data['hostid']);
+		// We are in the list of items
+		$this->checkTitle('Configuration of items');
+		$this->zbxTestTextPresent('CONFIGURATION OF ITEMS');
+		$this->zbxTestTextPresent('Items');
+		$this->zbxTestTextPresent('Displaying');
+
 		if ($data['status'] == HOST_STATUS_MONITORED || $data['status'] == HOST_STATUS_NOT_MONITORED) {
-			$hostid = $data['hostid'];
-
-			$this->zbxTestLogin('hosts.php');
-			$this->zbxTestDropdownSelectWait('groupid', 'all');
-
-			$this->checkTitle('Configuration of hosts');
-			$this->zbxTestTextPresent('HOSTS');
-			// Go to the list of items
-			$this->href_click('items.php?hostid='.$hostid);
-			$this->wait();
-			// We are in the list of items
-			$this->checkTitle('Configuration of items');
-			$this->zbxTestTextPresent('CONFIGURATION OF ITEMS');
-			$this->zbxTestTextPresent('Items');
-			$this->zbxTestTextPresent('Displaying');
 			$this->zbxTestTextPresent('Host list');
 			// Header
 			$this->zbxTestTextPresent(
@@ -67,33 +61,8 @@ class testPageItems extends CWebTest {
 					'Error'
 				)
 			);
-			// TODO someday should check that interval is not shown for trapper items, trends not shown for non-numeric items etc
-
-			$this->zbxTestDropdownHasOptions('go', array(
-					'Enable selected',
-					'Disable selected',
-					'Mass update',
-					'Copy selected to ...',
-					'Clear history for selected',
-					'Delete selected'
-			));
 		}
 		elseif ($data['status'] == HOST_STATUS_TEMPLATE) {
-			$templateid = $data['hostid'];
-
-			$this->zbxTestLogin('templates.php');
-			$this->zbxTestDropdownSelectWait('groupid', 'all');
-
-			$this->checkTitle('Configuration of templates');
-			$this->zbxTestTextPresent('TEMPLATES');
-			// Go to the list of items
-			$this->href_click('items.php?hostid='.$templateid);
-			$this->wait();
-			// We are in the list of items
-			$this->checkTitle('Configuration of items');
-			$this->zbxTestTextPresent('CONFIGURATION OF ITEMS');
-			$this->zbxTestTextPresent('Items');
-			$this->zbxTestTextPresent('Displaying');
 			$this->zbxTestTextPresent('Template list');
 			// Header
 			$this->zbxTestTextPresent(
@@ -111,16 +80,15 @@ class testPageItems extends CWebTest {
 				)
 			);
 			$this->zbxTestTextNotPresent('Error');
-			// TODO someday should check that interval is not shown for trapper items, trends not shown for non-numeric items etc
-
-			$this->zbxTestDropdownHasOptions('go', array(
-					'Enable selected',
-					'Disable selected',
-					'Mass update',
-					'Copy selected to ...',
-					'Clear history for selected',
-					'Delete selected'
-			));
 		}
+		// TODO someday should check that interval is not shown for trapper items, trends not shown for non-numeric items etc
+		$this->zbxTestDropdownHasOptions('go', array(
+				'Enable selected',
+				'Disable selected',
+				'Mass update',
+				'Copy selected to ...',
+				'Clear history for selected',
+				'Delete selected'
+			));
 	}
 }
