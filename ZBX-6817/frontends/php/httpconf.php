@@ -214,7 +214,7 @@ elseif (isset($_REQUEST['save'])) {
 			$dbHttpTest = reset($dbHttpTest);
 			$dbHttpSteps = zbx_toHash($dbHttpTest['steps'], 'httpstepid');
 
-			$httpTest = CArrayHelper::unsetEqualValues($httpTest, $dbHttpTest);
+			$httpTest = CArrayHelper::unsetEqualValues($httpTest, $dbHttpTest, array('applicationid'));
 			foreach ($httpTest['steps'] as $snum => $step) {
 				if (isset($step['httpstepid'])) {
 					$newStep = CArrayHelper::unsetEqualValues($step, $dbHttpSteps[$step['httpstepid']], array('httpstepid'));
