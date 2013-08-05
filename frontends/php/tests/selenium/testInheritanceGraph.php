@@ -64,7 +64,7 @@ class testInheritanceGraph extends CWebTest {
 	/**
 	 * @dataProvider update
 	 */
-/*	public function testInheritanceGraph_SimpleUpdate($data) {
+	public function testInheritanceGraph_SimpleUpdate($data) {
 		$name = $data['name'];
 
 		$sqlGraphs = "select * from graphs";
@@ -82,7 +82,7 @@ class testInheritanceGraph extends CWebTest {
 
 		$this->assertEquals($oldHashGraphs, DBhash($sqlGraphs));
 	}
-*/
+
 	// Returns create data
 	public static function create() {
 		return array(
