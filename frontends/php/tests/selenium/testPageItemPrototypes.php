@@ -30,7 +30,7 @@ class testPageItemPrototypes extends CWebTest {
 			' WHERE i.itemid=d.itemid'.
 				' AND h.hostid=i.hostid'.
 				' AND d.parent_itemid=di.itemid'.
-				' AND i.key_ LIKE '.zbx_dbstr('%zbx6275%');
+				' AND i.key_ LIKE '.zbx_dbstr('%-layout-test%')
 		);
 	}
 
@@ -38,11 +38,8 @@ class testPageItemPrototypes extends CWebTest {
 	* @dataProvider data
 	*/
 	public function testPageItemPrototypes_CheckLayout($data) {
-		$druleid = $data['parent_itemid'];
 		$drule = $data['d_name'];
-		$hostid = $data['hostid'];
-
-		$this->zbxTestLogin('disc_prototypes.php?hostid='.$hostid.'&parent_discoveryid='.$druleid);
+		$this->zbxTestLogin('disc_prototypes.php?hostid='.$data['hostid'].'&parent_discoveryid='.$data['parent_itemid']);
 
 		// We are in the list of protos
 		$this->checkTitle('Configuration of item prototypes');
@@ -81,15 +78,13 @@ class testPageItemPrototypes extends CWebTest {
 	/**
 	* @dataProvider data
 	*/
-	public function testPageItemPrototypes_SimpleDelete($rule) {
-		$itemid = $rule['itemid'];
-		$druleid = $rule['parent_itemid'];
-		$drule = $rule['d_name'];
-		$hostid = $rule['hostid'];
+	public function testPageItemPrototypes_SimpleDelete($data) {
+		$itemid = $data['itemid'];
+		$drule = $data['d_name'];
 
 		$this->chooseOkOnNextConfirmation();
 
-		$this->zbxTestLogin('disc_prototypes.php?hostid='.$hostid.'&parent_discoveryid='.$druleid);
+		$this->zbxTestLogin('disc_prototypes.php?hostid='.$data['hostid'].'&parent_discoveryid='.$data['parent_itemid']);
 		$this->checkTitle('Configuration of item prototypes');
 		$this->zbxTestCheckboxSelect('group_itemid_'.$itemid);
 		$this->zbxTestDropdownSelect('go', 'Delete selected');
@@ -120,8 +115,20 @@ class testPageItemPrototypes extends CWebTest {
 		DBsave_tables('triggers');
 	}
 
+	// Returns all discovery rules
+	public static function rule() {
+		return DBdata(
+			'SELECT h.status,i.name,i.itemid,d.parent_itemid,h.hostid,di.name AS d_name'.
+			' FROM items i,item_discovery d,items di,hosts h'.
+			' WHERE i.itemid=d.itemid'.
+				' AND h.hostid=i.hostid'.
+				' AND d.parent_itemid=di.itemid'.
+				' AND h.host LIKE '.zbx_dbstr('%-layout-test-%')
+		);
+	}
+
 	/**
-	* @dataProvider data
+	* @dataProvider rule
 	*/
 	public function testPageItemPrototypes_MassDelete($rule) {
 		$itemid = $rule['itemid'];
