@@ -45,7 +45,6 @@ function getLocales() {
 		'zh_TW' => _('Chinese (zh_TW)'),
 		'cs_CZ' => _('Czech (cs_CZ)'),
 		'nl_NL' => _('Dutch (nl_NL)'),
-		'fi_FI' => _('Finnish (fi_FI)'),
 		'fr_FR' => _('French (fr_FR)'),
 		'de_DE' => _('German (de_DE)'),
 		'el_GR' => _('Greek (el_GR)'),
@@ -55,7 +54,6 @@ function getLocales() {
 		'ko_KR' => _('Korean (ko_KR)'),
 		'ja_JP' => _('Japanese (ja_JP)'),
 		'lv_LV' => _('Latvian (lv_LV)'),
-		'lt_LT' => _('Lithuanian (lt_LT)'),
 		'fa_IR' => _('Persian (fa_IR)'),
 		'pl_PL' => _('Polish (pl_PL)'),
 		'pt_BR' => _('Portuguese (pt_BR)'),
@@ -63,12 +61,21 @@ function getLocales() {
 		'ru_RU' => _('Russian (ru_RU)'),
 		'sk_SK' => _('Slovak (sk_SK)'),
 		'es_ES' => _('Spanish (es_ES)'),
-		'sv_SE' => _('Swedish (sv_SE)'),
 		'tr_TR' => _('Turkish (tr_TR)'),
 		'uk_UA' => _('Ukrainian (uk_UA)')
 	);
 
 	return $locales;
+}
+
+function hiddenLocales() {
+	// Locales that are below some threshold are hidden from the locale dropdown by moving them here.
+	// To re-enable them (for example, to test), move or copy them to the getLocales function above.
+	$locales = array(
+		'fi_FI' => _('Finnish (fi_FI)'),
+		'lt_LT' => _('Lithuanian (lt_LT)'),
+		'sv_SE' => _('Swedish (sv_SE)')
+	);
 }
 
 /**
