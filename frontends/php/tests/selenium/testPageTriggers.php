@@ -23,34 +23,25 @@ require_once dirname(__FILE__) . '/../include/class.cwebtest.php';
 class testPageTriggers extends CWebTest {
 	// Returns all hosts
 	public static function data() {
-		return DBdata('SELECT * FROM hosts
-					WHERE status IN ('
-						.HOST_STATUS_MONITORED.','
-						.HOST_STATUS_NOT_MONITORED.','
-						.HOST_STATUS_TEMPLATE.')');
+		return DBdata(
+			'SELECT hostid,status'.
+			' FROM hosts'.
+			' WHERE host LIKE '.zbx_dbstr('%-layout-test-%')
+		);
 	}
 
 	/**
 	* @dataProvider data
 	*/
-
 	public function testPageTriggers_CheckLayout($data) {
+		// Go to the list of triggers
+		$this->zbxTestLogin('triggers.php?hostid='.$data['hostid']);
+		// We are in the list of items
+		$this->checkTitle('Configuration of triggers');
+		$this->zbxTestTextPresent('CONFIGURATION OF TRIGGERS');
+		$this->zbxTestTextPresent('Triggers');
+		$this->zbxTestTextPresent('Displaying');
 		if ($data['status'] == HOST_STATUS_MONITORED || $data['status'] == HOST_STATUS_NOT_MONITORED) {
-			$hostid = $data['hostid'];
-
-			$this->zbxTestLogin('hosts.php');
-			$this->zbxTestDropdownSelectWait('groupid', 'all');
-
-			$this->checkTitle('Configuration of hosts');
-			$this->zbxTestTextPresent('HOSTS');
-			// Go to the list of triggers
-			$this->href_click("triggers.php?hostid=$hostid");
-			$this->wait();
-			// We are in the list of triggers
-			$this->checkTitle('Configuration of triggers');
-			$this->zbxTestTextPresent('CONFIGURATION OF TRIGGERS');
-			$this->zbxTestTextPresent('Triggers');
-			$this->zbxTestTextPresent('Displaying');
 			$this->zbxTestTextPresent('Host list');
 			// Header
 			$this->zbxTestTextPresent(
@@ -62,32 +53,8 @@ class testPageTriggers extends CWebTest {
 					'Error'
 				)
 			);
-			// someday should check that interval is not shown for trapper items, trends not shown for non-numeric items etc
-
-			$this->zbxTestDropdownHasOptions('go', array(
-					'Enable selected',
-					'Disable selected',
-					'Mass update',
-					'Copy selected to ...',
-					'Delete selected'
-			));
 		}
 		if ($data['status'] == HOST_STATUS_TEMPLATE) {
-			$templateid = $data['hostid'];
-
-			$this->zbxTestLogin('templates.php');
-			$this->zbxTestDropdownSelectWait('groupid', 'all');
-
-			$this->checkTitle('Configuration of templates');
-			$this->zbxTestTextPresent('TEMPLATES');
-			// Go to the list of triggers
-			$this->href_click("triggers.php?groupid=0&hostid=$templateid");
-			$this->wait();
-			// We are in the list of triggers
-			$this->checkTitle('Configuration of triggers');
-			$this->zbxTestTextPresent('CONFIGURATION OF TRIGGERS');
-			$this->zbxTestTextPresent('Triggers');
-			$this->zbxTestTextPresent('Displaying');
 			$this->zbxTestTextPresent('Template list');
 			// Header
 			$this->zbxTestTextPresent(
@@ -99,15 +66,14 @@ class testPageTriggers extends CWebTest {
 				)
 			);
 			$this->zbxTestTextNotPresent('Error');
-			// someday should check that interval is not shown for trapper items, trends not shown for non-numeric items etc
-
-			$this->zbxTestDropdownHasOptions('go', array(
-					'Enable selected',
-					'Disable selected',
-					'Mass update',
-					'Copy selected to ...',
-					'Delete selected'
-			));
 		}
+		// TODO someday should check that interval is not shown for trapper items, trends not shown for non-numeric items etc
+		$this->zbxTestDropdownHasOptions('go', array(
+				'Enable selected',
+				'Disable selected',
+				'Mass update',
+				'Copy selected to ...',
+				'Delete selected'
+			));
 	}
 }
