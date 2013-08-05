@@ -19,7 +19,6 @@
 **/
 
 require_once dirname(__FILE__) . '/../include/class.cwebtest.php';
-require_once dirname(__FILE__) . '/../../include/db.inc.php';
 
 class testPageItems extends CWebTest {
 	// returns hosts and templates
@@ -27,7 +26,7 @@ class testPageItems extends CWebTest {
 		return DBdata(
 			'SELECT hostid,status'.
 			' FROM hosts'.
-			' WHERE host LIKE '.zbx_dbstr('%-layout-test-%');
+			' WHERE host LIKE '.zbx_dbstr('%-layout-test-%')
 		);
 	}
 
