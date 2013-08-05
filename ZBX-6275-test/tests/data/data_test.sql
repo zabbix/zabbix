@@ -1290,3 +1290,7 @@ INSERT INTO triggers (triggerid,expression,description,url,status,value,priority
 INSERT INTO functions (functionid,itemid,triggerid,function,parameter) VALUES (16022,40060,16022,'last','0');
 INSERT INTO triggers (triggerid, expression, description, comments, flags) VALUES (16023, '{16023}=0', 'Trigger-proto-layout-test-001', '', 2);
 INSERT INTO functions (functionid, itemid, triggerid, function, parameter) VALUES (16023, 40061 ,16023,'last',0);
+INSERT INTO triggers (triggerid,expression,description,url,status,value,priority,lastchange,comments,error,templateid,type,state,flags) VALUES (16024,'{16024}=0','Trigger-layout-test-001','',1,0,0,0,'','',NULL,0,0,0);
+INSERT INTO triggers (triggerid,expression,description,url,status,value,priority,lastchange,comments,error,templateid,type,state,flags) VALUES (16025,'{16025}=0','Trigger-layout-test-002','',0,0,0,0,'','',NULL,0,0,0);
+INSERT INTO functions (functionid,itemid,triggerid,function,parameter) VALUES (16024,40063,16024,'last','0');
+INSERT INTO functions (functionid,itemid,triggerid,function,parameter) VALUES (16025,40062,16025,'last','0');
