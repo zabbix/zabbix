@@ -24,15 +24,16 @@ class testPageTriggerPrototypes extends CWebTest {
 
 	// Returns all trigger protos
 	public static function data() {
-		$sql = 'SELECT i.hostid, i.name AS i_name, i.itemid, h.status, t.triggerid, t.description, d.parent_itemid, di.name AS d_name'.
+		return DBdata(
+				'SELECT i.hostid, i.name AS i_name, i.itemid, h.status, t.triggerid, t.description, d.parent_itemid, di.name AS d_name'.
 				' FROM items i, triggers t, functions f, item_discovery d, items di, hosts h'.
 					' WHERE f.itemid = i.itemid'.
 					' AND t.triggerid = f.triggerid'.
 					' AND d.parent_itemid=di.itemid'.
 					' AND i.itemid=d.itemid'.
 					' AND h.hostid=i.hostid'.
-					" AND i.name LIKE '%itemprotozbx6275%'";
-		return DBdata($sql);
+					' AND i.name LIKE '.zbx_dbstr('%-layout-test%')
+		);
 	}
 
 	/**
@@ -40,66 +41,37 @@ class testPageTriggerPrototypes extends CWebTest {
 	*/
 
 	public function testPageTriggerPrototypes_CheckLayout($data) {
-		$druleid = $data['parent_itemid'];
 		$drule = $data['d_name'];
-		$hostid = $data['hostid'];
+		$this->zbxTestLogin('trigger_prototypes.php?hostid='.$data['hostid'].'&parent_discoveryid='.$data['parent_itemid']);
+		// We are in the list of protos
+		$this->checkTitle('Configuration of trigger prototypes');
+		$this->zbxTestTextPresent('CONFIGURATION OF TRIGGER PROTOTYPES');
+		$this->zbxTestTextPresent('Trigger prototypes of '.$drule);
+		$this->zbxTestTextPresent('Displaying');
 
 		if ($data['status'] == HOST_STATUS_MONITORED || $data['status'] == HOST_STATUS_NOT_MONITORED) {
-
-			$this->zbxTestLogin("trigger_prototypes.php?hostid=$hostid&parent_discoveryid=$druleid");
-			// We are in the list of protos
-			$this->checkTitle('Configuration of trigger prototypes');
-			$this->zbxTestTextPresent('CONFIGURATION OF TRIGGER PROTOTYPES');
-			$this->zbxTestTextPresent('Trigger prototypes of '.$drule);
-			$this->zbxTestTextPresent('Displaying');
 			$this->zbxTestTextPresent('Host list');
-			// Header
-			$this->zbxTestTextPresent(
-				array(
-					'Severity',
-					'Name',
-					'Expression',
-					'Status'
-				)
-			);
-			$this->zbxTestTextNotPresent('Error');
-			// someday should check that interval is not shown for trapper items, trends not shown for non-numeric items etc
-
-			$this->zbxTestDropdownHasOptions('go', array(
-					'Enable selected',
-					'Disable selected',
-					'Mass update',
-					'Delete selected'
-			));
 		}
 		if ($data['status'] == HOST_STATUS_TEMPLATE) {
-
-			$this->zbxTestLogin("trigger_prototypes.php?hostid=$hostid&parent_discoveryid=$druleid");
-			// We are in the list of protos
-			$this->checkTitle('Configuration of trigger prototypes');
-			$this->zbxTestTextPresent('CONFIGURATION OF TRIGGER PROTOTYPES');
-			$this->zbxTestTextPresent('Trigger prototypes of '.$drule);
-			$this->zbxTestTextPresent('Displaying');
 			$this->zbxTestTextPresent('Template list');
-			// Header
-			$this->zbxTestTextPresent(
-				array(
-					'Severity',
-					'Name',
-					'Expression',
-					'Status'
-				)
-			);
-			$this->zbxTestTextNotPresent('Error');
-			// someday should check that interval is not shown for trapper items, trends not shown for non-numeric items etc
-
-			$this->zbxTestDropdownHasOptions('go', array(
-					'Enable selected',
-					'Disable selected',
-					'Mass update',
-					'Delete selected'
-			));
 		}
+		// Header
+		$this->zbxTestTextPresent(
+			array(
+				'Severity',
+				'Name',
+				'Expression',
+				'Status'
+			)
+		);
+		$this->zbxTestTextNotPresent('Error');
+		// TODO someday should check that interval is not shown for trapper items, trends not shown for non-numeric items etc
+		$this->zbxTestDropdownHasOptions('go', array(
+				'Enable selected',
+				'Disable selected',
+				'Mass update',
+				'Delete selected'
+		));
 	}
 
 	/**
@@ -112,16 +84,13 @@ class testPageTriggerPrototypes extends CWebTest {
 	/**
 	* @dataProvider data
 	*/
-	public function testPageTriggerPrototypes_SimpleDelete($rule) {
-		$itemid = $rule['itemid'];
-		$triggerid = $rule['triggerid'];
-		$druleid = $rule['parent_itemid'];
-		$drule = $rule['d_name'];
-		$hostid = $rule['hostid'];
+	public function testPageTriggerPrototypes_SimpleDelete($data) {
+		$triggerid = $data['triggerid'];
 
 		$this->chooseOkOnNextConfirmation();
 
-		$this->zbxTestLogin("trigger_prototypes.php?hostid=$hostid&parent_discoveryid=$druleid");
+		$this->zbxTestLogin('trigger_prototypes.php?hostid='.$data['hostid'].'&parent_discoveryid='.$data['parent_itemid']);
+
 		$this->checkTitle('Configuration of trigger prototypes');
 		$this->zbxTestCheckboxSelect('g_triggerid_'.$triggerid);
 		$this->zbxTestDropdownSelect('go', 'Delete selected');
@@ -132,15 +101,9 @@ class testPageTriggerPrototypes extends CWebTest {
 
 		$this->checkTitle('Configuration of trigger prototypes');
 		$this->zbxTestTextPresent('CONFIGURATION OF TRIGGER PROTOTYPES');
-		$this->zbxTestTextPresent('Trigger prototypes of '.$drule);
+		$this->zbxTestTextPresent('Trigger prototypes of '.$data['d_name']);
 
-		$sql = "SELECT * FROM items WHERE itemid=$itemid AND flags=".ZBX_FLAG_DISCOVERY;
-		$this->assertEquals(0, DBcount($sql));
-		$sql = "SELECT * FROM item_discovery WHERE parent_itemid=$itemid";
-		$this->assertEquals(0, DBcount($sql));
-		$sql = "SELECT gi.gitemid FROM graphs_items gi, item_discovery id WHERE gi.itemid=id.itemid AND id.parent_itemid=$itemid";
-		$this->assertEquals(0, DBcount($sql));
-		$sql = "SELECT f.functionid FROM functions f, item_discovery id WHERE f.itemid=id.itemid AND id.parent_itemid=$itemid";
+		$sql = 'SELECT null FROM triggers WHERE triggerid='.$triggerid;
 		$this->assertEquals(0, DBcount($sql));
 	}
 
@@ -158,19 +121,31 @@ class testPageTriggerPrototypes extends CWebTest {
 		DBsave_tables('triggers');
 	}
 
+	// Returns all discovery rules
+	public static function rule() {
+		return DBdata(
+				'SELECT i.hostid, i.name AS i_name, i.itemid, h.status, t.triggerid, t.description, d.parent_itemid, di.name AS d_name'.
+				' FROM items i, triggers t, functions f, item_discovery d, items di, hosts h'.
+					' WHERE f.itemid = i.itemid'.
+					' AND t.triggerid = f.triggerid'.
+					' AND d.parent_itemid=di.itemid'.
+					' AND i.itemid=d.itemid'.
+					' AND h.hostid=i.hostid'.
+					' AND h.host LIKE '.zbx_dbstr('%-layout-test-%')
+		);
+	}
+
 	/**
-	* @dataProvider data
+	* @dataProvider rule
 	*/
 	public function testPageTriggerPrototypes_MassDelete($rule) {
-		$itemid = $rule['itemid'];
-		$triggerid = $rule['triggerid'];
 		$druleid = $rule['parent_itemid'];
-		$drule = $rule['d_name'];
-		$hostid = $rule['hostid'];
+		$triggerids = DBdata('select i.itemid from item_discovery id, items i where parent_itemid='.$druleid.' and i.itemid = id.itemid');
+		$triggerids = zbx_objectValues($triggerids, 'itemid');
 
 		$this->chooseOkOnNextConfirmation();
 
-		$this->zbxTestLogin("trigger_prototypes.php?hostid=$hostid&parent_discoveryid=$druleid");
+		$this->zbxTestLogin('trigger_prototypes.php?hostid='.$rule['hostid'].'&parent_discoveryid='.$druleid);
 		$this->checkTitle('Configuration of trigger prototypes');
 		$this->zbxTestCheckboxSelect('all_triggers');
 		$this->zbxTestDropdownSelect('go', 'Delete selected');
@@ -181,15 +156,9 @@ class testPageTriggerPrototypes extends CWebTest {
 
 		$this->checkTitle('Configuration of trigger prototypes');
 		$this->zbxTestTextPresent('CONFIGURATION OF TRIGGER PROTOTYPES');
-		$this->zbxTestTextPresent('Trigger prototypes of '.$drule);
+		$this->zbxTestTextPresent('Trigger prototypes of '.$rule['d_name']);
 
-		$sql = "SELECT * FROM items WHERE itemid=$itemid AND flags=".ZBX_FLAG_DISCOVERY;
-		$this->assertEquals(0, DBcount($sql));
-		$sql = "SELECT * FROM item_discovery WHERE parent_itemid=$itemid";
-		$this->assertEquals(0, DBcount($sql));
-		$sql = "SELECT gi.gitemid FROM graphs_items gi, item_discovery id WHERE gi.itemid=id.itemid AND id.parent_itemid=$itemid";
-		$this->assertEquals(0, DBcount($sql));
-		$sql = "SELECT f.functionid FROM functions f, item_discovery id WHERE f.itemid=id.itemid AND id.parent_itemid=$itemid";
+		$sql = 'SELECT null FROM triggers WHERE '.dbConditionInt('triggerids', $triggerids);
 		$this->assertEquals(0, DBcount($sql));
 	}
 
