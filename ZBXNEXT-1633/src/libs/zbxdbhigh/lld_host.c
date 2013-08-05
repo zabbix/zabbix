@@ -548,8 +548,6 @@ void	DBlld_hosts_validate(zbx_vector_ptr_t *hosts, const zbx_vector_uint64_t *gr
 					}
 					else
 						host->flags &= ~ZBX_FLAG_LLD_HOST_DISCOVERED;
-
-					continue;
 				}
 
 				if (0 == strcmp(host->name, row[1]))
