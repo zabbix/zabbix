@@ -64,7 +64,7 @@ class testInheritanceGraph extends CWebTest {
 	/**
 	 * @dataProvider update
 	 */
-	public function testInheritanceGraph_SimpleUpdate($data) {
+/*	public function testInheritanceGraph_SimpleUpdate($data) {
 		$name = $data['name'];
 
 		$sqlGraphs = "select * from graphs";
@@ -82,7 +82,7 @@ class testInheritanceGraph extends CWebTest {
 
 		$this->assertEquals($oldHashGraphs, DBhash($sqlGraphs));
 	}
-
+*/
 	// Returns create data
 	public static function create() {
 		return array(
@@ -421,7 +421,7 @@ class testInheritanceGraph extends CWebTest {
 			$ymin_name = $data['ymin_name'];
 			$yminValue = $this->getValue('ymin_name');
 
-			$this->assertEquals($yminValue, $ymin_name.': '.$this->template);
+			$this->assertEquals($yminValue, $this->template.': '.$ymin_name);
 		}
 
 		if (isset($data['ymax_name'])) {
@@ -432,7 +432,7 @@ class testInheritanceGraph extends CWebTest {
 			$ymax_name = $data['ymax_name'];
 			$ymaxValue = $this->getValue('ymax_name');
 
-			$this->assertEquals($ymaxValue, $ymax_name.': '.$this->template);
+			$this->assertEquals($ymaxValue, $this->template.': '.$ymax_name);
 		}
 
 		$this->zbxTestClickWait('save');
