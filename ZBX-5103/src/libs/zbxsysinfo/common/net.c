@@ -214,6 +214,8 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 	PDNS_RECORD	pQueryResults, pDnsRecord;
 	LPTSTR		wzone;
 	char		tmp2[MAX_STRING_LEN], tmp[MAX_STRING_LEN];
+	static		HMODULE dnsapi_dllHandle = NULL;
+	static void	(WINAPI *DnsRecordListFree_dyn)(PDNS_RECORD, DNS_FREE_TYPE) = NULL;
 #else
 	char		*name;
 	unsigned char	*msg_end, *msg_ptr, *p;
@@ -660,8 +662,14 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 
 #ifdef _WINDOWS
 clean:
+	if (NULL == dnsapi_dllHandle)
+		dnsapi_dllHandle = LoadLibrary(L"Dnsapi.dll");
+
+	if (NULL != dnsapi_dllHandle && NULL == DnsRecordListFree_dyn)
+		(FARPROC)DnsRecordListFree_dyn = GetProcAddress(dnsapi_dllHandle, "DnsRecordListFree");
+
 	if (DNS_RCODE_NOERROR == res)
-		DnsRecordListFree(pQueryResults, DnsFreeRecordList);
+		DnsRecordListFree_dyn(pQueryResults, DnsFreeRecordList);
 #endif
 	return ret;
 
