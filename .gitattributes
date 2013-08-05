@@ -277,6 +277,7 @@ frontends/php/tests/selenium/testUrlParameters.php -text
 frontends/php/tests/selenium/testZBX6339.php -text
 frontends/php/tests/selenium/testZBX6648.php -text
 frontends/php/tests/selenium/testZBX6663.php -text
+include/zbxregexp.h -text
 m4/libxml2.m4 -text
 man/zabbix_agentd.man -text
 man/zabbix_get.man -text
@@ -564,6 +565,7 @@ src/libs/zbxdbhigh/lld_graph.c -text
 src/libs/zbxdbhigh/lld_host.c -text
 src/libs/zbxdbhigh/lld_item.c -text
 src/libs/zbxdbhigh/lld_trigger.c -text
+src/libs/zbxregexp/Makefile.am -text
 src/libs/zbxsysinfo/aix/hostname.c -text
 src/libs/zbxsysinfo/aix/software.c -text
 src/libs/zbxsysinfo/freebsd/hostname.c -text

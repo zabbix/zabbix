@@ -170,8 +170,7 @@ class CPie extends CGraphDraw {
 				$real_item['history'] = ZBX_HISTORY_DATA_UPKEEP;
 			}
 
-			if (($real_item['history'] * SEC_PER_DAY) > (time() - ($from_time + $this->period / 2)) // should pick data from history or trends
-					&& ($this->period / $this->sizeX) <= (ZBX_MAX_TREND_DIFF / ZBX_GRAPH_MAX_SKIP_CELL)) { // is reasonable to take data from history?
+			if (($real_item['history'] * SEC_PER_DAY) > (time() - ($from_time + $this->period / 2))) { // should pick data from history or trends
 				$this->dataFrom = 'history';
 				array_push($sql_arr,
 					'SELECT h.itemid,'.

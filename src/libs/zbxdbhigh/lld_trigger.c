@@ -751,7 +751,7 @@ static void	DBlld_save_triggers(zbx_vector_ptr_t *triggers, unsigned char status
  *                                                                            *
  ******************************************************************************/
 void	DBlld_update_triggers(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, struct zbx_json_parse *jp_data,
-		char **error, const char *f_macro, const char *f_regexp, ZBX_REGEXP *regexps, int regexps_num)
+		char **error, const char *f_macro, const char *f_regexp, zbx_vector_ptr_t *regexps)
 {
 	const char		*__function_name = "DBlld_update_triggers";
 
@@ -825,7 +825,7 @@ void	DBlld_update_triggers(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, struct 
 			if (FAIL == zbx_json_brackets_open(p, &jp_row))
 				continue;
 
-			if (SUCCEED != lld_check_record(&jp_row, f_macro, f_regexp, regexps, regexps_num))
+			if (SUCCEED != lld_check_record(&jp_row, f_macro, f_regexp, regexps))
 				continue;
 
 			DBlld_make_trigger(hostid, parent_triggerid, &triggers, description_proto, expression_proto,

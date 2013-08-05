@@ -21,9 +21,10 @@
 #include "db.h"
 #include "log.h"
 #include "zbxserver.h"
+#include "zbxregexp.h"
 
-int	lld_check_record(struct zbx_json_parse *jp_row, const char *f_macro, const char *f_regexp, ZBX_REGEXP *regexps,
-		int regexps_num)
+int	lld_check_record(struct zbx_json_parse *jp_row, const char *f_macro, const char *f_regexp,
+		zbx_vector_ptr_t *regexps)
 {
 	const char	*__function_name = "lld_check_record";
 
@@ -38,7 +39,7 @@ int	lld_check_record(struct zbx_json_parse *jp_row, const char *f_macro, const c
 		goto out;
 
 	if (SUCCEED == zbx_json_value_by_name_dyn(jp_row, f_macro, &value, &value_alloc))
-		res = regexp_match_ex(regexps, regexps_num, value, f_regexp, ZBX_CASE_SENSITIVE);
+		res = regexp_match_ex(regexps, value, f_regexp, ZBX_CASE_SENSITIVE);
 
 	zbx_free(value);
 out:

@@ -341,4 +341,7 @@ int	DCget_host_count();
 
 void	DCget_functions_hostids(zbx_vector_uint64_t *hosts, const zbx_vector_uint64_t *functionids);
 
+void	DCget_expressions_by_names(zbx_vector_ptr_t *expressions, const char * const *names, int names_num);
+void	DCget_expressions_by_name(zbx_vector_ptr_t *expressions, const char *name);
+
 #endif

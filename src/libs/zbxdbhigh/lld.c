@@ -23,6 +23,7 @@
 #include "events.h"
 #include "zbxalgo.h"
 #include "zbxserver.h"
+#include "zbxregexp.h"
 
 /******************************************************************************
  *                                                                            *
@@ -46,13 +47,14 @@ void	DBlld_process_discovery_rule(zbx_uint64_t lld_ruleid, char *value, zbx_time
 	unsigned char		state = 0;
 	unsigned short		lifetime;
 	char			*f_macro = NULL, *f_regexp = NULL;
-	ZBX_REGEXP		*regexps = NULL;
-	int			regexps_alloc = 0, regexps_num = 0;
+	zbx_vector_ptr_t	regexps;
 	char			*sql = NULL;
 	size_t			sql_alloc = 128, sql_offset = 0;
 	const char		*sql_start = "update items set ", *sql_continue = ",";
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() itemid:" ZBX_FS_UI64, __function_name, lld_ruleid);
+
+	zbx_vector_ptr_create(&regexps);
 
 	result = DBselect(
 			"select hostid,key_,state,filter,error,lifetime"
@@ -112,41 +114,16 @@ void	DBlld_process_discovery_rule(zbx_uint64_t lld_ruleid, char *value, zbx_time
 		*f_regexp++ = '\0';
 
 		if ('@' == *f_regexp)
-		{
-			DB_RESULT	result;
-			DB_ROW		row;
-			char		*f_regexp_esc;
-
-			f_regexp_esc = DBdyn_escape_string(f_regexp + 1);
-
-			result = DBselect("select e.expression,e.expression_type,e.exp_delimiter,e.case_sensitive"
-					" from regexps r,expressions e"
-					" where r.regexpid=e.regexpid"
-						" and r.name='%s'" ZBX_SQL_NODE,
-					f_regexp_esc, DBand_node_local("r.regexpid"));
-
-			zbx_free(f_regexp_esc);
-
-			while (NULL != (row = DBfetch(result)))
-			{
-				add_regexp_ex(&regexps, &regexps_alloc, &regexps_num,
-						f_regexp + 1, row[0], atoi(row[1]), row[2][0], atoi(row[3]));
-			}
-			DBfree_result(result);
-		}
+			DCget_expressions_by_name(&regexps, f_regexp + 1);
 
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() f_macro:'%s' f_regexp:'%s'",
 				__function_name, f_macro, f_regexp);
 	}
 
-	DBlld_update_items(hostid, lld_ruleid, &jp_data, &error, f_macro, f_regexp, regexps, regexps_num, lifetime,
-			ts->sec);
-	DBlld_update_triggers(hostid, lld_ruleid, &jp_data, &error, f_macro, f_regexp, regexps, regexps_num);
-	DBlld_update_graphs(hostid, lld_ruleid, &jp_data, &error, f_macro, f_regexp, regexps, regexps_num);
-	DBlld_update_hosts(lld_ruleid, &jp_data, &error, f_macro, f_regexp, regexps, regexps_num, lifetime, ts->sec);
-
-	clean_regexps_ex(regexps, &regexps_num);
-	zbx_free(regexps);
+	DBlld_update_items(hostid, lld_ruleid, &jp_data, &error, f_macro, f_regexp, &regexps, lifetime, ts->sec);
+	DBlld_update_triggers(hostid, lld_ruleid, &jp_data, &error, f_macro, f_regexp, &regexps);
+	DBlld_update_graphs(hostid, lld_ruleid, &jp_data, &error, f_macro, f_regexp, &regexps);
+	DBlld_update_hosts(lld_ruleid, &jp_data, &error, f_macro, f_regexp, &regexps, lifetime, ts->sec);
 
 	if (ITEM_STATE_NOTSUPPORTED == state)
 	{
@@ -182,6 +159,9 @@ error:
 		DBcommit();
 	}
 clean:
+	zbx_regexp_clean_expressions(&regexps);
+	zbx_vector_ptr_destroy(&regexps);
+
 	zbx_free(error);
 	zbx_free(db_error);
 	zbx_free(filter);
