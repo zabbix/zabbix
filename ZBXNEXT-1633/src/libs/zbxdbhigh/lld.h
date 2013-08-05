@@ -23,23 +23,24 @@
 
 #include "common.h"
 #include "zbxjson.h"
+#include "zbxalgo.h"
 
-int	lld_check_record(struct zbx_json_parse *jp_row, const char *f_macro, const char *f_regexp, ZBX_REGEXP *regexps,
-		int regexps_num);
+int	lld_check_record(struct zbx_json_parse *jp_row, const char *f_macro, const char *f_regexp,
+		zbx_vector_ptr_t *regexps);
 int	DBlld_get_item(zbx_uint64_t hostid, const char *tmpl_key, struct zbx_json_parse *jp_row, zbx_uint64_t *itemid);
 
 void	DBlld_update_items(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, struct zbx_json_parse *jp_data,
-		char **error, const char *f_macro, const char *f_regexp, ZBX_REGEXP *regexps, int regexps_num,
+		char **error, const char *f_macro, const char *f_regexp, zbx_vector_ptr_t *regexps,
 		unsigned short lifetime, int lastcheck);
 
 void	DBlld_update_graphs(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, struct zbx_json_parse *jp_data,
-		char **error, const char *f_macro, const char *f_regexp, ZBX_REGEXP *regexps, int regexps_num);
+		char **error, const char *f_macro, const char *f_regexp, zbx_vector_ptr_t *regexps);
 
 void	DBlld_update_triggers(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, struct zbx_json_parse *jp_data,
-		char **error, const char *f_macro, const char *f_regexp, ZBX_REGEXP *regexps, int regexps_num);
+		char **error, const char *f_macro, const char *f_regexp, zbx_vector_ptr_t *regexps);
 
 void	DBlld_update_hosts(zbx_uint64_t discovery_itemid, struct zbx_json_parse *jp_data, char **error,
-		const char *f_macro, const char *f_regexp, ZBX_REGEXP *regexps, int regexps_num,
-		unsigned short lifetime, int lastcheck);
+		const char *f_macro, const char *f_regexp, zbx_vector_ptr_t *regexps, unsigned short lifetime,
+		int lastcheck);
 
 #endif

@@ -520,7 +520,7 @@ static void	DBlld_save_graphs(zbx_vector_ptr_t *graphs, int width, int height, d
  *                                                                            *
  ******************************************************************************/
 void	DBlld_update_graphs(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, struct zbx_json_parse *jp_data,
-		char **error, const char *f_macro, const char *f_regexp, ZBX_REGEXP *regexps, int regexps_num)
+		char **error, const char *f_macro, const char *f_regexp, zbx_vector_ptr_t *regexps)
 {
 	const char		*__function_name = "DBlld_update_graphs";
 
@@ -640,7 +640,7 @@ void	DBlld_update_graphs(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, struct zb
 			if (FAIL == zbx_json_brackets_open(p, &jp_row))
 				continue;
 
-			if (SUCCEED != lld_check_record(&jp_row, f_macro, f_regexp, regexps, regexps_num))
+			if (SUCCEED != lld_check_record(&jp_row, f_macro, f_regexp, regexps))
 				continue;
 
 			DBlld_make_graph(hostid, parent_graphid, &graphs, name_proto, gitems_proto, gitems_proto_num,

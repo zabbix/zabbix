@@ -2878,8 +2878,8 @@ static void	DBlld_interfaces_validate(zbx_vector_ptr_t *hosts, char **error)
  *                                                                            *
  ******************************************************************************/
 void	DBlld_update_hosts(zbx_uint64_t lld_ruleid, struct zbx_json_parse *jp_data, char **error,
-		const char *f_macro, const char *f_regexp, ZBX_REGEXP *regexps, int regexps_num,
-		unsigned short lifetime, int lastcheck)
+		const char *f_macro, const char *f_regexp, zbx_vector_ptr_t *regexps, unsigned short lifetime,
+		int lastcheck)
 {
 	const char		*__function_name = "DBlld_update_hosts";
 
@@ -2976,7 +2976,7 @@ void	DBlld_update_hosts(zbx_uint64_t lld_ruleid, struct zbx_json_parse *jp_data,
 			if (FAIL == zbx_json_brackets_open(p, &jp_row))
 				continue;
 
-			if (SUCCEED != lld_check_record(&jp_row, f_macro, f_regexp, regexps, regexps_num))
+			if (SUCCEED != lld_check_record(&jp_row, f_macro, f_regexp, regexps))
 				continue;
 
 			host = DBlld_host_make(&hosts, host_proto, name_proto, &jp_row);

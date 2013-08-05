@@ -22,6 +22,7 @@
 #include "dbcache.h"
 #include "log.h"
 #include "zbxserver.h"
+#include "zbxregexp.h"
 
 #include "active.h"
 
@@ -161,7 +162,7 @@ int	send_list_of_active_checks(zbx_sock_t *sock, char *request)
 
 	char			*host = NULL, *p, *buffer = NULL, error[MAX_STRING_LEN], ip[INTERFACE_IP_LEN_MAX];
 	size_t			buffer_alloc = 8 * ZBX_KIBIBYTE, buffer_offset = 0;
-	int			ret = FAIL;
+	int			ret = FAIL, i;
 	zbx_uint64_t		hostid;
 	zbx_vector_uint64_t	itemids;
 
@@ -194,7 +195,7 @@ int	send_list_of_active_checks(zbx_sock_t *sock, char *request)
 	if (0 != itemids.values_num)
 	{
 		DC_ITEM	*dc_items;
-		int	*errcodes, i, refresh_unsupported, now;
+		int	*errcodes, refresh_unsupported, now;
 
 		dc_items = zbx_malloc(NULL, sizeof(DC_ITEM) * itemids.values_num);
 		errcodes = zbx_malloc(NULL, sizeof(int) * itemids.values_num);
@@ -255,21 +256,20 @@ out:
 	return ret;
 }
 
-static void	add_regexp_name(char ***regexp, int *regexp_alloc, int *regexp_num, const char *regexp_name)
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_vector_str_append_uniq                                       *
+ *                                                                            *
+ * Purpose: append non duplicate string to the string vector                  *
+ *                                                                            *
+ * Parameters: vector - [IN/OUT] the string vector                            *
+ *             str    - [IN] the string to append                             *
+ *                                                                            *
+ ******************************************************************************/
+static void	zbx_vector_str_append_uniq(zbx_vector_str_t *vector, char *str)
 {
-	int	i;
-
-	for (i = 0; i < *regexp_num; i++)
-		if (0 == strcmp((*regexp)[i], regexp_name))
-			return;
-
-	if (i == *regexp_num) {
-		if (*regexp_num == *regexp_alloc) {
-			*regexp_alloc += 32;
-			*regexp = zbx_realloc(*regexp, sizeof(char *) * *regexp_alloc);
-		}
-		(*regexp)[(*regexp_num)++] = strdup(regexp_name);
-	}
+	if (FAIL == zbx_vector_str_search(vector, str, ZBX_DEFAULT_STR_COMPARE_FUNC))
+		zbx_vector_str_append(vector, zbx_strdup(NULL, str));
 }
 
 /******************************************************************************
@@ -300,17 +300,20 @@ int	send_list_of_active_checks_json(zbx_sock_t *sock, struct zbx_json_parse *jp)
 	char			host[HOST_HOST_LEN_MAX], params[MAX_STRING_LEN], tmp[MAX_STRING_LEN],
 				ip[INTERFACE_IP_LEN_MAX], error[MAX_STRING_LEN], *host_metadata = NULL;
 	struct zbx_json		json;
-	int			ret = FAIL;
+	int			ret = FAIL, i;
 	zbx_uint64_t		hostid;
 	size_t			host_metadata_alloc = 1;	/* for at least NUL-termination char */
 	unsigned short		port;
 	zbx_vector_uint64_t	itemids;
 
 	unsigned char		item_key;
-	char			**regexp = NULL;
-	int			regexp_alloc = 0, regexp_num = 0, n;
+	zbx_vector_ptr_t	regexps;
+	zbx_vector_str_t	names;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	zbx_vector_ptr_create(&regexps);
+	zbx_vector_str_create(&names);
 
 	if (FAIL == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_HOST, host, sizeof(host)))
 	{
@@ -349,7 +352,7 @@ int	send_list_of_active_checks_json(zbx_sock_t *sock, struct zbx_json_parse *jp)
 	if (0 != itemids.values_num)
 	{
 		DC_ITEM	*dc_items;
-		int	*errcodes, i, refresh_unsupported, now;
+		int	*errcodes, refresh_unsupported, now;
 
 		dc_items = zbx_malloc(NULL, sizeof(DC_ITEM) * itemids.values_num);
 		errcodes = zbx_malloc(NULL, sizeof(int) * itemids.values_num);
@@ -402,17 +405,17 @@ int	send_list_of_active_checks_json(zbx_sock_t *sock, struct zbx_json_parse *jp)
 			{
 				/* "params" parameter */
 				if (0 == get_param(params, 2, tmp, sizeof(tmp)) && '@' == *tmp)
-					add_regexp_name(&regexp, &regexp_alloc, &regexp_num, tmp + 1);
+					zbx_vector_str_append_uniq(&names, tmp + 1);
 
 				if (ZBX_KEY_EVENTLOG == item_key)
 				{
 					/* "severity" parameter */
 					if (0 == get_param(params, 3, tmp, sizeof(tmp)) && '@' == *tmp)
-						add_regexp_name(&regexp, &regexp_alloc, &regexp_num, tmp + 1);
+						zbx_vector_str_append_uniq(&names, tmp + 1);
 
 					/* "logeventid" parameter */
 					if (0 == get_param(params, 5, tmp, sizeof(tmp)) && '@' == *tmp)
-						add_regexp_name(&regexp, &regexp_alloc, &regexp_num, tmp + 1);
+						zbx_vector_str_append_uniq(&names, tmp + 1);
 				}
 			}
 
@@ -429,54 +432,36 @@ int	send_list_of_active_checks_json(zbx_sock_t *sock, struct zbx_json_parse *jp)
 
 	zbx_json_close(&json);
 
-	if (0 != regexp_num)
+	DCget_expressions_by_names(&regexps, (const char * const *)names.values, names.values_num);
+
+	if (0 < regexps.values_num)
 	{
-		DB_RESULT	result;
-		DB_ROW		row;
-		char		*sql = NULL, *name_esc;
-		size_t		sql_alloc = 2 * ZBX_KIBIBYTE, sql_offset = 0;
+		char	buffer[32];
 
 		zbx_json_addarray(&json, ZBX_PROTO_TAG_REGEXP);
 
-		sql = zbx_malloc(sql, sql_alloc);
-
-		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-				"select r.name,e.expression,e.expression_type,e.exp_delimiter,e.case_sensitive"
-				" from regexps r,expressions e"
-				" where r.regexpid=e.regexpid"
-					" and r.name in (");
-
-		for (n = 0; n < regexp_num; n++)
+		for (i = 0; i < regexps.values_num; i++)
 		{
-			name_esc = DBdyn_escape_string(regexp[n]);
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%s'%s'",
-					n == 0 ? "" : ",",
-					name_esc);
-			zbx_free(name_esc);
-			zbx_free(regexp[n]);
-		}
-		zbx_chrcpy_alloc(&sql, &sql_alloc, &sql_offset, ')');
+			zbx_expression_t	*regexp = regexps.values[i];
 
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ZBX_SQL_NODE, DBand_node_local("r.regexpid"));
-
-		result = DBselect("%s", sql);
-		while (NULL != (row = DBfetch(result)))
-		{
 			zbx_json_addobject(&json, NULL);
-			zbx_json_addstring(&json, "name", row[0], ZBX_JSON_TYPE_STRING);
-			zbx_json_addstring(&json, "expression", row[1], ZBX_JSON_TYPE_STRING);
-			zbx_json_addstring(&json, "expression_type", row[2], ZBX_JSON_TYPE_INT);
-			zbx_json_addstring(&json, "exp_delimiter", row[3], ZBX_JSON_TYPE_STRING);
-			zbx_json_addstring(&json, "case_sensitive", row[4], ZBX_JSON_TYPE_INT);
+			zbx_json_addstring(&json, "name", regexp->name, ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(&json, "expression", regexp->expression, ZBX_JSON_TYPE_STRING);
+
+			zbx_snprintf(buffer, sizeof(buffer), "%d", regexp->expression_type);
+			zbx_json_addstring(&json, "expression_type",buffer, ZBX_JSON_TYPE_INT);
+
+			zbx_snprintf(buffer, sizeof(buffer), "%c", regexp->exp_delimiter);
+			zbx_json_addstring(&json, "exp_delimiter", buffer, ZBX_JSON_TYPE_STRING);
+
+			zbx_snprintf(buffer, sizeof(buffer), "%d", regexp->case_sensitive);
+			zbx_json_addstring(&json, "case_sensitive", buffer, ZBX_JSON_TYPE_INT);
+
 			zbx_json_close(&json);
 		}
-		DBfree_result(result);
-
-		zbx_free(sql);
 
 		zbx_json_close(&json);
 	}
-	zbx_free(regexp);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() sending [%s]", __function_name, json.buffer);
 
@@ -503,6 +488,14 @@ error:
 
 	zbx_json_free(&json);
 out:
+	for (i = 0; i < names.values_num; i++)
+		zbx_free(names.values[i]);
+
+	zbx_vector_str_destroy(&names);
+
+	zbx_regexp_clean_expressions(&regexps);
+	zbx_vector_ptr_destroy(&regexps);
+
 	zbx_free(host_metadata);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
