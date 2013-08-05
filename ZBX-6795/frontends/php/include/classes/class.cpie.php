@@ -314,7 +314,7 @@ class CPie extends CGraphDraw {
 			$proc = $this->sum == 0 ? 0 : ($datavalue * 100) / $this->sum;
 
 			if (isset($data) && isset($datavalue)) {
-				$strvalue = sprintf(_('Value').': %s ('.(round($proc) != $proc? '%0.2f' : '%s').'%%)',
+				$strvalue = sprintf(_('Value').': %s ('.(round($proc) != round($proc, 2) ? '%0.2f' : '%0.0f').'%%)',
 					convert_units(array(
 					'value' => $datavalue,
 					'units' => $this->items[$i]['units']
