@@ -1272,7 +1272,10 @@ function getTriggerOverviewCells($trigger, $screenId = null) {
 			'width' => 200,
 			'triggers' => array(
 				'items' => array(
-					'events' => array('triggerid' => $trigger['triggerid'])
+					'events' => array(
+						'triggerid' => $trigger['triggerid'],
+						'inNewWindow' => true
+					)
 				)
 			)
 		);

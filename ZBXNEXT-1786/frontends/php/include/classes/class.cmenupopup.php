@@ -29,6 +29,8 @@ class CMenuPopup extends CTag {
 	private $width = 150;
 
 	/**
+	 * Init menu popup data.
+	 *
 	 * @param bool   $options['isMap']
 	 * @param string $options['id']
 	 * @param int    $options['width']
@@ -65,7 +67,7 @@ class CMenuPopup extends CTag {
 
 		// scripts
 		if (!empty($options['scripts'])) {
-			if (is_int($options['scripts'])) {
+			if (!is_array($options['scripts'])) {
 				$hostId = $options['scripts'];
 
 				$options['scripts'] = array();
@@ -206,9 +208,15 @@ class CMenuPopup extends CTag {
 			foreach ($options['triggers']['items'] as $name => $args) {
 				if ($args) {
 					$params = '';
+					$inNewWindow = false;
 
 					if (is_array($args)) {
 						foreach ($args as $key => $value) {
+							if ($key == 'inNewWindow') {
+								$inNewWindow = true;
+								continue;
+							}
+
 							$params .= ($params ? '&' : '?').$key.'='.$value;
 						}
 					}
@@ -216,12 +224,18 @@ class CMenuPopup extends CTag {
 					switch ($name) {
 						case 'acknow':
 							$link = new CLink(_('Acknowledge'), 'acknow.php'.$params);
-							$link->attr('target', '_blank');
+
+							if ($inNewWindow) {
+								$link->attr('target', '_blank');
+							}
 							break;
 
 						case 'events':
 							$link = new CLink(_('Events'), 'events.php'.$params);
-							$link->attr('target', '_blank');
+
+							if ($inNewWindow) {
+								$link->attr('target', '_blank');
+							}
 							break;
 					}
 
@@ -251,15 +265,7 @@ class CMenuPopup extends CTag {
 						}
 					}
 
-					$link = new CLink($item['name'], 'history.php'.$params);
-					$link->attr('target', '_blank');
-
-					if (isset($item['params']['action']) && $item['params']['action'] == 'showlatest') {
-						$menu->addItem($link);
-					}
-					else {
-						$menu->addItem($link);
-					}
+					$menu->addItem(new CLink($item['name'], 'history.php'.$params));
 				}
 			}
 
@@ -544,6 +550,14 @@ class CMenuPopup extends CTag {
 		}
 	}
 
+	/**
+	 * Recursive function to prepare menu tree items.
+	 *
+	 * @param object $menu
+	 * @param array  $items
+	 * @param string $name
+	 * @param array  $params
+	 */
 	private function appendMenuItem(&$menu, array $items, $name, array $params) {
 		if ($items) {
 			$item = current($items);
@@ -569,6 +583,11 @@ class CMenuPopup extends CTag {
 		}
 	}
 
+	/**
+	 * Get unique id.
+	 *
+	 * @return string
+	 */
 	public static function getId() {
 		return uniqid();
 	}

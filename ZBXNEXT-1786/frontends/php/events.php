@@ -668,28 +668,49 @@ else {
 				$host = reset($trigger['hosts']);
 				$host = $hosts[$host['hostid']];
 
-				$items = array();
+				$triggerItems = array();
 				foreach ($trigger['items'] as $item) {
-					$i = array();
-					$i['itemid'] = $item['itemid'];
-					$i['value_type'] = $item['value_type'];
-					$i['action'] = str_in_array($item['value_type'], array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64))
-						? 'showgraph' : 'showvalues';
-					$i['name'] = itemName($item);
-					$items[] = $i;
+					$triggerItems[] = array(
+						'name' => itemName($item),
+						'params' => array(
+							'itemid' => $item['itemid'],
+							'action' => in_array($item['value_type'], array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64))
+								? 'showgraph' : 'showvalues'
+						)
+					);
 				}
-
-				$ack = getEventAckState($event, true);
 
 				$description = CMacrosResolverHelper::resolveEventDescription(zbx_array_merge($trigger, array(
 					'clock' => $event['clock'],
 					'ns' => $event['ns']
 				)));
 
-				$tr_desc = new CSpan($description, 'pointer');
-				$tr_desc->addAction('onclick', "create_mon_trigger_menu(event, ".
-						" [{'triggerid': '".$trigger['triggerid']."', 'lastchange': '".$event['clock']."'}],".
-						zbx_jsvalue($items, true).");");
+				$menuPopupId = CMenuPopup::getId();
+
+				$triggerDescription = new CSpan($description, 'pointer link_menu');
+				$triggerDescription->attr('data-menupopupid', $menuPopupId);
+
+				$triggerDiv = new CDiv(array(
+					$triggerDescription,
+					new CMenuPopup(array(
+						'id' => $menuPopupId,
+						'width' => 250,
+						'triggers' => array(
+							'items' => array(
+								'events' => array(
+									'triggerid' => $trigger['triggerid'],
+									'nav_time' => $event['clock']
+								)
+							)
+						),
+						'history' => array(
+							'items' => $triggerItems
+						)
+					)))
+				);
+
+				// acknowledge
+				$ack = getEventAckState($event, true);
 
 				// duration
 				$event['duration'] = ($nextEvent = get_next_event($event, $events))
@@ -744,7 +765,7 @@ else {
 					),
 					is_show_all_nodes() ? get_node_name_by_elid($event['objectid']) : null,
 					$hostDiv,
-					new CSpan($tr_desc, 'link_menu'),
+					$triggerDiv,
 					$statusSpan,
 					getSeverityCell($trigger['priority'], null, !$event['value']),
 					$event['duration'],
