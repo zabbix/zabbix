@@ -577,7 +577,8 @@ class CGraph extends CGraphGeneral {
 	protected function checkInput($graphs, $update = false) {
 		// get graph name on update
 		if ($update){
-			$graphs = $this->extendObjects($this->tableName(), $graphs, array('name'));
+			$graphs = $this->extendObjects($this->tableName(), $graphs,
+				array('name', 'graphtype', 'ymin_type', 'ymax_type', 'yaxismin', 'yaxismax'));
 		}
 
 		$itemids = array();
@@ -596,14 +597,16 @@ class CGraph extends CGraphGeneral {
 			}
 
 			// validate item fields
-			$fields = array('itemid' => null);
-			foreach ($graph['gitems'] as $gitem) {
-				if (!check_db_fields($fields, $gitem)) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('Missing "itemid" field for item.'));
-				}
+			if (isset($graph['gitems'])) {
+				$fields = array('itemid' => null);
+				foreach ($graph['gitems'] as $gitem) {
+					if (!check_db_fields($fields, $gitem)) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _('Missing "itemid" field for item.'));
+					}
 
-				// assigning with key preserves unique itemids
-				$itemids[$gitem['itemid']] = $gitem['itemid'];
+					// assigning with key preserves unique itemids
+					$itemids[$gitem['itemid']] = $gitem['itemid'];
+				}
 			}
 
 			// add Y axis item IDs for persmission validation
