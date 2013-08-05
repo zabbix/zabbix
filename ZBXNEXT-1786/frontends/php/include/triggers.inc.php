@@ -1598,8 +1598,7 @@ function make_trigger_details($trigger) {
 		$hostName,
 		new CMenuPopup(array(
 			'id' => $menuPopupId,
-			'hostid' => $hostId,
-			'scripts' => true,
+			'scripts' => $hostId,
 			'goto' => array(
 				'params' => array(
 					'hostid' => $hostId

@@ -24,6 +24,10 @@ jQuery(function($) {
 		var obj = $(this),
 			isActive = true;
 
+		if (obj.children().length == 0) {
+			return;
+		}
+
 		// load
 		$('.menu', obj).menu();
 		obj.data('isLoaded', true);

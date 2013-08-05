@@ -879,10 +879,12 @@ function getItemDataOverviewCells($tableRow, $ithosts, $hostName) {
 		$column->attr('data-menupopupid', $menuPopupId);
 		$column->addItem(new CMenuPopup(array(
 			'id' => $menuPopupId,
-			'graphLatest' => in_array($ithosts[$hostName]['value_type'], array(ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_FLOAT))
-				? array('itemid' => $item['itemid']) : null,
-			'latestValues' => array(
-				'itemid' => $item['itemid']
+			'history' => array(
+				'latest' => in_array($ithosts[$hostName]['value_type'], array(ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_FLOAT))
+					? array('itemid' => $item['itemid']) : null,
+				'latestValues' => array(
+					'itemid' => $item['itemid']
+				)
 			)
 		)));
 	}
