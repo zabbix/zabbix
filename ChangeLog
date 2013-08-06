@@ -1,6 +1,7 @@
 Changes for 2.1.2
 
 New features:
+...G...PS. [ZBXNEXT-1405] added IP to the warning about ignored messages because of their size (wiper)
 ........S. [ZBX-6770] improved host macro resolving by using configuration cache to get hosts used in trigger expressions (wiper)
 .......PS. [ZBXNEXT-1098] added internal check support to Zabbix proxies (wiper)
 ...GI..... [ZBX-6587] fixed Windows binaries descriptions (dimir)
@@ -320,7 +321,7 @@ A......... [ZBX-5498] applications API refactoring (Vedmak)
 Changes for 2.0.8rc1
 
 New features:
-
+...G...PS. [ZBXNEXT-1405] added IP to the warning about ignored messages because of their size (wiper)
 A.F....... [ZBX-1357] updated Dutch translation; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
