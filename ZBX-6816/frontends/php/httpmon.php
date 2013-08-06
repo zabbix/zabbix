@@ -36,17 +36,13 @@ $fields = array(
 	'hostid' =>		array(T_ZBX_INT,	O_OPT,		P_SYS,	DB_ID,		null),
 );
 check_fields($fields);
-if (get_request('groupid', 0) > 0) {
-	$groupId = available_groups($_REQUEST['groupid'], 0);
-	if (!$groupId) {
-		access_deny();
-	}
+
+// validate permissions
+if (get_request('groupid') && !API::HostGroup()->isReadable(array($_REQUEST['groupid']))) {
+	access_deny();
 }
-if (get_request('hostid', 0) > 0) {
-	$hostIds = available_hosts($_REQUEST['hostid'], 0);
-	if (empty($hostIds)) {
-		access_deny();
-	}
+if (get_request('hostid') && !API::Host()->isReadable(array($_REQUEST['hostid']))) {
+	access_deny();
 }
 
 validate_sort_and_sortorder('name', ZBX_SORT_DOWN);
