@@ -914,8 +914,8 @@ void	zbx_tcp_free(zbx_sock_t *s)
 ssize_t	zbx_tcp_recv_ext(zbx_sock_t *s, char **data, unsigned char flags, int timeout)
 {
 #define ZBX_BUF_LEN	ZBX_STAT_BUF_LEN * 8
-	ssize_t		nbytes, left, read_bytes, total_bytes;
-	size_t		allocated, offset;
+	ssize_t		nbytes, left, total_bytes;
+	size_t		allocated, offset, read_bytes;
 	zbx_uint64_t	expected_len;
 
 	ZBX_TCP_START();
@@ -944,9 +944,9 @@ ssize_t	zbx_tcp_recv_ext(zbx_sock_t *s, char **data, unsigned char flags, int ti
 
 		if (ZBX_MAX_RECV_DATA_SIZE < expected_len)
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "Message size " ZBX_FS_UI64 " exceeds the maximum size "
-					ZBX_FS_UI64 " bytes. Message ignored.", expected_len,
-					(zbx_uint64_t)ZBX_MAX_RECV_DATA_SIZE);
+			zabbix_log(LOG_LEVEL_WARNING, "Message size " ZBX_FS_UI64 " from IP %s"
+					" exceeds the maximum size " ZBX_FS_UI64 " bytes. Message ignored.",
+					expected_len, get_ip_by_socket(s), (zbx_uint64_t)ZBX_MAX_RECV_DATA_SIZE);
 			total_bytes = FAIL;
 			goto cleanup;
 		}
@@ -1038,7 +1038,7 @@ ssize_t	zbx_tcp_recv_ext(zbx_sock_t *s, char **data, unsigned char flags, int ti
 				}
 				else
 				{
-					if (nbytes < sizeof(s->buf_stat) - 1)	/* should we stop reading? */
+					if ((size_t)nbytes < sizeof(s->buf_stat) - 1)	/* should we stop reading? */
 					{
 						/* XML protocol? */
 						if (0 == strncmp(s->buf_dyn, "<req>", sizeof("<req>") - 1))
