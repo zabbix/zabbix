@@ -1187,7 +1187,7 @@ void	DBlld_groups_validate(zbx_vector_ptr_t *groups, char **error)
 				if (0 == (group->flags & ZBX_FLAG_LLD_GROUP_DISCOVERED))
 					continue;
 
-				if (0 == strcmp(group->name, row[1]))
+				if (0 == strcmp(group->name, row[0]))
 				{
 					*error = zbx_strdcatf(*error, "Cannot %s group:"
 							" group with the same name \"%s\" already exists.\n",
