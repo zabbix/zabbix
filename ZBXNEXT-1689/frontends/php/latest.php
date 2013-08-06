@@ -147,8 +147,6 @@ $pageFilter = new CPageFilter($options);
 $_REQUEST['groupid'] = $pageFilter->groupid;
 $_REQUEST['hostid'] = $pageFilter->hostid;
 
-$available_hosts = $pageFilter->hostsSelected ? array_keys($pageFilter->hosts) : array();
-
 $r_form->addItem(array(_('Group').SPACE, $pageFilter->getGroupsCB(true)));
 $r_form->addItem(array(SPACE._('Host').SPACE, $pageFilter->getHostsCB(true)));
 
@@ -174,6 +172,9 @@ $latest_wdgt->addFlicker($filterForm, CProfile::get('web.latest.filter.state', 1
 
 validate_sort_and_sortorder('i.name',ZBX_SORT_UP);
 
+$sortField = getPageSortField();
+$sortOrder = getPageSortOrder();
+
 // js templates
 require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php';
 require_once dirname(__FILE__).'/include/views/js/monitoring.latest.js.php';
@@ -192,59 +193,55 @@ $table->setHeader(array(
 	_('History')
 ));
 
-/**
- * Display APPLICATION ITEMS
- */
-$db_apps = array();
-$db_appids = array();
+// fetch hosts
+$availableHostIds = array();
+if ($_REQUEST['hostid']) {
+	$availableHostIds = array($_REQUEST['hostid']);
+}
+elseif ($pageFilter->hostsSelected) {
+	$availableHostIds = array_keys($pageFilter->hosts);
+}
 
-$options = array(
+$hosts = API::Host()->get(array(
 	'output' => array('name', 'hostid'),
-	'hostids' => $available_hosts,
+	'hostids' => $availableHostIds,
+	'with_monitored_items' => true,
 	'selectScreens' => API_OUTPUT_COUNT,
 	'selectInventory' => array('hostid'),
 	'preservekeys' => true
-);
-
-$sql_from = '';
-$sql_where = '';
-if($_REQUEST['groupid'] > 0){
-	$sql_from .= ',hosts_groups hg ';
-	$sql_where.= ' AND hg.hostid=h.hostid AND hg.groupid='.$_REQUEST['groupid'];
-
-	$options['groupid'] = $_REQUEST['groupid'];
+));
+foreach ($hosts as &$host) {
+	$host['item_cnt'] = 0;
 }
+unset($host);
 
-if($_REQUEST['hostid']>0){
-	$sql_where.= ' AND h.hostid='.$_REQUEST['hostid'];
-
-	$options['hostids'] = $_REQUEST['hostid'];
+// sort hosts
+if ($sortField == 'h.name') {
+	$sortFields = array(array('field' => 'name', 'order' => $sortOrder));
 }
+else {
+	$sortFields = array('name');
+}
+CArrayHelper::sort($hosts, $sortFields);
 
-$hosts = API::Host()->get($options);
+$hostIds = array_keys($hosts);
 
 // fetch scripts for the host JS menu
 if ($_REQUEST['hostid'] == 0) {
-	$hostScripts = API::Script()->getScriptsByHosts($options['hostids']);
+	$hostScripts = API::Script()->getScriptsByHosts($hostIds);
 }
 
-// select hosts
-$sql = 'SELECT DISTINCT h.name as hostname,h.hostid, a.* '.
-		' FROM applications a, hosts h '.$sql_from.
-		' WHERE a.hostid=h.hostid'.
-			$sql_where.
-			' AND '.dbConditionInt('h.hostid', $available_hosts);
-
-$db_app_res = DBselect($sql);
-while($db_app = DBfetch($db_app_res)){
-	$db_app['item_cnt'] = 0;
-
-	$db_apps[$db_app['applicationid']] = $db_app;
-	$db_appids[$db_app['applicationid']] = $db_app['applicationid'];
+// fetch applications
+$applications = API::Application()->get(array(
+	'output' => API_OUTPUT_EXTEND,
+	'hostids' => $hostIds,
+	'preservekeys' => true
+));
+foreach ($applications as &$application) {
+	$application['hostname'] = $hosts[$application['hostid']]['name'];
+	$application['item_cnt'] = 0;
 }
-
-$sortField = getPageSortField();
-$sortOrder = getPageSortOrder();
+unset($application);
 
 // if sortfield is host name
 if ($sortField == 'h.name') {
@@ -255,14 +252,17 @@ else {
 }
 // by default order by application name and application id
 array_push($sortFields, 'name', 'applicationid');
-CArrayHelper::sort($db_apps, $sortFields);
+CArrayHelper::sort($applications, $sortFields);
 
 $tab_rows = array();
 
+/**
+ * Display APPLICATION ITEMS
+ */
 // select items
 $sql = 'SELECT DISTINCT i.itemid,i.name,i.value_type,i.units,i.state,i.valuemapid,i.key_,ia.applicationid '.
 		' FROM items i,items_applications ia'.
-		' WHERE '.dbConditionInt('ia.applicationid',$db_appids).
+		' WHERE '.dbConditionInt('i.hostid', $hostIds).
 			' AND i.itemid=ia.itemid'.
 			' AND i.status='.ITEM_STATUS_ACTIVE.
 			' AND '.dbConditionInt('i.flags', array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED));
@@ -313,7 +313,7 @@ foreach ($displayItems as $db_item){
 	else
 		$db_item['unitsLong'] = '';
 
-	$db_app = &$db_apps[$db_item['applicationid']];
+	$db_app = &$applications[$db_item['applicationid']];
 
 	if(!isset($tab_rows[$db_app['applicationid']])) $tab_rows[$db_app['applicationid']] = array();
 	$app_rows = &$tab_rows[$db_app['applicationid']];
@@ -375,7 +375,7 @@ foreach ($displayItems as $db_item){
 unset($app_rows);
 unset($db_app);
 
-foreach ($db_apps as $appid => $dbApp) {
+foreach ($applications as $appid => $dbApp) {
 	$host = $hosts[$dbApp['hostid']];
 
 	if(!isset($tab_rows[$appid])) continue;
@@ -425,35 +425,6 @@ foreach ($db_apps as $appid => $dbApp) {
 /**
  * Display OTHER ITEMS (which are not linked to application)
  */
-$db_hosts = array();
-$db_hostids = array();
-
-// select hosts
-$sql = 'SELECT DISTINCT h.name,h.hostid '.
-		' FROM hosts h'.$sql_from.', items i '.
-			' LEFT JOIN items_applications ia ON ia.itemid=i.itemid'.
-		' WHERE ia.itemid is NULL '.
-			$sql_where.
-			' AND h.hostid=i.hostid '.
-			' AND '.dbConditionInt('i.flags', array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)).
-			' AND '.dbConditionInt('h.hostid', $available_hosts);
-
-$dbHostRes = DBfetchArray(DBselect($sql));
-
-// if sortfield is host name
-if ($sortField == 'h.name') {
-	$sortFields = array(array('field' => 'name', 'order' => $sortOrder));
-}
-else {
-	$sortFields = array('name');
-}
-CArrayHelper::sort($dbHostRes, $sortFields);
-
-foreach ($dbHostRes as $dbHost) {
-	$dbHost['item_cnt'] = 0;
-	$db_hosts[$dbHost['hostid']] = $dbHost;
-	$db_hostids[$dbHost['hostid']] = $dbHost['hostid'];
-}
 
 $tab_rows = array();
 
@@ -464,7 +435,7 @@ $sql = 'SELECT DISTINCT i.hostid,i.itemid,i.name,i.value_type,i.units,i.state,i.
 		' WHERE ia.itemid is NULL '.
 			' AND i.status='.ITEM_STATUS_ACTIVE.
 			' AND '.dbConditionInt('i.flags', array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)).
-			' AND '.dbConditionInt('i.hostid', $db_hostids);
+			' AND '.dbConditionInt('i.hostid', $hostIds);
 
 $allItems = DBfetchArray(DBselect($sql));
 
@@ -512,7 +483,7 @@ foreach ($displayItems as $db_item){
 	else
 		$db_item['unitsLong'] = '';
 
-	$db_host = &$db_hosts[$db_item['hostid']];
+	$db_host = &$hosts[$db_item['hostid']];
 
 	if (!isset($tab_rows[$db_host['hostid']])) $tab_rows[$db_host['hostid']] = array();
 	$app_rows = &$tab_rows[$db_host['hostid']];
@@ -574,7 +545,7 @@ foreach ($displayItems as $db_item){
 unset($app_rows);
 unset($db_host);
 
-foreach ($db_hosts as $hostId => $dbHost) {
+foreach ($hosts as $hostId => $dbHost) {
 	$host = $hosts[$dbHost['hostid']];
 
 	if(!isset($tab_rows[$hostId])) {
