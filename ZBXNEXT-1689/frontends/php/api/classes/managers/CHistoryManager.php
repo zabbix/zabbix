@@ -39,15 +39,15 @@ class CHistoryManager {
 			$queries[$table][] = DBaddLimit(
 				'SELECT *'.
 				' FROM '.$table.' h'.
-				' WHERE itemid='.zbx_dbstr($item['itemid']).
-				' ORDER BY clock DESC',
+				' WHERE h.itemid='.zbx_dbstr($item['itemid']).
+				' ORDER BY h.clock DESC',
 				$limit
 			);
 		}
 
 		$rs = array();
 		foreach ($queries as $tableQueries) {
-			$query = DBunion($tableQueries, $limit);
+			$query = DBunion($tableQueries);
 			while ($history = DBfetch($query)) {
 				$rs[$history['itemid']][] = $history;
 			}
@@ -59,7 +59,7 @@ class CHistoryManager {
 	/**
 	 * Returns those items from $items that have history data.
 	 *
-	 * @param array $items
+	 * @param array $items  an array of items with the 'itemid' and 'value_type' properties
 	 *
 	 * @return array
 	 */
@@ -76,7 +76,7 @@ class CHistoryManager {
 			$query = DBselect(
 				'SELECT DISTINCT h.itemid'.
 				' FROM '.$table.' h'.
-				' WHERE '.dbConditionInt('itemid', $itemIds)
+				' WHERE '.dbConditionInt('h.itemid', $itemIds)
 			);
 
 			while ($item = DBfetch($query)) {
