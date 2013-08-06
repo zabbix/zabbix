@@ -108,11 +108,8 @@ if (isset($_REQUEST['filter_rst'])) {
 }
 
 // show triggers
-if (isset($_REQUEST['show_triggers'])) {
-	CProfile::update('web.tr_status.filter.show_triggers', $_REQUEST['show_triggers'], PROFILE_TYPE_INT);
-}
-else {
-	$_REQUEST['show_triggers'] = CProfile::get('web.tr_status.filter.show_triggers', TRIGGERS_OPTION_ONLYTRUE);
+if (!isset($_REQUEST['show_triggers']) && isset($_REQUEST['filter_set'])) {
+	$_REQUEST['show_triggers'] = TRIGGERS_OPTION_ONLYTRUE;
 }
 
 // show events
