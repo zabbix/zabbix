@@ -28,7 +28,8 @@ class testPageDiscoveryRules extends CWebTest {
 			'SELECT h.hostid, i.itemid, i.name, h.host, h.status'.
 			' FROM hosts h, items i'.
 			' WHERE i.hostid=h.hostid'.
-				' AND h.host LIKE '.zbx_dbstr('%-layout-test%')
+				' AND h.host LIKE '.zbx_dbstr('%-layout-test%').
+				' AND i.flags = '.ZBX_FLAG_DISCOVERY
 		);
 	}
 
@@ -134,7 +135,7 @@ class testPageDiscoveryRules extends CWebTest {
 	// Returns all discovery rules
 	public static function rule() {
 		return DBdata(
-			'SELECT h.hostid, h.host, i.itemid, i.name from hosts h, items i'.
+			'SELECT distinct h.hostid, h.host from hosts h, items i'.
 			' WHERE h.host LIKE ' .zbx_dbstr('%-layout-test-%').
 				' AND h.hostid = i.hostid'.
 				' AND i.flags = '.ZBX_FLAG_DISCOVERY
