@@ -582,11 +582,7 @@ class CGraphPrototype extends CGraphGeneral {
 	 * @return void
 	 */
 	protected function checkInput($graphs, $update = false) {
-		// get graph name on update
-		if ($update){
-			$graphs = $this->extendObjects($this->tableName(), $graphs,
-				array('name', 'graphtype', 'ymin_type', 'ymax_type', 'yaxismin', 'yaxismax'));
-		}
+		$graphs = parent::setGraphDefaultValues($graphs, $update);
 
 		$itemids = array();
 
@@ -601,14 +597,17 @@ class CGraphPrototype extends CGraphGeneral {
 			if ((!$update && (!isset($graph['gitems']) || !is_array($graph['gitems']) || !$graph['gitems']))
 					|| ($update && isset($graph['gitems']) && (!is_array($graph['gitems']) || !$graph['gitems']))) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Missing items for graph prototype "%1$s".', $graph['name']));
+					_s('Missing items for graph prototype "%1$s".', $graph['name'])
+				);
 			}
 
 			// validate item fields
 			if (isset($graph['gitems'])) {
 				$fields = array('itemid' => null);
 				foreach ($graph['gitems'] as $gitem) {
-					if (!check_db_fields($fields, $gitem)) {
+					// on create "itemid" is required, on update required only if no "gitemid" is set
+					if ($update && !isset($gitem['gitemid']) && !check_db_fields($fields, $gitem)
+							|| !$update && !check_db_fields($fields, $gitem)) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _('Missing "itemid" field for item.'));
 					}
 
@@ -621,7 +620,8 @@ class CGraphPrototype extends CGraphGeneral {
 			if (isset($graph['ymin_type']) && $graph['ymin_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE) {
 				if (!isset($graph['ymin_itemid']) || zbx_empty($graph['ymin_itemid'])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('No "%1$s" given for graph prototype.', 'ymin_itemid'));
+						_s('No "%1$s" given for graph prototype.', 'ymin_itemid')
+					);
 				}
 				else {
 					$itemids[$graph['ymin_itemid']] = $graph['ymin_itemid'];
@@ -630,7 +630,8 @@ class CGraphPrototype extends CGraphGeneral {
 			if (isset($graph['ymax_type']) && $graph['ymax_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE) {
 				if (!isset($graph['ymax_itemid']) || zbx_empty($graph['ymax_itemid'])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('No "%1$s" given for graph prototype.', 'ymax_itemid'));
+						_s('No "%1$s" given for graph prototype.', 'ymax_itemid')
+					);
 				}
 				else {
 					$itemids[$graph['ymax_itemid']] = $graph['ymax_itemid'];
@@ -680,8 +681,7 @@ class CGraphPrototype extends CGraphGeneral {
 
 		foreach ($allowedItems as $item) {
 			if (!in_array($item['value_type'], $allowedValueTypes)) {
-				self::exception(
-					ZBX_API_ERROR_PARAMETERS,
+				self::exception(ZBX_API_ERROR_PARAMETERS,
 					_s('Cannot add a non-numeric item "%1$s" to graph "%2$s".', $item['name'], $graph['name'])
 				);
 			}
