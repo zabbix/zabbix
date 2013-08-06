@@ -1,0 +1,12 @@
+ALTER TABLE dhosts ALTER COLUMN dhostid SET WITH DEFAULT NULL
+/
+REORG TABLE dhosts
+/
+ALTER TABLE dhosts ALTER COLUMN druleid SET WITH DEFAULT NULL
+/
+REORG TABLE dhosts
+/
+DELETE FROM dhosts WHERE NOT druleid IN (SELECT druleid FROM drules)
+/
+ALTER TABLE dhosts ADD CONSTRAINT c_dhosts_1 FOREIGN KEY (druleid) REFERENCES drules (druleid) ON DELETE CASCADE
+/
