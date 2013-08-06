@@ -575,11 +575,7 @@ class CGraph extends CGraphGeneral {
 	 * @return void
 	 */
 	protected function checkInput($graphs, $update = false) {
-		// get graph name on update
-		if ($update){
-			$graphs = $this->extendObjects($this->tableName(), $graphs,
-				array('name', 'graphtype', 'ymin_type', 'ymax_type', 'yaxismin', 'yaxismax'));
-		}
+		$graphs = parent::setGraphDefaultValues($graphs, $update);
 
 		$itemids = array();
 
@@ -600,7 +596,9 @@ class CGraph extends CGraphGeneral {
 			if (isset($graph['gitems'])) {
 				$fields = array('itemid' => null);
 				foreach ($graph['gitems'] as $gitem) {
-					if (!check_db_fields($fields, $gitem)) {
+					// on create "itemid" is required, on update required only if no "gitemid" is set
+					if ($update && !isset($gitem['gitemid']) && !check_db_fields($fields, $gitem)
+							|| !$update && !check_db_fields($fields, $gitem)) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _('Missing "itemid" field for item.'));
 					}
 
@@ -641,7 +639,9 @@ class CGraph extends CGraphGeneral {
 		if (CUser::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
 			foreach ($itemids as $itemid) {
 				if (!isset($allowedItems[$itemid])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_('No permissions to referred object or it does not exist!')
+					);
 				}
 			}
 		}
@@ -653,8 +653,7 @@ class CGraph extends CGraphGeneral {
 		// get value type and name for these items
 		foreach ($allowedItems as $item) {
 			if (!in_array($item['value_type'], $allowedValueTypes)) {
-				self::exception(
-					ZBX_API_ERROR_PARAMETERS,
+				self::exception(ZBX_API_ERROR_PARAMETERS,
 					_s('Cannot add a non-numeric item "%1$s" to graph "%2$s".', $item['name'], $graph['name'])
 				);
 			}
