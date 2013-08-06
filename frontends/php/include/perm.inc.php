@@ -134,6 +134,11 @@ function get_user_system_auth($userid) {
 /***********************************************
 	GET ACCESSIBLE RESOURCES BY USERID
 ************************************************/
+/**
+ *
+ * @deprecated
+ * @see CHostGroup::isReadable()
+ */
 function available_groups($groupids, $editable = null) {
 	$options = array();
 	$options['groupids'] = $groupids;
@@ -142,6 +147,11 @@ function available_groups($groupids, $editable = null) {
 	return zbx_objectValues($groups, 'groupid');
 }
 
+/**
+ *
+ * @deprecated
+ * @see CHost::isReadable()
+ */
 function available_hosts($hostids, $editable = null) {
 	$options = array();
 	$options['hostids'] = $hostids;
@@ -151,6 +161,11 @@ function available_hosts($hostids, $editable = null) {
 	return zbx_objectValues($hosts, 'hostid');
 }
 
+/**
+ *
+ * @deprecated
+ * @see CTrigger::isReadable()
+ */
 function available_triggers($triggerids, $editable = null) {
 	$options = array(
 		'triggerids' => $triggerids,

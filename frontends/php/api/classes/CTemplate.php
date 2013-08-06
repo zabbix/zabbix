@@ -1057,7 +1057,13 @@ class CTemplate extends CHostGeneral {
 		return parent::massRemove($data);
 	}
 
-	public function isReadable($ids) {
+	/**
+	 * Check if user has read permissions for templates
+	 *
+	 * @param array $ids
+	 * @return bool
+	 */
+	public function isReadable(array $ids) {
 		if (!is_array($ids)) return false;
 		if (empty($ids)) return true;
 
@@ -1072,7 +1078,13 @@ class CTemplate extends CHostGeneral {
 		return (count($ids) == $count);
 	}
 
-	public function isWritable($ids) {
+	/**
+	 * Check if user has write permissions for templates
+	 *
+	 * @param array $ids
+	 * @return bool
+	 */
+	public function isWritable(array $ids) {
 		if (!is_array($ids)) return false;
 		if (empty($ids)) return true;
 

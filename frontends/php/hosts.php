@@ -111,20 +111,11 @@ $_REQUEST['go'] = get_request('go', 'none');
 /*
  * Permissions
  */
-if (get_request('groupid', 0) > 0) {
-	$groupId = available_groups($_REQUEST['groupid'], 1);
-	if (!$groupId) {
-		access_deny();
-	}
+if (get_request('groupid') && !API::HostGroup()->isWritable(array($_REQUEST['groupid']))) {
+	access_deny();
 }
-if (get_request('hostid', 0) > 0) {
-	$hostId = API::Host()->get(array(
-		'hostids' => $_REQUEST['hostid'],
-		'editable' => true
-	));
-	if (!$hostId) {
-		access_deny();
-	}
+if (get_request('hostid') && !API::Host()->isWritable(array($_REQUEST['hostid']))) {
+	access_deny();
 }
 
 /*
