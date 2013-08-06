@@ -42,7 +42,11 @@ class CMenuPopup extends CTag {
 	 * @param array  $options['urls'][n]['name']
 	 * @param array  $options['urls'][n]['url']
 	 * @param array  $options['triggers']
-	 * @param array  $options['triggers']['items']
+	 * @param array  $options['triggers']['triggerid']
+	 * @param array  $options['triggers']['events']
+	 * @param array  $options['triggers']['acknow']
+	 * @param array  $options['triggers']['configuration']
+	 * @param array  $options['triggers']['url']
 	 * @param array  $options['history']
 	 * @param array  $options['history']['items']
 	 * @param array  $options['history']['items']['name']
@@ -130,26 +134,12 @@ class CMenuPopup extends CTag {
 
 		// goto
 		if (!empty($options['goto']['items'])) {
-			$paramsGlobal = '';
-
-			if (!empty($options['goto']['params'])) {
-				foreach ($options['goto']['params'] as $key => $value) {
-					$paramsGlobal .= ($paramsGlobal ? '&' : '?').$key.'='.$value;
-				}
-			}
-
 			$menu = new CList(null, 'menu');
 			$menu->addStyle('width: '.$this->width.'px;');
 
 			foreach ($options['goto']['items'] as $name => $args) {
 				if ($args) {
-					$params = $paramsGlobal;
-
-					if (is_array($args)) {
-						foreach ($args as $key => $value) {
-							$params .= ($params ? '&' : '?').$key.'='.$value;
-						}
-					}
+					$params = self::getParams($args, isset($options['goto']['params']) ? $options['goto']['params'] : null);
 
 					switch ($name) {
 						case 'latest':
@@ -185,62 +175,40 @@ class CMenuPopup extends CTag {
 			}
 		}
 
-		// urls
-		if (!empty($options['urls'])) {
-			$menu = new CList(null, 'menu');
-			$menu->addStyle('width: '.$this->width.'px;');
-
-			foreach ($options['urls'] as $url) {
-				$menu->addItem(new CLink($url['name'], $url['url']));
-			}
-
-			if (!$menu->emptyList) {
-				$this->addItem(new CDiv(_('URLs'), 'title'));
-				$this->addItem($menu);
-			}
-		}
-
 		// triggers
-		if (!empty($options['triggers']['items'])) {
+		if (!empty($options['triggers'])) {
 			$menu = new CList(null, 'menu');
 			$menu->addStyle('width: '.$this->width.'px;');
 
-			foreach ($options['triggers']['items'] as $name => $args) {
-				if ($args) {
-					$params = '';
-					$inNewWindow = false;
+			$params = isset($options['triggers']['triggerid'])
+				? array('triggerid' => $options['triggers']['triggerid'])
+				: null;
 
-					if (is_array($args)) {
-						foreach ($args as $key => $value) {
-							if ($key == 'inNewWindow') {
-								$inNewWindow = true;
-								continue;
-							}
+			// events
+			if (!empty($options['triggers']['events'])) {
+				$menu->addItem(new CLink(_('Events'),
+					'events.php'.self::getParams($options['triggers']['events'], $params)));
+			}
 
-							$params .= ($params ? '&' : '?').$key.'='.$value;
-						}
-					}
+			// acknow
+			if (!empty($options['triggers']['acknow'])) {
+				$menu->addItem(new CLink(_('Acknowledge'),
+					'acknow.php'.self::getParams($options['triggers']['acknow'])));
+			}
 
-					switch ($name) {
-						case 'acknow':
-							$link = new CLink(_('Acknowledge'), 'acknow.php'.$params);
+			// configuration
+			if (!empty($options['triggers']['configuration'])) {
+				$params['form'] = 'update';
+				$params['switch_node'] = isset($options['triggers']['triggerid'])
+					? id2nodeid($options['triggers']['triggerid']) : null;
 
-							if ($inNewWindow) {
-								$link->attr('target', '_blank');
-							}
-							break;
+				$menu->addItem(new CLink(_('Configuration'),
+					'triggers.php'.self::getParams($options['triggers']['configuration'], $params)));
+			}
 
-						case 'events':
-							$link = new CLink(_('Events'), 'events.php'.$params);
-
-							if ($inNewWindow) {
-								$link->attr('target', '_blank');
-							}
-							break;
-					}
-
-					$menu->addItem($link);
-				}
+			// url
+			if (!empty($options['triggers']['url'])) {
+				$menu->addItem(new CLink(_('URL'), $options['triggers']['url']));
 			}
 
 			if (!$menu->emptyList) {
@@ -257,58 +225,58 @@ class CMenuPopup extends CTag {
 			// items
 			if (!empty($options['history']['items'])) {
 				foreach ($options['history']['items'] as $item) {
-					$params = '';
-
-					if (!empty($item['params'])) {
-						foreach ($item['params'] as $key => $value) {
-							$params .= ($params ? '&' : '?').$key.'='.$value;
-						}
-					}
-
-					$menu->addItem(new CLink($item['name'], 'history.php'.$params));
+					$menu->addItem(new CLink($item['name'],
+						'history.php'.self::getParams(isset($item['params']) ? $item['params'] : null)));
 				}
 			}
 
 			// latest
 			if (!empty($options['history']['latest']['itemid'])) {
-				$hourLink = new CLink(_('Last hour graph'), 'history.php?'.
+				$menu->addItem(new CLink(_('Last hour graph'), 'history.php?'.
 					'action=showgraph'.
 					'&period=3600'.
 					'&itemid='.$options['history']['latest']['itemid']
-				);
-				$hourLink->attr('target', '_blank');
-				$menu->addItem($hourLink);
+				));
 
-				$weekLink = new CLink(_('Last week graph'), 'history.php?'.
+				$menu->addItem(new CLink(_('Last week graph'), 'history.php?'.
 					'action=showgraph'.
 					'&period=604800&'.
 					'itemid='.$options['history']['latest']['itemid']
-				);
-				$weekLink->attr('target', '_blank');
-				$menu->addItem($weekLink);
+				));
 
-				$monthLink = new CLink(_('Last month graph'), 'history.php?'.
+				$menu->addItem(new CLink(_('Last month graph'), 'history.php?'.
 					'action=showgraph'.
 					'&period=2678400'.
 					'&itemid='.$options['history']['latest']['itemid']
-				);
-				$monthLink->attr('target', '_blank');
-				$menu->addItem($monthLink);
+				));
 			}
 
 			// latest values
 			if (!empty($options['history']['latestValues'])) {
-				$link = new CLink(_('Latest values'), 'history.php?'.
+				$menu->addItem(new CLink(_('Latest values'), 'history.php?'.
 					'action=showvalues'.
 					'&period=3600'.
 					'&itemid='.$options['history']['latestValues']['itemid']
-				);
-				$link->attr('target', '_blank');
-				$menu->addItem($link);
+				));
 			}
 
 			if (!$menu->emptyList) {
 				$this->addItem(new CDiv(_('History'), 'title'));
+				$this->addItem($menu);
+			}
+		}
+
+		// urls
+		if (!empty($options['urls'])) {
+			$menu = new CList(null, 'menu');
+			$menu->addStyle('width: '.$this->width.'px;');
+
+			foreach ($options['urls'] as $url) {
+				$menu->addItem(new CLink($url['name'], $url['url']));
+			}
+
+			if (!$menu->emptyList) {
+				$this->addItem(new CDiv(_('URLs'), 'title'));
 				$this->addItem($menu);
 			}
 		}
@@ -343,6 +311,12 @@ class CMenuPopup extends CTag {
 								my: "left top",
 								at: "left bottom"
 							});
+
+							setTimeout(function() {
+								if (!obj.data("isActive")) {
+									obj.fadeOut(50);
+								}
+							}, 2000);
 						});
 					});'
 				);
@@ -409,6 +383,12 @@ class CMenuPopup extends CTag {
 								my: "left top",
 								at: "left bottom"
 							});
+
+							setTimeout(function() {
+								if (!obj.data("isActive")) {
+									obj.fadeOut(50);
+								}
+							}, 2000);
 
 							return false;
 						});
@@ -590,5 +570,34 @@ class CMenuPopup extends CTag {
 	 */
 	public static function getId() {
 		return uniqid();
+	}
+
+	/**
+	 * Get url params.
+	 *
+	 * @param array $items
+	 * @param array $globalItems
+	 *
+	 * @return string
+	 */
+	private static function getParams($items, $globalItems = array()) {
+		$params = '';
+
+		if ($items && is_array($items) && $globalItems && is_array($globalItems)) {
+			$items = array_merge($items, $globalItems);
+		}
+		else {
+			if (!is_array($items) && $globalItems) {
+				$items = $globalItems;
+			}
+		}
+
+		if (is_array($items)) {
+			foreach ($items as $key => $value) {
+				$params .= ($params ? '&' : '?').$key.'='.$value;
+			}
+		}
+
+		return $params;
 	}
 }

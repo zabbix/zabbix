@@ -1271,12 +1271,8 @@ function getTriggerOverviewCells($trigger, $screenId = null) {
 		$menuPopupOptions = array(
 			'width' => 200,
 			'triggers' => array(
-				'items' => array(
-					'events' => array(
-						'triggerid' => $trigger['triggerid'],
-						'inNewWindow' => true
-					)
-				)
+				'triggerid' => $trigger['triggerid'],
+				'events' => true
 			)
 		);
 
@@ -1290,14 +1286,14 @@ function getTriggerOverviewCells($trigger, $screenId = null) {
 					if ($screenId) {
 						global $page;
 
-						$menuPopupOptions['triggers']['items']['acknow'] = array(
+						$menuPopupOptions['triggers']['acknow'] = array(
 							'eventid' => $event['eventid'],
 							'screenid' => $screenId,
 							'backurl' => $page['file']
 						);
 					}
 					else {
-						$menuPopupOptions['triggers']['items']['acknow'] = array(
+						$menuPopupOptions['triggers']['acknow'] = array(
 							'eventid' => $event['eventid'],
 							'backurl' => 'overview.php'
 						);

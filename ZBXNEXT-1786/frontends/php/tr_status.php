@@ -545,49 +545,13 @@ while ($row = DBfetch($dbTriggerDependencies)) {
 }
 
 foreach ($triggers as $trigger) {
-	$items = array();
-
 	$usedHosts = array();
 	foreach ($trigger['hosts'] as $host) {
 		$usedHosts[$host['hostid']] = $host['name'];
 	}
 	$usedHostCount = count($usedHosts);
 
-	foreach ($trigger['items'] as $inum => $item) {
-		$itemName = itemName($item);
-
-		// if we have items from different hosts, we must prefix a host name
-		if ($usedHostCount > 1) {
-			$itemName = $usedHosts[$item['hostid']].NAME_DELIMITER.$itemName;
-		}
-
-		$items[$inum]['itemid'] = $item['itemid'];
-		$items[$inum]['value_type'] = $item['value_type'];
-		$items[$inum]['action'] = str_in_array($item['value_type'], array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64)) ? 'showgraph' : 'showvalues';
-		$items[$inum]['name'] = htmlspecialchars($itemName);
-	}
-	$trigger['items'] = $items;
-
-	// trigger js menu
-	$menuTriggerConfiguration = 'null';
-	if ($showAdminLinks && $trigger['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
-		$configurationUrl = 'triggers.php?form=update&triggerid='.$trigger['triggerid'].'&hostid='.$pageFilter->hostid.'&switch_node='.id2nodeid($trigger['triggerid']);
-		$menuTriggerConfiguration = "['"._('Configuration of triggers')."', ".CJs::encodeJson($configurationUrl).
-			", null, {'outer': ['pum_o_item'], 'inner': ['pum_i_item']}]";
-	}
-	$menu_trigger_url = 'null';
-	if (!zbx_empty($trigger['url'])) {
-		// double CHtml::encode is required to prevent XSS attacks
-		$menu_trigger_url = "['"._('URL')."', ".CJs::encodeJson(CHtml::encode(CHtml::encode(resolveTriggerUrl($trigger)))).
-			", null, {'outer': ['pum_o_item'], 'inner': ['pum_i_item']}]";
-	}
-
-	$description = new CSpan($trigger['description'], 'link_menu');
-	$description->addAction('onclick',
-		"javascript: create_mon_trigger_menu(event, [{'triggerid': '".$trigger['triggerid'].
-			"', 'lastchange': '".$trigger['lastchange']."'}, ".$menuTriggerConfiguration.", ".$menu_trigger_url."],".
-		zbx_jsvalue($items, true).");"
-	);
+	$description = $trigger['description'];
 
 	if ($_REQUEST['show_details']) {
 		$font = new CTag('font', 'yes');
@@ -597,7 +561,6 @@ foreach ($triggers as $trigger) {
 		$description = array($description, BR(), $font);
 	}
 
-	// dependencies
 	if (!empty($trigger['dependencies'])) {
 		$dependenciesTable = new CTableInfo();
 		$dependenciesTable->setAttribute('style', 'width: 200px;');
@@ -636,7 +599,49 @@ foreach ($triggers as $trigger) {
 	}
 	unset($img, $dependenciesTable, $dependency);
 
-	$triggerDescription = new CSpan($description);
+	$triggerItems = array();
+	foreach ($trigger['items'] as $item) {
+		$itemName = htmlspecialchars(itemName($item));
+
+		// if we have items from different hosts, we must prefix a host name
+		if ($usedHostCount > 1) {
+			$itemName = $usedHosts[$item['hostid']].NAME_DELIMITER.$itemName;
+		}
+
+		$triggerItems[] = array(
+			'name' => $itemName,
+			'params' => array(
+				'itemid' => $item['itemid'],
+				'action' => in_array($item['value_type'], array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64))
+					? 'showgraph' : 'showvalues'
+			)
+		);
+	}
+
+	$menuPopupId = CMenuPopup::getId();
+
+	$triggerDescription = new CSpan($description, 'pointer link_menu');
+	$triggerDescription->attr('data-menupopupid', $menuPopupId);
+
+	$triggerDescription = new CDiv(array(
+		$triggerDescription,
+		new CMenuPopup(array(
+			'id' => $menuPopupId,
+			'width' => 250,
+			'triggers' => array(
+				'triggerid' => $trigger['triggerid'],
+				'events' => array(
+					'nav_time' => $trigger['lastchange']
+				),
+				'configuration' => ($showAdminLinks && $trigger['flags'] == ZBX_FLAG_DISCOVERY_NORMAL)
+					? array('hostid' => $pageFilter->hostid) : null,
+				'url' => zbx_empty($trigger['url']) ? null : CHtml::encode(CHtml::encode(resolveTriggerUrl($trigger)))
+			),
+			'history' => array(
+				'items' => $triggerItems
+			)
+		)))
+	);
 
 	// host js menu
 	$hostList = array();

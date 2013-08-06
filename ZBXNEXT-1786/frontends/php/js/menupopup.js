@@ -21,8 +21,7 @@
 jQuery(function($) {
 
 	$.fn.menuPopup = function() {
-		var obj = $(this),
-			isActive = true;
+		var obj = $(this);
 
 		if (obj.children().length == 0) {
 			return;
@@ -31,17 +30,18 @@ jQuery(function($) {
 		// load
 		$('.menu', obj).menu();
 		obj.data('isLoaded', true);
+		obj.data('isActive', false);
 		obj.fadeIn(0);
 
 		// close
 		obj.mouseenter(function() {
-			isActive = true;
+			obj.data('isActive', true);
 		})
 		.mouseleave(function() {
-			isActive = false;
+			obj.data('isActive', false);
 
 			setTimeout(function() {
-				if (!isActive) {
+				if (!obj.data('isActive')) {
 					obj.fadeOut(50);
 				}
 			}, 500);

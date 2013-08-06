@@ -422,6 +422,7 @@ if (!$firstEvent) {
 else {
 	$config = select_config();
 	$starttime = $firstEvent['clock'];
+	$showAdminLinks = (CWebUser::$data['type'] == USER_TYPE_ZABBIX_ADMIN || CWebUser::$data['type'] == USER_TYPE_SUPER_ADMIN);
 
 	if ($source == EVENT_SOURCE_DISCOVERY) {
 		// fetch discovered service and discovered host events separately
@@ -636,7 +637,7 @@ else {
 				'triggerids' => zbx_objectValues($events, 'objectid'),
 				'selectHosts' => array('hostid'),
 				'selectItems' => array('name', 'value_type', 'key_'),
-				'output' => array('description', 'expression', 'priority')
+				'output' => array('description', 'expression', 'priority', 'flags', 'url')
 			));
 			$triggers = zbx_toHash($triggers, 'triggerid');
 
@@ -671,7 +672,7 @@ else {
 				$triggerItems = array();
 				foreach ($trigger['items'] as $item) {
 					$triggerItems[] = array(
-						'name' => itemName($item),
+						'name' => htmlspecialchars(itemName($item)),
 						'params' => array(
 							'itemid' => $item['itemid'],
 							'action' => in_array($item['value_type'], array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64))
@@ -690,18 +691,19 @@ else {
 				$triggerDescription = new CSpan($description, 'pointer link_menu');
 				$triggerDescription->attr('data-menupopupid', $menuPopupId);
 
-				$triggerDiv = new CDiv(array(
+				$triggerDescription = new CDiv(array(
 					$triggerDescription,
 					new CMenuPopup(array(
 						'id' => $menuPopupId,
 						'width' => 250,
 						'triggers' => array(
-							'items' => array(
-								'events' => array(
-									'triggerid' => $trigger['triggerid'],
-									'nav_time' => $event['clock']
-								)
-							)
+							'triggerid' => $trigger['triggerid'],
+							'events' => array(
+								'nav_time' => $event['clock']
+							),
+							'configuration' => ($showAdminLinks && $trigger['flags'] == ZBX_FLAG_DISCOVERY_NORMAL)
+								? array('hostid' => $host['hostid']) : null,
+							'url' => zbx_empty($trigger['url']) ? null : CHtml::encode(CHtml::encode(resolveTriggerUrl($trigger)))
 						),
 						'history' => array(
 							'items' => $triggerItems
@@ -765,7 +767,7 @@ else {
 					),
 					is_show_all_nodes() ? get_node_name_by_elid($event['objectid']) : null,
 					$hostDiv,
-					$triggerDiv,
+					$triggerDescription,
 					$statusSpan,
 					getSeverityCell($trigger['priority'], null, !$event['value']),
 					$event['duration'],
