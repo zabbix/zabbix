@@ -5,6 +5,7 @@ New features:
 A.F....... [ZBX-1357] updated Dutch translation; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+...G...... [ZBX-6672] fixed windows agent performance counters being capped to 100 (wiper)
 ....I..... [ZBX-6831] fixed webtest item conversion in 1.8->2.0 database upgrade patch for mysql (wiper)
 ...G...... [ZBX-6527] fixed proc.mem calculations with getprocs() for AIX (wiper)
 ........S. [ZBX-5924] fixed curl verify host option setting in ez texting (wiper)
