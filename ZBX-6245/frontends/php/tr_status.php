@@ -108,9 +108,7 @@ if (isset($_REQUEST['filter_rst'])) {
 }
 
 // show triggers
-if (!isset($_REQUEST['show_triggers']) && isset($_REQUEST['filter_set'])) {
-	$_REQUEST['show_triggers'] = TRIGGERS_OPTION_ONLYTRUE;
-}
+$_REQUEST['show_triggers'] = isset($_REQUEST['show_triggers']) ? $_REQUEST['show_triggers'] : TRIGGERS_OPTION_ONLYTRUE;
 
 // show events
 if (isset($_REQUEST['show_events'])) {
