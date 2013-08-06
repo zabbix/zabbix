@@ -548,3 +548,8 @@ div.preloader {
 .multiselect .available .prefix { color: #77B7DA; }
 .multiselect .available ul li.hover { background: #4A7FA2; }
 .multiselect .available ul li.hover .prefix { color: #F1F1F1; }
+
+/* menu popup */
+.menuPopup { border: 1px solid #022744; }
+.menuPopup .title { color: #ffffff; background: #022744 url('../../../images/gradients/header_footer_blue.png') repeat-x top left; }
+.menuPopup .ui-menu { border: 1px solid #022744; }

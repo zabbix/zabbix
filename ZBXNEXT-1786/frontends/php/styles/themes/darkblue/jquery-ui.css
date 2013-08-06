@@ -364,36 +364,20 @@
  *
  * http://docs.jquery.com/UI/Menu#theming
  */
-.darkblue .ui-menu {
-	list-style:none;
-	padding: 2px;
-	margin: 0;
-	display:block;
-	float: left;
-}
-.darkblue .ui-menu .ui-menu {
-	margin-top: -3px;
-}
-.darkblue .ui-menu .ui-menu-item {
-	margin:0;
-	padding: 0;
-	zoom: 1;
-	float: left;
-	clear: left;
-	width: 100%;
-}
-.darkblue .ui-menu .ui-menu-item a {
-	text-decoration:none;
-	display:block;
-	padding:.2em .4em;
-	line-height:1.5;
-	zoom:1;
-}
-.darkblue .ui-menu .ui-menu-item a.ui-state-hover,
-.darkblue .ui-menu .ui-menu-item a.ui-state-active {
-	font-weight: normal;
-	margin: -1px;
-}
+.darkblue .ui-menu { list-style: none; padding: 2px; margin: 0; display: block; outline: none; }
+.darkblue .ui-menu .ui-menu { margin-top: -3px; position: absolute; }
+.darkblue .ui-menu .ui-menu-item { margin: 0; padding: 0; width: 100%; }
+.darkblue .ui-menu .ui-menu-divider { margin: 5px -2px 5px -2px; height: 0; font-size: 0; line-height: 0; border-width: 1px 0 0 0; }
+.darkblue .ui-menu .ui-menu-item a { text-decoration: none; display: block; padding: 2px .4em; line-height: 1.5; min-height: 0; font-weight: normal; }
+.darkblue .ui-menu .ui-menu-item a.ui-state-focus,
+.darkblue .ui-menu .ui-menu-item a.ui-state-active { font-weight: normal; margin: -1px; }
+.darkblue .ui-menu .ui-state-disabled { font-weight: normal; margin: .4em 0 .2em; line-height: 1.5; }
+.darkblue .ui-menu .ui-state-disabled a { cursor: default; }
+.darkblue .ui-menu-icons { position: relative; }
+.darkblue .ui-menu-icons .ui-menu-item a { position: relative; padding-left: 2em; }
+.darkblue .ui-menu .ui-icon { position: absolute; top: .2em; left: .2em; }
+.darkblue .ui-menu .ui-menu-icon { position: static; float: right; }
+
 /*
  * jQuery UI Button 1.8.9
  *
@@ -441,17 +425,16 @@ button.ui-button::-moz-focus-inner { border: 0; padding: 0; } /* reset extra pad
  *
  * http://docs.jquery.com/UI/Dialog#theming
  */
-.darkblue .ui-dialog { position: absolute; padding: .2em; width: 300px; overflow: hidden; }
-.darkblue .ui-dialog .ui-dialog-titlebar { padding: .4em 1em; position: relative;  }
-.darkblue .ui-dialog .ui-dialog-title { float: left; margin: .1em 16px .1em 0; }
-.darkblue .ui-dialog .ui-dialog-titlebar-close { position: absolute; right: .3em; top: 50%; width: 19px; margin: -10px 0 0 0; padding: 1px; height: 18px; }
-.darkblue .ui-dialog .ui-dialog-titlebar-close span { display: block; margin: 1px; }
-.darkblue .ui-dialog .ui-dialog-titlebar-close:hover, .darkblue .ui-dialog .ui-dialog-titlebar-close:focus { padding: 0; }
-.darkblue .ui-dialog .ui-dialog-content { position: relative; border: 0; padding: .5em 1em; background: none; overflow: auto; zoom: 1; }
-.darkblue .ui-dialog .ui-dialog-buttonpane { text-align: left; border-width: 1px 0 0 0; background-image: none; margin: .5em 0 0 0; padding: .3em 1em .5em .4em; }
+.darkblue .ui-dialog { position: absolute; top: 0; left: 0; padding: .2em; outline: 0; }
+.darkblue .ui-dialog .ui-dialog-titlebar { padding: .4em 1em; position: relative; }
+.darkblue .ui-dialog .ui-dialog-title { float: left; margin: .1em 0; white-space: nowrap; width: 90%; overflow: hidden; text-overflow: ellipsis; }
+.darkblue .ui-dialog .ui-dialog-titlebar-close { position: absolute; right: .3em; top: 50%; width: 21px; margin: -10px 0 0 0; padding: 1px; height: 20px; }
+.darkblue .ui-dialog .ui-dialog-content { position: relative; border: 0; padding: .5em 1em; background: none; overflow: auto; }
+.darkblue .ui-dialog .ui-dialog-buttonpane { text-align: left; border-width: 1px 0 0 0; background-image: none; margin-top: .5em; padding: .3em 1em .5em .4em; }
 .darkblue .ui-dialog .ui-dialog-buttonpane .ui-dialog-buttonset { float: right; }
 .darkblue .ui-dialog .ui-dialog-buttonpane button { margin: .5em .4em .5em 0; cursor: pointer; }
-.darkblue .ui-dialog .ui-resizable-se { width: 14px; height: 14px; right: 3px; bottom: 3px; }
+.darkblue .ui-dialog .ui-resizable-se { width: 12px; height: 12px; right: -5px; bottom: -5px; background-position: 16px 16px; }
+
 .darkblue .ui-draggable .ui-dialog-titlebar { cursor: move; }
 .darkblue .ui-sortable-placeholder { border: 1px dotted #2f2f2f; }
 
