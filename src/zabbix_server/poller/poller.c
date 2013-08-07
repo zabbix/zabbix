@@ -662,6 +662,13 @@ static int	get_values(unsigned char poller_type)
 						NULL, &items[i].password, MACRO_TYPE_COMMON, NULL, 0);
 				/* break; is not missing here */
 			case ITEM_TYPE_DB_MONITOR:
+				items[i].username = zbx_strdup(items[i].username, items[i].username_orig);
+				items[i].password = zbx_strdup(items[i].password, items[i].password_orig);
+
+				substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, &items[i],
+						NULL, &items[i].username, MACRO_TYPE_COMMON, NULL, 0);
+				substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, &items[i],
+						NULL, &items[i].password, MACRO_TYPE_COMMON, NULL, 0);
 				substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, &items[i],
 						NULL, &items[i].params, MACRO_TYPE_PARAMS_FIELD, NULL, 0);
 				break;
@@ -749,6 +756,10 @@ static int	get_values(unsigned char poller_type)
 				zbx_free(items[i].privatekey);
 				/* break; is not missing here */
 			case ITEM_TYPE_TELNET:
+				zbx_free(items[i].username);
+				zbx_free(items[i].password);
+				break;
+			case ITEM_TYPE_DB_MONITOR:
 				zbx_free(items[i].username);
 				zbx_free(items[i].password);
 				break;
