@@ -469,6 +469,9 @@ typedef enum
 }
 zbx_group_status_type_t;
 
+/* group internal flag */
+#define ZBX_INTERNAL_GROUP		1
+
 /* daemon type */
 #define ZBX_DAEMON_TYPE_SERVER		0x01
 #define ZBX_DAEMON_TYPE_PROXY_ACTIVE	0x02

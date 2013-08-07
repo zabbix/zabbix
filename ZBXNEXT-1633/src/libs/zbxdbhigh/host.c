@@ -5338,6 +5338,143 @@ void	zbx_destroy_services_lock()
 
 /******************************************************************************
  *                                                                            *
+ * Function: DBdelete_groups_validate                                         *
+ *                                                                            *
+ * Purpose: removes the groupids from the list which cannot be deleted        *
+ *          (host or template can remain without groups or it's an internal   *
+ *          group or it's used by a host prototype)                           *
+ *                                                                            *
+ ******************************************************************************/
+static void	DBdelete_groups_validate(zbx_vector_uint64_t *groupids)
+{
+	DB_RESULT		result;
+	DB_ROW			row;
+	char			*sql = NULL;
+	size_t			sql_alloc = 0, sql_offset = 0;
+	zbx_vector_uint64_t	hostids;
+	zbx_uint64_t		hostid, groupid;
+	int			index, internal;
+
+	if (0 == groupids->values_num)
+		return;
+
+	zbx_vector_uint64_create(&hostids);
+
+	/* select of the list of hosts which remain without groups */
+
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
+			"select hg.hostid"
+			" from hosts_groups hg"
+			" where");
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hg.groupid", groupids->values, groupids->values_num);
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
+			" and not exists ("
+				"select null"
+				" from hosts_groups hg2"
+				" where hg.hostid=hg2.hostid"
+					" and not");
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hg2.groupid", groupids->values, groupids->values_num);
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
+			")");
+
+	result = DBselect("%s", sql);
+
+	while (NULL != (row = DBfetch(result))) {
+		ZBX_STR2UINT64(hostid, row[0]);
+		zbx_vector_uint64_append(&hostids, hostid);
+	}
+	DBfree_result(result);
+
+	zbx_vector_uint64_sort(&hostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+	/* select of the list of groups which cannot be deleted */
+
+	sql_offset = 0;
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
+			"select g.groupid,g.internal,g.name"
+			" from groups g"
+			" where");
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "g.groupid", groupids->values, groupids->values_num);
+	if (0 < hostids.values_num)
+	{
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+				" and (g.internal=%d"
+					" or exists ("
+						"select null"
+						" from hosts_groups hg"
+						" where g.groupid=hg.groupid"
+							" and",
+				ZBX_INTERNAL_GROUP);
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hg.hostid", hostids.values, hostids.values_num);
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "))");
+	}
+	else
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " and g.internal=%d", ZBX_INTERNAL_GROUP);
+
+	result = DBselect("%s", sql);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		ZBX_STR2UINT64(groupid, row[0]);
+		internal = atoi(row[1]);
+
+		if (FAIL != (index = zbx_vector_uint64_bsearch(groupids, groupid, ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
+			zbx_vector_uint64_remove(groupids, index);
+
+		if (ZBX_INTERNAL_GROUP == internal)
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "group \"%s\" is internal and cannot be deleted", row[2]);
+		}
+		else
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "group \"%s\" cannot be deleted,"
+					" because some hosts or templates depend on it", row[2]);
+		}
+	}
+	DBfree_result(result);
+
+	/* check if groups is used in the groups prototypes */
+
+	if (0 != groupids->values_num)
+	{
+		sql_offset = 0;
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
+				"select g.groupid,g.name"
+				" from groups g"
+				" where");
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "g.groupid",
+				groupids->values, groupids->values_num);
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
+					" and exists ("
+						"select null"
+						" from group_prototype gp"
+						" where g.groupid=gp.groupid"
+					")");
+
+		result = DBselect("%s", sql);
+
+		while (NULL != (row = DBfetch(result)))
+		{
+			ZBX_STR2UINT64(groupid, row[0]);
+
+			if (FAIL != (index = zbx_vector_uint64_bsearch(groupids, groupid,
+					ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
+			{
+				zbx_vector_uint64_remove(groupids, index);
+			}
+
+			zabbix_log(LOG_LEVEL_WARNING, "group \"%s\" cannot be deleted,"
+					" because it is used by a host prototype", row[1]);
+		}
+		DBfree_result(result);
+	}
+
+	zbx_vector_uint64_destroy(&hostids);
+	zbx_free(sql);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: DBdelete_groups                                                  *
  *                                                                            *
  * Purpose: delete host groups from database                                  *
@@ -5354,6 +5491,8 @@ void	DBdelete_groups(zbx_vector_uint64_t *groupids)
 	int		i;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() values_num:%d", __function_name, groupids->values_num);
+
+	DBdelete_groups_validate(groupids);
 
 	if (0 == groupids->values_num)
 		goto out;
