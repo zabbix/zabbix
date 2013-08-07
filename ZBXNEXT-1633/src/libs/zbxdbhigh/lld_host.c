@@ -286,8 +286,7 @@ static void	DBlld_hosts_get(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts,
  * Parameters: hosts - [IN] list of hosts; should be sorted by hostid         *
  *                                                                            *
  ******************************************************************************/
-void	DBlld_hosts_validate(zbx_vector_ptr_t *hosts, const zbx_vector_uint64_t *groupids,
-		const zbx_vector_ptr_t *groups, char **error)
+void	DBlld_hosts_validate(zbx_vector_ptr_t *hosts, char **error)
 {
 	const char		*__function_name = "DBlld_hosts_validate";
 
@@ -2984,7 +2983,7 @@ void	DBlld_update_hosts(zbx_uint64_t lld_ruleid, struct zbx_json_parse *jp_data,
 		zbx_vector_ptr_sort(&hosts, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 
 		DBlld_groups_validate(&groups, error);
-		DBlld_hosts_validate(&hosts, &groupids, &groups, error);
+		DBlld_hosts_validate(&hosts, error);
 
 		DBlld_interfaces_make(&interfaces, &hosts);
 		DBlld_interfaces_validate(&hosts, error);
