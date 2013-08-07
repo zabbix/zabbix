@@ -38,8 +38,6 @@ require_once dirname(__FILE__).'/include/page_header.php';
 $fields = array(
 	'groupid' =>	array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
 	'hostid' =>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
-	'tr_groupid' =>	array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
-	'tr_hostid' =>	array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
 	'elementid' =>	array(T_ZBX_INT, O_OPT, P_SYS|P_NZERO, DB_ID, null),
 	'screenname' =>	array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
 	'step' =>		array(T_ZBX_INT, O_OPT, P_SYS,	BETWEEN(0, 65535), null),
@@ -55,6 +53,22 @@ $fields = array(
 	'favstate' =>	array(T_ZBX_INT, O_OPT, P_ACT,	NOT_EMPTY,	null)
 );
 check_fields($fields);
+
+// validate permissions
+if (get_request('groupid') && !API::HostGroup()->isReadable(array($_REQUEST['groupid'])) ||
+		get_request('hostid') && !API::Host()->isReadable(array($_REQUEST['hostid']))) {
+	access_deny();
+}
+if (get_request('elementid')) {
+	$screenItems = API::Screen()->get(array(
+		'screenids' => array($_REQUEST['elementid']),
+		'countOutput' => true
+	));
+	if (!$screenItems) {
+		access_deny();
+	}
+}
+
 
 /*
  * Filter

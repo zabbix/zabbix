@@ -90,6 +90,10 @@ if (isset($_REQUEST['userid'])) {
 		access_deny();
 	}
 }
+if (get_request('filter_usrgrpid') && !API::UserGroup()->isReadable(array($_REQUEST['filter_usrgrpid']))) {
+	access_deny();
+}
+
 if (isset($_REQUEST['go'])) {
 	if (!isset($_REQUEST['group_userid']) || !is_array($_REQUEST['group_userid'])) {
 		access_deny();

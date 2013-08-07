@@ -37,7 +37,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 		'hostids'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, 		'isset({config})&&({config}==3)&&isset({report_show})&&!isset({groupids})'),
 		'groupids'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, 		'isset({config})&&({config}==3)&&isset({report_show})&&!isset({hostids})'),
 
-		'items'=>		array(T_ZBX_STR, O_OPT,	NULL,	null,		'isset({report_show})'),
+		'items'=>		array(T_ZBX_STR, O_OPT,	null,	DB_ID,		'isset({report_show})'),
 		'new_graph_item'=>	array(T_ZBX_STR, O_OPT,	NULL,	null,		null),
 		'group_gid'=>		array(T_ZBX_STR, O_OPT,	null,	null,		null),
 
@@ -73,6 +73,19 @@ require_once dirname(__FILE__).'/include/page_header.php';
 	);
 
 	check_fields($fields);
+
+	// validate permissions
+	if (get_request('config') == 3) {
+		if (get_request('groupid') && !API::HostGroup()->isReadable(array($_REQUEST['groupid']))) {
+			access_deny();
+		}
+		if (get_request('groupids') && !API::HostGroup()->isReadable($_REQUEST['groupids'])) {
+			access_deny();
+		}
+		if (get_request('hostids') && !API::Host()->isReadable($_REQUEST['hostids'])) {
+			access_deny();
+		}
+	}
 
 /* AJAX */
 	if(isset($_REQUEST['favobj'])){

@@ -41,8 +41,6 @@ require_once dirname(__FILE__).'/include/page_header.php';
 		'sform'=>			array(T_ZBX_INT, O_OPT,  NULL,	  	IN('0,1'),	null),
 		'sitems'=>			array(T_ZBX_INT, O_OPT,  NULL, 		IN('0,1'),	null),
 
-		'groupid'=>			array(T_ZBX_INT, O_OPT,	 P_SYS,		DB_ID,	null),
-		'hostid'=>			array(T_ZBX_INT, O_OPT,  P_SYS,		DB_ID,	null),
 		'triggerid'=>		array(T_ZBX_INT, O_OPT,  P_SYS,		DB_ID,	null),
 
 		'type'=>			array(T_ZBX_INT, O_OPT,  NULL, 		IN('0,1'),	null),
@@ -58,6 +56,11 @@ require_once dirname(__FILE__).'/include/page_header.php';
 	);
 
 	check_fields($fields);
+
+	if (get_request('itemid') && !API::Item()->isReadable(array($_REQUEST['itemid'])) ||
+			get_request('triggerid') && !API::Trigger()->isWritable(array($_REQUEST['triggerid']))) {
+		access_deny();
+	}
 
 	$itemid = get_request('itemid',0);
 

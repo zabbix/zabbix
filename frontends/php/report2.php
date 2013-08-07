@@ -53,6 +53,32 @@ check_fields($fields);
 if (get_request('triggerid') && !API::Trigger()->isReadable(array($_REQUEST['triggerid']))) {
 	access_deny();
 }
+
+$availabilityReportMode = get_request('mode', CProfile::get('web.avail_report.mode', AVAILABILITY_REPORT_BY_HOST));
+CProfile::update('web.avail_report.mode', $availabilityReportMode, PROFILE_TYPE_INT);
+
+// validate permission
+if (get_request('filter_groupid') && !API::HostGroup()->isReadable(array($_REQUEST['filter_groupid'])) ||
+		get_request('filter_hostid') && !API::Host()->isReadable(array($_REQUEST['filter_hostid']))
+	) {
+	access_deny();
+}
+if ($availabilityReportMode) {
+	if (get_request('hostgroupid') && !API::HostGroup()->isReadable(array($_REQUEST['hostgroupid']))) {
+		access_deny();
+	}
+	if (get_request('tpl_triggerid')) {
+		$trigger = API::Trigger()->get(array(
+			'triggerids' => $_REQUEST['tpl_triggerid'],
+			'output' => array('triggerid'),
+			'filter' => array('flags' => null)
+		));
+		if (!$trigger){
+			access_deny();
+		}
+	}
+}
+
 /*
  * Ajax
  */
@@ -75,9 +101,6 @@ if (isset($_REQUEST['filter_rst'])) {
 	$_REQUEST['filter_timesince'] = 0;
 	$_REQUEST['filter_timetill'] = 0;
 }
-
-$availabilityReportMode = get_request('mode', CProfile::get('web.avail_report.mode', AVAILABILITY_REPORT_BY_HOST));
-CProfile::update('web.avail_report.mode', $availabilityReportMode, PROFILE_TYPE_INT);
 
 $config = select_config();
 

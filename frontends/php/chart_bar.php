@@ -61,6 +61,12 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 	check_fields($fields);
 
+	// validate permissions
+	$items = get_request('items',array());
+	if (!API::Item()->isReadable(zbx_objectValues($items,'itemid'))) {
+		access_deny();
+	}
+
 	$config = get_request('config', 1);
 	$title = get_request('title', _('Report'));
 	$xlabel = get_request('xlabel', 'X');
@@ -70,7 +76,6 @@ require_once dirname(__FILE__).'/include/page_header.php';
 	$sorttype = get_request('sorttype', 0);
 
 	if($config == 1){
-		$items = get_request('items', array());
 		$scaletype = get_request('scaletype', TIMEPERIOD_TYPE_WEEKLY);
 
 		$timesince = get_request('report_timesince', time() - SEC_PER_DAY);
@@ -289,7 +294,6 @@ require_once dirname(__FILE__).'/include/page_header.php';
 		}
 	}
 	else if($config == 2){
-		$items = get_request('items',array());
 		$periods = get_request('periods',array());
 
 		$graph = new CBar(GRAPH_TYPE_COLUMN);
@@ -390,9 +394,13 @@ require_once dirname(__FILE__).'/include/page_header.php';
 	}
 	else if($config == 3){
 
-		$items = get_request('items',array());
 		$hostids = get_request('hostids',array());
 		$groupids = get_request('groupids',array());
+
+		// validate permissions
+		if (!API::Host()->isReadable($hostids) || !API::HostGroup()->isReadable($groupids)) {
+			access_deny();
+		}
 
 		$title = get_request('title','Report 2');
 		$xlabel = get_request('xlabel','');

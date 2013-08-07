@@ -30,7 +30,6 @@ require_once dirname(__FILE__).'/include/page_header.php';
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = array(
 	'graphid' =>		array(T_ZBX_INT, O_MAND, P_SYS,		DB_ID,		null),
-	'screenid' =>		array(T_ZBX_STR, O_OPT, P_SYS,		null,		null),
 	'period' =>			array(T_ZBX_INT, O_OPT, P_NZERO,	BETWEEN(ZBX_MIN_PERIOD, ZBX_MAX_PERIOD), null),
 	'stime' =>			array(T_ZBX_STR, O_OPT, P_SYS,		null,		null),
 	'profileIdx' =>		array(T_ZBX_STR, O_OPT, null,		null,		null),
@@ -47,10 +46,6 @@ check_fields($fields);
 /*
  * Permissions
  */
-if (!DBfetch(DBselect('SELECT g.graphid FROM graphs g WHERE g.graphid='.$_REQUEST['graphid']))) {
-	show_error_message(_('No graphs defined.'));
-}
-
 $db_data = API::Graph()->get(array(
 	'graphids' => $_REQUEST['graphid'],
 	'selectHosts' => API_OUTPUT_EXTEND,
