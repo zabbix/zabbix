@@ -61,7 +61,7 @@ class CHistoryManager {
 	 *
 	 * @param array $items  an array of items with the 'itemid' and 'value_type' properties
 	 *
-	 * @return array
+	 * @return array    array of items with item IDs as keys
 	 */
 	public function getItemsWithData(array $items) {
 		$tableItems = array();
@@ -80,7 +80,7 @@ class CHistoryManager {
 			);
 
 			while ($item = DBfetch($query)) {
-				$rs[] = $items[$item['itemid']];
+				$rs[$item['itemid']] = $items[$item['itemid']];
 			}
 		}
 
